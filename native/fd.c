@@ -1,5 +1,12 @@
 #include "factor.h"
 
+void init_io(void)
+{
+	env.user[STDIN_ENV]  = handle(HANDLE_FD,0);
+	env.user[STDOUT_ENV] = handle(HANDLE_FD,1);
+	env.user[STDERR_ENV] = handle(HANDLE_FD,2);
+}
+
 void primitive_close_fd(void)
 {
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
@@ -12,35 +19,52 @@ void primitive_read_line_fd_8(void)
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
 
+	int amount;
+	int i;
+	int ch;
+
 	/* finished line, unicode */
 	SBUF* line = sbuf(LINE_SIZE);
 
 	/* read ascii from fd */
-	STRING* buf = string(LINE_SIZE / 2,'\0');
-
-	int amount;
-	int i;
-	int ch;
+	STRING* buf;
+	if(h->buffer == F)
+		h->buffer = tag_object(string(BUF_SIZE,'\0'));
+	buf = untag_string(h->buffer);
 	
 	for(;;)
 	{
-		amount = read(fd,buf + 1,buf->capacity * 2);
-		if(amount <= 0) /* error or EOF */
-			goto end;
-		else
+		if(h->buf_pos >= h->buf_fill)
 		{
-			for(i = 0; i < amount; i++)
+			amount = read(fd,buf + 1,buf->capacity * 2);
+			
+			if(amount <= 0) /* error or EOF */
 			{
-				ch = bget((CELL)buf + sizeof(STRING) + i);
-				if(ch == '\n')
-					goto end;
+				if(line->top == 0)
+					/* didn't read anything before EOF */
+					env.dt = F;
 				else
-					set_sbuf_nth(line,line->top,ch);
+					env.dt = tag_object(line);
+				return;
 			}
+
+			h->buf_fill = amount;
+			h->buf_pos = 0;
+		}
+
+		for(i = h->buf_pos; i < h->buf_fill; i++)
+		{
+			ch = bget((CELL)buf + sizeof(STRING) + i);
+			if(ch == '\n')
+			{
+				h->buf_pos = i + 1;
+				env.dt = tag_object(line);
+				return;
+			}
+			else
+				set_sbuf_nth(line,line->top,ch);
 		}
 	}
-
-end:	env.dt = tag_object(line);
 }
 
 void primitive_write_fd_8(void)

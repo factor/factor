@@ -78,6 +78,8 @@ void collect_object(void)
 	case SBUF_TYPE:
 		collect_sbuf((SBUF*)scan);
 		break;
+	case HANDLE_TYPE:
+		collect_handle((HANDLE*)scan);
 	}
 	
 	scan += size;

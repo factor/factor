@@ -21,6 +21,8 @@ void relocate_object()
 	case SBUF_TYPE:
 		fixup_sbuf((SBUF*)relocating);
 		break;
+	case HANDLE_TYPE:
+		fixup_handle((HANDLE*)relocating);
 	}
 
 	relocating += size;

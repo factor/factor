@@ -18,6 +18,9 @@ CELL handle(CELL type, CELL object)
 	HANDLE* handle = (HANDLE*)allot_object(HANDLE_TYPE,sizeof(HANDLE));
 	handle->type = type;
 	handle->object = object;
+	handle->buffer = F;
+	handle->buf_fill = 0;
+	handle->buf_pos = 0;
 	return tag_object(handle);
 }
 
@@ -25,4 +28,15 @@ void primitive_handlep(void)
 {
 	check_non_empty(env.dt);
 	env.dt = tag_boolean(typep(HANDLE_TYPE,env.dt));
+}
+
+void fixup_handle(HANDLE* handle)
+{
+	handle->object = -1;
+	fixup(&handle->buffer);
+}
+
+void collect_handle(HANDLE* handle)
+{
+	copy_object(&handle->buffer);
 }

@@ -90,7 +90,7 @@ USE: strings
 
             interpreter-loop
         ] [
-            default-error-handler
+            [ default-error-handler ] when*
         ] catch
     ] [
         f "top-level-continuation" set

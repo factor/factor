@@ -66,4 +66,5 @@ USE: unparser
     init-vocab-styles
     10 "base" set
     print-banner
+    room.
     init-interpreter ;

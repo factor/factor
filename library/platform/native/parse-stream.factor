@@ -29,6 +29,7 @@ IN: parser
 USE: arithmetic
 USE: combinators
 USE: errors
+USE: kernel
 USE: lists
 USE: namespaces
 USE: stack
@@ -63,11 +64,11 @@ USE: streams
 
 : parse-stream ( name stream -- code )
     <namespace> [
-        >r init-parser r> [ (parse) ] read-lines nreverse
+        >r init-parser r> [ room. (parse) ] read-lines nreverse
     ] bind ;
 
 : parse-file ( file -- code )
-    dup "r" <file-stream> parse-stream ;
+    dup <filecr> parse-stream ;
 
 : run-file ( file -- )
     parse-file call ;

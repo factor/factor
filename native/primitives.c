@@ -73,24 +73,21 @@ XT primitives[] = {
 	primitive_getenv,                       /* 69 */
 	primitive_setenv,                       /* 70 */
 	primitive_open_file,                    /* 71 */
-	primitive_read_line_8,                  /* 72 */
-	primitive_write_8,                      /* 73 */
-	primitive_close,                        /* 74 */
-	primitive_flush,                        /* 75 */
-	primitive_gc,                           /* 76 */
-	primitive_save_image,                   /* 77 */
-	primitive_datastack,                    /* 78 */
-	primitive_callstack,                    /* 79 */
-	primitive_set_datastack,                /* 80 */
-	primitive_set_callstack,                /* 81 */
-	primitive_handlep,                      /* 82 */
-	primitive_exit,                         /* 83 */
-	primitive_server_socket,                /* 84 */
-	primitive_close_fd,                     /* 85 */
-	primitive_accept_fd,                    /* 86 */
-	primitive_read_line_fd_8,               /* 87 */
-	primitive_write_fd_8,                   /* 88 */
-	primitive_flush_fd                      /* 89 */
+	primitive_gc,                           /* 72 */
+	primitive_save_image,                   /* 73 */
+	primitive_datastack,                    /* 74 */
+	primitive_callstack,                    /* 75 */
+	primitive_set_datastack,                /* 76 */
+	primitive_set_callstack,                /* 77 */
+	primitive_handlep,                      /* 78 */
+	primitive_exit,                         /* 79 */
+	primitive_server_socket,                /* 80 */
+	primitive_close_fd,                     /* 81 */
+	primitive_accept_fd,                    /* 82 */
+	primitive_read_line_fd_8,               /* 83 */
+	primitive_write_fd_8,                   /* 84 */
+	primitive_flush_fd,                     /* 85 */
+	primitive_room                          /* 86 */
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -36,9 +36,11 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
+USE: stdio
 USE: strings
 USE: vectors
 USE: words
+USE: unparser
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
@@ -90,6 +92,11 @@ USE: words
 
 : java? f ;
 : native? t ;
+
+: room. ( -- )
+    room
+    unparse write " bytes total, " write
+    unparse write " bytes used" print ;
 
 ! No compiler...
 : inline ;

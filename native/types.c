@@ -74,7 +74,6 @@ CELL untagged_object_size(CELL pointer)
 	case F_TYPE:
 	case T_TYPE:
 	case EMPTY_TYPE:
-	case HANDLE_TYPE:
 		size = CELLS * 2;
 		break;
 	case ARRAY_TYPE:
@@ -88,6 +87,9 @@ CELL untagged_object_size(CELL pointer)
 		break;
 	case SBUF_TYPE:
 		size = sizeof(SBUF);
+		break;
+	case HANDLE_TYPE:
+		size = sizeof(HANDLE);
 		break;
 	default:
 		critical_error("Cannot determine size",relocating);

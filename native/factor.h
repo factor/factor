@@ -2,6 +2,7 @@
 #define __FACTOR_H__
 
 #include <errno.h>
+#include <fcntl.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -11,6 +12,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <unistd.h>
 
 #define INLINE inline static
 
@@ -36,13 +38,13 @@
 #include "types.h"
 #include "array.h"
 #include "fd.h"
+#include "file.h"
 #include "fixnum.h"
 #include "cons.h"
 #include "word.h"
 #include "run.h"
 #include "handle.h"
 #include "image.h"
-#include "io.h"
 #include "primitives.h"
 #include "vector.h"
 #include "socket.h"

@@ -44,6 +44,7 @@ DEFER: getenv
 DEFER: setenv
 DEFER: save-image
 DEFER: handle?
+DEFER: room
 
 IN: strings
 DEFER: str=
@@ -51,10 +52,6 @@ DEFER: str-hashcode
 
 IN: io-internals
 DEFER: open-file
-DEFER: read-line-8
-DEFER: write-8
-DEFER: close
-DEFER: flush
 DEFER: server-socket
 DEFER: close-fd
 DEFER: accept-fd
@@ -145,10 +142,6 @@ IN: cross-compiler
         getenv
         setenv
         open-file
-        read-line-8
-        write-8
-        close
-        flush
         garbage-collection
         save-image
         datastack
@@ -163,6 +156,7 @@ IN: cross-compiler
         read-line-fd-8
         write-fd-8
         flush-fd
+        room
     ] [
         swap succ tuck primitive,
     ] each drop ;

@@ -50,3 +50,5 @@ INLINE void bput(CELL where, BYTE what)
 }
 
 bool in_zone(ZONE* z, CELL pointer);
+
+void primitive_room(void);

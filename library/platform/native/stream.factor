@@ -33,40 +33,6 @@ USE: stack
 USE: strings
 USE: namespaces
 
-: <c-stream> ( in out -- stream )
-    #! Create a C stream object, wrapping a pair of FILE*
-    #! handles for input and output.
-    <stream> [
-        "out" set
-        "in" set
-
-        ( str -- )
-        [ "out" get write-8 ] "fwrite" set
-        
-        ( -- str )
-        [ "in" get read-line-8 sbuf>str ] "freadln" set
-        
-        ( -- )
-        [
-            "out" get [ flush ] when*
-        ] "fflush" set
-        
-        ( -- )
-        [
-            "in" get [ close ] when*
-            "out" get [ close ] when*
-        ] "fclose" set
-    ] extend ;
-
-: <file-stream> ( path mode -- stream )
-    open-file dup <c-stream> ;
-
-: <filebr> ( path -- stream )
-    "r" <file-stream> ;
-
-: <filebw> ( path -- stream )
-    "w" <file-stream> ;
-
 : <fd-stream> ( in out -- stream )
     #! Create a file descriptor stream object, wrapping a pair
     #! of file descriptor handles for input and output.
@@ -78,7 +44,9 @@ USE: namespaces
         [ "out" get write-fd-8 ] "fwrite" set
         
         ( -- str )
-        [ "in" get read-line-fd-8 sbuf>str ] "freadln" set
+        [
+            "in" get read-line-fd-8 dup [ sbuf>str ] when
+        ] "freadln" set
         
         ( -- )
         [
@@ -91,6 +59,21 @@ USE: namespaces
             "out" get [ close-fd ] when*
         ] "fclose" set
     ] extend ;
+
+: <file-stream> ( path read? write? -- stream )
+    open-file dup <fd-stream> ;
+
+: <filecr> ( path -- stream )
+    t f <file-stream> ;
+
+: <filecw> ( path -- stream )
+    f t <file-stream> ;
+
+: <filebr> ( path -- stream )
+    t f <file-stream> ;
+
+: <filebw> ( path -- stream )
+    f t <file-stream> ;
 
 : <server> ( port -- stream )
     #! Starts listening on localhost:port. Returns a stream that
