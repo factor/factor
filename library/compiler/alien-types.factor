@@ -72,11 +72,9 @@ USE: words
 
 : c-type ( name -- type )
     global [
-        dup "c-types" get hash dup [
-            nip
-        ] [
-            drop "No such C type: " swap cat2 throw f
-        ] ifte
+        dup "c-types" get hash [
+            "No such C type: " swap cat2 throw f
+        ] ?unless
     ] bind ;
 
 : size ( name -- size )

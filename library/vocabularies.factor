@@ -63,13 +63,9 @@ USE: strings
 : search ( name list -- word )
     #! Search for a word in a list of vocabularies.
     dup [
-        2dup car (search) dup [
-            nip nip ( found )
-        ] [
-            drop cdr search ( check next )
-        ] ifte
+        2dup car (search) [ nip ] [ cdr search ] ?ifte
     ] [
-        2drop f ( not found )
+        2drop f
     ] ifte ;
 
 : <plist> ( name vocab -- plist )
@@ -91,7 +87,7 @@ USE: strings
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup (search) [ nip nip ] [ (create) dup reveal ] ifte* ;
+    2dup (search) [ nip ] [ (create) dup reveal ] ?ifte ;
 
 : forget ( word -- )
     #! Remove a word definition.

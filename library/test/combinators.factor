@@ -2,6 +2,8 @@ IN: scratchpad
 USE: kernel
 USE: math
 USE: test
+USE: stdio
+USE: prettyprint
 
 [ slip ] unit-test-fails
 [ 1 slip ] unit-test-fails
@@ -25,3 +27,9 @@ USE: test
 
 [ 0 ] [ f [ 0 ] unless* ] unit-test
 [ t ] [ t [ "Hello" ] unless* ] unit-test
+
+[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] with-string ] unit-test
+[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] with-string ] unit-test
+[ "4\n" ] [ [ 3 4 [ . ] ?when ] with-string ] unit-test
+[ 3 ] [ 3 f [ . ] ?when ] unit-test
+[ 3 ] [ 3 t [ . ] ?unless ] unit-test

@@ -53,11 +53,7 @@ USE: console
     "smart-terminal" on
     "verbose-compile" on
     "compile" on
-    os "win32" = [
-        "sdl" "shell" set
-    ] [
-        "ansi" "shell" set
-    ] ifte ;
+    os "win32" = "sdl" "ansi" ? "shell" set ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot

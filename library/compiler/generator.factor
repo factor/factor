@@ -62,11 +62,11 @@ SYMBOL: relocation-table
 
 : generate-node ( [ op | params ] -- )
     #! Generate machine code for a node.
-    unswons dup "generator" word-property dup [
-        nip call
+    unswons dup "generator" word-property [
+        call
     ] [
         "No generator" throw
-    ] ifte ;
+    ] ?ifte ;
 
 : generate-code ( word linear -- length )
     compiled-offset >r

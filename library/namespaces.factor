@@ -79,11 +79,11 @@ USE: vectors
 : (get) ( var ns -- value )
     #! Internal word for searching the namestack.
     dup [
-        2dup car hash* dup [
-            nip nip cdr ( found )
+        2dup car hash* [
+            nip cdr ( found )
         ] [
-            drop cdr (get) ( keep looking )
-        ] ifte
+            cdr (get) ( keep looking )
+        ] ?ifte
     ] [
         2drop f
     ] ifte ;
@@ -99,11 +99,7 @@ USE: vectors
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash dup [
-        nip
-    ] [
-        drop >r <namespace> dup r> set
-    ] ifte ;
+    dup namespace hash [ >r <namespace> dup r> set ] ?unless ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the

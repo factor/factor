@@ -47,16 +47,14 @@ SYMBOL: interned-literals
     compiled-offset cell 2 * align set-compiled-offset ; inline
 
 : intern-literal ( obj -- lit# )
-    dup interned-literals get hash dup [
-        nip
-    ] [
-        drop [
+    dup interned-literals get hash [
+        [
             address
             literal-top set-compiled-cell
             literal-top dup cell + set-literal-top
             dup
         ] keep interned-literals get set-hash
-    ] ifte ;
+    ] ?unless ;
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte

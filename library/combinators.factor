@@ -95,3 +95,25 @@ IN: kernel
     #!
     #! This combinator will not compile.
     dup slip forever ;
+
+: ?ifte ( default cond true false -- )
+    #! If cond is true, drop default and apply true
+    #! quotation to cond. Otherwise, drop cond, and apply false
+    #! to default.
+    >r >r dup [
+        nip r> r> drop call
+    ] [
+        drop r> drop r> call
+    ] ifte ; inline
+
+: ?when ( default cond true -- )
+    #! If cond is true, drop default and apply true
+    #! quotation to cond. Otherwise, drop cond, and leave
+    #! default on the stack.
+    >r dup [ nip r> call ] [ r> 2drop ] ifte ; inline
+
+: ?unless ( default cond false -- )
+    #! If cond is true, drop default and leave cond on the
+    #! stack. Otherwise, drop default, and apply false
+    #! quotation to default.
+    >r dup [ nip r> drop ] [ drop r> call ] ifte ; inline

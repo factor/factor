@@ -215,18 +215,10 @@ M: f ' ( obj -- ptr )
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary unit search
-    dup [
-        nip
-    ] [
-        drop "Missing DEFER: " word-error
-    ] ifte ;
+    [ "Missing DEFER: " word-error ] ?unless ;
 
 : fixup-word ( word -- offset )
-    dup pooled-object dup [
-        nip
-    ] [
-        drop "Not in image: " word-error
-    ] ifte ;
+    dup pooled-object [ "Not in image: " word-error ] ?unless ;
 
 : fixup-words ( -- )
     image get [
@@ -272,11 +264,9 @@ M: cons ' ( c -- tagged )
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    dup pooled-object dup [
-        nip
-    ] [
-        drop dup emit-string dup >r pool-object r>
-    ] ifte ;
+    dup pooled-object [
+        dup emit-string dup >r pool-object r>
+    ] ?unless ;
 
 ( Arrays and vectors )
 
@@ -311,12 +301,9 @@ M: vector ' ( vector -- pointer )
 
 M: hashtable ' ( hashtable -- pointer )
     #! Only hashtables are pooled, not vectors!
-    dup pooled-object dup [
-        nip
-    ] [
-        drop [ dup emit-vector [ pool-object ] keep ] keep
-        rehash
-    ] ifte ;
+    dup pooled-object [
+        [ dup emit-vector [ pool-object ] keep ] keep rehash
+    ] ?unless ;
 
 ( End of the image )
 

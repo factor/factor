@@ -191,14 +191,14 @@ SYMBOL: object
     #! error if this is impossible.
     over builtin-supertypes
     over builtin-supertypes
-    intersection dup [
-        nip nip lookup-union
+    intersection [
+        nip lookup-union
     ] [
-        drop [
+        [
             word-name , " and " , word-name ,
             " do not intersect" ,
         ] make-string throw
-    ] ifte ;
+    ] ?ifte ;
 
 : define-promise ( class -- )
     #! A promise is a word that has no effect during

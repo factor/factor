@@ -117,11 +117,7 @@ M: complex unparse ( num -- str )
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [
-        dup ch>ascii-escape dup [
-            nip
-        ] [
-            drop ch>unicode-escape
-        ] ifte
+        dup ch>ascii-escape [ ch>unicode-escape ] ?unless
     ] unless ;
 
 M: string unparse ( str -- str )

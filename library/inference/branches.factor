@@ -111,11 +111,9 @@ SYMBOL: cloned
 : deep-clone ( vector -- vector )
     #! Clone a vector if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assoc dup [
-        nip
-    ] [
-        drop vector-clone [ dup cloned [ acons ] change ] keep
-    ] ifte ;
+    dup cloned get assoc [
+        vector-clone [ dup cloned [ acons ] change ] keep
+    ] ?unless ;
 
 : deep-clone-vector ( vector -- vector )
     #! Clone a vector of vectors.

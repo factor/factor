@@ -46,11 +46,7 @@ USE: unparser
 ! immediately. Otherwise it is appended to the parse tree.
 
 : parsing? ( word -- ? )
-    dup word? [
-        "parsing" word-property
-    ] [
-        drop f
-    ] ifte ;
+    dup word? [ "parsing" word-property ] [ drop f ] ifte ;
 
 : end? ( -- ? )
     "col" get "line" get str-length >= ;
@@ -119,11 +115,7 @@ USE: unparser
 
 : scan-word ( -- obj )
     scan dup [
-        dup "use" get search dup [
-            nip
-        ] [
-            drop str>number
-        ] ifte
+        dup "use" get search [ str>number ] ?unless
     ] when ;
 
 : parsed| ( parsed parsed obj -- parsed )
@@ -131,11 +123,7 @@ USE: unparser
     >r unswons r> cons swap [ swons ] each swons ;
 
 : expect ( word -- )
-    dup scan = not [
-        "Expected " swap cat2 throw
-    ] [
-        drop
-    ] ifte ;
+    dup scan = [ drop ] [ "Expected " swap cat2 throw ] ifte ;
 
 : parsed ( obj -- )
     over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;

@@ -69,11 +69,11 @@ USE: prettyprint
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
-    over "infer" word-property dup [
+    over "infer" word-property [
         swap car ensure-d call drop
     ] [
-        drop consume/produce
-    ] ifte ;
+        consume/produce
+    ] ifte* ;
 
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 throw ;

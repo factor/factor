@@ -94,25 +94,21 @@ SYMBOL: meta-cf
     meta-cf [ [ push-r ] when* ] change ;
 
 : meta-word ( word -- )
-    dup "meta-word" word-property dup [
-        nip call
+    dup "meta-word" word-property [
+        call
     ] [
-        drop dup compound? [
+        dup compound? [
             word-parameter meta-call
         ] [
             host-word
         ] ifte
-    ] ifte ;
+    ] ?ifte ;
 
 : do ( obj -- )
     dup word? [ meta-word ] [ push-d ] ifte ;
 
 : meta-word-1 ( word -- )
-    dup "meta-word" word-property dup [
-        nip call
-    ] [
-        drop host-word
-    ] ifte ;
+    dup "meta-word" word-property [ call ] [ host-word ] ?ifte ;
 
 : do-1 ( obj -- )
     dup word? [ meta-word-1 ] [ push-d ] ifte ;
