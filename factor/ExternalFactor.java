@@ -115,6 +115,29 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		return new FactorStream(client);
 	} //}}}
 
+	//{{{ getVocabularies() method
+	public Cons getVocabularies()
+	{
+		Cons vocabs = super.getVocabularies();
+
+		try
+		{
+			Cons moreVocabs = (Cons)parseObject(eval("vocabs.")).car;
+			while(moreVocabs != null)
+			{
+				String vocab = (String)moreVocabs.car;
+				if(!Cons.contains(vocabs,vocab))
+					vocabs = new Cons(vocab,vocabs);
+				moreVocabs = moreVocabs.next();
+			}
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,e);
+		}
+		return vocabs;
+	} //}}}
+
 	//{{{ searchVocabulary() method
 	/**
 	 * Search through the given vocabulary list for the given word.
@@ -145,6 +168,39 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		{
 			Log.log(Log.ERROR,this,e);
 			return null;
+		}
+	} //}}}
+
+	//{{{ getCompletions() method
+	public void getCompletions(String vocab, String word, List completions,
+		boolean anywhere)
+	{
+		super.getCompletions(vocab,word,completions,anywhere);
+
+		try
+		{
+			/* We can't send words across the socket at this point in
+			human history, because of USE: issues. so we send name/vocab
+			pairs. */
+			Cons moreCompletions = (Cons)parseObject(eval(
+				FactorReader.unparseObject(word)
+				+ " "
+				+ FactorReader.unparseObject(vocab)
+				+ " "
+				+ (anywhere ? "vocab-apropos" : "vocab-completions")
+				+ " [ dup word-name swap word-vocabulary 2list ] map .")).car;
+
+			while(moreCompletions != null)
+			{
+				Cons completion = (Cons)moreCompletions.car;
+				completions.add(searchVocabulary(completion.next(),
+					(String)completion.car));
+				moreCompletions = moreCompletions.next();
+			}
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,e);
 		}
 	} //}}}
 

@@ -79,6 +79,11 @@ USE: unparser
         2drop
     ] ifte ;
 
+: vocab-completions ( substring vocab -- list )
+    #! Used by jEdit plugin. Like vocab-apropos, but only
+    #! matches at the start of a word name are considered.
+    words [ word-name over str-head? ] subset nip ;
+
 : apropos. ( substring -- )
     #! List all words that contain a string.
     vocabs [ dupd vocab-apropos. ] each drop ;

@@ -225,35 +225,6 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(Iterator use, String word, boolean anywhere)
-	{
-		try
-		{
-			List completions = new ArrayList();
-	
-			while(use.hasNext())
-			{
-				String vocab = (String)use.next();
-				getExternalInstance().getCompletions(
-					vocab,word,completions,anywhere);
-			}
-			
-			Collections.sort(completions,
-				new MiscUtilities.StringICaseCompare());
-	
-			return completions;
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	} //}}}
-	
-	//{{{ getCompletions() method
-	/**
-	 * @param anywhere If true, matches anywhere in the word name are
-	 * returned; otherwise, only matches from beginning.
-	 */
 	public static List getCompletions(Cons use, String word, boolean anywhere)
 	{
 		try
@@ -358,14 +329,19 @@ public class FactorPlugin extends EditPlugin
 	private static FactorWord[] findAllWordsNamed(View view, String word)
 		throws Exception
 	{
+		ExternalFactor external = getExternalInstance();
+
 		ArrayList words = new ArrayList();
-		Iterator vocabs = getExternalInstance().getVocabularies();
-		while(vocabs.hasNext())
+
+		Cons vocabs = external.getVocabularies();
+		while(vocabs != null)
 		{
-			Map vocab = (Map)vocabs.next();
-			FactorWord w = (FactorWord)vocab.get(word);
+			String vocab = (String)vocabs.car;
+			FactorWord w = (FactorWord)external.searchVocabulary(
+				new Cons(vocab,null),word);
 			if(w != null)
 				words.add(w);
+			vocabs = vocabs.next();
 		}
 		return (FactorWord[])words.toArray(new FactorWord[words.size()]);
 	} //}}}

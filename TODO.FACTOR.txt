@@ -26,12 +26,12 @@
 
 + listener/plugin:
 
+- listener: if too many things popped off the stack, complain
 - gracefully handle non-working cfactor
 - don't show listener on certain commands
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
-- finish ExternalFactor VocabularyLookup
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:
