@@ -35,10 +35,14 @@ USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
+USE: prettyprint
+USE: random
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: words
+USE: vocabularies
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
@@ -128,8 +132,20 @@ USE: strings
 : init-toplevel ( -- )
     [ "top-level-continuation" set ] callcc0 ;
 
+: (word-of-the-day) ( -- word )
+    vocabs random-element words random-element ;
+
+: word-of-the-day ( -- )
+    #! Something to entertain the poor hacker.
+    (word-of-the-day) dup defined? [
+        "WORD OF THE DAY: " print see
+    ] [
+        drop word-of-the-day
+    ] ifte ;
+
 : init-interpreter ( -- )
     print-banner
+    word-of-the-day
     room.
 
     init-toplevel

@@ -27,41 +27,42 @@
 
 IN: vectors
 USE: arithmetic
+USE: combinators
 USE: kernel
 USE: lists
 USE: stack
 
-: empty-vector ( len -- vec )
-    #! Creates a vector with 'len' elements set to f. Unlike
-    #! <vector>, which gives an empty vector with a certain
-    #! capacity.
-    dup <vector> dup >r set-vector-length r> ;
+: 2vector-nth ( n vec vec -- obj obj )
+    >r over >r vector-nth r> r> vector-nth ;
 
-: vector-empty? ( obj -- ? )
-    vector-length 0 = ;
+: ?vector= ( n vec vec -- ? )
+    #! Reached end?
+    drop vector-length = ;
 
-: vector-clear ( vector -- list )
-    #! Clears a vector.
-    0 swap set-vector-length ;
+: (vector=) ( n vec vec -- ? )
+    3dup ?vector= [
+        3drop t ( reached end without any unequal elts )
+    ] [
+        3dup 2vector-nth = [
+            >r >r succ r> r> (vector=)
+        ] [
+            3drop f
+        ] ifte
+    ] ifte ;
 
-: vector-push ( obj vector -- )
-    #! Push a value on the end of a vector.
-    dup vector-length swap set-vector-nth ;
+: vector-length= ( vec vec -- ? )
+    vector-length swap vector-length = ;
 
-: vector-peek ( vector -- obj )
-    #! Get value at end of vector without removing it.
-    dup vector-length pred swap vector-nth ;
-
-: vector-pop ( vector -- obj )
-    #! Get value at end of vector and remove it.
-    dup vector-length pred ( vector top )
-    2dup swap vector-nth >r swap set-vector-length r> ;
-
-: >pop> ( stack -- stack )
-    dup vector-pop drop ;
-
-DEFER: vector-map
-
-: clone-vector ( vector -- vector )
-    #! Shallow copy of a vector.
-    [ ] vector-map ;
+: vector= ( obj vec -- ? )
+    #! Check if two vectors are equal. Two vectors are
+    #! considered equal if they have the same length and contain
+    #! equal elements.
+    over vector? [
+        2dup vector-length= [
+            0 -rot (vector=)
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;

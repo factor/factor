@@ -203,4 +203,24 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 			return new FactorArray(newArray,top);
 		}
 	} //}}}
+
+	//{{{ equals() method
+	public boolean equals(Object obj)
+	{
+		if(obj instanceof FactorArray)
+		{
+			FactorArray a = (FactorArray)obj;
+			if(a.top != top)
+				return false;
+			for(int i = 0; i < top; i++)
+			{
+				if(!FactorLib.equal(stack[i],a.stack[i]))
+					return false;
+			}
+			
+			return true;
+		}
+		else
+			return false;
+	} //}}}
 }

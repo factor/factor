@@ -158,17 +158,7 @@ public class FactorLib
 	 */
 	public static boolean objectsEqual(Object o1, Object o2)
 	{
-		if(o1 == null)
-		{
-			if(o2 == null)
-				return true;
-			else
-				return false;
-		}
-		else if(o2 == null)
-			return false;
-		else
-			return o1.equals(o2);
+		return (o1 == null ? o2 == null : o1.equals(o2));
 	} //}}}
 
 	//{{{ copy() method

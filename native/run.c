@@ -28,7 +28,7 @@ void run(void)
 	for(;;)
 	{
 		check_stacks();
-		
+
 		if(env.cf == F)
 		{
 			if(cpeek() == empty)

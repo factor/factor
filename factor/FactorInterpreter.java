@@ -186,6 +186,12 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorWord bar = define("builtins","|");
 		bar.parsing = new Bar(bar);
 
+		/* vectors */
+		FactorWord beginVector = define("builtins","{");
+		beginVector.parsing = new BeginVector(beginVector);
+		FactorWord endVector = define("builtins","}");
+		endVector.parsing = new EndVector(beginVector,endVector);
+
 		/* word defs */
 		FactorWord def = define("builtins",":");
 		def.parsing = new Def(def);

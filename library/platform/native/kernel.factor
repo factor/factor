@@ -59,6 +59,7 @@ USE: unparser
         [
             [ number? ] [ number= ]
             [ cons? ] [ cons= ]
+            [ vector? ] [ vector= ]
             [ string? ] [ str= ]
             [ drop t ] [ 2drop f ]
         ] cond

@@ -104,6 +104,7 @@ primitives,
     "/library/platform/native/random.factor"
     "/library/platform/native/stack.factor"
     "/library/platform/native/words.factor"
+    "/library/platform/native/vectors.factor"
     "/library/platform/native/vocabularies.factor"
     "/library/platform/native/unparser.factor"
     "/library/platform/native/cross-compiler.factor"
