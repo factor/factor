@@ -74,8 +74,12 @@ USE: vectors
         [ >fixnum ]
         [ >fixnum ]
         [ drop 0 ]
+        [ drop 0 ]
     } generic ;
 
+
+IN: math DEFER: number= ( defined later... )
+IN: kernel
 : equal? ( obj obj -- ? )
     #! Use = instead.
     {
@@ -95,6 +99,7 @@ USE: vectors
         [ number= ]
         [ number= ]
         [ eq? ]
+        [ eq? ]
     } generic ;
 
 : = ( obj obj -- ? )
@@ -112,31 +117,6 @@ USE: vectors
         [ sbuf? ] [ sbuf-clone ]
         [ drop t ] [ ( return the object ) ]
     ] cond ;
-
-: type-name ( n -- str )
-    [
-        [ 0 | "fixnum" ]
-        [ 1 | "word" ]
-        [ 2 | "cons" ]
-        [ 4 | "ratio" ]
-        [ 5 | "complex" ]
-        [ 6 | "f" ]
-        [ 7 | "t" ]
-        [ 9 | "vector" ]
-        [ 10 | "string" ]
-        [ 11 | "sbuf" ]
-        [ 12 | "port" ]
-        [ 13 | "bignum" ]
-        [ 14 | "float" ]
-        [ 15 | "dll" ]
-        ! These values are only used by the kernel for error
-        ! reporting.
-        [ 100 | "fixnum/bignum" ]
-        [ 101 | "fixnum/bignum/ratio" ]
-        [ 102 | "fixnum/bignum/ratio/float" ]
-        [ 103 | "fixnum/bignum/ratio/float/complex" ]
-        [ 104 | "fixnum/string" ]
-    ] assoc ;
 
 : java? f ;
 : native? t ;

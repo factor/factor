@@ -7,12 +7,12 @@ void primitive_exit(void)
 
 void primitive_os_env(void)
 {
-	char* name = to_c_string(untag_string(dpeek()));
+	char* name = unbox_c_string();
 	char* value = getenv(name);
 	if(value == NULL)
-		drepl(F);
+		dpush(F);
 	else
-		drepl(tag_object(from_c_string(getenv(name))));
+		box_c_string(getenv(name));
 }
 
 void primitive_eq(void)

@@ -14,7 +14,7 @@ void check_compiled_offset(CELL offset)
 
 void primitive_set_compiled_byte(void)
 {
-	CELL offset = to_cell(dpop());
+	CELL offset = unbox_integer();
 	BYTE b = to_fixnum(dpop());
 	check_compiled_offset(offset);
 	bput(offset,b);
@@ -22,7 +22,7 @@ void primitive_set_compiled_byte(void)
 
 void primitive_set_compiled_cell(void)
 {
-	CELL offset = to_cell(dpop());
+	CELL offset = unbox_integer();
 	CELL c = to_fixnum(dpop());
 	check_compiled_offset(offset);
 	put(offset,c);
@@ -30,24 +30,24 @@ void primitive_set_compiled_cell(void)
 
 void primitive_compiled_offset(void)
 {
-	dpush(tag_integer(compiling.here));
+	box_integer(compiling.here);
 }
 
 void primitive_set_compiled_offset(void)
 {
-	CELL offset = to_cell(dpop());
+	CELL offset = unbox_integer();
 	check_compiled_offset(offset);
 	compiling.here = offset;
 }
 
 void primitive_literal_top(void)
 {
-	dpush(tag_integer(literal_top));
+	box_integer(literal_top);
 }
 
 void primitive_set_literal_top(void)
 {
-	CELL offset = to_cell(dpop());
+	CELL offset = unbox_integer();
 	check_compiled_offset(offset);
 	literal_top = offset;
 }

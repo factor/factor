@@ -8,6 +8,9 @@ INLINE ARRAY* untag_bignum(CELL tagged)
 	return (ARRAY*)UNTAG(tagged);
 }
 
+FIXNUM to_integer(CELL x);
+void box_integer(FIXNUM integer);
+FIXNUM unbox_integer(void);
 ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 void primitive_bignum_eq(void);
@@ -28,3 +31,19 @@ void primitive_bignum_greater(void);
 void primitive_bignum_greatereq(void);
 void primitive_bignum_not(void);
 void copy_bignum_constants(void);
+
+INLINE CELL tag_integer(FIXNUM x)
+{
+	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
+		return tag_object(s48_long_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+INLINE CELL tag_cell(CELL x)
+{
+	if(x > FIXNUM_MAX)
+		return tag_object(s48_ulong_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}

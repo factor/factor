@@ -100,6 +100,9 @@ CELL untagged_object_size(CELL pointer)
 	case DLL_TYPE:
 		size = sizeof(DLL);
 		break;
+	case ALIEN_TYPE:
+		size = sizeof(ALIEN);
+		break;
 	default:
 		critical_error("Cannot determine size",relocating);
 		size = -1;/* can't happen */

@@ -45,6 +45,13 @@ DEFER: dlopen
 DEFER: dlsym
 DEFER: dlsym-self
 DEFER: dlclose
+DEFER: <alien>
+DEFER: alien-cell
+DEFER: set-alien-cell
+DEFER: alien-4
+DEFER: set-alien-4
+DEFER: alien-1
+DEFER: set-alien-1
 
 IN: compiler
 DEFER: set-compiled-byte
@@ -347,10 +354,10 @@ IN: image
         dump
         cwd
         cd
-        set-compiled-byte
-        set-compiled-cell
         compiled-offset
         set-compiled-offset
+        set-compiled-cell
+        set-compiled-byte
         literal-top
         set-literal-top
         address-of
@@ -358,6 +365,13 @@ IN: image
         dlsym
         dlsym-self
         dlclose
+        <alien>
+        alien-cell
+        set-alien-cell
+        alien-4
+        set-alien-4
+        alien-1
+        set-alien-1
     ] [
         swap succ tuck primitive,
     ] each drop ;

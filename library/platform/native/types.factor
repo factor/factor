@@ -39,3 +39,32 @@ IN: io-internals : port?    ( obj -- ? ) type-of 12 eq? ;
 IN: math         : bignum?  ( obj -- ? ) type-of 13 eq? ;
 IN: math         : float?   ( obj -- ? ) type-of 14 eq? ;
 IN: alien        : dll?     ( obj -- ? ) type-of 15 eq? ;
+IN: alien        : alien?   ( obj -- ? ) type-of 16 eq? ;
+
+IN: kernel
+
+: type-name ( n -- str )
+    [
+        [ 0 | "fixnum" ]
+        [ 1 | "word" ]
+        [ 2 | "cons" ]
+        [ 4 | "ratio" ]
+        [ 5 | "complex" ]
+        [ 6 | "f" ]
+        [ 7 | "t" ]
+        [ 9 | "vector" ]
+        [ 10 | "string" ]
+        [ 11 | "sbuf" ]
+        [ 12 | "port" ]
+        [ 13 | "bignum" ]
+        [ 14 | "float" ]
+        [ 15 | "dll" ]
+        [ 16 | "alien" ]
+        ! These values are only used by the kernel for error
+        ! reporting.
+        [ 100 | "fixnum/bignum" ]
+        [ 101 | "fixnum/bignum/ratio" ]
+        [ 102 | "fixnum/bignum/ratio/float" ]
+        [ 103 | "fixnum/bignum/ratio/float/complex" ]
+        [ 104 | "fixnum/string" ]
+    ] assoc ;

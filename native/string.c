@@ -71,6 +71,12 @@ STRING* from_c_string(const BYTE* c_string)
 	return s;
 }
 
+/* FFI calls this */
+void box_c_string(const BYTE* c_string)
+{
+	dpush(tag_object(from_c_string(c_string)));
+}
+
 /* untagged */
 BYTE* to_c_string(STRING* s)
 {
@@ -90,6 +96,12 @@ BYTE* to_c_string(STRING* s)
 	c_str[s->capacity] = '\0';
 
 	return c_str;
+}
+
+/* FFI calls this */
+BYTE* unbox_c_string(void)
+{
+	return to_c_string(untag_string(dpop()));
 }
 
 void primitive_string_length(void)

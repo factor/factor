@@ -17,7 +17,9 @@ STRING* string(FIXNUM capacity, CELL fill);
 void hash_string(STRING* str);
 STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill);
 BYTE* to_c_string(STRING* s);
+void box_c_string(const BYTE* c_string);
 STRING* from_c_string(const BYTE* c_string);
+BYTE* unbox_c_string(void);
 
 #define SREF(string,index) ((CELL)string + sizeof(STRING) + index * CHARS)
 

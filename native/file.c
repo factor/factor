@@ -4,7 +4,7 @@ void primitive_open_file(void)
 {
 	bool write = untag_boolean(dpop());
 	bool read = untag_boolean(dpop());
-	char* path = to_c_string(untag_string(dpop()));
+	char* path = unbox_c_string();
 	int mode;
 	int fd;
 
@@ -75,10 +75,10 @@ void primitive_cwd(void)
 	char wd[MAXPATHLEN];
 	if(getcwd(wd,MAXPATHLEN) < 0)
 		io_error(__FUNCTION__);
-	dpush(tag_object(from_c_string(wd)));
+	box_c_string(wd);
 }
 
 void primitive_cd(void)
 {
-	chdir(to_c_string(untag_string(dpop())));
+	chdir(unbox_c_string());
 }

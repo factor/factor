@@ -43,14 +43,14 @@ void primitive_fixnum_add(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_integer(x + y));
+	box_integer(x + y);
 }
 
 void primitive_fixnum_subtract(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_integer(x - y));
+	box_integer(x - y);
 }
 
 /**
@@ -69,7 +69,7 @@ void primitive_fixnum_multiply(void)
 		FIXNUM prod = x * y;
 		/* if this is not equal, we have overflow */
 		if(prod / x == y)
-			dpush(tag_integer(prod));
+			box_integer(prod);
 		else
 		{
 			dpush(tag_object(
@@ -84,7 +84,7 @@ void primitive_fixnum_divint(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_integer(x / y));
+	box_integer(x / y);
 }
 
 void primitive_fixnum_divfloat(void)
@@ -98,8 +98,8 @@ void primitive_fixnum_divmod(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_integer(x / y));
-	dpush(tag_integer(x % y));
+	box_integer(x / y);
+	box_integer(x % y);
 }
 
 void primitive_fixnum_mod(void)

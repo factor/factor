@@ -32,6 +32,7 @@ CELL T;
 #define BIGNUM_TYPE 13
 #define FLOAT_TYPE 14
 #define DLL_TYPE 15
+#define ALIEN_TYPE 16
 
 /* Pseudo-types. For error reporting only. */
 #define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */

@@ -1,36 +1,5 @@
 #include "factor.h"
 
-CELL tag_integer(FIXNUM x)
-{
-	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag_object(s48_long_to_bignum(x));
-	else
-		return tag_fixnum(x);
-}
-
-CELL tag_cell(CELL x)
-{
-	if(x > FIXNUM_MAX)
-		return tag_object(s48_ulong_to_bignum(x));
-	else
-		return tag_fixnum(x);
-}
-
-CELL to_cell(CELL x)
-{
-	switch(type_of(x))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum_fast(x);
-	case BIGNUM_TYPE:
-		/* really need bignum_to_ulong! */
-		return s48_bignum_to_long(untag_bignum(x));
-	default:
-		type_error(INTEGER_TYPE,x);
-		return 0;
-	}
-}
-
 void primitive_arithmetic_type(void)
 {
 	CELL type2 = type_of(dpop());
@@ -52,6 +21,7 @@ void primitive_arithmetic_type(void)
 			type = type2;
 			break;
 		}
+		break;
 	case RATIO_TYPE:
 		switch(type2)
 		{
@@ -63,6 +33,7 @@ void primitive_arithmetic_type(void)
 			type = type2;
 			break;
 		}
+		break;
 	case FLOAT_TYPE:
 		switch(type2)
 		{
@@ -75,6 +46,7 @@ void primitive_arithmetic_type(void)
 			type = type2;
 			break;
 		}
+		break;
 	case COMPLEX_TYPE:
 		switch(type2)
 		{
@@ -88,6 +60,7 @@ void primitive_arithmetic_type(void)
 			type = type2;
 			break;
 		}
+		break;
 	default:
 		type = type1;
 		break;

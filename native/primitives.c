@@ -171,17 +171,24 @@ XT primitives[] = {
 	primitive_dump,
 	primitive_cwd,
 	primitive_cd,
-	primitive_set_compiled_byte,
-	primitive_set_compiled_cell,
 	primitive_compiled_offset,
 	primitive_set_compiled_offset,
+	primitive_set_compiled_cell,
+	primitive_set_compiled_byte,
 	primitive_literal_top,
 	primitive_set_literal_top,
 	primitive_address,
 	primitive_dlopen,
 	primitive_dlsym,
 	primitive_dlsym_self,
-	primitive_dlclose
+	primitive_dlclose,
+	primitive_alien,
+	primitive_alien_cell,
+	primitive_set_alien_cell,
+	primitive_alien_4,
+	primitive_set_alien_4,
+	primitive_alien_1,
+	primitive_set_alien_1
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -106,6 +106,7 @@ USE: words
         bignum=
         float=
         (not-=)
+        (not-=)
     } 2generic ;
 
 : + ( x y -- x+y )
@@ -125,6 +126,7 @@ USE: words
         no-method
         bignum+
         float+
+        no-method
         no-method
     } 2generic ;
 
@@ -146,6 +148,7 @@ USE: words
         bignum-
         float-
         no-method
+        no-method
     } 2generic ;
 
 : * ( x y -- x*y )
@@ -165,6 +168,7 @@ USE: words
         no-method
         bignum*
         float*
+        no-method
         no-method
     } 2generic ;
 
@@ -186,6 +190,7 @@ USE: words
         ratio
         float/f
         no-method
+        no-method
     } 2generic ;
 
 : /i ( x y -- x/y )
@@ -204,6 +209,7 @@ USE: words
         no-method
         no-method
         bignum/i
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -226,6 +232,7 @@ USE: words
         bignum/f
         float/f
         no-method
+        no-method
     } 2generic ;
 
 : mod ( x y -- x%y )
@@ -244,6 +251,7 @@ USE: words
         no-method
         no-method
         bignum-mod
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -266,6 +274,7 @@ USE: words
         bignum/mod
         no-method
         no-method
+        no-method
     } 2generic ;
 
 : bitand ( x y -- x&y )
@@ -284,6 +293,7 @@ USE: words
         no-method
         no-method
         bignum-bitand
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -306,6 +316,7 @@ USE: words
         bignum-bitor
         no-method
         no-method
+        no-method
     } 2generic ;
 
 : bitxor ( x y -- x^y )
@@ -324,6 +335,7 @@ USE: words
         no-method
         no-method
         bignum-bitxor
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -346,6 +358,7 @@ USE: words
         [ bignum-bitnot ]
         [ no-method     ]
         [ no-method     ]
+        [ no-method     ]
     } generic ;
 
 : shift ( x n -- x<<n )
@@ -364,6 +377,7 @@ USE: words
         no-method
         no-method
         bignum-shift
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -386,6 +400,7 @@ USE: words
         bignum<
         float<
         no-method
+        no-method
     } 2generic ;
 
 : <= ( x y -- ? )
@@ -405,6 +420,7 @@ USE: words
         no-method
         bignum<=
         float<=
+        no-method
         no-method
     } 2generic ;
 
@@ -426,6 +442,7 @@ USE: words
         bignum>
         float>
         no-method
+        no-method
     } 2generic ;
 
 : >= ( x y -- ? )
@@ -445,5 +462,6 @@ USE: words
         no-method
         bignum>=
         float>=
+        no-method
         no-method
     } 2generic ;

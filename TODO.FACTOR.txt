@@ -1,3 +1,6 @@
+FFI:
+- is signed -vs- unsigned pointers an issue?
+
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 

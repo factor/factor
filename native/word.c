@@ -45,7 +45,7 @@ void primitive_word_xt(void)
 void primitive_set_word_xt(void)
 {
 	WORD* word = untag_word(dpop());
-	word->xt = to_cell(dpop());
+	word->xt = unbox_integer();
 }
 
 void primitive_word_primitive(void)

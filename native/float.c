@@ -44,9 +44,9 @@ void primitive_str_to_float(void)
 void primitive_float_to_str(void)
 {
 	char tmp[33];
-	snprintf(tmp,32,"%.16g",to_float(dpeek()));
+	snprintf(tmp,32,"%.16g",to_float(dpop()));
 	tmp[32] = '\0';
-	drepl(tag_object(from_c_string(tmp)));
+	box_c_string(tmp);
 }
 
 void primitive_float_to_bits(void)

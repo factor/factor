@@ -1,5 +1,31 @@
 #include "factor.h"
 
+FIXNUM to_integer(CELL x)
+{
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum_fast(x);
+	case BIGNUM_TYPE:
+		return s48_bignum_to_long(untag_bignum(x));
+	default:
+		type_error(INTEGER_TYPE,x);
+		return 0;
+	}
+}
+
+/* FFI calls this */
+void box_integer(FIXNUM integer)
+{
+	dpush(tag_integer(integer));
+}
+
+/* FFI calls this */
+FIXNUM unbox_integer(void)
+{
+	return to_integer(dpop());
+}
+
 ARRAY* to_bignum(CELL tagged)
 {
 	RATIO* r;

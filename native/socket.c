@@ -45,7 +45,7 @@ int make_client_socket(const char* hostname, uint16_t port)
 void primitive_client_socket(void)
 {
 	uint16_t p = (uint16_t)to_fixnum(dpop());
-	char* host = to_c_string(untag_string(dpop()));
+	char* host = unbox_c_string();
 	int sock = make_client_socket(host,p);
 	dpush(tag_object(port(PORT_RECV,sock)));
 	dpush(tag_object(port(PORT_WRITE,sock)));

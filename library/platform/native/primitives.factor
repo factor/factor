@@ -212,10 +212,10 @@ USE: words
     [ dump                   | " obj -- " ]
     [ cwd                    | " -- dir " ]
     [ cd                     | " dir -- " ]
-    [ set-compiled-byte      | " n ptr -- " ]
-    [ set-compiled-cell      | " n ptr -- " ]
     [ compiled-offset        | " -- ptr " ]
     [ set-compiled-offset    | " ptr -- " ]
+    [ set-compiled-cell      | " n ptr -- " ]
+    [ set-compiled-byte      | " n ptr -- " ]
     [ literal-top            | " -- ptr " ]
     [ set-literal-top        | " ptr -- " ]
     [ address-of             | " obj -- ptr " ]
@@ -223,6 +223,13 @@ USE: words
     [ dlsym                  | " name dll -- ptr " ]
     [ dlsym-self             | " name -- ptr " ]
     [ dlclose                | " dll -- " ]
+    [ <alien>                | " ptr len -- alien " ]
+    [ alien-cell             | " alien off -- n " ]
+    [ set-alien-cell         | " n alien off -- " ]
+    [ alien-4                | " alien off -- n " ]
+    [ set-alien-4            | " n alien off -- " ]
+    [ alien-1                | " alien off -- n " ]
+    [ set-alien-1            | " n alien off -- " ]
 ] [
     unswons "stack-effect" swap set-word-property
 ] each
