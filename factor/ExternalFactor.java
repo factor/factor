@@ -68,7 +68,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 				/* Ensure we're ready for a connection immediately */
 				eval("nop");
 			}
-			catch(IOException e)
+			catch(Exception e)
 			{
 				close();
 			}

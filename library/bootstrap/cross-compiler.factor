@@ -314,9 +314,6 @@ IN: image
         swap
         over
         pick
-        nip
-        tuck
-        rot
         >r
         r>
         eq?

@@ -79,12 +79,12 @@ USE: logic
 : (can-kill?) ( literal node -- ? )
     #! Return false if the literal appears as input to this
     #! node, and this node is not a stack operation.
-    "can-kill" [ consumes-literal? not ] apply-dataflow ;
+    2dup consumes-literal? >r produces-literal? r> or not ;
 
 : can-kill? ( literal dataflow -- ? )
     #! Return false if the literal appears in any node in the
     #! list.
-    [ dupd (can-kill?) ] all? nip ;
+    [ dupd "can-kill" [ (can-kill?) ] apply-dataflow ] all? nip ;
 
 : kill-set ( dataflow -- list )
     #! Push a list of literals that may be killed in the IR.
@@ -92,13 +92,14 @@ USE: logic
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch.
-    [ node-param get ] bind [ dupd can-kill? ] all? nip ;
+    2dup consumes-literal? [
+        2drop f
+    ] [
+        [ node-param get ] bind [ dupd can-kill? ] all? nip
+    ] ifte ;
 
 : (kill-node) ( literals node -- )
-    swap [
-        over 2dup consumes-literal? >r produces-literal? r> or
-    ] some?
-    [ drop ] [ , ] ifte ;
+    swap [ over (can-kill?) ] all? [ , ] [ drop ] ifte ;
 
 : kill-node ( literals node -- )
     #! Remove the literals from the node and , it if it is not a
@@ -118,6 +119,10 @@ USE: logic
     [
         node-param [ [ dupd kill-nodes ] map nip ] change
     ] extend , ;
+
+#push [
+    consumes-literal? not
+] "can-kill" set-word-property
 
 #push [
     [ node-param get ] bind ,
@@ -153,11 +158,41 @@ USE: logic
 #drop [ 2drop t ] "can-kill" set-word-property
 #dup [ 2drop t ] "can-kill" set-word-property
 #swap [ 2drop t ] "can-kill" set-word-property
+
+: reduce-stack-op ( literals node map -- node )
+    #! If certain values passing through a stack op are being
+    #! killed, the stack op can be reduced, in extreme cases
+    #! to a no-op.
+    -rot [
+        node-consume-d get [
+            dup cons? [ car over contains? ] [ drop f ] ifte
+        ] map nip
+        swap assoc node-op set
+    ] extend ;
+
 #over [ 2drop t ] "can-kill" set-word-property
+#over [
+    [
+        [ [ f f ] | #over ]
+        [ [ f t ] | #dup ]
+        [ [ t f ] | #nop ]
+        [ [ t t ] | #nop ]
+    ] reduce-stack-op ,
+] "kill-node" set-word-property
+
 #pick [ 2drop t ] "can-kill" set-word-property
-#nip [ 2drop t ] "can-kill" set-word-property
-#tuck [ 2drop t ] "can-kill" set-word-property
-#rot [ 2drop t ] "can-kill" set-word-property
+#pick [
+    [
+        [ [ f f f ] | #pick ]
+        [ [ f f t ] | #over ]
+        [ [ f t f ] | #over ]
+        [ [ f t t ] | #dup ]
+        [ [ t f f ] | #nop ]
+        [ [ t f t ] | #nop ]
+        [ [ t t f ] | #nop ]
+        [ [ t t t ] | #nop ]
+    ] reduce-stack-op ,
+] "kill-node" set-word-property
 
 #>r [ 2drop t ] "can-kill" set-word-property
 #r> [ 2drop t ] "can-kill" set-word-property

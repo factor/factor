@@ -120,9 +120,6 @@ USE: vectors
 #swap [ drop \ swap CALL compiled-offset defer-xt ] "generator" set-word-property
 #over [ drop \ over CALL compiled-offset defer-xt ] "generator" set-word-property
 #pick [ drop \ pick CALL compiled-offset defer-xt ] "generator" set-word-property
-#nip [ drop \ nip CALL compiled-offset defer-xt ] "generator" set-word-property
-#tuck [ drop \ tuck CALL compiled-offset defer-xt ] "generator" set-word-property
-#rot [ drop \ rot CALL compiled-offset defer-xt ] "generator" set-word-property
 #>r [ drop \ >r CALL compiled-offset defer-xt ] "generator" set-word-property
 #r> [ drop \ r> CALL compiled-offset defer-xt ] "generator" set-word-property
 

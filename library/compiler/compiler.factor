@@ -48,19 +48,19 @@ USE: words
 ! <LittleDan> "whose peephole are we optimizing" "your mom's"
 
 : begin-compiling ( word -- definition )
+    "verbose-compile" get [
+        "Compiling " write dup . flush
+    ] when
     cell compile-aligned dup save-xt word-parameter ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    "verbose-compile" get [
-        "Compiling " write dup . flush
-    ] when
-    begin-compiling dataflow ( optimize ) linearize generate ;
+    begin-compiling dataflow optimize linearize generate ;
 
 : precompile ( word -- )
     #! Print linear IR of word.
     [
-        word-parameter dataflow ( optimize ) linearize [.]
+        word-parameter dataflow optimize linearize [.]
     ] with-scope ;
 
 : compile-postponed ( -- )

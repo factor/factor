@@ -59,31 +59,6 @@ void primitive_pick(void)
 	dpush(get(ds - CELLS * 2));
 }
 
-void primitive_nip(void)
-{
-	CELL top = dpop();
-	put(ds,top);
-}
-
-void primitive_tuck(void)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	put(ds - CELLS,top);
-	put(ds,next);
-	dpush(top);
-}
-
-void primitive_rot(void)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	CELL next_next = get(ds - CELLS * 2);
-	put(ds - CELLS * 2,next);
-	put(ds - CELLS,top);
-	put(ds,next_next);
-}
-
 void primitive_to_r(void)
 {
 	cpush(dpop());

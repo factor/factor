@@ -34,22 +34,22 @@ void primitive_to_fixnum(void)
 
 void primitive_fixnum_eq(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x == y);
 }
 
 void primitive_fixnum_add(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x + y);
 }
 
 void primitive_fixnum_subtract(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x - y);
 }
 
@@ -59,8 +59,8 @@ void primitive_fixnum_subtract(void)
  */
 void primitive_fixnum_multiply(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 
 	if(x == 0 || y == 0)
 		dpush(tag_fixnum(0));
@@ -82,51 +82,51 @@ void primitive_fixnum_multiply(void)
 
 void primitive_fixnum_divint(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x / y);
 }
 
 void primitive_fixnum_divfloat(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_object(make_float((double)x / (double)y)));
 }
 
 void primitive_fixnum_divmod(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x / y);
 	box_integer(x % y);
 }
 
 void primitive_fixnum_mod(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x % y));
 }
 
 void primitive_fixnum_and(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x & y));
 }
 
 void primitive_fixnum_or(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x | y));
 }
 
 void primitive_fixnum_xor(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x ^ y));
 }
 
@@ -137,8 +137,8 @@ void primitive_fixnum_xor(void)
  */
 void primitive_fixnum_shift(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 
 	if(y < 0)
 	{
@@ -172,35 +172,35 @@ void primitive_fixnum_shift(void)
 
 void primitive_fixnum_less(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x < y);
 }
 
 void primitive_fixnum_lesseq(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x <= y);
 }
 
 void primitive_fixnum_greater(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x > y);
 }
 
 void primitive_fixnum_greatereq(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	FIXNUM x = to_fixnum(dpop());
+	FIXNUM y = untag_fixnum_fast(dpop());
+	FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x >= y);
 }
 
 void primitive_fixnum_not(void)
 {
-	drepl(tag_fixnum(~to_fixnum(dpeek())));
+	drepl(tag_fixnum(~untag_fixnum_fast(dpeek())));
 }
 
 /* FFI calls this */

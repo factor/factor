@@ -60,9 +60,8 @@ SYMBOL: #dup
 SYMBOL: #swap
 SYMBOL: #over
 SYMBOL: #pick
-SYMBOL: #nip
-SYMBOL: #tuck
-SYMBOL: #rot
+
+SYMBOL: #nop
 
 SYMBOL: #>r
 SYMBOL: #r>

@@ -75,10 +75,10 @@ USE: words
         drop
         drop
         drop
-    } generic fixnum+ ; compiled
+    } generic + ; compiled
 
 [ 5 ] [ 2 3 4 generic-test-alt ] unit-test
-[ 3 ] [ 2 3 3/2 generic-test-alt ] unit-test
+[ 7/2 ] [ 2 3 3/2 generic-test-alt ] unit-test
 
 DEFER: generic-test-2
 

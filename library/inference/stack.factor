@@ -59,6 +59,3 @@ USE: namespaces
 \ swap #swap meta-infer
 \ over #over meta-infer
 \ pick #pick meta-infer
-\ nip #nip meta-infer
-\ tuck #tuck meta-infer
-\ rot #rot meta-infer

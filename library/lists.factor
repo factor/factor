@@ -47,7 +47,7 @@ USE: vectors
     #! from first occurrence where it is true, or return f.
     over [
         dup >r over >r >r car r> call [
-            r> r> drop
+            r> r> 2drop t
         ] [
             r> cdr r> some?
         ] ifte
