@@ -83,6 +83,13 @@ BEGIN-STRUCT: format
     FIELD: uchar  alpha
 END-STRUCT
 
+BEGIN-STRUCT: rect
+    FIELD: short   clip-x
+    FIELD: short   clip-y
+    FIELD: ushort   clip-w
+    FIELD: ushort   clip-h
+END-STRUCT
+
 BEGIN-STRUCT: surface
     FIELD: uint    flags
     FIELD: format* format
@@ -94,8 +101,8 @@ BEGIN-STRUCT: surface
     FIELD: void*   hwdata
     FIELD: short   clip-x
     FIELD: short   clip-y
-    FIELD: short   clip-w
-    FIELD: short   clip-h
+    FIELD: ushort   clip-w
+    FIELD: ushort   clip-h
     FIELD: uint    unused1
     FIELD: uint    locked
     FIELD: int     map
@@ -143,6 +150,10 @@ END-STRUCT
     "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
 
 ! SDL_SetGamma: float types
+
+: SDL_FillRect ( surface rect color -- n )
+    "int" "sdl" "SDL_FillRect"
+    [ "surface*" "rect*" "unint" ] alien-call ;
 
 : SDL_LockSurface ( surface -- )
     "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;

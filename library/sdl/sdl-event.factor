@@ -89,6 +89,10 @@ BEGIN-STRUCT: keyboard-event
     FIELD: uchar type  ! SDL_KEYDOWN or SDL_KEYUP
     FIELD: uchar which ! The keyboard device index
     FIELD: uchar state ! SDL_PRESSED or SDL_RELEASED
+    ! YUCK!
+    FIELD: uchar pad
+    FIELD: uchar pad
+    FIELD: uchar pad
     ! Later: inline structs
     FIELD: uchar scancode
     FIELD: int sym
@@ -109,8 +113,8 @@ END-STRUCT
 BEGIN-STRUCT: button-event
 	FIELD: uchar type    ! SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
 	FIELD: uchar which   ! The mouse device index
-	FIELD: uchar button; ! The mouse button index
-	FIELD: uchar state;  ! SDL_PRESSED or SDL_RELEASED
+	FIELD: uchar button  ! The mouse button index
+	FIELD: uchar state   ! SDL_PRESSED or SDL_RELEASED
 	FIELD: ushort x
     FIELD: ushort y      ! The X/Y coordinates of the mouse at press time
 END-STRUCT

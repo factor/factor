@@ -60,6 +60,7 @@ USE: words
 : 2>rect ( x y -- x:re x:im y:re y:im ) >r >rect r> >rect ;
 
 : complex= ( x y -- ? ) 2>rect 2= ;
+
 : complex+ ( x y -- x+y ) 2>rect swapd + >r + r> rect> ;
 : complex- ( x y -- x-y ) 2>rect swapd - >r - r> rect> ;
 : complex*re ( x y -- zx:re * y:re x:im * r:im )
