@@ -1,0 +1,72 @@
+contains ==> contains?
+
+.s: needs nreverse
+
+{...} vectors
+better .s
+
++ native:
+
+- partition, sort
+- describe-word
+- need hashtable inspection too
+- clone-sbuf
+- parsing should be parsing
+- inspector:
+       sort
+           partition
+- vocab inspecting ==> worddef>list, assumes . on a list works
+
++ interactive:
+
+- words. should output in a nicer form
+- inspector links when describe called without object path
+- 'cascading' styles
+
++ math:
+
+- FactorLib.equal() not very good
+- IN: format base: work with all types of numbers
+
++ listener:
+
+- link style lingers
+- back space then type: input style gone
+- fedit broken with listener
+- press enter in the middle of a line
+- print-numbered-list
+- new-listener shouldn't suspend continuation in current listener
+
++ compiler:
+
+- tail call optimization broken again
+- don't compile inline words
+- recursive words with code after ifte
+- less unnecessary args to auxiliary methods
+- inlining tail-recursive immediates
+- direct stack access leaks memory on stack
+- unnecessary local allocation: max is instance var, but several methods
+  get compiled.
+
++ misc:
+
+- should i -i inf -inf be parsing words?
+- fix multithreading
+- errors at startup not handled properly
+- namespace clone drops static var bindings
+- ditch map
+- ditch expand
+- try/catch
+- set-object-path
+- more readable traces
+
++ httpd:
+
+- httpd: don't flush so much
+- log with date
+- log user agent
+- add a socket timeout
+- if a directory is requested and URL does not end with /, redirect
+- return more header fields, like Content-Length, Last-Modified, and so on
+- HEAD request
+- basic authentication, using httpdAuth function from a config file

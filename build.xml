@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+
+<!--
+     Lets get high!
+-->
+
+<project name="SmokedOut" default="dist" basedir=".">
+
+	<target name="compile">
+		<javac
+			srcdir="."
+			destdir="."
+			deprecation="on"
+			includeJavaRuntime="yes"
+			debug="true"
+			optimize="true"
+		>
+		<include name="**/*.java"/>
+		</javac>
+	</target>
+	<target name="dist" depends="compile">
+		<jar
+			jarfile="Factor.jar"
+			manifest="Factor.manifest"
+			compress="true"
+		>
+			<fileset dir=".">
+				<include name="factor/*.java"/>
+				<include name="factor/**/*.java"/>
+				<include name="factor/*.class"/>
+				<include name="factor/*.factor"/>
+				<include name="factor/*.fasl"/>
+				<include name="factor/**/*.factor"/>
+				<include name="factor/**/*.class"/>
+				<include name="library/**/*.factor"/>
+				<include name="org/**/*.java"/>
+				<include name="org/**/*.class"/>
+				<include name="*.factor"/>
+				<include name="*.lsa"/>
+				<include name="Factor.manifest"/>
+			</fileset>
+		</jar>
+	</target>
+	<target name="clean" description="Clean old stuff.">
+		<delete>
+			<fileset dir="." includes="**/*.class"/>
+			<fileset dir="." includes="**/*.fasl"/>
+			<fileset dir="." includes="**/*~" defaultexcludes="no"/>
+			<fileset dir="." includes="**/#*#" defaultexcludes="no"/>
+			<fileset dir="." includes="**/*.rej"/>
+			<fileset dir="." includes="**/*.orig"/>
+			<fileset dir="." includes="**/.*.swp"/>
+			<fileset dir="." includes="**/.#*"/>
+			<fileset dir="." includes="**/.new*"/>
+			<fileset dir="." includes="**/.directory"/>
+		</delete>
+	</target>
+
+</project>
