@@ -62,12 +62,12 @@ USE: console
 [
     warm-boot
     garbage-collection
-    init-smart-terminal
     run-user-init
     "graphical" get [
         start-console
     ] [
         "interactive" get [
+            init-smart-terminal
             print-banner listener
         ] when
     ] ifte
@@ -120,6 +120,9 @@ os "win32" = "compile" get and [
     "gdi32"    "gdi32.dll"    "stdcall" add-library
     "libc"     "msvcrt.dll"   "cdecl"   add-library
 ] when
+
+! FIXME: KLUDGE to get FFI-based IO going in Windows.
+os "win32" = [ "/library/bootstrap/win32-io.factor" run-resource ] when
 
 "Compiling system..." print
 "compile" get [ compile-all ] when

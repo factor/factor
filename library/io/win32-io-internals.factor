@@ -61,11 +61,11 @@ SYMBOL: callbacks
 
 : get-access ( -- file-mode )
     "file-mode" get uncons 
-    [ GENERIC_WRITE ] [ 0 ] ifte >r
-    [ GENERIC_READ ] [ 0 ] ifte r> bitor ;
+    GENERIC_WRITE 0 ? >r
+    GENERIC_READ 0 ? r> bitor ;
 
 : get-sharemode ( -- share-mode )
-    FILE_SHARE_READ FILE_SHARE_WRITE bitor FILE_SHARE_DELETE bitor ;
+     FILE_SHARE_READ FILE_SHARE_WRITE bitor ;
 
 : get-create ( -- creation-disposition )
     "file-mode" get uncons [

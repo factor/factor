@@ -1,20 +1,16 @@
 #include "../factor.h"
 
-DLL *ffi_dlopen (F_STRING *path)
+void ffi_dlopen (DLL *dll)
 {
 #ifdef FFI
 	HMODULE module;
-	DLL *dll;
 
-	module = LoadLibrary(to_c_string(path));
+	module = LoadLibrary(to_c_string(untag_string(dll->path)));
 
 	if (!module)
 		general_error(ERROR_FFI, tag_object(last_error()));
 
-	dll = allot_object(DLL_TYPE, sizeof(DLL));
 	dll->dll = module;
-
-	return dll;
 #else
 	general_error(ERROR_FFI_DISABLED, F);
 #endif

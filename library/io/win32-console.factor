@@ -39,6 +39,7 @@ USE: generic
 USE: parser
 USE: compiler
 USE: win32-api
+USE: win32-stream
 
 TRAITS: win32-console-stream
 SYMBOL: handle
@@ -82,7 +83,7 @@ M: win32-console-stream fwrite-attr ( string style stream -- )
     ] bind ;
 
 C: win32-console-stream ( stream -- stream )
-    [ delegate set -11 GetStdHandle handle set ] extend ;
+    [ -11 GetStdHandle handle set delegate set ] extend ;
 
 global [ [ <win32-console-stream> ] smart-term-hook set ] bind
 

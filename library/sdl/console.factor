@@ -241,7 +241,7 @@ M: alien handle-event ( event -- ? )
     SDL_EnableKeyRepeat drop ;
 
 : console-loop ( -- )
-    yield check-event [ console-loop ] when ;
+    check-event [ console-loop ] when ;
 
 : console-quit ( -- )
     redraw-continuation off
@@ -261,7 +261,7 @@ SYMBOL: escape-continuation
 
         [
             console get swap <console-stream>
-            [ [ print-banner listener ] in-thread ] with-stream
+            [ print-banner listener ] with-stream
             SDL_Quit
             ( return from start-console word )
             escape-continuation get call
