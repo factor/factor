@@ -1,4 +1,4 @@
-72/73:
+73:
 
 - update plugin docs
 - word preview for remote words
@@ -22,8 +22,6 @@
 - fix checkbox alignment
 - each-slot combinator
 - references primitive
-- resize window: world not updated until mouse moved
-- x>offset
 - fix completion invoke in middle of word
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole

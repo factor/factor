@@ -16,7 +16,7 @@ M: resize-event handle-event ( event -- )
     dup resize-event-w swap resize-event-h
     [ world get resize-gadget ] 2keep
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
-    world get redraw ;
+    world get relayout ;
 
 : button-gesture ( button gesture -- [ gesture button ] )
     swap unit append my-hand hand-clicked handle-gesture drop ;

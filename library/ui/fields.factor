@@ -32,19 +32,37 @@ C: editor ( text -- )
     dup editor-caret unparent
     dup black foreground set-paint-property relayout ;
 
-: offset>x ( offset editor -- x )
-    editor-line [ line-text get ] bind str-head
-    font get swap
-    size-string drop ;
+: offset>x ( offset str -- x )
+    str-head font get swap size-string drop ;
+
+: run-char-widths ( str -- wlist )
+    #! List of x co-ordinates of each character.
+    0 swap str>list
+    [ ch>str shape-w [ + dup ] keep 2 /i - ] map nip ;
+
+: (x>offset) ( n x wlist -- offset )
+    dup [
+        uncons >r over > [
+            r> 2drop
+        ] [
+            >r 1 + r> r> (x>offset)
+        ] ifte
+    ] [
+        2drop
+    ] ifte ;
+
+: x>offset ( x str -- offset )
+    0 -rot run-char-widths (x>offset) ;
 
 : caret-pos ( editor -- x y )
-    dup editor-line [ caret get ] bind swap offset>x 0 ;
+    editor-line [ caret get line-text get ] bind offset>x 0 ;
 
 : caret-size ( editor -- w h )
     0 swap shape-h ;
 
 M: editor layout* ( field -- )
-    dup [ editor-text dup shape-w swap shape-h ] keep resize-gadget
+    dup [ editor-text dup shape-w swap shape-h ] keep
+    resize-gadget
     dup editor-caret over caret-size rot resize-gadget
     dup editor-caret swap caret-pos rot move-gadget ;
 
@@ -60,8 +78,13 @@ M: editor draw-shape ( label -- )
 M: field user-input* ( ch field -- ? )
     [ insert-char ] with-field-editor f ;
 
+: set-caret-x ( x field -- )
+    #! Move the caret to a clicked location.
+    [ line-text get x>offset caret set ] with-field-editor ;
+
 : click-field ( field -- )
-    my-hand request-focus ;
+    my-hand dup shape-x pick field-editor screen-pos shape-x -
+    pick set-caret-x  request-focus ;
 
 : field-gestures ( -- hash )
     {{

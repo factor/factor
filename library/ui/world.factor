@@ -21,8 +21,8 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : my-hand ( -- hand ) world get world-hand ;
 
-: draw-world ( -- )
-    world get dup gadget-redraw? [
+: draw-world ( world -- )
+    dup gadget-redraw? [
         dup world-hand update-hand [
             f over set-gadget-redraw?
             dup draw-gadget
@@ -34,20 +34,26 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 DEFER: handle-event
 
-: layout-world world get dup layout world-hand update-hand ;
+: layout-world ( world -- ) dup layout world-hand update-hand ;
 
-: eat-events ( event -- )
+: world-step ( world -- ? )
+    dup world-running? [
+        dup layout-world draw-world  t
+    ] [
+        drop f
+    ] ifte ;
+
+: eat-events ( event -- ? )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
     dup SDL_PollEvent [
         dup handle-event eat-events
     ] [
-        SDL_WaitEvent
+        world get world-step [ SDL_WaitEvent ] [ drop f ] ifte
     ] ifte ;
 
 : run-world ( -- )
-    world get world-running? [
-        layout-world draw-world
+    world get world-step [
         <event> dup eat-events [
             handle-event run-world
         ] [
@@ -75,6 +81,6 @@ global [
         [[ bevel-1    [ 224 224 255 ] ]]
         [[ bevel-2    [ 192 192 216 ] ]]
         [[ bevel-up?  t ]]
-        [[ font       [[ "Sans Serif" 14 ]] ]]
+        [[ font       [[ "Sans Serif" 16 ]] ]]
     }} world get set-gadget-paint
 ] bind
