@@ -81,35 +81,3 @@ void primitive_heap_stats(void)
 
 	dpush(list);
 }
-
-void primitive_instances(void)
-{
-	CELL list = F;
-	CELL search_type = to_fixnum(dpop());
-	CELL here;
-
-	primitive_gc();
-
-	here = active.here;
-
-	begin_heap_scan();
-	
-	for(;;)
-	{
-		CELL size, type;
-		CELL obj = heap_step(&size,&type);
-
-		if(walk_donep())
-			break;
-
-		/* don't want an infinite loop if we ask for a list of all
-		conses in the image! */
-		if(heap_scan_ptr >= here)
-			break;
-
-		if(search_type == type)
-			list = cons(obj,list);
-	}
-
-	dpush(list);
-}

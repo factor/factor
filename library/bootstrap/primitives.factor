@@ -200,7 +200,6 @@ vocabularies get [
     [ "<tuple>" "kernel-internals"            [ [ number ] [ tuple ] ] ]
     [ ">array" "kernel-internals"             [ [ object ] [ array ] ] ]
     [ ">tuple" "kernel-internals"             [ [ object ] [ tuple ] ] ]
-    [ "(instances)" "memory"                  [ [ integer ] [ general-list ] ] ]
     [ "begin-scan" "memory"                   [ [ ] [ ] ] ]
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
     [ "end-scan" "memory"                     [ [ ] [ object ] ] ]                         
