@@ -193,6 +193,8 @@ public class FactorInterpreter implements FactorObject, Runnable
 		ine.parsing = new Ine(def,ine);
 		FactorWord shuffle = define("syntax","~<<");
 		shuffle.parsing = new Shuffle(shuffle,">>~");
+		FactorWord symbol = define("syntax","SYMBOL:");
+		symbol.parsing = new Symbol(symbol);
 
 		/* reading numbers with another base */
 		FactorWord bin = define("syntax","BIN:");

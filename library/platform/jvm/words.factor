@@ -51,17 +51,20 @@ USE: stack
 : redefine ( word def -- )
     swap [ "def" set ] bind ;
 
-: word? ( obj -- boolean )
+: word? ( obj -- ? )
     "factor.FactorWord" is ;
 
-: compiled? ( worddef -- boolean )
+: compiled? ( worddef -- ? )
     "factor.compiler.CompiledDefinition" is ;
 
-: compound? ( worddef -- boolean )
+: compound? ( worddef -- ? )
     "factor.FactorCompoundDefinition" is ;
 
 : compound-or-compiled? ( worddef -- ? )
     dup compiled? swap compound? or ;
+
+: symbol? ( worddef -- ? )
+    "factor.FactorSymbolDefinition" is ;
 
 : comment? ( obj -- ? )
     "factor.FactorDocComment" is ;

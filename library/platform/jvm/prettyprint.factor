@@ -62,5 +62,6 @@ USE: words
         [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
         [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]
         [ primitive? ] [ "PRIMITIVE: " write unparse write drop ]
+        [ symbol? ] [ "SYMBOL: " write drop unparse write ]
         [ drop t ] [ 2drop "Not defined" write ]
     ] cond prettyprint-newline ;
