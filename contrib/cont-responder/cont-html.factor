@@ -270,6 +270,7 @@ USE: logic
 [ 
   "input" 
   "br" 
+  "link"
 ] [ define-open-html-word ] each
 
 ! Define some attributes
@@ -277,5 +278,5 @@ USE: logic
   "method" "action" "type" "value" "name" 
   "size" "href" "class" "border" "rows" "cols" 
   "id" "onclick" "style" "valign" "accesskey"
-  "src" "language" "colspan" "onchange"
+  "src" "language" "colspan" "onchange" "rel"
 ] [ define-attribute-word ] each 

@@ -40,6 +40,18 @@ USE: html
     <body> [ call ] </body>
   ] </html> ;
 
+: styled-page ( title stylesheet-quot quot -- )
+  #! Call the quotation, with all output going to the
+  #! body of an html page with the given title. stylesheet-quot
+  #! is called to generate the required stylesheet.
+  <html> [ 
+    <head> [ 
+      <title> [ rot write ] </title> 
+      swap call 
+    ] </head> 
+    <body> [ call ] </body>
+  ] </html> ;
+
 : paragraph ( str -- )
   #! Output the string as an html paragraph
   <p> [ write ] </p> ;
