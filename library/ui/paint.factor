@@ -35,8 +35,12 @@ TUPLE: hollow-rect delegate ;
 C: hollow-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-hollow-rect-delegate ] keep ;
 
+: hollow-rect ( shape -- )
+    #! Draw a hollow rect with the bounds of an arbitrary shape.
+    rect>screen >r 1 - r> 1 - fg rgb rectangleColor ;
+
 M: hollow-rect draw-shape ( rect -- )
-    >r surface get r> rect>screen fg rgb rectangleColor ;
+    >r surface get r> hollow-rect ;
 
 ! A rectangle that is filled.
 TUPLE: plain-rect delegate ;
@@ -44,8 +48,12 @@ TUPLE: plain-rect delegate ;
 C: plain-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-plain-rect-delegate ] keep ;
 
+: plain-rect ( shape -- )
+    #! Draw a filled rect with the bounds of an arbitrary shape.
+    rect>screen bg rgb boxColor ;
+
 M: plain-rect draw-shape ( rect -- )
-    >r surface get r> rect>screen bg rgb boxColor ;
+    >r surface get r> plain-rect ;
 
 ! A rectangle that is filled, and has a visible outline.
 TUPLE: etched-rect delegate ;
@@ -54,9 +62,7 @@ C: etched-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-etched-rect-delegate ] keep ;
 
 M: etched-rect draw-shape ( rect -- )
-    >r surface get r> 2dup
-    rect>screen bg rgb boxColor
-    rect>screen fg rgb rectangleColor ;
+    >r surface get r> 2dup plain-rect hollow-rect ;
 
 ! A rectangle that has a visible outline only if the rollover
 ! paint property is set.
@@ -68,11 +74,8 @@ C: roll-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-roll-rect-delegate ] keep ;
 
 M: roll-rect draw-shape ( rect -- )
-    rollover? get [
-        >r surface get r> rect>screen fg rgb rectangleColor
-    ] [
-        drop
-    ] ifte ;
+    >r surface get r> 2dup
+    plain-rect rollover? get [ hollow-rect ] [ 2drop ] ifte ;
 
 M: line draw-shape ( line -- )
     >r surface get r>
@@ -136,8 +139,8 @@ SYMBOL: clip
 : screen-bounds ( shape -- rect )
     [ shape-x x get + ] keep
     [ shape-y y get + ] keep
-    [ shape-w 1 + ] keep
-    shape-h 1 +
+    [ shape-w ] keep
+    shape-h
     <rectangle> ;
 
 : clip-rect ( x1 x2 y1 y2 -- rect )

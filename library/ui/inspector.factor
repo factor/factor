@@ -1,11 +1,17 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: gadgets generic hashtables kernel kernel-internals lists
-namespaces unparser vectors words ;
+USING: errors gadgets generic hashtables kernel kernel-internals
+lists namespaces strings unparser vectors words ;
 
 : label-box ( list -- gadget )
     <line-pile> swap [ <presentation> over add-gadget ] each ;
+
+: unparse* ( obj -- str ) dup string? [ unparse ] unless ;
+
+: sort-sheet ( assoc -- assoc )
+    #! Sort an association list whose keys are arbitrary objects
+    [ 2car swap unparse* swap unparse* str-lexi> ] sort ;
 
 : alist>sheet ( assoc -- sheet )
     unzip swap
@@ -28,7 +34,7 @@ namespaces unparser vectors words ;
     ] map-with ;
 
 : slot-sheet ( obj -- sheet )
-    object>alist alist>sheet "Slots:" <titled> ;
+    object>alist sort-sheet alist>sheet "Slots:" <titled> ;
 
 GENERIC: custom-sheet ( obj -- gadget )
 
@@ -36,7 +42,8 @@ GENERIC: custom-sheet ( obj -- gadget )
     0 default-gap 0 <pile>
     over top-sheet over add-gadget
     over slot-sheet over add-gadget
-    swap custom-sheet over add-gadget ;
+    swap custom-sheet over add-gadget
+    line-border dup moving-actions ;
 
 M: object custom-sheet drop <empty-gadget> ;
 
@@ -50,7 +57,7 @@ M: vector custom-sheet ( array -- gadget )
     "Elements:" <titled> ;
 
 M: hashtable custom-sheet ( array -- gadget )
-    hash>alist alist>sheet "Entries:" <titled> ;
+    hash>alist sort-sheet alist>sheet "Entries:" <titled> ;
 
 M: word custom-sheet ( word -- gadget )
     word-props <inspector> empty-border "Properties:" <titled> ;
@@ -62,7 +69,25 @@ M: tuple custom-sheet ( tuple -- gadget )
         <empty-gadget>
     ] ifte* ;
 
-: inspect ( obj -- )
-    <inspector> ( <scroller> )
-    line-border dup moving-actions world get add-gadget ;
+! We ensure that only one inspector is open for each object.
+SYMBOL: inspectors
 
+: ensure-ui
+    world get dup [ world-running? ] when [
+        "Inspector cannot be used if UI not running." throw
+    ] unless ;
+
+: inspector ( obj -- gadget )
+    #! Return an existing inspector gadget for this object, or
+    #! create a new one.
+    dup inspectors get assq [
+        dup <inspector>
+        [ swap inspectors [ acons ] change ] keep
+    ] ?unless ;
+
+: inspect ( obj -- )
+    #! Show an inspector for the object. The inspector lists
+    #! slots and entries in collections.
+    ensure-ui global [ inspector world get add-gadget ] bind ;
+
+global [ inspectors off ] bind

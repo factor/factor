@@ -177,6 +177,7 @@ cpu "x86" = "mini" get not and [
         "/library/ui/halo.factor"
         "/library/ui/labels.factor"
         "/library/ui/buttons.factor"
+        "/library/ui/checkboxes.factor"
         "/library/ui/line-editor.factor"
         "/library/ui/editors.factor"
         "/library/ui/dialogs.factor"

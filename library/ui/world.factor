@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math memory namespaces sdl
-sdl-event sdl-video stdio strings threads ;
+USING: alien errors generic kernel lists math memory namespaces
+sdl sdl-event sdl-video stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -55,6 +55,12 @@ DEFER: handle-event
     ] [
         drop world get world-step [ yield run-world ] when
     ] ifte ;
+
+: ensure-ui ( -- )
+    #! Raise an error if the UI is not running.
+    world get dup [ world-running? ] when [
+        "Inspector cannot be used if UI not running." throw
+    ] unless ;
 
 global [
     

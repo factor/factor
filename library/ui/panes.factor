@@ -78,5 +78,7 @@ M: pane stream-close ( stream -- ) drop ;
 
 : <console-pane> ( -- pane )
     <pane> dup [
-        [ print-banner listener ] in-thread
+        [
+            clear  print-banner listener
+        ] in-thread
     ] with-stream ;

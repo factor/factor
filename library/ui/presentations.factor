@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: kernel lists unparser ;
+USING: kernel lists namespaces prettyprint stdio unparser ;
 
 DEFER: inspect
 
@@ -15,15 +15,14 @@ DEFER: inspect
         [[ "Inspect" [ inspect ] ]]
     ] actionize ;
 
-TUPLE: presentation object delegate ;
+: press-presentation ( presentation obj -- )
+    #! Called when mouse is pressed over a presentation.
+    swap button-update  object-menu <menu> show-menu ;
 
-: presentation-actions ( presentation -- )
-    dup
-    [ drop ] [ button-up 1 ] set-action
-    [ presentation-object object-menu <menu> show-menu ]
+: presentation-actions ( presentation obj -- )
+    [ literal, \ press-presentation , ] make-list
     [ button-down 1 ] set-action ;
 
-C: presentation ( obj -- gadget )
-    over unparse <roll-label> over set-presentation-delegate
-    [ set-presentation-object ] keep
-    dup presentation-actions ;
+: <presentation> ( obj -- gadget )
+    dup unparse [ drop ] <roll-button>
+    [ swap  presentation-actions ] keep ;

@@ -6,14 +6,11 @@
 
 + ui:
 
-- inspector: complain if UI not running
-- opening listeners fails
+- mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
-- hide menu after item selected
 - scrollable inspector
 - inspector needs prettier nesting
 - <titled> needs to look better
-- enforce inspector uniqueness
 - auto-updating inspector
 - fix up the min thumb size hack
 - fix up initial layout of slider
@@ -23,6 +20,7 @@
 - resizing and moving gadgets
 - faster layout
 - faster repaint
+- closing inspectors
 
 + compiler/ffi:
 
