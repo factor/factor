@@ -92,11 +92,6 @@ BYTE* to_c_string(STRING* s)
 	return c_str;
 }
 
-void primitive_stringp(void)
-{
-	drepl(tag_boolean(typep(STRING_TYPE,dpeek())));
-}
-
 void primitive_string_length(void)
 {
 	drepl(tag_fixnum(untag_string(dpeek())->capacity));

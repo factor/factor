@@ -36,7 +36,6 @@ typedef struct {
 PORT* untag_port(CELL tagged);
 PORT* port(PORT_MODE type, CELL fd);
 void init_line_buffer(PORT* port, FIXNUM count);
-void primitive_portp(void);
 void fixup_port(PORT* port);
 void collect_port(PORT* port);
 void postpone_io_error(PORT* port, const char* func);

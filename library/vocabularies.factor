@@ -92,6 +92,7 @@ USE: strings
         "namespaces"
         "parser"
         "prettyprint"
+        "processes"
         "stack"
         "streams"
         "stdio"

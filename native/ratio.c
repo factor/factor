@@ -8,6 +8,19 @@ RATIO* ratio(CELL numerator, CELL denominator)
 	return ratio;
 }
 
+/* Does not reduce to lowest terms, so should only be used by math
+library implementation, to avoid breaking invariants. */
+void primitive_from_fraction(void)
+{
+	CELL denominator = dpop();
+	CELL numerator = dpop();
+	if(zerop(denominator))
+		raise(SIGFPE);
+	if(onep(denominator))
+		dpush(numerator);
+	dpush(tag_ratio(ratio(numerator,denominator)));
+}
+
 RATIO* to_ratio(CELL x)
 {
 	switch(type_of(x))
@@ -23,9 +36,25 @@ RATIO* to_ratio(CELL x)
 	}
 }
 
-void primitive_ratiop(void)
+void primitive_to_fraction(void)
 {
-	drepl(tag_boolean(typep(RATIO_TYPE,dpeek())));
+	RATIO* r;
+
+	switch(type_of(dpeek()))
+	{
+	case FIXNUM_TYPE:
+	case BIGNUM_TYPE:
+		dpush(tag_fixnum(1));
+		break;
+	case RATIO_TYPE:
+		r = untag_ratio(dpeek());
+		drepl(r->numerator);
+		dpush(r->denominator);
+		break;
+	default:
+		type_error(RATIONAL_TYPE,dpeek());
+		break;
+	}
 }
 
 void primitive_numerator(void)

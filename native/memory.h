@@ -69,4 +69,4 @@ bool in_zone(ZONE* z, CELL pointer);
 
 void primitive_room(void);
 void primitive_allot_profiling(void);
-void primitive_address_of(void);
+void primitive_address(void);

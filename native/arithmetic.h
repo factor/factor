@@ -138,6 +138,7 @@ bool realp(CELL tagged);
 void primitive_numberp(void);
 
 bool zerop(CELL tagged);
+bool onep(CELL tagged);
 
 void primitive_to_fixnum(void);
 void primitive_to_bignum(void);
@@ -177,4 +178,4 @@ void primitive_xor(void);
 CELL shift(CELL x, FIXNUM y);
 void primitive_shift(void);
 CELL gcd(CELL x, CELL y);
-void primitive_gcd(void);
+void primitive_not(void);

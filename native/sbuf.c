@@ -8,11 +8,6 @@ SBUF* sbuf(FIXNUM capacity)
 	return sbuf;
 }
 
-void primitive_sbufp(void)
-{
-	drepl(tag_boolean(typep(SBUF_TYPE,dpeek())));
-}
-
 void primitive_sbuf(void)
 {
 	drepl(tag_object(sbuf(to_fixnum(dpeek()))));

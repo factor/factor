@@ -115,12 +115,12 @@ CELL untagged_object_size(CELL pointer)
 	return align8(size);
 }
 
-void primitive_type_of(void)
+void primitive_type(void)
 {
 	drepl(tag_fixnum(type_of(dpeek())));
 }
 
-void primitive_size_of(void)
+void primitive_size(void)
 {
 	drepl(tag_fixnum(object_size(dpeek())));
 }

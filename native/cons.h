@@ -26,7 +26,6 @@ INLINE CELL cdr(CELL cons)
 	return untag_cons(cons)->cdr;
 }
 
-void primitive_consp(void);
 void primitive_cons(void);
 void primitive_car(void);
 void primitive_cdr(void);

@@ -1,10 +1,5 @@
 #include "factor.h"
 
-void primitive_floatp(void)
-{
-	drepl(tag_boolean(typep(FLOAT_TYPE,dpeek())));
-}
-
 FLOAT* to_float(CELL tagged)
 {
 	RATIO* r;

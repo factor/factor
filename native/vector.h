@@ -15,7 +15,6 @@ INLINE VECTOR* untag_vector(CELL tagged)
 
 VECTOR* vector(FIXNUM capacity);
 
-void primitive_vectorp(void);
 void primitive_vector(void);
 void primitive_vector_length(void);
 void primitive_set_vector_length(void);

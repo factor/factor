@@ -113,9 +113,29 @@ bool zerop(CELL tagged)
 	case FLOAT_TYPE:
 		return ((FLOAT*)UNTAG(tagged))->n == 0.0;
 	case RATIO_TYPE:
+	case COMPLEX_TYPE:
 		return false;
 	default:
-		critical_error("Bad parameter to zerop",tagged);
+		type_error(NUMBER_TYPE,tagged);
+		return false; /* Can't happen */
+	}
+}
+
+bool onep(CELL tagged)
+{
+	switch(type_of(tagged))
+	{
+	case FIXNUM_TYPE:
+		return tagged == 1;
+	case BIGNUM_TYPE:
+		return BIGNUM_ONE_P((ARRAY*)UNTAG(tagged),0);
+	case FLOAT_TYPE:
+		return ((FLOAT*)UNTAG(tagged))->n == 1.0;
+	case RATIO_TYPE:
+	case COMPLEX_TYPE:
+		return false;
+	default:
+		type_error(NUMBER_TYPE,tagged);
 		return false; /* Can't happen */
 	}
 }

@@ -82,5 +82,5 @@ INLINE CELL object_type(CELL tagged)
 void* allot_object(CELL type, CELL length);
 CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
-void primitive_type_of(void);
-void primitive_size_of(void);
+void primitive_type(void);
+void primitive_size(void);

@@ -22,11 +22,6 @@ void update_xt(WORD* word)
 	word->xt = primitive_to_xt(word->primitive);
 }
 
-void primitive_wordp(void)
-{
-	drepl(tag_boolean(typep(WORD_TYPE,dpeek())));
-}
-
 /* <word> ( primitive parameter plist -- word ) */
 void primitive_word(void)
 {

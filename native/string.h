@@ -36,7 +36,6 @@ INLINE void set_string_nth(STRING* string, CELL index, CHAR value)
 	cput(SREF(string,index),value);
 }
 
-void primitive_stringp(void);
 void primitive_string_length(void);
 void primitive_string_nth(void);
 FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len);

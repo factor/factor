@@ -32,7 +32,6 @@ INLINE CELL tag_word(WORD* word)
 
 WORD* word(CELL primitive, CELL parameter, CELL plist);
 void update_xt(WORD* word);
-void primitive_wordp(void);
 void primitive_word(void);
 void primitive_word_hashcode(void);
 void primitive_word_primitive(void);

@@ -44,11 +44,6 @@ void init_line_buffer(PORT* port, FIXNUM count)
 		port->line = tag_object(sbuf(LINE_SIZE));
 }
 
-void primitive_portp(void)
-{
-	drepl(tag_boolean(typep(PORT_TYPE,dpeek())));
-}
-
 void fixup_port(PORT* port)
 {
 	port->fd = -1;

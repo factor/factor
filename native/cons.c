@@ -8,11 +8,6 @@ CELL cons(CELL car, CELL cdr)
 	return tag_cons(cons);
 }
 
-void primitive_consp(void)
-{
-	drepl(tag_boolean(typep(CONS_TYPE,dpeek())));
-}
-
 void primitive_cons(void)
 {
 	CELL cdr = dpop();

@@ -30,9 +30,6 @@ USE: combinators
 USE: kernel
 USE: stack
 
-: bignum? ( obj -- ? ) type-of 13 eq? ;
-: complex? ( obj -- ? ) type-of 5 eq? ;
-
 : (gcd) ( x y -- z )
     dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 

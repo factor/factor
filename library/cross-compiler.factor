@@ -78,7 +78,6 @@ DEFER: cwd
 DEFER: cd
 
 IN: io-internals
-DEFER: port?
 DEFER: open-file
 DEFER: client-socket
 DEFER: server-socket
@@ -100,7 +99,8 @@ DEFER: next-io-task
 
 IN: math
 DEFER: number=
-DEFER: /i
+DEFER: >fraction
+DEFER: fraction>
 
 IN: parser
 DEFER: str>float
@@ -139,19 +139,16 @@ IN: image
         execute
         call
         ifte
-        cons?
         cons
         car
         cdr
         set-car
         set-cdr
-        vector?
         <vector>
         vector-length
         set-vector-length
         vector-nth
         set-vector-nth
-        string?
         str-length
         str-nth
         str-compare
@@ -160,7 +157,6 @@ IN: image
         index-of*
         substring
         str-reverse
-        sbuf?
         <sbuf>
         sbuf-length
         set-sbuf-length
@@ -176,16 +172,13 @@ IN: image
         >bignum
         >float
         number=
-        fixnum?
-        bignum?
-        ratio?
         numerator
         denominator
-        float?
+        >fraction
+        fraction>
         str>float
         unparse-float
         float>bits
-        complex?
         real
         imaginary
         >rect
@@ -219,7 +212,6 @@ IN: image
         fsin
         fsinh
         fsqrt
-        word?
         <word>
         word-hashcode
         word-xt
@@ -252,7 +244,6 @@ IN: image
         callstack
         set-datastack
         set-callstack
-        port?
         exit*
         client-socket
         server-socket

@@ -75,11 +75,13 @@ USE: parser
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math
+"/library/math/constants.factor"         run-resource ! math
 "/library/math/math.factor"              run-resource ! math
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/list-math.factor"         run-resource ! math
 
 !!! Development tools.
+"/library/platform/jvm/processes.factor"   run-resource ! processes
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint

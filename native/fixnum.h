@@ -13,9 +13,6 @@ INLINE CELL tag_fixnum(FIXNUM untagged)
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-void primitive_fixnump(void);
-void primitive_not(void);
-
 FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
 

@@ -8,11 +8,6 @@ VECTOR* vector(FIXNUM capacity)
 	return vector;
 }
 
-void primitive_vectorp(void)
-{
-	drepl(tag_boolean(typep(VECTOR_TYPE,dpeek())));
-}
-
 void primitive_vector(void)
 {
 	drepl(tag_object(vector(to_fixnum(dpeek()))));

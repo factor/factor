@@ -1,10 +1,5 @@
 #include "factor.h"
 
-void primitive_fixnump(void)
-{
-	drepl(tag_boolean(TAG(dpeek()) == FIXNUM_TYPE));
-}
-
 FIXNUM to_fixnum(CELL tagged)
 {
 	RATIO* r;
