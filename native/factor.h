@@ -19,6 +19,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <netdb.h>
 
 #define INLINE inline static
 

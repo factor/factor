@@ -32,7 +32,7 @@ package factor.jedit;
 import factor.*;
 import java.awt.Component;
 import javax.swing.*;
-import org.gjt.sp.jedit.jEdit;
+import org.gjt.sp.jedit.*;
 
 public class FactorWordRenderer extends DefaultListCellRenderer
 {
@@ -80,8 +80,12 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		}
 
 		setText(jEdit.getProperty(prop,
-			new String[] { word.name,
-			stackEffect }));
+			new String[] {
+				MiscUtilities.charsToEntities(word.name),
+				stackEffect == null
+				? 0 :
+				MiscUtilities.charsToEntities(stackEffect)
+			}));
 
 		return this;
 	}

@@ -19,7 +19,7 @@ void primitive_open_file(void)
 
 	fd = open(path,mode,FILE_MODE);
 	if(fd < 0)
-		io_error(NULL,__FUNCTION__);
+		io_error(__FUNCTION__);
 
 	dpush(read ? tag_object(port(PORT_READ,fd)) : F);
 	dpush(write ? tag_object(port(PORT_WRITE,fd)) : F);

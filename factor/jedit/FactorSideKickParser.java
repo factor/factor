@@ -145,6 +145,8 @@ public class FactorSideKickParser extends SideKickParser
 
 			parsed = parsed.next();
 		}
+
+		last.end = buffer.createPosition(buffer.getLength());
 	} //}}}
 
 	//{{{ supportsCompletion() method
@@ -267,5 +269,5 @@ public class FactorSideKickParser extends SideKickParser
 		{
 			Log.log(Log.ERROR,this,e);
 		}
-	}
+	} //}}}
 }

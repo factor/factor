@@ -116,6 +116,7 @@ XT primitives[] = {
 	primitive_set_callstack,
 	primitive_portp,
 	primitive_exit,
+	primitive_client_socket,
 	primitive_server_socket,
 	primitive_close_fd,
 	primitive_add_accept_io_task,

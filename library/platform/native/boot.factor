@@ -88,6 +88,8 @@ primitives,
     "/library/httpd/test-responder.factor"
     "/library/httpd/quit-responder.factor"
     "/library/httpd/default-responders.factor"
+    "/library/jedit/jedit-remote.factor"
+    "/library/jedit/jedit.factor"
     "/library/math/arc-trig-hyp.factor"
     "/library/math/arithmetic.factor"
     "/library/math/list-math.factor"

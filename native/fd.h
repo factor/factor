@@ -16,4 +16,4 @@ void write_fd_char_8(PORT* port, FIXNUM ch);
 void write_fd_string_8(PORT* port, STRING* str);
 void primitive_write_fd_8(void);
 void primitive_close_fd(void);
-void io_error(PORT* port, const char* func);
+void io_error(const char* func);

@@ -32,7 +32,7 @@ PORT* port(PORT_MODE type, CELL fd)
 		port->buffer = string(BUF_SIZE,'\0');
 
 	if(fcntl(port->fd,F_SETFL,O_NONBLOCK,1) == -1)
-		io_error(port,__FUNCTION__);
+		io_error(__FUNCTION__);
 
 	return port;
 }

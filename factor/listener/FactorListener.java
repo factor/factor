@@ -56,7 +56,8 @@ public class FactorListener extends JTextPane
 	private Cons readLineContinuation;
 	private int cmdStart = -1;
 
-	private SimpleAttributeSet nullAttributes = new SimpleAttributeSet();
+	private SimpleAttributeSet nullAttributes;
+
 	//{{{ FactorListener constructor
 	public FactorListener()
 	{
@@ -65,6 +66,8 @@ public class FactorListener extends JTextPane
 		addMouseMotionListener(mouse);
 
 		listenerList = new EventListenerList();
+
+		nullAttributes = new SimpleAttributeSet();
 
 		/* Replace enter to evaluate the input */
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),

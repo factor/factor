@@ -62,6 +62,7 @@ DEFER: clone-sbuf
 IN: io-internals
 DEFER: port?
 DEFER: open-file
+DEFER: client-socket
 DEFER: server-socket
 DEFER: close-fd
 DEFER: add-accept-io-task
@@ -210,6 +211,7 @@ IN: cross-compiler
         set-callstack
         port?
         exit*
+        client-socket
         server-socket
         close-fd
         add-accept-io-task

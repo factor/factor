@@ -1,6 +1,5 @@
-- sidekick: error source not removed
 - lineno/file for native
-- jedit for native with socket communication
+- native client socket
 - input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
@@ -9,6 +8,7 @@
 - enforce bottom-up in native bootstrap
 - standalone listener input style
 - add a socket timeout
+- drop test in http server
 
 + docs:
 
@@ -18,6 +18,7 @@
 - sbuf-hashcode
 - vector-hashcode
 - review doc formatting with latex2html
+- recursion -vs- iteration in vectors chapter
 
 + tests:
 
@@ -28,7 +29,8 @@
 
 + listener/plugin:
 
-- words with < in name
+- jedit bug? +line doesn't always work when switching into an existing
+  buffer with a remembered first line
 - auto insert USE:
 - why > 1 popup
 - listener backspace overzealous

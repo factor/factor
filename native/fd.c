@@ -33,7 +33,7 @@ bool read_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-			io_error(port,__FUNCTION__);
+			io_error(__FUNCTION__);
 		return false;
 	}
 	else
@@ -103,7 +103,7 @@ void primitive_read_line_fd_8(void)
 		port->line_ready = false;
 	}
 	else
-		io_error(port,__FUNCTION__);
+		io_error(__FUNCTION__);
 
 }
 
@@ -118,7 +118,7 @@ bool write_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-			io_error(port,__FUNCTION__);
+			io_error(__FUNCTION__);
 		return false;
 	}
 	else
@@ -165,7 +165,7 @@ void write_fd_char_8(PORT* port, FIXNUM ch)
 	char c = (char)ch;
 
 	if(!can_write(port,1))
-		io_error(port,__FUNCTION__);
+		io_error(__FUNCTION__);
 
 	bput((CELL)port->buffer + sizeof(STRING) + port->buf_fill,c);
 	port->buf_fill++;
@@ -177,7 +177,7 @@ void write_fd_string_8(PORT* port, STRING* str)
 
 	/* Note this ensures the buffer is large enough to fit the string */
 	if(!can_write(port,str->capacity))
-		io_error(port,__FUNCTION__);
+		io_error(__FUNCTION__);
 
 	c_str = to_c_string(str);
 
@@ -215,15 +215,4 @@ void primitive_close_fd(void)
 	/* This does not flush. */
 	PORT* port = untag_port(dpop());
 	close(port->fd);
-}
-
-void io_error(PORT* port, const char* func)
-{
-	STRING* function = from_c_string(func);
-	STRING* error = from_c_string(strerror(errno));
-
-	CONS* c = cons(tag_object(function),tag_cons(
-		cons(tag_object(error),F)));
-
-	general_error(ERROR_IO,tag_cons(c));
 }

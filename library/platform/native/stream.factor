@@ -87,6 +87,9 @@ USE: unparser
 : <client-stream> ( host port in out -- stream )
     <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;
 
+: <client> ( host port -- stream )
+    2dup client-socket <client-stream> ;
+
 : accept ( server -- client )
     #! Accept a connection from a server socket.
     "socket" swap get* blocking-accept <client-stream> ;
