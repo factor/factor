@@ -160,6 +160,9 @@
 				RelativePath="native\gc.c">
 			</File>
 			<File
+				RelativePath=".\native\hashtable.c">
+			</File>
+			<File
 				RelativePath="native\image.c">
 			</File>
 			<File
@@ -417,6 +420,9 @@
 			</File>
 			<File
 				RelativePath="native\gc.h">
+			</File>
+			<File
+				RelativePath=".\native\hashtable.h">
 			</File>
 			<File
 				RelativePath="native\image.h">

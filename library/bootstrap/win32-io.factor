@@ -52,8 +52,8 @@ USE: win32-io-internals
 USE: win32-stream
 USE: win32-api
 
-: <filecr> <win32-filecr> ;
-: <filecw> <win32-filecw> ;
+: <file-reader> <win32-file-reader> ;
+: <file-writer> <win32-file-writer> ;
 : <server> <win32-server> ;
 
 : init-stdio ( -- )

@@ -43,7 +43,8 @@ USE: unparser
 USE: win32-api
 USE: win32-io-internals
 
-TRAITS: win32-server
+TUPLE: win32-server this ;
+TUPLE: win32-client-stream delegate host ;
 SYMBOL: winsock
 SYMBOL: socket
 
@@ -76,27 +77,29 @@ SYMBOL: socket
 : listen-socket ( socket -- )
     20 wsa-listen 0 = [ handle-socket-error ] unless ;
 
-: <win32-client-stream> ( buf stream -- stream )
-    [ 
-        buffer-ptr <alien> 0 32 32 
-        <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r 
-        <indirect-pointer> GetAcceptExSockaddrs r> r> drop
-        dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
-        [ , ":" , unparse , ] make-string "client" set
-    ] extend ;
+C: win32-client-stream ( buf stream -- stream )
+    [ set-win32-client-stream-delegate ] keep >r
+    buffer-ptr <alien> 0 32 32 
+    <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r 
+    <indirect-pointer> GetAcceptExSockaddrs r> r> drop
+    dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
+    [ , ":" , unparse , ] make-string
+    r> [ set-win32-client-stream-host ] keep ;
+
+M: win32-client-stream client-stream-host win32-client-stream-host ;
 
 C: win32-server ( port -- server )
-    [ 
+    swap <namespace> [ 
         maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
         dup add-completion
         socket set
-    ] extend ;
+    ] extend over set-win32-server-this ;
 
 M: win32-server fclose ( server -- )
-    [ socket get CloseHandle drop ] bind ;
+    win32-server-this [ socket get CloseHandle drop ] bind ;
 
 M: win32-server accept ( server -- client )
-    [
+    win32-server-this [
         new-socket 64 <buffer>
         [
             alloc-io-task init-overlapped >r >r >r socket get r> r> 

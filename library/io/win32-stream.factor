@@ -42,7 +42,8 @@ USE: threads
 USE: win32-api
 USE: win32-io-internals
 
-TRAITS: win32-stream
+TUPLE: win32-stream this ;
+! handle in-buffer out-buffer fileptr file-size ;
 GENERIC: win32-stream-handle
 GENERIC: do-write
 
@@ -140,22 +141,22 @@ M: string do-write ( str -- )
     ] ifte ;
 
 M: win32-stream fwrite-attr ( str style stream -- )
-    nip [ do-write ] bind ;
+    win32-stream-this nip [ do-write ] bind ;
 
 M: win32-stream freadln ( stream -- str )
-    [ 80 <sbuf> do-read-line ] bind ;
+    win32-stream-this [ 80 <sbuf> do-read-line ] bind ;
 
 M: win32-stream fread# ( count stream -- str )
-    [ dup <sbuf> swap do-read-count ] bind ;
+    win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
 M: win32-stream fflush ( stream -- )
-    [ maybe-flush-output ] bind ;
+    win32-stream-this [ maybe-flush-output ] bind ;
 
 M: win32-stream fauto-flush ( stream -- )
     drop ;
 
 M: win32-stream fclose ( stream -- )
-    [
+    win32-stream-this [
         maybe-flush-output
         handle get CloseHandle drop 
         in-buffer get buffer-free 
@@ -163,10 +164,10 @@ M: win32-stream fclose ( stream -- )
     ] bind ;
 
 M: win32-stream win32-stream-handle ( stream -- handle )
-    [ handle get ] bind ;
+    win32-stream-this [ handle get ] bind ;
 
 C: win32-stream ( handle -- stream )
-    [
+    swap <namespace> [
         dup NULL GetFileSize dup -1 = not [
             file-size set
         ] [ drop f file-size set ] ifte
@@ -174,12 +175,12 @@ C: win32-stream ( handle -- stream )
         4096 <buffer> in-buffer set 
         4096 <buffer> out-buffer set
         0 fileptr set 
-    ] extend ;
+    ] extend over set-win32-stream-this ;
 
-: <win32-filecr> ( path -- stream )
+: <win32-file-reader> ( path -- stream )
     t f win32-open-file <win32-stream> ;
 
-: <win32-filecw> ( path -- stream )
+: <win32-file-writer> ( path -- stream )
     f t win32-open-file <win32-stream> ;
 
 
