@@ -107,6 +107,7 @@ M: namestack-manip (eval-infix)
     over length [ f , [ \ cons , ] times ] make-list
     [ list>vector ] append -rot (eval-infix) append ;
 
+DEFER: fold-consts
 : (| f ; parsing
 : | reverse f ; parsing
 : |) reverse infix fold-consts eval-infix swons \ call swons ; parsing
