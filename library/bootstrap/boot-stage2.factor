@@ -118,6 +118,7 @@ USE: namespaces
     "/library/inference/words.factor"
     "/library/inference/stack.factor"
     "/library/inference/types.factor"
+    "/library/inference/test.factor"
 
     "/library/compiler/assembler.factor"
     "/library/compiler/xt.factor"

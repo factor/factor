@@ -188,10 +188,6 @@ DEFER: apply-word
     #! Stack effect of a quotation.
     [ (infer) effect ] with-scope ;
 
-: try-infer ( quot -- effect/f )
-    #! Push f if inference fails.
-    [ infer ] [ [ drop f ] when ] catch ;
-
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
     [ (infer) get-dataflow ] with-scope ;

@@ -29,6 +29,8 @@ plugin.factor.jedit.FactorPlugin.menu=factor-listener \
 	- \
 	factor-extract-word \
 	- \
+	factor-infer-effects \
+	- \
 	factor-restart
 
 factor-listener.label=Listener
@@ -41,6 +43,7 @@ factor-edit.label=Edit word at caret
 factor-edit-dialog.label=Edit word...
 factor-usages.label=Word usages at caret
 factor-extract-word.label=Extract word...
+factor-infer-effects.label=Infer word stack effects...
 factor-restart.label=Restart Factor
 
 # SideKick stuff

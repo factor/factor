@@ -1,7 +1,5 @@
 ! Factor test suite.
 
-! Some of these words should be moved to the standard library.
-
 IN: test
 USE: errors
 USE: kernel

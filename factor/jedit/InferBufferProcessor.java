@@ -32,48 +32,56 @@ package factor.jedit;
 import factor.*;
 import java.io.IOException;
 import java.util.*;
-import org.gjt.sp.jedit.Buffer;
+import org.gjt.sp.jedit.io.VFSManager;
+import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.*;
 
 /**
  * A class used to compile all words in a file, or infer stack effects of all
  * words in a file, etc.
  */
-public abstract class FactorBufferProcessor
+public class InferBufferProcessor extends FactorBufferProcessor
 {
-	private LinkedHashMap results;
-
-	//{{{ FactorBufferProcessor constructor
-	public FactorBufferProcessor(Buffer buffer, ExternalFactor factor)
-		throws Exception
+	//{{{ createInferUnitTests() method
+	public static void createInferUnitTests(View view,
+		final Buffer buffer,
+		final ExternalFactor factor)
 	{
-		results = new LinkedHashMap();
-
-		Cons words = (Cons)buffer.getProperty(
-			FactorSideKickParser.WORDS_PROPERTY);
-		Cons wordCodeMap = null;
-		while(words != null)
+		final Buffer newBuffer = jEdit.newFile(view);
+		VFSManager.runInAWTThread(new Runnable()
 		{
-			FactorWord word = (FactorWord)words.car;
-			String expr = processWord(word);
-			System.err.println(expr);
-			results.put(word,factor.eval(expr));
-			words = words.next();
-		}
+			public void run()
+			{
+				newBuffer.setMode("factor");
+				try
+				{
+					new InferBufferProcessor(buffer,factor)
+						.insertResults(newBuffer,0);
+				}
+				catch(Exception e)
+				{
+					Log.log(Log.ERROR,this,e);
+				}
+			}
+		});
 	} //}}}
 	
+	//{{{ InferBufferProcessor constructor
+	public InferBufferProcessor(Buffer buffer, ExternalFactor factor)
+		throws Exception
+	{
+		super(buffer,factor);
+	} //}}}
+	
+	//{{{ processWord() method
 	/**
 	 * @return Code to process the word.
 	 */
-	public abstract String processWord(FactorWord word);
-
-	//{{{ insertResults() method
-	public void insertResults(Buffer buffer, int offset)
-		throws Exception
+	public String processWord(FactorWord word)
 	{
-		StringBuffer result = new StringBuffer();
-		Iterator iter = results.values().iterator();
-		while(iter.hasNext())
-			result.append(iter.next());
-		buffer.insert(offset,result.toString().trim());
+		StringBuffer expression = new StringBuffer();
+		expression.append(FactorPlugin.factorWord(word));
+		expression.append(" unit infer>test print");
+		return expression.toString();
 	} //}}}
 }
