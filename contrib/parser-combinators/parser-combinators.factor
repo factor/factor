@@ -45,7 +45,7 @@ USE: parser
   #! For a string this is everything but the first character.
   #! For a list this is the cdr.
   [
-    [ string? ] [ 1 str-tail ]
+    [ string? ] [ 1 swap str-tail ]
     [ list? ] [ cdr ]
   ] cond ;
 
@@ -77,7 +77,7 @@ USE: parser
   dup str-length pick < [
     2drop ""
   ] [
-    swap str-head
+    str-head
   ] ifte ;
 
 : (list-take) ( n list accum -- list )
@@ -107,7 +107,7 @@ USE: parser
   dup str-length pick < [
     2drop "" 
   ] [
-    swap str-tail 
+    str-tail 
   ] ifte ;
   
 : list-drop ( n list -- list )

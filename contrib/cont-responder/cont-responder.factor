@@ -44,6 +44,9 @@ USE: url-encoding
 USE: unparser
 USE: hashtables
 
+USE: prettyprint
+USE: inspector
+
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
   #! continuation table. This value will need to be
@@ -194,9 +197,7 @@ DEFER: show
 : with-string-stream ( quot -- string ) 
   #! Call the quotation with standard output bound to a string output
   #! stream. Return the string on exit.
-  <namespace> [ 
-    "stdio" 1024 <string-output-stream> put call "stdio" get stream>str 
-  ] bind ;
+  1024 <string-output-stream> dup >r swap with-stream r> stream>str ;
 
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser
@@ -234,8 +235,7 @@ DEFER: show
     call-exit-continuation 
   ] callcc1 
   nip ;
-USE: prettyprint
-USE: inspector
+
 
 : cont-get-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
@@ -254,17 +254,12 @@ USE: inspector
   ] ifte 
   [ write flush ] when* drop ;
 
-: post-request>namespace ( post-request -- namespace )
-  #! Return a namespace containing the name/value's from the 
-  #! post data.
-  alist>hash ;
-
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given
-  #! id and calls it with the POST data as an alist on the top
+  #! id and calls it with the POST data as a hashtable on the top
   #! of the stack.
   [ 
-    "response" get post-request>namespace swap resume-continuation 
+    "response" get alist>hash swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 

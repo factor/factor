@@ -39,7 +39,10 @@ USE: logic
 USE: combinators
 USE: live-updater
 USE: prettyprint
+USE: unparser
 USE: words
+USE: vectors
+USE: logging
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -71,13 +74,12 @@ USE: words
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [ "'" | "\\'" ] [ "\"" | "\\\"" ] ] assoc dup rot ? ] str-map ;
+  [ dup [ [ CHAR: ' | "\\'" ] [ CHAR: " | "\\\"" ] ] assoc dup rot ? ] str-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
   #! executed will set the eval textarea to that string.
   [ "document.forms.main.eval.value=\"" , escape-quotes , "\"" , ] make-string ;
-
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
@@ -87,7 +89,7 @@ USE: words
   #! Write out html to display the stack.
   <table border= "1" table> 
     <tr> <th> "Callstack" write </th> </tr>
-    [ <tr> <td> write-eval-link </td> </tr> ] each
+    [ <tr> <td> [ unparse write ] with-string-stream write-eval-link </td> </tr> ] each
   </table> ;
 
 : display-clear-history-link ( -- )
@@ -112,7 +114,7 @@ USE: words
     "responder" "inspect" put
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
-      <tr> <td colspan= "2" td> [ see ] with-simple-html-output </td> </tr>
+      <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
       <tr> <td valign= "top" td> [ apropos. ] with-simple-html-output </td> 
            <td valign= "top" td> [ usages. ] with-simple-html-output </td>
@@ -169,10 +171,18 @@ USE: words
     "eval" get
   ] bind ;
    
+: infra ( list quot -- list )
+  #! Call the quotation using 'list' as the datastack
+  #! return the result datastack as a list.
+  datastack >r    
+  swap list>vector tuck vector-push 
+  set-datastack call datastack vector>list
+  r> >pop> >pop> tuck vector-push set-datastack ;
+
 : do-eval ( list string -- list )
   #! Evaluate the expression in 'string' using 'list' as
   #! the datastack. Return the resulting stack as a list.
-  parse unit append restack call unstack ;
+  parse infra ;
 
 : do-eval-to-string ( list string -- list string )
   #! Evaluate expression using 'list' as the current callstack.
@@ -202,8 +212,9 @@ USE: words
     [ 
       run-eval-requester 
     ] [
-      show-message-page
+      dup [ show-message-page ] [ drop ] ifte
     ] catch 
   ] forever ;
 
 "eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
+
