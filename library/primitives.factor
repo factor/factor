@@ -69,7 +69,7 @@ USE: words
     [ set-sbuf-length        " n sbuf -- "                        [ 2 | 1 ] ]
     [ sbuf-nth               " n sbuf -- ch "                     [ 2 | 1 ] ]
     [ set-sbuf-nth           " ch n sbuf -- "                     [ 3 | 0 ] ]
-    [ sbuf-append            " ch/str sbuf -- "                   [ 2 | 1 ] ]
+    [ sbuf-append            " ch/str sbuf -- "                   [ 2 | 0 ] ]
     [ sbuf>str               " sbuf -- str "                      [ 1 | 1 ] ]
     [ sbuf-reverse           " sbuf -- "                          [ 1 | 0 ] ]
     [ sbuf-clone             " sbuf -- sbuf "                     [ 1 | 1 ] ]

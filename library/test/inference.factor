@@ -27,7 +27,7 @@ USE: namespaces
 ! ] unit-test
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
-[ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
+[ 3 ] [ [ { 1 2 } { 1 2 3 } ] longest-vector ] unit-test
 
 [ t ] [
     [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?

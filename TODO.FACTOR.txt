@@ -13,7 +13,6 @@
 - optimizer rewrite stack ops
 - alien-call need special nodes
 - mutual recursion is borked with certain branch order
-- >r [ r> ] [ r> ] ifte b0rked
 
 + linearizer/generator:
 
@@ -37,6 +36,8 @@
 
 + listener/plugin:
 
+- unterminated ; -- NPE
+- no USE:'s wrong place
 - errors don't always disappear
 - console: wrong history
 - listener: if too many things popped off the stack, complain

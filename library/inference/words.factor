@@ -154,7 +154,7 @@ USE: prettyprint
             drop #call swap
         ] ifte (consume/produce)
     ] [
-        drop no-base-case
+        2drop no-base-case
     ] ifte ;
 
 : no-effect? ( word -- ? )

@@ -40,36 +40,15 @@ USE: vectors
 USE: words
 USE: hashtables
 
-: branch-effect ( -- [ dataflow [ in-d | datastack ] ] )
-    get-dataflow  d-in get meta-d get cons  cons ;
-
-: infer-branch ( quot -- [ dataflow [ in-d | datastack ] ] )
-    #! Infer the quotation's effect, restoring the meta
-    #! interpreter state afterwards.
-    [
-        copy-interpreter
-        dataflow-graph off
-        infer-quot
-        ( #values values-node )
-        branch-effect
-    ] with-scope ;
-
-: difference ( [ in | stack ] -- diff )
-    #! Stack height difference of infer-branch return value.
-    uncons vector-length - ;
+: unify-d-in ( list -- d-in )
+    0 swap [ [ d-in get ] bind [ max ] when* ] each ;
 
 : balanced? ( list -- ? )
-    #! Check if a list of [ in | stack ] pairs has the same
-    #! stack height.
-    [ difference ] map all=? ;
+    [ [ d-in get meta-d get and ] bind ] subset
+    [ [ d-in get meta-d get vector-length - ] bind ] map all=? ;
 
-: max-vector-length ( list -- length )
+: longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
-
-: unify-lengths ( list -- list )
-    #! Pad all vectors to the same length. If one vector is
-    #! shorter, pad it with unknown results at the bottom.
-    dup max-vector-length swap [ dupd ensure nip ] map nip ;
 
 : unify-result ( obj obj -- obj )
     #! Replace values with unknown result if they differ,
@@ -81,16 +60,40 @@ USE: hashtables
     #! results.
     uncons [ [ unify-result ] vector-2map ] each ;
 
+: unify-lengths ( list -- list )
+    #! Pad all vectors to the same length. If one vector is
+    #! shorter, pad it with unknown results at the bottom.
+    dup longest-vector swap [ dupd ensure nip ] map nip ;
+
+: unify-datastacks ( list -- datastack )
+    [ [ meta-d get ] bind ] map [ ] subset
+    unify-lengths unify-stacks ;
+
+: check-lengths ( list -- )
+    [ vector-length ] map all=? [
+        "Unbalanced return stack effect" throw
+    ] unless ;
+
+: unify-callstacks ( list -- datastack )
+    [ [ meta-r get ] bind ] map [ ] subset
+    dup check-lengths unify-stacks ;
+
 : unify ( list -- )
-    #! Unify meta-interpreter state from two branches.
-    [ ] subset ! Filter terminator slots
     dup balanced? [
-        unzip
-        unify-lengths unify-stacks meta-d set
-        [ > ] top d-in set
+        dup unify-d-in d-in set
+        dup unify-datastacks meta-d set
+        unify-callstacks meta-r set
     ] [
         "Unbalanced branches" throw
     ] ifte ;
+
+: infer-branch ( quot -- namespace )
+    <namespace> [
+        copy-interpreter
+        dataflow-graph off
+        infer-quot
+        ( #values values-node )
+    ] extend ;
 
 : terminator? ( quot -- ? )
     #! This is a hack. no-method has a stack effect that
@@ -101,32 +104,36 @@ USE: hashtables
 : recursive-branch ( quot -- )
     #! Set base case if inference didn't fail.
     [
-        infer-branch cdr recursive-state get set-base
+        infer-branch [
+            d-in get meta-d get vector-length cons
+        ] bind recursive-state get set-base
     ] [
         [ drop ] when
     ] catch ;
 
-: (infer-branches) ( branchlist -- dataflowlist effectlist )
+: (infer-branches) ( branchlist -- list )
     dup [
         car dup terminator? [ drop ] [ recursive-branch ] ifte
     ] each
     [
         car dup terminator? [
-            infer-branch car f cons
+            infer-branch [
+                meta-d off meta-r off d-in off
+            ] extend
         ] [
             infer-branch
         ] ifte
-    ] map
-    unzip ;
+    ] map ;
 
 : infer-branches ( inputs instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again. The inputs
     #! parameter is a vector.
-    (infer-branches) >r
-    swap dataflow, [ node-consume-d set ] bind
-    r> unify ;
+    (infer-branches) [
+        [ [ get-dataflow ] bind ] map
+        swap dataflow, [ node-consume-d set ] bind
+    ] keep unify ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.

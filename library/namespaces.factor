@@ -114,7 +114,7 @@ USE: vectors
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
     #! namestack.
-    <namespace> >n call n> drop ;
+    <namespace> >n call n> drop ; inline
 
 : extend ( object code -- object )
     #! Used in code like this:

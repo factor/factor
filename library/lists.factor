@@ -196,7 +196,7 @@ DEFER: tree-contains?
         ] ifte
     ] [
         2drop t
-    ] ifte ;
+    ] ifte ; inline
 
 : all=? ( list -- ? )
     #! Check if all elements of a list are equal.
@@ -204,17 +204,17 @@ DEFER: tree-contains?
 
 : maximize ( pred o1 o2 -- o1/o2 )
     #! Return o1 if pred returns true, o2 otherwise.
-    [ rot call ] 2keep ? ;
+    [ rot call ] 2keep ? ; inline
 
 : (top) ( list maximizer -- elt )
     #! Return the highest element in the list, where maximizer
     #! has stack effect ( o1 o2 -- max(o1,o2) ).
-    >r uncons r> each ;
+    >r uncons r> each ; inline
 
 : top ( list pred -- elt )
     #! Return the highest element in the list, where pred is a
     #! partial order with stack effect ( o1 o2 -- ? ).
-    swap [ pick >r maximize r> swap ] (top) nip ;
+    swap [ pick >r maximize r> swap ] (top) nip ; inline
 
 : cons= ( obj cons -- ? )
     2dup eq? [

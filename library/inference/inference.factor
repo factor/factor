@@ -133,10 +133,10 @@ DEFER: apply-word
     2dup > [ "No solution to decomposition" throw ] when
     swap - -rot 2cdr >r + r> cons raise ;
 
-: set-base ( [ in | stack ] rstate -- )
+: set-base ( [ in | out ] rstate -- )
     #! Set the base case of the current word.
     dup [
-        >r uncons vector-length cons r>  car cdr [
+        car cdr [
             entry-effect get swap decompose base-case set
         ] bind
     ] [

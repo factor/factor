@@ -46,7 +46,7 @@ USE: combinators
 : eax/other ( reg quot quot -- )
     #! Execute first quotation if reg is EAX, second quotation
     #! otherwise, leaving reg on the stack.
-    pick EAX = [ drop nip call ] [ nip call ] ifte ;
+    pick EAX = [ drop nip call ] [ nip call ] ifte ; inline
 
 : byte/eax/cell ( imm reg byte eax cell -- )
     #! Assemble an instruction with 3 forms; byte operand, any
@@ -60,7 +60,7 @@ USE: combinators
         ] [
             r> drop r> drop r> call compile-cell
         ] ifte
-    ] ifte ;
+    ] ifte ; inline
 
 : MOD-R/M ( r/m reg/opcode mod -- )
     #! MOD-R/M is MOD REG/OPCODE R/M
