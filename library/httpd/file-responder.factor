@@ -54,7 +54,7 @@ USE: unparser
     over file-length file-response  "method" get "head" = [
         drop
     ] [
-        <filebr> stdio get fcopy
+        <file-reader> stdio get fcopy
     ] ifte ;
 
 : serve-file ( filename -- )

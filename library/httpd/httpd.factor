@@ -41,7 +41,7 @@ USE: url-encoding
 : httpd-log-stream ( -- stream )
     #! Set httpd-log-file to save httpd log to a file.
     "httpd-log-file" get dup [
-        <filecr>
+        <file-reader>
     ] [
         drop stdio get
     ] ifte ;

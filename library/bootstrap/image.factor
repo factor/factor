@@ -352,16 +352,15 @@ M: hashtable ' ( hashtable -- pointer )
     ] ifte ;
 
 : write-image ( image file -- )
-    <filebw> [ [ write-word ] vector-each ] with-stream ;
+    <file-writer> [ [ write-word ] vector-each ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [
         300000 <vector> image set
-        521 <hashtable> "objects" set
+        <namespace> "objects" set
         ! Note that this is a vector that we can side-effect,
         ! since ; ends up using this variable from nested
         ! parser namespaces.
-        1000 <vector> "word-fixups" set
         call
         image get
     ] with-scope ;

@@ -106,7 +106,7 @@ IN: hashtables
 
 : grow-hash ( hash -- )
     #! A good way to earn a living.
-    dup hash-size 3 * 2 /i <array> swap set-hash-array ;
+    dup hash-size 2 * <array> swap set-hash-array ;
 
 : (hash>alist) ( alist n hash -- alist )
     2dup bucket-count >= [

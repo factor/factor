@@ -64,17 +64,11 @@ M: fd-stream fclose ( -- )
 C: fd-stream ( in out -- stream )
     [ "out" set "in" set ] extend ;
 
-: <filecr> ( path -- stream )
+: <file-reader> ( path -- stream )
     t f open-file <fd-stream> ;
 
-: <filecw> ( path -- stream )
+: <file-writer> ( path -- stream )
     f t open-file <fd-stream> ;
-
-: <filebr> ( path -- stream )
-    <filecr> ;
-
-: <filebw> ( path -- stream )
-    <filecw> ;
 
 : init-stdio ( -- )
     stdin stdout <fd-stream> <stdio-stream> stdio set ;
@@ -94,4 +88,4 @@ C: fd-stream ( in out -- stream )
     "resource-path" get [ "." ] unless* ;
 
 : <resource-stream> ( path -- stream )
-    resource-path swap cat2 <filecr> ;
+    resource-path swap cat2 <file-reader> ;

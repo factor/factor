@@ -41,7 +41,7 @@ USE: words
     [ "~" get "/.jedit/server" cat2 ] unless* ;
 
 : jedit-server-info ( -- port auth )
-    jedit-server-file <filecr> [
+    jedit-server-file <file-reader> [
         read drop
         read parse-number
         read parse-number

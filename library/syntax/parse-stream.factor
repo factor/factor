@@ -75,7 +75,7 @@ USE: strings
     [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
-    dup <filecr> parse-stream ;
+    dup <file-reader> parse-stream ;
 
 : run-file ( file -- )
     #! Run a file. The file is read with the default IN:/USE:
@@ -83,7 +83,7 @@ USE: strings
     parse-file call ;
 
 : (parse-file) ( file -- quot )
-    dup <filecr> (parse-stream) ;
+    dup <file-reader> (parse-stream) ;
 
 : (run-file) ( file -- )
     #! Run a file. The file is read with the same IN:/USE: as

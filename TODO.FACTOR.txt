@@ -47,13 +47,11 @@
 - nicer way to combine two paths
 - add a socket timeout
 - rename f* words to stream-*
-- <file[bc][rw]> is badly named -- <file-reader>, <file-writer>
 
 + kernel:
 
 - ppc register decls
 - cat, reverse-cat primitives
-- first-class hashtables
 
 + misc:
 
@@ -63,6 +61,7 @@
 - browser responder for word links in HTTPd
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link
+- vectors: ensure its ok with bignum indices
 
 + httpd:
 

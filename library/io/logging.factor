@@ -51,4 +51,4 @@ USE: unparser
     [ stdio get "log" set call ] with-scope ;
 
 : with-log-file ( file quot -- )
-    [ swap <filecr> "log" set call ] with-scope ;
+    [ swap <file-reader> "log" set call ] with-scope ;
