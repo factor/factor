@@ -57,11 +57,11 @@ void fixup_port(F_PORT* port)
 
 void collect_port(F_PORT* port)
 {
-	copy_object(&port->buffer);
-	copy_object(&port->line);
-	copy_object(&port->client_host);
-	copy_object(&port->client_port);
-	copy_object(&port->io_error);
+	COPY_OBJECT(port->buffer);
+	COPY_OBJECT(port->line);
+	COPY_OBJECT(port->client_host);
+	COPY_OBJECT(port->client_port);
+	COPY_OBJECT(port->io_error);
 }
 
 #ifdef WIN32

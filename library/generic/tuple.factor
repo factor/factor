@@ -4,6 +4,8 @@ IN: generic
 USING: words parser kernel namespaces lists strings
 kernel-internals math hashtables errors vectors ;
 
+BUILTIN: tuple 18
+
 : class ( obj -- class )
     #! The class of an object.
     dup tuple? [ 2 slot ] [ type builtin-type ] ifte ;

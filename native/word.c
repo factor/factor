@@ -57,6 +57,6 @@ void fixup_word(F_WORD* word)
 
 void collect_word(F_WORD* word)
 {
-	copy_object(&word->parameter);
-	copy_object(&word->plist);
+	COPY_OBJECT(word->parameter);
+	COPY_OBJECT(word->plist);
 }

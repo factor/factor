@@ -16,30 +16,31 @@ INLINE void* copy_untagged_object(void* pointer, CELL size)
 
 CELL copy_object_impl(CELL pointer);
 
-INLINE void copy_object(CELL* handle)
+INLINE CELL copy_object(CELL pointer)
 {
-	CELL pointer = *handle;
 	CELL tag;
 	CELL header;
-	CELL newpointer;
 
 	if(pointer == F)
-		return;
+		return F;
 
 	tag = TAG(pointer);
 
 	if(tag == FIXNUM_TYPE)
-		return;
-
-	if(headerp(pointer))
-		critical_error("Asked to copy header",pointer);
+		return pointer;
 
 	header = get(UNTAG(pointer));
 	if(TAG(header) == GC_COLLECTED)
-		newpointer = UNTAG(header);
+		return RETAG(UNTAG(header),tag);
 	else
-		newpointer = copy_object_impl(pointer);
-	*handle = RETAG(newpointer,tag);
+		return RETAG(copy_object_impl(pointer),tag);
+}
+
+#define COPY_OBJECT(lvalue) lvalue = copy_object(lvalue)
+
+INLINE void copy_handle(CELL* handle)
+{
+	COPY_OBJECT(*handle);
 }
 
 void collect_roots(void);

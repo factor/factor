@@ -17,20 +17,20 @@ void collect_roots(void)
 	CELL ptr;
 
 	/*T must be the first in the heap */
-	copy_object(&T);
+	COPY_OBJECT(T);
 	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();
-	copy_object(&callframe);
-	copy_object(&executing);
+	COPY_OBJECT(callframe);
+	COPY_OBJECT(executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
-		copy_object((void*)ptr);
+		copy_handle((CELL*)ptr);
 
 	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
-		copy_object((void*)ptr);
+		copy_handle((CELL*)ptr);
 
 	for(i = 0; i < USER_ENV; i++)
-		copy_object(&userenv[i]);
+		copy_handle(&userenv[i]);
 }
 
 /*
@@ -106,7 +106,7 @@ INLINE CELL collect_next(CELL scan)
 	else
 	{
 		size = CELLS;
-		copy_object((CELL*)scan);
+		copy_handle((CELL*)scan);
 	}
 
 	return scan + size;

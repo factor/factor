@@ -29,5 +29,5 @@ void fixup_vector(F_VECTOR* vector)
 
 void collect_vector(F_VECTOR* vector)
 {
-	copy_object(&vector->array);
+	COPY_OBJECT(vector->array);
 }

@@ -28,5 +28,5 @@ void collect_literals(void)
 {
 	CELL i;
 	for(i = compiling.base; i < literal_top; i += CELLS)
-		copy_object((CELL*)i);
+		copy_handle((CELL*)i);
 }

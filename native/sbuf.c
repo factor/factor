@@ -190,5 +190,5 @@ void fixup_sbuf(F_SBUF* sbuf)
 
 void collect_sbuf(F_SBUF* sbuf)
 {
-	copy_object(&sbuf->string);
+	COPY_OBJECT(sbuf->string);
 }

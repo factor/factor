@@ -29,5 +29,5 @@ void fixup_hashtable(F_HASHTABLE* hashtable)
 
 void collect_hashtable(F_HASHTABLE* hashtable)
 {
-	copy_object(&hashtable->array);
+	COPY_OBJECT(hashtable->array);
 }

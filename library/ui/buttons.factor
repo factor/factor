@@ -3,6 +3,9 @@
 IN: gadgets
 USING: generic kernel lists math namespaces sdl ;
 
+: button-down? ( n -- ? )
+    my-hand hand-buttons contains? ;
+
 : button-pressed  ( button -- )
     dup f bevel-up? set-paint-property redraw ;
 

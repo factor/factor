@@ -160,7 +160,7 @@ void fixup_dll(DLL* dll)
 
 void collect_dll(DLL* dll)
 {
-	copy_object(&dll->path);
+	COPY_OBJECT(dll->path);
 }
 
 void fixup_alien(ALIEN* alien)

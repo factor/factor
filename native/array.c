@@ -100,5 +100,5 @@ void collect_array(F_ARRAY* array)
 	int i = 0;
 	CELL capacity = untag_fixnum_fast(array->capacity);
 	for(i = 0; i < capacity; i++)
-		copy_object((void*)AREF(array,i));
+		copy_handle((void*)AREF(array,i));
 }

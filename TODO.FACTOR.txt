@@ -11,9 +11,6 @@
 - print warning on null class
 - optimize away dispatch
 
-- move tuple to generic vocab
-
-- vectors: ensure its ok with bignum indices
 - code gc
 - ppc register decls
 
@@ -50,6 +47,7 @@
 
 + kernel:
 
+- vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
 - generational gc
 - make see work with union, builtin, predicate
@@ -57,3 +55,4 @@
 - proper ordering for classes
 - make-vector and make-string should not need a reverse step
 - worddef props
+- automatically recompiling defs
