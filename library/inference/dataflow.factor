@@ -39,13 +39,12 @@ USE: vectors
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
 
-SYMBOL: CALL ( non-tail call )
-SYMBOL: JUMP ( tail-call )
-SYMBOL: PUSH ( literal )
+SYMBOL: #call ( non-tail call )
+SYMBOL: #push ( literal )
 
-SYMBOL: IFTE
-SYMBOL: GENERIC
-SYMBOL: 2GENERIC
+SYMBOL: #ifte
+SYMBOL: #generic
+SYMBOL: #2generic
 
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
@@ -53,8 +52,8 @@ SYMBOL: node-consume-r
 SYMBOL: node-produce-r
 SYMBOL: node-op
 
-! PUSH nodes have this field set to the value being pushed.
-! CALL nodes have this as the word being called
+! #push nodes have this field set to the value being pushed.
+! #call nodes have this as the word being called
 SYMBOL: node-param
 
 : <dataflow-node> ( param op -- node )
@@ -93,4 +92,4 @@ SYMBOL: node-param
 : dataflow-drop, ( -- )
     #! Remove the top stack element and add a dataflow node
     #! noting this.
-    \ drop CALL dataflow, [ 1 0 node-inputs ] bind ;
+    \ drop #call dataflow, [ 1 0 node-inputs ] bind ;

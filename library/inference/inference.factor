@@ -110,7 +110,7 @@ DEFER: apply-word
     #! Literals are annotated with the current recursive
     #! state.
     dup recursive-state get cons push-d
-    PUSH dataflow, [ 1 0 node-outputs ] bind ;
+    #push dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )
     #! Apply the object's stack effect to the inferencer state.
@@ -149,10 +149,12 @@ DEFER: apply-word
     #! Stack effect of a quotation.
     [ f init-inference (infer)  effect ] with-scope ;
 
-: dataflow ( quot -- dataflow )
-    #! Data flow of a quotation.
-    [ f init-inference (infer)  get-dataflow ] with-scope ;
-
 : try-infer ( quot -- effect/f )
     #! Push f if inference fails.
     [ infer ] [ [ drop f ] when ] catch ;
+
+IN: dataflow
+
+: dataflow ( quot -- dataflow )
+    #! Data flow of a quotation.
+    [ f init-inference (infer)  get-dataflow ] with-scope ;

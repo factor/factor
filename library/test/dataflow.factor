@@ -33,7 +33,7 @@ USE: prettyprint
 ] unit-test
 
 [ t ] [
-    IFTE [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
+    #ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
 ] unit-test
 
 : dataflow-consume-d-len ( object -- n )
@@ -47,7 +47,7 @@ USE: prettyprint
 [ t ] [ [ 2 ] dataflow car dataflow-produce-d-len 1 = ] unit-test
 
 : dataflow-ifte-node-consume-d ( list -- node )
-    IFTE swap dataflow-contains-op? car [ node-consume-d get ] bind ;
+    #ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
 
 [ t ] [
     [ 2 [ swap ] [ nip "hi" ] ifte ] dataflow
@@ -56,7 +56,7 @@ USE: prettyprint
 
 [ t ] [
     [ { drop no-method drop no-method } generic ] dataflow
-    GENERIC swap dataflow-contains-op? car [
+    #generic swap dataflow-contains-op? car [
         node-param get [
             [ [ node-param get \ no-method = ] bind ] some?
         ] some?

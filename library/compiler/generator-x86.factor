@@ -25,41 +25,76 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: compiler
+IN: generator
+USE: alien
 USE: combinators
+USE: compiler
 USE: dataflow
 USE: errors
-USE: generator
-USE: hashtables
 USE: kernel
 USE: linearizer
 USE: lists
 USE: logic
 USE: math
 USE: namespaces
-USE: parser
-USE: prettyprint
 USE: stack
-USE: stdio
 USE: strings
-USE: unparser
-USE: vectors
 USE: words
 
-: (compile) ( word -- )
-    #! Should be called inside the with-compiler scope.
-    dup save-xt word-parameter dataflow linearize generate ;
+: LITERAL ( cell -- )
+    #! Push literal on data stack.
+    4 ESI R+I
+    ESI I>[R] ;
 
-: compile-postponed ( -- )
-    compile-words get [
-        uncons compile-words set (compile) compile-postponed
-    ] when* ;
+: [LITERAL] ( cell -- )
+    #! Push complex literal on data stack by following an
+    #! indirect pointer.
+    4 ESI R+I
+    EAX [I]>R
+    EAX ESI R>[R] ;
 
-: compile ( word -- )
-    [ postpone-word compile-postponed ] with-compiler ;
+: immediate? ( obj -- ? )
+    #! fixnums and f have a pointerless representation, and
+    #! are compiled immediately. Everything else can be moved
+    #! by GC, and is indexed through a table.
+    dup fixnum? swap f eq? or ;
 
-: compiled
-    #! Compile the most recently defined word.
-    word compile ; parsing
+: compile-literal ( obj -- )
+    dup immediate? [
+        address LITERAL
+    ] [
+        intern-literal [LITERAL]
+    ] ifte ;
 
-: compile-all ;
+: PUSH-DS ( -- )
+    #! Push contents of EAX onto datastack.
+    4 ESI R+I
+    EAX ESI R>[R] ;
+
+: POP-DS ( -- )
+    #! Pop datastack, store pointer to datastack top in EAX.
+    ESI EAX [R]>R
+    4 ESI R-I ;
+
+: SELF-CALL ( name -- )
+    #! Call named C function in Factor interpreter executable.
+    dlsym-self CALL JUMP-FIXUP ;
+
+: TYPE ( -- )
+    #! Peek datastack, store type # in EAX.
+    ESI PUSH-[R]
+    "type_of" SELF-CALL
+    4 ESP R+I ;
+
+: ARITHMETIC-TYPE ( -- )
+    #! Peek top two on datastack, store arithmetic type # in EAX.
+    ESI EAX R>R
+    EAX PUSH-[R]
+    4 EAX R-I
+    EAX PUSH-[R]
+    "arithmetic_type" SELF-CALL
+    8 ESP R+I ;
+
+\ #push [ compile-literal ] "generator" set-word-property
+\ #call [ CALL compiled-offset defer-xt ] "generator" set-word-property
+\ #return [ drop RET ] "generator" set-word-property

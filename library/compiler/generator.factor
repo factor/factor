@@ -25,41 +25,27 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: compiler
+IN: generator
 USE: combinators
+USE: compiler
 USE: dataflow
 USE: errors
-USE: generator
-USE: hashtables
-USE: kernel
 USE: linearizer
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: parser
-USE: prettyprint
 USE: stack
-USE: stdio
 USE: strings
-USE: unparser
-USE: vectors
 USE: words
 
-: (compile) ( word -- )
-    #! Should be called inside the with-compiler scope.
-    dup save-xt word-parameter dataflow linearize generate ;
+: generate-node ( [ op | params ] -- )
+    #! Generate machine code for a node.
+    unswons dup "generator" word-property dup [
+        nip call
+    ] [
+        "No generator" throw
+    ] ifte ;
 
-: compile-postponed ( -- )
-    compile-words get [
-        uncons compile-words set (compile) compile-postponed
-    ] when* ;
-
-: compile ( word -- )
-    [ postpone-word compile-postponed ] with-compiler ;
-
-: compiled
-    #! Compile the most recently defined word.
-    word compile ; parsing
-
-: compile-all ;
+: generate ( linear -- )
+    #! Compile a word definition from linear IR.
+    [ generate-node ] each ;

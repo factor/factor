@@ -34,13 +34,13 @@ USE: lists
 USE: namespaces
 
 \ >r [
-    \ >r CALL dataflow, [ 1 0 node-inputs ] extend
+    \ >r #call dataflow, [ 1 0 node-inputs ] extend
     pop-d push-r
     [ 0 1 node-outputs ] bind
 ] "infer" set-word-property
 
 \ r> [
-    \ r> CALL dataflow, [ 0 1 node-inputs ] extend
+    \ r> #call dataflow, [ 0 1 node-inputs ] extend
     pop-r push-d
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-property

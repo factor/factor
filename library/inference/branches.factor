@@ -133,7 +133,7 @@ USE: hashtables
     3 ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d 2list
-    >r 1 meta-d get vector-tail* IFTE r>
+    >r 1 meta-d get vector-tail* #ifte r>
     pop-d drop ( condition )
     infer-branches ;
 
@@ -147,14 +147,14 @@ USE: hashtables
     #! Infer effects for all branches, unify.
     2 ensure-d
     dataflow-drop, pop-d vtable>list
-    >r 1 meta-d get vector-tail* GENERIC r>
+    >r 1 meta-d get vector-tail* #generic r>
     infer-branches ;
 
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
     3 ensure-d
     dataflow-drop, pop-d vtable>list
-    >r 2 meta-d get vector-tail* 2GENERIC r>
+    >r 2 meta-d get vector-tail* #2generic r>
     infer-branches ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property

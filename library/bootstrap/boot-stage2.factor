@@ -113,6 +113,12 @@ USE: stdio
     "/library/inference/branches.factor"
     "/library/inference/stack.factor"
 
+    "/library/compiler/linearizer.factor"
+    "/library/compiler/assembler.factor"
+    "/library/compiler/xt.factor"
+    "/library/compiler/generator.factor"
+    "/library/compiler/compiler.factor"
+
     "/library/bootstrap/image.factor"
     "/library/bootstrap/cross-compiler.factor"
 
@@ -139,25 +145,24 @@ USE: stdio
 
 cpu "x86" = [
     [
-        "/library/compiler/assembler.factor"
-        "/library/compiler/assembly-x86.factor"
-        "/library/compiler/compiler-macros.factor"
-        "/library/compiler/compiler.factor"
-        "/library/compiler/ifte.factor"
-        "/library/compiler/generic.factor"
-        "/library/compiler/stack.factor"
-        "/library/compiler/interpret-only.factor"
-        "/library/compiler/alien-types.factor"
-        "/library/compiler/alien-macros.factor"
-        "/library/compiler/alien.factor"
-        
-        "/library/sdl/sdl.factor"
-        "/library/sdl/sdl-video.factor"
-        "/library/sdl/sdl-event.factor"
-        "/library/sdl/sdl-gfx.factor"
-        "/library/sdl/sdl-keysym.factor"
-        "/library/sdl/sdl-utils.factor"
-        "/library/sdl/hsv.factor"
+         "/library/compiler/assembly-x86.factor"
+         "/library/compiler/generator-x86.factor"
+!        "/library/compiler/compiler-macros.factor"
+!        "/library/compiler/ifte.factor"
+!        "/library/compiler/generic.factor"
+!        "/library/compiler/stack.factor"
+!        "/library/compiler/interpret-only.factor"
+!        "/library/compiler/alien-types.factor"
+!        "/library/compiler/alien-macros.factor"
+!        "/library/compiler/alien.factor"
+!        
+!        "/library/sdl/sdl.factor"
+!        "/library/sdl/sdl-video.factor"
+!        "/library/sdl/sdl-event.factor"
+!        "/library/sdl/sdl-gfx.factor"
+!        "/library/sdl/sdl-keysym.factor"
+!        "/library/sdl/sdl-utils.factor"
+!        "/library/sdl/hsv.factor"
     ] [
         dup print
         run-resource

@@ -47,7 +47,7 @@ USE: prettyprint
     #! parameters, add node. The quotation is called with the
     #! stack effect.
     over car ensure-d
-    rot CALL dataflow,
+    rot #call dataflow,
     [ pick swap dataflow-inputs ] keep
     pick 2slip swap dataflow-outputs ; inline
 
@@ -149,7 +149,7 @@ USE: prettyprint
     ] ifte ;
 
 : infer-call ( [ rstate | quot ] -- )
-    \ drop CALL dataflow, drop
+    \ drop #call dataflow, drop
     [
         dataflow-graph off
         pop-d uncons recursive-state set (infer)
