@@ -54,33 +54,69 @@ USE: styles
 
     [
         [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] "builtins" set-vocab-style
-    [
-        [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] "kernel" set-vocab-style
-    [
-        [ "ansi-fg" | "1" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] "combinators" set-vocab-style
-    [
-        [ "ansi-fg" | "2" ]
-        [ "fg" | [ 0 255 0 ] ]
-    ] "stack" set-vocab-style
-    [
-        [ "ansi-fg" | "3" ]
-        [ "fg" | [ 255 255 0 ] ]
+        [ "fg" | [ 204 0 0 ] ]
     ] "arithmetic" set-vocab-style
     [
         [ "ansi-fg" | "3" ]
-        [ "fg" | [ 255 255 0 ] ]
-    ] "math" set-vocab-style
-    [
-        [ "ansi-fg" | "4" ]
-        [ "fg" | [ 0 0 255 ] ]
-    ] "namespaces" set-vocab-style
+        [ "fg" | [ 255 132 0 ] ]
+    ] "combinators" set-vocab-style
     [
         [ "ansi-fg" | "5" ]
-        [ "fg" | [ 255 0 255 ] ]
-    ] "lists" set-vocab-style ;
+        [ "fg" | [ 102 0 204 ] ]
+    ] "continuations" set-vocab-style
+    [
+        [ "ansi-fg" | "1" ]
+        [ "fg" | [ 255 0 0 ] ]
+    ] "errors" set-vocab-style
+    [
+        [ "ansi-fg" | "4" ]
+        [ "fg" | [ 153 102 255 ] ]
+    ] "hashtables" set-vocab-style
+    [
+        [ "ansi-fg" | "2" ]
+        [ "fg" | [ 0 102 153 ] ]
+    ] "lists" set-vocab-style
+    [
+        [ "ansi-fg" | "6" ]
+        [ "fg" | [ 0 153 102 ] ]
+    ] "logic" set-vocab-style
+    [
+        [ "ansi-fg" | "1" ]
+        [ "fg" | [ 204 0 0 ] ]
+    ] "math" set-vocab-style
+    [
+        [ "ansi-fg" | "6" ]
+        [ "fg" | [ 0 153 255 ] ]
+    ] "namespaces" set-vocab-style
+    [
+        [ "ansi-fg" | "2" ]
+        [ "fg" | [ 102 204 255 ] ]
+    ] "parser" set-vocab-style
+    [
+        [ "ansi-fg" | "2" ]
+        [ "fg" | [ 102 204 255 ] ]
+    ] "prettyprint" set-vocab-style
+    [
+        [ "ansi-fg" | "2" ]
+        [ "fg" | [ 0 0 0 ] ]
+    ] "stack" set-vocab-style
+    [
+        [ "ansi-fg" | "4" ]
+        [ "fg" | [ 204 0 204 ] ]
+    ] "stdio" set-vocab-style
+    [
+        [ "ansi-fg" | "4" ]
+        [ "fg" | [ 102 0 204 ] ]
+    ] "streams" set-vocab-style
+    [
+        [ "ansi-fg" | "6" ]
+        [ "fg" | [ 255 0 204 ] ]
+    ] "strings" set-vocab-style
+    [
+        [ "ansi-fg" | "4" ]
+        [ "fg" | [ 102 204 255 ] ]
+    ] "unparser" set-vocab-style
+    [
+        [ "ansi-fg" | "3" ]
+        [ "fg" | [ 2 185 2 ] ]
+    ] "vectors" set-vocab-style ;
