@@ -72,6 +72,7 @@ USE: unparser
     [
         [ "describe-path" | "Describe" ]
         [ "lookup" | "Push" ]
+        [ "lookup execute" | "Execute" ]
         [ "lookup jedit" | "jEdit" ]
         [ "lookup usages." | "Usages" ]
     ] ;

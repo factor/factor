@@ -372,7 +372,20 @@ public class FactorReader
 			return null;
 		}
 		else if(next instanceof String)
-			return intern((String)next,define);
+		{
+			// remember the position before the word name
+			int line = scanner.getLineNumber();
+			int col = scanner.getColumnNumber();
+
+			FactorWord w = intern((String)next,define);
+			if(define && w != null)
+			{
+				w.line = line;
+				w.col = col;
+				w.file = scanner.getFileName();
+			}
+			return w;
+		}
 		else
 			return null;
 	} //}}}

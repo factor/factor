@@ -64,6 +64,21 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			else
 				prop = "factor.completion.defer";
 		}
+		else if(word.def instanceof FactorShuffleDefinition)
+		{
+			prop = "factor.completion.shuffle";
+			StringBuffer buf = new StringBuffer();
+			Cons def = word.def.toList(interp);
+			while(def != null)
+			{
+				if(buf.length() != 0)
+					buf.append(' ');
+
+				buf.append(def.car);
+				def = def.next();
+			}
+			stackEffect = buf.toString();
+		}
 		else
 		{
 			Cons def = word.def.toList(interp);

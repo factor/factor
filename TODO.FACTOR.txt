@@ -6,6 +6,14 @@
 - standalone listener input style
 - add a socket timeout
 - drop test in http server
+- jedit bug? +line doesn't always work when switching into an existing
+  buffer with a remembered first line
+- completion: enter no good
+- completion: don't show automatically
+- balance needs USE:
+- postpone errors until actual read/write op
+- command line arguments
+- socket protocol
 
 + docs:
 
@@ -26,25 +34,16 @@
 
 + listener/plugin:
 
-- jedit bug? +line doesn't always work when switching into an existing
-  buffer with a remembered first line
 - auto insert USE:
 - plugin not unloaded
 - listener backspace overzealous
-- lineno/file for shuffle defs
-- completion popups for shuffle defs
-- balance needs USE:
-- completion: enter no good
-- completion: don't show automatically
 - completion in the listener
 - special completion for USE:/IN:
 - inspector links when describe called without object path
 
 + native:
 
-- command line arguments
 - gc call in the middle of some ops might affect callstack
-- postpone errors until actual read/write op
 - multitasking
 - parsing should be parsing
 - better error reporting

@@ -39,3 +39,4 @@ factor.completion.plain=<html>: <b>{0}</b>
 factor.completion.defer=<html>DEFER: <b>{0}</b>
 factor.completion.parsing=<html>PARSING: <b>{0}</b>
 factor.completion.stack=<html>: <b>{0}</b> {1}
+factor.completion.shuffle=<html>~&lt;&lt; <b>{0}</b> {1} &gt;&gt;~

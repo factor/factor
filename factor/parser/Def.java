@@ -46,21 +46,11 @@ public class Def extends FactorParsingDefinition
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws Exception
 	{
-		FactorScanner scanner = reader.getScanner();
-
-		// remember the position before the word name
-		int line = scanner.getLineNumber();
-		int col = scanner.getColumnNumber();
-
-		// Read the word name
 		FactorWord newWord = reader.nextWord(true);
 
 		if(newWord == null)
 			return;
 
-		newWord.line = line;
-		newWord.col = col;
-		newWord.file = scanner.getFileName();
 		reader.pushExclusiveState(word,newWord);
 	}
 }

@@ -30,13 +30,12 @@ USE: arithmetic
 USE: combinators
 USE: errors
 USE: kernel
+USE: logic
 USE: namespaces
 USE: stack
+USE: stdio
 USE: strings
 USE: words
-
-! Doesn't exist in native Factor.
-: local-jedit-line/file "Not supported" throw ;
 
 : jedit-local? ( -- ? )
     java? [ global [ "jedit" get ] bind ] [ f ] ifte ;
@@ -52,10 +51,14 @@ USE: words
     global [ "resource-path" get ] bind [ "." ] unless* ;
 
 : word-file ( path -- dir file )
-    dup "resource:/" str-head? dup [
-        nip resource-path swap
+    dup [
+        dup "resource:/" str-head? dup [
+            nip resource-path swap
+        ] [
+            swap ( f file )
+        ] ifte
     ] [
-        swap ( f file )
+        f
     ] ifte ;
 
 : word-line/file ( word -- line dir file )
@@ -64,4 +67,12 @@ USE: words
     "file" swap word-property word-file ;
 
 : jedit ( word -- )
-    intern word-line/file jedit-line/file ;
+    intern dup [
+        word-line/file 2dup and [
+            jedit-line/file
+        ] [
+            "Unknown source" print
+        ] ifte
+    ] [
+        "Not defined" print
+    ] ifte ;
