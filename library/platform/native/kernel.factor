@@ -71,8 +71,8 @@ USE: vectors
 : clone ( obj -- obj )
     [
         [ cons? ] [ clone-list ]
-        [ vector? ] [ clone-vector ]
-        [ sbuf? ] [ clone-sbuf ]
+        [ vector? ] [ vector-clone ]
+        [ sbuf? ] [ sbuf-clone ]
         [ drop t ] [ ( return the object ) ]
     ] cond ;
 

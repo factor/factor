@@ -11,17 +11,10 @@ FLOAT* ratio_to_float(CELL n);
 
 #define CELL_TO_INTEGER(result) \
 	FIXNUM _result = (result); \
-	/* if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-		return tag_object(fixnum_to_bignum(_result)); \
+	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
+		return tag_object(s48_long_to_bignum(_result)); \
 	else \
-		 */return tag_fixnum(_result);
-
-#define BIGNUM_2_TO_INTEGER(result) \
-        BIGNUM_2 _result = (result); \
-        /* if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-                return tag_object(s48_long_to_bignum(_result)); \
-        else \
-                 */return tag_fixnum(_result);
+		return tag_fixnum(_result);
 
 #define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \

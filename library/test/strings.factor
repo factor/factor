@@ -3,6 +3,7 @@ USE: arithmetic
 USE: combinators
 USE: kernel
 USE: namespaces
+USE: stack
 USE: strings
 USE: test
 
@@ -81,6 +82,9 @@ unit-test
 
 [ t ] [ "abc" "abd" str-compare 0 < ] unit-test
 [ t ] [ "z" "abd" str-compare 0 > ] unit-test
+
+[ "fedcba" ] [ "abcdef" str>sbuf dup sbuf-reverse sbuf>str ] unit-test
+[ "edcba" ] [ "abcde" str>sbuf dup sbuf-reverse sbuf>str ] unit-test
 
 native? [
     [ t ] [ "Foo" str>sbuf "Foo" str>sbuf = ] unit-test

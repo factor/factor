@@ -1,19 +1,16 @@
 + bignums:
 
-- -1 is broken, add a test to verify this in the future
-- gcd is broken
-- bignum/ is broken
 - change shift< and shift> to ash
-- gcd is broken
 - cached 0/-1/1 should be cross compiled in image
 - bignum cross compiling
-- upgrading fixnums does not work
+- upgrading fixnums does not work with shift</shift>
 - ash is inefficient: arg 2 is upgraded to bignum then back
   to long
 - move some s48_ functions into bignum.c
 - remove unused functions
-
+- clean up type coercions in arithmetic.c
 - add a socket timeout
+
 - >lower, >upper for strings
 - telnetd should use multitasking
 - accept multi-line input in listener
@@ -62,7 +59,6 @@
 + native:
 
 - is the profiler using correct stack depth?
-- bignums
 - read1
 - sbuf-hashcode
 - vector-hashcode

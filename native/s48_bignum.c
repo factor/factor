@@ -259,7 +259,10 @@ bignum_type
 s48_bignum_quotient(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
-    return (BIGNUM_OUT_OF_BAND);
+    {
+      raise(SIGFPE);
+      return (BIGNUM_OUT_OF_BAND);
+    }
   if (BIGNUM_ZERO_P (numerator))
     return (BIGNUM_MAYBE_COPY (numerator));
   {
@@ -308,7 +311,10 @@ bignum_type
 s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
 {
   if (BIGNUM_ZERO_P (denominator))
-    return (BIGNUM_OUT_OF_BAND);
+    {
+      raise(SIGFPE);
+      return (BIGNUM_OUT_OF_BAND);
+    }
   if (BIGNUM_ZERO_P (numerator))
     return (BIGNUM_MAYBE_COPY (numerator));
   switch (bignum_compare_unsigned (numerator, denominator))

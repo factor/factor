@@ -3,4 +3,4 @@ USE: math
 USE: stack
 USE: test
 
-[ 35 fib drop ] time
+[ 30000 fac drop ] time

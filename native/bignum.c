@@ -7,7 +7,7 @@ void init_bignum(void)
 	bignum_pos_one = bignum_allocate(1,0);
 	(BIGNUM_REF (bignum_pos_one, 0)) = 1;
 
-	bignum_neg_one = bignum_allocate(1,0);
+	bignum_neg_one = bignum_allocate(1,1);
 	(BIGNUM_REF (bignum_neg_one, 0)) = 1;
 }
 
@@ -64,16 +64,16 @@ CELL multiply_bignum(ARRAY* x, ARRAY* y)
 	return tag_object(s48_bignum_multiply(x,y));
 }
 
-BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y)
+CELL gcd_bignum(ARRAY* x, ARRAY* y)
 {
-	BIGNUM_2 t;
+	ARRAY* t;
 
-	if(x < 0)
-		x = -x;
-	if(y < 0)
-		y = -y;
+	if(BIGNUM_NEGATIVE_P(x))
+		x = s48_bignum_negate(x);
+	if(BIGNUM_NEGATIVE_P(y))
+		y = s48_bignum_negate(y);
 
-	if(x > y)
+	if(s48_bignum_compare(x,y) == bignum_comparison_greater)
 	{
 		t = x;
 		x = y;
@@ -82,10 +82,10 @@ BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y)
 
 	for(;;)
 	{
-		if(x == 0)
-			return y;
+		if(BIGNUM_ZERO_P(x))
+			return tag_object(y);
 
-		t = y % x;
+		t = s48_bignum_remainder(y,x);
 		y = x;
 		x = t;
 	}
@@ -93,37 +93,29 @@ BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y)
 
 CELL divide_bignum(ARRAY* x, ARRAY* y)
 {
-	/* BIGNUM_2 _x = x->n;
-	BIGNUM_2 _y = y->n;
-	BIGNUM_2 gcd;
+	ARRAY* gcd;
 
-	if(_y == 0)
+	if(BIGNUM_ZERO_P(y))
+		raise(SIGFPE);
+
+	if(BIGNUM_NEGATIVE_P(y))
 	{
-		/* FIXME
-		abort();
-	}
-	else if(_y < 0)
-	{
-		_x = -_x;
-		_y = -_y;
+		x = s48_bignum_negate(x);
+		y = s48_bignum_negate(y);
 	}
 
-	gcd = gcd_bignum(_x,_y);
-	if(gcd != 1)
-	{
-		_x /= gcd;
-		_y /= gcd;
-	}
+	gcd = (ARRAY*)UNTAG(gcd_bignum(x,y));
+	x = s48_bignum_quotient(x,gcd);
+	y = s48_bignum_quotient(y,gcd);
 
-	if(_y == 1)
-		return tag_object(bignum(_x));
+	if(BIGNUM_ONE_P(y,0))
+		return tag_object(x);
 	else
 	{
 		return tag_ratio(ratio(
-			tag_object(bignum(_x)),
-			tag_object(bignum(_y))));
-	} */
-	return F;
+			tag_object(x),
+			tag_object(y)));
+	}
 }
 
 CELL divint_bignum(ARRAY* x, ARRAY* y)

@@ -114,7 +114,22 @@ void primitive_sbuf_to_string(void)
 	drepl(tag_object(sbuf_to_string(untag_sbuf(dpeek()))));
 }
 
-void primitive_clone_sbuf(void)
+void primitive_sbuf_reverse(void)
+{
+	SBUF* sbuf = untag_sbuf(dpop());
+	int i, j;
+	CHAR ch1, ch2;
+	for(i = 0; i < sbuf->top / 2; i++)
+	{
+		j = sbuf->top - i - 1;
+		ch1 = string_nth(sbuf->string,i);
+		ch2 = string_nth(sbuf->string,j);
+		set_string_nth(sbuf->string,j,ch1);
+		set_string_nth(sbuf->string,i,ch2);
+	}
+}
+
+void primitive_sbuf_clone(void)
 {
 	SBUF* s = untag_sbuf(dpeek());
 	SBUF* new_s = sbuf(s->top);

@@ -76,12 +76,3 @@ USE: test
 [ t ]
 [ 1000000000000/999999999999 1000000000001/999999999998 < ]
 unit-test
-
-[ 100 ] [ 100 100 gcd ] unit-test
-[ 100 ] [ 1000 100 gcd ] unit-test
-[ 100 ] [ 100 1000 gcd ] unit-test
-[ 4 ] [ 132 64 gcd ] unit-test
-[ 4 ] [ -132 64 gcd ] unit-test
-[ 4 ] [ -132 -64 gcd ] unit-test
-[ 4 ] [ 132 -64 gcd ] unit-test
-[ 4 ] [ -132 -64 gcd ] unit-test

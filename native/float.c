@@ -50,7 +50,7 @@ void primitive_float_to_str(void)
 void primitive_float_to_bits(void)
 {
 	double f = untag_float(dpeek());
-	BIGNUM_2 f_raw = *(BIGNUM_2*)&f;
+	long long f_raw = *(long long*)&f;
 	drepl(tag_object(s48_long_to_bignum(f_raw)));
 }
 

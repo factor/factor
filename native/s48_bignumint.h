@@ -104,7 +104,9 @@ extern ARRAY* shrink_array(ARRAY* array, CELL capacity);
    0, 1, and -1. */
 #define BIGNUM_ZERO() bignum_zero
 #define BIGNUM_ONE(neg_p) \
-   (neg_p ? bignum_pos_one : bignum_neg_one)
+   (neg_p ? bignum_neg_one : bignum_pos_one)
+
+#define BIGNUM_ONE_P(bignum,negative_p) ((bignum) == BIGNUM_ONE(negative_p))
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)

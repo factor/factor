@@ -62,6 +62,6 @@ USE: stack
 
 DEFER: vector-map
 
-: clone-vector ( vector -- vector )
+: vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;

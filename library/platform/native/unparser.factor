@@ -39,19 +39,23 @@ USE: stdio
 USE: strings
 USE: words
 
-: integer% ( num -- )
-    "base" get /mod swap dup 0 > [
-        integer%
+: integer% ( num radix -- )
+    tuck /mod >digit % dup 0 > [
+        swap integer%
     ] [
-        drop
-    ] ifte >digit % ;
+        2drop
+    ] ifte ;
 
 : integer- ( num -- num )
     dup 0 < [ "-" % neg ] when ;
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
-    [ "base" set <% integer- integer% %> ] with-scope ;
+    <% dup 0 < [
+        neg integer% CHAR: - %
+    ] [
+        integer%
+    ] ifte reverse%> ;
 
 : >dec ( num -- string )
     #! Convert an integer to its decimal representation.

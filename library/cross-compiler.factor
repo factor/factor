@@ -58,7 +58,7 @@ IN: strings
 DEFER: str=
 DEFER: str-hashcode
 DEFER: sbuf=
-DEFER: clone-sbuf
+DEFER: sbuf-clone
 
 IN: io-internals
 DEFER: port?
@@ -138,7 +138,8 @@ IN: cross-compiler
         set-sbuf-nth
         sbuf-append
         sbuf>str
-        clone-sbuf
+        sbuf-reverse
+        sbuf-clone
         sbuf=
         number?
         >fixnum

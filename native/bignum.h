@@ -1,5 +1,3 @@
-typedef long long BIGNUM_2;
-
 INLINE ARRAY* untag_bignum(CELL tagged)
 {
 	type_check(BIGNUM_TYPE,tagged);
@@ -18,7 +16,7 @@ CELL number_eq_bignum(ARRAY* x, ARRAY* y);
 CELL add_bignum(ARRAY* x, ARRAY* y);
 CELL subtract_bignum(ARRAY* x, ARRAY* y);
 CELL multiply_bignum(ARRAY* x, ARRAY* y);
-BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y);
+CELL gcd_bignum(ARRAY* x, ARRAY* y);
 CELL divide_bignum(ARRAY* x, ARRAY* y);
 CELL divint_bignum(ARRAY* x, ARRAY* y);
 CELL divfloat_bignum(ARRAY* x, ARRAY* y);

@@ -54,3 +54,7 @@ USE: stack
 
 : sbuf>str ( sbuf -- str )
     >str ;
+
+: sbuf-reverse ( sbuf -- )
+    #! Destructively reverse a string buffer.
+    [ ] "java.lang.StringBuffer" "reverse" jinvoke drop ;

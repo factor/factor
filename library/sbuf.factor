@@ -53,6 +53,11 @@ USE: stack
     #! stack.
     "string-buffer" get sbuf>str n> drop ;
 
+: reverse%> ( -- str )
+     #! Ends construction and pushes the *reversed*, constructed
+     #! text on the stack.
+     "string-buffer" get dup sbuf-reverse sbuf>str n> drop ;
+
 : fill ( count char -- string )
     #! Push a string that consists of the same character
     #! repeated.
