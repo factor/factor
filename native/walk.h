@@ -8,7 +8,7 @@ INLINE void begin_heap_walk(void)
 	heap_walk_ptr = active.base;
 }
 
-INLINE bool heap_step(CELL* size, CELL* type)
+INLINE CELL heap_step(CELL* size, CELL* type)
 {
 	CELL value = get(heap_walk_ptr);
 	CELL obj = heap_walk_ptr;

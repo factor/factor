@@ -42,6 +42,8 @@ void primitive_instances(void)
 	CELL search_type = to_fixnum(dpop());
 	CELL here = active.here;
 
+	primitive_gc();
+
 	begin_heap_walk();
 	
 	for(;;)

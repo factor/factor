@@ -7,7 +7,7 @@ USE: lists
 
 num-types [
     [
-        instances [
+        (instances) [
             class drop
         ] each
     ] keep
