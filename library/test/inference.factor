@@ -83,6 +83,9 @@ USE: lists
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
+! Simple combinators
+[ [ 1 | 2 ] [ [ car ] keep cdr ] infer ] unit-test
+
 [ [ 2 | 1 ] ] [ [ 2list ] infer ] unit-test
 [ [ 3 | 1 ] ] [ [ 3list ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ append ] infer ] unit-test

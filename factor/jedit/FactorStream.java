@@ -48,10 +48,13 @@ public class FactorStream
 	public FactorStream(Socket socket) throws IOException
 	{
 		this.socket = socket;
-		this.in = new DataInputStream(socket.getInputStream());
-		this.out = new DataOutputStream(socket.getOutputStream());
+		this.in = new DataInputStream(new BufferedInputStream(
+			socket.getInputStream()));
+		this.out = new DataOutputStream(new BufferedOutputStream(
+			socket.getOutputStream()));
 
-		out.write("\"\\0\" write flush USE: jedit stream-server\n".getBytes("ASCII"));
+		out.write("\"\\0\" write flush USE: jedit stream-server\n"
+			.getBytes("ASCII"));
 		out.flush();
 
 		/* Read everything until prompt */
