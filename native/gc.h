@@ -1,4 +1,3 @@
-CELL scan;
 bool gc_in_progress;
 int64_t gc_time;
 
@@ -11,9 +10,31 @@ INLINE void* copy_untagged_object(void* pointer, CELL size)
 	return newpointer;
 }
 
-void copy_object(CELL* handle);
-void collect_object(void);
-void collect_next(void);
+CELL copy_object_impl(CELL pointer);
+
+INLINE void copy_object(CELL* handle)
+{
+	CELL pointer = *handle;
+	CELL tag;
+	CELL header;
+	CELL newpointer;
+
+	if(pointer == F)
+		return;
+
+	tag = TAG(pointer);
+
+	if(tag == FIXNUM_TYPE)
+		return;
+
+	header = get(UNTAG(pointer));
+	if(TAG(header) == GC_COLLECTED)
+		newpointer = UNTAG(header);
+	else
+		newpointer = copy_object_impl(pointer);
+	*handle = RETAG(newpointer,tag);
+}
+
 void collect_roots(void);
 void primitive_gc(void);
 void maybe_garbage_collection(void);

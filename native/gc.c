@@ -10,56 +10,58 @@ INLINE void gc_debug(char* msg, CELL x) {
 #endif
 }
 
+void collect_roots(void)
+{
+	int i;
+
+	CELL ptr;
+
+	/*T must be the first in the heap */
+	copy_object(&T);
+	/* the bignum 0 1 -1 constants must be the next three */
+	copy_bignum_constants();
+	copy_object(&callframe);
+
+	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
+		copy_object((void*)ptr);
+
+	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
+		copy_object((void*)ptr);
+
+	for(i = 0; i < USER_ENV; i++)
+		copy_object(&userenv[i]);
+}
+
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
 pointer address without copying anything; otherwise, install
 a new forwarding pointer.
 */
-void copy_object(CELL* handle)
+CELL copy_object_impl(CELL pointer)
 {
-	CELL pointer = *handle;
-	CELL tag = TAG(pointer);
-	CELL header, newpointer;
+	CELL newpointer;
 
-	if(tag == FIXNUM_TYPE || pointer == F)
-		return;
-
+#ifdef GC_DEBUG
 	if(in_zone(&active,pointer))
 		critical_error("copy_object given newspace ptr",pointer);
+#endif
 
-	header = get(UNTAG(pointer));
-	
-	if(TAG(header) == GC_COLLECTED)
-	{
-		newpointer = UNTAG(header);
-		gc_debug("FORWARDING",newpointer);
-	}
-	else if(TAG(pointer) == GC_COLLECTED)
-	{
-		critical_error("asked to copy forwarding pointer",pointer);
-		newpointer = 0; /* to shut up gcc */
-	}
-	else
-	{
-		gc_debug("copy_object",pointer);
-		newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
-			object_size(pointer));
-		put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
-	}
-	
+	gc_debug("copy_object",pointer);
+	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
+		object_size(pointer));
+	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+
+#ifdef GC_DEBUG
 	if(tag == GC_COLLECTED)
 		critical_error("installing forwarding pointer in newspace",newpointer);
+#endif
 
-	*handle = RETAG(newpointer,tag);
+	return newpointer;
 }
 
-void collect_object(void)
+INLINE void collect_object(CELL scan)
 {
-	CELL size = untagged_object_size(scan);
-	gc_debug("collect_object",scan);
-	gc_debug("collect_object size=",size);
-	
 	switch(untag_header(get(scan)))
 	{
 	case WORD_TYPE:
@@ -78,52 +80,32 @@ void collect_object(void)
 		collect_port((F_PORT*)scan);
 		break;
 	}
-	
-	scan += size;
 }
 
-void collect_next(void)
+INLINE CELL collect_next(CELL scan)
 {
+	CELL size;
 	gc_debug("collect_next",scan);
 	gc_debug("collect_next header",get(scan));
 	switch(TAG(get(scan)))
 	{
 	case HEADER_TYPE:
-		collect_object();
+		size = untagged_object_size(scan);
+		collect_object(scan);
 		break;
 	default:
+		size = CELLS;
 		copy_object((CELL*)scan);
-		scan += CELLS;
 		break;
 	}
-}
-
-void collect_roots(void)
-{
-	int i;
-
-	CELL ptr;
-
-	gc_debug("collect_roots",scan);
-	/*T must be the first in the heap */
-	copy_object(&T);
-	/* the bignum 0 1 -1 constants must be the next three */
-	copy_bignum_constants();
-	copy_object(&callframe);
-
-	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
-		copy_object((void*)ptr);
-
-	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
-		copy_object((void*)ptr);
-
-	for(i = 0; i < USER_ENV; i++)
-		copy_object(&userenv[i]);
+	
+	return scan + size;
 }
 
 void primitive_gc(void)
 {
 	int64_t start = current_millis();
+	CELL scan;
 
 	gc_in_progress = true;
 
@@ -133,10 +115,11 @@ void primitive_gc(void)
 	collect_io_tasks();
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
+	
 	while(scan < active.here)
 	{
 		gc_debug("scan loop",scan);
-		collect_next();
+		scan = collect_next(scan);
 	}
 	gc_debug("gc done",0);
 

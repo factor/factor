@@ -54,10 +54,12 @@ INLINE CELL tag_header(CELL cell)
 INLINE CELL untag_header(CELL cell)
 {
 	CELL type = cell >> TAG_BITS;
+#ifdef HEADER_DEBUG
 	if(TAG(cell) != HEADER_TYPE)
 		critical_error("header type check",cell);
 	if(type <= HEADER_TYPE && type != WORD_TYPE)
 		critical_error("header invariant check",cell);
+#endif
 	return type;
 }
 
