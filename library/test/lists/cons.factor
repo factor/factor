@@ -2,6 +2,9 @@ IN: scratchpad
 USE: lists
 USE: test
 
+[ f ] [ f car ] unit-test
+[ f ] [ f cdr ] unit-test
+
 [ 5 car ] unit-test-fails
 [ "Hello world" cdr ] unit-test-fails
 

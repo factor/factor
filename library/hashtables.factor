@@ -52,10 +52,7 @@ IN: hashtables
     #! Look up a value in the hashtable.
     2dup (hashcode) swap hash-bucket assoc* ;
 
-: hash ( key table -- value )
-    #! Unlike hash*, this word cannot distinglish between an
-    #! undefined value, or a value set to f.
-    hash* dup [ cdr ] when ;
+: hash ( key table -- value ) hash* cdr ;
 
 : set-hash* ( key hash quot -- )
     #! Apply the quotation to yield a new association list.

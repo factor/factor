@@ -121,7 +121,7 @@ C: relative-bitfld ( word mask -- )
     #! Check that the address can fit in a 24-bit wide address
     #! field, used by PowerPC instructions.
     dup relative-fixup dup rot relative-bitfld-mask bitand = [
-        "Cannot jump further than 64 megabytes" throw
+        "Cannot jump this far" throw
     ] unless ;
 
 M: relative-bitfld fixup

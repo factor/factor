@@ -217,8 +217,7 @@ SYMBOL: sym-test
 [ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
 [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
 [ [ [ object ] [ general-t ] ] ] [ [ dup [ drop t ] unless ] infer ] unit-test
-[ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
-[ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
+[ [ [ general-list ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 
 ! [ [ 5 car ] infer ] unit-test-fails
 

@@ -7,7 +7,7 @@ streams strings unparser ;
 ! Words for accessing filesystem meta-data.
 
 : exists? ( file -- ? ) stat >boolean ;
-: directory? ( file -- ? ) stat dup [ car ] when ;
+: directory? ( file -- ? ) stat car ;
 : directory ( dir -- list ) (directory) [ string> ] sort ;
 : file-length ( file -- length ) stat dup [ cdr cdr car ] when ;
 : file-extension ( filename -- extension )

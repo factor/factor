@@ -22,6 +22,10 @@ USING: assembler inference kernel math words ;
 
 #epilogue [ drop compile-epilogue ] "generator" set-word-prop
 
+! #return-to [
+!     
+! ] "generator" set-word-prop
+
 #return [ drop BLR ] "generator" set-word-prop
 
 ! Far calls are made to addresses already known when the
@@ -39,10 +43,28 @@ USING: assembler inference kernel math words ;
         0 BL relative-24
     ] ifte ;
 
+: compile-jump-far ( n -- )
+    19 LOAD
+    19 MTCTR
+    BCTR ;
+
 : compile-jump-label ( label -- )
-    compile-epilogue  0 B relative-24 ;
+    dup primitive? [
+        word-xt compile-jump-far
+    ] [
+        0 B relative-24
+    ] ifte ;
+
+#jump [
+    dup postpone-word  compile-epilogue  compile-jump-label
+] "generator" set-word-prop
 
 : compile-jump-t ( label -- )
     POP-DS
     0 18 3 CMPI
     0 BNE  relative-14 ;
+
+: compile-jump-f ( label -- )
+    POP-DS
+    0 18 3 CMPI
+    0 BEQ  relative-14 ;

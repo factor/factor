@@ -8,6 +8,11 @@ IN: lists USING: generic kernel kernel-internals ;
 
 BUILTIN: cons 2 [ 0 "car" f ] [ 1 "cdr" f ] ;
 
+! We borrow an idiom from Common Lisp. The car/cdr of an empty
+! list is the empty list.
+M: f car ;
+M: f cdr ;
+
 : swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,
     #! has the effect of prepending the car to the cdr.
