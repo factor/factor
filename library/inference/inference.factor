@@ -162,10 +162,31 @@ DEFER: apply-word
     #! Apply the object's stack effect to the inferencer state.
     dup word? [ apply-word ] [ apply-literal ] ifte ;
 
+: active? ( -- ? )
+    #! Is this branch not terminated?
+    d-in get meta-d get and ;
+
+: terminate ( -- )
+    #! Ignore this branch's stack effect.
+    meta-d off meta-r off d-in off ;
+
+: terminator? ( obj -- ? )
+    #! Does it throw an error?
+    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
+
+: handle-terminator ( quot -- )
+    #! If the quotation throws an error, do not count its stack
+    #! effect.
+    [ terminator? ] some? [ terminate ] when ;
+
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ apply-object ] each ;
+    active? [
+        [ unswons apply-object infer-quot ] when*
+    ] [
+        drop
+    ] ifte ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.

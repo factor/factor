@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: words parser kernel namespaces lists strings
-kernel-internals math hashtables errors ;
+kernel-internals math hashtables errors vectors ;
 
 : make-tuple ( class -- tuple )
     dup "tuple-size" word-property <tuple>
@@ -102,28 +102,63 @@ kernel-internals math hashtables errors ;
         ] ifte
     ] [
         drop f
-    ] ifte ; inline
+    ] ifte ;
 
-: lookup-method ( class selector -- method )
-    "methods" word-property hash* ; inline
+: alist>quot ( default alist -- quot )
+    #! Turn an association list that maps values to quotations
+    #! into a quotation that executes a quotation depending on
+    #! the value on the stack.
+    [
+        [
+            unswons
+            \ dup , unswons literal, \ = , \ drop swons ,
+            alist>quot , \ ifte ,
+        ] make-list
+    ] when* ;
 
-: tuple-dispatch ( object selector -- )
-    over class over lookup-method [
-        cdr call ( method is defined )
+: (hash>quot) ( default hash -- quot )
+    [
+        \ dup , \ hashcode , dup bucket-count , \ rem ,
+        buckets>list [ alist>quot ] map-with list>vector ,
+        \ dispatch ,
+    ] make-list ;
+
+: hash>quot ( default hash -- quot )
+    #! Turn a hash  table that maps values to quotations into a
+    #! quotation that executes a quotation depending on the
+    #! value on the stack.
+    dup hash-size 4 <= [
+        hash>alist alist>quot
     ] [
-        object over lookup-method [
-            cdr call
+        (hash>quot)
+    ] ifte ;
+
+: default-tuple-method ( generic -- quot )
+    #! If the generic does not define a specific method for a
+    #! tuple, execute the return value of this.
+    dup "methods" word-property
+    tuple over hash dup [
+        2nip
+    ] [
+        drop object over hash dup [
+            2nip
         ] [
-            over tuple-delegate [
-                rot drop swap execute ( check delegate )
-            ] [
-                undefined-method ( no delegate )
-            ] ifte*
-        ] ?ifte
-    ] ?ifte ;
+            2drop [ dup tuple-delegate ] swap
+            dup unit swap
+            unit [ car ] cons [ undefined-method ] append
+            \ ?ifte 3list append
+        ] ifte
+    ] ifte ;
+
+: tuple-dispatch-quot ( generic -- quot )
+    #! Generate a quotation that performs tuple class dispatch
+    #! for methods defined on the given generic.
+    dup default-tuple-method \ drop swons
+    swap "methods" word-property hash>quot
+    [ dup class ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )
-    >r unit [ car tuple-dispatch ] cons tuple r> set-vtable ;
+    >r tuple-dispatch-quot tuple r> set-vtable ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its

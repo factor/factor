@@ -1,11 +1,18 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: files
+USING: io-internals errors hashtables kernel stdio strings
+namespaces generic ;
+
+! We need this early during bootstrap.
+: path+ ( path path -- path )
+    #! Combine two paths. This will be implemented later.
+    "/" swap cat3 ;
+
 IN: stdio
 DEFER: stdio
 
 IN: streams
-USING: io-internals errors hashtables kernel stdio strings
-namespaces generic ;
 
 TUPLE: fd-stream in out ;
 
@@ -56,4 +63,4 @@ C: fd-stream ( in out -- stream )
     "resource-path" get [ "." ] unless* ;
 
 : <resource-stream> ( path -- stream )
-    resource-path swap cat2 <file-reader> ;
+    resource-path swap path+ <file-reader> ;

@@ -136,6 +136,13 @@ BYTE* unbox_c_string(void)
 	return to_c_string(untag_string(dpop()));
 }
 
+/* FFI calls this */
+uint16_t* unbox_utf16_string(void)
+{
+	/* Return pointer to first character */
+	return (uint16_t*)(untag_string(dpop()) + 1);
+}
+
 void primitive_string_nth(void)
 {
 	F_STRING* string = untag_string(dpop());

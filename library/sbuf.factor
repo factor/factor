@@ -2,17 +2,6 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings USING: kernel lists math namespaces strings ;
 
-: make-string ( quot -- string )
-    #! Call a quotation. The quotation can call , to prepend
-    #! objects to the list that is returned when the quotation
-    #! is done.
-    make-list cat ; inline
-
-: make-rstring ( quot -- string )
-    #! Return a string whose entries are in the same order that ,
-    #! was called.
-    make-rlist cat ; inline
-
 : fill ( count char -- string )
     #! Push a string that consists of the same character
     #! repeated.

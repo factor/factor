@@ -1,60 +1,48 @@
-+ ui:
+72/73:
 
-- if gadgets are moved, added or deleted, update hand.
-- keyboard focus
-- keyboard gestures
-- text fields
-- finish check boxes
-
-+ compiler:
-
-- type inference fails with some assembler words;
-  displaced, register and other predicates need to inherit from list
-  not cons, and need stronger branch partial eval
-- more accurate type inference in some cases
-- optimize away dispatch
-- goal: to compile hash* optimally
-- type check/not-check entry points for compiled words
-- getenv/setenv: if literal arg, compile as a load/store
-- compile tuple dispatch
-
-+ oop:
-
-- make see work with union, builtin, predicate
-- doc comments of generics
-- proper ordering for classes
 - tuples: gracefully handle changing shape
 - keep a list of getter/setter words
 - default constructor
 - move tuple to generic vocab
+- update plugin docs
+- extract word keeps indent
+- word preview for remote words
+- support USING:
+- special completion for USE:/IN:
+- prettyprint: detect circular structure
+- vectors: ensure its ok with bignum indices
+- parsing words don't print readably
+- if gadgets are moved, added or deleted, update hand.
+- keyboard focus
+- keyboard gestures
+- text fields
+- code gc
+- type inference fails with some assembler words;
+  displaced, register and other predicates need to inherit from list
+  not cons, and need stronger branch partial eval
+- print warning on null class
+- optimize away dispatch
+- layouts with gaps
+- alignment of gadgets inside their bounding boxes needs thought
+- WordPreview calls markTokens() -> NPE
+- faster completion
+- ppc register decls
+- rename f* words to stream-*
 
-+ ffi:
+- ffi unicode strings: null char security hole
+- utf16 string boxing
+- slot compile problem
+- nulls at the end of utf16 strings
+
++ compiler/ffi:
 
 - value type structs
-- unicode strings
 - out parameters
-- figure out how to load an image referring to missing libraries
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *
 - FFI float types
-
-+ listener/plugin:
-
-- command to turn repl session into a source file
-- update plugin docs
-- extract word keeps indent
-- word preview for remote words
-- WordPreview calls markTokens() -> NPE
-- listener should be multithreaded
-- faster completion
-- NPE in ErrorHighlight
-- maple-like: press enter at old commands to evaluate there
-- completion in the listener
-- special completion for USE:/IN:
-- support USING:
-- command to prettyprint word def at caret, or selection
 
 + i/o:
 
@@ -62,25 +50,14 @@
 - better i/o scheduler
 - nicer way to combine two paths
 - add a socket timeout
-- rename f* words to stream-*
+- unix ffi i/o
 
 + kernel:
 
-- ppc register decls
 - cat, reverse-cat primitives
-
-+ misc:
-
+- generational gc
+- make see work with union, builtin, predicate
+- doc comments of generics
+- proper ordering for classes
 - make-vector and make-string should not need a reverse step
-- perhaps /i should work with all numbers
-- jedit ==> jedit-word, jedit takes a file name
-- browser responder for word links in HTTPd
 - worddef props
-- prettyprint: detect circular structure
-- vectors: ensure its ok with bignum indices
-- parsing words don't print readably
-
-+ httpd:
-
-- log with date
-- file responder; last-modified field

@@ -24,6 +24,7 @@ DLLEXPORT void box_c_string(const BYTE* c_string);
 F_STRING* from_c_string(const BYTE* c_string);
 void primitive_memory_to_string(void);
 DLLEXPORT BYTE* unbox_c_string(void);
+DLLEXPORT uint16_t* unbox_utf16_string(void);
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
 

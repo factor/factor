@@ -103,7 +103,7 @@ SYMBOL: surface
     ] with-scope ; inline
 
 : event-loop ( event -- )
-    dup SDL_WaitEvent 1 = [
+    dup SDL_WaitEvent [
         dup event-type SDL_QUIT = [
             drop
         ] [
@@ -171,7 +171,7 @@ global [
     over str-length 0 = [
         2drop 3drop 0
     ] [
-        TTF_RenderText_Blended
+        TTF_RenderUNICODE_Blended
         [ draw-surface ] keep
         [ surface-w ] keep
         SDL_FreeSurface
@@ -181,7 +181,7 @@ global [
     dup str-length 0 = [
         drop TTF_FontHeight 0 swap
     ] [
-        <int-box> <int-box> [ TTF_SizeText drop ] 2keep
+        <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep
         swap int-box-i swap int-box-i
     ] ifte ;
 

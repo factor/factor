@@ -64,12 +64,15 @@ strings vectors words hashtables prettyprint ;
     meta-r set drop ;
 
 : filter-terminators ( list -- list )
-    [ [ d-in get meta-d get and ] bind ] subset [
-        "No branch has a stack effect" throw
-    ] unless* ;
+    #! Remove branches that unconditionally throw errors.
+    [ [ active? ] bind ] subset ;
 
 : unify-effects ( list -- )
-    filter-terminators dup datastack-effect callstack-effect ;
+    filter-terminators [
+        dup datastack-effect callstack-effect
+    ] [
+        terminate
+    ] ifte* ;
 
 SYMBOL: cloned
 
@@ -93,14 +96,6 @@ SYMBOL: cloned
     d-in [ deep-clone-vector ] change
     dataflow-graph off ;
 
-: terminator? ( obj -- ? )
-    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
-
-: handle-terminator ( quot -- )
-    [ terminator? ] some? [
-        meta-d off meta-r off d-in off
-    ] when ;
-
 : propagate-type ( [[ value class ]] -- )
     #! Type propagation is chained.
     [
@@ -109,13 +104,20 @@ SYMBOL: cloned
     ] when* ;
 
 : infer-branch ( value -- namespace )
+    #! Return a namespace with inferencer variables:
+    #! meta-d, meta-r, d-in. They are set to f if
+    #! terminate was called.
     <namespace> [
         uncons propagate-type
         dup value-recursion recursive-state set
         copy-inference
         literal-value dup infer-quot
-        #values values-node
-        handle-terminator
+        active? [
+            #values values-node
+            handle-terminator
+        ] [
+            drop
+        ] ifte
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )

@@ -1,7 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
-USING: hashtables kernel kernel-internals lists vectors math ;
+USING: hashtables kernel kernel-internals lists strings vectors
+math ;
 
 ! Other languages have classes, objects, variables, etc.
 ! Factor has similar concepts.
@@ -124,6 +125,17 @@ SYMBOL: list-buffer
     #! Return a list whose entries are in the same order that ,
     #! was called.
     make-rlist reverse ; inline
+
+: make-string ( quot -- string )
+    #! Call a quotation. The quotation can call , to prepend
+    #! objects to the list that is returned when the quotation
+    #! is done.
+    make-list cat ; inline
+
+: make-rstring ( quot -- string )
+    #! Return a string whose entries are in the same order that ,
+    #! was called.
+    make-rlist cat ; inline
 
 : make-vector ( quot -- list )
     #! Return a vector whose entries are in the same order that

@@ -67,7 +67,7 @@ C: gadget ( shape -- gadget )
         ] ifte
     ] [
         2drop
-    ] ifte ;
+    ] ifte ; inline
 
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.

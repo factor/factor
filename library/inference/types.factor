@@ -27,14 +27,20 @@ lists math namespaces strings vectors words stdio prettyprint ;
     \ >string \ string infer-check
 ] "infer" set-word-property
 
-! \ slot [
-!     [ object fixnum ] ensure-d
+! : literal-slot ( -- )
 !     dataflow-drop, pop-d literal-value
 !     peek-d value-class builtin-supertypes dup length 1 = [
 !         cons \ slot [ [ object ] [ object ] ] (consume/produce)
 !     ] [
 !         "slot called without static type knowledge" throw
-!     ] ifte
+!     ] ifte ;
+! 
+! : computed-slot ( -- )
+!     \ slot dup "infer-effect" word-property consume/produce ;
+! 
+! \ slot [
+!     [ object fixnum ] ensure-d
+!     peek-d literal? [ literal-slot ] [ computed-slot ] ifte
 ! ] "infer" set-word-property
 
 : type-value-map ( value -- )

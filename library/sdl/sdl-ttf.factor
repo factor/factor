@@ -1,30 +1,5 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl-ttf
 USE: alien
 
@@ -82,20 +57,23 @@ BEGIN-STRUCT: int-box
     FIELD: int i
 END-STRUCT
 
-: TTF_SizeText ( font text w h -- ? )
-    "bool" "sdl-ttf" "TTF_SizeText" [ "void*" "char*" "int-box*" "int-box*" ] alien-invoke ;
+: TTF_SizeUNICODE ( font text w h -- ? )
+    "bool" "sdl-ttf" "TTF_SizeUNICODE" [ "void*" "ushort*" "int-box*" "int-box*" ] alien-invoke ;
 
-: TTF_RenderText_Solid ( font text fg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "char*" "int" ] alien-invoke ;
+: TTF_RenderUNICODE_Solid ( font text fg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderUNICODE_Solid" [ "void*" "ushort*" "int" ] alien-invoke ;
 
-: TTF_RenderText_Shaded ( font text fg bg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Shaded" [ "void*" "char*" "int" "int" ] alien-invoke ;
+: TTF_RenderGlyph_Solid ( font text fg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "ushort" "int" ] alien-invoke ;
+
+: TTF_RenderUNICODE_Shaded ( font text fg bg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderUNICODE_Shaded" [ "void*" "ushort*" "int" "int" ] alien-invoke ;
 
 : TTF_RenderGlyph_Shaded ( font text fg bg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Shaded" [ "void*" "ushort" "int" "int" ] alien-invoke ;
 
-: TTF_RenderText_Blended ( font text fg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Blended" [ "void*" "char*" "int" ] alien-invoke ;
+: TTF_RenderUNICODE_Blended ( font text fg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderUNICODE_Blended" [ "void*" "ushort*" "int" ] alien-invoke ;
 
 : TTF_RenderGlyph_Blended ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Blended" [ "void*" "ushort" "int" ] alien-invoke ;

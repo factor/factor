@@ -62,23 +62,37 @@ strings vectors words hashtables parser prettyprint ;
     #! we infer its stack effect inside a new block.
     gensym [ word-parameter infer-quot effect ] with-block ;
 
-: infer-compound ( word -- effect )
+: infer-compound ( word -- )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
-        recursive-state get init-inference
-        dup dup inline-compound drop present-effect
-        [ "infer-effect" set-word-property ] keep
-    ] with-scope consume/produce ;
+        [
+            recursive-state get init-inference
+            dup dup inline-compound drop present-effect
+            [ "infer-effect" set-word-property ] keep
+        ] with-scope consume/produce
+    ] [
+        [
+            >r branches-can-fail? [
+                drop
+            ] [
+                t "no-effect" set-word-property
+            ] ifte r> rethrow
+        ] when*
+    ] catch ;
 
 GENERIC: (apply-word)
 
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
-    dup "inline" word-property [
-        inline-compound 2drop
+    dup "no-effect" word-property [
+        no-effect
     ] [
-        infer-compound
+        dup "inline" word-property [
+            inline-compound 2drop
+        ] [
+            infer-compound
+        ] ifte
     ] ifte ;
 
 M: promise (apply-word) ( word -- )
@@ -141,14 +155,16 @@ M: symbol (apply-word) ( word -- )
     gensym dup [
         drop pop-d dup
         value-recursion recursive-state set
-        literal-value infer-quot
-    ] with-block drop ;
+        literal-value
+        dup infer-quot
+    ] with-block drop handle-terminator ;
 
 \ call [ infer-call ] "infer" set-word-property
 
 ! These hacks will go away soon
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ = [ [ object object ] [ object ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
 \ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-property

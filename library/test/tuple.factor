@@ -23,3 +23,11 @@ M: quux-tuple delegation-test drop 4 ;
 WRAPPER: quuux-tuple
 
 [ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
+
+GENERIC: delegation-test-2
+TUPLE: quux-tuple-2 ;
+C: quux-tuple-2 ;
+M: quux-tuple-2 delegation-test-2 drop 4 ;
+WRAPPER: quuux-tuple-2
+
+[ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
