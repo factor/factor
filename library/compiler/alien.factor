@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
+USE: assembler
 USE: compiler
 USE: errors
 USE: generic

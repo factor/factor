@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
+USE: assembler
 USE: inference
 USE: errors
 USE: kernel

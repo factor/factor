@@ -123,4 +123,4 @@ M: push-next simplify-drop ( node rest -- rest ? )
         [ #push-indirect | #replace-indirect ]
     ] assoc swons , r> t ;
 
-#drop [ simplify-drop ] "simplify" set-word-property
+\ drop [ simplify-drop ] "simplify" set-word-property

@@ -180,12 +180,12 @@ USE: prettyprint
 ! Don't care about inputs to recursive combinator calls
 #call-label [ 2drop t ] "can-kill" set-word-property
 
-#drop [ 2drop t ] "can-kill" set-word-property
-#drop [ kill-node ] "kill-node" set-word-property
-#dup [ 2drop t ] "can-kill" set-word-property
-#dup [ kill-node ] "kill-node" set-word-property
-#swap [ 2drop t ] "can-kill" set-word-property
-#swap [ kill-node ] "kill-node" set-word-property
+\ drop [ 2drop t ] "can-kill" set-word-property
+\ drop [ kill-node ] "kill-node" set-word-property
+\ dup [ 2drop t ] "can-kill" set-word-property
+\ dup [ kill-node ] "kill-node" set-word-property
+\ swap [ 2drop t ] "can-kill" set-word-property
+\ swap [ kill-node ] "kill-node" set-word-property
 
 : kill-mask ( killing inputs -- mask )
     [ over [ over value= ] some? >boolean nip ] map nip ;
@@ -199,25 +199,25 @@ USE: prettyprint
     ] keep
     over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
 
-#over [ 2drop t ] "can-kill" set-word-property
-#over [
+\ over [ 2drop t ] "can-kill" set-word-property
+\ over [
     [
-        [ [ f f ] | #over ]
-        [ [ f t ] | #dup ]
+        [ [ f f ] | over ]
+        [ [ f t ] | dup ]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 
-#pick [ 2drop t ] "can-kill" set-word-property
-#pick [
+\ pick [ 2drop t ] "can-kill" set-word-property
+\ pick [
     [
-        [ [ f f f ] | #pick ]
-        [ [ f f t ] | #over ]
-        [ [ f t f ] | #over ]
-        [ [ f t t ] | #dup ]
+        [ [ f f f ] | pick ]
+        [ [ f f t ] | over ]
+        [ [ f t f ] | over ]
+        [ [ f t t ] | dup ]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 
-#>r [ 2drop t ] "can-kill" set-word-property
-#>r [ kill-node ] "kill-node" set-word-property
-#r> [ 2drop t ] "can-kill" set-word-property
-#r> [ kill-node ] "kill-node" set-word-property
+\ >r [ 2drop t ] "can-kill" set-word-property
+\ >r [ kill-node ] "kill-node" set-word-property
+\ r> [ 2drop t ] "can-kill" set-word-property
+\ r> [ kill-node ] "kill-node" set-word-property

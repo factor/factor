@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,8 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USE: compiler
-IN: math-internals
+IN: compiler
 USE: assembler
 USE: inference
 USE: math
@@ -34,54 +33,10 @@ USE: words
 USE: kernel
 USE: alien
 USE: lists
+USE: math-internals
 
 ! This file provides compiling definitions for fixnum words
 ! that are faster than what C gives us.
-
-#drop [
-    drop
-    ECX DS>
-    ECX 4 SUB
-    ECX >DS
-] "generator" set-word-property
-
-#dup [
-    drop
-    ECX DS>
-    EAX [ ECX ] MOV
-    ECX 4 ADD
-    [ ECX ] EAX MOV
-    ECX >DS
-] "generator" set-word-property
-
-#swap [
-    drop
-    ECX DS>
-    EAX [ ECX ] MOV
-    EDX [ ECX -4 ] MOV
-    [ ECX ] EDX MOV
-    [ ECX -4 ] EAX MOV
-] "generator" set-word-property
-
-#over [
-    drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
-    ECX 4 ADD
-    [ ECX ] EAX MOV
-    ECX >DS
-] "generator" set-word-property
-
-#pick [
-    drop
-    ECX DS>
-    EAX [ ECX -8 ] MOV
-    ECX 4 ADD
-    [ ECX ] EAX MOV
-    ECX >DS
-] "generator" set-word-property
-
-\ #dup f "linearize" set-word-property
 
 : self ( word -- )
     f swap dup "infer-effect" word-property (consume/produce) ;

@@ -67,12 +67,7 @@ USE: prettyprint
     [ object fixnum ] ensure-d
     dataflow-drop, pop-d literal-value
     peek-d value-class builtin-supertypes dup length 1 = [
-        cons #slot dataflow, [
-            1 0 node-inputs
-            [ object ] consume-d
-            [ object ] produce-d
-            1 0 node-outputs
-        ] bind
+        cons \ slot [ [ object ] [ object ] ] (consume/produce)
     ] [
         "slot called without static type knowledge" throw
     ] ifte

@@ -182,6 +182,7 @@ os "win32" = [
 cpu "x86" = [
     [
          "/library/compiler/x86/assembler.factor"
+         "/library/compiler/x86/stack.factor"
          "/library/compiler/x86/generator.factor"
          "/library/compiler/x86/fixnum.factor"
     ] [

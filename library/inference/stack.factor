@@ -33,29 +33,25 @@ USE: namespaces
 USE: words
 
 \ >r [
-    f #>r dataflow, [ 1 0 node-inputs ] extend
+    f \ >r dataflow, [ 1 0 node-inputs ] extend
     pop-d push-r
     [ 0 1 node-outputs ] bind
 ] "infer" set-word-property
 
 \ r> [
-    f #r> dataflow, [ 0 1 node-inputs ] extend
+    f \ r> dataflow, [ 0 1 node-inputs ] extend
     pop-r push-d
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-property
 
-: meta-infer ( word op -- )
-    #! Mark a word as being partially evaluated.
-    dupd [
-        over unit , \ car ,
-        f , ,
-        "infer-effect" word-property ,
-        [ drop host-word ] ,
-        \ with-dataflow ,
-    ] make-list "infer" set-word-property ;
+: partial-eval ( word -- )
+    #! Partially evaluate a word.
+    f over dup
+    "infer-effect" word-property
+    [ drop host-word ] with-dataflow ;
 
-\ drop #drop meta-infer
-\ dup #dup meta-infer
-\ swap #swap meta-infer
-\ over #over meta-infer
-\ pick #pick meta-infer
+\ drop [ \ drop partial-eval ] "infer" set-word-property
+\ dup  [ \ dup  partial-eval ] "infer" set-word-property
+\ swap [ \ swap partial-eval ] "infer" set-word-property
+\ over [ \ over partial-eval ] "infer" set-word-property
+\ pick [ \ pick partial-eval ] "infer" set-word-property
