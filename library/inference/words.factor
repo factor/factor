@@ -39,7 +39,7 @@ USE: words
 USE: hashtables
 USE: parser
 
-: with-dataflow ( param op [ in | out ] quot -- )
+: with-dataflow ( param op [ intypes outtypes ] quot -- )
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.

@@ -196,6 +196,8 @@ SYMBOL: sym-test
 
 [ [ 1 | 1 ] ] [ [ get ] infer old-effect ] unit-test
 
+[ [ 1 | 1 ] ] [ [ str>number ] infer old-effect ] unit-test
+
 ! Type inference
 
 [ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test

@@ -28,6 +28,7 @@
 IN: compiler
 USE: inference
 USE: errors
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
@@ -56,7 +57,11 @@ USE: words
     ] when
     dup word-parameter ;
 
-: (compile) ( word -- )
+GENERIC: (compile) ( word -- )
+
+M: word (compile) drop ;
+
+M: compound (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
     compiling dataflow optimize linearize simplify generate ;
 

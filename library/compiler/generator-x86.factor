@@ -128,16 +128,18 @@ USE: math
     compiled-offset 0 compile-cell 0 defer-xt rel-address
 ] "generator" set-word-property
 
-#c-call [ CALL JUMP-FIXUP ] "generator" set-word-property
+#c-call [
+    uncons alien-symbol CALL JUMP-FIXUP
+] "generator" set-word-property
 
 #unbox [
-    CALL JUMP-FIXUP
+    dlsym-self CALL JUMP-FIXUP
     EAX PUSH-R
 ] "generator" set-word-property
 
 #box [
     EAX PUSH-R
-    CALL JUMP-FIXUP
+    dlsym-self CALL JUMP-FIXUP
     4 ESP R+I
 ] "generator" set-word-property
 

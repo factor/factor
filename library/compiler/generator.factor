@@ -81,7 +81,7 @@ SYMBOL: relocation-table
     dup [ compile-cell ] vector-each
     vector-length cell * ;
 
-: generate ( word linear -- )
+: (generate) ( word linear -- )
     #! Compile a word definition from linear IR.
     100 <vector> relocation-table set
     begin-assembly swap >r >r
@@ -89,5 +89,19 @@ SYMBOL: relocation-table
         generate-reloc
     r> set-compiled-cell
     r> set-compiled-cell ;
+
+SYMBOL: previous-offset
+
+: generate ( word linear -- )
+    #! If generation fails, reset compiled offset.
+    [
+        compiled-offset previous-offset set
+        (generate)
+    ] [
+        [
+            previous-offset get set-compiled-offset
+            rethrow
+        ] when*
+    ] catch ;
 
 #label [ save-xt ] "generator" set-word-property
