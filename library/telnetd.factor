@@ -54,7 +54,7 @@ USE: streams
     [
         quit-flag not
     ] [
-        dup accept telnet-client
+        dup >r accept telnet-client r>
     ] while ;
 
 : telnetd ( port -- )

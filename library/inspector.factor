@@ -63,18 +63,31 @@ USE: vocabularies
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;
 
-: describe-assoc ( alist -- )
-    dup [ car ] inject max-str-length swap
+: ?unparse ( obj -- str )
+    dup string? [ unparse ] unless ;
+
+: alist-keys>str ( alist -- alist )
+    #! Unparse non-string keys.
+    [ unswons ?unparse swons ] inject ;
+
+: alist-sort ( list -- list )
+    [ swap car swap car str-lexi> ] sort ;
+
+: name-padding ( alist -- col )
+    [ car ] inject max-str-length ;
+
+: (describe-assoc) ( alist -- )
+    dup name-padding swap
     [ dupd uncons value. ] each drop ;
+
+: describe-assoc ( alist -- )
+    alist-keys>str alist-sort (describe-assoc) ;
    
 : describe-namespace ( namespace -- )
     [ vars-values ] bind describe-assoc ;
 
-: ?unparse ( obj -- str )
-    dup string? [ unparse ] unless ;
-
 : describe-hashtable ( hashtables -- )
-    hash>alist [ unswons ?unparse swons ] inject describe-assoc ;
+    hash>alist describe-assoc ;
 
 : describe ( obj -- )
     [

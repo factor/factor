@@ -63,7 +63,10 @@ USE: strings
 
 : parse-stream ( name stream -- code )
     #! Uses the current namespace for temporary variables.
-    >r "parse-name" set f r> [ (parse) ] read-lines nreverse ;
+    >r "parse-name" set f r>
+    [ (parse) ] read-lines nreverse
+    "parse-name" off
+    "line-number" off ;
 
 : parse-file ( file -- code )
     dup <filecr> parse-stream ;

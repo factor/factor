@@ -1,5 +1,9 @@
 0.62:
 
+- read-line: handle \r\n
+- flush output buffer before reading line
+- print: only flush in stdio stream
+- ignore errors from flush
 - can-read-line?
 - client connections broken
 - vocabulary section: what is the dictionary?
@@ -14,8 +18,6 @@
 - listener backspace overzealous
 - SIGBUS handler
 - handle division by zero
-- errors: don't show .factor-rc
-- inspector: sort
 - log-client: fix for native
 - telnetd: needs own history
 - multitasking
@@ -54,7 +56,6 @@
 
 + native:
 
-- broken pipe errors with httpd and telnetd in cfactor
 - read#
 - to_fixnum and friends: error on float
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]

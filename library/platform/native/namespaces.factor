@@ -78,12 +78,9 @@ DEFER: >n
 : set ( value variable -- ) namespace set* ;
 : put ( variable value -- ) namespace put* ;
 
-: car-str-sort ( list -- list )
-    [ swap car swap car str-lexi> ] sort ;
-
-: vars-values ( -- list ) namespace hash>alist car-str-sort ;
-: vars ( -- list ) vars-values [ car ] inject ;
-: values ( -- list ) vars-values [ cdr ] inject ;
+: vars ( -- list ) namespace hash-keys ;
+: values ( -- list ) namespace hash-values ;
+: vars-values ( -- list ) namespace hash>alist ;
 
 ! We don't have bound objects in native Factor.
 : namespace? hashtable? ;
