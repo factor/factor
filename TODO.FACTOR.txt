@@ -22,9 +22,11 @@
 - vector-each/map examples
 - string construction examples
 - string construction ackward
+- read#
 
 + tests:
 
+- finish split
 - java factor: equal numbers have non-equal hashcodes!
 - sbuf=
 - vector-hashcode
@@ -52,7 +54,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 - errors: don't show .factor-rc
 - handle division by zero
 - decide if overflow is a fatal error
-- f >n: crashes
 - parsing should be parsing
 - describe-word
 - contains ==> contains?

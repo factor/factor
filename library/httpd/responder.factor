@@ -67,9 +67,6 @@ USE: httpd
 : no-such-responder ( name -- )
     "404 no such responder: " swap cat2 httpd-error ;
 
-: bad-responder-query ( argument -- )
-    "404 missing parameter" httpd-error ;
-
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
     dup "/" str-head? dup [ nip ] [ drop ] ifte ;
@@ -78,14 +75,9 @@ USE: httpd
     "Calling responder " swap cat2 log ;
 
 : serve-responder ( argument method -- )
-    swap
-    trim-/
-    dup "/" split1 dup [
-        nip unswons dup get-responder dup [
-            swap log-responder call-responder
-        ] [
-            drop nip nip no-such-responder
-        ] ifte
+    over log-responder
+    swap trim-/ "/" split1 over get-responder dup [
+        rot drop call-responder
     ] [
-        3drop bad-responder-query
+        2drop no-such-responder drop
     ] ifte ;

@@ -45,7 +45,7 @@ USE: vectors
     #! array index is determined using a hash function, and the
     #! buckets are associative lists which are searched
     #! linearly. The number of buckets must be a power of two.
-    dup <vector> dup >r set-vector-length r> ;
+    empty-vector ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.

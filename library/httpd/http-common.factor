@@ -33,7 +33,6 @@ USE: lists
 USE: logging
 USE: namespaces
 USE: parser
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
@@ -55,16 +54,15 @@ USE: url-encoding
     dup log-error
     <% dup "text/html" response % error-body % %> print ;
 
-: read-header-iter ( alist -- alist )
-    read dup "" = [
-        drop
-    ] [
-        "(.+?): (.+)" groups [ uncons car cons swons ]  when*
-        read-header-iter
-    ] ifte ;
+: header-line ( alist line -- alist )
+    ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
+
+: (read-header) ( alist -- alist )
+    read dup
+    f-or-"" [ drop ] [ header-line (read-header) ] ifte ;
 
 : read-header ( -- alist )
-    [ ] read-header-iter ;
+    [ ] (read-header) ;
 
 : content-length ( alist -- length )
     "Content-Length" swap assoc dec> ;

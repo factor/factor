@@ -127,18 +127,14 @@ USE: stack
         swap [ str// ] dip split cons
     ] ifte ;
 
-: split1 ( string split -- pair )
+: split1 ( string split -- before after )
     #! The car of the pair is the string up to the first
     #! occurrence of split; the cdr is the remainder of
     #! the string.
-    dupd index-of dup -1 = [
-        drop dup str-length 0 = [
-            drop f
-        ] [
-            unit
-        ] ifte
+    2dup index-of dup -1 = [
+        2drop f
     ] [
-        str// cons
+        swapd str/ rot str-length str/ nip
     ] ifte ;
 
 : max-str-length ( list -- len )

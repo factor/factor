@@ -42,21 +42,23 @@ USE: vectors
 : save-error ( error -- )
     #! Save the stacks and parser state for post-mortem
     #! inspection after an error.
-    "pos" get
-    "line" get
-    "line-number" get
-    "parse-name" get
-    global [
-        "error-parse-name" set
-        "error-line-number" set
-        "error-line" set
-        "error-pos" set
-        "error" set
-        datastack >pop> "error-datastack" set
-        callstack >pop> >pop> "error-callstack" set
-        namestack "error-namestack" set
-        catchstack "error-catchstack" set
-    ] bind ;
+    namespace [
+        "pos" get
+        "line" get
+        "line-number" get
+        "parse-name" get
+        global [
+            "error-parse-name" set
+            "error-line-number" set
+            "error-line" set
+            "error-pos" set
+            "error" set
+            datastack >pop> "error-datastack" set
+            callstack >pop> >pop> "error-callstack" set
+            namestack "error-namestack" set
+            catchstack "error-catchstack" set
+        ] bind
+    ] when* ;
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the
