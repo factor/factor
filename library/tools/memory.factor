@@ -36,12 +36,12 @@ namespaces prettyprint stdio unparser vectors words ;
         end-scan rethrow
     ] catch ; inline
 
-: instances ( class -- list )
-    #! Return a list of all instances of a built-in or tuple
-    #! class in the image.
+: instances ( quot -- list )
+    #! Return a list of all object that return true when the
+    #! quotation is applied to them.
     [
         [
-            dup class pick = [ , ] [ drop ] ifte
+            [ swap call ] 2keep rot [ , ] [ drop ] ifte
         ] each-object drop
     ] make-list ;
 
@@ -70,9 +70,7 @@ M: object (each-slot) ( quot obj -- )
 : references ( obj -- list )
     #! Return a list of all objects that refer to a given object
     #! in the image.
-    [ ] [
-        pick over refers? [ swons ] [ drop ] ifte
-    ] each-object nip ;
+    [ dupd refers? ] instances nip ;
 
 : vector+ ( n index vector -- )
     [ vector-nth + ] 2keep set-vector-nth ;

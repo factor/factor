@@ -42,8 +42,9 @@ SYMBOL: modifiers
     [[ "ALT"   HEX: 0200 ]]
     [[ "META"  HEX: 0400 ]]
     [[ "META"  HEX: 0800 ]]
-    [[ "NUM"   HEX: 1000 ]]
-    [[ "CAPS"  HEX: 2000 ]]
+! We ignore these two modifiers since they're mighty useless
+!    [[ "NUM"   HEX: 1000 ]]
+!    [[ "CAPS"  HEX: 2000 ]]
     [[ "MODE"  HEX: 4000 ]]
 ] modifiers set
 
