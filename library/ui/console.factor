@@ -79,6 +79,10 @@ SYMBOL: output-line
 #! A line editor object.
 SYMBOL: input-line
 
+#! The font size is hardcoded here.
+: line-height 8 ;
+: char-width 8 ;
+
 ! Scrolling
 : visible-lines ( -- n ) height get line-height /i ;
 : total-lines ( -- n ) lines get vector-length ;
@@ -104,10 +108,6 @@ SYMBOL: input-line
 : background white ;
 : foreground black ;
 : cursor     red   ;
-
-#! The font size is hardcoded here.
-: line-height 8 ;
-: char-width 8 ;
 
 : next-line ( -- )
     0 x set  line-height y [ + ] change ;

@@ -27,6 +27,7 @@
 + listener/plugin:
 
 - update plugin docs
+- extract word puts stuff in the wrong place
 - extract word keeps indent
 - word preview for remote words
 - WordPreview calls markTokens() -> NPE
