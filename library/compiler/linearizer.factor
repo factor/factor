@@ -44,8 +44,7 @@ USE: errors
 
 SYMBOL: #push-immediate
 SYMBOL: #push-indirect
-SYMBOL: #jump-label-t ( branch if top of stack is true )
-SYMBOL: #jump-label ( unconditional branch )
+SYMBOL: #jump-t ( branch if top of stack is true )
 SYMBOL: #jump ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
 
@@ -87,8 +86,18 @@ SYMBOL: #target ( part of jump table )
     swons ,
 ] "linearizer" set-word-property
 
+#call [
+    dup [ node-param get ] bind postpone-word
+    linear,
+] "linearizer" set-word-property
+
+#call-label [
+    [ node-param get ] bind #call swons ,
+] "linearizer" set-word-property
+
 : <label> ( -- label )
-    gensym ;
+    gensym
+    dup t "label" set-word-property ;
 
 : label, ( label -- )
     #label swons , ;
@@ -124,9 +133,9 @@ SYMBOL: #target ( part of jump table )
     #! IR.
     uncons car
     <label> [
-        #jump-label-t swons ,
+        #jump-t swons ,
         (linearize) ( false branch )
-        <label> dup #jump-label swons ,
+        <label> dup #jump swons ,
     ] keep label, ( branch target of BRANCH-T )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
@@ -144,9 +153,7 @@ SYMBOL: #target ( part of jump table )
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
-    [
-        uncons label,  (linearize)  dup #jump-label swons ,
-    ] each drop ;
+    [ uncons label, (linearize) dup #jump swons , ] each drop ;
 
 : check-dispatch ( vtable -- )
     length num-types = [

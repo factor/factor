@@ -73,12 +73,12 @@ USE: words
 : alien-function ( function library -- )
     [ library dlsym ] [ dlsym-self ] ifte* ;
 
-: compile-alien-call
-    pop-literal reverse PARAMETERS >r
-    pop-literal pop-literal alien-function CALL JUMP-FIXUP
-    r> CLEANUP
-    pop-literal RETURNS ;
-
-global [ <namespace> "libraries" set ] bind
-
-\ alien-call [ compile-alien-call ] "compiling" set-word-property
+! : compile-alien-call
+!     pop-literal reverse PARAMETERS >r
+!     pop-literal pop-literal alien-function CALL JUMP-FIXUP
+!     r> CLEANUP
+!     pop-literal RETURNS ;
+! 
+! global [ <namespace> "libraries" set ] bind
+! 
+! \ alien-call [ compile-alien-call ] "compiling" set-word-property

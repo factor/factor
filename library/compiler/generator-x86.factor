@@ -57,19 +57,14 @@ USE: words
 ] "generator" set-word-property
 
 #call [
-    dup postpone-word
     CALL compiled-offset defer-xt
 ] "generator" set-word-property
 
-#call-label [
-    CALL compiled-offset defer-xt
-] "generator" set-word-property
-
-#jump-label [
+#jump [
     JUMP compiled-offset defer-xt
 ] "generator" set-word-property
 
-#jump-label-t [
+#jump-t [
     POP-DS
     ! condition is now in EAX
     f address EAX CMP-I-R
