@@ -37,7 +37,7 @@ void throw_error(CELL error)
 
 void general_error(CELL error, CELL tagged)
 {
-	CONS* c = cons(error,tag_cons(cons(tagged,F)));
+	CELL c = cons(error,tag_cons(cons(tagged,F)));
 	if(userenv[BREAK_ENV] == 0)
 	{
 		/* Crash at startup */
@@ -52,18 +52,17 @@ void general_error(CELL error, CELL tagged)
 		}
 		exit(1);
 	}
-	throw_error(tag_cons(c));
+	throw_error(c);
 }
 
 void type_error(CELL type, CELL tagged)
 {
-	CONS* c = cons(tag_fixnum(type),tag_cons(cons(tagged,F)));
-	general_error(ERROR_TYPE,tag_cons(c));
+	CELL c = cons(tag_fixnum(type),tag_cons(cons(tagged,F)));
+	general_error(ERROR_TYPE,c);
 }
 
 void range_error(CELL tagged, CELL index, CELL max)
 {
-	CONS* c = cons(tagged,tag_cons(cons(tag_fixnum(index),
-		tag_cons(cons(tag_fixnum(max),F)))));
-	general_error(ERROR_RANGE,tag_cons(c));
+	CELL c = cons(tagged,cons(tag_fixnum(index),cons(tag_fixnum(max),F)));
+	general_error(ERROR_RANGE,c);
 }

@@ -37,14 +37,14 @@ void primitive_stat(void)
 		CELL mode = tag_fixnum(sb.st_mode & ~S_IFMT);
 		CELL size = tag_object(s48_long_long_to_bignum(sb.st_size));
 		CELL mtime = tag_integer(sb.st_mtime);
-		dpush(tag_cons(cons(
+		dpush(cons(
 			dirp,
-			tag_cons(cons(
+			cons(
 				mode,
-				tag_cons(cons(
+				cons(
 					size,
-					tag_cons(cons(
-						mtime,F)))))))));
+					cons(
+						mtime,F)))));
 	}
 }
 
@@ -61,7 +61,7 @@ void primitive_read_dir(void)
 		{
 			CELL name = tag_object(from_c_string(
 				file->d_name));
-			result = tag_cons(cons(name,result));
+			result = cons(name,result);
 		}
 
 		closedir(dir);

@@ -1,11 +1,11 @@
 #include "factor.h"
 
-CONS* cons(CELL car, CELL cdr)
+CELL cons(CELL car, CELL cdr)
 {
 	CONS* cons = allot(sizeof(CONS));
 	cons->car = car;
 	cons->cdr = cdr;
-	return cons;
+	return tag_cons(cons);
 }
 
 void primitive_consp(void)
@@ -17,7 +17,7 @@ void primitive_cons(void)
 {
 	CELL cdr = dpop();
 	CELL car = dpop();
-	dpush(tag_cons(cons(car,cdr)));
+	dpush(cons(car,cdr));
 }
 
 void primitive_car(void)

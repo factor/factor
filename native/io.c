@@ -42,8 +42,8 @@ IO_TASK* add_io_task(
 	io_tasks[fd].type = type;
 	io_tasks[fd].port = port;
 	io_tasks[fd].other_port = other_port;
-	io_tasks[fd].callbacks = tag_cons(cons(callback,
-		io_tasks[fd].callbacks));
+	io_tasks[fd].callbacks = cons(callback,
+		io_tasks[fd].callbacks);
 
 	if(fd >= *fd_count)
 		*fd_count = fd + 1;

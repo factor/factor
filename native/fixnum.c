@@ -50,55 +50,20 @@ CELL subtract_fixnum(FIXNUM x, FIXNUM y)
 
 /**
  * Multiply two integers, and trap overflow.
- * I'm sure a more efficient algorithm exists.
+ * Thanks to David Blaikie (The_Vulture from freenode #java) for the hint.
  */
 CELL multiply_fixnum(FIXNUM x, FIXNUM y)
 {
-	bool negp;
-	FIXNUM hx, lx, hy, ly;
-	FIXNUM hprod, lprod, xprod, result;
-
-	if(x < 0)
-	{
-		negp = true;
-		x = -x;
-	}
+	if(x == 0 || y == 0)
+		return tag_fixnum(0);
 	else
-		negp = false;
-
-	if(y < 0)
 	{
-		negp = !negp;
-		y = -y;
+		FIXNUM prod = x * y;
+		if(prod / x == y)
+			return tag_integer(prod);
 	}
 
-	hx = x >> HALF_WORD_SIZE;
-	hy = y >> HALF_WORD_SIZE;
-
-	hprod = hx * hy;
-
-	if(hprod != 0)
-		goto bignum;
-
-	lx = x & HALF_WORD_MASK;
-	ly = y & HALF_WORD_MASK;
-
-	lprod = lx * ly;
-
-	if(lprod > FIXNUM_MAX)
-		goto bignum;
-
-	xprod = lx * hy + hx * ly;
-
-	if(xprod > (FIXNUM_MAX >> HALF_WORD_SIZE))
-		goto bignum;
-
-	result = (xprod << HALF_WORD_SIZE) + lprod;
-	if(negp)
-		result = -result;
-	return tag_integer(result);
-
-bignum:	return tag_object(
+	return tag_object(
 		s48_bignum_multiply(
 			s48_long_to_bignum(x),
 			s48_long_to_bignum(y)));

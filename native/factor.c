@@ -21,8 +21,7 @@ int main(int argc, char** argv)
 	args = F;
 	while(--argc != 0)
 	{
-		args = tag_cons(cons(tag_object(from_c_string(argv[argc])),
-			args));
+		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}
 
 	userenv[ARGS_ENV] = args;

@@ -75,10 +75,7 @@ CELL make_io_error(const char* func)
 	STRING* function = from_c_string(func);
 	STRING* error = from_c_string(strerror(errno));
 
-	CONS* c = cons(tag_object(function),tag_cons(
-		cons(tag_object(error),F)));
-
-	return tag_cons(c);
+	return cons(tag_object(function),cons(tag_object(error),F));
 }
 
 void postpone_io_error(PORT* port, const char* func)
