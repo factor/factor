@@ -125,7 +125,7 @@ public class WordPreview implements ActionListener, CaretListener
 				{
 					view.getStatus().setMessageAndClear(
 						FactorWordRenderer.getWordHTMLString(
-						w,fdata.parser.getWordDefinition(w),true));
+						w,true));
 				}
 			}
 			catch(IOException e)

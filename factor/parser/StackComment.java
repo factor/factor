@@ -47,6 +47,6 @@ public class StackComment extends FactorParsingDefinition
 		throws Exception
 	{
 		String comment = reader.getScanner().readUntil( '(',')',false);
-		reader.append(new FactorDocComment(comment,true));
+		reader.setStackComment(comment);
 	}
 }

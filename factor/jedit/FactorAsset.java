@@ -39,15 +39,12 @@ import sidekick.*;
 public class FactorAsset extends Asset
 {
 	private FactorWord word;
-	private FactorWordDefinition def;
 
-	public FactorAsset(FactorWord word, FactorWordDefinition def,
-		Position start)
+	public FactorAsset(FactorWord word, Position start)
 	{
 		super(word.name);
-		this.start = start;
 		this.word = word;
-		this.def = def;
+		this.start = start;
 	}
 
 	public Icon getIcon()
@@ -62,6 +59,6 @@ public class FactorAsset extends Asset
 	
 	public String getLongString()
 	{
-		return FactorWordRenderer.getWordHTMLString(word,def,false);
+		return FactorWordRenderer.getWordHTMLString(word,false);
 	}
 }

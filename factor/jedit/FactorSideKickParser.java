@@ -40,7 +40,6 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
-	private WordPreview wordPreview;
 	private Map previewMap;
 
 	/**
@@ -55,22 +54,6 @@ public class FactorSideKickParser extends SideKickParser
 	{
 		super("factor");
 		previewMap = new HashMap();
-		worddefs = new HashMap();
-	} //}}}
-
-	//{{{ getWordDefinition() method
-	/**
-	 * Check for a word definition from a parsed source file. If one is
-	 * found, return it, otherwise return interpreter's definition.
-	 */
-	public FactorWordDefinition getWordDefinition(FactorWord word)
-	{
-		FactorWordDefinition def = (FactorWordDefinition)
-			worddefs.get(word);
-		if(def != null)
-			return def;
-		else
-			return word.def;
 	} //}}}
 
 	//{{{ activate() method
@@ -180,7 +163,6 @@ public class FactorSideKickParser extends SideKickParser
 					parsed.car;
 
 				FactorWord word = def.word;
-				worddefs.put(word,def);
 
 				/* word lines are indexed from 1 */
 				int startLine = Math.min(
@@ -197,8 +179,7 @@ public class FactorSideKickParser extends SideKickParser
 				if(last != null)
 					last.end = buffer.createPosition(start - 1);
 
-				last = new FactorAsset(word,def,
-					buffer.createPosition(start));
+				last = new FactorAsset(word,buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));
 			}
 

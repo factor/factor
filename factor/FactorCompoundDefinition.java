@@ -38,7 +38,6 @@ import java.util.*;
 public class FactorCompoundDefinition extends FactorWordDefinition
 {
 	public Cons definition;
-	private Cons endOfDocs;
 
 	//{{{ FactorCompoundDefinition constructor
 	/**
@@ -48,15 +47,6 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	{
 		super(word);
 		this.definition = definition;
-		if(definition == null)
-			endOfDocs = null;
-		else
-		{
-			endOfDocs = definition;
-			while(endOfDocs != null
-				&& endOfDocs.car instanceof FactorDocComment)
-				endOfDocs = endOfDocs.next();
-		}
 	} //}}}
 
 	//{{{ toList() method

@@ -49,10 +49,13 @@ public class Ine extends FactorParsingDefinition
 		throws Exception
 	{
 		FactorReader.ParseState state = reader.popState(start,word);
-		FactorWord w = (FactorWord)state.arg;
+		FactorWord w = state.defining;
+		/* Only ever null with restartable scanner;
+		error already logged, so give up */
 		if(w == null)
 			return;
 
-		reader.append(new FactorCompoundDefinition(w,state.first));
+		w.def = new FactorCompoundDefinition(w,state.first);
+		reader.append(w.def);
 	}
 }

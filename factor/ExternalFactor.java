@@ -135,7 +135,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 				return null;
 
 			result = (Cons)result.car;
-			return new FactorWord((String)result.car,(String)result.next().car);
+			w = new FactorWord(
+				(String)result.car,
+				(String)result.next().car);
+			w.stackEffect = (String)result.next().next().car;
+			return w;
 		}
 		catch(Exception e)
 		{

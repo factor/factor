@@ -269,6 +269,8 @@ public class FactorReader
 				w.line = line;
 				w.col = col;
 				w.file = scanner.getFileName();
+				w.stackEffect = null;
+				w.documentation = null;
 			}
 			return w;
 		}
@@ -313,8 +315,7 @@ public class FactorReader
 			return true;
 		else if(next instanceof String)
 		{
-			FactorWord word = intern((String)next,
-				!getCurrentState().warnUndefined);
+			FactorWord word = intern((String)next,false);
 			if(word == null)
 			{
 				/* We're ignoring errors */
@@ -341,24 +342,22 @@ public class FactorReader
 	 * An exclusive state can only happen at the top level.
 	 * For example, : ... ; definitions cannot be nested so they
 	 * are exclusive.
-	 *
-	 * @param args Parsing words can use this to store arbitrary info
 	 */
-	public void pushExclusiveState(FactorWord start, Object args)
+	public void pushExclusiveState(FactorWord start, FactorWord defining)
 		throws FactorParseException
 	{
 		if(getCurrentState().start != toplevel)
 			scanner.error(start + " cannot be nested");
-		pushState(start,args);
+		pushState(start,defining);
 	} //}}}
 
 	//{{{ pushState() method
 	/**
 	 * Push a parser state, for example reading of a list.
 	 */
-	public void pushState(FactorWord start, Object args)
+	public void pushState(FactorWord start, FactorWord defining)
 	{
-		states = new Cons(new ParseState(start,args),states);
+		states = new Cons(new ParseState(start,defining),states);
 	} //}}}
 
 	//{{{ popState() method
@@ -391,6 +390,18 @@ public class FactorReader
 		getCurrentState().append(obj);
 	} //}}}
 
+	//{{{ setStackComment() method
+	public void setStackComment(String comment)
+	{
+		getCurrentState().setStackComment(comment);
+	} //}}}
+
+	//{{{ addDocComment() method
+	public void addDocComment(String comment)
+	{
+		getCurrentState().addDocComment(comment);
+	} //}}}
+
 	//{{{ bar() method
 	/**
 	 * Sets the current parser state's cdr to the given object.
@@ -410,39 +421,24 @@ public class FactorReader
 	public class ParseState
 	{
 		public FactorWord start;
-		public Object arg;
+		public FactorWord defining;
 		public Cons first;
 		public Cons last;
-		public boolean warnUndefined;
-		private boolean comma;
+		private boolean bar;
 		private boolean docComment;
 
-		ParseState(FactorWord start, Object arg)
+		ParseState(FactorWord start, FactorWord defining)
 		{
 			docComment = start.docComment;
-			warnUndefined = true;
 			this.start = start;
-			this.arg = arg;
+			this.defining = defining;
 		}
 
 		void append(Object obj) throws FactorParseException
 		{
-			boolean docComment = (this.docComment || alwaysDocComments);
-			// In a doc comment context, first object is always
-			// a word, then followed by doc comments, then followed
-			// by code.
-			if(docComment && !(obj instanceof FactorDocComment)
-				&& first != null)
-			{
-				this.docComment = false;
-			}
-			else if(!docComment && obj instanceof FactorDocComment)
-			{
-				//scanner.error("Documentation comment not allowed here");
-				return;
-			}
+			docComment = false;
 
-			if(comma)
+			if(bar)
 			{
 				if(last.cdr != null)
 					scanner.error("Only one token allowed after |");
@@ -459,6 +455,27 @@ public class FactorReader
 			}
 		}
 
+		void setStackComment(String comment)
+		{
+			if(defining != null && defining.stackEffect == null)
+				defining.stackEffect = comment;
+		}
+
+		void addDocComment(String comment)
+		{
+			if(defining != null && (docComment || alwaysDocComments))
+			{
+				if(defining.documentation == null)
+					defining.documentation = comment;
+				else
+				{
+					/* Its O(n^2). Big deal. */
+					defining.documentation = defining.documentation
+						.concat(comment);
+				}
+			}
+		}
+
 		void bar() throws FactorParseException
 		{
 			if(last.cdr != null)
@@ -468,7 +485,7 @@ public class FactorReader
 				scanner.error("Only one token allowed after |");
 			}
 
-			comma = true;
+			bar = true;
 		}
 	} //}}}
 }

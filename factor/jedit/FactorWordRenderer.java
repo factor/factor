@@ -37,13 +37,11 @@ import org.gjt.sp.jedit.*;
 public class FactorWordRenderer extends DefaultListCellRenderer
 {
 	//{{{ getWordHTMLString() method
-	public static String getWordHTMLString(FactorWord word,
-		FactorWordDefinition def, boolean showIn)
+	public static String getWordHTMLString(FactorWord word, boolean showIn)
 	{
-		String prop = "factor.completion.plain";
-		String stackEffect = null;
+		String prop = "factor.completion.colon";
 
-		if(def == null)
+		/* if(def == null)
 		{
 			if(word.parsing != null)
 				prop = "factor.completion.parsing";
@@ -63,11 +61,10 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 					d.car;
 				if(comment.isStackComment())
 				{
-					prop = "factor.completion.stack";
 					stackEffect = comment.toString();
 				}
 			}
-		}
+		} */
 
 		String in;
 		if(showIn)
@@ -80,13 +77,15 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		else
 			in = "";
 
-		return "<html>" + in + jEdit.getProperty(prop,
-			new Object[] {
-				MiscUtilities.charsToEntities(word.name),
-				stackEffect == null
-				? null :
-				MiscUtilities.charsToEntities(stackEffect)
-			});
+		String html = "<html>" + in + jEdit.getProperty(prop,
+			new Object[] { MiscUtilities.charsToEntities(word.name) });
+		if(word.stackEffect != null)
+		{
+			html += jEdit.getProperty("factor.completion.stack",
+				new String[] { html, word.stackEffect });
+		}
+
+		return html;
 	} //}}}
 
 	private FactorSideKickParser parser;
@@ -114,9 +113,7 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			return this;
 
 		FactorWord word = (FactorWord)value;
-		setText(getWordHTMLString(word,
-			parser.getWordDefinition(word),
-			showIn));
+		setText(getWordHTMLString(word,showIn));
 
 		return this;
 	} //}}}

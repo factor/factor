@@ -51,6 +51,6 @@ public class LineComment extends FactorParsingDefinition
 	{
 		String comment = reader.getScanner().readUntilEOL();
 		if(doc)
-			reader.append(new FactorDocComment(comment,false));
+			reader.addDocComment(comment);
 	}
 }

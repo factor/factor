@@ -36,20 +36,20 @@ import java.util.*;
  */
 public class FactorWord implements FactorExternalizable
 {
-	private static int gensymCount = 0;
-
 	public String vocabulary;
 	public String name;
-
-	/**
-	 * Interpreted/compiled word definition.
-	 */
-	public FactorWordDefinition def;
+	public String stackEffect;
+	public String documentation;
 
 	/**
 	 * Parsing word definition.
 	 */
 	public FactorParsingDefinition parsing;
+
+	/**
+	 * Stub for interpreter definitin.
+	 */
+	public FactorWordDefinition def;
 
 	/**
 	 * Should the parser keep doc comments?
@@ -64,35 +64,10 @@ public class FactorWord implements FactorExternalizable
 	public int col;
 
 	//{{{ FactorWord constructor
-	/**
-	 * Do not use this constructor unless you're writing a packages
-	 * implementation or something. Use an FactorDictionary's
-	 * intern() method instead.
-	 */
-	public FactorWord(String vocabulary, String name,
-		FactorWordDefinition def)
-	{
-		this.vocabulary = vocabulary;
-		this.name = name;
-		this.def = def;
-	} //}}}
-
-	//{{{ FactorWord constructor
-	/**
-	 * Do not use this constructor unless you're writing a packages
-	 * implementation or something. Use an FactorDictionary's
-	 * intern() method instead.
-	 */
 	public FactorWord(String vocabulary, String name)
 	{
 		this.vocabulary = vocabulary;
 		this.name = name;
-	} //}}}
-
-	//{{{ define() method
-	public void define(FactorWordDefinition def)
-	{
-		this.def = def;
 	} //}}}
 
 	//{{{ toString() method
