@@ -1,0 +1,152 @@
+<html>
+  <head>
+    <title>Parser Combinators</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+      </head>
+  <body>
+    <h1>Parsers</h1>
+<p>A parser is a word or quotation that, when called, processes
+   an input string on the stack, performs some parsing operation on
+   it, and returns a result indicating the success of the parsing
+   operation.</p> 
+<p>The result returned by a parser is known as a 'list of
+successes'. It is a lazy list of standard Factor cons cells. Each cons
+cell is a result of a parse. The car of the cell is the result of the
+parse operation and the cdr of the cell is the remaining input left to
+be parsed.</p>
+<p>A list is used for the result as a parse operation can potentially
+return many successful results. For example, a parser that parses one
+or more digits will return more than one result for the input "123". A
+successful parse could be "1", "12" or "123".</p>
+<p>The list is lazy so if only one parse result is required the
+remaining results won't actually be processed if they are not
+requested. This improves efficiency.</p>
+<p>The car of the result pair can be any value that the parser wishes
+to return. It could be the successful portion of the input string
+parsed, an abstract syntax tree representing the parsed input, or even
+a quotation that should get called for later processing.</p>
+<p>A Parser Combinator is a word that takes one or more parsers and
+returns a parser that when called uses the original parsers in some
+manner.</p>
+<h1>Example Parsers</h1>
+<p>The following are some very simple parsers that demonstrate how
+general parsers work and the 'list of sucesses' that are returned as a
+result.</p>
+<pre class="code">
+  (1) : char-a ( inp -- result )
+        0 over str-nth CHAR: a = [
+          1 str-tail CHAR: a swons lunit
+        ] [
+          drop f
+        ] ifte ;
+  (2) "atest" char-a [ [ . ] leach ] when*
+      => [ 97 | "test" ]
+  (3) "test"  char-a [ [ . ] leach ] when*
+      =>
+</pre>
+<p>'char-a' is a parser that only accepts the character 'a' in the
+input string. When passed an input string with a string with a leading
+'a' then the 'list of successes' has 1 result value. The car of that
+result value is the character 'a' successfully parsed, and the cdr is
+the remaining input string. On failure of the parse an empty list is
+returned.</p> 
+<p>The parser combinator library provides a combinator, <&>, that takes
+two parsers off the stack and returns a parser that calls the original
+two in sequence. An example of use would be calling 'char-a' twice,
+which would then result in an input string expected with two 'a'
+characters leading:</p>
+<pre class="code">
+  (1) "aatest" [ char-a ] [ char-a ] <&> call
+      => < list of successes >
+  (2) [ . ] leach
+      => [ [ 97 97 ] | "test" ]
+</pre>
+<p>Creating parsers for specfic characters and tokens can be a chore
+so there is a word that, given a string token on the stack, returns
+a parser that parses that particular token:</p>
+<pre class="code">
+  (1) "begin" token 
+      => < a parser that parses the token "begin" >
+  (2) dup "this should fail" swap call .
+      => f
+  (3) "begin a successfull parse" swap call 
+      => < lazy list >
+  (4) [ . ] leach
+      => [ "begin" | " a successfull parse" ]
+</pre>
+<p>The word 'satisfy' takes a quotation from the top of the stack and
+returns a parser than when called will call the quotation with the
+first item in the input string on the stack. If the quotation returns
+true then the parse is successful, otherwise it fails:</p>
+<pre class="code">
+  (1) : digit-parser ( -- parser )
+        [ digit? ] satisfy ;
+  (2) "5" digit-parser call [ . ] leach
+      => [ 53 | "" ]
+  (3) "a" digit-parser call 
+      => f
+</pre>
+<p>Note that 'digit-parser' returns a parser, it is not the parser
+itself. It is really a parser generating word like 'token'. Whereas
+our 'char-a' word defined originally was a parser itself.</p>
+<p>Now that we can parse single digits it would be nice to easily
+parse a string of them. The '<*>' parser combinator word will do
+this. It accepts a parser on the top of the stack and produces a
+parser that parses zero or more of the constructs that the original
+parser parsed. The result of the '<*>' generated parser will be a list
+list of the successful results returned by the original parser.</p>
+<pre class="code">
+  (1) digit-parser <*>
+      => < parser >
+  (2) "123" swap call
+      => < lazy list >
+  (3) [ . ] leach
+      => [ [ [ 49 50 51 ] ] | "" ]
+         [ [ [ 49 50 ] ] | "3" ]
+         [ [ [ 49 ] ] | "23" ]
+         [ f | "123" ]    
+</pre>
+<p>In this case there are multiple successful parses. This is because
+the occurrence of zero or more digits happens more than once. There is
+also the 'f' case where zero digits is parsed. If only the 'longest
+match' is required then the lcar of the lazy list can be used and the
+remaining parse results are never produced.</p>
+<p>The result of the parse above is the list of characters
+parsed. Sometimes you want this to be something else, like an abstract
+syntax tree, or some calculation. For the digit case we may want the
+actual integer number.</p>
+<p>For this we can use the '<@' parser
+combinator. This combinator takes a parser and a quotation on the
+stack and returns a new parser. When the new parser is called it will
+call the original parser to produce the results, then it will call the
+quotation on each successfull result, and the result of that quotation
+will be the result of the parse:</p>
+<pre class="code">
+  (1) : digit-parser2 ( -- parser )
+        [ digit? ] satisfy [ CHAR: 0 - ] <@ ;
+  (2) "5" digit-parser2 call [ . ] leach
+      => [ 5 | "" ]
+</pre>
+<p>Notice that now the result is the actual integer '5' rather than
+character code '53'.</p>
+<pre class="code">
+  (1) : natural-parser ( -- parser )
+        digit-parser2 <*> [ car 0 [ swap 10 * + ] reduce unit  ] <@  ;
+  (2) "123" natural-parser call
+      => < lazy list >
+  (3) [ . ] leach
+      => [ [ 123 ] | "" ]
+         [ [ 12 ] | "3" ]
+         [ [ 1 ] | "23" ]
+         [ f | "123" ]
+</pre>
+<p>The number parsed is the actual integer number due to the operation
+of the '<@' word. This allows parsers to not only parse the input
+string but perform operations and transformations on the syntax tree
+returned.</p> 
+
+<p class="footer">
+News and updates to this software can be obtained from the authors
+weblog: <a href="http://radio.weblogs.com/0102385">Chris Double</a>.</p>
+<p id="copyright">Copyright (c) 2004, Chris Double. All Rights Reserved.</p>
+</body> </html>
