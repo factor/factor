@@ -114,11 +114,11 @@ M: generic apply-word ( word -- )
     #! If the type of the value at the top of the stack is
     #! known, inline the method body.
     [ object ] ensure-d
-    literal-type? branches-can-fail? not and [
-        inline-compound 2drop
-    ] [
-        dup dynamic-dispatch-warning apply-default
-    ] ifte ;
+!    literal-type? branches-can-fail? not and [
+!        inline-compound 2drop
+!    ] [
+        dup dynamic-dispatch-warning apply-default ;
+!    ] ifte ;
 
 : with-recursion ( quot -- )
     [

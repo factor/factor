@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: kernel lists namespaces words inference strings
-prettyprint ;
+USING: inference kernel lists math namespaces prettyprint
+strings words ;
 
 ! The linear IR being simplified is stored in this variable.
 SYMBOL: simplifying

@@ -34,3 +34,14 @@ M: f single-combination-test-2 single-combination-test-4 ;
 [ 3 ] [ t single-combination-test-2 ] unit-test
 [ 3 ] [ 3 single-combination-test-2 ] unit-test
 [ f ] [ f single-combination-test-2 ] unit-test
+
+GENERIC: broken-generic
+
+M: fixnum broken-generic 1.0 * broken-generic ;
+M: float broken-generic neg ;
+
+: broken-partial-eval 5 broken-generic ;
+
+\ broken-partial-eval compile
+
+[ -5.0 ] [ broken-partial-eval ] unit-test

@@ -4,20 +4,22 @@
 - word preview for remote words
 - faster completion
 - [ [ dup call ] dup call ] infer hangs
-- type inference fails with some assembler words;
-  displaced, register and other predicates need to inherit from list
-  not cons, and need stronger branch partial eval
 - code gc
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
-- more accurate types for various words
-- declarations
-- write read: write should flush
-- optimize away arithmetic dispatch
 
 + compiler/ffi:
 
+- more accurate types for various words
+- declarations
+- type inference fails with some assembler words;
+  displaced, register and other predicates need to inherit from list
+  not cons, and need stronger branch partial eval
+- redo partial eval
+- optimize away arithmetic dispatch
+- dataflow optimizer needs eq not =
+- the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - value type structs
 - out parameters

@@ -20,6 +20,7 @@ M: fd-stream stream-write-attr ( str style stream -- )
     nip fd-stream-out blocking-write ;
 
 M: fd-stream stream-readln ( stream -- str )
+    dup fd-stream-out [ blocking-flush ] when*
     fd-stream-in dup [ blocking-read-line ] when ;
 
 M: fd-stream stream-read ( count stream -- str )
