@@ -183,6 +183,7 @@ cpu "x86" = "mini" get not and [
         "/library/ui/events.factor"
         "/library/ui/scrolling.factor"
         "/library/ui/panes.factor"
+        "/library/ui/inspector.factor"
     ] [
         dup print
         run-resource

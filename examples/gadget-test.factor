@@ -15,7 +15,7 @@
 ! "examples/text-demo.factor" run-file
 
 IN: text-demo
-USING: listener threads unparser ;
+USING: listener parser threads unparser ;
 USE: streams
 USE: sdl
 USE: sdl-event
@@ -66,9 +66,11 @@ USE: words
 !    "Another field."  <field> "pile" get add-gadget
     <console-pane> <scroller> "pile" get add-gadget
 
-    "pile" get bevel-border dup "dialog" set ! dup  
-! moving-actions
-  world get add-gadget ;
+    "pile" get bevel-border dup "dialog" set  dup  
+ moving-actions
+  world get add-gadget 
+  
+  ;
 
 : gadget-demo ( -- )
     make-shapes

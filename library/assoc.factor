@@ -56,7 +56,7 @@ IN: lists USING: kernel ;
 : zip ( list list -- list )
     #! Make a new list containing pairs of corresponding
     #! elements from the two given lists.
-    dup [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
+    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
 
 : unzip ( assoc -- keys values )
     #! Split an association list into two lists of keys and

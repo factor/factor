@@ -6,10 +6,22 @@
 
 + ui:
 
+- scrollable inspector
+- inspector needs prettier nesting
+- <titled> needs to look better
+- enforce inspector uniqueness
+- auto-updating inspector
 - fix up the min thumb size hack
 - fix up initial layout of slider
 - console: scroll to bottom
 - caret clip
+- split preferred size and layouting
+- remove shelf/pile duplication
+- menus
+- opaque widgets
+- layered gadget
+- resizing and moving gadgets interactively with halo on top of gadget
+- hand clip
 
 + compiler/ffi:
 
@@ -36,8 +48,6 @@
 
 + i/o:
 
-- udp
-- ipv6
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - nicer way to combine two paths

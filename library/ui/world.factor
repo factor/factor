@@ -34,7 +34,10 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 DEFER: handle-event
 
-: layout-world ( world -- ) dup layout world-hand update-hand ;
+: layout-world ( world -- )
+    dup
+    0 0 width get height get <rectangle> clip set-paint-property
+    dup layout world-hand update-hand ;
 
 : world-step ( world -- ? )
     dup world-running? [
@@ -88,7 +91,6 @@ IN: shells
     world get shape-w world get shape-h 0 SDL_RESIZABLE
     [
         0 x set 0 y set [
-            0 0 width get height get <rectangle> clip set
             title dup SDL_WM_SetCaption
             <event> run-world
         ] with-screen
