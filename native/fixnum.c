@@ -149,16 +149,25 @@ CELL xor_fixnum(FIXNUM x, FIXNUM y)
 	return tag_fixnum(x ^ y);
 }
 
+/*
+ * Note the hairy overflow check.
+ * If we're shifting right by n bits, we won't overflow as long as none of the
+ * high WORD_SIZE-TAG_BITS-n bits are set.
+ */
 CELL shift_fixnum(FIXNUM x, FIXNUM y)
 {
-	if(y > -CELLS * 8 && y < CELLS * 8)
+	if(y < 0)
+		return tag_fixnum(x >> -y);
+	else if(y == 0)
+		return tag_fixnum(x);
+	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		long long result = (y < 0
-			? (long long)x >> -y
-			: (long long)x << y);
+		FIXNUM mask = (1 << (WORD_SIZE - 1 - TAG_BITS - y));
+		if(x > 0)
+			mask = -mask;
 
-		if(result >= FIXNUM_MIN && result <= FIXNUM_MAX)
-			return tag_fixnum(result);
+		if((x & mask) == 0)
+			return tag_fixnum(x << y);
 	}
 
 	return tag_object(s48_bignum_arithmetic_shift(

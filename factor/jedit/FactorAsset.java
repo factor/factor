@@ -29,6 +29,7 @@
 
 package factor.jedit;
 
+import factor.FactorWord;
 import javax.swing.Icon;
 import javax.swing.text.Position;
 import org.gjt.sp.jedit.Buffer;
@@ -36,10 +37,13 @@ import sidekick.*;
 
 public class FactorAsset extends Asset
 {
-	public FactorAsset(String name, Position start)
+	private FactorWord word;
+
+	public FactorAsset(FactorWord word, Position start)
 	{
-		super(name);
+		super(word.name);
 		this.start = start;
+		this.word = word;
 	}
 
 	public Icon getIcon()
@@ -49,11 +53,12 @@ public class FactorAsset extends Asset
 	
 	public String getShortString()
 	{
-		return name;
+		return word.name;
 	}
 	
 	public String getLongString()
 	{
-		return name;
+		return FactorWordRenderer.getWordHTMLString(
+			FactorPlugin.getInterpreter(),word,false);
 	}
 }

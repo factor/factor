@@ -42,11 +42,19 @@ public class FactorSideKickParser extends SideKickParser
 {
 	private WordPreview wordPreview;
 
+	/**
+	 * When we parse a file, we store the <word,worddef> pairs in this
+	 * map, so that completion popups show the latest stack effects,
+	 * and not whatever they were the last time the source was run-file'd.
+	 */
+	private Map worddefs;
+
 	//{{{ FactorSideKickParser constructor
 	public FactorSideKickParser()
 	{
 		super("factor");
 		wordPreview = new WordPreview();
+		worddefs = new HashMap();
 	} //}}}
 
 	//{{{ activate() method
@@ -151,6 +159,7 @@ public class FactorSideKickParser extends SideKickParser
 					parsed.car;
 
 				FactorWord word = def.word;
+				worddefs.put(word,def);
 
 				/* word lines are indexed from 1 */
 				int startLine = Math.min(
@@ -167,7 +176,7 @@ public class FactorSideKickParser extends SideKickParser
 				if(last != null)
 					last.end = buffer.createPosition(start - 1);
 
-				last = new FactorAsset(word.name,
+				last = new FactorAsset(word,
 					buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));
 			}

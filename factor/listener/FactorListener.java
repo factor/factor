@@ -310,7 +310,6 @@ public class FactorListener extends JTextPane
 			}
 
 			int caret = getCaretPosition();
-			int limit;
 			if(caret == cmdStart)
 			{
 				getToolkit().beep();
@@ -328,12 +327,12 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
-	//{{{ BackspaceAction class
-	class BackspaceAction extends AbstractAction
+	//{{{ HomeAction class
+	class HomeAction extends AbstractAction
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
-			setCaretPosition(limit);
+			setCaretPosition(cmdStart);
 		}
 	} //}}}
 

@@ -29,6 +29,8 @@
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
 
+#define WORD_SIZE (CELLS*8)
+
 /* must always be 16 bits */
 typedef unsigned short CHAR;
 #define CHARS ((signed)sizeof(CHAR))

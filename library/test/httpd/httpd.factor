@@ -11,7 +11,7 @@ USE: strings
 USE: stack
 USE: lists
 
-[ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n" ]
+[ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n\n" ]
 [
     [ "text/html" 12 file-response ] with-string
 ] unit-test
