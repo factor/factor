@@ -210,7 +210,7 @@ SYMBOL: callback-cc
   #! the request URL.
   [ 
     "HTTP/1.1 302 Document Moved\nLocation: " , ,
-    "\nContent-Length: 0\nContent-Type: text/plan\n\n" , 
+    "\nContent-Length: 0\nContent-Type: text/plain\n\n" , 
   ] make-string call-exit-continuation ;
 
 : redirect-to-here ( -- )
