@@ -1,0 +1,2092 @@
+%% LyX 1.3 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{alltt}
+\pagestyle{headings}
+\setcounter{tocdepth}{2}
+\setlength\parskip{\medskipamount}
+\setlength\parindent{0pt}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+ \newenvironment{lyxcode}
+   {\begin{list}{}{
+     \setlength{\rightmargin}{\leftmargin}
+     \setlength{\listparindent}{0pt}% needed for AMS classes
+     \raggedright
+     \setlength{\itemsep}{0pt}
+     \setlength{\parsep}{0pt}
+     \normalfont\ttfamily}%
+    \item[]}
+   {\end{list}}
+
+\usepackage{babel}
+\makeatother
+\begin{document}
+
+\title{Factor Developer's Guide}
+
+
+\author{Slava Pestov}
+
+\maketitle
+\tableofcontents{}
+
+
+\newpage
+\section*{Introduction}
+
+Factor is an imperative programming language with functional and object-oriented
+influences. Its primary goal is to be used for web-based server-side
+applications. Factor is interpreted by a virtual machine that provides
+garbage collection and prohibits pointer arithmetic.%
+\footnote{Two releases of Factor are available -- a virtual machine written
+in C, and an interpreter written in Java that runs on the Java virtual
+machine. This guide targets the C version of Factor.%
+}
+
+Factor borrows heavily from Forth, Joy and Lisp. From Forth it inherits
+a flexible syntax defined in terms of {}``parsing words'' and an
+execution model based on a data stack and call stack. From Joy and
+Lisp it inherits a virtual machine prohibiting direct pointer arithmetic,
+and the use of {}``cons cells'' to represent code and data structure.
+
+
+\section{Fundamentals}
+
+A \char`\"{}word\char`\"{} is the main unit of program organization
+in Factor -- it corresponds to a \char`\"{}function\char`\"{}, \char`\"{}procedure\char`\"{}
+or \char`\"{}method\char`\"{} in other languages.
+
+When code examples are given, the input is in a roman font, and any
+output from the interpreter is in italics:
+
+\begin{lyxcode}
+{}``Hello,~world!''~print
+
+\emph{Hello,~world!}
+\end{lyxcode}
+
+\subsection{The stack}
+
+The stack is used to exchange data between words. When a number is
+executed, it is pushed on the stack. When a word is executed, it receives
+input parameters by removing successive elements from the top of the
+stack. Results are then pushed back to the top of the stack. 
+
+The word \texttt{.s} prints the contents of the stack, leaving the
+contents of the stack unaffected. The top of the stack is the rightmost
+element in the printout:
+
+\begin{lyxcode}
+2~3~.s
+
+\emph{\{~2~3~\}}
+\end{lyxcode}
+The word \texttt{.} removes the object at the top of the stack, and
+prints it:
+
+\begin{lyxcode}
+1~2~3~.~.~.
+
+\emph{3}
+
+\emph{2}
+
+\emph{1}
+\end{lyxcode}
+The usual arithmetic operators \texttt{+ - {*} /} all take two parameters
+from the stack, and push one result back. Where the order of operands
+matters (\texttt{-} and \texttt{/}), the operands are taken from the
+stack in the natural order. For example:
+
+\begin{lyxcode}
+10~17~+~.
+
+\emph{27}
+
+111~234~-~.
+
+\emph{-123}
+
+333~3~/~.
+
+\emph{111}
+\end{lyxcode}
+This type of arithmetic is called \emph{postfix}, because the operator
+follows the operands. Contrast this with \emph{infix} notation used
+in many other languages, so-called because the operator is in-between
+the two operands.
+
+More complicated infix expressions can be translated into postfix
+by translating the inner-most parts first. Grouping parentheses are
+never necessary:
+
+\begin{lyxcode}
+!~Postfix~equivalent~of~(2~+~3)~{*}~6
+
+2~3~+~6~{*}
+
+\emph{30}
+
+!~Postfix~equivalent~of~2~+~(3~{*}~6)
+
+2~3~6~{*}~+
+
+\emph{20}
+\end{lyxcode}
+
+\subsection{Factoring}
+
+New words can be defined in terms of existing words using the \emph{colon
+definition} syntax:
+
+\begin{lyxcode}
+:~\emph{name}~(~\emph{inputs}~-{}-~\emph{outputs}~)
+
+~~~~\#!~\emph{Description}
+
+~~~~\emph{factors~...}~;
+\end{lyxcode}
+When the new word is executed, each one of its factors gets executed,
+in turn. The comment delimited by \texttt{(} and \texttt{)} is called
+a stack effect comment and is described later. The stack effect comment,
+as well as the documentation comment starting with \texttt{\#!} are
+both optional, and can be placed anywhere in the source code, not
+just in colon definitions.
+
+Note that in a source file, a word definition can span multiple lines.
+However, the interactive interpreter expects each line of input to
+be {}``complete'', so interactively, colon definitions must be entered
+all on one line.
+
+For example, lets assume we are designing some software for an aircraft
+navigation system. Lets assume that internally, all lengths are stored
+in meters, and all times are stored in seconds. We can define words
+for converting from kilometers to meters, and hours and minutes to
+seconds:
+
+\begin{lyxcode}
+:~kilometers~1000~{*}~;
+
+:~minutes~60~{*}~;
+
+:~hours~60~{*}~60~{*}~;
+
+2~kilometers~.
+
+\emph{2000}
+
+10~minutes~.
+
+\emph{600}
+
+2~hours~.
+
+\emph{7200}
+\end{lyxcode}
+Now, suppose we need a word that takes the flight time, the aircraft
+velocity, and the tailwind velocity, and returns the distance travelled.
+If the parameters are given on the stack in that order, all we do
+is add the top two elements (aircraft velocity, tailwind velocity)
+and multiply it by the element underneath (flight time). So the definition
+looks like this, this time with a stack effect comment since its slightly
+less obvious what the operands are:
+
+\begin{lyxcode}
+:~distance~(~time~aircraft~tailwind~-{}-~distance~)~+~{*}~;
+
+2~900~36~distance~.
+
+\emph{1872}
+\end{lyxcode}
+Note that we are not using any units here. We could, if we defined
+some words for velocity units first. The only non-trivial thing here
+is the implementation of \texttt{km/hour} -- we have to divide the
+\texttt{km/sec} velocity by the number of seconds in one hour to get
+the desired result:
+
+\begin{lyxcode}
+:~km/hour~kilometers~1~hours~/~;
+
+2~hours~900~km/hour~36~km/hour~distance~.
+
+\emph{1872000}
+\end{lyxcode}
+
+\subsection{Stack effects}
+
+A stack effect comment contains a description of inputs to the left
+of \texttt{-{}-}, and a description of outputs to the right. As always,
+the top of the stack is on the right side. Lets try writing a word
+to compute the cube of a number.%
+\footnote{I'd use the somewhat simpler example of a word that squares a number,
+but such a word already exists in the standard library. Its in the
+\texttt{arithmetic} vocabulary, named \texttt{sq}.%
+} 
+
+Three numbers on the stack can be multiplied together using \texttt{{*}
+{*}}:
+
+\begin{lyxcode}
+2~4~8~{*}~{*}~.
+
+\emph{64}
+\end{lyxcode}
+However, the stack effect of \texttt{{*} {*}} is \texttt{( a b c -{}-
+a{*}b{*}c )}. We would like to write word that takes \emph{one} input
+only. To achieve this, we need to be able to duplicate the top stack
+element twice. As it happens, there is a word \texttt{dup ( x -{}-
+x x )} for precisely this purpose. Now, we are able to define the
+\texttt{cube} word:
+
+\begin{lyxcode}
+:~cube~dup~dup~{*}~{*}~;
+
+10~cube~.
+
+\emph{1000}
+
+-2~cube~.
+
+\emph{-8}
+\end{lyxcode}
+It is quite often the case that we want to compose two factors in
+a colon definition, but their stack effects don't {}``match up''.
+
+There is a set of \emph{shuffle words} for solving precisely this
+problem. These words are so-called because they simply rearrange stack
+elements in some fashion, without modifying them in any way. Lets
+take a look at the most frequently-used shuffle words:
+
+\texttt{drop ( x -{}- )} Discard the top stack element. Used when
+a return value is not needed.
+
+\texttt{dup ( x -{}- x x )} Duplicate the top stack element. Used
+when a value is needed more than once.
+
+\texttt{swap ( x y -{}- y x )} Swap top two stack elements. Used when
+a word expects parameters in a different order.
+
+\texttt{rot ( x y z -{}- y z x )} Rotate top three stack elements
+to the left.
+
+\texttt{-rot ( x y z -{}- z x y )} Rotate top three stack elements
+to the right.
+
+\texttt{over ( x y -{}- x y x )} Bring the second stack element {}``over''
+the top element.
+
+\texttt{nip ( x y -{}- y )} Remove the second stack element.
+
+\texttt{tuck ( x y -{}- y x y )} Tuck the top stack element under
+the second stack element.
+
+You can try all these words out -- push some numbers on the stack,
+execute a word, and look at how the stack contents was changed using
+\texttt{.s}. Compare the stack contents with the stack effects above.
+
+Note the order of the shuffle word descriptions above. The ones at
+the top are used most often because they are easy to understand. The
+more complex ones such as rot should be avoided as possible, because
+they make the flow of data in a word definition harder to understand.
+
+If you find yourself using too many shuffle words, or you're writing
+a stack effect comment in the middle of a colon definition, it is
+a good sign that the word should probably be factored into two or
+more words. Effective factoring is like riding a bicycle -- it is
+hard at first, but then you {}``get it'', and writing small, clear
+and reusable word definitions becomes second-nature.
+
+
+\subsection{Combinators}
+
+A quotation a list of objects that can be executed. Words that operate
+on quotations are called \emph{combinators}. Quotations are input
+using the following syntax:
+
+\begin{lyxcode}
+{[}~2~3~+~.~{]}
+\end{lyxcode}
+When input, a quotation is not executed immediately -- rather, it
+becomes one object on the stack. Try evaluating the following:
+
+\begin{lyxcode}
+{[}~1~2~3~+~{*}~{]}~.s
+
+\emph{\{~{[}~1~2~3~+~{*}~{]}~\}}
+
+call~.s
+
+\emph{\{~5~\}}
+\end{lyxcode}
+\texttt{call} \texttt{( quot -{}- )} executes the quotation at the
+top of the stack. Using \texttt{call} with a literal quotation is
+useless; writing out the elements of the quotation has the same effect.
+However, the \texttt{call} combinator is a building block of more
+powerful combinators, since quotations can be passed around arbitrarily
+and even modified before being called.
+
+\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
+\texttt{true} or \texttt{false} quotations, depending on the boolean
+value of \texttt{cond}. In Factor, there is no real boolean data type
+-- instead, a special object \texttt{f} is the only object with a
+{}``false'' boolean value. Every other object is a boolean {}``true''.
+The special object \texttt{t} is the {}``canonical'' truth value.
+
+Here is an example of \texttt{ifte} usage:
+
+\begin{lyxcode}
+1~2~<~{[}~{}``1~is~less~than~2.''~print~{]}~{[}~{}``bug!''~print~{]}~ifte
+\end{lyxcode}
+Compare the order of operands here, and the order of arguments in
+the stack effect of \texttt{ifte}.
+
+That the stack effects of the two \texttt{ifte} branches should be
+the same. If they differ, the word becomes harder to document and
+debug.
+
+\texttt{times ( num quot -{}- )} executes a quotation a number of
+times. It is good style to have the quotation always consume as many
+values from the stack as it produces. This ensures the stack effect
+of the entire \texttt{times} expression stays constant regardless
+of the number of iterations.
+
+More combinators will be introduced later.
+
+
+\subsection{Vocabularies}
+
+The dictionary of words is not a flat list -- rather, it is separated
+into a number of \emph{vocabularies}. Each vocabulary is a named list
+of words that have something in common -- for example, the {}``lists''
+vocabulary contains words for working with linked lists.
+
+When a word is read by the parser, the \emph{vocabulary search path}
+determines which vocabularies to search. In the interactive interpreter,
+the default search path contains a large number of vocabularies. Contrast
+this to the situation when a file is being parsed -- the search path
+has a minimal set of vocabularies containing basic parsing words.%
+\footnote{The rationale here is that the interactive interpreter should have
+a large number of words available by default, for convenience, whereas
+source files should specify their external dependencies explicitly.%
+}
+
+New vocabularies are added to the search path using the \texttt{USE:}
+parsing word. For example:
+
+\begin{lyxcode}
+{}``/home/slava/.factor-rc''~exists?~.
+
+\emph{ERROR:~<interactive>:1:~Undefined:~exists?}
+
+USE:~streams
+
+{}``/home/slava/.factor-rc''~exists?~.
+
+\emph{t}
+\end{lyxcode}
+How do you know which vocabulary contains a word? Vocabularies can
+either be listed, or an {}``apropos'' search can be performed:
+
+\begin{lyxcode}
+\char`\"{}init\char`\"{}~words.
+
+\emph{{[}~?run-file~boot~cli-arg~cli-param~init-environment}
+
+\emph{init-gc~init-interpreter~init-scratchpad~init-search-path}
+
+\emph{init-stdio~init-toplevel~parse-command-line~parse-switches}
+
+\emph{run-files~run-user-init~stdin~stdout~{]}~}
+
+
+
+\char`\"{}map\char`\"{}~apropos.
+
+\emph{IN:~lists}
+
+\emph{map}
+
+\emph{IN:~strings}
+
+\emph{str-map}
+
+\emph{IN:~vectors}
+
+\emph{(vector-map)}
+
+\emph{(vector-map-step)}
+
+\emph{vector-map~}
+\end{lyxcode}
+New words are defined in the \emph{input vocabulary}. The input vocabulary
+can be changed at the interactive prompt, or in a source file, using
+the \texttt{IN:} parsing word. For example:
+
+\begin{lyxcode}
+IN:~music-database
+
+:~random-playlist~...~;
+\end{lyxcode}
+It is a convention (although it is not enforced by the parser) that
+the \texttt{IN:} directive is the first statement in a source file,
+and all \texttt{USE:} follow, before any other definitions.
+
+
+\section{PRACTICAL: Numbers game}
+
+In this section, basic input/output and flow control is introduced.
+We construct a program that repeatedly prompts the user to guess a
+number -- they are informed if their guess is correct, too low, or
+too high. The game ends on a correct guess.
+
+\begin{lyxcode}
+numbers-game
+
+\emph{I'm~thinking~of~a~number~between~0~and~100.}
+
+\emph{Enter~your~guess:}~25
+
+\emph{Too~low}
+
+\emph{Enter~your~guess:}~38
+
+\emph{Too~high}
+
+\emph{Enter~your~guess:}~31
+
+\emph{Correct~-~you~win!}
+\end{lyxcode}
+
+\subsection{Development methodology}
+
+A typical Factor development session involves a text editor and Factor
+interpreter running side by side. Instead of the edit/compile/run
+cycle, the development process becomes an {}``edit cycle'' -- you
+make some changes to the source file and reload it in the interpreter
+using a command like this:
+
+\begin{lyxcode}
+~~{}``numbers-game.factor''~run-file
+\end{lyxcode}
+Then the changes can be tested, either by hand, or using a test harness.
+There is no need to compile anything, or to lose interpreter state
+by restarting. Additionally, words with {}``throw-away'' definitions
+that you do not intend to keep can also be entered directly at this
+interpreter prompt.
+
+Each word should do one useful task. New words can be defined in terms
+of existing, already-tested words. You design a set of reusable words
+that model the problem domain. Then, the problem is solved in terms
+of a \emph{domain-specific vocabulary}. This is called \emph{bottom-up
+design.}
+
+The jEdit text editor makes Factor development much more pleasant.
+The Factor plugin for jEdit provides an {}``integrated development
+environment'' with many time-saving features. See the documentation
+for the plugin itself for details.
+
+
+\subsection{Getting started}
+
+Start a text editor and create a file named \texttt{numbers-game.factor}.
+
+At the top of the file, write a comment. Comments are a feature that
+can be found in almost any programming language; in Factor, they are
+implemented as parsing words. An example of commenting follows:
+
+\begin{lyxcode}
+!~The~word~!~discards~input~until~the~end~of~the~line
+
+(~The~word~(~discards~input~until~the~next~)
+\end{lyxcode}
+It is always a good idea to comment your code. Try to write simple
+code that does not need detailed comments to describe; similarly,
+avoid redundant comments. These two principles are hard to quantify
+in a concrete way, and will become more clear as your skills with
+Factor increase.
+
+We will be defining new words in the numbers-game vocabulary; add
+an \texttt{IN:} statement at the top of the source file:
+
+\begin{lyxcode}
+IN:~numbers-game
+\end{lyxcode}
+Also in order to be able to test the words, issue a \texttt{USE:}
+statement in the interactive interpreter:
+
+\begin{lyxcode}
+USE:~numbers-game
+\end{lyxcode}
+This section will develop the numbers game in an incremental fashion.
+After each addition, issue a command like the following to load the
+source file into the Factor interpreter:
+
+\begin{lyxcode}
+{}``numbers-game.factor''~run-file
+\end{lyxcode}
+
+\subsection{Reading a number from the keyboard}
+
+A fundamental operation required for the numbers game is to be able
+to read a number from the keyboard. The \texttt{read} word \texttt{(
+-{}- str )} reads a line of input and pushes it on the stack as a
+string. The \texttt{parse-word} word \texttt{( str -{}- n )} turns a decimal
+string representation of an integer into the integer itself. These
+two words can be combined into a single colon definition:
+
+\begin{lyxcode}
+:~read-number~(~-{}-~n~)~read~parse-word~;
+\end{lyxcode}
+You should add this definition to the source file, and try loading
+the file into the interpreter. As you will soon see, this raises an
+error! The problem is that the two words \texttt{read} and \texttt{parse-word}
+are not part of the default, minimal, vocabulary search path used
+when reading files. The solution is to use \texttt{apropos.} to find
+out which vocabularies contain those words, and add the appropriate
+USE: statements to the source file:
+
+\begin{lyxcode}
+USE:~parser
+
+USE:~stdio
+\end{lyxcode}
+After adding the above two statements, the file should now parse,
+and testing should confirm that the read-number word works correctly.%
+\footnote{There is the possibility of an invalid number being entered at the
+keyboard. In this case, \texttt{print-number} returns \texttt{f},
+the boolean false value. For the sake of simplicity, we ignore this
+case in the numbers game example. However, proper error handling is
+an essential part of any large program and is covered later.%
+}
+
+
+\subsection{Printing some messages}
+
+Now we need to make some words for printing various messages. They
+are given here without further ado:
+
+\begin{lyxcode}
+:~guess-banner
+
+~~~~{}``I'm~thinking~of~a~number~between~0~and~100.''~print~;
+
+:~guess-prompt~{}``Enter~your~guess:~''~write~;
+
+:~too-high~{}``Too~high''~print~;
+
+:~too-low~{}``Too~low''~print~;
+
+:~correct~{}``Correct~-~you~win!''~print~;
+\end{lyxcode}
+Note that in the above, stack effect comments are omitted, since they
+are obvious from context. You should ensure the words work correctly
+after loading the source file into the interpreter.
+
+
+\subsection{Taking action based on a guess}
+
+The next logical step is to write a word \texttt{judge-guess} that
+takes the user's guess along with the actual number to be guessed,
+and prints one of the messages \texttt{too-high}, \texttt{too-low},
+or \texttt{correct}. This word will also push a boolean flag, indicating
+if the game should continue or not -- in the case of a correct guess,
+the game does not continue.
+
+This description of judge-guess is a mouthful -- and it suggests that
+it may be best to split it into two words. So the first word we write
+handles the more specific case of an \emph{inexact} guess -- so it
+prints either \texttt{too-low} or \texttt{too-high}.
+
+\begin{lyxcode}
+:~inexact-guess~(~guess~actual~-{}-~)
+
+~~~~~>~{[}~too-high~{]}~{[}~too-low~{]}~ifte~;
+\end{lyxcode}
+Note that the word gives incorrect output if the two parameters are
+equal. However, it will never be called this way.
+
+With this out of the way, the implementation of judge-guess is an
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{=},
+and \texttt{2dup}, we can write:
+
+\begin{lyxcode}
+:~judge-guess~(~actual~guess~-{}-~?~)
+
+~~~~2dup~=~{[}
+
+~~~~~~~~correct~f
+
+~~~~{]}~{[}
+
+~~~~~~~~inexact-guess~t
+
+~~~~{]}~ifte~;
+\end{lyxcode}
+Note the use of \texttt{2dup ( x y -{}- x y x y )}. Since \texttt{=}
+consumes both its parameters, we must make copies of them to pass
+to \texttt{correct} and \texttt{inexact-guess}. Try the following
+at the interpreter to see what's going on:
+
+\begin{lyxcode}
+clear~1~2~2dup~=~.s
+
+\emph{\{~1~2~f~\}}
+
+clear~4~4~2dup~=~.s
+
+\emph{\{~4~4~t~\}}
+\end{lyxcode}
+Test \texttt{judge-guess} with a few inputs:
+
+\begin{lyxcode}
+1~10~judge-guess~.
+
+\emph{Too~low}
+
+\emph{t}
+
+89~43~judge-guess~.
+
+\emph{Too~high}
+
+\emph{t}
+
+64~64~judge-guess~.
+
+\emph{Correct}
+
+\emph{f}
+\end{lyxcode}
+
+\subsection{Generating random numbers}
+
+The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
+random number in a specified range. The range is inclusive, so both
+the minimum and maximum indexes are candidate random numbers. Use
+\texttt{apropos.} to determine that this word is in the \texttt{random}
+vocabulary. For the purposes of this game, random numbers will be
+in the range of 0 to 100, so we can define a word that generates a
+random number in the range of 0 to 100:
+
+\begin{lyxcode}
+:~number-to-guess~(~-{}-~n~)~0~100~random-int~;
+\end{lyxcode}
+Add the word definition to the source file, along with the appropriate
+\texttt{USE:} statement. Load the source file in the interpreter,
+and confirm that the word functions correctly, and that its stack
+effect comment is accurate.
+
+
+\subsection{The game loop}
+
+The game loop consists of repeated calls to \texttt{guess-prompt},
+\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
+pushes \texttt{f}, the loop stops, otherwise it continues. This is
+realized with a recursive implementation:
+
+\begin{lyxcode}
+:~numbers-game-loop~(~actual~-{}-~)
+
+~~~~dup~guess-prompt~read-number~judge-guess~{[}
+
+~~~~~~~~numbers-game-loop
+
+~~~~{]}~{[}
+
+~~~~~~~~drop
+
+~~~~{]}~ifte~;
+\end{lyxcode}
+In Factor, tail-recursive words consume a bounded amount of call stack
+space. This means you are free to pick recursion or iteration based
+on their own merits when solving a problem. In many other languages,
+the usefulness of recursion is severely limited by the lack of tail-recursive
+call optimization.
+
+
+\subsection{Finishing off}
+
+The last task is to combine everything into the main \texttt{numbers-game}
+word. This is easier than it seems:
+
+\begin{lyxcode}
+:~numbers-game~number-to-guess~numbers-game-loop~;
+\end{lyxcode}
+Try it out! Simply invoke the numbers-game word in the interpreter.
+It should work flawlessly, assuming you tested each component of this
+design incrementally!
+
+
+\subsection{The complete program}
+
+\begin{lyxcode}
+!~Numbers~game~example~\\
+
+
+IN:~numbers-game
+
+USE:~parser
+
+USE:~stdio~\\
+~\\
+:~read-number~(~-{}-~n~)~read~parse-word~;~\\
+~\\
+:~guess-banner
+
+~~~~{}``I'm~thinking~of~a~number~between~0~and~100.''~print~;
+
+:~guess-prompt~{}``Enter~your~guess:~''~write~;
+
+:~too-high~{}``Too~high''~print~;
+
+:~too-low~{}``Too~low''~print~;
+
+:~correct~{}``Correct~-~you~win!''~print~;~\\
+~\\
+:~inexact-guess~(~guess~actual~-{}-~)
+
+~~~~~>~{[}~too-high~{]}~{[}~too-low~{]}~ifte~;~\\
+~\\
+:~judge-guess~(~actual~guess~-{}-~?~)
+
+~~~~2dup~=~{[}
+
+~~~~~~~~correct~f
+
+~~~~{]}~{[}
+
+~~~~~~~~inexact-guess~t
+
+~~~~{]}~ifte~;~\\
+~\\
+:~number-to-guess~(~-{}-~n~)~0~100~random-int~;~\\
+~\\
+:~numbers-game-loop~(~actual~-{}-~)
+
+~~~~dup~guess-prompt~read-number~judge-guess~{[}
+
+~~~~~~~~numbers-game-loop
+
+~~~~{]}~{[}
+
+~~~~~~~~drop
+
+~~~~{]}~ifte~;~\\
+~\\
+:~numbers-game~number-to-guess~numbers-game-loop~;
+
+
+\end{lyxcode}
+
+\section{Lists}
+
+A list is composed of a set of pairs; each pair holds a list element,
+and a reference to the next pair. Lists have the following literal
+syntax:
+
+\begin{lyxcode}
+{[}~{}``CEO''~5~{}``CFO''~-4~f~{]}
+\end{lyxcode}
+Before we continue, it is important to understand the role of data
+types in Factor. Lets make a distinction between two categories of
+data types:
+
+\begin{itemize}
+\item Representational type -- this refers to the form of the data in the
+interpreter. Representational types include integers, strings, and
+vectors. Representational types are checked at run time -- attempting
+to multiply two strings, for example, will yield an error.
+\item Intentional type -- this refers to the meaning of the data within
+the problem domain. This could be a length measured in inches, or
+a string naming a file, or a list of objects in a room in a game.
+It is up to the programmer to check intentional types -- Factor won't
+prevent you from adding two integers representing a distance and a
+time, even though the result is meaningless.
+\end{itemize}
+
+\subsection{Cons cells}
+
+It may surprise you that in Factor, \emph{lists are intentional types}.
+This means that they are not an inherent feature of the interpreter;
+rather, they are built from a simpler data type, the \emph{cons cell}.
+
+A cons cell is an object that holds a reference to two other objects.
+The order of the two objects matters -- the first is called the \emph{car},
+the second is called the \emph{cdr}.
+
+All words relating to cons cells and lists are found in the \texttt{lists}
+vocabulary. The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
+\footnote{These infamous names originate from the Lisp language. Originally,
+{}``Lisp'' stood for {}``List Processing''.%
+} construct and deconstruct cons cells:
+
+\begin{lyxcode}
+1~2~cons~.
+
+\emph{{[}~1~|~2~{]}}
+
+3~4~car~.
+
+\emph{3}
+
+5~6~cdr~.
+
+\emph{6}
+\end{lyxcode}
+The output of the first expression suggests a literal syntax for cons
+cells:
+
+\begin{lyxcode}
+{[}~10~|~20~{]}~cdr~.
+
+\emph{20}
+
+{[}~{}``first''~|~{[}~{}``second''~|~f~{]}~{]}~car~.
+
+\emph{{}``first''}
+
+{[}~{}``first''~|~{[}~{}``second''~|~f~{]}~{]}~cdr~car~.
+
+\emph{{}``second''}
+\end{lyxcode}
+The last two examples make it clear how nested cons cells represent
+a list. Since this {}``nested cons cell'' syntax is extremely cumbersome,
+the parser provides an easier way:
+
+\begin{lyxcode}
+{[}~1~2~3~4~{]}~cdr~cdr~car~.
+
+\emph{3}
+\end{lyxcode}
+A \emph{generalized list} is a set of cons cells linked by their cdr.
+A \emph{proper list}, or just list, is a generalized list with a cdr
+equal to f, the list is a proper list. Also, the object \texttt{f}
+is a proper list, and in fact it is equivalent to the empty list \texttt{{[}
+{]}}. An \emph{improper list} is a generalized list that is not a
+proper list.
+
+The \texttt{list?} word tests if the object at the top of the stack
+is a proper list:
+
+\begin{lyxcode}
+{}``hello''~list?~.
+
+\emph{f}
+
+{[}~{}``first''~{}``second''~|~{}``third''~{]}~list?~.
+
+\emph{f}
+
+{[}~{}``first''~{}``second''~{}``third''~{]}~list?~.
+
+\emph{t}
+\end{lyxcode}
+
+\subsection{Working with lists}
+
+Unless otherwise documented, list manipulation words expect proper
+lists as arguments. Given an improper list, they will either raise
+an error, or disregard the hanging cdr at the end of the list.
+
+Also unless otherwise documented, list manipulation words return newly-created
+lists only. The original parameters are not modified. This may seem
+inefficient, however the absence of side effects makes code much easier
+to test and debug.%
+\footnote{Side effect-free code is the fundamental idea underlying functional
+programming languages. While Factor allows side effects and is not
+a functional programming language, for a lot of problems, coding in
+a functional style gives the most maintainable and readable results.%
+} Where performance is important, a set of {}``destructive'' words
+is provided. They are documented in the next section.
+
+\texttt{add ( list obj -{}- list )} Create a new list consisting of
+the original list, and a new element added at the end:
+
+\begin{lyxcode}
+{[}~1~2~3~{]}~4~add~.
+
+\emph{{[}~1~2~3~4~{]}}
+
+1~{[}~2~3~4~{]}~cons~.
+
+\emph{{[}~1~2~3~4~{]}}
+\end{lyxcode}
+While \texttt{cons} and \texttt{add} appear to have similar effects,
+they are quite different -- \texttt{cons} is a very cheap operation,
+while \texttt{add} has to copy the entire list first! If you need
+adds to the end to take a constant time, use a vector.
+
+\texttt{append ( list list -{}- list )} Append the two lists at the
+top of the stack:
+
+\begin{lyxcode}
+{[}~1~2~3~{]}~{[}~4~5~6~{]}~append~.
+
+\emph{{[}~1~2~3~4~5~6~{]}}
+
+{[}~1~2~3~{]}~dup~{[}~4~5~6~{]}~append~.s
+
+\emph{\{~{[}~1~2~3~{]}~{[}~1~2~3~4~5~6~{]}~\}}
+\end{lyxcode}
+The first list is copied, and the cdr of its last cons cell is set
+to the second list. The second example above shows that the original
+parameter was not modified. Interestingly, if the second parameter
+is not a proper list, \texttt{append} returns an improper list:
+
+\begin{lyxcode}
+{[}~1~2~3~{]}~4~append~.
+
+\emph{{[}~1~2~3~|~4~{]}}
+\end{lyxcode}
+\texttt{length ( list -{}- n )} Iterate down the cdr of the list until
+it reaches \texttt{f}, counting the number of elements in the list:
+
+\begin{lyxcode}
+{[}~{[}~1~2~{]}~{[}~3~4~{]}~5~{]}~length~.
+
+\emph{3}
+
+{[}~{[}~{[}~{}``Hey''~{]}~5~{]}~length~.
+
+\emph{2}
+\end{lyxcode}
+\texttt{nth ( index list -{}- obj )} Look up an element specified
+by a zero-based index, by successively iterating down the cdr of the
+list:
+
+\begin{lyxcode}
+1~{[}~{}``Hamster''~{}``Bagpipe''~{}``Beam''~{]}~nth~.
+
+\emph{{}``Bagpipe''}
+\end{lyxcode}
+This word takes linear time proportional to the list index. If you
+need constant time lookups, use a vector instead.
+
+\texttt{set-nth ( value index list -{}- list )} Create a new list,
+identical to the original list except the element at the specified
+index is replaced:
+
+\begin{lyxcode}
+{}``Done''~1~{[}~{}``Not~started''~{}``Incomplete''~{]}~set-nth~.
+
+\emph{{[}~{}``Done''~{}``Incomplete''~{]}}
+\end{lyxcode}
+\texttt{remove ( obj list -{}- list )} Push a new list, with all occurrences
+of the object removed. All other elements are in the same order:
+
+\begin{lyxcode}
+:~australia-~{}``Australia''~swap~remove~;
+
+{[}~\char`\"{}Canada\char`\"{}~\char`\"{}New~Zealand\char`\"{}~\char`\"{}Australia\char`\"{}~\char`\"{}Russia\char`\"{}~{]}~australia-~.
+
+\emph{{[}~\char`\"{}Canada\char`\"{}~\char`\"{}New~Zealand\char`\"{}~\char`\"{}Russia\char`\"{}~{]}}
+\end{lyxcode}
+\texttt{remove-nth ( index list -{}- list )} Push a new list, with
+an index removed:
+
+\begin{lyxcode}
+:~australia-~{}``Australia''~swap~remove~;
+
+{[}~\char`\"{}Canada\char`\"{}~\char`\"{}New~Zealand\char`\"{}~\char`\"{}Australia\char`\"{}~\char`\"{}Russia\char`\"{}~{]}~australia-~.
+
+\emph{{[}~\char`\"{}Canada\char`\"{}~\char`\"{}New~Zealand\char`\"{}~\char`\"{}Russia\char`\"{}~{]}}
+\end{lyxcode}
+\texttt{reverse ( list -{}- list )} Push a new list which has the
+same elements as the original one, but in reverse order:
+
+\begin{lyxcode}
+{[}~4~3~2~1~{]}~reverse~.
+
+\emph{{[}~1~2~3~4~{]}}
+\end{lyxcode}
+\texttt{contains ( obj list -{}- list )} Look for an occurrence of
+an object in a list. The remainder of the list starting from the first
+occurrence is returned. If the object does not occur in the list,
+f is returned:
+
+\begin{lyxcode}
+:~lived-in?~(~country~-{}-~?~)
+
+~~~~{[}~{}``Canada''~{}``New~Zealand''~{}``Australia''~{}``Russia''~{]}~contains~;
+
+{}``Australia''~lived-in?~.
+
+\emph{{[}~{}``Australia''~{}``Russia''~{]}}
+
+{}``Pakistan''~lived-in?~.
+
+\emph{f}
+\end{lyxcode}
+For now, assume {}``occurs'' means {}``contains an object that
+looks like''. The issue of object equality is covered in the next
+chapter.
+
+\texttt{unique ( list -{}- list )} Return a new list with all duplicate
+elements removed. This word executes in quadratic time, so should
+not be used with large lists. For example:
+
+\begin{lyxcode}
+{[}~1~2~1~4~1~8~{]}~unique~.
+
+\emph{{[}~1~2~4~8~{]}}
+\end{lyxcode}
+\texttt{unit ( obj -{}- list )} Make a list of one element:
+
+\begin{lyxcode}
+{}``Unit~18''~unit~.
+
+\emph{{[}~{}``Unit~18''~{]}}
+\end{lyxcode}
+
+\subsection{Association lists}
+
+An \emph{association list} is one where every element is a cons. The
+car of each cons is a name, the cdr is a value. The literal notation
+is suggestive:
+
+\begin{lyxcode}
+{[}
+
+~~~~{[}~{}``Jill''~|~{}``CEO''~{]}
+
+~~~~{[}~{}``Jeff''~|~{}``manager''~{]}
+
+~~~~{[}~{}``James~~|~{}``lowly~web~designer''~{]}
+
+{]}
+\end{lyxcode}
+\texttt{assoc? ( obj -{}- ? )} returns \texttt{t} if the object is
+a list whose every element is a cons; otherwise it returns \texttt{f}.
+
+\texttt{assoc ( name alist -{}- value )} looks for a pair with this
+name in the list, and pushes the cdr of the pair. Pushes f if no name
+with this pair is present. Note that assoc cannot differentiate between
+a name that is not present at all, or a name with a value of \texttt{f}.
+
+\texttt{assoc{*} ( name alist -{}- {[} name | value {]} )} looks for
+a pair with this name, and pushes the pair itself. Unlike \texttt{assoc},
+\texttt{assoc{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-assoc ( value name alist -{}- alist )} removes any existing
+occurrence of a name from the list, and adds a new pair. This creates
+a new list, the original is unaffected.
+
+\texttt{acons ( value name alist -{}- alist )} is slightly faster
+than \texttt{set-assoc} since it simply conses a new pair onto the
+list. However, if used repeatedly, the list will grow to contain a
+lot of {}``shadowed'' pairs.
+
+Searching an association list incurs a linear time cost, so they should
+only be used for small mappings -- a typical use is a mapping of half
+a dozen entries or so, specified literally in source. Hashtables can
+achieve better performance with larger mappings.
+
+
+\subsection{List combinators}
+
+In a traditional language such as C, every iteration or collection
+must be written out as a loop, with setting up and updating of indexes,
+etc. Factor on the other hand relies on combinators and quotations
+to avoid duplicating these loop ``design patterns'' throughout
+the code.
+
+The simplest case is iterating through each element of a list, and
+printing it or otherwise consuming it from the stack.
+
+\texttt{each ( list quot -{}- )} pushes each element of the list in
+turn, and executes the quotation. The list and quotation are not on
+the stack when the quotation is executed. This allows a powerful idiom
+where the quotation makes a copy of a value on the stack, and consumes
+it along with the list element. In fact, this idiom works with all
+well-designed combinators.%
+\footnote{Later, you will learn how to apply it when designing your own combinators.%
+}
+
+The previously-mentioned \texttt{reverse} word is implemented using
+\texttt{each}:
+
+\begin{lyxcode}
+:~reverse~{[}~{]}~swap~{[}~swons~{]}~each~;
+\end{lyxcode}
+To understand how it works, consider that each element of the original
+list is consed onto the beginning of a new list, in turn. So the last
+element of the original list ends up at the beginning of the new list.
+
+\texttt{inject ( list quot -{}- list )} is similar to \texttt{each},
+except the return values of the quotation are collected into the new
+list. The quotation must leave one more element on the stack than
+was present before the quotation was called, otherwise the combinator
+will not function properly; so the quotation must have stack effect
+\texttt{( obj -{}- obj )}.
+
+For example, suppose we have a list where each element stores the
+quantity of a some nutrient in 100 grams of food; we would like to
+find out the total nutrients contained in 300 grams:
+
+\begin{lyxcode}
+:~multiply-each~(~n~list~-{}-~list~)
+
+~~~~{[}~dupd~{*}~{]}~inject~nip~;
+
+3~{[}~50~450~101~{]}~multiply-each~.
+
+\emph{{[}~180~1350~303~{]}}
+\end{lyxcode}
+Note the use of \texttt{nip} to discard the original parameter \texttt{n}.
+
+In case there is no appropriate combinator, recursion can be used.
+Factor performs tail call optimization, so a word where the recursive
+call is the last thing done will not use an arbitrary amount of stack
+space.
+
+\texttt{subset ( list quot -{}- list )} produces a new list containing
+some of the elements of the original list. Which elements to collect
+is determined by the quotation -- the quotation is called with each
+list element on the stack in turn, and those elements for which the
+quotation does not return \texttt{f} are added to the new list. The
+quotation must have stack effect \texttt{( obj -{}- ? )}.
+
+For example, lets construct a list of all numbers between 0 and 99
+such that the sum of their digits is less than 10:
+
+\begin{lyxcode}
+:~sum-of-digits~(~n~-{}-~n~)~10~/mod~+~;
+
+100~count~{[}~sum-of-digits~10~<~{]}~subset~.
+
+\emph{{[}~0~1~2~3~4~5~6~7~8~9~10~11~12~13~14~15~16~17~18~20~21}
+
+\emph{22~23~24~25~26~27~30~31~32~33~34~35~36~40~41~42~43~44}
+
+\emph{45~50~51~52~53~54~60~61~62~63~70~71~72~80~81~90~{]}~}
+\end{lyxcode}
+\texttt{all? ( list quot -{}- ? )} returns \texttt{t} if the quotation
+returns \texttt{t} for all elements of the list, otherwise it returns
+\texttt{f}. In other words, if \texttt{all?} returns \texttt{t}, then
+\texttt{subset} applied to the same list and quotation would return
+the entire list.%
+\footnote{Barring any side effects which modify the execution of the quotation.
+It is best to avoid side effects when using list combinators.%
+}
+
+For example, the implementation of \texttt{assoc?} uses \texttt{all?}:
+
+\begin{lyxcode}
+:~assoc?~(~list~-{}-~?~)
+
+~~~~dup~list?~{[}~{[}~cons?~{]}~all?~{]}~{[}~drop~f~{]}~ifte~;
+\end{lyxcode}
+
+\subsection{\label{sub:List-constructors}List constructors}
+
+The list construction words minimize stack noise with a clever trick.
+They store a partial list in a variable, thus reducing the number
+of stack elements that have to be juggled.
+
+The word \texttt{{[}, ( -{}- )} begins list construction.
+
+The word \texttt{, ( obj -{}- )} appends an object to the partial
+list.
+
+The word \texttt{,{]} ( -{}- list )} pushes the complete list.
+
+While variables haven't been described yet, keep in mind that a new
+scope is created between \texttt{{[},} and \texttt{,{]}}. This means
+that list constructions can be nested, as long as in the end, the
+number of \texttt{{[},} and \texttt{,{]}} balances out. There is no
+requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
+word, however, debugging becomes prohibitively difficult when a list
+construction begins in one word and ends with another.
+
+Here is an example of list construction using this technique:
+
+\begin{lyxcode}
+{[},~1~10~{[}~2~{*}~dup~,~{]}~times~drop~,{]}~.
+
+\emph{{[}~2~4~8~16~32~64~128~256~512~1024~{]}}
+
+
+\end{lyxcode}
+
+\subsection{Destructively modifying lists}
+
+All previously discussed list modification functions always returned
+newly-allocated lists. Destructive list manipulation functions on
+the other hand reuse the cons cells of their input lists, and hence
+avoid memory allocation.
+
+Only ever destructively change lists you do not intend to reuse again.
+You should not rely on the side effects -- they are unpredictable.
+It is wrong to think that destructive words {}``modify'' the original
+list -- rather, think of them as returning a new list, just like the
+normal versions of the words, with the added caveat that the original
+list must not be used again.
+
+\texttt{nreverse ( list -{}- list )} reverses a list without consing.
+In the following example, the return value reuses the cons cells of
+the original list, and the original list has been ruined by unpredictable
+side effects:
+
+\begin{lyxcode}
+{[}~1~2~3~4~{]}~dup~nreverse~.s
+
+\emph{\{~{[}~4~{]}~{[}~4~3~2~1~{]}~\}}
+\end{lyxcode}
+Compare the second stack element (which is what remains of the original
+list) and the top stack element (the list returned by \texttt{nreverse}).
+
+The \texttt{nreverse} word is the most frequently used destructive
+list manipulator. The usual idiom is a loop where values are consed
+onto the beginning of a list in each iteration of a loop, then the
+list is reversed at the end. Since the original list is never used
+again, \texttt{nreverse} can safely be used here.
+
+\texttt{nappend ( list list -{}- list )} sets the cdr of the last
+cons cell in the first list to the second list, unless the first list
+is \texttt{f}, in which case it simply returns the second list. Again,
+the side effects on the first list are unpredictable -- if it is \texttt{f},
+it is unchanged, otherwise, it is equal to the return value:
+
+\begin{lyxcode}
+{[}~1~2~{]}~{[}~3~4~{]}~nappend~.
+
+\emph{{[}~1~2~3~4~{]}}
+\end{lyxcode}
+Note in the above examples, we use literal list parameters to nreverse
+and nappend. This is actually a very bad idea, since the same literal
+list may be used more than once! For example, lets make a colon definition:
+
+\begin{lyxcode}
+:~very-bad-idea~{[}~1~2~3~4~{]}~nreverse~;
+
+very-bad-idea~.
+
+\emph{{[}~4~3~2~1~{]}}
+
+very-bad-idea~.
+
+\emph{{[}~4~{]}}
+
+{}``very-bad-idea''~see
+
+\emph{:~very-bad-idea}
+
+~\emph{~~~{[}~4~{]}~nreverse~;}
+\end{lyxcode}
+As you can see, the word definition itself was ruined!
+
+Sometimes it is desirable make a copy of a list, so that the copy
+may be safely side-effected later.
+
+\texttt{clone-list ( list -{}- list )} pushes a new list containing
+the exact same elements as the original. The elements themselves are
+not copied.
+
+If you want to write your own destructive list manipulation words,
+you can use \texttt{set-car ( value cons -{}- )} and \texttt{set-cdr
+( value cons -{}- )} to modify individual cons cells. Some words that
+are not destructive on their inputs nonetheless create intermediate
+lists which are operated on using these words. One example is \texttt{clone-list}
+itself.
+
+
+\section{Vectors}
+
+A vector is a contiguous chunk of cells which hold references to arbitrary
+objects. Vectors have the following literal syntax:
+
+\begin{lyxcode}
+\{~f~f~f~t~t~f~t~t~-6~{}``Hey''~\}
+\end{lyxcode}
+Use of vector literals in source code is discouraged, since vector
+manipulation relies on side effects rather than return values, and
+hence it is very easy to mess up a literal embedded in a word definition.
+
+
+\subsection{Vectors versus lists}
+
+Vectors are applicable to a different class of problems than lists.
+Compare the relative performance of common operations on vectors and
+lists:
+
+\begin{tabular}{|c|c|c|}
+\hline 
+&
+Lists&
+Vectors\tabularnewline
+\hline
+\hline 
+Random access of an index&
+linear time&
+constant time\tabularnewline
+\hline 
+Add new element at start&
+constant time&
+linear time\tabularnewline
+\hline 
+Add new element at end&
+linear time&
+constant time\tabularnewline
+\hline
+\end{tabular}
+
+When using vectors, you need to pass around a vector and an index
+-- when working with lists, often only a list head is passed around.
+For this reason, if you need a sequence for iteration only, a list
+is a better choice because the list vocabulary contains a rich collection
+of recursive words.
+
+On the other hand, when you need to maintain your own {}``stack''-like
+collection, a vector is the obvious choice, since most pushes and
+pops can then avoid allocating memory.
+
+Vectors and lists can be converted back and forth using the \texttt{vector>list}
+word \texttt{( vector -{}- list )} and the \texttt{list>vector} word
+\texttt{( list -{}- vector )}.
+
+
+\subsection{Working with vectors}
+
+\texttt{<vector> ( capacity -{}- vector )} pushes a zero-length vector.
+Storing more elements than the initial capacity grows the vector.
+
+\texttt{vector-nth ( index vector -{}- obj )} pushes the object stored
+at a zero-based index of a vector:
+
+\begin{lyxcode}
+0~\{~{}``zero''~{}``one''~\}~vector-nth~.
+
+\emph{{}``zero''}
+
+2~\{~1~2~\}~vector-nth~.
+
+\emph{ERROR:~Out~of~bounds}
+\end{lyxcode}
+\texttt{set-vector-nth ( obj index vector -{}- )} stores a value into
+a vector:%
+\footnote{The words \texttt{get} and \texttt{set} used in this example will
+be formally introduced later.%
+}
+
+\begin{lyxcode}
+\{~{}``math''~{}``CS''~\}~{}``v''~set
+
+1~{}``philosophy''~{}``v''~get~set-vector-nth
+
+{}``v''~get~.
+
+\emph{\{~{}``math''~{}``philosophy''~\}}
+
+4~{}``CS''~{}``v''~get~set-vector-nth
+
+{}``v''~get~.
+
+\emph{\{~{}``math''~{}``philosophy''~f~f~{}``CS''~\}}
+\end{lyxcode}
+\texttt{vector-length ( vector -{}- length )} pushes the number of
+elements in a vector. As the previous two examples demonstrate, attempting
+to fetch beyond the end of the vector will raise an error, while storing
+beyond the end will grow the vector as necessary.
+
+\texttt{set-vector-length ( length vector -{}- )} resizes a vector.
+If the new length is larger than the current length, the vector grows
+if necessary, and the new cells are filled with \texttt{f}.
+
+\texttt{vector-push ( obj vector -{}- )} adds an object at the end
+of the vector. This increments the vector's length by one.
+
+\texttt{vector-pop ( vector -{}- obj )} removes the object at the
+end of the vector and pushes it. This decrements the vector's length
+by one.
+
+
+\subsection{Vector combinators}
+
+vector-each, vector-map
+
+
+\section{Strings}
+
+A \emph{string} is a sequence of 16-bit Unicode characters (conventionally,
+in the UTF16 encoding). Strings are input by enclosing them in quotes:
+
+\begin{lyxcode}
+{}``GET~/index.html~HTTP/1.0''
+\end{lyxcode}
+String literals must not span more than one line. The following is
+not valid:
+
+\begin{lyxcode}
+{}``Content-Type:~text/html
+
+Content-Length:~1280''
+\end{lyxcode}
+Instead, the newline must be represented using an escape, rather than
+literally. The newline escape is \texttt{\textbackslash{}n}, so we
+can write:
+
+\begin{lyxcode}
+{}``Content-Type:~text/html\textbackslash{}nContent-Length:~1280''
+\end{lyxcode}
+Other special characters, such as quotes and tabs can be input in
+a similar manner. Here is the full list of supported character escapes:
+
+\begin{tabular}{|c|c|}
+\hline 
+Character&
+Escape\tabularnewline
+\hline
+\hline 
+Quote&
+\texttt{\textbackslash{}''}\tabularnewline
+\hline 
+Newline&
+\texttt{\textbackslash{}n}\tabularnewline
+\hline 
+Carriage return&
+\texttt{\textbackslash{}r}\tabularnewline
+\hline 
+Horizontal tab&
+\texttt{\textbackslash{}t}\tabularnewline
+\hline 
+Terminal escape&
+\texttt{\textbackslash{}e}\tabularnewline
+\hline 
+Zero chacater&
+\texttt{\textbackslash{}0}\tabularnewline
+\hline 
+Arbitrary Unicode character&
+\texttt{\textbackslash{}u}\texttt{\emph{nnnn}}\tabularnewline
+\hline
+\end{tabular}
+
+The last row shows a notation for inputting any possible character
+using its hexadecimal value. For example, a space character can also
+be input as \texttt{\textbackslash{}u0020}.
+
+There is no specific character data type in Factor. When characters
+are extracted from a string, they are pushed on the stack as integers.
+It is possible to input an integer with a value equal to that of a
+Unicode character using the following special notation:
+
+\begin{lyxcode}
+CHAR:~A~.
+
+\emph{65}
+
+CHAR:~A~1~+~CHAR:~B~=~.
+
+\emph{t}
+\end{lyxcode}
+
+\subsection{Working with strings}
+
+String words are found in the \texttt{strings} vocabulary. String
+manipulation words always return a new copy of a string rather than
+modifying the string in-place. Notice the absence of words such as
+\texttt{set-str-nth} and \texttt{set-str-length}. Unlike lists, for
+which both constructive and destuctive manipulation words are provided,
+destructive string operations are only done with a distinct string
+buffer type, which is described in the next section.
+
+\texttt{str-length ( str -{}- n )} pushes the length of a string:
+
+\begin{lyxcode}
+{}``Factor''~str-length~.
+
+\emph{6}
+\end{lyxcode}
+\texttt{str-nth ( n str -{}- ch )} pushes the character located by
+a zero-based index. A string is essentially a vector specialized for
+storing one data type, the 16-bit unsigned character. These are returned
+as fixnums, so printing will not yield the actual character:
+
+\begin{lyxcode}
+0~{}``~{}``~str-nth~.
+
+\emph{32}
+\end{lyxcode}
+\texttt{index-of ( str substr -{}- n )} searches a string for the
+first occurrence of a substring or character. If an occurrence was
+found, its index is pushed. Otherwise, -1 is pushed:
+
+\begin{lyxcode}
+{}``www.sun.com''~CHAR:~.~index-of~.
+
+\emph{3}
+
+{}``mailto:billg@microsoft.com''~CHAR:~/~index-of~.
+
+\emph{-1}
+
+{}``www.lispworks.com''~{}``.com''~index-of~.
+
+\emph{13}
+\end{lyxcode}
+\texttt{index-of{*} ( n str substr -{}- n )} works like index-of,
+except it takes a start index as an argument.
+
+\texttt{substring ( start end str -{}- substr )} extracts a range
+of characters from a string into a new string.
+
+\texttt{split ( str split -{}- list )} pushes a new list of strings
+which are substrings of the original string, taken in between occurrences
+of the split string:
+
+\begin{lyxcode}
+{}``fixnum~bignum~ratio''~{}``~''~split~.
+
+\emph{{[}~{}``fixnum''~{}``bignum''~{}``ratio''~{]}}
+
+{}``/usr/bin/X''~CHAR:~/~split~.
+
+\emph{{[}~{}``''~{}``usr''~{}``bin''~{}``X''~{]}}
+\end{lyxcode}
+If you wish to concatenate a fixed number of strings at the top of
+the stack, you can use a member of the \texttt{cat} family of words
+from the \texttt{strings} vocabulary. They concatenate strings, in
+the order that they appear in the stack effect.
+
+\begin{tabular}{|c|c|}
+\hline 
+Word&
+Stack effect\tabularnewline
+\hline
+\hline 
+\texttt{cat2}&
+\texttt{( s1 s2 -{}- str )}\tabularnewline
+\hline 
+\texttt{cat3}&
+\texttt{( s1 s2 s3 -{}- str )}\tabularnewline
+\hline 
+\texttt{cat4}&
+\texttt{( s1 s2 s3 s4 -{}- str )}\tabularnewline
+\hline 
+\texttt{cat5}&
+\texttt{( s1 s2 s3 s4 s5 -{}- str )}\tabularnewline
+\hline
+\end{tabular}
+
+\texttt{cat ( list -{}- str )} is a generalization of the above words;
+it concatenates each element of a list into a new string.
+
+Some straightfoward examples:
+
+\begin{lyxcode}
+{}``How~are~you,~{}``~{}``Chuck''~{}``?''~cat3~.
+
+\emph{{}``How~are~you,~Chuck?''}
+
+{}``/usr/bin/X''~CHAR:~/~split~cat~.
+
+\emph{{}``usrbinX''}
+\end{lyxcode}
+String buffers, described in the next section, provide a more flexible
+means of concatenating strings.
+
+
+\subsection{String buffers}
+
+A \emph{string buffer} is a mutable string. The canonical use for
+a string buffer is to combine several strings into one. This is done
+by creating a new string buffer, appending strings and characters,
+and finally turning the string buffer into a string.
+
+\texttt{<sbuf> ( capacity -{}- sbuf )} pushes a new string buffer
+that is capable of holding up to the specified capacity before growing.
+
+\texttt{sbuf-append ( str/ch sbuf -{}- )} appends a string or a character
+to the end of the string buffer. If a number is given, its least significant
+16 bits are interpreted as a character value:
+
+\begin{lyxcode}
+100~<sbuf>~{}``my-sbuf''~set
+
+{}``Testing''~{}``my-sbuf''~get~sbuf-append
+
+32~{}``my-sbuf''~get~sbuf-append
+\end{lyxcode}
+\texttt{sbuf>str ( sbuf -{}- str )} pushes a string with the same
+contents as the string buffer:
+
+\begin{lyxcode}
+{}``my-sbuf''~get~sbuf>str~.
+
+{}``Testing~{}``
+\end{lyxcode}
+While usually string buffers are only used to concatenate a series
+of strings, they also support the same operations as vectors.
+
+\texttt{sbuf-nth ( n sbuf -{}- ch )} pushes the character stored at
+a zero-based index of a string buffer:
+
+\begin{lyxcode}
+2~{}``A~string.''~str-nth~.
+
+\emph{115}
+\end{lyxcode}
+\texttt{set-sbuf-nth ( ch n sbuf -{}- )} sets the character stored
+at a zero-based index of a string buffer. Only the least significant
+16 bits of the charcter are stored into the string buffer.
+
+\texttt{sbuf-length ( sbuf -{}- n )} pushes the number of characters
+in a string buffer. This is not the same as the capacity of the string
+buffer -- the capacity is the internal storage size of the string
+buffer, the length is a possibly smaller number indicating how much
+storage is in use.
+
+\texttt{set-sbuf-length ( n sbuf -{}- )} changes the length of the
+string buffer. The string buffer's storage grows if necessary, and
+new character positions are automatically filled with zeroes.
+
+
+\subsection{String constructors}
+
+Passing a string buffer on the stack can lead to unnecessary stack
+noise, and overly-complicated stack effects. Often it is better to
+use the string construction words, which operate on a similar principle
+to the list construction words.
+
+As seen in \ref{sub:List-constructors}, the \texttt{{[},} word begins
+list construction; the \texttt{,} word appends elements to the list
+that will be returned by the \texttt{,{]}} word. Similarly, the \texttt{<\%}
+word begins string construction; the \texttt{\%} word appends the
+top of the stack to the string that will be returned by the \texttt{\%>}
+word.
+
+The word \texttt{<\% ( -{}- )} begins string construction. The word
+definition creates a string buffer. Instead of leaving the string
+buffer on the stack, the word creates and pushes a scope on the name
+stack.
+
+The word \texttt{\% ( str/ch -{}- )} appends a string or a character
+to the partial list. The word definition calls \texttt{sbuf-append}
+on a string buffer located by searching the name stack.
+
+The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
+definition pops the name stack and calls \texttt{sbuf>str} on the
+appropriate string buffer.
+
+TODO examples
+
+
+\subsection{String combinators}
+
+A pair of combinators in the \texttt{strings} vocabulary iterate over a string, applying a quotation to each character. The \texttt{str-each} word does nothing other than calling the quotation, while \texttt{str-map} collects the return values of the quotation into a new string.
+
+\texttt{str-each ( str quot -{}- )} pushes each character of the string in turn, and executes the quotation. The quotation should have stack effect \texttt{( ch -- )}. The string and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the string for accumilation and so on. The following example counts the number of occurrences of the letter ``a'' in a string:
+
+\begin{alltt}
+: count-a ( str -- n )
+    0 swap [ CHAR: a = [ succ ] when ] str-each ;
+
+"Lets just say that you may stay" count-a .
+\emph{4}
+\end{alltt}
+
+\texttt{str-map (str quot -{}- str )} pushes each character 
+\subsection{Printing and reading strings}
+
+These words, found in the \texttt{stdio} vocabulary, differ from \texttt{.}
+in that they print strings only, without surrounding quotes, and raise
+an error for any other data type. The word \texttt{.} prints any Factor
+object in a form suited for parsing, hence it quotes strings.
+
+\texttt{write ( str -{}- )} writes a string to the standard output
+device, without a terminating newline.
+
+\texttt{read ( -{}- str )} reads a line of input from the standard
+input device, terminated by a newline.
+
+\texttt{print ( str -{}- )} writes a string followed by a newline
+character. Instead of passinga blank string, use \texttt{terpri (
+-{}- )} to print a single newline character.
+
+\begin{lyxcode}
+{}``a''~write~{}``b''~write
+
+ab
+
+{[}~{}``hello''~{}``world''~{]}~{[}~print~{]}~each
+
+hello
+
+world
+\end{lyxcode}
+Often a string representation of a number, usually one read from an
+input source, needs to be turned into a number. Unlike some languages,
+in Factor the conversion from a string such as {}``123'' into the
+number 123 is not automatic. To turn a string into a number, use one
+of two words in the \texttt{parser} vocabulary.
+
+\texttt{str>number ( str -{}- n )} creates an integer, ratio or floating
+point literal from its string representation. If the string does not
+reprent a valid number, an exception is thrown.
+
+\texttt{parse-number ( str -{}- n/f )} pushes f on failure, rather
+than raising an exception.
+
+XXX bad; talk about parse-word
+
+\texttt{unparse ( n -{}- str )} pushes the string representation of
+a number.
+
+
+\section{PRACTICAL: Contractor timesheet}
+
+
+\subsection{Adding a timesheet entry}
+
+When you begin working on a new task, you tell the timesheet you want
+to add a new entry. It then measures the elapsed time until you specify
+the task is done, and prompts for a task description.
+
+The first word we will write is \texttt{measure-duration}. We measure
+the time duration by using the \texttt{millis} word \texttt{( -{}-
+m )} to take the time before and after a call to \texttt{read}. The
+\texttt{millis} word pushes the number of milliseconds since a certain
+epoch -- the epoch does not matter here since we are only interested
+in the difference between two times.
+
+A first attempt at \texttt{measure-duration} might look like this:
+
+\begin{lyxcode}
+:~measure-duration~millis~read~drop~millis~-~;
+
+measure-duration~.
+\end{lyxcode}
+This word definition has the right general idea, however, the result
+is negative. Also, we would like to measure durations in minutes,
+not milliseconds:
+
+\begin{lyxcode}
+:~measure-duration~(~-{}-~duration~)
+
+~~~~millis
+
+~~~~read~drop
+
+~~~~millis~swap~-~1000~/i~60~/i~;
+\end{lyxcode}
+Note that the \texttt{/i} word \texttt{( x y -{}- x/y )}, from the
+\texttt{arithmetic} vocabulary, performs truncating division. This
+makes sense, since we are not interested in fractional parts of a
+minute here.
+
+Now that we can measure a time duration at the keyboard, lets write
+the \texttt{add-entry-prompt} word. This word does exactly what one
+would expect -- it prompts for the time duration and description,
+and leaves those two values on the stack:
+
+\begin{lyxcode}
+:~add-entry-prompt~(~-{}-~duration~description~)
+
+~~~~\char`\"{}Start~work~on~the~task~now.~Press~ENTER~when~done.\char`\"{}~print
+
+~~~~measure-duration
+
+~~~~\char`\"{}Please~enter~a~description:\char`\"{}~print
+
+~~~~read~;
+\end{lyxcode}
+You should interactively test this word. Measure off a minute or two,
+press ENTER, enter a description, and press ENTER again. The stack
+should now contain two values, in the same order as the stack effect
+comment.
+
+Now, almost all the ingredients are in place. The final add-entry
+word calls add-entry-prompt, then pushes the new entry on the end
+of the timesheet vector:
+
+\begin{lyxcode}
+:~add-entry~(~timesheet~-{}-~)
+
+~~~~add-entry-prompt~cons~swap~vector-push~;
+\end{lyxcode}
+Recall that timesheet entries are cons cells where the car is the
+duration and the cdr is the description, hence the call to \texttt{cons}.
+Note that this word side-effects the timesheet vector. You can test
+it interactively like so:
+
+\begin{lyxcode}
+10~<vector>~dup~add-entry
+
+\emph{Start~work~on~the~task~now.~Press~ENTER~when~done.}
+
+\emph{Please~enter~a~description:}
+
+\emph{Studying~Factor}
+
+.
+
+\emph{\{~{[}~2~|~{}``Studying~Factor''~{]}~\}}
+\end{lyxcode}
+
+\subsection{Printing the timesheet}
+
+The hard part of printing the timesheet is turning the duration in
+minutes into a nice hours/minutes string, like {}``01:15''. We would
+like to make a word like the following:
+
+\begin{lyxcode}
+135~hh:mm~.
+
+\emph{01:15}
+\end{lyxcode}
+First, we can make a pair of words hh and mm to extract the hours
+and minutes, respectively. This can be achieved using truncating division,
+and the modulo operator -- also, since we would like strings to be
+returned, the \texttt{unparse} word \texttt{( obj -{}- str )} from
+the \texttt{unparser} vocabulary is called to turn the integers into
+strings:
+
+\begin{lyxcode}
+:~hh~(~duration~-{}-~str~)~60~/i~unparse~;
+
+:~mm~(~duration~-{}-~str~)~60~mod~unparse~;
+\end{lyxcode}
+The \texttt{hh:mm} word can then be written, concatenating the return
+values of \texttt{hh} and \texttt{mm} into a single string using string
+construction:
+
+\begin{lyxcode}
+:~hh:mm~(~millis~-{}-~str~)~<\%~dup~hh~\%~\char`\"{}:\char`\"{}~\%~mm~\%~\%>~;
+\end{lyxcode}
+However, so far, these three definitions do not produce ideal output.
+Try a few examples:
+
+\begin{lyxcode}
+120~hh:mm~.
+
+2:0
+
+130~hh:mm~.
+
+2:10
+\end{lyxcode}
+Obviously, we would like the minutes to always be two digits. Luckily,
+there is a \texttt{digits} word \texttt{( str n -{}- str )} in the
+\texttt{format} vocabulary that adds enough zeros on the left of the
+string to give it the specified length. Try it out:
+
+\begin{lyxcode}
+{}``23''~2~digits~.
+
+\emph{{}``23''}
+
+{}``7''~2~digits~.
+
+\emph{{}``07''}
+\end{lyxcode}
+We can now change the definition of \texttt{mm} accordingly:
+
+\begin{lyxcode}
+:~mm~(~duration~-{}-~str~)~60~mod~unparse~2~digits~;
+\end{lyxcode}
+Now that time duration output is done, a first attempt at a definition
+of \texttt{print-timesheet} looks like this:
+
+\begin{lyxcode}
+:~print-timesheet~(~timesheet~-{}-~)
+
+~~~~{[}~uncons~write~{}``:~{}``~write~hh:mm~print~{]}~vector-each~;
+\end{lyxcode}
+This works, but produces ugly output:
+
+\begin{lyxcode}
+\{~{[}~30~|~{}``Studying~Factor''~{]}~{[}~65~|~{}``Paperwork''~{]}~\}
+
+print-timesheet
+
+\emph{Studying~Factor:~0:30}
+
+\emph{Paperwork:~1:05}
+\end{lyxcode}
+It would be much nicer if the time durations lined up in the same
+column. First, lets factor out the body of the \texttt{vector-each}
+loop into a new \texttt{print-entry} word before it gets too long:
+
+\begin{lyxcode}
+:~print-entry~(~duration~description~-{}-~)
+
+~~~~write~{}``:~''~write~hh:mm~print~;~\\
+~\\
+:~print-timesheet~(~timesheet~-{}-~)
+
+~~~~{[}~uncons~print-entry~{]}~vector-each~;
+\end{lyxcode}
+We can now make \texttt{print-entry} line up columns using the \texttt{pad-string}
+word \texttt{( str n -{}- str )}.
+
+\begin{lyxcode}
+:~print-entry~(~duration~description~-{}-~)
+
+~~~~dup
+
+~~~~write
+
+~~~~50~swap~pad-string~write~
+
+~~~~hh:mm~print~;
+\end{lyxcode}
+In the above definition, we first print the description, then enough
+blanks to move the cursor to column 60. So the description text is
+left-justified. If we had interchanged the order of the second and
+third line in the definition, the description text would be right-justified.
+
+Try out \texttt{print-timesheet} again, and marvel at the aligned
+columns:
+
+\begin{lyxcode}
+\{~{[}~30~|~{}``Studying~Factor''~{]}~{[}~65~|~{}``Paperwork''~{]}~\}
+
+print-timesheet
+
+\emph{Studying~Factor~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~0:30}
+
+\emph{Paperwork~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~1:05}
+\end{lyxcode}
+
+\subsection{The main menu}
+
+Reading a number, showing a menu
+
+
+\section{Variables and namespaces}
+
+
+\subsection{Hashtables}
+
+
+\subsection{Namespaces}
+
+
+\subsection{The name stack}
+
+
+\subsection{The inspector}
+
+
+\section{PRACTICAL: Music player}
+
+
+\section{Deeper in the beast}
+
+Text -> objects - parser, objects -> text - unparser for atoms, prettyprinter
+for collections.
+
+What really is a word -- primitive, parameter, property list.
+
+Call stack how it works and >r/r>
+
+
+\subsection{Parsing words}
+
+Lets take a closer look at Factor syntax. Consider a simple expression,
+and the result of evaluating it in the interactive interpreter:
+
+\begin{lyxcode}
+2~3~+~.
+
+\emph{5}
+\end{lyxcode}
+The interactive interpreter is basically an infinite loop. It reads
+a line of input from the terminal, parses this line to produce a \emph{quotation},
+and executes the quotation.
+
+In the parse step, the input text is tokenized into a sequence of
+white space-separated tokens. First, the interpreter checks if there
+is an existing word named by the token. If there is no such word,
+the interpreter instead treats the token as a number.%
+\footnote{Of course, Factor supports a full range of data types, including strings,
+lists and vectors. Their source representations are still built from
+numbers and words, however.%
+}
+
+Once the expression has been entirely parsed, the interactive interpreter
+executes it.
+
+This parse time/run time distinction is important, because words fall
+into two categories; {}``parsing words'' and {}``running words''.
+
+The parser constructs a parse tree from the input text. When the parser
+encounters a token representing a number or an ordinary word, the
+token is simply appended to the current parse tree node. A parsing
+word on the other hand is executed \emph{}immediately after being
+tokenized. Since it executes in the context of the parser, it has
+access to the raw input text, the entire parse tree, and other parser
+structures.
+
+Parsing words are also defined using colon definitions, except we
+add \texttt{parsing} after the terminating \texttt{;}. Here are two
+examples of definitions for words \texttt{foo} and \texttt{bar}, both
+are identical except in the second example, \texttt{foo} is defined
+as a parsing word:
+
+\begin{lyxcode}
+!~Lets~define~'foo'~as~a~running~word.
+
+:~foo~{}``1)~foo~executed.''~print~;
+
+:~bar~foo~{}``2)~bar~executed.''~;
+
+bar
+
+\emph{1)~foo~executed}
+
+\emph{2)~bar~executed}
+
+bar
+
+\emph{1)~foo~executed}
+
+\emph{2)~bar~executed}
+
+
+
+!~Now~lets~define~'foo'~as~a~parsing~word.
+
+:~foo~{}``1)~foo~executed.''~print~;~parsing
+
+:~bar~foo~{}``2)~bar~executed.''~;
+
+\emph{1)~foo~executed}
+
+bar
+
+\emph{2)~bar~executed}
+
+bar
+
+\emph{2)~bar~executed}
+\end{lyxcode}
+In fact, the word \texttt{{}``} that denotes a string literal is
+a parsing word -- it reads characters from the input text until the
+next occurrence of \texttt{{}``}, and appends this string to the
+current node of the parse tree. Note that strings and words are different
+types of objects. Strings are covered in great detail later.
+
+
+\section{PRACTICAL: Infix syntax}
+
+
+\section{Continuations}
+
+Generators, co-routines, multitasking, exception handling
+
+
+\section{HTTP Server}
+
+
+\section{PRACTICAL: Some web app}
+\end{document}

@@ -93,10 +93,10 @@ USE: unparser
     ] cond ;
 
 : base> ( str base -- num/f )
-    <namespace> [
+    [
         "base" set
         [ str>number ] [ [ drop f ] when ] catch
-    ] bind ;
+    ] with-scope ;
 
 : bin> ( str -- num )
     #! Convert a binary string to a number.
@@ -113,3 +113,6 @@ USE: unparser
 : hex> ( str -- num )
     #! Convert a hexadecimal string to a number.
     16 base> ;
+
+! Something really sucks about these words here
+: parse-number ( str -- num ) dec> ;

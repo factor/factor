@@ -30,8 +30,8 @@ USE: namespaces
 USE: parser
 
 : cross-compile-resource ( resource -- )
-    <namespace> [
+    [
         ! Change behavior of ;
         "cross-compiling" on
         run-resource
-    ] bind ;
+    ] with-scope ;

@@ -16,6 +16,7 @@
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:137)
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.run(EventDispatchThread.java:100)
 
+- A+f f doesn't always work
 - java factor: equal numbers have non-equal hashcodes!
 - java factor memory leak
 - vector=

@@ -45,11 +45,11 @@ USE: stack
 
 : f>0 ( obj -- obj )
     #! If f at the top of the stack, turn it into 0.
-    [ 0 ] unless* ;
+    f 0 replace ;
 
 : 0>f ( obj -- obj )
     #! If 0 at the top of the stack, turn it into f.
-    dup 0 = [ drop f ] when ;
+    0 f replace ;
 
 : max ( x y -- z )
     2dup > [ drop ] [ nip ] ifte ;

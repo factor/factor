@@ -52,7 +52,7 @@ USE: vocabularies
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
-    <namespace> [ "base" set <% integer- integer% %> ] bind ;
+    [ "base" set <% integer- integer% %> ] with-scope ;
 
 : >dec ( num -- string )
     #! Convert an integer to its decimal representation.

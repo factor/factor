@@ -146,8 +146,8 @@ USE: unparser
 
 : new-listener-hook ( listener -- )
     #! Called when user opens a new listener
-    <namespace> [
+    [
         dup "listener" set
        <listener-stream> "stdio" set
         init-interpreter
-    ] bind ;
+    ] with-scope ;

@@ -48,3 +48,7 @@ IN: logic USE: kernel USE: stack
     dup not swap ? ; inline
 
 : >boolean t f ? ; inline
+
+: replace ( obj old new -- obj/new )
+    #! If obj is equal to old, drop it and push new.
+    >r dupd = [ drop r> ] [ r> drop ] ifte ;

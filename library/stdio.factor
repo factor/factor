@@ -64,6 +64,6 @@ USE: streams
     "\n" write ;
 
 : with-stream ( stream quot -- )
-    <namespace> [
+    [
         swap "stdio" set [ "stdio" get fclose rethrow ] catch
-    ] bind ;
+    ] with-scope ;

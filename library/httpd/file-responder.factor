@@ -105,7 +105,7 @@ USE: httpd-responder
     ] ifte ;
 
 : serve-script ( argument filename -- )
-    <namespace> [ swap "argument" set run-file ] bind ;
+    [ swap "argument" set run-file ] with-scope ;
 
 : parse-object-name ( filename -- argument filename )
     dup [

@@ -47,4 +47,4 @@ USE: unparser
     ] when* ;
 
 : with-logging ( quot -- )
-    <namespace> [ "stdio" get "log" set call ] bind ;
+    [ "stdio" get "log" set call ] with-scope ;

@@ -98,7 +98,7 @@ USE: vocabularies
     ] cond ;
 
 : describe-object-path ( string -- )
-    <namespace> [
+    [
         dup "object-path" set
         global-object-path describe
-    ] bind ;
+    ] with-scope ;

@@ -190,11 +190,11 @@ DEFER: prettyprint*
     prettyprint-list prettyprint-; ;
 
 : . ( obj -- )
-    <namespace> [
+    [
         "prettyprint-single-line" on
         tab-size 4 * "prettyprint-limit" set
         prettyprint
-    ] bind ;
+    ] with-scope ;
 
 : [.] ( list -- )
     #! Unparse each element on its own line.

@@ -372,7 +372,7 @@ IN: cross-compiler
     <filebw> [ [ write-word ] vector-each ] with-stream ;
 
 : with-minimal-image ( quot -- image )
-    <namespace> [
+    [
         300000 <vector> "image" set
         521 <hashtable> "objects" set
         namespace-buckets <hashtable> "vocabularies" set
@@ -382,7 +382,7 @@ IN: cross-compiler
         1000 <vector> "word-fixups" set
         call
         "image" get
-    ] bind ;
+    ] with-scope ;
 
 : with-image ( quot -- image )
     [ begin call end ] with-minimal-image ;

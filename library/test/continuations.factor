@@ -21,9 +21,9 @@ USE: test
     [
         "test-cc" set
         5 "x" set
-        <namespace> [
+        [
             6 "x" set "test-cc" get call
-        ] bind
+        ] with-scope
     ] callcc0 "x" get 5 = ;
 
 [ t ] [ 10 callcc1-test 10 count = ] unit-test

@@ -103,6 +103,9 @@ USE: strings
     #! Convert a hexadecimal string to a number.
     16 base> ;
 
+! Something really sucks about these words here
+: parse-number ( str -- num ) dec> ;
+
 : str>number ( str -- num )
     dup "base" get base> dup [
         nip

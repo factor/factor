@@ -47,6 +47,9 @@ USE: url-encoding
         [ CHAR: " | "&quot;" ]
     ] ;
 
+: char>entity ( ch -- str )
+    dup >r html-entities assoc dup r> ? ;
+
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [ dup html-entities assoc dup rot ? ] str-map ;
@@ -119,9 +122,7 @@ USE: url-encoding
     ] extend ;
 
 : with-html-stream ( quot -- )
-     <namespace> [
-        "stdio" get <html-stream> "stdio" set call
-    ] bind ;
+    "stdio" get <html-stream> swap with-stream ;
 
 : html-head ( title -- )
     "<html><head><title>" write

@@ -77,9 +77,13 @@ USE: vectors
     namestack* vector-peek ; inline
 
 : bind ( namespace quot -- )
-    #! Execute a quotation with a new namespace on the namespace
-    #! stack. Compiles if the quotation compiles.
+    #! Execute a quotation with a namespace on the namestack.
     swap namespace-of >n call n> drop ; inline
+
+: with-scope ( quot -- )
+    #! Execute a quotation with a new namespace on the
+    #! namestack.
+    <namespace> >n call n> drop ;
 
 : extend ( object code -- object )
     #! Used in code like this:

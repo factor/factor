@@ -5,7 +5,7 @@
 	<target name="init">
 		<available property="jedit" classname="org.gjt.sp.jedit.jEdit" />
 	</target>
-	
+
 	<target name="compile" depends="init">
 		<javac
 			srcdir="."
@@ -19,7 +19,7 @@
 		<exclude name="factor/jedit/*.java"/>
 		</javac>
 	</target>
-	
+
 	<path id="jedit-classpath">
 		<pathelement location="${user.home}/.jedit/jars/ErrorList.jar" />
 		<pathelement location="${user.home}/.jedit/jars/SideKick.jar" />
@@ -36,7 +36,7 @@
 			<include name="factor/jedit/*.java"/>
 		</javac>
 	</target>
-	
+
 	<target name="dist" depends="compile,compile-jedit">
 		<jar
 			jarfile="Factor.jar"
@@ -51,10 +51,13 @@
 				<include name="library/**/*.factor"/>
 				<include name="org/**/*.class"/>
 				<include name="*.factor"/>
+				<include name="doc/**/*.html"/>
+				<include name="doc/*.html"/>
 				<include name="Factor.manifest"/>
 			</fileset>
 		</jar>
 	</target>
+
 	<target name="clean" description="Clean old stuff.">
 		<delete>
 			<fileset dir="." includes="**/*.class"/>
@@ -69,4 +72,18 @@
 		</delete>
 	</target>
 
+	<target name="docs" description="Build PDF and HTML docs.">
+		<delete>
+			<fileset dir="." includes="doc/devel-guide/*"/>
+			<fileset dir="." includes="doc/devel-guide.aux"/>
+			<fileset dir="." includes="doc/devel-guide.log"/>
+			<fileset dir="." includes="doc/devel-guide.pdf"/>
+		</delete>
+		<exec executable="latex" dir="doc">
+			<arg value="devel-guide.tex" />
+		</exec>
+		<exec executable="latex2html" dir="doc">
+			<arg value="devel-guide.tex" />
+		</exec>
+	</target>
 </project>

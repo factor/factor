@@ -76,11 +76,11 @@ USE: strings
 : run-file ( file -- )
     #! Run a file. The file is read with the default IN:/USE:
     #! for files.
-    <namespace> [
+    [
         10 "base" set
         file-vocabs
         parse-file
-    ] bind call ;
+    ] with-scope call ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;

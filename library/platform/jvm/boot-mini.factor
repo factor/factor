@@ -45,6 +45,7 @@ USE: parser
 "/library/vector-combinators.factor"        run-resource ! vectors
 "/library/lists.factor"                     run-resource ! lists
 "/library/assoc.factor"                     run-resource ! lists
+"/library/hashtables.factor"                run-resource ! hashtables
 "/library/platform/jvm/strings.factor"      run-resource ! strings
 "/library/platform/jvm/sbuf.factor"         run-resource ! strings
 "/library/strings.factor"                   run-resource ! strings
