@@ -33,6 +33,7 @@ USE: strings
 USE: arithmetic
 USE: namespaces
 USE: prettyprint
+USE: unparser
 
 : display-page ( title -- ) 
   #! Display a page with some text to test the cont-responder.
@@ -90,8 +91,8 @@ USE: prettyprint
   [ 
     #! And we don't need the 'url' argument
     drop         
-    "Counter: " over cat2 [ 
-      dup <h2> write </h2>
+    "Counter: " over unparse cat2 [ 
+      dup <h2> unparse write </h2>
       "++" over unit [ f ] swap append [ 1 + counter-example ] append quot-href
       "--" over unit [ f ] swap append [ 1 - counter-example ] append quot-href
       drop
@@ -106,17 +107,17 @@ USE: prettyprint
   [ 
     #! We don't need the 'url' argument
     drop   
-    "Counter: " "counter" get cat2 [ 
-      <h2> "counter" get write </h2>
+    "Counter: " "counter" get unparse cat2 [ 
+      <h2> "counter" get unparse write </h2>
       "++" [ "counter" get 1 + "counter" set ] quot-href
       "--" [ "counter" get 1 - "counter" set ] quot-href
     ] html-document 
   ] show 
   drop ;
 
-#! Install the examples
-"counter1" [ drop 0 counter-example ] install-cont-responder
-"counter2" [ drop counter-example2 ] install-cont-responder
-"test1" [ drop test-cont-responder ] install-cont-responder
-"test2" [ drop test-cont-responder2 ] install-cont-responder
-"test3" [ drop test-cont-responder3 ] install-cont-responder
+! Install the examples
+ "counter1" [ drop 0 counter-example ] install-cont-responder
+ "counter2" [ drop counter-example2 ] install-cont-responder
+ "test1" [ drop test-cont-responder ] install-cont-responder
+ "test2" [ drop test-cont-responder2 ] install-cont-responder
+ "test3" [ drop test-cont-responder3 ] install-cont-responder

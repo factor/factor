@@ -99,21 +99,21 @@ USE: logic
 ! Each closable HTML tag has four words defined. The example below is for
 ! <p>:
 !
-!: <p> ( -- )
+! : <p> ( -- )
 !  #! Writes the opening tag to standard output.
 !  "<p>" write ;
 
-!:  <p ( -- n: <namespace> )
+! :  <p ( -- n: <namespace> )
 !   #! Used for setting inline attributes. Prints out
 !   #! an unclosed opening tag.
 !   "<p" write <namespace> >n ;
 !
-!: p> ( n: <namespace> -- )
+! : p> ( n: <namespace> -- )
 !  #! Used to close off inline attribute version of word.
 !  #! Prints out attributes and closes opening tag.
 !   store-prev-attribute write-attributes n> drop ">" write ;
 !
-!: </p> ( -- )
+! : </p> ( -- )
 !  #! Write out the closing tag.
 !  "</foo>" write ;
 !
@@ -135,7 +135,7 @@ USE: logic
 ! Each attribute word has the form xxxx= where 'xxxx' is the attribute
 ! name. The example below is for href:
 !
-!: href= ( n: <namespace> optional-value -- )
+! : href= ( n: <namespace> optional-value -- )
 !  store-prev-attribute "href" "current-attribute" set ;
 
 : define-compound ( vocab name def -- )

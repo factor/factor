@@ -42,6 +42,7 @@ USE: logic
 USE: cont-html
 USE: logging
 USE: url-encoding
+USE: unparser
 
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
@@ -58,7 +59,7 @@ USE: url-encoding
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  <% 16 [ random-digit % ] times %> ;
+  <% 16 [ random-digit unparse % ] times %> ;
 
 : continuation-table ( -- <namespace> ) 
   #! Return the global table of continuations
