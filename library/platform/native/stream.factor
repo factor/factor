@@ -30,6 +30,7 @@ USE: combinators
 USE: io-internals
 USE: kernel
 USE: stack
+USE: strings
 USE: namespaces
 
 : <c-stream> ( in out -- stream )
@@ -39,10 +40,17 @@ USE: namespaces
         "out" set
         "in" set
 
-        ( string -- )
+        ( str -- )
         [ "out" get write-8 ] "fwrite" set
-        ( -- string )
-        [ "in" get read-line-8 ] "freadln" set
+        
+        ( -- str )
+        [ "in" get read-line-8 sbuf>str ] "freadln" set
+        
+        ( -- )
+        [
+            "out" get [ flush ] when*
+        ] "fflush" set
+        
         ( -- )
         [
             "in" get [ close ] when*
@@ -66,6 +74,17 @@ USE: namespaces
         "out" set
         "in" set
 
+        ( str -- )
+        [ "out" get write-fd-8 ] "fwrite" set
+        
+        ( -- str )
+        [ "in" get read-line-fd-8 sbuf>str ] "freadln" set
+        
+        ( -- )
+        [
+            "out" get [ flush-fd ] when*
+        ] "fflush" set
+        
         ( -- )
         [
             "in" get [ close-fd ] when*
@@ -89,4 +108,4 @@ USE: namespaces
     [ "socket" get ] bind accept-fd dup <fd-stream> ;
 
 : init-stdio ( -- )
-    stdin stdout <c-stream> "stdio" set ;
+    stdin stdout <fd-stream> "stdio" set ;

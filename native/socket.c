@@ -31,13 +31,6 @@ void primitive_server_socket(void)
 	env.dt = handle(HANDLE_FD,make_server_socket(port));
 }
 
-void primitive_close_fd(void)
-{
-	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	close(h->object);
-	env.dt = dpop();
-}
-
 int accept_connection(int sock)
 {
 	struct sockaddr_in clientname;

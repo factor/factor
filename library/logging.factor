@@ -32,6 +32,7 @@ USE: combinators
 USE: stack
 USE: streams
 USE: strings
+USE: unparser
 
 : log ( msg -- )
     "log" get dup [ tuck fprint fflush ] [ 2drop ] ifte ;
@@ -42,7 +43,7 @@ USE: strings
 : log-client ( -- )
     "client" get [
         "Accepted connection from " swap
-        [ "socket" get ] bind cat2 log
+        [ "socket" get unparse ] bind cat2 log
     ] when* ;
 
 : with-logging ( quot -- )

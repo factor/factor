@@ -2,12 +2,10 @@
 
 void init_io(void)
 {
-	env.user[STDIN_ENV]  = handle(HANDLE_C_STREAM,stdin);
-	env.user[STDOUT_ENV] = handle(HANDLE_C_STREAM,stdout);
-	env.user[STDERR_ENV] = handle(HANDLE_C_STREAM,stderr);
+	env.user[STDIN_ENV]  = handle(HANDLE_FD,0);
+	env.user[STDOUT_ENV] = handle(HANDLE_FD,1);
+	env.user[STDERR_ENV] = handle(HANDLE_FD,2);
 }
-
-#define LINE_SIZE 80
 
 void primitive_open_file(void)
 {
@@ -47,7 +45,7 @@ void primitive_read_line_8(void)
 			set_sbuf_nth(b,b->top,ch);
 	}
 
-	env.dt = tag_object(sbuf_to_string(b));
+	env.dt = tag_object(b);
 }
 
 /* write a string. */
@@ -69,5 +67,12 @@ void primitive_close(void)
 {
 	HANDLE* h = untag_handle(HANDLE_C_STREAM,env.dt);
 	fclose((FILE*)h->object);
+	env.dt = dpop();
+}
+
+void primitive_flush(void)
+{
+	HANDLE* h = untag_handle(HANDLE_C_STREAM,env.dt);
+	fflush((FILE*)h->object);
 	env.dt = dpop();
 }

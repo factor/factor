@@ -22,6 +22,10 @@
 #define CHAR unsigned short
 #define CHARS sizeof(CHAR)
 
+/* must always be 8 bits */
+#define BYTE unsigned char
+#define BYTES 1
+
 /* Memory heap size */
 #define DEFAULT_ARENA (4 * 1024 * 1024)
 #define STACK_SIZE 1024
@@ -31,6 +35,7 @@
 #include "gc.h"
 #include "types.h"
 #include "array.h"
+#include "fd.h"
 #include "fixnum.h"
 #include "cons.h"
 #include "word.h"

@@ -68,6 +68,7 @@ primitives,
     "/library/stream.factor"
     "/library/strings.factor"
     "/library/styles.factor"
+    "/library/telnetd.factor"
     "/library/vectors.factor"
     "/library/vector-combinators.factor"
     "/library/vocabularies.factor"

@@ -1,8 +1,10 @@
 + native:
 
+- file i/o using fds
+- handle expiry over image load/save
+- i/o error handling
 - {...} vectors
 - parsing should be parsing
-- telnetd: listening on a socket
 - describe-word
 - clone-sbuf
 - contains ==> contains?

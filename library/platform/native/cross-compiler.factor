@@ -54,9 +54,13 @@ DEFER: open-file
 DEFER: read-line-8
 DEFER: write-8
 DEFER: close
+DEFER: flush
 DEFER: server-socket
 DEFER: close-fd
 DEFER: accept-fd
+DEFER: read-line-fd-8
+DEFER: write-fd-8
+DEFER: flush-fd
 
 IN: words
 DEFER: <word>
@@ -144,6 +148,7 @@ IN: cross-compiler
         read-line-8
         write-8
         close
+        flush
         garbage-collection
         save-image
         datastack
@@ -155,6 +160,9 @@ IN: cross-compiler
         server-socket
         close-fd
         accept-fd
+        read-line-fd-8
+        write-fd-8
+        flush-fd
     ] [
         swap succ tuck primitive,
     ] each drop ;

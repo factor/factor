@@ -27,9 +27,9 @@
 
 IN: io-internals
 USE: kernel
+USE: namespaces
+USE: combinators
 
 : stdin 0 getenv ;
 : stdout 1 getenv ;
 : stderr 2 getenv ;
-
-! The remaining words in this vocabulary are primitives.

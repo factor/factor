@@ -6,7 +6,7 @@ HANDLE* untag_handle(CELL type, CELL tagged)
 	type_check(HANDLE_TYPE,tagged);
 	h = (HANDLE*)UNTAG(tagged);
 	/* after image load & save, handles are no longer valid */
-	if(h->object == 0)
+	if(h->object == -1)
 		general_error(ERROR_HANDLE_EXPIRED,tagged);
 	if(h->type != type)
 		general_error(ERROR_HANDLE_INCOMPAT,tagged);
