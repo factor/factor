@@ -1,10 +1,3 @@
-[error] AWT-EventQueue-0: java.lang.NullPointerException
-[error] AWT-EventQueue-0:  at org.gjt.sp.jedit.Buffer.markTokens(Buffer.java:2109)
-[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.getWordAtCaret(WordPreview.java:95)
-[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.showPreview(WordPreview.java:137)
-[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.actionPerformed(WordPreview.java:79)
-[error] AWT-EventQueue-0:  at javax.swing.Timer.fireActionPerformed(Timer.java:271)
-
 + compiler:
 
 - optimize away dispatch
@@ -28,6 +21,7 @@
 
 + listener/plugin:
 
+- WordPreview calls markTokens() -> NPE
 - stream server can hang because of exception handler limitations
 - listener should be multithreaded
 - compile all, infer all commands
@@ -40,7 +34,6 @@
 
 + kernel:
 
-- after bootstrapping, classes hash is messed up
 - do partial objects cause problems?
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
@@ -51,8 +44,6 @@
 
 + misc:
 
-- each-with map-with
-- step: print NEXT word to execute, not word that JUST executed
 - perhaps /i should work with all numbers
 - unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name

@@ -64,7 +64,7 @@ USE: math
 
 : usages. ( word -- )
     #! List all usages of a word in all vocabularies.
-    vocabs [ dupd usages-in-vocab. ] each drop ;
+    vocabs [ usages-in-vocab. ] each-with ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
@@ -86,7 +86,7 @@ USE: math
 
 : apropos. ( substring -- )
     #! List all words that contain a string.
-    vocabs [ dupd vocab-apropos. ] each drop ;
+    vocabs [ vocab-apropos. ] each-with ;
 
 : in. ( -- )
     #! Print the vocabulary where new words are added in

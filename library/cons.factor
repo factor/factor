@@ -98,8 +98,17 @@ PREDICATE: general-list list ( list -- ? )
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
-    #! quotation with effect ( X -- ) to each element.
+    #! quotation with effect ( elt -- ) to each element.
     over [ (each) each ] [ 2drop ] ifte ; inline
+
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ;
+
+: each-with ( obj list quot -- )
+    #! Push each element of a proper list in turn, and apply a
+    #! quotation with effect ( obj elt -- ) to each element.
+    swap [ with ] each 2drop ; inline
 
 : subset ( list quot -- list )
     #! Applies a quotation with effect ( X -- ? ) to each

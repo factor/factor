@@ -215,4 +215,4 @@ SYMBOL: object
     dup builtin-supertypes [ > ] sort
     classes get set-hash ;
 
-global [ classes get [ <namespace> classes set ] unless ] bind
+classes get [ <namespace> classes set ] unless

@@ -45,15 +45,15 @@ USE: prettyprint
 : computed-value-vector ( n -- vector )
     [ drop object <computed> ] vector-project ;
 
-: add-inputs ( count stack -- count stack )
+: add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    [ vector-length - dup ] keep
-    >r computed-value-vector dup r> vector-append ;
+    dup >r vector-length - computed-value-vector dup r>
+    vector-append ;
 
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup longest-vector swap [ dupd add-inputs nip ] map nip ;
+    dup longest-vector swap [ add-inputs ] map-with ;
 
 : unify-results ( list -- value )
     #! If all values in list are equal, return the value.
@@ -67,7 +67,7 @@ USE: prettyprint
 : vector-transpose ( list -- vector )
     #! Turn a list of same-length vectors into a vector of lists.
     dup car vector-length [
-        over [ dupd vector-nth ] map nip
+        over [ vector-nth ] map-with
     ] vector-project nip ;
 
 : unify-stacks ( list -- stack )

@@ -80,8 +80,7 @@ USE: unparser
 : file-link. ( dir name -- )
     tuck "/" swap cat3 dup "file-link" swons swap
     unparse file-actions <actions> "actions" swons
-    t "underline" swons
-    3list write-attr ;
+    2list write-attr ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.
@@ -91,11 +90,11 @@ USE: unparser
     #! If "doc-root" set, create links relative to it.
     dup directory [
         dup [ "." ".." ] contains? [
-            drop
+            2drop
         ] [
-            dupd file.
+            file.
         ] ifte
-    ] each drop ;
+    ] each-with ;
 
 : pwd cwd print ;
 : dir. cwd directory. ;

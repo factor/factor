@@ -305,7 +305,7 @@ M: vector ' ( vector -- pointer )
         >r dup vector-length [
             f swap pick set-vector-nth
         ] times* r>
-        [ unswons pick set-hash ] each drop
+        [ unswons rot set-hash ] each-with
     ] cons cons
     boot-quot [ append ] change ;
 

@@ -70,12 +70,12 @@ USE: kernel
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        over >r unswons rot assoc* dup [
+        unswons rot assoc* dup [
             cdr call
         ] [
             2drop
-        ] ifte r>
-    ] each drop ;
+        ] ifte
+    ] each-with ;
 
 : 2cons ( car1 car2 cdr1 cdr2 -- cons1 cons2 )
     rot swons >r cons r> ;

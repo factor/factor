@@ -124,6 +124,12 @@ DEFER: tree-contains?
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
+: map-with ( obj list quot -- )
+    #! Push each element of a proper list in turn, and collect
+    #! return values of applying a quotation with effect
+    #! ( obj elt -- obj ) to each element into a new list.
+    swap [ with rot ] map nip nip ; inline
+
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
     [ dupd = not ] subset nip ;

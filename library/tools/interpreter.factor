@@ -194,11 +194,11 @@ SYMBOL: meta-cf
 
 : step
     #! Step into current word.
-    [ next dup report do-1 ] not-done ;
+    [ meta-cf get . next do-1 ] not-done ;
 
 : into
     #! Step into current word.
-    [ next dup report do ] not-done ;
+    [ meta-cf get . next do ] not-done ;
 
 : walk-banner ( -- )
     "The following words control the single-stepper:" print

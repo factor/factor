@@ -38,3 +38,5 @@ USE: strings
 [ t ] [ [ 1 ] [ ] some? >boolean ] unit-test
 [ t ] [ [ 1 2 3 ] [ 2 > ] some? >boolean ] unit-test
 [ f ] [ [ 1 2 3 ] [ 10 > ] some? ] unit-test
+
+[ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test

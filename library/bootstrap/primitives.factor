@@ -51,6 +51,8 @@ vocabularies get [
     "syntax" set
 ] bind
 
+<namespace> classes set
+
 2 [
     [ "words" | "execute" ]
     [ "kernel" | "call" ]

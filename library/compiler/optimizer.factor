@@ -101,7 +101,7 @@ USE: prettyprint
 
 : (kill-nodes) ( literals dataflow -- )
     #! Append live nodes to currently constructing list.
-    [ dupd  "kill-node" [ nip , ] apply-dataflow ] each drop ;
+    [ "kill-node" [ nip , ] apply-dataflow ] each-with ;
 
 : kill-nodes ( literals dataflow -- dataflow )
     #! Remove literals and construct a list.

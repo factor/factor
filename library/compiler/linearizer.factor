@@ -150,8 +150,8 @@ SYMBOL: #target ( part of jump table )
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
     [
-        uncons label, (linearize) dup #jump-label swons ,
-    ] each drop ;
+        uncons label, (linearize) #jump-label swons ,
+    ] each-with ;
 
 : check-dispatch ( vtable -- )
     length num-types = [

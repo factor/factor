@@ -104,8 +104,8 @@ C: jedit-stream ( stream -- stream )
             "name"
             "stack-effect"
         ] [
-            dupd word-property
-        ] map nip
+            word-property
+        ] map-with
     ] when ;
 
 : completions ( str anywhere vocabs -- list )
