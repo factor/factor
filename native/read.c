@@ -59,6 +59,10 @@ bool read_line_step(PORT* port)
 				if(ch == '\n')
 					i++;
 			}
+
+			port->buf_pos = i + 1;
+			port->line_ready = true;
+			return true;
 		}
 
 		if(ch == '\n')
@@ -110,8 +114,6 @@ void primitive_add_read_line_io_task(void)
 
 bool perform_read_line_io_task(PORT* port)
 {
-	SBUF* line;
-
 	if(port->buf_pos >= port->buf_fill)
 	{
 		if(!read_step(port))
@@ -123,17 +125,14 @@ bool perform_read_line_io_task(PORT* port)
 		/* EOF */
 		if(port->line != F)
 		{
-			line = untag_sbuf(port->line);
-			if(line->top == 0)
+			if(untag_sbuf(port->line)->top == 0)
 				port->line = F;
 		}
 		port->line_ready = true;
 		return true;
 	}
 	else
-	{
 		return read_line_step(port);
-	}
 }
 
 void primitive_read_line_8(void)

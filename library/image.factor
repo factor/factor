@@ -186,7 +186,6 @@ USE: words
         nip
     ] [
         drop
-        "Forward reference: " write dup .
         ! Remember where we are, and add the reference later
         dup fixup-word-later
     ] ifte ;

@@ -99,6 +99,9 @@ USE: strings
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;
 
+: <resource-stream> ( path -- stream )
+    resource-path swap cat2 <filecr> ;
+
 : parse-resource ( path -- quot )
     #! Resources are loaded from the resource-path variable, or
     #! the current directory if it is not set. Words defined in
@@ -106,9 +109,7 @@ USE: strings
     #! resource:. This allows words that operate on source
     #! files, like "jedit", to use a different resource path
     #! at run time than was used at parse time.
-    "resource:" over cat2
-    swap resource-path swap cat2 <filecr>
-    parse-stream ;
+    "resource:" over cat2 swap <resource-stream> parse-stream ;
 
 : run-resource ( file -- )
     parse-resource call ;

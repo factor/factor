@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -38,7 +38,6 @@ USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
@@ -71,7 +70,7 @@ USE: unparser
 : irc-stream-write ( string -- )
     dup "buf" get sbuf-append
     ends-with-newline? [
-        "buf" get >str
+        "buf" get sbuf>str
         0 "buf" get set-sbuf-length
         "\n" split [ dup f-or-"" [ drop ] [ "recepient" get irc-message ] ifte ] each
     ] when ;
@@ -112,25 +111,15 @@ USE: unparser
 : irc-action-handler ( recepient message -- )
     " " split1 swap irc-action-quot call ;
 
-: irc-handle-privmsg ( [ recepient message ] -- )
-    uncons car irc-action-handler ;
-
-: irc-handle-join ( [ joined channel ] -- )
-    uncons car
-    [
-        dup "nick" get = [
-            "Hi " swap cat2 print
-        ] unless
-    ] with-irc-stream ;
-
 : irc-input ( line -- )
     #! Handle a line of IRC input.
     dup
-    ":.+?!.+? PRIVMSG (.+)?:(.+)" groups [
-        irc-handle-privmsg
-    ] when*
-    dup ":(.+)!.+ JOIN :(.+)" groups [
-        irc-handle-join
+    " PRIVMSG " split1 nip [
+        ":" split1 dup [
+            irc-action-handler
+        ] [
+            drop
+        ] ifte
     ] when*
 
     global [ print ] bind ;
@@ -148,7 +137,7 @@ USE: unparser
 
 : irc ( channels -- )
     irc-register
-    ! "identify foobar" "NickServ" irc-message
+    "identify foobar" "NickServ" irc-message
     [ irc-join ] each
     irc-loop ;
 
@@ -161,5 +150,3 @@ USE: unparser
     "irc.freenode.net" 6667 <client> [
         [ "#factor" ] irc
     ] with-stream ;
-
-!! "factor/irc.factor" run-file

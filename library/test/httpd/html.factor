@@ -10,11 +10,6 @@ USE: test
     "&lt;html&gt;&amp;&apos;sgml&apos;"
 ] [ "<html>&'sgml'" chars>entities ] unit-test
 
-[ "Hello world" ]
-[
-    "Hello world" f html-attr-string
-] unit-test
-
 [ "<span style=\"color: #ff00ff; font-family: Monospaced; \">car</span>" ]
 [
     "car"
