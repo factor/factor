@@ -138,9 +138,13 @@ DEFER: apply-word
 
 : set-base ( [ in | stack ] rstate -- )
     #! Set the base case of the current word.
-    >r uncons vector-length cons r>  car cdr [
-        entry-effect get swap decompose base-case set
-    ] bind ;
+    dup [
+        >r uncons vector-length cons r>  car cdr [
+            entry-effect get swap decompose base-case set
+        ] bind
+    ] [
+        2drop
+    ] ifte ;
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.

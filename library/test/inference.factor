@@ -193,3 +193,5 @@ SYMBOL: sym-test
 
 [ [ 1 | 0 ] ] [ [ >n ] infer ] unit-test
 [ [ 0 | 1 ] ] [ [ n> ] infer ] unit-test
+
+[ [ 1 | 1 ] ] [ [ get ] infer ] unit-test

@@ -53,7 +53,7 @@ SYMBOL: 2GENERIC
     unit cons cons  dataflow-graph cons@ ;
 
 : dataflow-literal, ( lit -- )
-    >r 0 PUSH r> dataflow, ;
+    >r f PUSH r> dataflow, ;
 
 : dataflow-word, ( in word -- )
     >r count CALL r> dataflow, ;

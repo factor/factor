@@ -93,12 +93,12 @@ DEFER: (infer)
 : recursive-branch ( quot -- ? )
     #! Set base case if inference didn't fail.
     [
-        car infer-branch drop  recursive-state get set-base t
+        car infer-branch drop recursive-state get set-base t
     ] [
         [ drop f ] when
     ] catch ;
 
-: infer-branches ( consume instruction brachlist -- )
+: infer-branches ( consume instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
