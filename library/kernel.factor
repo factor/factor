@@ -3,6 +3,9 @@
 IN: kernel
 USING: generic kernel-internals vectors ;
 
+UNION: boolean f t ;
+COMPLEMENT: general-t f
+
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
 
@@ -38,21 +41,6 @@ M: object clone ;
 : not ( a -- ~a ) f t ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
-
-IN: syntax
-
-! The canonical t is a heap-allocated dummy object. It is always
-! the first in the image.
-BUILTIN: t 7 ;
-
-! In the runtime, the canonical f is represented as a null
-! pointer with tag 3. So
-! f address . ==> 3
-BUILTIN: f 9 ;
-
-IN: kernel
-UNION: boolean f t ;
-COMPLEMENT: general-t f
 
 IN: alien
 

@@ -26,9 +26,6 @@ USING: alien generic hashtables kernel lists math sdl ;
     #! gesture, otherwise returns f.
     [ dupd handle-gesture* ] each-parent nip ;
 
-GENERIC: user-input* ( ch gadget -- ? )
-M: gadget user-input* 2drop t ;
-
 : user-input ( ch gadget -- ? )
     [ dupd user-input* ] each-parent nip ;
 

@@ -6,16 +6,6 @@ generic inference kernel-internals listener lists math memory
 namespaces parser presentation random stdio streams unparser
 words ;
 
-: default-cli-args
-    #! Some flags are *on* by default, unless user specifies
-    #! -no-<flag> CLI switch
-    "user-init" on
-    "interactive" on
-    "smart-terminal" on
-    "verbose-compile" on
-    "compile" on
-    os "win32" = "ui" "ansi" ? "shell" set ;
-
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
     #! quotation.
@@ -56,13 +46,7 @@ os "win32" = [
 ] when
 
 "Compiling system..." print
-"compile" get [
-    ! Compiling these first compiles a lot of core words and
-    ! leads to a faster compile overall.
-    \ car compile
-    \ = compile
-    compile-all
-] when
+"compile" get [ compile-all ] when
 
 terpri
 "Unless you're working on the compiler, ignore the errors above." print

@@ -10,7 +10,7 @@ USE: lists
 USE: kernel
 
 : test-interpreter
-    init-interpreter run meta-d get ;
+    init-interpreter meta-cf set run meta-d get ;
 
 [ { 1 2 3 } ] [
     [ 1 2 3 ] test-interpreter

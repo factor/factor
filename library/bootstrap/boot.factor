@@ -1,64 +1,79 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: lists image parser namespaces stdio kernel vectors
-words hashtables ;
+IN: image
+USING: lists parser namespaces stdio kernel vectors words
+hashtables ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
+: pull-in ( list -- ) [ parse-resource append, ] each ;
+
 ! The make-list form creates a boot quotation
 [
-    "/version.factor" parse-resource append,
-    "/library/stack.factor" parse-resource append,
-    "/library/combinators.factor" parse-resource append,
-    "/library/arrays.factor" parse-resource append,
-    "/library/kernel.factor" parse-resource append,
-    "/library/cons.factor" parse-resource append,
-    "/library/assoc.factor" parse-resource append,
-    "/library/math/math.factor" parse-resource append,
-    "/library/math/integer.factor" parse-resource append,
-    "/library/math/ratio.factor" parse-resource append,
-    "/library/math/float.factor" parse-resource append,
-    "/library/math/complex.factor" parse-resource append,
-    "/library/lists.factor" parse-resource append,
-    "/library/vectors.factor" parse-resource append,
-    "/library/strings.factor" parse-resource append,
-    "/library/hashtables.factor" parse-resource append,
-    "/library/words.factor" parse-resource append,
-    "/library/namespaces.factor" parse-resource append,
-    "/library/sbuf.factor" parse-resource append,
-    "/library/errors.factor" parse-resource append,
-    "/library/continuations.factor" parse-resource append,
-    "/library/threads.factor" parse-resource append,
-    "/library/io/stream.factor" parse-resource append,
-    "/library/io/stdio.factor" parse-resource append,
-    "/library/io/io-internals.factor" parse-resource append,
-    "/library/io/stream-impl.factor" parse-resource append,
-    "/library/vocabularies.factor" parse-resource append,
-    "/library/syntax/parse-numbers.factor" parse-resource append,
-    "/library/syntax/parser.factor" parse-resource append,
-    "/library/syntax/parse-stream.factor" parse-resource append,
-    "/library/syntax/generic.factor" parse-resource append,
-    "/library/syntax/parse-syntax.factor" parse-resource append,
+    [
+        "/version.factor"
+        "/library/stack.factor"
+        "/library/combinators.factor"
+        "/library/arrays.factor"
+        "/library/kernel.factor"
+        "/library/cons.factor"
+        "/library/assoc.factor"
+        "/library/math/math.factor"
+        "/library/math/integer.factor"
+        "/library/math/ratio.factor"
+        "/library/math/float.factor"
+        "/library/math/complex.factor"
+        "/library/lists.factor"
+        "/library/vectors.factor"
+        "/library/strings.factor"
+        "/library/hashtables.factor"
+        "/library/words.factor"
+        "/library/namespaces.factor"
+        "/library/sbuf.factor"
+        "/library/errors.factor"
+        "/library/continuations.factor"
+        "/library/threads.factor"
+        "/library/io/stream.factor"
+        "/library/io/stdio.factor"
+        "/library/io/io-internals.factor"
+        "/library/io/stream-impl.factor"
+        "/library/vocabularies.factor"
+        "/library/syntax/parse-numbers.factor"
+        "/library/syntax/parser.factor"
+        "/library/syntax/parse-stream.factor"
+        "/library/syntax/generic.factor"
+        "/library/syntax/parse-syntax.factor"
+        "/library/syntax/unparser.factor"
+        "/library/io/presentation.factor"
+        "/library/io/vocabulary-style.factor"
+        "/library/syntax/prettyprint.factor"
+        "/library/io/files.factor"
+        "/library/cli.factor"
+    ] pull-in
 
     "delegate" [ "generic" ] search
     "object" [ "generic" ] search
+    "classes" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind
 
     reveal
     reveal
-    
-    "/library/generic/generic.factor" parse-resource append,
-    "/library/generic/slots.factor" parse-resource append,
-    "/library/generic/object.factor" parse-resource append,
-    "/library/generic/null.factor" parse-resource append,
-    "/library/generic/builtin.factor" parse-resource append,
-    "/library/generic/predicate.factor" parse-resource append,
-    "/library/generic/union.factor" parse-resource append,
-    "/library/generic/complement.factor" parse-resource append,
-    "/library/generic/tuple.factor" parse-resource append,
+    reveal
 
-    "/library/bootstrap/init.factor" parse-resource append,
+    [
+        "/library/generic/generic.factor"
+        "/library/generic/slots.factor"
+        "/library/generic/object.factor"
+        "/library/generic/null.factor"
+        "/library/generic/builtin.factor"
+        "/library/generic/predicate.factor"
+        "/library/generic/union.factor"
+        "/library/generic/complement.factor"
+        "/library/generic/tuple.factor"
+    
+        "/library/bootstrap/init.factor"
+    ] pull-in
 ] make-list
 
 "boot" [ "kernel" ] search swons
@@ -76,3 +91,5 @@ vocabularies get [
 ] bind
 
 "!syntax" vocabularies get remove-hash
+
+FORGET: pull-in

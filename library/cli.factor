@@ -46,6 +46,16 @@ kernel-internals ;
 
 : cli-args ( -- args ) 10 getenv ;
 
+: default-cli-args
+    #! Some flags are *on* by default, unless user specifies
+    #! -no-<flag> CLI switch
+    "user-init" on
+    "interactive" on
+    "smart-terminal" on
+    "verbose-compile" on
+    "compile" on
+    os "win32" = "ui" "ansi" ? "shell" set ;
+
 : parse-command-line ( -- )
     #! Parse command line arguments.
     #! The first CLI arg is the image name.

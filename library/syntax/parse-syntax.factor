@@ -21,8 +21,15 @@ math namespaces parser strings words vectors unparse ;
 ! properties to the current word if it is set.
 
 ! Booleans
-: t t swons ; parsing
-: f f swons ; parsing
+
+! The canonical t is a heap-allocated dummy object. It is always
+! the first in the image.
+BUILTIN: t 7 ;  : t t swons ; parsing
+
+! In the runtime, the canonical f is represented as a null
+! pointer with tag 3. So
+! f address . ==> 3
+BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! Lists
 : [ f ; parsing

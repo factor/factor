@@ -137,8 +137,10 @@ M: object error. ( error -- )
 
 : init-error-handler ( -- )
     [ die ] >c ( last resort )
+    [ print-error die ] >c
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
     kernel-error 12 setenv ;
+    
 
 M: undefined-method error. ( error -- )
     [

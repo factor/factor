@@ -11,12 +11,16 @@ hashtables ;
 "syntax" vocab clone
 "generic" vocab clone
 
-! This symbol needs the same hashcode in the target as in the
+! These symbol needs the same hashcode in the target as in the
 ! host.
 vocabularies
+classes
 
 <namespace> vocabularies set
+<namespace> classes set
+
 vocabularies get [
+    reveal
     reveal
     "generic" set
     "syntax" set
@@ -26,8 +30,6 @@ vocabularies get [
 ! methods. Rather we must create a new empty generic.
 "delegate" [ "generic" ] search forget
 [ single-combination ] \ GENERIC: "delegate" "generic" create define-generic
-
-<namespace> classes set
 
 2 [
     [ "execute" "words"                       " word -- " ]

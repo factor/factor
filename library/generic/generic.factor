@@ -129,8 +129,8 @@ SYMBOL: object
     ] make-list lookup-union ;
 
 : class-and ( class class -- class )
-    #! Return a class that is a subclass of both, or raise an
-    #! error if this is impossible.
+    #! Return a class that is a subclass of both, or null in
+    #! the degenerate case.
     swap builtin-supertypes swap builtin-supertypes
     intersection lookup-union ;
 

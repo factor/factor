@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic interpreter kernel lists math namespaces strings
-unparser vectors words ;
+USING: errors generic interpreter kernel lists math namespaces
+prettyprint strings unparser vectors words ;
 
 : max-recursion 0 ;
 
@@ -54,7 +54,7 @@ M: computed value= ( literal value -- ? )
 
 M: computed value-class-and ( class value -- )
     [
-        value-class failing-class-and
+        value-class  failing-class-and
     ] keep set-value-class ;
 
 TUPLE: literal value delegate ;

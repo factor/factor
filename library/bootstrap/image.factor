@@ -323,7 +323,9 @@ M: hashtable ' ( hashtable -- pointer )
 : global, ( -- )
     vocabularies get
     dup vocabularies,
-    <namespace> [ vocabularies set ] extend '
+    <namespace> [
+        classes [ ] change  vocabularies set
+    ] extend '
     global-offset fixup ;
 
 : boot, ( quot -- )

@@ -220,7 +220,7 @@ SYMBOL: sym-test
 [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 [ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
 
-[ [ 5 car ] infer ] unit-test-fails
+! [ [ 5 car ] infer ] unit-test-fails
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;

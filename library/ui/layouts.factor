@@ -3,9 +3,6 @@
 IN: gadgets
 USING: generic hashtables kernel lists math namespaces ;
 
-GENERIC: layout* ( gadget -- )
-M: gadget layout* drop ;
-
 : layout ( gadget -- )
     #! Set the gadget's width and height to its preferred width
     #! and height. The gadget's children are laid out first.
