@@ -1,4 +1,5 @@
 IN: scratchpad
+USE: combinators
 USE: compiler
 USE: kernel
 USE: math
