@@ -11,17 +11,9 @@ C: box ( gadget -- box )
 
 M: box gadget-children box-children ;
 
-M: general-list draw ( list -- )
-    [ draw ] each ;
-
-M: box draw ( box -- )
-    dup [
-        dup [
-            dup
-            box-delegate draw
-            box-children draw
-        ] with-gadget
-    ] with-translation ;
+M: box draw-shape ( box -- )
+    dup box-delegate draw-gadget
+    dup [ box-children [ draw-gadget ] each ] with-translation ;
 
 M: general-list pick-up* ( point list -- gadget )
     dup [

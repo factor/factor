@@ -159,11 +159,11 @@ global [
         SDL_LockSurface
     ] when drop ;
 
-: draw-string ( x y font text fg bg -- width )
-    pick str-length 0 = [
-        2drop 2drop 2drop 0
+: draw-string ( x y font text fg -- width )
+    over str-length 0 = [
+        2drop 3drop 0
     ] [
-        TTF_RenderText_Shaded
+        TTF_RenderText_Blended
         [ draw-surface ] keep
         [ surface-w ] keep
         SDL_FreeSurface

@@ -18,11 +18,10 @@ M: label layout* ( label -- )
         swap size-string
     ] keep resize-gadget ;
 
-M: label draw ( label -- )
+M: label draw-shape ( label -- )
     dup shape-x x get +
     over shape-y y get +
     rot label-text
     >r font get lookup-font r>
     color get 3unlist make-color
-    white make-color
     draw-string drop ;

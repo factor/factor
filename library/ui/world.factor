@@ -10,9 +10,8 @@ sdl-video ;
 TUPLE: world running? hand delegate ;
 
 : <world-box> ( -- box )
-    0 0 0 0 <rectangle> <everywhere> <stamp>
-    dup blue 3list color set-paint-property
-    dup t filled set-paint-property
+    0 0 0 0 <plain-rect> <everywhere> <gadget>
+    dup [ 216 216 216 ] color set-paint-property
     <box> ;
 
 C: world ( -- world )
@@ -26,8 +25,8 @@ C: world ( -- world )
     world get dup gadget-redraw? [
         [
             f over set-gadget-redraw?
-            dup draw
-            world-hand draw
+            dup draw-gadget
+            world-hand draw-gadget
         ] with-surface
     ] [
         drop
@@ -40,7 +39,7 @@ DEFER: handle-event
 : run-world ( -- )
     world get world-running? [
         <event> dup SDL_WaitEvent 1 = [
-            handle-event draw-world layout-world run-world
+            handle-event layout-world draw-world run-world
         ] [
             drop
         ] ifte

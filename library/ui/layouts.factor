@@ -15,3 +15,16 @@ M: pile layout* ( pile -- )
     gadget-children r> zip [
         uncons 0 swap rot move-gadget
     ] each ;
+
+! A shelf is a box that lays out its contents horizontally.
+TUPLE: shelf delegate ;
+
+C: shelf ( gadget -- pile )
+    [ >r <box> r> set-shelf-delegate ] keep ;
+
+M: shelf layout* ( pile -- )
+    dup gadget-children run-widths >r >r
+    dup gadget-children max-height r> swap pick resize-gadget
+    gadget-children r> zip [
+        uncons 0 rot move-gadget
+    ] each ;

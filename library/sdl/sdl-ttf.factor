@@ -95,7 +95,7 @@ END-STRUCT
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Shaded" [ "void*" "ushort" "int" "int" ] alien-invoke ;
 
 : TTF_RenderText_Blended ( font text fg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Blended" [ "void*" "ushort" "int" ] alien-invoke ;
+    "surface*" "sdl-ttf" "TTF_RenderText_Blended" [ "void*" "char*" "int" ] alien-invoke ;
 
 : TTF_RenderGlyph_Blended ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Blended" [ "void*" "ushort" "int" ] alien-invoke ;

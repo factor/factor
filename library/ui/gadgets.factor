@@ -54,13 +54,11 @@ C: gadget ( shape -- gadget )
 : set-action ( gadget quot gesture -- )
     rot gadget-gestures set-hash ;
 
-: with-gadget ( gadget quot -- )
-    #! All drawing done inside the quotation is done with the
+: draw-gadget ( gadget -- )
+    #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
-    >r gadget-paint r> bind ;
-
-M: gadget draw ( gadget -- ) drop ;
+    dup gadget-paint [ draw-shape ] bind ;
 
 M: gadget pick-up* inside? ;
 
@@ -79,20 +77,7 @@ M: gadget pick-up* inside? ;
     gadget-parent [ relayout ] when* ;
 
 : move-gadget ( x y gadget -- )
-    [ move-shape ] keep
-    [ set-gadget-delegate ] keep
-    redraw ;
+    [ move-shape ] keep redraw ;
 
 : resize-gadget ( w h gadget -- )
-    [ resize-shape ] keep
-    [ set-gadget-delegate ] keep
-    redraw ;
-
-! A simple gadget that just draws its shape.
-TUPLE: stamp delegate ;
-
-C: stamp ( shape -- )
-    swap <gadget> over set-stamp-delegate ;
-
-M: stamp draw ( stamp -- )
-    dup [ gadget-delegate draw ] with-gadget ;
+    [ resize-shape ] keep redraw ;

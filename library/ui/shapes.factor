@@ -20,8 +20,8 @@ GENERIC: shape-y
 GENERIC: shape-w
 GENERIC: shape-h
 
-GENERIC: move-shape ( x y shape -- shape )
-GENERIC: resize-shape ( w h shape -- shape )
+GENERIC: move-shape ( x y shape -- )
+GENERIC: resize-shape ( w h shape -- )
 
 : with-translation ( shape quot -- )
     #! All drawing done inside the quotation is translated
@@ -33,31 +33,44 @@ GENERIC: resize-shape ( w h shape -- shape )
         r> call
     ] with-scope ; inline
 
-: translate ( point shape -- point )
-    #! Translate a point relative to the shape.
-    #! The rect>'ing of the given point won't be necessary as
-    #! soon as all generics delegate.
-    >r dup shape-x swap shape-y rect> r>
-    dup shape-x swap shape-y rect> - ;
-
 : max-width ( list -- n )
     #! The width of the widest shape.
     [ shape-w ] map [ > ] top ;
 
+: max-height ( list -- n )
+    #! The height of the tallest shape.
+    [ shape-h ] map [ > ] top ;
+
+: run-widths ( list -- w list )
+    #! Compute a list of running sums of widths of shapes.
+    [ 0 swap [ over , shape-w + ] each ] make-list ;
+
 : run-heights ( list -- h list )
-    #! Compute a list of accumilative sums of heights of shapes.
+    #! Compute a list of running sums of heights of shapes.
     [ 0 swap [ over , shape-h + ] each ] make-list ;
 
-! A point, represented as a complex number, is the simplest type
-! of shape.
-M: number inside? = ;
+! A point is the simplest shape.
+TUPLE: point x y ;
 
-M: number shape-x real ;
-M: number shape-y imaginary ;
-M: number shape-w drop 0 ;
-M: number shape-h drop 0 ;
+C: point ( x y -- point )
+    [ set-point-y ] keep [ set-point-x ] keep ;
 
-M: number move-shape ( x y point -- point ) drop rect> ;
+M: point inside? ( point point -- )
+    over shape-x over point-x = >r
+    swap shape-y swap point-y = r> and ;
+
+M: point shape-x point-x ;
+M: point shape-y point-y ;
+M: point shape-w drop 0 ;
+M: point shape-h drop 0 ;
+
+M: point move-shape ( x y point -- )
+    tuck set-point-y set-point-x ;
+
+: translate ( point shape -- point )
+    #! Translate a point relative to the shape.
+    over shape-y over shape-y - >r
+    swap shape-x swap shape-x - r> <point> ;
 
 ! A rectangle maps trivially to the shape protocol.
 TUPLE: rectangle x y w h ;
@@ -77,14 +90,11 @@ C: rectangle ( x y w h -- rect )
     [ set-rectangle-y ] keep
     [ set-rectangle-x ] keep ;
 
-M: number resize-shape ( w h point -- rect )
-     >rect 2swap <rectangle> ;
+M: rectangle move-shape ( x y rect -- )
+    tuck set-rectangle-y set-rectangle-x ;
 
-M: rectangle move-shape ( x y rect -- rect )
-    [ rectangle-w ] keep rectangle-h <rectangle> ;
-
-M: rectangle resize-shape ( w h rect -- rect )
-    [ rectangle-x ] keep rectangle-y 2swap <rectangle> ;
+M: rectangle resize-shape ( w h rect -- )
+    tuck set-rectangle-h set-rectangle-w ;
 
 : rectangle-x-extents ( rect -- x1 x2 )
     dup rectangle-x x get + swap rectangle-w dupd + ;
@@ -99,9 +109,3 @@ M: rectangle inside? ( point rect -- ? )
 ! Delegates to a bounded shape, but absorbs all points.
 WRAPPER: everywhere
 M: everywhere inside? ( point world -- ? ) 2drop t ;
-
-M: everywhere move-shape ( x y everywhere -- )
-    everywhere-delegate move-shape <everywhere> ;
-
-M: everywhere resize-shape ( w h everywhere -- )
-    everywhere-delegate resize-shape <everywhere> ;
