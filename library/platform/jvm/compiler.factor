@@ -56,7 +56,7 @@ USE: words
 : compiled>compound ( word -- def )
     #! Convert a compiled word definition into the compound
     #! definition which compiles to it.
-    dup worddef>list <compound> ;
+    dup word-parameter <compound> ;
 
 : decompile ( word -- )
     #! Decompiles a word; from now on, it will be interpreted

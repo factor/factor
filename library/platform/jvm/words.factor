@@ -92,7 +92,7 @@ USE: stack
 : defined? ( obj -- ? )
     dup word? [ worddef ] [ drop f ] ifte ;
 
-: worddef>list ( worddef -- list )
+: word-parameter ( worddef -- list )
     worddef interpreter swap
     [ "factor.FactorInterpreter" ] "factor.FactorWordDefinition"
     "toList" jinvoke ;
@@ -101,7 +101,7 @@ USE: stack
     dup [ dup car comment? [ cdr skip-docs ] when ] when ;
 
 : compound>list ( worddef -- list )
-    worddef>list dup [ skip-docs ] when ;
+    word-parameter dup [ skip-docs ] when ;
 
 : define-compound ( word def -- )
     #! Define a compound word at runtime.

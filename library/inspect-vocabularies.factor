@@ -41,7 +41,7 @@ USE: unparser
     2dup = [
         2drop f ! Don't say that a word uses itself
     ] [
-        worddef>list tree-contains?
+        word-parameter tree-contains?
     ] ifte ;
 
 : usages-in-vocab ( of vocab -- usages )

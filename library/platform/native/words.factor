@@ -50,7 +50,6 @@ USE: stack
 
 ! Various features not supported by native Factor.
 : comment? drop f ;
-: worddef>list word-parameter ;
 
 : word ( -- word )
     global [ "last-word" get ] bind ;

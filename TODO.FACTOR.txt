@@ -3,9 +3,7 @@
   (and don't hang when this happends!)
 - >lower, >upper for strings
 - telnetd should use multitasking
-- telnetd error handling
 - accept multi-line input in listener
-- telnetd: send errors on socket
 
 + docs:
 
@@ -75,11 +73,8 @@
 
 + misc:
 
-- worddef>list ==> word-parameter
 - alist -vs- assoc terminology
-- unique,
 - dissolve builtins vocabulary
-- ifte* combinator
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
 - some way to run httpd from command line

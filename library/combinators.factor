@@ -95,6 +95,13 @@ USE: stack
         2drop
     ] ifte ; interpret-only
 
+: ifte* ( cond true false -- )
+    #! If the condition is not f, execute the 'true' quotation,
+    #! with the condition on the stack. Otherwise, pop the
+    #! condition and execute the 'false' quotation.
+    pick [ drop call ] [ nip nip call ] ifte ;
+    inline interpret-only
+
 : interleave ( X list -- )
     #! Evaluate each element of the list with X on top of the
     #! stack. When done, X is popped off the stack.

@@ -29,6 +29,7 @@ IN: interpreter
 USE: arithmetic
 USE: combinators
 USE: continuations
+USE: errors
 USE: kernel
 USE: lists
 USE: logic
@@ -90,9 +91,12 @@ USE: vectors
 : exit ( -- )
     "quit-flag" on ;
 
+: eval-catch ( str -- )
+    [ eval ] [ default-error-handler ] catch ;
+
 : interpret ( -- )
     print-prompt read dup [
-        dup history+ eval
+        dup history+ eval-catch
     ] [
         drop exit
     ] ifte ;

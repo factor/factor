@@ -64,6 +64,11 @@ USE: stack
     #! Append an object to the currently constructing list.
     "list-buffer" cons@ ;
 
+: unique, ( obj -- )
+    #! Append an object to the currently constructing list, only
+    #! if the object does not already occur in the list.
+    "list-buffer" unique@ ;
+
 : list, ( list -- )
     #! Append each element to the currently constructing list.
     [ , ] each ;

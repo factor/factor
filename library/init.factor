@@ -87,9 +87,6 @@ USE: words
     #! Parse command line arguments.
     parse-switches run-files ;
 
-: init-toplevel ( -- )
-    [ "top-level-continuation" set ] callcc0 ;
-
 : (word-of-the-day) ( -- word )
     vocabs random-element words dup [
         random-element
@@ -112,13 +109,4 @@ USE: words
     word-of-the-day
     room.
 
-    init-toplevel
-
-    [
-        interpreter-loop
-    ] [
-        [
-            default-error-handler
-            "top-level-continuation" get call
-        ] when*
-    ] catch ;
+    interpreter-loop ;
