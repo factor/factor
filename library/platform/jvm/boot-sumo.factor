@@ -82,6 +82,7 @@ USE: parser
 "/library/math/arc-trig-hyp.factor"      run-resource ! math
 "/library/math/quadratic.factor"         run-resource ! math
 "/library/math/list-math.factor"         run-resource ! math
+"/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
 "/library/vocabulary-style.factor"         run-resource ! style

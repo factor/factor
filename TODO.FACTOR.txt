@@ -22,7 +22,6 @@
 - vector-each/map examples
 - string construction examples
 - string construction ackward
-- read#
 
 + tests:
 
@@ -47,6 +46,8 @@
 
 + native:
 
+- broken pipe errors with httpd and telnetd in cfactor
+- read#
 - write buffer
 - to_fixnum and friends: error on float
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
@@ -88,7 +89,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + httpd:
 
-- broken pipe errors with httpd and telnetd in cfactor
 - multitasking
 - inspect: always use inspect/ URL prefix, not responder name var
 - httpd: don't flush so much

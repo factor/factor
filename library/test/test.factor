@@ -85,6 +85,7 @@ USE: vocabularies
         "math/float"
         "math/complex"
         "math/irrational"
+        "math/simpson"
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"

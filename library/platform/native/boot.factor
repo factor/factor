@@ -96,6 +96,7 @@ primitives,
     "/library/math/pow.factor"
     "/library/math/quadratic.factor"
     "/library/math/trig-hyp.factor"
+    "/library/math/simpson.factor"
     "/library/test/test.factor"
     "/library/platform/native/errors.factor"
     "/library/platform/native/io-internals.factor"

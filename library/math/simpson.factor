@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -27,26 +27,44 @@
 
 IN: math
 USE: arithmetic
+USE: combinators
+USE: kernel
 USE: lists
+USE: logic
 USE: stack
 
-: |+ ( list -- sum )
-    #! sum all elements in a list.
-    0 swap [ + ] each ;
+: multiplier ( n -- 2|4 )
+    odd? 4 2 ? ;
 
-: +| ( list list -- list )
-    [ + ] 2map ;
+: (multipliers) ( list n -- list )
+    dup 2 <= [
+        drop
+    ] [
+        dup >r multiplier swons r> pred (multipliers)
+    ] ifte ;
 
-: |* ( list -- sum )
-    #! multiply all elements in a list.
-    1 swap [ * ] each ;
+: multipliers ( n -- list )
+    #! The value n must be odd. Makes a list like [ 1 4 2 4 1 ]
+    [ 1 ] swap (multipliers) 1 swons ;
 
-: *| ( list list -- list )
-    [ * ] 2map ;
+: x-values ( lower upper n -- list )
+    #! The value n must be odd.
+    pred >r over - r> dup succ count [
+        >r 3dup r> swap / * +
+    ] inject >r 3drop r> ;
 
-: *|+ ( list list -- dot )
-    #! Dot product
-    *| |+ ;
+: y-values ( lower upper n quot -- values )
+    >r x-values r> inject ;
 
-: average ( list -- avg )
-    dup |+ swap length / ;
+: (simpson) ( lower upper n quot -- value )
+    over multipliers >r y-values r> *|+ ;
+
+: h ( lower upper n -- h )
+    transp - swap pred / 3 / ;
+
+: simpson ( lower upper n quot -- value )
+    #! Compute the integral between the lower and upper bound,
+    #! using Simpson's method with n steps. The value of n must
+    #! be odd. The quotation must have stack effect
+    #! ( x -- f(x) ).
+    >r 3dup r> (simpson) >r h r> * ;
