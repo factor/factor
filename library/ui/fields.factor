@@ -85,7 +85,7 @@ TUPLE: field active? editor delegate ;
     bevel-border dup f bevel-up? set-paint-property ;
 
 M: field user-input* ( ch field -- ? )
-    field-editor [ insert-char ] with-editor f ;
+    field-editor [ insert-char ] with-editor t ;
 
 : field-gestures ( -- hash )
     {{

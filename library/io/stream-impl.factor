@@ -41,9 +41,6 @@ M: fd-stream stream-close ( stream -- )
 : <file-writer> ( path -- stream )
     f t open-file <fd-stream> ;
 
-: init-stdio ( -- )
-    stdin stdout <fd-stream> <stdio-stream> stdio set ;
-
 : (fcopy) ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'. Use fcopy; this word does not close
@@ -64,3 +61,14 @@ M: fd-stream stream-close ( stream -- )
 
 : <resource-stream> ( path -- stream )
     resource-path swap path+ <file-reader> ;
+
+TUPLE: null-stream ;
+M: null-stream stream-flush drop ;
+M: null-stream stream-auto-flush drop ;
+M: null-stream stream-read 2drop f ;
+M: null-stream stream-readln drop f ;
+M: null-stream stream-write-attr 3drop ;
+M: null-stream stream-close drop ;
+
+: init-stdio ( -- )
+    stdin stdout <fd-stream> <stdio-stream> stdio set ;

@@ -36,22 +36,6 @@ USE: stdio
 USE: prettyprint
 USE: words
 
-: grab ( gadget hand -- )
-    [ swap screen-pos swap screen-pos - >rect ] 2keep
-    >r [ move-gadget ] keep r> add-gadget ;
-
-: release ( gadget world -- )
-    >r dup screen-pos >r
-    dup unparent
-    r> >rect pick move-gadget
-    r> add-gadget ;
-
-: moving-actions
-    {{
-            [[ [ button-down 1 ] [ my-hand grab ] ]]
-        [[ [ button-up 1 ] [ world get release ] ]]
-    }} swap set-gadget-gestures ;
-
 : filled? "filled" get checkbox-selected? ;
 
 : <funny-rect>
@@ -72,6 +56,7 @@ USE: words
     "New Rectangle" [ drop 100 100 100 100 <funny-rect> dup [ 255 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
     "New Ellipse" [ drop 100 100 200 100 <funny-ellipse> dup [ 0 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
     "New Line" [ drop 100 100 200 100 <funny-line> dup [ 255 0 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
+    "Prompt" [ drop "Enter input text:" input-dialog . flush ] <button> "shelf" get add-gadget
     "Filled?" <checkbox> dup "filled" set "shelf" get add-gadget
     "shelf" get "pile" get add-gadget
     "Welcome to Factor " version cat2 <label> "pile" get add-gadget

@@ -44,7 +44,9 @@ C: gadget ( shape -- gadget )
     f swap set-gadget-parent ;
 
 : (add-gadget) ( gadget box -- )
-    [ gadget-children cons ] keep set-gadget-children ;
+    #! This is inefficient.
+    [ gadget-children swap unit append ] keep
+    set-gadget-children ;
 
 : unparent ( gadget -- )
     dup gadget-parent dup [ remove-gadget ] [ 2drop ] ifte ;
@@ -78,14 +80,16 @@ C: gadget ( shape -- gadget )
     ] ifte ; inline
 
 : each-parent ( gadget quot -- ? )
+    #! Keep executing the quotation on higher and higher
+    #! parents until it returns f.
     >r parent-list r> (each-parent) ; inline
-
-: relative-pos ( g1 g2 -- g2-p1 )
-    shape-pos swap screen-pos - ;
 
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.
     0 swap [ shape-pos + t ] each-parent drop ;
+
+: relative-pos ( g1 g2 -- g2-p1 )
+    shape-pos swap screen-pos - ;
 
 : child? ( parent child -- ? )
     dup [

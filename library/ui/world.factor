@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video ;
+sdl-video threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -52,14 +52,16 @@ DEFER: handle-event
         world get world-step [ SDL_WaitEvent ] [ drop f ] ifte
     ] ifte ;
 
-: run-world ( -- )
+: run-world ( event -- )
     world get world-step [
-        <event> dup eat-events [
-            handle-event run-world
+        dup eat-events [
+            [ handle-event ] in-thread run-world
         ] [
             drop
         ] ifte
-    ] when ;
+    ] [
+        drop
+    ] ifte ;
 
 : start-world ( -- )
     #! Start the Factor graphics subsystem with the given screen
@@ -69,7 +71,7 @@ DEFER: handle-event
     [
         0 x set
         0 y set
-        [ run-world ] with-screen
+        [ <event> run-world ] with-screen
     ] with-scope ;
 
 global [

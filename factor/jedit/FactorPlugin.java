@@ -116,6 +116,7 @@ public class FactorPlugin extends EditPlugin
 				List args = new ArrayList();
 				args.add(exePath);
 				args.add(imagePath);
+				args.add("-null-stdio");
 				args.add("-shell=telnet");
 				args.add("-telnetd-port=" + PORT);
 				String[] extraArgs = jEdit.getProperty(

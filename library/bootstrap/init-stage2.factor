@@ -22,7 +22,8 @@ words unparser kernel-internals console assembler memory ;
     init-error-handler
     init-random
     default-cli-args
-    parse-command-line ;
+    parse-command-line
+    "null-stdio" get [ << null-stream >> stdio set ] when ;
 
 : shell ( str -- )
     #! This handles the -shell:<foo> cli argument.

@@ -177,6 +177,8 @@ cpu "x86" = "mini" get not and [
         "/library/ui/labels.factor"
         "/library/ui/buttons.factor"
         "/library/ui/fields.factor"
+        "/library/ui/halo.factor"
+        "/library/ui/dialogs.factor"
         "/library/ui/events.factor"
     ] [
         dup print

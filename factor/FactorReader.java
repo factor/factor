@@ -204,6 +204,8 @@ public class FactorReader
 	//{{{ addUse() method
 	public void addUse(String name)
 	{
+		if(name.equals("!syntax"))
+			return;
 		setUse(new Cons(name,getUse()));
 	} //}}}
 
