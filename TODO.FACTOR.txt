@@ -8,7 +8,6 @@
 - special completion for USE:/IN:
 - vectors: ensure its ok with bignum indices
 - if gadgets are moved, added or deleted, update hand.
-- keyboard focus
 - keyboard gestures
 - text fields
 - code gc

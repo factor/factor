@@ -36,4 +36,4 @@ M: motion-event handle-event ( event -- )
     motion-event-pos my-hand move-hand ;
 
 M: key-down-event handle-event ( event -- )
-    keyboard-event>binding my-hand hand-gadget handle-gesture ;
+    keyboard-event>binding my-hand hand-focus handle-gesture ;

@@ -12,16 +12,7 @@ C: label ( text -- )
     [ set-label-text ] keep ;
 
 M: label layout* ( label -- )
-    [
-        dup label-text swap gadget-paint
-        [ font get lookup-font ] bind
-        swap size-string
-    ] keep resize-gadget ;
+    [ label-text dup shape-w swap shape-h ] keep resize-gadget ;
 
 M: label draw-shape ( label -- )
-    dup shape-x x get +
-    over shape-y y get +
-    rot label-text
-    >r font get lookup-font r>
-    foreground get 3unlist make-color
-    draw-string drop ;
+    dup [ label-text draw-shape ] with-translation ;

@@ -1,48 +1,9 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl
-USE: alien
-USE: math
-USE: namespaces
-USE: compiler
-USE: words
-USE: parser
-USE: kernel
-USE: errors
-USE: lists
-USE: prettyprint
-USE: sdl-event
-USE: sdl-gfx
-USE: sdl-video
-USE: streams
-USE: strings
-USE: sdl-ttf
-USE: hashtables
+USING: alien math namespaces compiler words parser kernel errors
+lists prettyprint sdl-event sdl-gfx sdl-keyboard sdl-video
+streams strings sdl-ttf hashtables ;
 
 SYMBOL: surface
 SYMBOL: width
@@ -57,6 +18,9 @@ SYMBOL: surface
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
     SDL_INIT_EVERYTHING SDL_Init drop  TTF_Init
+    1 SDL_EnableUNICODE drop
+    SDL_DEFAULT_REPEAT_DELAY SDL_DEFAULT_REPEAT_INTERVAL
+    SDL_EnableKeyRepeat drop
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgb ( [ r g b ] -- n )
@@ -180,7 +144,7 @@ global [
     ] ifte ;
 
 : size-string ( font text -- w h )
-    dup str-length 0 = [
+    >r lookup-font r> dup str-length 0 = [
         drop TTF_FontHeight 0 swap
     ] [
         <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep

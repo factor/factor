@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math namespaces
-sdl sdl-gfx ;
+sdl sdl-gfx sdl-ttf strings ;
 
 ! The painting protocol. Painting is controlled by various
 ! dynamically-scoped variables.
@@ -125,3 +125,19 @@ M: plain-ellipse draw-shape ( ellipse -- )
             gadget-children [ draw-gadget ] each
         ] with-translation
     ] bind ;
+
+! Strings are shapes too. This is somewhat of a hack and strings
+! do not have x/y co-ordinates.
+M: string shape-x drop 0 ;
+M: string shape-y drop 0 ;
+M: string shape-w
+    font get swap size-string ( h -) drop ;
+
+M: string shape-h ( text -- h )
+    #! This is just the height of the current font.
+    drop font get lookup-font TTF_FontHeight ;
+
+M: string draw-shape ( text -- )
+    >r x get y get font get lookup-font r>
+    foreground get 3unlist make-color
+    draw-string drop ;
