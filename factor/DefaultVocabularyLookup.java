@@ -207,8 +207,27 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 	} //}}}
 
 	//{{{ getCompletions() method
-	public void getCompletions(String vocab, String word, Set completions,
-		boolean anywhere)
+	/**
+	 * @param use A list of vocabularies.
+	 * @param word A substring of the word name to complete
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 * @param completions Set to add completions to
+	 */
+	public void getCompletions(Cons use, String word, boolean anywhere,
+		Set completions) throws Exception
+	{
+		while(use != null)
+		{
+			String vocab = (String)use.car;
+			getCompletions(vocab,word,anywhere,completions);
+			use = use.next();
+		}
+	} //}}}
+
+	//{{{ getCompletions() method
+	public void getCompletions(String vocab, String word, boolean anywhere,
+		Set completions) throws Exception
 	{
 		Map v = (Map)vocabularies.get(vocab);
 		if(v == null)

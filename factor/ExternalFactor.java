@@ -178,6 +178,19 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		return vocabs;
 	} //}}}
 
+	//{{{ makeWord() method
+	/**
+	 * Make a word from an info list returned by Factor.
+	 */
+	public synchronized FactorWord makeWord(Cons info)
+	{
+		FactorWord w = new FactorWord(
+			(String)info.car,
+			(String)info.next().car);
+		w.stackEffect = (String)info.next().next().car;
+		return w;
+	} //}}}
+
 	//{{{ searchVocabulary() method
 	/**
 	 * Search through the given vocabulary list for the given word.
@@ -197,16 +210,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			Cons result = parseObject(eval(FactorReader.unparseObject(name)
 				+ " "
 				+ FactorReader.unparseObject(vocabulary)
-				+ " jedit-lookup ."));
+				+ " search jedit-lookup ."));
 			if(result.car == null)
 				return null;
 
-			result = (Cons)result.car;
-			w = new FactorWord(
-				(String)result.car,
-				(String)result.next().car);
-			w.stackEffect = (String)result.next().next().car;
-			return w;
+			return makeWord((Cons)result.car);
 		}
 		catch(Exception e)
 		{
@@ -216,40 +224,32 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	} //}}}
 
 	//{{{ getCompletions() method
-	public synchronized void getCompletions(String vocab, String word, Set completions,
-		boolean anywhere)
+	public synchronized void getCompletions(Cons use, String word,
+		boolean anywhere, Set completions) throws Exception
 	{
-		super.getCompletions(vocab,word,completions,anywhere);
+		super.getCompletions(use,word,anywhere,completions);
 
 		if(closed)
 			return;
 
-		try
-		{
-			/* We can't send words across the socket at this point in
-			human history, because of USE: issues. so we send name/vocab
-			pairs. */
-			Cons moreCompletions = (Cons)parseObject(eval(
-				FactorReader.unparseObject(word)
-				+ " "
-				+ FactorReader.unparseObject(vocab)
-				+ " "
-				+ (anywhere ? "vocab-apropos" : "vocab-completions")
-				+ " [ dup word-name swap word-vocabulary 2list ] map .")).car;
+		/* We can't send words across the socket at this point in
+		human history, because of USE: issues. so we send name/vocab
+		pairs. */
+		Cons moreCompletions = (Cons)parseObject(eval(
+			FactorReader.unparseObject(word)
+			+ " "
+			+ FactorReader.unparseObject(Boolean.valueOf(anywhere))
+			+ " "
+			+ FactorReader.unparseObject(use)
+			+ " completions .")).car;
 
-			while(moreCompletions != null)
-			{
-				Cons completion = (Cons)moreCompletions.car;
-				FactorWord w = searchVocabulary(completion.next(),
-					(String)completion.car);
-				if(w != null)
-					completions.add(w);
-				moreCompletions = moreCompletions.next();
-			}
-		}
-		catch(Exception e)
+		while(moreCompletions != null)
 		{
-			Log.log(Log.ERROR,this,e);
+			Cons completion = (Cons)moreCompletions.car;
+			FactorWord w = makeWord(completion);
+			if(w != null)
+				completions.add(w);
+			moreCompletions = moreCompletions.next();
 		}
 	} //}}}
 

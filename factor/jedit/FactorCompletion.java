@@ -61,14 +61,23 @@ public class FactorCompletion extends SideKickCompletion
 
 	public void insert(int index)
 	{
-		Macros.Recorder recorder = view.getMacroRecorder();
+		FactorWord selected = ((FactorWord)get(index));
+		String insert = selected.name.substring(word.length());
 
-		String insert = ((FactorWord)get(index)).name.substring(
-			word.length());
+		Buffer buffer = textArea.getBuffer();
 
-		if(recorder != null)
-			recorder.recordInput(insert,false);
-		textArea.setSelectedText(insert);
+		try
+		{
+			buffer.beginCompoundEdit();
+			
+			textArea.setSelectedText(insert);
+			if(!FactorPlugin.isUsed(view,selected.vocabulary))
+				FactorPlugin.insertUse(view,selected.vocabulary);
+		}
+		finally
+		{
+			buffer.endCompoundEdit();
+		}
 	}
 
 	public int getTokenLength()
@@ -81,13 +90,7 @@ public class FactorCompletion extends SideKickCompletion
 		if(keyChar == '\t' || keyChar == '\n')
 			insert(selectedIndex);
 		else
-		{
-			Macros.Recorder recorder = view.getMacroRecorder();
-
-			if(recorder != null)
-				recorder.recordInput(1,keyChar,false);
 			textArea.userInput(keyChar);
-		}
 
 		boolean ws = (ReadTable.DEFAULT_READTABLE
 			.getCharacterType(keyChar)

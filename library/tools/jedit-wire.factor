@@ -95,10 +95,10 @@ C: jedit-stream ( stream -- stream )
     #! Execute this in the inferior Factor.
     stdio [ <jedit-stream> ] change  print-banner ;
 
-: jedit-lookup ( word vocabs -- )
+: jedit-lookup ( word -- list )
     #! A utility word called by the Factor plugin to get some
     #! required word info.
-    search dup [
+    dup [
         [
             "vocabulary"
             "name"
@@ -107,3 +107,16 @@ C: jedit-stream ( stream -- stream )
             dupd word-property
         ] map nip
     ] when ;
+
+: completions ( str anywhere vocabs -- list )
+    #! Make a list of completions. Each element of the list is
+    #! a name/vocabulary pair.
+    [
+        [
+            >r 2dup r> swap [
+                vocab-apropos
+            ] [
+                vocab-completions
+            ] ifte [ jedit-lookup , ] each
+        ] each
+    ] make-list ;

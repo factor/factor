@@ -290,8 +290,7 @@ public class FactorSideKickParser extends SideKickParser
 			return null;
 
 		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getCompletions(
-			data.use,word,false));
+			FactorPlugin.getCompletions(word,false));
 
 		if(completions.length == 0)
 			return null;

@@ -11,15 +11,11 @@
 - handle odd base cases, with code after ifte
 - handle recursion with when, when* etc
 
-+ linearizer/generator:
++ compiler:
 
 - getenv/setenv: if literal arg, compile as a load/store
-
-+ compiler frontend:
-
 - assembler opcodes dispatch on operand types
 - save code in image
-- compile word twice; no more 'cannot compile' error!
 
 + oop:
 
@@ -36,7 +32,6 @@
 
 + listener/plugin:
 
-- use decl wrong
 - faster completion
 - sidekick: still parsing too much
 - errors don't always disappear
@@ -53,10 +48,9 @@
 - cat, reverse-cat primitives
 - first-class hashtables
 - rewrite accessors and mutators in Factor, with slot/set-slot primitive
-- replace -export-dynamic with sundry-xt
 - add a socket timeout
-- word, writes entire plist
 - do transfer-word in fixup
+- move dispatch getenv setenv to kernel-internals
 
 + misc:
 
@@ -65,7 +59,6 @@
 - perhaps /i should work with all numbers
 - unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name
-- command line parsing cleanup
 - nicer way to combine two paths
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for

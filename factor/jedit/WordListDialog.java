@@ -31,16 +31,19 @@ package factor.jedit;
 
 import factor.*;
 import javax.swing.border.*;
+import javax.swing.event.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import org.gjt.sp.jedit.gui.EnhancedDialog;
 import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.Log;
 
 public abstract class WordListDialog extends EnhancedDialog
 {
 	protected View view;
 	protected JList list;
+	protected JTextArea preview;
 	protected JButton ok, cancel;
 
 	//{{{ WordListDialog constructor
@@ -55,11 +58,45 @@ public abstract class WordListDialog extends EnhancedDialog
 		content.setBorder(new EmptyBorder(12,12,12,12));
 		setContentPane(content);
 
-		content.add(BorderLayout.CENTER,new JScrollPane(
-			list = new JList()));
+		JScrollPane listScroll = new JScrollPane(
+			list = new JList());
 		list.setCellRenderer(new FactorWordRenderer(parser,true));
+		list.addListSelectionListener(new ListHandler());
+
+		JScrollPane previewScroll = new JScrollPane(
+			preview = new JTextArea(12,60));
+		preview.setEditable(false);
+
+		listScroll.setPreferredSize(previewScroll.getPreferredSize());
+
+		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
+			listScroll,previewScroll);
+		split.setDividerLocation(0.5);
+		split.setResizeWeight(0.5);
+		content.add(BorderLayout.CENTER,split);
 
 		content.add(BorderLayout.SOUTH,createButtonPanel());
+	} //}}}
+
+	//{{{ updatePreview() method
+	protected void updatePreview()
+	{
+		FactorWord word = (FactorWord)list.getSelectedValue();
+		if(word == null)
+		{
+			preview.setText("");
+			return;
+		}
+
+		try
+		{
+			preview.setText(FactorPlugin.evalInWire(
+				FactorPlugin.factorWord(word) + " see").trim());
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,e);
+		}
 	} //}}}
 
 	//{{{ createButtonPanel() method
@@ -89,6 +126,15 @@ public abstract class WordListDialog extends EnhancedDialog
 				ok();
 			else if(evt.getSource() == cancel)
 				cancel();
+		}
+	} //}}}
+
+	//{{{ ListHandler class
+	class ListHandler implements ListSelectionListener
+	{
+		public void valueChanged(ListSelectionEvent evt)
+		{
+			updatePreview();
 		}
 	} //}}}
 }

@@ -73,6 +73,13 @@ public class FactorPlugin extends EditPlugin
 	public void stop()
 	{
 		stopExternalInstance();
+
+		Buffer buffer = jEdit.getFirstBuffer();
+		while(buffer != null)
+		{
+			buffer.setProperty(FactorSideKickParser.PARSED_PROPERTY,null);
+			buffer = buffer.getNext();
+		}
 	} //}}}
 	
 	//{{{ getExternalInstance() method
@@ -165,9 +172,9 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 
 	//{{{ evalInWire() method
-	public static void evalInWire(String cmd) throws IOException
+	public static String evalInWire(String cmd) throws IOException
 	{
-		getExternalInstance().eval(cmd);
+		return getExternalInstance().eval(cmd);
 	} //}}}
 
 	//{{{ lookupWord() method
@@ -278,34 +285,12 @@ public class FactorPlugin extends EditPlugin
 	{
 		try
 		{
-			return getCompletions(getExternalInstance().getVocabularies(),word,
-				anywhere);
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-	} //}}}
-	
-	//{{{ getCompletions() method
-	/**
-	 * @param anywhere If true, matches anywhere in the word name are
-	 * returned; otherwise, only matches from beginning.
-	 */
-	public static Set getCompletions(Cons use, String word, boolean anywhere)
-	{
-		try
-		{
 			Set completions = new HashSet();
-	
-			while(use != null)
-			{
-				String vocab = (String)use.car;
-				getExternalInstance().getCompletions(
-					vocab,word,completions,anywhere);
-				use = use.next();
-			}
-
+			getExternalInstance().getCompletions(
+				getExternalInstance().getVocabularies(),
+				word,
+				anywhere,
+				completions);
 			return completions;
 		}
 		catch(Exception e)
@@ -375,7 +360,7 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 	
 	//{{{ isUsed() method
-	private static boolean isUsed(View view, String vocab)
+	public static boolean isUsed(View view, String vocab)
 	{
 		SideKickParsedData data = SideKickParsedData
 			.getParsedData(view);

@@ -43,14 +43,24 @@ public interface VocabularyLookup
 	public void forget(FactorWord word);
 
 	/**
+	 * @param use A list of vocabularies.
+	 * @param word A substring of the word name to complete
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 * @param completions Set to add completions to
+	 */
+	public void getCompletions(Cons use, String word, boolean anywhere,
+		Set completions) throws Exception;
+
+	/**
 	 * @param vocab The vocabulary name
 	 * @param word A substring of the word name to complete
-	 * @param completions List to add completions to
 	 * @param anywhere If true, word name will be matched anywhere, otherwise, just at
 	 * the beginning of the name.
+	 * @param completions Set to add completions to
 	 */
-	public void getCompletions(String vocab, String word, Set completions,
-		boolean anywhere) throws Exception;
+	public void getCompletions(String vocab, String word, boolean anywhere,
+		Set completions) throws Exception;
 
 	public Cons getVocabularies() throws Exception;
 }
