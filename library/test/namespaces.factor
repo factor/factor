@@ -29,7 +29,7 @@ unit-test
 [ t ]
 [
     \ test-word
-    global [ [ "vocabularies" "test" "test-word" ] object-path ] bind
+    global [ [ vocabularies "test" "test-word" ] object-path ] bind
     =
 ] unit-test
 

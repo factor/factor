@@ -42,7 +42,7 @@ USE: strings
 
 : directory ( dir -- list )
     #! List a directory.
-    (directory) str-sort ;
+    (directory) [ str-lexi> ] sort ;
 
 : file-length ( file -- length )
     stat dup [ cdr cdr car ] when ;

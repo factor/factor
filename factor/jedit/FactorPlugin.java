@@ -170,15 +170,40 @@ public class FactorPlugin extends EditPlugin
 		getExternalInstance().eval(cmd);
 	} //}}}
 
+	//{{{ lookupWord() method
+	/**
+	 * Look up the given Factor word in the vocabularies USE:d in the given view.
+	 */
+	public static FactorWord lookupWord(View view, String word)
+	{
+		SideKickParsedData data = SideKickParsedData.getParsedData(view);
+		if(data instanceof FactorParsedData)
+		{
+			FactorParsedData fdata = (FactorParsedData)data;
+			return getExternalInstance().searchVocabulary(fdata.use,word);
+		}
+		else
+			return null;
+	} //}}}
+
 	//{{{ factorWord() method
 	/**
-	 * Build a Factor expression for pushing the selected word on the stack
+	 * Look up the given Factor word in the vocabularies USE:d in the given view.
 	 */
-	public static String factorWord(FactorWord word)
+	public static String factorWord(View view, String word)
 	{
-		return FactorReader.unparseObject(word.name)
-			+ " [ " + FactorReader.unparseObject(word.vocabulary)
-			+ " ] search";
+		SideKickParsedData data = SideKickParsedData
+			.getParsedData(view);
+		if(data instanceof FactorParsedData)
+		{
+			FactorParsedData fdata = (FactorParsedData)data;
+			return "\""
+				+ FactorReader.charsToEscapes(word)
+				+ "\" " + FactorReader.unparseObject(fdata.use)
+				+ " search";
+		}
+		else
+			return null;
 	} //}}}
 
 	//{{{ factorWord() method
@@ -188,21 +213,22 @@ public class FactorPlugin extends EditPlugin
 	public static String factorWord(View view)
 	{
 		JEditTextArea textArea = view.getTextArea();
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(data instanceof FactorParsedData)
-		{
-			FactorParsedData fdata = (FactorParsedData)data;
-			String word = FactorPlugin.getWordAtCaret(textArea);
-			if(word == null)
-				return null;
-			return "\""
-				+ FactorReader.charsToEscapes(word)
-				+ "\" " + FactorReader.unparseObject(fdata.use)
-				+ " search";
-		}
-		else
+		String word = FactorPlugin.getWordAtCaret(textArea);
+		if(word == null)
 			return null;
+		else
+			return factorWord(view,word);
+	} //}}}
+
+	//{{{ factorWord() method
+	/**
+	 * Build a Factor expression for pushing the selected word on the stack
+	 */
+	public static String factorWord(FactorWord word)
+	{
+		return FactorReader.unparseObject(word.name)
+			+ " [ " + FactorReader.unparseObject(word.vocabulary)
+			+ " ] search";
 	} //}}}
 	
 	//{{{ factorWordOutputOp() method

@@ -25,9 +25,18 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: syntax
+USE: generic
+BUILTIN: f 6 FORGET: f?
+BUILTIN: t 7 FORGET: t?
+
 IN: vectors
 DEFER: vector=
 DEFER: vector-hashcode
+
+IN: lists
+DEFER: cons=
+DEFER: cons-hashcode
 
 IN: kernel
 USE: lists
@@ -108,3 +117,7 @@ IN: kernel
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
+
+: num-types ( -- n )
+    #! One more than the maximum value from type primitive.
+    17 ;

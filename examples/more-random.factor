@@ -5,6 +5,13 @@ USE: math
 USE: test
 USE: namespaces
 
+: nth ( n list -- list[n] )
+    #! nth element of a proper list.
+    #! Supplying n <= 0 pushes the first element of the list.
+    #! Supplying an argument beyond the end of the list raises
+    #! an error.
+    swap [ cdr ] times car ;
+
 : random-element ( list -- random )
     #! Returns a random element from the given list.
     dup >r length pred 0 swap random-int r> nth ;
@@ -85,4 +92,8 @@ USE: namespaces
         "random-pairs" get
         check-random-subset
     ] unit-test
+
+    [ 1 ] [  -1 [ 1 2 ] nth ] unit-test
+    [ 1 ] [  0  [ 1 2 ] nth ] unit-test
+    [ 2 ] [  1  [ 1 2 ] nth ] unit-test
 ] with-scope

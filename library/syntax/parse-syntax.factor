@@ -25,7 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: parser
+! Bootstrapping trick; see doc/bootstrap.txt.
+IN: !syntax
+USE: syntax
 
 USE: errors
 USE: hashtables
@@ -33,82 +35,17 @@ USE: kernel
 USE: lists
 USE: math
 USE: namespaces
+USE: parser
 USE: strings
 USE: words
 USE: vectors
 USE: unparser
 
-! Colon defs
-: CREATE ( -- word )
-    scan "in" get create dup set-word
-    dup f "documentation" set-word-property
-    dup f "stack-effect" set-word-property
-    dup "line-number" get "line" set-word-property
-    dup "col"         get "col"  set-word-property
-    dup "file"        get "file" set-word-property ;
-
-! \x
-: unicode-escape>ch ( -- esc )
-    #! Read \u....
-    next-ch digit> 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + ;
-
-: ascii-escape>ch ( ch -- esc )
-    [
-        [ CHAR: e | CHAR: \e ]
-        [ CHAR: n | CHAR: \n ]
-        [ CHAR: r | CHAR: \r ]
-        [ CHAR: t | CHAR: \t ]
-        [ CHAR: s | CHAR: \s ]
-        [ CHAR: \s | CHAR: \s ]
-        [ CHAR: 0 | CHAR: \0 ]
-        [ CHAR: \\ | CHAR: \\ ]
-        [ CHAR: \" | CHAR: \" ]
-    ] assoc ;
-
-: escape ( ch -- esc )
-    dup CHAR: u = [
-        drop unicode-escape>ch
-    ] [
-        ascii-escape>ch
-    ] ifte ;
-
-: parse-escape ( -- )
-    next-ch escape dup [ drop "Bad escape" throw ] unless ;
-
-: parse-ch ( ch -- ch )
-    dup CHAR: \\ = [ drop parse-escape ] when ;
-
-: doc-comment-here? ( parsed -- ? )
-    not "in-definition" get and ;
-
-: parsed-stack-effect ( parsed str -- parsed )
-    over doc-comment-here? [
-        word stack-effect [
-            drop
-        ] [
-            word swap "stack-effect" set-word-property
-        ] ifte
-    ] [
-        drop
-    ] ifte ;
-
-: documentation+ ( word str -- )
-    over "documentation" word-property [
-        swap "\n" swap cat3
-    ] when*
-    "documentation" set-word-property ;
-
-: parsed-documentation ( parsed str -- parsed )
-    over doc-comment-here? [
-        word swap documentation+
-    ] [
-        drop
-    ] ifte ;
-
-IN: syntax
+: parsing ( -- )
+    #! Mark the most recently defined word to execute at parse
+    #! time, rather than run time. The word can use 'scan' to
+    #! read ahead in the input stream.
+    word t "parsing" set-word-property ; parsing
 
 : inline ( -- )
     #! Mark the last word to be inlined.

@@ -32,7 +32,27 @@ USE: kernel
 USE: vectors
 USE: words
 
+BUILTIN: fixnum  0
+BUILTIN: ratio   4
+BUILTIN: complex 5
+BUILTIN: bignum  9
+BUILTIN: float   10
+
 DEFER: number=
+DEFER: mod
+DEFER: abs
+DEFER: <
+DEFER: <=
+DEFER: >
+DEFER: >=
+DEFER: neg
+DEFER: /i
+DEFER: *
+DEFER: +
+DEFER: -
+DEFER: /
+DEFER: /f
+DEFER: sq
 
 : (gcd) ( x y -- z ) dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 : gcd ( x y -- z ) abs swap abs 2dup < [ swap ] when (gcd) ;

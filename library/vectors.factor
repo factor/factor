@@ -26,9 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
+USE: generic
 USE: kernel
 USE: lists
 USE: math
+
+BUILTIN: vector  11
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
@@ -104,6 +107,15 @@ USE: math
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;
+
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
+
+: stack>list ( vector -- list )
+    [ ] swap [ swons ] vector-each ;
+
+: vector>list ( vector -- list )
+    stack>list reverse ;
 
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;

@@ -70,7 +70,7 @@ USE: vectors
 : set-global ( g -- ) 4 setenv ;
 
 : init-namespaces ( -- )
-    global >n  global "global" set ;
+    global >n ;
 
 : namespace-buckets 23 ;
 

@@ -55,10 +55,7 @@ USE: test
 USE: vectors
 USE: unparser
 USE: words
-
-USE: stack
-USE: combinators
-USE: logic
+USE: parser
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -193,24 +190,49 @@ M: f ' ( obj -- ptr )
 
 ( Words )
 
-: word, ( word -- pointer )
-    word-tag here-as >r word-tag >header emit
-    hashcode emit ( hashcode )
-    0 emit r> ;
+: make-plist ( word -- plist )
+    [
+        dup word-name "name" swons ,
+        dup word-vocabulary "vocabulary" swons ,
+        parsing? [ t "parsing" swons , ] when
+    ] make-list ;
 
-! This is to handle mutually recursive words
+: word, ( word -- )
+    [
+        word-tag >header ,
+        dup hashcode ,
+        0 ,
+        dup word-primitive ,
+        dup word-parameter ' ,
+        dup make-plist ' ,
+        0 ,
+        0 ,
+    ] make-list
+    swap word-tag here-as pool-object
+    [ emit ] each ;
+
+: word-error ( word msg -- )
+    [
+        ,
+        dup word-vocabulary ,
+        " " ,
+        word-name ,
+    ] make-string throw ;
+
+: transfer-word ( word -- word )
+    #! This is a hack. See doc/bootstrap.txt.
+    dup dup word-name swap word-vocabulary unit search
+    dup [
+        nip
+    ] [
+        drop "Missing DEFER: " word-error
+    ] ifte ;
 
 : fixup-word ( word -- offset )
     dup pooled-object dup [
         nip
     ] [
-        drop
-        [
-            "Not in image: " ,
-            dup word-vocabulary ,
-            " " ,
-            word-name ,
-        ] make-string throw
+        drop "Not in image: " word-error
     ] ifte ;
 
 : fixup-words ( -- )
@@ -219,7 +241,7 @@ M: f ' ( obj -- ptr )
     ] vector-map image set ;
 
 M: word ' ( word -- pointer )
-    dup pooled-object dup [ nip ] [ drop ] ifte ;
+    transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
@@ -263,40 +285,6 @@ M: string ' ( string -- pointer )
         drop dup emit-string dup >r pool-object r>
     ] ifte ;
 
-( Word definitions )
-
-: (vocabulary) ( name -- vocab )
-    #! Vocabulary for target image.
-    dup "vocabularies" get hash dup [
-        nip
-    ] [
-        drop >r namespace-buckets <hashtable> dup r>
-        "vocabularies" get set-hash
-    ] ifte ;
-
-: (word+) ( word -- )
-    #! Add the word to a vocabulary in the target image.
-    dup word-name over word-vocabulary 
-    (vocabulary) set-hash ;
-
-: emit-plist ( word -- plist )
-    [
-        dup word-name "name" swons ,
-        dup word-vocabulary "vocabulary" swons ,
-        "parsing" word-property [ t "parsing" swons , ] when
-    ] make-list ' ;
-
-: define, ( word primitive parameter -- )
-    #! Write a word definition to the image.
-    ' >r >r dup (word+) dup emit-plist >r
-    dup word, pool-object
-    r> ( -- plist )
-    r> ( primitive -- ) emit
-    r> ( parameter -- ) emit
-    ( plist -- ) emit
-    0 emit ( padding )
-    0 emit ;
-
 ( Arrays and vectors )
 
 : emit-array ( list -- pointer )
@@ -317,35 +305,29 @@ M: vector ' ( vector -- pointer )
 
 ( End of the image )
 
-: vocabularies, ( -- )
-    #! Produces code with stack effect ( -- vocabularies ).
-    #! This code sets up vocabulary hash tables.
-    \ <namespace> ,
+: vocabularies, ( vocabularies -- )
     [
-        "vocabularies" get [
-            uncons hash>alist , \ alist>hash , , \ set ,
-        ] hash-each
-    ] make-list ,
-    \ extend , ;
+        cdr dup vector? [
+            [
+                cdr dup word? [ word, ] [ drop ] ifte
+            ] hash-each
+        ] [
+            drop
+        ] ifte
+    ] hash-each ;
 
 : global, ( -- )
-    #! Produces code with stack effect ( vocabularies -- ).
-    <namespace> ' global-offset fixup
-    "vocabularies" ,
-    \ global ,
-    \ set-hash , ;
-
-: hash-quot ( -- quot )
-    #! Generate a quotation to generate vocabulary and global
-    #! namespace hashtables.
-    [ vocabularies, global, ] make-list ;
+    vocabularies get
+    dup vocabularies,
+    <namespace> [ vocabularies set ] extend '
+    global-offset fixup ;
 
 : boot, ( quot -- )
-    boot-quot get append ' boot-quot-offset fixup ;
+    boot-quot get ' boot-quot-offset fixup ;
 
 : end ( -- )
-    hash-quot
     boot,
+    global,
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -373,7 +355,6 @@ M: vector ' ( vector -- pointer )
     [
         300000 <vector> image set
         521 <hashtable> "objects" set
-        namespace-buckets <hashtable> "vocabularies" set
         ! Note that this is a vector that we can side-effect,
         ! since ; ends up using this variable from nested
         ! parser namespaces.
@@ -386,3 +367,21 @@ M: vector ' ( vector -- pointer )
     [ begin call end ] with-minimal-image ;
 
 : test-image ( quot -- ) with-image vector>list . ;
+
+: make-image ( name -- )
+    #! Make an image for the C interpreter.
+    [
+        "/library/bootstrap/boot.factor" run-resource
+        boot-quot set
+    ] with-image
+
+    swap write-image ;
+
+: make-images ( -- )
+    "64-bits" off
+    "big-endian" off "boot.image.le32" make-image
+    "big-endian" on  "boot.image.be32" make-image
+    "64-bits" on
+    "big-endian" off "boot.image.le64" make-image
+    "big-endian" on  "boot.image.be64" make-image
+    "64-bits" off ;

@@ -50,7 +50,7 @@ USE: words
 : run-user-init ( -- )
     #! Run user init file if it exists
     "user-init" get [
-        [ "~" get , "/" get , ".factor-" , "rc" , ] make-string
+        [ "~" get , "/" , ".factor-" , "rc" , ] make-string
         ?run-file
     ] when ;
 

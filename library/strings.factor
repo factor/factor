@@ -26,9 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
+USE: generic
 USE: kernel
 USE: lists
 USE: math
+
+BUILTIN: string 12
+BUILTIN: sbuf   13
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
@@ -131,11 +135,6 @@ USE: math
     over str-length [
         -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ; inline
-
-: str-sort ( list -- sorted )
-    #! Sorts the list into ascending lexicographical string
-    #! order.
-    [ str-lexi> ] sort ;
 
 : blank? ( ch -- ? ) " \t\n\r" str-contains? ;
 : letter? ( ch -- ? ) CHAR: a CHAR: z between? ;

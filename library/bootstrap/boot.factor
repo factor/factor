@@ -32,57 +32,66 @@ USE: namespaces
 USE: stdio
 USE: kernel
 USE: vectors
+USE: words
+USE: hashtables
 
-primitives,
-[
-    "/version.factor"
-    "/library/stack.factor"
-    "/library/kernel.factor"
-    "/library/generic/generic.factor"
-    "/library/generic/object.factor"
-    "/library/generic/builtin.factor"
-    "/library/generic/predicate.factor"
-    "/library/generic/traits.factor"
-    "/library/types.factor"
-    "/library/combinators.factor"
-    "/library/math/math.factor"
-    "/library/cons.factor"
-    "/library/logic.factor"
-    "/library/vectors.factor"
-    "/library/lists.factor"
-    "/library/assoc.factor"
-    "/library/math/arithmetic.factor"
-    "/library/math/math-combinators.factor"
-    "/library/strings.factor"
-    "/library/hashtables.factor"
-    "/library/namespaces.factor"
-    "/library/list-namespaces.factor"
-    "/library/sbuf.factor"
-    "/library/continuations.factor"
-    "/library/errors.factor"
-    "/library/threads.factor"
-    "/library/io/stream.factor"
-    "/library/io/io-internals.factor"
-    "/library/io/stream-impl.factor"
-    "/library/io/stdio.factor"
-    "/library/words.factor"
-    "/library/vocabularies.factor"
-    "/library/syntax/parse-numbers.factor"
-    "/library/syntax/parser.factor"
-    "/library/syntax/parse-syntax.factor"
-    "/library/syntax/parse-stream.factor"
-    "/library/math/generic.factor"
-    "/library/bootstrap/init.factor"
-] [
-    cross-compile-resource
-] each
+"/library/bootstrap/primitives.factor" run-resource
+"/version.factor" run-resource
+"/library/stack.factor" run-resource
+"/library/combinators.factor" run-resource
+"/library/kernel.factor" run-resource
+"/library/logic.factor" run-resource
+"/library/cons.factor" run-resource
+"/library/assoc.factor" run-resource
+"/library/math/generic.factor" run-resource
+"/library/words.factor" run-resource
+"/library/math/arithmetic.factor" run-resource
+"/library/math/math-combinators.factor" run-resource
+"/library/math/math.factor" run-resource
+"/library/lists.factor" run-resource
+"/library/vectors.factor" run-resource
+"/library/strings.factor" run-resource
+"/library/hashtables.factor" run-resource
+"/library/namespaces.factor" run-resource
+"/library/list-namespaces.factor" run-resource
+"/library/sbuf.factor" run-resource
+"/library/errors.factor" run-resource
+"/library/continuations.factor" run-resource
+"/library/threads.factor" run-resource
+"/library/io/stream.factor" run-resource
+"/library/io/stdio.factor" run-resource
+"/library/io/io-internals.factor" run-resource
+"/library/io/stream-impl.factor" run-resource
+"/library/vocabularies.factor" run-resource
+"/library/syntax/parse-numbers.factor" run-resource
+"/library/syntax/parser.factor" run-resource
+"/library/syntax/parse-stream.factor" run-resource
 
-IN: init
-DEFER: boot
+! A bootstrapping trick. See doc/bootstrap.txt.
+vocabularies get [
+    "generic" off
+] bind
 
-[
-    boot
-    "Good morning!" print
-    flush
-    "/library/bootstrap/boot-stage2.factor" run-resource
-] boot-quot set
+"/library/generic/generic.factor" run-resource
+"/library/generic/object.factor" run-resource
+"/library/generic/builtin.factor" run-resource
+"/library/generic/predicate.factor" run-resource
+"/library/generic/traits.factor" run-resource
+
+"/library/bootstrap/init.factor" run-resource
+
+! A bootstrapping trick. See doc/bootstrap.txt.
+"/library/syntax/parse-syntax.factor" run-resource
+
+vocabularies get [
+    "!syntax" get "syntax" set
+    "!syntax" off
+
+    "syntax" get [
+        cdr dup word? [
+            "syntax" "vocabulary" set-word-property
+        ] [
+            drop
+        ] ifte
+    ] hash-each
+] bind

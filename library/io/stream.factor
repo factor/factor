@@ -42,11 +42,11 @@ GENERIC: fclose      ( stream -- )
 : fread1 ( stream -- string )
     1 swap fread# dup f-or-"" [ 0 swap str-nth ] unless ;
 
-: fprint ( string stream -- )
-    tuck fwrite "\n" over fwrite fauto-flush ;
-
 : fwrite ( string stream -- )
     f swap fwrite-attr ;
+
+: fprint ( string stream -- )
+    tuck fwrite "\n" over fwrite fauto-flush ;
 
 TRAITS: string-output-stream
 

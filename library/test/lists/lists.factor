@@ -17,10 +17,6 @@ USE: strings
 [ t ] [ 1 [ 1 2 ] contains? >boolean ] unit-test
 [ t ] [ 2 [ 1 2 ] contains? >boolean ] unit-test
 
-[ 1 ] [  -1 [ 1 2 ] nth ] unit-test
-[ 1 ] [  0  [ 1 2 ] nth ] unit-test
-[ 2 ] [  1  [ 1 2 ] nth ] unit-test
-
 [ [ 3 ]     ] [ [ 3 ]         last* ] unit-test
 [ [ 3 ]     ] [ [ 1 2 3 ]     last* ] unit-test
 [ [ 3 | 4 ] ] [ [ 1 2 3 | 4 ] last* ] unit-test

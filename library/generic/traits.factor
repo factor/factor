@@ -68,9 +68,6 @@ SYMBOL: delegate
 : init-traits-map ( word -- )
     <namespace> "traits-map" set-word-property ;
 
-: undefined-method
-    "No applicable method." throw ;
-
 : traits-dispatch ( selector traits -- traits quot )
     #! Look up the method with the traits object on the stack.
     #! Returns the traits to call the method on; either the

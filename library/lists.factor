@@ -56,30 +56,6 @@ USE: vectors
     #! Test if a list contains an element.
     [ over = ] some? >boolean nip ;
 
-: nth ( n list -- list[n] )
-    #! nth element of a proper list.
-    #! Supplying n <= 0 pushes the first element of the list.
-    #! Supplying an argument beyond the end of the list raises
-    #! an error.
-    swap [ cdr ] times car ;
-
-: last* ( list -- last )
-    #! Last cons of a list.
-    dup cdr cons? [ cdr last* ] when ;
-
-: last ( list -- last )
-    #! Last element of a list.
-    last* car ;
-
-: tail ( list -- tail )
-    #! Return the cdr of the last cons cell, or f.
-    dup [ last* cdr ] when ;
-
-: list? ( list -- ? )
-    #! Proper list test. A proper list is either f, or a cons
-    #! cell whose cdr is a proper list.
-    dup cons? [ tail ] when not ;
-
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
 
@@ -109,10 +85,6 @@ USE: vectors
         drop
     ] ifte ; inline
 
-: num-sort ( list -- sorted )
-    #! Sorts the list into ascending numerical order.
-    [ > ] sort ;
-
 ! Redefined below
 DEFER: tree-contains?
 
@@ -140,14 +112,6 @@ DEFER: tree-contains?
     #! list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
-: (each) ( list quot -- list quot )
-    >r uncons r> tuck 2slip ; inline
-
-: each ( list quot -- )
-    #! Push each element of a proper list in turn, and apply a
-    #! quotation with effect ( X -- ) to each element.
-    over [ (each) each ] [ 2drop ] ifte ; inline
-
 : reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
@@ -156,18 +120,6 @@ DEFER: tree-contains?
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
-
-: subset ( list quot -- list )
-    #! Applies a quotation with effect ( X -- ? ) to each
-    #! element of a list; all elements for which the quotation
-    #! returned a value other than f are collected in a new
-    #! list.
-    over [
-        over car >r (each)
-        rot >r subset r> [ r> swons ] [ r> drop ] ifte
-    ] [
-        drop
-    ] ifte ; inline
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
@@ -181,19 +133,6 @@ DEFER: tree-contains?
     dup [
         uncons prune 2dup contains? [ nip ] [ cons ] ifte
     ] when ;
-
-: all? ( list pred -- ? )
-    #! Push if the predicate returns true for each element of
-    #! the list.
-    over [
-        dup >r swap uncons >r swap call [
-            r> r> all?
-        ] [
-            r> drop r> drop f
-        ] ifte
-    ] [
-        2drop t
-    ] ifte ; inline
 
 : all=? ( list -- ? )
     #! Check if all elements of a list are equal.
@@ -240,15 +179,6 @@ DEFER: tree-contains?
 
 : cons-hashcode ( cons -- hash )
     4 (cons-hashcode) ;
-
-: list>vector ( list -- vector )
-    dup length <vector> swap [ over vector-push ] each ;
-
-: stack>list ( vector -- list )
-    [ ] swap [ swons ] vector-each ;
-
-: vector>list ( vector -- list )
-    stack>list reverse ;
 
 : project ( n quot -- list )
     #! Execute the quotation n times, passing the loop counter

@@ -26,8 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: compiler
-USE: errors
 USE: kernel
 USE: namespaces
 USE: parser
@@ -35,7 +33,6 @@ USE: stdio
 USE: streams
 USE: threads
 USE: words
-USE: vectors
 
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
@@ -43,5 +40,11 @@ USE: vectors
     init-threads
     init-stdio
     "HOME" os-env [ "." ] unless* "~" set
-    "/" "/" set
     init-search-path ;
+
+[
+    boot
+    "Good morning!" print
+    flush
+    "/library/bootstrap/boot-stage2.factor" run-resource
+]

@@ -36,8 +36,6 @@ DEFER: plist-test
 ] unit-test
 
 [
-    <namespace> "vocabularies" set
-    
     [ t ] [ \ car "car" [ "lists" ] search = ] unit-test
 
     "test-scope" "scratchpad" create drop

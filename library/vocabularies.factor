@@ -30,6 +30,31 @@ USE: hashtables
 USE: kernel
 USE: lists
 USE: namespaces
+USE: strings
+
+: word ( -- word ) global [ "last-word" get ] bind ;
+: set-word ( word -- ) global [ "last-word" set ] bind ;
+
+: vocabs ( -- list )
+    #! Push a list of vocabularies.
+    vocabularies get hash-keys [ str-lexi> ] sort ;
+
+: vocab ( name -- vocab )
+    #! Get a vocabulary.
+    vocabularies get hash ;
+
+: word-sort ( list -- list )
+    #! Sort a list of words by name.
+    [ swap word-name swap word-name str-lexi> ] sort ;
+
+: words ( vocab -- list )
+    #! Push a list of all words in a vocabulary.
+    #! Filter empty slots.
+    vocab hash-values [ ] subset word-sort ;
+
+: each-word ( quot -- )
+    #! Apply a quotation to each word in the image.
+    vocabs [ words [ swap dup >r call r> ] each ] each drop ;
 
 : (search) ( name vocab -- word )
     vocab dup [ hash ] [ 2drop f ] ifte ;
@@ -55,12 +80,10 @@ USE: namespaces
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
-    global [
-        "vocabularies" get [
-            dup word-vocabulary
-            over word-name
-            2list set-object-path
-        ] bind
+    vocabularies get [
+        dup word-vocabulary
+        over word-name
+        2list set-object-path
     ] bind ;
 
 : create ( name vocab -- word )
@@ -72,3 +95,46 @@ USE: namespaces
 : forget ( word -- )
     #! Remove a word definition.
     dup word-vocabulary vocab [ word-name off ] bind ;
+
+: init-search-path ( -- )
+    ! For files
+    "scratchpad" "file-in" set
+    [ "builtins" "syntax" "scratchpad" ] "file-use" set
+    ! For interactive
+    "scratchpad" "in" set
+    [
+        "user"
+        "arithmetic"
+        "builtins"
+        "compiler"
+        "debugger"
+        "errors"
+        "files"
+        "hashtables"
+        "inference"
+        "inferior"
+        "interpreter"
+        "inspector"
+        "jedit"
+        "kernel"
+        "listener"
+        "lists"
+        "math"
+        "namespaces"
+        "parser"
+        "prettyprint"
+        "processes"
+        "profiler"
+        "stack"
+        "streams"
+        "stdio"
+        "strings"
+        "syntax"
+        "test"
+        "threads"
+        "unparser"
+        "vectors"
+        "vocabularies"
+        "words"
+        "scratchpad"
+    ] "use" set ;

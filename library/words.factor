@@ -34,6 +34,10 @@ USE: math
 USE: namespaces
 USE: strings
 
+BUILTIN: word 1
+
+SYMBOL: vocabularies
+
 : word-property ( word pname -- pvalue )
     swap word-plist assoc ;
 
@@ -47,18 +51,10 @@ PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
 PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 
-: word ( -- word ) global [ "last-word" get ] bind ;
-: set-word ( word -- ) global [ "last-word" set ] bind ;
-
-: (define) ( word primitive parameter -- )
-    #! Define a word in the current Factor instance.
+: define ( word primitive parameter -- )
     pick set-word-parameter
     over set-word-primitive
     f "parsing" set-word-property ;
-
-: define ( word primitive parameter -- )
-    #! The define-hook is set by the image bootstrapping code.
-    "define-hook" get [ call ] [ (define) ] ifte* ;
 
 : define-compound ( word def -- ) 1 swap define ;
 : define-symbol   ( word -- ) 2 over define ;
@@ -68,66 +64,7 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 : stack-effect    ( word -- str ) "stack-effect" word-property ;
 : documentation   ( word -- str ) "documentation" word-property ;
 
-: vocabs ( -- list )
-    #! Push a list of vocabularies.
-    global [ "vocabularies" get hash-keys str-sort ] bind ;
-
-: vocab ( name -- vocab )
-    #! Get a vocabulary.
-    global [ "vocabularies" get hash ] bind ;
-
-: word-sort ( list -- list )
-    #! Sort a list of words by name.
-    [ swap word-name swap word-name str-lexi> ] sort ;
-
-: words ( vocab -- list )
-    #! Push a list of all words in a vocabulary.
-    #! Filter empty slots.
-    vocab hash-values [ ] subset word-sort ;
-
-: each-word ( quot -- )
-    #! Apply a quotation to each word in the image.
-    vocabs [ words [ swap dup >r call r> ] each ] each drop ;
-
-: init-search-path ( -- )
-    ! For files
-    "scratchpad" "file-in" set
-    [ "builtins" "syntax" "scratchpad" ] "file-use" set
-    ! For interactive
-    "scratchpad" "in" set
-    [
-        "user"
-        "arithmetic"
-        "builtins"
-        "compiler"
-        "debugger"
-        "errors"
-        "files"
-        "hashtables"
-        "inference"
-        "inferior"
-        "interpreter"
-        "inspector"
-        "jedit"
-        "kernel"
-        "listener"
-        "lists"
-        "math"
-        "namespaces"
-        "parser"
-        "prettyprint"
-        "processes"
-        "profiler"
-        "stack"
-        "streams"
-        "stdio"
-        "strings"
-        "syntax"
-        "test"
-        "threads"
-        "unparser"
-        "vectors"
-        "vocabularies"
-        "words"
-        "scratchpad"
-    ] "use" set ;
+: word-clone ( word -- word )
+    dup word-primitive
+    over word-parameter
+    rot word-plist <word> ;

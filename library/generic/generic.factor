@@ -55,6 +55,9 @@ USE: vectors
 ! - metaclass: a metaclass is a symbol with a handful of word
 ! properties: "define-method" "builtin-types"
 
+: undefined-method
+    "No applicable method." throw ;
+
 : metaclass ( class -- metaclass )
     "metaclass" word-property ;
 

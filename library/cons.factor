@@ -26,7 +26,14 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
+USE: generic
 USE: kernel
+
+! This file contains vital list-related words that everything
+! else depends on, and is loaded early in bootstrap.
+! lists.factor has everything else.
+
+BUILTIN: cons 2
 
 : swons ( cdr car -- [ car | cdr ] )
     #! Push a new cons cell. If the cdr is f or a proper list,
@@ -50,3 +57,53 @@ USE: kernel
 
 : 2cdr ( cons cons -- car car )
     swap cdr swap cdr ;
+
+: last* ( list -- last )
+    #! Last cons of a list.
+    dup cdr cons? [ cdr last* ] when ;
+
+: last ( list -- last )
+    #! Last element of a list.
+    last* car ;
+
+: tail ( list -- tail )
+    #! Return the cdr of the last cons cell, or f.
+    dup [ last* cdr ] when ;
+
+: list? ( list -- ? )
+    #! Proper list test. A proper list is either f, or a cons
+    #! cell whose cdr is a proper list.
+    dup cons? [ tail ] when not ;
+
+: all? ( list pred -- ? )
+    #! Push if the predicate returns true for each element of
+    #! the list.
+    over [
+        dup >r swap uncons >r swap call [
+            r> r> all?
+        ] [
+            r> drop r> drop f
+        ] ifte
+    ] [
+        2drop t
+    ] ifte ; inline
+
+: (each) ( list quot -- list quot )
+    >r uncons r> tuck 2slip ; inline
+
+: each ( list quot -- )
+    #! Push each element of a proper list in turn, and apply a
+    #! quotation with effect ( X -- ) to each element.
+    over [ (each) each ] [ 2drop ] ifte ; inline
+
+: subset ( list quot -- list )
+    #! Applies a quotation with effect ( X -- ? ) to each
+    #! element of a list; all elements for which the quotation
+    #! returned a value other than f are collected in a new
+    #! list.
+    over [
+        over car >r (each)
+        rot >r subset r> [ r> swons ] [ r> drop ] ifte
+    ] [
+        drop
+    ] ifte ; inline

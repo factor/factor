@@ -13,6 +13,7 @@ USE: prettyprint
 USE: stdio
 USE: strings
 USE: words
+USE: vectors
 USE: unparser
 
 : assert ( t -- )
@@ -62,7 +63,7 @@ USE: unparser
 
 : all-tests ( -- )
     "Running Factor test suite..." print
-    "vocabularies" get [ f "scratchpad" set ] bind
+    vocabularies get [ "scratchpad" off ] bind
     [
         "lists/cons"
         "lists/lists"

@@ -26,10 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: io-internals
+USE: generic
 USE: kernel
 USE: namespaces
 USE: strings
 USE: threads
+
+BUILTIN: port 14
 
 : stdin 0 getenv ;
 : stdout 1 getenv ;

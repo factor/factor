@@ -28,6 +28,7 @@
 IN: alien
 USE: compiler
 USE: errors
+USE: generic
 USE: inference
 USE: interpreter
 USE: kernel
@@ -36,6 +37,9 @@ USE: math
 USE: namespaces
 USE: parser
 USE: words
+
+BUILTIN: dll   15
+BUILTIN: alien 16
 
 : library ( name -- handle )
     "libraries" get [

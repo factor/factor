@@ -32,6 +32,7 @@ USE: parser
 USE: stdio
 
 "Cold boot in progress..." print
+
 [
     "/version.factor"
     "/library/stack.factor"
@@ -41,7 +42,6 @@ USE: stdio
     "/library/generic/builtin.factor"
     "/library/generic/predicate.factor"
     "/library/generic/traits.factor"
-    "/library/types.factor"
     "/library/math/math.factor"
     "/library/cons.factor"
     "/library/combinators.factor"
@@ -117,6 +117,7 @@ USE: stdio
     "/library/compiler/xt.factor"
     "/library/compiler/optimizer.factor"
     "/library/compiler/linearizer.factor"
+    "/library/compiler/simplifier.factor"
     "/library/compiler/generator.factor"
     "/library/compiler/compiler.factor"
     "/library/compiler/alien-types.factor"
@@ -131,7 +132,6 @@ USE: stdio
     "/library/sdl/hsv.factor"
 
     "/library/bootstrap/image.factor"
-    "/library/bootstrap/cross-compiler.factor"
 
     "/library/httpd/url-encoding.factor"
     "/library/httpd/html-tags.factor"
