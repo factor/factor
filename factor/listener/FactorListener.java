@@ -65,16 +65,21 @@ public class FactorListener extends JTextPane
 
 		listenerList = new EventListenerList();
 
+		InputMap inputMap = getInputMap();
+		
 		/* Replace enter to evaluate the input */
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
 			new EnterAction());
 
 		/* Replace backspace to stop backspacing over the prompt */
-		getInputMap().put(KeyStroke.getKeyStroke('\b'),
+		inputMap.put(KeyStroke.getKeyStroke('\b'),
 			new BackspaceAction());
 
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME,0),
+			new HomeAction());
+
 		/* Workaround */
-		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),
 			new DummyAction());
 	} //}}}
 
@@ -320,6 +325,15 @@ public class FactorListener extends JTextPane
 			{
 				e.printStackTrace();
 			}
+		}
+	} //}}}
+
+	//{{{ BackspaceAction class
+	class BackspaceAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			setCaretPosition(limit);
 		}
 	} //}}}
 
