@@ -105,15 +105,6 @@ USE: vocabularies
     [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
   ] </table> ;
 
-: with-simple-html-output ( quot -- )
-  #! Run the quotation inside an HTML stream wrapped
-  #! around stdio.
-  <pre> [
-    "stdio" get <html-stream> [
-      call
-    ] with-stream
-  ] </pre> ;
-
 : html-for-word-source ( word-string -- )
   #! Return an html fragment dispaying the source
   #! of the given word.

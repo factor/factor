@@ -40,6 +40,7 @@ USE: html
 USE: kernel
 USE: logic
 USE: cont-html
+USE: logging
 
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
@@ -268,7 +269,7 @@ DEFER: show
   #! id and calls it with the POST data as an alist on the top
   #! of the stack.
   [ 
-    read-post-request post-request>namespace swap resume-continuation 
+    read-post-request dup log post-request>namespace swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 

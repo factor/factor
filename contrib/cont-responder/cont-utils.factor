@@ -29,6 +29,8 @@ USE: cont-responder
 USE: lists
 USE: stdio
 USE: stack
+USE: namespaces
+USE: html
 
 : simple-page ( title quot -- )
   #! Call the quotation, with all output going to the
@@ -66,3 +68,12 @@ USE: stack
 : button ( label -- )
   #! Output an HTML submit button with the given label.
   <input type= "submit" value= input/> ;
+
+: with-simple-html-output ( quot -- )
+  #! Run the quotation inside an HTML stream wrapped
+  #! around stdio.
+  <pre> [
+    "stdio" get <html-stream> [
+      call
+    ] with-stream
+  ] </pre> ;
