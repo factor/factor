@@ -197,12 +197,14 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized FactorWord makeWord(Cons info)
 	{
-		String vocabulary = (String)info.car;
-		String name = (String)info.next().car;
+		FactorWord definer = (FactorWord)info.car;
+		String vocabulary = (String)info.next().car;
+		String name = (String)info.next().next().car;
 		FactorWord w = super.searchVocabulary(new Cons(vocabulary,null),name);
 		if(w == null)
 			w = new FactorWord(this,vocabulary,name);
-		w.stackEffect = (String)info.next().next().car;
+		w.stackEffect = (String)info.next().next().next().car;
+		w.setDefiner(definer);
 		return w;
 	} //}}}
 
@@ -284,7 +286,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			try
 			{
 				/* don't care about response */
-				sendEval("0 exit*");
+				sendEval("0 exit");
 			}
 			catch(Exception e)
 			{

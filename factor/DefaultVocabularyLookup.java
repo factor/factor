@@ -134,6 +134,8 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		beginBuiltin.parsing = new ClassDefinition(beginBuiltin);
 		FactorWord tuple = define("syntax","TUPLE:");
 		tuple.parsing = new Tuple(tuple);
+		FactorWord primitive = define("syntax","PRIMITIVE:");
+		primitive.parsing = new Primitive(primitive);
 	} //}}}
 
 	//{{{ getVocabulary() method

@@ -81,11 +81,10 @@ namespaces parser strings words vectors math math-internals ;
      ] ifte ;
 
 ! Defining generic words
-: define-generic ( combination definer word -- )
+: define-generic ( combination word -- )
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    [ swap "definer" set-word-prop ] keep
     [ swap "combination" set-word-prop ] keep
     dup init-methods
     dup <vtable> make-generic ;
@@ -95,6 +94,7 @@ namespaces parser strings words vectors math math-internals ;
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-prop [ single-combination ] = ;
+M: generic definer drop \ GENERIC: ;
 
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
@@ -103,6 +103,7 @@ PREDICATE: compound generic ( word -- ? )
 
 PREDICATE: compound 2generic ( word -- ? )
     "combination" word-prop [ arithmetic-combination ] = ;
+M: 2generic definer drop \ 2GENERIC: ;
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: classes

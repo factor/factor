@@ -72,8 +72,8 @@ C: jedit-stream ( stream -- stream )
             "name"
             "stack-effect"
         ] [
-            word-prop
-        ] map-with
+            dupd word-prop
+        ] map >r definer r> cons
     ] when ;
 
 : completions ( str anywhere vocabs -- list )

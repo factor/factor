@@ -456,6 +456,18 @@ However, defining \texttt{dip} to be inlined will work:
 \textbf{[ [ number number number ] [ number ] ]}
 \end{alltt}
 
+You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
+
+\begin{alltt}
+\textbf{ok} [ draw-shape ] infer>test.
+\textbf{[ [ [ object ] [  ] ] ]
+[ [ draw-shape ] infer ]
+unit-test}
+\end{alltt}
+
+You can then copy and paste this snippet into a test script, and run the test script after
+making changes to the word to ensure its stack effect signature has not changed.
+
 \section{Optimization}
 
 While both the Factor interpreter and compiler are relatively slow at this stage, there

@@ -1,23 +1,33 @@
-+ plugin:
-
 - word preview for remote words
-- faster completion
-- file properties for constructors, accessors/mutators, predicates
 - set 'end' of artifacts/assets accurately
+- faster layout
+- faster repaint
+- auto-updating inspector
+- linux/ppc and mac os x ffi
+- stream server can hang because of exception handler limitations
+- better i/o scheduler
+- add a socket timeout
+- unix ffi i/o
+- parse errors: in parser not debugger
+- make-image: use a list not a vector
+- powerpc has weird callstack residue
+- make see work with union, builtin, predicate
+- make-vector and make-string should not need a reverse step
+- automatically recompiling defs
+- faster completion
+- console with presentations
+- browser
+- method doc strings
 
 + ui:
 
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
-- auto-updating inspector
 - fix up the min thumb size hack
-- faster layout
-- faster repaint
 - frame gap
 
 + compiler/ffi:
 
-- mac os x ffi
 - [ [ dup call ] dup call ] infer hangs
 - ffi unicode strings: null char security hole
 - utf16 string boxing
@@ -31,6 +41,7 @@
 - dataflow optimizer needs eq not =
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
+- re-introduce #target-label => #target optimization
 - value type structs
 - out parameters
 - bitfields in C structs
@@ -38,28 +49,16 @@
 - struct membres that are not *
 - FFI float types
 
-+ i/o:
-
-- stream server can hang because of exception handler limitations
-- better i/o scheduler
-- nicer way to combine two paths
-- add a socket timeout
-- unix ffi i/o
-
 + kernel:
 
-- parse errors: in parser not debugger
-- make-image: use a list not a vector
-- powerpc has weird callstack residue
+- condition system with restarts
+- nicer way to combine two paths
 - vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
 - code gc
 - generational gc
-- make see work with union, builtin, predicate
 - doc comments of generics
 - proper ordering for classes
-- make-vector and make-string should not need a reverse step
-- automatically recompiling defs
 
 + slow data structures:
 

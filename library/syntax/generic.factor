@@ -8,16 +8,14 @@ USING: syntax generic kernel lists namespaces parser words ;
 : GENERIC:
     #! GENERIC: bar creates a generic word bar. Add methods to
     #! the generic word using M:.
-    [ single-combination ]
-    \ GENERIC: CREATE define-generic ; parsing
+    [ single-combination ] CREATE define-generic ; parsing
 
 : 2GENERIC:
     #! 2GENERIC: bar creates a generic word bar. Add methods to
     #! the generic word using M:. 2GENERIC words dispatch on
     #! arithmetic types and should not be used for non-numerical
     #! types.
-    [ arithmetic-combination ]
-    \ 2GENERIC: CREATE define-generic ; parsing
+    [ arithmetic-combination ] CREATE define-generic ; parsing
 
 : BUILTIN:
     #! Syntax: BUILTIN: <class> <type#> <slots> ;

@@ -115,10 +115,9 @@ global [ string-mode off ] bind
     dup "col" get "col"  set-word-prop
     file get "file" set-word-prop ;
 
-: create-in "in" get create ;
+: create-in "in" get create dup save-location ;
 
-: CREATE ( -- word )
-    scan create-in dup save-location ;
+: CREATE ( -- word ) scan create-in ;
 
 : escape ( ch -- esc )
     [

@@ -26,11 +26,6 @@ vocabularies get [
     "syntax" set
 ] bind
 
-! We cannot simply copy the delegate generic with all its
-! methods. Rather we must create a new empty generic.
-"delegate" [ "generic" ] search forget
-[ single-combination ] \ GENERIC: "delegate" "generic" create define-generic
-
 2 [
     [ "execute" "words"                       " word -- " ]
     [ "call" "kernel"                         [ [ general-list ] [ ] ] ]

@@ -11,7 +11,7 @@ strings words ;
     #! Just like:
     #! GENERIC: generic
     #! M: class generic def ;
-    over >r [ single-combination ] \ GENERIC: r>
+    over [ single-combination ] swap
     define-generic define-method ;
 
 : define-slot-word ( class slot word quot -- )

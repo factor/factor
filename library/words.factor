@@ -35,10 +35,20 @@ SYMBOL: vocabularies
 : word-prop ( word name -- value ) swap word-props hash ;
 : set-word-prop ( word value name -- ) rot word-props set-hash ;
 
+GENERIC: definer ( word -- word )
+#! Return the parsing word that defined this word.
+
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
+M: compound definer drop \ : ;
+
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
+M: primitive definer drop \ PRIMITIVE: ;
+
 PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
+M: symbol definer drop \ SYMBOL: ;
+
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
+M: undefined definer drop \ DEFER: ;
 
 : define ( word primitive parameter -- )
     pick set-word-def
@@ -50,7 +60,6 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 : define-compound ( word def -- )
     #! If the word is a generic word, clear the properties 
     #! involved so that 'see' can work properly.
-    over f "definer" set-word-prop
     over f "methods" set-word-prop
     over f "combination" set-word-prop
     (define-compound) ;

@@ -77,6 +77,10 @@ BUILTIN: f 9 ;  : f f swons ; parsing
     scan-word unit swons  \ car swons ; parsing
 
 ! Vocabularies
+: PRIMITIVE:
+    #! This is just for show. All flash no substance.
+    "You cannot define primitives in Factor" throw ; parsing
+
 : DEFER:
     #! Create a word with no definition. Used for mutually
     #! recursive words.
