@@ -41,13 +41,3 @@ USE: stack
     restack
         call
     unstack ; interpret-only
-
-IN: lists
-DEFER: each
-
-: map ( [ items ] [ code ] -- [ mapping ] )
-    #! Applies the code to each item, returns a list that
-    #! contains the result of each application.
-    #!
-    #! This combinator will not compile.
-    unit cons restack each unstack ; inline interpret-only

@@ -1,3 +1,12 @@
+- plugin should not exit jEdit on fatal errors
+- auto insert USE:
+- add a socket timeout
+- read# and eof
+- don't allow multiple reads on the same port
+- multiple tasks should be able to write to the same port
+- prettyprinting an empty vector
+- jvm factor -- still supporting httpd?
+
 + docs:
 
 - unparse examples
@@ -5,7 +14,7 @@
 - recursion -vs- iteration in vectors chapter
 - objects chapter covering namespaces, hashtables, equality and
   object identity.
- =
+
 + tests:
 
 - java factor: equal numbers have non-equal hashcodes!
@@ -20,8 +29,6 @@
 - maple-like: press enter at old commands to evaluate there
 - make inferior.factor nicer to use
 - input style after clicking link
-- plugin should not exit jEdit on fatal errors
-- auto insert USE:
 - plugin not unloaded
 - listener backspace overzealous
 - completion in the listener
@@ -30,17 +37,13 @@
 
 + native:
 
-- add a socket timeout
 - read1
 - telnetd and httpd should use multitasking
-- read# and eof
 - sbuf-hashcode
 - vector-hashcode
 - clarify suspend -vs- yield - toplevel
 - irc: stack underflow?
 - ignore SIGPIPE
-- don't allow multiple reads on the same port
-- multiple tasks should be able to write to the same port
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - better i/o scheduler
@@ -61,14 +64,12 @@
 
 + misc:
 
-- ifte* and keep combinators
+- ifte* combinator
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
 - some way to run httpd from command line
-- prettyprinting an empty vector
 - rethink strhead/strtail&co
 - namespace clone drops static var bindings
-- ditch map
 - ditch expand
 - set-object-path
 - more readable traces

@@ -85,14 +85,14 @@ USE: words
 : effect>list ( effect -- list )
     [ "inD" "outD" "inR" "outR" ]
     [ dupd "factor.compiler.StackEffect" swap jvar-get ]
-    inject nip ;
+    map nip ;
 
 : effect>typelist ( effect -- list )
     [ "inDtypes" "outDtypes" "inRtypes" "outRtypes" ]
     [
         dupd "factor.compiler.StackEffect" swap jvar-get
-        array>list [ class-name ] inject
-    ] inject nip ;
+        array>list [ class-name ] map
+    ] map nip ;
 
 : balance ( code -- effect )
     #! Push stack effect of a quotation.

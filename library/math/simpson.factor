@@ -51,10 +51,10 @@ USE: stack
     #! The value n must be odd.
     pred >r over - r> dup succ count [
         >r 3dup r> swap / * +
-    ] inject >r 3drop r> ;
+    ] map >r 3drop r> ;
 
 : y-values ( lower upper n quot -- values )
-    >r x-values r> inject ;
+    >r x-values r> map ;
 
 : (simpson) ( lower upper n quot -- value )
     over multipliers >r y-values r> *|+ ;

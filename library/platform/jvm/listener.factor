@@ -81,7 +81,7 @@ USE: unparser
     uncons >r " " swap cat3 r> cons ;
 
 : <actions-menu> ( path -- alist )
-    unparse actions [ dupd <action-menu-item> ] inject nip ;
+    unparse actions [ dupd <action-menu-item> ] map nip ;
 
 : underline-attribute ( attribute-set -- )
     t "Underline" swing-attribute+ ;

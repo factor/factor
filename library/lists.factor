@@ -256,7 +256,7 @@ DEFER: tree-contains?
         2drop
     ] ifte ; inline interpret-only
 
-: inject ( list code -- list )
+: map ( list code -- list )
     #! Applies the code to each item, returns a list that
     #! contains the result of each application.
     #!
@@ -298,7 +298,7 @@ DEFER: tree-contains?
     inline interpret-only
 
 : substitute ( new old list -- list )
-    [ 2dup = [ drop over ] when ] inject nip nip ;
+    [ 2dup = [ drop over ] when ] map nip nip ;
 
 : (head) ( accum list n -- last list )
     dup 1 = [ drop ] [ pred >r copy-cons r> (head) ] ifte ;

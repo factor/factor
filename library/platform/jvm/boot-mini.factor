@@ -52,8 +52,8 @@ USE: parser
 "/library/platform/jvm/errors.factor"       run-resource ! errors
 "/library/platform/jvm/namespaces.factor"   run-resource ! namespaces
 "/library/namespaces.factor"                run-resource ! namespaces
-"/library/sbuf.factor"                      run-resource ! strings
 "/library/list-namespaces.factor"           run-resource ! namespaces
+"/library/sbuf.factor"                      run-resource ! strings
 "/library/math/namespace-math.factor"       run-resource ! arithmetic
 "/library/continuations.factor"             run-resource ! continuations
 "/library/errors.factor"                    run-resource ! errors

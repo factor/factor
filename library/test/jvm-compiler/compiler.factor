@@ -70,14 +70,14 @@ USE: words
 
 ! We had a problem with JVM stack overflow...
 
-: null-inject [ ] inject ; word must-compile
+: null-map [ ] map ; word must-compile
 
 ! And a problem with stack normalization after ifte if both
 ! datastack and callstack were in use...
 
-: inject-test [ dup [ ] when ] inject ; word must-compile
+: map-test [ dup [ ] when ] map ; word must-compile
 
-[ [ 1 2 3 ] ] [ [ 1 2 3 ] ] [ inject-test ] test-word
+[ [ 1 2 3 ] ] [ [ 1 2 3 ] ] [ map-test ] test-word
 
 : nested-test-iter f [ nested-test-iter ] when ;
 : nested-test f nested-test-iter drop ; word must-compile

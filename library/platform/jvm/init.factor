@@ -29,7 +29,6 @@ IN: init
 USE: combinators
 USE: compiler
 USE: continuations
-USE: httpd-responder
 USE: kernel
 USE: lists
 USE: interpreter
@@ -73,7 +72,6 @@ USE: words
     init-scratchpad
     init-styles
     init-vocab-styles
-    default-responders
     "args" get parse-command-line
     run-user-init
 

@@ -82,8 +82,8 @@ DEFER: >n
     [ swap car swap car str-lexi> ] sort ;
 
 : vars-values ( -- list ) namespace hash>alist alist-sort ;
-: vars ( -- list ) vars-values [ car ] inject ;
-: values ( -- list ) vars-values [ cdr ] inject ;
+: vars ( -- list ) vars-values [ car ] map ;
+: values ( -- list ) vars-values [ cdr ] map ;
 
 ! We don't have bound objects in native Factor.
 : namespace? hashtable? ;
