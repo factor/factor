@@ -90,7 +90,7 @@ DEFER: tree-contains?
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
-: map-with ( obj list quot -- )
+: map-with ( obj list quot -- list )
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( obj elt -- obj ) to each element into a new list.
