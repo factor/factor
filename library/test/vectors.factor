@@ -56,14 +56,6 @@ USE: namespaces
 [ 4 [ CHAR: a fill ] vector-project ]
 unit-test
 
-[ { 6 8 10 12 } ]
-[ { 1 2 3 4 } { 5 6 7 8 } vector-zip [ uncons + ] vector-map ]
-unit-test
-
-[ { [[ 1 5 ]] [[ 2 6 ]] [[ 3 7 ]] [[ 4 8 ]] } ]
-[ { 1 2 3 4 } { 5 6 7 8 } vector-zip ]
-unit-test
-
 [ [ ] ] [ 0 { } vector-tail ] unit-test
 [ [ ] ] [ 2 { 1 2 } vector-tail ] unit-test
 [ [ 3 4 ] ] [ 2 { 1 2 3 4 } vector-tail ] unit-test

@@ -48,7 +48,12 @@ complement [
 
 complement [
     ( generic vtable definition class -- )
-    drop num-types [ >r 3dup r> add-method ] times* 3drop
+    drop num-types [
+        [
+            >r 3dup r> builtin-type
+            dup [ add-method ] [ 2drop 2drop ] ifte
+        ] keep
+    ] repeat 3drop
 ] "add-method" set-word-property
 
 complement 90 "priority" set-word-property

@@ -151,3 +151,13 @@ DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;
 [ bah ] [ fixnum alien class-or ] unit-test
+
+DEFER: complement-test
+FORGET: complement-test
+GENERIC: complement-test
+
+M: f         complement-test drop "f" ;
+M: general-t complement-test drop "general-t" ;
+
+[ "general-t" ] [ 5 complement-test ] unit-test
+[ "f" ] [ f complement-test ] unit-test

@@ -51,7 +51,6 @@ USE: hashtables
     "/library/math/float.factor" parse-resource append,
     "/library/math/complex.factor" parse-resource append,
     "/library/words.factor" parse-resource append,
-    "/library/math/math-combinators.factor" parse-resource append,
     "/library/lists.factor" parse-resource append,
     "/library/vectors.factor" parse-resource append,
     "/library/strings.factor" parse-resource append,

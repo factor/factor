@@ -74,15 +74,8 @@ USE: prettyprint
 ] "infer" set-word-property
 
 : type-value-map ( value -- )
-    [
-        num-types [
-            dup builtin-type dup [
-                pick swons cons ,
-            ] [
-                2drop
-            ] ifte
-        ] times*
-    ] make-list nip ;
+    num-types [ dup builtin-type pick swons cons ] project
+    [ cdr cdr ] subset nip ;
 
 \ type [
     [ object ] ensure-d

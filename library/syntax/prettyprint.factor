@@ -186,7 +186,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 : {.} ( vector -- )
     #! Unparse each element on its own line.
-    stack>list [ . ] each ;
+    vector>list reverse [ . ] each ;
 
 : .s datastack  {.} ;
 : .r callstack  {.} ;

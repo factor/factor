@@ -11,7 +11,7 @@ USE: vectors
 
 : silly-key/value dup dup * swap ;
 
-1000 [ silly-key/value "testhash" get set-hash ] times*
+1000 [ [ silly-key/value "testhash" get set-hash ] keep ] repeat
 
 [ f ]
 [ 1000 count [ silly-key/value "testhash" get hash = not ] subset ]
@@ -40,11 +40,11 @@ unit-test
 16 <hashtable> "testhash" set
 
 t #{ 2 3 }# "testhash" get set-hash
-f 100 fac "testhash" get set-hash
+f 100000000000000000000000000 "testhash" get set-hash
 { } { [ { } ] } "testhash" get set-hash
 
 [ t ] [ #{ 2 3 }# "testhash" get hash ] unit-test
-[ f ] [ 100 fac "testhash" get hash* cdr ] unit-test
+[ f ] [ 100000000000000000000000000 "testhash" get hash* cdr ] unit-test
 [ { } ] [ { [ { } ] } vector-clone "testhash" get hash* cdr ] unit-test
 
 [

@@ -54,26 +54,28 @@ SYMBOL: surface
     #! Set up SDL graphics and call the quotation.
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
-: rgba ( r g b a -- n )
+: rgb ( r g b a -- n )
+    255
     swap 8 shift bitor
     swap 16 shift bitor
     swap 24 shift bitor ;
 
-: black 0 0 0 255 rgba ;
-: white 255 255 255 255 rgba ;
-: red 255 0 0 255 rgba ;
-: green 0 255 0 255 rgba ;
-: blue 0 0 255 255 rgba ;
+: black 0 0 0 ;
+: white 255 255 255 ;
+: red 255 0 0 ;
+: green 0 255 0 ;
+: blue 0 0 255 ;
 
 : clear-surface ( color -- )
     >r surface get 0 0 width get height get r> boxColor ;
 
-: pixel-step ( quot #{ x y }# -- )
-    tuck >r call >r surface get r> r> >rect rot pixelColor ;
-    inline
-
-: with-pixels ( w h quot -- )
-    -rot rect> [ over >r pixel-step r> ] 2times* drop ; inline
+: with-pixels ( quot -- )
+    width get [
+        height get [
+            [ rot dup slip swap surface get swap ] 2keep
+            [ rot pixelColor ] 2keep
+        ] repeat
+    ] repeat drop ; inline
 
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it

@@ -105,22 +105,3 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : alist>hash ( alist -- hash )
     37 <hashtable> swap [ unswons pick set-hash ] each ;
-
-! In case I break hashing:
-
-! : hash* ( key table -- value )
-!     hash>alist assoc* ;
-! 
-! : set-hash ( value key table -- )
-!     dup vector-length [
-!         ( value key table index )
-!         >r 3dup r>
-!         ( value key table value key table index )
-!         [
-!             swap vector-nth
-!             ( value key table value key alist )
-!             set-assoc
-!         ] keep
-!         ( value key table new-assoc index )
-!         pick set-vector-nth
-!     ] times* 3drop ;

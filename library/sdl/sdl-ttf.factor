@@ -81,11 +81,14 @@ USE: alien
 : TTF_RenderText_Solid ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "char*" "int" ] alien-invoke ;
 
+: TTF_RenderText_Shaded ( font text fg bg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderText_Shaded" [ "void*" "char*" "int" "int" ] alien-invoke ;
+
 : TTF_RenderGlyph_Shaded ( font text fg bg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Shaded" [ "void*" "ushort" "int" "int" ] alien-invoke ;
 
 : TTF_RenderText_Blended ( font text fg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Blended" [ "void*" "ushort" "int" "int" ] alien-invoke ;
+    "surface*" "sdl-ttf" "TTF_RenderText_Blended" [ "void*" "ushort" "int" ] alien-invoke ;
 
 : TTF_RenderGlyph_Blended ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Blended" [ "void*" "ushort" "int" ] alien-invoke ;

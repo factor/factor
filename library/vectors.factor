@@ -82,12 +82,20 @@ BUILTIN: vector 11
 : >pop> ( stack -- stack )
     dup vector-pop drop ;
 
-: vector-each ( vector code -- )
-    #! Execute the code, with each element of the vector
+: (vector>list) ( i vec -- list )
+    2dup vector-length >= [
+        2drop [ ]
+    ] [
+        2dup vector-nth >r >r 1 + r> (vector>list) r> swons
+    ] ifte ;
+
+: vector>list ( str -- list )
+    0 swap (vector>list) ;
+
+: vector-each ( vector quotation -- )
+    #! Execute the quotation with each element of the vector
     #! pushed onto the stack.
-    over vector-length [
-        -rot 2dup >r >r >r vector-nth r> call r> r>
-    ] times* 2drop ; inline
+    >r vector>list r> each ; inline
 
 : vector-map ( vector code -- vector )
     #! Applies code to each element of the vector, return a new
@@ -113,33 +121,18 @@ BUILTIN: vector 11
     [ rot vector-nappend ] keep
     [ swap vector-nappend ] keep ;
 
-: vector-project ( n quot -- accum )
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
+
+: vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter
     #! the quotation as it ranges from 0..n-1. Collect results
     #! in a new vector.
-    over <vector> rot [
-        -rot 2dup >r >r slip vector-push r> r>
-    ] times* nip ; inline
-
-: vector-zip ( v1 v2 -- v )
-    #! Make a new vector with each pair of elements from the
-    #! first two in a pair.
-    over vector-length over vector-length min [
-        pick pick >r over >r vector-nth r> r> vector-nth cons
-    ] vector-project 2nip ;
+    project list>vector ; inline
 
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
     [ ] vector-map ;
-
-: list>vector ( list -- vector )
-    dup length <vector> swap [ over vector-push ] each ;
-
-: stack>list ( vector -- list )
-    [ ] swap [ swons ] vector-each ;
-
-: vector>list ( vector -- list )
-    stack>list reverse ;
 
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
@@ -153,7 +146,7 @@ M: vector = ( obj vec -- ? )
     ] [
         over vector? [
             2dup vector-length= [
-                swap stack>list swap stack>list =
+                swap vector>list swap vector>list =
             ] [
                 2drop f
             ] ifte
@@ -163,9 +156,11 @@ M: vector = ( obj vec -- ? )
     ] ifte ;
 
 M: vector hashcode ( vec -- n )
-    0 swap dup vector-length 4 min [
-        over vector-nth hashcode rot bitxor swap
-    ] times* drop ;
+    dup vector-length 0 number= [
+        drop 0
+    ] [
+        0 swap vector-nth hashcode
+    ] ifte ;
 
 : vector-tail ( n vector -- list )
     #! Return a new list with all elements from the nth

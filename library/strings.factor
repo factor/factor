@@ -134,12 +134,20 @@ UNION: text string integer ;
         rot str-head swap
     ] ifte ;
 
-: str-each ( str [ code ] -- )
-    #! Execute the code, with each character of the string
+: (str>list) ( i str -- list )
+    2dup str-length >= [
+        2drop [ ]
+    ] [
+        2dup str-nth >r >r 1 + r> (str>list) r> swons
+    ] ifte ;
+
+: str>list ( str -- list )
+    0 swap (str>list) ;
+
+: str-each ( str quot -- )
+    #! Execute the quotation with each character of the string
     #! pushed onto the stack.
-    over str-length [
-        -rot 2dup >r >r >r str-nth r> call r> r>
-    ] times* 2drop ; inline
+    >r str>list r> each ; inline
 
 PREDICATE: integer blank     " \t\n\r" str-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;

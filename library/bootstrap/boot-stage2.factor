@@ -57,7 +57,6 @@ USE: namespaces
     "/library/math/float.factor"
     "/library/math/complex.factor"
     "/library/words.factor"
-    "/library/math/math-combinators.factor"
     "/library/lists.factor"
     "/library/vectors.factor"
     "/library/strings.factor"

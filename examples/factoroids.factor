@@ -129,7 +129,7 @@ M: ship tick ( actor -- ? ) dup [ move ] bind active? ;
 C: ship ( -- ship )
     [
         width get 2 /i  height get 50 - rect> position set
-        white color set
+        white rgb color set
         10 radius set
         0 velocity set
         active on
@@ -154,7 +154,7 @@ C: plasma ( actor dy -- plasma )
     [
         velocity set
         actor-xy
-        blue color set
+        blue rgb color set
         10 len set
         5 radius set
         active on
@@ -195,7 +195,7 @@ SYMBOL: stars
 : random-y 0 height get random-int ;
 : random-position random-x random-y rect> ;
 : random-byte 0 255 random-int ;
-: random-color random-byte random-byte random-byte 255 rgba ;
+: random-color random-byte random-byte random-byte rgb ;
 : random-velocity 0 10 20 random-int 10 /f rect> ;
 
 : random-star ( -- star )
@@ -254,7 +254,7 @@ C: enemy ;
 : spawn-enemy ( -- )
     <enemy> [
         random-x 10 rect> position set
-        red color set
+        red rgb color set
         0 wiggle-x set
         0 velocity set
         10 radius set
@@ -316,7 +316,7 @@ SYMBOL: event
 
 : render ( -- )
     #! Draw the scene.
-    [ black clear-surface draw-stars draw-actors ] with-surface ;
+    [ black rgb clear-surface draw-stars draw-actors ] with-surface ;
 
 : advance ( -- )
     #! Advance game state by one frame.

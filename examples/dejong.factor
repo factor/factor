@@ -48,7 +48,7 @@ SYMBOL: d
 
 : draw-dejong ( x0 y0 iterations -- )
     [
-        iterate-dejong 2dup scale-dejong rect> white pixel
+        iterate-dejong 2dup scale-dejong rect> white rgb pixel
     ] times 2drop ; compiled
 
 : dejong ( -- )

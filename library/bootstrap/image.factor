@@ -285,8 +285,8 @@ M: vector ' ( vector -- pointer )
     ! Now make a rehashing boot quotation
     dup hash>alist [
         >r dup vector-length [
-            f swap pick set-vector-nth
-        ] times* r>
+            [ f swap pick set-vector-nth ] keep
+        ] repeat r>
         [ unswons rot set-hash ] each-with
     ] cons cons
     boot-quot [ append ] change ;

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -40,6 +40,7 @@ USE: parser
 USE: words
 USE: hashtables
 USE: strings
+USE: unparser
 
 ! Command line parameters specify libraries to load.
 !
@@ -67,6 +68,15 @@ M: alien = ( obj obj -- ? )
     ] [
         2drop f
     ] ifte ;
+
+M: alien unparse ( obj -- str )
+    [
+        "#<" ,
+        dup local-alien? "local-alien" "alien" ? ,
+        " @ " ,
+        alien-address unparse ,
+        ">" ,
+    ] make-string ;
 
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;

@@ -47,8 +47,8 @@ object [
 object [
     ( generic vtable definition class -- )
     drop over vector-length [
-        pick pick -rot set-vector-nth
-    ] times* 3drop
+        3dup rot set-vector-nth
+    ] repeat 3drop
 ] "add-method" set-word-property
 
 object [ drop t ] "predicate" set-word-property

@@ -105,9 +105,9 @@ SYMBOL: input-line
     total-lines fix-first-line first-line set ;
 
 ! Rendering
-: background white ;
-: foreground black ;
-: cursor     red   ;
+: background white rgb ;
+: foreground black rgb ;
+: cursor     red   rgb ;
 
 : next-line ( -- )
     0 x set  line-height y [ + ] change ;
@@ -121,10 +121,10 @@ SYMBOL: input-line
 
 : draw-lines ( -- )
     visible-lines available-lines min [
-        first-line get +
+        dup first-line get +
         lines get vector-nth draw-line
         next-line
-    ] times* ;
+    ] repeat ;
 
 : blink-interval 500 ;
 
@@ -158,7 +158,7 @@ SYMBOL: input-line
     scrollbar-top
     width get
     scrollbar-bottom
-    black boxColor ;
+    black rgb boxColor ;
 
 : draw-console ( -- )
     [

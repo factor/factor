@@ -161,15 +161,14 @@ M: cons = ( obj cons -- ? )
 
 M: cons hashcode ( cons -- hash ) car hashcode ;
 
-: project ( n quot -- list )
-    #! Execute the quotation n times, passing the loop counter
-    #! the quotation as it ranges from 0..n-1. Collect results
-    #! in a new list.
-    [ ] rot [ -rot over >r >r call r> cons r> swap ] times*
-    nip reverse ; inline
+: (count) ( i n -- list )
+    2dup >= [ 2drop [ ] ] [ >r dup 1 + r> (count) cons ] ifte ;
 
 : count ( n -- [ 0 ... n-1 ] )
-    [ ] project ;
+    0 swap (count) ;
+
+: project ( n quot -- list )
+    >r count r> map ; inline
 
 : head ( list n -- list )
     #! Return the first n elements of the list.

@@ -32,7 +32,7 @@ USE: test
 
 : scale 255 * >fixnum ;
 
-: scale-rgba ( r g b -- n )
+: scale-rgb ( r g b -- n )
     scale
     swap scale 8 shift bitor
     swap scale 16 shift bitor
@@ -44,9 +44,9 @@ USE: test
 : <color-map> ( nb-cols -- map )
     [
         dup [
-            360 * over 1 + / 360 / sat val
-            hsv>rgb 1.0 scale-rgba ,
-        ] times*
+            dup 360 * over 1 + / 360 / sat val
+            hsv>rgb 1.0 scale-rgb ,
+        ] repeat
     ] make-list list>vector nip ;
 
 : absq >rect swap sq swap sq + ; inline
@@ -73,14 +73,14 @@ SYMBOL: center
     nb-iter get max-color min <color-map> cols set ;
 
 : c ( #{ i j }# -- c )
-    >rect >r
+    >r
     x-inc get * center get real x-inc get width get 2 / * - + >float
     r>
     y-inc get * center get imaginary y-inc get height get 2 / * - + >float
     rect> ;
 
 : render ( -- )
-    width get height get [
+    [
         c 0 nb-iter get iter dup 0 = [
             drop 0
         ] [

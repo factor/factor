@@ -8,7 +8,7 @@ USE: test
     [ ] times ; compiled
 
 : empty-loop-2 ( n -- )
-    [ drop ] times* ; compiled
+    [ ] repeat ; compiled
 
 [ ] [ 5000000 empty-loop-1 ] unit-test
 [ ] [ 5000000 empty-loop-2 ] unit-test
