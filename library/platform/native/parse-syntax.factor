@@ -157,7 +157,7 @@ USE: unparser
 ! Complex literal
 : #{
     #! Read #{ real imaginary #}
-    scan str>number scan str>number rect> parsed "}" expect ;
+    scan str>number scan str>number rect> "}" expect parsed ;
 
 ! Comments
 : doc-comment-here? ( parsed -- ? )
