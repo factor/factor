@@ -37,21 +37,18 @@ USE: math
 USE: namespaces
 USE: parser
 USE: words
+USE: hashtables
 
 BUILTIN: dll   15
 BUILTIN: alien 16
 
-: library ( name -- handle )
-    "libraries" get [
-        dup get dup dll? [
-            nip
-        ] [
-            dlopen tuck put
-        ] ifte
-    ] bind ;
+: (library) ( name -- object )
+    "libraries" get hash ;
 
-: alien-function ( function library -- )
-    [ library dlsym ] [ dlsym-self ] ifte* ;
+: load-dll ( library -- dll )
+    "dll" get dup [
+        drop "name" get dlopen dup "dll" set
+    ] unless ;
 
 SYMBOL: #c-invoke ( C ABI -- Unix and most Windows libs )
 SYMBOL: #cleanup ( unwind stack by parameter )
@@ -63,16 +60,26 @@ SYMBOL: #box ( move EAX to datastack )
 
 SYMBOL: #std-invoke ( stdcall ABI -- Win32 )
 
+: abi ( -- abi )
+    "abi" get "stdcall" = #std-invoke #c-invoke ? ;
+
+: alien-function ( function library -- address abi )
+    [
+        (library) [ load-dll dlsym abi ] bind
+    ] [
+        dlsym-self #c-invoke
+    ] ifte* ;
+
 ! These are set in the #c-invoke and #std-invoke dataflow IR
 ! nodes.
 SYMBOL: alien-returns
 SYMBOL: alien-parameters
 
-: infer-alien ( op -- )
-    >r 4 ensure-d
+: infer-alien ( -- )
+    4 ensure-d
     dataflow-drop, pop-d car
     dataflow-drop, pop-d car
-    dataflow-drop, pop-d car alien-function
+    dataflow-drop, pop-d car alien-function >r
     dataflow-drop, pop-d car swap
     r> dataflow, [
         alien-returns set
@@ -109,40 +116,20 @@ SYMBOL: alien-parameters
     r> swap [ #cleanup swons , ] [ drop ] ifte
     linearize-returns ;
 
-: c-invoke ( ... returns library function parameters -- ... )
-    #! Call a C library function.
-    #! 'returns' is a type spec, and 'parameters' is a list of
-    #! type specs. 'library' is an entry in the "libraries"
-    #! namespace.
-    "c-invoke cannot be interpreted." throw ;
-
-\ c-invoke [ 4 | 0 ] "infer-effect" set-word-property
-
-\ c-invoke [ #c-invoke infer-alien ] "infer" set-word-property
-
 #c-invoke [ linearize-alien ] "linearizer" set-word-property
-
-: std-invoke ( ... returns library function parameters -- ... )
-    #! Call a C library function with the stdcall ABI (Win32).
-    #! 'returns' is a type spec, and 'parameters' is a list of
-    #! type specs. 'library' is an entry in the "libraries"
-    #! namespace.
-    "std-invoke cannot be interpreted." throw ;
-
-\ std-invoke [ 4 | 0 ] "infer-effect" set-word-property
-
-\ std-invoke [ #std-invoke infer-alien ] "infer" set-word-property
 
 #std-invoke [ linearize-alien ] "linearizer" set-word-property
 
 : alien-invoke ( ... returns library function parameters -- ... )
+    #! Call a C library function.
+    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! type specs. 'library' is an entry in the "libraries"
+    #! namespace.
     "alien-invoke cannot be interpreted." throw ;
 
 \ alien-invoke [ 4 | 0 ] "infer-effect" set-word-property
 
-\ alien-invoke [
-    os "win32" = #std-invoke #c-invoke ? infer-alien
-] "infer" set-word-property
+\ alien-invoke [ infer-alien ] "infer" set-word-property
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

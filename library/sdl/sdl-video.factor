@@ -159,7 +159,7 @@ END-STRUCT
 : SDL_UnlockSurface ( surface -- )
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-invoke ;
 
-: SDL_MapRGB ( surface r g b -- )
+: SDL_MapRGB ( surface r g b -- rgb )
     "uint" "sdl" "SDL_MapRGB"
     [ "surface*" "uchar" "uchar" "uchar" ] alien-invoke ;
 

@@ -38,7 +38,7 @@ USE: compiler
 : SDL_INIT_EVENTTHREAD  HEX: 01000000 ;
 : SDL_INIT_EVERYTHING   HEX: 0000FFFF ;
 
-: SDL_Init ( mode -- )
+: SDL_Init ( mode -- 0/1 )
     "int" "sdl" "SDL_Init" [ "int" ] alien-invoke ;
 
 : SDL_GetError ( -- error )
