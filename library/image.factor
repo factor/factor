@@ -295,7 +295,7 @@ IN: cross-compiler
 ( Arrays and vectors )
 
 : 'array ( list -- untagged )
-    [ ' ] inject
+    [ ' ] map
     here >r
     array-type >header emit
     dup length emit

@@ -72,7 +72,7 @@ USE: url-encoding
     url-encode "a" swap link-attrs html-tag ;
 
 : >hex-color ( triplet -- hex )
-    [ >hex 2 digits ] inject "#" swons cat ;
+    [ >hex 2 digits ] map "#" swons cat ;
 
 : fg-css% ( color -- )
     "color: " % >hex-color % "; " % ;

@@ -78,7 +78,7 @@ USE: words
     ] when ;
 
 : parse-switches ( args -- args )
-    [ cli-arg ] inject ;
+    [ cli-arg ] map ;
 
 : run-files ( args -- )
     [ [ run-file ] when* ] each ;

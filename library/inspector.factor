@@ -65,10 +65,10 @@ USE: vectors
 
 : alist-keys>str ( alist -- alist )
     #! Unparse non-string keys.
-    [ unswons ?unparse swons ] inject ;
+    [ unswons ?unparse swons ] map ;
 
 : name-padding ( alist -- col )
-    [ car ] inject max-str-length ;
+    [ car ] map max-str-length ;
 
 : (describe-assoc) ( alist -- )
     dup name-padding swap

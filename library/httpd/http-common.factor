@@ -69,10 +69,10 @@ USE: url-encoding
     "Content-Length" swap assoc dec> ;
 
 : post-request>alist ( post-request -- alist )
-    "&" split [ "=" split1 cons ] inject ;
+    "&" split [ "=" split1 cons ] map ;
 
 : url-decode-alist ( alist -- alist )
-    [ uncons >r url-decode r> url-decode cons ] inject ;
+    [ uncons >r url-decode r> url-decode cons ] map ;
 
 : read-post-request ( header -- alist )
     content-length dup [

@@ -6,6 +6,7 @@
 - multiple tasks should be able to write to the same port
 - prettyprinting an empty vector
 - jvm factor -- still supporting httpd?
+- make inferior.factor nicer to use
 
 + docs:
 
@@ -27,7 +28,6 @@
 - balance needs USE:
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- make inferior.factor nicer to use
 - input style after clicking link
 - plugin not unloaded
 - listener backspace overzealous
