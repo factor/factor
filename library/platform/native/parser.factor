@@ -56,7 +56,10 @@ USE: unparser
         drop f
     ] ifte ;
 
-: parsing ( -- ) t "parsing" word set-word-property ;
+: parsing ( -- )
+    "cross-compiler" get [
+        t "parsing" word set-word-property
+    ] unless ; parsing
 
 : <parsing "line" set 0 "pos" set ;
 : parsing> "line" off "pos" off ;
