@@ -125,8 +125,21 @@ kernel-internals math hashtables errors ;
 : add-tuple-dispatch ( word vtable -- )
     >r unit [ car tuple-dispatch ] cons tuple r> set-vtable ;
 
-M: tuple clone ( tuple -- tuple )
+: clone-tuple ( tuple -- tuple )
+    #! Make a shallow copy of a tuple, without cloning its
+    #! delegate.
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
+
+: clone-delegate ( tuple -- )
+    dup class "delegate-field" word-property dup [
+        [ >fixnum slot clone ] 2keep set-slot
+    ] [
+        2drop
+    ] ifte ;
+
+M: tuple clone ( tuple -- tuple )
+    #! Clone a tuple and its delegate.
+    clone-tuple dup clone-delegate ;
 
 : tuple>list ( tuple -- list )
     dup array-capacity swap array>list ;

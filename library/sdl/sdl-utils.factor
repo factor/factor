@@ -132,9 +132,14 @@ global [
     }} logical-fonts set
 ] bind
 
+: (lookup-font) ( [[ name ptsize ]] -- font )
+    unswons logical-font swons dup get dup alien-address 0 = [
+        drop f
+    ] when ;
+
 : lookup-font ( [[ name ptsize ]] -- font )
     fonts get [
-        unswons logical-font swons dup get [
+        (lookup-font) [
             nip
         ] [
             [ uncons <font> dup ] keep set

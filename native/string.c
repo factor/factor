@@ -183,22 +183,20 @@ void primitive_string_compare(void)
 	dpush(tag_fixnum(string_compare(s1,s2)));
 }
 
-bool string_eq(F_STRING* s1, F_STRING* s2)
-{
-	if(s1 == s2)
-		return true;
-	else if(s1->hashcode != s2->hashcode)
-		return false;
-	else
-		return (string_compare(s1,s2) == 0);
-}
-
 void primitive_string_eq(void)
 {
 	F_STRING* s1 = untag_string(dpop());
 	CELL with = dpop();
 	if(type_of(with) == STRING_TYPE)
-		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
+	{
+		F_STRING* s2 = (F_STRING*)UNTAG(with);
+		if(s1->hashcode != s2->hashcode)
+			dpush(F);
+		else if(s1 == s2)
+			dpush(T);
+		else
+			dpush(tag_boolean((string_compare(s1,s2) == 0)));
+	}
 	else
 		dpush(F);
 }
