@@ -21,11 +21,28 @@ C: dlist-node
 
 : dlist-empty? ( dlist -- ? )
     dlist-first f = ;
+    
+: (unlink-prev) ( dlist dnode -- )
+    dup dlist-node-prev [
+        dupd swap dlist-node-next swap set-dlist-node-next
+    ] when*
+    2dup swap dlist-first eq? [ 
+        dlist-node-next swap set-dlist-first 
+    ] [ 2drop ] ifte ;
+
+: (unlink-next) ( dlist dnode -- )
+    dup dlist-node-next [
+        dupd swap dlist-node-prev swap set-dlist-node-prev
+    ] when*
+    2dup swap dlist-last eq? [
+        dlist-node-prev swap set-dlist-last
+    ] [ 2drop ] ifte ;
+
+: (dlist-unlink) ( dlist dnode -- )
+    [ (unlink-prev) ] 2keep (unlink-next) ;
 
 : (dlist-pop-front) ( dlist -- data )
-    [ dlist-first dlist-node-data ] keep
-    [ dup dlist-first dlist-node-next swap set-dlist-first ] keep
-    dup dlist-first [ drop ] [ f swap set-dlist-last ] ifte ;
+    [ dlist-first dlist-node-data ] keep dup dlist-first (dlist-unlink) ;
 
 : dlist-pop-front ( dlist -- data )
     dup dlist-empty? [ drop f ] [ (dlist-pop-front) ] ifte ;
