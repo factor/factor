@@ -39,6 +39,10 @@ USE: vectors
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
 
+! Vector in global namespace mapping type numbers to
+! builtin classes.
+SYMBOL: types
+
 builtin [
     "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
@@ -50,15 +54,17 @@ builtin [
 
 builtin 50 "priority" set-word-property
 
-: builtin-predicate ( type# symbol -- word )
-    predicate-word [
-        swap [ swap type eq? ] cons define-compound
-    ] keep ;
+: add-builtin-table types get set-vector-nth ;
 
-: builtin-class ( number type -- )
+: builtin-predicate ( type# symbol -- )
+    dup predicate-word
+    [ rot [ swap type eq? ] cons define-compound ] keep 
+    "predicate" set-word-property ;
+
+: builtin-class ( type# symbol -- )
+    2dup swap add-builtin-table
     dup undefined? [ dup define-symbol ] when
     2dup builtin-predicate
-    dupd "predicate" set-word-property
     dup builtin "metaclass" set-word-property
     swap "builtin-type" set-word-property ;
 
@@ -67,5 +73,10 @@ builtin 50 "priority" set-word-property
     #! type predicate with this number.
     CREATE scan-word swap builtin-class ; parsing
 
-: builtin-type ( symbol -- n )
-    "builtin-type" word-property ;
+: builtin-type ( n -- symbol )
+    types get vector-nth ;
+
+: type-name ( n -- string )
+    builtin-type word-name ;
+
+global [ num-types <vector> types set ] bind

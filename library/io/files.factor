@@ -33,6 +33,7 @@ USE: namespaces
 USE: presentation
 USE: stdio
 USE: strings
+USE: unparser
 
 : exists? ( file -- ? )
     stat >boolean ;
@@ -78,7 +79,7 @@ USE: strings
 
 : file-link. ( dir name -- )
     tuck "/" swap cat3 dup "file-link" swons swap
-    file-actions <actions> "actions" swons
+    unparse file-actions <actions> "actions" swons
     t "underline" swons
     3list write-attr ;
 

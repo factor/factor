@@ -36,6 +36,7 @@ USE: unparser
 USE: vectors
 USE: words
 USE: math
+USE: generic
 
 : expired-error ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -57,11 +58,22 @@ USE: math
     "I/O error in kernel function " write
     unswons write ": " write car print ;
 
+: type-error-name ( n -- string )
+    #! These values are only used by the kernel for error
+    #! reporting.
+    [
+        [ 100 | "fixnum/bignum" ]
+        [ 101 | "fixnum/bignum/ratio" ]
+        [ 102 | "fixnum/bignum/ratio/float" ]
+        [ 103 | "fixnum/bignum/ratio/float/complex" ]
+        [ 104 | "fixnum/string" ]
+    ] assoc [ type-name ] unless* ;
+
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write type type-name print
-    "Expected type: " write type-name print ;
+    "Object type: " write type type-error-name print
+    "Expected type: " write type-error-name print ;
 
 : array-range-error ( list -- )
     "Array range check error" print

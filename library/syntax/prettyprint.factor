@@ -86,29 +86,26 @@ M: object prettyprint* ( indent obj -- indent )
 
 : word-link ( word -- link )
     [
-        "vocabularies'" ,
-        dup word-vocabulary ,
-        "'" ,
-        word-name ,
+        dup word-name unparse ,
+        " [ " ,
+        word-vocabulary unparse ,
+        " ] search" ,
     ] make-string ;
 
-: word-actions ( -- list )
+: word-actions ( search -- list )
     [
-        [ "Describe" | "describe-path"  ]
-        [ "Push"     | "lookup"         ]
-        [ "Execute"  | "lookup execute" ]
-        [ "jEdit"    | "lookup jedit"   ]
-        [ "Usages"   | "lookup usages." ]
+        [ "See"     | "see"     ]
+        [ "Push"    | ""        ]
+        [ "Execute" | "execute" ]
+        [ "jEdit"   | "jedit"   ]
+        [ "Usages"  | "usages." ]
     ] ;
 
 : word-attrs ( word -- attrs )
     #! Words without a vocabulary do not get a link or an action
     #! popup.
     dup word-vocabulary [
-        word-link [ "object-link" swons ] keep
-        word-actions <actions> "actions" swons
-        t "underline" swons
-        3list
+        word-link word-actions <actions> "actions" swons unit
     ] [
         drop [ ]
     ] ifte ;

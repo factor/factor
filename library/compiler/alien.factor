@@ -50,7 +50,7 @@ BUILTIN: alien 16
         drop "name" get dlopen dup "dll" set
     ] unless ;
 
-SYMBOL: #c-invoke ( C ABI -- Unix and most Windows libs )
+SYMBOL: #c-invoke ( C ABI -- Unix and some Windows libs )
 SYMBOL: #cleanup ( unwind stack by parameter )
 
 SYMBOL: #c-call ( jump to raw address )

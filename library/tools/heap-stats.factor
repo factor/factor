@@ -35,6 +35,7 @@ USE: stdio
 USE: words
 USE: vectors
 USE: unparser
+USE: generic
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
