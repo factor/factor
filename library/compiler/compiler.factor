@@ -86,7 +86,7 @@ M: compound (compile) ( word -- )
 : cannot-compile ( word error -- )
     "verbose-compile" get [
         "Cannot compile " write swap .
-        default-error-handler
+        print-error
     ] [
         2drop
     ] ifte ;

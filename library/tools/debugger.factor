@@ -105,8 +105,13 @@ USE: generic
 : port-closed-error ( obj -- )
     "Port closed: " write . ;
 
-: kernel-error. ( obj n -- str )
-    {
+GENERIC: error. ( error -- )
+
+PREDICATE: cons kernel-error ( obj -- ? )
+    uncons cons? swap fixnum? and ;
+
+M: kernel-error error. ( error -- )
+    uncons car swap {
         expired-error
         io-task-twice-error
         no-io-tasks-error
@@ -124,32 +129,48 @@ USE: generic
         port-closed-error
     } vector-nth execute ;
 
-: kernel-error? ( obj -- ? )
-    dup cons? [ uncons cons? swap fixnum? and ] [ drop f ] ifte ;
+M: string error. ( error -- )
+    print ;
 
-: error. ( error -- str )
-    dup kernel-error? [
-        uncons car swap kernel-error.
-    ] [
-        dup string? [ print ] [ . ] ifte
-    ] ifte ;
+TRAITS: chained-error
+SYMBOL: original-error
 
-: standard-dump ( error -- )
-    "ERROR: " write error. ;
+C: chained-error ( original chain -- )
+    [ chained-error set original-error set ] extend ;
 
-: parse-dump ( error -- )
+M: chained-error error. ( error -- )
     [
+        chained-error get error.
+        " " [ original-error get error. ] with-prefix
+    ] bind ;
+
+TRAITS: multi-error
+
+C: multi-error ( list message -- )
+    [ original-error set multi-error set ] extend ;
+
+M: multi-error error. ( error -- )
+    [
+        original-error get error.
+        " " [ multi-error get [ . ] each ] with-prefix
+    ] bind ;
+
+M: object error. ( error -- )
+    . ;
+
+: in-parser? ( -- ? )
+    "error-line" get "error-col" get and ;
+
+: parse-dump ( -- )
+    [
+        "Parsing " ,
         "error-file" get [ "<interactive>" ] unless* , ":" ,
-        "error-line-number" get [ 1 ] unless* unparse , ": " ,
-    ] make-string write
-    error.
+        "error-line-number" get [ 1 ] unless* unparse ,
+    ] make-string print
     
     "error-line" get print
     
     [ "error-col" get " " fill , "^" , ] make-string print ;
-
-: in-parser? ( -- ? )
-    "error-line" get "error-col" get and ;
 
 : :s ( -- ) "error-datastack"  get {.} ;
 : :r ( -- ) "error-callstack"  get {.} ;
@@ -158,31 +179,34 @@ USE: generic
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 
+: debug-help ( -- )
+    [ :s :r :n :c ] [ prettyprint-1 " " write ] each
+    "show stacks at time of error." print
+    \ :get prettyprint-1
+    " ( var -- value ) inspects the error namestack." print ;
+
 : flush-error-handler ( error -- )
     #! Last resort.
     [ "Error in default error handler!" print drop ] when ;
 
-: default-error-handler ( error -- )
+: print-error ( error -- )
     #! Print the error.
     [
-        in-parser? [ parse-dump ] [ standard-dump ] ifte
-
-        [ :s :r :n :c ] [ prettyprint-1 " " write ] each
-        "show stacks at time of error." print
-        \ :get prettyprint-1
-        " ( var -- value ) inspects the error namestack." print
+        "! " [
+            in-parser? [ parse-dump ] when error.
+        ] with-prefix
     ] [
         flush-error-handler
     ] catch ;
 
-: print-error ( quot -- )
+: try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
-    [ [ default-error-handler ] when* ] catch ;
+    [ [ print-error debug-help ] when* ] catch ;
 
 : init-error-handler ( -- )
     [ 1 exit* ] >c ( last resort )
-    [ default-error-handler 1 exit* ] >c
+    [ print-error 1 exit* ] >c
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error ) ;
 
 ! So that stage 2 boot gives a useful error message if something

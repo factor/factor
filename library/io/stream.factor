@@ -31,6 +31,7 @@ USE: kernel
 USE: namespaces
 USE: strings
 USE: generic
+USE: lists
 
 GENERIC: fflush      ( stream -- )
 GENERIC: fauto-flush ( stream -- )
@@ -71,3 +72,24 @@ M: string-output-stream fauto-flush ( stream -- )
 C: string-output-stream ( size -- stream )
     #! Creates a new stream for writing to a string buffer.
     [ <sbuf> "buf" set ] extend ;
+
+! Prefix stream prefixes each line with a given string.
+TRAITS: prefix-stream
+SYMBOL: prefix
+SYMBOL: last-newline
+
+M: prefix-stream fwrite-attr ( string style stream -- )
+    [
+        last-newline get [
+            prefix get delegate get fwrite last-newline off
+        ] when
+
+        dupd delegate get fwrite-attr
+
+        "\n" str-tail? [
+            last-newline on
+        ] when
+    ] bind ;
+
+C: prefix-stream ( prefix stream -- stream )
+    [ last-newline on delegate set prefix set ] extend ;

@@ -19,11 +19,11 @@ USE: stdio
 
 "!!! The following error is part of the test" print
 
-[ ] [ [ 6 [ 12 [ "2 car" ] ] ] default-error-handler ] unit-test
+[ ] [ [ 6 [ 12 [ "2 car" ] ] ] print-error ] unit-test
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] parse ] [ default-error-handler ] catch
+[ [ "2 car" ] parse ] [ print-error ] catch
 
 [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
 

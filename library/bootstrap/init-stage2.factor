@@ -118,8 +118,10 @@ os "win32" = "compile" get and [
 "Compiling system..." print
 "compile" get [ compile-all ] when
 
+terpri
 "Unless you're working on the compiler, ignore the errors above." print
 "Not every word compiles, by design." print
+terpri
 
 0 [ compiled? [ succ ] when ] each-word
 unparse write " words compiled" print

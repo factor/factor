@@ -86,7 +86,7 @@ USE: url-encoding
             stdio get "client" set log-client
             read [ parse-request ] when*
         ] with-stream
-    ] print-error ;
+    ] try ;
 
 : httpd-connection ( socket -- )
     "http-server" get accept [ httpd-client ] in-thread drop ;

@@ -80,7 +80,7 @@ global [
 : listen ( -- )
     #! Wait for user input, and execute.
     listener-prompt get prompt.
-    [ read-multiline [ call ] [ exit ] ifte ] print-error ;
+    [ read-multiline [ call ] [ exit ] ifte ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.

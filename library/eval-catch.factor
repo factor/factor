@@ -31,7 +31,7 @@ USE: errors
 USE: stdio
 
 : eval-catch ( str -- )
-    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
+    [ eval ] [ [ print-error debug-help drop ] when* ] catch ;
 
 : eval>string ( in -- out )
     [ eval-catch ] with-string ;

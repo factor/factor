@@ -53,12 +53,12 @@ M: object prettyprint* ( indent obj -- indent )
     #! Avoid infinite loops -- maximum indent, 10 levels.
     "prettyprint-limit" get [ 40 ] unless* ;
 
-: prettyprint-indent ( indent -- )
+: indent ( indent -- )
     #! Print the given number of spaces.
     " " fill write ;
 
 : prettyprint-newline ( indent -- )
-    "\n" write prettyprint-indent ;
+    "\n" write indent ;
 
 : prettyprint-space ( -- )
     " " write ;

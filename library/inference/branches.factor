@@ -87,9 +87,11 @@ USE: prettyprint
     unify-lengths unify-stacks ;
 
 : check-lengths ( list -- )
-    [ vector-length ] map all=? [
-        "Unbalanced return stack effect" throw
-    ] unless ;
+    dup [ vector-length ] map all=? [
+        drop
+    ] [
+        "Unbalanced return stack effect:" <multi-error> throw
+    ] ifte ;
 
 : unify-callstacks ( list -- datastack )
     [ [ meta-r get ] bind ] map
