@@ -10,18 +10,15 @@
 IN: mandel
 
 USE: alien
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: sdl
 USE: sdl-event
 USE: sdl-gfx
 USE: sdl-video
-USE: stack
 USE: vectors
 USE: prettyprint
 USE: stdio

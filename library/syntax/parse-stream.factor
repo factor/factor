@@ -42,7 +42,7 @@ USE: strings
 
 : next-line ( -- str )
     "parse-stream" get freadln
-    "line-number" succ@ ;
+    "line-number" [ succ ] change ;
 
 : (read-lines) ( quot -- )
     next-line dup [

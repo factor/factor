@@ -72,8 +72,7 @@ USE: prettyprint
     >r
     <recursive-state> [ recursive-label set ] extend dupd cons
     recursive-state cons@
-    r> call
-    ( recursive-state uncons@ drop ) ;
+    r> call ;
 
 : (with-block) ( label quot -- )
     #! Call a quotation in a new namespace, and transfer

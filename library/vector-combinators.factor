@@ -68,7 +68,7 @@ USE: math
     #! Make a new vector with each pair of elements from the
     #! first two in a pair.
     over vector-length [
-        pick pick 2vector-nth cons
+        pick pick >r over >r vector-nth r> r> vector-nth cons
     ] vector-project nip nip ;
 
 : vector-2map ( v1 v2 quot -- v )

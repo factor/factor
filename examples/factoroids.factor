@@ -9,7 +9,6 @@
 
 IN: factoroids
 
-USE: combinators
 USE: errors
 USE: hashtables
 USE: kernel
@@ -24,7 +23,6 @@ USE: sdl-event
 USE: sdl-gfx
 USE: sdl-keysym
 USE: sdl-video
-USE: stack
 
 ! Game objects
 GENERIC: draw ( actor -- )
@@ -66,7 +64,7 @@ SYMBOL: enemy-shots
 
 : move ( -- )
     #! Add velocity vector to current actor's position vector.
-    velocity get position +@ ;
+    velocity get position [ + ] change ;
 
 : active? ( actor -- ? )
     #! Push f if the actor should be removed.
@@ -222,6 +220,11 @@ M: enemy draw ( actor -- )
 
 : attack-chance 30 ;
 
+: chance ( n -- boolean )
+    #! Returns true with a 1/n probability, false with a (n-1)/n
+    #! probability.
+    1 swap random-int 1 = ;
+
 : attack ( actor -- )
     #! Fire a shot some of the time.
     attack-chance chance [ enemy-fire ] [ drop ] ifte ;
@@ -230,7 +233,7 @@ SYMBOL: wiggle-x
 
 : wiggle ( -- )
     #! Wiggle from left to right.
-    -3 3 random-int wiggle-x +@
+    -3 3 random-int wiggle-x [ + ] change
     wiggle-x get sgn 1 rect> velocity set ;
 
 M: enemy tick ( actor -- )

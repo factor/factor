@@ -28,25 +28,10 @@
 IN: lists
 USE: kernel
 USE: namespaces
-USE: math
 
 : cons@ ( x var -- )
     #! Prepend x to the list stored in var.
     [ cons ] change ;
-
-: acons@ ( value key var -- )
-    #! Prepend [ key | value ] to the alist stored in var.
-    [ acons ] change ;
-
-: uncons@ ( var -- car )
-    #! Push the car of the list in var, and set the var to the
-    #! cdr.
-    [ uncons ] change ;
-
-: remove@ ( obj var -- )
-    #! Remove all occurrences of the object from the list
-    #! stored in the variable.
-    [ remove ] change ;
 
 : unique@ ( elem var -- )
     #! Prepend an element to the proper list stored in a

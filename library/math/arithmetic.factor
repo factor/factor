@@ -32,17 +32,6 @@ USE: kernel
 : rational? dup integer? swap ratio? or ;
 : real? dup number? swap complex? not and ;
 
-: odd? 2 mod 1 = ;
-: even? 2 mod 0 = ;
-
-: f>0 ( obj -- obj )
-    #! If f at the top of the stack, turn it into 0.
-    f 0 replace ;
-
-: 0>f ( obj -- obj )
-    #! If 0 at the top of the stack, turn it into f.
-    0 f replace ;
-
 : max ( x y -- z )
     2dup > [ drop ] [ nip ] ifte ;
 

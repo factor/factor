@@ -61,8 +61,6 @@ SYMBOL: #swap
 SYMBOL: #over
 SYMBOL: #pick
 
-SYMBOL: #nop
-
 SYMBOL: #>r
 SYMBOL: #r>
 

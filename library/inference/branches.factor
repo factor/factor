@@ -151,9 +151,7 @@ USE: hashtables
     infer-branches ;
 
 : vtable>list ( [ vtable | rstate ] -- list )
-    #! generic and 2generic use vectors of words, we need lists
-    #! of quotations.
-    unswons vector>list [ unit over cons ] map nip ;
+    unswons vector>list [ over cons ] map nip ;
 
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.

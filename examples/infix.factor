@@ -1,11 +1,14 @@
-USE: combinators
+USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: test
 USE: vectors
 USE: words
+
+: vector-peek ( vector -- obj )
+    #! Get value at end of vector without removing it.
+    dup vector-length pred swap vector-nth ;
 
 SYMBOL: exprs
 DEFER: infix

@@ -30,9 +30,6 @@ USE: kernel
 USE: lists
 USE: math
 
-: 2vector-nth ( n vec vec -- obj obj )
-    >r over >r vector-nth r> r> vector-nth ;
-
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
     #! <vector>, which gives an empty vector with a certain
@@ -42,17 +39,9 @@ USE: math
 : vector-empty? ( obj -- ? )
     vector-length 0 = ;
 
-: vector-clear ( vector -- )
-    #! Clears a vector.
-    0 swap set-vector-length ;
-
 : vector-push ( obj vector -- )
     #! Push a value on the end of a vector.
     dup vector-length swap set-vector-nth ;
-
-: vector-peek ( vector -- obj )
-    #! Get value at end of vector without removing it.
-    dup vector-length pred swap vector-nth ;
 
 : vector-pop ( vector -- obj )
     #! Get value at end of vector and remove it.

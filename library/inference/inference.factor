@@ -80,7 +80,7 @@ SYMBOL: save-effect
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d [ ensure ] change d-in +@ ;
+    meta-d [ ensure ] change d-in [ + ] change ;
 
 : consume-d ( count -- )
     #! Remove count of elements.

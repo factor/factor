@@ -53,7 +53,7 @@ USE: words
 SYMBOL: compiled-xts
 
 : save-xt ( word -- )
-    compiled-offset swap compiled-xts acons@ ;
+    compiled-offset swap compiled-xts [ acons ] change ;
 
 : commit-xt ( xt word -- )
     dup t "compiled" set-word-property  set-word-xt ;

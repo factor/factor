@@ -149,4 +149,3 @@ USE: vectors
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
-: toggle ( var -- ) dup get not put ;

@@ -1,10 +1,9 @@
 ! A simple IRC client written in Factor.
 
-USE: stack
 USE: stdio
 USE: namespaces
 USE: streams
-USE: combinators
+USE: kernel
 USE: threads
 
 SYMBOL: irc-stream

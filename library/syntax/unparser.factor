@@ -133,21 +133,21 @@ DEFER: unparse
 
 : unparse ( obj -- str )
     {
-        >dec
-        unparse-word
-        unparse-unknown
-        unparse-unknown
-        unparse-ratio
-        unparse-complex
-        unparse-f
-        unparse-t
-        unparse-unknown
-        >dec
-        unparse-float
-        unparse-unknown
-        unparse-str
-        unparse-unknown
-        unparse-unknown
-        unparse-unknown
-        unparse-unknown
+        [ >dec            ]
+        [ unparse-word    ]
+        [ unparse-unknown ]
+        [ unparse-unknown ]
+        [ unparse-ratio   ]
+        [ unparse-complex ]
+        [ unparse-f       ]
+        [ unparse-t       ]
+        [ unparse-unknown ]
+        [ >dec            ]
+        [ unparse-float   ]
+        [ unparse-unknown ]
+        [ unparse-str     ]
+        [ unparse-unknown ]
+        [ unparse-unknown ]
+        [ unparse-unknown ]
+        [ unparse-unknown ]
     } generic ;

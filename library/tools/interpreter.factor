@@ -46,7 +46,6 @@ SYMBOL: meta-r
 : pop-r meta-r get vector-pop ;
 SYMBOL: meta-d
 : push-d meta-d get vector-push ;
-: peek-d meta-d get vector-peek ;
 : pop-d meta-d get vector-pop ;
 SYMBOL: meta-n
 SYMBOL: meta-c
@@ -79,7 +78,7 @@ SYMBOL: meta-cf
     pop-r meta-cf set ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf uncons@ ] [ up next ] ifte ;
+    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
 
 : host-word ( word -- )
     #! Swap in the meta-interpreter's stacks, execute the word,

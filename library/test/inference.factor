@@ -43,7 +43,6 @@ USE: math-internals
 
 [ [ 2 | 4 ] ] [ [ 2dup ] infer ] unit-test
 [ [ 2 | 0 ] ] [ [ set-vector-length ] infer ] unit-test
-[ [ 1 | 0 ] ] [ [ vector-clear ] infer ] unit-test
 [ [ 2 | 0 ] ] [ [ vector-push ] infer ] unit-test
 
 [ [ 1 | 0 ] ] [ [ [ ] [ ] ifte ] infer ] unit-test

@@ -28,7 +28,6 @@
 IN: kernel
 USE: vectors
 
-: nop ( -- ) ;
 : 2drop ( x x -- ) drop drop ; inline
 : 3drop ( x x x -- ) drop drop drop ; inline
 : 2dup ( x y -- x y x y ) over over ; inline
@@ -37,7 +36,6 @@ USE: vectors
 : -rot ( x y z -- z x y ) swap >r swap r> ; inline
 : dupd ( x y -- x x y ) >r dup r> ; inline
 : swapd ( x y z -- y x z ) >r swap r> ; inline
-: transp ( x y z -- z y x ) swap rot ; inline
 : nip ( x y -- y ) swap drop ; inline
 : tuck ( x y -- y x y ) dup >r swap r> ; inline
 

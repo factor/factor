@@ -42,6 +42,7 @@ IN: image
 USE: errors
 USE: hashtables
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 USE: namespaces
@@ -77,28 +78,11 @@ SYMBOL: boot-quot
 : cell "64-bits" get 8 4 ? ;
 : char "64-bits" get 4 2 ? ;
 
-: tag-mask BIN: 111 ;
-: tag-bits 3 ;
+: tag-mask BIN: 111 ; inline
+: tag-bits 3 ; inline
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
-
-: fixnum-tag  BIN: 000 ;
-: word-tag    BIN: 001 ;
-: cons-tag    BIN: 010 ;
-: object-tag  BIN: 011 ;
-: ratio-tag   BIN: 100 ;
-: complex-tag BIN: 101 ;
-: header-tag  BIN: 110 ;
-: gc-fwd-ptr  BIN: 111 ; ( we don't output these )
-
-: f-type      6 ;
-: t-type      7 ;
-: array-type  8 ;
-: bignum-type 9 ;
-: float-type  10 ;
-: vector-type 11 ;
-: string-type 12 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;

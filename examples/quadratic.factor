@@ -27,7 +27,7 @@
 
 IN: quadratic
 USE: math
-USE: stack
+USE: kernel
 
 : quadratic-e ( b a -- -b/2a )
     2 * / neg ;

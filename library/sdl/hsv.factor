@@ -12,7 +12,7 @@ USE: lists
 USE: math
 USE: namespaces
 
-: f_ ( h s v i -- f ) >r transp >r 2dup r> 6 * r> - ;
+: f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;
 : p ( v s x -- v p x ) >r dupd neg succ * r> ;
 : q ( v s f -- q ) * neg succ * ;
 : t_ ( v s f -- t_ ) neg succ * neg succ * ;
@@ -25,10 +25,10 @@ USE: namespaces
 
 : hsv>rgb ( h s v -- r g b )
     pick 6 * >fixnum [
-        [ f_ t_ p swap   ( v p t ) ]
-        [ f_ q  p -rot   ( q v p ) ]
-        [ f_ t_ p swapd  ( p v t ) ]
-        [ f_ q  p rot    ( p q v ) ]
-        [ f_ t_ p transp ( t p v ) ]
-        [ f_ q  p        ( v p q ) ]
+        [ f_ t_ p swap     ( v p t ) ]
+        [ f_ q  p -rot     ( q v p ) ]
+        [ f_ t_ p swapd    ( p v t ) ]
+        [ f_ q  p rot      ( p q v ) ]
+        [ f_ t_ p swap rot ( t p v ) ]
+        [ f_ q  p          ( v p q ) ]
     ] mod-cond ;

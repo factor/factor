@@ -26,20 +26,43 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 USE: kernel
+USE: math
 
-IN: math         : fixnum?  ( obj -- ? ) type 0  eq? ;
-IN: words        : word?    ( obj -- ? ) type 1  eq? ;
-IN: lists        : cons?    ( obj -- ? ) type 2  eq? ;
-IN: math         : ratio?   ( obj -- ? ) type 4  eq? ;
-IN: math         : complex? ( obj -- ? ) type 5  eq? ;
-IN: math         : bignum?  ( obj -- ? ) type 9  eq? ;
-IN: math         : float?   ( obj -- ? ) type 10 eq? ;
-IN: vectors      : vector?  ( obj -- ? ) type 11 eq? ;
-IN: strings      : string?  ( obj -- ? ) type 12 eq? ;
-IN: strings      : sbuf?    ( obj -- ? ) type 13 eq? ;
-IN: io-internals : port?    ( obj -- ? ) type 14 eq? ;
-IN: alien        : dll?     ( obj -- ? ) type 15 eq? ;
-IN: alien        : alien?   ( obj -- ? ) type 16 eq? ;
+IN: kernel-internals
+
+: fixnum-tag  BIN: 000 ; inline
+: word-tag    BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: complex-tag BIN: 101 ; inline
+: header-tag  BIN: 110 ; inline
+
+: f-type      6  ; inline
+: t-type      7  ; inline
+: array-type  8  ; inline
+: bignum-type 9  ; inline
+: float-type  10 ; inline
+: vector-type 11 ; inline
+: string-type 12 ; inline
+: sbuf-type   13 ; inline
+: port-type   14 ; inline
+: dll-type    15 ; inline
+: alien-type  16 ; inline
+
+IN: math         : fixnum?  ( obj -- ? ) type fixnum-tag  eq? ;
+IN: words        : word?    ( obj -- ? ) type word-tag    eq? ;
+IN: lists        : cons?    ( obj -- ? ) type cons-tag    eq? ;
+IN: math         : ratio?   ( obj -- ? ) type ratio-tag   eq? ;
+IN: math         : complex? ( obj -- ? ) type complex-tag eq? ;
+IN: math         : bignum?  ( obj -- ? ) type bignum-type eq? ;
+IN: math         : float?   ( obj -- ? ) type float-type  eq? ;
+IN: vectors      : vector?  ( obj -- ? ) type vector-type eq? ;
+IN: strings      : string?  ( obj -- ? ) type string-type eq? ;
+IN: strings      : sbuf?    ( obj -- ? ) type sbuf-type   eq? ;
+IN: io-internals : port?    ( obj -- ? ) type port-type   eq? ;
+IN: alien        : dll?     ( obj -- ? ) type dll-type    eq? ;
+IN: alien        : alien?   ( obj -- ? ) type alien-type  eq? ;
 
 IN: kernel
 

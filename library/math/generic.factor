@@ -42,7 +42,6 @@ DEFER: number=
     [ swap real swap real ] 2keep
     swap imaginary swap imaginary ;
 
-: >fraction ( a/b -- a b ) dup numerator swap denominator ;
 : 2>fraction ( a/b c/d -- a c b d )
     [ swap numerator swap numerator ] 2keep
     swap denominator swap denominator ;
@@ -91,386 +90,383 @@ IN: math-internals
 : complex/f ( x y -- x/y )
     (complex/) tuck /f >r /f r> rect> ;
 
-: (not-=) ( x y -- f )
-    2drop f ;
-
 IN: math
 USE: math-internals
 
 : number= ( x y -- ? )
     {
-        fixnum=
-        (not-=)
-        (not-=)
-        (not-=)
-        ratio=
-        complex=
-        (not-=)
-        (not-=)
-        (not-=)
-        bignum=
-        float=
-        (not-=)
-        (not-=)
-        (not-=)
-        (not-=)
-        (not-=)
-        (not-=)
+        [ fixnum= ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ ratio= ]
+        [ complex= ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ bignum= ]
+        [ float= ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
+        [ 2drop f ]
     } 2generic ;
 
 : + ( x y -- x+y )
     {
-        fixnum+
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio+
-        complex+
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum+
-        float+
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum+ ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio+ ]
+        [ complex+ ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum+ ]
+        [ float+ ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : - ( x y -- x-y )
     {
-        fixnum-
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio-
-        complex-
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-
-        float-
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum- ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio- ]
+        [ complex- ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum- ]
+        [ float- ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : * ( x y -- x*y )
     {
-        fixnum*
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio*
-        complex*
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum*
-        float*
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum* ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio* ]
+        [ complex* ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum* ]
+        [ float* ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : / ( x y -- x/y )
     {
-        ratio
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio/
-        complex/
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio
-        float/f
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ ratio ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio/ ]
+        [ complex/ ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio ]
+        [ float/f ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : /i ( x y -- x/y )
     {
-        fixnum/i
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum/i
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum/i ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum/i ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : /f ( x y -- x/y )
     {
-        fixnum/f
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio/f
-        complex/f
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum/f
-        float/f
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum/f ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio/f ]
+        [ complex/f ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum/f ]
+        [ float/f ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : mod ( x y -- x%y )
     {
-        fixnum-mod
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-mod
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-mod ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-mod ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : /mod ( x y -- x/y x%y )
     {
-        fixnum/mod
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum/mod
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum/mod ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum/mod ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : bitand ( x y -- x&y )
     {
-        fixnum-bitand
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-bitand
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-bitand ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-bitand ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : bitor ( x y -- x|y )
     {
-        fixnum-bitor
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-bitor
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-bitor ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-bitor ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : bitxor ( x y -- x^y )
     {
-        fixnum-bitxor
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-bitxor
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-bitxor    ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-bitxor    ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : bitnot ( x -- ~x )
     {
-        fixnum-bitnot
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-bitnot
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-bitnot    ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-bitnot    ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } generic ;
 
 : shift ( x n -- x<<n )
     {
-        fixnum-shift
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum-shift
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum-shift     ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum-shift     ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : < ( x y -- ? )
     {
-        fixnum<
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio<
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum<
-        float<
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum<          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio<           ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum<          ]
+        [ float<           ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : <= ( x y -- ? )
     {
-        fixnum<=
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio<=
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum<=
-        float<=
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum<=         ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio<=          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum<=         ]
+        [ float<=          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : > ( x y -- ? )
     {
-        fixnum>
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio>
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum>
-        float>
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum>          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio>           ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum>          ]
+        [ float>           ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;
 
 : >= ( x y -- ? )
     {
-        fixnum>=
-        undefined-method
-        undefined-method
-        undefined-method
-        ratio>=
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        bignum>=
-        float>=
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
-        undefined-method
+        [ fixnum>=         ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ ratio>=          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ bignum>=         ]
+        [ float>=          ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
+        [ undefined-method ]
     } 2generic ;

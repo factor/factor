@@ -55,12 +55,6 @@ USE: math
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
 
-: cat4 ( "a" "b" "c" "d" -- "abcd" )
-    [ ] cons cons cons cons cat ;
-
-: cat5 ( "a" "b" "c" "d" "e" -- "abcde" )
-    [ ] cons cons cons cons cons cat ;
-
 : index-of ( string substring -- index )
     0 -rot index-of* ;
 
@@ -130,10 +124,6 @@ USE: math
     #! Returns the length of the longest string in the given
     #! list.
     0 swap [ str-length max ] each ;
-
-: ends-with-newline? ( string -- string )
-    #! Test if the string ends with a newline or not.
-    "\n" str-tail? ;
 
 : str-each ( str [ code ] -- )
     #! Execute the code, with each character of the string

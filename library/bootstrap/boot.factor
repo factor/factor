@@ -53,7 +53,6 @@ primitives,
     "/library/hashtables.factor"
     "/library/namespaces.factor"
     "/library/generic.factor"
-    "/library/math/namespace-math.factor"
     "/library/list-namespaces.factor"
     "/library/sbuf.factor"
     "/library/continuations.factor"

@@ -44,7 +44,6 @@ USE: strings
 : ?word-primitive ( obj -- prim/0 )
     dup word? [ word-primitive ] [ drop 0 ] ifte ;
 
-: defined?   ( obj -- ? ) ?word-primitive 0 = not ;
 : compound?  ( obj -- ? ) ?word-primitive 1 = ;
 : primitive? ( obj -- ? ) ?word-primitive 2 > ;
 : symbol?    ( obj -- ? ) ?word-primitive 2 = ;

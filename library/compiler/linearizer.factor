@@ -148,5 +148,3 @@ SYMBOL: #return-to ( push addr on C stack )
 ] "linearizer" set-word-property
 
 #values [ drop ] "linearizer" set-word-property
-
-#nop [ drop ] "linearizer" set-word-property

@@ -47,33 +47,31 @@ USE: vectors
 ! 'generic words' system will be built later.
 
 : generic ( obj vtable -- )
-    >r dup type r> vector-nth execute ;
+    >r dup type r> vector-nth call ;
 
 : 2generic ( n n vtable -- )
-    >r 2dup arithmetic-type r> vector-nth execute ;
-
-: default-hashcode drop 0 ;
+    >r 2dup arithmetic-type r> vector-nth call ;
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
     {
-        nop                ! 0
-        word-hashcode      ! 1
-        cons-hashcode      ! 2
-        default-hashcode   ! 3
-        >fixnum            ! 4
-        >fixnum            ! 5
-        default-hashcode   ! 6
-        default-hashcode   ! 7
-        default-hashcode   ! 8
-        >fixnum            ! 9 
-        >fixnum            ! 10
-        vector-hashcode    ! 11
-        str-hashcode       ! 12
-        sbuf-hashcode      ! 13
-        default-hashcode   ! 14
-        default-hashcode   ! 15
-        default-hashcode   ! 16
+        [               ] ! 0
+        [ word-hashcode     ] ! 1
+        [ cons-hashcode     ] ! 2
+        [ drop 0  ] ! 3
+        [ >fixnum           ] ! 4
+        [ >fixnum           ] ! 5
+        [ drop 0  ] ! 6
+        [ drop 0  ] ! 7
+        [ drop 0  ] ! 8
+        [ >fixnum           ] ! 9 
+        [ >fixnum           ] ! 10
+        [ vector-hashcode   ] ! 11
+        [ str-hashcode      ] ! 12
+        [ sbuf-hashcode     ] ! 13
+        [ drop 0  ] ! 14
+        [ drop 0  ] ! 15
+        [ drop 0  ] ! 16
     } generic ;
 
 IN: math DEFER: number= ( defined later... )
@@ -81,28 +79,24 @@ IN: kernel
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
     {
-        number= ! 0
-        eq?     ! 1
-        cons=   ! 2
-        eq?     ! 3
-        number= ! 4
-        number= ! 5
-        eq?     ! 6
-        eq?     ! 7
-        eq?     ! 8
-        number= ! 9 
-        number= ! 10
-        vector= ! 11
-        str=    ! 12
-        sbuf=   ! 13
-        eq?     ! 14
-        eq?     ! 15 
-        eq?     ! 16
+        [ number= ] ! 0
+        [ eq?     ] ! 1
+        [ cons=   ] ! 2
+        [ eq?     ] ! 3
+        [ number= ] ! 4
+        [ number= ] ! 5
+        [ eq?     ] ! 6
+        [ eq?     ] ! 7
+        [ eq?     ] ! 8
+        [ number= ] ! 9 
+        [ number= ] ! 10
+        [ vector= ] ! 11
+        [ str=    ] ! 12
+        [ sbuf=   ] ! 13
+        [ eq?     ] ! 14
+        [ eq?     ] ! 15 
+        [ eq?     ] ! 16
     } generic ; 
-
-: 2= ( a b c d -- ? )
-    #! Test if a = c, b = d.
-    rot = [ = ] [ 2drop f ] ifte ;
 
 : set-boot ( quot -- )
     #! Set the boot quotation.

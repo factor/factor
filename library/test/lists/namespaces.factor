@@ -11,12 +11,9 @@ USE: test
     "x" off 2 1 "x" acons@ 3 2 "x" acons@ "x" get
 ] unit-test
 
-[ [ 2 | 3 ] ] [ "x" uncons@ ] unit-test
-[ [ 1 | 2 ] ] [ "x" uncons@ ] unit-test
-
 [ [ 5 4 3 1 ] ] [
     [ 5 4 3 2 1 ] "x" set
-    2 "x" remove@
+    2 "x" [ remove ] change
     "x" get
 ] unit-test
 
@@ -27,7 +24,7 @@ USE: test
     f "x" unique@
     5 "x" unique@
     f "x" unique@
-    5 "x" remove@
+    5 "x" [ remove ] change
     "hello" "x" unique@
     "x" get
 ] unit-test

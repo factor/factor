@@ -121,7 +121,6 @@ DEFER: pending-io-error
 DEFER: next-io-task
 
 IN: math
-DEFER: >fraction
 DEFER: fraction>
 
 IN: math-internals

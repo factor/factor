@@ -1,13 +1,11 @@
 ! Numbers game example
 
 IN: numbers-game
-USE: combinators
 USE: kernel
 USE: math
 USE: parser
 USE: random
 USE: stdio
-USE: stack
 
 : read-number ( -- n ) read parse-number ;
 

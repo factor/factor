@@ -18,7 +18,7 @@ USE: sdl-gfx
 USE: sdl-video
 USE: namespaces
 USE: math
-USE: stack
+USE: kernel
 
 SYMBOL: a
 SYMBOL: b

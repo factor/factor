@@ -60,9 +60,6 @@ USE: vectors
     3list
     default-style append ;
 
-: var. ( [ name | value ] -- )
-    uncons unparse swap link-style write-attr ;
-
 : var-name. ( max name -- )
     tuck unparse pad-string write dup link-style
     swap unparse swap write-attr ;

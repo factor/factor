@@ -38,14 +38,14 @@ USE: generic
 
 ! Some words for outputting ANSI colors.
 
-: black   0 ; inline
-: red     1 ; inline
-: green   2 ; inline
-: yellow  3 ; inline
-: blue    4 ; inline
-: magenta 5 ; inline
-: cyan    6 ; inline
-: white   7 ; inline
+! black   0
+! red     1
+! green   2
+! yellow  3
+! blue    4
+! magenta 5
+! cyan    6
+! white   7
 
 : clear ( -- code )
     #! Clear screen

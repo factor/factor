@@ -50,9 +50,3 @@ USE: kernel
 
 : 2cdr ( cons cons -- car car )
     swap cdr swap cdr ;
-
-: 2cons ( cdr1 cdr2 car1 car2 -- cons1 cons2 )
-    rot swons >r cons r> ;
-
-: 2swons ( cdr1 cdr2 car1 car2 -- cons1 cons2 )
-    rot cons >r swons r> ;

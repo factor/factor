@@ -66,7 +66,7 @@ USE: unparser
     "line" off "col" off ;
 
 : ch ( -- ch ) "col" get "line" get str-nth ;
-: advance ( -- ) "col" succ@ ;
+: advance ( -- ) "col" [ succ ] change ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
