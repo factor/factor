@@ -91,3 +91,6 @@ C: buffer ( size -- buffer )
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory
     >r string-length r> buffer-reset ;
+
+: string>buffer ( string - -buffer )
+    dup string-length <buffer> tuck buffer-set ;
