@@ -9,9 +9,7 @@
 - word preview for remote words
 - support USING:
 - special completion for USE:/IN:
-- prettyprint: detect circular structure
 - vectors: ensure its ok with bignum indices
-- parsing words don't print readably
 - if gadgets are moved, added or deleted, update hand.
 - keyboard focus
 - keyboard gestures
@@ -32,7 +30,7 @@
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - slot compile problem
-- nulls at the end of utf16 strings
+- sdl console crash
 - x86 register decl
 
 + compiler/ffi:

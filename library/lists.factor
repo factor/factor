@@ -17,9 +17,13 @@ IN: lists USING: generic kernel math ;
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
-: contains? ( element list -- ? )
-    #! Test if a list contains an element.
+: contains? ( obj list -- ? )
+    #! Test if a list contains an element equal to an object.
     [ = ] some-with? >boolean ;
+
+: memq? ( obj list -- ? )
+    #! Test if a list contains an object.
+    [ eq? ] some-with? >boolean ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;

@@ -21,20 +21,20 @@ presentation unparser words ;
     dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: prettyprint* " " write
+    \ IN: prettyprint-word " " write
     word-vocabulary prettyprint-vocab " " write ;
 
 : prettyprint-: ( indent -- indent )
-    \ : prettyprint* " " write
+    \ : prettyprint-word " " write
     tab-size get + ;
 
 : prettyprint-; ( indent -- indent )
-    \ ; prettyprint*
+    \ ; prettyprint-word
     tab-size get - ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-property [
-        " " write prettyprint-1
+        " " write prettyprint-word
     ] [
         drop
     ] ifte ;
@@ -83,45 +83,46 @@ presentation unparser words ;
     ] keep documentation. ;
 
 : prettyprint-M: ( indent -- indent )
-    \ M: prettyprint-1 " " write tab-size get + ;
+    \ M: prettyprint-word " " write tab-size get + ;
 
 GENERIC: see ( word -- )
 
 M: compound see ( word -- )
     dup prettyprint-IN:
     0 prettyprint-: swap
-    [ prettyprint-1 ] keep
+    [ prettyprint-word ] keep
     [ prettyprint-docs ] keep
     [
-        word-parameter [ prettyprint-element ] each
+        word-parameter prettyprint-elements
         prettyprint-;
     ] keep
     prettyprint-plist prettyprint-newline ;
 
 : see-method ( indent word class method -- indent )
     >r >r >r prettyprint-M:
-    r> r> prettyprint-1 " " write
-    prettyprint-1 " " write
+    r> r> prettyprint-word " " write
+    prettyprint-word " " write
     dup prettyprint-newline
-    r> [ prettyprint-element ] each
+    r> prettyprint-elements
     prettyprint-;
     terpri ;
 
 M: generic see ( word -- )
     dup prettyprint-IN:
     0 swap
-    dup "definer" word-property prettyprint-1 " " write
-    dup prettyprint-1 terpri
+    dup "definer" word-property prettyprint-word " " write
+    dup prettyprint-word terpri
     dup methods [ over >r uncons see-method r> ] each 2drop ;
 
 M: primitive see ( word -- )
     dup prettyprint-IN:
-    "PRIMITIVE: " write dup prettyprint-1 stack-effect. terpri ;
+    "PRIMITIVE: " write dup prettyprint-word stack-effect.
+    terpri ;
 
 M: symbol see ( word -- )
     dup prettyprint-IN:
-    \ SYMBOL: prettyprint-1 " " write . ;
+    \ SYMBOL: prettyprint-word " " write . ;
 
 M: undefined see ( word -- )
     dup prettyprint-IN:
-    \ DEFER: prettyprint-1 " " write . ;
+    \ DEFER: prettyprint-word " " write . ;

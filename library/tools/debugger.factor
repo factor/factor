@@ -145,9 +145,9 @@ M: object error. ( error -- )
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ prettyprint-1 " " write ] each
+    [ :s :r :n :c ] [ prettyprint-word " " write ] each
     "show stacks at time of error." print
-    \ :get prettyprint-1
+    \ :get prettyprint-word
     " ( var -- value ) inspects the error namestack." print ;
 
 : flush-error-handler ( error -- )

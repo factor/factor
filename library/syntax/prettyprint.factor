@@ -7,41 +7,17 @@ IN: prettyprint
 ! to the generic vocabulary.
 USING: errors generic kernel kernel-internals lists math
 namespaces stdio strings presentation unparser vectors words
-hashtables ;
+hashtables parser ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
 SYMBOL: tab-size
+SYMBOL: recursion-check
 
 GENERIC: prettyprint* ( indent obj -- indent )
 
 M: object prettyprint* ( indent obj -- indent )
     unparse write ;
-
-: indent ( indent -- )
-    #! Print the given number of spaces.
-    " " fill write ;
-
-: prettyprint-newline ( indent -- )
-    "\n" write indent ;
-
-: prettyprint-element ( indent obj -- indent )
-    over prettyprint-limit get >= [
-        unparse write
-    ] [
-        prettyprint*
-    ] ifte " " write ;
-
-: <prettyprint ( indent -- indent )
-    tab-size get + one-line get [
-        " " write
-    ] [
-        dup prettyprint-newline
-    ] ifte ;
-
-: prettyprint> ( indent -- indent )
-    tab-size get - one-line get
-    [ dup prettyprint-newline ] unless ;
 
 : word-link ( word -- link )
     [
@@ -69,10 +45,51 @@ M: object prettyprint* ( indent obj -- indent )
         drop [ ]
     ] ifte ;
 
-M: word prettyprint* ( indent word -- indent )
+: prettyprint-word ( word -- )
     dup word-name
     swap dup word-attrs swap word-style append
     write-attr ;
+
+M: word prettyprint* ( indent word -- indent )
+    dup parsing? [
+        \ POSTPONE: prettyprint-word " " write
+    ] when
+    prettyprint-word ;
+
+: indent ( indent -- )
+    #! Print the given number of spaces.
+    " " fill write ;
+
+: prettyprint-newline ( indent -- )
+    "\n" write indent ;
+
+: prettyprint-elements ( indent list -- indent )
+    [ prettyprint* " " write ] each ;
+
+: <prettyprint ( indent -- indent )
+    tab-size get + one-line get [
+        " " write
+    ] [
+        dup prettyprint-newline
+    ] ifte ;
+
+: prettyprint> ( indent -- indent )
+    tab-size get - one-line get
+    [ dup prettyprint-newline ] unless ;
+
+: prettyprint-limit? ( indent -- ? )
+    prettyprint-limit get dup [ >= ] [ nip ] ifte ;
+
+: check-recursion ( indent obj quot -- ? indent )
+    #! We detect circular structure.
+    pick prettyprint-limit? >r
+    over recursion-check get memq? r> or [
+        2drop "..." write
+    ] [
+        over recursion-check [ cons ] change
+        call
+        recursion-check [ cdr ] change
+    ] ifte ;
 
 : prettyprint-sequence ( indent start list end -- indent )
     #! Prettyprint a list, with start/end delimiters; eg, [ ],
@@ -80,34 +97,46 @@ M: word prettyprint* ( indent word -- indent )
     #! unless the list is empty.
     over [
         >r
-        >r prettyprint* <prettyprint
-        r> [ prettyprint-element ] each
-        prettyprint> r> prettyprint*
+        >r prettyprint-word <prettyprint
+        r> prettyprint-elements
+        prettyprint> r> prettyprint-word
     ] [
-        >r >r prettyprint* " " write r> drop r> prettyprint*
+        >r >r prettyprint-word " " write
+        r> drop
+        r> prettyprint-word
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
-    \ [ swap \ ] prettyprint-sequence ;
+    [
+        \ [ swap \ ] prettyprint-sequence
+    ] check-recursion ;
 
 M: cons prettyprint* ( indent cons -- indent )
     #! Here we turn the cons into a list of two elements.
-    \ [[ swap uncons 2list \ ]] prettyprint-sequence ;
+    [
+        \ [[ swap uncons 2list \ ]] prettyprint-sequence
+    ] check-recursion ;
 
 M: vector prettyprint* ( indent vector -- indent )
-    \ { swap vector>list \ } prettyprint-sequence ;
+    [
+        \ { swap vector>list \ } prettyprint-sequence
+    ] check-recursion ;
 
 M: hashtable prettyprint* ( indent hashtable -- indent )
-    \ {{ swap hash>alist \ }} prettyprint-sequence ;
+    [
+        \ {{ swap hash>alist \ }} prettyprint-sequence
+    ] check-recursion ;
 
 M: tuple prettyprint* ( indent tuple -- indent )
-    \ << swap tuple>list \ >> prettyprint-sequence ;
-
-: prettyprint-1 ( obj -- )
-    0 swap prettyprint* drop ;
+    [
+        \ << swap tuple>list \ >> prettyprint-sequence
+    ] check-recursion ;
 
 : prettyprint ( obj -- )
-    prettyprint-1 terpri ;
+    [
+        recursion-check off
+        0 swap prettyprint* drop terpri
+    ] with-scope ;
 
 : vocab-link ( vocab -- link )
     "vocabularies'" swap cat2 ;
@@ -137,4 +166,4 @@ M: tuple prettyprint* ( indent tuple -- indent )
 : .o >oct print ;
 : .h >hex print ;
 
-global [ 40 prettyprint-limit set  4 tab-size set ] bind
+global [ 4 tab-size set ] bind
