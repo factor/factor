@@ -32,6 +32,7 @@ USE: errors
 USE: kernel
 USE: logic
 USE: stack
+USE: streams
 USE: strings
 USE: namespaces
 
