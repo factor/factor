@@ -20,7 +20,7 @@ SYMBOL: traits
     "traits-map" word-property ;
 
 : object-map ( obj -- hash )
-    dup has-namespace? [ traits swap get* ] [ drop f ] ifte ;
+    dup hashtable? [ traits swap hash ] [ drop f ] ifte ;
 
 : init-traits-map ( word -- )
     <namespace> "traits-map" set-word-property ;

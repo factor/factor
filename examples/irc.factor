@@ -88,9 +88,7 @@ USE: unparser
     [
         [
             eval
-        ] [
-            default-error-handler
-        ] catch
+        ] print-error
     ] keep-datastack drop ;
 
 : with-irc-stream ( recepient quot -- )
