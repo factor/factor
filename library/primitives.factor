@@ -150,7 +150,7 @@ USE: words
     [ getenv                 [ [ fixnum ] [ object ] ] ]
     [ setenv                 [ [ object fixnum ] [ ] ] ]
     [ open-file              [ [ string object object ] [ port ] ] ]
-    [ stat                   [ [ string ] [ cons ] ] ]
+    [ stat                   [ [ string ] [ general-list ] ] ]
     [ (directory)            [ [ string ] [ general-list ] ] ]
     [ garbage-collection     [ [ ] [ ] ] ]
     [ save-image             [ [ string ] [ ] ] ]

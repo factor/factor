@@ -57,7 +57,6 @@ USE: hashtables
     "/library/strings.factor" parse-resource append,
     "/library/hashtables.factor" parse-resource append,
     "/library/namespaces.factor" parse-resource append,
-    "/library/list-namespaces.factor" parse-resource append,
     "/library/sbuf.factor" parse-resource append,
     "/library/errors.factor" parse-resource append,
     "/library/continuations.factor" parse-resource append,

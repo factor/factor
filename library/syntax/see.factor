@@ -30,6 +30,7 @@ USE: generic
 USE: kernel
 USE: lists
 USE: math
+USE: namespaces
 USE: stdio
 USE: strings
 USE: presentation

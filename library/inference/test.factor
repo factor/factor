@@ -30,6 +30,7 @@ USE: errors
 USE: inference
 USE: kernel
 USE: lists
+USE: namespaces
 USE: prettyprint
 USE: stdio
 USE: strings

@@ -88,14 +88,6 @@ USE: prettyprint
         r> call
     ] (with-block) ;
 
-: entry-effect ( quot -- )
-    [
-        meta-d get inferring-entry-effect set
-        copy-inference
-        infer-quot
-        inferring-entry-effect off
-    ] with-scope ;
-
 : recursive? ( word -- ? )
     dup word-parameter tree-contains? ;
 
@@ -103,10 +95,7 @@ USE: prettyprint
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
-    gensym [
-        dup recursive? [ dup word-parameter entry-effect ] when
-        word-parameter infer-quot effect
-    ] with-block ;
+    gensym [ word-parameter infer-quot effect ] with-block ;
 
 : infer-compound ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -157,70 +146,42 @@ M: symbol (apply-word) ( word -- )
     swap vector-head nip
     r> vector-append r> cons ;
 
+: with-recursion ( quot -- )
+    [
+        inferring-base-case inc
+        call
+    ] [
+        inferring-base-case dec
+        rethrow
+    ] catch ;
+
 : base-case ( word -- [ d-in | meta-d ] )
     [
-        inferring-base-case on
-        copy-inference
-        inline-compound
-        inferring-base-case off
-    ] with-scope effect swap decompose ;
+        [
+            copy-inference
+            inline-compound
+        ] with-scope effect swap decompose
+        present-effect
+        >r [ #call-label ] [ #call ] ?ifte r>
+        (consume/produce)
+    ] with-recursion ;
 
 : no-base-case ( word -- )
     word-name " does not have a base case." cat2 throw ;
-
-: raise# ( n vec -- n )
-    #! Parameter is a vector of pairs. Return the highest index
-    #! where pairs are equal.
-    2dup vector-length >= [
-        drop
-    ] [
-        2dup vector-nth uncons = [
-            >r 1 + r> raise#
-        ] [
-            drop
-        ] ifte
-    ] ifte ;
-
-: raise ( vec1 vec2 -- list )
-    #! Return a new vector consisting of the remainder of vec1,
-    #! without any leading elements equal to those from vec2.
-    over vector-zip 0 swap raise# swap vector-tail ;
-
-: unify-entry-effect ( vector list -- )
-    #! If any elements are not equal, the vector's element is
-    #! replaced with the list's.
-    over vector-length over length - -rot [
-        ( n vector elt )
-        pick pick vector-nth over = [
-            drop
-        ] [
-            pick pick set-vector-nth
-        ] ifte
-        >r 1 + r>
-    ] each 2drop ;
-
-: (recursive-word) ( word label effect -- )
-    >r [ #call-label ] [ #call ] ?ifte r> (consume/produce) ;
-
-: apply-entry-effect ( word label -- )
-    #! Called at a recursive call point. We need this to compute
-    #! the set of literals that is retained across a recursive
-    #! call -- this is NOT the same as the literals present on
-    #! entry. This word mutates the inferring-entry-effect
-    #! vector.
-    over base-case uncons raise present-effect (recursive-word) ;
 
 : recursive-word ( word label -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    inferring-base-case get [
+    inferring-base-case get max-recursion > [
         drop no-base-case
     ] [
-        inferring-entry-effect get [
-            apply-entry-effect
+        inferring-base-case get max-recursion = [
+            over base-case
         ] [
-            over base-case present-effect (recursive-word)
+            [
+                drop inline-compound drop
+            ] with-recursion
         ] ifte
     ] ifte ;
 

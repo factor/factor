@@ -66,7 +66,6 @@ USE: namespaces
     "/library/strings.factor"
     "/library/hashtables.factor"
     "/library/namespaces.factor"
-    "/library/list-namespaces.factor"
     "/library/sbuf.factor"
     "/library/errors.factor"
     "/library/continuations.factor"

@@ -161,7 +161,7 @@ SYMBOL: cloned
     #! for the given branch.
     [
         [
-            branches-can-fail? [
+            inferring-base-case get 0 > [
                 [
                     infer-branch ,
                 ] [

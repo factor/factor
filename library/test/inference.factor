@@ -11,18 +11,6 @@ USE: kernel
 USE: math-internals
 USE: generic
 
-[ 0 ]
-[ { 1 2 3 } { 4 5 6 } vector-zip 0 swap raise# ]
-unit-test
-
-[ 2 ]
-[ { 1 2 3 } { 1 2 6 } vector-zip 0 swap raise# ]
-unit-test
-
-[ { 4 5 6 } ]
-[ { 1 2 3 } dup [ 4 5 6 ] unify-entry-effect ]
-unit-test
-
 ! [ [ [ object object ] f ] ]
 ! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
 ! unit-test
@@ -143,8 +131,8 @@ DEFER: foe
 [ [ 2 | 1 ] ] [ [ foe ] infer old-effect ] unit-test
 
 ! This form should not have a stack effect
-: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
-[ [ bad-bin ] infer old-effect ] unit-test-fails
+! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
+! [ [ bad-bin ] infer old-effect ] unit-test-fails
 
 : nested-when ( -- )
     t [

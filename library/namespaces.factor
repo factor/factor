@@ -31,6 +31,7 @@ USE: kernel
 USE: kernel-internals
 USE: lists
 USE: vectors
+USE: math
 
 ! Other languages have classes, objects, variables, etc.
 ! Factor has similar concepts.
@@ -126,3 +127,40 @@ USE: vectors
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
+: inc ( var -- ) [ 1 + ] change ;
+: dec ( var -- ) [ 1 - ] change ;
+
+: cons@ ( x var -- )
+    #! Prepend x to the list stored in var.
+    [ cons ] change ;
+
+: unique@ ( elem var -- )
+    #! Prepend an element to the proper list stored in a
+    #! variable if it is not already contained in the list.
+    [ unique ] change ;
+
+SYMBOL: list-buffer
+
+: make-rlist ( quot -- list )
+    #! Call a quotation. The quotation can call , to prepend
+    #! objects to the list that is returned when the quotation
+    #! is done.
+    [ list-buffer off call list-buffer get ] with-scope ;
+    inline
+
+: make-list ( quot -- list )
+    #! Return a list whose entries are in the same order that ,
+    #! was called.
+    make-rlist reverse ; inline
+
+: , ( obj -- )
+    #! Append an object to the currently constructing list.
+    list-buffer cons@ ;
+
+: unique, ( obj -- )
+    #! Append an object to the currently constructing list, only
+    #! if the object does not already occur in the list.
+    list-buffer unique@ ;
+
+: append, ( list -- )
+    [ , ] each ;

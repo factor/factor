@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -39,17 +39,13 @@ USE: hashtables
 USE: generic
 USE: prettyprint
 
-! If this variable is on, partial evalution of conditionals is
-! disabled.
+: max-recursion 1 ;
+
+! This variable takes a value from 0 up to max-recursion.
 SYMBOL: inferring-base-case
 
-! If this variable is on, we are inferring the entry effect, so
-! we unify all entry point effects to the vecto stored in this
-! variable.
-SYMBOL: inferring-entry-effect
-
 : branches-can-fail? ( -- ? )
-    inferring-base-case get inferring-entry-effect get or ;
+    inferring-base-case get max-recursion >= ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -161,8 +157,7 @@ M: literal set-value-class ( class value -- )
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    inferring-base-case off
-    inferring-entry-effect off ;
+    0 inferring-base-case set ;
 
 DEFER: apply-word
 
