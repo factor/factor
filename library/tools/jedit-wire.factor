@@ -90,11 +90,11 @@ M: jedit-stream fflush ( stream -- )
     [ CHAR: f write flush ] bind ;M
 
 C: jedit-stream ( stream -- stream )
-    [ dup delegate set "stdio" set ] extend ;C
+    [ dup delegate set stdio set ] extend ;C
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
-    "stdio" get <jedit-stream> "stdio" set
+    stdio get <jedit-stream> stdio set
     print-banner ;
 
 : jedit-lookup ( word vocabs -- )

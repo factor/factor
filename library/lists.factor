@@ -42,14 +42,22 @@ USE: vectors
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
-: contains? ( element list -- remainder )
-    #! Push remainder of list from first occurrence of element,
-    #! or f.
-    dup [
-        2dup car = [ nip ] [ cdr contains? ] ifte
+: some? ( list pred -- ? )
+    #! Apply predicate to each element ,return remainder of list
+    #! from first occurrence where it is true, or return f.
+    over [
+        dup >r over >r >r car r> call [
+            r> r> drop
+        ] [
+            r> cdr r> some?
+        ] ifte
     ] [
         2drop f
-    ] ifte ;
+    ] ifte ; inline
+
+: contains? ( element list -- ? )
+    #! Test if a list contains an element.
+    [ over = ] some? nip ;
 
 : nth ( n list -- list[n] )
     #! nth element of a proper list.
@@ -207,12 +215,6 @@ DEFER: tree-contains?
     #! Return the highest element in the list, where pred is a
     #! partial order with stack effect ( o1 o2 -- ? ).
     swap [ pick >r maximize r> swap ] (top) nip ;
-
-: (count) ( n list -- list )
-    >r pred dup 0 < [ drop r> ] [ dup r> cons (count) ] ifte ;
-
-: count ( n -- [ 0 ... n-1 ] )
-    [ ] (count) ;
 
 : cons= ( obj cons -- ? )
     2dup eq? [

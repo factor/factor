@@ -25,6 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: stdio
+DEFER: stdio
+
 IN: streams
 USE: combinators
 USE: continuations
@@ -78,7 +81,7 @@ C: fd-stream ( in out -- stream )
     <filecw> ;
 
 : init-stdio ( -- )
-    stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
+    stdin stdout <fd-stream> <stdio-stream> stdio set ;
 
 : (fcopy) ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the

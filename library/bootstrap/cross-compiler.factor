@@ -400,7 +400,8 @@ IN: image
     "big-endian" on  "boot.image.be32" make-image
     "64-bits" on
     "big-endian" off "boot.image.le64" make-image
-    "big-endian" on  "boot.image.be64" make-image ;
+    "big-endian" on  "boot.image.be64" make-image
+    "64-bits" off ;
 
 : cross-compile-resource ( resource -- )
     [

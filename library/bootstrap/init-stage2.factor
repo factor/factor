@@ -66,7 +66,7 @@ USE: unparser
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
 
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
+    "ansi" get [ stdio get <ansi-stream> stdio set ] when
 
     "compile" get [ compile-all ] when
 
@@ -91,7 +91,7 @@ unparse write " words have a stack effect" print
 "Now, you can run ./f factor.image" print
 
 ! Save a bit of space
-global [ "stdio" off ] bind
+global [ stdio off ] bind
 
 garbage-collection
 "factor.image" save-image

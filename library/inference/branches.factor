@@ -41,15 +41,17 @@ USE: vectors
 USE: words
 USE: hashtables
 
-: infer-branch ( quot -- [ in-d | datastack ] dataflow )
+: branch-effect ( -- [ dataflow [ in-d | datastack ] ] )
+    get-dataflow  d-in get meta-d get cons  cons ;
+
+: infer-branch ( quot -- [ dataflow [ in-d | datastack ] ] )
     #! Infer the quotation's effect, restoring the meta
     #! interpreter state afterwards.
     [
         copy-interpreter
         dataflow-graph off
         (infer)
-        d-in get meta-d get cons
-        get-dataflow
+        branch-effect
     ] with-scope ;
 
 : difference ( [ in | stack ] -- diff )
@@ -89,31 +91,35 @@ USE: hashtables
         "Unbalanced branches" throw
     ] ifte ;
 
-: recursive-branch ( quot -- ? )
+: recursive-branch ( quot -- )
     #! Set base case if inference didn't fail.
     [
-        car infer-branch drop recursive-state get set-base t
+        infer-branch cdr recursive-state get set-base
     ] [
-        [ drop f ] when
+        [ drop ] when
     ] catch ;
 
-: infer-branches ( branchlist instruction -- )
+: (infer-branches) ( branchlist -- dataflowlist effectlist )
+    dup
+    [ car recursive-branch ] each
+    [ car infer-branch ] map
+    unzip ;
+
+: infer-branches ( inputs instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
-    #! base case to this stack effect and try again.
-    swap f over [ recursive-branch or ] each [
-        [ [ car infer-branch , ] map ] make-list swap
-        >r dataflow, drop r> unify
-    ] [
-        current-word no-base-case
-    ] ifte ;
+    #! base case to this stack effect and try again. The inputs
+    #! parameter is a vector.
+    (infer-branches) >r
+    swap dataflow, [ node-consume-d set ] bind
+    r> unify ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
     3 ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d 2list
-    IFTE
+    >r 1 meta-d get vector-tail* IFTE r>
     pop-d drop ( condition )
     infer-branches ;
 
@@ -129,17 +135,14 @@ USE: hashtables
     #! Infer effects for all branches, unify.
     2 ensure-d
     dataflow-drop, pop-d vtable>list
-    GENERIC
-    peek-d drop ( dispatch )
+    >r 1 meta-d get vector-tail* GENERIC r>
     infer-branches ;
 
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
     3 ensure-d
     dataflow-drop, pop-d vtable>list
-    2GENERIC
-    peek-d drop ( dispatch )
-    peek-d drop ( dispatch )
+    >r 2 meta-d get vector-tail* 2GENERIC r>
     infer-branches ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property

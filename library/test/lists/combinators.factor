@@ -35,3 +35,8 @@ USE: strings
 [ 6 ] [ [ 5 6 ] [ > ] top ] unit-test
 [ 99 ] [ 100 count [ > ] top ] unit-test
 [ 0 ] [ 100 count [ < ] top ] unit-test
+
+[ f ] [ [ ] [ ] some? ] unit-test
+[ t ] [ [ 1 ] [ ] some? >boolean ] unit-test
+[ t ] [ [ 1 2 3 ] [ 2 > ] some? >boolean ] unit-test
+[ f ] [ [ 1 2 3 ] [ 10 > ] some? ] unit-test

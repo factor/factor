@@ -46,7 +46,7 @@ USE: url-encoding
     "httpd-log-file" get dup [
         <filecr>
     ] [
-        drop "stdio" get
+        drop stdio get
     ] ifte ;
 
 : url>path ( uri -- path )
@@ -86,7 +86,7 @@ USE: url-encoding
 : httpd-client ( socket -- )
     [
         [
-            "stdio" get "client" set log-client
+            stdio get "client" set log-client
             read [ parse-request ] when*
         ] with-stream
     ] print-error ;

@@ -47,7 +47,7 @@ USE: strings
     dup mime-type resource-response  "method" get "head" = [
         drop
     ] [
-        <resource-stream> "stdio" get fcopy
+        <resource-stream> stdio get fcopy
     ] ifte ;
 
 : resource-responder ( filename -- )

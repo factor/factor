@@ -16,8 +16,8 @@ USE: strings
 
 [ f         ] [ 3 [ ]     contains? ] unit-test
 [ f         ] [ 3 [ 1 2 ] contains? ] unit-test
-[ [ 1 2 ]   ] [ 1 [ 1 2 ] contains? ] unit-test
-[ [ 2 ]     ] [ 2 [ 1 2 ] contains? ] unit-test
+[ t ] [ 1 [ 1 2 ] contains? >boolean ] unit-test
+[ t ] [ 2 [ 1 2 ] contains? >boolean ] unit-test
 
 [ 1 ] [  -1 [ 1 2 ] nth ] unit-test
 [ 1 ] [  0  [ 1 2 ] nth ] unit-test

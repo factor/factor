@@ -33,7 +33,7 @@ C: xyzzy-stream ( stream -- stream )
     "<xyzzy>"
 ] [
     [
-        "stdio" get <xyzzy-stream> [
+        stdio get <xyzzy-stream> [
             "xyzzy" write
         ] with-stream
     ] with-string

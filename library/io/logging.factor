@@ -31,6 +31,7 @@ USE: combinators
 USE: hashtables
 USE: namespaces
 USE: stack
+USE: stdio
 USE: streams
 USE: strings
 USE: unparser
@@ -48,7 +49,7 @@ USE: unparser
     ] when* ;
 
 : with-logging ( quot -- )
-    [ "stdio" get "log" set call ] with-scope ;
+    [ stdio get "log" set call ] with-scope ;
 
 : with-log-file ( file quot -- )
     [ swap <filecr> "log" set call ] with-scope ;

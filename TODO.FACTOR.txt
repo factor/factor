@@ -1,3 +1,11 @@
+[error] AWT-EventQueue-0: java.lang.NullPointerException
+[error] AWT-EventQueue-0:  at org.gjt.sp.jedit.Buffer.markTokens(Buffer.java:2109)
+[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.getWordAtCaret(WordPreview.java:95)
+[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.showPreview(WordPreview.java:137)
+[error] AWT-EventQueue-0:  at factor.jedit.WordPreview.actionPerformed(WordPreview.java:79)
+[error] AWT-EventQueue-0:  at javax.swing.Timer.fireActionPerformed(Timer.java:271)
+
+
 + inference/interpreter:
 
 - combinator inference
@@ -25,6 +33,7 @@
 
 + listener/plugin:
 
+- errors don't always disappear
 - console: wrong history
 - listener: if too many things popped off the stack, complain
 - gracefully handle non-working cfactor
