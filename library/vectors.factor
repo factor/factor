@@ -126,7 +126,7 @@ BUILTIN: vector 11
     #! first two in a pair.
     over vector-length over vector-length min [
         pick pick >r over >r vector-nth r> r> vector-nth cons
-    ] vector-project nip nip ;
+    ] vector-project 2nip ;
 
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.
@@ -172,7 +172,7 @@ M: vector hashcode ( vec -- n )
     #! index upwards.
     2dup vector-length swap - [
         pick + over vector-nth
-    ] project nip nip ;
+    ] project 2nip ;
 
 : vector-tail* ( n vector -- list )
     #! Unlike vector-tail, n is an index from the end of the

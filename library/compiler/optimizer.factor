@@ -60,7 +60,7 @@ USE: vectors
 : mentions-literal? ( literal list -- ? )
     #! Does the given list of result objects refer to this
     #! literal?
-    [ dupd value= ] some? nip ;
+    [ value= ] some-with? ;
 
 : consumes-literal? ( literal node -- ? )
     #! Does the dataflow node consume the literal?
@@ -148,9 +148,7 @@ SYMBOL: branch-returns
 ] "calls-label" set-word-property
 
 : calls-label? ( label list -- ? )
-    [
-        dupd "calls-label" [ 2drop f ] apply-dataflow
-    ] some? nip ;
+    [ "calls-label" [ 2drop f ] apply-dataflow ] some-with? ;
 
 #label [
     [ node-param get ] bind calls-label?
@@ -161,7 +159,7 @@ SYMBOL: branch-returns
 ] "calls-label" set-word-property
 
 : branches-call-label? ( label list -- ? )
-    [ dupd calls-label? ] some? nip ;
+    [ calls-label? ] some-with? ;
 
 \ ifte [
     [ node-param get ] bind branches-call-label?

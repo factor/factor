@@ -39,15 +39,11 @@ USE: kernel
 : assoc* ( key alist -- [[ key value ]] )
     #! Looks up the key in an alist. Push the key/value pair.
     #! Most of the time you want to use assoc not assoc*.
-    dup [
-        2dup car car = [ nip car ] [ cdr assoc* ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+    [ car = ] some-with?  dup [ car ] when ;
 
 : assoc ( key alist -- value )
     #! Looks up the key in an alist.
-    assoc* dup [ cdr ] when ;
+    assoc*  dup [ cdr ] when ;
 
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.
@@ -70,11 +66,7 @@ USE: kernel
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        unswons rot assoc* dup [
-            cdr call
-        ] [
-            2drop
-        ] ifte
+        unswons rot assoc* dup [ cdr call ] [ 2drop ] ifte
     ] each-with ;
 
 : 2cons ( car1 car2 cdr1 cdr2 -- cons1 cons2 )

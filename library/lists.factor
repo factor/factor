@@ -42,22 +42,9 @@ USE: math
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
-: some? ( list pred -- ? )
-    #! Apply predicate to each element ,return remainder of list
-    #! from first occurrence where it is true, or return f.
-    over [
-        dup >r over >r >r car r> call [
-            r> r> drop
-        ] [
-            r> cdr r> some?
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ; inline
-
 : contains? ( element list -- ? )
     #! Test if a list contains an element.
-    [ over = ] some? >boolean nip ;
+    [ = ] some-with? >boolean ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
@@ -128,7 +115,7 @@ DEFER: tree-contains?
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( obj elt -- obj ) to each element into a new list.
-    swap [ with rot ] map nip nip ; inline
+    swap [ with rot ] map 2nip ; inline
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.

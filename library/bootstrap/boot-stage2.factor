@@ -35,10 +35,6 @@ USE: namespaces
 
 "Cold boot in progress..." print
 
-! vocabularies get [
-!     "generic" off
-! ] bind
-
 [
     "/library/generic/generic.factor"
     "/library/generic/object.factor"
@@ -137,6 +133,7 @@ USE: namespaces
     "/library/sdl/sdl-gfx.factor"
     "/library/sdl/sdl-keysym.factor"
     "/library/sdl/sdl-keyboard.factor"
+    "/library/sdl/sdl-ttf.factor"
     "/library/sdl/sdl-utils.factor"
     "/library/sdl/hsv.factor"
 

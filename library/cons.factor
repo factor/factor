@@ -123,4 +123,24 @@ PREDICATE: general-list list ( list -- ? )
     ] ifte ; inline
 
 : subset-with ( obj list quot -- list )
-    swap [ with rot ] subset nip nip ; inline
+    swap [ with rot ] subset 2nip ; inline
+
+: some? ( list pred -- ? )
+    #! Apply predicate with stack effect ( elt -- ? ) to each
+    #! element, return remainder of list from first occurrence
+    #! where it is true, or return f.
+    over [
+        dup >r over >r >r car r> call [
+            r> r> drop
+        ] [
+            r> cdr r> some?
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ; inline
+
+: some-with? ( obj list pred -- ? )
+    #! Apply predicate with stack effect ( obj elt -- ? ) to
+    #! each element, return remainder of list from first
+    #! occurrence where it is true, or return f.
+    swap [ with rot ] some? 2nip ; inline

@@ -37,7 +37,7 @@ USE: math
     3dup - + 1 < [
         2drop (random-int) 2dup swap mod (random-int-0)
     ] [
-        nip nip
+        2nip
     ] ifte ;
 
 : random-int-0 ( max -- n )

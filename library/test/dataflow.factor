@@ -15,19 +15,19 @@ USE: generic
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
-    [ dupd node-op swap hash = ] some? nip ;
+    [ node-op swap hash = ] some-with? ;
 
 : dataflow-contains-param? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
     [
-        dupd [
+        [
             node-op get #label = [
                 node-param get dataflow-contains-param?
             ] [
                 node-param get =
             ] ifte
         ] bind
-    ] some? nip ;
+    ] some-with? ;
 
 [ t ] [
     \ + [ 2 2 + ] dataflow dataflow-contains-param? >boolean

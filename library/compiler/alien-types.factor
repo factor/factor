@@ -153,6 +153,15 @@ global [ <namespace> "c-types" set ] bind
     "unbox_alien" "unboxer" set
 ] "void*" define-c-type
 
+! FIXME
+[
+    [ alien-4 ] "getter" set
+    [ set-alien-4 ] "setter" set
+    4 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "long" define-c-type
+
 [
     [ alien-4 ] "getter" set
     [ set-alien-4 ] "setter" set

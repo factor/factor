@@ -54,7 +54,7 @@ IN: kernel
     #! If the condition is not f, execute the 'true' quotation,
     #! with the condition on the stack. Otherwise, pop the
     #! condition and execute the 'false' quotation.
-    pick [ drop call ] [ nip nip call ] ifte ; inline
+    pick [ drop call ] [ 2nip call ] ifte ; inline
 
 : ?ifte ( default cond true false -- )
     #! If cond is true, drop default and apply true

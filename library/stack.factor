@@ -36,6 +36,7 @@ IN: kernel
 : dupd ( x y -- x x y ) >r dup r> ; inline
 : swapd ( x y z -- y x z ) >r swap r> ; inline
 : nip ( x y -- y ) swap drop ; inline
+: 2nip ( x y z -- z ) >r drop drop r> ; inline
 : tuck ( x y -- y x y ) dup >r swap r> ; inline
 
 : clear ( -- )
