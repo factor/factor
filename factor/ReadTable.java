@@ -43,10 +43,6 @@ public class ReadTable
 
 		DEFAULT_READTABLE.setCharacterType('\t',ReadTable.WHITESPACE);
 		DEFAULT_READTABLE.setCharacterType('\n',ReadTable.WHITESPACE);
-
-		// ^L
-		DEFAULT_READTABLE.setCharacterType((char)12,ReadTable.WHITESPACE);
-
 		DEFAULT_READTABLE.setCharacterType('\r',ReadTable.WHITESPACE);
 		DEFAULT_READTABLE.setCharacterType(' ',ReadTable.WHITESPACE);
 

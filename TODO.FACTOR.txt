@@ -1,7 +1,5 @@
-- move <resource-stream> from parser
 - quit responder breaks with multithreading
 - nicer way to combine two paths
-- -1.1 3 ^ shouldn't give a complex number
 - don't show listener on certain commands
 - plugin should not exit jEdit on fatal errors
 - wordpreview: don't show for string literals and comments
@@ -11,7 +9,6 @@
 - introduce ifte* and ?str-head/?str-tail where appropriate
 - namespace clone drops static var bindings
 - solaris: -lsocket -lnsl
-- unparsing: \u000c
 
 + bignums:
 
@@ -49,8 +46,6 @@
 
 - NPE in activate()/deactivate()
 - NPE in ErrorHighlight
-- caret at start of word: problem
-- don't use jEdit's word finding API
 - some way to not have previous definitions from a source file
   clutter the namespace
 - use inferior.factor for everything not just listener

@@ -39,13 +39,10 @@ USE: strings
 : run-file ( path -- )
     parse-file call ;
 
-: <resource-stream> ( path -- stream )
-    <rreader> f <char-stream> ;
-
 : parse-resource* ( resource -- list )
     dup <rreader> swap "resource:" swap cat2 swap parse-stream ;
 
-: parse-resource ( file -- )
+: parse-resource ( resource -- list )
      #! Override this to be slightly more useful for development.
     global [ "resource-path" get ] bind dup [
         swap cat2 parse-file

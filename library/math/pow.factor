@@ -34,6 +34,7 @@ USE: stack
 
 ! Power-related functions:
 !     exp log sqrt pow
+USE: logic
 
 : exp >rect swap fexp swap polar> ;
 : log >polar swap flog swap rect> ;
@@ -52,4 +53,8 @@ USE: stack
     [ [ >rect ] dip flog * swap ] dip * + ;
 
 : ^ ( z w -- z^w )
-    swap >polar 3dup ^theta [ ^mag ] dip polar> ;
+    over real? over integer? and [
+        fpow
+    ] [
+        swap >polar 3dup ^theta >r ^mag r> polar>
+    ] ifte ;

@@ -96,12 +96,6 @@ USE: strings
     #! the current interactive interpreter.
     (parse-file) call ;
 
-: resource-path ( -- path )
-    "resource-path" get [ "." ] unless* ;
-
-: <resource-stream> ( path -- stream )
-    resource-path swap cat2 <filecr> ;
-
 : parse-resource ( path -- quot )
     #! Resources are loaded from the resource-path variable, or
     #! the current directory if it is not set. Words defined in

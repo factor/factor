@@ -90,3 +90,9 @@ USE: namespaces
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'.
     [ 2dup (fcopy) ] [ -rot fclose fclose rethrow ] catch ;
+
+: resource-path ( -- path )
+    "resource-path" get [ "." ] unless* ;
+
+: <resource-stream> ( path -- stream )
+    resource-path swap cat2 <filecr> ;

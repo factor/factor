@@ -254,3 +254,6 @@ USE: strings
     #! Accept a connection from a server socket.
     [ "socket" get ] bind
     [ ] "java.net.ServerSocket" "accept" jinvoke <socket-stream> ;
+
+: <resource-stream> ( path -- stream )
+    <rreader> f <char-stream> ;

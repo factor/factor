@@ -24,8 +24,8 @@ void primitive_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	dpush(tag_object(s48_long_to_bignum(
-		t.tv_sec * 1000 + t.tv_usec/1000)));
+	dpush(tag_object(s48_long_long_to_bignum(
+		(long long)t.tv_sec * 1000 + t.tv_usec/1000)));
 }
 
 void primitive_init_random(void)

@@ -210,13 +210,40 @@ public class FactorPlugin extends EditPlugin
 		if(caret == line.length())
 			caret--;
 
-		String noWordSep = textArea.getBuffer().getStringProperty(
-			"noWordSep");
-		int wordStart = TextUtilities.findWordStart(line,caret,
-			noWordSep);
-		int wordEnd = TextUtilities.findWordEnd(line,caret,
-			noWordSep);
-		return line.substring(wordStart,wordEnd);
+		ReadTable readtable = ReadTable.DEFAULT_READTABLE;
+
+		if(readtable.getCharacterType(line.charAt(caret))
+			== ReadTable.WHITESPACE)
+		{
+			return null;
+		}
+
+		int start = caret;
+		while(start > 0)
+		{
+			if(readtable.getCharacterType(line.charAt(start - 1))
+				== ReadTable.WHITESPACE)
+			{
+				break;
+			}
+			else
+				start--;
+		}
+
+		int end = caret;
+		do
+		{
+			if(readtable.getCharacterType(line.charAt(end))
+				== ReadTable.WHITESPACE)
+			{
+				break;
+			}
+			else
+				end++;
+		}
+		while(end < line.length());
+
+		return line.substring(start,end);
 	} //}}}
 	
 	//{{{ showStatus() method
