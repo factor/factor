@@ -30,7 +30,7 @@ void run(void)
 	CELL next;
 
 	/* Error handling. */
-	setjmp(toplevel);
+	sigsetjmp(toplevel, 1);
 	
 	for(;;)
 	{

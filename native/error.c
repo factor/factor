@@ -38,7 +38,7 @@ void throw_error(CELL error)
 	}
 
 	/* Return to run() method */
-	longjmp(toplevel,1);
+	siglongjmp(toplevel,1);
 }
 
 void general_error(CELL error, CELL tagged)

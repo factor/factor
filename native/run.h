@@ -10,7 +10,7 @@
 #define GC_ENV         7
 
 /* Error handlers restore this */
-jmp_buf toplevel;
+sigjmp_buf toplevel;
 
 typedef struct {
 	/* TAGGED currently executing quotation */
