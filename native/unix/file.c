@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 void primitive_open_file(void)
 {
@@ -97,3 +97,4 @@ void primitive_cd(void)
 	maybe_garbage_collection();
 	chdir(unbox_c_string());
 }
+
