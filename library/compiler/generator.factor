@@ -52,9 +52,9 @@ SYMBOL: relocation-table
     #! If flag is true; relative.
     over primitive? [ rel-primitive ] [ 2drop ] ifte ;
 
-: rel-dlsym-self ( name rel/abs -- )
+: rel-dlsym ( name dll rel/abs -- )
     #! If flag is true; relative.
-    2 3 ? rel, relocating intern-literal rel, ;
+    2 3 ? rel, relocating cons intern-literal rel, ;
 
 : rel-address ( -- )
     #! Relocate address just compiled.

@@ -2,32 +2,38 @@
 
 void primitive_dlopen(void)
 {
+	DLL* dll;
+	F_STRING* path;
+
 	maybe_garbage_collection();
-	dpush(tag_object(ffi_dlopen(untag_string(dpop()))));
+
+	path = untag_string(dpop());
+	dll = allot_object(DLL_TYPE,sizeof(DLL));
+	dll->path = tag_object(path);
+	ffi_dlopen(dll);
+
+	dpush(tag_object(dll));
 }
 
 void primitive_dlsym(void)
 {
-	DLL *dll;	
-	F_STRING *sym;
+	CELL dll;
+	F_STRING* sym;
 
 	maybe_garbage_collection();
 
-	dll = untag_dll(dpop());
+	dll = dpop();
 	sym = untag_string(dpop());
-	dpush(tag_cell(ffi_dlsym(dll, sym)));
+
+	dpush(tag_cell((CELL)ffi_dlsym(
+		dll == F ? NULL : untag_dll(dll),
+		sym)));
 }
 
 void primitive_dlclose(void)
 {
 	maybe_garbage_collection();
 	ffi_dlclose(untag_dll(dpop()));
-}
-
-void primitive_dlsym_self(void)
-{
-	maybe_garbage_collection();
-	dpush(tag_cell(ffi_dlsym(NULL, untag_string(dpop()))));
 }
 
 DLL* untag_dll(CELL tagged)
@@ -148,7 +154,13 @@ void primitive_set_alien_1(void)
 
 void fixup_dll(DLL* dll)
 {
-	dll->dll = NULL;
+	data_fixup(&dll->path);
+	ffi_dlopen(dll);
+}
+
+void collect_dll(DLL* dll)
+{
+	copy_object(&dll->path);
 }
 
 void fixup_alien(ALIEN* alien)

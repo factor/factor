@@ -57,14 +57,6 @@ USE: kernel-internals
     init-random
     default-cli-args
     parse-command-line
-
-    os "win32" = "compile" get and [
-        "kernel32" "kernel32.dll" "stdcall" add-library
-        "user32"   "user32.dll"   "stdcall" add-library
-        "gdi32"    "gdi32.dll"    "stdcall" add-library
-        "libc"     "msvcrt.dll"   "cdecl"   add-library
-    ] when
-
     init-smart-terminal
     run-user-init ;
 
@@ -88,6 +80,13 @@ init-error-handler
 
 default-cli-args
 parse-command-line
+
+os "win32" = "compile" get and [
+    "kernel32" "kernel32.dll" "stdcall" add-library
+    "user32"   "user32.dll"   "stdcall" add-library
+    "gdi32"    "gdi32.dll"    "stdcall" add-library
+    "libc"     "msvcrt.dll"   "cdecl"   add-library
+] when
 
 "Compiling system..." print
 "compile" get [ compile-all ] when

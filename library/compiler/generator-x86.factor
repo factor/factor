@@ -34,12 +34,12 @@ USE: words
 USE: lists
 USE: math
 
-: DS ( -- address ) "ds" dlsym-self ;
+: DS ( -- address ) "ds" f dlsym ;
 
 : absolute-ds ( -- )
     #! Add an entry to the relocation table for the 32-bit
     #! immediate just compiled.
-    "ds" f rel-dlsym-self ;
+    "ds" f f rel-dlsym ;
 
 : POP-DS ( -- )
     #! Pop datastack to EAX.
@@ -129,17 +129,17 @@ USE: math
 ] "generator" set-word-property
 
 #c-call [
-    uncons alien-symbol CALL JUMP-FIXUP
+    uncons load-dll 2dup dlsym CALL JUMP-FIXUP t rel-dlsym
 ] "generator" set-word-property
 
 #unbox [
-    dlsym-self CALL JUMP-FIXUP
+    dup f dlsym CALL JUMP-FIXUP f t rel-dlsym
     EAX PUSH-R
 ] "generator" set-word-property
 
 #box [
     EAX PUSH-R
-    dlsym-self CALL JUMP-FIXUP
+    dup f dlsym CALL JUMP-FIXUP f t rel-dlsym
     4 ESP R+I
 ] "generator" set-word-property
 

@@ -150,7 +150,6 @@ XT primitives[] = {
 	primitive_address,
 	primitive_dlopen,
 	primitive_dlsym,
-	primitive_dlsym_self,
 	primitive_dlclose,
 	primitive_alien,
 	primitive_local_alien,

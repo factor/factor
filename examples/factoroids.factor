@@ -1,8 +1,15 @@
 ! A simple space shooter.
 !
-! To play the game:
+! To run this code, bootstrap Factor like so:
 !
-! ./f -libraries:sdl:name=libSDL.so -libraries:sdl-gfx:name=libSDL_gfx.so
+! ./f boot.image.le32
+!     -libraries:sdl:name=libSDL.so
+!     -libraries:sdl-gfx:name=libSDL_gfx.
+!
+! (But all on one line)
+!
+! Then, start Factor as usual (./f factor.image) and enter this
+! at the listener:
 !
 ! "examples/factoroids.factor" run-file
 

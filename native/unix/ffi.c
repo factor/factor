@@ -1,12 +1,11 @@
 #include "../factor.h"
 
-DLL *ffi_dlopen(F_STRING *path)
+void ffi_dlopen(DLL* dll)
 {
 #ifdef FFI
 	void* dllptr;
-	DLL* dll;
 	
-	dllptr = dlopen(to_c_string(path), RTLD_LAZY);
+	dllptr = dlopen(to_c_string(untag_string(dll->path)), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
@@ -14,9 +13,7 @@ DLL *ffi_dlopen(F_STRING *path)
 			from_c_string(dlerror())));
 	}
 
-	dll = allot_object(DLL_TYPE,sizeof(DLL));
 	dll->dll = dllptr;
-	return dll;
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif

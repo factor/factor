@@ -50,7 +50,7 @@ CELL to_cell(CELL x)
 			return (CELL)fixnum;
 		break;
 	case BIGNUM_TYPE:
-		bignum = to_bignum(dpop());
+		bignum = to_bignum(x);
 		if(BIGNUM_NEGATIVE_P(bignum))
 		{
 			range_error(F,0,tag_object(bignum),FIXNUM_MAX);
@@ -63,6 +63,7 @@ CELL to_cell(CELL x)
 		return 0;
 	}
 }
+
 /* FFI calls this */
 CELL unbox_cell(void)
 {

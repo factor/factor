@@ -61,19 +61,19 @@ USE: kernel
         nip real succ
     ] [
         nip >rect succ rect>
-    ] ifte ;
+    ] ifte ; inline
 
 : 2times<= ( #{ a b } #{ c d } -- ? )
-    swap real swap real <= ;
+    swap real swap real <= ; inline
 
 : (2times) ( limit n quot -- )
     pick pick 2times<= [
         3drop
     ] [
         rot pick dupd 2times-succ pick 3slip (2times)
-    ] ifte ;
+    ] ifte ; inline
 
 : 2times* ( #{ w h } quot -- )
     #! Apply a quotation to each pair of complex numbers
     #! #{ a b } such that a < w, b < h.
-    0 swap (2times) ;
+    0 swap (2times) ; inline

@@ -53,7 +53,7 @@ SYMBOL: surface
         >r 3dup bpp set height set width set r>
         SDL_SetVideoMode surface set
         r> call SDL_Quit
-    ] with-scope ;
+    ] with-scope ; inline
 
 : rgba ( r g b a -- n )
     swap 8 shift bitor
@@ -71,20 +71,21 @@ SYMBOL: surface
 
 : pixel-step ( quot #{ x y } -- )
     tuck >r call >r surface get r> r> >rect rot pixelColor ;
+    inline
 
 : with-pixels ( w h quot -- )
-    -rot rect> [ over >r pixel-step r> ] 2times* drop ;
+    -rot rect> [ over >r pixel-step r> ] 2times* drop ; inline
 
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
     [
         surface get dup must-lock-surface? [
-            dup SDL_LockSurface slip dup SDL_UnlockSurface
+            dup SDL_LockSurface drop slip dup SDL_UnlockSurface
         ] [
             slip
         ] ifte SDL_Flip drop
-    ] with-scope ;
+    ] with-scope ; inline
 
 : event-loop ( event -- )
     dup SDL_WaitEvent 1 = [

@@ -26,6 +26,7 @@
 
 + ffi:
 
+- figure out how to load an image referring to missing libraries
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
@@ -44,6 +45,7 @@
 
 + kernel:
 
+- do partial objects cause problems?
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
 - remove sbufs

@@ -1,9 +1,15 @@
 ! DeJong attractor renderer.
-! To run this code, start your interpreter like so:
 !
-! ./f -libraries:sdl:name=libSDL.so -libraries:sdl-gfx:name=libSDL_gfx.so
+! To run this code, bootstrap Factor like so:
 !
-! Then, enter this at the interpreter prompt:
+! ./f boot.image.le32
+!     -libraries:sdl:name=libSDL.so
+!     -libraries:sdl-gfx:name=libSDL_gfx.
+!
+! (But all on one line)
+!
+! Then, start Factor as usual (./f factor.image) and enter this
+! at the listener:
 !
 ! "examples/dejong.factor" run-file
 
@@ -19,6 +25,8 @@ USE: sdl-video
 USE: namespaces
 USE: math
 USE: kernel
+USE: test
+USE: compiler
 
 SYMBOL: a
 SYMBOL: b
@@ -58,6 +66,6 @@ SYMBOL: d
 
         <event> event-loop
         SDL_Quit
-    ] with-screen ;
+    ] with-screen ; compiled
 
-dejong
+[ dejong ] time

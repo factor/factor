@@ -153,7 +153,7 @@ END-STRUCT
     "bool" "sdl" "SDL_FillRect"
     [ "surface*" "rect*" "uint" ] alien-invoke ;
 
-: SDL_LockSurface ( surface -- )
+: SDL_LockSurface ( surface -- ? )
     "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-invoke ;
 
 : SDL_UnlockSurface ( surface -- )

@@ -105,8 +105,10 @@ void relocate_primitive(F_REL* rel, bool relative)
 
 void relocate_dlsym(F_REL* rel, bool relative)
 {
-	F_STRING* str = untag_string(get(rel->argument));
-	put(rel->offset,(CELL)ffi_dlsym(NULL,str)
+	F_CONS* cons = untag_cons(get(rel->argument));
+	F_STRING* symbol = untag_string(cons->car);
+	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
+	put(rel->offset,(CELL)ffi_dlsym(dll,symbol)
 		- (relative ? rel->offset + CELLS : 0));
 }
 
@@ -141,11 +143,11 @@ INLINE CELL relocate_code_next(CELL relocating)
 		case F_ABSOLUTE_PRIMITIVE:
 			relocate_primitive(rel,false);
 			break;
-		case F_RELATIVE_DLSYM_SELF:
+		case F_RELATIVE_DLSYM:
 			code_fixup(&rel->argument);
 			relocate_dlsym(rel,true);
 			break;
-		case F_ABSOLUTE_DLSYM_SELF:
+		case F_ABSOLUTE_DLSYM:
 			code_fixup(&rel->argument);
 			relocate_dlsym(rel,false);
 			break;

@@ -11,9 +11,10 @@ typedef enum {
 	/* arg is a primitive number */
 	F_RELATIVE_PRIMITIVE,
 	F_ABSOLUTE_PRIMITIVE,
-	/* arg is an pointer in the literal table holding a tagged string */
-	F_RELATIVE_DLSYM_SELF,
-	F_ABSOLUTE_DLSYM_SELF,
+	/* arg is a pointer in the literal table hodling a cons where the
+	car is a symbol string, and the cdr is a dll */
+	F_RELATIVE_DLSYM,
+	F_ABSOLUTE_DLSYM,
 	/* relocate an address to start of code heap */
 	F_ABSOLUTE
 } F_RELTYPE;

@@ -70,11 +70,16 @@ M: alien = ( obj obj -- ? )
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;
 
-: load-dll ( library -- dll )
-    "dll" get dup [
-        drop "name" get dlopen dup "dll" set
-    ] unless ;
-    
+: load-dll ( name -- dll )
+    #! Higher level wrapper around dlopen primitive.
+    library dup [
+        [
+            "dll" get dup [
+                drop "name" get dlopen dup "dll" set
+            ] unless
+        ] bind
+    ] when ;
+
 : add-library ( library name abi -- )
     "libraries" get [
         <namespace> [
@@ -92,9 +97,6 @@ SYMBOL: #box ( move EAX to datastack )
 
 : library-abi ( library -- abi )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
-
-: alien-symbol ( function library -- address )
-    library [ [ load-dll ] bind dlsym ] [ dlsym-self ] ifte* ;
 
 SYMBOL: #alien-invoke
 
@@ -149,7 +151,7 @@ SYMBOL: alien-parameters
 : linearize-alien ( node -- )
     dup linearize-parameters >r
     dup [ node-param get ] bind #c-call swons ,
-    dup [ node-param get car "stdcall" = ] bind
+    dup [ node-param get car library-abi "stdcall" = ] bind
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 

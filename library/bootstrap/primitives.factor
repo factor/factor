@@ -197,7 +197,6 @@ vocabularies get [
     [ "kernel" | "address" ]
     [ "alien" | "dlopen" ]
     [ "alien" | "dlsym" ]
-    [ "alien" | "dlsym-self" ]
     [ "alien" | "dlclose" ]
     [ "alien" | "<alien>" ]
     [ "alien" | "<local-alien>" ]
