@@ -12,8 +12,6 @@
 - optimize away dispatch
 
 - code gc
-- ppc register decls
-
 - #jump-f #jump-f-label
 - extract word inside M:, C:, and structure browsing for these
 - each-slot combinator
@@ -22,7 +20,6 @@
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
-- sdl console crash
 - more accurate types for various words
 - optimize out >array, >tuple, >hashtable etc
 - write read: write should flush

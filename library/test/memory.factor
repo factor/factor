@@ -7,7 +7,7 @@ USE: lists
 
 num-types [
     [
-        (instances) [
+        builtin-type instances [
             class drop
         ] each
     ] keep
