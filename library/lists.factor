@@ -104,7 +104,7 @@ USE: vectors
     #! For example, given a proper list, pushes a cons cell
     #! whose car is the last element of the list, and whose cdr
     #! is f.
-    [ dup cdr cons? ] [ cdr ] while ;
+    dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
     #! Pushes last element of a list. Since this pushes the

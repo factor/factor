@@ -29,6 +29,7 @@ IN: vectors
 DEFER: vector=
 
 IN: kernel
+
 USE: combinators
 USE: errors
 USE: io-internals
@@ -69,6 +70,7 @@ USE: vectors
         [ drop 0 ]
         [ >fixnum ]
         [ >fixnum ]
+        [ drop 0 ]
     } generic ;
 
 : equal? ( obj obj -- ? )
@@ -89,6 +91,7 @@ USE: vectors
         [ eq? ]
         [ number= ]
         [ number= ]
+        [ eq? ]
     } generic ;
 
 : = ( obj obj -- ? )
@@ -118,6 +121,7 @@ USE: vectors
         [ 12 | "port" ]
         [ 13 | "bignum" ]
         [ 14 | "float" ]
+        [ 15 | "dll" ]
         ! These values are only used by the kernel for error
         ! reporting.
         [ 100 | "fixnum/bignum" ]

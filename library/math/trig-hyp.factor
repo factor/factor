@@ -38,8 +38,8 @@ USE: stack
 ! Hyperbolic functions:
 !    cosh sech sinh cosech tanh coth
 
-: deg2rad pi * 180 / ;
-: rad2deg 180 * pi / ;
+: deg>rad pi * 180 / ;
+: rad>deg 180 * pi / ;
 
 : cos ( z -- cos )
     >rect 2dup

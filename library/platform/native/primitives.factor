@@ -26,21 +26,22 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 USE: combinators
+USE: alien
+USE: compiler
 USE: files
 USE: io-internals
-USE: lists
 USE: kernel
+USE: lists
 USE: math
-USE: strings
-USE: random
-USE: real-math
 USE: parser
 USE: profiler
+USE: random
+USE: real-math
 USE: stack
+USE: strings
+USE: unparser
 USE: vectors
 USE: words
-USE: unparser
-USE: compiler
 
 [
     [ execute                | " word -- " ]
@@ -196,6 +197,10 @@ USE: compiler
     [ set-compiled-offset    | " ptr -- " ]
     [ literal-top            | " -- ptr " ]
     [ set-literal-top        | " ptr -- " ]
+    [ dlopen                 | " path -- dll " ]
+    [ dlsym                  | " name dll -- ptr " ]
+    [ dlsym-self             | " name -- ptr " ]
+    [ dlclose                | " dll -- " ]
 ] [
     unswons "stack-effect" swap set-word-property
 ] each

@@ -42,7 +42,7 @@
 - finish namespaces docs
 - mention word accessors/mutators
 - to document:
-  >r r> (earlier on?)
+  >r r> example
   continuations
   streams
   multitasking

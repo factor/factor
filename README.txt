@@ -41,8 +41,8 @@ exactly one primitive for performing conditional execution:
 
     USE: combinators
 
-    1 10 < [ "10 is less than 1." print ] [ "whoa!" print ] ifte
-    ==> 10 is less than 1.
+    1 10 < [ "1 is less than 10." print ] [ "whoa!" print ] ifte
+    ==> 1 is less than 10.
 
 Here is an example of a word that uses these two concepts:
 

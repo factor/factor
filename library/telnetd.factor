@@ -61,11 +61,10 @@ USE: threads
     global [ f "telnetd-quit-flag" set ] bind ;
 
 : telnetd-loop ( server -- server )
-    [
-        quit-flag not
-    ] [
+    quit-flag [
         dup >r accept telnet-connection r>
-    ] while ;
+        telnetd-loop
+    ] unless ;
 
 : telnetd ( port -- )
     [

@@ -23,6 +23,12 @@
 #include <sys/time.h>
 #include <netdb.h>
 
+#define FFI
+
+#ifdef FFI
+#include <dlfcn.h>
+#endif /* FFI */
+
 #define INLINE inline static
 
 /* CELL must be 32 bits and your system must have 32-bit pointers */
@@ -81,5 +87,6 @@ and allows profiling. */
 #include "vector.h"
 #include "stack.h"
 #include "compiler.h"
+#include "ffi.h"
 
 #endif /* __FACTOR_H__ */

@@ -44,11 +44,17 @@ USE: combinators
 : MOD-R/M ( r/m reg/opcode mod -- )
     6 shift swap 3 shift bitor bitor compile-byte ;
 
-: PUSH ( reg -- )
+: PUSH-R ( reg -- )
     HEX: 50 + compile-byte ;
 
-: POP ( reg -- )
+: PUSH-I ( imm -- )
+    HEX: 68 compile-byte compile-cell ;
+
+: POP-R ( reg -- )
     HEX: 58 + compile-byte ;
+
+: LEAVE ( -- )
+    HEX: c9 compile-byte ;
 
 : I>R ( imm reg -- )
     #! MOV <imm> TO <reg>
@@ -68,14 +74,17 @@ USE: combinators
     HEX: c7 compile-byte  compile-byte  compile-cell ;
 
 : R>[I] ( reg imm -- )
-    #! MOV INDIRECT <imm> TO <reg>.
-    #! Actually only works with EAX.
+    #! MOV <reg> TO INDIRECT <imm>.
     over EAX = [
         nip HEX: a3 compile-byte
     ] [
         HEX: 89 compile-byte
         swap BIN: 101 swap 0 MOD-R/M
     ] ifte compile-cell ;
+
+: R>R ( reg reg -- )
+    #! MOV <reg> TO <reg>.
+    HEX: 89 compile-byte  swap BIN: 11 MOD-R/M ;
 
 : [R]>R ( reg reg -- )
     #! MOV INDIRECT <reg> TO <reg>.
@@ -91,6 +100,22 @@ USE: combinators
     BIN: 101 0 0 MOD-R/M
     compile-cell
     compile-cell ;
+
+: R+I ( imm reg -- )
+    #! ADD <imm> TO <reg>, STORE RESULT IN <reg>
+    over -128 127 between? [
+        HEX: 83 compile-byte
+        0 BIN: 11 MOD-R/M
+        compile-byte
+    ] [
+        dup EAX = [
+            drop HEX: 05 compile-byte
+        ] [
+            HEX: 81 compile-byte
+            0 BIN: 11 MOD-R/M
+        ] ifte
+        compile-cell
+    ] ifte ;
 
 : R-I ( imm reg -- )
     #! SUBTRACT <imm> FROM <reg>, STORE RESULT IN <reg>
@@ -132,12 +157,20 @@ USE: combinators
 : [LITERAL] ( cell -- )
     #! Push complex literal on data stack by following an
     #! indirect pointer.
-    ECX PUSH
+    ECX PUSH-R
     ( cell -- ) ECX [I]>R
     DATASTACK EAX [I]>R
     ECX EAX R>[R]
     4 DATASTACK I+[I]
-    ECX POP ;
+    ECX POP-R ;
+
+: PUSH-DS ( -- )
+    #! Push contents of EAX onto datastack.
+    ECX PUSH-R
+    DATASTACK ECX [I]>R
+    EAX ECX R>[R]
+    4 DATASTACK I+[I]
+    ECX POP-R ;
 
 : POP-DS ( -- )
     #! Pop datastack, store pointer to datastack top in EAX.

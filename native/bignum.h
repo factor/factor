@@ -8,7 +8,6 @@ INLINE ARRAY* untag_bignum(CELL tagged)
 	return (ARRAY*)UNTAG(tagged);
 }
 
-void primitive_bignump(void);
 ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 CELL number_eq_bignum(ARRAY* x, ARRAY* y);

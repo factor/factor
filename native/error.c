@@ -45,10 +45,12 @@ void general_error(CELL error, CELL tagged)
 		fprintf(stderr,"Error #%ld\n",to_fixnum(error));
 		if(error == ERROR_TYPE)
 		{
+			CELL obj = untag_cons(untag_cons(tagged)->cdr)->car;
+
 			fprintf(stderr,"Type #%ld\n",to_fixnum(
 				untag_cons(tagged)->car));
-			fprintf(stderr,"Got type #%ld\n",type_of(
-				untag_cons(tagged)->cdr));
+			fprintf(stderr,"Object %ld\n",obj);
+			fprintf(stderr,"Got type #%ld\n",type_of(obj));
 		}
 		fflush(stderr);
 		exit(1);

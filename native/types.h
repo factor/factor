@@ -31,6 +31,7 @@ CELL T;
 #define PORT_TYPE 12
 #define BIGNUM_TYPE 13
 #define FLOAT_TYPE 14
+#define DLL_TYPE 15
 
 /* Pseudo-types. For error reporting only. */
 #define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
@@ -60,9 +61,12 @@ INLINE CELL tag_header(CELL cell)
 
 INLINE CELL untag_header(CELL cell)
 {
+	CELL type = cell >> TAG_BITS;
 	if(TAG(cell) != HEADER_TYPE)
 		critical_error("header type check",cell);
-	return cell >> TAG_BITS;
+	if(type <= HEADER_TYPE && type != WORD_TYPE)
+		critical_error("header invariant check",cell);
+	return type;
 }
 
 INLINE CELL tag_object(void* cell)

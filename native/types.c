@@ -103,6 +103,9 @@ CELL untagged_object_size(CELL pointer)
 	case PORT_TYPE:
 		size = sizeof(PORT);
 		break;
+	case DLL_TYPE:
+		size = sizeof(DLL);
+		break;
 	default:
 		critical_error("Cannot determine size",relocating);
 		size = -1;/* can't happen */

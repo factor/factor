@@ -160,7 +160,11 @@ XT primitives[] = {
 	primitive_set_compiled_offset,
 	primitive_literal_top,
 	primitive_set_literal_top,
-	primitive_address_of
+	primitive_address_of,
+	primitive_dlopen,
+	primitive_dlsym,
+	primitive_dlsym_self,
+	primitive_dlclose
 };
 
 CELL primitive_to_xt(CELL primitive)

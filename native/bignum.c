@@ -1,10 +1,5 @@
 #include "factor.h"
 
-void primitive_bignump(void)
-{
-	drepl(tag_boolean(typep(BIGNUM_TYPE,dpeek())));
-}
-
 ARRAY* to_bignum(CELL tagged)
 {
 	RATIO* r;

@@ -18,7 +18,6 @@ COMPLEX* complex(CELL real, CELL imaginary);
 COMPLEX* to_complex(CELL x);
 CELL possibly_complex(CELL real, CELL imaginary);
 
-void primitive_complexp(void);
 void primitive_real(void);
 void primitive_imaginary(void);
 void primitive_to_rect(void);

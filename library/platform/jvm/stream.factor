@@ -232,9 +232,10 @@ USE: strings
 : <socket-stream> ( socket -- stream )
     #! Wraps a socket inside a byte-stream.
     dup
-    [ [ ] "java.net.Socket" "getInputStream"  jinvoke <bin> ]
-    [ [ ] "java.net.Socket" "getOutputStream" jinvoke <bout> ]
-    cleave
+    dup
+    [ ] "java.net.Socket" "getInputStream"  jinvoke <bin>
+    swap
+    [ ] "java.net.Socket" "getOutputStream" jinvoke <bout>
     <byte-stream> [
         dup >str "client" set "socket" set
 

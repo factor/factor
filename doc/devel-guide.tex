@@ -967,25 +967,50 @@ USE: stack
 
 \section{Sequences}
 
+Factor supports two primary types for storing sequential data; lists and vectors.
+Lists are stored in a linked manner, with each node of the list holding an
+element and a reference to the next node. Vectors, on the other hand, are contiguous sets of cells in memory, with each cell holding an element. Strings and string buffers can be considered as vectors specialized to holding characters, with the additional restriction that strings are immutable.
+
+Vectors are applicable to a different class of problems than lists.
+Compare the relative performance of common operations on vectors and
+lists:
+
+\begin{tabular}{|r|l|l|}
+\hline 
+&
+Lists&
+Vectors\tabularnewline
+\hline
+\hline 
+Random access of an index&
+linear time&
+constant time\tabularnewline
+\hline 
+Add new element at start&
+constant time&
+linear time\tabularnewline
+\hline 
+Add new element at end&
+linear time&
+constant time\tabularnewline
+\hline
+\end{tabular}
+
+Vectors and lists can be converted back and forth using the \texttt{vector>list}
+word \texttt{( vector -{}- list )} and the \texttt{list>vector} word
+\texttt{( list -{}- vector )}.
+
 \subsection{Lists and cons cells}
 
-A list of objects is realized as a set of pairs; each pair holds a list element,
-and a reference to the next pair. These pairs are known as \emph{cons cells}. All words relating to cons cells and lists are found in the \texttt{lists}
-vocabulary. Lists have the following literal
-syntax:
-
-\begin{alltt}
-{[} "CEO" 5 "CFO" -4 f {]}
-\end{alltt}
-
-A cons cell is an object that holds a reference to two other objects.
-The order of the two objects matters -- the first is called the \emph{car},
+A \emph{cons cell} is a compound object holding references to two other objects. The order matters; the first is called the \emph{car},
 the second is called the \emph{cdr}.
 
 The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
 \footnote{These infamous names originate from the Lisp language. Originally,
 {}``Lisp'' stood for {}``List Processing''.%
-} construct and deconstruct cons cells:
+} construct and deconstruct cons cells.
+All words relating to cons cells and lists are found in the \texttt{lists}
+vocabulary.
 
 \begin{alltt}
 1 2 cons .
@@ -995,6 +1020,7 @@ The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
 5 6 cons cdr .
 \emph{6}
 \end{alltt}
+
 The output of the first expression suggests a literal syntax for cons
 cells:
 
@@ -1006,18 +1032,18 @@ cells:
 {[} "first" | {[} "second" | f {]} {]} cdr car .
 \emph{"second"}
 \end{alltt}
-The last two examples make it clear how nested cons cells represent
-a list. Since this {}``nested cons cell'' syntax is extremely cumbersome,
-the parser provides an easier way:
+
+A \emph{proper list} (or often, just a \emph{list}) is a cons cell whose car is the first element, and the cdr is the \emph{rest of the list}. The car of the last cons cell in the list is the last element, and the cdr is \texttt{f}.
+
+Lists have the following literal
+syntax:
 
 \begin{alltt}
 {[} 1 2 3 4 {]} cdr cdr car .
 \emph{3}
 \end{alltt}
 
-A \emph{proper list} is a set of cons cells linked by their cdr, where the last cons cell has a cdr set to \texttt{f}. Also, the object \texttt{f} by itself
-is a proper list, and in fact it is equivalent to the empty list \texttt{{[}
-{]}}. An \emph{improper list} is a set of cons cells that does not terminate with \texttt{f}. Improper lists are input with the following syntax:
+An \emph{improper list} is one where the cdr of the last cons cell is not \texttt{f}. Improper lists are input with the following syntax:
 
 \begin{verbatim}
 [ 1 2 3 | 4 ]
@@ -1049,7 +1075,7 @@ It is worth mentioning a few words closely related to and defined in terms of \t
 : uncons dup car swap cdr ;
 \end{alltt}
 
-\texttt{unswons ( cons -{}- cdr car)} is just a swapped version of \texttt{uncons}. It is defined as thus:
+\texttt{unswons ( cons -{}- cdr car )} is just a swapped version of \texttt{uncons}. It is defined as thus:
 
 \begin{alltt}
 : unswons dup cdr swap car ;
@@ -1081,9 +1107,10 @@ the original list, and a new element added at the end:
 1 {[} 2 3 4 {]} cons .
 \emph{{[} 1 2 3 4 {]}}
 \end{alltt}
+
 While \texttt{cons} and \texttt{add} appear to have similar effects,
 they are quite different -- \texttt{cons} is a very cheap operation,
-while \texttt{add} has to copy the entire list first! If you need to add to the end of a sequence frequently, consider either using a vector, or adding to the beginning of a list and reversing the list when done. For information about lists, see \ref{sub:Vectors}.
+while \texttt{add} has to copy the entire list first! If you need to add to the end of a sequence frequently, consider either using a vector, or adding to the beginning of a list and reversing the list when done.
 
 \texttt{append ( list list -{}- list )} Append two lists at the
 top of the stack:
@@ -1094,6 +1121,7 @@ top of the stack:
 {[} 1 2 3 {]} dup {[} 4 5 6 {]} append .s
 \emph{\{ {[} 1 2 3 {]} {[} 1 2 3 4 5 6 {]} \}}
 \end{alltt}
+
 The first list is copied, and the cdr of its last cons cell is set
 to point to the second list. The second example above shows that the original
 parameter was not modified. Interestingly, if the second parameter
@@ -1103,6 +1131,7 @@ is not a proper list, \texttt{append} returns an improper list:
 {[} 1 2 3 {]} 4 append .
 \emph{{[} 1 2 3 | 4 {]}}
 \end{alltt}
+
 \texttt{length ( list -{}- n )} Iterate down the cdr of the list until
 it reaches \texttt{f}, counting the number of elements in the list:
 
@@ -1112,6 +1141,7 @@ it reaches \texttt{f}, counting the number of elements in the list:
 {[} {[} {[} "Hey" {]} 5 {]} length .
 \emph{2}
 \end{alltt}
+
 \texttt{nth ( index list -{}- obj )} Look up an element specified
 by a zero-based index, by successively iterating down the cdr of the
 list:
@@ -1120,6 +1150,7 @@ list:
 1 {[} "Hamster" "Bagpipe" "Beam" {]} nth .
 \emph{"Bagpipe"}
 \end{alltt}
+
 This word runs in linear time proportional to the list index. If you
 need constant time lookups, use a vector instead.
 
@@ -1128,10 +1159,11 @@ identical to the original list except the element at the specified
 index is replaced:
 
 \begin{alltt}
-{}``Done'' 1 {[} {}``Not started'' {}``Incomplete'' {]} set-nth .
+"Done" 1 {[} "Not started" "Incomplete" {]} set-nth .
 
-\emph{{[} {}``Done'' {}``Incomplete'' {]}}
+\emph{{[} "Done" "Incomplete" {]}}
 \end{alltt}
+
 \texttt{remove ( obj list -{}- list )} Push a new list, with all occurrences
 of the object removed. All other elements are in the same order:
 
@@ -1140,6 +1172,7 @@ of the object removed. All other elements are in the same order:
 {[} "Canada" "New Zealand" "Australia" "Russia" {]} australia- .
 \emph{{[} "Canada" "New Zealand" "Russia" {]}}
 \end{alltt}
+
 \texttt{remove-nth ( index list -{}- list )} Push a new list, with
 an index removed:
 
@@ -1148,6 +1181,7 @@ an index removed:
 {[} "Canada" "New Zealand" "Australia" "Russia" {]} remove-1 .
 \emph{{[} "Canada" "Australia" "Russia" {]}}
 \end{alltt}
+
 \texttt{reverse ( list -{}- list )} Push a new list which has the
 same elements as the original one, but in reverse order:
 
@@ -1155,6 +1189,7 @@ same elements as the original one, but in reverse order:
 {[} 4 3 2 1 {]} reverse .
 \emph{{[} 1 2 3 4 {]}}
 \end{alltt}
+
 \texttt{contains ( obj list -{}- list )} Look for an occurrence of
 an object in a list. The remainder of the list starting from the first
 occurrence is returned. If the object does not occur in the list,
@@ -1170,22 +1205,24 @@ f is returned:
 "Pakistan" lived-in? .
 \emph{f}
 \end{alltt}
-For now, assume {}``occurs'' means {}``contains an object that
-looks like''. The issue of object equality is covered later.
 
-\texttt{unique ( list -{}- list )} Return a new list with all duplicate
-elements removed. This word executes in quadratic time, so should
-not be used with large lists. For example:
+For now, assume {}``occurs'' means {}``contains an object that
+looks like''. The concept of object equality is covered later.
+
+\texttt{unique ( elem list -{}- list )} Return a new list containing the new element. If the list already contains the element, the same list is returned, otherwise the element is consed onto the list. This word executes in linear time, so its use in loops can be a potential performance bottleneck.
 
 \begin{alltt}
-{[} 1 2 1 4 1 8 {]} unique .
+1 {[} 1 2 4 8 {]} unique .
 \emph{{[} 1 2 4 8 {]}}
+3 {[} 1 2 4 8 {]} unique .
+\emph{{[} 3 1 2 4 8 {]}}
 \end{alltt}
+
 \texttt{unit ( obj -{}- list )} Make a list of one element:
 
 \begin{alltt}
-{}``Unit 18'' unit .
-\emph{{[} {}``Unit 18'' {]}}
+"Unit 18" unit .
+\emph{{[} "Unit 18" {]}}
 \end{alltt}
 
 \subsection{\label{sub:Destructively-modifying-lists}Destructively modifying lists}
@@ -1210,6 +1247,7 @@ the original list, and the original list has been destroyed:
 {[} 1 2 3 4 {]} dup nreverse .s
 \emph{\{ {[} 1 {]} {[} 4 3 2 1 {]} \}}
 \end{alltt}
+
 Compare the second stack element (which is what remains of the original
 list) and the top stack element (the list returned by \texttt{nreverse}).
 
@@ -1229,6 +1267,7 @@ it is unchanged, otherwise, it is equal to the return value:
 {[} 1 2 {]} {[} 3 4 {]} nappend .
 \emph{{[} 1 2 3 4 {]}}
 \end{alltt}
+
 Note in the above examples, we use literal list parameters to \texttt{nreverse}
 and \texttt{nappend}. This is actually a very bad idea, since the same literal
 list may be used more than once! For example, lets make a colon definition:
@@ -1238,11 +1277,12 @@ list may be used more than once! For example, lets make a colon definition:
 very-bad-idea .
 \emph{{[} 4 3 2 1 {]}}
 very-bad-idea .
-\emph{{[} 4 {]}}
-{}``very-bad-idea'' see
+\emph{{[} 1 {]}}
+"very-bad-idea" see
 \emph{: very-bad-idea}
- \emph{   {[} 4 {]} nreverse ;}
+ \emph{   {[} 1 {]} nreverse ;}
 \end{alltt}
+
 As you can see, the word definition itself was ruined!
 
 Sometimes it is desirable make a copy of a list, so that the copy
@@ -1262,7 +1302,7 @@ itself.
 
 \subsection{\label{sub:Vectors}Vectors}
 
-A \emph{vector} is a contiguous chunk of memory cells which hold references to arbitrary
+A \emph{vector} is a contiguous chunk of memory cells holding references to arbitrary
 objects. Vectors have the following literal syntax:
 
 \begin{alltt}
@@ -1286,9 +1326,10 @@ at a zero-based index of a vector:
 2 \{ 1 2 \} vector-nth .
 \emph{ERROR: Out of bounds}
 \end{alltt}
+
 \texttt{set-vector-nth ( obj index vector -{}- )} stores a value into
 a vector:%
-\footnote{The words \texttt{get} and \texttt{set} used in this example will
+\footnote{The words \texttt{get} and \texttt{set} used in this example refer to variables and will
 be formally introduced later.%
 }
 
@@ -1301,6 +1342,7 @@ be formally introduced later.%
 "v" get .
 \emph{\{ "math" "philosophy" f f "CS" \}}
 \end{alltt}
+
 \texttt{vector-length ( vector -{}- length )} pushes the number of
 elements in a vector. As the previous two examples demonstrate, attempting
 to fetch beyond the end of the vector will raise an error, while storing
@@ -1333,47 +1375,6 @@ pop-state .
 pop-state .
 \emph{12}
 \end{alltt}
-
-\subsection{Vectors versus lists}
-
-Vectors are applicable to a different class of problems than lists.
-Compare the relative performance of common operations on vectors and
-lists:
-
-\begin{tabular}{|r|l|l|}
-\hline 
-&
-Lists&
-Vectors\tabularnewline
-\hline
-\hline 
-Random access of an index&
-linear time&
-constant time\tabularnewline
-\hline 
-Add new element at start&
-constant time&
-linear time\tabularnewline
-\hline 
-Add new element at end&
-linear time&
-constant time\tabularnewline
-\hline
-\end{tabular}
-
-When using vectors, you need to pass around a vector and an index
--- when working with lists, often only a list head is passed around.
-For this reason, if you need a sequence for iteration only, a list
-is a better choice because the list vocabulary contains a rich collection
-of recursive words.
-
-On the other hand, when you need to maintain your own {}``stack''-like
-collection, a vector is the obvious choice, since most pushes and
-pops can then avoid allocating memory.
-
-Vectors and lists can be converted back and forth using the \texttt{vector>list}
-word \texttt{( vector -{}- list )} and the \texttt{list>vector} word
-\texttt{( list -{}- vector )}.
 
 \subsection{Strings}
 
@@ -1589,6 +1590,26 @@ new character positions are automatically filled with zeroes.
 
 \section{Control flow}
 
+Recall the syntax for a conditional statement from the first chapter:
+
+\begin{alltt}
+1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
+\end{alltt}
+
+The syntax for the quotations there looks an aweful lot like the syntax for literal lists. In fact, code quotations \emph{are} lists. Factor code is data, and vice versa.
+
+Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine.
+
+\subsection{The call stack}
+
+So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
+
+Another fundamental stack is the \emph{call stack}. When invoking an inner colon definition, the interpreter pushes the current execution state on the call stack so that it can be restored later.
+
+The call stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the call stack, and vice versa, respectively.
+
+give an example here
+
 \subsection{Recursion}
 
 The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional. The general form of a recursive word looks as follows:
@@ -1602,9 +1623,11 @@ The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} 
     {]} ifte ;
 \end{alltt}
 
-The recursive case contains one more more calls to the original word. When a recursive call is made, the current execution state is saved on the \emph{call stack}, so that when the recursive call returns execution continues where it left off.
+The recursive case contains one or more calls to the original word.
 
-There are a few things worth noting about the stack flow inside a recursive word. The condition must take care to preserve any input parameters needed for the base case and recursive case. The base case must consume all inputs, and leave the final return values on the stack. The recursive case should also be coded such that the stack effect of the total definition is the same regardless of how many iterations are preformed; words that consume or produce different numbers of paramters depending on circumstances are very hard to debug.
+There are a few things worth noting about the stack flow inside a recursive word. The condition must take care to preserve any input parameters needed for the base case and recursive case. The base case must consume all inputs, and leave the final return values on the stack. The recursive case should somehow reduce one of the parameters. This could mean incrementing or decrementing an integer, taking the \texttt{cdr} of a list, and so on. Parameters must eventually reduce to a state where the condition returns \texttt{f}, to avoid an infinite recursion.
+
+The recursive case should also be coded such that the stack effect of the total definition is the same regardless of how many iterations are preformed; words that consume or produce different numbers of paramters depending on circumstances are very hard to debug.
 
 In a programming language such as Java\footnote{Although by the time you read this, Java implementations might be doing tail-call optimization.}, using recursion to iterate through a long list is highly undesirable because it risks overflowing the (finite) call stack depth. However, Factor performs \emph{tail call optimization}, which is based on the observation that if the recursive call is made at a point right before the word being defined would return, there is \emph{actually nothing to save} on the call stack, so recursion call nesting can occur to arbitrary depth. Such recursion is known as \emph{tail recursion}.
 
@@ -2377,11 +2400,7 @@ The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, a
 
 \subsection{The name stack}
 
-So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
-
-Another stack is the \emph{call stack}. When a colon definition is invoked, the position within the current colon definition is pushed on the stack. This ensures that calling words return to the caller, just as in any other language with subroutines.\footnote{Factor supports a variety of structures for implementing non-local word exits, such as exceptions, co-routines, continuations, and so on. They all rely on manipulating the call stack and are described in later sections.}
-
-The \emph{name stack} is the focus of this section. The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the name stack. Its definition is simpler than one would expect:
+The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
 
 \begin{alltt}
 : bind ( namespace quot -- )

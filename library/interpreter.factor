@@ -102,8 +102,11 @@ USE: vectors
     ] ifte ;
 
 : interpreter-loop ( -- )
-    [ "quit-flag" get not ] [ interpret ] while
-    "quit-flag" off ;
+    "quit-flag" get [
+        "quit-flag" off
+    ] [
+        interpret interpreter-loop
+    ] ifte ;
 
 : room. ( -- )
     room

@@ -113,11 +113,10 @@ USE: url-encoding
     global [ "httpd-quit" off ] bind ;
 
 : httpd-loop ( server -- server )
-    [
-        quit-flag not
-    ] [
+    quit-flag [
         dup dup accept httpd-connection
-    ] while ;
+        httpd-loop
+    ] unless ;
 
 : (httpd) ( port -- )
     <server> [

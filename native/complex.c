@@ -33,11 +33,6 @@ CELL possibly_complex(CELL real, CELL imaginary)
 		return tag_complex(complex(real,imaginary));
 }
 
-void primitive_complexp(void)
-{
-	drepl(tag_boolean(typep(COMPLEX_TYPE,dpeek())));
-}
-
 void primitive_real(void)
 {
 	switch(type_of(dpeek()))

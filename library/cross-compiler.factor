@@ -40,6 +40,12 @@ USE: vectors
 USE: vectors
 USE: words
 
+IN: alien
+DEFER: dlopen
+DEFER: dlsym
+DEFER: dlsym-self
+DEFER: dlclose
+
 IN: compiler
 DEFER: set-compiled-byte
 DEFER: set-compiled-cell
@@ -288,6 +294,10 @@ IN: image
         literal-top
         set-literal-top
         address-of
+        dlopen
+        dlsym
+        dlsym-self
+        dlclose
     ] [
         swap succ tuck primitive,
     ] each drop ;

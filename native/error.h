@@ -13,6 +13,8 @@
 #define ERROR_NEGATIVE_ARRAY_SIZE (12<<3)
 #define ERROR_BAD_PRIMITIVE (13<<3)
 #define ERROR_C_STRING (14<<3)
+#define ERROR_FFI_DISABLED (15<<3)
+#define ERROR_FFI (16<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

@@ -1,11 +1,13 @@
 CC = gcc
 
+# On FreeBSD, to use SDL and other libc_r libs:
+CFLAGS = -Os -g -Wall -pthread
 # On PowerPC G5:
 # CFLAGS = -mcpu=970 -mtune=970 -mpowerpc64 -ffast-math -O3
 # On Pentium 4:
 # CFLAGS = -march=pentium4 -ffast-math -O3 -fomit-frame-pointer
 # Add -fomit-frame-pointer if you don't care about debugging
-CFLAGS = -Os -g -Wall
+# CFLAGS = -Os -g -Wall
 
 # On Solaris:
 # LIBS = -lsocket -lnsl -lm
@@ -24,7 +26,8 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/run.o \
 	native/sbuf.o native/socket.o native/stack.o \
 	native/string.o native/types.o native/vector.o \
-	native/write.o native/word.o native/compiler.o
+	native/write.o native/word.o native/compiler.o \
+	native/ffi.o
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)

@@ -84,7 +84,7 @@ USE: words
     "Operating system signal " write . ;
 
 : profiling-disabled-error ( obj -- )
-    drop "Recompile with the FACTOR_PROFILER flag." print ;
+    drop "Recompile with #define FACTOR_PROFILER." print ;
 
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;
@@ -94,6 +94,12 @@ USE: words
 
 : c-string-error ( obj -- )
     "Cannot convert to C string: " write . ;
+
+: ffi-disabled-error ( obj -- )
+    drop "Recompile Factor with #define FFI." print ;
+
+: ffi-error ( obj -- )
+    "FFI: " write print ;
 
 : kernel-error. ( obj n -- str )
     {
@@ -112,6 +118,8 @@ USE: words
         negative-array-size-error
         bad-primitive-error
         c-string-error
+        ffi-disabled-error
+        ffi-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

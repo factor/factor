@@ -41,7 +41,7 @@ USE: stack
 
 : str-length< ( str str -- boolean )
     #! Compare string lengths.
-    [ str-length ] 2apply < ;
+    swap str-length swap str-length < ;
 
 : cat ( [ "a" "b" "c" ] -- "abc" )
     ! If f appears in the list, it is not appended to the

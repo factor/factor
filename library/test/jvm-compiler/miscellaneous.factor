@@ -30,7 +30,7 @@ USE: words
 [ f           ] [                 ] [ gensym-test       ] test-word
 
 : intern-test ( 1 2 -- ? )
-    [ intern ] 2apply = ;
+    swap intern swap intern = ;
 
 [ f ] [ "#:a" "#:a" ] [ intern-test ] test-word
 [ t ] [ "#:" "#:" ] [ intern-test ] test-word
