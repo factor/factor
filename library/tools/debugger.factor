@@ -61,13 +61,17 @@ USE: generic
 : type-error-name ( n -- string )
     #! These values are only used by the kernel for error
     #! reporting.
-    [
+    dup [
         [ 100 | "fixnum/bignum" ]
         [ 101 | "fixnum/bignum/ratio" ]
         [ 102 | "fixnum/bignum/ratio/float" ]
         [ 103 | "fixnum/bignum/ratio/float/complex" ]
         [ 104 | "fixnum/string" ]
-    ] assoc [ type-name ] unless* ;
+    ] assoc dup [
+        nip
+    ] [
+        drop type-name
+    ] ifte ;
 
 : type-check-error ( list -- )
     "Type check error" print
@@ -75,11 +79,12 @@ USE: generic
     "Object type: " write type type-error-name print
     "Expected type: " write type-error-name print ;
 
-: array-range-error ( list -- )
-    "Array range check error" print
-    unswons "Object: " write .
-    uncons car "Maximum index: " write .
-    "Requested index: " write . ;
+: range-error ( list -- )
+    "Range check error" print
+    unswons [ "Object: " write . ] when*
+    unswons "Minimum index: " write .
+    unswons "Requested index: " write .
+    car "Maximum index: " write . ;
 
 : float-format-error ( list -- )
     "Invalid floating point literal format: " write . ;
@@ -111,7 +116,7 @@ USE: generic
         io-error
         undefined-word-error
         type-check-error
-        array-range-error
+        range-error
         float-format-error
         signal-error
         negative-array-size-error

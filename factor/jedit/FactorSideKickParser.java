@@ -184,9 +184,9 @@ public class FactorSideKickParser extends SideKickParser
 				FactorWord word = def.word;
 
 				/* word lines are indexed from 1 */
-				int startLine = Math.min(
+				int startLine = Math.max(0,Math.min(
 					buffer.getLineCount() - 1,
-					word.line - 1);
+					word.line - 1));
 				int startLineLength = buffer.getLineLength(startLine);
 				int startCol = Math.min(word.col,startLineLength);
 
@@ -194,7 +194,7 @@ public class FactorSideKickParser extends SideKickParser
 					+ startCol;
 
 				if(last != null)
-					last.end = buffer.createPosition(start - 1);
+					last.end = buffer.createPosition(Math.max(0,start - 1));
 
 				last = new FactorAsset(word,buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));

@@ -41,3 +41,5 @@ USE: math
 
 ! Make sure we use correct to_c_string form when writing
 [ ] [ "\0" write ] unit-test
+
+[ -1 read# ] unit-test-fails

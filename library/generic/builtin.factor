@@ -79,4 +79,9 @@ builtin 50 "priority" set-word-property
 : type-name ( n -- string )
     builtin-type word-name ;
 
+: class ( obj -- class )
+    #! Analogous to the type primitive. Pushes the builtin
+    #! class of an object.
+    type builtin-type ;
+
 global [ num-types <vector> types set ] bind

@@ -25,13 +25,17 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vectors
+IN: kernel-internals
 USE: generic
+
+BUILTIN: array 8
+
+IN: vectors
 USE: kernel
 USE: lists
 USE: math
 
-BUILTIN: vector  11
+BUILTIN: vector 11
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike

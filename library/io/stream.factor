@@ -39,8 +39,9 @@ GENERIC: fread#      ( count stream -- string )
 GENERIC: fwrite-attr ( string style stream -- )
 GENERIC: fclose      ( stream -- )
 
-: fread1 ( stream -- string )
-    1 swap fread# dup f-or-"" [ 0 swap str-nth ] unless ;
+: fread1 ( stream -- char/f )
+    1 swap fread#
+    dup f-or-"" [ drop f ] [ 0 swap str-nth ] ifte ;
 
 : fwrite ( string stream -- )
     f swap fwrite-attr ;

@@ -31,7 +31,7 @@ void primitive_set_sbuf_length(void)
 	str = untag_string(sbuf->string);
 	length = to_fixnum(dpop());
 	if(length < 0)
-		range_error(tag_object(sbuf),length,sbuf->top);
+		range_error(tag_object(sbuf),0,to_fixnum(length),sbuf->top);
 	sbuf->top = length;
 	if(length > str->capacity)
 		sbuf->string = tag_object(grow_string(str,length,F));
@@ -43,7 +43,7 @@ void primitive_sbuf_nth(void)
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= sbuf->top)
-		range_error(tag_object(sbuf),index,sbuf->top);
+		range_error(tag_object(sbuf),0,to_fixnum(index),sbuf->top);
 	dpush(string_nth(untag_string(sbuf->string),index));
 }
 
@@ -59,7 +59,7 @@ void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
 void set_sbuf_nth(F_SBUF* sbuf, CELL index, uint16_t value)
 {
 	if(index < 0)
-		range_error(tag_object(sbuf),index,sbuf->top);
+		range_error(tag_object(sbuf),0,to_fixnum(index),sbuf->top);
 	else if(index >= sbuf->top)
 		sbuf_ensure_capacity(sbuf,index + 1);
 

@@ -54,6 +54,7 @@
 
 + misc:
 
+- stream server can hang because of exception handler limitations
 - each-with map-with
 - step: print NEXT word to execute, not word that JUST executed
 - perhaps /i should work with all numbers

@@ -24,3 +24,7 @@ USE: stdio
 "!!! The following error is part of the test" print
 
 [ [ "2 car" ] parse ] [ default-error-handler ] catch
+
+[ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
+
+[ "cons" ] [ [ 1 2 ] type type-error-name ] unit-test

@@ -65,36 +65,38 @@ SYMBOL: save-effect
 
 ! A value has the following slots:
 
-! the literal object, if any.
-SYMBOL: value
-
-! value-type -- the type, if known.
-SYMBOL: value-type
-
-GENERIC: literal ( value -- obj )
+GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
+GENERIC: value-class ( value -- class )
 
-TRAITS: computed-value
-C: computed-value ( -- value )
-    [ gensym value set ] extend ;
-M: computed-value literal ( value -- obj )
+TRAITS: computed
+C: computed ( class -- value )
+    [
+        \ value-class set
+        gensym \ literal-value set
+    ] extend ;
+M: computed literal-value ( value -- obj )
     "Cannot use a computed value literally." throw ;
-M: computed-value value= ( literal value -- ? )
+M: computed value= ( literal value -- ? )
     2drop f ;
+M: computed value-class ( value -- class )
+    [ \ value-class get ] bind ;
 
-TRAITS: literal-value
-C: literal-value ( obj rstate -- value )
-    [ recursive-state set value set ] extend ;
-M: literal-value literal ( value -- obj )
-    [ value get ] bind ;
-M: literal-value value= ( literal value -- ? )
-    literal = ;
+TRAITS: literal
+C: literal ( obj rstate -- value )
+    [ recursive-state set \ literal-value set ] extend ;
+M: literal literal-value ( value -- obj )
+    [ \ literal-value get ] bind ;
+M: literal value= ( literal value -- ? )
+    literal-value = ;
+M: literal value-class ( value -- class )
+    literal-value class ;
 
 : value-recursion ( value -- rstate )
     [ recursive-state get ] bind ;
 
-: computed-value-vector ( n --  vector )
-    [ drop <computed-value> ] vector-project ;
+: computed-value-vector ( n -- vector )
+    [ drop object <computed> ] vector-project ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
@@ -111,19 +113,13 @@ M: literal-value value= ( literal value -- ? )
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d [ ensure ] change d-in [ + ] change ;
-
-: consume-d ( count -- )
-    #! Remove count of elements.
-    [ pop-d drop ] times ;
-
-: produce-d ( count -- )
-    #! Push count of unknown results.
-    [ <computed-value> push-d ] times ;
+    meta-d [ ensure ] change
+    d-in get swap [ object <computed> over vector-push ] times
+    drop ;
 
 : effect ( -- [ in | out ] )
     #! After inference is finished, collect information.
-    d-in get  meta-d get vector-length cons ;
+    d-in get vector-length meta-d get vector-length cons ;
 
 : <recursive-state> ( -- state )
     <namespace> [
@@ -132,7 +128,7 @@ M: literal-value value= ( literal value -- ? )
 
 : init-inference ( recursive-state -- )
     init-interpreter
-    0 d-in set
+    0 <vector> d-in set
     recursive-state set
     dataflow-graph off
     save-effect on ;
@@ -142,7 +138,7 @@ DEFER: apply-word
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup recursive-state get <literal-value> push-d
+    dup recursive-state get <literal> push-d
     #push dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )
@@ -206,3 +202,10 @@ DEFER: apply-word
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
     [ (infer) get-dataflow ] with-scope ;
+
+: type-infer ( quot -- [ in-types out-types ] )
+    [
+        (infer)
+        d-in get [ value-class ] vector-map
+        meta-d get [ value-class ] vector-map 2list
+    ] with-scope ;

@@ -38,33 +38,48 @@ USE: vectors
 USE: words
 USE: hashtables
 
-: unify-d-in ( list -- d-in )
-    0 swap [ [ d-in get ] bind [ max ] when* ] each ;
-
-: balanced? ( list -- ? )
-    [ [ d-in get meta-d get and ] bind ] subset
-    [ [ d-in get meta-d get vector-length - ] bind ] map all=? ;
-
 : longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
-
-: unify-result ( obj obj -- obj )
-    #! Replace values with unknown result if they differ,
-    #! otherwise retain them.
-    2dup = [ drop ] [ 2drop <computed-value> ] ifte ;
-
-: unify-stacks ( list -- stack )
-    #! Replace differing literals in stacks with unknown
-    #! results.
-    uncons [ [ unify-result ] vector-2map ] each ;
 
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
     dup longest-vector swap [ dupd ensure nip ] map nip ;
 
+: unify-classes ( class class -- class )
+    #! Return a class that both classes are subclasses of.
+    2dup = [ drop ] [ 2drop object ] ifte ;
+
+: unify-results ( obj obj -- obj )
+    #! Replace values with unknown result if they differ,
+    #! otherwise retain them.
+    2dup = [
+        drop
+    ] [
+        value-class swap value-class unify-classes <computed>
+    ] ifte ;
+
+: unify-stacks ( list -- stack )
+    #! Replace differing literals in stacks with unknown
+    #! results.
+    uncons [ [ unify-results ] vector-2map ] each ;
+
+: unify-d-in ( list -- d-in )
+    [ [ d-in get ] bind ] map unify-lengths unify-stacks ;
+
+: filter-terminators ( list -- list )
+    [ [ d-in get meta-d get and ] bind ] subset ;
+
+: balanced? ( list -- ? )
+    [
+        [
+            d-in get vector-length
+            meta-d get vector-length -
+        ] bind
+    ] map all=? ;
+
 : unify-datastacks ( list -- datastack )
-    [ [ meta-d get ] bind ] map [ ] subset
+    [ [ meta-d get ] bind ] map
     unify-lengths unify-stacks ;
 
 : check-lengths ( list -- )
@@ -73,11 +88,11 @@ USE: hashtables
     ] unless ;
 
 : unify-callstacks ( list -- datastack )
-    [ [ meta-r get ] bind ] map [ ] subset
+    [ [ meta-r get ] bind ] map
     dup check-lengths unify-stacks ;
 
 : unify ( list -- )
-    dup balanced? [
+    filter-terminators dup balanced? [
         dup unify-d-in d-in set
         dup unify-datastacks meta-d set
         unify-callstacks meta-r set
@@ -90,8 +105,9 @@ USE: hashtables
         save-effect set
         dup value-recursion recursive-state set
         copy-interpreter
+        d-in [ vector-clone ] change
         dataflow-graph off
-        literal infer-quot
+        literal-value infer-quot
         #values values-node
     ] extend ;
 
@@ -99,14 +115,13 @@ USE: hashtables
     #! This is a hack. undefined-method has a stack effect that
     #! probably does not match any other branch of the generic,
     #! so we handle it specially.
-    literal \ undefined-method swap tree-contains? ;
+    literal-value \ undefined-method swap tree-contains? ;
 
 : recursive-branch ( value -- )
     #! Set base case if inference didn't fail.
     [
         f infer-branch [
-            d-in get meta-d get vector-length cons
-            recursive-state get set-base
+            effect recursive-state get set-base
         ] bind
     ] [
         [ drop ] when
@@ -154,8 +169,8 @@ USE: hashtables
 \ ifte [ infer-ifte ] "infer" set-word-property
 
 : vtable>list ( value -- list )
-    dup value-recursion swap literal vector>list
-    [ over <literal-value> ] map nip ;
+    dup value-recursion swap literal-value vector>list
+    [ over <literal> ] map nip ;
 
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.

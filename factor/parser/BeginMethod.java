@@ -48,7 +48,7 @@ public class BeginMethod extends FactorParsingDefinition
 		if(type == null)
 			return;
 
-		FactorWord generic = reader.nextWord(true);
+		FactorWord generic = reader.nextWord(false);
 		if(generic == null)
 			return;
 

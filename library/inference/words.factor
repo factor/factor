@@ -27,6 +27,7 @@
 
 IN: inference
 USE: errors
+USE: generic
 USE: interpreter
 USE: kernel
 USE: lists
@@ -46,8 +47,24 @@ USE: prettyprint
     [ pick swap dataflow-inputs ] keep
     pick 2slip swap dataflow-outputs ; inline
 
+: consume-d ( count -- )
+    #! Remove count of elements.
+    [ pop-d drop ] times ;
+
+: produce-d ( count -- )
+    #! Push count of unknown results.
+    [ object <computed> push-d ] times ;
+
 : (consume/produce) ( param op effect -- )
-    [ unswons consume-d produce-d ] with-dataflow ;
+    [
+        dup cdr cons? [
+            ( new style )
+            
+        ] [
+            ( old style, will go away shortly )
+            unswons consume-d produce-d
+        ] ifte
+    ] with-dataflow ;
 
 : consume/produce ( word [ in | out ] -- )
     #! Add a node to the dataflow graph that consumes and
@@ -138,7 +155,8 @@ USE: prettyprint
     #! If at the location of the recursive call, we're taking
     #! more items from the stack than producing, we have a
     #! diverging recursion.
-    d-in get meta-d get vector-length > [
+    d-in get vector-length
+    meta-d get vector-length > [
         current-word word-name " diverges." cat2 throw
     ] when ;
 
@@ -184,7 +202,7 @@ USE: prettyprint
     gensym dup [
         drop pop-d dup
         value-recursion recursive-state set
-        literal infer-quot
+        literal-value infer-quot
     ] with-block ;
 
 \ call [ infer-call ] "infer" set-word-property

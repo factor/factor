@@ -247,11 +247,16 @@ public class FactorShell extends Shell
 			Cons pair = FactorPlugin.getExternalInstance()
 				.parseObject(w.getText());
 
-			String write = (String)pair.car;
-			AttributeSet attrs = new ListenerAttributeSet(
-				(Cons)pair.next().car);
-
-			output.writeAttrs(attrs,write);
+			if(pair.car instanceof String)
+			{
+				String write = (String)pair.car;
+				AttributeSet attrs = new ListenerAttributeSet(
+					(Cons)pair.next().car);
+	
+				output.writeAttrs(attrs,write);
+			}
+			else
+				Log.log(Log.ERROR,this,"Malformed write packet: " + pair);
 		}
 		
 		void packetLoop(Output output) throws Exception

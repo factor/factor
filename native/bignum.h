@@ -14,9 +14,12 @@ INLINE F_ARRAY* untag_bignum(CELL tagged)
 }
 
 F_FIXNUM to_integer(CELL x);
+CELL to_cell(CELL x);
+
 DLLEXPORT void box_integer(F_FIXNUM integer);
 DLLEXPORT void box_cell(CELL cell);
 DLLEXPORT F_FIXNUM unbox_integer(void);
+CELL to_cell(CELL x);
 DLLEXPORT CELL unbox_cell(void);
 F_ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);

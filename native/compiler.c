@@ -9,7 +9,7 @@ void init_compiler(void)
 void check_compiled_offset(CELL offset)
 {
 	if(offset < compiling.base || offset >= compiling.limit)
-		range_error(F,offset,compiling.limit);
+		range_error(F,0,to_integer(offset),compiling.limit);
 }
 
 void primitive_set_compiled_byte(void)
