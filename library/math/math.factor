@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2003, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -58,16 +58,16 @@ GENERIC: bitnot ( n -- n )
 
 ! Math types
 BUILTIN: fixnum 0
-BUILTIN: bignum 9
+BUILTIN: bignum 1
 UNION: integer fixnum bignum ;
 
 BUILTIN: ratio 4
 UNION: rational integer ratio ;
 
-BUILTIN: float 10
+BUILTIN: float 5
 UNION: real rational float ;
 
-BUILTIN: complex 5
+BUILTIN: complex 6
 UNION: number real complex ;
 
 M: real hashcode ( n -- n ) >fixnum ;

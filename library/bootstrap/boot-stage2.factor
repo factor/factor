@@ -42,6 +42,7 @@ USE: namespaces
 [
     "/library/generic/generic.factor"
     "/library/generic/object.factor"
+    "/library/generic/null.factor"
     "/library/generic/builtin.factor"
     "/library/generic/predicate.factor"
     "/library/generic/union.factor"

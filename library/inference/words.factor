@@ -40,15 +40,15 @@ USE: hashtables
 USE: parser
 USE: prettyprint
 
-: with-dataflow ( param op [ intypes outtypes ] quot -- )
+: with-dataflow ( param op [[ in# out# ]] quot -- )
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
     >r dup car ensure-d
     >r dataflow, r> r> rot
-    [ pick car swap dataflow-inputs ] keep
-    pick 2slip cdr car swap
-    dataflow-outputs ; inline
+    [ pick car swap [ length 0 node-inputs ] bind ] keep
+    pick >r >r nip call r> r> cdr car swap
+    [ length 0 node-outputs ] bind ; inline
 
 : consume-d ( typelist -- )
     [ pop-d 2drop ] each ;
@@ -57,6 +57,7 @@ USE: prettyprint
     [ <computed> push-d ] each ;
 
 : (consume/produce) ( param op effect )
+    dup >r -rot r>
     [ unswons consume-d car produce-d ] with-dataflow ;
 
 : consume/produce ( word [ in-types out-types ] -- )
@@ -78,7 +79,7 @@ USE: prettyprint
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 throw ;
 
-: with-block ( word label quot -- )
+: with-block ( word label quot -- node )
     #! Execute a quotation with the word on the stack, and add
     #! its dataflow contribution to a new block node in the IR.
     over [
@@ -91,7 +92,7 @@ USE: prettyprint
 : recursive? ( word -- ? )
     dup word-parameter tree-contains? ;
 
-: inline-compound ( word -- effect )
+: inline-compound ( word -- effect node )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
@@ -102,7 +103,7 @@ USE: prettyprint
     #! instance.
     [
         recursive-state get init-inference
-        dup dup inline-compound present-effect
+        dup dup inline-compound drop present-effect
         [ "infer-effect" set-word-property ] keep
     ] with-scope consume/produce ;
 
@@ -111,7 +112,7 @@ GENERIC: (apply-word)
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
     dup "inline" word-property [
-        inline-compound drop
+        inline-compound 2drop
     ] [
         infer-compound
     ] ifte ;
@@ -139,13 +140,6 @@ M: symbol (apply-word) ( word -- )
         ] when
     ] when ;
 
-: decompose ( x y -- [[ d-in meta-d ]] )
-    #! Return a stack effect such that x*effect = y.
-    uncons >r swap uncons >r
-    over vector-length over vector-length -
-    swap vector-head nip
-    r> vector-append r> cons ;
-
 : with-recursion ( quot -- )
     [
         inferring-base-case inc
@@ -155,15 +149,14 @@ M: symbol (apply-word) ( word -- )
         rethrow
     ] catch ;
 
-: base-case ( word -- [[ d-in meta-d ]] )
+: base-case ( word label -- )
     [
-        [
-            copy-inference
-            inline-compound
-        ] with-scope effect swap decompose
-        present-effect
-        >r [ #call-label ] [ #call ] ?ifte r>
-        (consume/produce)
+        over inline-compound [
+            drop
+            [ #call-label ] [ #call ] ?ifte
+            node-op set
+            node-param set
+        ] bind
     ] with-recursion ;
 
 : no-base-case ( word -- )
@@ -177,11 +170,9 @@ M: symbol (apply-word) ( word -- )
         drop no-base-case
     ] [
         inferring-base-case get max-recursion = [
-            over base-case
+            base-case
         ] [
-            [
-                drop inline-compound drop
-            ] with-recursion
+            [ drop inline-compound 2drop ] with-recursion
         ] ifte
     ] ifte ;
 
@@ -204,12 +195,13 @@ M: symbol (apply-word) ( word -- )
         drop pop-d dup
         value-recursion recursive-state set
         literal-value infer-quot
-    ] with-block ;
+    ] with-block drop ;
 
 \ call [ infer-call ] "infer" set-word-property
 
 ! These hacks will go away soon
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
 \ not-a-number t "terminator" set-word-property

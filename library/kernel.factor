@@ -71,8 +71,15 @@ M: object = eq? ;
 : xor ( a b -- a^b ) dup not swap ? ; inline
 
 IN: syntax
-BUILTIN: f 6
+
+! The canonical t is a heap-allocated dummy object. It is always
+! the first in the image.
 BUILTIN: t 7
+
+! In the runtime, the canonical f is represented as a null
+! pointer with tag 3. So
+! f address . ==> 3
+BUILTIN: f 9
 
 IN: kernel
 UNION: boolean f t ;

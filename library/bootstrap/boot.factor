@@ -72,16 +72,15 @@ USE: hashtables
 
     "traits" [ "generic" ] search
     "delegate" [ "generic" ] search
-    "object" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind
 
     reveal
     reveal
-    reveal
 
     "/library/generic/generic.factor" parse-resource append,
     "/library/generic/object.factor" parse-resource append,
+    "/library/generic/null.factor" parse-resource append,
     "/library/generic/builtin.factor" parse-resource append,
     "/library/generic/predicate.factor" parse-resource append,
     "/library/generic/union.factor" parse-resource append,

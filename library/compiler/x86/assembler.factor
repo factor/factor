@@ -251,6 +251,10 @@ GENERIC: SUB ( dst src -- )
 M: integer SUB HEX: 81 BIN: 101 immediate-8/32 ;
 M: operand SUB HEX: 29 2-operand ;
 
+GENERIC: AND ( dst src -- )
+M: integer AND HEX: 81 BIN: 100 immediate-8/32 ;
+M: operand AND HEX: 21 2-operand ;
+
 : IMUL ( dst src -- )
     HEX: 0f compile-byte HEX: af 2-operand ;
 

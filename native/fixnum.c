@@ -17,7 +17,7 @@ F_FIXNUM to_fixnum(CELL tagged)
 		r = (F_RATIO*)UNTAG(tagged);
 		x = to_bignum(r->numerator);
 		y = to_bignum(r->denominator);
-		return to_fixnum(tag_object(s48_bignum_quotient(x,y)));
+		return to_fixnum(tag_bignum(s48_bignum_quotient(x,y)));
 	case FLOAT_TYPE:
 		f = (F_FLOAT*)UNTAG(tagged);
 		return (F_FIXNUM)f->n;
@@ -72,7 +72,7 @@ void primitive_fixnum_multiply(void)
 			box_integer(prod);
 		else
 		{
-			dpush(tag_object(
+			dpush(tag_bignum(
 				s48_bignum_multiply(
 					s48_long_to_bignum(x),
 					s48_long_to_bignum(y))));
@@ -91,7 +91,7 @@ void primitive_fixnum_divfloat(void)
 {
 	F_FIXNUM y = untag_fixnum_fast(dpop());
 	F_FIXNUM x = untag_fixnum_fast(dpop());
-	dpush(tag_object(make_float((double)x / (double)y)));
+	dpush(tag_float((double)x / (double)y));
 }
 
 void primitive_fixnum_divmod(void)
@@ -166,7 +166,7 @@ void primitive_fixnum_shift(void)
 		}
 	}
 
-	dpush(tag_object(s48_bignum_arithmetic_shift(
+	dpush(tag_bignum(s48_bignum_arithmetic_shift(
 		s48_long_to_bignum(x),y)));
 }
 

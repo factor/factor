@@ -13,6 +13,11 @@ INLINE F_ARRAY* untag_bignum(CELL tagged)
 	return untag_bignum_fast(tagged);
 }
 
+INLINE CELL tag_bignum(F_ARRAY* bignum)
+{
+	return RETAG(bignum,BIGNUM_TYPE);
+}
+
 F_FIXNUM to_integer(CELL x);
 CELL to_cell(CELL x);
 
@@ -46,7 +51,7 @@ CELL three_test(void* x, unsigned char r, unsigned char g, unsigned char b);
 INLINE CELL tag_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
-		return tag_object(s48_long_to_bignum(x));
+		return tag_bignum(s48_long_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }
@@ -54,7 +59,7 @@ INLINE CELL tag_integer(F_FIXNUM x)
 INLINE CELL tag_cell(CELL x)
 {
 	if(x > FIXNUM_MAX)
-		return tag_object(s48_ulong_to_bignum(x));
+		return tag_bignum(s48_ulong_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }

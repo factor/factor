@@ -20,11 +20,17 @@ CELL object_size(CELL pointer)
 	case FIXNUM_TYPE:
 		size = 0;
 		break;
+	case BIGNUM_TYPE:
+		size = ASIZE(UNTAG(pointer));
+		break;
 	case CONS_TYPE:
 		size = sizeof(F_CONS);
 		break;
 	case RATIO_TYPE:
 		size = sizeof(F_RATIO);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
 		break;
 	case COMPLEX_TYPE:
 		size = sizeof(F_COMPLEX);

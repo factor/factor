@@ -39,13 +39,13 @@ USE: hashtables
 USE: generic
 USE: prettyprint
 
-: max-recursion 1 ;
+: max-recursion 0 ;
 
 ! This variable takes a value from 0 up to max-recursion.
 SYMBOL: inferring-base-case
 
 : branches-can-fail? ( -- ? )
-    inferring-base-case get max-recursion >= ;
+    inferring-base-case get max-recursion > ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -148,6 +148,10 @@ M: literal set-value-class ( class value -- )
 : present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
     uncons >r (present-effect) r> (present-effect) 2list ;
+
+: simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
+    #! After inference is finished, collect information.
+    uncons vector-length >r vector-length r> cons ;
 
 : effect ( -- [[ d-in meta-d ]] )
     d-in get meta-d get cons ;

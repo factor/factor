@@ -154,19 +154,14 @@ SYMBOL: cloned
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )
-    #! The branchlist is a list of pairs:
-    #! [[ value typeprop ]]
+    #! The branchlist is a list of pairs: [[ value typeprop ]]
     #! value is either a literal or computed instance; typeprop
     #! is a pair [[ value class ]] indicating a type propagation
     #! for the given branch.
     [
         [
-            inferring-base-case get 0 > [
-                [
-                    infer-branch ,
-                ] [
-                    [ drop ] when
-                ] catch
+            branches-can-fail? [
+                [ infer-branch , ] [ [ drop ] when ] catch
             ] [
                 infer-branch ,
             ] ifte
@@ -184,7 +179,7 @@ SYMBOL: cloned
     #! parameter is a vector.
     (infer-branches) dup unify-effects unify-dataflow ;
 
-: (with-block) ( label quot -- )
+: (with-block) ( label quot -- node )
     #! Call a quotation in a new namespace, and transfer
     #! inference state from the outer scope.
     swap >r [
@@ -192,8 +187,8 @@ SYMBOL: cloned
         call
         d-in get meta-d get meta-r get get-dataflow
     ] with-scope
-    r> swap #label dataflow, [ node-label set ] bind
-    meta-r set meta-d set d-in set ;
+    r> swap #label dataflow, [ node-label set ] extend >r
+    meta-r set meta-d set d-in set r> ;
 
 : boolean-value? ( value -- ? )
     #! Return if the value's boolean valuation is known.
@@ -208,7 +203,8 @@ SYMBOL: cloned
     value-class \ f = not ;
 
 : static-branch? ( value -- ? )
-    boolean-value? branches-can-fail? not and ;
+    drop f ;
+!    boolean-value? branches-can-fail? not and ;
 
 : static-ifte ( true false -- )
     #! If the branch taken is statically known, just infer
@@ -217,7 +213,7 @@ SYMBOL: cloned
     gensym [
         dup value-recursion recursive-state set
         literal-value infer-quot
-    ] (with-block) ;
+    ] (with-block) drop ;
 
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and

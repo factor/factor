@@ -43,7 +43,7 @@ void primitive_stat(void)
 	{
 		CELL dirp = tag_boolean(S_ISDIR(sb.st_mode));
 		CELL mode = tag_fixnum(sb.st_mode & ~S_IFMT);
-		CELL size = tag_object(s48_long_long_to_bignum(sb.st_size));
+		CELL size = tag_bignum(s48_long_long_to_bignum(sb.st_size));
 		CELL mtime = tag_integer(sb.st_mtime);
 		dpush(cons(
 			dirp,

@@ -21,6 +21,11 @@ INLINE double untag_float(CELL tagged)
 	return untag_float_fast(tagged);
 }
 
+INLINE CELL tag_float(double flo)
+{
+	return RETAG(make_float(flo),FLOAT_TYPE);
+}
+
 double to_float(CELL tagged);
 void primitive_to_float(void);
 void primitive_str_to_float(void);

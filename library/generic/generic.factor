@@ -190,16 +190,8 @@ SYMBOL: object
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or raise an
     #! error if this is impossible.
-    over builtin-supertypes
-    over builtin-supertypes
-    intersection [
-        nip lookup-union
-    ] [
-        [
-            word-name , " and " , word-name ,
-            " do not intersect" ,
-        ] make-string throw
-    ] ?ifte ;
+    swap builtin-supertypes swap builtin-supertypes
+    intersection lookup-union ;
 
 : define-promise ( class -- )
     #! A promise is a word that has no effect during

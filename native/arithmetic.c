@@ -5,8 +5,8 @@ void primitive_arithmetic_type(void)
 	CELL obj1 = dpeek();
 	CELL obj2 = get(ds - CELLS);
 
-	CELL type1 = type_of(obj1);
-	CELL type2 = type_of(obj2);
+	CELL type1 = TAG(obj1);
+	CELL type2 = TAG(obj2);
 
 	CELL type;
 
@@ -16,10 +16,10 @@ void primitive_arithmetic_type(void)
 		switch(type1)
 		{
 		case BIGNUM_TYPE:
-			put(ds - CELLS,tag_object(to_bignum(obj2)));
+			put(ds - CELLS,tag_bignum(to_bignum(obj2)));
 			break;
 		case FLOAT_TYPE:
-			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
+			put(ds - CELLS,tag_float(to_float((obj2))));
 			break;
 		}
 		type = type1;
@@ -28,11 +28,11 @@ void primitive_arithmetic_type(void)
 		switch(type1)
 		{
 		case FIXNUM_TYPE:
-			drepl(tag_object(to_bignum(obj1)));
+			drepl(tag_bignum(to_bignum(obj1)));
 			type = type2;
 			break;
 		case FLOAT_TYPE:
-			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
+			put(ds - CELLS,tag_float(to_float((obj2))));
 			type = type1;
 			break;
 		default:
@@ -48,7 +48,7 @@ void primitive_arithmetic_type(void)
 			type = type2;
 			break;
 		case FLOAT_TYPE:
-			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
+			put(ds - CELLS,tag_float(to_float((obj2))));
 			type = type1;
 			break;
 		default:
@@ -62,7 +62,7 @@ void primitive_arithmetic_type(void)
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
 		case RATIO_TYPE:
-			drepl(tag_object(make_float(to_float(obj1))));
+			drepl(tag_float(to_float(obj1)));
 			type = type2;
 			break;
 		default:
@@ -88,6 +88,6 @@ void primitive_arithmetic_type(void)
 		type = type2;
 		break;
 	}
-
+	
 	dpush(tag_fixnum(type));
 }

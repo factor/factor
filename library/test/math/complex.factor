@@ -3,6 +3,9 @@ USE: kernel
 USE: math
 USE: test
 
+[ 1 #{ 0 1 }# rect> ] unit-test-fails
+[ #{ 0 1 }# 1 rect> ] unit-test-fails
+
 [ f ] [ #{ 5 12.5 }# 5 ] [ = ] test-word
 [ t ] [ #{ 1.0 2.0 }# #{ 1 2 }# ] [ = ] test-word
 [ f ] [ #{ 1.0 2.3 }# #{ 1 2 }# ] [ = ] test-word

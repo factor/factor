@@ -6,26 +6,27 @@
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
+#define BIGNUM_TYPE 1
 #define CONS_TYPE 2
 #define OBJECT_TYPE 3
 #define RATIO_TYPE 4
-#define COMPLEX_TYPE 5
-#define HEADER_TYPE 6
+#define FLOAT_TYPE 5
+#define COMPLEX_TYPE 6
+#define HEADER_TYPE 7
 #define GC_COLLECTED 7 /* See gc.c */
 
 /*** Header types ***/
-
-/* Canonical F object */
-#define F_TYPE 6
-#define F RETAG(0,OBJECT_TYPE)
 
 /* Canonical T object */
 #define T_TYPE 7
 CELL T;
 
 #define ARRAY_TYPE 8
-#define BIGNUM_TYPE 9
-#define FLOAT_TYPE 10
+
+/* Canonical F object */
+#define F_TYPE 9
+#define F RETAG(0,OBJECT_TYPE)
+
 #define VECTOR_TYPE 11
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
@@ -48,18 +49,9 @@ INLINE CELL tag_header(CELL cell)
 	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
 }
 
-#define HEADER_DEBUG
-
 INLINE CELL untag_header(CELL cell)
 {
-	CELL type = cell >> TAG_BITS;
-#ifdef HEADER_DEBUG
-	if(!headerp(cell))
-		critical_error("header type check",cell);
-	if(type <= HEADER_TYPE)
-		critical_error("header invariant check",cell);
-#endif
-	return type;
+	return cell >> TAG_BITS;
 }
 
 INLINE CELL tag_object(void* cell)
@@ -69,7 +61,10 @@ INLINE CELL tag_object(void* cell)
 
 INLINE CELL object_type(CELL tagged)
 {
-	return untag_header(get(UNTAG(tagged)));
+	if(tagged == F)
+		return F_TYPE;
+	else
+		return untag_header(get(UNTAG(tagged)));
 }
 
 INLINE void type_check(CELL type, CELL tagged)
@@ -77,11 +72,6 @@ INLINE void type_check(CELL type, CELL tagged)
 	if(type < HEADER_TYPE)
 	{
 		if(TAG(tagged) == type)
-			return;
-	}
-	else if(tagged == F)
-	{
-		if(type == F_TYPE)
 			return;
 	}
 	else if(TAG(tagged) == OBJECT_TYPE
@@ -102,12 +92,7 @@ INLINE CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
 	if(tag == OBJECT_TYPE)
-	{
-		if(tagged == F)
-			return F_TYPE;
-		else
-			return untag_header(get(UNTAG(tagged)));
-	}
+		return object_type(tagged);
 	else
 		return tag;
 }

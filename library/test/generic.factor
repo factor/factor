@@ -133,7 +133,7 @@ M: very-funny gooey sq ;
 [ fixnum ] [ fixnum fixnum class-and ] unit-test
 [ fixnum ] [ fixnum integer class-and ] unit-test
 [ fixnum ] [ integer fixnum class-and ] unit-test
-[ vector fixnum class-and ] unit-test-fails
+[ null ] [ vector fixnum class-and ] unit-test
 [ integer ] [ fixnum bignum class-or ] unit-test
 [ integer ] [ fixnum integer class-or ] unit-test
 [ rational ] [ ratio integer class-or ] unit-test

@@ -145,3 +145,22 @@ USE: math-internals
 ] "generator" set-word-property
 
 \ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-property
+
+\ arithmetic-type [
+    drop
+    ECX DS>
+    EAX [ ECX -4 ] MOV
+    EAX BIN: 111 AND
+    EDX [ ECX ] MOV
+    EDX BIN: 111 AND
+    EAX EDX CMP
+    0 JE fixup >r
+    \ arithmetic-type compile-call
+    0 JMP fixup
+    compiled-offset r> patch
+    EAX 3 SHL
+    PUSH-DS
+    compiled-offset swap patch
+] "generator" set-word-property
+
+\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-property

@@ -116,7 +116,7 @@ void primitive_allot_profiling(void)
 
 void primitive_address(void)
 {
-	dpush(tag_object(s48_ulong_to_bignum(dpop())));
+	dpush(tag_bignum(s48_ulong_to_bignum(dpop())));
 }
 
 void primitive_heap_stats(void)

@@ -82,22 +82,15 @@ SYMBOL: boot-quot
 : tag ( cell -- tag ) tag-mask bitand ;
 
 : fixnum-tag  BIN: 000 ; inline
+: bignum-tag  BIN: 001 ; inline
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
-: ratio-tag   BIN: 100 ; inline
-: complex-tag BIN: 101 ; inline
 
 : f-type      6  ; inline
 : t-type      7  ; inline
 : array-type  8  ; inline
-: bignum-type 9  ; inline
-: float-type  10 ; inline
 : vector-type 11 ; inline
 : string-type 12 ; inline
-: sbuf-type   13 ; inline
-: port-type   14 ; inline
-: dll-type    15 ; inline
-: alien-type  16 ; inline
 : word-type   17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
@@ -155,8 +148,8 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
-    object-tag here-as >r
-    bignum-type >header emit
+    bignum-tag here-as >r
+    bignum-tag >header emit
     [
         [[ 0  [ 1 0   ] ]]
         [[ -1 [ 2 1 1 ] ]]

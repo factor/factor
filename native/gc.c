@@ -148,5 +148,5 @@ void maybe_garbage_collection(void)
 void primitive_gc_time(void)
 {
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_long_to_bignum(gc_time)));
+	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
 }

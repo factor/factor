@@ -54,10 +54,13 @@ builtin 50 "priority" set-word-property
 builtin [ 2drop t ] "class<" set-word-property
 
 : builtin-predicate ( type# symbol -- )
-    over f type = [
+    #! We call search here because we have to know if the symbol
+    #! is t or f, and cannot compare type numbers or symbol
+    #! identity during bootstrapping.
+    dup "f" [ "syntax" ] search = [
         nip [ not ] "predicate" set-word-property
     ] [
-        over t type = [
+        dup "t" [ "syntax" ] search = [
             nip [ ] "predicate" set-word-property
         ] [
             dup predicate-word
