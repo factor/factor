@@ -1,0 +1,307 @@
+FACTOR MATH WORDS
+
+=== Basics
+
+The following expressions demonstrate basic arithmetic in Factor.
+
+    0] 2 2 + .
+4
+    1] 10 4.5 - .
+5.5
+    2] 12.5 3 * .
+37.5
+    3] 6 20 / .
+3/10
+    4] 6 20 /f .
+0.3
+    5] 0.354 neg .
+-0.354
+    6] 5 recip .
+0.2
+
+Arithmetic operators appear after their oprands, and intermediate values
+are stored on a stack -- this is called postfix syntax.
+
+The word . prints the value at the top of the stack.
+
+There are no operator precedence levels, and expressions can always be
+reprepsented unambiguously without parantheses, unlike traditional
+algebraic syntax.
+
+For example, (3 + 2) * (1 - 6) is written as:
+
+3 2 + 1 6 - *
+
+However, 3 + (2 * 1) - 6 is written as:
+
+3 2 1 * + 6 -
+
+=== The number tower
+
+Factor supports operations with many types of numbers, transparently
+converting results from one type to another. The following informal
+diagram can be helpful in understanding the various types of numbers.
+
++--------+ +--------+
+|=fixnum=| |=bignum=|
++--------+ +--------+
++-------------------+ +-------+
+|      integer      | |=ratio=|
++-------------------+ +-------+
++-----------------------------+ +-------+
+|           rational          | |=float=|
++-----------------------------+ +-------+
++---------------------------------------+ +---------+
+|                  real                 | |=complex=|
++---------------------------------------+ +---------+
++---------------------------------------------------+
+|                      number                       |
++---------------------------------------------------+
+
+Types on the same row are disjoint.
+
+Each type is a subtype of all types directly below.
+
+Types whose boxes are marked with '=' are disjoint concrete types.
+
+Type upgrades are performed through the concrete types, from the top
+left down to the bottom right.
+
+Ratios and complex numbers are compound types; ratios consist of a pair
+of integers, complex numbers consist of a pair of real numbers.
+
+=== Types of numbers
+
+All number entry is in base 10.
+
+The predicate word number? tests if the top of the stack is a number.
+
+Numbers are partitioned into two disjoint subsets; real numbers and
+complex numbers. (In math, the reals are a subset of the complex
+numbers. In Factor, a number whose imaginary part is zero is *not* a
+complex number).
+
+Real numbers are partitioned into three disjoint subsets: integers,
+ratios and floats.
+
+==== Integers: 12 -100 340282366920938463463374607431768211456
+
+The predicate word integer? tests if the top of the stack is an integer.
+
+The integers are partitioned into two disjoint types:
+
+- signed 32-bit fixnums (predicate: fixnum?)
+- signed arbitrary precision bignums (predicate: bignum?)
+
+Fixnums are automatically upgraded as necessary to bignums.
+
+For example:
+
+    8] 1073741824 fixnum? .
+t
+    9] 128 fixnum? .
+t
+    10] 1073741824 128 * .    
+137438953472
+    11] 1073741824 128 * bignum? .
+t
+
+In the above example, the result of multiply those two fixnums exceeds
+2^31-1, and the result is upgraded to a bignum.
+
+When given integer operands, + - and * always return integers.
+
+==== Ratios: 1/10 -37/78 10/3
+
+A ratio is the result of a division of two integers where the
+denimonator is not a multiple of the numerator.
+
+The predicate word ratio? tests if the top of the stack is a ratio.
+
+Ratios are always reduced to lowest terms, and the denominator is always
+positive. The numerator never equals zero since dividing zero by a
+non-zero integer always results in the integer zero.
+
+The accessor words numerator and denominator deconstruct a ratio. Given
+an integer, numerator is a no-op and denominator always returns 1.
+
+    14] 100 -30 / numerator .
+-10
+    15] 100 -30 / denominator .
+3
+    16] 12 numerator .
+12
+
+The numerator and denominator are integers, and hence either fixnums or
+bignums (there is no requirement for them to be of the same type).
+
+The result of dividing two integers as a floating point number can be
+obtained using the word /f. For example:
+
+    17] 1 3 /f .
+0.3333333333333333
+
+When arithmetic operators are given a ratio and an integer as
+parameters, the result is also a ratio or an integer.
+
+==== Floats: -1.3 1.5e-6 0.003
+
+Floats are entered as double-precision. Single-precision floats can be
+constructed via coercion. They are converted to double-precision by
+arithmetic operands.
+
+The predicate word float? tests if the top of the stack is a single or
+double precision float.
+
+When at least one of the parameters to an arithmetic operator is a
+float, the result is always a (double precision) float.
+
+==== Complex numbers: #{ 2 2.5 } #{ 1/2 1/3 }
+
+A complex number has a real and imaginary part. The syntax is to write
+#{ followed by the real part, followed by the imaginary part, and
+finally terminated with }. Each token must be separted with whitespace.
+
+The predicate word complex? tests if the top of the stack is a single or
+double precision float.
+
+For example, what is commonly written as 2-3.5i in textbooks is
+expressed as #{ 2 2.5 } in Factor.
+
+The real and imaginary parts can be either integers, ratios or floats.
+There is no requirement for them to be of the same type.
+
+The accessor words real and imaginary deconstruct a complex number. The
+real part followed by the imaginary part can both be pushed at once
+using the word >rect, and a new complex number can be constructed from a
+real and imaginary part using the word rect>.
+
+    4] -i sqrt >rect .s
+-0.7071067811865475
+0.7071067811865476
+    5] 1 2 rect> .
+#{ 1 2 }
+
+A complex number with an imaginary component of zero is automatically
+downgraded to an integer, a ratio or a float (depending on the type of
+its real component.)
+
+    6] 10 0 rect> .
+10
+    7] #{ 5 -10 } #{ 2 10 } + .
+7
+
+Complex numbers never arise as results of arithmetic operators with real
+operands. However, various irrational functions return complex values
+for some real inputs.
+
+=== Mathematical functions
+
+==== Square root, squaring, arbitrary powers
+
+These are pretty much self-explanatory.
+
+    10] 36 sq sqrt .
+36.0
+    11] -2 sqrt sq .
+-2.0000000000000004
+    12] 10 15 ^ .
+1.0E15
+    13] e pi i * ^ .
+#{ -1.0 1.2246467991473532E-16 }
+
+==== Exponential, logarithm
+
+The function e^x and its inverse.
+
+    15] e .
+2.718281828459045
+    16] 2 exp .
+7.38905609893065
+    17] 5 log 2 log - exp .
+2.5
+
+Note that the complex logarithm is infinitely-valued. The principle
+value is chosen such that the complex part is in the interval (-pi,pi].
+
+    18] -10 log .
+#{ 2.302585092994046 3.141592653589793 }
+
+==== Trigonometric and hyperbolic functions
+
+The full complement of trigonometric and hyperbolic functions and their
+inverses is provided:
+
+sin    cos    tan
+asin   acos   atan
+cosec  sec    cot
+acosec asec   acot
+
+sinh    cosh    tanh
+asinh   acosh   atanh
+cosech  sech    coth
+acosech asech   acoth
+
+Complex arguments are supported. The specific branch cuts used by the
+inverse functions are undocumented by can be deduced from the
+definitions of those functions, and the branch cuts taken by 'log' and
+'sqrt'.
+
+==== Polar co-ordinates
+
+Complex numbers can be converted to/from polar co-ordinate
+representations using the words >polar and polar>.
+
+    41] #{ 1 1 } >polar .s
+0.7853981633974483
+1.4142135623730951
+    42] -5 pi 3 / polar> .
+#{ -2.5000000000000004 -4.330127018922193 }
+
+==== Miscellaneous integer functions
+
+Factorial, fibonacci sequence, harmonic numbers.
+
+    33] 128 2^ .
+340282366920938463463374607431768211456
+    34] 30 fib .
+1346269
+    35] 100 harmonic >float 100 log - .
+0.5822073316515288
+    36] 1000 fac .
+402387260077093773543702433923003985719374864210714632543799910429938512
+398629020592044208486969404800479988610197196058631666872994808558901323
+829669944590997424504087073759918823627727188732519779505950995276120874
+975462497043601418278094646496291056393887437886487337119181045825783647
+849977012476632889835955735432513185323958463075557409114262417474349347
+553428646576611667797396668820291207379143853719588249808126867838374559
+731746136085379534524221586593201928090878297308431392844403281231558611
+036976801357304216168747609675871348312025478589320767169132448426236131
+412508780208000261683151027341827977704784635868170164365024153691398281
+264810213092761244896359928705114964975419909342221566832572080821333186
+116811553615836546984046708975602900950537616475847728421889679646244945
+160765353408198901385442487984959953319101723355556602139450399736280750
+137837615307127761926849034352625200015888535147331611702103968175921510
+907788019393178114194545257223865541461062892187960223838971476088506276
+862967146674697562911234082439208160153780889893964518263243671616762179
+168909779911903754031274622289988005195444414282012187361745992642956581
+746628302955570299024324153181617210465832036786906117260158783520751516
+284225540265170483304226143974286933061690897968482590125458327168226458
+066526769958652682272807075781391858178889652208164348344825993266043367
+660176999612831860788386150279465955131156552036093988180612138558600301
+435694527224206344631797460594682573103790084024432438465657245014402821
+885252470935190620929023136493273497565513958720559654228749774011413346
+962715422845862377387538230483865688976461927383814900140767310446640259
+899490222221765904339901886018566526485061799702356193897017860040811889
+729918311021171229845901641921068884387121855646124960798722908519296819
+372388642614839657382291123125024186649353143970137428531926649875337218
+940694281434118520158014123344828015051399694290153483077644569099073152
+433278288269864602789864321139083506217095002597389863554277196742822248
+757586765752344220207573630569498825087968928162753848863396909959826280
+956121450994871701244516461260379029309120889086942028510640182154399457
+156805941872748998094254742173582401063677404595741785160829230135358081
+840096996372524230560855903700624271243416909004153690105933983835777939
+410970027753472000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000000000000000000000000000
+000000000000000000000000000000000000000000000000

@@ -7,9 +7,8 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 - decide if overflow is a fatal error
 - f >n: crashes
 - typecases: type error reporting bad
-- image output
 - floats
-- {...} vectors
+- {...} vectors in java factor
 - parsing should be parsing
 - describe-word
 - clone-sbuf

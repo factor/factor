@@ -1,0 +1,66 @@
+FACTOR CODING CONVENTIONS.
+
+=== Naming words
+
+foo.     - perform "foo", but instead of pushing the result on the
+           stack, print it in a human-readable form suitable for
+	   interactive use.
+
+	   Eg: words. vocabs.
+
+.X       - three words to print the contents of the stacks:
+           .s - data stack
+	   .r - call stack
+	   .n - name stack
+
+foo*     - a variation of "foo" that takes more parameters.
+
+           Eg: index-of* parse* random-element*
+
+         - a lower-level word used in the implementation of "foo".
+
+	   Eg: compile* prettyprint*
+
+         - a word that is a variation on "foo", but is more specialized
+	   and less frequently used.
+
+	   Eg: last* get*
+
+>into    - convert object to type "into".
+
+           Eg: >str >lower >upper >fixnum >realnum
+
+one>two  - convert object of type "one" to "two".
+
+           Eg: stream>str stack>list worddef>list
+
+         - transfer values between stacks.
+	 
+	   Eg: >r r> 2>r 2r> >n
+
+<type>   - create an object of "type".
+
+           Eg: <namespace> <sbuf> <stream>
+
+foo@     - get the value of a variable at the top of the stack;
+           operate on the value with "foo"; store the value back in the
+	   variable.
+
+	   Eg: +@ *@ -@ /@ cons@ append@
+
+foo-iter - a tail-recursive word used in the implementatin of "foo".
+
+           Eg: nreverse-iter partition-iter
+
+nfoo     - on lists, a destructive version of "foo".
+
+           Eg: nappend nreverse
+
+2foo     - like foo but with two operands taken from stack.
+
+           Eg: 2drop 2dup 2each
+
+[foo]    - apply "foo" to each element of a list; sometimes with a bit
+           more logic than just [ foo ] each.
+
+	   Eg: [+] [.]
