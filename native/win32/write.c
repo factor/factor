@@ -16,13 +16,15 @@ void primitive_can_write (void)
 
 void write_char_8 (F_PORT *port, F_FIXNUM ch)
 {
-	char buf = (char)ch;
-	WriteFile((HANDLE)port->fd, &buf, 1, NULL, NULL); 
+	DWORD ignore;
+	BYTE buf = (BYTE)ch;
+	WriteFile((HANDLE)port->fd, &buf, 1, &ignore, NULL);
 }
 
 void write_string_8 (F_PORT *port, F_STRING *str)
 {
-	WriteFile((HANDLE)port->fd, to_c_string(str), str->capacity, NULL, NULL);
+	DWORD ignore;
+	WriteFile((HANDLE)port->fd, to_c_string_unchecked(str), str->capacity, &ignore, NULL);
 }
 
 void primitive_write_8 (void)
