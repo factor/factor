@@ -42,6 +42,7 @@ USE: prettyprint
 USE: words
 USE: html
 USE: parser
+USE: errors
 
 : <browser> ( vocab word -- )
   #! An object for storing the current browser
@@ -111,7 +112,68 @@ USE: parser
       "current-vocab" get "current-word" get write-word-source
     ]
   ] horizontal-layout ;
-USE: logging
+
+: flatten ( tree - list ) 
+  #! Flatten a tree into a list.
+  dup f = [  
+  ] [ 
+    dup cons? [ 
+      dup car flatten swap cdr flatten append 
+    ] [ 
+      [ ] cons 
+    ] ifte 
+  ] ifte ;
+
+: word-uses ( word -- list )
+  #! Return a list of vocabularies that the given word uses.
+  worddef worddef>list flatten [ word? ] subset [
+    word-vocabulary
+  ] inject ;
+
+: vocabulary-uses ( vocab -- list )
+  #! Return a list of vocabularies that all words in a vocabulary
+  #! uses.
+  <namespace> [
+    "result" f put
+    words [
+      word-uses [
+        "result" unique@
+      ] each
+    ] each 
+    "result" get
+  ] bind ;
+
+: build-eval-string ( vocab to-eval -- string )
+  #! Build a string that can evaluate the string 'to-eval'
+  #! by first doing an 'IN: vocab' and a 'USE:' of all
+  #! necessary vocabs for existing words in that vocab.
+  <% >r "IN: " % dup % "\n" %
+     vocabulary-uses [ "USE: " % % "\n" % ] each
+     r> % "\n" % %> ;
+
+: show-parse-error ( error -- )
+  #! Show an error page describing the parse error.
+  [
+    <html> [
+      <head> [ <title> [ "Parse error" write ] </title> ] </head>
+      <body> [ 
+        swap [ write ] with-simple-html-output
+        <a href= a> [ "Ok" write ] </a>
+      ] </body>
+    ] </html>
+  ] show drop drop ;
+
+: eval-string ( vocab to-eval -- )
+  #! Evaluate the 'to-eval' within the given vocabulary.
+  build-eval-string [
+    parse call
+  ] [
+    [
+      show-parse-error
+      drop
+    ] when*
+  ] catch ;
+
 : browse ( <browser> -- )
   #! Display a Smalltalk like browser for exploring/modifying words.
   [
@@ -131,7 +193,7 @@ USE: logging
     ] bind [
       "vocabs" get
       "words" get
-      "eval" get [ log ] when 
+      "eval" get dup [ "vocabs" get swap eval-string ] [ drop ] ifte
     ] bind <browser>
   ] forever ;
 
