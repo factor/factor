@@ -120,6 +120,7 @@ USE: unparser
         cpu "x86" = [
             [
                 "x86-compiler/simple"
+                "x86-compiler/stack"
                 "x86-compiler/ifte"
                 "x86-compiler/generic"
                 "x86-compiler/bail-out"

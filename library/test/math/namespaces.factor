@@ -11,5 +11,5 @@ USE: math
 [ 2 ] [ 5 "x" /@ "x" get ] unit-test
 [ 1 ] [ "x" pred@ "x" get ] unit-test
 [ 2 ] [ "x" succ@ "x" get ] unit-test
-[ 7 ] [ -3 "x" set 10 "x" rem@ ] unit-test 
-[ -3 ] [ -3 "x" set 10 "x" rem@ ] unit-test 
+[ 7 ] [ -3 "x" set 10 "x" rem@ "x" get ] unit-test 
+[ -3 ] [ -3 "x" set 10 "x" mod@ "x" get ] unit-test 

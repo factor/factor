@@ -205,6 +205,7 @@ SYMBOL: stars
     ] extend ;
 
 : init-stars ( -- )
+    #! Generate random background of scrolling stars.
     [ ] star-count [ random-star swons ] times stars set ;
 
 : draw-stars ( -- )

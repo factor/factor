@@ -161,19 +161,21 @@ DEFER: prettyprint*
     ] ;
 
 : word-attrs ( word -- attrs )
-    dup defined? [
-        dup >r
-        word-link dup >r "object-link" swons r>
+    #! Words without a vocabulary do not get a link or an action
+    #! popup.
+    dup word-vocabulary [
+        word-link [ "object-link" swons ] keep
         word-actions <actions> "actions" swons
         t "underline" swons
         3list
-        r>
     ] [
-        [ ] swap
-    ] ifte word-style append ;
+        drop [ ]
+    ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-name swap word-attrs write-attr ;
+    dup word-name
+    swap dup word-attrs swap word-style append
+    write-attr ;
 
 : prettyprint-object ( indent obj -- indent )
     unparse write ;
