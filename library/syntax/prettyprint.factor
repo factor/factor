@@ -108,8 +108,12 @@ M: word prettyprint* ( indent word -- indent )
 
 M: list prettyprint* ( indent list -- indent )
     [
-        \ [ swap \ ] prettyprint-sequence
-    ] check-recursion ;
+        [
+            \ [ swap \ ] prettyprint-sequence
+        ] check-recursion
+    ] [
+        f unparse write
+    ] ifte* ;
 
 M: cons prettyprint* ( indent cons -- indent )
     #! Here we turn the cons into a list of two elements.

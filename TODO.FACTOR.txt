@@ -1,7 +1,5 @@
 72/73:
 
-- keep a list of getter/setter words
-- default constructor
 - move tuple to generic vocab
 - update plugin docs
 - extract word keeps indent
