@@ -39,74 +39,69 @@ USE: words
 USE: hashtables
 USE: prettyprint
 
-: longest-vector ( list -- length )
-    [ vector-length ] map [ > ] top ;
+: vector-length< ( vec1 vec2 -- ? )
+    swap vector-length swap vector-length < ;
 
-: computed-value-vector ( n -- vector )
-    [ drop object <computed> ] vector-project ;
+: unify-length ( vec1 vec2 -- vec1 )
+    2dup vector-length< [ swap ] unless [
+        vector-length over vector-length -
+        empty-vector [ swap vector-append ] keep
+    ] keep ;
 
-: add-inputs ( count stack -- count stack )
-    #! Add this many inputs to the given stack.
-    [ vector-length - dup ] keep
-    >r computed-value-vector dup r> vector-append ;
-
-: unify-lengths ( list -- list )
-    #! Pad all vectors to the same length. If one vector is
-    #! shorter, pad it with unknown results at the bottom.
-    dup longest-vector swap [ dupd add-inputs nip ] map nip ;
-
-: unify-classes ( value value -- value )
-    value-class swap value-class class-or <computed> ;
+: unify-classes ( value value -- class )
+    #! If one of the values is f, it was added as a result of
+    #! length unification so we just replace it with a computed
+    #! object value.
+    2dup and [
+        value-class swap value-class class-or
+    ] [
+        2drop object
+    ] ifte ;
 
 : unify-results ( value value -- value )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
-    2dup = [ drop ] [ unify-classes ] ifte ;
+    2dup = [ drop ] [ unify-classes <computed> ] ifte ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    uncons [ [ unify-results ] vector-2map ] each ;
-
-: unify-d-in ( list -- d-in )
-    [ [ d-in get ] bind ] map unify-lengths unify-stacks ;
-
-: filter-terminators ( list -- list )
-    [ [ d-in get meta-d get and ] bind ] subset ;
+    uncons [
+        unify-length vector-zip [
+            uncons unify-results
+        ] vector-map
+    ] each ;
 
 : balanced? ( list -- ? )
-    [
-        [
-            d-in get vector-length
-            meta-d get vector-length -
-        ] bind
-    ] map all=? ;
+    #! Check if a list of [ instack | outstack ] pairs is
+    #! balanced.
+    [ uncons vector-length swap vector-length - ] map all=? ;
 
-: unify-datastacks ( list -- datastack )
-    [ [ meta-d get ] bind ] map
-    unify-lengths unify-stacks ;
-
-: check-lengths ( list -- )
-    dup [ vector-length ] map all=? [
-        drop
-    ] [
-        "Unbalanced return stack effect:" <multi-error> throw
-    ] ifte ;
-
-: unify-callstacks ( list -- datastack )
-    [ [ meta-r get ] bind ] map
-    dup check-lengths unify-stacks ;
-
-: unify-effects ( list -- )
-    filter-terminators
-    [ "No branch has a stack effect" throw ] unless*
+: unify-effect ( list -- in out )
+    #! Unify a list of [ instack | outstack ] pairs.
     dup balanced? [
-        dup unify-d-in d-in set
-        dup unify-datastacks meta-d set
-        unify-callstacks meta-r set
+        unzip unify-stacks >r unify-stacks r>
     ] [
         "Unbalanced branches" throw
     ] ifte ;
+
+: datastack-effect ( list -- )
+    [ [ d-in get meta-d get ] bind cons ] map
+    unify-effect
+    meta-d set d-in set ;
+
+: callstack-effect ( list -- )
+    [ [ { } meta-r get ] bind cons ] map
+    unify-effect
+    meta-r set drop ;
+
+: filter-terminators ( list -- list )
+    [ [ d-in get meta-d get and ] bind ] subset [
+        "No branch has a stack effect" throw
+    ] unless* ;
+
+: unify-effects ( list -- )
+    filter-terminators  dup datastack-effect callstack-effect ;
 
 : deep-clone ( vector -- vector )
     #! Clone a vector of vectors.

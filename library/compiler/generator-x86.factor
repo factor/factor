@@ -41,10 +41,14 @@ USE: math
     #! immediate just compiled.
     "ds" f f rel-dlsym ;
 
+: PEEK-DS ( -- )
+    #! Peek datastack to EAX.
+    DS ECX [I]>R  absolute-ds
+    ECX EAX [R]>R ;
+
 : POP-DS ( -- )
     #! Pop datastack to EAX.
-    DS ECX [I]>R  absolute-ds
-    ECX EAX [R]>R
+    PEEK-DS
     4 ECX R-I
     ECX DS R>[I]  absolute-ds ;
 
@@ -74,6 +78,11 @@ USE: math
     intern-literal EAX [I]>R  rel-address
     EAX ECX R>[R]
     ECX DS R>[I]  absolute-ds
+] "generator" set-word-property
+
+#slot [
+    PEEK-DS
+    
 ] "generator" set-word-property
 
 #call [

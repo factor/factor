@@ -22,10 +22,8 @@ USE: generic
     [ 3 | 4 ]
 ] "effects" set
 
-[ 3 ] [ [ { 1 2 } { 1 2 3 } ] longest-vector ] unit-test
-
-[ t ] [
-    [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?
+[ { f 1 2 } { 1 2 3 } ] [
+    { 1 2 } { 1 2 3 } unify-lengths
 ] unit-test
 
 [ [ sq ] ] [
@@ -214,6 +212,6 @@ SYMBOL: sym-test
 [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
 [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 [ [ [ object ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
-[ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
+! [ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test

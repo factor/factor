@@ -37,6 +37,7 @@ USE: vectors
 USE: words
 USE: hashtables
 USE: generic
+USE: prettyprint
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -166,7 +167,11 @@ DEFER: apply-word
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ apply-object ] each ;
+    [
+        [ apply-object ] each
+    ] [
+        [ swap <chained-error> rethrow ] when*
+    ] catch ;
 
 : raise ( [ in | out ] -- [ in | out ] )
     uncons 2dup min tuck - >r - r> cons ;
@@ -201,7 +206,8 @@ DEFER: apply-word
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get vector-length 0 = [
-        "Word leaves elements on return stack" throw
+        "Word leaves elements on return stack"
+        <chained-error> throw
     ] unless ;
 
 : values-node ( op -- )

@@ -47,6 +47,7 @@ SYMBOL: meta-r
 SYMBOL: meta-d
 : push-d meta-d get vector-push ;
 : pop-d meta-d get vector-pop ;
+: peek-d meta-d get vector-peek ;
 SYMBOL: meta-n
 SYMBOL: meta-c
 

@@ -58,7 +58,7 @@ BUILTIN: vector 11
         "Vector length must be positive" throw 2drop
     ] [
         2dup (set-vector-length) grow-vector-array
-    ] ifte ;
+    ] ifte ; inline
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
@@ -72,6 +72,10 @@ BUILTIN: vector 11
 : vector-push ( obj vector -- )
     #! Push a value on the end of a vector.
     dup vector-length swap set-vector-nth ;
+
+: vector-peek ( vector -- obj )
+    #! Get value at end of vector.
+    dup vector-length pred swap vector-nth ;
 
 : vector-pop ( vector -- obj )
     #! Get value at end of vector and remove it.
@@ -121,15 +125,6 @@ BUILTIN: vector 11
     over vector-length [
         pick pick >r over >r vector-nth r> r> vector-nth cons
     ] vector-project nip nip ;
-
-: vector-2map ( v1 v2 quot -- v )
-    #! Apply a quotation with stack effect ( obj obj -- obj ) to
-    #! each pair of elements from v1 and v2, collecting them
-    #! into a new list. Behavior is undefined if vector lengths
-    #! differ.
-    -rot vector-zip [
-        swap dup >r >r uncons r> call r> swap
-    ] vector-map nip ; inline
 
 : vector-clone ( vector -- vector )
     #! Shallow copy of a vector.

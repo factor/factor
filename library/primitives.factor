@@ -210,9 +210,13 @@ USE: words
     [ memory>string          " address length -- str "            [ [ integer integer ] [ string ] ] ]
     [ local-alien?           " alien -- ? "                       [ [ alien ] [ object ] ] ]
     [ alien-address          " alien -- address "                 [ [ alien ] [ integer ] ] ]
-    [ >cons                  " cons -- cons "                     [ [ cons ] [ cons ] ] ]
-    [ >vector                " vector -- vector "                 [ [ vector ] [ vector ] ] ]
-    [ >string                " string -- string "                 [ [ string ] [ string ] ] ]
+    ! Note: a correct type spec for these would have [ X ] as
+    ! input, not [ object ]. However, we rely on the inferencer
+    ! to handle these specially, since they are also optimized
+    ! out in some cases, etc.
+    [ >cons                  " cons -- cons "                     [ [ object ] [ cons ] ] ]
+    [ >vector                " vector -- vector "                 [ [ object ] [ vector ] ] ]
+    [ >string                " string -- string "                 [ [ object ] [ string ] ] ]
     [ >word                  " word -- word "                     [ [ word ] [ word ] ] ]
     [ slot                   " obj n -- obj "                     [ [ object fixnum ] [ object ] ] ]
     [ set-slot               " obj obj n -- "                     [ [ object object fixnum ] [ ] ] ]

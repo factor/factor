@@ -108,10 +108,10 @@ USE: generic
 GENERIC: error. ( error -- )
 
 PREDICATE: cons kernel-error ( obj -- ? )
-    uncons cons? swap fixnum? and ;
+    car kernel-error = ;
 
 M: kernel-error error. ( error -- )
-    uncons car swap {
+    cdr uncons car swap {
         expired-error
         io-task-twice-error
         no-io-tasks-error
@@ -207,7 +207,8 @@ M: object error. ( error -- )
 : init-error-handler ( -- )
     [ 1 exit* ] >c ( last resort )
     [ print-error 1 exit* ] >c
-    [ dup save-error rethrow ] 5 setenv ( kernel calls on error ) ;
+    [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
+    kernel-error 12 setenv ;
 
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.

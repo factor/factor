@@ -12,6 +12,7 @@
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
 #define OS_ENV         11
+#define ERROR_ENV      12 /* a marker consed onto kernel errors */
 
 /* Profiling timer */
 #ifndef WIN32

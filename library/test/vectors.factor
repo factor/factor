@@ -5,6 +5,7 @@ USE: random
 USE: test
 USE: vectors
 USE: strings
+USE: namespaces
 
 [ [ t f t ] vector-length ] unit-test-fails
 [ 3 ] [ { t f t } vector-length ] unit-test
@@ -56,7 +57,7 @@ USE: strings
 unit-test
 
 [ { 6 8 10 12 } ]
-[ { 1 2 3 4 } { 5 6 7 8 } [ + ] vector-2map ]
+[ { 1 2 3 4 } { 5 6 7 8 } vector-zip [ uncons + ] vector-map ]
 unit-test
 
 [ { [ 1 | 5 ] [ 2 | 6 ] [ 3 | 7 ] [ 4 | 8 ] } ]
@@ -69,3 +70,15 @@ unit-test
 [ 2 [ ] vector-tail ] unit-test-fails
 
 [ [ 3 ] ] [ 1 { 1 2 3 } vector-tail* ] unit-test
+
+0 <vector> "funny-stack" set
+
+[ ] [ { 1 5 } "funny-stack" get vector-push ] unit-test
+[ ] [ { 2 3 } "funny-stack" get vector-push ] unit-test
+[ { 2 3 } ] [ "funny-stack" get vector-pop ] unit-test
+[ { 1 5 } ] [ "funny-stack" get vector-peek ] unit-test
+[ { 1 5 } ] [ "funny-stack" get vector-pop ] unit-test
+[ "funny-stack" get vector-pop ] unit-test-fails
+[ "funny-stack" get vector-pop ] unit-test-fails
+[ ] [ "funky" "funny-stack" get vector-push ] unit-test
+[ "funky" ] [ "funny-stack" get vector-pop ] unit-test

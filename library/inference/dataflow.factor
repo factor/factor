@@ -68,6 +68,9 @@ SYMBOL: #pick
 SYMBOL: #>r
 SYMBOL: #r>
 
+SYMBOL: #slot
+SYMBOL: #set-slot
+
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
 SYMBOL: node-consume-r
