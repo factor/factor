@@ -178,16 +178,18 @@ public class FactorPlugin extends EditPlugin
 		while(words != null)
 		{
 			FactorWord w = (FactorWord)words.car;
-
-			if(anywhere)
+			if(w.name != null)
 			{
-				if(w.name.indexOf(word) != -1)
-					completions.add(w);
-			}
-			else
-			{
-				if(w.name.startsWith(word))
-					completions.add(w);
+				if(anywhere)
+				{
+					if(w.name.indexOf(word) != -1)
+						completions.add(w);
+				}
+				else
+				{
+					if(w.name.startsWith(word))
+						completions.add(w);
+				}
 			}
 
 			words = words.next();
