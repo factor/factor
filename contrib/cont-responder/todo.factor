@@ -31,6 +31,7 @@ USE: strings
 USE: streams
 USE: namespaces
 USE: lists
+USE: arithmetic
 USE: stdio
 USE: kernel
 
@@ -76,8 +77,8 @@ USE: kernel
     "password" print-quoted "set" print
     "user" get print-quoted
     "user" print-quoted "set" print    
-    "items" get [ namespace>alist ] map print
-    "[ alist>namespace ] map" print 
+    "items" get [ namespace>alist ] map "items" swons print
+    "cdr [ alist>namespace ] map" print 
     "items" print-quoted "set" print
     "] extend" print
   ] bind ;
@@ -107,6 +108,37 @@ USE: kernel
   #! For each item in the currently bound todo list, call the quotation
   #! with that item bound.
   unit [ bind ] append "items" get swap each ;
+
+: todo-username ( <todo> -- username )
+  #! return the username for the todo list item.
+  [ "user" get ] bind ;
+
+: item-priority ( <todo-item> -- priority )
+  #! return the priority for the todo list item.
+  [ "priority" get ] bind ;
+
+: item-complete? ( <todo-item> -- boolean )
+  #! return true if the todo list item is completed.
+  [ "complete?" get ] bind ;
+
+: set-item-completed ( <todo-item> -- )
+  [ t "complete?" set ] bind ;
+
+: item-description ( <todo-item> -- description )
+  #! return the description for the todo list item.
+  [ "description" get ] bind ;
+
+: priority-comparator ( item1 item2 -- bool )
+  #! Return true if item1 is a higher priority than item2
+  >r item-priority r> item-priority > ;
+  
+: todo-items ( <todo> -- )
+  #! Return a list of items for the given todo list.
+  [ "items" get ] bind [ priority-comparator ] sort ;
+
+: delete-item ( <todo> <todo-item> -- )
+  #! Delete the item from the todo list
+  swap dup >r todo-items remove r> [ "items" set ] bind ;
 
 : test-todo 
   "user" "password" <todo> 

@@ -53,8 +53,9 @@ USE: prettyprint
         <input type= "submit" value= "Ok" input/>
       ] </form>
     ] html-document
-  ] show 
-  "name" swap assoc ;
+  ] show [
+    "name" get 
+  ] bind ;
 
 : test-cont-responder ( - )
   #! Test the cont-responder responder by displaying a few pages in a row.

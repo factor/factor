@@ -29,6 +29,7 @@
 IN: todo-example
 USE: cont-responder
 USE: cont-html
+USE: html
 USE: stdio
 USE: stack
 USE: strings
@@ -37,8 +38,10 @@ USE: inspector
 USE: lists
 USE: combinators
 USE: cont-examples
+USE: regexp
+USE: prettyprint
 USE: todo
-
+ 
 : simple-todo-page ( title quot -- )
   #! Call the quotation, with all output going to the
   #! body of an html page with the given title.
@@ -50,6 +53,19 @@ USE: todo
 : paragraph ( str -- )
   #! Output the string as an html paragraph
   <p> [ write ] </p> ;
+
+: show-message-page ( message -- )
+  #! Display the message in an HTML page with an OK button.
+  [
+    "Press OK to Continue" [
+       swap paragraph 
+       <a href= a> [ "OK" write ] </a>
+    ] simple-todo-page 
+  ] show 2drop ;
+
+: show-stack-page ( -- )
+  #! Debug function to show a page containing the current call stack.
+  [ .s ] with-string-stream chars>entities show-message-page ;
 
 : row ( list -- )
   #! Output an html TR row with each element of the list
@@ -63,107 +79,206 @@ USE: todo
   #! specified name.
   <input type= "text" size= "20" name= input/> ;
 
+: textarea-input ( name -- )
+  #! Output a simple HTML textarea field which will have the
+  #! specified name.
+  <input type= "text" size= "60" name= input/> ;
+!  <textarea name= textarea> [ "Enter description here." write ] </textarea> ;
+
+: password-input ( name -- )
+  #! Output an HTML password input field which will have the
+  #! specified name.
+  <input type= "password" size= "20" name= input/> ;
+
 : button ( label -- )
   #! Output an HTML submit button with the given label.
   <input type= "submit" value= input/> ;
 
-: form ( quot action -- )
+: form ( action quot  -- )
   #! Call quot with any output appearing inside an HTML form.
   #! The form is a POST form where the action is as specified.
-  <form method= "post" action= form> [ call ] </form> ;
+  <form method= "post" action= swap form> swap </form> ;
 
 : input-value ( name -- value )
   #! Get the value of the variable "name". If it is f 
   #! return "" else return the value.
   get [ "" ] unless* ;
 
+: login-form ( url button-text -- )
+  #! Write the HTML for an HTML form requesting a username
+  #! and password. The 'accept' button has the text given 
+  #! in 'button-text'. The form will go to the given URL on
+  #! submission.
+  swap [
+    <table> [
+      [ [ "Name:" write ] [ "name" simple-input ] ] row
+      [ [ "Password:" write ] [ "password" password-input ] ] row
+    ] </table>
+    button     
+  ] form ;
+   
+: registration-page ( submit-url -- )
+  #! Write the HTML for the registration page to std output.
+  "Register New TODO List" [
+    "Enter the username and password for your new todo list:" paragraph
+    "Register" login-form
+  ] simple-todo-page ;
+
+: login-details-valid? ( name password -- )
+  #! Ensure that a valid username and password were
+  #! entered. In particular, ensure that only alphanumeric
+  #! data was entered to prevent security problems by
+  #! using .., etc in the name.
+  drop "[a-zA-Z0-9]*" re-matches ;
+  
+: get-registration-details ( -- name password )
+  #! Get the registration details from the user putting
+  #! the name and password on the stack.
+  [ registration-page ] show [
+    "name" get "password" get
+  ] bind 2dup login-details-valid? [ 
+    2drop 
+    "Please ensure you enter a username containing letters and numbers only." show-message-page 
+    get-registration-details 	
+  ] unless ;
+   
+: get-todo-filename ( database-path <todo> -- filename )
+  #! Get the filename containing the todo list details.
+  <% swap % todo-username % ".todo" % %> ;
+  
+: add-default-todo-item ( <todo> -- )
+  #! Add a default todo item. This is a workaround for the 
+  #! currently hackish method of saving todo lists which can't
+  #! handle empty lists.
+  "1" "Set up todo list" <todo-item> add-todo-item ;
+
+: init-new-todo ( <todo> -- )
+  #! Add the default todo item and store the todo list to
+  #! persistent storage.
+  dup add-default-todo-item 
+  dup "database-path" get swap get-todo-filename store-todo ;
+
 : register-new-user ( -- )
   #! Get registration details for a new user and add a
-  #! todo list form them.
-  [ 
-    "Register New TODO List"
-    [
-      [
-        "<table>" write
-          [ [ "Name:" write ] [ "name" simple-input ] ] row
-          [ [ "Password:" write ] [ "password" simple-input ] ] row
-        "</table>" write
-        "Register" button     
-      ] swap form
-    ] simple-todo-page
-  ] show alist>namespace [
-    "name" get dup "password" get 
-  ] bind 
-  <todo> dup "1" "Set up todo list" <todo-item> add-todo-item
-  swap "database-path" get swap ".todo" cat3 store-todo ;
+  #! todo list for them.
+  get-registration-details 
+  2dup "database-path" get -rot user-exists? [
+    2drop
+    "That user already exists in the system, sorry. Please use another name."
+    show-message-page
+    register-new-user
+  ] [
+    <todo> init-new-todo
+    "You have successfully registered your todo list." show-message-page
+  ] ifte ;
 
-: get-login-information ( -- user password   )
+: login-request-paragraph ( -- )
+  #! Display the paragraph requesting the user to login or register.
+  <p> [ 
+    "Please enter your username and password (" write
+    "Click to Register" [ register-new-user ] quot-href
+    "):" write
+  ] </p> ;
+  
+: get-login-information ( -- user password )
   [
-    "Login"
-    [      
-      <p> [ "Please enter your username and password (" write
-            "Click to Register" [ register-new-user ] quot-href
-            "):" write
-          ] </p>     
-      [
-        "<table>" write 
-          [ [ "Username:" write ] [ "username" simple-input ] ] row
-          [ [ "Password:" write ] [ "password" simple-input ] ] row
-        "</table>" write
-        "Login" button
-      ] swap form 
+    "Login" [     
+      login-request-paragraph 
+      "Login" login-form
     ] simple-todo-page 
-  ] show alist>namespace [ "username" input-value "password" input-value ] bind ;
+  ] show [ 
+    "name" get "password" get 
+  ] bind  ;
+
+: ensure-login-valid ( user password -- user password )
+  2dup login-details-valid? [ 
+    "Please ensure you enter a username containing letters and numbers only." show-message-page 
+    get-login-information 	
+  ] unless ;
 
 : get-todo-list ( -- <todo> )
   #! Prompts for a username or password until a valid combination
   #! is entered then returns the <todo> list for that user.
-  get-login-information "database-path" get -rot user-exists? [ get-todo-list ] unless* ;
+  get-login-information ensure-login-valid 
+  "database-path" get -rot user-exists? [ 
+    "Sorry, your username or password was incorrect." show-message-page
+    get-todo-list 
+  ] unless* ;
 
-: enter-new-todo-item ( -- <todo-item> )
+: write-new-todo-item-form ( url -- )
+  #! Display the HTML for a form allowing entry of a 
+  #! todo item details.
+  [
+    <table> [
+      [ [ "Priority:" write ]    [ "priority" simple-input ] ] row
+      [ [ "Description:" write ] [ "description" textarea-input ] ] row
+    ] </table>
+    "Add" button
+  ] form ;
+  
+: get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
   [
-    "Enter New Todo Item"
-    [
-      [
-        "<table>" write
-          [ [ "Priority:" write ]    [ "priority" simple-input ] ] row
-          [ [ "Description:" write ] [ "description" simple-input ] ] row
-        "</table>" write  
-        "Add" button
-      ] swap form  
-    ] simple-todo-page  
-  ] show alist>namespace [ 
+    "Enter New Todo Item" [ write-new-todo-item-form ] simple-todo-page  
+  ] show [ 
     "priority" get "description" get <todo-item> 
   ] bind ;
 
 : save-current-todo ( -- )
   #! Save the current todo list
-  "todo" get dup "database-path" get swap [ "user" get ] bind ".todo" cat3 store-todo ;
+  "database-path" get "todo" get get-todo-filename "todo" get swap store-todo ;
+
+: lcurry1 ( value quot -- quot )
+  #! Return a quotation that when called will have 'value' 
+  #! as the first item on the stack.
+  cons ;
+
+: write-mark-complete-action ( item -- )
+  #! Write out HTML to perform a mark complete
+  #! action on an item (or other appropriate
+  #! action if already complete).
+  dup item-complete? [
+    "Delete" swap [ "todo" get swap delete-item save-current-todo ] lcurry1 quot-href
+  ] [
+    "Mark Completed" swap [ set-item-completed save-current-todo ] lcurry1 quot-href
+  ] ifte ;
+
+: write-item-row ( <todo-item> -- )
+  #! Write the todo list item as an HTML row.
+  dup dup dup
+  [ [ item-priority write ] 
+    [ item-complete? [ "Yes" ] [ "No" ] ifte write ] 
+    [ item-description write ] 
+    [ write-mark-complete-action ] 
+  ] row ;
+
+: write-item-table ( <todo> -- )
+  #! Write the table of items for the todo list.
+  <table> [
+    [ [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] ] row
+    todo-items [ write-item-row ] each 
+  ] </table> ;
+
+: do-add-new-item ( -- )
+  #! Request a new item from the user and add it to the current todo list.
+  "todo" get get-new-todo-item add-todo-item save-current-todo ;
+
+: show-todo-list ( -- )
+  #! Show the current todo list.
+  [
+    <% "todo" get todo-username % "'s To Do list" % %>
+    [
+      drop
+      "todo" get write-item-table
+      "Add Item" [ do-add-new-item ] quot-href
+    ] simple-todo-page 
+  ] show drop ;
 
 : todo-example ( path -- )
   #! Startup the todo list example using the given path as the 
   #! directory holding the todo files.
   "database-path" set
   get-todo-list "todo" set
-  [
-    "todo" get [ "user" get ] bind "'s" "To Do list" cat3
-    [
-      drop
-      "todo" get [
-	"<table>" write 
-          [ [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] ] row
-          [
-            [ [ "priority" get write ] 
-              [ "complete?" get [ "Yes" ] [ "No" ] ifte write ] 
-              [ "description" get write ] ] row
-          ] items-each-bind         
-        "</table>" write
-	"Add Item" [ 
-          "todo" get enter-new-todo-item add-todo-item save-current-todo
-        ] quot-href
-      ] bind
-    ] simple-todo-page 
-  ] show drop ;
+  show-todo-list ;
 
 "todo" [ drop "todo/" todo-example ] install-cont-responder

@@ -236,8 +236,8 @@ USE: logic
 : open-html-word-code ( name -- )
   #! Return a list of the code for the words
   #! used for the open only HTML tag.
-  dup [ <tag> [ ] write-tag ] cons t swons 
-  swap [ <tag> >n f ] cons t swons
+  dup [ <tag> [ ] write-tag ] cons f swons 
+  swap [ <tag> >n f ] cons f swons
   [ "last-name" get n> -rot swap attribute-assign [ ] write-tag ]
   2list cons ;
 
@@ -262,7 +262,7 @@ USE: logic
 [ 
   "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" 
  "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-  "b" "i" "ul" "table" "tr" "td" "pre"
+  "b" "i" "ul" "table" "tr" "td" "pre" "textarea"
 ] [ define-closed-html-word ] each
 
 ! Define some closed HTML tags
