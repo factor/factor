@@ -142,3 +142,6 @@ M: very-funny gooey sq ;
 [ t ] [ del1 builtin-supertypes [ integer? ] all? ] unit-test
 
 [ cons ] [ [ 1 2 ] class ] unit-test
+
+[ t ] [ \ generic \ compound class< ] unit-test
+[ f ] [ \ compound \ generic class< ] unit-test

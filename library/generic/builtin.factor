@@ -50,6 +50,9 @@ builtin [
 
 builtin 50 "priority" set-word-property
 
+! All builtin types are equivalent in ordering
+builtin [ 2drop t ] "class<" set-word-property
+
 : builtin-predicate ( type# symbol -- )
     over f type = [
         nip [ not ] "predicate" set-word-property

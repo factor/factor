@@ -80,10 +80,14 @@ USE: math-internals
 : class-ord ( class -- n ) metaclass "priority" word-property ;
 
 : class< ( cls1 cls2 -- ? )
-    swap class-ord swap class-ord < ;
+    over metaclass over metaclass = [
+        dup metaclass "class<" word-property call
+    ] [
+        swap class-ord swap class-ord <
+    ] ifte ;
 
-: sort-methods ( methods -- alist )
-    hash>alist [ 2car class< ] sort ;
+: methods ( generic -- alist )
+    "methods" word-property hash>alist [ 2car class< ] sort ;
 
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
@@ -95,8 +99,9 @@ USE: math-internals
 : <empty-vtable> ( -- vtable )
     num-types [ drop [ undefined-method ] ] vector-project ;
 
-: <vtable> ( generic methods -- vtable )
-    >r <empty-vtable> r> sort-methods [
+: <vtable> ( generic -- vtable )
+    <empty-vtable> over methods [
+        ( generic vtable method )
         >r 2dup r> unswons add-method
     ] each nip ;
 
@@ -104,21 +109,28 @@ USE: math-internals
     over "combination" word-property cons define-compound ;
 
 : (define-method) ( definition class generic -- )
-    [ "methods" word-property set-hash ] keep
-    dup dup "methods" word-property <vtable>
+    [ "methods" word-property set-hash ] keep dup <vtable>
     define-generic ;
 
+: init-methods ( word -- )
+     dup "methods" word-property [
+         drop
+     ] [
+        <namespace> "methods" set-word-property
+     ] ifte ;
+
 ! Defining generic words
-: (GENERIC) ( combination -- )
+: (GENERIC) ( combination definer -- )
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    CREATE [ swap "combination" set-word-property ] keep
-    dup dup "methods" word-property [
-        dup <namespace> [ "methods" set-word-property ] keep
-    ] unless* <vtable> define-generic ;
+    CREATE
+    [ swap "definer" set-word-property ] keep
+    [ swap "combination" set-word-property ] keep
+    dup init-methods
+    dup <vtable> define-generic ;
 
-PREDICATE: word generic ( word -- ? )
+PREDICATE: compound generic ( word -- ? )
     "combination" word-property ;
 
 : single-combination ( obj vtable -- )
@@ -127,7 +139,7 @@ PREDICATE: word generic ( word -- ? )
 : GENERIC:
     #! GENERIC: bar creates a generic word bar. Add methods to
     #! the generic word using M:.
-    [ single-combination ] (GENERIC) ; parsing
+    [ single-combination ] \ GENERIC: (GENERIC) ; parsing
 
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
@@ -139,7 +151,7 @@ PREDICATE: word generic ( word -- ? )
     #! the generic word using M:. 2GENERIC words dispatch on
     #! arithmetic types and should not be used for non-numerical
     #! types.
-    [ arithmetic-combination ] (GENERIC) ; parsing
+    [ arithmetic-combination ] \ 2GENERIC: (GENERIC) ; parsing
 
 : define-method ( class -- quotation )
     #! In a vain attempt at something resembling a "meta object

@@ -53,11 +53,11 @@ USE: words
     dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: prettyprint* prettyprint-space
-    word-vocabulary prettyprint-vocab prettyprint-space ;
+    \ IN: prettyprint* " " write
+    word-vocabulary prettyprint-vocab " " write ;
 
 : prettyprint-: ( indent -- indent )
-    \ : prettyprint* prettyprint-space
+    \ : prettyprint* " " write
     tab-size + ;
 
 : prettyprint-; ( indent -- indent )
@@ -66,7 +66,7 @@ USE: words
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-property [
-        prettyprint-space prettyprint-1
+        " " write prettyprint-1
     ] [
         drop
     ] ifte ;
@@ -98,18 +98,34 @@ USE: words
         stack-effect. dup prettyprint-newline
     ] keep documentation. ;
 
+: prettyprint-M: ( indent -- indent )
+    \ M: prettyprint-1 " " write tab-size + ;
+
 GENERIC: see ( word -- )
 
-M: object see ( obj -- )
-    "Not a word: " write . ;
-
 M: compound see ( word -- )
-    [ prettyprint-IN: ] keep
+    dup prettyprint-IN:
     0 prettyprint-: swap
     [ prettyprint-1 ] keep
     [ prettyprint-docs ] keep
     [ word-parameter prettyprint-list prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
+
+: see-method ( indent word class method -- indent )
+    >r >r >r prettyprint-M:
+    r> prettyprint-1 " " write
+    r> prettyprint-1 " " write
+    dup prettyprint-newline
+    r> prettyprint-list
+    prettyprint-;
+    terpri ;
+
+M: generic see ( word -- )
+    dup prettyprint-IN:
+    0 swap
+    dup "definer" word-property prettyprint-1 " " write
+    dup prettyprint-1 terpri
+    dup methods [ over >r uncons see-method r> ] each 2drop ;
 
 M: primitive see ( word -- )
     dup prettyprint-IN:
@@ -117,9 +133,8 @@ M: primitive see ( word -- )
 
 M: symbol see ( word -- )
     dup prettyprint-IN:
-    0 swap
-    \ SYMBOL: prettyprint-1 prettyprint-space . ;
+    \ SYMBOL: prettyprint-1 " " write . ;
 
 M: undefined see ( word -- )
     dup prettyprint-IN:
-    \ DEFER: prettyprint-1 prettyprint-space . ;
+    \ DEFER: prettyprint-1 " " write . ;

@@ -92,6 +92,8 @@ traits [
 
 traits 10 "priority" set-word-property
 
+traits [ 2drop t ] "class<" set-word-property
+
 : init-traits-map ( word -- )
     <namespace> "traits-map" set-word-property ;
 

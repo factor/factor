@@ -121,10 +121,6 @@ public class FactorPlugin extends EditPlugin
 					new String[args.size()]));
 
 				external = new ExternalFactor(PORT);
-
-				process.getErrorStream().close();
-				process.getInputStream().close();
-				process.getOutputStream().close();
 			}
 			catch(Exception e)
 			{
@@ -157,6 +153,9 @@ public class FactorPlugin extends EditPlugin
 			external.close();
 			try
 			{
+				process.getErrorStream().close();
+				process.getInputStream().close();
+				process.getOutputStream().close();
 				process.waitFor();
 			}
 			catch(Exception e)
@@ -164,6 +163,7 @@ public class FactorPlugin extends EditPlugin
 				Log.log(Log.DEBUG,FactorPlugin.class,e);
 			}
 			external = null;
+			process = null;
 		}
 	} //}}}
 	

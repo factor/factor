@@ -58,20 +58,17 @@ M: object prettyprint* ( indent obj -- indent )
 : prettyprint-newline ( indent -- )
     "\n" write indent ;
 
-: prettyprint-space ( -- )
-    " " write ;
-
 : prettyprint-element ( indent obj -- indent )
     over prettyprint-limit get >= [
         unparse write
     ] [
         prettyprint*
-    ] ifte prettyprint-space ;
+    ] ifte " " write ;
 
 : <prettyprint ( indent -- indent )
     tab-size +
     "prettyprint-single-line" get [
-        prettyprint-space
+        " " write
     ] [
         dup prettyprint-newline
     ] ifte ;
@@ -128,7 +125,7 @@ M: word prettyprint* ( indent word -- indent )
         ] [
             [
                 \ | prettyprint*
-                prettyprint-space prettyprint-element
+                " " write prettyprint-element
             ] when*
         ] ifte
     ] when* ;
@@ -150,7 +147,7 @@ M: vector prettyprint* ( indent vector -- indent )
     dup vector-length 0 = [
         drop
         \ { prettyprint*
-        prettyprint-space
+        " " write
         \ } prettyprint*
     ] [
         swap prettyprint-{ swap prettyprint-vector prettyprint-}
@@ -166,7 +163,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
     hash>alist dup length 0 = [
         drop
         \ {{ prettyprint*
-        prettyprint-space 
+        " " write 
         \ }} prettyprint*
     ] [
         swap prettyprint-{{ swap prettyprint-list prettyprint-}}

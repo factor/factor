@@ -19,7 +19,7 @@
 
 + oop:
 
-- make see work with generics
+- make see work with union, builtin, predicate
 - doc comments of generics
 - redo traits with generic method map
 

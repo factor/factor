@@ -52,6 +52,8 @@ union [
 
 union 30 "priority" set-word-property
 
+union [ 2drop t ] "class<" set-word-property
+
 : union-predicate ( definition -- list )
     [
         [

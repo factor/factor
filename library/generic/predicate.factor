@@ -65,6 +65,14 @@ predicate [
 
 predicate 25 "priority" set-word-property
 
+predicate [
+    2dup = [
+        2drop t
+    ] [
+        >r "superclass" word-property r> class<
+    ] ifte
+] "class<" set-word-property
+
 : define-predicate ( class predicate definition -- )
     rot "superclass" word-property "predicate" word-property
     [ \ dup , append, , [ drop f ] , \ ifte , ] make-list

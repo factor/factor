@@ -55,4 +55,6 @@ object [ drop t ] "predicate" set-word-property
 
 object 100 "priority" set-word-property
 
+object [ 2drop t ] "class<" set-word-property
+
 object object define-class

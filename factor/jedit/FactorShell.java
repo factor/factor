@@ -82,6 +82,7 @@ public class FactorShell extends Shell
 		try
 		{
 			state = getConsoleState(console);
+			state.openStream();
 			state.packetLoop(output);
 		}
 		catch(Exception e)
@@ -210,14 +211,14 @@ public class FactorShell extends Shell
 			}
 			else
 			{
-				/* try
+				try
 				{
 					packetLoop(output);
 				}
 				catch(Exception e)
 				{
 					Log.log(Log.ERROR,this,e);
-				} */
+				}
 			}
 		}
 
@@ -263,8 +264,6 @@ public class FactorShell extends Shell
 		{
 			if(waitingForInput)
 				return;
-
-			openStream();
 
 			if(stream == null)
 				return;
