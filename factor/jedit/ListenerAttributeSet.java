@@ -34,6 +34,7 @@ import factor.Cons;
 import javax.swing.text.*;
 import javax.swing.Action;
 import java.awt.Color;
+import org.gjt.sp.jedit.GUIUtilities;
 
 public class ListenerAttributeSet extends SimpleAttributeSet
 {
@@ -67,6 +68,9 @@ public class ListenerAttributeSet extends SimpleAttributeSet
 			addAttribute(StyleConstants.FontSize,value);
 		else if("actions".equals(key))
 			addAttribute(ConsolePane.Actions,createActionsMenu((Cons)value));
+		else if("icon".equals(key))
+			addAttribute(StyleConstants.IconAttribute,
+				GUIUtilities.loadIcon((String)value));
 	} //}}}
 	
 	//{{{ toColor() method

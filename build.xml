@@ -36,6 +36,7 @@
 				<include name="*.xml"/>
 				<include name="doc/**/*.html"/>
 				<include name="doc/**/*.png"/>
+				<include name="library/**/*.png"/>
 				<include name="doc/*.html"/>
 			</fileset>
 		</jar>
