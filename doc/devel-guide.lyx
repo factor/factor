@@ -232,7 +232,7 @@ More complicated infix expressions can be translated into postfix by translating
 
 
 \emph on 
-36
+30
 \layout LyX-Code
 
 ! Postfix equivalent of 2 + (3 * 6)
@@ -2137,6 +2137,126 @@ destructive
 
 
 \family typewriter 
+add ( list obj -- list )
+\family default 
+ Create a new list consisting of the original list, and a new element added
+ at the end:
+\layout LyX-Code
+
+[ 1 2 3 ] 4 add .
+\layout LyX-Code
+
+
+\emph on 
+[ 1 2 3 4 ]
+\layout LyX-Code
+
+1 [ 2 3 4 ] cons .
+\layout LyX-Code
+
+
+\emph on 
+[ 1 2 3 4 ]
+\layout Standard
+
+While 
+\family typewriter 
+cons
+\family default 
+ and 
+\family typewriter 
+add
+\family default 
+ appear to have similar effects, they are quite different -- 
+\family typewriter 
+cons
+\family default 
+ is a very cheap operation, while 
+\family typewriter 
+add
+\family default 
+ has to copy the entire list first! If you need adds to the end to take
+ a constant time, use a vector.
+\layout Standard
+
+
+\family typewriter 
+append ( list list -- list )
+\family default 
+ Append the two lists at the top of the stack:
+\layout LyX-Code
+
+[ 1 2 3 ] [ 4 5 6 ] append .
+\layout LyX-Code
+
+
+\emph on 
+[ 1 2 3 4 5 6 ]
+\layout LyX-Code
+
+[ 1 2 3 ] dup [ 4 5 6 ] append .s
+\layout LyX-Code
+
+
+\emph on 
+{ [ 1 2 3 ] [ 1 2 3 4 5 6 ] }
+\layout Standard
+
+The first list is copied, and the cdr of its last cons cell is set to the
+ second list.
+ The second example above shows that the original parameter was not modified.
+ Interestingly, if the second parameter is not a proper list, 
+\family typewriter 
+append
+\family default 
+ returns an improper list:
+\layout LyX-Code
+
+[ 1 2 3 ] 4 append .
+\layout LyX-Code
+
+
+\emph on 
+[ 1 2 3 | 4 ]
+\layout Standard
+
+
+\family typewriter 
+length ( list -- n )
+\family default 
+ Iterate down the cdr of the list until it reaches 
+\family typewriter 
+f
+\family default 
+, counting the number of elements in the list:
+\layout LyX-Code
+
+[ [ 1 2 ] [ 3 4 ] 5 ] length .
+\layout LyX-Code
+
+
+\emph on 
+3
+\layout LyX-Code
+
+[ [ [ 
+\begin_inset Quotes eld
+\end_inset 
+
+Hey
+\begin_inset Quotes erd
+\end_inset 
+
+ ] 5 ] length .
+\layout LyX-Code
+
+
+\emph on 
+2
+\layout Standard
+
+
+\family typewriter 
 nth ( index list -- obj )
 \family default 
  Look up an element specified by a zero-based index, by successively iterating
@@ -2189,55 +2309,37 @@ This word takes linear time proportional to the list index.
 
 
 \family typewriter 
-length ( list -- n )
+set-nth ( value index list -- list )
 \family default 
- Iterate down the cdr of the list until it reaches 
-\family typewriter 
-f
-\family default 
-, counting the number of elements in the list:
-\layout LyX-Code
-
-[ [ 1 2 ] [ 3 4 ] 5 ] length .
-\layout LyX-Code
-
-
-\emph on 
-3
-\layout LyX-Code
-
-[ [ [ 
-\begin_inset Quotes eld
-\end_inset 
-
-Hey
-\begin_inset Quotes erd
-\end_inset 
-
- ] 5 ] length .
-\layout LyX-Code
-
-
-\emph on 
-2
-\layout Standard
-
-
-\family typewriter 
-unit ( obj -- list )
-\family default 
- Make a list of one element:
+ Create a new list, identical to the original list except the element at
+ the specified index is replaced:
 \layout LyX-Code
 
 
 \begin_inset Quotes eld
 \end_inset 
 
-Unit 18
+Done
 \begin_inset Quotes erd
 \end_inset 
 
- unit .
+ 1 [ 
+\begin_inset Quotes eld
+\end_inset 
+
+Not started
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+Incomplete
+\begin_inset Quotes erd
+\end_inset 
+
+ ] set-nth .
 \layout LyX-Code
 
 
@@ -2246,7 +2348,15 @@ Unit 18
 \begin_inset Quotes eld
 \end_inset 
 
-Unit 18
+Done
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+Incomplete
 \begin_inset Quotes erd
 \end_inset 
 
@@ -2255,87 +2365,55 @@ Unit 18
 
 
 \family typewriter 
-append ( list list -- list )
+remove ( obj list -- list )
 \family default 
- Append the two lists at the top of the stack:
+ Push a new list, with all occurrences of the object removed.
+ All other elements are in the same order:
 \layout LyX-Code
 
-[ 1 2 3 ] [ 4 5 6 ] append .
+: australia- 
+\begin_inset Quotes eld
+\end_inset 
+
+Australia
+\begin_inset Quotes erd
+\end_inset 
+
+ swap remove ;
 \layout LyX-Code
 
-
-\emph on 
-[ 1 2 3 4 5 6 ]
-\layout LyX-Code
-
-[ 1 2 3 ] dup [ 4 5 6 ] append .s
-\layout LyX-Code
-
-
-\emph on 
-{ [ 1 2 3 ] [ 1 2 3 4 5 6 ] }
-\layout Standard
-
-The first list is copied, and the cdr of its last cons cell is set to the
- second list.
- The second example above shows that the original parameter was not modified.
- Interestingly, if the second parameter is not a proper list, 
-\family typewriter 
-append
-\family default 
- returns an improper list:
-\layout LyX-Code
-
-[ 1 2 3 ] 4 append .
+[ "Canada" "New Zealand" "Australia" "Russia" ] australia- .
 \layout LyX-Code
 
 
 \emph on 
-[ 1 2 3 | 4 ]
+[ "Canada" "New Zealand" "Russia" ]
 \layout Standard
 
 
 \family typewriter 
-add ( list obj -- list )
+remove-nth ( index list -- list )
 \family default 
- Create a new list consisting of the original list, and a new element added
- at the end:
+ Push a new list, with an index removed:
 \layout LyX-Code
 
-[ 1 2 3 ] 4 add .
+: australia- 
+\begin_inset Quotes eld
+\end_inset 
+
+Australia
+\begin_inset Quotes erd
+\end_inset 
+
+ swap remove ;
+\layout LyX-Code
+
+[ "Canada" "New Zealand" "Australia" "Russia" ] australia- .
 \layout LyX-Code
 
 
 \emph on 
-[ 1 2 3 4 ]
-\layout LyX-Code
-
-1 [ 2 3 4 ] cons .
-\layout LyX-Code
-
-
-\emph on 
-[ 1 2 3 4 ]
-\layout Standard
-
-While 
-\family typewriter 
-cons
-\family default 
- and 
-\family typewriter 
-add
-\family default 
- appear to have similar effects, they are quite different -- 
-\family typewriter 
-cons
-\family default 
- is a very cheap operation, while 
-\family typewriter 
-add
-\family default 
- has to copy the entire list first! If you need adds to the end to take
- a constant time, use a vector.
+[ "Canada" "New Zealand" "Russia" ]
 \layout Standard
 
 
@@ -2475,7 +2553,11 @@ contains an object that looks like
  The issue of object equality is covered in the next chapter.
 \layout Standard
 
-unique ( list -- list ) Return a new list with all duplicate elements removed.
+
+\family typewriter 
+unique ( list -- list )
+\family default 
+ Return a new list with all duplicate elements removed.
  This word executes in quadratic time, so should not be used with large
  lists.
  For example:
@@ -2491,58 +2573,33 @@ unique ( list -- list ) Return a new list with all duplicate elements removed.
 
 
 \family typewriter 
-remove ( obj list -- list )
+unit ( obj -- list )
 \family default 
- Push a new list, with all occurrences of the object removed.
- All other elements are in the same order:
+ Make a list of one element:
 \layout LyX-Code
 
-: australia- 
+
 \begin_inset Quotes eld
 \end_inset 
 
-Australia
+Unit 18
 \begin_inset Quotes erd
 \end_inset 
 
- swap remove ;
-\layout LyX-Code
-
-[ "Canada" "New Zealand" "Australia" "Russia" ] australia- .
+ unit .
 \layout LyX-Code
 
 
 \emph on 
-[ "Canada" "New Zealand" "Russia" ]
-\layout Standard
-
-
-\family typewriter 
-remove-nth ( index list -- list )
-\family default 
- Push a new list, with an index removed:
-\layout LyX-Code
-
-: australia- 
+[ 
 \begin_inset Quotes eld
 \end_inset 
 
-Australia
+Unit 18
 \begin_inset Quotes erd
 \end_inset 
 
- swap remove ;
-\layout LyX-Code
-
-[ "Canada" "New Zealand" "Australia" "Russia" ] australia- .
-\layout LyX-Code
-
-
-\emph on 
-[ "Canada" "New Zealand" "Russia" ]
-\layout Standard
-
-XXX: unique, set-nth -- talk about lists as stacks
+ ]
 \layout Subsection
 
 Association lists
@@ -3055,7 +3112,6 @@ nreverse
 nreverse
 \family default 
  can safely be used here.
- XXX - example
 \layout Standard
 
 
@@ -3648,6 +3704,505 @@ print, write, read, turning a string into a number
 \layout Section
 
 PRACTICAL: Contractor timesheet
+\layout Subsection
+
+Adding a timesheet entry
+\layout Standard
+
+When you begin working on a new task, you tell the timesheet you want to
+ add a new entry.
+ It then measures the elapsed time until you specify the task is done, and
+ prompts for a task description.
+\layout Standard
+
+The first word we will write is 
+\family typewriter 
+measure-duration
+\family default 
+.
+ We measure the time duration by using the 
+\family typewriter 
+millis
+\family default 
+ word 
+\family typewriter 
+( -- m )
+\family default 
+ to take the time before and after a call to 
+\family typewriter 
+read
+\family default 
+.
+ The 
+\family typewriter 
+millis
+\family default 
+ word pushes the number of milliseconds since a certain epoch -- the epoch
+ does not matter here since we are only interested in the difference between
+ two times.
+\layout Standard
+
+A first attempt at 
+\family typewriter 
+measure-duration
+\family default 
+ might look like this:
+\layout LyX-Code
+
+: measure-duration millis read drop millis - ;
+\layout LyX-Code
+
+measure-duration .
+\layout Standard
+
+This word definition has the right general idea, however, the result is
+ negative.
+ Also, we would like to measure durations in minutes, not milliseconds:
+\layout LyX-Code
+
+: measure-duration ( -- duration )
+\layout LyX-Code
+
+    millis
+\layout LyX-Code
+
+    read drop
+\layout LyX-Code
+
+    millis swap - 1000 /i 60 /i ;
+\layout Standard
+
+Note that the 
+\family typewriter 
+/i
+\family default 
+ word 
+\family typewriter 
+( x y -- x/y )
+\family default 
+, from the 
+\family typewriter 
+arithmetic
+\family default 
+ vocabulary, performs truncating division.
+ This makes sense, since we are not interested in fractional parts of a
+ minute here.
+\layout Standard
+
+Now that we can measure a time duration at the keyboard, lets write the
+ 
+\family typewriter 
+add-entry-prompt
+\family default 
+ word.
+ This word does exactly what one would expect -- it prompts for the time
+ duration and description, and leaves those two values on the stack:
+\layout LyX-Code
+
+: add-entry-prompt ( -- duration description )
+\layout LyX-Code
+
+    "Start work on the task now.
+ Press ENTER when done." print
+\layout LyX-Code
+
+    measure-duration
+\layout LyX-Code
+
+    "Please enter a description:" print
+\layout LyX-Code
+
+    read ;
+\layout Standard
+
+You should interactively test this word.
+ Measure off a minute or two, press ENTER, enter a description, and press
+ ENTER again.
+ The stack should now contain two values, in the same order as the stack
+ effect comment.
+\layout Standard
+
+Now, almost all the ingredients are in place.
+ The final add-entry word calls add-entry-prompt, then pushes the new entry
+ on the end of the timesheet vector:
+\layout LyX-Code
+
+: add-entry ( timesheet -- )
+\layout LyX-Code
+
+    add-entry-prompt cons swap vector-push ;
+\layout Standard
+
+Recall that timesheet entries are cons cells where the car is the duration
+ and the cdr is the description, hence the call to 
+\family typewriter 
+cons
+\family default 
+.
+ Note that this word side-effects the timesheet vector.
+ You can test it interactively like so:
+\layout LyX-Code
+
+10 <vector> dup add-entry
+\layout LyX-Code
+
+
+\emph on 
+Start work on the task now.
+ Press ENTER when done.
+\layout LyX-Code
+
+
+\emph on 
+Please enter a description:
+\layout LyX-Code
+
+
+\emph on 
+Studying Factor
+\layout LyX-Code
+
+.
+\layout LyX-Code
+
+
+\emph on 
+{ [ 2 | 
+\begin_inset Quotes eld
+\end_inset 
+
+Studying Factor
+\begin_inset Quotes erd
+\end_inset 
+
+ ] }
+\layout Subsection
+
+Printing the timesheet
+\layout Standard
+
+The hard part of printing the timesheet is turning the duration in minutes
+ into a nice hours/minutes string, like 
+\begin_inset Quotes eld
+\end_inset 
+
+01:15
+\begin_inset Quotes erd
+\end_inset 
+
+.
+ We would like to make a word like the following:
+\layout LyX-Code
+
+135 hh:mm .
+\layout LyX-Code
+
+
+\emph on 
+01:15
+\layout Standard
+
+First, we can make a pair of words hh and mm to extract the hours and minutes,
+ respectively.
+ This can be achieved using truncating division, and the modulo operator
+ -- also, since we would like strings to be returned, the 
+\family typewriter 
+unparse
+\family default 
+ word 
+\family typewriter 
+( obj -- str )
+\family default 
+ from the 
+\family typewriter 
+unparser
+\family default 
+ vocabulary is called to turn the integers into strings:
+\layout LyX-Code
+
+: hh ( duration -- str ) 60 /i unparse ;
+\layout LyX-Code
+
+: mm ( duration -- str ) 60 mod unparse ;
+\layout Standard
+
+The 
+\family typewriter 
+hh:mm
+\family default 
+ word can then be written, concatenating the return values of 
+\family typewriter 
+hh
+\family default 
+ and 
+\family typewriter 
+mm
+\family default 
+ into a single string using string construction:
+\layout LyX-Code
+
+: hh:mm ( millis -- str ) <% dup hh % ":" % mm % %> ;
+\layout Standard
+
+However, so far, these three definitions do not produce ideal output.
+ Try a few examples:
+\layout LyX-Code
+
+120 hh:mm .
+\layout LyX-Code
+
+2:0
+\layout LyX-Code
+
+130 hh:mm .
+\layout LyX-Code
+
+2:10
+\layout Standard
+
+Obviously, we would like the minutes to always be two digits.
+ Luckily, there is a 
+\family typewriter 
+digits
+\family default 
+ word 
+\family typewriter 
+( str n -- str )
+\family default 
+ in the 
+\family typewriter 
+format
+\family default 
+ vocabulary that adds enough zeros on the left of the string to give it
+ the specified length.
+ Try it out:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+23
+\begin_inset Quotes erd
+\end_inset 
+
+ 2 digits .
+\layout LyX-Code
+
+
+\emph on 
+
+\begin_inset Quotes eld
+\end_inset 
+
+23
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+7
+\begin_inset Quotes erd
+\end_inset 
+
+ 2 digits .
+\layout LyX-Code
+
+
+\emph on 
+
+\begin_inset Quotes eld
+\end_inset 
+
+07
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+We can now change the definition of 
+\family typewriter 
+mm
+\family default 
+ accordingly:
+\layout LyX-Code
+
+: mm ( duration -- str ) 60 mod unparse 2 digits ;
+\layout Standard
+
+Now that time duration output is done, a first attempt at a definition of
+ 
+\family typewriter 
+print-timesheet
+\family default 
+ looks like this:
+\layout LyX-Code
+
+: print-timesheet ( timesheet -- )
+\layout LyX-Code
+
+    [ uncons write 
+\begin_inset Quotes eld
+\end_inset 
+
+: 
+\begin_inset Quotes eld
+\end_inset 
+
+ write hh:mm print ] vector-each ;
+\layout Standard
+
+This works, but produces ugly output:
+\layout LyX-Code
+
+{ [ 30 | 
+\begin_inset Quotes eld
+\end_inset 
+
+Studying Factor
+\begin_inset Quotes erd
+\end_inset 
+
+ ] [ 65 | 
+\begin_inset Quotes eld
+\end_inset 
+
+Paperwork
+\begin_inset Quotes erd
+\end_inset 
+
+ ] }
+\layout LyX-Code
+
+print-timesheet
+\layout LyX-Code
+
+
+\emph on 
+Studying Factor: 0:30
+\layout LyX-Code
+
+
+\emph on 
+Paperwork: 1:05
+\layout Standard
+
+It would be much nicer if the time durations lined up in the same column.
+ First, lets factor out the body of the 
+\family typewriter 
+vector-each
+\family default 
+ loop into a new 
+\family typewriter 
+print-entry
+\family default 
+ word before it gets too long:
+\layout LyX-Code
+
+: print-entry ( duration description -- )
+\layout LyX-Code
+
+    write 
+\begin_inset Quotes eld
+\end_inset 
+
+: 
+\begin_inset Quotes erd
+\end_inset 
+
+ write hh:mm print ;
+\newline 
+
+\newline 
+: print-timesheet ( timesheet -- )
+\layout LyX-Code
+
+    [ uncons print-entry ] vector-each ;
+\layout Standard
+
+We can now make 
+\family typewriter 
+print-entry
+\family default 
+ line up columns using the 
+\family typewriter 
+pad-string
+\family default 
+ word 
+\family typewriter 
+( str n -- str )
+\family default 
+.
+\layout LyX-Code
+
+: print-entry ( duration description -- )
+\layout LyX-Code
+
+    dup
+\layout LyX-Code
+
+    write
+\layout LyX-Code
+
+    50 swap pad-string write 
+\layout LyX-Code
+
+    hh:mm print ;
+\layout Standard
+
+In the above definition, we first print the description, then enough blanks
+ to move the cursor to column 60.
+ So the description text is left-justified.
+ If we had interchanged the order of the second and third line in the definition
+, the description text would be right-justified.
+\layout Standard
+
+Try out 
+\family typewriter 
+print-timesheet
+\family default 
+ again, and marvel at the aligned columns:
+\layout LyX-Code
+
+{ [ 30 | 
+\begin_inset Quotes eld
+\end_inset 
+
+Studying Factor
+\begin_inset Quotes erd
+\end_inset 
+
+ ] [ 65 | 
+\begin_inset Quotes eld
+\end_inset 
+
+Paperwork
+\begin_inset Quotes erd
+\end_inset 
+
+ ] }
+\layout LyX-Code
+
+print-timesheet
+\layout LyX-Code
+
+
+\emph on 
+Studying Factor                                   0:30
+\layout LyX-Code
+
+
+\emph on 
+Paperwork                                         1:05
+\layout Subsection
+
+The complete program
 \layout Standard
 
 TODO operations:
@@ -3669,7 +4224,7 @@ TODO operations:
 use a vector to store [ annotation | time ] pairs, pass the vector in
 \layout Section
 
-Organization
+Variables and namespaces
 \layout Subsection
 
 Hashtables
