@@ -23,21 +23,17 @@ USING: generic kernel math namespaces ;
     [ [ drag-tile ] swap handle-gesture drop ] [ drag 1 ] set-action ;
 
 : close-tile [ close-tile ] swap handle-gesture drop ;
-: inspect-tile [ inspect-tile ] swap handle-gesture drop ;
 
-: tile-menu ( button -- )
-    [
-        [ "Close" close-tile ]
-        [ "Inspect" inspect-tile ]
-    ] actionize <menu> show-menu ;
+: <close-box> ( -- gadget )
+    <check> line-border dup [ close-tile ] button-actions ;
 
 : caption-content ( text -- gadget )
     1/2 10 0 <shelf>
-    [ "Menu" [ tile-menu ] <roll-button> swap add-gadget ] keep
+    [ <close-box> swap add-gadget ] keep
     [ >r <label> r> add-gadget ] keep ;
 
 : <caption> ( text -- caption )
-    caption-content line-border
+    caption-content filled-border
     dup t reverse-video set-paint-prop
     dup caption-actions ;
 
@@ -50,9 +46,7 @@ DEFER: inspect
     [ drag-tile ] [ drag-tile ] set-action ;
 
 : tile-content ( child caption -- pile )
-    0 1 1 <pile>
-    [ >r <caption> r> add-gadget ] keep
-    [ add-gadget ] keep ;
+     <frame> [ >r <caption> r> add-top ] keep [ add-center ] keep ;
 
 TUPLE: tile ;
 C: tile ( child caption -- tile )

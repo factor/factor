@@ -108,8 +108,8 @@ M: slider layout* ( slider -- )
 
 TUPLE: scroller viewport slider ;
 
-: add-viewport 2dup set-scroller-viewport add-gadget ;
-: add-slider 2dup set-scroller-slider add-gadget ;
+: add-viewport 2dup set-scroller-viewport add-center ;
+: add-slider 2dup set-scroller-slider add-right ;
 
 : viewport>bottom 1 swap scroll-viewport ;
 : scroll>bottom ( scroller -- )
@@ -121,7 +121,7 @@ TUPLE: scroller viewport slider ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
-    [ <line-shelf> swap set-delegate ] keep
+    <frame> over set-delegate
     [ >r <viewport> r> add-viewport ] keep
     [ dup scroller-viewport <slider> swap add-slider ] keep
     dup scroller-actions ;

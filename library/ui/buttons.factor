@@ -36,6 +36,7 @@ stdio ;
     ] ifte ;
 
 : button-actions ( button quot -- )
+    over f reverse-video set-paint-prop
     dupd [ action ] set-action
     dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action
@@ -52,5 +53,4 @@ stdio ;
 : <roll-button> ( label quot -- gadget )
     #! Thinner border that is only visible when the mouse is
     #! over the button.
-    >r <label> roll-border dup r> button-actions
-    dup f reverse-video set-paint-prop ;
+    >r <label> roll-border dup r> button-actions ;

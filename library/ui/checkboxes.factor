@@ -3,9 +3,11 @@
 IN: gadgets
 USING: generic kernel lists math namespaces sdl ;
 
-: <check> ( w h -- cross )
-    2dup >r >r 0 0 r> r> <line> <gadget>
-    >r tuck neg >r >r >r 0 r> r> r> <line> <gadget> r>
+: check-size 7 ;
+
+: <check> ( -- cross )
+    0 0 check-size dup <line> <gadget>
+    >r check-size 0 check-size neg check-size <line> <gadget> r>
     2list <stack> ;
 
 TUPLE: checkbox bevel selected? ;
@@ -17,9 +19,9 @@ TUPLE: checkbox bevel selected? ;
     #! Really, there should only be one child.
     dup checkbox-bevel gadget-children [ unparent ] each
     dup checkbox-selected? [
-        7 7 <check>
+        <check>
     ] [
-        0 0 7 7 <rectangle> <gadget>
+        0 0 check-size dup <rectangle> <gadget>
     ] ifte swap checkbox-bevel add-gadget ;
 
 : toggle-checkbox ( checkbox -- )

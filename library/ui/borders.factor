@@ -17,7 +17,7 @@ C: border ( child delegate size -- border )
     <empty-gadget> 5 <border> ;
 
 : line-border ( child -- border )
-    0 0 0 0 <etched-rect> <gadget> 5 <border> ;
+    0 0 0 0 <hollow-rect> <gadget> 5 <border> ;
 
 : filled-border ( child -- border )
     0 0 0 0 <plain-rect> <gadget> 5 <border> ;
