@@ -17,8 +17,10 @@ SYMBOL: channels
 SYMBOL: channel
 SYMBOL: nickname
 
-: irc-write ( s -- ) irc-stream get fwrite ;
-: irc-print ( s -- ) irc-stream get fprint irc-stream get fflush ;
+: irc-write ( s -- ) irc-stream get stream-write ;
+: irc-print ( s -- )
+    irc-stream get stream-print
+    irc-stream get stream-flush ;
 
 : nick ( nick -- )
     dup nickname set  "NICK " irc-write irc-print ;
@@ -58,10 +60,10 @@ M: privmsg irc-display ( line -- )
 !     write-highlighted terpri flush ;
 
 : in-loop ( -- )
-    irc-stream get freadln [ irc-display in-loop ] when* ;
+    irc-stream get stream-readln [ irc-display in-loop ] when* ;
 
 : input-thread ( -- ) [ in-loop ] in-thread ;
-: disconnect ( -- ) irc-stream get fclose ;
+: disconnect ( -- ) irc-stream get stream-close ;
 
 : command ( line -- )
     #! IRC /commands are just words.
