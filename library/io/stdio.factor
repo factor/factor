@@ -29,10 +29,7 @@ SYMBOL: stdio
         call stdio get stream>str
     ] with-stream ;
 
-TUPLE: stdio-stream delegate ;
-
-M: stdio-stream stream-auto-flush ( -- )
-    stdio-stream-delegate stream-flush ;
-
-M: stdio-stream stream-close ( -- )
-    drop ;
+TUPLE: stdio-stream ;
+C: stdio-stream ( stream -- stream ) [ set-delegate ] keep ;
+M: stdio-stream stream-auto-flush ( -- ) delegate stream-flush ;
+M: stdio-stream stream-close ( -- ) drop ;

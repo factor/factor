@@ -45,14 +45,13 @@ DEFER: pick-up
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand
-    world
+TUPLE: hand world
     click-pos click-rel clicked buttons
-    gadget focus delegate ;
+    gadget focus ;
 
 C: hand ( world -- hand )
     <empty-gadget>
-    over set-hand-delegate
+    over set-delegate
     [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;

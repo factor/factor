@@ -4,14 +4,13 @@ IN: gadgets
 USING: generic kernel lists math namespaces sdl stdio ;
 
 ! A label gadget draws a string.
-TUPLE: label text delegate ;
+TUPLE: label text ;
 
-C: label ( text -- )
-    <empty-gadget> over set-label-delegate
-    [ set-label-text ] keep ;
+C: label ( text -- label )
+    <empty-gadget> over set-delegate [ set-label-text ] keep ;
 
-M: label pref-size ( label -- ) label-text pref-size ;
+M: label pref-size label-text shape-size ;
 
 M: label draw-shape ( label -- )
-    dup label-delegate draw-shape
+    dup delegate draw-shape
     dup shape-pos [ label-text draw-shape ] with-trans ;

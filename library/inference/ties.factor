@@ -24,7 +24,7 @@ USING: kernel lists prettyprint ;
 ! GENERIC: car
 ! M: cons car 0 slot ;
 !
-! The only branch that does not end with undefined-method pulls
+! The only branch that does not end with no-method pulls
 ! a tie that sets the value's type to cons after two steps.
 
 ! Formally, a tie is a tuple.

@@ -54,7 +54,7 @@ namespaces parser strings words vectors math math-internals ;
 
 : <empty-vtable> ( generic -- vtable )
     unit num-types
-    [ drop dup [ car undefined-method ] cons ] vector-project
+    [ drop dup [ car no-method ] cons ] vector-project
     nip ;
 
 : <vtable> ( generic -- vtable )

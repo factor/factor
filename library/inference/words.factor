@@ -173,7 +173,7 @@ M: word apply-object ( word -- )
 \ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ = [ [ object object ] [ object ] ] "infer-effect" set-word-prop
 
-\ undefined-method t "terminator" set-word-prop
-\ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
+\ no-method t "terminator" set-word-prop
+\ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
 \ not-a-number t "terminator" set-word-prop
 \ throw t "terminator" set-word-prop

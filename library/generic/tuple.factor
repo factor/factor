@@ -4,6 +4,14 @@ IN: kernel-internals
 USING: words parser kernel namespaces lists strings math
 hashtables errors vectors ;
 
+! Tuples are really arrays in the runtime, but with a different
+! type number. The layout is as follows:
+
+! slot 0 - object header with type number (as usual)
+! slot 1 - length, including class/delegate slots
+! slot 2 - the class, a word
+! slot 3 - the delegate tuple, or f
+
 : make-tuple ( class size -- tuple )
     #! Internal allocation function. Do not call it directly,
     #! since you can fool the runtime and corrupt memory by
@@ -15,6 +23,18 @@ hashtables errors vectors ;
 IN: generic
 
 BUILTIN: tuple 18 [ 1 array-capacity f ] ;
+
+! So far, only tuples can have delegates, which also must be
+! tuples (the UI uses numbers as delegates in a couple of places
+! but this is Unsupported(tm)).
+GENERIC: delegate
+GENERIC: set-delegate
+
+M: object delegate drop f ;
+M: tuple delegate 3 slot ;
+
+M: object set-delegate 2drop ;
+M: tuple set-delegate 3 set-slot ;
 
 #! arrayed objects can be passed to array-capacity,
 #! array-nth, and set-array-nth.
@@ -48,15 +68,15 @@ UNION: arrayed array tuple ;
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
-        dup "tuple-size" word-prop r> length 1 + =
+        dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget ] ifte
     ] [
         r> 2drop
     ] ifte ;
 
 : tuple-slots ( tuple slots -- )
-    2dup length 1 + "tuple-size" set-word-prop
-    3 -rot simple-slots ;
+    2dup length 2 + "tuple-size" set-word-prop
+    4 -rot simple-slots ;
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 create-in ;
@@ -123,7 +143,7 @@ UNION: arrayed array tuple ;
         ] [
             2drop [ dup delegate ] swap
             dup unit swap
-            unit [ car ] cons [ undefined-method ] append
+            unit [ car ] cons [ no-method ] append
             \ ?ifte 3list append
         ] ifte
     ] ifte ;
@@ -143,16 +163,9 @@ UNION: arrayed array tuple ;
     #! delegate.
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
 
-: clone-delegate ( tuple -- )
-    dup class "delegate-slot" word-prop dup [
-        [ >fixnum slot clone ] 2keep set-slot
-    ] [
-        2drop
-    ] ifte ;
-
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
-    clone-tuple dup clone-delegate ;
+    clone-tuple dup delegate clone over set-delegate ;
 
 : tuple>list ( tuple -- list )
     dup array-capacity swap array>list ;
@@ -169,10 +182,12 @@ M: tuple = ( obj tuple -- ? )
     ] ifte ;
 
 M: tuple hashcode ( vec -- n )
-    dup array-capacity 1 number= [
+    #! If the capacity is two, then all we have is the class
+    #! slot and delegate.
+    dup array-capacity 2 number= [
         drop 0
     ] [
-        1 swap array-nth hashcode
+        2 swap array-nth hashcode
     ] ifte ;
 
 tuple [

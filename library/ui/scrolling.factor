@@ -1,12 +1,11 @@
 IN: gadgets
-USING: kernel lists math namespaces threads ;
+USING: generic kernel lists math namespaces threads ;
 
 ! A viewport can be scrolled.
 
-TUPLE: viewport x y delegate ;
+TUPLE: viewport x y ;
 
-: viewport-h ( viewport -- h ) gadget-children max-height ;
-: viewport-w ( viewport -- w ) gadget-children max-width ;
+: viewport-h ( viewport -- h ) gadget-child pref-size nip ;
 
 : adjust-scroll ( y viewport -- y )
     #! Make sure we don't scroll above the first line, or beyond
@@ -29,14 +28,13 @@ TUPLE: viewport x y delegate ;
     ] swap add-actions ;
 
 C: viewport ( content -- viewport )
-    [ <empty-gadget> swap set-viewport-delegate ] keep
+    [ <empty-gadget> swap set-delegate ] keep
     [ add-gadget ] keep
     0 over set-viewport-x
     0 over set-viewport-y
-    dup viewport-actions
-    640 480 pick resize-gadget ;
+    dup viewport-actions ;
 
-M: viewport pref-size gadget-children max-size ;
+M: viewport pref-size gadget-child pref-size ;
 
 M: viewport layout* ( viewport -- )
     dup gadget-children [
@@ -52,7 +50,7 @@ M: viewport layout* ( viewport -- )
 
 ! The offset slot is the y co-ordinate of the mouse relative to
 ! the thumb when it was clicked.
-TUPLE: slider viewport thumb delegate ;
+TUPLE: slider viewport thumb ;
 
 : hand-y ( gadget -- y )
     #! Vertical offset of hand from gadget.
@@ -91,11 +89,7 @@ TUPLE: slider viewport thumb delegate ;
 
 C: slider ( viewport -- slider )
     [ set-slider-viewport ] keep
-    [
-        f line-border
-        slider-size 200 pick resize-gadget
-        swap set-slider-delegate
-    ] keep
+    [ f line-border swap set-delegate ] keep
     [ <thumb> swap add-thumb ] keep
     [ slider-actions ] keep ;
 
@@ -114,18 +108,19 @@ C: slider ( viewport -- slider )
 : thumb-y ( slider -- y )
     dup slider-viewport viewport-y neg >thumb ;
 
+M: slider pref-size drop slider-size 100 ;
+
 M: slider layout* ( slider -- )
-    dup slider-viewport layout*
     dup shape-w over thumb-height pick slider-thumb resize-gadget
     0 over thumb-y rot slider-thumb move-gadget ;
 
-TUPLE: scroller viewport slider delegate ;
+TUPLE: scroller viewport slider ;
 
 : add-viewport 2dup set-scroller-viewport add-gadget ;
 : add-slider 2dup set-scroller-slider add-gadget ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
-    [ <line-shelf> swap set-scroller-delegate ] keep
+    [ <line-shelf> swap set-delegate ] keep
     [ >r <viewport> r> add-viewport ] keep
     [ dup scroller-viewport <slider> swap add-slider ] keep ;

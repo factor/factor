@@ -14,7 +14,7 @@ words ;
     init-random
     default-cli-args
     parse-command-line
-    "null-stdio" get [ << null-stream >> stdio set ] when ;
+    "null-stdio" get [ << null-stream f >> stdio set ] when ;
 
 : shell ( str -- )
     #! This handles the -shell:<foo> cli argument.

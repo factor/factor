@@ -45,10 +45,10 @@ C: string-output ( size -- stream )
 
 ! Sometimes, we want to have a delegating stream that uses stdio
 ! words.
-TUPLE: wrapper-stream delegate scope ;
+TUPLE: wrapper-stream scope ;
 
 C: wrapper-stream ( stream -- stream )
-    2dup set-wrapper-stream-delegate
+    2dup set-delegate
     [
         >r <namespace> [ stdio set ] extend r>
         set-wrapper-stream-scope

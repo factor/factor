@@ -63,22 +63,8 @@ USING: gadgets kernel lists math namespaces test ;
     [
         100 x set
         100 y set
-        #{ 110 115 }# << line 0 0 100 150 >> inside?
+        #{ 110 115 }# << line f 0 0 100 150 >> inside?
     ] with-scope
-] unit-test
-
-[
-    [
-        100
-        200
-        300
-    ]
-] [
-    [
-        0 0 100 100 <rectangle> <gadget> ,
-        0 0 200 200 <rectangle> <gadget> ,
-        0 0 300 300 <rectangle> <gadget> ,
-    ] make-list w/h drop 0 swap dup greatest swap layout-fill
 ] unit-test
 
 [
@@ -90,3 +76,5 @@ USING: gadgets kernel lists math namespaces test ;
     0 0 300 300 <rectangle> <gadget> "pile" get add-gadget
     "pile" get pref-size
 ] unit-test
+
+[ ] [ "pile" get layout* ] unit-test

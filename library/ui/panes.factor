@@ -1,15 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: kernel line-editor listener lists namespaces stdio
-streams strings threads ;
+USING: generic kernel line-editor listener lists namespaces
+stdio streams strings threads ;
 
 ! A pane is an area that can display text.
 
 ! output: pile
 ! current: label
 ! input: editor
-TUPLE: pane output current input continuation delegate ;
+TUPLE: pane output current input continuation ;
 
 : add-output 2dup set-pane-output add-gadget ;
 : add-input 2dup set-pane-input add-gadget ;
@@ -38,7 +38,7 @@ TUPLE: pane output current input continuation delegate ;
     ] swap add-actions ;
 
 C: pane ( -- pane )
-    <line-pile> over set-pane-delegate
+    <line-pile> over set-delegate
     <line-pile> over add-output
     "" <label> dup pick set-pane-current >r
     "" <editor> dup pick set-pane-input r>

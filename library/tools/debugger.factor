@@ -142,12 +142,12 @@ M: object error. ( error -- )
     kernel-error 12 setenv ;
     
 
-M: undefined-method error. ( error -- )
+M: no-method error. ( error -- )
     [
         "The generic word " ,
-        dup undefined-method-generic unparse ,
+        dup no-method-generic unparse ,
         " does not have a suitable method for " ,
-        undefined-method-object unparse ,
+        no-method-object unparse ,
     ] make-string print ;
 
 ! So that stage 2 boot gives a useful error message if something

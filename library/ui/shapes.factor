@@ -50,26 +50,8 @@ GENERIC: draw-shape ( obj -- )
         r> call
     ] with-scope ; inline
 
-: max-width ( list -- n )
-    #! The width of the widest shape.
-    [ [ shape-w ] map [ > ] top ] [ 0 ] ifte* ;
-
-: max-height ( list -- n )
-    #! The height of the tallest shape.
-    [ [ shape-h ] map [ > ] top ] [ 0 ] ifte* ;
-
-: accumilate ( gap list -- n list )
-    #! The nth element of the resulting list is the sum of the
-    #! first n elements of the given list plus gap, n times.
-    [ 0 swap [ over , + over + ] each ] make-list >r swap - r> ;
-
-: run-widths ( gap list -- w list )
-    #! Compute a list of running sums of widths of shapes.
-    [ shape-w ] map accumilate ;
-
-: run-heights ( gap list -- h list )
-    #! Compute a list of running sums of heights of shapes.
-    [ shape-h ] map accumilate ;
-
 : shape-pos ( shape -- pos )
     dup shape-x swap shape-y rect> ;
+
+: shape-size ( shape -- w h )
+    dup shape-w swap shape-h ;

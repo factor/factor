@@ -16,11 +16,11 @@ C: server ( port -- stream )
     #! with accept. No other stream operations are supported.
     [ >r server-socket r> set-server-port ] keep ;
 
-TUPLE: client-stream delegate host ;
+TUPLE: client-stream host ;
 
 C: client-stream ( host port in out -- stream )
     #! stream-flush yields until connection is established.
-    [ >r <fd-stream> r> set-client-stream-delegate ] keep
+    [ >r <fd-stream> r> set-delegate ] keep
     [ >r ":" swap unparse cat3 r> set-client-stream-host ] keep
     dup stream-flush ;
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: kernel lists math namespaces ;
+USING: generic kernel lists math namespaces ;
 
 : hide-menu ( -- )
     world get
@@ -20,7 +20,7 @@ USING: kernel lists math namespaces ;
 : <menu-item> ( label quot -- gadget )
     >r <label> menu-item-border dup r> button-actions ;
 
-TUPLE: menu delegate ;
+TUPLE: menu ;
 
 : menu-actions ( menu -- )
     [ drop world get hide-menu ] [ button-down 1 ] set-action ;
@@ -34,7 +34,7 @@ TUPLE: menu delegate ;
 
 C: menu ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
-    [ f line-border swap set-menu-delegate ] keep
+    [ f line-border swap set-delegate ] keep
     <line-pile> [ swap add-gadget ] 2keep
     rot assoc>menu dup menu-actions ;
 

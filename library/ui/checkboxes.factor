@@ -8,7 +8,7 @@ USING: generic kernel lists math namespaces sdl ;
     >r tuck neg >r >r >r 0 r> r> r> <line> <gadget> r>
     2list <stack> ;
 
-TUPLE: checkbox bevel selected? delegate ;
+TUPLE: checkbox bevel selected? ;
 
 : init-checkbox-bevel ( bevel checkbox -- )
     2dup set-checkbox-bevel add-gadget ;
@@ -38,7 +38,7 @@ TUPLE: checkbox bevel selected? delegate ;
     [ checkbox-bevel button-update ] [ mouse-enter ] set-action ;
 
 C: checkbox ( label -- checkbox )
-    <default-shelf> over set-checkbox-delegate
+    <default-shelf> over set-delegate
     [ f line-border swap init-checkbox-bevel ] keep
     [ >r <label> r> add-gadget ] keep
     dup checkbox-actions

@@ -8,13 +8,13 @@ prettyprint sdl stdio strings threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The menu slot ensures that only one menu is
 ! open at any one time.
-TUPLE: world running? hand menu delegate ;
+TUPLE: world running? hand menu ;
 
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <gadget> ;
 
 C: world ( -- world )
-    <world-box> over set-world-delegate
+    <world-box> over set-delegate
     t over set-world-running?
     dup <hand> over set-world-hand ;
 

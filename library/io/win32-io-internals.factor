@@ -142,7 +142,7 @@ END-STRUCT
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
     completion-port set 
     
-    << null-stream >> stdio set
+    << null-stream f >> stdio set
 
     <namespace> [
         32 <vector> callbacks set

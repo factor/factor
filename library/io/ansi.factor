@@ -48,11 +48,12 @@ presentation generic ;
 : ansi-attr-string ( string style -- string )
     [ ansi-attrs , reset , ] make-string ;
 
-TUPLE: ansi-stream delegate ;
+TUPLE: ansi-stream ;
+C: ansi-stream ( stream -- stream ) [ set-delegate ] keep ;
 
 M: ansi-stream stream-write-attr ( string style stream -- )
     >r [ default-style ] unless* ansi-attr-string r>
-    ansi-stream-delegate stream-write ;
+    delegate stream-write ;
 
 IN: shells
 

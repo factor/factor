@@ -7,12 +7,6 @@ IN: generic
 USING: kernel kernel-internals lists math namespaces parser
 strings words ;
 
-! So far, only tuples can have delegates, which also must be
-! tuples (the UI uses numbers as delegates in a couple of places
-! but this is Unsupported(tm)).
-GENERIC: delegate
-M: object delegate drop f ;
-
 : simple-generic ( class generic def -- )
     #! Just like:
     #! GENERIC: generic
@@ -64,24 +58,11 @@ M: object delegate drop f ;
 : simple-slot-spec ( class slots -- spec )
     [ simple-slot ] map-with ;
 
-: set-delegate-prop ( base class slots -- )
-    #! This sets the delegate-slot property of the class for
-    #! the benefit of tuples. Built-in types do not have
-    #! delegate slots.
-    swap >r [ "delegate" = dup [ >r 1 + r> ] unless ] some? [
-        r> swap
-        2dup "delegate-slot" set-word-prop
-        "delegate" [ "generic" ] search define-reader
-    ] [
-        r> 2drop
-    ] ifte ;
-
 : simple-slots ( base class slots -- )
     #! Takes a list of slot names, and for each slot name
     #! defines a pair of words <class>-<slot> and 
     #! set-<class>-<slot>. Slot numbering is consecutive and
     #! begins at base.
     >r tuck r>
-    3dup set-delegate-prop
     simple-slot-spec [ length [ + ] project-with ] keep zip
     define-slots ;

@@ -20,9 +20,9 @@ M: object delegation-test drop 3 ;
 TUPLE: quux-tuple ;
 C: quux-tuple ;
 M: quux-tuple delegation-test drop 4 ;
-TUPLE: quuux-tuple delegate ;
+TUPLE: quuux-tuple ;
 C: quuux-tuple
-    [ set-quuux-tuple-delegate ] keep ;
+    [ set-delegate ] keep ;
 
 [ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
 
@@ -30,9 +30,9 @@ GENERIC: delegation-test-2
 TUPLE: quux-tuple-2 ;
 C: quux-tuple-2 ;
 M: quux-tuple-2 delegation-test-2 drop 4 ;
-TUPLE: quuux-tuple-2 delegate ;
+TUPLE: quuux-tuple-2 ;
 C: quuux-tuple-2
-    [ set-quuux-tuple-2-delegate ] keep ;
+    [ set-delegate ] keep ;
 
 [ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
 

@@ -236,3 +236,11 @@ M: fixnum potential-hang dup [ potential-hang ] when ;
 ! [ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer ] unit-test
 ! 
 ! [ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer ] unit-test
+
+TUPLE: funny-cons car cdr ;
+GENERIC: iterate
+M: funny-cons iterate funny-cons-cdr iterate ;
+M: f iterate drop ;
+M: real iterate drop ;
+
+[ [[ 1 0 ]] ] [ [ iterate ] infer old-effect ] unit-test

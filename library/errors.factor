@@ -5,12 +5,12 @@ IN: streams DEFER: line-number
 IN: parser DEFER: file
 IN: errors USING: kernel-internals lists namespaces streams ;
 
-TUPLE: undefined-method object generic ;
+TUPLE: no-method object generic ;
 
-: undefined-method ( object generic -- )
+: no-method ( object generic -- )
     #! We 2dup here to leave both values on the stack, for
     #! post-mortem inspection.
-    2dup <undefined-method> throw ;
+    2dup <no-method> throw ;
 
 ! This is a very lightweight exception handling system.
 

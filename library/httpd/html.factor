@@ -100,7 +100,7 @@ url-encoding presentation generic ;
         drop call
     ] ifte ;
 
-TUPLE: html-stream delegate ;
+TUPLE: html-stream ;
 
 M: html-stream stream-write-attr ( str style stream -- )
     wrapper-stream-scope [
@@ -127,7 +127,7 @@ C: html-stream ( stream -- stream )
     #! underline
     #! size
     #! link - an object path
-    [ >r <wrapper-stream> r> set-html-stream-delegate ] keep ;
+    [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : with-html-stream ( quot -- )
     [ stdio [ <html-stream> ] change  call ] with-scope ;

@@ -78,7 +78,7 @@ USE: listener
     dup string-length write-big-endian-32
     write ;
 
-TUPLE: jedit-stream delegate ;
+TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
     wrapper-stream-scope
@@ -93,7 +93,7 @@ M: jedit-stream stream-flush ( stream -- )
     [ CHAR: f write flush ] bind ;
 
 C: jedit-stream ( stream -- stream )
-    [ >r <wrapper-stream> r> set-jedit-stream-delegate ] keep ;
+    [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.

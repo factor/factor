@@ -7,7 +7,7 @@ strings ;
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
 
-TUPLE: editor line caret delegate ;
+TUPLE: editor line caret ;
 
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;
@@ -70,7 +70,7 @@ TUPLE: editor line caret delegate ;
     dup red background set-paint-prop ;
 
 C: editor ( text -- )
-    0 0 0 0 <line> <gadget> over set-editor-delegate
+    0 0 0 0 <line> <gadget> over set-delegate
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
@@ -89,8 +89,7 @@ M: editor user-input* ( ch field -- ? )
     [ insert-char ] with-editor t ;
 
 M: editor layout* ( field -- )
-    dup [ editor-text dup shape-w swap shape-h ] keep
-    resize-gadget
+    dup [ editor-text shape-size ] keep resize-gadget
     dup editor-caret over caret-size rot resize-gadget
     dup editor-caret swap caret-pos rot move-gadget ;
 

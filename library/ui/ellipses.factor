@@ -39,19 +39,19 @@ M: ellipse inside? ( point ellipse -- ? )
 
 M: ellipse draw-shape drop ;
 
-TUPLE: hollow-ellipse delegate ;
+TUPLE: hollow-ellipse ;
 
 C: hollow-ellipse ( x y w h -- ellipse )
-    [ >r <ellipse> r> set-hollow-ellipse-delegate ] keep ;
+    [ >r <ellipse> r> set-delegate ] keep ;
 
 M: hollow-ellipse draw-shape ( ellipse -- )
     >r surface get r> ellipse>screen fg rgb
     ellipseColor ;
 
-TUPLE: plain-ellipse delegate ;
+TUPLE: plain-ellipse ;
 
 C: plain-ellipse ( x y w h -- ellipse )
-    [ >r <ellipse> r> set-plain-ellipse-delegate ] keep ;
+    [ >r <ellipse> r> set-delegate ] keep ;
 
 M: plain-ellipse draw-shape ( ellipse -- )
     >r surface get r> ellipse>screen bg rgb

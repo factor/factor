@@ -33,21 +33,21 @@ TUPLE: value class recursion class-ties literal-ties ;
 C: value ( recursion -- value )
     [ set-value-recursion ] keep ;
 
-TUPLE: computed delegate ;
+TUPLE: computed ;
 
 C: computed ( class -- value )
     swap recursive-state get <value> [ set-value-class ] keep
-    over set-computed-delegate ;
+    over set-delegate ;
 
 M: computed value= ( literal value -- ? )
     2drop f ;
 
 : failing-class-and ( class class -- class )
     2dup class-and dup null = [
-        drop [
+        -rot [
             word-name , " and " , word-name ,
             " do not intersect" ,
-        ] make-string inference-error
+        ] make-string inference-warning
     ] [
         2nip
     ] ifte ;
@@ -57,12 +57,12 @@ M: computed value-class-and ( class value -- )
         value-class  failing-class-and
     ] keep set-value-class ;
 
-TUPLE: literal value delegate ;
+TUPLE: literal value ;
 
 C: literal ( obj rstate -- value )
     [
         >r <value> [ >r dup class r> set-value-class ] keep
-        r> set-literal-delegate
+        r> set-delegate
     ] keep
     [ set-literal-value ] keep ;
 

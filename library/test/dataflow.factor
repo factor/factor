@@ -63,10 +63,10 @@ USE: generic
 ] unit-test
 
 ! [ t ] [
-!     [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
+!     [ { [ drop ] [ no-method ] [ drop ] [ no-method ] } generic ] dataflow
 !     \ dispatch swap dataflow-contains-op? car [
 !         node-param get [
-!             [ [ node-param get \ undefined-method = ] bind ] some?
+!             [ [ node-param get \ no-method = ] bind ] some?
 !         ] some?
 !     ] bind >boolean
 ! ] unit-test

@@ -6,13 +6,10 @@ USING: generic hashtables kernel lists math namespaces ;
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
 ! delegates to its shape.
-TUPLE: gadget
-    paint gestures
-    relayout? redraw?
-    parent children delegate ;
+TUPLE: gadget paint gestures relayout? redraw? parent children ;
 
 C: gadget ( shape -- gadget )
-    [ set-gadget-delegate ] keep
+    [ set-delegate ] keep
     [ <namespace> swap set-gadget-paint ] keep
     [ <namespace> swap set-gadget-gestures ] keep
     [ t swap set-gadget-relayout? ] keep
@@ -40,7 +37,7 @@ C: gadget ( shape -- gadget )
 : set-paint-prop ( gadget value key -- ) rot gadget-paint set-hash ;
 
 GENERIC: pref-size ( gadget -- w h )
-M: gadget pref-size dup shape-w swap shape-h ;
+M: gadget pref-size shape-size ;
 
 GENERIC: layout* ( gadget -- )
 

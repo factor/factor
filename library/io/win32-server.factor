@@ -29,7 +29,7 @@ USING: alien errors generic kernel kernel-internals lists math namespaces
        win32-io-internals ;
 
 TUPLE: win32-server this ;
-TUPLE: win32-client-stream delegate host ;
+TUPLE: win32-client-stream host ;
 SYMBOL: winsock
 SYMBOL: socket
 
@@ -72,7 +72,7 @@ SYMBOL: socket
     GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr>string ;
 
 C: win32-client-stream ( buf stream -- stream )
-    [ set-win32-client-stream-delegate extract-remote-host ] keep
+    [ set-delegate extract-remote-host ] keep
     [ set-win32-client-stream-host ] keep ;
 
 M: win32-client-stream client-stream-host win32-client-stream-host ;

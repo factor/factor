@@ -117,4 +117,4 @@ M: for-arguments-sake empty-method-test drop "Hi" ;
 TUPLE: another-one ;
 
 [ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
-[ << another-one >> ] [ <another-one> empty-method-test ] unit-test
+[ << another-one f >> ] [ <another-one> empty-method-test ] unit-test

@@ -1,7 +1,7 @@
 IN: gadgets
-USING: kernel namespaces threads ;
+USING: generic kernel namespaces threads ;
 
-TUPLE: dialog continuation delegate ;
+TUPLE: dialog continuation ;
 
 : dialog-action ( ok dialog -- )
     dup unparent  dialog-continuation call ;
@@ -24,7 +24,7 @@ TUPLE: dialog continuation delegate ;
     [ dialog-cancel ] dup set-action ;
 
 C: dialog ( content -- gadget )
-    [ f line-border swap set-dialog-delegate ] keep
+    [ f line-border swap set-delegate ] keep
     [
         >r <default-pile>
         [ add-gadget ] keep

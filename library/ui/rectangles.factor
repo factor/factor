@@ -50,10 +50,10 @@ M: rectangle inside? ( point rect -- ? )
 M: rectangle draw-shape drop ;
 
 ! A rectangle only whose outline is visible.
-TUPLE: hollow-rect delegate ;
+TUPLE: hollow-rect ;
 
 C: hollow-rect ( x y w h -- rect )
-    [ >r <rectangle> r> set-hollow-rect-delegate ] keep ;
+    [ >r <rectangle> r> set-delegate ] keep ;
 
 : hollow-rect ( shape -- )
     #! Draw a hollow rect with the bounds of an arbitrary shape.
@@ -63,10 +63,10 @@ M: hollow-rect draw-shape ( rect -- )
     >r surface get r> hollow-rect ;
 
 ! A rectangle that is filled.
-TUPLE: plain-rect delegate ;
+TUPLE: plain-rect ;
 
 C: plain-rect ( x y w h -- rect )
-    [ >r <rectangle> r> set-plain-rect-delegate ] keep ;
+    [ >r <rectangle> r> set-delegate ] keep ;
 
 : plain-rect ( shape -- )
     #! Draw a filled rect with the bounds of an arbitrary shape.
@@ -76,10 +76,10 @@ M: plain-rect draw-shape ( rect -- )
     >r surface get r> plain-rect ;
 
 ! A rectangle that is filled, and has a visible outline.
-TUPLE: etched-rect delegate ;
+TUPLE: etched-rect ;
 
 C: etched-rect ( x y w h -- rect )
-    [ >r <rectangle> r> set-etched-rect-delegate ] keep ;
+    [ >r <rectangle> r> set-delegate ] keep ;
 
 M: etched-rect draw-shape ( rect -- )
     >r surface get r> 2dup plain-rect hollow-rect ;
@@ -88,10 +88,10 @@ M: etched-rect draw-shape ( rect -- )
 ! paint property is set.
 SYMBOL: rollover?
 
-TUPLE: roll-rect delegate ;
+TUPLE: roll-rect ;
 
 C: roll-rect ( x y w h -- rect )
-    [ >r <rectangle> r> set-roll-rect-delegate ] keep ;
+    [ >r <rectangle> r> set-delegate ] keep ;
 
 M: roll-rect draw-shape ( rect -- )
     >r surface get r> 2dup
