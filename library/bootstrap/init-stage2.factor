@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: kernel
-USE: ansi
 USE: alien
 USE: compiler
 USE: errors
@@ -92,8 +91,8 @@ init-error-handler
 
 0 [ drop succ ] each-word unparse write " words" print 
 
-! "Counting word usages..." print
-! tally-usages
+"Counting word usages..." print
+tally-usages
 ! 
 ! "Automatically inlining words called " write
 ! auto-inline-count unparse write

@@ -83,7 +83,6 @@ USE: unparser
         "prettyprint"
         "image"
         "init"
-        "inspector"
         "io/io"
         "listener"
         "vectors"

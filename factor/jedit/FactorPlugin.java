@@ -99,10 +99,11 @@ public class FactorPlugin extends EditPlugin
 			{
 				String[] args = jEdit.getProperty("factor.external.args","-jedit")
 					.split(" ");
-				String[] nargs = new String[args.length + 3];
+				String[] nargs = new String[args.length + 4];
 				nargs[0] = jEdit.getProperty("factor.external.program");
 				nargs[1] = jEdit.getProperty("factor.external.image");
 				nargs[2] = "-no-ansi";
+				nargs[3] = "-no-smart-terminal";
 				System.arraycopy(args,0,nargs,3,args.length);
 				p = Runtime.getRuntime().exec(nargs);
 				p.getErrorStream().close();

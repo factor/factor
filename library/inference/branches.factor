@@ -108,7 +108,7 @@ USE: hashtables
         save-effect set
         dup value-recursion recursive-state set
         copy-interpreter
-        d-in [ vector-clone ] change
+        d-in [ [ vector-clone ] vector-map ] change
         dataflow-graph off
         literal-value infer-quot
         #values values-node
