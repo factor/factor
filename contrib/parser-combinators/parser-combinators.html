@@ -5,6 +5,11 @@
       </head>
   <body>
     <h1>Parsers</h1>
+<p class="note">The parser combinator library described here is based
+  on a library written for the Clean pure functional programming language and
+  described in chapter 5 of the 'Clean Book'. Based on the description
+  in that chapter I developed a version for Factor, a concatenative
+  language.</p>  
 <p>A parser is a word or quotation that, when called, processes
    an input string on the stack, performs some parsing operation on
    it, and returns a result indicating the success of the parsing
@@ -61,6 +66,7 @@ characters leading:</p>
   (2) [ . ] leach
       => [ [ 97 97 ] | "test" ]
 </pre>
+<h2>Tokens</h2>
 <p>Creating parsers for specfic characters and tokens can be a chore
 so there is a word that, given a string token on the stack, returns
 a parser that parses that particular token:</p>
@@ -74,6 +80,7 @@ a parser that parses that particular token:</p>
   (4) [ . ] leach
       => [ "begin" | " a successfull parse" ]
 </pre>
+<h2>Predicate matching</h2>
 <p>The word 'satisfy' takes a quotation from the top of the stack and
 returns a parser than when called will call the quotation with the
 first item in the input string on the stack. If the quotation returns
@@ -89,12 +96,13 @@ true then the parse is successful, otherwise it fails:</p>
 <p>Note that 'digit-parser' returns a parser, it is not the parser
 itself. It is really a parser generating word like 'token'. Whereas
 our 'char-a' word defined originally was a parser itself.</p>
+<h2>Zero or more matches</h2>
 <p>Now that we can parse single digits it would be nice to easily
 parse a string of them. The '<*>' parser combinator word will do
 this. It accepts a parser on the top of the stack and produces a
 parser that parses zero or more of the constructs that the original
 parser parsed. The result of the '<*>' generated parser will be a list
-list of the successful results returned by the original parser.</p>
+of the successful results returned by the original parser.</p>
 <pre class="code">
   (1) digit-parser <*>
       => < parser >
@@ -111,7 +119,8 @@ the occurrence of zero or more digits happens more than once. There is
 also the 'f' case where zero digits is parsed. If only the 'longest
 match' is required then the lcar of the lazy list can be used and the
 remaining parse results are never produced.</p>
-<p>The result of the parse above is the list of characters
+<h2>Manipulating parse trees</h2>
+<p>The result of the previous parse was the list of characters
 parsed. Sometimes you want this to be something else, like an abstract
 syntax tree, or some calculation. For the digit case we may want the
 actual integer number.</p>
@@ -144,7 +153,109 @@ character code '53'.</p>
 of the '<@' word. This allows parsers to not only parse the input
 string but perform operations and transformations on the syntax tree
 returned.</p> 
-
+<h2>Sequential combinator</h2>
+<p>To create a full grammar we need a parser combinator that does
+sequential compositions. That is, given two parsers, the sequential
+combinator will first run the first parser, and then run the second on
+the remaining text to be parsed. As the first parser returns a lazy
+list, the second parser will be run on each item of the lazy list. Of
+course this is done lazily so it only ends up being done when those
+list items are requested. The sequential combinator word is <&>.</p>
+<pre class="code">
+  ( 1 ) "number:" token 
+       => < parser that parses the text 'number:' >
+  ( 2 ) natural
+       => < parser that parses natural numbers >
+  ( 3 ) <&>
+       => < parser that parses 'number:' followed by a natural >
+  ( 4 ) "number:1000" swap call
+       => < list of successes >
+  ( 5 ) [ . ] leach
+       => [ [ "number:" 1000 ] | "" ]
+          [ [ "number:" 100 ] | "0" ]
+          [ [ "number:" 10 ] | "00" ]
+          [ [ "number:" 1 ] | "000" ]
+          [ [ "number:" ] | "1000" ]
+</pre>
+<h2>Choice combinator</h2>
+<p>As well as a sequential combinator we need an alternative
+combinator. The word for this is <|>. It takes two parsers from the
+stack and returns a parser that will first try the first parser. If it
+succeeds then the result for that is returned. If it fails then the
+second parser is tried and its result returned.</p>
+<pre class="code">
+  ( 1 ) "one" token
+        => < parser that parses the text 'one' >
+  ( 2 ) "two" token 
+        => < parser that parses the text 'two' >
+  ( 3 ) <|>
+        => < parser that parses 'one' or 'two' >
+  ( 4 ) "one" over call [ . ] leach
+        => [ "one" | "" ]
+  ( 5 ) "two" swap call [ . ] leach
+        => [ "two" | "" ]
+</pre>
+<h2>Skipping Whitespace</h2>
+<p>A parser transformer exists, the word 'sp', that takes an existing
+parser and returns a new one that will first skip any whitespace
+before calling the original parser. This makes it easy to write
+grammers that avoid whitespace without having to explicitly code it
+into the grammar.</p>
+<pre class="code">
+  ( 1 ) natural 
+        => < a parser for natural numbers >
+  ( 2 ) "+" token sp
+        => < parser for '+' which ignores leading whitespace >
+  ( 3 ) over sp
+        => < a parser for natural numbers skipping leading whitespace >
+  ( 4 ) <&> <&>
+        => < a parser for natural + natural >
+  ( 5 ) "1 + 2" over call lcar .
+        => [ [ 1 "+" 2 ] | "" ]
+  ( 6 ) "3+4" over call lcar .
+        => [ [ 3 "+" 4 ] | "" ]
+</pre>
+<h2>Eval grammar example</h2>
+<p>This example presents a simple grammar that will parse a number
+followed by an operator and another number. A factor expression that
+computes the entered value will be executed.</p>
+<pre class="code">
+  ( 1 ) natural 
+        => < a parser for natural numbers >
+  ( 2 ) "/" token "*" token "+" token "-" token <|> <|> <|> 
+        => < a parser for the operator >
+  ( 3 ) sp [ unit [ eval ] append unit ] <@
+        => < operator parser that skips whitespace and converts to a 
+             factor expression >
+  ( 4 ) natural sp
+        => < a whitespace skipping natural parser >
+  ( 5 ) <&> <&> [ call swap call ] <@
+        => < a parser that parsers the expression, converts it to
+             factor, calls it and puts the result in the parse tree >
+  ( 6 ) "123 + 456" over call lcar .
+        => [ 579 | "" ]
+  ( 7 ) "300-100" over call lcar .
+        => [ 200 | "" ]
+  ( 8 ) "200/2" over call lcar .
+        => [ 100 | "" ]
+</pre>
+<p>It looks complicated when expanded as above but the entire parser,
+factored a little, looks quite readable:</p>
+<pre class="code">
+  ( 1 ) : operator ( -- parser )
+          "/" token 
+          "*" token <|>
+          "+" token <|>
+          "-" token <|> 
+          [ unit [ eval ] append unit ] <@ ;
+  ( 2 ) : expression ( -- parser )
+          natural 
+          operator sp <&>  
+          natural sp <&> 
+          [ call swap call ] <@ ;
+  ( 3 ) "40+2" expression call lcar .
+        => [ 42 | "" ]
+</pre>
 <p class="footer">
 News and updates to this software can be obtained from the authors
 weblog: <a href="http://radio.weblogs.com/0102385">Chris Double</a>.</p>
