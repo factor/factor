@@ -261,7 +261,7 @@ USE: logic
 ! Define some open HTML tags
 [ 
   "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" 
- "ol" "li" "form" "a" "p" "html" "head" "body" "title"
+  "ol" "li" "form" "a" "p" "html" "head" "body" "title"
   "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea"
 ] [ define-closed-html-word ] each
 
@@ -274,5 +274,6 @@ USE: logic
 ! Define some attributes
 [ 
   "method" "action" "type" "value" "name" 
-  "size" "href" "class" "border" "rows" "cols"
+  "size" "href" "class" "border" "rows" "cols" 
+  "id" "onclick" "style" "valign" "accesskey"
 ] [ define-attribute-word ] each 

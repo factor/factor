@@ -26,6 +26,7 @@
 IN: cont-utils
 USE: cont-html
 USE: cont-responder
+USE: lists
 USE: stdio
 USE: stack
 
@@ -49,3 +50,15 @@ USE: stack
        <a href= a> [ "OK" write ] </a>
     ] simple-page 
   ] show 2drop ;
+
+: vertical-layout ( list -- )
+  #! Given a list of HTML components, arrange them vertically.
+  <table> [
+    [ <tr> [ <td> [ call ] </td> ] </tr> ] each
+  ] </table> ;
+
+: horizontal-layout ( list -- )
+  #! Given a list of HTML components, arrange them horizontally.
+  <table> [
+    <tr valign= "top" tr> [ [ <td> [ call ] </td> ] each ] </tr>
+  ] </table> ;

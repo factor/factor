@@ -35,49 +35,97 @@ USE: streams
 USE: parser
 USE: lists
 USE: errors
+USE: strings
+USE: logic
+USE: combinators
+
+: <evaluator> ( stack msg history -- )
+  #! Create an 'evaluator' object that holds
+  #! the current stack, output and history for
+  #! do-eval.
+  <namespace> [
+    "history" set
+    "output" set
+    "stack" set
+  ] extend ;
 
 : display-eval-form ( url -- )
   #! Display the components for allowing entry of 
   #! factor words to be evaluated.
-  <form method= "post" action= form> [
-    <textarea name= "eval" rows= "10" cols= "40" textarea> [
-      "" write
-    ] </textarea>
-    <input type= "submit" value= "Evaluate" input/>
-  ] </form> ;
+  <form name= "main" method= "post" action= form> [    
+    [
+      [
+        <textarea name= "eval" rows= "10" cols= "40" textarea> [
+          "" write 
+        ] </textarea>
+      ]
+      [
+        <input type= "submit" value= "Evaluate" accesskey= "e" input/>  
+      ]
+    ] vertical-layout
+  ] </form> 
+  "<script language='javascript'>document.forms.main.eval.focus()</script>" write ;
+
+: escape-quotes ( string -- string )
+  #! Replace occurrences of single quotes with
+  #! backslash quote.
+  [ dup [ [ "'" | "\\'" ] [ "\"" | "\\\"" ] ] assoc dup rot ? ] str-map ;
+ 
+: make-eval-javascript ( string -- string )
+  #! Give a string return some javascript that when
+  #! executed will set the eval textarea to that string.
+  <% "document.forms.main.eval.value=\"" % escape-quotes % "\"" % %> ;
+
+: write-eval-link ( string -- )
+  #! Given text to evaluate, create an A HREF link which when
+  #! clicked sets the eval textarea to that value.
+  <a href= "#" onclick= dup make-eval-javascript a> [ write ] </a> ;
 
 : display-stack ( list -- )
-  #! Write out html to display 'list' as a stack.
+  #! Write out html to display the stack.
   <table border= "1" table> [
     <tr> [ <th> [ "Callstack" write ] </th> ] </tr>
-    [ <tr> [ <td> [ write ] </td> ] </tr> ] each
+    [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
+  ] </table> ;
+
+: display-clear-history-link ( -- )
+  #! Write out html to display a link that will clear
+  #! the history list.
+  " (" write  
+  "Clear" [ [ ] "history" set ] quot-href
+  ")" write ;
+
+: display-history ( list -- )
+  #! Write out html to display the history.
+  <table border= "1" table> [
+    <tr> [ <th> [ "History" write display-clear-history-link ] </th> ] </tr>
+    [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
   ] </table> ;
 
 : display-last-output ( string -- )
-  #! Write out html to display the last output that
-  #! the evaluator wrote.
+  #! Write out html to display the last output.
   <table border= "1" table> [
-    <tr> [ 
-      <td> [ "Last Output" write ] </td>
-      <td> [ <pre> [ write ] </pre> ] </td>
-    ] </tr>
-  ] </table> ;           
+    <tr> [ <th> [ "Last Output" write ] </th> ] </tr>
+    <tr> [ <td> [ <pre> [ write ] </pre> ] </td> ] </tr>
+  ] </table> ;
   
-: get-expr-to-eval (  list string -- string )
+: get-expr-to-eval (  -- string )
   #! Show a page to the user requesting the form to be
-  #! evaluated. It displays the current stack passed as 'list'
-  #! and the last output given as 'string'.
-  #! Return the form as a string.
+  #! evaluated. Return the form as a string. Assumes
+  #! an evaluator is on the namestack.
   [ 
     <html> [
       <body> [
-	display-eval-form
-        display-last-output
-        display-stack
+        "Use Alt+E to evaluate, or press 'Evaluate'" paragraph
+        [
+          [ display-eval-form ]
+          [ "stack" get display-stack ]
+          [ "history" get display-history ]
+        ] horizontal-layout
+        "output" get display-last-output
       ] </body>
     ] </html>
   ] show [
-    2drop
     "eval" get
   ] bind ;
    
@@ -97,23 +145,25 @@ USE: errors
     ] with-stream r> stream>str 
   ] bind ;
 
-: run-eval-requester ( list string -- )
+: run-eval-requester ( evaluator -- )
   #! Enter a loop request an expression to
   #! evaluate, and displaying the results. 
-  #! 'list' will be the datastack initially
-  #! user and 'string' the output from the
-  #! last run.
-  over >r get-expr-to-eval r> swap do-eval-to-string
-  run-eval-requester ;
+  [
+    [
+      get-expr-to-eval dup "history" cons@
+      "stack" get swap do-eval-to-string 
+      "output" set "stack" set
+    ] forever 
+  ] bind ;
   
-: eval-responder ( list string -- )
-  #! Run an eval-responder using the list as the
-  #! initial callstack.
-  [ 
-    run-eval-requester 
-  ] [
-    show-message-page
-  ] catch
-  eval-responder ;
+: eval-responder ( evaluator -- )
+  #! Run an eval-responder using the given evaluation details.
+  [
+    [ 
+      run-eval-requester 
+    ] [
+      show-message-page
+    ] catch 
+  ] forever ;
 
-"eval" [ [ ] "None" eval-responder ] install-cont-responder
+"eval" [ [ ] "None" [ ] <evaluator> eval-responder ] install-cont-responder
