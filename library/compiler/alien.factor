@@ -110,6 +110,8 @@ SYMBOL: alien-parameters
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
+DEFER: alien-invoke
+
 : infer-alien-invoke ( -- )
     \ alien-invoke "infer-effect" word-prop car ensure-d
     pop-literal
@@ -122,6 +124,8 @@ SYMBOL: alien-parameters
     2dup ensure-dlsym
     cons #alien-global dataflow,
     set-alien-returns ;
+
+DEFER: alien-global
 
 : infer-alien-global ( -- )
     \ alien-global "infer-effect" word-prop car ensure-d
