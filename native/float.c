@@ -50,7 +50,9 @@ void primitive_float_to_str(void)
 
 void primitive_float_to_bits(void)
 {
-	/* FIXME */
+	double f = untag_float(env.dt);
+	BIGNUM_2 f_raw = *(BIGNUM_2*)&f;
+	env.dt = tag_object(bignum(f_raw));
 }
 
 CELL number_eq_float(CELL x, CELL y)

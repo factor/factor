@@ -3412,7 +3412,7 @@ list>vector
 .
 \layout Subsection
 
-Vector manipulation
+Working with vectors
 \layout Standard
 
 
@@ -3970,7 +3970,7 @@ CHAR: A 1 + CHAR: B = .
 t
 \layout Subsection
 
-String manipulation
+Working with strings
 \layout Standard
 
 String words are found in the 
@@ -3980,6 +3980,15 @@ strings
  vocabulary.
  String manipulation words always return a new copy of a string rather than
  modifying the string in-place.
+ Notice the absence of words such as 
+\family typewriter 
+set-str-nth
+\family default 
+ and 
+\family typewriter 
+set-str-length
+\family default 
+.
  Unlike lists, for which both constructive and destuctive manipulation words
  are provided, destructive string operations are only done with a distinct
  string buffer type, which is described in the next section.
@@ -4034,23 +4043,87 @@ str-nth ( n str -- ch )
 32
 \layout Standard
 
-Notice the lack of operations such as 
+
 \family typewriter 
-set-str-nth
+index-of ( str substr -- n )
 \family default 
- and 
-\family typewriter 
-set-str-length
-\family default 
-.
- Instead, strings can be sliced using words such as 
-\family typewriter 
-substring
-\family default 
-, and concatenated together using an intermediate string buffer.
+ searches a string for the first occurrence of a substring or character.
+ If an occurrence was found, its index is pushed.
+ Otherwise, -1 is pushed:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+www.sun.com
+\begin_inset Quotes erd
+\end_inset 
+
+ CHAR: .
+ index-of .
+\layout LyX-Code
+
+
+\emph on 
+3
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+mailto:billg@microsoft.com
+\begin_inset Quotes erd
+\end_inset 
+
+ CHAR: / index-of .
+\layout LyX-Code
+
+
+\emph on 
+-1
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+www.lispworks.com
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+.com
+\begin_inset Quotes erd
+\end_inset 
+
+ index-of .
+\layout LyX-Code
+
+
+\emph on 
+13
 \layout Standard
 
-index-of, substring, cat2/3/4/5, cat
+
+\family typewriter 
+index-of* ( n str substr -- n )
+\family default 
+ works like index-of, except it takes a start index as an argument.
+\layout Standard
+
+
+\family typewriter 
+substring ( start end str -- substr )
+\family default 
+ extracts a range of characters from a string into a new string.
+\layout Standard
+
+cat2/3/4/5, cat
 \layout Subsection
 
 String buffers

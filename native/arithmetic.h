@@ -22,7 +22,7 @@ FLOAT* ratio_to_float(CELL n);
         else \
                 return tag_fixnum(_result);
 
-#define BINARY_OP(OP,anytype,integerOnly) \
+#define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \
 { \
 	switch(type_of(x)) \
@@ -34,48 +34,18 @@ CELL OP(CELL x, CELL y) \
 		case FIXNUM_TYPE: \
 			return OP##_fixnum(x,y); \
 		case RATIO_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_ratio((CELL)fixnum_to_ratio(x),y); \
+			return OP##_ratio((CELL)fixnum_to_ratio(x),y); \
 		case COMPLEX_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
+			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
 			return OP##_bignum((CELL)fixnum_to_bignum(x),y); \
 		case FLOAT_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_float((CELL)fixnum_to_float(x),y); \
+			return OP##_float((CELL)fixnum_to_float(x),y); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-			{ \
-				type_error(NUMBER_TYPE,x); \
-				return F; \
-			} \
+			return OP##_anytype(x,y); \
 		} \
 \
 	case RATIO_TYPE: \
-\
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
 \
 		switch(type_of(y)) \
 		{ \
@@ -90,22 +60,10 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			return OP##_float((CELL)ratio_to_float(x),y); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-			{ \
-				type_error(NUMBER_TYPE,x); \
-				return F; \
-			} \
+			return OP##_anytype(x,y); \
 		} \
 \
 	case COMPLEX_TYPE: \
-\
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
 \
 		switch(type_of(y)) \
 		{ \
@@ -120,13 +78,7 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-			{ \
-				type_error(NUMBER_TYPE,x); \
-				return F; \
-			} \
+			return OP##_anytype(x,y); \
 		} \
 \
 	case BIGNUM_TYPE: \
@@ -136,48 +88,18 @@ CELL OP(CELL x, CELL y) \
 		case FIXNUM_TYPE: \
 			return OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
 		case RATIO_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_ratio((CELL)bignum_to_ratio(x),y); \
+			return OP##_ratio((CELL)bignum_to_ratio(x),y); \
 		case COMPLEX_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
+			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
 			return OP##_bignum(x,y); \
 		case FLOAT_TYPE: \
-			if(integerOnly) \
-			{ \
-				type_error(INTEGER_TYPE,y); \
-				return F; \
-			} \
-			else \
-				return OP##_float((CELL)bignum_to_float(x),y); \
+			return OP##_float((CELL)bignum_to_float(x),y); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-			{ \
-				type_error(NUMBER_TYPE,x); \
-				return F; \
-			} \
+			return OP##_anytype(x,y); \
 		} \
 \
 	case FLOAT_TYPE: \
-\
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
 \
 		switch(type_of(y)) \
 		{ \
@@ -192,24 +114,12 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			return OP##_float(x,y); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-			{ \
-				type_error(NUMBER_TYPE,x); \
-				return F; \
-			} \
+			return OP##_anytype(x,y); \
 		} \
 \
 	default: \
 \
-		if(anytype) \
-			return OP##_anytype(x,y); \
-		else \
-		{ \
-			type_error(NUMBER_TYPE,x); \
-			return F; \
-		} \
+		return OP##_anytype(x,y); \
 	} \
 } \
 \
@@ -217,6 +127,34 @@ void primitive_##OP(void) \
 { \
 	CELL x = dpop(), y = env.dt; \
 	env.dt = OP(x,y); \
+}
+
+#define BINARY_OP_INTEGER_ONLY(OP) \
+\
+CELL OP##_ratio(CELL x, CELL y) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+} \
+\
+CELL OP##_complex(CELL x, CELL y) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+} \
+\
+CELL OP##_float(CELL x, CELL y) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+}
+
+#define BINARY_OP_NUMBER_ONLY(OP) \
+\
+CELL OP##_anytype(CELL x, CELL y) \
+{ \
+	type_error(NUMBER_TYPE,x); \
+	return F; \
 }
 
 #define UNARY_OP(OP,anytype,integerOnly) \

@@ -30,3 +30,7 @@ USE: test
 
 [ t ] [ pi 3 > ] unit-test
 [ f ] [ e 2 <= ] unit-test
+
+[ 4607182418800017408 ] [ 1.0 float>bits ] unit-test
+[ 4614256656552045848 ] [ pi float>bits ] unit-test
+[ 4613303445314885481 ] [ e float>bits ] unit-test

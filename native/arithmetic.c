@@ -110,23 +110,68 @@ CELL number_eq_anytype(CELL x, CELL y)
 	return F;
 }
 
-          /* op */   /* anytype */   /* integer only */
-BINARY_OP(number_eq, true,           false)
-BINARY_OP(add,       false,          false)
-BINARY_OP(subtract,  false,          false)
-BINARY_OP(multiply,  false,          false)
-BINARY_OP(divide,    false,          false)
-BINARY_OP(divint,    false,          true)
-BINARY_OP(divfloat,  false,          false)
-BINARY_OP(divmod,    false,          true)
-BINARY_OP(mod,       false,          true)
-BINARY_OP(and,       false,          true)
-BINARY_OP(or,        false,          true)
-BINARY_OP(xor,       false,          true)
-BINARY_OP(shiftleft, false,          true)
-BINARY_OP(shiftright,false,          true)
-BINARY_OP(less,      false,          false)
-BINARY_OP(lesseq,    false,          false)
-BINARY_OP(greater,   false,          false)
-BINARY_OP(greatereq, false,          false)
-BINARY_OP(gcd,       false,          true)
+
+BINARY_OP(number_eq)
+
+BINARY_OP_NUMBER_ONLY(add)
+BINARY_OP(add)
+
+BINARY_OP_NUMBER_ONLY(subtract)
+BINARY_OP(subtract)
+
+BINARY_OP_NUMBER_ONLY(multiply)
+BINARY_OP(multiply)
+
+BINARY_OP_NUMBER_ONLY(divide)
+BINARY_OP(divide)
+
+BINARY_OP_INTEGER_ONLY(divint)
+BINARY_OP_NUMBER_ONLY(divint)
+BINARY_OP(divint)
+
+BINARY_OP_NUMBER_ONLY(divfloat)
+BINARY_OP(divfloat)
+
+BINARY_OP_INTEGER_ONLY(divmod)
+BINARY_OP_NUMBER_ONLY(divmod)
+BINARY_OP(divmod)
+
+BINARY_OP_INTEGER_ONLY(mod)
+BINARY_OP_NUMBER_ONLY(mod)
+BINARY_OP(mod)
+
+BINARY_OP_INTEGER_ONLY(and)
+BINARY_OP_NUMBER_ONLY(and)
+BINARY_OP(and)
+
+BINARY_OP_INTEGER_ONLY(or)
+BINARY_OP_NUMBER_ONLY(or)
+BINARY_OP(or)
+
+BINARY_OP_INTEGER_ONLY(xor)
+BINARY_OP_NUMBER_ONLY(xor)
+BINARY_OP(xor)
+
+BINARY_OP_INTEGER_ONLY(shiftleft)
+BINARY_OP_NUMBER_ONLY(shiftleft)
+BINARY_OP(shiftleft)
+
+BINARY_OP_INTEGER_ONLY(shiftright)
+BINARY_OP_NUMBER_ONLY(shiftright)
+BINARY_OP(shiftright)
+
+BINARY_OP_NUMBER_ONLY(less)
+BINARY_OP(less)
+
+BINARY_OP_NUMBER_ONLY(lesseq)
+BINARY_OP(lesseq)
+
+BINARY_OP_NUMBER_ONLY(greater)
+BINARY_OP(greater)
+
+BINARY_OP_NUMBER_ONLY(greatereq)
+BINARY_OP(greatereq)
+
+BINARY_OP_INTEGER_ONLY(gcd)
+BINARY_OP_NUMBER_ONLY(gcd)
+BINARY_OP(gcd)
