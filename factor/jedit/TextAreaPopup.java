@@ -38,48 +38,16 @@ import org.gjt.sp.jedit.textarea.JEditTextArea;
 import org.gjt.sp.jedit.*;
 import org.gjt.sp.util.Log;
 
-public class WordPopup extends JWindow
+public class TextAreaPopup extends JWindow
 {
 	private View view;
 	private JTextArea preview;
 	
-	//{{{ showWordPopup() method
-	public static void showWordPopup(JEditTextArea textArea)
+	//{{{ TextAreaPopup constructor
+	public TextAreaPopup(JEditTextArea textArea, String text)
 	{
-		View view = GUIUtilities.getView(textArea);
-		String def;
-
-		try
-		{
-			def = FactorPlugin.evalInWire(
-				FactorPlugin.factorWord(view)
-				+ " see").trim();
-		}
-		catch(IOException io)
-		{
-			def = io.toString();
-			Log.log(Log.ERROR,WordPopup.class,io);
-		}
-
-		WordPopup popup = new WordPopup(view,def);
-
-		int line = textArea.getCaretLine();
-		String lineText = textArea.getLineText(line);
-		int caret = textArea.getCaretPosition()
-			- textArea.getLineStartOffset(line);
-		int start = FactorPlugin.getWordStartOffset(lineText,caret);
-		Point loc = textArea.offsetToXY(line,start);
-		loc.y += textArea.getPainter().getFontMetrics().getHeight();
-		SwingUtilities.convertPointToScreen(loc,textArea.getPainter());
-		popup.setLocation(loc);
-		popup.show();
-	} //}}}
-
-	//{{{ WordPopup constructor
-	public WordPopup(View view, String text)
-	{
-		super(view);
-		this.view = view;
+		super(GUIUtilities.getView(textArea));
+		this.view = GUIUtilities.getView(textArea);
 		preview = new JTextArea(text);
 		preview.setEditable(false);
 		getContentPane().add(BorderLayout.CENTER,new JScrollPane(preview));
@@ -91,6 +59,23 @@ public class WordPopup extends JWindow
 		view.setKeyEventInterceptor(keyHandler);
 
 		GUIUtilities.requestFocus(this,preview);
+		
+		positionAtCaret(textArea);
+		setVisible(true);
+	} //}}}
+
+	//{{{ positionAtCaret() method
+	private void positionAtCaret(JEditTextArea textArea)
+	{
+		int line = textArea.getCaretLine();
+		String lineText = textArea.getLineText(line);
+		int caret = textArea.getCaretPosition()
+			- textArea.getLineStartOffset(line);
+		int start = FactorPlugin.getWordStartOffset(lineText,caret);
+		Point loc = textArea.offsetToXY(line,start);
+		loc.y += textArea.getPainter().getFontMetrics().getHeight();
+		SwingUtilities.convertPointToScreen(loc,textArea.getPainter());
+		setLocation(loc);
 	} //}}}
 
 	//{{{ KeyHandler class
