@@ -88,6 +88,9 @@ USE: words
     0 <vector> set-datastack
     0 <vector> set-callstack ;
 
+: java? f ;
+: native? t ;
+
 !!! HACK
 
 IN: strings

@@ -26,12 +26,18 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
+USE: kernel
 USE: strings
 
 : catchstack* ( -- cs )
+    interpreter
     "factor.FactorInterpreter" "catchstack" jvar-get ;
 
 : set-catchstack* ( cs -- )
+    interpreter
     "factor.FactorInterpreter" "catchstack" jvar-set ;
+
+: catchstack ( -- cs ) catchstack* clone ;
+: set-catchstack ( cs -- ) clone set-catchstack* ;
 
 : error>str ( error -- str ) >str ;

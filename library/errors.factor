@@ -29,18 +29,12 @@ IN: errors
 USE: arithmetic
 USE: combinators
 USE: continuations
-USE: inspector
 USE: kernel
 USE: lists
 USE: namespaces
 USE: stack
-USE: stdio
 USE: strings
-USE: unparser
 USE: vectors
-
-: catchstack ( -- cs ) catchstack* clone ;
-: set-catchstack ( cs -- ) clone set-catchstack* ;
 
 : >c ( catch -- )
     #! Push a catch block on the catchstack. Use the catch word
@@ -52,30 +46,19 @@ USE: vectors
     #! instead of invoking this word directly.
     catchstack* vector-pop ;
 
-: default-error-handler ( error -- )
-    #! Print the error and return to the top level.
-    "Uncaught exception." print
-    "-------------------" print
-    terpri
-    "Datastack:" print
-    .s
-    terpri
-    "Callstack:" print
-    .r
-    terpri
-    "Namestack:" print
-    .n
-    terpri
-    "ERROR: " write error>str print
-    suspend ;
+: >pop> ( stack -- stack )
+    dup vector-pop drop ;
 
-: save-error ( -- )
+: save-error ( error -- )
     #! Save the stacks for most-mortem inspection after an
     #! error.
-    datastack "error-datastack" set
-    callstack dup vector-pop drop "error-callstack" set
-    namestack "error-namestack" set
-    catchstack "error-catchstack" set ;
+    global [
+        "error" set
+        datastack >pop> "error-datastack" set
+        callstack >pop> >pop> "error-callstack" set
+        namestack "error-namestack" set
+        catchstack "error-catchstack" set
+    ] bind ;
 
 : catch ( try catch -- )
     #! Call the try quotation, restore the datastack to its
@@ -92,4 +75,4 @@ USE: vectors
 : throw ( error -- )
     #! Throw an error. If no catch handlers are installed, the
     #! default-error-handler is called.
-    save-error rethrow ;
+    dup save-error rethrow ;

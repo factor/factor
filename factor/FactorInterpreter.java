@@ -49,7 +49,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 	// boot.factor sets these.
 	public boolean interactive = true;
-	public boolean errorFlag = false;
 	public Throwable error;
 	public boolean dump = false;
 	public boolean verboseCompile = false;
@@ -353,11 +352,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 		global.setVariable("interpreter",this);
 
-		global.setVariable("error-flag",
-			new FactorNamespace.VarBinding(
-				getClass().getField("errorFlag"),
-				this));
-
 		global.setVariable("verbose-compile",
 			new FactorNamespace.VarBinding(
 				getClass().getField("verboseCompile"),
@@ -445,12 +439,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		else
 			eval(searchVocabulary(INIT_VOCAB,"boot"));
 
-		//XXX messy
-
-		run();
-		if(errorFlag)
-			run();
-
 		run();
 	} //}}}
 
@@ -490,41 +478,21 @@ public class FactorInterpreter implements FactorObject, Runnable
 	//{{{ handleError() method
 	private boolean handleError(Throwable e)
 	{
-		if(errorFlag)
+		error = FactorJava.unwrapException(e);
+		datastack.push(error);
+		try
 		{
-			System.err.println("Exception inside"
-				+ " error handler:");
+			eval(searchVocabulary(ERRORS_VOCAB,"throw"));
+			return false;
+		}
+		catch(Throwable e2)
+		{
+			System.err.println("Exception when calling throw:");
 			e.printStackTrace();
-			System.err.println("Original exception:");
-			error.printStackTrace();
-			System.err.println("Factor datastack:");
-			System.err.println(datastack.toList());
-			System.err.println("Factor callstack:");
-			System.err.println(callstack.toList());
 
 			topLevel();
 
 			return true;
-		}
-		else
-		{
-			errorFlag = true;
-			error = FactorJava.unwrapException(e);
-			datastack.push(error);
-			try
-			{
-				eval(searchVocabulary(ERRORS_VOCAB,"throw"));
-				return false;
-			}
-			catch(Throwable e2)
-			{
-				System.err.println("Exception when calling throw:");
-				e.printStackTrace();
-
-				topLevel();
-
-				return true;
-			}
 		}
 	} //}}}
 
@@ -755,8 +723,10 @@ public class FactorInterpreter implements FactorObject, Runnable
 		namestack.top = 0;
 		namestack.push(global);
 		catchstack.top = 0;
-		catchstack.push(searchVocabulary(ERRORS_VOCAB,
-			"default-error-handler"));
+		// DEFER: the word
+		define(ERRORS_VOCAB,"default-error-handler");
+		catchstack.push(new Cons(searchVocabulary(ERRORS_VOCAB,
+			"default-error-handler"),null));
 		callframe = null;
 	} //}}}
 }

@@ -98,4 +98,6 @@ IN: kernel
     [ "java.lang.String" ] "java.lang.System" "getProperty"
     jinvoke-static ;
 
+: java? t ;
+: native? f ;
 : version "factor.FactorInterpreter" "VERSION" jvar-static-get ;

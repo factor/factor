@@ -29,7 +29,6 @@ USE: parser
 
 !!! The standard library.
 "/library/platform/jvm/kernel.factor"       run-resource ! kernel
-"/library/platform/jvm/errors.factor"       run-resource ! errors
 "/library/platform/jvm/vectors.factor"      run-resource ! vectors
 "/library/platform/jvm/stack.factor"        run-resource ! stack
 "/library/logic.factor"                     run-resource ! logic
@@ -49,12 +48,14 @@ USE: parser
 "/library/platform/jvm/strings.factor"      run-resource ! strings
 "/library/platform/jvm/sbuf.factor"         run-resource ! strings
 "/library/strings.factor"                   run-resource ! strings
+"/library/platform/jvm/errors.factor"       run-resource ! errors
 "/library/platform/jvm/namespaces.factor"   run-resource ! namespaces
 "/library/namespaces.factor"                run-resource ! namespaces
 "/library/sbuf.factor"                      run-resource ! strings
 "/library/list-namespaces.factor"           run-resource ! namespaces
 "/library/math/namespace-math.factor"       run-resource ! arithmetic
 "/library/continuations.factor"             run-resource ! continuations
+"/library/errors.factor"                    run-resource ! errors
 "/library/platform/jvm/vocabularies.factor" run-resource ! vocabularies
 "/library/vocabularies.factor"              run-resource ! vocabularies
 "/library/platform/jvm/words.factor"        run-resource ! words
@@ -85,14 +86,9 @@ USE: parser
 "/library/inspector.factor"                run-resource ! inspector
 "/library/inspect-vocabularies.factor"     run-resource ! inspector
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
+"/library/debugger.factor"                 run-resource ! debugger
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
 
 !!! Final initialization...
-
-! Avoid an error from the parser about boot not being defined
-IN: kernel DEFER: boot
-
 "/library/init.factor"                     run-resource ! init
 "/library/platform/jvm/init.factor"        run-resource ! init
-
-boot

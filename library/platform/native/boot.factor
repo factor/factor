@@ -29,6 +29,7 @@ USE: arithmetic
 USE: combinators
 USE: format
 USE: inspector
+USE: init
 USE: kernel
 USE: lists
 USE: logic
@@ -49,6 +50,7 @@ primitives,
     "/library/combinators.factor"
     "/library/cons.factor"
     "/library/continuations.factor"
+    "/library/debugger.factor"
     "/library/errors.factor"
     "/library/format.factor"
     "/library/hashtables.factor"

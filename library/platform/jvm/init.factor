@@ -79,7 +79,7 @@ USE: strings
 
 : init-stdio ( -- )
     #! Initialize standard input/output.
-    stdin stdout <char-stream> set-stdio ;
+    stdin stdout <char-stream> "stdio" set ;
 
 : init-environment ( -- )
     #! Initialize OS-specific constants.
@@ -97,8 +97,6 @@ USE: strings
             drop
         ] ifte
     ] when ;
-
-IN: kernel
 
 : boot ( -- )
     #! The boot word is run by the intepreter when starting from

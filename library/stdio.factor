@@ -56,13 +56,6 @@ USE: streams
     #! Print a newline to standard output.
     "\n" write ;
 
-: set-stdio ( stdio -- )
-    #! Redirect standard input/output in the current namespace.
-    #! This also redirects the debugger standard input/output,
-    #! which can pose a security risk if stdio is a network
-    #! socket!
-    dup "stdio" set "error-stdio" set ;
-
 : with-stream ( stream quot -- )
     <namespace> [
         swap "stdio" set call "stdio" get fclose

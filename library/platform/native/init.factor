@@ -49,8 +49,6 @@ USE: vocabularies
 USE: words
 USE: unparser
 
-IN: kernel
-
 : boot ( -- )
     init-namespaces
 

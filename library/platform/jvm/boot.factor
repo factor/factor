@@ -86,8 +86,12 @@ IN: parser
 
 !!!
 
+IN: init DEFER: boot
+
 interpreter "factor.FactorInterpreter" "mini" jvar-get [
     "/library/platform/jvm/boot-mini.factor" run-resource
 ] [
     "/library/platform/jvm/boot-sumo.factor" run-resource
 ] ifte
+
+boot

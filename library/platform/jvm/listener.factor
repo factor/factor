@@ -155,7 +155,7 @@ USE: unparser
     #! Called when user opens a new listener in the desktop.
     <namespace> [
         dup "listener" set
-        <listener-stream> set-stdio
+        <listener-stream> "stdio" set
         initial-interpreter-loop
         "listener" get close-listener
     ] bind ;
