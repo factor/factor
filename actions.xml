@@ -3,6 +3,12 @@
 <!DOCTYPE ACTIONS SYSTEM "actions.dtd">
 
 <ACTIONS>
+	<ACTION NAME="factor-listener">
+		<CODE>
+			wm.addDockableWindow("console");
+			wm.getDockableWindow("console").setShell("Factor");
+		</CODE>
+	</ACTION>
 	<ACTION NAME="factor-restart">
 		<CODE>
 			FactorPlugin.stopExternalInstance();
@@ -15,7 +21,7 @@
 			if(sel == null)
 				view.toolkit.beep();
 			else
-				FactorPlugin.eval(view,sel);
+				FactorPlugin.evalInListener(view,sel);
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-run-file">
@@ -35,7 +41,7 @@
 				view.toolkit.beep();
 			else
 			{
-				FactorPlugin.eval(view,
+				FactorPlugin.evalInListener(view,
 					"\""
 					+ FactorReader.charsToEscapes(word)
 					+ "\" apropos.");
@@ -44,12 +50,12 @@
 	</ACTION>
 	<ACTION NAME="factor-see">
 		<CODE>
-			FactorPlugin.factorWordOperation(view,"see");
+			FactorPlugin.factorWordOutputOp(view,"see");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-edit">
 		<CODE>
-			FactorPlugin.factorWordOperation(view,"jedit");
+			FactorPlugin.factorWordWireOp(view,"jedit");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-edit-dialog">
@@ -60,7 +66,7 @@
 	</ACTION>
 	<ACTION NAME="factor-usages">
 		<CODE>
-			FactorPlugin.factorWordOperation(view,"usages.");
+			FactorPlugin.factorWordOutputOp(view,"usages.");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-insert-use">

@@ -81,8 +81,7 @@ public class WordPreview implements ActionListener, CaretListener
 	{
 		View view = textArea.getView();
 
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
+		SideKickParsedData data = SideKickParsedData.getParsedData(view);
 		if(data instanceof FactorParsedData)
 		{
 			int line = textArea.getCaretLine();

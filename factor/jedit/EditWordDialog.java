@@ -36,9 +36,11 @@ import javax.swing.text.Document;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.List;
 import org.gjt.sp.jedit.gui.EnhancedDialog;
 import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.Log;
 
 public class EditWordDialog extends WordListDialog
 {
@@ -80,8 +82,15 @@ public class EditWordDialog extends WordListDialog
 			return;
 		}
 
-		String code = FactorPlugin.factorWord(word);
-		FactorPlugin.eval(view,code + " jedit");
+		try
+		{
+			FactorPlugin.evalInWire(FactorPlugin.factorWord(word) + " jedit");
+		}
+		catch(IOException e)
+		{
+			/* Don't care */
+			Log.log(Log.ERROR,this,e);
+		}
 		dispose();
 	} //}}}
 

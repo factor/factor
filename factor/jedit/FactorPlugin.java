@@ -158,13 +158,19 @@ public class FactorPlugin extends EditPlugin
 			"sidekick.SideKickParser","factor");
 	} //}}}
 	
-	//{{{ eval() method
-	public static void eval(View view, String cmd)
+	//{{{ evalInListener() method
+	public static void evalInListener(View view, String cmd)
 	{
 		DockableWindowManager wm = view.getDockableWindowManager();
 		wm.addDockableWindow("console");
 		Console console = (Console)wm.getDockableWindow("console");
 		console.run(Shell.getShell("Factor"),console,cmd);
+	} //}}}
+
+	//{{{ evalInWire() method
+	public static void evalInWire(String cmd) throws IOException
+	{
+		getExternalInstance().eval(cmd);
 	} //}}}
 
 	//{{{ factorWord() method
@@ -202,17 +208,30 @@ public class FactorPlugin extends EditPlugin
 			return null;
 	} //}}}
 	
-	//{{{ factorWordOperation() method
+	//{{{ factorWordOutputOp() method
 	/**
 	 * Apply a Factor word to the selected word.
 	 */
-	public static void factorWordOperation(View view, String op)
+	public static void factorWordOutputOp(View view, String op)
 	{
 		String word = factorWord(view);
 		if(word == null)
 			view.getToolkit().beep();
 		else
-			eval(view,word + " " + op);
+			evalInListener(view,word + " " + op);
+	} //}}}
+
+	//{{{ factorWordWireOp() method
+	/**
+	 * Apply a Factor word to the selected word.
+	 */
+	public static void factorWordWireOp(View view, String op) throws IOException
+	{
+		String word = factorWord(view);
+		if(word == null)
+			view.getToolkit().beep();
+		else
+			evalInWire(word + " " + op);
 	} //}}}
 
 	//{{{ getCompletions() method
