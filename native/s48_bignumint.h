@@ -42,8 +42,8 @@ MIT in each case. */
    definition is `CHAR_BIT', which is defined in the Ansi C header
    file "limits.h". */
 
-typedef CELL bignum_digit_type;
-typedef CELL bignum_length_type;
+typedef long bignum_digit_type;
+typedef long bignum_length_type;
 
 /* BIGNUM_ALLOCATE allocates a (length + 1)-element array of
    `bignum_digit_type'; deallocation is the responsibility of the

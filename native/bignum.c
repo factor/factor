@@ -120,10 +120,7 @@ CELL divide_bignum(ARRAY* x, ARRAY* y)
 
 CELL divint_bignum(ARRAY* x, ARRAY* y)
 {
-	ARRAY* q = s48_bignum_quotient(x,y);
-	if(q == NULL)
-		raise(SIGFPE);
-	return tag_object(q);
+	return tag_object(s48_bignum_quotient(x,y));
 }
 
 CELL divfloat_bignum(ARRAY* x, ARRAY* y)
@@ -135,20 +132,15 @@ CELL divfloat_bignum(ARRAY* x, ARRAY* y)
 
 CELL divmod_bignum(ARRAY* x, ARRAY* y)
 {
-	ARRAY* q;
-	ARRAY* r;
-	if(s48_bignum_divide(x,y,&q,&r))
-		raise(SIGFPE);
+	ARRAY *q, *r;
+	s48_bignum_divide(x,y,&q,&r);
 	dpush(tag_object(q));
 	return tag_object(r);
 }
 
 CELL mod_bignum(ARRAY* x, ARRAY* y)
 {
-	ARRAY* r = s48_bignum_remainder(x,y);
-	if(r == NULL)
-		raise(SIGFPE);
-	return tag_object(r);
+	return tag_object(s48_bignum_remainder(x,y));
 }
 
 CELL and_bignum(ARRAY* x, ARRAY* y)

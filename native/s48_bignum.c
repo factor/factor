@@ -177,12 +177,15 @@ s48_bignum_multiply(bignum_type x, bignum_type y)
   return (bignum_multiply_unsigned (x, y, negative_p));
 }
 
-int
-bignum_divide(bignum_type numerator, bignum_type denominator,
+void
+s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 		  bignum_type * quotient, bignum_type * remainder)
 {
   if (BIGNUM_ZERO_P (denominator))
-    return (1);
+    {
+      raise(SIGFPE);
+      return;
+    }
   if (BIGNUM_ZERO_P (numerator))
     {
       (*quotient) = (BIGNUM_MAYBE_COPY (numerator));
@@ -244,15 +247,6 @@ bignum_divide(bignum_type numerator, bignum_type denominator,
 	  }
 	}
     }
-  return (0);
-}
-
-int
-s48_bignum_divide(bignum_type numerator, bignum_type denominator,
-		  void* quotient, void * remainder)
-{
-  return bignum_divide(numerator, denominator,
-		       (bignum_type *)quotient, (bignum_type *)remainder);
 }
 
 bignum_type
