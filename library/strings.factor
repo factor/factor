@@ -124,9 +124,6 @@ USE: stack
     dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
 
 : split1 ( string split -- before after )
-    #! The car of the pair is the string up to the first
-    #! occurrence of split; the cdr is the remainder of
-    #! the string.
     2dup index-of dup -1 = [
         2drop f
     ] [

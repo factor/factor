@@ -216,7 +216,12 @@ public class FactorLib
 				break;
 			buf.append((char)b);
 		}
-		return buf.toString();
+
+		/* EOF? */
+		if(b == -1 && buf.length() == 0)
+			return null;
+		else
+			return buf.toString();
 	} //}}}
 
 	//{{{ readCount() method

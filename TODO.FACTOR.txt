@@ -4,11 +4,16 @@
 - plugin should not exit jEdit on fatal errors
 - wordpreview: don't show for string literals and comments
 - alist -vs- assoc terminology
+- NPE in activate()/deactivate()
+- write-icon kind of messy; " " should be output by the listener
+- f usages. --> don't print all words
+- file responder: don't show full path in title
+
 - clean up listener's action popups
 - jedit ==> jedit-word, jedit takes a file name
 - introduce ifte* and ?str-head/?str-tail where appropriate
 - namespace clone drops static var bindings
-<kc5tja> The binary register ordering, from 0 to 7, is EAX, ECX, EDX, EBX, ESP, EBP, ESI, EDI.
+- when running (inf, .factor-rc not loaded
 
 + bignums:
 
@@ -44,7 +49,6 @@
 
 + listener/plugin:
 
-- NPE in activate()/deactivate()
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
@@ -82,11 +86,6 @@
 
 + misc:
 
-- write-icon kind of messy; " " should be output by the listener
-- f usages. --> don't print all words
-- pipe support
-- telnetd: init-history
-- str-reverse primitive
 - some way to run httpd from command line
 - don't rehash strings on every startup
 - 'cascading' styles

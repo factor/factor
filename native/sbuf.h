@@ -25,7 +25,6 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value);
 void primitive_set_sbuf_nth(void);
 void sbuf_append_string(SBUF* sbuf, STRING* string);
 void primitive_sbuf_append(void);
-STRING* sbuf_to_string(SBUF* sbuf);
 void primitive_sbuf_to_string(void);
 void primitive_sbuf_reverse(void);
 void primitive_sbuf_clone(void);

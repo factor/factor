@@ -111,3 +111,8 @@ void primitive_allot_profiling(void)
 	}
 #endif
 }
+
+void primitive_address_of(void)
+{
+	dpush(tag_object(s48_ulong_to_bignum(dpop())));
+}

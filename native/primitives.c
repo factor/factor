@@ -26,6 +26,7 @@ XT primitives[] = {
 	primitive_string_hashcode,
 	primitive_index_of,
 	primitive_substring,
+	primitive_string_reverse,
 	primitive_sbufp,
 	primitive_sbuf,
 	primitive_sbuf_length,
@@ -153,9 +154,13 @@ XT primitives[] = {
 	primitive_dump,
 	primitive_cwd,
 	primitive_cd,
-	primitive_compile_byte,
-	primitive_compile_cell,
-	primitive_compile_offset
+	primitive_set_compiled_byte,
+	primitive_set_compiled_cell,
+	primitive_compiled_offset,
+	primitive_set_compiled_offset,
+	primitive_literal_top,
+	primitive_set_literal_top,
+	primitive_address_of
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -58,7 +58,6 @@ USE: stack
     global [ "last-word" set ] bind ;
 
 : define-compound ( word def -- )
-    #! Define a compound word at runtime.
     over set-word-parameter
     1 swap set-word-primitive ;
 

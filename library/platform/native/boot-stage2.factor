@@ -109,7 +109,6 @@ USE: stdio
     "/library/telnetd.factor"
     "/library/inferior.factor"
     "/library/platform/native/profiler.factor"
-    "/library/platform/native/compiler.factor"
 
     "/library/image.factor"
     "/library/cross-compiler.factor"
@@ -131,6 +130,10 @@ USE: stdio
     "/library/jedit/jedit-no-local.factor"
     "/library/jedit/jedit-remote.factor"
     "/library/jedit/jedit.factor"
+
+    "/library/compiler/assembler.factor"
+    "/library/compiler/assembly-x86.factor"
+    "/library/compiler/compiler.factor"
 
     "/library/platform/native/primitives.factor"
 

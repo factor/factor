@@ -92,6 +92,9 @@ USE: words
 : bad-primitive-error ( obj -- )
     "Bad primitive number: " write . ;
 
+: c-string-error ( obj -- )
+    "Cannot convert to C string: " write . ;
+
 : kernel-error. ( obj n -- str )
     {
         expired-port-error
@@ -108,6 +111,7 @@ USE: words
         profiling-disabled-error
         negative-array-size-error
         bad-primitive-error
+        c-string-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

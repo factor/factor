@@ -42,9 +42,12 @@ USE: vectors
 USE: words
 
 IN: compiler
-DEFER: compile-byte
-DEFER: compile-cell
-DEFER: compile-offset
+DEFER: set-compiled-byte
+DEFER: set-compiled-cell
+DEFER: compiled-offset
+DEFER: set-compiled-offset
+DEFER: literal-top
+DEFER: set-literal-top
 
 IN: kernel
 DEFER: getenv
@@ -54,6 +57,7 @@ DEFER: room
 DEFER: os-env
 DEFER: type-of
 DEFER: size-of
+DEFER: address-of
 DEFER: dump
 
 IN: strings
@@ -150,6 +154,7 @@ IN: cross-compiler
         str-hashcode
         index-of*
         substring
+        str-reverse
         sbuf?
         <sbuf>
         sbuf-length
@@ -277,9 +282,13 @@ IN: cross-compiler
         dump
         cwd
         cd
-        compile-byte
-        compile-cell
-        compile-offset
+        set-compiled-byte
+        set-compiled-cell
+        compiled-offset
+        set-compiled-offset
+        literal-top
+        set-literal-top
+        address-of
     ] [
         swap succ tuck primitive,
     ] each drop ;

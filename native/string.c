@@ -80,7 +80,12 @@ BYTE* to_c_string(STRING* s)
 	BYTE* c_str = (BYTE*)(_c_str + 1);
 	
 	for(i = 0; i < s->capacity; i++)
+	{
+		CHAR ch = string_nth(s,i);
+		if(ch == '\0' || ch > 255)
+			general_error(ERROR_C_STRING,tag_object(s));
 		c_str[i] = string_nth(s,i);
+	}
 
 	c_str[s->capacity] = '\0';
 
@@ -258,4 +263,46 @@ void primitive_substring(void)
 	CELL end = to_fixnum(dpop());
 	CELL start = to_fixnum(dpop());
 	dpush(tag_object(substring(start,end,string)));
+}
+
+/* DESTRUCTIVE - don't use with user-visible strings */
+void string_reverse(STRING* s, int len)
+{
+	int i, j;
+	CHAR ch1, ch2;
+	for(i = 0; i < len / 2; i++)
+	{
+		j = len - i - 1;
+		ch1 = string_nth(s,i);
+		ch2 = string_nth(s,j);
+		set_string_nth(s,j,ch1);
+		set_string_nth(s,i,ch2);
+	}
+}
+
+/* Doesn't rehash the string! */
+STRING* string_clone(STRING* s, int len)
+{
+	STRING* copy = allot_string(len);
+	memcpy(copy + 1,s + 1,len * CHARS);
+	return copy;
+}
+
+void primitive_string_reverse(void)
+{
+	STRING* s = untag_string(dpeek());
+	s = string_clone(s,s->capacity);
+	string_reverse(s,s->capacity);
+	hash_string(s);
+	drepl(tag_object(s));
+}
+
+STRING* fixup_untagged_string(STRING* str)
+{
+	return (STRING*)((CELL)str + (active.base - relocation_base));
+}
+
+STRING* copy_untagged_string(STRING* str)
+{
+	return copy_untagged_object(str,SSIZE(str));
 }

@@ -25,39 +25,64 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
+IN: compiler
+USE: math
+USE: stack
+USE: lists
 USE: combinators
-USE: compiler
-USE: errors
-USE: kernel
-USE: namespaces
-USE: parser
-USE: stdio
-USE: streams
-USE: threads
 USE: words
+USE: namespaces
+USE: unparser
+USE: errors
+USE: strings
+USE: logic
+USE: kernel
 USE: vectors
 
-: init-errors ( -- )
-    64 <vector> set-catchstack* ;
+: compile-word ( word -- )
+    #! Compile a JMP at the end (tail call optimization)
+    word-xt "compile-last" get [ JMP ] [ CALL ] ifte ;
 
-: init-gc ( -- )
-    [ garbage-collection ] 7 setenv ;
+: compile-literal ( obj -- )
+    dup fixnum? [
+        address-of LITERAL
+    ] [
+        intern-literal [LITERAL]
+    ] ifte ;
 
-: boot ( -- )
-    #! Initialize an interpreter with the basic services.
-    init-gc
-    init-errors
-    init-namespaces
-    init-threads
-    init-stdio
-    "HOME" os-env [ "." ] unless* "~" set
-    10 "base" set
-    "/" "/" set
-    init-search-path ;
+: commit-literals ( -- )
+    "compile-datastack" get dup [ compile-literal ] vector-each
+    0 swap set-vector-length ;
 
-: cold-boot ( -- )
-    #! An initially-generated image has this as the boot
-    #! quotation.
-    boot
-    "/library/platform/native/boot-stage2.factor" run-resource ;
+: postpone ( obj -- )
+    "compile-datastack" get vector-push ;
+
+: compile-atom ( obj -- )
+    [
+        [ word? ] [ commit-literals compile-word ]
+        [ drop t ] [ postpone ]
+    ] cond ;
+
+: compile-loop ( quot -- )
+    dup [
+        unswons
+        over not "compile-last" set
+        compile-atom
+        compile-loop
+    ] [
+        commit-literals drop RET
+    ] ifte ;
+
+: compile-quot ( quot -- xt )
+    [
+        "compile-last" off
+        10 <vector> "compile-datastack" set
+        compiled-offset swap compile-loop
+    ] with-scope ;
+
+: compile ( word -- )
+    intern dup word-parameter compile-quot swap set-word-xt ;
+
+: call-xt ( xt -- )
+    #! For testing.
+    0 f f <word> [ set-word-xt ] keep execute ;

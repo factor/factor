@@ -46,13 +46,8 @@ void primitive_string_eq(void);
 void primitive_string_hashcode(void);
 void primitive_index_of(void);
 void primitive_substring(void);
-
-INLINE STRING* fixup_untagged_string(STRING* str)
-{
-	return (STRING*)((CELL)str + (active.base - relocation_base));
-}
-
-INLINE STRING* copy_untagged_string(STRING* str)
-{
-	return copy_untagged_object(str,SSIZE(str));
-}
+void string_reverse(STRING* s, int len);
+STRING* string_clone(STRING* s, int len);
+void primitive_string_reverse(void);
+STRING* fixup_untagged_string(STRING* str);
+STRING* copy_untagged_string(STRING* str);

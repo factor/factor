@@ -6,7 +6,7 @@ void load_image(char* filename)
 	HEADER h;
 	CELL size;
 	
-	fprintf(stderr,"Loading %s...",filename);
+	printf("Loading %s...",filename);
 
 	file = fopen(filename,"rb");
 	if(file == NULL)
@@ -30,7 +30,7 @@ void load_image(char* filename)
 	active.here = active.base + h.size;
 	fclose(file);
 
-	fprintf(stderr," relocating...");
+	printf(" relocating...");
 	fflush(stdout);
 
 	clear_environment();
@@ -40,7 +40,8 @@ void load_image(char* filename)
 
 	relocate(h.relocation_base);
 
-	fprintf(stderr," done\n");
+	printf(" done\n");
+	fflush(stdout);
 }
 
 bool save_image(char* filename)

@@ -27,6 +27,7 @@ CELL to_cell(CELL x)
 		return s48_bignum_to_long(untag_bignum(x));
 	default:
 		type_error(INTEGER_TYPE,x);
+		return 0;
 	}
 }
 

@@ -50,6 +50,7 @@ void general_error(CELL error, CELL tagged)
 			fprintf(stderr,"Got type #%ld\n",type_of(
 				untag_cons(tagged)->cdr));
 		}
+		fflush(stderr);
 		exit(1);
 	}
 	throw_error(c);

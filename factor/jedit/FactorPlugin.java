@@ -309,6 +309,7 @@ public class FactorPlugin extends EditPlugin
 
 		Buffer buffer = view.getBuffer();
 		int lastUseOffset = 0;
+		boolean trailingNewline = false;
 
 		for(int i = 0; i < buffer.getLineCount(); i++)
 		{
@@ -325,12 +326,17 @@ public class FactorPlugin extends EditPlugin
 					lastUseOffset = buffer.getLineEndOffset(i-1) - 1;
 			}
 			else
+			{
+				trailingNewline = true;
 				break;
+			}
 		}
 
 		String decl = "USE: " + vocab;
 		if(lastUseOffset != 0)
 			decl = "\n" + decl;
+		if(trailingNewline)
+			decl = decl + "\n";
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
 	} //}}}

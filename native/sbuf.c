@@ -101,32 +101,18 @@ void primitive_sbuf_append(void)
 	}
 }
 
-STRING* sbuf_to_string(SBUF* sbuf)
-{
-	STRING* string = allot_string(sbuf->top);
-	memcpy(string + 1,sbuf->string + 1,sbuf->top * CHARS);
-	hash_string(string);
-	return string;
-}
-
 void primitive_sbuf_to_string(void)
 {
-	drepl(tag_object(sbuf_to_string(untag_sbuf(dpeek()))));
+	SBUF* sbuf = untag_sbuf(dpeek());
+	STRING* s = string_clone(sbuf->string,sbuf->top);
+	hash_string(s);
+	drepl(tag_object(s));
 }
 
 void primitive_sbuf_reverse(void)
 {
 	SBUF* sbuf = untag_sbuf(dpop());
-	int i, j;
-	CHAR ch1, ch2;
-	for(i = 0; i < sbuf->top / 2; i++)
-	{
-		j = sbuf->top - i - 1;
-		ch1 = string_nth(sbuf->string,i);
-		ch2 = string_nth(sbuf->string,j);
-		set_string_nth(sbuf->string,j,ch1);
-		set_string_nth(sbuf->string,i,ch2);
-	}
+	string_reverse(sbuf->string,sbuf->top);
 }
 
 void primitive_sbuf_clone(void)

@@ -40,6 +40,7 @@ USE: stack
 USE: vectors
 USE: words
 USE: unparser
+USE: compiler
 
 [
     [ execute                | " word -- " ]
@@ -189,6 +190,12 @@ USE: unparser
     [ dump                   | " obj -- " ]
     [ cwd                    | " -- dir " ]
     [ cd                     | " dir -- " ]
+    [ set-compiled-byte      | " n ptr -- " ]
+    [ set-compiled-cell      | " n ptr -- " ]
+    [ compiled-offset        | " -- ptr " ]
+    [ set-compiled-offset    | " ptr -- " ]
+    [ literal-top            | " -- ptr " ]
+    [ set-literal-top        | " ptr -- " ]
 ] [
     unswons "stack-effect" swap set-word-property
 ] each

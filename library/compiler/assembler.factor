@@ -25,39 +25,34 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
-USE: combinators
-USE: compiler
-USE: errors
+IN: compiler
+USE: math
 USE: kernel
-USE: namespaces
-USE: parser
-USE: stdio
-USE: streams
-USE: threads
-USE: words
-USE: vectors
+USE: stack
 
-: init-errors ( -- )
-    64 <vector> set-catchstack* ;
+: cell 4 ;
+: literal-table 1024 cell * ;
 
-: init-gc ( -- )
-    [ garbage-collection ] 7 setenv ;
+: init-assembler ( -- )
+    compiled-offset literal-table + set-compiled-offset ;
 
-: boot ( -- )
-    #! Initialize an interpreter with the basic services.
-    init-gc
-    init-errors
-    init-namespaces
-    init-threads
-    init-stdio
-    "HOME" os-env [ "." ] unless* "~" set
-    10 "base" set
-    "/" "/" set
-    init-search-path ;
+: intern-literal ( obj -- lit# )
+    address-of
+    literal-top set-compiled-cell
+    literal-top dup cell + set-literal-top ;
 
-: cold-boot ( -- )
-    #! An initially-generated image has this as the boot
-    #! quotation.
-    boot
-    "/library/platform/native/boot-stage2.factor" run-resource ;
+: compile-byte ( n -- )
+    compiled-offset set-compiled-byte
+    compiled-offset 1 + set-compiled-offset ;
+
+: compile-cell ( n -- )
+    compiled-offset set-compiled-cell
+    compiled-offset cell + set-compiled-offset ;
+
+: DATASTACK ( -- ptr )
+    #! A pointer to a pointer to the datastack top.
+    11 getenv ;
+
+: CALLSTACK ( -- ptr )
+    #! A pointer to a pointer to the callstack top.
+    12 getenv ;

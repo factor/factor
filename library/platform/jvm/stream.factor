@@ -112,8 +112,8 @@ USE: strings
     #! java.io.OutputStream out. The streams are wrapped in
     #! buffered streams.
     <stream> [
-        <bout> "out" set
-        <bin> "in" set
+        "out" set
+        "in" set
         ( -- string )
         [ <byte-stream>/freadln ] "freadln" set
         ( count -- string )
@@ -191,12 +191,12 @@ USE: strings
     <char-stream> ;
 
 : <filebr> ( path -- stream )
-    [ "java.lang.String" ] "java.io.FileInputStream" jnew
+    [ "java.lang.String" ] "java.io.FileInputStream" jnew <bin>
     f
     <byte-stream> ;
 
 : <filebw> ( path -- stream )
-    [ "java.lang.String" ] "java.io.FileOutputStream" jnew
+    [ "java.lang.String" ] "java.io.FileOutputStream" jnew <bout>
     f swap
     <byte-stream> ;
 
@@ -232,8 +232,8 @@ USE: strings
 : <socket-stream> ( socket -- stream )
     #! Wraps a socket inside a byte-stream.
     dup
-    [ [ ] "java.net.Socket" "getInputStream"  jinvoke ]
-    [ [ ] "java.net.Socket" "getOutputStream" jinvoke ]
+    [ [ ] "java.net.Socket" "getInputStream"  jinvoke <bin> ]
+    [ [ ] "java.net.Socket" "getOutputStream" jinvoke <bout> ]
     cleave
     <byte-stream> [
         dup >str "client" set "socket" set

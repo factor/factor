@@ -101,6 +101,3 @@ USE: stack
 : split-n ( n str -- list )
     #! Split a string into n-character chunks.
     [, 0 -rot (split-n) ,] ;
-
-: str-reverse ( str -- str )
-    str>sbuf dup sbuf-reverse sbuf>str ;

@@ -3,21 +3,61 @@
 void init_compiler(void)
 {
 	init_zone(&compiling,COMPILE_ZONE_SIZE);
+	literal_top = compiling.base;
 }
 
-void primitive_compile_byte(void)
+void check_compiled_offset(CELL offset)
 {
-	bput(compiling.here,to_fixnum(dpop()));
-	compiling.here++;
+	if(offset < compiling.base || offset >= compiling.limit)
+		range_error(F,offset,compiling.limit);
 }
 
-void primitive_compile_cell(void)
+void primitive_set_compiled_byte(void)
 {
-	put(compiling.here,to_cell(dpop()));
-	compiling.here += sizeof(CELL);
+	CELL offset = to_cell(dpop());
+	BYTE b = to_fixnum(dpop());
+	check_compiled_offset(offset);
+	bput(offset,b);
 }
 
-void primitive_compile_offset(void)
+void primitive_set_compiled_cell(void)
+{
+	CELL offset = to_cell(dpop());
+	CELL c = to_fixnum(dpop());
+	check_compiled_offset(offset);
+	put(offset,c);
+}
+
+void primitive_compiled_offset(void)
 {
 	dpush(tag_integer(compiling.here));
+}
+
+void primitive_set_compiled_offset(void)
+{
+	CELL offset = to_cell(dpop());
+	check_compiled_offset(offset);
+	compiling.here = offset;
+}
+
+void primitive_literal_top(void)
+{
+	dpush(tag_integer(literal_top));
+}
+
+void primitive_set_literal_top(void)
+{
+	CELL offset = to_cell(dpop());
+	check_compiled_offset(offset);
+	literal_top = offset;
+}
+
+void collect_literals(void)
+{
+	CELL i = compiling.base;
+	while(i < literal_top)
+	{
+		copy_object((CELL*)i);
+		i += CELLS;
+	}
 }

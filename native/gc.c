@@ -143,6 +143,8 @@ void primitive_gc(void)
 	scan = active.here = active.base;
 	collect_roots();
 	collect_io_tasks();
+	/* collect literal objects referenced from compiled code */
+	collect_literals();
 	while(scan < active.here)
 	{
 		gc_debug("scan loop",scan);
