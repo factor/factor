@@ -41,19 +41,18 @@ USE: words
 USE: hashtables
 USE: prettyprint
 
-: with-dataflow ( word [ in | out ] quot -- )
+: with-dataflow ( param op [ in | out ] quot -- )
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
-    over car ensure-d
-    rot #call dataflow,
+    >r dup car ensure-d >r dataflow, r> r> rot
     [ pick swap dataflow-inputs ] keep
     pick 2slip swap dataflow-outputs ; inline
 
 : consume/produce ( word [ in | out ] -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    [ unswons consume-d produce-d ] with-dataflow ;
+    #call swap [ unswons consume-d produce-d ] with-dataflow ;
 
 : apply-effect ( word [ in | out ] -- )
     #! If a word does not have special inference behavior, we

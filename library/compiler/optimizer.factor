@@ -56,13 +56,24 @@ USE: logic
     #! literal?
     [ dup cons? [ car over = ] [ drop f ] ifte ] some? ;
 
-: (can-kill?) ( literal node -- ? )
-    #! Return false if the literal appears as input to this
-    #! node, and this node is not a stack operation.
+: default-kill? ( literal node -- ? )
     [
         node-consume-d get mentions-literal? swap
         node-consume-r get mentions-literal? nip or not
     ] bind ;
+
+: (can-kill?) ( literal node -- ? )
+    #! Return false if the literal appears as input to this
+    #! node, and this node is not a stack operation.
+    dup [ node-op get ] bind dup "shuffle" word-property [
+        3drop t
+    ] [
+        "can-kill" word-property dup [
+            call
+        ] [
+            drop default-kill?
+        ] ifte
+    ] ifte ;
 
 : can-kill? ( literal dataflow -- ? )
     [ dupd (can-kill?) ] all? nip ;
@@ -71,7 +82,13 @@ USE: logic
     #! Push a list of literals that may be killed in the IR.
     dup scan-literals [ over can-kill? ] subset nip ;
 
+: can-kill-branches? ( literal node -- ? )
+    [ node-param get ] bind [ dupd can-kill? ] all? nip ;
+
 #push [ , ] "scan-literal" set-word-property
 #ifte [ scan-branches ] "scan-literal" set-word-property
+#ifte [ can-kill-branches? ] "can-kill" set-word-property
 #generic [ scan-branches ] "scan-literal" set-word-property
+#generic [ can-kill-branches? ] "can-kill" set-word-property
 #2generic [ scan-branches ] "scan-literal" set-word-property
+#2generic [ can-kill-branches? ] "can-kill" set-word-property

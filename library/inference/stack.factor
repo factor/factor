@@ -33,31 +33,37 @@ USE: lists
 USE: namespaces
 
 \ >r [
-    \ >r #call dataflow, [ 1 0 node-inputs ] extend
+    f #>r dataflow, [ 1 0 node-inputs ] extend
     pop-d push-r
     [ 0 1 node-outputs ] bind
 ] "infer" set-word-property
 
+\ >r t "shuffle" set-word-property
+
 \ r> [
-    \ r> #call dataflow, [ 0 1 node-inputs ] extend
+    f #r> dataflow, [ 0 1 node-inputs ] extend
     pop-r push-d
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-property
 
-: meta-infer ( word -- )
+\ r> t "shuffle" set-word-property
+
+: meta-infer ( word op -- )
     #! Mark a word as being partially evaluated.
-    dup [
-       dup unit , \ car , \ dup ,
-       "infer-effect" word-property ,
-       [ drop host-word ] ,
-       \ with-dataflow ,
+    dup t "shuffle" set-word-property
+    dupd [
+        over unit , \ car ,
+        f , ,
+        "infer-effect" word-property ,
+        [ drop host-word ] ,
+        \ with-dataflow ,
     ] make-list "infer" set-word-property ;
 
-\ drop meta-infer
-\ dup meta-infer
-\ swap meta-infer
-\ over meta-infer
-\ pick meta-infer
-\ nip meta-infer
-\ tuck meta-infer
-\ rot meta-infer
+\ drop #drop meta-infer
+\ dup #dup meta-infer
+\ swap #swap meta-infer
+\ over #over meta-infer
+\ pick #pick meta-infer
+\ nip #nip meta-infer
+\ tuck #tuck meta-infer
+\ rot #rot meta-infer
