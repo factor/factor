@@ -7,10 +7,10 @@ unparser ;
 
 ! Command line parameters specify libraries to load.
 !
-! -library:<foo>:name=<soname> -- define a library <foo>, to be
+! -libraries:<foo>:name=<soname> -- define a library <foo>, to be
 ! loaded from the <soname> DLL.
 !
-! -library:<foo>:abi=stdcall -- define a library using the
+! -libraries:<foo>:abi=stdcall -- define a library using the
 ! stdcall ABI. This ABI is usually used on Win32. Any other abi
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
