@@ -53,7 +53,7 @@ USE: vectors
 : jump-table-entry ( word -- )
     #! Jump table entries are absolute addresses.
     dup postpone-word
-    compiled-offset 0 compile-cell 0 fixup-deferred-xt ;
+    compiled-offset 0 compile-cell 0 defer-xt ;
 
 : end-jump-table ( end-fixup -- )
     #! update the PUSH.

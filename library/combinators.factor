@@ -156,7 +156,7 @@ USE: stack
     #!
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
-    dupd [ drop ] ifte ; inline interpret-only
+    over [ call ] [ 2drop ] ifte ; inline interpret-only
 
 : while ( cond body -- )
     #! Evaluate cond. If it leaves t on the stack, evaluate

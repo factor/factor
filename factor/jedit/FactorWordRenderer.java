@@ -65,6 +65,10 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			}
 			stackEffect = buf.toString();
 		}
+		else if(def instanceof FactorSymbolDefinition)
+		{
+			prop = "factor.completion.symbol";
+		}
 		else
 		{
 			Cons d = def.toList(interp);

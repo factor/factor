@@ -99,7 +99,7 @@ SYMBOL: compile-words
     ] ifte ;
 
 : fixup-deferred-xt ( word where relative -- )
-    rot dup compiled? [
+    rot dup compiling? [
         compiled-xt swap - swap set-compiled-cell
     ] [
         "Not compiled: " swap word-name cat2 throw
@@ -112,7 +112,7 @@ SYMBOL: compile-words
     deferred-xts off ;
 
 : postpone-word ( word -- )
-    dup compiled? [ drop ] [ compile-words unique@ ] ifte ;
+    dup compiling? [ drop ] [ compile-words unique@ ] ifte ;
 
 ! During compilation, these two variables store pending
 ! literals. Literals are either consumed at compile-time by

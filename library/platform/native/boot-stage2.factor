@@ -142,6 +142,7 @@ USE: stdio
     "/library/compiler/ifte.factor"
     "/library/compiler/generic.factor"
     "/library/compiler/interpret-only.factor"
+    "/library/compiler/compile-all.factor"
     "/library/compiler/alien-types.factor"
     "/library/compiler/alien-macros.factor"
     "/library/compiler/alien.factor"
