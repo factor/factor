@@ -58,10 +58,10 @@ END-STRUCT
     alien-invoke ;
 
 : htons ( short -- short ) 
-    "short" "winsock" "htons" [ "short" ] alien-invoke ;
+    "ushort" "winsock" "htons" [ "ushort" ] alien-invoke ;
 
 : ntohs ( short -- short )
-    "short" "winsock" "ntohs" [ "short" ] alien-invoke ;
+    "ushort" "winsock" "ntohs" [ "ushort" ] alien-invoke ;
 
 : wsa-bind ( socket sockaddr len -- status )
     "int" "winsock" "bind" [ "void*" "sockaddr-in*" "int" ] alien-invoke ;

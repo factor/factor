@@ -77,14 +77,18 @@ SYMBOL: socket
 : listen-socket ( socket -- )
     20 wsa-listen 0 = [ handle-socket-error ] unless ;
 
-C: win32-client-stream ( buf stream -- stream )
-    [ set-win32-client-stream-delegate ] keep >r
-    buffer-ptr <alien> 0 32 32 
-    <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r 
-    <indirect-pointer> GetAcceptExSockaddrs r> r> drop
+: sockaddr>string ( sockaddr -- string )
     dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
-    [ , ":" , unparse , ] make-string
-    r> [ set-win32-client-stream-host ] keep ;
+    [ , ":" , unparse , ] make-string ;
+
+: extract-remote-host ( buffer -- host )
+    buffer-ptr <alien> 0 32 32 <indirect-pointer> <indirect-pointer> 
+                               <indirect-pointer> dup >r <indirect-pointer> 
+    GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr>string ;
+
+C: win32-client-stream ( buf stream -- stream )
+    [ set-win32-client-stream-delegate extract-remote-host ] keep
+    [ set-win32-client-stream-host ] keep ;
 
 M: win32-client-stream client-stream-host win32-client-stream-host ;
 

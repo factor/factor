@@ -156,8 +156,8 @@ global [ <namespace> "c-types" set ] bind
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
-    "box_cell" "boxer" set
-    "unbox_cell" "unboxer" set
+    "box_unsigned_2" "boxer" set
+    "unbox_unsigned_2" "unboxer" set
 ] "ushort" define-c-type
 
 [
@@ -172,8 +172,8 @@ global [ <namespace> "c-types" set ] bind
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
-    "box_cell" "boxer" set
-    "unbox_cell" "unboxer" set
+    "box_unsigned_1" "boxer" set
+    "unbox_unsigned_1" "unboxer" set
 ] "uchar" define-c-type
 
 [
