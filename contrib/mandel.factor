@@ -21,12 +21,15 @@ USE: stack
 USE: stdio
 USE: strings
 
-: mandel-step ( a z c -- c )
+: ?mandel-step ( a z c -- a z c ? )
     >r dupd sq + dup abs 2 < [
-        r> pred dup CHAR: \s > [ mandel-step ] [ nip nip ] ifte
+        r> pred dup CHAR: \s >
     ] [
-        2drop r>
+        r> f
     ] ifte ;
+
+: mandel-step ( a z c -- c )
+    [ ?mandel-step ] [ ] while nip nip ;
 
 : mandel-x ( x y -- )
     rect> dup CHAR: ~ mandel-step >char write ;
