@@ -254,33 +254,17 @@ USE: inspector
   ] ifte 
   [ write flush ] when* drop ;
 
-: post-request>alist ( post-request -- alist )
-  #! Return an alist containing name/value pairs from the
-  #! post data.
-  dup "&" swap str-contains? [
-    "&" split [ "=" split1 ] inject 
-  ] [
-    "=" split1 unit
-  ] ifte [ uncons >r url-decode r> url-decode cons ] inject ;
-
 : post-request>namespace ( post-request -- namespace )
   #! Return a namespace containing the name/value's from the 
   #! post data.
-  post-request>alist dup log alist>namespace ;
-
-: read-undecoded-post-request ( -- string )
-  #! Read the post request from the socket and return the post data
-  #! before it has been url decoded.
-  read-header content-length dup [
-    read#
-  ] when ;
+  dup log alist>namespace ;
 
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given
   #! id and calls it with the POST data as an alist on the top
   #! of the stack.
   [ 
-    read-undecoded-post-request dup log post-request>namespace swap resume-continuation 
+    "response" get dup log post-request>namespace swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 
