@@ -37,6 +37,7 @@ CELL allot(CELL a)
 	}
 	else if(active->here > active->alarm)
 	{
+		printf("GC\n");
 		/* Execute the 'garbage-collection' word */
 		cpush(env.cf);
 		env.cf = env.user[GC_ENV];

@@ -29,6 +29,8 @@ IN: cross-compiler
 USE: lists
 USE: namespaces
 USE: parser
+USE: prettyprint
+USE: stack
 
 : cross-compile-resource ( resource -- )
     <namespace> [

@@ -136,6 +136,6 @@ USE: strings
         [
             interpreter-loop
         ] [
-            default-error-handler suspend
+            [ default-error-handler suspend ] when*
         ] catch
     ] when ;

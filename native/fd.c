@@ -115,6 +115,7 @@ void primitive_write_fd_8(void)
 	switch(type)
 	{
 	case FIXNUM_TYPE:
+	case BIGNUM_TYPE:
 		write_fd_char_8(h,to_fixnum(text));
 		break;
 	case STRING_TYPE:

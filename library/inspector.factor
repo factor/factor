@@ -70,8 +70,11 @@ USE: vocabularies
 : describe-namespace ( namespace -- )
     [ vars-values ] bind describe-assoc ;
 
+: ?unparse ( obj -- str )
+    dup string? [ unparse ] unless ;
+
 : describe-hashtable ( hashtables -- )
-    hash>alist describe-assoc ;
+    hash>alist [ unswons ?unparse swons ] inject describe-assoc ;
 
 : describe ( obj -- )
     [

@@ -130,7 +130,7 @@ USE: words
 ! Eg : foo [ 5 | foo ] ;
 
 : fixup-word-later ( word -- )
-    image vector-length cons "word-fixups" cons@ ;
+    image vector-length cons "word-fixups" get vector-push ;
 
 : fixup-word ( where word -- )
     dup pooled-object dup [
@@ -140,7 +140,7 @@ USE: words
     ] ifte ;
 
 : fixup-words ( -- )
-    "word-fixups" get [ unswons fixup-word ] each ;
+    "word-fixups" get [ unswons fixup-word ] vector-each ;
 
 : 'word ( word -- pointer )
     dup pooled-object dup [
@@ -148,7 +148,7 @@ USE: words
     ] [
         drop
         ! Remember where we are, and add the reference later
-        fixup-word-later f
+        dup fixup-word-later
     ] ifte ;
 
 ( Conses )
@@ -318,6 +318,10 @@ IN: cross-compiler
         300000 <vector> "image" set
         521 <hashtable> "objects" set
         namespace-buckets <hashtable> "vocabularies" set
+        ! Note that this is a vector that we can side-effect,
+        ! since ; ends up using this variable from nested
+        ! parser namespaces.
+        1000 <vector> "word-fixups" set
         begin call end
         "image" get
     ] bind ;

@@ -31,7 +31,7 @@ typedef unsigned char BYTE;
 #define BYTES 1
 
 /* Memory heap size */
-#define DEFAULT_ARENA (4 * 1024 * 1024)
+#define DEFAULT_ARENA (128 * 1024 * 1024)
 #define STACK_SIZE 1024
 
 #include "error.h"
