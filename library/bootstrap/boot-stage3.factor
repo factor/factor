@@ -106,9 +106,9 @@ os "win32" = [
     "/library/win32/win32-io.factor"
     "/library/win32/win32-errors.factor"
     "/library/win32/winsock.factor"
-    "/library/io/win32-io-internals.factor"
-    "/library/io/win32-stream.factor"
-    "/library/io/win32-server.factor"
+    "/library/win32/win32-io-internals.factor"
+    "/library/win32/win32-stream.factor"
+    "/library/win32/win32-server.factor"
 ] pull-in
 
 os "unix" = [
