@@ -40,8 +40,6 @@ USE: stack
 : bignum? "java.math.BigInteger" is ; inline
 : >bignum "java.math.BigInteger" coerce ; inline
 
-: integer? dup fixnum? swap bignum? or ;
-
 : ratio? "factor.math.Ratio" is ; inline
 
 : numerator ( x/y -- x )
@@ -57,8 +55,6 @@ USE: stack
     ] [
         >number drop 1
     ] ifte ;
-
-: rational? dup integer? swap ratio? or ;
 
 : float? ( obj -- boolean )
     dup  "java.lang.Float"  is
@@ -94,5 +90,3 @@ USE: stack
     ] [
         >number 0
     ] ifte ;
-
-: real? dup number? swap complex? not and ;

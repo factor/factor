@@ -160,7 +160,8 @@ DEFER: '
 
 ( Strings )
 
-: pack ( n n -- ) 16 shift< bitor emit ;
+: pack ( n n -- )
+    "big-endian" get [ swap ] when 16 shift< bitor emit ;
 
 : pack-at ( n str -- )
     2dup str-nth rot succ rot str-nth pack ;

@@ -1,5 +1,15 @@
 #include "factor.h"
 
+INLINE BIGNUM* fixnum_to_bignum(CELL n)
+{
+	return bignum((BIGNUM_2)untag_fixnum_fast(n));
+}
+
+INLINE FIXNUM bignum_to_fixnum(CELL tagged)
+{
+	return (FIXNUM)(untag_bignum(tagged)->n);
+}
+
 #define BINARY_OP(OP) \
 void primitive_##OP(void) \
 { \
@@ -12,21 +22,21 @@ void primitive_##OP(void) \
 		switch(TAG(y)) \
 		{ \
 		case FIXNUM_TYPE: \
-			env.dt = OP##_fixnum(x,y); \
+			OP##_fixnum(x,y); \
 			break; \
 		case OBJECT_TYPE: \
 			switch(object_type(y)) \
 			{ \
 			case BIGNUM_TYPE: \
-				env.dt = OP##_bignum(fixnum_to_bignum(x),y); \
+				OP##_bignum(fixnum_to_bignum(x),y); \
 				break; \
 			default: \
-				type_error(y,FIXNUM_TYPE); \
+				type_error(FIXNUM_TYPE,y); \
 				break; \
 			} \
 			break; \
 		default: \
-			type_error(y,FIXNUM_TYPE); \
+			type_error(FIXNUM_TYPE,y); \
 			break; \
 		} \
 \
@@ -42,52 +52,46 @@ void primitive_##OP(void) \
 			switch(TAG(y)) \
 			{ \
 			case FIXNUM_TYPE: \
-				env.dt = OP##_bignum(x,fixnum_to_bignum(y)); \
+				OP##_bignum(x,fixnum_to_bignum(y)); \
 				break; \
 			case OBJECT_TYPE: \
 \
 				switch(object_type(y)) \
 				{ \
 				case BIGNUM_TYPE: \
-					env.dt = OP##_bignum(x,y); \
+					OP##_bignum(x,y); \
 					break; \
 				default: \
-					type_error(y,BIGNUM_TYPE); \
+					type_error(BIGNUM_TYPE,y); \
 					break; \
 				} \
 				break; \
 			default: \
-				type_error(y,BIGNUM_TYPE); \
+				type_error(BIGNUM_TYPE,y); \
 				break; \
 			} \
 			break; \
 \
 		default: \
 \
-			type_error(x,FIXNUM_TYPE); \
+			type_error(FIXNUM_TYPE,x); \
 			break; \
 		} \
 \
+		break; \
+\
 	default: \
 \
-		type_error(x,FIXNUM_TYPE); \
+		type_error(FIXNUM_TYPE,x); \
+		break; \
 	} \
 }
 
-/* ADDITION */
-INLINE CELL add_fixnum(CELL x, CELL y)
-{
-	CELL result = untag_fixnum_fast(x) + untag_fixnum_fast(y);
-	if(result & ~FIXNUM_MASK)
-		return tag_bignum(fixnum_to_bignum(result));
-	else
-		return tag_fixnum(result);
-}
-
-INLINE CELL add_bignum(CELL x, CELL y)
-{
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		+ ((BIGNUM*)UNTAG(y))->n));
-}
-
-BINARY_OP(add)
+void primitive_add(void);
+void primitive_subtract(void);
+void primitive_multiply(void);
+void primitive_divmod(void);
+void primitive_less(void);
+void primitive_lesseq(void);
+void primitive_greater(void);
+void primitive_greatereq(void);

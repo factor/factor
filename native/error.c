@@ -2,13 +2,13 @@
 
 void fatal_error(char* msg, CELL tagged)
 {
-	printf("Fatal error: %s %d\n",msg,tagged);
+	printf("Fatal error: %s %ld\n",msg,tagged);
 	exit(1);
 }
 
 void critical_error(char* msg, CELL tagged)
 {
-	printf("Critical error: %s %d\n",msg,tagged);
+	printf("Critical error: %s %ld\n",msg,tagged);
 	save_image("factor.crash.image");
 	exit(1);
 }

@@ -1,8 +1,10 @@
 + native:
 
+- gc when memory is tight
+- f >n: crashes
 - typecases: type error reporting bad
 - image output
-- 32-bit and 64-bit "bignums"
+- 64-bit "bignums"
 - floats
 - {...} vectors
 - parsing should be parsing
@@ -14,7 +16,6 @@
 - inspector: sort
 - index of str
 - accept: return socket, instead of printing msg
-- use div(3)
 
 + interactive:
 
@@ -32,7 +33,6 @@
 - back space then type: input style gone
 - fedit broken with listener
 - press enter in the middle of a line
-- print-numbered-list
 - new-listener shouldn't suspend continuation in current listener
 
 + compiler:

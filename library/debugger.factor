@@ -43,7 +43,7 @@ USE: unparser
 : parse-dump ( error -- )
     <%
     "parse-name" get [ "<interactive>" ] unless* % ":" %
-    "line-number" get [ 1 ] unless* fixnum>str % ": " %
+    "line-number" get [ 1 ] unless* unparse % ": " %
     %> write
     error.
     

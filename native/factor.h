@@ -19,11 +19,8 @@
 #define INLINE inline static
 
 /* CELL must be 32 bits and your system must have 32-bit pointers */
-typedef unsigned int CELL;
+typedef unsigned long int CELL;
 #define CELLS sizeof(CELL)
-
-#define CELL_MAX INT_MAX
-#define CELL_MIN INT_MIN
 
 /* must always be 16 bits */
 typedef unsigned short CHAR;
@@ -32,8 +29,6 @@ typedef unsigned short CHAR;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 #define BYTES 1
-
-typedef long long DCELL;
 
 /* Memory heap size */
 #define DEFAULT_ARENA (4 * 1024 * 1024)
@@ -47,7 +42,7 @@ typedef long long DCELL;
 #include "handle.h"
 #include "fixnum.h"
 #include "bignum.h"
-#include "math.h"
+#include "arithmetic.h"
 #include "string.h"
 #include "fd.h"
 #include "file.h"

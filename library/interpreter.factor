@@ -54,7 +54,7 @@ USE: vectors
     "history" get vector-push ;
 
 : print-numbered-entry ( index vector -- )
-    <% over fixnum>str % ": " % vector-nth % %> print ;
+    <% over unparse % ": " % vector-nth % %> print ;
 
 : print-numbered-vector ( list -- )
     dup vector-length [ over print-numbered-entry ] times* drop ;
@@ -77,7 +77,7 @@ USE: vectors
     "history" get vector-length ;
 
 : print-prompt ( -- )
-    <% "  ( " % history# fixnum>str % " ) " % %>
+    <% "  ( " % history# unparse % " ) " % %>
     [ "prompt" ] get-style
     [ write-attr ] bind
     flush ;

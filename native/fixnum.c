@@ -13,18 +13,6 @@ void primitive_fixnump(void)
 	env.dt = tag_boolean(TAG(env.dt) == FIXNUM_TYPE);
 }
 
-void primitive_subtract(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x - y;
-}
-
-void primitive_multiply(void)
-{
-	BINARY_OP(x,y);
-	env.dt = (x >> TAG_BITS) * y;
-}
-
 void primitive_divide(void)
 {
 	BINARY_OP(x,y);
@@ -36,16 +24,6 @@ void primitive_mod(void)
 {
 	BINARY_OP(x,y);
 	env.dt = x % y;
-}
-
-void primitive_divmod(void)
-{
-	div_t q;
-	BINARY_OP(x,y);
-	q = div(x,y);
-	/* division takes common factor of 8 out. */
-	dpush(tag_fixnum(q.quot));
-	env.dt = q.rem;
 }
 
 void primitive_and(void)
@@ -82,28 +60,4 @@ void primitive_shiftright(void)
 {
 	BINARY_OP(x,y);
 	env.dt = x << (y >> TAG_BITS);
-}
-
-void primitive_less(void)
-{
-	BINARY_OP(x,y);
-	env.dt = tag_boolean(x < y);
-}
-
-void primitive_lesseq(void)
-{
-	BINARY_OP(x,y);
-	env.dt = tag_boolean(x <= y);
-}
-
-void primitive_greater(void)
-{
-	BINARY_OP(x,y);
-	env.dt = tag_boolean(x > y);
-}
-
-void primitive_greatereq(void)
-{
-	BINARY_OP(x,y);
-	env.dt = tag_boolean(x >= y);
 }

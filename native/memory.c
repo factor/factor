@@ -27,10 +27,10 @@ CELL allot(CELL a)
 	if(active->here > active->limit)
 	{
 		printf("Out of memory\n");
-		printf("active->base  = %d\n",active->base);
-		printf("active->here  = %d\n",active->here);
-		printf("active->limit = %d\n",active->limit);
-		printf("request       = %d\n",a);
+		printf("active->base  = %ld\n",active->base);
+		printf("active->here  = %ld\n",active->here);
+		printf("active->limit = %ld\n",active->limit);
+		printf("request       = %ld\n",a);
 		exit(1);
 	}
 	return h;

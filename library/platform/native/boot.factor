@@ -105,7 +105,7 @@ primitives,
     all? clone-list clone-list-iter subset subset-iter
     subset-add car= cdr= cons= cons-hashcode
     tree-contains? =-or-contains? 
-    last* last inject
+    last* last inject integer?
 ] [ worddef worddef, ] each
 
 version,

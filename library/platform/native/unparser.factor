@@ -39,18 +39,18 @@ USE: strings
 USE: words
 USE: vocabularies
 
-: fixnum% ( num -- )
+: integer% ( num -- )
     "base" get /mod swap dup 0 > [
-        fixnum%
+        integer%
     ] [
         drop
     ] ifte >digit % ;
 
-: fixnum- ( num -- num )
+: integer- ( num -- num )
     dup 0 < [ "-" % neg ] when ;
 
-: fixnum>str ( num -- str )
-    <% fixnum- fixnum% %> ;
+: unparse-integer ( num -- str )
+    <% integer- integer% %> ;
 
 : unparse-str ( str -- str )
     #! Not done
@@ -61,10 +61,10 @@ USE: vocabularies
 
 : unparse ( obj -- str )
     [
-        [ t eq?   ] [ drop "t" ]
-        [ f eq?   ] [ drop "f" ]
-        [ word?   ] [ unparse-word ]
-        [ fixnum? ] [ fixnum>str ]
-        [ string? ] [ unparse-str ]
-        [ drop t  ] [ <% "#<" % class-of % ">" % %> ]
+        [ t eq?    ] [ drop "t" ]
+        [ f eq?    ] [ drop "f" ]
+        [ word?    ] [ unparse-word ]
+        [ integer? ] [ unparse-integer ]
+        [ string?  ] [ unparse-str ]
+        [ drop t   ] [ <% "#<" % class-of % ">" % %> ]
     ] cond ;

@@ -29,8 +29,6 @@ IN: unparser
 USE: kernel
 USE: strings
 
-: fixnum>str >str ; inline
-
 : unparse ( X -- "X" )
     [ "java.lang.Object" ] "factor.FactorReader" "unparseObject"
     jinvoke-static ;

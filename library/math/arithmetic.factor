@@ -31,6 +31,10 @@ USE: kernel
 USE: logic
 USE: stack
 
+: integer? dup fixnum? swap bignum? or ;
+: rational? dup integer? swap ratio? or ;
+: real? dup number? swap complex? not and ;
+
 : i #{ 0 1 } ; inline
 : -i #{ 0 -1 } ; inline
 : inf 1.0 0.0 / ; inline
