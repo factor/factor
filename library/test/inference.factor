@@ -23,7 +23,7 @@ USE: generic
 ] "effects" set
 
 [ { f 1 2 } { 1 2 3 } ] [
-    { 1 2 } { 1 2 3 } unify-lengths
+    { 1 2 } { 1 2 3 } unify-length
 ] unit-test
 
 [ [ sq ] ] [

@@ -38,6 +38,7 @@ USE: vectors
 USE: words
 USE: hashtables
 USE: parser
+USE: prettyprint
 
 : with-dataflow ( param op [ intypes outtypes ] quot -- )
     #! Take input parameters, execute quotation, take output
@@ -125,7 +126,7 @@ USE: parser
     ] [
         [
             swap save-effect get [
-                t "no-effect" set-word-property
+               (  t "no-effect" set-word-property ) drop
             ] [
                 drop
             ] ifte rethrow

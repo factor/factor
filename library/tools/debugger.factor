@@ -144,17 +144,6 @@ M: chained-error error. ( error -- )
         " " [ original-error get error. ] with-prefix
     ] bind ;
 
-TRAITS: multi-error
-
-C: multi-error ( list message -- )
-    [ original-error set multi-error set ] extend ;
-
-M: multi-error error. ( error -- )
-    [
-        original-error get error.
-        " " [ multi-error get [ . ] each ] with-prefix
-    ] bind ;
-
 M: object error. ( error -- )
     . ;
 

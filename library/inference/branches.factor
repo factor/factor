@@ -103,19 +103,36 @@ USE: prettyprint
 : unify-effects ( list -- )
     filter-terminators  dup datastack-effect callstack-effect ;
 
+SYMBOL: cloned
+
 : deep-clone ( vector -- vector )
+    #! Clone a vector if it hasn't already been cloned in this
+    #! with-deep-clone scope.
+    dup cloned get assoc dup [
+        nip
+    ] [
+        drop vector-clone [ dup cloned [ acons ] change ] keep
+    ] ifte ;
+
+: deep-clone-vector ( vector -- vector )
     #! Clone a vector of vectors.
-    [ vector-clone ] vector-map ;
+    [ ( deep-clone ) vector-clone ] vector-map ;
+
+: copy-inference ( -- )
+    #! We avoid cloning the same object more than once in order
+    #! to preserve identity structure.
+    cloned off
+    meta-r [ deep-clone-vector ] change
+    meta-d [ deep-clone-vector ] change
+    d-in [ deep-clone-vector ] change
+    dataflow-graph off ;
 
 : infer-branch ( value save-effect -- namespace )
     <namespace> [
         save-effect set
         uncons [ unswons [ \ value-class set ] bind ] when*
         dup value-recursion recursive-state set
-        meta-r [ deep-clone ] change
-        meta-d [ deep-clone ] change
-        d-in [ deep-clone ] change
-        dataflow-graph off
+        copy-inference
         literal-value infer-quot
         #values values-node
     ] extend ;
@@ -202,11 +219,11 @@ SYMBOL: dual-recursive-state
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap
-    peek-d literal? [
-        static-ifte
-    ] [
-        dynamic-ifte
-    ] ifte ;
+!    peek-d literal? [
+!        static-ifte
+!    ] [
+        dynamic-ifte ;
+!    ] ifte ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 

@@ -197,7 +197,8 @@ DEFER: apply-word
     #! Set the base case of the current word.
     dup [
         car cdr [
-            entry-effect get swap decompose base-case set
+            entry-effect get swap decompose
+            base-case set
         ] bind
     ] [
         2drop
