@@ -33,14 +33,7 @@ IN: words
 
 IN: kernel
 
-: inline ( -- )
-    #! Marks the most recently defined word to be inlined.
-    t word "factor.FactorWord" "inline" jvar-set ;
-
-: interpret-only ( -- )
-    #! Marks the most recently defined word as an interpret-only word;
-    #! attempting to compile it will raise an error.
-    t word "factor.FactorWord" "interpretOnly" jvar-set ;
+: inline ;
 
 : hashcode ( obj -- hashcode )
     #! If two objects are =, they must have equal hashcodes.
@@ -73,7 +66,6 @@ IN: kernel
 : toplevel ( -- )
     interpreter
     [ ] "factor.FactorInterpreter" "topLevel" jinvoke ;
-    interpret-only
 
 : exit* ( code -- )
     [ "int" ] "java.lang.System" "exit" jinvoke-static ;

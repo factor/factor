@@ -115,4 +115,3 @@ IN: kernel
 
 ! No compiler...
 : inline ;
-: interpret-only ;

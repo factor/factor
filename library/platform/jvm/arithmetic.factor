@@ -96,7 +96,7 @@ USE: stack
     "factor.FactorLib" "branch3" jinvoke-static ;
 
 : compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
-    >=< call ; inline interpret-only
+    >=< call ; inline
 
 : bitand ( x y -- x&y )
     #! Bitwise and.

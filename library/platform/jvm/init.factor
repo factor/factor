@@ -27,7 +27,6 @@
 
 IN: init
 USE: combinators
-USE: compiler
 USE: continuations
 USE: kernel
 USE: lists
@@ -64,17 +63,12 @@ USE: words
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
     t "user-init" set
-    t "compile"   set
 
     init-stdio
     init-environment
     init-search-path
     "args" get parse-command-line
     run-user-init
-
-    "compile" get [
-        compile-all
-    ] when
 
     t "startup-done" set
     

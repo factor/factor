@@ -93,11 +93,9 @@ USE: parser
 "/library/tools/listener.factor"           run-resource ! listener
 "/library/tools/inspector.factor"          run-resource ! inspector
 "/library/tools/word-tools.factor"         run-resource ! inspector
-"/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
 "/library/tools/debugger.factor"           run-resource ! debugger
 "/library/test/test.factor"                run-resource ! test
-"/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
 "/library/tools/telnetd.factor"            run-resource ! telnetd
 "/library/tools/inferior.factor"           run-resource ! inferior

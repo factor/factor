@@ -40,4 +40,4 @@ USE: stack
     unit
     restack
         call
-    unstack ; interpret-only
+    unstack ;

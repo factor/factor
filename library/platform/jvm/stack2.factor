@@ -34,13 +34,13 @@ USE: vectors
     interpreter "factor.FactorInterpreter" "datastack" jvar-get ;
 
 : datastack ( -- datastack )
-    datastack* clone ; interpret-only
+    datastack* clone ;
 
 : set-datastack* ( datastack -- ... )
     interpreter "factor.FactorInterpreter" "datastack" jvar-set ;
 
 : set-datastack ( datastack -- ... )
-    clone set-datastack* ; interpret-only
+    clone set-datastack* ;
 
 : callstack* ( -- callstack )
     interpreter "factor.FactorInterpreter" "callstack" jvar-get ;
@@ -57,13 +57,13 @@ USE: vectors
     ! word.
     [ clone ] call
     dup vector-pop drop
-    dup vector-pop drop ; interpret-only
+    dup vector-pop drop ;
 
 : set-callstack* ( callstack -- ... )
     interpreter "factor.FactorInterpreter" "callstack" jvar-set ;
 
 : set-callstack ( callstack -- ... )
-    clone set-callstack* ; interpret-only
+    clone set-callstack* ;
 
 : clear ( -- )
     #! Clear the datastack. For interactive use only; invoking

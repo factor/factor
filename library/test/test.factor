@@ -4,7 +4,6 @@
 
 IN: test
 USE: combinators
-USE: compiler
 USE: errors
 USE: kernel
 USE: lists

@@ -54,7 +54,7 @@ USE: stack
     [ ] "factor.FactorInterpreter" jnew ;
 
 : fork* ( current new -- thread )
-    dup <thread> >r clone-interpreter r> ; interpret-only
+    dup <thread> >r clone-interpreter r> ;
 
 : fork ( -- ? )
     #! Spawn a new thread. In the original thread, push f.
@@ -63,7 +63,7 @@ USE: stack
         drop t
     ] [
         start-thread f
-    ] ifte ; interpret-only
+    ] ifte ;
 
 : in-thread ( quot -- )
     #! Execute a quotation in a new thread.
@@ -71,4 +71,4 @@ USE: stack
         [ call ] [ default-error-handler toplevel ] catch
     ] [
         drop
-    ] ifte ; interpret-only
+    ] ifte ;

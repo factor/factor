@@ -87,7 +87,6 @@ USE: parser
 "/library/tools/listener.factor"           run-resource ! listener
 "/library/tools/inspector.factor"          run-resource ! inspector
 "/library/tools/word-tools.factor"         run-resource ! inspector
-"/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
 "/library/tools/debugger.factor"           run-resource ! debugger
 

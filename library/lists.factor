@@ -86,7 +86,7 @@ USE: vectors
         r> r> r> partition-iter
     ] [
         3drop
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : partition ( ref list combinator -- list1 list2 )
     #! Compare each element in a proper list against a
@@ -96,7 +96,7 @@ USE: vectors
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
     swap >r >r >r [ ] [ ] r> r> r> partition-iter ;
-    inline interpret-only
+    inline
 
 : sort ( list comparator -- sorted )
     #! Sort the elements in a proper list using a comparator.
@@ -113,7 +113,7 @@ USE: vectors
         cons append
     ] [
         drop
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : num-sort ( list -- sorted )
     #! Sorts the list into ascending numerical order.
@@ -147,13 +147,13 @@ DEFER: tree-contains?
     2dup contains? [ nip ] [ cons ] ifte ;
 
 : (each) ( list quot -- list quot )
-    >r uncons r> tuck 2slip ; inline interpret-only
+    >r uncons r> tuck 2slip ; inline
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( X -- ) to each element.
     over [ (each) each ] [ 2drop ] ifte ;
-    inline interpret-only
+    inline
 
 : reverse ( list -- list )
     [ ] swap [ swons ] each ;
@@ -163,7 +163,7 @@ DEFER: tree-contains?
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
     over [ (each) rot >r map r> swons ] [ drop ] ifte ;
-    inline interpret-only
+    inline
 
 : subset ( list quot -- list )
     #! Applies a quotation with effect ( X -- ? ) to each
@@ -175,7 +175,7 @@ DEFER: tree-contains?
         rot >r subset r> [ r> swons ] [ r> drop ] ifte
     ] [
         drop
-    ] ifte ; inline interpret-only
+    ] ifte ; inline
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
