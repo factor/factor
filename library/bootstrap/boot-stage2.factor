@@ -102,6 +102,7 @@ USE: stdio
     "/library/tools/heap-stats.factor"
     "/library/gensym.factor"
     "/library/tools/interpreter.factor"
+    "/library/inference/dataflow.factor"
     "/library/inference/inference.factor"
     "/library/inference/words.factor"
     "/library/inference/branches.factor"

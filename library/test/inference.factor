@@ -147,6 +147,10 @@ DEFER: foe
 
 [ [ 1 | 0 ] ] [ [ nested-when* ] infer ] unit-test
 
+SYMBOL: sym-test
+
+[ [ 0 | 1 ] ] [ [ sym-test ] infer ] unit-test
+
 [ [ 2 | 1 ] ] [ [ fie ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ foe ] infer ] unit-test
 

@@ -38,7 +38,7 @@ USE: stack
     #! pushed onto the stack.
     over vector-length [
         -rot 2dup >r >r >r vector-nth r> call r> r>
-    ] times* 2drop ;
+    ] times* 2drop ; inline
 
 : vector-map ( vector code -- vector )
     #! Applies code to each element of the vector, return a new
@@ -46,14 +46,14 @@ USE: stack
     #! ( obj -- obj ).
     over vector-length <vector> rot [
         swap >r apply r> tuck vector-push
-    ] vector-each nip ;
+    ] vector-each nip ; inline
 
 : vector-and ( vector -- ? )
     #! Logical and of all elements in the vector.
     t swap [ and ] vector-each ;
 
 : vector-all? ( vector pred -- ? )
-    vector-map vector-and ;
+    vector-map vector-and ; inline
 
 : vector-append ( v1 v2 -- )
     #! Destructively append v2 to v1.
@@ -65,7 +65,7 @@ USE: stack
     #! in a new vector.
     over <vector> rot [
         -rot 2dup >r >r slip vector-push r> r>
-    ] times* nip ;
+    ] times* nip ; inline
 
 : vector-zip ( v1 v2 -- v )
     #! Make a new vector with each pair of elements from the
@@ -81,4 +81,4 @@ USE: stack
     #! differ.
     -rot vector-zip [
         swap dup >r >r uncons r> call r> swap
-    ] vector-map nip ;
+    ] vector-map nip ; inline

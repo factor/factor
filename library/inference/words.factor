@@ -45,6 +45,7 @@ USE: hashtables
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
+    dup car pick dataflow-word,
     swap "infer" word-property dup [
         swap car ensure-d call
     ] [
@@ -69,17 +70,11 @@ USE: hashtables
 
 : apply-compound ( word -- )
     #! Infer a compound word's stack effect.
-    dup "inline-infer" word-property [
+    dup "inline" word-property [
         inline-compound
     ] [
-        [
-            dup dataflow,  infer-compound consume/produce
-        ] [
-            [
-                dup t "inline-infer" set-word-property
-                inline-compound
-            ] when
-        ] catch
+        dup infer-compound dup car rot dataflow-word,
+        consume/produce
     ] ifte ;
 
 : current-word ( -- word )
@@ -112,18 +107,25 @@ USE: hashtables
         check-recursion recursive-word
     ] [
         drop dup "infer-effect" word-property dup [
-            over dataflow,
             apply-effect
         ] [
-            drop dup compound? [ apply-compound ] [ no-effect ] ifte
+            drop
+            [
+                [ compound? ] [ apply-compound ]
+                [ symbol?   ] [ apply-literal  ]
+                [ drop t    ] [ no-effect      ]
+            ] cond
         ] ifte
     ] ifte ;
 
 : infer-call ( [ rstate | quot ] -- )
+    1 \ drop dataflow-word,
     [
+        dataflow-graph off
         pop-d uncons recursive-state set (infer)
-        d-in get meta-d get
-    ] with-scope  meta-d set d-in set ;
+        d-in get meta-d get get-dataflow
+    ] with-scope
+    [ dataflow-graph cons@ ] each meta-d set d-in set ;
 
 \ call [ infer-call ] "infer" set-word-property
 

@@ -55,13 +55,6 @@ SYMBOL: recursive-state
 SYMBOL: base-case
 SYMBOL: entry-effect
 
-! We build a dataflow graph for the compiler.
-SYMBOL: dataflow-graph
-
-: dataflow, ( obj -- )
-    #! Add a node to the dataflow IR.
-    dataflow-graph cons@ ;
-
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
 
@@ -115,21 +108,14 @@ SYMBOL: dataflow-graph
 
 DEFER: apply-word
 
+: apply-literal ( obj -- )
+    #! Literals are annotated with the current recursive
+    #! state.
+    dup dataflow-literal,  recursive-state get cons push-d ;
+
 : apply-object ( obj -- )
     #! Apply the object's stack effect to the inferencer state.
-    #! There are three options: recursive-infer words always
-    #! cause a recursive call of the inferencer, regardless.
-    #! Be careful, you might hang the inferencer. Other words
-    #! solve a fixed-point equation if a recursive call is made,
-    #! otherwise the inferencer is invoked recursively if its
-    #! not a recursive call.
-    dup word? [
-        apply-word
-    ] [
-        #! Literals are annotated with the current recursive
-        #! state.
-        dup dataflow,  recursive-state get cons push-d
-    ] ifte ;
+    dup word? [ apply-word ] [ apply-literal ] ifte ;
 
 : (infer) ( quot -- )
     #! Recursive calls to this word are made for nested
@@ -158,10 +144,11 @@ DEFER: apply-word
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
-    [
-        f init-inference (infer)  effect
-        ( dataflow-graph get USE: prettyprint . )
-    ] with-scope ;
+    [ f init-inference (infer)  effect ] with-scope ;
+
+: dataflow ( quot -- dataflow )
+    #! Data flow of a quotation.
+    [ f init-inference (infer)  get-dataflow ] with-scope ;
 
 : try-infer ( quot -- effect/f )
     #! Push f if inference fails.

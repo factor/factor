@@ -42,13 +42,16 @@ USE: hashtables
 
 DEFER: (infer)
 
-: (effect) ( -- [ in | stack ] )
-    d-in get  meta-d get cons ;
-
-: infer-branch ( quot -- [ in-d | datastack ] )
+: infer-branch ( quot -- [ in-d | datastack ] dataflow )
     #! Infer the quotation's effect, restoring the meta
     #! interpreter state afterwards.
-    [ copy-interpreter (infer) (effect) ] with-scope ;
+    [
+        copy-interpreter
+        dataflow-graph off
+        (infer)
+        d-in get meta-d get cons
+        get-dataflow
+    ] with-scope ;
 
 : difference ( [ in | stack ] -- diff )
     #! Stack height difference of infer-branch return value.
@@ -87,23 +90,28 @@ DEFER: (infer)
         "Unbalanced branches" throw
     ] ifte ;
 
-: recursive-branch ( quot -- )
-    #! Set base case if inference didn't fail
+: recursive-branch ( quot -- ? )
+    #! Set base case if inference didn't fail.
     [
-        car infer-branch recursive-state get set-base
+        car infer-branch drop  recursive-state get set-base t
     ] [
-        [ drop ] when
+        [ drop f ] when
     ] catch ;
 
-: infer-branches ( brachlist -- )
+: infer-branches ( consume instruction brachlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    dup [ recursive-branch ] each
-    [ car infer-branch ] map unify ;
+    f over [ recursive-branch or ] each [
+        [ [ car infer-branch , ] map ] make-list swap
+        >r dataflow, r> unify
+    ] [
+        "Foo!" throw
+    ] ifte ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
+    3 IFTE
     pop-d pop-d 2list
     pop-d drop ( condition )
     infer-branches ;
@@ -118,12 +126,14 @@ DEFER: (infer)
 
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.
+    2 GENERIC
     pop-d vtable>list
     peek-d drop ( dispatch )
     infer-branches ;
 
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
+    3 2GENERIC
     pop-d vtable>list
     peek-d drop ( dispatch )
     peek-d drop ( dispatch )

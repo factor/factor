@@ -72,7 +72,7 @@ DEFER: vector-map
 
 : ?vector= ( n vec vec -- ? )
     #! Reached end?
-    drop vector-length = ;
+    drop vector-length number= ;
 
 : (vector=) ( n vec vec -- ? )
     3dup ?vector= [

@@ -38,12 +38,12 @@ USE: stack
     #! Call a quotation. The quotation can call , to prepend
     #! objects to the list that is returned when the quotation
     #! is done.
-    make-list cat ;
+    make-list cat ; inline
 
 : make-rstring ( quot -- string )
     #! Return a string whose entries are in the same order that ,
     #! was called.
-    make-rlist cat ;
+    make-rlist cat ; inline
 
 : fill ( count char -- string )
     #! Push a string that consists of the same character
@@ -56,7 +56,7 @@ USE: stack
     #! The quotation must have stack effect ( X -- X ).
     over str-length <sbuf> rot [
         swap >r apply r> tuck sbuf-append
-    ] str-each nip sbuf>str ;
+    ] str-each nip sbuf>str ; inline
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [

@@ -42,16 +42,16 @@ USE: stack
 : keep ( a quot -- a )
     #! Execute the quotation with a on the stack, and restore a
     #! after the quotation returns.
-    over >r call r> ;
+    over >r call r> ; inline
 
 : 2keep ( a b quot -- a b )
     #! Execute the quotation with a and b on the stack, and
     #! restore a and b after the quotation returns.
-    over >r pick >r call r> r> ;
+    over >r pick >r call r> r> ; inline
 
 : apply ( code input -- code output )
     #! Apply code to input.
-    swap dup >r call r> swap ;
+    swap dup >r call r> swap ; inline
 
 : cond ( x list -- )
     #! The list is of this form:
@@ -86,8 +86,7 @@ USE: stack
     #! If the condition is not f, execute the 'true' quotation,
     #! with the condition on the stack. Otherwise, pop the
     #! condition and execute the 'false' quotation.
-    pick [ drop call ] [ nip nip call ] ifte ;
-    inline
+    pick [ drop call ] [ nip nip call ] ifte ; inline
 
 : unless ( cond quot -- )
     #! Execute a quotation only when the condition is f. The

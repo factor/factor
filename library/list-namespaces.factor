@@ -59,11 +59,12 @@ USE: stack
     #! objects to the list that is returned when the quotation
     #! is done.
     [ "list-buffer" off call "list-buffer" get ] with-scope ;
+    inline
 
 : make-list ( quot -- list )
     #! Return a list whose entries are in the same order that ,
     #! was called.
-    make-rlist reverse ;
+    make-rlist reverse ; inline
 
 : , ( obj -- )
     #! Append an object to the currently constructing list.

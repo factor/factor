@@ -143,7 +143,7 @@ USE: stack
     #! pushed onto the stack.
     over str-length [
         -rot 2dup >r >r >r str-nth r> call r> r>
-    ] times* 2drop ;
+    ] times* 2drop ; inline
 
 : str-sort ( list -- sorted )
     #! Sorts the list into ascending lexicographical string

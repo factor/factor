@@ -25,6 +25,7 @@
 
 + listener/plugin:
 
+- console: wrong history
 - listener: if too many things popped off the stack, complain
 - gracefully handle non-working cfactor
 - NPE in ErrorHighlight

@@ -76,7 +76,7 @@ USE: vectors
     dup cons? [ tail ] when not ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    rot [ swapd cons ] [ >r cons r> ] ifte ; inline
+    rot [ swapd cons ] [ >r cons r> ] ifte ;
 
 : partition-step ( ref list combinator -- ref cdr combinator car ? )
     pick pick car pick call >r >r unswons r> swap r> ; inline
@@ -141,8 +141,7 @@ DEFER: tree-contains?
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( X -- ) to each element.
-    over [ (each) each ] [ 2drop ] ifte ;
-    inline
+    over [ (each) each ] [ 2drop ] ifte ; inline
 
 : reverse ( list -- list )
     [ ] swap [ swons ] each ;
@@ -151,8 +150,7 @@ DEFER: tree-contains?
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
-    over [ (each) rot >r map r> swons ] [ drop ] ifte ;
-    inline
+    over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
 
 : subset ( list quot -- list )
     #! Applies a quotation with effect ( X -- ? ) to each
