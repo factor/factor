@@ -57,7 +57,13 @@ IN: words USING: hashtables kernel lists namespaces strings ;
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup (search) [ nip ] [ (create) dup reveal ] ?ifte ;
+    2dup (search) [
+        nip
+        dup f "documentation" set-word-property
+        dup f "stack-effect" set-word-property
+    ] [
+        (create) dup reveal
+    ] ?ifte ;
 
 : forget ( word -- )
     #! Remove a word definition.

@@ -1,5 +1,5 @@
 IN: scratchpad
-USING: generic kernel test math ;
+USING: generic kernel test math parser ;
 
 TUPLE: rect x y w h ;
 C: rect
@@ -20,7 +20,9 @@ M: object delegation-test drop 3 ;
 TUPLE: quux-tuple ;
 C: quux-tuple ;
 M: quux-tuple delegation-test drop 4 ;
-WRAPPER: quuux-tuple
+TUPLE: quuux-tuple delegate ;
+C: quuux-tuple
+    [ set-quuux-tuple-delegate ] keep ;
 
 [ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test
 
@@ -28,6 +30,24 @@ GENERIC: delegation-test-2
 TUPLE: quux-tuple-2 ;
 C: quux-tuple-2 ;
 M: quux-tuple-2 delegation-test-2 drop 4 ;
-WRAPPER: quuux-tuple-2
+TUPLE: quuux-tuple-2 delegate ;
+C: quuux-tuple-2
+    [ set-quuux-tuple-2-delegate ] keep ;
 
 [ 4 ] [ <quux-tuple-2> <quuux-tuple-2> delegation-test-2 ] unit-test
+
+! Make sure we handle changing shapes!
+
+[
+    100
+] [
+    TUPLE: point x y ;
+    C: point [ set-point-y ] keep [ set-point-x ] keep ;
+    
+    100 200 <point>
+    
+    ! Use eval to sequence parsing explicitly
+    "TUPLE: point y x ;" eval
+    
+    point-x
+] unit-test

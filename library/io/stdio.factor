@@ -29,7 +29,9 @@ SYMBOL: stdio
         call stdio get stream>str
     ] with-stream ;
 
-WRAPPER: stdio-stream
+TUPLE: stdio-stream delegate ;
+C: stdio-stream ( delegate -- stream )
+    [ set-stdio-stream-delegate ] keep ;
 
 M: stdio-stream fauto-flush ( -- )
     stdio-stream-delegate fflush ;

@@ -1,39 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
-USE: words
-USE: unparser
+USING: errors kernel lists math namespaces strings words
+unparser ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed
@@ -137,13 +106,17 @@ global [ string-mode off ] bind
     #! the parser is already line-tokenized.
     (until-eol) (until) ;
 
-: CREATE ( -- word )
-    scan "in" get create dup set-word
-    dup f "documentation" set-word-property
-    dup f "stack-effect" set-word-property
+: save-location ( word -- )
+    #! Remember where this word was defined.
+    dup set-word
     dup "line-number" get "line" set-word-property
-    dup "col"         get "col"  set-word-property
-    dup "file"        get "file" set-word-property ;
+    dup "col" get "col"  set-word-property
+    "file" get "file" set-word-property ;
+
+: create-in "in" get create ;
+
+: CREATE ( -- word )
+    scan create-in dup save-location ;
 
 : escape ( ch -- esc )
     [

@@ -29,15 +29,27 @@ kernel-internals math hashtables errors vectors ;
     over >r [ single-combination ] \ GENERIC: r> define-generic
     define-method ;
 
-: define-accessor ( word name n -- )
-    >r [ >r dup word-name , "-" , r> , ] make-string
-    "in" get create  r> [ slot ] cons define-tuple-generic ;
+: accessor-word ( name tuple -- word )
+    [ word-name , "-" , , ] make-string
+    create-in ;
 
-: define-mutator ( word name n -- )
-    >r [ "set-" , >r dup word-name , "-" , r> , ] make-string
-    "in" get create  r> [ set-slot ] cons define-tuple-generic ;
+: define-accessor ( tuple name n -- accessor )
+    #! Generic word with a method specializing on the tuple's
+    #! class that reads the right slot.
+    >r over accessor-word  r> [ slot ] cons
+    define-tuple-generic ;
 
-: define-field ( word name n -- )
+: mutator-word ( name tuple -- word )
+    [ "set-" , word-name , "-" , , ] make-string
+    create-in ;
+
+: define-mutator ( word name n -- mutator )
+    #! Generic word with a method specializing on the tuple's
+    #! class that writes to the right slot.
+    >r over mutator-word  r> [ set-slot ] cons
+    define-tuple-generic ;
+
+: define-slot ( word name n -- )
     over "delegate" = [
         pick over "delegate-field" set-word-property
     ] when
@@ -50,42 +62,53 @@ kernel-internals math hashtables errors vectors ;
     [ swap dup tuple? [ class eq? ] [ 2drop f ] ifte ] cons
     define-compound ;
 
-: define-tuple ( word fields -- )
-    2dup length 1 + "tuple-size" set-word-property
-    dup length [ 3 + ] project zip
-    [ uncons define-field ] each-with ;
-
 : begin-tuple ( word -- )
     dup intern-symbol
     dup tuple-predicate
     dup define-promise
     tuple "metaclass" set-word-property ;
 
+: check-shape ( word slots -- )
+    #! If the new list of slots is different from the previous,
+    #! forget the old definition.
+    >r "use" get search dup [
+        dup "slots" word-property r> = [
+            drop
+        ] [
+            forget
+        ] ifte
+    ] [
+        r> 2drop
+    ] ifte ;
+
+: define-slots ( tuple slots -- )
+    2dup "slots" set-word-property
+    2dup length 1 + "tuple-size" set-word-property
+    dup length [ 3 + ] project zip
+    [ uncons define-slot ] each-with ;
+
+: define-tuple ( tuple slots -- )
+    2dup check-shape
+    >r
+    create-in dup save-location
+    dup begin-tuple
+    r>
+    define-slots ;
+
 : TUPLE:
-    #! Followed by a tuple name, then field names, then ;
-    CREATE dup begin-tuple
+    #! Followed by a tuple name, then slot names, then ;
+    scan
     string-mode on
     [ string-mode off define-tuple ]
     f ; parsing
 
 : constructor-word ( word -- word )
-    word-name "<" swap ">" cat3 "in" get create ;
+    word-name "<" swap ">" cat3 create-in ;
 
 : tuple-constructor ( word def -- )
     over constructor-word >r
     [ swap literal, \ make-tuple , append, ] make-list
     r> swap define-compound ;
-
-: wrapper-constructor ( word -- quot )
-    "delegate-field" word-property [ set-slot ] cons
-    [ keep ] cons ;
-
-: WRAPPER:
-    #! A wrapper is a tuple whose only slot is a delegate slot.
-    CREATE dup begin-tuple
-    dup [ "delegate" ] define-tuple
-    dup wrapper-constructor
-    tuple-constructor ; parsing
 
 : C:
     #! Followed by a tuple name, then constructor code, then ;

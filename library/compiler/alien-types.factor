@@ -53,13 +53,13 @@ namespaces parser strings words ;
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the
     #! current 'in' vocabulary.
-    "in" get create >r
+    create-in >r
     [ "getter" get ] bind cons r> swap define-compound ;
 
 : define-setter ( offset type name -- )
     #! Define a word with stack effect ( obj alien -- ) in the
     #! current 'in' vocabulary.
-    "set-" swap cat2 "in" get create >r
+    "set-" swap cat2 create-in >r
     [ "setter" get ] bind cons r> swap define-compound ;
 
 : define-field ( offset type name -- offset )
@@ -78,7 +78,7 @@ namespaces parser strings words ;
     #! Used for C functions that expect you to pass in a struct.
     [ <local-alien> ] cons
     [ "<" , "struct-name" get , ">" , ] make-string
-    "in" get create swap
+    create-in swap
     define-compound ;
 
 : define-struct-type ( width -- )

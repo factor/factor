@@ -48,7 +48,9 @@ presentation generic ;
 : ansi-attr-string ( string style -- string )
     [ ansi-attrs , reset , ] make-string ;
 
-WRAPPER: ansi-stream
+TUPLE: ansi-stream delegate ;
+C: ansi-stream ( delegate -- stream )
+    [ set-ansi-stream-delegate ] keep ;
 
 M: ansi-stream fwrite-attr ( string style stream -- )
     >r [ default-style ] unless* ansi-attr-string r>
