@@ -38,6 +38,7 @@
 - FactorLib.equal() not very good
 - do nset-nth, nremove-nth, nsubstitute, ninject
 - IN: format base: work with all types of numbers
+- investigate mandel.factor
 
 + listener/plugin:
 

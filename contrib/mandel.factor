@@ -13,7 +13,6 @@
 !                (princ (code-char c))))
 !        (format t "~%"))
 
-USE: arithmetic
 USE: combinators
 USE: math
 USE: prettyprint
@@ -28,14 +27,14 @@ USE: strings
         r> f
     ] ifte ;
 
-: mandel-step ( a z c -- c )
-    [ ?mandel-step ] [ ] while nip nip ;
+: mandel-step ( a z c -- )
+    [ ?mandel-step ] [ ] while >char write 2drop ;
 
 : mandel-x ( x y -- )
-    rect> dup CHAR: ~ mandel-step >char write ;
+    rect> dup CHAR: ~ mandel-step ;
 
 : mandel-y ( y -- )
-    75 [ dupd 25 / 2 - swap mandel-x ] times* drop terpri ;
+    75 [ dupd 25 / 2 - >float swap mandel-x ] times* drop ;
 
 : mandel ( -- )
-    21 [ 10 / 1 - mandel-y ] times* ;
+    21 [ 10 / 1 - >float mandel-y terpri ] times* ;
