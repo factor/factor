@@ -2,21 +2,21 @@
 
 void reset_datastack(void)
 {
-	env.ds = env.ds_bot;
+	ds = ds_bot;
 }
 
 void reset_callstack(void)
 {
-	env.cs = env.cs_bot;
+	cs = cs_bot;
 }
 
 void init_stacks(void)
 {
-	env.ds_bot = (CELL)alloc_guarded(STACK_SIZE);
+	ds_bot = (CELL)alloc_guarded(STACK_SIZE);
 	reset_datastack();
-	env.cs_bot = (CELL)alloc_guarded(STACK_SIZE);
+	cs_bot = (CELL)alloc_guarded(STACK_SIZE);
 	reset_callstack();
-	env.cf = env.boot;
+	callframe = userenv[BOOT_ENV];
 }
 
 void primitive_drop(void)
@@ -32,44 +32,44 @@ void primitive_dup(void)
 void primitive_swap(void)
 {
 	CELL top = dpeek();
-	CELL next = get(env.ds - CELLS * 2);
-	put(env.ds - CELLS,next);
-	put(env.ds - CELLS * 2,top);
+	CELL next = get(ds - CELLS * 2);
+	put(ds - CELLS,next);
+	put(ds - CELLS * 2,top);
 }
 
 void primitive_over(void)
 {
-	dpush(get(env.ds - CELLS * 2));
+	dpush(get(ds - CELLS * 2));
 }
 
 void primitive_pick(void)
 {
-	dpush(get(env.ds - CELLS * 3));
+	dpush(get(ds - CELLS * 3));
 }
 
 void primitive_nip(void)
 {
 	CELL top = dpop();
-	put(env.ds - CELLS,top);
+	put(ds - CELLS,top);
 }
 
 void primitive_tuck(void)
 {
 	CELL top = dpeek();
-	CELL next = get(env.ds - CELLS * 2);
-	put(env.ds - CELLS * 2,top);
-	put(env.ds - CELLS,next);
+	CELL next = get(ds - CELLS * 2);
+	put(ds - CELLS * 2,top);
+	put(ds - CELLS,next);
 	dpush(top);
 }
 
 void primitive_rot(void)
 {
 	CELL top = dpeek();
-	CELL next = get(env.ds - CELLS * 2);
-	CELL next_next = get(env.ds - CELLS * 3);
-	put(env.ds - CELLS * 3,next);
-	put(env.ds - CELLS * 2,top);
-	put(env.ds - CELLS,next_next);
+	CELL next = get(ds - CELLS * 2);
+	CELL next_next = get(ds - CELLS * 3);
+	put(ds - CELLS * 3,next);
+	put(ds - CELLS * 2,top);
+	put(ds - CELLS,next_next);
 }
 
 void primitive_to_r(void)
@@ -94,12 +94,12 @@ VECTOR* stack_to_vector(CELL bottom, CELL top)
 
 void primitive_datastack(void)
 {
-	dpush(tag_object(stack_to_vector(env.ds_bot,env.ds)));
+	dpush(tag_object(stack_to_vector(ds_bot,ds)));
 }
 
 void primitive_callstack(void)
 {
-	dpush(tag_object(stack_to_vector(env.cs_bot,env.cs)));
+	dpush(tag_object(stack_to_vector(cs_bot,cs)));
 }
 
 /* Returns top of stack */
@@ -113,10 +113,10 @@ CELL vector_to_stack(VECTOR* vector, CELL bottom)
 
 void primitive_set_datastack(void)
 {
-	env.ds = vector_to_stack(untag_vector(dpop()),env.ds_bot);
+	ds = vector_to_stack(untag_vector(dpop()),ds_bot);
 }
 
 void primitive_set_callstack(void)
 {
-	env.cs = vector_to_stack(untag_vector(dpop()),env.cs_bot);
+	cs = vector_to_stack(untag_vector(dpop()),cs_bot);
 }

@@ -34,7 +34,7 @@ USE: lists
 USE: stack
 
 : <regex> ( pattern -- regex )
-    ! Compile the regex, if its not already compiled.
+    #! Compile the regex, if its not already compiled.
     dup "java.util.regex.Pattern" is not [
         [ "java.lang.String" ]
         "java.util.regex.Pattern" "compile"
@@ -54,10 +54,10 @@ USE: stack
     <regex> <matcher> re-matches* ;
 
 : [re-matches] ( matcher code -- boolean )
-    ! If the matcher's re-matches* function returns true,
-    ! evaluate the code with the matcher at the top of the
-    ! stack. Otherwise, pop the matcher off the stack and
-    ! push f.
+    #! If the matcher's re-matches* function returns true,
+    #! evaluate the code with the matcher at the top of the
+    #! stack. Otherwise, pop the matcher off the stack and
+    #! push f.
     [ dup re-matches* ] dip [ drop f ] ifte ;
 
 : re-replace* ( replace matcher -- string )
@@ -65,8 +65,8 @@ USE: stack
     "replaceAll" jinvoke ;
 
 : re-replace ( input regex replace -- string )
-    ! Replaces all occurrences of the regex in the input string
-    ! with the replace string.
+    #! Replaces all occurrences of the regex in the input string
+    #! with the replace string.
     -rot <regex> <matcher> re-replace* ;
 
 : re-split ( string split -- list )
@@ -95,23 +95,3 @@ USE: stack
 
 : group1 ( string regex -- string )
     groups dup [ car ] when ;
-
-: groups/t ( string re -- groups )
-    dup t = [
-        nip
-    ] [
-        groups
-    ] ifte ;
-
-: re-cond ( string alist -- )
-    dup [
-        unswons [ over ] dip ( string tail string head )
-        uncons [ groups/t ] dip ( string tail groups code )
-        over [
-            2nip call
-        ] [
-            2drop re-cond
-        ] ifte
-    ] [
-        2drop
-    ] ifte ;

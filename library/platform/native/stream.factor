@@ -36,7 +36,6 @@ USE: stack
 USE: stdio
 USE: strings
 USE: namespaces
-USE: unparser
 
 : <fd-stream> ( in out -- stream )
     #! Create a file descriptor stream object, wrapping a pair
@@ -77,28 +76,6 @@ USE: unparser
 
 : <filebw> ( path -- stream )
     <filecw> ;
-
-: <server> ( port -- stream )
-    #! Starts listening on localhost:port. Returns a stream that
-    #! you can close with fclose, and accept connections from
-    #! with accept. No other stream operations are supported.
-    server-socket <stream> [
-        "socket" set
-
-        ( -- )
-        [ "socket" get close-fd ] "fclose" set
-    ] extend ;
-
-: <client-stream> ( host port in out -- stream )
-    <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;
-
-: <client> ( host port -- stream )
-    #! fflush yields until connection is established.
-    2dup client-socket <client-stream> dup fflush ;
-
-: accept ( server -- client )
-    #! Accept a connection from a server socket.
-    "socket" swap get* blocking-accept <client-stream> ;
 
 : init-stdio ( -- )
     stdin stdout <fd-stream> <stdio-stream> "stdio" set ;

@@ -32,6 +32,6 @@ USE: parser
 : cross-compile-resource ( resource -- )
     [
         ! Change behavior of ;
-        "cross-compiling" on
+        [ compound, ] ";-hook" set
         run-resource
     ] with-scope ;

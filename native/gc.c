@@ -123,17 +123,16 @@ void collect_roots(void)
 	gc_debug("f",F);
 	copy_object(&T);
 	gc_debug("t",T);
-	copy_object(&env.cf);
-	copy_object(&env.boot);
+	copy_object(&callframe);
 
-	for(ptr = env.ds_bot; ptr < env.ds; ptr += CELLS)
+	for(ptr = ds_bot; ptr < ds; ptr += CELLS)
 		copy_object((void*)ptr);
 
-	for(ptr = env.cs_bot; ptr < env.cs; ptr += CELLS)
+	for(ptr = cs_bot; ptr < cs; ptr += CELLS)
 		copy_object((void*)ptr);
 
 	for(i = 0; i < USER_ENV; i++)
-		copy_object(&env.user[i]);
+		copy_object(&userenv[i]);
 }
 
 void primitive_gc(void)

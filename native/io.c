@@ -14,8 +14,8 @@ void init_io_tasks(fd_set* fdset, IO_TASK* io_tasks)
 
 void init_io(void)
 {
-	env.user[STDIN_ENV]  = tag_object(port(PORT_READ,0));
-	env.user[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
+	userenv[STDIN_ENV]  = tag_object(port(PORT_READ,0));
+	userenv[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
 	
 	read_fd_count = 0;
 	init_io_tasks(&read_fd_set,read_io_tasks);

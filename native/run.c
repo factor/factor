@@ -21,7 +21,7 @@ void clear_environment(void)
 {
 	int i;
 	for(i = 0; i < USER_ENV; i++)
-		env.user[i] = 0;
+		userenv[i] = 0;
 }
 
 #define EXECUTE(w) ((XT)(w->xt))()
@@ -35,20 +35,20 @@ void run(void)
 	
 	for(;;)
 	{
-		if(env.cf == F)
+		if(callframe == F)
 		{
-			env.cf = cpop();
+			callframe = cpop();
 			continue;
 		}
 
-		env.cf = (CELL)untag_cons(env.cf);
-		next = get(env.cf);
-		env.cf = get(env.cf + CELLS);
+		callframe = (CELL)untag_cons(callframe);
+		next = get(callframe);
+		callframe = get(callframe + CELLS);
 
 		if(TAG(next) == WORD_TYPE)
 		{
-			env.w = (WORD*)UNTAG(next);
-			EXECUTE(env.w);
+			executing = (WORD*)UNTAG(next);
+			EXECUTE(executing);
 		}
 		else
 			dpush(next);
@@ -58,33 +58,33 @@ void run(void)
 /* XT of deferred words */
 void undefined()
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_word(env.w));
+	general_error(ERROR_UNDEFINED_WORD,tag_word(executing));
 }
 
 /* XT of compound definitions */
 void call()
 {
 	/* tail call optimization */
-	if(env.cf != F)
-		cpush(env.cf);
+	if(callframe != F)
+		cpush(callframe);
 	/* the parameter is the colon def */
-	env.cf = env.w->parameter;
+	callframe = executing->parameter;
 }
 
 
 void primitive_execute(void)
 {
 	WORD* word = untag_word(dpop());
-	env.w = word;
-	EXECUTE(env.w);
+	executing = word;
+	EXECUTE(executing);
 }
 
 void primitive_call(void)
 {
 	CELL calling = dpop();
-	if(env.cf != F)
-		cpush(env.cf);
-	env.cf = calling;
+	if(callframe != F)
+		cpush(callframe);
+	callframe = calling;
 }
 
 void primitive_ifte(void)
@@ -93,9 +93,9 @@ void primitive_ifte(void)
 	CELL t = dpop();
 	CELL cond = dpop();
 	CELL calling = (untag_boolean(cond) ? t : f);
-	if(env.cf != F)
-		cpush(env.cf);
-	env.cf = calling;
+	if(callframe != F)
+		cpush(callframe);
+	callframe = calling;
 }
 
 void primitive_getenv(void)
@@ -103,7 +103,7 @@ void primitive_getenv(void)
 	FIXNUM e = to_fixnum(dpeek());
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
-	drepl(env.user[e]);
+	drepl(userenv[e]);
 }
 
 void primitive_setenv(void)
@@ -112,5 +112,5 @@ void primitive_setenv(void)
 	CELL value = dpop();
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
-	env.user[e] = value;
+	userenv[e] = value;
 }

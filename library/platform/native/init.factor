@@ -26,58 +26,32 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: ansi
-USE: arithmetic
-USE: errors
 USE: combinators
-USE: hashtables
-USE: httpd-responder
+USE: errors
 USE: kernel
-USE: lists
-USE: logic
-USE: interpreter
-USE: io-internals
-USE: math
-USE: random
 USE: namespaces
 USE: parser
-USE: prettyprint
-USE: stack
 USE: stdio
 USE: streams
-USE: strings
-USE: styles
-USE: vectors
 USE: words
-USE: unparser
 
 : init-gc ( -- )
     [ garbage-collection ] 7 setenv ;
 
 : boot ( -- )
+    #! Initialize an interpreter with the basic services.
     init-gc
-    init-random
     init-namespaces
     init-stdio
-    "stdio" get <ansi-stream> "stdio" set
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    "HOME" os-env [ "." ] unless* "~" set
-    "/" "/" set
-    10 "base" set
-
     init-errors
-    init-search-path
-    init-scratchpad
-    init-styles
-    init-vocab-styles
-    default-responders
-    
-    run-user-init
-    
-    "interactive" get [ init-interpreter ] when
-    
-    0 exit* ;
+    "HOME" os-env [ "." ] unless* "~" set
+    10 "base" set
+    "/" "/" set
+    init-search-path ;
+
+: cold-boot ( -- )
+    #! An initially-generated image has this as the boot
+    #! quotation.
+    boot
+    "/library/platform/native/boot-stage2.factor" run-resource
+    "finish-cold-boot" [ "init" ] search execute ;

@@ -63,3 +63,47 @@ USE: strings
 : intern ( "word" -- word )
     #! Returns the top of the stack if it already been interned.
     dup string? [ "use" get search ] when ;
+
+: init-search-path ( -- )
+    ! For files
+    "user" "file-in" set
+    [ "user" "builtins" ] "file-use" set
+    ! For interactive
+    "user" "in" set
+    [
+        "user"
+        "arithmetic"
+        "builtins"
+        "combinators"
+        "compiler"
+        "continuations"
+        "errors"
+        "debugger"
+        "hashtables"
+        "inspector"
+        "interpreter"
+        "jedit"
+        "kernel"
+        "lists"
+        "logic"
+        "math"
+        "namespaces"
+        "parser"
+        "prettyprint"
+        "stack"
+        "streams"
+        "stdio"
+        "strings"
+        "test"
+        "trace"
+        "unparser"
+        "vectors"
+        "vocabularies"
+        "words"
+        "scratchpad"
+    ] "use" set ;
+
+: init-scratchpad ( -- )
+    #! The contents of the scratchpad vocabulary is not saved
+    #! between runs.
+    <namespace> "scratchpad" "vocabularies" get set* ;

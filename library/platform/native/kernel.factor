@@ -28,6 +28,12 @@
 IN: namespaces
 DEFER: init-namespaces
 
+IN: vectors
+DEFER: vector=
+
+IN: errors
+DEFER: init-errors
+
 IN: kernel
 USE: arithmetic
 USE: combinators
@@ -42,6 +48,7 @@ USE: strings
 USE: vectors
 USE: words
 USE: unparser
+USE: vectors
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.

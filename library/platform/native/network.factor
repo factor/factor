@@ -25,59 +25,37 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
+IN: streams
 USE: combinators
-USE: compiler
 USE: continuations
-USE: httpd-responder
+USE: io-internals
+USE: errors
 USE: kernel
-USE: lists
-USE: interpreter
-USE: namespaces
-USE: parser
+USE: logic
 USE: stack
 USE: stdio
-USE: streams
 USE: strings
-USE: words
+USE: namespaces
+USE: unparser
 
-: stdin ( -- stdin )
-    "java.lang.System" "in"  jvar-static-get
-    <ireader> <breader> ;
+: <server> ( port -- stream )
+    #! Starts listening on localhost:port. Returns a stream that
+    #! you can close with fclose, and accept connections from
+    #! with accept. No other stream operations are supported.
+    server-socket <stream> [
+        "socket" set
 
-: stdout ( -- stdout )
-    "java.lang.System" "out" jvar-static-get <owriter> ;
+        ( -- )
+        [ "socket" get close-fd ] "fclose" set
+    ] extend ;
 
-: init-stdio ( -- )
-    #! Initialize standard input/output.
-    stdin stdout <char-stream> <stdio-stream> "stdio" set ;
+: <client-stream> ( host port in out -- stream )
+    <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;
 
-: init-environment ( -- )
-    #! Initialize OS-specific constants.
-    "user.home" system-property "~" set
-    "file.separator" system-property "/" set ;
+: <client> ( host port -- stream )
+    #! fflush yields until connection is established.
+    2dup client-socket <client-stream> dup fflush ;
 
-: boot ( -- )
-    #! The boot word is run by the intepreter when starting from
-    #! an object database.
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "compile"   set
-
-    init-stdio
-    init-environment
-    init-search-path
-    init-scratchpad
-    default-responders
-    "args" get parse-command-line
-    run-user-init
-
-    "compile" get [
-        compile-all
-    ] when
-
-    t "startup-done" set
-    
-    "interactive" get [ init-interpreter ] when ;
+: accept ( server -- client )
+    #! Accept a connection from a server socket.
+    "socket" swap get* blocking-accept <client-stream> ;

@@ -25,59 +25,51 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
+IN: errors
+USE: arithmetic
 USE: combinators
-USE: compiler
 USE: continuations
-USE: httpd-responder
 USE: kernel
 USE: lists
-USE: interpreter
+USE: logic
 USE: namespaces
-USE: parser
+USE: prettyprint
 USE: stack
 USE: stdio
-USE: streams
 USE: strings
-USE: words
+USE: unparser
+USE: vectors
 
-: stdin ( -- stdin )
-    "java.lang.System" "in"  jvar-static-get
-    <ireader> <breader> ;
+: kernel-error? ( obj -- ? )
+    dup cons? [ car fixnum? ] [ drop f ] ifte ;
 
-: stdout ( -- stdout )
-    "java.lang.System" "out" jvar-static-get <owriter> ;
+: ?vector-nth ( n vec -- obj )
+    over [
+        dup >r vector-length min 0 max r> vector-nth
+    ] [
+        2drop f
+    ] ifte ;
 
-: init-stdio ( -- )
-    #! Initialize standard input/output.
-    stdin stdout <char-stream> <stdio-stream> "stdio" set ;
+: error# ( n -- str )
+    {
+        "Expired port: "
+        "Undefined word: "
+        "Type check: "
+        "Array range check: "
+        "Underflow"
+        "I/O error: "
+        "Overflow"
+        "Incomparable types: "
+        "Float format: "
+        "Signal "
+    } ?vector-nth ;
 
-: init-environment ( -- )
-    #! Initialize OS-specific constants.
-    "user.home" system-property "~" set
-    "file.separator" system-property "/" set ;
+: ?kernel-error ( cons -- error# param )
+    dup cons? [ uncons dup cons? [ car ] when ] [ f ] ifte ;
 
-: boot ( -- )
-    #! The boot word is run by the intepreter when starting from
-    #! an object database.
+: kernel-error. ( error -- )
+    ?kernel-error swap error# dup "" ? write
+    dup [ . ] [ drop terpri ] ifte ;
 
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "compile"   set
-
-    init-stdio
-    init-environment
-    init-search-path
-    init-scratchpad
-    default-responders
-    "args" get parse-command-line
-    run-user-init
-
-    "compile" get [
-        compile-all
-    ] when
-
-    t "startup-done" set
-    
-    "interactive" get [ init-interpreter ] when ;
+: error. ( error -- str )
+    dup kernel-error? [ kernel-error. ] [ . ] ifte ;

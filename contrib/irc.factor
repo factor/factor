@@ -68,18 +68,21 @@ USE: unparser
 : keep-datastack ( quot -- )
     datastack [ call ] dip set-datastack drop ;
 
+: irc-stream-write ( string -- )
+    dup "buf" get sbuf-append
+    ends-with-newline? [
+        "buf" get >str
+        0 "buf" get set-sbuf-length
+        "\n" split [ dup f-or-"" [ drop ] [ "recepient" get irc-message ] ifte ] each
+    ] when ;
+
 : <irc-stream> ( stream recepient -- stream )
     <stream> [
         "recepient" set
         "stdio" set
         100 <sbuf> "buf" set
         [
-            dup "buf" get sbuf-append
-            ends-with-newline? [
-                "buf" get >str
-                0 "buf" get set-sbuf-length
-                "\n" split [ "recepient" get irc-message ] each
-            ] when
+            irc-stream-write
         ] "fwrite" set
     ] extend ;
 
@@ -100,15 +103,17 @@ USE: unparser
 
 : irc-action-quot ( action -- quot )
     [
-        [ "eval" irc-eval ]
-        [ "see" see terpri ]
-    ] assoc [ [ drop ] ] unless* ;
+        [ "eval" swap [ irc-eval ] with-irc-stream ]
+        [ "see" swap [ see terpri ] with-irc-stream ]
+        [ "join" nip irc-join ]
+        [ "quit" 2drop global [ "irc-quit-flag" on ] bind ]
+    ] assoc [ [ 2drop ] ] unless* ;
 
-: irc-action-handler ( messag   e -- )
+: irc-action-handler ( recepient message -- )
     " " split1 swap irc-action-quot call ;
 
 : irc-handle-privmsg ( [ recepient message ] -- )
-    uncons car swap [ irc-action-handler ] with-irc-stream ;
+    uncons car irc-action-handler ;
 
 : irc-handle-join ( [ joined channel ] -- )
     uncons car
@@ -130,13 +135,21 @@ USE: unparser
 
     global [ print ] bind ;
 
+: irc-quit-flag ( -- ? )
+    global [ "irc-quit-flag" get ] bind ;
+
+: clear-irc-quit-flag ( -- ? )
+    global [ "irc-quit-flag" off ] bind ;
+
 : irc-loop ( -- )
-    read [ irc-input irc-loop ] when* ;
+    irc-quit-flag [
+        read [ irc-input irc-loop ] when*
+    ] unless clear-irc-quit-flag ;
 
 : irc ( channels -- )
     irc-register
-    dup [ irc-join ] each
-    [ "Hello everybody" swap irc-message ] each
+    ! "identify foobar" "NickServ" irc-message
+    [ irc-join ] each
     irc-loop ;
 
 : irc-test
@@ -145,8 +158,8 @@ USE: unparser
     "irc.freenode.net" "server" set
     "Factor" "realname" set
     "factorbot" "nick" set
-    <namespace> "facts" set
-    "irc.freenode.net" 6667 <client>
-    <namespace> [ "stdio" set [ "#factor" ] irc ] bind ;
+    "irc.freenode.net" 6667 <client> [
+        [ "#factor" ] irc
+    ] with-stream ;
 
 !! "factor/irc.factor" run-file

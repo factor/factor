@@ -77,11 +77,13 @@ USE: unparser
     #! Begin a word definition. Word name follows.
     CREATE dup remember-where [ ] ; parsing
 
+: ;-hook ( -- quot )
+    ";-hook" get [ [ define-compound ] ] unless* ;
+
 : ;
     #! End a word definition.
     nreverse
-    "cross-compiling" get
-    [ compound, ] [ define-compound ] ifte ; parsing
+    ;-hook call ; parsing
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing
@@ -116,14 +118,16 @@ USE: unparser
         ascii-escape>ch
     ] ifte ;
 
-! String literal
-
 : parse-escape ( -- )
     next-ch escape dup [ drop "Bad escape" throw ] unless ;
 
 : parse-ch ( ch -- ch )
     dup CHAR: \\ = [ drop parse-escape ] when ;
 
+! Char literal
+: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
+
+! String literal
 : parse-string ( -- )
     next-ch dup CHAR: " = [
         drop
@@ -135,9 +139,6 @@ USE: unparser
     #! Note the ugly hack to carry the new value of 'pos' from
     #! the <% %> scope up to the original scope.
     <% parse-string "col" get %> swap "col" set parsed ; parsing
-
-! Char literal
-: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
 
 ! Complex literal
 : #{

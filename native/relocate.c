@@ -48,8 +48,8 @@ void relocate(CELL r)
 {
 	relocation_base = r;
 
-	fixup(&env.boot);
-	fixup(&env.user[GLOBAL_ENV]);
+	fixup(&userenv[BOOT_ENV]);
+	fixup(&userenv[GLOBAL_ENV]);
 
 	relocating = active->base;
 

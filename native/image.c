@@ -6,10 +6,11 @@ void load_image(char* filename)
 	HEADER h;
 	CELL size;
 	
-	printf("Loading %s...",filename);
-	fflush(stdout);
-	
+	fprintf(stderr,"Loading %s...",filename);
+
 	file = fopen(filename,"rb");
+	if(file < 0)
+		fatal_error("Cannot open image for reading",errno);
 
 	/* read it in native byte order */
 	fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
@@ -29,18 +30,17 @@ void load_image(char* filename)
 	active->here = active->base + h.size;
 	fclose(file);
 
-	printf(" relocating...");
+	fprintf(stderr," relocating...");
 	fflush(stdout);
 
 	clear_environment();
 
-	env.boot = h.boot;
-
-	env.user[GLOBAL_ENV] = h.global;
+	userenv[GLOBAL_ENV] = h.global;
+	userenv[BOOT_ENV] = h.boot;
 
 	relocate(h.relocation_base);
 
-	printf(" done\n");
+	fprintf(stderr," done\n");
 }
 
 bool save_image(char* filename)
@@ -48,16 +48,18 @@ bool save_image(char* filename)
 	FILE* file;
 	HEADER h;
 
-	printf("Saving %s\n",filename);
+	fprintf(stderr,"Saving %s...\n",filename);
 	
 	file = fopen(filename,"wb");
+	if(file < 0)
+		fatal_error("Cannot open image for writing",errno);
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
 	h.relocation_base = active->base;
-	h.boot = env.boot;
+	h.boot = userenv[BOOT_ENV];
 	h.size = (active->here - active->base);
-	h.global = env.user[GLOBAL_ENV];
+	h.global = userenv[GLOBAL_ENV];
 
 	fwrite(&h,sizeof(HEADER),1,file);
 	fwrite((void*)active->base,h.size,1,file);

@@ -15,11 +15,11 @@ void critical_error(char* msg, CELL tagged)
 
 void fix_stacks(void)
 {
-	if(STACK_UNDERFLOW(env.ds,env.ds_bot)
-		|| STACK_OVERFLOW(env.ds,env.ds_bot))
+	if(STACK_UNDERFLOW(ds,ds_bot)
+		|| STACK_OVERFLOW(ds,ds_bot))
 		reset_datastack();
-	if(STACK_UNDERFLOW(env.cs,env.cs_bot)
-		|| STACK_OVERFLOW(env.cs,env.cs_bot))
+	if(STACK_UNDERFLOW(cs,cs_bot)
+		|| STACK_OVERFLOW(cs,cs_bot))
 		reset_callstack();
 }
 
@@ -29,9 +29,9 @@ void throw_error(CELL error)
 
 	dpush(error);
 	/* Execute the 'throw' word */
-	cpush(env.cf);
-	env.cf = env.user[BREAK_ENV];
-	if(env.cf == 0)
+	cpush(callframe);
+	callframe = userenv[BREAK_ENV];
+	if(callframe == 0)
 	{
 		/* Crash at startup */
 		fatal_error("Error thrown before BREAK_ENV set",error);

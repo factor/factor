@@ -8,30 +8,31 @@
 #define BREAK_ENV      5
 #define CATCHSTACK_ENV 6
 #define GC_ENV         7
+#define BOOT_ENV       8
 
 /* Error handlers restore this */
 sigjmp_buf toplevel;
 
-typedef struct {
-	/* TAGGED currently executing quotation */
-	CELL cf;
-	/* raw pointer to datastack bottom */
-	CELL ds_bot;
-	/* raw pointer to datastack top */
-	CELL ds;
-	/* raw pointer to callstack bottom */
-	CELL cs_bot;
-	/* raw pointer to callstack top */
-	CELL cs;
-	/* raw pointer to currently executing word */
-	WORD* w;
-	/* TAGGED bootstrap quotation */
-	CELL boot;
-	/* TAGGED user environment data */
-	CELL user[USER_ENV];
-} ENV;
+/* TAGGED currently executing quotation */
+CELL callframe;
 
-ENV env;
+/* raw pointer to datastack bottom */
+CELL ds_bot;
+
+/* raw pointer to datastack top */
+CELL ds;
+
+/* raw pointer to callstack bottom */
+CELL cs_bot;
+
+/* raw pointer to callstack top */
+CELL cs;
+
+/* raw pointer to currently executing word */
+WORD* executing;
+
+/* TAGGED user environment data; see getenv/setenv prims */
+CELL userenv[USER_ENV];
 
 void init_signals(void);
 
@@ -39,41 +40,41 @@ void clear_environment(void);
 
 INLINE CELL dpop(void)
 {
-	env.ds -= CELLS;
-	return get(env.ds);
+	ds -= CELLS;
+	return get(ds);
 }
 
 INLINE void drepl(CELL top)
 {
-	put(env.ds - CELLS,top);
+	put(ds - CELLS,top);
 }
 
 INLINE void dpush(CELL top)
 {
-	put(env.ds,top);
-	env.ds += CELLS;
+	put(ds,top);
+	ds += CELLS;
 }
 
 INLINE CELL dpeek(void)
 {
-	return get(env.ds - CELLS);
+	return get(ds - CELLS);
 }
 
 INLINE CELL cpop(void)
 {
-	env.cs -= CELLS;
-	return get(env.cs);
+	cs -= CELLS;
+	return get(cs);
 }
 
 INLINE void cpush(CELL top)
 {
-	put(env.cs,top);
-	env.cs += CELLS;
+	put(cs,top);
+	cs += CELLS;
 }
 
 INLINE CELL cpeek(void)
 {
-	return get(env.cs - CELLS);
+	return get(cs - CELLS);
 }
 
 void run(void);

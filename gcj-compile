@@ -1,6 +1,0 @@
-#!/bin/sh
-for file in `find org factor -name \*.java`; do
-    gcj -c $file
-done
-
-gcj --main=factor.FactorInterpreter -o f *.o

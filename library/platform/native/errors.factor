@@ -26,18 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: arithmetic
-USE: combinators
-USE: continuations
 USE: kernel
-USE: lists
-USE: logic
-USE: namespaces
-USE: prettyprint
-USE: stack
-USE: stdio
-USE: strings
-USE: unparser
 USE: vectors
 
 ! This is a very lightweight exception handling system.
@@ -47,43 +36,8 @@ USE: vectors
 : set-catchstack* ( cs -- ) 6 setenv ;
 : set-catchstack ( cs -- ) clone set-catchstack* ;
 
-: kernel-error? ( obj -- ? )
-    dup cons? [ car fixnum? ] [ drop f ] ifte ;
-
-: ?vector-nth ( n vec -- obj )
-    over [
-        dup >r vector-length min 0 max r> vector-nth
-    ] [
-        2drop f
-    ] ifte ;
-
-: error# ( n -- str )
-    {
-        "Expired port: "
-        "Undefined word: "
-        "Type check: "
-        "Array range check: "
-        "Underflow"
-        "I/O error: "
-        "Overflow"
-        "Incomparable types: "
-        "Float format: "
-        "Signal "
-    } ?vector-nth ;
-
-: ?kernel-error ( cons -- error# param )
-    dup cons? [ uncons dup cons? [ car ] when ] [ f ] ifte ;
-
-: kernel-error. ( error -- )
-    ?kernel-error swap error# dup "" ? write
-    dup [ . ] [ drop terpri ] ifte ;
-
-: error. ( error -- str )
-    dup kernel-error? [ kernel-error. ] [ . ] ifte ;
-
 DEFER: >c
 DEFER: throw
-DEFER: default-error-handler
 
 : init-errors ( -- )
     64 <vector> set-catchstack*

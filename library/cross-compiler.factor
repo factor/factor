@@ -252,5 +252,7 @@ IN: cross-compiler
     swap write-image ;
 
 : make-images ( -- )
-    "big-endian" off "factor.image.le" make-image
-    "big-endian" on  "factor.image.be" make-image ;
+    "big-endian" off "boot.image.le" make-image
+    "big-endian" on  "boot.image.be" make-image
+    "boot.image.le and boot.image.be have been generated." print
+    ;

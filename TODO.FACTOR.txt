@@ -1,19 +1,21 @@
 - input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- enforce bottom-up in native bootstrap
 - fix up native file/line info
 - standalone listener input style
 - add a socket timeout
 - drop test in http server
 - jedit bug? +line doesn't always work when switching into an existing
   buffer with a remembered first line
+- jedit bug? ' in noWordSep ignored
+- word names containing ' not quoted properly
 - completion: enter no good
 - completion: don't show automatically
 - balance needs USE:
 - postpone errors until actual read/write op
 - command line arguments
 - socket protocol
+- irc: stack underflow?
 
 + docs:
 
@@ -45,7 +47,6 @@
 
 - gc call in the middle of some ops might affect callstack
 - multitasking
-- parsing should be parsing
 - better error reporting
 
 + JVM compiler:

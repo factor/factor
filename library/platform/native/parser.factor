@@ -56,9 +56,10 @@ USE: unparser
     ] ifte ;
 
 : parsing ( -- )
-    "cross-compiling" get [
-        t "parsing" word set-word-property
-    ] unless ; parsing
+    #! Mark the most recently defined word to execute at parse
+    #! time, rather than run time. The word can use 'scan' to
+    #! read ahead in the input stream.
+    t "parsing" word set-word-property ;
 
 : <parsing "line" set 0 "col" set ;
 : parsing> "line" off "col" off ;
@@ -171,3 +172,8 @@ USE: unparser
 
 : next-word-ch ( -- ch )
     "col" get "line" get skip-blank "col" set next-ch ;
+
+! Once this file has loaded, we can use 'parsing' normally.
+! This hack is needed because in Java Factor, 'parsing' is
+! not parsing, but in CFactor, it is.
+t "parsing" "parsing" [ "parser" ] search set-word-property

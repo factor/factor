@@ -26,58 +26,41 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
+USE: ansi
 USE: combinators
-USE: compiler
-USE: continuations
+USE: errors
 USE: httpd-responder
 USE: kernel
-USE: lists
-USE: interpreter
 USE: namespaces
 USE: parser
-USE: stack
-USE: stdio
+USE: random
 USE: streams
-USE: strings
+USE: styles
 USE: words
 
-: stdin ( -- stdin )
-    "java.lang.System" "in"  jvar-static-get
-    <ireader> <breader> ;
+: warm-boot ( -- )
+    #! A fully bootstrapped image has this as the boot
+    #! quotation.
+    boot
 
-: stdout ( -- stdout )
-    "java.lang.System" "out" jvar-static-get <owriter> ;
-
-: init-stdio ( -- )
-    #! Initialize standard input/output.
-    stdin stdout <char-stream> <stdio-stream> "stdio" set ;
-
-: init-environment ( -- )
-    #! Initialize OS-specific constants.
-    "user.home" system-property "~" set
-    "file.separator" system-property "/" set ;
-
-: boot ( -- )
-    #! The boot word is run by the intepreter when starting from
-    #! an object database.
+    init-random
+    "stdio" get <ansi-stream> "stdio" set
 
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
     t "user-init" set
-    t "compile"   set
+    t "interactive" set
 
-    init-stdio
-    init-environment
-    init-search-path
-    init-scratchpad
-    default-responders
-    "args" get parse-command-line
     run-user-init
 
-    "compile" get [
-        compile-all
-    ] when
+    "interactive" get [ init-interpreter ] when
 
-    t "startup-done" set
-    
-    "interactive" get [ init-interpreter ] when ;
+    0 exit* ;
+
+: finish-cold-boot ( -- )
+    #! After the stage2 bootstrap is done, this word
+    #! completes initialization.
+    init-scratchpad
+    init-styles
+    init-vocab-styles
+    default-responders ;
