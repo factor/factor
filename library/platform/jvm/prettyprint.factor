@@ -52,8 +52,8 @@ USE: words
     0 swap
     intern dup worddef
     [
-        [ compound-or-compiled? ] [ worddef>list prettyprint-:; ]
-        [ shuffle? ] [ worddef>list prettyprint-~<<>>~ ]
+        [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
+        [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]
         [ primitive? ] [ "PRIMITIVE: " write unparse write drop ]
         [ drop t ] [ 2drop "Not defined" write ]
     ] cond prettyprint-newline ;

@@ -16,7 +16,7 @@ USE: test
 [ [ 1 1 0 0 ] ] [ [ cdr ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ clone-list ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ cons ] ] [ balance>list ] test-word
-[ [ 2 1 0 0 ] ] [ [ contains ] ] [ balance>list ] test-word
+[ [ 2 1 0 0 ] ] [ [ contains? ] ] [ balance>list ] test-word
 [ [ 2 0 0 0 ] ] [ [ cons@ ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ count ] ] [ balance>list ] do-not-test-word
 [ [ 2 1 0 0 ] ] [ [ nth ] ] [ balance>list ] test-word

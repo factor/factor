@@ -35,10 +35,10 @@ USE: words
 [ f ] [ "#:a" "#:a" ] [ intern-test ] test-word
 [ t ] [ "#:" "#:" ] [ intern-test ] test-word
 
-: worddef>list-test ( -- ? )
-    [ dup * ] dup no-name worddef>list = ;
+: word-parameter-test ( -- ? )
+    [ dup * ] dup no-name word-parameter = ;
 
-[ t           ] [                 ] [ worddef>list-test ] test-word
+[ t           ] [                 ] [ word-parameter-test ] test-word
 
 : words-test ( -- ? )
     t vocabs [ words [ word? and ] each ] each ;
@@ -50,21 +50,21 @@ USE: words
 
 [ [ "A" "r:B" "--" "A" "r:B" ] ]
 [ "test-shuffle-1" ]
-[ worddef>list ]
+[ word-parameter ]
 test-word
 
 ~<< test-shuffle-2 A B -- r:A r:B >>~
 
 [ [ "A" "B" "--" "r:A" "r:B" ] ]
 [ "test-shuffle-2" ]
-[ worddef>list ]
+[ word-parameter ]
 test-word
 
 ~<< test-shuffle-3 A r:B r:C r:D r:E -- A C D E >>~
 
 [ [ "A" "r:B" "r:C" "r:D" "r:E" "--" "A" "C" "D" "E" ] ]
 [ "test-shuffle-3" ]
-[ worddef>list ]
+[ word-parameter ]
 test-word
 
 [ [ 2 1 0 0 ] ] [ [ = ] ] [ balance>list ] test-word
@@ -80,7 +80,7 @@ test-word
 
 : doc-test ( -- ) ;
 
-[ t ] [ "doc-test" ] [ intern worddef>list car comment? ] test-word
+[ t ] [ "doc-test" ] [ intern word-parameter car comment? ] test-word
 
 [ [ 2 1 0 0 ] ] [ [ is ] ] [ balance>list ] test-word
 [ t ] [ "java.lang.Integer" ] [ 0 100 random-int swap is ] test-word
