@@ -38,6 +38,9 @@ USE: errors
 USE: strings
 USE: logic
 USE: combinators
+USE: live-updater
+USE: prettyprint
+USE: vocabularies
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -102,6 +105,47 @@ USE: combinators
     [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
   ] </table> ;
 
+: with-simple-html-output ( quot -- )
+  #! Run the quotation inside an HTML stream wrapped
+  #! around stdio.
+  <pre> [
+    "stdio" get <html-stream> [
+      call
+    ] with-stream
+  ] </pre> ;
+
+: html-for-word-source ( word-string -- )
+  #! Return an html fragment dispaying the source
+  #! of the given word.
+  dup dup
+  <namespace> [
+    "responder" "inspect" put
+    <table border= "1" table> [
+      <tr> [ <th colspan= "2" th> [ "Source" write ] </th> ] </tr>
+      <tr> [ <td colspan= "2" td> [ [ see ] with-simple-html-output ] </td> ] </tr>
+      <tr> [ <th> [ "Apropos" write ] </th> <th> [ "Usages" write ] </th> ] </tr>
+      <tr> [ <td valign= "top" td> [ [ apropos. ] with-simple-html-output ] </td> 
+             <td valign= "top" td> [ [ usages. ] with-simple-html-output ] </td>
+      ] </tr>
+    ] </table>
+  ] bind ;
+
+: display-word-see-form ( url -- )
+  #! Write out the html for code that accepts
+  #! the name of a word, and displays the source
+  #! code of that word.
+  <form method= "post" action= "." form> [
+    [
+      [ 
+        "Enter the name of a word: " write
+        "see" [ html-for-word-source ] live-search
+      ]
+      [
+        <div id= "see" div> [ "" write ] </div>
+      ]
+    ] vertical-layout
+  ] </form> ;
+
 : display-last-output ( string -- )
   #! Write out html to display the last output.
   <table border= "1" table> [
@@ -109,12 +153,17 @@ USE: combinators
     <tr> [ <td> [ <pre> [ write ] </pre> ] </td> ] </tr>
   ] </table> ;
   
+
 : get-expr-to-eval (  -- string )
   #! Show a page to the user requesting the form to be
   #! evaluated. Return the form as a string. Assumes
   #! an evaluator is on the namestack.
   [ 
     <html> [
+      <head> [
+        <title> [ "Factor Evaluator" write ] </title>
+        include-live-updater-js
+      ] </head>        
       <body> [
         "Use Alt+E to evaluate, or press 'Evaluate'" paragraph
         [
@@ -122,6 +171,7 @@ USE: combinators
           [ "stack" get display-stack ]
           [ "history" get display-history ]
         ] horizontal-layout
+	display-word-see-form
         "output" get display-last-output
       ] </body>
     ] </html>
