@@ -43,9 +43,6 @@ M: sbuf = sbuf= ;
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
 
-: f>"" ( str/f -- str )
-    [ "" ] unless* ;
-
 : str-length< ( str str -- boolean )
     #! Compare string lengths.
     swap str-length swap str-length < ;
@@ -96,31 +93,33 @@ M: sbuf = sbuf= ;
     #! index.
     [ swap str-head ] 2keep succ swap str-tail ;
 
-: str-headcut ( str begin -- str str )
-    str-length str/ ;
-
-: =? ( x y z -- z/f )
-    #! Push z if x = y, otherwise f.
-    >r = r> f ? ;
-
-: str-head? ( str begin -- str )
-    #! If the string starts with begin, return the rest of the
-    #! string after begin. Otherwise, return f.
-    2dup str-length< [ 2drop f ] [ tuck str-headcut =? ] ifte ;
+: str-head? ( str begin -- ? )
+    2dup str-length< [
+        2drop f
+    ] [
+        dup str-length rot str-head =
+    ] ifte ;
 
 : ?str-head ( str begin -- str ? )
-    dupd str-head? dup [ nip t ] [ drop f ] ifte ;
+    2dup str-head? [
+        str-length swap str-tail t
+    ] [
+        drop f
+    ] ifte ;
 
-: str-tailcut ( str end -- str str )
-    str-length >r dup str-length r> - str/ swap ;
+: str-tail? ( str end -- ? )
+    2dup str-length< [
+        2drop f
+    ] [
+        dup str-length pick str-length swap - rot str-tail =
+    ] ifte ;
 
-: str-tail? ( str end -- str )
-    #! If the string ends with end, return the start of the
-    #! string before end. Otherwise, return f.
-    2dup str-length< [ 2drop f ] [ tuck str-tailcut =? ] ifte ;
-
-: ?str-tail ( str end -- str ? )
-    dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
+: ?str-tail ( str end -- ? )
+    2dup str-tail? [
+        str-length swap [ str-length swap - ] keep str-head t
+    ] [
+        drop f
+    ] ifte ;
 
 : split1 ( string split -- before after )
     2dup index-of dup -1 = [
@@ -129,11 +128,6 @@ M: sbuf = sbuf= ;
         [ swap str-length + over str-tail ] keep
         rot str-head swap
     ] ifte ;
-
-: max-str-length ( list -- len )
-    #! Returns the length of the longest string in the given
-    #! list.
-    0 swap [ str-length max ] each ;
 
 : str-each ( str [ code ] -- )
     #! Execute the code, with each character of the string

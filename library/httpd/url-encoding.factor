@@ -29,7 +29,6 @@ IN: url-encoding
 USE: errors
 USE: kernel
 USE: lists
-USE: format
 USE: math
 USE: parser
 USE: strings
@@ -37,7 +36,9 @@ USE: unparser
 
 : url-encode ( str -- str )
     [
-        dup url-quotable? [ "%" swap >hex 2 digits cat2 ] unless
+        dup url-quotable? [
+            "%" swap >hex 2 "0" pad cat2
+        ] unless
     ] str-map ;
 
 : catch-hex> ( str -- n )

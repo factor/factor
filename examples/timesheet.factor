@@ -2,7 +2,6 @@
 
 IN: timesheet
 USE: errors
-USE: format
 USE: kernel
 USE: lists
 USE: math
@@ -31,7 +30,7 @@ USE: vectors
 ! Printing the timesheet.
 
 : hh ( duration -- str ) 60 /i ;
-: mm ( duration -- str ) 60 mod unparse 2 digits ;
+: mm ( duration -- str ) 60 mod unparse 2 "0" pad ;
 : hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-list ;
 
 : print-entry ( duration description -- )

@@ -27,7 +27,6 @@
 
 IN: prettyprint
 USE: errors
-USE: format
 USE: generic
 USE: kernel
 USE: lists

@@ -27,7 +27,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd
-USE: format
 USE: kernel
 USE: lists
 USE: logging

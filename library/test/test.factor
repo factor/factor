@@ -78,7 +78,6 @@ USE: unparser
         "namespaces"
         "generic"
         "files"
-        "format"
         "parser"
         "parse-number"
         "prettyprint"

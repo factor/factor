@@ -36,6 +36,7 @@
 
 + listener/plugin:
 
+- use decl wrong
 - faster completion
 - sidekick: still parsing too much
 - errors don't always disappear

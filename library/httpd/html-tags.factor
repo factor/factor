@@ -26,7 +26,6 @@
 IN: html
 USE: strings
 USE: lists
-USE: format
 USE: kernel
 USE: stdio
 USE: namespaces

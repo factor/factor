@@ -43,13 +43,13 @@ USE: test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test
 
-[ "and end" ] [ "Beginning and end" "Beginning " str-head? ] unit-test
-[ f ] [ "Beginning and end" "Beginning x" str-head? ] unit-test
-[ f ] [ "Beginning and end" "eginning " str-head? ] unit-test
+[ "and end" t ] [ "Beginning and end" "Beginning " ?str-head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?str-head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?str-head ] unit-test
 
-[ "Beginning" ] [ "Beginning and end" " and end" str-tail? ] unit-test
-[ f ] [ "Beginning and end" "Beginning x" str-tail? ] unit-test
-[ f ] [ "Beginning and end" "eginning " str-tail? ] unit-test
+[ "Beginning" t ] [ "Beginning and end" " and end" ?str-tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?str-tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?str-tail ] unit-test
 
 [ [ "This" "is" "a" "split" "sentence" ] ]
 [ "This is a split sentence" " " split ]
@@ -62,16 +62,10 @@ unit-test
 [ [ "a" "b" "c" "d" "e" "f" ] ]
 [ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
 
-[ 6 ]
-[
-    [ "One" "Two" "Little" "Piggy" "Went" "To" "The" "Market" ]
-    max-str-length
-] unit-test
-
-[ "Hello world" ] [ "Hello world\n" "\n" str-tail? ] unit-test
-[ f ] [ "Hello world" "\n" str-tail? ] unit-test
-[ "" ] [ "\n" "\n" str-tail? ] unit-test
-[ f ] [ "" "\n" str-tail? ] unit-test
+[ "Hello world" t ] [ "Hello world\n" "\n" ?str-tail ] unit-test
+[ "Hello world" f ] [ "Hello world" "\n" ?str-tail ] unit-test
+[ "" t ] [ "\n" "\n" ?str-tail ] unit-test
+[ "" f ] [ "" "\n" ?str-tail ] unit-test
 
 [ t ] [ CHAR: a letter? ] unit-test
 [ f ] [ CHAR: A letter? ] unit-test
@@ -101,3 +95,6 @@ unit-test
     [ dup CHAR: \s = [ drop CHAR: + ] when ] str-map
 ]
 unit-test
+
+[ "05" ] [ "5" 2 "0" pad ] unit-test
+[ "666" ] [ "666" 2 "0" pad ] unit-test

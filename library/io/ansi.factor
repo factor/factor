@@ -28,7 +28,6 @@
 IN: ansi
 USE: lists
 USE: kernel
-USE: format
 USE: namespaces
 USE: stdio
 USE: streams

@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: html
-USE: format
 USE: lists
 USE: kernel
 USE: namespaces
@@ -55,7 +54,7 @@ USE: generic
     [ dup html-entities assoc dup rot ? ] str-map ;
 
 : >hex-color ( triplet -- hex )
-    [ >hex 2 digits ] map "#" swons cat ;
+    [ >hex 2 "0" pad ] map "#" swons cat ;
 
 : fg-css, ( color -- )
     "color: " , >hex-color , "; " , ;

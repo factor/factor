@@ -44,7 +44,7 @@ SYMBOL: predicate
         \ dup , "predicate" word-property , , , \ ifte ,
     ] make-list ;
 
-: (predicate-method) ( vtable definition class type# -- )
+: predicate-method ( vtable definition class type# -- )
     >r rot r> swap [
         vector-nth
         ( vtable definition class existing )
@@ -59,7 +59,7 @@ predicate [
     ( vtable definition class -- )
     dup builtin-supertypes [
         ( vtable definition class type# )
-        >r 3dup r> (predicate-method)
+        >r 3dup r> predicate-method
     ] each 3drop
 ] "add-method" set-word-property
 

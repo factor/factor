@@ -28,7 +28,6 @@
 IN: unparser
 USE: generic
 USE: kernel
-USE: format
 USE: lists
 USE: math
 USE: namespaces
@@ -142,7 +141,7 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 digits "\\u" swap cat2 ;
+    >hex 4 "0" pad "\\u" swap cat2 ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [

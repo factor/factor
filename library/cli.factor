@@ -64,26 +64,16 @@ USE: words
     #!
     #! Arguments containing = are handled differently; they
     #! set the object path.
-    "=" split1 dup [
+    "=" split1 [
         cli-var-param
     ] [
-        drop dup "no-" str-head? dup [
-            f put drop
-        ] [
-            drop t put
-        ] ifte
-    ] ifte ;
+        "no-" ?str-head not put
+    ] ifte* ;
 
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup f-or-"" [
-        dup "-" str-head? dup [
-            cli-param drop f
-        ] [
-            drop
-        ] ifte
-    ] unless ;
+    dup f-or-"" [ "-" ?str-head [ cli-param f ] when ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;

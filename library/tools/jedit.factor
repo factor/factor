@@ -88,10 +88,10 @@ USE: words
 
 : word-file ( path -- dir file )
     dup [
-        dup "resource:/" str-head? dup [
-            nip resource-path swap
+        "resource:/" ?str-head [
+            resource-path swap
         ] [
-            swap ( f file )
+            f swap
         ] ifte
     ] [
         f

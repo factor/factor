@@ -137,7 +137,7 @@ GENERIC: ' ( obj -- ptr )
 : here-as ( tag -- pointer )
     here swap bitor ;
 
-: pad ( -- )
+: align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
 ( Remember what objects we've compiled )
@@ -162,7 +162,7 @@ M: bignum ' ( bignum -- tagged )
         [ 0  | [ 1 0   ] ]
         [ -1 | [ 2 1 1 ] ]
         [ 1  | [ 2 0 1 ] ]
-    ] assoc [ emit ] each pad r> ;
+    ] assoc [ emit ] each align-here r> ;
 
 ( Special objects )
 
@@ -267,7 +267,7 @@ M: cons ' ( c -- tagged )
     dup str-length emit
     dup hashcode emit
     pack-string
-    pad ;
+    align-here ;
 
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
@@ -286,7 +286,7 @@ M: string ' ( string -- pointer )
     array-type >header emit
     dup length emit
     ( elements -- ) [ emit ] each
-    pad r> ;
+    align-here r> ;
 
 M: vector ' ( vector -- pointer )
     dup vector>list emit-array swap vector-length
@@ -294,7 +294,7 @@ M: vector ' ( vector -- pointer )
     vector-type >header emit
     emit ( length )
     emit ( array ptr )
-    pad r> ;
+    align-here r> ;
 
 ( End of the image )
 

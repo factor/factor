@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inspector
-USE: format
 USE: kernel
 USE: hashtables
 USE: lists
@@ -38,6 +37,7 @@ USE: words
 USE: prettyprint
 USE: unparser
 USE: vectors
+USE: math
 
 : relative>absolute-object-path ( string -- string )
     "object-path" get [ "'" rot cat3 ] when* ;
@@ -60,12 +60,20 @@ USE: vectors
     3list
     default-style append ;
 
+: pad-string ( len str -- str )
+    str-length - " " fill ;
+
 : var-name. ( max name -- )
     tuck unparse pad-string write dup link-style
     swap unparse swap write-attr ;
 
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;
+
+: max-str-length ( list -- len )
+    #! Returns the length of the longest string in the given
+    #! list.
+    0 swap [ str-length max ] each ;
 
 : name-padding ( alist -- col )
     [ car unparse ] map max-str-length ;

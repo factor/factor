@@ -74,7 +74,6 @@ USE: stdio
     "/library/syntax/parse-stream.factor"
     "/library/bootstrap/init.factor"
 
-    "/library/format.factor"
     "/library/syntax/unparser.factor"
     "/library/io/presentation.factor"
     "/library/io/vocabulary-style.factor"
