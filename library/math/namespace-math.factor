@@ -31,10 +31,10 @@ USE: logic
 USE: namespaces
 USE: stack
 
-: +@ ( num var -- ) dup [ get + ] dip set ;
-: -@ ( num var -- ) dup [ get swap - ] dip set ;
-: *@ ( num var -- ) dup [ get * ] dip set ;
-: /@ ( num var -- ) dup [ get / ] dip set ;
+: +@ ( num var -- ) tuck get + put ;
+: -@ ( num var -- ) tuck get swap - put ;
+: *@ ( num var -- ) tuck get * put ;
+: /@ ( num var -- ) tuck get swap / put ;
 : neg@ ( var -- ) dup get neg put ;
 : pred@ ( var -- ) dup get pred put ;
 : succ@ ( var -- ) dup get succ put ;

@@ -96,7 +96,7 @@ USE: vectors
 : lazy ( var [ a ] -- value )
     #! If the value of the variable is f, set the value to the
     #! result of evaluating [ a ].
-    over get [ drop get ] [ dip dupd set ] ifte ;
+    over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
 : alist> ( alist namespace -- )
     #! Set each key in the alist to its value in the
@@ -106,20 +106,17 @@ USE: vectors
 : alist>namespace ( alist -- namespace )
     <namespace> tuck alist> ;
 
-: object-path-traverse ( name object -- object )
+: traverse-path ( name object -- object )
     dup has-namespace? [ get* ] [ 2drop f ] ifte ;
 
-: object-path-iter ( object list -- object )
-    [
-        uncons [ swap object-path-traverse ] dip
-        object-path-iter
-    ] when* ;
+: (object-path) ( object list -- object )
+    [ uncons >r swap traverse-path r> (object-path) ] when* ;
 
 : object-path ( list -- object )
     #! An object path is a list of strings. Each string is a
     #! variable name in the object namespace at that level.
     #! Returns f if any of the objects are not set.
-    this swap object-path-iter ;
+    this swap (object-path) ;
 
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;

@@ -47,14 +47,14 @@ USE: unparser
     ] [
         ! Note that hex> will push f if there is an invalid
         ! hex literal
-        [ succ dup 2 + ] dip substring hex> [ >char % ]  when*
+        >r succ dup 2 + r> substring hex> [ >char % ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )
-    2dup url-decode-hex [ 3 + ] dip ;
+    2dup url-decode-hex >r 3 + r> ;
 
-: url-decode-+-or-other ( index str -- index str )
-    CHAR: + CHAR: \s replace % [ succ ] dip ;
+: url-decode-+-or-other ( index str ch -- index str )
+    CHAR: + CHAR: \s replace % >r succ r> ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [

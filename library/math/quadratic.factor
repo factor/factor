@@ -31,7 +31,7 @@ USE: math
 USE: stack
 
 : quadratic-complete ( a b c -- a b c a b )
-    [ 2dup ] dip -rot ;
+    >r 2dup r> -rot ;
 
 : quadratic-d ( c a b -- sqrt[b^2 - 4*a*c] )
     sq -rot 4 * * - sqrt ;
@@ -40,7 +40,7 @@ USE: stack
     neg swap / 2 / ;
 
 : quadratic-roots ( a b d -- alpha beta )
-    3dup - quadratic-root [ + quadratic-root ] dip ;
+    3dup - quadratic-root >r + quadratic-root r> ;
 
 : quadratic ( a b c -- alpha beta )
     #! Finds both roots of the polynomial a*x^2 + b*x + c using

@@ -30,18 +30,6 @@ USE: kernel
 USE: lists
 USE: stack
 
-: 2apply ( x y quot -- )
-    #! First applies the code to x, then to y.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    2dup >r >r nip call r> r> call ; inline interpret-only
-
-: cleave ( x quot quot -- )
-    #! Executes each quotation, with x on top of the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    >r over >r call r> r> call ; inline interpret-only
-
 : slip ( quot x -- x )
     >r call r> ; inline interpret-only
 
@@ -51,29 +39,14 @@ USE: stack
 : 3slip ( quot x y z -- x y z )
     >r >r >r call r> r> r> ; inline interpret-only
 
-: dip ( a [ b ] -- b a )
-    #! Call b as if b was not present on the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    swap >r call r> ; inline interpret-only
-
-: 2dip ( a b [ c ] -- c a b )
-    #! Call c as if a and b were not present on the stack.
-    #!
-    #! If the quotation compiles, this combinator compiles.
-    -rot >r >r call r> r> ; inline interpret-only
-
-: forever ( quot -- )
-    #! The code is evaluated in an infinite loop. Typically, a
-    #! continuation is used to escape the infinite loop.
-    #!
-    #! This combinator will not compile.
-    dup dip forever ; interpret-only
-
 : keep ( a quot -- a )
     #! Execute the quotation with a on the stack, and restore a
     #! after the quotation returns.
     over >r call r> ;
+
+: apply ( code input -- code output )
+    #! Apply code to input.
+    swap dup >r call r> swap ;
 
 : cond ( x list -- )
     #! The list is of this form:
@@ -111,20 +84,6 @@ USE: stack
     pick [ drop call ] [ nip nip call ] ifte ;
     inline interpret-only
 
-: interleave ( X quot -- )
-    #! Evaluate each element of the list with X on top of the
-    #! stack. When done, X is popped off the stack.
-    #!
-    #! To avoid unexpected results, each element of the list
-    #! must have stack effect ( X -- ).
-    #!
-    #! This combinator will not compile.
-    dup [
-        over [ unswons dip ] dip swap interleave
-    ] [
-        2drop
-    ] ifte ; interpret-only
-
 : unless ( cond quot -- )
     #! Execute a quotation only when the condition is f. The
     #! condition is popped off the stack.
@@ -157,6 +116,53 @@ USE: stack
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
     over [ call ] [ 2drop ] ifte ; inline interpret-only
+
+: forever ( quot -- )
+    #! The code is evaluated in an infinite loop. Typically, a
+    #! continuation is used to escape the infinite loop.
+    #!
+    #! This combinator will not compile.
+    dup dip forever ; interpret-only
+
+! DEPRECATED
+
+: 2apply ( x y quot -- )
+    #! First applies the code to x, then to y.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    2dup >r >r nip call r> r> call ; inline interpret-only
+
+: cleave ( x quot quot -- )
+    #! Executes each quotation, with x on top of the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    >r over >r call r> r> call ; inline interpret-only
+
+: dip ( a [ b ] -- b a )
+    #! Call b as if b was not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    swap >r call r> ; inline interpret-only
+
+: 2dip ( a b [ c ] -- c a b )
+    #! Call c as if a and b were not present on the stack.
+    #!
+    #! If the quotation compiles, this combinator compiles.
+    -rot >r >r call r> r> ; inline interpret-only
+
+: interleave ( X quot -- )
+    #! Evaluate each element of the list with X on top of the
+    #! stack. When done, X is popped off the stack.
+    #!
+    #! To avoid unexpected results, each element of the list
+    #! must have stack effect ( X -- ).
+    #!
+    #! This combinator will not compile.
+    dup [
+        over [ unswons dip ] dip swap interleave
+    ] [
+        2drop
+    ] ifte ; interpret-only
 
 : while ( cond body -- )
     #! Evaluate cond. If it leaves t on the stack, evaluate

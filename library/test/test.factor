@@ -98,6 +98,7 @@ USE: unparser
         "math/complex"
         "math/irrational"
         "math/simpson"
+        "math/namespaces"
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"

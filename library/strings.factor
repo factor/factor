@@ -80,45 +80,39 @@ USE: stack
 : str/ ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string.
-    2dup str-tail [ str-head ] dip ;
+    2dup str-tail >r str-head r> ;
 
 : str// ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    2dup succ str-tail [ str-head ] dip ;
+    2dup succ str-tail >r str-head r> ;
 
 : >title ( str -- str )
-    1 str/ [ >upper ] dip >lower cat2 ;
+    1 str/ >r >upper r> >lower cat2 ;
 
 : str-headcut ( str begin -- str str )
     str-length str/ ;
 
+: =? ( x y z -- z/f )
+    #! Push z if x = y, otherwise f.
+    -rot = [ drop f ] unless ;
+
 : str-head? ( str begin -- str )
     #! If the string starts with begin, return the rest of the
     #! string after begin. Otherwise, return f.
-    2dup str-length< [
-        2drop f
-    ] [
-        tuck str-headcut
-        [ = ] dip f ?
-    ] ifte ;
+    2dup str-length< [ 2drop f ] [ tuck str-headcut =? ] ifte ;
 
 : ?str-head ( str begin -- str ? )
     dupd str-head? dup [ nip t ] [ drop f ] ifte ;
 
 : str-tailcut ( str end -- str str )
-    str-length [ dup str-length ] dip - str/ ;
+    str-length >r dup str-length r> - str/ swap ;
 
 : str-tail? ( str end -- str )
     #! If the string ends with end, return the start of the
     #! string before end. Otherwise, return f.
-    2dup str-length< [
-        2drop f
-    ] [
-        tuck str-tailcut swap
-        [ = ] dip f ?
-    ] ifte ;
+    2dup str-length< [ 2drop f ] [ tuck str-tailcut =? ] ifte ;
 
 : ?str-tail ( str end -- str ? )
     dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
@@ -143,7 +137,7 @@ USE: stack
     #! Execute the code, with each character of the string
     #! pushed onto the stack.
     over str-length [
-        -rot 2dup [ [ str-nth ] dip call ] 2dip
+        -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ;
 
 : str-sort ( list -- sorted )

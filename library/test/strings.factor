@@ -91,3 +91,15 @@ unit-test
 [ f ] [ [ 0 10 "hello" substring ] [ not ] catch ] unit-test
 
 [ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" split-n ] unit-test
+
+[ 4 ] [
+    0 "There are Four Upper Case characters"
+    [ LETTER? [ succ ] when ] str-each
+] unit-test
+
+[ "Replacing+spaces+with+plus" ]
+[
+    "Replacing spaces with plus"
+    [ CHAR: \s CHAR: + replace ] str-map
+]
+unit-test

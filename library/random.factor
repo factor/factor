@@ -65,7 +65,7 @@ USE: stack
 
 : random-element-iter ( list index -- elem )
     #! Used by random-element*. Do not call directly.
-    [ unswons unswons ] dip ( list elem probability index )
+    >r unswons unswons r>   ( list elem probability index )
     swap -                  ( list elem index )
     dup 0 <= [
         drop nip
@@ -84,16 +84,13 @@ USE: stack
     #! Returns a random subset of the given list of comma pairs.
     #! The car of each pair is a probability, the cdr is the
     #! item itself. Only the cdr of the comma pair is returned.
-    dup [ [ [ ] ] dip car+ ] dip ( [ ] probabilitySum list )
-    [
-        [ 1 over random-int ] dip ( [ ] probabilitySum probability elem )
-        uncons ( [ ] probabilitySum probability elema elemd )
-        -rot ( [ ] probabilitySum elemd probability elema )
-        > ( [ ] probabilitySum elemd boolean )
+    [,
+        [ car+ ] keep ( probabilitySum list )
         [
-            drop
-        ] [
-            -rot ( elemd [ ] probabilitySum )
-            [ cons ] dip ( [ elemd ] probabilitySum )
-        ] ifte
-    ] each drop ;
+            >r 1 over random-int r> ( probabilitySum probability elem )
+            uncons ( probabilitySum probability elema elemd )
+            -rot ( probabilitySum elemd probability elema )
+            > ( probabilitySum elemd boolean )
+            [ drop ] [ , ] ifte
+        ] each drop
+    ,] ;

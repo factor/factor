@@ -67,7 +67,9 @@ USE: stack
     #! Apply a quotation to each character in the string, and
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
-    <% swap [ swap dup >r call % r> ] str-each drop %> ;
+    over str-length <sbuf> rot [
+        swap >r apply r> tuck sbuf-append
+    ] str-each nip sbuf>str ;
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [

@@ -39,18 +39,12 @@ USE: stack
         -rot 2dup >r >r >r vector-nth r> call r> r>
     ] times* 2drop ;
 
-: (vector-map-step) ( element code -- result code )
-    dup >r call r> ;
-
-: (vector-map) ( code target element -- result code target )
-    -rot >r (vector-map-step) r> ;
-
 : vector-map ( vector code -- vector )
     #! Applies code to each element of the vector, return a new
     #! vector with the results. The code must have stack effect
     #! ( obj -- obj ).
     over vector-length <vector> rot [
-        (vector-map) swapd tuck vector-push
+        swap >r apply r> tuck vector-push
     ] vector-each nip ;
 
 : vector-and ( vector -- ? )
