@@ -77,10 +77,10 @@ SYMBOL: alien-parameters
 
 : infer-alien ( -- )
     4 ensure-d
-    dataflow-drop, pop-d literal
-    dataflow-drop, pop-d literal
-    dataflow-drop, pop-d literal alien-function >r
-    dataflow-drop, pop-d literal swap
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value alien-function >r
+    dataflow-drop, pop-d literal-value swap
     r> dataflow, [
         alien-returns set
         alien-parameters set
