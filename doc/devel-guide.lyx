@@ -4123,7 +4123,319 @@ substring ( start end str -- substr )
  extracts a range of characters from a string into a new string.
 \layout Standard
 
-cat2/3/4/5, cat
+
+\family typewriter 
+split ( str split -- list )
+\family default 
+ pushes a new list of strings which are substrings of the original string,
+ taken in between occurrences of the split string:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+fixnum bignum ratio
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+ 
+\begin_inset Quotes erd
+\end_inset 
+
+ split .
+\layout LyX-Code
+
+
+\emph on 
+[ 
+\begin_inset Quotes eld
+\end_inset 
+
+fixnum
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+bignum
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+ratio
+\begin_inset Quotes erd
+\end_inset 
+
+ ]
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+/usr/bin/X
+\begin_inset Quotes erd
+\end_inset 
+
+ CHAR: / split .
+\layout LyX-Code
+
+
+\emph on 
+[ 
+\begin_inset Quotes eld
+\end_inset 
+
+
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+usr
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+bin
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+X
+\begin_inset Quotes erd
+\end_inset 
+
+ ]
+\layout Standard
+
+If you wish to concatenate a fixed number of strings at the top of the stack,
+ you can use a member of the 
+\family typewriter 
+cat
+\family default 
+ family of words from the 
+\family typewriter 
+strings
+\family default 
+ vocabulary.
+ They concatenate strings, in the order that they appear in the stack effect.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Word
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Stack effect
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+cat2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+( s1 s2 -- str )
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+cat3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+( s1 s2 s3 -- str )
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+cat4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+( s1 s2 s3 s4 -- str )
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+cat5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+( s1 s2 s3 s4 s5 -- str )
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\family typewriter 
+cat ( list -- str )
+\family default 
+ is a generalization of the above words; it concatenates each element of
+ a list into a new string.
+\layout Standard
+
+Some straightfoward examples:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+How are you, 
+\begin_inset Quotes eld
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+Chuck
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+?
+\begin_inset Quotes erd
+\end_inset 
+
+ cat3 .
+\layout LyX-Code
+
+
+\emph on 
+
+\begin_inset Quotes eld
+\end_inset 
+
+How are you, Chuck?
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+/usr/bin/X
+\begin_inset Quotes erd
+\end_inset 
+
+ CHAR: / split cat .
+\layout LyX-Code
+
+
+\emph on 
+
+\begin_inset Quotes eld
+\end_inset 
+
+usrbinX
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+String buffers, described in the next section, provide a more flexible means
+ of concatenating strings.
 \layout Subsection
 
 String buffers
@@ -4285,45 +4597,44 @@ set-sbuf-length ( n sbuf -- )
 String constructors
 \layout Standard
 
-The string construction words are the second example so far of dynamic scoping.
- The first was the list construction words we saw in 
+Passing a string buffer on the stack can lead to unnecessary stack noise,
+ and overly-complicated stack effects.
+ Often it is better to use the string construction words, which operate
+ on a similar principle to the list construction words.
+\layout Standard
+
+As seen in 
 \begin_inset LatexCommand \ref{sub:List-constructors}
 
 \end_inset 
 
-.
- Scoping and variables is the subject of a future chapter.
- However, a basic understanding is necessary to fully grasp list and string
- construction words.
-\layout Standard
-
-In the list construction idiom, the 
+, the 
 \family typewriter 
 [,
 \family default 
- and 
-\family typewriter 
-,]
-\family default 
- words started and ended a dynamic scope, during which the word 
+ word begins list construction; the 
 \family typewriter 
 ,
 \family default 
- appended elements on a list.
- The 
+ word appends elements to the list that will be returned by the 
+\family typewriter 
+,]
+\family default 
+ word.
+ Similarly, the 
 \family typewriter 
 <%
 \family default 
- and 
-\family typewriter 
-%>
-\family default 
- words similarly begin and end string construction.
- Intuitively, 
+ word begins string construction; the 
 \family typewriter 
 %
 \family default 
- appends the top of the stack to the currently-constructing string.
+ word appends the top of the stack to the string that will be returned by
+ the 
+\family typewriter 
+%>
+\family default 
+ word.
 \layout Standard
 
 The word 

@@ -2,6 +2,10 @@
 
 <project name=" Factor" default="dist" basedir=".">
 
+	<target name="init">
+		<available property="jedit" classname="org.gjt.sp.jedit.jEdit" />
+	</target>
+	
 	<target name="compile">
 		<javac
 			srcdir="."
@@ -15,7 +19,7 @@
 		<exclude name="factor/jedit/*.java"/>
 		</javac>
 	</target>
-	<target name="compile-jedit">
+	<target name="compile-jedit" if="jedit">
 		<javac
 			srcdir="."
 			destdir="."
