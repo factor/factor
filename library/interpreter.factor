@@ -100,8 +100,8 @@ USE: vectors
 
 : room. ( -- )
     room
-    1024 / unparse write " KB total, " write
-    1024 / unparse write " KB free" print ;
+    1024 /i unparse write " KB total, " write
+    1024 /i unparse write " KB free" print ;
 
 : help ( -- )
     "SESSION:" print

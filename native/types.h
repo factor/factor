@@ -9,8 +9,9 @@
 #define WORD_TYPE 1
 #define CONS_TYPE 2
 #define OBJECT_TYPE 3
-#define HEADER_TYPE 4
-#define GC_COLLECTED 5 /* See gc.c */
+#define RATIO_TYPE 4
+#define HEADER_TYPE 5
+#define GC_COLLECTED 6 /* See gc.c */
 
 /*** Header types ***/
 

@@ -5,9 +5,19 @@ INLINE BIGNUM* fixnum_to_bignum(CELL n)
 	return bignum((BIGNUM_2)untag_fixnum_fast(n));
 }
 
+INLINE RATIO* fixnum_to_ratio(CELL n)
+{
+	return ratio(n,tag_fixnum(1));
+}
+
 INLINE FIXNUM bignum_to_fixnum(CELL tagged)
 {
 	return (FIXNUM)(untag_bignum(tagged)->n);
+}
+
+INLINE RATIO* bignum_to_ratio(CELL n)
+{
+	return ratio(n,tag_fixnum(1));
 }
 
 #define CELL_TO_INTEGER(result) \
@@ -45,18 +55,18 @@ CELL OP(CELL x, CELL y) \
 					return OP##_anytype(x,y); \
 				else \
 					type_error(FIXNUM_TYPE,y); \
-				break; \
+				return F; \
 			} \
 			break; \
+		case RATIO_TYPE: \
+			return OP##_ratio((CELL)fixnum_to_ratio(x),y); \
 		default: \
 			if(anytype) \
 				return OP##_anytype(x,y); \
 			else \
 				type_error(FIXNUM_TYPE,y); \
-			break; \
+			return F; \
 		} \
-\
-		break; \
 \
 	case OBJECT_TYPE: \
 \
@@ -75,20 +85,19 @@ CELL OP(CELL x, CELL y) \
 				{ \
 				case BIGNUM_TYPE: \
 					return OP##_bignum(x,y); \
-					break; \
 				default: \
 					type_error(BIGNUM_TYPE,y); \
-					break; \
+					return F; \
 				} \
-				break; \
+			case RATIO_TYPE: \
+				return OP##_ratio((CELL)bignum_to_ratio(x),y); \
 			default: \
 				if(anytype) \
 					return OP##_anytype(x,y); \
 				else \
 					type_error(BIGNUM_TYPE,y); \
-				break; \
+				return F; \
 			} \
-			break; \
 \
 		default: \
 \
@@ -96,10 +105,37 @@ CELL OP(CELL x, CELL y) \
 				return OP##_anytype(x,y); \
 			else \
 				type_error(FIXNUM_TYPE,x); \
-			break; \
+			return F; \
 		} \
 \
-		break; \
+	case RATIO_TYPE: \
+\
+		switch(TAG(y)) \
+		{ \
+		case FIXNUM_TYPE: \
+			return OP##_ratio(x,(CELL)fixnum_to_ratio(y)); \
+		case OBJECT_TYPE: \
+			switch(object_type(y)) \
+			{ \
+			case BIGNUM_TYPE: \
+				return OP##_ratio(x,(CELL)bignum_to_ratio(y)); \
+			default: \
+				if(anytype) \
+					return OP##_anytype(x,y); \
+				else \
+					type_error(FIXNUM_TYPE,y); \
+				return F; \
+			} \
+			break; \
+		case RATIO_TYPE: \
+			return OP##_ratio(x,y); \
+		default: \
+			if(anytype) \
+				return OP##_anytype(x,y); \
+			else \
+				type_error(FIXNUM_TYPE,y); \
+			return F; \
+		} \
 \
 	default: \
 \
@@ -107,7 +143,7 @@ CELL OP(CELL x, CELL y) \
 			return OP##_anytype(x,y); \
 		else \
 			type_error(FIXNUM_TYPE,x); \
-		break; \
+		return F; \
 	} \
 } \
 \
@@ -118,16 +154,25 @@ void primitive_##OP(void) \
 }
 
 void primitive_numberp(void);
+
 FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
+
 BIGNUM* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 
+CELL to_integer(CELL tagged);
+void primitive_to_integer(void);
+
+CELL number_eq(CELL x, CELL y);
 void primitive_number_eq(void);
+
 void primitive_add(void);
 void primitive_subtract(void);
 void primitive_multiply(void);
 void primitive_divmod(void);
+void primitive_divint(void);
+void primitive_divide(void);
 void primitive_less(void);
 void primitive_lesseq(void);
 void primitive_greater(void);
@@ -138,3 +183,11 @@ void primitive_or(void);
 void primitive_xor(void);
 void primitive_shiftleft(void);
 void primitive_shiftright(void);
+
+CELL add(CELL x, CELL y);
+CELL subtract(CELL x, CELL y);
+CELL multiply(CELL x, CELL y);
+CELL divide(CELL x, CELL y);
+CELL divint(CELL x, CELL y);
+
+FIXNUM gcd_fixnum(FIXNUM x, FIXNUM y);

@@ -63,11 +63,12 @@ USE: words
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
 
-: fixnum-tag BIN: 000 ;
-: word-tag   BIN: 001 ;
-: cons-tag   BIN: 010 ;
-: object-tag BIN: 011 ;
-: header-tag BIN: 100 ;
+: fixnum-tag   BIN: 000 ;
+: word-tag     BIN: 001 ;
+: cons-tag     BIN: 010 ;
+: object-tag   BIN: 011 ;
+: rational-tag BIN: 100 ;
+: header-tag   BIN: 101 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;

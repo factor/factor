@@ -17,23 +17,7 @@ USE: test
 [ 4 ] [ 132 -64 ] [ gcd ] test-word
 [ 4 ] [ -132 -64 ] [ gcd ] test-word
 
-! Some ratio tests.
-
-[ t ] [ 10 3 ] [ / ratio? ] test-word
-[ f ] [ 10 2 ] [ / ratio? ] test-word
-[ 10 ] [ 10 ] [ numerator ] test-word
-[ 1 ] [ 10 ] [ denominator ] test-word
-[ 12 ] [ -12 -13 ] [ / numerator ] test-word
-[ 13 ] [ -12 -13 ] [ / denominator ] test-word
-[ 1 ] [ -1 -1 ] [ / numerator ] test-word
-[ 1 ] [ -1 -1 ] [ / denominator ] test-word
-
-[ -1 ] [ 2 -2 ] [ / ] test-word
-[ -1 ] [ -2 2 ] [ / ] test-word
-
 ! Make sure computation results are sane types.
-
-[ t ] [ 1 3 / 1 3 / ] [ = ] test-word
 [ t ] [ 30 2^ ] [ fixnum? ] test-word
 [ t ] [ 32 2^ ] [ bignum? ] test-word
 

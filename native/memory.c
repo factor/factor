@@ -21,7 +21,7 @@ void init_arena(CELL size)
 	active = z1;
 }
 
-CELL allot(CELL a)
+void* allot(CELL a)
 {
 	CELL h = active->here;
 	active->here = align8(active->here + a);
@@ -43,7 +43,7 @@ CELL allot(CELL a)
 		env.cf = env.user[GC_ENV];
 	}
 
-	return h;
+	return (void*)h;
 }
 
 void flip_zones()

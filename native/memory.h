@@ -13,7 +13,7 @@ ZONE* prior; /* if active==z1, z2; if active==z2, z1 */
 void init_arena(CELL size);
 void flip_zones();
 
-CELL allot(CELL a);
+void* allot(CELL a);
 
 INLINE CELL align8(CELL a)
 {

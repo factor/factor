@@ -53,6 +53,13 @@ USE: vocabularies
 : unparse-integer ( num -- str )
     <% integer- integer% %> ;
 
+: unparse-ratio ( num -- str )
+    <% dup
+    numerator integer- integer%
+    CHAR: / %
+    denominator integer- integer%
+    %> ;
+
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
     <namespace> [ "base" set unparse-integer ] bind ;
@@ -104,6 +111,7 @@ USE: vocabularies
         [ f eq?    ] [ drop "f" ]
         [ word?    ] [ unparse-word ]
         [ integer? ] [ unparse-integer ]
+        [ ratio?   ] [ unparse-ratio ]
         [ string?  ] [ unparse-str ]
         [ drop t   ] [ <% "#<" % class-of % ">" % %> ]
     ] cond ;

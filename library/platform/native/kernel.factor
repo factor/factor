@@ -76,6 +76,7 @@ USE: unparser
     [
         [ fixnum? ] [ drop "fixnum" ]
         [ bignum? ] [ drop "bignum" ]
+        [ ratio?  ] [ drop "ratio" ]
         [ cons?   ] [ drop "cons" ]
         [ word?   ] [ drop "word" ]
         [ f =     ] [ drop "f" ]

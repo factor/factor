@@ -53,9 +53,9 @@ void type_check(CELL type, CELL tagged)
  */
 CELL allot_object(CELL type, CELL length)
 {
-	CELL object = allot(length);
-	put(object,tag_header(type));
-	return object;
+	CELL* object = allot(length);
+	*object = tag_header(type);
+	return (CELL)object;
 }
 
 CELL object_size(CELL pointer)
@@ -66,6 +66,8 @@ CELL object_size(CELL pointer)
 		return align8(sizeof(CONS));
 	case WORD_TYPE:
 		return align8(sizeof(WORD));
+	case RATIO_TYPE:
+		return align8(sizeof(RATIO));
 	case OBJECT_TYPE:
 		return untagged_object_size(UNTAG(pointer));
 	default:

@@ -104,7 +104,7 @@ VECTOR* stack_to_vector(CELL top, CELL bottom)
 	CELL depth = (top - bottom - sizeof(ARRAY)) / CELLS - 1;
 	VECTOR* v = vector(depth);
 	ARRAY* a = v->array;
-	memcpy(a + 1,bottom + sizeof(ARRAY) + CELLS,depth * CELLS);
+	memcpy(a + 1,(void*)(bottom + sizeof(ARRAY) + CELLS),depth * CELLS);
 	v->top = depth;
 	return v;
 }
@@ -126,7 +126,7 @@ CELL vector_to_stack(VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom + sizeof(ARRAY) + CELLS;
 	CELL len = vector->top * CELLS;
-	memcpy(start,vector->array + 1,len);
+	memcpy((void*)start,vector->array + 1,len);
 	return start + len;
 }
 

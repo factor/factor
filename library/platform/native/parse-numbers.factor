@@ -61,20 +61,31 @@ USE: unparser
         not-a-number
     ] ifte ;
 
-: (str>fixnum) ( str -- num )
+: (str>integer) ( str -- num )
     0 swap [ digit> digit ] str-each ;
 
-: str>fixnum ( str -- num )
+: str>integer ( str -- num )
     #! Parse a string representation of an integer.
     dup str-length 0 = [
         drop not-a-number
     ] [
         dup "-" str-head? dup [
-            nip str>fixnum neg
+            nip str>integer neg
         ] [
-            drop (str>fixnum)
+            drop (str>integer)
         ] ifte
     ] ifte ;
 
+: str>ratio ( str -- num )
+    dup CHAR: / index-of str//
+    swap str>integer swap str>integer / ;
+
+: str>number ( str -- num )
+    "/" over str-contains? [
+        str>ratio
+    ] [
+        str>integer
+    ] ifte ;
+
 : parse-number ( str -- num/f )
-    [ str>fixnum ] [ [ drop f ] when ] catch ;
+    [ str>number ] [ [ drop f ] when ] catch ;

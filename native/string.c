@@ -215,7 +215,10 @@ void primitive_index_of(void)
 	string = untag_string(dpop());
 	index = to_fixnum(dpop());
 	if(index < 0 || index > string->capacity)
+	{
 		range_error(tag_object(string),index,string->capacity);
+		result = -1; /* can't happen */
+	}
 	else if(TAG(ch) == FIXNUM_TYPE)
 		result = index_of_ch(index,string,to_fixnum(ch));
 	else
@@ -235,7 +238,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 
 	result = allot_string(end - start);
 	memcpy(result + 1,
-		(CELL)(string + 1) + CHARS * start,
+		(void*)((CELL)(string + 1) + CHARS * start),
 		CHARS * (end - start));
 	hash_string(result);
 

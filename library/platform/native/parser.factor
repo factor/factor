@@ -97,7 +97,7 @@ USE: unparser
     dup "use" get search dup [
         nip
     ] [
-        drop str>fixnum
+        drop str>number
     ] ifte ;
 
 : parsed| ( obj -- )
@@ -111,7 +111,7 @@ USE: unparser
     over "|" = [ nip parsed| expect-] ] [ swons ] ifte ;
 
 : number, ( num -- )
-    str>fixnum parsed ;
+    str>number parsed ;
 
 : word, ( str -- )
     [

@@ -51,6 +51,12 @@ USE: stack
     "factor.math.FactorMath" "divide"
     jinvoke-static ; inline
 
+: /i ( a b -- a/b )
+    #! Truncating division.
+    [ "java.lang.Number" "java.lang.Number" ]
+    "factor.math.FactorMath" "_divide"
+    jinvoke-static ; inline
+
 : mod ( a b -- a%b )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.math.FactorMath" "mod"

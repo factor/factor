@@ -41,18 +41,18 @@ void fixup_array(ARRAY* array)
 {
 	int i = 0;
 	for(i = 0; i < array->capacity; i++)
-		fixup(AREF(array,i));
+		fixup((void*)AREF(array,i));
 }
 
 void collect_array(ARRAY* array)
 {
 	int i = 0;
 	for(i = 0; i < array->capacity; i++)
-		copy_object(AREF(array,i));
+		copy_object((void*)AREF(array,i));
 }
 
 /* copy an array to newspace */
 ARRAY* copy_array(ARRAY* array)
 {
-	return (ARRAY*)copy_untagged_object(array,ASIZE(array));
+	return copy_untagged_object(array,ASIZE(array));
 }

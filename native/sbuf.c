@@ -83,8 +83,8 @@ void sbuf_append_string(SBUF* sbuf, STRING* string)
 	CELL top = sbuf->top;
 	CELL strlen = string->capacity;
 	sbuf_ensure_capacity(sbuf,top + strlen);
-	memcpy((CELL)sbuf->string + sizeof(STRING) + top * CHARS,
-		(CELL)string + sizeof(STRING),strlen * CHARS);
+	memcpy((void*)((CELL)sbuf->string + sizeof(STRING) + top * CHARS),
+		(void*)((CELL)string + sizeof(STRING)),strlen * CHARS);
 }
 
 void primitive_sbuf_append(void)
@@ -123,7 +123,8 @@ void primitive_sbuf_to_string(void)
 
 void fixup_sbuf(SBUF* sbuf)
 {
-	sbuf->string = (CELL)sbuf->string + (active->base - relocation_base);
+	sbuf->string = (STRING*)((CELL)sbuf->string
+		+ (active->base - relocation_base));
 }
 
 void collect_sbuf(SBUF* sbuf)

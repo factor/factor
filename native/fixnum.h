@@ -14,5 +14,4 @@ INLINE CELL tag_fixnum(FIXNUM untagged)
 }
 
 void primitive_fixnump(void);
-void primitive_divide(void);
 void primitive_not(void);

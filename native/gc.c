@@ -11,9 +11,9 @@ INLINE void gc_debug(char* msg, CELL x) {
 }
 
 /* Given a pointer to a pointer to oldspace, copy it to newspace. */
-CELL copy_untagged_object(CELL pointer, CELL size)
+void* copy_untagged_object(void* pointer, CELL size)
 {
-	CELL newpointer = allot(size);
+	void* newpointer = allot(size);
 	memcpy(newpointer,pointer,size);
 
 	return newpointer;
@@ -51,7 +51,7 @@ void copy_object(CELL* handle)
 	else
 	{
 		gc_debug("copy_object",pointer);
-		newpointer = copy_untagged_object(UNTAG(pointer),
+		newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
 			object_size(pointer));
 		put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
 	}
@@ -100,7 +100,7 @@ void collect_next(void)
 		collect_object();
 		break;
 	default:
-		copy_object(scan);
+		copy_object((CELL*)scan);
 		scan += CELLS;
 		break;
 	}

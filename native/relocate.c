@@ -57,17 +57,17 @@ void relocate(CELL r)
 	   EMPTY, F, T */
 	if(untag_header(get(relocating)) != EMPTY_TYPE)
 		fatal_error("Not empty",get(relocating));
-	empty = tag_object(relocating);
+	empty = tag_object((CELL*)relocating);
 	relocate_next();
 
 	if(untag_header(get(relocating)) != F_TYPE)
 		fatal_error("Not F",get(relocating));
-	F = tag_object(relocating);
+	F = tag_object((CELL*)relocating);
 	relocate_next();
 
 	if(untag_header(get(relocating)) != T_TYPE)
 		fatal_error("Not T",get(relocating));
-	T = tag_object(relocating);
+	T = tag_object((CELL*)relocating);
 	relocate_next();
 
 	for(;;)

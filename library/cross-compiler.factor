@@ -41,6 +41,8 @@ USE: words
 
 IN: arithmetic
 DEFER: number=
+DEFER: >integer
+DEFER: /i
 
 IN: kernel
 DEFER: getenv
@@ -115,12 +117,17 @@ IN: cross-compiler
         number?
         >fixnum
         >bignum
+        >integer
         number=
         fixnum?
         bignum?
+        ratio?
+        numerator
+        denominator
         +
         -
         *
+        /i
         /
         mod
         /mod
