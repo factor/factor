@@ -62,12 +62,12 @@ void primitive_float_to_str(void)
 void primitive_float_to_bits(void)
 {
 	double f;
-	long long f_raw;
+	int64_t f_raw;
 
 	maybe_garbage_collection();
 
 	f = untag_float(dpeek());
-	f_raw = *(long long*)&f;
+	f_raw = *(int64_t*)&f;
 	drepl(tag_object(s48_long_long_to_bignum(f_raw)));
 }
 

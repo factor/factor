@@ -181,7 +181,7 @@ void primitive_alien_2(void)
 {
 #ifdef FFI
 	CELL ptr = alien_pointer();
-	box_signed_2(*(CHAR*)ptr);
+	box_signed_2(*(uint16_t*)ptr);
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif
@@ -192,7 +192,7 @@ void primitive_set_alien_2(void)
 #ifdef FFI
 	CELL ptr = alien_pointer();
 	CELL value = unbox_signed_2();
-	*(CHAR*)ptr = value;
+	*(uint16_t*)ptr = value;
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif

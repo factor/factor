@@ -1,6 +1,6 @@
 CELL scan;
 bool gc_in_progress;
-long long gc_time;
+int64_t gc_time;
 
 /* Given a pointer to oldspace, copy it to newspace. */
 INLINE void* copy_untagged_object(void* pointer, CELL size)

@@ -56,7 +56,7 @@ void sbuf_ensure_capacity(SBUF* sbuf, FIXNUM top)
 	sbuf->top = top;
 }
 
-void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value)
+void set_sbuf_nth(SBUF* sbuf, CELL index, uint16_t value)
 {
 	if(index < 0)
 		range_error(tag_object(sbuf),index,sbuf->top);

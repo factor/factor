@@ -383,7 +383,7 @@ s48_long_to_bignum(long n)
 }
 
 bignum_type
-s48_long_long_to_bignum(long long n)
+s48_long_long_to_bignum(int64_t n)
 {
   int negative_p;
   bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG_LONG];
@@ -393,7 +393,7 @@ s48_long_long_to_bignum(long long n)
   if (n == 1) return (BIGNUM_ONE (0));
   if (n == -1) return (BIGNUM_ONE (1));
   {
-    unsigned long long accumulator = ((negative_p = (n < 0)) ? (-n) : n);
+    uint64_t accumulator = ((negative_p = (n < 0)) ? (-n) : n);
     do
       {
 	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);

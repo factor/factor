@@ -24,12 +24,22 @@ void primitive_eq(void)
 	box_boolean(dpop() == dpop());
 }
 
-long long current_millis(void)
+#ifdef WIN32
+int64_t current_millis(void)
+{
+	FILETIME t;
+	GetSystemTimeAsFileTime(&t);
+	return ((int64_t)t.dwLowDateTime | (int64_t)t.dwHighDateTime<<32) / 100000
+		- 172456224000;
+}
+#else
+int64_t current_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	return (long long)t.tv_sec * 1000 + t.tv_usec/1000;
+	return (int64_t)t.tv_sec * 1000 + t.tv_usec/1000;
 }
+#endif
 
 void primitive_millis(void)
 {
@@ -39,17 +49,11 @@ void primitive_millis(void)
 
 void primitive_init_random(void)
 {
-#ifdef HAVE_SRANDOMDEV
-	srandomdev();
-#else
-	struct timeval t;
-	gettimeofday(&t,NULL);
-	srandom(t.tv_sec);
-#endif
+	srand((unsigned)time(NULL));
 }
 
 void primitive_random_int(void)
 {
 	maybe_garbage_collection();
-	dpush(tag_object(s48_long_to_bignum(random())));
+	dpush(tag_object(s48_long_to_bignum(rand())));
 }

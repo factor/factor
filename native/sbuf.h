@@ -20,7 +20,7 @@ void primitive_sbuf_length(void);
 void primitive_set_sbuf_length(void);
 void primitive_sbuf_nth(void);
 void sbuf_ensure_capacity(SBUF* sbuf, FIXNUM top);
-void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value);
+void set_sbuf_nth(SBUF* sbuf, CELL index, uint16_t value);
 void primitive_set_sbuf_nth(void);
 void sbuf_append_string(SBUF* sbuf, STRING* string);
 void primitive_sbuf_append(void);

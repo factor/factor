@@ -25,33 +25,61 @@ CELL cs_bot;
 /* raw pointer to callstack top */
 CELL cs;
 
-#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
 #include <setjmp.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/mman.h>
-#include <sys/param.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <netdb.h>
+
+#ifdef WIN32
+	#include <windows.h>
+#else
+	#include <dirent.h>
+	#include <sys/mman.h>
+	#include <sys/param.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <sys/stat.h>
+	#include <netinet/in.h>
+	#include <arpa/inet.h>
+	#include <unistd.h>
+	#include <sys/time.h>
+	#include <netdb.h>
+#endif
+
+#include <time.h>
+
+#if defined(_MSC_VER)
+	#pragma warning(disable:4312)
+	#pragma warning(disable:4311)
+	typedef enum { false, true } _Bool;
+	typedef enum _Bool bool;
+	typedef unsigned char uint8_t;
+	typedef unsigned short uint16_t;
+	typedef unsigned int uint32_t;
+	typedef unsigned __int64 uint64_t;
+	typedef signed char int8_t;
+	typedef signed short int16_t;
+	typedef signed int int32_t;
+	typedef signed __int64 int64_t;
+	#define snprintf _snprintf
+#else
+	#include <stdbool.h>
+#endif
 
 #ifdef FFI
 #include <dlfcn.h>
 #endif /* FFI */
 
-#define INLINE inline static
+#if defined(_MSC_VER)
+	#define INLINE static __inline
+#else
+	#define INLINE inline static
+#endif
 
 #define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
 #define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
@@ -63,8 +91,7 @@ CELL cs;
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
 /* must always be 16 bits */
-typedef unsigned short CHAR;
-#define CHARS ((signed)sizeof(CHAR))
+#define CHARS ((signed)sizeof(uint16_t))
 
 /* must always be 8 bits */
 typedef unsigned char BYTE;

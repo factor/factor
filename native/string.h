@@ -16,7 +16,7 @@ STRING* allot_string(FIXNUM capacity);
 STRING* string(FIXNUM capacity, CELL fill);
 FIXNUM hash_string(STRING* str, FIXNUM len);
 void rehash_string(STRING* str);
-STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill);
+STRING* grow_string(STRING* string, FIXNUM capacity, uint16_t fill);
 BYTE* to_c_string(STRING* s);
 BYTE* to_c_string_unchecked(STRING* s);
 void box_c_string(const BYTE* c_string);
@@ -35,7 +35,7 @@ INLINE CELL string_nth(STRING* string, CELL index)
 }
 
 /* untagged & unchecked */
-INLINE void set_string_nth(STRING* string, CELL index, CHAR value)
+INLINE void set_string_nth(STRING* string, CELL index, uint16_t value)
 {
 	cput(SREF(string,index),value);
 }

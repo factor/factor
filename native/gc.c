@@ -123,7 +123,7 @@ void collect_roots(void)
 
 void primitive_gc(void)
 {
-	long long start = current_millis();
+	int64_t start = current_millis();
 
 	gc_in_progress = true;
 

@@ -44,7 +44,7 @@ STRING* string(FIXNUM capacity, CELL fill)
 	return string;
 }
 
-STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill)
+STRING* grow_string(STRING* string, FIXNUM capacity, uint16_t fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
@@ -90,7 +90,7 @@ BYTE* to_c_string(STRING* s)
 
 	for(i = 0; i < s->capacity; i++)
 	{
-		CHAR ch = string_nth(s,i);
+		uint16_t ch = string_nth(s,i);
 		if(ch == '\0' || ch > 255)
 			general_error(ERROR_C_STRING,tag_object(s));
 	}
@@ -140,8 +140,8 @@ FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len)
 	CELL i = 0;
 	while(i < len)
 	{
-		CHAR c1 = string_nth(s1,i);
-		CHAR c2 = string_nth(s2,i);
+		uint16_t c1 = string_nth(s1,i);
+		uint16_t c2 = string_nth(s2,i);
 		if(c1 != c2)
 			return c1 - c2;
 		i++;
@@ -299,7 +299,7 @@ void primitive_substring(void)
 void string_reverse(STRING* s, int len)
 {
 	int i, j;
-	CHAR ch1, ch2;
+	uint16_t ch1, ch2;
 	for(i = 0; i < len / 2; i++)
 	{
 		j = len - i - 1;

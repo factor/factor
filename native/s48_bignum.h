@@ -66,7 +66,7 @@ s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 bignum_type s48_bignum_quotient(bignum_type, bignum_type);
 bignum_type s48_bignum_remainder(bignum_type, bignum_type);
 bignum_type s48_long_to_bignum(long);
-bignum_type s48_long_long_to_bignum(long long n);
+bignum_type s48_long_long_to_bignum(int64_t n);
 bignum_type s48_ulong_to_bignum(unsigned long);
 long s48_bignum_to_long(bignum_type);
 unsigned long s48_bignum_to_ulong(bignum_type);
