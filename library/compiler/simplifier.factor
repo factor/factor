@@ -28,6 +28,7 @@
 IN: compiler
 USE: inference
 USE: errors
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
@@ -41,47 +42,52 @@ USE: unparser
 USE: vectors
 USE: words
 
-: compiling ( word -- definition )
-    "verbose-compile" get [
-        "Compiling " write dup . flush
-    ] when
-    cell compile-aligned dup save-xt word-parameter ;
+! <LittleDan> peephole?
+! <LittleDan> "whose peephole are we optimizing" "your mom's"
 
-: (compile) ( word -- )
-    #! Should be called inside the with-compiler scope.
-    compiling dataflow optimize linearize simplify generate ;
+: labels ( linear -- list )
+    #! Make a list of all labels defined in the linear IR.
+    [ [ unswons #label = [ , ] [ drop ] ifte ] each ] make-list ;
 
-: precompile ( word -- )
-    #! Print linear IR of word.
+: label-called? ( label linear -- ? )
+    [ unswons #label = [ drop f ] [ over = ] ifte ] some? nip ;
+
+: purge-label ( label linear -- )
+    >r dup cdr r> label-called? [ , ] [ drop ] ifte ;
+
+: purge-labels ( linear -- linear )
+    #! Remove all unused labels.
     [
-        word-parameter dataflow optimize linearize simplify [.]
-    ] with-scope ;
+        dup [
+            dup car #label = [ over purge-label ] [ , ] ifte
+        ] each drop
+    ] make-list ;
 
-: compile-postponed ( -- )
-    compile-words get [
-        uncons compile-words set (compile) compile-postponed
-    ] when* ;
-
-: compile ( word -- )
-    [ postpone-word compile-postponed ] with-compiler ;
-
-: compiled ( -- )
-    #! Compile the most recently defined word.
-    word compile ; parsing
-
-: cannot-compile ( word -- )
-    "verbose-compile" get [
-        "Cannot compile " write .
+: simplify-node ( node rest -- rest ? )
+    over car "simplifier" word-property [
+        call
     ] [
-        drop
-    ] ifte ;
+        swap , f
+    ] ifte* ;
 
-: compile-all ( -- )
-    #! Compile all words.
-    [
-        dup "infer-effect" word-property [
-            [ compile ] [ [ cannot-compile ] when ] catch
-        ] [
-            drop
-        ] ifte
-    ] each-word ;
+: find-label ( label linear -- rest )
+    [ cdr over = ] some? cdr nip ;
+
+: (simplify) ( list -- ? )
+    dup [ uncons simplify-node drop (simplify) ] [ drop ] ifte ;
+
+: simplify ( linear -- linear )
+    purge-labels [ (simplify) ] make-list ;
+
+: follows? ( op list -- ? ) dup [ car car = ] [ 2drop f ] ifte ;
+
+GENERIC: call-simplifier ( node rest -- rest ? )
+
+M: cons call-simplifier ( node rest -- ? )
+    swap , f ;
+
+PREDICATE: cons return-follows #return swap follows? ;
+M: return-follows call-simplifier ( node rest -- rest ? )
+    cdr swap cdr #jump swons , t ;
+
+#call [ call-simplifier ] "simplifier" set-word-property

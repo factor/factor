@@ -96,8 +96,10 @@ SYMBOL: #target ( part of jump table )
 ] "linearizer" set-word-property
 
 : <label> ( -- label )
-    gensym
-    dup t "label" set-word-property ;
+    gensym  dup t "label" set-word-property ;
+
+: label? ( obj -- ? )
+    dup word ? [ "label" word-property ] [ drop f ] ifte ;
 
 : label, ( label -- )
     #label swons , ;

@@ -1,49 +1,105 @@
 ! A simple IRC client written in Factor.
 
+IN: irc
+USE: generic
 USE: stdio
 USE: namespaces
 USE: streams
 USE: kernel
 USE: threads
+USE: lists
+USE: strings
+USE: words
+USE: math
 
 SYMBOL: irc-stream
+SYMBOL: channels
 SYMBOL: channel
+SYMBOL: nickname
 
-: irc-write ( str -- )
-    irc-stream get fwrite ;
+: irc-write ( s -- ) irc-stream get fwrite ;
+: irc-print ( s -- ) irc-stream get fprint irc-stream get fflush ;
 
-: irc-print ( str -- )
-    irc-stream get fprint  irc-stream get fflush ;
-
-: join ( chan -- )
-    dup channel set  "JOIN " irc-write irc-print ;
+: nick ( nick -- )
+    dup nickname set  "NICK " irc-write irc-print ;
 
 : login ( nick -- )
-    "NICK " irc-write dup irc-print
+    dup nick
     "USER " irc-write irc-write
     " hostname servername :irc.factor" irc-print ;
 
-: connect ( channel nick server -- )
-    6667 <client> irc-stream set  login join ;
+: connect ( server -- ) 6667 <client> irc-stream set ;
+
+: write-highlighted ( line -- )
+    dup nickname get index-of -1 =
+    f [ [ "ansi-fg" | "3" ] ] ? write-attr ;
+
+: extract-nick ( line -- nick )
+    "!" split1 drop ;
+
+: write-nick ( line -- )
+    "!" split1 drop [ [ "bold" | t ] ] write-attr ;
+
+GENERIC: irc-display
+PREDICATE: string privmsg "PRIVMSG" index-of -1 > ;
+PREDICATE: string action  "ACTION" index-of -1 > ;
+
+M: string irc-display ( line -- )
+    print ;
+
+M: privmsg irc-display ( line -- )
+    "PRIVMSG" split1 >r write-nick r>
+    write-highlighted terpri flush ;
+
+! Doesn't look good
+! M: action irc-display ( line -- )
+!     " * " write
+!     "ACTION" split1 >r write-nick r>
+!     write-highlighted terpri flush ;
 
 : in-loop ( -- )
-    irc-stream get freadln [ print in-loop ] when* ;
+    irc-stream get freadln [ irc-display in-loop ] when* ;
 
-: say ( input -- )
-    "PRIVMSG " irc-write
-    channel get irc-write
-    " :" irc-write irc-print ;
+: input-thread ( -- ) [ in-loop ] in-thread ;
+: disconnect ( -- ) irc-stream get fclose ;
 
-: say-loop ( -- )
-    read [ say say-loop ] when* ;
+: command ( line -- )
+    #! IRC /commands are just words.
+    " " split1 swap [
+        "irc" "listener" "parser" "scratchpad"
+    ] search execute ;
 
-: disconnect ( -- )
-    irc-stream get fclose ;
+: (msg) ( line nick -- )
+    "PRIVMSG " irc-write irc-write " :" irc-write irc-print ;
 
-: input-thread ( -- )
-    [ in-loop ] in-thread ;
+: say ( line -- )
+    channel get [ (msg) ] [ "No channel." print ] ifte* ;
 
-: irc ( channel nick server -- )
-    [ connect  input-thread  say-loop  disconnect ] with-scope ;
+: talk ( input -- ) "/" ?str-head [ command ] [ say ] ifte ;
+: talk-loop ( -- ) read [ talk talk-loop ] when* ;
 
-"#concatenative" "conc" "irc.freenode.net" irc
+: irc ( nick server -- )
+    [
+        channels off
+        channel off
+        connect
+        login
+        input-thread
+        talk-loop
+        disconnect
+    ] with-scope ;
+
+! /commands
+: join ( chan -- )
+    dup channels [ cons ] change
+    dup channel set
+    "JOIN " irc-write irc-print ;
+
+: leave ( chan -- )
+    dup channels [ remove ] change
+    channels get dup [ car ] when channel set
+    "PART " irc-write irc-print ;
+
+: msg ( line -- ) " " split1 swap (msg) ;
+: me ( line -- ) "\u0001ACTION " swap "\u0001" cat3 say ;
+: quit ( line -- ) drop disconnect ;
