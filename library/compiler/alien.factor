@@ -151,7 +151,7 @@ SYMBOL: alien-parameters
 : linearize-alien ( node -- )
     dup linearize-parameters >r
     dup [ node-param get ] bind #c-call swons ,
-    dup [ node-param get car library-abi "stdcall" = ] bind
+    dup [ node-param get cdr library-abi "stdcall" = ] bind
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
