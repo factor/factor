@@ -27,38 +27,122 @@
 
 IN: win32-stream
 USE: alien
-USE: buffer
+USE: continuations
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 USE: namespaces
+USE: prettyprint
 USE: stdio
 USE: streams
+USE: strings
+USE: threads
 USE: win32-api
 USE: win32-io-internals
 
 TRAITS: win32-stream
-GENERIC: update-file-pointer
+
+SYMBOL: handle
+SYMBOL: in-buffer
+SYMBOL: out-buffer
+SYMBOL: fileptr
+SYMBOL: file-size
+
+: init-overlapped ( overlapped -- overlapped )
+    0 over set-overlapped-ext-internal
+    0 over set-overlapped-ext-internal-high
+    fileptr get over set-overlapped-ext-offset
+    0 over set-overlapped-ext-offset-high
+    0 over set-overlapped-ext-event ;
+
+: update-file-pointer ( whence -- )
+    file-size get [ fileptr [ + ] change ] when ;
+
+: flush-output ( -- ) 
+    [
+        alloc-io-task init-overlapped >r
+        handle get out-buffer get [ buffer-pos ] keep buffer-length
+        NULL r> WriteFile [ handle-io-error ] unless win32-next-io-task
+    ] callcc1
+
+    dup out-buffer get [ buffer-consume ] keep 
+    swap namespace update-file-pointer
+    buffer-length 0 > [ flush-output ] when ;
+
+: do-write ( str -- )
+    dup str-length out-buffer get buffer-capacity <= [
+        out-buffer get buffer-append
+    ] [
+        dup str-length out-buffer get buffer-size > [
+            dup str-length out-buffer get buffer-extend do-write
+        ] [ flush-output do-write ] ifte
+    ] ifte ;
+
+: fill-input ( -- ) 
+    [
+        alloc-io-task init-overlapped >r
+        handle get in-buffer get [ buffer-pos ] keep 
+        buffer-capacity file-size get [ fileptr get - min ] when*
+        NULL r>
+        ReadFile [ handle-io-error ] unless win32-next-io-task
+    ] callcc1
+
+    dup in-buffer get buffer-fill
+    namespace update-file-pointer ;
+
+: consume-input ( count -- str ) 
+    in-buffer get buffer-length 0 = [ fill-input ] when
+    in-buffer get buffer-size min
+    dup in-buffer get buffer-first-n
+    swap in-buffer get buffer-consume ;
+
+: do-read-count ( sbuf count -- str )
+    dup 0 = [ 
+        drop sbuf>str 
+    ] [
+        dup consume-input
+        dup str-length dup 0 = [
+            3drop dup sbuf-length 0 > [ sbuf>str ] [ drop f ] ifte
+        ] [
+            >r swap r> - >r swap [ sbuf-append ] keep r> do-read-count
+        ] ifte
+    ] ifte ;
 
 M: win32-stream fwrite-attr ( str style stream -- )
-    nip fwrite ;
+    nip [ do-write ] bind ;
 
 M: win32-stream freadln ( stream -- str )
     drop f ;
 
 M: win32-stream fread# ( count stream -- str )
-    drop f ;
+    [ dup <sbuf> swap do-read-count ] bind ;
 
 M: win32-stream fflush ( stream -- )
-    drop ;
+    [ flush-output ] bind ;
 
 M: win32-stream fclose ( stream -- )
-    [ "handle" get CloseHandle drop "buffer" get buffer-free ] bind ;
+    [
+        flush-output
+        handle get CloseHandle drop 
+        in-buffer get buffer-free 
+        out-buffer get buffer-free
+    ] bind ;
 
 C: win32-stream ( handle -- stream )
-    [ "handle" set 4096 <buffer> "buffer" set 0 "fp" set ] extend ;
+    [
+        dup NULL GetFileSize dup INVALID_FILE_SIZE = not [
+            file-size set
+        ] [ drop f file-size set ] ifte
+        handle set 
+        4096 <buffer> in-buffer set 
+        4096 <buffer> out-buffer set
+        0 fileptr set 
+    ] extend ;
 
 : <win32-filecr> ( path -- stream )
     t f win32-open-file <win32-stream> ;
 
+: <win32-filecw> ( path -- stream )
+    f t win32-open-file <win32-stream> ;

@@ -18,6 +18,10 @@ INLINE ALIEN* untag_alien(CELL tagged)
 	return (ALIEN*)UNTAG(tagged);
 }
 
+DLL *ffi_dlopen(F_STRING *path);
+void *ffi_dlsym(DLL *dll, F_STRING *symbol);
+void ffi_dlclose(DLL *dll);
+
 void primitive_dlopen(void);
 void primitive_dlsym(void);
 void primitive_dlsym_self(void);

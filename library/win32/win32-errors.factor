@@ -29,8 +29,20 @@ IN: win32-api
 USE: buffer
 USE: errors
 USE: kernel
+USE: kernel-internals
+USE: lists
 USE: math
+USE: parser
 USE: alien
+USE: words
+
+: CONSTANT: CREATE 
+    [ [ [ parsed ] each ] cons define-compound POSTPONE: parsing ] 
+    [ ] ; parsing
+
+CONSTANT: ERROR_SUCCESS 0 ;
+CONSTANT: ERROR_HANDLE_EOF 38 ;
+CONSTANT: ERROR_IO_PENDING 997 ;
 
 : FORMAT_MESSAGE_ALLOCATE_BUFFER HEX: 00000100 ;
 : FORMAT_MESSAGE_IGNORE_INSERTS  HEX: 00000200 ;

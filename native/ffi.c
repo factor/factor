@@ -1,5 +1,35 @@
 #include "factor.h"
 
+void primitive_dlopen(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_object(ffi_dlopen(untag_string(dpop()))));
+}
+
+void primitive_dlsym(void)
+{
+	DLL *dll;	
+	F_STRING *sym;
+
+	maybe_garbage_collection();
+
+	dll = untag_dll(dpop());
+	sym = untag_string(dpop());
+	dpush(tag_cell(ffi_dlsym(dll, sym)));
+}
+
+void primitive_dlclose(void)
+{
+	maybe_garbage_collection();
+	ffi_dlclose(untag_dll(dpop()));
+}
+
+void primitive_dlsym_self(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_cell(ffi_dlsym(NULL, untag_string(dpop()))));
+}
+
 DLL* untag_dll(CELL tagged)
 {
 	DLL* dll = (DLL*)UNTAG(tagged);

@@ -1,16 +1,12 @@
 #include "../factor.h"
 
-void primitive_dlopen(void)
+DLL *ffi_dlopen(F_STRING *path)
 {
 #ifdef FFI
-	char* path;
 	void* dllptr;
 	DLL* dll;
 	
-	maybe_garbage_collection();
-	
-	path = unbox_c_string();
-	dllptr = dlopen(path,RTLD_LAZY);
+	dllptr = dlopen(to_c_string(path), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
@@ -20,47 +16,31 @@ void primitive_dlopen(void)
 
 	dll = allot_object(DLL_TYPE,sizeof(DLL));
 	dll->dll = dllptr;
-	dpush(tag_object(dll));
+	return dll;
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif
 }
 
-void primitive_dlsym(void)
+void *ffi_dlsym(DLL *dll, F_STRING *symbol)
 {
 #ifdef FFI
-	DLL* dll = untag_dll(dpop());
-	void* sym = dlsym(dll->dll,unbox_c_string());
+	void* sym = dlsym(dll ? dll->dll : NULL, to_c_string(symbol));
 	if(sym == NULL)
 	{
 		general_error(ERROR_FFI,tag_object(
 			from_c_string(dlerror())));
 	}
-	dpush(tag_cell((CELL)sym));
+	return sym;
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif
 }
 
-void primitive_dlsym_self(void)
-{
-#if defined(FFI)
-	void* sym = dlsym(NULL,unbox_c_string());
-	if(sym == NULL)
-	{
-		general_error(ERROR_FFI,tag_object(
-			from_c_string(dlerror())));
-	}
-	dpush(tag_cell((CELL)sym));
-#else
-	general_error(ERROR_FFI_DISABLED,F);
-#endif
-}
 
-void primitive_dlclose(void)
+void ffi_dlclose(DLL *dll)
 {
 #ifdef FFI
-	DLL* dll = untag_dll(dpop());
 	if(dlclose(dll->dll) == -1)
 	{
 		general_error(ERROR_FFI,tag_object(

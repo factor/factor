@@ -70,9 +70,15 @@ END-STRUCT
 : STD_ERROR_HANDLE  -12 ;
 
 : INVALID_HANDLE_VALUE -1 <alien> ;
+: INVALID_FILE_SIZE HEX: FFFFFFFF ;
+
+: INFINITE HEX: FFFFFFFF ;
 
 : GetStdHandle ( id -- handle )
     "void*" "kernel32" "GetStdHandle" [ "int" ] alien-invoke ; 
+
+: GetFileSize ( handle out -- int )
+    "int" "kernel32" "GetFileSize" [ "void*" "void*" ] alien-invoke ; 
 
 : SetConsoleTextAttribute ( handle attrs -- ? )
     "bool" "kernel32" "SetConsoleTextAttribute" [ "void*" "int" ] 
@@ -97,6 +103,12 @@ END-STRUCT
 : CreateIoCompletionPort ( handle existing-port key numthreads -- )
     "void*" "kernel32" "CreateIoCompletionPort"
     [ "void*" "void*" "void*" "int" ]
+    alien-invoke ;
+
+: GetQueuedCompletionStatus 
+    ( port out-len out-key out-overlapped timeout -- ? )
+    "bool" "kernel32" "GetQueuedCompletionStatus"
+    [ "void*" "void*" "void*" "void*" "int" ]
     alien-invoke ;
 
 : CreateFile ( name access sharemode security create flags template -- handle )

@@ -106,8 +106,7 @@ void relocate_primitive(F_REL* rel, bool relative)
 void relocate_dlsym(F_REL* rel, bool relative)
 {
 	F_STRING* str = untag_string(get(rel->argument));
-	char* c_str = to_c_string(str);
-	put(rel->offset,(CELL)dlsym(NULL,c_str)
+	put(rel->offset,(CELL)ffi_dlsym(NULL,str)
 		- (relative ? rel->offset + CELLS : 0));
 }
 

@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: buffer
+IN: kernel-internals
 
 USE: alien
 USE: errors
@@ -36,49 +36,76 @@ USE: namespaces
 USE: strings
 USE: win32-api
 
+SYMBOL: buf-size
+SYMBOL: buf-ptr
+SYMBOL: buf-fill
+SYMBOL: buf-pos
+
 : imalloc ( size -- address )
     "int" "libc" "malloc" [ "int" ] alien-invoke ;
 
 : ifree ( address -- )
     "void" "libc" "free" [ "int" ] alien-invoke ;
 
+: irealloc ( address size -- address )
+    "int" "libc" "realloc" [ "int" "int" ] alien-invoke ;
+
 : <buffer> ( size -- buffer )
     #! Allocates and returns a new buffer.
     <namespace> [
-        dup "size" set
-        imalloc "buffer" set
-        0 "fill" set
-        0 "pos" set
+        dup buf-size set
+        imalloc buf-ptr set
+        0 buf-fill set
+        0 buf-pos set
     ] extend ;
 
 : buffer-free ( buffer -- )
     #! Frees the C memory associated with the buffer.
-    [ "buffer" get ifree ] bind ;
+    [ buf-ptr get ifree ] bind ;
 
 : buffer-contents ( buffer -- string )
     #! Returns the current contents of the buffer.
     [
-        "buffer" get "pos" get + 
-        "fill" get "pos" get - 
+        buf-ptr get buf-pos get + 
+        buf-fill get buf-pos get - 
         memory>string 
+    ] bind ;
+
+: buffer-first-n ( count buffer -- string )
+    [
+        buf-fill get buf-pos get - min
+        buf-ptr get buf-pos get +
+        swap memory>string
     ] bind ;
 
 : buffer-reset ( count buffer -- )
     #! Reset the position to 0 and the fill pointer to count.
-    [ 0 "pos" set "fill" set ] bind ;
+    [ 0 buf-pos set buf-fill set ] bind ;
 
 : buffer-consume ( count buffer -- )
     #! Consume count characters from the beginning of the buffer.
-    [ "pos" [ + "fill" get min ] change ] bind ;
+    [
+        buf-pos [ + buf-fill get min ] change 
+        buf-pos get buf-fill get = [ 
+            0 buf-pos set 0 buf-fill set 
+        ] when
+    ] bind ;
 
 : buffer-length ( buffer -- length )
     #! Returns the amount of unconsumed input in the buffer.
-    [ "fill" get "pos" get - max ] bind ;
+    [ buf-fill get buf-pos get - 0 max ] bind ;
+
+: buffer-size ( buffer -- size )
+    [ buf-size get ] bind ;
+
+: buffer-capacity ( buffer -- int )
+    #! Returns the amount of data that may be added to the buffer.
+    [ buf-size get buf-fill get - ] bind ;
 
 : buffer-set ( string buffer -- )
     #! Set the contents of a buffer to string.
     [ 
-        dup "buffer" get string>memory
+        dup buf-ptr get string>memory
         str-length namespace buffer-reset
     ] bind ;
 
@@ -86,19 +113,27 @@ USE: win32-api
     #! Appends a string to the end of the buffer. If it doesn't fit,
     #! an error is thrown.
     [ 
-        dup "size" get "fill" get - swap str-length < [
+        dup buf-size get buf-fill get - swap str-length < [
             "Buffer overflow" throw
         ] when
-        dup "buffer" get "fill" get + string>memory
-        "fill" [ swap str-length + ] change
+        dup buf-ptr get buf-fill get + string>memory
+        buf-fill [ swap str-length + ] change
     ] bind ;
 
-: buffer-fill ( buffer quot -- )
-    #! Execute quot with buffer as its argument, passing its result to
-    #! buffer-reset.
-    swap dup >r swap call r> buffer-reset ; inline
+: buffer-extend ( length buffer -- )
+    #! Increases the size of the buffer by length.
+    [
+        buf-size get + dup buf-ptr get swap irealloc 
+        buf-ptr set buf-size set
+    ] bind ;
+
+: buffer-fill ( count buffer -- )
+    #! Increases the fill pointer by count.
+    [ buf-fill [ + ] change ] bind ;
 
 : buffer-ptr ( buffer -- pointer )
     #! Returns the memory address of the buffer area.
-    [ "buffer" get ] bind ;
+    [ buf-ptr get ] bind ;
 
+: buffer-pos ( buffer -- int )
+    [ buf-ptr get buf-pos get + ] bind ;
