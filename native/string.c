@@ -10,25 +10,19 @@ F_STRING* allot_string(CELL capacity)
 	the sizeof(F_STRING) to a Factor string to get a C-style
 	UTF16 string for C library calls. */
 	cput(SREF(string,capacity),(uint16_t)'\0');
-	string->capacity = capacity;
+	string->length = tag_fixnum(capacity);
 	return string;
 }
 
 /* call this after constructing a string */
-/* uses same algorithm as java.lang.String for compatibility with
-images generated from Java Factor. */
-F_FIXNUM hash_string(F_STRING* str, CELL len)
+void rehash_string(F_STRING* str)
 {
 	F_FIXNUM hash = 0;
 	CELL i;
-	for(i = 0; i < len; i++)
+	CELL capacity = string_capacity(str);
+	for(i = 0; i < capacity; i++)
 		hash = 31*hash + string_nth(str,i);
-	return hash;
-}
-
-void rehash_string(F_STRING* str)
-{
-	str->hashcode = tag_fixnum(hash_string(str,str->capacity));
+	str->hashcode = tag_fixnum(hash);
 }
 
 /* untagged */
@@ -50,12 +44,13 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
+	CELL old_capacity = string_capacity(string);
 
 	F_STRING* new_string = allot_string(capacity);
 
-	memcpy(new_string + 1,string + 1,string->capacity * CHARS);
+	memcpy(new_string + 1,string + 1,old_capacity * CHARS);
 
-	for(i = string->capacity; i < capacity; i++)
+	for(i = old_capacity; i < capacity; i++)
 		cput(SREF(new_string,i),fill);
 
 	return new_string;
@@ -100,8 +95,8 @@ void box_c_string(const BYTE* c_string)
 BYTE* to_c_string(F_STRING* s)
 {
 	CELL i;
-
-	for(i = 0; i < s->capacity; i++)
+	CELL capacity = string_capacity(s);
+	for(i = 0; i < capacity; i++)
 	{
 		uint16_t ch = string_nth(s,i);
 		if(ch == '\0' || ch > 255)
@@ -114,7 +109,8 @@ BYTE* to_c_string(F_STRING* s)
 INLINE void string_to_memory(F_STRING* s, BYTE* string)
 {
 	CELL i;
-	for(i = 0; i < s->capacity; i++)
+	CELL capacity = string_capacity(s);
+	for(i = 0; i < capacity; i++)
 		string[i] = string_nth(s,i);
 }
 
@@ -128,10 +124,11 @@ void primitive_string_to_memory(void)
 /* untagged */
 BYTE* to_c_string_unchecked(F_STRING* s)
 {
-	F_STRING* _c_str = allot_string(s->capacity / CHARS + 1);
+	CELL capacity = string_capacity(s);
+	F_STRING* _c_str = allot_string(capacity / CHARS + 1);
 	BYTE* c_str = (BYTE*)(_c_str + 1);
 	string_to_memory(s,c_str);
-	c_str[s->capacity] = '\0';
+	c_str[capacity] = '\0';
 	return c_str;
 }
 
@@ -152,9 +149,10 @@ void primitive_string_nth(void)
 {
 	F_STRING* string = untag_string(dpop());
 	CELL index = to_fixnum(dpop());
+	CELL capacity = string_capacity(string);
 
-	if(index < 0 || index >= string->capacity)
-		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
+	if(index < 0 || index >= capacity)
+		range_error(tag_object(string),0,tag_fixnum(index),capacity);
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
@@ -175,8 +173,8 @@ F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len)
 
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
 {
-	CELL len1 = s1->capacity;
-	CELL len2 = s2->capacity;
+	CELL len1 = string_capacity(s1);
+	CELL len2 = string_capacity(s2);
 
 	CELL limit = (len1 < len2 ? len1 : len2);
 
@@ -215,7 +213,9 @@ void primitive_string_eq(void)
 
 CELL index_of_ch(CELL index, F_STRING* string, CELL ch)
 {
-	while(index < string->capacity)
+	CELL capacity = string_capacity(string);
+	
+	while(index < capacity)
 	{
 		if(string_nth(string,index) == ch)
 			return index;
@@ -228,21 +228,22 @@ CELL index_of_ch(CELL index, F_STRING* string, CELL ch)
 INLINE F_FIXNUM index_of_str(F_FIXNUM index, F_STRING* string, F_STRING* substring)
 {
 	CELL i = index;
-	CELL limit = string->capacity - substring->capacity;
+	CELL str_cap = string_capacity(string);
+	CELL substr_cap = string_capacity(substring);
+	CELL limit = str_cap - substr_cap;
 	CELL scan;
 
-	if(substring->capacity == 1)
+	if(substr_cap == 1)
 		return index_of_ch(index,string,string_nth(substring,0));
 
-	if(substring->capacity > string->capacity)
+	if(limit < 0)
 		return -1;
 
 outer:	if(i <= limit)
 	{
-		for(scan = 0; scan < substring->capacity; scan++)
+		for(scan = 0; scan < substr_cap; scan++)
 		{
-			if(string_nth(string,i + scan)
-				!= string_nth(substring,scan))
+			if(string_nth(string,i + scan) != string_nth(substring,scan))
 			{
 				i++;
 				goto outer;
@@ -261,14 +262,13 @@ outer:	if(i <= limit)
 void primitive_index_of(void)
 {
 	CELL ch = dpop();
-	F_STRING* string;
-	F_FIXNUM index;
+	F_STRING* string = untag_string(dpop());
+	CELL capacity = string_capacity(string);
+	F_FIXNUM index = to_fixnum(dpop());
 	CELL result;
-	string = untag_string(dpop());
-	index = to_fixnum(dpop());
-	if(index < 0 || index > string->capacity)
+	if(index < 0 || index > capacity)
 	{
-		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(index),capacity);
 		result = -1; /* can't happen */
 	}
 	else if(TAG(ch) == FIXNUM_TYPE)
@@ -281,12 +281,13 @@ void primitive_index_of(void)
 INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
 {
 	F_STRING* result;
+	CELL capacity = string_capacity(string);
 
 	if(start < 0)
-		range_error(tag_object(string),0,tag_fixnum(start),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(start),capacity);
 
-	if(end < start || end > string->capacity)
-		range_error(tag_object(string),0,tag_fixnum(end),string->capacity);
+	if(end < start || end > capacity)
+		range_error(tag_object(string),0,tag_fixnum(end),capacity);
 
 	result = allot_string(end - start);
 	memcpy(result + 1,
@@ -337,17 +338,14 @@ F_STRING* string_clone(F_STRING* s, int len)
 void primitive_string_reverse(void)
 {
 	F_STRING* s;
+	CELL capacity;
 
 	maybe_garbage_collection();
 
 	s = untag_string(dpeek());
-	s = string_clone(s,s->capacity);
-	string_reverse(s,s->capacity);
+	capacity = string_capacity(s);
+	s = string_clone(s,capacity);
+	string_reverse(s,capacity);
 	rehash_string(s);
 	drepl(tag_object(s));
-}
-
-void primitive_to_string(void)
-{
-	type_check(STRING_TYPE,dpeek());
 }

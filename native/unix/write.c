@@ -24,7 +24,7 @@ bool can_write(F_PORT* port, F_FIXNUM len)
 	if(port->type != PORT_WRITE)
 		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
-	buf_capacity = untag_string(port->buffer)->capacity * CHARS;
+	buf_capacity = string_capacity(untag_string(port->buffer)) * CHARS;
 	/* Is the string longer than the buffer? */
 	if(port->buf_fill == 0 && len > buf_capacity)
 	{
@@ -102,16 +102,15 @@ void write_string_raw(F_PORT* port, BYTE* str, CELL len)
 
 void write_string_8(F_PORT* port, F_STRING* str)
 {
-	BYTE* c_str;
+	CELL capacity = string_capacity(str);
 	
 	pending_io_error(port);
 
 	/* Note this ensures the buffer is large enough to fit the string */
-	if(!can_write(port,str->capacity))
+	if(!can_write(port,capacity))
 		io_error(__FUNCTION__);
 
-	c_str = to_c_string_unchecked(str);
-	write_string_raw(port,c_str,str->capacity);
+	write_string_raw(port,to_c_string_unchecked(str),capacity);
 }
 
 void primitive_write_8(void)

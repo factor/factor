@@ -36,7 +36,7 @@ void primitive_set_sbuf_length(void)
 	if(length < 0)
 		range_error(tag_object(sbuf),0,to_fixnum(length),sbuf->top);
 	sbuf->top = length;
-	if(length > str->capacity)
+	if(length > string_capacity(str))
 		sbuf->string = tag_object(grow_string(str,length,F));
 }
 
@@ -53,8 +53,7 @@ void primitive_sbuf_nth(void)
 void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
 {
 	F_STRING* string = untag_string(sbuf->string);
-	CELL capacity = string->capacity;
-	if(top >= capacity)
+	if(top >= string_capacity(string))
 		sbuf->string = tag_object(grow_string(string,top * 2 + 1,F));
 	sbuf->top = top;
 }
@@ -88,7 +87,7 @@ void primitive_set_sbuf_nth(void)
 void sbuf_append_string(F_SBUF* sbuf, F_STRING* string)
 {
 	CELL top = sbuf->top;
-	CELL strlen = string->capacity;
+	CELL strlen = string_capacity(string);
 	F_STRING* str;
 	sbuf_ensure_capacity(sbuf,top + strlen);
 	str = untag_string(sbuf->string);
@@ -175,12 +174,6 @@ void primitive_sbuf_eq(void)
 		dpush(tag_boolean(sbuf_eq(s1,(F_SBUF*)UNTAG(with))));
 	else
 		dpush(F);
-}
-
-void primitive_sbuf_hashcode(void)
-{
-	F_SBUF* sbuf = untag_sbuf(dpop());
-	dpush(tag_fixnum(hash_string(untag_string(sbuf->string),sbuf->top)));
 }
 
 void fixup_sbuf(F_SBUF* sbuf)

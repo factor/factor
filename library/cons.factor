@@ -6,10 +6,7 @@ IN: lists USING: generic kernel kernel-internals ;
 ! else depends on, and is loaded early in bootstrap.
 ! lists.factor has everything else.
 
-BUILTIN: cons 2
-
-: car ( [[ car cdr ]] -- car ) >cons 0 slot ; inline
-: cdr ( [[ car cdr ]] -- cdr ) >cons 1 slot ; inline
+BUILTIN: cons 2 [ 0 "car" f ] [ 1 "cdr" f ] ;
 
 : swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,

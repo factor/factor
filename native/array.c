@@ -31,11 +31,6 @@ void primitive_array(void)
 	dpush(tag_object(array(ARRAY_TYPE,capacity,F)));
 }
 
-void primitive_to_array(void)
-{
-	type_check(ARRAY_TYPE,dpeek());
-}
-
 void primitive_tuple(void)
 {
 	F_FIXNUM capacity = to_fixnum(dpop());
@@ -45,17 +40,12 @@ void primitive_tuple(void)
 	dpush(tag_object(array(TUPLE_TYPE,capacity,F)));
 }
 
-void primitive_to_tuple(void)
-{
-	type_check(TUPLE_TYPE,dpeek());
-}
-
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	int i;
 	F_ARRAY* new_array;
-	CELL curr_cap = untag_fixnum_fast(array->capacity);
+	CELL curr_cap = array_capacity(array);
 
 	if(curr_cap >= capacity)
 		return array;
@@ -90,7 +80,7 @@ F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity)
 void fixup_array(F_ARRAY* array)
 {
 	int i = 0;
-	CELL capacity = untag_fixnum_fast(array->capacity);
+	CELL capacity = array_capacity(array);
 	for(i = 0; i < capacity; i++)
 		data_fixup((void*)AREF(array,i));
 }
@@ -98,7 +88,7 @@ void fixup_array(F_ARRAY* array)
 void collect_array(F_ARRAY* array)
 {
 	int i = 0;
-	CELL capacity = untag_fixnum_fast(array->capacity);
+	CELL capacity = array_capacity(array);
 	for(i = 0; i < capacity; i++)
 		copy_handle((void*)AREF(array,i));
 }

@@ -1,16 +1,19 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: kernel-internals
+DEFER: (set-vector-length)
+DEFER: vector-array
+DEFER: set-vector-array
+
 IN: vectors
 USING: generic kernel lists math kernel-internals errors
 math-internals ;
 
 BUILTIN: vector 11
-
-: vector-length ( vec -- len ) >vector 1 slot ; inline
+    [ 1 "vector-length" (set-vector-length) ]
+    [ 2 vector-array set-vector-array ] ;
 
 IN: kernel-internals
-
-: (set-vector-length) ( len vec -- ) 1 set-slot ; inline
 
 : assert-positive ( fx -- )
     0 fixnum<
@@ -46,16 +49,15 @@ IN: kernel-internals
 IN: vectors
 
 : vector-nth ( n vec -- obj )
-    swap >fixnum swap >vector
-    2dup assert-bounds vector-array array-nth ;
+    >r >fixnum r> 2dup assert-bounds vector-array array-nth ;
 
 : set-vector-nth ( obj n vec -- )
-    swap >fixnum dup assert-positive swap >vector
+    >r >fixnum dup assert-positive r>
     2dup ensure-capacity vector-array
     set-array-nth ;
 
 : set-vector-length ( len vec -- )
-    swap >fixnum dup assert-positive swap >vector
+    >r >fixnum dup assert-positive r>
     2dup grow-capacity (set-vector-length) ;
 
 : empty-vector ( len -- vec )
@@ -166,3 +168,10 @@ IN: kernel
 : depth ( -- n )
     #! Push the number of elements on the datastack.
     datastack vector-length ;
+
+IN: kernel-internals
+
+: dispatch ( n vtable -- )
+    #! This word is unsafe since n is not bounds-checked. Do not
+    #! call it directly.
+    2 slot array-nth call ;

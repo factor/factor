@@ -14,7 +14,6 @@
 - code gc
 - #jump-f #jump-f-label
 - extract word inside M:, C:, and structure browsing for these
-- each-slot combinator
 - references primitive
 - fix completion invoke in middle of word
 - don't hardcode so many colors
@@ -26,6 +25,7 @@
 
 + compiler/ffi:
 
+- declarations
 - value type structs
 - out parameters
 - is signed -vs- unsigned pointers an issue?

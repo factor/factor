@@ -251,7 +251,7 @@ M: cons ' ( c -- tagged )
 : emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
-    dup str-length emit
+    dup str-length emit-fixnum
     dup hashcode emit-fixnum
     "\0" cat2 pack-string
     align-here ;

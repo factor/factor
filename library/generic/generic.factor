@@ -127,18 +127,8 @@ SYMBOL: object
     swap builtin-supertypes swap builtin-supertypes
     intersection lookup-union ;
 
-: define-promise ( class -- )
-    #! A promise is a word that has no effect during
-    #! interpretation, but instructs the compiler that the value
-    #! at the top of the stack is statically-known to be of the
-    #! given type. Promises should only be used by kernel code.
-    dup word-name "%" swap cat2 "kernel-internals" create
-    dup [ ] define-compound
-    swap "promise" set-word-property ;
-
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-property
-    dup define-promise
     dup builtin-supertypes [ > ] sort
     classes get set-hash ;
 

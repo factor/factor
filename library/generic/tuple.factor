@@ -1,18 +1,26 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: generic
-USING: words parser kernel namespaces lists strings
-kernel-internals math hashtables errors vectors ;
+IN: kernel-internals
+USING: words parser kernel namespaces lists strings math
+hashtables errors vectors ;
 
-BUILTIN: tuple 18
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size.
+    <tuple> [ 0 swap set-array-nth ] keep ;
+
+IN: generic
+
+BUILTIN: tuple 18 [ 1 array-capacity f ] ;
+
+#! arrayed objects can be passed to array-capacity,
+#! array-nth, and set-array-nth.
+UNION: arrayed array tuple ;
 
 : class ( obj -- class )
     #! The class of an object.
     dup tuple? [ 2 slot ] [ type builtin-type ] ifte ;
-
-: make-tuple ( class -- tuple )
-    dup "tuple-size" word-property <tuple>
-    [ 0 swap set-array-nth ] keep ;
 
 : (literal-tuple) ( list size -- tuple )
     dup <tuple> swap [
@@ -28,39 +36,6 @@ BUILTIN: tuple 18
         "Incorrect tuple length" throw
     ] ifte ;
 
-: tuple>list ( tuple -- list )
-    >tuple array>list ;
-
-: define-tuple-generic ( tuple word def -- )
-    over >r [ single-combination ] \ GENERIC: r> define-generic
-    define-method ;
-
-: accessor-word ( name tuple -- word )
-    [ word-name , "-" , , ] make-string
-    create-in ;
-
-: define-accessor ( tuple name n -- accessor )
-    #! Generic word with a method specializing on the tuple's
-    #! class that reads the right slot.
-    >r over accessor-word tuck r> [ slot ] cons
-    define-tuple-generic ;
-
-: mutator-word ( name tuple -- word )
-    [ "set-" , word-name , "-" , , ] make-string
-    create-in ;
-
-: define-mutator ( word name n -- mutator )
-    #! Generic word with a method specializing on the tuple's
-    #! class that writes to the right slot.
-    >r over mutator-word tuck r> [ set-slot ] cons
-    define-tuple-generic ;
-
-: define-slot ( word name n -- [ n accessor mutator ] )
-    over "delegate" = [
-        pick over "delegate-field" set-word-property
-    ] when
-    3dup define-mutator >r define-accessor r> cons ;
-
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
@@ -71,50 +46,43 @@ BUILTIN: tuple 18
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
-        dup "slots" word-property r> = [
-            drop
-        ] [
-            forget
-        ] ifte
+        dup "tuple-size" word-property r> length 1 + =
+        [ drop ] [ forget ] ifte
     ] [
         r> 2drop
     ] ifte ;
 
-: define-slots ( tuple slots -- words )
-    2dup "slots" set-word-property
+: tuple-slots ( tuple slots -- )
     2dup length 1 + "tuple-size" set-word-property
-    dup length [ 3 + ] project zip
-    [ uncons define-slot ] map-with ;
+    3 -rot simple-slots ;
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 create-in ;
 
 : define-constructor ( word def -- )
-    over constructor-word >r
-    [ swap literal, \ make-tuple , append, ] make-list
-    r> swap define-compound ;
+    >r [ constructor-word ] keep [
+        dup literal, "tuple-size" word-property , \ make-tuple ,
+    ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
     dup [
-        "slot-words" word-property
-        reverse [ cdr unit , \ keep , ] each
+        "slots" word-property
+        reverse [ last unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
-    >r
-    create-in
+    >r create-in
     dup save-location
     dup intern-symbol
     dup tuple-predicate
     dup tuple "metaclass" set-word-property
-    dup
-    dup r> define-slots "slot-words" set-word-property
+    dup r> tuple-slots
     default-constructor ;
 
 : tuple-delegate ( tuple -- obj )
     dup tuple? [
-        dup class "delegate-field" word-property dup [
+        dup class "delegate-slot" word-property dup [
             >fixnum slot
         ] [
             2drop f
@@ -185,7 +153,7 @@ BUILTIN: tuple 18
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
 
 : clone-delegate ( tuple -- )
-    dup class "delegate-field" word-property dup [
+    dup class "delegate-slot" word-property dup [
         [ >fixnum slot clone ] 2keep set-slot
     ] [
         2drop
@@ -196,7 +164,7 @@ M: tuple clone ( tuple -- tuple )
     clone-tuple dup clone-delegate ;
 
 : tuple>list ( tuple -- list )
-    >tuple dup array-capacity swap array>list ;
+    dup array-capacity swap array>list ;
 
 M: tuple = ( obj tuple -- ? )
     over tuple? [

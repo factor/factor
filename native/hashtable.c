@@ -17,11 +17,6 @@ void primitive_hashtable(void)
 	drepl(tag_object(hashtable(to_fixnum(dpeek()))));
 }
 
-void primitive_to_hashtable(void)
-{
-	type_check(HASHTABLE_TYPE,dpeek());
-}
-
 void fixup_hashtable(F_HASHTABLE* hashtable)
 {
 	data_fixup(&hashtable->array);

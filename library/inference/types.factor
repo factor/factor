@@ -7,25 +7,13 @@ lists math namespaces strings vectors words stdio prettyprint ;
 ! Enhanced inference of primitives relating to data types.
 ! Optimizes type checks and slot access.
 
-: infer-check ( assert class -- )
-    peek-d dup value-class pick = [
-        3drop
-    ] [
-        value-class-and
-        dup "infer-effect" word-property consume/produce
-    ] ifte ;
-
-\ >cons [
-    \ >cons \ cons infer-check
-] "infer" set-word-property
-
-\ >vector [
-    \ >vector \ vector infer-check
-] "infer" set-word-property
-
-\ >string [
-    \ >string \ string infer-check
-] "infer" set-word-property
+! : infer-check ( assert class -- )
+!     peek-d dup value-class pick = [
+!         3drop
+!     ] [
+!         value-class-and
+!         dup "infer-effect" word-property consume/produce
+!     ] ifte ;
 
 : fast-slot? ( -- ? )
     #! If the slot number is literal and the object's type is

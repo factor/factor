@@ -20,9 +20,8 @@ USING: syntax generic kernel lists namespaces parser words ;
     \ 2GENERIC: CREATE define-generic ; parsing
 
 : BUILTIN:
-    #! Followed by type name and type number. Define a built-in
-    #! type predicate with this number.
-    CREATE scan-word swap builtin-class ; parsing
+    #! Syntax: BUILTIN: <class> <type#> <slots> ;
+    CREATE scan-word [ builtin-class ] [ ] ; parsing
 
 : COMPLEMENT: ( -- class predicate definition )
     #! Followed by a class name, then a complemented class.

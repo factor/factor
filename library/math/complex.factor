@@ -13,13 +13,13 @@ USING: generic kernel kernel-internals math ;
 
 IN: math
 
-GENERIC: real ( #{ re im }# -- re )
-M: real real ;
-M: complex real 0 slot %real ;
+BUILTIN: complex 6 [ 0 "real" f ] [ 1 "imaginary" f ] ;
+UNION: number real complex ;
 
-GENERIC: imaginary ( #{ re im }# -- im )
+M: real real ;
 M: real imaginary drop 0 ;
-M: complex imaginary 1 slot %real ;
+
+M: number = ( n n -- ? ) number= ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [
@@ -49,8 +49,8 @@ M: complex imaginary 1 slot %real ;
 : absq >rect swap sq swap sq + ;
 
 : dot ( #{ x1 x2 }# #{ y1 y2 }# -- x1*y1+x2*y2 )
-    over real over real * >r swap imaginary swap imaginary * r>
-    + ;
+    over real over real * >r
+    swap imaginary swap imaginary * r> + ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.

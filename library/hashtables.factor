@@ -1,8 +1,17 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: hashtables USING: generic kernel lists math vectors ;
+IN: kernel-internals
+
+DEFER: hash-array
+DEFER: set-hash-array
+DEFER: set-hash-size
+
+IN: hashtables
+USING: generic kernel lists math vectors ;
 
 BUILTIN: hashtable 10
+    [ 1 "hash-size" set-hash-size ]
+    [ 2 hash-array set-hash-array ] ;
 
 ! A hashtable is implemented as an array of buckets. The
 ! array index is determined using a hash function, and the
@@ -15,15 +24,11 @@ BUILTIN: hashtable 10
 
 IN: kernel-internals
 
-: hash-array >hashtable 2 slot ( promise ) %array ; inline
-: set-hash-array swap >array swap >hashtable 2 set-slot ; inline
-
 : hash-bucket ( n hash -- alist )
-    swap >fixnum swap >hashtable hash-array array-nth ; inline
+    >r >fixnum r> hash-array array-nth ;
 
 : set-hash-bucket ( obj n hash -- )
-    swap >fixnum swap >hashtable hash-array set-array-nth ;
-    inline
+    >r >fixnum r> hash-array set-array-nth ;
 
 : change-bucket ( n hash quot -- )
     -rot hash-array
@@ -33,17 +38,13 @@ IN: kernel-internals
 IN: hashtables
 
 : hash-size+ ( hash -- )
-    >hashtable dup 1 slot 1 + swap 1 set-slot ; inline
+    dup hash-size 1 + swap set-hash-size ;
 
 : hash-size- ( hash -- )
-    >hashtable dup 1 slot 1 - swap 1 set-slot ; inline
-
-: hash-size ( hash -- n )
-    #! Number of elements in the hashtable.
-    >hashtable 1 slot ;
+    dup hash-size 1 - swap set-hash-size ;
 
 : bucket-count ( hash -- n )
-    >hashtable hash-array array-capacity ; inline
+    hash-array array-capacity ; inline
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.

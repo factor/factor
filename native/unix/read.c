@@ -5,7 +5,7 @@ bool read_step(F_PORT* port)
 {
 	F_FIXNUM amount = 0;
 	F_STRING* buffer = untag_string(port->buffer);
-	CELL capacity = buffer->capacity;
+	CELL capacity = string_capacity(buffer);
 
 	if(port->type == PORT_RECV)
 	{

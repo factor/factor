@@ -50,6 +50,7 @@ words hashtables ;
     reveal
     
     "/library/generic/generic.factor" parse-resource append,
+    "/library/generic/slots.factor" parse-resource append,
     "/library/generic/object.factor" parse-resource append,
     "/library/generic/null.factor" parse-resource append,
     "/library/generic/builtin.factor" parse-resource append,

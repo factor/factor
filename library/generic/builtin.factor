@@ -37,11 +37,12 @@ builtin [ 2drop t ] "class<" set-word-property
         ] ifte
     ] ifte ;
 
-: builtin-class ( type# symbol -- )
+: builtin-class ( symbol type# slotspec -- )
+    >r swap
     dup intern-symbol
     2dup builtin-predicate
     [ swap "builtin-type" set-word-property ] keep
-    builtin define-class ;
+    dup builtin define-class r> define-slots ;
 
 : builtin-type ( n -- symbol )
     unit classes get hash ;

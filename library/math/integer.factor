@@ -1,10 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors
-DEFER: throw
+IN: math
+BUILTIN: fixnum 0 ;
+BUILTIN: bignum 1 ;
+UNION: integer fixnum bignum ;
 
 IN: math-internals
-USING: generic kernel math ;
+USING: errors generic kernel math ;
 
 : fraction> ( a b -- a/b )
     dup 1 number= [

@@ -29,24 +29,6 @@ M: object number= 2drop f ;
 
 GENERIC: bitnot ( n -- n )
 
-! Math types
-BUILTIN: fixnum 0
-BUILTIN: bignum 1
-UNION: integer fixnum bignum ;
-
-BUILTIN: ratio 4
-UNION: rational integer ratio ;
-
-BUILTIN: float 5
-UNION: real rational float ;
-
-BUILTIN: complex 6
-UNION: number real complex ;
-
-M: real hashcode ( n -- n ) >fixnum ;
-
-M: number = ( n n -- ? ) number= ;
-
 : max ( x y -- z )
     2dup > [ drop ] [ nip ] ifte ;
 
@@ -72,7 +54,6 @@ M: number = ( n n -- ? ) number= ;
     dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
 
 GENERIC: abs ( z -- |z| )
-M: real abs dup 0 < [ neg ] when ;
 
 : (gcd) ( x y -- z )
     dup 0 number= [ drop ] [ tuck mod (gcd) ] ifte ;

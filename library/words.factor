@@ -5,35 +5,38 @@ USING: generic hashtables kernel kernel-internals lists math
 namespaces strings ;
 
 BUILTIN: word 17
+    [ 1 hashcode f ]
+    [ 4 "word-parameter" "set-word-parameter" ]
+    [ 5 "word-props" "set-word-props" ] ;
 
-M: word hashcode 1 slot %fixnum ;
+GENERIC: word-xt
+M: word word-xt ( w -- xt ) 2 integer-slot ;
+GENERIC: set-word-xt
+M: word set-word-xt ( xt w -- ) 2 set-integer-slot ;
 
-: word-xt     ( w -- xt ) >word 2 integer-slot ; inline
-: set-word-xt ( xt w -- ) >word 2 set-integer-slot ; inline
+GENERIC: word-primitive
+M: word word-primitive ( w -- n ) 3 integer-slot ;
+GENERIC: set-word-primitive
+M: word set-word-primitive ( n w -- )
+    [ 3 set-integer-slot ] keep update-xt ;
 
-: word-primitive ( w -- n ) >word 3 integer-slot ; inline
-: set-word-primitive ( n w -- )
-    >word [ 3 set-integer-slot ] keep update-xt ; inline
+GENERIC: call-count
+M: word call-count ( w -- n ) 6 integer-slot ;
+GENERIC: set-call-count
+M: word set-call-count ( n w -- ) 6 set-integer-slot ;
 
-: word-parameter     ( w -- obj ) >word 4 slot ; inline
-: set-word-parameter ( obj w -- ) >word 4 set-slot ; inline
-
-: word-props     ( w -- obj ) >word 5 slot ; inline
-: set-word-props ( obj w -- ) >word 5 set-slot ; inline
-
-: call-count     ( w -- n ) >word 6 integer-slot ; inline
-: set-call-count ( n w -- ) >word 6 set-integer-slot ; inline
-
-: allot-count     ( w -- n ) >word 7 integer-slot ; inline
-: set-allot-count ( n w -- ) >word 7 set-integer-slot ; inline
+GENERIC: allot-count
+M: word allot-count ( w -- n ) 7 integer-slot ;
+GENERIC: set-allot-count
+M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
 
 SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )
-    swap word-props hash ; inline
+    swap word-props hash ;
 
 : set-word-property ( word pvalue pname -- )
-    rot word-props set-hash ; inline
+    rot word-props set-hash ;
 
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
@@ -60,9 +63,6 @@ PREDICATE: compound promise ( obj -- ? )
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] ifte ;
 
-#! The type declaration is for the benefit of stack effect
-#! inference.
-: word-name ( word -- str )
-    "name" word-property >string ;
+: word-name ( word -- str ) "name" word-property ;
 
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic kernel lists math namespaces prettyprint
-stdio unparser vectors words ;
+USING: kernel-internals errors generic kernel lists math
+namespaces prettyprint stdio unparser vectors words ;
 
 ! Printing an overview of heap usage.
 
@@ -44,6 +44,35 @@ stdio unparser vectors words ;
             dup class pick = [ , ] [ drop ] ifte
         ] each-object drop
     ] make-list ;
+
+GENERIC: (each-slot) ( quot obj -- ) inline
+
+M: arrayed (each-slot) ( quot array -- )
+    dup array-capacity [
+        [
+            ( quot obj n -- )
+            swap array-nth swap dup slip
+        ] 2keep
+    ] repeat 2drop ;
+
+M: object (each-slot) ( quot obj -- )
+    dup class "slots" word-property [
+        pick pick >r >r car slot swap call r> r>
+    ] each 2drop ;
+
+: each-slot ( obj quot -- )
+    #! Apply the quotation to each slot value of the object.
+    swap (each-slot) ; inline
+
+: refers? ( to obj -- ? )
+    f swap [ pick eq? or ] each-slot nip ;
+
+: references ( obj -- list )
+    #! Return a list of all objects that refer to a given object
+    #! in the image.
+    [ ] [
+        pick over refers? [ swons ] [ drop ] ifte
+    ] each-object nip ;
 
 : vector+ ( n index vector -- )
     [ vector-nth + ] 2keep set-vector-nth ;

@@ -17,11 +17,6 @@ void primitive_vector(void)
 	drepl(tag_object(vector(to_fixnum(dpeek()))));
 }
 
-void primitive_to_vector(void)
-{
-	type_check(VECTOR_TYPE,dpeek());
-}
-
 void fixup_vector(F_VECTOR* vector)
 {
 	data_fixup(&vector->array);

@@ -1,13 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals USING: generic kernel vectors ;
-
-: dispatch ( n vtable -- )
-    #! This word is unsafe since n is not bounds-checked. Do not
-    #! call it directly.
-    vector-array array-nth call ;
-
 IN: kernel
+USING: generic kernel-internals vectors ;
 
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
@@ -49,12 +43,12 @@ IN: syntax
 
 ! The canonical t is a heap-allocated dummy object. It is always
 ! the first in the image.
-BUILTIN: t 7
+BUILTIN: t 7 ;
 
 ! In the runtime, the canonical f is represented as a null
 ! pointer with tag 3. So
 ! f address . ==> 3
-BUILTIN: f 9
+BUILTIN: f 9 ;
 
 IN: kernel
 UNION: boolean f t ;
@@ -64,5 +58,5 @@ IN: alien
 
 ! See compiler/alien.factor for the rest; this needs to be here
 ! since primitive stack effects involve alien inputs/outputs.
-BUILTIN: dll   15
-BUILTIN: alien 16
+BUILTIN: dll   15 ;
+BUILTIN: alien 16 ;

@@ -13,21 +13,18 @@ USING: generic math-internals kernel lists vectors ;
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
-BUILTIN: array 8
-
-DEFER: %fixnum
-
-: array-capacity   ( array -- n ) 1 slot %fixnum ; inline
-: vector-array     ( vec -- array ) >vector 2 slot %array ; inline
-: set-vector-array ( array vec -- ) >vector 2 set-slot ; inline
+BUILTIN: array 8 [ 1 "array-capacity" f ] ;
 
 : array-nth ( n array -- obj )
+    #! Unsafe.
     swap 2 fixnum+ slot ; inline
 
 : set-array-nth ( obj n array -- )
+    #! Unsafe.
     swap 2 fixnum+ set-slot ; inline
 
 : (array>list) ( n i array -- list )
+    #! Unsafe.
     pick pick fixnum<= [
         3drop [ ]
     ] [
@@ -36,4 +33,5 @@ DEFER: %fixnum
     ] ifte ;
 
 : array>list ( n array -- list )
+    #! Unsafe.
     0 swap (array>list) ;

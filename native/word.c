@@ -37,11 +37,6 @@ void primitive_word_compiledp(void)
 	box_boolean(word->xt != (CELL)docol && word->xt != (CELL)dosym);
 }
 
-void primitive_to_word(void)
-{
-	type_check(WORD_TYPE,dpeek());
-}
-
 void fixup_word(F_WORD* word)
 {
 	if(word->xt >= code_relocation_base

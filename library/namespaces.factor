@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
-USING: hashtables kernel kernel-internals lists strings vectors
-math ;
+USING: errors hashtables kernel kernel-internals lists math
+strings vectors ;
 
 ! Other languages have classes, objects, variables, etc.
 ! Factor has similar concepts.
@@ -34,7 +34,10 @@ math ;
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    >hashtable namestack cons set-namestack ; inline
+    dup hashtable? [
+        "Namestack must only contain hashtables" throw
+    ] unless
+    namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.

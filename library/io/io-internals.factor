@@ -33,7 +33,7 @@ USE: namespaces
 USE: strings
 USE: threads
 
-BUILTIN: port 14
+BUILTIN: port 14 ;
 
 : stdin 0 getenv ;
 : stdout 1 getenv ;

@@ -2,15 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings USING: generic kernel kernel-internals lists math ;
 
-! Define methods bound to primitives
-BUILTIN: string 12
-M: string hashcode 2 slot %fixnum ;
+BUILTIN: string 12 [ 1 "str-length" f ] [ 2 hashcode f ] ;
 M: string = str= ;
 
-: str-length ( str -- len ) >string 1 integer-slot ; inline
-
-BUILTIN: sbuf 13
-M: sbuf hashcode sbuf-hashcode ;
+BUILTIN: sbuf 13 ;
 M: sbuf = sbuf= ;
 
 UNION: text string integer ;

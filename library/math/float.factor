@@ -1,7 +1,14 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: math-internals
-USING: generic kernel math ;
+IN: math
+USING: generic kernel math-internals ;
+
+BUILTIN: float 5 ;
+UNION: real rational float ;
+
+M: real abs dup 0 < [ neg ] when ;
+
+M: real hashcode ( n -- n ) >fixnum ;
 
 M: float number= float= ;
 M: float < float< ;

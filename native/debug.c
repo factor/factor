@@ -61,7 +61,7 @@ CELL hash(CELL hash, CELL key)
 
 		a = untag_array(array);
 
-		for(i = 0; i < untag_fixnum_fast(a->capacity); i++)
+		for(i = 0; i < array_capacity(a); i++)
 		{
 			CELL value = assoc(get(AREF(a,i)),key);
 			if(value != F)

@@ -6,6 +6,7 @@ USING: kernel lists parser stdio words namespaces ;
 
 [
     "/library/generic/generic.factor"
+    "/library/generic/slots.factor"
     "/library/generic/object.factor"
     "/library/generic/null.factor"
     "/library/generic/builtin.factor"
