@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="FFI;WIN32"
+				PreprocessorDefinitions="FFI;WIN32;F_DEBUG"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -70,7 +70,7 @@
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				PreprocessorDefinitions="FFI;WIN32"
+				PreprocessorDefinitions="FFI;WIN32;F_DEBUG"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
 				EnableFunctionLevelLinking="TRUE"
@@ -137,6 +137,9 @@
 			</File>
 			<File
 				RelativePath="native\cons.c">
+			</File>
+			<File
+				RelativePath=".\native\debug.c">
 			</File>
 			<File
 				RelativePath="native\error.c">
@@ -390,6 +393,9 @@
 			</File>
 			<File
 				RelativePath="native\cons.h">
+			</File>
+			<File
+				RelativePath=".\native\debug.h">
 			</File>
 			<File
 				RelativePath="native\error.h">

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,9 @@ SYMBOL: callbacks
         f free-list set
     ] extend io-queue set ;
 
+: add-completion ( handle -- )
+    completion-port get NULL 1 CreateIoCompletionPort drop ;
+
 : get-access ( -- file-mode )
     "file-mode" get uncons 
     GENERIC_WRITE 0 ? >r
@@ -79,7 +82,7 @@ SYMBOL: callbacks
         cons "file-mode" set
         get-access get-sharemode NULL get-create FILE_FLAG_OVERLAPPED NULL 
         CreateFile dup INVALID_HANDLE_VALUE = [ win32-throw-error ] when
-        dup completion-port get NULL 1 CreateIoCompletionPort drop
+        dup add-completion
     ] with-scope ;
 
 BEGIN-STRUCT: indirect-pointer

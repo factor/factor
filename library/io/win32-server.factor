@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -79,8 +79,8 @@ SYMBOL: socket
 : <win32-client-stream> ( buf stream -- stream )
     [ 
         buffer-ptr <alien> 0 32 32 
-        <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r over 
-        GetAcceptExSockaddrs r> r> drop
+        <sockaddr-in> dup >r <indirect-pointer> <sockaddr-in> dup >r 
+        <indirect-pointer> GetAcceptExSockaddrs r> r> drop
         dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
         [ , ":" , unparse , ] make-string "client" set
     ] extend ;
@@ -88,7 +88,7 @@ SYMBOL: socket
 C: win32-server ( port -- server )
     [ 
         maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
-        dup completion-port get NULL 1 CreateIoCompletionPort drop
+        dup add-completion
         socket set
     ] extend ;
 
@@ -97,18 +97,13 @@ M: win32-server fclose ( server -- )
 
 M: win32-server accept ( server -- client )
     [
+        new-socket 1024 <buffer>
         [
-            new-socket "ns" set 1024 <buffer> "buf" set
-            [
-                alloc-io-task init-overlapped >r
-                socket get "ns" get "buf" get buffer-ptr <alien> 0
-                "sockaddr-in" size 16 + dup NULL r> AcceptEx
-                [ handle-socket-error ] unless (yield)
-            ] callcc0
-            "buf" get "ns" get 
-            dup completion-port get NULL 1 CreateIoCompletionPort drop
-            <win32-stream> <win32-client-stream>
-            "buf" get buffer-free
-        ] with-scope
+            alloc-io-task init-overlapped >r >r >r socket get r> r> 
+            buffer-ptr <alien> 0 "sockaddr-in" size 16 + dup NULL r> AcceptEx
+            [ handle-socket-error ] unless (yield)
+        ] callcc0
+        swap dup add-completion <win32-stream> dupd <win32-client-stream>
+        swap buffer-free
     ] bind ;
 
