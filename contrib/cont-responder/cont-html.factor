@@ -279,4 +279,5 @@ USE: logic
   "size" "href" "class" "border" "rows" "cols" 
   "id" "onclick" "style" "valign" "accesskey"
   "src" "language" "colspan" "onchange" "rel"
+  "width"
 ] [ define-attribute-word ] each 
