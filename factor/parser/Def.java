@@ -48,6 +48,8 @@ public class Def extends FactorParsingDefinition
 	{
 		// Read the word name
 		FactorWord newWord = reader.nextWord(true);
+		newWord.line = reader.getScanner().getLineNumber();
+		newWord.file = reader.getScanner().getFileName();
 		reader.pushExclusiveState(word,newWord);
 	}
 }

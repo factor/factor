@@ -129,15 +129,13 @@ USE: strings
     [ "top-level-continuation" set ] callcc0 ;
 
 : init-interpreter ( -- )
-    #! If we're run stand-alone, start the interpreter on stdio.
-    "interactive" get [
-        init-toplevel
+    print-banner
+    room.
 
-        [
-            print-banner
-            room.
-            interpreter-loop
-        ] [
-            [ default-error-handler suspend ] when*
-        ] catch
-    ] when ;
+    init-toplevel
+
+    [
+        interpreter-loop
+    ] [
+        [ default-error-handler suspend ] when*
+    ] catch ;

@@ -119,8 +119,27 @@ public class FactorListener extends JTextPane
 		listenerList.remove(EvalListener.class,l);
 	} //}}}
 
+	//{{{ eval() method
+	public void eval(String eval)
+	{
+		if(eval == null)
+			return;
+
+		try
+		{
+			StyledDocument doc = (StyledDocument)getDocument();
+			doc.insertString(doc.getLength(),eval + "\n",
+				getCharacterAttributes());
+		}
+		catch(BadLocationException ble)
+		{
+			ble.printStackTrace();
+		}
+		fireEvalEvent(eval);
+	} //}}}
+
 	//{{{ fireEvalEvent() method
-	private void fireEvalEvent(String code)
+	public void fireEvalEvent(String code)
 	{
 		setCursor(WaitCursor);
 
@@ -150,26 +169,6 @@ public class FactorListener extends JTextPane
 			return (String)a.getAttribute(Link);
 	} //}}}
 
-	//{{{ activateLink() method
-	private void activateLink(int pos)
-	{
-		String eval = getLinkAt(pos);
-		if(eval == null)
-			return;
-
-		try
-		{
-			StyledDocument doc = (StyledDocument)getDocument();
-			doc.insertString(doc.getLength(),eval + "\n",
-				getCharacterAttributes());
-		}
-		catch(BadLocationException ble)
-		{
-			ble.printStackTrace();
-		}
-		fireEvalEvent(eval);
-	} //}}}
-
 	//{{{ MouseHandler class
 	class MouseHandler extends MouseInputAdapter
 	{
@@ -180,7 +179,7 @@ public class FactorListener extends JTextPane
 			Point pt = new Point(e.getX(), e.getY());
 			int pos = editor.viewToModel(pt);
 			if(pos >= 0)
-				activateLink(pos);
+				eval(getLinkAt(pos));
 		}
 
 		public void mouseMoved(MouseEvent e)

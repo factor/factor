@@ -73,8 +73,14 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorClassLoader loader;
 	public String className;
 
+	/**
+	 * For text editor integration.
+	 */
+	public String file;
+	public int line;
+
 	private FactorNamespace namespace;
-	
+
 	//{{{ FactorWord constructor
 	/**
 	 * Do not use this constructor unless you're writing a packages

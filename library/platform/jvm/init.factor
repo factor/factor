@@ -77,4 +77,4 @@ USE: strings
 
     t "startup-done" set
     
-    init-interpreter ;
+    "interactive" get [ init-interpreter ] when ;

@@ -87,6 +87,18 @@ public class FactorScanner
 		this.readtable = readtable;
 	} //}}}
 
+	//{{{ getLineNumber() method
+	public int getLineNumber()
+	{
+		return lineNo;
+	} //}}}
+
+	//{{{ getFileName() method
+	public String getFileName()
+	{
+		return filename;
+	} //}}}
+
 	//{{{ nextLine() method
 	private void nextLine() throws IOException
 	{

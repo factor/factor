@@ -25,9 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-!!! This script and the scripts it calls bootstrap a new
-!!! object database.
-
 !!! Minimum amount of words needed to be able to read other
 !!! resources.
 
@@ -54,6 +51,13 @@ IN: streams
     "java.lang.Class" "getResourceAsStream" jinvoke
     <ireader> <breader> ;
 
+IN: strings
+
+: cat2 ( str str -- str )
+    #! Concatenate two strings.
+    swap
+    [ "java.lang.String" ] "java.lang.String" "concat" jinvoke ;
+
 IN: parser
 
 : parse* ( parser -- list )
@@ -78,7 +82,7 @@ IN: parser
     <parser> parse* ;
 
 : parse-resource ( resource -- list )
-    dup <rreader> parse-stream ;
+    dup <rreader> swap "resource:" swap cat2 swap parse-stream ;
 
 : run-resource ( path -- )
     #! Reads and runs a source file from a resource path.

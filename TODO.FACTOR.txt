@@ -3,6 +3,7 @@
 
 + listener:
 
+- top level broken
 - link style lingers
 - back space then type: input style gone
 - fedit broken with listener

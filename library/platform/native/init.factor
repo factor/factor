@@ -77,4 +77,4 @@ USE: unparser
 
     run-user-init
 
-    init-interpreter ;
+    "interactive" get [ init-interpreter ] when ;

@@ -71,25 +71,22 @@ public class FactorListenerPanel extends JPanel
 			listener = newListener()));
 	} //}}}
 
+	//{{{ getListener() method
+	public FactorListener getListener()
+	{
+		return listener;
+	} //}}}
+
 	//{{{ newListener() method
 	private FactorListener newListener()
 	{
 		final FactorListener listener = new FactorListener();
 		listener.addEvalListener(new EvalHandler());
 
-		try
-		{
-			interp.call(new Cons(listener,
-				new Cons(interp.searchVocabulary(
-					"listener","new-listener-hook"),
-				null)));
-			interp.run();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to initialize listener:");
-			e.printStackTrace();
-		}
+		eval(new Cons(listener,
+			new Cons(interp.searchVocabulary(
+				"listener","new-listener-hook"),
+			null)));
 
 		return listener;
 	} //}}}
@@ -108,7 +105,7 @@ public class FactorListenerPanel extends JPanel
 	} //}}}
 
 	//{{{ eval() method
-	public void eval(Cons cmd)
+	private void eval(Cons cmd)
 	{
 		try
 		{

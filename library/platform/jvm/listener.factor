@@ -28,6 +28,7 @@
 IN: listener
 USE: combinators
 USE: continuations
+USE: init
 USE: interpreter
 USE: kernel
 USE: lists
@@ -104,7 +105,7 @@ USE: unparser
 	"readLine" jinvoke ;
 
 : listener-readln ( -- line )
-    reset-attrs [ listener-readln* suspend ] callcc1 ;
+    reset-attrs [ listener-readln* toplevel ] callcc1 ;
 
 : listener-write-attr ( string -- )
     style>attribute-set "listener" get
@@ -147,8 +148,6 @@ USE: unparser
     #! Called when user opens a new listener
     <namespace> [
         dup "listener" set
-        <listener-stream> "stdio" set
-        print-banner
-        room.
-        interpreter-loop
+       <listener-stream> "stdio" set
+        init-interpreter
     ] bind ;

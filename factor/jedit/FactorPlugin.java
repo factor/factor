@@ -31,13 +31,23 @@ package factor.jedit;
 
 import factor.listener.FactorListenerPanel;
 import factor.FactorInterpreter;
+import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.*;
 import java.util.WeakHashMap;
 
 public class FactorPlugin extends EditPlugin
 {
+	private static final String DOCKABLE_NAME = "factor";
+
 	private static WeakHashMap views = new WeakHashMap();
 
+	//{{{ start() method
+	public void start()
+	{
+		/* Macros.registerHandler(new FactorMacroHandler()); */
+	} //}}}
+
+	//{{{ getInterpreter() method
 	public static FactorInterpreter getInterpreter(View view)
 	{
 		FactorInterpreter interp = (FactorInterpreter)
@@ -49,5 +59,15 @@ public class FactorPlugin extends EditPlugin
 			views.put(view,interp);
 		}
 		return interp;
-	}
+	} //}}}
+	
+	//{{{ eval() method
+	public static void eval(View view, String cmd)
+	{
+		DockableWindowManager wm = view.getDockableWindowManager();
+		wm.addDockableWindow(DOCKABLE_NAME);
+		FactorListenerPanel panel = (FactorListenerPanel)
+			wm.getDockableWindow(DOCKABLE_NAME);
+		panel.getListener().eval(cmd);
+	} //}}}
 }

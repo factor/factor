@@ -31,6 +31,13 @@ USE: kernel
 USE: logic
 USE: stack
 
+: cat2 ( "a" "b" -- "ab" )
+    swap
+    80 <sbuf>
+    dup >r sbuf-append r>
+    dup >r sbuf-append r>
+    sbuf>str ;
+
 : letter? CHAR: a CHAR: z between? ;
 : LETTER? CHAR: A CHAR: Z between? ;
 : digit? CHAR: 0 CHAR: 9 between? ;

@@ -93,7 +93,6 @@ USE: parser
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
 "/library/debugger.factor"                 run-resource ! debugger
-"/library/platform/jvm/listener.factor"    run-resource ! listener
 "/library/test/test.factor"                run-resource ! test
 "/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
@@ -117,6 +116,10 @@ USE: parser
 "/library/httpd/wiki-responder.factor"     run-resource ! wiki-responder
 "/library/httpd/default-responders.factor" run-resource ! default-responders
 
+!!! jEdit integration.
+"/library/jedit/jedit.factor" run-resource ! jedit
+
 !!! Final initialization...
 "/library/init.factor"                     run-resource ! init
 "/library/platform/jvm/init.factor"        run-resource ! init
+"/library/platform/jvm/listener.factor"    run-resource ! listener

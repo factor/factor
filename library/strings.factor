@@ -45,13 +45,6 @@ USE: stack
     ! string.
     80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>str ;
 
-: cat2 ( "a" "b" -- "ab" )
-    swap
-    80 <sbuf>
-    dup >r sbuf-append r>
-    dup >r sbuf-append r>
-    sbuf>str ;
-
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
 
