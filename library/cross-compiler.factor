@@ -66,6 +66,9 @@ DEFER: write-fd-8
 DEFER: flush-fd
 DEFER: shutdown-fd
 
+IN: parser
+DEFER: str>float
+
 IN: random
 DEFER: init-random
 DEFER: (random-int)
@@ -78,6 +81,9 @@ DEFER: word-parameter
 DEFER: set-word-parameter
 DEFER: word-plist
 DEFER: set-word-plist
+
+IN: unparser
+DEFER: unparse-float
 
 IN: cross-compiler
 
@@ -118,16 +124,21 @@ IN: cross-compiler
         >fixnum
         >bignum
         >integer
+        >float
         number=
         fixnum?
         bignum?
         ratio?
         numerator
         denominator
+        float?
+        str>float
+        unparse-float
         +
         -
         *
         /i
+        /f
         /
         mod
         /mod

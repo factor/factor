@@ -29,6 +29,20 @@ void primitive_to_float(void)
 	env.dt = tag_object(to_float(env.dt));
 }
 
+void primitive_str_to_float(void)
+{
+	char* c_str = to_c_string(untag_string(env.dt));
+	env.dt = tag_object(make_float(atof(c_str)));
+}
+
+void primitive_float_to_str(void)
+{
+	char tmp[33];
+	snprintf(&tmp,32,"%.16g",untag_float(env.dt)->n);
+	tmp[32] = '\0';
+	env.dt = tag_object(from_c_string(tmp));
+}
+
 CELL number_eq_float(CELL x, CELL y)
 {
 	return tag_boolean(((FLOAT*)UNTAG(x))->n

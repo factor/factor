@@ -45,6 +45,7 @@ void primitive_numberp(void)
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
 	case RATIO_TYPE:
+	case FLOAT_TYPE:
 		env.dt = T;
 		break;
 	default:

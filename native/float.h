@@ -19,6 +19,8 @@ INLINE FLOAT* untag_float(CELL tagged)
 void primitive_floatp(void);
 FLOAT* to_float(CELL tagged);
 void primitive_to_float(void);
+void primitive_str_to_float(void);
+void primitive_float_to_str(void);
 CELL number_eq_float(CELL x, CELL y);
 CELL add_float(CELL x, CELL y);
 CELL subtract_float(CELL x, CELL y);

@@ -81,11 +81,11 @@ USE: unparser
     swap str>integer swap str>integer / ;
 
 : str>number ( str -- num )
-    "/" over str-contains? [
-        str>ratio
-    ] [
-        str>integer
-    ] ifte ;
+    [
+        [ "/" swap str-contains? ] [ str>ratio   ]
+        [ "." swap str-contains? ] [ str>float   ]
+        [ drop t                 ] [ str>integer ]
+    ] cond ;
 
 : parse-number ( str -- num/f )
     [ str>number ] [ [ drop f ] when ] catch ;

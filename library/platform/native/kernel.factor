@@ -47,8 +47,7 @@ USE: unparser
     [
         [ cons? ] [ 4 cons-hashcode ]
         [ string? ] [ str-hashcode ]
-        [ fixnum? ] [ ( return the object ) ]
-        [ bignum? ] [ >fixnum ]
+        [ number? ] [ >fixnum ]
         [ drop t ] [ drop 0 ]
     ] cond ;
 
@@ -77,6 +76,7 @@ USE: unparser
         [ fixnum? ] [ drop "fixnum" ]
         [ bignum? ] [ drop "bignum" ]
         [ ratio?  ] [ drop "ratio" ]
+        [ float?  ] [ drop "float" ]
         [ cons?   ] [ drop "cons" ]
         [ word?   ] [ drop "word" ]
         [ f =     ] [ drop "f" ]

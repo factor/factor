@@ -104,6 +104,9 @@ CELL untagged_object_size(CELL pointer)
 	case BIGNUM_TYPE:
 		size = sizeof(BIGNUM);
 		break;
+	case FLOAT_TYPE:
+		size = sizeof(FLOAT);
+		break;
 	case HANDLE_TYPE:
 		size = sizeof(HANDLE);
 		break;

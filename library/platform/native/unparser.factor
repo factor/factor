@@ -112,6 +112,7 @@ USE: vocabularies
         [ word?    ] [ unparse-word ]
         [ integer? ] [ unparse-integer ]
         [ ratio?   ] [ unparse-ratio ]
+        [ float?   ] [ unparse-float ]
         [ string?  ] [ unparse-str ]
         [ drop t   ] [ <% "#<" % class-of % ">" % %> ]
     ] cond ;

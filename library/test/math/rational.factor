@@ -5,6 +5,8 @@ USE: stack
 USE: test
 
 [ t ] [ 0 fixnum? ] unit-test
+[ t ] [ 31415 number? ] unit-test
+[ t ] [ 31415 >bignum number? ] unit-test
 [ t ] [ 2345621 fixnum? ] unit-test
 
 [ t ] [ 2345621 dup >bignum >fixnum = ] unit-test
@@ -68,6 +70,12 @@ USE: test
 [ t ] [ 1 1/3 > ] unit-test
 [ t ] [ 2/3 3/4 <= ] unit-test
 [ f ] [ -2/3 1/3 > ] unit-test
+
+[ t ] [ 1000000000/999999 1000 > ] unit-test
+[ f ] [ 100000 100000000000/999999 > ] unit-test
+[ t ]
+[ 1000000000000/999999999999 1000000000001/999999999998 < ]
+unit-test
 
 [ 3 ] [ 10/3 >integer ] unit-test
 [ -3 ] [ -10/3 >integer ] unit-test
