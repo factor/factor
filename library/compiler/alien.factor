@@ -75,8 +75,6 @@ M: alien unparse ( obj -- str )
     
 SYMBOL: #cleanup ( unwind stack by parameter )
 
-SYMBOL: #c-call ( jump to raw address )
-
 SYMBOL: #unbox ( move top of datastack to C stack )
 SYMBOL: #box ( move EAX to datastack )
 
@@ -84,6 +82,7 @@ SYMBOL: #box ( move EAX to datastack )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
 
 SYMBOL: #alien-invoke
+SYMBOL: #alien-global
 
 ! These are set in the #alien-invoke dataflow IR node.
 SYMBOL: alien-returns
@@ -100,22 +99,36 @@ SYMBOL: alien-parameters
     [ drop object ] map dup dup ensure-d
     length 0 node-inputs consume-d ;
 
-: alien-node ( returns params function library -- )
+: ensure-dlsym ( symbol library -- ) load-dll dlsym drop ;
+
+: alien-invoke-node ( returns params function library -- )
     #! We should fail if the library does not exist, so that
     #! compilation does not keep trying to compile FFI words
     #! over and over again if the library is not loaded.
-    2dup load-dll dlsym drop
+    2dup ensure-dlsym
     cons #alien-invoke dataflow,
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
-: infer-alien ( -- )
-    [ string string string general-list ] ensure-d
-    dataflow-drop, pop-d literal-value
-    dataflow-drop, pop-d literal-value >r
-    dataflow-drop, pop-d literal-value
-    dataflow-drop, pop-d literal-value -rot
-    r> swap alien-node ;
+: infer-alien-invoke ( -- )
+    \ alien-invoke "infer-effect" word-prop car ensure-d
+    pop-literal
+    pop-literal >r
+    pop-literal
+    pop-literal -rot
+    r> swap alien-invoke-node ;
+
+: alien-global-node ( type name library -- )
+    2dup ensure-dlsym
+    cons #alien-global dataflow,
+    set-alien-returns ;
+
+: infer-alien-global ( -- )
+    \ alien-global "infer-effect" word-prop car ensure-d
+    pop-literal
+    pop-literal
+    pop-literal -rot
+    alien-global-node ;
 
 : box-parameter
     c-type [
@@ -137,14 +150,20 @@ SYMBOL: alien-parameters
         c-type [ "boxer" get ] bind #box swons ,
     ] ifte ;
 
-: linearize-alien ( node -- )
+: linearize-alien-invoke ( node -- )
     dup linearize-parameters >r
-    dup [ node-param get ] bind #c-call swons ,
+    dup [ node-param get ] bind #alien-invoke swons ,
     dup [ node-param get cdr library-abi "stdcall" = ] bind
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
-#alien-invoke [ linearize-alien ] "linearizer" set-word-prop
+#alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
+
+: linearize-alien-global ( node -- )
+    dup [ node-param get ] bind #alien-global swons ,
+    linearize-returns ;
+
+#alien-global [ linearize-alien-global ] "linearizer" set-word-prop
 
 TUPLE: alien-error lib ;
 
@@ -152,7 +171,7 @@ C: alien-error ( lib -- ) [ set-alien-error-lib ] keep ;
 
 M: alien-error error. ( error -- )
     [
-        "alien-invoke cannot be interpreted. " ,
+        "C library interface words cannot be interpreted. " ,
         "Either the compiler is disabled, " ,
         "or the ``" , alien-error-lib ,
         "'' library is missing." ,
@@ -165,10 +184,21 @@ M: alien-error error. ( error -- )
     #! namespace.
     rot <alien-error> throw ;
 
-\ alien-invoke [ [ object object object object ] [ ] ]
+\ alien-invoke [ [ string string string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
-\ alien-invoke [ infer-alien ] "infer" set-word-prop
+\ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
+
+: alien-global ( type library name -- value )
+    #! Fetch the value of C global variable.
+    #! 'type' is a type spec. 'library' is an entry in the
+    #! "libraries" namespace.
+    swap <alien-error> throw ;
+
+\ alien-global [ [ string string string ] [ object ] ]
+"infer-effect" set-word-prop
+
+\ alien-global [ infer-alien-global ] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

@@ -12,7 +12,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
     peek-next-d value-class builtin-supertypes length 1 = and ;
 
 : fast-slot ( -- )
-    dataflow-drop, pop-d literal-value
+    pop-literal
     peek-d value-class builtin-supertypes cons
     \ slot [ [ object ] [ object ] ] (consume/produce) ;
 

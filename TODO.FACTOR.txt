@@ -24,10 +24,7 @@
 
 + compiler/ffi:
 
-- ffi global variables, and get rid of factor_str_error hack
 - box/unbox_signed/unsigned_8
-- unsigned versions of all alien accessors and setters
-
 - [ [ dup call ] dup call ] infer hangs
 - ffi unicode strings: null char security hole
 - utf16 string boxing

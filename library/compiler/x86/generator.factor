@@ -55,8 +55,12 @@ math memory namespaces words ;
     compiled-offset swap set-compiled-cell ( fixup -- )
 ] "generator" set-word-prop
 
-#c-call [
+#alien-invoke [
     uncons load-dll 2dup dlsym CALL t rel-dlsym
+] "generator" set-word-prop
+
+#alien-global [
+    uncons load-dll 2dup dlsym EAX swap unit MOV f rel-dlsym
 ] "generator" set-word-prop
 
 #unbox [

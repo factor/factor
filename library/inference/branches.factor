@@ -227,7 +227,7 @@ SYMBOL: cloned
 USE: kernel-internals
 
 : static-dispatch ( vtable -- )
-    >r dataflow-drop, pop-d literal-value r>
+    >r pop-literal r>
     dup literal-value swap value-recursion
     >r vector-nth r> <literal> infer-quot-value ;
 
