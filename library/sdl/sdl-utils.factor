@@ -129,6 +129,8 @@ SYMBOL: logical-fonts
 global [
     {{
         [[ "Monospaced" "/fonts/VeraMono.ttf" ]]
+        [[ "Serif" "/fonts/VeraSe.ttf" ]]
+        [[ "Sans Serif" "/fonts/Vera.ttf" ]]
     }} logical-fonts set
 ] bind
 

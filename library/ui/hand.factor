@@ -86,7 +86,7 @@ C: hand ( world -- hand )
     r> swap fire-enter ;
 
 : request-focus ( gadget -- )
-    my-hand hand-focus swap
+    my-hand hand-focus
     2dup lose-focus
-    2dup my-hand set-hand-focus
+    swap dup my-hand set-hand-focus
     gain-focus ;

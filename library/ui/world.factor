@@ -68,13 +68,13 @@ DEFER: handle-event
 
 global [
     <world> world set
-    640 480 world get resize-gadget
+    1024 768 world get resize-gadget
     {{
-        [[ background [ 216 216 216 ] ]]
-        [[ foreground [ 0 0 0 ] ]]
-        [[ bevel-1    [ 240 240 240 ] ]]
-        [[ bevel-2    [ 192 192 192 ] ]]
+        [[ background [ 255 255 255 ] ]]
+        [[ foreground [ 0 0 102 ] ]]
+        [[ bevel-1    [ 224 224 255 ] ]]
+        [[ bevel-2    [ 192 192 216 ] ]]
         [[ bevel-up?  t ]]
-        [[ font       [[ "Monospaced" 12 ]] ]]
+        [[ font       [[ "Sans Serif" 14 ]] ]]
     }} world get set-gadget-paint
 ] bind

@@ -36,10 +36,20 @@ USE: stdio
 USE: prettyprint
 USE: words
 
+: grab ( gadget hand -- )
+    [ swap screen-pos swap screen-pos - >rect ] 2keep
+    >r [ move-gadget ] keep r> add-gadget ;
+
+: release ( gadget world -- )
+    >r dup screen-pos >r
+    dup unparent
+    r> >rect pick move-gadget
+    r> add-gadget ;
+
 : moving-actions
     {{
-        [[ [ button-down 1 ] [ 0 0 pick move-gadget my-hand add-gadget ] ]]
-        [[ [ button-up 1 ] [ my-hand shape-x my-hand shape-y pick move-gadget world get add-gadget ] ]]
+            [[ [ button-down 1 ] [ my-hand grab ] ]]
+        [[ [ button-up 1 ] [ world get release ] ]]
     }} swap set-gadget-gestures ;
 
 : filled? "filled" get checkbox-selected? ;
@@ -65,12 +75,11 @@ USE: words
     "Filled?" <checkbox> dup "filled" set "shelf" get add-gadget
     "shelf" get "pile" get add-gadget
     "Welcome to Factor " version cat2 <label> "pile" get add-gadget
+    "Welcome to Factor " version cat2 <label> <field> "pile" get add-gadget
+    "Welcome to Factor " version cat2 <label> <field> "pile" get add-gadget
 
     "pile" get bevel-border dup "dialog" set dup  
- {{
-         [[ [ button-down 1 ] [ dup unparent 0 0 pick move-gadget my-hand add-gadget ] ]]
-         [[ [ button-up 1 ] [ my-hand shape-x my-hand shape-y pick move-gadget world get add-gadget ] ]]
-     }} swap set-gadget-gestures
+ moving-actions
   world get add-gadget ;
 
 : gadget-demo ( -- )

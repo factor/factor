@@ -52,7 +52,7 @@ SYMBOL: button-down
         2dup inside? [ mouse-leave ] hierarchy-gesture
     ] each-parent drop ;
 
-: lose-focus ( old new -- )
+: lose-focus ( new old -- )
     #! If the old focus owner is a child of the new owner, do
     #! not fire a focus lost gesture, since the focus was not
     #! lost. Otherwise, fire a focus lost gesture and go to the

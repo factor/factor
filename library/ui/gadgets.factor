@@ -59,13 +59,13 @@ C: gadget ( shape -- gadget )
 : each-parent ( gadget quot -- )
     #! Apply quotation to each parent of the gadget in turn,
     #! stopping when the quotation returns f.
-    [ call ] 2keep rot [
-        >r gadget-parent dup [
-            r> each-parent
+    over [
+        [ call ] 2keep rot [
+            >r gadget-parent r> each-parent
         ] [
-            r> 2drop
+            2drop
         ] ifte
-    ] [
+    ] [ 
         2drop
     ] ifte ; inline
 
