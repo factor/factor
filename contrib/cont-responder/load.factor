@@ -46,6 +46,7 @@ USE: parser
 : l5 "live-updater.factor" run-file ;
 : l6 "eval-responder.factor" run-file ;
 : l7 "live-updater-responder.factor" run-file ;
+: l8 "browser.factor" run-file ;
 : la ;
 : la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
 : lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
