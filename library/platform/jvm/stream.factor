@@ -212,9 +212,6 @@ USE: strings
     [ "java.io.File" ] "java.io.File" "renameTo"
     jinvoke ;
 
-: file-extension ( filename -- extension )
-    ".*\\.(.*)" group1 ;
-
 : <sreader> ( string -- reader )
     [ "java.lang.String" ] "java.io.StringReader" jnew ;
 

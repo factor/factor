@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: quit-responder
+USE: combinators
 USE: namespaces
 USE: stdio
 USE: stack

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stdio
+USE: combinators
 USE: errors
 USE: kernel
 USE: namespaces

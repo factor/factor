@@ -27,7 +27,7 @@
 
 ! Parsing words. 'builtins' is a stupid vocabulary name now
 ! that it does not contain Java words anymore!
-IN: builtins
+IN: syntax
 
 USE: combinators
 USE: cross-compiler

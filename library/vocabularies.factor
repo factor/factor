@@ -66,10 +66,10 @@ USE: strings
 
 : init-search-path ( -- )
     ! For files
-    "user" "file-in" set
-    [ "user" "builtins" ] "file-use" set
+    "scratchpad" "file-in" set
+    [ "builtins" "syntax" "scratchpad" ] "file-use" set
     ! For interactive
-    "user" "in" set
+    "scratchpad" "in" set
     [
         "user"
         "arithmetic"
@@ -95,6 +95,7 @@ USE: strings
         "streams"
         "stdio"
         "strings"
+        "syntax"
         "test"
         "threads"
         "trace"

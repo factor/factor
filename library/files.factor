@@ -25,38 +25,39 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: profiler
+IN: files
 USE: combinators
-USE: kernel
 USE: lists
-USE: math
-USE: prettyprint
+USE: namespaces
 USE: stack
-USE: words
-USE: vectors
+USE: strings
 
-: reset-call-counts ( -- )
-    vocabs [ words [ 0 swap set-call-count ] each ] each ;
+: set-mime-types ( assoc -- )
+    "mime-types" global set* ;
 
-: sort-call-counts ( alist -- alist )
-    [ swap cdr swap cdr > ] sort ;
+: mime-types ( -- assoc )
+    "mime-types" global get* ;
 
-: call-count, ( word -- )
-    #! Add to constructing list if call count is non-zero.
-    dup call-count dup 0 = [
-        2drop
-    ] [
-        cons ,
-    ] ifte ;
+: file-extension ( filename -- extension )
+    "." split cdr dup [ last ] when ;
 
-: call-counts ( -- alist )
-    #! Push an alist of all word/call count pairs.
-    [, [ call-count, ] each-word ,] sort-call-counts ;
+: mime-type ( filename -- mime-type )
+    file-extension mime-types assoc [ "text/plain" ] unless* ;
 
-: profile ( quot -- )
-    #! Execute a quotation with the profiler enabled.
-    reset-call-counts
-    callstack vector-length profiling
-    call
-    f profiling
-    call-counts [ . ] each ;
+[
+    [ "html"   | "text/html"                ]
+    [ "txt"    | "text/plain"               ]
+                                           
+    [ "gif"    | "image/gif"                ]
+    [ "png"    | "image/png"                ]
+    [ "jpg"    | "image/jpeg"               ]
+    [ "jpeg"   | "image/jpeg"               ]
+               
+    [ "jar"    | "application/octet-stream" ]
+    [ "zip"    | "application/octet-stream" ]
+    [ "tgz"    | "application/octet-stream" ]
+    [ "tar.gz" | "application/octet-stream" ]
+    [ "gz"     | "application/octet-stream" ]
+      
+    [ "factor" | "application/x-factor"     ]
+] set-mime-types

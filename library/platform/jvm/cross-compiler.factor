@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: cross-compiler
+USE: combinators
 USE: kernel
 USE: lists
 USE: math

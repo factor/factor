@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
+USE: combinators
 USE: errors
 USE: namespaces
 USE: stack

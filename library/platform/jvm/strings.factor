@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
+USE: combinators
 USE: kernel
 USE: logic
 USE: stack

@@ -98,6 +98,7 @@ USE: stdio
     "/library/random.factor"
     "/library/stdio-binary.factor"
     "/library/platform/native/prettyprint.factor"
+    "/library/files.factor"
     "/library/interpreter.factor"
     "/library/inspector.factor"
     "/library/inspect-vocabularies.factor"

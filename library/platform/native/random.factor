@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: random
+USE: combinators
 USE: kernel
 USE: math
 USE: stack

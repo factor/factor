@@ -30,6 +30,7 @@ USE: combinators
 USE: html
 USE: kernel
 USE: lists
+USE: files
 USE: namespaces
 USE: parser
 USE: regexp
@@ -41,27 +42,6 @@ USE: strings
 USE: httpd
 USE: httpd-responder
 
-!!! Support words.
-: mime-types ( -- alist )
-    [
-        [  "html"   | "text/html"                ]
-        [  "txt"    | "text/plain"               ]
-                                                
-        [  "gif"    | "image/gif"                ]
-        [  "png"    | "image/png"                ]
-        [  "jpg"    | "image/jpeg"               ]
-        [  "jpeg"   | "image/jpeg"               ]
-                    
-        [  "jar"    | "application/octet-stream" ]
-        [  "zip"    | "application/octet-stream" ]
-        [  "tgz"    | "application/octet-stream" ]
-        [  "tar.gz" | "application/octet-stream" ]
-        [  "gz"     | "application/octet-stream" ]
-    ] ;
-
-: mime-type ( filename -- mime-type )
-    file-extension mime-types assoc [ "text/plain" ] unless* ;
-
 !!! Serving files.
 : file-header ( filename -- header )
     "200 Document follows" swap mime-type response ;
@@ -72,7 +52,7 @@ USE: httpd-responder
 !!! Serving directories.
 : file>html ( filename -- ... )
     "<li><a href=\"" swap
-    !dup directory? [ "/" cat2 ] when
+    ! dup directory? [ "/" cat2 ] when
     chars>entities
     "\">" over "</a></li>" ;
 

@@ -73,6 +73,7 @@ USE: parser
 "/library/styles.factor"                    run-resource ! styles
 "/library/platform/jvm/threads.factor"      run-resource ! threads
 "/library/logging.factor"                   run-resource ! logging
+"/library/files.factor"                     run-resource ! files
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math

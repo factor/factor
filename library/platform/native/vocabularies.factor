@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
+USE: combinators
 USE: lists
 USE: namespaces
 USE: stack

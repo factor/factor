@@ -38,10 +38,6 @@ import java.util.*;
  */
 public class FactorReader
 {
-	public static final Cons DEFAULT_USE = new Cons("builtins",
-		new Cons("scratchpad",null));
-	public static final String DEFAULT_IN = "scratchpad";
-
 	private FactorInterpreter interp;
 	private FactorScanner scanner;
 	private Cons states;
@@ -265,8 +261,8 @@ public class FactorReader
 		pushState(toplevel,null);
 		this.alwaysDocComments = alwaysDocComments;
 		this.interactive = interactive;
-		this.in = DEFAULT_IN;
-		this.use = DEFAULT_USE;
+		this.in = FactorInterpreter.DEFAULT_IN;
+		this.use = FactorInterpreter.DEFAULT_USE;
 	} //}}}
 
 	//{{{ getScanner() method

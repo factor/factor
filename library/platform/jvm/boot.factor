@@ -28,6 +28,8 @@
 !!! Minimum amount of words needed to be able to read other
 !!! resources.
 
+USE: combinators
+
 IN: stack
 
 ~<< dup A -- A A >>~

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stack
+USE: combinators
 USE: kernel
 USE: vectors
 

@@ -87,26 +87,10 @@ USE: words
     #! Parse command line arguments.
     parse-switches run-files ;
 
-: (word-of-the-day) ( -- word )
-    vocabs random-element words dup [
-        random-element
-    ] [
-        drop (word-of-the-day) ( empty vocab )
-    ] ifte ;
-
-: word-of-the-day ( -- )
-    #! Something to entertain the poor hacker.
-    (word-of-the-day) dup defined? [
-        "WORD OF THE DAY: " print see
-    ] [
-        drop word-of-the-day
-    ] ifte ;
-
 : init-interpreter ( -- )
     init-history
 
     print-banner
-    word-of-the-day
     room.
 
     interpreter-loop ;

@@ -73,6 +73,7 @@ USE: unparser
         "hashtables"
         "strings"
         "namespaces/namespaces"
+        "files"
         "format"
         "parser"
         "parse-number"

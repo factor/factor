@@ -83,4 +83,4 @@ USE: words
 
     t "startup-done" set
     
-    "interactive" get [ init-interpreter ] when ;
+    "interactive" get [ init-interpreter 1 exit* ] when ;

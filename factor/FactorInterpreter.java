@@ -35,7 +35,11 @@ import java.io.*;
 
 public class FactorInterpreter implements FactorObject, Runnable
 {
-	public static final String VERSION = "0.64";
+	public static final String VERSION = "0.65";
+
+	public static final Cons DEFAULT_USE = new Cons("builtins",
+		new Cons("syntax",new Cons("scratchpad",null)));
+	public static final String DEFAULT_IN = "scratchpad";
 
 	// command line arguments are stored here.
 	public Cons args;
@@ -63,18 +67,12 @@ public class FactorInterpreter implements FactorObject, Runnable
 	/**
 	 * Vocabulary search path for interactive parser.
 	 */
-	public Cons use;
+	public Cons use = DEFAULT_USE;
 
 	/**
 	 * Vocabulary to define new words in.
 	 */
-	public String in;
-
-	/**
-	 * Kernel vocabulary. Re-created on each startup, contains
-	 * primitives and parsing words.
-	 */
-	public FactorNamespace builtins;
+	public String in = DEFAULT_IN;
 
 	/**
 	 * Most recently defined word.
@@ -110,7 +108,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		this.vocabularies = interp.vocabularies;
 		this.use = interp.use;
 		this.in = interp.in;
-		this.builtins = interp.builtins;
 		this.last = interp.last;
 		this.global = interp.global;
 		this.startupDone = true;
@@ -148,73 +145,71 @@ public class FactorInterpreter implements FactorObject, Runnable
 	//{{{ initBuiltinDictionary() method
 	private void initBuiltinDictionary() throws Exception
 	{
-		builtins = new FactorNamespace();
-		vocabularies.setVariable("builtins",builtins);
-
-		in = "builtins";
-		use = new Cons(in,null);
+		vocabularies.setVariable("builtins",new FactorNamespace());
+		vocabularies.setVariable("combinators",new FactorNamespace());
+		vocabularies.setVariable("syntax",new FactorNamespace());
 
 		/* comments */
-		FactorWord lineComment = define("builtins","!");
+		FactorWord lineComment = define("syntax","!");
 		lineComment.parsing = new LineComment(lineComment,false);
-		FactorWord stackComment = define("builtins","(");
+		FactorWord stackComment = define("syntax","(");
 		stackComment.parsing = new StackComment(stackComment);
-		FactorWord docComment = define("builtins","#!");
+		FactorWord docComment = define("syntax","#!");
 		docComment.parsing = new LineComment(docComment,true);
 
 		/* strings */
-		FactorWord str = define("builtins","\"");
+		FactorWord str = define("syntax","\"");
 		str.parsing = new StringLiteral(str,true);
-		FactorWord ch = define("builtins","CHAR:");
+		FactorWord ch = define("syntax","CHAR:");
 		ch.parsing = new CharLiteral(ch);
 
 		/* constants */
-		FactorWord t = define("builtins","t");
+		FactorWord t = define("syntax","t");
 		t.parsing = new T(t);
-		FactorWord f = define("builtins","f");
+		FactorWord f = define("syntax","f");
 		f.parsing = new F(f);
-		FactorWord complex = define("builtins","#{");
+		FactorWord complex = define("syntax","#{");
 		complex.parsing = new ComplexLiteral(complex,"}");
 
 		/* lists */
-		FactorWord bra = define("builtins","[");
+		FactorWord bra = define("syntax","[");
 		bra.parsing = new Bra(bra);
-		FactorWord ket = define("builtins","]");
+		FactorWord ket = define("syntax","]");
 		ket.parsing = new Ket(bra,ket);
-		FactorWord bar = define("builtins","|");
+		FactorWord bar = define("syntax","|");
 		bar.parsing = new Bar(bar);
 
 		/* vectors */
-		FactorWord beginVector = define("builtins","{");
+		FactorWord beginVector = define("syntax","{");
 		beginVector.parsing = new BeginVector(beginVector);
-		FactorWord endVector = define("builtins","}");
+		FactorWord endVector = define("syntax","}");
 		endVector.parsing = new EndVector(beginVector,endVector);
 
 		/* word defs */
-		FactorWord def = define("builtins",":");
+		FactorWord def = define("syntax",":");
 		def.parsing = new Def(def);
 		def.getNamespace().setVariable("doc-comments",Boolean.TRUE);
-		FactorWord ine = define("builtins",";");
+		FactorWord ine = define("syntax",";");
 		ine.parsing = new Ine(def,ine);
-		FactorWord shuffle = define("builtins","~<<");
+		FactorWord shuffle = define("syntax","~<<");
 		shuffle.parsing = new Shuffle(shuffle,">>~");
 
 		/* reading numbers with another base */
-		FactorWord bin = define("builtins","BIN:");
+		FactorWord bin = define("syntax","BIN:");
 		bin.parsing = new Base(bin,2);
-		FactorWord oct = define("builtins","OCT:");
+		FactorWord oct = define("syntax","OCT:");
 		oct.parsing = new Base(oct,8);
-		FactorWord hex = define("builtins","HEX:");
+		FactorWord hex = define("syntax","HEX:");
 		hex.parsing = new Base(hex,16);
 
 		/* vocabulary parsing words */
-		FactorWord noParsing = define("builtins","POSTPONE:");
+		FactorWord noParsing = define("syntax","POSTPONE:");
 		noParsing.parsing = new NoParsing(noParsing);
-		FactorWord defer = define("builtins","DEFER:");
+		FactorWord defer = define("syntax","DEFER:");
 		defer.parsing = new Defer(defer);
-		FactorWord in = define("builtins","IN:");
+		FactorWord in = define("syntax","IN:");
 		in.parsing = new In(in);
-		FactorWord use = define("builtins","USE:");
+		FactorWord use = define("syntax","USE:");
 		use.parsing = new Use(use);
 
 		FactorWord interpreterGet = define("builtins","interpreter");
@@ -258,12 +253,12 @@ public class FactorInterpreter implements FactorObject, Runnable
 		define.def = new Define(define);
 
 		// combinators
-		FactorWord execute = define("builtins","execute");
+		FactorWord execute = define("words","execute");
 		execute.def = new Execute(execute);
-		FactorWord call = define("builtins","call");
+		FactorWord call = define("combinators","call");
 		call.def = new Call(call);
 		call.inline = true;
-		FactorWord ifte = define("builtins","ifte");
+		FactorWord ifte = define("combinators","ifte");
 		ifte.def = new Ifte(ifte);
 		ifte.inline = true;
 	} //}}}
@@ -289,7 +284,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 			"args",
 			"dump",
 			"interactive",
-			"builtins",
 			"in",
 			"last",
 			"use"

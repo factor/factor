@@ -1,4 +1,5 @@
 IN: test
+USE: combinators
 USE: compiler
 USE: namespaces
 USE: stdio

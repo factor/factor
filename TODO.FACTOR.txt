@@ -58,6 +58,7 @@ to_c_string allots too much
 
 + native:
 
+- eliminate usage of long long
 - is the profiler using correct stack depth?
 - read1
 - sbuf-hashcode
@@ -82,7 +83,6 @@ to_c_string allots too much
 + misc:
 
 - alist -vs- assoc terminology
-- dissolve builtins vocabulary
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
 - some way to run httpd from command line

@@ -39,6 +39,7 @@ USE: stdio
 USE: strings
 USE: unparser
 USE: vectors
+USE: words
 
 : expired-port-error ( obj -- )
     "Expired port: " write . ;
