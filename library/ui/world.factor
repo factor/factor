@@ -56,18 +56,7 @@ DEFER: handle-event
         drop world get world-step [ yield run-world ] when
     ] ifte ;
 
-SYMBOL: root-menu
-
-: show-root-menu ( -- )
-    root-menu get <menu> show-menu ;
-
 global [
-    [
-        [[ "Listener" [ <console-pane> <scroller> world get add-gadget ] ]]
-        [[ "Globals" [ global inspect ] ]]
-        [[ "Save image" [ "image" get save-image ] ]]
-        [[ "Exit" [ f world get set-world-running? ] ]]
-    ] root-menu set
     
     <world> world set
     
@@ -77,13 +66,9 @@ global [
 
         [[ background [ 255 255 255 ] ]]
         [[ foreground [ 0 0 0 ] ]]
-        [[ bevel-1    [ 224 224 255 ] ]]
-        [[ bevel-2    [ 192 192 216 ] ]]
         [[ reverse-video f ]]
-        [[ font       [[ "Sans Serif" 12 ]] ]]
+        [[ font [[ "Sans Serif" 12 ]] ]]
     }} world get set-gadget-paint
-
-    world get [ drop show-root-menu ] [ button-down 1 ] set-action
 ] bind
 
 : title ( -- str )

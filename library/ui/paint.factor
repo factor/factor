@@ -147,6 +147,13 @@ SYMBOL: clip
 : intersect ( rect rect -- rect )
     [ intersect-x ] 2keep intersect-y clip-rect ;
 
+: >sdl-rect ( rectangle -- sdlrect )
+    [ rectangle-x ] keep
+    [ rectangle-y ] keep
+    [ rectangle-w ] keep
+    rectangle-h
+    make-rect ;
+
 : set-clip ( rect -- ? )
     #! The top/left corner of the clip rectangle is the location
     #! of the gadget on the screen. The bottom/right is the
@@ -169,13 +176,6 @@ M: object shape-clip
         >r shape-clip clip [ intersect dup ] change set-clip r>
         call
     ] with-scope ; inline
-
-: >sdl-rect ( rectangle -- sdlrect )
-    [ rectangle-x ] keep
-    [ rectangle-y ] keep
-    [ rectangle-w ] keep
-    rectangle-h
-    make-rect ;
 
 : draw-gadget ( gadget -- )
     #! All drawing done inside draw-shape is done with the

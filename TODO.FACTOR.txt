@@ -6,6 +6,8 @@
 
 + ui:
 
+- inspector: complain if UI not running
+- opening listeners fails
 - menu dragging
 - hide menu after item selected
 - scrollable inspector
@@ -55,6 +57,7 @@
 
 + kernel:
 
+- hash-size regression
 - vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
 - code gc

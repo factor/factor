@@ -173,8 +173,8 @@ cpu "x86" = "mini" get not and [
         "/library/ui/gestures.factor"
         "/library/ui/hand.factor"
         "/library/ui/layouts.factor"
-        "/library/ui/halo.factor"
         "/library/ui/world.factor"
+        "/library/ui/halo.factor"
         "/library/ui/labels.factor"
         "/library/ui/buttons.factor"
         "/library/ui/line-editor.factor"
@@ -182,9 +182,11 @@ cpu "x86" = "mini" get not and [
         "/library/ui/dialogs.factor"
         "/library/ui/events.factor"
         "/library/ui/scrolling.factor"
+        "/library/ui/menus.factor"
         "/library/ui/presentations.factor"
         "/library/ui/panes.factor"
         "/library/ui/inspector.factor"
+        "/library/ui/root-menu.factor"
     ] [
         dup print
         run-resource
