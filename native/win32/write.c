@@ -12,20 +12,20 @@ void primitive_can_write (void)
 	box_boolean(true);
 }
 
-void write_char_8 (PORT *port, FIXNUM ch)
+void write_char_8 (F_PORT *port, F_FIXNUM ch)
 {
 	char buf = (char)ch;
 	WriteFile((HANDLE)port->fd, &buf, 1, NULL, NULL); 
 }
 
-void write_string_8 (PORT *port, STRING *str)
+void write_string_8 (F_PORT *port, F_STRING *str)
 {
 	WriteFile((HANDLE)port->fd, to_c_string(str), str->capacity, NULL, NULL);
 }
 
 void primitive_write_8 (void)
 {
-	PORT *port;
+	F_PORT *port;
 	CELL text, type;
 
 	maybe_garbage_collection();
