@@ -26,7 +26,7 @@
 IN: win32-stream
 USING: alien errors generic kernel kernel-internals lists math namespaces
        prettyprint stdio streams strings threads unparser win32-api
-       win32-io-internals ;
+       win32-io-internals io-internals ;
 
 TUPLE: win32-server this ;
 TUPLE: win32-client-stream host ;

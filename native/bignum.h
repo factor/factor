@@ -51,7 +51,7 @@ INLINE CELL tag_cell(CELL x)
 }
 
 /* FFI calls this */
-void box_signed_cell(F_FIXNUM integer);
+DLLEXPORT void box_signed_cell(F_FIXNUM integer);
 DLLEXPORT F_FIXNUM unbox_signed_cell(void);
 
 DLLEXPORT void box_unsigned_cell(CELL cell);

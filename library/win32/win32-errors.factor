@@ -29,7 +29,7 @@ IN: win32-api
 USE: buffer
 USE: errors
 USE: kernel
-USE: kernel-internals
+USE: io-internals
 USE: lists
 USE: math
 USE: parser

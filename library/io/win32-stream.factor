@@ -26,7 +26,7 @@
 IN: win32-stream
 USING: alien continuations generic kernel kernel-internals lists math
        namespaces prettyprint stdio streams strings threads win32-api
-       win32-io-internals ;
+       win32-io-internals io-internals ;
 
 TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle
@@ -67,7 +67,7 @@ SYMBOL: file-size
 
 M: integer do-write ( int -- )
     out-buffer get [ buffer-capacity 0 = [ flush-output ] when ] keep
-    >r ch>str r> >buffer ;
+    >r ch>string r> >buffer ;
 
 M: string do-write ( str -- )
     dup string-length out-buffer get buffer-capacity <= [

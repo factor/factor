@@ -25,7 +25,7 @@
 
 IN: win32-io-internals
 USING: alien errors kernel kernel-internals lists math namespaces threads 
-       vectors win32-api stdio streams generic ;
+       vectors win32-api stdio streams generic io-internals ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
