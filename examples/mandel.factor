@@ -1,7 +1,7 @@
 ! Graphical mandelbrot fractal renderer.
 ! To run this code, start your interpreter like so:
 !
-! ./f -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
+! ./f -libraries:sdl:name=libSDL.so -libraries:sdl-gfx:name=libSDL_gfx.so
 !
 ! Then, enter this at the interpreter prompt:
 !

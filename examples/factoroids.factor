@@ -2,7 +2,7 @@
 !
 ! To play the game:
 !
-! ./f factor.image -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
+! ./f -libraries:sdl:name=libSDL.so -libraries:sdl-gfx:name=libSDL_gfx.so
 !
 ! "examples/factoroids.factor" run-file
 
