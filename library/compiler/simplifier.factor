@@ -82,12 +82,16 @@ USE: words
 : follows? ( op list -- ? ) dup [ car car = ] [ 2drop f ] ifte ;
 
 GENERIC: call-simplifier ( node rest -- rest ? )
-
 M: cons call-simplifier ( node rest -- ? )
     swap , f ;
 
 PREDICATE: cons return-follows #return swap follows? ;
 M: return-follows call-simplifier ( node rest -- rest ? )
-    cdr swap cdr #jump swons , t ;
+    >r
+    unswons [
+        [ #call | #jump ]
+        [ #call-label | #jump-label ]
+    ] assoc swons , r> t ;
 
 #call [ call-simplifier ] "simplifier" set-word-property
+#call-label [ call-simplifier ] "simplifier" set-word-property

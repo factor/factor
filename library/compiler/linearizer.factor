@@ -46,6 +46,7 @@ SYMBOL: #push-immediate
 SYMBOL: #push-indirect
 SYMBOL: #jump-t ( branch if top of stack is true )
 SYMBOL: #jump ( tail-call )
+SYMBOL: #jump-label ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
 
 ! #dispatch is linearized as #dispatch followed by a #target
@@ -84,15 +85,6 @@ SYMBOL: #target ( part of jump table )
     [ node-param get ] bind
     dup immediate? #push-immediate #push-indirect ?
     swons ,
-] "linearizer" set-word-property
-
-#call [
-    dup [ node-param get ] bind postpone-word
-    linear,
-] "linearizer" set-word-property
-
-#call-label [
-    [ node-param get ] bind #call swons ,
 ] "linearizer" set-word-property
 
 : <label> ( -- label )

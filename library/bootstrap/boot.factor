@@ -78,6 +78,7 @@ vocabularies get [
 "/library/generic/predicate.factor" run-resource
 "/library/generic/traits.factor" run-resource
 
+! init.factor leaves a boot quotation on the stack
 "/library/bootstrap/init.factor" run-resource
 
 ! A bootstrapping trick. See doc/bootstrap.txt.

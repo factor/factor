@@ -38,6 +38,10 @@ IN: lists
 DEFER: cons=
 DEFER: cons-hashcode
 
+IN: math
+DEFER: >rect
+DEFER: bitxor
+
 IN: kernel
 USE: lists
 USE: math

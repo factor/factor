@@ -76,12 +76,15 @@ USE: words
         drop
     ] ifte ;
 
+: try-compile ( word -- )
+    [ compile ] [ [ cannot-compile ] when ] catch ;
+
 : compile-all ( -- )
     #! Compile all words.
     [
-        dup "infer-effect" word-property [
-            [ compile ] [ [ cannot-compile ] when ] catch
-        ] [
-            drop
-        ] ifte
+       ! dup "infer-effect" word-property [
+            try-compile
+       ! ] [
+       !     drop
+       ! ] ifte
     ] each-word ;

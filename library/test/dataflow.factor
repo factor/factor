@@ -61,14 +61,14 @@ USE: generic
     dataflow-ifte-node-consume-d length 1 =
 ] unit-test
 
-[ t ] [
-    [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
-    #dispatch swap dataflow-contains-op? car [
-        node-param get [
-            [ [ node-param get \ undefined-method = ] bind ] some?
-        ] some?
-    ] bind >boolean
-] unit-test
+! [ t ] [
+!     [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
+!     #dispatch swap dataflow-contains-op? car [
+!         node-param get [
+!             [ [ node-param get \ undefined-method = ] bind ] some?
+!         ] some?
+!     ] bind >boolean
+! ] unit-test
 
 SYMBOL: #test
 

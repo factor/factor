@@ -22,7 +22,7 @@ USE: vectors
     #! Call p mod q'th entry of the vector of quotations, where
     #! q is the length of the vector. The value q remains on the
     #! stack.
-    [ dupd length mod ] keep vector-nth call ;
+    [ dupd vector-length mod ] keep vector-nth call ;
 
 : hsv>rgb ( h s v -- r g b )
     pick 6 * >fixnum {

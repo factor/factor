@@ -57,10 +57,20 @@ USE: words
 ] "generator" set-word-property
 
 #call [
+    dup postpone-word
     CALL compiled-offset defer-xt
 ] "generator" set-word-property
 
 #jump [
+    dup postpone-word
+    JUMP compiled-offset defer-xt
+] "generator" set-word-property
+
+#call-label [
+    CALL compiled-offset defer-xt
+] "generator" set-word-property
+
+#jump-label [
     JUMP compiled-offset defer-xt
 ] "generator" set-word-property
 
@@ -96,16 +106,19 @@ USE: words
     compiled-offset 0 compile-cell 0 defer-xt
 ] "generator" set-word-property
 
-! TODO: to complete alien compilation, must provide generators
-! for #c-call, #box, #unbox and #cleanup.
-! 
-! : UNBOX ( name -- )
-!     #! Move top of datastack to C stack.
-!     SELF-CALL  EAX PUSH-R ;
-! 
-! : BOX ( name -- )
-!     #! Move EAX to datastack.
-!     EAX PUSH-R  SELF-CALL  4 ESP R+I ;
-! 
-! : CLEANUP ( amount -- )
-!     dup 0 = [ drop ] [ ESP R+I ] ifte ;
+#c-call [ CALL JUMP-FIXUP ] "generator" set-word-property
+
+#unbox [
+    CALL JUMP-FIXUP
+    EAX PUSH-R
+] "generator" set-word-property
+
+#box [
+    EAX PUSH-R
+    CALL JUMP-FIXUP
+    4 ESP R+I
+] "generator" set-word-property
+
+#cleanup [
+    dup 0 = [ drop ] [ ESP R+I ] ifte
+] "generator" set-word-property

@@ -85,7 +85,7 @@ SYMBOL: alien-parameters
 : linearize-parameters ( params -- count )
     #! Generate code for boxing a list of C types.
     #! Return amount stack must be unwound by.
-    [ alien-parameters get ] bind 0 swap [
+    [ alien-parameters get reverse ] bind 0 swap [
         c-type [
             "width" get cell align +
             "unboxer" get

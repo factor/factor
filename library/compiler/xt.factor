@@ -109,11 +109,7 @@ SYMBOL: compile-words
     deferred-xts off ;
 
 : with-compiler ( quot -- )
-    [
-        call
-        fixup-deferred-xts
-        commit-xts
-    ] with-scope ;
+    [ call  fixup-deferred-xts  commit-xts ] with-scope ;
 
 : postpone-word ( word -- )
     dup compiling? [ drop ] [ compile-words unique@ ] ifte ;
