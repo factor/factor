@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {

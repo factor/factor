@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 void init_sockaddr(struct sockaddr_in* name,
 	const char* hostname, uint16_t port)

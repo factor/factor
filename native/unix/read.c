@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 /* Return true if something was read */
 bool read_step(F_PORT* port)

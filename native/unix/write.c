@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 /* Return true if write was done */
 void write_step(F_PORT* port)
