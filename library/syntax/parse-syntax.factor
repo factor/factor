@@ -112,6 +112,12 @@ USE: unparser
     #! Add vocabulary to search path.
     scan "use" cons@ ; parsing
 
+: USING:
+    #! A list of vocabularies terminated with ;
+    string-mode on
+    [ string-mode off [ "use" cons@ ] each ]
+    f ; parsing
+
 : IN:
     #! Set vocabulary for new definitions.
     scan dup "use" cons@ "in" set ; parsing

@@ -68,7 +68,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord f = define("syntax","f");
 		f.parsing = new F(f);
 		FactorWord complex = define("syntax","#{");
-		complex.parsing = new ComplexLiteral(complex,"}");
+		complex.parsing = new ComplexLiteral(complex,"}#");
 
 		/* lists */
 		FactorWord bra = define("syntax","[");
@@ -114,6 +114,8 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		in.parsing = new In(in);
 		FactorWord use = define("syntax","USE:");
 		use.parsing = new Use(use);
+		FactorWord using = define("syntax","USING:");
+		using.parsing = new Using(using);
 
 		FactorWord pushWord = define("syntax","\\");
 		pushWord.parsing = new PushWord(pushWord);

@@ -60,7 +60,7 @@
 - jedit ==> jedit-word, jedit takes a file name
 - browser responder for word links in HTTPd
 - worddef props
-- prettyprint: when unparse called due to recursion, write a link
+- prettyprint: detect circular structure
 - vectors: ensure its ok with bignum indices
 
 + httpd:

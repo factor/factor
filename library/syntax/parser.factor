@@ -89,9 +89,16 @@ USE: unparser
     "col" get "line" get dup >r (scan) dup "col" set
     2dup = [ r> 3drop f ] [ r> substring ] ifte ;
 
+! If this variable is on, the parser does not internalize words;
+! it just appends strings to the parse tree as they are read.
+SYMBOL: string-mode
+global [ string-mode off ] bind
+
 : scan-word ( -- obj )
     scan dup [
-        dup "use" get search [ str>number ] ?unless
+        dup ";" = not string-mode get and [
+            dup "use" get search [ str>number ] ?unless
+        ] unless
     ] when ;
 
 : parse-loop ( -- )
