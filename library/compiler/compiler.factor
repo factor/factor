@@ -39,9 +39,8 @@ USE: logic
 USE: kernel
 USE: vectors
 
-: compile-word ( word -- )
-    #! Compile a JMP at the end (tail call optimization)
-    word-xt "compile-last" get [ JMP ] [ CALL ] ifte ;
+: pop-literal ( -- obj )
+    "compile-datastack" get vector-pop ;
 
 : compile-literal ( obj -- )
     dup fixnum? [
@@ -55,11 +54,27 @@ USE: vectors
     0 swap set-vector-length ;
 
 : postpone ( obj -- )
+    #! Literals are not compiled immediately, so that words like
+    #! ifte with special compilation behavior can work.
     "compile-datastack" get vector-push ;
+
+: compile-simple-word ( word -- )
+    #! Compile a JMP at the end (tail call optimization)
+    commit-literals word-xt
+    "compile-last" get [ JUMP ] [ CALL ] ifte ;
+
+: compile-word ( word -- )
+    #! If a word has a compiling property, then it has special
+    #! compilation behavior.
+    "compiling" over word-property dup [
+        nip call
+    ] [
+        drop compile-simple-word
+    ] ifte ;
 
 : compile-atom ( obj -- )
     [
-        [ word? ] [ commit-literals compile-word ]
+        [ word? ] [ compile-word ]
         [ drop t ] [ postpone ]
     ] cond ;
 

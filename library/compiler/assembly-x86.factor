@@ -30,6 +30,7 @@ USE: kernel
 USE: compiler
 USE: math
 USE: stack
+USE: combinators
 
 : EAX 0 ;
 : ECX 1 ;
@@ -48,15 +49,30 @@ USE: stack
 
 : I>R ( imm reg -- )
     #! MOV <imm> TO <reg>
-    HEX: b8 + compile-byte  compile-cell ;
+    dup EAX = [
+        drop HEX: b8 compile-byte
+    ] [
+        HEX: 8b compile-byte
+        3 shift BIN: 101 bitor compile-byte
+    ] ifte compile-cell ;
 
 : [I]>R ( imm reg -- )
     #! MOV INDIRECT <imm> TO <reg>
-    HEX: a1 + compile-byte  compile-cell ;
+    dup EAX = [
+        drop HEX: a1 compile-byte
+    ] [
+        HEX: 8d compile-byte
+        3 shift BIN: 101 bitor compile-byte
+    ] ifte compile-cell ;
 
 : I>[R] ( imm reg -- )
     #! MOV <imm> TO INDIRECT <reg>
     HEX: c7 compile-byte  compile-byte  compile-cell ;
+
+: R>[I] ( reg imm -- )
+    #! MOV INDIRECT <imm> TO <reg>.
+    #! Actually only works with EAX (?)
+    swap HEX: a3 + compile-byte  compile-cell ;
 
 : [R]>R ( reg reg -- )
     #! MOV INDIRECT <reg> TO <reg>.
@@ -91,16 +107,26 @@ USE: stack
     4 DATASTACK I+[I]
     ECX POP ;
 
-: (JMP) ( xt opcode -- )
+: POP-DS ( -- )
+    #! Pop datastack into EAX.
+    ( ECX PUSH )
+    DATASTACK ECX I>R
+    ! LEA...
+    HEX: 8d compile-byte HEX: 41 compile-byte HEX: fc compile-byte
+    EAX DATASTACK R>[I]
+    EAX EAX [R]>R
+    ( ECX POP ) ;
+
+: (JUMP) ( xt opcode -- )
     #! JMP, CALL insn is 5 bytes long
     #! addr is relative to *after* insn
     compile-byte  compiled-offset 4 + - compile-cell ;
 
-: JMP ( -- )
-    HEX: e9 (JMP) ;
+: JUMP ( -- )
+    HEX: e9 (JUMP) ;
 
 : CALL ( -- )
-    HEX: e8 (JMP) ;
+    HEX: e8 (JUMP) ;
 
 : RET ( -- )
     HEX: c3 compile-byte ;
