@@ -6,7 +6,6 @@ math memory namespaces words ;
 
 ! Not used on x86
 #prologue [ drop ] "generator" set-word-prop
-#epilogue [ drop ] "generator" set-word-prop
 
 \ slot [
     PEEK-DS

@@ -117,16 +117,9 @@ C: relative-bitfld ( word mask -- )
     BIN: 1111111111111100 <relative-bitfld>
     deferred-xts cons@ ;
 
-: check-bitfld ( fixup -- )
-    #! Check that the address can fit in a 24-bit wide address
-    #! field, used by PowerPC instructions.
-    dup relative-fixup dup rot relative-bitfld-mask bitand = [
-        "Cannot jump this far" throw
-    ] unless ;
-
 M: relative-bitfld fixup
-    dup check-bitfld
-    dup relative-fixup swap relative-where
+    dup relative-fixup over relative-bitfld-mask bitand
+    swap relative-where
     [ compiled-cell bitor ] keep
     set-compiled-cell ;
 

@@ -56,7 +56,6 @@ CELL cs_bot;
 #include <stdbool.h>
 #include <setjmp.h>
 #include <signal.h>
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

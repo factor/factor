@@ -7,8 +7,9 @@ USING: assembler inference kernel math words ;
 ! the link register in r0, then push r0 on the C stack.
 #prologue [
     drop
+    1 1 -16 STWU
     0 MFLR
-    0 1 -4 STWU
+    0 1 20 STW
 ] "generator" set-word-prop
 
 ! At the end of each word that calls a subroutine, we store
@@ -16,17 +17,15 @@ USING: assembler inference kernel math words ;
 ! stack, set the link register to the contents of r0, and jump
 ! to the link register.
 : compile-epilogue
-    0 1 0 LWZ
-    1 1 4 ADDI
+    0 1 20 LWZ
+    1 1 16 ADDI
     0 MTLR ;
-
-#epilogue [ drop compile-epilogue ] "generator" set-word-prop
 
 ! #return-to [
 !     
 ! ] "generator" set-word-prop
 
-#return [ drop BLR ] "generator" set-word-prop
+#return [ drop compile-epilogue BLR ] "generator" set-word-prop
 
 ! Far calls are made to addresses already known when the
 ! IR node is being generated. No forward reference far

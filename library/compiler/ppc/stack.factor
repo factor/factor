@@ -14,12 +14,24 @@ USING: compiler errors kernel math memory words ;
 : POP-CS PEEK-CS 15 15 4 SUBI ;
 : PUSH-CS 18 15 4 STWU ;
 
+: indirect-literal ( obj -- )
+    intern-literal 19 LOAD
+    18 19 0 LWZ ;
+
 #push-immediate [
      address 18 LOAD PUSH-DS
 ] "generator" set-word-prop
 
+#push-indirect [
+    indirect-literal  PUSH-DS
+] "generator" set-word-prop
+
 #replace-immediate [
      address 18 LOAD REPL-DS
+] "generator" set-word-prop
+
+#replace-indirect [
+    indirect-literal  REPL-DS
 ] "generator" set-word-prop
 
 \ drop [ drop  14 14 4 SUBI ] "generator" set-word-prop

@@ -58,7 +58,7 @@ macosx:
 
 linux:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -mregnames" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
 
 solaris:

@@ -14,22 +14,22 @@ This function is called from compiler.c. */
 
 /* IN: 3 = start, 4 = len */
 
-	.global flush_icache
-flush_icache:
+	.globl MANGLE(flush_icache)
+MANGLE(flush_icache):
 	/* compute number of cache lines to flush */
-	add 4,4,3
-	clrrwi 3,3,5    /* align addr to next lower cache line boundary */
-	sub 4,4,3       /* then n_lines = (len + 0x1f) / 0x20 */
-	addi 4,4,0x1f
-	srwi. 4,4,5     /* note '.' suffix */
-	beqlr           /* if n_lines == 0, just return. */
-	mtctr 4         /* flush cache lines */
-0:	dcbf 0,3        /* for each line... */
+	add r4,r4,r3
+	clrrwi r3,r3,5    /* align addr to next lower cache line boundary */
+	sub r4,r4,r3      /* then n_lines = (len + 0x1f) / 0x20 */
+	addi r4,r4,0x1f
+	srwi. r4,r4,5     /* note '.' suffix */
+	beqlr             /* if n_lines == 0, just return. */
+	mtctr r4          /* flush cache lines */
+0:	dcbf r0,r3        /* for each line... */
 	sync
-	icbi 0,3
-	addi 3,3,0x20
+	icbi r0,r3
+	addi r3,r3,0x20
 	bdnz 0b
-	sync            /* finish up */
+	sync              /* finish up */
 	isync
 	blr
 
