@@ -55,8 +55,8 @@ USE: namespaces
         
         ( -- )
         [
-            "in" get [ close-fd ] when*
             "out" get [ dup flush-fd close-fd ] when*
+            "in" get [ close-fd ] when*
         ] "fclose" set
     ] extend ;
 
