@@ -38,10 +38,13 @@ void primitive_read_line_fd_8(void)
 
 	/* read ascii from fd */
 	STRING* buf;
-	if(h->buffer == F)
+	if(h->buf_mode != B_READ)
+	{
+		h->buf_mode = B_READ;
 		h->buffer = tag_object(string(BUF_SIZE,'\0'));
+	}
 	buf = untag_string(h->buffer);
-	
+
 	for(;;)
 	{
 		if(h->buf_pos >= h->buf_fill)
@@ -82,17 +85,37 @@ void primitive_read_line_fd_8(void)
 	}
 }
 
-void primitive_write_fd_8(void)
+void write_fd_char_8(HANDLE* h, FIXNUM ch)
 {
-	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	int fd = h->object;
-	STRING* str = untag_string(dpop());
+	BYTE c = (BYTE)ch;
+
+	int amount = write(h->object,&c,1);
+
+	if(amount < 0)
+		io_error(__FUNCTION__);
+}
+
+void write_fd_string_8(HANDLE* h, STRING* str)
+{
 	char* c_str = to_c_string(str);
 	
-	int amount = write(fd,c_str,str->capacity);
+	int amount = write(h->object,c_str,str->capacity);
 	
 	if(amount < 0)
 		io_error(__FUNCTION__);
+}
+
+void primitive_write_fd_8(void)
+{
+	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
+
+	CELL text = dpop();
+	if(typep(text,FIXNUM_TYPE))
+		write_fd_char_8(h,untag_fixnum(text));
+	else if(typep(text,STRING_TYPE))
+		write_fd_string_8(h,untag_string(text));
+	else
+		type_error(STRING_TYPE,text);
 
 	env.dt = dpop();
 }
@@ -100,9 +123,15 @@ void primitive_write_fd_8(void)
 void primitive_flush_fd(void)
 {
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	int fd = h->object;
 
-	/* if(fsync(fd) < 0)
+	if(h->buf_mode == B_WRITE)
+	{
+		
+	}
+
+	/* int fd = h->object;
+
+	if(fsync(fd) < 0)
 		io_error(__FUNCTION__); */
 
 	env.dt = dpop();

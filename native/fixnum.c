@@ -46,10 +46,12 @@ void primitive_mod(void)
 
 void primitive_divmod(void)
 {
+	div_t q;
 	BINARY_OP(x,y);
-	dpush(tag_fixnum(x / y));
+	q = div(x,y);
 	/* division takes common factor of 8 out. */
-	env.dt = x % y;
+	dpush(tag_fixnum(q.quot));
+	env.dt = q.rem;
 }
 
 void primitive_and(void)

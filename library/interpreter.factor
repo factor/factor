@@ -40,6 +40,7 @@ USE: strings
 USE: styles
 USE: words
 USE: unparser
+USE: vectors
 
 : exit ( -- )
     t "quit-flag" set ;
@@ -47,43 +48,36 @@ USE: unparser
 : print-banner ( -- )
     "Factor " version cat2 print
     "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Enter ``help'' for help." print
     "Enter ``exit'' to exit." print ;
 
 : history+ ( cmd -- )
-    global [ "history" cons@ ] bind ;
+    "history" get vector-push ;
 
-: history# ( -- number )
-    global [ "history" get length ] bind ;
+: print-numbered-entry ( index vector -- )
+    dupd vector-nth ": " swap cat3 print ;
 
-: print-numbered-list* ( number list -- )
-    #! Print each element of the list with a number.
-    dup [
-        uncons [ over pred ] dip print-numbered-list*
-        swap fixnum>str swap ": " swap cat3 print
-    ] [
-        2drop
-    ] ifte ;
-
-: print-numbered-list ( list -- )
-    dup length pred swap print-numbered-list* ;
+: print-numbered-vector ( list -- )
+    dup vector-length [ over print-numbered-entry ] times* drop ;
 
 : history ( -- )
     "X redo    -- evaluate the expression with number X." print
     "X re-edit -- edit the expression with number X." print
-    "history" get print-numbered-list ;
+    "history" get print-numbered-vector ;
 
 : get-history ( index -- )
-    "history" get reverse nth ;
+    "history" get vector-nth ;
 
 : redo ( index -- )
-    get-history dup print eval ;
+    get-history dup "  ( " write write " )" print eval ;
 
 : re-edit ( index -- )
     get-history edit ;
 
+: history# ( -- number )
+    "history" get vector-length ;
+
 : print-prompt ( -- )
-    <% "    " % history# fixnum>str % "] " % %>
+    <% "  ( " % history# fixnum>str % " ) " % %>
     [ "prompt" ] get-style
     [ write-attr ] bind
     flush ;
@@ -96,26 +90,6 @@ USE: unparser
     ] ifte ;
 
 : interpreter-loop ( -- )
+    64 <vector> "history" set
     [ "quit-flag" get not ] [ interpret ] while
     "quit-flag" off ;
-
-: help
-    "clear              -- clear datastack." print
-    ".s                 -- print datastack." print
-    ".                  -- print top of datastack." print
-    "" print
-    "global describe    -- list all global variables." print
-    "describe           -- describe object at top of stack." print
-    "" print
-    "words.             -- list all words." print
-    "\"word\" see         -- show definition of \"word\"." print
-    "\"str\" apropos      -- list all words whose name contains \"str\"." print
-    "\"word\" usages.     -- list all words that call \"word\"." print
-    "" print
-    "[ expr ] balance . -- show stack effect of expression." print
-    "" print
-    "history            -- list previously entered expressions." print
-    "X redo             -- redo expression number X from history list." print
-    "" print
-    "exit               -- exit the interpreter." print
-    "" print ;

@@ -105,6 +105,7 @@ IN: cross-compiler
         sbuf-append
         sbuf>str
         fixnum?
+        bignum?
         +
         -
         *

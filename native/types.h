@@ -32,6 +32,7 @@ CELL empty;
 #define STRING_TYPE 11
 #define SBUF_TYPE 12
 #define HANDLE_TYPE 13
+#define BIGNUM_TYPE 14
 
 bool typep(CELL type, CELL tagged);
 void type_check(CELL type, CELL tagged);

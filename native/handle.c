@@ -19,6 +19,7 @@ CELL handle(CELL type, CELL object)
 	handle->type = type;
 	handle->object = object;
 	handle->buffer = F;
+	handle->buf_mode = B_NONE;
 	handle->buf_fill = 0;
 	handle->buf_pos = 0;
 	return tag_object(handle);
