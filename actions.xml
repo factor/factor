@@ -15,6 +15,7 @@
 	<ACTION NAME="factor-run-file">
 		<CODE>
 			buffer.save(view,null);
+			VFSManager.waitForRequests();
 			factor.jedit.FactorPlugin.eval(view,
 				"\""
 				+ MiscUtilities.charsToEscapes(buffer.path)

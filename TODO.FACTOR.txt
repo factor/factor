@@ -1,5 +1,3 @@
-+ tests:
-
 [error] AWT-EventQueue-0: java.lang.NullPointerException
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
@@ -16,7 +14,17 @@
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:137)
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.run(EventDispatchThread.java:100)
 
-- A+f f doesn't always work
++ docs:
+
+- vocabulary section: what is the dictionary?
+- document swons, uncons, unswons
+- vector-push/pop examples
+- vector-each/map examples
+- string construction examples
+- string construction ackward
+
++ tests:
+
 - java factor: equal numbers have non-equal hashcodes!
 - java factor memory leak
 - vector=
@@ -40,11 +48,10 @@
 
 + native:
 
-- number upgrading errors
+- to_fixnum and friends: error on float
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
 - errors: don't show .factor-rc
 - handle division by zero
-- fixup-words is crusty
 - decide if overflow is a fatal error
 - f >n: crashes
 - parsing should be parsing
