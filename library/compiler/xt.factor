@@ -2,7 +2,32 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
 USING: assembler errors kernel lists math namespaces strings
-words ;
+vectors words ;
+
+! To support saving compiled code to disk, generator words
+! append relocation instructions to this vector.
+SYMBOL: relocation-table
+
+: rel, ( n -- ) relocation-table get vector-push ;
+
+: relocating compiled-offset cell - rel, ;
+
+: rel-primitive ( word rel/abs -- )
+    #! If flag is true; relative.
+    0 1 ? rel, relocating word-primitive rel, ;
+
+: rel-dlsym ( name dll rel/abs -- )
+    #! If flag is true; relative.
+    2 3 ? rel, relocating cons intern-literal rel, ;
+
+: rel-address ( rel/abs -- )
+    #! Relocate address just compiled. If flag is true,
+    #! relative, and there is nothing to do.
+    [ 4 rel, relocating 0 rel, ] unless ;
+
+: rel-word ( word rel/abs -- )
+    #! If flag is true; relative.
+    over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
 
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
@@ -43,9 +68,11 @@ SYMBOL: deferred-xts
 
 SYMBOL: compile-words
 
-: defer-xt ( word where relative -- )
-    #! After word is compiled, put its XT at where, relative.
-    3list deferred-xts cons@ ;
+: defer-xt ( word where rel/abs -- )
+    #! After word is compiled, put its XT at where. If rel/abs
+    #! is true, this is a relative jump.
+    3dup compiled-offset 0 ? 3list deferred-xts cons@
+    nip rel-word ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be

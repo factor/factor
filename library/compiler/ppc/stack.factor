@@ -36,5 +36,14 @@ USING: compiler errors kernel math memory words ;
 \ dup [ drop  PEEK-DS PUSH-DS ] "generator" set-word-prop
 \ over [ drop  18 14 -4 LWZ  PUSH-DS ] "generator" set-word-prop
 \ pick [ drop  18 14 -8 LWZ  PUSH-DS ] "generator" set-word-prop
+
+\ swap [
+    drop
+    18 14 -4 LWZ
+    19 14 0 LWZ
+    19 14 -4 STW
+    18 14 0 STW
+] "generator" set-word-prop
+
 \ >r [ drop  POP-DS PUSH-CS ] "generator" set-word-prop
 \ r> [ drop  POP-CS PUSH-DS ] "generator" set-word-prop

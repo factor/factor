@@ -47,7 +47,7 @@ USING: inference kernel assembler words lists alien memory ;
     [ ESI ] swap address MOV ;
 
 : indirect-literal ( obj -- )
-    EAX swap intern-literal unit MOV  rel-address ;
+    EAX swap intern-literal unit MOV  f rel-address ;
 
 #push-immediate [
     ESI 4 ADD

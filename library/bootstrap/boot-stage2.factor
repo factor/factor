@@ -59,7 +59,7 @@ cpu "ppc" = [
     "/library/compiler/ppc/generator.factor"
 ] pull-in
 
-"compile" get cpu "x86" = and [
+"compile" get supported-cpu? and [
     init-assembler
     \ car compile
     \ = compile

@@ -4,34 +4,6 @@ IN: compiler
 USING: assembler inference errors kernel lists math namespaces
 strings words vectors ;
 
-! To support saving compiled code to disk, generator words
-! append relocation instructions to this vector.
-SYMBOL: relocation-table
-
-: rel, ( n -- ) relocation-table get vector-push ;
-
-: relocating compiled-offset cell - rel, ;
-
-: rel-primitive ( word rel/abs -- )
-    #! If flag is true; relative.
-    0 1 ? rel, relocating word-primitive rel, ;
-
-: rel-dlsym ( name dll rel/abs -- )
-    #! If flag is true; relative.
-    2 3 ? rel, relocating cons intern-literal rel, ;
-
-: rel-address ( -- )
-    #! Relocate address just compiled.
-    4 rel, relocating 0 rel, ;
-
-: rel-word ( word rel/abs -- )
-    #! If flag is true; relative.
-    over primitive? [
-        rel-primitive
-    ] [
-        nip [ rel-address ] unless
-    ] ifte ;
-
 : generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
     unswons dup "generator" word-prop [
