@@ -27,53 +27,12 @@
 
 IN: files
 USE: combinators
-USE: io-internals
-USE: kernel
 USE: lists
 USE: logic
-USE: math
-USE: namespaces
 USE: stack
-USE: strings
-
-: <file> ( path -- file )
-    #! Create an empty file object. Do not use this directly.
-    <namespace> [
-        "path" set
-        f "exists" set
-        f "directory" set
-        0 "permissions" set
-        0 "size" set
-        0 "mod-time" set
-    ] extend ;
-
-: path>file ( path -- file )
-    dup <file> [
-        stat [
-            "exists" on
-            [
-                "directory"
-                "permissions"
-                "size"
-                "mod-time"
-            ] [
-                set
-            ] 2each
-        ] when*
-    ] extend ;
-
-: ?path>file ( path/file -- file )
-    dup string? [ path>file ] when ;
 
 : exists? ( file -- ? )
-    ?path>file "exists" swap get* ;
+    stat >boolean ;
 
 : directory? ( file -- ? )
-    ?path>file "directory" swap get* ;
-
-: dirent>file ( parent name dir? -- file )
-    -rot "/" swap cat3 <file> [ "directory" set ] extend ;
-
-: directory ( file -- list )
-    #! Push a list of file objects in the directory.
-    dup read-dir [ dupd uncons dirent>file ] map nip ;
+    stat dup [ car ] when ;

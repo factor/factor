@@ -61,10 +61,7 @@ void primitive_read_dir(void)
 		{
 			CELL name = tag_object(from_c_string(
 				file->d_name));
-			CELL dirp = tag_boolean(
-				file->d_type == DT_DIR);
-			CELL entry = tag_cons(cons(name,dirp));
-			result = tag_cons(cons(entry,result));
+			result = tag_cons(cons(name,result));
 		}
 
 		closedir(dir);

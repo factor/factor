@@ -44,30 +44,56 @@ USE: words
 USE: unparser
 USE: vectors
 
+! The 'fake vtable' used here speeds things up a lot.
+! It is quite clumsy, however. A higher-level CLOS-style
+! 'generic words' system will be built later.
+
+: generic ( obj vtable -- )
+    over type-of swap vector-nth call ;
+
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
-    [
-        [ word? ] [ word-hashcode ]
-        [ cons? ] [ 4 cons-hashcode ]
-        [ string? ] [ str-hashcode ]
-        [ number? ] [ >fixnum ]
-        [ drop t ] [ drop 0 ]
-    ] cond ;
+    {
+        [ ]
+        [ word-hashcode ]
+        [ 4 cons-hashcode ]
+        [ drop 0 ]
+        [ >fixnum ]
+        [ >fixnum ]
+        [ drop 0 ]
+        [ drop 0 ]
+        [ drop 0 ]
+        [ drop 0 ]
+        [ str-hashcode ]
+        [ drop 0 ]
+        [ drop 0 ]
+        [ >fixnum ]
+        [ >fixnum ]
+    } generic ;
+
+: equal? ( obj obj -- ? )
+    #! Use = instead.
+    {
+        [ number= ]
+        [ eq? ]
+        [ cons= ]
+        [ eq? ]
+        [ number= ]
+        [ number= ]
+        [ eq? ]
+        [ eq? ]
+        [ eq? ]
+        [ vector= ]
+        [ str= ]
+        [ sbuf= ]
+        [ eq? ]
+        [ number= ]
+        [ number= ]
+    } generic ;
 
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
-    2dup eq? [
-        2drop t
-    ] [
-        [
-            [ number? ] [ number= ]
-            [ cons? ] [ cons= ]
-            [ vector? ] [ vector= ]
-            [ string? ] [ str= ]
-            [ sbuf? ] [ sbuf= ]
-            [ drop t ] [ 2drop f ]
-        ] cond
-    ] ifte ;
+    2dup eq? [ 2drop t ] [ equal? ] ifte ;
 
 : clone ( obj -- obj )
     [

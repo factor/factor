@@ -57,11 +57,13 @@ DEFER: str-hashcode
 DEFER: sbuf=
 DEFER: sbuf-clone
 
+IN: files
+DEFER: stat
+DEFER: directory
+
 IN: io-internals
 DEFER: port?
 DEFER: open-file
-DEFER: stat
-DEFER: read-dir
 DEFER: client-socket
 DEFER: server-socket
 DEFER: close-port
