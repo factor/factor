@@ -111,6 +111,8 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 
 bool perform_read_line_io_task(PORT* port)
 {
+	SBUF* line;
+
 	if(port->buf_pos >= port->buf_fill)
 	{
 		if(!read_step(port))
@@ -120,7 +122,12 @@ bool perform_read_line_io_task(PORT* port)
 	if(port->buf_fill == 0)
 	{
 		/* EOF */
-		port->line = F;
+		if(port->line != F)
+		{
+			line = untag_sbuf(port->line);
+			if(line->top == 0)
+				port->line = F;
+		}
 		port->line_ready = true;
 		return true;
 	}
@@ -128,6 +135,11 @@ bool perform_read_line_io_task(PORT* port)
 	{
 		return read_line_step(port);
 	}
+}
+
+bool perform_read_count_io_task(PORT* port)
+{
+	return false;
 }
 
 bool perform_write_io_task(PORT* port)
@@ -149,6 +161,7 @@ CELL perform_io_task(IO_TASK* task)
 {
 	PORT* port = untag_port(task->port);
 	CELL callback = task->callback;
+
 	switch(task->type)
 	{
 	case IO_TASK_READ_LINE:
@@ -159,6 +172,18 @@ CELL perform_io_task(IO_TASK* task)
 		else
 		{
 			add_io_task(IO_TASK_READ_LINE,port,
+				callback,read_io_tasks,
+				&read_fd_count);
+			return F;
+		}
+	case IO_TASK_READ_COUNT:
+		remove_io_task(IO_TASK_READ_COUNT,port,
+			read_io_tasks,&read_fd_count);
+		if(perform_read_count_io_task(port))
+			return callback;
+		else
+		{
+			add_io_task(IO_TASK_READ_COUNT,port,
 				callback,read_io_tasks,
 				&read_fd_count);
 			return F;
