@@ -136,17 +136,17 @@ CELL divide_fixnum(FIXNUM x, FIXNUM y)
 
 CELL and_fixnum(FIXNUM x, FIXNUM y)
 {
-	return x & y;
+	return tag_fixnum(x & y);
 }
 
 CELL or_fixnum(FIXNUM x, FIXNUM y)
 {
-	return x | y;
+	return tag_fixnum(x | y);
 }
 
 CELL xor_fixnum(FIXNUM x, FIXNUM y)
 {
-	return x ^ y;
+	return tag_fixnum(x ^ y);
 }
 
 CELL shift_fixnum(FIXNUM x, FIXNUM y)

@@ -19,3 +19,4 @@ USE: test
 [ -1 ] [ 123 >bignum dup bitnot bitxor ] unit-test
 [ -1 ] [ 123 dup bitnot >bignum bitxor ] unit-test
 [ -1 ] [ 123 dup bitnot bitxor >bignum ] unit-test
+[ 4 ] [ 4 7 bitand ] unit-test
