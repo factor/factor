@@ -10,18 +10,8 @@ CELL cons(CELL car, CELL cdr)
 
 void primitive_consp(void)
 {
-	switch(TAG(env.dt))
-	{
-	case EMPTY_TYPE:
-		check_non_empty(env.dt);
-		break;
-	case CONS_TYPE:
-		env.dt = T;
-		break;
-	default:
-		env.dt = F;
-		break;
-	}
+	check_non_empty(env.dt);
+	env.dt = tag_boolean(typep(CONS_TYPE,env.dt));
 }
 
 void primitive_cons(void)

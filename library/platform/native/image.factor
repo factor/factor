@@ -288,14 +288,27 @@ IN: cross-compiler
 : byte2 ( num -- byte )  8 shift> HEX: ff bitand ;
 : byte3 ( num -- byte )           HEX: ff bitand ;
 
-: >little-endian ( word -- word )
+: write-little-endian ( word -- )
     dup byte3 >char write
     dup byte2 >char write
     dup byte1 >char write
         byte0 >char write ;
 
+: write-big-endian ( word -- )
+    dup byte0 >char write
+    dup byte1 >char write
+    dup byte2 >char write
+        byte3 >char write ;
+
+: write-word ( word -- )
+    "big-endian" get [
+        write-big-endian
+    ] [
+        write-little-endian
+    ] ifte ;
+
 : write-image ( image file -- )
-    <filebw> [ [ >little-endian ] vector-each ] with-stream ;
+    <filebw> [ [ write-word ] vector-each ] with-stream ;
 
 : with-image ( quot -- image )
     <namespace> [

@@ -49,16 +49,6 @@ USE: vocabularies
 USE: words
 USE: unparser
 
-: init-namespaces ( -- )
-    64 <vector> set-namestack* global >n ;
-
-: init-stdio ( -- )
-    stdin stdout <native-stream> <ansi-stream> "stdio" set ;
-
-: init-error-handler ( -- )
-    #! The kernel calls this quotation when an error is raised.
-    [ throw ] 5 setenv ;
-
 IN: kernel
 
 : boot ( -- )
@@ -70,7 +60,7 @@ IN: kernel
     t "interactive" set
     
     init-stdio
-    init-error-handler
+    init-errors
     init-search-path
     init-scratchpad
     init-styles

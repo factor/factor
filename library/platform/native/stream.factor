@@ -42,3 +42,6 @@ USE: namespaces
         ( -- string )
         [ "in" get read-line-8 ] "freadln" set
     ] extend ;
+
+: init-stdio ( -- )
+    stdin stdout <native-stream> "stdio" set ;

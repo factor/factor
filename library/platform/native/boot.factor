@@ -49,6 +49,7 @@ primitives,
     "/library/combinators.factor"
     "/library/cons.factor"
     "/library/continuations.factor"
+    "/library/errors.factor"
     "/library/format.factor"
     "/library/hashtables.factor"
     "/library/init.factor"

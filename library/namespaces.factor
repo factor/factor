@@ -76,18 +76,18 @@ USE: vectors
     #! Push the current namespace.
     namestack* vector-peek ; inline
 
-: bind ( namespace quot -- )
-    #! Execute a quotation with a new namespace on the namespace
-    #! stack. Compiles if the quotation compiles.
-    swap namespace-of >n call n> drop ; inline
-
 : extend ( object code -- object )
     #! Used in code like this:
     #! : <subclass>
     #!      <superclass> [
     #!          ....
     #!      ] extend ;
-    over [ bind ] dip ; inline
+    swap namespace-of >n call n> ; inline
+
+: bind ( namespace quot -- )
+    #! Execute a quotation with a new namespace on the namespace
+    #! stack. Compiles if the quotation compiles.
+    extend drop ; inline
 
 : lazy ( var [ a ] -- value )
     #! If the value of the variable is f, set the value to the

@@ -38,9 +38,11 @@ public class FactorInterpreter implements FactorObject, Runnable
 {
 	public static final String VERSION = "0.60.6";
 
-	// we need to call two words (boot and break) from the kernel
-	// vocabulary
-	private static final String KERNEL_VOCAB = "kernel";
+	// we need to call the 'boot' word from the init vocabulary.
+	private static final String INIT_VOCAB = "init";
+
+	// we need to call the 'throw' word from the errors vocabulary.
+	private static final String ERRORS_VOCAB = "errors";
 
 	// command line arguments are stored here.
 	public Cons args;
@@ -58,6 +60,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 	public FactorArray callstack = new FactorArray();
 	public FactorArray datastack = new FactorArray();
 	public FactorArray namestack = new FactorArray();
+	public FactorArray catchstack = new FactorArray();
 
 	/**
 	 * Maps vocabulary names to vocabularies.
@@ -118,6 +121,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 		this.callstack = (FactorArray)interp.callstack.clone();
 		this.datastack = (FactorArray)interp.datastack.clone();
 		this.namestack = (FactorArray)interp.namestack.clone();
+		this.catchstack = (FactorArray)interp.catchstack.clone();
 		this.vocabularies = interp.vocabularies;
 		this.use = interp.use;
 		this.in = interp.in;
@@ -439,7 +443,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 			call(parser.parse());
 		}
 		else
-			eval(searchVocabulary(KERNEL_VOCAB,"boot"));
+			eval(searchVocabulary(INIT_VOCAB,"boot"));
 
 		//XXX messy
 
@@ -509,15 +513,13 @@ public class FactorInterpreter implements FactorObject, Runnable
 			datastack.push(error);
 			try
 			{
-				eval(searchVocabulary(KERNEL_VOCAB,"break"));
+				eval(searchVocabulary(ERRORS_VOCAB,"throw"));
 				return false;
 			}
 			catch(Throwable e2)
 			{
-				System.err.println("Exception when calling break:");
+				System.err.println("Exception when calling throw:");
 				e.printStackTrace();
-				System.err.println("Factor callstack:");
-				System.err.println(callstack);
 
 				topLevel();
 
@@ -578,8 +580,8 @@ public class FactorInterpreter implements FactorObject, Runnable
 			catch(Exception e)
 			{
 				callstack.push(callframe);
-				callframe = createCompiledCallframe(
-					(FactorWord)obj);
+				/* callframe = createCompiledCallframe(
+					(FactorWord)obj); */
 				while(compiledExceptions != null)
 				{
 					callstack.push(compiledExceptions.car);
@@ -752,6 +754,9 @@ public class FactorInterpreter implements FactorObject, Runnable
 		datastack.top = 0;
 		namestack.top = 0;
 		namestack.push(global);
+		catchstack.top = 0;
+		catchstack.push(searchVocabulary(ERRORS_VOCAB,
+			"default-error-handler"));
 		callframe = null;
 	} //}}}
 }

@@ -35,12 +35,16 @@ USE: stack
 USE: vectors
 
 DEFER: namespace
+DEFER: >n
 
 : namestack* ( -- ns ) 3 getenv ;
 : set-namestack* ( ns -- ) 3 setenv ;
 
 : global ( -- g ) 4 getenv ;
 : set-global ( g -- ) 4 setenv ;
+
+: init-namespaces ( -- )
+    64 <vector> set-namestack* global >n ;
 
 : namespace-buckets 23 ;
 

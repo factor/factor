@@ -29,6 +29,7 @@ IN: errors
 USE: arithmetic
 USE: combinators
 USE: continuations
+USE: inspector
 USE: kernel
 USE: lists
 USE: namespaces
@@ -38,43 +39,57 @@ USE: strings
 USE: unparser
 USE: vectors
 
-! This is a very lightweight exception handling system.
-
-: catchstack* ( -- cs ) 6 getenv ;
 : catchstack ( -- cs ) catchstack* clone ;
-: set-catchstack* ( cs -- ) 6 setenv ;
 : set-catchstack ( cs -- ) clone set-catchstack* ;
 
-: kernel-error? ( obj -- ? )
-    dup cons? [ car fixnum? ] [ drop f ] ifte ;
+: >c ( catch -- )
+    #! Push a catch block on the catchstack. Use the catch word
+    #! instead of invoking this word directly.
+    catchstack* vector-push ;
 
-: ?nth ( n list -- obj )
-    dup >r length min 0 max r> nth ;
+: c> ( catch -- )
+    #! Pop a catch block from the catchstack. Use the catch word
+    #! instead of invoking this word directly.
+    catchstack* vector-pop ;
 
-: error# ( n -- str )
-    [
-        "Handle expired"
-        "Undefined word"
-        "Type check"
-        "Array range check"
-        "Underflow"
-    ] ?nth ;
+: default-error-handler ( error -- )
+    #! Print the error and return to the top level.
+    "Uncaught exception." print
+    "-------------------" print
+    terpri
+    "Datastack:" print
+    .s
+    terpri
+    "Callstack:" print
+    .r
+    terpri
+    "Namestack:" print
+    .n
+    terpri
+    "ERROR: " write error>str print
+    suspend ;
 
-: kernel-error>str ( error -- )
-    <% car error# % ": " % unparse % %> ;
+: save-error ( -- )
+    #! Save the stacks for most-mortem inspection after an
+    #! error.
+    datastack "error-datastack" set
+    callstack dup vector-pop drop "error-callstack" set
+    namestack "error-namestack" set
+    catchstack "error-catchstack" set ;
 
-: error>str ( error -- str )
-    dup kernel-error? [
-        kernel-error>str
-    ] [
-        unparse
-    ] ifte ;
+: catch ( try catch -- )
+    #! Call the try quotation, restore the datastack to its
+    #! state before the try quotation, push the error (or f if
+    #! no error occurred) and call the catch quotation.
+    [ >c drop call f c> call ] callcc1 ( c> drop )
+    ( try catch error ) rot drop swap ( error catch ) call ;
 
-DEFER: >c
-DEFER: throw
-DEFER: default-error-handler
+: rethrow ( error -- )
+    #! Use rethrow when passing an error on from a catch block.
+    #! For convinience, this word is a no-op if error is f.
+    [ c> call ] when* ;
 
-: init-errors ( -- )
-    64 <vector> set-catchstack*
-    [ default-error-handler ] >c
-    [ throw ] 5 setenv ( kernel calls on error ) ;
+: throw ( error -- )
+    #! Throw an error. If no catch handlers are installed, the
+    #! default-error-handler is called.
+    save-error rethrow ;

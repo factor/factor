@@ -26,6 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
+USE: strings
 
-: throw ( obj -- )
-    [ "java.lang.Object" ] "factor.FactorLib" "error" jinvoke-static ;
+: catchstack* ( -- cs )
+    "factor.FactorInterpreter" "catchstack" jvar-get ;
+
+: set-catchstack* ( cs -- )
+    "factor.FactorInterpreter" "catchstack" jvar-set ;
+
+: error>str ( error -- str ) >str ;

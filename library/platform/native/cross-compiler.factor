@@ -169,4 +169,6 @@ IN: cross-compiler
         "/library/platform/native/boot.factor" run-resource
     ] with-image
 
+    ! Uncomment this on sparc and powerpc.
+    ! "big-endian" on
     "native/factor.image" write-image ;
