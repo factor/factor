@@ -86,7 +86,8 @@ C: editor ( text -- )
     1 swap shape-h ;
 
 M: editor user-input* ( ch field -- ? )
-    [ insert-char ] with-editor t ;
+    [ [ insert-char ] with-editor ] keep
+    [ scroll>bottom ] swap handle-gesture drop  t ;
 
 M: editor layout* ( field -- )
     dup [ editor-text shape-size ] keep resize-gadget

@@ -5,7 +5,7 @@ USING: errors kernel lists math namespaces prettyprint stdio
 strings vectors words ;
 
 ! A Factor interpreter written in Factor. Used by compiler for
-! partial evaluation, also for trace and step.
+! partial evaluation, also by the walker.
 
 ! Meta-stacks
 SYMBOL: meta-r
@@ -36,15 +36,11 @@ SYMBOL: meta-cf
     meta-n [ ] change
     meta-c [ ] change ;
 
-: done-cf? ( -- ? )
-    meta-cf get not ;
-
-: done? ( -- ? )
-    done-cf? meta-r get vector-length 0 = and ;
+: done-cf? ( -- ? ) meta-cf get not ;
+: done? ( -- ? ) done-cf? meta-r get vector-length 0 = and ;
 
 ! Callframe.
-: up ( -- )
-    pop-r meta-cf set ;
+: up ( -- ) pop-r meta-cf set ;
 
 : next ( -- obj )
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
@@ -68,23 +64,14 @@ SYMBOL: meta-cf
         dup compound? [ word-def meta-call ] [ host-word ] ifte
     ] ?ifte ;
 
-: do ( obj -- )
-    dup word? [ meta-word ] [ push-d ] ifte ;
+: do ( obj -- ) dup word? [ meta-word ] [ push-d ] ifte ;
 
 : meta-word-1 ( word -- )
     dup "meta-word" word-prop [ call ] [ host-word ] ?ifte ;
 
-: do-1 ( obj -- )
-    dup word? [ meta-word-1 ] [ push-d ] ifte ;
+: do-1 ( obj -- ) dup word? [ meta-word-1 ] [ push-d ] ifte ;
 
-: interpret ( quot -- )
-    #! The quotation is called with each word as its executed.
-    done? [ drop ] [ [ next swap call ] keep interpret ] ifte ;
-
-: run ( -- ) [ do ] interpret ;
-
-: set-meta-word ( word quot -- )
-    "meta-word" set-word-prop ;
+: set-meta-word ( word quot -- ) "meta-word" set-word-prop ;
 
 \ datastack [ meta-d get clone push-d ] set-meta-word
 \ set-datastack [ pop-d clone meta-d set ] set-meta-word
@@ -99,3 +86,5 @@ SYMBOL: meta-cf
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
+
+FORGET: set-meta-word

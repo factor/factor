@@ -1,3 +1,5 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel lists math namespaces threads ;
 
@@ -19,20 +21,13 @@ TUPLE: viewport x y ;
     [ set-viewport-y ] keep
     relayout ;
 
-: scroll>bottom ( viewport -- )
-    1 swap scroll-viewport ;
-
-: viewport-actions ( viewport -- )
-    [
-        [[ [ scroll>bottom ] [ scroll>bottom ] ]]
-    ] swap add-actions ;
+: scroll>bottom ( viewport -- ) 1 swap scroll-viewport ;
 
 C: viewport ( content -- viewport )
     [ <empty-gadget> swap set-delegate ] keep
     [ add-gadget ] keep
     0 over set-viewport-x
-    0 over set-viewport-y
-    dup viewport-actions ;
+    0 over set-viewport-y ;
 
 M: viewport pref-size gadget-child pref-size ;
 
@@ -42,9 +37,6 @@ M: viewport layout* ( viewport -- )
             >r dup viewport-x swap viewport-y r> move-gadget
         ] keep prefer
     ] each-with ;
-
-: scroll>bottom ( viewport -- )
-    dup viewport-h swap scroll-viewport ;
 
 ! A slider scrolls a viewport.
 
@@ -119,8 +111,17 @@ TUPLE: scroller viewport slider ;
 : add-viewport 2dup set-scroller-viewport add-gadget ;
 : add-slider 2dup set-scroller-slider add-gadget ;
 
+: viewport>bottom 1 swap scroll-viewport ;
+: scroll>bottom ( scroller -- )
+    dup scroller-slider relayout
+    scroller-viewport viewport>bottom ;
+
+: scroller-actions ( scroller -- )
+    [ scroll>bottom ] [ scroll>bottom ] set-action ;
+
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
     [ <line-shelf> swap set-delegate ] keep
     [ >r <viewport> r> add-viewport ] keep
-    [ dup scroller-viewport <slider> swap add-slider ] keep ;
+    [ dup scroller-viewport <slider> swap add-slider ] keep
+    dup scroller-actions ;

@@ -9,6 +9,12 @@ USE: math-internals
 USE: lists
 USE: kernel
 
+: interpret ( quot -- )
+    #! The quotation is called with each word as its executed.
+    done? [ drop ] [ [ next swap call ] keep interpret ] ifte ;
+
+: run ( -- ) [ do ] interpret ;
+
 : test-interpreter
     init-interpreter meta-cf set run meta-d get ;
 
