@@ -34,10 +34,10 @@ USE: io-internals
 USE: kernel
 USE: lists
 USE: math
+USE: math-internals
 USE: parser
 USE: profiler
 USE: random
-USE: real-math
 USE: stack
 USE: strings
 USE: unparser

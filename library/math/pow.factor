@@ -28,7 +28,7 @@
 IN: math
 USE: combinators
 USE: math
-USE: real-math
+USE: math-internals
 USE: kernel
 USE: logic
 USE: stack

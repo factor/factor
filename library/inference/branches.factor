@@ -28,6 +28,7 @@
 IN: inference
 USE: combinators
 USE: errors
+USE: generic
 USE: interpreter
 USE: kernel
 USE: lists
@@ -98,10 +99,10 @@ USE: hashtables
     ] extend ;
 
 : terminator? ( quot -- ? )
-    #! This is a hack. no-method has a stack effect that
+    #! This is a hack. undefined-method has a stack effect that
     #! probably does not match any other branch of the generic,
     #! so we handle it specially.
-    \ no-method swap tree-contains? ;
+    \ undefined-method swap tree-contains? ;
 
 : recursive-branch ( rstate quot -- )
     #! Set base case if inference didn't fail.
@@ -154,8 +155,7 @@ USE: hashtables
 
 : vtable>list ( [ vtable | rstate ] -- list )
     #! generic and 2generic use vectors of words, we need lists
-    #! of quotations. Filter out no-method. Dirty workaround;
-    #! later properly handle throw.
+    #! of quotations.
     unswons vector>list [ unit over cons ] map nip ;
 
 : infer-generic ( -- )

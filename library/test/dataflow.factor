@@ -63,10 +63,10 @@ USE: words
 ] unit-test
 
 [ t ] [
-    [ { drop no-method drop no-method } generic ] dataflow
+    [ { drop undefined-method drop undefined-method } generic ] dataflow
     #generic swap dataflow-contains-op? car [
         node-param get [
-            [ [ node-param get \ no-method = ] bind ] some?
+            [ [ node-param get \ undefined-method = ] bind ] some?
         ] some?
     ] bind >boolean
 ] unit-test

@@ -62,7 +62,7 @@ SYMBOL: delegate
 : init-traits-map ( word -- )
     <namespace> "traits-map" set-word-property ;
 
-: no-method
+: undefined-method
     "No applicable method." throw ;
 
 : method ( selector traits -- traits quot )
@@ -75,7 +75,7 @@ SYMBOL: delegate
         drop delegate swap hash* dup [
             cdr method ( check delegate )
         ] [
-            drop [ no-method ] ( no delegate )
+            drop [ undefined-method ] ( no delegate )
         ] ifte
     ] ifte ;
 

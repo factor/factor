@@ -1,8 +1,8 @@
 IN: scratchpad
 USE: kernel
 USE: math
+USE: math-internals
 USE: test
-USE: real-math
 
 ! Lets get the argument order correct, eh?
 [ 0.0 ] [ 0 1 fatan2 ] unit-test

@@ -30,9 +30,9 @@ USE: errors
 USE: kernel
 USE: lists
 USE: math
+USE: math-internals
 USE: namespaces
 USE: parser
-USE: real-math
 USE: stack
 USE: stdio
 USE: streams
@@ -111,9 +111,11 @@ DEFER: pending-io-error
 DEFER: next-io-task
 
 IN: math
-DEFER: arithmetic-type
 DEFER: >fraction
 DEFER: fraction>
+
+IN: math-internals
+DEFER: arithmetic-type
 DEFER: fixnum=
 DEFER: fixnum+
 DEFER: fixnum-
@@ -157,6 +159,18 @@ DEFER: float<
 DEFER: float<=
 DEFER: float>
 DEFER: float>=
+DEFER: facos
+DEFER: fasin
+DEFER: fatan
+DEFER: fatan2
+DEFER: fcos
+DEFER: fexp
+DEFER: fcosh
+DEFER: flog
+DEFER: fpow
+DEFER: fsin
+DEFER: fsinh
+DEFER: fsqrt
 
 IN: parser
 DEFER: str>float

@@ -30,7 +30,7 @@ USE: combinators
 USE: kernel
 USE: logic
 USE: math
-USE: real-math
+USE: math-internals
 USE: stack
 
 : fac ( n -- n! )

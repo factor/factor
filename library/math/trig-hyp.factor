@@ -29,7 +29,7 @@ IN: math
 USE: combinators
 USE: kernel
 USE: math
-USE: real-math
+USE: math-internals
 USE: stack
 
 ! Trigonometric functions:
