@@ -2,20 +2,21 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
 USING: io-internals kernel kernel-internals lists namespaces ;
-
+ 
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
 
 : run-queue ( -- queue ) 9 getenv ;
 : set-run-queue ( queue -- ) 9 setenv ;
 
+: init-threads ( -- )
+    <dlist> set-run-queue ;
+
 : next-thread ( -- quot )
-    #! Get and remove the next quotation from the run queue.
-    run-queue dup [ uncons set-run-queue ] when ;
+    run-queue dlist-pop-front ;
 
 : schedule-thread ( quot -- )
-    #! Add a quotation to the run queue.
-    run-queue cons set-run-queue ;
+    run-queue dlist-push-end ;
 
 : (yield) ( -- )
     #! If there is a quotation in the run queue, call it,
@@ -37,3 +38,4 @@ USING: io-internals kernel kernel-internals lists namespaces ;
     #! eventually be restored by a future call to (yield) or
     #! yield.
     [ schedule-thread (yield) ] callcc0 ;
+

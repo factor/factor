@@ -26,16 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-io-internals
-USE: alien
-USE: errors
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: vectors
-USE: win32-api
+USING: alien errors kernel kernel-internals lists math namespaces threads 
+       vectors win32-api ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
@@ -45,19 +37,10 @@ SYMBOL: callbacks
 : handle-io-error ( -- )
     #! If a write or read call fails unexpectedly, throw an error.
     GetLastError [ 
-        ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS 
+        ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
     ] contains? [ 
         win32-throw-error 
     ] unless ;
-
-: win32-init-stdio ( -- )
-    INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
-    completion-port set 
-    
-    <namespace> [
-        32 <vector> callbacks set
-        f free-list set
-    ] extend io-queue set ;
 
 : add-completion ( handle -- )
     completion-port get NULL 1 CreateIoCompletionPort drop ;
@@ -125,10 +108,43 @@ END-STRUCT
         callbacks get vector-nth cdr
     ] bind ;
 
-: win32-next-io-task ( -- quot )
-    completion-port get <indirect-pointer> dup >r <indirect-pointer> 
-    <indirect-pointer> dup >r INFINITE GetQueuedCompletionStatus
-    [ handle-io-error ] unless
-    r> r> indirect-pointer-value swap indirect-pointer-value <alien> 
-    overlapped-ext-user-data get-io-callback call ;
+: (wait-for-io) ( timeout -- ? overlapped len )
+    >r completion-port get 
+    <indirect-pointer> [ 0 swap set-indirect-pointer-value ] keep 
+    <indirect-pointer> 
+    <indirect-pointer>
+    pick over r> -rot >r >r GetQueuedCompletionStatus r> r> ;
+
+: overlapped>callback ( overlapped -- callback )
+    indirect-pointer-value dup 0 = [
+        drop f
+    ] [
+        <alien> overlapped-ext-user-data get-io-callback
+    ] ifte ;
+
+: wait-for-io ( timeout -- callback len )
+    (wait-for-io) rot [ handle-io-error ] unless
+    overlapped>callback swap indirect-pointer-value ;
+
+: win32-next-io-task ( -- )
+    INFINITE wait-for-io swap call ;
+
+: win32-io-thread ( -- )
+    10 wait-for-io swap [
+        [ schedule-thread call ] callcc0
+    ] [
+        drop yield
+    ] ifte* 
+    win32-io-thread ;
+
+: win32-init-stdio ( -- )
+    INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
+    completion-port set 
+    
+    <namespace> [
+        32 <vector> callbacks set
+        f free-list set
+    ] extend io-queue set 
+    
+    [ win32-io-thread ] in-thread ;
 

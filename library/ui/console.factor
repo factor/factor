@@ -363,7 +363,7 @@ M: alien handle-event ( event -- ? )
 
 : console-loop ( -- )
     redraw-console get [ draw-console redraw-console off ] when
-    check-event [ console-loop ] when ;
+    yield check-event [ console-loop ] when ;
 
 : console-quit ( -- )
     input-continuation get [ f swap call ] when*
