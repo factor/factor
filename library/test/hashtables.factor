@@ -22,13 +22,13 @@ unit-test
 unit-test
 
 [ f ]
-[ [ 1 2 | 3 ] hashtable? ]
+[ [[ 1 [[ 2 3 ]] ]] hashtable? ]
 unit-test
 
 ! Test some hashcodes.
 
 [ t ] [ [ 1 2 3 ] hashcode [ 1 2 3 ] hashcode = ] unit-test
-[ t ] [ [ f | t ] hashcode [ f | t ] hashcode = ] unit-test
+[ t ] [ [[ f t ]] hashcode [[ f t ]] hashcode = ] unit-test
 [ t ] [ [ 1 [ 2 3 ] 4 ] hashcode [ 1 [ 2 3 ] 4 ] hashcode = ] unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
@@ -48,10 +48,10 @@ f 100 fac "testhash" get set-hash
 [ { } ] [ { [ { } ] } vector-clone "testhash" get hash* cdr ] unit-test
 
 [
-    [ "salmon" | "fish" ]
-    [ "crocodile" | "reptile" ]
-    [ "cow" | "mammal" ]
-    [ "visual basic" | "language" ]
+    [[ "salmon" "fish" ]]
+    [[ "crocodile" "reptile" ]]
+    [[ "cow" "mammal" ]]
+    [[ "visual basic" "language" ]]
 ] alist>hash "testhash" set
 
 [ f ] [

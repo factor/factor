@@ -75,8 +75,12 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		bra.parsing = new Bra(bra);
 		FactorWord ket = define("syntax","]");
 		ket.parsing = new Ket(bra,ket);
-		FactorWord bar = define("syntax","|");
-		bar.parsing = new Bar(bar);
+
+		/* conses */
+		FactorWord beginCons = define("syntax","[[");
+		beginCons.parsing = new BeginCons(beginCons);
+		FactorWord endCons = define("syntax","]]");
+		endCons.parsing = new EndCons(beginCons,endCons);
 
 		/* vectors */
 		FactorWord beginVector = define("syntax","{");

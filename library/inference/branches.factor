@@ -76,12 +76,12 @@ USE: prettyprint
     unify-lengths vector-transpose [ unify-results ] vector-map ;
 
 : balanced? ( list -- ? )
-    #! Check if a list of [ instack | outstack ] pairs is
+    #! Check if a list of [[ instack outstack ]] pairs is
     #! balanced.
     [ uncons vector-length swap vector-length - ] map all=? ;
 
 : unify-effect ( list -- in out )
-    #! Unify a list of [ instack | outstack ] pairs.
+    #! Unify a list of [[ instack outstack ]] pairs.
     dup balanced? [
         unzip unify-stacks >r unify-stacks r>
     ] [
@@ -136,7 +136,7 @@ SYMBOL: cloned
         meta-d off meta-r off d-in off
     ] when ;
 
-: propagate-type ( [ value | class ] -- )
+: propagate-type ( [[ value class ]] -- )
     #! Type propagation is chained.
     [
         unswons 2dup set-value-class
@@ -155,9 +155,9 @@ SYMBOL: cloned
 
 : (infer-branches) ( branchlist -- list )
     #! The branchlist is a list of pairs:
-    #! [ value | typeprop ]
+    #! [[ value typeprop ]]
     #! value is either a literal or computed instance; typeprop
-    #! is a pair [ value | class ] indicating a type propagation
+    #! is a pair [[ value class ]] indicating a type propagation
     #! for the given branch.
     [
         [

@@ -46,61 +46,61 @@ USE: words
 <namespace> "vocabularies" set-style
 
 [
-    [ "ansi-fg" | "1" ]
-    [ "fg" | [ 204 0 0 ] ]
+    [[ "ansi-fg" "1" ]]
+    [[ "fg" [ 204 0 0 ] ]]
 ] "arithmetic" set-vocab-style
 [
-    [ "ansi-fg" | "1" ]
-    [ "fg" | [ 255 0 0 ] ]
+    [[ "ansi-fg" "1" ]]
+    [[ "fg" [ 255 0 0 ] ]]
 ] "errors" set-vocab-style
 [
-    [ "ansi-fg" | "4" ]
-    [ "fg" | [ 153 102 255 ] ]
+    [[ "ansi-fg" "4" ]]
+    [[ "fg" [ 153 102 255 ] ]]
 ] "hashtables" set-vocab-style
 [
-    [ "ansi-fg" | "2" ]
-    [ "fg" | [ 0 102 153 ] ]
+    [[ "ansi-fg" "2" ]]
+    [[ "fg" [ 0 102 153 ] ]]
 ] "lists" set-vocab-style
 [
-    [ "ansi-fg" | "1" ]
-    [ "fg" | [ 204 0 0 ] ]
+    [[ "ansi-fg" "1" ]]
+    [[ "fg" [ 204 0 0 ] ]]
 ] "math" set-vocab-style
 [
-    [ "ansi-fg" | "6" ]
-    [ "fg" | [ 0 153 255 ] ]
+    [[ "ansi-fg" "6" ]]
+    [[ "fg" [ 0 153 255 ] ]]
 ] "namespaces" set-vocab-style
 [
-    [ "ansi-fg" | "2" ]
-    [ "fg" | [ 102 204 255 ] ]
+    [[ "ansi-fg" "2" ]]
+    [[ "fg" [ 102 204 255 ] ]]
 ] "parser" set-vocab-style
 [
-    [ "ansi-fg" | "2" ]
-    [ "fg" | [ 102 204 255 ] ]
+    [[ "ansi-fg" "2" ]]
+    [[ "fg" [ 102 204 255 ] ]]
 ] "prettyprint" set-vocab-style
 [
-    [ "ansi-fg" | "2" ]
-    [ "fg" | [ 0 0 0 ] ]
+    [[ "ansi-fg" "2" ]]
+    [[ "fg" [ 0 0 0 ] ]]
 ] "stack" set-vocab-style
 [
-    [ "ansi-fg" | "4" ]
-    [ "fg" | [ 204 0 204 ] ]
+    [[ "ansi-fg" "4" ]]
+    [[ "fg" [ 204 0 204 ] ]]
 ] "stdio" set-vocab-style
 [
-    [ "ansi-fg" | "4" ]
-    [ "fg" | [ 102 0 204 ] ]
+    [[ "ansi-fg" "4" ]]
+    [[ "fg" [ 102 0 204 ] ]]
 ] "streams" set-vocab-style
 [
-    [ "ansi-fg" | "6" ]
-    [ "fg" | [ 255 0 204 ] ]
+    [[ "ansi-fg" "6" ]]
+    [[ "fg" [ 255 0 204 ] ]]
 ] "strings" set-vocab-style
 [
-    [ "ansi-fg" | "4" ]
-    [ "fg" | [ 102 204 255 ] ]
+    [[ "ansi-fg" "4" ]]
+    [[ "fg" [ 102 204 255 ] ]]
 ] "unparser" set-vocab-style
 [
-    [ "ansi-fg" | "3" ]
-    [ "fg" | [ 2 185 2 ] ]
+    [[ "ansi-fg" "3" ]]
+    [[ "fg" [ 2 185 2 ] ]]
 ] "vectors" set-vocab-style
 [
-    [ "fg" | [ 128 128 128 ] ]
+    [[ "fg" [ 128 128 128 ] ]]
 ] "syntax" set-vocab-style

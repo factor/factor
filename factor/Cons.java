@@ -50,6 +50,17 @@ public class Cons implements FactorExternalizable
 		return (Cons)cdr;
 	} //}}}
 
+	//{{{ isList() method
+	public static boolean isList(Object list)
+	{
+		if(list == null)
+			return true;
+		else if(list instanceof Cons)
+			return isList(((Cons)list).cdr);
+		else
+			return false;
+	} //}}}
+
 	//{{{ contains() method
 	public static boolean contains(Cons list, Object obj)
 	{
@@ -98,20 +109,8 @@ public class Cons implements FactorExternalizable
 		while(iter != null)
 		{
 			buf.append(FactorReader.unparseObject(iter.car));
-			if(iter.cdr instanceof Cons)
-			{
-				buf.append(' ');
-				iter = (Cons)iter.cdr;
-				continue;
-			}
-			else if(iter.cdr == null)
-				break;
-			else
-			{
-				buf.append(" | ");
-				buf.append(FactorReader.unparseObject(iter.cdr));
-				iter = null;
-			}
+			buf.append(' ');
+			iter = iter.next();
 		}
 
 		return buf.toString();
@@ -123,7 +122,14 @@ public class Cons implements FactorExternalizable
 	 */
 	public String toString()
 	{
-		return "[ " + elementsToString() + " ]";
+		if(isList(this))
+			return "[ " + elementsToString() + " ]";
+		else
+		{
+			return "[[ " + FactorReader.unparseObject(car)
+				+ " " + FactorReader.unparseObject(cdr)
+				+ " ]]";
+		}
 	} //}}}
 
 	//{{{ toArray() method

@@ -4,10 +4,10 @@ USE: namespaces
 USE: test
 
 [ [ 1 ] ] [ 1 f ] [ "x" set "x" cons@ "x" get ] test-word
-[ [ 1 | 2 ] ] [ 1 2 ] [ "x" set "x" cons@ "x" get ] test-word
+[ [[ 1 2 ]] ] [ 1 2 ] [ "x" set "x" cons@ "x" get ] test-word
 [ [ 1 2 ] ] [ 1 [ 2 ] ] [ "x" set "x" cons@ "x" get ] test-word
 
-[ [ [ 2 | 3 ] [ 1 | 2 ] ] ] [
+[ [ [[ 2 3 ]] [[ 1 2 ]] ] ] [
     "x" off 2 1 "x" [ acons ] change 3 2 "x" [ acons ] change "x" get
 ] unit-test
 

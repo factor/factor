@@ -89,11 +89,11 @@ M: object prettyprint* ( indent obj -- indent )
 
 : word-actions ( search -- list )
     [
-        [ "See"     | "see"     ]
-        [ "Push"    | ""        ]
-        [ "Execute" | "execute" ]
-        [ "jEdit"   | "jedit"   ]
-        [ "Usages"  | "usages." ]
+        [[ "See"     "see"     ]]
+        [[ "Push"    ""        ]]
+        [[ "Execute" "execute" ]]
+        [[ "jEdit"   "jedit"   ]]
+        [[ "Usages"  "usages." ]]
     ] ;
 
 : word-attrs ( word -- attrs )
@@ -118,20 +118,15 @@ M: word prettyprint* ( indent word -- indent )
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
-    [
-        uncons >r prettyprint-element r>
-        dup cons? [
-            prettyprint-list
-        ] [
-            [
-                \ | prettyprint*
-                " " write prettyprint-element
-            ] when*
-        ] ifte
-    ] when* ;
+    [ prettyprint-element ] each ;
 
-M: cons prettyprint* ( indent list -- indent )
+M: list prettyprint* ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
+
+M: cons prettyprint* ( indent cons -- indent )
+    \ [[ prettyprint* " " write
+            uncons >r prettyprint-element r> prettyprint-element
+    \ ]] prettyprint* ;
 
 : prettyprint-{ ( indent -- indent )
     \ { prettyprint* <prettyprint ;

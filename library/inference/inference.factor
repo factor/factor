@@ -69,7 +69,7 @@ GENERIC: set-value-class ( class value -- )
 ! A value has the following slots in addition to those relating
 ! to generics above:
 
-! An association list mapping values to [ value | class ] pairs
+! An association list mapping values to [[ value class ]] pairs
 SYMBOL: type-propagations
 
 TRAITS: computed
@@ -145,11 +145,11 @@ M: literal set-value-class ( class value -- )
 : (present-effect) ( vector -- list )
     [ value-class ] vector-map vector>list ;
 
-: present-effect ( [ d-in | meta-d ] -- [ in-types out-types ] )
+: present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
     uncons >r (present-effect) r> (present-effect) 2list ;
 
-: effect ( -- [ d-in | meta-d ] )
+: effect ( -- [[ d-in meta-d ]] )
     d-in get meta-d get cons ;
 
 : init-inference ( recursive-state -- )
@@ -193,7 +193,7 @@ DEFER: apply-word
     infer-quot
     #return values-node check-return ;
 
-: infer ( quot -- [ in | out ] )
+: infer ( quot -- [[ in out ]] )
     #! Stack effect of a quotation.
     [ (infer) effect present-effect ] with-scope ;
 

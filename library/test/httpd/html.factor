@@ -23,7 +23,7 @@ USE: kernel
 [
     [
         ""
-        [ [ "icon" | "library/icons/File.png" ] ]
+        [ [[ "icon" "library/icons/File.png" ]] ]
         [ drop ] icon-tag
     ] with-string
 ] unit-test
@@ -38,7 +38,7 @@ USE: kernel
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
 [
     [
-        [ [ "fg" 255 0 255 ] [ "font" | "Monospaced" ] ]
+        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
         [ drop "car" write ]
         span-tag
     ] with-string
@@ -56,7 +56,7 @@ USE: kernel
 [
     [
         "car"
-        [ [ "fg" 255 0 255 ] [ "font" | "Monospaced" ] ]
+        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
         html-write-attr
     ] with-string
 ] unit-test

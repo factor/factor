@@ -33,7 +33,7 @@ USE: kernel
 ] unit-test
 
 [ { "Hey" "there" } ] [
-    [ [ "Hey" | "there" ] uncons ] test-interpreter
+    [ [[ "Hey" "there" ]] uncons ] test-interpreter
 ] unit-test
 
 [ { t } ] [

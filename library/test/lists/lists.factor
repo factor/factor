@@ -10,7 +10,7 @@ USE: strings
 [ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test
 [ [ 2 ]         ] [ [ ] [ 2 ]       append ] unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
-[ [ 1 2 3 | 4 ] ] [ [ 1 2 3 ] 4     append ] unit-test
+[ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] ] [ [ 1 2 3 ] 4 append ] unit-test
 
 [ f         ] [ 3 [ ]     contains? ] unit-test
 [ f         ] [ 3 [ 1 2 ] contains? ] unit-test
@@ -19,11 +19,11 @@ USE: strings
 
 [ [ 3 ]     ] [ [ 3 ]         last* ] unit-test
 [ [ 3 ]     ] [ [ 1 2 3 ]     last* ] unit-test
-[ [ 3 | 4 ] ] [ [ 1 2 3 | 4 ] last* ] unit-test
+[ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last* ] unit-test
 
 [ 3 ] [ [ 3 ]         last ] unit-test
 [ 3 ] [ [ 1 2 3 ]     last ] unit-test
-[ 3 ] [ [ 1 2 3 | 4 ] last ] unit-test
+[ 3 ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
 
 [ 0 ] [ [ ]       length ] unit-test
 [ 3 ] [ [ 1 2 3 ] length ] unit-test
@@ -31,7 +31,7 @@ USE: strings
 [ t ] [ f         list? ] unit-test
 [ f ] [ t         list? ] unit-test
 [ t ] [ [ 1 2 ]   list? ] unit-test
-[ f ] [ [ 1 | 2 ] list? ] unit-test
+[ f ] [ [[ 1 2 ]] list? ] unit-test
 
 [ [ ]       ] [ 1 [ ]           remove ] unit-test
 [ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
@@ -49,7 +49,7 @@ USE: strings
 [ f ] [ 3 [ 1 [ 3 ] 2 ]   tree-contains? not ] unit-test
 [ f ] [ 1 [ [ [ 1 ] ] 2 ] tree-contains? not ] unit-test
 [ f ] [ 2 [ 1 2 ]         tree-contains? not ] unit-test
-[ f ] [ 3 [ 1 2 | 3 ]     tree-contains? not ] unit-test
+[ f ] [ 3 [[ 1 [[ 2 3 ]] ]] tree-contains? not ] unit-test
 
 [ [ ]         ] [ 0   count ] unit-test
 [ [ ]         ] [ -10 count ] unit-test

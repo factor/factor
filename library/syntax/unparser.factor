@@ -103,13 +103,13 @@ M: complex unparse ( num -- str )
 
 : ch>ascii-escape ( ch -- esc )
     [
-        [ CHAR: \e | "\\e" ]
-        [ CHAR: \n | "\\n" ]
-        [ CHAR: \r | "\\r" ]
-        [ CHAR: \t | "\\t" ]
-        [ CHAR: \0 | "\\0" ]
-        [ CHAR: \\ | "\\\\" ]
-        [ CHAR: \" | "\\\"" ]
+        [[ CHAR: \e "\\e"  ]]
+        [[ CHAR: \n "\\n"  ]]
+        [[ CHAR: \r "\\r"  ]]
+        [[ CHAR: \t "\\t"  ]]
+        [[ CHAR: \0 "\\0"  ]]
+        [[ CHAR: \\ "\\\\" ]]
+        [[ CHAR: \" "\\\"" ]]
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )

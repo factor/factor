@@ -72,10 +72,10 @@ USE: namespaces
     unit-test
     
     [
-        [ 10 | t ]
-        [ 20 | f ]
-        [ 30 | "monkey" ]
-        [ 24 | 1/2 ]
+        [[ 10 t ]]
+        [[ 20 f ]]
+        [[ 30 "monkey" ]]
+        [[ 24 1/2 ]]
         [ 13 | { "Hello" "Banana" } ]
     ] "random-pairs" set
     

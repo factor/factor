@@ -37,7 +37,7 @@ USE: alien
 USE: words
 
 : CONSTANT: CREATE 
-    [ [ [ parsed ] each ] cons define-compound POSTPONE: parsing ] 
+    [ [ [ swons ] each ] cons define-compound POSTPONE: parsing ] 
     [ ] ; parsing
 
 CONSTANT: ERROR_SUCCESS 0 ;

@@ -159,9 +159,9 @@ M: bignum ' ( bignum -- tagged )
     object-tag here-as >r
     bignum-type >header emit
     [
-        [ 0  | [ 1 0   ] ]
-        [ -1 | [ 2 1 1 ] ]
-        [ 1  | [ 2 0 1 ] ]
+        [[ 0  [ 1 0   ] ]]
+        [[ -1 [ 2 1 1 ] ]]
+        [[ 1  [ 2 0 1 ] ]]
     ] assoc [ emit ] each align-here r> ;
 
 ( Special objects )

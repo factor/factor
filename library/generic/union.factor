@@ -72,8 +72,8 @@ union [ 2drop t ] "class<" set-word-property
     [
         [
             [
-                [ f | POSTPONE: f ]
-                [ t | POSTPONE: t ]
+                [[ f POSTPONE: f ]]
+                [[ t POSTPONE: t ]]
             ] assoc dup
         ] keep ?
     ] map

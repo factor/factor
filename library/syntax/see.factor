@@ -40,9 +40,9 @@ USE: words
 ! Prettyprinting words
 : vocab-actions ( search -- list )
     [
-        [ "Words"   | "words."        ]
-        [ "Use"     | "\"use\" cons@" ]
-        [ "In"      | "\"in\" set" ]
+        [[ "Words"   "words."        ]]
+        [[ "Use"     "\"use\" cons@" ]]
+        [[ "In"      "\"in\" set"    ]]
     ] ;
 
 : vocab-attrs ( vocab -- attrs )

@@ -36,15 +36,15 @@ USE: kernel-internals
 
 BUILTIN: cons 2
 
-: car ( [ car | cdr ] -- car ) >cons 0 slot ; inline
-: cdr ( [ car | cdr ] -- cdr ) >cons 1 slot ; inline
+: car ( [[ car cdr ]] -- car ) >cons 0 slot ; inline
+: cdr ( [[ car cdr ]] -- cdr ) >cons 1 slot ; inline
 
-: swons ( cdr car -- [ car | cdr ] )
+: swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,
     #! has the effect of prepending the car to the cdr.
     swap cons ; inline
 
-: uncons ( [ car | cdr ] -- car cdr )
+: uncons ( [[ car cdr ]] -- car cdr )
     #! Push both the head and tail of a list.
     dup car swap cdr ; inline
 
@@ -52,7 +52,7 @@ BUILTIN: cons 2
     #! Construct a proper list of one element.
     f cons ; inline
 
-: unswons ( [ car | cdr ] -- cdr car )
+: unswons ( [[ car cdr ]] -- cdr car )
     #! Push both the head and tail of a list.
     dup cdr swap car ; inline
 

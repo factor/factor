@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,23 +31,21 @@ package factor.parser;
 
 import factor.*;
 
-public class Bar extends FactorParsingDefinition
+public class EndCons extends FactorParsingDefinition
 {
-	//{{{ Bar constructor
-	/**
-	 * A new definition.
-	 */
-	public Bar(FactorWord word)
-	{
-		super(word);
-	} //}}}
+	public FactorWord start;
 
-	public void eval(FactorReader reader)
-		throws Exception
+	public EndCons(FactorWord start, FactorWord end)
 	{
-		FactorReader.ParseState state = reader.getCurrentState();
-		if(state.start != reader.intern("[",false))
-			reader.error("| only allowed inside [ ... ]");
-		reader.bar();
+		super(end);
+		this.start = start;
+	}
+
+	public void eval(FactorReader reader) throws FactorParseException
+	{
+		Cons list = reader.popState(start,word).first;
+		if(Cons.length(list) != 2)
+			reader.getScanner().error("Exactly two objects must be between [[ and ]]");
+		reader.append(new Cons(list.car,list.next().car));
 	}
 }

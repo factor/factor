@@ -58,7 +58,7 @@ USE: generic
     #ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
 
 [ t ] [
-    [ 2 [ swap ] [ nip "hi" ] ifte ] dataflow
+    [ [ swap ] [ nip "hi" ] ifte ] dataflow
     dataflow-ifte-node-consume-d length 1 =
 ] unit-test
 
@@ -77,8 +77,8 @@ SYMBOL: #test
 
 [ 6 ] [
     {{
-        [ node-op | #test ]
-        [ node-param | 5 ]
+        [[ node-op #test ]]
+        [[ node-param 5 ]]
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
@@ -86,8 +86,8 @@ SYMBOL: #test
 
 [ 25 ] [
     {{
-        [ node-op | #test ]
-        [ node-param | 5 ]
+        [[ node-op #test ]]
+        [[ node-param 5 ]]
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 

@@ -3,6 +3,7 @@ USE: kernel
 USE: math
 USE: test
 USE: lists
+USE: namespaces
 USE: compiler
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html

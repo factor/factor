@@ -50,15 +50,15 @@ USE: unparser
 <namespace> "styles" set
 
 [
-    [ "font" | "Monospaced" ]
+    [[ "font" "Monospaced" ]]
 ] "default" set-style
 
 [
-    [ "bold" | t ]
+    [[ "bold" t ]]
 ] default-style append "prompt" set-style
 
 [
-    [ "ansi-fg" | "0" ]
-    [ "ansi-bg" | "2" ]
-    [ "fg" | [ 255 0 0 ] ]
+    [[ "ansi-fg" "0" ]]
+    [[ "ansi-bg" "2" ]]
+    [[ "fg" [ 255 0 0 ] ]]
 ] default-style append "comments" set-style

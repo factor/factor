@@ -202,18 +202,18 @@ USE: prettyprint
 \ over [ 2drop t ] "can-kill" set-word-property
 \ over [
     [
-        [ [ f f ] | over ]
-        [ [ f t ] | dup ]
+        [[ [ f f ] over ]]
+        [[ [ f t ] dup  ]]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 
 \ pick [ 2drop t ] "can-kill" set-word-property
 \ pick [
     [
-        [ [ f f f ] | pick ]
-        [ [ f f t ] | over ]
-        [ [ f t f ] | over ]
-        [ [ f t t ] | dup ]
+        [[ [ f f f ] pick ]]
+        [[ [ f f t ] over ]]
+        [[ [ f t f ] over ]]
+        [[ [ f t t ] dup  ]]
     ] reduce-stack-op
 ] "kill-node" set-word-property
 

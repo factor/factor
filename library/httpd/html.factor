@@ -39,11 +39,11 @@ USE: generic
 
 : html-entities ( -- alist )
     [
-        [ CHAR: < | "&lt;"   ]
-        [ CHAR: > | "&gt;"   ]
-        [ CHAR: & | "&amp;"  ]
-        [ CHAR: ' | "&apos;" ]
-        [ CHAR: " | "&quot;" ]
+        [[ CHAR: < "&lt;"   ]]
+        [[ CHAR: > "&gt;"   ]]
+        [[ CHAR: & "&amp;"  ]]
+        [[ CHAR: ' "&apos;" ]]
+        [[ CHAR: " "&quot;" ]]
     ] ;
 
 : char>entity ( ch -- str )

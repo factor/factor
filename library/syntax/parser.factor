@@ -118,20 +118,10 @@ USE: unparser
         dup "use" get search [ str>number ] ?unless
     ] when ;
 
-: parsed| ( parsed parsed obj -- parsed )
-    #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r unswons r> cons swap [ swons ] each swons ;
-
-: expect ( word -- )
-    dup scan = [ drop ] [ "Expected " swap cat2 throw ] ifte ;
-
-: parsed ( obj -- )
-    over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;
-
 : (parse) ( str -- )
     [
         scan-word [
-            dup parsing? [ execute ] [ parsed ] ifte
+            dup parsing? [ execute ] [ swons ] ifte
         ] when*
     ] with-parser ;
 
@@ -185,15 +175,15 @@ USE: unparser
 
 : ascii-escape>ch ( ch -- esc )
     [
-        [ CHAR: e | CHAR: \e ]
-        [ CHAR: n | CHAR: \n ]
-        [ CHAR: r | CHAR: \r ]
-        [ CHAR: t | CHAR: \t ]
-        [ CHAR: s | CHAR: \s ]
-        [ CHAR: \s | CHAR: \s ]
-        [ CHAR: 0 | CHAR: \0 ]
-        [ CHAR: \\ | CHAR: \\ ]
-        [ CHAR: \" | CHAR: \" ]
+        [[ CHAR: e  CHAR: \e ]]
+        [[ CHAR: n  CHAR: \n ]]
+        [[ CHAR: r  CHAR: \r ]]
+        [[ CHAR: t  CHAR: \t ]]
+        [[ CHAR: s  CHAR: \s ]]
+        [[ CHAR: \s CHAR: \s ]]
+        [[ CHAR: 0  CHAR: \0 ]]
+        [[ CHAR: \\ CHAR: \\ ]]
+        [[ CHAR: \" CHAR: \" ]]
     ] assoc ;
 
 : escape ( ch -- esc )

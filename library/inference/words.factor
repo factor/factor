@@ -139,7 +139,7 @@ M: symbol (apply-word) ( word -- )
         ] when
     ] when ;
 
-: decompose ( x y -- [ d-in | meta-d ] )
+: decompose ( x y -- [[ d-in meta-d ]] )
     #! Return a stack effect such that x*effect = y.
     uncons >r swap uncons >r
     over vector-length over vector-length -
@@ -155,7 +155,7 @@ M: symbol (apply-word) ( word -- )
         rethrow
     ] catch ;
 
-: base-case ( word -- [ d-in | meta-d ] )
+: base-case ( word -- [[ d-in meta-d ]] )
     [
         [
             copy-inference

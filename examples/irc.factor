@@ -32,13 +32,13 @@ SYMBOL: nickname
 
 : write-highlighted ( line -- )
     dup nickname get index-of -1 =
-    f [ [ "ansi-fg" | "3" ] ] ? write-attr ;
+    f [ [[ "ansi-fg" "3" ]] ] ? write-attr ;
 
 : extract-nick ( line -- nick )
     "!" split1 drop ;
 
 : write-nick ( line -- )
-    "!" split1 drop [ [ "bold" | t ] ] write-attr ;
+    "!" split1 drop [ [[ "bold" t ]] ] write-attr ;
 
 GENERIC: irc-display
 PREDICATE: string privmsg "PRIVMSG" index-of -1 > ;

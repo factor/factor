@@ -56,9 +56,9 @@ USE: url-encoding
 
 : request-method ( cmd -- method )
     [
-        [ "GET" | "get" ]
-        [ "POST" | "post" ]
-        [ "HEAD" | "head" ]
+        [[ "GET" "get" ]]
+        [[ "POST" "post" ]]
+        [[ "HEAD" "head" ]]
     ] assoc [ "bad" ] unless* ;
 
 : (handle-request) ( arg cmd -- url method )

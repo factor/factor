@@ -2,6 +2,7 @@ IN: scratchpad
 USE: lists
 USE: kernel
 USE: math
+USE: namespaces
 USE: random
 USE: test
 USE: compiler

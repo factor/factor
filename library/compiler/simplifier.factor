@@ -101,8 +101,8 @@ PREDICATE: cons return-follows #return swap follows? ;
 M: return-follows simplify-call ( node rest -- rest ? )
     >r
     unswons [
-        [ #call | #jump ]
-        [ #call-label | #jump-label ]
+        [[ #call #jump ]]
+        [[ #call-label #jump-label ]]
     ] assoc swons , r> t ;
 
 #call [ simplify-call ] "simplify" set-word-property
@@ -119,8 +119,8 @@ PREDICATE: cons push-next ( list -- ? )
 
 M: push-next simplify-drop ( node rest -- rest ? )
     nip uncons >r unswons [
-        [ #push-immediate | #replace-immediate ]
-        [ #push-indirect | #replace-indirect ]
+        [[ #push-immediate #replace-immediate ]]
+        [[ #push-indirect #replace-indirect ]]
     ] assoc swons , r> t ;
 
 \ drop [ simplify-drop ] "simplify" set-word-property

@@ -50,10 +50,10 @@ USE: unparser
 
 : file-actions ( -- list )
     [
-        [ "Push"             | ""           ]
-        [ "Run file"         | "run-file"   ]
-        [ "List directory"   | "directory." ]
-        [ "Change directory" | "cd"         ]
+        [[ "Push"             ""           ]]
+        [[ "Run file"         "run-file"   ]]
+        [[ "List directory"   "directory." ]]
+        [[ "Change directory" "cd"         ]]
     ] ;
 
 : set-mime-types ( assoc -- )
@@ -100,20 +100,20 @@ USE: unparser
 : dir. cwd directory. ;
 
 [
-    [ "html"   | "text/html"                        ]
-    [ "txt"    | "text/plain"                       ]
+    [[ "html"   "text/html"                        ]]
+    [[ "txt"    "text/plain"                       ]]
                                                     
-    [ "gif"    | "image/gif"                        ]
-    [ "png"    | "image/png"                        ]
-    [ "jpg"    | "image/jpeg"                       ]
-    [ "jpeg"   | "image/jpeg"                       ]
+    [[ "gif"    "image/gif"                        ]]
+    [[ "png"    "image/png"                        ]]
+    [[ "jpg"    "image/jpeg"                       ]]
+    [[ "jpeg"   "image/jpeg"                       ]]
                                                     
-    [ "jar"    | "application/octet-stream"         ]
-    [ "zip"    | "application/octet-stream"         ]
-    [ "tgz"    | "application/octet-stream"         ]
-    [ "tar.gz" | "application/octet-stream"         ]
-    [ "gz"     | "application/octet-stream"         ]
+    [[ "jar"    "application/octet-stream"         ]]
+    [[ "zip"    "application/octet-stream"         ]]
+    [[ "tgz"    "application/octet-stream"         ]]
+    [[ "tar.gz" "application/octet-stream"         ]]
+    [[ "gz"     "application/octet-stream"         ]]
                                                     
-    [ "factor" | "application/x-factor"             ]
-    [ "factsp" | "application/x-factor-server-page" ]
+    [[ "factor" "application/x-factor"             ]]
+    [[ "factsp" "application/x-factor-server-page" ]]
 ] set-mime-types

@@ -36,7 +36,7 @@ USE: kernel
     #! Push if the list appears to be an alist.
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 
-: assoc* ( key alist -- [ key | value ] )
+: assoc* ( key alist -- [[ key value ]] )
     #! Looks up the key in an alist. Push the key/value pair.
     #! Most of the time you want to use assoc not assoc*.
     dup [

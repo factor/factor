@@ -50,7 +50,7 @@ USE: url-encoding
 
 : error-head ( error -- )
     dup log-error
-    [ [ "Content-Type" | "text/html" ] ] over response ;
+    [ [[ "Content-Type" "text/html" ]] ] over response ;
 
 : httpd-error ( error -- )
     #! This must be run from handle-request
@@ -65,11 +65,11 @@ USE: url-encoding
     ] with-scope ;
 
 : serving-html ( -- )
-    [ [ "Content-Type" | "text/html" ] ]
+    [ [[ "Content-Type" "text/html" ]] ]
     "200 Document follows" response terpri ;
 
 : serving-text ( -- )
-    [ [ "Content-Type" | "text/plain" ] ]
+    [ [[ "Content-Type" "text/plain" ]] ]
     "200 Document follows" response terpri ;
 
 : redirect ( to -- )

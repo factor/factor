@@ -50,7 +50,7 @@ PREDICATE: vector hashtable ( obj -- ? )
     #! Compute the index of the bucket for a key.
     >r hashcode r> vector-length rem ; inline
 
-: hash* ( key table -- [ key | value ] )
+: hash* ( key table -- [[ key value ]] )
     #! Look up a value in the hashtable. First the bucket is
     #! determined using the hash function, then the association
     #! list therein is searched linearly.

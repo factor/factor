@@ -228,13 +228,13 @@ PREDICATE: alien key-down-event
 SYMBOL: keymap
 
 {{
-        [ [ "RETURN" ] | [ return-key ] ]
-        [ [ "BACKSPACE" ] | [ input-line get [ backspace ] bind ] ]
-        [ [ "LEFT" ] | [ input-line get [ left ] bind ] ]
-        [ [ "RIGHT" ] | [ input-line get [ right ] bind ] ]
-        [ [ "UP" ] | [ input-line get [ history-prev ] bind ] ]
-        [ [ "DOWN" ] | [ input-line get [ history-next ] bind ] ]
-        [ [ "CTRL" "k" ] | [ input-line get [ line-clear ] bind ] ]
+        [[ [ "RETURN" ] [ return-key ] ]]
+        [[ [ "BACKSPACE" ] [ input-line get [ backspace ] bind ] ]]
+        [[ [ "LEFT" ] [ input-line get [ left ] bind ] ]]
+        [[ [ "RIGHT" ] [ input-line get [ right ] bind ] ]]
+        [[ [ "UP" ] [ input-line get [ history-prev ] bind ] ]]
+        [[ [ "DOWN" ] [ input-line get [ history-next ] bind ] ]]
+        [[ [ "CTRL" "k" ] [ input-line get [ line-clear ] bind ] ]]
 }} keymap set
 
 M: key-down-event handle-event ( event -- ? )

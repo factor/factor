@@ -56,28 +56,27 @@ USE: unparser
 ! properties to the current word if it is set.
 
 ! Constants
-: t t parsed ; parsing
-: f f parsed ; parsing
+: t t swons ; parsing
+: f f swons ; parsing
 
 ! Lists
 : [ f ; parsing
-: ] reverse parsed ; parsing
+: ] reverse swons ; parsing
 
-: | ( syntax: | cdr ] )
-    #! See the word 'parsed'. We push a special sentinel, and
-    #! 'parsed' acts accordingly.
-    "|" ; parsing
+! Conses (whose cdr might not be a list)
+: [[ f ; parsing
+: ]] 2unlist swons swons ; parsing
 
 ! Vectors
 : { f ; parsing
-: } reverse list>vector parsed ; parsing
+: } reverse list>vector swons ; parsing
 
 ! Hashtables
 : {{ f ; parsing
-: }} alist>hash parsed ; parsing
+: }} alist>hash swons ; parsing
 
 ! Do not execute parsing word
-: POSTPONE: ( -- ) scan-word parsed ; parsing
+: POSTPONE: ( -- ) scan-word swons ; parsing
 
 : :
     #! Begin a word definition. Word name follows.
@@ -95,7 +94,7 @@ USE: unparser
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word unit parsed  \ car parsed ; parsing
+    scan-word unit swons  \ car swons ; parsing
 
 ! Vocabularies
 : DEFER:
@@ -112,7 +111,7 @@ USE: unparser
     scan dup "use" cons@ "in" set ; parsing
 
 ! Char literal
-: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
+: CHAR: ( -- ) next-word-ch parse-ch swons ; parsing
 
 ! String literal
 : parse-string ( -- )
@@ -126,11 +125,14 @@ USE: unparser
     #! Note the ugly hack to carry the new value of 'pos' from
     #! the make-string scope up to the original scope.
     [ parse-string "col" get ] make-string
-    swap "col" set parsed ; parsing
+    swap "col" set swons ; parsing
+
+: expect ( word -- )
+    dup scan = [ drop ] [ "Expected " swap cat2 throw ] ifte ;
 
 : #{
     #! Complex literal - #{ real imaginary #}
-    scan str>number scan str>number rect> "}" expect parsed ;
+    scan str>number scan str>number rect> "}" expect swons ;
     parsing
 
 ! Comments
@@ -148,11 +150,11 @@ USE: unparser
 
 ! Reading numbers in other bases
 
-: BASE: ( base -- )
+: (BASE) ( base -- )
     #! Read a number in a specific base.
-    scan swap base> parsed ;
+    scan swap base> swons ;
 
-: HEX: 16 BASE: ; parsing
-: DEC: 10 BASE: ; parsing
-: OCT: 8 BASE: ; parsing
-: BIN: 2 BASE: ; parsing
+: HEX: 16 (BASE) ; parsing
+: DEC: 10 (BASE) ; parsing
+: OCT: 8 (BASE) ; parsing
+: BIN: 2 (BASE) ; parsing

@@ -61,7 +61,7 @@ SYMBOL: relocation-table
     #! Relocate address just compiled.
     4 rel, relocating 0 rel, ;
 
-: generate-node ( [ op | params ] -- )
+: generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
     unswons dup "generator" word-property [
         call

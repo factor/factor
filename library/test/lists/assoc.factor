@@ -5,16 +5,16 @@ USE: namespaces
 USE: test
 
 [
-    [ "monkey" | 1       ]
-    [ "banana" | 2       ]
-    [ "Java"   | 3       ]
-    [ t        | "true"  ]
-    [ f        | "false" ]
-    [ [ 1 2 ]  | [ 2 1 ] ]
+    [[ "monkey" 1       ]]
+    [[ "banana" 2       ]]
+    [[ "Java"   3       ]]
+    [[ t        "true"  ]]
+    [[ f        "false" ]]
+    [[ [ 1 2 ]  [ 2 1 ] ]]
 ] "assoc" set
 
 [ t ] [ "assoc" get assoc? ] unit-test
-[ f ] [ [ 1 2 3 | 4 ] assoc? ] unit-test
+[ f ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] assoc? ] unit-test
 [ f ] [ "assoc" assoc? ] unit-test
 
 [ f       ] [ "monkey" f           assoc ] unit-test
@@ -28,9 +28,9 @@ USE: test
 [ "is great" ] [ "Java" "assoc" get assoc ] unit-test
 
 [
-    [ "one" | 1 ]
-    [ "two" | 2 ]
-    [ "four" | 4 ]
+    [[ "one" 1 ]]
+    [[ "two" 2 ]]
+    [[ "four" 4 ]]
 ] "value-alist" set
 
 [
