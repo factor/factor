@@ -1,11 +1,7 @@
 + bignums:
 
-- change shift< and shift> to ash
 - cached 0/-1/1 should be cross compiled in image
 - bignum cross compiling
-- upgrading fixnums does not work with shift</shift>
-- ash is inefficient: arg 2 is upgraded to bignum then back
-  to long
 - move some s48_ functions into bignum.c
 - remove unused functions
 - clean up type coercions in arithmetic.c
@@ -17,6 +13,7 @@
 
 + docs:
 
+- USE: arithmetic in numbers game
 - numbers section
 - examples of assoc usage
 - unparse examples, and difference from prettyprint

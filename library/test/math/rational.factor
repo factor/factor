@@ -3,6 +3,9 @@ USE: arithmetic
 USE: kernel
 USE: stack
 USE: test
+USE: unparser
+
+[ "-8" ] [ -8 unparse ] unit-test
 
 [ t ] [ 0 fixnum? ] unit-test
 [ t ] [ 31415 number? ] unit-test

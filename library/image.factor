@@ -50,7 +50,7 @@ USE: words
 
 : lo/hi64 ( long -- hi lo )
     dup
-    32 shift>
+    -32 shift
     HEX: ffffffff bitand
     swap
     HEX: ffffffff bitand ;
@@ -92,7 +92,7 @@ USE: words
 : bignum-type 13 ;
 : float-type  14 ;
 
-: immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
+: immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
 
 ( Image header )
@@ -214,7 +214,7 @@ DEFER: '
 ( Strings )
 
 : pack ( n n -- )
-    "big-endian" get [ swap ] when 16 shift< bitor emit ;
+    "big-endian" get [ swap ] when 16 shift bitor emit ;
 
 : pack-at ( n str -- )
     2dup str-nth rot succ rot str-nth pack ;

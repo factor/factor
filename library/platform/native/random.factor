@@ -42,7 +42,7 @@ USE: stack
 
 : random-int-0 ( max -- n )
     succ dup power-of-2? [
-        (random-int) * 31 shift>
+        (random-int) * -31 shift
     ] [
         (random-int) 2dup swap mod (random-int-0)
     ] ifte ;

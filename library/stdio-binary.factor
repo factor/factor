@@ -33,19 +33,19 @@ USE: strings
 
 : read-little-endian-32 ( -- word )
     read1
-    read1 8  shift< bitor
-    read1 16 shift< bitor
-    read1 24 shift< bitor ;
+    read1 8  shift bitor
+    read1 16 shift bitor
+    read1 24 shift bitor ;
 
 : read-big-endian-32 ( -- word )
-    read1 24 shift<
-    read1 16 shift< bitor
-    read1 8  shift< bitor
-    read1           bitor ;
+    read1 24 shift
+    read1 16 shift bitor
+    read1 8  shift bitor
+    read1          bitor ;
 
-: byte3 ( num -- byte ) 24 shift> HEX: ff bitand ;
-: byte2 ( num -- byte ) 16 shift> HEX: ff bitand ;
-: byte1 ( num -- byte )  8 shift> HEX: ff bitand ;
+: byte3 ( num -- byte ) -24 shift HEX: ff bitand ;
+: byte2 ( num -- byte ) -16 shift HEX: ff bitand ;
+: byte1 ( num -- byte )  -8 shift HEX: ff bitand ;
 : byte0 ( num -- byte )           HEX: ff bitand ;
 
 : write-little-endian-32 ( word -- )

@@ -66,7 +66,7 @@ USE: streams
     "stdio" get fwrite-attr ;
 
 : print ( string -- )
-    "stdio" get tuck fprint fflush ;
+    "stdio" get fprint ;
 
 : edit ( string -- )
     "stdio" get fedit ;

@@ -161,18 +161,21 @@ CELL xor_fixnum(CELL x, CELL y)
 	return x ^ y;
 }
 
-CELL shiftleft_fixnum(CELL x, CELL y)
+CELL shift_fixnum(CELL _x, FIXNUM y)
 {
-	/* BIGNUM_2_TO_INTEGER((BIGNUM_2)untag_fixnum_fast(x)
-		<< (BIGNUM_2)untag_fixnum_fast(y)); */
-	return F;
-}
+	FIXNUM x = untag_fixnum_fast(_x);
+	if(y > CELLS * -8 && y < CELLS * 8)
+	{
+		long long result = (y < 0
+			? (long long)x >> -y
+			: (long long)x << y);
 
-CELL shiftright_fixnum(CELL x, CELL y)
-{
-	/* BIGNUM_2_TO_INTEGER((BIGNUM_2)untag_fixnum_fast(x)
-		>> (BIGNUM_2)untag_fixnum_fast(y)); */
-	return F;
+		if(result >= FIXNUM_MIN && result <= FIXNUM_MAX)
+			return tag_fixnum(result);
+	}
+
+	return tag_object(s48_bignum_arithmetic_shift(
+		s48_long_to_bignum(x),y));
 }
 
 CELL less_fixnum(CELL x, CELL y)

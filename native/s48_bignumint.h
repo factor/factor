@@ -118,6 +118,9 @@ extern ARRAY* shrink_array(ARRAY* array, CELL capacity);
 #define BIGNUM_DIGITS_FOR_LONG						\
   (BIGNUM_BITS_TO_DIGITS ((sizeof (long)) * CHAR_BIT))
 
+#define BIGNUM_DIGITS_FOR_LONG_LONG					\
+  (BIGNUM_BITS_TO_DIGITS ((sizeof (long long)) * CHAR_BIT))
+
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 
 #define BIGNUM_ASSERT(expression)					\

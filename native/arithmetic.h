@@ -42,6 +42,27 @@ void primitive_##OP(void) \
 	dpush(OP(x,y)); \
 }
 
+#define BINARY_OP_FIXNUM(OP) \
+CELL OP(CELL x, FIXNUM y) \
+{ \
+	switch(type_of(x)) \
+	{ \
+	case FIXNUM_TYPE: \
+		return OP##_fixnum(x,y); \
+	case BIGNUM_TYPE: \
+		return OP##_bignum(to_bignum(x),y); \
+	default: \
+		type_error(INTEGER_TYPE,x); \
+		return F; \
+	} \
+} \
+\
+void primitive_##OP(void) \
+{ \
+	CELL y = dpop(), x = dpop(); \
+	dpush(OP(x,to_fixnum(y))); \
+}
+
 #define BINARY_OP_INTEGER_ONLY(OP) \
 \
 CELL OP##_ratio(RATIO* x, RATIO* y) \
@@ -164,9 +185,7 @@ CELL or(CELL x, CELL y);
 void primitive_or(void);
 CELL xor(CELL x, CELL y);
 void primitive_xor(void);
-CELL shiftleft(CELL x, CELL y);
-void primitive_shiftleft(void);
-CELL shiftright(CELL x, CELL y);
-void primitive_shiftright(void);
+CELL shift(CELL x, FIXNUM y);
+void primitive_shift(void);
 CELL gcd(CELL x, CELL y);
 void primitive_gcd(void);

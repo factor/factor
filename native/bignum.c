@@ -166,16 +166,9 @@ CELL xor_bignum(ARRAY* x, ARRAY* y)
 	return tag_object(s48_bignum_bitwise_xor(x,y));
 }
 
-CELL shiftleft_bignum(ARRAY* x, ARRAY* y)
+CELL shift_bignum(ARRAY* x, FIXNUM y)
 {
-	return tag_object(s48_bignum_arithmetic_shift(x,
-		s48_bignum_to_long(y)));
-}
-
-CELL shiftright_bignum(ARRAY* x, ARRAY* y)
-{
-	return tag_object(s48_bignum_arithmetic_shift(x,
-		-s48_bignum_to_long(y)));
+	return tag_object(s48_bignum_arithmetic_shift(x,y));
 }
 
 CELL less_bignum(ARRAY* x, ARRAY* y)

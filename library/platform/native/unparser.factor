@@ -51,8 +51,8 @@ USE: words
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
-    <% dup 0 < [
-        neg integer% CHAR: - %
+    <% over 0 < [
+        swap neg swap integer% CHAR: - %
     ] [
         integer%
     ] ifte reverse%> ;

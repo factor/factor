@@ -122,23 +122,10 @@ USE: stack
     "factor.math.FactorMath" "not"
     jinvoke-static ; inline
 
-: shift< ( x by -- )
+: shift ( x by -- )
     #! Shift 'by' bits to the left.
     [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftLeft"
-    jinvoke-static ; inline
-
-: shift> ( x by -- )
-    #! Shift 'by' bits to the right.
-    [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftRight"
-    jinvoke-static ; inline
-
-: shift>> ( x by -- )
-    #! Shift 'by' bits to the right, without performing sign
-    #! extension.
-    [ "java.lang.Number" "int" ]
-    "factor.math.FactorMath" "shiftRightUnsigned"
+    "factor.math.FactorMath" "shift"
     jinvoke-static ; inline
 
 : rem ( x y -- remainder )
