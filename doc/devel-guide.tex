@@ -1,19 +1,50 @@
-% :indentSize=4:tabSize=4:noTabs=true:mode=tex:
+% :indentSize=4:tabSize=4:noTabs=true:mode=tex:wrap=soft:
 
-\documentclass[english]{article}
+\documentclass[english]{book}
+\makeindex
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{alltt}
+\usepackage{tabularx}
+\usepackage{times}
 \pagestyle{headings}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 \setlength\parskip{\medskipamount}
 \setlength\parindent{0pt}
 
+\raggedbottom
+\raggedright
+
+\newcommand{\ttbackslash}{\char'134}
+
+\newcommand{\sidebar}[1]{{\fbox{\fbox{\parbox{10cm}{\begin{minipage}[b]{10cm}
+{\LARGE For wizards}
+
+#1
+\end{minipage}}}}}}
+
+\newcommand{\chapkeywords}[1]{%{\parbox{10cm}{\begin{minipage}[b]{10cm}
+\begin{quote}
+\emph{Key words:} \texttt{#1}
+\end{quote}
+%\end{minipage}}}}
+}
 \makeatletter
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
-%% Because html converters don't know tabularnewline
-\providecommand{\tabularnewline}{\\}
+\newcommand{\wordtable}[1]{{
+\begin{tabularx}{12cm}{|l l X|}
+#1
+\hline
+\end{tabularx}}}
+
+\newcommand{\tabvocab}[1]{
+\hline
+\multicolumn{3}{|l|}{
+\rule[-2mm]{0mm}{6mm}
+\texttt{#1} vocabulary:}
+\\
+\hline
+}
 
 \usepackage{babel}
 \makeatother
@@ -27,9 +58,7 @@
 \maketitle
 \tableofcontents{}
 
-
-\newpage
-\section*{Introduction}
+\chapter*{Introduction}
 
 Factor is a programming language with functional and object-oriented
 influences. Factor borrows heavily from Forth, Joy and Lisp. Programmers familiar with these languages will recognize many similarities with Factor.
@@ -42,86 +71,274 @@ Factor is \emph{safe}. This means all code executes in a virtual machine that pr
 garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
 
 When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
-output from the interpreter is in italics:
+output from the interpreter is in boldface:
 
 \begin{alltt}
-"Hello, world!" print
-\emph{Hello, world!}
+\textbf{ok} "Hello, world!" print
+\textbf{Hello, world!}
 \end{alltt}
 
-\section{Fundamentals}
+\chapter{First steps}
 
-A ``word'' is the main unit of program organization
-in Factor -- it corresponds to a ``function'', ``procedure''
-or ``method'' in other languages.
+This chapter will cover the basics of interactive development using the listener. Short code examples will be presented, along with an introduction to programming with the stack, a guide to using source files, and some hints for exploring the library.
 
-A typical Factor development session involves a text editor and Factor
-interpreter running side by side. Instead of the edit/compile/run
-cycle, the development process becomes an {}``edit cycle'' -- you
-make some changes to the source file and reload it in the interpreter
-using a command like this:
+\section{The listener}
+
+\chapkeywords{print write read}
+\index{\texttt{print}}
+\index{\texttt{write}}
+\index{\texttt{read}}
+
+Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. You will learn more about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 
 \begin{alltt}
-"numbers-game.factor" run-file
+./f factor.image
+\textbf{Loading factor.image... relocating... done
+This is native Factor 0.69
+Copyright (C) 2003, 2004 Slava Pestov
+Copyright (C) 2004 Chris Double
+Type ``exit'' to exit, ``help'' for help.
+65536 KB total, 62806 KB free
+ok}
 \end{alltt}
 
-Then the changes can be tested, either by hand, or using a test harness.
-There is no need to compile anything, or to lose interpreter state
-by restarting. Additionally, words with {}``throw-away'' definitions
-that you do not intend to keep can also be entered directly at this
-interpreter prompt.
-
-Factor emphasizes \emph{bottom-up design}. Each word should do one useful task. New words can be defined in terms
-of existing, already-tested words. You design a set of reusable words
-that model the problem domain. Problems are solved in terms
-of \emph{domain-specific vocabularies}, and Factor programs are really just libraries of reusable words.
-
-\subsection{The stack}
-
-The stack is used to exchange data between words. When a number is
-executed, it is pushed on the stack. When a word is executed, it receives
-input parameters by removing successive elements from the top of the
-stack. Results are then pushed back to the top of the stack. 
-
-The word \texttt{.s} prints the contents of the stack, leaving the
-contents of the stack unaffected. The top of the stack is the rightmost
-element in the printout:
+An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating the listener is ready to execute Factor expressions. You can try the classical first program:
 
 \begin{alltt}
-2 3 .s
-\emph{\{ 2 3 \}}
+\textbf{ok} "Hello, world." print
+\textbf{Hello, world.}
 \end{alltt}
 
-The word \texttt{.} removes the object at the top of the stack, and
-prints it:
+One thing all programmers have in common is they make large numbers of mistakes. There are two types of errors; syntax errors, and logic errors. Syntax errors indicate a simple typo or misplaced character.
+A logic error is not associated with a piece of source code, but rather an execution state. We will learn how to debug them later.  The listener will indicate the point in the source code where the confusion occurs:
 
 \begin{alltt}
-1 2 3 . . .
-\emph{3}
-\emph{2}
-\emph{1}
+\textbf{ok} "Hello, world" pr,int
+\textbf{<interactive>:1: Not a number
+"Hello, world" pr,int
+                     ^
+:s :r :n :c show stacks at time of error.}
 \end{alltt}
 
-The word \texttt{clear} removes all entries from the stack. It should only ever be used interactively, not from a definition!
+Factor source is composed from whitespace-separated words. Factor is case-sensitive. Each one of the following is exactly one word, and all four are distinct:
+
+\begin{verbatim}
+2dup
+2DUP
+[
+@$*(%#
+\end{verbatim}
+
+A frequent beginner's error is to leave out whitespace between words. When you are entering the code examples in the following sections, keep in mind that you cannot omit arbitrary whitespace:
 
 \begin{alltt}
-"hey ho" "merry christmas" .s
-\emph{\{ "hey ho" "merry christmas" \}}
-clear .s
-\emph{\{ \}}
+:greet "Greetings, " write print; \emph{! incorrect}
+: greet "Greetings, " write print ; \emph{! correct}
 \end{alltt}
+
+\section{Colon definitions}
+
+\chapkeywords{:~; see}
+\index{\texttt{:}}
+\index{\texttt{;}}
+\index{\texttt{see}}
+
+Factor words are similar to functions and procedures in other languages. Words are defined using \emph{colon definitino} syntax. Some words, like \texttt{print}, \texttt{write} and  \texttt{read}, along with dozens of others we will see, are part of Factor. Other words will be created by you.
+
+When you create a new word, you are associating a name with a particular sequence of \emph{already-existing} words. Enter the following colon definition in the listener:
+
+\begin{alltt}
+\textbf{ok} : ask-name "What is your name? " write read ;
+\end{alltt}
+
+What did we do above? We created a new word named \texttt{ask-name}, and associated with it the definition \texttt{"What is your name? " write read}. Now, lets type in two more colon definitions. The first one prints a personalized greeting. The second colon definition puts the first two together into a complete program.
+
+\begin{alltt}
+\textbf{ok} : greet "Greetings, " write print ;
+\textbf{ok} : friend ask-name greet ;
+\end{alltt}
+
+Now that the three words \texttt{ask-name}, \texttt{greet}, and \texttt{friend} have been defined, simply typing \texttt{friend} in the listener will run our example program:
+
+\begin{alltt}
+\textbf{ok} friend
+\textbf{What is your name? }Lambda the Ultimate
+\textbf{Greetings, Lambda the Ultimate}
+\end{alltt}
+
+Notice that the \texttt{ask-name} word passes a piece of data to the \texttt{greet} word. We will worry about the exact details later -- for now, our focus is the colon definition syntax itself.
+
+You can look at the definition of any word, including library words, using \texttt{see}:
+
+\begin{alltt}
+\textbf{ok} \ttbackslash greet see
+\textbf{IN: scratchpad
+: greet
+    "Greetings, " write print ;}
+\end{alltt}
+
+The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
+
+\sidebar{
+Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
+
+If you exit Factor by typing \texttt{exit}, any colon definitions entered at the listener will be lost. However, you can save a new image first, and use this image next time you start Factor in order to have access to  your definitions.
+
+\begin{alltt}
+\textbf{ok} "work.image" save-image\\
+\textbf{ok} exit
+\end{alltt}
+
+The \texttt{factor.image} file you start with initially is just an image that was saved after the standard library, and nothing else, was loaded.
+}
+
+\section{The stack}
+
+\chapkeywords{.s .~clear}
+\index{\texttt{.s}}
+\index{\texttt{.}}
+\index{\texttt{clear}}
+
+In order to be able to write more sophisticated programs, you will need to master usage of the \emph{stack}. Input parameters -- for example, numbers, or strings such as \texttt{"Hello "}, are pushed onto the top of the stack when typed. The most recently pushed value is said to be \emph{at the top} of the stack. When a word is executed, it takes
+input parameters from the top of the
+stack. Results are then pushed back on the stack. By convention, words remove input parameters from the stack.
+
+Recall our \texttt{friend} definition from the previous section. In this definition, the \texttt{ask-name} word passes a piece of data to the \texttt{greet} word:
+
+\begin{alltt}
+: friend ask-name greet ;
+\end{alltt}
+
+The first thing done by \texttt{friend} is calling \texttt{ask-name}, which was defined as follows:
+
+\begin{alltt}
+: ask-name "What is your name? " write read ;
+\end{alltt}
+
+Read this definition from left to right, and visualize the data flow. First, the string \texttt{"What is your name?~"} is pushed on the stack. The \texttt{write} word is called; it removes the string from the stack and writes it, without returning any values. Next, the \texttt{read} word is called. It waits for a line of input from the user, then pushes the entered string on the stack.
+
+After \texttt{ask-name}, the \texttt{friend} word calls \texttt{greet}, which was defined as follows:
+
+\begin{alltt}
+: greet "Greetings, " write print ;
+\end{alltt}
+
+This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, which writes this string. Next, \texttt{print} is called. Recall that the \texttt{read} call inside \texttt{ask-name} left the user's input on the stack; well, it is still there, and \texttt{print} prints it. In case you haven't already guessed, the difference between \texttt{write} and \texttt{print} is that the latter outputs a terminating new line.
+
+How did we know that \texttt{write} and \texttt{print} take one value from the stack each, or that \texttt{read} leaves one value on the stack? The answer is, you don't always know, however, you can use \texttt{see} to look up the \emph{stack effect comment} of any library word:
+
+\begin{alltt}
+\textbf{ok} \ttbackslash print see
+\textbf{IN: stdio
+: print ( string -{}- )
+    "stdio" get fprint ;}
+\end{alltt}
+
+You can see that the stack effect of \texttt{print} is \texttt{( string -{}- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read} is \texttt{( -{}- string )}.
+
+All words you write should have a stack effect. So our \texttt{friend} example should have been written as follows:
+
+\begin{verbatim}
+: ask-name ( -- name ) "What is your name? " write read ;
+: greet ( name -- ) "Greetings, " write print ;
+: friend ( -- ) ask-name greet ;
+\end{verbatim}
+
+The contents of the stack can be printed using the \texttt{.s} word:
+
+\begin{alltt}
+\textbf{ok} 1 2 3 .s
+\textbf{1
+2
+3}
+\end{alltt}
+
+The \texttt{.} (full-stop) word removes the top stack element, and prints it. Unlike \texttt{print}, which will only print a string, \texttt{.} can print any object.
+
+\begin{alltt}
+\textbf{ok} "Hi" .
+\textbf{"Hi"}
+\end{alltt}
+
+You might notice that \texttt{.} surrounds strings with quotes, while \texttt{print} prints the string without any kind of decoration. This is because \texttt{.} is a special word that outputs objects in a form \emph{that can be parsed back in}. This is a fundamental feature of Factor -- data is code, and code is data. We will learn some very deep consequences of this throughout this guide.
+
+If the stack is empty, calling \texttt{.} will raise an error. This is in general true for any word called with insufficient parameters, or parameters of the wrong type.
+
+The \texttt{clear} word removes all elements from the stack.
+
+\sidebar{
+In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
+}
+
+\section*{Review}
+
+Lets review the words  we've seen until now, and their stack effects. The ``vocab'' column will be described later, and only comes into play when we start working with source files. Basically, Factor's words are partitioned into vocabularies rather than being in one flat list.
+
+\wordtable{
+\tabvocab{syntax}
+\texttt{:~\emph{word}}&
+\texttt{( -{}- )}&
+Begin a word definion named \texttt{\emph{word}}.\\
+\texttt{;}&
+\texttt{( -{}- )}&
+End a word definion.\\
+\texttt{\ttbackslash\ \emph{word}}&
+\texttt{( -{}- )}&
+Push \texttt{\emph{word}} on the stack, instead of executing it.\\
+\tabvocab{stdio}
+\texttt{print}&
+\texttt{( string -{}- )}&
+Write a string to the console, with a new line.\\
+\texttt{write}&
+\texttt{( string -{}- )}&
+Write a string to the console, without a new line.\\
+\texttt{read}&
+\texttt{( -{}- string )}&
+Read a line of input from the console.\\
+\tabvocab{prettyprint}
+\texttt{.s}&
+\texttt{( -{}- )}&
+Print stack contents.\\
+\texttt{.}&
+\texttt{( value -{}- )}&
+Print value at top of stack in parsable form.\\
+\tabvocab{stack}
+\texttt{clear}&
+\texttt{( ...~-{}- )}&
+Clear stack contents.\\
+}
+
+From now on, each section will end with a summary of words and stack effects described in that section.
+
+\section{Arithmetic}
+
+\chapkeywords{+ - {*} / neg pred succ}
+\index{\texttt{+}}
+\index{\texttt{-}}
+\index{\texttt{*}}
+\index{\texttt{/}}
+\index{\texttt{neg}}
+\index{\texttt{pred}}
+\index{\texttt{succ}}
 
 The usual arithmetic operators \texttt{+ - {*} /} all take two parameters
 from the stack, and push one result back. Where the order of operands
 matters (\texttt{-} and \texttt{/}), the operands are taken in the natural order. For example:
 
 \begin{alltt}
-10 17 + .
-\emph{27}
-111 234 - .
-\emph{-123}
-333 3 / .
-\emph{111}
+\textbf{ok} 10 17 + .
+\textbf{27}
+\textbf{ok} 111 234 - .
+\textbf{-123}
+\textbf{ok} 333 3 / .
+\textbf{111}
+\end{alltt}
+
+The \texttt{neg} unary operator negates the number at the top of the stack (that is, multiplies it by -1). Two unary operators \texttt{pred} and \texttt{succ} subtract 1 and add 1, respectively, to the number at the top of the stack.
+
+\begin{alltt}
+\textbf{ok} 5 pred pred succ neg .
+\textbf{-4}
 \end{alltt}
 
 This type of arithmetic is called \emph{postfix}, because the operator
@@ -131,40 +348,23 @@ the two operands.
 
 More complicated infix expressions can be translated into postfix
 by translating the inner-most parts first. Grouping parentheses are
-never necessary:
+never necessary.
+
+Here is the postfix translation of $(2 + 3) \times 6$:
 
 \begin{alltt}
-! Postfix translation of (2 + 3) {*} 6
-2 3 + 6 {*}
-\emph{30}
-! Postfix translation of 2 + (3 {*} 6)
-2 3 6 {*} +
-\emph{20}
+\textbf{ok} 2 3 + 6 {*}
+\textbf{30}
 \end{alltt}
 
-\subsection{Factoring}
-
-New words can be defined in terms of existing words using the \emph{colon
-definition} syntax:
+Here is the postfix translation of $2 + (3 \times 6)$:
 
 \begin{alltt}
-: \emph{name} ( \emph{inputs} -{}- \emph{outputs} )
-    \#! \emph{Description}
-    \emph{factors ...} ;
+\textbf{ok} 2 3 6 {*} +
+\textbf{20}
 \end{alltt}
 
-When the new word is executed, each one of its factors gets executed,
-in turn.The stack effect comment delimited by \texttt{(} and \texttt{)},
-as well as the documentation comment starting with \texttt{!} are
-both optional, and can be placed anywhere in the source code, not
-just in colon definitions. The interpreter ignores comments -- don't you.
-
-Note that in a source file, a word definition can span multiple lines.
-However, the interactive interpreter expects each line of input to
-be ``complete'', so colon definitions that are input interactively must not contain line breaks.
-
-For example, say we are designing some aircraft
-navigation software. Suppose we need a word that takes the flight time, the aircraft
+As a simple example demonstrating postfix arithmetic, consider a word, presumably for an aircraft navigation system, that takes the flight time, the aircraft
 velocity, and the tailwind velocity, and returns the distance travelled.
 If the parameters are given on the stack in that order, all we do
 is add the top two elements (aircraft velocity, tailwind velocity)
@@ -172,20 +372,20 @@ and multiply it by the element underneath (flight time). So the definition
 looks like this:
 
 \begin{alltt}
-: distance ( time aircraft tailwind -{}- distance ) + {*} ;
-2 900 36 distance .
-\emph{1872}
+\textbf{ok} : distance ( time aircraft tailwind -{}- distance ) + {*} ;
+\textbf{ok} 2 900 36 distance .
+\textbf{1872}
 \end{alltt}
 
-Note that we are not using any distance or time units here. To extend this example to work with units, first assume that internally, all distances are
-in meters, and all time intervals are in seconds. We can define words
+Note that we are not using any distance or time units here. To extend this example to work with units, we make the assumption that for the purposes of computation, all distances are
+in meters, and all time intervals are in seconds. Then, we can define words
 for converting from kilometers to meters, and hours and minutes to
 seconds:
 
 \begin{alltt}
-: kilometers 1000 {*} ;
-: minutes 60 {*} ;
-: hours 60 {*} 60 {*} ;
+\textbf{ok} : kilometers 1000 {*} ;
+\textbf{ok} : minutes 60 {*} ;
+\textbf{ok} : hours 60 {*} 60 {*} ;
 2 kilometers .
 \emph{2000}
 10 minutes .
@@ -194,19 +394,56 @@ seconds:
 \emph{7200}
 \end{alltt}
 
-The implementation of \texttt{km/hour} is a bit more complex. We would like it to convert kilometers per hour to meters per second, to be consistent with the other units we defined. To get the desired result, we first have to convert to kilometers per second, then divide this by the number of seconds in one hour.
+The implementation of \texttt{km/hour} is a bit more complex. We would like it to convert kilometers per hour to meters per second. To get the desired result, we first have to convert to kilometers per second, then divide this by the number of seconds in one hour.
 
 \begin{alltt}
-: km/hour kilometers 1 hours / ;
-2 hours 900 km/hour 36 km/hour distance .
-\emph{1872000}
+\textbf{ok} : km/hour kilometers 1 hours / ;
+\textbf{ok} 2 hours 900 km/hour 36 km/hour distance .
+\textbf{1872000}
 \end{alltt}
 
-\subsection{Stack effects}
+\section*{Review}
 
-A stack effect comment contains a description of inputs to the left
-of \texttt{-{}-}, and a description of outputs to the right. As always,
-the top of the stack is on the right side.
+\wordtable{
+\tabvocab{math}
+\texttt{+}&
+\texttt{( x y -{}- z )}&
+Add \texttt{x} and \texttt{y}.\\
+\texttt{-}&
+\texttt{( x y -{}- z )}&
+Subtract \texttt{y} from \texttt{x}.\\
+\texttt{*}&
+\texttt{( x y -{}- z )}&
+Multiply \texttt{x} and \texttt{y}.\\
+\texttt{/}&
+\texttt{( x y -{}- z )}&
+Divide \texttt{x} by \texttt{y}.\\
+\texttt{pred}&
+\texttt{( x -{}- x-1 )}&
+Push the predecessor of \texttt{x}.\\
+\texttt{succ}&
+\texttt{( x -{}- x+1 )}&
+Push the successor of \texttt{x}.\\
+\texttt{neg}&
+\texttt{( x -{}- -1 )}&
+Negate \texttt{x}.\\
+}
+
+\section{Shuffle words}
+
+\chapkeywords{drop dup swap over nip dupd rot -rot tuck pick 2drop 2dup}
+\index{\texttt{drop}}
+\index{\texttt{dup}}
+\index{\texttt{swap}}
+\index{\texttt{over}}
+\index{\texttt{nip}}
+\index{\texttt{dupd}}
+\index{\texttt{rot}}
+\index{\texttt{-rot}}
+\index{\texttt{tuck}}
+\index{\texttt{pick}}
+\index{\texttt{2drop}}
+\index{\texttt{2dup}}
 
 Lets try writing a word to compute the cube of a number. 
 Three numbers on the stack can be multiplied together using \texttt{{*}
@@ -219,8 +456,7 @@ Three numbers on the stack can be multiplied together using \texttt{{*}
 
 However, the stack effect of \texttt{{*} {*}} is \texttt{( a b c -{}-
 a{*}b{*}c )}. We would like to write a word that takes \emph{one} input
-only. To achieve this, we need to be able to duplicate the top stack
-element twice. As it happens, there is a word \texttt{dup ( x -{}-
+only, and multiplies it by itself three times. To achieve this, we need to make two copies of the top stack element, and then execute \texttt{{*} {*}}. As it happens, there is a word \texttt{dup ( x -{}-
 x x )} for precisely this purpose. Now, we are able to define the
 \texttt{cube} word:
 
@@ -231,134 +467,963 @@ x x )} for precisely this purpose. Now, we are able to define the
 -2 cube .
 \emph{-8}
 \end{alltt}
-It is quite often the case that we want to compose two factors in
-a colon definition, but their stack effects don't {}``match up''.
 
-There is a set of \emph{shuffle words} for solving precisely this
-problem. These words are so-called because they simply rearrange stack
-elements in some fashion, without modifying them in any way. Lets
-take a look at the most frequently-used shuffle words:
+The \texttt{dup} word is just one of the several so-called \emph{shuffle words}. Shuffle words are used to solve the problem of composing two words whose stack effects don't quite {}``match up''.
 
-\texttt{drop ( x -{}- )} Discard the top stack element. Used when
-a word returns a value that is not needed.
+Lets take a look at the four most-frequently used shuffle words:
 
-\texttt{dup ( x -{}- x x )} Duplicate the top stack element. Used
-when a value is required as input for more than one word.
+\wordtable{
+\tabvocab{stack}
+\texttt{drop}&
+\texttt{( x -{}- )}&
+Discard the top stack element. Used when
+a word returns a value that is not needed.\\
+\texttt{dup}&
+\texttt{( x -{}- x x )}&
+Duplicate the top stack element. Used
+when a value is required as input for more than one word.\\
+\texttt{swap}&
+\texttt{( x y -{}- y x )}&
+Swap top two stack elements. Used when
+a word expects parameters in a different order.\\
+\texttt{over}&
+\texttt{( x y -{}- x y x )}&
+Bring the second stack element {}``over''
+the top element.\\}
 
-\texttt{swap ( x y -{}- y x )} Swap top two stack elements. Used when
-a word expects parameters in a different order.
+The remaining shuffle words are not used nearly as often, but are nonetheless handy in certian situations:
 
-\texttt{over ( x y -{}- x y x )} Bring the second stack element ``over''
-the top element.
-
-\texttt{rot ( x y z -{}- y z x )} Rotate top three stack elements
-to the left.
-
-\texttt{-rot ( x y z -{}- z x y )} Rotate top three stack elements
-to the right.
-
-\texttt{nip ( x y -{}- y )} Remove the second stack element.
-
-\texttt{tuck ( x y -{}- y x y )} Tuck the top stack element under
-the second stack element.
-
-\texttt{dupd ( x y -{}- x x y )} Duplicate the second stack element.
-
-\texttt{2drop ( x y -{}- )} Discard the top two stack elements.
-
-\texttt{2dup ( x y -{}- x y x y )} Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.
-
-\texttt{3drop ( x y z -{}- )} Discard the top three stack elements.
-
-\texttt{3dup ( x y z -{}- x y z x y z )} Duplicate the top three stack elements.
+\wordtable{
+\tabvocab{stack}
+\texttt{nip}&
+\texttt{( x y -{}- y )}&
+Remove the second stack element.\\
+\texttt{dupd}&
+\texttt{( x y -{}- x x y )}&
+Duplicate the second stack element.\\
+\texttt{rot}&
+\texttt{( x y z -{}- y z x )}&
+Rotate top three stack elements
+to the left.\\
+\texttt{-rot}&
+\texttt{( x y z -{}- z x y )}&
+Rotate top three stack elements
+to the right.\\
+\texttt{tuck}&
+\texttt{( x y -{}- y x y )}&
+``Tuck'' the top stack element under
+the second stack element.\\
+\texttt{pick}&
+\texttt{( x y z -{}- x y z x )}&
+``Pick'' the third stack element.\\
+\texttt{2drop}&
+\texttt{( x y -{}- )}&
+Discard the top two stack elements.\\
+\texttt{2dup}&
+\texttt{( x y -{}- x y x y )}&
+Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.\\
+}
 
 You should try all these words out and become familiar with them. Push some numbers on the stack,
 execute a shuffle word, and look at how the stack contents was changed using
 \texttt{.s}. Compare the stack contents with the stack effects above.
 
-Note the order of the shuffle word descriptions above. The ones at
-the top are used most often because they are easy to understand. The
-more complex ones such as \texttt{rot} and \texttt{2dup} should be avoided unless absolutely necessary, because
-they make the flow of data in a word definition harder to understand.
-
-If you find yourself using too many shuffle words, or you're writing
-a stack effect comment in the middle of a colon definition, it is
+Try to avoid the complex shuffle words such as \texttt{rot} and \texttt{2dup} as much as possible. They make data flow harder to understand. If you find yourself using too many shuffle words, or you're writing
+a stack effect comment in the middle of a colon definition to keep track of stack contents, it is
 a good sign that the word should probably be factored into two or
-more words. Each word should take at most a couple of sentences to describe. Effective factoring is like riding a bicycle -- once you ``get it'', it becomes second nature.
+more smaller words.
 
+A good rule of thumb is that each word should take at most a couple of sentences to describe; if it is so complex that you have to write more than that in a documentation comment, the word should be split up.
 
-\subsection{Vocabularies}
+Effective factoring is like riding a bicycle -- once you ``get it'', it becomes second nature.
 
-When an expression is parsed, each token in turn is looked up in the dictionary. If there is no dictionary entry, the token is parsed as a number instead.
-The dictionary of words is structured as a set of named \emph{vocabularies}. Each vocabulary is a list
-of related words -- for example, the {}``lists''
-vocabulary contains words for working with linked lists.
+\section{Working with the stack}
 
-When a word is read by the parser, the \emph{vocabulary search path}
-determines which vocabularies to search. In the interactive interpreter,
-the default search path contains a large number of vocabularies. Contrast
-this to the situation when a file is being parsed -- the search path
-has a minimal set of vocabularies containing basic parsing words.%
-\footnote{The rationale here is that the interactive interpreter should have
-a large number of words available for convenience, whereas
-source files should specify their external dependencies explicitly.%
+\chapkeywords{sq sqrt}
+\index{\texttt{sq}}
+\index{\texttt{sqrt}}
+
+In this section, we will work through the construction of a word for solving quadratic equations, that is, finding values of $x$ that satisfy $ax^2+bx+c=0$, where $a$, $b$ and $c$ are given to us. If you don't like math, take comfort in the fact this is the last mathematical example for a while!
+
+First, note that \texttt{sq} multiplies the top of the stack by itself, and \texttt{sqrt} takes the square root of a number:
+
+\begin{alltt}
+\textbf{ok} 5 sq .
+\textbf{25}
+\textbf{ok} 2 sqrt .
+\textbf{1.414213562373095}
+\end{alltt}
+
+The mathematical formula that gives a value of $x$ for known $a$, $b$ and $c$ might be familiar to you:
+
+$$x=\frac{-b}{2a}\pm\sqrt{\frac{b^2-4ac}{4a^2}}$$
+
+We will compute the left-hand side first. The word to compute it will be named \texttt{quadratic-e}, and it will take the values $a$ and $b$ on the stack:
+
+\begin{verbatim}
+: quadratic-e ( b a -- -b/2a )
+    2 * / neg ;
+\end{verbatim}
+
+Now, lets code the right hand side of the equation:
+
+\begin{verbatim}
+: quadratic-d ( a b c -- d )
+    pick 4 * * swap sq swap - swap sq 4 * / sqrt ;
+\end{verbatim}
+
+To understand how \texttt{quadratic-d} works, consider the stack after each step:
+
+\begin{tabular}{|l|l|}
+\hline
+Word:&Stack after:\\
+\hline
+Initial:&$a$ $b$ $c$\\
+\hline
+\texttt{pick}&$a$ $b$ $c$ $a$\\
+\hline
+\texttt{4}&$a$ $b$ $c$ $a$ $4$\\
+\hline
+\texttt{*}&$a$ $b$ $c$ $4a$\\
+\hline
+\texttt{*}&$a$ $b$ $4ac$\\
+\hline
+\texttt{swap}&$a$ $4ac$ $b$\\
+\hline
+\texttt{sq}&$a$ $4ac$ $b^2$\\
+\hline
+\texttt{swap}&$a$ $b^2$ $4ac$\\
+\hline
+\texttt{-}&$a$ $b^2-4ac$\\
+\hline
+\texttt{swap}&$b^2-4ac$ $a$\\
+\hline
+\texttt{sq}&$b^2-4ac$ $a^2$\\
+\hline
+\texttt{4}&$b^2-4ac$ $a^2$ $4$\\
+\hline
+\texttt{*}&$b^2-4ac$ $4a^2$\\
+\hline
+\texttt{/}&$\frac{b^2-4ac}{4a^2}$\\
+\hline
+\texttt{sqrt}&$\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\end{tabular}
+
+Now, we need a word that takes the values computed by \texttt{quadratic-e} and \texttt{quadratic-d}, and returns two values, one being the sum, the other being the difference. This is the $\pm$ part of the formula:
+
+\begin{verbatim}
+: quadratic-roots ( e d -- alpha beta )
+    2dup + -rot - ;
+\end{verbatim}
+
+You should be able to work through the stack flow of the above word in your head. Test it with a few inputs.
+
+Finally, we can put these three words together into a complete program:
+
+\begin{verbatim}
+: quadratic ( a b c -- alpha beta )
+    3dup quadratic-d
+    nip swap rot quadratic-e
+    swap quadratic-roots ;
+\end{verbatim}
+
+Again, lets look at the stack after each step of the execution of \texttt{quadratic}:
+
+\begin{tabular}{|l|l|}
+\hline
+Word:&Stack after:\\
+\hline
+Initial:&$a$ $b$ $c$\\
+\hline
+\texttt{3dup}&$a$ $b$ $c$ $a$ $b$ $c$\\
+\hline
+\texttt{quadratic-d}&$a$ $b$ $c$ $\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\texttt{nip}&$a$ $b$ $\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\texttt{swap}&$a$ $\sqrt{\frac{b^2-4ac}{4a^2}}$ $b$ \\
+\hline
+\texttt{rot}&$\sqrt{\frac{b^2-4ac}{4a^2}}$ $b$ $a$ \\
+\hline
+\texttt{quadratic-e}&$\sqrt{\frac{b^2-4ac}{4a^2}}$ $\frac{-b}{2a}$\\
+\hline
+\texttt{quadratic-roots}&$\frac{-b}{2a}+\sqrt{\frac{b^2-4ac}{4a^2}}$ $\frac{-b}{2a}-\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\end{tabular}
+
+You can test \texttt{quadratic} with a handful of inputs:
+
+\begin{alltt}
+\textbf{ok} 1 2 1 quadratic . .
+\textbf{-1.0}
+\textbf{-1.0}
+\textbf{ok} 1 -5 4 quadratic . .
+\textbf{1.0}
+\textbf{4.0}
+\textbf{ok} 1 0 1 quadratic . .
+\textbf{#\{ 0 -1.0 \}
+#\{ 0 1.0 \}}
+\end{alltt}
+
+The last example shows that Factor can handle complex numbers perfectly well. We will have more to say about complex numbers later.
+
+\section*{Review}
+
+\wordtable{
+\tabvocab{math}
+\texttt{sq}&
+\texttt{( x -{}- x*x )}&
+Square of a number.\\
+\texttt{sqrt}&
+\texttt{( x -{}- sqrt[x] )}&
+Square root of a number.\\
 }
 
-How do you know which vocabulary contains a word? Vocabularies can
-be listed, and ``apropos'' searches can be performed:
+\section{Source files}
+
+\chapkeywords{run-file apropos.~USE: IN:}
+\index{\texttt{run-file}}
+\index{\texttt{apropos.}}
+\index{\texttt{IN:}}
+\index{\texttt{USE:}}
+
+Entering colon definitions at the listener is very convenient for quick testing, but for serious work you should save your work in source files with the \texttt{.factor} filename extension. Any text editor will do, but if you use jEdit\footnote{\texttt{http://www.jedit.org}}, you can take advantage of the powerful integration features found in the Factor plugin. Consult the plugin documentation for details.
+
+Lets put our program for solving quadratic equations in a source file. Create a file named \texttt{quadratic.factor} in your favorite editor, and add the following content:
+
+\begin{verbatim}
+: quadratic-e ( b a -- -b/2a )
+    2 * / neg ;
+
+: quadratic-d ( a b c -- d )
+    pick 4 * * swap sq swap - swap sq 4 * / sqrt ;
+
+: quadratic-roots ( d e -- alpha beta )
+    2dup + -rot - ;
+
+: quadratic ( a b c -- alpha beta )
+    3dup quadratic-d
+    nip swap rot quadratic-e
+    swap quadratic-roots ;
+\end{verbatim}
+
+Now, load the source file in the Factor interpreter using the \texttt{run-file} word:
 
 \begin{alltt}
-"init" words.
-\emph{{[} ?run-file boot cli-arg cli-param init-environment}
-\emph{init-gc init-interpreter init-scratchpad init-search-path}
-\emph{init-stdio init-toplevel parse-command-line parse-switches}
-\emph{run-files run-user-init stdin stdout {]} }
-
-"map" apropos.
-\emph{IN: lists}
-\emph{map}
-\emph{IN: strings}
-\emph{str-map}
-\emph{IN: vectors}
-\emph{(vector-map)}
-\emph{(vector-map-step)}
-\emph{vector-map }
+\textbf{ok} "quadratic.factor" run-file
+\textbf{/home/slava/quadratic.factor:2: Not a number
+    2 * / neg ;
+       ^
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
 \end{alltt}
 
-New vocabularies are added to the search path using the \texttt{USE:}
-parsing word. For example:
+Oops! What happened? It looks like it is not recognizing the \texttt{*} word, which works fine in the listener! The problem is that while most words in the library are available for use at the listener, source files must explicitly declare which \texttt{vocabularies} they make use of. To find out which vocabulary holds the \texttt{*} word, use \texttt{apropos.}:
 
 \begin{alltt}
-"/home/slava/.factor-rc" exists? .
-\emph{ERROR: <interactive>:1: Undefined: exists?}
-USE: streams
-"/home/slava/.factor-rc" exists? .
-\emph{t}
+\textbf{ok} "*" apropos.
+\emph{...}
+\textbf{IN: math
+*}
+\emph{...}
 \end{alltt}
 
-New words are defined in the \emph{input vocabulary}. The input vocabulary
-can be changed at the interactive prompt, or in a source file, using
-the \texttt{IN:} parsing word. For example:
+The \texttt{apropos.}~word searches for words whose name contains a given string. As you can see, there are a number of words whose name contains \texttt{*}, but the one we are looking for is \texttt{*} itself, in the \texttt{math} vocabulary. To make use of the \texttt{math} vocabulary, simply add the following \texttt{vocabulary use declaration} at the beginning of the \texttt{quadratic.factor} source file:
 
-\begin{alltt}
-IN: music-database
-: random-playlist ... ;
-\end{alltt}
-It is a convention (although it is not enforced by the parser) that
-the \texttt{IN:} directive is the first statement in a source file,
-and all \texttt{USE:} follow, before any other definitions.
-
-Here is an example of a typical series of vocabulary declarations:
-
-\begin{alltt}
-IN: todo-list
-USE: kernel
-USE: lists
+\begin{verbatim}
 USE: math
-USE: strings
+\end{verbatim}
+
+Now, try loading the file again. This time, an error will be displayed because the \texttt{pick} word cannot be found. Use \texttt{apropos.} to confirm that \texttt{pick} is in the \texttt{stack} vocabulary, and add the appropriate declaration at the start of the source file. Then, the source file should load without any errors.
+
+By default, words you define go in the \texttt{scratchpad} vocabulary. To change this, add a declaration to the start of the source file:
+
+\texttt{IN: quadratic}
+
+Now, to use the words defined within, you must issue the following command in the listener first:
+
+\begin{alltt}
+\textbf{ok} USE: quadratic
 \end{alltt}
 
-\section{PRACTICAL: Numbers game}
+\sidebar{If you are using jEdit, you can use the \textbf{Plugins}>\textbf{Factor}>\textbf{Use word at caret} command to insert a \texttt{USE:} declaration for the word at the caret.}
+
+\section*{Review}
+
+\wordtable{
+\tabvocab{parser}
+\texttt{run-file}&
+\texttt{( string -{}- )}&
+Load a source file with the given name.\\
+\tabvocab{syntax}
+\texttt{USE: \emph{vocab}}&
+\texttt{( -{}- )}&
+Add a vocabulary to the search path.\\
+\texttt{IN: \emph{vocab}}&
+\texttt{( -{}- )}&
+Set vocabulary for new word definitions.\\
+\tabvocab{words}
+\texttt{apropos.}&
+\texttt{( string -{}- )}&
+List all words whose name contains a given string, and the vocabularies they are found in.\\
+}
+
+\section{Exploring the library}
+
+\chapkeywords{apropos.~see ~vocabs.~words.~httpd}
+
+We already saw two ways to explore the Factor library in previous sections: the \texttt{see} word, which shows a word definition, and \texttt{apropos.}~ which helps locate a word and its vocabulary if we know part of its name.
+
+Entering \texttt{vocabs.}~in the listener produces a list of all existing vocabularies:
+
+\begin{alltt}
+\textbf{ok} vocabs.
+\textbf{[ "alien" "ansi" "combinators" "compiler" "continuations"
+"errors" "file-responder" "files" "format" "hashtables"
+"html" "httpd" "httpd-responder" "image" "inference" "init"
+"inspect-responder" "inspector" "interpreter" "io-internals"
+"jedit" "kernel" "listener" "lists" "logging" "logic" "math"
+"namespaces" "parser" "presentation" "prettyprint"
+"processes" "profiler" "quit-responder" "random" "real-math"
+"resource-responder" "scratchpad" "sdl" "sdl-event"
+"sdl-gfx" "sdl-keysym" "sdl-video" "stack" "stdio" "streams"
+"strings" "syntax" "telnetd" "test" "test-responder"
+"threads" "unparser" "url-encoding" "vectors" "words" ]
+}
+\end{alltt}
+
+As you can see, there are a lot of vocabularies! Now, you can use \texttt{words.}~to list the words inside a given vocabulary:
+
+\begin{alltt}
+\textbf{ok} "lists" words.
+\textbf{[ (cons-hashcode) (count) (each) (partition) (top) , 2car
+2cdr 2cons 2list 2swons 3list =-or-contains? acons acons@
+all=? all? append assoc assoc* assoc-apply assoc? car cdr
+cons cons-hashcode cons= cons? cons@ contains? count each
+last last* length list>vector list? make-list make-rlist map
+maximize nth num-sort partition partition-add partition-step
+prune remove remove-assoc remove@ reverse set-assoc sort
+stack>list subset swons tail top tree-contains? uncons
+uncons@ unique unique, unique@ unit unswons unzip
+vector>list ]}
+\end{alltt}
+
+Any word definition can then be shown using \texttt{see}, but you might have to \texttt{USE:} the vocabulary first.
+
+\begin{alltt}
+\textbf{ok} USE: presentation
+\textbf{ok} \ttbackslash set-style see
+\textbf{IN: presentation
+: set-style ( style name -- )
+    "styles" get set-hash ;}
+\end{alltt}
+
+A more sophisticated way to browse the library is using the integrated HTTP server. You can start the HTTP server using the following pair of commands:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} 8888 httpd
+\end{alltt}
+
+Then, point your browser to the following URL, and start browsing:
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/inspect/vocabularies}
+\end{quote}
+
+To stop the HTTP server, point your browser to
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/quit}.
+\end{quote}
+
+You can even start the HTTP in a separate thread, using the following commands:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} USE: threads
+\textbf{ok} [ 8888 httpd ] in-thread
+\end{alltt}
+
+This way, you can browse code and play in the listener at the same time.
+
+\section*{Review}
+
+\wordtable{
+\tabvocab{words}
+\texttt{apropos.}&
+\texttt{( string -{}- )}&
+Search for words whose name contains a string.\\
+\texttt{vocabs.}&
+\texttt{( -{}- )}&
+List all vocabularies.\\
+\texttt{words.}&
+\texttt{( string -{}- )}&
+List all words in a given vocabulary.\\
+\tabvocab{httpd}
+\texttt{httpd}&
+\texttt{( port -{}- )}&
+Start an HTTP server on the given port.\\
+}
+
+\chapter{Working with data}
+
+This chapter will introduce the fundamental data type used in Factor -- the list.
+This will lead is to a discussion of debugging, conditional execution, recursion, and higher-order words, as well as a peek inside the interpreter, and an introduction to unit testing. If you have used another programming language, you will no doubt find using lists for all data limiting; other data types, such as vectors and hashtables, are introduced in later sections. However, a good understanding of lists is fundamental since they are used more than any other data type. 
+
+\section{Lists and cons cells}
+
+\chapkeywords{cons car cdr uncons unit}
+\index{\texttt{cons}}
+\index{\texttt{car}}
+\index{\texttt{cdr}}
+\index{\texttt{uncons}}
+\index{\texttt{unit}}
+
+A \emph{cons cell} is an ordered pair of values. The first value is called the \emph{car},
+the second is called the \emph{cdr}.
+
+The \texttt{cons} word takes two values from the stack, and pushes a cons cell containing both values:
+
+\begin{alltt}
+\textbf{ok} "fish" "chips" cons .
+\textbf{{[} "fish" | "chips" {]}}
+\end{alltt}
+
+Recall that \texttt{.}~prints objects in a form that can be parsed back in. This suggests that there is a literal syntax for cons cells. The difference between the literal syntax and calling \texttt{cons} is two-fold; \texttt{cons} can be used to make a cons cell whose components are computed values, and not literals, and \texttt{cons} allocates a new cons cell each time it is called, whereas a literal is allocated once.
+
+The \texttt{car} and \texttt{cdr} words push the constituents of a cons cell at the top of the stack.
+
+\begin{alltt}
+\textbf{ok} 5 "blind mice" cons car .
+\textbf{5}
+\textbf{ok} "peanut butter" "jelly" cons cdr .
+\textbf{"jelly"}
+\end{alltt}
+
+The \texttt{uncons} word pushes both the car and cdr of the cons cell at once:
+
+\begin{alltt}
+\textbf{ok} {[} "potatoes" | "gravy" {]} uncons .s
+\textbf{\{ "potatoes" "gravy" \}}
+\end{alltt}
+
+If you think back for a second to the previous section on shuffle words, you might be able to guess how \texttt{uncons} is implemented in terms of \texttt{car} and \texttt{cdr}:
+
+\begin{alltt}
+: uncons ( {[} car | cdr {]} -- car cdr ) dup car swap cdr ;
+\end{alltt}
+
+The cons cell is duplicated, its car is taken, the car is swapped with the cons cell, putting the cons cell at the top of the stack, and finally, the cdr of the cons cell is taken.
+
+Lists of values are represented with nested cons cells. The car is the first element of the list; the cdr is the rest of the list. The following example demonstrates this, along with the literal syntax used to print lists:
+
+\begin{alltt}
+\textbf{ok} {[} 1 2 3 4 {]} car .
+\textbf{1}
+\textbf{ok} {[} 1 2 3 4 {]} cdr .
+\textbf{{[} 2 3 4 {]}}
+\textbf{ok} {[} 1 2 3 4 {]} cdr cdr .
+\textbf{{[} 3 4 {]}}
+\end{alltt}
+
+Note that taking the cdr of a list of three elements gives a list of two elements; taking the cdr of a list of two elements returns a list of one element. So what is the cdr of a list of one element? It is the special value \texttt{f}:
+
+\begin{alltt}
+\textbf{ok} {[} "snowpeas" {]} cdr .
+\textbf{f}
+\end{alltt}
+
+The special value \texttt{f} represents the empty list. Hence you can see how cons cells and \texttt{f} allow lists of values to be constructed. If you are used to other languages, this might seem counter-intuitive at first, however the utility of this construction will come into play when we consider recursive words later in this chapter.
+
+One thing worth mentioning is the concept of an \emph{improper list}. An improper list is one where the cdr of the last cons cell is not \texttt{f}. Improper lists are input with the following syntax:
+
+\begin{verbatim}
+[ 1 2 3 | 4 ]
+\end{verbatim}
+
+Improper lists are rarely used, but it helps to be aware of their existence. Lists that are not improper lists are sometimes called \emph{proper lists}.
+
+Lets review the words we've seen in this section:
+
+\wordtable{
+\tabvocab{syntax}
+\texttt{{[}}&
+\texttt{( -{}- )}&
+Begin a literal list.\\
+\texttt{{]}}&
+\texttt{( -{}- )}&
+End a literal list.\\
+\tabvocab{lists}
+\texttt{cons}&
+\texttt{( car cdr -{}- {[} car | cdr {]} )}&
+Construct a cons cell.\\
+\texttt{car}&
+\texttt{( {[} car | cdr {]} -{}- car )}&
+Push the first element of a list.\\
+\texttt{cdr}&
+\texttt{( {[} car | cdr {]} -{}- cdr )}&
+Push the rest of the list without the first element.\\
+\texttt{uncons}&
+\texttt{( {[} car | cdr {]} -{}- car cdr )}&
+Push both components of a cons cell.\\}
+
+\section{Operations on lists}
+
+\chapkeywords{unit append reverse contains?}
+\index{\texttt{unit}}
+\index{\texttt{append}}
+\index{\texttt{reverse}}
+\index{\texttt{contains?}}
+
+The \texttt{lists} vocabulary defines a large number of words for working with lists. The most important ones will be covered in this section. Later sections will cover other words, usually with a discussion of their implementation.
+
+The \texttt{unit} word makes a list of one element. It does this by consing the top of the stack with the empty list \texttt{f}:
+
+\begin{alltt}
+: unit ( a -- {[} a {]} ) f cons ;
+\end{alltt}
+
+The \texttt{append} word appends two lists at the top of the stack:
+
+\begin{alltt}
+\textbf{ok} {[} "bacon" "eggs" {]} {[} "pancakes" "syrup" {]} append .
+\textbf{{[} "bacon" "eggs" "pancakes" "syrup" {]}}
+\end{alltt}
+
+Interestingly, only the first parameter has to be a list. if the second parameter
+is an improper list, or just a list at all, \texttt{append} returns an improper list:
+
+\begin{alltt}
+\textbf{ok} {[} "molasses" "treacle" {]} "caramel" append .
+\textbf{{[} "molasses" "treacle" | "caramel" {]}}
+\end{alltt}
+
+The \texttt{reverse} word creates a new list whose elements are in reverse order of the given list:
+
+\begin{alltt}
+\textbf{ok} {[} "steak" "chips" "gravy" {]} reverse .
+\textbf{{[} "gravy" "chips" "steak" {]}}
+\end{alltt}
+
+The \texttt{contains?}~word checks if a list contains a given element. The element comes first on the stack, underneath the list:
+
+\begin{alltt}
+\textbf{ok} : desert? {[} "ice cream" "cake" "cocoa" {]} contains? ;
+\textbf{ok} "stew" desert? .
+\textbf{f}
+\textbf{ok} "cake" desert? .
+\textbf{{[} "cake" "cocoa" {]}}
+\end{alltt}
+
+What exactly is going on in the mouth-watering example above? The \texttt{contains?}~word returns \texttt{f} if the element does not occur in the list, and returns \emph{the remainder of the list} if the element occurs in the list. The significance of this will become apparent in the next section -- \texttt{f} represents boolean falsity in a conditional statement.
+
+Note that we glossed the concept of object equality here -- you might wonder how \texttt{contains?}~decides if the element ``occurs'' in the list or not. It turns out it uses the \texttt{=} word, which checks if two objects have the same structure. Another way to check for equality is using \texttt{eq?}, which checks if two references refer to the same object. Both of these words will be covered in detail later.
+
+Lets review the words we saw in this section:
+
+\wordtable{
+\tabvocab{lists}
+\texttt{unit}&
+\texttt{( a -{}- {[} a {]} )}&
+Make a list of one element.\\
+\texttt{append}&
+\texttt{( list list -{}- list )}&
+Append two lists.\\
+\texttt{reverse}&
+\texttt{( list -{}- list )}&
+Reverse a list.\\
+\texttt{contains?}&
+\texttt{( value list -{}- ?~)}&
+Determine if a list contains a value.\\}
+
+\section{Conditional execution}
+
+\chapkeywords{f t ifte when unless unique abs infer}
+\index{\texttt{f}}
+\index{\texttt{t}}
+\index{\texttt{ifte}}
+\index{\texttt{when}}
+\index{\texttt{unless}}
+\index{\texttt{unique?}}
+\index{\texttt{abs}}
+\index{\texttt{ifer}}
+
+Until now, all code examples we've considered have been linear in nature; each word is executed in turn, left to right. To perform useful computations, we need the ability the execute different code depending on circumstances.
+
+The simplest style of a conditional form in Factor is the following:
+
+\begin{alltt}
+\emph{condition} {[}
+    \emph{to execute if true}
+{] [}
+    \emph{to execute if false}
+{]} ifte
+\end{alltt}
+
+The \texttt{ifte} word is a \emph{combinator}, because it executes lists representing code, or \emph{quotations}, given on the stack.
+
+The condition should be some piece of code that leaves a truth value on the stack. What is a truth value? In Factor, there is no special boolean data type
+-- instead, the special value \texttt{f} we've already seen to represent empty lists also represents falsity. Every other object represents boolean truth. In cases where a truth value must be explicitly produced, the value \texttt{t} can be used. The \texttt{ifte} word removes the condition from the stack, and executes one of the two branches depending on the truth value of the condition.
+
+A good first example to look at is the \texttt{unique} word. This word conses a value onto a list as long as the value does not already occur in the list. Otherwise, the original list is returned. You can guess that this word somehow involves \texttt{contains?}~and \texttt{cons}. Check out its implementation using \texttt{see} and your intuition will be confirmed:
+
+\begin{alltt}
+: unique ( elem list -- list )
+    2dup contains? [ nip ] [ cons ] ifte ;
+\end{alltt}
+
+The first the word does is duplicate the two values given as input, since \texttt{contains?}~consumes its inputs. If the value does occur in the list, \texttt{contains?}~returns the remainder of the list starting from the first occurrence; in other words, a truth value. This calls \texttt{nip}, which removes the value from the stack, leaving the original list at the top of the stack. On the other hand, if the value does not occur in the list, \texttt{contains?}~returns \texttt{f}, which causes the other branch of the conditional to execute. This branch calls \texttt{cons}, which adds the value at the beginning of the list. 
+
+Another frequently-used combinator \texttt{when}. This combinator is a variation of \texttt{ifte}, except only one quotation is given. If the condition is true, the quotation is executed. Nothing is done if the condition is false. In fact \texttt{when} is implemented in terms of \texttt{ifte}. Since \texttt{when} is called with a quotation on the stack, it suffices to push an empty list, and call \texttt{ifte} -- the given quotation is the true branch, and the empty quotation is the false branch:
+
+\begin{verbatim}
+: when ( ? quot -- )
+    [ ] ifte ;
+\end{verbatim}
+
+An example of a word that uses both \texttt{ifte} and \texttt{when} is the \texttt{abs} word, which computes the absolute value of a number:
+
+\begin{verbatim}
+: abs ( z -- abs )
+    dup complex? [
+        >rect mag2
+    ] [
+        dup 0 < [ neg ] when
+    ] ifte ;
+\end{verbatim}
+
+If the given number is a complex number, its distance from the origin is computed\footnote{Don't worry about the \texttt{>rect} and \texttt{mag2} words at this stage; they will be described later. If you are curious, use \texttt{see} to look at their definitions and read the documentation comments.}. Otherwise, if the parameter is a real number below zero, it is negated. If it is a real number greater than zero, it is not modified.
+
+The dual of the \texttt{when} combinator is the \texttt{unless} combinator. It takes a quotation to execute if the condition is false; otherwise nothing is done. In both cases, the condition is popped off the stack.
+
+The implementation is similar to that of \texttt{when}, but this time, we must swap the two quotations given to \texttt{ifte}, so that the true branch is an empty list, and the false branch is the user's quotation:
+
+\begin{verbatim}
+: unless ( ? quot -- )
+    [ ] swap ifte ;
+\end{verbatim}
+
+A very simple example of \texttt{unless} usage is the \texttt{assert} word:
+
+\begin{verbatim}
+: assert ( t -- )
+    [ "Assertion failed!" throw ] unless ;
+\end{verbatim}
+
+This word is used for unit testing -- it raises an error and stops execution if the top of the stack is false.
+
+\subsection{Stack effects of conditionals}
+
+It is good style to ensure that both branches of conditionals you write have the same stack effect. This makes words easier to debug. Since it is easy to make a stack flow mistake when working with conditionals, Factor includes a \emph{stack effect inference} tool. It can be used as follows:
+
+\begin{alltt}
+\textbf{ok} [ 2dup contains? [ nip ] [ cons ] ifte ] infer .
+\textbf{[ 2 | 1 ]}
+\end{alltt}
+
+The output indicates that the code snippet\footnote{The proper term for a code snippet is a ``quotation''. You will learn about quotations later.} takes two values from the stack, and leaves one. Now lets see what happends if we forget about the \texttt{nip} and try to infer the stack effect:
+
+\begin{alltt}
+\textbf{ok} [ 2dup contains? [ ] [ cons ] ifte ] infer .
+\textbf{ERROR: Unbalanced ifte branches
+:s :r :n :c show stacks at time of error.}
+\end{alltt}
+
+Now lets look at the stack effect of the \texttt{abs} word. First, verify that each branch has the same stack effect:
+ 
+\begin{alltt}
+\textbf{ok} [ >rect mag2 ] infer .
+\textbf{[ 1 | 1 ]}
+\textbf{ok} [ dup 0 < [ neg ] when ] infer .
+\textbf{[ 1 | 1 ]}
+\end{alltt}
+
+Since the branches are balanced, the stack effect of the entire conditional expression can be computed:
+
+\begin{alltt}
+\textbf{ok} [ abs ] infer .
+\textbf{[ 1 | 1 ]}
+\end{alltt}
+
+\subsection*{Review}
+
+\wordtable{
+\tabvocab{syntax}
+\texttt{f}&
+\texttt{( -{}- f )}&
+Empty list, and boolean falsity.\\
+\texttt{t}&
+\texttt{( -{}- f )}&
+Canonical truth value.\\
+\tabvocab{combinators}
+\texttt{ifte}&
+\texttt{( ?~true false -{}- )}&
+Execute either \texttt{true} or \texttt{false} depending on the boolean value of the conditional.\\
+\texttt{when}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
+\texttt{unless}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is false, otherwise do nothing but pop the condition and quotation off the stack.\\
+\tabvocab{lists}
+\texttt{unique}&
+\texttt{( elem list -{}- )}&
+Prepend an element to a list if it does not occur in the
+list.\\
+\tabvocab{math}
+\texttt{abs}&
+\texttt{( z -- abs )}&
+Compute the complex absolute value.\\
+\tabvocab{test}
+\texttt{assert}&
+\texttt{( t -- )}&
+Raise an error if the top of the stack is \texttt{f}.\\
+\tabvocab{inference}
+\texttt{infer}&
+\texttt{( quot -{}- {[} in | out {]} )}&
+Infer stack effect of code, if possible.\\}
+
+\section{Recursion}
+
+\chapkeywords{ifte when cons?~last last* list?}
+\index{\texttt{ifte}}
+\index{\texttt{when}}
+\index{\texttt{cons?}}
+\index{\texttt{last}}
+\index{\texttt{last*}}
+\index{\texttt{list?}}
+
+The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional. The general form of a recursive word looks as follows:
+
+\begin{alltt}
+: recursive
+    \emph{condition} {[}
+        \emph{recursive case}
+    {] [}
+        \emph{base case}
+    {]} ifte ;
+\end{alltt}
+
+Use \texttt{see} to take a look at the \texttt{last} word; it pushes the last element of a list:
+
+\begin{alltt}
+: last ( list -- last )
+    last* car ;
+\end{alltt}
+
+As you can see, it makes a call to an auxilliary word \texttt{last*}, and takes the car of the return value. As you can guess by looking at the output of \texttt{see}, \texttt{last*} pushes the last cons cell in a list:
+
+\begin{verbatim}
+: last* ( list -- last )
+    dup cdr cons? [ cdr last* ] when ;
+\end{verbatim}
+
+So if the top of stack is a cons cell whose cdr is not a cons cell, the cons cell remains on the stack -- it gets duplicated, its cdr is taken, the \texttt{cons?} predicate tests if it is a cons cell, then \texttt{when} consumes the condition, and takes the empty ``false'' branch. This is the \emph{base case} -- the last cons cell of a one-element list is the list itself.
+
+If the cdr of the list at the top of the stack is another cons cell, then something magical happends -- \texttt{last*} calls itself again, but this time, with the cdr of the list. The recursive call, in turn, checks of the end of the list has been reached; if not, it makes another recursive call, and so on.
+
+Lets test the word:
+
+\begin{alltt}
+\textbf{ok} {[} "salad" "pizza" "pasta" "pancakes" {]} last* .
+\textbf{{[} "pancakes" {]}}
+\textbf{ok} {[} "salad" "pizza" "pasta" | "pancakes" {]} last* .
+\textbf{{[} "pasta" | "pancakes" {]}}
+\textbf{ok} {[} "nachos" "tacos" "burritos" {]} last .
+\textbf{"burritos"}
+\end{alltt}
+
+A naive programmer might think that recursion is an infinite loop. Two things ensure that a recursion terminates: the existence of a base case, or in other words, a branch of a conditional that does not contain a recursive call; and an \emph{inductive step} in the recursive case, that reduces one of the arguments in some manner, thus ensuring that the computation proceeds one step closer to the base case.
+
+An inductive step usually consists of taking the cdr of a list (the conditional could check for \texttt{f} or a cons cell whose cdr is not a list, as above), or decrementing a counter (the conditional could compare the counter with zero). Of course, many variations are possible; one could instead increment a counter, pass around its maximum value, and compare the current value with the maximum on each iteration.
+
+Lets consider a more complicated example. Use \texttt{see} to bring up the definition of the \texttt{list?} word. This word checks that the value on the stack is a proper list, that is, it is either \texttt{f}, or a cons cell whose cdr is a proper list:
+
+\begin{verbatim}
+: list? ( list -- ? )
+    dup [
+        dup cons? [ cdr list? ] [ drop f ] ifte
+    ] [
+        drop t
+    ] ifte ;
+\end{verbatim}
+
+This example has two nested conditionals, and in effect, two base cases. The first base case arises when the value is \texttt{f}; in this case, it is dropped from the stack, and \texttt{t} is returned, since \texttt{f} is a proper list of no elements. The second base case arises when a value that is not a cons is given. This is clearly not a proper list.
+
+The inductive step takes the cdr of the list. So, the birds-eye view of the word is that it takes the cdr of the list on the stack, until it either reaches \texttt{f}, in which case the list is a proper list, and \texttt{t} is returned; or until it reaches something else, in which case the list is an improper list, and \texttt{f} is returned.
+
+Lets test the word:
+
+\begin{alltt}
+\textbf{ok} {[} "tofu" "beans" "rice" {]} list? .
+\textbf{t}
+\textbf{ok} {[} "sprouts" "carrots" | "lentils" {]} list? .
+\textbf{f}
+\textbf{ok} f list? .
+\textbf{t}
+\end{alltt}
+
+\subsection{Stack effects of recursive words}
+
+There are a few things worth noting about the stack flow inside a recursive word. The condition must take care to preserve any input parameters needed for the base case and recursive case. The base case must consume all inputs, and leave the final return values on the stack. The recursive case should somehow reduce one of the parameters. This could mean incrementing or decrementing an integer, taking the \texttt{cdr} of a list, and so on. Parameters must eventually reduce to a state where the condition returns \texttt{f}, to avoid an infinite recursion.
+
+The recursive case should also be coded such that the stack effect of the total definition is the same regardless of how many iterations are preformed; words that consume or produce different numbers of paramters depending on circumstances are very hard to debug.
+
+Lets review the words we saw in this chapter:
+
+\wordtable{
+\tabvocab{combinators}
+\texttt{when}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
+\tabvocab{lists}
+\texttt{cons?}&
+\texttt{( value -{}- ?~)}&
+Test if a value is a cons cell.\\
+\texttt{last}&
+\texttt{( list -{}- value )}&
+Last element of a list.\\
+\texttt{last*}&
+\texttt{( list -{}- cons )}&
+Last cons cell of a list.\\
+\texttt{list?}&
+\texttt{( value -{}- ?~)}&
+Test if a value is a proper list.\\
+}
+
+\section{Debugging}
+
+\section{The interpreter}
+
+\chapkeywords{acons >r r>}
+\index{\texttt{acons}}
+\index{\texttt{>r}}
+\index{\texttt{r>}}
+
+So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
+
+Another fundamental stack is the \emph{return stack}. It is used to save interpreter state for nested calls.
+
+You already know that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the return stack, executes the definition of that word, then restores the execution state from the return stack and continues.
+
+The return stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the return stack, and vice versa, respectively.
+
+The words \texttt{>r} and \texttt{r>} ``hide'' the top of the stack between their occurrences. Try the following in the listener:
+
+\begin{alltt}
+\textbf{ok} 1 2 3 .s
+\textbf{3
+2
+1}
+\textbf{ok} >r .s r>
+\textbf{2
+1}
+\textbf{ok} 1 2 3 .s
+\textbf{3
+2
+1}
+\end{alltt}
+
+A simple example can be found in the definition of the \texttt{acons} word:
+
+\begin{alltt}
+\textbf{ok} \ttbackslash acons see
+\textbf{: acons ( value key alist -- alist )
+    >r swons r> cons ;}
+\end{alltt}
+
+When the word is called, \texttt{swons} is applied to \texttt{value} and \texttt{key} creating a cons cell whose car is \texttt{key} and whose cdr is \texttt{value}, then \texttt{cons} is applied to this new cons cell, and \texttt{alist}. So this word adds the \texttt{key}/\texttt{value} pair to the beginning of the \texttt{alist}.
+
+Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single quotation or word definition. The following examples illustrate the point:
+
+\begin{verbatim}
+: the-good >r 2 + r> * ;
+: the-bad  >r 2 + ;
+: the-ugly r> ;
+\end{verbatim}
+
+Basically, the rule is you must leave the return stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can return to the calling word.
+
+One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the return stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the return stack before returning.
+
+Lets review the words we saw in this chapter:
+
+\wordtable{
+\tabvocab{lists}
+\texttt{acons}&
+\texttt{( value key alist -{}- alist )}&
+Add a key/value pair to the association list.\\
+\tabvocab{stack}
+\texttt{>r}&
+\texttt{( obj -{}- r:obj )}&
+Move value to return stack..\\
+\texttt{r>}&
+\texttt{( r:obj -{}- obj )}&
+Move value from return stack..\\
+}
+
+\section{Association lists}
+
+An \emph{association list} is a list where every element is a cons. The
+car of each cons is a name, the cdr is a value. The literal notation
+is suggestive:
+
+\begin{alltt}
+{[}
+    {[} "Jill"  | "CEO" {]}
+    {[} "Jeff"  | "manager" {]}
+    {[} "James" | "lowly web designer" {]}
+{]}
+\end{alltt}
+
+\texttt{assoc? ( obj -{}- ?~)} returns \texttt{t} if the object is
+a list whose every element is a cons; otherwise it returns \texttt{f}.
+
+\texttt{assoc ( key alist -{}- value )} looks for a pair with this
+key in the list, and pushes the cdr of the pair. Pushes f if no pair
+with this key is present. Note that \texttt{assoc} cannot differentiate between
+a key that is not present at all, or a key with a value of \texttt{f}.
+
+\texttt{assoc{*} ( key alist -{}- {[} key | value {]} )} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{assoc},
+\texttt{assoc{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-assoc ( value key alist -{}- alist )} removes any existing
+occurrence of a key from the list, and adds a new pair. This creates
+a new list, the original is unaffected.
+
+\texttt{acons ( value key alist -{}- alist )} is slightly faster
+than \texttt{set-assoc} since it simply conses a new pair onto the
+list. However, if used repeatedly, the list will grow to contain a
+lot of {}``shadowed'' pairs.
+
+The following pair of word definitions from the \texttt{html} vocabulary demonstrates the usage of association lists. It implements a mapping of special characters to their HTML entity names. Note the usage of \texttt{?}~to return the original character if the association lookup yields \texttt{f}:
+
+\begin{alltt}
+: html-entities ( -- alist )
+    {[}
+        {[} CHAR: < | "\&lt;"   {]}
+        {[} CHAR: > | "\&gt;"   {]}
+        {[} CHAR: \& | "\&amp;"  {]}
+        {[} CHAR: {'} | "\&apos;" {]}
+        {[} CHAR: {"} | "\&quot;" {]}
+    {]} ;
+
+: char>entity ( ch -- str )
+    dup >r html-entities assoc dup r> ? ;
+\end{alltt}
+
+Searching association lists incurs a linear time cost, so they should
+only be used for small mappings -- a typical use is a mapping of half
+a dozen entries or so, specified literally in source. Hashtables offer
+better performance with larger mappings.
+
+\section{Recursive combinators}
+
+\chapter{Practical: a numbers game}
 
 In this section, basic input/output and flow control is introduced.
 We construct a program that repeatedly prompts the user to guess a
@@ -376,7 +1441,7 @@ numbers-game
 \emph{Correct - you win!}
 \end{alltt}
 
-\subsection{Getting started}
+\section{Getting started}
 
 Start a text editor and create a file named \texttt{numbers-game.factor}.
 
@@ -413,7 +1478,7 @@ source file into the Factor interpreter:
 "numbers-game.factor" run-file
 \end{alltt}
 
-\subsection{Reading a number from the keyboard}
+\section{Reading a number from the keyboard}
 
 A fundamental operation required for the numbers game is to be able
 to read a number from the keyboard. The \texttt{read} word \texttt{(
@@ -447,7 +1512,7 @@ an essential part of any large program and is covered later.%
 }
 
 
-\subsection{Printing some messages}
+\section{Printing some messages}
 
 Now we need to make some words for printing various messages. They
 are given here without further ado:
@@ -465,7 +1530,7 @@ are obvious from context. You should ensure the words work correctly
 after loading the source file into the interpreter.
 
 
-\subsection{Taking action based on a guess}
+\section{Taking action based on a guess}
 
 The next logical step is to write a word \texttt{judge-guess} that
 takes the user's guess along with the actual number to be guessed,
@@ -523,7 +1588,7 @@ Test \texttt{judge-guess} with a few inputs:
 \emph{f}
 \end{alltt}
 
-\subsection{Generating random numbers}
+\section{Generating random numbers}
 
 The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
 random number in a specified range. The range is inclusive, so both
@@ -542,7 +1607,7 @@ and confirm that the word functions correctly, and that its stack
 effect comment is accurate.
 
 
-\subsection{The game loop}
+\section{The game loop}
 
 The game loop consists of repeated calls to \texttt{guess-prompt},
 \texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
@@ -564,7 +1629,7 @@ the usefulness of recursion is severely limited by the lack of tail-recursive
 call optimization.
 
 
-\subsection{Finishing off}
+\section{Finishing off}
 
 The last task is to combine everything into the main \texttt{numbers-game}
 word. This is easier than it seems:
@@ -577,7 +1642,7 @@ It should work flawlessly, assuming you tested each component of this
 design incrementally!
 
 
-\subsection{The complete program}
+\section{The complete program}
 
 \begin{verbatim}
 ! Numbers game example
@@ -621,865 +1686,448 @@ USE: stack
 : numbers-game number-to-guess numbers-game-loop ;
 \end{verbatim}
 
-\section{Sequences}
+\chapter{All about numbers}
 
-Factor supports two primary types for storing sequential data; lists and vectors.
-Lists are stored in a linked manner, with each node of the list holding an
-element and a reference to the next node. Vectors, on the other hand, are contiguous sets of cells in memory, with each cell holding an element. Strings and string buffers can be considered as vectors specialized to holding characters, with the additional restriction that strings are immutable.
+A brief introduction to arithmetic in Factor was given in the first chapter. Most of the time, the simple features outlined there suffice, and if math is not your thing, you can skim (or skip!) this chapter. For the true mathematician, Factor's numerical capability goes far beyond simple arithmetic.
 
-Vectors are applicable to a different class of problems than lists.
-Compare the relative performance of common operations on vectors and
-lists:
+Factor's numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
 
-\begin{tabular}{|r|l|l|}
-\hline 
-&
-Lists&
-Vectors\tabularnewline
-\hline
-\hline 
-Random access of an index&
-linear time&
-constant time\tabularnewline
-\hline 
-Add new element at start&
-constant time&
-linear time\tabularnewline
-\hline 
-Add new element at end&
-linear time&
-constant time\tabularnewline
-\hline
-\end{tabular}
+\section{Integers}
 
-Vectors and lists can be converted back and forth using the \texttt{vector>list}
-word \texttt{( vector -{}- list )} and the \texttt{list>vector} word
-\texttt{( list -{}- vector )}.
+\chapkeywords{integer?~BIN: OCT: HEX: .b .o .h}
 
-\subsection{Lists and cons cells}
+The simplest type of number is the integer. Integers come in two varieties -- \emph{fixnums} and \emph{bignums}. As their names suggest, a fixnum is a fixed-width quantity\footnote{Fixnums range in size from $-2^{w-3}-1$ to $2^{w-3}$, where $w$ is the word size of your processor (for example, 32 bits). Because fixnums automatically grow to bignums, usually you do not have to worry about details like this.}, and is a bit quicker to manipulate than an arbitrary-precision bignum.
 
-A \emph{cons cell} is a compound object holding references to two other objects. The order matters; the first is called the \emph{car},
-the second is called the \emph{cdr}.
+The predicate word \texttt{integer?}~tests if the top of the stack is an integer. If this returns true, then exactly one of \texttt{fixnum?}~or \texttt{bignum?}~would return true for that object. Usually, your code does not have to worry if it is dealing with fixnums or bignums.
 
-The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
-\footnote{These infamous names originate from the Lisp language. Originally,
-{}``Lisp'' stood for {}``List Processing''.%
-} construct and deconstruct cons cells.
-All words relating to cons cells and lists are found in the \texttt{lists}
-vocabulary.
+Unlike some languages where the programmer has to declare storage size explicitly and worry about overflow, integer operations automatically return bignums if the result would be too big to fit in a fixnum. Here is an example where multiplying two fixnums returns a bignum:
 
 \begin{alltt}
-1 2 cons .
-\emph{{[} 1 | 2 {]}}
-3 4 cons car .
-\emph{3}
-5 6 cons cdr .
-\emph{6}
+\textbf{ok} 134217728 fixnum? .
+\textbf{t}
+\textbf{ok} 128 fixnum? .
+\textbf{t}
+\textbf{ok} 134217728 128 * .
+\textbf{17179869184}
+\textbf{ok} 134217728 128 * bignum? .
+\textbf{t}
 \end{alltt}
 
-The output of the first expression suggests a literal syntax for cons
-cells:
+Integers can be entered using a different base. By default, all number entry is in base 10, however this can be changed by prefixing integer literals with one of the parsing words \texttt{BIN:}, \texttt{OCT:}, or \texttt{HEX:}. For example:
 
 \begin{alltt}
-{[} 10 | 20 {]} cdr .
-\emph{20}
-{[} "first" | {[} "second" | f {]} {]} car .
-\emph{"first"}
-{[} "first" | {[} "second" | f {]} {]} cdr car .
-\emph{"second"}
+\textbf{ok} BIN: 1110 BIN: 1 + .
+\textbf{15}
+\textbf{ok} HEX: deadbeef 2 * .
+\textbf{7471857118}
 \end{alltt}
 
-A \emph{proper list} (or often, just a \emph{list}) is a cons cell whose car is the first element, and the cdr is the \emph{rest of the list}. The car of the last cons cell in the list is the last element, and the cdr is \texttt{f}.
-
-Lists have the following literal
-syntax:
+The word \texttt{.} prints numbers in decimal, regardless of how they were input. A set of words in the \texttt{prettyprint} vocabulary is provided for print integers using another base.
 
 \begin{alltt}
-{[} 1 2 3 4 {]} cdr cdr car .
-\emph{3}
+\textbf{ok} 1234 .h
+\textbf{4d2}
+\textbf{ok} 1234 .o
+\textbf{2232}
+\textbf{ok} 1234 .b
+\textbf{10011010010}
 \end{alltt}
 
-An \emph{improper list} is one where the cdr of the last cons cell is not \texttt{f}. Improper lists are input with the following syntax:
+\section{Rational numbers}
 
-\begin{verbatim}
-[ 1 2 3 | 4 ]
-\end{verbatim}
+\chapkeywords{rational?~numerator denominator}
 
-The \texttt{list?} word tests if the object at the top of the stack
-is a proper list:
+If we add, subtract or multiply any two integers, the result is always an integer. However, this is not the case with division. When dividing a numerator by a denominator where the numerator is not a integer multiple of the denominator, a ratio is returned instead.
 
 \begin{alltt}
-"hello" list? .
-\emph{f}
-{[} "first" "second" | "third" {]} list? .
-\emph{f}
-{[} "first" "second" "third" {]} list? .
-\emph{t}
+1210 11 / .
+\emph{110}
+100 330 / .
+\emph{10/33}
 \end{alltt}
 
-It is worth mentioning a few words closely related to and defined in terms of \texttt{cons}, \texttt{car} and \texttt{cdr}.
+Ratios are printed and can be input literally in the form of the second example. Ratios are always reduced to lowest terms by factoring out the greatest common divisor of the numerator and denominator. A ratio with a denominator of 1 becomes an integer. Trying to create a ratio with a denominator of 0 raises an error.
 
-\texttt{swons ( cdr car -{}- cons )} constructs a cons cell, with the argument order reversed. Usually, it is considered bad practice to define two words that only differ by parameter order, however cons cells are constructed about equally frequently with both orders. Of course, \texttt{swons} is defined as follows:
+The predicate word \texttt{ratio?}~tests if the top of the stack is a ratio. The predicate word \texttt{rational?}~returns true if and only if one of \texttt{integer?}~or \texttt{ratio?}~would return true for that object. So in Factor terms, a ``ratio'' is a rational number whose denominator is not equal to 1.
+
+Ratios behave just like any other number -- all numerical operations work as expected, and in fact they use the formulas for adding, subtracting and multiplying fractions that you learned in high school.
 
 \begin{alltt}
-: swons swap cons ;
+\textbf{ok} 1/2 1/3 + .
+\textbf{5/6}
+\textbf{ok} 100 6 / 3 * .
+\textbf{50}
 \end{alltt}
 
-\texttt{uncons ( cons -{}- car cdr )} pushes both constituents of a cons cell. It is defined as thus:
+Ratios can be deconstructed into their numerator and denominator components using the \texttt{numerator} and \texttt{denominator} words. The numerator and denominator are both integers, and furthermore the denominator is always positive. When applied to integers, the numerator is the integer itself, and the denominator is 1.
 
 \begin{alltt}
-: uncons dup car swap cdr ;
+\textbf{ok} 75/33 numerator .
+\textbf{25}
+\textbf{ok} 75/33 denominator .
+\textbf{11}
+\textbf{ok} 12 numerator .
+\textbf{12}
 \end{alltt}
 
-\texttt{unswons ( cons -{}- cdr car )} is just a swapped version of \texttt{uncons}. It is defined as thus:
+\section{Floating point numbers}
+
+\chapkeywords{float?~>float /f}
+
+Rational numbers represent \emph{exact} quantities. On the other hand, a floating point number is an \emph{approximation}. While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point literals are often used to represent irrational numbers, which have no exact representation as a ratio of two integers. Floating point literals are input with a decimal point.
 
 \begin{alltt}
-: unswons dup cdr swap car ;
+\textbf{ok} 1.23 1.5 + .
+\textbf{1.73}
 \end{alltt}
 
-\subsection{Working with lists}
+The predicate word \texttt{float?}~tests if the top of the stack is a floating point number. The predicate word \texttt{real?}~returns true if and only if one of \texttt{rational?}~or \texttt{float?}~would return true for that object.
 
-Unless otherwise documented, list manipulation words expect proper
-lists as arguments. Given an improper list, they will either raise
-an error, or disregard the hanging cdr at the end of the list.
-
-List manipulation words usually return newly-created
-lists only. The original parameters are not modified. This may seem
-inefficient, however the absence of side effects makes code much easier
-to test and debug.
-
-\texttt{append ( list list -{}- list )} Append two lists at the
-top of the stack:
+Floating point numbers are \emph{contagious} -- introducing a floating point number in a computation ensures the result is also floating point.
 
 \begin{alltt}
-{[} 1 2 3 {]} {[} 4 5 6 {]} append .
-\emph{{[} 1 2 3 4 5 6 {]}}
-{[} 1 2 3 {]} dup {[} 4 5 6 {]} append .s
-\emph{\{ {[} 1 2 3 {]} {[} 1 2 3 4 5 6 {]} \}}
+\textbf{ok} 5/4 1/2 + .
+\textbf{7/4}
+\textbf{ok} 5/4 0.5 + .
+\textbf{1.75}
 \end{alltt}
 
-The first list is copied, and the cdr of its last cons cell is set
-to point to the second list. The second example above shows that the original
-parameter was not modified. Interestingly, if the second parameter
-is not a proper list, \texttt{append} returns an improper list:
+Apart from contaigion, there are two ways of obtaining a floating point result from a computation; the word \texttt{>float ( n -{}- f )} converts a rational number into its floating point approximation, and the word \texttt{/f ( x y -{}- x/y )} returns the floating point approximation of a quotient of two numbers.
 
 \begin{alltt}
-{[} 1 2 3 {]} 4 append .
-\emph{{[} 1 2 3 | 4 {]}}
+\textbf{ok} 7 4 / >float .
+\textbf{1.75}
+\textbf{ok} 7 4 /f .
+\textbf{1.75}
 \end{alltt}
 
-\texttt{length ( list -{}- n )} Iterate down the cdr of the list until
-it reaches \texttt{f}, counting the number of elements in the list:
+Indeed, the word \texttt{/f} could be defined as follows:
 
 \begin{alltt}
-{[} {[} 1 2 {]} {[} 3 4 {]} 5 {]} length .
-\emph{3}
-{[} {[} {[} "Hey" {]} 5 {]} length .
-\emph{2}
+: /f / >float ;
 \end{alltt}
 
-\texttt{nth ( index list -{}- obj )} Look up an element specified
-by a zero-based index, by successively iterating down the cdr of the
-list:
+However, the actual definition is slightly more efficient, since it computes the floating point result directly.
+
+\section{Complex numbers}
+
+\chapkeywords{i -i \#\{ complex?~real imaginary >rect rect> arg abs >polar polar>}
+
+Complex numbers arise as solutions to quadratic equations whose graph does not intersect the x axis. For example, the equation $x^2 + 1 = 0$ has no solution for real $x$, because there is no real number that is a square root of -1. However, in the field of complex numbers, this equation has a well-known solution:
 
 \begin{alltt}
-1 {[} "Hamster" "Bagpipe" "Beam" {]} nth .
-\emph{"Bagpipe"}
+\textbf{ok} -1 sqrt .
+\textbf{\#\{ 0 1 \}}
 \end{alltt}
 
-This word runs in linear time proportional to the list index. If you
-need constant time lookups, use a vector instead.
+The literal syntax for a complex number is \texttt{\#\{ re im \}}, where \texttt{re} is the real part and \texttt{im} is the imaginary part. For example, the literal \texttt{\#\{ 1/2 1/3 \}} corresponds to the complex number $1/2 + 1/3i$.
 
-\texttt{set-nth ( value index list -{}- list )} Create a new list,
-identical to the original list except the element at the specified
-index is replaced:
+The words \texttt{i} an \texttt{-i} push the literals \texttt{\#\{ 0 1 \}} and \texttt{\#\{ 0 -1 \}}, respectively.
+
+The predicate word \texttt{complex?} tests if the top of the stack is a complex number. Note that unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero.
+
+Complex numbers can be deconstructed into their real and imaginary components using the \texttt{real} and \texttt{imaginary} words. Both components can be pushed at once using the word \texttt{>rect ( z -{}- re im )}.
 
 \begin{alltt}
-"Done" 1 {[} "Not started" "Incomplete" {]} set-nth .
-
-\emph{{[} "Done" "Incomplete" {]}}
+\textbf{ok} -1 sqrt real .
+\textbf{0}
+\textbf{ok} -1 sqrt imaginary .
+\textbf{1}
+\textbf{ok} -1 sqrt sqrt >rect .s
+\textbf{\{ 0.7071067811865476 0.7071067811865475 \}}
 \end{alltt}
 
-\texttt{remove ( obj list -{}- list )} Push a new list, with all occurrences
-of the object removed. All other elements are in the same order:
+A complex number can be constructed from a real and imaginary component on the stack using the word \texttt{rect> ( re im -{}- z )}.
 
 \begin{alltt}
-: australia- ( list -- list ) "Australia" swap remove ;
-{[} "Canada" "New Zealand" "Australia" "Russia" {]} australia- .
-\emph{{[} "Canada" "New Zealand" "Russia" {]}}
+\textbf{ok} 1/3 5 rect> .
+\textbf{\#\{ 1/3 5 \}}
 \end{alltt}
 
-\texttt{reverse ( list -{}- list )} Push a new list which has the
-same elements as the original one, but in reverse order:
+Complex numbers are stored in \emph{rectangular form} as a real/imaginary component pair (this is where the names \texttt{>rect} and \texttt{rect>} come from). An alternative complex number representation is \emph{polar form}, consisting of an absolute value and argument. The absolute value and argument can be computed using the words \texttt{abs} and \texttt{arg}, and both can be pushed at once using \texttt{>polar ( z -{}- abs arg )}.
 
 \begin{alltt}
-{[} 4 3 2 1 {]} reverse .
-\emph{{[} 1 2 3 4 {]}}
+\textbf{ok} 5.3 abs .
+\textbf{5.3}
+\textbf{ok} i arg .
+\textbf{1.570796326794897}
+\textbf{ok} \#\{ 4 5 \} >polar .s
+\textbf{\{ 6.403124237432849 0.8960553845713439 \}}
 \end{alltt}
 
-\texttt{contains?~( obj list -{}- list )} Look for an occurrence of
-an object in a list. The remainder of the list starting from the first
-occurrence is returned. If the object does not occur in the list,
-f is returned:
+A new complex number can be created from an absolute value and argument using \texttt{polar> ( abs arg -{}- z )}.
 
 \begin{alltt}
-: lived-in? ( country -{}- ? )
-    {[}
-        "Canada" "New Zealand" "Australia" "Russia"
-    {]} contains ;
-"Australia" lived-in? .
-\emph{{[} "Australia" "Russia" {]}}
-"Pakistan" lived-in? .
-\emph{f}
+\textbf{ok} 1 pi polar> .
+\textbf{\#\{ -1.0 1.224606353822377e-16 \}}
 \end{alltt}
 
-For now, assume {}``occurs'' means {}``contains an object that
-looks like''. The concept of object equality is covered later.
+\section{Transcedential functions}
 
-\texttt{unique ( elem list -{}- list )} Return a new list containing the new element. If the list already contains the element, the same list is returned, otherwise the element is consed onto the list. This word executes in linear time, so its use in loops can be a potential performance bottleneck.
+\chapkeywords{\^{} exp log sin cos tan asin acos atan sec cosec cot asec acosec acot sinh cosh tanh asinh acosh atanh sech cosech coth asech acosech acoth}
+
+The \texttt{math} vocabulary provides a rich library of mathematical functions that covers exponentiation, logarithms, trigonometry, and hyperbolic functions. All functions accept and return complex number arguments where appropriate. These functions all return floating point values, or complex numbers whose real and imaginary components are floating point values.
+
+\texttt{\^{} ( x y -- x\^{}y )} raises \texttt{x} to the power of \texttt{y}. In the cases of \texttt{y} being equal to $1/2$, -1, or 2, respectively, the words \texttt{sqrt}, \texttt{recip} and \texttt{sq} can be used instead.
 
 \begin{alltt}
-1 {[} 1 2 4 8 {]} unique .
-\emph{{[} 1 2 4 8 {]}}
-3 {[} 1 2 4 8 {]} unique .
-\emph{{[} 3 1 2 4 8 {]}}
+\textbf{ok} 2 4 \^ .
+\textbf{16.0}
+\textbf{ok} i i \^ .
+\textbf{0.2078795763507619}
 \end{alltt}
 
-\texttt{unit ( obj -{}- list )} Make a list of one element:
+All remaining functions have a stack effect \texttt{( x -{}- y )}, it won't be repeated for brevity.
+
+\texttt{exp} raises the number $e$ to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows:
 
 \begin{alltt}
-"Unit 18" unit .
-\emph{{[} "Unit 18" {]}}
+: exp ( x -- e^x ) e swap \^ ;
 \end{alltt}
 
-\subsection{\label{sub:Vectors}Vectors}
+However, it is actually defined otherwise, for efficiency.\footnote{In fact, the word \texttt{\^{}} is actually defined in terms of \texttt{exp}, to correctly handle complex number arguments.}
 
-A \emph{vector} is a contiguous chunk of memory cells holding references to arbitrary
-objects. Vectors have the following literal syntax:
-
-\begin{alltt}
-\{ f f f t t f t t -6 {}``Hey'' \}
-\end{alltt}
-Use of vector literals in source code is discouraged, since vector
-manipulation relies on side effects rather than return values, and
-hence it is very easy to mess up a literal embedded in a word definition.
-
-Vector words are found in the \texttt{vectors} vocabulary.
-
-\texttt{<vector> ( capacity -{}- vector )} pushes a zero-length vector.
-Storing more elements than the initial capacity grows the vector.
-
-\texttt{vector-nth ( index vector -{}- obj )} pushes the object stored
-at a zero-based index of a vector:
+\texttt{log} computes the natural (base $e$) logarithm. This is the inverse of the \texttt{exp} function.
 
 \begin{alltt}
-0 \{ "zero" "one" \} vector-nth .
-\emph{"zero"}
-2 \{ 1 2 \} vector-nth .
-\emph{ERROR: Out of bounds}
+\textbf{ok} -1 log .
+\textbf{\#\{ 0.0 3.141592653589793 \}}
+\textbf{ok} e log .
+\textbf{1.0}
 \end{alltt}
 
-\texttt{set-vector-nth ( obj index vector -{}- )} stores a value into
-a vector:%
-\footnote{The words \texttt{get} and \texttt{set} used in this example refer to variables and will
-be formally introduced later.%
-}
+\texttt{sin}, \texttt{cos} and \texttt{tan} are the familiar trigonometric functions, and \texttt{asin}, \texttt{acos} and \texttt{atan} are their inverses.
+
+The reciprocals of the sine, cosine and tangent are defined as \texttt{sec}, \texttt{cosec} and \texttt{cot}, respectively. Their inverses are \texttt{asec}, \texttt{acosec} and \texttt{acot}.
+
+\texttt{sinh}, \texttt{cosh} and \texttt{tanh} are the hyperbolic functions, and \texttt{asinh}, \texttt{acosh} and \texttt{atanh} are their inverses.
+
+Similarly, the reciprocals of the hyperbolic functions are defined as \texttt{sech}, \texttt{cosech} and \texttt{coth}, respectively. Their inverses are \texttt{asech}, \texttt{acosech} and \texttt{acoth}.
+
+\section{Modular arithmetic}
+
+\chapkeywords{/i mod /mod gcd}
+
+In addition to the standard division operator \texttt{/}, there are a few related functions that are useful when working with integers.
+
+\texttt{/i ( x y -{}- x/y )} performs a truncating integer division. It could have been defined as follows:
 
 \begin{alltt}
-\{ "math" "CS" \} "v" set
-1 "philosophy" "v" get set-vector-nth
-"v" get .
-\emph{\{ "math" "philosophy" \}}
-4 "CS" "v" get set-vector-nth
-"v" get .
-\emph{\{ "math" "philosophy" f f "CS" \}}
+: /i / >integer ;
 \end{alltt}
 
-\texttt{vector-length ( vector -{}- length )} pushes the number of
-elements in a vector. As the previous two examples demonstrate, attempting
-to fetch beyond the end of the vector will raise an error, while storing
-beyond the end will grow the vector as necessary.
+However, the actual definition is a bit more efficient than that.
 
-\texttt{set-vector-length ( length vector -{}- )} resizes a vector.
-If the new length is larger than the current length, the vector grows
-if necessary, and the new cells are filled with \texttt{f}.
+\texttt{mod ( x y -{}- x\%y )} computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0, then \texttt{x} is a multiple of \texttt{y}.
 
-\texttt{vector-push ( obj vector -{}- )} adds an object at the end
-of the vector. This increments the vector's length by one.
-
-\texttt{vector-pop ( vector -{}- obj )} removes the object at the
-end of the vector and pushes it. This decrements the vector's length
-by one.
-
-The \texttt{vector-push} and \texttt{vector-pop} words can be used to implement additional stacks. For example:
+\texttt{/mod ( x y -{}- x/y x\%y )} pushes both the quotient and remainder.
 
 \begin{alltt}
-20 <vector> "state-stack" set
-: push-state ( obj -- ) "state-stack" get vector-push ;
-: pop-state ( -- obj ) "state-stack" get vector-pop ;
-12 push-state
-4 push-state
-pop-state .
-\emph{4}
-0 push-state
-pop-state .
+\textbf{ok} 100 3 mod .
+\textbf{1}
+\textbf{ok} -546 34 mod .
+\textbf{-2}
+\end{alltt}
+
+\texttt{gcd ( x y -{}- z )} pushes the greatest common divisor of two integers; that is, the largest number that both integers could be divided by and still yield integers as results. This word is used behind the scenes to reduce rational numbers to lowest terms when doing ratio arithmetic.
+
+\section{Bitwise operations}
+
+\chapkeywords{bitand bitor bitxor bitnot shift}
+
+There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation faciliates the so-called \emph{bitwise operations}.
+
+\texttt{bitand ( x y -{}- x\&y )} returns a new integer where each bit is set if and only if the corresponding bit is set in both $x$ and $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-and with a mask switches off all flags that are not explicitly set in the mask.
+
+\begin{alltt}
+BIN: 101 BIN: 10 bitand .b
 \emph{0}
-pop-state .
-\emph{12}
+BIN: 110 BIN: 10 bitand .b
+\emph{10}
 \end{alltt}
 
-\subsection{Strings}
-
-A \emph{string} is a sequence of 16-bit Unicode characters (conventionally,
-in the UTF16 encoding). Strings are input by enclosing them in quotes:
+\texttt{bitor ( x y -{}- x|y )} returns a new integer where each bit is set if and only if the corresponding bit is set in at least one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-or with a mask switches on all flags that are set in the mask.
 
 \begin{alltt}
-"GET /index.html HTTP/1.0"
+BIN: 101 BIN: 10 bitor .b
+\emph{111}
+BIN: 110 BIN: 10 bitor .b
+\emph{110}
 \end{alltt}
-String literals must not span more than one line. The following is
-not valid:
+
+\texttt{bitxor ( x y -{}- x\^{}y )} returns a new integer where each bit is set if and only if the corresponding bit is set in exactly one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-xor with a mask toggles on all flags that are set in the mask.
 
 \begin{alltt}
-"Content-Type: text/html
-Content-Length: 1280"
+BIN: 101 BIN: 10 bitxor .b
+\emph{111}
+BIN: 110 BIN: 10 bitxor .b
+\emph{100}
 \end{alltt}
-Instead, the newline must be represented using an escape, rather than
-literally. The newline escape is \texttt{\textbackslash{}n}, so we
-can write:
+
+\texttt{bitnot ( x -{}- y )} returns the bitwise complement of the input; that is, each bit in the input number is flipped. This is actually equivalent to negating a number, and subtracting one. So indeed, \texttt{bitnot} could have been defined as thus:
 
 \begin{alltt}
-"Content-Type: text/html\textbackslash{}nContent-Length: 1280"
+: bitnot neg pred ;
 \end{alltt}
-Other special characters, such as quotes and tabs can be input in
-a similar manner. Here is the full list of supported character escapes:
 
-\begin{tabular}{|r|l|}
-\hline 
-Character&
-Escape\tabularnewline
-\hline
-\hline 
-Quote&
-\texttt{\textbackslash{}''}\tabularnewline
-\hline 
-Newline&
-\texttt{\textbackslash{}n}\tabularnewline
-\hline 
-Carriage return&
-\texttt{\textbackslash{}r}\tabularnewline
-\hline 
-Horizontal tab&
-\texttt{\textbackslash{}t}\tabularnewline
-\hline 
-Terminal escape&
-\texttt{\textbackslash{}e}\tabularnewline
-\hline 
-Zero chacater&
-\texttt{\textbackslash{}0}\tabularnewline
-\hline 
-Arbitrary Unicode character&
-\texttt{\textbackslash{}u}\texttt{\emph{nnnn}}\tabularnewline
-\hline
-\end{tabular}
-
-The last row shows a notation for inputting any possible character
-using its hexadecimal value. For example, a space character can also
-be input as \texttt{\textbackslash{}u0020}.
-
-There is no specific character data type in Factor. When characters
-are extracted from a string, they are pushed on the stack as integers.
-It is possible to input an integer with a value equal to that of a
-Unicode character using the following special notation:
+\texttt{shift ( x n -{}- y )} returns a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
 
 \begin{alltt}
-CHAR: A .
-\emph{65}
-CHAR: A 1 + CHAR: B = .
-\emph{t}
+BIN: 101 5 shift .b
+\emph{10100000}
+BIN: 11111 -2 shift .b
+\emph{111}
 \end{alltt}
 
-\subsection{Working with strings}
+The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
 
-String words are found in the \texttt{strings} vocabulary. String
-manipulation words always return a new copy of a string rather than
-modifying the string in-place. Notice the absence of words such as
-\texttt{set-str-nth} and \texttt{set-str-length}. Unlike lists, for
-which both constructive and destuctive manipulation words are provided,
-destructive string operations are only done with a distinct string
-buffer type which is the topic of the next section.
+\chapter{Working with state}
 
-\texttt{str-length ( str -{}- n )} pushes the length of a string:
+\section{Building lists and strings}
+
+\chapkeywords{make-string make-list ,}
+\index{\texttt{make-string}}
+\index{\texttt{make-list}}
+\index{\texttt{make-,}}
+
+\section{Hashtables}
+
+A hashtable, much like an association list, stores key/value pairs, and offers lookup by key. However, whereas an association list must be searched linearly to locate keys, a hashtable uses a more sophisticated method. Key/value pairs are sorted into \emph{buckets} using a \emph{hash function}. If two objects are equal, then they must have the same hash code; but not necessarily vice versa. To look up the value associated with a key, only the bucket corresponding to the key has to be searched. A hashtable is simply a vector of buckets, where each bucket is an association list.
+
+\texttt{<hashtable> ( capacity -{}- hash )} creates a new hashtable with the specified number of buckets. A hashtable with one bucket is basically an association list. Right now, a ``large enough'' capacity must be specified, and performance degrades if there are too many key/value pairs per bucket. In a future implementation, hashtables will grow as needed as the number of key/value pairs increases.
+
+\texttt{hash ( key hash -{}- value )} looks up the value associated with a key in the hashtable. Pushes \texttt{f} if no pair with this key is present. Note that \texttt{hash} cannot differentiate between a key that is not present at all, or a key with a value of \texttt{f}.
+
+\texttt{hash* ( key hash -{}- {[} key | value {]} )} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{hash},
+\texttt{hash{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
+
+Hashtables can be converted to association lists and vice versa using
+the \texttt{hash>alist} and \texttt{alist>hash} words. The list of keys and
+list of values can be extracted using the \texttt{hash-keys} and \texttt{hash-values} words.
+
+examples
+
+\section{Variables}
+
+Notice that until now, all the code except a handful of examples has only used the stack for storage. You can also use variables to store temporary data, much like in other languages, however their use is not so prevalent. This is not a coincidence -- Fator was designed this way, and mastery of the stack is essential. Using variables where the stack is more appropriate leads to ugly, unreusable code.
+
+Variables are typically used for longer-term storage of data, and compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language. Variables should only be used for intermediate results if keeping everything on the stack would result in ackward stack flow.
+
+The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. Variable names are strings, and they do not have to be declared before use. For example:
 
 \begin{alltt}
-"Factor" str-length .
-\emph{6}
+5 "x" set
+"x" get .
+\emph{5}
 \end{alltt}
-\texttt{str-nth ( n str -{}- ch )} pushes the character located by
-a zero-based index. A string is essentially a vector specialized for
-storing one data type, the 16-bit unsigned character. These are returned
-as integers, so printing will not yield the actual character:
-\begin{alltt}
-0 " " str-nth .
-\emph{32}
-\end{alltt}
-\texttt{index-of ( str substr -{}- n )} searches a string for the
-first occurrence of a substring or character. If an occurrence was
-found, its index is pushed. Otherwise, -1 is pushed:
+
+\section{Namespaces}
+
+Only having one list of variable name/value bindings would make the language terribly inflexible. Instead, a variable has any number of potential values, one per namespace. There is a notion of a ``current namespace''; the \texttt{set} word always stores variables in the current namespace. On the other hand, \texttt{get} traverses up the stack of namespace bindings until it finds a variable with the specified name.
+
+\texttt{bind ( namespace quot -{}- )} executes a quotation in the dynamic scope of a namespace. For example, the following sets the value of \texttt{x} to 5 in the global namespace, regardless of the current namespace at the time the word was called.
 
 \begin{alltt}
-"www.sun.com" CHAR: . index-of .
-\emph{3}
-"mailto:billg@microsoft.com" CHAR: / index-of .
-\emph{-1}
-"www.lispworks.com" ".com" index-of .
-\emph{13}
+: global-example ( -- )
+    global {[} 5 "x" set {]} bind ;
 \end{alltt}
-\texttt{index-of{*} ( n str substr -{}- n )} works like \texttt{index-of},
-except it takes a start index as an argument.
 
-\texttt{substring ( start end str -{}- substr )} extracts a range
-of characters from a string into a new string.
+\texttt{<namespace> ( -{}- namespace )} creates a new namespace object. Actually, a namespace is just a hashtable, with a default capacity.
 
-\texttt{split ( str split -{}- list )} pushes a new list of strings
-which are substrings of the original string, taken in between occurrences
-of the split string:
+\texttt{with-scope ( quot -{}- )} combines \texttt{<namespace>} with \texttt{bind} by executing a quotation in a new namespace.
+
+get example
+
+describe
+
+\section{The name stack}
+
+The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
 
 \begin{alltt}
-"fixnum bignum ratio" " " split .
-\emph{{[} "fixnum" "bignum" "ratio" {]}}
-"/usr/bin/X" CHAR: / split .
-\emph{{[} "" "usr" "bin" "X" {]}}
+: bind ( namespace quot -- )
+    swap >n call n> drop ;
 \end{alltt}
-If you wish to concatenate a fixed number of strings at the top of
-the stack, you can use a member of the \texttt{cat} family of words
-from the \texttt{strings} vocabulary. They concatenate strings in
-the order that they appear in the stack effect.
 
-\begin{tabular}{|c|c|}
-\hline 
-Word&
-Stack effect\tabularnewline
-\hline
-\hline 
-\texttt{cat2}&
-\texttt{( s1 s2 -{}- str )}\tabularnewline
-\hline 
-\texttt{cat3}&
-\texttt{( s1 s2 s3 -{}- str )}\tabularnewline
-\hline 
-\texttt{cat4}&
-\texttt{( s1 s2 s3 s4 -{}- str )}\tabularnewline
-\hline 
-\texttt{cat5}&
-\texttt{( s1 s2 s3 s4 s5 -{}- str )}\tabularnewline
-\hline
-\end{tabular}
+The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
 
-\texttt{cat ( list -{}- str )} is a generalization of the above words;
-it concatenates each element of a list into a new string.
-
-Some straightfoward examples:
+The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
 
 \begin{alltt}
-"How are you, " "Chuck" "?" cat3 .
-\emph{"How are you, Chuck?"}
-"/usr/bin/X" CHAR: / split cat .
-\emph{"usrbinX"}
+: >n ( namespace -- n:namespace ) namestack* vector-push ;
+: n> ( n:namespace -- namespace ) namestack* vector-pop ;
 \end{alltt}
-String buffers, described in the next section, provide a more flexible
-means of concatenating strings.
 
+\section{\label{sub:List-constructors}List constructors}
 
-\subsection{String buffers}
+The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
+of stack elements that have to be juggled.
 
-A \emph{string buffer} is a mutable string. The canonical use for
-a string buffer is to combine several strings into one. This is done
-by creating a new string buffer, appending strings and characters,
-and finally turning the string buffer into a string.
+The word \texttt{{[}, ( -{}- )} begins list construction. This also pushes a new namespace on the name stack, so any variable values that are set between calls to \texttt{[,} and \texttt{,]} will be lost.
 
-\texttt{<sbuf> ( capacity -{}- sbuf )} pushes a new string buffer
-that is capable of holding up to the specified capacity before growing.
+The word \texttt{, ( obj -{}- )} appends an object to the partial
+list.
 
-\texttt{sbuf-append ( str/ch sbuf -{}- )} appends a string or a character
-to the end of the string buffer. If an integer is given, its least significant
-16 bits are interpreted as a character value:
+The word \texttt{,{]} ( -{}- list )} pushes the complete list, and pops the corresponding namespace from the name stack.
+
+The fact that a new
+scope is created between \texttt{{[},} and \texttt{,{]}} is very important.
+This means
+that list constructions can be nested. There is no
+requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
+word, however, debugging becomes prohibitively difficult when a list
+construction begins in one word and ends with another.
+
+Here is an example of list construction using this technique:
 
 \begin{alltt}
-100 <sbuf> "my-sbuf" set
-"Testing" "my-sbuf" get sbuf-append
-32 "my-sbuf" get sbuf-append
+{[}, 1 10 {[} 2 {*} dup , {]} times drop ,{]} .
+\emph{{[} 2 4 8 16 32 64 128 256 512 1024 {]}}
 \end{alltt}
-\texttt{sbuf>str ( sbuf -{}- str )} pushes a string with the same
-contents as the string buffer:
+
+\section{String constructors}
+
+The string construction words provide an alternative way to build up a string. Instead of passing a string buffer around on the stack, they store the string buffer in a variable. This reduces the number
+of stack elements that have to be juggled.
+
+The word \texttt{<\% ( -{}- )} begins string construction. The word
+definition creates a string buffer. Instead of leaving the string
+buffer on the stack, the word creates and pushes a scope on the name
+stack.
+
+The word \texttt{\% ( str/ch -{}- )} appends a string or a character
+to the partial list. The word definition calls \texttt{sbuf-append}
+on a string buffer located by searching the name stack.
+
+The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
+definition pops the name stack and calls \texttt{sbuf>str} on the
+appropriate string buffer.
+
+Compare the following two examples -- both define a word that concatenates together all elements of a list of strings. The first one uses a string buffer stored on the stack, the second uses string construction words:
 
 \begin{alltt}
-"my-sbuf" get sbuf>str .
-"Testing "
-\end{alltt}
-While usually string buffers are only used to concatenate a series
-of strings, they also support the same operations as vectors.
+: cat ( list -- str )
+    100 <sbuf> swap {[} over sbuf-append {]} each sbuf>str ;
 
-\texttt{sbuf-nth ( n sbuf -{}- ch )} pushes the character stored at
-a zero-based index of a string buffer:
+: cat ( list -- str )
+    <\% {[} \% {]} each \%> ;
+\end{alltt}
+
+The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, all code executed between two words is part of the scope. This allows the call to \texttt{\%} to occur in a nested word. For example, here is a pair of definitions that turn an association list of strings into a string of the form \texttt{key1=value1 key2=value2 ...}:
 
 \begin{alltt}
-2 "A string." str-nth .
-\emph{115}
-\end{alltt}
-\texttt{set-sbuf-nth ( ch n sbuf -{}- )} sets the character stored
-at a zero-based index of a string buffer. Only the least significant
-16 bits of the charcter are stored into the string buffer.
+: pair\% ( pair -{}- )
+    unswons \% "=" \% \% ;
 
-\texttt{sbuf-length ( sbuf -{}- n )} pushes the number of characters
-in a string buffer. This is not the same as the capacity of the string
-buffer -- the capacity is the internal storage size of the string
-buffer, the length is a possibly smaller number indicating how much
-storage is in use.
-
-\texttt{set-sbuf-length ( n sbuf -{}- )} changes the length of the
-string buffer. The string buffer's storage grows if necessary, and
-new character positions are automatically filled with zeroes.
-
-\section{Control flow}
-
-Recall the syntax for a conditional statement from the first chapter:
-
-\begin{alltt}
-1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
+: assoc>string ( alist -{}- )
+    <\% [ pair\% " " \% ] each \%> ;
 \end{alltt}
 
-The syntax for the quotations there looks an aweful lot like the syntax for literal lists. In fact, code quotations \emph{are} lists. Factor code is data, and vice versa.
-
-Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine.
-
-\subsection{Booleans and logic}
-
-Words that return a boolean truth value are known as \emph{predicates}. Predicates are usually used to decide what to execute next at branch points. In Factor, there is no special boolean data type
--- instead, a special object \texttt{f} is the only object with a
-``false'' boolean value. Every other object is a boolean ``true''.
-The special object \texttt{t} is the ``canonical'' truth value. Note that words that return booleans don't return \texttt{t} as a rule; any object that is not equal to \texttt{f} can be returned as the true value.
-
-The usual boolean operations are found in the \texttt{logic} vocabulary. Note that these are not integer bitwise operations; bitwise operations are described in the next chapter.
-
-\texttt{not ( ?~-{}- ?~)} returns \texttt{t} if the top of stack is \texttt{f}, and \texttt{f} otherwise.
-
-\texttt{and ( ?~?~-{}- ?~)} returns a true value if both input parameters are true.
-
-\texttt{or ( ?~?~-{}- ?~)} returns a true value if at least one of the input parameters is true.
-
-\texttt{xor ( ?~?~-{}- ?~)} returns a true value if exactly one of the input parameters is true.
-
-\begin{alltt}
-t t and .
-\emph{t}
-5 f and .
-\emph{f}
-f "hi" or .
-\emph{"hi"}
-f f or .
-\emph{f}
-t t xor .
-\emph{f}
-t f xor .
-\emph{t}
-\end{alltt}
-
-\texttt{?~( cond~true false -{}- obj~)} returns the second argument if the first argument is true, and returns the third argument if the first argument is false.
-
-\begin{alltt}
-: sgn 0 < -1 1 ? ;
--10 sgn .
-\emph{-1}
-5 sgn .
-\emph{1}
-\end{alltt}
-
-\subsection{\label{sub:Conditionals}Conditionals}
-
-The \texttt{ifte} combinator was already glossed over and hand-waved in the numbers game example. Now, we will take a closer look at \texttt{ifte} and related forms.
-
-\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
-\texttt{true} or \texttt{false} quotations, depending on the boolean
-value of \texttt{cond}. The condition is removed from the stack before one of the two quotations is executed; if it is required as a parameter to a word called by one of the quotations, it must be duplicated first.
-
-A quotation a list of objects that can be executed. Quotations are input
-using the following syntax:
-
-\begin{alltt}
-{[} 2 3 + . {]}
-\end{alltt}
-
-Here is an example of \texttt{ifte} usage:
-
-\begin{alltt}
-1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
-\end{alltt}
-
-Compare the order of parameters here with the order of parameters in
-the stack effect of \texttt{ifte}.
-
-The stack effects of the two \texttt{ifte} branches should be
-the same. If they differ, the word becomes harder to document and
-debug.
-
-Two minor variations are \texttt{when} \texttt{( cond true -{}- )} and \texttt{unless} \texttt{( cond false -{}- )}. They only have one branch; the other branch is a no-op. The branch should produce as many values as they consume; this ensures that the stack effect of the entire \texttt{when} or \texttt{unless} expression is consistent regardless of which branch was taken.
-
-The following definition pushes the first element of a list if the top of the stack is a list, otherwise it leaves it intact:
-
-\begin{verbatim}
-: first ( obj -- obj )
-    dup cons? [ car ] when ;
-\end{verbatim}
-
-Note that regardless of the value at the top of the stack, the stack height is consistent at the end of the \texttt{when} expression, since \texttt{car} produces as many values as it consumes.
-
-Because the \texttt{ifte} combinator considers any value not equal to \texttt{f} to be true, it is often the case that the same object that was used as the condition is needed for further processing. One solution is to \texttt{dup} the object, so that it is on the stack for the ``true'' branch to use. However, usually the ``false'' branch does not need the extra \texttt{f} on the stack, so it has to \texttt{drop}. This pattern is very common; here is the general shape of the code:
-
-\begin{verbatim}
-dup [
-    do-something
-] [
-    drop handle-failure
-] ifte
-\end{verbatim}
-
-In fact, this pattern is so common that it is embodied by the \texttt{ifte*} combinator. Using \texttt{ifte*}, one would write the above code as follows:
-
-\begin{verbatim}
-[
-    do-something
-] [
-    handle-failure
-] ifte*
-\end{verbatim}
-
-An example of \texttt{ifte*} use can be found in the definition of the \texttt{list?} word. If the top of the stack is not \texttt{f}, further processing needs to be performed; if it is \texttt{f}, it can be discarded, and \texttt{t} must be pushed on the stack, since \texttt{f} is the empty list:
-
-\begin{verbatim}
-: list? ( list -- boolean )
-    #! Proper list test. A proper list is either f, or a cons
-    #! cell whose cdr is a proper list.
-    [
-        dup cons? [ cdr list? ] [ drop f ] ifte 
-    ] [
-        t 
-    ] ifte* ;
-\end{verbatim}
-
-Similarly, there is a \texttt{when*} combinator, with only one branch. A code snippet to print the top of the stack if it is not \texttt{f} might look as follows:
-
-\begin{verbatim}
-[ . ] when*
-\end{verbatim}
-
-It is equivalent to either of the following two lines:
-
-\begin{verbatim}
-[ . ] [ ] ifte*
-dup [ . ] [ drop ] ifte
-\end{verbatim}
-
-The \texttt{unless*} combinator provides a convinient way to place another value on the stack if the top of the stack is \texttt{f}, and leave the stack intact otherwise. The \texttt{mime-type} word uses it to provide a default value in case an association list lookup fails:
-
-\begin{verbatim}
-: mime-type ( filename -- mime-type )
-    file-extension mime-types assoc [ "text/plain" ] unless* ;
-\end{verbatim}
-
-If \texttt{unless*} was not available, the above word could be written as
-follows:
-
-\begin{verbatim}
-: mime-type ( filename -- mime-type )
-    file-extension mime-types assoc dup [
-        drop "text/plain"
-    ] unless ;
-\end{verbatim}
-
-\subsection{The call stack}
-
-So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
-
-Another fundamental stack is the \emph{call stack}. When invoking an inner colon definition, the interpreter pushes the current execution state on the call stack so that it can be restored later.
-
-The call stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the call stack, and vice versa, respectively.
-
-Here is an example:
-
-\begin{verbatim}
-: acons ( value key alist -- alist )
-    >r swons r> cons ;
-\end{verbatim}
-
-When the word is called, \texttt{swons} is applied to \texttt{value} and \texttt{key} creating a cons cell whose car is \texttt{key} and whose cdr is \texttt{value}, then \texttt{cons} is applied to this new cons cell, and \texttt{alist}. So this word adds the \texttt{key}/\texttt{value} pair to the beginning of the \texttt{alist}.
-
-Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single quotation or word definition. The following examples illustrate the point:
-
-\begin{verbatim}
-: the-good >r 2 + r> * ;
-: the-bad  >r 2 + ;
-: the-ugly r> ;
-\end{verbatim}
-
-Basically, the rule is you must leave the call stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can continue executing without seeing your data on the call stack.
-
-One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the callstack before returning.
-
-\subsection{Recursion}
-
-The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional. The general form of a recursive word looks as follows:
-
-\begin{alltt}
-: recursive
-    \emph{condition} {[}
-        \emph{recursive case}
-    {] [}
-        \emph{base case}
-    {]} ifte ;
-\end{alltt}
-
-The recursive case contains one or more calls to the original word.
-
-There are a few things worth noting about the stack flow inside a recursive word. The condition must take care to preserve any input parameters needed for the base case and recursive case. The base case must consume all inputs, and leave the final return values on the stack. The recursive case should somehow reduce one of the parameters. This could mean incrementing or decrementing an integer, taking the \texttt{cdr} of a list, and so on. Parameters must eventually reduce to a state where the condition returns \texttt{f}, to avoid an infinite recursion.
-
-The recursive case should also be coded such that the stack effect of the total definition is the same regardless of how many iterations are preformed; words that consume or produce different numbers of paramters depending on circumstances are very hard to debug.
-
-In a programming language such as Java\footnote{Although by the time you read this, Java implementations might be doing tail-call optimization.}, using recursion to iterate through a long list is highly undesirable because it risks overflowing the (finite) call stack depth. However, Factor performs \emph{tail call optimization}, which is based on the observation that if the recursive call is made at a point right before the word being defined would return, there is \emph{actually nothing to save} on the call stack, so recursion call nesting can occur to arbitrary depth. Such recursion is known as \emph{tail recursion}.
-
-Here is an example of a word that is not tail-recursive:
-
-\begin{alltt}
-: factorial ( n -- n! )
-    dup 0 = {[}
-        drop 1
-    {] [}
-        dup pred factorial *
-    {]} ifte ;
-\end{alltt}
-
-The reason it is not tail recursive is that after the recursive call to \texttt{factorial} returns, the \texttt{*} word must still be called.\footnote{
-It is possible to rewrite \texttt{factorial} to be tail-recursive by splitting it into two words, the second of which takes an accumulator which is multiplied at each iteration. Of course, none of this is relevant, since the built-in library already provides a word \texttt{fac} that uses a tail-recursive combinator.}
-
-The following definition is tail-recursive, due to the placement of the recursive call to \texttt{contains?}, as well as the \texttt{ifte} forms that surround it:
-
-\begin{verbatim}
-: contains? ( element list -- remainder )
-    dup [
-        2dup car = [ nip ] [ cdr contains? ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-\end{verbatim}
-
-\subsection{Combinators}
-
-Recall from \ref{sub:Conditionals} that a quotation is simply a list containing executable words and literals. A \emph{combinator} is a word that takes quotations from the stack and executes them according to some pattern. We've already seen the \texttt{ifte} combinator, which is the basis of all conditional branching. Another very simple combinator is \texttt{call}.
-
-\texttt{call} \texttt{( quot -{}- )} executes the quotation at the
-top of the stack. Try evaluating the following:
-
-\begin{alltt}
-{[} 1 2 3 + {*} {]} .s
-\emph{\{ {[} 1 2 3 + {*} {]} \}}
-call .s
-\emph{\{ 5 \}}
-\end{alltt}
-
-Combined with recursion, the \texttt{ifte} and \texttt{call} combinators can be used to construct almost any kind of looping or iteration structure.
-
-\subsection{Sequence combinators}
-
-In a traditional language such as C, every iteration or collection
-must be written out as a loop, with setting up and updating of indexes,
-etc. Factor on the other hand relies on combinators and quotations
-to avoid duplicating these loop ``design patterns'' throughout
-the code.
-
-Factor provides three primary types of sequences; lists, vectors and strings. For each type, there is a pair of combinators; an \emph{iterator} that pushes each element of the sequence in turn, and executes a given quotation, and a \emph{collector} that also applies a quotation to each sequence element, but collects the results into a new sequence of the same type.
-
-The list iterator/collector combinator words are named \texttt{each} and \texttt{map}.
-
-\texttt{each ( list quot -{}- )} pushes each element of the list in
-turn, and executes the quotation. The list and quotation are not on
-the stack when the quotation is executed. This allows a powerful idiom
-where the quotation makes a copy of a value on the stack, and consumes
-it along with the list element.
-
-The previously-mentioned \texttt{reverse} word is implemented using
-\texttt{each}:
-
-\begin{alltt}
-: reverse ( list -- list ) {[} {]} swap {[} swons {]} each ;
-\end{alltt}
-
-To understand how it works, consider that each element of the original
-list is consed onto the beginning of a new list, in turn. So the last
-element of the original list ends up at the beginning of the new list.
-
-\texttt{map ( list quot -{}- list )} is similar to \texttt{each},
-except after each iteration the return value of the quotation is collected into a new
-list. The quotation must only leave one value on the stack; if it leaves more or less, the stack will underflow or overflow.
-
-For example, suppose we have a list where each element stores the
-quantity of a some nutrient in 100 grams of food; we would like to
-find out the total nutrients contained in 300 grams:
-
-\begin{alltt}
-: multiply-each ( n list -{}- list )
-    {[} dupd {*} {]} map nip ;
-3 {[} 50 450 101 {]} multiply-each .
-\emph{{[} 180 1350 303 {]}}
-\end{alltt}
-
-Note the use of \texttt{dupd} to preserve the value of \texttt{n} after each iteration, and the final \texttt{nip} to discard the value of \texttt{n}.
-
-The vector iterator/collector combinator words are named \texttt{vector-each} and \texttt{vector-map}.
-
-\texttt{vector-each ( vector quot -{}- )} pushes each element of the vector in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( obj -{}- )}. The vector and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the vector for accumilation and so on.
-
-The \texttt{stack>list} word makes use of \texttt{vector-each} to construct a list containing all elements of a given vector, in reverse order. In fact, its definition looks exactly like that of \texttt{reverse} except the \texttt{vector-each} combinator is used in place of \texttt{each}:
-
-\begin{alltt}
-: stack>list ( vector -- list )
-    {[} {]} swap {[} swons {]} vector-each ;
-\end{alltt}
-
-The \texttt{vector>list} word is defined as first creating a list of all elements in the vector in reverse order using \texttt{stack>list}, and then reversing this list:
-
-\begin{alltt}
-: vector>list ( vector -- list )
-    stack>list nreverse ;
-\end{alltt}
-
-\texttt{vector-map ( vector quot -{}- str )} is similar to \texttt{vector-each}, except after each iteration the return value of the quotation is collected into a new vector. The quotation should have a stack effect of \texttt{( obj -{}- obj )}.
-
-The \texttt{clone-vector} word is implemented as a degenerate case of \texttt{vector-map} -- the elements of the original vector are copied into a new vector without any modification:
-
-\begin{alltt}
-: clone-vector ( vector -- vector )
-    {[} {]} vector-map ;
-\end{alltt}
-
-The string iterator/collector combinator words are named \texttt{str-each} and \texttt{str-map}.
-
-\texttt{str-each ( str quot -{}- )} pushes each character of the string in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( ch -{}- )}. The string and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the string for accumilation and so on. The following example counts the number of occurrences of the letter ``a'' in a string:
-
-\begin{alltt}
-: count-a ( str -- n )
-    0 swap {[} CHAR: a = {[} 1 + {]} when {]} str-each ;
-
-"Lets just say that you may stay" count-a .
-\emph{4}
-\end{alltt}
-
-\texttt{str-map ( str quot -{}- str )} is similar to \texttt{str-each}, except after each iteration the return value of the quotation is collected into a new string. The quotation should have a stack effect of \texttt{( ch -{}- str/ch )}. The following example replaces all occurrences of the space character in the string with \texttt{+}:
-
-\begin{alltt}
-"We do not like spaces" {[} CHAR: \textbackslash{}s CHAR: + replace {]} str-map .
-\emph{"We+do+not+like+spaces"}
-\end{alltt}
-
-\section{PRACTICAL: Contractor timesheet}
+\chapter{Practical: a contractor timesheet}
 
 For the second practical example, we will code a small program that tracks how long you spend working on tasks. It will provide two primary functions, one for adding a new task and measuring how long you spend working on it, and another to print out the timesheet. A typical interaction looks like this:
 
@@ -1528,7 +2176,7 @@ x
 
 Once you have finished working your way through this tutorial, you might want to try extending the program -- for example, it could print the total hours, prompt for an hourly rate, then print the amount of money that should be billed.
 
-\subsection{Measuring a duration of time}
+\section{Measuring a duration of time}
 
 When you begin working on a new task, you tell the timesheet you want
 to add a new entry. It then measures the elapsed time until you specify
@@ -1564,7 +2212,7 @@ Note that the \texttt{/i} word \texttt{( x y -{}- x/y )}, from the
 makes sense, since we are not interested in fractional parts of a
 minute here.
 
-\subsection{Adding a timesheet entry}
+\section{Adding a timesheet entry}
 
 Now that we can measure a time duration at the keyboard, lets write
 the \texttt{add-entry-prompt} word. This word does exactly what one
@@ -1607,7 +2255,7 @@ it interactively like so:
 \emph{\{ {[} 2 | "Studying Factor" {]} \}}
 \end{alltt}
 
-\subsection{Printing the timesheet}
+\section{Printing the timesheet}
 
 The hard part of printing the timesheet is turning the duration in
 minutes into a nice hours/minutes string, like {}``01:15''. We would
@@ -1716,7 +2364,7 @@ print-timesheet
 \emph{Paperwork                                         1:05}
 \end{alltt}
 
-\subsection{The main menu}
+\section{The main menu}
 
 Finally, we will code a main menu that looks like this:
 
@@ -1778,7 +2426,7 @@ Finally, we want a \texttt{menu} word that first prints a menu, then prompts for
 
 Considering the stack effects of \texttt{print-menu} and \texttt{menu-prompt}, it should be obvious why the \texttt{dup} is needed.
 
-\subsection{Finishing off}
+\section{Finishing off}
 
 We now need a \texttt{main-menu} word. It takes the timesheet vector from the stack, and recursively calls itself until the user requests that the timesheet application exits:
 
@@ -1800,7 +2448,7 @@ All that remains now is the ``main word'' that runs the program with an empty ti
     10 <vector> main-menu ;
 \end{alltt}
 
-\subsection{The complete program}
+\section{The complete program}
 
 \begin{verbatim}
 ! Contractor timesheet example
@@ -1879,226 +2527,6 @@ USE: vectors
     10 <vector> main-menu ;
 \end{verbatim}
 
-\section{Structures}
-
-While sequences are very useful, for many programming problems a more structured representation of data is needed. Factor provides a set of tools for solving this problem; association lists, hashtables, and variables.
-All three are closely related to the notion of object equality, which will be covered first.
-
-\subsection{Identity and equality}
-
-What does it mean for two objects to be ``equal''? In actual fact, there are two ways of comparing objects. Two object references can be compared for \emph{identity} using the \texttt{eq?~( obj obj -{}- ?~)} word. This only returns true if both references point to the same object. A weaker form of comparison is the \texttt{= ( obj obj -{}- ?~)} word, which checks if two objects ``have the same shape''.
-If two objects are \texttt{eq?}, they will also be \texttt{=}, however the converse does not hold in the general case.
-
-For example, two literal objects with the same printed representation are as a general rule not always \texttt{eq?}, however they are \texttt{=}:
-
-\begin{alltt}
-{[} 1 2 3 {]} {[} 1 2 3 {]} eq? .
-\emph{f}
-{[} 1 2 3 {]} {[} 1 2 3 {]} = .
-\emph{t}
-\end{alltt}
-
-On the other hand, duplicating an object reference on the stack using \texttt{dup} or similar, will give two references which are \texttt{eq?}:
-
-\begin{alltt}
-"Hello" dup eq? .
-\emph{t}
-\end{alltt}
-
-In most cases, only \texttt{=} needs to be used. In fact, \texttt{eq?} is only used in a handful of places in the Factor standard library.
-
-\subsection{Association lists}
-
-An \emph{association list} is a list where every element is a cons. The
-car of each cons is a name, the cdr is a value. The literal notation
-is suggestive:
-
-\begin{alltt}
-{[}
-    {[} "Jill"  | "CEO" {]}
-    {[} "Jeff"  | "manager" {]}
-    {[} "James" | "lowly web designer" {]}
-{]}
-\end{alltt}
-
-\texttt{assoc? ( obj -{}- ?~)} returns \texttt{t} if the object is
-a list whose every element is a cons; otherwise it returns \texttt{f}.
-
-\texttt{assoc ( key alist -{}- value )} looks for a pair with this
-key in the list, and pushes the cdr of the pair. Pushes f if no pair
-with this key is present. Note that \texttt{assoc} cannot differentiate between
-a key that is not present at all, or a key with a value of \texttt{f}.
-
-\texttt{assoc{*} ( key alist -{}- {[} key | value {]} )} looks for
-a pair with this key, and pushes the pair itself. Unlike \texttt{assoc},
-\texttt{assoc{*}} returns different values in the cases of a value
-set to \texttt{f}, or an undefined value.
-
-\texttt{set-assoc ( value key alist -{}- alist )} removes any existing
-occurrence of a key from the list, and adds a new pair. This creates
-a new list, the original is unaffected.
-
-\texttt{acons ( value key alist -{}- alist )} is slightly faster
-than \texttt{set-assoc} since it simply conses a new pair onto the
-list. However, if used repeatedly, the list will grow to contain a
-lot of {}``shadowed'' pairs.
-
-The following pair of word definitions from the \texttt{html} vocabulary demonstrates the usage of association lists. It implements a mapping of special characters to their HTML entity names. Note the usage of \texttt{?}~to return the original character if the association lookup yields \texttt{f}:
-
-\begin{alltt}
-: html-entities ( -- alist )
-    {[}
-        {[} CHAR: < | "\&lt;"   {]}
-        {[} CHAR: > | "\&gt;"   {]}
-        {[} CHAR: \& | "\&amp;"  {]}
-        {[} CHAR: {'} | "\&apos;" {]}
-        {[} CHAR: {"} | "\&quot;" {]}
-    {]} ;
-
-: char>entity ( ch -- str )
-    dup >r html-entities assoc dup r> ? ;
-\end{alltt}
-
-Searching association lists incurs a linear time cost, so they should
-only be used for small mappings -- a typical use is a mapping of half
-a dozen entries or so, specified literally in source. Hashtables offer
-better performance with larger mappings.
-
-\subsection{Hashtables}
-
-A hashtable, much like an association list, stores key/value pairs, and offers lookup by key. However, whereas an association list must be searched linearly to locate keys, a hashtable uses a more sophisticated method. Key/value pairs are sorted into \emph{buckets} using a \emph{hash function}. If two objects are equal, then they must have the same hash code; but not necessarily vice versa. To look up the value associated with a key, only the bucket corresponding to the key has to be searched. A hashtable is simply a vector of buckets, where each bucket is an association list.
-
-\texttt{<hashtable> ( capacity -{}- hash )} creates a new hashtable with the specified number of buckets. A hashtable with one bucket is basically an association list. Right now, a ``large enough'' capacity must be specified, and performance degrades if there are too many key/value pairs per bucket. In a future implementation, hashtables will grow as needed as the number of key/value pairs increases.
-
-\texttt{hash ( key hash -{}- value )} looks up the value associated with a key in the hashtable. Pushes \texttt{f} if no pair with this key is present. Note that \texttt{hash} cannot differentiate between a key that is not present at all, or a key with a value of \texttt{f}.
-
-\texttt{hash* ( key hash -{}- {[} key | value {]} )} looks for
-a pair with this key, and pushes the pair itself. Unlike \texttt{hash},
-\texttt{hash{*}} returns different values in the cases of a value
-set to \texttt{f}, or an undefined value.
-
-\texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
-
-Hashtables can be converted to association lists and vice versa using
-the \texttt{hash>alist} and \texttt{alist>hash} words. The list of keys and
-list of values can be extracted using the \texttt{hash-keys} and \texttt{hash-values} words.
-
-examples
-
-\subsection{Variables}
-
-Notice that until now, all the code except a handful of examples has only used the stack for storage. You can also use variables to store temporary data, much like in other languages, however their use is not so prevalent. This is not a coincidence -- Fator was designed this way, and mastery of the stack is essential. Using variables where the stack is more appropriate leads to ugly, unreusable code.
-
-Variables are typically used for longer-term storage of data, and compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language. Variables should only be used for intermediate results if keeping everything on the stack would result in ackward stack flow.
-
-The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. Variable names are strings, and they do not have to be declared before use. For example:
-
-\begin{alltt}
-5 "x" set
-"x" get .
-\emph{5}
-\end{alltt}
-
-\subsection{Namespaces}
-
-Only having one list of variable name/value bindings would make the language terribly inflexible. Instead, a variable has any number of potential values, one per namespace. There is a notion of a ``current namespace''; the \texttt{set} word always stores variables in the current namespace. On the other hand, \texttt{get} traverses up the stack of namespace bindings until it finds a variable with the specified name.
-
-\texttt{bind ( namespace quot -{}- )} executes a quotation in the dynamic scope of a namespace. For example, the following sets the value of \texttt{x} to 5 in the global namespace, regardless of the current namespace at the time the word was called.
-
-\begin{alltt}
-: global-example ( -- )
-    global {[} 5 "x" set {]} bind ;
-\end{alltt}
-
-\texttt{<namespace> ( -{}- namespace )} creates a new namespace object. Actually, a namespace is just a hashtable, with a default capacity.
-
-\texttt{with-scope ( quot -{}- )} combines \texttt{<namespace>} with \texttt{bind} by executing a quotation in a new namespace.
-
-get example
-
-describe
-
-\subsection{The name stack}
-
-The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
-
-\begin{alltt}
-: bind ( namespace quot -- )
-    swap >n call n> drop ;
-\end{alltt}
-
-The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
-
-The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
-
-\begin{alltt}
-: >n ( namespace -- n:namespace ) namestack* vector-push ;
-: n> ( n:namespace -- namespace ) namestack* vector-pop ;
-\end{alltt}
-
-\subsection{\label{sub:List-constructors}List constructors}
-
-The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
-of stack elements that have to be juggled.
-
-The word \texttt{{[}, ( -{}- )} begins list construction. This also pushes a new namespace on the name stack, so any variable values that are set between calls to \texttt{[,} and \texttt{,]} will be lost.
-
-The word \texttt{, ( obj -{}- )} appends an object to the partial
-list.
-
-The word \texttt{,{]} ( -{}- list )} pushes the complete list, and pops the corresponding namespace from the name stack.
-
-The fact that a new
-scope is created between \texttt{{[},} and \texttt{,{]}} is very important.
-This means
-that list constructions can be nested. There is no
-requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
-word, however, debugging becomes prohibitively difficult when a list
-construction begins in one word and ends with another.
-
-Here is an example of list construction using this technique:
-
-\begin{alltt}
-{[}, 1 10 {[} 2 {*} dup , {]} times drop ,{]} .
-\emph{{[} 2 4 8 16 32 64 128 256 512 1024 {]}}
-\end{alltt}
-
-\subsection{String constructors}
-
-The string construction words provide an alternative way to build up a string. Instead of passing a string buffer around on the stack, they store the string buffer in a variable. This reduces the number
-of stack elements that have to be juggled.
-
-The word \texttt{<\% ( -{}- )} begins string construction. The word
-definition creates a string buffer. Instead of leaving the string
-buffer on the stack, the word creates and pushes a scope on the name
-stack.
-
-The word \texttt{\% ( str/ch -{}- )} appends a string or a character
-to the partial list. The word definition calls \texttt{sbuf-append}
-on a string buffer located by searching the name stack.
-
-The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
-definition pops the name stack and calls \texttt{sbuf>str} on the
-appropriate string buffer.
-
-Compare the following two examples -- both define a word that concatenates together all elements of a list of strings. The first one uses a string buffer stored on the stack, the second uses string construction words:
-
-\begin{alltt}
-: cat ( list -- str )
-    100 <sbuf> swap {[} over sbuf-append {]} each sbuf>str ;
-
-: cat ( list -- str )
-    <\% {[} \% {]} each \%> ;
-\end{alltt}
-
-The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, all code executed between two words is part of the scope. This allows the call to \texttt{\%} to occur in a nested word. For example, here is a pair of definitions that turn an association list of strings into a string of the form \texttt{key1=value1 key2=value2 ...}:
-
-\begin{alltt}
-: pair\% ( pair -{}- )
-    unswons \% "=" \% \% ;
-
-: assoc>string ( alist -{}- )
-    <\% [ pair\% " " \% ] each \%> ;
-\end{alltt}
+\input{new-guide.ind}
 
 \end{document}
