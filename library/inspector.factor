@@ -109,8 +109,8 @@ USE: vectors
         [ prettyprint ]
     ] cond ;
 
-: describe-object-path ( string -- )
-    [
-        dup "object-path" set
-        "'" split global [ object-path ] bind describe
-    ] with-scope ;
+: lookup ( str -- object )
+    global [ "'" split object-path ] bind ;
+
+: describe-path ( string -- )
+    [ dup "object-path" set lookup describe ] with-scope ;

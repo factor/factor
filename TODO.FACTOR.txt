@@ -10,7 +10,6 @@
 - multitasking
 - review doc formatting with latex2html
 - sidekick: error source not removed
-- array index out of bounds
 
 [error] AWT-EventQueue-0: java.lang.NullPointerException
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
@@ -40,8 +39,11 @@
 
 + listener/plugin:
 
+- lineno/file for shuffle defs
+- balance needs USE:
+- input style after clicking link
+- completion: enter no good
 - completion: don't show automatically
-- debug sidekick
 - completion in the listener
 - special completion for USE:/IN:
 - fedit broken with listener
@@ -60,6 +62,8 @@
 
 + JVM compiler:
 
+- compiled stack traces broken
+- save classes to disk
 - tail call optimization broken again
 - don't compile inline words
 - recursive words with code after ifte
@@ -71,7 +75,6 @@
 
 + misc:
 
-- compiled stack traces broken
 - namespace clone drops static var bindings
 - ditch map
 - ditch expand
@@ -85,7 +88,6 @@
 - log-client: fix for native
 - if user clicks stop in browser, doesn't stop sending?
 - log with date
-- log user agent
 - add a socket timeout
 - if a directory is requested and URL does not end with /, redirect
 - return more header fields, like Content-Length, Last-Modified, and so on

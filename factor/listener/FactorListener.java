@@ -49,6 +49,7 @@ public class FactorListener extends JTextPane
 		(Cursor.WAIT_CURSOR);
 
 	public static final Object Link = new Object();
+	public static final Object Actions = new Object();
 
 	private EventListenerList listenerList;
 
@@ -145,6 +146,7 @@ public class FactorListener extends JTextPane
 		try
 		{
 			StyledDocument doc = (StyledDocument)getDocument();
+			setCaretPosition(doc.getLength());
 			doc.insertString(doc.getLength(),eval + "\n",
 				getCharacterAttributes());
 		}
@@ -174,27 +176,77 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
-	//{{{ getLinkAt() method
-	private String getLinkAt(int pos)
+	//{{{ getAttributes() method
+	private AttributeSet getAttributes(int pos)
 	{
 		StyledDocument doc = (StyledDocument)getDocument();
 		Element e = doc.getCharacterElement(pos);
-		AttributeSet a = e.getAttributes();
+		return e.getAttributes();
+	} //}}}
+
+	//{{{ getActions() method
+	private Cons getActions(int pos)
+	{
+		AttributeSet a = getAttributes(pos);
 		if(a == null)
 			return null;
 		else
-			return (String)a.getAttribute(Link);
+			return (Cons)a.getAttribute(Actions);
+	} //}}}
+
+	//{{{ getActionsPopup() method
+	private JPopupMenu getActionsPopup(int pos)
+	{
+		Cons actions = getActions(pos);
+		if(actions == null)
+			return null;
+
+		JPopupMenu popup = new JPopupMenu();
+		while(actions != null)
+		{
+			Cons action = (Cons)actions.car;
+			JMenuItem item = new JMenuItem((String)action.cdr);
+			item.setActionCommand((String)action.car);
+			item.addActionListener(new EvalAction());
+			popup.add(item);
+			actions = actions.next();
+		}
+
+		return popup;
+	} //}}}
+
+	//{{{ showPopupMenu() method
+	private void showPopupMenu(int pos)
+	{
+		JPopupMenu actions = getActionsPopup(pos);
+		if(actions == null)
+			return;
+
+		try
+		{
+			StyledDocument doc = (StyledDocument)getDocument();
+			Element e = doc.getCharacterElement(pos);
+			Point pt = modelToView(e.getStartOffset())
+				.getLocation();
+			FontMetrics fm = getFontMetrics(getFont());
+
+			actions.show(this,pt.x,pt.y + fm.getHeight());
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	} //}}}
 
 	//{{{ MouseHandler class
 	class MouseHandler extends MouseInputAdapter
 	{
-		public void mouseClicked(MouseEvent e)
+		public void mousePressed(MouseEvent e)
 		{
 			Point pt = new Point(e.getX(), e.getY());
 			int pos = viewToModel(pt);
 			if(pos >= 0)
-				eval(getLinkAt(pos));
+				showPopupMenu(pos);
 		}
 
 		public void mouseMoved(MouseEvent e)
@@ -204,7 +256,7 @@ public class FactorListener extends JTextPane
 			if(pos >= 0)
 			{
 				Cursor cursor;
-				if(getLinkAt(pos) != null)
+				if(getActions(pos) != null)
 					cursor = MoveCursor;
 				else
 					cursor = DefaultCursor;
@@ -215,12 +267,20 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
+	//{{{ EvalAction class
+	class EvalAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			eval(evt.getActionCommand());
+		}
+	} //}}}
+
 	//{{{ EnterAction class
 	class EnterAction extends AbstractAction
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
-			setCaretPosition(getDocument().getLength());
 			replaceSelection("\n");
 
 			try

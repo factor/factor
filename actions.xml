@@ -40,7 +40,7 @@
 	</ACTION>
 	<ACTION NAME="factor-edit">
 		<CODE>
-			factorWordOperation(view,"USE: jedit jedit");
+			factorWordOperation(view,"jedit");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-usages">
@@ -55,7 +55,7 @@
 			else
 			{
 				factorEval(view,
-					"[ " + textArea.selectedText + " ] balance");
+					"[ " + textArea.selectedText + " ] balance .");
 			}
 		</CODE>
 	</ACTION>

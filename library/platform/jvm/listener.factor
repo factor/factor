@@ -64,20 +64,30 @@ USE: unparser
     "java.awt.Color"
     jnew ;
 
-: link-key ( -- attr )
-    "factor.listener.FactorListener" "Link" jvar-static-get
+: actions-key ( -- attr )
+    "factor.listener.FactorListener" "Actions" jvar-static-get
     ; inline
 
-: obj>listener-link ( obj -- link )
-    #! Listener links are quotations.
-    dup string? [
-        ! Inspector link.
-        unparse " describe-object-path" cat2
-    ] when ;
+: actions ( -- list )
+    [
+        [ "describe-path" | "Describe" ]
+        [ "lookup" | "Push" ]
+        [ "lookup jedit" | "jEdit" ]
+        [ "lookup usages." | "Usages" ]
+    ] ;
+
+: <action-menu-item> ( path pair -- pair )
+    uncons >r " " swap cat3 r> cons ;
+
+: <actions-menu> ( path -- alist )
+    unparse actions [ dupd <action-menu-item> ] inject nip ;
+
+: underline-attribute ( attribute-set -- )
+    t "Underline" swing-attribute+ ;
 
 : link-attribute ( attribute-set target -- )
-    [ dup t "Underline" swing-attribute+ ] dip
-    obj>listener-link link-key attribute+ ;
+    over underline-attribute
+    <actions-menu> actions-key attribute+ ;
 
 : style>attribute-set ( -- attribute-set )
     <attribute-set>
