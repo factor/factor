@@ -81,3 +81,6 @@ options.factor.code=new factor.jedit.FactorOptionPane();
 options.factor.program=Factor runtime executable:
 options.factor.image=Factor image:
 options.factor.choose=Choose file...
+options.factor.args=Additional arguments:
+
+factor.external.args=-jedit

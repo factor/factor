@@ -172,3 +172,12 @@ USE: math
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
     [ [ default-error-handler ] when* ] catch ;
+
+: init-error-handler ( -- )
+    [ 1 exit* ] >c ( last resort )
+    [ default-error-handler 1 exit* ] >c
+    [ dup save-error rethrow ] 5 setenv ( kernel calls on error ) ;
+
+! So that stage 2 boot gives a useful error message if something
+! fails after this file is loaded.
+init-error-handler

@@ -84,13 +84,14 @@ public class FactorPlugin extends EditPlugin
 	{
 		if(external == null)
 		{
-			Process p = Runtime.getRuntime().exec(
-				new String[] {
-					jEdit.getProperty("factor.external.program"),
-					jEdit.getProperty("factor.external.image"),
-					"-no-ansi",
-					"-jedit"
-				});
+			String[] args = jEdit.getProperty("factor.external.args","-jedit")
+				.split(" ");
+			String[] nargs = new String[args.length + 3];
+			nargs[0] = jEdit.getProperty("factor.external.program");
+			nargs[1] = jEdit.getProperty("factor.external.image");
+			nargs[2] = "-no-ansi";
+			System.arraycopy(args,0,nargs,3,args.length);
+			Process p = Runtime.getRuntime().exec(nargs);
 			p.getErrorStream().close();
 
 			external = new ExternalFactor(

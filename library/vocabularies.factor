@@ -69,3 +69,7 @@ USE: stack
     #! already contains the word, the existing instance is
     #! returned.
     2dup (search) [ nip nip ] [ (create) dup reveal ] ifte* ;
+
+: forget ( word -- )
+    #! Remove a word definition.
+    dup word-vocabulary vocab [ word-name off ] bind ;

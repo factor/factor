@@ -166,6 +166,8 @@ IN: syntax
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing
+: FORGET: scan-word forget ; parsing
+
 : USE: scan "use" cons@ ; parsing
 : IN: scan dup "use" cons@ "in" set ; parsing
 

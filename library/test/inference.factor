@@ -129,6 +129,24 @@ DEFER: foe
 : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
 [ [ bad-bin ] infer ] unit-test-fails
 
+: nested-when ( -- )
+    t [
+        t [
+            5 drop
+        ] when
+    ] when ;
+
+[ [ 0 | 0 ] ] [ [ nested-when ] infer ] unit-test
+
+: nested-when* ( -- )
+    [
+        [
+            drop
+        ] when*
+    ] when* ;
+
+[ [ 1 | 0 ] ] [ [ nested-when* ] infer ] unit-test
+
 [ [ 2 | 1 ] ] [ [ fie ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ foe ] infer ] unit-test
 
@@ -139,15 +157,16 @@ DEFER: foe
 [ [ 1 | 2 ] ] [ [ uncons ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ unit ] infer ] unit-test
 [ [ 1 | 2 ] ] [ [ unswons ] infer ] unit-test
-! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
-! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
-! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
 
 [ [ 1 | 1 ] ] [ [ length ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ reverse ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ tree-contains? ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ remove ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ prune ] infer ] unit-test
 
 [ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test

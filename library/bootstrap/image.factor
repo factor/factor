@@ -38,11 +38,6 @@
 ! It initializes the core interpreter services, and proceeds to
 ! run platform/native/boot-stage2.factor.
 
-IN: namespaces
-
-( Java Factor doesn't have this )
-: namespace-buckets 23 ;
-
 IN: image
 USE: combinators
 USE: errors
@@ -63,10 +58,15 @@ USE: vectors
 USE: unparser
 USE: words
 
-: image "image" get ;
-: emit ( cell -- ) image vector-push ;
+! The image being constructed; a vector of word-size integers
+SYMBOL: image
 
-: fixup ( value offset -- ) image set-vector-nth ;
+! Boot quotation, set by boot.factor
+SYMBOL: boot-quot
+
+: emit ( cell -- ) image get vector-push ;
+
+: fixup ( value offset -- ) image get set-vector-nth ;
 
 ( Object memory )
 
@@ -127,7 +127,7 @@ USE: words
 ( Allocator )
 
 : here ( -- size ) 
-    image vector-length header-size - cell * base + ;
+    image get vector-length header-size - cell * base + ;
 
 : here-as ( tag -- pointer )
     here swap bitor ;
@@ -195,9 +195,9 @@ USE: words
     ] ifte ;
 
 : fixup-words ( -- )
-    "image" get [
+    image get [
         dup word? [ fixup-word ] when
-    ] vector-map "image" set ;
+    ] vector-map image set ;
 
 : 'word ( word -- pointer )
     dup pooled-object dup [ nip ] [ drop ] ifte ;
@@ -208,18 +208,6 @@ DEFER: '
 
 : cons, ( -- pointer ) cons-tag here-as ;
 : 'cons ( c -- tagged ) uncons ' swap ' cons, -rot emit emit ;
-
-( Ratios -- almost the same as a cons )
-
-: ratio, ( -- pointer ) ratio-tag here-as ;
-: 'ratio ( a/b -- tagged )
-    dup denominator ' swap numerator ' ratio, -rot emit emit ;
-
-( Complex -- almost the same as ratio )
-
-: complex, ( -- pointer ) complex-tag here-as ;
-: 'complex ( #{ a b } -- tagged )
-    dup imaginary ' swap real ' complex, -rot emit emit ;
 
 ( Strings )
 
@@ -317,8 +305,6 @@ DEFER: '
     [
         [ fixnum?  ] [ 'fixnum      ]
         [ bignum?  ] [ 'bignum      ]
-        [ ratio?   ] [ 'ratio       ]
-        [ complex? ] [ 'complex     ]
         [ word?    ] [ 'word        ]
         [ cons?    ] [ 'cons        ]
         [ string?  ] [ 'string      ]
@@ -331,16 +317,35 @@ DEFER: '
 
 ( End of the image )
 
-: (set-boot) ( quot -- ) ' boot-quot-offset fixup ;
-: (set-global) ( namespace -- ) ' global-offset fixup ;
+: vocabularies, ( -- )
+    #! Produces code with stack effect ( -- vocabularies ).
+    #! This code sets up vocabulary hash tables.
+    \ <namespace> ,
+    [
+        "vocabularies" get [
+            uncons hash>alist , \ alist>hash , , \ set ,
+        ] hash-each
+    ] make-list ,
+    \ extend , ;
 
 : global, ( -- )
-    "vocabularies" get "vocabularies"
-    namespace-buckets <hashtable>
-    dup >r set-hash r> (set-global) ;
+    #! Produces code with stack effect ( vocabularies -- ).
+    <namespace> ' global-offset fixup
+    "vocabularies" ,
+    \ global ,
+    \ set-hash , ;
+
+: hash-quot ( -- quot )
+    #! Generate a quotation to generate vocabulary and global
+    #! namespace hashtables.
+    [ vocabularies, global, ] make-list ;
+
+: boot, ( quot -- )
+    boot-quot get append ' boot-quot-offset fixup ;
 
 : end ( -- )
-    global,
+    hash-quot
+    boot,
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -366,7 +371,7 @@ DEFER: '
 
 : with-minimal-image ( quot -- image )
     [
-        300000 <vector> "image" set
+        300000 <vector> image set
         521 <hashtable> "objects" set
         namespace-buckets <hashtable> "vocabularies" set
         ! Note that this is a vector that we can side-effect,
@@ -374,7 +379,7 @@ DEFER: '
         ! parser namespaces.
         1000 <vector> "word-fixups" set
         call
-        "image" get
+        image get
     ] with-scope ;
 
 : with-image ( quot -- image )

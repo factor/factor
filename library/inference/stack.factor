@@ -25,74 +25,33 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
-USE: ansi
-USE: combinators
-USE: compiler
-USE: errors
-USE: inference
-USE: kernel
-USE: listener
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: random
+IN: inference
+USE: interpreter
 USE: stack
-USE: streams
-USE: stdio
-USE: presentation
 USE: words
-USE: unparser
+USE: lists
 
-: cli-args ( -- args ) 10 getenv ;
+: meta-infer ( word -- )
+    #! Mark a word as being partially evaluated.
+    dup unit [ car host-word ] cons  "infer" set-word-property ;
 
-: warm-boot ( -- )
-    #! A fully bootstrapped image has this as the boot
-    #! quotation.
-    boot
+\ >r [ pop-d push-r ] "infer" set-word-property
+\ r> [ pop-r push-d ] "infer" set-word-property
 
-    init-error-handler
-    init-random
-    init-assembler
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    t "ansi" set
-    t "compile" set
-
-    ! The first CLI arg is the image name.
-    cli-args uncons parse-command-line "image" set
-
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
-
-    "compile" get [ compile-all ] when
-
-    run-user-init ;
-
-[
-    warm-boot
-    garbage-collection
-    "interactive" get [ print-banner listener ] when
-    0 exit*
-] set-boot
-
-init-error-handler
-
-0 [ drop succ ] each-word unparse write " words" print 
-
-"Inferring stack effects..." print
-0 [ unit try-infer [ succ ] when ] each-word
-unparse write " words have a stack effect" print
-
-"Bootstrapping is complete." print
-"Now, you can run ./f factor.image" print
-
-! Save a bit of space
-global [ "stdio" off ] bind
-
-garbage-collection
-"factor.image" save-image
-0 exit*
+\ drop meta-infer
+\ 2drop meta-infer 
+\ 3drop meta-infer
+\ dup meta-infer
+\ 2dup meta-infer
+\ 3dup meta-infer
+\ swap meta-infer
+\ over meta-infer
+\ pick meta-infer
+\ nip meta-infer
+\ tuck meta-infer
+\ rot meta-infer
+\ -rot meta-infer
+\ 2nip meta-infer
+\ transp meta-infer
+\ dupd meta-infer
+\ swapd meta-infer

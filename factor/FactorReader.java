@@ -346,7 +346,7 @@ public class FactorReader
 	public void pushExclusiveState(FactorWord start, FactorWord defining)
 		throws FactorParseException
 	{
-		if(getCurrentState().start != toplevel)
+		if(states != null && getCurrentState().start != toplevel)
 			scanner.error(start + " cannot be nested");
 		pushState(start,defining);
 	} //}}}

@@ -49,7 +49,7 @@ USE: vectors
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
-    >r hashcode HEX: ffffff bitand r> vector-length mod ;
+    >r hashcode r> vector-length rem ;
 
 : hash* ( key table -- [ key | value ] )
     #! Look up a value in the hashtable. First the bucket is

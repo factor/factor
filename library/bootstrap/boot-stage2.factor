@@ -102,7 +102,10 @@ USE: stdio
     "/library/tools/heap-stats.factor"
     "/library/gensym.factor"
     "/library/tools/interpreter.factor"
-    "/library/tools/inference.factor"
+    "/library/inference/inference.factor"
+    "/library/inference/words.factor"
+    "/library/inference/branches.factor"
+    "/library/inference/stack.factor"
 
     "/library/bootstrap/image.factor"
     "/library/bootstrap/cross-compiler.factor"

@@ -28,6 +28,11 @@
 USE: lists
 USE: image
 USE: parser
+USE: namespaces
+USE: stdio
+USE: combinators
+USE: kernel
+USE: vectors
 
 primitives,
 [
@@ -77,5 +82,7 @@ DEFER: boot
 
 [
     boot
+    "Good morning!" print
+    global vector? [ "vocabs set" ] [ "vocabs not set" ] ifte print
     "/library/bootstrap/boot-stage2.factor" run-resource
-] (set-boot)
+] boot-quot set

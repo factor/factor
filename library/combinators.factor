@@ -120,7 +120,7 @@ USE: stack
     #!
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
-    over [ call ] [ 2drop ] ifte ; inline
+    dupd [ drop ] ifte ; inline
 
 : forever ( quot -- )
     #! The code is evaluated in an infinite loop. Typically, a

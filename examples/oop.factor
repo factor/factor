@@ -39,7 +39,7 @@ SYMBOL: traits
     #! <foo> where foo is a traits type creates a new instance
     #! of foo.
     [ constructor-word [ <namespace> ] ] keep
-    traits-map [ traits pick set* ] cons append
+    traits-map [ traits pick set-hash ] cons append
     define-compound ;
 
 : predicate-word ( word -- word )

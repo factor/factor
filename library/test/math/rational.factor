@@ -85,6 +85,8 @@ unit-test
 
 [ -3 ] [ -3 10 mod ] unit-test
 [ 7 ] [ -3 10 rem ] unit-test
+[ 7 ] [ -13 10 rem ] unit-test
+[ 0 ] [ 37 37 rem ] unit-test
 
 [ -1 ] [ -12.55 sgn ] unit-test
 [ 1 ] [ 100000000000000000000000000000000 sgn ] unit-test

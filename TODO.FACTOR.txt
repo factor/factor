@@ -38,17 +38,16 @@
 
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
-- don't rehash strings on every startup
 - remove sbufs
 - cat, reverse-cat primitives
 - first-class hashtables
-- hash words in stage 2 of bootstrap
 - rewrite accessors and mutators in Factor, with slot/set-slot primitive
 - replace -export-dynamic with sundry-xt
 - add a socket timeout
 
 + misc:
 
+- unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup
 - nicer way to combine two paths
@@ -58,7 +57,6 @@
   objects
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link
-- FORGET: and forget
 
 + httpd:
 

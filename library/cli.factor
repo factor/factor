@@ -80,13 +80,13 @@ USE: words
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup [
+    dup f-or-"" [
         dup "-" str-head? dup [
             cli-param drop f
         ] [
             drop
         ] ifte
-    ] when ;
+    ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;

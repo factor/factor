@@ -51,6 +51,8 @@ public class FactorOptionPane extends AbstractOptionPane
 			createProgramField(jEdit.getProperty("factor.external.program")));
 		addComponent(jEdit.getProperty("options.factor.image"),
 			createImageField(jEdit.getProperty("factor.external.image")));
+		addComponent(jEdit.getProperty("options.factor.args"),
+			createArgsField(jEdit.getProperty("factor.external.args")));
 	} //}}}
 	
 	//{{{ _save() method
@@ -58,11 +60,13 @@ public class FactorOptionPane extends AbstractOptionPane
 	{
 		jEdit.setProperty("factor.external.program",program.getText());
 		jEdit.setProperty("factor.external.image",image.getText());
+		jEdit.setProperty("factor.external.args",args.getText());
 	} //}}}
 	
 	//{{{ Private members
 	private JTextField program;
 	private JTextField image;
+	private JTextField args;
 
 	//{{{ createProgramField() metnod
 	private JComponent createProgramField(String text)
@@ -76,6 +80,13 @@ public class FactorOptionPane extends AbstractOptionPane
 	{
 		image = new JTextField(text);
 		return createFieldAndButton(image);
+	} //}}}
+	
+	//{{{ createArgsField() metnod
+	private JComponent createArgsField(String text)
+	{
+		args = new JTextField(text);
+		return args;
 	} //}}}
 	
 	//{{{ createFieldAndButton() metnod
