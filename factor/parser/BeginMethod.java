@@ -41,14 +41,24 @@ public class BeginMethod extends FactorParsingDefinition
 	public void eval(FactorReader reader)
 		throws Exception
 	{
+		// remember the position before the word name
+		FactorScanner scanner = reader.getScanner();
+		int line = scanner.getLineNumber();
+		int col = scanner.getColumnNumber();
+		
 		FactorWord type = reader.nextWord(false);
 		if(type == null)
 			return;
 
-		FactorWord newWord = reader.nextWord(false);
-		if(newWord == null)
+		FactorWord generic = reader.nextWord(false);
+		if(generic == null)
 			return;
 
-		reader.pushExclusiveState(word,newWord);
+		MethodArtifact artifact = new MethodArtifact(type,generic);
+		artifact.setFile(scanner.getFileName());
+		artifact.setLine(line);
+		artifact.setColumn(col);
+		reader.addArtifact(artifact);
+		reader.pushExclusiveState(word,generic);
 	}
 }

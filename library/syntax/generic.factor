@@ -23,12 +23,10 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! Syntax: BUILTIN: <class> <type#> <slots> ;
     CREATE scan-word [ builtin-class ] [ ] ; parsing
 
-: COMPLEMENT: ( -- class predicate definition )
+: COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.
     CREATE
     dup intern-symbol
-    dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
     scan-word define-complement ; parsing
 
 : UNION: ( -- class predicate definition )

@@ -48,7 +48,7 @@ public abstract class FactorBufferProcessor
 		StringBuffer buf = new StringBuffer();
 
 		Cons words = (Cons)buffer.getProperty(
-			FactorSideKickParser.WORDS_PROPERTY);
+			FactorSideKickParser.ARTIFACTS_PROPERTY);
 		Cons wordCodeMap = null;
 		while(words != null)
 		{

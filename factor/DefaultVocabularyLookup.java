@@ -50,11 +50,11 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 
 		/* comments */
 		FactorWord lineComment = define("syntax","!");
-		lineComment.parsing = new LineComment(lineComment,false);
+		lineComment.parsing = new LineComment(lineComment);
 		FactorWord stackComment = define("syntax","(");
 		stackComment.parsing = new StackComment(stackComment);
 		FactorWord docComment = define("syntax","#!");
-		docComment.parsing = new LineComment(docComment,true);
+		docComment.parsing = new LineComment(docComment);
 
 		/* strings */
 		FactorWord str = define("syntax","\"");
@@ -91,7 +91,6 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		/* word defs */
 		FactorWord def = define("syntax",":");
 		def.parsing = new Def(def);
-		def.docComment = true;
 		FactorWord ine = define("syntax",";");
 		ine.parsing = new Ine(ine);
 		FactorWord symbol = define("syntax","SYMBOL:");

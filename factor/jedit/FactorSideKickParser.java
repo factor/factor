@@ -43,7 +43,7 @@ public class FactorSideKickParser extends SideKickParser
 	/**
 	 * We store the file's parse tree in this property.
 	 */
-	public static String WORDS_PROPERTY = "factor-parsed";
+	public static String ARTIFACTS_PROPERTY = "factor-parsed";
 
 	private Map previewMap;
 
@@ -98,7 +98,7 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		Object words = buffer.getProperty(WORDS_PROPERTY);
+		Object words = buffer.getProperty(ARTIFACTS_PROPERTY);
 		if(words instanceof Cons)
 			forgetWords((Cons)words);
 
@@ -135,7 +135,7 @@ public class FactorSideKickParser extends SideKickParser
 			d.in = r.getIn();
 			d.use = r.getUse();
 
-			addWordDefNodes(d,r.getDefinedWords(),buffer);
+			addArtifactNodes(d,r.getArtifacts(),buffer);
 		}
 		catch(FactorParseException pe)
 		{
@@ -152,7 +152,7 @@ public class FactorSideKickParser extends SideKickParser
 		}
 
 		if(r != null)
-			buffer.setProperty(WORDS_PROPERTY,r.getDefinedWords());
+			buffer.setProperty(ARTIFACTS_PROPERTY,r.getArtifacts());
 
 		return d;
 	} //}}}
@@ -171,21 +171,24 @@ public class FactorSideKickParser extends SideKickParser
 		}
 	} //}}}
 
-	//{{{ addWordDefNodes() method
-	private void addWordDefNodes(FactorParsedData d, Cons words, Buffer buffer)
+	//{{{ addArtifactNodes() method
+	private void addArtifactNodes(FactorParsedData d, Cons artifacts, Buffer buffer)
 	{
 		FactorAsset last = null;
 
-		while(words != null)
+		while(artifacts != null)
 		{
-			FactorWord word = (FactorWord)words.car;
+			FactorArtifact artifact = (FactorArtifact)artifacts.car;
 
-			/* word lines are indexed from 1 */
-			int startLine = Math.max(0,Math.min(
+			/* artifact lines are indexed from 1 */
+			int startLine = artifact.getLine();
+			startLine = Math.max(0,Math.min(
 				buffer.getLineCount() - 1,
-				word.line - 1));
+				startLine - 1));
 			int startLineLength = buffer.getLineLength(startLine);
-			int startCol = Math.min(word.col,startLineLength);
+
+			int startCol = artifact.getColumn();
+			startCol = Math.min(startCol,startLineLength);
 
 			int start = buffer.getLineStartOffset(startLine)
 				+ startCol;
@@ -193,10 +196,10 @@ public class FactorSideKickParser extends SideKickParser
 			if(last != null)
 				last.end = buffer.createPosition(Math.max(0,start - 1));
 
-			last = new FactorAsset(word,buffer.createPosition(start));
+			last = new FactorAsset(artifact,buffer.createPosition(start));
 			d.root.add(new DefaultMutableTreeNode(last));
 
-			words = words.next();
+			artifacts = artifacts.next();
 		}
 
 		if(last != null)
@@ -264,13 +267,13 @@ public class FactorSideKickParser extends SideKickParser
 		String text = buffer.getText(lineStart,caret - lineStart);
 
 		/* Don't complete in the middle of a word */
-		int lineEnd = buffer.getLineEndOffset(caretLine) - 1;
+		/* int lineEnd = buffer.getLineEndOffset(caretLine) - 1;
 		if(caret != lineEnd)
 		{
 			String end = buffer.getText(caret,lineEnd - caret);
 			if(!isWhitespace(end.charAt(0)))
 				return null;
-		}
+		} */
 
 		int wordStart = 0;
 		for(int i = text.length() - 1; i >= 0; i--)

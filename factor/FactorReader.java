@@ -53,7 +53,7 @@ public class FactorReader
 	private String in;
 	private int base = 10;
 
-	private Cons definedWords;
+	private Cons artifacts;
 
 	//{{{ getUnreadableString() method
 	public static String getUnreadableString(String str)
@@ -254,10 +254,16 @@ public class FactorReader
 		return word;
 	} //}}}
 
-	//{{{ getDefinedWords() method
-	public Cons getDefinedWords()
+	//{{{ getArtifacts() method
+	public Cons getArtifacts()
 	{
-		return Cons.reverse(definedWords);
+		return Cons.reverse(artifacts);
+	} //}}}
+	
+	//{{{ addArtifact() method
+	public void addArtifact(FactorArtifact artifact)
+	{
+		artifacts = new Cons(artifact,artifacts);
 	} //}}}
 	
 	//{{{ nextWord() method
@@ -282,10 +288,10 @@ public class FactorReader
 			FactorWord w = intern((String)next,define);
 			if(define && w != null)
 			{
-				definedWords = new Cons(w,definedWords);
-				w.line = line;
-				w.col = col;
-				w.file = scanner.getFileName();
+				artifacts = new Cons(w,artifacts);
+				w.setFile(scanner.getFileName());
+				w.setLine(line);
+				w.setColumn(col);
 				w.stackEffect = null;
 				w.documentation = null;
 			}
@@ -416,21 +422,6 @@ public class FactorReader
 		getCurrentState().setStackComment(comment);
 	} //}}}
 
-	//{{{ addDocComment() method
-	public void addDocComment(String comment)
-	{
-		getCurrentState().addDocComment(comment);
-	} //}}}
-
-	//{{{ bar() method
-	/**
-	 * Sets the current parser state's cdr to the given object.
-	 */
-	public void bar() throws FactorParseException
-	{
-		getCurrentState().bar();
-	} //}}}
-
 	//{{{ error() method
 	public void error(String msg) throws FactorParseException
 	{
@@ -444,68 +435,27 @@ public class FactorReader
 		public FactorWord defining;
 		public Cons first;
 		public Cons last;
-		private boolean bar;
-		private boolean docComment;
 
 		ParseState(FactorWord start, FactorWord defining)
 		{
-			docComment = start.docComment;
 			this.start = start;
 			this.defining = defining;
 		}
 
 		void append(Object obj) throws FactorParseException
 		{
-			docComment = false;
-
-			if(bar)
-			{
-				if(last.cdr != null)
-					scanner.error("Only one token allowed after |");
-				last.cdr = obj;
-			}
+			Cons next = new Cons(obj,null);
+			if(first == null)
+				first = next;
 			else
-			{
-				Cons next = new Cons(obj,null);
-				if(first == null)
-					first = next;
-				else
-					last.cdr = next;
-				last = next;
-			}
+				last.cdr = next;
+			last = next;
 		}
 
 		void setStackComment(String comment)
 		{
 			if(defining != null && defining.stackEffect == null)
 				defining.stackEffect = comment;
-		}
-
-		void addDocComment(String comment)
-		{
-			if(defining != null && (docComment || alwaysDocComments))
-			{
-				if(defining.documentation == null)
-					defining.documentation = comment;
-				else
-				{
-					/* Its O(n^2). Big deal. */
-					defining.documentation = defining.documentation
-						.concat(comment);
-				}
-			}
-		}
-
-		void bar() throws FactorParseException
-		{
-			if(last.cdr != null)
-			{
-				// We already read [ a | b
-				// no more can be appended to this state.
-				scanner.error("Only one token allowed after |");
-			}
-
-			bar = true;
 		}
 	} //}}}
 }

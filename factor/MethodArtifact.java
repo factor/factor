@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,37 +27,34 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.jedit;
+package factor;
 
-import factor.*;
-import javax.swing.Icon;
-import javax.swing.text.Position;
-import org.gjt.sp.jedit.Buffer;
-import sidekick.*;
+import factor.jedit.FactorWordRenderer;
+import org.gjt.sp.jedit.jEdit;
 
-public class FactorAsset extends Asset
+public class MethodArtifact extends FactorArtifact
+	implements FactorExternalizable
 {
-	private FactorArtifact artifact;
-
-	public FactorAsset(FactorArtifact artifact, Position start)
-	{
-		super(artifact.getShortString());
-		this.artifact = artifact;
-		this.start = start;
-	}
-
-	public Icon getIcon()
-	{
-		return null;
-	}
+	private FactorWord type;
+	private FactorWord generic;
 	
+	//{{{ MethodArtifact constructor
+	public MethodArtifact(FactorWord type, FactorWord generic)
+	{
+		this.type = type;
+		this.generic = generic;
+	} //}}}
+	
+	//{{{ getShortString() method
 	public String getShortString()
 	{
-		return artifact.getShortString();
-	}
+		return type.name + " " + generic.name;
+	} //}}}
 	
+	//{{{ getLongString() method
 	public String getLongString()
 	{
-		return artifact.getLongString();
-	}
+		return jEdit.getProperty("factor.completion.method",
+			new String[] { type.name, generic.name });
+	} //}}}
 }

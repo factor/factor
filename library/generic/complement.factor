@@ -35,7 +35,7 @@ complement [
 : complement-predicate ( complement -- list )
     "predicate" word-property [ not ] append ;
 
-: define-complement ( class predicate complement -- )
-    [ complement-predicate define-compound ] keep
-    dupd "complement" set-word-property
+: define-complement ( class complement -- )
+    2dup "complement" set-word-property
+    dupd complement-predicate "predicate" set-word-property
     complement define-class ;

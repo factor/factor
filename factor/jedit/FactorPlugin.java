@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -80,7 +80,7 @@ public class FactorPlugin extends EditPlugin
 		Buffer buffer = jEdit.getFirstBuffer();
 		while(buffer != null)
 		{
-			buffer.setProperty(FactorSideKickParser.WORDS_PROPERTY,null);
+			buffer.setProperty(FactorSideKickParser.ARTIFACTS_PROPERTY,null);
 			buffer = buffer.getNext();
 		}
 	} //}}}
@@ -681,6 +681,7 @@ public class FactorPlugin extends EditPlugin
 			buffer.indentLines(firstLine,lastLine);
 			
 			textArea.setSelectedText(newWord);
+			buffer.indentLine(textArea.getCaretLine(),true);
 		}
 		finally
 		{

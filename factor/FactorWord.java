@@ -29,7 +29,9 @@
 
 package factor;
 
-public class FactorWord implements FactorExternalizable
+import factor.jedit.FactorWordRenderer;
+
+public class FactorWord extends FactorArtifact implements FactorExternalizable
 {
 	public String vocabulary;
 	public String name;
@@ -45,18 +47,6 @@ public class FactorWord implements FactorExternalizable
 	 * For browsing, the parsing word that was used to define this word.
 	 */
 	private FactorWord definer;
-
-	/**
-	 * Should the parser keep doc comments?
-	 */
-	public boolean docComment;
-
-	/**
-	 * For text editor integration.
-	 */
-	public String file;
-	public int line;
-	public int col;
 
 	//{{{ FactorWord constructor
 	public FactorWord(String vocabulary, String name)
@@ -84,5 +74,17 @@ public class FactorWord implements FactorExternalizable
 	public void setDefiner(FactorWord definer)
 	{
 		this.definer = definer;
+	} //}}}
+	
+	//{{{ getShortString() method
+	public String getShortString()
+	{
+		return name;
+	} //}}}
+	
+	//{{{ getLongString() method
+	public String getLongString()
+	{
+		return FactorWordRenderer.getWordHTMLString(this,false);
 	} //}}}
 }

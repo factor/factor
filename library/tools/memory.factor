@@ -26,7 +26,7 @@ namespaces prettyprint stdio unparser vectors words ;
         swap dup slip (each-object)
     ] [
         2drop
-    ] ifte ; inline
+    ] ifte ;
 
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.
@@ -34,7 +34,7 @@ namespaces prettyprint stdio unparser vectors words ;
         begin-scan (each-object)
     ] [
         end-scan rethrow
-    ] catch ; inline
+    ] catch ;
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the

@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,38 +26,45 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+package factor;
 
-package factor.jedit;
-
-import factor.*;
-import javax.swing.Icon;
-import javax.swing.text.Position;
-import org.gjt.sp.jedit.Buffer;
-import sidekick.*;
-
-public class FactorAsset extends Asset
+public abstract class FactorArtifact
 {
-	private FactorArtifact artifact;
-
-	public FactorAsset(FactorArtifact artifact, Position start)
+	private String file;
+	private int line;
+	private int col;
+	
+	public String getFile()
 	{
-		super(artifact.getShortString());
-		this.artifact = artifact;
-		this.start = start;
-	}
-
-	public Icon getIcon()
-	{
-		return null;
+		return file;
 	}
 	
-	public String getShortString()
+	public void setFile(String file)
 	{
-		return artifact.getShortString();
+		this.file = file;
 	}
 	
-	public String getLongString()
+	public int getLine()
 	{
-		return artifact.getLongString();
+		return line;
 	}
+	
+	public void setLine(int line)
+	{
+		this.line = line;
+	}
+	
+	public int getColumn()
+	{
+		return col;
+	}
+	
+	public void setColumn(int column)
+	{
+		this.col = col;
+	}
+	
+	public abstract String getShortString();
+	public abstract String getLongString();
 }

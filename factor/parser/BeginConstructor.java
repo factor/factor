@@ -46,7 +46,7 @@ public class BeginConstructor extends FactorParsingDefinition
 			return;
 
 		reader.intern("<" + type + ">",true);
-
+		reader.addArtifact(new ConstructorArtifact(type));
 		reader.pushExclusiveState(word,type);
 	}
 }
