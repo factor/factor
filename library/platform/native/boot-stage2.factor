@@ -161,6 +161,7 @@ cpu "x86" = [
         "/library/sdl/sdl-video.factor"
         "/library/sdl/sdl-event.factor"
         "/library/sdl/sdl-gfx.factor"
+        "/library/sdl/sdl-utils.factor"
         "/library/sdl/hsv.factor"
     ] [
         dup print
@@ -189,6 +190,9 @@ DEFER: init-interpreter
 ] set-boot
 
 compilable-words compilable-word-list set
+
+! Save a bit of space
+global [ "stdio" off ] bind
 
 garbage-collection
 "factor.image" save-image

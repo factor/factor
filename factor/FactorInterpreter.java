@@ -214,6 +214,9 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorWord use = define("syntax","USE:");
 		use.parsing = new Use(use);
 
+		FactorWord pushWord = define("syntax","\\");
+		pushWord.parsing = new PushWord(pushWord);
+
 		FactorWord interpreterGet = define("builtins","interpreter");
 		interpreterGet.def = new InterpreterGet(interpreterGet);
 		interpreterGet.inline = true;

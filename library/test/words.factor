@@ -16,6 +16,17 @@ USE: lists
 
 [ t           ] [                 ] [ words-test        ] test-word
 
+DEFER: plist-test
+
+[ t ] [
+    \ plist-test t "sample-property" set-word-property
+    \ plist-test "sample-property" word-property
+] unit-test
+
+[ f ] [
+    \ plist-test f "sample-property" set-word-property
+    \ plist-test "sample-property" word-property
+] unit-test
 
 : test-last ( -- ) ;
 word word-name "last-word-test" set

@@ -17,4 +17,3 @@ INLINE CELL tag_ratio(RATIO* ratio)
 void primitive_numerator(void);
 void primitive_denominator(void);
 void primitive_from_fraction(void);
-void primitive_to_fraction(void);

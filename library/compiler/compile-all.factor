@@ -98,16 +98,21 @@ DEFER: can-compile-vector?
     dup "can-compile" word-property [
         drop t
     ] [
-        t over "can-compile" set-word-property
-        dup >r (can-compile) dup r>
-        "can-compile" set-word-property
+        dup t "can-compile" set-word-property
+        dup (can-compile)
+        [ "can-compile" set-word-property ] keep
     ] ifte ;
 
 SYMBOL: compilable-word-list
 
+: reset-can-compile ( -- )
+    [ f "can-compile" set-word-property ] each-word ;
+
 : compilable-words ( -- list )
     #! Make a list of all words that can be compiled.
-    [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,] ;
+    reset-can-compile
+    [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,]
+    reset-can-compile ;
 
 : cannot-compile ( word -- )
     "verbose-compile" get [

@@ -114,7 +114,7 @@ END-STRUCT
     ] ifte ;
 
 : SDL_VideoInit ( driver-name flags -- )
-    "int" "sdl" "SDL_SetVideoMode"
+    "int" "sdl" "SDL_VideoInit"
     [ "char*" "int" ] alien-call ;
 
 : SDL_VideoQuit ( -- )
@@ -134,7 +134,7 @@ END-STRUCT
 ! SDL_ListModes needs array of structs support
 
 : SDL_SetVideoMode ( width height bpp flags -- )
-    "int" "sdl" "SDL_SetVideoMode"
+    "surface*" "sdl" "SDL_SetVideoMode"
     [ "int" "int" "int" "int" ] alien-call ;
 
 ! UpdateRects, UpdateRect

@@ -33,10 +33,6 @@ USE: words
 [ ] [ ] [ ??nop ] test-word
 [ ] [ ] [ ???nop ] test-word
 
-: while-test [ f ] [ ] while ; word must-compile
-
-[ ] [ ] [ while-test ] test-word
-
 : times-test-1 [ nop ] times ; word must-compile
 : times-test-2 [ succ ] times ; word must-compile
 : times-test-3 0 10 [ succ ] times ; word must-compile

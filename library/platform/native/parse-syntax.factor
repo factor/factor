@@ -44,14 +44,13 @@ USE: unparser
 ! Colon defs
 : CREATE ( -- word )
     scan "in" get create dup set-word
-    f over "documentation" set-word-property
-    f over "stack-effect" set-word-property ;
+    dup f "documentation" set-word-property
+    dup f "stack-effect" set-word-property ;
 
 : remember-where ( word -- )
-    "line-number" get over "line" set-word-property
-    "col"         get over "col"  set-word-property
-    "file"        get over "file" set-word-property
-    drop ;
+    dup "line-number" get "line" set-word-property
+    dup "col"         get "col"  set-word-property
+        "file"        get "file" set-word-property ;
 
 ! \x
 : unicode-escape>ch ( -- esc )
@@ -92,22 +91,20 @@ USE: unparser
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word "stack-effect" set-word-property
+        word swap "stack-effect" set-word-property
     ] [
         drop
     ] ifte ;
 
-: documentation+ ( str word -- )
-    [
-        "documentation" word-property [
-            swap "\n" swap cat3
-        ] when*
-    ] keep
+: documentation+ ( word str -- )
+    over "documentation" word-property [
+        swap "\n" swap cat3
+    ] when*
     "documentation" set-word-property ;
 
 : parsed-documentation ( parsed str -- parsed )
     over doc-comment-here? [
-        word documentation+
+        word swap documentation+
     ] [
         drop
     ] ifte ;

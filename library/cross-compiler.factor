@@ -228,14 +228,12 @@ IN: image
         >float
         numerator
         denominator
-        >fraction
         fraction>
         str>float
         unparse-float
         float>bits
         real
         imaginary
-        >rect
         rect>
         fixnum=
         fixnum+

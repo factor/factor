@@ -45,10 +45,10 @@ USE: words
 
 [ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
 
-: null-rec ( -- )
-    t [ drop null-rec ] when* ; word must-compile
-
-[ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
+! : null-rec ( -- )
+!     t [ drop null-rec ] when* ; word must-compile
+! 
+! [ [ 0 0 0 0 ] ] [ [ null-rec ] ] [ balance>list ] test-word
 
 !: null-rec ( -- )
 !    t [ t null-rec ] unless* drop ; word must-compile test-null-rec

@@ -45,8 +45,8 @@ USE: stack
 : word-property ( word pname -- pvalue )
     swap [ get ] bind ;
 
-: set-word-property ( pvalue word pname -- )
-    swap [ set ] bind ;
+: set-word-property ( word pvalue pname -- )
+    rot [ set ] bind ;
 
 : redefine ( word def -- )
     swap [ "def" set ] bind ;

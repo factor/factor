@@ -37,8 +37,9 @@ USE: stack
 : word-property ( word pname -- pvalue )
     swap word-plist assoc ;
 
-: set-word-property ( pvalue word pname -- )
-    swap [ word-plist set-assoc ] keep set-word-plist ;
+: set-word-property ( word pvalue pname -- )
+    pick word-plist pick [ set-assoc ] [ remove-assoc nip ] ifte
+    swap set-word-plist ;
 
 : defined? ( obj -- ? )
     dup word? [ word-primitive 0 = not ] [ drop f ] ifte ;

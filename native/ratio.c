@@ -23,27 +23,6 @@ void primitive_from_fraction(void)
 	}
 }
 
-void primitive_to_fraction(void)
-{
-	RATIO* r;
-
-	switch(type_of(dpeek()))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-		dpush(tag_fixnum(1));
-		break;
-	case RATIO_TYPE:
-		r = untag_ratio(dpeek());
-		drepl(r->numerator);
-		dpush(r->denominator);
-		break;
-	default:
-		type_error(RATIONAL_TYPE,dpeek());
-		break;
-	}
-}
-
 void primitive_numerator(void)
 {
 	switch(type_of(dpeek()))

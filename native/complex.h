@@ -16,5 +16,4 @@ INLINE CELL tag_complex(COMPLEX* complex)
 
 void primitive_real(void);
 void primitive_imaginary(void);
-void primitive_to_rect(void);
 void primitive_from_rect(void);

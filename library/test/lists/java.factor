@@ -9,7 +9,6 @@ USE: test
 [ [ 3 1 0 0 ] ] [ [ 3list ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ append ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ array>list ] ] [ balance>list ] test-word
-[ [ 2 0 0 0 ] ] [ [ add@ ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ car ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ cdr ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ cons ] ] [ balance>list ] test-word
@@ -21,7 +20,6 @@ USE: test
 [ [ 1 1 0 0 ] ] [ [ last ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ length ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ list? ] ] [ balance>list ] test-word
-[ [ 1 1 0 0 ] ] [ [ nreverse ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ cons? ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ remove ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ reverse ] ] [ balance>list ] test-word

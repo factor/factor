@@ -42,7 +42,6 @@ USE: vectors
     2list cons ;
 
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    #! Append two lists.
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
@@ -56,8 +55,7 @@ USE: vectors
     ] ifte ;
 
 : nth ( n list -- list[n] )
-    #! Gets the nth element of a proper list by successively
-    #! iterating down the cdr pointer.
+    #! Push the nth element of a proper list.
     #! Supplying n <= 0 pushes the first element of the list.
     #! Supplying an argument beyond the end of the list raises
     #! an error.
@@ -65,15 +63,10 @@ USE: vectors
 
 : last* ( list -- last )
     #! Pushes last cons of a list.
-    #! For example, given a proper list, pushes a cons cell
-    #! whose car is the last element of the list, and whose cdr
-    #! is f.
     dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
-    #! Pushes last element of a list. Since this pushes the
-    #! car of the last cons cell, the list may be an improper
-    #! list.
+    #! Pushes last element of a list.
     last* car ;
 
 : list? ( list -- boolean )
@@ -155,29 +148,25 @@ DEFER: tree-contains?
     #! already contained in the list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
-: each ( list quotation -- )
+: each-step ( list quot -- list quot )
+    >r uncons r> tuck 2slip ; inline interpret-only
+
+: each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a
-    #! quotation to each element.
-    #!
-    #! The quotation must consume one more value than it
-    #! produces.
-    over [ >r uncons r> tuck 2slip each ] [ 2drop ] ifte ;
+    #! quotation with effect ( X -- ) to each element.
+    over [ each-step each ] [ 2drop ] ifte ;
     inline interpret-only
 
 : reverse ( list -- list )
     #! Push a new list that is the reverse of a proper list.
     [ ] swap [ swons ] each ;
 
-: map ( list code -- list )
-    #! Applies the code to each item, returns a list that
-    #! contains the result of each application.
-    #!
-    #! The quotation must consume as many values as it
-    #! produces.
-    f transp [
-        ! accum code elem -- accum code
-        transp over >r >r call r> cons r>
-    ] each drop reverse ; inline interpret-only
+: map ( list quot -- list )
+    #! Push each element of a proper list in turn, and collect
+    #! return values of applying a quotation with effect
+    #! ( X -- Y ) to each element into a new list.
+    over [ each-step rot >r map r> swons ] [ drop ] ifte ;
+    inline interpret-only
 
 : 2uncons ( list1 list2 -- car1 car2 cdr1 cdr2 )
     uncons >r >r uncons r> swap r> ;

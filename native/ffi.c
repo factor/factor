@@ -81,18 +81,39 @@ void primitive_dlclose(void)
 #endif
 }
 
+#ifdef FFI
+CELL unbox_alien(void)
+{
+	return untag_alien(dpop())->ptr;
+}
+
+void box_alien(CELL ptr)
+{
+	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
+	alien->ptr = ptr;
+	alien->local = false;
+	dpush(tag_object(alien));
+}
+
+INLINE CELL alien_pointer(void)
+{
+	FIXNUM offset = unbox_integer();
+	ALIEN* alien = untag_alien(dpop());
+	CELL ptr = alien->ptr;
+
+	if(ptr == NULL)
+		general_error(ERROR_EXPIRED,tag_object(alien));
+
+	return ptr + offset;
+}
+#endif
+
 void primitive_alien(void)
 {
 #ifdef FFI
-	CELL length = unbox_integer();
 	CELL ptr = unbox_integer();
-	ALIEN* alien;
 	maybe_garbage_collection();
-	alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
-	alien->ptr = ptr;
-	alien->length = length;
-	alien->local = false;
-	dpush(tag_object(alien));
+	box_alien(ptr);
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif
@@ -108,38 +129,12 @@ void primitive_local_alien(void)
 	alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
 	local = string(length / CHARS,'\0');
 	alien->ptr = (CELL)local + sizeof(STRING);
-	alien->length = length;
 	alien->local = true;
 	dpush(tag_object(alien));
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif
 }
-
-#ifdef FFI
-CELL unbox_alien(void)
-{
-	return untag_alien(dpop())->ptr;
-}
-
-INLINE CELL alien_pointer(void)
-{
-	FIXNUM offset = unbox_integer();
-	ALIEN* alien = untag_alien(dpop());
-	CELL ptr = alien->ptr;
-
-	if(ptr == NULL)
-		general_error(ERROR_EXPIRED,tag_object(alien));
-
-	if(offset < 0 || offset >= alien->length)
-	{
-		range_error(tag_object(alien),offset,alien->length);
-		return 0; /* can't happen */
-	}
-	else
-		return ptr + offset;
-}
-#endif
 
 void primitive_alien_cell(void)
 {

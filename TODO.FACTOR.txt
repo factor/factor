@@ -11,7 +11,7 @@ FFI:
 
 - when* compilation in jvm
 - compile word twice; no more 'cannot compile' error!
-- doc comments in assoc, image, inferior
+- doc comments in image, inferior
 - compiler: drop literal peephole optimization
 - compiling when*
 - compiling unless*

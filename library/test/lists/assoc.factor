@@ -41,3 +41,7 @@ USE: test
 
 [ 8 ] [ 1 "value-alist" get "quot-alist" get assoc-apply ] unit-test
 [ 1 ] [ 1 "value-alist" get f assoc-apply ] unit-test
+
+[ [ [ "one" + ] [ "four" * ] ] ] [
+    "three" "quot-alist" get remove-assoc
+] unit-test

@@ -83,24 +83,20 @@ USE: words
     drop [ "width" get ] bind + ;
 
 : define-constructor ( len -- )
-    [ <alien> ] cons
+    #! Make a word <foo> where foo is the structure name that
+    #! allocates a Factor heap-local instance of this structure.
+    #! Used for C functions that expect you to pass in a struct.
+    [ <local-alien> ] cons
     <% "<" % "struct-name" get % ">" % %>
     "in" get create swap
     define-compound ;
 
-: define-local-constructor ( len -- )
-    [ <local-alien> ] cons
-    <% "<local-" % "struct-name" get % ">" % %>
-    "in" get create swap
-    define-compound ;
-
-: define-struct-type ( len -- )
-    #! For example, if len is 32, make a C type with getter:
-    #! [ 32 >r alien-cell r> <alien> ] cons
+: define-struct-type ( -- )
     #! The setter just throws an error for now.
     [
-        [ >r alien-cell r> <alien> ] cons "getter" set
+        [ alien-cell <alien> ] "getter" set
         "unbox_alien" "unboxer" set
+        "box_alien" "boxer" set
         cell "width" set
     ] "struct-name" get "*" cat2 define-c-type ;
 
@@ -110,18 +106,16 @@ USE: words
 : FIELD: ( offset -- offset )
     scan scan define-field ; parsing
 
-: END-STRUCT ( offset -- )
-    dup define-constructor
-    dup define-local-constructor
-    define-struct-type ; parsing
+: END-STRUCT ( length -- )
+    define-constructor define-struct-type ; parsing
 
 global [ <namespace> "c-types" set ] bind
 
 [
-    [ alien-cell ] "getter" set
+    [ alien-cell <alien> ] "getter" set
     [ set-alien-cell ] "setter" set
     cell "width" set
-    "does_not_exist" "boxer" set
+    "box_alien" "boxer" set
     "unbox_alien" "unboxer" set
 ] "void*" define-c-type
 

@@ -59,7 +59,7 @@ USE: unparser
     #! Mark the most recently defined word to execute at parse
     #! time, rather than run time. The word can use 'scan' to
     #! read ahead in the input stream.
-    t word "parsing" set-word-property ;
+    word t "parsing" set-word-property ;
 
 : end? ( -- ? )
     "col" get "line" get str-length >= ;
@@ -185,4 +185,4 @@ USE: unparser
 ! Once this file has loaded, we can use 'parsing' normally.
 ! This hack is needed because in Java Factor, 'parsing' is
 ! not parsing, but in CFactor, it is.
-t "parsing" [ "parser" ] search "parsing" set-word-property
+\ parsing t "parsing" set-word-property
