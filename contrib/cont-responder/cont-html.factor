@@ -31,7 +31,6 @@ USE: combinators
 USE: stdio
 USE: namespaces
 USE: words
-USE: vocabularies
 USE: logic
 
 ! These words in cont-html are used to provide a means of writing

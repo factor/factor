@@ -32,7 +32,7 @@ USE: stack
 USE: stdio
 USE: combinators
 USE: namespaces
-USE: vocabularies
+USE: words
 USE: lists
 USE: streams
 USE: strings

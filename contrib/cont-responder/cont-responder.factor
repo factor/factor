@@ -64,7 +64,7 @@ USE: unparser
 : continuation-table ( -- <namespace> ) 
   #! Return the global table of continuations
   "continuation-table" get ;
-
+    
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
   <namespace> "continuation-table" set ;
@@ -234,8 +234,10 @@ DEFER: show
     call-exit-continuation 
   ] callcc1 
   nip ;
+USE: prettyprint
+USE: inspector
 
-: cont-get-responder ( id -- ) 
+: cont-get-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
   dup f-or-"" [
     #! No continuation id given
@@ -250,7 +252,7 @@ DEFER: show
     #! Use the given continuation  
     [ f swap resume-continuation ] with-exit-continuation
   ] ifte 
-  [ print ] when* drop ;
+  [ write flush ] when* drop ;
 
 : post-request>alist ( post-request -- alist )
   #! Return an alist containing name/value pairs from the
@@ -313,17 +315,21 @@ DEFER: show
   #! Install a cont-responder with the given name
   #! that will initially run the given quotation.
   #!
-  #! Convert the quotation os it is run within a session namespace
+  #! Convert the quotation so it is run within a session namespace
   #! and that namespace is initialized first.
   [ init-session-namespace ] swap append unit [ with-new-session ] append
   "httpd-responders" get [ 
      <responder> [ 
        [ cont-get-responder ] "get" set 
        [ cont-post-responder ] "post" set 
+       over "responder-name" set
+       over "responder" set
        reset-continuation-table 
        "disable-initial-redirect?" t put 
+     ] extend dup >r rot set 
+     r> [     
        f swap register-continuation "root-continuation" set 
-       dup "responder-name" set
-     ] extend put
+     ] bind
   ] bind ;
+
 

@@ -29,7 +29,7 @@ USE: live-updater
 USE: namespaces
 USE: cont-html
 USE: html
-USE: vocabularies
+USE: words
 USE: stdio
 USE: stack
 USE: kernel

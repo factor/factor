@@ -116,8 +116,8 @@ USE: unparser
   drop ;
 
 ! Install the examples
- "counter1" [ drop 0 counter-example ] install-cont-responder
- "counter2" [ drop counter-example2 ] install-cont-responder
- "test1" [ drop test-cont-responder ] install-cont-responder
- "test2" [ drop test-cont-responder2 ] install-cont-responder
- "test3" [ drop test-cont-responder3 ] install-cont-responder
+"counter1" [ drop 0 counter-example ] install-cont-responder
+"counter2" [ drop counter-example2 ] install-cont-responder
+"test1" [ drop test-cont-responder ] install-cont-responder
+"test2" [ drop test-cont-responder2 ] install-cont-responder
+"test3" [ drop test-cont-responder3 ] install-cont-responder

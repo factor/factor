@@ -40,7 +40,7 @@ USE: logic
 USE: combinators
 USE: live-updater
 USE: prettyprint
-USE: vocabularies
+USE: words
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
