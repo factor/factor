@@ -22,12 +22,23 @@
 - fix up the min thumb size hack
 - frame gap
 
-+ compiler/ffi:
++ fii:
 
+- replace alien-address, local-alien? primitives with colon defs
+- auto-generate box/unbox, and alien accessors
 - box/unbox_signed/unsigned_8
-- [ [ dup call ] dup call ] infer hangs
 - ffi unicode strings: null char security hole
 - utf16 string boxing
+- value type structs
+- out parameters
+- bitfields in C structs
+- SDL_Rect** type
+- struct membres that are not *
+- FFI float types
+
++ compiler/ffi:
+
+- [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
 - type inference fails with some assembler words;
@@ -39,12 +50,6 @@
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization
-- value type structs
-- out parameters
-- bitfields in C structs
-- SDL_Rect** type
-- struct membres that are not *
-- FFI float types
 
 + kernel:
 

@@ -22,7 +22,7 @@ CELL object_size(CELL pointer)
 		size = sizeof(F_FLOAT);
 		break;
 	case COMPLEX_TYPE:
-		size = sizeof(F_COMPLEX);
+		size = sizeof(F_CONS);
 		break;
 	case OBJECT_TYPE:
 		size = untagged_object_size(UNTAG(pointer));

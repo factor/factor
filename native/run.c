@@ -100,7 +100,7 @@ void primitive_ifte(void)
 	CELL f = dpop();
 	CELL t = dpop();
 	CELL cond = dpop();
-	call(untag_boolean(cond) ? t : f);
+	call(cond == F ? f : t);
 }
 
 void primitive_getenv(void)

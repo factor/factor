@@ -3,14 +3,14 @@
 void primitive_from_rect(void)
 {
 	CELL real, imaginary;
-	F_COMPLEX* complex;
+	F_CONS* complex;
 
 	maybe_garbage_collection();
 
 	imaginary = dpop();
 	real = dpop();
-	complex = allot(sizeof(F_COMPLEX));
-	complex->real = real;
-	complex->imaginary = imaginary;
-	dpush(tag_complex(complex));
+	complex = allot(sizeof(F_CONS));
+	complex->car = real;
+	complex->cdr = imaginary;
+	dpush(RETAG(complex,COMPLEX_TYPE));
 }

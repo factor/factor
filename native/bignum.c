@@ -25,7 +25,7 @@ CELL to_cell(CELL x)
 			return -1;
 		}
 		else
-			return s48_bignum_to_long(untag_bignum(x));
+			return s48_bignum_to_long(untag_bignum_fast(x));
 	default:
 		type_error(BIGNUM_TYPE,x);
 		return 0;
@@ -65,18 +65,17 @@ void primitive_to_bignum(void)
 	drepl(tag_bignum(to_bignum(dpeek())));
 }
 
-void primitive_bignum_eq(void)
-{
-	F_ARRAY* y = to_bignum(dpop());
-	F_ARRAY* x = to_bignum(dpop());
-	box_boolean(s48_bignum_equal_p(x,y));
-}
-
 #define GC_AND_POP_BIGNUMS(x,y) \
 	F_ARRAY *x, *y; \
 	maybe_garbage_collection(); \
 	y = untag_bignum_fast(dpop()); \
 	x = untag_bignum_fast(dpop());
+
+void primitive_bignum_eq(void)
+{
+	GC_AND_POP_BIGNUMS(x,y);
+	box_boolean(s48_bignum_equal_p(x,y));
+}
 
 void primitive_bignum_add(void)
 {
@@ -205,7 +204,7 @@ void primitive_bignum_not(void)
 {
 	maybe_garbage_collection();
 	drepl(tag_bignum(s48_bignum_bitwise_not(
-		untag_bignum(dpeek()))));
+		untag_bignum_fast(dpeek()))));
 }
 
 void copy_bignum_constants(void)

@@ -15,12 +15,6 @@ INLINE double untag_float_fast(CELL tagged)
 	return ((F_FLOAT*)UNTAG(tagged))->n;
 }
 
-INLINE double untag_float(CELL tagged)
-{
-	type_check(FLOAT_TYPE,tagged);
-	return untag_float_fast(tagged);
-}
-
 INLINE CELL tag_float(double flo)
 {
 	return RETAG(make_float(flo),FLOAT_TYPE);

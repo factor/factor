@@ -7,18 +7,10 @@ INLINE F_ARRAY* untag_bignum_fast(CELL tagged)
 	return (F_ARRAY*)UNTAG(tagged);
 }
 
-INLINE F_ARRAY* untag_bignum(CELL tagged)
-{
-	type_check(BIGNUM_TYPE,tagged);
-	return untag_bignum_fast(tagged);
-}
-
 INLINE CELL tag_bignum(F_ARRAY* bignum)
 {
 	return RETAG(bignum,BIGNUM_TYPE);
 }
-
-CELL to_cell(CELL x);
 
 CELL to_cell(CELL x);
 F_ARRAY* to_bignum(CELL tagged);
