@@ -1,24 +1,27 @@
-typedef enum { PORT_READ, PORT_WRITE, PORT_SPECIAL } PORT_MODE;
+typedef enum { PORT_READ, PORT_RECV, PORT_WRITE, PORT_SPECIAL } PORT_MODE;
 
 typedef struct {
 	CELL header;
-	/* one of PORT_READ or PORT_WRITE */
+	/* one of PORT_READ, PORT_RECV, PORT_WRITE or PORT_SPECIAL */
 	PORT_MODE type;
 	FIXNUM fd;
 	STRING* buffer;
+
+	/* top of buffer */
+	CELL buf_fill;
+	/* current read/write position */
+	CELL buf_pos;
+
 	/* tagged partial line used by read_line_fd */
 	CELL line;
 	/* is it ready to be returned? */
 	bool line_ready;
+
 	/* tagged client info used by accept_fd */
 	CELL client_host;
 	CELL client_port;
 	/* untagged fd of accepted connection */
 	CELL client_socket;
-	/* top of buffer */
-	CELL buf_fill;
-	/* current read/write position */
-	CELL buf_pos;
 } PORT;
 
 PORT* untag_port(CELL tagged);

@@ -26,11 +26,25 @@ void primitive_can_read_line(void)
 /* Return true if something was read */
 bool read_step(PORT* port)
 {
-	FIXNUM amount = read(port->fd,
-		port->buffer + 1,
-		port->buffer->capacity * 2);
+	FIXNUM  amount = 0;
 
-	if(amount == -1)
+	if(port->type == PORT_RECV)
+	{
+		/* try reading OOB data. */
+		amount = recv(port->fd,
+			port->buffer + 1,
+			port->buffer->capacity * 2,
+			MSG_OOB);
+	}
+
+	if(amount <= 0)
+	{
+		amount = read(port->fd,
+			port->buffer + 1,
+			port->buffer->capacity * 2);
+	}
+
+	if(amount < 0)
 	{
 		if(errno != EAGAIN)
 			io_error(__FUNCTION__);

@@ -1,8 +1,6 @@
-- non-blocking client socket
 - input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- sending ^C on socket
 - read#
 - enforce bottom-up in native bootstrap
 - fix up native file/line info

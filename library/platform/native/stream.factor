@@ -88,7 +88,8 @@ USE: unparser
     <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;
 
 : <client> ( host port -- stream )
-    2dup client-socket <client-stream> ;
+    #! fflush yields until connection is established.
+    2dup client-socket <client-stream> dup fflush ;
 
 : accept ( server -- client )
     #! Accept a connection from a server socket.

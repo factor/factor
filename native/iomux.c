@@ -231,9 +231,13 @@ CELL next_io_task(void)
 	if(!reading && !writing)
 		critical_error("next_io_task() called with no IO tasks",0);
 
+	set_up_fd_set(&except_fd_set,
+		read_fd_count,read_io_tasks);
+
 	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
-		&read_fd_set,&write_fd_set,NULL,NULL);
+		&read_fd_set,&write_fd_set,&except_fd_set,NULL);
 	
+		for(i = 0; i < read_fd_count; i++) if(FD_ISSET(i,&except_fd_set)) exit(1);/* write(3,"FUBAR\n",6); */
 	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
 	if(callback != F)
 		return callback;

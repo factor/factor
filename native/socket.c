@@ -25,8 +25,8 @@ int make_client_socket(const char* hostname, uint16_t port)
 	if(sock < 0)
 		io_error(__FUNCTION__);
 
-	/* if(fcntl(sock,F_SETFL,O_NONBLOCK,1) == -1)
-		io_error(__FUNCTION__); */
+	if(fcntl(sock,F_SETFL,O_NONBLOCK,1) == -1)
+		io_error(__FUNCTION__);
 
 	/* Connect to the server. */
 	init_sockaddr(&servername,hostname,port);
@@ -47,7 +47,7 @@ void primitive_client_socket(void)
 	uint16_t p = (uint16_t)to_fixnum(dpop());
 	char* host = to_c_string(untag_string(dpop()));
 	int sock = make_client_socket(host,p);
-	dpush(tag_object(port(PORT_READ,sock)));
+	dpush(tag_object(port(PORT_RECV,sock)));
 	dpush(tag_object(port(PORT_WRITE,sock)));
 }
 
@@ -99,7 +99,7 @@ CELL accept_connection(PORT* p)
 	struct sockaddr_in clientname;
 	size_t size = sizeof(clientname);
 	
-	int oobinline = 1;
+	/* int oobinline = 1; */
 
 	int new = accept(p->fd,(struct sockaddr *)&clientname,&size);
 	if(new < 0)
@@ -110,8 +110,8 @@ CELL accept_connection(PORT* p)
 			io_error(__FUNCTION__);
 	}
 
-	if(setsockopt(new,SOL_SOCKET,SO_OOBINLINE,&oobinline,sizeof(int)) < 0)
-		io_error(__FUNCTION__);
+	/* if(setsockopt(new,SOL_SOCKET,SO_OOBINLINE,&oobinline,sizeof(int)) < 0)
+		io_error(__FUNCTION__); */
 
 	p->client_host = tag_object(from_c_string(inet_ntoa(
 		clientname.sin_addr)));
@@ -126,6 +126,6 @@ void primitive_accept_fd(void)
 	PORT* p = untag_port(dpop());
 	dpush(p->client_host);
 	dpush(p->client_port);
-	dpush(tag_object(port(PORT_READ,p->client_socket)));
+	dpush(tag_object(port(PORT_RECV,p->client_socket)));
 	dpush(tag_object(port(PORT_WRITE,p->client_socket)));
 }
