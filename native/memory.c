@@ -79,7 +79,7 @@ void check_memory(void)
 
 void flip_zones()
 {
-	ZONE z = prior;
+	ZONE z = active;
 	active = prior;
 	prior = z;
 }

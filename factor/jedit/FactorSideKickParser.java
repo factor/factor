@@ -40,10 +40,39 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
+	private WordPreview wordPreview;
+
 	//{{{ FactorSideKickParser constructor
 	public FactorSideKickParser()
 	{
 		super("factor");
+		wordPreview = new WordPreview();
+	} //}}}
+
+	//{{{ activate() method
+	/**
+	 * This method is called when a buffer using this parser is selected
+	 * in the specified view.
+	 * @param editPane The edit pane
+	 * @since SideKick 0.3.1
+	 */
+	public void activate(EditPane editPane)
+	{
+		super.activate(editPane);
+		editPane.getTextArea().addCaretListener(wordPreview);
+	} //}}}
+
+	//{{{ deactivate() method
+	/**
+	 * This method is called when a buffer using this parser is no longer
+	 * selected in the specified view.
+	 * @param editPane The edit pane
+	 * @since SideKick 0.3.1
+	 */
+	public void deactivate(EditPane editPane)
+	{
+		super.deactivate(editPane);
+		editPane.getTextArea().removeCaretListener(wordPreview);
 	} //}}}
 
 	//{{{ parse() method
@@ -58,9 +87,9 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		FactorParsedData d = new FactorParsedData(buffer.getPath());
-
 		FactorInterpreter interp = FactorPlugin.getInterpreter();
+		FactorParsedData d = new FactorParsedData(
+			interp,buffer.getPath());
 
 		String text;
 

@@ -1,7 +1,24 @@
+- telnetd should use multitasking
+- file-responder: Content-Length
+- HEAD request for file-responder
+  - nicer way to combine two paths
+  - icons for file responder
+- -1.1 3 ^ shouldn't give a complex number
+- don't show listener on certain commands
+- inferior hangs
+- plugin should not exit jEdit on fatal errors
+- IN: format base: work with all types of numbers
+- home key in the listener
+- wordpreview: don't show for string literals and comments
+- eliminate usage of long long
+- 64 bit support
 - alist -vs- assoc terminology
-- some way to run httpd from command line
-- 'default responder' for when we go to root
 - minimize stage2 initialization code, just move it to source files
+- clean up listener's action popups
+- jedit ==> jedit-word, jedit takes a file name
+- introduce ifte* and ?str-head/?str-tail where appropriate
+- cwd, cd, pwd, dir., pwd. words
+- namespace clone drops static var bindings
 
 + bignums:
 
@@ -10,13 +27,11 @@
 
 - add a socket timeout
 - >lower, >upper for strings
-- telnetd should use multitasking
 - accept multi-line input in listener
 
 + docs:
 
 - logic
-- numbers game leaves extra on the stack
 - examples of assoc usage
 - unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
@@ -38,14 +53,13 @@
 
 - java factor: equal numbers have non-equal hashcodes!
 - FactorLib.equal() not very good
-- IN: format base: work with all types of numbers
 - investigate mandel.factor
 
 + listener/plugin:
 
-- inferior hangs
-- plugin should not exit jEdit on fatal errors
-- balance needs USE:
+- some way to not have previous definitions from a source file
+  clutter the namespace
+- use inferior.factor for everything not just listener
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
 - input style after clicking link
@@ -56,9 +70,6 @@
 
 + native:
 
-- eliminate usage of long long
-- is the profiler using correct stack depth?
-- read1
 - sbuf-hashcode
 - vector-hashcode
 - irc: stack underflow?
@@ -80,27 +91,20 @@
 
 + misc:
 
-- directory listings:
-  - nicer way to combine two paths
-  - icons for file responder
-  - cwd, cd, pwd, dir., pwd. words
-- -1.1 3 ^ shouldn't give a complex number
+- some way to run httpd from command line
 - don't rehash strings on every startup
 - 'cascading' styles
-- jedit ==> jedit-word, jedit takes a file name
-- introduce ifte* and ?str-head/?str-tail where appropriate
-- namespace clone drops static var bindings
 - ditch expand
 - set-object-path
 
 + httpd:
 
+- 'default responder' for when we go to root
 - quit responder breaks with multithreading
 - wiki responder:
   - port to native
   - text styles
 - if user clicks stop in browser, doesn't stop sending?
 - log with date
-- return more header fields, like Content-Length, Last-Modified, and so on
-- HEAD request
-- basic authentication, using httpdAuth function from a config file
+ basic authentication, using httpdAuth function from a config file
+- file responder; last-modified field

@@ -810,21 +810,19 @@ Note that the word gives incorrect output if the two parameters are
 equal. However, it will never be called this way.
 
 With this out of the way, the implementation of judge-guess is an
-easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{=},
-and \texttt{2dup}, we can write:
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \textttt{2drop} and \texttt{=}, we can write:
 
 \begin{alltt}
 : judge-guess ( actual guess -{}- ? )
     2dup = {[}
-        correct f
+        2drop correct f
     {]} {[}
         inexact-guess t
     {]} ifte ;
 \end{alltt}
 
-The word = is found in the \texttt{kernel} vocabulary, and the word 2dup is found in the \texttt{stack} vocabulary. Since \texttt{=}
-consumes both its parameters, we must first duplicate them with \texttt{2dup} so that later they can be passed
-to \texttt{correct} and \texttt{inexact-guess}. Try evaluating the following
+The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
+consumes both its parameters, we must first duplicate them with \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
 in the interpreter to see what's going on:
 
 \begin{alltt}
@@ -833,6 +831,7 @@ clear 1 2 2dup = .s
 clear 4 4 2dup = .s
 \emph{\{ 4 4 t \}}
 \end{alltt}
+
 Test \texttt{judge-guess} with a few inputs:
 
 \begin{alltt}
@@ -928,7 +927,7 @@ USE: stack
 
 : judge-guess ( actual guess -- ? )
     2dup = [
-        correct f
+        2drop correct f
     ] [
         inexact-guess t
     ] ifte ;

@@ -5,7 +5,7 @@ plugin.factor.jedit.FactorPlugin.activate=defer
 plugin.factor.jedit.FactorPlugin.name=Factor
 plugin.factor.jedit.FactorPlugin.version=0.65
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
-plugin.factor.jedit.FactorPlugin.docs=/doc/plugin.html
+plugin.factor.jedit.FactorPlugin.docs=/doc/jedit/index.html
 
 plugin.factor.jedit.FactorPlugin.depend.0=jedit 04.02.15.00
 plugin.factor.jedit.FactorPlugin.depend.1=plugin errorlist.ErrorListPlugin 1.3.2

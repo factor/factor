@@ -30,17 +30,39 @@
 package factor.jedit;
 
 import factor.*;
+import java.util.*;
+import javax.swing.event.*;
+import org.gjt.sp.jedit.textarea.*;
+import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.Log;
 import sidekick.*;
 
-public class FactorParsedData extends SideKickParsedData
+public class WordPreview implements CaretListener
 {
-	public FactorInterpreter interp;
-	public String in;
-	public Cons use;
-	
-	FactorParsedData(FactorInterpreter interp, String fileName)
+	public void caretUpdate(CaretEvent e)
 	{
-		super(fileName);
-		this.interp = interp;
+		showPreview((JEditTextArea)e.getSource());
+	}
+
+	private void showPreview(JEditTextArea textArea)
+	{
+		View view = textArea.getView();
+		String word = FactorPlugin.getWordAtCaret(textArea);
+		if(word == null)
+			return;
+		SideKickParsedData data = SideKickParsedData
+			.getParsedData(view);
+		if(data instanceof FactorParsedData)
+		{
+			FactorParsedData fdata = (FactorParsedData)data;
+			FactorWord w = fdata.interp
+				.searchVocabulary(fdata.use,word);
+			if(w != null)
+			{
+				view.getStatus().setMessageAndClear(
+					FactorWordRenderer.getWordHTMLString(
+					fdata.interp,w,true));
+			}
+		}
 	}
 }
