@@ -34,6 +34,7 @@ XT primitives[] = {
 	primitive_set_sbuf_nth,
 	primitive_sbuf_append,
 	primitive_sbuf_to_string,
+	primitive_sbuf_eq,
 	primitive_numberp,
 	primitive_to_fixnum,
 	primitive_to_bignum,

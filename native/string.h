@@ -39,6 +39,7 @@ INLINE void set_string_nth(STRING* string, CELL index, CHAR value)
 void primitive_stringp(void);
 void primitive_string_length(void);
 void primitive_string_nth(void);
+FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len);
 FIXNUM string_compare(STRING* s1, STRING* s2);
 void primitive_string_compare(void);
 void primitive_string_eq(void);

@@ -5,11 +5,13 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
+#include <poll.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,7 +32,9 @@ typedef unsigned short CHAR;
 
 /* Memory heap size */
 #define DEFAULT_ARENA (32 * 1024 * 1024)
-#define STACK_SIZE 1024
+
+/* #define PAGE_SIZE 4096 */
+#define STACK_SIZE 8192
 
 #include "error.h"
 #include "memory.h"
@@ -49,6 +53,7 @@ typedef unsigned short CHAR;
 #include "misc.h"
 #include "string.h"
 #include "fd.h"
+#include "iomux.h"
 #include "file.h"
 #include "cons.h"
 #include "image.h"

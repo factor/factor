@@ -105,15 +105,10 @@ void primitive_string_nth(void)
 	env.dt = tag_fixnum(string_nth(string,index));
 }
 
-FIXNUM string_compare(STRING* s1, STRING* s2)
+FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len)
 {
-	CELL len1 = s1->capacity;
-	CELL len2 = s2->capacity;
-
-	CELL limit = (len1 < len2 ? len1 : len2);
-
 	CELL i = 0;
-	while(i < limit)
+	while(i < len)
 	{
 		CHAR c1 = string_nth(s1,i);
 		CHAR c2 = string_nth(s2,i);
@@ -122,7 +117,21 @@ FIXNUM string_compare(STRING* s1, STRING* s2)
 		i++;
 	}
 	
-	return len1 - len2;
+	return 0;
+}
+
+FIXNUM string_compare(STRING* s1, STRING* s2)
+{
+	CELL len1 = s1->capacity;
+	CELL len2 = s2->capacity;
+
+	CELL limit = (len1 < len2 ? len1 : len2);
+
+	CELL comp = string_compare_head(s1,s2,limit);
+	if(comp != 0)
+		return comp;
+	else
+		return len1 - len2;
 }
 
 void primitive_string_compare(void)

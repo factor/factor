@@ -121,6 +121,25 @@ void primitive_sbuf_to_string(void)
 	env.dt = tag_object(sbuf_to_string(untag_sbuf(env.dt)));
 }
 
+bool sbuf_eq(SBUF* s1, SBUF* s2)
+{
+	if(s1->top == s2->top)
+		return string_compare_head(s1->string,s2->string,s1->top);
+	else
+		return false;
+}
+
+void primitive_sbuf_eq(void)
+{
+	SBUF* s1 = untag_sbuf(env.dt);
+	CELL with = dpop();
+	check_non_empty(with);
+	if(typep(SBUF_TYPE,with))
+		env.dt = tag_boolean(sbuf_eq(s1,(SBUF*)UNTAG(with)));
+	else
+		env.dt = F;
+}
+
 void fixup_sbuf(SBUF* sbuf)
 {
 	sbuf->string = (STRING*)((CELL)sbuf->string
