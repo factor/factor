@@ -70,7 +70,7 @@ USE: words
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
-    words [ dupd str-contains? ] subset nip ;
+    words [ word-name dupd str-contains? ] subset nip ;
 
 : vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.

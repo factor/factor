@@ -39,5 +39,3 @@ USE: strings
 
 : catchstack ( -- cs ) catchstack* clone ;
 : set-catchstack ( cs -- ) clone set-catchstack* ;
-
-: error>str ( error -- str ) >str ;

@@ -31,7 +31,9 @@ USE: combinators
 USE: continuations
 USE: kernel
 USE: lists
+USE: logic
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings
@@ -49,7 +51,7 @@ USE: vectors
     dup cons? [ car fixnum? ] [ drop f ] ifte ;
 
 : ?nth ( n list -- obj )
-    dup >r length min 0 max r> nth ;
+    over [ dup >r length min 0 max r> nth ] [ 2drop f ] ifte ;
 
 : error# ( n -- str )
     [
@@ -62,21 +64,14 @@ USE: vectors
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )
-    dup cons? [
-        uncons dup cons? [ car ] when
-    ] [
-        f
-    ] ifte ;
+    dup cons? [ uncons dup cons? [ car ] when ] [ f ] ifte ;
 
-: kernel-error>str ( error -- )
-    <% ?kernel-error swap error# % [ unparse % ] when* %> ;
+: kernel-error. ( error -- )
+    ?kernel-error swap error# dup "" ? write
+    dup [ . ] [ drop terpri ] ifte ;
 
-: error>str ( error -- str )
-    dup kernel-error? [
-        kernel-error>str
-    ] [
-        unparse
-    ] ifte ;
+: error. ( error -- str )
+    dup kernel-error? [ kernel-error. ] [ . ] ifte ;
 
 DEFER: >c
 DEFER: throw

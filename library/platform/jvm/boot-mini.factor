@@ -85,8 +85,8 @@ USE: parser
 "/library/inspector.factor"                run-resource ! inspector
 "/library/inspect-vocabularies.factor"     run-resource ! inspector
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
-"/library/debugger.factor"                 run-resource ! debugger
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
+"/library/debugger.factor"                 run-resource ! debugger
 
 !!! Final initialization...
 "/library/init.factor"                     run-resource ! init

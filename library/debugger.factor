@@ -38,14 +38,14 @@ USE: strings
 USE: unparser
 
 : standard-dump ( error -- )
-    <% "ERROR: " % error>str % %> print ;
+    "ERROR: " write error. ;
 
 : parse-dump ( error -- )
     <%
     "parse-name" get [ "<interactive>" ] unless* % ":" %
     "line-number" get [ 1 ] unless* fixnum>str % ": " %
-    error>str %
-    %> print
+    %> write
+    error.
     
     "line" get print
     

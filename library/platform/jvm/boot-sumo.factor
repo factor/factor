@@ -91,8 +91,8 @@ USE: parser
 "/library/inspector.factor"                run-resource ! inspector
 "/library/inspect-vocabularies.factor"     run-resource ! inspector
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
-"/library/debugger.factor"                 run-resource ! debugger
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
+"/library/debugger.factor"                 run-resource ! debugger
 "/library/platform/jvm/listener.factor"    run-resource ! listener
 "/library/test/test.factor"                run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi

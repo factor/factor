@@ -25,13 +25,15 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: debugger
+IN: errors
 USE: combinators
 USE: kernel
 USE: namespaces
 USE: prettyprint
 USE: stack
 USE: stdio
+
+: error. ( error -- str ) print ;
 
 : exception? ( exception -- boolean )
     "java.lang.Throwable" is ;
