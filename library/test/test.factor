@@ -93,6 +93,7 @@ prettyprint stdio strings words vectors unparser ;
         "line-editor"
         "gadgets"
         "memory"
+        "redefine"
     ] [
         test
     ] each

@@ -89,7 +89,7 @@ GENERIC: (undefine) ( word -- )
 M: word (undefine) drop ;
 
 : undefine ( word -- )
-    usages [ (undefine) ] each ;
+    dup (undefine) usages  [ (undefine) ] each ;
 
 ! The word primitive combined with the word def specify what the
 ! word does when invoked.

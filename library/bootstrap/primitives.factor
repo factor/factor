@@ -18,6 +18,7 @@ classes
 
 <namespace> vocabularies set
 <namespace> classes set
+<namespace> crossref set
 
 vocabularies get [
     reveal

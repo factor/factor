@@ -57,9 +57,17 @@ M: compound (compile) ( word -- )
     ] ifte ;
 
 : decompile ( word -- )
-    [ word-primitive ] keep set-word-primitive ;
+    dup compiled? [
+        "Decompiling " write dup . flush
+        [ word-primitive ] keep set-word-primitive
+    ] [
+        drop
+    ] ifte ;
 
-M: compound (undefine) decompile ;
+M: compound (undefine)
+    dup f "infer-effect" set-word-prop
+    dup f "no-effect" set-word-prop
+    decompile ;
 
 : recompile ( word -- )
     dup decompile compile ;

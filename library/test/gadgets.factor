@@ -57,7 +57,7 @@ USING: gadgets kernel lists math namespaces test ;
 [ 20 ] [ 110 110 -100 -200 <line> [ 20 30 rot move-shape ] keep shape-x ] unit-test
 [ 30 ] [ 110 110 -100 -200 <line> [ 20 30 rot move-shape ] keep shape-y ] unit-test
 [ 10 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-x ] unit-test
-[ 401 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-w ] unit-test
+[ 400 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-w ] unit-test
 
 [ t ] [
     [

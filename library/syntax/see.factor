@@ -149,5 +149,5 @@ M: tuple-class class.
 M: word class. drop ;
 
 : see ( word -- )
-    dup prettyprint-IN: dup definer. dup word.
+    dup prettyprint-IN: dup definer.
     dup stack-effect. terpri dup (see) class. ;

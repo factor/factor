@@ -241,11 +241,8 @@ The \texttt{usages.} word finds all words that refer to a given word. This word 
 
 \begin{alltt}
 \textbf{ok} \ttbs string-map usages.
-\textbf{IN: gadgets
-filter-nulls
-IN: html
-chars>entities
-IN: url-encoding
+\textbf{schars>entities
+filter-null
 url-encode}
 \end{alltt}
 
@@ -616,10 +613,7 @@ bootstrap:
 \textbf{bash\$} ./f boot.image.le32 -no-compile
 \end{alltt}
 
-The compiler has some limitations you must be aware of. The most important one is that if you
-redefine
-a word that is called from a compiled word, the change will not take effect until the caller words are themselves recompiled.
-The second limitation is that if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Finally, compiled code cannot be profiled, either. All of these limitations will be resolved in a future release.
+The compiler has two limitations you must be aware of. First, if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Second, compiled code cannot be profiled. These limitations will be resolved in a future release.
 
 The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation. To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
 
