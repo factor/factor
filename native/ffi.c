@@ -53,12 +53,20 @@ void primitive_dlsym(void)
 
 void primitive_dlsym_self(void)
 {
-#ifdef FFI
+#if defined(FFI)
 	void* sym = dlsym(NULL,unbox_c_string());
 	if(sym == NULL)
 	{
 		general_error(ERROR_FFI,tag_object(
 			from_c_string(dlerror())));
+	}
+	dpush(tag_cell((CELL)sym));
+#elif defined(WIN32)
+	void *sym = GetProcAddress(GetModuleHandle(NULL), unbox_c_string());
+	if(sym == NULL)
+	{
+		general_error(ERROR_FFI, tag_object(
+			from_c_string("bad symbol")));
 	}
 	dpush(tag_cell((CELL)sym));
 #else

@@ -2,6 +2,8 @@
 
 void primitive_add_write_io_task (void)
 {
+	maybe_garbage_collection();
+
 	callback_list = cons(dpop(), callback_list); 
 	dpop();
 }

@@ -43,7 +43,7 @@ CELL T;
 #define NUMBER_TYPE 103 /* F_COMPLEX or REAL */
 #define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
 
-CELL type_of(CELL tagged);
+DLLEXPORT CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);
 
 INLINE CELL tag_header(CELL cell)

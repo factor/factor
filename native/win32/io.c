@@ -23,6 +23,8 @@ void primitive_close (void)
 
 void primitive_next_io_task (void)
 {
+	maybe_garbage_collection();
+
 	if (callback_list != F)
 	{
 		F_CONS *cons = untag_cons(callback_list);

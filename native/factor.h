@@ -5,6 +5,12 @@
     #define FACTOR_X86
 #endif
 
+#if defined(WIN32)
+	#define DLLEXPORT __declspec(dllexport)
+#else
+	#define DLLEXPORT
+#endif
+
 /* CELL must be 32 bits and your system must have 32-bit pointers */
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
@@ -13,7 +19,7 @@ typedef unsigned long int CELL;
 CELL ds_bot;
 
 /* raw pointer to datastack top */
-CELL ds;
+DLLEXPORT CELL ds;
 
 /* raw pointer to callstack bottom */
 CELL cs_bot;
