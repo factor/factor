@@ -75,7 +75,7 @@ USE: unparser
         "errors"
         "hashtables"
         "strings"
-        "namespaces/namespaces"
+        "namespaces"
         "files"
         "format"
         "parser"
@@ -104,44 +104,24 @@ USE: unparser
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"
-    ] [
-        test
-    ] each
-    
-    native? [
         "crashes" test
         "sbuf" test
         "threads" test
         "parsing-word" test
         "inference" test
         "interpreter" test
-
-        cpu "x86" = [
-            [
-                "hsv"
-                "x86-compiler/simple"
-                "x86-compiler/stack"
-                "x86-compiler/ifte"
-                "x86-compiler/generic"
-                "x86-compiler/bail-out"
-            ] [
-                test
-            ] each
-        ] when
-    ] when
-
-    java? [
+    ] [
+        test
+    ] each
+    
+    cpu "x86" = [
         [
-            "lists/java"
-            "namespaces/java"
-            "jvm-compiler/auxiliary"
-            "jvm-compiler/compiler"
-            "jvm-compiler/compiler-types"
-            "jvm-compiler/inference"
-            "jvm-compiler/primitives"
-            "jvm-compiler/tail"
-            "jvm-compiler/types"
-            "jvm-compiler/miscellaneous"
+            "hsv"
+            "x86-compiler/simple"
+            "x86-compiler/stack"
+            "x86-compiler/ifte"
+            "x86-compiler/generic"
+            "x86-compiler/bail-out"
         ] [
             test
         ] each
