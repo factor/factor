@@ -113,20 +113,20 @@ USE: unparser
         "parsing-word"
         "inference"
         "dataflow"
-        "optimizer"
         "interpreter"
+        "hsv"
     ] [
         test
     ] each
     
     cpu "x86" = [
         [
-            "hsv"
-            "x86-compiler/simple"
-            "x86-compiler/stack"
-            "x86-compiler/ifte"
-            "x86-compiler/generic"
-            "x86-compiler/bail-out"
+            "compiler/optimizer"
+            "compiler/simple"
+            "compiler/stack"
+            "compiler/ifte"
+            "compiler/generic"
+            "compiler/bail-out"
         ] [
             test
         ] each

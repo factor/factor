@@ -33,6 +33,10 @@ USE: namespaces
 USE: inference
 USE: combinators
 
+! The linear IR is close to assembly language. It also resembles
+! Forth code in some sense. It exists so that pattern matching
+! optimization can be performed against it.
+
 ! Linear IR nodes. This is in addition to the symbols already
 ! defined in dataflow vocab.
 
@@ -79,6 +83,25 @@ SYMBOL: #jump ( tail-call )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
 
+: generic-head ( param op -- end label/param )
+    #! Output the jump table insn and return a list of
+    #! label/branch pairs.
+    >r
+    <label> ( end label ) swap
+    [ <label> cons ] map
+    dup [ cdr ] map r> swons , ;
+
+: generic-body ( end label/param -- )
+    #! Output each branch, with a jump to the end label.
+    [
+        uncons label,  (linearize)  dup #jump-label swons ,
+    ] each drop ;
+
+: linearize-generic ( param op -- )
+    #! The parameter is a list of lists, each one is a branch to
+    #! take in case the top of stack has that type.
+    generic-head dupd generic-body label, ;
+
 #label [
     dup [ node-label get ] bind label,
     [ node-param get ] bind (linearize)
@@ -86,4 +109,12 @@ SYMBOL: #jump ( tail-call )
 
 #ifte [
     [ node-param get ] bind linearize-ifte
+] "linearizer" set-word-property
+
+#generic [
+    [ node-param get node-op get ] bind linearize-generic
+] "linearizer" set-word-property
+
+#2generic [
+    [ node-param get node-op get ] bind linearize-generic
 ] "linearizer" set-word-property

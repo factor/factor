@@ -52,7 +52,13 @@ USE: words
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    begin-compiling dataflow optimize linearize generate ;
+    begin-compiling dataflow ( optimize ) linearize generate ;
+
+: precompile ( word -- )
+    #! Print linear IR of word.
+    [
+        word-parameter dataflow optimize linearize [.]
+    ] with-scope ;
 
 : compile-postponed ( -- )
     compile-words get [

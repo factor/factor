@@ -105,7 +105,7 @@ USE: vectors
     #! Execute the quotation with the variable value on the
     #! stack. The set the variable to the return value of the
     #! quotation.
-    >r dup get r> rot slip set ;
+    >r dup get r> rot slip set ; inline
 
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.

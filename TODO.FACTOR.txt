@@ -13,12 +13,10 @@
 - optimizer rewrite stack ops
 - alien-call need special nodes
 - mutual recursion is borked with certain branch order
-- fix inference of + = and others
 
 + linearizer/generator:
 
 - peephole optimizer
-- linearize generic, 2generic
 - getenv/setenv: if literal arg, compile as a load/store
 - compiler: drop literal peephole optimization
 

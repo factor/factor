@@ -82,7 +82,7 @@ USE: words
     [ >float                 " n -- float "                       [ 1 | 1 ] ]
     [ numerator              " a/b -- a "                         [ 1 | 1 ] ]
     [ denominator            " a/b -- b "                         [ 1 | 1 ] ]
-    [ fraction>              " a b -- a/b "                       [ 1 | 1 ] ]
+    [ fraction>              " a b -- a/b "                       [ 2 | 1 ] ]
     [ str>float              " str -- float "                     [ 1 | 1 ] ]
     [ unparse-float          " float -- str "                     [ 1 | 1 ] ]
     [ float>bits             " float -- n "                       [ 1 | 1 ] ]

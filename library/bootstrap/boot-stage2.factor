@@ -139,6 +139,7 @@ USE: stdio
     "/library/tools/jedit.factor"
 
     "/library/cli.factor"
+    "/library/sdl/hsv.factor"
 ] [
     dup print
     run-resource
@@ -163,13 +164,10 @@ cpu "x86" = [
 !        "/library/sdl/sdl-gfx.factor"
 !        "/library/sdl/sdl-keysym.factor"
 !        "/library/sdl/sdl-utils.factor"
-!        "/library/sdl/hsv.factor"
     ] [
         dup print
         run-resource
     ] each
-] [
-    "/library/compiler/dummy-compiler.factor" dup print run-resource
-] ifte
+] when
 
 "/library/bootstrap/init-stage2.factor" dup print run-resource
