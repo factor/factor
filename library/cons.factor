@@ -66,16 +66,12 @@ BUILTIN: cons 2
     #! Last element of a list.
     last* car ;
 
-: tail ( list -- tail )
-    #! Return the cdr of the last cons cell, or f.
-    dup [ last* cdr ] when ;
-
 UNION: general-list f cons ;
 
 PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    tail not ;
+    dup [ last* cdr ] when not ;
 
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of

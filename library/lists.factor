@@ -192,3 +192,11 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 : head ( list n -- list )
     #! Return the first n elements of the list.
     dup 0 > [ >r uncons r> pred head cons ] [ 2drop f ] ifte ;
+
+: tail ( list n -- tail )
+    #! Return the rest of the list, from the nth index onward.
+    [ cdr ] times ;
+
+: intersection ( list list -- list )
+    #! Make a list of elements that occur in both lists.
+    [ over contains? ] subset nip ;

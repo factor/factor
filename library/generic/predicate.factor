@@ -73,7 +73,7 @@ predicate 25 "priority" set-word-property
 : PREDICATE: ( -- class predicate definition )
     #! Followed by a superclass name, then a class name.
     scan-word
-    CREATE
+    CREATE dup intern-symbol
     dup rot "superclass" set-word-property
     dup predicate "metaclass" set-word-property
     dup predicate-word

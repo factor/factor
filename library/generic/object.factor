@@ -40,8 +40,6 @@ USE: math
 ! Catch-all metaclass for providing a default method.
 SYMBOL: object
 
-object object "metaclass" set-word-property
-
 object [
     drop num-types count
 ] "builtin-supertypes" set-word-property
@@ -56,3 +54,5 @@ object [
 object [ drop t ] "predicate" set-word-property
 
 object 100 "priority" set-word-property
+
+object object define-class

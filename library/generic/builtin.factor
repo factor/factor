@@ -39,10 +39,6 @@ USE: vectors
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
 
-! Vector in global namespace mapping type numbers to
-! builtin classes.
-SYMBOL: types
-
 builtin [
     "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
@@ -54,23 +50,20 @@ builtin [
 
 builtin 50 "priority" set-word-property
 
-: add-builtin-table types get set-vector-nth ;
-
 : builtin-predicate ( type# symbol -- )
     over f type = [
         nip [ not ] "predicate" set-word-property
     ] [
         dup predicate-word
-        [ rot [ swap type eq? ] cons define-compound ] keep 
+        [ rot [ swap type eq? ] cons define-compound ] keep
         unit "predicate" set-word-property
     ] ifte ;
 
 : builtin-class ( type# symbol -- )
-    2dup swap add-builtin-table
-    dup undefined? [ dup define-symbol ] when
+    dup intern-symbol
     2dup builtin-predicate
-    dup builtin "metaclass" set-word-property
-    swap "builtin-type" set-word-property ;
+    [ swap "builtin-type" set-word-property ] keep
+    builtin define-class ;
 
 : BUILTIN:
     #! Followed by type name and type number. Define a built-in
@@ -78,7 +71,7 @@ builtin 50 "priority" set-word-property
     CREATE scan-word swap builtin-class ; parsing
 
 : builtin-type ( n -- symbol )
-    types get vector-nth ;
+    unit classes get hash ;
 
 : type-name ( n -- string )
     builtin-type word-name ;
@@ -87,5 +80,3 @@ builtin 50 "priority" set-word-property
     #! Analogous to the type primitive. Pushes the builtin
     #! class of an object.
     type builtin-type ;
-
-global [ num-types <vector> types set ] bind

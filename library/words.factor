@@ -61,6 +61,9 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 : define-compound ( word def -- ) 1 swap define ;
 : define-symbol   ( word -- ) 2 over define ;
 
+: intern-symbol ( word -- )
+    dup undefined? [ define-symbol ] [ drop ] ifte ;
+
 : word-name       ( word -- str ) "name" word-property ;
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
 : stack-effect    ( word -- str ) "stack-effect" word-property ;

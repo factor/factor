@@ -54,17 +54,13 @@ USE: hashtables
     #! shorter, pad it with unknown results at the bottom.
     dup longest-vector swap [ dupd add-inputs nip ] map nip ;
 
-: unify-classes ( class class -- class )
-    #! Return a class that both classes are subclasses of.
-    2dup = [ drop ] [ 2drop object ] ifte ;
-
 : unify-results ( obj obj -- obj )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
     2dup = [
         drop
     ] [
-        value-class swap value-class unify-classes <computed>
+        value-class swap value-class class\/ <computed>
     ] ifte ;
 
 : unify-stacks ( list -- stack )

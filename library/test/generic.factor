@@ -7,6 +7,7 @@ USE: kernel
 USE: math
 USE: words
 USE: lists
+USE: vectors
 
 TRAITS: test-traits
 C: test-traits ;
@@ -124,3 +125,14 @@ GENERIC: gooey
 M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
+
+[ object ] [ object object class/\ ] unit-test
+[ fixnum ] [ fixnum object class/\ ] unit-test
+[ fixnum ] [ object fixnum class/\ ] unit-test
+[ fixnum ] [ fixnum fixnum class/\ ] unit-test
+[ fixnum ] [ fixnum integer class/\ ] unit-test
+[ fixnum ] [ integer fixnum class/\ ] unit-test
+[ vector fixnum class/\ ] unit-test-fails
+[ integer ] [ fixnum bignum class\/ ] unit-test
+[ integer ] [ fixnum integer class\/ ] unit-test
+[ rational ] [ ratio integer class\/ ] unit-test

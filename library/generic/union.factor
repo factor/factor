@@ -74,7 +74,8 @@ union 30 "priority" set-word-property
 : UNION: ( -- class predicate definition )
     #! Followed by a class name, then a list of union members.
     CREATE
-    dup union "metaclass" set-word-property
+    dup intern-symbol
+    dup union define-class
     dup predicate-word
     [ dupd unit "predicate" set-word-property ] keep
     [ define-union ] [ ] ; parsing

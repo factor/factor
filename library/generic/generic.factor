@@ -82,10 +82,10 @@ USE: math-internals
 : class-ord ( class -- n ) metaclass "priority" word-property ;
 
 : class< ( cls1 cls2 -- ? )
-    swap car class-ord swap car class-ord < ;
+    swap class-ord swap class-ord < ;
 
 : sort-methods ( methods -- alist )
-    hash>alist [ class< ] sort ;
+    hash>alist [ 2car class< ] sort ;
 
 : add-method ( vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
@@ -153,3 +153,38 @@ DEFER: add-traits-dispatch
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
     scan-word  dup define-method  scan-word swap [ ] ; parsing
+
+! Maps lists of builtin type numbers to class objects.
+SYMBOL: classes
+
+SYMBOL: object
+
+: type-union ( list list -- list )
+    append prune [ > ] sort ;
+
+: class\/ ( class class -- class )
+    #! Return a class that both classes are subclasses of.
+    swap builtin-supertypes
+    swap builtin-supertypes
+    type-union classes get hash [ object ] unless* ;
+
+: class/\ ( class class -- class )
+    #! Return a class that is a subclass of both, or raise an
+    #! error if this is impossible.
+    over builtin-supertypes
+    over builtin-supertypes
+    intersection dup [
+        nip nip classes get hash [ object ] unless*
+    ] [
+        drop [
+            word-name , " and " , word-name ,
+            " do not intersect" ,
+        ] make-string throw
+    ] ifte ;
+
+: define-class ( class metaclass -- )
+    dupd "metaclass" set-word-property
+    dup builtin-supertypes [ > ] sort
+    classes get set-hash ;
+
+global [ <namespace> classes set ] bind
