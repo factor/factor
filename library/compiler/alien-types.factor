@@ -83,7 +83,10 @@ USE: words
     3dup define-getter 3dup define-setter
     drop [ "width" get ] bind + ;
 
-: define-constructor ( len -- )
+: define-member ( max type -- max )
+    c-type [ "width" get ] bind max ;
+
+: define-constructor ( width -- )
     #! Make a word <foo> where foo is the structure name that
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
@@ -92,14 +95,11 @@ USE: words
     "in" get create swap
     define-compound ;
 
-: define-struct-type ( -- )
-    #! The setter just throws an error for now.
-    [
-        [ alien-cell <alien> ] "getter" set
-        "unbox_alien" "unboxer" set
-        "box_alien" "boxer" set
-        cell "width" set
-    ] "struct-name" get "*" cat2 define-c-type ;
+: define-struct-type ( width -- )
+    #! Define inline and pointer type for the struct. Pointer
+    #! type is exactly like void*.
+    [ "width" set ] "struct-name" get define-c-type
+    "void*" c-type "struct-name" get "*" cat2 c-types set* ;
 
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
@@ -108,7 +108,16 @@ USE: words
     scan scan define-field ; parsing
 
 : END-STRUCT ( length -- )
-    define-constructor define-struct-type ; parsing
+    dup define-constructor define-struct-type ; parsing
+
+: BEGIN-UNION: ( -- max )
+    scan "struct-name" set  0 ; parsing
+
+: MEMBER: ( max -- max )
+    scan define-member ; parsing
+
+: END-UNION ( max -- )
+    dup define-constructor define-struct-type ; parsing
 
 global [ <namespace> "c-types" set ] bind
 

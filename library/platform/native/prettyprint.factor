@@ -78,5 +78,6 @@ USE: words
         [ compound? ] [ see-compound ]
         [ symbol? ] [ see-symbol ]
         [ primitive? ] [ see-primitive ]
-        [ drop t ] [ see-undefined ]
+        [ word? ] [ see-undefined ]
+        [ drop t ] [ "Not a word: " write . ]
     ] cond ;

@@ -44,13 +44,13 @@ SYMBOL: height
         ] ifte SDL_Flip
     ] with-scope ;
 
-: event-loop ( event -- )
-    dup SDL_WaitEvent 1 = [
-        dup event-type SDL_QUIT = [
-            drop
-        ] [
-            event-loop
-        ] ifte
-    ] [
-        drop
-    ] ifte ;
+! : event-loop ( event -- )
+!     dup SDL_WaitEvent 1 = [
+!         dup event-type SDL_QUIT = [
+!             drop
+!         ] [
+!             event-loop
+!         ] ifte
+!     ] [
+!         drop
+!     ] ifte ;

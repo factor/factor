@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:sidekick.parser=none:
 
 ! $Id$
 !
@@ -59,13 +59,135 @@ END-ENUM
 : SDL_USEREVENT 24 ;
 : SDL_MAXEVENT  32 ;
 
-BEGIN-STRUCT: event
-    FIELD: char type
-    FIELD: int unused
-    FIELD: int unused
-    FIELD: int unused
-    FIELD: int unused
+: SDL_ACTIVEEVENTMASK     2      ;
+: SDL_KEYDOWNMASK         4      ;
+: SDL_KEYUPMASK           8      ;
+: SDL_MOUSEMOTIONMASK     16     ;
+: SDL_MOUSEBUTTONDOWNMASK 32     ;
+: SDL_MOUSEBUTTONUPMASK   64     ;
+: SDL_MOUSEEVENTMASK      112    ;
+: SDL_JOYAXISMOTIONMASK   128    ;
+: SDL_JOYBALLMOTIONMASK   256    ;
+: SDL_JOYHATMOTIONMASK    512    ;
+: SDL_JOYBUTTONDOWNMASK   1024   ;
+: SDL_JOYBUTTONUPMASK	  2048   ;
+: SDL_JOYEVENTMASK	      3968   ;
+: SDL_VIDEORESIZEMASK	  65536  ;
+: SDL_VIDEOEXPOSEMASK	  131072 ;
+: SDL_QUITMASK		      4096   ;
+: SDL_SYSWMEVENTMASK	  8192   ;
+
+: SDL_ALLEVENTS           HEX: ffffffff ;
+
+BEGIN-STRUCT: active-event
+    FIELD: uchar type  ! SDL_ACTIVEEVENT
+    FIELD: uchar gain  ! Whether given states were gained or lost (1/0)
+    FIELD: uchar state ! A mask of the focus states
 END-STRUCT
+
+BEGIN-STRUCT: keyboard-event
+    FIELD: uchar type  ! SDL_KEYDOWN or SDL_KEYUP
+    FIELD: uchar which ! The keyboard device index
+    FIELD: uchar state ! SDL_PRESSED or SDL_RELEASED
+    ! Later: inline structs
+    FIELD: uchar scancode
+    FIELD: int sym
+    FIELD: int mod
+    FIELD: ushort unicode
+END-STRUCT
+
+BEGIN-STRUCT: motion-event
+    FIELD: uchar type  ! SDL_MOUSEMOTION
+    FIELD: uchar which ! The mouse device index
+    FIELD: uchar state ! The current button state
+    FIELD: ushort x    ! The X/Y coordinates of the mouse
+    FIELD: ushort y
+    FIELD: short xrel  ! The relative motion in the X direction
+    FIELD: short yrel  ! The relative motion in the Y direction 
+END-STRUCT             
+
+BEGIN-STRUCT: button-event
+	FIELD: uchar type    ! SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
+	FIELD: uchar which   ! The mouse device index
+	FIELD: uchar button; ! The mouse button index
+	FIELD: uchar state;  ! SDL_PRESSED or SDL_RELEASED
+	FIELD: ushort x
+    FIELD: ushort y      ! The X/Y coordinates of the mouse at press time
+END-STRUCT
+
+BEGIN-STRUCT: joy-axis-event
+	FIELD: uchar type   ! SDL_JOYAXISMOTION
+    FIELD: uchar which  ! The joystick device index
+    FIELD: uchar axis   ! The joystick axis index
+    FIELD: short value  ! The axis value
+END-STRUCT
+
+BEGIN-STRUCT: joy-ball-event
+    FIELD: uchar type  ! SDL_JOYBALLMOTION
+    FIELD: uchar which ! The joystick device index
+    FIELD: uchar ball  ! The joystick trackball index
+    FIELD: short xrel  ! The relative motion in the X direction
+    FIELD: short yrel  ! The relative motion in the Y direction
+END-STRUCT
+
+BEGIN-STRUCT: joy-hat-event
+    FIELD: uchar type  ! SDL_JOYHATMOTION
+    FIELD: uchar which ! The joystick device index
+    FIELD: uchar hat   ! The joystick hat index
+    FIELD: uchar value ! The hat position value:
+        ! SDL_HAT_LEFTUP   SDL_HAT_UP       SDL_HAT_RIGHTUP
+        ! SDL_HAT_LEFT     SDL_HAT_CENTERED SDL_HAT_RIGHT
+        ! SDL_HAT_LEFTDOWN SDL_HAT_DOWN     SDL_HAT_RIGHTDOWN
+        ! Note that zero means the POV is centered.
+END-STRUCT       
+
+BEGIN-STRUCT: joy-button-event
+	FIELD: uchar type   ! SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP
+	FIELD: uchar which  ! The joystick device index
+	FIELD: uchar button ! The joystick button index
+	FIELD: uchar state  ! SDL_PRESSED or SDL_RELEASED
+END-STRUCT
+
+BEGIN-STRUCT: resize-event
+    FIELD: uchar type ! SDL_VIDEORESIZE
+    FIELD: int w      ! New width
+    FIELD: int h      ! New height
+END-STRUCT
+
+BEGIN-STRUCT: expose-event
+    FIELD: uchar type ! SDL_VIDEOEXPOSE
+END-STRUCT
+
+BEGIN-STRUCT: quit-event
+    FIELD: uchar type ! SDL_QUIT
+END-STRUCT
+
+BEGIN-STRUCT: user-event
+    FIELD: uchar type ! SDL_USREVENT through SDL_NUMEVENTS-1
+    FIELD: int code
+    FIELD: void* data1
+    FIELD: void* data2
+END-STRUCT
+
+BEGIN-STRUCT: event
+    FIELD: uchar type
+END-STRUCT
+
+BEGIN-UNION: event
+    MEMBER: event
+    MEMBER: active-event
+    MEMBER: keyboard-event
+    MEMBER: motion-event
+    MEMBER: button-event
+    MEMBER: joy-axis-event
+    MEMBER: joy-ball-event
+    MEMBER: joy-hat-event
+    MEMBER: joy-button-event
+    MEMBER: resize-event
+    MEMBER: expose-event
+    MEMBER: quit-event
+    MEMBER: user-event
+END-UNION
 
 : SDL_WaitEvent ( event -- )
     "int" "sdl" "SDL_WaitEvent" [ "event*" ] alien-call ;
