@@ -8,6 +8,7 @@
 - goal: to compile hash* optimally
 - type check/not-check entry points for compiled words
 - getenv/setenv: if literal arg, compile as a load/store
+- empty ifte: wrong input type.
 
 + oop:
 
@@ -40,6 +41,7 @@
 - completion in the listener
 - special completion for USE:/IN:
 - support USING:
+- command to prettyprint word def at caret, or selection
 
 + i/o:
 

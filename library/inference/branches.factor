@@ -113,7 +113,7 @@ SYMBOL: cloned
         uncons propagate-type
         dup value-recursion recursive-state set
         copy-inference
-        value-literal dup infer-quot
+        literal-value dup infer-quot
         #values values-node
         handle-terminator
     ] extend ;
@@ -177,7 +177,7 @@ SYMBOL: cloned
     dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
     gensym [
         dup value-recursion recursive-state set
-        value-literal infer-quot
+        literal-value infer-quot
     ] (with-block) drop ;
 
 : dynamic-ifte ( true false -- )
@@ -204,7 +204,7 @@ SYMBOL: cloned
 \ ifte [ infer-ifte ] "infer" set-word-property
 
 : vtable>list ( value -- list )
-    dup value-recursion swap value-literal vector>list
+    dup value-recursion swap literal-value vector>list
     [ over <literal> ] map nip ;
 
 USE: kernel-internals

@@ -63,20 +63,16 @@ SYMBOL: recursive-state
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
 
-! A value has the following slots in addition to those relating
-! to generics above:
+TUPLE: value class type-prop recursion ;
 
-TUPLE: value literal class type-prop recursion ;
-C: value ;
+C: value ( recursion -- value )
+    [ set-value-recursion ] keep ;
 
 TUPLE: computed delegate ;
 
 C: computed ( class -- value )
-    <value> over set-computed-delegate
-    [ set-value-class ] keep ;
-
-M: computed value-literal ( value -- obj )
-    "Cannot use a computed value literally." throw ;
+    swap recursive-state get <value> [ set-value-class ] keep
+    over set-computed-delegate ;
 
 M: computed value= ( literal value -- ? )
     2drop f ;
@@ -84,15 +80,17 @@ M: computed value= ( literal value -- ? )
 M: computed value-class-and ( class value -- )
     [ value-class class-and ] keep set-value-class ;
 
-TUPLE: literal delegate ;
+TUPLE: literal value delegate ;
 
 C: literal ( obj rstate -- value )
-    <value> over set-literal-delegate
-    [ set-value-recursion ] keep
-    [ set-value-literal ] keep ;
+    [
+        >r <value> [ >r dup class r> set-value-class ] keep
+        r> set-literal-delegate
+    ] keep
+    [ set-literal-value ] keep ;
 
 M: literal value= ( literal value -- ? )
-    value-literal = ;
+    literal-value = ;
 
 M: literal value-class-and ( class value -- )
     value-class class-and drop ;

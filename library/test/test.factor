@@ -67,6 +67,7 @@ USE: unparser
         "strings"
         "namespaces"
         "generic"
+        "tuple"
         "files"
         "parser"
         "parse-number"

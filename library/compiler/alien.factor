@@ -96,10 +96,10 @@ SYMBOL: alien-parameters
 
 : infer-alien ( -- )
     [ object object object object ] ensure-d
-    dataflow-drop, pop-d value-literal
-    dataflow-drop, pop-d value-literal >r
-    dataflow-drop, pop-d value-literal
-    dataflow-drop, pop-d value-literal -rot
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value >r
+    dataflow-drop, pop-d literal-value
+    dataflow-drop, pop-d literal-value -rot
     r> swap alien-node ;
 
 : box-parameter

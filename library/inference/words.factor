@@ -87,23 +87,6 @@ M: promise (apply-word) ( word -- )
 M: symbol (apply-word) ( word -- )
     apply-literal ;
 
-: current-word ( -- word )
-    #! Push word we're currently inferring effect of.
-    recursive-state get car car ;
-
-: check-recursion ( word -- )
-    #! If at the location of the recursive call, we're taking
-    #! more items from the stack than producing, we have a
-    #! diverging recursion. Note that this check is not done for
-    #! mutually-recursive words. Generally they should be
-    #! avoided.
-    current-word = [
-        d-in get vector-length
-        meta-d get vector-length > [
-            current-word word-name " diverges." cat2 throw
-        ] when
-    ] when ;
-
 : with-recursion ( quot -- )
     [
         inferring-base-case inc
@@ -143,7 +126,7 @@ M: symbol (apply-word) ( word -- )
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
-        dup check-recursion recursive-word
+        recursive-word
     ] [
         dup "infer-effect" word-property [
             apply-effect
@@ -158,7 +141,7 @@ M: symbol (apply-word) ( word -- )
     gensym dup [
         drop pop-d dup
         value-recursion recursive-state set
-        value-literal infer-quot
+        literal-value infer-quot
     ] with-block drop ;
 
 \ call [ infer-call ] "infer" set-word-property

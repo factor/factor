@@ -98,6 +98,30 @@ kernel-internals math hashtables errors ;
     >r unit [ car tuple-dispatch call ] cons tuple r>
     set-vtable ;
 
+M: tuple clone ( tuple -- tuple )
+    dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
+
+: tuple>list ( tuple -- list )
+    dup array-capacity swap array>list ;
+
+M: tuple = ( obj tuple -- ? )
+    over tuple? [
+        over class over class = [
+            swap tuple>list swap tuple>list =
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+M: tuple hashcode ( vec -- n )
+    dup array-capacity 1 number= [
+        drop 0
+    ] [
+        1 swap array-nth hashcode
+    ] ifte ;
+
 M: tuple class ( obj -- class ) 2 slot ;
 
 tuple [

@@ -57,7 +57,7 @@ SYMBOL: surface
     #! Set up SDL graphics and call the quotation.
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
-: rgb ( r g b a -- n )
+: rgb ( r g b -- n )
     255
     swap 8 shift bitor
     swap 16 shift bitor

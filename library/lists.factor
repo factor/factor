@@ -11,6 +11,9 @@ IN: lists USING: generic kernel math ;
 : 3list ( a b c -- [ a b c ] )
     2list cons ;
 
+: 3unlist ( [ a b c ] -- a b c )
+    uncons uncons car ;
+
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 

@@ -108,6 +108,9 @@ USING: kernel lists parser stdio words namespaces ;
 
     "/library/ui/line-editor.factor"
     "/library/ui/console.factor"
+    "/library/ui/shapes.factor"
+    "/library/ui/paint.factor"
+    "/library/ui/gadgets.factor"
 
     "/library/bootstrap/image.factor"
 

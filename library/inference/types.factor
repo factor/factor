@@ -29,7 +29,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
 
 ! \ slot [
 !     [ object fixnum ] ensure-d
-!     dataflow-drop, pop-d value-literal
+!     dataflow-drop, pop-d literal-value
 !     peek-d value-class builtin-supertypes dup length 1 = [
 !         cons \ slot [ [ object ] [ object ] ] (consume/produce)
 !     ] [
@@ -48,7 +48,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
         1 0 node-inputs
         [ object ] consume-d
         [ fixnum ] produce-d
-        r> peek-d value-type-prop
+        r> peek-d set-value-type-prop
         1 0 node-outputs
     ] bind
 ] "infer" set-word-property
