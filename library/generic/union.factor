@@ -66,8 +66,15 @@ union 30 "priority" set-word-property
     ] ifte* ;
 
 : define-union ( class predicate definition -- )
-    #! We have to turn the f object into the f word.
-    [ [ \ f ] unless* ] map
+    #! We have to turn the f object into the f word, same for t.
+    [
+        [
+            [
+                [ f | POSTPONE: f ]
+                [ t | POSTPONE: t ]
+            ] assoc dup
+        ] keep ?
+    ] map
     [ union-predicate define-compound ] keep
     "members" set-word-property ;
 

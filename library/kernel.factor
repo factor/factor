@@ -68,3 +68,6 @@ M: object = eq? ;
 IN: syntax
 BUILTIN: f 6
 BUILTIN: t 7
+
+IN: kernel
+UNION: boolean f t ;

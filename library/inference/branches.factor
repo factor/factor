@@ -103,12 +103,17 @@ USE: hashtables
         "Unbalanced branches" throw
     ] ifte ;
 
+: deep-clone ( vector -- vector )
+    #! Clone a vector of vectors.
+    [ vector-clone ] vector-map ;
+
 : infer-branch ( value save-effect -- namespace )
     <namespace> [
         save-effect set
         dup value-recursion recursive-state set
-        copy-interpreter
-        d-in [ [ vector-clone ] vector-map ] change
+        meta-r [ deep-clone ] change
+        meta-d [ deep-clone ] change
+        d-in [ deep-clone ] change
         dataflow-graph off
         literal-value infer-quot
         #values values-node

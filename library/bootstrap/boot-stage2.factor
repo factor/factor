@@ -30,6 +30,8 @@ USE: kernel
 USE: lists
 USE: parser
 USE: stdio
+USE: words
+USE: namespaces
 
 "Cold boot in progress..." print
 

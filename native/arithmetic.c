@@ -108,12 +108,6 @@ bool realp(CELL tagged)
 	}
 }
 
-void primitive_numberp(void)
-{
-	CELL tagged = dpop();
-	box_boolean(realp(tagged) || type_of(tagged) == COMPLEX_TYPE);
-}
-
 bool zerop(CELL tagged)
 {
 	switch(type_of(tagged))

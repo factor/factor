@@ -184,7 +184,7 @@ USE: prettyprint
         check-recursion recursive-word
     ] [
         drop dup "infer-effect" word-property dup [
-            dup cdr cons? [ old-effect ] when apply-effect
+            apply-effect
         ] [
             drop
             [

@@ -68,18 +68,6 @@ USE: hashtables
 "/library/syntax/parser.factor" run-resource
 "/library/syntax/parse-stream.factor" run-resource
 
-! A bootstrapping trick. See doc/bootstrap.txt.
-vocabularies get [
-    "generic" off
-] bind
-
-"/library/generic/generic.factor" run-resource
-"/library/generic/object.factor" run-resource
-"/library/generic/builtin.factor" run-resource
-"/library/generic/predicate.factor" run-resource
-"/library/generic/union.factor" run-resource
-"/library/generic/traits.factor" run-resource
-
 ! init.factor leaves a boot quotation on the stack
 "/library/bootstrap/init.factor" run-resource
 

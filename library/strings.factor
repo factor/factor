@@ -40,6 +40,8 @@ BUILTIN: sbuf   13
 M: sbuf hashcode sbuf-hashcode ;
 M: sbuf = sbuf= ;
 
+UNION: text string integer ;
+
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
 

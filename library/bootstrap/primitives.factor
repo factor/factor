@@ -82,7 +82,6 @@ vocabularies get [
     [ "strings" | "sbuf=" ]
     [ "strings" | "sbuf-hashcode" ]
     [ "math-internals" | "arithmetic-type" ]
-    [ "math" | "number?" ]
     [ "math" | ">fixnum" ]
     [ "math" | ">bignum" ]
     [ "math" | ">float" ]

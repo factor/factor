@@ -35,7 +35,6 @@ XT primitives[] = {
 	primitive_sbuf_eq,
 	primitive_sbuf_hashcode,
 	primitive_arithmetic_type,
-	primitive_numberp,
 	primitive_to_fixnum,
 	primitive_to_bignum,
 	primitive_to_float,

@@ -54,9 +54,13 @@ builtin 50 "priority" set-word-property
     over f type = [
         nip [ not ] "predicate" set-word-property
     ] [
-        dup predicate-word
-        [ rot [ swap type eq? ] cons define-compound ] keep
-        unit "predicate" set-word-property
+        over t type = [
+            nip [ ] "predicate" set-word-property
+        ] [
+            dup predicate-word
+            [ rot [ swap type eq? ] cons define-compound ] keep
+            unit "predicate" set-word-property
+        ] ifte
     ] ifte ;
 
 : builtin-class ( type# symbol -- )
