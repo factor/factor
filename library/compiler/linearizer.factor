@@ -38,11 +38,12 @@ USE: combinators
 ! optimization can be performed against it.
 
 ! Linear IR nodes. This is in addition to the symbols already
-! defined in dataflow vocab.
+! defined in inference vocab.
 
 SYMBOL: #jump-label-t ( branch if top of stack is true )
 SYMBOL: #jump-label ( unconditional branch )
 SYMBOL: #jump ( tail-call )
+SYMBOL: #return-to ( push addr on C stack )
 
 : linear, ( node -- )
     #! Add a node to the linear IR.
@@ -71,6 +72,24 @@ SYMBOL: #jump ( tail-call )
 : label, ( label -- )
     #label swons , ;
 
+: (linearize-label) ( node -- )
+    dup [ node-label get ] bind label,
+    [ node-param get ] bind (linearize) ;
+
+: linearize-label ( node -- )
+    #! Labels are tricky, because they might contain non-tail
+    #! calls. So we push the address of the location right after
+    #! the label, then linearize the label, then add a #return
+    #! node to the linear IR. The simplifier will take care of
+    #! this in the common case where the labelled block does
+    #! not contain non-tail recursive calls to itself.
+    <label> dup #return-to swons , >r
+    (linearize-label)
+    [ #return ] ,
+    r> label, ;
+
+#label [ linearize-label ] "linearizer" set-word-property
+
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
@@ -82,6 +101,10 @@ SYMBOL: #jump ( tail-call )
     ] keep label, ( branch target of BRANCH-T )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
+
+#ifte [
+    [ node-param get ] bind linearize-ifte
+] "linearizer" set-word-property
 
 : generic-head ( param op -- end label/param )
     #! Output the jump table insn and return a list of
@@ -101,15 +124,6 @@ SYMBOL: #jump ( tail-call )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
     generic-head dupd generic-body label, ;
-
-#label [
-    dup [ node-label get ] bind label,
-    [ node-param get ] bind (linearize)
-] "linearizer" set-word-property
-
-#ifte [
-    [ node-param get ] bind linearize-ifte
-] "linearizer" set-word-property
 
 #generic [
     [ node-param get node-op get ] bind linearize-generic

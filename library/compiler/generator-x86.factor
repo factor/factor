@@ -102,6 +102,10 @@ USE: vectors
     JNE compiled-offset defer-xt
 ] "generator" set-word-property
 
+#return-to [
+    PUSH-I/PARTIAL 0 defer-xt
+] "generator" set-word-property
+
 #return [ drop RET ] "generator" set-word-property
 
 #drop [ drop  4 ESI R-I ] "generator" set-word-property

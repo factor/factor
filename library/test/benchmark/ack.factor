@@ -16,6 +16,6 @@ USE: test
         ] [
             dupd pred ack >r pred r> ack
         ] ifte
-    ] ifte ;
+    ] ifte ; compiled
 
 [ 4093 ] [ 3 9 ack ] unit-test

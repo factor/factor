@@ -57,7 +57,7 @@ USE: words
 : precompile ( word -- )
     #! Print linear IR of word.
     [
-        word-parameter dataflow optimize linearize [.]
+        word-parameter dataflow ( optimize ) linearize [.]
     ] with-scope ;
 
 : compile-postponed ( -- )
@@ -72,4 +72,19 @@ USE: words
     #! Compile the most recently defined word.
     word compile ; parsing
 
-: compile-all ;
+: cannot-compile ( word -- )
+    "verbose-compile" get [
+        "Cannot compile " write .
+    ] [
+        drop
+    ] ifte ;
+
+: compile-all ( -- )
+    #! Compile all words.
+    [
+        dup "infer-effect" word-property [
+            [ compile ] [ [ cannot-compile ] when ] catch
+        ] [
+            drop
+        ] ifte
+    ] each-word ;

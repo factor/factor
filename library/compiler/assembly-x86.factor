@@ -75,6 +75,14 @@ USE: combinators
 : PUSH-I ( imm -- )
     HEX: 68 compile-byte compile-cell ;
 
+: PUSH-I/PARTIAL ( -- fixup )
+    #! This is potentially bad. In the compilation of
+    #! #return-to, we need to push something which is
+    #! only known later.
+    #!
+    #! Returns address of 32-bit immediate.
+    HEX: 68 compile-byte  compiled-offset  0 compile-cell ;
+
 : POP-R ( reg -- )
     HEX: 58 + compile-byte ;
 
