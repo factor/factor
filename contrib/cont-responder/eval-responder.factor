@@ -41,6 +41,7 @@ USE: unparser
 USE: words
 USE: vectors
 USE: logging
+USE: sequences
 
 : <evaluator> ( stack msg history -- )
   #! Create an 'evaluator' object that holds
@@ -172,7 +173,7 @@ USE: logging
   #! return the result datastack as a list.
   datastack >r    
   swap list>vector tuck vector-push 
-  set-datastack call datastack vector>list
+  set-datastack call datastack >list
   r> >pop> >pop> tuck vector-push set-datastack ;
 
 : do-eval ( list string -- list )

@@ -21,9 +21,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
-! Routines for managing a simple "To Do list". A todo list has a 'user', 'password'
-! and list of items. Each item has a priority, description, and indication if it is
-! complete. 
+! Routines for managing a simple "To Do list". A todo list has a 'user', 
+! 'password' and list of items. Each item has a priority, description, 
+! and indication if it is complete. 
 IN: todo
 USE: parser
 USE: strings
@@ -34,10 +34,10 @@ USE: math
 USE: stdio
 USE: kernel
 USE: prettyprint
-USE: unparser
 USE: url-encoding
 USE: files
 USE: hashtables
+USE: sequences
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
