@@ -59,6 +59,14 @@ void primitive_add_write_io_task(void)
 		write_io_tasks,&write_fd_count);
 }
 
+void primitive_add_accept_io_task(void)
+{
+	PORT* port = untag_port(dpop());
+	CELL callback = dpop();
+	add_io_task(IO_TASK_ACCEPT,port,callback,
+		read_io_tasks,&read_fd_count);
+}
+
 void remove_io_task(
 	IO_TASK_TYPE type,
 	PORT* port,
@@ -164,6 +172,18 @@ CELL perform_io_task(IO_TASK* task)
 			add_io_task(IO_TASK_WRITE,port,
 				callback,write_io_tasks,
 				&write_fd_count);
+			return F;
+		}
+	case IO_TASK_ACCEPT:
+		remove_io_task(IO_TASK_ACCEPT,port,
+			read_io_tasks,&read_fd_count);
+		if(accept_connection(port))
+			return callback;
+		else
+		{
+			add_io_task(IO_TASK_ACCEPT,port,
+				callback,read_io_tasks,
+				&read_fd_count);
 			return F;
 		}
 	default:

@@ -56,3 +56,10 @@ USE: strings
 
 : blocking-read-line ( port -- line )
     dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
+
+: wait-to-accept ( socket -- )
+    [ swap add-accept-io-task next-io-task drop ( call ) ] callcc0 ;
+
+: blocking-accept ( socket -- host port socket )
+    dup wait-to-accept accept-fd ;
+

@@ -83,9 +83,12 @@ USE: namespaces
         [ "socket" get close-fd ] "fclose" set
     ] extend ;
 
+: <client-stream> ( host port socket -- stream )
+    dup <fd-stream> [ "port" set "client" set ] extend ;
+
 : accept ( server -- client )
     #! Accept a connection from a server socket.
-    "socket" swap get* accept-fd dup <fd-stream> ;
+    "socket" swap get* blocking-accept <client-stream> ;
 
 : init-stdio ( -- )
     stdin stdout <fd-stream> <stdio-stream> "stdio" set ;

@@ -17,7 +17,7 @@ void primitive_open_file(void)
 	else
 		mode = 0;
 
-	fd = open(path,mode);
+	fd = open(path,mode,FILE_MODE);
 	if(fd < 0)
 		io_error(NULL,__FUNCTION__);
 

@@ -66,6 +66,7 @@ DEFER: port?
 DEFER: open-file
 DEFER: server-socket
 DEFER: close-fd
+DEFER: add-accept-io-task
 DEFER: accept-fd
 DEFER: can-read-line?
 DEFER: add-read-line-io-task
@@ -214,6 +215,7 @@ IN: cross-compiler
         exit*
         server-socket
         close-fd
+        add-accept-io-task
         accept-fd
         can-read-line?
         add-read-line-io-task

@@ -42,6 +42,11 @@ public class FactorScanner
 	 */
 	public static final Object EOF = new Object();
 
+	/**
+	 * Special object returned on EOL.
+	 */
+	public static final Object EOL = new Object();
+
 	private String filename;
 	private BufferedReader in;
 
@@ -106,7 +111,7 @@ public class FactorScanner
 	} //}}}
 
 	//{{{ nextLine() method
-	private void nextLine() throws IOException
+	public void nextLine() throws IOException
 	{
 		lineNo++;
 		line = in.readLine();
@@ -130,10 +135,10 @@ public class FactorScanner
 		int base)
 		throws IOException, FactorParseException
 	{
-		if(line == null || position == line.length())
-			nextLine();
 		if(line == null)
 			return EOF;
+		if(position == line.length())
+			return EOL;
 
 		for(;;)
 		{
@@ -142,9 +147,8 @@ public class FactorScanner
 				// EOL
 				if(buf.length() != 0)
 					return word(readNumbers,base);
-				nextLine();
-				if(line == null)
-					return EOF;
+				else
+					return EOL;
 			}
 
 			char ch = line.charAt(position++);
@@ -178,14 +182,16 @@ public class FactorScanner
 		}
 	} //}}}
 
-	//{{{ nextNonEOF() method
-	public Object nextNonEOF(
+	//{{{ nextNonEOL() method
+	public Object nextNonEOL(
 		boolean readNumbers,
 		boolean start,
 		int base)
 		throws IOException, FactorParseException
 	{
 		Object next = next(readNumbers,start,base);
+		if(next == EOL)
+			error("Unexpected EOL");
 		if(next == EOF)
 			error("Unexpected EOF");
 		return next;

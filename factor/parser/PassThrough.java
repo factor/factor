@@ -48,6 +48,6 @@ public class PassThrough extends FactorParsingDefinition
 		throws Exception
 	{
 		reader.append(reader.intern(word.name
-			+ reader.next(false,false),false));
+			+ reader.nextNonEOL(false,false),false));
 	}
 }

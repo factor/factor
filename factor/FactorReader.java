@@ -346,6 +346,8 @@ public class FactorReader
 	 */
 	public Cons parse() throws Exception
 	{
+		scanner.nextLine();
+
 		for(;;)
 		{
 			if(next())
@@ -378,7 +380,7 @@ public class FactorReader
 	 */
 	public FactorWord nextWord(boolean define) throws Exception
 	{
-		Object next = next(true,false);
+		Object next = nextNonEOL(true,false);
 		if(next == FactorScanner.EOF)
 		{
 			scanner.error("Unexpected EOF");
@@ -401,16 +403,23 @@ public class FactorReader
 		boolean start)
 		throws IOException, FactorParseException
 	{
-		return scanner.next(readNumbers,start,base);
+		Object next = scanner.next(readNumbers,start,base);
+		if(next == FactorScanner.EOL)
+		{
+			scanner.nextLine();
+			return next(readNumbers,start);
+		}
+		else
+			return next;
 	} //}}}
 	
-	//{{{ nextNonEOF() method
-	public Object nextNonEOF(
+	//{{{ nextNonEOL() method
+	public Object nextNonEOL(
 		boolean readNumbers,
 		boolean start)
 		throws IOException, FactorParseException
 	{
-		return scanner.nextNonEOF(readNumbers,start,base);
+		return scanner.nextNonEOL(readNumbers,start,base);
 	} //}}}
 	
 	//{{{ next() method

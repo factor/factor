@@ -1,5 +1,7 @@
 0.62:
 
+- can-read-line?
+- client connections broken
 - vocabulary section: what is the dictionary?
 - document swons, uncons, unswons
 - vector-push/pop examples
@@ -14,7 +16,7 @@
 - handle division by zero
 - errors: don't show .factor-rc
 - inspector: sort
-- accept: return socket, instead of printing msg
+- log-client: fix for native
 - telnetd: needs own history
 - multitasking
 

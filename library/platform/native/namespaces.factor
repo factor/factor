@@ -32,6 +32,7 @@ USE: hashtables
 USE: kernel
 USE: lists
 USE: stack
+USE: strings
 USE: vectors
 
 DEFER: namespace
@@ -77,9 +78,12 @@ DEFER: >n
 : set ( value variable -- ) namespace set* ;
 : put ( variable value -- ) namespace put* ;
 
-: vars ( -- list ) namespace hash-keys ;
-: values ( -- list ) namespace hash-values ;
-: vars-values ( -- list ) namespace hash>alist ;
+: car-str-sort ( list -- list )
+    [ swap car swap car str-lexi> ] sort ;
+
+: vars-values ( -- list ) namespace hash>alist car-str-sort ;
+: vars ( -- list ) vars-values [ car ] inject ;
+: values ( -- list ) vars-values [ cdr ] inject ;
 
 ! We don't have bound objects in native Factor.
 : namespace? hashtable? ;

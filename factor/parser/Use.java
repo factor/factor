@@ -47,7 +47,7 @@ public class Use extends FactorParsingDefinition
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws Exception
 	{
-		String next = (String)reader.next(false,false);
+		String next = (String)reader.nextNonEOL(false,false);
 
 		reader.addUse(next);
 	} //}}}

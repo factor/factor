@@ -43,25 +43,32 @@ void primitive_server_socket(void)
 	dpush(tag_object(port(make_server_socket(p))));
 }
 
-int accept_connection(int sock)
+CELL accept_connection(PORT* p)
 {
 	struct sockaddr_in clientname;
 	size_t size = sizeof(clientname);
 	
-	int new = accept(sock,(struct sockaddr *)&clientname,&size);
+	int new = accept(p->fd,(struct sockaddr *)&clientname,&size);
 	if(new < 0)
-		io_error(NULL,__FUNCTION__);
+	{
+		if(errno == EAGAIN)
+			return false;
+		else
+			io_error(NULL,__FUNCTION__);
+	}
 
-	printf("Connection from host %s, port %hd.\n",
-		inet_ntoa(clientname.sin_addr),
-		ntohs(clientname.sin_port));
+	p->client_host = tag_object(from_c_string(inet_ntoa(
+		clientname.sin_addr)));
+	p->client_port = tag_fixnum(ntohs(clientname.sin_port));
+	p->client_socket = tag_object(port(new));
 
-	return new;
+	return true;
 }
 
 void primitive_accept_fd(void)
 {
-	PORT* p = untag_port(dpop());
-	PORT* new = port(accept_connection(p->fd));
-	dpush(tag_object(new));
+	PORT* port = untag_port(dpop());
+	dpush(port->client_host);
+	dpush(port->client_port);
+	dpush(port->client_socket);
 }

@@ -17,6 +17,9 @@ PORT* port(CELL fd)
 	port->fd = fd;
 	port->buffer = NULL;
 	port->line = F;
+	port->client_host = F;
+	port->client_port = F;
+	port->client_socket = F;
 	port->buf_mode = B_NONE;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
@@ -60,6 +63,9 @@ void fixup_port(PORT* port)
 	if(port->buffer != 0)
 		port->buffer = fixup_untagged_string(port->buffer);
 	fixup(&port->line);
+	fixup(&port->client_host);
+	fixup(&port->client_port);
+	fixup(&port->client_socket);
 }
 
 void collect_port(PORT* port)
@@ -67,4 +73,7 @@ void collect_port(PORT* port)
 	if(port->buffer != 0)
 		port->buffer = copy_untagged_string(port->buffer);
 	copy_object(&port->line);
+	copy_object(&port->client_host);
+	copy_object(&port->client_port);
+	copy_object(&port->client_socket);
 }

@@ -119,6 +119,7 @@ XT primitives[] = {
 	primitive_exit,
 	primitive_server_socket,
 	primitive_close_fd,
+	primitive_add_accept_io_task,
 	primitive_accept_fd,
 	primitive_can_read_line,
 	primitive_add_read_line_io_task,

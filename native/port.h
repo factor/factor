@@ -7,6 +7,10 @@ typedef struct {
 	STRING* buffer;
 	/* tagged partial line used by read_line_fd */
 	CELL line;
+	/* tagged client info used by accept_fd */
+	CELL client_host;
+	CELL client_port;
+	CELL client_socket;
 	/* one of B_READ, B_WRITE or B_NONE */
 	B_MODE buf_mode;
 	/* top of buffer */
