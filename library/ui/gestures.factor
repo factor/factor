@@ -1,7 +1,14 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists sdl-event ;
+USING: alien generic hashtables kernel lists sdl-event ;
+
+: handle-gesture* ( gesture gadget -- ? )
+    tuck gadget-gestures hash* dup [
+        cdr call f
+    ] [
+        2drop t
+    ] ifte ;
 
 : handle-gesture ( gesture gadget -- )
     #! If a gadget's handle-gesture* generic returns t, the
@@ -17,8 +24,11 @@ USING: generic kernel lists sdl-event ;
         2drop
     ] ifte ;
 
-TUPLE: redraw-gesture ;
-C: redraw-gesture ;
+! Redraw gesture. Don't handle this yourself.
+: redraw ( gadget -- )
+    \ redraw swap handle-gesture ;
 
-M: object redraw ( gadget -- )
-    <redraw-gesture> swap handle-gesture ;
+! Mouse gestures are lists where the first element is one of:
+SYMBOL: motion
+SYMBOL: button-up
+SYMBOL: button-down

@@ -4,37 +4,33 @@ IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
 sdl-video ;
 
+SYMBOL: world
+
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
 ! it is special in that the world does not list it as part of
 ! its contents.
 TUPLE: hand click-pos clicked buttons delegate ;
 
-C: hand ( -- hand )
+C: hand ( world -- hand )
     0 <gadget> <ghost> <box>
-    over set-hand-delegate ;
+    over set-hand-delegate
+    [ set-gadget-parent ] keep ;
 
-GENERIC: hand-gesture ( hand gesture -- )
+: motion-gesture ( gesture hand -- )
+    #! Send the gesture to the gadget at the hand's position in
+    #! the world.
+    world get pick-up handle-gesture ;
 
-M: object hand-gesture ( hand gesture -- ) 2drop ;
+: button-gesture ( gesture hand -- )
+    #! Send the gesture to the gadget at the hand's last click
+    #! position in the world. This is used to send a button up
+    #! to the gadget that was clicked, regardless of the mouse
+    #! position at the time of the button up.
+    hand-clicked handle-gesture ;
 
 : button/ ( n hand -- )
     [ hand-buttons unique ] keep set-hand-buttons ;
 
 : button\ ( n hand -- )
     [ hand-buttons remove ] keep set-hand-buttons ;
-
-M: button-down-event hand-gesture ( hand gesture -- )
-    2dup
-    dup button-event-x swap button-event-y rect>
-    swap set-hand-click-pos
-    button-event-button swap button/ ;
-
-M: button-up-event hand-gesture ( hand gesture -- )
-    button-event-button swap button\ ;
-
-M: motion-event hand-gesture ( hand gesture -- )
-    dup motion-event-x swap motion-event-y rot move-gadget ;
-
-M: hand redraw ( hand -- )
-    drop world get redraw ;

@@ -5,26 +5,33 @@ USING: generic hashtables kernel lists namespaces ;
 
 ! Gadget protocol.
 GENERIC: pick-up* ( point gadget -- gadget/t )
-GENERIC: handle-gesture* ( gesture gadget -- ? )
 
 : pick-up ( point gadget -- gadget )
     #! pick-up* returns t to mean 'this gadget', avoiding the
     #! exposed facade issue.
     tuck pick-up* dup t = [ drop ] [ nip ] ifte ;
 
-! A gadget is a shape together with paint, and a reference to
-! the gadget's parent. A gadget delegates to its shape.
-TUPLE: gadget paint parent delegate ;
+! A gadget is a shape, a paint, a mapping of gestures to
+! actions, and a reference to the gadget's parent. A gadget
+! delegates to its shape.
+TUPLE: gadget paint gestures parent delegate ;
 
 C: gadget ( shape -- gadget )
     [ set-gadget-delegate ] keep
-    [ <namespace> swap set-gadget-paint ] keep ;
+    [ <namespace> swap set-gadget-paint ] keep
+    [ <namespace> swap set-gadget-gestures ] keep ;
 
 : paint-property ( gadget key -- value )
     swap gadget-paint hash ;
 
 : set-paint-property ( gadget value key -- )
     rot gadget-paint set-hash ;
+
+: action ( gadget gesture -- quot )
+    swap gadget-gestures hash ;
+
+: set-action ( gadget quot gesture -- )
+    rot gadget-gestures set-hash ;
 
 : with-gadget ( gadget quot -- )
     #! All drawing done inside the quotation is done with the
@@ -37,9 +44,7 @@ M: gadget draw ( gadget -- )
 
 M: gadget pick-up* inside? ;
 
-M: gadget handle-gesture* 2drop t ;
-
-GENERIC: redraw ( gadget -- )
+DEFER: redraw ( gadget -- )
 
 : move-gadget ( x y gadget -- )
     [ move-shape ] keep
@@ -55,3 +60,4 @@ GENERIC: redraw ( gadget -- )
 WRAPPER: ghost
 M: ghost draw drop ;
 M: ghost pick-up* 2drop f ;
+M: ghost draw drop ;

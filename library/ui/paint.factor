@@ -21,9 +21,6 @@ SYMBOL: filled ! is the interior of the shape filled?
 
 GENERIC: draw ( obj -- )
 
-M: ghost draw ( ghost -- )
-    drop ;
-
 M: number draw ( point -- )
     >r surface get r> >rect rgb-color pixelColor ;
 

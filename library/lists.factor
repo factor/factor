@@ -93,8 +93,13 @@ DEFER: tree-contains?
     swap [ with rot ] map 2nip ; inline
 
 : remove ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
+    #! Remove all occurrences of objects equal to this one from
+    #! the list.
     [ = not ] subset-with ;
+
+: remq ( obj list -- list )
+    #! Remove all occurrences of the object from the list.
+    [ eq? not ] subset-with ;
 
 : length ( list -- length )
     0 swap [ drop 1 + ] each ;

@@ -50,7 +50,8 @@ M: box pick-up* ( point box -- gadget )
     ] with-translation ;
 
 : box- ( gadget box -- )
-    2dup box-contents remove swap tuck set-box-contents redraw
+    [ 2dup box-contents remq swap set-box-contents ] keep
+    redraw
     f swap set-gadget-parent ;
 
 : (box+) ( gadget box -- )
