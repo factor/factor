@@ -63,8 +63,15 @@ USE: words
         ] each drop
     ] make-list ;
 
+: singleton ( word op default -- )
+    >r word-property dup [
+        r> drop call
+    ] [
+        drop r> call
+    ] ifte ;
+
 : simplify-node ( node rest -- rest ? )
-    over car "simplifier" word-property [
+    over car "simplify" word-property [
         call
     ] [
         swap , f
@@ -79,7 +86,23 @@ USE: words
 : simplify ( linear -- linear )
     purge-labels [ (simplify) ] make-list ;
 
-: follows? ( op list -- ? ) dup [ car car = ] [ 2drop f ] ifte ;
+: follow ( linear -- linear )
+    dup car car "follow" word-property dup [
+        call
+    ] [
+        drop
+    ] ifte ;
+
+#label [
+    cdr follow
+] "follow" set-word-property
+
+#jump-label [
+    uncons >r cdr r> find-label follow
+] "follow" set-word-property
+
+: follows? ( op linear -- ? )
+    follow dup [ car car = ] [ 2drop f ] ifte ;
 
 GENERIC: call-simplifier ( node rest -- rest ? )
 M: cons call-simplifier ( node rest -- ? )
@@ -93,5 +116,5 @@ M: return-follows call-simplifier ( node rest -- rest ? )
         [ #call-label | #jump-label ]
     ] assoc swons , r> t ;
 
-#call [ call-simplifier ] "simplifier" set-word-property
-#call-label [ call-simplifier ] "simplifier" set-word-property
+#call [ call-simplifier ] "simplify" set-word-property
+#call-label [ call-simplifier ] "simplify" set-word-property

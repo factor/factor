@@ -3,6 +3,7 @@ USE: kernel
 USE: math
 USE: test
 USE: lists
+USE: compiler
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
 
@@ -14,9 +15,9 @@ USE: lists
         string-step
     ] [
         2drop
-    ] ifte ;
+    ] ifte ; compiled
 
 : string-benchmark ( n -- )
-    "abcdef" 10 [ 2dup string-step ] times 2drop ;
+    "abcdef" 10 [ 2dup string-step ] times 2drop ; compiled
 
 [ ] [ 1000000 string-benchmark ] unit-test

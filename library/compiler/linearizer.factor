@@ -129,7 +129,7 @@ SYMBOL: #target ( part of jump table )
     <label> [
         #jump-t swons ,
         (linearize) ( false branch )
-        <label> dup #jump swons ,
+        <label> dup #jump-label swons ,
     ] keep label, ( branch target of BRANCH-T )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
@@ -147,7 +147,9 @@ SYMBOL: #target ( part of jump table )
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
-    [ uncons label, (linearize) dup #jump swons , ] each drop ;
+    [
+        uncons label, (linearize) dup #jump-label swons ,
+    ] each drop ;
 
 : check-dispatch ( vtable -- )
     length num-types = [

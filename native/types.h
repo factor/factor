@@ -51,7 +51,7 @@ INLINE CELL tag_header(CELL cell)
 	return RETAG(cell << TAG_BITS,HEADER_TYPE);
 }
 
-#define HEADER_DEBUG
+/* #define HEADER_DEBUG */
 
 INLINE CELL untag_header(CELL cell)
 {
@@ -80,7 +80,7 @@ INLINE void type_check(CELL type, CELL tagged)
 	if(type < HEADER_TYPE)
 	{
 #ifdef HEADER_DEBUG
-		if(type == WORD_TYPE && object_type(tagged) != WORD_TYPE)
+		if(TAG(tagged) == WORD_TYPE && object_type(tagged) != WORD_TYPE)
 			critical_error("word header check",tagged);
 #endif
 		if(TAG(tagged) == type)

@@ -119,6 +119,7 @@ USE: unparser
     cpu "x86" = [
         [
             "compiler/optimizer"
+            "compiler/simplifier"
             "compiler/simple"
             "compiler/stack"
             "compiler/ifte"
