@@ -89,6 +89,7 @@ os "win32" = [
     "libc"     "msvcrt.dll"   "cdecl"    add-library
     "sdl"      "SDL.dll"      "cdecl"    add-library
     "sdl-gfx"  "SDL_gfx.dll"  "cdecl"    add-library
+    "sdl-ttf"  "SDL_ttf.dll"  "cdecl"    add-library
     ! FIXME: KLUDGE to get FFI-based IO going in Windows.
     "/library/bootstrap/win32-io.factor" run-resource
 ] when
