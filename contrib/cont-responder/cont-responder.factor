@@ -257,14 +257,14 @@ USE: inspector
 : post-request>namespace ( post-request -- namespace )
   #! Return a namespace containing the name/value's from the 
   #! post data.
-  dup log alist>namespace ;
+  alist>namespace ;
 
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given
   #! id and calls it with the POST data as an alist on the top
   #! of the stack.
   [ 
-    "response" get dup log post-request>namespace swap resume-continuation 
+    "response" get post-request>namespace swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 

@@ -189,6 +189,9 @@ USE: kernel
     "Register" login-form
   ] simple-page ;
 
+: re-matches ( a b -- b )
+  drop drop t ;
+
 : login-details-valid? ( name password -- )
   #! Ensure that a valid username and password were
   #! entered. In particular, ensure that only alphanumeric

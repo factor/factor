@@ -43,6 +43,7 @@ USE: words
 USE: html
 USE: parser
 USE: errors
+USE: unparser
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -104,25 +105,17 @@ USE: errors
     ] ifte
   ] bind drop ;
 
-: get-vm-runtime ( -- java.lang.Runtime )
-  f "java.lang.Runtime" "getRuntime" jinvoke-static ;
-
-: get-free-memory ( java.lang.Runtime -- int )
-  f "java.lang.Runtime" "freeMemory" jinvoke ;
-
-: get-total-memory ( java.lang.Runtime -- int )
-  f "java.lang.Runtime" "totalMemory" jinvoke ;
-
 : write-vm-statistics ( -- )
   #! Display statistics about the JVM in use.
+  room unparse >r unparse r> 
   <table> 
     <tr>  
       <td> "Free Memory" write </td>
-      <td> get-vm-runtime get-free-memory write </td> 
+      <td> write </td> 
     </tr>
     <tr> 
       <td> "Total Memory" write </td>
-      <td> get-vm-runtime get-total-memory write </td> 
+      <td> write </td> 
     </tr>
   </table> ;
 
