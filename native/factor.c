@@ -10,8 +10,10 @@ void init_factor(char* image)
 
 	init_errors();
 
-#ifdef FACTOR_X86
+#if defined(FACTOR_X86)
 	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
+#elif defined(FACTOR_PPC)
+	userenv[CPU_ENV] = tag_object(from_c_string("ppc"));
 #else
 	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
 #endif

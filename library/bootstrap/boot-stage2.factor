@@ -11,7 +11,6 @@ parse-command-line
 ! Dummy defs for mini bootstrap
 IN: compiler : compile-all ; : compile drop ; : supported-cpu? f ;
 IN: assembler : init-assembler ;
-IN: alien : add-library 3drop ;
 
 : pull-in ( ? list -- )
     swap [
@@ -22,7 +21,7 @@ IN: alien : add-library 3drop ;
         drop
     ] ifte ;
 
-"mini" get not [
+t [
     "/library/tools/debugger.factor"
     "/library/tools/gensym.factor"
     "/library/tools/interpreter.factor"
@@ -47,14 +46,19 @@ IN: alien : add-library 3drop ;
     "/library/compiler/alien.factor"
 ] pull-in
 
-cpu "x86" = "mini" get not and [
+cpu "x86" = [
     "/library/compiler/x86/assembler.factor"
     "/library/compiler/x86/stack.factor"
     "/library/compiler/x86/generator.factor"
     "/library/compiler/x86/fixnum.factor"
 ] pull-in
 
-"compile" get supported-cpu? and [
+cpu "ppc" = [
+    "/library/compiler/ppc/assembler.factor"
+    "/library/compiler/ppc/stack.factor"
+] pull-in
+
+"compile" get cpu "x86" = and [
     init-assembler
     \ car compile
     \ = compile
@@ -62,7 +66,7 @@ cpu "x86" = "mini" get not and [
     \ scan compile
 ] when
 
-"mini" get not [
+t [
     "/library/math/constants.factor"
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
