@@ -1,15 +1,18 @@
 % :indentSize=4:tabSize=4:noTabs=true:mode=tex:
 
-\documentclass[english]{article}
+\documentclass[english]{book}
+\makeindex
 \usepackage[T1]{fontenc}
 \usepackage[latin1]{inputenc}
 \usepackage{alltt}
 \usepackage{tabularx}
 \usepackage{times}
 \pagestyle{headings}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 \setlength\parskip{\medskipamount}
 \setlength\parindent{0pt}
+
+\newcommand{\ttbackslash}{\char'134}
 
 \newcommand{\sidebar}[1]{{\fbox{\fbox{\parbox{10cm}{\begin{minipage}[b]{10cm}
 {\LARGE For wizards}
@@ -24,9 +27,20 @@
 \end{minipage}}}}
 \makeatletter
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
-%% Because html converters don't know tabularnewline
-\providecommand{\tabularnewline}{\\}
+\newcommand{\wordtable}[1]{{
+\begin{tabularx}{12cm}{|l l X|}
+#1
+\hline
+\end{tabularx}}}
+
+\newcommand{\tabvocab}[1]{
+\hline
+\multicolumn{3}{|l|}{
+\rule[-2mm]{0mm}{6mm}
+\texttt{#1} vocabulary:}
+\\
+\hline
+}
 
 \usepackage{babel}
 \makeatother
@@ -40,17 +54,36 @@
 \maketitle
 \tableofcontents{}
 
-\section{Introduction}
+\chapter*{Introduction}
 
-\subsection{Inspirations for Factor, history.}
+Factor is a programming language with functional and object-oriented
+influences. Factor borrows heavily from Forth, Joy and Lisp. Programmers familiar with these languages will recognize many similarities with Factor.
 
-\section{First steps}
+Factor is \emph{interactive}. This means it is possible to run a Factor interpreter that reads from the keyboard, and immediately executes expressions as they are entered. This allows words to be defined and tested one at a time.
 
-This section will cover the basics of interactive development using the listener. Short code examples will be presented, along with an introduction to programming with the stack, a guide to using source files, and some hints for exploring the library.
+Factor is \emph{dynamic}. This means that all objects in the language are fully reflective at run time, and that new definitions can be entered without restarting the interpreter. Factor code can be used interchangably as data, meaning that sophisticated language extensions can be realized as libraries of words.
 
-\subsection{The listener}
+Factor is \emph{safe}. This means all code executes in a virtual machine that provides
+garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
+
+When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
+output from the interpreter is in boldface:
+
+\begin{alltt}
+\textbf{ok} "Hello, world!" print
+\textbf{Hello, world!}
+\end{alltt}
+
+\chapter{First steps}
+
+This chapter will cover the basics of interactive development using the listener. Short code examples will be presented, along with an introduction to programming with the stack, a guide to using source files, and some hints for exploring the library.
+
+\section{The listener}
 
 \chapkeywords{print write read}
+\index{\texttt{print}}
+\index{\texttt{write}}
+\index{\texttt{read}}
 
 Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. You will learn more about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 
@@ -86,9 +119,12 @@ One thing all programmers have in common is they make large numbers of mistakes.
 
 A logic error is not associated with a piece of source code, but rather an execution state. We will learn how to debug them later.
 
-\subsection{Colon definitions}
+\section{Colon definitions}
 
 \chapkeywords{:~; see}
+\index{\texttt{:}}
+\index{\texttt{;}}
+\index{\texttt{see}}
 
 Once you build up a collection of useful code snippets, you can reuse them without retyping them each time.
 
@@ -101,7 +137,7 @@ Lets try writing a program to prompt the user for their name, and then output a 
 \textbf{Greetings, Lambda the Ultimate}
 \end{alltt}
 
-Now, instead of re-typing the entire program each time we want to execute it, it would be nice if we could just type one \emph{word}.
+You won't understand the syntax at this stage -- don't worry about it, it is all explained later. For now, make the observation that instead of re-typing the entire program each time we want to execute it, it would be nice if we could just type one \emph{word}.
 
 A ``word'' is the main unit of program organization
 in Factor -- it corresponds to a ``function'', ``procedure''
@@ -131,28 +167,31 @@ Now that the three words \texttt{ask-name}, \texttt{greet}, and \texttt{friend} 
 You can look at the definition of any word, including library words, using \texttt{see}:
 
 \begin{alltt}
-\textbf{ok} \\ greet see
+\textbf{ok} \ttbackslash greet see
 \textbf{IN: scratchpad
 : greet
     "Greetings, " write print ;}
 \end{alltt}
 
-\sidebar{
-Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
+%\sidebar{
+%Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
+%
+%If you exit Factor by typing \texttt{exit}, any colon definitions entered at the listener will be lost. However, you can save a new image first, and use this image next time you start Factor in order to have access to  your definitions.
+%
+%\begin{alltt}
+%\textbf{ok} "work.image" save-image\\
+%\textbf{ok} exit
+%\end{alltt}
+%
+%The \texttt{factor.image} file you start with initially is just an image that was saved after the standard library, and nothing else, was loaded.
+%}
 
-If you exit Factor by typing \texttt{exit}, any colon definitions entered at the listener will be lost. However, you can save a new image first, and use this image next time you start Factor in order to have access to  your definitions.
-
-\begin{alltt}
-\textbf{ok} "work.image" save-image\\
-\textbf{ok} exit
-\end{alltt}
-
-The \texttt{factor.image} file you start with initially is just an image that was saved after the standard library, and nothing else, was loaded.
-}
-
-\subsection{The stack}
+\section{The stack}
 
 \chapkeywords{.s .~clear}
+\index{\texttt{.s}}
+\index{\texttt{.}}
+\index{\texttt{clear}}
 
 The \texttt{ask-name} word passes a piece of data to the \texttt{greet} word in the following definition:
 
@@ -163,6 +202,8 @@ The \texttt{ask-name} word passes a piece of data to the \texttt{greet} word in 
 In order to be able to write more sophisticated programs, you will need to master usage of the \emph{stack}. The stack is used to exchange data between words. Input parameters -- for example, strings like \texttt{"Hello "}, or numbers, are pushed onto the top of the stack. The most recently pushed value is said to be \emph{at the top} of the stack. When a word is executed, it pops
 input parameters from the top of the
 stack. Results are then pushed back on the stack.
+
+In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
 
 Lets look at the \texttt{friend} example one more time. Recall that first, the \texttt{friend} word calls the \texttt{ask-name} word defined as follows:
 
@@ -183,13 +224,13 @@ This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, wh
 How did we know that \texttt{write} and \texttt{print} take one value from the stack each, or that \texttt{read} leaves one value on the stack? The answer is, you don't always know, however, you can use \texttt{see} to look up the \emph{stack effect comment} of any library word:
 
 \begin{alltt}
-\textbf{ok} \\ print see
+\textbf{ok} \ttbackslash print see
 \textbf{IN: stdio
 : print ( string -{}- )
     "stdio" get fprint ;}
 \end{alltt}
 
-You can see that the stack effect of \texttt{print} is \texttt{( string -- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read} is \texttt{( -- string )}.
+You can see that the stack effect of \texttt{print} is \texttt{( string -{}- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read} is \texttt{( -{}- string )}.
 
 The contents of the stack can be printed using the \texttt{.s} word:
 
@@ -213,54 +254,54 @@ If the stack is empty, calling \texttt{.} will raise an error. This is in genera
 
 The \texttt{clear} word removes all elements from the stack.
 
-Lets review the words we've seen until now.
+Lets review the words  we've seen until now, and their stack effects. The ``vocab'' column will be described later, and only comes into play when we start working with source files. Basically, Factor's words are partitioned into vocabularies rather than being in one flat list.
 
-\begin{tabularx}{12cm}{|l|l|l|X|}
-\hline
-Vocabulary&
-Word&
-Stack effect&
-Description\tabularnewline
-\hline
-\texttt{stdio}&
+\wordtable{
+\tabvocab{syntax}
+\texttt{:~\emph{word}}&
+\texttt{( -{}- )}&
+Begin a word definion named \texttt{\emph{word}}.\\
+\texttt{;}&
+\texttt{( -{}- )}&
+End a word definion.\\
+\texttt{\ttbackslash\ \emph{word}}&
+\texttt{( -{}- )}&
+Push \texttt{\emph{word}} on the stack, instead of executing it.\\
+\tabvocab{stdio}
 \texttt{print}&
 \texttt{( string -{}- )}&
-Write a string to the console, with a new line.\tabularnewline
-\hline
-\texttt{stdio}&
+Write a string to the console, with a new line.\\
 \texttt{write}&
 \texttt{( string -{}- )}&
-Write a string to the console, without a new line.\tabularnewline
-\hline
-\texttt{stdio}&
+Write a string to the console, without a new line.\\
 \texttt{read}&
 \texttt{( -{}- string )}&
-Read a line of input from the console.\tabularnewline
-\hline
-\texttt{prettyprint}&
+Read a line of input from the console.\\
+\tabvocab{prettyprint}
 \texttt{.s}&
 \texttt{( -{}- )}&
-Print stack contents.\tabularnewline
-\hline
-\texttt{prettyprint}&
+Print stack contents.\\
 \texttt{.}&
 \texttt{( value -{}- )}&
-Print value at top of stack in parsable form.\tabularnewline
-\hline
-\texttt{stack}&
+Print value at top of stack in parsable form.\\
+\tabvocab{stack}
 \texttt{clear}&
 \texttt{( ...~-{}- )}&
-Clear stack contents.\tabularnewline
-\hline
-\end{tabularx}
-
-\sidebar{
-In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
+Clear stack contents.\\
 }
 
-\subsection{Arithmetic}
+From now on, each section will end with a summary of words and stack effects described in that section.
+
+\section{Arithmetic}
 
 \chapkeywords{+ - {*} / neg pred succ}
+\index{\texttt{+}}
+\index{\texttt{-}}
+\index{\texttt{*}}
+\index{\texttt{/}}
+\index{\texttt{neg}}
+\index{\texttt{pred}}
+\index{\texttt{succ}}
 
 The usual arithmetic operators \texttt{+ - {*} /} all take two parameters
 from the stack, and push one result back. Where the order of operands
@@ -277,6 +318,11 @@ matters (\texttt{-} and \texttt{/}), the operands are taken in the natural order
 
 The \texttt{neg} unary operator negates the number at the top of the stack (that is, multiplies it by -1). Two unary operators \texttt{pred} and \texttt{succ} subtract 1 and add 1, respectively, to the number at the top of the stack.
 
+\begin{alltt}
+\textbf{ok} 5 pred pred succ neg .
+\textbf{-4}
+\end{alltt}
+
 This type of arithmetic is called \emph{postfix}, because the operator
 follows the operands. Contrast this with \emph{infix} notation used
 in many other languages, so-called because the operator is in-between
@@ -286,14 +332,14 @@ More complicated infix expressions can be translated into postfix
 by translating the inner-most parts first. Grouping parentheses are
 never necessary.
 
-Here is the postfix translation of $(2 + 3) {*} 6$:
+Here is the postfix translation of $(2 + 3) \times 6$:
 
 \begin{alltt}
 \textbf{ok} 2 3 + 6 {*}
 \textbf{30}
 \end{alltt}
 
-Here is the postfix translation of $2 + (3 {*} 6)$:
+Here is the postfix translation of $2 + (3 \times 6)$:
 
 \begin{alltt}
 \textbf{ok} 2 3 6 {*} +
@@ -338,9 +384,50 @@ The implementation of \texttt{km/hour} is a bit more complex. We would like it t
 \textbf{1872000}
 \end{alltt}
 
-\subsection{Shuffle words}
+Lets review the words we saw in this section.
+
+\wordtable{
+\tabvocab{math}
+\texttt{+}&
+\texttt{( x y -{}- z )}&
+Add \texttt{x} and \texttt{y}.\\
+\texttt{-}&
+\texttt{( x y -{}- z )}&
+Subtract \texttt{y} from \texttt{x}.\\
+\texttt{*}&
+\texttt{( x y -{}- z )}&
+Multiply \texttt{x} and \texttt{y}.\\
+\texttt{/}&
+\texttt{( x y -{}- z )}&
+Divide \texttt{x} by \texttt{y}.\\
+\texttt{pred}&
+\texttt{( x -{}- x-1 )}&
+Push the predecessor of \texttt{x}.\\
+\texttt{succ}&
+\texttt{( x -{}- x+1 )}&
+Push the successor of \texttt{x}.\\
+\texttt{neg}&
+\texttt{( x -{}- -1 )}&
+Negate \texttt{x}.\\
+}
+
+\section{Shuffle words}
 
 \chapkeywords{drop dup swap over nip dupd rot -rot tuck pick 2drop 2dup 3drop 3dup}
+\index{\texttt{drop}}
+\index{\texttt{dup}}
+\index{\texttt{swap}}
+\index{\texttt{over}}
+\index{\texttt{nip}}
+\index{\texttt{dupd}}
+\index{\texttt{rot}}
+\index{\texttt{-rot}}
+\index{\texttt{tuck}}
+\index{\texttt{pick}}
+\index{\texttt{2drop}}
+\index{\texttt{2dup}}
+\index{\texttt{3drop}}
+\index{\texttt{3dup}}
 
 Lets try writing a word to compute the cube of a number. 
 Three numbers on the stack can be multiplied together using \texttt{{*}
@@ -369,48 +456,69 @@ The \texttt{dup} word is just one of the several so-called \emph{shuffle words}.
 
 Lets take a look at the four most-frequently used shuffle words:
 
-\texttt{drop ( x -{}- )} Discard the top stack element. Used when
-a word returns a value that is not needed.
-
-\texttt{dup ( x -{}- x x )} Duplicate the top stack element. Used
-when a value is required as input for more than one word.
-
-\texttt{swap ( x y -{}- y x )} Swap top two stack elements. Used when
-a word expects parameters in a different order.
-
-\texttt{over ( x y -{}- x y x )} Bring the second stack element {}``over''
-the top element.
+\wordtable{
+\tabvocab{stack}
+\texttt{drop}&
+\texttt{( x -{}- )}&
+Discard the top stack element. Used when
+a word returns a value that is not needed.\\
+\texttt{dup}&
+\texttt{( x -{}- x x )}&
+Duplicate the top stack element. Used
+when a value is required as input for more than one word.\\
+\texttt{swap}&
+\texttt{( x y -{}- y x )}&
+Swap top two stack elements. Used when
+a word expects parameters in a different order.\\
+\texttt{over}&
+\texttt{( x y -{}- x y x )}&
+Bring the second stack element {}``over''
+the top element.\\}
 
 The remaining shuffle words are not used nearly as often, but are nonetheless handy in certian situations:
 
-\texttt{nip ( x y -{}- y )} Remove the second stack element.
-
-\texttt{dupd ( x y -{}- x x y )} Duplicate the second stack element.
-
-\texttt{rot ( x y z -{}- y z x )} Rotate top three stack elements
-to the left.
-
-\texttt{-rot ( x y z -{}- z x y )} Rotate top three stack elements
-to the right.
-
-\texttt{tuck ( x y -{}- y x y )} Tuck the top stack element under
-the second stack element.
-
-\texttt{pick ( x y z -{}- x y z x )} ``Pick'' the third stack element.
-
-\texttt{2drop ( x y -{}- )} Discard the top two stack elements.
-
-\texttt{2dup ( x y -{}- x y x y )} Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.
-
-\texttt{3drop ( x y z -{}- )} Discard the top three stack elements.
-
-\texttt{3dup ( x y z -{}- x y z x y z )} Duplicate the top three stack elements.
+\wordtable{
+\tabvocab{stack}
+\texttt{nip}&
+\texttt{( x y -{}- y )}&
+Remove the second stack element.\\
+\texttt{dupd}&
+\texttt{( x y -{}- x x y )}&
+Duplicate the second stack element.\\
+\texttt{rot}&
+\texttt{( x y z -{}- y z x )}&
+Rotate top three stack elements
+to the left.\\
+\texttt{-rot}&
+\texttt{( x y z -{}- z x y )}&
+Rotate top three stack elements
+to the right.\\
+\texttt{tuck}&
+\texttt{( x y -{}- y x y )}&
+``Tuck'' the top stack element under
+the second stack element.\\
+\texttt{pick}&
+\texttt{( x y z -{}- x y z x )}&
+``Pick'' the third stack element.\\
+\texttt{2drop}&
+\texttt{( x y -{}- )}&
+Discard the top two stack elements.\\
+\texttt{2dup}&
+\texttt{( x y -{}- x y x y )}&
+Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.\\
+%\texttt{3drop}&
+%\texttt{( x y z -{}- )}&
+%Discard the top three stack elements.\\
+%\texttt{3dup}&
+%\texttt{( x y z -{}- x y z x y z )}&
+%Duplicate the top three stack elements.\\
+}
 
 You should try all these words out and become familiar with them. Push some numbers on the stack,
 execute a shuffle word, and look at how the stack contents was changed using
 \texttt{.s}. Compare the stack contents with the stack effects above.
 
-Try to avoid as much as possible the complex shuffle words such as \texttt{rot} and \texttt{2dup}. They make data flow harder to understand. If you find yourself using too many shuffle words, or you're writing
+Try to avoid the complex shuffle words such as \texttt{rot} and \texttt{2dup} as much as possible. They make data flow harder to understand. If you find yourself using too many shuffle words, or you're writing
 a stack effect comment in the middle of a colon definition to keep track of stack contents, it is
 a good sign that the word should probably be factored into two or
 more smaller words.
@@ -419,15 +527,23 @@ A good rule of thumb is that each word should take at most a couple of sentences
 
 Effective factoring is like riding a bicycle -- once you ``get it'', it becomes second nature.
 
-\subsection{Source files}
+\section{Source files}
 
-\subsection{Exploring the library}
+\section{Exploring the library}
 
-\section{Working with data}
+\chapter{Working with data}
 
-\subsection{Lists and cons cells}
+This chapter will introduce the fundamental data type used in Factor -- the list.
+This will lead is to a discussion of debugging, conditional execution, recursion, and higher-order words, as well as a peek inside the interpreter, and an introduction to unit testing. If you have used another programming language, you will no doubt find using lists for all data limiting; other data types, such as vectors and hashtables, are introduced in later sections. However, a good understanding of lists is fundamental since they are used more than any other data type. 
 
-\chapkeywords{cons car cdr uncons}
+\section{Lists and cons cells}
+
+\chapkeywords{cons car cdr uncons unit}
+\index{\texttt{cons}}
+\index{\texttt{car}}
+\index{\texttt{cdr}}
+\index{\texttt{uncons}}
+\index{\texttt{unit}}
 
 A \emph{cons cell} is an ordered pair of values. The first value is called the \emph{car},
 the second is called the \emph{cdr}.
@@ -457,6 +573,14 @@ The \texttt{uncons} word pushes both the car and cdr of the cons cell at once:
 \textbf{\{ "potatoes" "gravy" \}}
 \end{alltt}
 
+If you think back for a second to the previous section on shuffle words, you might be able to guess how \texttt{uncons} is implemented in terms of \texttt{car} and \texttt{cdr}:
+
+\begin{alltt}
+: uncons ( {[} car | cdr {]} -- car cdr ) dup car swap cdr ;
+\end{alltt}
+
+The cons cell is duplicated, its car is taken, the car is swapped with the cons cell, putting the cons cell at the top of the stack, and finally, the cdr of the cons cell is taken.
+
 Lists of values are represented with nested cons cells. The car is the first element of the list; the cdr is the rest of the list. The following example demonstrates this, along with the literal syntax used to print lists:
 
 \begin{alltt}
@@ -485,28 +609,107 @@ One thing worth mentioning is the concept of an \emph{improper list}. An imprope
 
 Improper lists are rarely used, but it helps to be aware of their existence. Lists that are not improper lists are sometimes called \emph{proper lists}.
 
-\subsection{Operations on lists}
+Lets review the words we've seen in this section:
+
+\wordtable{
+\tabvocab{syntax}
+\texttt{{[}}&
+\texttt{( -{}- )}&
+Begin a literal list.\\
+\texttt{{]}}&
+\texttt{( -{}- )}&
+End a literal list.\\
+\tabvocab{lists}
+\texttt{cons}&
+\texttt{( car cdr -{}- {[} car | cdr {]} )}&
+Construct a cons cell.\\
+\texttt{car}&
+\texttt{( {[} car | cdr {]} -{}- car )}&
+Push the first element of a list.\\
+\texttt{cdr}&
+\texttt{( {[} car | cdr {]} -{}- cdr )}&
+Push the rest of the list without the first element.\\
+\texttt{uncons}&
+\texttt{( {[} car | cdr {]} -{}- car cdr )}&
+Push both components of a cons cell.\\}
+
+\section{Operations on lists}
+
+\chapkeywords{unit append reverse contains?}
+\index{\texttt{unit}}
+\index{\texttt{append}}
+\index{\texttt{reverse}}
+\index{\texttt{contains?}}
+
+The \texttt{lists} vocabulary defines a large number of words for working with lists. The most important ones will be covered in this section. Later sections will cover other words, usually with a discussion of their implementation.
+
+The \texttt{unit} word makes a list of one element. It does this by consing the top of the stack with the empty list \texttt{f}:
+
+\begin{alltt}
+: unit ( a -- {[} a {]} ) f cons ;
+\end{alltt}
 
 The \texttt{append} word appends two lists at the top of the stack:
 
 \begin{alltt}
-\textbf{ok} {[} 1 2 3 {]} {[} 4 5 6 {]} append .
-\textbf{{[} 1 2 3 4 5 6 {]}}
-\textbf{ok} {[} 1 2 3 {]} dup {[} 4 5 6 {]} append .s
-\textbf{\{ {[} 1 2 3 {]} {[} 1 2 3 4 5 6 {]} \}}
+\textbf{ok} {[} "bacon" "eggs" {]} {[} "pancakes" "syrup" {]} append .
+\textbf{{[} "bacon" "eggs" "pancakes" "syrup" {]}}
 \end{alltt}
 
 Interestingly, only the first parameter has to be a list. if the second parameter
 is an improper list, or just a list at all, \texttt{append} returns an improper list:
 
 \begin{alltt}
-\textbf{ok} {[} 1 2 3 {]} 4 append .
-\textbf{{[} 1 2 3 | 4 {]}}
+\textbf{ok} {[} "molasses" "treacle" {]} "caramel" append .
+\textbf{{[} "molasses" "treacle" | "caramel" {]}}
 \end{alltt}
 
-\subsection{Debugging}
+The \texttt{reverse} word creates a new list whose elements are in reverse order of the given list:
 
-\subsection{Conditional execution}
+\begin{alltt}
+\textbf{ok} {[} "steak" "chips" "gravy" {]} reverse .
+\textbf{{[} "gravy" "chips" "steak" {]}}
+\end{alltt}
+
+The \texttt{contains?}~word checks if a list contains a given element. The element comes first on the stack, underneath the list:
+
+\begin{alltt}
+\textbf{ok} : desert? {[} "ice cream" "cake" "cocoa" {]} contains? ;
+\textbf{ok} "stew" desert? .
+\textbf{f}
+\textbf{ok} "cake" desert? .
+\textbf{{[} "cake" "cocoa" {]}}
+\end{alltt}
+
+What exactly is going on in the mouth-watering example above? The \texttt{contains?}~word returns \texttt{f} if the element does not occur in the list, and returns \emph{the remainder of the list} if the element occurs in the list. The significance of this will become apparent in the next section -- \texttt{f} represents boolean falsity in a conditional statement.
+
+Note that we glossed the concept of object equality here -- you might wonder how \texttt{contains?}~decides if the element ``occurs'' in the list or not. It turns out it uses the \texttt{=} word, which checks if two objects have the same structure. Another way to check for equality is using \texttt{eq?}, which checks if two references refer to the same object. Both of these words will be covered in detail later.
+
+Lets review the words we saw in this section:
+
+\wordtable{
+\tabvocab{lists}
+\texttt{unit}&
+\texttt{( a -{}- {[} a {]} )}&
+Make a list of one element.\\
+\texttt{append}&
+\texttt{( list list -{}- list )}&
+Append two lists.\\
+\texttt{reverse}&
+\texttt{( list -{}- list )}&
+Reverse a list.\\
+\texttt{contains?}&
+\texttt{( value list -{}- ?~)}&
+Determine if a list contains a value.\\}
+
+\section{Conditional execution}
+
+\chapkeywords{f t ifte unique infer}
+\index{\texttt{f}}
+\index{\texttt{t}}
+\index{\texttt{ifte}}
+\index{\texttt{unique?}}
+\index{\texttt{ifer}}
 
 Until now, all code examples we've considered have been linear in nature; each word is executed in turn, left to right. To perform useful computations, we need the ability the execute different code depending on circumstances.
 
@@ -521,27 +724,226 @@ The simplest style of a conditional form in Factor is the following:
 \end{alltt}
 
 The condition should be some piece of code that leaves a truth value on the stack. What is a truth value? In Factor, there is no special boolean data type
--- instead, the special value \texttt{f} we've already seen to represent empty lists also represents falsity. Every other object represents boolean truth.
+-- instead, the special value \texttt{f} we've already seen to represent empty lists also represents falsity. Every other object represents boolean truth. In cases where a truth value must be explicitly produced, the value \texttt{t} can be used. The \texttt{ifte} word removes the condition from the stack, and executes one of the two branches depending on the truth value of the condition.
 
-Lets look at a simple example of a word that 
+A good first example to look at is the \texttt{unique} word. This word conses a value onto a list as long as the value does not already occur in the list. Otherwise, the original list is returned. You can guess that this word somehow involves \texttt{contains?}~and \texttt{cons}. Check out its implementation using \texttt{see} and your intuition will be confirmed:
 
-\subsection{Recursion}
+\begin{alltt}
+: unique ( elem list -- list )
+    2dup contains? [ nip ] [ cons ] ifte ;
+\end{alltt}
 
-\subsection{Combinators}
+The first the word does is duplicate the two values given as input, since \texttt{contains?}~consumes its inputs. If the value does occur in the list, \texttt{contains?}~returns the remainder of the list starting from the first occurrence; in other words, a truth value. This calls \texttt{nip}, which removes the value from the stack, leaving the original list at the top of the stack. On the other hand, if the value does not occur in the list, \texttt{contains?}~returns \texttt{f}, which causes the other branch of the conditional to execute. This branch calls \texttt{cons}, which adds the value at the beginning of the list. 
 
-\subsection{The interpreter}
+\subsection{Stack effects of conditionals}
 
-\subsection{Recursive combinators}
+It is good style to ensure that both branches of conditionals you write have the same stack effect. This makes words easier to debug. Since it is easy to make a stack flow mistake when working with conditionals, Factor includes a \emph{stack effect inference} tool. It can be used as follows:
 
-\subsection{Unit testing}
+\begin{alltt}
+\textbf{ok} [ 2dup contains? [ nip ] [ cons ] ifte ] infer .
+\textbf{[ 2 | 1 ]}
+\end{alltt}
 
-\section{All about numbers}
+The output indicates that the code snippet\footnote{The proper term for a code snippet is a ``quotation''. You will learn about quotations later.} takes two values from the stack, and leaves one. Now lets see what happends if we forget about the \texttt{nip} and try to infer the stack effect:
+
+\begin{alltt}
+\textbf{ok} [ 2dup contains? [ ] [ cons ] ifte ] infer .
+\textbf{ERROR: Unbalanced ifte branches
+:s :r :n :c show stacks at time of error.}
+\end{alltt}
+
+Lets review the words we saw in this section:
+
+\wordtable{
+\tabvocab{syntax}
+\texttt{f}&
+\texttt{( -{}- f )}&
+Empty list, and boolean falsity.\\
+\texttt{t}&
+\texttt{( -{}- f )}&
+Canonical truth value.\\
+\tabvocab{combinators}
+\texttt{ifte}&
+\texttt{( ?~true false -{}- )}&
+Execute either \texttt{true} or \texttt{false} depending on the boolean value of the conditional.\\
+\tabvocab{lists}
+\texttt{unique}&
+\texttt{( elem list -{}- )}&
+Prepend an element to a list if it does not occur in the
+list.\\
+\tabvocab{inference}
+\texttt{infer}&
+\texttt{( quot -{}- {[} in | out {]} )}&
+Infer stack effect of code, if possible.\\}
+
+\section{Recursion}
+
+\chapkeywords{ifte when cons?~last last* list?}
+\index{\texttt{ifte}}
+\index{\texttt{when}}
+\index{\texttt{cons?}}
+\index{\texttt{last}}
+\index{\texttt{last*}}
+\index{\texttt{list?}}
+
+The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional. The general form of a recursive word looks as follows:
+
+\begin{alltt}
+: recursive
+    \emph{condition} {[}
+        \emph{recursive case}
+    {] [}
+        \emph{base case}
+    {]} ifte ;
+\end{alltt}
+
+Use \texttt{see} to take a look at the \texttt{last} word; it pushes the last element of a list:
+
+\begin{alltt}
+: last ( list -- last )
+    last* car ;
+\end{alltt}
+
+As you can see, it makes a call to an auxilliary word \texttt{last*}, and takes the car of the return value. As you can guess by looking at the output of \texttt{see}, \texttt{last*} pushes the last cons cell in a list:
+
+\begin{verbatim}
+: last* ( list -- last )
+    dup cdr cons? [ cdr last* ] when ;
+\end{verbatim}
+
+To understand the above code, first make the observation that the following two lines are equivalent:
+
+\begin{verbatim}
+dup cdr cons? [ cdr last* ] when
+dup cdr cons? [ cdr last* ] [ ] ifte
+\end{verbatim}
+
+That is, \texttt{when} is a conditional where the ``false'' branch is empty.
+
+So if the top of stack is a cons cell whose cdr is not a cons cell, the cons cell remains on the stack -- it gets duplicated, its cdr is taken, the \texttt{cons?} predicate tests if it is a cons cell, then \texttt{when} consumes the condition, and takes the empty ``false'' branch. This is the \emph{base case} -- the last cons cell of a one-element list is the list itself.
+
+If the cdr of the list at the top of the stack is another cons cell, then something magical happends -- \texttt{last*} calls itself again, but this time, with the cdr of the list. The recursive call, in turn, checks of the end of the list has been reached; if not, it makes another recursive call, and so on.
+
+Lets test the word:
+
+\begin{alltt}
+\textbf{ok} {[} "salad" "pizza" "pasta" "pancakes" {]} last* .
+\textbf{{[} "pancakes" {]}}
+\textbf{ok} {[} "salad" "pizza" "pasta" | "pancakes" {]} last* .
+\textbf{{[} "pasta" | "pancakes" {]}}
+\textbf{ok} {[} "nachos" "tacos" "burritos" {]} last .
+\textbf{"burritos"}
+\end{alltt}
+
+A naive programmer might think that recursion is an infinite loop. Two things ensure that a recursion terminates: the existence of a base case, or in other words, a branch of a conditional that does not contain a recursive call; and an \emph{inductive step} in the recursive case, that reduces one of the arguments in some manner, thus ensuring that the computation proceeds one step closer to the base case.
+
+An inductive step usually consists of taking the cdr of a list (the conditional could check for \texttt{f} or a cons cell whose cdr is not a list, as above), or decrementing a counter (the conditional could compare the counter with zero). Of course, many variations are possible; one could instead increment a counter, pass around its maximum value, and compare the current value with the maximum on each iteration.
+
+Lets consider a more complicated example. Use \texttt{see} to bring up the definition of the \texttt{list?} word. This word checks that the value on the stack is a proper list, that is, it is either \texttt{f}, or a cons cell whose cdr is a proper list:
+
+\begin{verbatim}
+: list? ( list -- ? )
+    dup [
+        dup cons? [ cdr list? ] [ drop f ] ifte
+    ] [
+        drop t
+    ] ifte ;
+\end{verbatim}
+
+This example has two nested conditionals, and in effect, two base cases. The first base case arises when the value is \texttt{f}; in this case, it is dropped from the stack, and \texttt{t} is returned, since \texttt{f} is a proper list of no elements. The second base case arises when a value that is not a cons is given. This is clearly not a proper list.
+
+The inductive step takes the cdr of the list. So, the birds-eye view of the word is that it takes the cdr of the list on the stack, until it either reaches \texttt{f}, in which case the list is a proper list, and \texttt{t} is returned; or until it reaches something else, in which case the list is an improper list, and \texttt{f} is returned.
+
+Lets test the word:
+
+\begin{alltt}
+\textbf{ok} {[} "tofu" "beans" "rice" {]} list? .
+\textbf{t}
+\textbf{ok} {[} "sprouts" "carrots" | "lentils" {]} list? .
+\textbf{f}
+\textbf{ok} f list? .
+\textbf{t}
+\end{alltt}
+
+\subsection{Stack effects of recursive words}
+
+There are a few things worth noting about the stack flow inside a recursive word. The condition must take care to preserve any input parameters needed for the base case and recursive case. The base case must consume all inputs, and leave the final return values on the stack. The recursive case should somehow reduce one of the parameters. This could mean incrementing or decrementing an integer, taking the \texttt{cdr} of a list, and so on. Parameters must eventually reduce to a state where the condition returns \texttt{f}, to avoid an infinite recursion.
+
+The recursive case should also be coded such that the stack effect of the total definition is the same regardless of how many iterations are preformed; words that consume or produce different numbers of paramters depending on circumstances are very hard to debug.
+
+Lets review the words we saw in this chapter:
+
+\wordtable{
+\tabvocab{combinators}
+\texttt{when}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
+\tabvocab{lists}
+\texttt{cons?}&
+\texttt{( value -{}- ?~)}&
+Test if a value is a cons cell.\\
+\texttt{last}&
+\texttt{( list -{}- value )}&
+Last element of a list.\\
+\texttt{last*}&
+\texttt{( list -{}- cons )}&
+Last cons cell of a list.\\
+\texttt{list?}&
+\texttt{( value -{}- ?~)}&
+Test if a value is a proper list.\\
+}
+
+\section{Debugging}
+
+\section{Combinators}
+
+\section{The interpreter}
+
+\index{\texttt{acons}}
+\index{\texttt{>r}}
+\index{\texttt{r>}}
+
+So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
+
+Another fundamental stack is the \emph{call stack}. It is used to save interpreter state for nested calls.
+
+You have probably noticed that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the call stack, executes the definition of that word, then restores the execution state from the call stack and continues.
+
+The call stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the call stack, and vice versa, respectively.
+
+A simple example can be found in the definition of the \texttt{acons} word:
+
+\begin{alltt}
+\textbf{ok} \ttbackslash acons see
+\textbf{: acons ( value key alist -- alist )
+    >r swons r> cons ;}
+\end{alltt}
+
+When the word is called, \texttt{swons} is applied to \texttt{value} and \texttt{key} creating a cons cell whose car is \texttt{key} and whose cdr is \texttt{value}, then \texttt{cons} is applied to this new cons cell, and \texttt{alist}. So this word adds the \texttt{key}/\texttt{value} pair to the beginning of the \texttt{alist}.
+
+Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single quotation or word definition. The following examples illustrate the point:
+
+\begin{verbatim}
+: the-good >r 2 + r> * ;
+: the-bad  >r 2 + ;
+: the-ugly r> ;
+\end{verbatim}
+
+Basically, the rule is you must leave the call stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can continue executing without seeing your data on the call stack.
+
+One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the callstack before returning.
+
+\section{Recursive combinators}
+
+\section{Unit testing}
+
+\chapter{All about numbers}
 
 A brief introduction to arithmetic in Factor was given in the first chapter. Most of the time, the simple features outlined there suffice, and if math is not your thing, you can skim (or skip!) this chapter. For the true mathematician, Factor's numerical capability goes far beyond simple arithmetic.
 
 Factor's numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
 
-\subsection{Integers}
+\section{Integers}
 
 \chapkeywords{integer?~BIN: OCT: HEX: .b .o .h}
 
@@ -582,7 +984,7 @@ The word \texttt{.} prints numbers in decimal, regardless of how they were input
 \textbf{10011010010}
 \end{alltt}
 
-\subsection{Rational numbers}
+\section{Rational numbers}
 
 \chapkeywords{rational?~numerator denominator}
 
@@ -619,7 +1021,7 @@ Ratios can be deconstructed into their numerator and denominator components usin
 \textbf{12}
 \end{alltt}
 
-\subsection{Floating point numbers}
+\section{Floating point numbers}
 
 \chapkeywords{float?~>float /f}
 
@@ -658,7 +1060,7 @@ Indeed, the word \texttt{/f} could be defined as follows:
 
 However, the actual definition is slightly more efficient, since it computes the floating point result directly.
 
-\subsection{Complex numbers}
+\section{Complex numbers}
 
 \chapkeywords{i -i \#\{ complex?~real imaginary >rect rect> arg abs >polar polar>}
 
@@ -711,7 +1113,7 @@ A new complex number can be created from an absolute value and argument using \t
 \textbf{\#\{ -1.0 1.224606353822377e-16 \}}
 \end{alltt}
 
-\subsection{Transcedential functions}
+\section{Transcedential functions}
 
 \chapkeywords{\^{} exp log sin cos tan asin acos atan sec cosec cot asec acosec acot sinh cosh tanh asinh acosh atanh sech cosech coth asech acosech acoth}
 
@@ -753,7 +1155,7 @@ The reciprocals of the sine, cosine and tangent are defined as \texttt{sec}, \te
 
 Similarly, the reciprocals of the hyperbolic functions are defined as \texttt{sech}, \texttt{cosech} and \texttt{coth}, respectively. Their inverses are \texttt{asech}, \texttt{acosech} and \texttt{acoth}.
 
-\subsection{Modular arithmetic}
+\section{Modular arithmetic}
 
 \chapkeywords{/i mod /mod gcd}
 
@@ -780,7 +1182,7 @@ However, the actual definition is a bit more efficient than that.
 
 \texttt{gcd ( x y -{}- z )} pushes the greatest common divisor of two integers; that is, the largest number that both integers could be divided by and still yield integers as results. This word is used behind the scenes to reduce rational numbers to lowest terms when doing ratio arithmetic.
 
-\subsection{Bitwise operations}
+\section{Bitwise operations}
 
 \chapkeywords{bitand bitor bitxor bitnot shift}
 
@@ -829,5 +1231,7 @@ BIN: 11111 -2 shift .b
 \end{alltt}
 
 The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
+
+\input{new-guide.ind}
 
 \end{document}

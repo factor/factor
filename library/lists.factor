@@ -63,10 +63,14 @@ USE: vectors
 : last ( list -- last )
     last* car ;
 
-: list? ( list -- boolean )
+: list? ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    [ dup cons? [ cdr list? ] [ drop f ] ifte ] [ t ] ifte* ;
+    dup [
+        dup cons? [ cdr list? ] [ drop f ] ifte
+    ] [
+        drop t
+    ] ifte ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     >r >r [ r> cons r> ] [ r> swap r> cons ] ifte ; inline
@@ -138,8 +142,8 @@ DEFER: tree-contains?
     ] ifte ;
 
 : unique ( elem list -- list )
-    #! Prepend an element to a proper list if it is not
-    #! already contained in the list.
+    #! Prepend an element to a list if it does not occur in the
+    #! list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
 : (each) ( list quot -- list quot )
