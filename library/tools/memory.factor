@@ -42,7 +42,7 @@ namespaces prettyprint sequences stdio unparser vectors words ;
 GENERIC: (each-slot) ( quot obj -- ) inline
 
 M: arrayed (each-slot) ( quot array -- )
-    dup array-capacity [
+    dup length [
         [
             ( quot obj n -- )
             swap array-nth swap dup slip

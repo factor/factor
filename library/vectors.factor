@@ -38,7 +38,7 @@ IN: kernel-internals
     #! doubling of its size.
     2dup vector-length fixnum>= [
         >r 1 fixnum+ r>
-        2dup vector-array array-capacity fixnum> [
+        2dup vector-array length fixnum> [
             over 2 fixnum* over grow-capacity
         ] when
         (set-vector-length)

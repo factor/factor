@@ -1,3 +1,4 @@
+USING: sequences ;
 USE: lists
 USE: kernel
 USE: math
@@ -75,8 +76,8 @@ unit-test
 [ "funky" ] [ "funny-stack" get vector-pop ] unit-test
 
 [ t ] [
-    { 1 2 3 4 } dup vector-array array-capacity
-    >r clone vector-array array-capacity r>
+    { 1 2 3 4 } dup vector-array length
+    >r clone vector-array length r>
     =
 ] unit-test
 

@@ -13,7 +13,7 @@ USING: generic kernel lists math-internals sequences vectors ;
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
-BUILTIN: array 8 [ 1 "array-capacity" f ] ;
+BUILTIN: array 8 [ 1 length f ] ;
 
 : array-nth ( n array -- obj )
     #! Unsafe.
@@ -23,6 +23,5 @@ BUILTIN: array 8 [ 1 "array-capacity" f ] ;
     #! Unsafe.
     swap 2 fixnum+ set-slot ; inline
 
-M: array length array-capacity ;
 M: array nth array-nth ;
 M: array set-nth set-array-nth ;

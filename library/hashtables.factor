@@ -42,7 +42,7 @@ IN: kernel-internals
 
 IN: hashtables
 
-: bucket-count ( hash -- n ) hash-array array-capacity ;
+: bucket-count ( hash -- n ) hash-array length ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.

@@ -22,7 +22,7 @@ hashtables errors sequences vectors ;
 
 IN: generic
 
-BUILTIN: tuple 18 [ 1 array-capacity f ] ;
+BUILTIN: tuple 18 [ 1 length f ] ;
 
 ! So far, only tuples can have delegates, which also must be
 ! tuples (the UI uses numbers as delegates in a couple of places
@@ -37,16 +37,14 @@ M: object set-delegate 2drop ;
 M: tuple set-delegate 3 set-slot ;
 
 : check-array ( n array -- )
-    array-capacity 0 swap between? [
+    length 0 swap between? [
         "Array index out of bounds" throw
     ] unless ;
 
-M: tuple length array-capacity ;
 M: tuple nth 2dup check-array array-nth ;
 M: tuple set-nth 2dup check-array set-array-nth ;
 
-#! arrayed objects can be passed to array-capacity,
-#! array-nth, and set-array-nth.
+#! arrayed objects can be passed to array-nth, and set-array-nth
 UNION: arrayed array tuple ;
 
 : class ( obj -- class )
@@ -171,7 +169,7 @@ UNION: arrayed array tuple ;
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
-    dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
+    dup length dup <tuple> [ -rot copy-array ] keep ;
 
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
