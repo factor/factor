@@ -27,6 +27,8 @@
 
 IN: kernel
 USE: ansi
+USE: win32-console
+USE: alien
 USE: compiler
 USE: errors
 USE: inference
@@ -67,7 +69,18 @@ USE: unparser
 
     "ansi" get [ stdio [ <ansi-stream> ] change ] when
 
+    os "win32" = "compile" get and [
+        "kernel32" "kernel32.dll" "stdcall" add-library
+        "user32"   "user32.dll"   "stdcall" add-library
+        "gdi32"    "gdi32.dll"    "stdcall" add-library
+        "libc"     "msvcrt.dll"   "cdecl"   add-library
+    ] when
+
     "compile" get [ compile-all ] when
+
+    os "win32" = "compile" get and [ 
+        stdio [ <win32-console-stream> ] change 
+    ] when
 
     run-user-init ;
 

@@ -155,6 +155,20 @@ USE: stdio
     run-resource
 ] each
 
+os "win32" = [
+    [
+        "/library/io/buffer.factor"
+        "/library/win32/win32-io.factor"
+        "/library/win32/win32-errors.factor"
+        "/library/io/win32-io-internals.factor"
+        "/library/io/win32-stream.factor"
+        "/library/io/win32-console.factor"
+    ] [
+        dup print
+        run-resource
+    ] each
+] when
+
 cpu "x86" = [
     [
          "/library/compiler/assembly-x86.factor"

@@ -63,7 +63,15 @@ M: alien = ( obj obj -- ? )
     "dll" get dup [
         drop "name" get dlopen dup "dll" set
     ] unless ;
-
+    
+: add-library ( library name abi -- )
+    "libraries" get [
+        <namespace> [
+          "abi" set
+          "name" set
+        ] extend put
+    ] bind ;
+    
 SYMBOL: #c-invoke ( C ABI -- Unix and some Windows libs )
 SYMBOL: #cleanup ( unwind stack by parameter )
 
@@ -148,3 +156,4 @@ SYMBOL: alien-parameters
 global [
     "libraries" get [ <namespace> "libraries" set ] unless
 ] bind
+
