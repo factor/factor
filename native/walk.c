@@ -40,9 +40,11 @@ void primitive_instances(void)
 {
 	CELL list = F;
 	CELL search_type = to_fixnum(dpop());
-	CELL here = active.here;
+	CELL here;
 
 	primitive_gc();
+
+	here = active.here;
 
 	begin_heap_walk();
 	
