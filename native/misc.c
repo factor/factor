@@ -32,7 +32,13 @@ void primitive_millis(void)
 
 void primitive_init_random(void)
 {
+#ifdef HAVE_SRANDOMDEV
 	srandomdev();
+#else
+	struct timeval t;
+	gettimeofday(&t,NULL);
+	srandom(t.tv_sec);
+#endif
 }
 
 void primitive_random_int(void)

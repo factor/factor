@@ -2475,6 +2475,20 @@ contains an object that looks like
  The issue of object equality is covered in the next chapter.
 \layout Standard
 
+unique ( list -- list ) Return a new list with all duplicate elements removed.
+ This word executes in quadratic time, so should not be used with large
+ lists.
+ For example:
+\layout LyX-Code
+
+[ 1 2 1 4 1 8 ] unique .
+\layout LyX-Code
+
+
+\emph on 
+[ 1 2 4 8 ]
+\layout Standard
+
 
 \family typewriter 
 remove ( obj list -- list )

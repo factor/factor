@@ -91,7 +91,7 @@ DEFER: prettyprint*
 
 : check-recursion ( indent obj quot -- )
     >r over prettyprint-limit >= [
-        r> drop drop "#< ... >" write
+        r> drop drop "#< ... > " write
     ] [
         r> call
     ] ifte ;
