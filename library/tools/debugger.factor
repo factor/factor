@@ -175,6 +175,16 @@ M: object error. ( error -- )
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
     kernel-error 12 setenv ;
 
+: undefined-method ( object generic -- )
+    #! We 2dup here to leave both values on the stack, for
+    #! post-mortem inspection.
+    2dup [
+        "The generic word " ,
+        unparse ,
+        " does not have a suitable method for " ,
+        unparse ,
+    ] make-string throw ;
+
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.
 init-error-handler

@@ -38,6 +38,7 @@ USE: words
 USE: vectors
 USE: math
 USE: math-internals
+USE: unparser
 
 ! A simple single-dispatch generic word system.
 
@@ -63,9 +64,6 @@ USE: math-internals
 
 ! Metaclasses have priority -- this induces an order in which
 ! methods are added to the vtable.
-
-: undefined-method
-    "No applicable method." throw ;
 
 : metaclass ( class -- metaclass )
     "metaclass" word-property ;
@@ -94,14 +92,17 @@ USE: math-internals
     #! Add the method entry to the vtable. Unlike define-method,
     #! this is called at vtable build time, and in the sorted
     #! order.
-    dup metaclass "add-method" word-property
-    [ [ undefined-method ] ] unless* call ;
+    dup metaclass "add-method" word-property [
+        [ "Metaclass is missing add-method" throw ]
+    ] unless* call ;
 
-: <empty-vtable> ( -- vtable )
-    num-types [ drop [ undefined-method ] ] vector-project ;
+: <empty-vtable> ( generic -- vtable )
+    unit num-types
+    [ drop dup [ car undefined-method ] cons ] vector-project
+    nip ;
 
 : <vtable> ( generic -- vtable )
-    <empty-vtable> over methods [
+    dup <empty-vtable> over methods [
         ( generic vtable method )
         >r 2dup r> unswons add-method
     ] each nip ;

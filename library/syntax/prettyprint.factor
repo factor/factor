@@ -121,7 +121,11 @@ M: word prettyprint* ( indent word -- indent )
     [ prettyprint-element ] each ;
 
 M: list prettyprint* ( indent list -- indent )
-    swap prettyprint-[ swap prettyprint-list prettyprint-] ;
+    [
+        swap prettyprint-[ swap prettyprint-list prettyprint-]
+    ] [
+        f unparse write
+    ] ifte* ;
 
 M: cons prettyprint* ( indent cons -- indent )
     \ [[ prettyprint* " " write

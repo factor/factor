@@ -37,6 +37,11 @@ USE: namespaces
 USE: strings
 USE: vectors
 
+: undefined-method ( object generic -- )
+    #! This word is redefined in tools/debugger.factor with a
+    #! more useful definition once unparse is available.
+    "No suitable method" throw ;
+
 ! This is a very lightweight exception handling system.
 
 : catchstack ( -- cs ) 6 getenv ;

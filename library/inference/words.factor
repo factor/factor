@@ -204,5 +204,6 @@ M: symbol (apply-word) ( word -- )
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
+\ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-property
 \ not-a-number t "terminator" set-word-property
 \ throw t "terminator" set-word-property
