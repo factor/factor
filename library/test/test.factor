@@ -8,6 +8,7 @@ USE: compiler
 USE: errors
 USE: kernel
 USE: lists
+USE: logic
 USE: math
 USE: namespaces
 USE: parser
@@ -33,6 +34,10 @@ USE: unparser
         swap >r >r clear r> call datastack vector>list r>
         = assert
     ] keep-datastack 2drop ;
+
+: unit-test-fails ( quot -- )
+    #! Assert that the quotation throws an error.
+    [ [ not ] catch ] cons [ f ] swap unit-test ;
 
 : test-word ( output input word -- )
     #! Old-style test.
@@ -107,14 +112,17 @@ USE: unparser
     ] each
     
     native? [
-        [
-            "threads"
-            "x86-compiler/simple"
-            "x86-compiler/ifte"
-            "x86-compiler/generic"
-        ] [
-            test
-        ] each
+        "threads" test
+
+        cpu "x86" = [
+            [
+                "x86-compiler/simple"
+                "x86-compiler/ifte"
+                "x86-compiler/generic"
+            ] [
+                test
+            ] each
+        ] when
     ] when
 
     java? [

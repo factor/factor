@@ -134,3 +134,7 @@ test-word
 [ "66/200" ]
 [ parse-number unparse ]
 test-word
+
+[ "12" bin> ] unit-test-fails
+[ "fdsf" bin> ] unit-test-fails
+[ 3 ] [ "11" bin> ] unit-test

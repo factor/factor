@@ -78,10 +78,7 @@ DEFER: >n
 : set ( value variable -- ) namespace set* ;
 : put ( variable value -- ) namespace put* ;
 
-: alist-sort ( list -- list )
-    [ swap car swap car str-lexi> ] sort ;
-
-: vars-values ( -- list ) namespace hash>alist alist-sort ;
+: vars-values ( -- list ) namespace hash>alist ;
 : vars ( -- list ) vars-values [ car ] map ;
 : values ( -- list ) vars-values [ cdr ] map ;
 

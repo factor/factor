@@ -61,28 +61,29 @@ USE: vectors
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;
 
-: ?unparse ( obj -- str )
-    dup string? [ unparse ] unless ;
-
 : alist-keys>str ( alist -- alist )
-    #! Unparse non-string keys.
-    [ unswons ?unparse swons ] map ;
+    [ unswons unparse swons ] map ;
 
 : name-padding ( alist -- col )
     [ car ] map max-str-length ;
 
-: (describe-assoc) ( alist -- )
+: describe-assoc ( alist -- )
     dup name-padding swap
     [ dupd uncons value. ] each drop ;
 
-: describe-assoc ( alist -- )
-    alist-keys>str (describe-assoc) ;
+: alist-sort ( list -- list )
+    [ swap car swap car str-lexi> ] sort ;
+
+: describe-assoc* ( alist -- )
+    #! Used to describe alists made from hashtables and
+    #! namespaces.
+    alist-keys>str alist-sort describe-assoc ;
 
 : describe-namespace ( namespace -- )
-    [ vars-values ] bind describe-assoc ;
+    [ vars-values ] bind describe-assoc* ;
 
 : describe-hashtable ( hashtables -- )
-    hash>alist describe-assoc ;
+    hash>alist describe-assoc* ;
 
 : describe ( obj -- )
     [

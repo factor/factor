@@ -240,22 +240,19 @@ DEFER: tree-contains?
     #! Push each element of a proper list in turn, and apply a
     #! quotation to each element.
     #!
-    #! In order to compile, the quotation must consume one more
-    #! value than it produces.
-    over [
-        >r uncons r> tuck >r >r call r> r> each
-    ] [
-        2drop
-    ] ifte ; inline interpret-only
+    #! The quotation must consume one more value than it
+    #! produces.
+    over [ >r uncons r> tuck 2slip each ] [ 2drop ] ifte ;
+    inline interpret-only
 
 : map ( list code -- list )
     #! Applies the code to each item, returns a list that
     #! contains the result of each application.
     #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
+    #! The quotation must consume as many values as it
+    #! produces.
     f transp [
-        ( accum code elem -- accum code )
+        ! accum code elem -- accum code
         transp over >r >r call r> cons r>
     ] each drop nreverse ; inline interpret-only
 
@@ -263,7 +260,7 @@ DEFER: tree-contains?
     uncons >r >r uncons r> swap r> ;
 
 : 2each-step ( list list quot -- cdr cdr )
-    >r 2uncons r> -rot >r >r call r> r> ; inline interpret-only
+    >r 2uncons r> -rot 2slip ; inline interpret-only
 
 : 2each ( list list quot -- )
     #! Apply the quotation to each pair of elements from the
@@ -276,7 +273,7 @@ DEFER: tree-contains?
     ] ifte ; inline interpret-only
 
 : 2map-step ( accum quot elt elt -- accum )
-    2swap swap >r call r> cons ;
+    2swap swap slip cons ;
 
 : <2map ( list list quot -- accum quot list list )
     >r f -rot r> -rot ;

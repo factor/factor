@@ -2,9 +2,9 @@ FFI:
 - is signed -vs- unsigned pointers an issue?
 
 - command line parsing cleanup
+- > 1 ( ) inside word def
 
-- BIN: 2: bad
-
+- when* compilation
 - compile word twice; no more 'cannot compile' error!
 - doc comments in assoc, image, inferior
 - styles - could use some cleanup
@@ -44,8 +44,6 @@ FFI:
 - perhaps /i should work with all numbers
 - profiler is inaccurate: wrong word on cs
 - buffer change handler in sidekick is screwed
-- dec> bin> oct> hex> throw errors
-- parse-number doesn't
 - eval with multilien strings and #!
 - quit responder breaks with multithreading
 - nicer way to combine two paths

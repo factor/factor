@@ -95,7 +95,7 @@ USE: url-encoding
     [ ] (read-header) ;
 
 : content-length ( alist -- length )
-    "Content-Length" swap assoc dec> ;
+    "Content-Length" swap assoc parse-number ;
 
 : query>alist ( query -- alist )
     dup [

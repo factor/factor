@@ -92,9 +92,7 @@ USE: stdio
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
-    "/library/math/quadratic.factor"
     "/library/math/list-math.factor"
-    "/library/math/simpson.factor"
 
     "/library/extend-stream.factor"
     "/library/platform/native/in-thread.factor"
