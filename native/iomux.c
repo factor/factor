@@ -12,8 +12,11 @@ void init_io_tasks(fd_set* fdset, IO_TASK* io_tasks)
 	}
 }
 
-void init_iomux(void)
+void init_io(void)
 {
+	env.user[STDIN_ENV]  = tag_object(port(PORT_READ,0));
+	env.user[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
+	
 	read_fd_count = 0;
 	init_io_tasks(&read_fd_set,read_io_tasks);
 
@@ -30,8 +33,8 @@ IO_TASK* add_io_task(
 {
 	int fd = port->fd;
 
-	/* if(io_tasks[fd].port != F)
-		critical_error("Adding I/O task twice",fd); */
+	if(io_tasks[fd].port != F)
+		critical_error("Adding I/O task twice",fd);
 
 	io_tasks[fd].type = type;
 	io_tasks[fd].port = tag_object(port);
@@ -41,22 +44,6 @@ IO_TASK* add_io_task(
 		*fd_count = fd + 1;
 
 	return &io_tasks[fd];
-}
-
-void primitive_add_read_line_io_task(void)
-{
-	PORT* port = untag_port(dpop());
-	CELL callback = dpop();
-	add_io_task(IO_TASK_READ_LINE,port,callback,
-		read_io_tasks,&read_fd_count);
-}
-
-void primitive_add_write_io_task(void)
-{
-	PORT* port = untag_port(dpop());
-	CELL callback = dpop();
-	add_io_task(IO_TASK_WRITE,port,callback,
-		write_io_tasks,&write_fd_count);
 }
 
 void primitive_add_accept_io_task(void)
@@ -107,65 +94,6 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 	}
 	
 	return retval;
-}
-
-bool perform_read_line_io_task(PORT* port)
-{
-	SBUF* line;
-
-	if(port->buf_pos >= port->buf_fill)
-	{
-		if(!read_step(port))
-			return false;
-	}
-
-	if(port->buf_fill == 0)
-	{
-		/* EOF */
-		if(port->line != F)
-		{
-			line = untag_sbuf(port->line);
-			if(line->top == 0)
-				port->line = F;
-		}
-		port->line_ready = true;
-		return true;
-	}
-	else
-	{
-		return read_line_step(port);
-	}
-}
-
-bool perform_read_count_io_task(PORT* port)
-{
-	SBUF* line;
-
-	if(port->buf_pos >= port->buf_fill)
-	{
-		if(!read_step(port))
-			return false;
-	}
-
-	if(port->buf_fill == 0)
-		return true;
-	else
-		return read_count_step(port,port->count);
-}
-
-bool perform_write_io_task(PORT* port)
-{
-	if(write_step(port))
-	{
-		if(port->buf_pos == port->buf_fill)
-		{
-			/* All written */
-			port->buf_pos = 0;
-			port->buf_fill = 0;
-			return true;
-		}
-	}
-	return false;
 }
 
 CELL perform_io_task(IO_TASK* task)
@@ -273,7 +201,6 @@ CELL next_io_task(void)
 	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
 		&read_fd_set,&write_fd_set,&except_fd_set,NULL);
 	
-		for(i = 0; i < read_fd_count; i++) if(FD_ISSET(i,&except_fd_set)) exit(1);/* write(3,"FUBAR\n",6); */
 	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
 	if(callback != F)
 		return callback;
@@ -284,6 +211,13 @@ CELL next_io_task(void)
 void primitive_next_io_task(void)
 {
 	dpush(next_io_task());
+}
+
+void primitive_close(void)
+{
+	/* This does not flush. */
+	PORT* port = untag_port(dpop());
+	close(port->fd);
 }
 
 void collect_io_tasks(void)

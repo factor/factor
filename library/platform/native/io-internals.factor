@@ -64,6 +64,15 @@ USE: strings
 : blocking-read-line ( port -- line )
     dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
 
+: fill-fd# ( count port -- )
+    [ -rot add-read-count-io-task yield ] callcc0 2drop ;
+
+: wait-to-read# ( count port -- )
+    2dup can-read-count? [ 2drop ] [ fill-fd# ] ifte ;
+
+: blocking-read# ( count port -- str )
+    2dup wait-to-read# read-count-fd-8 dup [ sbuf>str ] when ;
+
 : wait-to-accept ( socket -- )
     [ swap add-accept-io-task yield ] callcc0 drop ;
 

@@ -13,7 +13,6 @@ int main(int argc, char** argv)
 	init_arena(DEFAULT_ARENA);
 	load_image(argv[1]);
 	init_stacks();
-	init_iomux();
 	init_io();
 	init_signals();
 

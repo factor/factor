@@ -32,7 +32,7 @@ typedef unsigned short CHAR;
 #define CHARS sizeof(CHAR)
 
 /* Memory heap size */
-#define DEFAULT_ARENA (32 * 1024 * 1024)
+#define DEFAULT_ARENA (5 * 1024 * 1024)
 
 #define STACK_SIZE 16384
 
@@ -54,10 +54,11 @@ typedef unsigned short CHAR;
 #include "string.h"
 #include "sbuf.h"
 #include "port.h"
-#include "fd.h"
+#include "iomux.h"
+#include "read.h"
+#include "write.h"
 #include "file.h"
 #include "socket.h"
-#include "iomux.h"
 #include "cons.h"
 #include "image.h"
 #include "primitives.h"

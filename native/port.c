@@ -37,6 +37,14 @@ PORT* port(PORT_MODE type, CELL fd)
 	return port;
 }
 
+void init_line_buffer(PORT* port, FIXNUM count)
+{
+	if(port->line == F)
+		port->line = tag_object(sbuf(LINE_SIZE));
+	else
+		untag_sbuf(port->line)->top = 0;
+}
+
 void primitive_portp(void)
 {
 	drepl(tag_boolean(typep(PORT_TYPE,dpeek())));

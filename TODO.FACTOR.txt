@@ -1,7 +1,6 @@
 - input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- read#
 - enforce bottom-up in native bootstrap
 - fix up native file/line info
 - standalone listener input style
@@ -43,6 +42,7 @@
 
 + native:
 
+- command line arguments
 - gc call in the middle of some ops might affect callstack
 - postpone errors until actual read/write op
 - multitasking

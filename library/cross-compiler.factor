@@ -70,6 +70,9 @@ DEFER: accept-fd
 DEFER: can-read-line?
 DEFER: add-read-line-io-task
 DEFER: read-line-fd-8
+DEFER: can-read-count?
+DEFER: add-read-count-io-task
+DEFER: read-count-fd-8
 DEFER: can-write?
 DEFER: add-write-io-task
 DEFER: write-fd-8
@@ -219,6 +222,9 @@ IN: cross-compiler
         can-read-line?
         add-read-line-io-task
         read-line-fd-8
+        can-read-count?
+        add-read-count-io-task
+        read-count-fd-8
         can-write?
         add-write-io-task
         write-fd-8

@@ -50,11 +50,15 @@ USE: vectors
 : kernel-error? ( obj -- ? )
     dup cons? [ car fixnum? ] [ drop f ] ifte ;
 
-: ?nth ( n list -- obj )
-    over [ dup >r length min 0 max r> nth ] [ 2drop f ] ifte ;
+: ?vector-nth ( n vec -- obj )
+    over [
+        dup >r vector-length min 0 max r> vector-nth
+    ] [
+        2drop f
+    ] ifte ;
 
 : error# ( n -- str )
-    [
+    {
         "Expired port: "
         "Undefined word: "
         "Type check: "
@@ -65,7 +69,7 @@ USE: vectors
         "Incomparable types: "
         "Float format: "
         "Signal "
-    ] ?nth ;
+    } ?vector-nth ;
 
 : ?kernel-error ( cons -- error# param )
     dup cons? [ uncons dup cons? [ car ] when ] [ f ] ifte ;

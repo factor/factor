@@ -51,6 +51,11 @@ USE: unparser
         ( -- str )
         [ "in" get dup [ blocking-read-line ] when ] "freadln" set
         
+        ( count -- str )
+        [
+            "in" get dup [ blocking-read# ] [ nip ] ifte
+        ] "fread#" set
+        
         ( -- )
         [ "out" get [ flush-fd ] when* ] "fflush" set
         
