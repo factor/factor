@@ -29,6 +29,7 @@
 IN: todo-example
 USE: cont-responder
 USE: cont-html
+USE: cont-utils
 USE: html
 USE: stdio
 USE: stack
@@ -42,27 +43,6 @@ USE: regexp
 USE: prettyprint
 USE: todo
  
-: simple-todo-page ( title quot -- )
-  #! Call the quotation, with all output going to the
-  #! body of an html page with the given title.
-  <html> [ 
-    <head> [ <title> [ swap write ] </title> ] </head> 
-    <body> [ call ] </body>
-  ] </html> ;
-
-: paragraph ( str -- )
-  #! Output the string as an html paragraph
-  <p> [ write ] </p> ;
-
-: show-message-page ( message -- )
-  #! Display the message in an HTML page with an OK button.
-  [
-    "Press OK to Continue" [
-       swap paragraph 
-       <a href= a> [ "OK" write ] </a>
-    ] simple-todo-page 
-  ] show 2drop ;
-
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
   [ .s ] with-string-stream chars>entities show-message-page ;
@@ -122,7 +102,7 @@ USE: todo
   "Register New TODO List" [
     "Enter the username and password for your new todo list:" paragraph
     "Register" login-form
-  ] simple-todo-page ;
+  ] simple-page ;
 
 : login-details-valid? ( name password -- )
   #! Ensure that a valid username and password were
@@ -185,7 +165,7 @@ USE: todo
     "Login" [     
       login-request-paragraph 
       "Login" login-form
-    ] simple-todo-page 
+    ] simple-page 
   ] show [ 
     "name" get "password" get 
   ] bind  ;
@@ -219,7 +199,7 @@ USE: todo
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
   [
-    "Enter New Todo Item" [ write-new-todo-item-form ] simple-todo-page  
+    "Enter New Todo Item" [ write-new-todo-item-form ] simple-page  
   ] show [ 
     "priority" get "description" get <todo-item> 
   ] bind ;
@@ -271,7 +251,7 @@ USE: todo
       drop
       "todo" get write-item-table
       "Add Item" [ do-add-new-item ] quot-href
-    ] simple-todo-page 
+    ] simple-page 
   ] show drop ;
 
 : todo-example ( path -- )

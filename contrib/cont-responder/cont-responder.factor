@@ -34,7 +34,6 @@ USE: namespaces
 USE: stack
 USE: combinators
 USE: streams
-USE: regexp
 USE: lists
 USE: strings
 USE: html
@@ -254,9 +253,9 @@ DEFER: show
   #! Return an alist containing name/value pairs from the
   #! post data.
   dup "&" swap str-contains? [
-    "(.+)&(.+)" groups [ "(.+)=(.*)" groups uncons car cons ] inject 
+    "&" split [ "=" split1 ] inject 
   ] [
-    "(.+)=(.+)" groups uncons car cons unit
+    "=" split1 unit
   ] ifte ;
 
 : post-request>namespace ( post-request -- namespace )
