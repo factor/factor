@@ -79,3 +79,9 @@ USE: stack
             2drop
         ] ifte r>
     ] each drop ;
+
+: unzip ( assoc -- keys values )
+    #! Split an association list into two lists of keys and
+    #! values.
+    [ ] [ ] rot [ uncons 2swons ] each
+    swap reverse swap reverse ;

@@ -33,6 +33,8 @@ USE: stack
 USE: vectors
 USE: words
 
+DEFER: number=
+
 : (gcd) ( x y -- z ) dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 : gcd ( x y -- z ) abs swap abs 2dup < [ swap ] when (gcd) ;
 
@@ -44,7 +46,8 @@ USE: words
     [ swap numerator swap numerator ] 2keep
     swap denominator swap denominator ;
 
-: ratio= ( a/b c/d -- ? ) 2>fraction = [ = ] [ 2drop f ] ifte ;
+: ratio= ( a/b c/d -- ? )
+    2>fraction number= [ number= ] [ 2drop f ] ifte ;
 : ratio-scale ( a/b c/d -- a*d b*c )
     2>fraction >r * swap r> * swap ;
 : ratio+d ( a/b c/d -- b*d ) denominator swap denominator * ;
@@ -64,7 +67,8 @@ USE: words
     [ swap real swap real ] 2keep
     swap imaginary swap imaginary ;
 
-: complex= ( x y -- ? ) 2>rect = [ = ] [ 2drop f ] ifte ;
+: complex= ( x y -- ? )
+    2>rect number= [ number= ] [ 2drop f ] ifte ;
 
 : complex+ ( x y -- x+y ) 2>rect + >r + r> rect> ;
 : complex- ( x y -- x-y ) 2>rect - >r - r> rect> ;

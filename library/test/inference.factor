@@ -10,9 +10,10 @@ USE: lists
 
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
+[ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
+
 [ t ] [
-    { 1 2 } { 1 2 3 } 
-    unify-lengths swap vector-length swap vector-length =
+    [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?
 ] unit-test
 
 [ [ sq ] ] [ [ sq ] [ sq ] unify-result ] unit-test
@@ -84,7 +85,31 @@ USE: lists
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
 ! Simple combinators
-[ [ 1 | 2 ] [ [ car ] keep cdr ] infer ] unit-test
+[ [ 1 | 2 ] ] [ [ [ car ] keep cdr ] infer ] unit-test
+
+! Mutual recursion
+DEFER: foe
+
+: fie ( element obj -- ? )
+    dup cons? [ foe ] [ eq? ] ifte ;
+
+: foe ( element tree -- ? )
+    dup [
+        2dup car fie [
+            nip
+        ] [
+            cdr dup cons? [
+                foe
+            ] [
+                fie
+            ] ifte
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+[ [ 2 | 1 ] ] [ [ fie ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ foe ] infer ] unit-test
 
 [ [ 2 | 1 ] ] [ [ 2list ] infer ] unit-test
 [ [ 3 | 1 ] ] [ [ 3list ] infer ] unit-test
@@ -96,3 +121,6 @@ USE: lists
 ! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ number= ] infer ] unit-test

@@ -46,9 +46,6 @@ public class Symbol extends FactorParsingDefinition
 		throws Exception
 	{
 		FactorWord w = reader.nextWord(true);
-		reader.append(w.vocabulary);
-		reader.append(w.name);
 		reader.append(new FactorSymbolDefinition(w,w));
-		reader.append(reader.intern("define",false));
 	}
 }

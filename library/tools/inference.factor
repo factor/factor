@@ -62,7 +62,8 @@ SYMBOL: recursive-state
     >r gensym-vector dup r> vector-append ;
 
 : ensure ( count stack -- count stack )
-    #! Ensure stack has this many elements.
+    #! Ensure stack has this many elements. Return number of
+    #! elements added.
     2dup vector-length > [
         [ vector-length - dup ] keep inputs
     ] [
@@ -170,7 +171,7 @@ DEFER: (infer)
     #! quotations.
     [ apply-object ] each ;
 
-: (infer-branch) ( quot -- [ in-d | datastack ] )
+: infer-branch ( quot -- [ in-d | datastack ] )
     #! Infer the quotation's effect, restoring the meta
     #! interpreter state afterwards.
     [
@@ -178,45 +179,41 @@ DEFER: (infer)
         d-in get  meta-d get cons
     ] with-scope ;
 
-: infer-branch ( quot -- [ in-d | datastack ] )
-    #! Push f if inference failed.
-    [ (infer-branch) ] [ [ drop f ] when ] catch ;
-
 : difference ( [ in | stack ] -- diff )
     #! Stack height difference of infer-branch return value.
     uncons vector-length - ;
 
-: balanced? ( [ in | stack ] [ in | stack ] -- ? )
-    #! Check if two stack effects preserve stack height.
-    difference swap difference = ;
+: balanced? ( list -- ? )
+    #! Check if a list of [ in | stack ] pairs has the same
+    #! stack height.
+    [ difference ] map all=? ;
 
-: max-vector-length ( vector vector -- length )
-    swap vector-length swap vector-length max ;
+: max-vector-length ( list -- length )
+    [ vector-length ] map [ > ] top ;
 
-: unify-lengths ( stack stack -- stack stack )
-    #! If one vector is shorter, pad it with unknown results at
-    #! the bottom.
-    2dup max-vector-length
-    tuck swap ensure nip >r swap ensure nip r> ;
+: unify-lengths ( list -- list )
+    #! Pad all vectors to the same length. If one vector is
+    #! shorter, pad it with unknown results at the bottom.
+    dup max-vector-length swap [ dupd ensure nip ] map nip ;
 
 : unify-result ( obj obj -- obj )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
     2dup = [ drop ] [ 2drop gensym ] ifte ;
 
-: unify-stacks ( stack stack -- stack )
+: unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths [ unify-result ] vector-2map ;
+    uncons [ [ unify-result ] vector-2map ] each ;
 
-: unify ( [ in | stack ] [ in | stack ] -- )
+: unify ( list -- )
     #! Unify meta-interpreter state from two branches.
-    2dup balanced? [
-        2dup
-        2car max d-in set
-        2cdr unify-stacks meta-d set
+    dup balanced? [
+        unzip
+        unify-lengths unify-stacks meta-d set
+        [ > ] top d-in set
     ] [
-        "Unbalanced ifte branches" throw
+        "Unbalanced branches" throw
     ] ifte ;
 
 : set-base ( [ in | stack ] -- )
@@ -225,33 +222,38 @@ DEFER: (infer)
     uncons vector-length cons r>
     recursive-state acons@ ;
 
-: recursive-branches ( false true fe te -- fe te )
-    #! At least one of the branches did not have a computable
-    #! stack effect. Set the base case to the other branch, and
-    #! try again.
-    2dup or [
-        dup [
-            dup set-base >r 2drop infer-branch r>
-        ] [
-            drop dup set-base swap infer-branch rot drop
-        ] ifte
-    ] [
-        no-base-case
-    ] ifte ;
+: recursive-branch ( quot -- )
+    #! Set base case if inference didn't fail.
+    [ infer-branch set-base ] [ [ drop ] when ] catch ;
 
-: infer-branches ( false true -- [ in | stack ] [ in | stack ] )
+: infer-branches ( brachlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    over infer-branch over infer-branch 2dup and [
-        2nip ( all good )
-    ] [
-        recursive-branches
-    ] ifte ;
+    dup [ recursive-branch ] each [ infer-branch ] map unify ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
-    pop-d pop-d pop-d drop ( condition ) infer-branches unify ;
+    pop-d pop-d 2list pop-d drop ( condition ) infer-branches ;
+
+: vtable>list ( vtable -- list )
+    #! generic and 2generic use vectors of words, we need lists
+    #! of quotations. Filter out no-method. Dirty workaround;
+    #! later properly handle throw.
+    vector>list [
+        dup \ no-method = [ drop f ] [ unit ] ifte
+    ] map [ ] subset ;
+
+: infer-generic ( -- )
+    #! Infer effects for all branches, unify.
+    pop-d vtable>list peek-d drop ( dispatch ) infer-branches ;
+
+: infer-2generic ( -- )
+    #! Infer effects for all branches, unify.
+    pop-d vtable>list
+    peek-d drop ( dispatch )
+    peek-d drop ( dispatch )
+    infer-branches ;
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
@@ -259,6 +261,12 @@ DEFER: (infer)
 
 \ call [ pop-d (infer) ] "infer" set-word-property
 \ ifte [ infer-ifte ] "infer" set-word-property
+
+\ generic [ infer-generic ] "infer" set-word-property
+\ generic [ 2 | 0 ] "infer-effect" set-word-property
+
+\ 2generic [ infer-2generic ] "infer" set-word-property
+\ 2generic [ 3 | 0 ] "infer-effect" set-word-property
 
 \ >r [ pop-d push-r ] "infer" set-word-property
 \ r> [ pop-r push-d ] "infer" set-word-property

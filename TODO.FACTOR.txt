@@ -1,5 +1,6 @@
 + inference/interpreter:
 
+- word links in stepper
 - : bin 5 [ 5 bin bin 5 ] [ 2drop ] ifte ;
 - combinator inference
 - generic/2generic inference

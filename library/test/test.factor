@@ -70,6 +70,7 @@ USE: unparser
         "lists/lists"
         "lists/assoc"
         "lists/namespaces"
+        "lists/combinators"
         "combinators"
         "continuations"
         "errors"
@@ -104,12 +105,12 @@ USE: unparser
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"
-        "crashes" test
-        "sbuf" test
-        "threads" test
-        "parsing-word" test
-        "inference" test
-        "interpreter" test
+        "crashes"
+        "sbuf"
+        "threads"
+        "parsing-word"
+        "inference"
+        "interpreter"
     ] [
         test
     ] each
@@ -127,12 +128,16 @@ USE: unparser
         ] each
     ] when
 
-    "benchmark/empty-loop" test
-    "benchmark/fac" test
-    "benchmark/fib" test
-    "benchmark/sort" test 
-    "benchmark/continuations" test
-    "benchmark/ack" test 
-    "benchmark/hashtables" test
-    "benchmark/strings" test
-    "benchmark/vectors" test ;
+    [
+        "benchmark/empty-loop"
+        "benchmark/fac"
+        "benchmark/fib"
+        "benchmark/sort" 
+        "benchmark/continuations"
+        "benchmark/ack" 
+        "benchmark/hashtables"
+        "benchmark/strings"
+        "benchmark/vectors"
+    ] [
+        test
+    ] each ;
