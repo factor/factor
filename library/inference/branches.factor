@@ -149,7 +149,7 @@ SYMBOL: dual-recursive-state
     #! Either the word is not recursive, or it is recursive
     #! and the base case throws an error.
     [
-        [ terminator-quot? not ] subset dup length 1 > [
+        unzip drop [ terminator-quot? not ] subset dup length 1 > [
             infer-base-cases unify-effects
             effect dual-recursive-state get set-base
         ] [
@@ -158,7 +158,7 @@ SYMBOL: dual-recursive-state
     ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )
-    dup infer-base-case [
+    dup infer-base-case unzip drop [
         dup t infer-branch swap terminator-quot? [
             [ meta-d off meta-r off d-in off ] extend
         ] when
@@ -181,7 +181,10 @@ SYMBOL: dual-recursive-state
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap 2list
     >r 1 meta-d get vector-tail* #ifte r>
-    pop-d drop ( condition )
+    pop-d [
+        dup \ t cons ,
+        \ f cons ,
+    ] make-list zip ( condition )
     infer-branches ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
@@ -194,6 +197,7 @@ SYMBOL: dual-recursive-state
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
+    [ f cons ] map
     >r 1 meta-d get vector-tail* #dispatch r>
     pop-d drop ( n )
     infer-branches ;

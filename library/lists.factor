@@ -200,12 +200,3 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.
     [ over contains? ] subset nip ;
-
-: zip ( list list -- list )
-    #! Make a new list containing pairs of corresponding
-    #! elements from the two given lists.
-    dup [
-        2uncons zip >r cons r> cons
-    ] [
-        2drop [ ]
-    ] ifte ;
