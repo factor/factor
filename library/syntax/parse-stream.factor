@@ -15,7 +15,10 @@ USING: kernel lists namespaces streams strings ;
     line-number off ;
 
 : parse-stream ( name stream -- quot )
-    [ file-vocabs (parse-stream) ] with-scope ;
+    [
+        file-vocabs
+        [ (parse-stream) ] with-parser
+    ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;

@@ -40,7 +40,7 @@ global [
 : read-multiline ( -- quot ? )
     #! Keep parsing until the end is reached. Flag indicates
     #! EOF.
-    f depth (read-multiline) >r reverse r> ;
+    [ f depth (read-multiline) >r reverse r> ] with-parser ;
 
 : listen ( -- )
     #! Wait for user input, and execute.

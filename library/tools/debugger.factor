@@ -60,12 +60,11 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : heap-scan-error ( obj -- )
     "Cannot do next-object outside begin/end-scan" write drop ;
 
-GENERIC: error. ( error -- )
-
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;
 
 M: kernel-error error. ( error -- )
+    #! Kernel errors are indexed by integers.
     cdr uncons car swap {
         expired-error
         io-task-twice-error
@@ -85,25 +84,17 @@ M: kernel-error error. ( error -- )
         heap-scan-error
     } vector-nth execute ;
 
-M: string error. ( error -- )
-    print ;
-
-M: object error. ( error -- )
-    . ;
-
-: in-parser? ( -- ? )
-    "error-line" get "error-col" get and ;
-
-: parse-dump ( -- )
+M: no-method error. ( error -- )
     [
-        "Parsing " ,
-        "error-file" get [ "<interactive>" ] unless* , ":" ,
-        "error-line-number" get [ 1 ] unless* unparse ,
-    ] make-string print
-    
-    "error-line" get dup string? [ print ] [ drop ] ifte
-    
-    [ "error-col" get " " fill , "^" , ] make-string print ;
+        "The generic word " ,
+        dup no-method-generic unparse ,
+        " does not have a suitable method for " ,
+        no-method-object unparse ,
+    ] make-string print ;
+
+M: string error. ( error -- ) print ;
+
+M: object error. ( error -- ) . ;
 
 : :s ( -- ) "error-datastack"  get {.} ;
 : :r ( -- ) "error-callstack"  get {.} ;
@@ -124,11 +115,7 @@ M: object error. ( error -- )
 
 : print-error ( error -- )
     #! Print the error.
-    [
-        in-parser? [ parse-dump ] when error.
-    ] [
-        flush-error-handler
-    ] catch ;
+    [ error. ] [ flush-error-handler ] catch ;
 
 : try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
@@ -138,23 +125,13 @@ M: object error. ( error -- )
 : save-error ( error ds rs ns cs -- )
     #! Save the stacks and parser state for post-mortem
     #! inspection after an error.
-    namespace [
-        "col" get
-        "line" get
-        line-number get
-        file get
-        global [
-            "error-file" set
-            "error-line-number" set
-            "error-line" set
-            "error-col" set
-            "error-catchstack" set
-            "error-namestack" set
-            "error-callstack" set
-            "error-datastack" set
-            "error" set
-        ] bind
-    ] when ;
+    global [
+        "error-catchstack" set
+        "error-namestack" set
+        "error-callstack" set
+        "error-datastack" set
+        "error" set
+    ] bind ;
 
 : init-error-handler ( -- )
     [ die ] >c ( last resort )
@@ -165,14 +142,6 @@ M: object error. ( error -- )
         save-error rethrow
     ] 5 setenv
     kernel-error 12 setenv ;
-
-M: no-method error. ( error -- )
-    [
-        "The generic word " ,
-        dup no-method-generic unparse ,
-        " does not have a suitable method for " ,
-        no-method-object unparse ,
-    ] make-string print ;
 
 ! So that stage 2 boot gives a useful error message if something
 ! fails after this file is loaded.

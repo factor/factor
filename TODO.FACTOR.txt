@@ -1,4 +1,4 @@
-- word preview for remote words
+- word preview for parsing words
 - set 'end' of artifacts/assets accurately
 - faster layout
 - faster repaint
@@ -8,7 +8,6 @@
 - better i/o scheduler
 - add a socket timeout
 - unix ffi i/o
-- parse errors: in parser not debugger
 - make-image: use a list not a vector
 - powerpc has weird callstack residue
 - make see work with union, builtin, predicate
@@ -16,7 +15,7 @@
 - automatically recompiling defs
 - faster completion
 - console with presentations
-- browser
+- ui browser
 - method doc strings
 
 + ui:
