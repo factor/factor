@@ -86,7 +86,6 @@ vocabularies get [
 
 vocabularies get [
     "!syntax" get "syntax" set
-    "!syntax" off
 
     "syntax" get [
         cdr dup word? [
@@ -96,3 +95,5 @@ vocabularies get [
         ] ifte
     ] hash-each
 ] bind
+
+"!syntax" vocabularies get remove-hash

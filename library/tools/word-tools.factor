@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
+USE: generic
 USE: inspector
 USE: lists
 USE: kernel
@@ -34,6 +35,7 @@ USE: prettyprint
 USE: stdio
 USE: strings
 USE: unparser
+USE: math
 
 : word-uses? ( of in -- ? )
     2dup = [
@@ -100,3 +102,28 @@ USE: unparser
 
 : words. ( vocab -- )
     words . ;
+
+: usage+ ( key -- )
+    dup "usages" word-property
+    [ succ ] [ 1 ] ifte*
+    "usages" set-word-property ;
+
+GENERIC: count-usages ( quot -- )
+M: object count-usages drop ;
+M: word count-usages usage+ ;
+M: cons count-usages unswons count-usages count-usages ;
+
+: tally-usages ( -- )
+    [ f "usages" set-word-property ] each-word
+    [ word-parameter count-usages ] each-word ;
+
+: auto-inline ( count -- )
+    #! Automatically inline all words called less than a count
+    #! number of times.
+    [
+        2dup "usages" word-property dup 0 ? >= [
+            t "inline" set-word-property
+        ] [
+            drop
+        ] ifte
+    ] each-word drop ;

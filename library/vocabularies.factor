@@ -55,6 +55,7 @@ USE: strings
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
     vocabs [ words [ swap dup >r call r> ] each ] each drop ;
+    inline
 
 : (search) ( name vocab -- word )
     vocab dup [ hash ] [ 2drop f ] ifte ;

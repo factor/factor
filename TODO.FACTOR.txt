@@ -42,6 +42,7 @@
 
 + listener/plugin:
 
+- word added >1 
 - sidekick: still parsing too much
 - errors don't always disappear
 - console: wrong history

@@ -71,6 +71,7 @@ USE: unparser
 
     run-user-init ;
 
+: auto-inline-count 5 ;
 [
     warm-boot
     garbage-collection
@@ -81,6 +82,14 @@ USE: unparser
 init-error-handler
 
 0 [ drop succ ] each-word unparse write " words" print 
+
+! "Counting word usages..." print
+! tally-usages
+! 
+! "Automatically inlining words called " write
+! auto-inline-count unparse write
+! " or less times..." print
+! auto-inline-count auto-inline
 
 "Inferring stack effects..." print
 0 [ unit try-infer [ succ ] when ] each-word

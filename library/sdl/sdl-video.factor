@@ -119,50 +119,50 @@ END-STRUCT
 
 : SDL_VideoInit ( driver-name flags -- )
     "int" "sdl" "SDL_VideoInit"
-    [ "char*" "int" ] c-invoke ;
+    [ "char*" "int" ] alien-invoke ;
 
 : SDL_VideoQuit ( -- )
-    "void" "sdl" "SDL_VideoQuit" [ ] c-invoke ;
+    "void" "sdl" "SDL_VideoQuit" [ ] alien-invoke ;
 
 ! SDL_VideoDriverName -- needs strings as out params.
 
 : SDL_GetVideoSurface ( -- surface )
-    "surface*" "sdl" "SDL_GetVideoSurface" [ ] c-invoke ;
+    "surface*" "sdl" "SDL_GetVideoSurface" [ ] alien-invoke ;
 
 ! SDL_GetVideoInfo needs C struct bitfield support
 
 : SDL_VideoModeOK ( width height bpp flags -- )
     "int" "sdl" "SDL_VideoModeOK"
-    [ "int" "int" "int" "int" ] c-invoke ;
+    [ "int" "int" "int" "int" ] alien-invoke ;
 
 ! SDL_ListModes needs array of structs support
 
 : SDL_SetVideoMode ( width height bpp flags -- )
     "surface*" "sdl" "SDL_SetVideoMode"
-    [ "int" "int" "int" "int" ] c-invoke ;
+    [ "int" "int" "int" "int" ] alien-invoke ;
 
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "bool" "sdl" "SDL_Flip" [ "surface*" ] c-invoke ;
+    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-invoke ;
 
 ! SDL_SetGamma: float types
 
 : SDL_FillRect ( surface rect color -- n )
     #! If rect is null, fills entire surface.
     "bool" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "uint" ] c-invoke ;
+    [ "surface*" "rect*" "uint" ] alien-invoke ;
 
 : SDL_LockSurface ( surface -- )
-    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] c-invoke ;
+    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-invoke ;
 
 : SDL_UnlockSurface ( surface -- )
-    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] c-invoke ;
+    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-invoke ;
 
 : SDL_MapRGB ( surface r g b -- )
     "uint" "sdl" "SDL_MapRGB"
-    [ "surface*" "uchar" "uchar" "uchar" ] c-invoke ;
+    [ "surface*" "uchar" "uchar" "uchar" ] alien-invoke ;
 
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"
-    [ "char*" "char*" ] c-invoke ;
+    [ "char*" "char*" ] alien-invoke ;

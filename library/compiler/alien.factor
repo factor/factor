@@ -135,6 +135,15 @@ SYMBOL: alien-parameters
 
 #std-invoke [ linearize-alien ] "linearizer" set-word-property
 
+: alien-invoke ( ... returns library function parameters -- ... )
+    "alien-invoke cannot be interpreted." throw ;
+
+\ alien-invoke [ 4 | 0 ] "infer-effect" set-word-property
+
+\ alien-invoke [
+    os "win32" = #std-invoke #c-invoke ? infer-alien
+] "infer" set-word-property
+
 global [
     "libraries" get [ <namespace> "libraries" set ] unless
 ] bind

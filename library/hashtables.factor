@@ -63,14 +63,19 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : set-hash* ( key table quot -- )
     #! Apply the quotation to yield a new association list.
-    over >r -rot dupd (hashcode) r> vector-nth swap call ;
-    inline
+    >r
+        2dup (hashcode)
+    r> pick >r
+        over >r
+            >r swap vector-nth r> call
+        r>
+    r> set-vector-nth ; inline
     
-! : set-hash ( value key table -- )
+: set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
     #! key/value pair.
-!    [ set-assoc ] set-hash* ;
+    [ set-assoc ] set-hash* ;
 
 : remove-hash ( key table -- )
     #! Remove a value from a hashtable.
