@@ -20,7 +20,7 @@ CELL ds_bot;
 
 /* raw pointer to datastack top */
 #ifdef FACTOR_X86
-	register DLLEXPORT CELL ds asm("esi");
+	register CELL ds asm("esi");
 #else
 	CELL ds;
 #endif
