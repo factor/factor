@@ -57,7 +57,7 @@ USE: unparser
     ] ifte ;
 
 : parsing ( -- )
-    "cross-compiler" get [
+    "cross-compiling" get [
         t "parsing" word set-word-property
     ] unless ; parsing
 
