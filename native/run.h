@@ -74,11 +74,6 @@ INLINE void cpush(CELL top)
 	put(cs,top);
 }
 
-INLINE CELL cpeek(void)
-{
-	return get(cs);
-}
-
 INLINE void call(CELL quot)
 {
 	/* tail call optimization */

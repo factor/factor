@@ -76,7 +76,7 @@ USE: vectors
         [ cons-hashcode     ] ! 2
         [ drop 0  ] ! 3
         [ >fixnum           ] ! 4
-        [ >fixnum           ] ! 5
+        [ >rect >fixnum swap >fixnum bitxor           ] ! 5
         [ drop 0  ] ! 6
         [ drop 0  ] ! 7
         [ drop 0  ] ! 8

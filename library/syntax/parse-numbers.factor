@@ -27,6 +27,7 @@
 
 IN: parser
 USE: errors
+USE: generic
 USE: kernel
 USE: lists
 USE: math
@@ -47,14 +48,14 @@ USE: unparser
         [ drop t ] [ not-a-number ]
     ] cond ;
 
-: digit ( num digit base -- num )
+: digit+ ( num digit base -- num )
     2dup < [ rot * + ] [ not-a-number ] ifte ;
 
 : (base>) ( base str -- num )
     dup str-length 0 = [
         not-a-number
     ] [
-        0 swap [ digit> pick digit ] str-each nip
+        0 swap [ digit> pick digit+ ] str-each nip
     ] ifte ;
 
 : base> ( str base -- num )
@@ -62,16 +63,19 @@ USE: unparser
     #! conversion fails.
     swap "-" ?str-head [ (base>) neg ] [ (base>) ] ifte ;
 
-: str>ratio ( str -- num )
+DEFER: str>number
+FORGET: str>number
+GENERIC: str>number ( str -- num )
+
+M: string str>number 10 base> ;
+
+PREDICATE: string potential-ratio "/" swap str-contains? ;
+M: potential-ratio str>number ( str -- num )
     dup CHAR: / index-of str// swap 10 base> swap 10 base> / ;
 
-: str>number ( str -- num )
-    #! Convert a string to a number; throws errors.
-    [
-        [ "/" swap str-contains? ] [ str>ratio ]
-        [ "." swap str-contains? ] [ str>float ]
-        [ drop t                 ] [ 10 base>  ]
-    ] cond ;
+PREDICATE: string potential-float "." swap str-contains? ;
+M: potential-float str>number ( str -- num )
+    str>float ;
 
 : parse-number ( str -- num )
     #! Convert a string to a number; return f on error.

@@ -63,8 +63,3 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
 : stack-effect    ( word -- str ) "stack-effect" word-property ;
 : documentation   ( word -- str ) "documentation" word-property ;
-
-: word-clone ( word -- word )
-    dup word-primitive
-    over word-parameter
-    rot word-plist <word> ;
