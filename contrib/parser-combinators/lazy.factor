@@ -75,7 +75,7 @@ USE: logic
 
 : (ltake) ( n llist accum -- list )
   >r >r pred dup 0 < [ 
-    drop r> drop r> nreverse  
+    drop r> drop r> reverse  
   ] [ 
     r> luncons swap r> cons (ltake) 
   ] ifte ;
@@ -91,10 +91,10 @@ USE: logic
   over [ ] = [
     2drop [ ]
   ] [
-    [ luncons ] dip     
+    >r luncons r>     
     dup swapd           
     [ lmap ] curry2  
-    [ call ] dip
+    >r call r>
     lcons 
   ] ifte ;
 
@@ -104,7 +104,7 @@ USE: logic
   over [ ] = [
     2drop [ ] 
   ] [
-    [ luncons ] dip
+    >r luncons r>
     dup swapd
     [ lsubset ] curry2
     -rot dupd call [ 

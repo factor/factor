@@ -60,7 +60,7 @@ USE: files
 : add-todo-item ( <todo> <item> -- )
   #! Add the item to the todo list
   swap [
-    "items" add@
+    "items" get swap unit append "items" set
   ] bind ;
 
 : namespace>alist ( namespace -- alist )

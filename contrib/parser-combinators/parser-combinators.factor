@@ -82,7 +82,7 @@ USE: parser
 
 : (list-take) ( n list accum -- list )
   >r >r pred dup 0 < [ 
-    drop r> drop r> nreverse 
+    drop r> drop r> reverse 
   ] [ 
     r> uncons swap r> cons (list-take) 
   ] ifte ;
@@ -131,7 +131,7 @@ USE: parser
 : ifte-head= ( string-or-list ch [ quot1 ] [ quot2 ] -- )
   #! When the character 'ch' is equal to the head
   #! of the string or list, run the quot1 otherwise run quot2.
-  [ swap phead = ] 2dip ifte ;
+  r> r> swap phead = r> r> ifte ;
 
 : symbol ( ch -- parser )
   #! Return a parser that parses the given symbol.
@@ -246,7 +246,7 @@ USE: unparser
   #! Return a parser that first skips all whitespace before
   #! parsing.
   [ ( inp parser -- result )
-    [ parse-skipwhite ] dip call
+    >r parse-skipwhite r> call
   ] curry1 ;
 
 : just ( parser -- parser )
@@ -264,7 +264,7 @@ USE: unparser
   #! to the resulting parse tree.
   [ ( inp p f -- result )
     >r call r> [ ( [ x | xs ] f -- [ fx | xs ] )
-      swap uncons [ swap over [ call ] [ drop ] ifte ] dip cons
+      swap uncons r> swap over [ call ] [ drop ] ifte r> cons
     ] curry1 lmap
   ] curry2 ;
 
@@ -359,7 +359,7 @@ USE: unparser
   #! Call quot with start and the first value in the list.
   #! quot is then called with the result of quot and the 
   #! next item in the list until the list is exhausted.
-  uncons >r swap dup dip r> dup [
+  uncons >r swap dup swap r> call r> r> dup [
     (reduce)
   ] [
     2drop
