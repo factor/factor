@@ -109,23 +109,10 @@ USE: prettyprint
 
 SYMBOL: cloned
 
-: assq* ( key alist -- [ key | value ] )
-    #! Looks up the key in an alist. Push the key/value pair.
-    #! Most of the time you want to use assq not assq*.
-    dup [
-        2dup car car eq? [ nip car ] [ cdr assq* ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: assq ( key alist -- value )
-    #! Looks up the key in an alist.
-    assq* dup [ cdr ] when ;
-
 : deep-clone ( vector -- vector )
     #! Clone a vector if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assq dup [
+    dup cloned get assoc dup [
         nip
     ] [
         drop vector-clone [ dup cloned [ acons ] change ] keep
@@ -144,94 +131,23 @@ SYMBOL: cloned
     d-in [ deep-clone-vector ] change
     dataflow-graph off ;
 
+: terminator? ( obj -- ? )
+    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
+
+: handle-terminator ( quot -- )
+    [ terminator? ] some? [
+        meta-d off meta-r off d-in off
+    ] when ;
+
 : infer-branch ( value -- namespace )
     <namespace> [
         uncons [ unswons set-value-class ] when*
         dup value-recursion recursive-state set
         copy-inference
-        literal-value infer-quot
+        literal-value dup infer-quot
         #values values-node
+        handle-terminator
     ] extend ;
-
-: terminator? ( obj -- ? )
-    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
-
-: terminator-quot? ( [ quot | type-prop ] -- ? )
-    car literal-value [ terminator? ] some? ;
-
-: dual-branch ( branch branchlist -- rstate )
-    #! Return a recursive state for a branch other than the
-    #! given one in the list.
-    [ over eq? not ] subset nip car car value-recursion ;
-
-! FIXME this is really bad
-: old-effect ( [ in-types out-types ] -- [ in | out ] )
-    uncons car length >r length r> cons ;
-
-: foo>effect ( [ in-types out-types ] -- [ in | out ] )
-    [ effect old-effect ] bind ;
-
-: raise ( [ in | out ] -- [ in | out ] )
-    uncons 2dup min tuck - >r - r> cons ;
-
-: effect>foo ( [ in | out ] -- [ intypes outtypes ] )
-    <namespace> [
-        uncons
-        [ drop object <computed> ] vector-project meta-d set
-        [ drop object <computed> ] vector-project d-in set
-        { } meta-r set
-    ] extend ;
-
-: decompose ( first second -- solution )
-    #! Return a stack effect such that first*solution = second.
-    2dup 2car
-    2dup > [ "No solution to decomposition" throw ] when
-    swap - -rot 2cdr >r + r> cons raise effect>foo ;
-
-: set-base ( effect rstate -- )
-    #! Set the base case of the current word.
-    dup [
-        car cdr [
-            entry-effect get old-effect dup [ 0 | 0 ] = [
-                drop
-            ] [
-                swap foo>effect decompose
-            ] ifte
-            base-case cons@
-        ] bind
-    ] [
-        2drop
-    ] ifte ;
-
-: recursive-branch ( branch branchlist -- )
-    [
-        dupd dual-branch >r infer-branch r> set-base
-    ] [
-        [ 2drop ] when
-    ] catch ;
-
-: no-base-case ( word -- )
-    word-name " does not have a base case." cat2 throw ;
-
-: get-base ( word rstate -- effect )
-    [ base-case get ] bind dup [
-        nip [ unify-effects effect ] with-scope
-    ] [
-        drop no-base-case
-    ] ifte ;
-
-: infer-base-case ( branchlist -- )
-    [
-        inferring-base-case on
-
-        dup [
-            2dup terminator-quot? [
-                2drop
-            ] [
-                recursive-branch
-            ] ifte
-        ] each drop
-    ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )
     #! The branchlist is a list of pairs:
@@ -239,11 +155,19 @@ SYMBOL: cloned
     #! value is either a literal or computed instance; typeprop
     #! is a pair [ value | class ] indicating a type propagation
     #! for the given branch.
-    dup infer-base-case [
-        dup infer-branch swap terminator-quot? [
-            [ meta-d off meta-r off d-in off ] extend
-        ] when
-    ] map ;
+    [
+        [
+            inferring-base-case get [
+                [
+                    infer-branch ,
+                ] [
+                    [ drop ] when
+                ] catch
+            ] [
+                infer-branch ,
+            ] ifte
+        ] each
+    ] make-list ;
 
 : unify-dataflow ( inputs instruction effectlist -- )
     [ [ get-dataflow ] bind ] map

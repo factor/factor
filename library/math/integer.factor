@@ -33,23 +33,22 @@ USE: generic
 USE: kernel
 USE: math
 
-: reduce ( x y -- x' y' )
-    dup 0 < [ swap neg swap neg ] when
-    2dup gcd tuck /i >r /i r> ; inline
-
 : fraction> ( a b -- a/b )
-    dup 0 = [
-        "Division by zero" throw drop
+    dup 1 number= [
+        drop
     ] [
-        dup 1 = [
-            drop
-        ] [
-            (fraction>)
-        ] ifte
+        (fraction>)
     ] ifte ; inline
 
 : integer/ ( x y -- x/y )
-    reduce fraction> ; inline
+    dup 0 number= [
+        "Division by zero" throw drop
+    ] [
+        dup 0 < [
+            swap neg swap neg
+        ] when
+        2dup gcd tuck /i >r /i r> fraction>
+    ] ifte ;
 
 M: fixnum number= fixnum= ;
 M: fixnum < fixnum< ;

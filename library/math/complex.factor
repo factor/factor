@@ -45,7 +45,7 @@ M: complex imaginary 1 slot ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [
-        dup 0 = [ drop ] [ (rect>) ] ifte
+        dup 0 number= [ drop ] [ (rect>) ] ifte
     ] [
         "Complex number must have real components" throw drop
     ] ifte ; inline

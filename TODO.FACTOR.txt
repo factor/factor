@@ -34,8 +34,8 @@
 
 + listener/plugin:
 
+- stream server can hang because of exception handler limitations
 - listener should be multithreaded
-- fully socket based communication
 - compile all, infer all commands
 - type something -- no completions -- hit another key -- not inserted
 - faster completion
@@ -55,18 +55,15 @@
 - cat, reverse-cat primitives
 - first-class hashtables
 - add a socket timeout
-- do transfer-word in fixup
 
 + misc:
 
-- stream server can hang because of exception handler limitations
 - each-with map-with
 - step: print NEXT word to execute, not word that JUST executed
 - perhaps /i should work with all numbers
 - unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name
 - nicer way to combine two paths
-- ditch object paths
 - browser responder for word links in HTTPd
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link

@@ -53,15 +53,8 @@ SYMBOL: inferring-base-case
 ! inputs.
 SYMBOL: d-in
 
-! Recursive state. Alist maps words to hashmaps...
+! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
-! ... with keys:
-SYMBOL: base-case
-SYMBOL: entry-effect
-! When a call to a combinator is compiled, recursion cannot
-! simply jump to the definition of the combinator. Instead, it
-! makes a local jump to this label.
-SYMBOL: recursive-label
 
 ! A value has the following slots:
 GENERIC: literal-value ( value -- obj )
@@ -140,16 +133,12 @@ M: literal set-value-class ( class value -- )
     d-in get [ value-class ] vector-map vector>list
     meta-d get [ value-class ] vector-map vector>list 2list ;
 
-: <recursive-state> ( -- state )
-    <namespace> [
-        base-case off  effect entry-effect set
-    ] extend ;
-
 : init-inference ( recursive-state -- )
     init-interpreter
     0 <vector> d-in set
     recursive-state set
-    dataflow-graph off ;
+    dataflow-graph off
+    inferring-base-case off ;
 
 DEFER: apply-word
 

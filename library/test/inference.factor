@@ -11,6 +11,20 @@ USE: kernel
 USE: math-internals
 USE: generic
 
+[ [ [ object object ] f ] ]
+[ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
+unit-test
+
+[ [ [ fixnum fixnum ] f ] ]
+[
+    [ [ rational rational ] [ rational fixnum ] ]
+    [ [ object ] f ] decompose
+]
+unit-test
+
+: old-effect ( [ in-types out-types ] -- [ in | out ] )
+    uncons car length >r length r> cons ;
+
 [
     [ 1 | 2 ]
     [ 2 | 1 ]
@@ -100,10 +114,10 @@ USE: generic
 
 ! Not sure how to fix this one
 
-! : funny-recursion
-!     dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
-! 
-! [ [ 1 | 1 ] ] [ [ funny-recursion ] infer old-effect ] unit-test
+: funny-recursion
+    dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
+
+[ [ 1 | 1 ] ] [ [ funny-recursion ] infer old-effect ] unit-test
 
 ! Simple combinators
 [ [ 1 | 2 ] ] [ [ [ car ] keep cdr ] infer old-effect ] unit-test

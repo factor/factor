@@ -33,6 +33,9 @@ USE: math
 : 2list ( a b -- [ a b ] )
     unit cons ;
 
+: 2unlist ( [ a b ] -- a b )
+    uncons car ;
+
 : 3list ( a b c -- [ a b c ] )
     2list cons ;
 
@@ -164,7 +167,7 @@ M: cons = ( obj cons -- ? )
     ] ifte ;
 
 : cons-hashcode ( cons count -- hash )
-    dup 0 = [
+    dup 0 number= [
         2drop 0
     ] [
         over cons? [

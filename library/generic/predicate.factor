@@ -87,3 +87,6 @@ predicate [
     dup predicate-word
     [ dupd unit "predicate" set-word-property ] keep
     [ define-predicate ] [ ] ; parsing
+
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-property ;

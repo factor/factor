@@ -113,8 +113,8 @@ M: compound see ( word -- )
 
 : see-method ( indent word class method -- indent )
     >r >r >r prettyprint-M:
-    r> prettyprint-1 " " write
-    r> prettyprint-1 " " write
+    r> r> prettyprint-1 " " write
+    prettyprint-1 " " write
     dup prettyprint-newline
     r> prettyprint-list
     prettyprint-;

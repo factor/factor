@@ -130,9 +130,6 @@ USE: math-internals
     dup init-methods
     dup <vtable> define-generic ;
 
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-property ;
-
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 

@@ -106,11 +106,11 @@ GENERIC: abs ( z -- |z| )
 M: real abs dup 0 < [ neg ] when ;
 
 : (gcd) ( x y -- z )
-    dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
+    dup 0 number= [ drop ] [ tuck mod (gcd) ] ifte ;
 
 : gcd ( x y -- z )
     #! Greatest common divisor.
     abs swap abs 2dup < [ swap ] when (gcd) ;
 
 : align ( offset width -- offset )
-    2dup mod dup 0 = [ 2drop ] [ - + ] ifte ;
+    2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ;

@@ -151,7 +151,7 @@ M: vector = ( obj vec -- ? )
     ] [
         over vector? [
             2dup vector-length= [
-                swap vector>list swap vector>list =
+                swap stack>list swap stack>list =
             ] [
                 2drop f
             ] ifte

@@ -56,7 +56,7 @@ USE: prettyprint
 : produce-d ( typelist -- )
     [ <computed> push-d ] each ;
 
-: (consume/produce) ( param op effect -- )
+: (consume/produce) ( param op effect )
     [ unswons consume-d car produce-d ] with-dataflow ;
 
 : consume/produce ( word [ in-types out-types ] -- )
@@ -83,7 +83,6 @@ USE: prettyprint
     #! its dataflow contribution to a new block node in the IR.
     over [
         >r
-        <recursive-state> [ recursive-label set ] extend
         dupd cons
         recursive-state cons@
         r> call
@@ -120,31 +119,49 @@ M: symbol (apply-word) ( word -- )
     #! Push word we're currently inferring effect of.
     recursive-state get car car ;
 
-: check-recursion ( -- )
+: check-recursion ( word -- )
     #! If at the location of the recursive call, we're taking
     #! more items from the stack than producing, we have a
-    #! diverging recursion.
-    d-in get vector-length
-    meta-d get vector-length > [
-        current-word word-name " diverges." cat2 throw
+    #! diverging recursion. Note that this check is not done for
+    #! mutually-recursive words. Generally they should be
+    #! avoided.
+    recursive-state get car = [
+        d-in get vector-length
+        meta-d get vector-length > [
+            current-word word-name " diverges." cat2 throw
+        ] when
     ] when ;
 
-: recursive-word ( word state -- )
+: base-case ( word -- effect )
+    [
+        inferring-base-case on
+        copy-inference
+        inline-compound
+        inferring-base-case off
+    ] with-scope ;
+
+: decompose ( x y -- effect )
+    #! Return a stack effect such that x*effect = y.
+    2unlist >r swap 2unlist swap length tail append
+    ! workaround
+    [ drop object ] map
+    r> 2list ;
+
+: recursive-word ( word label -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    [ get-base ] 2keep [ recursive-label get ] bind
-    dup [
-        ( word effect label )
-        nip #call-label
+    inferring-base-case get [
+        drop word-name " does not have a base case." cat2 throw
     ] [
-        drop #call
-    ] ifte rot (consume/produce) ;
+        2dup [ drop #call-label ] [ nip #call ] ifte
+        rot base-case effect swap decompose (consume/produce)
+    ] ifte ;
 
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
-        check-recursion recursive-word
+        dup check-recursion recursive-word
     ] [
         dup "infer-effect" word-property [
             apply-effect
@@ -165,11 +182,8 @@ M: symbol (apply-word) ( word -- )
 \ call [ infer-call ] "infer" set-word-property
 
 ! These are due to bugs and will be removed
-\ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ / [ [ number number ] [ number ] ] "infer-effect" set-word-property
 \ gcd [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ hashcode [ [ object ] [ integer ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
 \ not-a-number t "terminator" set-word-property
