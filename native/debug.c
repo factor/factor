@@ -1,7 +1,5 @@
 #include "factor.h"
 
-#ifdef F_DEBUG
-
 bool equals(CELL obj1, CELL obj2)
 {
 	if(type_of(obj1) == STRING_TYPE
@@ -163,12 +161,3 @@ void dump_stacks(void)
 	fprintf(stderr,"\n");
 	fflush(stderr);
 }
-
-#else
-
-void dump_stacks(void)
-{
-	fprintf(stderr,"Stack dumping disabled -- recompile with F_DEBUG\n");
-}
-
-#endif

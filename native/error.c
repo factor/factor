@@ -18,8 +18,24 @@ void critical_error(char* msg, CELL tagged)
 	exit(1);
 }
 
+void early_error(CELL error)
+{
+	if(userenv[BREAK_ENV] == F)
+	{
+		/* Crash at startup */
+		fprintf(stderr,"Error during startup: ");
+		print_obj(error);
+		dump_stacks();
+		fprintf(stderr,"\n");
+		fflush(stderr);
+		exit(1);
+	}
+}
+
 void throw_error(CELL error, bool keep_stacks)
 {
+	early_error(error);
+
 	thrown_error = error;
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;
@@ -33,28 +49,9 @@ void throw_error(CELL error, bool keep_stacks)
 #endif
 }
 
-void early_error(CELL error)
-{
-	if(userenv[BREAK_ENV] == F)
-	{
-		/* Crash at startup */
-		if(type_of(error) == FIXNUM_TYPE)
-			fprintf(stderr,"Error: %ld\n",to_fixnum(error));
-		else if(type_of(error) == STRING_TYPE)
-			fprintf(stderr,"Error: %s\n",to_c_string(untag_string(error)));
-
-		dump_stacks();
-
-		fflush(stderr);
-
-		exit(1);
-	}
-}
-
 void primitive_throw(void)
 {
 	CELL error = dpop();
-	early_error(error);
 	throw_error(error,true);
 }
 
@@ -67,15 +64,14 @@ void primitive_die(void)
 
 void general_error(CELL error, CELL tagged)
 {
-	early_error(error);
-	throw_error(cons(userenv[ERROR_ENV],cons(error,cons(tagged,F))),true);
+	CELL thrown = cons(userenv[ERROR_ENV],cons(error,cons(tagged,F)));
+	throw_error(thrown,true);
 }
 
 /* It is not safe to access 'ds' from a signal handler, so we just not
 touch it */
 void signal_error(int signal)
 {
-	early_error(ERROR_SIGNAL);
 	throw_error(cons(userenv[ERROR_ENV],
 		cons(ERROR_SIGNAL,
 			cons(tag_fixnum(signal),F))),false);

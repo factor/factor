@@ -44,7 +44,7 @@ math memory namespaces words ;
 
 #jump-t-label [ compile-jump-t ] "generator" set-word-prop
 
-#jump-t [ dup compile-jump-t ] "generator" set-word-prop
+#jump-t [ compile-jump-t ] "generator" set-word-prop
 
 : compile-jump-f ( word -- )
     POP-DS
@@ -55,7 +55,7 @@ math memory namespaces words ;
 
 #jump-f-label [ compile-jump-f ] "generator" set-word-prop
 
-#jump-f [ dup compile-jump-f ] "generator" set-word-prop
+#jump-f [ compile-jump-f ] "generator" set-word-prop
 
 #return-to [ 0 PUSH fixup f defer-xt ] "generator" set-word-prop
 
