@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -131,7 +129,7 @@ END-STRUCT
 
 : win32-io-thread ( -- )
     10 wait-for-io swap [
-        [ schedule-thread call ] callcc0
+        [ schedule-thread call ] callcc0 2drop
     ] [
         drop yield
     ] ifte* 

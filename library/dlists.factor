@@ -29,3 +29,17 @@ C: dlist-node
 
 : dlist-pop-front ( dlist -- data )
     dup dlist-empty? [ drop f ] [ (dlist-pop-front) ] ifte ;
+
+: (dlist-each) ( quot dnode -- )
+    [
+        [ dlist-node-data swap [ call ] keep ] keep 
+        dlist-node-next (dlist-each)
+    ] [
+        drop
+    ] ifte* ;
+
+: dlist-each ( dlist quot -- )
+    swap dlist-first (dlist-each) ;
+
+: dlist-length ( dlist -- length )
+    0 swap [ drop 1 + ] dlist-each ;
