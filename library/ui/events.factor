@@ -19,7 +19,7 @@ M: resize-event handle-event ( event -- )
     world get redraw ;
 
 : button-gesture ( button gesture -- [ gesture button ] )
-    swap unit append my-hand hand-clicked handle-gesture ;
+    swap unit append my-hand hand-clicked handle-gesture drop ;
 
 M: button-down-event handle-event ( event -- )
     button-event-button dup my-hand button/
@@ -36,4 +36,13 @@ M: motion-event handle-event ( event -- )
     motion-event-pos my-hand move-hand ;
 
 M: key-down-event handle-event ( event -- )
-    keyboard-event>binding my-hand hand-focus handle-gesture ;
+    dup keyboard-event>binding
+    my-hand hand-focus handle-gesture [
+        keyboard-event-unicode dup 0 = [
+            drop
+        ] [
+            my-hand hand-focus user-input drop
+        ] ifte
+    ] [
+        drop
+    ] ifte ;

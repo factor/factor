@@ -36,7 +36,7 @@ USING: generic kernel lists math namespaces sdl ;
     #! fire an action gesture.
     dup button-update
     dup mouse-over? [
-        [ action ] swap handle-gesture
+        [ action ] swap handle-gesture drop
     ] [
         drop
     ] ifte ;

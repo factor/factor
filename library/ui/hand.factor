@@ -74,7 +74,7 @@ C: hand ( world -- hand )
     dup world get pick-up swap set-hand-gadget ;
 
 : fire-motion ( hand -- )
-    [ motion ] swap hand-gadget handle-gesture ;
+    [ motion ] swap hand-gadget handle-gesture drop ;
 
 : move-hand ( x y hand -- )
     dup shape-pos >r

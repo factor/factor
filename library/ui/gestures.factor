@@ -16,11 +16,18 @@ USING: alien generic hashtables kernel lists math sdl-event ;
         2drop t
     ] ifte ;
 
-: handle-gesture ( gesture gadget -- )
+: handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the
     #! event was not consumed and is passed on to the gadget's
-    #! parent.
-    [ dupd handle-gesture* ] each-parent drop ;
+    #! parent. This word returns t if no gadget handled the
+    #! gesture, otherwise returns f.
+    [ dupd handle-gesture* ] each-parent nip ;
+
+GENERIC: user-input* ( ch gadget -- ? )
+M: gadget user-input* 2drop f ;
+
+: user-input ( ch gadget -- ? )
+    [ dupd user-input* ] each-parent nip ;
 
 ! Mouse gestures are lists where the first element is one of:
 SYMBOL: motion
@@ -41,7 +48,7 @@ SYMBOL: button-down
     [
         [ shape-pos + ] keep
         2dup inside? [ mouse-enter ] hierarchy-gesture
-    ] each-parent drop ;
+    ] each-parent 2drop ;
 
 : mouse-leave ( point gadget -- )
     #! If the new point is inside the old gadget, do not fire a
@@ -50,7 +57,7 @@ SYMBOL: button-down
     [
         [ shape-pos + ] keep
         2dup inside? [ mouse-leave ] hierarchy-gesture
-    ] each-parent drop ;
+    ] each-parent 2drop ;
 
 : lose-focus ( new old -- )
     #! If the old focus owner is a child of the new owner, do
@@ -59,7 +66,7 @@ SYMBOL: button-down
     #! parent.
     [
         2dup child? [ lose-focus ] hierarchy-gesture
-    ] each-parent drop ;
+    ] each-parent 2drop ;
 
 : gain-focus ( old new -- )
     #! If the old focus owner is a child of the new owner, do
@@ -68,4 +75,4 @@ SYMBOL: button-down
     #! to the parent.
     [
         2dup child? [ gain-focus ] hierarchy-gesture
-    ] each-parent drop ;
+    ] each-parent 2drop ;

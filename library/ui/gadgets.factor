@@ -56,22 +56,24 @@ C: gadget ( shape -- gadget )
     tuck (add-gadget)
     relayout ;
 
-: each-parent ( gadget quot -- )
+: each-parent ( gadget quot -- ? )
     #! Apply quotation to each parent of the gadget in turn,
-    #! stopping when the quotation returns f.
+    #! stopping when the quotation returns f. Return f if a
+    #! quotation somewhere returned f; if the search bottoms
+    #! out, return t.
     over [
         [ call ] 2keep rot [
             >r gadget-parent r> each-parent
         ] [
-            2drop
+            2drop f ( quotation returns f )
         ] ifte
     ] [ 
-        2drop
+        2drop t ( search bottomed out )
     ] ifte ; inline
 
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.
-    0 swap [ shape-pos + t ] each-parent ;
+    0 swap [ shape-pos + t ] each-parent drop ;
 
 : child? ( parent child -- ? )
     dup [

@@ -75,8 +75,8 @@ USE: words
     "Filled?" <checkbox> dup "filled" set "shelf" get add-gadget
     "shelf" get "pile" get add-gadget
     "Welcome to Factor " version cat2 <label> "pile" get add-gadget
-    "Welcome to Factor " version cat2 <field> "pile" get add-gadget
-    "Welcome to Factor " version cat2 <field> "pile" get add-gadget
+    "A field."  <field> "pile" get add-gadget
+    "Another field."  <field> "pile" get add-gadget
 
     "pile" get bevel-border dup "dialog" set dup  
  moving-actions

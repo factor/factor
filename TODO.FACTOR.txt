@@ -8,8 +8,6 @@
 - special completion for USE:/IN:
 - vectors: ensure its ok with bignum indices
 - if gadgets are moved, added or deleted, update hand.
-- keyboard gestures
-- text fields
 - code gc
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
@@ -22,6 +20,11 @@
 - ppc register decls
 - rename f* words to stream-*
 
+- resize window: world not updated until mouse moved
+- x>offset
+- fix completion invoke in middle of word
+- html: word links
+- don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - slot compile problem
