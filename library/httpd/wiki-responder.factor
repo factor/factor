@@ -48,7 +48,7 @@ USE: httpd-responder
     wiki-word-regexp re-matches ;
 
 : wiki-word-links ( str -- str )
-    wiki-word-regexp "$1" "$1" link-tag re-replace ;
+    wiki-word-regexp "$1" "$1" re-replace ;
 
 : get-wiki-page ( name -- text )
     "wiki" get [ get ] bind ;
@@ -70,7 +70,7 @@ USE: httpd-responder
 
 : wiki-footer ( name -- )
     "<hr>" print
-    "Edit" swap "edit?" swap cat2 link-tag write ;
+    "Edit" swap "edit?" swap cat2 write ;
 
 : serve-existing-page ( name text -- )
     over [ write-wiki-page wiki-footer ] html-document ;
