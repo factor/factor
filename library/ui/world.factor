@@ -23,7 +23,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( -- )
     world get dup gadget-redraw? [
-        [
+        dup world-hand update-hand [
             f over set-gadget-redraw?
             dup draw-gadget
             dup gadget-paint [ world-hand draw-gadget ] bind
@@ -34,7 +34,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 DEFER: handle-event
 
-: layout-world world get layout ;
+: layout-world world get dup layout world-hand update-hand ;
 
 : eat-events ( event -- )
     #! Keep polling for events until there are no more events in

@@ -85,6 +85,10 @@ C: hand ( world -- hand )
     dup fire-motion
     r> swap fire-enter ;
 
+: update-hand ( hand -- )
+    #! Called when a gadget is removed or added.
+    [ dup shape-x swap shape-y ] keep move-hand ;
+
 : request-focus ( gadget hand -- )
     dup >r hand-focus
     2dup lose-focus

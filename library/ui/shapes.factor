@@ -41,13 +41,18 @@ GENERIC: resize-shape ( w h shape -- )
     #! The height of the tallest shape.
     [ [ shape-h ] map [ > ] top ] [ 0 ] ifte* ;
 
-: run-widths ( list -- w list )
-    #! Compute a list of running sums of widths of shapes.
-    [ 0 swap [ over , shape-w + ] each ] make-list ;
+: accumilate ( gap list -- n list )
+    #! The nth element of the resulting list is the sum of the
+    #! first n elements of the given list plus gap, n times.
+    [ 0 swap [ over , + over + ] each ] make-list >r swap - r> ;
 
-: run-heights ( list -- h list )
+: run-widths ( gap list -- w list )
+    #! Compute a list of running sums of widths of shapes.
+    [ shape-w ] map accumilate ;
+
+: run-heights ( gap list -- h list )
     #! Compute a list of running sums of heights of shapes.
-    [ 0 swap [ over , shape-h + ] each ] make-list ;
+    [ shape-h ] map accumilate ;
 
 ! A point, represented as a complex number, is the simplest
 ! shape. It is not mutable and cannot be used as the delegate of

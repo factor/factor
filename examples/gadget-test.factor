@@ -66,8 +66,8 @@ USE: words
 : make-shapes ( -- )
     f world get set-gadget-children
     
-    100 20 0 0 <rectangle> <pile> "pile" set
-    0 0 0 0 <rectangle> <shelf> "shelf" set
+    default-gap <pile> "pile" set
+    default-gap <shelf> "shelf" set
     "Close" [ "dialog" get world get remove-gadget ] <button> "shelf" get add-gadget
     "New Rectangle" [ drop 100 100 100 100 <funny-rect> dup [ 255 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
     "New Ellipse" [ drop 100 100 200 100 <funny-ellipse> dup [ 0 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget

@@ -50,86 +50,101 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/io/presentation.factor"
     "/library/io/vocabulary-style.factor"
     "/library/syntax/prettyprint.factor"
-    "/library/syntax/see.factor"
     "/library/tools/debugger.factor"
 
-    "/library/math/constants.factor"
-    "/library/math/pow.factor"
-    "/library/math/trig-hyp.factor"
-    "/library/math/arc-trig-hyp.factor"
-
-    "/library/in-thread.factor"
-    "/library/io/network.factor"
-    "/library/io/logging.factor"
-    "/library/random.factor"
-    "/library/io/stdio-binary.factor"
     "/library/io/files.factor"
     "/library/eval-catch.factor"
     "/library/tools/heap-stats.factor"
     "/library/tools/listener.factor"
-    "/library/tools/word-tools.factor"
-    "/library/test/test.factor"
-    "/library/io/ansi.factor"
-    "/library/tools/telnetd.factor"
-    "/library/tools/jedit-wire.factor"
-    "/library/tools/profiler.factor"
-    "/library/gensym.factor"
-    "/library/tools/interpreter.factor"
-
-    ! Inference needs to know primitive stack effects at load time
-    "/library/primitives.factor"
-
-    "/library/inference/dataflow.factor"
-    "/library/inference/inference.factor"
-    "/library/inference/branches.factor"
-    "/library/inference/words.factor"
-    "/library/inference/stack.factor"
-    "/library/inference/types.factor"
-    "/library/inference/test.factor"
-
-    "/library/compiler/assembler.factor"
-    "/library/compiler/xt.factor"
-    "/library/compiler/optimizer.factor"
-    "/library/compiler/linearizer.factor"
-    "/library/compiler/simplifier.factor"
-    "/library/compiler/generator.factor"
-    "/library/compiler/compiler.factor"
-    "/library/compiler/alien-types.factor"
-    "/library/compiler/alien.factor"
-
-    "/library/sdl/sdl.factor"
-    "/library/sdl/sdl-video.factor"
-    "/library/sdl/sdl-event.factor"
-    "/library/sdl/sdl-gfx.factor"
-    "/library/sdl/sdl-keysym.factor"
-    "/library/sdl/sdl-keyboard.factor"
-    "/library/sdl/sdl-ttf.factor"
-    "/library/sdl/sdl-utils.factor"
-    "/library/sdl/hsv.factor"
-
-    "/library/bootstrap/image.factor"
-
-    "/library/httpd/url-encoding.factor"
-    "/library/httpd/html-tags.factor"
-    "/library/httpd/html.factor"
-    "/library/httpd/http-common.factor"
-    "/library/httpd/responder.factor"
-    "/library/httpd/httpd.factor"
-    "/library/httpd/file-responder.factor"
-    "/library/httpd/test-responder.factor"
-    "/library/httpd/quit-responder.factor"
-    "/library/httpd/resource-responder.factor"
-    "/library/httpd/cont-responder.factor"
-    "/library/httpd/browser-responder.factor"
-    "/library/httpd/default-responders.factor"
-
-    "/library/tools/jedit.factor"
-
     "/library/cli.factor"
 ] [
-    dup print
-    run-resource
+    dup print run-resource
 ] each
+
+IN: command-line DEFER: parse-command-line
+parse-command-line
+
+! Dummy defs for mini bootstrap
+IN: compiler : compile-all ;
+IN: assembler : init-assembler ;
+IN: alien : add-library 3drop ;
+
+"mini" get [
+    [
+        "/library/math/constants.factor"
+        "/library/math/pow.factor"
+        "/library/math/trig-hyp.factor"
+        "/library/math/arc-trig-hyp.factor"
+
+        "/library/syntax/see.factor"
+
+        "/library/gensym.factor"
+        "/library/in-thread.factor"
+        "/library/io/network.factor"
+        "/library/io/logging.factor"
+        "/library/random.factor"
+        "/library/io/stdio-binary.factor"
+
+        "/library/tools/word-tools.factor"
+        "/library/test/test.factor"
+        "/library/io/ansi.factor"
+        "/library/tools/telnetd.factor"
+        "/library/tools/jedit-wire.factor"
+        "/library/tools/profiler.factor"
+        "/library/tools/interpreter.factor"
+    
+        ! Inference needs to know primitive stack effects at load time
+        "/library/primitives.factor"
+    
+        "/library/inference/dataflow.factor"
+        "/library/inference/inference.factor"
+        "/library/inference/branches.factor"
+        "/library/inference/words.factor"
+        "/library/inference/stack.factor"
+        "/library/inference/types.factor"
+        "/library/inference/test.factor"
+    
+        "/library/compiler/assembler.factor"
+        "/library/compiler/xt.factor"
+        "/library/compiler/optimizer.factor"
+        "/library/compiler/linearizer.factor"
+        "/library/compiler/simplifier.factor"
+        "/library/compiler/generator.factor"
+        "/library/compiler/compiler.factor"
+        "/library/compiler/alien-types.factor"
+        "/library/compiler/alien.factor"
+    
+        "/library/sdl/sdl.factor"
+        "/library/sdl/sdl-video.factor"
+        "/library/sdl/sdl-event.factor"
+        "/library/sdl/sdl-gfx.factor"
+        "/library/sdl/sdl-keysym.factor"
+        "/library/sdl/sdl-keyboard.factor"
+        "/library/sdl/sdl-ttf.factor"
+        "/library/sdl/sdl-utils.factor"
+        "/library/sdl/hsv.factor"
+    
+        "/library/bootstrap/image.factor"
+    
+        "/library/httpd/url-encoding.factor"
+        "/library/httpd/html-tags.factor"
+        "/library/httpd/html.factor"
+        "/library/httpd/http-common.factor"
+        "/library/httpd/responder.factor"
+        "/library/httpd/httpd.factor"
+        "/library/httpd/file-responder.factor"
+        "/library/httpd/test-responder.factor"
+        "/library/httpd/quit-responder.factor"
+        "/library/httpd/resource-responder.factor"
+        "/library/httpd/cont-responder.factor"
+        "/library/httpd/browser-responder.factor"
+        "/library/httpd/default-responders.factor"
+    
+        "/library/tools/jedit.factor"
+    ] [
+        dup print run-resource
+    ] each
+] unless
 
 os "win32" = [
     [
@@ -146,7 +161,7 @@ os "win32" = [
     ] each
 ] when
 
-cpu "x86" = [
+cpu "x86" = "mini" get not and [
     [
         "/library/compiler/x86/assembler.factor"
         "/library/compiler/x86/stack.factor"

@@ -21,27 +21,31 @@ M: gadget layout* drop ;
         drop
     ] ifte ;
 
-! A pile is a box that lays out its contents vertically.
-TUPLE: pile delegate ;
+: default-gap 3 ;
 
-C: pile ( shape -- pile )
-    [ >r <gadget> r> set-pile-delegate ] keep ;
+! A pile is a box that lays out its contents vertically.
+TUPLE: pile gap delegate ;
+
+C: pile ( gap -- pile )
+    0 0 0 0 <rectangle> <gadget> over set-pile-delegate
+    [ set-pile-gap ] keep ;
 
 M: pile layout* ( pile -- )
-    dup gadget-children run-heights >r >r
+    dup pile-gap over gadget-children run-heights >r >r
     dup gadget-children max-width r> pick resize-gadget
     gadget-children r> zip [
         uncons 0 swap rot move-gadget
     ] each ;
 
 ! A shelf is a box that lays out its contents horizontally.
-TUPLE: shelf delegate ;
+TUPLE: shelf gap delegate ;
 
-C: shelf ( shape -- pile )
-    [ >r <gadget> r> set-shelf-delegate ] keep ;
+C: shelf ( gap -- pile )
+    0 0 0 0 <rectangle> <gadget> over set-shelf-delegate
+    [ set-shelf-gap ] keep ;
 
 M: shelf layout* ( pile -- )
-    dup gadget-children run-widths >r >r
+    dup shelf-gap over gadget-children run-widths >r >r
     dup gadget-children max-height r> swap pick resize-gadget
     gadget-children r> zip [
         uncons 0 rot move-gadget

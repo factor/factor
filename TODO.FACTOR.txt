@@ -8,18 +8,18 @@
 - support USING:
 - special completion for USE:/IN:
 - vectors: ensure its ok with bignum indices
-- if gadgets are moved, added or deleted, update hand.
 - code gc
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
 - print warning on null class
 - optimize away dispatch
-- layouts with gaps
 - alignment of gadgets inside their bounding boxes needs thought
 - faster completion
 - ppc register decls
 
+- begin-scan, next-object, end-scan primitives
+- each-object, each-slot combinators
 - port leak
 - references primitive
 - ditch % for tuples?
