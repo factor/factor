@@ -15,7 +15,8 @@ CELL port(CELL fd)
 {
 	PORT* port = allot_object(PORT_TYPE,sizeof(PORT));
 	port->fd = fd;
-	port->buffer = (STRING*)0;
+	port->buffer = NULL;
+	port->line = NULL;
 	port->buf_mode = B_NONE;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
@@ -43,8 +44,10 @@ void fixup_port(PORT* port)
 {
 	port->fd = -1;
 	if(port->buffer != 0)
+		port->buffer = fixup_untagged_string(port->buffer);
+	if(port->line != 0)
 	{
-		port->buffer = (STRING*)((CELL)port->buffer
+		port->line = (SBUF*)((CELL)port->line
 			+ (active->base - relocation_base));
 	}
 }
@@ -52,8 +55,10 @@ void fixup_port(PORT* port)
 void collect_port(PORT* port)
 {
 	if(port->buffer != 0)
+		port->buffer = copy_untagged_string(port->buffer);
+	if(port->line != 0)
 	{
-		port->buffer = copy_untagged_object(
-			port->buffer,SSIZE(port->buffer));
+		port->line = (SBUF*)copy_untagged_object(
+			port->line,sizeof(SBUF));
 	}
 }

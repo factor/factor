@@ -33,8 +33,7 @@ typedef unsigned short CHAR;
 /* Memory heap size */
 #define DEFAULT_ARENA (32 * 1024 * 1024)
 
-/* #define PAGE_SIZE 4096 */
-#define STACK_SIZE 8192
+#define STACK_SIZE 16384
 
 #include "error.h"
 #include "memory.h"
@@ -50,7 +49,9 @@ typedef unsigned short CHAR;
 #include "complex.h"
 #include "arithmetic.h"
 #include "misc.h"
+#include "relocate.h"
 #include "string.h"
+#include "sbuf.h"
 #include "port.h"
 #include "fd.h"
 #include "file.h"
@@ -61,7 +62,5 @@ typedef unsigned short CHAR;
 #include "primitives.h"
 #include "vector.h"
 #include "stack.h"
-#include "sbuf.h"
-#include "relocate.h"
 
 #endif /* __FACTOR_H__ */

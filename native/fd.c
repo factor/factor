@@ -7,9 +7,11 @@ void init_io(void)
 	env.user[STDERR_ENV] = port(2);
 }
 
-int read_step(PORT* port, STRING* buf)
+int read_step(PORT* port)
 {
-	int amount = read(port->fd,buf + 1,buf->capacity * 2);
+	int amount = read(port->fd,
+		port->buffer + 1,
+		port->buffer->capacity * 2);
 
 	port->buf_fill = (amount < 0 ? 0 : amount);
 	port->buf_pos = 0;
@@ -17,85 +19,101 @@ int read_step(PORT* port, STRING* buf)
 	return amount;
 }
 
-void primitive_read_line_fd_8(void)
+READLINE_STAT read_line_step(PORT* port)
 {
-	PORT* port = untag_port(dpeek());
-
 	int amount;
 	int i;
 	int ch;
 
-	/* finished line, unicode */
-	SBUF* line = sbuf(LINE_SIZE);
+	SBUF* line = port->line;
+
+	if(port->buf_pos >= port->buf_fill)
+	{
+		amount = read_step(port);
+
+		if(amount < 0)
+			io_error(__FUNCTION__);
+		else if(amount == 0)
+			return READLINE_EOF;
+	}
+
+	for(i = port->buf_pos; i < port->buf_fill; i++)
+	{
+		ch = bget((CELL)port->buffer + sizeof(STRING) + i);
+		if(ch == '\n')
+		{
+			port->buf_pos = i + 1;
+			return READLINE_EOL;
+		}
+		else
+			set_sbuf_nth(line,line->top,ch);
+	}
+
+	port->buf_pos = port->buf_fill;
+
+	/* We've reached the end of the above loop, without seeing a newline
+	or EOF, so read again */
+	return READLINE_AGAIN;
+}
+
+void primitive_read_line_fd_8(void)
+{
+	PORT* port = untag_port(dpeek());
+	SBUF* line;
+	READLINE_STAT state;
 
 	init_buffer(port,B_READ);
+	if(port->line == NULL)
+		port->line = sbuf(LINE_SIZE);
+	else
+		port->line->top = 0;
+	line = port->line;
 
 	for(;;)
 	{
-		if(port->buf_pos >= port->buf_fill)
+		state = read_line_step(port);
+		if(state != READLINE_AGAIN)
 		{
-			amount = read_step(port,port->buffer);
-
-			if(amount < 0)
-				io_error(__FUNCTION__);
-
-			if(amount == 0)
+			if(state == READLINE_EOF && line->top == 0)
 			{
-				if(line->top == 0)
-				{
-					/* didn't read anything before EOF */
-					drepl(F);
-				}
-				else
-					drepl(tag_object(line));
-				return;
-			}
-		}
-
-		for(i = port->buf_pos; i < port->buf_fill; i++)
-		{
-			ch = bget((CELL)port->buffer + sizeof(STRING) + i);
-			if(ch == '\n')
-			{
-				port->buf_pos = i + 1;
-				drepl(tag_object(line));
-				return;
+				/* didn't read anything before EOF */
+				drepl(F);
 			}
 			else
-				set_sbuf_nth(line,line->top,ch);
+				drepl(tag_object(sbuf_to_string(line)));
+			return;
 		}
-		
-		/* We've reached the end of the above loop */
-		port->buf_pos = port->buf_fill;
 	}
+}
+
+void write_step(PORT* port)
+{
+	char* chars = (char*)port->buffer + sizeof(STRING);
+
+	FIXNUM amount = write(port->fd,chars + port->buf_pos,
+		port->buf_fill - port->buf_pos);
+
+	if(amount < 0)
+		io_error(__FUNCTION__);
+
+	port->buf_pos += amount;
 }
 
 /* keep writing to the stream until everything is written */
-void write_fully(PORT* port, char* str, CELL len)
-{
-	FIXNUM amount, written = 0, remains;
-
-	for(;;)
-	{
-		remains = len - written;
-
-		if(remains == 0)
-			break;
-
-		amount = write(port->fd,str + written,remains);
-		if(amount < 0)
-			io_error(__FUNCTION__);
-
-		written += amount;
-	}
-}
-
 void flush_buffer(PORT* port)
 {
 	if(port->buf_mode != B_WRITE || port->buf_fill == 0)
 		return;
 
-	write_fully(port,(char*)port->buffer + sizeof(STRING),port->buf_fill);
+	for(;;)
+	{
+		if(port->buf_fill == port->buf_pos)
+			break;
+
+		write_step(port);
+	}
+
+	port->buf_pos = 0;
 	port->buf_fill = 0;
 }
 
@@ -122,25 +140,23 @@ void write_fd_string_8(PORT* port, STRING* str)
 	/* Is the string longer than the buffer? */
 	if(str->capacity > port->buffer->capacity * CHARS)
 	{
-		/* Just write it immediately */
 		flush_buffer(port);
-		write_fully(port,c_str,str->capacity);
+
+		/* Increase the buffer to fit the string */
+		port->buffer = allot_string(str->capacity / CHARS + 1);
 	}
-	else
+	/* Is there enough room in the buffer? If not, flush */
+	if(port->buf_fill + str->capacity
+		> port->buffer->capacity * CHARS)
 	{
-		/* Is there enough room in the buffer? If not, flush */
-		if(port->buf_fill + str->capacity
-			> port->buffer->capacity * CHARS)
-		{
-			flush_buffer(port);
-		}
-
-		/* Append string to buffer */
-		memcpy((void*)((CELL)port->buffer + sizeof(STRING)
-			+ port->buf_fill),c_str,str->capacity);
-
-		port->buf_fill += str->capacity;
+		flush_buffer(port);
 	}
+
+	/* Append string to buffer */
+	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
+		+ port->buf_fill),c_str,str->capacity);
+
+	port->buf_fill += str->capacity;
 }
 
 void primitive_write_fd_8(void)

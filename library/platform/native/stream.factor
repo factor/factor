@@ -48,7 +48,7 @@ USE: namespaces
         
         ( -- str )
         [
-            "in" get read-line-fd-8 dup [ sbuf>str ] when
+            "in" get read-line-fd-8
         ] "freadln" set
         
         ( -- )

@@ -1,16 +1,19 @@
+/* Buffer mode */
+typedef enum { B_READ, B_WRITE, B_NONE } B_MODE;
+
 typedef struct {
 	CELL header;
 	FIXNUM fd;
 	STRING* buffer;
-	CELL buf_mode;
+	/* partial line used by read_line_fd */
+	SBUF* line;
+	/* one of B_READ, B_WRITE or B_NONE */
+	B_MODE buf_mode;
+	/* top of buffer */
 	CELL buf_fill;
+	/* current read/write position */
 	CELL buf_pos;
 } PORT;
-
-/* Buffer mode */
-#define B_READ 0
-#define B_WRITE 1
-#define B_NONE 2
 
 PORT* untag_port(CELL tagged);
 CELL port(CELL fd);

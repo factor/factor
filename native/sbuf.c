@@ -134,11 +134,10 @@ void primitive_sbuf_eq(void)
 
 void fixup_sbuf(SBUF* sbuf)
 {
-	sbuf->string = (STRING*)((CELL)sbuf->string
-		+ (active->base - relocation_base));
+	sbuf->string = fixup_untagged_string(sbuf->string);
 }
 
 void collect_sbuf(SBUF* sbuf)
 {
-	sbuf->string = copy_untagged_object(sbuf->string,SSIZE(sbuf->string));
+	sbuf->string = copy_untagged_string(sbuf->string);
 }
