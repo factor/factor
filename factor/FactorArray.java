@@ -204,6 +204,20 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 		}
 	} //}}}
 
+	//{{{ hashCode() method
+	public int hashCode()
+	{
+		int hashCode = 0;
+		for(int i = 0; i < Math.min(top,4); i++)
+		{
+			Object obj = stack[i];
+			if(obj != null)
+				hashCode ^= obj.hashCode();
+		}
+
+		return hashCode;
+	} //}}}
+
 	//{{{ equals() method
 	public boolean equals(Object obj)
 	{

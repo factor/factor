@@ -14,7 +14,8 @@ INLINE STRING* untag_string(CELL tagged)
 
 STRING* allot_string(FIXNUM capacity);
 STRING* string(FIXNUM capacity, CELL fill);
-void hash_string(STRING* str);
+FIXNUM hash_string(STRING* str, FIXNUM len);
+void rehash_string(STRING* str);
 STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill);
 BYTE* to_c_string(STRING* s);
 void box_c_string(const BYTE* c_string);

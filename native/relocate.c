@@ -20,7 +20,7 @@ void relocate_object()
 		fixup_vector((VECTOR*)relocating);
 		break;
 	case STRING_TYPE:
-		hash_string((STRING*)relocating);
+		rehash_string((STRING*)relocating);
 		break;
 	case SBUF_TYPE:
 		fixup_sbuf((SBUF*)relocating);

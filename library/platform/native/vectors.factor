@@ -66,3 +66,11 @@ USE: stack
     ] [
         2drop f
     ] ifte ;
+
+: ?vector-nth ( n vec -- obj/f )
+    2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
+
+: vector-hashcode ( vec -- n )
+    0 swap 4 [
+        over ?vector-nth hashcode rot bitxor swap
+    ] times* drop ;

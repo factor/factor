@@ -27,3 +27,8 @@ USE: vectors
 [ list>vector [ 3 > ] vector-all? ] test-word
 [ t ] [ [ ] ]
 [ list>vector [ 3 > ] vector-all? ] test-word
+
+[ t ] [ { } hashcode { } hashcode = ] unit-test
+[ t ] [ { 1 2 3 } hashcode { 1 2 3 } hashcode = ] unit-test
+[ t ] [ { 1 { 2 } 3 } hashcode { 1 { 2 } 3 } hashcode = ] unit-test
+[ t ] [ { } hashcode { } hashcode = ] unit-test

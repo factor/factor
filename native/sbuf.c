@@ -100,7 +100,7 @@ void primitive_sbuf_to_string(void)
 {
 	SBUF* sbuf = untag_sbuf(dpeek());
 	STRING* s = string_clone(sbuf->string,sbuf->top);
-	hash_string(s);
+	rehash_string(s);
 	drepl(tag_object(s));
 }
 
@@ -120,7 +120,9 @@ void primitive_sbuf_clone(void)
 
 bool sbuf_eq(SBUF* s1, SBUF* s2)
 {
-	if(s1->top == s2->top)
+	if(s1 == s2)
+		return true;
+	else if(s1->top == s2->top)
 		return (string_compare_head(s1->string,s2->string,s1->top) == 0);
 	else
 		return false;
@@ -134,6 +136,12 @@ void primitive_sbuf_eq(void)
 		dpush(tag_boolean(sbuf_eq(s1,(SBUF*)UNTAG(with))));
 	else
 		dpush(F);
+}
+
+void primitive_sbuf_hashcode(void)
+{
+	SBUF* sbuf = untag_sbuf(dpop());
+	dpush(tag_fixnum(hash_string(sbuf->string,sbuf->top)));
 }
 
 void fixup_sbuf(SBUF* sbuf)

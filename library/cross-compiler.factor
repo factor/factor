@@ -80,6 +80,7 @@ IN: strings
 DEFER: str=
 DEFER: str-hashcode
 DEFER: sbuf=
+DEFER: sbuf-hashcode
 DEFER: sbuf-clone
 
 IN: files
@@ -221,6 +222,7 @@ IN: image
         sbuf-reverse
         sbuf-clone
         sbuf=
+        sbuf-hashcode
         arithmetic-type
         number?
         >fixnum

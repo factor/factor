@@ -72,6 +72,7 @@ USE: unparser
         "errors"
         "hashtables"
         "strings"
+        "sbuf"
         "namespaces/namespaces"
         "files"
         "format"

@@ -19,7 +19,7 @@ USE: stack
     ] with-scope
 ] unit-test
 
-[ "<img src='/resource/library/icons/File.png'>" ]
+[ "<img src='/responder/resource/library/icons/File.png'>" ]
 [
     [
         ""

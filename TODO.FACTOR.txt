@@ -44,8 +44,6 @@ FFI:
 - add a socket timeout
 - fix error postoning -- not all errors thrown by i/o code are
   postponed
-- sbuf-hashcode
-- vector-hashcode
 - some way to run httpd from command line
 
 + bignums:

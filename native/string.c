@@ -13,14 +13,20 @@ STRING* allot_string(FIXNUM capacity)
 }
 
 /* call this after constructing a string */
-/* uses same algorithm as java.lang.String for compatibility */
-void hash_string(STRING* str)
+/* uses same algorithm as java.lang.String for compatibility with
+images generated from Java Factor. */
+FIXNUM hash_string(STRING* str, FIXNUM len)
 {
 	FIXNUM hash = 0;
 	CELL i;
-	for(i = 0; i < str->capacity; i++)
+	for(i = 0; i < len; i++)
 		hash = 31*hash + string_nth(str,i);
-	str->hashcode = hash;
+	return hash;
+}
+
+void rehash_string(STRING* str)
+{
+	str->hashcode = hash_string(str,str->capacity);
 }
 
 /* untagged */
@@ -33,7 +39,7 @@ STRING* string(FIXNUM capacity, CELL fill)
 	for(i = 0; i < capacity; i++)
 		cput(SREF(string,i),fill);
 
-	hash_string(string);
+	rehash_string(string);
 
 	return string;
 }
@@ -66,7 +72,7 @@ STRING* from_c_string(const BYTE* c_string)
 		c_string++;
 	}
 
-	hash_string(s);
+	rehash_string(s);
 	
 	return s;
 }
@@ -158,7 +164,9 @@ void primitive_string_compare(void)
 
 bool string_eq(STRING* s1, STRING* s2)
 {
-	if(s1->hashcode != s2->hashcode)
+	if(s1 == s2)
+		return true;
+	else if(s1->hashcode != s2->hashcode)
 		return false;
 	else
 		return (string_compare(s1,s2) == 0);
@@ -258,7 +266,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 	memcpy(result + 1,
 		(void*)((CELL)(string + 1) + CHARS * start),
 		CHARS * (end - start));
-	hash_string(result);
+	rehash_string(result);
 
 	return result;
 }
@@ -300,7 +308,7 @@ void primitive_string_reverse(void)
 	STRING* s = untag_string(dpeek());
 	s = string_clone(s,s->capacity);
 	string_reverse(s,s->capacity);
-	hash_string(s);
+	rehash_string(s);
 	drepl(tag_object(s));
 }
 

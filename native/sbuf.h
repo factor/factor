@@ -29,5 +29,6 @@ void primitive_sbuf_reverse(void);
 void primitive_sbuf_clone(void);
 bool sbuf_eq(SBUF* s1, SBUF* s2);
 void primitive_sbuf_eq(void);
+void primitive_sbuf_hashcode(void);
 void fixup_sbuf(SBUF* sbuf);
 void collect_sbuf(SBUF* sbuf);

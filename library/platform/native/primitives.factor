@@ -75,6 +75,7 @@ USE: words
     [ sbuf-reverse           | " sbuf -- " ]
     [ sbuf-clone             | " sbuf -- sbuf " ]
     [ sbuf=                  | " sbuf sbuf -- ? " ]
+    [ sbuf-hashcode          | " sbuf -- n " ]
     [ arithmetic-type        | " n n -- type " ]
     [ number?                | " obj -- ? " ]
     [ >fixnum                | " n -- fixnum " ]
