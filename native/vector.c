@@ -30,7 +30,7 @@ void primitive_set_vector_length(void)
 	FIXNUM length = untag_fixnum(dpop());
 	vector->top = length;
 	if(length < 0)
-		range_error(vector,index,length);
+		range_error(tag_object(vector),length,vector->top);
 	else if(length > vector->array->capacity)
 		vector->array = grow_array(vector->array,length,F);
 	env.dt = dpop(); /* don't forget this! */
@@ -42,7 +42,7 @@ void primitive_vector_nth(void)
 	CELL index = untag_fixnum(dpop());
 
 	if(index < 0 || index >= vector->top)
-		range_error(vector,index,vector->top);
+		range_error(tag_object(vector),index,vector->top);
 	env.dt = array_nth(vector->array,index);
 }
 
@@ -64,7 +64,7 @@ void primitive_set_vector_nth(void)
 	check_non_empty(value);
 
 	if(index < 0)
-		range_error(vector,index,vector->top);
+		range_error(tag_object(vector),index,vector->top);
 	else if(index >= vector->top)
 		vector_ensure_capacity(vector,index);
 

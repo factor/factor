@@ -30,7 +30,7 @@ void primitive_set_sbuf_length(void)
 	FIXNUM length = untag_fixnum(dpop());
 	sbuf->top = length;
 	if(length < 0)
-		range_error(env.dt,index,length);
+		range_error(env.dt,length,sbuf->top);
 	else if(length > sbuf->string->capacity)
 		sbuf->string = grow_string(sbuf->string,length,F);
 	env.dt = dpop(); /* don't forget this! */

@@ -14,7 +14,12 @@ void primitive_open_file(void)
 		mode = O_RDONLY;
 	else if(write)
 		mode = O_WRONLY | O_CREAT | O_TRUNC;
+	else
+		mode = 0;
 
 	fd = open(path,mode);
+	if(fd < 0)
+		io_error(__FUNCTION__);
+
 	env.dt = handle(HANDLE_FD,fd);
 }

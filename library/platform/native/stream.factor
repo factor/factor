@@ -86,9 +86,20 @@ USE: namespaces
         [ "socket" get close-fd ] "fclose" set
     ] extend ;
 
+: <socket-stream> ( fd -- stream )
+    #! A slight variation on <fd-stream> that calls shutdown(2)
+    #! when closed.
+    dup <fd-stream> [
+        ( -- )
+        [
+            "in"  get [ dup shutdown-fd close-fd ] when*
+            ( out == in )
+        ] "fclose" set
+    ] extend ;
+
 : accept ( server -- client )
     #! Accept a connection from a server socket.
-    [ "socket" get ] bind accept-fd dup <fd-stream> ;
+    [ "socket" get ] bind accept-fd <socket-stream> ;
 
 : init-stdio ( -- )
     stdin stdout <fd-stream> "stdio" set ;

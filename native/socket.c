@@ -5,22 +5,34 @@ int make_server_socket(CHAR port)
 	int sock;
 	struct sockaddr_in name;
 	
+	int reuseaddr = 1;
+	
 	/* Create the socket */
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	
 	if(sock < 0)
-		return -1;
+		io_error(__FUNCTION__);
+	
+	/* Reuse port number */
+	if(setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&reuseaddr,sizeof(int)) < 0)
+		io_error(__FUNCTION__);
 	
 	/* Give the socket a name */
 	name.sin_family = AF_INET;
 	name.sin_port = htons(port);
 	name.sin_addr.s_addr = htonl(INADDR_ANY);
 	if(bind(sock,(struct sockaddr *)&name, sizeof(name)) < 0)
-		return -1;
+	{
+		close(sock);
+		io_error(__FUNCTION__);
+	}
 
 	/* Start listening for connections */
 	if(listen(sock,1) < 0)
-		return -1;
+	{
+		close(sock);
+		io_error(__FUNCTION__);
+	}
 
 	return sock;
 }
@@ -38,7 +50,7 @@ int accept_connection(int sock)
 	
 	int new = accept(sock,(struct sockaddr *)&clientname,&size);
 	if(new < 0)
-		return -1;
+		io_error(__FUNCTION__);
 
 	printf("Connection from host %s, port %hd.\n",
 		inet_ntoa(clientname.sin_addr),

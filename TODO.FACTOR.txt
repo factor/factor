@@ -3,7 +3,6 @@
 - image output
 - 32-bit and 64-bit "bignums"
 - floats
-- i/o error handling
 - {...} vectors
 - parsing should be parsing
 - describe-word

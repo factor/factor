@@ -58,6 +58,7 @@ DEFER: accept-fd
 DEFER: read-line-fd-8
 DEFER: write-fd-8
 DEFER: flush-fd
+DEFER: shutdown-fd
 
 IN: words
 DEFER: <word>
@@ -156,6 +157,7 @@ IN: cross-compiler
         read-line-fd-8
         write-fd-8
         flush-fd
+        shutdown-fd
         room
     ] [
         swap succ tuck primitive,

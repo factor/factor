@@ -1,6 +1,6 @@
 #include "factor.h"
 
-CELL cons(CELL car, CELL cdr)
+CONS* cons(CELL car, CELL cdr)
 {
 	CONS* cons = (CONS*)allot(sizeof(CONS));
 	cons->car = car;

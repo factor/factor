@@ -29,6 +29,7 @@ void primitive_read_line_fd_8(void)
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
 
+	int amount;
 	int i;
 	int ch;
 
@@ -45,7 +46,12 @@ void primitive_read_line_fd_8(void)
 	{
 		if(h->buf_pos >= h->buf_fill)
 		{
-			if(fill_buffer(h,fd,buf) <= 0)
+			amount = fill_buffer(h,fd,buf);
+
+			if(amount < 0)
+				io_error(__FUNCTION__);
+
+			if(amount == 0)
 			{
 				if(line->top == 0)
 				{
@@ -82,7 +88,12 @@ void primitive_write_fd_8(void)
 	int fd = h->object;
 	STRING* str = untag_string(dpop());
 	char* c_str = to_c_string(str);
-	write(fd,c_str,str->capacity);
+	
+	int amount = write(fd,c_str,str->capacity);
+	
+	if(amount < 0)
+		io_error(__FUNCTION__);
+
 	env.dt = dpop();
 }
 
@@ -90,6 +101,20 @@ void primitive_flush_fd(void)
 {
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
-	fsync(fd);
+
+	/* if(fsync(fd) < 0)
+		io_error(__FUNCTION__); */
+
+	env.dt = dpop();
+}
+
+void primitive_shutdown_fd(void)
+{
+	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
+	int fd = h->object;
+
+	if(shutdown(fd,SHUT_RDWR) < 0)
+		io_error(__FUNCTION__);
+
 	env.dt = dpop();
 }

@@ -87,7 +87,8 @@ XT primitives[] = {
 	primitive_read_line_fd_8,               /* 83 */
 	primitive_write_fd_8,                   /* 84 */
 	primitive_flush_fd,                     /* 85 */
-	primitive_room                          /* 86 */
+	primitive_shutdown_fd,                  /* 86 */
+	primitive_room                          /* 87 */
 };
 
 CELL primitive_to_xt(CELL primitive)
@@ -95,7 +96,7 @@ CELL primitive_to_xt(CELL primitive)
 	XT xt;
 
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		general_error("Invalid primitive",tag_fixnum(primitive));
+		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
 	
 	xt = primitives[primitive];
 	if((CELL)xt % 8 != 0)

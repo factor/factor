@@ -62,6 +62,7 @@ USE: vectors
         "Underflow"
         "Bad primitive: "
         "Incompatible handle: "
+        "I/O error: "
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

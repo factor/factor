@@ -14,7 +14,7 @@ INLINE CELL tag_cons(CONS* cons)
 	return RETAG(cons,CONS_TYPE);
 }
 
-CELL cons(CELL car, CELL cdr);
+CONS* cons(CELL car, CELL cdr);
 
 INLINE CELL car(CELL cons)
 {

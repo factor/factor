@@ -50,5 +50,15 @@ void range_error(CELL tagged, CELL index, CELL max)
 {
 	CONS* c = cons(tagged,tag_cons(cons(tag_fixnum(index),
 		tag_cons(cons(tag_fixnum(max),F)))));
-	general_error(ERROR_RANGE,c);
+	general_error(ERROR_RANGE,tag_cons(c));
+}
+
+void io_error(const char* func)
+{
+	STRING* function = from_c_string(func);
+	STRING* error = from_c_string(strerror(errno));
+
+	CONS* c = cons(tag_object(function),tag_cons(
+		cons(tag_object(error),F)));
+	general_error(ERROR_IO,tag_cons(c));
 }

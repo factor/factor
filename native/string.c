@@ -51,7 +51,7 @@ STRING* grow_string(STRING* string, CELL capacity, CHAR fill)
 }
 
 /* untagged */
-STRING* from_c_string(char* c_string)
+STRING* from_c_string(const char* c_string)
 {
 	CELL length = strlen(c_string);
 	STRING* s = allot_string(length);
@@ -59,7 +59,7 @@ STRING* from_c_string(char* c_string)
 
 	for(i = 0; i < length; i++)
 	{
-		put(SREF(s,i),c_string);
+		put(SREF(s,i),*c_string);
 		c_string++;
 	}
 
@@ -101,7 +101,7 @@ void primitive_string_nth(void)
 	CELL index = untag_fixnum(dpop());
 
 	if(index < 0 || index >= string->capacity)
-		range_error(string,index,string->capacity);
+		range_error(tag_object(string),index,string->capacity);
 	env.dt = tag_fixnum(string_nth(string,index));
 }
 
@@ -160,7 +160,7 @@ void primitive_string_hashcode(void)
 INLINE CELL index_of_ch(CELL index, STRING* string, CELL ch)
 {
 	if(index < 0)
-		range_error(string,index,string->capacity);
+		range_error(tag_object(string),index,string->capacity);
 
 	while(index < string->capacity)
 	{
@@ -201,8 +201,11 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 {
 	STRING* result;
 
-	if(start < 0 || end < start)
-		range_error(string,index,string->capacity);
+	if(start < 0)
+		range_error(tag_object(string),start,string->capacity);
+
+	if(end < start)
+		range_error(tag_object(string),end,string->capacity);
 
 	result = allot_string(end - start);
 	memcpy(result + 1,
