@@ -1,5 +1,6 @@
 #include "factor.h"
 
+CELL upgraded_arithmetic_type(CELL type1, CELL type2);
 BIGNUM* fixnum_to_bignum(CELL n);
 RATIO* fixnum_to_ratio(CELL n);
 FLOAT* fixnum_to_float(CELL n);
@@ -25,100 +26,19 @@ FLOAT* ratio_to_float(CELL n);
 #define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \
 { \
-	switch(type_of(x)) \
+	switch(upgraded_arithmetic_type(type_of(x),type_of(y))) \
 	{ \
 	case FIXNUM_TYPE: \
-\
-		switch(type_of(y)) \
-		{ \
-		case FIXNUM_TYPE: \
-			return OP##_fixnum(x,y); \
-		case RATIO_TYPE: \
-			return OP##_ratio((CELL)fixnum_to_ratio(x),y); \
-		case COMPLEX_TYPE: \
-			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
-		case BIGNUM_TYPE: \
-			return OP##_bignum((CELL)fixnum_to_bignum(x),y); \
-		case FLOAT_TYPE: \
-			return OP##_float((CELL)fixnum_to_float(x),y); \
-		default: \
-			return OP##_anytype(x,y); \
-		} \
-\
-	case RATIO_TYPE: \
-\
-		switch(type_of(y)) \
-		{ \
-		case FIXNUM_TYPE: \
-			return OP##_ratio(x,(CELL)fixnum_to_ratio(y)); \
-		case RATIO_TYPE: \
-			return OP##_ratio(x,y); \
-		case COMPLEX_TYPE: \
-			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
-		case BIGNUM_TYPE: \
-			return OP##_ratio(x,(CELL)bignum_to_ratio(y)); \
-		case FLOAT_TYPE: \
-			return OP##_float((CELL)ratio_to_float(x),y); \
-		default: \
-			return OP##_anytype(x,y); \
-		} \
-\
-	case COMPLEX_TYPE: \
-\
-		switch(type_of(y)) \
-		{ \
-		case FIXNUM_TYPE: \
-			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
-		case RATIO_TYPE: \
-			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
-		case COMPLEX_TYPE: \
-			return OP##_complex(x,y); \
-		case BIGNUM_TYPE: \
-			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
-		case FLOAT_TYPE: \
-			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
-		default: \
-			return OP##_anytype(x,y); \
-		} \
-\
+		return OP##_fixnum(x,y); \
 	case BIGNUM_TYPE: \
-	 \
-		switch(type_of(y)) \
-		{ \
-		case FIXNUM_TYPE: \
-			return OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
-		case RATIO_TYPE: \
-			return OP##_ratio((CELL)bignum_to_ratio(x),y); \
-		case COMPLEX_TYPE: \
-			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
-		case BIGNUM_TYPE: \
-			return OP##_bignum(x,y); \
-		case FLOAT_TYPE: \
-			return OP##_float((CELL)bignum_to_float(x),y); \
-		default: \
-			return OP##_anytype(x,y); \
-		} \
-\
+		return OP##_bignum(to_bignum(x),to_bignum(y)); \
+	case RATIO_TYPE: \
+		return OP##_ratio(to_ratio(x),to_ratio(y)); \
 	case FLOAT_TYPE: \
-\
-		switch(type_of(y)) \
-		{ \
-		case FIXNUM_TYPE: \
-			return OP##_float(x,(CELL)fixnum_to_float(y)); \
-		case RATIO_TYPE: \
-			return OP##_float(x,(CELL)ratio_to_float(y)); \
-		case COMPLEX_TYPE: \
-			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
-		case BIGNUM_TYPE: \
-			return OP##_float(x,(CELL)bignum_to_float(y)); \
-		case FLOAT_TYPE: \
-			return OP##_float(x,y); \
-		default: \
-			return OP##_anytype(x,y); \
-		} \
-\
+		return OP##_float(to_float(x),to_float(y)); \
+	case COMPLEX_TYPE: \
+		return OP##_complex(to_complex(x),to_complex(y)); \
 	default: \
-\
 		return OP##_anytype(x,y); \
 	} \
 } \
@@ -131,21 +51,21 @@ void primitive_##OP(void) \
 
 #define BINARY_OP_INTEGER_ONLY(OP) \
 \
-CELL OP##_ratio(CELL x, CELL y) \
+CELL OP##_ratio(RATIO* x, RATIO* y) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_ratio(x)); \
 	return F; \
 } \
 \
-CELL OP##_complex(CELL x, CELL y) \
+CELL OP##_complex(COMPLEX* x, COMPLEX* y) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_complex(x)); \
 	return F; \
 } \
 \
-CELL OP##_float(CELL x, CELL y) \
+CELL OP##_float(FLOAT* x, FLOAT* y) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_object(x)); \
 	return F; \
 }
 
@@ -165,13 +85,13 @@ CELL OP(CELL x) \
 	case FIXNUM_TYPE: \
 		return OP##_fixnum(x); \
 	case RATIO_TYPE: \
-		return OP##_ratio(x); \
+		return OP##_ratio((RATIO*)UNTAG(x)); \
 	case COMPLEX_TYPE: \
-		return OP##_complex(x); \
+		return OP##_complex((COMPLEX*)UNTAG(x)); \
 	case BIGNUM_TYPE: \
-		return OP##_bignum(x); \
+		return OP##_bignum((BIGNUM*)UNTAG(x)); \
 	case FLOAT_TYPE: \
-		return OP##_float(x); \
+		return OP##_float((FLOAT*)UNTAG(x)); \
 	default: \
 		return OP##_anytype(x); \
 	} \
@@ -184,21 +104,21 @@ void primitive_##OP(void) \
 
 #define UNARY_OP_INTEGER_ONLY(OP) \
 \
-CELL OP##_ratio(CELL x) \
+CELL OP##_ratio(RATIO* x) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_ratio(x)); \
 	return F; \
 } \
 \
-CELL OP##_complex(CELL x) \
+CELL OP##_complex(COMPLEX* x) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_complex(x)); \
 	return F; \
 } \
 \
-CELL OP##_float(CELL x) \
+CELL OP##_float(FLOAT* x) \
 { \
-	type_error(INTEGER_TYPE,x); \
+	type_error(INTEGER_TYPE,tag_object(x)); \
 	return F; \
 }
 

@@ -54,64 +54,54 @@ void primitive_float_to_bits(void)
 	drepl(tag_object(bignum(f_raw)));
 }
 
-CELL number_eq_float(CELL x, CELL y)
+CELL number_eq_float(FLOAT* x, FLOAT* y)
 {
-	return tag_boolean(((FLOAT*)UNTAG(x))->n
-		== ((FLOAT*)UNTAG(y))->n);
+	return tag_boolean(x->n == y->n);
 }
 
-CELL add_float(CELL x, CELL y)
+CELL add_float(FLOAT* x, FLOAT* y)
 {
-	return tag_object(make_float(((FLOAT*)UNTAG(x))->n
-		+ ((FLOAT*)UNTAG(y))->n));
+	return tag_object(make_float(x->n + y->n));
 }
 
-CELL subtract_float(CELL x, CELL y)
+CELL subtract_float(FLOAT* x, FLOAT* y)
 {
-	return tag_object(make_float(((FLOAT*)UNTAG(x))->n
-		- ((FLOAT*)UNTAG(y))->n));
+	return tag_object(make_float(x->n - y->n));
 }
 
-CELL multiply_float(CELL x, CELL y)
+CELL multiply_float(FLOAT* x, FLOAT* y)
 {
-	return tag_object(make_float(((FLOAT*)UNTAG(x))->n
-		* ((FLOAT*)UNTAG(y))->n));
+	return tag_object(make_float(x->n * y->n));
 }
 
-CELL divide_float(CELL x, CELL y)
+CELL divide_float(FLOAT* x, FLOAT* y)
 {
-	return tag_object(make_float(((FLOAT*)UNTAG(x))->n
-		/ ((FLOAT*)UNTAG(y))->n));
+	return tag_object(make_float(x->n / y->n));
 }
 
-CELL divfloat_float(CELL x, CELL y)
+CELL divfloat_float(FLOAT* x, FLOAT* y)
 {
-	return tag_object(make_float(((FLOAT*)UNTAG(x))->n
-		/ ((FLOAT*)UNTAG(y))->n));
+	return tag_object(make_float(x->n / y->n));
 }
 
-CELL less_float(CELL x, CELL y)
+CELL less_float(FLOAT* x, FLOAT* y)
 {
-	return tag_boolean(((FLOAT*)UNTAG(x))->n
-		< ((FLOAT*)UNTAG(y))->n);
+	return tag_boolean(x->n < y->n);
 }
 
-CELL lesseq_float(CELL x, CELL y)
+CELL lesseq_float(FLOAT* x, FLOAT* y)
 {
-	return tag_boolean(((FLOAT*)UNTAG(x))->n
-		<= ((FLOAT*)UNTAG(y))->n);
+	return tag_boolean(x->n <= y->n);
 }
 
-CELL greater_float(CELL x, CELL y)
+CELL greater_float(FLOAT* x, FLOAT* y)
 {
-	return tag_boolean(((FLOAT*)UNTAG(x))->n
-		> ((FLOAT*)UNTAG(y))->n);
+	return tag_boolean(x->n > y->n);
 }
 
-CELL greatereq_float(CELL x, CELL y)
+CELL greatereq_float(FLOAT* x, FLOAT* y)
 {
-	return tag_boolean(((FLOAT*)UNTAG(x))->n
-		>= ((FLOAT*)UNTAG(y))->n);
+	return tag_boolean(x->n >= y->n);
 }
 
 void primitive_facos(void)

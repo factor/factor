@@ -1,5 +1,54 @@
 #include "factor.h"
 
+CELL upgraded_arithmetic_type(CELL type1, CELL type2)
+{
+	switch(type1)
+	{
+	case FIXNUM_TYPE:
+		return type2;
+	case BIGNUM_TYPE:
+		switch(type2)
+		{
+		case FIXNUM_TYPE:
+			return type1;
+		default:
+			return type2;
+		}
+	case RATIO_TYPE:
+		switch(type2)
+		{
+		case FIXNUM_TYPE:
+		case BIGNUM_TYPE:
+			return type1;
+		default:
+			return type2;
+		}
+	case FLOAT_TYPE:
+		switch(type2)
+		{
+		case FIXNUM_TYPE:
+		case BIGNUM_TYPE:
+		case RATIO_TYPE:
+			return type1;
+		default:
+			return type2;
+		}
+	case COMPLEX_TYPE:
+		switch(type2)
+		{
+		case FIXNUM_TYPE:
+		case BIGNUM_TYPE:
+		case RATIO_TYPE:
+		case FLOAT_TYPE:
+			return type1;
+		default:
+			return type2;
+		}
+	default:
+		return type1;
+	}
+}
+
 BIGNUM* fixnum_to_bignum(CELL n)
 {
 	return bignum((BIGNUM_2)untag_fixnum_fast(n));

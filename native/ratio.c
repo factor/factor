@@ -8,6 +8,21 @@ RATIO* ratio(CELL numerator, CELL denominator)
 	return ratio;
 }
 
+RATIO* to_ratio(CELL x)
+{
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+	case BIGNUM_TYPE:
+		return ratio(x,tag_fixnum(1));
+	case RATIO_TYPE:
+		return (RATIO*)UNTAG(x);
+	default:
+		type_error(RATIONAL_TYPE,x);
+		return NULL;
+	}
+}
+
 void primitive_ratiop(void)
 {
 	drepl(tag_boolean(typep(RATIO_TYPE,dpeek())));
@@ -47,88 +62,68 @@ void primitive_denominator(void)
 	}
 }
 
-CELL number_eq_ratio(CELL x, CELL y)
+CELL number_eq_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
 	return tag_boolean(
-		untag_boolean(number_eq(rx->numerator,ry->numerator)) &&
-		untag_boolean(number_eq(rx->denominator,ry->denominator)));
+		untag_boolean(number_eq(x->numerator,y->numerator)) &&
+		untag_boolean(number_eq(x->denominator,y->denominator)));
 }
 
-CELL add_ratio(CELL x, CELL y)
+CELL add_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return divide(add(multiply(rx->numerator,ry->denominator),
-		multiply(rx->denominator,ry->numerator)),
-		multiply(rx->denominator,ry->denominator));
+	return divide(add(multiply(x->numerator,y->denominator),
+		multiply(x->denominator,y->numerator)),
+		multiply(x->denominator,y->denominator));
 }
 
-CELL subtract_ratio(CELL x, CELL y)
+CELL subtract_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return divide(subtract(multiply(rx->numerator,ry->denominator),
-		multiply(rx->denominator,ry->numerator)),
-		multiply(rx->denominator,ry->denominator));
+	return divide(subtract(multiply(x->numerator,y->denominator),
+		multiply(x->denominator,y->numerator)),
+		multiply(x->denominator,y->denominator));
 }
 
-CELL multiply_ratio(CELL x, CELL y)
+CELL multiply_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
 	return divide(
-		multiply(rx->numerator,ry->numerator),
-		multiply(rx->denominator,ry->denominator));
+		multiply(x->numerator,y->numerator),
+		multiply(x->denominator,y->denominator));
 }
 
-CELL divide_ratio(CELL x, CELL y)
+CELL divide_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
 	return divide(
-		multiply(rx->numerator,ry->denominator),
-		multiply(rx->denominator,ry->numerator));
+		multiply(x->numerator,y->denominator),
+		multiply(x->denominator,y->numerator));
 }
 
-CELL divfloat_ratio(CELL x, CELL y)
+CELL divfloat_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
 	return divfloat(
-		multiply(rx->numerator,ry->denominator),
-		multiply(rx->denominator,ry->numerator));
+		multiply(x->numerator,y->denominator),
+		multiply(x->denominator,y->numerator));
 }
 
-CELL less_ratio(CELL x, CELL y)
+CELL less_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return less(multiply(rx->numerator,ry->denominator),
-		multiply(ry->numerator,rx->denominator));
+	return less(multiply(x->numerator,y->denominator),
+		multiply(y->numerator,x->denominator));
 }
 
-CELL lesseq_ratio(CELL x, CELL y)
+CELL lesseq_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return lesseq(multiply(rx->numerator,ry->denominator),
-		multiply(ry->numerator,rx->denominator));
+	return lesseq(multiply(x->numerator,y->denominator),
+		multiply(y->numerator,x->denominator));
 }
 
-CELL greater_ratio(CELL x, CELL y)
+CELL greater_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return greater(multiply(rx->numerator,ry->denominator),
-		multiply(ry->numerator,rx->denominator));
+	return greater(multiply(x->numerator,y->denominator),
+		multiply(y->numerator,x->denominator));
 }
 
-CELL greatereq_ratio(CELL x, CELL y)
+CELL greatereq_ratio(RATIO* x, RATIO* y)
 {
-	RATIO* rx = (RATIO*)UNTAG(x);
-	RATIO* ry = (RATIO*)UNTAG(y);
-	return greatereq(multiply(rx->numerator,ry->denominator),
-		multiply(ry->numerator,rx->denominator));
+	return greatereq(multiply(x->numerator,y->denominator),
+		multiply(y->numerator,x->denominator));
 }

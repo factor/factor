@@ -32,16 +32,16 @@ void primitive_str_to_float(void);
 void primitive_float_to_str(void);
 void primitive_float_to_bits(void);
 
-CELL number_eq_float(CELL x, CELL y);
-CELL add_float(CELL x, CELL y);
-CELL subtract_float(CELL x, CELL y);
-CELL multiply_float(CELL x, CELL y);
-CELL divide_float(CELL x, CELL y);
-CELL divfloat_float(CELL x, CELL y);
-CELL less_float(CELL x, CELL y);
-CELL lesseq_float(CELL x, CELL y);
-CELL greater_float(CELL x, CELL y);
-CELL greatereq_float(CELL x, CELL y);
+CELL number_eq_float(FLOAT* x, FLOAT* y);
+CELL add_float(FLOAT* x, FLOAT* y);
+CELL subtract_float(FLOAT* x, FLOAT* y);
+CELL multiply_float(FLOAT* x, FLOAT* y);
+CELL divide_float(FLOAT* x, FLOAT* y);
+CELL divfloat_float(FLOAT* x, FLOAT* y);
+CELL less_float(FLOAT* x, FLOAT* y);
+CELL lesseq_float(FLOAT* x, FLOAT* y);
+CELL greater_float(FLOAT* x, FLOAT* y);
+CELL greatereq_float(FLOAT* x, FLOAT* y);
 
 void primitive_facos(void);
 void primitive_fasin(void);

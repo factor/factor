@@ -33,28 +33,24 @@ void primitive_to_bignum(void)
 	drepl(tag_object(to_bignum(dpeek())));
 }
 
-CELL number_eq_bignum(CELL x, CELL y)
+CELL number_eq_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_boolean(((BIGNUM*)UNTAG(x))->n
-		== ((BIGNUM*)UNTAG(y))->n);
+	return tag_boolean(x->n == y->n);
 }
 
-CELL add_bignum(CELL x, CELL y)
+CELL add_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		+ ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n + y->n));
 }
 
-CELL subtract_bignum(CELL x, CELL y)
+CELL subtract_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		- ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n - y->n));
 }
 
-CELL multiply_bignum(CELL x, CELL y)
+CELL multiply_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		* ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n * y->n));
 }
 
 BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y)
@@ -84,10 +80,10 @@ BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y)
 	}
 }
 
-CELL divide_bignum(CELL x, CELL y)
+CELL divide_bignum(BIGNUM* x, BIGNUM* y)
 {
-	BIGNUM_2 _x = ((BIGNUM*)UNTAG(x))->n;
-	BIGNUM_2 _y = ((BIGNUM*)UNTAG(y))->n;
+	BIGNUM_2 _x = x->n;
+	BIGNUM_2 _y = y->n;
 	BIGNUM_2 gcd;
 
 	if(_y == 0)
@@ -118,88 +114,75 @@ CELL divide_bignum(CELL x, CELL y)
 	}
 }
 
-CELL divint_bignum(CELL x, CELL y)
+CELL divint_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		/ ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n / y->n));
 }
 
-CELL divfloat_bignum(CELL x, CELL y)
+CELL divfloat_bignum(BIGNUM* x, BIGNUM* y)
 {
-	BIGNUM_2 _x = ((BIGNUM*)UNTAG(x))->n;
-	BIGNUM_2 _y = ((BIGNUM*)UNTAG(y))->n;
+	BIGNUM_2 _x = x->n;
+	BIGNUM_2 _y = y->n;
 	return tag_object(make_float((double)_x / (double)_y));
 }
 
-CELL divmod_bignum(CELL x, CELL y)
+CELL divmod_bignum(BIGNUM* x, BIGNUM* y)
 {
-	dpush(tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		/ ((BIGNUM*)UNTAG(y))->n)));
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		% ((BIGNUM*)UNTAG(y))->n));
+	dpush(tag_object(bignum(x->n / y->n)));
+	return tag_object(bignum(x->n % y->n));
 }
 
-CELL mod_bignum(CELL x, CELL y)
+CELL mod_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		% ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n % y->n));
 }
 
-CELL and_bignum(CELL x, CELL y)
+CELL and_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		& ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n & y->n));
 }
 
-CELL or_bignum(CELL x, CELL y)
+CELL or_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		| ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n | y->n));
 }
 
-CELL xor_bignum(CELL x, CELL y)
+CELL xor_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		^ ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n ^ y->n));
 }
 
-CELL shiftleft_bignum(CELL x, CELL y)
+CELL shiftleft_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		<< ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n << y->n));
 }
 
-CELL shiftright_bignum(CELL x, CELL y)
+CELL shiftright_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
-		>> ((BIGNUM*)UNTAG(y))->n));
+	return tag_object(bignum(x->n >> y->n));
 }
 
-CELL less_bignum(CELL x, CELL y)
+CELL less_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_boolean(((BIGNUM*)UNTAG(x))->n
-		< ((BIGNUM*)UNTAG(y))->n);
+	return tag_boolean(x->n < y->n);
 }
 
-CELL lesseq_bignum(CELL x, CELL y)
+CELL lesseq_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_boolean(((BIGNUM*)UNTAG(x))->n
-		<= ((BIGNUM*)UNTAG(y))->n);
+	return tag_boolean(x->n <= y->n);
 }
 
-CELL greater_bignum(CELL x, CELL y)
+CELL greater_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_boolean(((BIGNUM*)UNTAG(x))->n
-		> ((BIGNUM*)UNTAG(y))->n);
+	return tag_boolean(x->n > y->n);
 }
 
-CELL greatereq_bignum(CELL x, CELL y)
+CELL greatereq_bignum(BIGNUM* x, BIGNUM* y)
 {
-	return tag_boolean(((BIGNUM*)UNTAG(x))->n
-		>= ((BIGNUM*)UNTAG(y))->n);
+	return tag_boolean(x->n >= y->n);
 }
 
-CELL not_bignum(CELL x)
+CELL not_bignum(BIGNUM* x)
 {
-	return tag_object(bignum(~((BIGNUM*)UNTAG(x))->n));
+	return tag_object(bignum(~(x->n)));
 }

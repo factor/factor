@@ -8,6 +8,23 @@ COMPLEX* complex(CELL real, CELL imaginary)
 	return complex;
 }
 
+COMPLEX* to_complex(CELL x)
+{
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+	case BIGNUM_TYPE:
+	case FLOAT_TYPE:
+	case RATIO_TYPE:
+		return complex(x,0);
+	case COMPLEX_TYPE:
+		return (COMPLEX*)UNTAG(x);
+	default:
+		type_error(NUMBER_TYPE,x);
+		return NULL;
+	}
+}
+
 CELL possibly_complex(CELL real, CELL imaginary)
 {
 	if(zerop(imaginary))
@@ -35,7 +52,7 @@ void primitive_real(void)
 		drepl(untag_complex(dpeek())->real);
 		break;
 	default:
-		type_error(COMPLEX_TYPE,dpeek());
+		type_error(NUMBER_TYPE,dpeek());
 		break;
 	}
 }
@@ -54,7 +71,7 @@ void primitive_imaginary(void)
 		drepl(untag_complex(dpeek())->imaginary);
 		break;
 	default:
-		type_error(COMPLEX_TYPE,dpeek());
+		type_error(NUMBER_TYPE,dpeek());
 		break;
 	}
 }
@@ -95,68 +112,58 @@ void primitive_from_rect(void)
 	dpush(possibly_complex(real,imaginary));
 }
 
-CELL number_eq_complex(CELL x, CELL y)
+CELL number_eq_complex(COMPLEX* x, COMPLEX* y)
 {
-	COMPLEX* cx = (COMPLEX*)UNTAG(x);
-	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return tag_boolean(
-		untag_boolean(number_eq(cx->real,cy->real)) &&
-		untag_boolean(number_eq(cx->imaginary,cy->imaginary)));
+		untag_boolean(number_eq(x->real,y->real)) &&
+		untag_boolean(number_eq(x->imaginary,y->imaginary)));
 }
 
-CELL add_complex(CELL x, CELL y)
+CELL add_complex(COMPLEX* x, COMPLEX* y)
 {
-	COMPLEX* cx = (COMPLEX*)UNTAG(x);
-	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return possibly_complex(
-		add(cx->real,cy->real),
-		add(cx->imaginary,cy->imaginary));
+		add(x->real,y->real),
+		add(x->imaginary,y->imaginary));
 }
 
-CELL subtract_complex(CELL x, CELL y)
+CELL subtract_complex(COMPLEX* x, COMPLEX* y)
 {
-	COMPLEX* cx = (COMPLEX*)UNTAG(x);
-	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return possibly_complex(
-		subtract(cx->real,cy->real),
-		subtract(cx->imaginary,cy->imaginary));
+		subtract(x->real,y->real),
+		subtract(x->imaginary,y->imaginary));
 }
 
-CELL multiply_complex(CELL x, CELL y)
+CELL multiply_complex(COMPLEX* x, COMPLEX* y)
 {
-	COMPLEX* cx = (COMPLEX*)UNTAG(x);
-	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return possibly_complex(
 		subtract(
-			multiply(cx->real,cy->real),
-			multiply(cx->imaginary,cy->imaginary)),
+			multiply(x->real,y->real),
+			multiply(x->imaginary,y->imaginary)),
 		add(
-			multiply(cx->real,cy->imaginary),
-			multiply(cx->imaginary,cy->real)));
+			multiply(x->real,y->imaginary),
+			multiply(x->imaginary,y->real)));
 }
 
 #define COMPLEX_DIVIDE(x,y) \
-	COMPLEX* cx = (COMPLEX*)UNTAG(x); \
-	COMPLEX* cy = (COMPLEX*)UNTAG(y); \
 \
 	CELL mag = add( \
-		multiply(cy->real,cy->real), \
-		multiply(cy->imaginary,cy->imaginary)); \
+		multiply(y->real,y->real), \
+		multiply(y->imaginary,y->imaginary)); \
 \
 	CELL r = add( \
-		multiply(cx->real,cy->real), \
-		multiply(cx->imaginary,cy->imaginary)); \
+		multiply(x->real,y->real), \
+		multiply(x->imaginary,y->imaginary)); \
 	CELL i = subtract( \
-		multiply(cx->imaginary,cy->real), \
-		multiply(cx->real,cy->imaginary));
+		multiply(x->imaginary,y->real), \
+		multiply(x->real,y->imaginary));
 
-CELL divide_complex(CELL x, CELL y)
+CELL divide_complex(COMPLEX* x, COMPLEX* y)
 {
 	COMPLEX_DIVIDE(x,y);
 	return possibly_complex(divide(r,mag),divide(i,mag));
 }
 
-CELL divfloat_complex(CELL x, CELL y)
+CELL divfloat_complex(COMPLEX* x, COMPLEX* y)
 {
 	COMPLEX_DIVIDE(x,y);
 	return possibly_complex(divfloat(r,mag),divfloat(i,mag));
@@ -165,25 +172,25 @@ CELL divfloat_complex(CELL x, CELL y)
 #define INCOMPARABLE(x,y) general_error(ERROR_INCOMPARABLE, \
 	tag_cons(cons(RETAG(x,COMPLEX_TYPE),RETAG(y,COMPLEX_TYPE))));
 
-CELL less_complex(CELL x, CELL y)
+CELL less_complex(COMPLEX* x, COMPLEX* y)
 {
 	INCOMPARABLE(x,y);
 	return F;
 }
 
-CELL lesseq_complex(CELL x, CELL y)
+CELL lesseq_complex(COMPLEX* x, COMPLEX* y)
 {
 	INCOMPARABLE(x,y);
 	return F;
 }
 
-CELL greater_complex(CELL x, CELL y)
+CELL greater_complex(COMPLEX* x, COMPLEX* y)
 {
 	INCOMPARABLE(x,y);
 	return F;
 }
 
-CELL greatereq_complex(CELL x, CELL y)
+CELL greatereq_complex(COMPLEX* x, COMPLEX* y)
 {
 	INCOMPARABLE(x,y);
 	return F;

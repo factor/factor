@@ -142,7 +142,9 @@ USE: words
     #! Very bad!
     object-tag here-as >r
     bignum-type >header emit
-    0 emit ( alignment -- FIXME 64-bit arch )
+    4 emit ( capacity )
+    0 emit ( sign XXXX )
+    0 emit ( pad XXXX )
     ( bignum -- ) emit64 r> ;
 
 ( Special objects )

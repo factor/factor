@@ -15,6 +15,7 @@ INLINE CELL tag_complex(COMPLEX* complex)
 }
 
 COMPLEX* complex(CELL real, CELL imaginary);
+COMPLEX* to_complex(CELL x);
 CELL possibly_complex(CELL real, CELL imaginary);
 
 void primitive_complexp(void);
@@ -22,13 +23,13 @@ void primitive_real(void);
 void primitive_imaginary(void);
 void primitive_to_rect(void);
 void primitive_from_rect(void);
-CELL number_eq_complex(CELL x, CELL y);
-CELL add_complex(CELL x, CELL y);
-CELL subtract_complex(CELL x, CELL y);
-CELL multiply_complex(CELL x, CELL y);
-CELL divide_complex(CELL x, CELL y);
-CELL divfloat_complex(CELL x, CELL y);
-CELL less_complex(CELL x, CELL y);
-CELL lesseq_complex(CELL x, CELL y);
-CELL greater_complex(CELL x, CELL y);
-CELL greatereq_complex(CELL x, CELL y);
+CELL number_eq_complex(COMPLEX* x, COMPLEX* y);
+CELL add_complex(COMPLEX* x, COMPLEX* y);
+CELL subtract_complex(COMPLEX* x, COMPLEX* y);
+CELL multiply_complex(COMPLEX* x, COMPLEX* y);
+CELL divide_complex(COMPLEX* x, COMPLEX* y);
+CELL divfloat_complex(COMPLEX* x, COMPLEX* y);
+CELL less_complex(COMPLEX* x, COMPLEX* y);
+CELL lesseq_complex(COMPLEX* x, COMPLEX* y);
+CELL greater_complex(COMPLEX* x, COMPLEX* y);
+CELL greatereq_complex(COMPLEX* x, COMPLEX* y);

@@ -4,6 +4,7 @@ LIBS = -lm
 STRIP = strip
 
 OBJS = native/arithmetic.o native/array.o native/bignum.o \
+	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/file.o native/fixnum.o \
 	native/float.o native/gc.o \

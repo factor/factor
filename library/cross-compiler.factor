@@ -52,6 +52,7 @@ DEFER: room
 DEFER: os-env
 DEFER: type-of
 DEFER: size-of
+DEFER: dump
 
 IN: strings
 DEFER: str=
@@ -244,6 +245,7 @@ IN: cross-compiler
         profiling
         call-count
         set-call-count
+        dump
     ] [
         swap succ tuck primitive,
     ] each drop ;
