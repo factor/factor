@@ -42,8 +42,8 @@ USE: parser
   "cont-utils.factor" run-file ;
 : l2 
   "cont-examples.factor" run-file ;
-! : l3 "todo.factor" run-file ;
-! : l4 "todo-example.factor" run-file ;
+: l3 "todo.factor" run-file ;
+: l4 "todo-example.factor" run-file ;
 : l5 "live-updater.factor" run-file ;
 ! : l6 "eval-responder.factor" run-file ;
 : l7 "live-updater-responder.factor" run-file ;
