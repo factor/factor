@@ -11,12 +11,17 @@ USING: generic kernel lists math namespaces sdl ;
 
 : mouse-over? ( gadget -- ? ) my-hand hand-gadget child? ;
 
+: button-rollover? ( button -- ? )
+    mouse-over? 1 button-down? not and ;
+
 : rollover-update ( button -- )
-    dup mouse-over? blue black ? foreground set-paint-property ;
+    dup button-rollover? blue black ? foreground set-paint-property ;
 
 : button-pressed? ( button -- ? )
+    #! Return true if the mouse was clicked on the button, and
+    #! is currently over the button.
     dup mouse-over? [
-        my-hand hand-buttons 1 swap contains? [
+        1 button-down? [
             my-hand hand-clicked child?
         ] [
             drop f

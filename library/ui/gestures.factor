@@ -76,3 +76,6 @@ SYMBOL: button-down
     [
         2dup child? [ gain-focus ] hierarchy-gesture
     ] each-parent 2drop ;
+
+: button-down? ( n -- ? )
+    my-hand hand-buttons contains? ;

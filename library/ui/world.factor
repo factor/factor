@@ -47,7 +47,7 @@ DEFER: handle-event
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
     dup SDL_PollEvent [
-        dup handle-event eat-events
+        [ handle-event ] in-thread eat-events
     ] [
         world get world-step [ SDL_WaitEvent ] [ drop f ] ifte
     ] ifte ;
