@@ -62,10 +62,3 @@ USE: url-encoding
 [ ] [ "GET /index.html" parse-request ] unit-test
 [ ] [ "GET ../index.html" parse-request ] unit-test
 [ ] [ "POO" parse-request ] unit-test
-
-[ ] [ "/" "get" ] [ serve-responder ] test-word
-[ ] [ "" "get" ] [ serve-responder ] test-word
-[ ] [ "does-not-exist!" "get" ] [ serve-responder ] test-word
-[ ] [ "does-not-exist!/" "get" ] [ serve-responder ] test-word
-
-[ ] [ "inspect/global" "get" ] [ serve-responder ] test-word

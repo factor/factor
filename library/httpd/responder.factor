@@ -58,6 +58,10 @@ USE: httpd
 : serving-text ( -- )
     "200 Document follows" "text/plain" response print ;
 
+: redirect ( to -- )
+    "301 Moved Permanently" "text/plain" response write
+    "Location: " write print ;
+
 : get-responder ( name -- responder )
     "httpd-responders" get get* ;
 
@@ -80,9 +84,15 @@ USE: httpd
     "Calling responder " swap cat2 log ;
 
 : serve-responder ( argument method -- )
-    over log-responder
-    swap trim-/ "/" split1 over get-responder dup [
-        rot drop call-responder
+    swap
+    dup log-responder
+    trim-/ "/" split1 dup [
+        over get-responder dup [
+            rot drop call-responder
+        ] [
+            2drop no-such-responder drop
+        ] ifte
     ] [
-        2drop no-such-responder drop
+        ! Argument is just a responder name without /
+        drop "/" swap "/" cat3 redirect drop
     ] ifte ;

@@ -36,10 +36,10 @@ USE: stack
 : word-name ( word -- name )
     "name" swap word-property ;
 
-: set-word-name ( word -- vocab )
+: set-word-name ( word name -- )
     "name" swap set-word-property ;
 
-: word-vocabulary ( word name -- )
+: word-vocabulary ( word -- vocab )
     "vocabulary" swap word-property ;
 
 : set-word-vocabulary ( word vocab -- )

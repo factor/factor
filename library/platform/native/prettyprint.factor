@@ -35,16 +35,11 @@ USE: unparser
 USE: words
 
 : see-compound ( word -- )
-    0 swap dup word-parameter
-    [
-        [ prettyprint-: ] dip prettyprint-word
-        dup prettyprint-newline
-    ] dip
-    prettyprint-list prettyprint-;
+    0 swap dup word-parameter prettyprint-:;
     prettyprint-newline ;
 
 : see-primitive ( word -- )
-    "Primitive: " write unparse print ;
+    "PRIMITIVE: " write unparse print ;
 
 : see-undefined ( word -- )
     drop "Not defined" print ;

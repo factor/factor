@@ -1,31 +1,27 @@
-- gc call in the middle of some ops might affect callstack
+- bitwise operations
+- clone-hashtable
+- sidekick: error source not removed
+- lineno/file for native
+- jedit for native with socket communication
+- input style after clicking link
+- fedit broken with listener
+- maple-like: press enter at old commands to evaluate there
 - sending ^C on socket
-- postpone errors until actual read/write op
+- read#
+- describe-word
+- enforce bottom-up in native bootstrap
+- standalone listener input style
+- log-client: fix for native
+- add a socket timeout
+
++ docs:
+
 - vector-each/map examples
 - unparse examples
 - finish second practical
 - sbuf-hashcode
 - vector-hashcode
-- listener backspace overzealous
-- multitasking
 - review doc formatting with latex2html
-- sidekick: error source not removed
-
-[error] AWT-EventQueue-0: java.lang.NullPointerException
-[error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
-[error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
-[error] AWT-EventQueue-0:  at sidekick.SideKickTree.expandTreeAt(Unknown Source)
-[error] AWT-EventQueue-0:  at sidekick.SideKickTree.access$100(Unknown Source)
-[error] AWT-EventQueue-0:  at sidekick.SideKickTree$1.actionPerformed(Unknown Source)
-[error] AWT-EventQueue-0:  at javax.swing.Timer.fireActionPerformed(Timer.java:271)
-[error] AWT-EventQueue-0:  at javax.swing.Timer$DoPostEvent.run(Timer.java:201)
-[error] AWT-EventQueue-0:  at java.awt.event.InvocationEvent.dispatch(InvocationEvent.java:178)
-[error] AWT-EventQueue-0:  at java.awt.EventQueue.dispatchEvent(EventQueue.java:454)
-[error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:201)
-[error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:151)
-[error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:145)
-[error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:137)
-[error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.run(EventDispatchThread.java:100)
 
 + tests:
 
@@ -33,34 +29,24 @@
 - FactorLib.equal() not very good
 - do nset-nth, nremove-nth, nsubstitute, ninject
 - IN: format base: work with all types of numbers
-- bitwise operations
-
-- rethink strhead/strtail&co
 
 + listener/plugin:
 
-- lineno/file for native
-- jedit for native with socket communication
+- listener backspace overzealous
 - lineno/file for shuffle defs
 - balance needs USE:
-- input style after clicking link
 - completion: enter no good
 - completion: don't show automatically
 - completion in the listener
 - special completion for USE:/IN:
-- fedit broken with listener
-- maple-like: press enter at old commands to evaluate there
 - inspector links when describe called without object path
 
 + native:
 
-- read#
+- gc call in the middle of some ops might affect callstack
+- postpone errors until actual read/write op
+- multitasking
 - parsing should be parsing
-- see: show word flags and IN:
-- describe-word
-- contains ==> contains?
-- telnetd: send errors on socket
-- enforce bottom-up in native bootstrap
 
 + JVM compiler:
 
@@ -77,21 +63,23 @@
 
 + misc:
 
+- rethink strhead/strtail&co
 - namespace clone drops static var bindings
 - ditch map
 - ditch expand
 - set-object-path
 - more readable traces
 - 'cascading' styles
-- standalone listener input style
+- telnetd: send errors on socket
+- contains ==> contains?
 
 + httpd:
 
-- log-client: fix for native
+- file responder:
+  - port to native
+  - if a directory is requested and URL does not end with /, redirect
 - if user clicks stop in browser, doesn't stop sending?
 - log with date
-- add a socket timeout
-- if a directory is requested and URL does not end with /, redirect
 - return more header fields, like Content-Length, Last-Modified, and so on
 - HEAD request
 - basic authentication, using httpdAuth function from a config file

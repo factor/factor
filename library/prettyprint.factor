@@ -174,6 +174,20 @@ DEFER: prettyprint*
 : prettyprint ( obj -- )
     0 swap prettyprint* drop terpri ;
 
+: vocab-link ( vocab -- link )
+    <% "vocabularies'" % % %> ;
+
+: vocab-attrs ( word -- attrs )
+    default-style clone [ vocab-link "link" set ] extend ;
+
+: prettyprint-vocab ( vocab -- )
+    dup vocab-attrs [ write-attr ] bind ;
+
+: prettyprint-IN: ( indent word -- indent )
+    "IN:" write prettyprint-space
+    word-vocabulary prettyprint-vocab
+    dup prettyprint-newline ;
+
 : prettyprint-: ( indent -- indent )
     ":" write prettyprint-space
     tab-size + ;
@@ -182,11 +196,18 @@ DEFER: prettyprint*
     ";" write
     tab-size - ;
 
+: prettyprint-plist ( word -- )
+    "parsing" over word-property [ " parsing" write ] when
+    "inline" over word-property [ " inline" write ] when
+    drop ;
+
 : prettyprint-:; ( indent word list -- indent )
-    >r
-    >r prettyprint-: r>
-    prettyprint-word prettyprint-space r>
-    prettyprint-list prettyprint-; ;
+    over >r >r dup
+    >r prettyprint-IN: prettyprint-: r>
+    prettyprint-word
+    native? [ dup prettyprint-newline ] [ prettyprint-space ] ifte
+    r>
+    prettyprint-list prettyprint-; r> prettyprint-plist ;
 
 : . ( obj -- )
     [
