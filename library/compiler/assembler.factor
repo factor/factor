@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
+USE: combinators
 USE: math
 USE: kernel
 USE: stack
@@ -35,6 +36,13 @@ USE: stack
 
 : init-assembler ( -- )
     compiled-offset literal-table + set-compiled-offset ;
+
+: compile-aligned ( n -- )
+    dup compiled-offset mod dup 0 = [
+        2drop
+    ] [
+        - compiled-offset + set-compiled-offset
+    ] ifte ;
 
 : intern-literal ( obj -- lit# )
     address-of

@@ -75,3 +75,8 @@ garbage-collection
 : one-rec [ f one-rec ] [ "hi" ] ifte ; compiled
 
 [ "hi" ] [ t one-rec ] unit-test
+
+: after-ifte-test
+    t [ ] [ ] ifte 5 ; compiled
+
+[ 5 ] [ after-ifte-test ] unit-test

@@ -41,6 +41,9 @@ USE: combinators
 : ESI 6 ;
 : EDI 7 ;
 
+: MOD-R/M ( r/m reg/opcode mod -- )
+    6 shift swap 3 shift bitor bitor compile-byte ;
+
 : PUSH ( reg -- )
     HEX: 50 + compile-byte ;
 
@@ -57,7 +60,7 @@ USE: combinators
         drop HEX: a1 compile-byte
     ] [
         HEX: 8b compile-byte
-        3 shift BIN: 101 bitor compile-byte
+        BIN: 101 swap 0 MOD-R/M
     ] ifte compile-cell ;
 
 : I>[R] ( imm reg -- )
@@ -71,21 +74,21 @@ USE: combinators
         nip HEX: a3 compile-byte
     ] [
         HEX: 89 compile-byte
-        swap 3 shift BIN: 101 bitor compile-byte
+        swap BIN: 101 swap 0 MOD-R/M
     ] ifte compile-cell ;
 
 : [R]>R ( reg reg -- )
     #! MOV INDIRECT <reg> TO <reg>.
-    HEX: 8b compile-byte  swap 3 shift bitor compile-byte ;
+    HEX: 8b compile-byte  swap 0 MOD-R/M ;
 
 : R>[R] ( reg reg -- )
     #! MOV <reg> TO INDIRECT <reg>.
-    HEX: 89 compile-byte  swap 3 shift bitor compile-byte ;
+    HEX: 89 compile-byte  swap 0 MOD-R/M ;
 
 : I+[I] ( imm addr -- )
     #! ADD <imm> TO ADDRESS <addr>
     HEX: 81 compile-byte
-    HEX: 05 compile-byte
+    BIN: 101 0 0 MOD-R/M
     compile-cell
     compile-cell ;
 
@@ -93,14 +96,14 @@ USE: combinators
     #! SUBTRACT <imm> FROM <reg>, STORE RESULT IN <reg>
     over -128 127 between? [
         HEX: 83 compile-byte
-        HEX: e8 + compile-byte
+        BIN: 101 BIN: 11 MOD-R/M
         compile-byte
     ] [
         dup EAX = [
             drop HEX: 2d compile-byte
         ] [
             HEX: 81 compile-byte
-            BIN: 11101000 bitor
+            BIN: 101 BIN: 11 MOD-R/M
         ] ifte
         compile-cell
     ] ifte ;
@@ -111,11 +114,11 @@ USE: combinators
     #! 81 38 33 33 33 00       cmpl   $0x333333,(%eax)
     over -128 127 between? [
         HEX: 83 compile-byte
-        HEX: 38 + compile-byte
+        BIN: 111 0 MOD-R/M
         compile-byte
     ] [
         HEX: 81 compile-byte
-        HEX: 38 + compile-byte
+        BIN: 111 0 MOD-R/M
         compile-cell
     ] ifte ;
 
@@ -127,8 +130,8 @@ USE: combinators
     4 DATASTACK I+[I] ;
 
 : [LITERAL] ( cell -- )
-    #! Push literal on data stack by following an indirect
-    #! pointer.
+    #! Push complex literal on data stack by following an
+    #! indirect pointer.
     ECX PUSH
     ( cell -- ) ECX [I]>R
     DATASTACK EAX [I]>R

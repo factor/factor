@@ -25,7 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: cross-compiler
 USE: combinators
 USE: kernel
 USE: lists
@@ -127,7 +126,7 @@ DEFER: set-word-plist
 IN: unparser
 DEFER: unparse-float
 
-IN: cross-compiler
+IN: image
 
 : primitives, ( -- )
     1 [

@@ -3,7 +3,7 @@ CC = gcc
 # On PowerPC G5:
 # CFLAGS = -mcpu=970 -mtune=970 -mpowerpc64 -ffast-math -O3
 # On Pentium 4:
-# CFLAGS = -march=pentium4 -ffast-math -O3
+# CFLAGS = -march=pentium4 -ffast-math -O3 -fomit-frame-pointer
 # Add -fomit-frame-pointer if you don't care about debugging
 CFLAGS = -Os -g -Wall
 

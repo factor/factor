@@ -26,7 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 USE: lists
-USE: cross-compiler
+USE: image
 
 primitives,
 [

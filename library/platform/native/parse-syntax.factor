@@ -28,7 +28,6 @@
 IN: syntax
 
 USE: combinators
-USE: cross-compiler
 USE: errors
 USE: kernel
 USE: lists

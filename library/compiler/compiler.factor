@@ -132,6 +132,7 @@ USE: words
     ] with-scope ;
 
 : begin-compiling ( word -- )
+    cell compile-aligned
     compiled-offset "compiled-xt" rot set-word-property ;
 
 : end-compiling ( word -- xt )

@@ -25,7 +25,12 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: cross-compiler
+IN: namespaces
+
+( Java Factor doesn't have this )
+: namespace-buckets 23 ;
+
+IN: image
 USE: combinators
 USE: errors
 USE: hashtables
@@ -253,12 +258,6 @@ DEFER: '
     ] ifte ;
 
 ( Word definitions )
-
-IN: namespaces
-
-: namespace-buckets 23 ;
-
-IN: cross-compiler
 
 : (vocabulary) ( name -- vocab )
     #! Vocabulary for target image.

@@ -409,6 +409,7 @@ is pushed on the stack. Try evaluating the following:
 call .s
 \emph{\{ 5 \}}
 \end{alltt}
+
 \texttt{call} \texttt{( quot -{}- )} executes the quotation at the
 top of the stack. Using \texttt{call} with a literal quotation is
 useless; writing out the elements of the quotation has the same effect.
@@ -441,10 +442,6 @@ of the number of iterations.
 More combinators will be introduced in later sections.
 
 \subsection{Recursion}
-
-The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional.
-
-FIXME
 
 \section{Numbers}
 
@@ -2400,11 +2397,28 @@ The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} ar
 : n> ( n:namespace -- namespace ) namestack* vector-pop ;
 \end{alltt}
 
-\section{Metaprogramming}
+\section{The execution model in depth}
 
-Recall that code quotations are in fact just linked lists. Factor code is data, and vice versa. Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine. A word is itself a first-class object.
+\subsection{Recursion}
 
-It is the job of the parser to transform source code denoting literals and words into their internal representations. This is done using a vocabulary of \emph{parsing words}. The prettyprinter does the converse, by printing out data structures in a parsable form (both to humans and Factor). Because code is data, text representation of source code doubles as a way to serialize almost any Factor object.
+The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional.
+
+
+tail recursion
+
+preserving values between iterations
+
+ensuring a consistent stack effect
+
+works well with lists, since only the head is passed
+
+not so well with vectors and strings -- need an obj+index
+
+\subsection{Combinators}
+
+a combinator is a recursive word that takes quotations
+
+how to ensure a consistent stack view for the quotations
 
 \subsection{Looking at words}
 
@@ -2451,24 +2465,6 @@ An association list of name/value pairs.\tabularnewline
 If the primitive number is set to 1, the word is a colon definition and the parameter must be a quotation. Any other primitive number denotes a function of the virtual machine, and the parameter is ignored. Do not rely on primitive numbers in your code, instead use the \texttt{compound? ( obj -{}- ? )} and \texttt{primitive? ( obj -{}- ? )} predicates.
 
 The word \texttt{define ( word quot -{}- )} defines a word to have the specified colon definition. Note that \texttt{create} and  \texttt{define} perform an action somewhat analagous to the \texttt{: ... ;} notation for colon definitions, except at parse time rather than run time.
-
-\subsection{The prettyprinter}
-
-We've already seen the word \texttt{.} which prints the top of the stack in a form that may be read back in. The word \texttt{prettyprint} is similar, except the output is in an indented, multiple-line format. Both words are in the \texttt{prettyprint} vocabulary. Here is an example:
-
-\begin{alltt}
-{[} 1 {[} 2 3 4 {]} 5 {]} .
-\emph{{[} 1 {[} 2 3 4 {]} 5 {]}}
-{[} 1 {[} 2 3 4 {]} 5 {]} prettyprint
-\emph{{[}
-    1 {[}
-        2 3 4
-    {]} 5
-{]}}
-\end{alltt}
-
-
-\subsection{The parser}
 
 \subsection{Parsing words}
 
@@ -2538,6 +2534,29 @@ next occurrence of \texttt{{}''}, and appends this string to the
 current node of the parse tree. Note that strings and words are different
 types of objects. Strings are covered in great detail later.
 
+\section{NOT DONE}
+
+Recall that code quotations are in fact just linked lists. Factor code is data, and vice versa. Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine. A word is itself a first-class object.
+
+It is the job of the parser to transform source code denoting literals and words into their internal representations. This is done using a vocabulary of \emph{parsing words}. The prettyprinter does the converse, by printing out data structures in a parsable form (both to humans and Factor). Because code is data, text representation of source code doubles as a way to serialize almost any Factor object.
+
+\subsection{The prettyprinter}
+
+We've already seen the word \texttt{.} which prints the top of the stack in a form that may be read back in. The word \texttt{prettyprint} is similar, except the output is in an indented, multiple-line format. Both words are in the \texttt{prettyprint} vocabulary. Here is an example:
+
+\begin{alltt}
+{[} 1 {[} 2 3 4 {]} 5 {]} .
+\emph{{[} 1 {[} 2 3 4 {]} 5 {]}}
+{[} 1 {[} 2 3 4 {]} 5 {]} prettyprint
+\emph{{[}
+    1 {[}
+        2 3 4
+    {]} 5
+{]}}
+\end{alltt}
+
+
+\subsection{Profiling}
 
 \section{PRACTICAL: Infix syntax}
 

@@ -1,5 +1,5 @@
 USE: test
-USE: cross-compiler
+USE: image
 USE: namespaces
 USE: stdio
 
