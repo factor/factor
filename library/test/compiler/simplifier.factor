@@ -3,6 +3,7 @@ USE: compiler
 USE: test
 USE: inference
 USE: lists
+USE: kernel
 
 [ [ ] ] [ [ ] simplify ] unit-test
 [ [ [ #return ] ] ] [ [ [ #return ] ] simplify ] unit-test
@@ -37,4 +38,21 @@ unit-test
         [ #label | 123 ]
         [ #return ]
     ] simplify car
+] unit-test
+
+[
+    t
+] [
+    [
+        [ #push-immediate | 1 ]
+    ] push-next? >boolean
+] unit-test
+
+[
+    [
+        [ #replace-immediate | 1 ]
+        [ #return ]
+    ]
+] [
+    [ drop 1 ] dataflow linearize simplify
 ] unit-test

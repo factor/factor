@@ -70,7 +70,7 @@ USE: vectors
     >r dup type r> dispatch ; inline
 
 : 2generic ( n n vtable -- )
-    >r 2dup arithmetic-type r> dispatch ; inline
+    >r arithmetic-type r> dispatch ; inline
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.

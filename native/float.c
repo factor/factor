@@ -74,8 +74,8 @@ void primitive_float_to_bits(void)
 #define GC_AND_POP_FLOATS(x,y) \
 	double x, y; \
 	maybe_garbage_collection(); \
-	y = to_float(dpop()); \
-	x = to_float(dpop());
+	y = untag_float_fast(dpop()); \
+	x = untag_float_fast(dpop());
 
 void primitive_float_eq(void)
 {
@@ -151,7 +151,10 @@ void primitive_fatan(void)
 
 void primitive_fatan2(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	double x, y;
+	maybe_garbage_collection();
+	y = to_float(dpop());
+	x = to_float(dpop());
 	dpush(tag_object(make_float(atan2(x,y))));
 }
 
@@ -181,7 +184,10 @@ void primitive_flog(void)
 
 void primitive_fpow(void)
 {
-	GC_AND_POP_FLOATS(x,y);
+	double x, y;
+	maybe_garbage_collection();
+	y = to_float(dpop());
+	x = to_float(dpop());
 	dpush(tag_object(make_float(pow(x,y))));
 }
 

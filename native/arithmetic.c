@@ -1,80 +1,95 @@
 #include "factor.h"
 
-CELL arithmetic_type(CELL obj1, CELL obj2)
+void primitive_arithmetic_type(void)
 {
+	CELL obj1 = dpeek();
+	CELL obj2 = get(ds - CELLS);
+
 	CELL type1 = type_of(obj1);
 	CELL type2 = type_of(obj2);
 
 	CELL type;
 
-	switch(type1)
+	switch(type2)
 	{
 	case FIXNUM_TYPE:
-		type = type2;
+		switch(type1)
+		{
+		case BIGNUM_TYPE:
+			put(ds - CELLS,tag_object(to_bignum(obj2)));
+			break;
+		case FLOAT_TYPE:
+			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
+			break;
+		}
+		type = type1;
 		break;
 	case BIGNUM_TYPE:
-		switch(type2)
+		switch(type1)
 		{
 		case FIXNUM_TYPE:
+			drepl(tag_object(to_bignum(obj1)));
+			type = type2;
+			break;
+		case FLOAT_TYPE:
+			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
 			type = type1;
 			break;
 		default:
-			type = type2;
+			type = type1;
 			break;
 		}
 		break;
 	case RATIO_TYPE:
-		switch(type2)
+		switch(type1)
 		{
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
+			type = type2;
+			break;
+		case FLOAT_TYPE:
+			put(ds - CELLS,tag_object(make_float(to_float((obj2)))));
 			type = type1;
 			break;
 		default:
-			type = type2;
+			type = type1;
 			break;
 		}
 		break;
 	case FLOAT_TYPE:
-		switch(type2)
+		switch(type1)
 		{
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
 		case RATIO_TYPE:
-			type = type1;
+			drepl(tag_object(make_float(to_float(obj1))));
+			type = type2;
 			break;
 		default:
-			type = type2;
+			type = type1;
 			break;
 		}
 		break;
 	case COMPLEX_TYPE:
-		switch(type2)
+		switch(type1)
 		{
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
 		case RATIO_TYPE:
 		case FLOAT_TYPE:
-			type = type1;
+			type = type2;
 			break;
 		default:
-			type = type2;
+			type = type1;
 			break;
 		}
 		break;
 	default:
-		type = type1;
+		type = type2;
 		break;
 	}
 
-	return type;
-}
-
-void primitive_arithmetic_type(void)
-{
-	CELL obj2 = dpop();
-	CELL obj1 = dpop();
-	dpush(tag_fixnum(arithmetic_type(obj1,obj2)));
+	dpush(tag_fixnum(type));
 }
 
 bool realp(CELL tagged)

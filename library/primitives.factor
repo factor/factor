@@ -73,7 +73,7 @@ USE: words
     [ sbuf-clone             " sbuf -- sbuf "                     [ 1 | 1 ] ]
     [ sbuf=                  " sbuf sbuf -- ? "                   [ 2 | 1 ] ]
     [ sbuf-hashcode          " sbuf -- n "                        [ 1 | 1 ] ]
-    [ arithmetic-type        " n n -- type "                      [ 2 | 1 ] ]
+    [ arithmetic-type        " n n -- type "                      [ 2 | 3 ] ]
     [ number?                " obj -- ? "                         [ 1 | 1 ] ]
     [ >fixnum                " n -- fixnum "                      [ 1 | 1 ] ]
     [ >bignum                " n -- bignum "                      [ 1 | 1 ] ]

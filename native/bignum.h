@@ -2,10 +2,15 @@ CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
 
+INLINE F_ARRAY* untag_bignum_fast(CELL tagged)
+{
+	return (F_ARRAY*)UNTAG(tagged);
+}
+
 INLINE F_ARRAY* untag_bignum(CELL tagged)
 {
 	type_check(BIGNUM_TYPE,tagged);
-	return (F_ARRAY*)UNTAG(tagged);
+	return untag_bignum_fast(tagged);
 }
 
 F_FIXNUM to_integer(CELL x);

@@ -44,6 +44,8 @@ USE: errors
 
 SYMBOL: #push-immediate
 SYMBOL: #push-indirect
+SYMBOL: #replace-immediate
+SYMBOL: #replace-indirect
 SYMBOL: #jump-t ( branch if top of stack is true )
 SYMBOL: #jump ( tail-call )
 SYMBOL: #jump-label ( tail-call )
@@ -166,17 +168,3 @@ SYMBOL: #target ( part of jump table )
 ] "linearizer" set-word-property
 
 #values [ drop ] "linearizer" set-word-property
-
-[
-    [ #drop drop ]
-    [ #dup  dup  ]
-    [ #swap swap ]
-    [ #over over ]
-    [ #pick pick ]
-    [ #>r   >r   ]
-    [ #r>   r>   ]
-] [
-    uncons
-    [ car #call swons , drop ] cons
-    "linearizer" set-word-property
-] each

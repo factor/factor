@@ -81,8 +81,8 @@ void primitive_bignum_eq(void)
 #define GC_AND_POP_BIGNUMS(x,y) \
 	F_ARRAY *x, *y; \
 	maybe_garbage_collection(); \
-	y = to_bignum(dpop()); \
-	x = to_bignum(dpop());
+	y = untag_bignum_fast(dpop()); \
+	x = untag_bignum_fast(dpop());
 
 void primitive_bignum_add(void)
 {

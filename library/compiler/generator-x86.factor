@@ -31,6 +31,7 @@ USE: inference
 USE: kernel
 USE: namespaces
 USE: words
+USE: lists
 
 : DS ( -- address ) "ds" dlsym-self ;
 
@@ -51,6 +52,19 @@ USE: words
 #push-indirect [
     DS ECX [I]>R
     4 ECX R+I
+    intern-literal EAX [I]>R
+    EAX ECX R>[R]
+    ECX DS R>[I]
+] "generator" set-word-property
+
+#replace-immediate [
+    DS ECX [I]>R
+    address  ECX I>[R]
+    ECX DS R>[I]
+] "generator" set-word-property
+
+#replace-indirect [
+    DS ECX [I]>R
     intern-literal EAX [I]>R
     EAX ECX R>[R]
     ECX DS R>[I]
@@ -122,3 +136,17 @@ USE: words
 #cleanup [
     dup 0 = [ drop ] [ ESP R+I ] ifte
 ] "generator" set-word-property
+
+[
+    [ #drop drop ]
+    [ #dup  dup  ]
+    [ #swap swap ]
+    [ #over over ]
+    [ #pick pick ]
+    [ #>r   >r   ]
+    [ #r>   r>   ]
+] [
+    uncons
+    [ car CALL compiled-offset defer-xt drop ] cons
+    "generator" set-word-property
+] each
