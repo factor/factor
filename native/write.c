@@ -56,9 +56,9 @@ void primitive_can_write(void)
 
 void primitive_add_write_io_task(void)
 {
-	PORT* port = untag_port(dpop());
 	CELL callback = dpop();
-	add_io_task(IO_TASK_WRITE,port,callback,
+	CELL port = dpop();
+	add_io_task(IO_TASK_WRITE,port,F,callback,
 		write_io_tasks,&write_fd_count);
 }
 
@@ -89,21 +89,26 @@ void write_char_8(PORT* port, FIXNUM ch)
 	port->buf_fill++;
 }
 
+/* Caller must ensure buffer is of the right size. */
+void write_string_raw(PORT* port, char* str, CELL len)
+{
+	/* Append string to buffer */
+	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
+		+ port->buf_fill),str,len);
+
+	port->buf_fill += len;
+}
+
 void write_string_8(PORT* port, STRING* str)
 {
 	char* c_str;
-
+	
 	/* Note this ensures the buffer is large enough to fit the string */
 	if(!can_write(port,str->capacity))
 		io_error(__FUNCTION__);
 
 	c_str = to_c_string(str);
-
-	/* Append string to buffer */
-	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
-		+ port->buf_fill),c_str,str->capacity);
-
-	port->buf_fill += str->capacity;
+	write_string_raw(port,c_str,str->capacity);
 }
 
 void primitive_write_8(void)
@@ -112,6 +117,7 @@ void primitive_write_8(void)
 
 	CELL text = dpop();
 	CELL type = type_of(text);
+	STRING* str;
 
 	pending_io_error(port);
 
@@ -122,7 +128,8 @@ void primitive_write_8(void)
 		write_char_8(port,to_fixnum(text));
 		break;
 	case STRING_TYPE:
-		write_string_8(port,untag_string(text));
+		str = untag_string(text);
+		write_string_8(port,str);
 		break;
 	default:
 		type_error(STRING_TYPE,text);

@@ -117,6 +117,7 @@ USE: stdio
     "/library/httpd/http-common.factor"
     "/library/httpd/responder.factor"
     "/library/httpd/httpd.factor"
+    "/library/httpd/file-responder.factor"
     "/library/httpd/inspect-responder.factor"
     "/library/httpd/test-responder.factor"
     "/library/httpd/quit-responder.factor"

@@ -28,18 +28,20 @@ void init_io(void)
 
 IO_TASK* add_io_task(
 	IO_TASK_TYPE type,
-	PORT* port,
+	CELL port,
+	CELL other_port,
 	CELL callback,
 	IO_TASK* io_tasks,
 	int* fd_count)
 {
-	int fd = port->fd;
+	int fd = untag_port(port)->fd;
 
 	if(io_tasks[fd].callbacks != F && type != IO_TASK_WRITE)
-		general_error(ERROR_IO_TASK_TWICE,tag_object(port));
+		general_error(ERROR_IO_TASK_TWICE,port);
 
 	io_tasks[fd].type = type;
-	io_tasks[fd].port = tag_object(port);
+	io_tasks[fd].port = port;
+	io_tasks[fd].other_port = other_port;
 	io_tasks[fd].callbacks = tag_cons(cons(callback,
 		io_tasks[fd].callbacks));
 
@@ -47,14 +49,6 @@ IO_TASK* add_io_task(
 		*fd_count = fd + 1;
 
 	return &io_tasks[fd];
-}
-
-void primitive_add_accept_io_task(void)
-{
-	PORT* port = untag_port(dpop());
-	CELL callback = dpop();
-	add_io_task(IO_TASK_ACCEPT,port,callback,
-		read_io_tasks,&read_fd_count);
 }
 
 void remove_io_task(
@@ -66,6 +60,7 @@ void remove_io_task(
 	int fd = port->fd;
 
 	io_tasks[fd].port = F;
+	io_tasks[fd].other_port = F;
 	io_tasks[fd].callbacks = F;
 
 	if(fd == *fd_count - 1)
@@ -77,6 +72,55 @@ void remove_io_tasks(PORT* port)
 	remove_io_task(IO_TASK_READ_LINE,port,
 		read_io_tasks,&read_fd_count);
 	remove_io_task(IO_TASK_WRITE,port,
+		write_io_tasks,&write_fd_count);
+}
+
+bool perform_copy_from_io_task(PORT* port, PORT* other_port)
+{
+	if(port->buf_fill == 0)
+	{
+		if(read_step(port))
+		{
+			/* EOF? */
+			if(port->buf_fill == 0)
+				return true;
+		}
+		else
+			return false;
+	}
+
+	if(can_write(other_port,port->buf_fill))
+	{
+		write_string_raw(other_port,
+			(char*)(port->buffer + 1),
+			port->buf_fill);
+		port->buf_pos = port->buf_fill = 0;
+	}
+
+	return false;
+}
+
+bool perform_copy_to_io_task(PORT* port, PORT* other_port)
+{
+	bool success = perform_write_io_task(port);
+	/* only return 'true' if the COPY_FROM task is done also. */
+	if(read_io_tasks[other_port->fd].port == F)
+		return success;
+	else
+		return false;
+}
+
+void primitive_add_copy_io_task(void)
+{
+	CELL callback = dpop();
+	CELL to = dpop();
+	CELL from = dpop();
+	/* callback for COPY_FROM is F since we only care about
+	when BOTH tasks are done, and this is taken care of by
+	COPY_TO. */
+	add_io_task(IO_TASK_COPY_FROM,from,to,F,
+		read_io_tasks,&read_fd_count);
+	add_io_task(IO_TASK_COPY_TO,to,from,callback,
 		write_io_tasks,&write_fd_count);
 }
 
@@ -133,6 +177,14 @@ CELL perform_io_task(IO_TASK* io_task, IO_TASK* io_tasks, int* fd_count)
 		break;
 	case IO_TASK_ACCEPT:
 		success = accept_connection(port);
+		break;
+	case IO_TASK_COPY_FROM:
+		success = perform_copy_from_io_task(port,
+			untag_port(io_task->other_port));
+		break;
+	case IO_TASK_COPY_TO:
+		success = perform_copy_to_io_task(port,
+			untag_port(io_task->other_port));
 		break;
 	default:
 		critical_error("Bad I/O task",io_task->type);

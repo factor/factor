@@ -1,4 +1,5 @@
 IN: scratchpad
+USE: file-responder
 USE: httpd
 USE: httpd-responder
 USE: logging
@@ -66,3 +67,24 @@ USE: url-encoding
 [ [ [ "Foo" | "Bar" ] ] ] [ "Foo=Bar" post-request>alist ] unit-test
 [ [ [ "Foo" | "Bar" ] [ "Baz" | "Quux" ] ] ]
 [ "Foo=Bar&Baz=Quux" post-request>alist ] unit-test
+
+[ f "/foo/hello.html" ] [
+    [
+        "/foo/" "doc-root" set
+        "hello.html" parse-object-name
+    ] with-scope
+] unit-test
+
+[ "some-arg" "/foo/hello.html" ] [
+    [
+        "/foo/" "doc-root" set
+        "hello.html?some-arg" parse-object-name
+    ] with-scope
+] unit-test
+
+[ f "/foo/" ] [
+    [
+        "/foo" "doc-root" set
+        f parse-object-name
+    ] with-scope
+] unit-test

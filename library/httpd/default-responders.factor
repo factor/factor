@@ -53,12 +53,12 @@ USE: wiki-responder
             "quit" "responder" set
             [ quit-responder ] "get" set
         ] extend "quit" set
-!
-!        <responder> [
-!            "file" "responder" set
-!            [ file-responder ] "get" set
-!        ] extend "file" set
-!
+ 
+         <responder> [
+             "file" "responder" set
+             [ file-responder ] "get" set
+         ] extend "file" set
+ 
 !        <responder> [
 !            "wiki" "responder" set
 !            [ wiki-get-responder ] "get" set

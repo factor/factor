@@ -37,7 +37,8 @@ USE: stack
 USE: strings
 
 : fcopy ( from to -- )
-    ! Copy the contents of the byte-stream 'from' to the byte-stream 'to'.
+    #! Copy the contents of the byte-stream 'from' to the
+    #! byte-stream 'to'.
     [ [ "in" get ] bind ] dip
     [ "out" get ] bind
     [ "java.io.InputStream" "java.io.OutputStream" ]

@@ -2,7 +2,7 @@
 
 /* Stop-and-copy garbage collection using Cheney's algorithm. */
 
-/* #define GC_DEBUG /* */
+/* #define GC_DEBUG */
 
 INLINE void gc_debug(char* msg, CELL x) {
 #ifdef GC_DEBUG

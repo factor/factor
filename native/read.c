@@ -107,12 +107,12 @@ void primitive_can_read_line(void)
 
 void primitive_add_read_line_io_task(void)
 {
-	PORT* port = untag_port(dpop());
 	CELL callback = dpop();
-	add_io_task(IO_TASK_READ_LINE,port,callback,
+	CELL port = dpop();
+	add_io_task(IO_TASK_READ_LINE,port,F,callback,
 		read_io_tasks,&read_fd_count);
 
-	init_line_buffer(port,LINE_SIZE);
+	init_line_buffer(untag_port(port),LINE_SIZE);
 }
 
 bool perform_read_line_io_task(PORT* port)
@@ -206,10 +206,11 @@ void primitive_can_read_count(void)
 
 void primitive_add_read_count_io_task(void)
 {
+	CELL callback = dpop();
 	PORT* port = untag_port(dpop());
 	FIXNUM count = to_fixnum(dpop());
-	CELL callback = dpop();
-	add_io_task(IO_TASK_READ_COUNT,port,callback,
+	add_io_task(IO_TASK_READ_COUNT,
+		tag_object(port),F,callback,
 		read_io_tasks,&read_fd_count);
 
 	port->count = count;

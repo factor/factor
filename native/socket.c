@@ -94,6 +94,14 @@ void primitive_server_socket(void)
 	dpush(tag_object(port(PORT_SPECIAL,make_server_socket(p))));
 }
 
+void primitive_add_accept_io_task(void)
+{
+	CELL callback = dpop();
+	CELL port = dpop();
+	add_io_task(IO_TASK_ACCEPT,port,F,callback,
+		read_io_tasks,&read_fd_count);
+}
+
 CELL accept_connection(PORT* p)
 {
 	struct sockaddr_in clientname;

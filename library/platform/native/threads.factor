@@ -57,15 +57,15 @@ USE: stack
     #! If there is a quotation in the run queue, call it,
     #! otherwise wait for I/O. The currently executing
     #! continuation is suspended. Use yield instead.
-    next-thread dup [
+    next-thread [
         call
     ] [
-        drop next-io-task dup [
+        next-io-task [
             call
         ] [
-            drop (yield)
-        ] ifte
-    ] ifte ;
+            (yield)
+        ] ifte*
+    ] ifte* ;
 
 : yield ( -- )
     #! Add the current continuation to the run queue, and yield

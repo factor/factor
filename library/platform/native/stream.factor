@@ -56,12 +56,12 @@ USE: namespaces
         ] "fread#" set
         
         ( -- )
-        [ "out" get [ flush-fd ] when* ] "fflush" set
+        [ "out" get [ blocking-flush ] when* ] "fflush" set
         
         ( -- )
         [
-            "out" get [ dup flush-fd close-fd ] when*
-            "in" get [ close-fd ] when*
+            "out" get [ dup blocking-flush close-port ] when*
+            "in" get [ close-port ] when*
         ] "fclose" set
     ] extend ;
 
@@ -83,3 +83,8 @@ USE: namespaces
 : exists? ( file -- ? )
     #! This is terrible.
     [ <filebr> fclose t ] [ nip not ] catch ;
+
+: fcopy ( from to -- )
+    #! Copy the contents of the fd-stream 'from' to the
+    #! fd-stream 'to'.
+    "out" swap get* >r "in" swap get* r> blocking-copy ;

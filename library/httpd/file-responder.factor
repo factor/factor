@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -27,82 +27,45 @@
 
 IN: file-responder
 USE: combinators
-USE: html
+USE: errors
 USE: kernel
-USE: lists
 USE: files
+USE: httpd
+USE: httpd-responder
 USE: namespaces
 USE: parser
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
 
-USE: httpd
-USE: httpd-responder
-
-!!! Serving files.
-: file-header ( filename -- header )
-    "200 Document follows" swap mime-type response ;
-
-: serve-file ( filename -- )
-    dup file-header print <filebr> "stdio" get fcopy ;
-
-!!! Serving directories.
-: file>html ( filename -- ... )
-    "<li><a href=\"" swap
-    ! dup directory? [ "/" cat2 ] when
-    chars>entities
-    "\">" over "</a></li>" ;
-
-: directory>html ( directory -- html )
-    directory [ file>html ] map cat ;
-
-: list-directory ( directory -- )
-    serving-html
-    [
-        "<html><head><title>" swap
-        "</title></head><body><h1>" over
-        "</h1><ul>" over
-        directory>html
-        "</ul></body></html>"
-    ] cons expand cat write ;
-
-: serve-directory ( directory -- )
-    dup "/index.html" cat2 dup exists? [
-        nip serve-file
-    ] [
-        drop list-directory
-    ] ifte ;
-
-!!! Serving objects.
-: serve-static ( filename -- )
-    dup directory? [
-        serve-directory
-    ] [
-        serve-file
-    ] ifte ;
+: parse-object-name ( filename -- argument filename )
+    dup [ "?" split1 swap ] [ "/" ] ifte
+    "doc-root" get swap cat2 ;
 
 : serve-script ( argument filename -- )
     [ swap "argument" set run-file ] with-scope ;
 
-: parse-object-name ( filename -- argument filename )
-    dup [
-        dup "(.*?)\\?(.*)" groups dup [ nip call ] when swap
+: file-header ( mime-type -- header )
+    "200 Document follows" swap response ;
+
+: copy-and-close ( from -- )
+    [ dupd "stdio" get fcopy ] [ >r fclose r> rethrow ] catch ;
+
+: serve-static ( argument filename mime-type -- )
+    file-header print <filebr> "stdio" get fcopy drop ;
+
+: serve-file ( argument filename -- )
+    dup mime-type dup "application/x-factor-server-page" = [
+        drop serve-script
     ] [
-        drop f "/"
+        serve-static
     ] ifte ;
 
 : file-responder ( filename -- )
     "doc-root" get [
-        parse-object-name "doc-root" get swap cat2
-        dup exists? [
-            dup file-extension "lhtml" = [
-                serve-script
-            ] [
-                nip serve-static
-            ] ifte
+        parse-object-name dup exists? [
+            serve-file
         ] [
             2drop "404 not found" httpd-error
         ] ifte

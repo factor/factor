@@ -62,7 +62,7 @@ DEFER: port?
 DEFER: open-file
 DEFER: client-socket
 DEFER: server-socket
-DEFER: close-fd
+DEFER: close-port
 DEFER: add-accept-io-task
 DEFER: accept-fd
 DEFER: can-read-line?
@@ -74,6 +74,7 @@ DEFER: read-count-fd-8
 DEFER: can-write?
 DEFER: add-write-io-task
 DEFER: write-fd-8
+DEFER: add-copy-io-task
 DEFER: next-io-task
 
 IN: math
@@ -222,7 +223,7 @@ IN: cross-compiler
         exit*
         client-socket
         server-socket
-        close-fd
+        close-port
         add-accept-io-task
         accept-fd
         can-read-line?
@@ -234,6 +235,7 @@ IN: cross-compiler
         can-write?
         add-write-io-task
         write-fd-8
+        add-copy-io-task
         next-io-task
         room
         os-env

@@ -45,19 +45,20 @@ USE: strings
     file-extension mime-types assoc [ "text/plain" ] unless* ;
 
 [
-    [ "html"   | "text/html"                ]
-    [ "txt"    | "text/plain"               ]
-                                           
-    [ "gif"    | "image/gif"                ]
-    [ "png"    | "image/png"                ]
-    [ "jpg"    | "image/jpeg"               ]
-    [ "jpeg"   | "image/jpeg"               ]
-               
-    [ "jar"    | "application/octet-stream" ]
-    [ "zip"    | "application/octet-stream" ]
-    [ "tgz"    | "application/octet-stream" ]
-    [ "tar.gz" | "application/octet-stream" ]
-    [ "gz"     | "application/octet-stream" ]
-      
-    [ "factor" | "application/x-factor"     ]
+    [ "html"   | "text/html"                        ]
+    [ "txt"    | "text/plain"                       ]
+                                                    
+    [ "gif"    | "image/gif"                        ]
+    [ "png"    | "image/png"                        ]
+    [ "jpg"    | "image/jpeg"                       ]
+    [ "jpeg"   | "image/jpeg"                       ]
+                                                    
+    [ "jar"    | "application/octet-stream"         ]
+    [ "zip"    | "application/octet-stream"         ]
+    [ "tgz"    | "application/octet-stream"         ]
+    [ "tar.gz" | "application/octet-stream"         ]
+    [ "gz"     | "application/octet-stream"         ]
+                                                    
+    [ "factor" | "application/x-factor"             ]
+    [ "factsp" | "application/x-factor-server-page" ]
 ] set-mime-types

@@ -46,7 +46,7 @@ USE: unparser
         "socket" set
 
         ( -- )
-        [ "socket" get close-fd ] "fclose" set
+        [ "socket" get close-port ] "fclose" set
     ] extend ;
 
 : <client-stream> ( host port in out -- stream )

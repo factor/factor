@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Os -mpentiumpro -Wall -fomit-frame-pointer
+CFLAGS = -g -Os -mpentiumpro -Wall
 LIBS = -lm
 STRIP = strip
 
