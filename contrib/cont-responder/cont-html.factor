@@ -274,5 +274,5 @@ USE: logic
 ! Define some attributes
 [ 
   "method" "action" "type" "value" "name" 
-  "size" "href" "class" "border"
+  "size" "href" "class" "border" "rows" "cols"
 ] [ define-attribute-word ] each 
