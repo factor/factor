@@ -100,7 +100,6 @@ USE: unparser
         "math/float"
         "math/complex"
         "math/irrational"
-        "math/namespaces"
         "httpd/url-encoding"
         "httpd/html"
         "httpd/httpd"

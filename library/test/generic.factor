@@ -90,3 +90,13 @@ M: f bool>str drop "false" ;
 
 [ t ] [ t bool>str str>bool ] unit-test
 [ f ] [ f bool>str str>bool ] unit-test
+
+PREDICATE: cons nonempty-list list? ;
+
+GENERIC: funny-length
+M: cons funny-length drop 0 ;
+M: nonempty-list funny-length length ;
+
+[ 0 ] [ [ 1 2 | 3 ] funny-length ] unit-test
+[ 3 ] [ [ 1 2 3 ] funny-length ] unit-test
+[ "hello" funny-length ] unit-test-fails

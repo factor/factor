@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: hashtables
+USE: generic
 USE: kernel
 USE: lists
 USE: math
@@ -35,8 +36,8 @@ USE: vectors
 ! for the lifetime of the hashtable, otherwise problems will
 ! occur. Do not use vector words with hashtables.
 
-: hashtable? ( obj -- ? )
-    dup vector? [ [ assoc? ] vector-all? ] [ drop f ] ifte ;
+PREDICATE: vector hashtable ( obj -- ? )
+    [ assoc? ] vector-all? ;
 
 : <hashtable> ( buckets -- )
     #! A hashtable is implemented as an array of buckets. The

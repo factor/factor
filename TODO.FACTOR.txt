@@ -35,8 +35,7 @@
 
 + listener/plugin:
 
-- unterminated ; -- NPE
-- no USE:'s wrong place
+- sidekick: still parsing too much
 - errors don't always disappear
 - console: wrong history
 - listener: if too many things popped off the stack, complain

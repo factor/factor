@@ -55,3 +55,12 @@ word word-name "last-word-test" set
 [ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test
 
 [ f ] [ gensym gensym = ] unit-test
+
+[ f ] [ 123 compound? ] unit-test
+
+: colon-def ;
+[ t ] [ \ colon-def compound? ] unit-test
+
+SYMBOL: a-symbol
+[ f ] [ \ a-symbol compound? ] unit-test
+[ t ] [ \ a-symbol symbol? ] unit-test

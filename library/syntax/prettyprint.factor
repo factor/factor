@@ -28,6 +28,7 @@
 IN: prettyprint
 USE: errors
 USE: format
+USE: generic
 USE: kernel
 USE: lists
 USE: math
@@ -39,6 +40,11 @@ USE: unparser
 USE: vectors
 USE: words
 USE: hashtables
+
+GENERIC: prettyprint* ( indent obj -- indent )
+
+M: object prettyprint* ( indent obj -- indent )
+    unparse write ;
 
 : tab-size
     #! Change this to suit your tastes.
@@ -58,11 +64,12 @@ USE: hashtables
 : prettyprint-space ( -- )
     " " write ;
 
-! Real definition follows
-DEFER: prettyprint*
-
 : prettyprint-element ( indent obj -- indent )
-    prettyprint* prettyprint-space ;
+    over prettyprint-limit >= [
+        unparse write
+    ] [
+        prettyprint*
+    ] ifte prettyprint-space ;
 
 : <prettyprint ( indent -- indent )
     tab-size +
@@ -107,16 +114,16 @@ DEFER: prettyprint*
         drop [ ]
     ] ifte ;
 
-: prettyprint-word ( word -- )
+M: word prettyprint* ( indent word -- indent )
     dup word-name
     swap dup word-attrs swap word-style append
     write-attr ;
 
 : prettyprint-[ ( indent -- indent )
-    \ [ prettyprint-word <prettyprint ;
+    \ [ prettyprint* <prettyprint ;
 
 : prettyprint-] ( indent -- indent )
-    prettyprint> \ ] prettyprint-word ;
+    prettyprint> \ ] prettyprint* ;
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
@@ -126,70 +133,56 @@ DEFER: prettyprint*
             prettyprint-list
         ] [
             [
-                \ | prettyprint-word
+                \ | prettyprint*
                 prettyprint-space prettyprint-element
             ] when*
         ] ifte
     ] when* ;
 
-: prettyprint-[] ( indent list -- indent )
+M: cons prettyprint* ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
 
 : prettyprint-{ ( indent -- indent )
-    \ { prettyprint-word <prettyprint ;
+    \ { prettyprint* <prettyprint ;
 
 : prettyprint-} ( indent -- indent )
-    prettyprint> \ } prettyprint-word ;
+    prettyprint> \ } prettyprint* ;
 
 : prettyprint-vector ( indent list -- indent )
     #! Pretty-print a vector, without { and }.
     [ prettyprint-element ] vector-each ;
 
-: prettyprint-{} ( indent vector -- indent )
+M: vector prettyprint* ( indent vector -- indent )
     dup vector-length 0 = [
         drop
-        \ { prettyprint-word
+        \ { prettyprint*
         prettyprint-space
-        \ } prettyprint-word
+        \ } prettyprint*
     ] [
         swap prettyprint-{ swap prettyprint-vector prettyprint-}
     ] ifte ;
 
 : prettyprint-{{ ( indent -- indent )
-    \ {{ prettyprint-word <prettyprint ;
+    \ {{ prettyprint* <prettyprint ;
 
 : prettyprint-}} ( indent -- indent )
-    prettyprint> \ }} prettyprint-word ;
+    prettyprint> \ }} prettyprint* ;
 
-: prettyprint-{{}} ( indent hashtable -- indent )
+M: hashtable prettyprint* ( indent hashtable -- indent )
     hash>alist dup length 0 = [
         drop
-        \ {{ prettyprint-word
+        \ {{ prettyprint*
         prettyprint-space 
-        \ }} prettyprint-word
+        \ }} prettyprint*
     ] [
         swap prettyprint-{{ swap prettyprint-list prettyprint-}}
     ] ifte ;
 
-: prettyprint-object ( indent obj -- indent )
-    unparse write ;
-
-: prettyprint* ( indent obj -- indent )
-    over prettyprint-limit >= [
-        prettyprint-object
-    ] [
-        [
-            [ f =        ] [ prettyprint-object ]
-            [ cons?      ] [ prettyprint-[] ]
-            [ hashtable? ] [ prettyprint-{{}} ]
-            [ vector?    ] [ prettyprint-{} ]
-            [ word?      ] [ prettyprint-word ]
-            [ drop t     ] [ prettyprint-object ]
-        ] cond
-    ] ifte ;
+: prettyprint-1 ( obj -- )
+    0 swap prettyprint* drop ;
 
 : prettyprint ( obj -- )
-    0 swap prettyprint* drop terpri ;
+    prettyprint-1 terpri ;
 
 : vocab-link ( vocab -- link )
     "vocabularies'" swap cat2 ;

@@ -6,6 +6,9 @@ USE: namespaces
 USE: strings
 USE: test
 
+[ f ] [ "a" "b" "c" =? ] unit-test
+[ "c" ] [ "a" "a" "c" =? ] unit-test
+
 [ f ] [ "A string." f-or-"" ] unit-test
 [ t ] [ "" f-or-"" ] unit-test
 [ t ] [ f f-or-"" ] unit-test

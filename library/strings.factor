@@ -91,7 +91,7 @@ USE: math
 
 : =? ( x y z -- z/f )
     #! Push z if x = y, otherwise f.
-    -rot = [ drop f ] unless ;
+    >r = r> f ? ;
 
 : str-head? ( str begin -- str )
     #! If the string starts with begin, return the rest of the

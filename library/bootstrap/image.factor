@@ -40,6 +40,7 @@
 
 IN: image
 USE: errors
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
@@ -128,6 +129,9 @@ SYMBOL: boot-quot
 : heap-size-offset 5 ;
 : header-size      6 ;
 
+GENERIC: ' ( obj -- ptr )
+#! Write an object to the image.
+
 ( Allocator )
 
 : here ( -- size ) 
@@ -149,11 +153,11 @@ SYMBOL: boot-quot
 
 ( Fixnums )
 
-: emit-fixnum ( n -- tagged ) fixnum-tag immediate ;
+M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: emit-bignum ( bignum -- tagged )
+M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     object-tag here-as >r
     bignum-type >header emit
@@ -170,11 +174,16 @@ SYMBOL: boot-quot
 : t,
     object-tag here-as "t" set
     t-type >header emit
-    0 emit-fixnum emit ;
+    0 ' emit ;
 
-:  0,  0 emit-bignum drop ;
-:  1,  1 emit-bignum drop ;
-: -1, -1 emit-bignum drop ;
+M: t ' ( obj -- ptr ) drop "t" get ;
+M: f ' ( obj -- ptr )
+    #! f is #define F RETAG(0,OBJECT_TYPE)
+    drop object-tag ;
+
+:  0,  0 >bignum ' drop ;
+:  1,  1 >bignum ' drop ;
+: -1, -1 >bignum ' drop ;
 
 ( Beginning of the image )
 ! The image proper begins with the header, then T,
@@ -209,14 +218,12 @@ SYMBOL: boot-quot
         dup word? [ fixup-word ] when
     ] vector-map image set ;
 
-: emit-word ( word -- pointer )
+M: word ' ( word -- pointer )
     dup pooled-object dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
-DEFER: '
-
-: emit-cons ( c -- tagged )
+M: cons ' ( c -- tagged )
     uncons ' swap '
     cons-tag here-as
     -rot emit emit ;
@@ -239,7 +246,7 @@ DEFER: '
 : pack-string ( string -- )
     char tuck swap split-n (pack-string) ;
 
-: (emit-string) ( string -- )
+: emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
@@ -247,13 +254,13 @@ DEFER: '
     pack-string
     pad ;
 
-: emit-string ( string -- pointer )
+M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
     dup pooled-object dup [
         nip
     ] [
-        drop dup (emit-string) dup >r pool-object r>
+        drop dup emit-string dup >r pool-object r>
     ] ifte ;
 
 ( Word definitions )
@@ -300,29 +307,13 @@ DEFER: '
     ( elements -- ) [ emit ] each
     pad r> ;
 
-: emit-vector ( vector -- pointer )
+M: vector ' ( vector -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
     emit ( length )
     emit ( array ptr )
     pad r> ;
-
-( Cross-compile a reference to an object )
-
-: ' ( obj -- pointer )
-    [
-        [ fixnum?  ] [ emit-fixnum      ]
-        [ bignum?  ] [ emit-bignum      ]
-        [ word?    ] [ emit-word        ]
-        [ cons?    ] [ emit-cons        ]
-        [ string?  ] [ emit-string      ]
-        [ vector?  ] [ emit-vector      ]
-        [ t =      ] [ drop "t" get     ]
-        ! f is #define F RETAG(0,OBJECT_TYPE)
-        [ f =      ] [ drop object-tag  ]
-        [ drop t   ] [ "Cannot cross-compile: " swap cat2 throw ]
-    ] cond ;
 
 ( End of the image )
 

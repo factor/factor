@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
+USE: generic
 USE: hashtables
 USE: kernel
 USE: lists
@@ -41,13 +42,10 @@ USE: strings
     pick [ set-assoc ] [ remove-assoc nip ] ifte
     swap set-word-plist ;
 
-: ?word-primitive ( obj -- prim/0 )
-    dup word? [ word-primitive ] [ drop -1 ] ifte ;
-
-: compound?  ( obj -- ? ) ?word-primitive 1 = ;
-: primitive? ( obj -- ? ) ?word-primitive 2 > ;
-: symbol?    ( obj -- ? ) ?word-primitive 2 = ;
-: undefined? ( obj -- ? ) ?word-primitive 0 = ;
+PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
+PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
+PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
+PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;

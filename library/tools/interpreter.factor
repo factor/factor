@@ -187,14 +187,14 @@ SYMBOL: meta-cf
 
 : walk-banner ( -- )
     "The following words control the single-stepper:" print
-    [ &s &r &n &c ] [ prettyprint-word " " write ] each
+    [ &s &r &n &c ] [ prettyprint-1 " " write ] each
     "show stepper stacks." print
-    \ &get prettyprint-word
+    \ &get prettyprint-1
     " ( var -- value ) inspects the stepper namestack." print
-    \ step prettyprint-word " -- single step" print
-    \ (trace) prettyprint-word " -- trace until end" print
-    \ (run) prettyprint-word " -- run until end" print
-    \ exit prettyprint-word " -- exit single-stepper" print ;
+    \ step prettyprint-1 " -- single step" print
+    \ (trace) prettyprint-1 " -- trace until end" print
+    \ (run) prettyprint-1 " -- run until end" print
+    \ exit prettyprint-1 " -- exit single-stepper" print ;
 
 : walk ( quot -- )
     #! Single-step through execution of a quotation.

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: prettyprint
+USE: generic
 USE: kernel
 USE: lists
 USE: math
@@ -43,20 +44,20 @@ USE: words
     dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( indent word -- )
-    \ IN: prettyprint-word prettyprint-space
+    \ IN: prettyprint* prettyprint-space
     word-vocabulary prettyprint-vocab prettyprint-newline ;
 
 : prettyprint-: ( indent -- indent )
-    \ : prettyprint-word prettyprint-space
+    \ : prettyprint* prettyprint-space
     tab-size + ;
 
 : prettyprint-; ( indent -- indent )
-    \ ; prettyprint-word
+    \ ; prettyprint*
     tab-size - ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-property [
-        prettyprint-space prettyprint-word
+        prettyprint-space prettyprint-1
     ] [
         drop
     ] ifte ;
@@ -88,29 +89,25 @@ USE: words
         stack-effect. dup prettyprint-newline
     ] keep documentation. ;
 
-: see-compound ( word -- )
+GENERIC: see ( word -- )
+
+M: object see ( obj -- )
+    "Not a word: " write . ;
+
+M: compound see ( word -- )
     0 swap
     [ dupd prettyprint-IN: prettyprint-: ] keep
-    [ prettyprint-word ] keep
+    [ prettyprint-1 ] keep
     [ prettyprint-docs ] keep
     [ word-parameter prettyprint-list prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
 
-: see-primitive ( word -- )
+M: primitive see ( word -- )
     "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
 
-: see-symbol ( word -- )
-    \ SYMBOL: prettyprint-word prettyprint-space . ;
+M: symbol see ( word -- )
+    0 over prettyprint-IN:
+    \ SYMBOL: prettyprint-1 prettyprint-space . ;
 
-: see-undefined ( word -- )
+M: undefined see ( word -- )
     drop "Not defined" print ;
-
-: see ( name -- )
-    #! Show a word definition.
-    [
-        [ compound? ] [ see-compound ]
-        [ symbol? ] [ see-symbol ]
-        [ primitive? ] [ see-primitive ]
-        [ word? ] [ see-undefined ]
-        [ drop t ] [ "Not a word: " write . ]
-    ] cond ;
