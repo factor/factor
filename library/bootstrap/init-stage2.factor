@@ -58,7 +58,8 @@ USE: unparser
     ! -no-<flag> CLI switch
     t "user-init" set
     t "interactive" set
-    t "ansi" set
+    ! We don't want ANSI escape codes on Windows
+    os "unix" = "ansi" set
     t "compile" set
 
     ! The first CLI arg is the image name.

@@ -42,6 +42,10 @@ USE: vectors
     #! Returns one of "x86" or "unknown".
     7 getenv ;
 
+: os ( -- arch )
+    #! Returns one of "unix" or "win32".
+    11 getenv ;
+
 ! The 'fake vtable' used here speeds things up a lot.
 ! It is quite clumsy, however. A higher-level CLOS-style
 ! 'generic words' system will be built later.

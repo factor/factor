@@ -28,10 +28,6 @@ DEFER: plist-test
     \ plist-test "sample-property" word-property
 ] unit-test
 
-: test-last ( -- ) ;
-word word-name "last-word-test" set
-
-[ "test-last" ] [ ] [ "last-word-test" get ] test-word
 [ f ] [ 5 ] [ compound? ] test-word
 
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-property
@@ -64,3 +60,8 @@ word word-name "last-word-test" set
 SYMBOL: a-symbol
 [ f ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
+
+: test-last ( -- ) ;
+word word-name "last-word-test" set
+
+[ "test-last" ] [ ] [ "last-word-test" get ] test-word

@@ -100,7 +100,10 @@ global [
     "Code space: " write (room.) ;
 
 : print-banner ( -- )
-    "Factor " write version print
+    "Factor " write version write
+    " (OS: " write os write
+    " CPU: " write cpu write
+    ")" print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Copyright (C) 2004 Chris Double" print
     "Copyright (C) 2004 Mackenzie Straight" print

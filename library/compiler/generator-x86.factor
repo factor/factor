@@ -37,26 +37,50 @@ USE: strings
 USE: words
 USE: vectors
 
+: DS ( -- address ) "ds" dlsym-self ;
+
 : PUSH-DS ( -- )
     #! Push contents of EAX onto datastack.
-    4 ESI R+I
-    EAX ESI R>[R] ;
+    DS ECX [I]>R
+    4 ECX R+I
+    EAX ECX R>[R]
+    ECX DS R>[I] ;
 
 : POP-DS ( -- )
-    #! Pop datastack, store pointer to datastack top in EAX.
-    ESI EAX [R]>R
-    4 ESI R-I ;
+    #! Pop datastack to EAX.
+    DS ECX [I]>R
+    ECX EAX [R]>R
+    4 ECX R-I
+    ECX DS R>[I] ;
+
+: PEEK-DS ( -- )
+    #! Peek datastack to EAX.
+    DS ECX [I]>R
+    ECX EAX [R]>R ;
+
+: PEEK-2-DS ( -- )
+    #! Peek second value on datastack to EAX.
+    DS ECX [I]>R
+    4 ECX R-I
+    ECX EAX [R]>R ;
 
 : SELF-CALL ( name -- )
     #! Call named C function in Factor interpreter executable.
     dlsym-self CALL JUMP-FIXUP ;
 
 #push-immediate [
-    address  4 ESI R+I  ESI I>[R]
+    DS ECX [I]>R
+    4 ECX R+I
+    address  ECX I>[R]
+    ECX DS R>[I]
 ] "generator" set-word-property
 
 #push-indirect [
-    intern-literal 4 ESI R+I  EAX [I]>R  EAX ESI R>[R]
+    DS ECX [I]>R
+    4 ECX R+I
+    intern-literal EAX [I]>R
+    EAX ECX R>[R]
+    ECX DS R>[I]
 ] "generator" set-word-property
 
 #call [
@@ -86,20 +110,19 @@ USE: vectors
 
 #return [ drop RET ] "generator" set-word-property
 
-#drop [ drop  4 ESI R-I ] "generator" set-word-property
-#dup [
-    drop
-    ESI EAX [R]>R
-    4 ESI R+I
-    EAX ESI R>[R]
-] "generator" set-word-property
-
-! This is crap
-#swap [ drop \ swap CALL compiled-offset defer-xt ] "generator" set-word-property
-#over [ drop \ over CALL compiled-offset defer-xt ] "generator" set-word-property
-#pick [ drop \ pick CALL compiled-offset defer-xt ] "generator" set-word-property
-#>r [ drop \ >r CALL compiled-offset defer-xt ] "generator" set-word-property
-#r> [ drop \ r> CALL compiled-offset defer-xt ] "generator" set-word-property
+[
+    [ #drop drop ]
+    [ #dup  dup  ]
+    [ #swap swap ]
+    [ #over over ]
+    [ #pick pick ]
+    [ #>r   >r   ]
+    [ #r>   r>   ]
+] [
+    uncons [
+        car CALL compiled-offset defer-xt drop
+    ] cons "generator" set-word-property
+] each
 
 : begin-jump-table ( -- )
     #! Compile a piece of code that jumps to an offset in a
@@ -130,7 +153,8 @@ USE: vectors
 
 : TYPE ( -- )
     #! Peek datastack, store type # in EAX.
-    ESI PUSH-[R]
+    PEEK-DS
+    EAX PUSH-R
     "type_of" SELF-CALL
     4 ESP R+I ;
 
@@ -144,10 +168,10 @@ USE: vectors
 
 : ARITHMETIC-TYPE ( -- )
     #! Peek top two on datastack, store arithmetic type # in EAX.
-    ESI EAX R>R
-    EAX PUSH-[R]
-    4 EAX R-I
-    EAX PUSH-[R]
+    PEEK-DS
+    EAX PUSH-R
+    PEEK-2-DS
+    EAX PUSH-R
     "arithmetic_type" SELF-CALL
     8 ESP R+I ;
 

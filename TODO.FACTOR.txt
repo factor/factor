@@ -25,6 +25,15 @@
 - save code in image
 - compile word twice; no more 'cannot compile' error!
 
++ oop:
+
+- union metaclass
+- make M: order-independent
+- bootstrapping generic words
+- 2generic
+- move generic, 2generic from kernel vocabulary
+- generic = hashcode and math ops
+
 + ffi:
 
 - is signed -vs- unsigned pointers an issue?
@@ -66,7 +75,6 @@
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup
 - nicer way to combine two paths
-- finish OOP
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for
   objects

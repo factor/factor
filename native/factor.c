@@ -17,6 +17,12 @@ void init_factor(char* image)
 #else
 	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
 #endif
+
+#ifdef WIN32
+	userenv[OS_ENV] = tag_object(from_c_string("win32"));
+#else
+	userenv[OS_ENV] = tag_object(from_c_string("unix"));
+#endif
 }
 
 int main(int argc, char** argv)
