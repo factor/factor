@@ -46,18 +46,6 @@ SYMBOL: traits
     #! definitions.
     "traits-map" word-property ;
 
-traits [
-    ( class generic quotation )
-    
-    swap rot traits-map set-hash
-] "define-method" set-word-property
-
-traits [
-    \ vector "builtin-type" word-property unique,
-] "builtin-supertypes" set-word-property
-
-traits 10 "priority" set-word-property
-
 ! Hashtable slot holding an optional delegate. Any undefined
 ! methods are called on the delegate. The object can also
 ! manually pass any methods on to the delegate.
@@ -67,9 +55,6 @@ SYMBOL: delegate
     #! Get the method map for an object.
     #! We will use hashtable? here when its a first-class type.
     dup vector? [ traits swap hash ] [ drop f ] ifte ;
-
-: init-traits-map ( word -- )
-    <namespace> "traits-map" set-word-property ;
 
 : traits-dispatch ( selector traits -- traits quot )
     #! Look up the method with the traits object on the stack.
@@ -84,6 +69,31 @@ SYMBOL: delegate
             drop [ undefined-method ] ( no delegate )
         ] ifte
     ] ifte ;
+
+: add-traits-dispatch ( word vtable -- )
+    >r unit [ car swap traits-dispatch call ] cons \ vector r>
+    set-vtable ;
+
+traits [
+    ( generic vtable definition class -- )
+    2drop add-traits-dispatch
+] "add-method" set-word-property
+
+traits [
+    ( class generic quotation )
+    3dup -rot (define-method)
+    over dup word-parameter car add-traits-dispatch
+    swap rot traits-map set-hash
+] "define-method" set-word-property
+
+traits [
+    drop vector "builtin-type" word-property unit
+] "builtin-supertypes" set-word-property
+
+traits 10 "priority" set-word-property
+
+: init-traits-map ( word -- )
+    <namespace> "traits-map" set-word-property ;
 
 : traits-predicate ( word -- )
     #! foo? where foo is a traits type tests if the top of stack
@@ -100,10 +110,6 @@ SYMBOL: delegate
     dup init-traits-map
     dup traits "metaclass" set-word-property
     traits-predicate ; parsing
-
-: add-traits-dispatch ( word vtable -- )
-    >r unit [ car swap traits-dispatch call ] cons \ vector r>
-    set-vtable ;
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 "in" get create ;

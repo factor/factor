@@ -37,6 +37,7 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
+USE: parser
 
 : with-dataflow ( param op [ in | out ] quot -- )
     #! Take input parameters, execute quotation, take output
@@ -206,8 +207,12 @@ USE: hashtables
 
 \ call [ infer-call ] "infer" set-word-property
 
-\ - [ 2 | 1 ] "infer-effect" set-word-property
-\ * [ 2 | 1 ] "infer-effect" set-word-property
-\ / [ 2 | 1 ] "infer-effect" set-word-property
-\ gcd [ 2 | 1 ] "infer-effect" set-word-property
-\ hashcode [ 1 | 1 ] "infer-effect" set-word-property
+! These are due to bugs and will be removed
+\ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ / [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ gcd [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ hashcode [ [ object ] [ integer ] ] "infer-effect" set-word-property
+
+\ undefined-method t "terminator" set-word-property
+\ not-a-number t "terminator" set-word-property

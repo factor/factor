@@ -44,8 +44,8 @@ builtin [
 ] "builtin-supertypes" set-word-property
 
 builtin [
-    ( vtable definition class -- )
-    rot set-vtable
+    ( generic vtable definition class -- )
+    rot set-vtable drop
 ] "add-method" set-word-property
 
 builtin 50 "priority" set-word-property

@@ -41,9 +41,6 @@ USE: words
     "HOME" os-env [ "." ] unless* "~" set
     init-search-path ;
 
-[
-    boot
-    "Good morning!" print
-    flush
-    "/library/bootstrap/boot-stage2.factor" run-resource
-]
+"Good morning!" print
+flush
+"/library/bootstrap/boot-stage2.factor" run-resource

@@ -162,8 +162,11 @@ public class FactorSideKickParser extends SideKickParser
 	{
 		while(words != null)
 		{
-			Object obj = words.car;
-			FactorPlugin.getExternalInstance().forget((FactorWord)obj);
+			FactorWord word = (FactorWord)words.car;
+			// We're not allowed to forget parsing words.
+			if(word.parsing != null)
+				return;
+			FactorPlugin.getExternalInstance().forget(word);
 			words = words.next();
 		}
 	} //}}}

@@ -46,8 +46,8 @@ union [
 ] "builtin-supertypes" set-word-property
 
 union [
-    ( vtable definition class -- )
-    "members" word-property [ >r 2dup r> add-method ] each 2drop
+    ( generic vtable definition class -- )
+    "members" word-property [ >r 3dup r> add-method ] each 3drop
 ] "add-method" set-word-property
 
 union 30 "priority" set-word-property

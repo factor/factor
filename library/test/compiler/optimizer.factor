@@ -17,4 +17,4 @@ USE: lists
 
 [ [ [ 1 ] [ 2 ] ] ] [ [ t [ 1 ] [ 2 ] ifte ] dataflow kill-set ] unit-test
 
-[ [ t t f ] ] [ [ 1 2 ] [ 1 2 3 ] [ f <literal-value> ] map kill-mask ] unit-test
+[ [ t t f ] ] [ [ 1 2 ] [ 1 2 3 ] [ f <literal> ] map kill-mask ] unit-test

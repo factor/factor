@@ -56,11 +56,11 @@ predicate [
 ] "builtin-supertypes" set-word-property
 
 predicate [
-    ( vtable definition class -- )
+    ( generic vtable definition class -- )
     dup builtin-supertypes [
         ( vtable definition class type# )
         >r 3dup r> predicate-method
-    ] each 3drop
+    ] each 2drop 2drop
 ] "add-method" set-word-property
 
 predicate 25 "priority" set-word-property

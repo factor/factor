@@ -693,6 +693,10 @@ Entering colon definitions at the listener is very convenient for quick testing,
 Lets put our program for solving quadratic equations in a source file. Create a file named \texttt{quadratic.factor} in your favorite editor, and add the following content:
 
 \begin{verbatim}
+IN: quadratic
+USE: math
+USE: kernel
+
 : quadratic-e ( b a -- -b/2a )
     2 * / neg ;
 

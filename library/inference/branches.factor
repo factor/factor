@@ -119,34 +119,40 @@ USE: hashtables
         #values values-node
     ] extend ;
 
-: terminator? ( quot -- ? )
-    #! This is a hack. undefined-method has a stack effect that
-    #! probably does not match any other branch of the generic,
-    #! so we handle it specially.
-    literal-value \ undefined-method swap tree-contains? ;
+: terminator? ( obj -- ? )
+    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
 
-: recursive-branch ( value -- )
+: terminator-quot? ( quot -- ? )
+    literal-value [ terminator? ] some? ;
+
+: recursive-branch ( rstate value -- )
     #! Set base case if inference didn't fail.
     [
         f infer-branch [
-            effect old-effect recursive-state get set-base
+            effect old-effect swap set-base
         ] bind
     ] [
-        [ drop ] when
+        [ 2drop ] when
     ] catch ;
 
+: dual-branch ( branch branchlist -- rstate )
+    #! Return a recursive state for a branch other than the
+    #! given one in the list.
+    [ over eq? not ] subset nip car value-recursion ;
+
 : infer-base-case ( branchlist -- )
-    [
-        dup terminator? [
+    dup [
+        dup terminator-quot? [
             drop
         ] [
+            [ over dual-branch ] keep
             recursive-branch
         ] ifte
-    ] each ;
+    ] each drop ;
 
 : (infer-branches) ( branchlist -- list )
     dup infer-base-case [
-        dup terminator? [
+        dup terminator-quot? [
             t infer-branch [
                 meta-d off meta-r off d-in off
             ] extend

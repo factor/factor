@@ -210,7 +210,6 @@ vocabularies get [
     [ "random" | "init-random" ]
     [ "random" | "(random-int)" ]
     [ "kernel" | "type" ]
-    [ "kernel" | "size" ]
     [ "files" | "cwd" ]
     [ "files" | "cd" ]
     [ "compiler" | "compiled-offset" ]

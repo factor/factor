@@ -138,3 +138,5 @@ M: very-funny gooey sq ;
 [ rational ] [ ratio integer class-or ] unit-test
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
+
+[ t ] [ del1 builtin-supertypes [ integer? ] all? ] unit-test

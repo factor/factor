@@ -36,43 +36,61 @@ USE: words
 USE: hashtables
 
 "/library/bootstrap/primitives.factor" run-resource
-"/version.factor" run-resource
-"/library/stack.factor" run-resource
-"/library/combinators.factor" run-resource
-"/library/kernel.factor" run-resource
-"/library/cons.factor" run-resource
-"/library/assoc.factor" run-resource
-"/library/math/math.factor" run-resource
-"/library/math/integer.factor" run-resource
-"/library/math/ratio.factor" run-resource
-"/library/math/float.factor" run-resource
-"/library/math/complex.factor" run-resource
-"/library/words.factor" run-resource
-"/library/math/math-combinators.factor" run-resource
-"/library/lists.factor" run-resource
-"/library/vectors.factor" run-resource
-"/library/strings.factor" run-resource
-"/library/hashtables.factor" run-resource
-"/library/namespaces.factor" run-resource
-"/library/list-namespaces.factor" run-resource
-"/library/sbuf.factor" run-resource
-"/library/errors.factor" run-resource
-"/library/continuations.factor" run-resource
-"/library/threads.factor" run-resource
-"/library/io/stream.factor" run-resource
-"/library/io/stdio.factor" run-resource
-"/library/io/io-internals.factor" run-resource
-"/library/io/stream-impl.factor" run-resource
-"/library/vocabularies.factor" run-resource
-"/library/syntax/parse-numbers.factor" run-resource
-"/library/syntax/parser.factor" run-resource
-"/library/syntax/parse-stream.factor" run-resource
 
-! init.factor leaves a boot quotation on the stack
-"/library/bootstrap/init.factor" run-resource
+! The make-list form creates a boot quotation
+[
+    "/version.factor" parse-resource append,
+    "/library/stack.factor" parse-resource append,
+    "/library/combinators.factor" parse-resource append,
+    "/library/kernel.factor" parse-resource append,
+    "/library/cons.factor" parse-resource append,
+    "/library/assoc.factor" parse-resource append,
+    "/library/math/math.factor" parse-resource append,
+    "/library/math/integer.factor" parse-resource append,
+    "/library/math/ratio.factor" parse-resource append,
+    "/library/math/float.factor" parse-resource append,
+    "/library/math/complex.factor" parse-resource append,
+    "/library/words.factor" parse-resource append,
+    "/library/math/math-combinators.factor" parse-resource append,
+    "/library/lists.factor" parse-resource append,
+    "/library/vectors.factor" parse-resource append,
+    "/library/strings.factor" parse-resource append,
+    "/library/hashtables.factor" parse-resource append,
+    "/library/namespaces.factor" parse-resource append,
+    "/library/list-namespaces.factor" parse-resource append,
+    "/library/sbuf.factor" parse-resource append,
+    "/library/errors.factor" parse-resource append,
+    "/library/continuations.factor" parse-resource append,
+    "/library/threads.factor" parse-resource append,
+    "/library/io/stream.factor" parse-resource append,
+    "/library/io/stdio.factor" parse-resource append,
+    "/library/io/io-internals.factor" parse-resource append,
+    "/library/io/stream-impl.factor" parse-resource append,
+    "/library/vocabularies.factor" parse-resource append,
+    "/library/syntax/parse-numbers.factor" parse-resource append,
+    "/library/syntax/parser.factor" parse-resource append,
+    "/library/syntax/parse-stream.factor" parse-resource append,
 
-! A bootstrapping trick. See doc/bootstrap.txt.
-"/library/syntax/parse-syntax.factor" run-resource
+    "traits" [ "generic" ] search
+    "delegate" [ "generic" ] search
+
+    vocabularies get [ "generic" off ] bind
+
+    reveal
+    reveal
+
+    "/library/generic/generic.factor" parse-resource append,
+    "/library/generic/object.factor" parse-resource append,
+    "/library/generic/builtin.factor" parse-resource append,
+    "/library/generic/predicate.factor" parse-resource append,
+    "/library/generic/union.factor" parse-resource append,
+    "/library/generic/traits.factor" parse-resource append,
+
+    "/library/bootstrap/init.factor" parse-resource append,
+    "/library/syntax/parse-syntax.factor" parse-resource append,
+] make-list
+
+"boot" [ "kernel" ] search swons
 
 vocabularies get [
     "!syntax" get "syntax" set

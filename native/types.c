@@ -102,8 +102,3 @@ void primitive_type(void)
 {
 	drepl(tag_fixnum(type_of(dpeek())));
 }
-
-void primitive_size(void)
-{
-	drepl(tag_fixnum(object_size(dpeek())));
-}

@@ -104,7 +104,7 @@ public class FactorPlugin extends EditPlugin
 				nargs[1] = jEdit.getProperty("factor.external.image");
 				nargs[2] = "-no-ansi";
 				nargs[3] = "-no-smart-terminal";
-				System.arraycopy(args,0,nargs,3,args.length);
+				System.arraycopy(args,0,nargs,4,args.length);
 				p = Runtime.getRuntime().exec(nargs);
 				p.getErrorStream().close();
 

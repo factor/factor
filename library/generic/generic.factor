@@ -76,9 +76,6 @@ USE: math-internals
 : set-vtable ( definition class vtable -- )
     >r "builtin-type" word-property r> set-vector-nth ;
 
-: <empty-vtable> ( -- vtable )
-    num-types [ drop [ undefined-method ] ] vector-project ;
-
 : class-ord ( class -- n ) metaclass "priority" word-property ;
 
 : class< ( cls1 cls2 -- ? )
@@ -87,40 +84,38 @@ USE: math-internals
 : sort-methods ( methods -- alist )
     hash>alist [ 2car class< ] sort ;
 
-: add-method ( vtable definition class -- )
+: add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
     #! this is called at vtable build time, and in the sorted
     #! order.
     dup metaclass "add-method" word-property
     [ [ undefined-method ] ] unless* call ;
 
-: <vtable> ( methods -- vtable )
-    <empty-vtable> swap sort-methods [
-        dupd unswons add-method
-    ] each ;
+: <empty-vtable> ( -- vtable )
+    num-types [ drop [ undefined-method ] ] vector-project ;
 
-DEFER: add-traits-dispatch
+: <vtable> ( generic methods -- vtable )
+    >r <empty-vtable> r> sort-methods [
+        >r 2dup r> unswons add-method
+    ] each nip ;
 
 : define-generic ( word vtable -- )
     over "combination" word-property cons define-compound ;
 
 : (define-method) ( definition class generic -- )
-    [ "methods" word-property [ set-hash ] keep <vtable> ] keep
-    swap define-generic ;
+    [ "methods" word-property set-hash ] keep
+    dup dup "methods" word-property <vtable>
+    define-generic ;
 
 ! Defining generic words
 : (GENERIC) ( combination -- )
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    CREATE 2dup "combination" word-property = [
-        2drop
-    ] [
-        [ swap "combination" set-word-property ] keep
-        dup <namespace> "methods" set-word-property
-        <empty-vtable> [ add-traits-dispatch ] 2keep
-        define-generic
-    ] ifte ;
+    CREATE [ swap "combination" set-word-property ] keep
+    dup dup "methods" word-property [
+        dup <namespace> [ "methods" set-word-property ] keep
+    ] unless* <vtable> define-generic ;
 
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline

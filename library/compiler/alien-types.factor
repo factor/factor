@@ -75,12 +75,12 @@ USE: words
         dup "c-types" get hash dup [
             nip
         ] [
-            drop "No such C type: " swap cat2 throw
+            drop "No such C type: " swap cat2 throw f
         ] ifte
     ] bind ;
 
 : define-c-type ( quot name -- )
-    c-types [ >r <c-type> swap extend r> set ] bind ;
+    c-types [ >r <c-type> swap extend r> set ] bind ; inline
 
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the

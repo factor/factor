@@ -35,6 +35,10 @@ USE: namespaces
 
 "Cold boot in progress..." print
 
+! vocabularies get [
+!     "generic" off
+! ] bind
+
 [
     "/library/generic/generic.factor"
     "/library/generic/object.factor"
@@ -74,7 +78,6 @@ USE: namespaces
     "/library/syntax/parse-numbers.factor"
     "/library/syntax/parser.factor"
     "/library/syntax/parse-stream.factor"
-    "/library/bootstrap/init.factor"
 
     "/library/syntax/unparser.factor"
     "/library/io/presentation.factor"

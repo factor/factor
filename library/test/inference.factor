@@ -6,6 +6,7 @@ USE: vectors
 USE: kernel
 USE: lists
 USE: namespaces
+USE: parser
 USE: kernel
 USE: math-internals
 USE: generic
@@ -160,16 +161,16 @@ SYMBOL: sym-test
 [ [ 1 | 2 ] ] [ [ uncons ] infer old-effect ] unit-test
 [ [ 1 | 1 ] ] [ [ unit ] infer old-effect ] unit-test
 [ [ 1 | 2 ] ] [ [ unswons ] infer old-effect ] unit-test
-! [ [ 1 | 1 ] ] [ [ last* ] infer old-effect ] unit-test
-! [ [ 1 | 1 ] ] [ [ last ] infer old-effect ] unit-test
-! [ [ 1 | 1 ] ] [ [ list? ] infer old-effect ] unit-test
+[ [ 1 | 1 ] ] [ [ last* ] infer old-effect ] unit-test
+[ [ 1 | 1 ] ] [ [ last ] infer old-effect ] unit-test
+[ [ 1 | 1 ] ] [ [ list? ] infer old-effect ] unit-test
 
 [ [ 1 | 1 ] ] [ [ length ] infer old-effect ] unit-test
 [ [ 1 | 1 ] ] [ [ reverse ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ contains? ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ tree-contains? ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ remove ] infer old-effect ] unit-test
-! [ [ 1 | 1 ] ] [ [ prune ] infer old-effect ] unit-test
+[ [ 1 | 1 ] ] [ [ prune ] infer old-effect ] unit-test
 
 [ [ 2 | 1 ] ] [ [ bitor ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ bitand ] infer old-effect ] unit-test
@@ -204,3 +205,4 @@ SYMBOL: sym-test
 [ [ [ object ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
 [ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
 [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
+[ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test

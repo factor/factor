@@ -45,10 +45,10 @@ object [
 ] "builtin-supertypes" set-word-property
 
 object [
-    ( vtable definition class -- )
+    ( generic vtable definition class -- )
     drop over vector-length [
         pick pick -rot set-vector-nth
-    ] times* 2drop
+    ] times* 3drop
 ] "add-method" set-word-property
 
 object [ drop t ] "predicate" set-word-property
