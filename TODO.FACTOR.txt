@@ -8,9 +8,9 @@
 
 - fix up the min thumb size hack
 - fix up initial layout of slider
-- clicking in scroll bar: jump
-- clicking thumb: drag
 - console: scroll to bottom
+- pile/shelf fill
+- caret clip
 
 + compiler/ffi:
 

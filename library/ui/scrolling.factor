@@ -51,32 +51,45 @@ M: viewport layout* ( viewport -- )
 ! the thumb when it was clicked.
 TUPLE: slider viewport thumb offset delegate ;
 
-: <thumb> ( -- thumb )
-    f bevel-border
-    dup t bevel-up? set-paint-property ;
+TUPLE: thumb offset delegate ;
+
+: hand-y ( gadget -- y )
+    #! Vertical offset of hand from gadget.
+    my-hand swap relative shape-y ;
+
+: thumb-click ( thumb -- )
+    [ hand-y ] keep set-thumb-offset ;
+
+: thumb-drag ( thumb -- y )
+    [ gadget-parent hand-y ] keep thumb-offset - ;
+
+: thumb-motion ( thumb -- )
+    dup thumb-drag over gadget-parent shape-h /
+    over gadget-parent slider-viewport scroll-viewport
+    relayout ;
+
+: thumb-actions ( thumb -- )
+    dup
+    [ thumb-click ] [ button-down 1 ] set-action
+    [ thumb-motion ] [ drag ] set-action ;
+
+C: thumb ( -- thumb )
+    f bevel-border over set-thumb-delegate
+    dup t bevel-up? set-paint-property
+    dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
     2dup add-gadget set-slider-thumb ;
 
 : slider-size 20 ;
 
-: hand-y ( gadget -- y )
-    #! Vertical offset of hand from gadget.
-    my-hand swap relative shape-y ;
-
 : slider-click ( slider -- )
-    [ slider-thumb hand-y ] keep set-slider-offset ;
-
-: slider-drag ( slider -- y )
-    [ hand-y ] keep slider-offset - ;
-
-: slider-motion ( slider -- )
-    dup slider-drag over shape-h / over slider-viewport
-    scroll-viewport relayout ;
+    [ dup hand-y swap shape-h / ] keep
+    [ slider-viewport scroll-viewport ] keep
+    relayout ;
 
 : slider-actions ( slider -- )
-    dup [ slider-click ] [ button-down 1 ] set-action
-    [ slider-motion ] [ drag ] set-action ;
+    [ slider-click ] [ button-down 1 ] set-action ;
 
 C: slider ( viewport -- slider )
     [ set-slider-viewport ] keep
@@ -88,20 +101,20 @@ C: slider ( viewport -- slider )
     [ <thumb> swap add-thumb ] keep
     [ slider-actions ] keep ;
 
-: visible-portion ( viewport -- float )
+: visible-portion ( viewport -- rational )
     #! Visible portion, between 0 and 1.
-    dup shape-h swap viewport-h 1 max / 1 min ;
+    [ shape-h ] keep viewport-h 1 max / 1 min ;
 
 : >thumb ( slider y -- y )
     #! Convert a y co-ordinate in the viewport to a thumb
     #! position.
     swap slider-viewport visible-portion * >fixnum ;
 
-: thumb-y ( slider -- y )
-    dup slider-viewport viewport-y neg >thumb ;
-
 : thumb-height ( slider -- h )
     dup shape-h [ >thumb slider-size max ] keep min ;
+
+: thumb-y ( slider -- y )
+    dup slider-viewport viewport-y neg >thumb ;
 
 M: slider layout* ( slider -- )
     dup slider-viewport layout*
