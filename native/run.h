@@ -78,20 +78,23 @@ INLINE void cpush(CELL top)
 INLINE void call(CELL quot)
 {
 	/* tail call optimization */
-	if(callframe != F)
+	if(callframe == F)
+		/* put(cs - CELLS,executing) */;
+	else
 	{
 		cpush(executing);
 		cpush(callframe);
 	}
+
 	callframe = quot;
 }
 
 void clear_environment(void);
 
 void run(void);
-void undefined(void);
-void docol(void);
-void dosym(void);
+void undefined(F_WORD* word);
+void docol(F_WORD* word);
+void dosym(F_WORD* word);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);

@@ -1,6 +1,6 @@
 #include "factor.h"
 
-XT primitives[] = {
+void* primitives[] = {
 	undefined,
 	docol,
 	dosym,

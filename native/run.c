@@ -9,7 +9,10 @@ void clear_environment(void)
 	executing = F;
 }
 
-#define EXECUTE(w) ((XT)(untag_word_fast(w)->xt))()
+INLINE void execute(F_WORD* word)
+{
+	((XT)(word->xt))(word);
+}
 
 void run(void)
 {
@@ -45,7 +48,7 @@ void run(void)
 		if(callframe == F)
 		{
 			callframe = cpop();
-			cpop();
+			executing = cpop();
 			continue;
 		}
 
@@ -54,10 +57,7 @@ void run(void)
 		callframe = get(callframe + CELLS);
 
 		if(TAG(next) == WORD_TYPE)
-		{
-			executing = next;
-			EXECUTE(executing);
-		}
+			execute(untag_word_fast(next));
 		else
 			dpush(next);
 	}
@@ -73,28 +73,27 @@ void run(void)
 }
 
 /* XT of deferred words */
-void undefined()
+void undefined(F_WORD* word)
 {
-	general_error(ERROR_UNDEFINED_WORD,executing);
+	general_error(ERROR_UNDEFINED_WORD,tag_word(word));
 }
 
 /* XT of compound definitions */
-void docol(void)
+void docol(F_WORD* word)
 {
-	call(untag_word_fast(executing)->parameter);
+	call(word->parameter);
+	executing = tag_word(word);
 }
 
 /* pushes word parameter */
-void dosym(void)
+void dosym(F_WORD* word)
 {
-	dpush(untag_word_fast(executing)->parameter);
+	dpush(word->parameter);
 }
 
 void primitive_execute(void)
 {
-	type_check(WORD_TYPE,dpeek());
-	executing = dpop();
-	EXECUTE(executing);
+	execute(untag_word(dpop()));
 }
 
 void primitive_call(void)

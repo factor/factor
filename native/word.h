@@ -1,5 +1,3 @@
-typedef void (*XT)(void);
-
 typedef struct {
 	/* TAGGED header */
 	CELL header;
@@ -18,6 +16,8 @@ typedef struct {
 	/* UNTAGGED amount of memory allocated in word */
 	CELL allot_count;
 } F_WORD;
+
+typedef void (*XT)(F_WORD* word);
 
 INLINE F_WORD* untag_word_fast(CELL tagged)
 {

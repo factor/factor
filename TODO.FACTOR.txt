@@ -34,7 +34,6 @@
 + kernel:
 
 - do partial objects cause problems?
-- profiler is inaccurate: wrong word on cs
 - better i/o scheduler
 - remove sbufs
 - cat, reverse-cat primitives
