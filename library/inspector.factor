@@ -35,7 +35,7 @@ USE: namespaces
 USE: stack
 USE: stdio
 USE: strings
-USE: styles
+USE: presentation
 USE: words
 USE: prettyprint
 USE: unparser
@@ -48,42 +48,45 @@ USE: vectors
     #! Print a list of defined variables.
     vars [ print ] each ;
 
+: object-actions ( -- alist )
+    [
+        [ "Describe" | "describe-path"  ]
+        [ "Push"     | "lookup"         ]
+    ] ;
+
 : link-style ( path -- style )
     relative>absolute-object-path
-    "object-link" default-style acons ;
+    dup "object-link" swons swap
+    object-actions <actions> "actions" swons
+    t "underline" swons
+    3list
+    default-style append ;
 
 : var. ( [ name | value ] -- )
     uncons unparse swap link-style write-attr ;
 
 : var-name. ( max name -- )
-    tuck pad-string write dup link-style write-attr ;
+    tuck unparse pad-string write dup link-style
+    swap unparse swap write-attr ;
 
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;
 
-: alist-keys>str ( alist -- alist )
-    [ unswons unparse swons ] map ;
-
 : name-padding ( alist -- col )
-    [ car ] map max-str-length ;
+    [ car unparse ] map max-str-length ;
 
 : describe-assoc ( alist -- )
     dup name-padding swap
     [ dupd uncons value. ] each drop ;
 
 : alist-sort ( list -- list )
-    [ swap car swap car str-lexi> ] sort ;
-
-: describe-assoc* ( alist -- )
-    #! Used to describe alists made from hashtables and
-    #! namespaces.
-    alist-keys>str alist-sort describe-assoc ;
+    [ swap car unparse swap car unparse str-lexi> ] sort ;
 
 : describe-namespace ( namespace -- )
-    [ vars-values ] bind describe-assoc* ;
+    [ vars-values ] bind alist-sort describe-assoc ;
 
 : describe-hashtable ( hashtables -- )
-    hash>alist describe-assoc* ;
+    hash>alist alist-sort describe-assoc ;
 
 : describe ( obj -- )
     [

@@ -38,7 +38,7 @@ USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings
-USE: styles
+USE: presentation
 USE: unparser
 USE: vectors
 USE: words
@@ -141,7 +141,7 @@ DEFER: prettyprint*
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
 : prettyprint-comment ( comment -- )
-    trim-newline "comments" get-style write-attr ;
+    trim-newline "comments" style write-attr ;
 
 : word-link ( word -- link )
     <%
@@ -151,12 +151,26 @@ DEFER: prettyprint*
     word-name %
     %> ;
 
+: word-actions ( -- list )
+    [
+        [ "Describe" | "describe-path"  ]
+        [ "Push"     | "lookup"         ]
+        [ "Execute"  | "lookup execute" ]
+        [ "jEdit"    | "lookup jedit"   ]
+        [ "Usages"   | "lookup usages." ]
+    ] ;
+
 : word-attrs ( word -- attrs )
     dup defined? [
-        dup >r word-link "object-link" r> word-style acons
+        dup >r
+        word-link dup >r "object-link" swons r>
+        word-actions <actions> "actions" swons
+        t "underline" swons
+        3list
+        r>
     ] [
-        word-style
-    ] ifte ;
+        [ ] swap
+    ] ifte word-style append ;
 
 : prettyprint-word ( word -- )
     dup word-name swap word-attrs write-attr ;

@@ -38,7 +38,7 @@ USE: parser
 USE: stack
 USE: stdio
 USE: strings
-USE: styles
+USE: presentation
 USE: words
 USE: unparser
 USE: vectors
@@ -51,7 +51,7 @@ USE: vectors
     "Type ``exit'' to exit, ``help'' for help." print ;
 
 : print-prompt ( -- )
-    "ok" "prompt" get-style write-attr
+    "ok" "prompt" style write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input

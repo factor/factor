@@ -25,21 +25,29 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: styles
+IN: presentation
 USE: combinators
 USE: kernel
 USE: lists
 USE: namespaces
 USE: stack
+USE: strings
+USE: unparser
+
+: <actions> ( path alist -- alist )
+    #! For each element of the alist, change the value to
+    #! path " " value
+    >r unparse r>
+    [ uncons >r over " " r> cat3 cons ] map nip ;
 
 ! A style is an alist whose key/value pairs hold
 ! significance to the 'fwrite-attr' word when applied to a
 ! stream that supports attributed string output.
 
-: (get-style) ( name -- style ) "styles" get get* ;
-: default-style ( -- style ) "default" (get-style) ;
-: get-style ( name -- style )
-    (get-style) [ default-style ] unless* ;
+: (style) ( name -- style ) "styles" get get* ;
+: default-style ( -- style ) "default" (style) ;
+: style ( name -- style )
+    (style) [ default-style ] unless* ;
 : set-style ( style name -- ) "styles" get set* ;
 
 <namespace> "styles" set

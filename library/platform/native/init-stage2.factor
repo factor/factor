@@ -38,7 +38,7 @@ USE: parser
 USE: random
 USE: stack
 USE: streams
-USE: styles
+USE: presentation
 USE: words
 
 : cli-args ( -- args ) 10 getenv ;

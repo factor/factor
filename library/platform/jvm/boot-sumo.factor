@@ -72,7 +72,7 @@ USE: parser
 "/library/extend-stream.factor"             run-resource ! streams
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
-"/library/styles.factor"                    run-resource ! styles
+"/library/presentation.factor"              run-resource ! presentation
 "/library/platform/jvm/threads.factor"      run-resource ! threads
 "/library/logging.factor"                   run-resource ! logging
 

@@ -38,7 +38,7 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: styles
+USE: presentation
 USE: words
 
 : stdin ( -- stdin )

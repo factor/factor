@@ -39,7 +39,7 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: styles
+USE: presentation
 
 ! The purpose of this library is to allow CFactor to be embedded
 ! inside the Java Factor listener in jEdit.

@@ -31,15 +31,15 @@ USE: lists
 USE: kernel
 USE: namespaces
 USE: stack
-USE: styles
+USE: presentation
 
 : vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are
     #! to be printed.
-    "vocabularies" get-style get* ;
+    "vocabularies" style get* ;
 
 : set-vocab-style ( style vocab -- )
-    >r default-style append r> "vocabularies" get-style set* ;
+    >r default-style append r> "vocabularies" style set* ;
 
 : word-style ( word -- style )
     word-vocabulary [ vocab-style ] [ default-style ] ifte* ;

@@ -35,7 +35,7 @@ USE: lists
 USE: namespaces
 USE: stack
 USE: stdio
-USE: styles
+USE: presentation
 USE: streams
 USE: strings
 USE: unparser
@@ -86,48 +86,17 @@ USE: unparser
         "console.Console"
     ] "console.Console$EvalAction" jnew ;
 
-: <action-menu-item> ( path pair -- action )
-    uncons swapd " " swap cat3 <eval-action> ;
-
 : >action-array ( list -- array )
     [ "javax.swing.Action" ] coerce ;
 
-: <actions-menu> ( path actions -- array )
-    [ dupd <action-menu-item> ] map nip >action-array ;
-
-: object-actions ( -- list )
-    [
-        [ "Describe" | "describe-path"  ]
-        [ "Push"     | "lookup"         ]
-        [ "Execute"  | "lookup execute" ]
-        [ "jEdit"    | "lookup jedit"   ]
-        [ "Usages"   | "lookup usages." ]
-    ] ;
-
-: <object-actions-menu> ( path -- alist )
-    unparse object-actions <actions-menu> ;
-
-: file-actions ( -- list )
-    [
-        [ "Push"             | ""           ]
-        [ "Run file"         | "run-file"   ]
-        [ "List directory"   | "directory." ]
-        [ "Change directory" | "cd"         ]
-    ] ;
-
-: <file-actions-menu> ( path -- alist )
-    unparse file-actions <actions-menu> ;
+: <actions-menu> ( actions -- array )
+    [ uncons <eval-action> ] map >action-array ;
 
 : underline-attribute ( attribute-set -- )
     t "Underline" swing-attribute+ ;
 
-: object-link-attribute ( attribute-set target -- )
-    over underline-attribute
-    <object-actions-menu> actions-key attribute+ ;
-
-: file-link-attribute ( attribute-set target -- )
-    over underline-attribute
-    <file-actions-menu> actions-key attribute+ ;
+: actions-attribute ( attribute-set actions -- )
+    <actions-menu> actions-key attribute+ ;
 
 : icon-attribute ( string style value -- )
     dupd <icon> set-icon-style
@@ -137,8 +106,7 @@ USE: unparser
     #! We need the string, since outputting an icon changes the
     #! string to " ".
     <attribute-set> swap [
-        [ "object-link" dupd object-link-attribute ]
-        [ "file-link"   dupd file-link-attribute ]
+        [ "actions"     dupd actions-attribute ]
         [ "bold"        drop dup t "Bold" swing-attribute+ ]
         [ "italics"     drop dup t "Italic" swing-attribute+ ]
         [ "underline"   drop dup t "Underline" swing-attribute+ ]
