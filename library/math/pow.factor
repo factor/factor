@@ -30,11 +30,11 @@ USE: combinators
 USE: math
 USE: real-math
 USE: kernel
+USE: logic
 USE: stack
 
 ! Power-related functions:
 !     exp log sqrt pow
-USE: logic
 
 : exp >rect swap fexp swap polar> ;
 : log >polar swap flog swap rect> ;

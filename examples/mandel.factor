@@ -18,6 +18,9 @@ USE: logic
 USE: math
 USE: namespaces
 USE: sdl
+USE: sdl-event
+USE: sdl-gfx
+USE: sdl-video
 USE: stack
 USE: vectors
 USE: prettyprint

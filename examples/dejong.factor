@@ -13,6 +13,9 @@
 IN: dejong
 
 USE: sdl
+USE: sdl-event
+USE: sdl-gfx
+USE: sdl-video
 USE: namespaces
 USE: math
 USE: stack
