@@ -274,8 +274,9 @@ IN: cross-compiler
 
     dup word-name "name" swons ,
     dup word-vocabulary "vocabulary" swons ,
-    "parsing" swap word-property >boolean "parsing" swons ,
+    "parsing" over word-property [ t "parsing" swons , ] when
 
+    drop
     ,] ' ;
 
 : (worddef,) ( word primitive parameter -- )

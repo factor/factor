@@ -67,9 +67,15 @@ USE: unparser
 ! Colon defs
 : CREATE scan "in" get create ;
 
+: remember-where ( word -- )
+    "line-number" get "line" pick set-word-property
+    "col"         get "col"  pick set-word-property
+    "file"        get "file" pick set-word-property
+    drop ;
+
 : :
     #! Begin a word definition. Word name follows.
-    CREATE [ ]  ; parsing
+    CREATE dup remember-where [ ] ; parsing
 
 : ;
     #! End a word definition.
@@ -128,7 +134,7 @@ USE: unparser
 : "
     #! Note the ugly hack to carry the new value of 'pos' from
     #! the <% %> scope up to the original scope.
-    <% parse-string "pos" get %> swap "pos" set parsed ; parsing
+    <% parse-string "col" get %> swap "col" set parsed ; parsing
 
 ! Char literal
 : CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing

@@ -28,6 +28,7 @@
 IN: jedit
 USE: arithmetic
 USE: combinators
+USE: errors
 USE: kernel
 USE: namespaces
 USE: stack
@@ -35,7 +36,7 @@ USE: strings
 USE: words
 
 ! Doesn't exist in native Factor.
-DEFER: local-jedit-line/file
+: local-jedit-line/file "Not supported" throw ;
 
 : jedit-local? ( -- ? )
     java? [ global [ "jedit" get ] bind ] [ f ] ifte ;
@@ -59,7 +60,8 @@ DEFER: local-jedit-line/file
 
 : word-line/file ( word -- line dir file )
     #! Note that line numbers here start from 1
-    [ "line" get "file" get word-file ] bind ;
+    "line" over word-property swap
+    "file" swap word-property word-file ;
 
 : jedit ( word -- )
     intern word-line/file jedit-line/file ;

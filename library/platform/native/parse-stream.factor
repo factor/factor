@@ -37,6 +37,11 @@ USE: stdio
 USE: streams
 USE: strings
 
+! Stream parsing uses a number of variables:
+! file
+! line-number
+! parse-stream
+
 : next-line ( -- str )
     "parse-stream" get freadln
     "line-number" succ@ ;
@@ -63,9 +68,9 @@ USE: strings
 
 : parse-stream ( name stream -- code )
     #! Uses the current namespace for temporary variables.
-    >r "parse-name" set f r>
+    >r "file" set f r>
     [ (parse) ] read-lines nreverse
-    "parse-name" off
+    "file" off
     "line-number" off ;
 
 : parse-file ( file -- code )

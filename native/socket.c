@@ -11,6 +11,8 @@ void init_sockaddr(struct sockaddr_in* name,
 
 	if(hostinfo == NULL)
 		io_error(__FUNCTION__);
+
+	name->sin_addr = *((struct in_addr *)hostinfo->h_addr);
 }
 
 int make_client_socket(const char* hostname, uint16_t port)
@@ -23,15 +25,18 @@ int make_client_socket(const char* hostname, uint16_t port)
 	if(sock < 0)
 		io_error(__FUNCTION__);
 
-	if(fcntl(sock,F_SETFL,O_NONBLOCK,1) == -1)
-		io_error(__FUNCTION__);
+	/* if(fcntl(sock,F_SETFL,O_NONBLOCK,1) == -1)
+		io_error(__FUNCTION__); */
 
 	/* Connect to the server. */
 	init_sockaddr(&servername,hostname,port);
 	if(connect(sock,(struct sockaddr *)&servername,sizeof(servername)) < 0)
 	{
 		if(errno != EINPROGRESS)
+		{
+			close(sock);
 			io_error(__FUNCTION__);
+		}
 	}
 
 	return sock;

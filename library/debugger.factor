@@ -42,17 +42,17 @@ USE: unparser
 
 : parse-dump ( error -- )
     <%
-    "error-parse-name" get [ "<interactive>" ] unless* % ":" %
+    "error-file" get [ "<interactive>" ] unless* % ":" %
     "error-line-number" get [ 1 ] unless* unparse % ": " %
     %> write
     error.
     
     "error-line" get print
     
-    <% "error-pos" get " " fill % "^" % %> print ;
+    <% "error-col" get " " fill % "^" % %> print ;
 
 : in-parser? ( -- ? )
-    "error-line" get "error-pos" get and ;
+    "error-line" get "error-col" get and ;
 
 : error-handler-hook
     #! The game overrides this.

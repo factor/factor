@@ -43,15 +43,15 @@ USE: vectors
     #! Save the stacks and parser state for post-mortem
     #! inspection after an error.
     namespace [
-        "pos" get
+        "col" get
         "line" get
         "line-number" get
-        "parse-name" get
+        "file" get
         global [
-            "error-parse-name" set
+            "error-file" set
             "error-line-number" set
             "error-line" set
-            "error-pos" set
+            "error-col" set
             "error" set
             datastack >pop> "error-datastack" set
             callstack >pop> >pop> "error-callstack" set

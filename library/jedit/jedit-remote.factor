@@ -63,7 +63,8 @@ USE: unparser
         "restore" get bool% "," %
         "newView" get bool% "," %
         "newPlainView" get bool% "," %
-        unparse % "," %
+        ( If the dir is not set, we don't want to send f )
+        dup [ unparse ] [ drop "null" ] ifte % "," %
         list>bsh-array% ");\n" % %>
     ] bind ;
 

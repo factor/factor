@@ -60,11 +60,11 @@ USE: unparser
         t "parsing" word set-word-property
     ] unless ; parsing
 
-: <parsing "line" set 0 "pos" set ;
-: parsing> "line" off "pos" off ;
-: end? ( -- ? ) "pos" get "line" get str-length >= ;
-: ch ( -- ch ) "pos" get "line" get str-nth ;
-: advance ( -- ) "pos" succ@ ;
+: <parsing "line" set 0 "col" set ;
+: parsing> "line" off "col" off ;
+: end? ( -- ? ) "col" get "line" get str-length >= ;
+: ch ( -- ch ) "col" get "line" get str-nth ;
+: advance ( -- ) "col" succ@ ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
@@ -108,7 +108,7 @@ USE: unparser
     ] ifte ;
 
 : scan ( -- token )
-    "pos" get "line" get dup >r (scan) dup "pos" set
+    "col" get "line" get dup >r (scan) dup "col" set
     2dup = [
         r> 3drop f
     ] [
@@ -155,10 +155,10 @@ USE: unparser
 
 ! Used by parsing words
 : ch-search ( ch -- index )
-    "pos" get "line" get rot index-of* ;
+    "col" get "line" get rot index-of* ;
 
 : (until) ( index -- str )
-    "pos" get swap dup succ "pos" set "line" get substring ;
+    "col" get swap dup succ "col" set "line" get substring ;
 
 : until ( ch -- str )
     ch-search (until) ;
@@ -170,4 +170,4 @@ USE: unparser
     end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
 
 : next-word-ch ( -- ch )
-    "pos" get "line" get skip-blank "pos" set next-ch ;
+    "col" get "line" get skip-blank "col" set next-ch ;
