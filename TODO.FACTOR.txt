@@ -1,10 +1,7 @@
 + inference/interpreter:
 
-- : bin 5 [ 5 bin bin 5 ] [ 2drop ] ifte ;
 - combinator inference
-- generic/2generic inference
 - type inference
-- [ 2 2 . ] run fails
 - some way to step over a word in the stepper
 - step: print NEXT word to execute, not word that JUST executed
 - cache stack effects

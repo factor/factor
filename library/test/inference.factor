@@ -125,6 +125,10 @@ DEFER: foe
         2drop f
     ] ifte ;
 
+! This form should not have a stack effect
+: bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
+[ [ bad-bin ] infer ] unit-test-fails
+
 [ [ 2 | 1 ] ] [ [ fie ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ foe ] infer ] unit-test
 
@@ -138,6 +142,12 @@ DEFER: foe
 ! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
+
+[ [ 1 | 1 ] ] [ [ length ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ reverse ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ remove ] infer ] unit-test
 
 [ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test

@@ -60,7 +60,7 @@ SYMBOL: meta-cf
 : init-interpreter ( -- )
     10 <vector> meta-r set
     10 <vector> meta-d set
-    f meta-n set
+    namestack meta-n set
     f meta-c set
     f meta-cf set ;
 

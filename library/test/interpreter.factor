@@ -4,6 +4,8 @@ USE: test
 USE: namespaces
 USE: combinators
 USE: stack
+USE: stdio
+USE: prettyprint
 USE: math
 USE: lists
 USE: kernel
@@ -46,4 +48,8 @@ USE: kernel
 
 [ { 4 } ] [
     init-interpreter [ 2 2 + ] run meta-d get
+] unit-test
+
+[ { "4\n" } ] [
+    init-interpreter [ [ 2 2 + . ] with-string ] run meta-d get
 ] unit-test
