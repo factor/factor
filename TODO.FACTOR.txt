@@ -22,15 +22,19 @@ FFI:
 
 - clean up listener's action popups
 - jedit ==> jedit-word, jedit takes a file name
-- introduce ifte* and ?str-head/?str-tail where appropriate
 - namespace clone drops static var bindings
+- add a socket timeout
+- fix error postoning -- not all errors thrown by i/o code are
+  postponed
+- sbuf-hashcode
+- vector-hashcode
+- some way to run httpd from command line
 
 + bignums:
 
 - move some s48_ functions into bignum.c
 - remove unused functions
 
-- add a socket timeout
 - >lower, >upper for strings
 - accept multi-line input in listener
 
@@ -75,12 +79,6 @@ FFI:
 
 + native:
 
-- fix error postoning -- not all errors thrown by i/o code are
-  postponed
-- sbuf-hashcode
-- vector-hashcode
-- irc: stack underflow?
-- gc call in the middle of some ops might affect callstack
 - better i/o scheduler
 
 + JVM compiler:
@@ -98,7 +96,6 @@ FFI:
 
 + misc:
 
-- some way to run httpd from command line
 - don't rehash strings on every startup
 - 'cascading' styles
 - ditch expand
@@ -106,7 +103,6 @@ FFI:
 
 + httpd:
 
-- 'default responder' for when we go to root
 - wiki responder:
   - port to native
   - text styles

@@ -75,6 +75,8 @@ global [ <namespace> "httpd-responders" set ] bind
     [ resource-responder ] "get" set
 ] extend add-responder
 
+"file" set-default-responder
+
 !        <responder> [
 !            "wiki" "responder" set
 !            [ wiki-get-responder ] "get" set

@@ -101,7 +101,10 @@ void primitive_datastack(void)
 
 void primitive_callstack(void)
 {
+	/* we don't want gc word to end up on callstack. */
+	gc_protect = true;
 	dpush(tag_object(stack_to_vector(cs_bot,cs)));
+	gc_protect = false;
 }
 
 /* Returns top of stack */

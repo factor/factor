@@ -10,6 +10,9 @@ ZONE prior;
 
 bool allot_profiling;
 
+/* we can temporarily disable GC */
+bool gc_protect;
+
 void* alloc_guarded(CELL size);
 void init_zone(ZONE* zone, CELL size);
 void init_arena(CELL size);
@@ -29,7 +32,8 @@ INLINE void* allot(CELL a)
 	active.here += align8(a);
 	if(allot_profiling)
 		allot_profile_step(align8(a));
-	check_memory();
+	if(active.here > active.alarm)
+		check_memory();
 	return (void*)h;
 }
 

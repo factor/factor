@@ -76,25 +76,44 @@ USE: strings
         "404" "httpd-responders" get get*
     ] unless* ;
 
+: default-responder ( -- responder )
+    "default" get-responder ;
+
+: set-default-responder ( name -- )
+    get-responder "default" "httpd-responders" get set* ;
+
 : responder-argument ( argument -- argument )
     dup f-or-"" [ drop "default-argument" get ] when ;
 
 : call-responder ( method argument responder -- )
     [ responder-argument swap get call ] bind ;
 
-: trim-/ ( url -- url )
-    #! Trim a leading /, if there is one.
-    "/" ?str-head drop ;
+: serve-default-responder ( method url -- )
+    default-responder call-responder ;
+
+: serve-explicit-responder ( method url -- )
+    "/" split1 dup [
+        swap get-responder call-responder
+    ] [
+        ! Just a responder name by itself
+        drop "request" get "/" cat2 redirect drop
+    ] ifte ;
 
 : log-responder ( url -- )
     "Calling responder " swap cat2 log ;
 
+: trim-/ ( url -- url )
+    #! Trim a leading /, if there is one.
+    "/" ?str-head drop ;
+
 : serve-responder ( method url -- )
-    dup log-responder trim-/ "/" split1 dup [
-        swap get-responder call-responder
+    #! Responder URLs come in two forms:
+    #! /foo/bar... - default-responder used
+    #! /responder/foo/bar - responder foo, argument bar
+    dup log-responder trim-/ "responder/" ?str-head [
+        serve-explicit-responder
     ] [
-        ! Just a responder name by itself
-        drop "/" swap "/" cat3 redirect drop
+        serve-default-responder
     ] ifte ;
 
 : no-such-responder ( -- )
