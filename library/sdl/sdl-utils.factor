@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -39,6 +39,9 @@ USE: prettyprint
 USE: sdl-event
 USE: sdl-gfx
 USE: sdl-video
+USE: streams
+USE: strings
+USE: sdl-ttf
 
 SYMBOL: surface
 SYMBOL: width
@@ -59,6 +62,14 @@ SYMBOL: surface
     swap 8 shift bitor
     swap 16 shift bitor
     swap 24 shift bitor ;
+
+: make-color ( r g b -- color )
+    #! Make an SDL_Color struct. This will go away soon in favor
+    #! of pass-by-value support in the FFI.
+    255 24 shift
+    swap 16 shift bitor
+    swap 8 shift bitor
+    swap bitor ;
 
 : black 0 0 0 ;
 : white 255 255 255 ;
@@ -98,3 +109,55 @@ SYMBOL: surface
     ] [
         drop
     ] ifte ;
+
+SYMBOL: fonts
+
+: null? ( alien -- ? )
+    dup [ alien-address 0 = ] when ;
+
+: <font> ( name ptsize -- font )
+    >r resource-path swap cat2 r> TTF_OpenFont ;
+
+: font ( name ptsize -- font )
+    fonts get [
+        2dup cons get [
+            2nip
+        ] [
+            2dup cons >r <font> dup r> set
+        ] ifte*
+    ] bind ;
+
+: make-rect ( x y w h -- rect )
+    <rect>
+    [ set-rect-h ] keep
+    [ set-rect-w ] keep
+    [ set-rect-y ] keep
+    [ set-rect-x ] keep ;
+
+: surface-rect ( x y surface -- rect )
+    dup surface-w swap surface-h make-rect ;
+
+: draw-surface ( x y surface -- )
+    [
+        [ surface-rect ] keep swap surface get 0 0
+    ] keep surface-rect swap rot SDL_UpperBlit drop ;
+
+: draw-string ( x y font text fg bg -- width )
+    pick str-length 0 = [
+        2drop 2drop 2drop 0
+    ] [
+        TTF_RenderText_Shaded
+        [ draw-surface ] keep
+        [ surface-w ] keep
+        SDL_FreeSurface
+    ] ifte ;
+
+: size-string ( font text -- w h )
+    dup str-length 0 = [
+        drop TTF_FontHeight 0 swap
+    ] [
+        <int-box> <int-box> [ TTF_SizeText drop ] 2keep
+        swap int-box-i swap int-box-i
+    ] ifte ;
+
+global [ <namespace> fonts set ] bind

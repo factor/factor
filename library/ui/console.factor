@@ -63,6 +63,7 @@ USE: errors
 USE: line-editor
 USE: hashtables
 USE: lists
+USE: sdl-ttf
 
 #! A namespace holding console state.
 SYMBOL: console
@@ -78,13 +79,16 @@ SYMBOL: y
 SYMBOL: output-line
 #! A line editor object.
 SYMBOL: input-line
+#! A TTF_Font* value.
+SYMBOL: console-font
+#! Font height.
+SYMBOL: line-height
 
 #! The font size is hardcoded here.
-: line-height 8 ;
 : char-width 8 ;
 
 ! Scrolling
-: visible-lines ( -- n ) height get line-height /i ;
+: visible-lines ( -- n ) height get line-height get /i ;
 : total-lines ( -- n ) lines get vector-length ;
 : available-lines ( -- ) total-lines first-line get - ;
 
@@ -105,19 +109,20 @@ SYMBOL: input-line
     total-lines fix-first-line first-line set ;
 
 ! Rendering
-: background white rgb ;
-: foreground black rgb ;
-: cursor     red   rgb ;
+: background white ;
+: foreground black ;
+: cursor     red   ;
 
 : next-line ( -- )
-    0 x set  line-height y [ + ] change ;
+    0 x set  line-height get y [ + ] change ;
 
 : draw-line ( str -- )
-    [ surface get x get y get ] keep foreground stringColor
-    str-length char-width * x [ + ] change ;
+    >r x get y get console-font get r>
+    foreground make-color background make-color draw-string
+    x [ + ] change ;
 
 : clear-display ( -- )
-    surface get 0 0 width get height get background boxColor ;
+    surface get 0 0 width get height get background rgb boxColor ;
 
 : draw-lines ( -- )
     visible-lines available-lines min [
@@ -133,14 +138,17 @@ SYMBOL: input-line
     swap
     y get
     over 1 +
-    y get line-height +
-    cursor boxColor ;
+    y get line-height get +
+    cursor rgb boxColor ;
 
 : draw-current ( -- )
     output-line get sbuf>str draw-line ;
 
 : caret-x ( -- x )
-    x get input-line get [ caret get char-width * + ] bind ;
+    x get input-line get [
+        console-font get caret get line-text get str-head
+        size-string drop +
+    ] bind ;
 
 : draw-input ( -- )
     caret-x >r
@@ -341,7 +349,13 @@ M: alien handle-event ( event -- ? )
         drop t
     ] ifte ;
 
+: set-console-font ( font ptsize )
+    font dup console-font set
+    TTF_FontHeight line-height set ;
+
 : init-console ( -- )
+    TTF_Init
+    "/fonts/VeraMono.ttf" 14 set-console-font
     <event> event set
     0 first-line set
     80 <vector> lines set

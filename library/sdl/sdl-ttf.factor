@@ -78,6 +78,13 @@ USE: alien
 : TTF_FontFaceStyleName ( font -- n )
     "char*" "sdl-ttf" "TTF_FontFaceStyleName" [ "void*" ] alien-invoke ;
 
+BEGIN-STRUCT: int-box
+    FIELD: int i
+END-STRUCT
+
+: TTF_SizeText ( font text w h -- ? )
+    "bool" "sdl-ttf" "TTF_SizeText" [ "void*" "char*" "int-box*" "int-box*" ] alien-invoke ;
+
 : TTF_RenderText_Solid ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "char*" "int" ] alien-invoke ;
 
