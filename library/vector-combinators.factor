@@ -72,7 +72,7 @@ USE: stack
     #! first two in a pair.
     over vector-length [
         pick pick 2vector-nth cons
-    ] vector-collect nip nip ;
+    ] vector-project nip nip ;
 
 : vector-2map ( v1 v2 quot -- v )
     #! Apply a quotation with stack effect ( obj obj -- obj ) to

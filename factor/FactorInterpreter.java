@@ -35,7 +35,7 @@ import java.io.*;
 
 public class FactorInterpreter implements FactorObject, Runnable
 {
-	public static final String VERSION = "0.68";
+	public static final String VERSION = "0.69";
 
 	public static final Cons DEFAULT_USE = new Cons("builtins",
 		new Cons("syntax",new Cons("scratchpad",null)));
