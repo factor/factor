@@ -86,7 +86,7 @@ USE: listener
 : write-editable-word-source ( vocab word -- )
   #! Write the source in a manner allowing it to be edited.
   <textarea name= "eval" rows= "30" cols= "80" textarea> 
-    1024 <string-output-stream> dup >r [
+    1024 <string-output> dup >r [
       >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
     ] with-stream r> stream>str chars>entities write
   </textarea> <br/>
@@ -224,3 +224,4 @@ USE: listener
   "browser" f <browser> browse ;
 
 "browser" [ f browser-responder ] install-cont-responder
+!"browser-edit" [ t browser-responder ] install-cont-responder

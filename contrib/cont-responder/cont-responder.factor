@@ -193,7 +193,7 @@ DEFER: show
 : with-string-stream ( quot -- string ) 
   #! Call the quotation with standard output bound to a string output
   #! stream. Return the string on exit.
-  1024 <string-output-stream> dup >r swap with-stream r> stream>str ;
+  1024 <string-output> dup >r swap with-stream r> stream>str ;
 
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser

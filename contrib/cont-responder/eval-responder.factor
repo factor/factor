@@ -73,7 +73,7 @@ USE: logging
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [ CHAR: ' | "\\'" ] [ CHAR: " | "\\\"" ] ] assoc dup rot ? ] str-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] str-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -187,7 +187,7 @@ USE: logging
   #! callstack along with the resulting datastack as a list.
   <namespace> [ 
     "inspect" "responder" set
-    1024 <string-output-stream> dup >r <html-stream> [
+    1024 <string-output> dup >r <html-stream> [
       do-eval 
     ] with-stream r> stream>str 
   ] bind ;

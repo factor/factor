@@ -152,7 +152,7 @@ Dynamic Data
 ============
 
 Adding dynamic data to the page is relatively easy. This example pulls
-a information from the 'room' word which displays memory details about
+information from the 'room' word which displays memory details about
 the running Factor system. It also uses 'room.' which outputs these
 details to standard output and this is wrapped in a <pre> tag so it is
 formatted correctly.
