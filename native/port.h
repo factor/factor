@@ -1,5 +1,9 @@
 #define BUF_SIZE (8 * 1024)
 
+#ifndef WIN32
+#define INVALID_HANDLE_VALUE -1
+#endif
+
 typedef enum {
 	PORT_READ,
 	PORT_RECV,

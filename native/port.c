@@ -8,8 +8,6 @@ F_PORT* untag_port(CELL tagged)
 	/* after image load & save, ports are no longer valid */
 	if(p->fd == -1)
 		general_error(ERROR_EXPIRED,tagged);
-	/* if(p->closed)
-		general_error(ERROR_CLOSED,tagged); */
 	return p;
 }
 
@@ -47,7 +45,7 @@ void init_line_buffer(F_PORT* port, F_FIXNUM count)
 
 void fixup_port(F_PORT* port)
 {
-	port->fd = -1;
+	port->fd = (F_FIXNUM)INVALID_HANDLE_VALUE;
 	fixup(&port->buffer);
 	fixup(&port->line);
 	fixup(&port->client_host);
@@ -64,6 +62,29 @@ void collect_port(F_PORT* port)
 	copy_object(&port->io_error);
 }
 
+#ifdef WIN32
+CELL make_io_error(const char* func)
+{
+	char *buffer;
+	F_STRING *function = from_c_string(func);
+	F_STRING *error;
+	DWORD dw = GetLastError();
+	
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		dw,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR) &buffer,
+		0, NULL);
+
+	error = from_c_string(buffer);
+	LocalFree(buffer);
+
+	return cons(tag_object(function),cons(tag_object(error),F));
+}
+#else
 CELL make_io_error(const char* func)
 {
 	F_STRING* function = from_c_string(func);
@@ -71,6 +92,7 @@ CELL make_io_error(const char* func)
 
 	return cons(tag_object(function),cons(tag_object(error),F));
 }
+#endif
 
 void postpone_io_error(F_PORT* port, const char* func)
 {

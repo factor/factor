@@ -1,4 +1,4 @@
-#include "factor.h"
+#include "../factor.h"
 
 void init_io_tasks(fd_set* fdset, IO_TASK* io_tasks)
 {
