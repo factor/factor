@@ -1,5 +1,10 @@
 #include "factor.h"
 
+void init_errors(void)
+{
+	thrown_error = F;
+}
+
 void fatal_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"Fatal error: %s %ld\n",msg,tagged);
@@ -15,9 +20,9 @@ void critical_error(char* msg, CELL tagged)
 
 void throw_error(CELL error)
 {
-	dpush(error);
-	/* Execute the 'throw' word */
-	call(userenv[BREAK_ENV]);
+	/* dpush(error); */
+	/* call(userenv[BREAK_ENV]); */
+	thrown_error = error;
 
 	/* Return to run() method */
 	siglongjmp(toplevel,1);

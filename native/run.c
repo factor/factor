@@ -16,6 +16,13 @@ void run(void)
 
 	/* Error handling. */
 	sigsetjmp(toplevel, 1);
+	if(thrown_error != F)
+	{
+		dpush(thrown_error);
+		/* Notify any 'catch' blocks */
+		call(userenv[BREAK_ENV]);
+		thrown_error = F;
+	}
 
 	for(;;)
 	{

@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 	init_io();
 	init_signals();
 	init_compiler();
+	init_errors();
 
 	args = F;
 	while(--argc != 0)
@@ -27,7 +28,7 @@ int main(int argc, char** argv)
 
 	userenv[ARGS_ENV] = args;
 
-#if defined(i386) || defined(__i386) || defined(__i386__)
+#ifdef FACTOR_X86
 	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
 #else
 	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));

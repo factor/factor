@@ -27,6 +27,10 @@
 #include <dlfcn.h>
 #endif /* FFI */
 
+#if defined(i386) || defined(__i386) || defined(__i386__)
+    #define FACTOR_X86
+#endif
+
 #define INLINE inline static
 
 /* CELL must be 32 bits and your system must have 32-bit pointers */

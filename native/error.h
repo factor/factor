@@ -19,6 +19,11 @@
 #define ERROR_CALLSTACK_OVERFLOW (18<<3)
 #define ERROR_CLOSED (19<<3)
 
+/* When throw_error throws an error, it sets this global and
+longjmps back to the top-level. */
+CELL thrown_error;
+
+void init_errors(void);
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 void throw_error(CELL object);
