@@ -10,15 +10,6 @@ INLINE void gc_debug(char* msg, CELL x) {
 #endif
 }
 
-/* Given a pointer to oldspace, copy it to newspace. */
-void* copy_untagged_object(void* pointer, CELL size)
-{
-	void* newpointer = allot(size);
-	memcpy(newpointer,pointer,size);
-
-	return newpointer;
-}
-
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
@@ -33,7 +24,7 @@ void copy_object(CELL* handle)
 
 	if(tag == FIXNUM_TYPE || pointer == F)
 		return;
-	
+
 	if(in_zone(&active,pointer))
 		critical_error("copy_object given newspace ptr",pointer);
 

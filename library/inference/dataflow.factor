@@ -26,9 +26,14 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
+USE: interpreter
 USE: lists
+USE: math
 USE: namespaces
 USE: stack
+USE: words
+USE: combinators
+USE: vectors
 
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
@@ -55,5 +60,10 @@ SYMBOL: 2GENERIC
 : dataflow-literal, ( lit -- )
     >r f PUSH r> dataflow, ;
 
-: dataflow-word, ( in word -- )
-    >r count CALL r> dataflow, ;
+: inputs ( count -- vector )
+    meta-d get [ vector-length swap - ] keep vector-tail ;
+
+: dataflow-word, ( word -- )
+    [
+        "infer-effect" word-property car inputs CALL
+    ] keep dataflow, ;

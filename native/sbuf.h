@@ -3,8 +3,8 @@ typedef struct {
 	CELL header;
 	/* untagged */
 	CELL top;
-	/* untagged */
-	STRING* string;
+	/* tagged */
+	CELL string;
 } SBUF;
 
 INLINE SBUF* untag_sbuf(CELL tagged)

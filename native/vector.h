@@ -3,8 +3,8 @@ typedef struct {
 	CELL header;
 	/* untagged */
 	CELL top;
-	/* untagged */
-	ARRAY* array;
+	/* tagged */
+	CELL array;
 } VECTOR;
 
 INLINE VECTOR* untag_vector(CELL tagged)

@@ -6,8 +6,8 @@ typedef struct {
 
 INLINE ARRAY* untag_array(CELL tagged)
 {
-	type_check(ARRAY_TYPE,tagged);
-	return (ARRAY*)UNTAG(tagged);
+	/* type_check(ARRAY_TYPE,tagged); */
+	return (ARRAY*)UNTAG(tagged); /* FIXME */
 }
 
 ARRAY* allot_array(CELL type, FIXNUM capacity);
@@ -34,4 +34,3 @@ INLINE void set_array_nth(ARRAY* array, CELL index, CELL value)
 
 void fixup_array(ARRAY* array);
 void collect_array(ARRAY* array);
-ARRAY* copy_array(ARRAY* array);

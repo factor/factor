@@ -19,7 +19,6 @@ PORT* port(PORT_MODE type, CELL fd)
 	port->type = type;
 	port->closed = false;
 	port->fd = fd;
-	port->buffer = NULL;
 	port->line = F;
 	port->client_host = F;
 	port->client_port = F;
@@ -31,9 +30,9 @@ PORT* port(PORT_MODE type, CELL fd)
 	port->io_error = F;
 
 	if(type == PORT_SPECIAL)
-		port->buffer = NULL;
+		port->buffer = F;
 	else
-		port->buffer = string(BUF_SIZE,'\0');
+		port->buffer = tag_object(string(BUF_SIZE,'\0'));
 
 	if(fcntl(port->fd,F_SETFL,O_NONBLOCK,1) == -1)
 		io_error(__FUNCTION__);
@@ -50,8 +49,7 @@ void init_line_buffer(PORT* port, FIXNUM count)
 void fixup_port(PORT* port)
 {
 	port->fd = -1;
-	if(port->buffer != 0)
-		port->buffer = fixup_untagged_string(port->buffer);
+	fixup(&port->buffer);
 	fixup(&port->line);
 	fixup(&port->client_host);
 	fixup(&port->client_port);
@@ -60,8 +58,7 @@ void fixup_port(PORT* port)
 
 void collect_port(PORT* port)
 {
-	if(port->buffer != 0)
-		port->buffer = copy_untagged_string(port->buffer);
+	copy_object(&port->buffer);
 	copy_object(&port->line);
 	copy_object(&port->client_host);
 	copy_object(&port->client_port);

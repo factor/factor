@@ -330,13 +330,3 @@ void primitive_string_reverse(void)
 	rehash_string(s);
 	drepl(tag_object(s));
 }
-
-STRING* fixup_untagged_string(STRING* str)
-{
-	return (STRING*)((CELL)str + (active.base - relocation_base));
-}
-
-STRING* copy_untagged_string(STRING* str)
-{
-	return copy_untagged_object(str,SSIZE(str));
-}

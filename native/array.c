@@ -59,9 +59,3 @@ void collect_array(ARRAY* array)
 	for(i = 0; i < array->capacity; i++)
 		copy_object((void*)AREF(array,i));
 }
-
-/* copy an array to newspace */
-ARRAY* copy_array(ARRAY* array)
-{
-	return copy_untagged_object(array,ASIZE(array));
-}

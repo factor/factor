@@ -3,7 +3,7 @@
 /* Return true if write was done */
 void write_step(PORT* port)
 {
-	BYTE* chars = (BYTE*)port->buffer + sizeof(STRING);
+	BYTE* chars = (BYTE*)untag_string(port->buffer) + sizeof(STRING);
 
 	FIXNUM amount = write(port->fd,chars + port->buf_pos,
 		port->buf_fill - port->buf_pos);
@@ -24,12 +24,12 @@ bool can_write(PORT* port, FIXNUM len)
 	if(port->type != PORT_WRITE)
 		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
-	buf_capacity = port->buffer->capacity * CHARS;
+	buf_capacity = untag_string(port->buffer)->capacity * CHARS;
 	/* Is the string longer than the buffer? */
 	if(port->buf_fill == 0 && len > buf_capacity)
 	{
 		/* Increase the buffer to fit the string */
-		port->buffer = allot_string(len / CHARS + 1);
+		port->buffer = tag_object(allot_string(len / CHARS + 1));
 		return true;
 	}
 	else
@@ -86,7 +86,7 @@ void write_char_8(PORT* port, FIXNUM ch)
 	if(!can_write(port,1))
 		io_error(__FUNCTION__);
 
-	bput((CELL)port->buffer + sizeof(STRING) + port->buf_fill,c);
+	bput((CELL)untag_string(port->buffer) + sizeof(STRING) + port->buf_fill,c);
 	port->buf_fill++;
 }
 
@@ -94,7 +94,7 @@ void write_char_8(PORT* port, FIXNUM ch)
 void write_string_raw(PORT* port, BYTE* str, CELL len)
 {
 	/* Append string to buffer */
-	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
+	memcpy((void*)((CELL)untag_string(port->buffer) + sizeof(STRING)
 		+ port->buf_fill),str,len);
 
 	port->buf_fill += len;

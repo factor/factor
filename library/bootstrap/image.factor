@@ -283,9 +283,9 @@ DEFER: '
 
 ( Arrays and vectors )
 
-: 'array ( list -- untagged )
+: 'array ( list -- pointer )
     [ ' ] map
-    here >r
+    object-tag here-as >r
     array-type >header emit
     dup length emit
     ( elements -- ) [ emit ] each

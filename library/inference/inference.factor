@@ -58,7 +58,7 @@ SYMBOL: entry-effect
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
 
-: inputs ( count stack -- stack )
+: add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
     >r gensym-vector dup r> vector-append ;
 
@@ -66,7 +66,7 @@ SYMBOL: entry-effect
     #! Ensure stack has this many elements. Return number of
     #! elements added.
     2dup vector-length > [
-        [ vector-length - dup ] keep inputs
+        [ vector-length - dup ] keep add-inputs
     ] [
         >r drop 0 r>
     ] ifte ;

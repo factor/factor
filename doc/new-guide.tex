@@ -270,7 +270,7 @@ The \texttt{clear} word removes all elements from the stack.
 In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
 }
 
-\subsection*{Review}
+\section*{Review}
 
 Lets review the words  we've seen until now, and their stack effects. The ``vocab'' column will be described later, and only comes into play when we start working with source files. Basically, Factor's words are partitioned into vocabularies rather than being in one flat list.
 
@@ -402,7 +402,7 @@ The implementation of \texttt{km/hour} is a bit more complex. We would like it t
 \textbf{1872000}
 \end{alltt}
 
-\subsection*{Review}
+\section*{Review}
 
 \wordtable{
 \tabvocab{math}
@@ -668,7 +668,7 @@ You can test \texttt{quadratic} with a handful of inputs:
 
 The last example shows that Factor can handle complex numbers perfectly well. We will have more to say about complex numbers later.
 
-\subsection*{Review}
+\section*{Review}
 
 \wordtable{
 \tabvocab{math}
@@ -749,7 +749,7 @@ Now, to use the words defined within, you must issue the following command in th
 
 \sidebar{If you are using jEdit, you can use the \textbf{Plugins}>\textbf{Factor}>\textbf{Use word at caret} command to insert a \texttt{USE:} declaration for the word at the caret.}
 
-\subsection*{Review}
+\section*{Review}
 
 \wordtable{
 \tabvocab{parser}
@@ -771,7 +771,7 @@ List all words whose name contains a given string, and the vocabularies they are
 
 \section{Exploring the library}
 
-\chapkeywords{apropos. see ~vocabs.~words.~httpd}
+\chapkeywords{apropos.~see ~vocabs.~words.~httpd}
 
 We already saw two ways to explore the Factor library in previous sections: the \texttt{see} word, which shows a word definition, and \texttt{apropos.}~ which helps locate a word and its vocabulary if we know part of its name.
 
@@ -848,7 +848,7 @@ You can even start the HTTP in a separate thread, using the following commands:
 
 This way, you can browse code and play in the listener at the same time.
 
-\subsection*{Review}
+\section*{Review}
 
 \wordtable{
 \tabvocab{words}
@@ -1040,11 +1040,14 @@ Determine if a list contains a value.\\}
 
 \section{Conditional execution}
 
-\chapkeywords{f t ifte unique infer}
+\chapkeywords{f t ifte when unless unique abs infer}
 \index{\texttt{f}}
 \index{\texttt{t}}
 \index{\texttt{ifte}}
+\index{\texttt{when}}
+\index{\texttt{unless}}
 \index{\texttt{unique?}}
+\index{\texttt{abs}}
 \index{\texttt{ifer}}
 
 Until now, all code examples we've considered have been linear in nature; each word is executed in turn, left to right. To perform useful computations, we need the ability the execute different code depending on circumstances.
@@ -1059,6 +1062,8 @@ The simplest style of a conditional form in Factor is the following:
 {]} ifte
 \end{alltt}
 
+The \texttt{ifte} word is a \emph{combinator}, because it executes lists representing code, or \emph{quotations}, given on the stack.
+
 The condition should be some piece of code that leaves a truth value on the stack. What is a truth value? In Factor, there is no special boolean data type
 -- instead, the special value \texttt{f} we've already seen to represent empty lists also represents falsity. Every other object represents boolean truth. In cases where a truth value must be explicitly produced, the value \texttt{t} can be used. The \texttt{ifte} word removes the condition from the stack, and executes one of the two branches depending on the truth value of the condition.
 
@@ -1070,6 +1075,44 @@ A good first example to look at is the \texttt{unique} word. This word conses a 
 \end{alltt}
 
 The first the word does is duplicate the two values given as input, since \texttt{contains?}~consumes its inputs. If the value does occur in the list, \texttt{contains?}~returns the remainder of the list starting from the first occurrence; in other words, a truth value. This calls \texttt{nip}, which removes the value from the stack, leaving the original list at the top of the stack. On the other hand, if the value does not occur in the list, \texttt{contains?}~returns \texttt{f}, which causes the other branch of the conditional to execute. This branch calls \texttt{cons}, which adds the value at the beginning of the list. 
+
+Another frequently-used combinator \texttt{when}. This combinator is a variation of \texttt{ifte}, except only one quotation is given. If the condition is true, the quotation is executed. Nothing is done if the condition is false. In fact \texttt{when} is implemented in terms of \texttt{ifte}. Since \texttt{when} is called with a quotation on the stack, it suffices to push an empty list, and call \texttt{ifte} -- the given quotation is the true branch, and the empty quotation is the false branch:
+
+\begin{verbatim}
+: when ( ? quot -- )
+    [ ] ifte ;
+\end{verbatim}
+
+An example of a word that uses both \texttt{ifte} and \texttt{when} is the \texttt{abs} word, which computes the absolute value of a number:
+
+\begin{verbatim}
+: abs ( z -- abs )
+    dup complex? [
+        >rect mag2
+    ] [
+        dup 0 < [ neg ] when
+    ] ifte ;
+\end{verbatim}
+
+If the given number is a complex number, its distance from the origin is computed\footnote{Don't worry about the \texttt{>rect} and \texttt{mag2} words at this stage; they will be described later. If you are curious, use \texttt{see} to look at their definitions and read the documentation comments.}. Otherwise, if the parameter is a real number below zero, it is negated. If it is a real number greater than zero, it is not modified.
+
+The dual of the \texttt{when} combinator is the \texttt{unless} combinator. It takes a quotation to execute if the condition is false; otherwise nothing is done. In both cases, the condition is popped off the stack.
+
+The implementation is similar to that of \texttt{when}, but this time, we must swap the two quotations given to \texttt{ifte}, so that the true branch is an empty list, and the false branch is the user's quotation:
+
+\begin{verbatim}
+: unless ( ? quot -- )
+    [ ] swap ifte ;
+\end{verbatim}
+
+A very simple example of \texttt{unless} usage is the \texttt{assert} word:
+
+\begin{verbatim}
+: assert ( t -- )
+    [ "Assertion failed!" throw ] unless ;
+\end{verbatim}
+
+This word is used for unit testing -- it raises an error and stops execution if the top of the stack is false.
 
 \subsection{Stack effects of conditionals}
 
@@ -1088,7 +1131,23 @@ The output indicates that the code snippet\footnote{The proper term for a code s
 :s :r :n :c show stacks at time of error.}
 \end{alltt}
 
-Lets review the words we saw in this section:
+Now lets look at the stack effect of the \texttt{abs} word. First, verify that each branch has the same stack effect:
+ 
+\begin{alltt}
+\textbf{ok} [ >rect mag2 ] infer .
+\textbf{[ 1 | 1 ]}
+\textbf{ok} [ dup 0 < [ neg ] when ] infer .
+\textbf{[ 1 | 1 ]}
+\end{alltt}
+
+Since the branches are balanced, the stack effect of the entire conditional expression can be computed:
+
+\begin{alltt}
+\textbf{ok} [ abs ] infer .
+\textbf{[ 1 | 1 ]}
+\end{alltt}
+
+\subsection*{Review}
 
 \wordtable{
 \tabvocab{syntax}
@@ -1102,11 +1161,25 @@ Canonical truth value.\\
 \texttt{ifte}&
 \texttt{( ?~true false -{}- )}&
 Execute either \texttt{true} or \texttt{false} depending on the boolean value of the conditional.\\
+\texttt{when}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
+\texttt{unless}&
+\texttt{( ?~quot -{}- )}&
+Execute quotation if the condition is false, otherwise do nothing but pop the condition and quotation off the stack.\\
 \tabvocab{lists}
 \texttt{unique}&
 \texttt{( elem list -{}- )}&
 Prepend an element to a list if it does not occur in the
 list.\\
+\tabvocab{math}
+\texttt{abs}&
+\texttt{( z -- abs )}&
+Compute the complex absolute value.\\
+\tabvocab{test}
+\texttt{assert}&
+\texttt{( t -- )}&
+Raise an error if the top of the stack is \texttt{f}.\\
 \tabvocab{inference}
 \texttt{infer}&
 \texttt{( quot -{}- {[} in | out {]} )}&
@@ -1146,15 +1219,6 @@ As you can see, it makes a call to an auxilliary word \texttt{last*}, and takes 
 : last* ( list -- last )
     dup cdr cons? [ cdr last* ] when ;
 \end{verbatim}
-
-To understand the above code, first make the observation that the following two lines are equivalent:
-
-\begin{verbatim}
-dup cdr cons? [ cdr last* ] when
-dup cdr cons? [ cdr last* ] [ ] ifte
-\end{verbatim}
-
-That is, \texttt{when} is a conditional where the ``false'' branch is empty.
 
 So if the top of stack is a cons cell whose cdr is not a cons cell, the cons cell remains on the stack -- it gets duplicated, its cdr is taken, the \texttt{cons?} predicate tests if it is a cons cell, then \texttt{when} consumes the condition, and takes the empty ``false'' branch. This is the \emph{base case} -- the last cons cell of a one-element list is the list itself.
 
@@ -1231,111 +1295,6 @@ Test if a value is a proper list.\\
 
 \section{Debugging}
 
-\section{Combinators}
-
-\chapkeywords{when unless when* unless* ifte*}
-\index{\texttt{when}}
-\index{\texttt{unless}}
-\index{\texttt{when*}}
-\index{\texttt{unless*}}
-\index{\texttt{ifte*}}
-
-A \emph{combinator} is a word that takes a code quotation on the stack. In this section, we will look at some simple combinators, all derived from the fundamental \texttt{ifte} combinator we saw earlier. A later section will cover recursive combinators, used for iteration over lists and such.
-
-You may have noticed the curious form of conditional expressions we have seen so far. Indeed, the two code quotations given as branches of the conditional look just like lists, and \texttt{ifte} looks like a normal word that takes these two lists from the stack:
-
-\begin{alltt}
-\emph{condition} {[}
-    \emph{to execute if true}
-{] [}
-    \emph{to execute if false}
-{]} ifte
-\end{alltt}
-
-The \texttt{ifte} word is a \emph{combinator}, because it executes lists representing code, or \emph{quotations}, given on the stack.
-
-%We have already seen the \texttt{when} combinator, which is similar to \texttt{ifte} except it only takes one quotation; the quotation is executed if the condition is true, and nothing is done if the condition is false. In fact \texttt{when} is implemented in terms of \texttt{ifte}. If you think about it for a brief moment, since \texttt{when} is called with a quotation on the stack, it suffices to push an empty list, and call \texttt{ifte}:
-%
-%\begin{verbatim}
-%: when ( ? quot -- )
-%    [ ] ifte ;
-%\end{verbatim}
-%
-%An example of a word that uses both \texttt{ifte} and \texttt{when} is the \texttt{abs} word, which computes the absolute value of a number:
-%
-%\begin{verbatim}
-%: abs ( z -- abs )
-%    #! Compute the complex absolute value.
-%    dup complex? [
-%        >rect mag2
-%    ] [
-%        dup 0 < [ neg ] when
-%    ] ifte ;
-%\end{verbatim}
-%
-%If the given number is a complex number, its distance from the origin is computed\footnote{Don't worry about the \texttt{>rect} and \texttt{mag2} words at this stage; they will be described later. If you are curious, use \texttt{see} to look at their definitions and read the documentation comments.}. Otherwise, if the parameter is a real number below zero, it is negated. If it is a real number greater than zero, it is not modified.
-
-% Note that each branch has the same stack effect. You can use the \texttt{infer} combinator to verify this:
-% 
-% \begin{alltt}
-% \textbf{ok} [ >rect mag2 ] infer .
-% \textbf{[ 1 | 1 ]}
-% \textbf{ok} [ dup 0 < [ neg ] when ] infer .
-% \textbf{[ 1 | 1 ]}
-% \end{alltt}
-% 
-% Hence, the stack effect of the entire conditional expression can be computed:
-% 
-% \begin{alltt}
-% \textbf{ok} [ abs ] infer .
-% \textbf{[ 1 | 1 ]}
-% \end{alltt}
-
-%The dual of the \texttt{when} combinator is the \texttt{unless} combinator. It takes a quotation to execute if the condition is false; otherwise nothing is done. In both cases, the condition is popped off the stack.
-%
-%The implementation is similar to that of \texttt{when}, but this time, we must swap the two quotations given to \texttt{ifte}, so that the true branch is an empty list, and the false branch is the user's quotation:
-%
-%\begin{verbatim}
-%: unless ( ? quot -- )
-%    [ ] swap ifte ;
-%\end{verbatim}
-%
-%A very simple example of \texttt{unless} usage is the \texttt{assert} word:
-%
-%\begin{verbatim}
-%: assert ( t -- )
-%    [ "Assertion failed!" throw ] unless ;
-%\end{verbatim}
-
-%Lets take a look at the words we saw in this section:
-%
-%\wordtable{
-%\tabvocab{combinators}
-%\texttt{when}&
-%\texttt{( ?~quot -{}- )}&
-%Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
-%\texttt{unless}&
-%\texttt{( ?~quot -{}- )}&
-%Execute quotation if the condition is false, otherwise do nothing but pop the condition and quotation off the stack.\\
-%\texttt{when*}&
-%\texttt{( ?~quot -{}- )}&
-%If the condition is true, execute the quotation, with the condition on the stack. Otherwise, pop the condition off the stack.\\
-%\texttt{unless*}&
-%\texttt{( ?~quot -{}- )}&
-%If the condition is false, pop the condition and execute the quotation. Otherwise, leave the condition on the stack.\\
-%\texttt{ifte*}&
-%\texttt{( ?~true false -{}- )}&
-%If condition is true, execute the true branch, with the condition on the stack. Otherwise, pop the condition off the stack and execute the false branch.\\
-%\tabvocab{math}
-%\texttt{ans}&
-%\texttt{( z -- abs )}&
-%Compute the complex absolute value.\\
-%\tabvocab{test}
-%\texttt{assert}&
-%\texttt{( t -- )}&
-%Raise an error if the top of the stack is \texttt{f}.\\
-%}
-
 \section{The interpreter}
 
 \chapkeywords{acons >r r>}
@@ -1350,6 +1309,22 @@ Another fundamental stack is the \emph{return stack}. It is used to save interpr
 You already know that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the return stack, executes the definition of that word, then restores the execution state from the return stack and continues.
 
 The return stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the return stack, and vice versa, respectively.
+
+The words \texttt{>r} and \texttt{r>} ``hide'' the top of the stack between their occurrences. Try the following in the listener:
+
+\begin{alltt}
+\textbf{ok} 1 2 3 .s
+\textbf{3
+2
+1}
+\textbf{ok} >r .s r>
+\textbf{2
+1}
+\textbf{ok} 1 2 3 .s
+\textbf{3
+2
+1}
+\end{alltt}
 
 A simple example can be found in the definition of the \texttt{acons} word:
 
@@ -1389,9 +1364,327 @@ Move value to return stack..\\
 Move value from return stack..\\
 }
 
+\section{Association lists}
+
+An \emph{association list} is a list where every element is a cons. The
+car of each cons is a name, the cdr is a value. The literal notation
+is suggestive:
+
+\begin{alltt}
+{[}
+    {[} "Jill"  | "CEO" {]}
+    {[} "Jeff"  | "manager" {]}
+    {[} "James" | "lowly web designer" {]}
+{]}
+\end{alltt}
+
+\texttt{assoc? ( obj -{}- ?~)} returns \texttt{t} if the object is
+a list whose every element is a cons; otherwise it returns \texttt{f}.
+
+\texttt{assoc ( key alist -{}- value )} looks for a pair with this
+key in the list, and pushes the cdr of the pair. Pushes f if no pair
+with this key is present. Note that \texttt{assoc} cannot differentiate between
+a key that is not present at all, or a key with a value of \texttt{f}.
+
+\texttt{assoc{*} ( key alist -{}- {[} key | value {]} )} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{assoc},
+\texttt{assoc{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-assoc ( value key alist -{}- alist )} removes any existing
+occurrence of a key from the list, and adds a new pair. This creates
+a new list, the original is unaffected.
+
+\texttt{acons ( value key alist -{}- alist )} is slightly faster
+than \texttt{set-assoc} since it simply conses a new pair onto the
+list. However, if used repeatedly, the list will grow to contain a
+lot of {}``shadowed'' pairs.
+
+The following pair of word definitions from the \texttt{html} vocabulary demonstrates the usage of association lists. It implements a mapping of special characters to their HTML entity names. Note the usage of \texttt{?}~to return the original character if the association lookup yields \texttt{f}:
+
+\begin{alltt}
+: html-entities ( -- alist )
+    {[}
+        {[} CHAR: < | "\&lt;"   {]}
+        {[} CHAR: > | "\&gt;"   {]}
+        {[} CHAR: \& | "\&amp;"  {]}
+        {[} CHAR: {'} | "\&apos;" {]}
+        {[} CHAR: {"} | "\&quot;" {]}
+    {]} ;
+
+: char>entity ( ch -- str )
+    dup >r html-entities assoc dup r> ? ;
+\end{alltt}
+
+Searching association lists incurs a linear time cost, so they should
+only be used for small mappings -- a typical use is a mapping of half
+a dozen entries or so, specified literally in source. Hashtables offer
+better performance with larger mappings.
+
 \section{Recursive combinators}
 
-\section{Unit testing}
+\chapter{Practical: a numbers game}
+
+In this section, basic input/output and flow control is introduced.
+We construct a program that repeatedly prompts the user to guess a
+number -- they are informed if their guess is correct, too low, or
+too high. The game ends on a correct guess.
+
+\begin{alltt}
+numbers-game
+\emph{I'm thinking of a number between 0 and 100.}
+\emph{Enter your guess:} 25
+\emph{Too low}
+\emph{Enter your guess:} 38
+\emph{Too high}
+\emph{Enter your guess:} 31
+\emph{Correct - you win!}
+\end{alltt}
+
+\section{Getting started}
+
+Start a text editor and create a file named \texttt{numbers-game.factor}.
+
+Write a short comment at the top of the file. Two examples of commenting style supported by Factor:
+
+\begin{alltt}
+! Numbers game.
+( The great numbers game )
+\end{alltt}
+
+It is always a good idea to comment your code. Try to write simple
+code that does not need detailed comments to describe; similarly,
+avoid redundant comments. These two principles are hard to quantify
+in a concrete way, and will become more clear as your skills with
+Factor increase.
+
+We will be defining new words in the \texttt{numbers-game} vocabulary; add
+an \texttt{IN:} statement at the top of the source file:
+
+\begin{alltt}
+IN: numbers-game
+\end{alltt}
+Also in order to be able to test the words, issue a \texttt{USE:}
+statement in the interactive interpreter:
+
+\begin{alltt}
+USE: numbers-game
+\end{alltt}
+This section will develop the numbers game in an incremental fashion.
+After each addition, issue a command like the following to load the
+source file into the Factor interpreter:
+
+\begin{alltt}
+"numbers-game.factor" run-file
+\end{alltt}
+
+\section{Reading a number from the keyboard}
+
+A fundamental operation required for the numbers game is to be able
+to read a number from the keyboard. The \texttt{read} word \texttt{(
+-{}- str )} reads a line of input and pushes it on the stack.
+The \texttt{parse-number} word \texttt{( str -{}- n )} turns a decimal
+string representation of an integer into the integer itself. These
+two words can be combined into a single colon definition:
+
+\begin{alltt}
+: read-number ( -{}- n ) read parse-number ;
+\end{alltt}
+You should add this definition to the source file, and try loading
+the file into the interpreter. As you will soon see, this raises an
+error! The problem is that the two words \texttt{read} and \texttt{parse-number}
+are not part of the default, minimal, vocabulary search path used
+when reading files. The solution is to use \texttt{apropos.} to find
+out which vocabularies contain those words, and add the appropriate
+\texttt{USE:} statements to the source file:
+
+\begin{alltt}
+USE: parser
+USE: stdio
+\end{alltt}
+After adding the above two statements, the file should now parse,
+and testing should confirm that the \texttt{read-number} word works correctly.%
+\footnote{There is the possibility of an invalid number being entered at the
+keyboard. In this case, \texttt{parse-number} returns \texttt{f},
+the boolean false value. For the sake of simplicity, we ignore this
+case in the numbers game example. However, proper error handling is
+an essential part of any large program and is covered later.%
+}
+
+
+\section{Printing some messages}
+
+Now we need to make some words for printing various messages. They
+are given here without further ado:
+
+\begin{alltt}
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+\end{alltt}
+Note that in the above, stack effect comments are omitted, since they
+are obvious from context. You should ensure the words work correctly
+after loading the source file into the interpreter.
+
+
+\section{Taking action based on a guess}
+
+The next logical step is to write a word \texttt{judge-guess} that
+takes the user's guess along with the actual number to be guessed,
+and prints one of the messages \texttt{too-high}, \texttt{too-low},
+or \texttt{correct}. This word will also push a boolean flag, indicating
+if the game should continue or not -- in the case of a correct guess,
+the game does not continue.
+
+This description of judge-guess is a mouthful -- and it suggests that
+it may be best to split it into two words. The first word we write
+handles the more specific case of an \emph{inexact} guess -- so it
+prints either \texttt{too-low} or \texttt{too-high}.
+
+\begin{alltt}
+: inexact-guess ( actual guess -{}- )
+     < {[} too-high {]} {[} too-low {]} ifte ;
+\end{alltt}
+Note that the word gives incorrect output if the two parameters are
+equal. However, it will never be called this way.
+
+With this out of the way, the implementation of judge-guess is an
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
+
+\begin{alltt}
+: judge-guess ( actual guess -{}- ? )
+    2dup = {[}
+        2drop correct f
+    {]} {[}
+        inexact-guess t
+    {]} ifte ;
+\end{alltt}
+
+The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
+consumes both its inputs, we must first duplicate the \texttt{actual} and \texttt{guess} parameters using \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
+in the interpreter to see what's going on:
+
+\begin{alltt}
+clear 1 2 2dup = .s
+\emph{\{ 1 2 f \}}
+clear 4 4 2dup = .s
+\emph{\{ 4 4 t \}}
+\end{alltt}
+
+Test \texttt{judge-guess} with a few inputs:
+
+\begin{alltt}
+1 10 judge-guess .
+\emph{Too low}
+\emph{t}
+89 43 judge-guess .
+\emph{Too high}
+\emph{t}
+64 64 judge-guess .
+\emph{Correct}
+\emph{f}
+\end{alltt}
+
+\section{Generating random numbers}
+
+The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
+random number in a specified range. The range is inclusive, so both
+the minimum and maximum indexes are candidate random numbers. Use
+\texttt{apropos.} to determine that this word is in the \texttt{random}
+vocabulary. For the purposes of this game, random numbers will be
+in the range of 0 to 100, so we can define a word that generates a
+random number in the range of 0 to 100:
+
+\begin{alltt}
+: number-to-guess ( -{}- n ) 0 100 random-int ;
+\end{alltt}
+Add the word definition to the source file, along with the appropriate
+\texttt{USE:} statement. Load the source file in the interpreter,
+and confirm that the word functions correctly, and that its stack
+effect comment is accurate.
+
+
+\section{The game loop}
+
+The game loop consists of repeated calls to \texttt{guess-prompt},
+\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
+returns \texttt{f}, the loop stops, otherwise it continues. This is
+realized with a recursive implementation:
+
+\begin{alltt}
+: numbers-game-loop ( actual -{}- )
+    dup guess-prompt read-number judge-guess {[}
+        numbers-game-loop
+    {]} {[}
+        drop
+    {]} ifte ;
+\end{alltt}
+In Factor, tail-recursive words consume a bounded amount of call stack
+space. This means you are free to pick recursion or iteration based
+on their own merits when solving a problem. In many other languages,
+the usefulness of recursion is severely limited by the lack of tail-recursive
+call optimization.
+
+
+\section{Finishing off}
+
+The last task is to combine everything into the main \texttt{numbers-game}
+word. This is easier than it seems:
+
+\begin{alltt}
+: numbers-game number-to-guess numbers-game-loop ;
+\end{alltt}
+Try it out! Simply invoke the \texttt{numbers-game} word in the interpreter.
+It should work flawlessly, assuming you tested each component of this
+design incrementally!
+
+
+\section{The complete program}
+
+\begin{verbatim}
+! Numbers game example
+
+IN: numbers-game
+USE: kernel
+USE: math
+USE: parser
+USE: random
+USE: stdio
+USE: stack
+
+: read-number ( -- n ) read parse-number ;
+
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+
+: inexact-guess ( actual guess -- )
+     < [ too-high ] [ too-low ] ifte ;
+
+: judge-guess ( actual guess -- ? )
+    2dup = [
+        2drop correct f
+    ] [
+        inexact-guess t
+    ] ifte ;
+
+: number-to-guess ( -- n ) 0 100 random-int ;
+
+: numbers-game-loop ( actual -- )
+    dup guess-prompt read-number judge-guess [
+        numbers-game-loop
+    ] [
+        drop
+    ] ifte ;
+
+: numbers-game number-to-guess numbers-game-loop ;
+\end{verbatim}
 
 \chapter{All about numbers}
 
@@ -1697,6 +1990,542 @@ The attentive reader will notice that shifting to the left is equivalent to mult
 \index{\texttt{make-list}}
 \index{\texttt{make-,}}
 
+\section{Hashtables}
+
+A hashtable, much like an association list, stores key/value pairs, and offers lookup by key. However, whereas an association list must be searched linearly to locate keys, a hashtable uses a more sophisticated method. Key/value pairs are sorted into \emph{buckets} using a \emph{hash function}. If two objects are equal, then they must have the same hash code; but not necessarily vice versa. To look up the value associated with a key, only the bucket corresponding to the key has to be searched. A hashtable is simply a vector of buckets, where each bucket is an association list.
+
+\texttt{<hashtable> ( capacity -{}- hash )} creates a new hashtable with the specified number of buckets. A hashtable with one bucket is basically an association list. Right now, a ``large enough'' capacity must be specified, and performance degrades if there are too many key/value pairs per bucket. In a future implementation, hashtables will grow as needed as the number of key/value pairs increases.
+
+\texttt{hash ( key hash -{}- value )} looks up the value associated with a key in the hashtable. Pushes \texttt{f} if no pair with this key is present. Note that \texttt{hash} cannot differentiate between a key that is not present at all, or a key with a value of \texttt{f}.
+
+\texttt{hash* ( key hash -{}- {[} key | value {]} )} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{hash},
+\texttt{hash{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
+
+Hashtables can be converted to association lists and vice versa using
+the \texttt{hash>alist} and \texttt{alist>hash} words. The list of keys and
+list of values can be extracted using the \texttt{hash-keys} and \texttt{hash-values} words.
+
+examples
+
+\section{Variables}
+
+Notice that until now, all the code except a handful of examples has only used the stack for storage. You can also use variables to store temporary data, much like in other languages, however their use is not so prevalent. This is not a coincidence -- Fator was designed this way, and mastery of the stack is essential. Using variables where the stack is more appropriate leads to ugly, unreusable code.
+
+Variables are typically used for longer-term storage of data, and compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language. Variables should only be used for intermediate results if keeping everything on the stack would result in ackward stack flow.
+
+The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. Variable names are strings, and they do not have to be declared before use. For example:
+
+\begin{alltt}
+5 "x" set
+"x" get .
+\emph{5}
+\end{alltt}
+
+\section{Namespaces}
+
+Only having one list of variable name/value bindings would make the language terribly inflexible. Instead, a variable has any number of potential values, one per namespace. There is a notion of a ``current namespace''; the \texttt{set} word always stores variables in the current namespace. On the other hand, \texttt{get} traverses up the stack of namespace bindings until it finds a variable with the specified name.
+
+\texttt{bind ( namespace quot -{}- )} executes a quotation in the dynamic scope of a namespace. For example, the following sets the value of \texttt{x} to 5 in the global namespace, regardless of the current namespace at the time the word was called.
+
+\begin{alltt}
+: global-example ( -- )
+    global {[} 5 "x" set {]} bind ;
+\end{alltt}
+
+\texttt{<namespace> ( -{}- namespace )} creates a new namespace object. Actually, a namespace is just a hashtable, with a default capacity.
+
+\texttt{with-scope ( quot -{}- )} combines \texttt{<namespace>} with \texttt{bind} by executing a quotation in a new namespace.
+
+get example
+
+describe
+
+\section{The name stack}
+
+The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
+
+\begin{alltt}
+: bind ( namespace quot -- )
+    swap >n call n> drop ;
+\end{alltt}
+
+The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
+
+The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
+
+\begin{alltt}
+: >n ( namespace -- n:namespace ) namestack* vector-push ;
+: n> ( n:namespace -- namespace ) namestack* vector-pop ;
+\end{alltt}
+
+\section{\label{sub:List-constructors}List constructors}
+
+The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
+of stack elements that have to be juggled.
+
+The word \texttt{{[}, ( -{}- )} begins list construction. This also pushes a new namespace on the name stack, so any variable values that are set between calls to \texttt{[,} and \texttt{,]} will be lost.
+
+The word \texttt{, ( obj -{}- )} appends an object to the partial
+list.
+
+The word \texttt{,{]} ( -{}- list )} pushes the complete list, and pops the corresponding namespace from the name stack.
+
+The fact that a new
+scope is created between \texttt{{[},} and \texttt{,{]}} is very important.
+This means
+that list constructions can be nested. There is no
+requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
+word, however, debugging becomes prohibitively difficult when a list
+construction begins in one word and ends with another.
+
+Here is an example of list construction using this technique:
+
+\begin{alltt}
+{[}, 1 10 {[} 2 {*} dup , {]} times drop ,{]} .
+\emph{{[} 2 4 8 16 32 64 128 256 512 1024 {]}}
+\end{alltt}
+
+\section{String constructors}
+
+The string construction words provide an alternative way to build up a string. Instead of passing a string buffer around on the stack, they store the string buffer in a variable. This reduces the number
+of stack elements that have to be juggled.
+
+The word \texttt{<\% ( -{}- )} begins string construction. The word
+definition creates a string buffer. Instead of leaving the string
+buffer on the stack, the word creates and pushes a scope on the name
+stack.
+
+The word \texttt{\% ( str/ch -{}- )} appends a string or a character
+to the partial list. The word definition calls \texttt{sbuf-append}
+on a string buffer located by searching the name stack.
+
+The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
+definition pops the name stack and calls \texttt{sbuf>str} on the
+appropriate string buffer.
+
+Compare the following two examples -- both define a word that concatenates together all elements of a list of strings. The first one uses a string buffer stored on the stack, the second uses string construction words:
+
+\begin{alltt}
+: cat ( list -- str )
+    100 <sbuf> swap {[} over sbuf-append {]} each sbuf>str ;
+
+: cat ( list -- str )
+    <\% {[} \% {]} each \%> ;
+\end{alltt}
+
+The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, all code executed between two words is part of the scope. This allows the call to \texttt{\%} to occur in a nested word. For example, here is a pair of definitions that turn an association list of strings into a string of the form \texttt{key1=value1 key2=value2 ...}:
+
+\begin{alltt}
+: pair\% ( pair -{}- )
+    unswons \% "=" \% \% ;
+
+: assoc>string ( alist -{}- )
+    <\% [ pair\% " " \% ] each \%> ;
+\end{alltt}
+
+\chapter{Practical: a contractor timesheet}
+
+For the second practical example, we will code a small program that tracks how long you spend working on tasks. It will provide two primary functions, one for adding a new task and measuring how long you spend working on it, and another to print out the timesheet. A typical interaction looks like this:
+
+\begin{alltt}
+timesheet-app
+\emph{
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+a
+\emph{Start work on the task now. Press ENTER when done.
+
+Please enter a description:}
+Working on the Factor HTTP server
+
+\emph{(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+a
+\emph{Start work on the task now. Press ENTER when done.
+
+Please enter a description:}
+Writing a kick-ass web app
+\emph{
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+p
+\emph{TIMESHEET:
+Working on the Factor HTTP server                           0:25
+Writing a kick-ass web app                                  1:03
+
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+x
+\end{alltt}
+
+Once you have finished working your way through this tutorial, you might want to try extending the program -- for example, it could print the total hours, prompt for an hourly rate, then print the amount of money that should be billed.
+
+\section{Measuring a duration of time}
+
+When you begin working on a new task, you tell the timesheet you want
+to add a new entry. It then measures the elapsed time until you specify
+the task is done, and prompts for a task description.
+
+The first word we will write is \texttt{measure-duration}. We measure
+the time duration by using the \texttt{millis} word \texttt{( -{}-
+m )} to take the time before and after a call to \texttt{read}. The
+\texttt{millis} word pushes the number of milliseconds since a certain
+epoch -- the epoch does not matter here since we are only interested
+in the difference between two times.
+
+A first attempt at \texttt{measure-duration} might look like this:
+
+\begin{alltt}
+: measure-duration millis read drop millis - ;
+measure-duration .
+\end{alltt}
+
+This word definition has the right general idea, however, the result
+is negative. Also, we would like to measure durations in minutes,
+not milliseconds:
+
+\begin{alltt}
+: measure-duration ( -{}- duration )
+    millis
+    read drop
+    millis swap - 1000 /i 60 /i ;
+\end{alltt}
+
+Note that the \texttt{/i} word \texttt{( x y -{}- x/y )}, from the
+\texttt{math} vocabulary, performs truncating division. This
+makes sense, since we are not interested in fractional parts of a
+minute here.
+
+\section{Adding a timesheet entry}
+
+Now that we can measure a time duration at the keyboard, lets write
+the \texttt{add-entry-prompt} word. This word does exactly what one
+would expect -- it prompts for the time duration and description,
+and leaves those two values on the stack:
+
+\begin{alltt}
+: add-entry-prompt ( -{}- duration description )
+    "Start work on the task now. Press ENTER when done." print
+    measure-duration
+    "Please enter a description:" print
+    read ;
+\end{alltt}
+
+You should interactively test this word. Measure off a minute or two,
+press ENTER, enter a description, and press ENTER again. The stack
+should now contain two values, in the same order as the stack effect
+comment.
+
+Now, almost all the ingredients are in place. The final add-entry
+word calls add-entry-prompt, then pushes the new entry on the end
+of the timesheet vector:
+
+\begin{alltt}
+: add-entry ( timesheet -{}- )
+    add-entry-prompt cons swap vector-push ;
+\end{alltt}
+
+Recall that timesheet entries are cons cells where the car is the
+duration and the cdr is the description, hence the call to \texttt{cons}.
+Note that this word side-effects the timesheet vector. You can test
+it interactively like so:
+
+\begin{alltt}
+10 <vector> dup add-entry
+\emph{Start work on the task now. Press ENTER when done.}
+\emph{Please enter a description:}
+\emph{Studying Factor}
+.
+\emph{\{ {[} 2 | "Studying Factor" {]} \}}
+\end{alltt}
+
+\section{Printing the timesheet}
+
+The hard part of printing the timesheet is turning the duration in
+minutes into a nice hours/minutes string, like {}``01:15''. We would
+like to make a word like the following:
+
+\begin{alltt}
+135 hh:mm .
+\emph{01:15}
+\end{alltt}
+
+First, we can make a pair of words \texttt{hh} and \texttt{mm} to extract the hours
+and minutes, respectively. This can be achieved using truncating division,
+and the modulo operator -- also, since we would like strings to be
+returned, the \texttt{unparse} word \texttt{( obj -{}- str )} from
+the \texttt{unparser} vocabulary is called to turn the integers into
+strings:
+
+\begin{alltt}
+: hh ( duration -{}- str ) 60 /i unparse ;
+: mm ( duration -{}- str ) 60 mod unparse ;
+\end{alltt}
+
+The \texttt{hh:mm} word can then be written, concatenating the return
+values of \texttt{hh} and \texttt{mm} into a single string using string
+construction:
+
+\begin{alltt}
+: hh:mm ( millis -{}- str ) <\% dup hh \% ":" \% mm \% \%> ;
+\end{alltt}
+However, so far, these three definitions do not produce ideal output.
+Try a few examples:
+
+\begin{alltt}
+120 hh:mm .
+2:0
+130 hh:mm .
+2:10
+\end{alltt}
+Obviously, we would like the minutes to always be two digits. Luckily,
+there is a \texttt{digits} word \texttt{( str n -{}- str )} in the
+\texttt{format} vocabulary that adds enough zeros on the left of the
+string to give it the specified length. Try it out:
+
+\begin{alltt}
+"23" 2 digits .
+\emph{"23"}
+"7"2 digits .
+\emph{"07"}
+\end{alltt}
+We can now change the definition of \texttt{mm} accordingly:
+
+\begin{alltt}
+: mm ( duration -{}- str ) 60 mod unparse 2 digits ;
+\end{alltt}
+Now that time duration output is done, a first attempt at a definition
+of \texttt{print-timesheet} looks like this:
+
+\begin{alltt}
+: print-timesheet ( timesheet -{}- )
+    {[} uncons write ": " write hh:mm print {]} vector-each ;
+\end{alltt}
+This works, but produces ugly output:
+
+\begin{alltt}
+\{ {[} 30 | "Studying Factor" {]} {[} 65 | "Paperwork" {]} \}
+print-timesheet
+\emph{Studying Factor: 0:30}
+\emph{Paperwork: 1:05}
+\end{alltt}
+
+It would be much nicer if the time durations lined up in the same
+column. First, lets factor out the body of the \texttt{vector-each}
+loop into a new \texttt{print-entry} word before it gets too long:
+
+\begin{alltt}
+: print-entry ( duration description -{}- )
+    write ": " write hh:mm print ;
+
+: print-timesheet ( timesheet -{}- )
+    {[} uncons print-entry {]} vector-each ;
+\end{alltt}
+
+We can now make \texttt{print-entry} line up columns using the \texttt{pad-string}
+word \texttt{( str n -{}- str )}.
+
+\begin{alltt}
+: print-entry ( duration description -{}- )
+    dup
+    write
+    50 swap pad-string write 
+    hh:mm print ;
+\end{alltt}
+
+In the above definition, we first print the description, then enough
+blanks to move the cursor to column 60. So the description text is
+left-justified. If we had interchanged the order of the second and
+third line in the definition, the description text would be right-justified.
+
+Try out \texttt{print-timesheet} again, and marvel at the aligned
+columns:
+
+\begin{alltt}
+\{ {[} 30 | "Studying Factor" {]} {[} 65 | "Paperwork" {]} \}
+print-timesheet
+\emph{Studying Factor                                   0:30}
+\emph{Paperwork                                         1:05}
+\end{alltt}
+
+\section{The main menu}
+
+Finally, we will code a main menu that looks like this:
+
+\begin{alltt}
+
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.
+\end{alltt}
+
+We will represent the menu as an association list. Recall that an association list is a list of pairs, where the car of each pair is a key, and the cdr is a value. Our keys will literally be keyboard keys (``e'', ``a'' and ``p''), and the values will themselves be pairs consisting of a menu item label and a quotation.
+
+The first word we will code is \texttt{print-menu}. It takes an association list, and prints the second element of each pair's value. Note that \texttt{terpri} simply prints a blank line:
+
+\begin{alltt}
+: print-menu ( menu -{}- )
+    terpri {[} cdr car print {]} each terpri
+    "Enter a letter between ( ) to execute that action." print ;
+\end{alltt}
+
+You can test \texttt{print-menu} with a short association list:
+
+\begin{alltt}
+{[} {[} "x" "(X)yzzy" 2 2 + . {]} {[} "f" "(F)oo" -1 sqrt . {]} {]} print-menu
+\emph{
+Xyzzy
+Foo
+
+Enter a letter between ( ) to execute that action.}
+\end{alltt}
+
+The next step is to write a \texttt{menu-prompt} word that takes the same association list, reads a line of input from the keyboard, and executes the quotation associated with that line. Recall that the \texttt{assoc} word returns \texttt{f} if the specified key could not be found in the association list. The below definition makes use of a conditional to signal an error in that case:
+
+\begin{alltt}
+: menu-prompt ( menu -{}- )
+    read swap assoc dup {[}
+        cdr call
+    {]} {[}
+        "Invalid input: " swap unparse cat2 throw
+    {]} ifte ;
+\end{alltt}
+
+Try applying the new \texttt{menu-prompt} word to the association list we used to test \texttt{print-menu}. You should verify that entering \texttt{x} causes the quotation \texttt{{[} 2 2 + . {]}} to be executed:
+
+\begin{alltt}
+{[} {[} "x" "(X)yzzy" 2 2 + . {]} {[} "f" "(F)oo" -1 sqrt . {]} {]} menu-prompt
+x
+\emph{4}
+\end{alltt}
+
+Finally, we want a \texttt{menu} word that first prints a menu, then prompts for and acts on input:
+
+\begin{alltt}
+: menu ( menu -{}- )
+    dup print-menu menu-prompt ;
+\end{alltt}
+
+Considering the stack effects of \texttt{print-menu} and \texttt{menu-prompt}, it should be obvious why the \texttt{dup} is needed.
+
+\section{Finishing off}
+
+We now need a \texttt{main-menu} word. It takes the timesheet vector from the stack, and recursively calls itself until the user requests that the timesheet application exits:
+
+\begin{alltt}
+: main-menu ( timesheet -{}- )
+    {[}
+        {[} "e" "(E)xit" drop {]}
+        {[} "a" "(A)dd entry" dup add-entry main-menu {]}
+        {[} "p" "(P)rint timesheet" dup print-timesheet main-menu {]}
+    {]} menu ;
+\end{alltt}
+
+Note that unless the first option is selected, the timesheet vector is eventually passed into the recursive \texttt{main-menu} call.
+
+All that remains now is the ``main word'' that runs the program with an empty timesheet vector. Note that the initial capacity of the vector is 10 elements, however this is not a limit -- adding more than 10 elements will grow the vector:
+
+\begin{alltt}
+: timesheet-app ( -{}- )
+    10 <vector> main-menu ;
+\end{alltt}
+
+\section{The complete program}
+
+\begin{verbatim}
+! Contractor timesheet example
+
+IN: timesheet
+USE: combinators
+USE: errors
+USE: format
+USE: kernel
+USE: lists
+USE: math
+USE: parser
+USE: stack
+USE: stdio
+USE: strings
+USE: unparser
+USE: vectors
+
+! Adding a new entry to the time sheet.
+
+: measure-duration ( -- duration )
+    millis
+    read drop
+    millis swap - 1000 /i 60 /i ;
+
+: add-entry-prompt ( -- duration description )
+    "Start work on the task now. Press ENTER when done." print
+    measure-duration
+    "Please enter a description:" print
+    read ;
+
+: add-entry ( timesheet -- )
+    add-entry-prompt cons swap vector-push ;
+
+! Printing the timesheet.
+
+: hh ( duration -- str ) 60 /i ;
+: mm ( duration -- str ) 60 mod unparse 2 digits ;
+: hh:mm ( millis -- str ) <% dup hh % ":" % mm % %> ;
+
+: print-entry ( duration description -- )
+    dup write
+    60 swap pad-string write
+    hh:mm print ;
+
+: print-timesheet ( timesheet -- )
+    "TIMESHEET:" print
+    [ uncons print-entry ] vector-each ;
+
+! Displaying a menu
+
+: print-menu ( menu -- )
+    terpri [ cdr car print ] each terpri
+    "Enter a letter between ( ) to execute that action." print ;
+
+: menu-prompt ( menu -- )
+    read swap assoc dup [
+        cdr call
+    ] [
+        "Invalid input: " swap unparse cat2 throw
+    ] ifte ;
+
+: menu ( menu -- )
+    dup print-menu menu-prompt ;
+
+! Main menu
+
+: main-menu ( timesheet -- )
+    [
+        [ "e" "(E)xit" drop ]
+        [ "a" "(A)dd entry" dup add-entry main-menu ]
+        [ "p" "(P)rint timesheet" dup print-timesheet main-menu ]
+    ] menu ;
+
+: timesheet-app ( -- )
+    10 <vector> main-menu ;
+\end{verbatim}
 
 \input{new-guide.ind}
 

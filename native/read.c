@@ -4,21 +4,18 @@
 bool read_step(PORT* port)
 {
 	FIXNUM amount = 0;
+	STRING* buffer = untag_string(port->buffer);
+	CELL capacity = buffer->capacity;
 
 	if(port->type == PORT_RECV)
 	{
 		/* try reading OOB data. */
-		amount = recv(port->fd,
-			port->buffer + 1,
-			port->buffer->capacity * 2,
-			MSG_OOB);
+		amount = recv(port->fd,buffer + 1,capacity * CHARS,MSG_OOB);
 	}
 
 	if(amount <= 0)
 	{
-		amount = read(port->fd,
-			port->buffer + 1,
-			port->buffer->capacity * 2);
+		amount = read(port->fd,buffer + 1,capacity * CHARS);
 	}
 
 	if(amount < 0)
@@ -45,16 +42,17 @@ bool read_line_step(PORT* port)
 	BYTE ch;
 
 	SBUF* line = untag_sbuf(port->line);
+	STRING* buffer = untag_string(port->buffer);
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
-		ch = bget((CELL)port->buffer + sizeof(STRING) + i);
+		ch = bget((CELL)buffer + sizeof(STRING) + i);
 
 		if(ch == '\r')
 		{
 			if(i != port->buf_fill - 1)
 			{
-				ch = bget((CELL)port->buffer
+				ch = bget((CELL)buffer
 					+ sizeof(STRING) + i + 1);
 				if(ch == '\n')
 					i++;
@@ -169,10 +167,11 @@ bool read_count_step(PORT* port)
 	BYTE ch;
 
 	SBUF* line = untag_sbuf(port->line);
+	STRING* buffer = untag_string(port->buffer);
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
-		ch = bget((CELL)port->buffer + sizeof(STRING) + i);
+		ch = bget((CELL)buffer + sizeof(STRING) + i);
 		set_sbuf_nth(line,line->top,ch);
 		if(line->top == port->count)
 		{

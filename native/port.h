@@ -12,7 +12,7 @@ typedef struct {
 	PORT_MODE type;
 	bool closed;
 	FIXNUM fd;
-	STRING* buffer;
+	CELL buffer;
 
 	/* top of buffer */
 	CELL buf_fill;

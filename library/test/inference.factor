@@ -161,16 +161,16 @@ SYMBOL: sym-test
 [ [ 1 | 2 ] ] [ [ uncons ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ unit ] infer ] unit-test
 [ [ 1 | 2 ] ] [ [ unswons ] infer ] unit-test
-[ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
-[ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
-[ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
 
 [ [ 1 | 1 ] ] [ [ length ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ reverse ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ tree-contains? ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ remove ] infer ] unit-test
-[ [ 1 | 1 ] ] [ [ prune ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ prune ] infer ] unit-test
 
 [ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test

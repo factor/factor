@@ -60,7 +60,7 @@ solaris:
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-	$(STRIP) $@
+	#$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)

@@ -113,3 +113,10 @@ DEFER: vector-map
     0 swap 4 [
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;
+
+: vector-tail ( n vector -- vector )
+    #! Return a new vector, with all elements from the nth
+    #! index upwards.
+    2dup vector-length swap - [
+        pick + over vector-nth
+    ] vector-project nip nip ;

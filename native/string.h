@@ -52,5 +52,3 @@ void primitive_substring(void);
 void string_reverse(STRING* s, int len);
 STRING* string_clone(STRING* s, int len);
 void primitive_string_reverse(void);
-STRING* fixup_untagged_string(STRING* str);
-STRING* copy_untagged_string(STRING* str);
