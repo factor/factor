@@ -13,6 +13,8 @@ plugin.factor.jedit.FactorPlugin.depend.3=plugin console.ConsolePlugin 4.0.2
 
 #! Menu
 plugin.factor.jedit.FactorPlugin.menu=factor-listener \
+	sidekick-tree \
+	sidekick-complete \
 	- \
 	factor-run-file \
 	factor-eval-selection \

@@ -33,14 +33,10 @@ import factor.*;
 
 public class Def extends FactorParsingDefinition
 {
-	//{{{ Def constructor
-	/**
-	 * A new definition.
-	 */
 	public Def(FactorWord word)
 	{
 		super(word);
-	} //}}}
+	}
 
 	public void eval(FactorReader reader)
 		throws Exception

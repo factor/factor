@@ -27,22 +27,26 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.parser;
+package factor;
 
-import factor.*;
-
-public class Symbol extends FactorParsingDefinition
+/**
+ * M: type generic ... ;M
+ */
+public class FactorMethodDefinition extends FactorWordDefinition
 {
-	public Symbol(FactorWord word)
-	{
-		super(word);
-	}
+	private FactorWord type;
+	private Cons def;
 
-	public void eval(FactorReader reader)
-		throws Exception
+	public FactorMethodDefinition(FactorWord type,
+		FactorWord generic, Cons def)
 	{
-		FactorWord w = reader.nextWord(true);
-		w.def = new FactorSymbolDefinition(w,w);
-		reader.append(w.def);
+		super(generic);
+		this.type = type;
+		this.def = def;
+	}
+	
+	public Cons toList()
+	{
+		return def;
 	}
 }

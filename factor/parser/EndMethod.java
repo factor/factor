@@ -31,18 +31,27 @@ package factor.parser;
 
 import factor.*;
 
-public class Symbol extends FactorParsingDefinition
+public class EndMethod extends FactorParsingDefinition
 {
-	public Symbol(FactorWord word)
+	public FactorWord start;
+
+	public EndMethod(FactorWord start, FactorWord end)
 	{
-		super(word);
+		super(end);
+		this.start = start;
 	}
 
 	public void eval(FactorReader reader)
 		throws Exception
 	{
-		FactorWord w = reader.nextWord(true);
-		w.def = new FactorSymbolDefinition(w,w);
+		FactorReader.ParseState state = reader.popState(start,word);
+		FactorWord w = state.defining;
+		/* Only ever null with restartable scanner;
+		error already logged, so give up */
+		if(w == null)
+			return;
+
+		w.def = new FactorMethodDefinition(null,w,state.first);
 		reader.append(w.def);
 	}
 }

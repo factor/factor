@@ -51,19 +51,6 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		else if(def instanceof FactorSymbolDefinition)
 		{
 			prop = "factor.completion.symbol";
-		}
-		else
-		{
-			Cons d = def.toList();
-			if(d != null && d.car instanceof FactorDocComment)
-			{
-				FactorDocComment comment = (FactorDocComment)
-					d.car;
-				if(comment.isStackComment())
-				{
-					stackEffect = comment.toString();
-				}
-			}
 		} */
 
 		String in;

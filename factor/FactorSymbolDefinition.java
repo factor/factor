@@ -47,10 +47,4 @@ public class FactorSymbolDefinition extends FactorWordDefinition
 		super(word);
 		this.symbol = symbol;
 	} //}}}
-
-	//{{{ toList() method
-	public Cons toList()
-	{
-		return new Cons(symbol,null);
-	} //}}}
 }

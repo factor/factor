@@ -31,9 +31,9 @@ package factor.parser;
 
 import factor.*;
 
-public class Symbol extends FactorParsingDefinition
+public class Generic extends FactorParsingDefinition
 {
-	public Symbol(FactorWord word)
+	public Generic(FactorWord word)
 	{
 		super(word);
 	}
@@ -42,7 +42,7 @@ public class Symbol extends FactorParsingDefinition
 		throws Exception
 	{
 		FactorWord w = reader.nextWord(true);
-		w.def = new FactorSymbolDefinition(w,w);
+		w.def = new FactorGenericDefinition(w);
 		reader.append(w.def);
 	}
 }

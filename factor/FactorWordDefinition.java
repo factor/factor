@@ -51,7 +51,7 @@ public abstract class FactorWordDefinition
 	//{{{ toList() method
 	public Cons toList()
 	{
-		return new Cons(new FactorWord(null,getClass().getName()),null);
+		return null;
 	} //}}}
 
 	//{{{ toString() method

@@ -210,14 +210,14 @@ public class FactorShell extends Shell
 			}
 			else
 			{
-				try
+				/* try
 				{
 					packetLoop(output);
 				}
 				catch(Exception e)
 				{
 					Log.log(Log.ERROR,this,e);
-				}
+				} */
 			}
 		}
 

@@ -321,6 +321,3 @@ SYMBOL: event
     ] with-screen ;
 
 factoroids
-
-! Currently the plugin doesn't handle GENERIC: and M:, so we
-! disable the parser. too many errors :sidekick.parser=factor:
