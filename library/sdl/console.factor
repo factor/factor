@@ -248,6 +248,8 @@ M: alien handle-event ( event -- ? )
     input-continuation get [ f swap call ] when*
     SDL_Quit ;
 
+SYMBOL: escape-continuation
+
 : start-console ( -- )
     <namespace> [
         640 480 32 SDL_HWSURFACE init-screen
@@ -255,11 +257,14 @@ M: alien handle-event ( event -- ? )
     ] extend console set
 
     [
+        escape-continuation set
+
         [
             console get swap <console-stream>
             [ [ print-banner listener ] in-thread ] with-stream
             SDL_Quit
-            call ( return from start-console word )
+            ( return from start-console word )
+            escape-continuation get call
         ] callcc0
 
         console get [
