@@ -141,11 +141,19 @@ DEFER: fold-consts
     [ + ] 2keep - ;
 
 ! Install arithmetic operators into words
-[ + - / * ^ and or mod +- ] [ dup arith-2 set-word-property ] each
+[ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
+  bitxor dot ] [
+    dup arith-2 set-word-property rem
+] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [
     uncons arith-2 set-word-property
 ] each
-[ sqrt abs fac get sq ] [ dup arith-1 set-word-property ] each
+[ sqrt abs fac get sq asin denominator rational? rad>deg exp recip sgn >rect acoth arg fixnum
+  bitnot sinh acosec acosh acosech complex? ratio? number? >polar number= cis deg>rad >fixnum
+  cot cos sec cosec tan imaginary coth asech atanh absq >float numerator acot acos atan asec
+  cosh log bignum? conjugate asinh sin float? real? >bignum tanh sech ] [
+    dup arith-1 set-word-property
+] each
 [ [[ - neg ]] ] [ uncons arith-1 set-word-property ] each
 \ get t nsmanip? set-word-property
 [ pi i e -i inf -inf pi/2 ] [ t constant? set-word-property ] each
