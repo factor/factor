@@ -46,7 +46,7 @@ void primitive_vector_nth(void)
 	env.dt = array_nth(vector->array,index);
 }
 
-void vector_ensure_capacity(VECTOR* vector, int index)
+void vector_ensure_capacity(VECTOR* vector, CELL index)
 {
 	ARRAY* array = vector->array;
 	CELL capacity = array->capacity;

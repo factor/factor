@@ -36,6 +36,7 @@ USE: namespaces
 USE: stack
 USE: strings
 USE: words
+USE: vectors
 USE: vocabularies
 USE: unparser
 
@@ -49,7 +50,7 @@ IN: builtins
 : f f parsed ; parsing
 
 ! Lists
-: [ f ; parsing
+: [ [ ] ; parsing
 : ] nreverse parsed ; parsing
 
 : | ( syntax: | cdr ] )
@@ -57,17 +58,23 @@ IN: builtins
     #! 'parsed' acts accordingly.
     "|" ; parsing
 
+! Vectors
+: { f ; parsing
+: } nreverse list>vector parsed ; parsing
+
 ! Colon defs
+: CREATE: scan "in" get create ;
+
 : :
     #! Begin a word definition. Word name follows.
-    scan "in" get create f ; parsing
+    CREATE: [ ] ; parsing
 
 : ;
     #! End a word definition.
     nreverse define ; parsing
 
 ! Vocabularies
-: DEFER: scan "in" get create drop ; parsing
+: DEFER: CREATE: drop ; parsing
 : USE: scan "use" cons@ ; parsing
 : IN: scan dup "use" cons@ "in" set ; parsing
 

@@ -69,7 +69,6 @@ USE: words
 : object-tag BIN: 011 ;
 : header-tag BIN: 100 ;
 
-: fixnum-mask HEX: 1fffffff ;
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
 
@@ -137,7 +136,7 @@ USE: words
     dup pooled-object dup [
         nip swap fixup
     ] [
-        drop "Not in image: " swap cat2 throw
+        drop "Not in image: " swap word-name cat2 throw
     ] ifte ;
 
 : fixup-words ( -- )
@@ -184,7 +183,7 @@ DEFER: '
     object-tag here-as swap
     11 >header emit
     dup str-length emit
-    dup hashcode ( fixnum-mask bitand ) emit
+    dup hashcode emit
     pack-string
     pad ;
 

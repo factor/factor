@@ -63,6 +63,7 @@ USE: vectors
         "Bad primitive: "
         "Incompatible handle: "
         "I/O error: "
+        "Overflow"
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

@@ -31,15 +31,16 @@ void copy_object(CELL* handle)
 	CELL tag = TAG(pointer);
 	CELL header, newpointer;
 
-	if(in_zone(active,pointer))
-		critical_error("copy_object given newspace ptr",pointer);
-
 	if(tag == FIXNUM_TYPE)
 	{
 		/* convinience */
+		gc_debug("FIXNUM",pointer);
 		return;
 	}
 	
+	if(in_zone(active,pointer))
+		critical_error("copy_object given newspace ptr",pointer);
+
 	header = get(UNTAG(pointer));
 	
 	if(TAG(header) == GC_COLLECTED)
@@ -83,6 +84,7 @@ void collect_object(void)
 		break;
 	case HANDLE_TYPE:
 		collect_handle((HANDLE*)scan);
+		break;
 	}
 	
 	scan += size;

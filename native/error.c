@@ -15,9 +15,9 @@ void critical_error(char* msg, CELL tagged)
 
 void fix_stacks(void)
 {
-	if(env.ds < env.ds_bot + sizeof(ARRAY))
+	if(UNDERFLOW(env.ds,env.ds_bot) || OVERFLOW(env.ds,env.ds_bot))
 		reset_datastack();
-	if(env.cs <= env.cs_bot + sizeof(ARRAY))
+	if(UNDERFLOW(env.cs,env.cs_bot) || OVERFLOW(env.cs,env.cs_bot))
 		reset_callstack();
 }
 

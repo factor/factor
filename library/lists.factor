@@ -31,6 +31,7 @@ USE: combinators
 USE: kernel
 USE: logic
 USE: stack
+USE: vectors
 
 : 2list ( a b -- [ a b ] )
     #! Construct a proper list of 2 elements.
@@ -338,3 +339,12 @@ DEFER: tree-contains?
         cons-hashcode r>
         xor
     ] ifte ;
+
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
+
+: stack>list ( vector -- list )
+    [ ] swap [ swons ] vector-each ;
+
+: vector>list ( vector -- list )
+    stack>list nreverse ;

@@ -1,5 +1,6 @@
 #define UNDERFLOW_CHECKING
 
+#define UNDERFLOW(stack,bot) ((stack) < UNTAG(bot) + sizeof(ARRAY))
 #define OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + object_size(bot))
 
 INLINE void check_stacks(void)
@@ -7,9 +8,9 @@ INLINE void check_stacks(void)
 
 #ifdef UNDERFLOW_CHECKING
 	if(OVERFLOW(env.ds,env.ds_bot))
-		fatal_error("datastack overflow",env.ds);
+		general_error(ERROR_OVERFLOW,F);
 	if(OVERFLOW(env.cs,env.cs_bot))
-		fatal_error("callstack overflow",env.ds);
+		general_error(ERROR_OVERFLOW,F);
 #endif
 
 }

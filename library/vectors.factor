@@ -28,6 +28,7 @@
 IN: vectors
 USE: arithmetic
 USE: kernel
+USE: lists
 USE: stack
 
 : vector-empty? ( obj -- ? )

@@ -99,6 +99,9 @@ CELL untagged_object_size(CELL pointer)
 	case SBUF_TYPE:
 		size = sizeof(SBUF);
 		break;
+	case BIGNUM_TYPE:
+		size = sizeof(BIGNUM);
+		break;
 	case HANDLE_TYPE:
 		size = sizeof(HANDLE);
 		break;

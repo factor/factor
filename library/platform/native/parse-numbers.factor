@@ -79,3 +79,6 @@ USE: unparser
             drop (str>fixnum)
         ] ifte
     ] ifte ;
+
+: parse-number ( str -- num/f )
+    [ str>fixnum ] [ [ drop f ] when ] catch ;
