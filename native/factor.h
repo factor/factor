@@ -23,8 +23,6 @@
 #include <sys/time.h>
 #include <netdb.h>
 
-#define FFI
-
 #ifdef FFI
 #include <dlfcn.h>
 #endif /* FFI */

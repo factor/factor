@@ -1,17 +1,6 @@
-CC = gcc34
-
-# On FreeBSD, to use SDL and other libc_r libs:
-# CFLAGS = -g -Wall -export-dynamic -pthread
-# On PowerPC G5:
-# CFLAGS = -mcpu=970 -mtune=970 -mpowerpc64 -ffast-math -O3
-# On Pentium 4:
-CFLAGS = -march=pentium4 -ffast-math -Os -fomit-frame-pointer -export-dynamic -pthread
-# Add -fomit-frame-pointer if you don't care about debugging
-# CFLAGS = -Os -g -Wall
-
-# On Solaris:
-# LIBS = -lsocket -lnsl -lm
-LIBS = -lm
+CC = gcc
+DEFAULT_CFLAGS = -Os -Wall -export-dynamic -fomit-frame-pointer
+DEFAULT_LIBS = -lm
 
 STRIP = strip
 
@@ -29,9 +18,37 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/write.o native/word.o native/compiler.o \
 	native/ffi.o
 
+default:
+	@echo "Run 'make' with one of the following parameters:"
+	@echo ""
+	@echo "bsd"
+	@echo "linux"
+	@echo "solaris"
+	@echo ""
+	@echo "Also, you might want to set the SITE_CFLAGS environment"
+	@echo "variable to enable some CPU-specific optimizations; this"
+	@echo "can make a huge difference. Eg:"
+	@echo ""
+	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
+
+bsd:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -pthread" \
+		LIBS="$(DEFAULT_LIBS)"
+
+linux:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
+		LIBS="$(DEFAULT_LIBS) -ldl"
+
+solaris:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS)" \
+		LIBS="$(DEFAULT_LIBS) -lsocket -lnsl -lm"
+
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-#	$(STRIP) $@
+	$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)
