@@ -52,7 +52,7 @@ USE: listener
     dup str-length write-big-endian-32 write flush ;
 
 : read-packet ( -- string )
-    read-big-endian-32 read# ;
+    read-big-endian-32 read ;
 
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return
@@ -80,15 +80,15 @@ USE: listener
 
 TUPLE: jedit-stream delegate ;
 
-M: jedit-stream freadln ( stream -- str )
+M: jedit-stream stream-readln ( stream -- str )
     wrapper-stream-scope
-    [ CHAR: r write flush read-big-endian-32 read# ] bind ;
+    [ CHAR: r write flush read-big-endian-32 read ] bind ;
 
-M: jedit-stream fwrite-attr ( str style stream -- )
+M: jedit-stream stream-write-attr ( str style stream -- )
     wrapper-stream-scope
     [ [ default-style ] unless* jedit-write-attr ] bind ;
 
-M: jedit-stream fflush ( stream -- )
+M: jedit-stream stream-flush ( stream -- )
     wrapper-stream-scope
     [ CHAR: f write flush ] bind ;
 

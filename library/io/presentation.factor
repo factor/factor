@@ -39,7 +39,7 @@ USE: unparser
     [ uncons >r over " " r> cat3 cons ] map nip ;
 
 ! A style is an alist whose key/value pairs hold
-! significance to the 'fwrite-attr' word when applied to a
+! significance to the 'stream-write-attr' word when applied to a
 ! stream that supports attributed string output.
 
 : (style) ( name -- style ) "styles" get hash ;

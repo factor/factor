@@ -201,18 +201,18 @@ SYMBOL: redraw-console
 ! The console stream
 
 ! Restoring this continuation with a string on the stack returns
-! to the caller of freadln.
+! to the caller of stream-readln.
 SYMBOL: input-continuation
 
 TUPLE: console-stream console redraw-continuation ;
 
-M: console-stream fflush ( stream -- )
-    fauto-flush ;
+M: console-stream stream-flush ( stream -- )
+    stream-auto-flush ;
 
-M: console-stream fauto-flush ( stream -- )
+M: console-stream stream-auto-flush ( stream -- )
     console-stream-console [ redraw-console on ] bind ;
 
-M: console-stream freadln ( stream -- line )
+M: console-stream stream-readln ( stream -- line )
     [
         swap [
             console-stream-console
@@ -225,10 +225,10 @@ M: console-stream freadln ( stream -- line )
         ] ifte
     ] callcc1 nip ;
 
-M: console-stream fwrite-attr ( string style stream -- )
+M: console-stream stream-write-attr ( string style stream -- )
     nip console-stream-console [ console-write ] bind ;
 
-M: console-stream fclose ( stream -- ) drop ;
+M: console-stream stream-close ( stream -- ) drop ;
 
 ! Event handling
 SYMBOL: event

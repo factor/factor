@@ -95,7 +95,7 @@ C: win32-server ( port -- server )
         socket set
     ] extend over set-win32-server-this ;
 
-M: win32-server fclose ( server -- )
+M: win32-server stream-close ( server -- )
     win32-server-this [ socket get CloseHandle drop ] bind ;
 
 M: win32-server accept ( server -- client )

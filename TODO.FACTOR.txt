@@ -19,7 +19,6 @@
 - alignment of gadgets inside their bounding boxes needs thought
 - faster completion
 - ppc register decls
-- rename f* words to stream-*
 
 - port leak
 - references primitive

@@ -16,22 +16,22 @@ IN: streams
 
 TUPLE: fd-stream in out ;
 
-M: fd-stream fwrite-attr ( str style stream -- )
+M: fd-stream stream-write-attr ( str style stream -- )
     nip fd-stream-out blocking-write ;
 
-M: fd-stream freadln ( stream -- str )
+M: fd-stream stream-readln ( stream -- str )
     fd-stream-in dup [ blocking-read-line ] when ;
 
-M: fd-stream fread# ( count stream -- str )
-    fd-stream-in dup [ blocking-read# ] [ nip ] ifte ;
+M: fd-stream stream-read ( count stream -- str )
+    fd-stream-in dup [ blocking-read ] [ nip ] ifte ;
 
-M: fd-stream fflush ( stream -- )
+M: fd-stream stream-flush ( stream -- )
     fd-stream-out [ blocking-flush ] when* ;
 
-M: fd-stream fauto-flush ( stream -- )
+M: fd-stream stream-auto-flush ( stream -- )
     drop ;
 
-M: fd-stream fclose ( stream -- )
+M: fd-stream stream-close ( stream -- )
     dup fd-stream-out [ dup blocking-flush close-port ] when*
     fd-stream-in [ close-port ] when* ;
 
@@ -53,7 +53,7 @@ M: fd-stream fclose ( stream -- )
 : fcopy ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'.
-    [ 2dup (fcopy) ] [ -rot fclose fclose rethrow ] catch ;
+    [ 2dup (fcopy) ] [ -rot stream-close stream-close rethrow ] catch ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;

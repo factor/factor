@@ -139,12 +139,12 @@ END-STRUCT
     win32-io-thread ;
 
 TUPLE: null-stream ;
-M: null-stream fflush drop ;
-M: null-stream fauto-flush drop ;
-M: null-stream fread# 2drop f ;
-M: null-stream freadln drop f ;
-M: null-stream fwrite-attr 3drop ;
-M: null-stream fclose drop ;
+M: null-stream stream-flush drop ;
+M: null-stream stream-auto-flush drop ;
+M: null-stream stream-read 2drop f ;
+M: null-stream stream-readln drop f ;
+M: null-stream stream-write-attr 3drop ;
+M: null-stream stream-close drop ;
 
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort

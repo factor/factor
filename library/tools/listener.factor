@@ -26,7 +26,7 @@ global [
 
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
-    >r read dup [
+    >r read-line dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
         ] [

@@ -50,9 +50,9 @@ presentation generic ;
 
 TUPLE: ansi-stream delegate ;
 
-M: ansi-stream fwrite-attr ( string style stream -- )
+M: ansi-stream stream-write-attr ( string style stream -- )
     >r [ default-style ] unless* ansi-attr-string r>
-    ansi-stream-delegate fwrite ;
+    ansi-stream-delegate stream-write ;
 
 IN: shells
 

@@ -142,22 +142,22 @@ M: string do-write ( str -- )
         ] ifte
     ] ifte ;
 
-M: win32-stream fwrite-attr ( str style stream -- )
+M: win32-stream stream-write-attr ( str style stream -- )
     win32-stream-this nip [ do-write ] bind ;
 
-M: win32-stream freadln ( stream -- str )
+M: win32-stream stream-readln ( stream -- str )
     win32-stream-this [ 80 <sbuf> do-read-line ] bind ;
 
-M: win32-stream fread# ( count stream -- str )
+M: win32-stream stream-read ( count stream -- str )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
-M: win32-stream fflush ( stream -- )
+M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
 
-M: win32-stream fauto-flush ( stream -- )
+M: win32-stream stream-auto-flush ( stream -- )
     drop ;
 
-M: win32-stream fclose ( stream -- )
+M: win32-stream stream-close ( stream -- )
     win32-stream-this [
         maybe-flush-output
         handle get CloseHandle drop 

@@ -56,7 +56,7 @@ stdio streams strings threads url-encoding ;
 : httpd-client ( socket -- )
     [
         [
-            stdio get log-client read [ parse-request ] when*
+            stdio get log-client read-line [ parse-request ] when*
         ] with-stream
     ] try ;
 
@@ -70,7 +70,7 @@ stdio streams strings threads url-encoding ;
     <server> "http-server" set [
         httpd-loop
     ] [
-        "http-server" get fclose rethrow
+        "http-server" get stream-close rethrow
     ] catch ;
 
 : httpd ( port -- )

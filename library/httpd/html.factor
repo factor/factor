@@ -102,7 +102,7 @@ url-encoding presentation generic ;
 
 TUPLE: html-stream delegate ;
 
-M: html-stream fwrite-attr ( str style stream -- )
+M: html-stream stream-write-attr ( str style stream -- )
     wrapper-stream-scope [
         [
             [

@@ -5,15 +5,15 @@ USING: errors kernel lists namespaces streams generic strings ;
 
 SYMBOL: stdio
 
-: flush      ( -- )              stdio get fflush ;
-: read       ( -- string )       stdio get freadln ;
-: read1      ( count -- string ) stdio get fread1 ;
-: read#      ( count -- string ) stdio get fread# ;
-: write      ( string -- )       stdio get fwrite ;
-: write-attr ( string style -- ) stdio get fwrite-attr ;
-: print      ( string -- )       stdio get fprint ;
+: flush      ( -- )              stdio get stream-flush ;
+: read-line  ( -- string )       stdio get stream-readln ;
+: read1      ( -- char )         stdio get stream-read1 ;
+: read       ( count -- string ) stdio get stream-read ;
+: write      ( string -- )       stdio get stream-write ;
+: write-attr ( string style -- ) stdio get stream-write-attr ;
+: print      ( string -- )       stdio get stream-print ;
 : terpri     ( -- )              "\n" write ;
-: close      ( -- )              stdio get fclose ;
+: close      ( -- )              stdio get stream-close ;
 
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png
@@ -31,8 +31,8 @@ SYMBOL: stdio
 
 TUPLE: stdio-stream delegate ;
 
-M: stdio-stream fauto-flush ( -- )
-    stdio-stream-delegate fflush ;
+M: stdio-stream stream-auto-flush ( -- )
+    stdio-stream-delegate stream-flush ;
 
-M: stdio-stream fclose ( -- )
+M: stdio-stream stream-close ( -- )
     drop ;

@@ -86,7 +86,7 @@ USE: url-encoding
     ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
 
 : (read-header) ( alist -- alist )
-    read dup
+    read-line dup
     f-or-"" [ drop ] [ header-line (read-header) ] ifte ;
 
 : read-header ( -- alist )
@@ -105,7 +105,7 @@ USE: url-encoding
     ] when ;
 
 : read-post-request ( header -- alist )
-    content-length dup [ read# query>alist ] when ;
+    content-length dup [ read query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [

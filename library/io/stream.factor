@@ -5,34 +5,34 @@ DEFER: stdio
 IN: streams
 USING: errors kernel namespaces strings generic lists ;
 
-GENERIC: fflush      ( stream -- )
-GENERIC: fauto-flush ( stream -- )
-GENERIC: freadln     ( stream -- string )
-GENERIC: fread#      ( count stream -- string )
-GENERIC: fwrite-attr ( string style stream -- )
-GENERIC: fclose      ( stream -- )
+GENERIC: stream-flush      ( stream -- )
+GENERIC: stream-auto-flush ( stream -- )
+GENERIC: stream-readln     ( stream -- string )
+GENERIC: stream-read       ( count stream -- string )
+GENERIC: stream-write-attr ( string style stream -- )
+GENERIC: stream-close      ( stream -- )
 
-: fread1 ( stream -- char/f )
-    1 swap fread#
+: stream-read1 ( stream -- char/f )
+    1 swap stream-read
     dup f-or-"" [ drop f ] [ 0 swap str-nth ] ifte ;
 
-: fwrite ( string stream -- )
-    f swap fwrite-attr ;
+: stream-write ( string stream -- )
+    f swap stream-write-attr ;
 
-: fprint ( string stream -- )
-    [ fwrite ] keep
-    [ "\n" swap fwrite ] keep
-    fauto-flush ;
+: stream-print ( string stream -- )
+    [ stream-write ] keep
+    [ "\n" swap stream-write ] keep
+    stream-auto-flush ;
 
 ! A stream that builds a string of all text written to it.
 TUPLE: string-output buf ;
 
-M: string-output fwrite-attr ( string style stream -- )
+M: string-output stream-write-attr ( string style stream -- )
     nip string-output-buf sbuf-append ;
 
-M: string-output fclose ( stream -- ) drop ;
-M: string-output fflush ( stream -- ) drop ;
-M: string-output fauto-flush ( stream -- ) drop ;
+M: string-output stream-close ( stream -- ) drop ;
+M: string-output stream-flush ( stream -- ) drop ;
+M: string-output stream-auto-flush ( stream -- ) drop ;
 
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output

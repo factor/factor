@@ -41,7 +41,7 @@ USE: strings
 ! parse-stream
 
 : next-line ( -- str )
-    "parse-stream" get freadln
+    "parse-stream" get stream-readln
     "line-number" [ 1 + ] change ;
 
 : (read-lines) ( quot -- )
@@ -57,7 +57,7 @@ USE: strings
     swap [
         "parse-stream" set 0 "line-number" set (read-lines)
     ] [
-        "parse-stream" get fclose rethrow
+        "parse-stream" get stream-close rethrow
     ] catch ;
 
 : file-vocabs ( -- )

@@ -15,7 +15,7 @@ threads parser ;
 
 : telnetd ( port -- )
     [
-        <server> [ telnetd-loop ] [ swap fclose rethrow ] catch
+        <server> [ telnetd-loop ] [ swap stream-close rethrow ] catch
     ] with-logging ;
 
 IN: shells

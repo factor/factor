@@ -10,9 +10,9 @@ strings unparser words ;
 
 : jedit-server-info ( -- port auth )
     jedit-server-file <file-reader> [
-        read drop
-        read parse-number
-        read parse-number
+        read-line drop
+        read-line parse-number
+        read-line parse-number
     ] with-stream ;
 
 : make-jedit-request ( files params -- code )

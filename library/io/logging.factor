@@ -36,7 +36,7 @@ USE: strings
 USE: unparser
 
 : log ( msg -- )
-    "log" get dup [ tuck fprint fflush ] [ 2drop ] ifte ;
+    "log" get dup [ tuck stream-print stream-flush ] [ 2drop ] ifte ;
 
 : log-error ( error -- )
     "Error: " swap cat2 log ;
