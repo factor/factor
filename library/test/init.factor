@@ -1,5 +1,5 @@
 IN: scratchpad
-USE: init
+USE: command-line
 USE: namespaces
 USE: test
 

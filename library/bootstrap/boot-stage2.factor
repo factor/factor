@@ -34,7 +34,12 @@ USE: stdio
 "Cold boot in progress..." print
 
 [
-    "/version.factor"
+    "/library/generic/generic.factor"
+    "/library/generic/object.factor"
+    "/library/generic/builtin.factor"
+    "/library/generic/predicate.factor"
+    "/library/generic/traits.factor"
+
     "/version.factor"
     "/library/stack.factor"
     "/library/combinators.factor"
@@ -57,11 +62,6 @@ USE: stdio
     "/library/errors.factor"
     "/library/continuations.factor"
     "/library/threads.factor"
-    "/library/generic/generic.factor"
-    "/library/generic/object.factor"
-    "/library/generic/builtin.factor"
-    "/library/generic/predicate.factor"
-    "/library/generic/traits.factor"
     "/library/io/stream.factor"
     "/library/io/stdio.factor"
     "/library/io/io-internals.factor"
@@ -71,7 +71,7 @@ USE: stdio
     "/library/syntax/parser.factor"
     "/library/syntax/parse-stream.factor"
     "/library/bootstrap/init.factor"
-    "/library/syntax/parse-syntax.factor"
+!    "/library/syntax/parse-syntax.factor"
 
     "/library/format.factor"
     "/library/syntax/unparser.factor"

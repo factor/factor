@@ -4,7 +4,6 @@
 !
 ! ./f factor.image -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
 !
-! "examples/oop.factor" run-file
 ! "examples/factoroids.factor" run-file
 
 IN: factoroids
@@ -16,7 +15,7 @@ USE: lists
 USE: logic
 USE: math
 USE: namespaces
-USE: oop
+USE: generic
 USE: random
 USE: sdl
 USE: sdl-event
@@ -116,18 +115,18 @@ M: ship draw ( actor -- )
     [
         surface get screen-xy radius get color get
         filledCircleColor
-    ] bind ;M
+    ] bind ;
 
-M: ship tick ( actor -- ? ) dup [ move ] bind active? ;M
+M: ship tick ( actor -- ? ) dup [ move ] bind active? ;
 
-: make-ship ( -- ship )
-    <ship> [
+C: ship ( -- ship )
+    [
         width get 2 /i  height get 50 - rect> position set
         white color set
         10 radius set
         0 velocity set
         active on
-    ] extend unit ;
+    ] extend ;
 
 ! Projectiles
 TRAITS: plasma
@@ -135,17 +134,17 @@ M: plasma draw ( actor -- )
     [
         surface get screen-xy dup len get + color get
         vlineColor
-    ] bind ;M
+    ] bind ;
 
 M: plasma tick ( actor -- ? )
-    dup [ move ] bind dup in-screen? swap active? and ;M
+    dup [ move ] bind dup in-screen? swap active? and ;
 
 M: plasma collide ( actor1 actor2 -- )
     #! Remove the other actor.
-    deactivate deactivate ;M
+    deactivate deactivate ;
 
-: make-plasma ( actor dy -- plasma )
-    <plasma> [
+C: plasma ( actor dy -- plasma )
+    [
         velocity set
         actor-xy
         blue color set
@@ -157,17 +156,17 @@ M: plasma collide ( actor1 actor2 -- )
 : player-fire ( -- )
     #! Do nothing if player is dead.
     player-actor [
-        #{ 0 -6 } make-plasma player-shots cons@
+        #{ 0 -6 } <plasma> player-shots cons@
     ] when* ;
 
 : enemy-fire ( actor -- )
-    #{ 0 5 } make-plasma enemy-shots cons@ ;
+    #{ 0 5 } <plasma> enemy-shots cons@ ;
 
 ! Background of stars
 TRAITS: particle
 
 M: particle draw ( actor -- )
-    [ surface get screen-xy color get pixelColor ] bind ;M
+    [ surface get screen-xy color get pixelColor ] bind ;
 
 : wrap ( -- )
     #! If current actor has gone beyond screen bounds, move it
@@ -178,7 +177,9 @@ M: particle draw ( actor -- )
     rect> position set ;
 
 M: particle tick ( actor -- )
-    [ move wrap t ] bind ;M
+    [ move wrap t ] bind ;
+
+C: particle ;
 
 SYMBOL: stars
 : star-count 100 ;
@@ -216,7 +217,7 @@ M: enemy draw ( actor -- )
     [
         surface get screen-xy radius get color get
         filledCircleColor
-    ] bind ;M
+    ] bind ;
 
 : attack-chance 30 ;
 
@@ -239,7 +240,9 @@ SYMBOL: wiggle-x
 M: enemy tick ( actor -- )
     dup attack
     dup [ wiggle move position get imaginary ] bind
-    y-in-screen? swap active? and ;M
+    y-in-screen? swap active? and ;
+
+C: enemy ;
 
 : spawn-enemy ( -- )
     <enemy> [
@@ -289,7 +292,7 @@ SYMBOL: event
 : init-game ( -- )
     #! Init game objects.
     init-stars
-    make-ship player set
+    <ship> unit player set
     <event> event set ;
 
 : each-layer ( quot -- )

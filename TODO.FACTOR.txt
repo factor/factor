@@ -14,7 +14,6 @@
 + linearizer/generator:
 
 - peephole optimizer
-- tail call optimization
 - getenv/setenv: if literal arg, compile as a load/store
 - compiler: drop literal peephole optimization
 
@@ -35,7 +34,6 @@
 
 + ffi:
 
-- port ffi to new compiler
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
@@ -68,7 +66,6 @@
 
 + misc:
 
-- some way to step over a word in the stepper
 - step: print NEXT word to execute, not word that JUST executed
 - perhaps /i should work with all numbers
 - unit test weirdness: 2 lines appears at end

@@ -61,13 +61,20 @@ PREDICATE: vector hashtable ( obj -- ? )
     #! undefined value, or a value set to f.
     hash* dup [ cdr ] when ;
 
-: set-hash ( value key table -- )
+: set-hash* ( key table quot -- )
+    #! Apply the quotation to yield a new association list.
+    over >r -rot dupd (hashcode) r> vector-nth swap call ;
+    inline
+    
+! : set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
-    #! key/value pair,
-    dup >r 2dup (hashcode) dup >r swap
-    vector-nth set-assoc
-    r> r> set-vector-nth ;
+    #! key/value pair.
+!    [ set-assoc ] set-hash* ;
+
+: remove-hash ( key table -- )
+    #! Remove a value from a hashtable.
+    [ remove-assoc ] set-hash* ;
 
 : hash-each ( hash code -- )
     #! Apply the code to each key/value pair of the hashtable.

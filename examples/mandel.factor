@@ -8,7 +8,7 @@
 ! "examples/mandel.factor" run-file
 
 IN: mandel
-
+USE: compiler
 USE: alien
 USE: errors
 USE: kernel
@@ -43,14 +43,14 @@ USE: test
         ] times*
     ] make-list list>vector nip ;
 
-: absq >rect swap sq swap sq + ;
+: absq >rect swap sq swap sq + ; inline
 
 : iter ( c z nb-iter -- x )
     over absq 4 >= over 0 = or [
         nip nip
     ] [
         pred >r sq dupd + r> iter
-    ] ifte ;
+    ] ifte ; compiled
 
 : max-color 360 ;
 
@@ -71,7 +71,7 @@ SYMBOL: center
     x-inc get * center get real x-inc get width get 2 / * - + >float
     r>
     y-inc get * center get imaginary y-inc get height get 2 / * - + >float
-    rect> ;
+    rect> ; compiled
 
 : render ( -- )
     init-mandel

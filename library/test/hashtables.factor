@@ -46,3 +46,15 @@ f 100 fac "testhash" get set-hash
 [ t ] [ #{ 2 3 } "testhash" get hash ] unit-test
 [ f ] [ 100 fac "testhash" get hash* cdr ] unit-test
 [ { } ] [ { [ { } ] } vector-clone "testhash" get hash* cdr ] unit-test
+
+[
+    [ "salmon" | "fish" ]
+    [ "crocodile" | "reptile" ]
+    [ "cow" | "mammal" ]
+    [ "visual basic" | "language" ]
+] alist>hash "testhash" set
+
+[ f ] [
+    "visual basic" "testhash" get remove-hash
+    "visual basic" "testhash" get hash*
+] unit-test

@@ -106,6 +106,16 @@ SYMBOL: meta-cf
 : do ( obj -- )
     dup word? [ meta-word ] [ push-d ] ifte ;
 
+: meta-word-1 ( word -- )
+    dup "meta-word" word-property dup [
+        nip call
+    ] [
+        drop host-word
+    ] ifte ;
+
+: do-1 ( obj -- )
+    dup word? [ meta-word-1 ] [ push-d ] ifte ;
+
 : (interpret) ( quot -- )
     #! The quotation is called with each word as its executed.
     done? [ drop ] [ [ next swap call ] keep (interpret) ] ifte ;
@@ -183,6 +193,10 @@ SYMBOL: meta-cf
 
 : step
     #! Step into current word.
+    [ next dup report do-1 ] not-done ;
+
+: into
+    #! Step into current word.
     [ next dup report do ] not-done ;
 
 : walk-banner ( -- )
@@ -191,7 +205,8 @@ SYMBOL: meta-cf
     "show stepper stacks." print
     \ &get prettyprint-1
     " ( var -- value ) inspects the stepper namestack." print
-    \ step prettyprint-1 " -- single step" print
+    \ step prettyprint-1 " -- single step over" print
+    \ into prettyprint-1 " -- single step into" print
     \ (trace) prettyprint-1 " -- trace until end" print
     \ (run) prettyprint-1 " -- run until end" print
     \ exit prettyprint-1 " -- exit single-stepper" print ;

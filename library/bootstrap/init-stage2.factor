@@ -25,12 +25,12 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
+IN: kernel
 USE: ansi
 USE: compiler
 USE: errors
 USE: inference
-USE: kernel
+USE: command-line
 USE: listener
 USE: lists
 USE: math
@@ -75,7 +75,7 @@ USE: unparser
     warm-boot
     garbage-collection
     "interactive" get [ print-banner listener ] when
-    0 exit*
+    0 exit* 
 ] set-boot
 
 init-error-handler

@@ -41,7 +41,16 @@ USE: unparser
 USE: vectors
 USE: words
 
+: supported-cpu? ( -- ? )
+    cpu "unknown" = not ;
+
+: check-architecture ( -- )
+    supported-cpu? [
+        "Unsupported CPU; compiler disabled" throw
+    ] unless ;
+
 : compiling ( word -- definition )
+    check-architecture
     "verbose-compile" get [
         "Compiling " write dup . flush
     ] when
@@ -67,7 +76,7 @@ USE: words
 
 : compiled ( -- )
     #! Compile the most recently defined word.
-    word compile ; parsing
+    "compile" get [ word compile ] when ; parsing
 
 : cannot-compile ( word -- )
     "verbose-compile" get [
@@ -81,10 +90,4 @@ USE: words
 
 : compile-all ( -- )
     #! Compile all words.
-    [
-       ! dup "infer-effect" word-property [
-            try-compile
-       ! ] [
-       !     drop
-       ! ] ifte
-    ] each-word ;
+    [ try-compile ] each-word ;
