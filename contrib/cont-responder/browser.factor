@@ -46,6 +46,7 @@ USE: unparser
 USE: logging
 USE: listener
 USE: url-encoding
+USE: hashtables
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -100,10 +101,12 @@ USE: url-encoding
     "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
-    ] [
-      [ 
-        >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
-      ] with-simple-html-output
+    ] [ 
+      2dup swap unit search [
+        [ 
+          >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
+        ] with-simple-html-output
+      ] when
     ] ifte
   ] bind drop ;
 
@@ -199,7 +202,6 @@ USE: url-encoding
 
 : browse ( <browser> -- )
   #! Display a Smalltalk like browser for exploring/modifying words.
-  [
     [
       [
         <html> 
@@ -227,10 +229,10 @@ USE: url-encoding
       "words" get 
       "eval" get dup [ "vocabs" get swap eval-string ] [ drop ] ifte
       [
-	"vocabs" get "words" get browser-url forward-to-url
+	"vocabs" get dup [ ] [ drop "unknown" ] ifte "words" get dup [ ] [ drop "unknown" ] ifte browser-url 
+	forward-to-url
       ] show
-    ] bind <browser>
-  ] forever ;
+    ] bind <browser> ;
 
 : browser-responder ( allow-edit? -- )
   #! Start the Smalltalk-like browser.
