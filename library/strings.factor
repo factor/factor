@@ -104,6 +104,9 @@ USE: stack
         [ = ] dip f ?
     ] ifte ;
 
+: ?str-head ( str begin -- str ? )
+    dupd str-head? dup [ nip t ] [ drop f ] ifte ;
+
 : str-tailcut ( str end -- str str )
     str-length [ dup str-length ] dip - str/ ;
 
@@ -116,6 +119,9 @@ USE: stack
         tuck str-tailcut swap
         [ = ] dip f ?
     ] ifte ;
+
+: ?str-tail ( str end -- str ? )
+    dupd str-tail? dup [ nip t ] [ drop f ] ifte ;
 
 : split1 ( string split -- before after )
     #! The car of the pair is the string up to the first

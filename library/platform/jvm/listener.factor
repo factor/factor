@@ -55,6 +55,18 @@ USE: unparser
     "javax.swing.text.StyleConstants" swap jvar-static-get
     ; inline
 
+: set-icon-style ( attribute-set icon -- )
+    [
+        "javax.swing.text.MutableAttributeSet"
+        "javax.swing.Icon"
+    ] "javax.swing.text.StyleConstants"
+    "setIcon" jinvoke-static ;
+
+: <icon> ( resource -- icon )
+    resource
+    [ "java.net.URL" ]
+    "javax.swing.ImageIcon" jnew ;
+
 : swing-attribute+ ( attribute-set value key -- )
     style-constant attribute+ ;
 
@@ -68,38 +80,57 @@ USE: unparser
     "factor.listener.FactorListener" "Actions" jvar-static-get
     ; inline
 
-: actions ( -- list )
-    [
-        [ "describe-path" | "Describe" ]
-        [ "lookup" | "Push" ]
-        [ "lookup execute" | "Execute" ]
-        [ "lookup jedit" | "jEdit" ]
-        [ "lookup usages." | "Usages" ]
-    ] ;
-
 : <action-menu-item> ( path pair -- pair )
     uncons >r " " swap cat3 r> cons ;
 
-: <actions-menu> ( path -- alist )
-    unparse actions [ dupd <action-menu-item> ] map nip ;
+: <actions-menu> ( path actions -- alist )
+    [ dupd <action-menu-item> ] map nip ;
+
+: object-actions ( -- list )
+    [
+        [ "describe-path"  | "Describe" ]
+        [ "lookup"         | "Push" ]
+        [ "lookup execute" | "Execute" ]
+        [ "lookup jedit"   | "jEdit" ]
+        [ "lookup usages." | "Usages" ]
+    ] ;
+
+: <object-actions-menu> ( path -- alist )
+    unparse object-actions <actions-menu> ;
+
+: file-actions ( -- list )
+    [
+        [ ""               | "Push" ]
+        [ "run-file"       | "Run file" ]
+        [ "directory."     | "List directory" ]
+    ] ;
+
+: <file-actions-menu> ( path -- alist )
+    unparse file-actions <actions-menu> ;
 
 : underline-attribute ( attribute-set -- )
     t "Underline" swing-attribute+ ;
 
-: link-attribute ( attribute-set target -- )
+: object-link-attribute ( attribute-set target -- )
     over underline-attribute
-    <actions-menu> actions-key attribute+ ;
+    <object-actions-menu> actions-key attribute+ ;
+
+: file-link-attribute ( attribute-set target -- )
+    over underline-attribute
+    <file-actions-menu> actions-key attribute+ ;
 
 : style>attribute-set ( style -- attribute-set )
     <attribute-set> swap [
-        [ "link"      dupd link-attribute ]
-        [ "bold"      drop dup t "Bold" swing-attribute+ ]
-        [ "italics"   drop dup t "Italic" swing-attribute+ ]
-        [ "underline" drop dup t "Underline" swing-attribute+ ]
-        [ "fg"        dupd >color "Foreground" swing-attribute+ ]
-        [ "bg"        dupd >color "Background" swing-attribute+ ]
-        [ "font"      dupd "FontFamily" swing-attribute+ ]
-        [ "size"      dupd "FontSize" swing-attribute+ ]
+        [ "object-link" dupd object-link-attribute ]
+        [ "file-link"   dupd file-link-attribute ]
+        [ "bold"        drop dup t "Bold" swing-attribute+ ]
+        [ "italics"     drop dup t "Italic" swing-attribute+ ]
+        [ "underline"   drop dup t "Underline" swing-attribute+ ]
+        [ "fg"          dupd >color "Foreground" swing-attribute+ ]
+        [ "bg"          dupd >color "Background" swing-attribute+ ]
+        [ "font"        dupd "FontFamily" swing-attribute+ ]
+        [ "size"        dupd "FontSize" swing-attribute+ ]
+        [ "icon"        dupd <icon> set-icon-style ]
     ] assoc-apply ;
 
 : set-character-attrs ( attrs -- )

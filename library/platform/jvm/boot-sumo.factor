@@ -68,7 +68,6 @@ USE: parser
 "/library/stream.factor"                    run-resource ! streams
 "/library/platform/jvm/stream.factor"       run-resource ! streams
 "/library/platform/jvm/files.factor"        run-resource ! files
-"/library/files.factor"                     run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
@@ -91,6 +90,7 @@ USE: parser
 "/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
+"/library/files.factor"                    run-resource ! files
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint
 "/library/interpreter.factor"              run-resource ! interpreter
 "/library/inspector.factor"                run-resource ! inspector

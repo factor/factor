@@ -29,6 +29,7 @@ IN: file-responder
 USE: combinators
 USE: errors
 USE: files
+USE: html
 USE: httpd
 USE: httpd-responder
 USE: kernel
@@ -64,17 +65,18 @@ USE: strings
     "raw-query" get [ CHAR: ? % % ] when*
     %> redirect ;
 
+: list-directory ( directory -- )
+    serving-html dup [ directory. ] simple-html-document ;
+
 : serve-directory ( filename -- )
-    dup "/" str-tail? dup [
-        drop dup "index.html" cat2 dup exists? [
+    "/" ?str-tail [
+        dup "index.html" cat2 dup exists? [
             serve-file
         ] [
-            drop
-            "Foo bar" log
-            drop
+            drop list-directory
         ] ifte
     ] [
-        2drop directory-no/
+        drop directory-no/
     ] ifte ;
 
 : serve-object ( filename -- )

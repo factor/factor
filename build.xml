@@ -52,6 +52,7 @@
 				<include name="*.xml"/>
 				<include name="library/**/*.factor"/>
 				<include name="library/**/*.txt"/>
+				<include name="library/**/*.png"/>
 				<include name="org/**/*.class"/>
 				<include name="*.factor"/>
 				<include name="doc/**/*.html"/>

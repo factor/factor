@@ -59,7 +59,7 @@ DEFER: sbuf-clone
 
 IN: files
 DEFER: stat
-DEFER: directory
+DEFER: (directory)
 
 IN: io-internals
 DEFER: port?
@@ -223,7 +223,7 @@ IN: cross-compiler
         setenv
         open-file
         stat
-        read-dir
+        (directory)
         garbage-collection
         save-image
         datastack

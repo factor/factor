@@ -27,12 +27,18 @@
 
 IN: files
 USE: combinators
+USE: io-internals
 USE: lists
 USE: logic
 USE: stack
+USE: strings
 
 : exists? ( file -- ? )
     stat >boolean ;
 
 : directory? ( file -- ? )
     stat dup [ car ] when ;
+
+: directory ( dir -- list )
+    #! List a directory.
+    (directory) str-sort ;

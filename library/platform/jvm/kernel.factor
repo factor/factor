@@ -56,9 +56,11 @@ IN: kernel
     [ "java.lang.Object" "java.lang.Object" ]
     "factor.FactorLib" "equal" jinvoke-static ;
 
+: class-of* ( obj -- class )
+    [ ] "java.lang.Object" "getClass" jinvoke ;
+
 : class-of ( obj -- class )
-    [ ] "java.lang.Object" "getClass" jinvoke
-    [ ] "java.lang.Class" "getName" jinvoke ;
+    class-of* [ ] "java.lang.Class" "getName" jinvoke ;
 
 : is ( obj class -- boolean )
     ! Like "instanceof" in Java.
@@ -115,3 +117,8 @@ IN: kernel
   >bignum ;
 
 : room free-memory total-memory ;
+
+: resource ( path -- url )
+    interpreter class-of*
+    [ "java.lang.String" ]
+    "java.lang.Class" "getResource" jinvoke ;

@@ -16,3 +16,11 @@ USE: test
     [ [ "fg" 255 0 255 ] [ "font" | "Monospaced" ] ]
     span-tag
 ] unit-test
+
+[ "/file/foo/bar" ]
+[
+    [
+        "/home/slava/doc/" "doc-root" set
+        "/home/slava/doc/foo/bar" file-link-href
+    ] with-scope
+] unit-test

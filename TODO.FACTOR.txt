@@ -1,8 +1,6 @@
 - alist -vs- assoc terminology
 - some way to run httpd from command line
 - 'default responder' for when we go to root
-- file responder:
-  - directory listings
 - minimize stage2 initialization code, just move it to source files
 
 + bignums:
@@ -83,6 +81,10 @@
 
 + misc:
 
+- directory listings:
+  - icons for file responder
+  - cwd, cd, pwd, dir., pwd. words
+- -1.1 3 ^ shouldn't give a complex number
 - don't rehash strings on every startup
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name

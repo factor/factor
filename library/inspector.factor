@@ -49,7 +49,8 @@ USE: vectors
     vars [ print ] each ;
 
 : link-style ( path -- style )
-    relative>absolute-object-path "link" default-style acons ;
+    relative>absolute-object-path
+    "object-link" default-style acons ;
 
 : var. ( [ name | value ] -- )
     uncons unparse swap link-style write-attr ;

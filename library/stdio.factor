@@ -29,6 +29,7 @@ IN: stdio
 USE: combinators
 USE: errors
 USE: kernel
+USE: lists
 USE: namespaces
 USE: stack
 USE: streams
@@ -65,6 +66,10 @@ USE: streams
 : write-attr ( string style -- )
     #! Write an attributed string to standard output.
     "stdio" get fwrite-attr ;
+
+: write-icon ( resource -- )
+    #! Write an icon. Eg, /library/icons/File.png
+    "icon" swons unit "" swap write-attr ;
 
 : print ( string -- )
     "stdio" get fprint ;

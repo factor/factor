@@ -153,7 +153,7 @@ DEFER: prettyprint*
 
 : word-attrs ( word -- attrs )
     dup defined? [
-        dup >r word-link "link" r> word-style acons
+        dup >r word-link "object-link" r> word-style acons
     ] [
         word-style
     ] ifte ;
@@ -181,7 +181,7 @@ DEFER: prettyprint*
     <% "vocabularies'" % % %> ;
 
 : vocab-attrs ( word -- attrs )
-    vocab-link "link" default-style acons ;
+    vocab-link "object-link" default-style acons ;
 
 : prettyprint-vocab ( vocab -- )
     dup vocab-attrs write-attr ;

@@ -65,12 +65,6 @@ USE: url-encoding
     #! Wrap a string in an HTML tag.
     <% dupd opening-tag swap % closing-tag %> ;
 
-: link-attrs ( link -- attrs )
-    <% "href=\"/inspect/" % % "\"" % %> ;
-
-: link-tag ( string link -- string )
-    url-encode "a" swap link-attrs html-tag ;
-
 : >hex-color ( triplet -- hex )
     [ >hex 2 digits ] map "#" swons cat ;
 
@@ -105,8 +99,28 @@ USE: url-encoding
 : span-tag ( string style -- string )
     "span" swap <% "style=\"" % css-style% "\"" % %> html-tag ;
 
+: link-tag ( string link -- string )
+    url-encode "a" swap <% "href=" % unparse % %> html-tag ;
+
+: resolve-file-link ( path -- link )
+    #! The file responder needs relative links not absolute
+    #! links.
+    "doc-root" get [
+        ?str-head [ "/" ?str-head drop ] when
+    ] when* "/" ?str-tail drop ;
+
+: file-link-href ( path -- href )
+    <% "/file/" % resolve-file-link % %> ;
+
+: object-link-href ( path -- href )
+    <% "/inspect/" % % %> ;
+
 : html-attr-string ( string style -- string )
-    [ span-tag ] keep "link" swap assoc [ link-tag ] when* ;
+    [ span-tag ] keep
+    [
+        [ "file-link"   file-link-href   link-tag ]
+        [ "object-link" object-link-href link-tag ]
+    ] assoc-apply ;
 
 : html-write-attr ( string style -- )
     swap chars>entities swap html-attr-string write ;
@@ -151,5 +165,5 @@ USE: url-encoding
 
 : simple-html-document ( title quot -- )
     swap [
-        [ [ call ] with-html-stream ] preformatted-html
+        [ with-html-stream ] preformatted-html
     ] html-document ;

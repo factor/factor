@@ -75,7 +75,7 @@ USE: strings
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
-    dup "/" str-head? dup [ nip ] [ drop ] ifte ;
+    "/" ?str-head drop ;
 
 : log-responder ( url -- )
     "Calling responder " swap cat2 log ;

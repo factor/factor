@@ -28,8 +28,10 @@
 IN: files
 USE: combinators
 USE: lists
+USE: logic
 USE: namespaces
 USE: stack
+USE: stdio
 USE: strings
 
 : set-mime-types ( assoc -- )
@@ -43,6 +45,32 @@ USE: strings
 
 : mime-type ( filename -- mime-type )
     file-extension mime-types assoc [ "text/plain" ] unless* ;
+
+: dir-icon
+    "/library/icons/Folder.png" ;
+
+: file-icon
+    "/library/icons/File.png" ;
+
+: file-icon. ( path -- )
+    directory? dir-icon file-icon ? write-icon ;
+
+: file-link. ( dir name -- )
+    tuck "/" swap cat3 "file-link" swons unit write-attr ;
+
+: file. ( dir name -- )
+    #! If "doc-root" set, create links relative to it.
+    2dup "/" swap cat3 file-icon. " " write file-link. terpri ;
+
+: directory. ( dir -- )
+    #! If "doc-root" set, create links relative to it.
+    dup directory [
+        dup [ "." ".." ] contains? [
+            drop
+        ] [
+            dupd file.
+        ] ifte
+    ] each drop ;
 
 [
     [ "html"   | "text/html"                        ]
