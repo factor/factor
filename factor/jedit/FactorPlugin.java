@@ -197,15 +197,18 @@ public class FactorPlugin extends EditPlugin
 			FactorWord w = (FactorWord)words.car;
 			if(w != null && w.name != null)
 			{
-				if(anywhere)
+				if(!completions.contains(w))
 				{
-					if(w.name.indexOf(word) != -1)
-						completions.add(w);
-				}
-				else
-				{
-					if(w.name.startsWith(word))
-						completions.add(w);
+					if(anywhere)
+					{
+						if(w.name.indexOf(word) != -1)
+							completions.add(w);
+					}
+					else
+					{
+						if(w.name.startsWith(word))
+							completions.add(w);
+					}
 				}
 			}
 

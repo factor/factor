@@ -72,7 +72,6 @@ USE: stdio
     "/library/platform/native/words.factor"
     "/library/words.factor"
     "/library/platform/native/vocabularies.factor"
-    "/library/vocabularies.factor"
     "/library/platform/native/parse-numbers.factor"
     "/library/platform/native/parser.factor"
     "/library/platform/native/parse-syntax.factor"

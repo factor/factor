@@ -32,6 +32,7 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
+USE: strings
 
 : word-name ( word -- name )
     "name" word-property ;
@@ -39,6 +40,69 @@ USE: stack
 : word-vocabulary ( word -- vocab )
     "vocabulary" word-property ;
 
+: vocabs ( -- list )
+    #! Push a list of vocabularies.
+    global [ "vocabularies" get [ vars str-sort ] bind ] bind ;
+
+: vocab ( name -- vocab )
+    #! Get a vocabulary.
+    global [ "vocabularies" get get* ] bind ;
+
+: word-sort ( list -- list )
+    #! Sort a list of words by name.
+    [ swap word-name swap word-name str-lexi> ] sort ;
+
+: words ( vocab -- list )
+    #! Push a list of all words in a vocabulary.
+    #! Filter empty slots.
+    vocab [ values ] bind [ ] subset word-sort ;
+
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
     vocabs [ words [ swap dup >r call r> ] each ] each drop ;
+
+: init-search-path ( -- )
+    ! For files
+    "scratchpad" "file-in" set
+    [ "builtins" "syntax" "scratchpad" ] "file-use" set
+    ! For interactive
+    "scratchpad" "in" set
+    [
+        "user"
+        "arithmetic"
+        "builtins"
+        "combinators"
+        "compiler"
+        "continuations"
+        "debugger"
+        "errors"
+        "files"
+        "hashtables"
+        "inference"
+        "inferior"
+        "interpreter"
+        "inspector"
+        "jedit"
+        "kernel"
+        "listener"
+        "lists"
+        "logic"
+        "math"
+        "namespaces"
+        "parser"
+        "prettyprint"
+        "processes"
+        "profiler"
+        "stack"
+        "streams"
+        "stdio"
+        "strings"
+        "syntax"
+        "test"
+        "threads"
+        "unparser"
+        "vectors"
+        "vocabularies"
+        "words"
+        "scratchpad"
+    ] "use" set ;

@@ -21,7 +21,7 @@
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *
-- float types
+- FFI float types
 - compile word twice; no more 'cannot compile' error!
 - perhaps /i should work with all numbers
 - assembler opcodes dispatch on operand types
@@ -31,7 +31,6 @@
 + listener/plugin:
 
 - extract word in wrong place
-- twice in completion list
 - accept multi-line input in listener
 - don't show listener on certain commands
 - NPE in ErrorHighlight
@@ -45,7 +44,6 @@
 
 + kernel:
 
-- save restore stacks between longjmp in case they are in registers
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
 - >lower, >upper for strings
@@ -62,7 +60,6 @@
 
 - alist -vs- assoc terminology
 - jedit ==> jedit-word, jedit takes a file name
-- 'cascading' styles
 - command line parsing cleanup
 - nicer way to combine two paths
 - :get &get

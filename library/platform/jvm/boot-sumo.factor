@@ -58,7 +58,6 @@ USE: parser
 "/library/continuations.factor"             run-resource ! continuations
 "/library/errors.factor"                    run-resource ! errors
 "/library/platform/jvm/vocabularies.factor" run-resource ! vocabularies
-"/library/vocabularies.factor"              run-resource ! vocabularies
 "/library/platform/jvm/words.factor"        run-resource ! words
 "/library/words.factor"                     run-resource ! words
 "/library/format.factor"                    run-resource ! format
