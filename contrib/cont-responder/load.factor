@@ -26,6 +26,11 @@
 USE: httpd-responder
 USE: httpd
 USE: threads
+USE: stack
+USE: prettyprint
+USE: combinators
+USE: errors
+USE: stdio
 default-responders
 
 USE: parser
@@ -37,5 +42,7 @@ USE: parser
 : l5 "todo.factor" run-file ;
 : l6 "todo-example.factor" run-file ;
 : l7 "eval-responder.factor" run-file ;
-: l8 8888 httpd ;
-: l9 [ 8888 httpd ] in-thread ;
+: l8 "live-updater-responder.factor" run-file ;
+: la ;
+: la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
+: lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
