@@ -4,15 +4,11 @@ DEFAULT_LIBS = -lm
 
 STRIP = strip
 
-obj-$(UNIX) += native/unix/file.o native/unix/io.o native/unix/socket.o \
+UNIX_OBJS = native/unix/file.o native/unix/io.o native/unix/socket.o \
 	native/unix/signal.o native/unix/read.o native/unix/write.o \
 	native/unix/ffi.o native/unix/run.o
 
-obj-$(WIN32) += native/win32/ffi.o native/win32/file.o native/win32/io.o \
-	native/win32/misc.o native/win32/read.o native/win32/write.o \
-	native/win32/run.o
-
-obj-y += native/arithmetic.o native/array.o native/bignum.o \
+OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/fixnum.o \
@@ -47,45 +43,34 @@ default:
 bsd:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -pthread" \
-		LIBS="$(DEFAULT_LIBS)" \
-		UNIX=y
+		LIBS="$(DEFAULT_LIBS)"
 
 bsd-nopthread:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS)" \
-		UNIX=y
+		LIBS="$(DEFAULT_LIBS)"
 
 macosx:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
-		LIBS="$(DEFAULT_LIBS)" \
-		UNIX=y
+		LIBS="$(DEFAULT_LIBS)" 
 
 linux:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS) -ldl" \
-		UNIX=y
+		LIBS="$(DEFAULT_LIBS) -ldl" 
 
 solaris:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -lsocket -lnsl -lm" \
-		UNIX=y
+		LIBS="$(DEFAULT_LIBS) -lsocket -lnsl -lm"
 
-windows:
-	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -DWIN32" \
-		LIBS="$(DEFAULT_LIBS)" \
-		WIN32=y
-
-f: $(obj-y)
-	$(CC) $(LIBS) $(CFLAGS) -o $@ $(obj-y)
+f: $(OBJS)
+	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
 	$(STRIP) $@
 
 clean:
-	rm -f $(obj-y)
+	rm -f $(OBJS)
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
