@@ -11,6 +11,7 @@
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
+#define CPU_ENV        11
 
 /* Profiling timer */
 struct itimerval prof_timer;

@@ -27,9 +27,13 @@
 
 IN: compiler
 USE: combinators
+USE: errors
 USE: lists
 USE: logic
+USE: namespaces
+USE: prettyprint
 USE: stack
+USE: stdio
 USE: vectors
 USE: words
 
@@ -99,6 +103,14 @@ DEFER: can-compile-vector?
         "can-compile" set-word-property
     ] ifte ;
 
+SYMBOL: compilable-word-list
+
 : compilable-words ( -- list )
     #! Make a list of all words that can be compiled.
     [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,] ;
+
+: init-compiler ( -- )
+    #! Compile all words.
+    compilable-word-list get [
+        [ compile ] [ [ "Cannot compile " write . ] when ] catch
+    ] each ;

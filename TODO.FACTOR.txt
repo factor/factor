@@ -4,12 +4,14 @@ FFI:
 - BIN: 2: bad
 
 - compile word twice; no more 'cannot compile' error!
-
-- compiled? messy
+- doc comments in assoc, image, inferior
+- styles - could use some cleanup
+- list - trim down
+- move quadratic and simpson to contrib
+- init-assembler called twice
 - compiler: drop literal peephole optimization
 - compiling when*
 - compiling unless*
-- eliminate uses of 2dip
 - getenv/setenv: if literal arg, compile as a load/store
 - inline words
 

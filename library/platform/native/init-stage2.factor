@@ -62,9 +62,12 @@ USE: words
     t "user-init" set
     t "interactive" set
     t "ansi" set
+    t "compile" set
 
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
+
+    "compile" get [ init-compiler ] when
 
     run-user-init
 

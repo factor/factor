@@ -46,6 +46,10 @@ USE: words
 USE: unparser
 USE: vectors
 
+: cpu ( -- arch )
+    #! Returns one of "x86" or "unknown".
+    11 getenv ;
+
 ! The 'fake vtable' used here speeds things up a lot.
 ! It is quite clumsy, however. A higher-level CLOS-style
 ! 'generic words' system will be built later.
@@ -115,6 +119,10 @@ IN: kernel
         [ sbuf? ] [ sbuf-clone ]
         [ drop t ] [ ( return the object ) ]
     ] cond ;
+
+: set-boot ( quot -- )
+    #! Set the boot quotation.
+    8 setenv ;
 
 : java? f ;
 : native? t ;

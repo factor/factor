@@ -1,11 +1,11 @@
-CC = gcc
+CC = gcc34
 
 # On FreeBSD, to use SDL and other libc_r libs:
-CFLAGS = -g -Wall -export-dynamic -pthread
+# CFLAGS = -g -Wall -export-dynamic -pthread
 # On PowerPC G5:
 # CFLAGS = -mcpu=970 -mtune=970 -mpowerpc64 -ffast-math -O3
 # On Pentium 4:
-# CFLAGS = -march=pentium4 -ffast-math -Os -fomit-frame-pointer -export-dynamic -pthread
+CFLAGS = -march=pentium4 -ffast-math -Os -fomit-frame-pointer -export-dynamic -pthread
 # Add -fomit-frame-pointer if you don't care about debugging
 # CFLAGS = -Os -g -Wall
 

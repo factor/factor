@@ -27,6 +27,12 @@ int main(int argc, char** argv)
 
 	userenv[ARGS_ENV] = args;
 
+#if defined(i386) || defined(__i386) || defined(__i386__)
+	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
+#else
+	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
+#endif
+
 	run();
 
 	return 0;

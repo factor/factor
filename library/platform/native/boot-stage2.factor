@@ -27,9 +27,11 @@
 
 IN: init
 USE: combinators
+USE: compiler
 USE: errors
 USE: kernel
 USE: lists
+USE: namespaces
 USE: parser
 USE: stack
 USE: strings
@@ -135,35 +137,47 @@ USE: stdio
     "/library/jedit/jedit-remote.factor"
     "/library/jedit/jedit.factor"
 
-    "/library/compiler/assembler.factor"
-    "/library/compiler/assembly-x86.factor"
-    "/library/compiler/compiler-macros.factor"
-    "/library/compiler/compiler.factor"
-    "/library/compiler/ifte.factor"
-    "/library/compiler/generic.factor"
-    "/library/compiler/interpret-only.factor"
-    "/library/compiler/compile-all.factor"
-    "/library/compiler/alien-types.factor"
-    "/library/compiler/alien-macros.factor"
-    "/library/compiler/alien.factor"
-
     "/library/platform/native/primitives.factor"
 
     "/library/init.factor"
-    "/library/platform/native/init-stage2.factor"
 ] [
     dup print
     run-resource
 ] each
 
+cpu "x86" = [
+    [
+        "/library/compiler/assembler.factor"
+        "/library/compiler/assembly-x86.factor"
+        "/library/compiler/compiler-macros.factor"
+        "/library/compiler/compiler.factor"
+        "/library/compiler/ifte.factor"
+        "/library/compiler/generic.factor"
+        "/library/compiler/interpret-only.factor"
+        "/library/compiler/compile-all.factor"
+        "/library/compiler/alien-types.factor"
+        "/library/compiler/alien-macros.factor"
+        "/library/compiler/alien.factor"
+    ] [
+        dup print
+        run-resource
+    ] each
+] [
+    "/library/compiler/dummy-compiler.factor" dup print run-resource
+] ifte
+
+"/library/platform/native/init-stage2.factor" dup print run-resource
+
 IN: init
 DEFER: warm-boot
 
 IN: compiler
-DEFER: init-assembler
+DEFER: compilable-words
+DEFER: compilable-word-list
 
-: set-boot ( quot -- ) 8 setenv ;
-[ init-assembler warm-boot ] set-boot
+[ warm-boot ] set-boot
+
+compilable-words compilable-word-list set
 
 garbage-collection
 "factor.image" save-image
