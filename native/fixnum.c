@@ -7,7 +7,7 @@ F_FIXNUM to_fixnum(CELL tagged)
 	F_ARRAY* y;
 	F_FLOAT* f;
 
-	switch(type_of(tagged))
+	switch(TAG(tagged))
 	{
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);

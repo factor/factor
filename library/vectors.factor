@@ -167,11 +167,6 @@ M: vector hashcode ( vec -- n )
         over vector-nth hashcode rot bitxor swap
     ] times* drop ;
 
-: vector-head ( n vector -- list )
-    #! Return a new list with all elements up to the nth
-    #! element.
-    swap [ over vector-nth ] vector-project nip ;
-
 : vector-tail ( n vector -- list )
     #! Return a new list with all elements from the nth
     #! index upwards.

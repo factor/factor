@@ -1,6 +1,5 @@
 + compiler:
 
-- recursive? and tree-contains? should handle vectors
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval

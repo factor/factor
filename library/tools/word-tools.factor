@@ -36,13 +36,18 @@ USE: stdio
 USE: strings
 USE: unparser
 USE: math
+USE: hashtables
 
-: word-uses? ( of in -- ? )
+GENERIC: word-uses? ( of in -- ? )
+M: word word-uses? 2drop f ;
+M: compound word-uses? ( of in -- ? )
     2dup = [
         2drop f ! Don't say that a word uses itself
     ] [
         word-parameter tree-contains?
     ] ifte ;
+M: generic word-uses? ( of in -- ? )
+    "methods" word-property hash>alist tree-contains? ;
 
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.

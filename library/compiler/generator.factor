@@ -49,10 +49,6 @@ SYMBOL: relocation-table
     #! If flag is true; relative.
     0 1 ? rel, relocating word-primitive rel, ;
 
-: rel-word ( word rel/abs -- )
-    #! If flag is true; relative.
-    over primitive? [ rel-primitive ] [ 2drop ] ifte ;
-
 : rel-dlsym ( name dll rel/abs -- )
     #! If flag is true; relative.
     2 3 ? rel, relocating cons intern-literal rel, ;
@@ -60,6 +56,14 @@ SYMBOL: relocation-table
 : rel-address ( -- )
     #! Relocate address just compiled.
     4 rel, relocating 0 rel, ;
+
+: rel-word ( word rel/abs -- )
+    #! If flag is true; relative.
+    over primitive? [
+        rel-primitive
+    ] [
+        nip [ rel-address ] unless
+    ] ifte ;
 
 : generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
@@ -106,6 +110,8 @@ SYMBOL: previous-offset
     ] catch ;
 
 #label [ save-xt ] "generator" set-word-property
+
+#end-dispatch [ drop ] "generator" set-word-property
 
 : type-tag ( type -- tag )
     #! Given a type number, return the tag number.

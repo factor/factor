@@ -2,7 +2,7 @@
 
 F_FIXNUM to_integer(CELL x)
 {
-	switch(type_of(x))
+	switch(TAG(x))
 	{
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(x);

@@ -52,6 +52,9 @@ USE: words
 : compile-call ( word -- )
     dup dup postpone-word  compile-call-label  t rel-word ;
 
+: compile-target ( word -- )
+    compiled-offset 0 compile-cell 0 defer-xt ;
+
 #call [
     compile-call
 ] "generator" set-word-property
@@ -97,9 +100,14 @@ USE: words
     compiled-offset swap set-compiled-cell ( fixup -- )
 ] "generator" set-word-property
 
+#target-label [
+    #! Jump table entries are absolute addresses.
+    compile-target rel-address
+] "generator" set-word-property
+
 #target [
     #! Jump table entries are absolute addresses.
-    compiled-offset 0 compile-cell 0 defer-xt rel-address
+    dup dup postpone-word compile-target f rel-word
 ] "generator" set-word-property
 
 #c-call [

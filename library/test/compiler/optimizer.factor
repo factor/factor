@@ -18,3 +18,5 @@ USE: lists
 [ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] dataflow kill-set ] unit-test
 
 [ [ t t f ] ] [ [ 1 2 ] [ 1 2 3 ] [ f <literal> ] map kill-mask ] unit-test
+
+[ t ] [ 3 [ 3 over [ ] [ ] ifte drop ] dataflow kill-set contains? ] unit-test

@@ -33,6 +33,7 @@ USE: inference
 USE: words
 USE: prettyprint
 USE: kernel-internals
+USE: vectors
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never
@@ -89,12 +90,24 @@ USE: kernel-internals
     #! Push a list of literals that may be killed in the IR.
     dup scan-literals [ over can-kill? ] subset nip ;
 
+SYMBOL: branch-returns
+
 : can-kill-branches? ( literal node -- ? )
-    #! Check if the literal appears in either branch.
+    #! Check if the literal appears in either branch. This
+    #! assumes that the last element of each branch is a #values
+    #! node.
     2dup consumes-literal? [
         2drop f
     ] [
-        [ node-param get ] bind [ dupd can-kill? ] all? nip
+        [ node-param get ] bind
+        [
+            dup [
+                last [ node-consume-d get list>vector ] bind
+            ] map
+            unify-stacks vector>list
+            branch-returns set
+            [ dupd can-kill? ] all? nip
+        ] with-scope
     ] ifte ;
 
 : kill-node ( literals node -- )
@@ -169,6 +182,14 @@ USE: kernel-internals
         node-param [ kill-nodes ] change
     ] extend ,
 ] "kill-node" set-word-property
+
+#values [
+    dupd consumes-literal? [
+        branch-returns get mentions-literal?
+    ] [
+        drop t
+    ] ifte
+] "can-kill" set-word-property
 
 \ ifte [ scan-branches ] "scan-literal" set-word-property
 \ ifte [ can-kill-branches? ] "can-kill" set-word-property

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,101 +26,176 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: inference
-USE: errors
-USE: generic
-USE: hashtables
 USE: kernel
 USE: lists
-USE: math
 USE: namespaces
-USE: parser
-USE: prettyprint
-USE: stdio
-USE: strings
-USE: unparser
-USE: vectors
 USE: words
+USE: inference
+USE: strings
+USE: strings
+USE: prettyprint
 
-: labels ( linear -- list )
-    #! Make a list of all labels defined in the linear IR.
-    [ [ unswons #label = [ , ] [ drop ] ifte ] each ] make-list ;
+! The linear IR being simplified is stored in this variable.
+SYMBOL: simplifying
+
+: simplifiers ( linear -- list )
+    #! A list of quotations with stack effect
+    #! ( linear -- linear ? ) that can simplify the first node
+    #! in the linear IR.
+    car car "simplifiers" word-property ;
+
+: simplify-node ( linear list -- linear ? )
+    dup [
+        uncons >r call [
+            r> drop t
+        ] [
+            r> simplify-node
+        ] ifte
+    ] when ;
+
+: simplify-1 ( linear -- linear ? )
+    #! Return a new linear IR.
+    dup [
+        dup simplifiers simplify-node
+        [ uncons simplify-1 >r cons r> ] unless*
+    ] [
+        f
+    ] ifte ;
+
+: simplify ( linear -- linear )
+    #! Keep simplifying until simplify-1 returns f.
+    [
+        dup simplifying set  simplify-1 [ simplify ] when
+    ] with-scope ;
 
 : label-called? ( label linear -- ? )
     [ unswons #label = [ drop f ] [ over = ] ifte ] some? nip ;
 
-: purge-label ( label linear -- )
-    >r dup cdr r> label-called? [ , ] [ drop ] ifte ;
+: next-physical? ( op linear -- ? )
+    cdr dup [ car car = ] [ 2drop f ] ifte ;
 
-: purge-labels ( linear -- linear )
-    #! Remove all unused labels.
-    [
-        dup [
-            dup car #label = [ over purge-label ] [ , ] ifte
-        ] each drop
-    ] make-list ;
-
-: singleton ( word op default -- )
-    >r word-property dup [
-        r> drop call
-    ] [
-        drop r> call
-    ] ifte ;
-
-: simplify-node ( node rest -- rest ? )
-    over car "simplify" [ swap , f ] singleton ;
-
-: find-label ( label linear -- rest )
-    [ cdr over = ] some? cdr nip ;
-
-: (simplify) ( list -- ? )
-    dup [ uncons simplify-node drop (simplify) ] [ drop ] ifte ;
-
-: simplify ( linear -- linear )
-    ( purge-labels ) [ (simplify) ] make-list ;
-
-: follow ( linear -- linear )
-    dup car car "follow" [ ] singleton ;
+: cancel ( linear op -- linear param ? )
+    #! If the following op is as given, remove it, and return
+    #! its param.
+    over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
 
 #label [
-    cdr follow
-] "follow" set-word-property
+    [
+        dup car cdr simplifying get
+        label-called? [ f ] [ cdr t ] ifte
+    ]
+] "simplifiers" set-word-property
+
+\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-property
+\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-property
+\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-property
+\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-property
+
+: next-logical ( linear -- linear )
+    dup car car "next-logical" word-property call ;
+
+#label [
+    cdr next-logical
+] "next-logical" set-word-property
+
+: find-label ( label -- rest )
+    simplifying get [
+        uncons pick = swap #label = and
+    ] some? nip ;
 
 #jump-label [
-    uncons >r cdr r> find-label follow
-] "follow" set-word-property
+    car cdr find-label cdr
+] "next-logical" set-word-property
 
-: follows? ( op linear -- ? )
-    follow dup [ car car = ] [ 2drop f ] ifte ;
+#target-label [
+    car cdr find-label cdr
+] "next-logical" set-word-property
 
-GENERIC: simplify-call ( node rest -- rest ? )
-M: cons simplify-call ( node rest -- rest ? )
-    swap , f ;
+: next-logical? ( op linear -- ? )
+    next-logical dup [ car car = ] [ 2drop f ] ifte ;
 
-PREDICATE: cons return-follows #return swap follows? ;
-M: return-follows simplify-call ( node rest -- rest ? )
-    >r
-    unswons [
-        [[ #call #jump ]]
-        [[ #call-label #jump-label ]]
-    ] assoc swons , r> t ;
+: reduce ( linear op new -- linear ? )
+    >r over cdr next-logical? [
+        unswons cdr r> swons swons t
+    ] [
+        r> drop f
+    ] ifte ;
 
-#call [ simplify-call ] "simplify" set-word-property
-#call-label [ simplify-call ] "simplify" set-word-property
+#call [
+    [
+        #return #jump reduce
+    ]
+] "simplifiers" set-word-property
 
-GENERIC: simplify-drop ( node rest -- rest ? )
-M: cons simplify-drop ( node rest -- rest ? )
-    swap , f ;
+#call-label [
+    [
+        #return #jump-label reduce
+    ]
+] "simplifiers" set-word-property
 
-PREDICATE: cons push-next ( list -- ? )
+: double-jump ( linear op1 op2 -- linear ? )
+    #! A jump to a jump is just a jump. If the next logical node
+    #! is a jump of type op1, replace the jump at the car of the
+    #! list with a just of type op2.
+    swap pick next-logical? [
+        over next-logical car cdr cons swap cdr cons t
+    ] [
+        drop f
+    ] ifte ;
+
+: useless-jump ( linear -- linear ? )
+    #! A jump to a label immediately following is not needed.
+    dup car cdr find-label over cdr eq? [ cdr t ] [ f ] ifte ;
+
+: (dead-code) ( linear -- linear ? )
+    #! Remove all nodes until the next #label.
     dup [
-        car car [ #push-immediate #push-indirect ] contains?
-    ] when ;
+        dup car car #label = [
+            f
+        ] [
+            cdr (dead-code) t or
+        ] ifte
+    ] [
+        f
+    ] ifte ;
 
-M: push-next simplify-drop ( node rest -- rest ? )
-    nip uncons >r unswons [
-        [[ #push-immediate #replace-immediate ]]
-        [[ #push-indirect #replace-indirect ]]
-    ] assoc swons , r> t ;
+: dead-code ( linear -- linear ? )
+    uncons (dead-code) >r cons r> ;
 
-\ drop [ simplify-drop ] "simplify" set-word-property
+#jump-label [
+    [
+        #return #return double-jump
+    ] [
+        #jump-label #jump-label double-jump
+    ] [
+        #jump #jump double-jump
+    ] [
+        useless-jump
+    ] [
+        dead-code
+    ]
+] "simplifiers" set-word-property
+
+#target-label [
+    [
+        #jump-label #target-label double-jump
+    ] [
+        #jump #target double-jump
+    ]
+] "simplifiers" set-word-property
+
+#jump [ [ dead-code ] ] "simplifiers" set-word-property
+#return [ [ dead-code ] ] "simplifiers" set-word-property
+#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-property
+
+\ drop [
+    [
+        #push-immediate cancel [
+            #replace-immediate swons swons t
+        ] when
+    ] [
+        #push-indirect cancel [
+            #replace-indirect swons swons t
+        ] when
+    ]
+] "simplifiers" set-word-property

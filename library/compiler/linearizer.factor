@@ -53,10 +53,13 @@ SYMBOL: #jump ( tail-call )
 SYMBOL: #jump-label ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
 
-! dispatch is linearized as dispatch followed by a #target
-! for each dispatch table entry. The linearizer ensures the
-! correct number of #targets is emitted.
+! dispatch is linearized as dispatch followed by a #target or
+! #target-label for each dispatch table entry. The dispatch
+! table terminates with #end-dispatch. The linearizer ensures
+! the correct number of #targets is emitted.
 SYMBOL: #target ( part of jump table )
+SYMBOL: #target-label
+SYMBOL: #end-dispatch
 
 : linear, ( node -- )
     #! Add a node to the linear IR.
@@ -146,7 +149,8 @@ SYMBOL: #target ( part of jump table )
     #! label/branch pairs.
     [ dispatch ] ,
     <label> ( end label ) swap
-    [ <label> dup #target swons ,  cons ] map ;
+    [ <label> dup #target-label swons ,  cons ] map
+    [ #end-dispatch ] , ;
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.

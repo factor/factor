@@ -6,7 +6,7 @@ double to_float(CELL tagged)
 	double x;
 	double y;
 
-	switch(type_of(tagged))
+	switch(TAG(tagged))
 	{
 	case FIXNUM_TYPE:
 		return (double)untag_fixnum_fast(tagged);
