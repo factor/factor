@@ -6,11 +6,11 @@ SYMBOL: variable?
     #! For word props: will this be a var in an infix expression?
 PREDICATE: word var
     #! Class of variables
-    variable? word-property ;
+    variable? word-prop ;
 SYMBOL: constant?
     #! Word prop for things like pi and e
 PREDICATE: word con
-    constant? word-property ;
+    constant? word-prop ;
 
 PREDICATE: cons single
     #! Single-element list
@@ -45,7 +45,7 @@ M: list-nvl infix
 
 : VARIABLE:
     #! Make a variable, which acts like a symbol
-    CREATE dup define-symbol t variable? set-word-property ; parsing
+    CREATE dup define-symbol t variable? set-word-prop ; parsing
 VARIABLE: x
 VARIABLE: y
 VARIABLE: z
@@ -86,11 +86,11 @@ M: var (eval-infix)
 : swap-in-infix ( var fix1 fix2 -- [ fix1solved swap fix2solved ] )
     >r dupd (eval-infix) swap r> (eval-infix) \ swap swons append ;
 M: list3 (eval-infix)
-    unswons arith-2 word-property unit -rot 2unlist
+    unswons arith-2 word-prop unit -rot 2unlist
     swap-in-infix \ dup swons swap append ;
 
 M: list2 (eval-infix)
-    2unlist swapd (eval-infix) swap arith-1 word-property unit append ;
+    2unlist swapd (eval-infix) swap arith-1 word-prop unit append ;
 
 : build-prefix ( num-of-vars -- quote )
     #! What needs to be placed in front of the eval-infix quote
@@ -122,25 +122,25 @@ DEFER: fold-consts
     #! :| sq x |: x * x ;
     CREATE [
         "in-defintion" off
-        3dup nip "infix-code" set-word-property
+        3dup nip "infix-code" set-word-prop
         end-infix define-compound
     ] f "in-definition" on ; parsing
 : |:
     #! :| sq x |: x * x ;
-    reverse 3dup nip "infix-args" set-word-property
+    reverse 3dup nip "infix-args" set-word-prop
     swap f ; parsing
 
 : .w/o-line ( obj -- )
     [ one-line on 4 swap prettyprint* drop ] with-scope ;
 
-PREDICATE: compound infix-word "infix-code" word-property ;
+PREDICATE: compound infix-word "infix-code" word-prop ;
 
 M: infix-word see
     dup prettyprint-IN:
     ":| " write dup prettyprint-word " " write
-    dup "infix-args" word-property [ prettyprint-word " " write ] each
+    dup "infix-args" word-prop [ prettyprint-word " " write ] each
     "|:\n    " write
-    "infix-code" word-property .w/o-line
+    "infix-code" word-prop .w/o-line
     " ;" print ;
 
 
@@ -177,17 +177,17 @@ M: infix-word see
 ! Install arithmetic operators into words
 [ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
   bitxor dot rem || ] [
-    dup arith-2 set-word-property
+    dup arith-2 set-word-prop
 ] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [
-    uncons arith-2 set-word-property
+    uncons arith-2 set-word-prop
 ] each
 [ sqrt abs fac sq asin denominator rational? rad>deg exp recip sgn >rect acoth arg fixnum
   bitnot sinh acosec acosh acosech complex? ratio? number? >polar number= cis deg>rad >fixnum
   cot cos sec cosec tan imaginary coth asech atanh absq >float numerator acot acos atan asec
   cosh log bignum? conjugate asinh sin float? real? >bignum tanh sech ] [
-    dup arith-1 set-word-property
+    dup arith-1 set-word-prop
 ] each
-[ [[ - neg ]] ] [ uncons arith-1 set-word-property ] each
-[ pi i e -i inf -inf pi/2 ] [ t constant? set-word-property ] each
+[ [[ - neg ]] ] [ uncons arith-1 set-word-prop ] each
+[ pi i e -i inf -inf pi/2 ] [ t constant? set-word-prop ] each
 

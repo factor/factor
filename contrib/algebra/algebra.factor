@@ -10,13 +10,13 @@ M: list2 (fold-consts)
     2unlist (fold-consts) [
         2list t
     ] [
-        swap arith-1 word-property unit call f
+        swap arith-1 word-prop unit call f
     ] ifte ;
 M: list3 (fold-consts)
     3unlist >r (fold-consts) r> swapd (fold-consts) >r rot r> or [
         3list t
     ] [
-        rot arith-2 word-property unit call f
+        rot arith-2 word-prop unit call f
     ] ifte ;
 
 : fold-consts ( infix -- infix )
