@@ -48,7 +48,7 @@ USE: strings
 
 : init-stdio ( -- )
     #! Initialize standard input/output.
-    stdin stdout <char-stream> "stdio" set ;
+    stdin stdout <char-stream> <stdio-stream> "stdio" set ;
 
 : init-environment ( -- )
     #! Initialize OS-specific constants.

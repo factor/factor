@@ -104,7 +104,7 @@ USE: namespaces
     [ "socket" get ] bind accept-fd <socket-stream> ;
 
 : init-stdio ( -- )
-    stdin stdout <fd-stream> "stdio" set ;
+    stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
 
 : exists? ( file -- ? )
     #! This is terrible.

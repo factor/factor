@@ -27,9 +27,15 @@
 
 IN: stdio
 USE: errors
+USE: kernel
 USE: namespaces
 USE: stack
 USE: streams
+
+: <stdio-stream> ( stream -- stream )
+    #! We disable fclose on stdio so that various tricks like
+    #! with-stream can work.
+    clone [ [ ] "fclose" set ] extend ;
 
 : flush ( -- )
     "stdio" get fflush ;
