@@ -46,15 +46,12 @@ USE: stack
         2drop f ( not found )
     ] ifte ;
 
-: create-plist ( name vocab -- plist )
+: <plist> ( name vocab -- plist )
     "vocabulary" swons swap "name" swons 2list ;
 
-: (undefined)
-    #! Primitive# of undefined words.
-    0 ;
-
 : (create) ( name vocab -- word )
-    (undefined) f 2swap create-plist <word> ;
+    #! Create an undefined word without adding to a vocabulary.
+    <plist> 0 f rot <word> ;
 
 : word+ ( name vocab word -- )
     swap vocab* put* ;

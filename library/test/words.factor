@@ -33,3 +33,8 @@ word word-name "last-word-test" set
 
 [ "test-last" ] [ ] [ "last-word-test" get ] test-word
 [ f ] [ 5 ] [ compound? ] test-word
+
+"create-test" "scratchpad" create { 1 2 } "testing" set-word-property
+[ { 1 2 } ] [
+    "create-test" [ "scratchpad" ] search "testing" word-property
+] unit-test

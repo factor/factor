@@ -48,7 +48,6 @@ USE: vectors
     init-threads
     init-stdio
     "HOME" os-env [ "." ] unless* "~" set
-    10 "base" set
     "/" "/" set
     init-search-path ;
 

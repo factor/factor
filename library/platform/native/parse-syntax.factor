@@ -155,7 +155,7 @@ IN: syntax
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word unit parsed [ car ] car parsed ; parsing
+    scan-word unit parsed  \ car parsed ; parsing
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing

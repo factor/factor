@@ -74,11 +74,7 @@ USE: strings
     "line-number" off ;
 
 : parse-stream ( name stream -- quot )
-    [
-        10 "base" set
-        file-vocabs
-        (parse-stream)
-    ] with-scope ;
+    [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <filecr> parse-stream ;
