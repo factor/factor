@@ -118,3 +118,5 @@ IN: kernel
     interpreter class-of*
     [ "java.lang.String" ]
     "java.lang.Class" "getResource" jinvoke ;
+
+: cpu "jvm" ;

@@ -197,7 +197,7 @@ IN: syntax
 
 : BASE: ( base -- )
     #! Read a number in a specific base.
-    scan swap str>integer parsed ;
+    scan swap base> parsed ;
 
 : HEX: 16 BASE: ; parsing
 : DEC: 10 BASE: ; parsing
