@@ -67,7 +67,7 @@ USE: url-encoding
     [ ] read-header-iter ;
 
 : content-length ( alist -- length )
-    "Content-Length" swap assoc parse-number ;
+    "Content-Length" swap assoc dec> ;
 
 : read-post-request ( -- string )
     read-header content-length dup [ read# url-decode ] when ;

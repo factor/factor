@@ -55,6 +55,7 @@ public class FactorListener extends JTextPane
 	private Cons readLineContinuation;
 	private int cmdStart = -1;
 
+	private SimpleAttributeSet nullAttributes = new SimpleAttributeSet();
 	//{{{ FactorListener constructor
 	public FactorListener()
 	{
@@ -64,8 +65,17 @@ public class FactorListener extends JTextPane
 
 		listenerList = new EventListenerList();
 
-		getInputMap().put(KeyStroke.getKeyStroke('\n'),
+		/* Replace enter to evaluate the input */
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
 			new EnterAction());
+
+		/* Replace backspace to stop backspacing over the prompt */
+		getInputMap().put(KeyStroke.getKeyStroke('\b'),
+			new BackspaceAction());
+
+		/* Workaround */
+		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),
+			new DummyAction());
 	} //}}}
 
 	//{{{ insertWithAttrs() method
@@ -79,7 +89,7 @@ public class FactorListener extends JTextPane
 		int offset1 = doc.getLength();
 		doc.insertString(offset1,text,null);
 		int offset2 = offset1 + text.length();
-		doc.setCharacterAttributes(offset1,offset2,attrs,false);
+		doc.setCharacterAttributes(offset1,offset2,attrs,true);
 		setCaretPosition(offset2);
 	} //}}}
 
@@ -92,6 +102,7 @@ public class FactorListener extends JTextPane
 		this.readLineContinuation = continuation;
 		cmdStart = doc.getLength();
 		setCaretPosition(cmdStart);
+		setCharacterAttributes(nullAttributes,true);
 		/* doc.setCharacterAttributes(cmdStart,cmdStart,input,false);
 		setCharacterAttributes(input,false); */
 	} //}}}
@@ -104,7 +115,13 @@ public class FactorListener extends JTextPane
 		if(cmdStart > length)
 			return "";
 		else
-			return doc.getText(cmdStart,length - cmdStart);
+		{
+			String line = doc.getText(cmdStart,length - cmdStart);
+			if(line.endsWith("\n"))
+				return line.substring(0,line.length() - 1);
+			else
+				return line;
+		}
 	} //}}}
 
 	//{{{ addEvalListener() method
@@ -174,20 +191,16 @@ public class FactorListener extends JTextPane
 	{
 		public void mouseClicked(MouseEvent e)
 		{
-			JEditorPane editor = (JEditorPane) e.getSource();
-
 			Point pt = new Point(e.getX(), e.getY());
-			int pos = editor.viewToModel(pt);
+			int pos = viewToModel(pt);
 			if(pos >= 0)
 				eval(getLinkAt(pos));
 		}
 
 		public void mouseMoved(MouseEvent e)
 		{
-			JEditorPane editor = (JEditorPane) e.getSource();
-
 			Point pt = new Point(e.getX(), e.getY());
-			int pos = editor.viewToModel(pt);
+			int pos = viewToModel(pt);
 			if(pos >= 0)
 			{
 				Cursor cursor;
@@ -207,6 +220,9 @@ public class FactorListener extends JTextPane
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
+			setCaretPosition(getDocument().getLength());
+			replaceSelection("\n");
+
 			try
 			{
 				fireEvalEvent(getLine());
@@ -215,6 +231,45 @@ public class FactorListener extends JTextPane
 			{
 				e.printStackTrace();
 			}
+		}
+	} //}}}
+
+	//{{{ BackspaceAction class
+	class BackspaceAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			if(getSelectionStart() != getSelectionEnd())
+			{
+				replaceSelection("");
+				return;
+			}
+
+			int caret = getCaretPosition();
+			int limit;
+			if(caret == cmdStart)
+			{
+				getToolkit().beep();
+				return;
+			}
+
+			try
+			{
+				getDocument().remove(caret - 1,1);
+				setCharacterAttributes(nullAttributes,true);
+			}
+			catch(BadLocationException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	} //}}}
+
+	//{{{ DummyAction class
+	class DummyAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
 		}
 	} //}}}
 }

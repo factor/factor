@@ -78,9 +78,13 @@ USE: vectors
     "history" get vector-length ;
 
 : print-prompt ( -- )
-    <% "  ( " % history# unparse % " ) " % %>
+    <% "  ( " % history# unparse % " )" % %>
     [ "prompt" ] get-style
     [ write-attr ] bind
+    ! Print the space without a style, to workaround a bug in
+    ! the GUI listener where the style from the prompt carries
+    ! over to the input
+    " " write
     flush ;
 
 : exit ( -- )

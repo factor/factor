@@ -37,13 +37,3 @@ USE: stack
     dup >r sbuf-append r>
     dup >r sbuf-append r>
     sbuf>str ;
-
-: letter? CHAR: a CHAR: z between? ;
-: LETTER? CHAR: A CHAR: Z between? ;
-: digit? CHAR: 0 CHAR: 9 between? ;
-: printable? CHAR: \s CHAR: ~ between? ;
-
-: quotable? ( ch -- ? )
-    #! In a string literal, can this character be used without
-    #! escaping?
-    dup printable? swap "\"\\" str-contains? not and ;

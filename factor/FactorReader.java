@@ -248,7 +248,12 @@ public class FactorReader
 			|| obj instanceof FactorExternalizable)
 			return obj.toString();
 		else if(obj instanceof Character)
-			return "\"" + charsToEscapes(obj.toString()) + "\"";
+		{
+			if(((Character)obj).charValue() == ' ')
+				return "CHAR: \\s";
+			else
+				return "CHAR: " + charsToEscapes(obj.toString());
+		}
 		else
 			return getUnreadableString(obj.toString());
 	} //}}}

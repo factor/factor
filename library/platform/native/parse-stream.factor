@@ -59,8 +59,7 @@ USE: strings
 
 : file-vocabs ( -- )
     "file-in" get "in" set
-    "file-use" get "use" set
-     ;
+    "file-use" get "use" set ;
 
 : parse-stream ( name stream -- code )
     #! Uses the current namespace for temporary variables.
@@ -77,7 +76,11 @@ USE: strings
 : run-file ( file -- )
     #! Run a file. The file is read with the default IN:/USE:
     #! for files.
-    <namespace> [ file-vocabs parse-file ] bind call ;
+    <namespace> [
+        10 "base" set
+        file-vocabs
+        parse-file
+    ] bind call ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;

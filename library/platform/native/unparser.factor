@@ -50,34 +50,34 @@ USE: vocabularies
 : integer- ( num -- num )
     dup 0 < [ "-" % neg ] when ;
 
-: unparse-integer ( num -- str )
-    <% integer- integer% %> ;
-
-: unparse-ratio ( num -- str )
-    <% dup
-    numerator integer- integer%
-    CHAR: / %
-    denominator integer- integer%
-    %> ;
-
-: unparse-complex ( num -- str )
-    >rect <% "#{ " % swap unparse % " " % unparse % " }" % %> ;
-
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
-    <namespace> [ "base" set unparse-integer ] bind ;
+    <namespace> [ "base" set <% integer- integer% %> ] bind ;
+
+: >dec ( num -- string )
+    #! Convert an integer to its decimal representation.
+    10 >base ;
 
 : >bin ( num -- string )
-    #! Convert a number to its binary representation.
+    #! Convert an integer to its binary representation.
     2 >base ;
 
 : >oct ( num -- string )
-    #! Convert a number to its octal representation.
+    #! Convert an integer to its octal representation.
     8 >base ;
 
 : >hex ( num -- string )
-    #! Convert a number to its hexadecimal representation.
+    #! Convert an integer to its hexadecimal representation.
     16 >base ;
+
+: unparse-ratio ( num -- str )
+    <% dup
+    numerator unparse %
+    CHAR: / %
+    denominator unparse % %> ;
+
+: unparse-complex ( num -- str )
+    >rect <% "#{ " % swap unparse % " " % unparse % " }" % %> ;
 
 : ch>ascii-escape ( ch -- esc )
     [
@@ -118,7 +118,7 @@ USE: vocabularies
         [ t eq?    ] [ drop "t" ]
         [ f eq?    ] [ drop "f" ]
         [ word?    ] [ unparse-word ]
-        [ integer? ] [ unparse-integer ]
+        [ integer? ] [ >dec ]
         [ ratio?   ] [ unparse-ratio ]
         [ float?   ] [ unparse-float fix-float ]
         [ complex? ] [ unparse-complex ]

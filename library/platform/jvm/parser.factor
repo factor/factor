@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
+USE: errors
 USE: namespaces
 USE: stack
 USE: streams
@@ -72,22 +73,39 @@ USE: strings
 : (run-file) ( path -- )
     dup <freader> interactive-parse-stream call ;
 
-: parse ( string -- list )
+: parse ( str -- list )
     #! Parse a string using an interactive parser.
     "<interactive>" swap <sreader> <breader> interactive-parse-stream ;
 
 : eval ( "X" -- X )
     parse call ;
 
-: parse-number* ( str base -- number )
+: base> ( str base -- num )
+    #! Parse a number in a specified base.
     [ "java.lang.String" "int" ]
     "factor.math.NumberParser"
     "parseNumber"
     jinvoke-static ;
 
-: parse-number ( str -- number )
-    10 parse-number* ;
+: bin> ( str -- num )
+    #! Convert a binary string to a number.
+    2 base> ;
 
-: hex> ( string -- num )
+: oct> ( str -- num )
+    #! Convert an octal string to a number.
+    8 base> ;
+
+: dec> ( str -- num )
+    #! Convert a decimal string to a number.
+    10 base> ;
+
+: hex> ( str -- num )
     #! Convert a hexadecimal string to a number.
-    16 parse-number* ;
+    16 base> ;
+
+: str>number ( str -- num )
+    dup "base" get base> dup [
+        nip
+    ] [
+        drop "Not a number: " swap cat2 throw
+    ] ifte ;

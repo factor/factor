@@ -29,18 +29,16 @@ IN: url-encoding
 USE: arithmetic
 USE: combinators
 USE: kernel
+USE: logic
 USE: format
 USE: parser
-USE: regexp
 USE: stack
 USE: strings
 USE: unparser
 
 : url-encode ( str -- str )
     [
-        dup "[a-zA-Z0-9/_?]" re-matches [
-            "%" swap >number >hex 2 digits cat2
-        ] unless
+        dup url-quotable? [ "%" swap >hex 2 digits cat2 ] unless
     ] str-map ;
 
 : url-decode-hex ( index str -- )
@@ -56,13 +54,13 @@ USE: unparser
     2dup url-decode-hex [ 3 + ] dip ;
 
 : url-decode-+-or-other ( index str -- index str )
-    dup "+" = [ drop " " ] when % [ succ ] dip ;
+    dup CHAR: + = [ drop CHAR: \s ] when % [ succ ] dip ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [
         2drop
     ] [
-        2dup str-nth dup "%" = [
+        2dup str-nth dup CHAR: % = [
             drop url-decode-%
         ] [
             url-decode-+-or-other

@@ -1,5 +1,6 @@
 IN: scratchpad
 USE: arithmetic
+USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists

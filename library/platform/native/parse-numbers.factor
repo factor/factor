@@ -85,11 +85,31 @@ USE: unparser
     swap str>integer swap str>integer / ;
 
 : str>number ( str -- num )
+    #! Affected by "base" variable.
     [
         [ "/" swap str-contains? ] [ str>ratio   ]
         [ "." swap str-contains? ] [ str>float   ]
         [ drop t                 ] [ str>integer ]
     ] cond ;
 
-: parse-number ( str -- num/f )
-    [ str>number ] [ [ drop f ] when ] catch ;
+: base> ( str base -- num/f )
+    <namespace> [
+        "base" set
+        [ str>number ] [ [ drop f ] when ] catch
+    ] bind ;
+
+: bin> ( str -- num )
+    #! Convert a binary string to a number.
+    2 base> ;
+
+: oct> ( str -- num )
+    #! Convert an octal string to a number.
+    8 base> ;
+
+: dec> ( str -- num )
+    #! Convert a decimal string to a number.
+    10 base> ;
+
+: hex> ( str -- num )
+    #! Convert a hexadecimal string to a number.
+    16 base> ;

@@ -40,9 +40,15 @@ import javax.swing.text.html.*;
 public class FactorDesktop extends JFrame
 {
 	//{{{ main() method
-	public static void main(String[] args)
+	public static void main(final String[] args)
 	{
-		new FactorDesktop(args,true);
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				new FactorDesktop(args,true);
+			}
+		});
 	} //}}}
 
 	//{{{ FactorDesktop constructor

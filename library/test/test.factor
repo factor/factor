@@ -44,18 +44,23 @@ USE: vocabularies
 
 : test ( name -- )
     ! Run the given test.
+    "Testing " write dup write "..." print
     "/library/test/" swap ".factor" cat3 run-resource ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
-        "lists/all"
+        "lists/cons"
+        "lists/lists"
+        "lists/assoc"
+        "lists/destructive"
+        "lists/namespaces"
         "combinators"
         "continuations"
         "hashtables"
         "strings"
-        "namespaces/all"
+        "namespaces/namespaces"
         "format"
         "parser"
         "parse-number"
@@ -68,10 +73,26 @@ USE: vocabularies
         "math/float"
         "math/complex"
         "math/irrational"
-        !
-        "html"
-        "httpd"
-        "jvm-compiler/all"
+        "httpd/url-encoding"
+        "httpd/html"
+        "httpd/httpd"
     ] [
         test
-    ] each ;
+    ] each
+    
+    java? [
+        [
+            "lists/java"
+            "namespaces/java"
+            "jvm-compiler/auxiliary"
+            "jvm-compiler/compiler"
+            "jvm-compiler/compiler-types"
+            "jvm-compiler/inference"
+            "jvm-compiler/primitives"
+            "jvm-compiler/tail"
+            "jvm-compiler/types"
+            "jvm-compiler/miscellaneous"
+        ] [
+            test
+        ] each
+    ] when ;

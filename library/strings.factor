@@ -162,5 +162,24 @@ USE: stack
     #! order.
     [ str-lexi> ] sort ;
 
-: blank? ( ch -- ? )
-    " \t\n\r" str-contains? ;
+: blank? ( ch -- ? ) " \t\n\r" str-contains? ;
+: letter? ( ch -- ? ) CHAR: a CHAR: z between? ;
+: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ;
+: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ;
+: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ;
+
+: quotable? ( ch -- ? )
+    #! In a string literal, can this character be used without
+    #! escaping?
+    dup printable? swap "\"\\" str-contains? not and ;
+
+: url-quotable? ( ch -- ? )
+    #! In a URL, can this character be used without
+    #! URL-encoding?
+    [
+        [ letter?             ] [ drop t ]
+        [ LETTER?             ] [ drop t ]
+        [ digit?              ] [ drop t ]
+        [ "/_?" str-contains? ] [ drop t ]
+        [                     ] [ drop f ]
+    ] cond ;

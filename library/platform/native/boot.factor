@@ -78,6 +78,8 @@ primitives,
     "/library/vocabularies.factor"
     "/library/vocabulary-style.factor"
     "/library/words.factor"
+    "/library/httpd/html.factor"
+    "/library/httpd/url-encoding.factor"
     "/library/math/arc-trig-hyp.factor"
     "/library/math/arithmetic.factor"
     "/library/math/list-math.factor"
