@@ -52,6 +52,7 @@ VARIABLE: z
 VARIABLE: a
 VARIABLE: b
 VARIABLE: c
+VARIABLE: d
 
 SYMBOL: arith-1
     #! Word prop for unary mathematical function
@@ -106,9 +107,42 @@ M: list2 (eval-infix)
     over length build-prefix -rot (eval-infix) append ;
 
 DEFER: fold-consts
-: (| f ; parsing
-: | reverse f ; parsing
-: |) reverse infix fold-consts eval-infix swons \ call swons ; parsing
+: (| f ; parsing ! delete
+: | reverse f ; parsing ! delete
+: end-infix ( vars reverse-infix -- code )
+    infix fold-consts eval-infix ;
+: |) reverse end-infix swons \ call swons ; parsing ! delete
+
+: 3keep
+    #! like keep or 2keep but with 3
+    -rot >r >r swap r> r> 3dup
+    >r >r >r >r rot r> swap call r> r> r> ;
+
+: :|
+    #! :| sq x |: x * x ;
+    CREATE [
+        "in-defintion" off
+        3dup nip "infix-code" set-word-property
+        end-infix define-compound
+    ] f "in-definition" on ; parsing
+: |:
+    #! :| sq x |: x * x ;
+    reverse 3dup nip "infix-args" set-word-property
+    swap f ; parsing
+
+: .w/o-line ( obj -- )
+    [ one-line on 4 swap prettyprint* drop ] with-scope ;
+
+PREDICATE: compound infix-word "infix-code" word-property ;
+
+M: infix-word see
+    dup prettyprint-IN:
+    ":| " write dup prettyprint-word " " write
+    dup "infix-args" word-property [ prettyprint-word " " write ] each
+    "|:\n    " write
+    "infix-code" word-property .w/o-line
+    " ;" print ;
+
 
 : (fac) dup 0 = [ drop ] [ dup 1 - >r * r> (fac) ] ifte ;
 : fac
@@ -138,9 +172,11 @@ DEFER: fold-consts
 : +- ( a b -- a+b a-b )
     [ + ] 2keep - ;
 
+: || ;
+
 ! Install arithmetic operators into words
 [ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
-  bitxor dot rem ] [
+  bitxor dot rem || ] [
     dup arith-2 set-word-property
 ] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [
@@ -154,3 +190,4 @@ DEFER: fold-consts
 ] each
 [ [[ - neg ]] ] [ uncons arith-1 set-word-property ] each
 [ pi i e -i inf -inf pi/2 ] [ t constant? set-word-property ] each
+

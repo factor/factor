@@ -50,5 +50,6 @@ M: list3 (install-mod)
     #! the given one using modular arithmetic.
     >r modularity swons r> (install-mod) ;
 
-: quadratic-formula (| a b c |
-    [ [ - b ] / 2 * a ] +- [ sqrt [ sq b ] - 4 * a * c ] / 2 * a |) ;
+:| quadratic-formula a b c |:
+    [ [ - b ] / 2 * a ] +- [ sqrt [ sq b ] - 4 * a * c ] / 2 * a ;
+
