@@ -11,7 +11,7 @@ USE: stack
     "&lt;html&gt;&amp;&apos;sgml&apos;"
 ] [ "<html>&'sgml'" chars>entities ] unit-test
 
-[ "/file/foo/bar" ]
+[ "/foo/bar" ]
 [
     [
         "/home/slava/doc/" "doc-root" set

@@ -85,14 +85,6 @@ SYMBOL: compile-words
     #! After word is compiled, put its XT at where, relative.
     3list deferred-xts cons@ ;
 
-: compiled? ( word -- ? )
-    #! This is a hack.
-    dup "compiled" word-property [
-        drop t
-    ] [
-        primitive?
-    ] ifte ;
-
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
     #! added to the list of words to be compiled.
@@ -120,10 +112,7 @@ SYMBOL: compile-words
     deferred-xts off ;
 
 : postpone-word ( word -- )
-    dup compiled? [ drop ] [
-        t over "compiled" set-word-property
-        compile-words unique@
-    ] ifte ;
+    dup compiled? [ drop ] [ compile-words unique@ ] ifte ;
 
 ! During compilation, these two variables store pending
 ! literals. Literals are either consumed at compile-time by

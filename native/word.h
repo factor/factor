@@ -46,5 +46,6 @@ void primitive_word_call_count(void);
 void primitive_set_word_call_count(void);
 void primitive_word_allot_count(void);
 void primitive_set_word_allot_count(void);
+void primitive_word_compiledp(void);
 void fixup_word(WORD* word);
 void collect_word(WORD* word);

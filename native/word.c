@@ -104,6 +104,14 @@ void primitive_set_word_allot_count(void)
 	word->allot_count = to_fixnum(dpop());
 }
 
+void primitive_word_compiledp(void)
+{
+	WORD* word = untag_word(dpeek());
+	/* is it bad to hardcode this? */
+	drepl(tag_boolean(word->xt != (CELL)docol
+		&& word->xt != (CELL)dosym));
+}
+
 void fixup_word(WORD* word)
 {
 	update_xt(word);

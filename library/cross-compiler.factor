@@ -305,6 +305,13 @@ IN: image
         set-word-parameter
         word-plist
         set-word-plist
+        call-profiling
+        call-count
+        set-call-count
+        allot-profiling
+        allot-count
+        set-allot-count
+        compiled?
         drop
         dup
         swap
@@ -352,12 +359,6 @@ IN: image
         (random-int)
         type
         size
-        call-profiling
-        call-count
-        set-call-count
-        allot-profiling
-        allot-count
-        set-allot-count
         dump
         cwd
         cd
