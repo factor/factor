@@ -76,9 +76,13 @@ USE: url-encoding
 
 : httpd-client ( socket -- )
     [
-        "stdio" get "client" set log-client
-        read [ parse-request ] when*
-    ] with-stream ;
+        [
+            "stdio" get "client" set log-client
+            read [ parse-request ] when*
+        ] with-stream
+    ] [
+        default-error-handler drop
+    ] catch ;
 
 : quit-flag ( -- ? )
     global [ "httpd-quit" get ] bind ;
