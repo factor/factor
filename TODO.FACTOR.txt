@@ -17,7 +17,7 @@
 - console: scroll to bottom
 - split preferred size and layouting
 - remove shelf/pile duplication
-- resizing and moving gadgets
+- resizing gadgets
 - faster layout
 - faster repaint
 - closing inspectors

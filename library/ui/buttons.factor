@@ -4,17 +4,16 @@ IN: gadgets
 USING: generic kernel lists math namespaces prettyprint sdl
 stdio ;
 
-: button-down? ( n -- ? )
-    my-hand hand-buttons contains? ;
+: button-down? ( n -- ? ) hand hand-buttons contains? ;
 
-: mouse-over? ( gadget -- ? ) my-hand hand-gadget child? ;
+: mouse-over? ( gadget -- ? ) hand hand-gadget child? ;
 
 : button-pressed? ( button -- ? )
     #! Return true if the mouse was clicked on the button, and
     #! is currently over the button.
     dup mouse-over? [
         1 button-down? [
-            my-hand hand-clicked child?
+            hand hand-clicked child?
         ] [
             drop f
         ] ifte

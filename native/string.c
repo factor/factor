@@ -80,19 +80,19 @@ void primitive_memory_to_string(void)
 }
 
 /* untagged */
-F_STRING* from_c_string(const BYTE* c_string)
+F_STRING* from_c_string(const char* c_string)
 {
-	return memory_to_string(c_string,strlen(c_string));
+	return memory_to_string((BYTE*)c_string,strlen(c_string));
 }
 
 /* FFI calls this */
-void box_c_string(const BYTE* c_string)
+void box_c_string(const char* c_string)
 {
 	dpush(tag_object(from_c_string(c_string)));
 }
 
 /* untagged */
-BYTE* to_c_string(F_STRING* s)
+char* to_c_string(F_STRING* s)
 {
 	CELL i;
 	CELL capacity = string_capacity(s);
@@ -122,18 +122,18 @@ void primitive_string_to_memory(void)
 }
 
 /* untagged */
-BYTE* to_c_string_unchecked(F_STRING* s)
+char* to_c_string_unchecked(F_STRING* s)
 {
 	CELL capacity = string_capacity(s);
 	F_STRING* _c_str = allot_string(capacity / CHARS + 1);
 	BYTE* c_str = (BYTE*)(_c_str + 1);
 	string_to_memory(s,c_str);
 	c_str[capacity] = '\0';
-	return c_str;
+	return (char*)c_str;
 }
 
 /* FFI calls this */
-BYTE* unbox_c_string(void)
+char* unbox_c_string(void)
 {
 	return to_c_string(untag_string(dpop()));
 }

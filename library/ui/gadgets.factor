@@ -11,12 +11,15 @@ TUPLE: gadget
     relayout? redraw?
     parent children delegate ;
 
+DEFER: default-actions
+
 C: gadget ( shape -- gadget )
     [ set-gadget-delegate ] keep
     [ <namespace> swap set-gadget-paint ] keep
     [ <namespace> swap set-gadget-gestures ] keep
     [ t swap set-gadget-relayout? ] keep
-    [ t swap set-gadget-redraw? ] keep ;
+    [ t swap set-gadget-redraw? ] keep
+    dup default-actions ;
 
 : <empty-gadget> ( -- gadget )
     0 0 0 0 <rectangle> <gadget> ;

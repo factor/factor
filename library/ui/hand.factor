@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video ;
+USING: alien generic kernel lists math namespaces prettyprint
+sdl sdl-event sdl-video stdio ;
 
 DEFER: pick-up
 
@@ -50,12 +50,34 @@ TUPLE: hand
     click-pos clicked buttons
     gadget focus delegate ;
 
+: grab ( gadget hand -- )
+    #! Grab hold of a gadget; the gadget will move with the
+    #! hand.
+    2dup set-hand-clicked
+    [ swap screen-pos swap screen-pos - >rect ] 2keep
+    >r [ move-gadget ] keep r> add-gadget ;
+
+: release* ( gadget world -- )
+    >r dup screen-pos >r dup unparent
+    r> >rect pick move-gadget
+    r> add-gadget ;
+
+: release ( hand -- )
+    #! Release the gadget we are holding.
+    dup gadget-children car swap hand-world release* ;
+
+: hand-actions ( hand -- )
+    #! A nice trick is that the hand is only consulted for
+    #! gestures when one of its children is clicked.
+    [ release ] [ button-up 1 ] set-action ;
+
 C: hand ( world -- hand )
     <empty-gadget>
     over set-hand-delegate
     [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
-    [ set-hand-gadget ] keep ;
+    [ set-hand-gadget ] keep
+    [ hand-actions ] keep ;
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
@@ -71,9 +93,16 @@ C: hand ( world -- hand )
 : fire-enter ( oldpos hand -- )
     hand-gadget [ screen-pos - ] keep mouse-enter ;
 
-: update-hand-gadget ( hand -- )
+: find-hand-gadget ( hand -- gadget )
     #! The hand gadget is the gadget under the hand right now.
-    dup dup hand-world pick-up swap set-hand-gadget ;
+    dup gadget-children [ dup hand-world pick-up ] unless ;
+
+: update-hand-gadget ( hand -- )
+    dup find-hand-gadget swap set-hand-gadget ;
+
+: motion-gesture ( hand gadget gesture -- )
+    #! Send a gesture like [ drag 2 ].
+    rot hand-buttons car unit append swap handle-gesture drop ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,
@@ -81,7 +110,7 @@ C: hand ( world -- hand )
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
     dup hand-buttons [
-        [ drag ] swap hand-clicked handle-gesture drop
+        dup hand-clicked [ drag ] motion-gesture
     ] [
         drop
     ] ifte ;

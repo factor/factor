@@ -9,7 +9,7 @@ SYMBOL: root-menu
     root-menu get <menu> show-menu ;
 
 : <console> ( -- console )
-    <console-pane> <scroller> line-border  dup moving-actions ;
+    <console-pane> <scroller> line-border ;
 
 [
     [[ "Listener" [ <console> world get add-gadget ] ]]

@@ -19,29 +19,29 @@ M: resize-event handle-event ( event -- )
     world get relayout ;
 
 : button-gesture ( button gesture -- [ gesture button ] )
-    swap unit append my-hand hand-clicked handle-gesture drop ;
+    swap unit append hand hand-clicked handle-gesture drop ;
 
 M: button-down-event handle-event ( event -- )
-    button-event-button dup my-hand button/
+    button-event-button dup hand button/
     [ button-down ] button-gesture ;
 
 M: button-up-event handle-event ( event -- )
-    button-event-button dup my-hand button\
+    button-event-button dup hand button\
     [ button-up ] button-gesture ;
 
 : motion-event-pos ( event -- x y )
     dup motion-event-x swap motion-event-y ;
 
 M: motion-event handle-event ( event -- )
-    motion-event-pos my-hand move-hand ;
+    motion-event-pos hand move-hand ;
 
 M: key-down-event handle-event ( event -- )
     dup keyboard-event>binding
-    my-hand hand-focus handle-gesture [
+    hand hand-focus handle-gesture [
         keyboard-event-unicode dup 0 = [
             drop
         ] [
-            my-hand hand-focus user-input drop
+            hand hand-focus user-input drop
         ] ifte
     ] [
         drop

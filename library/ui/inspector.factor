@@ -43,18 +43,18 @@ GENERIC: custom-sheet ( obj -- gadget )
     over top-sheet over add-gadget
     over slot-sheet over add-gadget
     swap custom-sheet over add-gadget
-    line-border dup moving-actions ;
+    line-border ;
 
 M: object custom-sheet drop <empty-gadget> ;
 
+M: list custom-sheet ( list -- gadget )
+    [ length count ] keep zip alist>sheet "Elements:" <titled> ;
+
 M: array custom-sheet ( array -- gadget )
-    [ array-capacity [ count ] keep ] keep array>list zip
-    alist>sheet
-    "Elements:" <titled> ;
+    [ array-capacity ] keep array>list custom-sheet ;
 
 M: vector custom-sheet ( array -- gadget )
-    dup vector-length count swap vector>list zip alist>sheet
-    "Elements:" <titled> ;
+    vector>list custom-sheet ;
 
 M: hashtable custom-sheet ( array -- gadget )
     hash>alist sort-sheet alist>sheet "Entries:" <titled> ;

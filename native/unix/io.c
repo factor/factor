@@ -83,7 +83,7 @@ bool perform_copy_from_io_task(F_PORT* port, F_PORT* other_port)
 	if(can_write(other_port,port->buf_fill))
 	{
 		write_string_raw(other_port,
-			(BYTE*)(untag_string(port->buffer) + 1),
+			(char*)(untag_string(port->buffer) + 1),
 			port->buf_fill);
 		port->buf_pos = port->buf_fill = 0;
 	}

@@ -20,7 +20,6 @@ TUPLE: dialog continuation delegate ;
     <button> over add-gadget ;
 
 : dialog-actions ( dialog -- )
-    dup moving-actions
     dup [ dialog-ok ] dup set-action
     [ dialog-cancel ] dup set-action ;
 

@@ -82,21 +82,11 @@ SYMBOL: meta-cf
 : do-1 ( obj -- )
     dup word? [ meta-word-1 ] [ push-d ] ifte ;
 
-: (interpret) ( quot -- )
+: interpret ( quot -- )
     #! The quotation is called with each word as its executed.
-    done? [ drop ] [ [ next swap call ] keep (interpret) ] ifte ;
+    done? [ drop ] [ [ next swap call ] keep interpret ] ifte ;
 
-: interpret ( quot quot -- )
-    #! The first quotation is meta-interpreted, with each word
-    #! passed to the second quotation. Pollutes current
-    #! namespace.
-    init-interpreter swap meta-cf set (interpret) ;
-
-: (run) ( -- )
-    [ do ] (interpret) ;
-
-: run ( quot -- )
-    [ do ] interpret ;
+: run ( -- ) [ do ] interpret ;
 
 : set-meta-word ( word quot -- )
     "meta-word" set-word-property ;
@@ -116,23 +106,6 @@ SYMBOL: meta-cf
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
 
 ! Some useful tools
-
-: report ( obj -- )
-    meta-r get vector-length " " fill write . flush ;
-
-: (trace) ( -- )
-    [ dup report do ] (interpret) ;
-
-: trace ( quot -- )
-    #! Trace execution of a quotation by printing each word as
-    #! its executed, and each literal as its pushed. Each line
-    #! is indented by the call stack height.
-    [
-        init-interpreter
-        meta-cf set
-        (trace)
-        meta-d get set-datastack
-    ] with-scope ;
 
 : &s
     #! Print stepper data stack.
@@ -154,19 +127,27 @@ SYMBOL: meta-cf
     #! Print stepper variable value.
     meta-n get (get) ;
 
-: not-done ( quot -- )
-    done? [ "Stepper is done." print drop ] [ call ] ifte ;
+: stack-report ( -- )
+    meta-r get vector-length "=" fill write
+    meta-d get vector-length "-" fill write ;
 
-: next-report ( -- obj )
-    next dup report meta-cf get report ;
+: not-done ( quot -- )
+    done? [
+        stack-report "Stepper is done." print drop
+    ] [
+        call
+    ] ifte ;
+
+: report ( -- )
+    stack-report meta-cf get . ;
 
 : step
     #! Step into current word.
-    [ next-report do-1 ] not-done ;
+    [ next do-1 report ] not-done ;
 
 : into
     #! Step into current word.
-    [ next-report do ] not-done ;
+    [ next do report ] not-done ;
 
 : walk-banner ( -- )
     "The following words control the single-stepper:" print
@@ -176,9 +157,9 @@ SYMBOL: meta-cf
     " ( var -- value ) inspects the stepper namestack." print
     \ step prettyprint-word " -- single step over" print
     \ into prettyprint-word " -- single step into" print
-    \ (trace) prettyprint-word " -- trace until end" print
-    \ (run) prettyprint-word " -- run until end" print
-    \ exit prettyprint-word " -- exit single-stepper" print ;
+    \ run prettyprint-word " -- run until end" print
+    \ exit prettyprint-word " -- exit single-stepper" print
+    report ;
 
 : walk ( quot -- )
     #! Single-step through execution of a quotation.

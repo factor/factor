@@ -57,7 +57,7 @@ TUPLE: thumb offset delegate ;
 
 : hand-y ( gadget -- y )
     #! Vertical offset of hand from gadget.
-    my-hand swap relative shape-y ;
+    hand swap relative shape-y ;
 
 : thumb-click ( thumb -- )
     [ hand-y ] keep set-thumb-offset ;
@@ -73,7 +73,7 @@ TUPLE: thumb offset delegate ;
 : thumb-actions ( thumb -- )
     dup
     [ thumb-click ] [ button-down 1 ] set-action
-    [ thumb-motion ] [ drag ] set-action ;
+    [ thumb-motion ] [ drag 1 ] set-action ;
 
 C: thumb ( -- thumb )
     0 0 0 0 <plain-rect> <gadget> over set-thumb-delegate

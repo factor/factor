@@ -5,11 +5,6 @@ USING: kernel lists namespaces prettyprint stdio unparser ;
 
 DEFER: inspect
 
-: actionize ( obj assoc -- assoc )
-    [
-        unswons >r >r unit [ car ] cons r> append r> swons
-    ] map-with ;
-
 : object-menu ( obj -- assoc )
     [
         [[ "Inspect" [ inspect ] ]]

@@ -91,7 +91,7 @@ void write_char_8(F_PORT* port, F_FIXNUM ch)
 }
 
 /* Caller must ensure buffer is of the right size. */
-void write_string_raw(F_PORT* port, BYTE* str, CELL len)
+void write_string_raw(F_PORT* port, char* str, CELL len)
 {
 	/* Append string to buffer */
 	memcpy((void*)((CELL)untag_string(port->buffer) + sizeof(F_STRING)

@@ -2,13 +2,13 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien errors generic kernel lists math memory namespaces
-sdl sdl-event sdl-video stdio strings threads ;
+prettyprint sdl sdl-event sdl-video stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The menu slot ensures that only one menu is
 ! open at any one time.
-TUPLE: world running? hand menu delegate ;
+TUPLE: world running? hand menu halo delegate ;
 
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <gadget> ;
@@ -16,11 +16,13 @@ TUPLE: world running? hand menu delegate ;
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
-    dup <hand> over set-world-hand ;
+    dup <hand> over set-world-hand
+    dup <halo> over set-world-halo ;
 
 M: world inside? ( point world -- ? ) 2drop t ;
 
-: my-hand ( -- hand ) world get world-hand ;
+: hand world get world-hand ;
+: halo world get world-halo ;
 
 : draw-world ( world -- )
     dup gadget-redraw? [
@@ -35,10 +37,21 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 DEFER: handle-event
 
+: layout-halo ( world -- )
+    world-halo dup halo-selected dup [
+        dup gadget-parent [
+            drop dup gadget-parent [ relayout ] [ drop ] ifte
+        ] [
+            unparent drop
+        ] ifte
+    ] [
+        2drop
+    ] ifte ;
+
 : layout-world ( world -- )
     dup
     0 0 width get height get <rectangle> clip set-paint-property
-    dup layout world-hand update-hand ;
+    dup layout-halo dup layout world-hand update-hand ;
 
 : world-step ( world -- ? )
     dup world-running? [
