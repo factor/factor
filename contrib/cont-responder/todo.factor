@@ -94,7 +94,7 @@ USE: url-encoding
 
 : store-todo ( <todo> filename -- )
   #! store the todo list in the given file.
-  <filebw> [ write-todo ] with-stream ;
+  <filecw> [ write-todo ] with-stream ;
 
 : read-todo ( -- <todo> )
   #! Read a todo list from the current input stream.
@@ -109,7 +109,7 @@ USE: url-encoding
   ] times ;
 
 : load-todo ( filename -- <todo> )
-  <filebr> [ read-todo ] with-stream ;  
+  <filecr> [ read-todo ] with-stream ;  
 
 : password-matches? ( password <todo> -- <todo> )
   #! Returns the <todo> if the password matches otherwise

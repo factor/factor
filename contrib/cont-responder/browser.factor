@@ -44,6 +44,7 @@ USE: html
 USE: parser
 USE: errors
 USE: unparser
+USE: logging
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -72,7 +73,7 @@ USE: unparser
   #! Write out the HTML for the list of words in a vocabulary.
   <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     words [ 
-      dup "current-word" get [ "" ] unless* str-compare 0 = [
+      word-name dup "current-word" get [ "" ] unless* str-compare 0 = [
       "<option selected>" write
      ] [
         "<option>" write
@@ -107,7 +108,7 @@ USE: unparser
 
 : write-vm-statistics ( -- )
   #! Display statistics about the JVM in use.
-  room unparse >r unparse r> 
+  room swap unparse >r unparse r> 
   <table> 
     <tr>  
       <td> "Free Memory" write </td>
@@ -148,9 +149,9 @@ USE: unparser
 
 : word-uses ( word -- list )
   #! Return a list of vocabularies that the given word uses.
-  worddef worddef>list flatten [ word? ] subset [
+  worddef>list flatten [ word? ] subset [
     word-vocabulary
-  ] inject ;
+  ] map ;
 
 : vocabulary-uses ( vocab -- list )
   #! Return a list of vocabularies that all words in a vocabulary
@@ -230,6 +231,6 @@ USE: unparser
 
 : browser-responder ( allow-edit? -- )
   #! Start the Smalltalk-like browser.
-  "browser" "" <browser> browse ;
+  "browser" f <browser> browse ;
 
 "browser" [ f browser-responder ] install-cont-responder

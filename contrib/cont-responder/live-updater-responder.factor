@@ -35,6 +35,7 @@ USE: stack
 USE: kernel
 USE: cont-utils
 USE: cont-responder
+USE: prettyprint
 
 : live-search-apropos-word ( string -- )
   #! Given a string that is a factor word, show the
@@ -59,7 +60,7 @@ USE: cont-responder
       <body> 
        [
          [ 
-           "millis" [ millis write ] "Display Server millis" live-anchor
+           "millis" [ millis prettyprint ] "Display Server millis" live-anchor
            <div id= "millis" div>  
              "The millisecond time from the server will appear here" write 
            </div>         
