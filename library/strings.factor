@@ -34,12 +34,12 @@ USE: math
 
 ! Define methods bound to primitives
 BUILTIN: string 12
-M: string hashcode str-hashcode ;
+M: string hashcode 2 slot ;
 M: string = str= ;
 
 : str-length ( str -- len ) >string 1 integer-slot ; inline
 
-BUILTIN: sbuf   13
+BUILTIN: sbuf 13
 M: sbuf hashcode sbuf-hashcode ;
 M: sbuf = sbuf= ;
 

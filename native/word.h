@@ -3,7 +3,7 @@ typedef void (*XT)(void);
 typedef struct {
 	/* TAGGED header */
 	CELL header;
-	/* untagged hashcode */
+	/* TAGGED hashcode */
 	CELL hashcode;
 	/* untagged execution token: jump here to execute word */
 	CELL xt;

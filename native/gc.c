@@ -83,7 +83,7 @@ INLINE void collect_object(CELL scan)
 		collect_alien((ALIEN*)scan);
 		break;
 	case DLL_TYPE:
-		collect_dll((ALIEN*)scan);
+		collect_dll((DLL*)scan);
 		break;
 	}
 }

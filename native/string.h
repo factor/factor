@@ -2,8 +2,8 @@ typedef struct {
 	CELL header;
 	/* untagged */
 	CELL capacity;
-	/* untagged */
-	F_FIXNUM hashcode;
+	/* tagged */
+	CELL hashcode;
 } F_STRING;
 
 INLINE F_STRING* untag_string(CELL tagged)
@@ -47,7 +47,6 @@ F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len);
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2);
 void primitive_string_compare(void);
 void primitive_string_eq(void);
-void primitive_string_hashcode(void);
 void primitive_index_of(void);
 void primitive_substring(void);
 void string_reverse(F_STRING* s, int len);

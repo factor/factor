@@ -43,5 +43,6 @@ void primitive_set_alien_2(void);
 void primitive_alien_1(void);
 void primitive_set_alien_1(void);
 void fixup_dll(DLL* dll);
+void collect_dll(DLL* dll);
 void fixup_alien(ALIEN* alien);
 void collect_alien(ALIEN* alien);

@@ -23,7 +23,8 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/unix/signal.o \
 	native/unix/read.o \
 	native/unix/write.o \
-	native/unix/ffi.o
+	native/unix/ffi.o \
+	native/debug.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"

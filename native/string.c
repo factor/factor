@@ -23,7 +23,7 @@ F_FIXNUM hash_string(F_STRING* str, CELL len)
 
 void rehash_string(F_STRING* str)
 {
-	str->hashcode = hash_string(str,str->capacity);
+	str->hashcode = tag_fixnum(hash_string(str,str->capacity));
 }
 
 /* untagged */
@@ -201,11 +201,6 @@ void primitive_string_eq(void)
 		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
 	else
 		dpush(F);
-}
-
-void primitive_string_hashcode(void)
-{
-	drepl(tag_fixnum(untag_string(dpeek())->hashcode));
 }
 
 CELL index_of_ch(CELL index, F_STRING* string, CELL ch)

@@ -61,7 +61,6 @@ vocabularies get [
     [ "strings" | "str-nth" ]
     [ "strings" | "str-compare" ]
     [ "strings" | "str=" ]
-    [ "strings" | "str-hashcode" ]
     [ "strings" | "index-of*" ]
     [ "strings" | "substring" ]
     [ "strings" | "str-reverse" ]

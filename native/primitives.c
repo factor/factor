@@ -14,7 +14,6 @@ XT primitives[] = {
 	primitive_string_nth,
 	primitive_string_compare,
 	primitive_string_eq,
-	primitive_string_hashcode,
 	primitive_index_of,
 	primitive_substring,
 	primitive_string_reverse,

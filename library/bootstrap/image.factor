@@ -265,7 +265,7 @@ M: cons ' ( c -- tagged )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
-    dup hashcode emit
+    dup hashcode fixnum-tag immediate emit
     pack-string
     align-here ;
 
@@ -305,7 +305,7 @@ M: vector ' ( vector -- pointer )
         >r dup vector-length [
             f swap pick set-vector-nth
         ] times* r>
-        [ unswons pick set-hash ] each
+        [ unswons pick set-hash ] each drop
     ] cons cons
     boot-quot [ append ] change ;
 

@@ -59,7 +59,6 @@ USE: words
     [ str-nth                " n str -- ch "                      [ [ integer string ] [ integer ] ] ]
     [ str-compare            " str str -- -1/0/1 "                [ [ string string ] [ integer ] ] ]
     [ str=                   " str str -- ? "                     [ [ string string ] [ boolean ] ] ]
-    [ str-hashcode           " str -- n "                         [ [ string ] [ integer ] ] ]
     [ index-of*              " n str/ch str -- n "                [ [ integer string text ] [ integer ] ] ]
     [ substring              " start end str -- str "             [ [ integer integer string ] [ string ] ] ]
     [ str-reverse            " str -- str "                       [ [ string ] [ string ] ] ]
