@@ -66,7 +66,7 @@ USE: unparser
 : POSTPONE: ( -- ) scan-word parsed ; parsing
 
 ! Colon defs
-: CREATE
+: CREATE ( -- word )
     scan "in" get create dup set-word
     f "documentation" pick set-word-property ;
 

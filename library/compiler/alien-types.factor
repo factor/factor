@@ -83,7 +83,14 @@ USE: words
 
 : define-constructor ( len -- )
     [ <alien> ] cons
-    <% "<" % "struct-name" get % ">" % %> "in" get create swap
+    <% "<" % "struct-name" get % ">" % %>
+    "in" get create swap
+    define-compound ;
+
+: define-local-constructor ( len -- )
+    [ <local-alien> ] cons
+    <% "<local-" % "struct-name" get % ">" % %>
+    "in" get create swap
     define-compound ;
 
 : define-struct-type ( len -- )
@@ -103,6 +110,7 @@ USE: words
         "struct-name" set
         0 swap [ define-field ] each
         dup define-constructor
+        dup define-local-constructor
         define-struct-type
     ] with-scope ;
 

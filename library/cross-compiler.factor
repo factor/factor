@@ -46,6 +46,7 @@ DEFER: dlsym
 DEFER: dlsym-self
 DEFER: dlclose
 DEFER: <alien>
+DEFER: <local-alien>
 DEFER: alien-cell
 DEFER: set-alien-cell
 DEFER: alien-4
@@ -369,6 +370,7 @@ IN: image
         dlsym-self
         dlclose
         <alien>
+        <local-alien>
         alien-cell
         set-alien-cell
         alien-4

@@ -45,12 +45,6 @@ USE: stack
     ! This is the naive implementation, for benchmarking purposes.
     1 swap [ succ * ] times* ;
 
-: 2^ ( x -- 2^x )
-    1 swap [ 2 * ] times ;
-
-: harmonic ( n -- 1 + 1/2 + 1/3 + ... + 1/n )
-    0 swap [ succ recip + ] times* ;
-
 : mag2 ( x y -- mag )
     #! Returns the magnitude of the vector (x,y).
     swap sq swap sq + fsqrt ;

@@ -183,6 +183,7 @@ XT primitives[] = {
 	primitive_dlsym_self,
 	primitive_dlclose,
 	primitive_alien,
+	primitive_local_alien,
 	primitive_alien_cell,
 	primitive_set_alien_cell,
 	primitive_alien_4,

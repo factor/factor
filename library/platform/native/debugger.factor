@@ -41,8 +41,8 @@ USE: unparser
 USE: vectors
 USE: words
 
-: expired-port-error ( obj -- )
-    "Expired port: " write . ;
+: expired-error ( obj -- )
+    "Object did not survive image save/load: " write . ;
 
 : io-task-twice-error ( obj -- )
     "Attempting to perform two simultaneous I/O operations on "
@@ -79,9 +79,6 @@ USE: words
 : signal-error ( obj -- )
     "Operating system signal " write . ;
 
-: profiling-disabled-error ( obj -- )
-    drop "Recompile with #define FACTOR_PROFILER." print ;
-
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;
 
@@ -99,7 +96,7 @@ USE: words
 
 : kernel-error. ( obj n -- str )
     {
-        expired-port-error
+        expired-error
         io-task-twice-error
         no-io-tasks-error
         incompatible-port-error
@@ -109,7 +106,6 @@ USE: words
         array-range-error
         float-format-error
         signal-error
-        profiling-disabled-error
         negative-array-size-error
         bad-primitive-error
         c-string-error

@@ -43,3 +43,6 @@ USE: test
 [ t ] [ #{ 12 13 } #{ 13 14 } / #{ 13 14 } * #{ 12 13 } ] [ = ] test-word
 
 [ #{ -3 4 } ] [ #{ 3 -4 } ] [ neg ] test-word
+
+[ 5 ] [ #{ 3 4 } abs ] unit-test
+[ 5 ] [ -5.0 abs ] unit-test

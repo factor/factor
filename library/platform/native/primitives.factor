@@ -224,6 +224,7 @@ USE: words
     [ dlsym-self             | " name -- ptr " ]
     [ dlclose                | " dll -- " ]
     [ <alien>                | " ptr len -- alien " ]
+    [ <local-alien>          | " len -- alien " ]
     [ alien-cell             | " alien off -- n " ]
     [ set-alien-cell         | " n alien off -- " ]
     [ alien-4                | " alien off -- n " ]

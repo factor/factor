@@ -3,16 +3,14 @@ typedef struct {
 	void* dll;
 } DLL;
 
-INLINE DLL* untag_dll(CELL tagged)
-{
-	type_check(DLL_TYPE,tagged);
-	return (DLL*)UNTAG(tagged);
-}
+DLL* untag_dll(CELL tagged);
 
 typedef struct {
 	CELL header;
 	CELL ptr;
 	CELL length;
+	/* local aliens are heap-allocated as strings and must be collected. */
+	bool local;
 } ALIEN;
 
 INLINE ALIEN* untag_alien(CELL tagged)
@@ -26,7 +24,8 @@ void primitive_dlsym(void);
 void primitive_dlsym_self(void);
 void primitive_dlclose(void);
 void primitive_alien(void);
-ALIEN* unbox_alien(void);
+void primitive_local_alien(void);
+CELL unbox_alien(void);
 void primitive_alien_cell(void);
 void primitive_set_alien_cell(void);
 void primitive_alien_4(void);
@@ -35,3 +34,6 @@ void primitive_alien_2(void);
 void primitive_set_alien_2(void);
 void primitive_alien_1(void);
 void primitive_set_alien_1(void);
+void fixup_dll(DLL* dll);
+void fixup_alien(ALIEN* alien);
+void collect_alien(ALIEN* alien);

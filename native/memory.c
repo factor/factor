@@ -38,7 +38,6 @@ void init_arena(CELL size)
 	gc_in_progress = false;
 }
 
-#ifdef FACTOR_PROFILER
 void allot_profile_step(CELL a)
 {
 	CELL depth = (cs - cs_bot) / CELLS;
@@ -57,7 +56,6 @@ void allot_profile_step(CELL a)
 
 	executing->allot_count += a;
 }
-#endif
 
 void check_memory(void)
 {
@@ -99,9 +97,6 @@ void primitive_room(void)
 
 void primitive_allot_profiling(void)
 {
-#ifndef FACTOR_PROFILER
-	general_error(ERROR_PROFILING_DISABLED,F);
-#else
 	CELL d = dpop();
 	if(d == F)
 		allot_profiling = false;
@@ -110,7 +105,6 @@ void primitive_allot_profiling(void)
 		allot_profiling = true;
 		profile_depth = to_fixnum(d);
 	}
-#endif
 }
 
 void primitive_address(void)

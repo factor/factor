@@ -33,11 +33,6 @@ USE: stack
 USE: vectors
 USE: words
 
-: abs ( z -- abs )
-    #! This definition is replaced when the remainder of the
-    #! math library is read in at stage2.
-    dup 0 < [ neg ] when ;
-
 : (gcd) ( x y -- z ) dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 : gcd ( x y -- z ) abs swap abs 2dup < [ swap ] when (gcd) ;
 

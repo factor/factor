@@ -7,7 +7,7 @@ PORT* untag_port(CELL tagged)
 	p = (PORT*)UNTAG(tagged);
 	/* after image load & save, ports are no longer valid */
 	if(p->fd == -1)
-		general_error(ERROR_PORT_EXPIRED,tagged);
+		general_error(ERROR_EXPIRED,tagged);
 	return p;
 }
 

@@ -89,9 +89,7 @@ INLINE void call(CELL quot)
 	/* tail call optimization */
 	if(callframe != F)
 	{
-#ifdef FACTOR_PROFILER
 		cpush(tag_word(executing));
-#endif
 		cpush(callframe);
 	}
 	callframe = quot;

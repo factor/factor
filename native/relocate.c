@@ -28,6 +28,12 @@ void relocate_object()
 	case PORT_TYPE:
 		fixup_port((PORT*)relocating);
 		break;
+	case DLL_TYPE:
+		fixup_dll((DLL*)relocating);
+		break;
+	case ALIEN_TYPE:
+		fixup_alien((ALIEN*)relocating);
+		break;
 	}
 
 }

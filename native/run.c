@@ -61,9 +61,7 @@ void run(void)
 		if(callframe == F)
 		{
 			callframe = cpop();
-#ifdef FACTOR_PROFILER
 			cpop();
-#endif
 			continue;
 		}
 
@@ -131,9 +129,6 @@ void primitive_setenv(void)
 
 void primitive_call_profiling(void)
 {
-#ifndef FACTOR_PROFILER
-	general_error(ERROR_PROFILING_DISABLED,F);
-#else
 	CELL d = dpop();
 	if(d == F)
 	{
@@ -154,5 +149,4 @@ void primitive_call_profiling(void)
 
 	if(setitimer(ITIMER_PROF,&prof_timer,NULL) < 0)
 		io_error(__FUNCTION__);
-#endif
 }

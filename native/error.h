@@ -1,4 +1,4 @@
-#define ERROR_PORT_EXPIRED (0<<3)
+#define ERROR_EXPIRED (0<<3)
 #define ERROR_IO_TASK_TWICE (1<<3)
 #define ERROR_IO_TASK_NONE (2<<3)
 #define ERROR_INCOMPATIBLE_PORT (3<<3)
@@ -8,12 +8,11 @@
 #define ERROR_RANGE (7<<3)
 #define ERROR_FLOAT_FORMAT (8<<3)
 #define ERROR_SIGNAL (9<<3)
-#define ERROR_PROFILING_DISABLED (10<<3)
-#define ERROR_NEGATIVE_ARRAY_SIZE (11<<3)
-#define ERROR_BAD_PRIMITIVE (12<<3)
-#define ERROR_C_STRING (13<<3)
-#define ERROR_FFI_DISABLED (14<<3)
-#define ERROR_FFI (15<<3)
+#define ERROR_NEGATIVE_ARRAY_SIZE (10<<3)
+#define ERROR_BAD_PRIMITIVE (11<<3)
+#define ERROR_C_STRING (12<<3)
+#define ERROR_FFI_DISABLED (13<<3)
+#define ERROR_FFI (14<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

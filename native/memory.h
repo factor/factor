@@ -27,10 +27,8 @@ INLINE void* allot(CELL a)
 {
 	CELL h = active.here;
 	active.here += align8(a);
-#ifdef FACTOR_PROFILER
 	if(allot_profiling)
 		allot_profile_step(align8(a));
-#endif
 	check_memory();
 	return (void*)h;
 }
