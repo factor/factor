@@ -38,6 +38,7 @@ USE: vectors
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
 
+! Label nodes have the node-label variable set.
 SYMBOL: #label
 
 SYMBOL: #call ( non-tail call )

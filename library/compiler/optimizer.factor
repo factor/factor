@@ -37,10 +37,11 @@ USE: prettyprint
 USE: logic
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
-! it simply removes literals that are eventually dropped, and
-! never arise as inputs to any other type of function. Such
-! 'dead' literals arise when combinators are inlined and
-! quotations are lifted to their call sites.
+! it removes literals that are eventually dropped, and never
+! arise as inputs to any other type of function. Such 'dead'
+! literals arise when combinators are inlined and quotations are
+! lifted to their call sites. Also, #label nodes are inlined if
+! their children do not make a recursive call to the label.
 
 : scan-literal ( node -- )
     #! If the node represents a literal push, add the literal to
@@ -98,17 +99,16 @@ USE: logic
         [ node-param get ] bind [ dupd can-kill? ] all? nip
     ] ifte ;
 
-: (kill-node) ( literals node -- )
+: kill-node ( literals node -- )
     swap [ over (can-kill?) ] all? [ , ] [ drop ] ifte ;
 
-: kill-node ( literals node -- )
-    #! Remove the literals from the node and , it if it is not a
-    #! NOP.
-    "kill-node" [ nip , ] apply-dataflow ;
+: (kill-nodes) ( literals dataflow -- )
+    #! Append live nodes to currently constructing list.
+    [ dupd  "kill-node" [ nip , ] apply-dataflow ] each drop ;
 
 : kill-nodes ( literals dataflow -- dataflow )
     #! Remove literals and construct a list.
-    [ [ dupd kill-node ] each drop ] make-list ;
+    [ (kill-nodes) ] make-list ;
 
 : optimize ( dataflow -- dataflow )
     #! Remove redundant literals from the IR. The original IR
@@ -120,17 +120,9 @@ USE: logic
         node-param [ [ dupd kill-nodes ] map nip ] change
     ] extend , ;
 
-#push [
-    [ node-param get ] bind ,
-] "scan-literal" set-word-property
-
-#push [
-    consumes-literal? not
-] "can-kill" set-word-property
-
-#push [
-    (kill-node)
-] "kill-node" set-word-property
+#push [ [ node-param get ] bind , ] "scan-literal" set-word-property
+#push [ consumes-literal? not ] "can-kill" set-word-property
+#push [ kill-node ] "kill-node" set-word-property
 
 #label [
     [ node-param get ] bind (scan-literals)
@@ -140,8 +132,46 @@ USE: logic
     [ node-param get ] bind can-kill?
 ] "can-kill" set-word-property
 
+: (calls-label?) ( label node -- ? )
+    "calls-label" [ 2drop f ] apply-dataflow ;
+
+#call-label [
+    [ node-param get ] bind =
+] "calls-label" set-word-property
+
+: calls-label? ( label list -- ? )
+    [ dupd (calls-label?) ] some? nip ;
+
+#label [
+    [ node-param get ] bind calls-label?
+] "calls-label" set-word-property
+
+: branches-call-label? ( label list -- ? )
+    [ dupd calls-label? ] some? nip ;
+
+#ifte [
+    [ node-param get ] bind branches-call-label?
+] "calls-label" set-word-property
+
+#generic [
+    [ node-param get ] bind branches-call-label?
+] "calls-label" set-word-property
+
+#2generic [
+    [ node-param get ] bind branches-call-label?
+] "calls-label" set-word-property
+
+: recursive-label? ( node -- ? )
+    #! Does the label node contain calls to itself?
+    [ node-label get node-param get ] bind
+    calls-label? ;
+
 #label [ ( literals node -- )
-    [ node-param [ kill-nodes ] change ] extend ,
+    dup recursive-label? [
+       [ node-param [ kill-nodes ] change ] extend ,
+    ] [
+       [ node-param get ] bind (kill-nodes)
+    ] ifte
 ] "kill-node" set-word-property
 
 #ifte [ scan-branches ] "scan-literal" set-word-property
@@ -160,11 +190,11 @@ USE: logic
 #call-label [ 2drop t ] "can-kill" set-word-property
 
 #drop [ 2drop t ] "can-kill" set-word-property
-#drop [ (kill-node) ] "kill-node" set-word-property
+#drop [ kill-node ] "kill-node" set-word-property
 #dup [ 2drop t ] "can-kill" set-word-property
-#dup [ (kill-node) ] "kill-node" set-word-property
+#dup [ kill-node ] "kill-node" set-word-property
 #swap [ 2drop t ] "can-kill" set-word-property
-#swap [ (kill-node) ] "kill-node" set-word-property
+#swap [ kill-node ] "kill-node" set-word-property
 
 : kill-mask ( literals node -- mask )
     [ node-consume-d get ] bind [
@@ -197,6 +227,6 @@ USE: logic
 ] "kill-node" set-word-property
 
 #>r [ 2drop t ] "can-kill" set-word-property
-#>r [ (kill-node) ] "kill-node" set-word-property
+#>r [ kill-node ] "kill-node" set-word-property
 #r> [ 2drop t ] "can-kill" set-word-property
-#r> [ (kill-node) ] "kill-node" set-word-property
+#r> [ kill-node ] "kill-node" set-word-property
