@@ -71,8 +71,9 @@ USE: stdio
     "/library/platform/native/parser.factor"
     "/library/platform/native/parse-syntax.factor"
     "/library/platform/native/parse-stream.factor"
-    "/library/platform/native/unparser.factor"
 
+    "/library/format.factor"
+    "/library/platform/native/unparser.factor"
     "/library/styles.factor"
     "/library/vocabulary-style.factor"
     "/library/prettyprint.factor"

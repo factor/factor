@@ -69,6 +69,8 @@ USE: words
     #! Convert an integer to its hexadecimal representation.
     16 >base ;
 
+DEFER: unparse
+
 : unparse-ratio ( num -- str )
     <% dup
     numerator unparse %

@@ -25,15 +25,17 @@ void init_signals(void)
 {
 	struct sigaction custom_sigaction;
 	struct sigaction profiling_sigaction;
+	struct sigaction ign_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
 	profiling_sigaction.sa_sigaction = profiling_step;
 	profiling_sigaction.sa_flags = SA_SIGINFO;
+	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
 	sigaction(SIGBUS,&custom_sigaction,NULL);
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
-	sigaction(SIGPIPE,&custom_sigaction,NULL);
+	sigaction(SIGPIPE,&ign_sigaction,NULL);
 	sigaction(SIGPROF,&profiling_sigaction,NULL);
 }
 
@@ -42,6 +44,7 @@ void clear_environment(void)
 	int i;
 	for(i = 0; i < USER_ENV; i++)
 		userenv[i] = 0;
+	profile_depth = 0;
 }
 
 #define EXECUTE(w) ((XT)(w->xt))()
@@ -136,6 +139,8 @@ void primitive_profiling(void)
 	{
 		timerclear(&prof_timer.it_interval);
 		timerclear(&prof_timer.it_value);
+
+		profile_depth = 0;
 	}
 	else
 	{

@@ -71,9 +71,10 @@ bool perform_write_io_task(PORT* port)
 {
 	if(write_step(port))
 	{
-		if(port->buf_pos == port->buf_fill)
+		if(port->buf_pos == port->buf_fill || port->io_error != F)
 		{
-			/* All written */
+			/* All written, or I/O error is preventing further
+			transaction */
 			port->buf_pos = 0;
 			port->buf_fill = 0;
 			return true;

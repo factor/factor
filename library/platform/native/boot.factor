@@ -66,8 +66,6 @@ primitives,
     "/library/platform/native/parser.factor"
     "/library/platform/native/parse-syntax.factor"
     "/library/platform/native/parse-stream.factor"
-    "/library/format.factor"
-    "/library/platform/native/unparser.factor"
     "/library/platform/native/init.factor"
 ] [
     cross-compile-resource

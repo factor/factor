@@ -17,6 +17,8 @@ void init_io(void)
 	userenv[STDIN_ENV]  = tag_object(port(PORT_READ,0));
 	userenv[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
 	
+	/* debug_fd = fdopen(3,"w"); */
+
 	read_fd_count = 0;
 	init_io_tasks(&read_fd_set,read_io_tasks);
 

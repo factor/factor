@@ -61,6 +61,8 @@ USE: words
     #! The boot word is run by the intepreter when starting from
     #! an object database.
 
+    10 "base" set
+
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
     t "user-init" set
