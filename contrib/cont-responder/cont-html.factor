@@ -277,5 +277,5 @@ USE: logic
   "method" "action" "type" "value" "name" 
   "size" "href" "class" "border" "rows" "cols" 
   "id" "onclick" "style" "valign" "accesskey"
-  "src" "language"
+  "src" "language" "colspan"
 ] [ define-attribute-word ] each 
