@@ -3,15 +3,40 @@
 void init_io(void)
 {
 	env.user[STDIN_ENV]  = port(0);
+	set_nonblocking(0);
 	env.user[STDOUT_ENV] = port(1);
+	set_nonblocking(1);
 	env.user[STDERR_ENV] = port(2);
+	set_nonblocking(2);
 }
 
 int read_step(PORT* port)
 {
-	int amount = read(port->fd,
-		port->buffer + 1,
-		port->buffer->capacity * 2);
+	FIXNUM amount = -1;
+
+	add_read_io_task(port,F);
+
+	for(;;)
+	{
+		amount = read(port->fd,
+			port->buffer + 1,
+			port->buffer->capacity * 2);
+
+		if(amount == -1)
+		{
+			if(errno != EAGAIN)
+			{
+				remove_read_io_task(port);
+				return -1;
+			}
+		}
+		else
+			break;
+
+		iomux();
+	}
+
+	remove_read_io_task(port);
 
 	port->buf_fill = (amount < 0 ? 0 : amount);
 	port->buf_pos = 0;
@@ -90,8 +115,30 @@ void write_step(PORT* port)
 {
 	char* chars = (char*)port->buffer + sizeof(STRING);
 
-	FIXNUM amount = write(port->fd,chars + port->buf_pos,
-		port->buf_fill - port->buf_pos);
+	FIXNUM amount;
+
+	add_write_io_task(port,F);
+
+	for(;;)
+	{
+		amount = write(port->fd,chars + port->buf_pos,
+			port->buf_fill - port->buf_pos);
+
+		if(amount == -1)
+		{
+			if(errno != EAGAIN)
+			{
+				remove_write_io_task(port);
+				return;
+			}
+		}
+		else
+			break;
+
+		iomux();
+	}
+
+	remove_write_io_task(port);
 
 	if(amount < 0)
 		io_error(__FUNCTION__);
@@ -192,4 +239,10 @@ void primitive_close_fd(void)
 	PORT* port = untag_port(dpop());
 	flush_buffer(port);
 	close(port->fd);
+}
+
+void set_nonblocking(int fd)
+{
+	if(fcntl(fd,F_SETFL,O_NONBLOCK,1) == -1)
+		io_error(__FUNCTION__);
 }

@@ -52,6 +52,8 @@ int accept_connection(int sock)
 	if(new < 0)
 		io_error(__FUNCTION__);
 
+	set_nonblocking(new);
+
 	printf("Connection from host %s, port %hd.\n",
 		inet_ntoa(clientname.sin_addr),
 		ntohs(clientname.sin_port));

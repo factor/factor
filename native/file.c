@@ -9,13 +9,13 @@ void primitive_open_file(void)
 	int fd;
 
 	if(read && write)
-		mode = O_RDWR | O_CREAT;
+		mode = O_RDWR | O_CREAT | O_NONBLOCK;
 	else if(read)
-		mode = O_RDONLY;
+		mode = O_RDONLY | O_NONBLOCK;
 	else if(write)
-		mode = O_WRONLY | O_CREAT | O_TRUNC;
+		mode = O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK;
 	else
-		mode = 0;
+		mode = O_NONBLOCK;
 
 	fd = open(path,mode);
 	if(fd < 0)

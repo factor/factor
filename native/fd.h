@@ -15,3 +15,4 @@ void write_fd_string_8(PORT* port, STRING* str);
 void primitive_write_fd_8(void);
 void primitive_flush_fd(void);
 void primitive_close_fd(void);
+void set_nonblocking(int fd);

@@ -14,6 +14,7 @@ int main(int argc, char** argv)
 	load_image(argv[1]);
 	init_stacks();
 	init_io();
+
 	run();
 
 	return 0;

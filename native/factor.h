@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <math.h>
-#include <poll.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
