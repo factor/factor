@@ -90,8 +90,10 @@ public abstract class WordListDialog extends EnhancedDialog
 
 		try
 		{
-			preview.setText(FactorPlugin.evalInWire(
-				FactorPlugin.factorWord(word) + " see").trim());
+			String text = FactorPlugin.evalInWire(
+				FactorPlugin.factorWord(word) + " see").trim();
+			preview.setText(text);
+			preview.setCaretPosition(text.length());
 		}
 		catch(Exception e)
 		{

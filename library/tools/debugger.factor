@@ -78,9 +78,6 @@ USE: math
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;
 
-: bad-primitive-error ( obj -- )
-    "Bad primitive number: " write . ;
-
 : c-string-error ( obj -- )
     "Cannot convert to C string: " write . ;
 
@@ -106,7 +103,6 @@ USE: math
         float-format-error
         signal-error
         negative-array-size-error
-        bad-primitive-error
         c-string-error
         ffi-disabled-error
         ffi-error

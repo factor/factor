@@ -9,11 +9,10 @@
 #define ERROR_FLOAT_FORMAT (8<<3)
 #define ERROR_SIGNAL (9<<3)
 #define ERROR_NEGATIVE_ARRAY_SIZE (10<<3)
-#define ERROR_BAD_PRIMITIVE (11<<3)
-#define ERROR_C_STRING (12<<3)
-#define ERROR_FFI_DISABLED (13<<3)
-#define ERROR_FFI (14<<3)
-#define ERROR_CLOSED (15<<3)
+#define ERROR_C_STRING (11<<3)
+#define ERROR_FFI_DISABLED (12<<3)
+#define ERROR_FFI (13<<3)
+#define ERROR_CLOSED (14<<3)
 
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */

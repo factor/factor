@@ -59,22 +59,33 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill)
 	return new_string;
 }
 
-/* untagged */
-F_STRING* from_c_string(const BYTE* c_string)
+INLINE F_STRING* memory_to_string(const BYTE* string, CELL length)
 {
-	CELL length = strlen(c_string);
 	F_STRING* s = allot_string(length);
 	CELL i;
 
 	for(i = 0; i < length; i++)
 	{
-		cput(SREF(s,i),*c_string);
-		c_string++;
+		cput(SREF(s,i),*string);
+		string++;
 	}
 
 	rehash_string(s);
 	
 	return s;
+}
+
+void primitive_memory_to_string(void)
+{
+	CELL length = unbox_cell();
+	BYTE* string = (BYTE*)unbox_cell();
+	dpush(tag_object(memory_to_string(string,length)));
+}
+
+/* untagged */
+F_STRING* from_c_string(const BYTE* c_string)
+{
+	return memory_to_string(c_string,strlen(c_string));
 }
 
 /* FFI calls this */
@@ -98,19 +109,27 @@ BYTE* to_c_string(F_STRING* s)
 	return to_c_string_unchecked(s);
 }
 
+INLINE void string_to_memory(F_STRING* s, BYTE* string)
+{
+	CELL i;
+	for(i = 0; i < s->capacity; i++)
+		string[i] = string_nth(s,i);
+}
+
+void primitive_string_to_memory(void)
+{
+	F_STRING* str = untag_string(dpop());
+	BYTE* address = (BYTE*)unbox_cell();
+	string_to_memory(str,address);
+}
+
 /* untagged */
 BYTE* to_c_string_unchecked(F_STRING* s)
 {
 	F_STRING* _c_str = allot_string(s->capacity / CHARS + 1);
-	CELL i;
-
 	BYTE* c_str = (BYTE*)(_c_str + 1);
-	
-	for(i = 0; i < s->capacity; i++)
-		c_str[i] = string_nth(s,i);
-
+	string_to_memory(s,c_str);
 	c_str[s->capacity] = '\0';
-
 	return c_str;
 }
 

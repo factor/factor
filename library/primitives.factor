@@ -31,6 +31,7 @@ USE: errors
 USE: files
 USE: io-internals
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 USE: math-internals
@@ -227,6 +228,8 @@ USE: words
     [ set-alien-1            " n alien off -- "                   [ 3 | 0 ] ]
     [ heap-stats             " -- instances bytes "               [ 0 | 2 ] ]
     [ throw                  " error -- "                         [ 1 | 0 ] ]
+    [ string>memory          " str address -- "                   [ 2 | 0 ] ]
+    [ memory>string          " address length -- str "            [ 2 | 1 ] ]
 ] [
     uncons dupd uncons car ( word word stack-effect infer-effect )
     >r "stack-effect" set-word-property r>

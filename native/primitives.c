@@ -189,13 +189,15 @@ XT primitives[] = {
 	primitive_alien_1,
 	primitive_set_alien_1,
 	primitive_heap_stats,
-	primitive_throw
+	primitive_throw,
+	primitive_string_to_memory,
+	primitive_memory_to_string
 };
 
 CELL primitive_to_xt(CELL primitive)
 {
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
-
-	return (CELL)primitives[primitive];
+		return (CELL)undefined;
+	else
+		return (CELL)primitives[primitive];
 }
