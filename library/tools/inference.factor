@@ -145,14 +145,14 @@ DEFER: (infer)
 
 : apply-compound ( word -- )
     #! Infer a compound word's stack effect.
-    dup "inline" word-property [
+    dup "inline-infer" word-property [
         inline-compound
     ] [
         [
             infer-compound consume/produce
         ] [
             [
-                dup t "inline" set-word-property
+                dup t "inline-infer" set-word-property
                 inline-compound
             ] when
         ] catch

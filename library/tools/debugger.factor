@@ -147,12 +147,16 @@ USE: math
 : :s ( -- ) "error-datastack"  get {.} ;
 : :r ( -- ) "error-callstack"  get {.} ;
 : :n ( -- ) "error-namestack"  get [.] ;
-: :c ( -- ) "error-catchstack" get {.} ;
+: :c ( -- ) "error-catchstack" get [.] ;
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 
+: flush-error-handler ( error -- )
+    #! Last resort.
+    [ "Error in default error handler!" print drop ] when ;
+
 : default-error-handler ( error -- )
-    #! Print the error and return to the top level.
+    #! Print the error.
     [
         in-parser? [ parse-dump ] [ standard-dump ] ifte
 
@@ -160,7 +164,9 @@ USE: math
         "show stacks at time of error." print
         \ :get prettyprint-word
         " ( var -- value ) inspects the error namestack." print
-    ] when* ;
+    ] [
+        flush-error-handler
+    ] catch ;
 
 : print-error ( quot -- )
     #! Execute a quotation, and if it throws an error, print it

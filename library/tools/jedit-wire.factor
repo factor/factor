@@ -46,6 +46,7 @@ USE: words
 !
 ! jEdit sends a packet with code to eval, it receives the output
 ! captured with with-string.
+USE: listener
 : write-packet ( string -- )
     dup str-length write-big-endian-32 write flush ;
 
@@ -102,7 +103,8 @@ USE: words
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
-    "stdio" get <jedit-stream> "stdio" set ;
+    "stdio" get <jedit-stream> "stdio" set
+    print-banner ;
 
 : jedit-lookup ( word vocabs -- )
     #! A utility word called by the Factor plugin to get some

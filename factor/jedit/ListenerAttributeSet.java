@@ -32,7 +32,7 @@ package factor.jedit;
 import console.*;
 import factor.Cons;
 import javax.swing.text.*;
-import javax.swing.Action;
+import javax.swing.*;
 import java.awt.Color;
 import org.gjt.sp.jedit.GUIUtilities;
 
@@ -69,8 +69,10 @@ public class ListenerAttributeSet extends SimpleAttributeSet
 		else if("actions".equals(key))
 			addAttribute(ConsolePane.Actions,createActionsMenu((Cons)value));
 		else if("icon".equals(key))
-			addAttribute(StyleConstants.IconAttribute,
-				GUIUtilities.loadIcon((String)value));
+		{
+			StyleConstants.setIcon(this,GUIUtilities.loadIcon(
+				"jeditresource:/Factor.jar!" + value));
+		}
 	} //}}}
 	
 	//{{{ toColor() method

@@ -116,10 +116,10 @@ DEFER: prettyprint*
     write-attr ;
 
 : prettyprint-[ ( indent -- indent )
-        \ [ prettyprint-word <prettyprint ;
+    \ [ prettyprint-word <prettyprint ;
 
 : prettyprint-] ( indent -- indent )
-        prettyprint> \ ] prettyprint-word ;
+    prettyprint> \ ] prettyprint-word ;
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
@@ -156,10 +156,10 @@ DEFER: prettyprint*
     ] ifte ;
 
 : prettyprint-{{ ( indent -- indent )
-        \ {{ prettyprint-word <prettyprint ;
+    \ {{ prettyprint-word <prettyprint ;
 
 : prettyprint-}} ( indent -- indent )
-        prettyprint> \ }} prettyprint-word ;
+    prettyprint> \ }} prettyprint-word ;
 
 : prettyprint-{{}} ( indent hashtable -- indent )
     hash>alist dup length 0 = [
@@ -206,10 +206,10 @@ DEFER: prettyprint*
     #! Unparse each element on its own line.
     stack>list [ . ] each ;
 
-: .n namestack  [.] ;
 : .s datastack  {.} ;
 : .r callstack  {.} ;
-: .c catchstack {.} ;
+: .n namestack  [.] ;
+: .c catchstack [.] ;
 
 ! For integers only
 : .b >bin print ;

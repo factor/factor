@@ -5,6 +5,8 @@ USE: namespaces
 USE: stack
 USE: test
 USE: lists
+USE: parser
+USE: stdio
 
 [ f ] [ [ ] [ ] catch ] unit-test
 
@@ -16,5 +18,10 @@ USE: lists
     "Hello" =
 ] unit-test
 
-[ ] [ [ ] print-error ] unit-test
-[ ] [ [ 2 car ] print-error ] unit-test
+"!!! The following error is part of the test" print
+
+[ ] [ [ 6 [ 12 [ "2 car" ] ] ] default-error-handler ] unit-test
+
+"!!! The following error is part of the test" print
+
+[ [ "2 car" ] parse ] [ default-error-handler ] catch

@@ -15,3 +15,4 @@ USE: errors
 [ 2 ] [ yield "x" get ] unit-test
 [ ] [ [ flush ] in-thread flush ] unit-test
 [ ] [ [ "Errors, errors" throw ] in-thread ] unit-test
+yield

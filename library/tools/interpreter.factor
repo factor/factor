@@ -44,6 +44,7 @@ USE: stdio
 ! partial evaluation, also for trace and step.
 
 ! Meta-stacks
+USE: listener
 SYMBOL: meta-r
 : push-r meta-r get vector-push ;
 : pop-r meta-r get vector-pop ;
@@ -176,7 +177,7 @@ SYMBOL: meta-cf
 
 : &c
     #! Print stepper catch stack.
-    meta-c get {.} ;
+    meta-c get [.] ;
 
 : &get ( var -- value )
     #! Print stepper variable value.
@@ -197,10 +198,15 @@ SYMBOL: meta-cf
     " ( var -- value ) inspects the stepper namestack." print
     \ step prettyprint-word " -- single step" print
     \ (trace) prettyprint-word " -- trace until end" print
-    \ (run) prettyprint-word " -- run until end" print ;
+    \ (run) prettyprint-word " -- run until end" print
+    \ exit prettyprint-word " -- exit single-stepper" print ;
 
 : walk ( quot -- )
     #! Single-step through execution of a quotation.
-    init-interpreter
-    meta-cf set
-    walk-banner ;
+    [
+        "walk" listener-prompt set
+        init-interpreter
+        meta-cf set
+        walk-banner
+        listener
+    ] with-scope ;

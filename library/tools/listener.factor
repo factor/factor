@@ -45,17 +45,12 @@ USE: vectors
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt
+SYMBOL: quit-flag
 
 global [
     "..." cont-prompt set
     "ok" listener-prompt set
 ] bind
-
-: print-banner ( -- )
-    "Factor " write version print
-    "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Copyright (C) 2004 Chris Double" print
-    "Type ``exit'' to exit, ``help'' for help." print ;
 
 : prompt. ( text -- )
     "prompt" style write-attr
@@ -65,7 +60,8 @@ global [
     " " write flush ;
 
 : exit ( -- )
-    "quit-flag" on ;
+    #! Exit the current listener.
+    quit-flag on ;
 
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
@@ -85,16 +81,14 @@ global [
     #! EOF.
     f depth (read-multiline) >r reverse r> ;
 
-: listener-step ( -- )
+: listen ( -- )
+    #! Wait for user input, and execute.
     listener-prompt get prompt.
     [ read-multiline [ call ] [ exit ] ifte ] print-error ;
 
-: listener-loop ( -- )
-    "quit-flag" get [
-        "quit-flag" off
-    ] [
-        listener-step listener-loop
-    ] ifte ;
+: listener ( -- )
+    #! Run a listener loop that executes user input.
+    quit-flag get [ quit-flag off ] [ listen listener ] ifte ;
 
 : kb. 1024 /i unparse write " KB" write ;
 
@@ -109,13 +103,14 @@ global [
     "Data space: " write (room.)
     "Code space: " write (room.) ;
 
-: init-listener ( -- )
-    print-banner
+: print-banner ( -- )
+    "Factor " write version print
+    "Copyright (C) 2003, 2004 Slava Pestov" print
+    "Copyright (C) 2004 Chris Double" print
+    "Type ``exit'' to exit, ``help'' for help." print
     terpri
     room.
-    terpri
-
-    listener-loop ;
+    terpri ;
 
 : help ( -- )
     "SESSION:" print

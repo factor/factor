@@ -43,7 +43,7 @@ USE: stack
     [
         schedule-thread
         ! Clear stacks since we never go up from this point
-        { } set-catchstack
+        [ ] set-catchstack
         { } set-callstack
         print-error
         (yield)

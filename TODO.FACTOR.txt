@@ -4,7 +4,6 @@
 - type inference
 - some way to step over a word in the stepper
 - step: print NEXT word to execute, not word that JUST executed
-- step: start a nested listener
 
 + compiler/ffi:
 
@@ -37,10 +36,8 @@
 
 + kernel:
 
-- dissolve library/platform/native/
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
-- >lower, >upper for strings
 - don't rehash strings on every startup
 - remove sbufs
 - cat, reverse-cat primitives
@@ -52,11 +49,9 @@
 
 + misc:
 
-- alist -vs- assoc terminology
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup
 - nicer way to combine two paths
-- catchstack lists
 - OOP
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for

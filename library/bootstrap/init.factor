@@ -40,7 +40,6 @@ USE: vectors
 
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
-    init-errors
     init-namespaces
     init-threads
     init-stdio
