@@ -1,5 +1,5 @@
-CC = gcc34
-CFLAGS = -Os -ffast-math -march=pentium4 -Wall -fomit-frame-pointer
+CC = gcc
+CFLAGS = -g -Wall
 LIBS = -lm
 STRIP = strip
 
@@ -18,7 +18,7 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 
 f: $(OBJS)
 	$(CC) $(LIBS) -o $@ $(OBJS)
-	$(STRIP) $@
+#	$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)

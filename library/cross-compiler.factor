@@ -79,6 +79,7 @@ DEFER: can-write?
 DEFER: add-write-io-task
 DEFER: write-fd-8
 DEFER: add-copy-io-task
+DEFER: pending-io-error
 DEFER: next-io-task
 
 IN: math
@@ -247,6 +248,7 @@ IN: cross-compiler
         add-write-io-task
         write-fd-8
         add-copy-io-task
+        pending-io-error
         next-io-task
         room
         os-env

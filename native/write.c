@@ -21,8 +21,6 @@ bool can_write(PORT* port, FIXNUM len)
 {
 	CELL buf_capacity;
 
-	pending_io_error(port);
-
 	if(port->type != PORT_WRITE)
 		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
@@ -42,6 +40,7 @@ void primitive_can_write(void)
 {
 	PORT* port = untag_port(dpop());
 	FIXNUM len = to_fixnum(dpop());
+	pending_io_error(port);
 	dpush(tag_boolean(can_write(port,len)));
 }
 
@@ -73,6 +72,8 @@ void write_char_8(PORT* port, FIXNUM ch)
 {
 	char c = (char)ch;
 
+	pending_io_error(port);
+
 	if(!can_write(port,1))
 		io_error(__FUNCTION__);
 
@@ -94,6 +95,8 @@ void write_string_8(PORT* port, STRING* str)
 {
 	char* c_str;
 	
+	pending_io_error(port);
+
 	/* Note this ensures the buffer is large enough to fit the string */
 	if(!can_write(port,str->capacity))
 		io_error(__FUNCTION__);

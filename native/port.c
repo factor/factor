@@ -100,3 +100,8 @@ void pending_io_error(PORT* port)
 		general_error(ERROR_IO,io_error);
 	}
 }
+
+void primitive_pending_io_error(void)
+{
+	pending_io_error(untag_port(dpop()));
+}

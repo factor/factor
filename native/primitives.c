@@ -133,6 +133,7 @@ XT primitives[] = {
 	primitive_add_write_io_task,
 	primitive_write_8,
 	primitive_add_copy_io_task,
+	primitive_pending_io_error,
 	primitive_next_io_task,
 	primitive_room,
 	primitive_os_env,

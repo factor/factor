@@ -69,6 +69,8 @@
 
 + native:
 
+- fix error postoning -- not all errors thrown by i/o code are
+  postponed
 - sbuf-hashcode
 - vector-hashcode
 - irc: stack underflow?

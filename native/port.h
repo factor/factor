@@ -42,3 +42,4 @@ void collect_port(PORT* port);
 void postpone_io_error(PORT* port, const char* func);
 void io_error(const char* func);
 void pending_io_error(PORT* port);
+void primitive_pending_io_error(void);
