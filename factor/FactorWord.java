@@ -198,7 +198,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	//{{{ toString() method
 	public String toString()
 	{
-		return name == null ? "#<unnamed>"
-			: FactorReader.charsToEscapes(name);
+		return name == null ? "#<unnamed>" : name;
 	} //}}}
 }

@@ -5,21 +5,17 @@ USE: math
 USE: stack
 USE: test
 
+[ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
+[ 6 ] [ [ 2 2 + ] 1 1 2slip + + ] unit-test
+[ 6 ] [ [ 2 1 + ] 1 1 1 3slip + + + ] unit-test
+
+[ 6 ] [ 2 [ sq ] keep + ] unit-test
+
 [   ] [ 3 [ ] cond ] unit-test
 [ t ] [ 4 [ [ 1 = ] [ ] [ 4 = ] [ drop t ] [ 2 = ] [ ] ] cond ] unit-test
 
-[ 0 1 2 3 4 ] [ 5 [ ] times* ] unit-test
-[ ] [ 0 [ ] times* ] unit-test
+[ 0 ] [ f [ sq ] [ 0 ] ifte* ] unit-test
+[ 4 ] [ 2 [ sq ] [ 0 ] ifte* ] unit-test
 
-[ #{ 1 1 } ] [ #{ 2 3 } #{ 1 0 } 2times-succ ] unit-test
-[ #{ 1 2 } ] [ #{ 2 3 } #{ 1 1 } 2times-succ ] unit-test
-[ #{ 2 0 } ] [ #{ 3 3 } #{ 1 2 } 2times-succ ] unit-test
-[ #{ 2 1 } ] [ #{ 3 3 } #{ 2 0 } 2times-succ ] unit-test
-[ #{ 2 0 } ] [ #{ 2 2 } #{ 1 1 } 2times-succ ] unit-test
-
-[ #{ 0 0 } #{ 0 1 } #{ 1 0 } #{ 1 1 } ]
-[ #{ 2 2 } [ ] 2times* ] unit-test
-
-[ #{ 0 0 } #{ 0 1 } #{ 0 2 } #{ 1 0 } #{ 1 1 } #{ 1 2 } 
-  #{ 2 0 } #{ 2 1 } #{ 2 2 } ]
-[ #{ 3 3 } [ ] 2times* ] unit-test
+[ 0 ] [ f [ 0 ] unless* ] unit-test
+[ t ] [ t [ "Hello" ] unless* ] unit-test

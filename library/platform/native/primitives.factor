@@ -28,6 +28,7 @@
 USE: combinators
 USE: alien
 USE: compiler
+USE: errors
 USE: files
 USE: io-internals
 USE: kernel
@@ -235,6 +236,7 @@ USE: words
     [ alien-1                | " alien off -- n " ]
     [ set-alien-1            | " n alien off -- " ]
     [ heap-stats             | " -- instances bytes " ]
+    [ throw                  | " error -- " ]
 ] [
     unswons "stack-effect" set-word-property
 ] each

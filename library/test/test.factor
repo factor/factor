@@ -89,6 +89,7 @@ USE: unparser
         "math/bignum"
         "math/bitops"
         "math/gcd"
+        "math/math-combinators"
         "math/rational"
         "math/float"
         "math/complex"

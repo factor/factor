@@ -37,6 +37,7 @@ USE: namespaces
 USE: parser
 USE: prettyprint
 USE: stack
+USE: stdio
 USE: strings
 USE: unparser
 USE: vectors
@@ -62,11 +63,7 @@ SYMBOL: compiled-xts
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc dup [
-        nip
-    ] [
-        drop word-xt
-    ] ifte ;
+    dup compiled-xts get assoc [ nip ] [ word-xt ] ifte* ;
 
 ! "fixup-xts" is a list of [ where word relative ] pairs; the xt
 ! of word when its done compiling will be written to the offset,
@@ -74,13 +71,24 @@ SYMBOL: compiled-xts
 
 SYMBOL: deferred-xts
 
+! Words being compiled are consed onto this list. When a word
+! is encountered that has not been previously compiled, it is
+! consed onto this list. Compilation stops when the list is
+! empty.
+
+SYMBOL: compile-words
+
 : defer-xt ( word where relative -- )
     #! After word is compiled, put its XT at where, relative.
     3list deferred-xts cons@ ;
 
 : compiled? ( word -- ? )
     #! This is a hack.
-    dup "compiled" word-property swap primitive? or ;
+    dup "compiled" word-property [
+        drop t
+    ] [
+        primitive?
+    ] ifte ;
 
 : fixup-deferred-xt ( word where relative -- )
     rot dup compiled? [
@@ -95,18 +103,10 @@ SYMBOL: deferred-xts
     ] each
     deferred-xts off ;
 
-! Words being compiled are consed onto this list. When a word
-! is encountered that has not been previously compiled, it is
-! consed onto this list. Compilation stops when the list is
-! empty.
-
-SYMBOL: compile-words
-
 : postpone-word ( word -- )
-    dup compiled? [
-        drop
-    ] [
-        t over "compiled" set-word-property compile-words cons@
+    dup compiled? [ drop ] [
+        t over "compiled" set-word-property
+        compile-words unique@
     ] ifte ;
 
 ! During compilation, these two variables store pending
@@ -206,6 +206,7 @@ SYMBOL: compile-callstack
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
+    dup . flush
     intern dup save-xt word-parameter compile-quot RET ;
 
 : compile-postponed ( -- )

@@ -47,9 +47,9 @@ public class CharLiteral extends FactorParsingDefinition
 	public void eval(FactorInterpreter interp, FactorReader reader)
 		throws IOException, FactorParseException
 	{
-		String word = (String)reader.nextNonEOL(false,false);
-		if(word.length() != 1)
-			reader.error("Bad character literal: " + word);
-		reader.append(new Character(word.charAt(0)));
+		FactorScanner scanner = reader.getScanner();
+		scanner.skipWhitespace();
+		char ch = scanner.readNonEOFEscaped();
+		reader.append(new Character(ch));
 	}
 }

@@ -80,6 +80,10 @@ DEFER: countdown-b
 [ 64 f ] [ f 4 dummy-when-4 ] unit-test
 [ f t ] [ t f dummy-when-4 ] unit-test
 
+: dummy-when-5 f [ dup fixnum* ] when ; compiled
+
+[ f ] [ f dummy-when-5 ] unit-test
+
 : dummy-unless-1 t [ ] unless ; compiled
 
 [ ] [ dummy-unless-1 ] unit-test

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 USE: combinators
+USE: errors
 USE: kernel
 USE: lists
 USE: math
@@ -382,6 +383,7 @@ IN: image
         alien-1
         set-alien-1
         heap-stats
+        throw
     ] [
         swap succ tuck primitive,
     ] each drop ;

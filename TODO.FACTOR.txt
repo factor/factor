@@ -7,7 +7,9 @@ FFI:
 
 - compiled? messy
 - compiler: drop literal peephole optimization
-- compiler: arithmetic-type { ... } execute
+- compiling when*
+- compiling unless*
+- eliminate uses of 2dip
 - getenv/setenv: if literal arg, compile as a load/store
 - inline words
 

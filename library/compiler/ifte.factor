@@ -60,7 +60,7 @@ USE: lists
     tail? [ RET f ] [ JUMP ] ifte swap branch-target ;
 
 : end-if ( fixup -- )
-    tail? [ drop RET ] [ branch-target ] ifte ;
+    tail? [ RET ] when [ branch-target ] when* ;
 
 : compile-ifte ( compile-time: true false -- )
     pop-literal pop-literal  commit-literals
@@ -79,7 +79,7 @@ USE: lists
 : compile-unless ( compile-time: false -- )
     pop-literal  commit-literals
     compile-t-test >r
-    ( t -- ) compile-quot
+    ( f -- ) compile-quot
     r> end-if ;
 
 [ compile-ifte ] \ ifte "compiling" set-word-property

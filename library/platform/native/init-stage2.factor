@@ -28,6 +28,7 @@
 IN: init
 USE: ansi
 USE: combinators
+USE: compiler
 USE: errors
 USE: httpd-responder
 USE: kernel
@@ -35,6 +36,7 @@ USE: lists
 USE: namespaces
 USE: parser
 USE: random
+USE: stack
 USE: streams
 USE: styles
 USE: words
@@ -44,7 +46,7 @@ USE: words
 : init-error-handler ( -- )
     [ 1 exit* ] >c ( last resort )
     [ default-error-handler 1 exit* ] >c
-    [ throw ] 5 setenv ( kernel calls on error ) ;
+    [ dup save-error rethrow ] 5 setenv ( kernel calls on error ) ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
@@ -53,6 +55,7 @@ USE: words
 
     init-error-handler
     init-random
+    init-assembler
 
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch

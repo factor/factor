@@ -35,6 +35,11 @@ void throw_error(CELL error)
 	siglongjmp(toplevel,1);
 }
 
+void primitive_throw(void)
+{
+	throw_error(dpop());
+}
+
 void general_error(CELL error, CELL tagged)
 {
 	CELL c = cons(error,cons(tagged,F));

@@ -121,8 +121,45 @@ public class FactorScanner
 			nextLine();
 	} //}}}
 
+	//{{{ isEOL() method
+	private boolean isEOL()
+	{
+		return position >= line.length();
+	} //}}}
+	
+	//{{{ skipWhitespace() method
+	/**
+	 * The Factor parser is so much nicer in Factor than Java!
+	 */
+	public void skipWhitespace() throws FactorParseException
+	{
+		for(;;)
+		{
+			if(isEOL())
+				return;
+
+			char ch = line.charAt(position++);
+
+			int type = readtable.getCharacterType(ch);
+
+			switch(type)
+			{
+			case ReadTable.INVALID:
+				error("Invalid character in input: " + ch);
+				break;
+			case ReadTable.WHITESPACE:
+				break;
+			default:
+				position--;
+				return;
+			}
+		}
+	} //}}}
+	
 	//{{{ next() method
 	/**
+	 * Read a word name. Note that no escaping of characters is done.
+	 *
 	 * @param readNumbers If true, will return either a Number or a
 	 * String. Otherwise, only Strings are returned.
 	 * @param start If true, dispatches will be handled by their parsing
@@ -143,7 +180,7 @@ public class FactorScanner
 
 		for(;;)
 		{
-			if(position == line.length())
+			if(position >= line.length())
 			{
 				// EOL
 				if(buf.length() != 0)
@@ -174,10 +211,8 @@ public class FactorScanner
 					return word(readNumbers,base);
 				}
 			case ReadTable.CONSTITUENT:
-				buf.append(ch);
-				break;
 			case ReadTable.SINGLE_ESCAPE:
-				buf.append(escape());
+				buf.append(ch);
 				break;
 			}
 		}
@@ -199,6 +234,9 @@ public class FactorScanner
 	} //}}}
 
 	//{{{ readUntil() method
+	/**
+	 * Characters are escaped.
+	 */
 	public String readUntil(char start, char end, boolean escapesAllowed)
 		throws IOException, FactorParseException
 	{
@@ -206,7 +244,7 @@ public class FactorScanner
 
 		for(;;)
 		{
-			if(position == line.length())
+			if(isEOL())
 			{
 				error("Expected " + end + " before EOL");
 				break;
@@ -252,7 +290,7 @@ public class FactorScanner
 	//{{{ readNonEOF() method
 	public char readNonEOF() throws FactorParseException, IOException
 	{
-		if(position == line.length())
+		if(isEOL())
 		{
 			error("Unexpected EOL");
 			return '\0';
@@ -279,7 +317,7 @@ public class FactorScanner
 	//{{{ atEndOfWord() method
 	public boolean atEndOfWord() throws IOException
 	{
-		if(position == line.length())
+		if(isEOL())
 			return true;
 		if(line == null)
 			return true;

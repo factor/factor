@@ -27,7 +27,16 @@
 
 IN: errors
 USE: kernel
+USE: stack
 USE: strings
+
+DEFER: save-error
+DEFER: rethrow
+
+: throw ( error -- )
+    #! Throw an error that will be caught by a surrounding
+    #! catch block.
+    dup save-error rethrow ;
 
 : catchstack* ( -- cs )
     interpreter

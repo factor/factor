@@ -20,4 +20,5 @@ void fix_stacks(void);
 void throw_error(CELL object);
 void general_error(CELL error, CELL tagged);
 void type_error(CELL type, CELL tagged);
+void primitive_throw(void);
 void range_error(CELL tagged, CELL index, CELL max);
