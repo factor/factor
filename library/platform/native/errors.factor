@@ -64,6 +64,7 @@ USE: vectors
         "Overflow"
         "Incomparable types: "
         "Float format: "
+        "Signal "
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

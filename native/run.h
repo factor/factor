@@ -33,6 +33,8 @@ typedef struct {
 
 ENV env;
 
+void init_signals(void);
+
 void clear_environment(void);
 
 INLINE CELL dpop(void)

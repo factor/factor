@@ -15,6 +15,7 @@ int main(int argc, char** argv)
 	init_stacks();
 	init_iomux();
 	init_io();
+	init_signals();
 
 	run();
 
