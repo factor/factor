@@ -10,7 +10,7 @@ INLINE void gc_debug(char* msg, CELL x) {
 #endif
 }
 
-/* Given a pointer to a pointer to oldspace, copy it to newspace. */
+/* Given a pointer to oldspace, copy it to newspace. */
 void* copy_untagged_object(void* pointer, CELL size)
 {
 	void* newpointer = allot(size);
@@ -47,6 +47,11 @@ void copy_object(CELL* handle)
 	{
 		newpointer = UNTAG(header);
 		gc_debug("FORWARDING",newpointer);
+	}
+	else if(TAG(pointer) == GC_COLLECTED)
+	{
+		critical_error("asked to copy forwarding pointer",pointer);
+		newpointer = 0; /* to shut up gcc */
 	}
 	else
 	{

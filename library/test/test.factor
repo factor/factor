@@ -51,6 +51,7 @@ USE: vocabularies
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
+        "garbage-collection"
         "lists/cons"
         "lists/lists"
         "lists/assoc"

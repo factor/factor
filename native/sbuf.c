@@ -129,6 +129,5 @@ void fixup_sbuf(SBUF* sbuf)
 
 void collect_sbuf(SBUF* sbuf)
 {
-	sbuf->string = copy_untagged_object(sbuf->string,
-		sizeof(sbuf->string) + sbuf->string->capacity);
+	sbuf->string = copy_untagged_object(sbuf->string,SSIZE(sbuf->string));
 }
