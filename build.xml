@@ -6,7 +6,7 @@
 		<available property="jedit" classname="org.gjt.sp.jedit.jEdit" />
 	</target>
 	
-	<target name="compile">
+	<target name="compile" depends="init">
 		<javac
 			srcdir="."
 			destdir="."
@@ -19,18 +19,24 @@
 		<exclude name="factor/jedit/*.java"/>
 		</javac>
 	</target>
-	<target name="compile-jedit" if="jedit">
+	
+	<path id="jedit-classpath">
+		<pathelement location="${user.home}/.jedit/jars/ErrorList.jar" />
+		<pathelement location="${user.home}/.jedit/jars/SideKick.jar" />
+	</path>
+
+	<target name="compile-jedit" depends="init" if="jedit">
 		<javac
-			srcdir="."
-			destdir="."
-			deprecation="on"
-			includeJavaRuntime="yes"
+			classpathref="jedit-classpath"
 			debug="true"
+			deprecation="on"
+			destdir="."
 			optimize="true"
-		>
-		<include name="factor/jedit/*.java"/>
+			srcdir=".">
+			<include name="factor/jedit/*.java"/>
 		</javac>
 	</target>
+	
 	<target name="dist" depends="compile,compile-jedit">
 		<jar
 			jarfile="Factor.jar"

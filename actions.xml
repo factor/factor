@@ -21,4 +21,15 @@
 				+ "\" run-file");
 		</CODE>
 	</ACTION>
+	<ACTION NAME="factor-apropos">
+		<CODE>
+			if(textArea.selectionCount == 0)
+				textArea.selectWord();
+			factor.jedit.FactorPlugin.eval(view,
+				"\""
+				+ MiscUtilities.charsToEscapes(
+				textArea.selectedText)
+				+ "\" apropos.");
+		</CODE>
+	</ACTION>
 </ACTIONS>

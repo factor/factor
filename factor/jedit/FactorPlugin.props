@@ -8,14 +8,21 @@ plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=index.html
 
 plugin.factor.jedit.FactorPlugin.depend.0=jedit 04.02.15.00
+plugin.factor.jedit.FactorPlugin.depend.1=plugin errorlist.ErrorListPlugin 1.3.2
+plugin.factor.jedit.FactorPlugin.depend.2=plugin sidekick.SideKickPlugin 0.3
 
 plugin.factor.jedit.FactorPlugin.menu=factor \
 	- \
 	factor-run-file \
-	factor-eval-selection
+	factor-eval-selection \
+	factor-apropos
 
 factor.label=Factor Listener
 factor-run-file.label=Run Current File
 factor-eval-selection.label=Evaluate Selection
+factor-apropos.label=Apropos
 
 factor.title=Factor
+
+sidekick.parser.factor.label=Factor
+mode.factor.sidekick.parser=factor

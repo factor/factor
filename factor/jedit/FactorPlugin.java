@@ -33,13 +33,12 @@ import factor.listener.FactorListenerPanel;
 import factor.FactorInterpreter;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.*;
-import java.util.WeakHashMap;
 
 public class FactorPlugin extends EditPlugin
 {
 	private static final String DOCKABLE_NAME = "factor";
 
-	private static WeakHashMap views = new WeakHashMap();
+	private static FactorInterpreter interp;
 
 	//{{{ start() method
 	public void start()
@@ -48,16 +47,17 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 
 	//{{{ getInterpreter() method
-	public static FactorInterpreter getInterpreter(View view)
+	/**
+	 * This can be called from the SideKick thread and must be thread safe.
+	 */
+	public static synchronized FactorInterpreter getInterpreter()
 	{
-		FactorInterpreter interp = (FactorInterpreter)
-			views.get(view);
 		if(interp == null)
 		{
 			interp = FactorListenerPanel.newInterpreter(
 				new String[] { "-jedit" });
-			views.put(view,interp);
 		}
+
 		return interp;
 	} //}}}
 	

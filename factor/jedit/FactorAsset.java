@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003 Slava Pestov.
+ * Copyright (C) 2004 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,71 +27,33 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor;
+package factor.jedit;
 
-public class FactorParseException extends FactorException
+import javax.swing.Icon;
+import javax.swing.text.Position;
+import org.gjt.sp.jedit.Buffer;
+import sidekick.*;
+
+public class FactorAsset extends Asset
 {
-	private String filename;
-	private int lineno;
-	private int position;
-	private String msg;
-
-	public FactorParseException(
-		String filename,
-		int lineno,
-		String str)
+	public FactorAsset(String name, Position start)
 	{
-		super(filename + ":" + lineno + ": " + str);
-		this.filename = filename;
-		this.lineno = lineno;
-		this.msg = str;
+		super(name);
+		this.start = start;
 	}
 
-	public FactorParseException(
-		String filename,
-		int lineno,
-		String line,
-		int position,
-		String str)
+	public Icon getIcon()
 	{
-		super(filename + ":" + lineno + ": " + str
-			+ "\n" + getDetailMessage(line,position));
-		this.filename = filename;
-		this.lineno = lineno;
-		this.position = position;
-		this.msg = str;
+		return null;
 	}
-
-	public String getFileName()
+	
+	public String getShortString()
 	{
-		return filename;
+		return name;
 	}
-
-	public int getLineNumber()
+	
+	public String getLongString()
 	{
-		return lineno;
-	}
-
-	public int getPosition()
-	{
-		return position;
-	}
-
-	public String getMessage()
-	{
-		return msg;
-	}
-
-	private static String getDetailMessage(String line, int position)
-	{
-		if(line == null)
-			return "#<at end of file>";
-
-		StringBuffer buf = new StringBuffer(line);
-		buf.append('\n');
-		for(int i = 0; i < position; i++)
-			buf.append(' ');
-		buf.append('^');
-		return buf.toString();
+		return name;
 	}
 }

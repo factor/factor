@@ -7,6 +7,6 @@
 <DOCKABLES>
 	<DOCKABLE NAME="factor">
 		new factor.listener.FactorListenerPanel(
-			factor.jedit.FactorPlugin.getInterpreter(view));
+			factor.jedit.FactorPlugin.getInterpreter());
 	</DOCKABLE>
 </DOCKABLES>

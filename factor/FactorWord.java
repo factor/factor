@@ -78,6 +78,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 */
 	public String file;
 	public int line;
+	public int col;
 
 	private FactorNamespace namespace;
 

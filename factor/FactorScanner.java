@@ -93,6 +93,12 @@ public class FactorScanner
 		return lineNo;
 	} //}}}
 
+	//{{{ getColumnNumber() method
+	public int getColumnNumber()
+	{
+		return position;
+	} //}}}
+
 	//{{{ getFileName() method
 	public String getFileName()
 	{
