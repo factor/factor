@@ -49,7 +49,7 @@ public class FactorListenerPanel extends JPanel
 		{
 			FactorInterpreter interp = new FactorInterpreter();
 			interp.interactive = false;
-			interp.init(args,null);
+			interp.init(args);
 			return interp;
 		}
 		catch(Exception e)
