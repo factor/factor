@@ -2977,6 +2977,11 @@ all?
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 \layout Subsection
 
+
+\begin_inset LatexCommand \label{sub:List-constructors}
+
+\end_inset 
+
 List constructors
 \layout Standard
 
@@ -3241,14 +3246,14 @@ Hey
 \layout Standard
 
 Use of vector literals in source code is discouraged, since vector manipulation
- relies on side effects rather than return values, and it is very easy to
- mess up a literal embedded in a word definition.
+ relies on side effects rather than return values, and hence it is very
+ easy to mess up a literal embedded in a word definition.
 \layout Subsection
 
 Vectors versus lists
 \layout Standard
 
-Vectors are applicable for a different class of problems than lists.
+Vectors are applicable to a different class of problems than lists.
  Compare the relative performance of common operations on vectors and lists:
 \layout Standard
 
@@ -3672,36 +3677,754 @@ vector-each, vector-map
 \layout Section
 
 Strings
+\layout Standard
+
+A 
+\emph on 
+string
+\emph default 
+ is a sequence of 16-bit Unicode characters (conventionally, in the UTF16
+ encoding).
+ Strings are input by enclosing them in quotes:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+GET /index.html HTTP/1.0
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+String literals must not span more than one line.
+ The following is not valid:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+Content-Type: text/html
+\layout LyX-Code
+
+Content-Length: 1280
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+Instead, the newline must be represented using an escape, rather than literally.
+ The newline escape is 
+\family typewriter 
+
+\backslash 
+n
+\family default 
+, so we can write:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+Content-Type: text/html
+\backslash 
+nContent-Length: 1280
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+Other special characters, such as quotes and tabs can be input in a similar
+ manner.
+ Here is the full list of supported character escapes:
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features>
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Character
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Escape
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Quote
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+
+\begin_inset Quotes erd
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Newline
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+n
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Carriage return
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+r
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Horizontal tab
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+t
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Terminal escape
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+e
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Zero chacater
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+0
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Arbitrary Unicode character
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family typewriter 
+
+\backslash 
+u
+\emph on 
+nnnn
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+The last row shows a notation for inputting any possible character using
+ its hexadecimal value.
+ For example, a space character can also be input as 
+\family typewriter 
+
+\backslash 
+u0020
+\family default 
+.
+\layout Standard
+
+There is no specific character data type in Factor.
+ When characters are extracted from a string, they are pushed on the stack
+ as integers.
+ It is possible to input an integer with a value equal to that of a Unicode
+ character using the following special notation:
+\layout LyX-Code
+
+CHAR: A .
+\layout LyX-Code
+
+
+\emph on 
+65
+\layout LyX-Code
+
+CHAR: A 1 + CHAR: B = .
+\layout LyX-Code
+
+
+\emph on 
+t
 \layout Subsection
 
-Strings are character vectors
+String manipulation
 \layout Standard
 
-str-nth, str-length, substring, ...
+String words are found in the 
+\family typewriter 
+strings
+\family default 
+ vocabulary.
+ String manipulation words always return a new copy of a string rather than
+ modifying the string in-place.
+ Unlike lists, for which both constructive and destuctive manipulation words
+ are provided, destructive string operations are only done with a distinct
+ string buffer type, which is described in the next section.
+\layout Standard
+
+
+\family typewriter 
+str-length ( str -- n )
+\family default 
+ pushes the length of a string:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+Factor
+\begin_inset Quotes erd
+\end_inset 
+
+ str-length .
+\layout LyX-Code
+
+
+\emph on 
+6
+\layout Standard
+
+
+\family typewriter 
+str-nth ( n str -- ch )
+\family default 
+ pushes the character located by a zero-based index.
+ A string is essentially a vector specialized for storing one data type,
+ the 16-bit unsigned character.
+ These are returned as fixnums, so printing will not yield the actual character:
+\layout LyX-Code
+
+0 
+\begin_inset Quotes eld
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+ str-nth .
+\layout LyX-Code
+
+
+\emph on 
+32
+\layout Standard
+
+Notice the lack of operations such as 
+\family typewriter 
+set-str-nth
+\family default 
+ and 
+\family typewriter 
+set-str-length
+\family default 
+.
+ Instead, strings can be sliced using words such as 
+\family typewriter 
+substring
+\family default 
+, and concatenated together using an intermediate string buffer.
+\layout Standard
+
+index-of, substring, cat2/3/4/5, cat
 \layout Subsection
 
-String buffers are mutable
+String buffers
 \layout Standard
 
-<sbuf>, sbuf-append, sbuf>str
+A 
+\emph on 
+string buffer
+\emph default 
+ is a mutable string.
+ The canonical use for a string buffer is to combine several strings into
+ one.
+ This is done by creating a new string buffer, appending strings and characters,
+ and finally turning the string buffer into a string.
 \layout Standard
 
-Otherwise like a vector:
+
+\family typewriter 
+<sbuf> ( capacity -- sbuf )
+\family default 
+ pushes a new string buffer that is capable of holding up to the specified
+ capacity before growing.
 \layout Standard
 
-sbuf-nth, set-sbuf-nth, sbuf-length, set-sbuf-length
+
+\family typewriter 
+sbuf-append ( str/ch sbuf -- )
+\family default 
+ appends a string or a character to the end of the string buffer.
+ If a number is given, its least significant 16 bits are interpreted as
+ a character value:
+\layout LyX-Code
+
+100 <sbuf> 
+\begin_inset Quotes eld
+\end_inset 
+
+my-sbuf
+\begin_inset Quotes erd
+\end_inset 
+
+ set
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+Testing
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+my-sbuf
+\begin_inset Quotes erd
+\end_inset 
+
+ get sbuf-append
+\layout LyX-Code
+
+32 
+\begin_inset Quotes eld
+\end_inset 
+
+my-sbuf
+\begin_inset Quotes erd
+\end_inset 
+
+ get sbuf-append
+\layout Standard
+
+
+\family typewriter 
+sbuf>str ( sbuf -- str )
+\family default 
+ pushes a string with the same contents as the string buffer:
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+my-sbuf
+\begin_inset Quotes erd
+\end_inset 
+
+ get sbuf>str .
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+Testing 
+\begin_inset Quotes eld
+\end_inset 
+
+
+\layout Standard
+
+While usually string buffers are only used to concatenate a series of strings,
+ they also support the same operations as vectors.
+\layout Standard
+
+
+\family typewriter 
+sbuf-nth ( n sbuf -- ch )
+\family default 
+ pushes the character stored at a zero-based index of a string buffer:
+\layout LyX-Code
+
+2 
+\begin_inset Quotes eld
+\end_inset 
+
+A string.
+\begin_inset Quotes erd
+\end_inset 
+
+ str-nth .
+\layout LyX-Code
+
+
+\emph on 
+115
+\layout Standard
+
+
+\family typewriter 
+set-sbuf-nth ( ch n sbuf -- )
+\family default 
+ sets the character stored at a zero-based index of a string buffer.
+ Only the least significant 16 bits of the charcter are stored into the
+ string buffer.
+\layout Standard
+
+
+\family typewriter 
+sbuf-length ( sbuf -- n )
+\family default 
+ pushes the number of characters in a string buffer.
+ This is not the same as the capacity of the string buffer -- the capacity
+ is the internal storage size of the string buffer, the length is a possibly
+ smaller number indicating how much storage is in use.
+\layout Standard
+
+
+\family typewriter 
+set-sbuf-length ( n sbuf -- )
+\family default 
+ changes the length of the string buffer.
+ The string buffer's storage grows if necessary, and new character positions
+ are automatically filled with zeroes.
 \layout Subsection
 
 String constructors
 \layout Standard
 
-<% % %>
+The string construction words are the second example so far of dynamic scoping.
+ The first was the list construction words we saw in 
+\begin_inset LatexCommand \ref{sub:List-constructors}
+
+\end_inset 
+
+.
+ Scoping and variables is the subject of a future chapter.
+ However, a basic understanding is necessary to fully grasp list and string
+ construction words.
+\layout Standard
+
+In the list construction idiom, the 
+\family typewriter 
+[,
+\family default 
+ and 
+\family typewriter 
+,]
+\family default 
+ words started and ended a dynamic scope, during which the word 
+\family typewriter 
+,
+\family default 
+ appended elements on a list.
+ The 
+\family typewriter 
+<%
+\family default 
+ and 
+\family typewriter 
+%>
+\family default 
+ words similarly begin and end string construction.
+ Intuitively, 
+\family typewriter 
+%
+\family default 
+ appends the top of the stack to the currently-constructing string.
+\layout Standard
+
+The word 
+\family typewriter 
+<% ( -- )
+\family default 
+ begins string construction.
+ The word definition creates a string buffer.
+ Instead of leaving the string buffer on the stack, the word creates and
+ pushes a scope on the name stack.
+\layout Standard
+
+The word 
+\family typewriter 
+% ( str/ch -- )
+\family default 
+ appends a string or a character to the partial list.
+ The word definition calls 
+\family typewriter 
+sbuf-append
+\family default 
+ on a string buffer located by searching the name stack.
+\layout Standard
+
+The word 
+\family typewriter 
+%> ( -- str )
+\family default 
+ pushes the complete list.
+ The word definition pops the name stack and calls 
+\family typewriter 
+sbuf>str
+\family default 
+ on the appropriate string buffer.
+\layout Standard
+
+TODO examples
 \layout Subsection
 
 Printing and reading strings
 \layout Standard
 
-print, write, read, turning a string into a number
+These words, found in the 
+\family typewriter 
+stdio
+\family default 
+ vocabulary, differ from 
+\family typewriter 
+.
+
+\family default 
+ in that they print strings only, without surrounding quotes, and raise
+ an error for any other data type.
+ The word 
+\family typewriter 
+.
+
+\family default 
+ prints any Factor object in a form suited for parsing, hence it quotes
+ strings.
+\layout Standard
+
+
+\family typewriter 
+write ( str -- )
+\family default 
+ writes a string to the standard output device, without a terminating newline.
+\layout Standard
+
+
+\family typewriter 
+read ( -- str )
+\family default 
+ reads a line of input from the standard input device, terminated by a newline.
+\layout Standard
+
+
+\family typewriter 
+print ( str -- )
+\family default 
+ writes a string followed by a newline character.
+ Instead of passinga blank string, use 
+\family typewriter 
+terpri ( -- )
+\family default 
+ to print a single newline character.
+\layout LyX-Code
+
+
+\begin_inset Quotes eld
+\end_inset 
+
+a
+\begin_inset Quotes erd
+\end_inset 
+
+ write 
+\begin_inset Quotes eld
+\end_inset 
+
+b
+\begin_inset Quotes erd
+\end_inset 
+
+ write
+\layout LyX-Code
+
+ab
+\layout LyX-Code
+
+[ 
+\begin_inset Quotes eld
+\end_inset 
+
+hello
+\begin_inset Quotes erd
+\end_inset 
+
+ 
+\begin_inset Quotes eld
+\end_inset 
+
+world
+\begin_inset Quotes erd
+\end_inset 
+
+ ] [ print ] each
+\layout LyX-Code
+
+hello
+\layout LyX-Code
+
+world
+\layout Standard
+
+Often a string representation of a number, usually one read from an input
+ source, needs to be turned into a number.
+ Unlike some languages, in Factor the conversion from a string such as 
+\begin_inset Quotes eld
+\end_inset 
+
+123
+\begin_inset Quotes erd
+\end_inset 
+
+ into the number 123 is not automatic.
+ To turn a string into a number, use one of two words in the 
+\family typewriter 
+parser
+\family default 
+ vocabulary.
+\layout Standard
+
+
+\family typewriter 
+str>number ( str -- n )
+\family default 
+ creates an integer, ratio or floating point literal from its string representat
+ion.
+ If the string does not reprent a valid number, an exception is thrown.
+\layout Standard
+
+
+\family typewriter 
+parse-number ( str -- n/f )
+\family default 
+ pushes f on failure, rather than raising an exception.
+\layout Standard
+
+
+\family typewriter 
+unparse ( n -- str )
+\family default 
+ pushes the string representation of a number.
 \layout Section
 
 PRACTICAL: Contractor timesheet

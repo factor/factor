@@ -1,9 +1,21 @@
++ tests:
+
+- java factor: equal numbers have non-equal hashcodes!
 - java factor memory leak
+- vector=
+- sbuf=
+- vector-hashcode
+- {...} vectors in java factor
+- clone-sbuf
+- FactorLib.equal() not very good
+- test substitute, set-nth, remove-nth
+- do nset-nth, nremove-nth, nsubstitute, ninject
+
 - tail call optimization broken again
+- rethink strhead/strtail&co
 
 + listener:
 
-- top level broken
 - link style lingers
 - back space then type: input style gone
 - fedit broken with listener
@@ -12,20 +24,15 @@
 + native:
 
 - native float>bits
-- vector=
 - do something about "base" variable -- too fragile
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
 - errors: don't show .factor-rc
-- ratio comparsion, ratio bitops that coerce to integers
 - handle division by zero
 - fixup-words is crusty
 - decide if overflow is a fatal error
 - f >n: crashes
-- typecases: type error reporting bad
-- {...} vectors in java factor
 - parsing should be parsing
 - describe-word
-- clone-sbuf
 - contains ==> contains?
 - telnetd: send errors on socket
 - inspector: sort
@@ -39,7 +46,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + math:
 
-- FactorLib.equal() not very good
 - IN: format base: work with all types of numbers
 
 + compiler:
@@ -54,8 +60,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + misc:
 
-- test substitute, set-nth, remove-nth
-- do nset-nth, nremove-nth, nsubstitute, ninject
 - compiled stack traces broken
 - should i -i inf -inf be parsing words?
 - namespace clone drops static var bindings

@@ -339,12 +339,16 @@ DEFER: tree-contains?
 
 : cons-hashcode ( cons count -- hash )
     dup 0 = [
-        nip
+        2drop 0
     ] [
-        pred >r uncons r> tuck
-        cons-hashcode >r
-        cons-hashcode r>
-        xor
+        over cons? [
+            pred >r uncons r> tuck
+            cons-hashcode >r
+            cons-hashcode r>
+            bitxor
+        ] [
+            drop hashcode
+        ] ifte
     ] ifte ;
 
 : list>vector ( list -- vector )

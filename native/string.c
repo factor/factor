@@ -28,7 +28,7 @@ STRING* string(CELL capacity, CELL fill)
 	STRING* string = allot_string(capacity);
 
 	for(i = 0; i < capacity; i++)
-		put(SREF(string,i),fill);
+		cput(SREF(string,i),fill);
 
 	hash_string(string);
 
@@ -45,7 +45,7 @@ STRING* grow_string(STRING* string, CELL capacity, CHAR fill)
 	memcpy(new_string + 1,string + 1,string->capacity * CHARS);
 
 	for(i = string->capacity; i < capacity; i++)
-		put(SREF(new_string,i),fill);
+		cput(SREF(new_string,i),fill);
 
 	return new_string;
 }
@@ -59,7 +59,7 @@ STRING* from_c_string(const char* c_string)
 
 	for(i = 0; i < length; i++)
 	{
-		put(SREF(s,i),*c_string);
+		cput(SREF(s,i),*c_string);
 		c_string++;
 	}
 

@@ -26,3 +26,15 @@ unit-test
 [ f ]
 [ [ 1 2 | 3 ] hashtable? ]
 unit-test
+
+! Test some hashcodes.
+
+[ t ] [ [ 1 2 3 ] hashcode [ 1 2 3 ] hashcode = ] unit-test
+[ t ] [ [ f | t ] hashcode [ f | t ] hashcode = ] unit-test
+[ t ] [ [ 1 [ 2 3 ] 4 ] hashcode [ 1 [ 2 3 ] 4 ] hashcode = ] unit-test
+
+native? [
+    [ t ] [ 12 hashcode 12 hashcode = ] unit-test
+    [ t ] [ 12 >bignum hashcode 12 hashcode = ] unit-test
+    [ t ] [ 12.0 hashcode 12 >bignum hashcode = ] unit-test
+] when

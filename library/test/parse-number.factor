@@ -105,12 +105,12 @@ test-word
 [ parse-number ]
 test-word
 
-[ f ]
+[ -5 ]
 [ "10/-2" ]
 [ parse-number ]
 test-word
 
-[ f ]
+[ 5 ]
 [ "-10/-2" ]
 [ parse-number ]
 test-word

@@ -49,10 +49,15 @@ USE: words
 : image "image" get ;
 : emit ( cell -- ) image vector-push ;
 
+: lo/hi64 ( long -- hi lo )
+    dup
+    32 shift>
+    HEX: ffffffff bitand
+    swap
+    HEX: ffffffff bitand ;
+
 : emit64 ( bignum -- )
-    #! Little endian byte order
-    dup HEX: ffffffff bitand emit
-    32 shift> HEX: ffffffff bitand emit ;
+    lo/hi64 "big-endian" get [ swap ] when emit emit ;
 
 : fixup ( value offset -- ) image set-vector-nth ;
 

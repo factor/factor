@@ -70,9 +70,18 @@ public class NumberParser
 			char ch = word.charAt(i);
 			if(ch == '-')
 			{
-				if((i != 0 && Character.toLowerCase(
-					word.charAt(i - 1))
-					!= 'e') || word.length() == 1)
+				if(i != 0)
+				{
+					char c = Character.toLowerCase(
+						word.charAt(i - 1));
+					if(c != 'e' && c != '/')
+					{
+						number = false;
+						break;
+					}
+				}
+
+				if(word.length() == 1)
 				{
 					number = false;
 					break;
