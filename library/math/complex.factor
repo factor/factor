@@ -25,11 +25,30 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: errors
+DEFER: throw
+
 IN: math
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: math
 USE: math-internals
+
+GENERIC: real ( #{ re im } -- re )
+M: real real ;
+M: complex real 0 slot ;
+
+GENERIC: imaginary ( #{ re im } -- im )
+M: real imaginary drop 0 ;
+M: complex imaginary 1 slot ;
+
+: rect> ( xr xi -- x )
+    over real? over real? and [
+        dup 0 = [ drop ] [ (rect>) ] ifte
+    ] [
+        "Complex number must have real components" throw drop
+    ] ifte ; inline
 
 : >rect ( x -- xr xi ) dup real swap imaginary ; inline
 

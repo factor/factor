@@ -13,6 +13,8 @@
 
 + compiler:
 
+- slot compilation
+- optimize away dispatch
 - getenv/setenv: if literal arg, compile as a load/store
 - assembler opcodes dispatch on operand types
 - save code in image
@@ -21,6 +23,7 @@
 
 - make see work with generics
 - doc comments of generics
+- redo traits with generic method map
 
 + ffi:
 
@@ -47,10 +50,8 @@
 - remove sbufs
 - cat, reverse-cat primitives
 - first-class hashtables
-- rewrite accessors and mutators in Factor, with slot/set-slot primitive
 - add a socket timeout
 - do transfer-word in fixup
-- move dispatch getenv setenv to kernel-internals
 
 + misc:
 
@@ -62,8 +63,7 @@
 - jedit ==> jedit-word, jedit takes a file name
 - nicer way to combine two paths
 - ditch object paths
-- browser responder for word links in HTTPd; inspect responder for
-  objects
+- browser responder for word links in HTTPd
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link
 

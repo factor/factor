@@ -10,6 +10,7 @@ USE: namespaces
 USE: prettyprint
 USE: words
 USE: kernel
+USE: kernel-internals
 USE: generic
 
 : dataflow-contains-op? ( object list -- ? )
@@ -36,7 +37,7 @@ USE: generic
     car car ; inline
 
 [ t ] [
-    \ car [ inline-test ] dataflow dataflow-contains-param? >boolean
+    \ slot [ inline-test ] dataflow dataflow-contains-param? >boolean
 ] unit-test
 
 [ t ] [

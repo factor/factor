@@ -25,9 +25,15 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: kernel-internals
 USE: generic
+USE: kernel
 USE: vectors
+
+: dispatch ( n vtable -- )
+    vector-nth call ;
+
+IN: kernel
 
 GENERIC: hashcode ( obj -- n )
 M: object hashcode drop 0 ;
@@ -42,9 +48,6 @@ M: object = eq? ;
 : os ( -- arch )
     #! Returns one of "unix" or "win32".
     11 getenv ;
-
-: dispatch ( n vtable -- )
-    vector-nth call ;
 
 : set-boot ( quot -- )
     #! Set the boot quotation.

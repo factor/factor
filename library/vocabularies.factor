@@ -77,14 +77,14 @@ USE: strings
 
 : (create) ( name vocab -- word )
     #! Create an undefined word without adding to a vocabulary.
-    <plist> 0 f rot <word> ;
+    <plist> <word> [ set-word-plist ] keep ;
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
     vocabularies get [
-        dup word-vocabulary
-        over word-name
-        2list set-object-path
+        dup word-vocabulary nest [
+            dup word-name set
+        ] bind
     ] bind ;
 
 : create ( name vocab -- word )
@@ -115,7 +115,6 @@ USE: strings
         "inference"
         "inferior"
         "interpreter"
-        "inspector"
         "jedit"
         "kernel"
         "listener"

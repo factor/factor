@@ -136,13 +136,18 @@ USE: parser
         ] when*
     ] catch ;
 
-: apply-compound ( word -- )
+GENERIC: (apply-word)
+
+M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
     dup "inline" word-property [
         inline-compound drop
     ] [
         infer-compound
     ] ifte ;
+
+M: symbol (apply-word) ( word -- )
+    apply-literal ;
 
 : current-word ( -- word )
     #! Push word we're currently inferring effect of.
@@ -175,9 +180,6 @@ USE: parser
         2drop no-base-case
     ] ifte ;
 
-: no-effect? ( word -- ? )
-    "no-effect" word-property ;
-
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc dup [
@@ -186,13 +188,11 @@ USE: parser
         drop dup "infer-effect" word-property dup [
             apply-effect
         ] [
-            drop
-            [
-                [ no-effect? ] [ no-effect      ]
-                [ compound?  ] [ apply-compound ]
-                [ symbol?    ] [ apply-literal  ]
-                [ drop t     ] [ no-effect      ]
-            ] cond
+            drop dup "no-effect" word-property [
+                no-effect
+            ] [
+                (apply-word)
+            ] ifte
         ] ifte
     ] ifte ;
 

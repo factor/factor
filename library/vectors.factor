@@ -25,17 +25,40 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel-internals
 USE: generic
-
-BUILTIN: array 8
-
-IN: vectors
 USE: kernel
 USE: lists
 USE: math
 
+IN: errors
+DEFER: throw
+
+IN: kernel-internals
+
+BUILTIN: array 8
+
+! UNSAFE!
+: array-capacity   ( array -- n )   1 integer-slot ; inline
+: vector-array     ( vec -- array ) 2 slot ; inline
+: set-vector-array ( array vec -- ) 2 set-slot ; inline
+
+: grow-vector-array ( len vec -- )
+    [ vector-array grow-array ] keep set-vector-array ; inline
+
+: (set-vector-length) ( len vec -- ) 1 set-integer-slot ; inline
+
+IN: vectors
+
 BUILTIN: vector 11
+
+: vector-length ( vec -- len ) >vector 1 integer-slot ; inline
+
+: set-vector-length ( len vec -- )
+    >vector over 0 < [
+        "Vector length must be positive" throw 2drop
+    ] [
+        2dup (set-vector-length) grow-vector-array
+    ] ifte ;
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
@@ -162,3 +185,10 @@ M: vector hashcode ( vec -- n )
     #! vector. For example, if n=1, this returns a vector of
     #! one element.
     [ vector-length swap - ] keep vector-tail ;
+
+! Find a better place for this
+IN: kernel
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack vector-length ;

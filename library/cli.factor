@@ -54,8 +54,12 @@ USE: words
         ?run-file
     ] when ;
 
-: cli-var-param ( name value -- )
-    swap ":" split set-object-path ;
+: set-path ( value list -- )
+    unswons over [ nest [ set-path ] bind ] [ nip set ] ifte ;
+
+: cli-var-param ( name value -- ) swap ":" split set-path ;
+
+: cli-bool-param ( name -- ) "no-" ?str-head not put ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -64,11 +68,7 @@ USE: words
     #!
     #! Arguments containing = are handled differently; they
     #! set the object path.
-    "=" split1 [
-        cli-var-param
-    ] [
-        "no-" ?str-head not put
-    ] ifte* ;
+    "=" split1 [ cli-var-param ] [ cli-bool-param ] ifte* ;
 
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was

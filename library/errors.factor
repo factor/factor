@@ -30,6 +30,7 @@ DEFER: callcc1
 
 IN: errors
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 USE: namespaces

@@ -17,12 +17,7 @@ void primitive_cons(void)
 	dpush(cons(car,cdr));
 }
 
-void primitive_car(void)
+void primitive_to_cons(void)
 {
-	drepl(car(dpeek()));
-}
-
-void primitive_cdr(void)
-{
-	drepl(cdr(dpeek()));
+	type_check(CONS_TYPE,dpeek());
 }

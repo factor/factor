@@ -14,28 +14,9 @@ void primitive_vector(void)
 	drepl(tag_object(vector(to_fixnum(dpeek()))));
 }
 
-void primitive_vector_length(void)
+void primitive_to_vector(void)
 {
-	drepl(tag_fixnum(untag_vector(dpeek())->top));
-}
-
-void primitive_set_vector_length(void)
-{
-	F_VECTOR* vector;
-	F_FIXNUM length;
-	F_ARRAY* array;
-
-	maybe_garbage_collection();
-
-	vector = untag_vector(dpop());
-	length = to_fixnum(dpop());
-	array = untag_array(vector->array);
-
-	if(length < 0)
-		range_error(tag_object(vector),0,tag_fixnum(length),vector->top);
-	vector->top = length;
-	if(length > array->capacity)
-		vector->array = tag_object(grow_array(array,length,F));
+	type_check(VECTOR_TYPE,dpeek());
 }
 
 void primitive_vector_nth(void)

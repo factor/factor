@@ -26,17 +26,24 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
+USE: alien
 USE: math
 USE: kernel
 
-: cell 4 ;
-: literal-table 1024 cell * ;
+: cell 4 ; inline
+: literal-table 1024 cell * ; inline
 
 : init-assembler ( -- )
     compiled-offset literal-table + set-compiled-offset ;
 
+: set-compiled-byte ( n addr -- )
+    <alien> 0 set-alien-1 ; inline
+
+: set-compiled-cell ( n addr -- )
+    <alien> 0 set-alien-cell ; inline
+
 : compile-aligned ( n -- )
-    compiled-offset swap align set-compiled-offset ;
+    compiled-offset swap align set-compiled-offset ; inline
 
 : intern-literal ( obj -- lit# )
     address
@@ -45,8 +52,8 @@ USE: kernel
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte
-    compiled-offset 1 + set-compiled-offset ;
+    compiled-offset 1 + set-compiled-offset ; inline
 
 : compile-cell ( n -- )
     compiled-offset set-compiled-cell
-    compiled-offset cell + set-compiled-offset ;
+    compiled-offset cell + set-compiled-offset ; inline

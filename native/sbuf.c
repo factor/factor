@@ -168,7 +168,7 @@ void primitive_sbuf_eq(void)
 {
 	F_SBUF* s1 = untag_sbuf(dpop());
 	CELL with = dpop();
-	if(typep(SBUF_TYPE,with))
+	if(type_of(with) == SBUF_TYPE)
 		dpush(tag_boolean(sbuf_eq(s1,(F_SBUF*)UNTAG(with))));
 	else
 		dpush(F);

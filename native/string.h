@@ -42,7 +42,6 @@ INLINE void set_string_nth(F_STRING* string, CELL index, uint16_t value)
 	cput(SREF(string,index),value);
 }
 
-void primitive_string_length(void);
 void primitive_string_nth(void);
 F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len);
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2);
@@ -54,3 +53,4 @@ void primitive_substring(void);
 void string_reverse(F_STRING* s, int len);
 F_STRING* string_clone(F_STRING* s, int len);
 void primitive_string_reverse(void);
+void primitive_to_string(void);

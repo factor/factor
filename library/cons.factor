@@ -28,12 +28,16 @@
 IN: lists
 USE: generic
 USE: kernel
+USE: kernel-internals
 
 ! This file contains vital list-related words that everything
 ! else depends on, and is loaded early in bootstrap.
 ! lists.factor has everything else.
 
 BUILTIN: cons 2
+
+: car ( [ car | cdr ] -- car ) >cons 0 slot ; inline
+: cdr ( [ car | cdr ] -- cdr ) >cons 1 slot ; inline
 
 : swons ( cdr car -- [ car | cdr ] )
     #! Push a new cons cell. If the cdr is f or a proper list,

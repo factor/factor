@@ -28,6 +28,7 @@
 IN: strings
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 
@@ -35,6 +36,8 @@ USE: math
 BUILTIN: string 12
 M: string hashcode str-hashcode ;
 M: string = str= ;
+
+: str-length ( str -- len ) >string 1 integer-slot ; inline
 
 BUILTIN: sbuf   13
 M: sbuf hashcode sbuf-hashcode ;

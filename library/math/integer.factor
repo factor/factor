@@ -25,6 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: errors
+DEFER: throw
+
 IN: math-internals
 USE: generic
 USE: kernel
@@ -33,6 +36,17 @@ USE: math
 : reduce ( x y -- x' y' )
     dup 0 < [ swap neg swap neg ] when
     2dup gcd tuck /i >r /i r> ; inline
+
+: fraction> ( a b -- a/b )
+    dup 0 = [
+        "Division by zero" throw drop
+    ] [
+        dup 1 = [
+            drop
+        ] [
+            (fraction>)
+        ] ifte
+    ] ifte ; inline
 
 : integer/ ( x y -- x/y )
     reduce fraction> ; inline

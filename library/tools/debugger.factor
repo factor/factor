@@ -27,6 +27,7 @@
 
 IN: errors
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: namespaces
 USE: prettyprint
@@ -63,10 +64,7 @@ USE: generic
     #! reporting.
     dup [
         [ 100 | "fixnum/bignum" ]
-        [ 101 | "fixnum/bignum/ratio" ]
-        [ 102 | "fixnum/bignum/ratio/float" ]
-        [ 103 | "fixnum/bignum/ratio/float/complex" ]
-        [ 104 | "fixnum/string" ]
+        [ 104 | "fixnum/bignum/string" ]
     ] assoc dup [
         nip
     ] [

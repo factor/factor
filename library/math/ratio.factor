@@ -25,10 +25,22 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math-internals
+IN: math
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: math
+USE: math-internals
+
+GENERIC: numerator ( a/b -- a )
+M: integer numerator ;
+M: ratio numerator 0 slot ;
+
+GENERIC: denominator ( a/b -- b )
+M: integer denominator drop 1 ;
+M: ratio denominator 1 slot ;
+
+IN: math-internals
 
 : 2>fraction ( a/b c/d -- a c b d )
     [ swap numerator swap numerator ] 2keep

@@ -1,10 +1,5 @@
 #include "factor.h"
 
-bool typep(CELL type, CELL tagged)
-{
-	return type_of(tagged) == type;
-}
-
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
@@ -101,4 +96,36 @@ CELL untagged_object_size(CELL pointer)
 void primitive_type(void)
 {
 	drepl(tag_fixnum(type_of(dpeek())));
+}
+
+#define SLOT(obj,slot) UNTAG(obj) + slot * CELLS
+
+void primitive_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = dpop();
+	dpush(get(SLOT(obj,slot)));
+}
+
+void primitive_set_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = dpop();
+	CELL value = dpop();
+	put(SLOT(obj,slot),value);
+}
+
+void primitive_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = dpop();
+	dpush(tag_integer(get(SLOT(obj,slot))));
+}
+
+void primitive_set_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = dpop();
+	F_FIXNUM value = to_integer(dpop());
+	put(SLOT(obj,slot),value);
 }

@@ -194,5 +194,6 @@ USE: hashtables
     pop-d drop ( n )
     infer-branches ;
 
+USE: kernel-internals
 \ dispatch [ infer-dispatch ] "infer" set-word-property
 \ dispatch [ 2 | 0 ] "infer-effect" set-word-property

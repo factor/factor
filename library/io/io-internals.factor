@@ -28,6 +28,7 @@
 IN: io-internals
 USE: generic
 USE: kernel
+USE: kernel-internals
 USE: namespaces
 USE: strings
 USE: threads

@@ -1,19 +1,5 @@
 #include "factor.h"
 
-F_WORD* word(CELL primitive, CELL parameter, CELL plist)
-{
-	F_WORD* word = allot_object(WORD_TYPE,sizeof(F_WORD));
-	word->hashcode = (CELL)word; /* initial address */
-	word->xt = primitive_to_xt(primitive);
-	word->primitive = primitive;
-	word->parameter = parameter;
-	word->plist = plist;
-	word->call_count = 0;
-	word->allot_count = 0;
-
-	return word;
-}
-
 /* When a word is executed we jump to the value of the xt field. However this
    value is an unportable function pointer, so in the image we store a primitive
    number that indexes a list of xts. */
@@ -25,93 +11,35 @@ void update_xt(F_WORD* word)
 /* <word> ( primitive parameter plist -- word ) */
 void primitive_word(void)
 {
-	CELL plist, parameter;
-	F_FIXNUM primitive;
+	F_WORD* word;
 
 	maybe_garbage_collection();
 
-	plist = dpop();
-	parameter = dpop();
-	primitive = to_fixnum(dpop());
-	dpush(tag_word(word(primitive,parameter,plist)));
+	word = allot_object(WORD_TYPE,sizeof(F_WORD));
+	word->hashcode = (CELL)word; /* initial address */
+	word->xt = (CELL)undefined;
+	word->primitive = 0;
+	word->parameter = F;
+	word->plist = F;
+	word->call_count = 0;
+	word->allot_count = 0;
+	dpush(tag_word(word));
 }
 
-void primitive_word_hashcode(void)
+void primitive_update_xt(void)
 {
-	drepl(tag_fixnum(untag_word(dpeek())->hashcode));
-}
-
-void primitive_word_xt(void)
-{
-	drepl(tag_cell(untag_word(dpeek())->xt));
-}
-
-void primitive_set_word_xt(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->xt = unbox_integer();
-}
-
-void primitive_word_primitive(void)
-{
-	drepl(tag_fixnum(untag_word(dpeek())->primitive));
-}
-
-void primitive_set_word_primitive(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->primitive = to_fixnum(dpop());
-	update_xt(word);
-}
-
-void primitive_word_parameter(void)
-{
-	drepl(untag_word(dpeek())->parameter);
-}
-
-void primitive_set_word_parameter(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->parameter = dpop();
-}
-
-void primitive_word_plist(void)
-{
-	drepl(untag_word(dpeek())->plist);
-}
-
-void primitive_set_word_plist(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->plist = dpop();
-}
-
-void primitive_word_call_count(void)
-{
-	drepl(tag_cell(untag_word(dpeek())->call_count));
-}
-
-void primitive_set_word_call_count(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->call_count = to_fixnum(dpop());
-}
-
-void primitive_word_allot_count(void)
-{
-	drepl(tag_cell(untag_word(dpeek())->allot_count));
-}
-
-void primitive_set_word_allot_count(void)
-{
-	F_WORD* word = untag_word(dpop());
-	word->allot_count = to_fixnum(dpop());
+	update_xt(untag_word(dpop()));
 }
 
 void primitive_word_compiledp(void)
 {
 	F_WORD* word = untag_word(dpop());
 	box_boolean(word->xt != (CELL)docol && word->xt != (CELL)dosym);
+}
+
+void primitive_to_word(void)
+{
+	type_check(WORD_TYPE,dpeek());
 }
 
 void fixup_word(F_WORD* word)

@@ -59,18 +59,6 @@ void primitive_float_to_str(void)
 	box_c_string(tmp);
 }
 
-void primitive_float_to_bits(void)
-{
-	double f;
-	int64_t f_raw;
-
-	maybe_garbage_collection();
-
-	f = untag_float(dpeek());
-	f_raw = *(int64_t*)&f;
-	drepl(tag_object(s48_long_long_to_bignum(f_raw)));
-}
-
 #define GC_AND_POP_FLOATS(x,y) \
 	double x, y; \
 	maybe_garbage_collection(); \

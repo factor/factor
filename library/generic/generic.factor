@@ -29,6 +29,7 @@ IN: generic
 USE: errors
 USE: hashtables
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: namespaces
 USE: parser

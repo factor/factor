@@ -30,22 +30,10 @@ INLINE CELL tag_word(F_WORD* word)
 	return RETAG(word,WORD_TYPE);
 }
 
-F_WORD* word(CELL primitive, CELL parameter, CELL plist);
 void update_xt(F_WORD* word);
 void primitive_word(void);
-void primitive_word_hashcode(void);
-void primitive_word_primitive(void);
-void primitive_set_word_primitive(void);
-void primitive_word_xt(void);
-void primitive_set_word_xt(void);
-void primitive_word_parameter(void);
-void primitive_set_word_parameter(void);
-void primitive_word_plist(void);
-void primitive_set_word_plist(void);
-void primitive_word_call_count(void);
-void primitive_set_word_call_count(void);
-void primitive_word_allot_count(void);
-void primitive_set_word_allot_count(void);
+void primitive_update_xt(void);
 void primitive_word_compiledp(void);
+void primitive_to_word(void);
 void fixup_word(F_WORD* word);
 void collect_word(F_WORD* word);

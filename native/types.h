@@ -38,12 +38,7 @@ CELL T;
 
 /* Pseudo-types. For error reporting only. */
 #define INTEGER_TYPE 100 /* F_FIXNUM or BIGNUM */
-#define RATIONAL_TYPE 101 /* INTEGER or F_RATIO */
-#define REAL_TYPE 102 /* RATIONAL or F_FLOAT */
-#define NUMBER_TYPE 103 /* F_COMPLEX or REAL */
 #define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
-
-bool typep(CELL type, CELL tagged);
 
 INLINE CELL tag_header(CELL cell)
 {
@@ -117,3 +112,8 @@ INLINE CELL type_of(CELL tagged)
 	else
 		return tag;
 }
+
+void primitive_slot(void);
+void primitive_set_slot(void);
+void primitive_integer_slot(void);
+void primitive_set_integer_slot(void);

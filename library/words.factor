@@ -29,6 +29,7 @@ IN: words
 USE: generic
 USE: hashtables
 USE: kernel
+USE: kernel-internals
 USE: lists
 USE: math
 USE: namespaces
@@ -36,17 +37,36 @@ USE: strings
 
 BUILTIN: word 1
 
-M: word hashcode word-hashcode ;
+M: word hashcode 1 integer-slot ;
+
+: word-xt     ( w -- xt ) >word 2 integer-slot ; inline
+: set-word-xt ( xt w -- ) >word 2 set-integer-slot ; inline
+
+: word-primitive ( w -- n ) >word 3 integer-slot ; inline
+: set-word-primitive ( n w -- )
+    >word [ 3 set-integer-slot ] keep update-xt ; inline
+
+: word-parameter     ( w -- obj ) >word 4 slot ; inline
+: set-word-parameter ( obj w -- ) >word 4 set-slot ; inline
+
+: word-plist     ( w -- obj ) >word 5 slot ; inline
+: set-word-plist ( obj w -- ) >word 5 set-slot ; inline
+
+: call-count     ( w -- n ) >word 6 integer-slot ; inline
+: set-call-count ( n w -- ) >word 6 set-integer-slot ; inline
+
+: allot-count     ( w -- n ) >word 7 integer-slot ; inline
+: set-allot-count ( n w -- ) >word 7 set-integer-slot ; inline
 
 SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )
-    swap word-plist assoc ;
+    swap word-plist assoc ; inline
 
 : set-word-property ( word pvalue pname -- )
     pick word-plist
     pick [ set-assoc ] [ remove-assoc nip ] ifte
-    swap set-word-plist ;
+    swap set-word-plist ; inline
 
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;

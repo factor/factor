@@ -139,11 +139,6 @@ BYTE* unbox_c_string(void)
 	return to_c_string(untag_string(dpop()));
 }
 
-void primitive_string_length(void)
-{
-	drepl(tag_fixnum(untag_string(dpeek())->capacity));
-}
-
 void primitive_string_nth(void)
 {
 	F_STRING* string = untag_string(dpop());
@@ -205,7 +200,7 @@ void primitive_string_eq(void)
 {
 	F_STRING* s1 = untag_string(dpop());
 	CELL with = dpop();
-	if(typep(STRING_TYPE,with))
+	if(type_of(with) == STRING_TYPE)
 		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
 	else
 		dpush(F);
@@ -348,4 +343,9 @@ void primitive_string_reverse(void)
 	string_reverse(s,s->capacity);
 	rehash_string(s);
 	drepl(tag_object(s));
+}
+
+void primitive_to_string(void)
+{
+	type_check(STRING_TYPE,dpeek());
 }

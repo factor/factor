@@ -110,17 +110,6 @@ USE: generic
         call
     ] ifte* ;
 
-: object-link-href ( path -- href )
-    #! Perhaps this should not be hard-coded.
-    "/responder/inspect/" swap cat2 ;
-
-: object-link-tag ( style quot -- )
-    over "object-link" swap assoc [
-        <a href= object-link-href url-encode a> call </a>
-    ] [
-        call
-    ] ifte* ;
-
 : icon-tag ( string style quot -- )
     over "icon" swap assoc dup [
         <img src= "/responder/resource/" swap cat2 img/>
@@ -137,10 +126,8 @@ M: html-stream fwrite-attr ( str style stream -- )
     [
         [
             [
-                [
-                    [ drop chars>entities write ] span-tag
-                ] file-link-tag
-            ] object-link-tag
+                [ drop chars>entities write ] span-tag
+            ] file-link-tag
         ] icon-tag
     ] bind ;
 

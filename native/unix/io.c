@@ -126,7 +126,7 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks,
 
 	for(i = 0; i < fd_count; i++)
 	{
-		if(typep(PORT_TYPE,io_tasks[i].port))
+		if(type_of(io_tasks[i].port) == PORT_TYPE)
 		{
 			if(untag_port(io_tasks[i].port)->closed)
 				*closed = true;
@@ -205,7 +205,7 @@ CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count)
 	{
 		IO_TASK io_task = io_tasks[i];
 
-		if(typep(PORT_TYPE,io_task.port))
+		if(type_of(io_task.port) == PORT_TYPE)
 		{
 			F_PORT* port = untag_port(io_task.port);
 			if(port->closed)

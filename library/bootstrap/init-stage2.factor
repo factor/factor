@@ -42,6 +42,7 @@ USE: stdio
 USE: presentation
 USE: words
 USE: unparser
+USE: kernel-internals
 
 : cli-args ( -- args ) 10 getenv ;
 
