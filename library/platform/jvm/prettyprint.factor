@@ -55,5 +55,6 @@ USE: words
     [
         [ compound-or-compiled? ] [ worddef>list prettyprint-:; ]
         [ shuffle? ] [ worddef>list prettyprint-~<<>>~ ]
-        [ drop t ] [ "PRIMITIVE: " write unparse write drop ]
+        [ primitive? ] [ "PRIMITIVE: " write unparse write drop ]
+        [ drop t ] [ 2drop "Not defined" print ]
     ] cond prettyprint-newline ;

@@ -62,8 +62,8 @@ word >str "last-word-test" set
 [ f ] [ 5 ] [ shuffle?  ] test-word
 
 [ t ] [ ] [
-    [ "global" "vocabularies" "test" "test-word" "def" ] object-path
-    "test-word" [ "test" ] search worddef =
+    [ "global" "vocabularies" "test" "test-word" ] object-path
+    "test-word" [ "test" ] search eq?
 ] test-word
 
 ! Make sure callstack only clones callframes, and not

@@ -66,17 +66,10 @@ USE: vocabularies
     [ vars max-str-length vars-values ] bind
     [ dupd value. ] each drop ;
 
-: describe-word ( word -- )
-    !intern dup worddef [ dup see terpri ] when
-    !"PROPERTY LIST:" print
-    !"--------------" print
-    !describe-namespace ;
-    ;
-
 : describe ( obj -- )
     [
         [ word? ]
-        [ describe-word ]
+        [ see ]
         
         [ string? ]
         [ print ]

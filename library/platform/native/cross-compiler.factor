@@ -162,3 +162,11 @@ IN: cross-compiler
 
 : cross-compile-resource ( resource -- )
     parse-resource cross-compile ;
+
+: make-image ( -- )
+    #! Make an image for the C interpreter.
+    [
+        "/library/platform/native/boot.factor" run-resource
+    ] with-image
+
+    "native/factor.image" write-image ;

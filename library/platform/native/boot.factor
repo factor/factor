@@ -42,65 +42,61 @@ USE: vectors
 USE: words
 USE: cross-compiler
 
+primitives,
 [
-    primitives,
-    [
-        "/library/ansi.factor"
-        "/library/assoc.factor"
-        "/library/combinators.factor"
-        "/library/cons.factor"
-        "/library/continuations.factor"
-        "/library/format.factor"
-        "/library/hashtables.factor"
-        "/library/init.factor"
-        "/library/inspector.factor"
-        "/library/interpreter.factor"
-        "/library/list-namespaces.factor"
-        "/library/logging.factor"
-        "/library/logic.factor"
-        "/library/namespaces.factor"
-        "/library/prettyprint.factor"
-        "/library/sbuf.factor"
-        "/library/stdio.factor"
-        "/library/stream.factor"
-        "/library/strings.factor"
-        "/library/styles.factor"
-        "/library/vectors.factor"
-        "/library/vector-combinators.factor"
-        "/library/vocabularies.factor"
-        "/library/vocabulary-style.factor"
-        "/library/words.factor"
-        "/library/math/math-combinators.factor"
-        "/library/math/namespace-math.factor"
-        "/library/platform/native/errors.factor"
-        "/library/platform/native/io-internals.factor"
-        "/library/platform/native/stream.factor"
-        "/library/platform/native/kernel.factor"
-        "/library/platform/native/namespaces.factor"
-        "/library/platform/native/parser.factor"
-        "/library/platform/native/prettyprint.factor"
-        "/library/platform/native/stack.factor"
-        "/library/platform/native/words.factor"
-        "/library/platform/native/vectors.factor"
-        "/library/platform/native/vocabularies.factor"
-        "/library/platform/native/unparser.factor"
-        "/library/platform/native/init.factor"
-    ] [
-        cross-compile-resource
-    ] each
-    !!"/library/lists.factor"
-    [
-        between? min max
-        append add remove contains unique
-        pred succ neg fib each nreverse nreverse-iter
-        max 2list length reverse nth list? 2rlist
-        all? clone-list clone-list-iter subset subset-iter
-        subset-add car= cdr= cons= cons-hashcode
-    ] [ worddef worddef, ] each
+    "/library/ansi.factor"
+    "/library/assoc.factor"
+    "/library/combinators.factor"
+    "/library/cons.factor"
+    "/library/continuations.factor"
+    "/library/format.factor"
+    "/library/hashtables.factor"
+    "/library/init.factor"
+    "/library/inspector.factor"
+    "/library/interpreter.factor"
+    "/library/list-namespaces.factor"
+    "/library/logging.factor"
+    "/library/logic.factor"
+    "/library/namespaces.factor"
+    "/library/prettyprint.factor"
+    "/library/sbuf.factor"
+    "/library/stdio.factor"
+    "/library/stream.factor"
+    "/library/strings.factor"
+    "/library/styles.factor"
+    "/library/vectors.factor"
+    "/library/vector-combinators.factor"
+    "/library/vocabularies.factor"
+    "/library/vocabulary-style.factor"
+    "/library/words.factor"
+    "/library/math/math-combinators.factor"
+    "/library/math/namespace-math.factor"
+    "/library/platform/native/errors.factor"
+    "/library/platform/native/io-internals.factor"
+    "/library/platform/native/stream.factor"
+    "/library/platform/native/kernel.factor"
+    "/library/platform/native/namespaces.factor"
+    "/library/platform/native/parser.factor"
+    "/library/platform/native/prettyprint.factor"
+    "/library/platform/native/stack.factor"
+    "/library/platform/native/words.factor"
+    "/library/platform/native/vectors.factor"
+    "/library/platform/native/vocabularies.factor"
+    "/library/platform/native/unparser.factor"
+    "/library/platform/native/init.factor"
+] [
+    cross-compile-resource
+] each
+[
+    ! We don't include all of 'lists' or 'math' yet...
+    between? min max
+    append add remove contains unique
+    pred succ neg fib each nreverse nreverse-iter
+    max 2list length reverse nth list? 2rlist
+    all? clone-list clone-list-iter subset subset-iter
+    subset-add car= cdr= cons= cons-hashcode
+] [ worddef worddef, ] each
 
-    version,
-    
-    [ boot ] (set-boot)
-] with-image
+version,
 
-"/home/slava/CFactor/factor.image" write-image
+[ boot ] (set-boot)

@@ -35,6 +35,6 @@ USE: test
 [ 3 4 1 2 3 4 ] [ 1 2 3 4     ] [ 2tuck    ] test-word
 
 [             ] [ 1           ] [ >r r> drop           ] test-word
-[ 2 1         ] [ 1 2         ] [ >r >r r> r>            ] test-word
+[ 1 2         ] [ 1 2         ] [ >r >r r> r>            ] test-word
 
 "Stack checks passed." print
