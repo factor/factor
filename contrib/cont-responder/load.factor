@@ -49,4 +49,4 @@ USE: parser
 : l8 "browser.factor" run-file ;
 : la ;
 : la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
-: lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
+! : lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
