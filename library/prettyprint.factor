@@ -130,8 +130,12 @@ DEFER: prettyprint*
     #! Pretty-print a vector, without { and }.
     [ [ prettyprint-element ] vector-each ] check-recursion ;
 
-: prettyprint-{} ( indent list -- indent )
-    swap prettyprint-{ swap prettyprint-vector prettyprint-} ;
+: prettyprint-{} ( indent vector -- indent )
+    dup vector-length 0 = [
+        drop "{ }" write
+    ] [
+        swap prettyprint-{ swap prettyprint-vector prettyprint-}
+    ] ifte ;
 
 : trim-newline ( str -- str )
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;

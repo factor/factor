@@ -38,6 +38,9 @@ USE: strings
 : run-file ( path -- )
     parse-file call ;
 
+: <resource-stream> ( path -- stream )
+    <rreader> f <char-stream> ;
+
 : parse-resource* ( resource -- list )
     dup <rreader> swap "resource:" swap cat2 swap parse-stream ;
 

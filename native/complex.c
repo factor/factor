@@ -162,26 +162,29 @@ CELL divfloat_complex(CELL x, CELL y)
 	return possibly_complex(divfloat(r,mag),divfloat(i,mag));
 }
 
+#define INCOMPARABLE(x,y) general_error(ERROR_INCOMPARABLE, \
+	tag_cons(cons(tag_complex(x),tag_complex(y))));
+
 CELL less_complex(CELL x, CELL y)
 {
-	general_error(ERROR_INCOMPARABLE,tag_cons(cons(x,y)));
+	INCOMPARABLE(x,y);
 	return F;
 }
 
 CELL lesseq_complex(CELL x, CELL y)
 {
-	general_error(ERROR_INCOMPARABLE,tag_cons(cons(x,y)));
+	INCOMPARABLE(x,y);
 	return F;
 }
 
 CELL greater_complex(CELL x, CELL y)
 {
-	general_error(ERROR_INCOMPARABLE,tag_cons(cons(x,y)));
+	INCOMPARABLE(x,y);
 	return F;
 }
 
 CELL greatereq_complex(CELL x, CELL y)
 {
-	general_error(ERROR_INCOMPARABLE,tag_cons(cons(x,y)));
+	INCOMPARABLE(x,y);
 	return F;
 }

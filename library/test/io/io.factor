@@ -23,3 +23,9 @@ USE: test
 ] [
     "/library/test/io/mac-os-eol.txt" <resource-stream> lines-test
 ] unit-test
+
+[
+    "This is a line.\rThis is another line.\r"
+] [
+    500 "/library/test/io/mac-os-eol.txt" <resource-stream> fread#
+] unit-test

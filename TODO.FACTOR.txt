@@ -1,10 +1,8 @@
 - plugin should not exit jEdit on fatal errors
 - auto insert USE:
 - add a socket timeout
-- read# and eof
 - don't allow multiple reads on the same port
 - multiple tasks should be able to write to the same port
-- prettyprinting an empty vector
 - jvm factor -- still supporting httpd?
 - make inferior.factor nicer to use
 
@@ -47,7 +45,6 @@
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - better i/o scheduler
-- better error reporting
 
 + JVM compiler:
 

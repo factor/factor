@@ -222,7 +222,7 @@ public class FactorLib
 		int read = 0;
 		while((read = in.read(bytes,offset,count - offset)) > 0)
 			offset += read;
-		return new String(bytes,"ASCII");
+		return new String(bytes,0,offset,"ASCII");
 	} //}}}
 
 	//{{{ readCount() method
@@ -234,6 +234,6 @@ public class FactorLib
 		int read = 0;
 		while((read = in.read(chars,offset,count - offset)) > 0)
 			offset += read;
-		return new String(chars);
+		return new String(chars,0,offset);
 	} //}}}
 }

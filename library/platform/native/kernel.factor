@@ -82,23 +82,26 @@ USE: vectors
         [ drop t ] [ ( return the object ) ]
     ] cond ;
 
-: class-of ( obj -- name )
+: type-name ( n -- str )
     [
-        [ fixnum?  ] [ drop "fixnum" ]
-        [ bignum?  ] [ drop "bignum" ]
-        [ ratio?   ] [ drop "ratio" ]
-        [ float?   ] [ drop "float" ]
-        [ complex? ] [ drop "complex" ]
-        [ cons?    ] [ drop "cons" ]
-        [ word?    ] [ drop "word" ]
-        [ f =      ] [ drop "f" ]
-        [ t =      ] [ drop "t" ]
-        [ vector?  ] [ drop "vector" ]
-        [ string?  ] [ drop "string" ]
-        [ sbuf?    ] [ drop "sbuf" ]
-        [ port?    ] [ drop "port" ]
-        [ drop t   ] [ drop "unknown" ]
-    ] cond ;
+        [ 0 | "fixnum" ]
+        [ 1 | "word" ]
+        [ 2 | "cons" ]
+        [ 4 | "ratio" ]
+        [ 5 | "complex" ]
+        [ 6 | "f" ]
+        [ 7 | "t" ]
+        [ 9 | "vector" ]
+        [ 10 | "string" ]
+        [ 11 | "sbuf" ]
+        [ 12 | "port" ]
+        [ 13 | "bignum" ]
+        [ 14 | "float" ]
+        [ 100 | "fixnum/bignum" ]
+        [ 101 | "fixnum/bignum/ratio" ]
+        [ 102 | "fixnum/bignum/ratio/float" ]
+        [ 103 | "fixnum/bignum/ratio/float/complex" ]
+    ] assoc ;
 
 : toplevel ( -- )
     init-namespaces

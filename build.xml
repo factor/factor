@@ -48,6 +48,7 @@
 				<include name="factor/**/*.class"/>
 				<include name="factor/**/*.props"/>
 				<include name="factor/**/*.bsh"/>
+				<include name="factor/**/*.txt"/>
 				<include name="*.xml"/>
 				<include name="library/**/*.factor"/>
 				<include name="org/**/*.class"/>

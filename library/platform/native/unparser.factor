@@ -122,5 +122,5 @@ USE: words
         [ float?   ] [ unparse-float fix-float ]
         [ complex? ] [ unparse-complex ]
         [ string?  ] [ unparse-str ]
-        [ drop t   ] [ <% "#<" % class-of % ">" % %> ]
+        [ drop t   ] [ <% "#<" % type-of type-name % ">" % %> ]
     ] cond ;

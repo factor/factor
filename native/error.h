@@ -2,14 +2,12 @@
 #define ERROR_UNDEFINED_WORD (1<<3)
 #define ERROR_TYPE (2<<3)
 #define ERROR_RANGE (3<<3)
-#define ERROR_UNDERFLOW (4<<3)
-#define ERROR_IO (5<<3)
-#define ERROR_OVERFLOW (6<<3)
-#define ERROR_INCOMPARABLE (7<<3)
-#define ERROR_FLOAT_FORMAT (8<<3)
-#define ERROR_SIGNAL (9<<3)
-#define ERROR_IO_TASK_TWICE (10<<3)
-#define ERROR_IO_TASK_NONE (11<<3)
+#define ERROR_IO (4<<3)
+#define ERROR_INCOMPARABLE (5<<3)
+#define ERROR_FLOAT_FORMAT (6<<3)
+#define ERROR_SIGNAL (7<<3)
+#define ERROR_IO_TASK_TWICE (8<<3)
+#define ERROR_IO_TASK_NONE (9<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

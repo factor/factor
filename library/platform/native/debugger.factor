@@ -40,38 +40,65 @@ USE: strings
 USE: unparser
 USE: vectors
 
-: kernel-error? ( obj -- ? )
-    dup cons? [ car fixnum? ] [ drop f ] ifte ;
+: expired-port-error ( obj -- )
+    "Expired port: " write . ;
 
-: ?vector-nth ( n vec -- obj )
-    over [
-        dup >r vector-length min 0 max r> vector-nth
-    ] [
-        2drop f
-    ] ifte ;
+: undefined-word-error ( obj -- )
+    "Undefined word: " write . ;
 
-: error# ( n -- str )
+: type-check-error ( list -- )
+    "Type check error" print
+    uncons car dup "Object: " write .
+    "Object type: " write type-of type-name print
+    "Expected type: " write type-name print ;
+
+: array-range-error ( list -- )
+    "Array range check error" print
+    unswons "Object: " write .
+    uncons car "Maximum index: " write .
+    "Requested index: " write . ;
+
+: io-error ( list -- )
+    "I/O error in kernel function " write
+    unswons write ": " write car print ;
+
+: numerical-comparison-error ( list -- )
+    "Cannot compare " write unswons unparse write
+    " with " write unparse print ;
+
+: float-format-error ( list -- )
+    "Invalid floating point literal format: " write car . ;
+
+: signal-error ( obj -- )
+    "Operating system signal " write . ;
+
+: io-task-twice-error ( obj -- )
+    "Attempting to perform two simulatenous I/O operations on "
+    write . ;
+
+: no-io-tasks-error ( obj -- )
+    "No I/O tasks" print ;
+
+: kernel-error. ( obj n -- str )
     {
-        "Expired port: "
-        "Undefined word: "
-        "Type check: "
-        "Array range check: "
-        "Underflow"
-        "I/O error: "
-        "Overflow"
-        "Incomparable types: "
-        "Float format: "
-        "Signal "
-        "Adding I/O task twice on port: "
-        "No I/O tasks"
-    } ?vector-nth ;
+        expired-port-error
+        undefined-word-error
+        type-check-error
+        array-range-error
+        io-error
+        numerical-comparison-error
+        float-format-error
+        signal-error
+        io-task-twice-error
+        no-io-tasks-error
+    } vector-nth execute ;
 
-: ?kernel-error ( cons -- error# param )
-    dup cons? [ uncons dup cons? [ car ] when ] [ f ] ifte ;
-
-: kernel-error. ( error -- )
-    ?kernel-error swap error# dup "" ? write
-    dup [ . ] [ drop terpri ] ifte ;
+: kernel-error? ( obj -- ? )
+    dup cons? [ uncons cons? swap fixnum? and ] [ drop f ] ifte ;
 
 : error. ( error -- str )
-    dup kernel-error? [ kernel-error. ] [ . ] ifte ;
+    dup kernel-error? [
+        uncons car swap kernel-error.
+    ] [
+        dup string? [ print ] [ . ] ifte
+    ] ifte ;
