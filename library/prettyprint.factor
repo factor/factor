@@ -88,34 +88,24 @@ DEFER: prettyprint*
         dup prettyprint-newline
     ] unless ;
 
-: check-recursion ( indent obj quot -- )
-    >r over prettyprint-limit >= [
-        r> drop drop "#< ... > " write
-    ] [
-        r> call
-    ] ifte ;
-
 : prettyprint-[ ( indent -- indent )
     "[" write <prettyprint ;
 
 : prettyprint-] ( indent -- indent )
     prettyprint> "]" write ;
 
-: (prettyprint-list) ( indent list -- indent )
+: prettyprint-list ( indent list -- indent )
+    #! Pretty-print a list, without [ and ].
     [
         uncons >r prettyprint-element r>
         dup cons? [
-            (prettyprint-list)
+            prettyprint-list
         ] [
             [
                 "|" write prettyprint-space prettyprint-element
             ] when*
         ] ifte
     ] when* ;
-
-: prettyprint-list ( indent list -- indent )
-    #! Pretty-print a list, without [ and ].
-    [ (prettyprint-list) ] check-recursion ;
 
 : prettyprint-[] ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
@@ -128,7 +118,7 @@ DEFER: prettyprint*
 
 : prettyprint-vector ( indent list -- indent )
     #! Pretty-print a vector, without { and }.
-    [ [ prettyprint-element ] vector-each ] check-recursion ;
+    [ prettyprint-element ] vector-each ;
 
 : prettyprint-{} ( indent vector -- indent )
     dup vector-length 0 = [
@@ -181,14 +171,18 @@ DEFER: prettyprint*
     unparse write ;
 
 : prettyprint* ( indent obj -- indent )
-    [
-        [ f =       ] [ prettyprint-object ]
-        [ cons?     ] [ prettyprint-[] ]
-        [ vector?   ] [ prettyprint-{} ]
-        [ comment?  ] [ prettyprint-comment ]
-        [ word?     ] [ prettyprint-word ]
-        [ drop t    ] [ prettyprint-object ]
-    ] cond ;
+    over prettyprint-limit >= [
+        unparse write
+    ] [
+        [
+            [ f =       ] [ prettyprint-object ]
+            [ cons?     ] [ prettyprint-[] ]
+            [ vector?   ] [ prettyprint-{} ]
+            [ comment?  ] [ prettyprint-comment ]
+            [ word?     ] [ prettyprint-word ]
+            [ drop t    ] [ prettyprint-object ]
+        ] cond
+    ] ifte ;
 
 : prettyprint ( obj -- )
     0 swap prettyprint* drop terpri ;
@@ -203,15 +197,15 @@ DEFER: prettyprint*
     dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( indent word -- )
-    "IN:" write prettyprint-space
+    \ IN: prettyprint-word prettyprint-space
     word-vocabulary prettyprint-vocab prettyprint-newline ;
 
 : prettyprint-: ( indent -- indent )
-    ":" write prettyprint-space
+    \ : prettyprint-word prettyprint-space
     tab-size + ;
 
 : prettyprint-; ( indent -- indent )
-    ";" write
+    \ ; prettyprint-word
     tab-size - ;
 
 : prettyprint-plist ( word -- )

@@ -29,6 +29,7 @@ IN: parser
 
 USE: combinators
 USE: errors
+USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
@@ -133,6 +134,10 @@ IN: syntax
 ! Vectors
 : { f ; parsing
 : } reverse list>vector parsed ; parsing
+
+! Hashtables
+: {{ f ; parsing
+: }} alist>hash parsed ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word parsed ; parsing

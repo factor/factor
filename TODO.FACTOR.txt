@@ -1,14 +1,22 @@
-- add a socket timeout
-- compiling when*
-- compiling unless*
-- getenv/setenv: if literal arg, compile as a load/store
-- inline words
-- alist -vs- assoc terminology
-- compiler: drop literal peephole optimization
++ inference/interpreter:
+
+- : bin 5 [ 5 bin bin 5 ] [ 2drop ] ifte ;
+- combinator inference
+- generic/2generic inference
+- type inference
 - [ 2 2 . ] run fails
+- some way to step over a word in the stepper
+- step: print NEXT word to execute, not word that JUST executed
+- cache stack effects
+- once generic inference is done, can-compile is "has stack effect!"
 
 + compiler/ffi:
 
+- compiling when*
+- compiling each, etc.
+- getenv/setenv: if literal arg, compile as a load/store
+- inline words
+- compiler: drop literal peephole optimization
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
@@ -16,23 +24,9 @@
 - float types
 - compile word twice; no more 'cannot compile' error!
 - perhaps /i should work with all numbers
-
-+ docs:
-
-- explain how log uses >polar and rect>
-- simple i/o section
-- unparse examples, and difference from prettyprint
-- review doc formatting with latex2html
-- recursion -vs- iteration in vectors chapter, and combinator
-  construction
-- [, , ,] -- mention that , are usually in nested words
-- finish namespaces docs
-- mention word accessors/mutators
-- to document:
-  continuations
-  streams
-  multitasking
-  unit testing
+- assembler opcodes dispatch on operand types
+- lifting
+- save code in image
 
 + listener/plugin:
 
@@ -48,7 +42,6 @@
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:
-- inspector links when describe called without object path
 
 + kernel:
 
@@ -57,37 +50,38 @@
 - better i/o scheduler
 - >lower, >upper for strings
 - don't rehash strings on every startup
+- remove sbufs
+- cat, reverse-cat primitives
+- first-class hashtables
+- hash words in stage 2 of bootstrap
+- rewrite accessors and mutators in Factor, with slot/set-slot primitive
+- replace -export-dynamic with sundry-xt
+- add a socket timeout
 
 + misc:
 
+- alist -vs- assoc terminology
 - jedit ==> jedit-word, jedit takes a file name
 - 'cascading' styles
 - command line parsing cleanup
 - nicer way to combine two paths
+- :get &get
+- namestack, catchstack lists
+- OOP
+- room. prints code heap size
+- refactor sort
+- ditch java factor
+- ditch object paths
+- browser responder for word links in HTTPd; inspect responder for
+  objects
+- use keep instead of tuck, try to remove usages of transp
+- worddef props
+- prettyprint: when unparse called due to recursion, write a link
+- prettyprinter should output {{ ... }} syntax for hashtables
+- FORGET: and forget
 
 + httpd:
 
-- wiki responder:
-  - port to native
-  - text styles
 - log with date
- basic authentication, using httpdAuth function from a config file
+- basic authentication, using httpdAuth function from a config file
 - file responder; last-modified field
-
-+ java factor is going away:
-
-- compiled stack traces broken
-- save classes to disk
-- tail call optimization broken again
-- don't compile inline words
-- recursive words with code after ifte
-- less unnecessary args to auxiliary methods
-- inlining tail-recursive immediates
-- direct stack access leaks memory on stack
-- unnecessary local allocation: max is instance var, but several methods
-  get compiled.
-- ditch expand
-- when* compilation in jvm
-- plugin should not exit jEdit on fatal errors
-- java factor: equal numbers have non-equal hashcodes!
-- FactorLib.equal() not very good

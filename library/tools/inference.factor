@@ -258,43 +258,16 @@ DEFER: (infer)
     [ init-inference (infer)  effect ] with-scope ;
 
 \ call [ pop-d (infer) ] "infer" set-word-property
-\ call [ 1 | 0 ] "infer-effect" set-word-property
-
-\ ifte [ 3 | 0 ] "infer-effect" set-word-property
 \ ifte [ infer-ifte ] "infer" set-word-property
 
 \ >r [ pop-d push-r ] "infer" set-word-property
-\ >r [ 1 | 0 ] "infer-effect" set-word-property
 \ r> [ pop-r push-d ] "infer" set-word-property
-\ r> [ 0 | 1 ] "infer-effect" set-word-property
 
 \ drop  t "meta-infer" set-word-property
-\ drop [ 1 | 0 ] "infer-effect" set-word-property
-\ nip t "meta-infer" set-word-property
-\ nip [ 2 | 1 ] "infer-effect" set-word-property
 \ dup  t "meta-infer" set-word-property
-\ dup [ 1 | 2 ] "infer-effect" set-word-property
-\ over t "meta-infer" set-word-property
-\ over [ 2 | 3 ] "infer-effect" set-word-property
-\ pick t "meta-infer" set-word-property
-\ pick [ 3 | 4 ] "infer-effect" set-word-property
 \ swap t "meta-infer" set-word-property
-\ swap [ 2 | 2 ] "infer-effect" set-word-property
+\ over t "meta-infer" set-word-property
+\ pick t "meta-infer" set-word-property
+\ nip t "meta-infer" set-word-property
+\ tuck t "meta-infer" set-word-property
 \ rot t "meta-infer" set-word-property
-\ rot [ 3 | 3 ] "infer-effect" set-word-property
-
-\ type [ 1 | 1 ] "infer-effect" set-word-property
-\ eq? [ 2 | 1 ] "infer-effect" set-word-property
-
-\ car [ 1 | 1 ] "infer-effect" set-word-property
-\ cdr [ 1 | 1 ] "infer-effect" set-word-property
-\ cons [ 2 | 1 ] "infer-effect" set-word-property
-
-\ fixnum+ [ 2 | 1 ] "infer-effect" set-word-property
-\ fixnum- [ 2 | 1 ] "infer-effect" set-word-property
-\ fixnum* [ 2 | 1 ] "infer-effect" set-word-property
-
-\ vector-nth [ 2 | 1 ] "infer-effect" set-word-property
-\ set-vector-nth [ 3 | 0 ] "infer-effect" set-word-property
-\ vector-length [ 1 | 1 ] "infer-effect" set-word-property
-\ set-vector-length [ 2 | 0 ] "infer-effect" set-word-property
