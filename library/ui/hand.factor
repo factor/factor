@@ -4,7 +4,41 @@ IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
 sdl-video ;
 
-SYMBOL: world
+DEFER: pick-up*
+
+: pick-up-list ( point list -- gadget )
+    dup [
+        2dup car pick-up dup [
+            2nip
+        ] [
+            drop cdr pick-up-list
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: pick-up* ( point gadget -- gadget/t )
+    #! The logic is thus. If the point is definately outside the
+    #! box, return f. Otherwise, see if the point is contained
+    #! in any subgadget. If not, see if it is contained in the
+    #! box delegate.
+    2dup inside? [
+        2dup [ translate ] keep
+        gadget-children pick-up-list dup [
+            2nip
+        ] [
+            drop inside?
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: pick-up ( point gadget -- gadget )
+    #! pick-up* returns t to mean 'this gadget', avoiding the
+    #! exposed facade issue.
+    tuck pick-up* dup t = [ drop ] [ nip ] ifte ;
+
+DEFER: world
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
@@ -13,7 +47,7 @@ SYMBOL: world
 TUPLE: hand click-pos clicked buttons delegate ;
 
 C: hand ( world -- hand )
-    0 0 <point> <gadget> <box>
+    0 0 <point> <gadget>
     over set-hand-delegate
     [ set-gadget-parent ] keep ;
 

@@ -84,3 +84,20 @@ M: bevel-rect draw-shape ( rect -- )
         [[ color [ 160 160 160 ] ]]
         [[ font [[ "Monospaced" 12 ]] ]]
     }} ;
+
+: draw-gadget ( gadget -- )
+    #! All drawing done inside draw-shape is done with the
+    #! gadget's paint. If the gadget does not have any custom
+    #! paint, just call the quotation.
+    dup gadget-paint [
+        dup draw-shape
+        dup [
+            gadget-children [ draw-gadget ] each
+        ] with-translation
+    ] bind ;
+
+: redraw ( gadget -- )
+    #! Redraw a gadget before the next iteration of the event
+    #! loop.
+    t over set-gadget-redraw?
+    gadget-parent [ redraw ] when* ;

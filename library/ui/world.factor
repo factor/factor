@@ -11,8 +11,7 @@ TUPLE: world running? hand delegate ;
 
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <everywhere> <gadget>
-    dup [ 216 216 216 ] color set-paint-property
-    <box> ;
+    dup [ 216 216 216 ] color set-paint-property ;
 
 C: world ( -- world )
     <world-box> over set-world-delegate
