@@ -160,6 +160,8 @@ cpu "x86" = [
         "/library/sdl/sdl.factor"
         "/library/sdl/sdl-video.factor"
         "/library/sdl/sdl-event.factor"
+        "/library/sdl/sdl-gfx.factor"
+        "/library/sdl/hsv.factor"
     ] [
         dup print
         run-resource

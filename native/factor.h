@@ -45,7 +45,7 @@ typedef unsigned short CHAR;
 typedef unsigned char BYTE;
 
 /* Memory heap size */
-#define DEFAULT_ARENA (5 * 1024 * 1024)
+#define DEFAULT_ARENA (64 * 1024 * 1024)
 #define COMPILE_ZONE_SIZE (5 * 1024 * 1024)
 
 #define STACK_SIZE 16384
