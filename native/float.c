@@ -51,7 +51,7 @@ void primitive_float_to_bits(void)
 {
 	double f = untag_float(dpeek());
 	BIGNUM_2 f_raw = *(BIGNUM_2*)&f;
-	drepl(tag_object(bignum(f_raw)));
+	drepl(tag_object(s48_long_to_bignum(f_raw)));
 }
 
 CELL number_eq_float(FLOAT* x, FLOAT* y)

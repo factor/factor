@@ -49,9 +49,9 @@ CELL upgraded_arithmetic_type(CELL type1, CELL type2)
 	}
 }
 
-BIGNUM* fixnum_to_bignum(CELL n)
+ARRAY* fixnum_to_bignum(CELL n)
 {
-	return bignum((BIGNUM_2)untag_fixnum_fast(n));
+	return s48_long_to_bignum(untag_fixnum_fast(n));
 }
 
 RATIO* fixnum_to_ratio(CELL n)
@@ -66,7 +66,8 @@ FLOAT* fixnum_to_float(CELL n)
 
 FIXNUM bignum_to_fixnum(CELL tagged)
 {
-	return (FIXNUM)(((BIGNUM*)UNTAG(tagged))->n);
+	return (FIXNUM)s48_bignum_to_long(
+		(ARRAY*)UNTAG(tagged));
 }
 
 RATIO* bignum_to_ratio(CELL n)
@@ -76,7 +77,8 @@ RATIO* bignum_to_ratio(CELL n)
 
 FLOAT* bignum_to_float(CELL tagged)
 {
-	return make_float((double)((BIGNUM*)UNTAG(tagged))->n);
+	return make_float(s48_bignum_to_double(
+		(ARRAY*)UNTAG(tagged)));
 }
 
 FLOAT* ratio_to_float(CELL tagged)
@@ -118,7 +120,7 @@ bool zerop(CELL tagged)
 	case FIXNUM_TYPE:
 		return tagged == 0;
 	case BIGNUM_TYPE:
-		return ((BIGNUM*)UNTAG(tagged))->n == 0;
+		return BIGNUM_ZERO_P((ARRAY*)UNTAG(tagged));
 	case FLOAT_TYPE:
 		return ((FLOAT*)UNTAG(tagged))->n == 0.0;
 	case RATIO_TYPE:

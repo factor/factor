@@ -124,6 +124,7 @@ void collect_roots(void)
 	copy_object(&T);
 	gc_debug("t",T);
 	copy_object(&callframe);
+	copy_bignum_constants();
 
 	for(ptr = ds_bot; ptr < ds; ptr += CELLS)
 		copy_object((void*)ptr);

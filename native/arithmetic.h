@@ -1,7 +1,7 @@
 #include "factor.h"
 
 CELL upgraded_arithmetic_type(CELL type1, CELL type2);
-BIGNUM* fixnum_to_bignum(CELL n);
+ARRAY* fixnum_to_bignum(CELL n);
 RATIO* fixnum_to_ratio(CELL n);
 FLOAT* fixnum_to_float(CELL n);
 FIXNUM bignum_to_fixnum(CELL tagged);
@@ -11,17 +11,17 @@ FLOAT* ratio_to_float(CELL n);
 
 #define CELL_TO_INTEGER(result) \
 	FIXNUM _result = (result); \
-	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
+	/* if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
 		return tag_object(fixnum_to_bignum(_result)); \
 	else \
-		return tag_fixnum(_result);
+		 */return tag_fixnum(_result);
 
 #define BIGNUM_2_TO_INTEGER(result) \
         BIGNUM_2 _result = (result); \
-        if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-                return tag_object(bignum(_result)); \
+        /* if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
+                return tag_object(s48_long_to_bignum(_result)); \
         else \
-                return tag_fixnum(_result);
+                 */return tag_fixnum(_result);
 
 #define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \
@@ -89,7 +89,7 @@ CELL OP(CELL x) \
 	case COMPLEX_TYPE: \
 		return OP##_complex((COMPLEX*)UNTAG(x)); \
 	case BIGNUM_TYPE: \
-		return OP##_bignum((BIGNUM*)UNTAG(x)); \
+		return OP##_bignum((ARRAY*)UNTAG(x)); \
 	case FLOAT_TYPE: \
 		return OP##_float((FLOAT*)UNTAG(x)); \
 	default: \
@@ -136,9 +136,7 @@ void primitive_numberp(void);
 
 bool zerop(CELL tagged);
 
-FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
-BIGNUM* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 void primitive_to_integer(void);
 CELL number_eq(CELL x, CELL y);

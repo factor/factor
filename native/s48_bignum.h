@@ -53,42 +53,94 @@ enum bignum_comparison
 };
 
 typedef void * bignum_procedure_context;
-extern int s48_bignum_equal_p(bignum_type, bignum_type);
-extern enum bignum_comparison s48_bignum_test(bignum_type);
-extern enum bignum_comparison s48_bignum_compare(bignum_type, bignum_type);
-extern bignum_type s48_bignum_add(bignum_type, bignum_type);
-extern bignum_type s48_bignum_subtract(bignum_type, bignum_type);
-extern bignum_type s48_bignum_negate(bignum_type);
-extern bignum_type s48_bignum_multiply(bignum_type, bignum_type);
-extern int s48_bignum_divide(bignum_type numerator, bignum_type denominator,
+int s48_bignum_equal_p(bignum_type, bignum_type);
+enum bignum_comparison s48_bignum_test(bignum_type);
+enum bignum_comparison s48_bignum_compare(bignum_type, bignum_type);
+bignum_type s48_bignum_add(bignum_type, bignum_type);
+bignum_type s48_bignum_subtract(bignum_type, bignum_type);
+bignum_type s48_bignum_negate(bignum_type);
+bignum_type s48_bignum_multiply(bignum_type, bignum_type);
+int s48_bignum_divide(bignum_type numerator, bignum_type denominator,
 			     void * quotient, void * remainder);
-extern bignum_type s48_bignum_quotient(bignum_type, bignum_type);
-extern bignum_type s48_bignum_remainder(bignum_type, bignum_type);
-extern bignum_type s48_long_to_bignum(long);
-extern bignum_type s48_ulong_to_bignum(unsigned long);
-extern long s48_bignum_to_long(bignum_type);
-extern unsigned long s48_bignum_to_ulong(bignum_type);
-extern bignum_type s48_double_to_bignum(double);
-extern double s48_bignum_to_double(bignum_type);
-extern int s48_bignum_fits_in_word_p(bignum_type, long word_length,
+bignum_type s48_bignum_quotient(bignum_type, bignum_type);
+bignum_type s48_bignum_remainder(bignum_type, bignum_type);
+bignum_type s48_long_to_bignum(long);
+bignum_type s48_ulong_to_bignum(unsigned long);
+long s48_bignum_to_long(bignum_type);
+unsigned long s48_bignum_to_ulong(bignum_type);
+bignum_type s48_double_to_bignum(double);
+double s48_bignum_to_double(bignum_type);
+int s48_bignum_fits_in_word_p(bignum_type, long word_length,
 				     int twos_complement_p);
-extern bignum_type s48_bignum_length_in_bits(bignum_type);
-extern bignum_type s48_bignum_length_upper_limit(void);
-extern bignum_type s48_digit_stream_to_bignum
+bignum_type s48_bignum_length_in_bits(bignum_type);
+bignum_type s48_bignum_length_upper_limit(void);
+bignum_type s48_digit_stream_to_bignum
        (unsigned int n_digits,
 	unsigned int (*producer(bignum_procedure_context)),
 	bignum_procedure_context context,
 	unsigned int radix,
 	int negative_p);
-extern long s48_bignum_max_digit_stream_radix(void);
+long s48_bignum_max_digit_stream_radix(void);
 
 /* Added bitwise operators. */
 
-extern bignum_type s48_bignum_bitwise_not(bignum_type),
+bignum_type s48_bignum_bitwise_not(bignum_type),
                    s48_bignum_arithmetic_shift(bignum_type, long),
                    s48_bignum_bitwise_and(bignum_type, bignum_type),
                    s48_bignum_bitwise_ior(bignum_type, bignum_type),
                    s48_bignum_bitwise_xor(bignum_type, bignum_type);
 
-extern int s48_bignum_oddp(bignum_type);
-extern long s48_bignum_bit_count(bignum_type);
+int s48_bignum_oddp(bignum_type);
+long s48_bignum_bit_count(bignum_type);
+
+/* Forward references */
+int bignum_equal_p_unsigned(bignum_type, bignum_type);
+enum bignum_comparison bignum_compare_unsigned(bignum_type, bignum_type);
+bignum_type bignum_add_unsigned(bignum_type, bignum_type, int);
+bignum_type bignum_subtract_unsigned(bignum_type, bignum_type);
+bignum_type bignum_multiply_unsigned(bignum_type, bignum_type, int);
+bignum_type bignum_multiply_unsigned_small_factor
+  (bignum_type, bignum_digit_type, int);
+void bignum_destructive_scale_up(bignum_type, bignum_digit_type);
+void bignum_destructive_add(bignum_type, bignum_digit_type);
+void bignum_divide_unsigned_large_denominator
+  (bignum_type, bignum_type, bignum_type *, bignum_type *, int, int);
+void bignum_destructive_normalization(bignum_type, bignum_type, int);
+void bignum_destructive_unnormalization(bignum_type, int);
+void bignum_divide_unsigned_normalized(bignum_type, bignum_type, bignum_type);
+bignum_digit_type bignum_divide_subtract
+  (bignum_digit_type *, bignum_digit_type *, bignum_digit_type,
+   bignum_digit_type *);
+void bignum_divide_unsigned_medium_denominator
+  (bignum_type, bignum_digit_type, bignum_type *, bignum_type *, int, int);
+bignum_digit_type bignum_digit_divide
+  (bignum_digit_type, bignum_digit_type, bignum_digit_type, bignum_digit_type *);
+bignum_digit_type bignum_digit_divide_subtract
+  (bignum_digit_type, bignum_digit_type, bignum_digit_type, bignum_digit_type *);
+void bignum_divide_unsigned_small_denominator
+  (bignum_type, bignum_digit_type, bignum_type *, bignum_type *, int, int);
+bignum_digit_type bignum_destructive_scale_down
+  (bignum_type, bignum_digit_type);
+bignum_type bignum_remainder_unsigned_small_denominator
+  (bignum_type, bignum_digit_type, int);
+bignum_type bignum_digit_to_bignum(bignum_digit_type, int);
+bignum_type bignum_allocate(bignum_length_type, int);
+bignum_type bignum_allocate_zeroed(bignum_length_type, int);
+bignum_type bignum_shorten_length(bignum_type, bignum_length_type);
+bignum_type bignum_trim(bignum_type);
+bignum_type bignum_copy(bignum_type);
+bignum_type bignum_new_sign(bignum_type, int);
+bignum_type bignum_maybe_new_sign(bignum_type, int);
+void bignum_destructive_copy(bignum_type, bignum_type);
+/* Unused
+void bignum_destructive_zero(bignum_type);
+*/
+
+/* Added for bitwise operations. */
+bignum_type bignum_magnitude_ash(bignum_type arg1, long n);
+bignum_type bignum_pospos_bitwise_op(int op, bignum_type, bignum_type);
+bignum_type bignum_posneg_bitwise_op(int op, bignum_type, bignum_type);
+bignum_type bignum_negneg_bitwise_op(int op, bignum_type, bignum_type);
+void        bignum_negate_magnitude(bignum_type);
+long        bignum_unsigned_logcount(bignum_type arg);
+int         bignum_unsigned_logbitp(int shift, bignum_type bignum);

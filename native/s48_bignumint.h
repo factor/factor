@@ -57,7 +57,7 @@ typedef CELL bignum_length_type;
 /* BIGNUM_REDUCE_LENGTH allows the memory system to reclaim some
    space when a bignum's length is reduced from its original value. */
 #define BIGNUM_REDUCE_LENGTH(target, source, length)            \
-     target = shrink_array(source, length)
+     target = shrink_array(source, length + 1)
 extern ARRAY* shrink_array(ARRAY* array, CELL capacity);
 
 /* BIGNUM_DEALLOCATE is called when disposing of bignums which are
@@ -83,9 +83,9 @@ extern ARRAY* shrink_array(ARRAY* array, CELL capacity);
 #define BIGNUM_START_PTR(bignum)					\
   ((BIGNUM_TO_POINTER (bignum)) + 1)
 
-#define BIGNUM_LENGTH(bignum) (bignum->capacity - 1)
+#define BIGNUM_LENGTH(bignum) ((bignum)->capacity - 1)
 
-#define BIGNUM_NEGATIVE_P(bignum) (AREF(bignum,0) != 0)
+#define BIGNUM_NEGATIVE_P(bignum) (get(AREF(bignum,0)) != 0)
 #define BIGNUM_SET_NEGATIVE_P(bignum,neg) put(AREF(bignum,0),neg)
 
 #define BIGNUM_ZERO_P(bignum)						\
@@ -102,9 +102,9 @@ extern ARRAY* shrink_array(ARRAY* array, CELL capacity);
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() s48_bignum_zero
+#define BIGNUM_ZERO() bignum_zero
 #define BIGNUM_ONE(neg_p) \
-   (neg_p ? s48_bignum_pos_one : s48_bignum_neg_one)
+   (neg_p ? bignum_pos_one : bignum_neg_one)
 
 #define HD_LOW(digit) ((digit) & BIGNUM_HALF_DIGIT_MASK)
 #define HD_HIGH(digit) ((digit) >> BIGNUM_HALF_DIGIT_LENGTH)

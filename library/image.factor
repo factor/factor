@@ -139,13 +139,13 @@ USE: words
 ( Bignums )
 
 : 'bignum ( bignum -- tagged )
-    #! Very bad!
-    object-tag here-as >r
-    bignum-type >header emit
-    4 emit ( capacity )
-    0 emit ( sign XXXX )
-    0 emit ( pad XXXX )
-    ( bignum -- ) emit64 r> ;
+    'fixnum ;
+!    #! Very bad!
+!    object-tag here-as >r
+!    bignum-type >header emit
+!    1 emit ( capacity )
+!    0 emit ( sign XXXX )
+!    ( bignum -- ) emit r> ;
 
 ( Special objects )
 
