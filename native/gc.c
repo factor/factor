@@ -111,7 +111,7 @@ void collect_next(void)
 	}
 }
 
-void copy_roots(void)
+void collect_roots(void)
 {
 	int i;
 
@@ -140,7 +140,8 @@ void primitive_gc(void)
 {
 	flip_zones();
 	scan = active->here = active->base;
-	copy_roots();
+	collect_roots();
+	collect_io_tasks();
 	while(scan < active->here)
 	{
 		gc_debug("scan loop",scan);

@@ -14,7 +14,7 @@ int read_step(PORT* port)
 {
 	FIXNUM amount = -1;
 
-	add_read_io_task(port,F);
+	add_io_task(IO_TASK_READ_LINE,port,F);
 
 	for(;;)
 	{
@@ -26,7 +26,7 @@ int read_step(PORT* port)
 		{
 			if(errno != EAGAIN)
 			{
-				remove_read_io_task(port);
+				remove_io_task(IO_TASK_READ_LINE,port);
 				return -1;
 			}
 		}
@@ -36,7 +36,7 @@ int read_step(PORT* port)
 		iomux();
 	}
 
-	remove_read_io_task(port);
+	remove_io_task(IO_TASK_READ_LINE,port);
 
 	port->buf_fill = (amount < 0 ? 0 : amount);
 	port->buf_pos = 0;
@@ -111,39 +111,29 @@ void primitive_read_line_fd_8(void)
 	}
 }
 
-void write_step(PORT* port)
+/* Return true if write was done */
+bool write_step(PORT* port)
 {
 	char* chars = (char*)port->buffer + sizeof(STRING);
 
-	FIXNUM amount;
+	FIXNUM amount = write(port->fd,chars + port->buf_pos,
+		port->buf_fill - port->buf_pos);
 
-	add_write_io_task(port,F);
-
-	for(;;)
+	if(amount == -1)
 	{
-		amount = write(port->fd,chars + port->buf_pos,
-			port->buf_fill - port->buf_pos);
-
-		if(amount == -1)
-		{
-			if(errno != EAGAIN)
-			{
-				remove_write_io_task(port);
-				return;
-			}
-		}
+		if(errno == EAGAIN)
+			return false;
 		else
-			break;
-
-		iomux();
+		{
+			io_error(__FUNCTION__);
+			return false;
+		}
 	}
-
-	remove_write_io_task(port);
-
-	if(amount < 0)
-		io_error(__FUNCTION__);
-
-	port->buf_pos += amount;
+	else
+	{
+		port->buf_pos += amount;
+		return true;
+	}
 }
 
 /* keep writing to the stream until everything is written */
@@ -152,13 +142,18 @@ void flush_buffer(PORT* port)
 	if(port->buf_mode != B_WRITE || port->buf_fill == 0)
 		return;
 
+	add_io_task(IO_TASK_WRITE,port,F);
+
 	for(;;)
 	{
 		if(port->buf_fill == port->buf_pos)
 			break;
 
-		write_step(port);
+		if(!write_step(port))
+			iomux();
 	}
+
+	remove_io_task(IO_TASK_WRITE,port);
 
 	port->buf_pos = 0;
 	port->buf_fill = 0;

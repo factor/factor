@@ -1,5 +1,12 @@
+typedef enum {
+	IO_TASK_READ_LINE,
+	IO_TASK_READ_COUNT,
+	IO_TASK_WRITE
+} IO_TASK_TYPE;
+
 typedef struct {
-	PORT* port;
+	IO_TASK_TYPE type;
+	CELL port;
 	CELL callback;
 } IO_TASK;
 
@@ -13,19 +20,20 @@ int write_fd_count;
 
 void init_io_tasks(fd_set* fd_set, IO_TASK* io_tasks);
 void init_iomux(void);
-void add_io_task(
+void add_io_task_impl(
+	IO_TASK_TYPE type,
 	PORT* port,
 	CELL callback,
-	fd_set* fd_set,
+	fd_set* fdset,
 	IO_TASK* io_tasks,
 	int* fd_count);
-void add_read_io_task(PORT* port, CELL callback);
-void add_write_io_task(PORT* port, CELL callback);
-void remove_io_task(
+void add_io_task(IO_TASK_TYPE type, PORT* port, CELL callback);
+void remove_io_task_impl(
+	IO_TASK_TYPE type,
 	PORT* port,
 	fd_set* fdset,
 	IO_TASK* io_tasks,
 	int* fd_count);
-void remove_read_io_task(PORT* port);
-void remove_write_io_task(PORT* port);
+void remove_io_task(IO_TASK_TYPE type, PORT* port);
 CELL iomux(void);
+void collect_io_tasks(void);

@@ -7,6 +7,7 @@ int read_step(PORT* port);
 typedef enum { READLINE_AGAIN, READLINE_EOL, READLINE_EOF } READLINE_STAT;
 
 READLINE_STAT read_line_step(PORT* port);
+bool write_step(PORT* port);
 void flush_buffer(PORT* port);
 void init_io(void);
 void primitive_read_line_fd_8(void);
