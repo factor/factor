@@ -66,7 +66,7 @@ USE: unparser
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
 
-    "ansi" get [ stdio get <ansi-stream> stdio set ] when
+    "ansi" get [ stdio [ <ansi-stream> ] change ] when
 
     "compile" get [ compile-all ] when
 

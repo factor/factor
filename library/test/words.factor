@@ -55,3 +55,5 @@ word word-name "last-word-test" set
 
 [ t ] [ vocabs list? ] unit-test
 [ t ] [ vocabs [ words [ word? ] all? ] all? ] unit-test
+
+[ f ] [ gensym gensym = ] unit-test

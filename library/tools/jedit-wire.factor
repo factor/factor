@@ -94,8 +94,7 @@ C: jedit-stream ( stream -- stream )
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
-    stdio get <jedit-stream> stdio set
-    print-banner ;
+    stdio [ <jedit-stream> ] change  print-banner ;
 
 : jedit-lookup ( word vocabs -- )
     #! A utility word called by the Factor plugin to get some

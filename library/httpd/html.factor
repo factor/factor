@@ -162,10 +162,10 @@ C: html-stream ( stream -- stream )
     #! underline
     #! size
     #! link - an object path
-    [ dup delegate set stdio set ] extend ;
+    [ dup delegate set stdio set ] extend ;C
 
 : with-html-stream ( quot -- )
-    [ stdio get <html-stream> stdio set call ] with-scope ;
+    [ stdio [ <html-stream> ] change  call ] with-scope ;
 
 : html-document ( title quot -- )
     swap chars>entities dup

@@ -77,7 +77,7 @@ SYMBOL: recursive-label
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d get ensure meta-d set d-in +@ ;
+    meta-d [ ensure ] change d-in +@ ;
 
 : consume-d ( count -- )
     #! Remove count of elements.

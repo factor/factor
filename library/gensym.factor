@@ -36,7 +36,7 @@ SYMBOL: gensym-count
 
 : (gensym) ( -- name )
     "G:" global [
-        gensym-count get succ dup gensym-count set
+        gensym-count [ succ dup ] change
     ] bind unparse cat2 ;
 
 : gensym ( -- word )

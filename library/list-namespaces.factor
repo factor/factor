@@ -34,26 +34,26 @@ USE: math
 
 : cons@ ( x var -- )
     #! Prepend x to the list stored in var.
-    tuck get cons put ;
+    [ cons ] change ;
 
 : acons@ ( value key var -- )
     #! Prepend [ key | value ] to the alist stored in var.
-    [ get acons ] keep set ;
+    [ acons ] change ;
 
 : uncons@ ( var -- car )
     #! Push the car of the list in var, and set the var to the
     #! cdr.
-    dup get uncons rot set ;
+    [ uncons ] change ;
 
 : remove@ ( obj var -- )
     #! Remove all occurrences of the object from the list
     #! stored in the variable.
-    tuck get remove put ;
+    [ remove ] change ;
 
 : unique@ ( elem var -- )
     #! Prepend an element to the proper list stored in a
     #! variable if it is not already contained in the list.
-    tuck get unique put ;
+    [ unique ] change ;
 
 SYMBOL: list-buffer
 

@@ -12,10 +12,8 @@
 - handle recursion with when, when* etc
 - optimizer rewrite stack ops
 - optimizer nested ifte
-- optimizer recursive call
-- dataflow make block nodes for inlined words
-- dataflow recursive calls marked as so
 - alien-call need special nodes
+- fix dataflow unit tests
 
 + linearizer/generator:
 
@@ -83,5 +81,4 @@
 + httpd:
 
 - log with date
-- basic authentication, using httpdAuth function from a config file
 - file responder; last-modified field

@@ -101,6 +101,12 @@ USE: vectors
 : set ( value variable -- ) namespace set-hash ;
 : put ( variable value -- ) swap set ;
 
+: change ( var quot -- )
+    #! Execute the quotation with the variable value on the
+    #! stack. The set the variable to the return value of the
+    #! quotation.
+    >r dup get r> rot slip set ;
+
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
@@ -117,11 +123,6 @@ USE: vectors
     #!          ....
     #!      ] extend ;
     over >r bind r> ; inline
-
-: lazy ( var [ a ] -- value )
-    #! If the value of the variable is f, set the value to the
-    #! result of evaluating [ a ].
-    over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
 : traverse-path ( name object -- object )
     dup hashtable? [ hash ] [ 2drop f ] ifte ;

@@ -67,10 +67,10 @@ SYMBOL: meta-cf
 
 : copy-interpreter ( -- )
     #! Copy interpreter state from containing namespaces.
-    meta-r get vector-clone meta-r set
-    meta-d get vector-clone meta-d set
-    meta-n get meta-n set
-    meta-c get meta-c set ;
+    meta-r [ vector-clone ] change
+    meta-d [ vector-clone ] change
+    meta-n [ ] change
+    meta-c [ ] change ;
 
 : done-cf? ( -- ? )
     meta-cf get not ;
@@ -95,7 +95,7 @@ SYMBOL: meta-cf
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    meta-cf get [ push-r ] when* meta-cf set ;
+    meta-cf [ [ push-r ] when* ] change ;
 
 : meta-word ( word -- )
     dup "meta-word" word-property dup [

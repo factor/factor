@@ -94,20 +94,23 @@ USE: logic
     #! Check if the literal appears in either branch.
     [ node-param get ] bind [ dupd can-kill? ] all? nip ;
 
-: kill-literal ( literals node -- )
-    #! Remove the literals from the node and , it if it is not a
-    #! NOP.
+: (kill-node) ( literals node -- )
     swap [
         over 2dup consumes-literal? >r produces-literal? r> or
     ] some?
     [ drop ] [ , ] ifte ;
 
-: kill-literals ( literals dataflow -- )
-    #! Remove literals and construct a list.
-    [ dupd kill-literal ] each drop ;
+: kill-node ( literals node -- )
+    #! Remove the literals from the node and , it if it is not a
+    #! NOP.
+    "kill-node" [ (kill-node) ] apply-dataflow ;
 
-: optimize ( dataflow -- )
-    [ dup kill-set swap kill-literals ] make-list ;
+: kill-nodes ( literals dataflow -- )
+    #! Remove literals and construct a list.
+    [ dupd kill-node ] each drop ;
+
+: optimize ( dataflow -- dataflow )
+    [ dup kill-set swap kill-nodes ] make-list ;
 
 #push [
     [ node-param get ] bind ,
@@ -120,6 +123,10 @@ USE: logic
 #label [
     [ node-param get ] bind can-kill?
 ] "can-kill" set-word-property
+
+#label [ ( literals node -- )
+    [ node-param [ kill-nodes ] change ] bind
+] "kill-node" set-word-property
 
 #ifte [ scan-branches ] "scan-literal" set-word-property
 #ifte [ can-kill-branches? ] "can-kill" set-word-property
