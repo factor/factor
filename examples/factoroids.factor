@@ -1,5 +1,12 @@
-! Currently the plugin doesn't handle GENERIC: and M:, so we
-! disable the parser. too many errors :sidekick.parser=none:
+! A simple space shooter.
+!
+! To play the game:
+!
+! ./f factor.image -libraries:sdl=libSDL.so -libraries:sdl-gfx=libSDL_gfx.so
+!
+! "examples/oop.factor" run-file
+! "examples/factoroids.factor" run-file
+
 IN: factoroids
 
 USE: combinators
@@ -267,3 +274,6 @@ SYMBOL: event
     ] with-screen ;
 
 factoroids
+
+! Currently the plugin doesn't handle GENERIC: and M:, so we
+! disable the parser. too many errors :sidekick.parser=none:

@@ -2,12 +2,6 @@
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	general_error(ERROR_SIGNAL,tag_fixnum(signal));
-}
-
-void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap)
-{
-	fprintf(stderr,"memory signal\n");
 	if(active.here > active.limit)
 	{
 		fprintf(stderr,"Out of memory\n");
@@ -18,7 +12,7 @@ void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		exit(1);
 	}
 	else
-		general_error(ERROR_SIGNAL,tag_fixnum(signal));
+		signal_error(signal);
 }
 
 /* Called from a signal handler. XXX - is this safe? */
@@ -41,19 +35,16 @@ void init_signals(void)
 {
 	struct sigaction custom_sigaction;
 	struct sigaction profiling_sigaction;
-	struct sigaction memory_sigaction;
 	struct sigaction ign_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
 	profiling_sigaction.sa_sigaction = call_profiling_step;
 	profiling_sigaction.sa_flags = SA_SIGINFO;
-	memory_sigaction.sa_sigaction = memory_signal_handler;
-	memory_sigaction.sa_flags = SA_SIGINFO;
 	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
-	sigaction(SIGBUS,&memory_sigaction,NULL);
-	sigaction(SIGSEGV,&memory_sigaction,NULL);
+	sigaction(SIGBUS,&custom_sigaction,NULL);
+	sigaction(SIGSEGV,&custom_sigaction,NULL);
 	sigaction(SIGPIPE,&ign_sigaction,NULL);
 	sigaction(SIGPROF,&profiling_sigaction,NULL);
 }

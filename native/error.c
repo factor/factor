@@ -18,9 +18,12 @@ void critical_error(char* msg, CELL tagged)
 	exit(1);
 }
 
-void throw_error(CELL error)
+void throw_error(CELL error, bool keep_stacks)
 {
 	thrown_error = error;
+	thrown_keep_stacks = keep_stacks;
+	thrown_ds = ds;
+	thrown_cs = cs;
 
 	/* Return to run() method */
 	siglongjmp(toplevel,1);
@@ -28,30 +31,32 @@ void throw_error(CELL error)
 
 void primitive_throw(void)
 {
-	throw_error(dpop());
+	throw_error(dpop(),true);
+}
+
+void early_error(CELL error)
+{
+	if(userenv[BREAK_ENV] == F)
+	{
+		/* Crash at startup */
+		fprintf(stderr,"Error %ld thrown before BREAK_ENV set\n",to_fixnum(error));
+		fflush(stderr);
+		exit(1);
+	}
 }
 
 void general_error(CELL error, CELL tagged)
 {
-	CELL c = cons(error,cons(tagged,F));
-	if(userenv[BREAK_ENV] == F)
-	{
-		/* Crash at startup */
-		fprintf(stderr,"Error thrown before BREAK_ENV set\n");
-		fprintf(stderr,"Error #%ld\n",to_fixnum(error));
-		if(error == ERROR_TYPE)
-		{
-			CELL obj = untag_cons(untag_cons(tagged)->cdr)->car;
+	early_error(error);
+	throw_error(cons(error,cons(tagged,F)),true);
+}
 
-			fprintf(stderr,"Type #%ld\n",to_fixnum(
-				untag_cons(tagged)->car));
-			fprintf(stderr,"Object %ld\n",obj);
-			fprintf(stderr,"Got type #%ld\n",type_of(obj));
-		}
-		fflush(stderr);
-		exit(1);
-	}
-	throw_error(c);
+/* It is not safe to access 'ds' from a signal handler, so we just not
+touch it */
+void signal_error(int signal)
+{
+	early_error(ERROR_SIGNAL);
+	throw_error(cons(ERROR_SIGNAL,cons(tag_fixnum(signal),F)),false);
 }
 
 void type_error(CELL type, CELL tagged)
