@@ -273,10 +273,10 @@ INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
 	F_STRING* result;
 
 	if(start < 0)
-		range_error(tag_object(string),0,to_fixnum(start),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(start),string->capacity);
 
 	if(end < start || end > string->capacity)
-		range_error(tag_object(string),0,to_fixnum(end),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(end),string->capacity);
 
 	result = allot_string(end - start);
 	memcpy(result + 1,

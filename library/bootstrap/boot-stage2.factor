@@ -137,7 +137,9 @@ USE: namespaces
     "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-utils.factor"
     "/library/sdl/hsv.factor"
-    "/library/sdl/console.factor"
+
+    "/library/ui/line-editor.factor"
+    "/library/ui/console.factor"
 
     "/library/bootstrap/image.factor"
 

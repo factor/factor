@@ -95,3 +95,6 @@ USE: strings
 : split-n ( n str -- list )
     #! Split a string into n-character chunks.
     [ 0 -rot (split-n) ] make-list ;
+
+: ch>str ( ch -- str )
+    1 <sbuf> [ sbuf-append ] keep sbuf>str ;

@@ -38,7 +38,8 @@ USE: vectors
 
 ! Traits metaclass for user-defined classes based on hashtables
 
-: traits ( object -- symbol ) \ traits swap hash ;
+: traits ( object -- symbol )
+    dup vector? [ \ traits swap hash ] [ drop f ] ifte ;
 
 ! Hashtable slot holding an optional delegate. Any undefined
 ! methods are called on the delegate. The object can also

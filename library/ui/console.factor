@@ -1,3 +1,30 @@
+! :folding=indent:collapseFolds=1:
+
+! $Id$
+!
+! Copyright (C) 2004, 2005 Slava Pestov.
+! 
+! Redistribution and use in source and binary forms, with or without
+! modification, are permitted provided that the following conditions are met:
+! 
+! 1. Redistributions of source code must retain the above copyright notice,
+!    this list of conditions and the following disclaimer.
+! 
+! 2. Redistributions in binary form must reproduce the above copyright notice,
+!    this list of conditions and the following disclaimer in the documentation
+!    and/or other materials provided with the distribution.
+! 
+! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 ! A graphical console.
 !
 ! To run this code, bootstrap Factor like so:
@@ -34,6 +61,7 @@ USE: listener
 USE: threads
 USE: stdio
 USE: errors
+USE: line-editor
 
 #! A namespace holding console state.
 SYMBOL: console
@@ -47,8 +75,8 @@ SYMBOL: x
 SYMBOL: y
 #! A string buffer.
 SYMBOL: output-line
-#! A string buffer.
-SYMBOL: line-editor
+#! A line editor object.
+SYMBOL: input-line
 
 ! Rendering
 : background HEX: 0000dbff ;
@@ -94,7 +122,7 @@ SYMBOL: line-editor
     output-line get sbuf>str draw-line ;
 
 : draw-input ( -- )
-    line-editor get sbuf>str draw-line draw-cursor ;
+    input-line get [ line-text get ] bind draw-line draw-cursor ;
 
 : draw-console ( -- )
     [
@@ -187,7 +215,7 @@ PREDICATE: integer return-key
 
 M: return-key key-down ( key -- )
     drop
-    line-editor get empty-buffer
+    input-line get [ line-text get line-clear ] bind
     dup console-write "\n" console-write
     input-continuation get call ;
 
@@ -195,14 +223,22 @@ PREDICATE: integer backspace-key
     SDLK_BACKSPACE = ;
 
 M: backspace-key key-down ( key -- )
-    line-editor get dup sbuf-length 0 = [
-        drop
-    ] [
-        [ sbuf-length 1 - ] keep set-sbuf-length
-    ] ifte ;
+    input-line get [ backspace ] bind ;
+
+PREDICATE: integer left-key
+    SDLK_LEFT = ;
+
+M: left-key key-down ( key -- )
+    input-line get [ left ] bind ;
+
+PREDICATE: integer right-key
+    SDLK_RIGHT = ;
+
+M: right-key key-down ( key -- )
+    input-line get [ right ] bind ;
 
 M: integer key-down ( key -- )
-    line-editor get sbuf-append ;
+    input-line get [ insert-char ] bind ;
 
 GENERIC: handle-event ( event -- ? )
 
@@ -234,7 +270,7 @@ M: alien handle-event ( event -- ? )
     <event> event set
     0 first-line set
     80 <vector> lines set
-    80 <sbuf> line-editor set
+    <line-editor> input-line set
     80 <sbuf> output-line set
     1 SDL_EnableUNICODE drop
     SDL_DEFAULT_REPEAT_DELAY SDL_DEFAULT_REPEAT_INTERVAL

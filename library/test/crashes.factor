@@ -9,6 +9,7 @@ USE: test
 USE: vectors
 USE: lists
 USE: words
+USE: prettyprint
 
 ! Various things that broke CFactor at various times.
 ! This should run without issue (and tests nothing useful)
@@ -62,3 +63,6 @@ USE: words
 [ 1 { } vector-nth ] [ garbage-collection drop ] catch
 [ -1 { } set-vector-length ] [ garbage-collection drop ] catch
 [ 1 "" str-nth ] [ garbage-collection drop ] catch
+
+! ... and again
+[ "" 10 str/ ] [ . ] catch

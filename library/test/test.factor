@@ -111,6 +111,7 @@ USE: unparser
         "interpreter"
         "hsv"
         "alien"
+        "line-editor"
     ] [
         test
     ] each
