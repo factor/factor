@@ -32,7 +32,7 @@ package factor.jedit;
 import console.*;
 import factor.*;
 import javax.swing.text.AttributeSet;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.HashMap;
 import org.gjt.sp.jedit.jEdit;
@@ -200,6 +200,19 @@ public class FactorShell extends Shell
 			stream = null;
 		}
 		
+		private void handleWritePacket(FactorStream.WritePacket w, Output output)
+			throws Exception
+		{
+			Cons pair = FactorPlugin.getExternalInstance()
+				.parseObject(w.getText());
+
+			String write = (String)pair.car;
+			AttributeSet attrs = new ListenerAttributeSet(
+				(Cons)pair.next().car);
+
+			output.writeAttrs(attrs,write);
+		}
+		
 		void packetLoop(Output output) throws Exception
 		{
 			if(waitingForInput)
@@ -216,11 +229,7 @@ public class FactorShell extends Shell
 					break;
 				}
 				else if(p instanceof FactorStream.WritePacket)
-				{
-					FactorStream.WritePacket w
-						= (FactorStream.WritePacket)p;
-					output.writeAttrs(w.getAttributes(),w.getText());
-				}
+					handleWritePacket((FactorStream.WritePacket)p,output);
 			}
 		}
 

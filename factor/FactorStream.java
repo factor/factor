@@ -27,10 +27,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.jedit;
+package factor;
 
-import factor.Cons;
-import factor.FactorReader;
 import javax.swing.text.AttributeSet;
 import java.io.*;
 import java.net.Socket;
@@ -132,30 +130,16 @@ public class FactorStream
 	//{{{ WritePacket class
 	public static class WritePacket extends Packet
 	{
-		public WritePacket(String input)
+		public WritePacket(String text)
 			throws Exception
 		{
-			FactorReader parser = new FactorReader(
-				"parseObject()",
-				new BufferedReader(new StringReader(input)),
-				true,FactorPlugin.getExternalInstance());
-			Cons pair = parser.parse();
-
-			this.write = (String)pair.car;
-			this.attrs = new ListenerAttributeSet((Cons)pair.next().car);
+			this.text = text;
 		}
-		
 		public String getText()
 		{
-			return write;
+			return text;
 		}
 
-		public AttributeSet getAttributes()
-		{
-			return attrs;
-		}
-
-		private String write;
-		private AttributeSet attrs;
+		private String text;
 	} //}}}
 }

@@ -36,7 +36,7 @@
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
-- ExternalFactor VocabularyLookup
+- finish ExternalFactor VocabularyLookup
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
@@ -44,6 +44,7 @@
 
 + kernel:
 
+- dissolve library/platform/native/
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
 - >lower, >upper for strings

@@ -26,15 +26,17 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: stdio
-USE: stack
-USE: strings
 USE: combinators
-USE: parser
+USE: lists
 USE: namespaces
+USE: parser
 USE: presentation
-USE: streams
 USE: prettyprint
+USE: stack
+USE: stdio
+USE: streams
+USE: strings
+USE: words
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -101,3 +103,16 @@ USE: prettyprint
 : stream-server ( -- )
     #! Execute this in the inferior Factor.
     "stdio" get <jedit-stream> "stdio" set ;
+
+: jedit-lookup ( word vocabs -- )
+    #! A utility word called by the Factor plugin to get some
+    #! required word info.
+    search dup [
+        [
+            "vocabulary"
+            "name"
+            "stack-effect"
+        ] [
+            dupd word-property
+        ] map nip
+    ] when ;

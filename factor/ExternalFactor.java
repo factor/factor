@@ -27,9 +27,8 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.jedit;
+package factor;
 
-import factor.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -91,6 +90,8 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized String eval(String cmd) throws IOException
 	{
+		/* Log.log(Log.DEBUG,ExternalFactor.class,"SEND: " + cmd); */
+
 		waitForAck();
 
 		sendEval(cmd);
@@ -99,7 +100,9 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		byte[] response = new byte[responseLength];
 		in.readFully(response);
 		
-		return new String(response,"ASCII");
+		String responseStr = new String(response,"ASCII");
+		/* Log.log(Log.DEBUG,ExternalFactor.class,"RECV: " + responseStr); */
+		return responseStr;
 	} //}}}
 
 	//{{{ openStream() method
@@ -110,6 +113,35 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	{
 		Socket client = new Socket("localhost",streamServer);
 		return new FactorStream(client);
+	} //}}}
+
+	//{{{ searchVocabulary() method
+	/**
+	 * Search through the given vocabulary list for the given word.
+	 */
+	public FactorWord searchVocabulary(Cons vocabulary, String name)
+	{
+		FactorWord w = super.searchVocabulary(vocabulary,name);
+		if(w != null)
+			return w;
+
+		try
+		{
+			Cons result = parseObject(eval(FactorReader.unparseObject(name)
+				+ " "
+				+ FactorReader.unparseObject(vocabulary)
+				+ " jedit-lookup ."));
+			if(result.car == null)
+				return null;
+
+			result = (Cons)result.car;
+			return new FactorWord((String)result.car,(String)result.next().car);
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,e);
+			return null;
+		}
 	} //}}}
 
 	//{{{ close() method
