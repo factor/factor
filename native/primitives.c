@@ -137,6 +137,7 @@ XT primitives[] = {
 	primitive_stat,
 	primitive_read_dir,
 	primitive_gc,
+	primitive_gc_time,
 	primitive_save_image,
 	primitive_datastack,
 	primitive_callstack,

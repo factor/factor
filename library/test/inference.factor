@@ -20,11 +20,11 @@ USE: namespaces
     [ 3 | 4 ]
 ] "effects" set
 
-[ t ] [
-    "effects" get [
-        dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
-    ] all?
-] unit-test
+! [ t ] [
+!     "effects" get [
+!         dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
+!     ] all?
+! ] unit-test
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
 [ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
@@ -146,7 +146,7 @@ DEFER: foe
 [ [ 1 | 1 ] ] [ [ length ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ reverse ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
-[ [ 2 | 1 ] ] [ [ contains? ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ tree-contains? ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ remove ] infer ] unit-test
 
 [ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test

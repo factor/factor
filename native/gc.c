@@ -132,6 +132,8 @@ void collect_roots(void)
 
 void primitive_gc(void)
 {
+	long long start = current_millis();
+
 	gc_in_progress = true;
 
 	flip_zones();
@@ -148,6 +150,8 @@ void primitive_gc(void)
 	gc_debug("gc done",0);
 
 	gc_in_progress = false;
+
+	gc_time += (current_millis() - start);
 }
 
 /* WARNING: only call this from a context where all local variables
@@ -156,4 +160,10 @@ void maybe_garbage_collection(void)
 {
 	if(active.here > active.alarm)
 		primitive_gc();
+}
+
+void primitive_gc_time(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_object(s48_long_long_to_bignum(gc_time)));
 }

@@ -130,21 +130,26 @@ DEFER: (infer)
     call
     recursive-state uncons@ drop ;
 
-: recursive-infer ( quot -- )
+: infer-word ( word -- )
+    #! Infer a word's stack effect, and cache it.
     [
         recursive-state get init-inference
-        (infer)  effect
+        [
+            dup word-parameter (infer) effect
+            [ "infer-effect" set-word-property ] keep
+        ] with-recursive-state
     ] with-scope ;
+
+: inline-compound ( word -- )
+    [ word-parameter (infer) ] with-recursive-state ;
 
 : apply-compound ( word -- )
     #! Infer a compound word's stack effect.
     [
-        word-parameter [
-            recursive-infer consume/produce
-        ] [
-            [ (infer) ] when
-        ] catch
-    ] with-recursive-state ;
+        infer-word consume/produce
+    ] [
+        [ inline-compound ] when
+    ] catch ;
 
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
@@ -256,11 +261,14 @@ DEFER: (infer)
     >r uncons r> uncons >r -
     dup 0 < [ neg + r> cons ] [ r> + cons ] ifte ;
 
+: raise ( [ in | out ] -- [ in | out ] )
+    uncons 2dup min tuck - >r - r> cons ;
+
 : decompose ( first second -- solution )
     #! Return a stack effect such that first*solution = second.
     2dup 2car
     2dup > [ "No solution to decomposition" throw ] when
-    swap - -rot 2cdr >r + r> cons ;
+    swap - -rot 2cdr >r + r> cons raise ;
 
 : set-base ( [ in | stack ] -- )
     #! Set the base case of the current word.
@@ -312,7 +320,7 @@ DEFER: (infer)
 
 : meta-infer ( word -- )
     #! Mark a word as being partially evaluated.
-    dup unit [ car meta-word ] cons  "infer" set-word-property ;
+    dup unit [ car host-word ] cons  "infer" set-word-property ;
 
 \ call [ pop-d (infer) ] "infer" set-word-property
 \ ifte [ infer-ifte ] "infer" set-word-property

@@ -48,7 +48,7 @@ USE: stack
     ] ifte ;
 
 : vector-length= ( vec vec -- ? )
-    vector-length swap vector-length = ;
+    vector-length swap vector-length number= ;
 
 : vector= ( obj vec -- ? )
     #! Check if two vectors are equal. Two vectors are

@@ -1,4 +1,4 @@
-% :indentSize=4:tabSize=4:noTabs=true:mode=tex:
+% :indentSize=4:tabSize=4:noTabs=true:mode=tex:wrap=soft:
 
 \documentclass[english]{book}
 \makeindex
@@ -173,18 +173,18 @@ You can look at the definition of any word, including library words, using \text
     "Greetings, " write print ;}
 \end{alltt}
 
-%\sidebar{
-%Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
-%
-%If you exit Factor by typing \texttt{exit}, any colon definitions entered at the listener will be lost. However, you can save a new image first, and use this image next time you start Factor in order to have access to  your definitions.
-%
-%\begin{alltt}
-%\textbf{ok} "work.image" save-image\\
-%\textbf{ok} exit
-%\end{alltt}
-%
-%The \texttt{factor.image} file you start with initially is just an image that was saved after the standard library, and nothing else, was loaded.
-%}
+\sidebar{
+Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
+
+If you exit Factor by typing \texttt{exit}, any colon definitions entered at the listener will be lost. However, you can save a new image first, and use this image next time you start Factor in order to have access to  your definitions.
+
+\begin{alltt}
+\textbf{ok} "work.image" save-image\\
+\textbf{ok} exit
+\end{alltt}
+
+The \texttt{factor.image} file you start with initially is just an image that was saved after the standard library, and nothing else, was loaded.
+}
 
 \section{The stack}
 
@@ -897,6 +897,109 @@ Test if a value is a proper list.\\
 
 \section{Combinators}
 
+\chapkeywords{when unless when* unless* ifte*}
+\index{\texttt{when}}
+\index{\texttt{unless}}
+\index{\texttt{when*}}
+\index{\texttt{unless*}}
+\index{\texttt{ifte*}}
+
+A \emph{combinator} is a word that takes a code quotation on the stack. In this section, we will look at some simple combinators, all derived from the fundamental \texttt{ifte} combinator we saw earlier. A later section will cover recursive combinators, used for iteration over lists and such.
+
+You may have noticed the curious form of conditional expressions we have seen so far. Indeed, the two code quotations given as branches of the conditional look just like lists, and \texttt{ifte} looks like a normal word that takes these two lists from the stack:
+
+\begin{alltt}
+\emph{condition} {[}
+    \emph{to execute if true}
+{] [}
+    \emph{to execute if false}
+{]} ifte
+\end{alltt}
+
+The \texttt{ifte} word is a \emph{combinator}, because it executes lists representing code, or \emph{quotations}, given on the stack.
+
+%We have already seen the \texttt{when} combinator, which is similar to \texttt{ifte} except it only takes one quotation; the quotation is executed if the condition is true, and nothing is done if the condition is false. In fact \texttt{when} is implemented in terms of \texttt{ifte}. If you think about it for a brief moment, since \texttt{when} is called with a quotation on the stack, it suffices to push an empty list, and call \texttt{ifte}:
+%
+%\begin{verbatim}
+%: when ( ? quot -- )
+%    [ ] ifte ;
+%\end{verbatim}
+%
+%An example of a word that uses both \texttt{ifte} and \texttt{when} is the \texttt{abs} word, which computes the absolute value of a number:
+%
+%\begin{verbatim}
+%: abs ( z -- abs )
+%    #! Compute the complex absolute value.
+%    dup complex? [
+%        >rect mag2
+%    ] [
+%        dup 0 < [ neg ] when
+%    ] ifte ;
+%\end{verbatim}
+%
+%If the given number is a complex number, its distance from the origin is computed\footnote{Don't worry about the \texttt{>rect} and \texttt{mag2} words at this stage; they will be described later. If you are curious, use \texttt{see} to look at their definitions and read the documentation comments.}. Otherwise, if the parameter is a real number below zero, it is negated. If it is a real number greater than zero, it is not modified.
+
+% Note that each branch has the same stack effect. You can use the \texttt{infer} combinator to verify this:
+% 
+% \begin{alltt}
+% \textbf{ok} [ >rect mag2 ] infer .
+% \textbf{[ 1 | 1 ]}
+% \textbf{ok} [ dup 0 < [ neg ] when ] infer .
+% \textbf{[ 1 | 1 ]}
+% \end{alltt}
+% 
+% Hence, the stack effect of the entire conditional expression can be computed:
+% 
+% \begin{alltt}
+% \textbf{ok} [ abs ] infer .
+% \textbf{[ 1 | 1 ]}
+% \end{alltt}
+
+%The dual of the \texttt{when} combinator is the \texttt{unless} combinator. It takes a quotation to execute if the condition is false; otherwise nothing is done. In both cases, the condition is popped off the stack.
+%
+%The implementation is similar to that of \texttt{when}, but this time, we must swap the two quotations given to \texttt{ifte}, so that the true branch is an empty list, and the false branch is the user's quotation:
+%
+%\begin{verbatim}
+%: unless ( ? quot -- )
+%    [ ] swap ifte ;
+%\end{verbatim}
+%
+%A very simple example of \texttt{unless} usage is the \texttt{assert} word:
+%
+%\begin{verbatim}
+%: assert ( t -- )
+%    [ "Assertion failed!" throw ] unless ;
+%\end{verbatim}
+
+%Lets take a look at the words we saw in this section:
+%
+%\wordtable{
+%\tabvocab{combinators}
+%\texttt{when}&
+%\texttt{( ?~quot -{}- )}&
+%Execute quotation if the condition is true, otherwise do nothing but pop the condition and quotation off the stack.\\
+%\texttt{unless}&
+%\texttt{( ?~quot -{}- )}&
+%Execute quotation if the condition is false, otherwise do nothing but pop the condition and quotation off the stack.\\
+%\texttt{when*}&
+%\texttt{( ?~quot -{}- )}&
+%If the condition is true, execute the quotation, with the condition on the stack. Otherwise, pop the condition off the stack.\\
+%\texttt{unless*}&
+%\texttt{( ?~quot -{}- )}&
+%If the condition is false, pop the condition and execute the quotation. Otherwise, leave the condition on the stack.\\
+%\texttt{ifte*}&
+%\texttt{( ?~true false -{}- )}&
+%If condition is true, execute the true branch, with the condition on the stack. Otherwise, pop the condition off the stack and execute the false branch.\\
+%\tabvocab{math}
+%\texttt{ans}&
+%\texttt{( z -- abs )}&
+%Compute the complex absolute value.\\
+%\tabvocab{test}
+%\texttt{assert}&
+%\texttt{( t -- )}&
+%Raise an error if the top of the stack is \texttt{f}.\\
+%}
+
 \section{The interpreter}
 
 \chapkeywords{acons >r r>}
@@ -908,7 +1011,7 @@ So far, we have seen what we called ``the stack'' store intermediate values betw
 
 Another fundamental stack is the \emph{return stack}. It is used to save interpreter state for nested calls.
 
-You have probably noticed that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the return stack, executes the definition of that word, then restores the execution state from the return stack and continues.
+You already know that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the return stack, executes the definition of that word, then restores the execution state from the return stack and continues.
 
 The return stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the return stack, and vice versa, respectively.
 
@@ -949,9 +1052,6 @@ Move value to return stack..\\
 \texttt{( r:obj -{}- obj )}&
 Move value from return stack..\\
 }
-
-\section{Word definitions}
-
 
 \section{Recursive combinators}
 

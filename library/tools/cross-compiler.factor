@@ -66,6 +66,7 @@ DEFER: literal-top
 DEFER: set-literal-top
 
 IN: kernel
+DEFER: gc-time
 DEFER: getenv
 DEFER: setenv
 DEFER: save-image
@@ -325,6 +326,7 @@ IN: image
         stat
         (directory)
         garbage-collection
+        gc-time
         save-image
         datastack
         callstack

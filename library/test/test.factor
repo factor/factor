@@ -30,8 +30,9 @@ USE: unparser
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
-    millis >r call millis r> -
-    unparse write " milliseconds" print ;
+    millis >r gc-time >r call gc-time r> - millis r> -
+    unparse write " milliseconds run time" print
+    unparse write " milliseconds GC time" print ;
 
 : unit-test ( output input -- )
     [
