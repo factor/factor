@@ -1,7 +1,7 @@
 CC = gcc
 
 # On FreeBSD, to use SDL and other libc_r libs:
-CFLAGS = -g -Wall -pthread -export-dynamic
+CFLAGS = -g -Wall -export-dynamic -pthread
 # On PowerPC G5:
 # CFLAGS = -mcpu=970 -mtune=970 -mpowerpc64 -ffast-math -O3
 # On Pentium 4:

@@ -120,7 +120,13 @@ USE: unparser
     over underline-attribute
     <file-actions-menu> actions-key attribute+ ;
 
-: style>attribute-set ( style -- attribute-set )
+: icon-attribute ( string style value -- )
+    dupd <icon> set-icon-style
+    >r drop " " r> ;
+
+: style>attribute-set ( string style -- string attribute-set )
+    #! We need the string, since outputting an icon changes the
+    #! string to " ".
     <attribute-set> swap [
         [ "object-link" dupd object-link-attribute ]
         [ "file-link"   dupd file-link-attribute ]
@@ -131,7 +137,7 @@ USE: unparser
         [ "bg"          dupd >color "Background" swing-attribute+ ]
         [ "font"        dupd "FontFamily" swing-attribute+ ]
         [ "size"        dupd "FontSize" swing-attribute+ ]
-        [ "icon"        dupd <icon> set-icon-style ]
+        [ "icon"        icon-attribute ]
     ] assoc-apply ;
 
 : set-character-attrs ( attrs -- )
@@ -149,7 +155,8 @@ USE: unparser
     jinvoke ;
 
 : reset-attrs ( -- )
-    default-style style>attribute-set set-character-attrs ;
+    f default-style style>attribute-set set-character-attrs
+    drop ;
 
 : listener-readln* ( continuation -- )
     "listener" get

@@ -42,6 +42,15 @@ USE: stack
     #! If the quotation compiles, this combinator compiles.
     >r over >r call r> r> call ; inline interpret-only
 
+: slip ( quot x -- x )
+    >r call r> ; inline interpret-only
+
+: 2slip ( quot x y -- x y )
+    >r >r call r> r> ; inline interpret-only
+
+: 3slip ( quot x y z -- x y z )
+    >r >r >r call r> r> r> ; inline interpret-only
+
 : dip ( a [ b ] -- b a )
     #! Call b as if b was not present on the stack.
     #!

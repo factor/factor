@@ -66,7 +66,7 @@ USE: stack
     ] ifte ;
 
 : ALIEN-CALL ( return func dll params -- )
-    PARAMETERS >r
+    reverse PARAMETERS >r
     dlsym CALL drop
     r> CLEANUP
     RETURNS ;

@@ -4,26 +4,22 @@ FFI:
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 
-- fix responder generated links
+- perhaps /i should work with all numbers
 - profiler is inaccurate: wrong word on cs
 - buffer change handler in sidekick is screwed
 - dec> bin> oct> hex> throw errors
 - parse-number doesn't
 - eval with multilien strings and #!
-- redefining a word doesn't clear comments
 - quit responder breaks with multithreading
 - nicer way to combine two paths
 - don't show listener on certain commands
 - plugin should not exit jEdit on fatal errors
 - wordpreview: don't show for string literals and comments
 - alist -vs- assoc terminology
-- write-icon kind of messy; " " should be output by the listener
-- f usages. --> don't print all words
 - file responder: don't show full path in title
 
 - clean up listener's action popups
 - jedit ==> jedit-word, jedit takes a file name
-- namespace clone drops static var bindings
 - add a socket timeout
 - fix error postoning -- not all errors thrown by i/o code are
   postponed

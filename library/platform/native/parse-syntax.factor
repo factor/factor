@@ -68,7 +68,8 @@ USE: unparser
 ! Colon defs
 : CREATE ( -- word )
     scan "in" get create dup set-word
-    f "documentation" pick set-word-property ;
+    f "documentation" pick set-word-property
+    f "stack-effect" pick set-word-property ;
 
 : remember-where ( word -- )
     "line-number" get "line" pick set-word-property
@@ -81,14 +82,14 @@ USE: unparser
     CREATE dup remember-where [ ]
     "in-definition" on ; parsing
 
-: ;-hook ( -- quot )
-    ";-hook" get [ [ define-compound ] ] unless* ;
+: ;-hook ( word def -- )
+    ";-hook" get [ call ] [ define-compound ] ifte* ;
 
 : ;
     #! End a word definition.
     "in-definition" off
     nreverse
-    ;-hook call ; parsing
+    ;-hook ; parsing
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing

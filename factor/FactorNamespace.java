@@ -93,8 +93,14 @@ public class FactorNamespace implements PublicCloneable, FactorObject
 				Map.Entry entry = (Map.Entry)iter.next();
 				Object key = entry.getKey();
 				Object value = entry.getValue();
-				if(!(value instanceof VarBinding))
-					this.words.put(key,value);
+				if(value instanceof VarBinding)
+				{
+					VarBinding b = (VarBinding)value;
+					if(b.instance != null)
+						continue;
+				}
+
+				this.words.put(key,value);
 			}
 		}
 

@@ -38,14 +38,14 @@ USE: stack
     tuck >r dup 0 <= [
         r> 3drop
     ] [
-        pred >r call r> r> times
+        pred slip r> times
     ] ifte ; inline interpret-only
 
 : (times) ( limit n quot -- )
     pick pick <= [
         3drop
     ] [
-        tuck >r tuck >r rot >r call r> r> succ r> (times)
+        rot pick succ pick 3slip (times)
     ] ifte ; inline interpret-only
 
 : times* ( n quot -- )
@@ -55,3 +55,27 @@ USE: stack
     #! In order to compile, the code must consume one more value
     #! than it produces.
     0 swap (times) ; inline interpret-only
+
+: 2times-succ ( #{ a b } #{ c d } -- z )
+    #! Lexicographically add #{ 0 1 } to a complex number.
+    #! If d + 1 == b, return #{ c+1 0 }. Otherwise, #{ c d+1 }.
+    2dup imaginary succ swap imaginary = [
+        nip real succ
+    ] [
+        nip >rect succ rect>
+    ] ifte ;
+
+: 2times<= ( #{ a b } #{ c d } -- ? )
+    swap real swap real <= ;
+
+: (2times) ( limit n quot -- )
+    pick pick 2times<= [
+        3drop
+    ] [
+        rot pick dupd 2times-succ pick 3slip (2times)
+    ] ifte ;
+
+: 2times* ( #{ w h } quot -- )
+    #! Apply a quotation to each pair of complex numbers
+    #! #{ a b } such that a < w, b < h.
+    0 swap (2times) ;
