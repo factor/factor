@@ -41,8 +41,9 @@ USE: parser
 : l4 "cont-examples.factor" run-file ;
 : l5 "todo.factor" run-file ;
 : l6 "todo-example.factor" run-file ;
-: l7 "eval-responder.factor" run-file ;
-: l8 "live-updater-responder.factor" run-file ;
+: l7 "live-updater.factor" run-file ;
+: l8 "eval-responder.factor" run-file ;
+: l9 "live-updater-responder.factor" run-file ;
 : la ;
 : la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
 : lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
