@@ -28,16 +28,12 @@ USE: httpd
 USE: httpd-responder
 USE: math
 USE: random
-USE: continuations
 USE: namespaces
-USE: stack
-USE: combinators
 USE: streams
 USE: lists
 USE: strings
 USE: html
 USE: kernel
-USE: logic
 USE: html
 USE: logging
 USE: url-encoding

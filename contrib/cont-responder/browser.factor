@@ -28,9 +28,8 @@ IN: browser
 USE: html
 USE: cont-responder
 USE: cont-utils
-USE: stack
+USE: kernel
 USE: stdio
-USE: combinators
 USE: namespaces
 USE: words
 USE: lists

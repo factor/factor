@@ -28,10 +28,9 @@ USE: html
 USE: cont-responder
 USE: lists
 USE: stdio
-USE: stack
+USE: kernel
 USE: namespaces
 USE: html
-USE: combinators
 
 : simple-page ( title quot -- )
   #! Call the quotation, with all output going to the

@@ -25,7 +25,7 @@
 IN: cont-examples
 USE: cont-responder
 USE: html
-USE: stack
+USE: kernel
 USE: stdio
 USE: html
 USE: lists

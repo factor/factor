@@ -30,7 +30,6 @@ USE: namespaces
 USE: html
 USE: words
 USE: stdio
-USE: stack
 USE: kernel
 USE: cont-utils
 USE: cont-responder

@@ -40,7 +40,6 @@ USE: parser
 USE: html
 USE: cont-responder
 USE: cont-utils
-USE: stack
 USE: stdio
 USE: namespaces
 

@@ -24,7 +24,7 @@
 ! cont-responder code for display forms and anchors that use XMLHttpRequest
 ! and the 'liveUpdater.js' code.
 IN: live-updater
-USE: stack
+USE: kernel
 USE: streams
 USE: strings
 USE: html
@@ -32,7 +32,6 @@ USE: cont-responder
 USE: stdio
 USE: namespaces
 USE: lists
-USE: combinators
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.
