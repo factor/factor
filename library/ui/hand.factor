@@ -38,8 +38,6 @@ DEFER: pick-up
     #! exposed facade issue.
     tuck pick-up* dup t = [ drop ] [ nip ] ifte ;
 
-DEFER: world
-
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
 ! it is special in that the world does not list it as part of
@@ -47,11 +45,15 @@ DEFER: world
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand click-pos clicked buttons gadget focus delegate ;
+TUPLE: hand
+    world
+    click-pos clicked buttons
+    gadget focus delegate ;
 
 C: hand ( world -- hand )
     0 0 0 0 <rectangle> <gadget>
     over set-hand-delegate
+    [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
@@ -71,7 +73,7 @@ C: hand ( world -- hand )
 
 : update-hand-gadget ( hand -- )
     #! The hand gadget is the gadget under the hand right now.
-    dup world get pick-up swap set-hand-gadget ;
+    dup dup hand-world pick-up swap set-hand-gadget ;
 
 : fire-motion ( hand -- )
     [ motion ] swap hand-gadget handle-gesture drop ;

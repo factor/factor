@@ -51,3 +51,8 @@ C: quuux-tuple-2
     
     point-x
 ] unit-test
+
+! Ensure we have a fresh word.
+DEFER: losing-eq FORGET: losing-eq
+[ t ] [ DEFER: losing-eq \ losing-eq TUPLE: losing-eq x y ; \ losing-eq eq? ]
+unit-test

@@ -2,6 +2,7 @@
 
 void primitive_begin_scan(void)
 {
+	primitive_gc();
 	heap_scan_ptr = active.base;
 	heap_scan_end = active.here;
 	heap_scan = true;

@@ -4,6 +4,8 @@ IN: memory
 USING: errors generic kernel lists math namespaces prettyprint
 stdio unparser vectors words ;
 
+! Printing an overview of heap usage.
+
 : kb. 1024 /i unparse write " KB" write ;
 
 : (room.) ( free total -- )
@@ -17,18 +19,7 @@ stdio unparser vectors words ;
     "Data space: " write (room.)
     "Code space: " write (room.) ;
 
-: heap-stat. ( type instances bytes -- )
-    dup 0 = [
-        3drop
-    ] [
-        rot builtin-type word-name write ": " write
-        unparse write " bytes, " write
-        unparse write " instances" print
-    ] ifte ;
-
-: heap-stats. ( -- )
-    #! Print heap allocation breakdown.
-    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
+! Some words for iterating through the heap.
 
 : (each-object) ( quot -- )
     next-object dup [
@@ -47,9 +38,22 @@ stdio unparser vectors words ;
 
 : instances ( class -- list )
     #! Return a list of all instances of a built-in or tuple
-    #! class.
+    #! class in the image.
     [
         [
             dup class pick = [ , ] [ drop ] ifte
         ] each-object drop
     ] make-list ;
+
+: heap-stat. ( type instances bytes -- )
+    dup 0 = [
+        3drop
+    ] [
+        rot builtin-type word-name write ": " write
+        unparse write " bytes, " write
+        unparse write " instances" print
+    ] ifte ;
+
+: heap-stats. ( -- )
+    #! Print heap allocation breakdown.
+    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
