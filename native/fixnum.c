@@ -218,11 +218,11 @@ void box_signed_2(signed short integer)
 /* FFI calls this */
 signed char unbox_signed_1(void)
 {
-	return to_integer(dpop());
+	return to_fixnum(dpop());
 }
 
 /* FFI calls this */
 signed short unbox_signed_2(void)
 {
-	return to_integer(dpop());
+	return to_fixnum(dpop());
 }

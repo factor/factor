@@ -118,6 +118,6 @@ void primitive_set_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
 	CELL obj = dpop();
-	F_FIXNUM value = to_integer(dpop());
+	F_FIXNUM value = to_fixnum(dpop());
 	put(SLOT(obj,slot),value);
 }

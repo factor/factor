@@ -1,19 +1,5 @@
 #include "factor.h"
 
-F_FIXNUM to_integer(CELL x)
-{
-	switch(TAG(x))
-	{
-	case FIXNUM_TYPE:
-		return untag_fixnum_fast(x);
-	case BIGNUM_TYPE:
-		return s48_bignum_to_long(untag_bignum(x));
-	default:
-		type_error(BIGNUM_TYPE,x);
-		return 0;
-	}
-}
-
 /* FFI calls this */
 void box_integer(F_FIXNUM integer)
 {
@@ -29,7 +15,7 @@ void box_cell(CELL cell)
 /* FFI calls this */
 F_FIXNUM unbox_integer(void)
 {
-	return to_integer(dpop());
+	return to_fixnum(dpop());
 }
 
 CELL to_cell(CELL x)

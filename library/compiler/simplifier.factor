@@ -69,7 +69,14 @@ SYMBOL: simplifying
     ] with-scope ;
 
 : label-called? ( label linear -- ? )
-    [ unswons #label = [ drop f ] [ over = ] ifte ] some? nip ;
+    [ uncons pick = swap #label = not and ] some? nip ;
+
+#label [
+    [
+        dup car cdr simplifying get label-called?
+        [ f ] [ cdr t ] ifte
+    ]
+] "simplifiers" set-word-property
 
 : next-physical? ( op linear -- ? )
     cdr dup [ car car = ] [ 2drop f ] ifte ;
@@ -79,17 +86,27 @@ SYMBOL: simplifying
     #! its param.
     over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
 
-#label [
-    [
-        dup car cdr simplifying get
-        label-called? [ f ] [ cdr t ] ifte
-    ]
-] "simplifiers" set-word-property
-
 \ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-property
 \ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-property
 \ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-property
 \ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-property
+
+\ drop [
+    [
+        #push-immediate cancel [
+            #replace-immediate swons swons t
+        ] when
+    ] [
+        #push-indirect cancel [
+            #replace-indirect swons swons t
+        ] when
+    ]
+] "simplifiers" set-word-property
+
+: find-label ( label -- rest )
+    simplifying get [
+        uncons pick = swap #label = and
+    ] some? nip ;
 
 : next-logical ( linear -- linear )
     dup car car "next-logical" word-property call ;
@@ -97,11 +114,6 @@ SYMBOL: simplifying
 #label [
     cdr next-logical
 ] "next-logical" set-word-property
-
-: find-label ( label -- rest )
-    simplifying get [
-        uncons pick = swap #label = and
-    ] some? nip ;
 
 #jump-label [
     car cdr find-label cdr
@@ -122,15 +134,11 @@ SYMBOL: simplifying
     ] ifte ;
 
 #call [
-    [
-        #return #jump reduce
-    ]
+    [ #return #jump reduce ]
 ] "simplifiers" set-word-property
 
 #call-label [
-    [
-        #return #jump-label reduce
-    ]
+    [ #return #jump-label reduce ]
 ] "simplifiers" set-word-property
 
 : double-jump ( linear op1 op2 -- linear ? )
@@ -163,39 +171,18 @@ SYMBOL: simplifying
     uncons (dead-code) >r cons r> ;
 
 #jump-label [
-    [
-        #return #return double-jump
-    ] [
-        #jump-label #jump-label double-jump
-    ] [
-        #jump #jump double-jump
-    ] [
-        useless-jump
-    ] [
-        dead-code
-    ]
+    [ #return #return double-jump ]
+    [ #jump-label #jump-label double-jump ]
+    [ #jump #jump double-jump ]
+    [ useless-jump ]
+    [ dead-code ]
 ] "simplifiers" set-word-property
 
 #target-label [
-    [
-        #jump-label #target-label double-jump
-    ] [
-        #jump #target double-jump
-    ]
+    [ #jump-label #target-label double-jump ]
+    [ #jump #target double-jump ]
 ] "simplifiers" set-word-property
 
 #jump [ [ dead-code ] ] "simplifiers" set-word-property
 #return [ [ dead-code ] ] "simplifiers" set-word-property
 #end-dispatch [ [ dead-code ] ] "simplifiers" set-word-property
-
-\ drop [
-    [
-        #push-immediate cancel [
-            #replace-immediate swons swons t
-        ] when
-    ] [
-        #push-indirect cancel [
-            #replace-indirect swons swons t
-        ] when
-    ]
-] "simplifiers" set-word-property

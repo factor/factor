@@ -38,8 +38,8 @@
 ! Then, start Factor as usual (./f factor.image) and enter this
 ! at the listener:
 !
-! USE: console
-! start-console
+! USE: shells
+! sdl
 
 IN: console
 USE: generic
@@ -62,6 +62,7 @@ USE: stdio
 USE: errors
 USE: line-editor
 USE: hashtables
+USE: lists
 
 #! A namespace holding console state.
 SYMBOL: console
@@ -78,10 +79,31 @@ SYMBOL: output-line
 #! A line editor object.
 SYMBOL: input-line
 
+! Scrolling
+: visible-lines ( -- n ) height get line-height /i ;
+: total-lines ( -- n ) lines get vector-length ;
+: available-lines ( -- ) total-lines first-line get - ;
+
+: fix-first-line ( line -- line )
+    total-lines visible-lines - 1 + min 0 max ;
+
+: change-first-line ( quot -- )
+    first-line get
+    swap call fix-first-line
+    first-line set ; inline
+
+: line-scroll-up   ( -- ) [ 1 - ] change-first-line ;
+: line-scroll-down ( -- ) [ 1 + ] change-first-line ;
+: page-scroll-up   ( -- ) [ visible-lines - ] change-first-line ;
+: page-scroll-down ( -- ) [ visible-lines + ] change-first-line ;
+
+: scroll-to-bottom ( -- )
+    total-lines fix-first-line first-line set ;
+
 ! Rendering
-: background HEX: 0000dbff ;
-: foreground HEX: 6d92ffff ;
-: cursor     HEX: ffff24ff ;
+: background white ;
+: foreground black ;
+: cursor     red   ;
 
 #! The font size is hardcoded here.
 : line-height 8 ;
@@ -96,12 +118,6 @@ SYMBOL: input-line
 
 : clear-display ( -- )
     surface get 0 0 width get height get background boxColor ;
-
-: visible-lines ( -- n )
-    height get line-height /i ;
-
-: available-lines ( -- )
-    lines get vector-length first-line get - ;
 
 : draw-lines ( -- )
     visible-lines available-lines min [
@@ -131,6 +147,19 @@ SYMBOL: input-line
     input-line get [ line-text get ] bind draw-line
     r> draw-cursor ;
 
+: scrollbar-width 16 ;
+: scroll-y ( line -- y ) total-lines 1 + / height get * ;
+: scrollbar-top ( -- y ) first-line get scroll-y ;
+: scrollbar-bottom ( -- y ) first-line get visible-lines + scroll-y ;
+
+: draw-scrollbar ( -- )
+    surface get
+    width get scrollbar-width -
+    scrollbar-top
+    width get
+    scrollbar-bottom
+    black boxColor ;
+
 : draw-console ( -- )
     [
         0 x set
@@ -139,19 +168,14 @@ SYMBOL: input-line
         draw-lines
         draw-current
         draw-input
+        draw-scrollbar
     ] with-surface ;
 
 : empty-buffer ( sbuf -- str )
     dup sbuf>str 0 rot set-sbuf-length ;
 
 : add-line ( text -- )
-    lines get vector-push
-    lines get vector-length 1 + first-line get - visible-lines -
-    dup 0 >= [
-        first-line [ + ] change
-    ] [
-        drop
-    ] ifte ;
+    lines get vector-push scroll-to-bottom ;
 
 : console-write ( text -- )
     "\n" split1 [       
@@ -222,34 +246,85 @@ SYMBOL: event
 
 GENERIC: handle-event ( event -- ? )
 
-PREDICATE: alien key-down-event
-    keyboard-event-type SDL_KEYDOWN = ;
-
 SYMBOL: keymap
 
 {{
-        [[ [ "RETURN" ] [ return-key ] ]]
-        [[ [ "BACKSPACE" ] [ input-line get [ backspace ] bind ] ]]
-        [[ [ "LEFT" ] [ input-line get [ left ] bind ] ]]
-        [[ [ "RIGHT" ] [ input-line get [ right ] bind ] ]]
-        [[ [ "UP" ] [ input-line get [ history-prev ] bind ] ]]
-        [[ [ "DOWN" ] [ input-line get [ history-next ] bind ] ]]
-        [[ [ "CTRL" "k" ] [ input-line get [ line-clear ] bind ] ]]
+    [[ [ "RETURN" ] [ return-key ] ]]
+    [[ [ "BACKSPACE" ] [ input-line get [ backspace ] bind ] ]]
+    [[ [ "LEFT" ] [ input-line get [ left ] bind ] ]]
+    [[ [ "RIGHT" ] [ input-line get [ right ] bind ] ]]
+    [[ [ "UP" ] [ input-line get [ history-prev ] bind ] ]]
+    [[ [ "SHIFT" "DOWN" ] [ line-scroll-down ] ]]
+    [[ [ "SHIFT" "UP" ] [ line-scroll-up ] ]]
+    [[ [ "PAGEDOWN" ] [ page-scroll-down ] ]]
+    [[ [ "PAGEUP" ] [ page-scroll-up ] ]]
+    [[ [ "DOWN" ] [ input-line get [ history-next ] bind ] ]]
+    [[ [ "CTRL" "k" ] [ input-line get [ line-clear ] bind ] ]]
 }} keymap set
+
+: input-key? ( event -- ? )
+    #! Is this a keystroke that potentially inserts input, or
+    #! does it have modifiers?
+    keyboard-event-unicode valid-char? ;
+
+: user-input ( char -- )
+    input-line get [ insert-char ] bind  scroll-to-bottom ;
 
 M: key-down-event handle-event ( event -- ? )
     dup keyboard-event>binding keymap get hash [
         call draw-console
     ] [
-        keyboard-event-unicode dup valid-char? [
-            input-line get [ insert-char ] bind draw-console
+        dup input-key? [
+            keyboard-event-unicode user-input draw-console
         ] [
             drop
         ] ifte
     ] ?ifte t ;
 
-PREDICATE: alien quit-event
-    quit-event-type SDL_QUIT = ;
+! The y co-ordinate of the start of the drag.
+SYMBOL: drag-start-y
+! The first line at the time
+SYMBOL: drag-start-line
+
+: scrollbar-click ( y -- )
+    dup scrollbar-top < [
+        drop page-scroll-up draw-console
+    ] [
+        dup scrollbar-bottom > [
+            drop page-scroll-down draw-console
+        ] [
+            drag-start-y set
+            first-line get drag-start-line set
+        ] ifte
+    ] ifte ;
+
+M: button-down-event handle-event ( event -- ? )
+    dup button-event-x width get scrollbar-width - >= [
+        button-event-y scrollbar-click
+    ] [
+        drop
+    ] ifte t ;
+
+M: button-up-event handle-event ( event -- ? )
+    drop
+    drag-start-y off
+    drag-start-line off t ;
+
+M: motion-event handle-event ( event -- ? )
+    drag-start-y get [
+        motion-event-y drag-start-y get -
+        height get / total-lines * drag-start-line get +
+        >fixnum fix-first-line first-line set
+        draw-console
+    ] [
+        drop
+    ] ifte t ;
+
+M: resize-event handle-event ( event -- ? )
+    dup resize-event-w swap resize-event-h
+    0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
+    scroll-to-bottom
+    draw-console t ;
 
 M: quit-event handle-event ( event -- ? )
     drop f ;
@@ -290,7 +365,7 @@ IN: shells
 
 : sdl ( -- )
     <namespace> [
-        800 600 32 SDL_HWSURFACE init-screen
+        640 480 0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
         init-console
     ] extend console set
 

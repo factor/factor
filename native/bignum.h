@@ -18,7 +18,6 @@ INLINE CELL tag_bignum(F_ARRAY* bignum)
 	return RETAG(bignum,BIGNUM_TYPE);
 }
 
-F_FIXNUM to_integer(CELL x);
 CELL to_cell(CELL x);
 
 DLLEXPORT void box_integer(F_FIXNUM integer);

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -27,6 +27,8 @@
 
 IN: sdl-event
 USE: alien
+USE: generic
+USE: kernel
 
 BEGIN-ENUM: 0
     ENUM: SDL_NOEVENT         ! Unused (do not remove)
@@ -100,6 +102,12 @@ BEGIN-STRUCT: keyboard-event
     FIELD: ushort unicode
 END-STRUCT
 
+PREDICATE: alien key-down-event
+    keyboard-event-type SDL_KEYDOWN = ;
+
+PREDICATE: alien key-up-event
+    keyboard-event-type SDL_KEYUP = ;
+
 BEGIN-STRUCT: motion-event
     FIELD: uchar type  ! SDL_MOUSEMOTION
     FIELD: uchar which ! The mouse device index
@@ -108,7 +116,10 @@ BEGIN-STRUCT: motion-event
     FIELD: ushort y
     FIELD: short xrel  ! The relative motion in the X direction
     FIELD: short yrel  ! The relative motion in the Y direction 
-END-STRUCT             
+END-STRUCT
+
+PREDICATE: alien motion-event
+    motion-event-type SDL_MOUSEMOTION = ;
 
 BEGIN-STRUCT: button-event
 	FIELD: uchar type    ! SDL_MOUSEBUTTONDOWN or SDL_MOUSEBUTTONUP
@@ -119,12 +130,21 @@ BEGIN-STRUCT: button-event
     FIELD: ushort y      ! The X/Y coordinates of the mouse at press time
 END-STRUCT
 
+PREDICATE: alien button-down-event
+    button-event-type SDL_MOUSEBUTTONDOWN = ;
+
+PREDICATE: alien button-up-event
+    button-event-type SDL_MOUSEBUTTONUP = ;
+
 BEGIN-STRUCT: joy-axis-event
 	FIELD: uchar type   ! SDL_JOYAXISMOTION
     FIELD: uchar which  ! The joystick device index
     FIELD: uchar axis   ! The joystick axis index
     FIELD: short value  ! The axis value
 END-STRUCT
+
+PREDICATE: alien joy-axis-event
+    joy-axis-event-type SDL_JOYAXISMOTION = ;
 
 BEGIN-STRUCT: joy-ball-event
     FIELD: uchar type  ! SDL_JOYBALLMOTION
@@ -133,6 +153,9 @@ BEGIN-STRUCT: joy-ball-event
     FIELD: short xrel  ! The relative motion in the X direction
     FIELD: short yrel  ! The relative motion in the Y direction
 END-STRUCT
+
+PREDICATE: alien joy-ball-event
+    joy-ball-event-type SDL_JOYBALLMOTION = ;
 
 BEGIN-STRUCT: joy-hat-event
     FIELD: uchar type  ! SDL_JOYHATMOTION
@@ -145,12 +168,21 @@ BEGIN-STRUCT: joy-hat-event
         ! Note that zero means the POV is centered.
 END-STRUCT
 
+PREDICATE: alien joy-hat-event
+    joy-hat-event-type SDL_JOYHATMOTION = ;
+
 BEGIN-STRUCT: joy-button-event
 	FIELD: uchar type   ! SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP
 	FIELD: uchar which  ! The joystick device index
 	FIELD: uchar button ! The joystick button index
 	FIELD: uchar state  ! SDL_PRESSED or SDL_RELEASED
 END-STRUCT
+
+PREDICATE: alien joy-button-down-event
+    joy-button-event-type SDL_JOYBUTTONDOWN = ;
+
+PREDICATE: alien joy-button-up-event
+    joy-button-event-type SDL_JOYBUTTONUP = ;
 
 BEGIN-STRUCT: resize-event
     FIELD: uchar type ! SDL_VIDEORESIZE
@@ -162,9 +194,15 @@ BEGIN-STRUCT: expose-event
     FIELD: uchar type ! SDL_VIDEOEXPOSE
 END-STRUCT
 
+PREDICATE: alien resize-event
+    resize-event-type SDL_VIDEORESIZE = ;
+
 BEGIN-STRUCT: quit-event
     FIELD: uchar type ! SDL_QUIT
 END-STRUCT
+
+PREDICATE: alien quit-event
+    quit-event-type SDL_QUIT = ;
 
 BEGIN-STRUCT: user-event
     FIELD: uchar type ! SDL_USREVENT through SDL_NUMEVENTS-1
@@ -172,6 +210,9 @@ BEGIN-STRUCT: user-event
     FIELD: void* data1
     FIELD: void* data2
 END-STRUCT
+
+PREDICATE: alien user-event
+    user-event-type SDL_QUIT = ;
 
 BEGIN-STRUCT: event
     FIELD: uchar type
