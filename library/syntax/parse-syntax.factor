@@ -96,7 +96,7 @@ math namespaces parser strings words vectors unparse ;
 
 ! String literal
 : parse-string ( n str -- n )
-    2dup str-nth CHAR: " = [
+    2dup string-nth CHAR: " = [
         drop 1 +
     ] [
         [ next-char swap , ] keep parse-string

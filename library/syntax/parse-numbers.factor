@@ -50,26 +50,26 @@ M: object digit> not-a-number ;
     2dup < [ rot * + ] [ not-a-number ] ifte ;
 
 : (base>) ( base str -- num )
-    dup str-length 0 = [
+    dup string-length 0 = [
         not-a-number
     ] [
-        0 swap [ digit> pick digit+ ] str-each nip
+        0 swap [ digit> pick digit+ ] string-each nip
     ] ifte ;
 
 : base> ( str base -- num )
     #! Convert a string to an integer. Throw an error if
     #! conversion fails.
-    swap "-" ?str-head [ (base>) neg ] [ (base>) ] ifte ;
+    swap "-" ?string-head [ (base>) neg ] [ (base>) ] ifte ;
 
 GENERIC: str>number ( str -- num )
 
 M: string str>number 10 base> ;
 
-PREDICATE: string potential-ratio "/" swap str-contains? ;
+PREDICATE: string potential-ratio "/" swap string-contains? ;
 M: potential-ratio str>number ( str -- num )
-    dup CHAR: / index-of str// swap 10 base> swap 10 base> / ;
+    dup CHAR: / index-of string// swap 10 base> swap 10 base> / ;
 
-PREDICATE: string potential-float "." swap str-contains? ;
+PREDICATE: string potential-float "." swap string-contains? ;
 M: potential-float str>number ( str -- num )
     str>float ;
 

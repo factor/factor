@@ -22,7 +22,7 @@ kernel-internals ;
 
 : cli-var-param ( name value -- ) swap ":" split set-path ;
 
-: cli-bool-param ( name -- ) "no-" ?str-head not put ;
+: cli-bool-param ( name -- ) "no-" ?string-head not put ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -36,7 +36,7 @@ kernel-internals ;
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup f-or-"" [ "-" ?str-head [ cli-param f ] when ] unless ;
+    dup f-or-"" [ "-" ?string-head [ cli-param f ] when ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;

@@ -49,7 +49,7 @@ USE: listener
 ! captured with with-string.
 
 : write-packet ( string -- )
-    dup str-length write-big-endian-32 write flush ;
+    dup string-length write-big-endian-32 write flush ;
 
 : read-packet ( -- string )
     read-big-endian-32 read ;
@@ -75,7 +75,7 @@ USE: listener
 : jedit-write-attr ( str style -- )
     CHAR: w write
     [ swap . . ] with-string
-    dup str-length write-big-endian-32
+    dup string-length write-big-endian-32
     write ;
 
 TUPLE: jedit-stream delegate ;

@@ -25,7 +25,6 @@ void primitive_set_sbuf_nth(void);
 void sbuf_append_string(F_SBUF* sbuf, F_STRING* string);
 void primitive_sbuf_append(void);
 void primitive_sbuf_to_string(void);
-void primitive_sbuf_reverse(void);
 void primitive_sbuf_clone(void);
 bool sbuf_eq(F_SBUF* s1, F_SBUF* s2);
 void primitive_sbuf_eq(void);

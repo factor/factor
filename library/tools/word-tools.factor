@@ -42,7 +42,7 @@ M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
-    words [ word-name dupd str-contains? ] subset nip ;
+    words [ word-name dupd string-contains? ] subset nip ;
 
 : vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.
@@ -55,7 +55,7 @@ M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
 : vocab-completions ( substring vocab -- list )
     #! Used by jEdit plugin. Like vocab-apropos, but only
     #! matches at the start of a word name are considered.
-    words [ word-name over ?str-head nip ] subset nip ;
+    words [ word-name over ?string-head nip ] subset nip ;
 
 : apropos. ( substring -- )
     #! List all words that contain a string.
@@ -78,7 +78,7 @@ M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
 
 : word-file ( word -- file )
     "file" word-prop dup [
-        "resource:/" ?str-head [
+        "resource:/" ?string-head [
             resource-path swap path+
         ] when
     ] when ;

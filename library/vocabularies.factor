@@ -7,7 +7,7 @@ IN: words USING: hashtables kernel lists namespaces strings ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    vocabularies get hash-keys [ str-lexi> ] sort ;
+    vocabularies get hash-keys [ string> ] sort ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.
@@ -15,7 +15,7 @@ IN: words USING: hashtables kernel lists namespaces strings ;
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
-    [ swap word-name swap word-name str-lexi> ] sort ;
+    [ swap word-name swap word-name string> ] sort ;
 
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.

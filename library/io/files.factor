@@ -12,7 +12,7 @@ strings unparser ;
 
 : directory ( dir -- list )
     #! List a directory.
-    (directory) [ str-lexi> ] sort ;
+    (directory) [ string> ] sort ;
 
 : file-length ( file -- length )
     stat dup [ cdr cdr car ] when ;

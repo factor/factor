@@ -54,6 +54,4 @@ void primitive_string_compare(void);
 void primitive_string_eq(void);
 void primitive_index_of(void);
 void primitive_substring(void);
-void string_reverse(F_STRING* s, int len);
 F_STRING* string_clone(F_STRING* s, int len);
-void primitive_string_reverse(void);

@@ -8,25 +8,25 @@ IN: strings USING: kernel lists math namespaces strings ;
     [ swap [ dup , ] times drop ] make-string ;
 
 : pad ( string count char -- string )
-    >r over str-length - dup 0 <= [
+    >r over string-length - dup 0 <= [
         r> 2drop
     ] [
         r> fill swap cat2
     ] ifte ;
 
-: str-map ( str code -- str )
+: string-map ( str code -- str )
     #! Apply a quotation to each character in the string, and
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
-    over str-length <sbuf> rot [
+    over string-length <sbuf> rot [
         swap >r apply swap r> tuck sbuf-append
-    ] str-each nip sbuf>str ; inline
+    ] string-each nip sbuf>string ; inline
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [
-        >r drop str-tail , r> ( end of string )
+        >r drop string-tail , r> ( end of string )
     ] [
-        swap str-length dupd + >r swap substring , r>
+        swap string-length dupd + >r swap substring , r>
     ] ifte ;
 
 : (split) ( index string split -- )
@@ -42,10 +42,10 @@ IN: strings USING: kernel lists math namespaces strings ;
     [ 0 -rot (split) ] make-list ;
 
 : split-n-advance substring , >r tuck + swap r> ;
-: split-n-finish nip dup str-length swap substring , ;
+: split-n-finish nip dup string-length swap substring , ;
 
 : (split-n) ( start n str -- )
-    3dup >r dupd + r> 2dup str-length < [
+    3dup >r dupd + r> 2dup string-length < [
         split-n-advance (split-n)
     ] [
         split-n-finish 3drop
@@ -55,5 +55,5 @@ IN: strings USING: kernel lists math namespaces strings ;
     #! Split a string into n-character chunks.
     [ 0 -rot (split-n) ] make-list ;
 
-: ch>str ( ch -- str )
-    1 <sbuf> [ sbuf-append ] keep sbuf>str ;
+: ch>string ( ch -- str )
+    1 <sbuf> [ sbuf-append ] keep sbuf>string ;

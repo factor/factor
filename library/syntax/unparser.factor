@@ -54,7 +54,7 @@ M: ratio unparse ( num -- str )
 : fix-float ( str -- str )
     #! This is terrible. Will go away when we do our own float
     #! output.
-    "." over str-contains? [ ".0" cat2 ] unless ;
+    "." over string-contains? [ ".0" cat2 ] unless ;
 
 M: float unparse ( float -- str )
     (unparse-float) fix-float ;
@@ -90,7 +90,7 @@ M: complex unparse ( num -- str )
 
 M: string unparse ( str -- str )
     [
-        CHAR: " , [ unparse-ch , ] str-each CHAR: " ,
+        CHAR: " , [ unparse-ch , ] string-each CHAR: " ,
     ] make-string ;
 
 M: word unparse ( obj -- str )

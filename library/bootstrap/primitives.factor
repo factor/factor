@@ -30,20 +30,18 @@ vocabularies get [
     [ "ifte" "kernel"                         [ [ object general-list general-list ] [ ] ] ]
     [ "cons" "lists"                          [ [ object object ] [ cons ] ] ]
     [ "<vector>" "vectors"                    [ [ integer ] [ vector ] ] ]
-    [ "str-nth" "strings"                     [ [ integer string ] [ integer ] ] ]
-    [ "str-compare" "strings"                 [ [ string string ] [ integer ] ] ]
-    [ "str=" "strings"                        [ [ string string ] [ boolean ] ] ]
+    [ "string-nth" "strings"                  [ [ integer string ] [ integer ] ] ]
+    [ "string-compare" "strings"              [ [ string string ] [ integer ] ] ]
+    [ "string=" "strings"                     [ [ string string ] [ boolean ] ] ]
     [ "index-of*" "strings"                   [ [ integer string text ] [ integer ] ] ]
     [ "substring" "strings"                   [ [ integer integer string ] [ string ] ] ]
-    [ "str-reverse" "strings"                 [ [ string ] [ string ] ] ]
     [ "<sbuf>" "strings"                      [ [ integer ] [ sbuf ] ] ]
     [ "sbuf-length" "strings"                 [ [ sbuf ] [ integer ] ] ]
     [ "set-sbuf-length" "strings"             [ [ integer sbuf ] [ ] ] ]
     [ "sbuf-nth" "strings"                    [ [ integer sbuf ] [ integer ] ] ]
     [ "set-sbuf-nth" "strings"                [ [ integer integer sbuf ] [ ] ] ]
     [ "sbuf-append" "strings"                 [ [ text sbuf ] [ ] ] ]
-    [ "sbuf>str" "strings"                    [ [ sbuf ] [ string ] ] ]
-    [ "sbuf-reverse" "strings"                [ [ sbuf ] [ ] ] ]
+    [ "sbuf>string" "strings"                 [ [ sbuf ] [ string ] ] ]
     [ "sbuf-clone" "strings"                  [ [ sbuf ] [ sbuf ] ] ]
     [ "sbuf=" "strings"                       [ [ sbuf sbuf ] [ boolean ] ] ]
     [ "arithmetic-type" "math-internals"      [ [ object object ] [ object object fixnum ] ] ]
@@ -195,7 +193,7 @@ vocabularies get [
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
     [ "end-scan" "memory"                     [ [ ] [ ] ] ]
     [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
-] [                                           
+] [
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [
         "stack-effect" set-word-prop

@@ -73,7 +73,7 @@ USE: unparser
     ] ifte ;
 
 : serve-directory ( filename -- )
-    "/" ?str-tail [
+    "/" ?string-tail [
         dup "/index.html" cat2 dup exists? [
             serve-file
         ] [

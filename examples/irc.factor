@@ -77,7 +77,7 @@ M: privmsg irc-display ( line -- )
 : say ( line -- )
     channel get [ (msg) ] [ "No channel." print ] ifte* ;
 
-: talk ( input -- ) "/" ?str-head [ command ] [ say ] ifte ;
+: talk ( input -- ) "/" ?string-head [ command ] [ say ] ifte ;
 : talk-loop ( -- ) read [ talk talk-loop ] when* ;
 
 : irc ( nick server -- )

@@ -20,14 +20,14 @@ unparser ;
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
     #! which should have stack effect ( ch -- ? ).
-    >r 2dup str-length < [
-        2dup str-nth r> dup >r call [
+    >r 2dup string-length < [
+        2dup string-nth r> dup >r call [
             r> 2drop
         ] [
             >r 1 + r> r> skip
         ] ifte
     ] [
-        r> drop nip str-length
+        r> drop nip string-length
     ] ifte ; inline
 
 : skip-blank ( n line -- n )
@@ -41,10 +41,10 @@ unparser ;
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    "\"" str-contains? ;
+    "\"" string-contains? ;
 
 : skip-word ( n line -- n )
-    2dup str-nth denotation? [
+    2dup string-nth denotation? [
         drop 1 +
     ] [
         [ blank? ] skip
@@ -52,7 +52,7 @@ unparser ;
 
 : (scan) ( n line -- start end )
     [ skip-blank dup ] keep
-    2dup str-length < [ skip-word ] [ drop ] ifte ;
+    2dup string-length < [ skip-word ] [ drop ] ifte ;
 
 : scan ( -- token )
     "col" get "line" get dup >r (scan) dup "col" set
@@ -98,7 +98,7 @@ global [ string-mode off ] bind
     ch-search (until) ;
 
 : (until-eol) ( -- index ) 
-    "\n" ch-search dup -1 = [ drop "line" get str-length ] when ;
+    "\n" ch-search dup -1 = [ drop "line" get string-length ] when ;
 
 : until-eol ( -- str )
     #! This is just a hack to get "eval" to work with multiline
@@ -132,17 +132,17 @@ global [ string-mode off ] bind
     ] assoc dup [ "Bad escape" throw ] unless ;
 
 : next-escape ( n str -- ch n )
-    2dup str-nth CHAR: u = [
+    2dup string-nth CHAR: u = [
         swap 1 + dup 4 + [ rot substring hex> ] keep
     ] [
-        over 1 + >r str-nth escape r>
+        over 1 + >r string-nth escape r>
     ] ifte ;
 
 : next-char ( n str -- ch n )
-    2dup str-nth CHAR: \\ = [
+    2dup string-nth CHAR: \\ = [
         >r 1 + r> next-escape
     ] [
-        over 1 + >r str-nth r>
+        over 1 + >r string-nth r>
     ] ifte ;
 
 : doc-comment-here? ( parsed -- ? )

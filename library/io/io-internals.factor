@@ -46,7 +46,7 @@ BUILTIN: port 14 ;
 
 : blocking-write ( str port -- )
     over
-    dup string? [ str-length ] [ drop 1 ] ifte
+    dup string? [ string-length ] [ drop 1 ] ifte
     over wait-to-write write-fd-8 ;
 
 : blocking-fill ( port -- )
@@ -56,7 +56,7 @@ BUILTIN: port 14 ;
     dup can-read-line? [ drop ] [ blocking-fill ] ifte ;
 
 : blocking-read-line ( port -- line )
-    dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
+    dup wait-to-read-line read-line-fd-8 dup [ sbuf>string ] when ;
 
 : fill-fd ( count port -- )
     [ add-read-count-io-task (yield) ] callcc0 2drop ;
@@ -65,7 +65,7 @@ BUILTIN: port 14 ;
     2dup can-read-count? [ 2drop ] [ fill-fd ] ifte ;
 
 : blocking-read ( count port -- str )
-    2dup wait-to-read read-count-fd-8 dup [ sbuf>str ] when ;
+    2dup wait-to-read read-count-fd-8 dup [ sbuf>string ] when ;
 
 : wait-to-accept ( socket -- )
     [ add-accept-io-task (yield) ] callcc0 drop ;

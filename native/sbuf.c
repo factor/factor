@@ -133,12 +133,6 @@ void primitive_sbuf_to_string(void)
 	drepl(tag_object(s));
 }
 
-void primitive_sbuf_reverse(void)
-{
-	F_SBUF* sbuf = untag_sbuf(dpop());
-	string_reverse(untag_string(sbuf->string),sbuf->top);
-}
-
 void primitive_sbuf_clone(void)
 {
 	F_SBUF* s;

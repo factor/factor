@@ -14,7 +14,7 @@ GENERIC: stream-close      ( stream -- )
 
 : stream-read1 ( stream -- char/f )
     1 swap stream-read
-    dup f-or-"" [ drop f ] [ 0 swap str-nth ] ifte ;
+    dup f-or-"" [ drop f ] [ 0 swap string-nth ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
@@ -37,7 +37,7 @@ M: string-output stream-auto-flush ( stream -- ) drop ;
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output
     #! stream.
-    string-output-buf sbuf>str ;
+    string-output-buf sbuf>string ;
 
 C: string-output ( size -- stream )
     #! Creates a new stream for writing to a string buffer.

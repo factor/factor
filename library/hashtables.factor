@@ -9,6 +9,8 @@ DEFER: set-hash-size
 IN: hashtables
 USING: generic kernel lists math vectors ;
 
+! We put hash-size in the hashtables vocabulary, and
+! the other words in kernel-internals.
 BUILTIN: hashtable 10
     [ 1 "hash-size" set-hash-size ]
     [ 2 hash-array set-hash-array ] ;
@@ -35,25 +37,19 @@ IN: kernel-internals
     [ array-nth swap call ] 2keep
     set-array-nth ; inline
 
+: hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
+: hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
+
 IN: hashtables
 
-: hash-size+ ( hash -- )
-    dup hash-size 1 + swap set-hash-size ;
-
-: hash-size- ( hash -- )
-    dup hash-size 1 - swap set-hash-size ;
-
-: bucket-count ( hash -- n )
-    hash-array array-capacity ;
+: bucket-count ( hash -- n ) hash-array array-capacity ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
     >r hashcode r> bucket-count rem ; inline
 
 : hash* ( key table -- [[ key value ]] )
-    #! Look up a value in the hashtable. First the bucket is
-    #! determined using the hash function, then the association
-    #! list therein is searched linearly.
+    #! Look up a value in the hashtable.
     2dup (hashcode) swap hash-bucket assoc* ;
 
 : hash ( key table -- value )
@@ -68,7 +64,7 @@ IN: hashtables
     -rot 2dup (hashcode) over [
         ( quot key hash assoc -- )
         swapd 2dup
-        assoc [ rot hash-size- ] [ rot drop ] ifte
+        assoc* [ rot hash-size- ] [ rot drop ] ifte
         rot call
     ] change-bucket ; inline
 
@@ -97,7 +93,9 @@ IN: hashtables
 : rehash ( hash -- )
     #! Increase the hashtable size if its too small.
     dup rehash? [
-        dup hash>alist over grow-hash
+        dup hash>alist
+        over grow-hash
+        0 pick set-hash-size
         [ unswons rot (set-hash) ] each-with
     ] [
         drop
@@ -115,6 +113,7 @@ IN: hashtables
 
 : hash-clear ( hash -- )
     #! Remove all entries from a hashtable.
+    0 over set-hash-size
     dup bucket-count [
         [ f swap pick set-hash-bucket ] keep
     ] repeat drop ;
@@ -140,8 +139,9 @@ IN: hashtables
     >r hash>alist r> each ; inline
 
 M: hashtable clone ( hash -- hash )
-    dup bucket-count dup <hashtable> [
-        hash-array rot hash-array rot copy-array
+    dup bucket-count <hashtable>
+    over hash-size over set-hash-size [
+        hash-array swap hash-array dup array-capacity copy-array
     ] keep ;
 
 : hash-subset? ( subset of -- ? )

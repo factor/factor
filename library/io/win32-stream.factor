@@ -70,11 +70,11 @@ M: integer do-write ( int -- )
     buffer-append-char ;
 
 M: string do-write ( str -- )
-    dup str-length out-buffer get buffer-capacity <= [
+    dup string-length out-buffer get buffer-capacity <= [
         out-buffer get buffer-append
     ] [
-        dup str-length out-buffer get buffer-size > [
-            dup str-length out-buffer get buffer-extend do-write
+        dup string-length out-buffer get buffer-size > [
+            dup string-length out-buffer get buffer-extend do-write
         ] [ flush-output do-write ] ifte
     ] ifte ;
 
@@ -95,16 +95,16 @@ M: string do-write ( str -- )
     dup in-buffer get buffer-first-n
     swap in-buffer get buffer-consume ;
 
-: sbuf>str-or-f ( sbuf -- str-or-? )
-    dup sbuf-length 0 > [ sbuf>str ] [ drop f ] ifte ;
+: sbuf>string-or-f ( sbuf -- str-or-? )
+    dup sbuf-length 0 > [ sbuf>string ] [ drop f ] ifte ;
 
 : do-read-count ( sbuf count -- str )
     dup 0 = [ 
-        drop sbuf>str 
+        drop sbuf>string 
     ] [
         dup consume-input
-        dup str-length dup 0 = [
-            3drop sbuf>str-or-f
+        dup string-length dup 0 = [
+            3drop sbuf>string-or-f
         ] [
             >r swap r> - >r swap [ sbuf-append ] keep r> do-read-count
         ] ifte
@@ -114,14 +114,14 @@ M: string do-write ( str -- )
     1 in-buffer get buffer-first-n ;
 
 : do-read-line ( sbuf -- str )
-    1 consume-input dup str-length 0 = [ drop sbuf>str-or-f ] [
+    1 consume-input dup string-length 0 = [ drop sbuf>string-or-f ] [
         dup "\r" = [
             peek-input "\n" = [ 1 consume-input drop ] when 
-            drop sbuf>str
+            drop sbuf>string
         ] [ 
             dup "\n" = [
                 peek-input "\r" = [ 1 consume-input drop ] when 
-                drop sbuf>str
+                drop sbuf>string
             ] [
                 over sbuf-append do-read-line 
             ] ifte

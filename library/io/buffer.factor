@@ -78,15 +78,15 @@ C: buffer ( size -- buffer )
     dup buffer-size swap buffer-fill - ;
 
 : buffer-set ( string buffer -- )
-    2dup buffer-ptr string>memory >r str-length r> buffer-reset ;
+    2dup buffer-ptr string>memory >r string-length r> buffer-reset ;
 
 : (check-overflow) ( string buffer -- )
-    buffer-capacity swap str-length < [ "Buffer overflow" throw ] when ;
+    buffer-capacity swap string-length < [ "Buffer overflow" throw ] when ;
 
 : buffer-append ( string buffer -- )
     2dup (check-overflow)
     [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
-    [ buffer-fill swap str-length + ] keep set-buffer-fill ;
+    [ buffer-fill swap string-length + ] keep set-buffer-fill ;
 
 : buffer-append-char ( int buffer -- )
     #! Append a single character to a buffer

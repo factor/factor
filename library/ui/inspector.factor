@@ -11,7 +11,7 @@ lists namespaces strings unparser vectors words ;
 
 : sort-sheet ( assoc -- assoc )
     #! Sort an association list whose keys are arbitrary objects
-    [ 2car swap unparse* swap unparse* str-lexi> ] sort ;
+    [ 2car swap unparse* swap unparse* string> ] sort ;
 
 : alist>sheet ( assoc -- sheet )
     unzip swap

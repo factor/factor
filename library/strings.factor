@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings USING: generic kernel kernel-internals lists math ;
 
-BUILTIN: string 12 [ 1 "str-length" f ] [ 2 hashcode f ] ;
-M: string = str= ;
+BUILTIN: string 12 [ 1 "string-length" f ] [ 2 hashcode f ] ;
+M: string = string= ;
 
 BUILTIN: sbuf 13 ;
 M: sbuf = sbuf= ;
@@ -13,21 +13,21 @@ UNION: text string integer ;
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
 
-: str-length< ( str str -- boolean )
+: string-length< ( str str -- boolean )
     #! Compare string lengths.
-    swap str-length swap str-length < ;
+    swap string-length swap string-length < ;
 
 : cat ( [ "a" "b" "c" ] -- "abc" )
     ! If f appears in the list, it is not appended to the
     ! string.
-    80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>str ;
+    80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>string ;
 
 : cat2 ( "a" "b" -- "ab" )
     swap
     80 <sbuf>
     dup >r sbuf-append r>
     dup >r sbuf-append r>
-    sbuf>str ;
+    sbuf>string ;
 
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
@@ -35,58 +35,58 @@ UNION: text string integer ;
 : index-of ( string substring -- index )
     0 -rot index-of* ;
 
-: str-lexi> ( str1 str2 -- ? )
+: string> ( str1 str2 -- ? )
     ! Returns if the first string lexicographically follows str2
-    str-compare 0 > ;
+    string-compare 0 > ;
 
-: str-head ( index str -- str )
+: string-head ( index str -- str )
     #! Returns a new string, from the beginning of the string
     #! until the given index.
     0 -rot substring ;
 
-: str-contains? ( substr str -- ? )
+: string-contains? ( substr str -- ? )
     swap index-of -1 = not ;
 
-: str-tail ( index str -- str )
+: string-tail ( index str -- str )
     #! Returns a new string, from the given index until the end
     #! of the string.
-    [ str-length ] keep substring ;
+    [ string-length ] keep substring ;
 
-: str/ ( str index -- str str )
+: string/ ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string.
-    [ swap str-head ] 2keep swap str-tail ;
+    [ swap string-head ] 2keep swap string-tail ;
 
-: str// ( str index -- str str )
+: string// ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    [ swap str-head ] 2keep 1 + swap str-tail ;
+    [ swap string-head ] 2keep 1 + swap string-tail ;
 
-: str-head? ( str begin -- ? )
-    2dup str-length< [
+: string-head? ( str begin -- ? )
+    2dup string-length< [
         2drop f
     ] [
-        dup str-length rot str-head =
+        dup string-length rot string-head =
     ] ifte ;
 
-: ?str-head ( str begin -- str ? )
-    2dup str-head? [
-        str-length swap str-tail t
+: ?string-head ( str begin -- str ? )
+    2dup string-head? [
+        string-length swap string-tail t
     ] [
         drop f
     ] ifte ;
 
-: str-tail? ( str end -- ? )
-    2dup str-length< [
+: string-tail? ( str end -- ? )
+    2dup string-length< [
         2drop f
     ] [
-        dup str-length pick str-length swap - rot str-tail =
+        dup string-length pick string-length swap - rot string-tail =
     ] ifte ;
 
-: ?str-tail ( str end -- ? )
-    2dup str-tail? [
-        str-length swap [ str-length swap - ] keep str-head t
+: ?string-tail ( str end -- ? )
+    2dup string-tail? [
+        string-length swap [ string-length swap - ] keep string-head t
     ] [
         drop f
     ] ifte ;
@@ -95,26 +95,26 @@ UNION: text string integer ;
     2dup index-of dup -1 = [
         2drop f
     ] [
-        [ swap str-length + over str-tail ] keep
-        rot str-head swap
+        [ swap string-length + over string-tail ] keep
+        rot string-head swap
     ] ifte ;
 
-: (str>list) ( i str -- list )
-    2dup str-length >= [
+: (string>list) ( i str -- list )
+    2dup string-length >= [
         2drop [ ]
     ] [
-        2dup str-nth >r >r 1 + r> (str>list) r> swons
+        2dup string-nth >r >r 1 + r> (string>list) r> swons
     ] ifte ;
 
-: str>list ( str -- list )
-    0 swap (str>list) ;
+: string>list ( str -- list )
+    0 swap (string>list) ;
 
-: str-each ( str quot -- )
+: string-each ( str quot -- )
     #! Execute the quotation with each character of the string
     #! pushed onto the stack.
-    >r str>list r> each ; inline
+    >r string>list r> each ; inline
 
-PREDICATE: integer blank     " \t\n\r" str-contains? ;
+PREDICATE: integer blank     " \t\n\r" string-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
@@ -123,7 +123,7 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
     #! escaping?
-    dup printable? swap "\"\\" str-contains? not and ;
+    dup printable? swap "\"\\" string-contains? not and ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -131,4 +131,4 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." str-contains? or ;
+    swap "/_?." string-contains? or ;

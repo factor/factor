@@ -28,8 +28,8 @@ TUPLE: editor line caret delegate ;
 
 : run-char-widths ( str -- wlist )
     #! List of x co-ordinates of each character.
-    0 swap str>list
-    [ ch>str shape-w [ + dup ] keep 2 /i - ] map nip ;
+    0 swap string>list
+    [ ch>string shape-w [ + dup ] keep 2 /i - ] map nip ;
 
 : (x>offset) ( n x wlist -- offset )
     dup [
@@ -77,7 +77,7 @@ C: editor ( text -- )
     dup editor-actions ;
 
 : offset>x ( offset str -- x )
-    str-head font get swap size-string drop ;
+    string-head font get swap size-string drop ;
 
 : caret-pos ( editor -- x y )
     editor-line [ caret get line-text get ] bind offset>x 0 ;

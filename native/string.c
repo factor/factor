@@ -312,40 +312,10 @@ void primitive_substring(void)
 	dpush(tag_object(substring(start,end,string)));
 }
 
-/* DESTRUCTIVE - don't use with user-visible strings */
-void string_reverse(F_STRING* s, int len)
-{
-	int i, j;
-	uint16_t ch1, ch2;
-	for(i = 0; i < len / 2; i++)
-	{
-		j = len - i - 1;
-		ch1 = string_nth(s,i);
-		ch2 = string_nth(s,j);
-		set_string_nth(s,j,ch1);
-		set_string_nth(s,i,ch2);
-	}
-}
-
 /* Doesn't rehash the string! */
 F_STRING* string_clone(F_STRING* s, int len)
 {
 	F_STRING* copy = allot_string(len);
 	memcpy(copy + 1,s + 1,len * CHARS);
 	return copy;
-}
-
-void primitive_string_reverse(void)
-{
-	F_STRING* s;
-	CELL capacity;
-
-	maybe_garbage_collection();
-
-	s = untag_string(dpeek());
-	capacity = string_capacity(s);
-	s = string_clone(s,capacity);
-	string_reverse(s,capacity);
-	rehash_string(s);
-	drepl(tag_object(s));
 }
