@@ -33,6 +33,7 @@ primitives,
     "/library/platform/native/kernel.factor"
     "/library/platform/native/stack.factor"
     "/library/platform/native/types.factor"
+    "/library/platform/native/math.factor"
     "/library/cons.factor"
     "/library/combinators.factor"
     "/library/logic.factor"

@@ -21,22 +21,21 @@ INLINE double untag_float(CELL tagged)
 	return untag_float_fast(tagged);
 }
 
-FLOAT* to_float(CELL tagged);
+double to_float(CELL tagged);
 void primitive_to_float(void);
 void primitive_str_to_float(void);
 void primitive_float_to_str(void);
 void primitive_float_to_bits(void);
 
-CELL number_eq_float(FLOAT* x, FLOAT* y);
-CELL add_float(FLOAT* x, FLOAT* y);
-CELL subtract_float(FLOAT* x, FLOAT* y);
-CELL multiply_float(FLOAT* x, FLOAT* y);
-CELL divide_float(FLOAT* x, FLOAT* y);
-CELL divfloat_float(FLOAT* x, FLOAT* y);
-CELL less_float(FLOAT* x, FLOAT* y);
-CELL lesseq_float(FLOAT* x, FLOAT* y);
-CELL greater_float(FLOAT* x, FLOAT* y);
-CELL greatereq_float(FLOAT* x, FLOAT* y);
+void primitive_float_eq(void);
+void primitive_float_add(void);
+void primitive_float_subtract(void);
+void primitive_float_multiply(void);
+void primitive_float_divfloat(void);
+void primitive_float_less(void);
+void primitive_float_lesseq(void);
+void primitive_float_greater(void);
+void primitive_float_greatereq(void);
 
 void primitive_facos(void);
 void primitive_fasin(void);

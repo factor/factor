@@ -173,6 +173,9 @@ public class FactorPlugin extends EditPlugin
 		String vocab, String word, List completions, boolean anywhere)
 	{
 		FactorNamespace v = interp.getVocabulary(vocab);
+		if(v == null)
+			return;
+
 		Cons words = v.toValueList();
 
 		while(words != null)

@@ -80,6 +80,13 @@ CELL upgraded_arithmetic_type(CELL type1, CELL type2)
 	}
 }
 
+void primitive_arithmetic_type(void)
+{
+	CELL type2 = type_of(dpop());
+	CELL type1 = type_of(dpop());
+	dpush(tag_fixnum(upgraded_arithmetic_type(type1,type2)));
+}
+
 bool realp(CELL tagged)
 {
 	switch(type_of(tagged))
@@ -126,7 +133,7 @@ bool onep(CELL tagged)
 	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
-		return tagged == 1;
+		return tagged == tag_fixnum(1);
 	case BIGNUM_TYPE:
 		return BIGNUM_ONE_P((ARRAY*)UNTAG(tagged),0);
 	case FLOAT_TYPE:
@@ -139,69 +146,3 @@ bool onep(CELL tagged)
 		return false; /* Can't happen */
 	}
 }
-
-/* EQUALITY */
-CELL number_eq_anytype(CELL x, CELL y)
-{
-	return F;
-}
-
-
-BINARY_OP(number_eq)
-
-BINARY_OP_NUMBER_ONLY(add)
-BINARY_OP(add)
-
-BINARY_OP_NUMBER_ONLY(subtract)
-BINARY_OP(subtract)
-
-BINARY_OP_NUMBER_ONLY(multiply)
-BINARY_OP(multiply)
-
-BINARY_OP_NUMBER_ONLY(divide)
-BINARY_OP(divide)
-
-BINARY_OP_INTEGER_ONLY(divint)
-BINARY_OP_NUMBER_ONLY(divint)
-BINARY_OP(divint)
-
-BINARY_OP_NUMBER_ONLY(divfloat)
-BINARY_OP(divfloat)
-
-BINARY_OP_INTEGER_ONLY(divmod)
-BINARY_OP_NUMBER_ONLY(divmod)
-BINARY_OP(divmod)
-
-BINARY_OP_INTEGER_ONLY(mod)
-BINARY_OP_NUMBER_ONLY(mod)
-BINARY_OP(mod)
-
-BINARY_OP_INTEGER_ONLY(and)
-BINARY_OP_NUMBER_ONLY(and)
-BINARY_OP(and)
-
-BINARY_OP_INTEGER_ONLY(or)
-BINARY_OP_NUMBER_ONLY(or)
-BINARY_OP(or)
-
-BINARY_OP_INTEGER_ONLY(xor)
-BINARY_OP_NUMBER_ONLY(xor)
-BINARY_OP(xor)
-
-BINARY_OP_FIXNUM(shift)
-
-BINARY_OP_NUMBER_ONLY(less)
-BINARY_OP(less)
-
-BINARY_OP_NUMBER_ONLY(lesseq)
-BINARY_OP(lesseq)
-
-BINARY_OP_NUMBER_ONLY(greater)
-BINARY_OP(greater)
-
-BINARY_OP_NUMBER_ONLY(greatereq)
-BINARY_OP(greatereq)
-
-UNARY_OP_INTEGER_ONLY(not)
-UNARY_OP_NUMBER_ONLY(not)
-UNARY_OP(not)

@@ -3,6 +3,8 @@
 ARRAY* to_bignum(CELL tagged)
 {
 	RATIO* r;
+	ARRAY* x;
+	ARRAY* y;
 	FLOAT* f;
 
 	switch(type_of(tagged))
@@ -13,7 +15,9 @@ ARRAY* to_bignum(CELL tagged)
 		return (ARRAY*)UNTAG(tagged);
 	case RATIO_TYPE:
 		r = (RATIO*)UNTAG(tagged);
-		return to_bignum(divint(r->numerator,r->denominator));
+		x = to_bignum(r->numerator);
+		y = to_bignum(r->denominator);
+		return s48_bignum_quotient(x,y);
 	case FLOAT_TYPE:
 		f = (FLOAT*)UNTAG(tagged);
 		return s48_double_to_bignum(f->n);
@@ -28,172 +32,157 @@ void primitive_to_bignum(void)
 	drepl(tag_object(to_bignum(dpeek())));
 }
 
-CELL number_eq_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_eq(void)
 {
-	return tag_boolean(s48_bignum_equal_p(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_boolean(s48_bignum_equal_p(x,y)));
 }
 
-CELL add_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_add(void)
 {
-	return tag_object(s48_bignum_add(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_add(x,y)));
 }
 
-CELL subtract_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_subtract(void)
 {
-	return tag_object(s48_bignum_subtract(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_subtract(x,y)));
 }
 
-CELL multiply_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_multiply(void)
 {
-	return tag_object(s48_bignum_multiply(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_multiply(x,y)));
 }
 
-CELL gcd_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_divint(void)
 {
-	ARRAY* t;
-
-	if(BIGNUM_NEGATIVE_P(x))
-		x = s48_bignum_negate(x);
-	if(BIGNUM_NEGATIVE_P(y))
-		y = s48_bignum_negate(y);
-
-	if(s48_bignum_compare(x,y) == bignum_comparison_greater)
-	{
-		t = x;
-		x = y;
-		y = t;
-	}
-
-	for(;;)
-	{
-		if(BIGNUM_ZERO_P(x))
-			return tag_object(y);
-
-		t = s48_bignum_remainder(y,x);
-		y = x;
-		x = t;
-	}
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_quotient(x,y)));
 }
 
-CELL divide_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_divfloat(void)
 {
-	ARRAY* gcd;
-
-	if(BIGNUM_ZERO_P(y))
-		raise(SIGFPE);
-
-	if(BIGNUM_NEGATIVE_P(y))
-	{
-		x = s48_bignum_negate(x);
-		y = s48_bignum_negate(y);
-	}
-
-	gcd = (ARRAY*)UNTAG(gcd_bignum(x,y));
-	x = s48_bignum_quotient(x,gcd);
-	y = s48_bignum_quotient(y,gcd);
-
-	if(BIGNUM_ONE_P(y,0))
-		return tag_object(x);
-	else
-	{
-		return tag_ratio(ratio(
-			tag_object(x),
-			tag_object(y)));
-	}
-}
-
-CELL divint_bignum(ARRAY* x, ARRAY* y)
-{
-	return tag_object(s48_bignum_quotient(x,y));
-}
-
-CELL divfloat_bignum(ARRAY* x, ARRAY* y)
-{
-	return tag_object(make_float(
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(make_float(
 		s48_bignum_to_double(x) /
-		s48_bignum_to_double(y)));
+		s48_bignum_to_double(y))));
 }
 
-CELL divmod_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_divmod(void)
 {
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
 	ARRAY *q, *r;
 	s48_bignum_divide(x,y,&q,&r);
 	dpush(tag_object(q));
-	return tag_object(r);
+	dpush(tag_object(r));
 }
 
-CELL mod_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_mod(void)
 {
-	return tag_object(s48_bignum_remainder(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_remainder(x,y)));
 }
 
-CELL and_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_and(void)
 {
-	return tag_object(s48_bignum_bitwise_and(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_bitwise_and(x,y)));
 }
 
-CELL or_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_or(void)
 {
-	return tag_object(s48_bignum_bitwise_ior(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_bitwise_ior(x,y)));
 }
 
-CELL xor_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_xor(void)
 {
-	return tag_object(s48_bignum_bitwise_xor(x,y));
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_bitwise_xor(x,y)));
 }
 
-CELL shift_bignum(ARRAY* x, FIXNUM y)
+void primitive_bignum_shift(void)
 {
-	return tag_object(s48_bignum_arithmetic_shift(x,y));
+	FIXNUM y = to_fixnum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_object(s48_bignum_arithmetic_shift(x,y)));
 }
 
-CELL less_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_less(void)
 {
-	return tag_boolean(
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_boolean(
 		s48_bignum_compare(x,y)
-		== bignum_comparison_less);
+		== bignum_comparison_less));
 }
 
-CELL lesseq_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_lesseq(void)
 {
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:
 	case bignum_comparison_equal:
-		return T;
+		dpush(T);
+		break;
 	case bignum_comparison_greater:
-		return F;
+		dpush(F);
+		break;
 	default:
 		critical_error("s48_bignum_compare returns bogus value",0);
-		return F;
+		break;
 	}
 }
 
-CELL greater_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_greater(void)
 {
-	return tag_boolean(
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+	dpush(tag_boolean(
 		s48_bignum_compare(x,y)
-		== bignum_comparison_greater);
+		== bignum_comparison_greater));
 }
 
-CELL greatereq_bignum(ARRAY* x, ARRAY* y)
+void primitive_bignum_greatereq(void)
 {
+	ARRAY* y = to_bignum(dpop());
+	ARRAY* x = to_bignum(dpop());
+
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:
-		return F;
+		dpush(F);
+		break;
 	case bignum_comparison_equal:
 	case bignum_comparison_greater:
-		return T;
+		dpush(T);
+		break;
 	default:
 		critical_error("s48_bignum_compare returns bogus value",0);
-		return F;
+		break;
 	}
 }
 
-CELL not_bignum(ARRAY* x)
+void primitive_bignum_not(void)
 {
-	return tag_object(s48_bignum_bitwise_not(x));
+	drepl(tag_object(s48_bignum_bitwise_not(
+		untag_bignum(dpeek()))));
 }
 
 void copy_bignum_constants(void)

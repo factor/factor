@@ -73,10 +73,6 @@ USE: words
     uncons car "Maximum index: " write .
     "Requested index: " write . ;
 
-: numerical-comparison-error ( list -- )
-    "Cannot compare " write unswons unparse write
-    " with " write unparse print ;
-
 : float-format-error ( list -- )
     "Invalid floating point literal format: " write . ;
 
@@ -111,7 +107,6 @@ USE: words
         undefined-word-error
         type-check-error
         array-range-error
-        numerical-comparison-error
         float-format-error
         signal-error
         profiling-disabled-error

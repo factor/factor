@@ -52,6 +52,9 @@ USE: vectors
 : generic ( obj vtable -- )
     over type-of swap vector-nth call ;
 
+: 2generic ( n n map -- )
+    >r 2dup arithmetic-type r> vector-nth execute ;
+
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
     {
@@ -97,6 +100,10 @@ USE: vectors
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
     2dup eq? [ 2drop t ] [ equal? ] ifte ;
+
+: 2= ( a b c d -- ? )
+    #! Test if a = c, b = d.
+    swapd = [ = ] [ 2drop f ] ifte ;
 
 : clone ( obj -- obj )
     [

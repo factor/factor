@@ -6,15 +6,14 @@
 #define ERROR_UNDEFINED_WORD (5<<3)
 #define ERROR_TYPE (6<<3)
 #define ERROR_RANGE (7<<3)
-#define ERROR_INCOMPARABLE (8<<3)
-#define ERROR_FLOAT_FORMAT (9<<3)
-#define ERROR_SIGNAL (10<<3)
-#define ERROR_PROFILING_DISABLED (11<<3)
-#define ERROR_NEGATIVE_ARRAY_SIZE (12<<3)
-#define ERROR_BAD_PRIMITIVE (13<<3)
-#define ERROR_C_STRING (14<<3)
-#define ERROR_FFI_DISABLED (15<<3)
-#define ERROR_FFI (16<<3)
+#define ERROR_FLOAT_FORMAT (8<<3)
+#define ERROR_SIGNAL (9<<3)
+#define ERROR_PROFILING_DISABLED (10<<3)
+#define ERROR_NEGATIVE_ARRAY_SIZE (11<<3)
+#define ERROR_BAD_PRIMITIVE (12<<3)
+#define ERROR_C_STRING (13<<3)
+#define ERROR_FFI_DISABLED (14<<3)
+#define ERROR_FFI (15<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

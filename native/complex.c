@@ -8,23 +8,6 @@ COMPLEX* complex(CELL real, CELL imaginary)
 	return complex;
 }
 
-COMPLEX* to_complex(CELL x)
-{
-	switch(type_of(x))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-	case FLOAT_TYPE:
-	case RATIO_TYPE:
-		return complex(x,0);
-	case COMPLEX_TYPE:
-		return (COMPLEX*)UNTAG(x);
-	default:
-		type_error(NUMBER_TYPE,x);
-		return NULL;
-	}
-}
-
 CELL possibly_complex(CELL real, CELL imaginary)
 {
 	if(zerop(imaginary))
@@ -105,88 +88,4 @@ void primitive_from_rect(void)
 		type_error(REAL_TYPE,real);
 
 	dpush(possibly_complex(real,imaginary));
-}
-
-CELL number_eq_complex(COMPLEX* x, COMPLEX* y)
-{
-	return tag_boolean(
-		untag_boolean(number_eq(x->real,y->real)) &&
-		untag_boolean(number_eq(x->imaginary,y->imaginary)));
-}
-
-CELL add_complex(COMPLEX* x, COMPLEX* y)
-{
-	return possibly_complex(
-		add(x->real,y->real),
-		add(x->imaginary,y->imaginary));
-}
-
-CELL subtract_complex(COMPLEX* x, COMPLEX* y)
-{
-	return possibly_complex(
-		subtract(x->real,y->real),
-		subtract(x->imaginary,y->imaginary));
-}
-
-CELL multiply_complex(COMPLEX* x, COMPLEX* y)
-{
-	return possibly_complex(
-		subtract(
-			multiply(x->real,y->real),
-			multiply(x->imaginary,y->imaginary)),
-		add(
-			multiply(x->real,y->imaginary),
-			multiply(x->imaginary,y->real)));
-}
-
-#define COMPLEX_DIVIDE(x,y) \
-\
-	CELL mag = add( \
-		multiply(y->real,y->real), \
-		multiply(y->imaginary,y->imaginary)); \
-\
-	CELL r = add( \
-		multiply(x->real,y->real), \
-		multiply(x->imaginary,y->imaginary)); \
-	CELL i = subtract( \
-		multiply(x->imaginary,y->real), \
-		multiply(x->real,y->imaginary));
-
-CELL divide_complex(COMPLEX* x, COMPLEX* y)
-{
-	COMPLEX_DIVIDE(x,y);
-	return possibly_complex(divide(r,mag),divide(i,mag));
-}
-
-CELL divfloat_complex(COMPLEX* x, COMPLEX* y)
-{
-	COMPLEX_DIVIDE(x,y);
-	return possibly_complex(divfloat(r,mag),divfloat(i,mag));
-}
-
-#define INCOMPARABLE(x,y) general_error(ERROR_INCOMPARABLE, \
-	cons(RETAG(x,COMPLEX_TYPE),RETAG(y,COMPLEX_TYPE)));
-
-CELL less_complex(COMPLEX* x, COMPLEX* y)
-{
-	INCOMPARABLE(x,y);
-	return F;
-}
-
-CELL lesseq_complex(COMPLEX* x, COMPLEX* y)
-{
-	INCOMPARABLE(x,y);
-	return F;
-}
-
-CELL greater_complex(COMPLEX* x, COMPLEX* y)
-{
-	INCOMPARABLE(x,y);
-	return F;
-}
-
-CELL greatereq_complex(COMPLEX* x, COMPLEX* y)
-{
-	INCOMPARABLE(x,y);
-	return F;
 }

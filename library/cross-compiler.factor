@@ -98,9 +98,52 @@ DEFER: pending-io-error
 DEFER: next-io-task
 
 IN: math
-DEFER: number=
+DEFER: arithmetic-type
 DEFER: >fraction
 DEFER: fraction>
+DEFER: fixnum=
+DEFER: fixnum+
+DEFER: fixnum-
+DEFER: fixnum*
+DEFER: fixnum/i
+DEFER: fixnum/f
+DEFER: fixnum-mod
+DEFER: fixnum/mod
+DEFER: fixnum-bitand
+DEFER: fixnum-bitor
+DEFER: fixnum-bitxor
+DEFER: fixnum-bitnot
+DEFER: fixnum-shift
+DEFER: fixnum<
+DEFER: fixnum<=
+DEFER: fixnum>
+DEFER: fixnum>=
+DEFER: bignum=
+DEFER: bignum+
+DEFER: bignum-
+DEFER: bignum*
+DEFER: bignum/i
+DEFER: bignum/f
+DEFER: bignum-mod
+DEFER: bignum/mod
+DEFER: bignum-bitand
+DEFER: bignum-bitor
+DEFER: bignum-bitxor
+DEFER: bignum-bitnot
+DEFER: bignum-shift
+DEFER: bignum<
+DEFER: bignum<=
+DEFER: bignum>
+DEFER: bignum>=
+DEFER: float=
+DEFER: float+
+DEFER: float-
+DEFER: float*
+DEFER: float/f
+DEFER: float<
+DEFER: float<=
+DEFER: float>
+DEFER: float>=
 
 IN: parser
 DEFER: str>float
@@ -167,11 +210,11 @@ IN: image
         sbuf-reverse
         sbuf-clone
         sbuf=
+        arithmetic-type
         number?
         >fixnum
         >bignum
         >float
-        number=
         numerator
         denominator
         >fraction
@@ -183,23 +226,49 @@ IN: image
         imaginary
         >rect
         rect>
-        +
-        -
-        *
-        /i
-        /f
-        /
-        mod
-        /mod
-        bitand
-        bitor
-        bitxor
-        bitnot
-        shift
-        <
-        <=
-        >
-        >=
+        fixnum=
+        fixnum+
+        fixnum-
+        fixnum*
+        fixnum/i
+        fixnum/f
+        fixnum-mod
+        fixnum/mod
+        fixnum-bitand
+        fixnum-bitor
+        fixnum-bitxor
+        fixnum-bitnot
+        fixnum-shift
+        fixnum<
+        fixnum<=
+        fixnum>
+        fixnum>=
+        bignum=
+        bignum+
+        bignum-
+        bignum*
+        bignum/i
+        bignum/f
+        bignum-mod
+        bignum/mod
+        bignum-bitand
+        bignum-bitor
+        bignum-bitxor
+        bignum-bitnot
+        bignum-shift
+        bignum<
+        bignum<=
+        bignum>
+        bignum>=
+        float=
+        float+
+        float-
+        float*
+        float/f
+        float<
+        float<=
+        float>
+        float>=
         facos
         fasin
         fatan
