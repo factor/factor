@@ -110,7 +110,7 @@ void write_string_8(PORT* port, STRING* str)
 	if(!can_write(port,str->capacity))
 		io_error(__FUNCTION__);
 
-	c_str = to_c_string(str);
+	c_str = to_c_string_unchecked(str);
 	write_string_raw(port,c_str,str->capacity);
 }
 

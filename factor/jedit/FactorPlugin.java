@@ -30,7 +30,7 @@
 package factor.jedit;
 
 import factor.*;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.textarea.*;
@@ -41,14 +41,84 @@ import sidekick.*;
 public class FactorPlugin extends EditPlugin
 {
 	private static FactorInterpreter interp;
+	private static ExternalFactor external;
 
+	//{{{ getPluginPath() method
+	private String getPluginPath()
+	{
+		return MiscUtilities.getParentOfPath(
+			jEdit.getPlugin("factor.jedit.FactorPlugin")
+			.getPluginJAR().getPath())
+			+ "Factor";
+	} //}}}
+	
 	//{{{ start() method
 	public void start()
 	{
 		BeanShell.eval(null,BeanShell.getNameSpace(),
 			"import factor.*;\nimport factor.jedit.*;\n");
+		String program = jEdit.getProperty("factor.external.program");
+		String image = jEdit.getProperty("factor.external.image");
+		if(program == null || image == null
+			|| program.length() == 0 || image.length() == 0)
+		{
+			jEdit.setProperty("factor.external.program",
+				MiscUtilities.constructPath(getPluginPath(),"f"));
+			jEdit.setProperty("factor.external.image",
+				MiscUtilities.constructPath(getPluginPath(),"factor.image"));
+		}
+	} //}}}
+
+	//{{{ stop() method
+	public void stop()
+	{
+		stopExternalInstance();
 	} //}}}
 	
+	//{{{ getExternalInstance() method
+	/**
+	 * Returns the object representing a connection to an external Factor instance.
+	 * It will start the interpreter if it's not already running.
+	 */
+	public static ExternalFactor getExternalInstance()
+		throws IOException, UnsupportedEncodingException
+	{
+		if(external == null)
+		{
+			Process p = Runtime.getRuntime().exec(
+				new String[] {
+					jEdit.getProperty("factor.external.program"),
+					jEdit.getProperty("factor.external.image"),
+					"-no-ansi",
+					"-jedit"
+				});
+			p.getErrorStream().close();
+
+			external = new ExternalFactor(
+				getInterpreter(),
+				p.getInputStream(),
+				p.getOutputStream());
+		}
+
+		return external;
+	} //}}}
+
+	//{{{ stopExternalInstance() method
+	/**
+	 * Stops the external interpreter. It will probably be restarted soon after.
+	 */
+	public static void stopExternalInstance()
+	{
+		((FactorShell)ServiceManager.getService("console.Shell","Factor"))
+			.closeStreams();
+
+		if(external != null)
+		{
+			external.close();
+			external = null;
+		}
+	} //}}}
+
 	//{{{ newInterpreter() method
 	private static FactorInterpreter newInterpreter(String[] args)
 	{
@@ -75,7 +145,7 @@ public class FactorPlugin extends EditPlugin
 	{
 		if(interp == null)
 		{
-			interp = newInterpreter(new String[] { "-jedit" });
+			interp = newInterpreter(new String[] { "-jedit", "-no-compile" });
 		}
 
 		return interp;

@@ -32,28 +32,19 @@ package factor.jedit;
 import console.*;
 import factor.*;
 import javax.swing.text.AttributeSet;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.WeakHashMap;
+import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.ServiceManager;
+import org.gjt.sp.util.Log;
 
 public class FactorShell extends Shell
 {
-	//{{{ readLine() method
-	/**
-	 * Helper static method to simplify Factor code.
-	 */
-	public static void readLine(Cons continuation, Console console)
-	{
-		FactorShell shell = (FactorShell)ServiceManager.getService(
-			"console.Shell","Factor");
-		ConsoleState state = shell.getConsoleState(console);
-		state.readLineContinuation = continuation;
-	} //}}}
-	
 	//{{{ FactorShell constructor
 	public FactorShell()
 	{
 		super("Factor");
-		interp = FactorPlugin.getInterpreter();
 		consoles = new WeakHashMap();
 	} //}}}
 
@@ -75,7 +66,15 @@ public class FactorShell extends Shell
 	 */
 	public void printPrompt(Console console, Output output)
 	{
-		getConsoleState(console);
+		try
+		{
+			getConsoleState(console).packetLoop(output);
+		}
+		catch(Exception e)
+		{
+			output.print(console.getErrorColor(),e.toString());
+			Log.log(Log.ERROR,this,e);
+		}
 	} //}}}
 
 	//{{{ execute() method
@@ -91,11 +90,20 @@ public class FactorShell extends Shell
 	public void execute(Console console, String input,
 		Output output, Output error, String command)
 	{
-		ConsoleState state = getConsoleState(console);
-		Cons quot = new Cons(command,state.readLineContinuation);
-		eval(quot);
-		output.commandDone();
-		error.commandDone();
+		try
+		{
+			getConsoleState(console).readResponse(output,command);
+		}
+		catch(Exception e)
+		{
+			output.print(console.getErrorColor(),e.toString());
+			Log.log(Log.ERROR,this,e);
+		}
+		finally
+		{
+			output.commandDone();
+			error.commandDone();
+		}
 	} //}}}
 	
 	//{{{ stop() method
@@ -105,41 +113,35 @@ public class FactorShell extends Shell
 	public void stop(Console console)
 	{
 	} //}}}
-	
+
+	//{{{ closeStreams() method
+	/**
+	 * Close all listener connections. Should be called before Factor is restarted.
+	 */
+	public void closeStreams()
+	{
+		Iterator iter = consoles.values().iterator();
+		while(iter.hasNext())
+		{
+			ConsoleState state = (ConsoleState)iter.next();
+			state.closeStream();
+		}
+	} //}}}
+
 	//{{{ Private members
-	private FactorInterpreter interp;
 	private WeakHashMap consoles;
 	
 	//{{{ getConsoleState() method
 	private ConsoleState getConsoleState(Console console)
+		throws IOException
 	{
 		ConsoleState state = (ConsoleState)consoles.get(console);
 		if(state == null)
 		{
 			state = new ConsoleState(console);
 			consoles.put(console,state);
-
-			eval(new Cons(console,
-				new Cons(interp.searchVocabulary(
-					"console","console-hook"),
-					null)));
 		}
 		return state;
-	} //}}}
-
-	//{{{ eval() method
-	private void eval(Cons cmd)
-	{
-		try
-		{
-			interp.call(cmd);
-			interp.run();
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to eval " + cmd + ":");
-			e.printStackTrace();
-		}
 	} //}}}
 
 	//}}}
@@ -148,11 +150,83 @@ public class FactorShell extends Shell
 	class ConsoleState
 	{
 		private Console console;
-		Cons readLineContinuation;
+		private FactorStream stream;
+		private boolean waitingForInput;
 		
 		ConsoleState(Console console)
 		{
 			this.console = console;
+		}
+
+		void openStream(Output output) throws Exception
+		{
+			if(stream == null)
+			{
+				output.print(console.getInfoColor(),
+					jEdit.getProperty("factor.shell.opening"));
+				stream = FactorPlugin.getExternalInstance().openStream();
+			}
+		}
+
+		void closeStream()
+		{
+			try
+			{
+				if(stream != null)
+				{
+					waitingForInput = false;
+					console.print(console.getInfoColor(),
+						jEdit.getProperty("factor.shell.closing"));
+					stream.close();
+					stream = null;
+				}
+			}
+			catch(IOException e)
+			{
+				/* We don't care */
+				Log.log(Log.ERROR,this,e);
+			}
+		}
+		
+		void packetLoop(Output output) throws Exception
+		{
+			if(waitingForInput)
+				return;
+
+			openStream(output);
+
+			FactorStream.Packet p;
+			while((p = stream.nextPacket()) != null)
+			{
+				if(p instanceof FactorStream.ReadLinePacket)
+				{
+					waitingForInput = true;
+					break;
+				}
+				else if(p instanceof FactorStream.WritePacket)
+				{
+					FactorStream.WritePacket w
+						= (FactorStream.WritePacket)p;
+					output.writeAttrs(w.getAttributes(),w.getText());
+				}
+			}
+		}
+
+		void readResponse(Output output, String command) throws Exception
+		{
+			if(waitingForInput)
+			{
+				openStream(output);
+
+				stream.readResponse(command);
+				waitingForInput = false;
+				packetLoop(output);
+			}
+			else
+			{
+				console.print(console.getErrorColor(),
+					jEdit.getProperty("factor.shell.not-waiting"));
+			}
 		}
 	} //}}}
 }

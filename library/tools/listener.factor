@@ -64,9 +64,6 @@ USE: vectors
 : exit ( -- )
     "quit-flag" on ;
 
-: eval-catch ( str -- )
-    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
-
 : listener-step ( -- )
     print-prompt read [ eval-catch ] [ exit ] ifte* ;
 

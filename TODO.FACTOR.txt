@@ -30,7 +30,6 @@
 
 + listener/plugin:
 
-- extract word in wrong place
 - accept multi-line input in listener
 - don't show listener on certain commands
 - NPE in ErrorHighlight

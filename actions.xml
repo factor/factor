@@ -3,6 +3,12 @@
 <!DOCTYPE ACTIONS SYSTEM "actions.dtd">
 
 <ACTIONS>
+	<ACTION NAME="factor-restart">
+		<CODE>
+			FactorPlugin.stopExternalInstance();
+			FactorPlugin.getExternalInstance();
+		</CODE>
+	</ACTION>
 	<ACTION NAME="factor-eval-selection">
 		<CODE>
 			sel = textArea.selectedText;

@@ -39,3 +39,6 @@ USE: math
     "/library/test/io/binary.txt" <resource-stream>
     [ read1 ] with-stream >fixnum
 ] unit-test
+
+! Make sure we use correct to_c_string form when writing
+[ ] [ "\0" write ] unit-test

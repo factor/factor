@@ -1,4 +1,4 @@
-! :folding=none:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,30 +25,14 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: threads
-USE: combinators
-USE: continuations
+IN: parser
 USE: errors
-USE: io-internals
-USE: kernel
-USE: lists
 USE: stack
+USE: combinators
+USE: stdio
 
-: in-thread ( quot -- )
-    #! Execute a quotation in a co-operative thread. The
-    #! quotation begins executing immediately, and execution
-    #! after the 'in-thread' call in the original thread
-    #! resumes when the quotation yields, either due to blocking
-    #! I/O or an explicit call to 'yield'.
-    [
-        schedule-thread
-        ! Clear stacks since we never go up from this point
-        { } set-catchstack
-        { } set-callstack
-        [
-            call
-        ] [
-            [ default-error-handler drop ] when*
-        ] catch
-        (yield)
-    ] callcc0 drop ;
+: eval-catch ( str -- )
+    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
+
+: eval>string ( in -- out )
+    [ eval-catch ] with-string ;

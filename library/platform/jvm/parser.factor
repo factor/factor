@@ -81,6 +81,9 @@ USE: strings
 : eval ( "X" -- X )
     parse call ;
 
+: eval-catch ( str -- )
+    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
+
 : parse-number* ( str base -- num )
     #! Convert a string to a number. Return f if conversion
     #! fails.

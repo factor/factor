@@ -482,8 +482,7 @@ public class FactorReader
 		ParseState state = getCurrentState();
 		if(state.start != start)
 			scanner.error(end + " does not close " + state.start);
-		else
-			states = states.next();
+		states = states.next();
 		return state;
 	} //}}}
 
