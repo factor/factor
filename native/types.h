@@ -35,6 +35,7 @@ CELL empty;
 #define BIGNUM_TYPE 14
 
 bool typep(CELL type, CELL tagged);
+CELL type_of(CELL tagged);
 void type_check(CELL type, CELL tagged);
 
 INLINE void check_non_empty(CELL cell)
@@ -69,6 +70,11 @@ INLINE CELL untag_header(CELL cell)
 INLINE CELL tag_object(void* cell)
 {
 	return RETAG(cell,OBJECT_TYPE);
+}
+
+INLINE CELL object_type(CELL tagged)
+{
+	return untag_header(get(UNTAG(tagged)));
 }
 
 CELL allot_object(CELL type, CELL length);

@@ -1,5 +1,6 @@
 + native:
 
+- typecases: type error reporting bad
 - image output
 - 32-bit and 64-bit "bignums"
 - floats

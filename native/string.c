@@ -212,7 +212,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 		(CELL)(string + 1) + CHARS * start,
 		CHARS * (end - start));
 	hash_string(result);
-	
+
 	return result;
 }
 

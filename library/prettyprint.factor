@@ -103,14 +103,16 @@ DEFER: prettyprint*
     prettyprint> "]" write ;
 
 : (prettyprint-list) ( indent list -- indent )
-    uncons >r prettyprint-element r>
-    dup cons? [
-        (prettyprint-list)
-    ] [
-        [
-            "|" write prettyprint-space prettyprint-element
-        ] when*
-    ] ifte ;
+    [
+        uncons >r prettyprint-element r>
+        dup cons? [
+            (prettyprint-list)
+        ] [
+            [
+                "|" write prettyprint-space prettyprint-element
+            ] when*
+        ] ifte
+    ] when* ;
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].

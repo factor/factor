@@ -19,6 +19,15 @@ bool typep(CELL type, CELL tagged)
 	return false;
 }
 
+CELL type_of(CELL tagged)
+{
+	CELL tag = TAG(tagged);
+	if(tag != OBJECT_TYPE)
+		return tag;
+	else
+		return untag_header(get(UNTAG(tagged)));
+}
+
 void type_check(CELL type, CELL tagged)
 {
 	if(type < HEADER_TYPE)

@@ -110,12 +110,20 @@ void primitive_write_fd_8(void)
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 
 	CELL text = dpop();
-	if(typep(text,FIXNUM_TYPE))
+	CELL type = type_of(text);
+
+	switch(type)
+	{
+	case FIXNUM_TYPE:
 		write_fd_char_8(h,untag_fixnum(text));
-	else if(typep(text,STRING_TYPE))
+		break;
+	case STRING_TYPE:
 		write_fd_string_8(h,untag_string(text));
-	else
+		break;
+	default:
 		type_error(STRING_TYPE,text);
+		break;
+	}
 
 	env.dt = dpop();
 }
@@ -142,8 +150,8 @@ void primitive_shutdown_fd(void)
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
 
-	if(shutdown(fd,SHUT_RDWR) < 0)
-		io_error(__FUNCTION__);
+	/* if(shutdown(fd,SHUT_RDWR) < 0)
+		io_error(__FUNCTION__); */
 
 	env.dt = dpop();
 }

@@ -93,10 +93,18 @@ void primitive_sbuf_append(void)
 	CELL object = dpop();
 	check_non_empty(object);
 	env.dt = dpop();
-	if(TAG(object) == FIXNUM_TYPE)
+	switch(type_of(object))
+	{
+	case FIXNUM_TYPE:
 		set_sbuf_nth(sbuf,sbuf->top,untag_fixnum(object));
-	else
+		break;
+	case STRING_TYPE:
 		sbuf_append_string(sbuf,untag_string(object));
+		break;
+	default:
+		type_error(STRING_TYPE,object);
+		break;
+	}
 }
 
 STRING* sbuf_to_string(SBUF* sbuf)

@@ -3,6 +3,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <limits.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,6 +21,9 @@
 /* CELL must be 32 bits and your system must have 32-bit pointers */
 typedef unsigned int CELL;
 #define CELLS sizeof(CELL)
+
+#define CELL_MAX INT_MAX
+#define CELL_MIN INT_MIN
 
 /* must always be 16 bits */
 typedef unsigned short CHAR;
@@ -43,6 +47,7 @@ typedef long long DCELL;
 #include "handle.h"
 #include "fixnum.h"
 #include "bignum.h"
+#include "math.h"
 #include "string.h"
 #include "fd.h"
 #include "file.h"

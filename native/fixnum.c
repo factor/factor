@@ -13,12 +13,6 @@ void primitive_fixnump(void)
 	env.dt = tag_boolean(TAG(env.dt) == FIXNUM_TYPE);
 }
 
-void primitive_add(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x + y;
-}
-
 void primitive_subtract(void)
 {
 	BINARY_OP(x,y);
@@ -75,7 +69,7 @@ void primitive_xor(void)
 void primitive_not(void)
 {
 	type_check(FIXNUM_TYPE,env.dt);
-	env.dt = RETAG(~env.dt,FIXNUM_TYPE);
+	env.dt = RETAG(UNTAG(~env.dt),FIXNUM_TYPE);
 }
 
 void primitive_shiftleft(void)

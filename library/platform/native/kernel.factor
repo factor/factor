@@ -73,6 +73,7 @@ USE: unparser
 : class-of ( obj -- name )
     [
         [ fixnum? ] [ drop "fixnum" ]
+        [ bignum? ] [ drop "bignum" ]
         [ cons?   ] [ drop "cons" ]
         [ word?   ] [ drop "word" ]
         [ f =     ] [ drop "f" ]

@@ -1,9 +1,15 @@
 #define FIXNUM int /* unboxed */
+#define FIXNUM_MASK 0x1fffffff
+
+INLINE FIXNUM untag_fixnum_fast(CELL tagged)
+{
+	return ((FIXNUM)tagged) >> TAG_BITS;
+}
 
 INLINE FIXNUM untag_fixnum(CELL tagged)
 {
 	type_check(FIXNUM_TYPE,tagged);
-	return ((FIXNUM)tagged) >> TAG_BITS;
+	return untag_fixnum_fast(tagged);
 }
 
 INLINE CELL tag_fixnum(FIXNUM untagged)

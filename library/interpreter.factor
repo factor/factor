@@ -42,19 +42,19 @@ USE: words
 USE: unparser
 USE: vectors
 
-: exit ( -- )
-    t "quit-flag" set ;
-
 : print-banner ( -- )
     "Factor " version cat2 print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Enter ``exit'' to exit." print ;
 
+: init-history ( -- )
+    "history" get [ 64 <vector> "history" set ] unless ;
+
 : history+ ( cmd -- )
     "history" get vector-push ;
 
 : print-numbered-entry ( index vector -- )
-    dupd vector-nth ": " swap cat3 print ;
+    <% over fixnum>str % ": " % vector-nth % %> print ;
 
 : print-numbered-vector ( list -- )
     dup vector-length [ over print-numbered-entry ] times* drop ;
@@ -82,14 +82,17 @@ USE: vectors
     [ write-attr ] bind
     flush ;
 
+: exit ( -- )
+    "quit-flag" on ;
+
 : interpret ( -- )
     print-prompt read dup [
         dup history+ eval
     ] [
-        drop "quit-flag" on
+        drop exit
     ] ifte ;
 
 : interpreter-loop ( -- )
-    64 <vector> "history" set
+    init-history
     [ "quit-flag" get not ] [ interpret ] while
     "quit-flag" off ;
