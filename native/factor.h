@@ -54,7 +54,7 @@ typedef unsigned short CHAR;
 #include "string.h"
 #include "sbuf.h"
 #include "port.h"
-#include "iomux.h"
+#include "io.h"
 #include "read.h"
 #include "write.h"
 #include "file.h"

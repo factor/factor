@@ -7,7 +7,7 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/file.o native/fixnum.o \
 	native/float.o native/gc.o \
-	native/image.o native/iomux.o native/memory.o \
+	native/image.o native/io.o native/memory.o \
 	native/misc.o native/port.o native/primitives.o \
 	native/ratio.o native/read.o native/relocate.o \
 	native/run.o \
