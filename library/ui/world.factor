@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video strings threads ;
+sdl-video stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -46,24 +46,13 @@ DEFER: handle-event
         drop f
     ] ifte ;
 
-: eat-events ( event -- ? )
+: run-world ( -- )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
-    dup SDL_PollEvent [
-        [ handle-event ] in-thread eat-events
+    <event> dup SDL_PollEvent [
+        [ handle-event ] in-thread drop run-world
     ] [
-        world get world-step [ SDL_WaitEvent ] [ drop f ] ifte
-    ] ifte ;
-
-: run-world ( event -- )
-    world get world-step [
-        dup eat-events [
-            [ handle-event ] in-thread run-world
-        ] [
-            drop
-        ] ifte
-    ] [
-        drop
+        drop world get world-step [ yield run-world ] when
     ] ifte ;
 
 : title ( -- str )
@@ -71,14 +60,15 @@ DEFER: handle-event
 
 global [
     <world> world set
-    1024 768 world get resize-gadget
+    1280 1024 world get resize-gadget
     {{
+
         [[ background [ 255 255 255 ] ]]
-        [[ foreground [ 0 0 102 ] ]]
+        [[ foreground [ 0 0 0 ] ]]
         [[ bevel-1    [ 224 224 255 ] ]]
         [[ bevel-2    [ 192 192 216 ] ]]
-        [[ bevel-up?  t ]]
-        [[ font       [[ "Sans Serif" 16 ]] ]]
+        [[ reverse-video f ]]
+        [[ font       [[ "Sans Serif" 12 ]] ]]
     }} world get set-gadget-paint
 ] bind
 

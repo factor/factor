@@ -6,12 +6,6 @@ USING: generic kernel lists math namespaces sdl ;
 : button-down? ( n -- ? )
     my-hand hand-buttons contains? ;
 
-: button-pressed  ( button -- )
-    dup f bevel-up? set-paint-property redraw ;
-
-: button-released ( button -- )
-    dup t bevel-up? set-paint-property redraw ;
-
 : mouse-over? ( gadget -- ? ) my-hand hand-gadget child? ;
 
 : button-pressed? ( button -- ? )
@@ -28,12 +22,12 @@ USING: generic kernel lists math namespaces sdl ;
     ] ifte ;
 
 : button-update ( button -- )
-    dup button-pressed? not bevel-up? set-paint-property redraw ;
+    dup dup button-pressed? reverse-video set-paint-property
+    redraw ;
 
 : button-clicked ( button -- )
     #! If the mouse is released while still inside the button,
     #! fire an action gesture.
-    dup button-update
     dup mouse-over? [
         [ action ] swap handle-gesture drop
     ] [
@@ -42,13 +36,13 @@ USING: generic kernel lists math namespaces sdl ;
 
 : button-actions ( button quot -- )
     dupd [ action ] set-action
-    dup [ button-clicked ] [ button-up 1 ] set-action
+    dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action
     dup [ button-update ] [ mouse-leave ] set-action
     [ button-update ] [ mouse-enter ] set-action ;
 
 : <button> ( label quot -- button )
-    >r <label> bevel-border dup r> button-actions ;
+    >r <label> line-border dup r> button-actions ;
 
 : <check> ( w h -- cross )
     2dup >r >r 0 0 r> r> <line> <gadget>
@@ -64,18 +58,29 @@ TUPLE: checkbox bevel selected? delegate ;
     #! Really, there should only be one child.
     dup checkbox-bevel gadget-children [ unparent ] each
     dup checkbox-selected? [
-        11 11 <check>
+        7 7 <check>
     ] [
-        0 0 11 11 <rectangle> <gadget>
+        0 0 7 7 <rectangle> <gadget>
     ] ifte swap checkbox-bevel add-gadget ;
 
 : toggle-checkbox ( checkbox -- )
     dup checkbox-selected? not over set-checkbox-selected?
     update-checkbox ;
 
+: checkbox-update ( checkbox -- )
+    dup button-pressed? >r checkbox-bevel r>
+    reverse-video set-paint-property ;
+
+: checkbox-actions ( checkbox -- )
+    dup [ toggle-checkbox ] [ action ] set-action
+    dup [ dup checkbox-update button-clicked ] [ button-up 1 ] set-action
+    dup [ checkbox-update ] [ button-down 1 ] set-action
+    dup [ checkbox-update ] [ mouse-leave ] set-action
+    [ checkbox-bevel button-update ] [ mouse-enter ] set-action ;
+
 C: checkbox ( label -- checkbox )
     <default-shelf> over set-checkbox-delegate
-    [ f bevel-border swap init-checkbox-bevel ] keep
+    [ f line-border swap init-checkbox-bevel ] keep
     [ >r <label> r> add-gadget ] keep
-    dup [ toggle-checkbox ] button-actions
+    dup checkbox-actions
     dup update-checkbox ;

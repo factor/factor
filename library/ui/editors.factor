@@ -16,12 +16,10 @@ TUPLE: editor line caret delegate ;
     editor-line [ set-line-text ] bind ;
 
 : focus-editor ( editor -- )
-    dup editor-caret over add-gadget
-    dup blue foreground set-paint-property relayout ;
+    dup editor-caret swap add-gadget ;
 
 : unfocus-editor ( editor -- )
-    dup editor-caret unparent
-    dup black foreground set-paint-property relayout ;
+    editor-caret unparent ;
 
 : with-editor ( editor quot -- )
     #! Execute a quotation in the line editor scope, then
@@ -101,4 +99,4 @@ M: editor draw-shape ( label -- )
 
 : <field> ( text -- field )
     #! A field is just a stand-alone editor with a border.
-    <editor> bevel-border dup f bevel-up? set-paint-property  ;
+    <editor> line-border ;

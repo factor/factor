@@ -76,8 +76,8 @@ TUPLE: thumb offset delegate ;
     [ thumb-motion ] [ drag ] set-action ;
 
 C: thumb ( -- thumb )
-    f bevel-border over set-thumb-delegate
-    dup t bevel-up? set-paint-property
+    0 0 0 0 <plain-rect> <gadget> over set-thumb-delegate
+    dup t reverse-video set-paint-property
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
@@ -96,7 +96,7 @@ C: thumb ( -- thumb )
 C: slider ( viewport -- slider )
     [ set-slider-viewport ] keep
     [
-        f bevel-border dup f bevel-up? set-paint-property
+        f line-border
         slider-size 200 pick resize-gadget
         swap set-slider-delegate
     ] keep

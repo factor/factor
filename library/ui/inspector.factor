@@ -1,8 +1,18 @@
 USING: gadgets generic hashtables kernel kernel-internals lists
 namespaces unparser vectors words ;
 
+DEFER: inspect
+
+: <presentation> ( obj -- gadget )
+    dup unparse <label> [
+        swap
+        [ \ drop , literal, \ inspect , ] make-list
+        [ button-up 1 ] set-action
+    ] keep
+    dup [ drop ] [ button-down 1 ] set-action ;
+
 : label-box ( list -- gadget )
-    <line-pile> swap [ unparse <label> over add-gadget ] each ;
+    <line-pile> swap [ <presentation> over add-gadget ] each ;
 
 : alist>sheet ( assoc -- sheet )
     unzip swap
@@ -61,5 +71,5 @@ M: tuple custom-sheet ( tuple -- gadget )
 
 : inspect ( obj -- )
     <inspector> ( <scroller> )
-    bevel-border dup moving-actions world get add-gadget ;
+    line-border dup moving-actions world get add-gadget ;
 

@@ -93,8 +93,8 @@ C: border ( delegate size -- border )
 : empty-border ( child -- border )
     <empty-gadget> standard-border ;
 
-: bevel-border ( child -- border )
-    3 0 0 0 0 <bevel-rect> <gadget> standard-border ;
+: line-border ( child -- border )
+    0 0 0 0 <etched-rect> <gadget> standard-border ;
 
 : size-border ( border -- )
     dup gadget-children

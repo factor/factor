@@ -24,7 +24,7 @@ DEFER: pick-up
     #! box delegate.
     2dup inside? [
         2dup [ translate ] keep
-        gadget-children pick-up-list dup [
+        gadget-children reverse pick-up-list dup [
             2nip
         ] [
             3drop t
@@ -104,3 +104,7 @@ C: hand ( world -- hand )
     2dup lose-focus
     swap dup r> set-hand-focus
     gain-focus ;
+
+M: hand shape-clip
+    #! The hand's children are not clipped.
+    hand-world shape-clip ;

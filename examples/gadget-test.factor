@@ -53,7 +53,7 @@ USE: words
     f world get set-gadget-children
     
     0 default-gap 0 <pile> "pile" set
-!    <default-shelf> "shelf" set
+    <default-shelf> "shelf" set
 !    "Close" [ "dialog" get world get remove-gadget ] <button> "shelf" get add-gadget
 !    "New Rectangle" [ drop 100 100 100 100 <funny-rect> dup [ 255 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
 !    "New Ellipse" [ drop 100 100 200 100 <funny-ellipse> dup [ 0 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
@@ -66,7 +66,7 @@ USE: words
 !    "Another field."  <field> "pile" get add-gadget
     <console-pane> <scroller> "pile" get add-gadget
 
-    "pile" get bevel-border dup "dialog" set  dup  
+    "pile" get line-border dup "dialog" set  dup  
  moving-actions
   world get add-gadget 
   

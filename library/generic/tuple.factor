@@ -124,11 +124,11 @@ UNION: arrayed array tuple ;
     #! If the generic does not define a specific method for a
     #! tuple, execute the return value of this.
     dup "methods" word-property
-    tuple over hash dup [
-        2nip
+    tuple over hash* dup [
+        2nip cdr
     ] [
-        drop object over hash dup [
-            2nip
+        drop object over hash* dup [
+            2nip cdr
         ] [
             2drop [ dup tuple-delegate ] swap
             dup unit swap

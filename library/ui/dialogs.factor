@@ -25,7 +25,7 @@ TUPLE: dialog continuation delegate ;
     [ dialog-cancel ] dup set-action ;
 
 C: dialog ( content -- gadget )
-    [ f bevel-border swap set-dialog-delegate ] keep
+    [ f line-border swap set-dialog-delegate ] keep
     [
         >r <default-pile>
         [ add-gadget ] keep

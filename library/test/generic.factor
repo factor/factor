@@ -107,3 +107,14 @@ M: general-t complement-test drop "general-t" ;
 
 [ "general-t" ] [ 5 complement-test ] unit-test
 [ "f" ] [ f complement-test ] unit-test
+
+GENERIC: empty-method-test
+M: object empty-method-test ;
+TUPLE: for-arguments-sake ;
+
+M: for-arguments-sake empty-method-test drop "Hi" ;
+
+TUPLE: another-one ;
+
+[ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
+[ << another-one >> ] [ <another-one> empty-method-test ] unit-test
