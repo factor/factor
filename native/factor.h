@@ -33,6 +33,11 @@
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
 
+#define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
+#define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
+
+#define FIXNUM long int /* unboxed */
+
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)
 #define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
@@ -46,7 +51,7 @@ typedef unsigned char BYTE;
 
 /* Memory heap size */
 #define DEFAULT_ARENA (64 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (5 * 1024 * 1024)
+#define COMPILE_ZONE_SIZE (4 * 1024 * 1024)
 
 #define STACK_SIZE 16384
 

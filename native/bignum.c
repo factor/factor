@@ -55,6 +55,7 @@ ARRAY* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(to_bignum(dpeek())));
 }
 
@@ -65,38 +66,39 @@ void primitive_bignum_eq(void)
 	dpush(tag_boolean(s48_bignum_equal_p(x,y)));
 }
 
+#define GC_AND_POP_BIGNUMS(x,y) \
+	ARRAY *x, *y; \
+	maybe_garbage_collection(); \
+	y = to_bignum(dpop()); \
+	x = to_bignum(dpop());
+
 void primitive_bignum_add(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_add(x,y)));
 }
 
 void primitive_bignum_subtract(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_subtract(x,y)));
 }
 
 void primitive_bignum_multiply(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_multiply(x,y)));
 }
 
 void primitive_bignum_divint(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_quotient(x,y)));
 }
 
 void primitive_bignum_divfloat(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(make_float(
 		s48_bignum_to_double(x) /
 		s48_bignum_to_double(y))));
@@ -104,9 +106,8 @@ void primitive_bignum_divfloat(void)
 
 void primitive_bignum_divmod(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
 	ARRAY *q, *r;
+	GC_AND_POP_BIGNUMS(x,y);
 	s48_bignum_divide(x,y,&q,&r);
 	dpush(tag_object(q));
 	dpush(tag_object(r));
@@ -114,36 +115,35 @@ void primitive_bignum_divmod(void)
 
 void primitive_bignum_mod(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_remainder(x,y)));
 }
 
 void primitive_bignum_and(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_bitwise_and(x,y)));
 }
 
 void primitive_bignum_or(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_bitwise_ior(x,y)));
 }
 
 void primitive_bignum_xor(void)
 {
-	ARRAY* y = to_bignum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	dpush(tag_object(s48_bignum_bitwise_xor(x,y)));
 }
 
 void primitive_bignum_shift(void)
 {
-	FIXNUM y = to_fixnum(dpop());
-	ARRAY* x = to_bignum(dpop());
+	FIXNUM y;
+        ARRAY* x;
+	maybe_garbage_collection();
+	y = to_fixnum(dpop());
+	x = to_bignum(dpop());
 	dpush(tag_object(s48_bignum_arithmetic_shift(x,y)));
 }
 
@@ -207,6 +207,7 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(s48_bignum_bitwise_not(
 		untag_bignum(dpeek()))));
 }

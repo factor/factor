@@ -74,7 +74,6 @@ DEFER: os-env
 DEFER: type
 DEFER: size
 DEFER: address
-DEFER: dump
 DEFER: heap-stats
 
 IN: strings
@@ -357,7 +356,6 @@ IN: image
         (random-int)
         type
         size
-        dump
         cwd
         cd
         compiled-offset

@@ -2,24 +2,29 @@ IN: scratchpad
 USE: kernel
 USE: math
 USE: test
+USE: real-math
 
-[ 4.0 ] [ 16 ] [ sqrt ] test-word
-[ #{ 0 4.0 } ] [ -16 ] [ sqrt ] test-word
+! Lets get the argument order correct, eh?
+[ 0.0 ] [ 0 1 fatan2 ] unit-test
+[ 0.25 ] [ 2 -2 fpow ] unit-test
 
-[ 4.0 ] [ 2 2 ] [ ^ ] test-word
-[ 0.25 ] [ 2 -2 ] [ ^ ] test-word
-[ t ] [ 2 0.5 ^ 2 ^ ] [ 2 2.00001 between? ] test-word
-[ t ] [ e pi i * ^ real ] [ -1.0 = ] test-word
-[ t ] [ e pi i * ^ imaginary ] [ -0.00001 0.00001 between? ] test-word
+[ 4.0 ] [ 16 sqrt ] unit-test
+[ #{ 0 4.0 } ] [ -16 sqrt ] unit-test
 
-[ 1.0 ] [ 0 ] [ cosh ] test-word
-[ 0.0 ] [ 1 ] [ acosh ] test-word
+[ 4.0 ] [ 2 2 ^ ] unit-test
+[ 0.25 ] [ 2 -2 ^ ] unit-test
+[ t ] [ 2 0.5 ^ 2 ^ 2 2.00001 between? ] unit-test
+[ t ] [ e pi i * ^ real -1.0 = ] unit-test
+[ t ] [ e pi i * ^ imaginary -0.00001 0.00001 between? ] unit-test
 
-[ 1.0 ] [ 0 ] [ cos ] test-word
-[ 0.0 ] [ 1 ] [ acos ] test-word
-
-[ 0.0 ] [ 0 ] [ sinh ] test-word
-[ 0.0 ] [ 0 ] [ asinh ] test-word
-
-[ 0.0 ] [ 0 ] [ sin ] test-word
-[ 0.0 ] [ 0 ] [ asin ] test-word
+[ 1.0 ] [ 0 cosh ] unit-test
+[ 0.0 ] [ 1 acosh ] unit-test
+            
+[ 1.0 ] [ 0 cos ] unit-test
+[ 0.0 ] [ 1 acos ] unit-test
+            
+[ 0.0 ] [ 0 sinh ] unit-test
+[ 0.0 ] [ 0 asinh ] unit-test
+            
+[ 0.0 ] [ 0 sin ] unit-test
+[ 0.0 ] [ 0 asin ] unit-test

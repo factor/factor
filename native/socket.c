@@ -45,8 +45,14 @@ int make_client_socket(const char* hostname, uint16_t port)
 void primitive_client_socket(void)
 {
 	uint16_t p = (uint16_t)to_fixnum(dpop());
-	char* host = unbox_c_string();
-	int sock = make_client_socket(host,p);
+	char* host;
+	int sock;
+
+	maybe_garbage_collection();
+
+	host = unbox_c_string();
+	sock = make_client_socket(host,p);
+
 	dpush(tag_object(port(PORT_RECV,sock)));
 	dpush(tag_object(port(PORT_WRITE,sock)));
 }
@@ -91,13 +97,16 @@ int make_server_socket(uint16_t port)
 void primitive_server_socket(void)
 {
 	uint16_t p = (uint16_t)to_fixnum(dpop());
+	maybe_garbage_collection();
 	dpush(tag_object(port(PORT_SPECIAL,make_server_socket(p))));
 }
 
 void primitive_add_accept_io_task(void)
 {
-	CELL callback = dpop();
-	CELL port = dpop();
+	CELL callback, port;
+	maybe_garbage_collection();
+	callback = dpop();
+	port = dpop();
 	add_io_task(IO_TASK_ACCEPT,port,F,callback,
 		read_io_tasks,&read_fd_count);
 }
@@ -131,7 +140,9 @@ CELL accept_connection(PORT* p)
 
 void primitive_accept_fd(void)
 {
-	PORT* p = untag_port(dpop());
+	PORT* p;
+	maybe_garbage_collection();
+	p = untag_port(dpop());
 	dpush(p->client_host);
 	dpush(p->client_port);
 	dpush(tag_object(port(PORT_RECV,p->client_socket)));

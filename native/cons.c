@@ -10,8 +10,10 @@ CELL cons(CELL car, CELL cdr)
 
 void primitive_cons(void)
 {
-	CELL cdr = dpop();
-	CELL car = dpop();
+	CELL car, cdr;
+	maybe_garbage_collection();
+	cdr = dpop();
+	car = dpop();
 	dpush(cons(car,cdr));
 }
 

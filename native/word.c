@@ -25,9 +25,13 @@ void update_xt(WORD* word)
 /* <word> ( primitive parameter plist -- word ) */
 void primitive_word(void)
 {
-	CELL plist = dpop();
+	CELL plist, parameter;
 	FIXNUM primitive;
-	CELL parameter = dpop();
+
+	maybe_garbage_collection();
+
+	plist = dpop();
+	parameter = dpop();
 	primitive = to_fixnum(dpop());
 	dpush(tag_word(word(primitive,parameter,plist)));
 }

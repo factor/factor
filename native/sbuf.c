@@ -10,6 +10,7 @@ SBUF* sbuf(FIXNUM capacity)
 
 void primitive_sbuf(void)
 {
+	maybe_garbage_collection();
 	drepl(tag_object(sbuf(to_fixnum(dpeek()))));
 }
 
@@ -20,8 +21,13 @@ void primitive_sbuf_length(void)
 
 void primitive_set_sbuf_length(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
-	FIXNUM length = to_fixnum(dpop());
+	SBUF* sbuf;
+	FIXNUM length;
+
+	maybe_garbage_collection();
+
+	sbuf = untag_sbuf(dpop());
+	length = to_fixnum(dpop());
 	if(length < 0)
 		range_error(tag_object(sbuf),length,sbuf->top);
 	sbuf->top = length;
@@ -61,9 +67,15 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value)
 
 void primitive_set_sbuf_nth(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
-	FIXNUM index = to_fixnum(dpop());
-	CELL value = dpop();
+	SBUF* sbuf;
+	FIXNUM index;
+	CELL value;
+
+	maybe_garbage_collection();
+
+	sbuf = untag_sbuf(dpop());
+	index = to_fixnum(dpop());
+	value = dpop();
 
 	set_sbuf_nth(sbuf,index,value);
 }
@@ -79,8 +91,14 @@ void sbuf_append_string(SBUF* sbuf, STRING* string)
 
 void primitive_sbuf_append(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
-	CELL object = dpop();
+	SBUF* sbuf;
+	CELL object;
+
+	maybe_garbage_collection();
+
+	sbuf = untag_sbuf(dpop());
+	object = dpop();
+
 	switch(type_of(object))
 	{
 	case FIXNUM_TYPE:
@@ -98,8 +116,13 @@ void primitive_sbuf_append(void)
 
 void primitive_sbuf_to_string(void)
 {
-	SBUF* sbuf = untag_sbuf(dpeek());
-	STRING* s = string_clone(sbuf->string,sbuf->top);
+	SBUF* sbuf;
+	STRING* s;
+
+	maybe_garbage_collection();
+
+	sbuf = untag_sbuf(dpeek());
+	s = string_clone(sbuf->string,sbuf->top);
 	rehash_string(s);
 	drepl(tag_object(s));
 }
@@ -112,8 +135,14 @@ void primitive_sbuf_reverse(void)
 
 void primitive_sbuf_clone(void)
 {
-	SBUF* s = untag_sbuf(dpeek());
-	SBUF* new_s = sbuf(s->top);
+	SBUF* s;
+	SBUF* new_s;
+
+	maybe_garbage_collection();
+
+	s = untag_sbuf(dpeek());
+	new_s = sbuf(s->top);
+
 	sbuf_append_string(new_s,s->string);
 	drepl(tag_object(new_s));
 }

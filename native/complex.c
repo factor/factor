@@ -62,8 +62,12 @@ void primitive_to_rect(void)
 
 void primitive_from_rect(void)
 {
-	CELL imaginary = dpop();
-	CELL real = dpop();
+	CELL imaginary, real;
+
+	maybe_garbage_collection();
+
+	imaginary = dpop();
+	real = dpop();
 
 	if(!realp(imaginary))
 		type_error(REAL_TYPE,imaginary);

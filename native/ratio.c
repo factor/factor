@@ -4,8 +4,12 @@
 library implementation, to avoid breaking invariants. */
 void primitive_from_fraction(void)
 {
-	CELL denominator = dpop();
-	CELL numerator = dpop();
+	CELL numerator, denominator;
+
+	maybe_garbage_collection();
+
+	denominator = dpop();
+	numerator = dpop();
 	if(zerop(denominator))
 		raise(SIGFPE);
 	if(onep(denominator))

@@ -209,7 +209,6 @@ USE: words
     [ allot-profiling        | " depth -- " ]
     [ allot-count            | " word -- n " ]
     [ set-allot-count        | " n word -- n " ]
-    [ dump                   | " obj -- " ]
     [ cwd                    | " -- dir " ]
     [ cd                     | " dir -- " ]
     [ compiled-offset        | " -- ptr " ]

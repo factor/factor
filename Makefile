@@ -1,5 +1,5 @@
 CC = gcc
-DEFAULT_CFLAGS = -Os -Wall -export-dynamic -fomit-frame-pointer
+DEFAULT_CFLAGS = -Os -Wall -export-dynamic -fomit-frame-pointer $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
@@ -22,6 +22,7 @@ default:
 	@echo "Run 'make' with one of the following parameters:"
 	@echo ""
 	@echo "bsd"
+	@echo "bsd-nopthread - on FreeBSD 4, if you want to use profiling"
 	@echo "linux"
 	@echo "solaris"
 	@echo ""
@@ -34,6 +35,11 @@ default:
 bsd:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -pthread" \
+		LIBS="$(DEFAULT_LIBS)"
+
+bsd-nopthread:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
 		LIBS="$(DEFAULT_LIBS)"
 
 linux:

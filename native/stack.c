@@ -94,15 +94,14 @@ VECTOR* stack_to_vector(CELL bottom, CELL top)
 
 void primitive_datastack(void)
 {
+	maybe_garbage_collection();
 	dpush(tag_object(stack_to_vector(ds_bot,ds)));
 }
 
 void primitive_callstack(void)
 {
-	/* we don't want gc word to end up on callstack. */
-	gc_protect = true;
+	maybe_garbage_collection();
 	dpush(tag_object(stack_to_vector(cs_bot,cs)));
-	gc_protect = false;
 }
 
 /* Returns top of stack */

@@ -69,8 +69,8 @@ void type_error(CELL type, CELL tagged)
 	general_error(ERROR_TYPE,c);
 }
 
-void range_error(CELL tagged, CELL index, CELL max)
+void range_error(CELL tagged, FIXNUM index, CELL max)
 {
-	CELL c = cons(tagged,cons(tag_fixnum(index),cons(tag_fixnum(max),F)));
+	CELL c = cons(tagged,cons(tag_integer(index),cons(tag_cell(max),F)));
 	general_error(ERROR_RANGE,c);
 }

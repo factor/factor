@@ -169,7 +169,6 @@ XT primitives[] = {
 	primitive_random_int,
 	primitive_type,
 	primitive_size,
-	primitive_dump,
 	primitive_cwd,
 	primitive_cd,
 	primitive_compiled_offset,
