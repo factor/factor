@@ -35,6 +35,22 @@ USE: namespaces
 USE: stack
 USE: strings
 
+: close ( stream -- )
+    [
+        [ "java.io.InputStream" is ] [
+            [ ] "java.io.InputStream" "close" jinvoke
+        ]
+        [ "java.io.OutputStream" is ] [
+            [ ] "java.io.OutputStream" "close" jinvoke
+        ]
+        [ "java.io.Reader" is ] [
+            [ ] "java.io.Reader" "close" jinvoke
+        ]
+        [ "java.io.Writer" is ] [
+            [ ] "java.io.Writer" "close" jinvoke
+        ]
+    ] cond ;
+
 : fcopy ( from to -- )
     #! Copy the contents of the byte-stream 'from' to the
     #! byte-stream 'to'.
@@ -81,8 +97,8 @@ USE: strings
     "out" get [ ] "java.io.OutputStream" "flush" jinvoke ;
 
 : <byte-stream>/fclose ( -- )
-    "in" get  [ [ ] "java.io.InputStream"  "close" jinvoke ] when* 
-    "out" get [ [ ] "java.io.OutputStream" "close" jinvoke ] when* ;
+    "in" get  [ close ] when* 
+    "out" get [ close ] when* ;
 
 : <bin> ( in -- in )
     [ "java.io.InputStream" ] "java.io.BufferedInputStream" jnew ;
@@ -134,8 +150,8 @@ USE: strings
     "out" get [ ] "java.io.Writer" "flush" jinvoke ;
 
 : <char-stream>/fclose ( -- )
-    "in" get  [ [ ] "java.io.Reader" "close" jinvoke ] when* 
-    "out" get [ [ ] "java.io.Writer" "close" jinvoke ] when* ;
+    "in" get  [ close ] when* 
+    "out" get [ close ] when* ;
 
 : <char-stream> ( in out -- stream )
     #! Creates a new stream for reading from the
@@ -189,13 +205,6 @@ USE: strings
 
 : <sreader> ( string -- reader )
     [ "java.lang.String" ] "java.io.StringReader" jnew ;
-
-: close ( stream -- )
-    dup "java.io.Reader" is [
-        [ ] "java.io.Reader" "close" jinvoke
-    ] [
-        [ ] "java.io.Writer" "close" jinvoke
-    ] ifte ;
 
 : <server> ( port -- stream )
     #! Starts listening on localhost:port. Returns a stream that

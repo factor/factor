@@ -23,6 +23,8 @@ plugin.factor.jedit.FactorPlugin.menu=factor \
 	factor-edit-dialog \
 	factor-see \
 	factor-usages \
+	- \
+	factor-extract-word
 
 factor.label=Factor Listener
 factor-run-file.label=Run current file
@@ -33,6 +35,7 @@ factor-see.label=See word at caret
 factor-edit.label=Edit word at caret
 factor-edit-dialog.label=Edit word...
 factor-usages.label=Word usages at caret
+factor-extract-word.label=Extract word...
 
 factor.title=Factor
 
@@ -54,3 +57,9 @@ factor.insert-use.caption=There are multiple words named "{0}". Select the one t
 
 factor.edit-word.title=Edit Word Definition
 factor.edit-word.caption=Word name:
+
+factor.extract-word.title=Extract Word
+factor.extract-word.message=Enter name of new word:
+
+factor.extract-word-where.title=Cannot Extract Here
+factor.extract-word-where.message=This command can only be used inside a word definition.

@@ -32,6 +32,7 @@ USE: lists
 USE: logic
 USE: stack
 USE: strings
+USE: namespaces
 
 : <file> ( path -- file )
     dup "java.io.File" is not [
@@ -60,3 +61,11 @@ USE: strings
 
 : file-length ( file -- size )
     <file> [ ] "java.io.File" "length" jinvoke ;
+
+: cwd ( -- dir )
+    global [ "cwd" get ] bind ;
+
+: cd ( dir --)
+    global [ "cwd" set ] bind ;
+
+global [ "user.dir" system-property "cwd" set ] bind

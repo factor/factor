@@ -72,6 +72,9 @@ USE: strings
         ] ifte
     ] each drop ;
 
+: pwd cwd print ;
+: dir. cwd directory. ;
+
 [
     [ "html"   | "text/html"                        ]
     [ "txt"    | "text/plain"                       ]

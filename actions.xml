@@ -66,4 +66,9 @@
 				FactorPlugin.insertUseDialog(view,word);
 		</CODE>
 	</ACTION>
+	<ACTION NAME="factor-extract-word">
+		<CODE>
+			FactorPlugin.extractWord(view);
+		</CODE>
+	</ACTION>
 </ACTIONS>

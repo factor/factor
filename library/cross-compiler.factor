@@ -60,6 +60,8 @@ DEFER: sbuf-clone
 IN: files
 DEFER: stat
 DEFER: (directory)
+DEFER: cwd
+DEFER: cd
 
 IN: io-internals
 DEFER: port?
@@ -264,6 +266,8 @@ IN: cross-compiler
         allot-count
         set-allot-count
         dump
+        cwd
+        cd
     ] [
         swap succ tuck primitive,
     ] each drop ;

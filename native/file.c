@@ -69,3 +69,16 @@ void primitive_read_dir(void)
 
 	dpush(result);
 }
+
+void primitive_cwd(void)
+{
+	char wd[MAXPATHLEN];
+	if(getcwd(wd,MAXPATHLEN) < 0)
+		io_error(__FUNCTION__);
+	dpush(tag_object(from_c_string(wd)));
+}
+
+void primitive_cd(void)
+{
+	chdir(to_c_string(untag_string(dpop())));
+}

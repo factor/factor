@@ -128,13 +128,14 @@ public class FactorLib
 	} //}}}
 
 	//{{{ exec() method
-	public static int exec(String[] args) throws Exception
+	public static int exec(String[] args, String dir) throws Exception
 	{
 		int exitCode = -1;
 
 		try
 		{
-			Process process = Runtime.getRuntime().exec(args);
+			Process process = Runtime.getRuntime().exec(args,
+				null,new File(dir));
 			process.getInputStream().close();
 			process.getOutputStream().close();
 			process.getErrorStream().close();

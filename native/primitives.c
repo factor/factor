@@ -148,7 +148,9 @@ XT primitives[] = {
 	primitive_allot_profiling,
 	primitive_word_allot_count,
 	primitive_set_word_allot_count,
-	primitive_dump
+	primitive_dump,
+	primitive_cwd,
+	primitive_cd
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -307,4 +307,49 @@ public class FactorPlugin extends EditPlugin
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
 	} //}}}
+
+	//{{{ extractWord() method
+	public static void extractWord(View view)
+	{
+		JEditTextArea textArea = view.getTextArea();
+		Buffer buffer = textArea.getBuffer();
+		String selection = textArea.getSelectedText();
+		if(selection == null)
+			selection = "";
+
+		SideKickParsedData data = SideKickParsedData
+			.getParsedData(view);
+		if(!(data instanceof FactorParsedData))
+		{
+			view.getToolkit().beep();
+			return;
+		}
+
+		Asset asset = data.getAssetAtPosition(
+			textArea.getCaretPosition());
+
+		if(asset == null)
+		{
+			GUIUtilities.error(view,"factor.extract-word-where",null);
+			return;
+		}
+
+		String newWord = GUIUtilities.input(view,
+			"factor.extract-word",null);
+		if(newWord == null)
+			return;
+
+		int start = asset.start.getOffset();
+
+		String indent = MiscUtilities.createWhiteSpace(
+			buffer.getIndentSize(),
+			(buffer.getBooleanProperty("noTabs") ? 0
+			: buffer.getTabSize()));
+
+		String newDef = ": " + newWord + "\n" + indent
+			+ selection.trim() + " ;\n\n" ;
+
+		buffer.insert(start,newDef);
+		textArea.setSelectedText(newWord);
+	} //}}}
 }

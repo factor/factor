@@ -87,6 +87,7 @@ USE: parser
 "/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
+"/library/platform/jvm/processes.factor"   run-resource ! processes
 "/library/extend-stream.factor"            run-resource ! streams
 "/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style

@@ -360,6 +360,10 @@ public class FactorReader
 	 */
 	public FactorWord nextWord(boolean define) throws Exception
 	{
+		// remember the position before the word name
+		int line = scanner.getLineNumber();
+		int col = scanner.getColumnNumber();
+
 		Object next = nextNonEOL(true,false);
 		if(next instanceof Number)
 		{
@@ -369,10 +373,6 @@ public class FactorReader
 		}
 		else if(next instanceof String)
 		{
-			// remember the position before the word name
-			int line = scanner.getLineNumber();
-			int col = scanner.getColumnNumber();
-
 			FactorWord w = intern((String)next,define);
 			if(define && w != null)
 			{

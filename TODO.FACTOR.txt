@@ -6,16 +6,12 @@
 - plugin should not exit jEdit on fatal errors
 - IN: format base: work with all types of numbers
 - wordpreview: don't show for string literals and comments
-- NPE in activate()/deactivate()
-- NPE in ErrorHighlight
 - 64 bit support
 - alist -vs- assoc terminology
 - clean up listener's action popups
 - jedit ==> jedit-word, jedit takes a file name
 - introduce ifte* and ?str-head/?str-tail where appropriate
-- cwd, cd, pwd, dir., pwd. words
 - namespace clone drops static var bindings
-- f usages. --> don't print all words
 
 + bignums:
 
@@ -54,6 +50,8 @@
 
 + listener/plugin:
 
+- NPE in activate()/deactivate()
+- NPE in ErrorHighlight
 - don't use jEdit's word finding API
 - some way to not have previous definitions from a source file
   clutter the namespace
@@ -91,6 +89,9 @@
 
 + misc:
 
+- write-icon kind of messy; " " should be output by the listener
+- f usages. --> don't print all words
+- pipe support
 - telnetd: init-history
 - str-reverse primitive
 - some way to run httpd from command line
@@ -105,7 +106,6 @@
 - wiki responder:
   - port to native
   - text styles
-- if user clicks stop in browser, doesn't stop sending?
 - log with date
  basic authentication, using httpdAuth function from a config file
 - file responder; last-modified field

@@ -187,6 +187,8 @@ USE: unparser
     [ allot-count            | " word -- n " ]
     [ set-allot-count        | " n word -- n " ]
     [ dump                   | " obj -- " ]
+    [ cwd                    | " -- dir " ]
+    [ cd                     | " dir -- " ]
 ] [
     unswons "stack-effect" swap set-word-property
 ] each

@@ -25,47 +25,34 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: init
-USE: ansi
-USE: combinators
-USE: errors
-USE: httpd-responder
+IN: processes
+USE: files
 USE: kernel
-USE: lists
-USE: namespaces
-USE: parser
-USE: random
 USE: streams
-USE: styles
-USE: words
+USE: stack
 
-: cli-args ( -- args ) 10 getenv ;
+: exec ( args -- exitCode )
+    cwd
+    [
+        [ "java.lang.String" ] "java.lang.String"
+    ] "factor.FactorLib" "exec"
+    jinvoke-static ;
 
-: init-error-handler ( -- )
-    [ 1 exit* ] >c ( last resort )
-    [ default-error-handler 1 exit* ] >c
-    [ throw ] 5 setenv ( kernel calls on error ) ;
+: (pipe) ( args -- process )
+    f cwd <file> jvm-runtime
+    [
+        [ "java.lang.String" ]
+        [ "java.lang.String" ]
+        "java.io.File"
+    ] "java.lang.Runtime" "exec" jinvoke ;
 
-: warm-boot ( -- )
-    #! A fully bootstrapped image has this as the boot
-    #! quotation.
-    boot
+: close-stderr ( process -- )
+    [ ] "java.lang.Process" "getErrorStream" jinvoke close ;
 
-    init-error-handler
-    init-random
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    t "ansi" set
-
-    ! The first CLI arg is the image name.
-    cli-args uncons parse-command-line "image" set
-
-    run-user-init
-
-    "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
-    "interactive" get [ init-interpreter ] when
-
-    0 exit* ;
+: pipe ( args -- stream )
+    #! Start a process, and return a stream for communicating
+    #! with it.
+    (pipe) dup close-stderr
+    dup [ ] "java.lang.Process" "getInputStream" jinvoke
+    swap [ ] "java.lang.Process" "getOutputStream" jinvoke
+    <byte-stream> ;

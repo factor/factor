@@ -100,9 +100,10 @@ USE: unparser
 
 : file-actions ( -- list )
     [
-        [ ""               | "Push" ]
-        [ "run-file"       | "Run file" ]
-        [ "directory."     | "List directory" ]
+        [ ""           | "Push" ]
+        [ "run-file"   | "Run file" ]
+        [ "directory." | "List directory" ]
+        [ "cd"         | "Change directory" ]
     ] ;
 
 : <file-actions-menu> ( path -- alist )

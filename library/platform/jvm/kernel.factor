@@ -74,10 +74,6 @@ IN: kernel
     interpreter
     [ ] "factor.FactorInterpreter" "topLevel" jinvoke ;
 
-: exec ( args -- exitCode )
-    [ [ "java.lang.String" ] ] "factor.FactorLib" "exec"
-    jinvoke-static ;
-
 : exit* ( code -- )
     [ "int" ] "java.lang.System" "exit" jinvoke-static ;
 
@@ -103,8 +99,8 @@ IN: kernel
 : version "factor.FactorInterpreter" "VERSION" jvar-static-get ;
 
 : jvm-runtime ( -- java.lang.Runtime )
-  #! Return the java.lang.Runtime object for the JVM
-  f "java.lang.Runtime" "getRuntime" jinvoke-static ;
+    #! Return the java.lang.Runtime object for the JVM
+    f "java.lang.Runtime" "getRuntime" jinvoke-static ;
 
 : free-memory ( -- int )
   #! Return the free memory in the JVM.

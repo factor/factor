@@ -69,7 +69,7 @@ USE: streams
 
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png
-    "icon" swons unit "" swap write-attr ;
+    "icon" swons unit " " swap write-attr ;
 
 : print ( string -- )
     "stdio" get fprint ;
