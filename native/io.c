@@ -2,9 +2,9 @@
 
 void init_io(void)
 {
-	env.user[STDIN_ENV]  = handle(stdin);
-	env.user[STDOUT_ENV] = handle(stdout);
-	env.user[STDERR_ENV] = handle(stderr);
+	env.user[STDIN_ENV]  = handle(HANDLE_C_STREAM,stdin);
+	env.user[STDOUT_ENV] = handle(HANDLE_C_STREAM,stdout);
+	env.user[STDERR_ENV] = handle(HANDLE_C_STREAM,stderr);
 }
 
 #define LINE_SIZE 80
@@ -14,13 +14,13 @@ void primitive_open_file(void)
 	char* mode = to_c_string(untag_string(env.dt));
 	char* path = to_c_string(untag_string(dpop()));
 	FILE* file = fopen(path,mode);
-	env.dt = handle(file);
+	env.dt = handle(HANDLE_C_STREAM,file);
 }
 
 /* read a line of ASCII text. */
 void primitive_read_line_8(void)
 {
-	HANDLE* h = untag_handle(env.dt);
+	HANDLE* h = untag_handle(HANDLE_C_STREAM,env.dt);
 	FILE* file = (FILE*)h->object;
 
 	SBUF* b = sbuf(LINE_SIZE);
@@ -53,7 +53,7 @@ void primitive_read_line_8(void)
 /* write a string. */
 void primitive_write_8(void)
 {
-	HANDLE* h = untag_handle(env.dt);
+	HANDLE* h = untag_handle(HANDLE_C_STREAM,env.dt);
 	FILE* file = (FILE*)h->object;
 	STRING* str = untag_string(dpop());
 	CELL strlen = str->capacity;
@@ -67,7 +67,7 @@ void primitive_write_8(void)
 
 void primitive_close(void)
 {
-	HANDLE* h = untag_handle(env.dt);
+	HANDLE* h = untag_handle(HANDLE_C_STREAM,env.dt);
 	fclose((FILE*)h->object);
 	env.dt = dpop();
 }

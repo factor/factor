@@ -32,8 +32,8 @@ USE: kernel
 USE: stack
 USE: namespaces
 
-: <native-stream> ( in out -- stream )
-    #! Create a native stream object, wrapping a pair of file
+: <c-stream> ( in out -- stream )
+    #! Create a C stream object, wrapping a pair of FILE*
     #! handles for input and output.
     <stream> [
         "out" set
@@ -51,7 +51,7 @@ USE: namespaces
     ] extend ;
 
 : <file-stream> ( path mode -- stream )
-    open-file dup <native-stream> ;
+    open-file dup <c-stream> ;
 
 : <filebr> ( path -- stream )
     "r" <file-stream> ;
@@ -59,5 +59,34 @@ USE: namespaces
 : <filebw> ( path -- stream )
     "w" <file-stream> ;
 
+: <fd-stream> ( in out -- stream )
+    #! Create a file descriptor stream object, wrapping a pair
+    #! of file descriptor handles for input and output.
+    <stream> [
+        "out" set
+        "in" set
+
+        ( -- )
+        [
+            "in" get [ close-fd ] when*
+            "out" get [ close-fd ] when*
+        ] "fclose" set
+    ] extend ;
+
+: <server> ( port -- stream )
+    #! Starts listening on localhost:port. Returns a stream that
+    #! you can close with fclose, and accept connections from
+    #! with accept. No other stream operations are supported.
+    server-socket <stream> [
+        "socket" set
+
+        ( -- )
+        [ "socket" get close-fd ] "fclose" set
+    ] extend ;
+
+: accept ( server -- client )
+    #! Accept a connection from a server socket.
+    [ "socket" get ] bind accept-fd dup <fd-stream> ;
+
 : init-stdio ( -- )
-    stdin stdout <native-stream> "stdio" set ;
+    stdin stdout <c-stream> "stdio" set ;

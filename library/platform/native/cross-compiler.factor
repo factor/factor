@@ -54,6 +54,9 @@ DEFER: open-file
 DEFER: read-line-8
 DEFER: write-8
 DEFER: close
+DEFER: server-socket
+DEFER: close-fd
+DEFER: accept-fd
 
 IN: words
 DEFER: <word>
@@ -149,6 +152,9 @@ IN: cross-compiler
         set-callstack
         handle?
         exit*
+        server-socket
+        close-fd
+        accept-fd
     ] [
         swap succ tuck primitive,
     ] each drop ;

@@ -55,12 +55,13 @@ USE: vectors
 
 : error# ( n -- str )
     [
-        "Handle expired: "
+        "Expired handle: "
         "Undefined word: "
         "Type check: "
         "Array range check: "
         "Underflow"
         "Bad primitive: "
+        "Incompatible handle: "
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

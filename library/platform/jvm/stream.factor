@@ -221,8 +221,8 @@ USE: strings
 
 : <server> ( port -- stream )
     #! Starts listening on localhost:port. Returns a stream that
-    #! you can close with fclose. No other stream operations are
-    #! supported.
+    #! you can close with fclose, and accept connections from
+    #! with accept. No other stream operations are supported.
     [ "int" ] "java.net.ServerSocket" jnew
     <stream> [
         "socket" set

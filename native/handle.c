@@ -1,6 +1,6 @@
 #include "factor.h"
 
-HANDLE* untag_handle(CELL tagged)
+HANDLE* untag_handle(CELL type, CELL tagged)
 {
 	HANDLE* h;
 	type_check(HANDLE_TYPE,tagged);
@@ -8,12 +8,15 @@ HANDLE* untag_handle(CELL tagged)
 	/* after image load & save, handles are no longer valid */
 	if(h->object == 0)
 		general_error(ERROR_HANDLE_EXPIRED,tagged);
+	if(h->type != type)
+		general_error(ERROR_HANDLE_INCOMPAT,tagged);
 	return h;
 }
 
-CELL handle(CELL object)
+CELL handle(CELL type, CELL object)
 {
 	HANDLE* handle = (HANDLE*)allot_object(HANDLE_TYPE,sizeof(HANDLE));
+	handle->type = type;
 	handle->object = object;
 	return tag_object(handle);
 }

@@ -83,7 +83,10 @@ XT primitives[] = {
 	primitive_set_datastack,                /* 79 */
 	primitive_set_callstack,                /* 80 */
 	primitive_handlep,                      /* 81 */
-	primitive_exit                          /* 82 */
+	primitive_exit,                         /* 82 */
+	primitive_server_socket,                /* 83 */
+	primitive_close_fd,                     /* 84 */
+	primitive_accept_fd                     /* 85 */
 };
 
 CELL primitive_to_xt(CELL primitive)

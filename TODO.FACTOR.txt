@@ -3,13 +3,13 @@
 - {...} vectors
 - parsing should be parsing
 - telnetd: listening on a socket
-- apropos
 - describe-word
 - clone-sbuf
 - contains ==> contains?
 - telnetd: send errors on socket
 - partition, sort
 - inspector: sort
+- index of str
 
 + interactive:
 
