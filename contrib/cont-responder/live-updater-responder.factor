@@ -33,15 +33,10 @@ USE: stack
 USE: stdio
 USE: namespaces
 USE: streams
-USE: parser
 USE: lists
-USE: errors
 USE: strings
-USE: logic
 USE: kernel
-USE: prettyprint
 USE: vocabularies
-USE: combinators
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.
@@ -161,18 +156,6 @@ USE: combinators
   write-live-search-tag
   write-live-search-script ;
 
-: live-search-see-word ( string -- )
-  #! Given a string that is a factor word, show the
-  #! source to that word.
-  <namespace> [
-    "responder" "inspect" put
-    <pre> [
-        "stdio" get <html-stream> [   
-          see
-        ] with-stream              
-    ] </pre>
-  ] bind ;
-
 : live-search-apropos-word ( string -- )
   #! Given a string that is a factor word, show the
   #! aporpos of that word.
@@ -196,23 +179,23 @@ USE: combinators
         ] </script>
       ] </head>
       <body> [
-       "millis" [ millis write ] "Display Server millis" live-anchor
-       <div id= "millis" div> [ 
-         "The millisecond time from the server will appear here" write 
-       ] </div>        
-       <br/>
-       "Enter a word to see:" paragraph
-       "search" [ live-search-see-word ] live-search
-       <br/>
-       <div id= "search" div> [
-         "" write
-       ] </div>
-       "Enter a word to apropos:" paragraph
-       "apropos" [ live-search-apropos-word ] live-search
-       <br/>
-       <div id= "apropos" div> [
-         "" write
-       ] </div>
+       [
+         [ 
+           "millis" [ millis write ] "Display Server millis" live-anchor
+           <div id= "millis" div> [ 
+             "The millisecond time from the server will appear here" write 
+           ] </div>         
+         ]
+         [        
+           "Enter a word to apropos:" paragraph
+           "apropos" [ live-search-apropos-word ] live-search
+         ]
+         [
+           <div id= "apropos" div> [
+             "" write
+           ] </div>
+         ] 
+       ] vertical-layout
      ] </body>
     ] </html>
   ] show ;
