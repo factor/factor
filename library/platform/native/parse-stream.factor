@@ -66,32 +66,49 @@ USE: strings
     "file-in" get "in" set
     "file-use" get "use" set ;
 
-: parse-stream ( name stream -- code )
+: (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
     >r "file" set f r>
     [ (parse) ] read-lines nreverse
     "file" off
     "line-number" off ;
 
-: parse-file ( file -- code )
-    dup <filecr> parse-stream ;
+: parse-stream ( name stream -- quot )
+    [
+        10 "base" set
+        file-vocabs
+        (parse-stream)
+    ] with-scope ;
 
-: (run-file) ( file -- )
-    #! Run a file. The file is read with the same IN:/USE: as
-    #! the current interactive interpreter.
-    parse-file call ;
+: parse-file ( file -- quot )
+    dup <filecr> parse-stream ;
 
 : run-file ( file -- )
     #! Run a file. The file is read with the default IN:/USE:
     #! for files.
-    [
-        10 "base" set
-        file-vocabs
-        parse-file
-    ] with-scope call ;
+    parse-file call ;
+
+: (parse-file) ( file -- quot )
+    dup <filecr> (parse-stream) ;
+
+: (run-file) ( file -- )
+    #! Run a file. The file is read with the same IN:/USE: as
+    #! the current interactive interpreter.
+    (parse-file) call ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;
 
+: parse-resource ( path -- quot )
+    #! Resources are loaded from the resource-path variable, or
+    #! the current directory if it is not set. Words defined in
+    #! resources have a definition source path starting with
+    #! resource:. This allows words that operate on source
+    #! files, like "jedit", to use a different resource path
+    #! at run time than was used at parse time.
+    "resource:" over cat2
+    swap resource-path swap cat2 <filecr>
+    parse-stream ;
+
 : run-resource ( file -- )
-    resource-path swap cat2 run-file ;
+    parse-resource call ;

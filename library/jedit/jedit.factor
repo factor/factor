@@ -68,10 +68,10 @@ USE: words
 
 : jedit ( word -- )
     intern dup [
-        word-line/file 2dup and [
+        word-line/file dup [
             jedit-line/file
         ] [
-            "Unknown source" print
+            3drop "Unknown source" print
         ] ifte
     ] [
         "Not defined" print

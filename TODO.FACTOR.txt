@@ -1,7 +1,6 @@
 - input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- fix up native file/line info
 - standalone listener input style
 - add a socket timeout
 - drop test in http server
@@ -45,6 +44,7 @@
 
 + native:
 
+- accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - multitasking
 - better error reporting
