@@ -36,12 +36,13 @@ C: viewport ( content -- viewport )
     dup viewport-actions
     640 480 pick resize-gadget ;
 
+M: viewport pref-size gadget-children max-size ;
+
 M: viewport layout* ( viewport -- )
     dup gadget-children [
-        2dup
-        >r dup viewport-x swap viewport-y r> move-gadget
-        [ dup shape-h >r swap shape-w swap shape-w max r> ] keep
-        resize-gadget
+        [
+            >r dup viewport-x swap viewport-y r> move-gadget
+        ] keep prefer
     ] each-with ;
 
 : scroll>bottom ( viewport -- )

@@ -6,16 +6,20 @@
 
 + ui:
 
+- split preferred size and layouting
+- shelf
+- pile
+- editor
+- slider
+- fix up initial layout of slider
+
 - resizing a gadget should probably relayout children
 - resizing: drag relative to initial click pos
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - auto-updating inspector
 - fix up the min thumb size hack
-- fix up initial layout of slider
 - console: scroll to bottom
-- split preferred size and layouting
-- remove shelf/pile duplication
 - faster layout
 - faster repaint
 

@@ -10,8 +10,7 @@ C: label ( text -- )
     <empty-gadget> over set-label-delegate
     [ set-label-text ] keep ;
 
-M: label layout* ( label -- )
-    [ label-text dup shape-w swap shape-h ] keep resize-gadget ;
+M: label pref-size ( label -- ) label-text pref-size ;
 
 M: label draw-shape ( label -- )
     dup label-delegate draw-shape

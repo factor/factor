@@ -11,8 +11,8 @@ USING: generic hashtables kernel lists math namespaces ;
     dup gadget-relayout? [
         dup gadget-paint [
             f over set-gadget-relayout?
-            dup gadget-children [ layout ] each
-            layout*
+            dup layout*
+            gadget-children [ layout ] each
         ] bind
     ] [
         drop
@@ -35,13 +35,23 @@ C: pile ( align gap fill -- pile )
 : <default-pile> 1/2 default-gap 0 <pile> ;
 : <line-pile> 0 0 1 <pile> ;
 
-: w- swap shape-w swap shape-w - ;
-: pile-w 2dup w- rot pile-fill * swap shape-w + >fixnum ;
-: pile-x dupd w- swap pile-align * >fixnum ;
+: w/h ( list -- widths heights ) [ pref-size cons ] map unzip ;
 
-: horizontal-layout ( pile gadget y -- )
-    >r 2dup pile-w over shape-h pick resize-gadget
-    tuck pile-x r> rot move-gadget ;
+: greatest ( integers -- n ) [ [ > ] top ] [ 0 ] ifte* ;
+
+: layout-align ( align max dimensions -- offsets )
+    [ >r 2dup r> - * ] map 2nip ;
+
+: layout-fill ( fill max dimensions -- dimensions )
+    [ layout-align ] keep zip [ uncons + ] map ;
+
+: layout-run ( gap list -- n list )
+    #! The nth element of the resulting list is the sum of the
+    #! first n elements of the given list plus gap, n times.
+    [ 0 swap [ over , + over + ] each ] make-list >r swap - r> ;
+
+M: pile pref-size ( pile -- w h )
+    dup pile-gap swap w/h swapd layout-run drop >r greatest r> ;
 
 M: pile layout* ( pile -- )
     dup pile-gap over gadget-children run-heights >r >r
@@ -70,7 +80,11 @@ C: shelf ( align gap fill -- shelf )
 : <default-shelf> 1/2 default-gap 0 <shelf> ;
 : <line-shelf> 0 0 1 <shelf> ;
 
-M: shelf layout* ( pile -- )
+M: shelf pref-size ( shelf -- w h )
+    dup shelf-gap over gadget-children run-widths drop
+    swap gadget-children max-height ;
+
+M: shelf layout* ( shelf -- )
     dup shelf-gap over gadget-children run-widths >r >r
     dup gadget-children max-height r> swap pick resize-gadget
     dup gadget-children r> zip [
@@ -95,12 +109,6 @@ C: border ( child delegate size -- border )
 : filled-border ( child -- border )
     0 0 0 0 <plain-rect> <gadget> 5 <border> ;
 
-: size-border ( border -- )
-    dup gadget-children
-    dup max-width pick border-size 2 * +
-    swap max-height pick border-size 2 * +
-    rot resize-gadget ;
-
 : layout-border-x/y ( border -- )
     dup gadget-children [
         >r border-size dup r> move-gadget
@@ -113,8 +121,13 @@ C: border ( child delegate size -- border )
     ] keep
     gadget-children [ >r 2dup r> resize-gadget ] each 2drop ;
 
+M: border pref-size ( border -- w h )
+    dup gadget-children
+    dup max-width pick border-size 2 * +
+    swap max-height rot border-size 2 * + ;
+
 M: border layout* ( border -- )
-    dup size-border dup layout-border-x/y layout-border-w/h ;
+    dup layout-border-x/y layout-border-w/h ;
 
 ! A stack just lays out all its children on top of each other.
 TUPLE: stack delegate ;
@@ -123,9 +136,11 @@ C: stack ( list -- stack )
     over set-stack-delegate
     swap [ over add-gadget ] each ;
 
+: max-size ( stack -- w h ) w/h swap greatest swap greatest ;
+
+M: stack pref-size gadget-children max-size ;
+
 M: stack layout* ( stack -- )
-    dup gadget-children dup max-width swap max-height
-    rot 3dup resize-gadget
-    gadget-children [
-        >r 2dup r> resize-gadget
-    ] each 2drop ;
+    dup gadget-children [
+        >r dup shape-w over shape-h r> resize-gadget
+    ] each drop ;

@@ -39,8 +39,16 @@ C: gadget ( shape -- gadget )
 : paint-prop ( gadget key -- value ) swap gadget-paint hash ;
 : set-paint-prop ( gadget value key -- ) rot gadget-paint set-hash ;
 
+GENERIC: pref-size ( gadget -- w h )
+M: gadget pref-size dup shape-w swap shape-h ;
+
 GENERIC: layout* ( gadget -- )
-M: gadget layout* drop ;
+
+: prefer ( gadget -- ) [ pref-size ] keep resize-gadget ;
+
+M: gadget layout*
+    #! Trivial layout gives each child its preferred size.
+    gadget-children [ prefer ] each ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 M: gadget user-input* 2drop t ;
