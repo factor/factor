@@ -122,8 +122,6 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		/* OOP */
 		FactorWord generic = define("syntax","GENERIC:");
 		generic.parsing = new Definer(generic);
-		FactorWord traits = define("syntax","TRAITS:");
-		traits.parsing = new Definer(traits);
 		FactorWord beginMethod = define("syntax","M:");
 		beginMethod.parsing = new BeginMethod(beginMethod);
 		FactorWord beginConstructor = define("syntax","C:");
@@ -131,7 +129,9 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord beginPredicate = define("syntax","PREDICATE:");
 		beginPredicate.parsing = new BeginPredicate(beginPredicate);
 		FactorWord beginUnion = define("syntax","UNION:");
-		beginUnion.parsing = new BeginUnion(beginUnion);
+		beginUnion.parsing = new ClassDefinition(beginUnion);
+		FactorWord beginBuiltin = define("syntax","BUILTIN:");
+		beginBuiltin.parsing = new ClassDefinition(beginBuiltin);
 		FactorWord tuple = define("syntax","TUPLE:");
 		tuple.parsing = new Tuple(tuple);
 	} //}}}

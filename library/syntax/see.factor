@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: generic kernel lists math namespaces stdio strings
-presentation unparser words ;
+presentation streams unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )

@@ -98,6 +98,7 @@ t [
     "/library/bootstrap/image.factor"
 
     "/library/httpd/url-encoding.factor"
+    "/library/httpd/mime.factor"
     "/library/httpd/html-tags.factor"
     "/library/httpd/html.factor"
     "/library/httpd/http-common.factor"

@@ -1,6 +1,5 @@
 + plugin:
 
-- update plugin docs
 - word preview for remote words
 - faster completion
 

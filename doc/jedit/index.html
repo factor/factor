@@ -90,9 +90,7 @@ color: #666699;
 
 <h1 align="center">Factor plugin</h1>
 
-<p>Factor is a programming language with postfix syntax. The Factor plugin for <a href="http://www.jedit.org">jEdit</a> makes for a more pleasant development experience. It provides many time-saving features for working with Factor code. This document only explains the plugin. For information on Factor itself, including extensive documentation in PDF format, see the Factor web site: <a href="http://factor.sourceforge.net">http://factor.sourceforge.net</a>. <p>
-
-<h2 class="fancy-heading">Introduction</h2>
+<p>Factor is a programming language with postfix syntax. The Factor plugin for <a href="http://www.jedit.org">jEdit</a> makes for a more pleasant programming experience -- it allows you to navigate Factor source very rapidly, running unit tests and reloading code with ease. Word definitions become a pleasure to write with on the fly parsing, completion, and stack effect checking. For information on Factor itself, including extensive documentation in PDF format, see the Factor web site: <a href="http://factor.sourceforge.net">http://factor.sourceforge.net</a>. </p>
 
 The <code>Factor.jar</code> file shipped with the Factor distribution can then be placed in <code>$HOME/.jedit/jars/</code> and loaded by jEdit.<p>
 
@@ -106,13 +104,19 @@ The <code>Factor.jar</code> file shipped with the Factor distribution can then b
 
 <img class="nice-box" src="listener.png">
 
-<h2 class="browsing">Browsing</h2>
+<h2 class="fancy-heading">Live environment</h2>
 
-<p>The <b>See word at caret</b> command displays a popup showing the word definition at the caret.</p>
+<p>Factor files are parsed in a background thread and checked for errors, using the framework provided by the SideKick plugin. Errors are underlined in the text area (and listed in the <b>ErrorList</b> plugin window). Words are looked up in the external Factor instance, and you are notified of typos immediately.</p>
 
-<img class="nice-box" src="see.png">
+<img class="nice-box" src="error.png">
 
-<p>The <b>Edit word at caret</b> command opens the source file containing the definition of the word at the caret.</p>
+<p>The stack effect of the word at the caret is shown in the status bar.</p>
+
+<img class="nice-box" src="status.png">
+
+<p>The <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Structure Browser</b> displays a list of all words defined in the current buffer:</p>
+
+<img class="nice-box" src="word-list.png">
 
 <p>The <b>Edit word</b> command opens a dialog box where the name of a word can be typed -- while the word is being typed, the possible completions is instantly updated, and selecting one opens the source file containing the definition of that word:</p>
 
@@ -123,39 +127,49 @@ The <code>Factor.jar</code> file shipped with the Factor distribution can then b
 <pre class="nice-box"><SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">/home/slava/Factor/</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> <SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">resource-path</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> set
 </PRE>
 
-<h2 class="fancy-heading">Cross-referencing</h2>
+<h2 class="fancy-heading">Browsing</h2>
 
-<p>The <b>Word usages at caret</b> command displays a list of words that refer to the word at the caret in the Factor listener window. Clicking on words in the listener shows a popup menu with various useful actions.</p>
+<p>The <b>See word at caret</b> command displays a popup word definition.</p>
+
+<img class="nice-box" src="see.png">
+
+<p>The <b>Word usages at caret</b> command displays a list of words that use a word.</p>
 
 <img class="nice-box" src="usages.png">
 
+<p> Clicking on words in the listener shows a popup menu with various useful actions.</p>
+
+<img class="nice-box" src="usages-menu.png">
+
 <p>Here we see the result of selecting <b>See</b>.</p>
 
-<img class="nice-box" src="describe.png">
+<img class="nice-box" src="usages-see.png">
 
-<h2 class="fancy-heading">Error checking</h2>
+<p>The <b>Edit word at caret</b> command opens the source file containing the definition of the word at the caret.</p>
 
-<p>Factor files are parsed in a background thread and checked for errors, using the framework provided by the SideKick plugin. Errors are underlined in the text area (and listed in the <b>ErrorList</b> plugin window).</p>
+<p>The <b>Infer word at caret</b> command shows a popup with the inferred stack effect. Note that not all words have an inferred stack effect. This command is great for debugging!</p>
 
-<img class="nice-box" src="error.png">
+<img class="nice-box" src="infer.png">
 
-<p>A common error is a missing <code>USE:</code> declaration. The <b>Use word at caret</b> command searches for the word at the caret in all vocabularies, and adds a <code>USE:</code> declaration for the vocabulary to the start of the source file -- in this case, <code>ifte</code> is found in the <code>combinators</code> vocabulary, and the parse error instantly goes away:</p>
+<h2 class="fancy-heading">Coding time-savers</h2>
+
+<p>Factor words are separated into vocabularies, and each source file must list which vocabularies it uses. A common error is a missing <code>USING:</code> declaration. The <b>Use word at caret</b> command searches for the word at the caret in all vocabularies, and adds a <code>USE:</code> declaration for the vocabulary to the start of the source file -- in this case, <code>ifte</code> is found in the <code>kernel</code> vocabulary, and the parse error instantly goes away:</p>
 
 <img class="nice-box" src="word-use.png">
 
-<h2 class="fancy-heading">Completion and browsing</h2>
-
-<p>The stack effect of the word at the caret is shown in the status bar.</p>
-
-<img class="nice-box" src="status.png">
-
-<p>Invoking <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Show Completion Popup</b> displays a popup of possible completions for the word at the caret -- bind this to <code>C+SPACE</code> for quick access:</p>
+<p>Invoking <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Show Completion Popup</b> displays a popup of possible completions for the word at the caret -- bind this to <code>C+SPACE</code> for quick access. Inserting a call to a word via a completion popup automatically adds a <code>USING:</code> declaration, if necessary.</p>
 
 <img class="nice-box" src="complete.png">
 
-<p>The <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Structure Browser</b> displays a list of all words defined in the current buffer:</p>
+<p>The <b>Extract word</b> command can only be invoked if there is a selection. It asks for a new word name, replaces the selection with a call to the word, and adds a new colon definition directly above the current definition.</p>
 
-<img class="nice-box" src="word-list.png">
+<p>Here, some text is selected:</p>
+
+<img class="nice-box" src="extract-before.png">
+
+<p>Now, <b>Extract word</b> is invoked, and a new word name is entered:</p>
+
+<img class="nice-box" src="extract-after.png">
 
 </body>
 </html>

@@ -1,13 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-
-! This using kernel-internals is pretty bad. Remove the
-! kernel-internals usage as soon as the tuple class is moved
-! to the generic vocabulary.
-USING: errors generic kernel kernel-internals lists math
-namespaces stdio strings presentation unparser vectors words
-hashtables parser ;
+USING: errors generic hashtables kernel lists math namespaces
+parser presentation stdio streams strings unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line

@@ -44,7 +44,6 @@ hashtables ;
         "/library/syntax/generic.factor"
         "/library/syntax/parse-syntax.factor"
         "/library/syntax/unparser.factor"
-        "/library/io/presentation.factor"
         "/library/syntax/prettyprint.factor"
         "/library/io/files.factor"
         "/library/cli.factor"

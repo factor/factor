@@ -19,9 +19,8 @@ presentation generic ;
 ! cyan    6
 ! white   7
 
-: clear ( -- code )
-    #! Clear screen
-    "\e[2J\e[H" ; inline
+TUPLE: ansi-stream ;
+C: ansi-stream ( stream -- stream ) [ set-delegate ] keep ;
 
 : reset ( -- code )
     #! Reset ANSI color codes.
@@ -42,17 +41,10 @@ presentation generic ;
 : ansi-attrs ( style -- )
     "bold"    over assoc [ bold , ] when
     "ansi-fg" over assoc [ fg , ] when*
-    "ansi-bg" over assoc [ bg , ] when*
-    drop ;
-    
-: ansi-attr-string ( string style -- string )
-    [ ansi-attrs , reset , ] make-string ;
-
-TUPLE: ansi-stream ;
-C: ansi-stream ( stream -- stream ) [ set-delegate ] keep ;
+    "ansi-bg" swap assoc [ bg , ] when* ;
 
 M: ansi-stream stream-write-attr ( string style stream -- )
-    >r [ default-style ] unless* ansi-attr-string r>
+    >r [ ansi-attrs , reset , ] make-string r>
     delegate stream-write ;
 
 IN: shells

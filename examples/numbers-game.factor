@@ -1,11 +1,7 @@
 ! Numbers game example
 
 IN: numbers-game
-USE: kernel
-USE: math
-USE: parser
-USE: random
-USE: stdio
+USING: kernel math parser random stdio ;
 
 : read-number ( -- n ) read parse-number ;
 
