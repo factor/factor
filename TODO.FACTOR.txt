@@ -1,6 +1,5 @@
 + inference/interpreter:
 
-- word links in stepper
 - : bin 5 [ 5 bin bin 5 ] [ 2drop ] ifte ;
 - combinator inference
 - generic/2generic inference
@@ -31,6 +30,7 @@
 
 + listener/plugin:
 
+- gracefully handle non-working cfactor
 - accept multi-line input in listener
 - don't show listener on certain commands
 - NPE in ErrorHighlight
@@ -63,10 +63,8 @@
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup
 - nicer way to combine two paths
-- :get &get
-- namestack, catchstack lists
+- catchstack lists
 - OOP
-- room. prints code heap size
 - refactor sort
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for

@@ -899,17 +899,18 @@ Test if a value is a proper list.\\
 
 \section{The interpreter}
 
+\chapkeywords{acons >r r>}
 \index{\texttt{acons}}
 \index{\texttt{>r}}
 \index{\texttt{r>}}
 
 So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
 
-Another fundamental stack is the \emph{call stack}. It is used to save interpreter state for nested calls.
+Another fundamental stack is the \emph{return stack}. It is used to save interpreter state for nested calls.
 
-You have probably noticed that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the call stack, executes the definition of that word, then restores the execution state from the call stack and continues.
+You have probably noticed that code quotations are just lists. At a low level, each colon definition is also just a quotation. The interpreter consists of a loop that iterates a quotation, pushing each literal, and executing each word. If the word is a colon definition, the interpreter saves its state on the return stack, executes the definition of that word, then restores the execution state from the return stack and continues.
 
-The call stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the call stack, and vice versa, respectively.
+The return stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the return stack, and vice versa, respectively.
 
 A simple example can be found in the definition of the \texttt{acons} word:
 
@@ -929,9 +930,28 @@ Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single
 : the-ugly r> ;
 \end{verbatim}
 
-Basically, the rule is you must leave the call stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can continue executing without seeing your data on the call stack.
+Basically, the rule is you must leave the return stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can return to the calling word.
 
-One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the callstack before returning.
+One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the return stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the return stack before returning.
+
+Lets review the words we saw in this chapter:
+
+\wordtable{
+\tabvocab{lists}
+\texttt{acons}&
+\texttt{( value key alist -{}- alist )}&
+Add a key/value pair to the association list.\\
+\tabvocab{stack}
+\texttt{>r}&
+\texttt{( obj -{}- r:obj )}&
+Move value to return stack..\\
+\texttt{r>}&
+\texttt{( r:obj -{}- obj )}&
+Move value from return stack..\\
+}
+
+\section{Word definitions}
+
 
 \section{Recursive combinators}
 
@@ -1231,6 +1251,16 @@ BIN: 11111 -2 shift .b
 \end{alltt}
 
 The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
+
+\chapter{Working with state}
+
+\section{Building lists and strings}
+
+\chapkeywords{make-string make-list ,}
+\index{\texttt{make-string}}
+\index{\texttt{make-list}}
+\index{\texttt{make-,}}
+
 
 \input{new-guide.ind}
 

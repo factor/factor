@@ -19,6 +19,9 @@ USE: strings
 
 [ [ 43 "a" [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
+[ "fdsfs" num-sort ] unit-test-fails
+[ [ ] ] [ [ ] num-sort ] unit-test
+[ [ "2 + 2" ] ] [ [ "2 + 2" ] [ str-lexi> ] sort ] unit-test
 [ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] num-sort ] unit-test
 
 [ f ] [ [ { } { } "Hello" ] all=? ] unit-test

@@ -43,7 +43,6 @@ USE: hashtables
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
-! - meta-infer -- evaluate word in meta-interpreter if set.
 ! - infer - quotation with custom inference behavior; ifte uses
 ! this. Word is passed on the stack.
 ! - recursive-infer - if true, inferencer will always invoke
@@ -92,24 +91,16 @@ SYMBOL: entry-effect
 : consume/produce ( [ in | out ] -- )
     unswons dup ensure-d consume-d produce-d ;
 
-: standard-effect ( word [ in | out ] -- )
+: apply-effect ( word [ in | out ] -- )
     #! If a word does not have special inference behavior, we
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
-    over "meta-infer" word-property [
-        drop host-word
-    ] [
-        nip consume/produce
-    ] ifte ;
-
-: apply-effect ( word [ in | out ] -- )
-    #! Helper word for apply-word.
     dup car ensure-d
-    over "infer" word-property dup [
-        nip nip call
+    swap "infer" word-property dup [
+        nip call
     ] [
-        drop standard-effect
+        drop consume/produce
     ] ifte ;
 
 : no-effect ( word -- )
@@ -301,6 +292,10 @@ DEFER: (infer)
     #! Stack effect of a quotation.
     [ init-inference (infer)  effect ] with-scope ;
 
+: meta-infer ( word -- )
+    #! Mark a word as being partially evaluated.
+    dup unit [ car meta-word ] cons  "infer" set-word-property ;
+
 \ call [ pop-d (infer) ] "infer" set-word-property
 \ ifte [ infer-ifte ] "infer" set-word-property
 
@@ -313,11 +308,16 @@ DEFER: (infer)
 \ >r [ pop-d push-r ] "infer" set-word-property
 \ r> [ pop-r push-d ] "infer" set-word-property
 
-\ drop  t "meta-infer" set-word-property
-\ dup  t "meta-infer" set-word-property
-\ swap t "meta-infer" set-word-property
-\ over t "meta-infer" set-word-property
-\ pick t "meta-infer" set-word-property
-\ nip t "meta-infer" set-word-property
-\ tuck t "meta-infer" set-word-property
-\ rot t "meta-infer" set-word-property
+\ drop meta-infer
+\ dup meta-infer
+\ swap meta-infer
+\ over meta-infer
+\ pick meta-infer
+\ nip meta-infer
+\ tuck meta-infer
+\ rot meta-infer
+
+\ + [ 2 | 1 ] "infer-effect" set-word-property
+\ - [ 2 | 1 ] "infer-effect" set-word-property
+\ * [ 2 | 1 ] "infer-effect" set-word-property
+\ / [ 2 | 1 ] "infer-effect" set-word-property

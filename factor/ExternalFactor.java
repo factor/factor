@@ -158,6 +158,15 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		{
 			/* don't care about response */
 			sendEval("0 exit*");
+		}
+		catch(Exception e)
+		{
+			// We don't care...
+			Log.log(Log.DEBUG,this,e);
+		}
+		
+		try
+		{
 			in.close();
 			out.close();
 		}

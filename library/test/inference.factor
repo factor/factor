@@ -146,5 +146,17 @@ DEFER: foe
 [ [ 2 | 1 ] ] [ [ /i ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ /f ] infer ] unit-test
 [ [ 2 | 2 ] ] [ [ /mod ] infer ] unit-test
-
+[ [ 2 | 1 ] ] [ [ + ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ - ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ * ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ / ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ < ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ <= ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ > ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ >= ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ number= ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ = ] infer ] unit-test
+
+[ [ 1 | 0 ] ] [ [ >n ] infer ] unit-test
+[ [ 0 | 1 ] ] [ [ n> ] infer ] unit-test

@@ -43,6 +43,8 @@ USE: vectors
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
+    #! Push remainder of list from first occurrence of element,
+    #! or f.
     dup [
         2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
@@ -50,67 +52,54 @@ USE: vectors
     ] ifte ;
 
 : nth ( n list -- list[n] )
-    #! Push the nth element of a proper list.
+    #! nth element of a proper list.
     #! Supplying n <= 0 pushes the first element of the list.
     #! Supplying an argument beyond the end of the list raises
     #! an error.
     swap [ cdr ] times car ;
 
 : last* ( list -- last )
-    #! Pushes last cons of a list.
+    #! Last cons of a list.
     dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
+    #! Last element of a list.
     last* car ;
+
+: tail ( list -- tail )
+    #! Return the cdr of the last cons cell, or f.
+    dup [ last* cdr ] when ;
 
 : list? ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    dup [
-        dup cons? [ cdr list? ] [ drop f ] ifte
-    ] [
-        drop t
-    ] ifte ;
+    dup cons? [ tail ] when not ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    >r >r [ r> cons r> ] [ r> swap r> cons ] ifte ; inline
+    rot [ >r cons r> ] [ swapd cons ] ifte ; inline
 
-: partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
-    >r rot >r rot r> r> -rot >r >r dup >r swap call r> swap r> r>
-    partition-add ; inline
+: partition-step ( list combinator -- cdr combinator car ? )
+    over car over call >r >r unswons r> swap r> ; inline
 
-: partition-iter ( ret1 ret2 ref combinator list -- ret1 ret2 )
-    dup [
-        3dup cdr >r >r >r
-        car partition-step
-        r> r> r> partition-iter
+: (partition) ( list combinator ret1 ret2 -- ret1 ret2 )
+    >r >r  over [
+        partition-step  r> r> partition-add  (partition)
     ] [
-        3drop
+        2drop  r> r>
     ] ifte ; inline
 
-: partition ( ref list combinator -- list1 list2 )
-    #! Compare each element in a proper list against a
-    #! reference element using a combinator. The combinator's
-    #! return value determines if the element is prepended to
-    #! the first or second list.
+: partition ( list ref combinator -- list1 list2 )
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
-    swap >r >r >r [ ] [ ] r> r> r> partition-iter ;
-    inline
+    cons [ ] [ ] (partition) ; inline
 
 : sort ( list comparator -- sorted )
-    #! Sort the elements in a proper list using a comparator.
-    #! The comparator must have stack effect:
-    #! ( x y -- ? )
-    #! To sort elements in descending order, return t if x < y.
-    #! To sort elements in ascending order, return t if x > y.
+    #! To sort in ascending order, comparator must have stack
+    #! effect ( x y -- x>y ).
     over [
-        ! Partition
-        dup >r >r uncons dupd r> partition r>
-        ! Recurse
-        tuck sort >r sort swap r>
-        ! Combine
-        cons append
+        ( Partition ) [ >r uncons over r> partition ] keep
+        ( Recurse ) [ sort swap ] keep sort
+        ( Combine ) swapd cons append
     ] [
         drop
     ] ifte ; inline

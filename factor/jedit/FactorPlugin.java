@@ -79,7 +79,7 @@ public class FactorPlugin extends EditPlugin
 	 * Returns the object representing a connection to an external Factor instance.
 	 * It will start the interpreter if it's not already running.
 	 */
-	public static ExternalFactor getExternalInstance()
+	public synchronized static ExternalFactor getExternalInstance()
 		throws IOException, UnsupportedEncodingException
 	{
 		if(external == null)
