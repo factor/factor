@@ -6,23 +6,6 @@ void init_io(void)
 	env.user[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
 }
 
-bool can_read_line(PORT* port)
-{
-	if(port->line_ready)
-		return true;
-	else
-	{
-		read_line_step(port);
-		return port->line_ready;
-	}
-}
-
-void primitive_can_read_line(void)
-{
-	PORT* port = untag_port(dpop());
-	dpush(tag_boolean(can_read_line(port)));
-}
-
 /* Return true if something was read */
 bool read_step(PORT* port)
 {
@@ -108,6 +91,23 @@ bool read_line_step(PORT* port)
 	return false;
 }
 
+bool can_read_line(PORT* port)
+{
+	if(port->line_ready)
+		return true;
+	else
+	{
+		read_line_step(port);
+		return port->line_ready;
+	}
+}
+
+void primitive_can_read_line(void)
+{
+	PORT* port = untag_port(dpop());
+	dpush(tag_boolean(can_read_line(port)));
+}
+
 void primitive_read_line_fd_8(void)
 {
 	PORT* port = untag_port(dpeek());
@@ -120,6 +120,57 @@ void primitive_read_line_fd_8(void)
 	else
 		io_error(__FUNCTION__);
 
+}
+
+bool read_count_step(PORT* port, FIXNUM count)
+{
+	int i;
+	char ch;
+
+	SBUF* line;
+
+	if(port->line == F)
+	{
+		line = sbuf(count);
+		port->line = tag_object(line);
+	}
+	else
+	{
+		line = untag_sbuf(port->line);
+		line->top = 0;
+	}
+
+	for(i = port->buf_pos; i < port->buf_fill; i++)
+	{
+		ch = bget((CELL)port->buffer + sizeof(STRING) + i);
+		set_sbuf_nth(line,line->top,ch);
+		if(line->top == count)
+			return true;
+	}
+
+	/* We've reached the end of the above loop, without seeing enough chars
+	or EOF, so read again */
+	return false;
+}
+
+#define CAN_READ_COUNT(sbuf) (untag_sbuf(port->line)->top >= count)
+
+bool can_read_count(PORT* port, FIXNUM count)
+{
+	if(port->line != F && CAN_READ_COUNT(sbuf))
+		return true;
+	else
+	{
+		read_count_step(port,count);
+		return CAN_READ_COUNT(sbuf);
+	}
+}
+
+void primitive_can_read_count(void)
+{
+	FIXNUM len = to_fixnum(dpop());
+	PORT* port = untag_port(dpop());
+	dpush(tag_boolean(can_read_count(port,len)));
 }
 
 /* Return true if write was done */

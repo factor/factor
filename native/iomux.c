@@ -139,7 +139,18 @@ bool perform_read_line_io_task(PORT* port)
 
 bool perform_read_count_io_task(PORT* port)
 {
-	return false;
+	SBUF* line;
+
+	if(port->buf_pos >= port->buf_fill)
+	{
+		if(!read_step(port))
+			return false;
+	}
+
+	if(port->buf_fill == 0)
+		return true;
+	else
+		return read_count_step(port,port->count);
 }
 
 bool perform_write_io_task(PORT* port)

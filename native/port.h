@@ -15,7 +15,11 @@ typedef struct {
 	/* tagged partial line used by read_line_fd */
 	CELL line;
 	/* is it ready to be returned? */
+	/* with the read# IO_TASK, this means that the operation is done */
 	bool line_ready;
+
+	/* count for read# */
+	FIXNUM count;
 
 	/* tagged client info used by accept_fd */
 	CELL client_host;
