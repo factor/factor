@@ -12,10 +12,17 @@ stdio streams strings threads url-encoding ;
         drop stdio get
     ] ifte ;
 
-: url>path ( uri -- path )
+: (url>path) ( uri -- path )
     url-decode "http://" ?str-head [
         "/" split1 dup "" ? nip
     ] when ;
+
+: url>path ( uri -- path )
+    "?" split1 dup [
+      >r (url>path) "?" r> cat3
+    ] [
+      drop (url>path)
+    ] ifte ;
 
 : secure-path ( path -- path )
     ".." over str-contains? [ drop f ] when ;
