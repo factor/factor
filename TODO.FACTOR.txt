@@ -11,7 +11,6 @@
 - handle odd base cases, with code after ifte
 - handle recursion with when, when* etc
 - optimizer rewrite stack ops
-- optimizer nested ifte
 - alien-call need special nodes
 - fix dataflow unit tests
 
