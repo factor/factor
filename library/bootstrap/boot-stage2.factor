@@ -187,7 +187,8 @@ cpu "x86" = "mini" get not and [
         "/library/ui/presentations.factor"
         "/library/ui/panes.factor"
         "/library/ui/inspector.factor"
-        "/library/ui/root-menu.factor"
+        "/library/ui/init-world.factor"
+        "/library/ui/tool-menus.factor"
     ] [
         dup print
         run-resource

@@ -5,16 +5,6 @@ USING: kernel math namespaces prettyprint sdl ;
 
 TUPLE: halo selected delegate ;
 
-: gadget-menu ( gadget -- assoc )
-    [
-        [[ "Inspect" [ inspect ] ]]
-        [[ "Unparent" [ unparent ] ]]
-        [[ "Move" [ hand grab ] ]]
-    ] actionize ;
-
-: halo-menu ( halo -- )
-    halo-selected gadget-menu <menu> show-menu ;
-
 : show-halo* ( gadget -- )
     #! Show the halo on a specific gadget.
     halo
@@ -38,6 +28,8 @@ TUPLE: halo selected delegate ;
             drop halo halo-selected gadget-parent 
         ] when show-halo*
     ] ifte ;
+
+DEFER: halo-menu
 
 : halo-actions ( gadget -- )
     dup [ halo-selected hand grab ] [ button-down 1 ] set-action

@@ -13,6 +13,8 @@ TUPLE: world running? hand menu halo delegate ;
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <gadget> ;
 
+DEFER: <halo>
+
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
@@ -36,6 +38,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
     ] ifte ;
 
 DEFER: handle-event
+DEFER: halo-selected
 
 : layout-halo ( world -- )
     world-halo dup halo-selected dup [
@@ -74,21 +77,6 @@ DEFER: handle-event
     world get dup [ world-running? ] when [
         "Inspector cannot be used if UI not running." throw
     ] unless ;
-
-global [
-    
-    <world> world set
-    
-    1280 1024 world get resize-gadget
-    
-    {{
-
-        [[ background [ 255 255 255 ] ]]
-        [[ foreground [ 0 0 0 ] ]]
-        [[ reverse-video f ]]
-        [[ font [[ "Sans Serif" 12 ]] ]]
-    }} world get set-gadget-paint
-] bind
 
 : title ( -- str )
     "Factor " version cat2 ;

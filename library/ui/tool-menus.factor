@@ -19,3 +19,13 @@ SYMBOL: root-menu
 ] root-menu set
 
 world get [ drop show-root-menu ] [ button-down 1 ] set-action
+
+: gadget-menu ( gadget -- assoc )
+    [
+        [[ "Inspect" [ inspect ] ]]
+        [[ "Unparent" [ unparent ] ]]
+        [[ "Move" [ hand grab ] ]]
+    ] actionize ;
+
+: halo-menu ( halo -- )
+    halo-selected gadget-menu <menu> show-menu ;
