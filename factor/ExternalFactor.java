@@ -89,7 +89,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		out.write("USE: jedit wire-server\n".getBytes("ASCII"));
 		out.flush();
 		waitForAck();
-	}
+	} //}}}
 
 	//{{{ waitForAck() method
 	private void waitForAck() throws IOException
@@ -104,6 +104,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			byte[] discard = new byte[2048];
 			int len = in.read(discard,0,discard.length);
 			discardStr = new String(discard,0,len);
+			Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
 		}
 	} //}}}
 	
