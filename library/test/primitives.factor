@@ -8,7 +8,7 @@ USE: test
 "car" must-compile
 
 ! jvar-set
-"rplaca" must-compile
+"set-car" must-compile
 
 ! jvar-get-static
 "version" must-compile

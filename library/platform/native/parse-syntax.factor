@@ -25,25 +25,25 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: parser
+! Parsing words. 'builtins' is a stupid vocabulary name now
+! that it does not contain Java words anymore!
+IN: builtins
+
 USE: arithmetic
 USE: combinators
+USE: cross-compiler
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
 USE: namespaces
+USE: parser
 USE: stack
 USE: strings
 USE: words
 USE: vectors
 USE: vocabularies
 USE: unparser
-
-! Parsing words. 'builtins' is a stupid vocabulary name now
-! that it does not contain Java words anymore!
-
-IN: builtins
 
 ! Constants
 : t t parsed ; parsing
@@ -62,19 +62,24 @@ IN: builtins
 : { f ; parsing
 : } nreverse list>vector parsed ; parsing
 
+! Do not execute parsing word
+: POSTPONE: ( -- ) scan parse-word parsed ; parsing
+
 ! Colon defs
-: CREATE: scan "in" get create ;
+: CREATE scan "in" get create ;
 
 : :
     #! Begin a word definition. Word name follows.
-    CREATE: [ ] ; parsing
+    CREATE [ ]  ; parsing
 
 : ;
     #! End a word definition.
-    nreverse define ; parsing
+    nreverse
+    "cross-compiling" get
+    [ compound, ] [ define ] ifte ; parsing
 
 ! Vocabularies
-: DEFER: CREATE: drop ; parsing
+: DEFER: CREATE drop ; parsing
 : USE: scan "use" cons@ ; parsing
 : IN: scan dup "use" cons@ "in" set ; parsing
 
@@ -119,7 +124,7 @@ IN: builtins
 : ( ")" until drop ; parsing
 : ! until-eol drop ; parsing
 : #! until-eol drop ; parsing
-    
+
 ! Reading numbers in other bases
 
 : BASE: ( base -- )

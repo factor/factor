@@ -107,3 +107,17 @@ IN: kernel
 : java? t ;
 : native? f ;
 : version "factor.FactorInterpreter" "VERSION" jvar-static-get ;
+
+: jvm-runtime ( -- java.lang.Runtime )
+  #! Return the java.lang.Runtime object for the JVM
+  f "java.lang.Runtime" "getRuntime" jinvoke-static ;
+
+: free-memory ( -- int )
+  #! Return the free memory in the JVM.
+  jvm-runtime f "java.lang.Runtime" "freeMemory" jinvoke ;
+
+: total-memory ( -- int )
+  #! Return the total memory available to the JVM.
+  jvm-runtime f "java.lang.Runtime" "totalMemory" jinvoke ;
+
+: room free-memory total-memory ;

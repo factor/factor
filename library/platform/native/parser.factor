@@ -99,7 +99,7 @@ USE: unparser
 
 : parsed| ( obj -- )
     #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r dup nreverse last* r> swap rplacd swons ;
+    >r dup nreverse last* r> swap set-cdr swons ;
 
 : expect-] ( -- )
     scan "]" = not [ "Expected ]" throw ] when ;

@@ -31,14 +31,14 @@ void primitive_cdr(void)
 	env.dt = cdr(env.dt);
 }
 
-void primitive_rplaca(void)
+void primitive_set_car(void)
 {
 	check_non_empty(dpeek());
 	untag_cons(env.dt)->car = dpop();
 	env.dt = dpop();
 }
 
-void primitive_rplacd(void)
+void primitive_set_cdr(void)
 {
 	check_non_empty(dpeek());
 	untag_cons(env.dt)->cdr = dpop();

@@ -26,24 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: cross-compiler
-USE: lists
 USE: namespaces
 USE: parser
-USE: prettyprint
-USE: stack
 
 : cross-compile-resource ( resource -- )
     <namespace> [
-        ! Replace ; with our own
-        "file-use" get
-        "cross-compiler-syntax" swons
-        "file-use" set
+        ! Change behavior of ;
+        "cross-compiling" on
         run-resource
     ] bind ;
-
-IN: cross-compiler-syntax
-USE: builtins
-
-: ; ( -- )
-    #! Cross-compile the just-read definition.
-    nreverse compound, ; parsing

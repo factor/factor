@@ -51,6 +51,8 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + misc:
 
+- test substitute, set-nth, remove-nth
+- do nset-nth, nremove-nth, nsubstitute, ninject
 - compiled stack traces broken
 - should i -i inf -inf be parsing words?
 - namespace clone drops static var bindings

@@ -81,8 +81,8 @@ IN: cross-compiler
         cons
         car
         cdr
-        rplaca
-        rplacd
+        set-car
+        set-cdr
         vector?
         <vector>
         vector-length

@@ -14,20 +14,6 @@ FIXNUM to_fixnum(CELL tagged)
 	}
 }
 
-#define CELL_TO_INTEGER(result) \
-	FIXNUM _result = (result); \
-	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-		env.dt = tag_bignum(fixnum_to_bignum(_result)); \
-	else \
-		env.dt = tag_fixnum(_result);
-
-#define BIGNUM_2_TO_INTEGER(result) \
-	BIGNUM_2 _result = (result); \
-	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-		env.dt = tag_bignum(bignum(_result)); \
-	else \
-		env.dt = tag_fixnum(_result);
-
 /* ADDITION */
 INLINE void add_fixnum(CELL x, CELL y)
 {

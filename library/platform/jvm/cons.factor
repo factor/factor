@@ -55,10 +55,10 @@ IN: lists USE: kernel USE: stack
 : deep-clone ( cons -- cons )
     [ "factor.Cons" ] "factor.Cons" "deepClone" jinvoke-static ;
 
-: rplaca ( A [ B | C ] -- )
+: set-car ( A [ B | C ] -- )
     #! DESTRUCTIVE. Replace the head of a list.
     "factor.Cons" "car" jvar-set ; inline
 
-: rplacd ( A [ B | C ] -- )
+: set-cdr ( A [ B | C ] -- )
     #! DESTRUCTIVE. Replace the tail of a list.
     "factor.Cons" "cdr" jvar-set ; inline

@@ -72,13 +72,13 @@ USE: vectors
     [
         dup cons?
     ] [
-        uncons >r unit tuck >r rplacd r> r>
+        uncons >r unit tuck >r set-cdr r> r>
     ] while ;
 
 : clone-list ( list -- list )
     #! Push a shallow copy of a list.
     dup [
-        uncons >r unit dup r> clone-list-iter swap rplacd
+        uncons >r unit dup r> clone-list-iter swap set-cdr
     ] when ;
 
 : contains ( element list -- remainder )
@@ -134,7 +134,7 @@ USE: vectors
     #! list is destructively modified to point to the second
     #! list, unless the first list is f, in which case the
     #! second list is returned.
-    over [ over last* rplacd ] [ nip ] ifte ;
+    over [ over last* set-cdr ] [ nip ] ifte ;
 
 : first ( list -- obj )
     #! Push the head of the list, or f if the list is empty.
@@ -156,7 +156,7 @@ USE: vectors
     ] ifte ;
 
 : nreverse-iter ( list cons -- list cons )
-    [ dup dup cdr 2swap rplacd nreverse-iter ] when* ;
+    [ dup dup cdr 2swap set-cdr nreverse-iter ] when* ;
 
 : nreverse ( list -- list )
     #! DESTRUCTIVE. Reverse the given list, without consing.
@@ -208,18 +208,6 @@ USE: vectors
 : num-sort ( list -- sorted )
     #! Sorts the list into ascending numerical order.
     [ > ] sort ;
-
-: remove ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
-    dup [
-        2dup car = [
-            cdr remove
-        ] [
-            uncons swapd remove cons
-        ] ifte
-    ] [
-        nip
-    ] ifte ;
 
 ! Redefined below
 DEFER: tree-contains?
@@ -279,6 +267,12 @@ DEFER: tree-contains?
         transp over >r >r call r> cons r>
     ] each drop nreverse ; inline interpret-only
 
+: substitute ( new old list -- list )
+    [ 2dup = [ drop over ] when ] inject ;
+
+: set-nth ( value index list -- list )
+    over 0 = [ nip cdr cons ] [ >r pred r> set-nth ] ifte ;
+
 : subset-add ( car pred accum -- accum )
     >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
 
@@ -298,6 +292,13 @@ DEFER: tree-contains?
     #! In order to compile, the quotation must consume as many
     #! values as it produces.
     f -rot subset-iter nreverse ; inline interpret-only
+
+: remove ( obj list -- list )
+    #! Remove all occurrences of the object from the list.
+    [ dupd = not ] subset nip ;
+
+: remove-nth ( index list -- list )
+    over 0 = [ nip cdr ] [ >r pred r> cdr remove-nth ] ifte ;
 
 : length ( list -- length )
     #! Pushes the length of the given proper list.
@@ -323,6 +324,12 @@ DEFER: tree-contains?
     ] [
         2drop t
     ] ifte ;
+
+: (count) ( n list -- list )
+    >r pred dup 0 < [ drop r> ] [ dup r> cons (count) ] ifte ;
+
+: count ( n -- [ 0 ... n-1 ] )
+    [ ] (count) ;
 
 : car= swap car swap car = ;
 : cdr= swap cdr swap cdr = ;

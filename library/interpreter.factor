@@ -60,7 +60,7 @@ USE: vectors
 : print-numbered-vector ( list -- )
     dup vector-length [ over print-numbered-entry ] times* drop ;
 
-: history ( -- )
+: history. ( -- )
     "X redo    -- evaluate the expression with number X." print
     "X re-edit -- edit the expression with number X." print
     "history" get print-numbered-vector ;
@@ -98,12 +98,18 @@ USE: vectors
     [ "quit-flag" get not ] [ interpret ] while
     "quit-flag" off ;
 
+: room. ( -- )
+    room
+    1024 / unparse write " KB total, " write
+    1024 / unparse write " KB free" print ;
+
 : help ( -- )
     "SESSION:" print
     native? [
         "\"foo.image\" save-image   -- save heap to a file" print
-        "room.                    -- show memory usage" print
     ] when
+    "history.                 -- show previous commands" print
+    "room.                    -- show memory usage" print
     "garbage-collection       -- force a GC" print
     "exit                     -- exit interpreter" print
     terpri

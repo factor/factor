@@ -66,6 +66,6 @@ word >str "last-word-test" set
 
 ! Make sure callstack only clones callframes, and not
 ! everything on the callstack.
-[ ] [ ] [ f unit dup dup rplacd >r callstack r> 2drop ] test-word
+[ ] [ ] [ f unit dup dup set-cdr >r callstack r> 2drop ] test-word
 
 "Miscellaneous passed." print

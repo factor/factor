@@ -95,11 +95,6 @@ USE: unparser
 : java? f ;
 : native? t ;
 
-: room. ( -- )
-    room
-    unparse write " bytes total, " write
-    unparse write " bytes free" print ;
-
 ! No compiler...
 : inline ;
 : interpret-only ;

@@ -73,7 +73,6 @@ USE: test
 [ [ ]         ] [ 0               ] [ count             ] test-word
 [ [ ]         ] [ -10             ] [ count             ] test-word
 [ [ ]         ] [ -inf            ] [ count             ] test-word
-[ [ 0 1 2 ]   ] [ e               ] [ count             ] test-word
 [ [ 0 1 2 3 ] ] [ 4               ] [ count             ] test-word
 
 [ [ 2 1 0 0 ] ] [ [ nth ] ] [ balance>list ] test-word
@@ -148,13 +147,13 @@ USE: test
 [ [ 1 ]       ] [ [ 1 ]           ] [ reverse           ] test-word
 [ [ 3 2 1 ]   ] [ [ 1 2 3 ]       ] [ reverse           ] test-word
 
-[ [ 2 0 0 0 ] ] [ [ rplaca ] ] [ balance>list ] test-word
+[ [ 2 0 0 0 ] ] [ [ set-car ] ] [ balance>list ] test-word
 [ "a" | "b" ] clone-list "x" set
-[ [ 1 | "b" ]   ] [ 1 "x" get            ] [ rplaca "x" get         ] test-word
+[ [ 1 | "b" ]   ] [ 1 "x" get            ] [ set-car "x" get         ] test-word
 
-[ [ 2 0 0 0 ] ] [ [ rplacd ] ] [ balance>list ] test-word
+[ [ 2 0 0 0 ] ] [ [ set-cdr ] ] [ balance>list ] test-word
 [ "a" | "b" ] clone-list "x" set                                         
-[ [ "a" | 2 ]   ] [ 2 "x" get            ] [ rplacd "x" get         ] test-word
+[ [ "a" | 2 ]   ] [ 2 "x" get            ] [ set-cdr "x" get         ] test-word
 
 [ [ 2 2 0 0 ] ] [ [ [ < ] partition ] ] [ balance>list ] test-word
 [ [ -5 3 1 ] [ -2 4 4 -2 ] ]
@@ -200,7 +199,7 @@ USE: test
 [ [ 1 1 0 0 ] ] [ [ deep-clone ] ] [ balance>list ] test-word
 
 : deep-clone-test ( x -- x y )
-    dup deep-clone dup car 5 swap rplaca ;
+    dup deep-clone dup car 5 swap set-car ;
 
 [ [ [ 1 | 2 ] ] [ [ 5 | 2 ] ] ] [ [ [ 1 | 2 ] ] ] 
 [ deep-clone-test ] test-word

@@ -17,6 +17,7 @@ void primitive_close_fd(void)
 int fill_buffer(HANDLE* h, int fd, STRING* buf)
 {
 	int amount = read(fd,buf + 1,buf->capacity * 2);
+	/* printf("READING %d GOT %d\n",buf->capacity * 2,amount); */
 
 	h->buf_fill = (amount < 0 ? 0 : amount);
 	h->buf_pos = 0;

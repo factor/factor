@@ -20,7 +20,7 @@ USE: test
 !test-word
 !
 ![ [ [ "factor.Cons" "java.lang.Object" ] f f f ] ]
-![ [ rplaca ] ]
+![ [ set-car ] ]
 ![ balance>typelist ]
 !test-word
 !
