@@ -81,3 +81,15 @@ DEFER: compile-jump-f ( label -- )
 
 #jump-f-label [ compile-jump-f ] "generator" set-word-prop
 #jump-f [ compile-jump-f ] "generator" set-word-prop
+
+: compile-target ( word -- ) 0 compile-cell absolute ;
+
+#target-label [
+    #! Jump table entries are absolute addresses.
+    compile-target
+] "generator" set-word-prop
+
+#target [
+    #! Jump table entries are absolute addresses.
+    dup postpone-word  compile-target
+] "generator" set-word-prop

@@ -18,15 +18,25 @@ USING: errors kernel math memory words ;
 : i-form ( li aa lk -- n )
     >r 1 shift bitor r> bitor ;
 
+: x-form ( s a b xo rc -- n )
+    >r 1 shift >r 11 shift >r 16 shift >r 21 shift
+    r> bitor r> bitor r> bitor r> bitor ;
+
 : xfx-form ( d spr xo -- n )
     1 shift >r 11 shift >r 21 shift r> bitor r> bitor ;
 
+: xo-form ( d a b oe xo rc -- n )
+    >r 1 shift >r 10 shift >r 11 shift >r 16 shift >r 21 shift
+    r> bitor r> bitor r> bitor r> bitor r> bitor ;
+
 : ADDI d-form 14 insn ;
-: SUBI neg ADDI ;
 : LI 0 rot ADDI ;
 : ADDIS d-form 15 insn ;
 : LIS 0 rot ADDIS ;
+: ADD 0 266 0 xo-form 31 insn ;
+: SUBI neg ADDI ;
 : ORI d-form 24 insn ;
+: SRAWI 824 0 x-form 31 insn ;
 : BL 0 1 i-form 18 insn ;
 : B 0 0 i-form 18 insn ;
 : BC 0 0 b-form 16 insn ;
@@ -50,11 +60,8 @@ USING: errors kernel math memory words ;
 : CMPI d-form 11 insn ;
 
 : w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;
+: LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;
 
 : LOAD ( n r -- )
     #! PowerPC cannot load a 32 bit literal in one instruction.
-   >r dup dup HEX: ffff bitand = [
-        r> LI
-   ] [
-       w>h/h r> tuck LIS dup rot ORI
-   ] ifte ;
+   >r dup dup HEX: ffff bitand = [ r> LI ] [ r> LOAD32 ] ifte ;

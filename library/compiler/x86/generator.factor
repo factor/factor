@@ -20,8 +20,6 @@ math memory namespaces words ;
     dup postpone-word  compile-jump-label
 ] "generator" set-word-prop
 
-: compile-target ( word -- ) 0 compile-cell absolute ;
-
 : compile-jump-t ( word -- )
     POP-DS
     ! condition is now in EAX
@@ -51,16 +49,6 @@ math memory namespaces words ;
     [ EAX ] JMP
     compile-aligned
     compiled-offset swap set-compiled-cell ( fixup -- )
-] "generator" set-word-prop
-
-#target-label [
-    #! Jump table entries are absolute addresses.
-    compile-target
-] "generator" set-word-prop
-
-#target [
-    #! Jump table entries are absolute addresses.
-    dup postpone-word  compile-target
 ] "generator" set-word-prop
 
 #c-call [

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler inference kernel math words ;
+USING: assembler inference kernel kernel-internals lists math
+words ;
 
 ! At the start of each word that calls a subroutine, we store
 ! the link register in r0, then push r0 on the C stack.
@@ -20,6 +21,12 @@ USING: assembler inference kernel math words ;
     0 1 20 LWZ
     1 1 16 ADDI
     0 MTLR ;
+
+\ slot [
+    PEEK-DS
+    2unlist type-tag >r cell * r> - >r 18 18 r> LWZ
+    REPL-DS
+] "generator" set-word-prop
 
 ! #return-to [
 !     
@@ -67,3 +74,19 @@ USING: assembler inference kernel math words ;
     POP-DS
     0 18 3 CMPI
     0 BEQ  relative-14 ;
+
+\ dispatch [
+    ! Compile a piece of code that jumps to an offset in a
+    ! jump table indexed by the fixnum at the top of the stack.
+    ! The jump table must immediately follow this macro.
+    drop
+    POP-DS
+    18 18 1 SRAWI
+    ! The value 24 is a magic number. It is the length of the
+    ! instruction sequence that follows to be generated.
+    compiled-offset 24 + 19 LOAD32
+    18 18 19 ADD
+    18 18 0 LWZ
+    18 MTLR
+    BLR
+] "generator" set-word-prop
