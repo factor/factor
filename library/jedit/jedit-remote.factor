@@ -26,40 +26,56 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: arithmetic
 USE: combinators
-USE: kernel
+USE: lists
+USE: logic
 USE: namespaces
+USE: parser
 USE: stack
+USE: streams
+USE: stdio
 USE: strings
-USE: words
+USE: unparser
 
-! Doesn't exist in native Factor.
-DEFER: local-jedit-line/file
+: jedit-server-file ( -- path )
+    "jedit-server-file" get
+    [ "~" get "/.jedit/server" cat2 ] unless* ;
 
-: jedit-local? ( -- ? )
-    java? [ global [ "jedit" get ] bind ] [ f ] ifte ;
+: jedit-server-info ( -- port auth )
+    jedit-server-file <filecr> [
+        read drop
+        read parse-number
+        read parse-number
+    ] with-stream ;
 
-: jedit-line/file ( line dir file -- )
-    jedit-local? [
-        local-jedit-line/file
-    ] [
-        remote-jedit-line/file
-    ] ifte ;
+: bool% ( ? -- str )
+    "true" "false" ? % ;
 
-: resource-path ( -- path )
-    global [ "resource-path" get ] bind [ "." ] unless* ;
+: list>bsh-array% ( list -- code )
+    "new String[] {" %
+    [ unparse % "," % ] each
+    "null}" % ;
 
-: word-file ( path -- dir file )
-    dup "resource:/" str-head? dup [
-        nip resource-path swap
-    ] [
-        swap ( f file )
-    ] ifte ;
+: make-jedit-request ( files dir params -- code )
+    [
+        <%
+        "EditServer.handleClient(" %
+        "restore" get bool% "," %
+        "newView" get bool% "," %
+        "newPlainView" get bool% "," %
+        unparse % "," %
+        list>bsh-array% ");\n" % %>
+    ] bind ;
 
-: word-line/file ( word -- line dir file )
-    #! Note that line numbers here start from 1
-    [ "line" get "file" get word-file ] bind ;
+: send-jedit-request ( request -- )
+    jedit-server-info swap "localhost" swap <client> [
+        big-endian-32 dup str-length big-endian-16 write flush
+    ] with-stream ;
 
-: jedit ( word -- )
-    intern word-line/file jedit-line/file ;
+: remote-jedit-line/file ( line dir file -- )
+    rot "+line:" swap unparse cat2 unit cons swap
+    <namespace> [
+        "restore" off
+        "newView" off
+        "newPlainView" off
+    ] extend make-jedit-request send-jedit-request ;

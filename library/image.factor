@@ -341,28 +341,11 @@ IN: cross-compiler
 
 ( Image output )
 
-: byte0 ( num -- byte ) 24 shift> HEX: ff bitand ;
-: byte1 ( num -- byte ) 16 shift> HEX: ff bitand ;
-: byte2 ( num -- byte )  8 shift> HEX: ff bitand ;
-: byte3 ( num -- byte )           HEX: ff bitand ;
-
-: write-little-endian ( word -- )
-    dup byte3 >char write
-    dup byte2 >char write
-    dup byte1 >char write
-        byte0 >char write ;
-
-: write-big-endian ( word -- )
-    dup byte0 >char write
-    dup byte1 >char write
-    dup byte2 >char write
-        byte3 >char write ;
-
 : write-word ( word -- )
     "big-endian" get [
-        write-big-endian
+        big-endian-32
     ] [
-        write-little-endian
+        little-endian-32
     ] ifte ;
 
 : write-image ( image file -- )

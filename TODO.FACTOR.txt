@@ -28,6 +28,7 @@
 
 + listener/plugin:
 
+- words with < in name
 - auto insert USE:
 - why > 1 popup
 - listener backspace overzealous

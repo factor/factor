@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,41 +25,33 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: jedit
+IN: stdio
 USE: arithmetic
-USE: combinators
-USE: kernel
-USE: namespaces
 USE: stack
+USE: streams
 USE: strings
-USE: words
 
-! Doesn't exist in native Factor.
-DEFER: local-jedit-line/file
+: byte3 ( num -- byte ) 24 shift> HEX: ff bitand ;
+: byte2 ( num -- byte ) 16 shift> HEX: ff bitand ;
+: byte1 ( num -- byte )  8 shift> HEX: ff bitand ;
+: byte0 ( num -- byte )           HEX: ff bitand ;
 
-: jedit-local? ( -- ? )
-    java? [ global [ "jedit" get ] bind ] [ f ] ifte ;
+: little-endian-32 ( word -- )
+    dup byte0 >char write
+    dup byte1 >char write
+    dup byte2 >char write
+        byte3 >char write ;
 
-: jedit-line/file ( line dir file -- )
-    jedit-local? [
-        local-jedit-line/file
-    ] [
-        remote-jedit-line/file
-    ] ifte ;
+: big-endian-32 ( word -- )
+    dup byte3 >char write
+    dup byte2 >char write
+    dup byte1 >char write
+        byte0 >char write ;
 
-: resource-path ( -- path )
-    global [ "resource-path" get ] bind [ "." ] unless* ;
+: little-endian-16 ( char -- )
+    dup byte0 >char write
+        byte1 >char write ;
 
-: word-file ( path -- dir file )
-    dup "resource:/" str-head? dup [
-        nip resource-path swap
-    ] [
-        swap ( f file )
-    ] ifte ;
-
-: word-line/file ( word -- line dir file )
-    #! Note that line numbers here start from 1
-    [ "line" get "file" get word-file ] bind ;
-
-: jedit ( word -- )
-    intern word-line/file jedit-line/file ;
+: big-endian-16 ( char -- )
+    dup byte1 >char write
+        byte0 >char write ;

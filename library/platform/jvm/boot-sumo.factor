@@ -85,6 +85,7 @@ USE: parser
 "/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
+"/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint
@@ -118,7 +119,9 @@ USE: parser
 "/library/httpd/default-responders.factor" run-resource ! default-responders
 
 !!! jEdit integration.
-"/library/jedit/jedit.factor" run-resource ! jedit
+"/library/jedit/jedit-local.factor" run-resource  ! jedit
+"/library/jedit/jedit-remote.factor" run-resource ! jedit
+"/library/jedit/jedit.factor" run-resource        ! jedit
 
 !!! Final initialization...
 "/library/init.factor"                     run-resource ! init

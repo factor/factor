@@ -69,6 +69,7 @@ primitives,
     "/library/random.factor"
     "/library/sbuf.factor"
     "/library/stdio.factor"
+    "/library/stdio-binary.factor"
     "/library/stream.factor"
     "/library/strings.factor"
     "/library/styles.factor"
