@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-keyboard sdl-video ;
+USING: alien generic kernel lists math namespaces sdl ;
 
 GENERIC: handle-event ( event -- )
 

@@ -58,6 +58,13 @@ void primitive_throw(void)
 	throw_error(error,true);
 }
 
+void primitive_die(void)
+{
+	dump_stacks();
+	fflush(stderr);
+	exit(1);
+}
+
 void general_error(CELL error, CELL tagged)
 {
 	early_error(error);

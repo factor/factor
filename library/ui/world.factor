@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien errors generic kernel lists math memory namespaces
-prettyprint sdl sdl-event sdl-video stdio strings threads ;
+prettyprint sdl stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the

@@ -2,7 +2,7 @@
 
 /* Stop-and-copy garbage collection using Cheney's algorithm. */
 
-/* #define GC_DEBUG */
+#define GC_DEBUG
 
 INLINE void gc_debug(char* msg, CELL x) {
 #ifdef GC_DEBUG
@@ -52,11 +52,6 @@ CELL copy_object_impl(CELL pointer)
 	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
 		object_size(pointer));
 	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
-
-#ifdef GC_DEBUG
-	if(tag == GC_COLLECTED)
-		critical_error("installing forwarding pointer in newspace",newpointer);
-#endif
 
 	return newpointer;
 }

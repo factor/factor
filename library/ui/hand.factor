@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic kernel lists math namespaces prettyprint
-sdl sdl-event sdl-video stdio ;
+sdl stdio ;
 
 DEFER: pick-up
 

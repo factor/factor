@@ -167,9 +167,9 @@ cpu "x86" = "mini" get not and [
         "/library/compiler/x86/fixnum.factor"
 
         "/library/ui/shapes.factor"
-        "/library/ui/text.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/paint.factor"
+        "/library/ui/text.factor"
         "/library/ui/gestures.factor"
         "/library/ui/hand.factor"
         "/library/ui/layouts.factor"

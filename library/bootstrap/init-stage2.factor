@@ -57,9 +57,10 @@ os "win32" = [
 
 "Compiling system..." print
 "compile" get [
-    ! Compiling this first compiles a lot of core words and
+    ! Compiling these first compiles a lot of core words and
     ! leads to a faster compile overall.
     \ car compile
+    \ = compile
     compile-all
 ] when
 

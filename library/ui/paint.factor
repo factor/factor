@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math namespaces sdl
-sdl-gfx sdl-ttf sdl-video stdio strings ;
+stdio strings ;
 
 ! The painting protocol. Painting is controlled by various
 ! dynamically-scoped variables.

@@ -1,8 +1,8 @@
 ! Strings are shapes too. This is somewhat of a hack and strings
 ! do not have x/y co-ordinates.
 IN: gadgets
-USING: alien hashtables kernel lists namespaces sdl
-sdl-ttf sdl-video streams strings ;
+USING: alien hashtables kernel lists namespaces sdl streams
+strings ;
 
 SYMBOL: fonts
 
@@ -38,13 +38,6 @@ global [
         ] ifte*
     ] bind ;
 
-: make-rect ( x y w h -- rect )
-    <rect>
-    [ set-rect-h ] keep
-    [ set-rect-w ] keep
-    [ set-rect-y ] keep
-    [ set-rect-x ] keep ;
-
 : surface-rect ( x y surface -- rect )
     dup surface-w swap surface-h make-rect ;
 
@@ -56,6 +49,11 @@ global [
     surface get dup must-lock-surface? [
         SDL_LockSurface
     ] when drop ;
+
+: filter-nulls ( str -- str )
+    "\0" over string-contains? [
+        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
+    ] when ;
 
 : size-string ( font text -- w h )
     >r lookup-font r> filter-nulls dup string-length 0 = [
@@ -75,11 +73,6 @@ M: string shape-w
 M: string shape-h ( text -- h )
     #! This is just the height of the current font.
     drop font get lookup-font TTF_FontHeight ;
-
-: filter-nulls ( str -- str )
-    "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
-    ] when ;
 
 M: string draw-shape ( text -- )
     dup string-length 0 = [

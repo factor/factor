@@ -136,8 +136,7 @@ M: object error. ( error -- )
     [ [ print-error debug-help ] when* ] catch ;
 
 : init-error-handler ( -- )
-    [ 1 exit* ] >c ( last resort )
-    [ print-error 1 exit* ] >c
+    [ die ] >c ( last resort )
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
     kernel-error 12 setenv ;
 

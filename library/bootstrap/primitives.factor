@@ -198,6 +198,7 @@ vocabularies get [
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
     [ "end-scan" "memory"                     [ [ ] [ ] ] ]
     [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
+    [ "die" "kernel"                          [ [ ] [ ] ] ]
 ] [
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [

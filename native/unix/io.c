@@ -292,12 +292,14 @@ void collect_io_tasks(void)
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
 		COPY_OBJECT(read_io_tasks[i].port);
+		COPY_OBJECT(read_io_tasks[i].other_port);
 		COPY_OBJECT(read_io_tasks[i].callbacks);
 	}
 
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
 		COPY_OBJECT(write_io_tasks[i].port);
+		COPY_OBJECT(write_io_tasks[i].other_port);
 		COPY_OBJECT(write_io_tasks[i].callbacks);
 	}
 }

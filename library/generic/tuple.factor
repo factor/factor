@@ -10,6 +10,8 @@ hashtables errors vectors ;
     #! specifying an incorrect size.
     <tuple> [ 0 swap set-array-nth ] keep ;
 
+: tuple-class 2 slot ; inline
+
 IN: generic
 
 BUILTIN: tuple 18 [ 1 array-capacity f ] ;
@@ -20,7 +22,7 @@ UNION: arrayed array tuple ;
 
 : class ( obj -- class )
     #! The class of an object.
-    dup tuple? [ 2 slot ] [ type builtin-type ] ifte ;
+    dup tuple? [ tuple-class ] [ type builtin-type ] ifte ;
 
 : (literal-tuple) ( list size -- tuple )
     dup <tuple> swap [
@@ -131,7 +133,7 @@ UNION: arrayed array tuple ;
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
     swap "methods" word-prop hash>quot
-    [ dup class ] swap append ;
+    [ dup tuple-class ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
