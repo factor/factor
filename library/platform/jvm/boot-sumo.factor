@@ -83,7 +83,6 @@ USE: parser
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/trig-hyp.factor"          run-resource ! math
 "/library/math/arc-trig-hyp.factor"      run-resource ! math
-"/library/math/list-math.factor"         run-resource ! math
 
 !!! Development tools.
 "/library/platform/jvm/processes.factor"   run-resource ! processes

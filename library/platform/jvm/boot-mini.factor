@@ -79,7 +79,6 @@ USE: parser
 "/library/math/constants.factor"         run-resource ! math
 "/library/math/math.factor"              run-resource ! math
 "/library/math/pow.factor"               run-resource ! math
-"/library/math/list-math.factor"         run-resource ! math
 
 !!! Development tools.
 "/library/platform/jvm/processes.factor"   run-resource ! processes

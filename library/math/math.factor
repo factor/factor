@@ -35,11 +35,7 @@ USE: stack
 
 : fib ( n -- nth fibonacci number )
     ! This is the naive implementation, for benchmarking purposes.
-    dup 1 <= [
-        drop 1
-    ] [
-        pred dup fib swap pred fib +
-    ] ifte ;
+    dup 1 <= [ drop 1 ] [ pred dup fib swap pred fib + ] ifte ;
 
 : fac ( n -- n! )
     ! This is the naive implementation, for benchmarking purposes.
@@ -51,11 +47,7 @@ USE: stack
 
 : abs ( z -- abs )
     #! Compute the complex absolute value.
-    dup complex? [
-        >rect mag2
-    ] [
-        dup 0 < [ neg ] when
-    ] ifte ;
+    dup complex? [ >rect mag2 ] [ dup 0 < [ neg ] when ] ifte ;
 
 : conjugate ( z -- z* )
     >rect neg rect> ;

@@ -271,7 +271,9 @@ the second stack element.
 
 \texttt{2dup ( x y -{}- x y x y )} Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.
 
-\texttt{2swap ( x y z t -{}- z t x y )} Swap the top two stack elements.
+\texttt{3drop ( x y z -{}- )} Discard the top three stack elements.
+
+\texttt{3dup ( x y z -{}- x y z x y z )} Duplicate the top three stack elements.
 
 You should try all these words out and become familiar with them. Push some numbers on the stack,
 execute a shuffle word, and look at how the stack contents was changed using
@@ -279,7 +281,7 @@ execute a shuffle word, and look at how the stack contents was changed using
 
 Note the order of the shuffle word descriptions above. The ones at
 the top are used most often because they are easy to understand. The
-more complex ones such as \texttt{rot} and \texttt{2swap} should be avoided unless absolutely necessary, because
+more complex ones such as \texttt{rot} and \texttt{2dup} should be avoided unless absolutely necessary, because
 they make the flow of data in a word definition harder to understand.
 
 If you find yourself using too many shuffle words, or you're writing

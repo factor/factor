@@ -43,11 +43,7 @@ USE: stack
     #! Looks up the key in an alist. Push the key/value pair.
     #! Most of the time you want to use assoc not assoc*.
     dup [
-        2dup car car = [
-            nip car
-        ] [
-            cdr assoc*
-        ] ifte
+        2dup car car = [ nip car ] [ cdr assoc* ] ifte
     ] [
         2drop f
     ] ifte ;

@@ -33,7 +33,6 @@ USE: vectors
 : 3drop ( x x x -- ) drop drop drop ;
 : 2dup ( x y -- x y x y ) over over ;
 : 3dup ( x y z -- x y z x y z ) pick pick pick ;
-: 2swap ( x y z t -- z t x y ) rot >r rot r> ;
 : -rot ( x y z -- z x y ) rot rot ;
 : dupd ( x y -- x x y ) >r dup r> ;
 : swapd ( x y z -- y x z ) >r swap r> ;

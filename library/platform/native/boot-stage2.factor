@@ -93,7 +93,6 @@ USE: stdio
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
-    "/library/math/list-math.factor"
 
     "/library/platform/native/in-thread.factor"
     "/library/platform/native/network.factor"
