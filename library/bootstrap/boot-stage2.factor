@@ -9,7 +9,7 @@ default-cli-args
 parse-command-line
 
 ! Dummy defs for mini bootstrap
-IN: compiler : compile-all ; : compile drop ;
+IN: compiler : compile-all ; : compile drop ; : supported-cpu? f ;
 IN: assembler : init-assembler ;
 IN: alien : add-library 3drop ;
 
@@ -54,7 +54,7 @@ cpu "x86" = "mini" get not and [
     "/library/compiler/x86/fixnum.factor"
 ] pull-in
 
-"compile" get [
+"compile" get supported-cpu? and [
     init-assembler
     \ car compile
     \ = compile

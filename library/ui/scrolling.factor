@@ -15,13 +15,11 @@ TUPLE: viewport x y ;
     dup shape-h swap viewport-h - max 0 min ;
 
 : scroll-viewport ( y viewport -- )
-    #! y is a number between 0 and 1.
+    #! y is a number between -1 and 0..
     [ viewport-h * >fixnum ] keep
     [ adjust-scroll ] keep
     [ set-viewport-y ] keep
     relayout ;
-
-: scroll>bottom ( viewport -- ) 1 swap scroll-viewport ;
 
 C: viewport ( content -- viewport )
     [ <empty-gadget> swap set-delegate ] keep
@@ -32,11 +30,8 @@ C: viewport ( content -- viewport )
 M: viewport pref-size gadget-child pref-size ;
 
 M: viewport layout* ( viewport -- )
-    dup gadget-children [
-        [
-            >r dup viewport-x swap viewport-y r> move-gadget
-        ] keep prefer
-    ] each-with ;
+    dup gadget-child dup prefer
+    >r dup viewport-x swap viewport-y r> move-gadget ;
 
 ! A slider scrolls a viewport.
 
@@ -111,13 +106,16 @@ TUPLE: scroller viewport slider ;
 : add-viewport 2dup set-scroller-viewport add-center ;
 : add-slider 2dup set-scroller-slider add-right ;
 
-: viewport>bottom 1 swap scroll-viewport ;
-: scroll>bottom ( scroller -- )
-    dup scroller-slider relayout
-    scroller-viewport viewport>bottom ;
+: viewport>bottom -1 swap scroll-viewport ;
+: (scroll>bottom) ( scroller -- )
+    dup scroller-viewport viewport>bottom
+    scroller-slider relayout ;
 
 : scroller-actions ( scroller -- )
-    [ scroll>bottom ] [ scroll>bottom ] set-action ;
+    [ (scroll>bottom) ] [ scroll>bottom ] set-action ;
+
+: scroll>bottom ( gadget -- )
+    [ scroll>bottom ] swap handle-gesture drop ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.

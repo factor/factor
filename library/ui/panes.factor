@@ -72,7 +72,7 @@ M: pane stream-readln ( stream -- line )
     [ swap set-pane-continuation (yield) ] callcc1 nip ;
 
 M: pane stream-write-attr ( string style stream -- )
-    nip swap "\n" split pane-write ;
+    [ nip swap "\n" split pane-write ] keep scroll>bottom ;
 
 M: pane stream-close ( stream -- ) drop ;
 

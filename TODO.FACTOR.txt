@@ -6,14 +6,12 @@
 
 + ui:
 
-- fix up initial layout of slider
 - resizing a gadget should probably relayout children
 - resizing: drag relative to initial click pos
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - auto-updating inspector
 - fix up the min thumb size hack
-- console: scroll to bottom
 - faster layout
 - faster repaint
 - check broken

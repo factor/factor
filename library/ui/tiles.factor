@@ -37,11 +37,8 @@ USING: generic kernel math namespaces ;
     dup t reverse-video set-paint-prop
     dup caption-actions ;
 
-DEFER: inspect
-
 : tile-actions ( tile -- )
     dup [ unparent ] [ close-tile ] set-action
-    dup [ inspect ] [ inspect-tile ] set-action
     dup [ raise ] [ raise ] set-action
     [ drag-tile ] [ drag-tile ] set-action ;
 
