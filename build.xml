@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 
-<!--
-     Lets get high!
--->
-
-<project name="SmokedOut" default="dist" basedir=".">
+<project name=" Factor" default="dist" basedir=".">
 
 	<target name="compile">
 		<javac
