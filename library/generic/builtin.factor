@@ -77,9 +77,6 @@ builtin 50 "priority" set-word-property
 : builtin-type ( n -- symbol )
     unit classes get hash ;
 
-: type-name ( n -- string )
-    builtin-type word-name ;
-
 : class ( obj -- class )
     #! Analogous to the type primitive. Pushes the builtin
     #! class of an object.

@@ -11,7 +11,7 @@ USE: compiler
     2dup str-length > [
         dup [ "123" , , "456" , , "789" , ] make-string
         dup dup str-length 2 /i 0 swap rot substring
-        swap dup str-length 2 /i succ 1 swap rot substring cat2
+        swap dup str-length 2 /i 1 + 1 swap rot substring cat2
         string-step
     ] [
         2drop

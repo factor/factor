@@ -55,7 +55,7 @@ USE: unparser
 
 : test ( name -- )
     ! Run the given test.
-    depth pred >r
+    depth 1 - >r
     "Testing " write dup write "..." print
     "/library/test/" swap ".factor" cat3 run-resource
     "Checking before/after depth..." print

@@ -66,7 +66,7 @@ USE: unparser
     "line" off "col" off ;
 
 : ch ( -- ch ) "col" get "line" get str-nth ;
-: advance ( -- ) "col" [ succ ] change ;
+: advance ( -- ) "col" [ 1 + ] change ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
@@ -75,7 +75,7 @@ USE: unparser
         2dup str-nth r> dup >r call [
             r> 2drop
         ] [
-            >r succ r> r> skip
+            >r 1 + r> r> skip
         ] ifte
     ] [
         r> drop nip str-length
@@ -101,7 +101,7 @@ USE: unparser
     dup >r skip-blank dup r>
     2dup str-length < [
         2dup str-nth denotation? [
-            drop succ
+            drop 1 +
         ] [
             skip-word
         ] ifte
@@ -159,7 +159,7 @@ USE: unparser
     "col" get "line" get rot index-of* ;
 
 : (until) ( index -- str )
-    "col" get swap dup succ "col" set "line" get substring ;
+    "col" get swap dup 1 + "col" set "line" get substring ;
 
 : until ( ch -- str )
     ch-search (until) ;

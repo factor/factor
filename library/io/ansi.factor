@@ -91,4 +91,7 @@ C: ansi-stream ( stream -- stream )
     #! ansi-bg - background color
     [ delegate set ] extend ;
 
-global [ [ <ansi-stream> ] smart-term-hook set ] bind
+IN: shells
+
+: ansi
+    stdio [ <ansi-stream> ] change tty ;

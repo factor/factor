@@ -53,7 +53,7 @@ USE: words
     scan str>number ; parsing
 
 : ENUM:
-    dup CREATE swap unit define-compound succ ; parsing
+    dup CREATE swap unit define-compound 1 + ; parsing
 
 : END-ENUM
     drop ; parsing

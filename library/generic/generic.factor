@@ -118,6 +118,9 @@ USE: math-internals
         dup <namespace> [ "methods" set-word-property ] keep
     ] unless* <vtable> define-generic ;
 
+PREDICATE: word generic ( word -- ? )
+    "combination" word-property ;
+
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 

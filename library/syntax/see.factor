@@ -37,15 +37,24 @@ USE: unparser
 USE: words
 
 ! Prettyprinting words
-: vocab-attrs ( word -- attrs )
-    vocab-link "object-link" default-style acons ;
+: vocab-actions ( search -- list )
+    [
+        [ "Words"   | "words."        ]
+        [ "Use"     | "\"use\" cons@" ]
+        [ "In"      | "\"in\" set" ]
+    ] ;
+
+: vocab-attrs ( vocab -- attrs )
+    #! Words without a vocabulary do not get a link or an action
+    #! popup.
+    unparse vocab-actions <actions> "actions" swons unit ;
 
 : prettyprint-vocab ( vocab -- )
     dup vocab-attrs write-attr ;
 
-: prettyprint-IN: ( indent word -- )
+: prettyprint-IN: ( word -- )
     \ IN: prettyprint* prettyprint-space
-    word-vocabulary prettyprint-vocab prettyprint-newline ;
+    word-vocabulary prettyprint-vocab prettyprint-space ;
 
 : prettyprint-: ( indent -- indent )
     \ : prettyprint* prettyprint-space
@@ -95,19 +104,22 @@ M: object see ( obj -- )
     "Not a word: " write . ;
 
 M: compound see ( word -- )
-    0 swap
-    [ dupd prettyprint-IN: prettyprint-: ] keep
+    [ prettyprint-IN: ] keep
+    0 prettyprint-: swap
     [ prettyprint-1 ] keep
     [ prettyprint-docs ] keep
     [ word-parameter prettyprint-list prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
 
 M: primitive see ( word -- )
-    "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
+    dup prettyprint-IN:
+    "PRIMITIVE: " write dup prettyprint-1 stack-effect. terpri ;
 
 M: symbol see ( word -- )
-    0 over prettyprint-IN:
+    dup prettyprint-IN:
+    0 swap
     \ SYMBOL: prettyprint-1 prettyprint-space . ;
 
 M: undefined see ( word -- )
-    drop "Not defined" print ;
+    dup prettyprint-IN:
+    \ DEFER: prettyprint-1 prettyprint-space . ;

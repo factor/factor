@@ -111,7 +111,7 @@ SYMBOL: line-editor
 
 : add-line ( text -- )
     lines get vector-push
-    lines get vector-length succ first-line get - visible-lines -
+    lines get vector-length 1 + first-line get - visible-lines -
     dup 0 >= [
         first-line [ + ] change
     ] [
@@ -198,7 +198,7 @@ M: backspace-key key-down ( key -- )
     line-editor get dup sbuf-length 0 = [
         drop
     ] [
-        [ sbuf-length pred ] keep set-sbuf-length
+        [ sbuf-length 1 - ] keep set-sbuf-length
     ] ifte ;
 
 M: integer key-down ( key -- )
@@ -250,7 +250,9 @@ M: alien handle-event ( event -- ? )
 
 SYMBOL: escape-continuation
 
-: start-console ( -- )
+IN: shells
+
+: sdl ( -- )
     <namespace> [
         800 600 32 SDL_HWSURFACE init-screen
         init-console

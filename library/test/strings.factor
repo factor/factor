@@ -83,7 +83,7 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ succ ] when ] str-each
+    [ LETTER? [ 1 + ] when ] str-each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]

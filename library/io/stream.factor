@@ -48,7 +48,9 @@ GENERIC: fclose      ( stream -- )
     f swap fwrite-attr ;
 
 : fprint ( string stream -- )
-    tuck fwrite "\n" over fwrite fauto-flush ;
+    [ fwrite ] keep
+    [ "\n" swap fwrite ] keep
+    fauto-flush ;
 
 TRAITS: string-output-stream
 

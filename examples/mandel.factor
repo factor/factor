@@ -44,7 +44,7 @@ USE: test
 : <color-map> ( nb-cols -- map )
     [
         dup [
-            360 * over succ / 360 / sat val
+            360 * over 1 + / 360 / sat val
             hsv>rgb 1.0 scale-rgba ,
         ] times*
     ] make-list list>vector nip ;
@@ -55,7 +55,7 @@ USE: test
     over absq 4 >= over 0 = or [
         nip nip
     ] [
-        pred >r sq dupd + r> iter
+        1 - >r sq dupd + r> iter
     ] ifte ;
 
 : max-color 360 ;

@@ -78,27 +78,16 @@ USE: prettyprint
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 throw ;
 
-: with-recursive-state ( word label quot -- )
-    >r
-    <recursive-state> [ recursive-label set ] extend dupd cons
-    recursive-state cons@
-    r> call ;
-
-: (with-block) ( label quot -- )
-    #! Call a quotation in a new namespace, and transfer
-    #! inference state from the outer scope.
-    swap >r [
-        dataflow-graph off
-        call
-        d-in get meta-d get meta-r get get-dataflow
-    ] with-scope
-    r> swap #label dataflow, [ node-label set ] bind
-    meta-r set meta-d set d-in set ;
-
 : with-block ( word label quot -- )
     #! Execute a quotation with the word on the stack, and add
     #! its dataflow contribution to a new block node in the IR.
-    over [ with-recursive-state ] (with-block) ;
+    over [
+        >r
+        <recursive-state> [ recursive-label set ] extend
+        dupd cons
+        recursive-state cons@
+        r> call
+    ] (with-block) ;
 
 : inline-compound ( word -- effect )
     #! Infer the stack effect of a compound word in the current
@@ -131,9 +120,6 @@ M: symbol (apply-word) ( word -- )
     #! Push word we're currently inferring effect of.
     recursive-state get car car ;
 
-: no-base-case ( word -- )
-    word-name " does not have a base case." cat2 throw ;
-
 : check-recursion ( -- )
     #! If at the location of the recursive call, we're taking
     #! more items from the stack than producing, we have a
@@ -147,32 +133,25 @@ M: symbol (apply-word) ( word -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    base-case over hash dup [
-        swap [ recursive-label get ] bind ( word effect label )
-        dup [
-            rot drop #call-label rot
-        ] [
-            drop #call swap
-        ] ifte (consume/produce)
+    [ get-base ] 2keep [ recursive-label get ] bind
+    dup [
+        ( word effect label )
+        nip #call-label
     ] [
-        2drop no-base-case
-    ] ifte ;
+        drop #call
+    ] ifte rot (consume/produce) ;
 
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
-    dup recursive-state get assoc dup [
+    dup recursive-state get assoc [
         check-recursion recursive-word
     ] [
-        drop dup "infer-effect" word-property dup [
+        dup "infer-effect" word-property [
             apply-effect
         ] [
-            drop dup "no-effect" word-property [
-                no-effect
-            ] [
-                (apply-word)
-            ] ifte
-        ] ifte
-    ] ifte ;
+            (apply-word)
+        ] ifte*
+    ] ifte* ;
 
 : infer-call ( -- )
     [ general-list ] ensure-d

@@ -40,6 +40,8 @@ USE: vectors
 USE: words
 USE: hashtables
 
+SYMBOL: prettyprint-limit
+
 GENERIC: prettyprint* ( indent obj -- indent )
 
 M: object prettyprint* ( indent obj -- indent )
@@ -48,10 +50,6 @@ M: object prettyprint* ( indent obj -- indent )
 : tab-size
     #! Change this to suit your tastes.
     4 ;
-
-: prettyprint-limit ( -- limit )
-    #! Avoid infinite loops -- maximum indent, 10 levels.
-    "prettyprint-limit" get [ 40 ] unless* ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -64,7 +62,7 @@ M: object prettyprint* ( indent obj -- indent )
     " " write ;
 
 : prettyprint-element ( indent obj -- indent )
-    over prettyprint-limit >= [
+    over prettyprint-limit get >= [
         unparse write
     ] [
         prettyprint*
@@ -186,7 +184,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 : . ( obj -- )
     [
         "prettyprint-single-line" on
-        tab-size 4 * "prettyprint-limit" set
+        16 prettyprint-limit set
         prettyprint
     ] with-scope ;
 
@@ -207,3 +205,5 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
+
+global [ 40 prettyprint-limit set ] bind

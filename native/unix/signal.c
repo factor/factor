@@ -15,6 +15,11 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		signal_error(signal);
 }
 
+void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap)
+{
+	dump_stacks();
+}
+
 /* Called from a signal handler. XXX - is this safe? */
 void call_profiling_step(int signal, siginfo_t* siginfo, void* uap)
 {
@@ -36,10 +41,13 @@ void init_signals(void)
 	struct sigaction custom_sigaction;
 	struct sigaction profiling_sigaction;
 	struct sigaction ign_sigaction;
+	struct sigaction dump_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
 	profiling_sigaction.sa_sigaction = call_profiling_step;
 	profiling_sigaction.sa_flags = SA_SIGINFO;
+	dump_sigaction.sa_sigaction = dump_stack_signal;
+	dump_sigaction.sa_flags = SA_SIGINFO;
 	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
@@ -47,6 +55,7 @@ void init_signals(void)
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
 	sigaction(SIGPIPE,&ign_sigaction,NULL);
 	sigaction(SIGPROF,&profiling_sigaction,NULL);
+	sigaction(SIGQUIT,&dump_sigaction,NULL);
 }
 
 void primitive_call_profiling(void)

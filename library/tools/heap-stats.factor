@@ -48,4 +48,4 @@ USE: generic
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ dupd uncons heap-stat. succ ] each drop ;
+    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;

@@ -79,7 +79,7 @@ SYMBOL: #test
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
 #test [ [ node-param get ] bind sq ] "foobar" set-word-property
@@ -88,7 +88,7 @@ SYMBOL: #test
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
 ! Somebody (cough) got the order of ifte nodes wrong.

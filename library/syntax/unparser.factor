@@ -41,7 +41,7 @@ GENERIC: unparse ( obj -- str )
 M: object unparse ( obj -- str )
     [
         "#<" ,
-        dup type type-name ,
+        dup class unparse ,
         " @ " , 
         address unparse ,
         ">" ,
@@ -51,10 +51,10 @@ M: object unparse ( obj -- str )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
 
 : integer, ( num radix -- )
-    tuck /mod >digit , dup 0 > [
-        swap integer,
+    dup >r /mod >digit , dup 0 > [
+        r> integer,
     ] [
-        2drop
+        r> 2drop
     ] ifte ;
 
 : >base ( num radix -- string )

@@ -40,40 +40,56 @@ import org.gjt.sp.util.Log;
 public class ExternalFactor extends DefaultVocabularyLookup
 {
 	//{{{ ExternalFactor constructor
-	/**
-	 * We are given two streams that point to a bare REPL.
-	 */
-	public ExternalFactor(Process proc, InputStream in, OutputStream out)
+	public ExternalFactor(int port)
 	{
-		if(proc == null || in == null || out == null)
-			closed = true;
-		else
-		{
-			this.proc = proc;
+		/* Start stream server */;
+		streamServer = port;
 
+		for(int i = 1; i < 6; i++)
+		{
+			Log.log(Log.DEBUG,this,"Factor connection, try #" + i);
 			try
 			{
-				this.in = new DataInputStream(in);
-				this.out = new DataOutputStream(out);
-
-				out.write("USE: jedit wire-server\n".getBytes("ASCII"));
-				out.flush();
-
-				waitForAck();
-
-				/* Start stream server */
-				streamServer = 9999;
-				eval("USE: telnetd [ 9999 telnetd ] in-thread");
-
-				/* Ensure we're ready for a connection immediately */
-				eval("nop");
+				Thread.sleep(1000);
+				openWire();
+				Log.log(Log.DEBUG,this,"Connection established");
+				return;
 			}
 			catch(Exception e)
 			{
-				close();
+				Log.log(Log.ERROR,this,e);
 			}
+			
 		}
+
+		Log.log(Log.ERROR,this,"Cannot connect to Factor on port " + port);
+		if(in != null && out != null)
+			close();
 	} //}}}
+
+	//{{{ openWireSocket() method
+	/**
+	 * Return a listener stream.
+	 */
+	public Socket openWireSocket() throws IOException
+	{
+		if(closed)
+			throw new IOException("Socket closed");
+		return new Socket("localhost",streamServer);
+	} //}}}
+
+	//{{{ openWire() method
+	private void openWire() throws Exception
+	{
+		Socket client = openWireSocket();
+		in = new DataInputStream(new BufferedInputStream(
+			client.getInputStream()));
+		out = new DataOutputStream(new BufferedOutputStream(
+			client.getOutputStream()));
+		out.write("USE: jedit wire-server\n".getBytes("ASCII"));
+		out.flush();
+		waitForAck();
+	}
 
 	//{{{ waitForAck() method
 	private void waitForAck() throws IOException
@@ -132,22 +148,16 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public FactorStream openStream()
 	{
-		if(closed)
-			return null;
-		else
+		try
 		{
-			try
-			{
-				Socket client = new Socket("localhost",streamServer);
-				return new FactorStream(client);
-			}
-			catch(Exception e)
-			{
-				Log.log(Log.ERROR,this,"Cannot open stream connection to "
-					+ "external Factor:");
-				Log.log(Log.ERROR,this,e);
-				return null;
-			}
+			return new FactorStream(openWireSocket());
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,"Cannot open stream connection to "
+				+ "external Factor:");
+			Log.log(Log.ERROR,this,e);
+			return null;
 		}
 	} //}}}
 
@@ -279,7 +289,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		
 		try
 		{
-			proc.waitFor();
 			in.close();
 			out.close();
 		}
@@ -289,7 +298,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			Log.log(Log.DEBUG,this,e);
 		}
 
-		proc = null;
 		in = null;
 		out = null;
 	} //}}}
@@ -303,7 +311,6 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	//{{{ Private members
 	private boolean closed;
 
-	private Process proc;
 	private DataInputStream in;
 	private DataOutputStream out;
 	

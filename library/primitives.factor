@@ -98,7 +98,7 @@ USE: words
     [ fixnum<=               " x y -- ? "                         [ [ fixnum fixnum ] [ boolean ] ] ]
     [ fixnum>                " x y -- ? "                         [ [ fixnum fixnum ] [ boolean ] ] ]
     [ fixnum>=               " x y -- ? "                         [ [ fixnum fixnum ] [ boolean ] ] ]
-    [ bignum=                " x y -- ? "                         [ [ fixnum fixnum ] [ boolean ] ] ]
+    [ bignum=                " x y -- ? "                         [ [ bignum bignum ] [ boolean ] ] ]
     [ bignum+                " x y -- x+y "                       [ [ bignum bignum ] [ bignum ] ] ]
     [ bignum-                " x y -- x-y "                       [ [ bignum bignum ] [ bignum ] ] ]
     [ bignum*                " x y -- x*y "                       [ [ bignum bignum ] [ bignum ] ] ]

@@ -223,5 +223,5 @@ vocabularies get [
     [ "kernel-internals" | "set-integer-slot" ]
     [ "kernel-internals" | "grow-array" ]
 ] [
-    unswons create swap succ [ f define ] keep
+    unswons create swap 1 + [ f define ] keep
 ] each drop

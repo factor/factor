@@ -63,7 +63,7 @@ USE: generic
     "Type check error" print
     uncons car dup "Object: " write .
     "Object type: " write class .
-    "Expected type: " write type-name print ;
+    "Expected type: " write builtin-type . ;
 
 : range-error ( list -- )
     "Range check error" print

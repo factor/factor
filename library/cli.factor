@@ -82,16 +82,6 @@ USE: kernel-internals
 : run-files ( args -- )
     [ [ run-file ] when* ] each ;
 
-: default-cli-args
-    #! Some flags are *on* by default, unless user specifies
-    #! -no-<flag> CLI switch
-    "user-init" on
-    "interactive" on
-    "smart-terminal" on
-    "verbose-compile" on
-    "compile" on
-    os "win32" = [ "graphical" on ] when ;
-
 : cli-args ( -- args ) 10 getenv ;
 
 : parse-command-line ( -- )

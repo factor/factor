@@ -42,6 +42,8 @@ import sidekick.*;
 public class FactorPlugin extends EditPlugin
 {
 	private static ExternalFactor external;
+	private static Process process;
+	private static int PORT = 9999;
 
 	//{{{ getPluginPath() method
 	private String getPluginPath()
@@ -101,7 +103,6 @@ public class FactorPlugin extends EditPlugin
 	{
 		if(external == null)
 		{
-			Process p = null;
 			InputStream in = null;
 			OutputStream out = null;
 
@@ -110,27 +111,28 @@ public class FactorPlugin extends EditPlugin
 				List args = new ArrayList();
 				args.add(jEdit.getProperty("factor.external.program"));
 				args.add(jEdit.getProperty("factor.external.image"));
-				args.add("-no-ansi");
-				args.add("-no-smart-terminal");
+				args.add("-shell=telnet");
+				args.add("-telnetd-port=" + PORT);
 				String[] extraArgs = jEdit.getProperty(
-					"factor.external.args","-jedit")
+					"factor.external.args")
 					.split(" ");
 				addNonEmpty(extraArgs,args);
-				p = Runtime.getRuntime().exec((String[])args.toArray(
+				process = Runtime.getRuntime().exec((String[])args.toArray(
 					new String[args.size()]));
-				p.getErrorStream().close();
 
-				in = p.getInputStream();
-				out = p.getOutputStream();
+				external = new ExternalFactor(PORT);
+
+				process.getErrorStream().close();
+				process.getInputStream().close();
+				process.getOutputStream().close();
 			}
-			catch(IOException io)
+			catch(Exception e)
 			{
 				Log.log(Log.ERROR,FactorPlugin.class,
 					"Cannot start external Factor:");
-				Log.log(Log.ERROR,FactorPlugin.class,io);
+				Log.log(Log.ERROR,FactorPlugin.class,e);
+				process = null;
 			}
-
-			external = new ExternalFactor(p,in,out);
 		}
 
 		return external;
@@ -153,6 +155,14 @@ public class FactorPlugin extends EditPlugin
 		if(external != null)
 		{
 			external.close();
+			try
+			{
+				process.waitFor();
+			}
+			catch(Exception e)
+			{
+				Log.log(Log.DEBUG,FactorPlugin.class,e);
+			}
 			external = null;
 		}
 	} //}}}

@@ -87,9 +87,6 @@ M: number = ( n n -- ? ) number= ;
 
 : sq dup * ; inline
 
-: pred 1 - ; inline
-: succ 1 + ; inline
-
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
 

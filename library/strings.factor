@@ -96,7 +96,7 @@ UNION: text string integer ;
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    [ swap str-head ] 2keep succ swap str-tail ;
+    [ swap str-head ] 2keep 1 + swap str-tail ;
 
 : str-head? ( str begin -- ? )
     2dup str-length< [

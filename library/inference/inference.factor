@@ -39,6 +39,10 @@ USE: hashtables
 USE: generic
 USE: prettyprint
 
+! If this symbol is on, partial evalution of conditionals is
+! disabled.
+SYMBOL: inferring-base-case
+
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
@@ -64,6 +68,7 @@ GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class ( value -- class )
 GENERIC: value-class-and ( class value -- )
+GENERIC: set-value-class ( class value -- )
 
 TRAITS: computed
 C: computed ( class -- value )
@@ -79,6 +84,8 @@ M: computed value-class ( value -- class )
     [ \ value-class get ] bind ;
 M: computed value-class-and ( class value -- )
     [ \ value-class [ class-and ] change ] bind ;
+M: computed set-value-class ( class value -- )
+    [ \ value-class set ] bind ;
 
 TRAITS: literal
 C: literal ( obj rstate -- value )
@@ -91,6 +98,8 @@ M: literal value-class ( value -- class )
     literal-value class ;
 M: literal value-class-and ( class value -- )
     value-class class-and drop ;
+M: literal set-value-class ( class value -- )
+    2drop ;
 
 : value-recursion ( value -- rstate )
     [ recursive-state get ] bind ;
@@ -98,7 +107,7 @@ M: literal value-class-and ( class value -- )
 : (ensure-types) ( typelist n stack -- )
     pick [
         3dup >r >r car r> r> vector-nth value-class-and
-        >r >r cdr r> succ r> (ensure-types)
+        >r >r cdr r> 1 + r> (ensure-types)
     ] [
         3drop
     ] ifte ;
@@ -131,9 +140,6 @@ M: literal value-class-and ( class value -- )
     d-in get [ value-class ] vector-map vector>list
     meta-d get [ value-class ] vector-map vector>list 2list ;
 
-: old-effect ( [ in-types out-types ] | [ in | out ] )
-    uncons car length >r length r> cons ;
-
 : <recursive-state> ( -- state )
     <namespace> [
         base-case off  effect entry-effect set
@@ -161,37 +167,6 @@ DEFER: apply-word
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ apply-object ] each ;
-
-: raise ( [ in | out ] -- [ in | out ] )
-    uncons 2dup min tuck - >r - r> cons ;
-
-: new-effect ( [ in | out ] -- [ intypes outtypes ] )
-    uncons
-    swap [ drop object ] project
-    swap [ drop object ] project
-    2list ;
-
-: decompose ( first second -- solution )
-    #! Return a stack effect such that first*solution = second.
-    over [ [ ] [ ] ] = [
-        nip
-    ] [
-        swap old-effect swap old-effect
-        2dup 2car
-        2dup > [ "No solution to decomposition" throw ] when
-        swap - -rot 2cdr >r + r> cons raise new-effect
-    ] ifte ;
-
-: set-base ( [ in | out ] rstate -- )
-    #! Set the base case of the current word.
-    dup [
-        car cdr [
-            [ effect ] bind entry-effect get swap decompose
-            base-case set
-        ] bind
-    ] [
-        2drop
-    ] ifte ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.

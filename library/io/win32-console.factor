@@ -85,5 +85,5 @@ M: win32-console-stream fwrite-attr ( string style stream -- )
 C: win32-console-stream ( stream -- stream )
     [ -11 GetStdHandle handle set delegate set ] extend ;
 
-global [ [ <win32-console-stream> ] smart-term-hook set ] bind
+! global [ [ <win32-console-stream> ] smart-term-hook set ] bind
 

@@ -38,6 +38,7 @@ USE: presentation
 USE: words
 USE: unparser
 USE: vectors
+USE: ansi
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt
@@ -143,3 +144,8 @@ global [
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;
+
+IN: shells
+
+: tty
+    print-banner listener ;

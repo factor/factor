@@ -34,6 +34,10 @@
 
 + listener/plugin:
 
+- listener should be multithreaded
+- fully socket based communication
+- compile all, infer all commands
+- type something -- no completions -- hit another key -- not inserted
 - faster completion
 - sidekick: still parsing too much
 - errors don't always disappear

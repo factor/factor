@@ -45,10 +45,19 @@ USE: unparser
 USE: kernel-internals
 USE: console
 
-: init-smart-terminal
-    "smart-terminal" get [
-        stdio smart-term-hook get change 
-    ] when ;
+: default-cli-args
+    #! Some flags are *on* by default, unless user specifies
+    #! -no-<flag> CLI switch
+    "user-init" on
+    "interactive" on
+    "smart-terminal" on
+    "verbose-compile" on
+    "compile" on
+    os "win32" = [
+        "sdl" "shell" set
+    ] [
+        "ansi" "shell" set
+    ] ifte ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
@@ -59,18 +68,15 @@ USE: console
     default-cli-args
     parse-command-line ;
 
+: shell ( str -- )
+    #! This handles the -shell:<foo> cli argument.
+    [ "shells" ] search execute ;
+
 [
     warm-boot
     garbage-collection
     run-user-init
-    "graphical" get [
-        start-console
-    ] [
-        "interactive" get [
-            init-smart-terminal
-            print-banner listener
-        ] when
-    ] ifte
+    "shell" get shell
     0 exit* 
 ] set-boot
 
@@ -136,10 +142,10 @@ terpri
 "Not every word compiles, by design." print
 terpri
 
-0 [ compiled? [ succ ] when ] each-word
+0 [ compiled? [ 1 + ] when ] each-word
 unparse write " words compiled" print
 
-0 [ drop succ ] each-word
+0 [ drop 1 + ] each-word
 unparse write " words total" print 
 
 "Bootstrapping is complete." print

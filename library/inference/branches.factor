@@ -39,10 +39,6 @@ USE: words
 USE: hashtables
 USE: prettyprint
 
-! If this symbol is on, partial evalution of conditionals is
-! disabled.
-SYMBOL: inferring-base-case
-
 : vector-length< ( vec1 vec2 -- ? )
     swap vector-length swap vector-length < ;
 
@@ -65,7 +61,11 @@ SYMBOL: inferring-base-case
 : unify-results ( value value -- value )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
-    2dup = [ drop ] [ unify-classes <computed> ] ifte ;
+    2dup = [
+        drop
+    ] [
+        unify-classes <computed>
+    ] ifte ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
@@ -109,10 +109,23 @@ SYMBOL: inferring-base-case
 
 SYMBOL: cloned
 
+: assq* ( key alist -- [ key | value ] )
+    #! Looks up the key in an alist. Push the key/value pair.
+    #! Most of the time you want to use assq not assq*.
+    dup [
+        2dup car car eq? [ nip car ] [ cdr assq* ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: assq ( key alist -- value )
+    #! Looks up the key in an alist.
+    assq* dup [ cdr ] when ;
+
 : deep-clone ( vector -- vector )
     #! Clone a vector if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assoc dup [
+    dup cloned get assq dup [
         nip
     ] [
         drop vector-clone [ dup cloned [ acons ] change ] keep
@@ -120,7 +133,7 @@ SYMBOL: cloned
 
 : deep-clone-vector ( vector -- vector )
     #! Clone a vector of vectors.
-    [ ( deep-clone ) vector-clone ] vector-map ;
+    [ deep-clone ] vector-map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
@@ -133,7 +146,7 @@ SYMBOL: cloned
 
 : infer-branch ( value -- namespace )
     <namespace> [
-        uncons [ unswons [ \ value-class set ] bind ] when*
+        uncons [ unswons set-value-class ] when*
         dup value-recursion recursive-state set
         copy-inference
         literal-value infer-quot
@@ -151,12 +164,61 @@ SYMBOL: cloned
     #! given one in the list.
     [ over eq? not ] subset nip car car value-recursion ;
 
+! FIXME this is really bad
+: old-effect ( [ in-types out-types ] -- [ in | out ] )
+    uncons car length >r length r> cons ;
+
+: foo>effect ( [ in-types out-types ] -- [ in | out ] )
+    [ effect old-effect ] bind ;
+
+: raise ( [ in | out ] -- [ in | out ] )
+    uncons 2dup min tuck - >r - r> cons ;
+
+: effect>foo ( [ in | out ] -- [ intypes outtypes ] )
+    <namespace> [
+        uncons
+        [ drop object <computed> ] vector-project meta-d set
+        [ drop object <computed> ] vector-project d-in set
+        { } meta-r set
+    ] extend ;
+
+: decompose ( first second -- solution )
+    #! Return a stack effect such that first*solution = second.
+    2dup 2car
+    2dup > [ "No solution to decomposition" throw ] when
+    swap - -rot 2cdr >r + r> cons raise effect>foo ;
+
+: set-base ( effect rstate -- )
+    #! Set the base case of the current word.
+    dup [
+        car cdr [
+            entry-effect get old-effect dup [ 0 | 0 ] = [
+                drop
+            ] [
+                swap foo>effect decompose
+            ] ifte
+            base-case cons@
+        ] bind
+    ] [
+        2drop
+    ] ifte ;
+
 : recursive-branch ( branch branchlist -- )
     [
         dupd dual-branch >r infer-branch r> set-base
     ] [
         [ 2drop ] when
     ] catch ;
+
+: no-base-case ( word -- )
+    word-name " does not have a base case." cat2 throw ;
+
+: get-base ( word rstate -- effect )
+    [ base-case get ] bind dup [
+        nip [ unify-effects effect ] with-scope
+    ] [
+        drop no-base-case
+    ] ifte ;
 
 : infer-base-case ( branchlist -- )
     [
@@ -192,7 +254,18 @@ SYMBOL: cloned
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again. The inputs
     #! parameter is a vector.
-    (infer-branches) dup unify-effects unify-dataflow ;
+    (infer-branches)  dup unify-effects unify-dataflow ;
+
+: (with-block) ( label quot -- )
+    #! Call a quotation in a new namespace, and transfer
+    #! inference state from the outer scope.
+    swap >r [
+        dataflow-graph off
+        call
+        d-in get meta-d get meta-r get get-dataflow
+    ] with-scope
+    r> swap #label dataflow, [ node-label set ] bind
+    meta-r set meta-d set d-in set ;
 
 : static-branch? ( value -- )
     literal? inferring-base-case get not and ;
@@ -221,11 +294,11 @@ SYMBOL: cloned
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap
-    peek-d static-branch? [
-        static-ifte
-    ] [
+!    peek-d static-branch? [
+!        static-ifte
+!    ] [
         dynamic-ifte
-    ] ifte ;
+    ( ] ifte ) ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 

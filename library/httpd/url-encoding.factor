@@ -49,14 +49,14 @@ USE: unparser
     2dup str-length 2 - >= [
         2drop
     ] [
-        >r succ dup 2 + r> substring  catch-hex> [ , ] when*
+        >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )
     2dup url-decode-hex >r 3 + r> ;
 
 : url-decode-+-or-other ( index str ch -- index str )
-    dup CHAR: + = [ drop CHAR: \s ] when , >r succ r> ;
+    dup CHAR: + = [ drop CHAR: \s ] when , >r 1 + r> ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [

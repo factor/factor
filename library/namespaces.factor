@@ -30,6 +30,7 @@ USE: hashtables
 USE: kernel
 USE: kernel-internals
 USE: lists
+USE: vectors
 
 ! Other languages have classes, objects, variables, etc.
 ! Factor has similar concepts.
@@ -50,8 +51,8 @@ USE: lists
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: namestack ( -- ns ) 3 getenv ;
-: set-namestack ( ns -- ) 3 setenv ;
+: namestack ( -- ns ) 3 getenv ; inline
+: set-namestack ( ns -- ) 3 setenv ; inline
 
 : namespace ( -- namespace )
     #! Push the current namespace.
@@ -59,7 +60,7 @@ USE: lists
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    namestack cons set-namestack ; inline
+    >vector namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.

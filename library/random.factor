@@ -34,14 +34,14 @@ USE: math
     dup dup neg bitand = ;
 
 : (random-int-0) ( n bits val -- n )
-    3dup - + pred 0 < [
+    3dup - + 1 < [
         2drop (random-int) 2dup swap mod (random-int-0)
     ] [
         nip nip
     ] ifte ;
 
 : random-int-0 ( max -- n )
-    succ dup power-of-2? [
+    1 + dup power-of-2? [
         (random-int) * -31 shift
     ] [
         (random-int) 2dup swap mod (random-int-0)

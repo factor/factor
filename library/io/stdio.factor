@@ -77,6 +77,3 @@ C: stdio-stream ( delegate -- stream )
     swap stdio get <prefix-stream> [
         stdio set call
     ] with-scope ; inline
-
-! Set this to a quotation in init code, depending on OS.
-SYMBOL: smart-term-hook

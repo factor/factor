@@ -75,11 +75,11 @@ BUILTIN: vector 11
 
 : vector-peek ( vector -- obj )
     #! Get value at end of vector.
-    dup vector-length pred swap vector-nth ;
+    dup vector-length 1 - swap vector-nth ;
 
 : vector-pop ( vector -- obj )
     #! Get value at end of vector and remove it.
-    dup vector-length pred ( vector top )
+    dup vector-length 1 - ( vector top )
     2dup swap vector-nth >r swap set-vector-length r> ;
 
 : >pop> ( stack -- stack )

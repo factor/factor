@@ -126,7 +126,7 @@ DEFER: tree-contains?
     [ dupd = not ] subset nip ;
 
 : length ( list -- length )
-    0 swap [ drop succ ] each ;
+    0 swap [ drop 1 + ] each ;
 
 : prune ( list -- list )
     #! Remove duplicate elements.
@@ -168,7 +168,7 @@ M: cons = ( obj cons -- ? )
         2drop 0
     ] [
         over cons? [
-            pred >r uncons r> tuck
+            1 - >r uncons r> tuck
             cons-hashcode >r
             cons-hashcode r>
             bitxor
@@ -191,7 +191,7 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 
 : head ( list n -- list )
     #! Return the first n elements of the list.
-    dup 0 > [ >r uncons r> pred head cons ] [ 2drop f ] ifte ;
+    dup 0 > [ >r uncons r> 1 - head cons ] [ 2drop f ] ifte ;
 
 : tail ( list n -- tail )
     #! Return the rest of the list, from the nth index onward.

@@ -14,7 +14,7 @@ USE: namespaces
 
 : random-element ( list -- random )
     #! Returns a random element from the given list.
-    dup >r length pred 0 swap random-int r> nth ;
+    dup >r length 1 - 0 swap random-int r> nth ;
 
 : random-subset ( list -- list )
     #! Returns a random subset of the given list. Each item is

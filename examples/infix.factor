@@ -8,7 +8,7 @@ USE: words
 
 : vector-peek ( vector -- obj )
     #! Get value at end of vector without removing it.
-    dup vector-length pred swap vector-nth ;
+    dup vector-length 1 - swap vector-nth ;
 
 SYMBOL: exprs
 DEFER: infix

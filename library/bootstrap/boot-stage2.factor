@@ -114,8 +114,8 @@ USE: namespaces
 
     "/library/inference/dataflow.factor"
     "/library/inference/inference.factor"
-    "/library/inference/words.factor"
     "/library/inference/branches.factor"
+    "/library/inference/words.factor"
     "/library/inference/stack.factor"
 
     "/library/compiler/assembler.factor"
