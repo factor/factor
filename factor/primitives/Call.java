@@ -29,11 +29,9 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
-import org.objectweb.asm.*;
 
 public class Call extends FactorPrimitiveDefinition
 {
@@ -51,28 +49,5 @@ public class Call extends FactorPrimitiveDefinition
 		throws Exception
 	{
 		interp.call((Cons)interp.datastack.pop());
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	/**
-	 * Compile a call to this word. Returns maximum JVM stack use.
-	 */
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Cons.class);
-		FlowObject quot = (FlowObject)compiler.datastack.pop();
-		quot.compileCallTo(mw,recursiveCheck);
 	} //}}}
 }

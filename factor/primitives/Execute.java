@@ -29,7 +29,6 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Set;

@@ -56,8 +56,7 @@ public class Ine extends FactorParsingDefinition
 
 		reader.append(w.vocabulary);
 		reader.append(w.name);
-		reader.append(new FactorCompoundDefinition(
-			w,state.first,interp));
+		reader.append(new FactorCompoundDefinition(w,state.first));
 		reader.append(reader.intern("define",false));
 	}
 }

@@ -29,9 +29,7 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
-import org.objectweb.asm.*;
 
 public class Coerce extends FactorPrimitiveDefinition
 {
@@ -53,30 +51,5 @@ public class Coerce extends FactorPrimitiveDefinition
 		Class type = FactorJava.toClass(datastack.pop());
 		datastack.push(FactorJava.convertToJavaType(
 			datastack.pop(),type));
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Class.class);
-		Class type = FactorJava.toClass(compiler.popLiteral());
-		if(mw == null)
-			compiler.ensure(compiler.datastack,type);
-		else
-			FlowObject.generateToConversionPre(mw,type);
-		compiler.pop(compiler.datastack,mw,type);
-		compiler.push(compiler.datastack,mw,type);
 	} //}}}
 }

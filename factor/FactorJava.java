@@ -29,7 +29,6 @@
 
 package factor;
 
-import factor.compiler.FactorCompiler;
 import factor.math.*;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.*;

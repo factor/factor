@@ -29,11 +29,9 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
-import org.objectweb.asm.*;
 
 public class JVarGetStatic extends FactorPrimitiveDefinition
 {
@@ -58,39 +56,5 @@ public class JVarGetStatic extends FactorPrimitiveDefinition
 		datastack.push(
 			FactorJava.convertFromJavaType(
 			field.get(null)));
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw == null)
-			compiler.ensure(compiler.datastack,String.class);
-		String fieldName = FactorJava.toString(compiler.popLiteral());
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Class.class);
-		Class clazz = FactorJava.toClass(compiler.popLiteral());
-		Field field = clazz.getField(fieldName);
-
-		if(mw != null)
-		{
-			FlowObject.generateToConversionPre(mw,field.getType());
-			mw.visitFieldInsn(GETSTATIC,
-				clazz.getName().replace('.','/'),
-				fieldName,
-				FactorJava.javaClassToVMClass(field.getType()));
-		}
-
-		compiler.push(compiler.datastack,mw,field.getType());
 	} //}}}
 }

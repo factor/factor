@@ -29,9 +29,7 @@
 
 package factor;
 
-import factor.compiler.*;
 import java.util.*;
-import org.objectweb.asm.*;
 
 /**
  * ~<< name ... -- >>~
@@ -59,11 +57,11 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	private int shuffleRlength;
 
 	//{{{ FactorShuffleDefinition constructor
-	public FactorShuffleDefinition(FactorWord word, Cons definition,
-		FactorInterpreter interp) throws FactorException
+	public FactorShuffleDefinition(FactorWord word, Cons definition)
+		throws FactorException
 	{
 		super(word);
-		fromList(definition,interp);
+		fromList(definition);
 	} //}}}
 
 	//{{{ FactorShuffleDefinition constructor
@@ -111,32 +109,6 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 					break;
 			}
 		}
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws FactorStackException
-	{
-		compileCallTo(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compile() method
-	/**
-	 * Compile the given word, returning a new word definition.
-	 */
-	FactorWordDefinition compile(FactorInterpreter interp,
-		RecursiveState recursiveCheck) throws Exception
-	{
-		return this;
-	} //}}}
-
-	//{{{ compileCallTo() method
-	public void compileCallTo(CodeVisitor mw, FactorCompiler compiler,
-		RecursiveState recursiveCheck) throws FactorStackException
-	{
-		compiler.ensure(compiler.datastack,consumeD);
-		compiler.ensure(compiler.callstack,consumeR);
-		eval(compiler.interp,compiler.datastack,compiler.callstack);
 	} //}}}
 
 	//{{{ eval() method
@@ -223,7 +195,7 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ fromList() method
-	public void fromList(Cons definition, FactorInterpreter interp)
+	public void fromList(Cons definition)
 		throws FactorRuntimeException
 	{
 		String f = "--";
@@ -345,7 +317,7 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ toList() method
-	public Cons toList(FactorInterpreter interp)
+	public Cons toList()
 	{
 		Cons list = null;
 

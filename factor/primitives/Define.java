@@ -29,7 +29,6 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 
 public class Define extends FactorPrimitiveDefinition
@@ -65,17 +64,5 @@ public class Define extends FactorPrimitiveDefinition
 			FactorJava.toString(name));
 		word.define(definition);
 		interp.last = word;
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compiler.ensure(compiler.datastack,FactorWordDefinition.class);
-		compiler.pop(compiler.datastack,null,FactorWordDefinition.class);
-		compiler.ensure(compiler.datastack,String.class);
-		compiler.pop(compiler.datastack,null,String.class);
-		compiler.ensure(compiler.datastack,String.class);
-		compiler.pop(compiler.datastack,null,String.class);
 	} //}}}
 }

@@ -29,7 +29,6 @@
 
 package factor;
 
-import factor.compiler.*;
 import java.util.Set;
 
 /**
@@ -47,7 +46,7 @@ public abstract class FactorPrimitiveDefinition extends FactorWordDefinition
 	} //}}}
 
 	//{{{ fromList() method
-	public void fromList(Cons cons, FactorInterpreter interp)
+	public void fromList(Cons cons)
 	{
 	} //}}}
 }

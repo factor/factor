@@ -29,11 +29,9 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
-import org.objectweb.asm.*;
 
 public class JInvoke extends FactorPrimitiveDefinition
 {
@@ -111,71 +109,5 @@ public class JInvoke extends FactorPrimitiveDefinition
 		{
 			throw new FactorStackException(_args.length);
 		}
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw == null)
-			compiler.ensure(compiler.datastack,String.class);
-		String name = FactorJava.toString(compiler.popLiteral());
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Class.class);
-		Class clazz = FactorJava.toClass(compiler.popLiteral());
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Cons.class);
-		Cons args = (Cons)compiler.popLiteral();
-
-		Class[] _args = FactorJava.classNameToClassList(args);
-		Method method = clazz.getMethod(name,_args);
-
-		checkStatic(method);
-
-		Class returnType = method.getReturnType();
-
-		if(mw != null)
-			FlowObject.generateToConversionPre(mw,returnType);
-
-		if(!staticMethod)
-		{
-			if(mw == null)
-				compiler.ensure(compiler.datastack,clazz);
-			compiler.pop(compiler.datastack,mw,clazz);
-		}
-
-		if(mw == null)
-			compiler.ensure(compiler.datastack,_args);
-
-		compiler.generateArgs(mw,_args.length,0,_args);
-
-		if(mw != null)
-		{
-			int opcode;
-			if(staticMethod)
-				opcode = INVOKESTATIC;
-			else if(clazz.isInterface())
-				opcode = INVOKEINTERFACE;
-			else
-				opcode = INVOKEVIRTUAL;
-			mw.visitMethodInsn(opcode,
-				clazz.getName().replace('.','/'),
-				name,
-				FactorJava.javaSignatureToVMSignature(
-				_args,returnType));
-		}
-
-		if(returnType != Void.TYPE)
-			compiler.push(compiler.datastack,mw,returnType);
 	} //}}}
 }

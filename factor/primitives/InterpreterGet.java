@@ -29,10 +29,8 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.util.Set;
-import org.objectweb.asm.*;
 
 public class InterpreterGet extends FactorPrimitiveDefinition
 {
@@ -51,24 +49,5 @@ public class InterpreterGet extends FactorPrimitiveDefinition
 		throws Exception
 	{
 		interp.datastack.push(interp);
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw != null)
-			mw.visitVarInsn(ALOAD,0);
-		compiler.push(compiler.datastack,mw,FactorInterpreter.class);
 	} //}}}
 }

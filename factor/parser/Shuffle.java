@@ -71,8 +71,7 @@ public class Shuffle extends FactorParsingDefinition
 
 		reader.append(newWord.vocabulary);
 		reader.append(newWord.name);
-		reader.append(new FactorShuffleDefinition(
-			newWord,first,interp));
+		reader.append(new FactorShuffleDefinition(newWord,first));
 		reader.append(reader.intern("define",false));
 	}
 }

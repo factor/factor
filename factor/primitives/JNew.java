@@ -29,11 +29,9 @@
 
 package factor.primitives;
 
-import factor.compiler.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
-import org.objectweb.asm.*;
 
 public class JNew extends FactorPrimitiveDefinition
 {
@@ -65,52 +63,5 @@ public class JNew extends FactorPrimitiveDefinition
 		}
 
 		datastack.push(constructor.newInstance(params));
-	} //}}}
-
-	//{{{ getStackEffect() method
-	public void getStackEffect(RecursiveState recursiveCheck,
-		FactorCompiler compiler) throws Exception
-	{
-		compileImmediate(null,compiler,recursiveCheck);
-	} //}}}
-
-	//{{{ compileImmediate() method
-	public void compileImmediate(
-		CodeVisitor mw,
-		FactorCompiler compiler,
-		RecursiveState recursiveCheck)
-		throws Exception
-	{
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Class.class);
-		Class clazz = FactorJava.toClass(compiler.popLiteral());
-		if(mw == null)
-			compiler.ensure(compiler.datastack,Cons.class);
-		Cons args = (Cons)compiler.popLiteral();
-
-		Class[] _args = FactorJava.classNameToClassList(args);
-		Constructor constructor = clazz.getConstructor(_args);
-
-		if(mw != null)
-		{
-			FlowObject.generateToConversionPre(mw,clazz);
-			mw.visitTypeInsn(NEW,clazz.getName().replace('.','/'));
-			mw.visitInsn(DUP);
-		}
-
-		if(mw == null)
-			compiler.ensure(compiler.datastack,_args);
-		compiler.generateArgs(mw,_args.length,0,_args);
-
-		if(mw != null)
-		{
-			mw.visitMethodInsn(INVOKESPECIAL,
-				clazz.getName().replace('.','/'),
-				"<init>",
-				FactorJava.javaSignatureToVMSignature(
-				_args,Void.TYPE));
-		}
-
-		compiler.push(compiler.datastack,mw,clazz);
 	} //}}}
 }
