@@ -82,8 +82,17 @@ INLINE void type_check(CELL type, CELL tagged)
 
 	type_error(type,tagged);
 }
+/*
+ * It is up to the caller to fill in the object's fields in a meaningful
+ * fashion!
+ */
+INLINE void* allot_object(CELL type, CELL length)
+{
+	CELL* object = allot(length);
+	*object = tag_header(type);
+	return object;
+}
 
-void* allot_object(CELL type, CELL length);
 CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 void primitive_type(void);

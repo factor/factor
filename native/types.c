@@ -1,16 +1,5 @@
 #include "factor.h"
 
-/*
- * It is up to the caller to fill in the object's fields in a meaningful
- * fashion!
- */
-void* allot_object(CELL type, CELL length)
-{
-	CELL* object = allot(length);
-	*object = tag_header(type);
-	return object;
-}
-
 CELL object_size(CELL pointer)
 {
 	CELL size;

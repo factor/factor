@@ -85,7 +85,7 @@ vocabularies get [
     [[ "math-internals" "(fraction>)" ]]
     [[ "parser" "str>float" ]]
     [[ "unparser" "(unparse-float)" ]]
-    [[ "math-internals" "(rect>)" ]]
+    [[ "math-internals" "<complex>" ]]
     [[ "math-internals" "fixnum=" ]]
     [[ "math-internals" "fixnum+" ]]
     [[ "math-internals" "fixnum-" ]]

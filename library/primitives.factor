@@ -81,7 +81,7 @@ USE: words
     [ (fraction>)            [ [ integer integer ] [ rational ] ] ]
     [ str>float              [ [ string ] [ float ] ] ]
     [ (unparse-float)        [ [ float ] [ string ] ] ]
-    [ (rect>)                [ [ real real ] [ number ] ] ]
+    [ <complex>              [ [ real real ] [ number ] ] ]
     [ fixnum=                [ [ fixnum fixnum ] [ boolean ] ] ]
     [ fixnum+                [ [ fixnum fixnum ] [ integer ] ] ]
     [ fixnum-                [ [ fixnum fixnum ] [ integer ] ] ]

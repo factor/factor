@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -69,4 +69,5 @@ SYMBOL: interned-literals
     compiled-offset 0 compile-cell
     compiled-offset 0 compile-cell ;
 
-global [ <namespace> interned-literals set ] bind
+: init-assembler ( -- )
+    global [ <namespace> interned-literals set ] bind ;

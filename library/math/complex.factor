@@ -28,12 +28,18 @@
 IN: errors
 DEFER: throw
 
-IN: math
+IN: math-internals
 USE: generic
 USE: kernel
 USE: kernel-internals
 USE: math
-USE: math-internals
+
+: (rect>) ( xr xi -- x )
+    #! Does not perform a check that the arguments are reals.
+    #! Do not use in your own code.
+    dup 0 number= [ drop ] [ <complex> ] ifte ; inline
+
+IN: math
 
 GENERIC: real ( #{ re im }# -- re )
 M: real real ;
@@ -45,7 +51,7 @@ M: complex imaginary 1 slot %real ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [
-        dup 0 number= [ drop ] [ (rect>) ] ifte
+        (rect>)
     ] [
         "Complex number must have real components" throw drop
     ] ifte ; inline
@@ -80,17 +86,17 @@ M: complex number= ( x y -- ? )
 : *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
 : *im ( x y -- xi*yr xr*yi ) 2>rect >r * swap r> * ; inline
 
-M: complex + 2>rect + >r + r> rect> ;
-M: complex - 2>rect - >r - r> rect> ;
-M: complex * ( x y -- x*y ) 2dup *re - -rot *im + rect> ;
+M: complex + 2>rect + >r + r> (rect>) ;
+M: complex - 2>rect - >r - r> (rect>) ;
+M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
 
 : abs^2 ( x -- y ) >rect sq swap sq + ; inline
 : complex/ ( x y -- r i m )
     #! r = xr*yr+xi*yi, i = xi*yr-xr*yi, m = yr*yr+yi*yi
     dup abs^2 >r 2dup *re + -rot *im - r> ; inline
 
-M: complex / ( x y -- x/y ) complex/ tuck / >r / r> rect> ;
-M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> rect> ;
+M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
+M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
 
 M: complex abs ( z -- |z| ) >rect mag2 ;
 
