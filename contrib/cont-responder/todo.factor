@@ -39,7 +39,8 @@ USE: unparser
 USE: url-encoding
 USE: combinators
 USE: files
-
+USE: logic
+USE: hashtables
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
@@ -63,25 +64,22 @@ USE: files
     "items" get swap unit append "items" set
   ] bind ;
 
-: namespace>alist ( namespace -- alist )
-  #! Convert a namespace to an alist
-  [ vars-values ] bind ;  
-  
-: print-quoted ( str -- )
-  #! Print the string with quotes around it
-  "\"" write write "\"" print ;
+: >yes/no ( bool -- str )
+  #! Return the string "yes" if the boolean is true, else
+  #! return "no".
+  "yes" "no" ? ;
 
 : write-item ( <todo-item> -- )
   #! write the item in a manner that can be later re-read
   [
-    "complete?" get [ "yes" url-encode print ] [ "no" url-encode print ] ifte
+    "complete?" get >yes/no url-encode print
     "priority" get url-encode print
     "description" get url-encode print
   ] bind ;
 
 : write-items ( list -- )
   #! write the todo list items
-  dup length unparse print
+  dup length .
   [ write-item ] each ;
 
 : write-todo ( <todo> -- )
@@ -116,7 +114,7 @@ USE: files
 : password-matches? ( password <todo> -- <todo> )
   #! Returns the <todo> if the password matches otherwise
   #! returns false.
-  dup -rot [ "password" get ] bind = [ ] [ drop f ] ifte ;
+  tuck [ "password" get ] bind = [ drop f ] unless ;
 
 : user-exists? ( db-path name password -- <todo> )
   #! Returns a <todo> if a user with the given name exists
@@ -127,29 +125,32 @@ USE: files
     2drop f 
   ] ifte ;
 
+: each-bind ( quot list -- )
+  [ swap [ bind ] keep ] each drop ;
+
 : items-each-bind ( quot -- )
   #! For each item in the currently bound todo list, call the quotation
   #! with that item bound.
-  unit [ bind ] append "items" get swap each ;
+  "items" get each-bind ;
 
 : todo-username ( <todo> -- username )
   #! return the username for the todo list item.
-  [ "user" get ] bind ;
+  "user" swap hash ;
 
 : item-priority ( <todo-item> -- priority )
   #! return the priority for the todo list item.
-  [ "priority" get ] bind ;
+  "priority" swap hash ;
 
 : item-complete? ( <todo-item> -- boolean )
   #! return true if the todo list item is completed.
-  [ "complete?" get ] bind ;
+  "complete?" swap hash ;
 
 : set-item-completed ( <todo-item> -- )
-  [ t "complete?" set ] bind ;
+  t "complete?" rot set-hash ;
 
 : item-description ( <todo-item> -- description )
   #! return the description for the todo list item.
-  [ "description" get ] bind ;
+  "description" swap hash ;
 
 : priority-comparator ( item1 item2 -- bool )
   #! Return true if item1 is a higher priority than item2
@@ -157,7 +158,7 @@ USE: files
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.
-  [ "items" get ] bind [ priority-comparator ] sort ;
+  "items" swap hash [ priority-comparator ] sort ;
 
 : delete-item ( <todo> <todo-item> -- )
   #! Delete the item from the todo list
