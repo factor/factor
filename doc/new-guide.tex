@@ -12,6 +12,9 @@
 \setlength\parskip{\medskipamount}
 \setlength\parindent{0pt}
 
+\raggedbottom
+\raggedright
+
 \newcommand{\ttbackslash}{\char'134}
 
 \newcommand{\sidebar}[1]{{\fbox{\fbox{\parbox{10cm}{\begin{minipage}[b]{10cm}
@@ -20,11 +23,12 @@
 #1
 \end{minipage}}}}}}
 
-\newcommand{\chapkeywords}[1]{{\parbox{10cm}{\begin{minipage}[b]{10cm}
+\newcommand{\chapkeywords}[1]{%{\parbox{10cm}{\begin{minipage}[b]{10cm}
 \begin{quote}
 \emph{Key words:} \texttt{#1}
 \end{quote}
-\end{minipage}}}}
+%\end{minipage}}}}
+}
 \makeatletter
 
 \newcommand{\wordtable}[1]{{
@@ -105,9 +109,8 @@ An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating t
 \textbf{Hello, world.}
 \end{alltt}
 
-As you can guess, listener interaction will be set in a typewriter font. I will use boldface for program output, and plain text for user input  You should try each code example in the guide, and try to understand it.
-
-One thing all programmers have in common is they make large numbers of mistakes. There are two types of errors; syntax errors, and logic errors. Syntax errors indicate a simple typo or misplaced character. The listener will indicate the point in the source code where the confusion occurs:
+One thing all programmers have in common is they make large numbers of mistakes. There are two types of errors; syntax errors, and logic errors. Syntax errors indicate a simple typo or misplaced character.
+A logic error is not associated with a piece of source code, but rather an execution state. We will learn how to debug them later.  The listener will indicate the point in the source code where the confusion occurs:
 
 \begin{alltt}
 \textbf{ok} "Hello, world" pr,int
@@ -117,7 +120,21 @@ One thing all programmers have in common is they make large numbers of mistakes.
 :s :r :n :c show stacks at time of error.}
 \end{alltt}
 
-A logic error is not associated with a piece of source code, but rather an execution state. We will learn how to debug them later.
+Factor source is composed from whitespace-separated words. Factor is case-sensitive. Each one of the following is exactly one word, and all four are distinct:
+
+\begin{verbatim}
+2dup
+2DUP
+[
+@$*(%#
+\end{verbatim}
+
+A frequent beginner's error is to leave out whitespace between words. When you are entering the code examples in the following sections, keep in mind that you cannot omit arbitrary whitespace:
+
+\begin{alltt}
+:greet "Greetings, " write print; \emph{! incorrect}
+: greet "Greetings, " write print ; \emph{! correct}
+\end{alltt}
 
 \section{Colon definitions}
 
@@ -126,43 +143,30 @@ A logic error is not associated with a piece of source code, but rather an execu
 \index{\texttt{;}}
 \index{\texttt{see}}
 
-Once you build up a collection of useful code snippets, you can reuse them without retyping them each time.
+Factor words are similar to functions and procedures in other languages. Words are defined using \emph{colon definitino} syntax. Some words, like \texttt{print}, \texttt{write} and  \texttt{read}, along with dozens of others we will see, are part of Factor. Other words will be created by you.
 
-Lets try writing a program to prompt the user for their name, and then output a personalized greeting.
-
-\begin{alltt}
-\textbf{ok} "What is your name? " write read
-\textbf{What is your name? }Lambda the Ultimate
-\textbf{ok} "Greetings, " write print
-\textbf{Greetings, Lambda the Ultimate}
-\end{alltt}
-
-You won't understand the syntax at this stage -- don't worry about it, it is all explained later. For now, make the observation that instead of re-typing the entire program each time we want to execute it, it would be nice if we could just type one \emph{word}.
-
-A ``word'' is the main unit of program organization
-in Factor -- it corresponds to a ``function'', ``procedure''
-or ``method'' in other languages. Some words, like \texttt{print}, \texttt{write} and  \texttt{read}, along with dozens of others we will see, are part of Factor. Other words will be created by you.
-
-When you create a new word, you associate a name with a particular sequence of \emph{already-existing} words. You should practice the suggestively-named \emph{colon definition syntax} in the listener:
+When you create a new word, you are associating a name with a particular sequence of \emph{already-existing} words. Enter the following colon definition in the listener:
 
 \begin{alltt}
 \textbf{ok} : ask-name "What is your name? " write read ;
 \end{alltt}
 
-What did we do above? We created a new word named \texttt{ask-name}, and associated with it the definition \texttt{"What is your name? " write read}. Now, lets type in two more colon definitions. The first one associates a name with the second part of our example. The second colon definition puts the first two together into a complete program.
+What did we do above? We created a new word named \texttt{ask-name}, and associated with it the definition \texttt{"What is your name? " write read}. Now, lets type in two more colon definitions. The first one prints a personalized greeting. The second colon definition puts the first two together into a complete program.
 
 \begin{alltt}
 \textbf{ok} : greet "Greetings, " write print ;
 \textbf{ok} : friend ask-name greet ;
 \end{alltt}
 
-Now that the three words \texttt{ask-name}, \texttt{greet}, and \texttt{friend} have been defined, simply typing \texttt{friend} in the listener will run the example as if you had typed it directly.
+Now that the three words \texttt{ask-name}, \texttt{greet}, and \texttt{friend} have been defined, simply typing \texttt{friend} in the listener will run our example program:
 
 \begin{alltt}
 \textbf{ok} friend
 \textbf{What is your name? }Lambda the Ultimate
 \textbf{Greetings, Lambda the Ultimate}
 \end{alltt}
+
+Notice that the \texttt{ask-name} word passes a piece of data to the \texttt{greet} word. We will worry about the exact details later -- for now, our focus is the colon definition syntax itself.
 
 You can look at the definition of any word, including library words, using \texttt{see}:
 
@@ -172,6 +176,8 @@ You can look at the definition of any word, including library words, using \text
 : greet
     "Greetings, " write print ;}
 \end{alltt}
+
+The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
 
 \sidebar{
 Factor is written in itself. Indeed, most words in the Factor library are colon definitions, defined in terms of other words. Out of more than two thousand words in the Factor library, less than two hundred are \emph{primitive}, or built-in to the runtime.
@@ -193,33 +199,31 @@ The \texttt{factor.image} file you start with initially is just an image that wa
 \index{\texttt{.}}
 \index{\texttt{clear}}
 
-The \texttt{ask-name} word passes a piece of data to the \texttt{greet} word in the following definition:
+In order to be able to write more sophisticated programs, you will need to master usage of the \emph{stack}. Input parameters -- for example, numbers, or strings such as \texttt{"Hello "}, are pushed onto the top of the stack when typed. The most recently pushed value is said to be \emph{at the top} of the stack. When a word is executed, it takes
+input parameters from the top of the
+stack. Results are then pushed back on the stack. By convention, words remove input parameters from the stack.
+
+Recall our \texttt{friend} definition from the previous section. In this definition, the \texttt{ask-name} word passes a piece of data to the \texttt{greet} word:
 
 \begin{alltt}
 : friend ask-name greet ;
 \end{alltt}
 
-In order to be able to write more sophisticated programs, you will need to master usage of the \emph{stack}. The stack is used to exchange data between words. Input parameters -- for example, strings like \texttt{"Hello "}, or numbers, are pushed onto the top of the stack. The most recently pushed value is said to be \emph{at the top} of the stack. When a word is executed, it pops
-input parameters from the top of the
-stack. Results are then pushed back on the stack.
-
-In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
-
-Lets look at the \texttt{friend} example one more time. Recall that first, the \texttt{friend} word calls the \texttt{ask-name} word defined as follows:
+The first thing done by \texttt{friend} is calling \texttt{ask-name}, which was defined as follows:
 
 \begin{alltt}
 : ask-name "What is your name? " write read ;
 \end{alltt}
 
-Read this definition from left to right, and visualize the data flow. First, the string \texttt{"What is your name? "} is pushed on the stack. The \texttt{write} word is called; it removes the string from the stack and writes it, without returning any values. Next, the \texttt{read} word is called. It waits for input from the user, then pushes the entered string on the stack.
+Read this definition from left to right, and visualize the data flow. First, the string \texttt{"What is your name?~"} is pushed on the stack. The \texttt{write} word is called; it removes the string from the stack and writes it, without returning any values. Next, the \texttt{read} word is called. It waits for a line of input from the user, then pushes the entered string on the stack.
 
-After \texttt{ask-name}, the \texttt{friend} word finally calls \texttt{greet}, which was defined as follows:
+After \texttt{ask-name}, the \texttt{friend} word calls \texttt{greet}, which was defined as follows:
 
 \begin{alltt}
 : greet "Greetings, " write print ;
 \end{alltt}
 
-This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, which writes this string. Next, \texttt{print} is called. Recall that the \texttt{read} call inside \texttt{ask-name} left the user's input on the stack; well, it is still there, and \texttt{print} writes it. In case you haven't already guessed, the difference between \texttt{write} and \texttt{print} is that the latter outputs a terminating new line.
+This word pushes the string  \texttt{"Greetings, "} and calls \texttt{write}, which writes this string. Next, \texttt{print} is called. Recall that the \texttt{read} call inside \texttt{ask-name} left the user's input on the stack; well, it is still there, and \texttt{print} prints it. In case you haven't already guessed, the difference between \texttt{write} and \texttt{print} is that the latter outputs a terminating new line.
 
 How did we know that \texttt{write} and \texttt{print} take one value from the stack each, or that \texttt{read} leaves one value on the stack? The answer is, you don't always know, however, you can use \texttt{see} to look up the \emph{stack effect comment} of any library word:
 
@@ -231,6 +235,14 @@ How did we know that \texttt{write} and \texttt{print} take one value from the s
 \end{alltt}
 
 You can see that the stack effect of \texttt{print} is \texttt{( string -{}- )}. This is a mnemonic indicating that this word pops a string from the stack, and pushes no values back on the stack. As you can verify using \texttt{see}, the stack effect of \texttt{read} is \texttt{( -{}- string )}.
+
+All words you write should have a stack effect. So our \texttt{friend} example should have been written as follows:
+
+\begin{verbatim}
+: ask-name ( -- name ) "What is your name? " write read ;
+: greet ( name -- ) "Greetings, " write print ;
+: friend ( -- ) ask-name greet ;
+\end{verbatim}
 
 The contents of the stack can be printed using the \texttt{.s} word:
 
@@ -253,6 +265,12 @@ You might notice that \texttt{.} surrounds strings with quotes, while \texttt{pr
 If the stack is empty, calling \texttt{.} will raise an error. This is in general true for any word called with insufficient parameters, or parameters of the wrong type.
 
 The \texttt{clear} word removes all elements from the stack.
+
+\sidebar{
+In Factor, the stack takes the place of local variables found in other languages. Factor still supports variables, but they are usually used for different purposes. Like most other languages, Factor heap-allocates objects, and passes object references by value. However, we don't worry about this until mutable state is introduced.
+}
+
+\subsection*{Review}
 
 Lets review the words  we've seen until now, and their stack effects. The ``vocab'' column will be described later, and only comes into play when we start working with source files. Basically, Factor's words are partitioned into vocabularies rather than being in one flat list.
 
@@ -384,7 +402,7 @@ The implementation of \texttt{km/hour} is a bit more complex. We would like it t
 \textbf{1872000}
 \end{alltt}
 
-Lets review the words we saw in this section.
+\subsection*{Review}
 
 \wordtable{
 \tabvocab{math}
@@ -413,7 +431,7 @@ Negate \texttt{x}.\\
 
 \section{Shuffle words}
 
-\chapkeywords{drop dup swap over nip dupd rot -rot tuck pick 2drop 2dup 3drop 3dup}
+\chapkeywords{drop dup swap over nip dupd rot -rot tuck pick 2drop 2dup}
 \index{\texttt{drop}}
 \index{\texttt{dup}}
 \index{\texttt{swap}}
@@ -426,8 +444,6 @@ Negate \texttt{x}.\\
 \index{\texttt{pick}}
 \index{\texttt{2drop}}
 \index{\texttt{2dup}}
-\index{\texttt{3drop}}
-\index{\texttt{3dup}}
 
 Lets try writing a word to compute the cube of a number. 
 Three numbers on the stack can be multiplied together using \texttt{{*}
@@ -506,12 +522,6 @@ Discard the top two stack elements.\\
 \texttt{2dup}&
 \texttt{( x y -{}- x y x y )}&
 Duplicate the top two stack elements. A frequent use for this word is when two values have to be compared using something like \texttt{=} or \texttt{<} before being passed to another word.\\
-%\texttt{3drop}&
-%\texttt{( x y z -{}- )}&
-%Discard the top three stack elements.\\
-%\texttt{3dup}&
-%\texttt{( x y z -{}- x y z x y z )}&
-%Duplicate the top three stack elements.\\
 }
 
 You should try all these words out and become familiar with them. Push some numbers on the stack,
@@ -527,9 +537,335 @@ A good rule of thumb is that each word should take at most a couple of sentences
 
 Effective factoring is like riding a bicycle -- once you ``get it'', it becomes second nature.
 
+\section{Working with the stack}
+
+\chapkeywords{sq sqrt}
+\index{\texttt{sq}}
+\index{\texttt{sqrt}}
+
+In this section, we will work through the construction of a word for solving quadratic equations, that is, finding values of $x$ that satisfy $ax^2+bx+c=0$, where $a$, $b$ and $c$ are given to us. If you don't like math, take comfort in the fact this is the last mathematical example for a while!
+
+First, note that \texttt{sq} multiplies the top of the stack by itself, and \texttt{sqrt} takes the square root of a number:
+
+\begin{alltt}
+\textbf{ok} 5 sq .
+\textbf{25}
+\textbf{ok} 2 sqrt .
+\textbf{1.414213562373095}
+\end{alltt}
+
+The mathematical formula that gives a value of $x$ for known $a$, $b$ and $c$ might be familiar to you:
+
+$$x=\frac{-b}{2a}\pm\sqrt{\frac{b^2-4ac}{4a^2}}$$
+
+We will compute the left-hand side first. The word to compute it will be named \texttt{quadratic-e}, and it will take the values $a$ and $b$ on the stack:
+
+\begin{verbatim}
+: quadratic-e ( b a -- -b/2a )
+    2 * / neg ;
+\end{verbatim}
+
+Now, lets code the right hand side of the equation:
+
+\begin{verbatim}
+: quadratic-d ( a b c -- d )
+    pick 4 * * swap sq swap - swap sq 4 * / sqrt ;
+\end{verbatim}
+
+To understand how \texttt{quadratic-d} works, consider the stack after each step:
+
+\begin{tabular}{|l|l|}
+\hline
+Word:&Stack after:\\
+\hline
+Initial:&$a$ $b$ $c$\\
+\hline
+\texttt{pick}&$a$ $b$ $c$ $a$\\
+\hline
+\texttt{4}&$a$ $b$ $c$ $a$ $4$\\
+\hline
+\texttt{*}&$a$ $b$ $c$ $4a$\\
+\hline
+\texttt{*}&$a$ $b$ $4ac$\\
+\hline
+\texttt{swap}&$a$ $4ac$ $b$\\
+\hline
+\texttt{sq}&$a$ $4ac$ $b^2$\\
+\hline
+\texttt{swap}&$a$ $b^2$ $4ac$\\
+\hline
+\texttt{-}&$a$ $b^2-4ac$\\
+\hline
+\texttt{swap}&$b^2-4ac$ $a$\\
+\hline
+\texttt{sq}&$b^2-4ac$ $a^2$\\
+\hline
+\texttt{4}&$b^2-4ac$ $a^2$ $4$\\
+\hline
+\texttt{*}&$b^2-4ac$ $4a^2$\\
+\hline
+\texttt{/}&$\frac{b^2-4ac}{4a^2}$\\
+\hline
+\texttt{sqrt}&$\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\end{tabular}
+
+Now, we need a word that takes the values computed by \texttt{quadratic-e} and \texttt{quadratic-d}, and returns two values, one being the sum, the other being the difference. This is the $\pm$ part of the formula:
+
+\begin{verbatim}
+: quadratic-roots ( e d -- alpha beta )
+    2dup + -rot - ;
+\end{verbatim}
+
+You should be able to work through the stack flow of the above word in your head. Test it with a few inputs.
+
+Finally, we can put these three words together into a complete program:
+
+\begin{verbatim}
+: quadratic ( a b c -- alpha beta )
+    3dup quadratic-d
+    nip swap rot quadratic-e
+    swap quadratic-roots ;
+\end{verbatim}
+
+Again, lets look at the stack after each step of the execution of \texttt{quadratic}:
+
+\begin{tabular}{|l|l|}
+\hline
+Word:&Stack after:\\
+\hline
+Initial:&$a$ $b$ $c$\\
+\hline
+\texttt{3dup}&$a$ $b$ $c$ $a$ $b$ $c$\\
+\hline
+\texttt{quadratic-d}&$a$ $b$ $c$ $\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\texttt{nip}&$a$ $b$ $\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\texttt{swap}&$a$ $\sqrt{\frac{b^2-4ac}{4a^2}}$ $b$ \\
+\hline
+\texttt{rot}&$\sqrt{\frac{b^2-4ac}{4a^2}}$ $b$ $a$ \\
+\hline
+\texttt{quadratic-e}&$\sqrt{\frac{b^2-4ac}{4a^2}}$ $\frac{-b}{2a}$\\
+\hline
+\texttt{quadratic-roots}&$\frac{-b}{2a}+\sqrt{\frac{b^2-4ac}{4a^2}}$ $\frac{-b}{2a}-\sqrt{\frac{b^2-4ac}{4a^2}}$\\
+\hline
+\end{tabular}
+
+You can test \texttt{quadratic} with a handful of inputs:
+
+\begin{alltt}
+\textbf{ok} 1 2 1 quadratic . .
+\textbf{-1.0}
+\textbf{-1.0}
+\textbf{ok} 1 -5 4 quadratic . .
+\textbf{1.0}
+\textbf{4.0}
+\textbf{ok} 1 0 1 quadratic . .
+\textbf{#\{ 0 -1.0 \}
+#\{ 0 1.0 \}}
+\end{alltt}
+
+The last example shows that Factor can handle complex numbers perfectly well. We will have more to say about complex numbers later.
+
+\subsection*{Review}
+
+\wordtable{
+\tabvocab{math}
+\texttt{sq}&
+\texttt{( x -{}- x*x )}&
+Square of a number.\\
+\texttt{sqrt}&
+\texttt{( x -{}- sqrt[x] )}&
+Square root of a number.\\
+}
+
 \section{Source files}
 
+\chapkeywords{run-file apropos.~USE: IN:}
+\index{\texttt{run-file}}
+\index{\texttt{apropos.}}
+\index{\texttt{IN:}}
+\index{\texttt{USE:}}
+
+Entering colon definitions at the listener is very convenient for quick testing, but for serious work you should save your work in source files with the \texttt{.factor} filename extension. Any text editor will do, but if you use jEdit\footnote{\texttt{http://www.jedit.org}}, you can take advantage of the powerful integration features found in the Factor plugin. Consult the plugin documentation for details.
+
+Lets put our program for solving quadratic equations in a source file. Create a file named \texttt{quadratic.factor} in your favorite editor, and add the following content:
+
+\begin{verbatim}
+: quadratic-e ( b a -- -b/2a )
+    2 * / neg ;
+
+: quadratic-d ( a b c -- d )
+    pick 4 * * swap sq swap - swap sq 4 * / sqrt ;
+
+: quadratic-roots ( d e -- alpha beta )
+    2dup + -rot - ;
+
+: quadratic ( a b c -- alpha beta )
+    3dup quadratic-d
+    nip swap rot quadratic-e
+    swap quadratic-roots ;
+\end{verbatim}
+
+Now, load the source file in the Factor interpreter using the \texttt{run-file} word:
+
+\begin{alltt}
+\textbf{ok} "quadratic.factor" run-file
+\textbf{/home/slava/quadratic.factor:2: Not a number
+    2 * / neg ;
+       ^
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+Oops! What happened? It looks like it is not recognizing the \texttt{*} word, which works fine in the listener! The problem is that while most words in the library are available for use at the listener, source files must explicitly declare which \texttt{vocabularies} they make use of. To find out which vocabulary holds the \texttt{*} word, use \texttt{apropos.}:
+
+\begin{alltt}
+\textbf{ok} "*" apropos.
+\emph{...}
+\textbf{IN: math
+*}
+\emph{...}
+\end{alltt}
+
+The \texttt{apropos.}~word searches for words whose name contains a given string. As you can see, there are a number of words whose name contains \texttt{*}, but the one we are looking for is \texttt{*} itself, in the \texttt{math} vocabulary. To make use of the \texttt{math} vocabulary, simply add the following \texttt{vocabulary use declaration} at the beginning of the \texttt{quadratic.factor} source file:
+
+\begin{verbatim}
+USE: math
+\end{verbatim}
+
+Now, try loading the file again. This time, an error will be displayed because the \texttt{pick} word cannot be found. Use \texttt{apropos.} to confirm that \texttt{pick} is in the \texttt{stack} vocabulary, and add the appropriate declaration at the start of the source file. Then, the source file should load without any errors.
+
+By default, words you define go in the \texttt{scratchpad} vocabulary. To change this, add a declaration to the start of the source file:
+
+\texttt{IN: quadratic}
+
+Now, to use the words defined within, you must issue the following command in the listener first:
+
+\begin{alltt}
+\textbf{ok} USE: quadratic
+\end{alltt}
+
+\sidebar{If you are using jEdit, you can use the \textbf{Plugins}>\textbf{Factor}>\textbf{Use word at caret} command to insert a \texttt{USE:} declaration for the word at the caret.}
+
+\subsection*{Review}
+
+\wordtable{
+\tabvocab{parser}
+\texttt{run-file}&
+\texttt{( string -{}- )}&
+Load a source file with the given name.\\
+\tabvocab{syntax}
+\texttt{USE: \emph{vocab}}&
+\texttt{( -{}- )}&
+Add a vocabulary to the search path.\\
+\texttt{IN: \emph{vocab}}&
+\texttt{( -{}- )}&
+Set vocabulary for new word definitions.\\
+\tabvocab{words}
+\texttt{apropos.}&
+\texttt{( string -{}- )}&
+List all words whose name contains a given string, and the vocabularies they are found in.\\
+}
+
 \section{Exploring the library}
+
+\chapkeywords{apropos. see ~vocabs.~words.~httpd}
+
+We already saw two ways to explore the Factor library in previous sections: the \texttt{see} word, which shows a word definition, and \texttt{apropos.}~ which helps locate a word and its vocabulary if we know part of its name.
+
+Entering \texttt{vocabs.}~in the listener produces a list of all existing vocabularies:
+
+\begin{alltt}
+\textbf{ok} vocabs.
+\textbf{[ "alien" "ansi" "combinators" "compiler" "continuations"
+"errors" "file-responder" "files" "format" "hashtables"
+"html" "httpd" "httpd-responder" "image" "inference" "init"
+"inspect-responder" "inspector" "interpreter" "io-internals"
+"jedit" "kernel" "listener" "lists" "logging" "logic" "math"
+"namespaces" "parser" "presentation" "prettyprint"
+"processes" "profiler" "quit-responder" "random" "real-math"
+"resource-responder" "scratchpad" "sdl" "sdl-event"
+"sdl-gfx" "sdl-keysym" "sdl-video" "stack" "stdio" "streams"
+"strings" "syntax" "telnetd" "test" "test-responder"
+"threads" "unparser" "url-encoding" "vectors" "words" ]
+}
+\end{alltt}
+
+As you can see, there are a lot of vocabularies! Now, you can use \texttt{words.}~to list the words inside a given vocabulary:
+
+\begin{alltt}
+\textbf{ok} "lists" words.
+\textbf{[ (cons-hashcode) (count) (each) (partition) (top) , 2car
+2cdr 2cons 2list 2swons 3list =-or-contains? acons acons@
+all=? all? append assoc assoc* assoc-apply assoc? car cdr
+cons cons-hashcode cons= cons? cons@ contains? count each
+last last* length list>vector list? make-list make-rlist map
+maximize nth num-sort partition partition-add partition-step
+prune remove remove-assoc remove@ reverse set-assoc sort
+stack>list subset swons tail top tree-contains? uncons
+uncons@ unique unique, unique@ unit unswons unzip
+vector>list ]}
+\end{alltt}
+
+Any word definition can then be shown using \texttt{see}, but you might have to \texttt{USE:} the vocabulary first.
+
+\begin{alltt}
+\textbf{ok} USE: presentation
+\textbf{ok} \ttbackslash set-style see
+\textbf{IN: presentation
+: set-style ( style name -- )
+    "styles" get set-hash ;}
+\end{alltt}
+
+A more sophisticated way to browse the library is using the integrated HTTP server. You can start the HTTP server using the following pair of commands:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} 8888 httpd
+\end{alltt}
+
+Then, point your browser to the following URL, and start browsing:
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/inspect/vocabularies}
+\end{quote}
+
+To stop the HTTP server, point your browser to
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/quit}.
+\end{quote}
+
+You can even start the HTTP in a separate thread, using the following commands:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} USE: threads
+\textbf{ok} [ 8888 httpd ] in-thread
+\end{alltt}
+
+This way, you can browse code and play in the listener at the same time.
+
+\subsection*{Review}
+
+\wordtable{
+\tabvocab{words}
+\texttt{apropos.}&
+\texttt{( string -{}- )}&
+Search for words whose name contains a string.\\
+\texttt{vocabs.}&
+\texttt{( -{}- )}&
+List all vocabularies.\\
+\texttt{words.}&
+\texttt{( string -{}- )}&
+List all words in a given vocabulary.\\
+\tabvocab{httpd}
+\texttt{httpd}&
+\texttt{( port -{}- )}&
+Start an HTTP server on the given port.\\
+}
 
 \chapter{Working with data}
 
