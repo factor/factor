@@ -48,13 +48,60 @@ CELL subtract_fixnum(FIXNUM x, FIXNUM y)
 	return tag_integer(x - y);
 }
 
+/**
+ * Multiply two integers, and trap overflow.
+ * I'm sure a more efficient algorithm exists.
+ */
 CELL multiply_fixnum(FIXNUM x, FIXNUM y)
 {
-	long long result = (long long)x * (long long)y;
-	if(result < FIXNUM_MIN || result > FIXNUM_MAX)
-		return tag_object(s48_long_long_to_bignum(result));
+	bool negp;
+	FIXNUM hx, lx, hy, ly;
+	FIXNUM hprod, lprod, xprod, result;
+
+	if(x < 0)
+	{
+		negp = true;
+		x = -x;
+	}
 	else
-		return tag_fixnum(result);
+		negp = false;
+
+	if(y < 0)
+	{
+		negp = !negp;
+		y = -y;
+	}
+
+	hx = x >> HALF_WORD_SIZE;
+	hy = y >> HALF_WORD_SIZE;
+
+	hprod = hx * hy;
+
+	if(hprod != 0)
+		goto bignum;
+
+	lx = x & HALF_WORD_MASK;
+	ly = y & HALF_WORD_MASK;
+
+	lprod = lx * ly;
+
+	if(lprod > FIXNUM_MAX)
+		goto bignum;
+
+	xprod = lx * hy + hx * ly;
+
+	if(xprod > (FIXNUM_MAX >> HALF_WORD_SIZE))
+		goto bignum;
+
+	result = (xprod << HALF_WORD_SIZE) + lprod;
+	if(negp)
+		result = -result;
+	return tag_integer(result);
+
+bignum:	return tag_object(
+		s48_bignum_multiply(
+			s48_long_to_bignum(x),
+			s48_long_to_bignum(y)));
 }
 
 CELL divint_fixnum(FIXNUM x, FIXNUM y)

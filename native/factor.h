@@ -30,6 +30,8 @@ typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
 
 #define WORD_SIZE (CELLS*8)
+#define HALF_WORD_SIZE (CELLS*4)
+#define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
 
 /* must always be 16 bits */
 typedef unsigned short CHAR;
