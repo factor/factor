@@ -41,6 +41,28 @@ USE: url-encoding
     ] with-logging
 ] unit-test
 
+[ "index.html" ]
+[ "http://www.jedit.org/index.html" url>path ] unit-test
+
+[ "foo/bar" ]
+[ "http://www.jedit.org/foo/bar" url>path ] unit-test
+
+[ "" ]
+[ "http://www.jedit.org/" url>path ] unit-test
+
+[ "" ]
+[ "http://www.jedit.org" url>path ] unit-test
+
+[ "foobar" ]
+[ "foobar" secure-path ] unit-test
+
+[ f ]
+[ "foobar/../baz" secure-path ] unit-test
+
+[ ] [ "GET /index.html" parse-request ] unit-test
+[ ] [ "GET ../index.html" parse-request ] unit-test
+[ ] [ "POO" parse-request ] unit-test
+
 [ ] [ "/" "get" ] [ serve-responder ] test-word
 [ ] [ "" "get" ] [ serve-responder ] test-word
 [ ] [ "test" "get" ] [ serve-responder ] test-word

@@ -31,6 +31,7 @@ USE: arithmetic
 USE: errors
 USE: combinators
 USE: hashtables
+USE: httpd-responder
 USE: kernel
 USE: lists
 USE: logic
@@ -74,6 +75,7 @@ USE: unparser
     init-scratchpad
     init-styles
     init-vocab-styles
+    ! default-responders
 
     run-user-init
 

@@ -29,11 +29,11 @@ IN: httpd
 USE: arithmetic
 USE: combinators
 USE: errors
+USE: kernel
 USE: lists
 USE: logging
 USE: logic
 USE: namespaces
-USE: regexp
 USE: stack
 USE: stdio
 USE: streams
@@ -46,37 +46,38 @@ USE: url-encoding
     "400 Bad request" httpd-error ;
 
 : url>path ( uri -- path )
-    url-decode dup "http://.*?(/.*)" group1 dup [
-        nip
+    url-decode dup "http://" str-head? dup [
+        "/" split1 f "" replace nip nip
     ] [
         drop
     ] ifte ;
 
-: secure-path ( request -- path )
-    dup [
-        "(.*?)( HTTP.*|)" group1 dup [
-            dup #".*\.\.+" re-matches [ drop f ] when
-        ] when
-    ] when ;
+: secure-path ( path -- path )
+    ".." over str-contains? [ drop f ] when ;
 
-: httpd-request ( request -- )
+: handle-request ( arg cmd -- )
+    [
+        [ "GET"  = ] [ drop "get"  serve-responder ]
+        [ "POST" = ] [ drop "post" serve-responder ]
+        [ drop t   ] [ 2drop bad-request           ]
+    ] cond ;
+
+: parse-request ( request -- )
     dup log
-    secure-path dup [
-        url>path
-
-        [
-            [ "GET (.+)"  | [ car "get"  serve-responder ] ]
-            [ "POST (.+)" | [ car "post" serve-responder ] ]
-            [ t           | [ drop bad-request           ] ]
-        ] re-cond
+    " " split1 dup [
+        " HTTP" split1 drop url>path secure-path dup [
+            swap handle-request
+        ] [
+            2drop bad-request
+        ] ifte
     ] [
-        drop bad-request
+        2drop bad-request
     ] ifte ;
 
 : httpd-client ( socket -- )
     [
         "stdio" get "client" set log-client
-        read [ httpd-request ] when*
+        read [ parse-request ] when*
     ] with-stream ;
 
 : quit-flag ( -- ? )

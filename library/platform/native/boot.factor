@@ -82,6 +82,7 @@ primitives,
     "/library/httpd/url-encoding.factor"
     "/library/httpd/http-common.factor"
     "/library/httpd/responder.factor"
+    "/library/httpd/httpd.factor"
     "/library/math/arc-trig-hyp.factor"
     "/library/math/arithmetic.factor"
     "/library/math/list-math.factor"

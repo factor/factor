@@ -56,7 +56,7 @@ USE: httpd
     "200 Document follows" "text/plain" response print ;
 
 : get-responder ( name -- responder )
-    "httpd-responders" get [ get ] bind ;
+    "httpd-responders" get get* ;
 
 : responder-argument ( argument -- argument )
     dup f-or-"" [ drop "default-argument" get ] when ;
