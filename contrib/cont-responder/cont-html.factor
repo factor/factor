@@ -194,25 +194,11 @@ USE: logic
   [ store-prev-attribute ] cons reverse [ "current-attribute" set ] append create-word ;
 
 ! Define some closed HTML tags
-[ 
-  "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" 
-  "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-  "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea"
-  "script" "div" "span" "select" "option"
-] [ define-closed-html-word ] each
+[ "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" "ol" "li" "form" "a" "p" "html" "head" "body" "title" "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea" "script" "div" "span" "select" "option" ] [ define-closed-html-word ] each
 
 ! Define some open HTML tags
-[ 
-  "input" 
-  "br" 
-  "link"
-] [ define-open-html-word ] each
+[ "input" "br" "link" ] [ define-open-html-word ] each
 
 ! Define some attributes
 [ 
-  "method" "action" "type" "value" "name" 
-  "size" "href" "class" "border" "rows" "cols" 
-  "id" "onclick" "style" "valign" "accesskey"
-  "src" "language" "colspan" "onchange" "rel"
-  "width"
-] [ define-attribute-word ] each 
+  "method" "action" "type" "value" "name" "size" "href" "class" "border" "rows" "cols" "id" "onclick" "style" "valign" "accesskey" "src" "language" "colspan" "onchange" "rel" "width"] [ define-attribute-word ] each 
