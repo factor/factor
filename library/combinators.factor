@@ -122,7 +122,7 @@ USE: stack
     #! continuation is used to escape the infinite loop.
     #!
     #! This combinator will not compile.
-    dup dip forever ; interpret-only
+    dup slip forever ; interpret-only
 
 ! DEPRECATED
 
