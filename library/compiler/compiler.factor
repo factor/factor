@@ -52,6 +52,9 @@ USE: words
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
+    "verbose-compile" get [
+        "Compiling " write dup . flush
+    ] when
     begin-compiling dataflow ( optimize ) linearize generate ;
 
 : precompile ( word -- )

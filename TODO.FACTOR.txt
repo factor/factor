@@ -12,11 +12,11 @@
 - handle recursion with when, when* etc
 - optimizer rewrite stack ops
 - alien-call need special nodes
-- mutual recursion is borked with certain branch order
 
 + linearizer/generator:
 
 - peephole optimizer
+- tail call optimization
 - getenv/setenv: if literal arg, compile as a load/store
 - compiler: drop literal peephole optimization
 

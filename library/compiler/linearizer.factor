@@ -132,3 +132,5 @@ SYMBOL: #return-to ( push addr on C stack )
 #2generic [
     [ node-param get node-op get ] bind linearize-generic
 ] "linearizer" set-word-property
+
+#values [ drop ] "linearizer" set-word-property

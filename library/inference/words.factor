@@ -115,7 +115,11 @@ USE: prettyprint
         dup (infer-compound) consume/produce
     ] [
         [
-            swap t "no-effect" set-word-property rethrow
+            swap save-effect get [
+                t "no-effect" set-word-property
+            ] [
+                drop
+            ] ifte rethrow
         ] when*
     ] catch ;
 
@@ -187,7 +191,6 @@ USE: prettyprint
 
 \ call [ infer-call ] "infer" set-word-property
 
-\ + [ 2 | 1 ] "infer-effect" set-word-property
 \ - [ 2 | 1 ] "infer-effect" set-word-property
 \ * [ 2 | 1 ] "infer-effect" set-word-property
 \ / [ 2 | 1 ] "infer-effect" set-word-property

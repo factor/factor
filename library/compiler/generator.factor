@@ -49,4 +49,3 @@ USE: words
     [ generate-node ] each ;
 
 #label [ save-xt ] "generator" set-word-property
-#values [ nop ] "generator" set-word-property

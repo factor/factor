@@ -87,12 +87,14 @@ USE: hashtables
         "Unbalanced branches" throw
     ] ifte ;
 
-: infer-branch ( quot -- namespace )
+: infer-branch ( rstate quot save-effect -- namespace )
     <namespace> [
+        save-effect set
+        swap recursive-state set
         copy-interpreter
         dataflow-graph off
         infer-quot
-        ( #values values-node )
+        #values values-node
     ] extend ;
 
 : terminator? ( quot -- ? )
@@ -101,27 +103,33 @@ USE: hashtables
     #! so we handle it specially.
     \ no-method swap tree-contains? ;
 
-: recursive-branch ( quot -- )
+: recursive-branch ( rstate quot -- )
     #! Set base case if inference didn't fail.
     [
-        infer-branch [
+        f infer-branch [
             d-in get meta-d get vector-length cons
         ] bind recursive-state get set-base
     ] [
-        [ drop ] when
+        [ 2drop ] when
     ] catch ;
 
-: (infer-branches) ( branchlist -- list )
-    dup [
-        car dup terminator? [ drop ] [ recursive-branch ] ifte
-    ] each
+: infer-base-case ( branchlist -- )
     [
-        car dup terminator? [
-            infer-branch [
+        unswons dup terminator? [
+            2drop
+        ] [
+            recursive-branch
+        ] ifte
+    ] each ;
+
+: (infer-branches) ( branchlist -- list )
+    dup infer-base-case [
+        unswons dup terminator? [
+            t infer-branch [
                 meta-d off meta-r off d-in off
             ] extend
         ] [
-            infer-branch
+            t infer-branch
         ] ifte
     ] map ;
 

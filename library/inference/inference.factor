@@ -59,6 +59,12 @@ SYMBOL: entry-effect
 ! makes a local jump to this label.
 SYMBOL: recursive-label
 
+! When inferring stack effects of mutually recursive words, we
+! don't want to save the fact that one word does not have a
+! stack effect before the base case of its mutual pair is
+! inferred.
+SYMBOL: save-effect
+
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
 
@@ -100,7 +106,8 @@ SYMBOL: recursive-label
     init-interpreter
     0 d-in set
     recursive-state set
-    dataflow-graph off ;
+    dataflow-graph off
+    save-effect on ;
 
 DEFER: apply-word
 
