@@ -140,6 +140,7 @@ USE: stdio
     "/library/compiler/words.factor"
     "/library/compiler/alien-types.factor"
     "/library/compiler/alien-macros.factor"
+    "/library/compiler/alien.factor"
 
     "/library/platform/native/primitives.factor"
 

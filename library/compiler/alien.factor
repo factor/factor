@@ -26,41 +26,54 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
-USE: kernel
+USE: errors
 USE: lists
 USE: math
 USE: namespaces
+USE: parser
 USE: stack
+USE: words
 
-: UNBOX ( name -- )
-    #! Move top of datastack to C stack.
-    dlsym-self CALL drop
-    EAX PUSH-R ;
+: BEGIN-ENUM:
+    #! C-style enumartions. Their use is not encouraged unless
+    #! it is for C library interfaces. Used like this:
+    #!
+    #! BEGIN-ENUM 0
+    #!     ENUM: x
+    #!     ENUM: y
+    #!     ENUM: z
+    #! END-ENUM
+    #!
+    #! This is the same as : x 0 ; : y 1 ; : z 2 ;.
+    scan str>number ; parsing
 
-: BOX ( name -- )
-    #! Move EAX to datastack.
-    24 ESP R-I
-    EAX PUSH-R
-    dlsym-self CALL drop
-    28 ESP R+I ;
+: ENUM:
+    dup CREATE swap unit define-compound succ ; parsing
 
-: PARAMETERS ( params -- count )
-    #! Generate code for boxing a list of C types.
-    #! Return amount stack must be unwound by.
-    0 swap [
-        c-type [
-            "unboxer" get UNBOX "width" get cell align +
-        ] bind
-    ] each ;
+: END-ENUM
+    drop ; parsing
 
-: CLEANUP ( amount -- )
-    dup 0 = [ drop ] [ ESP R+I ] ifte ;
+: alien-call ( ... returns library function parameters -- ... )
+    #! Call a C library function.
+    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! type specs. 'library' is an entry in the "libraries"
+    #! namespace.
+    "alien-call cannot be interpreted." throw ;
 
-: RETURNS ( type -- )
-    dup "void" = [
-        drop
-    ] [
-        c-type [ "boxer" get ] bind BOX
-    ] ifte ;
+: library ( name -- handle )
+    "libraries" get get* ;
+
+: alien-function ( function library -- )
+    library dlsym ;
+
+: compile-alien-call
+    pop-literal reverse PARAMETERS >r
+    pop-literal pop-literal alien-function CALL drop
+    r> CLEANUP
+    pop-literal RETURNS ;
+
+global [ <namespace> "libraries" set ] bind
+
+[ alien-call compile-alien-call ]
+unswons "compiling" swap set-word-property

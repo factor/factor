@@ -32,6 +32,7 @@ USE: errors
 USE: lists
 USE: math
 USE: namespaces
+USE: parser
 USE: stack
 USE: strings
 USE: words
@@ -74,8 +75,8 @@ USE: words
     "set-" swap cat2 "in" get create >r
     [ "setter" get ] bind cons r> swap define-compound ;
 
-: define-field ( offset spec -- offset )
-    unswons >r c-type dup >r [ "width" get ] bind align r> r>
+: define-field ( offset type name -- offset )
+    >r c-type dup >r [ "width" get ] bind align r> r>
     "struct-name" get swap "-" swap cat3
     ( offset type name -- )
     3dup define-getter 3dup define-setter
@@ -108,11 +109,22 @@ USE: words
     #! alien.
     [
         "struct-name" set
-        0 swap [ define-field ] each
+        0 swap [ unswons define-field ] each
         dup define-constructor
         dup define-local-constructor
         define-struct-type
     ] with-scope ;
+
+: BEGIN-STRUCT: ( -- offset )
+    scan "struct-name" set  0 ; parsing
+
+: FIELD: ( offset -- offset )
+    scan scan define-field ; parsing
+
+: END-STRUCT ( offset -- )
+    dup define-constructor
+    dup define-local-constructor
+    define-struct-type ; parsing
 
 global [ <namespace> "c-types" set ] bind
 
