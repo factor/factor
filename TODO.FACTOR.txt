@@ -6,6 +6,8 @@
 
 + ui:
 
+- menu dragging
+- hide menu after item selected
 - scrollable inspector
 - inspector needs prettier nesting
 - <titled> needs to look better
@@ -16,9 +18,7 @@
 - console: scroll to bottom
 - split preferred size and layouting
 - remove shelf/pile duplication
-- menus
-- layered gadget
-- resizing and moving gadgets interactively with halo on top of gadget
+- resizing and moving gadgets
 - faster layout
 - faster repaint
 

@@ -84,17 +84,16 @@ M: shelf layout* ( pile -- )
 ! a 5-pixel padding.
 TUPLE: border size delegate ;
 
-C: border ( delegate size -- border )
-    [ set-border-size ] keep [ set-border-delegate ] keep ;
-
-: standard-border ( child delegate -- border )
-    5 <border> [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
+C: border ( child delegate size -- border )
+    [ set-border-size ] keep
+    [ set-border-delegate ] keep
+    [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
 
 : empty-border ( child -- border )
-    <empty-gadget> standard-border ;
+    <empty-gadget> 5 <border> ;
 
 : line-border ( child -- border )
-    0 0 0 0 <etched-rect> <gadget> standard-border ;
+    0 0 0 0 <etched-rect> <gadget> 5 <border> ;
 
 : size-border ( border -- )
     dup gadget-children

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math namespaces sdl
-sdl-gfx sdl-ttf sdl-video strings ;
+sdl-gfx sdl-ttf sdl-video stdio strings ;
 
 ! The painting protocol. Painting is controlled by various
 ! dynamically-scoped variables.
@@ -27,10 +27,9 @@ SYMBOL: font  ! a list of two elements, a font name and size.
 
 GENERIC: draw-shape ( obj -- )
 
-! Actual rectangles don't draw; use a hollow-rect, plain-rect
-! or bevel-rect instead.
 M: rectangle draw-shape drop ;
 
+! A rectangle only whose outline is visible.
 TUPLE: hollow-rect delegate ;
 
 C: hollow-rect ( x y w h -- rect )
@@ -39,6 +38,7 @@ C: hollow-rect ( x y w h -- rect )
 M: hollow-rect draw-shape ( rect -- )
     >r surface get r> rect>screen fg rgb rectangleColor ;
 
+! A rectangle that is filled.
 TUPLE: plain-rect delegate ;
 
 C: plain-rect ( x y w h -- rect )
@@ -47,6 +47,7 @@ C: plain-rect ( x y w h -- rect )
 M: plain-rect draw-shape ( rect -- )
     >r surface get r> rect>screen bg rgb boxColor ;
 
+! A rectangle that is filled, and has a visible outline.
 TUPLE: etched-rect delegate ;
 
 C: etched-rect ( x y w h -- rect )
@@ -56,6 +57,22 @@ M: etched-rect draw-shape ( rect -- )
     >r surface get r> 2dup
     rect>screen bg rgb boxColor
     rect>screen fg rgb rectangleColor ;
+
+! A rectangle that has a visible outline only if the rollover
+! paint property is set.
+SYMBOL: rollover?
+
+TUPLE: roll-rect delegate ;
+
+C: roll-rect ( x y w h -- rect )
+    [ >r <rectangle> r> set-roll-rect-delegate ] keep ;
+
+M: roll-rect draw-shape ( rect -- )
+    rollover? get [
+        >r surface get r> rect>screen fg rgb rectangleColor
+    ] [
+        drop
+    ] ifte ;
 
 M: line draw-shape ( line -- )
     >r surface get r>

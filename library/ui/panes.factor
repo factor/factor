@@ -30,12 +30,12 @@ TUPLE: pane output current input continuation delegate ;
     pane-continuation call ;
  
 : pane-actions ( line -- )
-    {{
+    [
         [[ [ button-down 1 ] [ pane-input click-editor ] ]]
         [[ [ "RETURN" ] [ pane-return ] ]]
         [[ [ "UP" ] [ pane-input [ history-prev ] with-editor ] ]]
         [[ [ "DOWN" ] [ pane-input [ history-next ] with-editor ] ]]
-    }} clone swap set-gadget-gestures ;
+    ] swap add-actions ;
 
 C: pane ( -- pane )
     <line-pile> over set-pane-delegate

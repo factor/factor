@@ -74,6 +74,7 @@ USE: words
 
 : gadget-demo ( -- )
     make-shapes
-    start-world ;
+    USE: shells
+    ui ;
 
 gadget-demo

@@ -55,7 +55,7 @@ TUPLE: editor line caret delegate ;
     request-focus ;
 
 : editor-actions ( editor -- )
-    {{
+    [
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
         [[ [ button-down 1 ] [ click-editor ] ]]
@@ -63,7 +63,7 @@ TUPLE: editor line caret delegate ;
         [[ [ "LEFT" ] [ [ left ] with-editor ] ]]
         [[ [ "RIGHT" ] [ [ right ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
-    }} clone swap set-gadget-gestures ;
+    ] swap add-actions ;
 
 : <caret> ( -- caret )
     0 0 0 0 <plain-rect> <gadget>

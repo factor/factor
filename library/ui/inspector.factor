@@ -1,15 +1,8 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: gadgets
 USING: gadgets generic hashtables kernel kernel-internals lists
 namespaces unparser vectors words ;
-
-DEFER: inspect
-
-: <presentation> ( obj -- gadget )
-    dup unparse <label> [
-        swap
-        [ \ drop , literal, \ inspect , ] make-list
-        [ button-up 1 ] set-action
-    ] keep
-    dup [ drop ] [ button-down 1 ] set-action ;
 
 : label-box ( list -- gadget )
     <line-pile> swap [ <presentation> over add-gadget ] each ;

@@ -1,13 +1,14 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video stdio strings threads ;
+USING: alien generic kernel lists math memory namespaces sdl
+sdl-event sdl-video stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
-! world variable.
-TUPLE: world running? hand delegate ;
+! world variable. The menu slot ensures that only one menu is
+! open at any one time.
+TUPLE: world running? hand menu delegate ;
 
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <gadget> ;
@@ -55,12 +56,23 @@ DEFER: handle-event
         drop world get world-step [ yield run-world ] when
     ] ifte ;
 
-: title ( -- str )
-    "Factor " version cat2 ;
+SYMBOL: root-menu
+
+: show-root-menu ( -- )
+    root-menu get <menu> show-menu ;
 
 global [
+    [
+        [[ "Listener" [ <console-pane> <scroller> world get add-gadget ] ]]
+        [[ "Globals" [ global inspect ] ]]
+        [[ "Save image" [ "image" get save-image ] ]]
+        [[ "Exit" [ f world get set-world-running? ] ]]
+    ] root-menu set
+    
     <world> world set
+    
     1280 1024 world get resize-gadget
+    
     {{
 
         [[ background [ 255 255 255 ] ]]
@@ -70,7 +82,12 @@ global [
         [[ reverse-video f ]]
         [[ font       [[ "Sans Serif" 12 ]] ]]
     }} world get set-gadget-paint
+
+    world get [ drop show-root-menu ] [ button-down 1 ] set-action
 ] bind
+
+: title ( -- str )
+    "Factor " version cat2 ;
 
 IN: shells
 
@@ -82,6 +99,6 @@ IN: shells
     [
         0 x set 0 y set [
             title dup SDL_WM_SetCaption
-            <event> run-world
+            run-world
         ] with-screen
     ] with-scope ;

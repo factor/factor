@@ -24,9 +24,9 @@ TUPLE: viewport x y delegate ;
     1 swap scroll-viewport ;
 
 : viewport-actions ( viewport -- )
-    {{
+    [
         [[ [ scroll>bottom ] [ scroll>bottom ] ]]
-    }} clone swap set-gadget-gestures ;
+    ] swap add-actions ;
 
 C: viewport ( content -- viewport )
     [ <empty-gadget> swap set-viewport-delegate ] keep

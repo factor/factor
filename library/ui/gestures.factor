@@ -9,6 +9,9 @@ USING: alien generic hashtables kernel lists math sdl-event ;
 : set-action ( gadget quot gesture -- )
     rot gadget-gestures set-hash ;
 
+: add-actions ( alist gadget -- )
+    swap [ unswons set-action ] each-with ;
+
 : handle-gesture* ( gesture gadget -- ? )
     tuck gadget-gestures hash* dup [
         cdr call f
