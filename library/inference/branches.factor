@@ -83,6 +83,7 @@ USE: hashtables
 
 : unify ( list -- )
     #! Unify meta-interpreter state from two branches.
+    [ ] subset ! Filter terminator slots
     dup balanced? [
         unzip
         unify-lengths unify-stacks meta-d set
@@ -90,6 +91,12 @@ USE: hashtables
     ] [
         "Unbalanced branches" throw
     ] ifte ;
+
+: terminator? ( quot -- ? )
+    #! This is a hack. no-method has a stack effect that
+    #! probably does not match any other branch of the generic,
+    #! so we handle it specially.
+    \ no-method swap tree-contains? ;
 
 : recursive-branch ( quot -- )
     #! Set base case if inference didn't fail.
@@ -100,9 +107,16 @@ USE: hashtables
     ] catch ;
 
 : (infer-branches) ( branchlist -- dataflowlist effectlist )
-    dup
-    [ car recursive-branch ] each
-    [ car infer-branch ] map
+    dup [
+        car dup terminator? [ drop ] [ recursive-branch ] ifte
+    ] each
+    [
+        car dup terminator? [
+            infer-branch car f cons
+        ] [
+            infer-branch
+        ] ifte
+    ] map
     unzip ;
 
 : infer-branches ( inputs instruction branchlist -- )
@@ -127,9 +141,7 @@ USE: hashtables
     #! generic and 2generic use vectors of words, we need lists
     #! of quotations. Filter out no-method. Dirty workaround;
     #! later properly handle throw.
-    unswons vector>list [
-        dup \ no-method = [ drop f ] [ unit over cons ] ifte
-    ] map [ ] subset nip ;
+    unswons vector>list [ unit over cons ] map nip ;
 
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.

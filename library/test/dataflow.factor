@@ -11,6 +11,7 @@ USE: dataflow
 USE: kernel
 USE: vectors
 USE: namespaces
+USE: prettyprint
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
@@ -51,4 +52,13 @@ USE: namespaces
 [ t ] [
     [ 2 [ swap ] [ nip "hi" ] ifte ] dataflow
     dataflow-ifte-node-consume-d vector-length 1 =
+] unit-test
+
+[ t ] [
+    [ { drop no-method drop no-method } generic ] dataflow
+    GENERIC swap dataflow-contains-op? car [
+        node-param get [
+            [ [ node-param get \ no-method = ] bind ] some?
+        ] some?
+    ] bind >boolean
 ] unit-test
