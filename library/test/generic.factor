@@ -77,3 +77,16 @@ M: fixnum foobar drop "Goodbye cruel world" ;
 
 [ "Hello world" ] [ 4 foobar foobar ] unit-test
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
+
+GENERIC: bool>str
+M: t bool>str drop "true" ;
+M: f bool>str drop "false" ;
+
+: str>bool
+    [
+        [ "true" | t ]
+        [ "false" | f ]
+    ] assoc ;
+
+[ t ] [ t bool>str str>bool ] unit-test
+[ f ] [ f bool>str str>bool ] unit-test

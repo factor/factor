@@ -35,6 +35,8 @@ IN: words        BUILTIN: word    1
 IN: lists        BUILTIN: cons    2
 IN: math         BUILTIN: ratio   4
 IN: math         BUILTIN: complex 5
+IN: syntax       BUILTIN: f       6 FORGET: f?
+IN: syntax       BUILTIN: t       7 FORGET: t?
 IN: math         BUILTIN: bignum  9
 IN: math         BUILTIN: float   10
 IN: vectors      BUILTIN: vector  11

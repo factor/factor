@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: unparser
+USE: generic
 USE: kernel
 USE: format
 USE: lists
@@ -35,6 +36,17 @@ USE: parser
 USE: stdio
 USE: strings
 USE: words
+
+GENERIC: unparse ( obj -- str )
+
+M: object unparse ( obj -- str )
+    [
+        "#<" ,
+        dup type type-name ,
+        " @ " , 
+        address unparse ,
+        ">" ,
+    ] make-string ;
 
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
@@ -61,9 +73,10 @@ USE: words
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;
 
-DEFER: unparse
+M: fixnum unparse ( obj -- str ) >dec ;
+M: bignum unparse ( obj -- str ) >dec ;
 
-: unparse-ratio ( num -- str )
+M: ratio unparse ( num -- str )
     [
         dup
         numerator unparse ,
@@ -71,7 +84,15 @@ DEFER: unparse
         denominator unparse ,
     ] make-string ;
 
-: unparse-complex ( num -- str )
+: fix-float ( str -- str )
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    "." over str-contains? [ ".0" cat2 ] unless ;
+
+M: float unparse ( float -- str )
+    (unparse-float) fix-float ;
+
+M: complex unparse ( num -- str )
     [
         "#{ " ,
         dup
@@ -104,50 +125,13 @@ DEFER: unparse
         ] ifte
     ] unless ;
 
-: unparse-str ( str -- str )
+M: string unparse ( str -- str )
     [
         CHAR: " , [ unparse-ch , ] str-each CHAR: " ,
     ] make-string ;
 
-: unparse-word ( word -- str )
+M: word unparse ( obj -- str )
     word-name dup "#<unnamed>" ? ;
 
-: fix-float ( str -- str )
-    #! This is terrible. Will go away when we do our own float
-    #! output.
-    "." over str-contains? [ ".0" cat2 ] unless ;
-
-: unparse-float ( float -- str ) (unparse-float) fix-float ;
-
-: unparse-unknown ( obj -- str )
-    [
-        "#<" ,
-        dup type type-name ,
-        " @ " , 
-        address unparse ,
-        ">" ,
-    ] make-string ;
-
-: unparse-t drop "t" ;
-: unparse-f drop "f" ;
-
-: unparse ( obj -- str )
-    {
-        [ >dec            ]
-        [ unparse-word    ]
-        [ unparse-unknown ]
-        [ unparse-unknown ]
-        [ unparse-ratio   ]
-        [ unparse-complex ]
-        [ unparse-f       ]
-        [ unparse-t       ]
-        [ unparse-unknown ]
-        [ >dec            ]
-        [ unparse-float   ]
-        [ unparse-unknown ]
-        [ unparse-str     ]
-        [ unparse-unknown ]
-        [ unparse-unknown ]
-        [ unparse-unknown ]
-        [ unparse-unknown ]
-    } generic ;
+M: t unparse drop "t" ;
+M: f unparse drop "f" ;
