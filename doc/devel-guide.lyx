@@ -43,7 +43,7 @@ Slava Pestov
 Introduction
 \layout Standard
 
-Factor is an imperitive programming language with functional and object-oriented
+Factor is an imperative programming language with functional and object-oriented
  influences.
  Its primary goal is to be used for web-based server-side applications.
  Factor is interpreted by a virtual machine that provides garbage collection
@@ -80,7 +80,7 @@ cons cells
 \begin_inset Quotes erd
 \end_inset 
 
- to represent code and data struture.
+ to represent code and data structure.
 \layout Section
 
 Fundamentals
@@ -221,7 +221,7 @@ infix
 
 More complicated infix expressions can be translated into postfix by translating
  the inner-most parts first.
- Grouping parantheses are never necessary:
+ Grouping parentheses are never necessary:
 \layout LyX-Code
 
 ! Postfix equivalent of (2 + 3) * 6
@@ -461,8 +461,9 @@ However, the stack effect of
 one
 \emph default 
  input only.
- To achive this, we need to be able to duplicate the top stack element twice.
- As it happends, there is a word 
+ To achieve this, we need to be able to duplicate the top stack element
+ twice.
+ As it happens, there is a word 
 \family typewriter 
 dup ( x -- x x )
 \family default 
@@ -826,7 +827,7 @@ collapsed false
 \layout Standard
 
 The rationale here is that the interactive interpreter should have a large
- number of words available by default, for convinience, whereas source files
+ number of words available by default, for convenience, whereas source files
  should specify their external dependencies explicitly.
 \end_inset 
 
@@ -1507,7 +1508,7 @@ word
 ( min max -- n )
 \family default 
  pushes a random number in a specified range.
- The range is inclusive, so both the minimum and maximum indices are candidate
+ The range is inclusive, so both the minimum and maximum indexes are candidate
  random numbers.
  Use 
 \family typewriter 
@@ -2119,7 +2120,7 @@ collapsed false
 Side effect-free code is the fundamental idea underlying functional programming
  languages.
  While Factor allows side effects and is not a functional programming language,
- for a lot of problems, coding in a functional style gives the most maintanable
+ for a lot of problems, coding in a functional style gives the most maintainable
  and readable results.
 \end_inset 
 
@@ -2763,7 +2764,7 @@ List combinators
 \layout Standard
 
 In a traditional language such as C, every iteration or collection must
- be written out as a loop, with setting up and updating of idices, etc.
+ be written out as a loop, with setting up and updating of indexes, etc.
  Factor on the other hand relies on combinators and quotations to avoid
  duplicating these loop 
 \begin_inset Quotes eld

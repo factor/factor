@@ -32,8 +32,8 @@ USE: real-math
 USE: kernel
 USE: stack
 
-!!! Power-related functions:
-!!!     exp log sqrt pow
+! Power-related functions:
+!     exp log sqrt pow
 
 : exp >rect swap fexp swap polar> ;
 : log >polar swap flog swap rect> ;

@@ -31,11 +31,11 @@ USE: combinators
 USE: real-math
 USE: stack
 
-!!! Inverse trigonometric functions:
-!!!    acos asec asin acosec atan acot
+! Inverse trigonometric functions:
+!    acos asec asin acosec atan acot
 
-!!! Inverse hyperbolic functions:
-!!!    acosh asech asinh acosech atanh acoth
+! Inverse hyperbolic functions:
+!    acosh asech asinh acosech atanh acoth
 
 : acosh dup sq pred sqrt + log ;
 : asech recip acosh ;

@@ -32,11 +32,11 @@ USE: kernel
 USE: real-math
 USE: stack
 
-!!! Trigonometric functions:
-!!!    cos sec sin cosec tan cot
+! Trigonometric functions:
+!    cos sec sin cosec tan cot
 
-!!! Hyperbolic functions:
-!!!    cosh sech sinh cosech tanh coth
+! Hyperbolic functions:
+!    cosh sech sinh cosech tanh coth
 
 : cos ( z -- cos )
     >rect 2dup
