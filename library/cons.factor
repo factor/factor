@@ -80,6 +80,10 @@ PREDICATE: general-list list ( list -- ? )
     #! cell whose cdr is a proper list.
     dup [ last* cdr ] when not ;
 
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ; inline
+
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
     #! the list.
@@ -93,6 +97,9 @@ PREDICATE: general-list list ( list -- ? )
         2drop t
     ] ifte ; inline
 
+: all-with? ( obj list pred -- ? )
+    swap [ with rot ] all? 2nip ; inline
+
 : (each) ( list quot -- list quot )
     >r uncons r> tuck 2slip ; inline
 
@@ -100,10 +107,6 @@ PREDICATE: general-list list ( list -- ? )
     #! Push each element of a proper list in turn, and apply a
     #! quotation with effect ( elt -- ) to each element.
     over [ (each) each ] [ 2drop ] ifte ; inline
-
-: with ( obj quot elt -- obj quot )
-    #! Utility word for each-with, map-with.
-    pick pick >r >r swap call r> r> ; inline
 
 : each-with ( obj list quot -- )
     #! Push each element of a proper list in turn, and apply a

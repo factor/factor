@@ -37,14 +37,11 @@ USE: kernel-internals
 [ f ] [ [ 1 2 ] { 1 2 3 } = ] unit-test
 [ f ] [ { 1 2 } [ 1 2 3 ] = ] unit-test
 
-[ [ 1 4 9 16 ] ] [ [ 1 2 3 4 ] ]
-[ list>vector [ dup * ] vector-map vector>list ] test-word
-[ t ] [ [ 1 2 3 4 ] ]
-[ list>vector [ number? ] vector-all? ] test-word
-[ f ] [ [ 1 2 3 4 ] ]
-[ list>vector [ 3 > ] vector-all? ] test-word
-[ t ] [ [ ] ]
-[ list>vector [ 3 > ] vector-all? ] test-word
+[ [ 1 4 9 16 ] ]
+[
+    [ 1 2 3 4 ]
+    list>vector [ dup * ] vector-map vector>list
+] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 [ t ] [ { 1 2 3 } hashcode { 1 2 3 } hashcode = ] unit-test
@@ -79,6 +76,11 @@ unit-test
 
 [ t ] [
     { 1 2 3 4 } dup vector-array array-capacity
-    >r vector-clone vector-array array-capacity r>
+    >r clone vector-array array-capacity r>
     =
+] unit-test
+
+[ f ] [
+    { 1 2 3 4 } dup clone
+    swap vector-array swap vector-array eq?
 ] unit-test

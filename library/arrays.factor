@@ -30,6 +30,7 @@ USE: generic
 USE: math-internals
 USE: kernel
 USE: lists
+USE: vectors
 
 ! An array is a range of memory storing pointers to other
 ! objects. Arrays are not used directly, and their access words
@@ -44,8 +45,8 @@ USE: lists
 BUILTIN: array 8
 
 : array-capacity   ( array -- n )   1 slot ; inline
-: vector-array     ( vec -- array ) 2 slot ; inline
-: set-vector-array ( array vec -- ) 2 set-slot ; inline
+: vector-array     ( vec -- array ) >vector 2 slot ; inline
+: set-vector-array ( array vec -- ) >vector 2 set-slot ; inline
 
 : array-nth ( n array -- obj )
     swap 2 fixnum+ slot ; inline

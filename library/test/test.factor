@@ -43,14 +43,6 @@ USE: unparser
     #! Assert that the quotation throws an error.
     [ [ not ] catch ] cons [ f ] swap unit-test ;
 
-: test-word ( output input word -- )
-    #! Old-style test.
-    append unit-test ;
-
-: do-not-test-word ( output input word -- )
-    #! Flag for tests that are known not to work.
-    3drop ;
-
 : test ( name -- )
     ! Run the given test.
     depth 1 - >r

@@ -25,7 +25,7 @@ USE: prettyprint
 
 10 <vector> "x" set
 [ -2 "x" get set-vector-length ] [ drop ] catch
-[ "x" get vector-clone drop ] [ drop ] catch
+[ "x" get clone drop ] [ drop ] catch
 
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
 
@@ -57,7 +57,7 @@ USE: prettyprint
 : callstack-overflow callstack-overflow f ;
 [ callstack-overflow ] unit-test-fails
 
-[ [ cdr cons ] word-plist ] unit-test-fails
+[ [ cdr cons ] word-props ] unit-test-fails
 
 ! Forgot to tag out of bounds index
 [ 1 { } vector-nth ] [ garbage-collection drop ] catch

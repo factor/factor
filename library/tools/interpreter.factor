@@ -63,8 +63,8 @@ SYMBOL: meta-cf
 
 : copy-interpreter ( -- )
     #! Copy interpreter state from containing namespaces.
-    meta-r [ vector-clone ] change
-    meta-d [ vector-clone ] change
+    meta-r [ clone ] change
+    meta-d [ clone ] change
     meta-n [ ] change
     meta-c [ ] change ;
 
@@ -132,12 +132,12 @@ SYMBOL: meta-cf
 : set-meta-word ( word quot -- )
     "meta-word" set-word-property ;
 
-\ datastack [ meta-d get vector-clone push-d ] set-meta-word
-\ set-datastack [ pop-d vector-clone meta-d set ] set-meta-word
+\ datastack [ meta-d get clone push-d ] set-meta-word
+\ set-datastack [ pop-d clone meta-d set ] set-meta-word
 \ >r   [ pop-d push-r ] set-meta-word
 \ r>   [ pop-r push-d ] set-meta-word
-\ callstack [ meta-r get vector-clone push-d ] set-meta-word
-\ set-callstack [ pop-d vector-clone meta-r set ] set-meta-word
+\ callstack [ meta-r get clone push-d ] set-meta-word
+\ set-callstack [ pop-d clone meta-r set ] set-meta-word
 \ namestack [ meta-n get push-d ] set-meta-word
 \ set-namestack [ pop-d meta-n set ] set-meta-word
 \ catchstack [ meta-c get push-d ] set-meta-word

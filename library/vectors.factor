@@ -70,6 +70,9 @@ IN: kernel-internals
         2drop
     ] ifte ; inline
 
+: copy-array ( to from n -- )
+    [ 3dup swap array-nth pick rot set-array-nth ] repeat 2drop ;
+
 IN: vectors
 
 : vector-nth ( n vec -- obj )
@@ -123,13 +126,6 @@ IN: vectors
         swap >r apply r> tuck vector-push
     ] vector-each nip ; inline
 
-: vector-and ( vector -- ? )
-    #! Logical and of all elements in the vector.
-    t swap [ and ] vector-each ;
-
-: vector-all? ( vector pred -- ? )
-    vector-map vector-and ; inline
-
 : vector-nappend ( v1 v2 -- )
     #! Destructively append v2 to v1.
     [ over vector-push ] vector-each drop ;
@@ -148,9 +144,10 @@ IN: vectors
     #! in a new vector.
     project list>vector ; inline
 
-: vector-clone ( vector -- vector )
-    #! Shallow copy of a vector.
-    [ ] vector-map ;
+M: vector clone ( vector -- vector )
+    dup vector-length dup empty-vector [
+        vector-array rot vector-array rot copy-array
+    ] keep ;
 
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;

@@ -192,7 +192,7 @@ M: f ' ( obj -- ptr )
         0 ,
         dup word-primitive ,
         dup word-parameter ' ,
-        dup word-plist ' ,
+        dup word-props ' ,
         0 ,
         0 ,
     ] make-list
@@ -284,16 +284,16 @@ M: string ' ( string -- pointer )
 M: vector ' ( vector -- pointer )
     emit-vector ;
 
-: rehash ( hashtable -- )
-    ! Now make a rehashing boot quotation
-    dup hash>alist [
-        over hash-clear
-        [ unswons rot set-hash ] each-with
-    ] cons cons
-    boot-quot [ append ] change ;
+! : rehash ( hashtable -- )
+!     ! Now make a rehashing boot quotation
+!     dup hash>alist [
+!         over hash-clear
+!         [ unswons rot set-hash ] each-with
+!     ] cons cons
+!     boot-quot [ append ] change ;
 
 : emit-hashtable ( hash -- pointer )
-    dup buckets>list emit-array swap hash-size
+    dup buckets>list emit-array swap hash>alist length
     object-tag here-as >r
     hashtable-type >header emit
     emit-fixnum ( length )
@@ -303,7 +303,7 @@ M: vector ' ( vector -- pointer )
 M: hashtable ' ( hashtable -- pointer )
     #! Only hashtables are pooled, not vectors!
     dup pooled-object [
-        [ dup emit-hashtable [ pool-object ] keep ] keep rehash
+        dup emit-hashtable [ pool-object ] keep
     ] ?unless ;
 
 ( End of the image )

@@ -11,10 +11,7 @@ USE: kernel
     "poo" [ "scratchpad" ] search execute
 ] unit-test
 
-: words-test ( -- ? )
-    t vocabs [ words [ word? and ] each ] each ;
-
-[ t           ] [                 ] [ words-test        ] test-word
+[ t ] [ t vocabs [ words [ word? and ] each ] each ] unit-test
 
 DEFER: plist-test
 
@@ -28,7 +25,7 @@ DEFER: plist-test
     \ plist-test "sample-property" word-property
 ] unit-test
 
-[ f ] [ 5 ] [ compound? ] test-word
+[ f ] [ 5 compound? ] unit-test
 
 "create-test" "scratchpad" create { 1 2 } "testing" set-word-property
 [ { 1 2 } ] [
@@ -62,4 +59,4 @@ SYMBOL: a-symbol
 : test-last ( -- ) ;
 word word-name "last-word-test" set
 
-[ "test-last" ] [ ] [ "last-word-test" get ] test-word
+[ "test-last" ] [ "last-word-test" get ] unit-test

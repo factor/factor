@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -49,8 +49,8 @@ M: word hashcode 1 slot %fixnum ;
 : word-parameter     ( w -- obj ) >word 4 slot ; inline
 : set-word-parameter ( obj w -- ) >word 4 set-slot ; inline
 
-: word-plist     ( w -- obj ) >word 5 slot ; inline
-: set-word-plist ( obj w -- ) >word 5 set-slot ; inline
+: word-props     ( w -- obj ) >word 5 slot ; inline
+: set-word-props ( obj w -- ) >word 5 set-slot ; inline
 
 : call-count     ( w -- n ) >word 6 integer-slot ; inline
 : set-call-count ( n w -- ) >word 6 set-integer-slot ; inline
@@ -61,12 +61,10 @@ M: word hashcode 1 slot %fixnum ;
 SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )
-    swap word-plist assoc ; inline
+    swap word-props hash ; inline
 
 : set-word-property ( word pvalue pname -- )
-    pick word-plist
-    pick [ set-assoc ] [ remove-assoc nip ] ifte
-    swap set-word-plist ; inline
+    rot word-props set-hash ; inline
 
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;

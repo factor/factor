@@ -8,19 +8,16 @@ USE: kernel
 USE: io-internals
 
 [ "\"hello\\\\backslash\"" ]
-[ "hello\\backslash" ]
-[ unparse ]
-test-word
+[ "hello\\backslash" unparse ]
+unit-test
 
 [ "\"\\u1234\"" ]
-[ "\u1234" ]
-[ unparse ]
-test-word
+[ "\u1234" unparse ]
+unit-test
 
 [ "\"\\e\"" ]
-[ "\e" ]
-[ unparse ]
-test-word
+[ "\e" unparse ]
+unit-test
 
 [ "1.0" ] [ 1.0 unparse ] unit-test
 [ "f" ] [ f unparse ] unit-test

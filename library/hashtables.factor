@@ -39,9 +39,14 @@ BUILTIN: hashtable 10
 ! buckets are associative lists which are searched
 ! linearly.
 
+! The unsafe words go in kernel internals. Everything else, even
+! if it is somewhat 'implementation detail', is in the
+! public 'hashtables' vocabulary.
+
 IN: kernel-internals
 
 : hash-array 2 slot ; inline
+: set-hash-array 2 set-slot ; inline
 
 : hash-bucket ( n hash -- alist )
     swap >fixnum swap >hashtable hash-array array-nth ; inline
@@ -50,13 +55,18 @@ IN: kernel-internals
     swap >fixnum swap >hashtable hash-array set-array-nth ;
     inline
 
+: change-bucket ( n hash quot -- )
+    -rot hash-array
+    [ array-nth swap call ] 2keep
+    set-array-nth ; inline
+
+IN: hashtables
+
 : hash-size+ ( hash -- )
     >hashtable dup 1 slot 1 + swap 1 set-slot ; inline
 
 : hash-size- ( hash -- )
     >hashtable dup 1 slot 1 - swap 1 set-slot ; inline
-
-IN: hashtables
 
 : hash-size ( hash -- n )
     #! Number of elements in the hashtable.
@@ -80,24 +90,53 @@ IN: hashtables
     #! undefined value, or a value set to f.
     hash* dup [ cdr ] when ;
 
-: set-hash* ( key table quot -- )
+: set-hash* ( key hash quot -- )
     #! Apply the quotation to yield a new association list.
     #! If the association list already contains the key,
     #! decrement the hash size, since it will get removed.
-    >r
-        2dup (hashcode)
-    r> pick >r
-        over >r
-            >r swap hash-bucket r> call
-        r>
-    r> set-hash-bucket ; inline
-    
+    -rot 2dup (hashcode) over [
+        ( quot key hash assoc -- )
+        swapd 2dup
+        assoc [ rot hash-size- ] [ rot drop ] ifte
+        rot call
+    ] change-bucket ; inline
+
+: rehash? ( hash -- ? )
+    dup bucket-count 3 * 2 /i swap hash-size < ;
+
+: grow-hash ( hash -- )
+    #! A good way to earn a living.
+    dup hash-size 3 * 2 /i <array> swap set-hash-array ;
+
+: (hash>alist) ( alist n hash -- alist )
+    2dup bucket-count >= [
+        2drop
+    ] [
+        [ hash-bucket [ swons ] each ] 2keep
+        >r 1 + r> (hash>alist)
+    ] ifte ;
+
+: hash>alist ( hash -- alist )
+    #! Push a list of key/value pairs in a hashtable.
+    [ ] 0 rot (hash>alist) ;
+
+: (set-hash) ( value key hash -- )
+    dup hash-size+ [ set-assoc ] set-hash* ;
+
+: rehash ( hash -- )
+    #! Increase the hashtable size if its too small.
+    dup rehash? [
+        dup hash>alist over grow-hash
+        [ unswons rot (set-hash) ] each-with
+    ] [
+        drop
+    ] ifte ;
+
 : set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
     #! key/value pair.
-    dup hash-size+
-    [ set-assoc ] set-hash* ;
+    dup rehash (set-hash) ;
 
 : remove-hash ( key table -- )
     #! Remove a value from a hashtable.
@@ -113,20 +152,9 @@ IN: hashtables
     #! Push a list of key/value pairs in a hashtable.
     dup bucket-count swap hash-array array>list ;
 
-: (hash>alist) ( alist n hash -- alist )
-    2dup bucket-count >= [
-        2drop
-    ] [
-        [ hash-bucket [ swons ] each ] 2keep
-        >r 1 + r> (hash>alist)
-    ] ifte ;
-
-: hash>alist ( hash -- alist )
-    #! Push a list of key/value pairs in a hashtable.
-    [ ] 0 rot (hash>alist) ;
-
 : alist>hash ( alist -- hash )
-    dup length <hashtable> swap [ unswons pick set-hash ] each ;
+    dup length 1 max <hashtable> swap
+    [ unswons pick set-hash ] each ;
 
 : hash-keys ( hash -- list )
     #! Push a list of keys in a hashtable.
@@ -139,3 +167,22 @@ IN: hashtables
 : hash-each ( hash code -- )
     #! Apply the code to each key/value pair of the hashtable.
     >r hash>alist r> each ; inline
+
+M: hashtable clone ( hash -- hash )
+    dup bucket-count dup <hashtable> [
+        hash-array rot hash-array rot copy-array
+    ] keep ;
+
+: hash-subset? ( subset of -- ? )
+    hash>alist [ uncons >r swap hash r> = ] all-with? ;
+
+M: hashtable = ( obj hash -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        over hashtable? [
+            2dup hash-subset? >r swap hash-subset? r> and
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;

@@ -29,7 +29,7 @@ USE: lists
     "X-Spyware-Requested: yes" header-line
 ] unit-test
 
-[ ] [ "404 not found" ] [ httpd-error ] test-word
+[ ] [ "404 not found" httpd-error ] unit-test
 
 [ "arg" ] [
     [

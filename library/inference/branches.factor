@@ -108,11 +108,11 @@ USE: prettyprint
 
 SYMBOL: cloned
 
-: deep-clone ( vector -- vector )
-    #! Clone a vector if it hasn't already been cloned in this
+: deep-clone ( obj -- obj )
+    #! Clone an object if it hasn't already been cloned in this
     #! with-deep-clone scope.
     dup cloned get assoc [
-        vector-clone [ dup cloned [ acons ] change ] keep
+        clone [ dup cloned [ acons ] change ] keep
     ] ?unless ;
 
 : deep-clone-vector ( vector -- vector )

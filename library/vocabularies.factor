@@ -68,12 +68,12 @@ USE: strings
         2drop f
     ] ifte ;
 
-: <plist> ( name vocab -- plist )
-    "vocabulary" swons swap "name" swons 2list ;
+: <props> ( name vocab -- plist )
+    "vocabulary" swons swap "name" swons 2list alist>hash ;
 
 : (create) ( name vocab -- word )
     #! Create an undefined word without adding to a vocabulary.
-    <plist> <word> [ set-word-plist ] keep ;
+    <props> <word> [ set-word-props ] keep ;
 
 : reveal ( word -- )
     #! Add a new word to its vocabulary.

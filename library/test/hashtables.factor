@@ -45,7 +45,7 @@ f 100000000000000000000000000 "testhash" get set-hash
 
 [ t ] [ #{ 2 3 }# "testhash" get hash ] unit-test
 [ f ] [ 100000000000000000000000000 "testhash" get hash* cdr ] unit-test
-[ { } ] [ { [ { } ] } vector-clone "testhash" get hash* cdr ] unit-test
+[ { } ] [ { [ { } ] } clone "testhash" get hash* cdr ] unit-test
 
 [
     [[ "salmon" "fish" ]]
@@ -68,7 +68,19 @@ f 100000000000000000000000000 "testhash" get set-hash
 ! Testing the hash element counting
 
 <namespace> "counting" set
-"key" "value" "counting" get set-hash
+"value" "key" "counting" get set-hash
 [ 1 ] [ "counting" get hash-size ] unit-test
-"key" "value" "counting" get set-hash
+"value" "key" "counting" get set-hash
 [ 1 ] [ "counting" get hash-size ] unit-test
+"key" "counting" get remove-hash
+[ 0 ] [ "counting" get hash-size ] unit-test
+"key" "counting" get remove-hash
+[ 0 ] [ "counting" get hash-size ] unit-test
+
+[ t ] [ {{ }} dup = ] unit-test
+[ f ] [ "xyz" {{ }} = ] unit-test
+[ t ] [ {{ }} {{ }} = ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ }} = ] unit-test
+[ f ] [ {{ }} {{ [[ 1 3 ]] }} = ] unit-test
+[ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} = ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} = ] unit-test
