@@ -88,10 +88,17 @@ USE: words
 
 ( Image header )
 
+: base
+    #! We relocate the image to after the header, and leaving
+    #! two empty cells. This lets us differentiate an F pointer
+    #! (0/tag 3) from a pointer to the first object in the
+    #! image.
+    2 cell * ;
+
 : header ( -- )
     image-magic emit
     image-version emit
-    ( relocation base at end of header ) 0 emit
+    ( relocation base at end of header ) base emit
     ( bootstrap quotation set later ) 0 emit
     ( global namespace set later ) 0 emit
     ( size of heap set later ) 0 emit ;
@@ -101,11 +108,16 @@ USE: words
 : heap-size-offset 5 ;
 : header-size      6 ;
 
-( Top of heap pointer )
+( Allocator )
 
-: here ( -- size ) image vector-length header-size - cell * ;
-: here-as ( tag -- pointer ) here swap bitor ;
-: pad ( -- ) here 8 mod 4 = [ 0 emit ] when ;
+: here ( -- size ) 
+    image vector-length header-size - cell * base + ;
+
+: here-as ( tag -- pointer )
+    here swap bitor ;
+
+: pad ( -- )
+    here 8 mod 4 = [ 0 emit ] when ;
 
 ( Remember what objects we've compiled )
 
@@ -135,18 +147,20 @@ USE: words
 
 ! Padded with fixnums for 8-byte alignment
 
-: f, object-tag here-as "f" set f-type >header emit 0 'fixnum emit ;
-: t, object-tag here-as "t" set t-type >header emit 0 'fixnum emit ;
+: t,
+    object-tag here-as "t" set
+    t-type >header emit
+    0 'fixnum emit ;
 
 :  0,  0 'bignum drop ;
 :  1,  1 'bignum drop ;
 : -1, -1 'bignum drop ;
 
 ( Beginning of the image )
-! The image proper begins with the header, then F, T,
+! The image proper begins with the header, then T,
 ! and the bignums 0, 1, and -1.
 
-: begin ( -- ) header f, t, 0, 1, -1, ;
+: begin ( -- ) header t, 0, 1, -1, ;
 
 ( Words )
 
@@ -315,7 +329,8 @@ IN: cross-compiler
         [ string?  ] [ 'string      ]
         [ vector?  ] [ 'vector      ]
         [ t =      ] [ drop "t" get ]
-        [ f =      ] [ drop "f" get ]
+        ! f is #define F RETAG(0,OBJECT_TYPE)
+        [ f =      ] [ drop object-tag ]
         [ drop t   ] [ "Cannot cross-compile: " swap cat2 throw ]
     ] cond ;
 
@@ -329,7 +344,10 @@ IN: cross-compiler
     namespace-buckets <hashtable>
     dup >r set-hash r> (set-global) ;
 
-: end ( -- ) global, fixup-words here heap-size-offset fixup ;
+: end ( -- )
+    global,
+    fixup-words
+    here base - heap-size-offset fixup ;
 
 ( Image output )
 

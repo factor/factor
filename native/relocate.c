@@ -2,14 +2,12 @@
 
 void fixup(CELL* cell)
 {
-	if(TAG(*cell) != FIXNUM_TYPE)
+	if(TAG(*cell) != FIXNUM_TYPE && *cell != F)
 		*cell += (active.base - relocation_base);
 }
 
 void relocate_object()
 {
-	CELL size;
-	size = untagged_object_size(relocating);
 	switch(untag_header(get(relocating)))
 	{
 	case WORD_TYPE:
@@ -32,20 +30,27 @@ void relocate_object()
 		break;
 	}
 
-	relocating += size;
 }
 
 void relocate_next()
 {
+	CELL size = CELLS;
+
 	switch(TAG(get(relocating)))
 	{
 	case HEADER_TYPE:
+		size = untagged_object_size(relocating);
 		relocate_object();
 		break;
+	case OBJECT_TYPE:
+		if(get(relocating) == F)
+			break;
+		/* fall thru */
 	default:
 		fixup((CELL*)relocating);
-		relocating += CELLS;
+		break;
 	}
+	relocating += size;
 }
 
 void init_object(CELL* handle, CELL type)
@@ -65,8 +70,7 @@ void relocate(CELL r)
 
 	relocating = active.base;
 
-	/* The first two objects in the image must always be F, T */
-	init_object(&F,F_TYPE);
+	/* The first object in the image must always T */
 	init_object(&T,T_TYPE);
 
 	/* The next three must be bignum 0, 1, -1  */

@@ -31,12 +31,8 @@ void copy_object(CELL* handle)
 	CELL tag = TAG(pointer);
 	CELL header, newpointer;
 
-	if(tag == FIXNUM_TYPE)
-	{
-		/* convinience */
-		gc_debug("FIXNUM",pointer);
+	if(tag == FIXNUM_TYPE || pointer == F)
 		return;
-	}
 	
 	if(in_zone(&active,pointer))
 		critical_error("copy_object given newspace ptr",pointer);
@@ -118,8 +114,7 @@ void collect_roots(void)
 	CELL ptr;
 
 	gc_debug("collect_roots",scan);
-	/* these two must be the first in the heap */
-	copy_object(&F);
+	/*T must be the first in the heap */
 	copy_object(&T);
 	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();

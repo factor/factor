@@ -18,7 +18,7 @@
 
 /* Canonical F object */
 #define F_TYPE 6
-CELL F;
+#define F RETAG(0,OBJECT_TYPE)
 
 /* Canonical T object */
 #define T_TYPE 7

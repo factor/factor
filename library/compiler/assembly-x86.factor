@@ -49,19 +49,14 @@ USE: combinators
 
 : I>R ( imm reg -- )
     #! MOV <imm> TO <reg>
-    dup EAX = [
-        drop HEX: b8 compile-byte
-    ] [
-        HEX: 8b compile-byte
-        3 shift BIN: 101 bitor compile-byte
-    ] ifte compile-cell ;
+    HEX: b8 + compile-byte  compile-cell ;
 
 : [I]>R ( imm reg -- )
     #! MOV INDIRECT <imm> TO <reg>
     dup EAX = [
         drop HEX: a1 compile-byte
     ] [
-        HEX: 8d compile-byte
+        HEX: 8b compile-byte
         3 shift BIN: 101 bitor compile-byte
     ] ifte compile-cell ;
 
@@ -71,8 +66,13 @@ USE: combinators
 
 : R>[I] ( reg imm -- )
     #! MOV INDIRECT <imm> TO <reg>.
-    #! Actually only works with EAX (?)
-    swap HEX: a3 + compile-byte  compile-cell ;
+    #! Actually only works with EAX.
+    over EAX = [
+        nip HEX: a3 compile-byte
+    ] [
+        HEX: 89 compile-byte
+        swap 3 shift BIN: 101 bitor compile-byte
+    ] ifte compile-cell ;
 
 : [R]>R ( reg reg -- )
     #! MOV INDIRECT <reg> TO <reg>.
@@ -89,6 +89,36 @@ USE: combinators
     compile-cell
     compile-cell ;
 
+: R-I ( imm reg -- )
+    #! SUBTRACT <imm> FROM <reg>, STORE RESULT IN <reg>
+    over -128 127 between? [
+        HEX: 83 compile-byte
+        HEX: e8 + compile-byte
+        compile-byte
+    ] [
+        dup EAX = [
+            drop HEX: 2d compile-byte
+        ] [
+            HEX: 81 compile-byte
+            BIN: 11101000 bitor
+        ] ifte
+        compile-cell
+    ] ifte ;
+
+: CMP-I-[R] ( imm reg -- )
+    #! There are two forms of CMP we assemble
+    #! 83 38 03                cmpl   $0x3,(%eax)
+    #! 81 38 33 33 33 00       cmpl   $0x333333,(%eax)
+    over -128 127 between? [
+        HEX: 83 compile-byte
+        HEX: 38 + compile-byte
+        compile-byte
+    ] [
+        HEX: 81 compile-byte
+        HEX: 38 + compile-byte
+        compile-cell
+    ] ifte ;
+
 : LITERAL ( cell -- )
     #! Push literal on data stack.
     #! Assume that it is ok to clobber EAX without saving.
@@ -100,33 +130,36 @@ USE: combinators
     #! Push literal on data stack by following an indirect
     #! pointer.
     ECX PUSH
-    ( cell -- ) ECX I>R
-    ECX ECX [R]>R
+    ( cell -- ) ECX [I]>R
     DATASTACK EAX [I]>R
     ECX EAX R>[R]
     4 DATASTACK I+[I]
     ECX POP ;
 
 : POP-DS ( -- )
-    #! Pop datastack into EAX.
-    ( ECX PUSH )
-    DATASTACK ECX I>R
-    ! LEA...
-    HEX: 8d compile-byte HEX: 41 compile-byte HEX: fc compile-byte
-    EAX DATASTACK R>[I]
-    EAX EAX [R]>R
-    ( ECX POP ) ;
+    #! Pop datastack, store pointer to datastack top in EAX.
+    DATASTACK EAX [I]>R
+    4 EAX R-I
+    EAX DATASTACK R>[I] ;
 
-: (JUMP) ( xt opcode -- )
-    #! JMP, CALL insn is 5 bytes long
+: fixup ( addr where -- )
+    #! Encode a relative offset to addr from where at where.
+    #! Add 4 because addr is relative to *after* insn.
+    dup >r 4 + - r> set-compiled-cell ;
+
+: (JUMP) ( xt -- fixup )
     #! addr is relative to *after* insn
-    compile-byte  compiled-offset 4 + - compile-cell ;
+    compiled-offset dup >r 4 + - compile-cell r> ;
 
-: JUMP ( -- )
-    HEX: e9 (JUMP) ;
+: JUMP ( xt -- fixup )
+    #! Push address of branch for fixup
+    HEX: e9 compile-byte  (JUMP) ;
 
-: CALL ( -- )
-    HEX: e8 (JUMP) ;
+: CALL ( xt -- fixup )
+    HEX: e8 compile-byte  (JUMP) ;
+
+: JE ( xt -- fixup )
+    HEX: 0f compile-byte HEX: 84 compile-byte (JUMP) ;
 
 : RET ( -- )
     HEX: c3 compile-byte ;

@@ -15,8 +15,6 @@ void critical_error(char* msg, CELL tagged)
 
 void fix_stacks(void)
 {
-	fprintf(stderr,"%x\n",ds);
-	fprintf(stderr,"%x\n",ds_bot);
 	if(STACK_UNDERFLOW(ds,ds_bot)
 		|| STACK_OVERFLOW(ds,ds_bot))
 		reset_datastack();

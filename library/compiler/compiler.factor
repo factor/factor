@@ -26,42 +26,64 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: math
-USE: stack
-USE: lists
 USE: combinators
-USE: words
-USE: namespaces
-USE: unparser
 USE: errors
-USE: strings
-USE: logic
 USE: kernel
+USE: lists
+USE: logic
+USE: math
+USE: namespaces
+USE: parser
+USE: stack
+USE: strings
+USE: unparser
 USE: vectors
+USE: words
 
 : pop-literal ( -- obj )
     "compile-datastack" get vector-pop ;
 
+: immediate? ( obj -- ? )
+    #! fixnums and f have a pointerless representation, and
+    #! are compiled immediately. Everything else can be moved
+    #! by GC, and is indexed through a table.
+    dup fixnum? swap f eq? or ;
+
 : compile-literal ( obj -- )
-    dup fixnum? [
+    dup immediate? [
         address-of LITERAL
     ] [
         intern-literal [LITERAL]
     ] ifte ;
 
 : commit-literals ( -- )
-    "compile-datastack" get dup [ compile-literal ] vector-each
-    0 swap set-vector-length ;
+    "compile-datastack" get
+    dup vector-empty? [
+        drop
+    ] [
+        dup [ compile-literal ] vector-each
+        0 swap set-vector-length
+    ] ifte ;
 
 : postpone ( obj -- )
     #! Literals are not compiled immediately, so that words like
     #! ifte with special compilation behavior can work.
     "compile-datastack" get vector-push ;
 
+: tail? ( -- ? )
+    "compile-callstack" get vector-empty? ;
+
+: compiled-xt ( word -- xt )
+    "compiled-xt" over word-property dup [
+        nip
+    ] [
+        drop word-xt
+    ] ifte ;
+
 : compile-simple-word ( word -- )
     #! Compile a JMP at the end (tail call optimization)
-    commit-literals word-xt
-    "compile-last" get [ JUMP ] [ CALL ] ifte ;
+    commit-literals compiled-xt
+    tail? [ JUMP ] [ CALL ] ifte drop ;
 
 : compile-word ( word -- )
     #! If a word has a compiling property, then it has special
@@ -72,32 +94,54 @@ USE: vectors
         drop compile-simple-word
     ] ifte ;
 
-: compile-atom ( obj -- )
+: begin-compiling-quot ( quot -- )
+    "compile-callstack" get vector-push ;
+
+: end-compiling-quot ( -- )
+    "compile-callstack" get vector-pop drop ;
+
+: compiling ( quot -- )
+    #! Called on each iteration of compile-loop, with the
+    #! remaining quotation.
     [
-        [ word? ] [ compile-word ]
-        [ drop t ] [ postpone ]
-    ] cond ;
+        "compile-callstack" get
+        dup vector-length pred
+        swap set-vector-nth
+    ] [
+        end-compiling-quot
+    ] ifte* ;
+
+: compile-atom ( obj -- )
+    dup word? [ compile-word ] [ postpone ] ifte ;
 
 : compile-loop ( quot -- )
-    dup [
-        unswons
-        over not "compile-last" set
-        compile-atom
-        compile-loop
-    ] [
-        commit-literals drop RET
-    ] ifte ;
-
-: compile-quot ( quot -- xt )
     [
-        "compile-last" off
+        uncons  dup compiling  swap compile-atom  compile-loop
+    ] when* ;
+
+: compile-quot ( quot -- )
+    [
+        dup begin-compiling-quot compile-loop commit-literals
+    ] when* ;
+
+: with-compiler ( quot -- )
+    [
         10 <vector> "compile-datastack" set
-        compiled-offset swap compile-loop
+        10 <vector> "compile-callstack" set
+        call
     ] with-scope ;
 
-: compile ( word -- )
-    intern dup word-parameter compile-quot swap set-word-xt ;
+: begin-compiling ( word -- )
+    compiled-offset "compiled-xt" rot set-word-property ;
 
-: call-xt ( xt -- )
-    #! For testing.
-    0 f f <word> [ set-word-xt ] keep execute ;
+: end-compiling ( word -- xt )
+    "compiled-xt" over word-property over set-word-xt
+    f "compiled-xt" rot set-word-property ;
+
+: compile ( word -- )
+    intern dup
+    begin-compiling
+    dup word-parameter [ compile-quot RET ] with-compiler
+    end-compiling ;
+
+: compiled word compile ; parsing

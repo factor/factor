@@ -3,10 +3,15 @@
 CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
-	if(tag != OBJECT_TYPE)
-		return tag;
+	if(tag == OBJECT_TYPE)
+	{
+		if(tagged == F)
+			return F_TYPE;
+		else
+			return untag_header(get(UNTAG(tagged)));
+	}
 	else
-		return untag_header(get(UNTAG(tagged)));
+		return tag;
 }
 
 bool typep(CELL type, CELL tagged)
@@ -67,13 +72,15 @@ CELL object_size(CELL pointer)
 CELL untagged_object_size(CELL pointer)
 {
 	CELL size;
-	
+
+	if(pointer == F)
+		return 0;
+
 	switch(untag_header(get(pointer)))
 	{
 	case WORD_TYPE:
 		size = sizeof(WORD);
 		break;
-	case F_TYPE:
 	case T_TYPE:
 		size = CELLS * 2;
 		break;

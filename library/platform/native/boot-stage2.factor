@@ -134,6 +134,7 @@ USE: stdio
     "/library/compiler/assembler.factor"
     "/library/compiler/assembly-x86.factor"
     "/library/compiler/compiler.factor"
+    "/library/compiler/words.factor"
 
     "/library/platform/native/primitives.factor"
 

@@ -111,7 +111,7 @@ void primitive_set_word_allot_count(void)
 
 void fixup_word(WORD* word)
 {
-	word->xt = primitive_to_xt(word->primitive);
+	update_xt(word);
 	fixup(&word->parameter);
 	fixup(&word->plist);
 }
