@@ -73,9 +73,11 @@ USE: hashtables
 
     "traits" [ "generic" ] search
     "delegate" [ "generic" ] search
+    "object" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind
 
+    reveal
     reveal
     reveal
 

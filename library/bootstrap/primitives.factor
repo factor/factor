@@ -34,6 +34,7 @@ USE: parser
 USE: words
 USE: vectors
 USE: hashtables
+USE: generic
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab

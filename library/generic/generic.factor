@@ -205,7 +205,7 @@ SYMBOL: object
     #! interpretation, but instructs the compiler that the value
     #! at the top of the stack is statically-known to be of the
     #! given type. Promises should only be used by kernel code.
-    dup word-name "%" swap cat2 "in" get create
+    dup word-name "%" swap cat2 "kernel-internals" create
     dup [ ] define-compound
     swap "promise" set-word-property ;
 
