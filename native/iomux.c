@@ -111,11 +111,6 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 
 bool perform_read_line_io_task(PORT* port)
 {
-	if(port->line == F)
-		port->line = tag_object(sbuf(LINE_SIZE));
-	else
-		untag_sbuf(port->line)->top = 0;
-
 	if(port->buf_pos >= port->buf_fill)
 	{
 		if(!read_step(port))
@@ -126,6 +121,7 @@ bool perform_read_line_io_task(PORT* port)
 	{
 		/* EOF */
 		port->line = F;
+		port->line_ready = true;
 		return true;
 	}
 	else

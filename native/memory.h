@@ -15,11 +15,19 @@ ZONE* zalloc(CELL size);
 void init_arena(CELL size);
 void flip_zones();
 
-void* allot(CELL a);
+void check_memory(void);
 
 INLINE CELL align8(CELL a)
 {
 	return ((a & 7) == 0) ? a : ((a + 8) & ~7);
+}
+
+INLINE void* allot(CELL a)
+{
+	CELL h = active->here;
+	active->here += align8(a);
+	check_memory();
+	return (void*)h;
 }
 
 INLINE CELL get(CELL where)

@@ -1,8 +1,8 @@
 0.62:
 
-- read-line: handle \r\n
-- ignore errors from flush
-- can-read-line?
+- gc call in the middle of some ops might affect callstack
+- sending ^C on socket
+- postpone errors until actual read/write op
 - vector-each/map examples
 - unparse examples
 - finish second practical
@@ -83,7 +83,7 @@
 
 + httpd:
 
-- httpd: don't flush so much
+- if user clicks stop in browser, doesn't stop sending?
 - log with date
 - log user agent
 - add a socket timeout

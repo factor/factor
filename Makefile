@@ -1,5 +1,5 @@
 CC = gcc34
-CFLAGS = -Os -march=pentium4 -Wall -Wno-long-long
+CFLAGS = -Os -march=pentium4 -Wall -Wno-long-long -fomit-frame-pointer
 LIBS = -lm
 STRIP = strip
 

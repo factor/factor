@@ -8,7 +8,13 @@ void init_io(void)
 
 bool can_read_line(PORT* port)
 {
-	return false;
+	if(port->line_ready)
+		return true;
+	else
+	{
+		read_line_step(port);
+		return port->line_ready;
+	}
 }
 
 void primitive_can_read_line(void)
@@ -43,32 +49,61 @@ bool read_line_step(PORT* port)
 	int i;
 	char ch;
 
-	SBUF* line = untag_sbuf(port->line);
+	SBUF* line;
+
+	if(port->line == F)
+	{
+		line = sbuf(LINE_SIZE);
+		port->line = tag_object(line);
+	}
+	else
+	{
+		line = untag_sbuf(port->line);
+		line->top = 0;
+	}
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
 		ch = bget((CELL)port->buffer + sizeof(STRING) + i);
+
+		if(ch == '\r')
+		{
+			if(i != port->buf_fill - 1)
+			{
+				ch = bget((CELL)port->buffer
+					+ sizeof(STRING) + i + 1);
+				if(ch == '\n')
+					i++;
+			}
+		}
+
 		if(ch == '\n')
 		{
 			port->buf_pos = i + 1;
+			port->line_ready = true;
 			return true;
 		}
 		else
 			set_sbuf_nth(line,line->top,ch);
 	}
 
-	port->buf_pos = port->buf_fill;
-
 	/* We've reached the end of the above loop, without seeing a newline
 	or EOF, so read again */
+	port->line_ready = false;
 	return false;
 }
 
 void primitive_read_line_fd_8(void)
 {
 	PORT* port = untag_port(dpeek());
-	drepl(port->line);
-	port->line = F;
+	if(port->line_ready)
+	{
+		drepl(port->line);
+		port->line = F;
+		port->line_ready = false;
+	}
+	else
+		io_error(port,__FUNCTION__);
 
 }
 

@@ -24,7 +24,7 @@ ZONE* zalloc(CELL size)
 	ZONE* z = (ZONE*)malloc(sizeof(ZONE));
 	if(z == 0)
 		fatal_error("Cannot allocate zone header",size);
-	z->base = z->here = (CELL)malloc(size);
+	z->base = z->here = align8((CELL)malloc(size));
 	if(z->base == 0)
 		fatal_error("Cannot allocate zone",size);
 	z->limit = z->base + size;
@@ -40,28 +40,23 @@ void init_arena(CELL size)
 	active = z1;
 }
 
-void* allot(CELL a)
+void check_memory(void)
 {
-	CELL h = active->here;
-	active->here = align8(active->here + a);
+	if(active->here > active->alarm)
+	{
+		if(active->here > active->limit)
+		{
+			printf("Out of memory\n");
+			printf("active->base  = %ld\n",active->base);
+			printf("active->here  = %ld\n",active->here);
+			printf("active->limit = %ld\n",active->limit);
+			exit(1);
+		}
 
-	if(active->here > active->limit)
-	{
-		printf("Out of memory\n");
-		printf("active->base  = %ld\n",active->base);
-		printf("active->here  = %ld\n",active->here);
-		printf("active->limit = %ld\n",active->limit);
-		printf("request       = %ld\n",a);
-		exit(1);
-	}
-	else if(active->here > active->alarm)
-	{
 		/* Execute the 'garbage-collection' word */
 		cpush(env.cf);
 		env.cf = env.user[GC_ENV];
 	}
-
-	return (void*)h;
 }
 
 void flip_zones()

@@ -8,6 +8,8 @@ typedef struct {
 	STRING* buffer;
 	/* tagged partial line used by read_line_fd */
 	CELL line;
+	/* is it ready to be returned? */
+	bool line_ready;
 	/* tagged client info used by accept_fd */
 	CELL client_host;
 	CELL client_port;

@@ -22,6 +22,7 @@ PORT* port(PORT_MODE type, CELL fd)
 	port->client_port = F;
 	port->client_socket = F;
 	port->line = F;
+	port->line_ready = false;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
 
