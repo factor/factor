@@ -31,7 +31,7 @@ USE: kernel
 USE: math
 USE: math-internals
 
-: >rect ( x -- xr xi ) dup real swap imaginary ;
+: >rect ( x -- xr xi ) dup real swap imaginary ; inline
 
 : conjugate ( z -- z* )
     >rect neg rect> ;
@@ -53,7 +53,7 @@ IN: math-internals
 
 : 2>rect ( x y -- xr yr xi yi )
     [ swap real swap real ] 2keep
-    swap imaginary swap imaginary ;
+    swap imaginary swap imaginary ; inline
 
 M: complex number= ( x y -- ? )
     2>rect number= [ number= ] [ 2drop f ] ifte ;

@@ -37,14 +37,9 @@
 + listener/plugin:
 
 - faster completion
-- word added >1 if external instance dies
 - sidekick: still parsing too much
 - errors don't always disappear
-- console: wrong history
-- listener: if too many things popped off the stack, complain
 - NPE in ErrorHighlight
-- some way to not have previous definitions from a source file
-  clutter the namespace
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:

@@ -62,7 +62,7 @@ global [
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
     >r read dup [
-        (parse) depth r> dup >r = [
+        (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
         ] [
             ( more input needed ) r> cont-prompt get prompt.

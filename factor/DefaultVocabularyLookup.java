@@ -188,6 +188,14 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		}
 	} //}}}
 
+	//{{{ forget() method
+	public void forget(FactorWord word)
+	{
+		Map vocab = (Map)vocabularies.get(word.vocabulary);
+		if(vocab != null)
+			vocab.remove(word.name);
+	} //}}}
+
 	//{{{ getVocabularies() method
 	public Cons getVocabularies()
 	{

@@ -36,8 +36,11 @@ public interface VocabularyLookup
 {
 	public FactorWord define(String in, String word)
 		throws Exception;
+
 	public FactorWord searchVocabulary(Cons use, String word)
 		throws Exception;
+
+	public void forget(FactorWord word);
 
 	/**
 	 * @param vocab The vocabulary name

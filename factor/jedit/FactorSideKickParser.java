@@ -40,14 +40,12 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
-	private Map previewMap;
-
 	/**
-	 * When we parse a file, we store the <word,worddef> pairs in this
-	 * map, so that completion popups show the latest stack effects,
-	 * and not whatever they were the last time the source was run-file'd.
+	 * We store the file's parse tree in this property.
 	 */
-	private Map worddefs;
+	public static String PARSED_PROPERTY = "factor-parsed";
+
+	private Map previewMap;
 
 	//{{{ FactorSideKickParser constructor
 	public FactorSideKickParser()
@@ -100,6 +98,9 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
+		Cons parsed = (Cons)buffer.getProperty(PARSED_PROPERTY);
+		removeWordDefinitions(parsed);
+
 		FactorParsedData d = new FactorParsedData(
 			this,buffer.getPath());
 
@@ -126,12 +127,14 @@ public class FactorSideKickParser extends SideKickParser
 				errorSource);
 			FactorReader r = new FactorReader(scanner,
 				false,FactorPlugin.getExternalInstance());
-	
-			Cons parsed = r.parse();
-	
+
+			parsed = r.parse();
+
 			d.in = r.getIn();
 			d.use = r.getUse();
 	
+			buffer.setProperty(PARSED_PROPERTY,parsed);
+
 			addWordDefNodes(d,parsed,buffer);
 		}
 		catch(FactorParseException pe)
@@ -151,9 +154,23 @@ public class FactorSideKickParser extends SideKickParser
 		return d;
 	} //}}}
 
+	//{{{ removeWordDefinitions() method
+	private void removeWordDefinitions(Cons parsed)
+	{
+		while(parsed != null)
+		{
+			Object obj = parsed.car;
+			if(obj instanceof FactorWordDefinition)
+			{
+				FactorPlugin.getExternalInstance().forget(
+					((FactorWordDefinition)obj).word);
+			}
+			parsed = parsed.next();
+		}
+	} //}}}
+
 	//{{{ addWordDefNodes() method
-	private void addWordDefNodes(SideKickParsedData d, Cons parsed,
-		Buffer buffer)
+	private void addWordDefNodes(FactorParsedData d, Cons parsed, Buffer buffer)
 	{
 		FactorAsset last = null;
 
@@ -171,10 +188,8 @@ public class FactorSideKickParser extends SideKickParser
 				int startLine = Math.min(
 					buffer.getLineCount() - 1,
 					word.line - 1);
-				int startLineLength = buffer.getLineLength(
-					startLine);
-				int startCol = Math.min(word.col,
-					startLineLength);
+				int startLineLength = buffer.getLineLength(startLine);
+				int startCol = Math.min(word.col,startLineLength);
 
 				int start = buffer.getLineStartOffset(startLine)
 					+ startCol;

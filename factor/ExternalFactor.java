@@ -185,34 +185,34 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	public synchronized FactorWord searchVocabulary(Cons vocabulary, String name)
 	{
 		FactorWord w = super.searchVocabulary(vocabulary,name);
+
 		if(w != null)
 			return w;
 
+		if(closed)
+			return define("#<unknown>",name);
+
 		try
 		{
-			if(!closed)
-			{
-				Cons result = parseObject(eval(FactorReader.unparseObject(name)
-					+ " "
-					+ FactorReader.unparseObject(vocabulary)
-					+ " jedit-lookup ."));
-				if(result.car == null)
-					return null;
-	
-				result = (Cons)result.car;
-				w = new FactorWord(
-					(String)result.car,
-					(String)result.next().car);
-				w.stackEffect = (String)result.next().next().car;
-				return w;
-			}
+			Cons result = parseObject(eval(FactorReader.unparseObject(name)
+				+ " "
+				+ FactorReader.unparseObject(vocabulary)
+				+ " jedit-lookup ."));
+			if(result.car == null)
+				return null;
+
+			result = (Cons)result.car;
+			w = new FactorWord(
+				(String)result.car,
+				(String)result.next().car);
+			w.stackEffect = (String)result.next().next().car;
+			return w;
 		}
 		catch(Exception e)
 		{
 			Log.log(Log.ERROR,this,e);
+			return null;
 		}
-
-		return new FactorWord("unknown",name);
 	} //}}}
 
 	//{{{ getCompletions() method

@@ -40,6 +40,9 @@ USE: math-internals
 
 ! A simple single-dispatch generic word system.
 
+! "if I say I'd rather eat cheese than shit... doesn't mean
+! those are the only two things I can eat." - Tac
+
 : predicate-word ( word -- word )
     word-name "?" cat2 "in" get create ;
 
