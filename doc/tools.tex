@@ -1,0 +1,293 @@
+\documentclass{article}
+\usepackage{times}
+\usepackage{tabularx}
+\usepackage{alltt}
+
+\newcommand{\ttbs}{\char'134}
+\begin{document}
+
+\title{The Factor Development Environment}
+\author{Slava Pestov}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This article covers the interactive development environment for the Factor programming language, whose homepage is located at \texttt{http://factor.sf.net}.
+
+Factor supports interactive development in a live environment. Instead of working with
+static executable files and restarting your application after each change, you can
+incrementally make changes to your application and test them immediately. If you
+notice an undesirable behavior, Factor's powerful reflection features will aid in
+pinpointing the error.
+
+\section{System organization}
+
+\subsection{The listener}
+
+Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. I will have more to say about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
+
+\begin{alltt}
+./f factor.image
+\textbf{Loading factor.image... relocating... done
+Factor 0.73 :: http://factor.sourceforge.net :: unix/x86
+(C) 2003, 2005 Slava Pestov, Chris Double,
+Mackenzie Straight
+ok}
+\end{alltt}
+
+
+An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating the listener is ready to execute Factor phrases. The listener is a piece of Factor code, like any other; however, it helps to think of it as the primary interface to the Factor system. The listener reads Factor code and executes it. You can try the classical first program:
+
+\begin{alltt}
+\textbf{ok} "Hello, world." print
+\textbf{Hello, world.}
+\end{alltt}
+
+
+Multi-line phrases are supported; if there are unclosed brackets, the listener outputs \texttt{...} instead of the \texttt{ok} prompt, and the entire phrase is executed once all brackets are closed:
+
+\begin{alltt}
+\textbf{ok} [ 1 2 3 ] [
+\textbf{...} .
+\textbf{...} ] each
+\textbf{1
+2
+3}
+\end{alltt}
+
+The listener knows when to print a continuation prompt by looking at the height of the
+stack. Parsing words such as \texttt{[} and \texttt{:} leave elements on the parser
+stack; these elements are popped by \texttt{]} and \texttt{;}.
+
+\subsection{Source files}
+
+While it is possible to do all development in the listener and save your work in images, it is far more convenient to work with source files, at least until an in-image structure editor is developed.
+
+By convention, Factor source files are saved with the \texttt{.factor} filename extension. They can be loaded into the image as follows:
+
+\begin{alltt}
+\textbf{ok} "examples/numbers-game.factor" run-file
+\end{alltt}
+
+In Factor, loading a source file replaces any existing definitions\footnote{But see \ref{compiler} for this is not true of compiled code.}. Each word definition remembers what source file it was loaded from (if any). To reload the source file associated with a definition, use the \texttt{reload} word:
+
+\begin{alltt}
+\textbf{ok} \ttbs draw reload
+\end{alltt}
+
+Word definitions also retain the line number where they are located in their original source file. This allows you to open a word definition in jEdit\footnote{\texttt{http://www.jedit.org}} for editing using the
+\texttt{jedit} word:
+
+\begin{alltt}
+\textbf{ok} \ttbs compile jedit
+\end{alltt}
+
+This word requires that a jEdit instance is already running.
+
+For the \texttt{jedit} word to work with words in the Factor library, you must set the \texttt{"resource-path"} variable to the location of the Factor source tree. One way to do this is to add a phrase like the following to your \texttt{.factor-rc}:
+
+\begin{verbatim}
+"/home/slava/Factor/" "resource-path" set
+\end{verbatim}
+
+On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
+any quick definitions you want available at the listener there. To avoid loading this
+file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image, as described in the next section.
+
+\subsection{Images}
+
+The \texttt{factor.image} file is basically a dump of all objects in the heap. A new image can be saved as follows:
+
+\begin{alltt}
+\textbf{ok} "work.image" save-image
+\textbf{Saving work.image...}
+\end{alltt}
+
+When you save an image before exiting Factor, then start Factor again, everything will be almost as you left it. Try the following:
+
+\begin{alltt}
+./f factor.image
+\textbf{ok} "Learn Factor" "reminder" set
+\textbf{ok} "factor.image" save-image bye
+\textbf{Saving factor.image...}
+\end{alltt}
+
+Factor will save the image and exit. Now start it again and see that the reminder is still there:
+
+\begin{alltt}
+./f factor.image
+\textbf{ok} "reminder" get .
+\textbf{"Learn Factor"}
+\end{alltt}
+
+This is what is meant by the image being an \emph{infinite session}. When you shut down and restart Factor, what happends is much closer to a Laptop's ``suspend'' mode, than a desktop computer being fully shut down.
+
+\subsection{Looking at objects}
+
+. prints an object in almost-readable form
+printing numbers in other bases, [.], {.}
+we can inspect memory with  instances references heap-stats
+
+\section{Word tools}
+
+\subsection{Exploring vocabularies}
+
+Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
+
+Entering \texttt{vocabs.}~in the listener produces a list of all existing vocabularies:
+
+\begin{alltt}
+\textbf{ok} vocabs.
+\textbf{[ "alien" "ansi" "assembler" "browser-responder"
+"command-line" "compiler" "cont-responder" "errors"
+"file-responder" "files" "gadgets" "generic"
+"hashtables" "html" "httpd" "httpd-responder" "image"
+"inference" "interpreter" "io-internals" "jedit"
+"kernel" "kernel-internals" "line-editor" "listener"
+"lists" "logging" "math" "math-internals" "memory"
+"namespaces" "parser" "prettyprint" "profiler"
+"quit-responder" "random" "resource-responder"
+"scratchpad" "sdl" "shells" "stdio" "streams"
+"strings" "syntax" "telnetd" "test" "test-responder"
+"threads" "unparser" "url-encoding" "vectors" "words" ]}
+\end{alltt}
+
+As you can see, there are a lot of vocabularies! Now, you can use \texttt{words.}~to list the words inside a given vocabulary:
+
+\begin{alltt}
+\textbf{ok} "namespaces" words.
+\textbf{[ (get) , <namespace> >n append, bind change cons@
+dec extend get global inc init-namespaces list-buffer
+literal, make-list make-rlist make-rstring make-string
+make-vector n> namespace namestack nest off on put set
+set-global set-namestack unique, unique@ with-scope ]}
+\end{alltt}
+
+You can look at the definition of any word, including library words, using \texttt{see}. Keep in mind you might have to \texttt{USE:} the vocabulary first.
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} \ttbs httpd-connection see
+\textbf{IN: httpd : httpd-connection ( socket -- )
+    "http-server" get accept [
+        httpd-client
+    ] in-thread drop ;}
+\end{alltt}
+
+The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
+
+\subsection{Cross-referencing words}
+
+The \texttt{apropos.} word is handy when searching for related words. It lists all words
+whose names contain a given string. The \texttt{apropos.} word is also useful when you know the exact name of a word, but are unsure what vocabulary it is in. For example, if you're looking for ways to iterate over various collections, you can do an apropos search for \texttt{map}:
+
+\begin{alltt}
+\textbf{ok} "map" apropos.
+\textbf{IN: inference
+type-value-map
+IN: lists
+map
+map-with
+IN: sdl
+set-surface-map
+surface-map
+IN: strings
+string-map
+IN: vectors
+vector-map}
+\end{alltt}
+
+From the above output, you can see that \texttt{map} is for lists, \texttt{string-map} is for strings, and \texttt{vector-map} is for vectors.
+
+The \texttt{usages.} word finds all words that refer to a given word. This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it.
+
+\begin{alltt}
+\textbf{ok} \ttbs string-map usages.
+\textbf{IN: gadgets
+filter-nulls
+IN: html
+chars>entities
+IN: url-encoding
+url-encode}
+\end{alltt}
+
+\subsection{Browsing via the HTTP server}
+
+
+A more sophisticated way to browse the library is using the integrated HTTP server. You can start the HTTP server using the following pair of commands:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} 8888 httpd
+\end{alltt}
+
+Then, point your browser to the following URL, and start browsing:
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/inspect/vocabularies}
+\end{quote}
+
+To stop the HTTP server, point your browser to
+
+\begin{quote}
+\texttt{http://localhost:8888/responder/quit}.
+\end{quote}
+
+You can even start the HTTP in a separate thread, and look at code in your web browser while continuing to play in the listener:
+
+\begin{alltt}
+\textbf{ok} USE: httpd
+\textbf{ok} USE: threads
+\textbf{ok} [ 8888 httpd ] in-thread
+\end{alltt}
+
+\section{Dealing with runtime errors}
+
+Since Factor does very little ``static'' or compile-time checking, you will have to learn how to deal with and fix runtime errors. On the upside, the tools available are pretty nice.
+
+\subsection{The debugger}
+
+Talk about .s/.r/.n/.c, and how to read .r.
+
+If the execution of a phrase in the listener causes an error to be thrown, the error
+is printed and the stacks at the time of the error are saved. If you're spent any
+time with Factor at all, you are probably familiar with this type of message:
+
+\begin{alltt}
+\textbf{ok} "quadratic.factor" run-file
+\textbf{/home/slava/quadratic.factor:2: Not a number
+    2 * / neg ;
+       ^
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+The message there pretty much sums it up; you can look at the stacks at the time of the error, as well as look up variables in the scope that was active.
+
+In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool.
+
+\subsection{The walker}
+
+walker
+annotations: watch and break
+
+\subsection{Dealing with hangs}
+
+If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \textbf{Control-\ttbs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
+
+\subsection{Stack effect inference}
+
+\section{Optimization}
+
+\subsection{Timing code}
+
+\subsection{\label{compiler}The compiler}
+
+precompile
+
+\subsection{The profiler}
+
+\end{document}

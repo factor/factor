@@ -36,9 +36,6 @@ prettyprint strings test vectors words ;
 ! Hitype -vs- hitype
 [ ] [ [ "hello" vector-length ] [ drop ] catch ] unit-test
 
-! f -vs- lotype
-[ ] [ [ f car ] [ drop ] catch ] unit-test
-
 ! f -vs- hitype
 [ ] [ [ f vector-length ] [ drop ] catch ] unit-test
 

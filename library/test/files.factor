@@ -1,5 +1,6 @@
 IN: scratchpad
 USE: files
+USE: httpd
 USE: lists
 USE: test
 

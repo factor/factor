@@ -1,3 +1,10 @@
+I wrote down some issues I found while reading the devel-guide.pdf:
+- page 10, colon definition first paragraph: "colon definitino" -> "colon definition"
+- p. 18 and 19, quadratic-d and the following table: the swap before sq should be rot
+- p. 67, definition of class: "distinglishes" -> "distinguishes"
+- p. 69, last paragraph: "user defined tupes" -> "user defined tuples"
+- p. 70, definition of false(f): "sigleton" -> "singleton"
+
 + plugin:
 
 - word preview for remote words

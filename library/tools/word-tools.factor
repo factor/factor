@@ -61,15 +61,6 @@ M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
     #! List all words that contain a string.
     vocabs [ vocab-apropos. ] each-with ;
 
-: in. ( -- )
-    #! Print the vocabulary where new words are added in
-    #! interactive parsers.
-    "in" get print ;
-
-: use. ( -- )
-    #! Print the vocabulary search path for interactive parsers.
-    "use" get . ;
-
 : vocabs. ( -- )
     vocabs . ;
 

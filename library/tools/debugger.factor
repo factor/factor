@@ -140,7 +140,6 @@ M: object error. ( error -- )
     [ print-error die ] >c
     [ dup save-error rethrow ] 5 setenv ( kernel calls on error )
     kernel-error 12 setenv ;
-    
 
 M: no-method error. ( error -- )
     [
