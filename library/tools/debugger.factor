@@ -59,23 +59,11 @@ USE: generic
     "I/O error in kernel function " write
     unswons write ": " write car print ;
 
-: type-error-name ( n -- string )
-    #! These values are only used by the kernel for error
-    #! reporting.
-    dup [
-        [ 100 | "fixnum/bignum" ]
-        [ 104 | "fixnum/bignum/string" ]
-    ] assoc dup [
-        nip
-    ] [
-        drop type-name
-    ] ifte ;
-
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write type type-error-name print
-    "Expected type: " write type-error-name print ;
+    "Object type: " write class .
+    "Expected type: " write type-name print ;
 
 : range-error ( list -- )
     "Range check error" print
@@ -131,18 +119,6 @@ M: kernel-error error. ( error -- )
 
 M: string error. ( error -- )
     print ;
-
-TRAITS: chained-error
-SYMBOL: original-error
-
-C: chained-error ( original chain -- )
-    [ chained-error set original-error set ] extend ;
-
-M: chained-error error. ( error -- )
-    [
-        chained-error get error.
-        " " [ original-error get error. ] with-prefix
-    ] bind ;
 
 M: object error. ( error -- )
     . ;

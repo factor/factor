@@ -161,11 +161,14 @@ SYMBOL: object
 : type-intersection ( list list -- list )
     intersection [ > ] sort ;
 
+: lookup-union ( typelist -- class )
+    classes get hash [ object ] unless* ;
+
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
     swap builtin-supertypes
     swap builtin-supertypes
-    type-union classes get hash [ object ] unless* ;
+    type-union lookup-union ;
 
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or raise an
@@ -173,7 +176,7 @@ SYMBOL: object
     over builtin-supertypes
     over builtin-supertypes
     type-intersection dup [
-        nip nip classes get hash [ object ] unless*
+        nip nip lookup-union
     ] [
         drop [
             word-name , " and " , word-name ,

@@ -16,7 +16,7 @@ void primitive_word(void)
 	maybe_garbage_collection();
 
 	word = allot_object(WORD_TYPE,sizeof(F_WORD));
-	word->hashcode = (CELL)word; /* initial address */
+	word->hashcode = tag_fixnum((CELL)word); /* initial address */
 	word->xt = (CELL)undefined;
 	word->primitive = 0;
 	word->parameter = F;

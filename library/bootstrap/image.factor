@@ -193,7 +193,7 @@ M: f ' ( obj -- ptr )
 : word, ( word -- )
     [
         word-tag >header ,
-        dup hashcode ,
+        dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
         dup word-parameter ' ,
@@ -288,13 +288,35 @@ M: string ' ( string -- pointer )
     ( elements -- ) [ emit ] each
     align-here r> ;
 
-M: vector ' ( vector -- pointer )
+: emit-vector ( vector -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
     emit ( length )
     emit ( array ptr )
     align-here r> ;
+
+M: vector ' ( vector -- pointer )
+    emit-vector ;
+
+: rehash ( hashtable -- )
+    ! Now make a rehashing boot quotation
+    dup hash>alist [
+        >r dup vector-length [
+            f swap pick set-vector-nth
+        ] times* r>
+        [ unswons pick set-hash ] each
+    ] cons cons
+    boot-quot [ append ] change ;
+
+M: hashtable ' ( hashtable -- pointer )
+    #! Only hashtables are pooled, not vectors!
+    dup pooled-object dup [
+        nip
+    ] [
+        drop [ dup emit-vector [ pool-object ] keep ] keep
+        rehash
+    ] ifte ;
 
 ( End of the image )
 
@@ -316,11 +338,11 @@ M: vector ' ( vector -- pointer )
     global-offset fixup ;
 
 : boot, ( quot -- )
-    boot-quot get ' boot-quot-offset fixup ;
+    boot-quot get swap append ' boot-quot-offset fixup ;
 
-: end ( -- )
-    boot,
+: end ( quot -- )
     global,
+    boot,
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -357,6 +379,7 @@ M: vector ' ( vector -- pointer )
     ] with-scope ;
 
 : with-image ( quot -- image )
+    #! The quotation leaves a boot quotation on the stack.
     [ begin call end ] with-minimal-image ;
 
 : test-image ( quot -- ) with-image vector>list . ;
@@ -364,8 +387,8 @@ M: vector ' ( vector -- pointer )
 : make-image ( name -- )
     #! Make an image for the C interpreter.
     [
+        boot-quot off
         "/library/bootstrap/boot.factor" run-resource
-        boot-quot set
     ] with-image
 
     swap write-image ;

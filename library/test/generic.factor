@@ -140,3 +140,5 @@ M: very-funny gooey sq ;
 [ number ] [ object number class-and ] unit-test
 
 [ t ] [ del1 builtin-supertypes [ integer? ] all? ] unit-test
+
+[ cons ] [ [ 1 2 ] class ] unit-test

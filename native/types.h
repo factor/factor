@@ -36,10 +36,6 @@ CELL T;
 
 #define TYPE_COUNT 17
 
-/* Pseudo-types. For error reporting only. */
-#define INTEGER_TYPE 100 /* F_FIXNUM or BIGNUM */
-#define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
-
 INLINE CELL tag_header(CELL cell)
 {
 	return RETAG(cell << TAG_BITS,HEADER_TYPE);

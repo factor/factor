@@ -160,11 +160,7 @@ DEFER: apply-word
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [
-        [ apply-object ] each
-    ] [
-        [ swap <chained-error> rethrow ] when*
-    ] catch ;
+    [ apply-object ] each ;
 
 : raise ( [ in | out ] -- [ in | out ] )
     uncons 2dup min tuck - >r - r> cons ;
@@ -190,7 +186,7 @@ DEFER: apply-word
     #! Set the base case of the current word.
     dup [
         car cdr [
-            entry-effect get swap decompose
+            [ effect ] bind entry-effect get swap decompose
             base-case set
         ] bind
     ] [
@@ -200,8 +196,7 @@ DEFER: apply-word
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get vector-length 0 = [
-        "Word leaves elements on return stack"
-        <chained-error> throw
+        "Word leaves elements on return stack" throw
     ] unless ;
 
 : values-node ( op -- )

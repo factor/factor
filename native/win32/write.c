@@ -48,7 +48,7 @@ void primitive_write_8 (void)
 		write_string_8(port, untag_string(text));
 		break;
 	default:
-		type_error(TEXT_TYPE, text);
+		type_error(STRING_TYPE, text);
 		break;
 	}
 }

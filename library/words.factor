@@ -37,7 +37,7 @@ USE: strings
 
 BUILTIN: word 1
 
-M: word hashcode 1 integer-slot ;
+M: word hashcode 1 slot ;
 
 : word-xt     ( w -- xt ) >word 2 integer-slot ; inline
 : set-word-xt ( xt w -- ) >word 2 set-integer-slot ; inline

@@ -103,11 +103,7 @@ USE: prettyprint
 : inline-compound ( word -- effect )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance.
-    [
-        gensym [ word-parameter infer-quot effect ] with-block
-    ] [
-        [ swap <chained-error> rethrow ] when*
-    ] catch ;
+    gensym [ word-parameter infer-quot effect ] with-block ;
 
 : infer-compound ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -198,3 +194,4 @@ M: symbol (apply-word) ( word -- )
 
 \ undefined-method t "terminator" set-word-property
 \ not-a-number t "terminator" set-word-property
+\ throw t "terminator" set-word-property

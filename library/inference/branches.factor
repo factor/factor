@@ -146,40 +146,29 @@ SYMBOL: cloned
 : terminator-quot? ( [ quot | type-prop ] -- ? )
     car literal-value [ terminator? ] some? ;
 
-: dual-branch ( branchlist branch -- rstate )
+: dual-branch ( branch branchlist -- rstate )
     #! Return a recursive state for a branch other than the
     #! given one in the list.
-    swap [ over eq? not ] subset nip car car value-recursion ;
+    [ over eq? not ] subset nip car car value-recursion ;
 
-SYMBOL: dual-recursive-state
-
-: recursive-branch ( branchlist value -- namespace )
-    #! Return effect namespace if inference didn't fail.
+: recursive-branch ( branch branchlist -- )
     [
-        [ dual-branch dual-recursive-state set ] keep
-        infer-branch
+        dupd dual-branch >r infer-branch r> set-base
     ] [
-        [ 2drop f ] when
+        [ 2drop ] when
     ] catch ;
 
-: infer-base-cases ( branchlist -- list )
-    dup [ dupd recursive-branch ] map [ ] subset nip ;
-
 : infer-base-case ( branchlist -- )
-    #! Can't do much if there is only one non-terminator branch.
-    #! Either the word is not recursive, or it is recursive
-    #! and the base case throws an error.
     [
         inferring-base-case on
 
-        [ terminator-quot? not ] subset dup length 1 > [
-            infer-base-cases unify-effects
-            effect dual-recursive-state get set-base
-        ] [
-            drop
-        ] ifte
-        
-        inferring-base-case off
+        dup [
+            2dup terminator-quot? [
+                2drop
+            ] [
+                recursive-branch
+            ] ifte
+        ] each drop
     ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )

@@ -9,7 +9,7 @@ F_FIXNUM to_integer(CELL x)
 	case BIGNUM_TYPE:
 		return s48_bignum_to_long(untag_bignum(x));
 	default:
-		type_error(INTEGER_TYPE,x);
+		type_error(BIGNUM_TYPE,x);
 		return 0;
 	}
 }
@@ -59,7 +59,7 @@ CELL to_cell(CELL x)
 		else
 			return s48_bignum_to_long(untag_bignum(x));
 	default:
-		type_error(INTEGER_TYPE,x);
+		type_error(BIGNUM_TYPE,x);
 		return 0;
 	}
 }

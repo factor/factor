@@ -140,7 +140,7 @@ void primitive_write_8(void)
 		write_string_8(port,str);
 		break;
 	default:
-		type_error(TEXT_TYPE,text);
+		type_error(STRING_TYPE,text);
 		break;
 	}
 }

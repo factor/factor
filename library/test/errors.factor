@@ -26,5 +26,3 @@ USE: stdio
 [ [ "2 car" ] parse ] [ print-error ] catch
 
 [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
-
-[ "cons" ] [ [ 1 2 ] type type-error-name ] unit-test
