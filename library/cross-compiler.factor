@@ -50,6 +50,8 @@ DEFER: alien-cell
 DEFER: set-alien-cell
 DEFER: alien-4
 DEFER: set-alien-4
+DEFER: alien-2
+DEFER: set-alien-2
 DEFER: alien-1
 DEFER: set-alien-1
 
@@ -370,6 +372,8 @@ IN: image
         set-alien-cell
         alien-4
         set-alien-4
+        alien-2
+        set-alien-2
         alien-1
         set-alien-1
     ] [

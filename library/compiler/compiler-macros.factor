@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,59 +25,35 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math
-USE: combinators
-USE: kernel
-USE: logic
-USE: math
-USE: real-math
-USE: stack
+IN: compiler
 
-: fib ( n -- nth fibonacci number )
-    ! This is the naive implementation, for benchmarking purposes.
-    dup 1 <= [
-        drop 1
-    ] [
-        pred dup fib swap pred fib +
-    ] ifte ;
+: LITERAL ( cell -- )
+    #! Push literal on data stack.
+    #! Assume that it is ok to clobber EAX without saving.
+    DATASTACK EAX [I]>R
+    EAX I>[R]
+    4 DATASTACK I+[I] ;
 
-: fac ( n -- n! )
-    ! This is the naive implementation, for benchmarking purposes.
-    1 swap [ succ * ] times* ;
+: [LITERAL] ( cell -- )
+    #! Push complex literal on data stack by following an
+    #! indirect pointer.
+    ECX PUSH-R
+    ( cell -- ) ECX [I]>R
+    DATASTACK EAX [I]>R
+    ECX EAX R>[R]
+    4 DATASTACK I+[I]
+    ECX POP-R ;
 
-: 2^ ( x -- 2^x )
-    1 swap [ 2 * ] times ;
+: PUSH-DS ( -- )
+    #! Push contents of EAX onto datastack.
+    ECX PUSH-R
+    DATASTACK ECX [I]>R
+    EAX ECX R>[R]
+    4 DATASTACK I+[I]
+    ECX POP-R ;
 
-: harmonic ( n -- 1 + 1/2 + 1/3 + ... + 1/n )
-    0 swap [ succ recip + ] times* ;
-
-: mag2 ( x y -- mag )
-    #! Returns the magnitude of the vector (x,y).
-    swap sq swap sq + fsqrt ;
-
-: abs ( z -- abs )
-    #! Compute the complex absolute value.
-    dup complex? [
-        >rect mag2
-    ] [
-        dup 0 < [ neg ] when
-    ] ifte ;
-
-: conjugate ( z -- z* )
-    >rect neg rect> ;
-
-: arg ( z -- arg )
-    #! Compute the complex argument.
-    >rect swap fatan2 ; inline
-
-: >polar ( z -- abs arg )
-    >rect 2dup mag2 transp fatan2 ;
-
-: cis ( theta -- cis )
-    dup fcos swap fsin rect> ;
-
-: polar> ( abs arg -- z )
-    cis * ; inline
-
-: align ( offset width -- offset )
-    2dup mod dup 0 = [ 2drop ] [ - + ] ifte ;
+: POP-DS ( -- )
+    #! Pop datastack, store pointer to datastack top in EAX.
+    DATASTACK EAX [I]>R
+    4 EAX R-I
+    EAX DATASTACK R>[I] ;

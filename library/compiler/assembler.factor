@@ -38,11 +38,7 @@ USE: stack
     compiled-offset literal-table + set-compiled-offset ;
 
 : compile-aligned ( n -- )
-    dup compiled-offset mod dup 0 = [
-        2drop
-    ] [
-        - compiled-offset + set-compiled-offset
-    ] ifte ;
+    compiled-offset swap align set-compiled-offset ;
 
 : intern-literal ( obj -- lit# )
     address-of

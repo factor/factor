@@ -83,11 +83,21 @@ INLINE void type_check(CELL type, CELL tagged)
 {
 	if(type < HEADER_TYPE)
 	{
-		if(TAG(tagged) != type)
-			type_error(type,tagged);
+		if(TAG(tagged) == type)
+			return;
 	}
-	else if(object_type(tagged) != type)
-		type_error(type,tagged);
+	else if(tagged == F)
+	{
+		if(type == F_TYPE)
+			return;
+	}
+	else if(TAG(tagged) == OBJECT_TYPE
+		&& object_type(tagged) == type)
+	{
+		return;
+	}
+
+	type_error(type,tagged);
 }
 
 void* allot_object(CELL type, CELL length);

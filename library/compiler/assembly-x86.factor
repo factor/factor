@@ -147,37 +147,6 @@ USE: combinators
         compile-cell
     ] ifte ;
 
-: LITERAL ( cell -- )
-    #! Push literal on data stack.
-    #! Assume that it is ok to clobber EAX without saving.
-    DATASTACK EAX [I]>R
-    EAX I>[R]
-    4 DATASTACK I+[I] ;
-
-: [LITERAL] ( cell -- )
-    #! Push complex literal on data stack by following an
-    #! indirect pointer.
-    ECX PUSH-R
-    ( cell -- ) ECX [I]>R
-    DATASTACK EAX [I]>R
-    ECX EAX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
-
-: PUSH-DS ( -- )
-    #! Push contents of EAX onto datastack.
-    ECX PUSH-R
-    DATASTACK ECX [I]>R
-    EAX ECX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
-
-: POP-DS ( -- )
-    #! Pop datastack, store pointer to datastack top in EAX.
-    DATASTACK EAX [I]>R
-    4 EAX R-I
-    EAX DATASTACK R>[I] ;
-
 : fixup ( addr where -- )
     #! Encode a relative offset to addr from where at where.
     #! Add 4 because addr is relative to *after* insn.

@@ -48,3 +48,9 @@ USE: lists
         -1 over shift swap -1 >bignum swap shift = and
     ] each
 ] unit-test
+
+[ 12 ] [ 11 4 align ] unit-test
+[ 12 ] [ 12 4 align ] unit-test
+[ 12 ] [ 10 2 align ] unit-test
+[ 14 ] [ 13 2 align ] unit-test
+[ 11 ] [ 11 1 align ] unit-test

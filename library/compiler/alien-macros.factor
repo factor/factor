@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,59 +25,27 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: math
-USE: combinators
-USE: kernel
-USE: logic
-USE: math
-USE: real-math
+IN: alien
+USE: compiler
+USE: lists
+USE: namespaces
 USE: stack
 
-: fib ( n -- nth fibonacci number )
-    ! This is the naive implementation, for benchmarking purposes.
-    dup 1 <= [
-        drop 1
-    ] [
-        pred dup fib swap pred fib +
-    ] ifte ;
+: UNBOX ( name -- )
+    #! Move top of datastack to C stack.
+    dlsym-self CALL drop
+    EAX PUSH-R ;
 
-: fac ( n -- n! )
-    ! This is the naive implementation, for benchmarking purposes.
-    1 swap [ succ * ] times* ;
+: BOX ( name -- )
+    #! Move EAX to datastack.
+    24 ESP R-I
+    EAX PUSH-R
+    dlsym-self CALL drop
+    28 ESP R+I ;
 
-: 2^ ( x -- 2^x )
-    1 swap [ 2 * ] times ;
+: PARAMETERS ( list -- )
+    #! Generate code for boxing a list of C types.
+    [ c-type [ "unboxer" get ] bind UNBOX ] each ;
 
-: harmonic ( n -- 1 + 1/2 + 1/3 + ... + 1/n )
-    0 swap [ succ recip + ] times* ;
-
-: mag2 ( x y -- mag )
-    #! Returns the magnitude of the vector (x,y).
-    swap sq swap sq + fsqrt ;
-
-: abs ( z -- abs )
-    #! Compute the complex absolute value.
-    dup complex? [
-        >rect mag2
-    ] [
-        dup 0 < [ neg ] when
-    ] ifte ;
-
-: conjugate ( z -- z* )
-    >rect neg rect> ;
-
-: arg ( z -- arg )
-    #! Compute the complex argument.
-    >rect swap fatan2 ; inline
-
-: >polar ( z -- abs arg )
-    >rect 2dup mag2 transp fatan2 ;
-
-: cis ( theta -- cis )
-    dup fcos swap fsin rect> ;
-
-: polar> ( abs arg -- z )
-    cis * ; inline
-
-: align ( offset width -- offset )
-    2dup mod dup 0 = [ 2drop ] [ - + ] ifte ;
+: RETURNS ( type -- )
+    c-type [ "boxer" get ] bind BOX ;

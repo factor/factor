@@ -8,6 +8,7 @@ USE: stack
 USE: strings
 USE: test
 USE: vectors
+USE: lists
 
 ! Various things that broke CFactor at various times.
 ! This should run without issue (and tests nothing useful)
@@ -32,3 +33,25 @@ USE: vectors
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
 
 10 [ [ -1000000 <sbuf> ] [ drop ] catch ] times
+
+! Make sure various type checks don't run into header untagging
+! problems etc.
+
+! Lotype -vs- lotype
+[ ] [ [ 4 car ] [ drop ] catch ] unit-test
+
+! Lotype -vs- hitype
+[ ] [ [ 4 vector-length ] [ drop ] catch ] unit-test
+[ ] [ [ [ 4 3 ] vector-length ] [ drop ] catch ] unit-test
+
+! Hitype -vs- lotype
+[ ] [ [ "hello" car ] [ drop ] catch ] unit-test
+
+! Hitype -vs- hitype
+[ ] [ [ "hello" vector-length ] [ drop ] catch ] unit-test
+
+! f -vs- lotype
+[ ] [ [ f car ] [ drop ] catch ] unit-test
+
+! f -vs- hitype
+[ ] [ [ f vector-length ] [ drop ] catch ] unit-test

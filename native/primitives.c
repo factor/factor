@@ -187,6 +187,8 @@ XT primitives[] = {
 	primitive_set_alien_cell,
 	primitive_alien_4,
 	primitive_set_alien_4,
+	primitive_alien_2,
+	primitive_set_alien_2,
 	primitive_alien_1,
 	primitive_set_alien_1
 };

@@ -228,6 +228,8 @@ USE: words
     [ set-alien-cell         | " n alien off -- " ]
     [ alien-4                | " alien off -- n " ]
     [ set-alien-4            | " n alien off -- " ]
+    [ alien-2                | " alien off -- n " ]
+    [ set-alien-2            | " n alien off -- " ]
     [ alien-1                | " alien off -- n " ]
     [ set-alien-1            | " n alien off -- " ]
 ] [

@@ -81,6 +81,11 @@ void primitive_alien(void)
 #endif
 }
 
+ALIEN* unbox_alien(void)
+{
+	return untag_alien(dpop())->ptr;
+}
+
 INLINE CELL alien_pointer(void)
 {
 	FIXNUM offset = unbox_integer();
@@ -130,6 +135,27 @@ void primitive_set_alien_4(void)
 	CELL ptr = alien_pointer();
 	CELL value = unbox_integer();
 	*(int*)ptr = value;
+#else
+	general_error(ERROR_FFI_DISABLED,F);
+#endif
+}
+
+void primitive_alien_2(void)
+{
+#ifdef FFI
+	CELL ptr = alien_pointer();
+	box_integer(*(CHAR*)ptr);
+#else
+	general_error(ERROR_FFI_DISABLED,F);
+#endif
+}
+
+void primitive_set_alien_2(void)
+{
+#ifdef FFI
+	CELL ptr = alien_pointer();
+	CELL value = unbox_integer();
+	*(CHAR*)ptr = value;
 #else
 	general_error(ERROR_FFI_DISABLED,F);
 #endif

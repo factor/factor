@@ -133,8 +133,11 @@ USE: stdio
 
     "/library/compiler/assembler.factor"
     "/library/compiler/assembly-x86.factor"
+    "/library/compiler/compiler-macros.factor"
     "/library/compiler/compiler.factor"
     "/library/compiler/words.factor"
+    "/library/compiler/alien-types.factor"
+    "/library/compiler/alien-macros.factor"
 
     "/library/platform/native/primitives.factor"
 
