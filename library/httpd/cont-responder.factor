@@ -45,9 +45,9 @@ USE: inspector
   #! Number of seconds to timeout continuations in
   #! continuation table. This value will need to be
   #! tuned. I leave it at 24 hours but it can be
-  #! higher/lower as needed. Default to 12 hours for
+  #! higher/lower as needed. Default to 15 minutes for
   #! testing.
-  12 3600 * ;
+  900 ;
 
 : redirect-enabled? 
   #! Set to true if you want the post-redirect-get pattern
