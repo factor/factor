@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: generic kernel math ;
+IN: dlists USING: generic kernel math ;
 
 ! Double-linked lists.
 
