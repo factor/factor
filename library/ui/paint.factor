@@ -1,12 +1,19 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl sdl-gfx ;
+USING: generic hashtables kernel lists math namespaces
+sdl sdl-gfx ;
 
 ! The painting protocol. Painting is controlled by various
 ! dynamically-scoped variables.
 
 ! "Paint" is a namespace containing some or all of these values.
+
+: paint-property ( gadget key -- value )
+    swap gadget-paint hash ;
+
+: set-paint-property ( gadget value key -- )
+    rot gadget-paint set-hash ;
 
 ! Colors are lists of three integers, 0..255.
 SYMBOL: foreground ! Used for text and outline shapes.
@@ -26,10 +33,6 @@ SYMBOL: font  ! a list of two elements, a font name and size.
 GENERIC: draw-shape ( obj -- )
 
 M: rectangle draw-shape drop ;
-
-M: point draw-shape ( point -- )
-    >r surface get r> dup point-x swap point-y
-    foreground get rgb pixelColor ;
 
 TUPLE: hollow-rect delegate ;
 

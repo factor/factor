@@ -55,7 +55,7 @@ C: border ( delegate size -- border )
     [ set-border-size ] keep [ set-border-delegate ] keep ;
 
 : standard-border ( child delegate -- border )
-    5 <border> [ box+ ] keep ;
+    5 <border> [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
     0 0 0 0 <rectangle> <gadget> standard-border ;
@@ -76,8 +76,8 @@ C: border ( delegate size -- border )
 
 : layout-border-w/h ( border -- )
     [
-        dup shape-h over border-size - >r
-        dup shape-w swap border-size - r>
+        dup shape-h over border-size 2 * - >r
+        dup shape-w swap border-size 2 * - r>
     ] keep
     gadget-children [ >r 2dup r> resize-gadget ] each 2drop ;
 

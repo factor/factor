@@ -14,4 +14,8 @@ USING: generic kernel lists math namespaces sdl ;
     dup [ dup button-released ] r> append
     [ button-up 1 ] set-action
     dup [ button-pressed ]
-    [ button-down 1 ] set-action ;
+    [ button-down 1 ] set-action
+    dup [ USE: prettyprint . "Mouse left" USE: stdio print ]
+    [ mouse-leave ] set-action
+    dup [ USE: prettyprint . "Mouse enter" USE: stdio print ]
+    [ mouse-enter ] set-action ;

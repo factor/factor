@@ -44,27 +44,41 @@ DEFER: world
 ! mouse button click state. The hand's parent is the world, but
 ! it is special in that the world does not list it as part of
 ! its contents.
-TUPLE: hand click-pos clicked buttons delegate ;
+TUPLE: hand click-pos clicked buttons gadget delegate ;
 
 C: hand ( world -- hand )
-    0 0 <point> <gadget>
+    0 0 0 0 <rectangle> <gadget>
     over set-hand-delegate
-    [ set-gadget-parent ] keep ;
-
-: motion-gesture ( gesture hand -- )
-    #! Send the gesture to the gadget at the hand's position in
-    #! the world.
-    world get pick-up handle-gesture ;
-
-: button-gesture ( gesture hand -- )
-    #! Send the gesture to the gadget at the hand's last click
-    #! position in the world. This is used to send a button up
-    #! to the gadget that was clicked, regardless of the mouse
-    #! position at the time of the button up.
-    hand-clicked handle-gesture ;
+    [ set-gadget-parent ] 2keep
+    [ set-hand-gadget ] keep ;
 
 : button/ ( n hand -- )
+    dup hand-gadget over set-hand-clicked
+    dup shape-pos over set-hand-click-pos
     [ hand-buttons unique ] keep set-hand-buttons ;
 
 : button\ ( n hand -- )
     [ hand-buttons remove ] keep set-hand-buttons ;
+
+: fire-leave ( hand -- )
+    dup hand-gadget [ swap shape-pos swap screen-pos - ] keep
+    mouse-leave ;
+
+: fire-enter ( oldpos hand -- )
+    hand-gadget [ screen-pos - ] keep
+    mouse-enter ;
+
+: gadget-at-hand ( hand -- gadget )
+    dup gadget-children [ car ] [ world get pick-up ] ?ifte ;
+
+: update-hand-gadget ( hand -- )
+    #! The hand gadget is the gadget under the hand right now.
+    dup gadget-at-hand [ swap set-hand-gadget ] keep ;
+
+: move-hand ( x y hand -- )
+    dup shape-pos >r
+    [ move-gadget ] keep
+    dup fire-leave
+    dup update-hand-gadget
+    [ motion ] swap handle-gesture
+    r> swap fire-enter ;

@@ -18,23 +18,19 @@ M: resize-event handle-event ( event -- )
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
     world get redraw ;
 
-: button-event-pos ( event -- point )
-    dup button-event-x swap button-event-y <point> ;
+: button-gesture ( button gesture -- [ gesture button ] )
+    swap unit append my-hand hand-clicked handle-gesture ;
 
 M: button-down-event handle-event ( event -- )
-    dup button-event-pos my-hand set-hand-click-pos
-    my-hand hand-click-pos world get pick-up
-    my-hand set-hand-clicked
     button-event-button dup my-hand button/
-    button-down swap 2list my-hand button-gesture ;
+    [ button-down ] button-gesture ;
 
 M: button-up-event handle-event ( event -- )
-    button-event-button
-    dup my-hand button\
-    button-up swap 2list my-hand button-gesture
-    f my-hand set-hand-clicked
-    f my-hand set-hand-click-pos ;
+    button-event-button dup my-hand button\
+    [ button-up ] button-gesture ;
+
+: motion-event-pos ( event -- x y )
+    dup motion-event-x swap motion-event-y ;
 
 M: motion-event handle-event ( event -- )
-    dup motion-event-x swap motion-event-y my-hand move-gadget
-    [ motion ] my-hand motion-gesture ;
+    motion-event-pos my-hand move-hand ;

@@ -49,28 +49,23 @@ GENERIC: resize-shape ( w h shape -- )
     #! Compute a list of running sums of heights of shapes.
     [ 0 swap [ over , shape-h + ] each ] make-list ;
 
-! A point is the simplest shape.
-TUPLE: point x y ;
+! A point, represented as a complex number, is the simplest
+! shape. It is not mutable and cannot be used as the delegate of
+! a gadget.
+: shape-pos ( shape -- pos )
+    dup shape-x swap shape-y rect> ;
 
-C: point ( x y -- point )
-    [ set-point-y ] keep [ set-point-x ] keep ;
+M: number inside? ( point point -- )
+    >r shape-pos r> = ;
 
-M: point inside? ( point point -- )
-    over shape-x over point-x = >r
-    swap shape-y swap point-y = r> and ;
-
-M: point shape-x point-x ;
-M: point shape-y point-y ;
-M: point shape-w drop 0 ;
-M: point shape-h drop 0 ;
-
-M: point move-shape ( x y point -- )
-    tuck set-point-y set-point-x ;
+M: number shape-x real ;
+M: number shape-y imaginary ;
+M: number shape-w drop 0 ;
+M: number shape-h drop 0 ;
 
 : translate ( point shape -- point )
     #! Translate a point relative to the shape.
-    over shape-y over shape-y - >r
-    swap shape-x swap shape-x - r> <point> ;
+    swap shape-pos swap shape-pos - ;
 
 ! A rectangle maps trivially to the shape protocol.
 TUPLE: rectangle x y w h ;
@@ -97,10 +92,10 @@ M: rectangle resize-shape ( w h rect -- )
     tuck set-rectangle-h set-rectangle-w ;
 
 : rectangle-x-extents ( rect -- x1 x2 )
-    dup rectangle-x x get + swap rectangle-w dupd + ;
+    dup rectangle-x x get + swap rectangle-w 1 - dupd + ;
 
 : rectangle-y-extents ( rect -- x1 x2 )
-    dup rectangle-y y get + swap rectangle-h dupd + ;
+    dup rectangle-y y get + swap rectangle-h 1 - dupd + ;
 
 M: rectangle inside? ( point rect -- ? )
     over shape-x over rectangle-x-extents between? >r

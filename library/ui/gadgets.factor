@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists namespaces ;
+USING: generic hashtables kernel lists math namespaces ;
 
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
@@ -17,18 +17,6 @@ C: gadget ( shape -- gadget )
     [ <namespace> swap set-gadget-gestures ] keep
     [ t swap set-gadget-relayout? ] keep
     [ t swap set-gadget-redraw? ] keep ;
-
-: paint-property ( gadget key -- value )
-    swap gadget-paint hash ;
-
-: set-paint-property ( gadget value key -- )
-    rot gadget-paint set-hash ;
-
-: action ( gadget gesture -- quot )
-    swap gadget-gestures hash ;
-
-: set-action ( gadget quot gesture -- )
-    rot gadget-gestures set-hash ;
 
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
@@ -50,20 +38,37 @@ C: gadget ( shape -- gadget )
 : resize-gadget ( w h gadget -- )
     [ resize-shape ] keep redraw ;
 
-: box- ( gadget box -- )
+: remove-gadget ( gadget box -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep
     relayout
     f swap set-gadget-parent ;
 
-: (box+) ( gadget box -- )
+: (add-gadget) ( gadget box -- )
     [ gadget-children cons ] keep set-gadget-children ;
 
 : unparent ( gadget -- )
-    dup gadget-parent dup [ box- ] [ 2drop ] ifte ;
+    dup gadget-parent dup [ remove-gadget ] [ 2drop ] ifte ;
 
-: box+ ( gadget box -- )
+: add-gadget ( gadget box -- )
     #! Add a gadget to a box.
     over unparent
     dup pick set-gadget-parent
-    tuck (box+)
+    tuck (add-gadget)
     relayout ;
+
+: each-parent ( gadget quot -- )
+    #! Apply quotation to each parent of the gadget in turn,
+    #! stopping when the quotation returns f.
+    [ call ] 2keep rot [
+        >r gadget-parent dup [
+            r> each-parent
+        ] [
+            r> 2drop
+        ] ifte
+    ] [
+        2drop
+    ] ifte ;
+
+: screen-pos ( gadget -- point )
+    #! The position of the gadget on the screen.
+    0 swap [ shape-pos + t ] each-parent ;
