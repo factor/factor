@@ -63,7 +63,7 @@ USE: unparser
 : } nreverse list>vector parsed ; parsing
 
 ! Do not execute parsing word
-: POSTPONE: ( -- ) scan parse-word parsed ; parsing
+: POSTPONE: ( -- ) scan-word parsed ; parsing
 
 ! Colon defs
 : CREATE
@@ -186,7 +186,7 @@ USE: unparser
 
 : BASE: ( base -- )
     #! Read a number in a specific base.
-    "base" get >r "base" set scan number, r> "base" set ;
+    scan swap str>integer parsed ;
 
 : HEX: 16 BASE: ; parsing
 : DEC: 10 BASE: ; parsing

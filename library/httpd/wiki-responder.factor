@@ -32,95 +32,41 @@ USE: html
 USE: lists
 USE: logic
 USE: kernel
+USE: math
 USE: namespaces
+USE: parser
 USE: regexp
 USE: stdio
 USE: stack
 USE: strings
+USE: words
 
 USE: httpd
 USE: httpd-responder
 
-: wiki-word-regexp ( -- regexp )
-    "((?:[A-Z][a-z0-9]*){2,})" ;
-
-: wiki-word? ( word -- ? )
-    wiki-word-regexp re-matches ;
-
-: wiki-word-links ( str -- str )
-    wiki-word-regexp "$1" "$1" re-replace ;
-
-: get-wiki-page ( name -- text )
-    "wiki" get [ get ] bind ;
-
-: write-wiki-page ( text -- )
-    [ chars>entities wiki-word-links write ] call ;
-
-: wiki-nodes ( -- alist )
-    "wiki" get [ vars-values ] bind ;
-
-: search-wiki ( string -- alist )
-    wiki-nodes [ dupd cdr str-contains? ] subset nip ;
-
-: get-category-text ( category -- text )
-    <% search-wiki [ car % "\n" % ] each %> ;
-
-: serve-category-page ( name text -- )
-    swap [ write-wiki-page ] html-document ;
-
-: wiki-footer ( name -- )
-    "<hr>" print
-    "Edit" swap "edit?" swap cat2 write ;
-
-: serve-existing-page ( name text -- )
-    over [ write-wiki-page wiki-footer ] html-document ;
-
-: wiki-editor ( name text -- )
-    "<form action='" write
-    swap write
-    "' method='post'>" print
-    "<textarea name='text' cols='64' rows='16'>" write
-    [ chars>entities write ] when*
-    "</textarea><p>" print
-    "<input type='Submit' value='Submit'></form>" write ;
-
-: serve-edit-page ( name text -- )
-    over [
-        over wiki-word? [
-            wiki-editor
-        ] [
-            drop "Not a wiki word: " write write
-        ] ifte
-    ] html-document ;
-
-: wiki-get-responder ( argument -- )
-    serving-html
-
-    dup "edit?" str-head? dup [
-        nip dup get-wiki-page serve-edit-page
-    ] [
-        drop dup "Category" str-head? [
-            dup get-category-text serve-category-page
-        ] [
-            dup get-wiki-page dup [
-                serve-existing-page
-            ] [
-                serve-edit-page
-            ] ifte
-        ] ifte
-    ] ifte ;
-
-: set-wiki-page ( name text -- )
-    "wiki" get [ put ] bind ;
-
-: wiki-post-responder ( argument -- )
-    #! Handle a page edit.
-    "response" get dup [
-        "text=" str-head? dup [
-            2dup set-wiki-page serve-existing-page
-        ] [
-            2drop bad-request
-        ] ifte
-    ] [
-        2drop bad-request
-    ] ifte ;
+! : wiki-word? ( word -- ? )
+!     #! A WikiWord starts with a capital and contains more than
+!     #! one capital letter.
+!     dup str-length 0 > [
+!         0 over str-nth LETTER? [
+!             0 swap [ LETTER? [ succ ] when ] str-each 1 = not
+!         ] [
+!             drop f
+!         ] ifte
+!     ] [
+!         drop f
+!     ] ifte ;
+! 
+! : wiki-formatting ( str -- )
+!     #! If a word with this name exists in the wiki-formatting
+!     #! vocabulary, its a special text style sequence.
+!     [ "wiki-formatting" ] search ;
+! 
+! : (wiki-parser) ( text -- )
+!     [
+!         scan dup wiki-word? [
+!             <a href= dup a> write </a>
+!         ] [
+!             write
+!         ] ifte " " write
+!     ] with-parser ;

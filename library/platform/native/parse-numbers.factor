@@ -50,52 +50,37 @@ USE: unparser
         [ drop t ] [ not-a-number ]
     ] cond ;
 
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+: digit ( num digit base -- num )
+    2dup <= [ rot * + ] [ not-a-number ] ifte ;
 
-: digit ( num digit -- num )
-    "base" get swap 2dup > [
-        >r * r> +
-    ] [
-        not-a-number
-    ] ifte ;
-
-: (str>integer) ( str -- num )
-    dup str-length 0 = [
+: (str>integer) ( str base -- num )
+    over str-length 0 = [
         not-a-number
     ] [
-        0 swap [ digit> digit ] str-each
+        0 rot [ digit> pick digit ] str-each nip
     ] ifte ;
 
-: str>integer ( str -- num )
-    #! Parse a string representation of an integer.
-    dup str-length 0 = [
-        drop not-a-number
+: str>integer ( str base -- num )
+    swap "-" ?str-head [
+        swap (str>integer) neg
     ] [
-        dup "-" str-head? dup [
-            nip (str>integer) neg
-        ] [
-            drop (str>integer)
-        ] ifte
+        swap (str>integer)
     ] ifte ;
 
 : str>ratio ( str -- num )
     dup CHAR: / index-of str//
-    swap str>integer swap str>integer / ;
+    swap 10 str>integer swap 10 str>integer / ;
 
 : str>number ( str -- num )
     #! Affected by "base" variable.
     [
-        [ "/" swap str-contains? ] [ str>ratio   ]
-        [ "." swap str-contains? ] [ str>float   ]
-        [ drop t                 ] [ str>integer ]
+        [ "/" swap str-contains? ] [ str>ratio      ]
+        [ "." swap str-contains? ] [ str>float      ]
+        [ drop t                 ] [ 10 str>integer ]
     ] cond ;
 
 : base> ( str base -- num/f )
-    [
-        "base" set
-        [ str>number ] [ [ drop f ] when ] catch
-    ] with-scope ;
+    [ str>integer ] [ [ 2drop f ] when ] catch ;
 
 : bin> ( str -- num )
     #! Convert a binary string to a number.
@@ -114,4 +99,5 @@ USE: unparser
     16 base> ;
 
 ! Something really sucks about these words here
-: parse-number ( str -- num ) dec> ;
+: parse-number ( str -- num )
+    [ str>number ] [ [ drop f ] when ] catch ;

@@ -39,6 +39,9 @@ USE: stdio
 USE: strings
 USE: words
 
+: >digit ( n -- ch )
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+
 : integer% ( num radix -- )
     tuck /mod >digit % dup 0 > [
         swap integer%
@@ -118,6 +121,13 @@ DEFER: unparse
     #! output.
     "." over str-contains? [ ".0" cat2 ] unless ;
 
+: unparse-unknown ( obj -- str )
+    <% "#<" %
+    dup type-of type-name %
+    " @ " % 
+    address-of unparse %
+    ">" % %> ;
+
 : unparse ( obj -- str )
     [
         [ t eq?    ] [ drop "t" ]
@@ -128,5 +138,5 @@ DEFER: unparse
         [ float?   ] [ unparse-float fix-float ]
         [ complex? ] [ unparse-complex ]
         [ string?  ] [ unparse-str ]
-        [ drop t   ] [ <% "#<" % type-of type-name % ">" % %> ]
+        [ drop t   ] [ unparse-unknown ]
     ] cond ;

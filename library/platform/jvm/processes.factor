@@ -39,15 +39,13 @@ USE: stack
     jinvoke-static ;
 
 : (pipe) ( args -- process )
-    f cwd <file> jvm-runtime
-    [
-        [ "java.lang.String" ]
-        [ "java.lang.String" ]
-        "java.io.File"
-    ] "java.lang.Runtime" "exec" jinvoke ;
+    jvm-runtime
+    [ [ "java.lang.String" ] ]
+    "java.lang.Runtime" "exec" jinvoke ;
 
 : close-stderr ( process -- )
-    [ ] "java.lang.Process" "getErrorStream" jinvoke close ;
+    [ ] "java.lang.Process" "getErrorStream" jinvoke
+    close-java-stream ;
 
 : pipe ( args -- stream )
     #! Start a process, and return a stream for communicating

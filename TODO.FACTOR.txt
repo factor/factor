@@ -1,10 +1,16 @@
+[error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
+[error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
+
+- dec> bin> oct> hex> throw errors
+- parse-number doesn't
+- eval with multilien strings and #!
+- redefining a word doesn't clear comments
 - quit responder breaks with multithreading
 - nicer way to combine two paths
 - don't show listener on certain commands
 - plugin should not exit jEdit on fatal errors
 - wordpreview: don't show for string literals and comments
 - alist -vs- assoc terminology
-- NPE in activate()/deactivate()
 - write-icon kind of messy; " " should be output by the listener
 - f usages. --> don't print all words
 - file responder: don't show full path in title
@@ -13,7 +19,6 @@
 - jedit ==> jedit-word, jedit takes a file name
 - introduce ifte* and ?str-head/?str-tail where appropriate
 - namespace clone drops static var bindings
-- when running (inf, .factor-rc not loaded
 
 + bignums:
 
@@ -26,7 +31,9 @@
 
 + docs:
 
-- examples of assoc usage
+- explain how log uses >polar and rect>
+- when* unless*
+- simple i/o section
 - unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
 - recursion -vs- iteration in vectors chapter, and combinator

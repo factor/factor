@@ -35,7 +35,7 @@ USE: namespaces
 USE: stack
 USE: strings
 
-: close ( stream -- )
+: close-java-stream ( stream -- )
     [
         [ "java.io.InputStream" is ] [
             [ ] "java.io.InputStream" "close" jinvoke
@@ -97,8 +97,8 @@ USE: strings
     "out" get [ ] "java.io.OutputStream" "flush" jinvoke ;
 
 : <byte-stream>/fclose ( -- )
-    "in" get  [ close ] when* 
-    "out" get [ close ] when* ;
+    "in" get  [ close-java-stream ] when* 
+    "out" get [ close-java-stream ] when* ;
 
 : <bin> ( in -- in )
     [ "java.io.InputStream" ] "java.io.BufferedInputStream" jnew ;
@@ -150,8 +150,8 @@ USE: strings
     "out" get [ ] "java.io.Writer" "flush" jinvoke ;
 
 : <char-stream>/fclose ( -- )
-    "in" get  [ close ] when* 
-    "out" get [ close ] when* ;
+    "in" get  [ close-java-stream ] when* 
+    "out" get [ close-java-stream ] when* ;
 
 : <char-stream> ( in out -- stream )
     #! Creates a new stream for reading from the

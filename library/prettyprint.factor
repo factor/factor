@@ -218,3 +218,8 @@ DEFER: prettyprint*
 : .s datastack  . ;
 : .r callstack  . ;
 : .c catchstack . ;
+
+! For integers only
+: .b >bin print ;
+: .o >oct print ;
+: .h >hex print ;

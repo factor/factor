@@ -81,10 +81,11 @@ USE: streams
     #! Print a newline to standard output.
     "\n" write ;
 
+: close ( -- )
+    "stdio" get fclose ;
+
 : with-stream ( stream quot -- )
-    [
-        swap "stdio" set [ "stdio" get fclose rethrow ] catch
-    ] with-scope ;
+    [ swap "stdio" set  [ close rethrow ] catch ] with-scope ;
 
 : with-string ( quot -- str )
     #! Execute a quotation, and push a string containing all

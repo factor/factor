@@ -61,9 +61,19 @@ USE: unparser
     #! read ahead in the input stream.
     t "parsing" word set-word-property ;
 
-: <parsing "line" set 0 "col" set ;
-: parsing> "line" off "col" off ;
-: end? ( -- ? ) "col" get "line" get str-length >= ;
+: end? ( -- ? )
+    "col" get "line" get str-length >= ;
+
+: (with-parser) ( quot -- )
+    end? [ drop ] [ [ call ] keep (with-parser) ] ifte ;
+
+: with-parser ( text quot -- )
+    #! Keep calling the quotation until we reach the end of the
+    #! input.
+    swap "line" set 0 "col" set
+    (with-parser)
+    "line" off "col" off ;
+
 : ch ( -- ch ) "col" get "line" get str-nth ;
 : advance ( -- ) "col" succ@ ;
 
@@ -116,12 +126,14 @@ USE: unparser
         r> substring
     ] ifte ;
 
-: parse-word ( str -- obj )
-    dup "use" get search dup [
-        nip
-    ] [
-        drop str>number
-    ] ifte ;
+: scan-word ( -- obj )
+    scan dup [
+        dup "use" get search dup [
+            nip
+        ] [
+            drop str>number
+        ] ifte
+    ] when ;
 
 : parsed| ( obj -- )
     #! Some ugly ugly code to handle [ a | b ] expressions.
@@ -137,15 +149,12 @@ USE: unparser
 : parsed ( obj -- )
     over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;
 
-: number, ( num -- )
-    str>number parsed ;
-
-: word, ( str -- )
+: (parse) ( str -- )
     [
-        parse-word dup parsing? [ execute ] [ parsed ] ifte
-    ] when* ;
-
-: (parse) <parsing [ end? not ] [ scan word, ] while parsing> ;
+        scan-word [
+            dup parsing? [ execute ] [ parsed ] ifte
+        ] when*
+    ] with-parser ;
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
