@@ -38,13 +38,11 @@ words hashtables ;
     "/library/syntax/parser.factor" parse-resource append,
     "/library/syntax/parse-stream.factor" parse-resource append,
 
-    "traits" [ "generic" ] search
     "delegate" [ "generic" ] search
     "object" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind
 
-    reveal
     reveal
     reveal
 
@@ -55,7 +53,6 @@ words hashtables ;
     "/library/generic/predicate.factor" parse-resource append,
     "/library/generic/union.factor" parse-resource append,
     "/library/generic/complement.factor" parse-resource append,
-    "/library/generic/traits.factor" parse-resource append,
     "/library/generic/tuple.factor" parse-resource append,
 
     "/library/bootstrap/init.factor" parse-resource append,

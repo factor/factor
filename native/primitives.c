@@ -176,7 +176,9 @@ void* primitives[] = {
 	primitive_grow_array,
 	primitive_hashtable,
 	primitive_array,
-	primitive_tuple
+	primitive_tuple,
+	primitive_to_array,
+	primitive_to_tuple
 };
 
 CELL primitive_to_xt(CELL primitive)

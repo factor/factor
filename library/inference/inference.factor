@@ -60,56 +60,45 @@ SYMBOL: d-in
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
-GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
-GENERIC: value-class ( value -- class )
 GENERIC: value-class-and ( class value -- )
-GENERIC: set-value-class ( class value -- )
 
 ! A value has the following slots in addition to those relating
 ! to generics above:
 
-! An association list mapping values to [[ value class ]] pairs
-SYMBOL: type-propagations
+TUPLE: value literal class type-prop recursion ;
+C: value ;
 
-TRAITS: computed
+TUPLE: computed delegate ;
+
 C: computed ( class -- value )
-    [
-        \ value-class set
-        gensym \ literal-value set
-        type-propagations off
-    ] extend ;
-M: computed literal-value ( value -- obj )
+    <value> over set-computed-delegate
+    [ set-value-class ] keep ;
+
+M: computed value-literal ( value -- obj )
     "Cannot use a computed value literally." throw ;
+
 M: computed value= ( literal value -- ? )
     2drop f ;
-M: computed value-class ( value -- class )
-    [ \ value-class get ] bind ;
-M: computed value-class-and ( class value -- )
-    [ \ value-class [ class-and ] change ] bind ;
-M: computed set-value-class ( class value -- )
-    [ \ value-class set ] bind ;
 
-TRAITS: literal
+M: computed value-class-and ( class value -- )
+    [ value-class class-and ] keep set-value-class ;
+
+TUPLE: literal delegate ;
+
 C: literal ( obj rstate -- value )
-    [
-        recursive-state set
-        \ literal-value set
-        type-propagations off
-    ] extend ;
-M: literal literal-value ( value -- obj )
-    [ \ literal-value get ] bind ;
+    <value> over set-literal-delegate
+    [ set-value-recursion ] keep
+    [ set-value-literal ] keep ;
+
 M: literal value= ( literal value -- ? )
-    literal-value = ;
-M: literal value-class ( value -- class )
-    literal-value class ;
+    value-literal = ;
+
 M: literal value-class-and ( class value -- )
     value-class class-and drop ;
+
 M: literal set-value-class ( class value -- )
     2drop ;
-
-: value-recursion ( value -- rstate )
-    [ recursive-state get ] bind ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [

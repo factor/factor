@@ -9,7 +9,7 @@ kernel-internals math hashtables errors ;
     [ 0 swap set-array-nth ] keep ;
 
 : define-tuple-generic ( tuple word def -- )
-    over >r \ single-combination \ GENERIC: r> define-generic
+    over >r [ single-combination ] \ GENERIC: r> define-generic
     define-method ;
 
 : define-accessor ( word name n -- )
@@ -21,6 +21,9 @@ kernel-internals math hashtables errors ;
     "in" get create  r> [ set-slot ] cons define-tuple-generic ;
 
 : define-field ( word name n -- )
+    over "delegate" = [
+        pick over "delegate-field" set-word-property
+    ] when
     3dup define-accessor define-mutator ;
 
 : tuple-predicate ( word -- )
@@ -35,13 +38,15 @@ kernel-internals math hashtables errors ;
     dup length [ 3 + ] project zip
     [ uncons define-field ] each-with ;
 
-: TUPLE:
-    #! Followed by a tuple name, then field names, then ;
-    CREATE
+: begin-tuple ( word -- )
     dup intern-symbol
     dup tuple-predicate
     dup define-promise
-    dup tuple "metaclass" set-word-property
+    tuple "metaclass" set-word-property ;
+
+: TUPLE:
+    #! Followed by a tuple name, then field names, then ;
+    CREATE dup begin-tuple
     string-mode on
     [ string-mode off define-tuple ]
     f ; parsing
@@ -54,22 +59,40 @@ kernel-internals math hashtables errors ;
     [ swap literal, \ make-tuple , append, ] make-list
     r> swap define-compound ;
 
-: TC:
+: wrapper-constructor ( word -- quot )
+    "delegate-field" word-property [ set-slot ] cons
+    [ keep ] cons ;
+
+: WRAPPER:
+    #! A wrapper is a tuple whose only slot is a delegate slot.
+    CREATE dup begin-tuple
+    dup [ "delegate" ] define-tuple
+    dup wrapper-constructor
+    tuple-constructor ; parsing
+
+: C:
     #! Followed by a tuple name, then constructor code, then ;
     #! Constructor code executes with the empty tuple on the
     #! stack.
     scan-word [ tuple-constructor ] f ; parsing
 
-: tuple-dispatch ( object selector -- object quot )
-    over class over "methods" word-property hash* dup [
-        nip cdr ( method is defined )
+: tuple-delegate ( tuple -- obj )
+    >tuple dup class "delegate-field" word-property dup [
+        >fixnum slot
     ] [
-       ! drop delegate rot hash [
-       !     swap tuple-dispatch ( check delegate )
-       ! ] [
+        2drop f
+    ] ifte ; inline
+
+: tuple-dispatch ( object selector -- object quot )
+    over class over "methods" word-property hash* [
+        cdr ( method is defined )
+    ] [
+        over tuple-delegate [
+            rot drop swap tuple-dispatch ( check delegate )
+        ] [
             [ undefined-method ] ( no delegate )
-       ! ] ifte*
-    ] ifte ;
+        ] ifte*
+    ] ?ifte ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r unit [ car tuple-dispatch call ] cons tuple r>

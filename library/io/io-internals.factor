@@ -76,5 +76,3 @@ BUILTIN: port 14
 : blocking-copy ( in out -- )
     [ add-copy-io-task (yield) ] callcc0
     pending-io-error pending-io-error ;
-
-

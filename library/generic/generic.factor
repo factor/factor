@@ -16,10 +16,6 @@ namespaces parser strings words vectors math math-internals ;
 ! - class: a user defined way of differentiating objects, either
 ! based on type, or some combination of type, predicate, or
 ! method map.
-! - traits: a hashtable has traits of its traits slot is set to
-! a hashtable mapping selector names to method definitions.
-! The class of an object with traits is determined by the object
-! identity of the traits method map.
 ! - metaclass: a metaclass is a symbol with a handful of word
 ! properties: "builtin-types" "priority"
 

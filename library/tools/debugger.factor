@@ -157,9 +157,7 @@ M: object error. ( error -- )
 : print-error ( error -- )
     #! Print the error.
     [
-        "! " [
-            in-parser? [ parse-dump ] when error.
-        ] with-prefix
+        in-parser? [ parse-dump ] when error.
     ] [
         flush-error-handler
     ] catch ;

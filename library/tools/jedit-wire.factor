@@ -37,6 +37,7 @@ USE: streams
 USE: strings
 USE: words
 USE: generic
+USE: listener
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -46,7 +47,7 @@ USE: generic
 !
 ! jEdit sends a packet with code to eval, it receives the output
 ! captured with with-string.
-USE: listener
+
 : write-packet ( string -- )
     dup str-length write-big-endian-32 write flush ;
 
@@ -77,19 +78,22 @@ USE: listener
     dup str-length write-big-endian-32
     write ;
 
-TRAITS: jedit-stream
+TUPLE: jedit-stream delegate ;
 
 M: jedit-stream freadln ( stream -- str )
+    wrapper-stream-scope
     [ CHAR: r write flush read-big-endian-32 read# ] bind ;
 
 M: jedit-stream fwrite-attr ( str style stream -- )
+    wrapper-stream-scope
     [ [ default-style ] unless* jedit-write-attr ] bind ;
 
 M: jedit-stream fflush ( stream -- )
+    wrapper-stream-scope
     [ CHAR: f write flush ] bind ;
 
 C: jedit-stream ( stream -- stream )
-    [ dup delegate set stdio set ] extend ;
+    [ >r <wrapper-stream> r> set-jedit-stream-delegate ] keep ;
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.

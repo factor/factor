@@ -41,10 +41,9 @@ USE: unparser
 : log-error ( error -- )
     "Error: " swap cat2 log ;
 
-: log-client ( -- )
-    "client" get [
-        "Accepted connection from " swap
-        "client" swap hash cat2 log
+: log-client ( client-stream -- )
+    client-stream-host [
+        "Accepted connection from " swap cat2 log
     ] when* ;
 
 : with-logging ( quot -- )

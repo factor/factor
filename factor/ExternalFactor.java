@@ -63,8 +63,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		}
 
 		Log.log(Log.ERROR,this,"Cannot connect to Factor on port " + port);
-		if(in != null && out != null)
-			close();
+		close();
 	} //}}}
 
 	//{{{ openWireSocket() method
@@ -280,21 +279,26 @@ public class ExternalFactor extends DefaultVocabularyLookup
 
 		closed = true;
 
-		try
+		if(out != null)
 		{
-			/* don't care about response */
-			sendEval("0 exit*");
-		}
-		catch(Exception e)
-		{
-			// We don't care...
-			Log.log(Log.DEBUG,this,e);
+			try
+			{
+				/* don't care about response */
+				sendEval("0 exit*");
+			}
+			catch(Exception e)
+			{
+				// We don't care...
+				Log.log(Log.DEBUG,this,e);
+			}
 		}
 		
 		try
 		{
-			in.close();
-			out.close();
+			if(in != null)
+				in.close();
+			if(out != null)
+				out.close();
 		}
 		catch(Exception e)
 		{

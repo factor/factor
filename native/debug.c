@@ -15,6 +15,9 @@ bool equals(CELL obj1, CELL obj2)
 
 CELL assoc(CELL alist, CELL key)
 {
+	if(alist == F)
+		return F;
+
 	if(TAG(alist) != CONS_TYPE)
 	{
 		fprintf(stderr,"Not an alist: %ld\n",alist);
@@ -36,6 +39,38 @@ CELL assoc(CELL alist, CELL key)
 	}
 }
 
+CELL hash(CELL hash, CELL key)
+{
+	if(type_of(hash) != HASHTABLE_TYPE)
+	{
+		fprintf(stderr,"Not a hash: %ld\n",hash);
+		return F;
+	}
+
+	{
+		int i;
+
+		CELL array = ((F_HASHTABLE*)UNTAG(hash))->array;
+		F_ARRAY* a;
+
+		if(type_of(array) != ARRAY_TYPE)
+		{
+			fprintf(stderr,"Not an array: %ld\n",hash);
+			return F;
+		}
+
+		a = untag_array(array);
+
+		for(i = 0; i < untag_fixnum_fast(a->capacity); i++)
+		{
+			CELL value = assoc(get(AREF(a,i)),key);
+			if(value != F)
+				return value;
+		}
+		
+		return F;
+	}
+}
 void print_cons(CELL cons)
 {
 	fprintf(stderr,"[ ");
@@ -59,7 +94,7 @@ void print_cons(CELL cons)
 
 void print_word(F_WORD* word)
 {
-	CELL name = assoc(word->plist,tag_object(from_c_string("name")));
+	CELL name = hash(word->plist,tag_object(from_c_string("name")));
 	if(type_of(name) == STRING_TYPE)
 		fprintf(stderr,"%s",to_c_string(untag_string(name)));
 	else
@@ -83,6 +118,9 @@ void print_obj(CELL obj)
 {
 	switch(type_of(obj))
 	{
+	case FIXNUM_TYPE:
+		fprintf(stderr,"%d",untag_fixnum_fast(obj));
+		break;
 	case CONS_TYPE:
 		print_cons(obj);
 		break;

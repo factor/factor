@@ -31,6 +31,11 @@ void primitive_array(void)
 	dpush(tag_object(array(ARRAY_TYPE,capacity,F)));
 }
 
+void primitive_to_array(void)
+{
+	type_check(ARRAY_TYPE,dpeek());
+}
+
 void primitive_tuple(void)
 {
 	F_FIXNUM capacity = to_fixnum(dpop());
@@ -38,6 +43,11 @@ void primitive_tuple(void)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
 	dpush(tag_object(array(TUPLE_TYPE,capacity,F)));
+}
+
+void primitive_to_tuple(void)
+{
+	type_check(TUPLE_TYPE,dpeek());
 }
 
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)

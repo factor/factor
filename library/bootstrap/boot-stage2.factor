@@ -12,7 +12,6 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/generic/predicate.factor"
     "/library/generic/union.factor"
     "/library/generic/complement.factor"
-    "/library/generic/traits.factor"
     "/library/generic/tuple.factor"
 
     "/version.factor"

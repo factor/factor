@@ -195,6 +195,8 @@ vocabularies get [
     [[ "hashtables" "<hashtable>" ]]
     [[ "kernel-internals" "<array>" ]]
     [[ "kernel-internals" "<tuple>" ]]
+    [[ "kernel-internals" ">array" ]]
+    [[ "kernel-internals" ">tuple" ]]
 ] [
     unswons create swap 1 + [ f define ] keep
 ] each drop

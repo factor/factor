@@ -199,47 +199,37 @@ SYMBOL: redraw-console
 
 ! The console stream
 
-! Restoring this continuation returns to the
-! top-level console event loop.
-SYMBOL: redraw-continuation
-
 ! Restoring this continuation with a string on the stack returns
 ! to the caller of freadln.
 SYMBOL: input-continuation
 
-TRAITS: console-stream
+TUPLE: console-stream console redraw-continuation ;
 
 C: console-stream ( console console-continuation -- stream )
-    [
-        redraw-continuation set
-        console set
-    ] extend ;
+    [ set-console-stream-redraw-continuation ] keep
+    [ set-console-stream-console ] keep ;
 
 M: console-stream fflush ( stream -- )
     fauto-flush ;
 
 M: console-stream fauto-flush ( stream -- )
-    [
-        console get [ redraw-console on ] bind
-    ] bind ;
+    console-stream-console [ redraw-console on ] bind ;
 
 M: console-stream freadln ( stream -- line )
     [
-        [
-            console get [ input-continuation set ] bind
-            redraw-continuation get dup [
-                call
-            ] [
-                drop f
-            ] ifte
-        ] callcc1
-    ] bind ;
+        swap [
+            console-stream-console
+            [ input-continuation set ] bind
+        ] keep
+        dup console-stream-redraw-continuation dup [
+            call
+        ] [
+            drop f
+        ] ifte
+    ] callcc1 nip ;
 
 M: console-stream fwrite-attr ( string style stream -- )
-    [
-        drop
-        console get [ console-write ] bind
-    ] bind ;
+    nip console-stream-console [ console-write ] bind ;
 
 M: console-stream fclose ( stream -- ) drop ;
 
@@ -375,7 +365,6 @@ M: alien handle-event ( event -- ? )
     check-event [ console-loop ] when ;
 
 : console-quit ( -- )
-    redraw-continuation off
     input-continuation get [ f swap call ] when*
     SDL_Quit ;
 

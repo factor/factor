@@ -185,6 +185,8 @@ hashtables ;
     [ <hashtable>            [ [ number ] [ hashtable ] ] ]
     [ <array>                [ [ number ] [ array ] ] ]
     [ <tuple>                [ [ number ] [ tuple ] ] ]
+    [ >array                 [ [ object ] [ array ] ] ]
+    [ >tuple                 [ [ object ] [ tuple ] ] ]
 ] [
     2unlist dup string? [
         "stack-effect" set-word-property
