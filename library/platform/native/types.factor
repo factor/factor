@@ -70,3 +70,7 @@ IN: kernel
         [ 103 | "fixnum/bignum/ratio/float/complex" ]
         [ 104 | "fixnum/string" ]
     ] assoc ;
+
+: num-types ( -- n )
+    #! One more than the maximum value from type-of.
+    17 ;

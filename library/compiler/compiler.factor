@@ -35,6 +35,7 @@ USE: logic
 USE: math
 USE: namespaces
 USE: parser
+USE: prettyprint
 USE: stack
 USE: strings
 USE: unparser
@@ -67,20 +68,31 @@ SYMBOL: compiled-xts
         drop word-xt
     ] ifte ;
 
-! "fixup-xts" is a list of [ where | word ] pairs; the xt of
-! word when its done compiling will be written to the offset.
+! "fixup-xts" is a list of [ where word relative ] pairs; the xt
+! of word when its done compiling will be written to the offset,
+! relative to the offset.
 
 SYMBOL: deferred-xts
 
-: defer-xt ( word where -- )
-    #! After word is compiled, put a call to it at offset.
-    deferred-xts acons@ ;
+: defer-xt ( word where relative -- )
+    #! After word is compiled, put its XT at where, relative.
+    3list deferred-xts cons@ ;
 
-: fixup-deferred-xt ( where word -- )
-    compiled-xt swap JUMP-FIXUP ;
+: compiled? ( word -- ? )
+    #! This is a hack.
+    dup "compiled" word-property swap primitive? or ;
+
+: fixup-deferred-xt ( word where relative -- )
+    rot dup compiled? [
+        compiled-xt swap - swap set-compiled-cell
+    ] [
+        "Not compiled: " swap word-name cat2 throw
+    ] ifte ;
 
 : fixup-deferred-xts ( -- )
-    deferred-xts get [ uncons fixup-deferred-xt ] each
+    deferred-xts get [
+        uncons uncons car fixup-deferred-xt
+    ] each
     deferred-xts off ;
 
 ! Words being compiled are consed onto this list. When a word
@@ -91,8 +103,11 @@ SYMBOL: deferred-xts
 SYMBOL: compile-words
 
 : postpone-word ( word -- )
-    t over "compiled" set-word-property
-    compile-words cons@ ;
+    dup compiled? [
+        drop
+    ] [
+        t over "compiled" set-word-property compile-words cons@
+    ] ifte ;
 
 ! During compilation, these two variables store pending
 ! literals. Literals are either consumed at compile-time by
@@ -135,14 +150,11 @@ SYMBOL: compile-callstack
 : tail? ( -- ? )
     compile-callstack get vector-empty? ;
 
-: compiled? ( word -- ? )
-    #! This is a hack.
-    dup "compiled" word-property swap primitive? or ;
-
 : compile-simple-word ( word -- )
     #! Compile a JMP at the end (tail call optimization)
-    dup compiled? [ dup postpone-word ] unless
-    commit-literals tail? [ JUMP ] [ CALL ] ifte defer-xt ;
+    dup postpone-word
+    commit-literals tail? [ JUMP ] [ CALL ] ifte
+    compiled-offset defer-xt ;
 
 : compile-word ( word -- )
     #! If a word has a compiling property, then it has special

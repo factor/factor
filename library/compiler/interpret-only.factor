@@ -26,58 +26,25 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: alien
+USE: combinators
+USE: errors
+USE: kernel
+USE: lists
+USE: stack
+USE: strings
+USE: words
 
-: DATASTACK ( -- ptr )
-    #! A pointer to a pointer to the datastack top.
-    "ds" dlsym-self ;
+: interpret-only-error ( name -- )
+    "Cannot compile " swap cat2 throw ;
 
-: CALLSTACK ( -- ptr )
-    #! A pointer to a pointer to the callstack top.
-    "cs" dlsym-self ;
+: word-interpret-only ( word -- )
+    dup word-name [ interpret-only-error ] cons
+    swap
+    "compiling" set-word-property ;
 
-: LITERAL ( cell -- )
-    #! Push literal on data stack.
-    #! Assume that it is ok to clobber EAX without saving.
-    DATASTACK EAX [I]>R
-    EAX I>[R]
-    4 DATASTACK I+[I] ;
-
-: [LITERAL] ( cell -- )
-    #! Push complex literal on data stack by following an
-    #! indirect pointer.
-    ECX PUSH-R
-    ( cell -- ) ECX [I]>R
-    DATASTACK EAX [I]>R
-    ECX EAX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
-
-: PUSH-DS ( -- )
-    #! Push contents of EAX onto datastack.
-    ECX PUSH-R
-    DATASTACK ECX [I]>R
-    EAX ECX R>[R]
-    4 DATASTACK I+[I]
-    ECX POP-R ;
-
-: PEEK-DS ( -- )
-    #! Peek datastack, store pointer to datastack top in EAX.
-    DATASTACK EAX [I]>R
-    4 EAX R-I ;
-
-: POP-DS ( -- )
-    #! Pop datastack, store pointer to datastack top in EAX.
-    PEEK-DS
-    EAX DATASTACK R>[I] ;
-
-: SELF-CALL ( name -- )
-    #! Call named C function in Factor interpreter executable.
-    dlsym-self CALL JUMP-FIXUP ;
-
-: TYPE-OF ( -- )
-    #! Peek datastack, store type # in EAX.
-    PEEK-DS
-    EAX PUSH-[R]
-    "type_of" SELF-CALL
-    4 ESP R+I ;
+\ call word-interpret-only
+\ datastack word-interpret-only
+\ callstack word-interpret-only
+\ set-datastack word-interpret-only
+\ set-callstack word-interpret-only
+\ 2generic word-interpret-only

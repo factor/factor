@@ -33,7 +33,7 @@ USE: kernel
 USE: math
 USE: lists
 
-: F-TEST ( -- fixup )
+: compile-f-test ( -- fixup )
     #! Push addr where we write the branch target address.
     POP-DS
     ! ptr to condition is now in EAX
@@ -44,60 +44,21 @@ USE: lists
 : branch-target ( fixup -- )
     compiled-offset swap JUMP-FIXUP ;
 
-: ELSE ( fixup -- fixup )
+: compile-else ( fixup -- fixup )
     #! Push addr where we write the branch target address,
     #! and fixup branch target address from compile-f-test.
     #! Push f for the fixup if we're tail position.
     tail? [ RET f ] [ JUMP ] ifte swap branch-target ;
 
-: END-IF ( fixup -- )
+: end-if ( fixup -- )
     tail? [ drop RET ] [ branch-target ] ifte ;
 
 : compile-ifte ( compile-time: true false -- )
     pop-literal pop-literal  commit-literals
-    F-TEST >r
+    compile-f-test >r
     ( t -- ) compile-quot
-    r> ELSE >r
+    r> compile-else >r
     ( f -- ) compile-quot
-    r> END-IF ;
+    r> end-if ;
 
-: TABLE-JUMP ( start-fixup -- end-fixup )
-    #! The 32-bit address of the code after the jump table
-    #! should be written to end-fixup.
-    #! The jump table must immediately follow this macro.
-    tail? [ 0 ] [ 0 PUSH-I compiled-offset 4 - ] ifte >r
-    ( start-fixup r:end-fixup )
-    EAX JUMP-[R]
-    compiled-offset swap set-compiled-cell ( update the ADD )
-    r> ;
-
-: BEGIN-JUMP-TABLE ( -- end-fixup )
-    #! Compile a piece of code that jumps to an offset in a
-    #! jump table indexed by the type of the Factor object in
-    #! EAX.
-    TYPE-OF
-    2 EAX R<<I
-    EAX+/PARTIAL
-    TABLE-JUMP ;
-
-: END-JUMP-TABLE ( end-fixup -- )
-    compiled-offset dup 0 = [
-        2drop
-    ] [
-        set-compiled-cell ( update the PUSH )
-    ] ifte ;
-
-: compile-generic ( compile-time: vtable -- )
-    #! Compile a faster alternative to
-    #! : generic ( obj vtable -- )
-    #!     >r dup type r> vector-nth execute ;
-    BEGIN-JUMP-TABLE
-    ! write table now
-    END-JUMP-TABLE ;
-
-[
-    [ ifte compile-ifte ]
-    [ generic compile-generic ]
-] [
-    unswons "compiling" set-word-property
-] each
+[ compile-ifte ] \ ifte "compiling" set-word-property

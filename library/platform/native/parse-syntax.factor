@@ -94,6 +94,11 @@ USE: unparser
 ! Symbols
 : SYMBOL: CREATE define-symbol ; parsing
 
+: \
+    #! Parsed as a piece of code that pushes a word on the stack
+    #! \ foo ==> [ foo ] car
+    scan-word unit parsed [ car ] car parsed ; parsing
+
 ! Vocabularies
 : DEFER: CREATE drop ; parsing
 : USE: scan "use" cons@ ; parsing
