@@ -17,6 +17,7 @@ void primitive_add_copy_io_task (void)
 void primitive_close (void)
 {
 	F_PORT *port = untag_port(dpop());
+
 	CloseHandle((HANDLE)port->fd);
 	port->closed = true;
 }

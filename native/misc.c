@@ -57,3 +57,26 @@ void primitive_random_int(void)
 	maybe_garbage_collection();
 	dpush(tag_object(s48_long_to_bignum(rand())));
 }
+
+#ifdef WIN32
+F_STRING *last_error()
+{
+	char *buffer;
+	F_STRING *error;
+	DWORD dw = GetLastError();
+	
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |
+		FORMAT_MESSAGE_FROM_SYSTEM,
+		NULL,
+		dw,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR) &buffer,
+		0, NULL);
+
+	error = from_c_string(buffer);
+	LocalFree(buffer);
+
+	return error;
+}
+#endif

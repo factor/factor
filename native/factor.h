@@ -75,7 +75,7 @@ CELL cs;
 	#include <stdbool.h>
 #endif
 
-#ifdef FFI
+#if defined(FFI) && !defined(WIN32)
 #include <dlfcn.h>
 #endif /* FFI */
 
@@ -122,9 +122,9 @@ typedef unsigned char BYTE;
 #include "float.h"
 #include "complex.h"
 #include "arithmetic.h"
+#include "string.h"
 #include "misc.h"
 #include "relocate.h"
-#include "string.h"
 #include "sbuf.h"
 #include "port.h"
 #include "io.h"

@@ -19,7 +19,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				PreprocessorDefinitions="FFI;WIN32"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="5"
@@ -70,7 +70,7 @@
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="FFI;WIN32"
 				StringPooling="TRUE"
 				RuntimeLibrary="4"
 				EnableFunctionLevelLinking="TRUE"
@@ -205,6 +205,21 @@
 				Name="win32"
 				Filter="">
 				<File
+					RelativePath=".\native\win32\ffi.c">
+					<FileConfiguration
+						Name="Debug|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)2.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)2.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="native\win32\file.c">
 				</File>
 				<File
@@ -235,6 +250,23 @@
 			<Filter
 				Name="unix"
 				Filter="">
+				<File
+					RelativePath=".\native\unix\ffi.c">
+					<FileConfiguration
+						Name="Debug|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Win32"
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
 				<File
 					RelativePath="native\unix\file.c">
 					<FileConfiguration

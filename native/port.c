@@ -67,24 +67,9 @@ void collect_port(F_PORT* port)
 #ifdef WIN32
 CELL make_io_error(const char* func)
 {
-	char *buffer;
 	F_STRING *function = from_c_string(func);
-	F_STRING *error;
-	DWORD dw = GetLastError();
-	
-	FormatMessage(
-		FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM,
-		NULL,
-		dw,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		(LPTSTR) &buffer,
-		0, NULL);
 
-	error = from_c_string(buffer);
-	LocalFree(buffer);
-
-	return cons(tag_object(function),cons(tag_object(error),F));
+	return cons(tag_object(function),cons(tag_object(last_error()),F));
 }
 #else
 CELL make_io_error(const char* func)
