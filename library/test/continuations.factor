@@ -30,4 +30,4 @@ USE: test
 [ t ] [ callcc-namespace-test ] unit-test
 
 ! This caused the Java Factor to run out of memory
-[ ] [ 10000 [ [ call ] callcc0 ] times ] unit-test
+[ ] [ 100000 [ [ call ] callcc0 ] times ] unit-test

@@ -198,8 +198,9 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 			return new FactorArray();
 		else
 		{
-			return new FactorArray(
-				FactorLib.cloneArray(stack),top);
+			Object[] newArray = new Object[stack.length];
+			System.arraycopy(stack,0,newArray,0,top);
+			return new FactorArray(newArray,top);
 		}
 	} //}}}
 }

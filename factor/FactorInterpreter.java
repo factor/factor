@@ -35,7 +35,7 @@ import java.io.*;
 
 public class FactorInterpreter implements FactorObject, Runnable
 {
-	public static final String VERSION = "0.61";
+	public static final String VERSION = "0.62";
 
 	// command line arguments are stored here.
 	public Cons args;

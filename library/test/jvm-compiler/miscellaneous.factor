@@ -77,15 +77,11 @@ test-word
 
 [ [ 1 1 0 0 ] ] [ [ clone ] ] [ balance>list ] test-word
 
-[ [ 1 1 0 0 ] ] [ [ clone-array ] ] [ balance>list ] test-word
-
 [ [ 1 1 0 0 ] ] [ [ comment? ] ] [ balance>list ] test-word
 
 : doc-test ( -- ) ;
 
 [ t ] [ "doc-test" ] [ intern worddef>list car comment? ] test-word
-
-[ [ 1 1 0 0 ] ] [ [ deep-clone-array ] ] [ balance>list ] test-word
 
 [ [ 2 1 0 0 ] ] [ [ is ] ] [ balance>list ] test-word
 [ t ] [ "java.lang.Integer" ] [ 0 100 random-int swap is ] test-word

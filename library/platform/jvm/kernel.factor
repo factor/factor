@@ -61,16 +61,6 @@ IN: kernel
 : clone ( obj -- obj )
     [ ] "factor.PublicCloneable" "clone" jinvoke ;
 
-: clone-array ( obj -- obj )
-    [ [ "java.lang.Object" ] ]
-    "factor.FactorLib" "cloneArray"
-    jinvoke-static ;
-
-: deep-clone-array ( obj -- obj )
-    [ [ "java.lang.Object" ] ]
-    "factor.FactorLib" "deepCloneArray"
-    jinvoke-static ;
-
 : is ( obj class -- boolean )
     ! Like "instanceof" in Java.
     [ "java.lang.Object" ] "java.lang.Class" "isInstance"

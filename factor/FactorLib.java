@@ -49,29 +49,6 @@ public class FactorLib
 			return o3;
 	} //}}}
 
-	//{{{ cloneArray() method
-	public static Object[] cloneArray(Object[] array)
-	{
-		Object[] newArray = new Object[array.length];
-		System.arraycopy(array,0,newArray,0,array.length);
-		return newArray;
-	} //}}}
-
-	//{{{ deepCloneArray() method
-	public static Object[] deepCloneArray(Object[] array)
-	{
-		Object[] newArray = new Object[array.length];
-		for(int i = 0; i < array.length; i++)
-		{
-			Object o = array[i];
-			if(o instanceof PublicCloneable)
-				newArray[i] = ((PublicCloneable)o).clone();
-			else
-				newArray[i] = o;
-		}
-		return newArray;
-	} //}}}
-
 	//{{{ error() method
 	public static void error(Object obj) throws Throwable
 	{

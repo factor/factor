@@ -26,11 +26,10 @@
 + tests:
 
 - java factor: equal numbers have non-equal hashcodes!
-- java factor memory leak
+- {...} vectors in java factor
 - vector=
 - sbuf=
 - vector-hashcode
-- {...} vectors in java factor
 - clone-sbuf
 - FactorLib.equal() not very good
 - test substitute, set-nth, remove-nth
