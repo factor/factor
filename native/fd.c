@@ -10,55 +10,40 @@ void init_io(void)
 	set_nonblocking(2);
 }
 
-int read_step(PORT* port)
+/* Return true if something was read */
+bool read_step(PORT* port)
 {
-	FIXNUM amount = -1;
+	FIXNUM amount = read(port->fd,
+		port->buffer + 1,
+		port->buffer->capacity * 2);
 
-	add_io_task(IO_TASK_READ_LINE,port,F);
-
-	for(;;)
+	if(amount == -1)
 	{
-		amount = read(port->fd,
-			port->buffer + 1,
-			port->buffer->capacity * 2);
-
-		if(amount == -1)
-		{
-			if(errno != EAGAIN)
-			{
-				remove_io_task(IO_TASK_READ_LINE,port);
-				return -1;
-			}
-		}
-		else
-			break;
-
-		iomux();
+		if(errno != EAGAIN)
+			io_error(__FUNCTION__);
+		return false;
 	}
-
-	remove_io_task(IO_TASK_READ_LINE,port);
-
-	port->buf_fill = (amount < 0 ? 0 : amount);
-	port->buf_pos = 0;
-
-	return amount;
+	else
+	{
+		port->buf_fill = (amount < 0 ? 0 : amount);
+		port->buf_pos = 0;
+		return true;
+	}
 }
 
 READLINE_STAT read_line_step(PORT* port)
 {
-	int amount;
 	int i;
-	int ch;
+	char ch;
 
 	SBUF* line = port->line;
 
 	if(port->buf_pos >= port->buf_fill)
 	{
-		amount = read_step(port);
+		if(!read_step(port))
+			return READLINE_WAIT;
 
-		if(amount < 0)
-			io_error(__FUNCTION__);
-		else if(amount == 0)
+		if(port->buf_fill == 0)
 			return READLINE_EOF;
 	}
 
@@ -94,21 +79,27 @@ void primitive_read_line_fd_8(void)
 		port->line->top = 0;
 	line = port->line;
 
+	add_io_task(IO_TASK_READ_LINE,port,F);
+
 	for(;;)
 	{
 		state = read_line_step(port);
-		if(state != READLINE_AGAIN)
+		if(state == READLINE_WAIT)
+			iomux();
+		else if(state == READLINE_EOF && line->top == 0)
 		{
-			if(state == READLINE_EOF && line->top == 0)
-			{
-				/* didn't read anything before EOF */
-				drepl(F);
-			}
-			else
-				drepl(tag_object(sbuf_to_string(line)));
-			return;
+			/* didn't read anything before EOF */
+			drepl(F);
+			break;
+		}
+		else if(state == READLINE_EOL)
+		{
+			drepl(tag_object(sbuf_to_string(line)));
+			break;
 		}
 	}
+
+	remove_io_task(IO_TASK_READ_LINE,port);
 }
 
 /* Return true if write was done */
@@ -121,13 +112,9 @@ bool write_step(PORT* port)
 
 	if(amount == -1)
 	{
-		if(errno == EAGAIN)
-			return false;
-		else
-		{
+		if(errno != EAGAIN)
 			io_error(__FUNCTION__);
-			return false;
-		}
+		return false;
 	}
 	else
 	{

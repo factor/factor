@@ -1,10 +1,15 @@
 #define LINE_SIZE 80
 #define BUF_SIZE (32 * 1024)
 
-int read_step(PORT* port);
+bool read_step(PORT* port);
 
 /* read_line_step() return values */
-typedef enum { READLINE_AGAIN, READLINE_EOL, READLINE_EOF } READLINE_STAT;
+typedef enum {
+	READLINE_WAIT, /* means we have to wait for more I/O */
+	READLINE_AGAIN,
+	READLINE_EOL,
+	READLINE_EOF
+} READLINE_STAT;
 
 READLINE_STAT read_line_step(PORT* port);
 bool write_step(PORT* port);
