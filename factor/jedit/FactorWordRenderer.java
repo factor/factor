@@ -56,6 +56,9 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		String prop = "factor.completion.plain";
 		String stackEffect = null;
 
+		if(!value instanceof FactorWord)
+			return this;
+
 		FactorWord word = (FactorWord)value;
 		if(word.def == null)
 		{
