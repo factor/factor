@@ -331,10 +331,10 @@ sequence the page shows. Any Factor code can be called and the
 continuation based system will sequentially display each page. The
 back button, browser window cloning, etc will all continue to work.
 
-You'll notice the URL's in the browser have a number at the end of
-them. This is the 'continuation identifier' which is like a session id
-except that it identifies not just the data you have stored but your
-location within the responder as well.
+You'll notice the URL's in the browser have an 'id' query parameter with
+a number as its value. This is the 'continuation identifier' which is
+like a session id except that it identifies not just the data you have
+stored but your location within the responder as well.
 
 Forms and POST data
 ===================
@@ -603,7 +603,7 @@ calls the code we want to test and call the 'test-cont-function' word:
   <cont-test-state> [ subroutine-example1 ] test-cont-function
    => 
   HTTP/1.1 302 Document Moved
-  Location: 8209741119458310
+  Location: ?id=8209741119458310
   Content-Length: 0
   Content-Type: text/plain
 
@@ -628,9 +628,9 @@ state on the stack:
   Content-Type: text/html
   <html><head><title>Subroutine Example 1</title></head>
         <body><p>Please select:
-                 <ol><li><a href='7687398605200513'>Flow1</a></li>
-                     <li><a href='7856272029924613'>Flow2</a></li>
-                     <li><a href='4909116160485714'>Flow3</a></li>
+                 <ol><li><a href='?id=7687398605200513'>Flow1</a></li>
+                     <li><a href='?id=7856272029924613'>Flow2</a></li>
+                     <li><a href='?id=4909116160485714'>Flow3</a></li>
                  </ol>
               </p>
         </body>
@@ -645,7 +645,7 @@ written previously:
   <cont-test-state> [ post-example1 ] test-cont-function
     =>
   HTTP/1.1 302 Document Moved
-  Location: 5829759941409535
+  Location: ?id=5829759941409535
   Content-Length: 0
   Content-Type: text/plain
 
@@ -658,7 +658,7 @@ Again we skip past the forward:
 
   <html><head><title>Please enter your name</title></head>
         <body>
-          <form action='5456539333180428' method='post'>
+          <form action='?id=5456539333180428' method='post'>
             <p>Please enter your name:
                <input type='text'size='20'name='username'>
                <input type='submit'value='Ok'>

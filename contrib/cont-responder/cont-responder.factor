@@ -39,7 +39,7 @@ USE: logging
 USE: url-encoding
 USE: unparser
 USE: hashtables
-
+USE: parser
 USE: prettyprint
 USE: inspector
 
@@ -58,7 +58,7 @@ USE: inspector
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 16 [ random-digit unparse , ] times ] make-string ;
+  [ 32 [ random-digit unparse , ] times ] make-string str>number 36 >base ;
 
 : continuation-table ( -- <namespace> ) 
   #! Return the global table of continuations
@@ -126,6 +126,11 @@ USE: inspector
 : get-continuation-item ( id -- <item> )
   #! Get the continuation item associated with the id.
   continuation-table [ get ] bind ;
+
+: id>url ( id -- string )
+  #! Convert the continuation id to an URL suitable for
+  #! embedding in an HREF or other HTML.
+  url-encode "?id=" swap cat2 ;
 
 DEFER: show 
 
@@ -195,6 +200,15 @@ DEFER: show
   #! stream. Return the string on exit.
   1024 <string-output> dup >r swap with-stream r> stream>str ;
 
+: forward-to-url ( url -- )
+  #! When executed inside a 'show' call, this will force a
+  #! HTTP 302 to occur to instruct the browser to forward to
+  #! the request URL.
+  [ 
+    "HTTP/1.1 302 Document Moved\nLocation: " , ,
+    "\nContent-Length: 0\nContent-Type: text/plan\n\n" , 
+  ] make-string call-exit-continuation ;
+
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser
   #! goes to the current point in the code. This forces an URL
@@ -208,7 +222,7 @@ DEFER: show
   ] [
     [ 
       t swap register-continuation 
-      [ "HTTP/1.1 302 Document Moved\nLocation: " , , "\n" , 
+      [ "HTTP/1.1 302 Document Moved\nLocation: " , id>url , "\n" , 
         "Content-Length: 0\nContent-Type: text/plain\n\n" , ] make-string
       call-exit-continuation 
     ] callcc1 drop 
@@ -226,7 +240,7 @@ DEFER: show
   store-callback-cc
   redirect-enabled? [ redirect-to-here ] when
   [ 
-    t swap register-continuation swap 
+    t swap register-continuation id>url swap 
     [ serving-html ] car swons with-string-stream
     call-exit-continuation 
   ] callcc1 
@@ -235,6 +249,8 @@ DEFER: show
 
 : cont-get-responder ( id-or-f -- ) 
   #! httpd responder that retrieves a continuation and calls it.
+  drop
+  "id" "query" get assoc
   dup f-or-"" [
     #! No continuation id given
     drop "root-continuation" get dup [
@@ -255,7 +271,9 @@ DEFER: show
   #! id and calls it with the POST data as a hashtable on the top
   #! of the stack.
   [ 
-    "response" get alist>hash swap resume-continuation 
+    drop
+    "response" get alist>hash 
+    "id" "query" get assoc resume-continuation 
   ] with-exit-continuation
   print drop ;
 
@@ -271,7 +289,7 @@ DEFER: show
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a href= callback-quot t swap register-continuation a> write </a> ;
+  <a href= callback-quot t swap register-continuation id>url a> write </a> ;
 
 : with-new-session ( quot -- )
   #! Each cont-responder is bound inside their own

@@ -28,10 +28,6 @@
 ! Not all functions have been wrapped yet. Only those directly involving
 ! executing SQL calls and obtaining results.
 !
-! TODO: Do I have to free stuctures like <sqlite3> and <char*>, etc
-!       or do they get freed on garbage collection?
-!       How do I do pointers to pointers? Use the 'indirect' trick?
-!
 IN: sqlite
 USE: kernel
 USE: alien
@@ -98,77 +94,58 @@ END-STRUCT
 : SQLITE_TRANSIENT   -1 ;
 
 : sqlite3_open ( filename sqlite3-indirect -- result )
-  "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ; compiled
 
 : sqlite3_close ( db -- )
-  "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ; compiled
 
 : sqlite3_prepare ( db sql sql-len sqlite3-stmt-indirect tail -- result )
-  "int" "sqlite" "sqlite3_prepare" [ "sqlite3*" "char*" "int" "sqlite3-stmt-indirect*" "char*-indirect*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_prepare" [ "sqlite3*" "char*" "int" "sqlite3-stmt-indirect*" "char*-indirect*" ] alien-invoke ; compiled
 
 : sqlite3_finalize ( stmt -- result ) 
-  "int" "sqlite" "sqlite3_finalize" [ "sqlite3-stmt*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_finalize" [ "sqlite3-stmt*" ] alien-invoke ; compiled
 
 : sqlite3_reset ( stmt -- result )
-  "int" "sqlite" "sqlite3_reset" [ "sqlite3-stmt*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_reset" [ "sqlite3-stmt*" ] alien-invoke ; compiled
 
 : sqlite3_step ( stmt -- result )
-  "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; compiled
 
 : sqlite3_bind_blob ( stmt index pointer len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ; compiled
 
 : sqlite3_bind_int ( stmt index int -- result )
-  "int" "sqlite" "sqlite3_bind_int" [ "sqlite3-stmt*" "int" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_bind_int" [ "sqlite3-stmt*" "int" "int" ] alien-invoke ; compiled
 
 : sqlite3_bind_null ( stmt index  -- result )
-  "int" "sqlite" "sqlite3_bind_null" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_bind_null" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_bind_text ( stmt index text len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_count ( stmt -- count )
-  "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ; compiled
 
 : sqlite3_column_blob ( stmt col -- void* )
-  "void*" "sqlite" "sqlite3_column_blob" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "void*" "sqlite" "sqlite3_column_blob" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_bytes ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_bytes" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_column_bytes" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_decltype ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_decltype" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "char*" "sqlite" "sqlite3_column_decltype" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_int ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_int" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "int" "sqlite" "sqlite3_column_int" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_name ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_name" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "char*" "sqlite" "sqlite3_column_name" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_text ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_text" [ "sqlite3-stmt*" "int" ] alien-invoke ;
+  "char*" "sqlite" "sqlite3_column_text" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 : sqlite3_column_type ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_type" [ "sqlite3-stmt*" "int" ] alien-invoke ;
-
-\ sqlite3_open compile
-\ sqlite3_close compile
-\ sqlite3_prepare compile
-\ sqlite3_finalize compile
-\ sqlite3_reset compile
-\ sqlite3_bind_blob compile
-\ sqlite3_bind_int compile
-\ sqlite3_bind_null compile
-\ sqlite3_bind_text compile
-\ sqlite3_step compile
-\ sqlite3_column_count compile
-\ sqlite3_column_blob compile
-\ sqlite3_column_bytes compile
-\ sqlite3_column_decltype compile
-\ sqlite3_column_int compile
-\ sqlite3_column_name compile
-\ sqlite3_column_text compile
-\ sqlite3_column_type compile
+  "int" "sqlite" "sqlite3_column_type" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
 
 ! High level sqlite routines
 : sqlite-check-result ( result -- )
@@ -220,26 +197,32 @@ END-STRUCT
   #! from zero, as a string.
   sqlite3_column_text ;
 
-: (sqlite-each) 
-  "statement" get sqlite3_step dup SQLITE_ROW = [
-    drop
-    "statement" get "quot" get call (sqlite-each)
-  ] [ 
+: step-complete? ( step-result -- bool )
+  #! Return true if the result of a sqlite3_step is
+  #! such that the iteration has completed (ie. it is
+  #! SQLITE_DONE). Throw an error if an error occurs. 
+  dup SQLITE_ROW =  [
+    drop f
+  ] [
     dup SQLITE_DONE = [
-      drop
+      drop t 
     ] [
       sqlite-check-result
-    ] ifte 
+    ] ifte
   ] ifte ;
 
 : sqlite-each ( statement quot -- )    
-  #! Excecute the SQL statement, and call the quotation for
+  #! Execute the SQL statement, and call the quotation for
   #! each row returned from executing the statement with the
   #! statement on the top of the stack.
-  #! TODO: Implement without named parameters
-  <namespace> [
-    "quot" set
-    "statement" set
-    (sqlite-each)
-  ] bind ;
+  over sqlite3_step step-complete? [ 
+    2drop
+  ] [
+    2dup 2slip sqlite-each
+  ] ifte ;
 
+! For comparison, here is the linrec implementation of sqlite-each
+! [ drop sqlite3_step step-complete? ]
+! [ 2drop ]
+! [ 2dup 2slip ]
+! [ ] linrec ; 

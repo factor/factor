@@ -47,7 +47,7 @@ USE: lists
     [
       "js/liveUpdater.js" get-live-updater-js write
     ] show        
-  ] register-continuation ;
+  ] register-continuation id>url ;
 
 : include-live-updater-js ( -- )
   #! Write out the HTML script to include the live updater
@@ -96,7 +96,7 @@ USE: lists
     "document.getElementById('" write
     write
     "').onclick=liveUpdaterUri('" write
-    register-live-anchor-quot write
+    register-live-anchor-quot id>url write
     "');" write
   </script> ;
   
@@ -153,7 +153,7 @@ USE: lists
     "liveSearch('" write
     write
     "', '" write
-    register-live-search-quot write
+    register-live-search-quot id>url write
     "');" write
   </script> ;
 

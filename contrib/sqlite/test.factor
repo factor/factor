@@ -47,4 +47,9 @@ USE: prettyprint
   sqlite-finalize
   sqlite-close ;
 
+: run-test2 ( -- )
+  "test.db" sqlite-open
+  dup "select * from test" sqlite-prepare
+  dup [ show-people ] ;
+
 run-test

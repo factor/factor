@@ -107,7 +107,7 @@ USE: kernel
 
 : todo-stylesheet-url ( -- url )
   #! Generate an URL for the stylesheet.
-  t [ [ drop todo-stylesheet write ] show ] register-continuation ;
+  t [ [ drop todo-stylesheet write ] show ] register-continuation id>url ;
 
 : include-todo-stylesheet ( -- )  
   #! Generate HTML to include the todo stylesheet

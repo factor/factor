@@ -45,6 +45,7 @@ USE: errors
 USE: unparser
 USE: logging
 USE: listener
+USE: url-encoding
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -187,6 +188,15 @@ USE: listener
     ] when*
   ] catch ;
 
+: browser-url ( vocab word -- url )
+  #! Given a vocabulary and word as strings, return a browser
+  #! URL which, when requested, will display the source to that
+  #! word.
+  [ 
+    ".?word=" , url-encode ,
+    "&vocab=" , url-encode ,
+  ] make-string ;
+
 : browse ( <browser> -- )
   #! Display a Smalltalk like browser for exploring/modifying words.
   [
@@ -213,15 +223,22 @@ USE: listener
       ] extend
     ] bind [
       "allow-edit?" get
-      "vocabs" get
-      "words" get
+      "vocabs" get 
+      "words" get 
       "eval" get dup [ "vocabs" get swap eval-string ] [ drop ] ifte
+      [
+	"vocabs" get "words" get browser-url forward-to-url
+      ] show
     ] bind <browser>
   ] forever ;
 
 : browser-responder ( allow-edit? -- )
   #! Start the Smalltalk-like browser.
-  "browser" f <browser> browse ;
+  "query" get dup [
+    dup >r "vocab" swap assoc r> "word" swap assoc
+  ] [
+    drop "browser" f 
+  ] ifte <browser> browse ;
 
 "browser" [ f browser-responder ] install-cont-responder
-!"browser-edit" [ t browser-responder ] install-cont-responder
+! "browser-edit" [ t browser-responder ] install-cont-responder
