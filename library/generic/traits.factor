@@ -38,70 +38,46 @@ USE: vectors
 
 ! Traits metaclass for user-defined classes based on hashtables
 
-! Hashtable slot holding a selector->method map.
-SYMBOL: traits
-
-: traits-map ( class -- hash )
-    #! The method map word property maps selector words to
-    #! definitions.
-    "traits-map" word-property ;
+: traits ( object -- symbol ) \ traits swap hash ;
 
 ! Hashtable slot holding an optional delegate. Any undefined
 ! methods are called on the delegate. The object can also
 ! manually pass any methods on to the delegate.
 SYMBOL: delegate
 
-: object-map ( obj -- hash )
-    #! Get the method map for an object.
-    #! We will use hashtable? here when its a first-class type.
-    dup vector? [ traits swap hash ] [ drop f ] ifte ;
-
-: traits-dispatch ( selector traits -- traits quot )
-    #! Look up the method with the traits object on the stack.
-    #! Returns the traits to call the method on; either the
-    #! original object, or one of the delegates.
-    2dup object-map hash* dup [
-        rot drop cdr ( method is defined )
+: traits-dispatch ( object selector -- object quot )
+    over traits over "methods" word-property hash* dup [
+        nip cdr ( method is defined )
     ] [
-        drop delegate swap hash* dup [
-            cdr traits-dispatch ( check delegate )
+        drop delegate rot hash [
+            swap traits-dispatch ( check delegate )
         ] [
-            drop [ undefined-method ] ( no delegate )
-        ] ifte
+            [ undefined-method ] ( no delegate )
+        ] ifte*
     ] ifte ;
 
 : add-traits-dispatch ( word vtable -- )
-    >r unit [ car swap traits-dispatch call ] cons \ vector r>
+    >r unit [ car traits-dispatch call ] cons \ vector r>
     set-vtable ;
 
-traits [
+\ traits [
     ( generic vtable definition class -- )
     2drop add-traits-dispatch
 ] "add-method" set-word-property
 
-traits [
-    ( class generic quotation )
-    3dup -rot (define-method)
-    over dup word-parameter car add-traits-dispatch
-    swap rot traits-map set-hash
-] "define-method" set-word-property
-
-traits [
+\ traits [
     drop vector "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
 
-traits 10 "priority" set-word-property
+\ traits 10 "priority" set-word-property
 
-traits [ 2drop t ] "class<" set-word-property
-
-: init-traits-map ( word -- )
-    <namespace> "traits-map" set-word-property ;
+\ traits [ 2drop t ] "class<" set-word-property
 
 : traits-predicate ( word -- )
     #! foo? where foo is a traits type tests if the top of stack
     #! is of this type.
     dup predicate-word swap
-    traits-map [ swap object-map eq? ] cons
+    [ swap traits eq? ] cons
     define-compound ;
 
 : TRAITS:
@@ -109,8 +85,7 @@ traits [ 2drop t ] "class<" set-word-property
     #! created with <foo>, and tested with foo?.
     CREATE
     dup define-symbol
-    dup init-traits-map
-    dup traits "metaclass" set-word-property
+    dup \ traits "metaclass" set-word-property
     traits-predicate ; parsing
 
 : constructor-word ( word -- word )
@@ -118,7 +93,7 @@ traits [ 2drop t ] "class<" set-word-property
 
 : define-constructor ( constructor traits definition -- )
     >r
-    traits-map [ traits pick set-hash ] cons \ <namespace> swons
+    [ \ traits pick set-hash ] cons \ <namespace> swons
     r> append define-compound ;
 
 : C: ( -- constructor traits [ ] )

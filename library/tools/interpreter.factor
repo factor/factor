@@ -192,13 +192,16 @@ SYMBOL: meta-cf
 : not-done ( quot -- )
     done? [ "Stepper is done." print drop ] [ call ] ifte ;
 
+: next-report ( -- obj )
+    next dup report meta-cf get report ;
+
 : step
     #! Step into current word.
-    [ meta-cf get . next do-1 ] not-done ;
+    [ next-report do-1 ] not-done ;
 
 : into
     #! Step into current word.
-    [ meta-cf get . next do ] not-done ;
+    [ next-report do ] not-done ;
 
 : walk-banner ( -- )
     "The following words control the single-stepper:" print
