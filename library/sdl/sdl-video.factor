@@ -56,32 +56,39 @@ USE: stack
 : SDL_SRCALPHA    HEX: 00010000 ; ! Blit uses source alpha blending
 : SDL_PREALLOC    HEX: 01000000 ; ! Surface uses preallocated memory
 
+BEGIN-STRUCT: rect
+    FIELD: short x
+    FIELD: short y
+    FIELD: ushort w
+    FIELD: ushort h
+END-STRUCT
+
 BEGIN-STRUCT: format
     FIELD: void* palette
-    FIELD: char  BitsPerPixel
-    FIELD: char  BytesPerPixel
-    FIELD: char  Rloss
-    FIELD: char  Gloss
-    FIELD: char  Bloss
-    FIELD: char  Aloss
-    FIELD: char  Rshift
-    FIELD: char  Gshift
-    FIELD: char  Bshift
-    FIELD: char  Ashift
-    FIELD: int   Rmask
-    FIELD: int   Gmask
-    FIELD: int   Bmask
-    FIELD: int   Amask
-    FIELD: int   colorkey
-    FIELD: char  alpha
+    FIELD: uchar  BitsPerPixel
+    FIELD: uchar  BytesPerPixel
+    FIELD: uchar  Rloss
+    FIELD: uchar  Gloss
+    FIELD: uchar  Bloss
+    FIELD: uchar  Aloss
+    FIELD: uchar  Rshift
+    FIELD: uchar  Gshift
+    FIELD: uchar  Bshift
+    FIELD: uchar  Ashift
+    FIELD: uint   Rmask
+    FIELD: uint   Gmask
+    FIELD: uint   Bmask
+    FIELD: uint   Amask
+    FIELD: uint   colorkey
+    FIELD: uchar  alpha
 END-STRUCT
 
 BEGIN-STRUCT: surface
-    FIELD: int     flags
+    FIELD: uint    flags
     FIELD: format* format
     FIELD: int     w
     FIELD: int     h
-    FIELD: short   pitch
+    FIELD: ushort  pitch
     FIELD: void*   pixels
     FIELD: int     offset
     FIELD: void*   hwdata
@@ -89,10 +96,10 @@ BEGIN-STRUCT: surface
     FIELD: short   clip-y
     FIELD: short   clip-w
     FIELD: short   clip-h
-    FIELD: int     unused1
-    FIELD: int     locked
+    FIELD: uint    unused1
+    FIELD: uint    locked
     FIELD: int     map
-    FIELD: int     format_version
+    FIELD: uint    format_version
     FIELD: int     refcount
 END-STRUCT
 
@@ -106,18 +113,42 @@ END-STRUCT
         drop t
     ] ifte ;
 
+: SDL_VideoInit ( driver-name flags -- )
+    "int" "sdl" "SDL_SetVideoMode"
+    [ "char*" "int" ] alien-call ;
+
+: SDL_VideoQuit ( -- )
+    "void" "sdl" "SDL_VideoQuit" [ ] alien-call ;
+
+! SDL_VideoDriverName -- needs strings as out params.
+
+: SDL_GetVideoSurface ( -- surface )
+    "surface*" "sdl" "SDL_GetVideoSurface" [ ] alien-call ;
+
+! SDL_GetVideoInfo needs C struct bitfield support
+
+: SDL_VideoModeOK ( width height bpp flags -- )
+    "int" "sdl" "SDL_VideoModeOK"
+    [ "int" "int" "int" "int" ] alien-call ;
+
+! SDL_ListModes needs array of structs support
+
 : SDL_SetVideoMode ( width height bpp flags -- )
     "int" "sdl" "SDL_SetVideoMode"
     [ "int" "int" "int" "int" ] alien-call ;
+
+! UpdateRects, UpdateRect
+
+: SDL_Flip ( surface -- )
+    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
+
+! SDL_SetGamma: float types
 
 : SDL_LockSurface ( surface -- )
     "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
 
 : SDL_UnlockSurface ( surface -- )
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
-
-: SDL_Flip ( surface -- )
-    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
 
 : SDL_MapRGB ( surface r g b -- )
     "int" "sdl" "SDL_MapRGB"

@@ -1,5 +1,10 @@
 FFI:
 - is signed -vs- unsigned pointers an issue?
+- bitfields in C structs
+- unsigned types
+- SDL_Rect** type
+- struct membres that are not *
+- float types
 
 - command line parsing cleanup
 - > 1 ( ) inside word def

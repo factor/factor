@@ -37,13 +37,6 @@ USE: words
 
 [ ] [ ] [ while-test ] test-word
 
-: [while]
-    [ over call ] [ dup 2dip ] while 2drop ; inline
-
-: [while-test] [ f ] [ ] [while] ; word must-compile
-
-[ ] [ ] [ [while-test] ] test-word
-
 : times-test-1 [ nop ] times ; word must-compile
 : times-test-2 [ succ ] times ; word must-compile
 : times-test-3 0 10 [ succ ] times ; word must-compile
@@ -59,7 +52,7 @@ USE: words
 [ 3 ] [ t f ] [ nested-ifte ] test-word
 [ 4 ] [ f f ] [ nested-ifte ] test-word
 
-: flow-erasure [ 2 2 + ] [ ] dip call ; inline word must-compile
+: flow-erasure [ 2 2 + ] [ ] swap >r call r> call ; inline word must-compile
 
 [ 4 ] [ ] [ flow-erasure ] test-word
 

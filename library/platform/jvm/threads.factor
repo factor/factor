@@ -54,7 +54,7 @@ USE: stack
     [ ] "factor.FactorInterpreter" jnew ;
 
 : fork* ( current new -- thread )
-    dup <thread> [ clone-interpreter ] dip ; interpret-only
+    dup <thread> >r clone-interpreter r> ; interpret-only
 
 : fork ( -- ? )
     #! Spawn a new thread. In the original thread, push f.

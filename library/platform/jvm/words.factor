@@ -81,7 +81,7 @@ USE: stack
 : no-name ( list -- word )
     ! Generates an uninternalized word and gives it a compound
     ! definition created from the given list.
-    [ gensym dup dup ] dip <compound> redefine ;
+    >r gensym dup dup r> <compound> redefine ;
 
 : primitive? ( worddef -- boolean )
     "factor.FactorPrimitiveDefinition" is ;

@@ -58,7 +58,7 @@ USE: stack
     #! evaluate the code with the matcher at the top of the
     #! stack. Otherwise, pop the matcher off the stack and
     #! push f.
-    [ dup re-matches* ] dip [ drop f ] ifte ;
+    >r dup re-matches* r> [ drop f ] ifte ;
 
 : re-replace* ( replace matcher -- string )
     [ "java.lang.String" ] "java.util.regex.Matcher"

@@ -51,7 +51,7 @@ USE: words
     tab-size - ;
 
 : prettyprint-~<<>>~ ( indent word list -- indent )
-    [ [ prettyprint-~<< ] dip prettyprint-word " " write ] dip
+    >r >r prettyprint-~<< r> prettyprint-word " " write r>
     [ write " " write ] each
     prettyprint->>~ ;
 

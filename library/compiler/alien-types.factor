@@ -134,6 +134,14 @@ global [ <namespace> "c-types" set ] bind
 ] "int" define-c-type
 
 [
+    [ alien-4 ] "getter" set
+    [ set-alien-4 ] "setter" set
+    4 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "uint" define-c-type
+
+[
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
@@ -142,12 +150,28 @@ global [ <namespace> "c-types" set ] bind
 ] "short" define-c-type
 
 [
+    [ alien-2 ] "getter" set
+    [ set-alien-2 ] "setter" set
+    2 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "ushort" define-c-type
+
+[
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
     "box_integer" "boxer" set
     "unbox_integer" "unboxer" set
 ] "char" define-c-type
+
+[
+    [ alien-1 ] "getter" set
+    [ set-alien-1 ] "setter" set
+    1 "width" set
+    "box_integer" "boxer" set
+    "unbox_integer" "unboxer" set
+] "uchar" define-c-type
 
 [
     [ alien-4 ] "getter" set

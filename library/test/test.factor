@@ -93,6 +93,7 @@ USE: unparser
         "unparser"
         "random"
         "stream"
+        "styles"
         "math/bignum"
         "math/bitops"
         "math/gcd"
