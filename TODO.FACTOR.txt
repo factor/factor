@@ -1,10 +1,31 @@
+- add a socket timeout
+- don't allow multiple reads on the same port
+  (and don't hang when this happends!)
+- >lower, >upper for strings
+- telnetd should use multitasking
+- telnetd error handling
+- accept multi-line input in listener
+- telnetd: send errors on socket
+
 + docs:
 
-- unparse examples
+- numbers section
+- examples of assoc usage
+- unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
-- recursion -vs- iteration in vectors chapter
-- objects chapter covering namespaces, hashtables, equality and
-  object identity.
+- recursion -vs- iteration in vectors chapter, and combinator
+  construction
+- <% % %> and [, , ,] -- mention that % and , are usually in nested
+  words
+- object identity and equality - eq? and =
+- finish namespaces docs
+- mention word accessors/mutators
+- to document:
+  >r r> (earlier on?)
+  continuations
+  streams
+  multitasking
+  unit testing
 
 + tests:
 
@@ -30,19 +51,12 @@
 
 + native:
 
-- add a socket timeout
-- don't allow multiple reads on the same port
-  (and don't hang when this happends!)
 - is the profiler using correct stack depth?
 - bignums
-- >lower, >upper for strings
 - read1
-- telnetd should use multitasking
-- telnetd error handling
 - sbuf-hashcode
 - vector-hashcode
 - irc: stack underflow?
-- accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - better i/o scheduler
 
@@ -61,7 +75,9 @@
 
 + misc:
 
-- jvm factor -- still supporting httpd?
+- worddef>list ==> word-parameter
+- alist -vs- assoc terminology
+- unique,
 - dissolve builtins vocabulary
 - ifte* combinator
 - 'cascading' styles
@@ -71,8 +87,6 @@
 - namespace clone drops static var bindings
 - ditch expand
 - set-object-path
-- telnetd: send errors on socket
-- contains ==> contains?
 
 + httpd:
 

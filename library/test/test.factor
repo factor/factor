@@ -45,6 +45,7 @@ USE: unparser
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
+    "Timing " write dup .
     millis >r call millis r> - . ;
 
 : test ( name -- )

@@ -31,19 +31,22 @@
 
 Factor is an imperative programming language with functional and object-oriented
 influences. Its primary focus is the development of web-based server-side
-applications. Factor is run by a virtual machine that provides
-garbage collection and prohibits pointer arithmetic.%
-\footnote{Two releases of Factor are available -- a virtual machine written
-in C, and an interpreter written in Java that runs on the Java virtual
-machine. This guide targets the C version of Factor.%
-}
+applications. Factor borrows heavily from Forth, Joy and Lisp. Programmers familiar with these languages will recognize many similarities with Factor.
 
-Factor borrows heavily from Forth, Joy and Lisp. From Forth it inherits
-a flexible syntax defined in terms of ``parsing words'' and an
-execution model based on a data stack and call stack. From Joy and
-Lisp it inherits a virtual machine prohibiting direct pointer arithmetic,
-and the use of ``cons cells'' to represent code and data structure.
+Factor is \emph{interactive}. This means it is possible to run a Factor interpreter that reads from the keyboard, and immediately executes expressions as they are entered. This allows words to be defined and tested one at a time.
 
+Factor is \emph{dynamic}. This means that all objects in the language are fully reflective at run time, and that new definitions can be entered without restarting the interpreter. Factor code can be used interchangably as data, meaning that sophisticated language extensions can be realized as libraries of words.
+
+Factor is \emph{safe}. This means all code executes in a virtual machine that provides
+garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
+
+When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
+output from the interpreter is in italics:
+
+\begin{alltt}
+"Hello, world!" print
+\emph{Hello, world!}
+\end{alltt}
 
 \section{Fundamentals}
 
@@ -51,13 +54,26 @@ A ``word'' is the main unit of program organization
 in Factor -- it corresponds to a ``function'', ``procedure''
 or ``method'' in other languages.
 
-When code examples are given, the input is in a roman font, and any
-output from the interpreter is in italics:
+A typical Factor development session involves a text editor and Factor
+interpreter running side by side. Instead of the edit/compile/run
+cycle, the development process becomes an {}``edit cycle'' -- you
+make some changes to the source file and reload it in the interpreter
+using a command like this:
 
 \begin{alltt}
-"Hello, world!" print
-\emph{Hello, world!}
+"numbers-game.factor" run-file
 \end{alltt}
+
+Then the changes can be tested, either by hand, or using a test harness.
+There is no need to compile anything, or to lose interpreter state
+by restarting. Additionally, words with {}``throw-away'' definitions
+that you do not intend to keep can also be entered directly at this
+interpreter prompt.
+
+Factor emphasizes \emph{bottom-up design}. Each word should do one useful task. New words can be defined in terms
+of existing, already-tested words. You design a set of reusable words
+that model the problem domain. Then, the problem is solved in terms
+of a \emph{domain-specific vocabulary}, and Factor programs are really just libraries of ureusable words.
 
 \subsection{The stack}
 
@@ -340,16 +356,6 @@ a large number of words available for convenience, whereas
 source files should specify their external dependencies explicitly.%
 }
 
-New vocabularies are added to the search path using the \texttt{USE:}
-parsing word. For example:
-
-\begin{alltt}
-{}``/home/slava/.factor-rc'' exists? .
-\emph{ERROR: <interactive>:1: Undefined: exists?}
-USE: streams
-{}``/home/slava/.factor-rc'' exists? .
-\emph{t}
-\end{alltt}
 How do you know which vocabulary contains a word? Vocabularies can
 either be listed, and ``apropos'' searches can be performed:
 
@@ -370,6 +376,18 @@ either be listed, and ``apropos'' searches can be performed:
 \emph{(vector-map-step)}
 \emph{vector-map }
 \end{alltt}
+
+New vocabularies are added to the search path using the \texttt{USE:}
+parsing word. For example:
+
+\begin{alltt}
+"/home/slava/.factor-rc" exists? .
+\emph{ERROR: <interactive>:1: Undefined: exists?}
+USE: streams
+"/home/slava/.factor-rc" exists? .
+\emph{t}
+\end{alltt}
+
 New words are defined in the \emph{input vocabulary}. The input vocabulary
 can be changed at the interactive prompt, or in a source file, using
 the \texttt{IN:} parsing word. For example:
@@ -409,35 +427,6 @@ numbers-game
 \emph{Enter your guess:} 31
 \emph{Correct - you win!}
 \end{alltt}
-
-\subsection{Development methodology}
-
-A typical Factor development session involves a text editor and Factor
-interpreter running side by side. Instead of the edit/compile/run
-cycle, the development process becomes an {}``edit cycle'' -- you
-make some changes to the source file and reload it in the interpreter
-using a command like this:
-
-\begin{alltt}
-"numbers-game.factor" run-file
-\end{alltt}
-Then the changes can be tested, either by hand, or using a test harness.
-There is no need to compile anything, or to lose interpreter state
-by restarting. Additionally, words with {}``throw-away'' definitions
-that you do not intend to keep can also be entered directly at this
-interpreter prompt.
-
-Each word should do one useful task. New words can be defined in terms
-of existing, already-tested words. You design a set of reusable words
-that model the problem domain. Then, the problem is solved in terms
-of a \emph{domain-specific vocabulary}. This is called \emph{bottom-up
-design.}
-
-The jEdit text editor makes Factor development much more pleasant.
-The Factor plugin for jEdit provides an {}``integrated development
-environment'' with many time-saving features. See the documentation
-for the plugin itself for details.
-
 
 \subsection{Getting started}
 
@@ -685,10 +674,15 @@ USE: stack
 : numbers-game number-to-guess numbers-game-loop ;
 \end{verbatim}
 
+\section{Numbers}
+
+Arithmetic operations, number tower, deconstructing ratios and complex, irrational functions, numerical integration.
+
 \section{Lists}
 
-A list is composed of a set of pairs; each pair holds a list element,
-and a reference to the next pair. Lists have the following literal
+A list of objects is realized as a set of pairs; each pair holds a list element,
+and a reference to the next pair. All words relating to cons cells and lists are found in the \texttt{lists}
+vocabulary.  Lists have the following literal
 syntax:
 
 \begin{alltt}
@@ -721,8 +715,7 @@ A cons cell is an object that holds a reference to two other objects.
 The order of the two objects matters -- the first is called the \emph{car},
 the second is called the \emph{cdr}.
 
-All words relating to cons cells and lists are found in the \texttt{lists}
-vocabulary. The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
+The words \texttt{cons}, \texttt{car} and \texttt{cdr}%
 \footnote{These infamous names originate from the Lisp language. Originally,
 {}``Lisp'' stood for {}``List Processing''.%
 } construct and deconstruct cons cells:
@@ -759,7 +752,7 @@ is a proper list, and in fact it is equivalent to the empty list \texttt{{[}
 {]}}. An \emph{improper list} is a set of cons cells that does not terminate with \texttt{f}. Improper lists are input with the following syntax:
 
 \begin{verbatim}
-{[} 1 2 3 | 4 {]}
+[ 1 2 3 | 4 ]
 \end{verbatim}
 
 The \texttt{list?} word tests if the object at the top of the stack
@@ -943,21 +936,21 @@ is suggestive:
 \texttt{assoc? ( obj -{}- ? )} returns \texttt{t} if the object is
 a list whose every element is a cons; otherwise it returns \texttt{f}.
 
-\texttt{assoc ( name alist -{}- value )} looks for a pair with this
-name in the list, and pushes the cdr of the pair. Pushes f if no pair
-with this name is present. Note that \texttt{assoc} cannot differentiate between
-a name that is not present at all, or a name with a value of \texttt{f}.
+\texttt{assoc ( key alist -{}- value )} looks for a pair with this
+key in the list, and pushes the cdr of the pair. Pushes f if no pair
+with this key is present. Note that \texttt{assoc} cannot differentiate between
+a key that is not present at all, or a key with a value of \texttt{f}.
 
-\texttt{assoc{*} ( name alist -{}- {[} name | value {]} )} looks for
-a pair with this name, and pushes the pair itself. Unlike \texttt{assoc},
+\texttt{assoc{*} ( key alist -{}- {[} key | value {]} )} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{assoc},
 \texttt{assoc{*}} returns different values in the cases of a value
 set to \texttt{f}, or an undefined value.
 
-\texttt{set-assoc ( value name alist -{}- alist )} removes any existing
-occurrence of a name from the list, and adds a new pair. This creates
+\texttt{set-assoc ( value key alist -{}- alist )} removes any existing
+occurrence of a key from the list, and adds a new pair. This creates
 a new list, the original is unaffected.
 
-\texttt{acons ( value name alist -{}- alist )} is slightly faster
+\texttt{acons ( value key alist -{}- alist )} is slightly faster
 than \texttt{set-assoc} since it simply conses a new pair onto the
 list. However, if used repeatedly, the list will grow to contain a
 lot of {}``shadowed'' pairs.
@@ -1271,18 +1264,18 @@ A pair of combinators for iterating over vectors are provided in the \texttt{vec
 
 \texttt{vector-each ( vector quot -{}- )} pushes each element of the vector in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( obj -- )}. The vector and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the vector for accumilation and so on.
 
-The \texttt{vector>list} word is defined as first creating a list of all elements in the vector in reverse order, and then reversing this list:
-
-\begin{alltt}
-: vector>list ( vector -- list )
-    stack>list nreverse ;
-\end{alltt}
-
-The \texttt{stack>list} word makes use of \texttt{vector-each} to construct the list. In fact, its definition looks exactly like that of \texttt{reverse} except the \texttt{vector-each} combinator is used in place of \texttt{each}:
+The \texttt{stack>list} word makes use of \texttt{vector-each} to construct a list containing all elements of a given vector, in reverse order. In fact, its definition looks exactly like that of \texttt{reverse} except the \texttt{vector-each} combinator is used in place of \texttt{each}:
 
 \begin{alltt}
 : stack>list ( vector -- list )
     {[} {]} swap {[} swons {]} vector-each ;
+\end{alltt}
+
+The \texttt{vector>list} word is defined as first creating a list of all elements in the vector in reverse order using \texttt{stack>list}, and then reversing this list:
+
+\begin{alltt}
+: vector>list ( vector -- list )
+    stack>list nreverse ;
 \end{alltt}
 
 \texttt{vector-map ( vector quot -{}- str )} is similar to \texttt{vector-each}, except after each iteration the return value of the quotation is collected into a new vector. The quotation should have a stack effect of \texttt{( obj -- obj )}.
@@ -1377,7 +1370,7 @@ buffer type which is the topic of the next section.
 \texttt{str-length ( str -{}- n )} pushes the length of a string:
 
 \begin{alltt}
-{}``Factor'' str-length .
+"Factor" str-length .
 \emph{6}
 \end{alltt}
 \texttt{str-nth ( n str -{}- ch )} pushes the character located by
@@ -1917,14 +1910,123 @@ All that remains now is the ``main word'' that runs the program with an empty ti
     10 <vector> main-menu ;
 \end{alltt}
 
-\section{Variables and namespaces}
+\subsection{The complete program}
 
+\begin{verbatim}
+! Contractor timesheet example
+
+IN: timesheet
+USE: arithmetic
+USE: combinators
+USE: errors
+USE: format
+USE: kernel
+USE: lists
+USE: parser
+USE: stack
+USE: stdio
+USE: strings
+USE: unparser
+USE: vectors
+
+! Adding a new entry to the time sheet.
+
+: measure-duration ( -- duration )
+    millis
+    read drop
+    millis swap - 1000 /i 60 /i ;
+
+: add-entry-prompt ( -- duration description )
+    "Start work on the task now. Press ENTER when done." print
+    measure-duration
+    "Please enter a description:" print
+    read ;
+
+: add-entry ( timesheet -- )
+    add-entry-prompt cons swap vector-push ;
+
+! Printing the timesheet.
+
+: hh ( duration -- str ) 60 /i ;
+: mm ( duration -- str ) 60 mod unparse 2 digits ;
+: hh:mm ( millis -- str ) <% dup hh % ":" % mm % %> ;
+
+: print-entry ( duration description -- )
+    dup write
+    60 swap pad-string write
+    hh:mm print ;
+
+: print-timesheet ( timesheet -- )
+    "TIMESHEET:" print
+    [ uncons print-entry ] vector-each ;
+
+! Displaying a menu
+
+: print-menu ( menu -- )
+    terpri [ cdr car print ] each terpri
+    "Enter a letter between ( ) to execute that action." print ;
+
+: menu-prompt ( menu -- )
+    read swap assoc dup [
+        cdr call
+    ] [
+        "Invalid input: " swap unparse cat2 throw
+    ] ifte ;
+
+: menu ( menu -- )
+    dup print-menu menu-prompt ;
+
+! Main menu
+
+: main-menu ( timesheet -- )
+    [
+        [ "e" "(E)xit" drop ]
+        [ "a" "(A)dd entry" dup add-entry main-menu ]
+        [ "p" "(P)rint timesheet" dup print-timesheet main-menu ]
+    ] menu ;
+
+: timesheet-app ( -- )
+    10 <vector> main-menu ;
+\end{verbatim}
+
+\section{Object orientation}
+
+\subsection{Identity and equality}
 
 \subsection{Hashtables}
 
+A hashtable, much like an association list, stores key/value pairs, and offers lookup by key. However, whereas an association list must be searched linearly to locate keys, a hashtable uses a more sophisticated method. Key/value pairs are sorted into \emph{buckets} using a \emph{hash function}. If two objects are equal, then they must have the same hash code; but not necessarily vice versa. To look up the value associated with a key, only the bucket corresponding to the key has to be searched. A hashtable is simply a vector of buckets, where each bucket is an association list.
+
+\texttt{<hashtable> ( capacity -{}- hash )} creates a new hashtable with the specified number of buckets. A hashtable with one bucket is basically an association list. Right now, a ``large enough'' capacity must be specified, and performance degrades if there are too many key/value pairs per bucket. In a future implementation, hashtables will grow as needed as the number of key/value pairs increases.
+
+\texttt{hash ( key hash -{}- value )} looks up the value associated with a key in the hashtable. Pushes \texttt{f} if no pair with this key is present. Note that \texttt{hash} cannot differentiate between a key that is not present at all, or a key with a value of \texttt{f}.
+
+\texttt{hash* ( key hash -{}- {[} key | value {]})} looks for
+a pair with this key, and pushes the pair itself. Unlike \texttt{hash},
+\texttt{hash{*}} returns different values in the cases of a value
+set to \texttt{f}, or an undefined value.
+
+\texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
+
+examples, and hash>alist, hash-keys, hash-values
+
+\subsection{Variables}
+
+Notice that until now, all the code except a handful of examples has only used the stack for storage. You can also use variables to store temporary data, much like in other languages, however their use is not so prevalent. This is not a coincidence -- Fator was designed this way, and mastery of the stack is essential. Using variables where the stack is more appropriate leads to ugly, unreusable code.
+
+Variables are typically used for longer-term storage of data, and for temporary storage of objects that are being constructed, where using the stack would be ackward. Another use for variables is compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language.
+
+The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. For example:
+
+blah blah
 
 \subsection{Namespaces}
 
+describe bind and extend combinators
+
+namespaces are hashtables
+
+values, vars, vars-values
 
 \subsection{The name stack}
 
@@ -1947,12 +2049,6 @@ The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} ar
 : >n ( namespace -- n:namespace ) namestack* vector-push ;
 : n> ( n:namespace -- namespace ) namestack* vector-pop ;
 \end{alltt}
-
-\subsection{The inspector}
-
-
-\section{PRACTICAL: Music player}
-
 
 \section{Metaprogramming}
 

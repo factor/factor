@@ -21,7 +21,7 @@ unit-test
 [ f ]
 [
     "random-pairs" get
-    random-element* [ t f "monkey" ] contains not
+    random-element* [ t f "monkey" ] contains? not
 ] unit-test
 
 : check-random-int ( min max -- )

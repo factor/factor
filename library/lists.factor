@@ -81,16 +81,12 @@ USE: vectors
 : cddr ( list -- cddr )
     cdr cdr ; inline
 
-: contains ( element list -- remainder )
+: contains? ( element list -- remainder )
     #! If the proper list contains the element, push the
     #! remainder of the list, starting from the cell whose car
     #! is elem. Otherwise push f.
     dup [
-        2dup car = [
-            nip
-        ] [
-            cdr contains
-        ] ifte
+        2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -143,7 +139,7 @@ USE: vectors
 : next ( obj list -- obj )
     #! Push the next object in the list after an object. Wraps
     #! around to beginning of list if object is at the end.
-    tuck contains dup [
+    tuck contains? dup [
         ! Is there another entry in the list?
         cdr dup [
             nip car
@@ -238,11 +234,7 @@ DEFER: tree-contains?
 : unique ( elem list -- list )
     #! Prepend an element to a proper list if it is not
     #! already contained in the list.
-    2dup contains [
-        nip
-    ] [
-        cons
-    ] ifte ;
+    2dup contains? [ nip ] [ cons ] ifte ;
 
 : each ( list quotation -- )
     #! Push each element of a proper list in turn, and apply a
