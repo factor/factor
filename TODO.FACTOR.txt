@@ -6,6 +6,7 @@
 
 + ui:
 
+- single-pixel shuffle
 - resizing a gadget should probably relayout children
 - resizing: drag relative to initial click pos
 - mouse enter onto overlapping with interior, but not child, gadget

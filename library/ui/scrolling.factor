@@ -111,11 +111,11 @@ TUPLE: scroller viewport slider ;
     dup scroller-viewport viewport>bottom
     scroller-slider relayout ;
 
-: scroller-actions ( scroller -- )
-    [ (scroll>bottom) ] [ scroll>bottom ] set-action ;
-
 : scroll>bottom ( gadget -- )
     [ scroll>bottom ] swap handle-gesture drop ;
+
+: scroller-actions ( scroller -- )
+    [ (scroll>bottom) ] [ scroll>bottom ] set-action ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
