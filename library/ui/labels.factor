@@ -14,12 +14,5 @@ C: label ( text -- )
 M: label layout* ( label -- )
     [ label-text dup shape-w swap shape-h ] keep resize-gadget ;
 
-: label-x ( label -- x )
-    dup shape-w swap label-text shape-w - 2 /i ;
-
-: label-y ( label -- y )
-    shape-h font get lookup-font TTF_FontHeight - 2 /i ;
-
 M: label draw-shape ( label -- )
-    dup label-x over label-y rect> over shape-pos +
-    [ label-text draw-shape ] with-trans ;
+    dup shape-pos [ label-text draw-shape ] with-trans ;

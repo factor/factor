@@ -9,7 +9,6 @@
 - fix up the min thumb size hack
 - fix up initial layout of slider
 - console: scroll to bottom
-- pile/shelf fill
 - caret clip
 
 + compiler/ffi:

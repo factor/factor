@@ -38,38 +38,47 @@ C: pile ( align gap fill -- pile )
 : <default-pile> 1/2 default-gap 0 <pile> ;
 : <line-pile> 0 0 1 <pile> ;
 
-: horizontal-layout ( gadget y box -- )
-    pick shape-w over shape-w swap - swap pile-align * >fixnum
-    swap rot move-gadget ;
+: w- swap shape-w swap shape-w - ;
+: pile-w 2dup w- rot pile-fill * swap shape-w + >fixnum ;
+: pile-x dupd w- swap pile-align * >fixnum ;
+
+: horizontal-layout ( pile gadget y -- )
+    >r 2dup pile-w over shape-h pick resize-gadget
+    tuck pile-x r> rot move-gadget ;
 
 M: pile layout* ( pile -- )
     dup pile-gap over gadget-children run-heights >r >r
     dup gadget-children max-width r> pick resize-gadget
     dup gadget-children r> zip [
-        uncons rot horizontal-layout
+        uncons horizontal-layout
     ] each-with ;
 
 ! A shelf is a box that lays out its contents horizontally.
-TUPLE: shelf gap align delegate ;
+TUPLE: shelf gap align fill delegate ;
 
-C: shelf ( align gap -- shelf )
+C: shelf ( align gap fill -- shelf )
     <empty-gadget> over set-shelf-delegate
+    [ set-shelf-fill ] keep
     [ set-shelf-gap ] keep
     [ set-shelf-align ] keep ;
 
-: vertical-layout ( gadget x box -- )
-    pick shape-h over shape-h swap - swap shelf-align * >fixnum
-    rot move-gadget ;
+: h- swap shape-h swap shape-h - ;
+: shelf-h 2dup h- rot shelf-fill * swap shape-h + >fixnum ;
+: shelf-y dupd h- swap shelf-align * >fixnum ;
 
-: <default-shelf> 1/2 default-gap <shelf> ;
-: <line-shelf> 0 0 <shelf> ;
+: vertical-layout ( gadget x shelf -- )
+    >r 2dup shelf-h >r dup shape-w r> pick resize-gadget
+    tuck shelf-y r> swap rot move-gadget ;
+
+: <default-shelf> 1/2 default-gap 0 <shelf> ;
+: <line-shelf> 0 0 1 <shelf> ;
 
 M: shelf layout* ( pile -- )
     dup shelf-gap over gadget-children run-widths >r >r
     dup gadget-children max-height r> swap pick resize-gadget
     dup gadget-children r> zip [
-        uncons pick vertical-layout
-    ] each drop ;
+        uncons vertical-layout
+    ] each-with ;
 
 ! A border lays out its children on top of each other, all with
 ! a 5-pixel padding.

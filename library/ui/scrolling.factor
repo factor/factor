@@ -38,8 +38,10 @@ C: viewport ( content -- viewport )
 
 M: viewport layout* ( viewport -- )
     dup gadget-children [
-        >r dup viewport-x swap viewport-y r>
-        move-gadget
+        2dup
+        >r dup viewport-x swap viewport-y r> move-gadget
+        [ dup shape-h >r swap shape-w swap shape-w max r> ] keep
+        resize-gadget
     ] each-with ;
 
 : scroll>bottom ( viewport -- )
@@ -95,7 +97,7 @@ C: slider ( viewport -- slider )
     [ set-slider-viewport ] keep
     [
         f bevel-border dup f bevel-up? set-paint-property
-        slider-size 480 pick resize-gadget
+        slider-size 200 pick resize-gadget
         swap set-slider-delegate
     ] keep
     [ <thumb> swap add-thumb ] keep
@@ -128,6 +130,6 @@ TUPLE: scroller viewport slider delegate ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
-    [ <default-shelf> swap set-scroller-delegate ] keep
+    [ <line-shelf> swap set-scroller-delegate ] keep
     [ >r <viewport> r> add-viewport ] keep
     [ dup scroller-viewport <slider> swap add-slider ] keep ;
