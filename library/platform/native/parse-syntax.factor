@@ -132,7 +132,7 @@ USE: unparser
     <% parse-string "pos" get %> swap "pos" set parsed ; parsing
 
 ! Char literal
-: CHAR: ( -- ) skip-blank next-ch parse-ch parsed ; parsing
+: CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
 
 ! Complex literal
 : #{

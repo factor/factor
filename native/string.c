@@ -136,8 +136,8 @@ FIXNUM string_compare(STRING* s1, STRING* s2)
 
 void primitive_string_compare(void)
 {
-	STRING* s1 = untag_string(env.dt);
-	STRING* s2 = untag_string(dpop());
+	STRING* s2 = untag_string(env.dt);
+	STRING* s1 = untag_string(dpop());
 
 	env.dt = tag_fixnum(string_compare(s1,s2));
 }

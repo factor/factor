@@ -10,6 +10,8 @@ ZONE* z2;
 ZONE* active; /* either z1 or z2 */
 ZONE* prior; /* if active==z1, z2; if active==z2, z1 */
 
+void* alloc_guarded(CELL size);
+ZONE* zalloc(CELL size);
 void init_arena(CELL size);
 void flip_zones();
 

@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 
 	init_arena(DEFAULT_ARENA);
 	load_image(argv[1]);
-	init_environment();
+	init_stacks();
 	init_io();
 	run();
 

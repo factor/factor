@@ -67,31 +67,54 @@ USE: unparser
 : ch ( -- ch ) "pos" get "line" get str-nth ;
 : advance ( -- ) "pos" succ@ ;
 
-: ch-blank? ( -- ? ) end? [ f ] [ ch blank? ] ifte ;
-: skip-blank ( -- ) [ ch-blank? ] [ advance ] while ;
-: ch-word? ( -- ? ) end? [ f ] [ ch blank? not ] ifte ;
-: skip-word ( -- ) [ ch-word? ] [ advance ] while ;
+: skip ( n line quot -- n )
+    #! Find the next character that satisfies the quotation,
+    #! which should have stack effect ( ch -- ? ).
+    >r 2dup str-length < [
+        2dup str-nth r> dup >r call [
+            r> 2drop
+        ] [
+            >r succ r> r> skip
+        ] ifte
+    ] [
+        r> drop nip str-length
+    ] ifte ;
 
-: ch-dispatch? ( -- ? )
+: skip-blank ( n line -- n )
+    [ blank? not ] skip ;
+
+: skip-word ( n line -- n )
+    [ blank? ] skip ;
+
+: denotation? ( ch -- ? )
     #! Hard-coded for now. Make this customizable later.
-    #! A 'dispatch' is a character that is treated as its
+    #! A 'denotation' is a character that is treated as its
     #! own word, eg:
     #!
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    ch "\"" str-contains? ;
+    "\"" str-contains? ;
 
-: (scan) ( -- start end )
-    skip-blank "pos" get
-    end? [
-        dup
+: (scan) ( n line -- start end )
+    dup >r skip-blank dup r>
+    2dup str-length < [
+        2dup str-nth denotation? [
+            drop succ
+        ] [
+            skip-word
+        ] ifte
     ] [
-        ch-dispatch? [ advance ] [ skip-word ] ifte "pos" get
+        drop
     ] ifte ;
 
-: scan ( -- str )
-    (scan) 2dup = [ 2drop f ] [ "line" get substring ] ifte ;
+: scan ( -- token )
+    "pos" get "line" get dup >r (scan) dup "pos" set
+    2dup = [
+        r> 3drop f
+    ] [
+        r> substring
+    ] ifte ;
 
 : parse-word ( str -- obj )
     dup "use" get search dup [
@@ -146,3 +169,6 @@ USE: unparser
 
 : next-ch ( -- ch )
     end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
+
+: next-word-ch ( -- ch )
+    "pos" get "line" get skip-blank "pos" set next-ch ;

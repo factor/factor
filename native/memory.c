@@ -4,20 +4,20 @@
 under/overflow. size must be a multiple of the page size */
 void* alloc_guarded(CELL size)
 {
-	char* stack = mmap((void*)0,PAGE_SIZE + STACK_SIZE + PAGE_SIZE,
+	char* array = mmap((void*)0,PAGE_SIZE + size + PAGE_SIZE,
 		PROT_READ | PROT_WRITE,MAP_ANON,-1,0);
 
-	if(mprotect(stack,PAGE_SIZE,PROT_NONE) == -1)
-		fatal_error("Cannot allocate low guard page",(CELL)stack);
+	if(mprotect(array,PAGE_SIZE,PROT_NONE) == -1)
+		fatal_error("Cannot allocate low guard page",(CELL)array);
 
-	if(mprotect(stack + PAGE_SIZE + STACK_SIZE,PAGE_SIZE,PROT_NONE) == -1)
-		fatal_error("Cannot allocate high guard page",(CELL)stack);
+	if(mprotect(array + PAGE_SIZE + size,PAGE_SIZE,PROT_NONE) == -1)
+		fatal_error("Cannot allocate high guard page",(CELL)array);
 
-	/* return bottom of actual stack */
-	return stack + PAGE_SIZE;
+	/* return bottom of actual array */
+	return array + PAGE_SIZE;
 }
 
-static ZONE* zalloc(CELL size)
+ZONE* zalloc(CELL size)
 {
 	ZONE* z = (ZONE*)malloc(sizeof(ZONE));
 	if(z == 0)

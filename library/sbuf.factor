@@ -34,6 +34,9 @@ USE: namespaces
 USE: strings
 USE: stack
 
+: str>sbuf ( str -- sbuf )
+    dup str-length <sbuf> tuck sbuf-append ;
+
 : string-buffer-size 80 ;
 
 : <% ( -- )

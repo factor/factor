@@ -115,9 +115,8 @@ void copy_roots(void)
 {
 	int i;
 
-	CELL ds_depth = env.ds - UNTAG(env.ds_bot);
-	CELL cs_depth = env.cs - UNTAG(env.cs_bot);
-	
+	CELL ptr;
+
 	gc_debug("collect_roots",scan);
 	/* these three must be the first in the heap */
 	copy_object(&empty);
@@ -127,13 +126,15 @@ void copy_roots(void)
 	copy_object(&T);
 	gc_debug("t",T);
 	copy_object(&env.dt);
-	copy_object(&env.ds_bot);
-	env.ds = UNTAG(env.ds_bot) + ds_depth;
-	copy_object(&env.cs_bot);
-	env.cs = UNTAG(env.cs_bot) + cs_depth;
 	copy_object(&env.cf);
 	copy_object(&env.boot);
-	
+
+	for(ptr = env.ds_bot; ptr < env.ds; ptr += CELLS)
+		copy_object((void*)ptr);
+
+	for(ptr = env.cs_bot; ptr < env.cs; ptr += CELLS)
+		copy_object((void*)ptr);
+
 	for(i = 0; i < USER_ENV; i++)
 		copy_object(&env.user[i]);
 }

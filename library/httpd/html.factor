@@ -64,11 +64,8 @@ USE: url-encoding
     #! Wrap a string in an HTML tag.
     <% dupd opening-tag swap % closing-tag %> ;
 
-: responder-link% ( -- )
-    "/" % "responder" get % "/" % ;
-
 : link-attrs ( link -- attrs )
-    <% "href=\"" % responder-link% % "\"" % %> ;
+    <% "href=\"/inspect/" % % "\"" % %> ;
 
 : link-tag ( string link -- string )
     "a" swap link-attrs html-tag ;

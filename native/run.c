@@ -7,15 +7,6 @@ void clear_environment(void)
 		env.user[i] = 0;
 }
 
-void init_environment(void)
-{
-	env.ds_bot = tag_object(array(STACK_SIZE,empty));
-	reset_datastack();
-	env.cs_bot = tag_object(array(STACK_SIZE,empty));
-	reset_callstack();
-	env.cf = env.boot;
-}
-
 #define EXECUTE(w) ((XT)(w->xt))()
 
 void run(void)
@@ -27,8 +18,6 @@ void run(void)
 	
 	for(;;)
 	{
-		check_stacks();
-
 		if(env.cf == F)
 		{
 			if(cpeek() == empty)

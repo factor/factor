@@ -17,11 +17,11 @@ typedef struct {
 	CELL dt;
 	/* TAGGED currently executing quotation */
 	CELL cf;
-	/* TAGGED pointer to datastack bottom */
+	/* raw pointer to datastack bottom */
 	CELL ds_bot;
 	/* raw pointer to datastack top */
 	CELL ds;
-	/* TAGGED pointer to callstack bottom */
+	/* raw pointer to callstack bottom */
 	CELL cs_bot;
 	/* raw pointer to callstack top */
 	CELL cs;
@@ -36,7 +36,6 @@ typedef struct {
 ENV env;
 
 void clear_environment(void);
-void init_environment(void);
 void check_non_empty(CELL cell);
 
 INLINE CELL dpop(void)

@@ -58,13 +58,13 @@ IN: kernel
     [ ] "java.lang.Object" "getClass" jinvoke
     [ ] "java.lang.Class" "getName" jinvoke ;
 
-: clone ( obj -- obj )
-    [ ] "factor.PublicCloneable" "clone" jinvoke ;
-
 : is ( obj class -- boolean )
     ! Like "instanceof" in Java.
     [ "java.lang.Object" ] "java.lang.Class" "isInstance"
     jinvoke ;
+
+: clone ( obj -- obj )
+    [ ] "factor.PublicCloneable" "clone" jinvoke ;
 
 : toplevel ( -- )
     interpreter

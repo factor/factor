@@ -59,6 +59,7 @@ DEFER: size-of
 IN: strings
 DEFER: str=
 DEFER: str-hashcode
+DEFER: sbuf=
 
 IN: io-internals
 DEFER: open-file
@@ -124,6 +125,7 @@ IN: cross-compiler
         set-sbuf-nth
         sbuf-append
         sbuf>str
+        sbuf=
         number?
         >fixnum
         >bignum

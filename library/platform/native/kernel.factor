@@ -61,6 +61,7 @@ USE: unparser
             [ cons? ] [ cons= ]
             [ vector? ] [ vector= ]
             [ string? ] [ str= ]
+            [ sbuf? ] [ sbuf= ]
             [ drop t ] [ 2drop f ]
         ] cond
     ] ifte ;

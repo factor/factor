@@ -124,7 +124,7 @@ void primitive_sbuf_to_string(void)
 bool sbuf_eq(SBUF* s1, SBUF* s2)
 {
 	if(s1->top == s2->top)
-		return string_compare_head(s1->string,s2->string,s1->top);
+		return (string_compare_head(s1->string,s2->string,s1->top) == 0);
 	else
 		return false;
 }

@@ -2,14 +2,23 @@
 
 void reset_datastack(void)
 {
-	env.ds = UNTAG(env.ds_bot) + sizeof(ARRAY);
+	env.ds = env.ds_bot;
 	env.dt = empty;
 }
 
 void reset_callstack(void)
 {
-	env.cs = UNTAG(env.cs_bot) + sizeof(ARRAY);
+	env.cs = env.cs_bot;
 	cpush(empty);
+}
+
+void init_stacks(void)
+{
+	env.ds_bot = (CELL)alloc_guarded(STACK_SIZE);
+	reset_datastack();
+	env.cs_bot = (CELL)alloc_guarded(STACK_SIZE);
+	reset_callstack();
+	env.cf = env.boot;
 }
 
 void primitive_drop(void)
@@ -99,12 +108,12 @@ void primitive_from_r(void)
 	env.dt = cpop();
 }
 
-VECTOR* stack_to_vector(CELL top, CELL bottom)
+VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
-	CELL depth = (top - bottom - sizeof(ARRAY)) / CELLS - 1;
+	CELL depth = (top - bottom) / CELLS - 1;
 	VECTOR* v = vector(depth);
 	ARRAY* a = v->array;
-	memcpy(a + 1,(void*)(bottom + sizeof(ARRAY) + CELLS),depth * CELLS);
+	memcpy(a + 1,(char*)bottom + CELLS,depth * CELLS);
 	v->top = depth;
 	return v;
 }
@@ -112,19 +121,19 @@ VECTOR* stack_to_vector(CELL top, CELL bottom)
 void primitive_datastack(void)
 {
 	dpush(env.dt);
-	env.dt = tag_object(stack_to_vector(env.ds,UNTAG(env.ds_bot)));
+	env.dt = tag_object(stack_to_vector(env.ds_bot,env.ds));
 }
 
 void primitive_callstack(void)
 {
 	dpush(env.dt);
-	env.dt = tag_object(stack_to_vector(env.cs,UNTAG(env.cs_bot)));
+	env.dt = tag_object(stack_to_vector(env.cs_bot,env.cs));
 }
 
 /* Returns top of stack */
 CELL vector_to_stack(VECTOR* vector, CELL bottom)
 {
-	CELL start = bottom + sizeof(ARRAY) + CELLS;
+	CELL start = bottom + CELLS;
 	CELL len = vector->top * CELLS;
 	memcpy((void*)start,vector->array + 1,len);
 	return start + len;
@@ -132,12 +141,12 @@ CELL vector_to_stack(VECTOR* vector, CELL bottom)
 
 void primitive_set_datastack(void)
 {
-	env.ds = vector_to_stack(untag_vector(env.dt),UNTAG(env.ds_bot));
+	env.ds = vector_to_stack(untag_vector(env.dt),env.ds_bot);
 	env.dt = dpop();
 }
 
 void primitive_set_callstack(void)
 {
-	env.cs = vector_to_stack(untag_vector(env.dt),UNTAG(env.cs_bot));
+	env.cs = vector_to_stack(untag_vector(env.dt),env.cs_bot);
 	env.dt = dpop();
 }
