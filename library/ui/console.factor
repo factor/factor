@@ -53,7 +53,6 @@ USE: math
 USE: kernel
 USE: strings
 USE: alien
-USE: sdl-keysym
 USE: sdl-keyboard
 USE: streams
 USE: prettyprint
@@ -110,6 +109,8 @@ SYMBOL: input-line
         lines get vector-nth draw-line
         next-line
     ] times* ;
+
+: blink-interval 500 ;
 
 : draw-cursor ( x -- )
     surface get
@@ -210,38 +211,14 @@ SYMBOL: event
 
 : valid-char? 1 255 between? ;
 
-! 
-! M: null-key key-down ( key -- )
-!     drop ;
-! 
-! PREDICATE: integer return-key
-!     SDLK_RETURN = ;
-! 
 : return-key
-     input-line get [ line-text get line-clear ] bind
+     input-line get [
+         commit-history
+         line-text get
+         line-clear
+     ] bind
      dup console-write "\n" console-write
      input-continuation get call ;
-! 
-! PREDICATE: integer backspace-key
-!     SDLK_BACKSPACE = ;
-! 
-! M: backspace-key key-down ( key -- )
-!     input-line get [ backspace ] bind ;
-! 
-! PREDICATE: integer left-key
-!     SDLK_LEFT = ;
-! 
-! M: left-key key-down ( key -- )
-!     input-line get [ left ] bind ;
-! 
-! PREDICATE: integer right-key
-!     SDLK_RIGHT = ;
-! 
-! M: right-key key-down ( key -- )
-!     input-line get [ right ] bind ;
-! 
-! M: integer key-down ( key -- )
-!     input-line get [ insert-char ] bind ;
 
 GENERIC: handle-event ( event -- ? )
 
@@ -255,6 +232,9 @@ SYMBOL: keymap
         [ [ "BACKSPACE" ] | [ input-line get [ backspace ] bind ] ]
         [ [ "LEFT" ] | [ input-line get [ left ] bind ] ]
         [ [ "RIGHT" ] | [ input-line get [ right ] bind ] ]
+        [ [ "UP" ] | [ input-line get [ history-prev ] bind ] ]
+        [ [ "DOWN" ] | [ input-line get [ history-next ] bind ] ]
+        [ [ "CTRL" "k" ] | [ input-line get [ line-clear ] bind ] ]
 }} keymap set
 
 M: key-down-event handle-event ( event -- ? )

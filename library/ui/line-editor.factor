@@ -30,16 +30,71 @@ USE: namespaces
 USE: strings
 USE: kernel
 USE: math
+USE: vectors
 
 SYMBOL: line-text
 SYMBOL: caret
 
+! History stuff
+SYMBOL: history
+SYMBOL: history-index
+
+: history-length ( -- n )
+    #! Call this in the line editor scope.
+    history get vector-length ;
+
+: reset-history ( -- )
+    #! Call this in the line editor scope. After user input,
+    #! resets the history index.
+    history-length history-index set ;
+
+: commit-history ( -- )
+    #! Call this in the line editor scope. Adds the currently
+    #! entered text to the history.
+    line-text get dup "" = [
+        drop
+    ] [
+        history-index get history get set-vector-nth
+        reset-history
+    ] ifte ;
+
+: set-line-text ( text -- )
+    #! Call this in the line editor scope.
+    dup line-text set str-length caret set ;
+
+: goto-history ( n -- )
+    #! Call this in the line editor scope.
+    dup history-index set
+    history get vector-nth set-line-text ;
+
+: history-prev ( -- )
+    #! Call this in the line editor scope.
+    history-index get dup 0 = [
+        drop
+    ] [
+        dup history-length = [ commit-history ] when
+        1 - goto-history
+    ] ifte ;
+
+: history-next ( -- )
+    #! Call this in the line editor scope.
+    history-index get dup 1 + history-length >= [
+        drop
+    ] [
+        1 + goto-history
+    ] ifte ;
+
 : line-clear ( -- )
     #! Call this in the line editor scope.
-    0 caret set "" line-text set ;
+    0 caret set
+    "" line-text set ;
 
 : <line-editor> ( -- editor )
-    <namespace> [ line-clear ] extend ;
+    <namespace> [
+        line-clear
+        100 <vector> history set
+        0 history-index set
+    ] extend ;
 
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.
@@ -51,6 +106,7 @@ SYMBOL: caret
 
 : line-insert ( str offset -- )
     #! Call this in the line editor scope.
+    reset-history
     2dup caret-insert
     line-text get swap str/
     swapd cat3 line-text set ;
@@ -73,6 +129,7 @@ SYMBOL: caret
 
 : line-remove ( offset length -- )
     #! Call this in the line editor scope.
+    reset-history
     2dup caret-remove
     dupd + line-text get str-tail
     >r line-text get str-head r> cat2
