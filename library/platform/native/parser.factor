@@ -173,8 +173,14 @@ USE: unparser
 : until ( ch -- str )
     ch-search (until) ;
 
+: (until-eol) ( -- index ) 
+    "\n" ch-search dup -1 = [ drop "line" get str-length ] when ;
+
 : until-eol ( -- str )
-    "line" get str-length (until) ;
+    #! This is just a hack to get "eval" to work with multiline
+    #! strings from jEdit with EOL comments. Normally, input to
+    #! the parser is already line-tokenized.
+    (until-eol) (until) ;
 
 : next-ch ( -- ch )
     end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;

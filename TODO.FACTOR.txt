@@ -1,5 +1,13 @@
 FFI:
 
+- wordpreview: don't show for string literals and comments
+- listener: use console shell api
+- add a socket timeout
+- fix error postoning -- not all errors thrown by i/o code are
+  postponed
+- file responder: don't show full path in title
+- quit responder breaks with multithreading
+
 + compiler/ffi:
 
 - is signed -vs- unsigned pointers an issue?
@@ -37,15 +45,12 @@ FFI:
 - clean up listener's action popups
 - accept multi-line input in listener
 - don't show listener on certain commands
-- wordpreview: don't show for string literals and comments
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
 - use inferior.factor for everything not just listener
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- input style after clicking link
-- listener backspace overzealous
 - completion in the listener
 - special completion for USE:/IN:
 - inspector links when describe called without object path
@@ -54,12 +59,7 @@ FFI:
 
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
-- move some s48_ functions into bignum.c
-- remove unused functions
 - >lower, >upper for strings
-- add a socket timeout
-- fix error postoning -- not all errors thrown by i/o code are
-  postponed
 - don't rehash strings on every startup
 
 + misc:
@@ -67,23 +67,17 @@ FFI:
 - jedit ==> jedit-word, jedit takes a file name
 - 'cascading' styles
 - command line parsing cleanup
-- > 1 ( ) inside word def
-- parsing-word test fails
-- doc comments in image, inferior
-- eval with multilien strings and #!
 - nicer way to combine two paths
 - alist -vs- assoc terminology
 
 + httpd:
 
-- file responder: don't show full path in title
 - wiki responder:
   - port to native
   - text styles
 - log with date
  basic authentication, using httpdAuth function from a config file
 - file responder; last-modified field
-- quit responder breaks with multithreading
 
 + java factor is going away:
 

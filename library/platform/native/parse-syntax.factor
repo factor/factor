@@ -45,12 +45,10 @@ USE: unparser
 : CREATE ( -- word )
     scan "in" get create dup set-word
     dup f "documentation" set-word-property
-    dup f "stack-effect" set-word-property ;
-
-: remember-where ( word -- )
+    dup f "stack-effect" set-word-property
     dup "line-number" get "line" set-word-property
     dup "col"         get "col"  set-word-property
-        "file"        get "file" set-word-property ;
+    dup "file"        get "file" set-word-property ;
 
 ! \x
 : unicode-escape>ch ( -- esc )
@@ -91,7 +89,11 @@ USE: unparser
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word swap "stack-effect" set-word-property
+        word stack-effect [
+            drop
+        ] [
+            word swap "stack-effect" set-word-property
+        ] ifte
     ] [
         drop
     ] ifte ;
@@ -137,17 +139,14 @@ IN: syntax
 
 : :
     #! Begin a word definition. Word name follows.
-    CREATE dup remember-where [ ]
-    "in-definition" on ; parsing
+    CREATE [ ] "in-definition" on ; parsing
 
 : ;-hook ( word def -- )
     ";-hook" get [ call ] [ define-compound ] ifte* ;
 
 : ;
     #! End a word definition.
-    "in-definition" off
-    reverse
-    ;-hook ; parsing
+    "in-definition" off reverse ;-hook ; parsing
 
 ! Symbols
 : SYMBOL: CREATE define-symbol ; parsing

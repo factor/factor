@@ -59,8 +59,8 @@ USE: stack
 
 : define-compound ( word def -- )
     over set-word-parameter
-    ( dup f "parsing" set-word-property )
-    1 swap set-word-primitive ;
+    1 over set-word-primitive
+    f "parsing" set-word-property ;
 
 : define-symbol ( word -- )
     dup dup set-word-parameter

@@ -313,7 +313,7 @@ public class FactorPlugin extends EditPlugin
 
 		Buffer buffer = view.getBuffer();
 		int lastUseOffset = 0;
-		boolean trailingNewline = false;
+		boolean leadingNewline = false;
 
 		for(int i = 0; i < buffer.getLineCount(); i++)
 		{
@@ -321,26 +321,29 @@ public class FactorPlugin extends EditPlugin
 			if(text.startsWith("IN:") || text.startsWith("USE:"))
 			{
 				lastUseOffset = buffer.getLineEndOffset(i) - 1;
+				leadingNewline = true;
 			}
-			else if(text.startsWith("!") || text.length() == 0)
+			else if(text.startsWith("!"))
+			{
+				lastUseOffset = buffer.getLineEndOffset(i) - 1;
+				leadingNewline = true;
+			}
+			else if(text.length() == 0)
 			{
 				if(i == 0)
 					lastUseOffset = 0;
 				else
-					lastUseOffset = buffer.getLineEndOffset(i-1) - 1;
+					lastUseOffset  = buffer.getLineEndOffset(i - 1) - 1;
 			}
 			else
 			{
-				trailingNewline = true;
 				break;
 			}
 		}
 
 		String decl = "USE: " + vocab;
-		if(lastUseOffset != 0)
+		if(leadingNewline)
 			decl = "\n" + decl;
-		if(trailingNewline)
-			decl = decl + "\n";
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
 	} //}}}
@@ -377,6 +380,9 @@ public class FactorPlugin extends EditPlugin
 			return;
 
 		int start = asset.start.getOffset();
+		/* Hack */
+		start = buffer.getLineStartOffset(
+			buffer.getLineOfOffset(start));
 
 		String indent = MiscUtilities.createWhiteSpace(
 			buffer.getIndentSize(),
@@ -386,7 +392,16 @@ public class FactorPlugin extends EditPlugin
 		String newDef = ": " + newWord + "\n" + indent
 			+ selection.trim() + " ;\n\n" ;
 
-		buffer.insert(start,newDef);
-		textArea.setSelectedText(newWord);
+		try
+		{
+			buffer.beginCompoundEdit();
+			
+			buffer.insert(start,newDef);
+			textArea.setSelectedText(newWord);
+		}
+		finally
+		{
+			buffer.endCompoundEdit();
+		}
 	} //}}}
 }
