@@ -55,54 +55,82 @@ USE: errors
 
 : write-vocab-list ( -- )
   #! Write out the HTML for the list of vocabularies
-  <select name= "vocabs" size= "20" onchange= "document.forms.main.submit()" select> [
-    vocabs [ 
-      dup "current-vocab" get [ "" ] unless* = [
-      "<option selected>" write
-     ] [
-        "<option>" write
-     ] ifte 
-     chars>entities write 
-     "</option>\n" write     
-    ] each
-  ] </select> ;
+  <table> [ 
+    <tr> [ <th> [ "Vocabularies" write ] </th> ] </tr>
+    <tr> [
+      <td> [
+        <select name= "vocabs" size= "20" onchange= "document.forms.main.submit()" select> [
+          vocabs [ 
+            dup "current-vocab" get [ "" ] unless* = [
+            "<option selected>" write
+           ] [
+              "<option>" write
+           ] ifte 
+           chars>entities write 
+           "</option>\n" write     
+          ] each
+        ] </select> 
+      ] </td>
+    ] </tr> 
+  ] </table> ;
 
 : write-word-list ( vocab -- )
   #! Write out the HTML for the list of words in a vocabulary.
-  <select name= "words" size= "20" onchange= "document.forms.main.submit()" select> [
-    words [ 
-      dup "current-word" get [ "" ] unless* str-compare 0 = [
-      "<option selected>" write
-     ] [
-        "<option>" write
-     ] ifte 
-     chars>entities write 
-     "</option>\n" write     
-    ] each
-  ] </select> ;
+  <table> [ 
+    <tr> [ <th> [ "Words" write ] </th> ] </tr>
+    <tr> [
+      <td> [
+        <select name= "words" size= "20" onchange= "document.forms.main.submit()" select> [
+          words [ 
+            dup "current-word" get [ "" ] unless* str-compare 0 = [
+            "<option selected>" write
+           ] [
+              "<option>" write
+           ] ifte 
+           chars>entities write 
+           "</option>\n" write     
+          ] each
+        ] </select> 
+      ] </td>
+    ] </tr> 
+  ] </table> ;
 
 : write-editable-word-source ( vocab word -- )
   #! Write the source in a manner allowing it to be edited.
-  <textarea name= "eval" rows= "30" cols= "80" textarea> [
-    1024 <string-output-stream> dup >r [
-      >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-    ] with-stream r> stream>str chars>entities write
-  ] </textarea> <br/>
-  "Accept" button ;
+  <table> [ 
+    <tr> [ <td> [ "<b>Source</b>" write ] </td> ] </tr>
+    <tr> [
+      <td> [
+        <textarea name= "eval" rows= "30" cols= "80" textarea> [
+          1024 <string-output-stream> dup >r [
+            >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
+          ] with-stream r> stream>str chars>entities write
+        ] </textarea> <br/>
+        "Accept" button 
+      ] </td>
+    ] </tr> 
+  ] </table> ;
 
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
-  <namespace> [
-    "responder" "inspect" put
-    "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
-    "edit-state" get [
-      write-editable-word-source 
-    ] [
-      [ 
-        >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
-      ] with-simple-html-output
-    ] ifte
-  ] bind drop ;
+  <table> [ 
+    <tr> [ <td> [ "<b>Source</b>" write ] </td> ] </tr>
+    <tr> [
+      <td> [
+        <namespace> [
+          "responder" "inspect" put
+          "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
+          "edit-state" get [
+            write-editable-word-source 
+          ] [
+            [ 
+              >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
+            ] with-simple-html-output
+          ] ifte
+        ] bind drop 
+      ] </td>
+    ] </tr> 
+  ] </table> ;
 
 : get-vm-runtime ( -- java.lang.Runtime )
   f "java.lang.Runtime" "getRuntime" jinvoke-static ;
