@@ -49,13 +49,3 @@ USING: gadgets kernel lists math namespaces test ;
         pick-up
     ] bind
 ] unit-test
-    
-[ 30 ] [
-    default-paint [
-        35 10 rect>
-        [ 10 30 50 70 ] [ funny-rect ] map
-        0 0 200 200 <rect> <gadget> <ghost> <box>
-        [ set-box-contents ] keep
-        pick-up shape-x
-    ] bind
-] unit-test

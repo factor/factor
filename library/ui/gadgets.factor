@@ -39,8 +39,7 @@ C: gadget ( shape -- gadget )
     #! paint, just call the quotation.
     >r gadget-paint r> bind ;
 
-M: gadget draw ( gadget -- )
-    dup [ gadget-delegate draw ] with-gadget ;
+M: gadget draw ( gadget -- ) drop ;
 
 M: gadget pick-up* inside? ;
 
@@ -56,8 +55,11 @@ DEFER: redraw ( gadget -- )
     [ set-gadget-delegate ] keep
     redraw ;
 
-! An invisible gadget.
-WRAPPER: ghost
-M: ghost draw drop ;
-M: ghost pick-up* 2drop f ;
-M: ghost draw drop ;
+! A simple gadget that just draws its shape.
+TUPLE: stamp delegate ;
+
+C: stamp ( shape -- )
+    swap <gadget> over set-stamp-delegate ;
+
+M: stamp draw ( stamp -- )
+    dup [ gadget-delegate draw ] with-gadget ;

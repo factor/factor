@@ -13,7 +13,7 @@ SYMBOL: world
 TUPLE: hand click-pos clicked buttons delegate ;
 
 C: hand ( world -- hand )
-    0 <gadget> <ghost> <box>
+    0 <gadget> <box>
     over set-hand-delegate
     [ set-gadget-parent ] keep ;
 

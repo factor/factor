@@ -34,5 +34,5 @@ M: rectangle draw ( rect -- )
         [[ y 0 ]]
         [[ color [ 0 0 0 ] ]]
         [[ filled f ]]
-        [[ font [ "Monospaced" 12 ] ]]
+        [[ font [[ "Monospaced" 12 ]] ]]
     }} ;

@@ -42,6 +42,7 @@ USE: sdl-video
 USE: streams
 USE: strings
 USE: sdl-ttf
+USE: hashtables
 
 SYMBOL: surface
 SYMBOL: width
@@ -119,12 +120,23 @@ SYMBOL: fonts
 : <font> ( name ptsize -- font )
     >r resource-path swap cat2 r> TTF_OpenFont ;
 
-: font ( name ptsize -- font )
+SYMBOL: logical-fonts
+
+: logical-font ( name -- name )
+    dup logical-fonts get hash dup [ nip ] [ drop ] ifte ;
+
+global [
+    {{
+        [[ "Monospaced" "/fonts/VeraMono.ttf" ]]
+    }} logical-fonts set
+] bind
+
+: lookup-font ( [[ name ptsize ]] -- font )
     fonts get [
-        2dup cons get [
-            2nip
+        unswons logical-font swons dup get [
+            nip
         ] [
-            2dup cons >r <font> dup r> set
+            [ uncons <font> dup ] keep set
         ] ifte*
     ] bind ;
 
@@ -139,9 +151,13 @@ SYMBOL: fonts
     dup surface-w swap surface-h make-rect ;
 
 : draw-surface ( x y surface -- )
+    surface get SDL_UnlockSurface
     [
         [ surface-rect ] keep swap surface get 0 0
-    ] keep surface-rect swap rot SDL_UpperBlit drop ;
+    ] keep surface-rect swap rot SDL_UpperBlit drop
+    surface get dup must-lock-surface? [
+        SDL_LockSurface
+    ] when drop ;
 
 : draw-string ( x y font text fg bg -- width )
     pick str-length 0 = [

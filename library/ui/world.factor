@@ -10,7 +10,7 @@ sdl-video ;
 TUPLE: world running? hand delegate redraw? ;
 
 : <world-box> ( -- box )
-    0 0 0 0 <rectangle> <everywhere> <gadget>
+    0 0 0 0 <rectangle> <everywhere> <stamp>
     dup blue 3list color set-paint-property
     dup t filled set-paint-property
     <box> ;
