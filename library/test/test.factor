@@ -119,6 +119,7 @@ USE: unparser
 
         cpu "x86" = [
             [
+                "hsv" test
                 "x86-compiler/simple"
                 "x86-compiler/stack"
                 "x86-compiler/ifte"
