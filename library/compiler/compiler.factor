@@ -56,7 +56,7 @@ USE: test
     "verbose-compile" get [
         "Compiling " write dup . flush
     ] when
-    dup word-parameter ;
+    dup word-def ;
 
 GENERIC: (compile) ( word -- )
 
@@ -69,7 +69,7 @@ M: compound (compile) ( word -- )
 : precompile ( word -- )
     #! Print linear IR of word.
     [
-        word-parameter dataflow optimize linearize simplify [.]
+        word-def dataflow optimize linearize simplify [.]
     ] with-scope ;
 
 : compile-postponed ( -- )

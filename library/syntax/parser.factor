@@ -15,7 +15,7 @@ unparser ;
 ! immediately. Otherwise it is appended to the parse tree.
 
 : parsing? ( word -- ? )
-    dup word? [ "parsing" word-property ] [ drop f ] ifte ;
+    dup word? [ "parsing" word-prop ] [ drop f ] ifte ;
 
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
@@ -109,9 +109,9 @@ global [ string-mode off ] bind
 : save-location ( word -- )
     #! Remember where this word was defined.
     dup set-word
-    dup line-number get "line" set-word-property
-    dup "col" get "col"  set-word-property
-    file get "file" set-word-property ;
+    dup line-number get "line" set-word-prop
+    dup "col" get "col"  set-word-prop
+    file get "file" set-word-prop ;
 
 : create-in "in" get create ;
 
@@ -150,20 +150,20 @@ global [ string-mode off ] bind
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word "stack-effect" word-property [
+        word "stack-effect" word-prop [
             drop
         ] [
-            word swap "stack-effect" set-word-property
+            word swap "stack-effect" set-word-prop
         ] ifte
     ] [
         drop
     ] ifte ;
 
 : documentation+ ( word str -- )
-    over "documentation" word-property [
+    over "documentation" word-prop [
         swap "\n" swap cat3
     ] when*
-    "documentation" set-word-property ;
+    "documentation" set-word-prop ;
 
 : parsed-documentation ( parsed str -- parsed )
     over doc-comment-here? [

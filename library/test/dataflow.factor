@@ -73,7 +73,7 @@ USE: generic
 
 SYMBOL: #test
 
-#test f "foobar" set-word-property
+#test f "foobar" set-word-prop
 
 [ 6 ] [
     {{
@@ -82,7 +82,7 @@ SYMBOL: #test
     }} "foobar" [ [ node-param get ] bind 1 + ] apply-dataflow
 ] unit-test
 
-#test [ [ node-param get ] bind sq ] "foobar" set-word-property
+#test [ [ node-param get ] bind sq ] "foobar" set-word-prop
 
 [ 25 ] [
     {{

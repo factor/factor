@@ -43,7 +43,7 @@ strings words ;
     #! the form [ slot reader writer ]. slot is an integer,
     #! reader and writer are either words, strings or f.
     intern-slots
-    2dup "slots" set-word-property
+    2dup "slots" set-word-prop
     [ 3unlist define-slot ] each-with ;
 
 : reader-word ( class name -- word )
@@ -63,7 +63,7 @@ strings words ;
     #! the benefit of tuples. Built-in types do not have
     #! delegate slots.
     swap >r [ "delegate" = dup [ >r 1 + r> ] unless ] some? [
-        r> swap "delegate-slot" set-word-property
+        r> swap "delegate-slot" set-word-prop
     ] [
         r> 2drop
     ] ifte ;

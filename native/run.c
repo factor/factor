@@ -69,14 +69,14 @@ void undefined(F_WORD* word)
 /* XT of compound definitions */
 void docol(F_WORD* word)
 {
-	call(word->parameter);
+	call(word->def);
 	executing = tag_object(word);
 }
 
 /* pushes word parameter */
 void dosym(F_WORD* word)
 {
-	dpush(word->parameter);
+	dpush(word->def);
 }
 
 void primitive_execute(void)

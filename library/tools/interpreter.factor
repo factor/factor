@@ -63,21 +63,17 @@ SYMBOL: meta-cf
     meta-cf [ [ push-r ] when* ] change ;
 
 : meta-word ( word -- )
-    dup "meta-word" word-property [
+    dup "meta-word" word-prop [
         call
     ] [
-        dup compound? [
-            word-parameter meta-call
-        ] [
-            host-word
-        ] ifte
+        dup compound? [ word-def meta-call ] [ host-word ] ifte
     ] ?ifte ;
 
 : do ( obj -- )
     dup word? [ meta-word ] [ push-d ] ifte ;
 
 : meta-word-1 ( word -- )
-    dup "meta-word" word-property [ call ] [ host-word ] ?ifte ;
+    dup "meta-word" word-prop [ call ] [ host-word ] ?ifte ;
 
 : do-1 ( obj -- )
     dup word? [ meta-word-1 ] [ push-d ] ifte ;
@@ -89,7 +85,7 @@ SYMBOL: meta-cf
 : run ( -- ) [ do ] interpret ;
 
 : set-meta-word ( word quot -- )
-    "meta-word" set-word-property ;
+    "meta-word" set-word-prop ;
 
 \ datastack [ meta-d get clone push-d ] set-meta-word
 \ set-datastack [ pop-d clone meta-d set ] set-meta-word

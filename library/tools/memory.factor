@@ -50,7 +50,7 @@ M: arrayed (each-slot) ( quot array -- )
     ] repeat 2drop ;
 
 M: object (each-slot) ( quot obj -- )
-    dup class "slots" word-property [
+    dup class "slots" word-prop [
         pick pick >r >r car slot swap call r> r>
     ] each 2drop ;
 

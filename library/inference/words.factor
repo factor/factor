@@ -32,15 +32,12 @@ strings vectors words hashtables parser prettyprint ;
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 inference-error ;
 
-: recursive? ( word -- ? )
-    dup word-parameter tree-contains? ;
-
 : inline-compound ( word -- effect node )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
-    gensym over word-parameter cons [
-        word-parameter infer-quot effect
+    gensym over word-def cons [
+        word-def infer-quot effect
     ] with-block ;
 
 : infer-compound ( word -- )
@@ -50,14 +47,14 @@ strings vectors words hashtables parser prettyprint ;
         [
             recursive-state get init-inference
             dup dup inline-compound drop present-effect
-            [ "infer-effect" set-word-property ] keep
+            [ "infer-effect" set-word-prop ] keep
         ] with-scope consume/produce
     ] [
         [
             >r branches-can-fail? [
                 drop
             ] [
-                t "no-effect" set-word-property
+                t "no-effect" set-word-prop
             ] ifte r> rethrow
         ] when*
     ] catch ;
@@ -70,7 +67,7 @@ M: object (apply-word) ( word -- )
 
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
-    dup "no-effect" word-property [
+    dup "no-effect" word-prop [
         no-effect
     ] [
         infer-compound
@@ -82,8 +79,8 @@ M: symbol (apply-word) ( word -- )
 GENERIC: apply-word
 
 : apply-default ( word -- )
-    dup "infer-effect" word-property [
-        over "infer" word-property [
+    dup "infer-effect" word-prop [
+        over "infer" word-prop [
             swap car ensure-d call drop
         ] [
             consume/produce
@@ -96,7 +93,7 @@ M: word apply-word ( word -- )
     apply-default ;
 
 M: compound apply-word ( word -- )
-    dup "inline" word-property [
+    dup "inline" word-prop [
         inline-compound 2drop
     ] [
         apply-default
@@ -168,15 +165,15 @@ M: word apply-object ( word -- )
     [ general-list ] ensure-d
     dataflow-drop, pop-d infer-quot-value ;
 
-\ call [ infer-call ] "infer" set-word-property
+\ call [ infer-call ] "infer" set-word-prop
 
 ! These hacks will go away soon
-\ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ + [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ = [ [ object object ] [ object ] ] "infer-effect" set-word-property
+\ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ = [ [ object object ] [ object ] ] "infer-effect" set-word-prop
 
-\ undefined-method t "terminator" set-word-property
-\ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-property
-\ not-a-number t "terminator" set-word-property
-\ throw t "terminator" set-word-property
+\ undefined-method t "terminator" set-word-prop
+\ undefined-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
+\ not-a-number t "terminator" set-word-prop
+\ throw t "terminator" set-word-prop

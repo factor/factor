@@ -8,9 +8,9 @@ typedef struct {
 	/* untagged on-disk primitive number */
 	CELL primitive;
 	/* TAGGED parameter to xt; used for colon definitions */
-	CELL parameter;
-	/* TAGGED property list for library code */
-	CELL plist;
+	CELL def;
+	/* TAGGED property hash for library code */
+	CELL props;
 	/* UNTAGGED call count incremented by profiler */
 	CELL call_count;
 	/* UNTAGGED amount of memory allocated in word */

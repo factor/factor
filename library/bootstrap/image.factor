@@ -191,7 +191,7 @@ M: f ' ( obj -- ptr )
         dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
-        dup word-parameter ' ,
+        dup word-def ' ,
         dup word-props ' ,
         0 ,
         0 ,

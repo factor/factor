@@ -87,7 +87,7 @@ GENERIC: displacement ( op -- )
 ( Register operands -- eg, ECX                                 )
 : REGISTER:
     CREATE dup define-symbol
-    scan-word "register" set-word-property ; parsing
+    scan-word "register" set-word-prop ; parsing
 
 REGISTER: EAX 0
 REGISTER: ECX 1
@@ -98,10 +98,10 @@ REGISTER: EBP 5
 REGISTER: ESI 6
 REGISTER: EDI 7
 
-PREDICATE: word register "register" word-property ;
+PREDICATE: word register "register" word-prop ;
 
 M: register modifier drop BIN: 11 ;
-M: register register "register" word-property ;
+M: register register "register" word-prop ;
 M: register displacement drop ;
 
 ( Indirect register operands -- eg, [ ECX ]                    )

@@ -57,7 +57,7 @@ SYMBOL: compiled-xts
     compiled-offset swap compiled-xts [ acons ] change ;
 
 : commit-xt ( xt word -- )
-    dup t "compiled" set-word-property  set-word-xt ;
+    dup t "compiled" set-word-prop  set-word-xt ;
 
 : commit-xts ( -- )
     compiled-xts get [ unswons commit-xt ] each

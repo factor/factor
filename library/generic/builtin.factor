@@ -8,32 +8,32 @@ words vectors ;
 SYMBOL: builtin
 
 builtin [
-    "builtin-type" word-property unit
-] "builtin-supertypes" set-word-property
+    "builtin-type" word-prop unit
+] "builtin-supertypes" set-word-prop
 
 builtin [
     ( generic vtable definition class -- )
     rot set-vtable drop
-] "add-method" set-word-property
+] "add-method" set-word-prop
 
-builtin 50 "priority" set-word-property
+builtin 50 "priority" set-word-prop
 
 ! All builtin types are equivalent in ordering
-builtin [ 2drop t ] "class<" set-word-property
+builtin [ 2drop t ] "class<" set-word-prop
 
 : builtin-predicate ( type# symbol -- )
     #! We call search here because we have to know if the symbol
     #! is t or f, and cannot compare type numbers or symbol
     #! identity during bootstrapping.
     dup "f" [ "syntax" ] search = [
-        nip [ not ] "predicate" set-word-property
+        nip [ not ] "predicate" set-word-prop
     ] [
         dup "t" [ "syntax" ] search = [
-            nip [ ] "predicate" set-word-property
+            nip [ ] "predicate" set-word-prop
         ] [
             dup predicate-word
             [ rot [ swap type eq? ] cons define-compound ] keep
-            unit "predicate" set-word-property
+            unit "predicate" set-word-prop
         ] ifte
     ] ifte ;
 
@@ -41,7 +41,7 @@ builtin [ 2drop t ] "class<" set-word-property
     >r swap
     dup intern-symbol
     2dup builtin-predicate
-    [ swap "builtin-type" set-word-property ] keep
+    [ swap "builtin-type" set-word-prop ] keep
     dup builtin define-class r> define-slots ;
 
 : builtin-type ( n -- symbol )

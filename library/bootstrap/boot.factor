@@ -68,7 +68,7 @@ vocabularies get [
 
     "syntax" get [
         cdr dup word? [
-            "syntax" "vocabulary" set-word-property
+            "syntax" "vocabulary" set-word-prop
         ] [
             drop
         ] ifte

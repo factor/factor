@@ -210,7 +210,7 @@ SYMBOL: cloned
         dynamic-ifte
     ] ifte ;
 
-\ ifte [ infer-ifte ] "infer" set-word-property
+\ ifte [ infer-ifte ] "infer" set-word-prop
 
 : vtable>list ( value -- list )
     dup value-recursion swap literal-value vector>list
@@ -247,6 +247,6 @@ USE: kernel-internals
         dynamic-dispatch
     ] ifte ;
 
-\ dispatch [ infer-dispatch ] "infer" set-word-property
+\ dispatch [ infer-dispatch ] "infer" set-word-prop
 \ dispatch [ [ fixnum vector ] [ ] ]
-"infer-effect" set-word-property
+"infer-effect" set-word-prop

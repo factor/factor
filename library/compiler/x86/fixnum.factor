@@ -43,7 +43,7 @@ USE: math-internals
 ! prototype to test the assembler.
 
 : self ( word -- )
-    f swap dup "infer-effect" word-property (consume/produce) ;
+    f swap dup "infer-effect" word-prop (consume/produce) ;
 
 : fixnum-insn ( overflow opcode -- )
     #! This needs to be factored.
@@ -59,15 +59,15 @@ USE: math-internals
 
 \ fixnum+ [
     drop \ fixnum+ \ ADD fixnum-insn
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum+ [ \ fixnum+ self ] "infer" set-word-property
+\ fixnum+ [ \ fixnum+ self ] "infer" set-word-prop
 
 \ fixnum- [
     drop \ fixnum- \ SUB fixnum-insn
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum- [ \ fixnum- self ] "infer" set-word-property
+\ fixnum- [ \ fixnum- self ] "infer" set-word-prop
 
 \ fixnum* [
     drop
@@ -81,9 +81,9 @@ USE: math-internals
     ESI 4 SUB
     [ ESI ] EAX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum* [ \ fixnum* self ] "infer" set-word-property
+\ fixnum* [ \ fixnum* self ] "infer" set-word-prop
 
 \ fixnum/i [
     drop
@@ -98,9 +98,9 @@ USE: math-internals
     ESI 4 SUB
     [ ESI ] EAX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum/i [ \ fixnum/i self ] "infer" set-word-property
+\ fixnum/i [ \ fixnum/i self ] "infer" set-word-prop
 
 \ fixnum-mod [
     drop
@@ -115,9 +115,9 @@ USE: math-internals
     ESI 4 SUB
     [ ESI ] EDX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-property
+\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-prop
 
 \ fixnum/mod [
     drop
@@ -132,9 +132,9 @@ USE: math-internals
     [ ESI -4 ] EAX MOV
     [ ESI ] EDX MOV
     r> compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-property
+\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-prop
 
 \ arithmetic-type [
     drop
@@ -150,6 +150,6 @@ USE: math-internals
     EAX 3 SHL
     PUSH-DS
     compiled-offset swap patch
-] "generator" set-word-property
+] "generator" set-word-prop
 
-\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-property
+\ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-prop

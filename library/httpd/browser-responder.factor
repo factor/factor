@@ -123,7 +123,7 @@ errors unparser logging listener url-encoding hashtables memory ;
 
 : word-uses ( word -- list )
   #! Return a list of vocabularies that the given word uses.
-  word-parameter flatten [ word? ] subset [
+  word-def flatten [ word? ] subset [
     word-vocabulary
   ] map ;
 

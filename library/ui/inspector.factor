@@ -29,7 +29,7 @@ lists namespaces strings unparser vectors words ;
     <line-pile> [ add-gadget ] keep [ add-gadget ] keep ;
 
 : object>alist ( obj -- assoc )
-    dup class "slots" word-property [
+    dup class "slots" word-prop [
         cdr car [ execute ] keep swons
     ] map-with ;
 
@@ -43,7 +43,7 @@ GENERIC: custom-sheet ( obj -- gadget )
     over top-sheet over add-gadget
     over slot-sheet over add-gadget
     swap custom-sheet over add-gadget
-    line-border ;
+    <scroller> line-border ;
 
 M: object custom-sheet drop <empty-gadget> ;
 

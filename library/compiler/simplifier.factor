@@ -11,7 +11,7 @@ SYMBOL: simplifying
     #! A list of quotations with stack effect
     #! ( linear -- linear ? ) that can simplify the first node
     #! in the linear IR.
-    car car "simplifiers" word-property ;
+    car car "simplifiers" word-prop ;
 
 : simplify-node ( linear list -- linear ? )
     dup [
@@ -45,7 +45,7 @@ SYMBOL: simplifying
         dup car cdr simplifying get label-called?
         [ f ] [ cdr t ] ifte
     ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : next-physical? ( op linear -- ? )
     cdr dup [ car car = ] [ 2drop f ] ifte ;
@@ -55,10 +55,10 @@ SYMBOL: simplifying
     #! its param.
     over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
 
-\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-property
-\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-property
-\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-property
-\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-property
+\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-prop
+\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-prop
+\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-prop
+\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-prop
 
 \ drop [
     [
@@ -70,7 +70,7 @@ SYMBOL: simplifying
             #replace-indirect swons swons t
         ] when
     ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : find-label ( label -- rest )
     simplifying get [
@@ -78,19 +78,19 @@ SYMBOL: simplifying
     ] some? nip ;
 
 : next-logical ( linear -- linear )
-    dup car car "next-logical" word-property call ;
+    dup car car "next-logical" word-prop call ;
 
 #label [
     cdr next-logical
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 #jump-label [
     car cdr find-label cdr
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 #target-label [
     car cdr find-label cdr
-] "next-logical" set-word-property
+] "next-logical" set-word-prop
 
 : next-logical? ( op linear -- ? )
     next-logical dup [ car car = ] [ 2drop f ] ifte ;
@@ -104,11 +104,11 @@ SYMBOL: simplifying
 
 #call [
     [ #return #jump reduce ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 #call-label [
     [ #return #jump-label reduce ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 : double-jump ( linear op1 op2 -- linear ? )
     #! A jump to a jump is just a jump. If the next logical node
@@ -145,13 +145,13 @@ SYMBOL: simplifying
     [ #jump #jump double-jump ]
     [ useless-jump ]
     [ dead-code ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
 #target-label [
     [ #jump-label #target-label double-jump ]
     [ #jump #target double-jump ]
-] "simplifiers" set-word-property
+] "simplifiers" set-word-prop
 
-#jump [ [ dead-code ] ] "simplifiers" set-word-property
-#return [ [ dead-code ] ] "simplifiers" set-word-property
-#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-property
+#jump [ [ dead-code ] ] "simplifiers" set-word-prop
+#return [ [ dead-code ] ] "simplifiers" set-word-prop
+#end-dispatch [ [ dead-code ] ] "simplifiers" set-word-prop

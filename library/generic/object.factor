@@ -8,19 +8,19 @@ SYMBOL: object
 
 object [
     drop num-types count
-] "builtin-supertypes" set-word-property
+] "builtin-supertypes" set-word-prop
 
 object [
     ( generic vtable definition class -- )
     drop over vector-length [
         3dup rot set-vector-nth
     ] repeat 3drop
-] "add-method" set-word-property
+] "add-method" set-word-prop
 
-object [ drop t ] "predicate" set-word-property
+object [ drop t ] "predicate" set-word-prop
 
-object 100 "priority" set-word-property
+object 100 "priority" set-word-prop
 
-object [ 2drop t ] "class<" set-word-property
+object [ 2drop t ] "class<" set-word-prop
 
 object object define-class

@@ -198,8 +198,8 @@ vocabularies get [
 ] [                                           
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [
-        "stack-effect" set-word-property
+        "stack-effect" set-word-prop
     ] [
-        "infer-effect" set-word-property
+        "infer-effect" set-word-prop
     ] ifte
 ] each drop

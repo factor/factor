@@ -18,12 +18,12 @@ lists math namespaces strings vectors words stdio prettyprint ;
 
 : computed-slot ( -- )
     "Computed slot access is slower" inference-warning
-    \ slot dup "infer-effect" word-property consume/produce ;
+    \ slot dup "infer-effect" word-prop consume/produce ;
 
 \ slot [
     [ object fixnum ] ensure-d
     fast-slot? [ fast-slot ] [ computed-slot ] ifte
-] "infer" set-word-property
+] "infer" set-word-prop
 
 : type-value-map ( value -- )
     num-types
@@ -47,4 +47,4 @@ lists math namespaces strings vectors words stdio prettyprint ;
 \ type [
     [ object ] ensure-d
     literal-type? [ literal-type ] [ computed-type ] ifte
-] "infer" set-word-property
+] "infer" set-word-prop

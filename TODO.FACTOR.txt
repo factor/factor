@@ -6,6 +6,13 @@
 
 + ui:
 
+- resizing a gadget should probably relayout children
+- when halo is shown, rollovers don't disappear
+- halo outline should be the clipped rect
+- sometimes releasing moving gadget doesn't work
+- after moving halo, halo is underneath the gadget
+- resizing: drag relative to initial click pos
+- thumb gadgetry breaks with halo sometimes
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - scrollable inspector
@@ -17,7 +24,6 @@
 - console: scroll to bottom
 - split preferred size and layouting
 - remove shelf/pile duplication
-- resizing gadgets
 - faster layout
 - faster repaint
 - closing inspectors

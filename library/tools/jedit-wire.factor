@@ -108,7 +108,7 @@ C: jedit-stream ( stream -- stream )
             "name"
             "stack-effect"
         ] [
-            word-property
+            word-prop
         ] map-with
     ] when ;
 

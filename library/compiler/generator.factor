@@ -34,7 +34,7 @@ SYMBOL: relocation-table
 
 : generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
-    unswons dup "generator" word-property [
+    unswons dup "generator" word-prop [
         call
     ] [
         "No generator" throw
@@ -76,9 +76,9 @@ SYMBOL: previous-offset
         ] when*
     ] catch ;
 
-#label [ save-xt ] "generator" set-word-property
+#label [ save-xt ] "generator" set-word-prop
 
-#end-dispatch [ drop ] "generator" set-word-property
+#end-dispatch [ drop ] "generator" set-word-prop
 
 : type-tag ( type -- tag )
     #! Given a type number, return the tag number.

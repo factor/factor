@@ -40,7 +40,7 @@ strings unparser words ;
 : jedit ( word -- )
     #! Note that line numbers here start from 1
     dup word-file dup [
-        swap "line" word-property jedit-line/file
+        swap "line" word-prop jedit-line/file
     ] [
         2drop "Unknown source" print
     ] ifte ;

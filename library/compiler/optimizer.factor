@@ -131,43 +131,43 @@ SYMBOL: branch-returns
         node-param [ [ dupd kill-nodes ] map nip ] change
     ] extend , ;
 
-#push [ [ node-param get ] bind , ] "scan-literal" set-word-property
-#push [ consumes-literal? not ] "can-kill" set-word-property
-#push [ kill-node ] "kill-node" set-word-property
+#push [ [ node-param get ] bind , ] "scan-literal" set-word-prop
+#push [ consumes-literal? not ] "can-kill" set-word-prop
+#push [ kill-node ] "kill-node" set-word-prop
 
 #label [
     [ node-param get ] bind (scan-literals)
-] "scan-literal" set-word-property
+] "scan-literal" set-word-prop
 
 #label [
     [ node-param get ] bind can-kill?
-] "can-kill" set-word-property
+] "can-kill" set-word-prop
 
 #call-label [
     [ node-param get ] bind =
-] "calls-label" set-word-property
+] "calls-label" set-word-prop
 
 : calls-label? ( label list -- ? )
     [ "calls-label" [ 2drop f ] apply-dataflow ] some-with? ;
 
 #label [
     [ node-param get ] bind calls-label?
-] "calls-label" set-word-property
+] "calls-label" set-word-prop
 
 #simple-label [
     [ node-param get ] bind calls-label?
-] "calls-label" set-word-property
+] "calls-label" set-word-prop
 
 : branches-call-label? ( label list -- ? )
     [ calls-label? ] some-with? ;
 
 \ ifte [
     [ node-param get ] bind branches-call-label?
-] "calls-label" set-word-property
+] "calls-label" set-word-prop
 
 \ dispatch [
     [ node-param get ] bind branches-call-label?
-] "calls-label" set-word-property
+] "calls-label" set-word-prop
 
 : optimize-label ( -- op )
     #! Does the label node contain calls to itself?
@@ -179,7 +179,7 @@ SYMBOL: branch-returns
         optimize-label node-op set
         node-param [ kill-nodes ] change
     ] extend ,
-] "kill-node" set-word-property
+] "kill-node" set-word-prop
 
 #values [
     dupd consumes-literal? [
@@ -187,25 +187,25 @@ SYMBOL: branch-returns
     ] [
         drop t
     ] ifte
-] "can-kill" set-word-property
+] "can-kill" set-word-prop
 
-\ ifte [ scan-branches ] "scan-literal" set-word-property
-\ ifte [ can-kill-branches? ] "can-kill" set-word-property
-\ ifte [ kill-branches ] "kill-node" set-word-property
+\ ifte [ scan-branches ] "scan-literal" set-word-prop
+\ ifte [ can-kill-branches? ] "can-kill" set-word-prop
+\ ifte [ kill-branches ] "kill-node" set-word-prop
 
-\ dispatch [ scan-branches ] "scan-literal" set-word-property
-\ dispatch [ can-kill-branches? ] "can-kill" set-word-property
-\ dispatch [ kill-branches ] "kill-node" set-word-property
+\ dispatch [ scan-branches ] "scan-literal" set-word-prop
+\ dispatch [ can-kill-branches? ] "can-kill" set-word-prop
+\ dispatch [ kill-branches ] "kill-node" set-word-prop
 
 ! Don't care about inputs to recursive combinator calls
-#call-label [ 2drop t ] "can-kill" set-word-property
+#call-label [ 2drop t ] "can-kill" set-word-prop
 
-\ drop [ 2drop t ] "can-kill" set-word-property
-\ drop [ kill-node ] "kill-node" set-word-property
-\ dup [ 2drop t ] "can-kill" set-word-property
-\ dup [ kill-node ] "kill-node" set-word-property
-\ swap [ 2drop t ] "can-kill" set-word-property
-\ swap [ kill-node ] "kill-node" set-word-property
+\ drop [ 2drop t ] "can-kill" set-word-prop
+\ drop [ kill-node ] "kill-node" set-word-prop
+\ dup [ 2drop t ] "can-kill" set-word-prop
+\ dup [ kill-node ] "kill-node" set-word-prop
+\ swap [ 2drop t ] "can-kill" set-word-prop
+\ swap [ kill-node ] "kill-node" set-word-prop
 
 : kill-mask ( killing inputs -- mask )
     [ over [ over value= ] some? >boolean nip ] map nip ;
@@ -219,15 +219,15 @@ SYMBOL: branch-returns
     ] keep
     over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
 
-\ over [ 2drop t ] "can-kill" set-word-property
+\ over [ 2drop t ] "can-kill" set-word-prop
 \ over [
     [
         [[ [ f f ] over ]]
         [[ [ f t ] dup  ]]
     ] reduce-stack-op
-] "kill-node" set-word-property
+] "kill-node" set-word-prop
 
-\ pick [ 2drop t ] "can-kill" set-word-property
+\ pick [ 2drop t ] "can-kill" set-word-prop
 \ pick [
     [
         [[ [ f f f ] pick ]]
@@ -235,9 +235,9 @@ SYMBOL: branch-returns
         [[ [ f t f ] over ]]
         [[ [ f t t ] dup  ]]
     ] reduce-stack-op
-] "kill-node" set-word-property
+] "kill-node" set-word-prop
 
-\ >r [ 2drop t ] "can-kill" set-word-property
-\ >r [ kill-node ] "kill-node" set-word-property
-\ r> [ 2drop t ] "can-kill" set-word-property
-\ r> [ kill-node ] "kill-node" set-word-property
+\ >r [ 2drop t ] "can-kill" set-word-prop
+\ >r [ kill-node ] "kill-node" set-word-prop
+\ r> [ 2drop t ] "can-kill" set-word-prop
+\ r> [ kill-node ] "kill-node" set-word-prop

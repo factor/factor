@@ -34,16 +34,16 @@ USING: syntax generic kernel lists namespaces parser words ;
     CREATE
     dup intern-symbol
     dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-prop ] keep
     [ define-union ] [ ] ; parsing
 
 : PREDICATE: ( -- class predicate definition )
     #! Followed by a superclass name, then a class name.
     scan-word
     CREATE dup intern-symbol
-    dup rot "superclass" set-word-property
+    dup rot "superclass" set-word-prop
     dup predicate-word
-    [ dupd unit "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-prop ] keep
     [ define-predicate ] [ ] ; parsing
 
 : TUPLE:

@@ -3,7 +3,23 @@
 IN: gadgets
 USING: kernel math namespaces prettyprint sdl ;
 
-TUPLE: halo selected delegate ;
+: drag-sizer ( sizer -- )
+    gadget-parent ( - halo) [
+        dup hand relative >rect
+        rot halo-selected resize-gadget
+    ] keep relayout ;
+
+: sizer-actions ( sizer -- )
+    dup [ drop ] [ button-down 1 ] set-action
+    [ drag-sizer ] [ drag 1 ] set-action ;
+
+: <sizer> ( -- sizer )
+    0 0 10 10 <plain-rect> <gadget>
+    dup sizer-actions ;
+
+! A halo retains the gadget its surrounding, as well as the
+! resizing gadget and a delegate.
+TUPLE: halo selected sizer delegate ;
 
 : show-halo* ( gadget -- )
     #! Show the halo on a specific gadget.
@@ -39,12 +55,24 @@ DEFER: halo-menu
 C: halo ( -- halo )
     0 0 0 0 <hollow-rect> <gadget> over set-halo-delegate
     dup red foreground set-paint-property
+    dup red background set-paint-property
+    <sizer> over 2dup set-halo-sizer add-gadget
     dup halo-actions ;
 
-M: halo layout* ( halo -- )
+: halo-update ( halo -- )
+    #! Move the halo to the position of its selected gadget.
     dup halo-selected
     2dup screen-pos >rect rot move-gadget
     dup shape-w swap shape-h rot resize-gadget ;
+
+: sizer-layout ( halo -- )
+    #! Position the sizer to the bottom right corner.
+    dup halo-sizer
+    over shape-h over shape-h -
+    >r over shape-w over shape-w - r> rot move-gadget drop ;
+
+M: halo layout* ( halo -- )
+    dup halo-update sizer-layout ;
 
 : default-actions ( gadget -- )
     [ show-halo ] [ button-down 2 ] set-action ;

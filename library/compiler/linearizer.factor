@@ -62,13 +62,13 @@ SYMBOL: #end-dispatch
     [ node-param get ] bind
     dup immediate? #push-immediate #push-indirect ?
     swons ,
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : <label> ( -- label )
-    gensym  dup t "label" set-word-property ;
+    gensym  dup t "label" set-word-prop ;
 
 : label? ( obj -- ? )
-    dup word? [ "label" word-property ] [ drop f ] ifte ;
+    dup word? [ "label" word-prop ] [ drop f ] ifte ;
 
 : label, ( label -- )
     #label swons , ;
@@ -81,7 +81,7 @@ SYMBOL: #end-dispatch
 
 #simple-label [
     linearize-simple-label
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : linearize-label ( node -- )
     #! Labels are tricky, because they might contain non-tail
@@ -97,7 +97,7 @@ SYMBOL: #end-dispatch
 
 #label [
     linearize-label
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
@@ -112,7 +112,7 @@ SYMBOL: #end-dispatch
 
 \ ifte [
     [ node-param get ] bind linearize-ifte
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
@@ -133,6 +133,6 @@ SYMBOL: #end-dispatch
 
 \ dispatch [
     [ node-param get ] bind linearize-dispatch
-] "linearizer" set-word-property
+] "linearizer" set-word-prop
 
-#values [ drop ] "linearizer" set-word-property
+#values [ drop ] "linearizer" set-word-prop

@@ -9,7 +9,7 @@ USE: lists
 
 : foo 1 2 3 ;
 
-[ [ ] ] [ \ foo word-parameter dataflow kill-set ] unit-test
+[ [ ] ] [ \ foo word-def dataflow kill-set ] unit-test
 
 [ [ [ + ] [ - ] ] ] [ [ 3 4 1 2 > [ + ] [ - ] ifte ] dataflow kill-set ] unit-test
 

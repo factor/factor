@@ -30,7 +30,7 @@ UNION: arrayed array tuple ;
     ] repeat nip ;
 
 : literal-tuple ( list -- tuple )
-    dup car "tuple-size" word-property over length over = [
+    dup car "tuple-size" word-prop over length over = [
         (literal-tuple)
     ] [
         "Incorrect tuple length" throw
@@ -46,14 +46,14 @@ UNION: arrayed array tuple ;
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
-        dup "tuple-size" word-property r> length 1 + =
+        dup "tuple-size" word-prop r> length 1 + =
         [ drop ] [ forget ] ifte
     ] [
         r> 2drop
     ] ifte ;
 
 : tuple-slots ( tuple slots -- )
-    2dup length 1 + "tuple-size" set-word-property
+    2dup length 1 + "tuple-size" set-word-prop
     3 -rot simple-slots ;
 
 : constructor-word ( word -- word )
@@ -61,12 +61,12 @@ UNION: arrayed array tuple ;
 
 : define-constructor ( word def -- )
     >r [ constructor-word ] keep [
-        dup literal, "tuple-size" word-property , \ make-tuple ,
+        dup literal, "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
     dup [
-        "slots" word-property
+        "slots" word-prop
         reverse [ last unit , \ keep , ] each
     ] make-list define-constructor ;
 
@@ -76,13 +76,13 @@ UNION: arrayed array tuple ;
     dup save-location
     dup intern-symbol
     dup tuple-predicate
-    dup tuple "metaclass" set-word-property
+    dup tuple "metaclass" set-word-prop
     dup r> tuple-slots
     default-constructor ;
 
 : tuple-delegate ( tuple -- obj )
     dup tuple? [
-        dup class "delegate-slot" word-property dup [
+        dup class "delegate-slot" word-prop dup [
             >fixnum slot
         ] [
             2drop f
@@ -123,7 +123,7 @@ UNION: arrayed array tuple ;
 : default-tuple-method ( generic -- quot )
     #! If the generic does not define a specific method for a
     #! tuple, execute the return value of this.
-    dup "methods" word-property
+    dup "methods" word-prop
     tuple over hash* dup [
         2nip cdr
     ] [
@@ -141,7 +141,7 @@ UNION: arrayed array tuple ;
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap "methods" word-property hash>quot
+    swap "methods" word-prop hash>quot
     [ dup class ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )
@@ -153,7 +153,7 @@ UNION: arrayed array tuple ;
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
 
 : clone-delegate ( tuple -- )
-    dup class "delegate-slot" word-property dup [
+    dup class "delegate-slot" word-prop dup [
         [ >fixnum slot clone ] 2keep set-slot
     ] [
         2drop
@@ -187,12 +187,12 @@ M: tuple hashcode ( vec -- n )
 tuple [
     ( generic vtable definition class -- )
     2drop add-tuple-dispatch
-] "add-method" set-word-property
+] "add-method" set-word-prop
 
 tuple [
-    drop tuple "builtin-type" word-property unit
-] "builtin-supertypes" set-word-property
+    drop tuple "builtin-type" word-prop unit
+] "builtin-supertypes" set-word-prop
 
-tuple 10 "priority" set-word-property
+tuple 10 "priority" set-word-prop
 
-tuple [ 2drop t ] "class<" set-word-property
+tuple [ 2drop t ] "class<" set-word-prop

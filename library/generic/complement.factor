@@ -9,10 +9,10 @@ vectors words ;
 SYMBOL: complement
 
 complement [
-    "complement" word-property builtin-supertypes
+    "complement" word-prop builtin-supertypes
     num-types count
     difference
-] "builtin-supertypes" set-word-property
+] "builtin-supertypes" set-word-prop
 
 complement [
     ( generic vtable definition class -- )
@@ -22,20 +22,20 @@ complement [
             dup [ add-method ] [ 2drop 2drop ] ifte
         ] keep
     ] repeat 3drop
-] "add-method" set-word-property
+] "add-method" set-word-prop
 
-complement 90 "priority" set-word-property
+complement 90 "priority" set-word-prop
 
 complement [
-    swap "complement" word-property
-    swap "complement" word-property
+    swap "complement" word-prop
+    swap "complement" word-prop
     class< not
-] "class<" set-word-property
+] "class<" set-word-prop
 
 : complement-predicate ( complement -- list )
-    "predicate" word-property [ not ] append ;
+    "predicate" word-prop [ not ] append ;
 
 : define-complement ( class complement -- )
-    2dup "complement" set-word-property
-    dupd complement-predicate "predicate" set-word-property
+    2dup "complement" set-word-prop
+    dupd complement-predicate "predicate" set-word-prop
     complement define-class ;

@@ -126,7 +126,7 @@ SYMBOL: alien-parameters
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
-#alien-invoke [ linearize-alien ] "linearizer" set-word-property
+#alien-invoke [ linearize-alien ] "linearizer" set-word-prop
 
 : alien-invoke ( ... returns library function parameters -- ... )
     #! Call a C library function.
@@ -140,9 +140,9 @@ SYMBOL: alien-parameters
     ] make-string throw ;
 
 \ alien-invoke [ [ object object object object ] [ ] ]
-"infer-effect" set-word-property
+"infer-effect" set-word-prop
 
-\ alien-invoke [ infer-alien ] "infer" set-word-property
+\ alien-invoke [ infer-alien ] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

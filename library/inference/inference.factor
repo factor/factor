@@ -156,7 +156,7 @@ M: object apply-object apply-literal ;
 
 : terminator? ( obj -- ? )
     #! Does it throw an error?
-    dup word? [ "terminator" word-property ] [ drop f ] ifte ;
+    dup word? [ "terminator" word-prop ] [ drop f ] ifte ;
 
 : handle-terminator ( quot -- )
     #! If the quotation throws an error, do not count its stack

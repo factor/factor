@@ -33,7 +33,7 @@ presentation unparser words ;
     tab-size get - ;
 
 : prettyprint-prop ( word prop -- )
-    tuck word-name word-property [
+    tuck word-name word-prop [
         " " write prettyprint-word
     ] [
         drop
@@ -57,12 +57,12 @@ presentation unparser words ;
     ] make-string comment. ;
 
 : stack-effect. ( indent word -- indent )
-    dup "stack-effect" word-property [
+    dup "stack-effect" word-prop [
         " " write
         [ CHAR: ( , , CHAR: ) , ] make-string
         comment.
     ] [
-        "infer-effect" word-property dup [
+        "infer-effect" word-prop dup [
             infer-effect.
         ] [
             drop
@@ -70,7 +70,7 @@ presentation unparser words ;
     ] ?ifte ;
 
 : documentation. ( indent word -- indent )
-    "documentation" word-property [
+    "documentation" word-prop [
         "\n" split [
             "#!" swap cat2 comment.
             dup prettyprint-newline
@@ -92,10 +92,7 @@ M: compound see ( word -- )
     0 prettyprint-: swap
     [ prettyprint-word ] keep
     [ prettyprint-docs ] keep
-    [
-        word-parameter prettyprint-elements
-        prettyprint-;
-    ] keep
+    [ word-def prettyprint-elements prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
 
 : see-method ( indent word class method -- indent )

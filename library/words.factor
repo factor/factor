@@ -6,7 +6,7 @@ namespaces strings ;
 
 BUILTIN: word 17
     [ 1 hashcode f ]
-    [ 4 "word-parameter" "set-word-parameter" ]
+    [ 4 "word-def" "set-word-def" ]
     [ 5 "word-props" "set-word-props" ] ;
 
 GENERIC: word-xt
@@ -32,11 +32,8 @@ M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
 
 SYMBOL: vocabularies
 
-: word-property ( word pname -- pvalue )
-    swap word-props hash ;
-
-: set-word-property ( word pvalue pname -- )
-    rot word-props set-hash ;
+: word-prop ( word name -- value ) swap word-props hash ;
+: set-word-prop ( word value name -- ) rot word-props set-hash ;
 
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
@@ -44,16 +41,24 @@ PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 
 : define ( word primitive parameter -- )
-    pick set-word-parameter
+    pick set-word-def
     over set-word-primitive
-    f "parsing" set-word-property ;
+    f "parsing" set-word-prop ;
 
-: define-compound ( word def -- ) 1 swap define ;
-: define-symbol   ( word -- ) 2 over define ;
+: (define-compound) ( word def -- ) 1 swap define ;
+
+: define-compound ( word def -- )
+    #! If the word is a generic word, clear the properties 
+    #! involved so that 'see' can work properly.
+    over f "definer" set-word-prop
+    over f "methods" set-word-prop
+    over f "combination" set-word-prop
+    (define-compound) ;
+
+: define-symbol ( word -- ) 2 over define ;
 
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] ifte ;
 
-: word-name ( word -- str ) "name" word-property ;
-
-: word-vocabulary ( word -- str ) "vocabulary" word-property ;
+: word-name ( word -- str ) "name" word-prop ;
+: word-vocabulary ( word -- str ) "vocabulary" word-prop ;

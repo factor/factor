@@ -94,7 +94,7 @@ void print_cons(CELL cons)
 
 void print_word(F_WORD* word)
 {
-	CELL name = hash(word->plist,tag_object(from_c_string("name")));
+	CELL name = hash(word->props,tag_object(from_c_string("name")));
 	if(type_of(name) == STRING_TYPE)
 		fprintf(stderr,"%s",to_c_string(untag_string(name)));
 	else

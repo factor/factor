@@ -1,10 +1,5 @@
 IN: scratchpad
-USE: math
-USE: test
-USE: words
-USE: namespaces
-USE: lists
-USE: kernel
+USING: generic kernel lists math namespaces test words ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
@@ -16,20 +11,20 @@ USE: kernel
 DEFER: plist-test
 
 [ t ] [
-    \ plist-test t "sample-property" set-word-property
-    \ plist-test "sample-property" word-property
+    \ plist-test t "sample-property" set-word-prop
+    \ plist-test "sample-property" word-prop
 ] unit-test
 
 [ f ] [
-    \ plist-test f "sample-property" set-word-property
-    \ plist-test "sample-property" word-property
+    \ plist-test f "sample-property" set-word-prop
+    \ plist-test "sample-property" word-prop
 ] unit-test
 
 [ f ] [ 5 compound? ] unit-test
 
-"create-test" "scratchpad" create { 1 2 } "testing" set-word-property
+"create-test" "scratchpad" create { 1 2 } "testing" set-word-prop
 [ { 1 2 } ] [
-    "create-test" [ "scratchpad" ] search "testing" word-property
+    "create-test" [ "scratchpad" ] search "testing" word-prop
 ] unit-test
 
 [
@@ -56,6 +51,14 @@ SYMBOL: a-symbol
 [ f ] [ \ a-symbol compound? ] unit-test
 [ t ] [ \ a-symbol symbol? ] unit-test
 
+! See if redefining a generic as a colon def clears some
+! word props.
+GENERIC: testing
+: testing ;
+
+[ f ] [ \ testing generic? ] unit-test
+
+! This has to be the last test in the file.
 : test-last ( -- ) ;
 word word-name "last-word-test" set
 

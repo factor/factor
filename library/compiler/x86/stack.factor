@@ -52,32 +52,32 @@ USING: inference kernel assembler words lists alien memory ;
 #push-immediate [
     ESI 4 ADD
     immediate-literal
-] "generator" set-word-property
+] "generator" set-word-prop
 
 #push-indirect [
     indirect-literal
     PUSH-DS
-] "generator" set-word-property
+] "generator" set-word-prop
 
 #replace-immediate [
     immediate-literal
-] "generator" set-word-property
+] "generator" set-word-prop
 
 #replace-indirect [
     indirect-literal
     [ ESI ] EAX MOV
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ drop [
     drop
     ESI 4 SUB
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ dup [
     drop
     PEEK-DS
     PUSH-DS
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ swap [
     drop
@@ -85,29 +85,29 @@ USING: inference kernel assembler words lists alien memory ;
     EDX [ ESI -4 ] MOV
     [ ESI ] EDX MOV
     [ ESI -4 ] EAX MOV
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ over [
     drop
     EAX [ ESI -4 ] MOV
     PUSH-DS
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ pick [
     drop
     EAX [ ESI -8 ] MOV
     PUSH-DS
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ >r [
     drop
     POP-DS
     ECX CS>
     PUSH-CS
-] "generator" set-word-property
+] "generator" set-word-prop
 
 \ r> [
     drop
     POP-CS
     PUSH-DS
-] "generator" set-word-property
+] "generator" set-word-prop

@@ -8,19 +8,14 @@ parser ;
 GENERIC: word-uses? ( of in -- ? )
 M: word word-uses? 2drop f ;
 M: compound word-uses? ( of in -- ? )
-    2dup = [
-        2drop f ! Don't say that a word uses itself
-    ] [
-        word-parameter tree-contains?
-    ] ifte ;
+    #! Don't say that a word uses itself.
+    2dup = [ 2drop f  ] [ word-def tree-contains? ] ifte ;
 
 : generic-uses? ( of in -- ? )
-    "methods" word-property hash>alist tree-contains? ;
+    "methods" word-prop hash>alist tree-contains? ;
 
-M: generic word-uses? ( of in -- ? )
-    generic-uses? ;
-M: 2generic word-uses? ( of in -- ? )
-    generic-uses? ;
+M: generic word-uses? ( of in -- ? ) generic-uses? ;
+M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
 
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.
@@ -82,7 +77,7 @@ M: 2generic word-uses? ( of in -- ? )
     words . ;
 
 : word-file ( word -- file )
-    "file" word-property dup [
+    "file" word-prop dup [
         "resource:/" ?str-head [
             resource-path swap path+
         ] when

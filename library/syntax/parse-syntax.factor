@@ -10,11 +10,11 @@ math namespaces parser strings words vectors unparse ;
     #! Mark the most recently defined word to execute at parse
     #! time, rather than run time. The word can use 'scan' to
     #! read ahead in the input stream.
-    word t "parsing" set-word-property ; parsing
+    word t "parsing" set-word-prop ; parsing
 
 : inline ( -- )
     #! Mark the last word to be inlined.
-    word  t "inline" set-word-property ; parsing
+    word  t "inline" set-word-prop ; parsing
 
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"

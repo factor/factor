@@ -59,8 +59,8 @@ IN: words USING: hashtables kernel lists namespaces strings ;
     #! returned.
     2dup (search) [
         nip
-        dup f "documentation" set-word-property
-        dup f "stack-effect" set-word-property
+        dup f "documentation" set-word-prop
+        dup f "stack-effect" set-word-prop
     ] [
         (create) dup reveal
     ] ?ifte ;

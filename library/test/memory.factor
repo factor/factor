@@ -4,7 +4,7 @@ USING: generic kernel lists math memory words ;
 num-types [
     [
         builtin-type [
-            "predicate" word-property instances [
+            "predicate" word-prop instances [
                 class drop
             ] each
         ] when*
