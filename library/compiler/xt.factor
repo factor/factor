@@ -56,7 +56,6 @@ USE: words
 SYMBOL: compiled-xts
 
 : save-xt ( word -- )
-    cell compile-aligned
     compiled-offset swap compiled-xts acons@ ;
 
 : commit-xt ( xt word -- )

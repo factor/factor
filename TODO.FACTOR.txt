@@ -12,14 +12,13 @@
 - handle recursion with when, when* etc
 - optimizer rewrite stack ops
 - alien-call need special nodes
-- fix dataflow unit tests
+- mutual recursion is borked with certain branch order
+- fix inference of + = and others
 
 + linearizer/generator:
 
 - peephole optimizer
 - linearize generic, 2generic
-- generate conditionals
-- generator needs to be aware of labels
 - getenv/setenv: if literal arg, compile as a load/store
 - compiler: drop literal peephole optimization
 

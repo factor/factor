@@ -47,3 +47,6 @@ USE: words
 : generate ( linear -- )
     #! Compile a word definition from linear IR.
     [ generate-node ] each ;
+
+#label [ save-xt ] "generator" set-word-property
+#values [ nop ] "generator" set-word-property

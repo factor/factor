@@ -114,8 +114,10 @@ USE: logic
     #! is destructively modified.
     dup kill-set swap kill-nodes ;
 
-: kill-branches ( literals branchlist -- branchlist )
-    [ dupd kill-nodes ] map nip ;
+: kill-branches ( literals node -- )
+    [
+        node-param [ [ dupd kill-nodes ] map nip ] change
+    ] extend , ;
 
 #push [
     [ node-param get ] bind ,
@@ -135,24 +137,15 @@ USE: logic
 
 #ifte [ scan-branches ] "scan-literal" set-word-property
 #ifte [ can-kill-branches? ] "can-kill" set-word-property
-
-#ifte [ ( literals node -- )
-    [ node-param [ kill-branches ] change ] extend ,
-] "kill-node" set-word-property
+#ifte [ kill-branches ] "kill-node" set-word-property
 
 #generic [ scan-branches ] "scan-literal" set-word-property
 #generic [ can-kill-branches? ] "can-kill" set-word-property
-
-#generic [ ( literals node -- )
-    [ node-param [ kill-branches ] change ] extend ,
-] "kill-node" set-word-property
+#generic [ kill-branches ] "kill-node" set-word-property
 
 #2generic [ scan-branches ] "scan-literal" set-word-property
 #2generic [ can-kill-branches? ] "can-kill" set-word-property
-
-#2generic [ ( literals node -- )
-    [ node-param [ kill-branches ] change ] extend ,
-] "kill-node" set-word-property
+#2generic [ kill-branches ] "kill-node" set-word-property
 
 ! Don't care about inputs to recursive combinator calls
 #call-label [ 2drop t ] "can-kill" set-word-property

@@ -44,9 +44,15 @@ USE: unparser
 USE: vectors
 USE: words
 
+! <LittleDan> peephole?
+! <LittleDan> "whose peephole are we optimizing" "your mom's"
+
+: begin-compiling ( word -- definition )
+    cell compile-aligned dup save-xt word-parameter ;
+
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    dup save-xt word-parameter dataflow linearize generate ;
+    begin-compiling dataflow optimize linearize generate ;
 
 : compile-postponed ( -- )
     compile-words get [
@@ -56,7 +62,7 @@ USE: words
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
 
-: compiled
+: compiled ( -- )
     #! Compile the most recently defined word.
     word compile ; parsing
 

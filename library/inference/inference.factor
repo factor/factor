@@ -143,17 +143,22 @@ DEFER: apply-word
         2drop
     ] ifte ;
 
-: return-node ( -- )
-    #! Add a #return node to the dataflow graph.
-    f #return dataflow, [
+: check-return ( -- )
+    #! Raise an error if word leaves values on return stack.
+    meta-r get vector-length 0 = [
+        "Word leaves elements on return stack" throw
+    ] unless ;
+
+: values-node ( op -- )
+    #! Add a #values or #return node to the graph.
+    f swap dataflow, [
         meta-d get vector>list node-consume-d set
-        meta-r get vector-length 0 = [
-            "Word leaves elements on return stack" throw
-        ] unless
     ] bind ;
 
 : (infer) ( quot -- )
-    f init-inference infer-quot return-node ;
+    f init-inference
+    infer-quot
+    #return values-node check-return ;
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.

@@ -29,7 +29,7 @@ USE: words
 [ 1 ] [ dummy-ifte-5 ] unit-test
 
 : dummy-ifte-6
-    dup 1 <= [
+    dup 1 fixnum<= [
         drop 1
     ] [
         1 fixnum- dup swap 1 fixnum- fixnum+

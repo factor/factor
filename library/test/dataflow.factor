@@ -19,7 +19,15 @@ USE: words
 
 : dataflow-contains-param? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
-    [ dupd node-param swap hash = ] some? nip ;
+    [
+        dupd [
+            node-op get #label = [
+                node-param get dataflow-contains-param?
+            ] [
+                node-param get =
+            ] ifte
+        ] bind
+    ] some? nip ;
 
 [ t ] [
     \ + [ 2 2 + ] dataflow dataflow-contains-param? >boolean
@@ -81,4 +89,11 @@ SYMBOL: #test
         [ node-op | #test ]
         [ node-param | 5 ]
     }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
+] unit-test
+
+! Somebody (cough) got the order of ifte nodes wrong.
+
+[ t ] [
+    #ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
+    [ node-param get ] bind car car [ node-param get ] bind 1 =
 ] unit-test

@@ -50,6 +50,7 @@ USE: hashtables
         copy-interpreter
         dataflow-graph off
         infer-quot
+        ( #values values-node )
         branch-effect
     ] with-scope ;
 
@@ -131,7 +132,7 @@ USE: hashtables
     #! Infer effects for both branches, unify.
     3 ensure-d
     dataflow-drop, pop-d
-    dataflow-drop, pop-d 2list
+    dataflow-drop, pop-d swap 2list
     >r 1 meta-d get vector-tail* #ifte r>
     pop-d drop ( condition )
     infer-branches ;

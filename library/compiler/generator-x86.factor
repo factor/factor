@@ -93,6 +93,43 @@ USE: words
     "arithmetic_type" SELF-CALL
     8 ESP R+I ;
 
-\ #push [ compile-literal ] "generator" set-word-property
-\ #call [ CALL compiled-offset defer-xt ] "generator" set-word-property
-\ #return [ drop RET ] "generator" set-word-property
+#push [ compile-literal ] "generator" set-word-property
+
+#call [
+    dup postpone-word
+    CALL compiled-offset defer-xt
+] "generator" set-word-property
+
+#call-label [
+    CALL compiled-offset defer-xt
+] "generator" set-word-property
+
+#jump-label [
+    JUMP compiled-offset defer-xt
+] "generator" set-word-property
+
+#jump-label-t [
+    POP-DS
+    ! condition is now in EAX
+    f address EAX CMP-I-R
+    ! jump w/ address added later
+    JNE compiled-offset defer-xt
+] "generator" set-word-property
+
+#return [ drop RET ] "generator" set-word-property
+
+#drop [ drop  4 ESI R-I ] "generator" set-word-property
+#dup [
+    drop
+    ESI EAX [R]>R
+    4 ESI R+I
+    EAX ESI R>[R]
+] "generator" set-word-property
+
+#swap [ drop \ swap CALL compiled-offset defer-xt ] "generator" set-word-property
+#over [ drop \ over CALL compiled-offset defer-xt ] "generator" set-word-property
+#nip [ drop \ nip CALL compiled-offset defer-xt ] "generator" set-word-property
+#tuck [ drop \ tuck CALL compiled-offset defer-xt ] "generator" set-word-property
+#rot [ drop \ rot CALL compiled-offset defer-xt ] "generator" set-word-property
+#>r [ drop \ >r CALL compiled-offset defer-xt ] "generator" set-word-property
+#r> [ drop \ r> CALL compiled-offset defer-xt ] "generator" set-word-property
