@@ -28,10 +28,19 @@ M: button-down-event hand-gesture ( hand gesture -- )
 M: button-up-event hand-gesture ( hand gesture -- )
     button-event-button swap button\ ;
 
+M: motion-event hand-gesture ( hand gesture -- )
+    dup motion-event-x swap motion-event-y rot move-gadget ;
+
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
 ! world variable.
-TUPLE: world running? hand delegate ;
+TUPLE: world running? hand delegate redraw? ;
+
+TUPLE: redraw-gesture ;
+C: redraw-gesture ;
+
+: redraw ( gadget -- )
+    <redraw-gesture> swap handle-gesture ;
 
 M: hand handle-gesture* ( gesture hand -- ? )
     2dup swap hand-gesture
@@ -43,6 +52,7 @@ M: hand handle-gesture* ( gesture hand -- ? )
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
+    t over set-world-redraw?
     <hand> over set-world-hand ;
 
 GENERIC: world-gesture ( world gesture -- )
@@ -52,15 +62,28 @@ M: alien world-gesture ( world gesture -- ) 2drop ;
 M: quit-event world-gesture ( world gesture -- )
     drop f swap set-world-running? ;
 
+M: redraw-gesture world-gesture ( world gesture -- )
+    drop t swap set-world-redraw? ;
+
 M: world handle-gesture* ( gesture world -- ? )
     swap world-gesture f ;
 
 : my-hand ( -- hand ) world get world-hand ;
 
+: draw-world ( -- )
+    world get dup world-redraw? [
+        [
+            f over set-world-redraw?
+            draw
+        ] with-surface
+    ] [
+        drop
+    ] ifte ;
+
 : run-world ( -- )
     world get world-running? [
         <event> dup SDL_WaitEvent 1 = [
-            my-hand handle-gesture run-world
+            my-hand handle-gesture draw-world run-world
         ] [
             drop
         ] ifte

@@ -3,12 +3,15 @@
 IN: gadgets
 USING: generic kernel math namespaces ;
 
-! Shape protocol.
+! Shape protocol. Shapes are immutable; moving or resizing a
+! shape makes a new shape.
 
 ! These dynamically-bound variables affect the generic word
 ! inside?.
-SYMBOL: x ! x translation
-SYMBOL: y ! y translation
+SYMBOL: x
+SYMBOL: y
+
+GENERIC: inside? ( point shape -- ? )
 
 ! A shape is an object with a defined bounding
 ! box, and a notion of interior.
@@ -17,7 +20,8 @@ GENERIC: shape-y
 GENERIC: shape-w
 GENERIC: shape-h
 
-GENERIC: inside? ( point shape -- ? )
+GENERIC: move-shape ( x y shape -- shape )
+GENERIC: resize-shape ( w h shape -- shape )
 
 : with-translation ( shape quot -- )
     #! All drawing done inside the quotation is translated
@@ -31,11 +35,14 @@ GENERIC: inside? ( point shape -- ? )
 
 ! A point, represented as a complex number, is the simplest type
 ! of shape.
+M: number inside? = ;
+
 M: number shape-x real ;
 M: number shape-y imaginary ;
 M: number shape-w drop 0 ;
 M: number shape-h drop 0 ;
-M: number inside? = ;
+
+M: number move-shape ( x y point -- point ) drop rect> ;
 
 ! A rectangle maps trivially to the shape protocol.
 TUPLE: rect x y w h ;
@@ -54,6 +61,15 @@ C: rect ( x y w h -- rect )
     [ set-rect-w ] keep
     [ set-rect-y ] keep
     [ set-rect-x ] keep ;
+
+M: number resize-shape ( w h point -- rect )
+     >rect 2swap <rect> ;
+
+M: rect move-shape ( x y rect -- rect )
+    [ rect-w ] keep rect-h <rect> ;
+
+M: rect resize-shape ( w h rect -- rect )
+    [ rect-x ] keep rect-y 2swap <rect> ;
 
 : rect-x-extents ( rect -- x1 x2 )
     dup rect-x x get + swap rect-w dupd + ;

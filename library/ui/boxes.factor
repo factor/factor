@@ -20,7 +20,7 @@ M: box draw ( box -- )
         ] with-gadget
     ] with-translation ;
 
-M: general-list pick-up ( point list -- gadget )
+M: general-list pick-up* ( point list -- gadget )
     dup [
         2dup car pick-up dup [
             2nip
@@ -31,17 +31,17 @@ M: general-list pick-up ( point list -- gadget )
         2drop f
     ] ifte ;
 
-M: box pick-up ( point box -- gadget )
+M: box pick-up* ( point box -- gadget )
     #! The logic is thus. If the point is definately outside the
     #! box, return f. Otherwise, see if the point is contained
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
     dup [
-        2dup gadget-delegate inside? [
+        2dup inside? [
             2dup box-contents pick-up dup [
                 2nip
             ] [
-                drop box-delegate pick-up
+                drop box-delegate pick-up*
             ] ifte
         ] [
             2drop f
@@ -54,5 +54,5 @@ M: box pick-up ( point box -- gadget )
 
 : box+ ( gadget box -- )
     #! Add a gadget to a box.
-    swap dup gadget-parent dup [ box- ] [ 2drop ] ifte
+    over gadget-parent [ pick swap box- ] when*
     [ box-contents cons ] keep set-box-contents ;

@@ -7,9 +7,9 @@ USING: generic kernel lists sdl-event ;
     #! If a gadget's handle-gesture* generic returns t, the
     #! event was not consumed and is passed on to the gadget's
     #! parent.
-    2dup handle-gesture* [
-        gadget-parent dup [
-            handle-gesture
+    dup [
+        2dup handle-gesture* [
+            gadget-parent handle-gesture
         ] [
             2drop
         ] ifte

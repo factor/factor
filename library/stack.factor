@@ -10,6 +10,7 @@ IN: kernel
 : -rot ( x y z -- z x y ) swap >r swap r> ; inline
 : dupd ( x y -- x x y ) >r dup r> ; inline
 : swapd ( x y z -- y x z ) >r swap r> ; inline
+: 2swap ( x y z t -- z t x y ) >r rot r> rot ; inline
 : nip ( x y -- y ) swap drop ; inline
 : 2nip ( x y z -- z ) >r drop drop r> ; inline
 : tuck ( x y -- y x y ) dup >r swap r> ; inline

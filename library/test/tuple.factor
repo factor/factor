@@ -15,4 +15,11 @@ C: rect
 
 [ t ] [ 10 20 30 40 <rect> dup clone 0 swap [ move ] keep = ] unit-test
 
+GENERIC: delegation-test
+M: object delegation-test drop 3 ;
+TUPLE: quux-tuple ;
+C: quux-tuple ;
+M: quux-tuple delegation-test drop 4 ;
+WRAPPER: quuux-tuple
 
+[ 3 ] [ <quux-tuple> <quuux-tuple> delegation-test ] unit-test

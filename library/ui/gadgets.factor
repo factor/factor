@@ -4,8 +4,14 @@ IN: gadgets
 USING: generic hashtables kernel lists namespaces ;
 
 ! Gadget protocol.
-GENERIC: pick-up ( point gadget -- gadget )
+
+GENERIC: pick-up* ( point gadget -- gadget/t )
 GENERIC: handle-gesture* ( gesture gadget -- ? )
+
+: pick-up ( point gadget -- gadget )
+    #! pick-up* returns t to mean 'this gadget', avoiding the
+    #! exposed facade issue.
+    tuck pick-up* dup t = [ drop ] [ nip ] ifte ;
 
 ! A gadget is a shape together with paint, and a reference to
 ! the gadget's parent. A gadget delegates to its shape.
@@ -30,11 +36,14 @@ C: gadget ( shape -- gadget )
 M: gadget draw ( gadget -- )
     dup [ gadget-delegate draw ] with-gadget ;
 
-M: gadget pick-up tuck inside? [ drop f ] unless ;
+M: gadget pick-up* inside? ;
 
 M: gadget handle-gesture* 2drop t ;
+
+: move-gadget ( x y gadget -- )
+    [ move-shape ] keep set-gadget-delegate ;
 
 ! An invisible gadget.
 WRAPPER: ghost
 M: ghost draw drop ;
-M: ghost pick-up 2drop f ;
+M: ghost pick-up* 2drop f ;

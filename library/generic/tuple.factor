@@ -87,15 +87,22 @@ kernel-internals math hashtables errors ;
         drop f
     ] ifte ; inline
 
+: lookup-method ( class selector -- method )
+    "methods" word-property hash* ; inline
+
 : tuple-dispatch ( object selector -- )
-    over class over "methods" word-property hash* [
+    over class over lookup-method [
         cdr call ( method is defined )
     ] [
-        over tuple-delegate [
-            rot drop swap execute ( check delegate )
+        object over lookup-method [
+            cdr call
         ] [
-            undefined-method ( no delegate )
-        ] ifte*
+            over tuple-delegate [
+                rot drop swap execute ( check delegate )
+            ] [
+                undefined-method ( no delegate )
+            ] ifte*
+        ] ?ifte
     ] ?ifte ;
 
 : add-tuple-dispatch ( word vtable -- )
