@@ -177,7 +177,7 @@ global [ string-mode off ] bind
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        word stack-effect [
+        word "stack-effect" word-property [
             drop
         ] [
             word swap "stack-effect" set-word-property

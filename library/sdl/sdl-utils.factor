@@ -133,8 +133,10 @@ global [
 ] bind
 
 : (lookup-font) ( [[ name ptsize ]] -- font )
-    unswons logical-font swons dup get dup alien-address 0 = [
-        drop f
+    unswons logical-font swons dup get dup alien? [
+        dup alien-address 0 = [
+            drop f
+        ] when
     ] when ;
 
 : lookup-font ( [[ name ptsize ]] -- font )

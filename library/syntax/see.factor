@@ -47,14 +47,29 @@ presentation unparser words ;
 : prettyprint-comment ( comment -- )
     "comments" style write-attr ;
 
+: infer-effect. ( effect -- )
+    0 swap
+    " ( " prettyprint-comment
+    2unlist >r [ prettyprint-element ] each r>
+    "-- " write
+    [ prettyprint-element ] each
+    ")" prettyprint-comment
+    drop ;
+
 : stack-effect. ( word -- )
-    stack-effect [
+    dup "stack-effect" word-property [
         " " write
         [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
-    ] when* ;
+    ] [
+        "infer-effect" word-property dup [
+            infer-effect.
+        ] [
+            2drop
+        ] ifte
+    ] ?ifte ;
 
 : documentation. ( indent word -- indent )
-    documentation [
+    "documentation" word-property [
         "\n" split [
             "#!" swap cat2 prettyprint-comment
             dup prettyprint-newline

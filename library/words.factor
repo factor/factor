@@ -66,10 +66,3 @@ PREDICATE: compound promise ( obj -- ? )
     "name" word-property >string ;
 
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
-
-: stack-effect    ( word -- str )
-    dup "stack-effect" word-property [
-        
-    ] ?unless ;
-
-: documentation   ( word -- str ) "documentation" word-property ;
