@@ -7,16 +7,22 @@ STRIP = strip
 OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
-	native/factor.o native/file.o native/fixnum.o \
+	native/factor.o native/fixnum.o \
 	native/float.o native/gc.o \
-	native/image.o native/io.o native/memory.o \
+	native/image.o native/memory.o \
 	native/misc.o native/port.o native/primitives.o \
-	native/ratio.o native/read.o native/relocate.o \
+	native/ratio.o native/relocate.o \
 	native/run.o \
-	native/sbuf.o native/socket.o native/stack.o \
+	native/sbuf.o native/stack.o \
 	native/string.o native/types.o native/vector.o \
-	native/write.o native/word.o native/compiler.o \
-	native/ffi.o native/signal.o native/boolean.o
+	native/word.o native/compiler.o \
+	native/ffi.o native/boolean.o \
+	native/unix/file.o \
+	native/unix/io.o \
+	native/unix/socket.o \
+	native/unix/signal.o \
+	native/unix/read.o \
+	native/unix/write.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
