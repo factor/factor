@@ -8,5 +8,5 @@ INLINE bool untag_boolean(CELL tagged)
 	return (tagged == F ? false : true);
 }
 
-void box_boolean(bool value);
-bool unbox_boolean(void);
+DLLEXPORT void box_boolean(bool value);
+DLLEXPORT bool unbox_boolean(void);

@@ -19,9 +19,9 @@ void rehash_string(F_STRING* str);
 F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill);
 BYTE* to_c_string(F_STRING* s);
 BYTE* to_c_string_unchecked(F_STRING* s);
-void box_c_string(const BYTE* c_string);
+DLLEXPORT void box_c_string(const BYTE* c_string);
 F_STRING* from_c_string(const BYTE* c_string);
-BYTE* unbox_c_string(void);
+DLLEXPORT BYTE* unbox_c_string(void);
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
 
