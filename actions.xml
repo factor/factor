@@ -49,7 +49,7 @@
 	</ACTION>
 	<ACTION NAME="factor-see">
 		<CODE>
-			WordPopup.showWordPopup(textArea);
+			FactorPlugin.factorWordPopupOp(view,"see");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-edit">
@@ -80,6 +80,16 @@
 	<ACTION NAME="factor-extract-word">
 		<CODE>
 			FactorPlugin.extractWord(view);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-infer-effect">
+		<CODE>
+			FactorPlugin.factorWordPopupOp(view,"unit infer .");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-compile">
+		<CODE>
+			FactorPlugin.factorWordOutputOp(view,"recompile");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-infer-effects">

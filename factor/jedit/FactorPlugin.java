@@ -298,6 +298,22 @@ public class FactorPlugin extends EditPlugin
 			evalInWire(word + " " + op);
 	} //}}}
 
+	//{{{ factorWordPopupOp() method
+	/**
+	 * Apply a Factor word to the selected word.
+	 */
+	public static void factorWordPopupOp(View view, String op) throws IOException
+	{
+		String word = factorWord(view);
+		if(word == null)
+			view.getToolkit().beep();
+		else
+		{
+			new TextAreaPopup(view.getTextArea(),
+				evalInWire(word + " " + op).trim());
+		}
+	} //}}}
+
 	//{{{ toWordArray() method
 	public static FactorWord[] toWordArray(Set completions)
 	{
