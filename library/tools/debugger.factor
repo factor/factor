@@ -57,6 +57,9 @@ prettyprint stdio strings unparser vectors words math generic ;
 : port-closed-error ( obj -- )
     "Port closed: " write . ;
 
+: heap-scan-error ( obj -- )
+    "Cannot do next-object outside begin/end-scan" write drop ;
+
 GENERIC: error. ( error -- )
 
 PREDICATE: cons kernel-error ( obj -- ? )
@@ -79,6 +82,7 @@ M: kernel-error error. ( error -- )
         ffi-disabled-error
         ffi-error
         port-closed-error
+        heap-scan-error
     } vector-nth execute ;
 
 M: string error. ( error -- )

@@ -15,9 +15,6 @@ unparser ;
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
 
-BUILTIN: dll   15
-BUILTIN: alien 16
-
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
 

@@ -179,7 +179,10 @@ void* primitives[] = {
 	primitive_tuple,
 	primitive_to_array,
 	primitive_to_tuple,
-	primitive_instances
+	primitive_instances,
+	primitive_begin_scan,
+	primitive_next_object,
+	primitive_end_scan
 };
 
 CELL primitive_to_xt(CELL primitive)

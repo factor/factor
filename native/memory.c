@@ -58,6 +58,7 @@ void init_arena(CELL size)
 	init_zone(&compiling,size);
 	allot_profiling = false;
 	gc_in_progress = false;
+	heap_scan = false;
 	gc_time = 0;
 }
 

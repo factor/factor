@@ -61,3 +61,10 @@ BUILTIN: f 9
 IN: kernel
 UNION: boolean f t ;
 COMPLEMENT: general-t f
+
+IN: alien
+
+! See compiler/alien.factor for the rest; this needs to be here
+! since primitive stack effects involve alien inputs/outputs.
+BUILTIN: dll   15
+BUILTIN: alien 16

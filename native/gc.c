@@ -117,6 +117,13 @@ void primitive_gc(void)
 	int64_t start = current_millis();
 	CELL scan;
 
+	if(heap_scan)
+	{
+		fprintf(stderr,"GC disabled\n");
+		fflush(stderr);
+		return;
+	}
+
 	gc_in_progress = true;
 
 	fprintf(stderr,"GC\n");

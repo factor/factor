@@ -130,6 +130,10 @@ public class FactorPlugin extends EditPlugin
 					.getParentOfPath(imagePath)));
 
 				external = new ExternalFactor(PORT);
+
+				process.getOutputStream().close();
+				process.getInputStream().close();
+				process.getErrorStream().close();
 			}
 			catch(Exception e)
 			{

@@ -23,7 +23,6 @@
 - begin-scan, next-object, end-scan primitives
 - each-object, each-slot combinators
 - references primitive
-- ditch % for tuples?
 - resize window: world not updated until mouse moved
 - x>offset
 - fix completion invoke in middle of word

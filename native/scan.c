@@ -1,5 +1,51 @@
 #include "factor.h"
 
+void primitive_begin_scan(void)
+{
+	heap_scan_ptr = active.base;
+	heap_scan_end = active.here;
+	heap_scan = true;
+}
+
+void primitive_next_object(void)
+{
+	CELL value = get(heap_scan_ptr);
+	CELL obj = heap_scan_ptr;
+	CELL size, type;
+
+	if(!heap_scan)
+		general_error(ERROR_HEAP_SCAN,F);
+
+	if(heap_scan_ptr >= heap_scan_end)
+	{
+		dpush(F);
+		return;
+	}
+	
+	if(headerp(value))
+	{
+		size = align8(untagged_object_size(heap_scan_ptr));
+		type = untag_header(value);
+	}
+	else
+	{
+		size = CELLS * 2;
+		type = CONS_TYPE;
+	}
+
+	heap_scan_ptr += size;
+
+	if(type < HEADER_TYPE)
+		dpush(RETAG(obj,type));
+	else
+		dpush(RETAG(obj,OBJECT_TYPE));
+}
+
+void primitive_end_scan(void)
+{
+	heap_scan = false;
+}
+
 void primitive_heap_stats(void)
 {
 	int instances[TYPE_COUNT], bytes[TYPE_COUNT];
@@ -12,7 +58,7 @@ void primitive_heap_stats(void)
 	for(i = 0; i < TYPE_COUNT; i++)
 		bytes[i] = 0;
 
-	begin_heap_walk();
+	begin_heap_scan();
 
 	for(;;)
 	{
@@ -46,7 +92,7 @@ void primitive_instances(void)
 
 	here = active.here;
 
-	begin_heap_walk();
+	begin_heap_scan();
 	
 	for(;;)
 	{
@@ -58,7 +104,7 @@ void primitive_instances(void)
 
 		/* don't want an infinite loop if we ask for a list of all
 		conses in the image! */
-		if(heap_walk_ptr >= here)
+		if(heap_scan_ptr >= here)
 			break;
 
 		if(search_type == type)

@@ -93,9 +93,6 @@ IN: alien : add-library 3drop ;
         "/library/tools/profiler.factor"
         "/library/tools/interpreter.factor"
     
-        ! Inference needs to know primitive stack effects at load time
-        "/library/primitives.factor"
-    
         "/library/inference/dataflow.factor"
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"

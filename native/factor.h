@@ -127,6 +127,6 @@ typedef unsigned char BYTE;
 #include "relocate.h"
 #include "ffi.h"
 #include "debug.h"
-#include "walk.h"
+#include "scan.h"
 
 #endif /* __FACTOR_H__ */

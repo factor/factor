@@ -1,4 +1,8 @@
 bool gc_in_progress;
+
+/* GC is off during heap walking */
+bool heap_scan;
+
 int64_t gc_time;
 
 /* Given a pointer to oldspace, copy it to newspace. */

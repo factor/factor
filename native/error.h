@@ -13,6 +13,7 @@
 #define ERROR_FFI_DISABLED (12<<3)
 #define ERROR_FFI (13<<3)
 #define ERROR_CLOSED (14<<3)
+#define ERROR_HEAP_SCAN (15<<3)
 
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
