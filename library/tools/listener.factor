@@ -44,8 +44,12 @@ USE: unparser
 USE: vectors
 
 : print-banner ( -- )
-    <% "This is " % java? [ "JVM " % ] when
-    native? [ "native " % ] when "Factor " % version % %> print
+    [
+        "This is " ,
+        java? [ "JVM " , ] when
+        native? [ "native " , ] when
+        "Factor " , version ,
+    ] make-string print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Copyright (C) 2004 Chris Double" print
     "Type ``exit'' to exit, ``help'' for help." print ;

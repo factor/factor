@@ -48,24 +48,25 @@ USE: unparser
         read parse-number
     ] with-stream ;
 
-: bool% ( ? -- str )
-    "true" "false" ? % ;
+: bool, ( ? -- str )
+    "true" "false" ? , ;
 
-: list>bsh-array% ( list -- code )
-    "new String[] {" %
-    [ unparse % "," % ] each
-    "null}" % ;
+: list>bsh-array, ( list -- code )
+    "new String[] {" ,
+    [ unparse , "," , ] each
+    "null}" , ;
 
 : make-jedit-request ( files dir params -- code )
     [
-        <%
-        "EditServer.handleClient(" %
-        "restore" get bool% "," %
-        "newView" get bool% "," %
-        "newPlainView" get bool% "," %
-        ( If the dir is not set, we don't want to send f )
-        dup [ unparse ] [ drop "null" ] ifte % "," %
-        list>bsh-array% ");\n" % %>
+        [
+            "EditServer.handleClient(" ,
+            "restore" get bool, "," ,
+            "newView" get bool, "," ,
+            "newPlainView" get bool, "," ,
+            ( If the dir is not set, we don't want to send f )
+            dup [ unparse ] [ drop "null" ] ifte , "," ,
+            list>bsh-array, ");\n" ,
+        ] make-string
     ] bind ;
 
 : send-jedit-request ( request -- )

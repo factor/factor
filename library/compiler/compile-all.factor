@@ -111,7 +111,9 @@ SYMBOL: compilable-word-list
 : compilable-words ( -- list )
     #! Make a list of all words that can be compiled.
     reset-can-compile
-    [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,]
+    [
+        [ dup can-compile? [ , ] [ drop ] ifte ] each-word
+    ] make-list
     reset-can-compile ;
 
 : cannot-compile ( word -- )

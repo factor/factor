@@ -35,16 +35,20 @@ USE: strings
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    global [ "vocabularies" get [ vars ] bind ] bind ;
+    global [ "vocabularies" get [ vars str-sort ] bind ] bind ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.
     global [ "vocabularies" get get* ] bind ;
 
+: word-sort ( list -- list )
+    #! Sort a list of words by name.
+    [ swap word-name swap word-name str-lexi> ] sort ;
+
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
-    vocab [ values ] bind [ ] subset ;
+    vocab [ values ] bind [ ] subset word-sort ;
 
 : init-search-path ( -- )
     ! For files

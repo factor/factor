@@ -39,12 +39,12 @@ USE: test
 : val 0.85 ;
 
 : <color-map> ( nb-cols -- map )
-    [,
+    [
         dup [
             360 * over succ / 360 / sat val
             hsv>rgb 1.0 scale-rgba ,
         ] times*
-    ,] list>vector nip ;
+    ] make-list list>vector nip ;
 
 : absq >rect swap sq swap sq + ;
 

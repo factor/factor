@@ -68,13 +68,13 @@ USE: strings
     "\e[4" swap "m" cat3 ; inline
 
 : ansi-attrs ( style -- )
-    "bold"    over assoc [ bold % ] when
-    "ansi-fg" over assoc [ fg % ] when*
-    "ansi-bg" over assoc [ bg % ] when*
+    "bold"    over assoc [ bold , ] when
+    "ansi-fg" over assoc [ fg , ] when*
+    "ansi-bg" over assoc [ bg , ] when*
     drop ;
 
 : ansi-attr-string ( string style -- string )
-    <% ansi-attrs % reset % %> ;
+    [ ansi-attrs , reset , ] make-string ;
 
 : <ansi-stream> ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams

@@ -93,7 +93,7 @@ USE: words
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
     [ <local-alien> ] cons
-    <% "<" % "struct-name" get % ">" % %>
+    [ "<" , "struct-name" get , ">" , ] make-string
     "in" get create swap
     define-compound ;
 

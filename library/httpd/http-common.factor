@@ -80,9 +80,10 @@ USE: url-encoding
     "301 Moved Permanently" response terpri ;
 
 : directory-no/ ( -- )
-    <% "request" get % CHAR: / %
-    "raw-query" get [ CHAR: ? % % ] when*
-    %> redirect ;
+    [
+        "request" get , CHAR: / ,
+        "raw-query" get [ CHAR: ? , , ] when*
+    ] make-string redirect ;
 
 : header-line ( alist line -- alist )
     ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
@@ -111,7 +112,7 @@ USE: url-encoding
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
-        unswons <% % ": " % % %> log
+        unswons [ , ": " , , ] make-string log
     ] when* ;
 
 : prepare-url ( url -- url )

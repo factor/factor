@@ -58,33 +58,35 @@ USE: url-encoding
 : >hex-color ( triplet -- hex )
     [ >hex 2 digits ] map "#" swons cat ;
 
-: fg-css% ( color -- )
-    "color: " % >hex-color % "; " % ;
+: fg-css, ( color -- )
+    "color: " , >hex-color , "; " , ;
 
-: bold-css% ( flag -- )
-    [ "font-weight: bold; " % ] when ;
+: bold-css, ( flag -- )
+    [ "font-weight: bold; " , ] when ;
 
-: italics-css% ( flag -- )
-    [ "font-style: italic; " % ] when ;
+: italics-css, ( flag -- )
+    [ "font-style: italic; " , ] when ;
 
-: underline-css% ( flag -- )
-    [ "text-decoration: underline; " % ] when ;
+: underline-css, ( flag -- )
+    [ "text-decoration: underline; " , ] when ;
 
-: size-css% ( size -- )
-    "font-size: " % unparse % "; " % ;
+: size-css, ( size -- )
+    "font-size: " , unparse , "; " , ;
 
-: font-css% ( font -- )
-    "font-family: " % % "; " % ;
+: font-css, ( font -- )
+    "font-family: " , , "; " , ;
 
 : css-style ( style -- )
-    <% [
-        [ "fg"        fg-css% ]
-        [ "bold"      bold-css% ]
-        [ "italics"   italics-css% ]
-        [ "underline" underline-css% ]
-        [ "size"      size-css% ]
-        [ "font"      font-css% ]
-    ] assoc-apply %> ;
+    [
+        [
+            [ "fg"        fg-css, ]
+            [ "bold"      bold-css, ]
+            [ "italics"   italics-css, ]
+            [ "underline" underline-css, ]
+            [ "size"      size-css, ]
+            [ "font"      font-css, ]
+        ] assoc-apply
+    ] make-string ;
 
 : span-tag ( style quot -- )
     over css-style dup "" = [
@@ -101,7 +103,7 @@ USE: url-encoding
     ] when* "/" ?str-tail drop ;
 
 : file-link-href ( path -- href )
-    <% "/" % resolve-file-link url-encode % %> ;
+    [ "/" , resolve-file-link url-encode , ] make-string ;
 
 : file-link-tag ( style quot -- )
     over "file-link" swap assoc [

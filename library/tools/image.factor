@@ -274,13 +274,11 @@ DEFER: '
     (vocabulary) set-hash ;
 
 : 'plist ( word -- plist )
-    [,
-
-    dup word-name "name" swons ,
-    dup word-vocabulary "vocabulary" swons ,
-    "parsing" word-property [ t "parsing" swons , ] when
-
-    ,] ' ;
+    [
+        dup word-name "name" swons ,
+        dup word-vocabulary "vocabulary" swons ,
+        "parsing" word-property [ t "parsing" swons , ] when
+    ] make-list ' ;
 
 : (worddef,) ( word primitive parameter -- )
     ' >r >r dup (word+) dup 'plist >r

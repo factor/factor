@@ -34,7 +34,7 @@ USE: vectors
 
 : hh ( duration -- str ) 60 /i ;
 : mm ( duration -- str ) 60 mod unparse 2 digits ;
-: hh:mm ( millis -- str ) <% dup hh % ":" % mm % %> ;
+: hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-list ;
 
 : print-entry ( duration description -- )
     dup write

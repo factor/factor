@@ -69,7 +69,7 @@ USE: logic
 ! <a href= "http://" swap cat2 a> "click" write </a>
 !
 ! (url -- )
-! <a href= <% "http://" % % %> a> "click" write </a>
+! <a href= [ "http://" , , ] make-string a> "click" write </a>
 !
 ! Tags that have no 'closing' equivalent have a trailing tag/> form:
 !
@@ -78,7 +78,9 @@ USE: logic
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
-    reverse <% [ dup car % "='" % cdr % "'" % ] each %> ;
+    reverse [
+        [ dup car , "='" , cdr , "'" , ] each
+    ] make-string ;
 
 : write-attributes ( n: namespace -- )    
     #! With the attribute namespace on the stack, get the attributes
@@ -163,13 +165,13 @@ USE: logic
 : def-for-html-word-</foo> ( name -- name quot )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    <% "</" % % ">" % %> dup [ write ] cons ;
+    [ "</" , , ">" , ] make-string dup [ write ] cons ;
 
 : def-for-html-word-<foo/> ( name -- name quot )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    <% "<" % dup % "/>" % %> swap
-    <% "<" % % ">" % %>
+    [ "<" , dup , "/>" , ] make-string swap
+    [ "<" , , ">" , ] make-string
     [ write ] cons ;
 
 : def-for-html-word-foo/> ( name -- name quot )

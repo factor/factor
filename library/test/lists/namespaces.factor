@@ -33,8 +33,8 @@ USE: test
 ] unit-test
 
 [ [ "xyz" #{ 3 2 } 1/5 [ { } ] ] ] [
-    [, "xyz" , "xyz" unique,
+    [ "xyz" , "xyz" unique,
     #{ 3 2 } , #{ 3 2 } unique,
     1/5 , 1/5 unique,
-    [, { } unique, ,] , ,]
+    [ { } unique, ] make-list , ] make-list
 ] unit-test

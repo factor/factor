@@ -42,23 +42,22 @@ USE: words
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
 
-: integer% ( num radix -- )
-    tuck /mod >digit % dup 0 > [
-        swap integer%
+: integer, ( num radix -- )
+    tuck /mod >digit , dup 0 > [
+        swap integer,
     ] [
         2drop
     ] ifte ;
 
-: integer- ( num -- num )
-    dup 0 < [ "-" % neg ] when ;
-
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
-    <% over 0 < [
-        swap neg swap integer% CHAR: - %
-    ] [
-        integer%
-    ] ifte reverse%> ;
+    [
+        over 0 < [
+            swap neg swap integer, CHAR: - ,
+        ] [
+            integer,
+        ] ifte
+    ] make-rstring ;
 
 : >dec ( num -- string ) 10 >base ;
 : >bin ( num -- string ) 2 >base ;
@@ -68,13 +67,22 @@ USE: words
 DEFER: unparse
 
 : unparse-ratio ( num -- str )
-    <% dup
-    numerator unparse %
-    CHAR: / %
-    denominator unparse % %> ;
+    [
+        dup
+        numerator unparse ,
+        CHAR: / ,
+        denominator unparse ,
+    ] make-string ;
 
 : unparse-complex ( num -- str )
-    >rect <% "#{ " % swap unparse % " " % unparse % " }" % %> ;
+    [
+        "#{ " ,
+        dup
+        real unparse ,
+        " " ,
+        imaginary unparse ,
+        " }" ,
+    ] make-string ;
 
 : ch>ascii-escape ( ch -- esc )
     [
@@ -100,7 +108,9 @@ DEFER: unparse
     ] unless ;
 
 : unparse-str ( str -- str )
-    <% CHAR: " % [ unparse-ch % ] str-each CHAR: " % %> ;
+    [
+        CHAR: " , [ unparse-ch , ] str-each CHAR: " ,
+    ] make-string ;
 
 : unparse-word ( word -- str )
     word-name dup "#<unnamed>" ? ;
@@ -113,11 +123,13 @@ DEFER: unparse
 : unparse-float ( float -- str ) (unparse-float) fix-float ;
 
 : unparse-unknown ( obj -- str )
-    <% "#<" %
-    dup type type-name %
-    " @ " % 
-    address unparse %
-    ">" % %> ;
+    [
+        "#<" ,
+        dup type type-name ,
+        " @ " , 
+        address unparse ,
+        ">" ,
+    ] make-string ;
 
 : unparse-t drop "t" ;
 : unparse-f drop "f" ;

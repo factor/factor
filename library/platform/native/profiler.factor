@@ -55,7 +55,7 @@ SYMBOL: only-top
 
 : call-counts. ( -- )
     #! Print word/call count pairs.
-    [, [ call-count, ] each-word ,] counts. ;
+    [ [ call-count, ] each-word ] make-list counts. ;
 
 : profile-depth ( -- n )
     only-top get [ -1 ] [ callstack vector-length ] ifte ;
@@ -76,7 +76,7 @@ SYMBOL: only-top
 
 : allot-counts. ( -- alist )
     #! Print word/allot count pairs.
-    [, [ allot-count, ] each-word ,] counts. ;
+    [ [ allot-count, ] each-word ] make-list counts. ;
 
 : allot-profile ( quot -- )
     #! Execute a quotation with the memory profiler enabled.

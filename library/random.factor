@@ -84,7 +84,7 @@ USE: stack
     #! Returns a random subset of the given list of comma pairs.
     #! The car of each pair is a probability, the cdr is the
     #! item itself. Only the cdr of the comma pair is returned.
-    [,
+    [
         [ car+ ] keep ( probabilitySum list )
         [
             >r 1 over random-int r> ( probabilitySum probability elem )
@@ -93,4 +93,4 @@ USE: stack
             > ( probabilitySum elemd boolean )
             [ drop ] [ , ] ifte
         ] each drop
-    ,] ;
+    ] make-list ;

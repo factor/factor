@@ -169,13 +169,14 @@ IN: syntax
     next-ch dup CHAR: " = [
         drop
     ] [
-        parse-ch % parse-string
+        parse-ch , parse-string
     ] ifte ;
 
 : "
     #! Note the ugly hack to carry the new value of 'pos' from
-    #! the <% %> scope up to the original scope.
-    <% parse-string "col" get %> swap "col" set parsed ; parsing
+    #! the make-string scope up to the original scope.
+    [ parse-string "col" get ] make-string
+    swap "col" set parsed ; parsing
 
 ! Complex literal
 : #{

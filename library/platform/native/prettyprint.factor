@@ -39,7 +39,7 @@ USE: words
 : stack-effect. ( word -- )
     stack-effect [
         " " write
-        <% CHAR: ( % % CHAR: ) % %> prettyprint-comment
+        [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
     ] when* ;
 
 : documentation. ( indent word -- indent )

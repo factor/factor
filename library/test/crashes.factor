@@ -22,10 +22,6 @@ USE: lists
     [ drop ] [ drop ] catch
 ] keep-datastack
 
-"hello" str>sbuf "x" set
-[ -5 "x" get set-sbuf-length ] [ drop ] catch
-[ "x" get sbuf>str drop ] [ drop ] catch
-
 10 <vector> "x" set
 [ -2 "x" get set-vector-length ] [ drop ] catch
 [ "x" get vector-clone drop ] [ drop ] catch

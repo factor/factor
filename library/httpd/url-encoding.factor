@@ -29,6 +29,7 @@ IN: url-encoding
 USE: combinators
 USE: errors
 USE: kernel
+USE: lists
 USE: logic
 USE: format
 USE: math
@@ -51,14 +52,14 @@ USE: unparser
         2drop
     ] [
         >r succ dup 2 + r> substring
-        catch-hex> [ >char % ] when*
+        catch-hex> [ >char , ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )
     2dup url-decode-hex >r 3 + r> ;
 
 : url-decode-+-or-other ( index str ch -- index str )
-    CHAR: + CHAR: \s replace % >r succ r> ;
+    CHAR: + CHAR: \s replace , >r succ r> ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [
@@ -72,4 +73,4 @@ USE: unparser
     ] ifte ;
 
 : url-decode ( str -- str )
-    <% 0 swap url-decode-iter %> ;
+    [ 0 swap url-decode-iter ] make-string ;

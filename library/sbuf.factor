@@ -34,34 +34,21 @@ USE: namespaces
 USE: strings
 USE: stack
 
-: str>sbuf ( str -- sbuf )
-    dup str-length <sbuf> tuck sbuf-append ;
+: make-string ( quot -- string )
+    #! Call a quotation. The quotation can call , to prepend
+    #! objects to the list that is returned when the quotation
+    #! is done.
+    make-list cat ;
 
-: string-buffer-size 80 ;
-
-: <% ( -- )
-    #! Begins constructing a string.
-    <namespace> >n string-buffer-size <sbuf>
-    "string-buffer" set ;
-
-: % ( str -- )
-    #! Append a string to the construction buffer.
-    "string-buffer" get sbuf-append ;
-
-: %> ( -- str )
-    #! Ends construction and pushes the constructed text on the
-    #! stack.
-    "string-buffer" get sbuf>str n> drop ;
-
-: reverse%> ( -- str )
-     #! Ends construction and pushes the *reversed*, constructed
-     #! text on the stack.
-     "string-buffer" get dup sbuf-reverse sbuf>str n> drop ;
+: make-rstring ( quot -- string )
+    #! Return a string whose entries are in the same order that ,
+    #! was called.
+    make-rlist cat ;
 
 : fill ( count char -- string )
     #! Push a string that consists of the same character
     #! repeated.
-    <% swap [ dup % ] times drop %> ;
+    [ swap [ dup , ] times drop ] make-string ;
 
 : str-map ( str code -- str )
     #! Apply a quotation to each character in the string, and
@@ -88,7 +75,7 @@ USE: stack
 : split ( string split -- list )
     #! Split the string at each occurrence of split, and push a
     #! list of the pieces.
-    [, 0 -rot (split) ,] ;
+    [ 0 -rot (split) ] make-list ;
 
 : split-n-advance substring , >r tuck + swap r> ;
 : split-n-finish nip dup str-length swap substring , ;
@@ -102,4 +89,4 @@ USE: stack
 
 : split-n ( n str -- list )
     #! Split a string into n-character chunks.
-    [, 0 -rot (split-n) ,] ;
+    [ 0 -rot (split-n) ] make-list ;

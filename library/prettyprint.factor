@@ -144,12 +144,12 @@ DEFER: prettyprint*
     trim-newline "comments" style write-attr ;
 
 : word-link ( word -- link )
-    <%
-    "vocabularies'" %
-    dup word-vocabulary %
-    "'" %
-    word-name %
-    %> ;
+    [
+        "vocabularies'" ,
+        dup word-vocabulary ,
+        "'" ,
+        word-name ,
+    ] make-string ;
 
 : word-actions ( -- list )
     [
@@ -194,7 +194,7 @@ DEFER: prettyprint*
     0 swap prettyprint* drop terpri ;
 
 : vocab-link ( vocab -- link )
-    <% "vocabularies'" % % %> ;
+    "vocabularies'" swap cat2 ;
 
 : vocab-attrs ( word -- attrs )
     vocab-link "object-link" default-style acons ;

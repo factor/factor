@@ -29,6 +29,7 @@ IN: errors
 USE: combinators
 USE: continuations
 USE: kernel
+USE: lists
 USE: logic
 USE: namespaces
 USE: prettyprint
@@ -41,15 +42,15 @@ USE: unparser
     "ERROR: " write error. ;
 
 : parse-dump ( error -- )
-    <%
-    "error-file" get [ "<interactive>" ] unless* % ":" %
-    "error-line-number" get [ 1 ] unless* unparse % ": " %
-    %> write
+    [
+        "error-file" get [ "<interactive>" ] unless* , ":" ,
+        "error-line-number" get [ 1 ] unless* unparse , ": " ,
+    ] make-string write
     error.
     
     "error-line" get print
     
-    <% "error-col" get " " fill % "^" % %> print ;
+    [ "error-col" get " " fill , "^" , ] make-string print ;
 
 : in-parser? ( -- ? )
     "error-line" get "error-col" get and ;

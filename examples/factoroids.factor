@@ -113,10 +113,6 @@ SYMBOL: enemy-shots
 
 ! The player's ship
 
-! Flags that can be set to move the ship
-SYMBOL: left
-SYMBOL: right
-
 TRAITS: ship
 M: ship draw ( actor -- )
     [
