@@ -40,7 +40,7 @@ USE: errors
   #! Display the components for allowing entry of 
   #! factor words to be evaluated.
   <form method= "post" action= form> [
-    <textarea name= "eval" textarea> [
+    <textarea name= "eval" rows= "10" cols= "40" textarea> [
       "" write
     ] </textarea>
     <input type= "submit" value= "Evaluate" input/>
