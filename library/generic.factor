@@ -145,8 +145,17 @@ SYMBOL: delegate
     #! traits type.
     scan-word [ constructor-word ] keep [ (;C) ] [ ] ; parsing
 
+: (;M) ( type generic definition -- )
+    pick builtin-type [
+        rot "builtin-type" word-property
+        rot "vtable" word-property
+        set-vector-nth
+    ] [
+        rot traits-map [ put ] bind
+    ] ifte ;
+
 : M: ( -- type generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word scan-word [ rot traits-map [ put ] bind ] [ ] ;
+    scan-word scan-word [ (;M) ] [ ] ;
     parsing
