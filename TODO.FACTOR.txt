@@ -9,8 +9,6 @@
 - sbuf-hashcode
 - vector-hashcode
 - listener backspace overzealous
-- SIGBUS handler
-- handle division by zero
 - log-client: fix for native
 - multitasking
 

@@ -3,7 +3,7 @@
 plugin.factor.jedit.FactorPlugin.activate=defer
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.61
+plugin.factor.jedit.FactorPlugin.version=0.62
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/plugin.html
 
