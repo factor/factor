@@ -64,6 +64,7 @@ USE: line-editor
 USE: hashtables
 USE: lists
 USE: sdl-ttf
+USE: prettyprint
 
 #! A namespace holding console state.
 SYMBOL: console
@@ -121,11 +122,11 @@ SYMBOL: redraw-console
 
 : draw-line ( str -- )
     >r x get y get console-font get r>
-    foreground make-color draw-string
+    foreground 3unlist make-color draw-string
     x [ + ] change ;
 
 : clear-display ( -- )
-    surface get 0 0 width get height get background 3list rgb boxColor ;
+    surface get 0 0 width get height get background rgb boxColor ;
 
 : draw-lines ( -- )
     visible-lines available-lines min [
@@ -142,7 +143,7 @@ SYMBOL: redraw-console
     y get
     over 1 +
     y get line-height get +
-    cursor 3list rgb boxColor ;
+    cursor rgb boxColor ;
 
 : draw-current ( -- )
     output-line get sbuf>str draw-line ;
@@ -169,7 +170,7 @@ SYMBOL: redraw-console
     scrollbar-top
     width get
     scrollbar-bottom
-    black 3list rgb boxColor ;
+    black rgb boxColor ;
 
 : draw-console ( -- )
     [
