@@ -23,3 +23,6 @@ USING: assembler inference kernel words ;
 ] "generator" set-word-prop
 
 #return [ drop BLR ] "generator" set-word-prop
+
+: compile-call-label ( label -- ) 0 BL relative-24 ;
+: compile-jump-label ( label -- ) 0 B relative-24 ;

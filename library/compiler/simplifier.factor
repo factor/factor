@@ -26,7 +26,8 @@ SYMBOL: simplifying
     #! Return a new linear IR.
     dup [
         dup simplifiers simplify-node
-        [ uncons simplify-1 >r cons r> ] unless*
+        [ uncons simplify-1 drop cons t ]
+        [ uncons simplify-1 >r cons r> ] ifte
     ] [
         f
     ] ifte ;
@@ -34,8 +35,8 @@ SYMBOL: simplifying
 : simplify ( linear -- linear )
     #! Keep simplifying until simplify-1 returns f.
     [
-        dup simplifying set  simplify-1 [ simplify ] when
-    ] with-scope ;
+        dup simplifying set  simplify-1
+    ] with-scope  [ simplify ] when ;
 
 : label-called? ( label linear -- ? )
     [ uncons pick = swap #label = not and ] some? nip ;
@@ -92,7 +93,9 @@ SYMBOL: simplifying
     car cdr find-label cdr
 ] "next-logical" set-word-prop
 
-#epilogue [ cdr ] "next-logical" set-word-prop
+#epilogue [
+    cdr next-logical
+] "next-logical" set-word-prop
 
 : next-logical? ( op linear -- ? )
     next-logical dup [ car car = ] [ 2drop f ] ifte ;

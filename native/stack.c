@@ -15,17 +15,11 @@ void fix_stacks(void)
 	if(STACK_UNDERFLOW(ds,ds_bot))
 		reset_datastack();
 	else if(STACK_OVERFLOW(ds,ds_bot))
-	{
-		fprintf(stderr,"ds oveflow\n");
 		reset_datastack();
-	}
 	else if(STACK_UNDERFLOW(cs,cs_bot))
 		reset_callstack();
 	else if(STACK_OVERFLOW(cs,cs_bot))
-	{
-		fprintf(stderr,"cs oveflow\n");
 		reset_callstack();
-	}
 }
 
 void init_stacks(void)

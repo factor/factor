@@ -14,37 +14,17 @@ math memory namespaces words ;
     [ ESI ] EAX MOV
 ] "generator" set-word-prop
 
-: compile-call-label ( label -- ) 0 CALL fixup t defer-xt ;
-: compile-jump-label ( label -- ) 0 JMP fixup t defer-xt ;
+: compile-call-label ( label -- ) 0 CALL relative ;
+: compile-jump-label ( label -- ) 0 JMP relative ;
 
-: compile-call ( word -- )
-    dup postpone-word  compile-call-label ;
-
-: compile-target ( word -- )
-    compiled-offset 0 compile-cell f defer-xt ;
-
-#call [
-    compile-call
-] "generator" set-word-prop
-
-#jump [
-    dup postpone-word  compile-jump-label
-] "generator" set-word-prop
-
-#call-label [
-    compile-call-label
-] "generator" set-word-prop
-
-#jump-label [
-    compile-jump-label
-] "generator" set-word-prop
+: compile-target ( word -- ) 0 compile-cell absolute ;
 
 : compile-jump-t ( word -- )
     POP-DS
     ! condition is now in EAX
     EAX f address CMP
     ! jump w/ address added later
-    0 JNE fixup t defer-xt ;
+    0 JNE relative ;
 
 #jump-t-label [ compile-jump-t ] "generator" set-word-prop
 
@@ -55,13 +35,13 @@ math memory namespaces words ;
     ! condition is now in EAX
     EAX f address CMP
     ! jump w/ address added later
-    0 JE fixup t defer-xt ;
+    0 JE relative ;
 
 #jump-f-label [ compile-jump-f ] "generator" set-word-prop
 
 #jump-f [ compile-jump-f ] "generator" set-word-prop
 
-#return-to [ 0 PUSH fixup f defer-xt ] "generator" set-word-prop
+#return-to [ 0 PUSH absolute ] "generator" set-word-prop
 
 #return [ drop RET ] "generator" set-word-prop
 
@@ -72,7 +52,7 @@ math memory namespaces words ;
     drop
     POP-DS
     EAX 1 SHR
-    EAX HEX: ffff ADD fixup f rel-address
+    EAX HEX: ffff ADD  just-compiled f rel-address
     [ EAX ] JMP
     compile-aligned
     compiled-offset swap set-compiled-cell ( fixup -- )
@@ -85,7 +65,7 @@ math memory namespaces words ;
 
 #target [
     #! Jump table entries are absolute addresses.
-    dup postpone-word compile-target
+    dup postpone-word  compile-target
 ] "generator" set-word-prop
 
 #c-call [

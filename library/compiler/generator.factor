@@ -55,3 +55,24 @@ SYMBOL: previous-offset
 : type-tag ( type -- tag )
     #! Given a type number, return the tag number.
     dup 6 > [ drop 3 ] when ;
+
+DEFER: compile-call-label ( label -- )
+DEFER: compile-jump-label ( label -- )
+
+: compile-call ( word -- ) dup postpone-word compile-call-label ;
+
+#call [
+    compile-call
+] "generator" set-word-prop
+
+#jump [
+    dup postpone-word  compile-jump-label
+] "generator" set-word-prop
+
+#call-label [
+    compile-call-label
+] "generator" set-word-prop
+
+#jump-label [
+    compile-jump-label
+] "generator" set-word-prop

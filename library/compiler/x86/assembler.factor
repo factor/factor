@@ -176,12 +176,7 @@ UNION: operand register indirect displaced disp-only ;
     pick register? [ BIN: 10 bitor swapd ] when
     compile-byte register 1-operand ;
 
-: fixup ( -- addr )
-    #! After compiling a jump, this returns the address where
-    #! the branch target can be written.
-    compiled-offset 4 - ;
-
-: relative ( addr -- addr )
+: from ( addr -- addr )
     #! Relative to after next 32-bit immediate.
     compiled-offset - 4 - ;
 
@@ -212,15 +207,15 @@ M: operand MOV HEX: 89 2-operand ;
 
 ( Control flow                                                 )
 GENERIC: JMP ( op -- )
-M: integer JMP HEX: e9 compile-byte relative compile-cell ;
+M: integer JMP HEX: e9 compile-byte from compile-cell ;
 M: operand JMP HEX: ff compile-byte BIN: 100 1-operand ;
 
 GENERIC: CALL ( op -- )
-M: integer CALL HEX: e8 compile-byte relative compile-cell ;
+M: integer CALL HEX: e8 compile-byte from compile-cell ;
 M: operand CALL HEX: ff compile-byte BIN: 010 1-operand ;
 
 : JUMPcc ( addr opcode -- )
-    HEX: 0f compile-byte  compile-byte  relative compile-cell ;
+    HEX: 0f compile-byte  compile-byte  from compile-cell ;
 
 : JO  HEX: 80 JUMPcc ;
 : JNO HEX: 81 JUMPcc ;

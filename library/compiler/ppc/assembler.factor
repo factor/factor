@@ -28,6 +28,7 @@ USING: errors kernel math memory words ;
 : LIS 0 rot ADDIS ;
 : ORI d-form 24 insn ;
 : BL 0 1 i-form 18 insn ;
+: B 0 0 i-form 18 insn ;
 : BCLR 0 8 0 0 b-form 19 insn ;
 : BLR 20 BCLR ;
 : MFSPR 5 shift 339 xfx-form 31 insn ;

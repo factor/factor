@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler errors kernel lists math namespaces strings
-vectors words ;
+USING: assembler errors generic kernel lists math namespaces
+strings vectors words ;
 
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.
@@ -55,12 +55,6 @@ SYMBOL: compiled-xts
 : compiled-xt ( word -- xt )
     dup compiled-xts get assoc [ word-xt ] ?unless ;
 
-! "deferred-xts" is a list of [ where word relative ] pairs; the
-! xt of word when its done compiling will be written to the
-! offset, relative to the offset.
-
-SYMBOL: deferred-xts
-
 ! Words being compiled are consed onto this list. When a word
 ! is encountered that has not been previously compiled, it is
 ! consed onto this list. Compilation stops when the list is
@@ -68,11 +62,63 @@ SYMBOL: deferred-xts
 
 SYMBOL: compile-words
 
-: defer-xt ( word where rel/abs -- )
-    #! After word is compiled, put its XT at where. If rel/abs
-    #! is true, this is a relative jump.
-    3dup compiled-offset 0 ? 3list deferred-xts cons@
-    nip rel-word ;
+! deferred-xts is a list of objects responding to the fixup
+! generic.
+SYMBOL: deferred-xts
+
+! Some machinery to allow forward references
+GENERIC: fixup ( object -- )
+
+TUPLE: relative word where to ;
+
+: just-compiled compiled-offset 4 - ;
+
+C: relative ( word -- )
+    dup t rel-word
+    [ set-relative-word ] keep
+    [ just-compiled swap set-relative-where ] keep
+    [ compiled-offset swap set-relative-to ] keep ;
+
+: relative ( word -- ) <relative> deferred-xts cons@ ;
+
+: relative-fixup ( relative -- addr where )
+    dup relative-word compiled-xt over relative-to -
+    swap relative-where ;
+
+M: relative fixup ( relative -- )
+    relative-fixup set-compiled-cell ;
+
+TUPLE: absolute word where ;
+
+C: absolute ( word -- )
+    dup f rel-word
+    [ set-absolute-word ] keep
+    [ just-compiled swap set-absolute-where ] keep ;
+
+: absolute ( word -- ) <absolute> deferred-xts cons@ ;
+
+M: absolute fixup ( absolute -- )
+    dup absolute-word compiled-xt
+    swap absolute-where set-compiled-cell ;
+
+TUPLE: relative-24 ;
+
+C: relative-24 ( word -- )
+    [ >r <relative> r> set-delegate ] keep
+    [ just-compiled swap set-relative-to ] keep ;
+
+: relative-24 ( word -- ) <relative-24> deferred-xts cons@ ;
+
+: check-24 ( addr -- )
+    #! Check that the address can fit in a 24-bit wide address
+    #! field, used by PowerPC instructions.
+    dup BIN: 11111111111111111111111100 bitand = [
+        "Cannot jump further than 64 megabytes" throw
+    ] unless ;
+
+M: relative-24 fixup
+    relative-fixup over check-24 [ compiled-cell bitor ] keep
+    set-compiled-cell ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -87,21 +133,11 @@ SYMBOL: compile-words
         ] ifte
     ] ifte ;
 
-: fixup-deferred-xt ( word where relative -- )
-    rot dup compiling? [
-        compiled-xt swap - swap set-compiled-cell
-    ] [
-        "Not compiled: " swap word-name cat2 throw
-    ] ifte ;
-
-: fixup-deferred-xts ( -- )
-    deferred-xts get [
-        uncons uncons car fixup-deferred-xt
-    ] each
-    deferred-xts off ;
+: fixup-xts ( -- )
+    deferred-xts get [ fixup ] each  deferred-xts off ;
 
 : with-compiler ( quot -- )
-    [ call  fixup-deferred-xts  commit-xts ] with-scope ;
+    [ call  fixup-xts  commit-xts ] with-scope ;
 
 : postpone-word ( word -- )
     dup compiling? [ drop ] [ compile-words unique@ ] ifte ;
