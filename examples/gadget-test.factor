@@ -76,8 +76,8 @@ USE: words
 !    "Another field."  <field> "pile" get add-gadget
     scroller "pile" get add-gadget
 
-    "pile" get bevel-border dup "dialog" set dup  
- moving-actions
+    "pile" get bevel-border dup "dialog" set ! dup  
+! moving-actions
   world get add-gadget ;
 
 : gadget-demo ( -- )

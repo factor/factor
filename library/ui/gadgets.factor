@@ -91,7 +91,7 @@ C: gadget ( shape -- gadget )
     #! The position of the gadget on the screen.
     0 swap [ shape-pos + t ] each-parent drop ;
 
-: relative-pos ( g1 g2 -- g2-p1 )
+: relative ( g1 g2 -- g2-p1 )
     shape-pos swap screen-pos - ;
 
 : child? ( parent child -- ? )

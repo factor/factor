@@ -76,7 +76,15 @@ C: hand ( world -- hand )
     dup dup hand-world pick-up swap set-hand-gadget ;
 
 : fire-motion ( hand -- )
-    [ motion ] swap hand-gadget handle-gesture drop ;
+    #! Fire a motion gesture to the gadget underneath the hand,
+    #! and if a mouse button is down, fire a drag gesture to the
+    #! gadget that was clicked.
+    [ motion ] over hand-gadget handle-gesture drop
+    dup hand-buttons [
+        [ drag ] swap hand-clicked handle-gesture drop
+    ] [
+        drop
+    ] ifte ;
 
 : move-hand ( x y hand -- )
     dup shape-pos >r

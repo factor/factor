@@ -65,7 +65,7 @@ M: editor layout* ( field -- )
     dup editor-caret swap caret-pos rot move-gadget ;
 
 M: editor draw-shape ( label -- )
-    dup [ editor-text draw-shape ] with-translation ;
+    dup [ editor-text draw-shape ] with-trans ;
 
 TUPLE: field active? editor delegate ;
 
@@ -78,7 +78,7 @@ TUPLE: field active? editor delegate ;
 
 : click-editor ( editor -- )
     my-hand
-    2dup relative-pos shape-x pick set-caret-x
+    2dup relative shape-x pick set-caret-x
     request-focus ;
 
 : field-border ( gadget -- border )

@@ -22,4 +22,4 @@ M: label layout* ( label -- )
 
 M: label draw-shape ( label -- )
     dup label-x over label-y rect> over shape-pos +
-    [ label-text draw-shape ] with-translation ;
+    [ label-text draw-shape ] with-trans ;

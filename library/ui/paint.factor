@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces
-sdl sdl-gfx sdl-ttf strings ;
+USING: generic hashtables kernel lists math namespaces sdl
+sdl-gfx sdl-ttf sdl-video strings ;
 
 ! The painting protocol. Painting is controlled by various
 ! dynamically-scoped variables.
@@ -113,17 +113,24 @@ C: plain-ellipse ( x y w h -- ellipse )
 
 M: plain-ellipse draw-shape ( ellipse -- )
     >r surface get r> ellipse>screen background get rgb
-     filledEllipseColor ;
+    filledEllipseColor ;
+
+: set-clip ( -- )
+    surface get x get y get width get height get make-rect
+    SDL_SetClipRect drop ;
 
 : draw-gadget ( gadget -- )
     #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
     dup gadget-paint [
-        dup draw-shape
         dup [
-            gadget-children [ draw-gadget ] each
-        ] with-translation
+            set-clip
+            dup draw-shape
+            dup [
+                gadget-children [ draw-gadget ] each
+            ] with-trans
+        ] with-clip
     ] bind ;
 
 ! Strings are shapes too. This is somewhat of a hack and strings

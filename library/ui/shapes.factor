@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces ;
+USING: generic kernel lists math namespaces sdl ;
 
 ! Shape protocol. Shapes are immutable; moving or resizing a
 ! shape makes a new shape.
@@ -23,7 +23,18 @@ GENERIC: shape-h
 GENERIC: move-shape ( x y shape -- )
 GENERIC: resize-shape ( w h shape -- )
 
-: with-translation ( shape quot -- )
+: clip-w ( gadget -- )
+    width [ nip ( over shape-x - swap shape-w min 0 max ) ] change ;
+
+: clip-h ( gadget -- )
+    height [ nip ( over shape-y - swap shape-h min 0 max ) ] change ;
+
+: with-clip ( shape quot -- )
+    #!  All drawing done inside the quotation is clipped to the
+    #! shape's bounds.
+    [ >r dup clip-w clip-h r> call ] with-scope ; inline
+
+: with-trans ( shape quot -- )
     #! All drawing done inside the quotation is translated
     #! relative to the shape's origin.
     [

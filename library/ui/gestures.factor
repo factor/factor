@@ -31,6 +31,7 @@ M: gadget user-input* 2drop t ;
 
 ! Mouse gestures are lists where the first element is one of:
 SYMBOL: motion
+SYMBOL: drag
 SYMBOL: button-up
 SYMBOL: button-down
 

@@ -14,22 +14,30 @@ C: viewport ( content -- viewport )
 
 M: viewport layout* ( viewport -- )
     dup gadget-children [
-        >r dup viewport-scroll-x swap viewport-scroll-y r>
+        >r dup viewport-x swap viewport-y r>
         move-gadget
     ] each-with ;
 
 : viewport-h ( viewport -- h ) gadget-children max-height ;
 : viewport-w ( viewport -- w ) gadget-children max-width ;
 
+: adjust-scroll ( y viewport -- y )
+    #! Make sure we don't scroll above the first line, or beyond
+    #! the end of the document.
+    dup shape-h swap viewport-h - max 0 min ;
+
 : scroll-viewport ( y viewport -- )
     #! y is a number between 0 and 1.
     [ viewport-h * >fixnum ] keep
+    [ adjust-scroll ] keep
     [ set-viewport-y ] keep
     relayout ;
 
 ! A slider scrolls a viewport.
 
-TUPLE: slider viewport thumb scrolling? delegate ;
+! The offset slot is the y co-ordinate of the mouse relative to
+! the thumb when it was clicked.
+TUPLE: slider viewport thumb offset delegate ;
 
 : <thumb> ( -- thumb )
     f bevel-border
@@ -40,19 +48,23 @@ TUPLE: slider viewport thumb scrolling? delegate ;
 
 : slider-size 20 ;
 
+: hand-y ( gadget -- y )
+    #! Vertical offset of hand from gadget.
+    my-hand swap relative shape-y ;
+
+: slider-click ( slider -- )
+    [ slider-thumb hand-y ] keep set-slider-offset ;
+
+: slider-drag ( slider -- y )
+    [ hand-y ] keep slider-offset - ;
+
 : slider-motion ( slider -- )
-    dup slider-scrolling? [
-        dup screen-pos my-hand screen-pos - shape-y
-        over shape-h / over slider-viewport scroll-viewport
-        relayout
-    ] [
-        drop
-    ] ifte ;
+    dup slider-drag over shape-h / over slider-viewport
+    scroll-viewport relayout ;
 
 : slider-actions ( slider -- )
-    dup [ slider-motion ] [ motion ] set-action
-    dup [ t swap set-slider-scrolling? ] [ button-down 1 ] set-action
-    [ f swap set-slider-scrolling? ] [ button-up 1 ] set-action ;
+    dup [ slider-click ] [ button-down 1 ] set-action
+    [ slider-motion ] [ drag ] set-action ;
 
 C: slider ( viewport -- slider )
     [ set-slider-viewport ] keep
@@ -65,7 +77,7 @@ C: slider ( viewport -- slider )
     [ slider-actions ] keep ;
 
 : visible-portion ( viewport -- float )
-    #! Visible portion, > 0, <= 1.
+    #! Visible portion, between 0 and 1.
     dup shape-h swap viewport-h 1 max / 1 min ;
 
 : >thumb ( slider y -- y )
