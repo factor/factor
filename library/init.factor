@@ -30,6 +30,7 @@ USE: combinators
 USE: compiler
 USE: continuations
 USE: errors
+USE: files
 USE: interpreter
 USE: kernel
 USE: lists

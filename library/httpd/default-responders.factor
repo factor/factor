@@ -26,7 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd-responder
+USE: httpd
 USE: namespaces
+USE: stack
+USE: strings
 
 USE: test-responder
 USE: inspect-responder
@@ -34,10 +37,18 @@ USE: quit-responder
 USE: file-responder
 USE: wiki-responder
 
+: no-such-responder ( -- )
+    "404 No such responder" httpd-error ;
+
 : default-responders ( -- )
     #! Remove all existing responders, and create a blank
     #! responder table.
     <namespace> [
+        <responder> [
+            "404" "responder" set
+            [ drop no-such-responder ] "get" set
+        ] extend "404" set
+
         <responder> [
             "test" "responder" set
             [ test-responder ] "get" set
@@ -53,12 +64,12 @@ USE: wiki-responder
             "quit" "responder" set
             [ quit-responder ] "get" set
         ] extend "quit" set
- 
-         <responder> [
-             "file" "responder" set
-             [ file-responder ] "get" set
-         ] extend "file" set
- 
+
+        <responder> [
+            "file" "responder" set
+            [ file-responder ] "get" set
+        ] extend "file" set
+
 !        <responder> [
 !            "wiki" "responder" set
 !            [ wiki-get-responder ] "get" set

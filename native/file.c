@@ -24,3 +24,23 @@ void primitive_open_file(void)
 	dpush(read ? tag_object(port(PORT_READ,fd)) : F);
 	dpush(write ? tag_object(port(PORT_WRITE,fd)) : F);
 }
+
+void primitive_stat(void)
+{
+	struct stat sb;
+	STRING* path = untag_string(dpop());
+	if(stat(to_c_string(path),&sb) < 0)
+		dpush(F);
+	else
+	{
+		CELL mode = tag_integer(sb.st_mode);
+		CELL size = tag_object(s48_long_long_to_bignum(sb.st_size));
+		CELL mtime = tag_integer(sb.st_mtime);
+		dpush(tag_cons(cons(
+			mode,
+			tag_cons(cons(
+				size,
+				tag_cons(cons(
+					mtime,F)))))));
+	}
+}

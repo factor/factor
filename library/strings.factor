@@ -36,6 +36,9 @@ USE: stack
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
 
+: f>"" ( str/f -- str )
+    [ "" ] unless* ;
+
 : str-length< ( str str -- boolean )
     #! Compare string lengths.
     [ str-length ] 2apply < ;

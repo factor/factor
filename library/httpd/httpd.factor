@@ -61,11 +61,17 @@ USE: url-encoding
 : secure-path ( path -- path )
     ".." over str-contains? [ drop f ] when ;
 
+: get-request ( url -- )
+    [ "get" swap serve-responder ] with-request ;
+
+: post-request ( url -- )
+    [ "post" swap serve-responder ] with-request ;
+
 : handle-request ( arg cmd -- )
     [
-        [ "GET"  = ] [ drop "get"  serve-responder ]
-        [ "POST" = ] [ drop "post" serve-responder ]
-        [ drop t   ] [ 2drop bad-request           ]
+        [ "GET"  = ] [ drop get-request ]
+        [ "POST" = ] [ drop post-request ]
+        [ drop t   ] [ 2drop bad-request ]
     ] cond ;
 
 : parse-request ( request -- )

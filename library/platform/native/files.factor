@@ -25,62 +25,20 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: streams
+IN: files
 USE: combinators
-USE: continuations
 USE: io-internals
-USE: errors
 USE: kernel
+USE: lists
 USE: logic
+USE: math
 USE: stack
-USE: stdio
-USE: strings
-USE: namespaces
 
-: <fd-stream> ( in out -- stream )
-    #! Create a file descriptor stream object, wrapping a pair
-    #! of file descriptor handles for input and output.
-    <stream> [
-        "out" set
-        "in" set
+: exists? ( file -- ? )
+    stat >boolean ;
 
-        ( str -- )
-        [ "out" get blocking-write ] "fwrite" set
-        
-        ( -- str )
-        [ "in" get dup [ blocking-read-line ] when ] "freadln" set
-        
-        ( count -- str )
-        [
-            "in" get dup [ blocking-read# ] [ nip ] ifte
-        ] "fread#" set
-        
-        ( -- )
-        [ "out" get [ blocking-flush ] when* ] "fflush" set
-        
-        ( -- )
-        [
-            "out" get [ dup blocking-flush close-port ] when*
-            "in" get [ close-port ] when*
-        ] "fclose" set
-    ] extend ;
+: dir-mode
+    OCT: 40000 ;
 
-: <filecr> ( path -- stream )
-    t f open-file <fd-stream> ;
-
-: <filecw> ( path -- stream )
-    f t open-file <fd-stream> ;
-
-: <filebr> ( path -- stream )
-    <filecr> ;
-
-: <filebw> ( path -- stream )
-    <filecw> ;
-
-: init-stdio ( -- )
-    stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
-
-: fcopy ( from to -- )
-    #! Copy the contents of the fd-stream 'from' to the
-    #! fd-stream 'to'.
-    "out" swap get* >r "in" swap get* r> blocking-copy ;
+: directory? ( file -- ? )
+    stat dup [ car dir-mode bitand 0 = not ] when ;

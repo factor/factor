@@ -55,6 +55,18 @@ USE: url-encoding
     dup log-error
     <% dup "text/html" response % error-body % %> print ;
 
+: serving-html ( -- )
+    "200 Document follows" "text/html" response print ;
+
+: serving-text ( -- )
+    "200 Document follows" "text/plain" response print ;
+
+: redirect ( to -- )
+    "301 Moved Permanently" "text/plain" response write
+    "Location: " write write
+    terpri terpri
+    "The resource has moved." print ;
+
 : header-line ( alist line -- alist )
     ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
 
@@ -68,28 +80,34 @@ USE: url-encoding
 : content-length ( alist -- length )
     "Content-Length" swap assoc dec> ;
 
-: post-request>alist ( post-request -- alist )
-    "&" split [ "=" split1 cons ] map ;
-
-: url-decode-alist ( alist -- alist )
-    [ uncons >r url-decode r> url-decode cons ] map ;
+: query>alist ( query -- alist )
+    dup [
+        "&" split [
+            "=" split1
+            dup [ url-decode ] when swap
+            dup [ url-decode ] when swap cons
+        ] map
+    ] when ;
 
 : read-post-request ( header -- alist )
-    content-length dup [
-        read# post-request>alist url-decode-alist
-    ] when ;
+    content-length dup [ read# query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
         unswons <% % ": " % % %> log
     ] when* ;
 
-: with-request ( method quot -- )
-    [
-        read-header "header" set
-        "header" get log-user-agent
-        swap "post" = [
-            "header" get read-post-request "response" set
-        ] when
-        call
-    ] with-scope ;
+: prepare-url ( url -- url )
+    #! This is executed in the with-request namespace.
+    "?" split1
+    dup "raw-query" set query>alist "query" set
+    dup "request" set ;
+
+: prepare-header ( -- )
+    read-header dup "header" set
+    dup log-user-agent
+    read-post-request "response" set ;
+
+: with-request ( url quot -- )
+    #! The quotation is called with the URL on the stack.
+    [ swap prepare-url swap prepare-header call ] with-scope ;

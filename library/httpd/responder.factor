@@ -28,6 +28,7 @@
 IN: httpd-responder
 
 USE: combinators
+USE: httpd
 USE: kernel
 USE: lists
 USE: logging
@@ -37,7 +38,17 @@ USE: stack
 USE: streams
 USE: strings
 
-USE: httpd
+! Responders are called in a new namespace with these
+! variables:
+
+! - request -- the entire URL requested, including responder
+!              name
+! - raw-query -- raw query string
+! - query -- an alist of query parameters, eg
+!            foo.bar?a=b&c=d becomes
+!            [ [ "a" | "b" ] [ "c" | "d" ] ]
+! - header -- an alist of headers from the user's client
+! - response -- an alist of the POST request response
 
 : <responder> ( -- responder )
     <namespace> [
@@ -45,56 +56,34 @@ USE: httpd
         [
             drop "GET method not implemented" httpd-error
         ] "get" set
-
         ( url -- )
         [
             drop "POST method not implemented" httpd-error
         ] "post" set
     ] extend ;
 
-: serving-html ( -- )
-    "200 Document follows" "text/html" response print ;
-
-: serving-text ( -- )
-    "200 Document follows" "text/plain" response print ;
-
-: redirect ( to -- )
-    "301 Moved Permanently" "text/plain" response write
-    "Location: " write write
-    terpri terpri
-    "The resource has moved." print ;
-
 : get-responder ( name -- responder )
-    "httpd-responders" get get* ;
+    "httpd-responders" get get* [
+        "404" "httpd-responders" get get*
+    ] unless* ;
 
 : responder-argument ( argument -- argument )
     dup f-or-"" [ drop "default-argument" get ] when ;
 
 : call-responder ( method argument responder -- )
-    pick [
-        [ responder-argument swap get call ] bind
-    ] with-request ;
-
-: no-such-responder ( name -- )
-    "404 no such responder: " swap cat2 httpd-error ;
+    [ responder-argument swap get call ] bind ;
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
     dup "/" str-head? dup [ nip ] [ drop ] ifte ;
 
-: log-responder ( argument -- )
+: log-responder ( url -- )
     "Calling responder " swap cat2 log ;
 
-: serve-responder ( argument method -- )
-    swap
-    dup log-responder
-    trim-/ "/" split1 dup [
-        over get-responder dup [
-            rot drop call-responder
-        ] [
-            2drop no-such-responder drop
-        ] ifte
+: serve-responder ( method url -- )
+    dup log-responder trim-/ "/" split1 dup [
+        swap get-responder call-responder
     ] [
-        ! Argument is just a responder name without /
+        ! Just a responder name by itself
         drop "/" swap "/" cat3 redirect drop
     ] ifte ;

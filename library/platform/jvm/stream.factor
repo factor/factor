@@ -32,7 +32,6 @@ USE: kernel
 USE: lists
 USE: logic
 USE: namespaces
-USE: regexp
 USE: stack
 USE: strings
 
@@ -185,33 +184,8 @@ USE: strings
     f swap
     <byte-stream> ;
 
-: <file> ( path -- file )
-    dup "java.io.File" is not [
-        [ "java.lang.String" ] "java.io.File" jnew
-    ] when ;
-
-: fdelete ( file -- ? )
-    #! Delete a file.
-    <file> [ ] "java.io.File" "delete" jinvoke ;
-
 : <freader> ( file -- freader )
     [ "java.lang.String" ] "java.io.FileReader" jnew <breader> ;
-
-: exists? ( file -- boolean )
-    <file> [ ] "java.io.File" "exists" jinvoke ;
-
-: directory? ( file -- boolean )
-    <file> [ ] "java.io.File" "isDirectory" jinvoke ;
-
-: directory ( file -- listing )
-    <file> [ ] "java.io.File" "list" jinvoke array>list str-sort ;
-
-: frename ( from to -- ? )
-    ! Rename file 'from' to 'to'. These can be paths or
-    ! java.io.File instances.
-    <file> swap <file>
-    [ "java.io.File" ] "java.io.File" "renameTo"
-    jinvoke ;
 
 : <sreader> ( string -- reader )
     [ "java.lang.String" ] "java.io.StringReader" jnew ;

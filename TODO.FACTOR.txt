@@ -3,8 +3,6 @@
 - 'default responder' for when we go to root
 - file responder:
   - directory listings
-  - index.html
-  - if a directory is requested and URL does not end with /, redirect
 - minimize stage2 initialization code, just move it to source files
 
 + bignums:
@@ -85,6 +83,7 @@
 
 + misc:
 
+- don't rehash strings on every startup
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
 - rethink strhead/strtail&co

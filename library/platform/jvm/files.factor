@@ -25,68 +25,35 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: file-responder
+IN: files
 USE: combinators
-USE: errors
-USE: files
-USE: httpd
-USE: httpd-responder
 USE: kernel
-USE: logging
-USE: namespaces
-USE: parser
+USE: lists
+USE: logic
 USE: stack
-USE: stdio
-USE: streams
 USE: strings
 
-: serving-path ( filename -- filename )
-    f>"" "doc-root" get swap cat2 ;
+: <file> ( path -- file )
+    dup "java.io.File" is not [
+        [ "java.lang.String" ] "java.io.File" jnew
+    ] when ;
 
-: file-header ( mime-type -- header )
-    "200 Document follows" swap response ;
+: delete ( file -- ? )
+    #! Delete a file.
+    <file> [ ] "java.io.File" "delete" jinvoke ;
 
-: copy-and-close ( from -- )
-    [ dupd "stdio" get fcopy ] [ >r fclose r> rethrow ] catch ;
+: exists? ( file -- boolean )
+    <file> [ ] "java.io.File" "exists" jinvoke ;
 
-: serve-static ( filename mime-type -- )
-    file-header print <filebr> "stdio" get fcopy ;
+: directory? ( file -- boolean )
+    <file> [ ] "java.io.File" "isDirectory" jinvoke ;
 
-: serve-file ( filename -- )
-    dup mime-type dup "application/x-factor-server-page" = [
-        drop run-file
-    ] [
-        serve-static
-    ] ifte ;
+: directory ( file -- listing )
+    <file> [ ] "java.io.File" "list" jinvoke array>list str-sort ;
 
-: directory-no/ ( -- )
-    <% "request" get % CHAR: / %
-    "raw-query" get [ CHAR: ? % % ] when*
-    %> redirect ;
-
-: serve-directory ( filename -- )
-    dup "/" str-tail? dup [
-        drop dup "index.html" cat2 dup exists? [
-            serve-file
-        ] [
-            drop
-            "Foo bar" log
-            drop
-        ] ifte
-    ] [
-        2drop directory-no/
-    ] ifte ;
-
-: serve-object ( filename -- )
-    dup directory? [ serve-directory ] [ serve-file ] ifte ;
-
-: file-responder ( filename -- )
-    "doc-root" get [
-        serving-path dup exists? [
-            serve-object
-        ] [
-            drop "404 not found" httpd-error
-        ] ifte
-    ] [
-        drop "404 doc-root not set" httpd-error
-    ] ifte ;
+: rename ( from to -- ? )
+    ! Rename file 'from' to 'to'. These can be paths or
+    ! java.io.File instances.
+    <file> swap <file>
+    [ "java.io.File" ] "java.io.File" "renameTo"
+    jinvoke ;

@@ -67,13 +67,14 @@ USE: parser
 "/library/platform/jvm/regexp.factor"       run-resource ! regexp
 "/library/stream.factor"                    run-resource ! streams
 "/library/platform/jvm/stream.factor"       run-resource ! streams
+"/library/platform/jvm/files.factor"        run-resource ! files
+"/library/files.factor"                     run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
 "/library/styles.factor"                    run-resource ! styles
 "/library/platform/jvm/threads.factor"      run-resource ! threads
 "/library/logging.factor"                   run-resource ! logging
-"/library/files.factor"                     run-resource ! files
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math

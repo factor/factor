@@ -60,6 +60,7 @@ DEFER: sbuf-clone
 IN: io-internals
 DEFER: port?
 DEFER: open-file
+DEFER: stat
 DEFER: client-socket
 DEFER: server-socket
 DEFER: close-port
@@ -218,6 +219,7 @@ IN: cross-compiler
         getenv
         setenv
         open-file
+        stat
         garbage-collection
         save-image
         datastack

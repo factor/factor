@@ -21,6 +21,9 @@ void relocate_object()
 	case VECTOR_TYPE:
 		fixup_vector((VECTOR*)relocating);
 		break;
+	case STRING_TYPE:
+		hash_string((STRING*)relocating);
+		break;
 	case SBUF_TYPE:
 		fixup_sbuf((SBUF*)relocating);
 		break;

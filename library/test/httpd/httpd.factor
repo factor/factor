@@ -14,7 +14,6 @@ USE: url-encoding
 [ 5430 ]
 [ f "Content-Length: 5430" header-line content-length ] unit-test
 
-
 [ "hello world"   ] [ "hello+world"    url-decode ] unit-test
 [ "hello world"   ] [ "hello%20world"  url-decode ] unit-test
 [ " ! "           ] [ "%20%21%20"      url-decode ] unit-test
@@ -23,8 +22,6 @@ USE: url-encoding
 [ "hello%20world" ] [ "hello world"    url-encode ] unit-test
 [ "%20%21%20"     ] [ " ! "            url-encode ] unit-test
 
-! These make sure the words work, and don't leave
-! extra crap on the stakc
 [ ] [ "404 not found" ] [ httpd-error ] test-word
 
 [ "arg" ] [
@@ -60,13 +57,18 @@ USE: url-encoding
 [ f ]
 [ "foobar/../baz" secure-path ] unit-test
 
-[ ] [ "GET /index.html" parse-request ] unit-test
 [ ] [ "GET ../index.html" parse-request ] unit-test
 [ ] [ "POO" parse-request ] unit-test
 
-[ [ [ "Foo" | "Bar" ] ] ] [ "Foo=Bar" post-request>alist ] unit-test
+[ [ [ "Foo" | "Bar" ] ] ] [ "Foo=Bar" query>alist ] unit-test
+
 [ [ [ "Foo" | "Bar" ] [ "Baz" | "Quux" ] ] ]
-[ "Foo=Bar&Baz=Quux" post-request>alist ] unit-test
+[ "Foo=Bar&Baz=Quux" query>alist ] unit-test
+
+[ [ [ "Baz" | " " ] ] ]
+[ "Baz=%20" query>alist ] unit-test
+
+[ [ [ "Foo" ] ] ] [ "Foo" query>alist ] unit-test
 
 [ f "/foo/hello.html" ] [
     [
