@@ -1,29 +1,5 @@
-! :folding=none:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+! See http://factor.sf.net/license.txt for BSD license.
 
 ! This library allows one to generate a new set of bootstrap
 ! images (boot.image.{le32,le64,be32,be64}.
@@ -39,24 +15,8 @@
 ! run platform/native/boot-stage2.factor.
 
 IN: image
-USE: errors
-USE: generic
-USE: kernel-internals
-USE: hashtables
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: random
-USE: stdio
-USE: streams
-USE: strings
-USE: test
-USE: vectors
-USE: unparser
-USE: words
-USE: parser
+USING: errors generic hashtables kernel lists math namespaces
+parser prettyprint stdio streams strings vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -285,14 +245,6 @@ M: string ' ( string -- pointer )
 M: vector ' ( vector -- pointer )
     emit-vector ;
 
-! : rehash ( hashtable -- )
-!     ! Now make a rehashing boot quotation
-!     dup hash>alist [
-!         over hash-clear
-!         [ unswons rot set-hash ] each-with
-!     ] cons cons
-!     boot-quot [ append ] change ;
-
 : emit-hashtable ( hash -- pointer )
     dup buckets>list emit-array swap hash>alist length
     object-tag here-as >r
@@ -324,7 +276,9 @@ M: hashtable ' ( hashtable -- pointer )
     vocabularies get
     dup vocabularies,
     <namespace> [
-        classes [ ] change  vocabularies set
+        vocabularies set
+        classes [ ] change
+        builtins [ ] change
     ] extend '
     global-offset fixup ;
 
@@ -361,9 +315,6 @@ M: hashtable ' ( hashtable -- pointer )
     [
         300000 <vector> image set
         <namespace> "objects" set
-        ! Note that this is a vector that we can side-effect,
-        ! since ; ends up using this variable from nested
-        ! parser namespaces.
         call
         image get
     ] with-scope ;

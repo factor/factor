@@ -303,3 +303,9 @@ void collect_io_tasks(void)
 		COPY_OBJECT(write_io_tasks[i].callbacks);
 	}
 }
+
+/* FFI calls this */
+char* factor_str_error(void)
+{
+	return strerror(errno);
+}

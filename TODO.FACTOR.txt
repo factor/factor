@@ -1,4 +1,3 @@
-- word preview for parsing words
 - set 'end' of artifacts/assets accurately
 - faster layout
 - faster repaint
@@ -11,19 +10,23 @@
 - make-image: use a list not a vector
 - powerpc has weird callstack residue
 - make-vector and make-string should not need a reverse step
-- faster completion
 - console with presentations
 - ui browser
 - method doc strings
 
 + ui:
 
+- word preview for parsing words
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - fix up the min thumb size hack
 - frame gap
 
 + compiler/ffi:
+
+- ffi global variables, and get rid of factor_str_error hack
+- box/unbox_signed/unsigned_8
+- unsigned versions of all alien accessors and setters
 
 - [ [ dup call ] dup call ] infer hangs
 - ffi unicode strings: null char security hole
@@ -48,6 +51,7 @@
 
 + kernel:
 
+- clean up metaclasses
 - unify unparse and prettyprint
 - condition system with restarts
 - nicer way to combine two paths

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USING: compiler inference math ;
 
 USE: test

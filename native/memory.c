@@ -97,10 +97,10 @@ bool in_zone(ZONE* z, CELL pointer)
 
 void primitive_room(void)
 {
-	box_integer(compiling.limit - compiling.here);
-	box_integer(compiling.limit - compiling.base);
-	box_integer(active.limit - active.here);
-	box_integer(active.limit - active.base);
+	box_signed_cell(compiling.limit - compiling.here);
+	box_signed_cell(compiling.limit - compiling.base);
+	box_signed_cell(active.limit - active.here);
+	box_signed_cell(active.limit - active.base);
 }
 
 void primitive_allot_profiling(void)

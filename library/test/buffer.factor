@@ -1,4 +1,4 @@
-IN: scratchpad USING: test kernel kernel-internals ;
+IN: temporary USING: test kernel kernel-internals ;
 
 : with-buffer ( size quot -- )
     >r <buffer> r> keep buffer-free ;

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: file-responder
 USE: httpd
 USE: httpd-responder

@@ -1,23 +1,5 @@
 #include "factor.h"
 
-/* FFI calls this */
-void box_integer(F_FIXNUM integer)
-{
-	dpush(tag_integer(integer));
-}
-
-/* FFI calls this */
-void box_cell(CELL cell)
-{
-	dpush(tag_cell(cell));
-}
-
-/* FFI calls this */
-F_FIXNUM unbox_integer(void)
-{
-	return to_fixnum(dpop());
-}
-
 CELL to_cell(CELL x)
 {
 	F_FIXNUM fixnum;
@@ -48,12 +30,6 @@ CELL to_cell(CELL x)
 		type_error(BIGNUM_TYPE,x);
 		return 0;
 	}
-}
-
-/* FFI calls this */
-CELL unbox_cell(void)
-{
-	return to_cell(dpop());
 }
 
 F_ARRAY* to_bignum(CELL tagged)
@@ -237,4 +213,64 @@ void copy_bignum_constants(void)
 	COPY_OBJECT(bignum_zero);
 	COPY_OBJECT(bignum_pos_one);
 	COPY_OBJECT(bignum_neg_one);
+}
+
+void box_signed_cell(F_FIXNUM integer)
+{
+	dpush(tag_integer(integer));
+}
+
+F_FIXNUM unbox_signed_cell(void)
+{
+	return to_fixnum(dpop());
+}
+
+void box_unsigned_cell(CELL cell)
+{
+	dpush(tag_cell(cell));
+}
+
+F_FIXNUM unbox_unsigned_cell(void)
+{
+	return to_cell(dpop());
+}
+
+void box_signed_4(s32 n)
+{
+	dpush(tag_bignum(s48_long_to_bignum(n)));
+}
+
+s32 unbox_signed_4(void)
+{
+	return s48_bignum_to_long(to_bignum(dpop()));
+}
+
+void box_unsigned_4(u32 n)
+{
+	dpush(tag_bignum(s48_ulong_to_bignum(n)));
+}
+
+u32 unbox_unsigned_4(void)
+{
+	return s48_bignum_to_ulong(to_bignum(dpop()));
+}
+
+void box_signed_8(s64 n)
+{
+	dpush(tag_bignum(s48_long_long_to_bignum(n)));
+}
+
+s64 unbox_signed_8(void)
+{
+	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
+}
+
+void box_unsigned_8(u64 n)
+{
+	dpush(tag_bignum(s48_long_long_to_bignum(n)));
+}
+
+u64 unbox_unsigned_8(void)
+{
+	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
 }

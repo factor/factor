@@ -18,6 +18,7 @@ classes
 
 <namespace> vocabularies set
 <namespace> classes set
+num-types <vector> builtins set
 <namespace> crossref set
 
 vocabularies get [
@@ -170,14 +171,27 @@ vocabularies get [
     [ "dlclose" "alien"                       [ [ dll ] [ ] ] ]
     [ "<alien>" "alien"                       [ [ integer ] [ alien ] ] ]
     [ "<local-alien>" "alien"                 [ [ integer ] [ alien ] ] ]
-    [ "alien-cell" "alien"                    [ [ alien integer ] [ integer ] ] ]
-    [ "set-alien-cell" "alien"                [ [ integer alien integer ] [ ] ] ]
-    [ "alien-4" "alien"                       [ [ alien integer ] [ integer ] ] ]
-    [ "set-alien-4" "alien"                   [ [ integer alien integer ] [ ] ] ]
-    [ "alien-2" "alien"                       [ [ alien integer ] [ fixnum ] ] ]
-    [ "set-alien-2" "alien"                   [ [ integer alien integer ] [ ] ] ]
-    [ "alien-1" "alien"                       [ [ alien integer ] [ fixnum ] ] ]
-    [ "set-alien-1" "alien"                   [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-cell" "alien"             [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-cell" "alien"         [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-cell" "alien"           [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-cell" "alien"       [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-8" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-8" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-8" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-8" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-4" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-4" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-4" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-4" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-2" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-2" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-2" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-2" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-signed-1" "alien"                [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-signed-1" "alien"            [ [ integer alien integer ] [ ] ] ]
+    [ "alien-unsigned-1" "alien"              [ [ alien integer ] [ integer ] ] ]
+    [ "set-alien-unsigned-1" "alien"          [ [ integer alien integer ] [ ] ] ]
+    [ "alien-value-string" "alien"            [ [ alien integer ] [ string ] ] ]
     [ "throw" "errors"                        [ [ object ] [ ] ] ]
     [ "string>memory" "kernel-internals"      [ [ string integer ] [ ] ] ]
     [ "memory>string" "kernel-internals"      [ [ integer integer ] [ string ] ] ]

@@ -7,6 +7,9 @@ words vectors ;
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
 
+! Global vector mapping type numbers to builtin class objects.
+SYMBOL: builtins
+
 builtin [
     "builtin-type" word-prop unit
 ] "builtin-supertypes" set-word-prop
@@ -38,13 +41,13 @@ builtin [ 2drop t ] "class<" set-word-prop
     ] ifte ;
 
 : builtin-class ( symbol type# slotspec -- )
+    >r 2dup builtins get set-vector-nth r>
     >r swap
     dup intern-symbol
     2dup builtin-predicate
     [ swap "builtin-type" set-word-prop ] keep
     dup builtin define-class r> define-slots ;
 
-: builtin-type ( n -- symbol )
-    unit classes get hash ;
+: builtin-type ( n -- symbol ) builtins get vector-nth ;
 
 PREDICATE: word builtin metaclass builtin = ;

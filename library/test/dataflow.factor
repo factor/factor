@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: inference
 USE: lists
 USE: math

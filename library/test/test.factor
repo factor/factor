@@ -43,7 +43,7 @@ prettyprint stdio strings words vectors unparser ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
-    vocabularies get [ "scratchpad" off ] bind
+    vocabularies get [ "temporary" off ] bind
     [
         "lists/cons"
         "lists/lists"
@@ -94,6 +94,7 @@ prettyprint stdio strings words vectors unparser ;
         "gadgets"
         "memory"
         "redefine"
+        "annotate"
     ] [
         test
     ] each

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: files
 USE: httpd
 USE: lists

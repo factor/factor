@@ -60,7 +60,7 @@ void box_alien(void* ptr)
 
 INLINE void* alien_pointer(void)
 {
-	F_FIXNUM offset = unbox_integer();
+	F_FIXNUM offset = unbox_signed_cell();
 	ALIEN* alien = untag_alien(dpop());
 	void* ptr = alien->ptr;
 
@@ -72,14 +72,14 @@ INLINE void* alien_pointer(void)
 
 void primitive_alien(void)
 {
-	void* ptr = (void*)unbox_integer();
+	void* ptr = (void*)unbox_signed_cell();
 	maybe_garbage_collection();
 	box_alien(ptr);
 }
 
 void primitive_local_alien(void)
 {
-	F_FIXNUM length = unbox_integer();
+	F_FIXNUM length = unbox_signed_cell();
 	ALIEN* alien;
 	F_STRING* local;
 	if(length < 0)
@@ -99,57 +99,7 @@ void primitive_local_alienp(void)
 
 void primitive_alien_address(void)
 {
-	box_cell((CELL)untag_alien(dpop())->ptr);
-}
-
-void primitive_alien_cell(void)
-{
-	box_integer(*(int*)alien_pointer());
-}
-
-void primitive_set_alien_cell(void)
-{
-	CELL* ptr = alien_pointer();
-	CELL value = unbox_integer();
-	*ptr = value;
-}
-
-void primitive_alien_4(void)
-{
-	int* ptr = alien_pointer();
-	box_integer(*ptr);
-}
-
-void primitive_set_alien_4(void)
-{
-	int* ptr = alien_pointer();
-	int value = unbox_integer();
-	*ptr = value;
-}
-
-void primitive_alien_2(void)
-{
-	u16* ptr = alien_pointer();
-	box_signed_2(*ptr);
-}
-
-void primitive_set_alien_2(void)
-{
-	u16* ptr = alien_pointer();
-	CELL value = unbox_signed_2();
-	*ptr = value;
-}
-
-void primitive_alien_1(void)
-{
-	box_signed_1(*(BYTE*)alien_pointer());
-}
-
-void primitive_set_alien_1(void)
-{
-	BYTE* ptr = alien_pointer();
-	BYTE value = value = unbox_signed_1();
-	*ptr = value;
+	box_unsigned_cell((CELL)untag_alien(dpop())->ptr);
 }
 
 void fixup_dll(DLL* dll)
@@ -176,4 +126,32 @@ void collect_alien(ALIEN* alien)
 		ptr = copy_untagged_object(ptr,SSIZE(ptr));
 		alien->ptr = (void*)(ptr + 1);
 	}
+}
+
+#define DEF_ALIEN_SLOT(name,type,boxer) \
+void primitive_alien_##name (void) \
+{ \
+	box_##boxer (*(type*)alien_pointer()); \
+} \
+void primitive_set_alien_##name (void) \
+{ \
+	type* ptr = alien_pointer(); \
+	type value = unbox_##boxer (); \
+	*ptr = value; \
+}
+
+DEF_ALIEN_SLOT(signed_cell,int,signed_cell)
+DEF_ALIEN_SLOT(unsigned_cell,CELL,unsigned_cell)
+DEF_ALIEN_SLOT(signed_8,s64,signed_8)
+DEF_ALIEN_SLOT(unsigned_8,u64,unsigned_8)
+DEF_ALIEN_SLOT(signed_4,s32,signed_4)
+DEF_ALIEN_SLOT(unsigned_4,u32,unsigned_4)
+DEF_ALIEN_SLOT(signed_2,s16,signed_2)
+DEF_ALIEN_SLOT(unsigned_2,u16,unsigned_2)
+DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
+DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
+
+void primitive_alien_value_string(void)
+{
+	box_c_string(alien_pointer());
 }

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: alien
 USE: kernel
 USE: test

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USING: parser prettyprint stdio ;
 
 USE: hashtables
@@ -122,12 +122,12 @@ TUPLE: another-one ;
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: scratchpad\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] with-string ] unit-test
 
 [ t ] [
     DEFER: not-fixnum
-    "IN: scratchpad\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
+    "IN: temporary\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
     dup eval
     [ \ not-fixnum see ] with-string =
 ] unit-test

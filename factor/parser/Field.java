@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,63 +27,32 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.jedit;
+package factor.parser;
 
 import factor.*;
-import java.awt.Component;
-import javax.swing.*;
-import org.gjt.sp.jedit.*;
+import java.io.IOException;
 
-public class FactorWordRenderer extends DefaultListCellRenderer
+public class Field extends FactorParsingDefinition
 {
-	//{{{ getWordHTMLString() method
-	public static String getWordHTMLString(FactorWord word, boolean showIn)
+	public Field(FactorWord word)
 	{
-		String str = jEdit.getProperty("factor.completion.def",
-			new String[] { word.getDefiner().name,word.name });
+		super(word);
+	}
 
-		if(showIn)
+	public void eval(FactorReader reader)
+		throws IOException, FactorParseException
+	{
+		Object type = reader.nextNonEOL(false,false);
+		if(!(type instanceof String))
 		{
-			str = jEdit.getProperty("factor.completion.in",
-				new Object[] { word.vocabulary }) + str;
+			reader.getScanner().error("Missing field type");
+			return;
 		}
-
-		if(word.stackEffect != null)
+		Object name = reader.nextNonEOL(false,false);
+		if(!(name instanceof String))
 		{
-			str = jEdit.getProperty("factor.completion.stack",
-				new String[] { str, word.stackEffect });
+			reader.getScanner().error("Missing field name");
+			return;
 		}
-
-		return str;
-	} //}}}
-
-	private FactorSideKickParser parser;
-	private boolean showIn;
-
-	//{{{ FactorWordRenderer constructor
-	public FactorWordRenderer(FactorSideKickParser parser, boolean showIn)
-	{
-		this.parser = parser;
-		this.showIn = showIn;
-	} //}}}
-
-	//{{{ getListCellRendererComponent() method
-	public Component getListCellRendererComponent(
-		JList list,
-		Object value,
-		int index,
-		boolean isSelected,
-		boolean cellHasFocus)
-	{
-		super.getListCellRendererComponent(list,value,index,
-			isSelected,cellHasFocus);
-
-		if(!(value instanceof FactorWord))
-			return this;
-
-		FactorWord word = (FactorWord)value;
-		setText(getWordHTMLString(word,showIn));
-
-		return this;
-	} //}}}
+	}
 }

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: command-line
 USE: namespaces
 USE: test

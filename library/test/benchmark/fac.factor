@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: math
 USE: test
 USE: compiler

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: parser
 USE: test
 USE: unparser
@@ -37,7 +37,7 @@ unit-test
 
 [ "hello world" ]
 [
-    "IN: scratchpad : hello \"hello world\" ;"
+    "IN: temporary : hello \"hello world\" ;"
     parse call "USE: scratchpad hello" eval
 ] unit-test
 

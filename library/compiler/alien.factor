@@ -26,6 +26,9 @@ unparser words ;
 
 : null? ( alien -- ? ) dup [ alien-address 0 = ] when ;
 
+: null>f ( alien -- alien/f )
+    dup alien-address 0 = [ drop f ] when ;
+
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
 

@@ -107,14 +107,14 @@ M: compound apply-word ( word -- )
     "Dynamic dispatch for " swap word-name cat2
     inference-warning ;
 
-M: generic apply-word ( word -- )
-    #! If the type of the value at the top of the stack is
-    #! known, inline the method body.
-    [ object ] ensure-d
+! M: generic apply-word ( word -- )
+!     #! If the type of the value at the top of the stack is
+!     #! known, inline the method body.
+!     [ object ] ensure-d
 !    literal-type? branches-can-fail? not and [
 !        inline-compound 2drop
 !    ] [
-        dup dynamic-dispatch-warning apply-default ;
+!        dup dynamic-dispatch-warning apply-default ;
 !    ] ifte ;
 
 : with-recursion ( quot -- )
@@ -171,7 +171,8 @@ M: word apply-object ( word -- )
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ = [ [ object object ] [ object ] ] "infer-effect" set-word-prop
+\ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
 
 \ no-method t "terminator" set-word-prop
 \ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop

@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 
 ! Various things that broke CFactor at various times.
 USING: errors kernel lists math memory namespaces parser

@@ -34,21 +34,18 @@ namespaces parser strings words ;
         0 "width" set
     ] extend ;
 
-: c-types ( -- ns )
-    global [ "c-types" get ] bind ;
+SYMBOL: c-types
 
 : c-type ( name -- type )
-    global [
-        dup "c-types" get hash [ ] [
-            "No such C type: " swap cat2 throw f
-        ] ?ifte
-    ] bind ;
+    dup c-types get hash [ ] [
+        "No such C type: " swap cat2 throw f
+    ] ?ifte ;
 
 : size ( name -- size )
     c-type [ "width" get ] bind ;
 
 : define-c-type ( quot name -- )
-    c-types [ >r <c-type> swap extend r> set ] bind ; inline
+    c-types get [ >r <c-type> swap extend r> set ] bind ; inline
 
 : define-getter ( offset type name -- )
     #! Define a word with stack effect ( alien -- obj ) in the
@@ -63,7 +60,7 @@ namespaces parser strings words ;
     [ "setter" get ] bind cons r> swap define-compound ;
 
 : define-field ( offset type name -- offset )
-    >r c-type dup >r [ "width" get ] bind align r> r>
+    >r c-type dup >r [ "align" get ] bind align r> r>
     "struct-name" get swap "-" swap cat3
     ( offset type name -- )
     3dup define-getter 3dup define-setter
@@ -85,7 +82,8 @@ namespaces parser strings words ;
     #! Define inline and pointer type for the struct. Pointer
     #! type is exactly like void*.
     [ "width" set ] "struct-name" get define-c-type
-    "void*" c-type "struct-name" get "*" cat2 c-types set-hash ;
+    "void*" c-type "struct-name" get "*" cat2
+    c-types get set-hash ;
 
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
@@ -109,93 +107,126 @@ namespaces parser strings words ;
     #! C null value.
     0 <alien> ;
 
-global [ <namespace> "c-types" set ] bind
+global [ <namespace> c-types set ] bind
 
 [
-    [ alien-cell <alien> ] "getter" set
-    [ set-alien-cell ] "setter" set
+    [ alien-unsigned-cell <alien> ] "getter" set
+    [ alien-address set-alien-unsigned-cell ] "setter" set
     cell "width" set
+    cell "align" set
     "box_alien" "boxer" set
     "unbox_alien" "unboxer" set
 ] "void*" define-c-type
 
-! FIXME
 [
-    [ alien-4 ] "getter" set
-    [ set-alien-4 ] "setter" set
-    4 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
-] "long" define-c-type
+    [ alien-signed-8 ] "getter" set
+    [ set-alien-signed-8 ] "setter" set
+    8 "width" set
+    8 "align" set
+    "box_signed_8" "boxer" set
+    "unbox_signed_8" "unboxer" set
+] "longlong" define-c-type
 
 [
-    [ alien-4 ] "getter" set
-    [ set-alien-4 ] "setter" set
+    [ alien-unsigned-8 ] "getter" set
+    [ set-alien-unsigned-8 ] "setter" set
+    8 "width" set
+    8 "align" set
+    "box_unsinged_8" "boxer" set
+    "unbox_unsigned_8" "unboxer" set
+] "ulonglong" define-c-type
+
+[
+    [ alien-signed-4 ] "getter" set
+    [ set-alien-signed-4 ] "setter" set
     4 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    4 "align" set
+    "box_signed_4" "boxer" set
+    "unbox_signed_4" "unboxer" set
 ] "int" define-c-type
 
 [
-    [ alien-4 ] "getter" set
-    [ set-alien-4 ] "setter" set
+    [ alien-unsigned-4 ] "getter" set
+    [ set-alien-unsigned-4 ] "setter" set
     4 "width" set
-    "box_cell" "boxer" set
-    "unbox_cell" "unboxer" set
+    4 "align" set
+    "box_unsigned_4" "boxer" set
+    "unbox_unsigned_4" "unboxer" set
 ] "uint" define-c-type
 
 [
-    [ alien-2 ] "getter" set
-    [ set-alien-2 ] "setter" set
+    [ alien-signed-2 ] "getter" set
+    [ set-alien-signed-2 ] "setter" set
     2 "width" set
+    2 "align" set
     "box_signed_2" "boxer" set
     "unbox_signed_2" "unboxer" set
 ] "short" define-c-type
 
 [
-    [ alien-2 ] "getter" set
-    [ set-alien-2 ] "setter" set
+    [ alien-unsigned-2 ] "getter" set
+    [ set-alien-unsigned-2 ] "setter" set
     2 "width" set
+    2 "align" set
     "box_unsigned_2" "boxer" set
     "unbox_unsigned_2" "unboxer" set
 ] "ushort" define-c-type
 
 [
-    [ alien-1 ] "getter" set
-    [ set-alien-1 ] "setter" set
+    [ alien-signed-1 ] "getter" set
+    [ set-alien-signed-1 ] "setter" set
     1 "width" set
+    1 "align" set
     "box_signed_1" "boxer" set
     "unbox_signed_1" "unboxer" set
 ] "char" define-c-type
 
 [
-    [ alien-1 ] "getter" set
-    [ set-alien-1 ] "setter" set
+    [ alien-unsigned-1 ] "getter" set
+    [ set-alien-unsigned-1 ] "setter" set
     1 "width" set
+    1 "align" set
     "box_unsigned_1" "boxer" set
     "unbox_unsigned_1" "unboxer" set
 ] "uchar" define-c-type
 
 [
-    [ alien-4 ] "getter" set
-    [ set-alien-4 ] "setter" set
+    [ alien-unsigned-4 ] "getter" set
+    [ set-alien-unsigned-4 ] "setter" set
     cell "width" set
+    cell "align" set
     "box_c_string" "boxer" set
     "unbox_c_string" "unboxer" set
 ] "char*" define-c-type
 
+! This is not the best way to do it.
 [
-    [ alien-4 ] "getter" set
-    [ set-alien-4 ] "setter" set
+    [ alien-value-string ] "getter" set
+    256 "width" set
+    cell "align" set
+] "uchar256" define-c-type
+
+[
+    [ alien-unsigned-4 ] "getter" set
+    [ set-alien-unsigned-4 ] "setter" set
     cell "width" set
+    cell "align" set
     "box_utf16_string" "boxer" set
     "unbox_utf16_string" "unboxer" set
 ] "ushort*" define-c-type
 
 [
-    [ alien-4 0 = not ] "getter" set
-    [ 1 0 ? set-alien-4 ] "setter" set
+    [ alien-unsigned-4 0 = not ] "getter" set
+    [ 1 0 ? set-alien-unsigned-4 ] "setter" set
     cell "width" set
+    cell "align" set
     "box_boolean" "boxer" set
     "unbox_boolean" "unboxer" set
 ] "bool" define-c-type
+
+: alias-c-type ( old new -- )
+    c-types get [ >r get r> set ] bind ;
+
+! FIXME for 64-bit platforms
+"int" "long" alias-c-type
+"uint" "ulong" alias-c-type

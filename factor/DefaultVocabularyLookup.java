@@ -136,6 +136,14 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		tuple.parsing = new Tuple(tuple);
 		FactorWord primitive = define("syntax","PRIMITIVE:");
 		primitive.parsing = new Primitive(primitive);
+		
+		/* Alien */
+		FactorWord beginStruct = define("alien","BEGIN-STRUCT:");
+		beginStruct.parsing = new BeginStruct(beginStruct);
+		FactorWord endStruct = define("alien","END-STRUCT");
+		endStruct.parsing = new EndStruct(beginStruct,endStruct);
+		FactorWord field = define("alien","FIELD:");
+		field.parsing = new Field(field);
 	} //}}}
 
 	//{{{ getVocabulary() method

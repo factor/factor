@@ -20,11 +20,7 @@ INLINE CELL tag_bignum(F_ARRAY* bignum)
 
 CELL to_cell(CELL x);
 
-DLLEXPORT void box_integer(F_FIXNUM integer);
-DLLEXPORT void box_cell(CELL cell);
-DLLEXPORT F_FIXNUM unbox_integer(void);
 CELL to_cell(CELL x);
-DLLEXPORT CELL unbox_cell(void);
 F_ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 void primitive_bignum_eq(void);
@@ -45,7 +41,6 @@ void primitive_bignum_greater(void);
 void primitive_bignum_greatereq(void);
 void primitive_bignum_not(void);
 void copy_bignum_constants(void);
-CELL three_test(void* x, unsigned char r, unsigned char g, unsigned char b);
 
 INLINE CELL tag_integer(F_FIXNUM x)
 {
@@ -62,3 +57,22 @@ INLINE CELL tag_cell(CELL x)
 	else
 		return tag_fixnum(x);
 }
+
+/* FFI calls this */
+void box_signed_cell(F_FIXNUM integer);
+DLLEXPORT F_FIXNUM unbox_signed_cell(void);
+
+DLLEXPORT void box_unsigned_cell(CELL cell);
+DLLEXPORT F_FIXNUM unbox_unsigned_cell(void);
+
+DLLEXPORT void box_signed_4(s32 n);
+DLLEXPORT s32 unbox_signed_4(void);
+
+DLLEXPORT void box_unsigned_4(u32 n);
+DLLEXPORT u32 unbox_unsigned_4(void);
+
+DLLEXPORT void box_signed_8(s64 n);
+DLLEXPORT s64 unbox_signed_8(void);
+
+DLLEXPORT void box_unsigned_8(u64 n);
+DLLEXPORT u64 unbox_unsigned_8(void);

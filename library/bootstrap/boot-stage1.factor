@@ -56,9 +56,11 @@ hashtables ;
     "delegate" [ "generic" ] search
     "object" [ "generic" ] search
     "classes" [ "generic" ] search
+    "builtins" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind
 
+    reveal
     reveal
     reveal
     reveal

@@ -8,23 +8,23 @@ void init_compiler(CELL size)
 
 void primitive_compiled_offset(void)
 {
-	box_integer(compiling.here);
+	box_unsigned_cell(compiling.here);
 }
 
 void primitive_set_compiled_offset(void)
 {
-	CELL offset = unbox_integer();
+	CELL offset = unbox_unsigned_cell();
 	compiling.here = offset;
 }
 
 void primitive_literal_top(void)
 {
-	box_integer(literal_top);
+	box_unsigned_cell(literal_top);
 }
 
 void primitive_set_literal_top(void)
 {
-	CELL offset = unbox_integer();
+	CELL offset = unbox_unsigned_cell();
 	if(offset >= literal_max)
 		critical_error("Too many compiled literals",offset);
 	literal_top = offset;

@@ -537,6 +537,7 @@ public class FactorPlugin extends EditPlugin
 			{
 				offset = buffer.getLineEndOffset(i) - 1;
 				leadingNewline = true;
+				break;
 			}
 			else if(text.startsWith("!"))
 			{

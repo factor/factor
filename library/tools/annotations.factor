@@ -6,10 +6,10 @@ IN: words
 ! or single-stepping. Note that currently, words referring to
 ! annotated words cannot be compiled; and annotating a word has
 ! no effect of compiled calls to that word.
-USING: interpreter kernel lists stdio strings ;
+USING: interpreter kernel lists stdio strings test ;
 
 : annotate ( word quot -- ) #! Quotation: ( word def -- def )
-    over [ word-def swap call ] keep (define-compound) ;
+    >r dup dup word-def r> call (define-compound) ; inline
 
 : (watch) >r "==> " swap word-name cat2 \ print r> cons cons ;
 
@@ -19,8 +19,10 @@ USING: interpreter kernel lists stdio strings ;
     #! word with \ foo reload.
     [ (watch) ] annotate ;
 
-: (break) [ walk ] cons ;
-
 : break ( word -- )
     #! Cause the word to start the code walker when executed.
-    [ nip (break) ] annotate ;
+    [ nip [ walk ] cons ] annotate ;
+
+: timer ( word -- )
+    #! Print the time taken to execute the word when it's called.
+    [ nip [ time ] cons ] annotate ;

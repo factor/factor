@@ -1,4 +1,4 @@
-IN: scratchpad
+IN: temporary
 USE: namespaces
 USE: parser
 USE: streams
