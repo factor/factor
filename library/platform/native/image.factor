@@ -35,6 +35,7 @@ USE: kernel
 USE: lists
 USE: logic
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: streams

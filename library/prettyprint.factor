@@ -58,51 +58,64 @@ USE: words
 : prettyprint-space ( -- )
     " " write ;
 
-: prettyprint-[ ( indent -- indent )
-    "[" write
-    tab-size + dup prettyprint-newline ;
-
-: prettyprint-] ( indent -- indent )
-    tab-size - dup prettyprint-newline
-    "]" write
-    prettyprint-space ;
+: newline-after? ( obj -- ? )
+    comment? ;
 
 ! Real definition follows
 DEFER: prettyprint*
 
+: prettyprint-element ( indent obj -- indent )
+    dup >r prettyprint* r> newline-after? [
+        dup prettyprint-newline
+    ] [
+        prettyprint-space
+    ] ifte ;
+
+: <prettyprint ( indent -- indent )
+    tab-size +
+    "prettyprint-single-line" get [
+        prettyprint-space
+    ] [
+        dup prettyprint-newline
+    ] ifte ;
+
+: prettyprint> ( indent -- indent )
+    tab-size -
+    "prettyprint-single-line" get [
+        dup prettyprint-newline
+    ] unless ;
+
+: prettyprint-[ ( indent -- indent )
+    "[" write <prettyprint ;
+
+: prettyprint-] ( indent -- indent )
+    prettyprint> "]" write ;
+
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
-    [ prettyprint* ] each ;
+    [ prettyprint-element ] each ;
 
 : prettyprint-[] ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
 
 : prettyprint-{ ( indent -- indent )
-    "{" write
-    tab-size + dup prettyprint-newline ;
+    "{" write <prettyprint ;
 
 : prettyprint-} ( indent -- indent )
-    tab-size - dup prettyprint-newline
-    "}" write
-    prettyprint-space ;
+    prettyprint> "}" write ;
 
 : prettyprint-vector ( indent list -- indent )
     #! Pretty-print a vector, without { and }.
-    [ prettyprint* ] vector-each ;
+    [ prettyprint-element ] vector-each ;
 
 : prettyprint-{} ( indent list -- indent )
     swap prettyprint-{ swap prettyprint-vector prettyprint-} ;
 
-: write-comment ( comment -- )
-    [ "comments" ] get-style [ write-attr ] bind ;
+: trim-newline ( str -- str )
+    dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
-: prettyprint-comment ( indent obj -- indent )
-    ends-with-newline? dup [
-        write-comment terpri
-        dup prettyprint-indent
-    ] [
-        drop write-comment " " write
-    ] ifte ;
+: prettyprint-comment ( comment -- )
+    [ "comments" ] get-style [ trim-newline write-attr ] bind ;
 
 : word-link ( word -- link )
     <%
@@ -121,14 +134,14 @@ DEFER: prettyprint*
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-attrs [ word-name write-attr ] bind " " write ;
+    dup word-attrs [ word-name write-attr ] bind ;
 
 : prettyprint-object ( indent obj -- indent )
-    unparse write " " write ;
+    unparse write ;
 
 : prettyprint* ( indent obj -- indent )
     [
-        [ not       ] [ prettyprint-object ]
+        [ f =       ] [ prettyprint-object ]
         [ list?     ] [ prettyprint-[] ]
         [ vector?   ] [ prettyprint-{} ]
         [ comment?  ] [ prettyprint-comment ]
@@ -136,8 +149,8 @@ DEFER: prettyprint*
         [ drop t    ] [ prettyprint-object ]
     ] cond ;
 
-: prettyprint ( list -- )
-    0 swap prettyprint* drop ;
+: prettyprint ( obj -- )
+    0 swap prettyprint* drop terpri ;
 
 : prettyprint-: ( indent -- indent )
     ":" write prettyprint-space
@@ -148,10 +161,21 @@ DEFER: prettyprint*
     tab-size - ;
 
 : prettyprint-:; ( indent word list -- indent )
-    [ [ prettyprint-: ] dip prettyprint-word ] dip
+    >r
+    >r prettyprint-: r>
+    prettyprint-word prettyprint-space r>
     prettyprint-list prettyprint-; ;
 
-: .n namestack  prettyprint ;
-: .s datastack  prettyprint ;
-: .r callstack  prettyprint ;
-: .c catchstack prettyprint ;
+: . ( obj -- )
+    <namespace> [
+        "prettyprint-single-line" on prettyprint
+    ] bind ;
+
+: [.] ( list -- )
+    #! Unparse each element on its own line.
+    [ . ] each ;
+
+: .n namestack  . ;
+: .s datastack  . ;
+: .r callstack  . ;
+: .c catchstack . ;

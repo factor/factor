@@ -30,6 +30,8 @@ USE: errors
 USE: kernel
 USE: namespaces
 
+! Generic functions, of sorts...
+
 : fflush ( stream -- )
     [ "fflush" get call ] bind ;
 
@@ -79,6 +81,8 @@ USE: namespaces
     ] extend ;
 
 : <extend-stream> ( stream -- stream )
+    #! Create a stream that wraps another stream. Override some
+    #! or all of the stream words.
     <stream> [
         "stream" set
         ( -- string )

@@ -28,6 +28,7 @@
 IN: httpd
 USE: arithmetic
 USE: combinators
+USE: errors
 USE: lists
 USE: logging
 USE: logic
@@ -73,11 +74,10 @@ USE: url-encoding
     ] ifte ;
 
 : httpd-client ( socket -- )
-    <namespace> [
-        dup "client" set "stdio" set
-        log-client
+    [
+        "stdio" get "client" set log-client
         read [ httpd-request ] when*
-    ] bind ;
+    ] with-stream ;
 
 : quit-flag ( -- ? )
     "httpd-quit" get ;
@@ -89,10 +89,14 @@ USE: url-encoding
     [
         quit-flag not
     ] [
-        dup accept dup httpd-client fclose
+        dup accept httpd-client
     ] while ;
 
 : httpd ( port -- )
     [
-        <server> httpd-loop fclose clear-quit-flag
+        <server> [
+            httpd-loop
+        ] [
+            swap fclose clear-quit-flag rethrow
+        ] catch
     ] with-logging ;

@@ -74,11 +74,11 @@ USE: vocabularies
         [ string? ]
         [ print ]
         
-        [ namespace? ]
+        [ has-namespace? ]
         [ dup describe-banner describe-namespace ]
         
         [ drop t ]
-        [ prettyprint terpri ]
+        [ prettyprint ]
     ] cond ;
 
 : describe-object-path ( string -- )

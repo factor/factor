@@ -53,15 +53,23 @@ USE: vectors
 
 : error# ( n -- str )
     [
-        "Handle expired"
-        "Undefined word"
-        "Type check"
-        "Array range check"
+        "Handle expired: "
+        "Undefined word: "
+        "Type check: "
+        "Array range check: "
         "Underflow"
+        "Bad primitive: "
     ] ?nth ;
 
+: ?kernel-error ( cons -- error# param )
+    dup cons? [
+        uncons dup cons? [ car ] when
+    ] [
+        f
+    ] ifte ;
+
 : kernel-error>str ( error -- )
-    <% car error# % ": " % unparse % %> ;
+    <% ?kernel-error swap error# % [ unparse % ] when* %> ;
 
 : error>str ( error -- str )
     dup kernel-error? [

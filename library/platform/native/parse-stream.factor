@@ -39,21 +39,31 @@ USE: streams
     "parse-stream" get freadln
     "line-number" succ@ ;
 
-: (parse-stream) ( -- )
-    next-line [ (parse) (parse-stream) ] when* ;
+: (read-lines) ( quot -- )
+    next-line dup [
+        swap dup >r call r> (read-lines)
+    ] [
+        2drop
+    ] ifte ;
 
-: <parse-stream ( name stream -- )
-    "parse-stream" set
+: read-lines ( stream quot -- )
+    #! Apply a quotation to each line as its read. Close the
+    #! stream.
+    swap [
+        "parse-stream" set 0 "line-number" set (read-lines)
+    ] [
+        "parse-stream" get fclose rethrow
+    ] catch ;
+
+: init-parser ( name -- seed )
     "parse-name" set
-    0 "line-number" set ;
+    "user" "in" set
+    [ "builtins" "user" ] "use" set
+    f ;
 
-: parse-stream ( name stream -- )
+: parse-stream ( name stream -- code )
     <namespace> [
-        [
-            <parse-stream f (parse-stream) nreverse
-        ] [
-            "parse-stream" get fclose rethrow
-        ] catch
+        >r init-parser r> [ (parse) ] read-lines nreverse
     ] bind ;
 
 : parse-file ( file -- code )

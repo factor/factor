@@ -27,8 +27,6 @@
 
 IN: unparser
 USE: kernel
-USE: lists
-USE: stdio
 USE: strings
 
 : fixnum>str >str ; inline
@@ -36,13 +34,6 @@ USE: strings
 : unparse ( X -- "X" )
     [ "java.lang.Object" ] "factor.FactorReader" "unparseObject"
     jinvoke-static ;
-
-: . ( expr -- )
-    unparse print ;
-
-: [.] ( list -- )
-    #! Unparse each element on its own line.
-    [ . ] each ;
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.

@@ -31,6 +31,7 @@ USE: inspector
 USE: lists
 USE: kernel
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings

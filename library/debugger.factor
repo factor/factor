@@ -65,7 +65,7 @@ USE: unparser
 
     suspend ;
 
-: :s ( -- ) "error-datastack"  get prettyprint ;
-: :r ( -- ) "error-callstack"  get prettyprint ;
-: :n ( -- ) "error-namestack"  get prettyprint ;
-: :c ( -- ) "error-catchstack" get prettyprint ;
+: :s ( -- ) "error-datastack"  get . ;
+: :r ( -- ) "error-callstack"  get . ;
+: :n ( -- ) "error-namestack"  get . ;
+: :c ( -- ) "error-catchstack" get . ;

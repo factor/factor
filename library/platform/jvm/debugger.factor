@@ -29,9 +29,9 @@ IN: debugger
 USE: combinators
 USE: kernel
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
-USE: unparser
 
 : exception? ( exception -- boolean )
     "java.lang.Throwable" is ;

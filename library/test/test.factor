@@ -11,6 +11,7 @@ USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings

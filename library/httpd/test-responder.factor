@@ -27,7 +27,7 @@
 
 IN: test-responder
 USE: stdio
-USE: unparser
+USE: prettyprint
 
 USE: httpd
 USE: httpd-responder

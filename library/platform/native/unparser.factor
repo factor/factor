@@ -40,7 +40,11 @@ USE: words
 USE: vocabularies
 
 : fixnum% ( num -- )
-    base /mod swap dup 0 > [ fixnum% ] [ drop ] ifte >digit % ;
+    "base" get /mod swap dup 0 > [
+        fixnum%
+    ] [
+        drop
+    ] ifte >digit % ;
 
 : fixnum- ( num -- num )
     dup 0 < [ "-" % neg ] when ;
@@ -62,12 +66,5 @@ USE: vocabularies
         [ word?   ] [ unparse-word ]
         [ fixnum? ] [ fixnum>str ]
         [ string? ] [ unparse-str ]
-        [ drop t  ] [ drop "#<unknown>" ]
+        [ drop t  ] [ <% "#<" % class-of % ">" % %> ]
     ] cond ;
-
-: . ( expr -- )
-    unparse print ;
-
-: [.] ( list -- )
-    #! Unparse each element on its own line.
-    [ . ] each ;

@@ -27,6 +27,7 @@
 
 IN: prettyprint
 USE: combinators
+USE: parser
 USE: prettyprint
 USE: stack
 USE: stdio
@@ -34,20 +35,25 @@ USE: unparser
 USE: vocabularies
 USE: words
 
-: see ( word -- )
-    !!! Ugh!
-    intern dup compound? [
-        0 swap dup word-parameter
-        [
-            [ prettyprint-: ] dip prettyprint-word
-            dup prettyprint-newline
-        ] dip
-        prettyprint-list prettyprint-;
-        prettyprint-newline
-    ] [
-        dup primitive? [
-            "Primitive: " write unparse print
-        ] [
-            drop "Not defined" print
-        ] ifte
-    ] ifte ;
+: see-compound ( word -- )
+    0 swap dup word-parameter
+    [
+        [ prettyprint-: ] dip prettyprint-word
+        dup prettyprint-newline
+    ] dip
+    prettyprint-list prettyprint-;
+    prettyprint-newline ;
+
+: see-primitive ( word -- )
+    "Primitive: " write unparse print ;
+
+: see-undefined ( word -- )
+    drop "Not defined" print ;
+
+: see ( name -- )
+    intern
+    [
+        [ compound? ] [ see-compound ]
+        [ primitive? ] [ see-primitive ]
+        [ drop t ] [ see-undefined ]
+    ] cond ;

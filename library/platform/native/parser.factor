@@ -41,13 +41,29 @@ USE: unparser
 
 ! Number parsing
 
-: base "base" get ;
-: set-base "base" set ;
+: letter? #\a #\z between? ;
+: LETTER? #\A #\Z between? ;
 : digit? #\0 #\9 between? ;
-: >digit #\0 + ;
+
 : not-a-number "Not a number" throw ;
-: digit> dup digit? [ #\0 - ] [ not-a-number ] ifte ;
-: digit ( num digit -- num ) >r base * r> + ;
+
+: digit> ( ch -- n )
+    [
+        [ digit? ] [ #\0 - ]
+        [ letter? ] [ #\a - 10 + ]
+        [ LETTER? ] [ #\A - 10 + ]
+        [ drop t ] [ not-a-number ]
+    ] cond ;
+
+: >digit ( n -- ch )
+    dup 10 < [ #\0 + ] [ 10 - #\a + ] ifte ;
+
+: digit ( num digit -- num )
+    "base" get swap 2dup >= [
+        >r * r> +
+    ] [
+        not-a-number
+    ] ifte ;
 
 : (str>fixnum) ( str -- num )
     0 swap [ digit> digit ] str-each ;
@@ -74,7 +90,13 @@ USE: unparser
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
 
-: parsing? ( word -- ? ) "parsing" swap word-property ;
+: parsing? ( word -- ? )
+    dup word? [
+        "parsing" swap word-property
+    ] [
+        drop f
+    ] ifte ;
+
 : parsing ( -- ) t "parsing" word set-word-property ;
 
 : <parsing "line" set 0 "pos" set ;
@@ -109,16 +131,22 @@ USE: unparser
 : scan ( -- str )
     (scan) 2dup = [ 2drop f ] [ "line" get substring ] ifte ;
 
+: parse-word ( str -- obj )
+    dup "use" get search dup [
+        nip
+    ] [
+        drop str>fixnum
+    ] ifte ;
+
+: parsed ( obj -- )
+    swons ;
+
 : number, ( num -- )
-    str>fixnum swons ;
+    str>fixnum parsed ;
 
 : word, ( str -- )
     [
-        dup "use" get search dup [
-            nip dup parsing? [ execute ] [ swons ] ifte
-        ] [
-            drop number,
-        ] ifte
+        parse-word dup parsing? [ execute ] [ parsed ] ifte
     ] when* ;
 
 : (parse) <parsing [ end? not ] [ scan word, ] while parsing> ;
@@ -152,13 +180,23 @@ USE: unparser
 IN: builtins
 
 ! Constants
-: t t swons ; parsing
-: f f swons ; parsing
+: t t parsed ; parsing
+: f f parsed ; parsing
 
 ! Lists
 : [ f ; parsing
-: ] nreverse swons ; parsing
-    
+: ] nreverse parsed ; parsing
+
+: expect-] scan "]" = not [ "Expected ]" throw ] when ;
+
+: one-word ( -- obj ) f scan word, car ;
+
+: | ( syntax: | cdr ] )
+    #! See the word 'parsed'.
+    "|"
+    nreverse dup last* one-word swap rplacd parsed
+    expect-] ; parsing
+
 ! Colon defs
 : :
     #! Begin a word definition. Word name follows.
@@ -189,22 +227,33 @@ IN: builtins
 
 ! String literal
 
-: scan-escape ( -- )
+: parse-escape ( -- )
     next-ch escape dup [ % ] [ drop "Bad escape" throw ] ifte ;
 
-: scan-string ( -- )
+: parse-string ( -- )
     next-ch dup #\" = [
         drop
     ] [
-        dup #\\\ = [ drop scan-escape ] [ % ] ifte scan-string
+        dup #\\\ = [ drop parse-escape ] [ % ] ifte parse-string
     ] ifte ;
 
 : "
     #! Note the ugly hack to carry the new value of 'pos' from
     #! the <% %> scope up to the original scope.
-    <% scan-string "pos" get %> swap "pos" set swons ; parsing
+    <% parse-string "pos" get %> swap "pos" set parsed ; parsing
 
 ! Comments
 : ( ")" until drop ; parsing
 : ! until-eol drop ; parsing
 : #! until-eol drop ; parsing
+    
+! Reading numbers in other bases
+
+: BASE: ( base -- )
+    #! Read a number in a specific base.
+    "base" get >r "base" set scan number, r> "base" set ;
+
+: HEX: 16 BASE: ; parsing
+: DEC: 10 BASE: ; parsing
+: OCT: 8 BASE: ; parsing
+: BIN: 2 BASE: ; parsing

@@ -1,7 +1,6 @@
 + native:
 
 - parsing: HEX:, #\, |
-- minimal use/in for parse-stream
 - prettyprint-1
 - {...} vectors
 - parsing should be parsing
@@ -12,7 +11,6 @@
 - clone-sbuf
 - contains ==> contains?
 - telnetd: send errors on socket
-- native 'see'
 - partition, sort
 - inspector: sort
 
@@ -59,7 +57,6 @@
 
 + httpd:
 
-- use catch
 - httpd: don't flush so much
 - log with date
 - log user agent
