@@ -204,7 +204,7 @@ M: tuple clone ( tuple -- tuple )
     clone-tuple dup clone-delegate ;
 
 : tuple>list ( tuple -- list )
-    dup array-capacity swap array>list ;
+    >tuple dup array-capacity swap array>list ;
 
 M: tuple = ( obj tuple -- ? )
     over tuple? [

@@ -1,19 +1,10 @@
 IN: scratchpad
-USE: errors
-USE: kernel
-USE: math
-USE: namespaces
-USE: parser
-USE: strings
-USE: test
-USE: vectors
-USE: lists
-USE: words
-USE: prettyprint
 
 ! Various things that broke CFactor at various times.
 ! This should run without issue (and tests nothing useful)
 ! in Java Factor
+USING: errors kernel lists math memory namespaces parser
+prettyprint strings test vectors words ;
 
 "20 <sbuf> \"foo\" set" eval
 "garbage-collection" eval

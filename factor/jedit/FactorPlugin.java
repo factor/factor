@@ -507,7 +507,7 @@ public class FactorPlugin extends EditPlugin
 			String text = buffer.getLineText(i);
 			int index = text.indexOf("USING:");
 			if(index != -1)
-				return index + "USING:".length();
+				return buffer.getLineStartOffset(i) + index;
 		}
 		
 		return -1;
@@ -565,7 +565,7 @@ public class FactorPlugin extends EditPlugin
 		if(end == -1)
 			end = buffer.getLength();
 
-		String decl = text.substring(offset,end);
+		String decl = text.substring(offset + "USING:".length(),end);
 		
 		List declList = new ArrayList();
 		StringTokenizer st = new StringTokenizer(decl);
@@ -574,7 +574,7 @@ public class FactorPlugin extends EditPlugin
 		declList.add(vocab);
 		Collections.sort(declList);
 		
-		StringBuffer buf = new StringBuffer(" ");
+		StringBuffer buf = new StringBuffer("USING: ");
 		Iterator iter = declList.iterator();
 		while(iter.hasNext())
 		{

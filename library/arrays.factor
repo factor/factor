@@ -15,8 +15,10 @@ USING: generic math-internals kernel lists vectors ;
 
 BUILTIN: array 8
 
-: array-capacity   ( array -- n )   1 slot ; inline
-: vector-array     ( vec -- array ) >vector 2 slot ; inline
+DEFER: %fixnum
+
+: array-capacity   ( array -- n ) 1 slot %fixnum ; inline
+: vector-array     ( vec -- array ) >vector 2 slot %array ; inline
 : set-vector-array ( array vec -- ) >vector 2 set-slot ; inline
 
 : array-nth ( n array -- obj )

@@ -97,7 +97,7 @@ M: object error. ( error -- )
         "error-line-number" get [ 1 ] unless* unparse ,
     ] make-string print
     
-    "error-line" get print
+    "error-line" get dup string? [ print ] [ drop ] ifte
     
     [ "error-col" get " " fill , "^" , ] make-string print ;
 

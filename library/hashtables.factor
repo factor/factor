@@ -15,8 +15,8 @@ BUILTIN: hashtable 10
 
 IN: kernel-internals
 
-: hash-array 2 slot ; inline
-: set-hash-array 2 set-slot ; inline
+: hash-array >hashtable 2 slot ( promise ) %array ; inline
+: set-hash-array swap >array swap >hashtable 2 set-slot ; inline
 
 : hash-bucket ( n hash -- alist )
     swap >fixnum swap >hashtable hash-array array-nth ; inline

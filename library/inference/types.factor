@@ -27,21 +27,25 @@ lists math namespaces strings vectors words stdio prettyprint ;
     \ >string \ string infer-check
 ] "infer" set-word-property
 
-! : literal-slot ( -- )
-!     dataflow-drop, pop-d literal-value
-!     peek-d value-class builtin-supertypes dup length 1 = [
-!         cons \ slot [ [ object ] [ object ] ] (consume/produce)
-!     ] [
-!         "slot called without static type knowledge" throw
-!     ] ifte ;
-! 
-! : computed-slot ( -- )
-!     \ slot dup "infer-effect" word-property consume/produce ;
-! 
-! \ slot [
-!     [ object fixnum ] ensure-d
-!     peek-d literal? [ literal-slot ] [ computed-slot ] ifte
-! ] "infer" set-word-property
+: fast-slot? ( -- ? )
+    #! If the slot number is literal and the object's type is
+    #! known, we can compile a slot access into a single
+    #! instruction (x86).
+    peek-d literal?
+    peek-next-d value-class builtin-supertypes length 1 = and ;
+
+: fast-slot ( -- )
+    dataflow-drop, pop-d literal-value
+    peek-d value-class builtin-supertypes cons
+    \ slot [ [ object ] [ object ] ] (consume/produce) ;
+
+: computed-slot ( -- )
+    \ slot dup "infer-effect" word-property consume/produce ;
+
+\ slot [
+    [ object fixnum ] ensure-d
+    fast-slot? [ fast-slot ] [ computed-slot ] ifte
+] "infer" set-word-property
 
 : type-value-map ( value -- )
     num-types [ dup builtin-type pick swons cons ] project

@@ -31,9 +31,10 @@
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
-- slot compile problem
 - sdl console crash
 - UI: don't roll over if mouse button is down
+- more accurate types for various words
+- optimize out >array, >tuple, >hashtable etc
 
 + compiler/ffi:
 
