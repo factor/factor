@@ -78,7 +78,6 @@ errors unparser logging listener url-encoding hashtables memory ;
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
   <namespace> [
-    "responder" "browser" put
     "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
@@ -187,7 +186,12 @@ errors unparser logging listener url-encoding hashtables memory ;
       [
         <html> 
           <head> 
-            <title> "Factor Browser" write </title>
+            <title> 
+              "Factor Browser - " write 
+              "current-vocab" get write
+              " - " write
+              "current-word" get write
+            </title>
           </head>
           <body> 
             <form name= "main" action= method= "post" form> 
@@ -212,7 +216,7 @@ errors unparser logging listener url-encoding hashtables memory ;
       [
 	"vocabs" get dup [ ] [ drop "unknown" ] ifte "words" get dup [ ] [ drop "unknown" ] ifte browser-url 
 	forward-to-url
-      ] show
+      ] show-final
     ] bind <browser> ;
 
 : browser-responder ( allow-edit? -- )

@@ -106,7 +106,7 @@ USE: kernel
 
 : todo-stylesheet-url ( -- url )
   #! Generate an URL for the stylesheet.
-  t [ [ drop todo-stylesheet write ] show ] register-continuation id>url ;
+  t [ [ todo-stylesheet write ] show-final ] register-continuation id>url ;
 
 : include-todo-stylesheet ( -- )  
   #! Generate HTML to include the todo stylesheet
@@ -476,14 +476,13 @@ USE: kernel
     [ "todo" get todo-username , "'s To Do list" , ] make-string
     [ include-todo-stylesheet ]
     [
-      drop
       "todo" get write-item-table
       [
         [ "Add Item" [ do-add-new-item ] quot-href ]
         [ "Change Password" [ do-change-password ] quot-href ]
       ] horizontal-layout
     ] styled-page 
-  ] show drop ;
+  ] show-final ;
 
 : todo-example ( path -- )
   #! Startup the todo list example using the given path as the 
