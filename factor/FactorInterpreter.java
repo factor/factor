@@ -81,7 +81,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 	 */
 	public FactorWord last;
 
-	public FactorNamespace global;
+	public FactorNamespace global = new FactorNamespace();
 
 	private FactorNamespace interpNamespace;
 
@@ -91,7 +91,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 	public static void main(String[] args) throws Exception
 	{
 		FactorInterpreter interp = new FactorInterpreter();
-		interp.init(args,null);
+		interp.init(args);
 		interp.run();
 	} //}}}
 
@@ -117,7 +117,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 	} //}}}
 
 	//{{{ init() method
-	public void init(String[] args, Object root) throws Exception
+	public void init(String[] args) throws Exception
 	{
 		for(int i = 0; i < args.length; i++)
 		{
@@ -139,7 +139,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 		vocabularies = new FactorNamespace();
 		initBuiltinDictionary();
-		initNamespace(root);
+		initNamespace();
 		topLevel();
 
 		runBootstrap();
@@ -269,10 +269,8 @@ public class FactorInterpreter implements FactorObject, Runnable
 	} //}}}
 
 	//{{{ initNamespace() method
-	private void initNamespace(Object root) throws Exception
+	private void initNamespace() throws Exception
 	{
-		global = new FactorNamespace(null,root);
-
 		global.setVariable("interpreter",this);
 
 		global.setVariable("verbose-compile",
