@@ -25,6 +25,7 @@
 !
 IN: eval-responder
 USE: cont-html
+USE: html
 USE: cont-responder
 USE: cont-utils
 USE: stack
@@ -58,7 +59,7 @@ USE: errors
   <table border= "1" table> [
     <tr> [ 
       <td> [ "Last Output" write ] </td>
-      <td> [ write ] </td>
+      <td> [ <pre> [ write ] </pre> ] </td>
     ] </tr>
   ] </table> ;           
   
@@ -89,9 +90,12 @@ USE: errors
   #! Evaluate expression using 'list' as the current callstack.
   #! All output should go to a string which is returned on the
   #! callstack along with the resulting datastack as a list.
-  1024 <string-output-stream> dup >r [
-    do-eval 
-  ] with-stream r> stream>str ;
+  <namespace> [ 
+    "inspect" "responder" set
+    1024 <string-output-stream> dup >r <html-stream> [
+      do-eval 
+    ] with-stream r> stream>str 
+  ] bind ;
 
 : run-eval-requester ( list string -- )
   #! Enter a loop request an expression to
