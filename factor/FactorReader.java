@@ -241,10 +241,7 @@ public class FactorReader
 		FactorWord word;
 
 		if(define)
-		{
 			word = lookup.define(getIn(),name);
-			definedWords = new Cons(word,definedWords);
-		}
 		else
 		{
 			word = searchVocabulary(getUse(),name);
@@ -283,6 +280,7 @@ public class FactorReader
 			FactorWord w = intern((String)next,define);
 			if(define && w != null)
 			{
+				definedWords = new Cons(w,definedWords);
 				w.line = line;
 				w.col = col;
 				w.file = scanner.getFileName();

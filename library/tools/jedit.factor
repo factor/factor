@@ -83,9 +83,6 @@ USE: words
         "newPlainView" off
     ] extend make-jedit-request send-jedit-request ;
 
-: resource-path ( -- path )
-    global [ "resource-path" get ] bind [ "." ] unless* ;
-
 : word-file ( path -- dir file )
     dup [
         "resource:/" ?str-head [

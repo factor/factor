@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:sidekick.parser=none:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -78,8 +78,8 @@ USE: alien
 : TTF_FontFaceStyleName ( font -- n )
     "char*" "sdl-ttf" "TTF_FontFaceStyleName" [ "void*" ] alien-invoke ;
 
-: TTF_RenderText_Solid ( font text fg bg -- surface )
-    "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "char*" "int" "int" ] alien-invoke ;
+: TTF_RenderText_Solid ( font text fg -- surface )
+    "surface*" "sdl-ttf" "TTF_RenderText_Solid" [ "void*" "char*" "int" ] alien-invoke ;
 
 : TTF_RenderGlyph_Shaded ( font text fg bg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderGlyph_Shaded" [ "void*" "ushort" "int" "int" ] alien-invoke ;

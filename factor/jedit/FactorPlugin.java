@@ -154,7 +154,8 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static void stopExternalInstance()
 	{
-		getFactorShell().closeStreams();
+		if(getFactorShell() != null)
+			getFactorShell().closeStreams();
 
 		if(external != null)
 		{

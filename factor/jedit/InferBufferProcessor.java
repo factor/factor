@@ -46,7 +46,11 @@ public class InferBufferProcessor extends FactorBufferProcessor
 	public static void createInferUnitTests(View view,
 		final Buffer buffer,
 		final ExternalFactor factor)
+		throws Exception
 	{
+		final String results = new InferBufferProcessor(buffer,factor)
+			.getResults();
+
 		final Buffer newBuffer = jEdit.newFile(view);
 		VFSManager.runInAWTThread(new Runnable()
 		{
@@ -55,8 +59,7 @@ public class InferBufferProcessor extends FactorBufferProcessor
 				newBuffer.setMode("factor");
 				try
 				{
-					new InferBufferProcessor(buffer,factor)
-						.insertResults(newBuffer,0);
+					newBuffer.insert(0,results);
 				}
 				catch(Exception e)
 				{

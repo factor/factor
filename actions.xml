@@ -98,4 +98,12 @@
 				FactorPlugin.getExternalInstance());
 		</CODE>
 	</ACTION>
+	<ACTION NAME="factor-compile-all">
+		<CODE>
+			wm.showDockableWindow("console");
+			CompileBufferProcessor.compileWordsInBuffer(view,buffer,
+				FactorPlugin.getExternalInstance(),
+				wm.getDockableWindow("console"));
+		</CODE>
+	</ACTION>
 </ACTIONS>

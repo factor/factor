@@ -4,7 +4,7 @@
 !
 ! ./f boot.image.le32
 !     -libraries:sdl:name=libSDL.so
-!     -libraries:sdl-gfx:name=libSDL_gfx.
+!     -libraries:sdl-gfx:name=libSDL_gfx.so
 !
 ! (But all on one line)
 !
@@ -36,9 +36,6 @@ SYMBOL: d
 : next-x ( x y -- x ) a get * sin swap b get * cos - ;
 : next-y ( x y -- y ) swap c get * sin swap d get * cos - ;
 
-: white ( -- rgb )
-    HEX: ffffffff ;
-
 : pixel ( #{ x y }# color -- )
     >r >r surface get r> >rect r> pixelColor ;
 
@@ -52,20 +49,20 @@ SYMBOL: d
 : draw-dejong ( x0 y0 iterations -- )
     [
         iterate-dejong 2dup scale-dejong rect> white pixel
-    ] times 2drop ;
+    ] times 2drop ; compiled
 
 : dejong ( -- )
     ! Fiddle with these four values!
-    1.4 a set
-    -2.3 b set
-    2.4 c set
+    1.0 a set
+    -1.3 b set
+    0.8 c set
     -2.1 d set
 
-    640 480 32 SDL_HWSURFACE [
-        [ 0 0 100000 draw-dejong ] with-surface
+    1024 768 0 SDL_HWSURFACE [
+        [ 0 0 200000 [ draw-dejong ] time ] with-surface
 
         <event> event-loop
         SDL_Quit
-    ] with-screen ; compiled
+    ] with-screen ;
 
-[ dejong ] time
+dejong

@@ -29,48 +29,42 @@
 
 package factor.jedit;
 
+import console.Output;
 import factor.*;
-import org.gjt.sp.jedit.Buffer;
+import java.io.IOException;
+import java.util.*;
+import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.*;
 
-/**
- * A class used to compile all words in a file, or infer stack effects of all
- * words in a file, etc.
- */
-public abstract class FactorBufferProcessor
+public class CompileBufferProcessor extends FactorBufferProcessor
 {
-	private String results;
-
-	//{{{ FactorBufferProcessor constructor
-	public FactorBufferProcessor(Buffer buffer, ExternalFactor factor)
-		throws Exception
+	//{{{ compileWordsInBuffer() method
+	public static void compileWordsInBuffer(View view,
+		Buffer buffer,
+		ExternalFactor factor,
+		Output output) throws Exception
 	{
-		StringBuffer buf = new StringBuffer();
-
-		Cons words = (Cons)buffer.getProperty(
-			FactorSideKickParser.WORDS_PROPERTY);
-		Cons wordCodeMap = null;
-		while(words != null)
-		{
-			FactorWord word = (FactorWord)words.car;
-			String expr = processWord(word);
-			buf.append("! ");
-			buf.append(expr);
-			buf.append('\n');
-			buf.append(factor.eval(expr));
-			words = words.next();
-		}
-		
-		results = buf.toString();
+		String results = new CompileBufferProcessor(
+			buffer,factor).getResults();
+		output.print(null,results);
 	} //}}}
 	
+	//{{{ CompileBufferProcessor constructor
+	public CompileBufferProcessor(Buffer buffer, ExternalFactor factor)
+		throws Exception
+	{
+		super(buffer,factor);
+	} //}}}
+	
+	//{{{ processWord() method
 	/**
 	 * @return Code to process the word.
 	 */
-	public abstract String processWord(FactorWord word);
-
-	//{{{ getResults() method
-	public String getResults()
+	public String processWord(FactorWord word)
 	{
-		return results;
+		StringBuffer expression = new StringBuffer();
+		expression.append(FactorPlugin.factorWord(word));
+		expression.append(" try-compile");
+		return expression.toString();
 	} //}}}
 }
