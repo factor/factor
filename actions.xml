@@ -9,14 +9,14 @@
 			if(sel == null)
 				view.toolkit.beep();
 			else
-				factorEval(view,sel);
+				FactorPlugin.eval(view,sel);
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-run-file">
 		<CODE>
 			buffer.save(view,null);
 			VFSManager.waitForRequests();
-			factorEval(view,
+			FactorPlugin.eval(view,
 				"\""
 				+ factor.FactorReader.charsToEscapes(buffer.path)
 				+ "\" run-file");
@@ -26,7 +26,7 @@
 		<CODE>
 			if(textArea.selectionCount == 0)
 				textArea.selectWord();
-			factorEval(view,
+			FactorPlugin.eval(view,
 				"\""
 				+ factor.FactorReader.charsToEscapes(
 				textArea.selectedText)
@@ -35,35 +35,29 @@
 	</ACTION>
 	<ACTION NAME="factor-see">
 		<CODE>
-			factorWordOperation(view,"see");
+			FactorPlugin.factorWordOperation(view,"see");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-edit">
 		<CODE>
-			factorWordOperation(view,"jedit");
+			FactorPlugin.factorWordOperation(view,"jedit");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-edit-dialog">
+		<CODE>
+			new EditWordDialog(view,FactorPlugin.getInterpreter());
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-usages">
 		<CODE>
-			factorWordOperation(view,"usages.");
-		</CODE>
-	</ACTION>
-	<ACTION NAME="factor-balance">
-		<CODE>
-			if(textArea.selectionCount == 0)
-				textArea.toolkit.beep();
-			else
-			{
-				factorEval(view,
-					"[ " + textArea.selectedText + " ] balance .");
-			}
+			FactorPlugin.factorWordOperation(view,"usages.");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-insert-use">
 		<CODE>
 			if(textArea.selectionCount == 0)
 				textArea.selectWord();
-			factor.jedit.FactorPlugin.insertUseDialog(view,
+			FactorPlugin.insertUseDialog(view,
 				textArea.selectedText);
 		</CODE>
 	</ACTION>

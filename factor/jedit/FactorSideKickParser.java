@@ -231,57 +231,15 @@ public class FactorSideKickParser extends SideKickParser
 		if(word.length() == 0)
 			return null;
 
-		List completions = getCompletions(data.use,word);
+		List completions = FactorPlugin.getCompletions(
+			data.use,word,false);
 
 		if(completions.size() == 0)
 			return null;
 		else
 		{
-			Collections.sort(completions,
-				new MiscUtilities.StringICaseCompare());
 			return new FactorCompletion(editPane.getView(),
 				completions,word,data);
-		}
-	} //}}}
-
-	//{{{ getCompletions() method
-	private List getCompletions(Cons use, String word)
-	{
-		List completions = new ArrayList();
-		FactorInterpreter interp = FactorPlugin.getInterpreter();
-
-		while(use != null)
-		{
-			String vocab = (String)use.car;
-			getCompletions(interp,vocab,word,completions);
-			use = use.next();
-		}
-		
-		return completions;
-	} //}}}
-
-	//{{{ getCompletions() method
-	private void getCompletions(FactorInterpreter interp, String vocab,
-		String word, List completions)
-	{
-		try
-		{
-			FactorNamespace v = interp.getVocabulary(vocab);
-			Cons words = v.toValueList();
-
-			while(words != null)
-			{
-				FactorWord w = (FactorWord)words.car;
-
-				if(w.name.startsWith(word))
-					completions.add(w);
-
-				words = words.next();
-			}
-		}
-		catch(Exception e)
-		{
-			Log.log(Log.ERROR,this,e);
 		}
 	} //}}}
 }

@@ -487,7 +487,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 	//{{{ getVocabulary() method
 	public FactorNamespace getVocabulary(String name)
-		throws Exception
 	{
 		Object value = vocabularies.getVariable(name);
 		if(value instanceof FactorNamespace)
@@ -498,7 +497,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 	//{{{ defineVocabulary() method
 	public void defineVocabulary(String name)
-		throws Exception
 	{
 		Object value = vocabularies.getVariable(name);
 		if(value == null)
@@ -569,31 +567,23 @@ public class FactorInterpreter implements FactorObject, Runnable
 		if(isUninterned(name))
 			return new FactorWord(null,name);
 
-		try
+		FactorNamespace v = getVocabulary(vocabulary);
+		if(v == null)
 		{
-			FactorNamespace v = getVocabulary(vocabulary);
-			if(v == null)
-			{
-				v = new FactorNamespace();
-				vocabularies.setVariable(vocabulary,v);
-			}
-			Object value = v.getVariable(name);
-			if(value instanceof FactorWord)
-				return (FactorWord)value;
-			else
-			{
-				// save to same workspace as vocabulary,
-				// or no workspace if vocabulary is builtins
-				FactorWord word = new FactorWord(
-					vocabulary,name,null);
-				v.setVariable(name,word);
-				return word;
-			}
+			v = new FactorNamespace();
+			vocabularies.setVariable(vocabulary,v);
 		}
-		catch(Exception e)
+		Object value = v.getVariable(name);
+		if(value instanceof FactorWord)
+			return (FactorWord)value;
+		else
 		{
-			// should not happen!
-			throw new RuntimeException(e);
+			// save to same workspace as vocabulary,
+			// or no workspace if vocabulary is builtins
+			FactorWord word = new FactorWord(
+				vocabulary,name,null);
+			v.setVariable(name,word);
+			return word;
 		}
 	} //}}}
 

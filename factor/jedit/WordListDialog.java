@@ -37,37 +37,57 @@ import java.awt.*;
 import org.gjt.sp.jedit.gui.EnhancedDialog;
 import org.gjt.sp.jedit.*;
 
-public class InsertUseDialog extends WordListDialog
+public abstract class WordListDialog extends EnhancedDialog
 {
-	//{{{ InsertUseDialog constructor
-	public InsertUseDialog(View view, FactorInterpreter interp,
-		FactorWord[] words)
+	protected View view;
+	protected JList list;
+	protected JButton ok, cancel;
+
+	//{{{ WordListDialog constructor
+	public WordListDialog(View view, FactorInterpreter interp, String title)
 	{
-		super(view,interp,jEdit.getProperty("factor.insert-use.title"));
+		super(view,title,true);
 
-		getContentPane().add(BorderLayout.NORTH,new JLabel(
-			jEdit.getProperty("factor.insert-use.caption",
-			new String[] { words[0].name })));
+		this.view = view;
 
-		list.setListData(words);
-		list.setSelectedIndex(0);
+		JPanel content = new JPanel(new BorderLayout(12,12));
+		content.setBorder(new EmptyBorder(12,12,12,12));
+		setContentPane(content);
 
-		pack();
-		setLocationRelativeTo(view);
-		setVisible(true);
-	} //}}}
-	
-	//{{{ ok() method
-	public void ok()
-	{
-		FactorWord w = (FactorWord)list.getSelectedValue();
-		FactorPlugin.insertUse(view,w.vocabulary);
-		dispose();
+		content.add(BorderLayout.CENTER,new JScrollPane(
+			list = new JList()));
+		list.setCellRenderer(new FactorWordRenderer(interp,true));
+
+		content.add(BorderLayout.SOUTH,createButtonPanel());
 	} //}}}
 
-	//{{{ cancel() method
-	public void cancel()
+	//{{{ createButtonPanel() method
+	private Box createButtonPanel()
 	{
-		dispose();
+		Box buttons = new Box(BoxLayout.X_AXIS);
+		buttons.add(Box.createGlue());
+		buttons.add(ok = new JButton(jEdit.getProperty(
+			"common.ok")));
+		getRootPane().setDefaultButton(ok);
+		ok.addActionListener(new ActionHandler());
+		buttons.add(Box.createHorizontalStrut(12));
+		buttons.add(cancel = new JButton(jEdit.getProperty(
+			"common.cancel")));
+		cancel.addActionListener(new ActionHandler());
+		buttons.add(Box.createGlue());
+		
+		return buttons;
+	} //}}}
+
+	//{{{ ActionHandler class
+	class ActionHandler implements ActionListener
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			if(evt.getSource() == ok)
+				ok();
+			else if(evt.getSource() == cancel)
+				cancel();
+		}
 	} //}}}
 }

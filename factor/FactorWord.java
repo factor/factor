@@ -89,7 +89,7 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	 * intern() method instead.
 	 */
 	public FactorWord(String vocabulary, String name,
-		FactorWordDefinition def) throws Exception
+		FactorWordDefinition def)
 	{
 		this.vocabulary = vocabulary;
 		this.name = name;

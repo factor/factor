@@ -32,7 +32,7 @@ package factor.jedit;
 import factor.listener.FactorListenerPanel;
 import factor.*;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.util.*;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
@@ -43,14 +43,6 @@ public class FactorPlugin extends EditPlugin
 	private static final String DOCKABLE_NAME = "factor";
 
 	private static FactorInterpreter interp;
-
-	//{{{ start() method
-	public void start()
-	{
-		String path = "/factor/jedit/factor.bsh";
-		BeanShell.runScript(null,path,new InputStreamReader(
-			getClass().getResourceAsStream(path)),false);
-	} //}}}
 
 	//{{{ getInterpreter() method
 	/**
@@ -77,6 +69,117 @@ public class FactorPlugin extends EditPlugin
 		panel.getListener().eval(cmd);
 	} //}}}
 
+	//{{{ factorWord() method
+	/**
+	 * Build a Factor expression for pushing the selected word on the stack
+	 */
+	public static String factorWord(FactorWord word)
+	{
+		return FactorReader.unparseObject(word.name)
+			+ " [ " + FactorReader.unparseObject(word.vocabulary)
+			+ " ] search";
+	} //}}}
+
+	//{{{ factorWord() method
+	/**
+	 * Build a Factor expression for pushing the selected word on the stack
+	 */
+	public static String factorWord(View view)
+	{
+		JEditTextArea textArea = view.getTextArea();
+		SideKickParsedData data = SideKickParsedData
+			.getParsedData(view);
+		if(data instanceof FactorParsedData)
+		{
+			FactorParsedData fdata = (FactorParsedData)data;
+			String word = FactorPlugin.getWordAtCaret(textArea);
+			if(word == null)
+				return null;
+			return "\""
+				+ FactorReader.charsToEscapes(word)
+				+ "\" " + FactorReader.unparseObject(fdata.use)
+				+ " search";
+		}
+		else
+			return null;
+	} //}}}
+	
+	//{{{ factorWordOperation() method
+	/**
+	 * Apply a Factor word to the selected word.
+	 */
+	public static void factorWordOperation(View view, String op)
+	{
+		String word = factorWord(view);
+		if(word == null)
+			view.getToolkit().beep();
+		else
+			eval(view,word + " " + op);
+	} //}}}
+
+	//{{{ getCompletions() method
+	/**
+	 * Returns all words in all vocabularies.
+	 *
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public static List getCompletions(String word, boolean anywhere)
+	{
+		return getCompletions(interp.vocabularies.toVarList(),word,
+			anywhere);
+	} //}}}
+	
+	//{{{ getCompletions() method
+	/**
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public static List getCompletions(Cons use,
+		String word, boolean anywhere)
+	{
+		List completions = new ArrayList();
+		FactorInterpreter interp = FactorPlugin.getInterpreter();
+
+		while(use != null)
+		{
+			String vocab = (String)use.car;
+			getCompletions(interp,vocab,word,completions,anywhere);
+			use = use.next();
+		}
+		
+		Collections.sort(completions,
+			new MiscUtilities.StringICaseCompare());
+
+		return completions;
+	} //}}}
+
+	//{{{ getCompletions() method
+	private static void getCompletions(FactorInterpreter interp,
+		String vocab, String word, List completions, boolean anywhere)
+	{
+		FactorNamespace v = interp.getVocabulary(vocab);
+		Cons words = v.toValueList();
+
+		while(words != null)
+		{
+			FactorWord w = (FactorWord)words.car;
+
+			if(anywhere)
+			{
+				if(w.name.indexOf(word) != -1)
+					completions.add(w);
+			}
+			else
+			{
+				if(w.name.startsWith(word))
+					completions.add(w);
+			}
+
+			words = words.next();
+		}
+	} //}}}
+	
 	//{{{ getWordAtCaret() method
 	public static String getWordAtCaret(JEditTextArea textArea)
 	{
@@ -148,7 +251,7 @@ public class FactorPlugin extends EditPlugin
 		else if(words.length == 1)
 			insertUse(view,words[0].vocabulary);
 		else
-			new InsertUseDialog(view,words);
+			new InsertUseDialog(view,getInterpreter(),words);
 	} //}}}
 
 	//{{{ insertUse() method
@@ -179,5 +282,5 @@ public class FactorPlugin extends EditPlugin
 		String decl = "USE: " + vocab + "\n";
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
-	} //}}]
+	} //}}}
 }
