@@ -12,6 +12,9 @@
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
 
+/* Profiling timer */
+struct itimerval prof_timer;
+
 /* Error handlers restore this */
 sigjmp_buf toplevel;
 
@@ -36,8 +39,13 @@ WORD* executing;
 /* TAGGED user environment data; see getenv/setenv prims */
 CELL userenv[USER_ENV];
 
-void init_signals(void);
+/* Call stack depth to start profile counter from */
+/* This ensures that words in the user's interpreter do not count */
+CELL profile_depth;
 
+void signal_handler(int signal, siginfo_t* siginfo, void* uap);
+void profiling_step(int signal, siginfo_t* siginfo, void* uap);
+void init_signals(void);
 void clear_environment(void);
 
 INLINE CELL dpop(void)
@@ -79,9 +87,22 @@ INLINE CELL cpeek(void)
 	return get(cs - CELLS);
 }
 
+INLINE void call(CELL quot)
+{
+	/* tail call optimization */
+	if(callframe != F)
+	{
+#ifdef EXTRA_CALL_INFO
+		cpush(tag_word(executing));
+#endif
+		cpush(callframe);
+	}
+	callframe = quot;
+}
+
 void run(void);
 void undefined(void);
-void call(void);
+void docol(void);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);
@@ -89,3 +110,4 @@ void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
 void primitive_os_env(void);
+void primitive_profiling(void);

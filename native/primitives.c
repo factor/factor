@@ -2,7 +2,7 @@
 
 XT primitives[] = {
 	undefined,
-	call,
+	docol,
 	primitive_execute,
 	primitive_call,
 	primitive_ifte,
@@ -137,7 +137,10 @@ XT primitives[] = {
 	primitive_init_random,
 	primitive_random_int,
 	primitive_type_of,
-	primitive_size_of
+	primitive_size_of,
+	primitive_profiling,
+	primitive_word_call_count,
+	primitive_set_word_call_count
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -7,6 +7,7 @@ WORD* word(CELL primitive, CELL parameter, CELL plist)
 	word->primitive = primitive;
 	word->parameter = parameter;
 	word->plist = plist;
+	word->call_count = 0;
 
 	return word;
 }
@@ -66,6 +67,17 @@ void primitive_set_word_plist(void)
 {
 	WORD* word = untag_word(dpop());
 	word->plist = dpop();
+}
+
+void primitive_word_call_count(void)
+{
+	drepl(tag_fixnum(untag_word(dpeek())->call_count));
+}
+
+void primitive_set_word_call_count(void)
+{
+	WORD* word = untag_word(dpop());
+	word->call_count = to_fixnum(dpop());
 }
 
 void fixup_word(WORD* word)

@@ -36,6 +36,10 @@ typedef unsigned short CHAR;
 
 #define STACK_SIZE 16384
 
+/* This decreases performance slightly but gives more readable backtraces,
+and allows profiling. */
+#define EXTRA_CALL_INFO
+
 #include "error.h"
 #include "memory.h"
 #include "gc.h"

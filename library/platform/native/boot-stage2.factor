@@ -103,6 +103,7 @@ USE: stdio
     "/library/ansi.factor"
     "/library/telnetd.factor"
     "/library/inferior.factor"
+    "/library/platform/native/profiler.factor"
 
     "/library/image.factor"
     "/library/cross-compiler.factor"

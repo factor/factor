@@ -5,6 +5,8 @@
 - multiple tasks should be able to write to the same port
 - jvm factor -- still supporting httpd?
 - make inferior.factor nicer to use
+- telnetd printing signal 13, and other problems
+- check error callstack, not enough >pop>?
 
 + docs:
 
@@ -35,6 +37,9 @@
 
 + native:
 
+- is the profiler using correct stack depth?
+- bignums
+- >lower, >upper for strings
 - read1
 - telnetd and httpd should use multitasking
 - sbuf-hashcode

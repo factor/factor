@@ -29,8 +29,7 @@ void throw_error(CELL error)
 
 	dpush(error);
 	/* Execute the 'throw' word */
-	cpush(callframe);
-	callframe = userenv[BREAK_ENV];
+	call(userenv[BREAK_ENV]);
 	if(callframe == 0)
 	{
 		/* Crash at startup */

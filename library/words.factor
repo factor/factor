@@ -44,3 +44,7 @@ USE: stack
 
 : set-word-vocabulary ( word vocab -- )
     "vocabulary" swap set-word-property ;
+
+: each-word ( quot -- )
+    #! Apply a quotation to each word in the image.
+    vocabs [ words [ swap dup >r call r> ] each ] each drop ;

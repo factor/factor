@@ -38,8 +38,8 @@ CELL T;
 #define REAL_TYPE 102 /* RATIONAL or FLOAT */
 #define NUMBER_TYPE 103 /* COMPLEX or REAL */
 
-bool typep(CELL type, CELL tagged);
 CELL type_of(CELL tagged);
+bool typep(CELL type, CELL tagged);
 void type_check(CELL type, CELL tagged);
 
 INLINE CELL tag_boolean(CELL untagged)

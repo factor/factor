@@ -54,8 +54,7 @@ void check_memory(void)
 		}
 
 		/* Execute the 'garbage-collection' word */
-		cpush(callframe);
-		callframe = userenv[GC_ENV];
+		call(userenv[GC_ENV]);
 	}
 }
 

@@ -5,19 +5,36 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 	general_error(ERROR_SIGNAL,tag_fixnum(signal));
 }
 
+/* Called from a signal handler. XXX - is this safe? */
+void profiling_step(int signal, siginfo_t* siginfo, void* uap)
+{
+	CELL depth = (cs - cs_bot) / CELLS;
+	int i;
+	CELL obj;
+	for(i = profile_depth; i < depth; i++)
+	{
+		obj = get(cs_bot + i * CELLS);
+		if(TAG(obj) == WORD_TYPE)
+			untag_word(obj)->call_count++;
+	}
+
+	executing->call_count++;
+}
+
 void init_signals(void)
 {
 	struct sigaction custom_sigaction;
-	struct sigaction ign_sigaction;
+	struct sigaction profiling_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
-	ign_sigaction.sa_handler = SIG_IGN;
-	ign_sigaction.sa_flags = 0;
+	profiling_sigaction.sa_sigaction = profiling_step;
+	profiling_sigaction.sa_flags = SA_SIGINFO;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
 	sigaction(SIGBUS,&custom_sigaction,NULL);
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
 	sigaction(SIGPIPE,&custom_sigaction,NULL);
+	sigaction(SIGPROF,&profiling_sigaction,NULL);
 }
 
 void clear_environment(void)
@@ -41,6 +58,9 @@ void run(void)
 		if(callframe == F)
 		{
 			callframe = cpop();
+#ifdef EXTRA_CALL_INFO
+			cpop();
+#endif
 			continue;
 		}
 
@@ -65,29 +85,20 @@ void undefined()
 }
 
 /* XT of compound definitions */
-void call()
+void docol(void)
 {
-	/* tail call optimization */
-	if(callframe != F)
-		cpush(callframe);
-	/* the parameter is the colon def */
-	callframe = executing->parameter;
+	call(executing->parameter);
 }
-
 
 void primitive_execute(void)
 {
-	WORD* word = untag_word(dpop());
-	executing = word;
+	executing = untag_word(dpop());
 	EXECUTE(executing);
 }
 
 void primitive_call(void)
 {
-	CELL calling = dpop();
-	if(callframe != F)
-		cpush(callframe);
-	callframe = calling;
+	call(dpop());
 }
 
 void primitive_ifte(void)
@@ -95,10 +106,7 @@ void primitive_ifte(void)
 	CELL f = dpop();
 	CELL t = dpop();
 	CELL cond = dpop();
-	CELL calling = (untag_boolean(cond) ? t : f);
-	if(callframe != F)
-		cpush(callframe);
-	callframe = calling;
+	call(untag_boolean(cond) ? t : f);
 }
 
 void primitive_getenv(void)
@@ -116,4 +124,30 @@ void primitive_setenv(void)
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
 	userenv[e] = value;
+}
+
+void primitive_profiling(void)
+{
+#ifndef EXTRA_CALL_INFO
+	general_error(PROFILING_DISABLED,F);
+#else
+	CELL d = dpop();
+	if(d == F)
+	{
+		timerclear(&prof_timer.it_interval);
+		timerclear(&prof_timer.it_value);
+	}
+	else
+	{
+		prof_timer.it_interval.tv_sec = 0;
+		prof_timer.it_interval.tv_usec = 1000;
+		prof_timer.it_value.tv_sec = 0;
+		prof_timer.it_value.tv_usec = 1000;
+
+		profile_depth = to_fixnum(d);
+	}
+
+	if(setitimer(ITIMER_PROF,&prof_timer,NULL) < 0)
+		io_error(__FUNCTION__);
+#endif
 }

@@ -1,24 +1,5 @@
 #include "factor.h"
 
-bool typep(CELL type, CELL tagged)
-{
-	if(type < HEADER_TYPE)
-	{
-		if(TAG(tagged) == type)
-			return true;
-	}
-	else if(type >= HEADER_TYPE)
-	{
-		if(TAG(tagged) == OBJECT_TYPE)
-		{
-			if(untag_header(get(UNTAG(tagged))) == type)
-				return true;
-		}
-	}
-	
-	return false;
-}
-
 CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
@@ -28,23 +9,15 @@ CELL type_of(CELL tagged)
 		return untag_header(get(UNTAG(tagged)));
 }
 
+bool typep(CELL type, CELL tagged)
+{
+	return type_of(tagged) == type;
+}
+
 void type_check(CELL type, CELL tagged)
 {
-	if(type < HEADER_TYPE)
-	{
-		if(TAG(tagged) == type)
-			return;
-	}
-	else if(type >= HEADER_TYPE)
-	{
-		if(TAG(tagged) == OBJECT_TYPE)
-		{
-			if(untag_header(get(UNTAG(tagged))) == type)
-				return;
-		}
-	}
-	
-	type_error(type,tagged);
+	if(type_of(tagged) != type)
+		type_error(type,tagged);
 }
 
 /*

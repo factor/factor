@@ -79,6 +79,9 @@ USE: vectors
 : no-io-tasks-error ( obj -- )
     "No I/O tasks" print ;
 
+: profiling-disabled-error ( obj -- )
+    drop "Recompile with the EXTRA_CALL_INFO flag." print ;
+
 : kernel-error. ( obj n -- str )
     {
         expired-port-error

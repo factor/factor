@@ -81,6 +81,11 @@ DEFER: next-io-task
 IN: parser
 DEFER: str>float
 
+IN: profiler
+DEFER: profiling
+DEFER: call-count
+DEFER: set-call-count
+
 IN: random
 DEFER: init-random
 DEFER: (random-int)
@@ -236,6 +241,9 @@ IN: cross-compiler
         (random-int)
         type-of
         size-of
+        profiling
+        call-count
+        set-call-count
     ] [
         swap succ tuck primitive,
     ] each drop ;

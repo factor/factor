@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,53 +25,37 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: continuations
-USE: combinators
-USE: errors
+IN: profiler
+USE: arithmetic
 USE: kernel
 USE: lists
-USE: namespaces
+USE: prettyprint
 USE: stack
+USE: words
 USE: vectors
 
-: reify ( quot -- )
-    >r datastack >pop> callstack >pop> namestack catchstack
-    r> call ;
+: reset-call-counts ( -- )
+    vocabs [ words [ 0 swap set-call-count ] each ] each ;
 
-: (callcc) cons cons cons cons swap call ;
+: sort-call-counts ( alist -- alist )
+    [ swap cdr swap cdr > ] sort ;
 
-: continue0 ( ds rs ns cs -- )
-    set-catchstack set-namestack
-    >r set-datastack r> set-callstack ;
-
-: callcc0 ( code -- )
-    #! Calls the code with a special quotation at the top of the
-    #! stack. The quotation has stack effect:
-    #!
-    #! ( -- ... )
-    #!
-    #! When called, the quotation restores execution state to
-    #! the point after the callcc0 call.
-    [ [ continue0 ] (callcc) ] reify ;
-
-: continue1 ( obj ds rs ns cs -- obj )
-    set-catchstack set-namestack
-    rot >r >r set-datastack r> r> swap set-callstack ;
-
-: callcc1 ( code -- )
-    #! Calls the code with a special quotation at the top of the
-    #! stack. The quotation has stack effect:
-    #!
-    #! ( X -- ... )
-    #!
-    #! When called, the quotation restores execution state to
-    #! the point after the callcc1 call, and places X at the top
-    #! of the original datastack.
-    [ [ continue1 ] (callcc) ] reify ;
-
-: suspend ( -- )
-    "top-level-continuation" get dup [
-        call
+: call-count, ( word -- )
+    #! Add to constructing list if call count is non-zero.
+    dup call-count dup 0 = [
+        2drop
     ] [
-        toplevel
+        cons ,
     ] ifte ;
+
+: call-counts ( -- alist )
+    #! Push an alist of all word/call count pairs.
+    [, [ call-count, ] each-word ,] sort-call-counts ;
+
+: profile ( quot -- )
+    #! Execute a quotation with the profiler enabled.
+    reset-call-counts
+    callstack vector-length profiling
+    call
+    f profiling
+    call-counts [ . ] each ;

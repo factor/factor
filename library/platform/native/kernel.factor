@@ -97,6 +97,8 @@ USE: vectors
         [ 12 | "port" ]
         [ 13 | "bignum" ]
         [ 14 | "float" ]
+        ! These values are only used by the kernel for error
+        ! reporting.
         [ 100 | "fixnum/bignum" ]
         [ 101 | "fixnum/bignum/ratio" ]
         [ 102 | "fixnum/bignum/ratio/float" ]

@@ -8,6 +8,7 @@
 #define ERROR_SIGNAL (7<<3)
 #define ERROR_IO_TASK_TWICE (8<<3)
 #define ERROR_IO_TASK_NONE (9<<3)
+#define ERROR_PROFILING_DISABLED (10<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
