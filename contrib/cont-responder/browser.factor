@@ -104,6 +104,24 @@ USE: errors
     ] ifte
   ] bind drop ;
 
+: get-vm-runtime ( -- java.lang.Runtime )
+  f "java.lang.Runtime" "getRuntime" jinvoke-static ;
+
+: get-free-memory ( java.lang.Runtime -- int )
+  f "java.lang.Runtime" "freeMemory" jinvoke ;
+
+: get-total-memory ( java.lang.Runtime -- int )
+  f "java.lang.Runtime" "totalMemory" jinvoke ;
+
+: write-vm-statistics ( -- )
+  #! Display statistics about the JVM in use.
+  <table> [
+    <tr> [ <td> [ "Free Memory" write ] </td>
+           <td> [ get-vm-runtime get-free-memory write ] </td> ] </tr>
+    <tr> [ <td> [ "Total Memory" write ] </td>
+           <td> [ get-vm-runtime get-total-memory write ] </td> ] </tr>
+  ] </table> ;
+
 : write-browser-body ( -- )
   #! Write out the HTML for the body of the main browser page.
   [
@@ -112,7 +130,8 @@ USE: errors
     [ 
       "current-vocab" get "current-word" get write-word-source
     ]
-  ] horizontal-layout ;
+  ] horizontal-layout 
+  write-vm-statistics ;
 
 : flatten ( tree - list ) 
   #! Flatten a tree into a list.
