@@ -27,7 +27,6 @@
 
 IN: sdl
 USE: alien
-USE: compiler
 
 BEGIN-ENUM: 0
     ENUM: SDL_NOEVENT         ! Unused (do not remove)
@@ -69,4 +68,4 @@ BEGIN-STRUCT: event
 END-STRUCT
 
 : SDL_WaitEvent ( event -- )
-    "int" "sdl" "SDL_WaitEvent" [ "event*" ] alien-call ; compiled
+    "int" "sdl" "SDL_WaitEvent" [ "event*" ] alien-call ;

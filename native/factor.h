@@ -52,10 +52,6 @@ typedef unsigned char BYTE;
 
 #define STACK_SIZE 16384
 
-/* This decreases performance slightly but gives more readable backtraces,
-and allows profiling. */
-#define FACTOR_PROFILER
-
 #include "memory.h"
 #include "error.h"
 #include "gc.h"

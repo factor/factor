@@ -118,6 +118,20 @@ USE: vectors
     #! Returns f if any of the objects are not set.
     this swap (object-path) ;
 
+: (set-object-path) ( name -- namespace )
+    dup namespace get* dup [
+        nip
+    ] [
+        drop <namespace> tuck put
+    ] ifte ;
+
+: set-object-path ( value list -- )
+    unswons over [
+        (set-object-path) [ set-object-path ] bind
+    ] [
+        nip set
+    ] ifte ;
+
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
 : toggle ( var -- ) dup get not put ;

@@ -109,8 +109,11 @@ SYMBOL: compilable-word-list
     #! Make a list of all words that can be compiled.
     [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,] ;
 
+: cannot-compile ( word -- )
+    "verbose-compile" get [ "Cannot compile " write . ] when ;
+
 : init-compiler ( -- )
     #! Compile all words.
     compilable-word-list get [
-        [ compile ] [ [ "Cannot compile " write . ] when ] catch
+        [ compile ] [ cannot-compile ] catch
     ] each ;

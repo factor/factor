@@ -1,6 +1,8 @@
 FFI:
 - is signed -vs- unsigned pointers an issue?
 
+- command line parsing cleanup
+
 - BIN: 2: bad
 
 - compile word twice; no more 'cannot compile' error!
@@ -128,7 +130,6 @@ FFI:
 - don't rehash strings on every startup
 - 'cascading' styles
 - ditch expand
-- set-object-path
 
 + httpd:
 

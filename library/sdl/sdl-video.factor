@@ -108,17 +108,17 @@ END-STRUCT
 
 : SDL_SetVideoMode ( width height bpp flags -- )
     "int" "sdl" "SDL_SetVideoMode"
-    [ "int" "int" "int" "int" ] alien-call ; compiled
+    [ "int" "int" "int" "int" ] alien-call ;
 
 : SDL_LockSurface ( surface -- )
-    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ; compiled
+    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
 
 : SDL_UnlockSurface ( surface -- )
-    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ; compiled
+    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
 
 : SDL_Flip ( surface -- )
-    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ; compiled
+    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
 
 : SDL_MapRGB ( surface r g b -- )
     "int" "sdl" "SDL_MapRGB"
-    [ "surface*" "char" "char" "char" ] alien-call ; compiled
+    [ "surface*" "char" "char" "char" ] alien-call ;

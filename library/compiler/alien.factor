@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
+USE: combinators
 USE: compiler
 USE: errors
 USE: lists
@@ -62,7 +63,13 @@ USE: words
     "alien-call cannot be interpreted." throw ;
 
 : library ( name -- handle )
-    "libraries" get get* ;
+    "libraries" get [
+        dup get dup dll? [
+            nip
+        ] [
+            dlopen tuck put
+        ] ifte
+    ] bind ;
 
 : alien-function ( function library -- )
     library dlsym ;

@@ -57,14 +57,24 @@ USE: words
         ?run-file
     ] when ;
 
+: cli-var-param ( name value -- )
+    swap ":" split set-object-path ;
+
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
     #! setting that variable to t, or if the argument is
     #! prefixed with 'no-', setting the variable to f.
-    dup "no-" str-head? dup [
-        f put drop
+    #!
+    #! Arguments containing = are handled differently; they
+    #! set the object path.
+    "=" split1 dup [
+        cli-var-param
     ] [
-        drop t put
+        drop dup "no-" str-head? dup [
+            f put drop
+        ] [
+            drop t put
+        ] ifte
     ] ifte ;
 
 : cli-arg ( argument -- argument )

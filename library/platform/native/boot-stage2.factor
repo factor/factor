@@ -158,6 +158,10 @@ cpu "x86" = [
         "/library/compiler/alien-types.factor"
         "/library/compiler/alien-macros.factor"
         "/library/compiler/alien.factor"
+        
+        "/library/sdl/sdl.factor"
+        "/library/sdl/sdl-video.factor"
+        "/library/sdl/sdl-event.factor"
     ] [
         dup print
         run-resource

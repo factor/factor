@@ -42,3 +42,14 @@ unit-test
 [ f ]
 [ <namespace> [ f "some-global" set "some-global" get ] bind ]
 unit-test
+
+[
+    5 [ "test" "object" "path" ] set-object-path
+    [ 5 ] [ [ "test" "object" "path" ] object-path ] unit-test
+
+    7 [ "test" "object" "pathe" ] set-object-path
+    [ 7 ] [ [ "test" "object" "pathe" ] object-path ] unit-test
+
+    9 [ "teste" "object" "pathe" ] set-object-path
+    [ 9 ] [ [ "teste" "object" "pathe" ] object-path ] unit-test
+] with-scope
