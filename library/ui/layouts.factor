@@ -54,11 +54,7 @@ M: pile pref-size ( pile -- w h )
     dup pile-gap swap w/h swapd layout-run drop >r greatest r> ;
 
 M: pile layout* ( pile -- )
-    dup pile-gap over gadget-children run-heights >r >r
-    dup gadget-children max-width r> pick resize-gadget
-    dup gadget-children r> zip [
-        uncons horizontal-layout
-    ] each-with ;
+    drop ;
 
 ! A shelf is a box that lays out its contents horizontally.
 TUPLE: shelf gap align fill delegate ;

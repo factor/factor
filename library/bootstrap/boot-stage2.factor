@@ -74,13 +74,13 @@ cpu "x86" = "mini" get not and [
     "/library/io/network.factor"
     "/library/io/logging.factor"
     "/library/io/stdio-binary.factor"
-    "/library/io/ansi.factor"
     
     "/library/syntax/see.factor"
     
     "/library/eval-catch.factor"
     "/library/tools/memory.factor"
     "/library/tools/listener.factor"
+    "/library/io/ansi.factor"
     "/library/tools/word-tools.factor"
     "/library/test/test.factor"
     "/library/inference/test.factor"
