@@ -123,7 +123,9 @@ M: line shape-y dup line-y dup rot line-h + min ;
 M: line shape-w line-w abs ;
 M: line shape-h line-h abs ;
 
-: line-pos ( line -- #{ x y }# ) dup line-x swap line-y rect> ;
+: line-pos ( line -- #{ x y }# )
+    dup line-x x get + swap line-y y get + rect> ;
+
 : line-dir ( line -- #{ w h }# ) dup line-w swap line-h rect> ;
 
 : move-line-x ( x line -- )
@@ -159,11 +161,11 @@ M: line resize-shape ( w h line -- )
 : line>screen ( shape -- x1 y1 x2 y2 )
     [ line-x x get + ] keep
     [ line-y y get + ] keep
-    [ dup line-w swap line-x + pick + ] keep
-    dup line-h swap line-y + pick + ; 
+    [ line-w pick + ] keep
+    line-h pick + ; 
 
 : line-inside? ( p d -- ? )
-    dupd proj - absq 2 < ;
+    dupd proj - absq 4 < ;
 
 M: line inside? ( point line -- ? )
     2dup inside-rect? [

@@ -42,19 +42,16 @@ USE: words
         [[ [ button-up 1 ] [ my-hand shape-x my-hand shape-y pick move-gadget world get add-gadget ] ]]
     }} swap set-gadget-gestures ;
 
+: filled? "filled" get checkbox-selected? ;
+
 : <funny-rect>
-    <plain-rect> <gadget> dup moving-actions ;
+    filled? [ <plain-rect> ] [ <hollow-rect> ] ifte <gadget> dup moving-actions ;
 
 : <funny-ellipse>
-    <plain-ellipse> <gadget> dup moving-actions ;
+    filled? [ <plain-ellipse> ] [ <hollow-ellipse> ] ifte <gadget> dup moving-actions ;
 
 : <funny-line>
     <line> <gadget> dup moving-actions ;
-
-: check-box ( label -- checkbox )
-    0 0 0 0 <rectangle> <shelf>
-    [ >r <label> r> add-gadget ] keep
-    [ >r f bevel-border r> add-gadget ] keep ;
 
 : make-shapes ( -- )
     f world get set-gadget-children
@@ -65,7 +62,7 @@ USE: words
     "New Rectangle" [ drop 100 100 100 100 <funny-rect> dup [ 255 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
     "New Ellipse" [ drop 100 100 200 100 <funny-ellipse> dup [ 0 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
     "New Line" [ drop 100 100 200 100 <funny-line> dup [ 255 0 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
-    "A check box" [ drop ] <check-box> "shelf" get add-gadget
+    "Filled?" <checkbox> dup "filled" set "shelf" get add-gadget
     "shelf" get "pile" get add-gadget
     "Welcome to Factor " version cat2 <label> "pile" get add-gadget
 

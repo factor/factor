@@ -63,3 +63,11 @@ USING: gadgets kernel lists math namespaces test ;
 [ 30 ] [ 110 110 -100 -200 <line> [ 20 30 rot move-shape ] keep shape-y ] unit-test
 [ 10 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-x ] unit-test
 [ 400 ] [ 110 110 -100 -200 <line> [ 400 400 rot resize-shape ] keep shape-w ] unit-test
+
+[ t ] [
+    [
+        100 x set
+        100 y set
+        #{ 110 115 }# << line 0 0 100 150 >> inside?
+    ] with-scope
+] unit-test

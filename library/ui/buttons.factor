@@ -51,12 +51,32 @@ USING: generic kernel lists math namespaces sdl ;
 : <button> ( label quot -- button )
     >r <label> bevel-border dup r> button-actions ;
 
-: <cross> ( w h -- cross )
+: <check> ( w h -- cross )
     2dup >r >r 0 0 r> r> <line> <gadget>
-    >r tuck neg >r >r >r 0 r> r> r> <line> <gadget> r> 2list <stack> ;
+    >r tuck neg >r >r >r 0 r> r> r> <line> <gadget> r>
+    2list <stack> ;
 
-: <check-box> ( label quot -- checkbox )
-    >r 0 0 0 0 <rectangle> <shelf>
+TUPLE: checkbox bevel selected? delegate ;
+
+: init-checkbox-bevel ( bevel checkbox -- )
+    2dup set-checkbox-bevel add-gadget ;
+
+: update-checkbox ( checkbox -- )
+    #! Really, there should only be one child.
+    dup checkbox-bevel gadget-children [ unparent ] each
+    dup checkbox-selected? [
+        11 11 <check>
+    ] [
+        0 0 11 11 <rectangle> <gadget>
+    ] ifte swap checkbox-bevel add-gadget ;
+
+: toggle-checkbox ( checkbox -- )
+    dup checkbox-selected? not over set-checkbox-selected?
+    update-checkbox ;
+
+C: checkbox ( label -- checkbox )
+    0 0 0 0 <rectangle> <shelf> over set-checkbox-delegate
     [ >r <label> r> add-gadget ] keep
-    [ >r 11 11 <cross> bevel-border r> add-gadget ] keep dup
-    r> button-actions ;
+    [ f bevel-border swap init-checkbox-bevel ] keep
+    dup [ toggle-checkbox ] button-actions
+    dup update-checkbox ;
