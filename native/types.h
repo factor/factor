@@ -34,6 +34,8 @@ CELL T;
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 
+#define TYPE_COUNT 17
+
 /* Pseudo-types. For error reporting only. */
 #define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
 #define RATIONAL_TYPE 101 /* INTEGER or RATIO */

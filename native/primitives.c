@@ -190,7 +190,8 @@ XT primitives[] = {
 	primitive_alien_2,
 	primitive_set_alien_2,
 	primitive_alien_1,
-	primitive_set_alien_1
+	primitive_set_alien_1,
+	primitive_heap_stats
 };
 
 CELL primitive_to_xt(CELL primitive)

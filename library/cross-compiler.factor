@@ -73,6 +73,7 @@ DEFER: type-of
 DEFER: size-of
 DEFER: address-of
 DEFER: dump
+DEFER: heap-stats
 
 IN: strings
 DEFER: str=
@@ -376,6 +377,7 @@ IN: image
         set-alien-2
         alien-1
         set-alien-1
+        heap-stats
     ] [
         swap succ tuck primitive,
     ] each drop ;
