@@ -96,9 +96,8 @@ SYMBOL: entry-effect
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
-    dup car ensure-d
     swap "infer" word-property dup [
-        nip call
+        swap car ensure-d call
     ] [
         drop consume/produce
     ] ifte ;
@@ -118,13 +117,34 @@ SYMBOL: entry-effect
         base-case off  effect entry-effect set
     ] extend ;
 
+: init-inference ( recursive-state -- )
+    init-interpreter
+    0 d-in set
+    0 r-in set
+    recursive-state set ;
+
 DEFER: (infer)
+
+: with-recursive-state ( word quot -- )
+    over <recursive-state> cons recursive-state cons@
+    call
+    recursive-state uncons@ drop ;
+
+: recursive-infer ( quot -- )
+    [
+        recursive-state get init-inference
+        (infer)  effect
+    ] with-scope ;
 
 : apply-compound ( word -- )
     #! Infer a compound word's stack effect.
-    dup <recursive-state> cons recursive-state cons@
-    word-parameter (infer)
-    recursive-state uncons@ drop ;
+    [
+        word-parameter [
+            recursive-infer consume/produce
+        ] [
+            [ (infer) ] when
+        ] catch
+    ] with-recursive-state ;
 
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.
@@ -183,12 +203,6 @@ DEFER: (infer)
     ] [
         push-d
     ] ifte ;
-
-: init-inference ( -- )
-    init-interpreter
-    0 d-in set
-    0 r-in set
-    f recursive-state set ;
 
 : (infer) ( quot -- )
     #! Recursive calls to this word are made for nested
@@ -290,7 +304,11 @@ DEFER: (infer)
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
-    [ init-inference (infer)  effect ] with-scope ;
+    [ f init-inference (infer)  effect ] with-scope ;
+
+: try-infer ( quot -- effect/f )
+    #! Push f if inference fails.
+    [ infer ] [ [ drop f ] when ] catch ;
 
 : meta-infer ( word -- )
     #! Mark a word as being partially evaluated.
@@ -309,13 +327,22 @@ DEFER: (infer)
 \ r> [ pop-r push-d ] "infer" set-word-property
 
 \ drop meta-infer
+\ 2drop meta-infer 
+\ 3drop meta-infer
 \ dup meta-infer
+\ 2dup meta-infer
+\ 3dup meta-infer
 \ swap meta-infer
 \ over meta-infer
 \ pick meta-infer
 \ nip meta-infer
 \ tuck meta-infer
 \ rot meta-infer
+\ -rot meta-infer
+\ 2nip meta-infer
+\ transp meta-infer
+\ dupd meta-infer
+\ swapd meta-infer
 
 \ + [ 2 | 1 ] "infer-effect" set-word-property
 \ - [ 2 | 1 ] "infer-effect" set-word-property

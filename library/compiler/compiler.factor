@@ -221,4 +221,6 @@ SYMBOL: compile-callstack
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
 
-: compiled word compile ; parsing
+: compiled
+    #! Compile the most recently defined word.
+    word compile ; parsing

@@ -76,28 +76,28 @@ USE: vectors
     dup cons? [ tail ] when not ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    rot [ >r cons r> ] [ swapd cons ] ifte ; inline
+    rot [ swapd cons ] [ >r cons r> ] ifte ; inline
 
-: partition-step ( list combinator -- cdr combinator car ? )
-    over car over call >r >r unswons r> swap r> ; inline
+: partition-step ( ref list combinator -- ref cdr combinator car ? )
+    pick pick car pick call >r >r unswons r> swap r> ; inline
 
-: (partition) ( list combinator ret1 ret2 -- ret1 ret2 )
+: (partition) ( ref list combinator ret1 ret2 -- ret1 ret2 )
     >r >r  over [
         partition-step  r> r> partition-add  (partition)
     ] [
-        2drop  r> r>
+        3drop  r> r>
     ] ifte ; inline
 
-: partition ( list ref combinator -- list1 list2 )
+: partition ( ref list combinator -- list1 list2 )
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
-    cons [ ] [ ] (partition) ; inline
+    [ ] [ ] (partition) ; inline
 
 : sort ( list comparator -- sorted )
     #! To sort in ascending order, comparator must have stack
     #! effect ( x y -- x>y ).
     over [
-        ( Partition ) [ >r uncons over r> partition ] keep
+        ( Partition ) [ >r uncons dupd r> partition ] keep
         ( Recurse ) [ sort swap ] keep sort
         ( Combine ) swapd cons append
     ] [

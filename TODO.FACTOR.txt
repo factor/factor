@@ -62,11 +62,9 @@
 - nicer way to combine two paths
 - catchstack lists
 - OOP
-- refactor sort
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for
   objects
-- use keep instead of tuck, try to remove usages of transp
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link
 - prettyprinter should output {{ ... }} syntax for hashtables
