@@ -44,7 +44,8 @@ USE: generic
 ! - infer - quotation with custom inference behavior; ifte uses
 ! this. Word is passed on the stack.
 
-! Amount of results we had to add to the datastack
+! Vector of results we had to add to the datastack. Ie, the
+! inputs.
 SYMBOL: d-in
 
 ! Recursive state. Alist maps words to hashmaps...
@@ -67,6 +68,7 @@ SYMBOL: save-effect
 GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class ( value -- class )
+GENERIC: value-class-and ( class value -- )
 
 TRAITS: computed
 C: computed ( class -- value )
@@ -80,6 +82,8 @@ M: computed value= ( literal value -- ? )
     2drop f ;
 M: computed value-class ( value -- class )
     [ \ value-class get ] bind ;
+M: computed value-class-and ( class value -- )
+    [ \ value-class [ class-and ] change ] bind ;
 
 TRAITS: literal
 C: literal ( obj rstate -- value )
@@ -90,9 +94,26 @@ M: literal value= ( literal value -- ? )
     literal-value = ;
 M: literal value-class ( value -- class )
     literal-value class ;
+M: literal value-class-and ( class value -- )
+    value-class class-and drop ;
 
 : value-recursion ( value -- rstate )
     [ recursive-state get ] bind ;
+
+: (ensure-types) ( typelist n stack -- )
+    pick [
+        3dup >r >r car r> r> vector-nth value-class-and
+        >r >r cdr r> succ r> (ensure-types)
+    ] [
+        3drop
+    ] ifte ;
+
+: ensure-types ( typelist stack -- )
+    dup vector-length pick length - dup 0 < [
+        swap >r neg tail 0 r>
+    ] [
+        swap
+    ] ifte (ensure-types) ;
 
 : required-inputs ( typelist stack -- values )
     >r dup length r> vector-length - dup 0 > [
@@ -105,17 +126,22 @@ M: literal value-class ( value -- class )
     >r list>vector dup r> vector-append ;
 
 : ensure-d ( typelist -- )
+    dup meta-d get ensure-types
     meta-d get required-inputs dup
     meta-d [ vector-prepend ] change
     d-in [ vector-prepend ] change ;
 
-: effect ( -- [ in | out ] )
+: effect ( -- [ in-types out-types ] )
     #! After inference is finished, collect information.
-    d-in get vector-length meta-d get vector-length cons ;
+    d-in get [ value-class ] vector-map vector>list
+    meta-d get [ value-class ] vector-map vector>list 2list ;
+
+: old-effect ( [ in-types out-types ] | [ in | out ] )
+    uncons car length >r length r> cons ;
 
 : <recursive-state> ( -- state )
     <namespace> [
-        base-case off  effect entry-effect set
+        base-case off  effect old-effect entry-effect set
     ] extend ;
 
 : init-inference ( recursive-state -- )
@@ -194,10 +220,3 @@ DEFER: apply-word
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
     [ (infer) get-dataflow ] with-scope ;
-
-: type-infer ( quot -- [ in-types out-types ] )
-    [
-        (infer)
-        d-in get [ value-class ] vector-map vector>list
-        meta-d get [ value-class ] vector-map vector>list 2list
-    ] with-scope ;

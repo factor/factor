@@ -90,3 +90,5 @@ C: ansi-stream ( stream -- stream )
     #! ansi-fg - foreground color
     #! ansi-bg - background color
     [ delegate set ] extend ;
+
+global [ [ <ansi-stream> ] smart-term-hook set ] bind

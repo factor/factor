@@ -150,7 +150,7 @@ void primitive_string_nth(void)
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= string->capacity)
-		range_error(tag_object(string),0,to_fixnum(index),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
@@ -271,7 +271,7 @@ void primitive_index_of(void)
 	index = to_fixnum(dpop());
 	if(index < 0 || index > string->capacity)
 	{
-		range_error(tag_object(string),0,to_fixnum(index),string->capacity);
+		range_error(tag_object(string),0,tag_fixnum(index),string->capacity);
 		result = -1; /* can't happen */
 	}
 	else if(TAG(ch) == FIXNUM_TYPE)

@@ -27,7 +27,6 @@
 
 IN: kernel
 USE: ansi
-USE: win32-console
 USE: alien
 USE: compiler
 USE: errors
@@ -60,14 +59,11 @@ USE: unparser
     ! -no-<flag> CLI switch
     t "user-init" set
     t "interactive" set
-    ! We don't want ANSI escape codes on Windows
-    os "unix" = "ansi" set
     t "compile" set
+    t "smart-terminal" set
 
     ! The first CLI arg is the image name.
     cli-args uncons parse-command-line "image" set
-
-    "ansi" get [ stdio [ <ansi-stream> ] change ] when
 
     os "win32" = "compile" get and [
         "kernel32" "kernel32.dll" "stdcall" add-library
@@ -78,8 +74,8 @@ USE: unparser
 
     "compile" get [ compile-all ] when
 
-    os "win32" = "compile" get and [ 
-        stdio [ <win32-console-stream> ] change 
+    "smart-terminal" get [
+        stdio smart-term-hook get change 
     ] when
 
     run-user-init ;

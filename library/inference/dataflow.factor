@@ -95,7 +95,7 @@ SYMBOL: node-param
     meta-d get vector-tail* node-consume-d set ;
 
 : dataflow-inputs ( in node -- )
-    [ dup cons? [ length ] when 0 node-inputs ] bind ;
+    [ dup list? [ length ] when 0 node-inputs ] bind ;
 
 : node-outputs ( d-count r-count -- )
     #! Execute in the node's namespace.
@@ -103,7 +103,7 @@ SYMBOL: node-param
     meta-d get vector-tail* node-produce-d set ;
 
 : dataflow-outputs ( out node -- )
-    [ dup cons? [ length ] when 0 node-outputs ] bind ;
+    [ dup list? [ length ] when 0 node-outputs ] bind ;
 
 : get-dataflow ( -- IR )
     dataflow-graph get reverse ;

@@ -54,14 +54,13 @@ USE: hashtables
     #! shorter, pad it with unknown results at the bottom.
     dup longest-vector swap [ dupd add-inputs nip ] map nip ;
 
-: unify-results ( obj obj -- obj )
+: unify-classes ( value value -- value )
+    value-class swap value-class class-or <computed> ;
+
+: unify-results ( value value -- value )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
-    2dup = [
-        drop
-    ] [
-        value-class swap value-class class\/ <computed>
-    ] ifte ;
+    2dup = [ drop ] [ unify-classes ] ifte ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
@@ -125,7 +124,7 @@ USE: hashtables
     #! Set base case if inference didn't fail.
     [
         f infer-branch [
-            effect recursive-state get set-base
+            effect old-effect recursive-state get set-base
         ] bind
     ] [
         [ drop ] when

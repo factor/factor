@@ -126,13 +126,13 @@ M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
 
-[ object ] [ object object class/\ ] unit-test
-[ fixnum ] [ fixnum object class/\ ] unit-test
-[ fixnum ] [ object fixnum class/\ ] unit-test
-[ fixnum ] [ fixnum fixnum class/\ ] unit-test
-[ fixnum ] [ fixnum integer class/\ ] unit-test
-[ fixnum ] [ integer fixnum class/\ ] unit-test
-[ vector fixnum class/\ ] unit-test-fails
-[ integer ] [ fixnum bignum class\/ ] unit-test
-[ integer ] [ fixnum integer class\/ ] unit-test
-[ rational ] [ ratio integer class\/ ] unit-test
+[ object ] [ object object class-and ] unit-test
+[ fixnum ] [ fixnum object class-and ] unit-test
+[ fixnum ] [ object fixnum class-and ] unit-test
+[ fixnum ] [ fixnum fixnum class-and ] unit-test
+[ fixnum ] [ fixnum integer class-and ] unit-test
+[ fixnum ] [ integer fixnum class-and ] unit-test
+[ vector fixnum class-and ] unit-test-fails
+[ integer ] [ fixnum bignum class-or ] unit-test
+[ integer ] [ fixnum integer class-or ] unit-test
+[ rational ] [ ratio integer class-or ] unit-test

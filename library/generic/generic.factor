@@ -162,13 +162,13 @@ SYMBOL: object
 : type-union ( list list -- list )
     append prune [ > ] sort ;
 
-: class\/ ( class class -- class )
+: class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
     swap builtin-supertypes
     swap builtin-supertypes
     type-union classes get hash [ object ] unless* ;
 
-: class/\ ( class class -- class )
+: class-and ( class class -- class )
     #! Return a class that is a subclass of both, or raise an
     #! error if this is impossible.
     over builtin-supertypes

@@ -43,9 +43,10 @@ USE: prettyprint
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
-    >r dup car dup cons? [ [ drop object ] project ] unless ensure-d >r dataflow, r> r> rot
+    >r dup car dup list? [ [ drop object ] project ] unless ensure-d
+    >r dataflow, r> r> rot
     [ pick car swap dataflow-inputs ] keep
-    pick 2slip cdr swap
+    pick 2slip cdr dup cons? [ car ] when swap
     dataflow-outputs ; inline
 
 : consume-d ( typelist -- )
@@ -56,7 +57,7 @@ USE: prettyprint
 
 : (consume/produce) ( param op effect -- )
     [
-        dup cdr cons? [
+        dup cdr list? [
             ( new style )
             unswons consume-d car produce-d
         ] [
@@ -65,18 +66,18 @@ USE: prettyprint
         ] ifte
     ] with-dataflow ;
 
-: consume/produce ( word [ in | out ] -- )
+: consume/produce ( word [ in-types out-types ] -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
     #call swap (consume/produce) ;
 
-: apply-effect ( word [ in | out ] -- )
+: apply-effect ( word [ in-types out-types ] -- )
     #! If a word does not have special inference behavior, we
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
     over "infer" word-property dup [
-        swap car dup cons? [ [ drop object ] project ] unless ensure-d call drop
+        swap car dup list? [ [ drop object ] project ] unless ensure-d call drop
     ] [
         drop consume/produce
     ] ifte ;

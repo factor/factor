@@ -70,3 +70,6 @@ M: stdio-stream fclose ( -- )
 
 C: stdio-stream ( delegate -- stream )
     [ delegate set ] extend ;
+
+! Set this to a quotation in init code, depending on OS.
+SYMBOL: smart-term-hook
