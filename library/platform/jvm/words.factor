@@ -3,6 +3,7 @@
 ! $Id$
 !
 ! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2004 Chris Double.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -101,3 +102,8 @@ USE: stack
 
 : compound>list ( worddef -- list )
     worddef>list dup [ skip-docs ] when ;
+
+: define-compound ( word def -- )
+    #! Define a compound word at runtime.
+    >r dup >r [ "vocabulary" get "name" get ] bind r> r>
+    <compound> define ;

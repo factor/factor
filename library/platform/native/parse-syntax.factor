@@ -81,7 +81,7 @@ USE: unparser
     #! End a word definition.
     nreverse
     "cross-compiling" get
-    [ compound, ] [ define ] ifte ; parsing
+    [ compound, ] [ define-compound ] ifte ; parsing
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing

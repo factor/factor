@@ -48,6 +48,12 @@ USE: stack
 : primitive? ( obj -- ? )
     dup word? [ word-primitive 1 = not ] [ drop f ] ifte ;
 
+: define-compound ( word def -- )
+    #! Define a compound word at runtime.
+    over set-word
+    over set-word-parameter
+    1 swap set-word-primitive ;
+
 ! Various features not supported by native Factor.
 : comment? drop f ;
 : worddef>list word-parameter ;
@@ -61,12 +67,3 @@ IN: kernel
 
 : set-word ( word -- )
     global [ "last-word" set ] bind ;
-
-IN: builtins
-
-: define ( word definition -- )
-    #! Unlike the Java interpreter primitive define, the
-    #! definition parameter is a list.
-    over set-word
-    over set-word-parameter
-    1 swap set-word-primitive ;

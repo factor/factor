@@ -78,6 +78,7 @@ USE: unparser
         "prettyprint"
         "inspector"
         "vectors"
+        "words"
         "unparser"
         "random"
         "math/bitops"
