@@ -68,7 +68,9 @@ USE: words
 : cons-tag     BIN: 010 ;
 : object-tag   BIN: 011 ;
 : rational-tag BIN: 100 ;
-: header-tag   BIN: 101 ;
+: complex-tag  BIN: 101 ;
+: header-tag   BIN: 110 ;
+: gc-fwd-ptr   BIN: 111 ; ( we don't output these )
 
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;

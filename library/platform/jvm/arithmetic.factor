@@ -63,7 +63,7 @@ USE: stack
     jinvoke-static ; inline
 
 : /mod ( a b -- a/b a%b )
-    2dup / >fixnum -rot mod ;
+    2dup /i -rot mod ;
 
 : > ( a b -- boolean )
     [ "java.lang.Number" "java.lang.Number" ]

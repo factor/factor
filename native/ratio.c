@@ -2,7 +2,7 @@
 
 RATIO* ratio(CELL numerator, CELL denominator)
 {
-	RATIO* ratio = (RATIO*)allot(sizeof(RATIO));
+	RATIO* ratio = allot(sizeof(RATIO));
 	ratio->numerator = numerator;
 	ratio->denominator = denominator;
 	return ratio;
@@ -26,7 +26,7 @@ void primitive_numerator(void)
 		env.dt = untag_ratio(env.dt)->numerator;
 		break;
 	default:
-		type_error(RATIO_TYPE,env.dt);
+		type_error(RATIONAL_TYPE,env.dt);
 		break;
 	}
 }
@@ -43,7 +43,7 @@ void primitive_denominator(void)
 		env.dt = untag_ratio(env.dt)->denominator;
 		break;
 	default:
-		type_error(RATIO_TYPE,env.dt);
+		type_error(RATIONAL_TYPE,env.dt);
 		break;
 	}
 }

@@ -60,20 +60,32 @@ void* allot_object(CELL type, CELL length)
 
 CELL object_size(CELL pointer)
 {
+	CELL size;
+
 	switch(TAG(pointer))
 	{
 	case CONS_TYPE:
-		return align8(sizeof(CONS));
+		size = sizeof(CONS);
+		break;
 	case WORD_TYPE:
-		return align8(sizeof(WORD));
+		size = sizeof(WORD);
+		break;
 	case RATIO_TYPE:
-		return align8(sizeof(RATIO));
+		size = sizeof(RATIO);
+		break;
+	case COMPLEX_TYPE:
+		size = sizeof(COMPLEX);
+		break;
 	case OBJECT_TYPE:
-		return untagged_object_size(UNTAG(pointer));
+		size = untagged_object_size(UNTAG(pointer));
+		break;
 	default:
 		critical_error("Cannot determine size",pointer);
-		return -1;
+		size = 0; /* Can't happen */
+		break;
 	}
+
+	return align8(size);
 }
 
 CELL untagged_object_size(CELL pointer)

@@ -36,21 +36,48 @@ FLOAT* ratio_to_float(CELL tagged)
 	return (FLOAT*)UNTAG(divfloat(r->numerator,r->denominator));
 }
 
-void primitive_numberp(void)
+bool realp(CELL tagged)
 {
-	check_non_empty(env.dt);
-
-	switch(type_of(env.dt))
+	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
 	case RATIO_TYPE:
 	case FLOAT_TYPE:
-		env.dt = T;
+		return true;
 		break;
 	default:
-		env.dt = F;
+		return false;
 		break;
+	}
+}
+
+bool numberp(CELL tagged)
+{
+	return realp(tagged) || type_of(tagged) == COMPLEX_TYPE;
+}
+
+void primitive_numberp(void)
+{
+	check_non_empty(env.dt);
+	env.dt = tag_boolean(numberp(env.dt));
+}
+
+bool zerop(CELL tagged)
+{
+	switch(type_of(tagged))
+	{
+	case FIXNUM_TYPE:
+		return tagged == 0;
+	case BIGNUM_TYPE:
+		return ((BIGNUM*)UNTAG(tagged))->n == 0;
+	case FLOAT_TYPE:
+		return ((FLOAT*)UNTAG(tagged))->n == 0.0;
+	case RATIO_TYPE:
+		return false;
+	default:
+		critical_error("Bad parameter to zerop",tagged);
+		return false; /* Can't happen */
 	}
 }
 
@@ -67,7 +94,7 @@ CELL to_integer(CELL tagged)
 		r = (RATIO*)UNTAG(tagged);
 		return divint(r->numerator,r->denominator);
 	default:
-		type_error(FIXNUM_TYPE,tagged);
+		type_error(INTEGER_TYPE,tagged);
 		return NULL; /* can't happen */
 	}
 }

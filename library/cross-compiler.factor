@@ -134,6 +134,11 @@ IN: cross-compiler
         float?
         str>float
         unparse-float
+        complex?
+        real
+        imaginary
+        >rect
+        rect>
         +
         -
         *

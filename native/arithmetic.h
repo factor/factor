@@ -35,14 +35,28 @@ CELL OP(CELL x, CELL y) \
 			return OP##_fixnum(x,y); \
 		case RATIO_TYPE: \
 			if(integerOnly) \
-				return OP(x,to_integer(y)); \
+			{ \
+				type_error(FIXNUM_TYPE,y); \
+				return F; \
+			} \
 			else \
 				return OP##_ratio((CELL)fixnum_to_ratio(x),y); \
+		case COMPLEX_TYPE: \
+			if(integerOnly) \
+			{ \
+				type_error(FIXNUM_TYPE,y); \
+				return F; \
+			} \
+			else \
+				return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
 			return OP##_bignum((CELL)fixnum_to_bignum(x),y); \
 		case FLOAT_TYPE: \
 			if(integerOnly) \
-				return OP(x,to_integer(y)); \
+			{ \
+				type_error(FIXNUM_TYPE,y); \
+				return F; \
+			} \
 			else \
 				return OP##_float((CELL)fixnum_to_float(x),y); \
 		default: \
@@ -55,28 +69,52 @@ CELL OP(CELL x, CELL y) \
 \
 	case RATIO_TYPE: \
 \
+		if(integerOnly) \
+		{ \
+			type_error(FIXNUM_TYPE,x); \
+			return F; \
+		} \
+\
 		switch(type_of(y)) \
 		{ \
 		case FIXNUM_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),y); \
-			else \
-				return OP##_ratio(x,(CELL)fixnum_to_ratio(y)); \
+			return OP##_ratio(x,(CELL)fixnum_to_ratio(y)); \
 		case RATIO_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),to_integer(y)); \
-			else \
-				return OP##_ratio(x,y); \
+			return OP##_ratio(x,y); \
+		case COMPLEX_TYPE: \
+			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),y); \
-			else \
-				return OP##_ratio(x,(CELL)bignum_to_ratio(y)); \
+			return OP##_ratio(x,(CELL)bignum_to_ratio(y)); \
 		case FLOAT_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),to_integer(y)); \
+			return OP##_float((CELL)ratio_to_float(x),y); \
+		default: \
+			if(anytype) \
+				return OP##_anytype(x,y); \
 			else \
-				return OP##_float((CELL)ratio_to_float(x),y); \
+				type_error(FIXNUM_TYPE,y); \
+			return F; \
+		} \
+\
+	case COMPLEX_TYPE: \
+\
+		if(integerOnly) \
+		{ \
+			type_error(FIXNUM_TYPE,x); \
+			return F; \
+		} \
+\
+		switch(type_of(y)) \
+		{ \
+		case FIXNUM_TYPE: \
+			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
+		case RATIO_TYPE: \
+			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
+		case COMPLEX_TYPE: \
+			return OP##_complex(x,y); \
+		case BIGNUM_TYPE: \
+			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
+		case FLOAT_TYPE: \
+			return OP##_complex(x,(CELL)complex(y,tag_fixnum(0))); \
 		default: \
 			if(anytype) \
 				return OP##_anytype(x,y); \
@@ -93,14 +131,28 @@ CELL OP(CELL x, CELL y) \
 			return OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
 		case RATIO_TYPE: \
 			if(integerOnly) \
-				return OP(x,to_integer(y)); \
+			{ \
+				type_error(BIGNUM_TYPE,y); \
+				return F; \
+			} \
 			else \
 				return OP##_ratio((CELL)bignum_to_ratio(x),y); \
+		case COMPLEX_TYPE: \
+			if(integerOnly) \
+			{ \
+				type_error(BIGNUM_TYPE,y); \
+				return F; \
+			} \
+			else \
+				return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
 			return OP##_bignum(x,y); \
 		case FLOAT_TYPE: \
 			if(integerOnly) \
-				return OP(x,to_integer(y)); \
+			{ \
+				type_error(BIGNUM_TYPE,y); \
+				return F; \
+			} \
 			else \
 				return OP##_float((CELL)bignum_to_float(x),y); \
 		default: \
@@ -112,34 +164,27 @@ CELL OP(CELL x, CELL y) \
 		} \
 \
 	case FLOAT_TYPE: \
-	 \
+\
+		if(integerOnly) \
+		{ \
+			type_error(FIXNUM_TYPE,x); \
+			return F; \
+		} \
+\
 		switch(type_of(y)) \
 		{ \
 		case FIXNUM_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),y); \
-			else \
-				return OP##_float(x,(CELL)fixnum_to_float(y)); \
+			return OP##_float(x,(CELL)fixnum_to_float(y)); \
 		case RATIO_TYPE: \
-			if(integerOnly) \
-				return OP(x,to_integer(y)); \
-			else \
-				return OP##_float(x,(CELL)ratio_to_float(y)); \
+			return OP##_float(x,(CELL)ratio_to_float(y)); \
+		case COMPLEX_TYPE: \
+			return OP##_complex((CELL)complex(x,tag_fixnum(0)),y); \
 		case BIGNUM_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),y); \
-			else \
-				return OP##_float(x,(CELL)bignum_to_float(y)); \
+			return OP##_float(x,(CELL)bignum_to_float(y)); \
 		case FLOAT_TYPE: \
-			if(integerOnly) \
-				return OP(to_integer(x),to_integer(y)); \
-			else \
-				return OP##_float(x,y); \
+			return OP##_float(x,y); \
 		default: \
-			if(anytype) \
-				return OP##_anytype(x,y); \
-			else \
-				type_error(FLOAT_TYPE,y); \
+			type_error(FLOAT_TYPE,y); \
 			return F; \
 		} \
 \
@@ -159,7 +204,11 @@ void primitive_##OP(void) \
 	env.dt = OP(x,y); \
 }
 
+bool realp(CELL tagged);
+bool numberp(CELL tagged);
 void primitive_numberp(void);
+
+bool zerop(CELL tagged);
 
 FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);

@@ -79,6 +79,7 @@ primitives,
     "/library/vocabulary-style.factor"
     "/library/words.factor"
     "/library/math/math-combinators.factor"
+    "/library/math/list-math.factor"
     "/library/math/namespace-math.factor"
     "/library/test/test.factor"
     "/library/platform/native/arithmetic.factor"

@@ -10,8 +10,9 @@
 #define CONS_TYPE 2
 #define OBJECT_TYPE 3
 #define RATIO_TYPE 4
-#define HEADER_TYPE 5
-#define GC_COLLECTED 6 /* See gc.c */
+#define COMPLEX_TYPE 5
+#define HEADER_TYPE 6
+#define GC_COLLECTED 7 /* See gc.c */
 
 /*** Header types ***/
 
@@ -34,6 +35,11 @@ CELL empty;
 #define HANDLE_TYPE 13
 #define BIGNUM_TYPE 14
 #define FLOAT_TYPE 15
+
+/* Pseudo-types. For error reporting only. */
+#define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
+#define RATIONAL_TYPE 101 /* INTEGER or RATIO */
+#define REAL_TYPE 102 /* RATIONAL or FLOAT */
 
 bool typep(CELL type, CELL tagged);
 CELL type_of(CELL tagged);

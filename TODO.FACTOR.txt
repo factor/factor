@@ -1,5 +1,8 @@
 + native:
 
+- printing floats: append .0 always
+- vector=
+- make-image: take a parameter, include le & be images in dist
 - do something about "base" variable -- too fragile
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
 - errors: don't show .factor-rc
