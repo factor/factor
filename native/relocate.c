@@ -26,6 +26,7 @@ void relocate_object()
 		break;
 	case PORT_TYPE:
 		fixup_port((PORT*)relocating);
+		break;
 	}
 
 	relocating += size;

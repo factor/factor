@@ -140,7 +140,8 @@ XT primitives[] = {
 	primitive_size_of,
 	primitive_profiling,
 	primitive_word_call_count,
-	primitive_set_word_call_count
+	primitive_set_word_call_count,
+	primitive_dump
 };
 
 CELL primitive_to_xt(CELL primitive)

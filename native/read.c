@@ -87,7 +87,7 @@ bool can_read_line(PORT* port)
 	pending_io_error(port);
 
 	if(port->type != PORT_READ && port->type != PORT_RECV)
-		general_error(ERROR_INCOMPATIBLE_PORT,port);
+		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
 	if(port->line_ready)
 		return true;
@@ -184,7 +184,7 @@ bool can_read_count(PORT* port, FIXNUM count)
 	pending_io_error(port);
 
 	if(port->type != PORT_READ && port->type != PORT_RECV)
-		general_error(ERROR_INCOMPATIBLE_PORT,port);
+		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
 	if(port->line != F && CAN_READ_COUNT(port,count))
 		return true;
@@ -237,7 +237,7 @@ void primitive_read_count_8(void)
 	PORT* port = untag_port(dpop());
 	FIXNUM len = to_fixnum(dpop());
 	if(port->count != len)
-		critical_error("read# counts don't match",port);
+		critical_error("read# counts don't match",tag_object(port));
 
 	pending_io_error(port);
 

@@ -2,17 +2,17 @@ typedef long long BIGNUM_2;
 
 typedef struct {
 	CELL header;
-/* FIXME */
-#ifndef FACTOR_64
-	CELL alignment;
-#endif
+	CELL capacity;
+	CELL sign;
+	CELL fill; /* bad */
 	BIGNUM_2 n;
 } BIGNUM;
 
 /* untagged */
 INLINE BIGNUM* allot_bignum()
 {
-	return allot_object(BIGNUM_TYPE,sizeof(BIGNUM));
+	/* Bignums are really retrofitted arrays */
+	return (BIGNUM*)allot_array(BIGNUM_TYPE,4);
 }
 
 /* untagged */

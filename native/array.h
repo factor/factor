@@ -10,9 +10,10 @@ INLINE ARRAY* untag_array(CELL tagged)
 	return (ARRAY*)UNTAG(tagged);
 }
 
+ARRAY* allot_array(CELL type, CELL capacity);
 ARRAY* array(CELL capacity, CELL fill);
-
 ARRAY* grow_array(ARRAY* array, CELL capacity, CELL fill);
+ARRAY* shrink_array(ARRAY* array, CELL capacity);
 
 #define AREF(array,index) ((CELL)array + sizeof(ARRAY) + index * CELLS)
 

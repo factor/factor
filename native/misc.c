@@ -42,3 +42,13 @@ void primitive_random_int(void)
 {
 	dpush(tag_object(bignum(random())));
 }
+
+void primitive_dump(void)
+{
+	/* Take an object, and print its memory. Later, return a vector */
+	CELL obj = dpop();
+	CELL size = object_size(obj);
+	int i;
+	for(i = 0; i < size; i += CELLS)
+		fprintf(stderr,"%x\n",get(UNTAG(obj) + i));
+}

@@ -1,10 +1,9 @@
 #include "factor.h"
 
 /* untagged */
-ARRAY* allot_array(CELL capacity)
+ARRAY* allot_array(CELL type, CELL capacity)
 {
-	ARRAY* array = allot_object(ARRAY_TYPE,
-		sizeof(ARRAY) + capacity * CELLS);
+	ARRAY* array = allot_object(type,sizeof(ARRAY) + capacity * CELLS);
 	array->capacity = capacity;
 	return array;
 }
@@ -14,7 +13,7 @@ ARRAY* array(CELL capacity, CELL fill)
 {
 	int i;
 
-	ARRAY* array = allot_array(capacity);
+	ARRAY* array = allot_array(ARRAY_TYPE, capacity);
 
 	for(i = 0; i < capacity; i++)
 		put(AREF(array,i),fill);
@@ -27,13 +26,20 @@ ARRAY* grow_array(ARRAY* array, CELL capacity, CELL fill)
 	/* later on, do an optimization: if end of array is here, just grow */
 	int i;
 
-	ARRAY* new_array = allot_array(capacity);
+	ARRAY* new_array = allot_array(untag_header(array->header),capacity);
 
 	memcpy(new_array + 1,array + 1,array->capacity * CELLS);
 
 	for(i = array->capacity; i < capacity; i++)
 		put(AREF(new_array,i),fill);
 
+	return new_array;
+}
+
+ARRAY* shrink_array(ARRAY* array, CELL capacity)
+{
+	ARRAY* new_array = allot_array(untag_header(array->header),capacity);
+	memcpy(new_array + 1,array + 1,capacity * CELLS);
 	return new_array;
 }
 

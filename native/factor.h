@@ -48,6 +48,8 @@ and allows profiling. */
 #include "word.h"
 #include "run.h"
 #include "fixnum.h"
+#include "s48_bignumint.h"
+#include "s48_bignum.h"
 #include "bignum.h"
 #include "ratio.h"
 #include "float.h"

@@ -163,7 +163,7 @@ CELL divfloat_complex(CELL x, CELL y)
 }
 
 #define INCOMPARABLE(x,y) general_error(ERROR_INCOMPARABLE, \
-	tag_cons(cons(tag_complex(x),tag_complex(y))));
+	tag_cons(cons(RETAG(x,COMPLEX_TYPE),RETAG(y,COMPLEX_TYPE))));
 
 CELL less_complex(CELL x, CELL y)
 {

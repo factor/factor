@@ -77,6 +77,7 @@ CELL untagged_object_size(CELL pointer)
 		size = CELLS * 2;
 		break;
 	case ARRAY_TYPE:
+	case BIGNUM_TYPE:
 		size = ASIZE(pointer);
 		break;
 	case VECTOR_TYPE:
@@ -87,9 +88,6 @@ CELL untagged_object_size(CELL pointer)
 		break;
 	case SBUF_TYPE:
 		size = sizeof(SBUF);
-		break;
-	case BIGNUM_TYPE:
-		size = sizeof(BIGNUM);
 		break;
 	case FLOAT_TYPE:
 		size = sizeof(FLOAT);
