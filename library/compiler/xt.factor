@@ -81,12 +81,11 @@ C: relative ( word -- )
 
 : relative ( word -- ) <relative> deferred-xts cons@ ;
 
-: relative-fixup ( relative -- addr where )
-    dup relative-word compiled-xt over relative-to -
-    swap relative-where ;
+: relative-fixup ( relative -- addr )
+    dup relative-word compiled-xt swap relative-to - ;
 
 M: relative fixup ( relative -- )
-    relative-fixup set-compiled-cell ;
+    dup relative-fixup swap relative-where set-compiled-cell ;
 
 TUPLE: absolute word where ;
 
@@ -101,23 +100,34 @@ M: absolute fixup ( absolute -- )
     dup absolute-word compiled-xt
     swap absolute-where set-compiled-cell ;
 
-TUPLE: relative-24 ;
+! Fixups where the address is inside a bitfield in the
+! instruction.
+TUPLE: relative-bitfld mask ;
 
-C: relative-24 ( word -- )
+C: relative-bitfld ( word mask -- )
+    [ set-relative-bitfld-mask ] keep
     [ >r <relative> r> set-delegate ] keep
     [ just-compiled swap set-relative-to ] keep ;
 
-: relative-24 ( word -- ) <relative-24> deferred-xts cons@ ;
+: relative-24 ( word -- )
+    BIN: 11111111111111111111111100 <relative-bitfld>
+    deferred-xts cons@ ;
 
-: check-24 ( addr -- )
+: relative-14 ( word -- )
+    BIN: 1111111111111100 <relative-bitfld>
+    deferred-xts cons@ ;
+
+: check-bitfld ( fixup -- )
     #! Check that the address can fit in a 24-bit wide address
     #! field, used by PowerPC instructions.
-    dup BIN: 11111111111111111111111100 bitand = [
+    dup relative-fixup dup rot relative-bitfld-mask bitand = [
         "Cannot jump further than 64 megabytes" throw
     ] unless ;
 
-M: relative-24 fixup
-    relative-fixup over check-24 [ compiled-cell bitor ] keep
+M: relative-bitfld fixup
+    dup check-bitfld
+    dup relative-fixup swap relative-where
+    [ compiled-cell bitor ] keep
     set-compiled-cell ;
 
 : compiling? ( word -- ? )

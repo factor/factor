@@ -26,20 +26,12 @@ math memory namespaces words ;
     ! jump w/ address added later
     0 JNE relative ;
 
-#jump-t-label [ compile-jump-t ] "generator" set-word-prop
-
-#jump-t [ compile-jump-t ] "generator" set-word-prop
-
 : compile-jump-f ( word -- )
     POP-DS
     ! condition is now in EAX
     EAX f address CMP
     ! jump w/ address added later
     0 JE relative ;
-
-#jump-f-label [ compile-jump-f ] "generator" set-word-prop
-
-#jump-f [ compile-jump-f ] "generator" set-word-prop
 
 #return-to [ 0 PUSH absolute ] "generator" set-word-prop
 

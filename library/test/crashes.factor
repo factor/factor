@@ -1,8 +1,6 @@
 IN: scratchpad
 
 ! Various things that broke CFactor at various times.
-! This should run without issue (and tests nothing useful)
-! in Java Factor
 USING: errors kernel lists math memory namespaces parser
 prettyprint strings test vectors words ;
 
@@ -57,3 +55,8 @@ prettyprint strings test vectors words ;
 
 ! ... and again
 [ "" 10 string/ ] [ . ] catch
+
+! Weird PowerPC bug.
+[ "4" throw ] [ drop ] catch
+garbage-collection
+garbage-collection

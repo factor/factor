@@ -76,3 +76,12 @@ DEFER: compile-jump-label ( label -- )
 #jump-label [
     compile-jump-label
 ] "generator" set-word-prop
+
+DEFER: compile-jump-t ( label -- )
+DEFER: compile-jump-f ( label -- )
+
+#jump-t-label [ compile-jump-t ] "generator" set-word-prop
+#jump-t [ compile-jump-t ] "generator" set-word-prop
+
+#jump-f-label [ compile-jump-f ] "generator" set-word-prop
+#jump-f [ compile-jump-f ] "generator" set-word-prop

@@ -14,22 +14,12 @@ USING: compiler errors kernel math memory words ;
 : POP-CS PEEK-CS 15 15 4 SUBI ;
 : PUSH-CS 18 15 4 STWU ;
 
-: w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;
-
-: immediate-literal ( obj -- )
-    #! PowerPC cannot load a 32 bit literal in one instruction.
-    address dup HEX: ffff <= [
-        18 LI
-    ] [
-        w>h/h 18 LIS  18 18 rot ORI
-    ] ifte ;
-
 #push-immediate [
-    immediate-literal  PUSH-DS
+     address 18 LOAD PUSH-DS
 ] "generator" set-word-prop
 
 #replace-immediate [
-    immediate-literal  REPL-DS
+     address 18 LOAD REPL-DS
 ] "generator" set-word-prop
 
 \ drop [ drop  14 14 4 SUBI ] "generator" set-word-prop

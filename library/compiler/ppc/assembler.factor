@@ -29,8 +29,12 @@ USING: errors kernel math memory words ;
 : ORI d-form 24 insn ;
 : BL 0 1 i-form 18 insn ;
 : B 0 0 i-form 18 insn ;
+: BC 0 0 b-form 16 insn ;
+: BNE 4 2 rot BC ;
 : BCLR 0 8 0 0 b-form 19 insn ;
 : BLR 20 BCLR ;
+: BCLRL 0 8 0 1 b-form 19 insn ;
+: BLRL 20 BCLRL ;
 : MFSPR 5 shift 339 xfx-form 31 insn ;
 : MFLR 8 MFSPR ;
 : MTSPR 5 shift 467 xfx-form 31 insn ;
@@ -38,3 +42,14 @@ USING: errors kernel math memory words ;
 : LWZ d-form 32 insn ;
 : STW d-form 36 insn ;
 : STWU d-form 37 insn ;
+: CMPI d-form 11 insn ;
+
+: w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;
+
+: LOAD ( n r -- )
+    #! PowerPC cannot load a 32 bit literal in one instruction.
+   >r dup dup HEX: ffff bitand = [
+        r> LI
+   ] [
+       w>h/h r> tuck LIS dup rot ORI
+   ] ifte ;

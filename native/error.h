@@ -19,8 +19,12 @@
 longjmps back to the top-level. */
 CELL thrown_error;
 CELL thrown_keep_stacks;
+/* Since longjmp restores registers, we must save all these values.
+On x86, only the first is in a register; on PowerPC, all are. */
 CELL thrown_ds;
 CELL thrown_cs;
+CELL thrown_callframe;
+CELL thrown_executing;
 
 void init_errors(void);
 void fatal_error(char* msg, CELL tagged);

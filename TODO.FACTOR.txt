@@ -50,6 +50,7 @@
 
 + kernel:
 
+- powerpc has weird callstack residue
 - vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
 - code gc

@@ -30,9 +30,15 @@ void run(void)
 		{
 			ds = thrown_ds;
 			cs = thrown_cs;
+			callframe = thrown_callframe;
+			executing = thrown_executing;
 		}
 		else
+		{
 			fix_stacks();
+			callframe = F;
+			executing = F;
+		}
 
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
