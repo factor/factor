@@ -36,7 +36,7 @@ import java.io.*;
 
 public class FactorInterpreter implements FactorObject, Runnable
 {
-	public static final String VERSION = "0.60.5";
+	public static final String VERSION = "0.60.6";
 
 	// we need to call two words (boot and break) from the kernel
 	// vocabulary
