@@ -1,3 +1,7 @@
++ native:
+
+- parsing: -1, HEX:, #\, |
+- minimal use/in for parse-stream
 - prettyprint-1
 - {...} vectors
 - better .s
@@ -10,9 +14,6 @@
 - contains ==> contains?
 - telnetd: send errors on socket
 - native 'see'
-
-+ native:
-
 - partition, sort
 - inspector: sort
 

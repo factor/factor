@@ -54,9 +54,6 @@ USE: stack
     #! If the quotation compiles, this combinator compiles.
     -rot >r >r call r> r> ; inline interpret-only
 
-: 3dip ( a b c quot -- )
-    swap >r swap >r swap >r call r> r> r> ;
-
 : forever ( code -- )
     #! The code is evaluated in an infinite loop. Typically, a
     #! continuation is used to escape the infinite loop.

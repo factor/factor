@@ -30,6 +30,7 @@ USE: combinators
 USE: continuations
 USE: kernel
 USE: inspector
+USE: logic
 USE: namespaces
 USE: stack
 USE: stdio
@@ -41,8 +42,8 @@ USE: unparser
 
 : parse-dump ( error -- )
     <%
-    "parse-name" get % ":" %
-    "line-number" get fixnum>str % ": " %
+    "parse-name" get [ "<interactive>" ] unless* % ":" %
+    "line-number" get [ 1 ] unless* fixnum>str % ": " %
     error>str %
     %> print
     
@@ -50,10 +51,12 @@ USE: unparser
     
     <% "pos" get " " fill % "^" % %> print ;
 
+: in-parser? ( -- ? )
+    "line" get "pos" get and ;
+
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
-    "parse-name" get [ parse-dump ] [ standard-dump ] ifte
-    terpri
+    in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
 
     "Stacks have been reset." print
     ":s :r :n :c show stacks at time of error." print

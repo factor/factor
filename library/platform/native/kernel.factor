@@ -91,6 +91,10 @@ USE: words
 : java? f ;
 : native? t ;
 
+! No compiler...
+: inline ;
+: interpret-only ;
+
 !!! HACK
 
 IN: strings

@@ -31,6 +31,7 @@ USE: combinators
 USE: errors
 USE: lists
 USE: namespaces
+USE: stack
 USE: stdio
 USE: streams
 
@@ -39,22 +40,24 @@ USE: streams
     "line-number" succ@ ;
 
 : (parse-stream) ( -- )
-    next-line [ print (parse-stream) ] when* ;
+    next-line [ (parse) (parse-stream) ] when* ;
+
+: <parse-stream ( name stream -- )
+    "parse-stream" set
+    "parse-name" set
+    0 "line-number" set ;
 
 : parse-stream ( name stream -- )
     <namespace> [
         [
-            "parse-stream" set
-            "parse-name" set
-            0 "line-number" set
-            f (parse-stream) nreverse
+            <parse-stream f (parse-stream) nreverse
         ] [
             "parse-stream" get fclose rethrow
         ] catch
     ] bind ;
 
 : parse-file ( file -- code )
-    "r" <file-stream> parse-stream ;
+    dup "r" <file-stream> parse-stream ;
 
 : run-file ( file -- )
     parse-file call ;

@@ -13,10 +13,7 @@ void primitive_open_file(void)
 {
 	char* mode = to_c_string(untag_string(env.dt));
 	char* path = to_c_string(untag_string(dpop()));
-	printf("fopen %s %s\n",path,mode);
 	FILE* file = fopen(path,mode);
-	if(file == 0)
-		printf("error %d\n",errno);
 	env.dt = handle(file);
 }
 
@@ -72,4 +69,5 @@ void primitive_close(void)
 {
 	HANDLE* h = untag_handle(env.dt);
 	fclose((FILE*)h->object);
+	env.dt = dpop();
 }

@@ -37,6 +37,7 @@ USE: stack
 USE: strings
 USE: words
 USE: vocabularies
+USE: unparser
 
 ! Number parsing
 
@@ -83,7 +84,7 @@ USE: vocabularies
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    ch "\"" str-contains? ;
+    ch "\"!" str-contains? ;
 
 : (scan) ( -- start end )
     skip-blank "pos" get
@@ -130,6 +131,9 @@ USE: vocabularies
 : until-eol ( ch -- str )
     "line" get str-length (until) ;
 
+: next-ch ( -- ch )
+    end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
+
 !!! Parsing words. 'builtins' is a stupid vocabulary name now
 !!! that it does not contain Java words anymore!
 
@@ -142,13 +146,6 @@ IN: builtins
 ! Lists
 : [ f ; parsing
 : ] nreverse swons ; parsing
-
-! Comments
-: ( ")" until drop ; parsing
-: ! until-eol drop ; parsing
-
-! String literal
-: " "\"" until swons ; parsing
     
 ! Colon defs
 : :
@@ -160,5 +157,42 @@ IN: builtins
     nreverse define ; parsing
 
 ! Vocabularies
+: DEFER: scan "in" get create drop ; parsing
 : USE: scan "use" cons@ ; parsing
 : IN: scan dup "use" cons@ "in" set ; parsing
+
+! \x
+: escape ( ch -- esc )
+    [
+        [ #\e | #\\e ]
+        [ #\n | #\\n ]
+        [ #\r | #\\r ]
+        [ #\t | #\\t ]
+        [ #\s | #\\s ]
+        [ #\\s | #\\s ]
+        [ #\0 | #\\0 ]
+        [ #\\\ | #\\\ ]
+        [ #\\" | #\\" ]
+    ] assoc ;
+
+! String literal
+
+: scan-escape ( -- )
+    next-ch escape dup [ % ] [ drop "Bad escape" throw ] ifte ;
+
+: scan-string ( -- )
+    next-ch dup #\" = [
+        drop
+    ] [
+        dup #\\\ = [ drop scan-escape ] [ % ] ifte scan-string
+    ] ifte ;
+
+: "
+    #! Note the ugly hack to carry the new value of 'pos' from
+    #! the <% %> scope up to the original scope.
+    <% scan-string "pos" get %> swap "pos" set swons ; parsing
+
+! Comments
+: ( ")" until drop ; parsing
+: ! until-eol drop ; parsing
+: #! until-eol drop ; parsing
