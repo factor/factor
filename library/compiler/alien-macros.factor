@@ -26,8 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
+USE: combinators
 USE: compiler
+USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: stack
 
@@ -43,9 +46,27 @@ USE: stack
     dlsym-self CALL drop
     28 ESP R+I ;
 
-: PARAMETERS ( list -- )
+: PARAMETERS ( params -- count )
     #! Generate code for boxing a list of C types.
-    [ c-type [ "unboxer" get ] bind UNBOX ] each ;
+    #! Return amount stack must be unwound by.
+    0 swap [
+        c-type [
+            "unboxer" get UNBOX "width" get cell align +
+        ] bind
+    ] each ;
+
+: CLEANUP ( amount -- )
+    dup 0 = [ drop ] [ ESP R+I ] ifte ;
 
 : RETURNS ( type -- )
-    c-type [ "boxer" get ] bind BOX ;
+    dup "void" = [
+        drop
+    ] [
+        c-type [ "boxer" get ] bind BOX
+    ] ifte ;
+
+: ALIEN-CALL ( return func dll params -- )
+    PARAMETERS >r
+    dlsym CALL drop
+    r> CLEANUP
+    RETURNS ;
