@@ -73,6 +73,16 @@ USE: lists
 
 [ [ 1 | 1 ] ] [ [ simple-recursion-2 ] infer ] unit-test
 
+: bad-recursion-1
+    dup [ drop bad-recursion-1 5 ] [ ] ifte ;
+
+[ [ bad-recursion-1 ] infer ] unit-test-fails
+
+: bad-recursion-2
+    dup [ uncons bad-recursion-2 ] [ ] ifte ;
+
+[ [ bad-recursion-2 ] infer ] unit-test-fails
+
 [ [ 2 | 1 ] ] [ [ 2list ] infer ] unit-test
 [ [ 3 | 1 ] ] [ [ 3list ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ append ] infer ] unit-test

@@ -130,6 +130,14 @@ DEFER: (infer)
     current-word word-name
     " does not have a base case." cat2 throw ;
 
+: check-recursion ( -- )
+    #! If at the location of the recursive call, we're taking
+    #! more items from the stack than producing, we have a
+    #! diverging recursion.
+    d-in get meta-d get vector-length > [
+        current-word word-name " diverges." cat2 throw
+    ] when ;
+
 : recursive-word ( word effect -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error.
@@ -139,7 +147,7 @@ DEFER: (infer)
     #! Apply the object's stack effect to the inferencer state.
     dup word? [
         dup recursive-state get assoc [
-            recursive-word
+            check-recursion recursive-word
         ] [
             apply-word
         ] ifte*

@@ -114,7 +114,7 @@ USE: stdio
     "/library/platform/native/heap-stats.factor"
     "/library/platform/native/gensym.factor"
     "/library/tools/interpreter.factor"
-    "/library/tools/inference.factor"
+!    "/library/tools/inference.factor"
 
     "/library/tools/image.factor"
     "/library/tools/cross-compiler.factor"
