@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors kernel lists math namespaces strings words
+USING: errors kernel lists math namespaces streams strings words
 unparser ;
 
 ! The parser uses a number of variables:
@@ -109,9 +109,9 @@ global [ string-mode off ] bind
 : save-location ( word -- )
     #! Remember where this word was defined.
     dup set-word
-    dup "line-number" get "line" set-word-property
+    dup line-number get "line" set-word-property
     dup "col" get "col"  set-word-property
-    "file" get "file" set-word-property ;
+    file get "file" set-word-property ;
 
 : create-in "in" get create ;
 

@@ -21,9 +21,18 @@ IN: kernel
     #! restore a and b after the quotation returns.
     over >r pick >r call r> r> ; inline
 
-: apply ( code input -- code output )
-    #! Apply code to input.
-    swap dup >r call r> swap ; inline
+: while ( quot generator -- )
+    #! Keep applying the quotation to the value produced by
+    #! calling the generator until the generator returns f.
+    2dup >r >r swap >r call dup [
+        r> call r> r> while
+    ] [
+        r> 2drop r> r> 2drop
+    ] ifte ; inline
+
+: apply ( code input -- code )
+    #! A utility word for recursive combinators.
+    swap dup slip ; inline
 
 : ifte* ( cond true false -- )
     #! If the condition is not f, execute the 'true' quotation,

@@ -150,6 +150,23 @@ SYMBOL: cloned
     r> swap #label dataflow, [ node-label set ] extend >r
     meta-r set meta-d set d-in set r> ;
 
+: with-block ( word [[ label quot ]] quot -- node )
+    #! Execute a quotation with the word on the stack, and add
+    #! its dataflow contribution to a new block node in the IR.
+    over [
+        >r
+        dupd cons
+        recursive-state cons@
+        r> call
+    ] (with-block) ;
+
+: infer-quot-value ( value -- )
+    gensym dup pick literal-value cons [
+        drop
+        dup value-recursion recursive-state set
+        literal-value dup infer-quot
+    ] with-block drop handle-terminator ;
+
 : boolean-value? ( value -- ? )
     #! Return if the value's boolean valuation is known.
     value-class
@@ -170,10 +187,7 @@ SYMBOL: cloned
     #! If the branch taken is statically known, just infer
     #! along that branch.
     dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
-    gensym [
-        dup value-recursion recursive-state set
-        literal-value infer-quot
-    ] (with-block) drop ;
+    infer-quot-value ;
 
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
@@ -207,15 +221,31 @@ SYMBOL: cloned
     0 recursive-state get <literal>
     [ set-value-literal-ties ] keep ;
 
+: static-dispatch? ( -- )
+    peek-d literal? branches-can-fail? not and ;
+
 USE: kernel-internals
-: infer-dispatch ( -- )
-    #! Infer effects for all branches, unify.
-    [ object vector ] ensure-d
-    dataflow-drop, pop-d vtable>list
+
+: static-dispatch ( vtable -- )
+    >r dataflow-drop, pop-d literal-value r>
+    dup literal-value swap value-recursion
+    >r vector-nth r> <literal> infer-quot-value ;
+
+: dynamic-dispatch ( vtable -- )
     >r 1 meta-d get vector-tail* \ dispatch r>
+    vtable>list 
     pop-d <dispatch-index>
     over length [ <literal-tie> ] project-with
     zip infer-branches ;
+
+: infer-dispatch ( -- )
+    #! Infer effects for all branches, unify.
+    [ object vector ] ensure-d
+    dataflow-drop, pop-d  static-dispatch? [
+        static-dispatch
+    ] [
+        dynamic-dispatch
+    ] ifte ;
 
 \ dispatch [ infer-dispatch ] "infer" set-word-property
 \ dispatch [ [ fixnum vector ] [ ] ]

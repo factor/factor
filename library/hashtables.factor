@@ -44,7 +44,7 @@ IN: hashtables
     dup hash-size 1 - swap set-hash-size ;
 
 : bucket-count ( hash -- n )
-    hash-array array-capacity ; inline
+    hash-array array-capacity ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.

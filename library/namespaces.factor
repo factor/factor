@@ -30,7 +30,7 @@ strings vectors ;
 
 : namespace ( -- namespace )
     #! Push the current namespace.
-    namestack car ; inline
+    namestack car ;
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.

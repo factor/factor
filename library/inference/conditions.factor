@@ -27,7 +27,11 @@ M: inference-error error. ( error -- )
     "Inference error: " inference-condition. ;
 
 : inference-warning ( msg -- )
-    \ inference-warning inference-condition error. ;
+    "inference-warnings" get [
+        \ inference-warning inference-condition error.
+    ] [
+        drop
+    ] ifte ;
 
 PREDICATE: cons inference-warning car \ inference-warning = ;
 M: inference-warning error. ( error -- )

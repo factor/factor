@@ -92,10 +92,16 @@ namespaces parser strings words vectors math math-internals ;
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-property [ single-combination ] = ;
+
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
     #! being coerced to a maximal type.
     >r arithmetic-type r> dispatch ; inline
+
+PREDICATE: compound 2generic ( word -- ? )
+    "combination" word-property [ arithmetic-combination ] = ;
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: classes

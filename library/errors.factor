@@ -1,12 +1,16 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel DEFER: callcc1
-IN: errors USING: kernel-internals lists namespaces ;
+IN: streams DEFER: line-number
+IN: parser DEFER: file
+IN: errors USING: kernel-internals lists namespaces streams ;
+
+TUPLE: undefined-method object generic ;
 
 : undefined-method ( object generic -- )
-    #! This word is redefined in tools/debugger.factor with a
-    #! more useful definition once unparse is available.
-    "No suitable method" throw ;
+    #! We 2dup here to leave both values on the stack, for
+    #! post-mortem inspection.
+    2dup <undefined-method> throw ;
 
 ! This is a very lightweight exception handling system.
 
@@ -22,8 +26,8 @@ IN: errors USING: kernel-internals lists namespaces ;
     namespace [
         "col" get
         "line" get
-        "line-number" get
-        "file" get
+        line-number get
+        file get
         global [
             "error-file" set
             "error-line-number" set

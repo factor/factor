@@ -3,7 +3,7 @@
 IN: stdio
 DEFER: stdio
 IN: streams
-USING: errors kernel namespaces strings generic lists ;
+USING: errors generic kernel lists math namespaces strings ;
 
 GENERIC: stream-flush      ( stream -- )
 GENERIC: stream-auto-flush ( stream -- )
@@ -53,3 +53,19 @@ C: wrapper-stream ( stream -- stream )
         >r <namespace> [ stdio set ] extend r>
         set-wrapper-stream-scope
     ] keep ;
+
+SYMBOL: line-number
+SYMBOL: parser-stream
+
+: next-line ( -- str )
+    parser-stream get stream-readln
+    line-number [ 1 + ] change ;
+
+: read-lines ( stream quot -- )
+    #! Apply a quotation to each line as its read. Close the
+    #! stream.
+    swap [
+        parser-stream set 0 line-number set [ next-line ] while
+    ] [
+        parser-stream get stream-close rethrow
+    ] catch ;

@@ -21,17 +21,11 @@ namespaces prettyprint stdio unparser vectors words ;
 
 ! Some words for iterating through the heap.
 
-: (each-object) ( quot -- )
-    next-object dup [
-        swap dup slip (each-object)
-    ] [
-        2drop
-    ] ifte ;
-
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.
     [
-        begin-scan (each-object)
+        begin-scan
+        [ next-object ] while
     ] [
         end-scan rethrow
     ] catch ;

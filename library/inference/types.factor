@@ -17,6 +17,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
     \ slot [ [ object ] [ object ] ] (consume/produce) ;
 
 : computed-slot ( -- )
+    "Computed slot access is slower" inference-warning
     \ slot dup "infer-effect" word-property consume/produce ;
 
 \ slot [
@@ -29,8 +30,11 @@ lists math namespaces strings vectors words stdio prettyprint ;
     [ tuck builtin-type <class-tie> cons ] project-with
     [ cdr class-tie-class ] subset ;
 
-\ type [
-    [ object ] ensure-d
+: literal-type ( -- )
+    dataflow-drop, pop-d value-class builtin-supertypes car
+    apply-literal ;
+
+: computed-type ( -- )
     \ type #call dataflow, [
         peek-d type-value-map >r
         1 0 node-inputs
@@ -38,5 +42,9 @@ lists math namespaces strings vectors words stdio prettyprint ;
         [ fixnum ] produce-d
         r> peek-d set-value-literal-ties
         1 0 node-outputs
-    ] bind
+    ] bind ;
+
+\ type [
+    [ object ] ensure-d
+    literal-type? [ literal-type ] [ computed-type ] ifte
 ] "infer" set-word-property

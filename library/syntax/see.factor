@@ -107,12 +107,18 @@ M: compound see ( word -- )
     prettyprint-;
     terpri ;
 
-M: generic see ( word -- )
-    dup prettyprint-IN:
+: see-generic ( word definer -- )
+    >r dup prettyprint-IN:
     0 swap
-    dup "definer" word-property prettyprint-word " " write
+    r> prettyprint-word " " write
     dup prettyprint-word terpri
     dup methods [ over >r uncons see-method r> ] each 2drop ;
+
+M: generic see ( word -- )
+    \ GENERIC: see-generic ;
+
+M: 2generic see ( word -- )
+    \ 2GENERIC: see-generic ;
 
 M: primitive see ( word -- )
     dup prettyprint-IN:

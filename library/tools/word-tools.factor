@@ -13,8 +13,14 @@ M: compound word-uses? ( of in -- ? )
     ] [
         word-parameter tree-contains?
     ] ifte ;
-M: generic word-uses? ( of in -- ? )
+
+: generic-uses? ( of in -- ? )
     "methods" word-property hash>alist tree-contains? ;
+
+M: generic word-uses? ( of in -- ? )
+    generic-uses? ;
+M: 2generic word-uses? ( of in -- ? )
+    generic-uses? ;
 
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.

@@ -36,29 +36,7 @@ USE: streams
 USE: strings
 
 ! Stream parsing uses a number of variables:
-! file
-! line-number
-! parse-stream
-
-: next-line ( -- str )
-    "parse-stream" get stream-readln
-    "line-number" [ 1 + ] change ;
-
-: (read-lines) ( quot -- )
-    next-line dup [
-        swap dup >r call r> (read-lines)
-    ] [
-        2drop
-    ] ifte ;
-
-: read-lines ( stream quot -- )
-    #! Apply a quotation to each line as its read. Close the
-    #! stream.
-    swap [
-        "parse-stream" set 0 "line-number" set (read-lines)
-    ] [
-        "parse-stream" get stream-close rethrow
-    ] catch ;
+SYMBOL: file
 
 : file-vocabs ( -- )
     "file-in" get "in" set
@@ -66,10 +44,10 @@ USE: strings
 
 : (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
-    >r "file" set f ( initial parse tree ) r>
+    >r file set f ( initial parse tree ) r>
     [ (parse) ] read-lines reverse
-    "file" off
-    "line-number" off ;
+    file off
+    line-number off ;
 
 : parse-stream ( name stream -- quot )
     [ file-vocabs (parse-stream) ] with-scope ;

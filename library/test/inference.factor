@@ -219,6 +219,14 @@ SYMBOL: sym-test
 [ [ [ object ] [ general-t ] ] ] [ [ dup [ drop t ] unless ] infer ] unit-test
 [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 [ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
+
+[ [ 5 car ] infer ] unit-test-fails
+
+GENERIC: potential-hang
+M: fixnum potential-hang dup [ potential-hang ] when ;
+
+[ ] [ [ 5 potential-hang ] infer drop ] unit-test
+
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
 ! [ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test

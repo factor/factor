@@ -13,7 +13,7 @@ USING: errors generic kernel math ;
         drop
     ] [
         (fraction>)
-    ] ifte ; inline
+    ] ifte ;
 
 : division-by-zero ( x y -- )
     "Division by zero" throw drop ;

@@ -121,9 +121,6 @@ M: computed literal-value ( value -- )
     #! After inference is finished, collect information.
     uncons vector-length >r vector-length r> cons ;
 
-: effect ( -- [[ d-in meta-d ]] )
-    d-in get meta-d get cons ;
-
 : init-inference ( recursive-state -- )
     init-interpreter
     0 <vector> d-in set
@@ -131,7 +128,7 @@ M: computed literal-value ( value -- )
     dataflow-graph off
     0 inferring-base-case set ;
 
-DEFER: apply-word
+GENERIC: apply-object
 
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
@@ -139,13 +136,19 @@ DEFER: apply-word
     dup recursive-state get <literal> push-d
     #push dataflow, [ 1 0 node-outputs ] bind ;
 
-: apply-object ( obj -- )
-    #! Apply the object's stack effect to the inferencer state.
-    dup word? [ apply-word ] [ apply-literal ] ifte ;
+M: object apply-object apply-literal ;
 
 : active? ( -- ? )
     #! Is this branch not terminated?
     d-in get meta-d get and ;
+
+: check-active ( -- )
+    active? [
+         "Provable runtime error" inference-error
+    ] unless ;
+
+: effect ( -- [[ d-in meta-d ]] )
+    d-in get meta-d get cons ;
 
 : terminate ( -- )
     #! Ignore this branch's stack effect.
@@ -184,6 +187,7 @@ DEFER: apply-word
 : (infer) ( quot -- )
     f init-inference
     infer-quot
+    check-active
     #return values-node check-return ;
 
 : infer ( quot -- [[ in out ]] )

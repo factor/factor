@@ -40,10 +40,10 @@ GENERIC: bitnot ( n -- n )
     #! by swapping them.
     2dup > [ swap ] when  >r dupd max r> min = ;
 
-: sq dup * ; inline
+: sq dup * ;
 
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
+: neg 0 swap - ;
+: recip 1 swap / ;
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.

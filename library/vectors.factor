@@ -27,7 +27,7 @@ IN: kernel-internals
 : grow-capacity ( len vec -- )
     #! If the vector cannot accomodate len elements, resize it
     #! to exactly len.
-    [ vector-array grow-array ] keep set-vector-array ; inline
+    [ vector-array grow-array ] keep set-vector-array ;
 
 : ensure-capacity ( n vec -- )
     #! If n is beyond the vector's length, increase the length,
@@ -41,7 +41,7 @@ IN: kernel-internals
         (set-vector-length)
     ] [
         2drop
-    ] ifte ; inline
+    ] ifte ;
 
 : copy-array ( to from n -- )
     [ 3dup swap array-nth pick rot set-array-nth ] repeat 2drop ;
@@ -95,7 +95,7 @@ IN: vectors
     #! vector with the results. The code must have stack effect
     #! ( obj -- obj ).
     over vector-length <vector> rot [
-        swap >r apply r> tuck vector-push
+        swap >r apply swap r> tuck vector-push
     ] vector-each nip ; inline
 
 : vector-nappend ( v1 v2 -- )

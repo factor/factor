@@ -126,9 +126,6 @@ void primitive_gc(void)
 
 	gc_in_progress = true;
 
-	fprintf(stderr,"GC\n");
-	fflush(stderr);
-
 	flip_zones();
 	scan = active.base;
 	collect_roots();

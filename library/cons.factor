@@ -11,19 +11,19 @@ BUILTIN: cons 2 [ 0 "car" f ] [ 1 "cdr" f ] ;
 : swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,
     #! has the effect of prepending the car to the cdr.
-    swap cons ; inline
+    swap cons ;
 
 : uncons ( [[ car cdr ]] -- car cdr )
     #! Push both the head and tail of a list.
-    dup car swap cdr ; inline
+    dup car swap cdr ;
 
 : unit ( a -- [ a ] )
     #! Construct a proper list of one element.
-    f cons ; inline
+    f cons ;
 
 : unswons ( [[ car cdr ]] -- cdr car )
     #! Push both the head and tail of a list.
-    dup cdr swap car ; inline
+    dup cdr swap car ;
 
 : 2car ( cons cons -- car car )
     swap car swap car ;

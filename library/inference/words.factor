@@ -29,29 +29,8 @@ strings vectors words hashtables parser prettyprint ;
     #! produces a number of values.
     #call swap (consume/produce) ;
 
-: apply-effect ( word [ in-types out-types ] -- )
-    #! If a word does not have special inference behavior, we
-    #! either execute the word in the meta interpreter (if it is
-    #! side-effect-free and all parameters are literal), or
-    #! simply apply its stack effect to the meta-interpreter.
-    over "infer" word-property [
-        swap car ensure-d call drop
-    ] [
-        consume/produce
-    ] ifte* ;
-
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 inference-error ;
-
-: with-block ( word [[ label quot ]] quot -- node )
-    #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new block node in the IR.
-    over [
-        >r
-        dupd cons
-        recursive-state cons@
-        r> call
-    ] (with-block) ;
 
 : recursive? ( word -- ? )
     dup word-parameter tree-contains? ;
@@ -94,18 +73,52 @@ M: compound (apply-word) ( word -- )
     dup "no-effect" word-property [
         no-effect
     ] [
-        dup "inline" word-property [
-            inline-compound 2drop
-        ] [
-            infer-compound
-        ] ifte
+        infer-compound
     ] ifte ;
-
-M: promise (apply-word) ( word -- )
-    "promise" word-property unit ensure-d ;
 
 M: symbol (apply-word) ( word -- )
     apply-literal ;
+
+GENERIC: apply-word
+
+: apply-default ( word -- )
+    dup "infer-effect" word-property [
+        over "infer" word-property [
+            swap car ensure-d call drop
+        ] [
+            consume/produce
+        ] ifte*
+    ] [
+        (apply-word)
+    ] ifte* ;
+
+M: word apply-word ( word -- )
+    apply-default ;
+
+M: compound apply-word ( word -- )
+    dup "inline" word-property [
+        inline-compound 2drop
+    ] [
+        apply-default
+    ] ifte ;
+
+: literal-type? ( -- ? )
+    peek-d value-class builtin-supertypes
+    dup length 1 = >r [ tuple ] = not r> and ;
+
+: dynamic-dispatch-warning ( word -- )
+    "Dynamic dispatch for " swap word-name cat2
+    inference-warning ;
+
+M: generic apply-word ( word -- )
+    #! If the type of the value at the top of the stack is
+    #! known, inline the method body.
+    [ object ] ensure-d
+    literal-type? branches-can-fail? not and [
+        inline-compound 2drop
+    ] [
+        dup dynamic-dispatch-warning apply-default
+    ] ifte ;
 
 : with-recursion ( quot -- )
     [
@@ -143,32 +156,24 @@ M: symbol (apply-word) ( word -- )
         ] ifte
     ] ifte ;
 
-: apply-word ( word -- )
+M: word apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
-        dup "infer-effect" word-property [
-            apply-effect
-        ] [
-            (apply-word)
-        ] ifte*
+        apply-word
     ] ifte* ;
 
 : infer-call ( -- )
     [ general-list ] ensure-d
-    dataflow-drop,
-    pop-d gensym dup pick literal-value cons [
-        drop
-        dup value-recursion recursive-state set
-        literal-value dup infer-quot
-    ] with-block drop handle-terminator ;
+    dataflow-drop, pop-d infer-quot-value ;
 
 \ call [ infer-call ] "infer" set-word-property
 
 ! These hacks will go away soon
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-property
+\ + [ [ number number ] [ number ] ] "infer-effect" set-word-property
 \ = [ [ object object ] [ object ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property

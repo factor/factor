@@ -7,7 +7,6 @@
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
-- optimize away dispatch
 - code gc
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole
@@ -15,6 +14,7 @@
 - more accurate types for various words
 - declarations
 - write read: write should flush
+- optimize away arithmetic dispatch
 
 + compiler/ffi:
 

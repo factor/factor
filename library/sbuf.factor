@@ -19,7 +19,7 @@ IN: strings USING: kernel lists math namespaces strings ;
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
     over str-length <sbuf> rot [
-        swap >r apply r> tuck sbuf-append
+        swap >r apply swap r> tuck sbuf-append
     ] str-each nip sbuf>str ; inline
 
 : split-next ( index string split -- next )
