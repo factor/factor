@@ -44,7 +44,8 @@ public abstract class WordListDialog extends EnhancedDialog
 	protected JButton ok, cancel;
 
 	//{{{ WordListDialog constructor
-	public WordListDialog(View view, FactorInterpreter interp, String title)
+	public WordListDialog(View view, FactorSideKickParser parser,
+		String title)
 	{
 		super(view,title,true);
 
@@ -56,7 +57,7 @@ public abstract class WordListDialog extends EnhancedDialog
 
 		content.add(BorderLayout.CENTER,new JScrollPane(
 			list = new JList()));
-		list.setCellRenderer(new FactorWordRenderer(interp,true));
+		list.setCellRenderer(new FactorWordRenderer(parser,true));
 
 		content.add(BorderLayout.SOUTH,createButtonPanel());
 	} //}}}

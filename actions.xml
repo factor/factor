@@ -48,7 +48,8 @@
 	</ACTION>
 	<ACTION NAME="factor-edit-dialog">
 		<CODE>
-			new EditWordDialog(view,FactorPlugin.getInterpreter());
+			new EditWordDialog(view,FactorPlugin
+				.getSideKickParser());
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-usages">

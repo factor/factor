@@ -43,10 +43,34 @@ USE: strings
     read1 8  shift bitor
     read1          bitor ;
 
+: byte7 ( num -- byte ) -56 shift HEX: ff bitand ;
+: byte6 ( num -- byte ) -48 shift HEX: ff bitand ;
+: byte5 ( num -- byte ) -40 shift HEX: ff bitand ;
+: byte4 ( num -- byte ) -32 shift HEX: ff bitand ;
 : byte3 ( num -- byte ) -24 shift HEX: ff bitand ;
 : byte2 ( num -- byte ) -16 shift HEX: ff bitand ;
 : byte1 ( num -- byte )  -8 shift HEX: ff bitand ;
 : byte0 ( num -- byte )           HEX: ff bitand ;
+
+: write-little-endian-64 ( word -- )
+    dup byte0 >char write
+    dup byte1 >char write
+    dup byte2 >char write
+    dup byte3 >char write
+    dup byte4 >char write
+    dup byte5 >char write
+    dup byte6 >char write
+        byte7 >char write ;
+
+: write-big-endian-64 ( word -- )
+    dup byte7 >char write
+    dup byte6 >char write
+    dup byte5 >char write
+    dup byte4 >char write
+    dup byte3 >char write
+    dup byte2 >char write
+    dup byte1 >char write
+        byte0 >char write ;
 
 : write-little-endian-32 ( word -- )
     dup byte0 >char write

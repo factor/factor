@@ -77,6 +77,7 @@ USE: parser
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math
+"/library/math/constants.factor"         run-resource ! math
 "/library/math/math.factor"              run-resource ! math
 "/library/math/pow.factor"               run-resource ! math
 "/library/math/trig-hyp.factor"          run-resource ! math

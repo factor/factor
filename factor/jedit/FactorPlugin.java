@@ -66,6 +66,13 @@ public class FactorPlugin extends EditPlugin
 		return interp;
 	} //}}}
 	
+	//{{{ getSideKickParser() method
+	public static FactorSideKickParser getSideKickParser()
+	{
+		return (FactorSideKickParser)ServiceManager.getService(
+			"sidekick.SideKickParser","factor");
+	} //}}}
+	
 	//{{{ eval() method
 	public static void eval(View view, String cmd)
 	{
@@ -261,7 +268,7 @@ public class FactorPlugin extends EditPlugin
 		else if(words.length == 1)
 			insertUse(view,words[0].vocabulary);
 		else
-			new InsertUseDialog(view,getInterpreter(),words);
+			new InsertUseDialog(view,getSideKickParser(),words);
 	} //}}}
 
 	//{{{ insertUse() method
@@ -279,17 +286,24 @@ public class FactorPlugin extends EditPlugin
 		for(int i = 0; i < buffer.getLineCount(); i++)
 		{
 			String text = buffer.getLineText(i).trim();
-			if(text.startsWith("IN:") || text.startsWith("USE:")
-				|| text.startsWith("!")
-				|| text.length() == 0)
+			if(text.startsWith("IN:") || text.startsWith("USE:"))
 			{
-				lastUseOffset = buffer.getLineStartOffset(i);
+				lastUseOffset = buffer.getLineEndOffset(i) - 1;
+			}
+			else if(text.startsWith("!") || text.length() == 0)
+			{
+				if(i == 0)
+					lastUseOffset = 0;
+				else
+					lastUseOffset = buffer.getLineEndOffset(i-1) - 1;
 			}
 			else
 				break;
 		}
 
-		String decl = "USE: " + vocab + "\n";
+		String decl = "USE: " + vocab;
+		if(lastUseOffset != 0)
+			decl = "\n" + decl;
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
 	} //}}}

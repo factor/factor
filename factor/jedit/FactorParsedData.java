@@ -34,13 +34,13 @@ import sidekick.*;
 
 public class FactorParsedData extends SideKickParsedData
 {
-	public FactorInterpreter interp;
+	public FactorSideKickParser parser;
 	public String in;
 	public Cons use;
 	
-	FactorParsedData(FactorInterpreter interp, String fileName)
+	FactorParsedData(FactorSideKickParser parser, String fileName)
 	{
 		super(fileName);
-		this.interp = interp;
+		this.parser = parser;
 	}
 }

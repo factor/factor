@@ -38,40 +38,40 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 {
 	//{{{ getWordHTMLString() method
 	public static String getWordHTMLString(FactorInterpreter interp,
-		FactorWord word, boolean showIn)
+		FactorWord word, FactorWordDefinition def, boolean showIn)
 	{
 		String prop = "factor.completion.plain";
 		String stackEffect = null;
 
-		if(word.def == null)
+		if(def == null)
 		{
 			if(word.parsing != null)
 				prop = "factor.completion.parsing";
 			else
 				prop = "factor.completion.defer";
 		}
-		else if(word.def instanceof FactorShuffleDefinition)
+		else if(def instanceof FactorShuffleDefinition)
 		{
 			prop = "factor.completion.shuffle";
 			StringBuffer buf = new StringBuffer();
-			Cons def = word.def.toList(interp);
-			while(def != null)
+			Cons d = def.toList(interp);
+			while(d != null)
 			{
 				if(buf.length() != 0)
 					buf.append(' ');
 
-				buf.append(def.car);
-				def = def.next();
+				buf.append(d.car);
+				d = d.next();
 			}
 			stackEffect = buf.toString();
 		}
 		else
 		{
-			Cons def = word.def.toList(interp);
-			if(def != null && def.car instanceof FactorDocComment)
+			Cons d = def.toList(interp);
+			if(d != null && d.car instanceof FactorDocComment)
 			{
 				FactorDocComment comment = (FactorDocComment)
-					def.car;
+					d.car;
 				if(comment.isStackComment())
 				{
 					prop = "factor.completion.stack";
@@ -100,13 +100,13 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			});
 	} //}}}
 
-	private FactorInterpreter interp;
+	private FactorSideKickParser parser;
 	private boolean showIn;
 
 	//{{{ FactorWordRenderer constructor
-	public FactorWordRenderer(FactorInterpreter interp, boolean showIn)
+	public FactorWordRenderer(FactorSideKickParser parser, boolean showIn)
 	{
-		this.interp = interp;
+		this.parser = parser;
 		this.showIn = showIn;
 	} //}}}
 
@@ -124,7 +124,11 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		if(!(value instanceof FactorWord))
 			return this;
 
-		setText(getWordHTMLString(interp,(FactorWord)value,showIn));
+		FactorWord word = (FactorWord)value;
+		setText(getWordHTMLString(parser.getInterpreter(),
+			word,
+			parser.getWordDefinition(word),
+			showIn));
 
 		return this;
 	} //}}}

@@ -37,7 +37,7 @@ void throw_error(CELL error)
 
 void general_error(CELL error, CELL tagged)
 {
-	CELL c = cons(error,tag_cons(cons(tagged,F)));
+	CELL c = cons(error,cons(tagged,F));
 	if(userenv[BREAK_ENV] == 0)
 	{
 		/* Crash at startup */
@@ -57,7 +57,7 @@ void general_error(CELL error, CELL tagged)
 
 void type_error(CELL type, CELL tagged)
 {
-	CELL c = cons(tag_fixnum(type),tag_cons(cons(tagged,F)));
+	CELL c = cons(tag_fixnum(type),cons(tagged,F));
 	general_error(ERROR_TYPE,c);
 }
 

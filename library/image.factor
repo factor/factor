@@ -49,16 +49,6 @@ USE: words
 : image "image" get ;
 : emit ( cell -- ) image vector-push ;
 
-: lo/hi64 ( long -- hi lo )
-    dup
-    -32 shift
-    HEX: ffffffff bitand
-    swap
-    HEX: ffffffff bitand ;
-
-: emit64 ( bignum -- )
-    lo/hi64 "big-endian" get [ swap ] when emit emit ;
-
 : fixup ( value offset -- ) image set-vector-nth ;
 
 ( Object memory )
@@ -66,7 +56,8 @@ USE: words
 : image-magic HEX: 0f0e0d0c ;
 : image-version 0 ;
 
-: cell ( we're compiling for a 32-bit system ) 4 ;
+: cell "64-bits" get 8 4 ? ;
+: char "64-bits" get 4 2 ? ;
 
 : tag-mask BIN: 111 ;
 : tag-bits 3 ;
@@ -128,14 +119,6 @@ USE: words
 ( Fixnums )
 
 : 'fixnum ( n -- tagged ) fixnum-tag immediate ;
-
-( Floats )
-
-: 'float ( f -- tagged )
-    object-tag here-as >r
-    float-type >header emit
-    0 emit ( alignment -- FIXME 64-bit arch )
-    float>bits emit64 r> ;
 
 ( Bignums )
 
@@ -222,24 +205,22 @@ DEFER: '
 
 ( Strings )
 
-: pack ( n n -- )
-    "big-endian" get [ swap ] when 16 shift bitor emit ;
+: pad-string ( n str -- )
+    tuck str-length - CHAR: \0 fill cat2 ;
 
-: pack-at ( n str -- )
-    2dup str-nth rot succ rot str-nth pack ;
+: emit-string ( str -- )
+    "big-endian" get [ str-reverse ] unless
+    0 swap [ swap 16 shift + ] str-each emit ;
 
-: (pack-string) ( n str -- )
-    2dup str-length >= [
-        2drop
-    ] [
-        2dup str-length pred = [
-            2dup str-nth 0 pack
-        ] [
-            2dup pack-at
-        ] ifte >r 2 + r> (pack-string)
-    ] ifte ;
+: (pack-string) ( n list -- )
+    #! Emit bytes for a string, with n characters per word.
+    [
+        2dup str-length < [ dupd pad-string ] when
+        emit-string
+    ] each drop ;
 
-: pack-string ( str -- ) 0 swap (pack-string) ;
+: pack-string ( string -- )
+    char tuck swap split-n (pack-string) ;
 
 : string, ( string -- )
     object-tag here-as swap
@@ -327,7 +308,6 @@ IN: cross-compiler
     [
         [ fixnum?  ] [ 'fixnum      ]
         [ bignum?  ] [ 'bignum      ]
-        [ float?   ] [ 'float       ]
         [ ratio?   ] [ 'ratio       ]
         [ complex? ] [ 'complex     ]
         [ word?    ] [ 'word        ]
@@ -355,10 +335,18 @@ IN: cross-compiler
 ( Image output )
 
 : write-word ( word -- )
-    "big-endian" get [
-        write-big-endian-32
+    "64-bits" get [
+        "big-endian" get [
+            write-big-endian-64
+        ] [
+            write-little-endian-64
+        ] ifte
     ] [
-        write-little-endian-32
+         "big-endian" get [
+            write-big-endian-32
+        ] [
+            write-little-endian-32
+        ] ifte
     ] ifte ;
 
 : write-image ( image file -- )

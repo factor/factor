@@ -1,9 +1,5 @@
 typedef struct {
 	CELL header;
-/* FIXME */
-#ifndef FACTOR_64
-	CELL alignment;
-#endif
 	double n;
 } FLOAT;
 

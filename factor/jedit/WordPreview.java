@@ -39,11 +39,21 @@ import sidekick.*;
 
 public class WordPreview implements CaretListener
 {
+	private FactorSideKickParser parser;
+
+	//{{{ WordPreview constructor
+	public WordPreview(FactorSideKickParser parser)
+	{
+		this.parser = parser;
+	} //}}}
+	
+	//{{{ caretUpdate() method
 	public void caretUpdate(CaretEvent e)
 	{
 		showPreview((JEditTextArea)e.getSource());
-	}
+	} //}}}
 
+	//{{{ showPreview() method
 	private void showPreview(JEditTextArea textArea)
 	{
 		View view = textArea.getView();
@@ -55,14 +65,15 @@ public class WordPreview implements CaretListener
 		if(data instanceof FactorParsedData)
 		{
 			FactorParsedData fdata = (FactorParsedData)data;
-			FactorWord w = fdata.interp
-				.searchVocabulary(fdata.use,word);
+			FactorInterpreter interp = fdata.parser
+				.getInterpreter();
+			FactorWord w = interp.searchVocabulary(fdata.use,word);
 			if(w != null)
 			{
 				view.getStatus().setMessageAndClear(
 					FactorWordRenderer.getWordHTMLString(
-					fdata.interp,w,true));
+					interp,w,fdata.parser.getWordDefinition(w),true));
 			}
 		}
-	}
+	} //}}}
 }

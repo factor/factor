@@ -85,8 +85,8 @@ unit-test
 [ t ] [ "abc" "abd" str-compare 0 < ] unit-test
 [ t ] [ "z" "abd" str-compare 0 > ] unit-test
 
-[ "fedcba" ] [ "abcdef" str>sbuf dup sbuf-reverse sbuf>str ] unit-test
-[ "edcba" ] [ "abcde" str>sbuf dup sbuf-reverse sbuf>str ] unit-test
+[ "fedcba" ] [ "abcdef" str-reverse ] unit-test
+[ "edcba" ] [ "abcde" str-reverse ] unit-test
 
 native? [
     [ t ] [ "Foo" str>sbuf "Foo" str>sbuf = ] unit-test
@@ -103,3 +103,5 @@ native? [
 ] when
 
 [ f ] [ [ 0 10 "hello" substring ] [ not ] catch ] unit-test
+
+[ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" split-n ] unit-test

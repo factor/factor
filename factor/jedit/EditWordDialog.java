@@ -46,9 +46,9 @@ public class EditWordDialog extends WordListDialog
 	private Timer timer;
 
 	//{{{ EditWordDialog constructor
-	public EditWordDialog(View view, FactorInterpreter interp)
+	public EditWordDialog(View view, FactorSideKickParser parser)
 	{
-		super(view,interp,jEdit.getProperty("factor.edit-word.title"));
+		super(view,parser,jEdit.getProperty("factor.edit-word.title"));
 
 		Box top = new Box(BoxLayout.X_AXIS);
 		top.add(new JLabel(jEdit.getProperty(

@@ -54,14 +54,15 @@ CELL subtract_fixnum(FIXNUM x, FIXNUM y)
  */
 CELL multiply_fixnum(FIXNUM x, FIXNUM y)
 {
+	FIXNUM prod;
+
 	if(x == 0 || y == 0)
 		return tag_fixnum(0);
-	else
-	{
-		FIXNUM prod = x * y;
-		if(prod / x == y)
-			return tag_integer(prod);
-	}
+
+	prod = x * y;
+	/* if this is not equal, we have overflow */
+	if(prod / x == y)
+		return tag_integer(prod);
 
 	return tag_object(
 		s48_bignum_multiply(

@@ -40,10 +40,10 @@ import org.gjt.sp.jedit.*;
 public class InsertUseDialog extends WordListDialog
 {
 	//{{{ InsertUseDialog constructor
-	public InsertUseDialog(View view, FactorInterpreter interp,
+	public InsertUseDialog(View view, FactorSideKickParser parser,
 		FactorWord[] words)
 	{
-		super(view,interp,jEdit.getProperty("factor.insert-use.title"));
+		super(view,parser,jEdit.getProperty("factor.insert-use.title"));
 
 		getContentPane().add(BorderLayout.NORTH,new JLabel(
 			jEdit.getProperty("factor.insert-use.caption",

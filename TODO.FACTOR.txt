@@ -6,7 +6,8 @@
 - plugin should not exit jEdit on fatal errors
 - IN: format base: work with all types of numbers
 - wordpreview: don't show for string literals and comments
-- eliminate usage of long long
+- NPE in activate()/deactivate()
+- NPE in ErrorHighlight
 - 64 bit support
 - alist -vs- assoc terminology
 - clean up listener's action popups
@@ -53,6 +54,7 @@
 
 + listener/plugin:
 
+- don't use jEdit's word finding API
 - some way to not have previous definitions from a source file
   clutter the namespace
 - use inferior.factor for everything not just listener
@@ -89,6 +91,8 @@
 
 + misc:
 
+- telnetd: init-history
+- str-reverse primitive
 - some way to run httpd from command line
 - don't rehash strings on every startup
 - 'cascading' styles

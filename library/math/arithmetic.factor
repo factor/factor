@@ -38,14 +38,6 @@ USE: stack
 : odd? 2 mod 1 = ;
 : even? 2 mod 0 = ;
 
-: i #{ 0 1 } ; inline
-: -i #{ 0 -1 } ; inline
-: inf 1.0 0.0 / ; inline
-: -inf -1.0 0.0 / ; inline
-: e 2.7182818284590452354 ; inline
-: pi 3.14159265358979323846 ; inline
-: pi/2 1.5707963267948966 ; inline
-
 : f>0 ( obj -- obj )
     #! If f at the top of the stack, turn it into 0.
     f 0 replace ;
@@ -71,7 +63,3 @@ USE: stack
 
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
-
-: deg2rad pi * 180 / ;
-
-: rad2deg 180 * pi / ;

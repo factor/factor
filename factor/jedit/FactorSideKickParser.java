@@ -40,6 +40,7 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
+	private FactorInterpreter interp;
 	private WordPreview wordPreview;
 
 	/**
@@ -53,8 +54,30 @@ public class FactorSideKickParser extends SideKickParser
 	public FactorSideKickParser()
 	{
 		super("factor");
-		wordPreview = new WordPreview();
+		interp = FactorPlugin.getInterpreter();
+		wordPreview = new WordPreview(this);
 		worddefs = new HashMap();
+	} //}}}
+
+	//{{{ getInterpreter() method
+	public FactorInterpreter getInterpreter()
+	{
+		return interp;
+	} //}}}
+
+	//{{{ getWordDefinition() method
+	/**
+	 * Check for a word definition from a parsed source file. If one is
+	 * found, return it, otherwise return interpreter's definition.
+	 */
+	public FactorWordDefinition getWordDefinition(FactorWord word)
+	{
+		FactorWordDefinition def = (FactorWordDefinition)
+			worddefs.get(word);
+		if(def != null)
+			return def;
+		else
+			return word.def;
 	} //}}}
 
 	//{{{ activate() method
@@ -95,9 +118,8 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		FactorInterpreter interp = FactorPlugin.getInterpreter();
 		FactorParsedData d = new FactorParsedData(
-			interp,buffer.getPath());
+			this,buffer.getPath());
 
 		String text;
 
@@ -176,7 +198,7 @@ public class FactorSideKickParser extends SideKickParser
 				if(last != null)
 					last.end = buffer.createPosition(start - 1);
 
-				last = new FactorAsset(word,
+				last = new FactorAsset(word,def,
 					buffer.createPosition(start));
 				d.root.add(new DefaultMutableTreeNode(last));
 			}

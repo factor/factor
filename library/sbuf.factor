@@ -87,3 +87,20 @@ USE: stack
     #! Split the string at each occurrence of split, and push a
     #! list of the pieces.
     [, 0 -rot (split) ,] ;
+
+: split-n-advance substring , >r tuck + swap r> ;
+: split-n-finish nip dup str-length swap substring , ;
+
+: (split-n) ( start n str -- )
+    3dup >r dupd + r> 2dup str-length < [
+        split-n-advance (split-n)
+    ] [
+        split-n-finish 3drop
+    ] ifte ;
+
+: split-n ( n str -- list )
+    #! Split a string into n-character chunks.
+    [, 0 -rot (split-n) ,] ;
+
+: str-reverse ( str -- str )
+    str>sbuf dup sbuf-reverse sbuf>str ;

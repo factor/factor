@@ -81,6 +81,7 @@ USE: stdio
     "/library/debugger.factor"
     "/library/platform/native/init.factor"
 
+    "/library/math/constants.factor"
     "/library/math/math.factor"
     "/library/platform/native/math.factor"
     "/library/math/pow.factor"
