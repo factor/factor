@@ -119,50 +119,50 @@ END-STRUCT
 
 : SDL_VideoInit ( driver-name flags -- )
     "int" "sdl" "SDL_VideoInit"
-    [ "char*" "int" ] alien-call ;
+    [ "char*" "int" ] c-invoke ;
 
 : SDL_VideoQuit ( -- )
-    "void" "sdl" "SDL_VideoQuit" [ ] alien-call ;
+    "void" "sdl" "SDL_VideoQuit" [ ] c-invoke ;
 
 ! SDL_VideoDriverName -- needs strings as out params.
 
 : SDL_GetVideoSurface ( -- surface )
-    "surface*" "sdl" "SDL_GetVideoSurface" [ ] alien-call ;
+    "surface*" "sdl" "SDL_GetVideoSurface" [ ] c-invoke ;
 
 ! SDL_GetVideoInfo needs C struct bitfield support
 
 : SDL_VideoModeOK ( width height bpp flags -- )
     "int" "sdl" "SDL_VideoModeOK"
-    [ "int" "int" "int" "int" ] alien-call ;
+    [ "int" "int" "int" "int" ] c-invoke ;
 
 ! SDL_ListModes needs array of structs support
 
 : SDL_SetVideoMode ( width height bpp flags -- )
     "surface*" "sdl" "SDL_SetVideoMode"
-    [ "int" "int" "int" "int" ] alien-call ;
+    [ "int" "int" "int" "int" ] c-invoke ;
 
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_Flip" [ "surface*" ] c-invoke ;
 
 ! SDL_SetGamma: float types
 
 : SDL_FillRect ( surface rect color -- n )
     #! If rect is null, fills entire surface.
     "bool" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "uint" ] alien-call ;
+    [ "surface*" "rect*" "uint" ] c-invoke ;
 
 : SDL_LockSurface ( surface -- )
-    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] c-invoke ;
 
 : SDL_UnlockSurface ( surface -- )
-    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
+    "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] c-invoke ;
 
 : SDL_MapRGB ( surface r g b -- )
     "uint" "sdl" "SDL_MapRGB"
-    [ "surface*" "uchar" "uchar" "uchar" ] alien-call ;
+    [ "surface*" "uchar" "uchar" "uchar" ] c-invoke ;
 
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"
-    [ "char*" "char*" ] alien-call ;
+    [ "char*" "char*" ] c-invoke ;

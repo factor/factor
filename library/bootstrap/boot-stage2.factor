@@ -128,6 +128,7 @@ USE: stdio
     "/library/sdl/sdl-gfx.factor"
     "/library/sdl/sdl-keysym.factor"
     "/library/sdl/sdl-utils.factor"
+    "/library/sdl/hsv.factor"
 
     "/library/bootstrap/image.factor"
     "/library/bootstrap/cross-compiler.factor"
@@ -148,7 +149,6 @@ USE: stdio
     "/library/tools/jedit.factor"
 
     "/library/cli.factor"
-    "/library/sdl/hsv.factor"
 ] [
     dup print
     run-resource

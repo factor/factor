@@ -28,38 +28,14 @@
 IN: alien
 USE: compiler
 USE: errors
+USE: inference
+USE: interpreter
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: parser
 USE: words
-
-: BEGIN-ENUM:
-    #! C-style enumerations. Their use is not encouraged unless
-    #! it is for C library interfaces. Used like this:
-    #!
-    #! BEGIN-ENUM 0
-    #!     ENUM: x
-    #!     ENUM: y
-    #!     ENUM: z
-    #! END-ENUM
-    #!
-    #! This is the same as : x 0 ; : y 1 ; : z 2 ;.
-    scan str>number ; parsing
-
-: ENUM:
-    dup CREATE swap unit define-compound succ ; parsing
-
-: END-ENUM
-    drop ; parsing
-
-: alien-call ( ... returns library function parameters -- ... )
-    #! Call a C library function.
-    #! 'returns' is a type spec, and 'parameters' is a list of
-    #! type specs. 'library' is an entry in the "libraries"
-    #! namespace.
-    "alien-call cannot be interpreted." throw ;
 
 : library ( name -- handle )
     "libraries" get [
@@ -73,12 +49,88 @@ USE: words
 : alien-function ( function library -- )
     [ library dlsym ] [ dlsym-self ] ifte* ;
 
-! : compile-alien-call
-!     pop-literal reverse PARAMETERS >r
-!     pop-literal pop-literal alien-function CALL JUMP-FIXUP
-!     r> CLEANUP
-!     pop-literal RETURNS ;
-! 
-! global [ <namespace> "libraries" set ] bind
-! 
-! \ alien-call [ compile-alien-call ] "compiling" set-word-property
+SYMBOL: #c-invoke ( C ABI -- Unix and most Windows libs )
+SYMBOL: #cleanup ( unwind stack by parameter )
+
+SYMBOL: #c-call ( jump to raw address )
+
+SYMBOL: #unbox ( move top of datastack to C stack )
+SYMBOL: #box ( move EAX to datastack )
+
+SYMBOL: #std-invoke ( stdcall ABI -- Win32 )
+
+! These are set in the #c-invoke and #std-invoke dataflow IR
+! nodes.
+SYMBOL: alien-returns
+SYMBOL: alien-parameters
+
+: infer-alien ( op -- )
+    >r 4 ensure-d
+    dataflow-drop, pop-d car
+    dataflow-drop, pop-d car
+    dataflow-drop, pop-d car alien-function
+    dataflow-drop, pop-d car swap
+    r> dataflow, [
+        alien-returns set
+        alien-parameters set
+    ] bind ;
+
+: unbox-parameter ( function -- )
+    dlsym-self #unbox swons , ;
+
+: linearize-parameters ( params -- count )
+    #! Generate code for boxing a list of C types.
+    #! Return amount stack must be unwound by.
+    [ alien-parameters get ] bind 0 swap [
+        c-type [
+            "width" get cell align +
+            "unboxer" get
+        ] bind unbox-parameter
+    ] each ;
+
+: box-parameter ( function -- )
+    dlsym-self #box swons , ;
+
+: linearize-returns ( returns -- )
+    [ alien-returns get ] bind dup "void" = [
+        drop
+    ] [
+        c-type [ "boxer" get ] bind box-parameter
+    ] ifte ;
+
+: linearize-alien ( node -- )
+    dup linearize-parameters >r
+    dup [ node-param get ] bind #c-call swons ,
+    dup [ node-op get #c-invoke = ] bind
+    r> swap [ #cleanup swons , ] [ drop ] ifte
+    linearize-returns ;
+
+: c-invoke ( ... returns library function parameters -- ... )
+    #! Call a C library function.
+    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! type specs. 'library' is an entry in the "libraries"
+    #! namespace.
+    "c-invoke cannot be interpreted." throw ;
+
+\ c-invoke [ 4 | 0 ] "infer-effect" set-word-property
+
+\ c-invoke [ #c-invoke infer-alien ] "infer" set-word-property
+
+#c-invoke [ linearize-alien ] "linearizer" set-word-property
+
+: std-invoke ( ... returns library function parameters -- ... )
+    #! Call a C library function with the stdcall ABI (Win32).
+    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! type specs. 'library' is an entry in the "libraries"
+    #! namespace.
+    "std-invoke cannot be interpreted." throw ;
+
+\ std-invoke [ 4 | 0 ] "infer-effect" set-word-property
+
+\ std-invoke [ #std-invoke infer-alien ] "infer" set-word-property
+
+#std-invoke [ linearize-alien ] "linearizer" set-word-property
+
+global [
+    "libraries" get [ <namespace> "libraries" set ] unless
+] bind

@@ -39,10 +39,10 @@ USE: compiler
 : SDL_INIT_EVERYTHING   HEX: 0000FFFF ;
 
 : SDL_Init ( mode -- )
-    "int" "sdl" "SDL_Init" [ "int" ] alien-call ;
+    "int" "sdl" "SDL_Init" [ "int" ] c-invoke ;
 
 : SDL_GetError ( -- error )
-    "char*" "sdl" "SDL_GetError" [ ] alien-call ;
+    "char*" "sdl" "SDL_GetError" [ ] c-invoke ;
 
 : SDL_Quit ( -- )
-    "void" "sdl" "SDL_Quit" [ ] alien-call ;
+    "void" "sdl" "SDL_Quit" [ ] c-invoke ;
