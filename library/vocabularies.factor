@@ -78,7 +78,7 @@ IN: words USING: hashtables kernel lists namespaces strings ;
     [
         "compiler" "debugger" "errors" "files" "generic"
         "hashtables" "inference" "interpreter" "jedit" "kernel"
-        "listener" "lists" "math" "namespaces" "parser"
+        "listener" "lists" "math" "memory" "namespaces" "parser"
         "prettyprint" "processes" "profiler" "streams" "stdio"
         "strings" "syntax" "test" "threads" "unparser" "vectors"
         "words" "scratchpad"

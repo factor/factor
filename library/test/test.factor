@@ -1,18 +1,8 @@
 ! Factor test suite.
 
 IN: test
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: prettyprint
-USE: stdio
-USE: strings
-USE: words
-USE: vectors
-USE: unparser
+USING: errors kernel lists math memory namespaces parser
+prettyprint stdio strings words vectors unparser ;
 
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;

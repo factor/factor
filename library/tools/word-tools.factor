@@ -84,4 +84,4 @@ M: generic word-uses? ( of in -- ? )
 
 : reload ( word -- )
     #! Reload the source file the word originated from.
-    word-file run-resource ;
+    word-file run-file ;

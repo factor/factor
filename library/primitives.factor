@@ -7,7 +7,7 @@ DEFER: dll
 USING: alien assembler compiler errors files generic
 io-internals kernel kernel-internals lists math math-internals
 parser profiler random strings unparser vectors words
-hashtables ;
+hashtables memory ;
 
 [
     [ execute                " word -- "                          f ]
@@ -187,6 +187,7 @@ hashtables ;
     [ <tuple>                [ [ number ] [ tuple ] ] ]
     [ >array                 [ [ object ] [ array ] ] ]
     [ >tuple                 [ [ object ] [ tuple ] ] ]
+    [ (instances)            [ [ integer ] [ general-list ] ] ]
 ] [
     2unlist dup string? [
         "stack-effect" set-word-property

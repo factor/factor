@@ -1,5 +1,6 @@
 72/73:
 
+- [ [ dup call ] dup call ] infer hangs
 - move tuple to generic vocab
 - update plugin docs
 - extract word keeps indent
@@ -20,6 +21,9 @@
 - ppc register decls
 - rename f* words to stream-*
 
+- port leak
+- references primitive
+- ditch % for tuples?
 - resize window: world not updated until mouse moved
 - x>offset
 - fix completion invoke in middle of word

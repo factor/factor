@@ -26,11 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: assembler
-USE: alien
-USE: math
-USE: kernel
-USE: hashtables
-USE: namespaces
+USING: alien math memory kernel hashtables namespaces ;
 
 SYMBOL: interned-literals
 

@@ -119,7 +119,7 @@ void print_obj(CELL obj)
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
-		fprintf(stderr,"%d",untag_fixnum_fast(obj));
+		fprintf(stderr,"%ld",untag_fixnum_fast(obj));
 		break;
 	case CONS_TYPE:
 		print_cons(obj);

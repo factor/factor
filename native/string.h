@@ -1,5 +1,3 @@
-
-
 typedef struct {
 	CELL header;
 	/* untagged num of chars */

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: kernel lists math namespaces parser words vectors
+USING: kernel lists math memory namespaces parser words vectors
 hashtables generic ;
 
 ! Bring up a bare cross-compiling vocabulary.
@@ -125,9 +125,9 @@ vocabularies get [
     [[ "io-internals" "open-file" ]]
     [[ "files" "stat" ]]
     [[ "files" "(directory)" ]]
-    [[ "kernel" "garbage-collection" ]]
-    [[ "kernel" "gc-time" ]]
-    [[ "kernel" "save-image" ]]
+    [[ "memory" "garbage-collection" ]]
+    [[ "memory" "gc-time" ]]
+    [[ "memory" "save-image" ]]
     [[ "kernel" "datastack" ]]
     [[ "kernel" "callstack" ]]
     [[ "kernel" "set-datastack" ]]
@@ -150,7 +150,7 @@ vocabularies get [
     [[ "io-internals" "add-copy-io-task" ]]
     [[ "io-internals" "pending-io-error" ]]
     [[ "io-internals" "next-io-task" ]]
-    [[ "kernel" "room" ]]
+    [[ "memory" "room" ]]
     [[ "kernel" "os-env" ]]
     [[ "kernel" "millis" ]]
     [[ "random" "init-random" ]]
@@ -162,7 +162,7 @@ vocabularies get [
     [[ "assembler" "set-compiled-offset" ]]
     [[ "assembler" "literal-top" ]]
     [[ "assembler" "set-literal-top" ]]
-    [[ "kernel" "address" ]]
+    [[ "memory" "address" ]]
     [[ "alien" "dlopen" ]]
     [[ "alien" "dlsym" ]]
     [[ "alien" "dlclose" ]]
@@ -176,7 +176,7 @@ vocabularies get [
     [[ "alien" "set-alien-2" ]]
     [[ "alien" "alien-1" ]]
     [[ "alien" "set-alien-1" ]]
-    [[ "kernel" "heap-stats" ]]
+    [[ "memory" "heap-stats" ]]
     [[ "errors" "throw" ]]
     [[ "kernel-internals" "string>memory" ]]
     [[ "kernel-internals" "memory>string" ]]
@@ -197,6 +197,7 @@ vocabularies get [
     [[ "kernel-internals" "<tuple>" ]]
     [[ "kernel-internals" ">array" ]]
     [[ "kernel-internals" ">tuple" ]]
+    [[ "memory" "(instances)" ]]
 ] [
     unswons create swap 1 + [ f define ] keep
 ] each drop

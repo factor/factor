@@ -58,8 +58,7 @@ kernel-internals math hashtables errors vectors ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word swap
-    [ swap dup tuple? [ class eq? ] [ 2drop f ] ifte ] cons
+    dup predicate-word swap [ swap class eq? ] cons
     define-compound ;
 
 : check-shape ( word slots -- )

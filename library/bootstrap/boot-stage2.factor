@@ -65,6 +65,7 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/io/stdio-binary.factor"
     "/library/io/files.factor"
     "/library/eval-catch.factor"
+    "/library/tools/heap-stats.factor"
     "/library/tools/listener.factor"
     "/library/tools/word-tools.factor"
     "/library/test/test.factor"
@@ -72,7 +73,6 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/tools/telnetd.factor"
     "/library/tools/jedit-wire.factor"
     "/library/tools/profiler.factor"
-    "/library/tools/heap-stats.factor"
     "/library/gensym.factor"
     "/library/tools/interpreter.factor"
 

@@ -25,27 +25,9 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USE: html
-USE: cont-responder
-USE: kernel
-USE: stdio
-USE: namespaces
-USE: words
-USE: lists
-USE: streams
-USE: strings
-USE: inspector
-USE: kernel
-USE: prettyprint
-USE: words
-USE: html
-USE: parser
-USE: errors
-USE: unparser
-USE: logging
-USE: listener
-USE: url-encoding
-USE: hashtables
+USING: html cont-responder kernel stdio namespaces words lists
+streams strings inspector kernel prettyprint words html parser
+errors unparser logging listener url-encoding hashtables memory ;
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser

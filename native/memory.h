@@ -72,4 +72,3 @@ void primitive_memory_1(void);
 void primitive_set_memory_cell(void);
 void primitive_set_memory_4(void);
 void primitive_set_memory_1(void);
-void primitive_heap_stats(void);
