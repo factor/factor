@@ -1,5 +1,6 @@
 IN: scratchpad
 USE: compiler
+USE: stack
 
 0 EAX I>R
 0 ECX I>R
@@ -35,3 +36,12 @@ ECX ECX R>[R]
 4 ECX R-I
 65535 EAX R-I
 65535 ECX R-I
+
+EAX PUSH-R
+ECX PUSH-R
+EAX PUSH-[R]
+ECX PUSH-[R]
+65535 PUSH-I
+
+EAX JUMP-[R]
+ECX JUMP-[R]

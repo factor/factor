@@ -36,15 +36,11 @@ USE: stack
 
 : UNBOX ( name -- )
     #! Move top of datastack to C stack.
-    dlsym-self CALL JUMP-FIXUP
-    EAX PUSH-R ;
+    SELF-CALL  EAX PUSH-R ;
 
 : BOX ( name -- )
     #! Move EAX to datastack.
-    24 ESP R-I
-    EAX PUSH-R
-    dlsym-self CALL JUMP-FIXUP
-    28 ESP R+I ;
+    EAX PUSH-R  SELF-CALL  4 ESP R+I ;
 
 : PARAMETERS ( params -- count )
     #! Generate code for boxing a list of C types.

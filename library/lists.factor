@@ -380,19 +380,22 @@ DEFER: tree-contains?
         over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte
     ] ifte ;
 
-: cons-hashcode ( cons count -- hash )
+: (cons-hashcode) ( cons count -- hash )
     dup 0 = [
         2drop 0
     ] [
         over cons? [
             pred >r uncons r> tuck
-            cons-hashcode >r
-            cons-hashcode r>
+            (cons-hashcode) >r
+            (cons-hashcode) r>
             bitxor
         ] [
             drop hashcode
         ] ifte
     ] ifte ;
+
+: cons-hashcode ( cons -- hash )
+    4 (cons-hashcode) ;
 
 : list>vector ( list -- vector )
     dup length <vector> swap [ over vector-push ] each ;

@@ -7,8 +7,6 @@ USE: kernel
 USE: combinators
 USE: words
 
-"Hi." USE: stdio print
-
 : no-op ; compiled
 
 [ ] [ no-op ] unit-test
@@ -89,7 +87,7 @@ garbage-collection
 
 DEFER: countdown-b
 
-: countdown-a ( n -- ) dup 0 eq? [ drop ] [ pred countdown-b ] ifte ;
-: countdown-b ( n -- ) dup 0 eq? [ drop ] [ pred countdown-a ] ifte ; compiled
+: countdown-a ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-b ] ifte ;
+: countdown-b ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-a ] ifte ; compiled
 
 [ ] [ 10 countdown-b ] unit-test

@@ -28,6 +28,7 @@
 IN: stack
 USE: vectors
 
+: nop ( -- ) ;
 : 2drop ( x x -- ) drop drop ;
 : 3drop ( x x x -- ) drop drop drop ;
 : 2dup ( x y -- x y x y ) over over ;

@@ -11,8 +11,6 @@
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
-#define DS_ENV         11 /* ptr to base addr of datastack */
-#define CS_ENV         12 /* ptr to base addr of callstack */
 
 /* Profiling timer */
 struct itimerval prof_timer;

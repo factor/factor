@@ -26,6 +26,15 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
+USE: alien
+
+: DATASTACK ( -- ptr )
+    #! A pointer to a pointer to the datastack top.
+    "ds" dlsym-self ;
+
+: CALLSTACK ( -- ptr )
+    #! A pointer to a pointer to the callstack top.
+    "cs" dlsym-self ;
 
 : LITERAL ( cell -- )
     #! Push literal on data stack.
@@ -57,3 +66,14 @@ IN: compiler
     DATASTACK EAX [I]>R
     4 EAX R-I
     EAX DATASTACK R>[I] ;
+
+: SELF-CALL ( name -- )
+    #! Call named C function in Factor interpreter executable.
+    dlsym-self CALL JUMP-FIXUP ;
+
+: TYPE-OF ( -- )
+    #! Pop datastack, store type # in EAX.
+    POP-DS
+    EAX PUSH-[R]
+    "type_of" SELF-CALL
+    4 ESI R-I ;

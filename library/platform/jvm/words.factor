@@ -42,11 +42,11 @@ USE: stack
         intern dup [ [ "def" get ] bind ] when
     ] unless ;
 
-: word-property ( pname word -- pvalue )
-    [ get ] bind ;
+: word-property ( word pname -- pvalue )
+    swap [ get ] bind ;
 
-: set-word-property ( pvalue pname word -- )
-    [ set ] bind ;
+: set-word-property ( pvalue word pname -- )
+    swap [ set ] bind ;
 
 : redefine ( word def -- )
     swap [ "def" set ] bind ;

@@ -51,56 +51,57 @@ USE: vectors
 ! 'generic words' system will be built later.
 
 : generic ( obj vtable -- )
-    over type swap vector-nth call ;
+    >r dup type r> vector-nth execute ;
 
-: 2generic ( n n map -- )
+: 2generic ( n n vtable -- )
     >r 2dup arithmetic-type r> vector-nth execute ;
+
+: default-hashcode drop 0 ;
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
     {
-        [ ]
-        [ word-hashcode ]
-        [ 4 cons-hashcode ]
-        [ drop 0 ]
-        [ >fixnum ]
-        [ >fixnum ]
-        [ drop 0 ]
-        [ drop 0 ]
-        [ drop 0 ]
-        [ vector-hashcode ]
-        [ str-hashcode ]
-        [ sbuf-hashcode ]
-        [ drop 0 ]
-        [ >fixnum ]
-        [ >fixnum ]
-        [ drop 0 ]
-        [ drop 0 ]
+        nop
+        word-hashcode
+        cons-hashcode
+        default-hashcode
+        >fixnum
+        >fixnum
+        default-hashcode
+        default-hashcode
+        default-hashcode
+        vector-hashcode
+        str-hashcode
+        sbuf-hashcode
+        default-hashcode
+        >fixnum
+        >fixnum
+        default-hashcode
+        default-hashcode
     } generic ;
-
 
 IN: math DEFER: number= ( defined later... )
 IN: kernel
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
     {
-        [ number= ]
-        [ eq? ]
-        [ cons= ]
-        [ eq? ]
-        [ number= ]
-        [ number= ]
-        [ eq? ]
-        [ eq? ]
-        [ eq? ]
-        [ vector= ]
-        [ str= ]
-        [ sbuf= ]
-        [ eq? ]
-        [ number= ]
-        [ number= ]
-        [ eq? ]
-        [ eq? ]
+        number=
+        eq?
+        cons=
+        eq?
+        number=
+        number=
+        eq?
+        eq?
+        eq?
+        vector=
+        str=
+        sbuf=
+        eq?
+        number=
+        number=
+        eq?
+        eq?
     } generic ;
 
 : 2= ( a b c d -- ? )

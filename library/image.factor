@@ -175,32 +175,21 @@ USE: words
     0 emit ;
 
 ! This is to handle mutually recursive words
-! It is a hack. A recursive word in the cdr of a
-! cons doesn't work! This never happends though.
-!
-! Eg : foo [ 5 | foo ] ;
 
-: fixup-word-later ( word -- )
-    image vector-length cons "word-fixups" get vector-push ;
-
-: fixup-word ( where word -- )
+: fixup-word ( word -- offset )
     dup pooled-object dup [
-        nip swap fixup
+        nip
     ] [
         drop "Not in image: " swap word-name cat2 throw
     ] ifte ;
 
 : fixup-words ( -- )
-    "word-fixups" get [ unswons fixup-word ] vector-each ;
+    "image" get [
+        dup word? [ fixup-word ] when
+    ] vector-map "image" set ;
 
 : 'word ( word -- pointer )
-    dup pooled-object dup [
-        nip
-    ] [
-        drop
-        ! Remember where we are, and add the reference later
-        dup fixup-word-later
-    ] ifte ;
+    dup pooled-object dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
@@ -278,9 +267,8 @@ DEFER: '
 
     dup word-name "name" swons ,
     dup word-vocabulary "vocabulary" swons ,
-    "parsing" over word-property [ t "parsing" swons , ] when
+    "parsing" word-property [ t "parsing" swons , ] when
 
-    drop
     ,] ' ;
 
 : (worddef,) ( word primitive parameter -- )

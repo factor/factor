@@ -52,11 +52,3 @@ USE: stack
 : compile-cell ( n -- )
     compiled-offset set-compiled-cell
     compiled-offset cell + set-compiled-offset ;
-
-: DATASTACK ( -- ptr )
-    #! A pointer to a pointer to the datastack top.
-    11 getenv ;
-
-: CALLSTACK ( -- ptr )
-    #! A pointer to a pointer to the callstack top.
-    12 getenv ;

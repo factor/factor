@@ -41,11 +41,36 @@ USE: combinators
 : ESI 6 ;
 : EDI 7 ;
 
+: byte? -128 127 between? ;
+
+: eax/other ( reg quot quot -- )
+    #! Execute first quotation if reg is EAX, second quotation
+    #! otherwise, leaving reg on the stack.
+    pick EAX = [ drop nip call ] [ nip call ] ifte ;
+
+: byte/eax/cell ( imm reg byte eax cell -- )
+    #! Assemble an instruction with 3 forms; byte operand, any
+    #! register; eax register, cell operand; other register,
+    #! cell operand.
+    >r >r >r >r dup byte? [
+        r> r> call r> drop r> drop compile-byte
+    ] [
+        r> dup EAX = [
+            drop r> drop r> call r> drop compile-cell
+        ] [
+            r> drop r> drop r> call compile-cell
+        ] ifte
+    ] ifte ;
+
 : MOD-R/M ( r/m reg/opcode mod -- )
+    #! MOD-R/M is MOD REG/OPCODE R/M
     6 shift swap 3 shift bitor bitor compile-byte ;
 
 : PUSH-R ( reg -- )
     HEX: 50 + compile-byte ;
+
+: PUSH-[R] ( reg -- )
+    HEX: ff compile-byte BIN: 110 0 MOD-R/M ;
 
 : PUSH-I ( imm -- )
     HEX: 68 compile-byte compile-cell ;
@@ -62,12 +87,12 @@ USE: combinators
 
 : [I]>R ( imm reg -- )
     #! MOV INDIRECT <imm> TO <reg>
-    dup EAX = [
-        drop HEX: a1 compile-byte
+    [
+        HEX: a1 compile-byte
     ] [
         HEX: 8b compile-byte
         BIN: 101 swap 0 MOD-R/M
-    ] ifte compile-cell ;
+    ] eax/other compile-cell ;
 
 : I>[R] ( imm reg -- )
     #! MOV <imm> TO INDIRECT <reg>
@@ -75,12 +100,12 @@ USE: combinators
 
 : R>[I] ( reg imm -- )
     #! MOV <reg> TO INDIRECT <imm>.
-    over EAX = [
-        nip HEX: a3 compile-byte
+    swap [
+        HEX: a3 compile-byte
     ] [
         HEX: 89 compile-byte
-        swap BIN: 101 swap 0 MOD-R/M
-    ] ifte compile-cell ;
+        BIN: 101 swap 0 MOD-R/M
+    ] eax/other compile-cell ;
 
 : R>R ( reg reg -- )
     #! MOV <reg> TO <reg>.
@@ -101,43 +126,49 @@ USE: combinators
     compile-cell
     compile-cell ;
 
+: EAX+/PARTIAL ( -- fixup )
+    #! This is potentially bad. In the compilation of
+    #! generic and 2generic, we need to add something which is
+    #! only known later.
+    #!
+    #! Returns address of 32-bit immediate.
+    HEX: 05 compile-byte  compiled-offset  0 compile-cell ;
+
 : R+I ( imm reg -- )
     #! ADD <imm> TO <reg>, STORE RESULT IN <reg>
-    over -128 127 between? [
+    [
         HEX: 83 compile-byte
         0 BIN: 11 MOD-R/M
-        compile-byte
     ] [
-        dup EAX = [
-            drop HEX: 05 compile-byte
-        ] [
-            HEX: 81 compile-byte
-            0 BIN: 11 MOD-R/M
-        ] ifte
-        compile-cell
-    ] ifte ;
+        HEX: 05 compile-byte
+    ] [
+        HEX: 81 compile-byte
+        0 BIN: 11 MOD-R/M
+    ] byte/eax/cell ;
 
 : R-I ( imm reg -- )
     #! SUBTRACT <imm> FROM <reg>, STORE RESULT IN <reg>
-    over -128 127 between? [
+    [
         HEX: 83 compile-byte
         BIN: 101 BIN: 11 MOD-R/M
-        compile-byte
     ] [
-        dup EAX = [
-            drop HEX: 2d compile-byte
-        ] [
-            HEX: 81 compile-byte
-            BIN: 101 BIN: 11 MOD-R/M
-        ] ifte
-        compile-cell
-    ] ifte ;
+        HEX: 2d compile-byte
+    ] [
+        HEX: 81 compile-byte
+        BIN: 101 BIN: 11 MOD-R/M
+    ] byte/eax/cell ;
+
+: R<<I ( imm reg -- )
+    #! SHIFT <reg> BY <imm>, STORE RESULT IN <reg>
+    HEX: c1 compile-byte
+    BIN: 100 BIN: 11 MOD-R/M
+    compile-byte ;
 
 : CMP-I-[R] ( imm reg -- )
     #! There are two forms of CMP we assemble
     #! 83 38 03                cmpl   $0x3,(%eax)
     #! 81 38 33 33 33 00       cmpl   $0x333333,(%eax)
-    over -128 127 between? [
+    over byte? [
         HEX: 83 compile-byte
         BIN: 111 0 MOD-R/M
         compile-byte
@@ -160,8 +191,16 @@ USE: combinators
     #! Push address of branch for fixup
     HEX: e9 compile-byte  (JUMP) ;
 
+: JUMP-[R] ( reg -- )
+    #! JUMP TO INDIRECT <reg>.
+    HEX: ff compile-byte  BIN: 100 0 MOD-R/M ;
+
 : CALL ( -- fixup )
     HEX: e8 compile-byte  (JUMP) ;
+
+: CALL-[R] ( reg -- )
+    #! CALL INDIRECT <reg>.
+    HEX: ff compile-byte  BIN: 10 0 MOD-R/M ;
 
 : JE ( -- fixup )
     HEX: 0f compile-byte HEX: 84 compile-byte  (JUMP) ;
