@@ -30,7 +30,7 @@ USE: stdio
 USE: html
 USE: lists
 USE: strings
-USE: arithmetic
+USE: math
 USE: namespaces
 USE: prettyprint
 USE: unparser

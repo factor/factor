@@ -31,7 +31,7 @@ USE: strings
 USE: streams
 USE: namespaces
 USE: lists
-USE: arithmetic
+USE: math
 USE: stdio
 USE: kernel
 USE: prettyprint

@@ -25,7 +25,7 @@ USE: lazy
 USE: stack
 USE: lists
 USE: strings
-USE: arithmetic
+USE: math
 USE: logic
 USE: kernel
 USE: combinators

@@ -26,7 +26,7 @@ IN: cont-responder
 USE: stdio
 USE: httpd
 USE: httpd-responder
-USE: arithmetic
+USE: math
 USE: random
 USE: continuations
 USE: format

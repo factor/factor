@@ -23,7 +23,7 @@
 IN: lazy-examples
 USE: lazy
 USE: stack
-USE: arithmetic
+USE: math
 USE: lists
 USE: combinators
 USE: kernel

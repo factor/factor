@@ -149,7 +149,7 @@ USE: logging
 
 : word-uses ( word -- list )
   #! Return a list of vocabularies that the given word uses.
-  worddef>list flatten [ word? ] subset [
+  word-parameter flatten [ word? ] subset [
     word-vocabulary
   ] map ;
 

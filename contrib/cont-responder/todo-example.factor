@@ -42,7 +42,7 @@ USE: cont-examples
 USE: regexp
 USE: prettyprint
 USE: todo
-USE: arithmetic
+USE: math
 USE: logic
 USE: kernel
 USE: lazy

@@ -23,7 +23,7 @@
 IN: lazy
 USE: lists
 USE: stack
-USE: arithmetic
+USE: math
 USE: stdio
 USE: prettyprint
 USE: kernel
