@@ -42,7 +42,79 @@ USE: cont-examples
 USE: regexp
 USE: prettyprint
 USE: todo
+USE: arithmetic
+USE: logic
  
+: todo-stylesheet ( -- string )
+  #! Return the stylesheet for the todo list
+  <% 
+    "table.list {" %
+    "  text-align:center;" %
+    "  font-family: Verdana;" %
+    "  font-weight: normal;" %
+    "  font-size: 11px;" %
+    "  color: #404040;" %
+    "  background-color: #fafafa;" %
+    "  border: 1px #6699cc solid;" %
+    "  border-collapse: collapse;" %
+    "  boder-spacing: 0px;" %
+    "}" %
+    "tr.heading {" %
+    "  border-bottom: 2px solid #6699cc;" %
+    "  border-left: 1px solix #6699cc;" %
+    "  background-color: #BEC8D1;" %
+    "  text-align: left;" %
+    "  text-indent: 0px;" %
+    "  font-family: verdana;" %
+    "  font-weight: bold;" %
+    "  color: #404040;" %
+    "}" %
+    "tr.item {" %
+    "  border-bottom: 1px solid #9cf;" %
+    "  border-top: 0px;" %
+    "  border-left: 1px solid #9cf;" %
+    "  border-right: 0px;" %
+    "  text-align: left;" %
+    "  text-indent: 2px;" %
+    "  font-family: verdana, sans-serif, arial;" %
+    "  font-weight: normal;" %
+    "  color: #404040;" %
+    "  background-color: #fafafa;" %
+    "}" %
+    "tr.complete {" %
+    "  border-bottom: 1px solid #9cf;" %
+    "  border-top: 0px;" %
+    "  border-left: 1px solid #9cf;" %
+    "  border-right: 0px;" %
+    "  text-align: left;" %
+    "  text-indent: 2px;" %
+    "  font-family: verdana, sans-serif, arial;" %
+    "  font-weight: normal;" %
+    "  color: #404040;" %
+    "  background-color: #ccc;" %
+    "}" %
+    "td.lbl {" %
+    "  font-weight: bold; text-align: right;" %
+    "}" %
+    "tr.required {" %
+    "  background: #FCC;" %
+    "}" %
+    "input:focus {" %
+    "  background: yellow;" %
+    "}" %
+    "textarea:focus {" %
+    "  background: yellow;" %
+    "}" %
+  %> ;
+
+: todo-stylesheet-url ( -- url )
+  #! Generate an URL for the stylesheet.
+  t [ [ drop todo-stylesheet write ] show ] register-continuation ;
+
+: include-todo-stylesheet ( -- )  
+  #! Generate HTML to include the todo stylesheet
+  <link rel= "stylesheet" href= todo-stylesheet-url link/> ;
+
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
   [ .s ] with-string-stream chars>entities show-message-page ;
@@ -54,16 +126,32 @@ USE: todo
     [ <td> [ call ] </td> ] each
   ] </tr> ;
 
+: styled-row ( class list -- )
+  #! Output an html TR row with each element of the list
+  #! being called to produce the output for each TD.
+  <tr class= swap tr> [
+    [ <td> [ call ] </td> ] each
+  ] </tr> ;
+
 : simple-input ( name -- )
   #! Output a simple HTML input field which will have the
   #! specified name.
   <input type= "text" size= "20" name= input/> ;
 
+: simple-input-with-value ( name value -- )
+  #! Output a simple HTML input field which will have the
+  #! specified name and value.
+  <input type= "text" size= "20" value= name= input/> ;
+
 : textarea-input ( name -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name.
-  <input type= "text" size= "60" name= input/> ;
-!  <textarea name= textarea> [ "Enter description here." write ] </textarea> ;
+  <textarea name= rows= "10" cols= "40" textarea> [ "Enter description here." write ] </textarea> ;
+
+: textarea-input-with-value ( name value -- )
+  #! Output a simple HTML textarea field which will have the
+  #! specified name and value.
+  <textarea name= swap rows= "10" cols= "40" textarea> [ write ] </textarea> ;
 
 : password-input ( name -- )
   #! Output an HTML password input field which will have the
@@ -186,19 +274,60 @@ USE: todo
   #! todo item details.
   [
     <table> [
-      [ [ "Priority:" write ]    [ "priority" simple-input ] ] row
-      [ [ "Description:" write ] [ "description" textarea-input ] ] row
+      <tr class= "required" tr> [ <td class= "lbl" td> [ "Priority" write ] </td>
+             <td> [ "priority" simple-input ] </td> ] </tr>
+      <tr class= "required" tr> [ <td class= "lbl" td> [ "Description" write ] </td>
+             <td> [ "description" textarea-input ] </td> ] </tr>
     ] </table>
     "Add" button
   ] form ;
+
+: write-edit-todo-item-form ( item url -- )
+  #! Display the HTML for a form allowing editing of a 
+  #! todo item details.
+  swap [
+    [   
+      <table> [
+        <tr class= "required" tr> [ <td class= "lbl" td> [ "Priority" write ] </td>
+               <td> [ "priority" dup get simple-input-with-value  ] </td> ] </tr>
+        <tr class= "required" tr> [ <td class= "lbl" td> [ "Description" write ] </td>
+               <td> [ "description" dup get textarea-input-with-value ] </td> ] </tr>
+      ] </table>
+      "Save" button
+    ] form 
+  ] bind ;
   
+: todo-details-valid? ( priority description -- bool )
+  #! Return true if a valid priority and description were entered.
+  str-length 0 > swap "[0-9]" re-matches and ;
+
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
   [
-    "Enter New Todo Item" [ write-new-todo-item-form ] simple-page  
+    "Enter New Todo Item" [ include-todo-stylesheet ] [ write-new-todo-item-form ] styled-page  
   ] show [ 
-    "priority" get "description" get <todo-item> 
-  ] bind ;
+    "priority" get "description" get 
+  ] bind 2dup todo-details-valid? [
+    <todo-item> 
+  ] [
+    2drop 
+    "Please ensure you enter a Priority from 0-9 and a description." show-message-page
+    get-new-todo-item
+  ] ifte ;
+
+: edit-item-details ( item -- )
+  #! Allow editing of an existing items details.
+  [
+    "Edit Item" [ include-todo-stylesheet ] [ write-edit-todo-item-form ] styled-page  
+  ] show [ 
+    "priority" get "description" get 
+  ] bind 2dup todo-details-valid? [
+    rot [ "description" set "priority" set ] bind  
+  ] [
+    drop drop 
+    "Please ensure you enter a Priority from 0-9 and a description." show-message-page
+    edit-item-details
+  ] ifte ;
 
 : save-current-todo ( -- )
   #! Save the current todo list
@@ -216,22 +345,35 @@ USE: todo
   dup item-complete? [
     "Delete" swap [ "todo" get swap delete-item save-current-todo ] lcurry1 quot-href
   ] [
-    "Mark Completed" swap [ set-item-completed save-current-todo ] lcurry1 quot-href
+    "Complete" swap [ set-item-completed save-current-todo ] lcurry1 quot-href
   ] ifte ;
+
+: write-edit-action ( item -- )
+  #! Write out html to allow editing an item.
+  "Edit" swap [ edit-item-details save-current-todo ] lcurry1 quot-href ;
+
+: item-class ( <todo-item> -- string )
+  #! Return the class to use for displaying the row for the
+  #! item.
+  item-complete? [ "complete" ] [ "item" ] ifte ;
 
 : write-item-row ( <todo-item> -- )
   #! Write the todo list item as an HTML row.
-  dup dup dup
-  [ [ item-priority write ] 
+  dup dup dup dup
+  dup item-class [ 
+    [ item-priority write ] 
     [ item-complete? [ "Yes" ] [ "No" ] ifte write ] 
     [ item-description write ] 
-    [ write-mark-complete-action ] 
-  ] row ;
+    [ write-mark-complete-action ]
+    [ write-edit-action ] 
+  ] styled-row ;
 
 : write-item-table ( <todo> -- )
   #! Write the table of items for the todo list.
   <table> [
-    [ [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] ] row
+    "heading" [ 
+      [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] [ " " write ] 
+    ] styled-row
     todo-items [ write-item-row ] each 
   ] </table> ;
 
@@ -243,11 +385,12 @@ USE: todo
   #! Show the current todo list.
   [
     <% "todo" get todo-username % "'s To Do list" % %>
+    [ include-todo-stylesheet ]
     [
       drop
       "todo" get write-item-table
       "Add Item" [ do-add-new-item ] quot-href
-    ] simple-page 
+    ] styled-page 
   ] show drop ;
 
 : todo-example ( path -- )
