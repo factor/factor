@@ -27,6 +27,7 @@
 
 IN: vectors
 DEFER: vector=
+DEFER: vector-hashcode
 
 IN: kernel
 
@@ -80,8 +81,8 @@ USE: vectors
 
 IN: math DEFER: number= ( defined later... )
 IN: kernel
-: equal? ( obj obj -- ? )
-    #! Use = instead.
+: = ( obj obj -- ? )
+    #! Push t if a is isomorphic to b.
     {
         [ number= ]
         [ eq? ]
@@ -101,10 +102,6 @@ IN: kernel
         [ eq? ]
         [ eq? ]
     } generic ;
-
-: = ( obj obj -- ? )
-    #! Push t if a is isomorphic to b.
-    2dup eq? [ 2drop t ] [ equal? ] ifte ;
 
 : 2= ( a b c d -- ? )
     #! Test if a = c, b = d.
