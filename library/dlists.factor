@@ -53,10 +53,10 @@ C: dlist-node
         dlist-node-next (dlist-each)
     ] [
         drop
-    ] ifte* ;
+    ] ifte* ; inline
 
 : dlist-each ( dlist quot -- )
-    swap dlist-first (dlist-each) ;
+    swap dlist-first (dlist-each) ; inline
 
 : dlist-length ( dlist -- length )
     0 swap [ drop 1 + ] dlist-each ;

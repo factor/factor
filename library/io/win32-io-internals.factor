@@ -25,20 +25,23 @@
 
 IN: win32-io-internals
 USING: alien errors kernel kernel-internals lists math namespaces threads 
-       vectors win32-api ;
+       vectors win32-api stdio streams generic ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
 SYMBOL: free-list
 SYMBOL: callbacks
 
-: handle-io-error ( -- )
-    #! If a write or read call fails unexpectedly, throw an error.
-    GetLastError [ 
+: expected-error? ( -- bool )
+    [ 
         ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
-    ] contains? [ 
-        win32-throw-error 
-    ] unless ;
+    ] contains? ;
+
+: handle-io-error ( -- )
+    GetLastError expected-error? [ win32-throw-error ] unless ;
+
+: queue-error ( len/status -- len/status )
+    GetLastError expected-error? [ drop f ] unless ;
 
 : add-completion ( handle -- )
     completion-port get NULL 1 CreateIoCompletionPort drop ;
@@ -106,7 +109,7 @@ END-STRUCT
         callbacks get vector-nth cdr
     ] bind ;
 
-: (wait-for-io) ( timeout -- ? overlapped len )
+: (wait-for-io) ( timeout -- error overlapped len )
     >r completion-port get 
     <indirect-pointer> [ 0 swap set-indirect-pointer-value ] keep 
     <indirect-pointer> 
@@ -121,8 +124,8 @@ END-STRUCT
     ] ifte ;
 
 : wait-for-io ( timeout -- callback len )
-    (wait-for-io) rot [ handle-io-error ] unless
-    overlapped>callback swap indirect-pointer-value ;
+    (wait-for-io) overlapped>callback swap indirect-pointer-value 
+    rot [ queue-error ] unless ;
 
 : win32-next-io-task ( -- )
     INFINITE wait-for-io swap call ;
@@ -135,10 +138,20 @@ END-STRUCT
     ] ifte* 
     win32-io-thread ;
 
+TUPLE: null-stream ;
+M: null-stream fflush drop ;
+M: null-stream fauto-flush drop ;
+M: null-stream fread# 2drop f ;
+M: null-stream freadln drop f ;
+M: null-stream fwrite-attr 3drop ;
+M: null-stream fclose drop ;
+
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
     completion-port set 
     
+    << null-stream >> stdio set
+
     <namespace> [
         32 <vector> callbacks set
         f free-list set

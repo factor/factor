@@ -107,7 +107,13 @@ USE: unparser
     ] [
         test
     ] each
-    
+
+    os "win32" = [
+        [
+            "buffer"
+        ] [ test ] each
+    ] when    
+
     cpu "x86" = [
         [
             "compiler/optimizer"

@@ -42,8 +42,7 @@ USE: threads
 USE: win32-api
 USE: win32-io-internals
 
-TUPLE: win32-stream this ;
-! handle in-buffer out-buffer fileptr file-size ;
+TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle
 GENERIC: do-write
 
@@ -52,6 +51,9 @@ SYMBOL: in-buffer
 SYMBOL: out-buffer
 SYMBOL: fileptr
 SYMBOL: file-size
+
+: pending-error ( len/status -- len/status )
+    dup [ win32-throw-error ] unless ;
 
 : init-overlapped ( overlapped -- overlapped )
     0 over set-overlapped-ext-internal
@@ -66,9 +68,9 @@ SYMBOL: file-size
 : flush-output ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get out-buffer get [ buffer-pos ] keep buffer-length
+        handle get out-buffer get [ buffer-pos+ptr ] keep buffer-length
         NULL r> WriteFile [ handle-io-error ] unless (yield)
-    ] callcc1
+    ] callcc1 pending-error
 
     dup update-file-pointer
     out-buffer get [ buffer-consume ] keep 
@@ -93,13 +95,13 @@ M: string do-write ( str -- )
 : fill-input ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get in-buffer get [ buffer-pos ] keep 
+        handle get in-buffer get [ buffer-pos+ptr ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         NULL r>
         ReadFile [ handle-io-error ] unless (yield)
-    ] callcc1
+    ] callcc1 pending-error
 
-    dup in-buffer get buffer-fill update-file-pointer ;
+    dup in-buffer get buffer-inc-fill update-file-pointer ;
 
 : consume-input ( count -- str ) 
     in-buffer get buffer-length 0 = [ fill-input ] when
