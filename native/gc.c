@@ -87,8 +87,8 @@ void collect_object(void)
 	case SBUF_TYPE:
 		collect_sbuf((SBUF*)scan);
 		break;
-	case HANDLE_TYPE:
-		collect_handle((HANDLE*)scan);
+	case PORT_TYPE:
+		collect_port((PORT*)scan);
 		break;
 	}
 	
@@ -118,14 +118,11 @@ void copy_roots(void)
 	CELL ptr;
 
 	gc_debug("collect_roots",scan);
-	/* these three must be the first in the heap */
-	copy_object(&empty);
-	gc_debug("empty",empty);
+	/* these two must be the first in the heap */
 	copy_object(&F);
 	gc_debug("f",F);
 	copy_object(&T);
 	gc_debug("t",T);
-	copy_object(&env.dt);
 	copy_object(&env.cf);
 	copy_object(&env.boot);
 

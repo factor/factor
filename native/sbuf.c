@@ -10,40 +10,38 @@ SBUF* sbuf(FIXNUM capacity)
 
 void primitive_sbufp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(SBUF_TYPE,env.dt));
+	drepl(tag_boolean(typep(SBUF_TYPE,dpeek())));
 }
 
 void primitive_sbuf(void)
 {
-	env.dt = tag_object(sbuf(to_fixnum(env.dt)));
+	drepl(tag_object(sbuf(to_fixnum(dpeek()))));
 }
 
 void primitive_sbuf_length(void)
 {
-	env.dt = tag_fixnum(untag_sbuf(env.dt)->top);
+	drepl(tag_fixnum(untag_sbuf(dpeek())->top));
 }
 
 void primitive_set_sbuf_length(void)
 {
-	SBUF* sbuf = untag_sbuf(env.dt);
+	SBUF* sbuf = untag_sbuf(dpop());
 	FIXNUM length = to_fixnum(dpop());
 	sbuf->top = length;
 	if(length < 0)
-		range_error(env.dt,length,sbuf->top);
+		range_error(tag_object(sbuf),length,sbuf->top);
 	else if(length > sbuf->string->capacity)
 		sbuf->string = grow_string(sbuf->string,length,F);
-	env.dt = dpop(); /* don't forget this! */
 }
 
 void primitive_sbuf_nth(void)
 {
-	SBUF* sbuf = untag_sbuf(env.dt);
+	SBUF* sbuf = untag_sbuf(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= sbuf->top)
-		range_error(env.dt,index,sbuf->top);
-	env.dt = string_nth(sbuf->string,index);
+		range_error(tag_object(sbuf),index,sbuf->top);
+	dpush(string_nth(sbuf->string,index));
 }
 
 void sbuf_ensure_capacity(SBUF* sbuf, int top)
@@ -68,14 +66,11 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value)
 
 void primitive_set_sbuf_nth(void)
 {
-	SBUF* sbuf = untag_sbuf(env.dt);
+	SBUF* sbuf = untag_sbuf(dpop());
 	FIXNUM index = to_fixnum(dpop());
 	CELL value = dpop();
-	check_non_empty(value);
 
 	set_sbuf_nth(sbuf,index,value);
-	
-	env.dt = dpop(); /* don't forget this! */
 }
 
 void sbuf_append_string(SBUF* sbuf, STRING* string)
@@ -89,10 +84,8 @@ void sbuf_append_string(SBUF* sbuf, STRING* string)
 
 void primitive_sbuf_append(void)
 {
-	SBUF* sbuf = untag_sbuf(env.dt);
+	SBUF* sbuf = untag_sbuf(dpop());
 	CELL object = dpop();
-	check_non_empty(object);
-	env.dt = dpop();
 	switch(type_of(object))
 	{
 	case FIXNUM_TYPE:
@@ -118,7 +111,7 @@ STRING* sbuf_to_string(SBUF* sbuf)
 
 void primitive_sbuf_to_string(void)
 {
-	env.dt = tag_object(sbuf_to_string(untag_sbuf(env.dt)));
+	drepl(tag_object(sbuf_to_string(untag_sbuf(dpeek()))));
 }
 
 bool sbuf_eq(SBUF* s1, SBUF* s2)
@@ -131,13 +124,12 @@ bool sbuf_eq(SBUF* s1, SBUF* s2)
 
 void primitive_sbuf_eq(void)
 {
-	SBUF* s1 = untag_sbuf(env.dt);
+	SBUF* s1 = untag_sbuf(dpop());
 	CELL with = dpop();
-	check_non_empty(with);
 	if(typep(SBUF_TYPE,with))
-		env.dt = tag_boolean(sbuf_eq(s1,(SBUF*)UNTAG(with)));
+		dpush(tag_boolean(sbuf_eq(s1,(SBUF*)UNTAG(with))));
 	else
-		env.dt = F;
+		dpush(F);
 }
 
 void fixup_sbuf(SBUF* sbuf)

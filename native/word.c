@@ -21,57 +21,51 @@ void update_xt(WORD* word)
 
 void primitive_wordp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(TAG(env.dt) == WORD_TYPE);
+	drepl(tag_boolean(typep(WORD_TYPE,dpeek())));
 }
 
 /* <word> ( primitive parameter plist -- word ) */
 void primitive_word(void)
 {
-	CELL plist = env.dt;
+	CELL plist = dpop();
 	FIXNUM primitive;
 	CELL parameter = dpop();
-	check_non_empty(plist);
-	check_non_empty(parameter);
 	primitive = to_fixnum(dpop());
-	env.dt = tag_word(word(primitive,parameter,plist));
+	dpush(tag_word(word(primitive,parameter,plist)));
 }
 
 void primitive_word_primitive(void)
 {
-	env.dt = tag_fixnum(untag_word(env.dt)->primitive);
+	drepl(tag_fixnum(untag_word(dpeek())->primitive));
 }
 
 void primitive_set_word_primitive(void)
 {
-	WORD* word = untag_word(env.dt);
+	WORD* word = untag_word(dpop());
 	word->primitive = to_fixnum(dpop());
 	update_xt(word);
-	env.dt = dpop();
 }
 
 void primitive_word_parameter(void)
 {
-	env.dt = untag_word(env.dt)->parameter;
+	drepl(untag_word(dpeek())->parameter);
 }
 
 void primitive_set_word_parameter(void)
 {
-	check_non_empty(dpeek());
-	untag_word(env.dt)->parameter = dpop();
-	env.dt = dpop();
+	WORD* word = untag_word(dpop());
+	word->parameter = dpop();
 }
 
 void primitive_word_plist(void)
 {
-	env.dt = untag_word(env.dt)->plist;
+	drepl(untag_word(dpeek())->plist);
 }
 
 void primitive_set_word_plist(void)
 {
-	check_non_empty(dpeek());
-	untag_word(env.dt)->plist = dpop();
-	env.dt = dpop();
+	WORD* word = untag_word(dpop());
+	word->plist = dpop();
 }
 
 void fixup_word(WORD* word)

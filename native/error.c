@@ -27,11 +27,16 @@ void throw_error(CELL error)
 {
 	fix_stacks();
 
-	dpush(env.dt);
-	env.dt = error;
+	dpush(error);
 	/* Execute the 'throw' word */
 	cpush(env.cf);
 	env.cf = env.user[BREAK_ENV];
+	if(env.cf == 0)
+	{
+		/* Crash at startup */
+		fatal_error("Error thrown before BREAK_ENV set",error);
+	}
+
 	/* Return to run() method */
 	longjmp(toplevel,1);
 }

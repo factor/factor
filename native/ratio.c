@@ -10,40 +10,39 @@ RATIO* ratio(CELL numerator, CELL denominator)
 
 void primitive_ratiop(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(RATIO_TYPE,env.dt));
+	drepl(tag_boolean(typep(RATIO_TYPE,dpeek())));
 }
 
 void primitive_numerator(void)
 {
-	switch(type_of(env.dt))
+	switch(type_of(dpeek()))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
 		/* No op */
 		break;
 	case RATIO_TYPE:
-		env.dt = untag_ratio(env.dt)->numerator;
+		drepl(untag_ratio(dpeek())->numerator);
 		break;
 	default:
-		type_error(RATIONAL_TYPE,env.dt);
+		type_error(RATIONAL_TYPE,dpeek());
 		break;
 	}
 }
 
 void primitive_denominator(void)
 {
-	switch(type_of(env.dt))
+	switch(type_of(dpeek()))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
-		env.dt = tag_fixnum(1);
+		drepl(tag_fixnum(1));
 		break;
 	case RATIO_TYPE:
-		env.dt = untag_ratio(env.dt)->denominator;
+		drepl(untag_ratio(dpeek())->denominator);
 		break;
 	default:
-		type_error(RATIONAL_TYPE,env.dt);
+		type_error(RATIONAL_TYPE,dpeek());
 		break;
 	}
 }

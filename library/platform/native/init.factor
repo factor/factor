@@ -76,7 +76,9 @@ USE: unparser
     init-styles
     init-vocab-styles
     default-responders
-
+    
     run-user-init
-
-    "interactive" get [ init-interpreter ] when ;
+    
+    "interactive" get [ init-interpreter ] when
+    
+    0 exit* ;

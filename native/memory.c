@@ -84,7 +84,6 @@ bool in_zone(ZONE* z, CELL pointer)
 void primitive_room(void)
 {
 	/* push: free total */
-	dpush(env.dt);
-	env.dt = tag_fixnum(active->limit - active->base);
 	dpush(tag_fixnum(active->limit - active->here));
+	dpush(tag_fixnum(active->limit - active->base));
 }

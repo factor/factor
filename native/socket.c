@@ -39,8 +39,8 @@ int make_server_socket(CHAR port)
 
 void primitive_server_socket(void)
 {
-	CHAR port = (CHAR)to_fixnum(env.dt);
-	env.dt = handle(HANDLE_FD,make_server_socket(port));
+	CHAR p = (CHAR)to_fixnum(dpop());
+	dpush(port(make_server_socket(p)));
 }
 
 int accept_connection(int sock)
@@ -61,6 +61,6 @@ int accept_connection(int sock)
 
 void primitive_accept_fd(void)
 {
-	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	env.dt = handle(HANDLE_FD,accept_connection(h->object));
+	PORT* p = untag_port(dpop());
+	dpush(port(accept_connection(p->fd)));
 }

@@ -2,14 +2,13 @@
 
 void primitive_fixnump(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(TAG(env.dt) == FIXNUM_TYPE);
+	drepl(tag_boolean(TAG(dpeek()) == FIXNUM_TYPE));
 }
 
 void primitive_not(void)
 {
-	type_check(FIXNUM_TYPE,env.dt);
-	env.dt = RETAG(UNTAG(~env.dt),FIXNUM_TYPE);
+	type_check(FIXNUM_TYPE,dpeek());
+	drepl(RETAG(UNTAG(~dpeek()),FIXNUM_TYPE));
 }
 
 FIXNUM to_fixnum(CELL tagged)
@@ -37,7 +36,7 @@ FIXNUM to_fixnum(CELL tagged)
 
 void primitive_to_fixnum(void)
 {
-	env.dt = tag_fixnum(to_fixnum(env.dt));
+	drepl(tag_fixnum(to_fixnum(dpeek())));
 }
 
 CELL number_eq_fixnum(CELL x, CELL y)

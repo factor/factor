@@ -2,8 +2,7 @@
 
 void primitive_bignump(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(BIGNUM_TYPE,env.dt));
+	drepl(tag_boolean(typep(BIGNUM_TYPE,dpeek())));
 }
 
 BIGNUM* to_bignum(CELL tagged)
@@ -31,7 +30,7 @@ BIGNUM* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
-	env.dt = tag_object(to_bignum(env.dt));
+	drepl(tag_object(to_bignum(dpeek())));
 }
 
 CELL number_eq_bignum(CELL x, CELL y)

@@ -85,14 +85,13 @@ USE: words
 
 : f-type      6 ;
 : t-type      7 ;
-: empty-type  8 ;
-: array-type  9 ;
-: vector-type 10 ;
-: string-type 11 ;
-: sbuf-type   12 ;
-: handle-type 13 ;
-: bignum-type 14 ;
-: float-type  15 ;
+: array-type  8 ;
+: vector-type 9 ;
+: string-type 10 ;
+: sbuf-type   11 ;
+: handle-type 12 ;
+: bignum-type 13 ;
+: float-type  14 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
@@ -153,12 +152,11 @@ USE: words
 
 : f, object-tag here-as "f" set f-type >header emit 0 'fixnum emit ;
 : t, object-tag here-as "t" set t-type >header emit 0 'fixnum emit ;
-: empty, empty-type >header emit 0 'fixnum emit ;
 
 ( Beginning of the image )
-! The image proper begins with the header, then EMPTY, F, T
+! The image proper begins with the header, then F, T
 
-: begin ( -- ) header empty, f, t, ;
+: begin ( -- ) header f, t, ;
 
 ( Words )
 

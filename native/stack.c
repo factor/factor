@@ -3,13 +3,11 @@
 void reset_datastack(void)
 {
 	env.ds = env.ds_bot;
-	env.dt = empty;
 }
 
 void reset_callstack(void)
 {
 	env.cs = env.cs_bot;
-	cpush(empty);
 }
 
 void init_stacks(void)
@@ -23,117 +21,91 @@ void init_stacks(void)
 
 void primitive_drop(void)
 {
-	check_non_empty(env.dt);
-	env.dt = dpop();
+	dpop();
 }
 
 void primitive_dup(void)
 {
-	check_non_empty(env.dt);
-	dpush(env.dt);
+	dpush(dpeek());
 }
 
 void primitive_swap(void)
 {
-	CELL top, next;
-	check_non_empty(env.dt);
-	check_non_empty(dpeek());
-	top = env.dt;
-	next = dpop();
-	dpush(top);
-	env.dt = next;
+	CELL top = dpeek();
+	CELL next = get(env.ds - CELLS * 2);
+	put(env.ds - CELLS,next);
+	put(env.ds - CELLS * 2,top);
 }
 
 void primitive_over(void)
 {
-	CELL under = dpeek();
-	check_non_empty(env.dt);
-	check_non_empty(under);
-	dpush(env.dt);
-	env.dt = under;
+	dpush(get(env.ds - CELLS * 2));
 }
 
 void primitive_pick(void)
 {
-	CELL under = dpeek();
-	CELL under_under = get(env.ds - CELLS * 2);
-	check_non_empty(env.dt);
-	check_non_empty(under);
-	check_non_empty(under_under);
-	dpush(env.dt);
-	env.dt = under_under;
+	dpush(get(env.ds - CELLS * 3));
 }
 
 void primitive_nip(void)
 {
-	check_non_empty(dpeek());
-	dpop();
+	CELL top = dpop();
+	put(env.ds - CELLS,top);
 }
 
 void primitive_tuck(void)
 {
-	CELL under = dpeek();
-	check_non_empty(env.dt);
-	check_non_empty(under);
-	dpop();
-	dpush(env.dt);
-	dpush(under);
+	CELL top = dpeek();
+	CELL next = get(env.ds - CELLS * 2);
+	put(env.ds - CELLS * 2,top);
+	put(env.ds - CELLS,next);
+	dpush(top);
 }
 
 void primitive_rot(void)
 {
-	CELL y, z;
-	/* z y env.dt --> y env.dt z <top> */
-	check_non_empty(env.dt);
-	y = dpeek();
-	check_non_empty(y);
-	z = get(env.ds - CELLS * 2);
-	check_non_empty(z);
-	put(env.ds - CELLS * 2,y);
-	put(env.ds - CELLS,env.dt);
-	env.dt = z;
+	CELL top = dpeek();
+	CELL next = get(env.ds - CELLS * 2);
+	CELL next_next = get(env.ds - CELLS * 3);
+	put(env.ds - CELLS * 3,next);
+	put(env.ds - CELLS * 2,top);
+	put(env.ds - CELLS,next_next);
 }
 
 void primitive_to_r(void)
 {
-	check_non_empty(env.dt);
-	cpush(env.dt);
-	env.dt = dpop();
+	cpush(dpop());
 }
 
 void primitive_from_r(void)
 {
-	check_non_empty(cpeek());
-	dpush(env.dt);
-	env.dt = cpop();
+	dpush(cpop());
 }
 
 VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
-	CELL depth = (top - bottom) / CELLS - 1;
+	CELL depth = (top - bottom) / CELLS;
 	VECTOR* v = vector(depth);
 	ARRAY* a = v->array;
-	memcpy(a + 1,(char*)bottom + CELLS,depth * CELLS);
+	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	v->top = depth;
 	return v;
 }
 
 void primitive_datastack(void)
 {
-	dpush(env.dt);
-	env.dt = tag_object(stack_to_vector(env.ds_bot,env.ds));
+	dpush(tag_object(stack_to_vector(env.ds_bot,env.ds)));
 }
 
 void primitive_callstack(void)
 {
-	dpush(env.dt);
-	env.dt = tag_object(stack_to_vector(env.cs_bot,env.cs));
+	dpush(tag_object(stack_to_vector(env.cs_bot,env.cs)));
 }
 
 /* Returns top of stack */
 CELL vector_to_stack(VECTOR* vector, CELL bottom)
 {
-	CELL start = bottom + CELLS;
+	CELL start = bottom;
 	CELL len = vector->top * CELLS;
 	memcpy((void*)start,vector->array + 1,len);
 	return start + len;
@@ -141,12 +113,10 @@ CELL vector_to_stack(VECTOR* vector, CELL bottom)
 
 void primitive_set_datastack(void)
 {
-	env.ds = vector_to_stack(untag_vector(env.dt),env.ds_bot);
-	env.dt = dpop();
+	env.ds = vector_to_stack(untag_vector(dpop()),env.ds_bot);
 }
 
 void primitive_set_callstack(void)
 {
-	env.cs = vector_to_stack(untag_vector(env.dt),env.cs_bot);
-	env.dt = dpop();
+	env.cs = vector_to_stack(untag_vector(dpop()),env.cs_bot);
 }

@@ -125,8 +125,8 @@ CELL OP(CELL x, CELL y) \
 \
 void primitive_##OP(void) \
 { \
-	CELL x = dpop(), y = env.dt; \
-	env.dt = OP(x,y); \
+	CELL y = dpop(), x = dpop(); \
+	dpush(OP(x,y)); \
 }
 
 #define BINARY_OP_INTEGER_ONLY(OP) \
@@ -203,7 +203,7 @@ CELL OP(CELL x) \
 \
 void primitive_##OP(void) \
 { \
-	env.dt = OP(env.dt); \
+	drepl(OP(dpeek())); \
 }
 
 bool realp(CELL tagged);

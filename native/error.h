@@ -1,13 +1,12 @@
-#define ERROR_HANDLE_EXPIRED (0<<3)
+#define ERROR_PORT_EXPIRED (0<<3)
 #define ERROR_UNDEFINED_WORD (1<<3)
 #define ERROR_TYPE (2<<3)
 #define ERROR_RANGE (3<<3)
 #define ERROR_UNDERFLOW (4<<3)
-#define ERROR_HANDLE_INCOMPAT (5<<3)
-#define ERROR_IO (6<<3)
-#define ERROR_OVERFLOW (7<<3)
-#define ERROR_INCOMPARABLE (8<<3)
-#define ERROR_FLOAT_FORMAT (9<<3)
+#define ERROR_IO (5<<3)
+#define ERROR_OVERFLOW (6<<3)
+#define ERROR_INCOMPARABLE (7<<3)
+#define ERROR_FLOAT_FORMAT (8<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

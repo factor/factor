@@ -18,13 +18,12 @@ CELL possibly_complex(CELL real, CELL imaginary)
 
 void primitive_complexp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(COMPLEX_TYPE,env.dt));
+	drepl(tag_boolean(typep(COMPLEX_TYPE,dpeek())));
 }
 
 void primitive_real(void)
 {
-	switch(type_of(env.dt))
+	switch(type_of(dpeek()))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
@@ -33,29 +32,29 @@ void primitive_real(void)
 		/* No op */
 		break;
 	case COMPLEX_TYPE:
-		env.dt = untag_complex(env.dt)->real;
+		drepl(untag_complex(dpeek())->real);
 		break;
 	default:
-		type_error(COMPLEX_TYPE,env.dt);
+		type_error(COMPLEX_TYPE,dpeek());
 		break;
 	}
 }
 
 void primitive_imaginary(void)
 {
-	switch(type_of(env.dt))
+	switch(type_of(dpeek()))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
 	case FLOAT_TYPE:
 	case RATIO_TYPE:
-		env.dt = tag_fixnum(0);
+		drepl(tag_fixnum(0));
 		break;
 	case COMPLEX_TYPE:
-		env.dt = untag_complex(env.dt)->imaginary;
+		drepl(untag_complex(dpeek())->imaginary);
 		break;
 	default:
-		type_error(COMPLEX_TYPE,env.dt);
+		type_error(COMPLEX_TYPE,dpeek());
 		break;
 	}
 }
@@ -63,32 +62,29 @@ void primitive_imaginary(void)
 void primitive_to_rect(void)
 {
 	COMPLEX* c;
-	switch(type_of(env.dt))
+	switch(type_of(dpeek()))
 	{
 	case FIXNUM_TYPE:
 	case BIGNUM_TYPE:
 	case FLOAT_TYPE:
 	case RATIO_TYPE:
-		dpush(env.dt);
-		env.dt = tag_fixnum(0);
+		dpush(tag_fixnum(0));
 		break;
 	case COMPLEX_TYPE:
-		c = untag_complex(env.dt);
-		env.dt = c->imaginary;
+		c = untag_complex(dpeek());
 		dpush(c->real);
+		dpush(c->imaginary);
 		break;
 	default:
-		type_error(COMPLEX_TYPE,env.dt);
+		type_error(NUMBER_TYPE,dpeek());
 		break;
 	}
 }
 
 void primitive_from_rect(void)
 {
-	CELL imaginary = env.dt;
+	CELL imaginary = dpop();
 	CELL real = dpop();
-	check_non_empty(imaginary);
-	check_non_empty(real);
 
 	if(!realp(imaginary))
 		type_error(REAL_TYPE,imaginary);
@@ -96,7 +92,7 @@ void primitive_from_rect(void)
 	if(!realp(real))
 		type_error(REAL_TYPE,real);
 
-	env.dt = possibly_complex(real,imaginary);
+	dpush(possibly_complex(real,imaginary));
 }
 
 CELL number_eq_complex(CELL x, CELL y)

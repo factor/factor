@@ -10,37 +10,36 @@ CONS* cons(CELL car, CELL cdr)
 
 void primitive_consp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(CONS_TYPE,env.dt));
+	drepl(tag_boolean(typep(CONS_TYPE,dpeek())));
 }
 
 void primitive_cons(void)
 {
-	check_non_empty(env.dt);
-	check_non_empty(dpeek());
-	env.dt = tag_cons(cons(dpop(),env.dt));
+	CELL cdr = dpop();
+	CELL car = dpop();
+	dpush(tag_cons(cons(car,cdr)));
 }
 
 void primitive_car(void)
 {
-	env.dt = car(env.dt);
+	drepl(car(dpeek()));
 }
 
 void primitive_cdr(void)
 {
-	env.dt = cdr(env.dt);
+	drepl(cdr(dpeek()));
 }
 
 void primitive_set_car(void)
 {
-	check_non_empty(dpeek());
-	untag_cons(env.dt)->car = dpop();
-	env.dt = dpop();
+	CELL cons = dpop();
+	CELL car = dpop();
+	untag_cons(cons)->car = car;
 }
 
 void primitive_set_cdr(void)
 {
-	check_non_empty(dpeek());
-	untag_cons(env.dt)->cdr = dpop();
-	env.dt = dpop();
+	CELL cons = dpop();
+	CELL cdr = dpop();
+	untag_cons(cons)->cdr = cdr;
 }

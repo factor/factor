@@ -2,32 +2,29 @@
 
 void primitive_exit(void)
 {
-	exit(to_fixnum(env.dt));
+	exit(to_fixnum(dpop()));
 }
 
 void primitive_os_env(void)
 {
-	char* name = to_c_string(untag_string(env.dt));
+	char* name = to_c_string(untag_string(dpeek()));
 	char* value = getenv(name);
 	if(value == NULL)
-		env.dt = F;
+		drepl(F);
 	else
-		env.dt = tag_object(from_c_string(getenv(name)));
+		drepl(tag_object(from_c_string(getenv(name))));
 }
 
 void primitive_eq(void)
 {
-	check_non_empty(env.dt);
-	check_non_empty(dpeek());
-	env.dt = tag_boolean(dpop() == env.dt);
+	dpush(tag_boolean(dpop() == dpop()));
 }
 
 void primitive_millis(void)
 {
 	struct timeval t;
 	gettimeofday(&t,NULL);
-	dpush(env.dt);
-	env.dt = tag_object(bignum(t.tv_sec * 1000 + t.tv_usec/1000));
+	dpush(tag_object(bignum(t.tv_sec * 1000 + t.tv_usec/1000)));
 }
 
 void primitive_init_random(void)
@@ -43,6 +40,5 @@ void primitive_init_random(void)
 
 void primitive_random_int(void)
 {
-	dpush(env.dt);
-	env.dt = tag_object(bignum(random()));
+	dpush(tag_object(bignum(random())));
 }

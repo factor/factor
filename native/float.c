@@ -2,8 +2,7 @@
 
 void primitive_floatp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(FLOAT_TYPE,env.dt));
+	drepl(tag_boolean(typep(FLOAT_TYPE,dpeek())));
 }
 
 FLOAT* to_float(CELL tagged)
@@ -26,33 +25,33 @@ FLOAT* to_float(CELL tagged)
 
 void primitive_to_float(void)
 {
-	env.dt = tag_object(to_float(env.dt));
+	drepl(tag_object(to_float(dpeek())));
 }
 
 void primitive_str_to_float(void)
 {
-	STRING* str = untag_string(env.dt);
+	STRING* str = untag_string(dpeek());
 	char* c_str = to_c_string(str);
 	char* end = c_str;
 	double f = strtod(c_str,&end);
 	if(end != c_str + str->capacity)
 		general_error(ERROR_FLOAT_FORMAT,tag_object(str));
-	env.dt = tag_object(make_float(f));
+	drepl(tag_object(make_float(f)));
 }
 
 void primitive_float_to_str(void)
 {
 	char tmp[33];
-	snprintf(&tmp,32,"%.16g",to_float(env.dt)->n);
+	snprintf(&tmp,32,"%.16g",to_float(dpeek())->n);
 	tmp[32] = '\0';
-	env.dt = tag_object(from_c_string(tmp));
+	drepl(tag_object(from_c_string(tmp)));
 }
 
 void primitive_float_to_bits(void)
 {
-	double f = untag_float(env.dt);
+	double f = untag_float(dpeek());
 	BIGNUM_2 f_raw = *(BIGNUM_2*)&f;
-	env.dt = tag_object(bignum(f_raw));
+	drepl(tag_object(bignum(f_raw)));
 }
 
 CELL number_eq_float(CELL x, CELL y)
@@ -117,64 +116,64 @@ CELL greatereq_float(CELL x, CELL y)
 
 void primitive_facos(void)
 {
-	env.dt = tag_object(make_float(acos(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(acos(to_float(dpeek())->n))));
 }
 
 void primitive_fasin(void)
 {
-	env.dt = tag_object(make_float(asin(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(asin(to_float(dpeek())->n))));
 }
 
 void primitive_fatan(void)
 {
-	env.dt = tag_object(make_float(atan(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(atan(to_float(dpeek())->n))));
 }
 
 void primitive_fatan2(void)
 {
-	double x = to_float(env.dt)->n;
+	double x = to_float(dpop())->n;
 	double y = to_float(dpop())->n;
-	env.dt = tag_object(make_float(atan2(y,x)));
+	dpush(tag_object(make_float(atan2(y,x))));
 }
 
 void primitive_fcos(void)
 {
-	env.dt = tag_object(make_float(cos(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(cos(to_float(dpeek())->n))));
 }
 
 void primitive_fexp(void)
 {
-	env.dt = tag_object(make_float(exp(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(exp(to_float(dpeek())->n))));
 }
 
 void primitive_fcosh(void)
 {
-	env.dt = tag_object(make_float(cosh(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(cosh(to_float(dpeek())->n))));
 }
 
 void primitive_flog(void)
 {
-	env.dt = tag_object(make_float(log(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(log(to_float(dpeek())->n))));
 }
 
 void primitive_fpow(void)
 {
-	double x = to_float(env.dt)->n;
+	double x = to_float(dpop())->n;
 	double y = to_float(dpop())->n;
-	env.dt = tag_object(make_float(pow(y,x)));
+	dpush(tag_object(make_float(pow(y,x))));
 }
 
 void primitive_fsin(void)
 {
-	env.dt = tag_object(make_float(sin(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(sin(to_float(dpeek())->n))));
 }
 
 void primitive_fsinh(void)
 {
-	env.dt = tag_object(make_float(sinh(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(sinh(to_float(dpeek())->n))));
 }
 
 void primitive_fsqrt(void)
 {
-	env.dt = tag_object(make_float(sqrt(to_float(env.dt)->n)));
+	drepl(tag_object(make_float(sqrt(to_float(dpeek())->n))));
 }

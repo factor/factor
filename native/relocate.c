@@ -24,8 +24,8 @@ void relocate_object()
 	case SBUF_TYPE:
 		fixup_sbuf((SBUF*)relocating);
 		break;
-	case HANDLE_TYPE:
-		fixup_handle((HANDLE*)relocating);
+	case PORT_TYPE:
+		fixup_port((PORT*)relocating);
 	}
 
 	relocating += size;
@@ -53,13 +53,7 @@ void relocate(CELL r)
 
 	relocating = active->base;
 
-	/* The first three objects in the image must always be
-	   EMPTY, F, T */
-	if(untag_header(get(relocating)) != EMPTY_TYPE)
-		fatal_error("Not empty",get(relocating));
-	empty = tag_object((CELL*)relocating);
-	relocate_next();
-
+	/* The first two objects in the image must always be F, T */
 	if(untag_header(get(relocating)) != F_TYPE)
 		fatal_error("Not F",get(relocating));
 	F = tag_object((CELL*)relocating);

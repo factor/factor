@@ -59,8 +59,7 @@ bool numberp(CELL tagged)
 
 void primitive_numberp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(numberp(env.dt));
+	drepl(tag_boolean(numberp(dpeek())));
 }
 
 bool zerop(CELL tagged)
@@ -101,7 +100,7 @@ CELL to_integer(CELL tagged)
 
 void primitive_to_integer(void)
 {
-	env.dt = to_integer(env.dt);
+	drepl(to_integer(dpeek()));
 }
 
 /* EQUALITY */

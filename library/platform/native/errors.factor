@@ -55,12 +55,11 @@ USE: vectors
 
 : error# ( n -- str )
     [
-        "Expired handle: "
+        "Expired port: "
         "Undefined word: "
         "Type check: "
         "Array range check: "
         "Underflow"
-        "Incompatible handle: "
         "I/O error: "
         "Overflow"
         "Incomparable types: "

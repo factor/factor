@@ -2,7 +2,7 @@
 
 void primitive_open_file(void)
 {
-	bool write = untag_boolean(env.dt);
+	bool write = untag_boolean(dpop());
 	bool read = untag_boolean(dpop());
 	char* path = to_c_string(untag_string(dpop()));
 	int mode;
@@ -21,5 +21,5 @@ void primitive_open_file(void)
 	if(fd < 0)
 		io_error(__FUNCTION__);
 
-	env.dt = handle(HANDLE_FD,fd);
+	dpush(port(fd));
 }

@@ -69,8 +69,6 @@ bool save_image(char* filename)
 
 void primitive_save_image(void)
 {
-	STRING* filename = untag_string(env.dt);
-	env.dt = dpop();
-	
+	STRING* filename = untag_string(dpop());
 	save_image(to_c_string(filename));
 }

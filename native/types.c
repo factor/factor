@@ -101,7 +101,6 @@ CELL untagged_object_size(CELL pointer)
 		return align8(sizeof(WORD));
 	case F_TYPE:
 	case T_TYPE:
-	case EMPTY_TYPE:
 		size = CELLS * 2;
 		break;
 	case ARRAY_TYPE:
@@ -122,8 +121,8 @@ CELL untagged_object_size(CELL pointer)
 	case FLOAT_TYPE:
 		size = sizeof(FLOAT);
 		break;
-	case HANDLE_TYPE:
-		size = sizeof(HANDLE);
+	case PORT_TYPE:
+		size = sizeof(PORT);
 		break;
 	default:
 		critical_error("Cannot determine size",relocating);
@@ -136,12 +135,10 @@ CELL untagged_object_size(CELL pointer)
 
 void primitive_type_of(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_fixnum(type_of(env.dt));
+	drepl(tag_fixnum(type_of(dpeek())));
 }
 
 void primitive_size_of(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_fixnum(object_size(env.dt));
+	drepl(tag_fixnum(object_size(dpeek())));
 }

@@ -13,8 +13,6 @@
 jmp_buf toplevel;
 
 typedef struct {
-	/* TAGGED top of datastack; EMPTY if datastack is empty */
-	CELL dt;
 	/* TAGGED currently executing quotation */
 	CELL cf;
 	/* raw pointer to datastack bottom */
@@ -36,12 +34,16 @@ typedef struct {
 ENV env;
 
 void clear_environment(void);
-void check_non_empty(CELL cell);
 
 INLINE CELL dpop(void)
 {
 	env.ds -= CELLS;
 	return get(env.ds);
+}
+
+INLINE void drepl(CELL top)
+{
+	put(env.ds - CELLS,top);
 }
 
 INLINE void dpush(CELL top)

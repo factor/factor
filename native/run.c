@@ -20,9 +20,6 @@ void run(void)
 	{
 		if(env.cf == F)
 		{
-			if(cpeek() == empty)
-				break;
-
 			env.cf = cpop();
 			continue;
 		}
@@ -34,15 +31,10 @@ void run(void)
 		if(TAG(next) == WORD_TYPE)
 		{
 			env.w = (WORD*)UNTAG(next);
-			/* printf("EXECUTE %d\n",env.w->primitive); */
 			EXECUTE(env.w);
 		}
 		else
-		{
-			/* printf("DPUSH %d\n",type_of(next)); */
-			dpush(env.dt);
-			env.dt = next;
-		}
+			dpush(next);
 	}
 }
 
@@ -65,16 +57,14 @@ void call()
 
 void primitive_execute(void)
 {
-	WORD* word = untag_word(env.dt);
-	env.dt = dpop();
+	WORD* word = untag_word(dpop());
 	env.w = word;
 	EXECUTE(env.w);
 }
 
 void primitive_call(void)
 {
-	CELL calling = env.dt;
-	env.dt = dpop();
+	CELL calling = dpop();
 	if(env.cf != F)
 		cpush(env.cf);
 	env.cf = calling;
@@ -82,11 +72,10 @@ void primitive_call(void)
 
 void primitive_ifte(void)
 {
-	CELL f = env.dt;
+	CELL f = dpop();
 	CELL t = dpop();
 	CELL cond = dpop();
 	CELL calling = (untag_boolean(cond) ? t : f);
-	env.dt = dpop();
 	if(env.cf != F)
 		cpush(env.cf);
 	env.cf = calling;
@@ -94,19 +83,17 @@ void primitive_ifte(void)
 
 void primitive_getenv(void)
 {
-	FIXNUM e = to_fixnum(env.dt);
+	FIXNUM e = to_fixnum(dpeek());
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
-	env.dt = env.user[e];
+	drepl(env.user[e]);
 }
 
 void primitive_setenv(void)
 {
-	FIXNUM e = to_fixnum(env.dt);
+	FIXNUM e = to_fixnum(dpop());
 	CELL value = dpop();
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
-	check_non_empty(value);
 	env.user[e] = value;
-	env.dt = dpop();
 }

@@ -10,40 +10,38 @@ VECTOR* vector(FIXNUM capacity)
 
 void primitive_vectorp(void)
 {
-	check_non_empty(env.dt);
-	env.dt = tag_boolean(typep(VECTOR_TYPE,env.dt));
+	drepl(tag_boolean(typep(VECTOR_TYPE,dpeek())));
 }
 
 void primitive_vector(void)
 {
-	env.dt = tag_object(vector(to_fixnum(env.dt)));
+	drepl(tag_object(vector(to_fixnum(dpeek()))));
 }
 
 void primitive_vector_length(void)
 {
-	env.dt = tag_fixnum(untag_vector(env.dt)->top);
+	drepl(tag_fixnum(untag_vector(dpeek())->top));
 }
 
 void primitive_set_vector_length(void)
 {
-	VECTOR* vector = untag_vector(env.dt);
+	VECTOR* vector = untag_vector(dpop());
 	FIXNUM length = to_fixnum(dpop());
 	vector->top = length;
 	if(length < 0)
 		range_error(tag_object(vector),length,vector->top);
 	else if(length > vector->array->capacity)
 		vector->array = grow_array(vector->array,length,F);
-	env.dt = dpop(); /* don't forget this! */
 }
 
 void primitive_vector_nth(void)
 {
-	VECTOR* vector = untag_vector(env.dt);
+	VECTOR* vector = untag_vector(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= vector->top)
 		range_error(tag_object(vector),index,vector->top);
-	env.dt = array_nth(vector->array,index);
+	dpush(array_nth(vector->array,index));
 }
 
 void vector_ensure_capacity(VECTOR* vector, CELL index)
@@ -58,10 +56,9 @@ void vector_ensure_capacity(VECTOR* vector, CELL index)
 
 void primitive_set_vector_nth(void)
 {
-	VECTOR* vector = untag_vector(env.dt);
+	VECTOR* vector = untag_vector(dpop());
 	FIXNUM index = to_fixnum(dpop());
 	CELL value = dpop();
-	check_non_empty(value);
 
 	if(index < 0)
 		range_error(tag_object(vector),index,vector->top);
@@ -70,8 +67,6 @@ void primitive_set_vector_nth(void)
 
 	/* the following does not check bounds! */
 	set_array_nth(vector->array,index,value);
-	
-	env.dt = dpop(); /* don't forget this! */
 }
 
 void fixup_vector(VECTOR* vector)

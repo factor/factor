@@ -24,17 +24,13 @@ CELL F;
 #define T_TYPE 7
 CELL T;
 
-/* Empty stack marker */
-#define EMPTY_TYPE 8
-CELL empty;
-
-#define ARRAY_TYPE 9
-#define VECTOR_TYPE 10
-#define STRING_TYPE 11
-#define SBUF_TYPE 12
-#define HANDLE_TYPE 13
-#define BIGNUM_TYPE 14
-#define FLOAT_TYPE 15
+#define ARRAY_TYPE 8
+#define VECTOR_TYPE 9
+#define STRING_TYPE 10
+#define SBUF_TYPE 11
+#define PORT_TYPE 12
+#define BIGNUM_TYPE 13
+#define FLOAT_TYPE 14
 
 /* Pseudo-types. For error reporting only. */
 #define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
@@ -46,12 +42,6 @@ bool typep(CELL type, CELL tagged);
 CELL type_of(CELL tagged);
 void type_check(CELL type, CELL tagged);
 
-INLINE void check_non_empty(CELL cell)
-{
-	if(cell == empty)
-		general_error(ERROR_UNDERFLOW,F);
-}
-
 INLINE CELL tag_boolean(CELL untagged)
 {
 	return (untagged == false ? F : T);
@@ -59,7 +49,6 @@ INLINE CELL tag_boolean(CELL untagged)
 
 INLINE bool untag_boolean(CELL tagged)
 {
-	check_non_empty(tagged);
 	return (tagged == F ? false : true);
 }
 
