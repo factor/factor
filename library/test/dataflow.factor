@@ -7,11 +7,11 @@ USE: logic
 USE: combinators
 USE: hashtables
 USE: stack
-USE: dataflow
 USE: kernel
 USE: vectors
 USE: namespaces
 USE: prettyprint
+USE: words
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.
@@ -37,10 +37,10 @@ USE: prettyprint
 ] unit-test
 
 : dataflow-consume-d-len ( object -- n )
-    [ node-consume-d get vector-length ] bind ;
+    [ node-consume-d get length ] bind ;
 
 : dataflow-produce-d-len ( object -- n )
-    [ node-produce-d get vector-length ] bind ;
+    [ node-produce-d get length ] bind ;
 
 [ t ] [ [ drop ] dataflow car dataflow-consume-d-len 1 = ] unit-test
 
@@ -51,7 +51,7 @@ USE: prettyprint
 
 [ t ] [
     [ 2 [ swap ] [ nip "hi" ] ifte ] dataflow
-    dataflow-ifte-node-consume-d vector-length 1 =
+    dataflow-ifte-node-consume-d length 1 =
 ] unit-test
 
 [ t ] [
@@ -61,4 +61,24 @@ USE: prettyprint
             [ [ node-param get \ no-method = ] bind ] some?
         ] some?
     ] bind >boolean
+] unit-test
+
+SYMBOL: #test
+
+#test f "foobar" set-word-property
+
+[ 6 ] [
+    {{
+        [ node-op | #test ]
+        [ node-param | 5 ]
+    }} "foobar" [ drop succ ] apply-dataflow
+] unit-test
+
+#test [ sq ] "foobar" set-word-property
+
+[ 25 ] [
+    {{
+        [ node-op | #test ]
+        [ node-param | 5 ]
+    }} "foobar" [ drop succ ] apply-dataflow
 ] unit-test

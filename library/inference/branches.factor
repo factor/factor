@@ -27,7 +27,6 @@
 
 IN: inference
 USE: combinators
-USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
@@ -50,7 +49,7 @@ USE: hashtables
     [
         copy-interpreter
         dataflow-graph off
-        (infer)
+        infer-quot
         branch-effect
     ] with-scope ;
 

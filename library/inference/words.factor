@@ -27,7 +27,6 @@
 
 IN: inference
 USE: combinators
-USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
@@ -73,7 +72,7 @@ USE: prettyprint
 : inline-compound ( word -- effect )
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance.
-    [ word-parameter (infer) effect ] with-recursive-state ;
+    [ word-parameter infer-quot effect ] with-recursive-state ;
 
 : (infer-compound) ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -152,7 +151,7 @@ USE: prettyprint
     \ drop #call dataflow, drop
     [
         dataflow-graph off
-        pop-d uncons recursive-state set (infer)
+        pop-d uncons recursive-state set infer-quot
         d-in get meta-d get get-dataflow
     ] with-scope
     [ dataflow-graph cons@ ] each meta-d set d-in set ;

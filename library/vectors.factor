@@ -74,17 +74,6 @@ DEFER: vector-map
     #! Reached end?
     drop vector-length number= ;
 
-: (vector=) ( n vec vec -- ? )
-    3dup ?vector= [
-        3drop t ( reached end without any unequal elts )
-    ] [
-        3dup 2vector-nth = [
-            >r >r succ r> r> (vector=)
-        ] [
-            3drop f
-        ] ifte
-    ] ifte ;
-
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
 
@@ -97,7 +86,7 @@ DEFER: vector-map
     ] [
         over vector? [
             2dup vector-length= [
-                0 -rot (vector=)
+                swap vector>list swap vector>list =
             ] [
                 2drop f
             ] ifte
@@ -114,14 +103,14 @@ DEFER: vector-map
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;
 
-: vector-tail ( n vector -- vector )
+: vector-tail ( n vector -- list )
     #! Return a new vector, with all elements from the nth
     #! index upwards.
     2dup vector-length swap - [
         pick + over vector-nth
-    ] vector-project nip nip ;
+    ] project nip nip ;
 
-: vector-tail* ( n vector -- vector )
+: vector-tail* ( n vector -- list )
     #! Unlike vector-tail, n is an index from the end of the
     #! vector. For example, if n=1, this returns a vector of
     #! one element.

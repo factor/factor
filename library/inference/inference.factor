@@ -27,7 +27,6 @@
 
 IN: inference
 USE: combinators
-USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
@@ -116,7 +115,7 @@ DEFER: apply-word
     #! Apply the object's stack effect to the inferencer state.
     dup word? [ apply-word ] [ apply-literal ] ifte ;
 
-: (infer) ( quot -- )
+: infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ apply-object ] each ;
@@ -145,16 +144,26 @@ DEFER: apply-word
         2drop
     ] ifte ;
 
+: return-node ( -- )
+    #! Add a #return node to the dataflow graph.
+    f #return dataflow, [
+        meta-d get vector>list node-consume-d set
+        meta-r get vector-length 0 = [
+            "Word leaves elements on return stack" throw
+        ] unless
+    ] bind ;
+
+: (infer) ( quot -- )
+    f init-inference infer-quot return-node ;
+
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
-    [ f init-inference (infer)  effect ] with-scope ;
+    [ (infer) effect ] with-scope ;
 
 : try-infer ( quot -- effect/f )
     #! Push f if inference fails.
     [ infer ] [ [ drop f ] when ] catch ;
 
-IN: dataflow
-
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
-    [ f init-inference (infer)  get-dataflow ] with-scope ;
+    [ (infer) get-dataflow ] with-scope ;

@@ -25,12 +25,12 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: linearizer
+IN: compiler
 USE: lists
 USE: words
 USE: stack
 USE: namespaces
-USE: dataflow
+USE: inference
 USE: combinators
 
 ! Linear IR nodes. This is in addition to the symbols already
@@ -40,7 +40,6 @@ SYMBOL: #branch-t ( branch if top of stack is true )
 SYMBOL: #branch ( unconditional branch )
 SYMBOL: #label ( branch target )
 SYMBOL: #jump ( tail-call )
-SYMBOL: #return ( return to caller )
 
 : linear, ( param op -- )
     swons , ;
@@ -49,12 +48,7 @@ SYMBOL: #return ( return to caller )
     #! Dataflow OPs have a linearizer word property. This
     #! quotation is executed to convert the node into linear
     #! form.
-    [ node-param get  node-op get ] bind
-    dup "linearizer" word-property dup [
-        nip call
-    ] [
-        drop linear,
-    ] ifte ;
+    "linearizer" [ drop linear, ] apply-dataflow ;
 
 : (linearize) ( dataflow -- )
     [ >linear ] each ;
@@ -85,4 +79,4 @@ SYMBOL: #return ( return to caller )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
 
-\ #ifte [ linearize-ifte ] "linearizer" set-word-property
+#ifte [ linearize-ifte ] "linearizer" set-word-property

@@ -113,6 +113,7 @@ USE: stdio
     "/library/inference/branches.factor"
     "/library/inference/stack.factor"
 
+    "/library/compiler/optimizer.factor"
     "/library/compiler/linearizer.factor"
     "/library/compiler/assembler.factor"
     "/library/compiler/xt.factor"

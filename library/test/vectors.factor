@@ -53,9 +53,9 @@ unit-test
 [ { 1 2 3 4 } { 5 6 7 8 } vector-zip ]
 unit-test
 
-[ { } ] [ 0 { } vector-tail ] unit-test
-[ { } ] [ 2 { 1 2 } vector-tail ] unit-test
-[ { 3 4 } ] [ 2 { 1 2 3 4 } vector-tail ] unit-test
-[ 2 { } vector-tail ] unit-test-fails
+[ [ ] ] [ 0 { } vector-tail ] unit-test
+[ [ ] ] [ 2 { 1 2 } vector-tail ] unit-test
+[ [ 3 4 ] ] [ 2 { 1 2 3 4 } vector-tail ] unit-test
+[ 2 [ ] vector-tail ] unit-test-fails
 
-[ { 3 } ] [ 1 { 1 2 3 } vector-tail* ] unit-test
+[ [ 3 ] ] [ 1 { 1 2 3 } vector-tail* ] unit-test

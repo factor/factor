@@ -25,12 +25,10 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: generator
+IN: compiler
 USE: combinators
-USE: compiler
-USE: dataflow
+USE: inference
 USE: errors
-USE: linearizer
 USE: lists
 USE: math
 USE: namespaces

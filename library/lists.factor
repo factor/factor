@@ -252,3 +252,13 @@ DEFER: tree-contains?
 
 : vector>list ( vector -- list )
     stack>list reverse ;
+
+: project ( n quot -- list )
+    #! Execute the quotation n times, passing the loop counter
+    #! the quotation as it ranges from 0..n-1. Collect results
+    #! in a new list.
+    [ ] rot [ -rot over >r >r call r> cons r> swap ] times*
+    nip reverse ; inline
+
+: count ( n -- [ 0 ... n-1 ] )
+    [ ] project ;

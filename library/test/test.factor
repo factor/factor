@@ -113,6 +113,7 @@ USE: unparser
         "parsing-word"
         "inference"
         "dataflow"
+        "optimizer"
         "interpreter"
     ] [
         test

@@ -77,6 +77,3 @@ SYMBOL: list-buffer
     #! Append an object to the currently constructing list, only
     #! if the object does not already occur in the list.
     list-buffer unique@ ;
-
-: count ( n -- [ 0 ... n-1 ] )
-    [ [ , ] times* ] make-list ;

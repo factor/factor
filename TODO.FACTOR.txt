@@ -5,31 +5,36 @@
 [error] AWT-EventQueue-0:  at factor.jedit.WordPreview.actionPerformed(WordPreview.java:79)
 [error] AWT-EventQueue-0:  at javax.swing.Timer.fireActionPerformed(Timer.java:271)
 
++ inference/dataflow:
 
-+ inference/interpreter:
-
-- combinator inference
 - type inference
-- some way to step over a word in the stepper
-- step: print NEXT word to execute, not word that JUST executed
+- handle odd base cases, with code after ifte
+- handle recursion with when, when* etc
+- lifting
+- stack ops and alien-call need special nodes
 
-+ compiler/ffi:
++ linearizer/generator:
 
-- compiling when*
-- compiling each, etc.
+- peephole optimizer
+- linearize generic, 2generic
+- generate conditionals
+- generator needs to be aware of labels
 - getenv/setenv: if literal arg, compile as a load/store
-- inline words
 - compiler: drop literal peephole optimization
+
++ compiler frontend:
+
+- assembler opcodes dispatch on operand types
+- save code in image
+- compile word twice; no more 'cannot compile' error!
+
++ ffi:
+
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *
 - FFI float types
-- compile word twice; no more 'cannot compile' error!
-- perhaps /i should work with all numbers
-- assembler opcodes dispatch on operand types
-- lifting
-- save code in image
 
 + listener/plugin:
 
@@ -57,6 +62,9 @@
 
 + misc:
 
+- some way to step over a word in the stepper
+- step: print NEXT word to execute, not word that JUST executed
+- perhaps /i should work with all numbers
 - unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup

@@ -25,8 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: dataflow
-USE: inference
+IN: inference
 USE: interpreter
 USE: lists
 USE: math
@@ -46,6 +45,8 @@ SYMBOL: #ifte
 SYMBOL: #generic
 SYMBOL: #2generic
 
+SYMBOL: #return
+
 SYMBOL: node-consume-d
 SYMBOL: node-produce-d
 SYMBOL: node-consume-r
@@ -60,10 +61,10 @@ SYMBOL: node-param
     <namespace> [
         node-op set
         node-param set
-        { } node-consume-d set
-        { } node-produce-d set
-        { } node-consume-r set
-        { } node-produce-r set
+        [ ] node-consume-d set
+        [ ] node-produce-d set
+        [ ] node-consume-r set
+        [ ] node-produce-r set
     ] extend ;
 
 : node-inputs ( d-count r-count -- )
@@ -93,3 +94,16 @@ SYMBOL: node-param
     #! Remove the top stack element and add a dataflow node
     #! noting this.
     \ drop #call dataflow, [ 1 0 node-inputs ] bind ;
+
+: apply-dataflow ( dataflow name default -- )
+    #! For the dataflow node, look up named word property,
+    #! if its not defined, apply default quotation to
+    #! ( param op ) otherwise apply property quotation to
+    #! ( param ).
+    >r >r [ node-param get  node-op get ] bind dup r>
+    word-property dup [
+        ( param op property )
+        nip call r> drop
+    ] [
+        drop r> call
+    ] ifte ;

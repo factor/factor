@@ -27,12 +27,10 @@
 
 IN: compiler
 USE: combinators
-USE: dataflow
+USE: inference
 USE: errors
-USE: generator
 USE: hashtables
 USE: kernel
-USE: linearizer
 USE: lists
 USE: logic
 USE: math

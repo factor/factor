@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: dataflow
 USE: interpreter
 USE: stack
 USE: words

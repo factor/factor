@@ -385,6 +385,7 @@ public class FactorPlugin extends EditPlugin
 		Buffer buffer = view.getBuffer();
 		int lastUseOffset = 0;
 		boolean leadingNewline = false;
+		boolean seenUse = false;
 
 		for(int i = 0; i < buffer.getLineCount(); i++)
 		{
@@ -393,13 +394,14 @@ public class FactorPlugin extends EditPlugin
 			{
 				lastUseOffset = buffer.getLineEndOffset(i) - 1;
 				leadingNewline = true;
+				seenUse = true;
 			}
-			else if(text.startsWith("!"))
+			else if(text.startsWith("!") && !seenUse)
 			{
 				lastUseOffset = buffer.getLineEndOffset(i) - 1;
 				leadingNewline = true;
 			}
-			else if(text.length() == 0)
+			else if(text.length() == 0 && !seenUse)
 			{
 				if(i == 0)
 					lastUseOffset = 0;
