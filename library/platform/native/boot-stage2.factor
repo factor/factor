@@ -128,6 +128,8 @@ USE: stdio
     "/library/jedit/jedit-remote.factor"
     "/library/jedit/jedit.factor"
 
+    "/library/platform/native/primitives.factor"
+
     "/library/init.factor"
     "/library/platform/native/init-stage2.factor"
 ] [

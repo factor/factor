@@ -36,14 +36,13 @@ USE: strings
 USE: unparser
 USE: words
 
-: prettyprint-docs ( indent word -- indent )
-    [
-        stack-effect [
-            <% CHAR: ( % % CHAR: ) % %> prettyprint-comment
-            dup prettyprint-newline
-        ] when*
-    ] keep
+: stack-effect. ( word -- )
+    stack-effect [
+        " " write
+        <% CHAR: ( % % CHAR: ) % %> prettyprint-comment
+    ] when* ;
 
+: documentation. ( indent word -- indent )
     documentation [
         "\n" split [
             "#!" swap cat2 prettyprint-comment
@@ -51,16 +50,21 @@ USE: words
         ] each
     ] when* ;
 
+: prettyprint-docs ( indent word -- indent )
+    [
+        stack-effect. dup prettyprint-newline
+    ] keep documentation. ;
+
 : see-compound ( word -- )
     0 swap
     [ dupd prettyprint-IN: prettyprint-: ] keep
-    [ prettyprint-word prettyprint-space ] keep
+    [ prettyprint-word ] keep
     [ prettyprint-docs ] keep
     [ word-parameter prettyprint-list prettyprint-; ] keep
     prettyprint-plist prettyprint-newline ;
 
 : see-primitive ( word -- )
-    "PRIMITIVE: " write unparse print ;
+    "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
 
 : see-undefined ( word -- )
     drop "Not defined" print ;

@@ -69,24 +69,3 @@ USE: url-encoding
 [ "Baz=%20" query>alist ] unit-test
 
 [ [ [ "Foo" ] ] ] [ "Foo" query>alist ] unit-test
-
-[ f "/foo/hello.html" ] [
-    [
-        "/foo/" "doc-root" set
-        "hello.html" parse-object-name
-    ] with-scope
-] unit-test
-
-[ "some-arg" "/foo/hello.html" ] [
-    [
-        "/foo/" "doc-root" set
-        "hello.html?some-arg" parse-object-name
-    ] with-scope
-] unit-test
-
-[ f "/foo/" ] [
-    [
-        "/foo" "doc-root" set
-        f parse-object-name
-    ] with-scope
-] unit-test
