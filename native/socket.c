@@ -39,7 +39,7 @@ int make_server_socket(CHAR port)
 
 void primitive_server_socket(void)
 {
-	CHAR port = (CHAR)untag_fixnum(env.dt);
+	CHAR port = (CHAR)to_fixnum(env.dt);
 	env.dt = handle(HANDLE_FD,make_server_socket(port));
 }
 

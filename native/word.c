@@ -33,7 +33,7 @@ void primitive_word(void)
 	CELL parameter = dpop();
 	check_non_empty(plist);
 	check_non_empty(parameter);
-	primitive = untag_fixnum(dpop());
+	primitive = to_fixnum(dpop());
 	env.dt = tag_word(word(primitive,parameter,plist));
 }
 
@@ -45,7 +45,7 @@ void primitive_word_primitive(void)
 void primitive_set_word_primitive(void)
 {
 	WORD* word = untag_word(env.dt);
-	word->primitive = untag_fixnum(dpop());
+	word->primitive = to_fixnum(dpop());
 	update_xt(word);
 	env.dt = dpop();
 }

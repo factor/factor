@@ -49,14 +49,12 @@ USE: vocabularies
 USE: words
 USE: unparser
 
-: boot ( -- )
-    init-namespaces
+: init-gc ( -- )
+    [ garbage-collection ] 7 setenv ;
 
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    
+: boot ( -- )
+    init-gc
+    init-namespaces
     init-stdio
     "stdio" get <ansi-stream> "stdio" set
     init-errors
@@ -64,6 +62,12 @@ USE: unparser
     init-scratchpad
     init-styles
     init-vocab-styles
+
+    ! Some flags are *on* by default, unless user specifies
+    ! -no-<flag> CLI switch
+    t "user-init" set
+    t "interactive" set
+
     10 "base" set
     print-banner
     room.

@@ -28,7 +28,7 @@ void primitive_##OP(void) \
 			switch(object_type(y)) \
 			{ \
 			case BIGNUM_TYPE: \
-				OP##_bignum(fixnum_to_bignum(x),y); \
+				OP##_bignum((CELL)fixnum_to_bignum(x),y); \
 				break; \
 			default: \
 				type_error(FIXNUM_TYPE,y); \
@@ -52,7 +52,7 @@ void primitive_##OP(void) \
 			switch(TAG(y)) \
 			{ \
 			case FIXNUM_TYPE: \
-				OP##_bignum(x,fixnum_to_bignum(y)); \
+				OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
 				break; \
 			case OBJECT_TYPE: \
 \
@@ -87,6 +87,8 @@ void primitive_##OP(void) \
 	} \
 }
 
+FIXNUM to_fixnum(CELL tagged);
+
 void primitive_add(void);
 void primitive_subtract(void);
 void primitive_multiply(void);
@@ -95,3 +97,9 @@ void primitive_less(void);
 void primitive_lesseq(void);
 void primitive_greater(void);
 void primitive_greatereq(void);
+void primitive_mod(void);
+void primitive_and(void);
+void primitive_or(void);
+void primitive_xor(void);
+void primitive_shiftleft(void);
+void primitive_shiftright(void);

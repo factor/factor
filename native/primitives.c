@@ -97,7 +97,7 @@ CELL primitive_to_xt(CELL primitive)
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
 		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
 	
-	return primitives[primitive];
+	return (CELL)primitives[primitive];
 }
 
 void primitive_eq(void)

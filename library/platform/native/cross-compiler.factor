@@ -116,8 +116,8 @@ IN: cross-compiler
         bitor
         bitxor
         bitnot
-        shift>
         shift<
+        shift>
         <
         <=
         >

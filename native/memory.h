@@ -1,6 +1,7 @@
 typedef struct {
 	CELL base;
 	CELL here;
+	CELL alarm;
 	CELL limit;
 } ZONE;
 

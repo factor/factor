@@ -115,7 +115,7 @@ void primitive_write_fd_8(void)
 	switch(type)
 	{
 	case FIXNUM_TYPE:
-		write_fd_char_8(h,untag_fixnum(text));
+		write_fd_char_8(h,to_fixnum(text));
 		break;
 	case STRING_TYPE:
 		write_fd_string_8(h,untag_string(text));
@@ -147,10 +147,10 @@ void primitive_flush_fd(void)
 
 void primitive_shutdown_fd(void)
 {
-	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
+	/* HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
 
-	/* if(shutdown(fd,SHUT_RDWR) < 0)
+	if(shutdown(fd,SHUT_RDWR) < 0)
 		io_error(__FUNCTION__); */
 
 	env.dt = dpop();

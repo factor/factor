@@ -98,7 +98,7 @@ void primitive_string_length(void)
 void primitive_string_nth(void)
 {
 	STRING* string = untag_string(env.dt);
-	CELL index = untag_fixnum(dpop());
+	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= string->capacity)
 		range_error(tag_object(string),index,string->capacity);
@@ -189,9 +189,9 @@ void primitive_index_of(void)
 	CELL result;
 	check_non_empty(ch);
 	string = untag_string(dpop());
-	index = untag_fixnum(dpop());
+	index = to_fixnum(dpop());
 	if(TAG(ch) == FIXNUM_TYPE)
-		result = index_of_ch(index,string,untag_fixnum(ch));
+		result = index_of_ch(index,string,to_fixnum(ch));
 	else
 		result = index_of_str(index,string,untag_string(ch));
 	env.dt = tag_fixnum(result);
@@ -220,7 +220,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 void primitive_substring(void)
 {
 	STRING* string = untag_string(env.dt);
-	CELL end = untag_fixnum(dpop());
-	CELL start = untag_fixnum(dpop());
+	CELL end = to_fixnum(dpop());
+	CELL start = to_fixnum(dpop());
 	env.dt = tag_object(substring(start,end,string));
 }

@@ -9,6 +9,7 @@ static ZONE* zalloc(CELL size)
 	if(z->base == 0)
 		fatal_error("Cannot allocate zone",size);
 	z->limit = z->base + size;
+	z->alarm = z->base + (size * 3) / 4;
 	z->base = align8(z->base);
 	return z;
 }
@@ -24,6 +25,7 @@ CELL allot(CELL a)
 {
 	CELL h = active->here;
 	active->here = align8(active->here + a);
+
 	if(active->here > active->limit)
 	{
 		printf("Out of memory\n");
@@ -33,6 +35,13 @@ CELL allot(CELL a)
 		printf("request       = %ld\n",a);
 		exit(1);
 	}
+	else if(active->here > active->alarm)
+	{
+		/* Execute the 'garbage-collection' word */
+		cpush(env.cf);
+		env.cf = env.user[GC_ENV];
+	}
+
 	return h;
 }
 

@@ -16,7 +16,7 @@ void primitive_vectorp(void)
 
 void primitive_vector(void)
 {
-	env.dt = tag_object(vector(untag_fixnum(env.dt)));
+	env.dt = tag_object(vector(to_fixnum(env.dt)));
 }
 
 void primitive_vector_length(void)
@@ -27,7 +27,7 @@ void primitive_vector_length(void)
 void primitive_set_vector_length(void)
 {
 	VECTOR* vector = untag_vector(env.dt);
-	FIXNUM length = untag_fixnum(dpop());
+	FIXNUM length = to_fixnum(dpop());
 	vector->top = length;
 	if(length < 0)
 		range_error(tag_object(vector),length,vector->top);
@@ -39,7 +39,7 @@ void primitive_set_vector_length(void)
 void primitive_vector_nth(void)
 {
 	VECTOR* vector = untag_vector(env.dt);
-	CELL index = untag_fixnum(dpop());
+	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= vector->top)
 		range_error(tag_object(vector),index,vector->top);
@@ -59,7 +59,7 @@ void vector_ensure_capacity(VECTOR* vector, int index)
 void primitive_set_vector_nth(void)
 {
 	VECTOR* vector = untag_vector(env.dt);
-	FIXNUM index = untag_fixnum(dpop());
+	FIXNUM index = to_fixnum(dpop());
 	CELL value = dpop();
 	check_non_empty(value);
 

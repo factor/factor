@@ -1,11 +1,13 @@
 #define USER_ENV 16
 
-#define STDIN_ENV     0
-#define STDOUT_ENV    1
-#define STDERR_ENV    2
-#define NAMESTACK_ENV 3
-#define GLOBAL_ENV    4
-#define BREAK_ENV     5
+#define STDIN_ENV      0
+#define STDOUT_ENV     1
+#define STDERR_ENV     2
+#define NAMESTACK_ENV  3
+#define GLOBAL_ENV     4
+#define BREAK_ENV      5
+#define CATCHSTACK_ENV 6
+#define GC_ENV         7
 
 /* Error handlers restore this */
 jmp_buf toplevel;

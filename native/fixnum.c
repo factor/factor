@@ -20,44 +20,8 @@ void primitive_divide(void)
 	env.dt = tag_fixnum(x / y);
 }
 
-void primitive_mod(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x % y;
-}
-
-void primitive_and(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x & y;
-}
-
-void primitive_or(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x | y;
-}
-
-void primitive_xor(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x ^ y;
-}
-
 void primitive_not(void)
 {
 	type_check(FIXNUM_TYPE,env.dt);
 	env.dt = RETAG(UNTAG(~env.dt),FIXNUM_TYPE);
-}
-
-void primitive_shiftleft(void)
-{
-	BINARY_OP(x,y);
-	env.dt = UNTAG(x >> (y >> TAG_BITS));
-}
-
-void primitive_shiftright(void)
-{
-	BINARY_OP(x,y);
-	env.dt = x << (y >> TAG_BITS);
 }

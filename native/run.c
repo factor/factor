@@ -45,10 +45,12 @@ void run(void)
 		if(TAG(next) == WORD_TYPE)
 		{
 			env.w = (WORD*)UNTAG(next);
+			/* printf("EXECUTE %d\n",env.w->primitive); */
 			EXECUTE(env.w);
 		}
 		else
 		{
+			/* printf("DPUSH %d\n",type_of(next)); */
 			dpush(env.dt);
 			env.dt = next;
 		}
@@ -103,7 +105,7 @@ void primitive_ifte(void)
 
 void primitive_getenv(void)
 {
-	FIXNUM e = untag_fixnum(env.dt);
+	FIXNUM e = to_fixnum(env.dt);
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
 	env.dt = env.user[e];
@@ -111,7 +113,7 @@ void primitive_getenv(void)
 
 void primitive_setenv(void)
 {
-	FIXNUM e = untag_fixnum(env.dt);
+	FIXNUM e = to_fixnum(env.dt);
 	CELL value = dpop();
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
@@ -122,5 +124,5 @@ void primitive_setenv(void)
 
 void primitive_exit(void)
 {
-	exit(untag_fixnum(env.dt));
+	exit(to_fixnum(env.dt));
 }

@@ -69,6 +69,7 @@ USE: words
 : object-tag BIN: 011 ;
 : header-tag BIN: 100 ;
 
+: fixnum-mask HEX: 1fffffff ;
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
 
@@ -183,7 +184,7 @@ DEFER: '
     object-tag here-as swap
     11 >header emit
     dup str-length emit
-    dup hashcode emit
+    dup hashcode fixnum-mask bitand emit
     pack-string
     pad ;
 

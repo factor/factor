@@ -16,7 +16,7 @@ void primitive_sbufp(void)
 
 void primitive_sbuf(void)
 {
-	env.dt = tag_object(sbuf(untag_fixnum(env.dt)));
+	env.dt = tag_object(sbuf(to_fixnum(env.dt)));
 }
 
 void primitive_sbuf_length(void)
@@ -27,7 +27,7 @@ void primitive_sbuf_length(void)
 void primitive_set_sbuf_length(void)
 {
 	SBUF* sbuf = untag_sbuf(env.dt);
-	FIXNUM length = untag_fixnum(dpop());
+	FIXNUM length = to_fixnum(dpop());
 	sbuf->top = length;
 	if(length < 0)
 		range_error(env.dt,length,sbuf->top);
@@ -39,7 +39,7 @@ void primitive_set_sbuf_length(void)
 void primitive_sbuf_nth(void)
 {
 	SBUF* sbuf = untag_sbuf(env.dt);
-	CELL index = untag_fixnum(dpop());
+	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= sbuf->top)
 		range_error(env.dt,index,sbuf->top);
@@ -69,7 +69,7 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, CHAR value)
 void primitive_set_sbuf_nth(void)
 {
 	SBUF* sbuf = untag_sbuf(env.dt);
-	FIXNUM index = untag_fixnum(dpop());
+	FIXNUM index = to_fixnum(dpop());
 	CELL value = dpop();
 	check_non_empty(value);
 
@@ -96,7 +96,8 @@ void primitive_sbuf_append(void)
 	switch(type_of(object))
 	{
 	case FIXNUM_TYPE:
-		set_sbuf_nth(sbuf,sbuf->top,untag_fixnum(object));
+	case BIGNUM_TYPE:
+		set_sbuf_nth(sbuf,sbuf->top,to_fixnum(object));
 		break;
 	case STRING_TYPE:
 		sbuf_append_string(sbuf,untag_string(object));
