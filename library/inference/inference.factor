@@ -111,7 +111,7 @@ M: computed literal-value ( value -- )
     d-in [ vector-prepend ] change ;
 
 : (present-effect) ( vector -- list )
-    [ value-class ] vector-map vector>list ;
+    vector>list [ value-class ] map ;
 
 : present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.

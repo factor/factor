@@ -16,7 +16,7 @@ GENERIC: clone ( obj -- obj )
 M: object clone ;
 
 : cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
+    #! Returns one of "x86", "ppc", or "unknown".
     7 getenv ;
 
 : os ( -- arch )

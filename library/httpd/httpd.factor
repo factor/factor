@@ -63,8 +63,7 @@ stdio streams strings threads url-encoding ;
 : httpd-connection ( socket -- )
     "http-server" get accept [ httpd-client ] in-thread drop ;
 
-: httpd-loop ( -- )
-    [ httpd-connection ] forever ;
+: httpd-loop ( -- ) httpd-connection httpd-loop ;
 
 : (httpd) ( port -- )
     <server> "http-server" set [

@@ -2,23 +2,16 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
 
-: slip ( quot x -- x )
+: slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
-: 2slip ( quot x y -- x y )
+: 2slip ( quot x y -- x y : quot: -- )
     >r >r call r> r> ; inline
 
-: 3slip ( quot x y z -- x y z )
-    >r >r >r call r> r> r> ; inline
-
-: keep ( a quot -- a )
-    #! Execute the quotation with a on the stack, and restore a
-    #! after the quotation returns.
+: keep ( a quot -- a | quot: a -- )
     over >r call r> ; inline
 
-: 2keep ( a b quot -- a b )
-    #! Execute the quotation with a and b on the stack, and
-    #! restore a and b after the quotation returns.
+: 2keep ( a b quot -- a b | quot: a b -- )
     over >r pick >r call r> r> ; inline
 
 : while ( quot generator -- )
@@ -30,20 +23,12 @@ IN: kernel
         r> 2drop r> r> 2drop
     ] ifte ; inline
 
-: apply ( code input -- code )
-    #! A utility word for recursive combinators.
-    swap dup slip ; inline
-
 : ifte* ( cond true false -- )
-    #! If the condition is not f, execute the 'true' quotation,
-    #! with the condition on the stack. Otherwise, pop the
-    #! condition and execute the 'false' quotation.
+    #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
     pick [ drop call ] [ 2nip call ] ifte ; inline
 
 : ?ifte ( default cond true false -- )
-    #! If cond is true, drop default and apply true
-    #! quotation to cond. Otherwise, drop cond, and apply false
-    #! to default.
+    #! [ X ] [ Y ] ?ifte ==> dup [ nip X ] [ drop Y ] ifte
     >r >r dup [
         nip r> r> drop call
     ] [
@@ -82,10 +67,3 @@ IN: kernel
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
     dupd [ drop ] ifte ; inline
-
-: forever ( quot -- )
-    #! The code is evaluated in an infinite loop. Typically, a
-    #! continuation is used to escape the infinite loop.
-    #!
-    #! This combinator will not compile.
-    dup slip forever ;

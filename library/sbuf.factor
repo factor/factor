@@ -18,9 +18,7 @@ IN: strings USING: kernel lists math namespaces strings ;
     #! Apply a quotation to each character in the string, and
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
-    over string-length <sbuf> rot [
-        swap >r apply swap r> tuck sbuf-append
-    ] string-each nip sbuf>string ; inline
+    >r string>list r> map cat ; inline
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [

@@ -56,6 +56,8 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 
 + kernel:
 
+- parse errors: in parser not debugger
+- make-image: use a list not a vector
 - powerpc has weird callstack residue
 - vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
@@ -65,5 +67,4 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 - doc comments of generics
 - proper ordering for classes
 - make-vector and make-string should not need a reverse step
-- worddef props
 - automatically recompiling defs

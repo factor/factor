@@ -94,9 +94,7 @@ IN: vectors
     #! Applies code to each element of the vector, return a new
     #! vector with the results. The code must have stack effect
     #! ( obj -- obj ).
-    over vector-length <vector> rot [
-        swap >r apply swap r> tuck vector-push
-    ] vector-each nip ; inline
+    >r vector>list r> map list>vector ; inline
 
 : vector-nappend ( v1 v2 -- )
     #! Destructively append v2 to v1.

@@ -12,7 +12,6 @@ USE: prettyprint
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
 [ 6 ] [ [ 2 2 + ] 1 1 2slip + + ] unit-test
-[ 6 ] [ [ 2 1 + ] 1 1 1 3slip + + + ] unit-test
 
 [ [ ] keep ] unit-test-fails
 

@@ -191,6 +191,13 @@ USE: logging
     ] with-stream r> stream>str 
   ] bind ;
 
+: forever ( quot -- )
+  #! The code is evaluated in an infinite loop. Typically, a
+  #! continuation is used to escape the infinite loop.
+  #!
+  #! This combinator will not compile.
+  dup slip forever ;
+
 : run-eval-requester ( evaluator -- )
   #! Enter a loop request an expression to
   #! evaluate, and displaying the results. 

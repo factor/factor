@@ -11,7 +11,7 @@ threads parser ;
     [ telnet-client ] in-thread drop ;
 
 : telnetd-loop ( server -- server )
-    [ [ accept telnet-connection ] keep ] forever ;
+    [ accept telnet-connection ] keep telnetd-loop ;
 
 : telnetd ( port -- )
     [
