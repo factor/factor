@@ -103,6 +103,9 @@ USE: url-encoding
         ] in-thread drop
     ] ifte ;
 
+: quit-flag ( -- ? )
+    global [ "httpd-quit" get ] bind ;
+
 : clear-quit-flag ( -- )
     global [ "httpd-quit" off ] bind ;
 

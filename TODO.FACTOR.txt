@@ -37,7 +37,8 @@
 - bignums
 - >lower, >upper for strings
 - read1
-- telnetd and httpd should use multitasking
+- telnetd should use multitasking
+- telnetd error handling
 - sbuf-hashcode
 - vector-hashcode
 - irc: stack underflow?
