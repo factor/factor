@@ -194,6 +194,9 @@ DEFER: init-listener
 
 compilable-words compilable-word-list set
 
+"Bootstrapping is complete." print
+"Now, you can run ./f factor.image" print
+
 ! Save a bit of space
 global [ "stdio" off ] bind
 

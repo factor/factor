@@ -55,3 +55,7 @@ USE: lists
 
 ! f -vs- hitype
 [ ] [ [ f vector-length ] [ drop ] catch ] unit-test
+
+! See how well callstack overflow is handled
+: callstack-overflow callstack-overflow f ;
+[ callstack-overflow ] unit-test-fails

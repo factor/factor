@@ -7,7 +7,7 @@ USE: test
 
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
 
-: ack ( m n -- )
+: ack ( m n -- x )
     over 0 = [
         nip succ
     ] [

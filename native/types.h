@@ -46,16 +46,6 @@ CELL T;
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);
 
-INLINE CELL tag_boolean(CELL untagged)
-{
-	return (untagged == false ? F : T);
-}
-
-INLINE bool untag_boolean(CELL tagged)
-{
-	return (tagged == F ? false : true);
-}
-
 INLINE CELL tag_header(CELL cell)
 {
 	return RETAG(cell << TAG_BITS,HEADER_TYPE);

@@ -147,17 +147,17 @@ END-STRUCT
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-call ;
 
 ! SDL_SetGamma: float types
 
 : SDL_FillRect ( surface rect color -- n )
     #! If rect is null, fills entire surface.
-    "int" "sdl" "SDL_FillRect"
+    "bool" "sdl" "SDL_FillRect"
     [ "surface*" "rect*" "uint" ] alien-call ;
 
 : SDL_LockSurface ( surface -- )
-    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
+    "bool" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
 
 : SDL_UnlockSurface ( surface -- )
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
@@ -165,3 +165,7 @@ END-STRUCT
 : SDL_MapRGB ( surface r g b -- )
     "uint" "sdl" "SDL_MapRGB"
     [ "surface*" "uchar" "uchar" "uchar" ] alien-call ;
+
+: SDL_WM_SetCaption ( title icon -- )
+    "void" "sdl" "SDL_WM_SetCaption"
+    [ "char*" "char*" ] alien-call ;

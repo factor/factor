@@ -6,6 +6,7 @@ USE: math
 USE: namespaces
 USE: stack
 USE: test
+USE: strings
 
 [ [ ]           ] [ [ ]   [ ]       append ] unit-test
 [ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test

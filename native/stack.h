@@ -3,6 +3,7 @@
 
 void reset_datastack(void);
 void reset_callstack(void);
+void fix_stacks(void);
 void init_stacks(void);
 
 void primitive_drop(void);

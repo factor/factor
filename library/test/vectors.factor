@@ -5,6 +5,7 @@ USE: random
 USE: stack
 USE: test
 USE: vectors
+USE: strings
 
 [ { } ] [ [ ] list>vector ] unit-test
 [ { 1 2 } ] [ [ 1 2 ] list>vector ] unit-test
@@ -35,6 +36,10 @@ USE: vectors
 
 [ { 1 2 3 4 5 6 } ]
 [ { 1 2 3 } vector-clone dup { 4 5 6 } vector-append ] unit-test
+
+[ { "" "a" "aa" "aaa" } ]
+[ 4 [ CHAR: a fill ] vector-project ]
+unit-test
 
 [ { 6 8 10 12 } ]
 [ { 1 2 3 4 } { 5 6 7 8 } [ + ] vector-2map ]

@@ -20,8 +20,6 @@ void critical_error(char* msg, CELL tagged)
 
 void throw_error(CELL error)
 {
-	/* dpush(error); */
-	/* call(userenv[BREAK_ENV]); */
 	thrown_error = error;
 
 	/* Return to run() method */

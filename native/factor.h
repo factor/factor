@@ -1,6 +1,30 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
+#if defined(i386) || defined(__i386) || defined(__i386__)
+    #define FACTOR_X86
+#endif
+
+/* CELL must be 32 bits and your system must have 32-bit pointers */
+typedef unsigned long int CELL;
+#define CELLS ((signed)sizeof(CELL))
+
+/* raw pointer to datastack bottom */
+CELL ds_bot;
+
+/* raw pointer to datastack top */
+#ifdef FACTOR_X86
+register CELL ds asm("%esi");
+#else
+CELL ds;
+#endif
+
+/* raw pointer to callstack bottom */
+CELL cs_bot;
+
+/* raw pointer to callstack top */
+CELL cs;
+
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -27,15 +51,7 @@
 #include <dlfcn.h>
 #endif /* FFI */
 
-#if defined(i386) || defined(__i386) || defined(__i386__)
-    #define FACTOR_X86
-#endif
-
 #define INLINE inline static
-
-/* CELL must be 32 bits and your system must have 32-bit pointers */
-typedef unsigned long int CELL;
-#define CELLS ((signed)sizeof(CELL))
 
 #define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
 #define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
@@ -62,6 +78,7 @@ typedef unsigned char BYTE;
 #include "error.h"
 #include "gc.h"
 #include "types.h"
+#include "boolean.h"
 #include "word.h"
 #include "run.h"
 #include "signal.h"

@@ -195,3 +195,6 @@ END-UNION
 
 : SDL_WaitEvent ( event -- )
     "int" "sdl" "SDL_WaitEvent" [ "event*" ] alien-call ;
+
+: SDL_PollEvent ( event -- ? )
+    "bool" "sdl" "SDL_PollEvent" [ "event*" ] alien-call ;

@@ -75,7 +75,7 @@ void primitive_bignum_eq(void)
 {
 	ARRAY* y = to_bignum(dpop());
 	ARRAY* x = to_bignum(dpop());
-	dpush(tag_boolean(s48_bignum_equal_p(x,y)));
+	box_boolean(s48_bignum_equal_p(x,y));
 }
 
 #define GC_AND_POP_BIGNUMS(x,y) \
@@ -163,9 +163,7 @@ void primitive_bignum_less(void)
 {
 	ARRAY* y = to_bignum(dpop());
 	ARRAY* x = to_bignum(dpop());
-	dpush(tag_boolean(
-		s48_bignum_compare(x,y)
-		== bignum_comparison_less));
+	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_less);
 }
 
 void primitive_bignum_lesseq(void)
@@ -192,9 +190,7 @@ void primitive_bignum_greater(void)
 {
 	ARRAY* y = to_bignum(dpop());
 	ARRAY* x = to_bignum(dpop());
-	dpush(tag_boolean(
-		s48_bignum_compare(x,y)
-		== bignum_comparison_greater));
+	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_greater);
 }
 
 void primitive_bignum_greatereq(void)

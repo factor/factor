@@ -79,3 +79,10 @@ USE: unparser
 [ t ]
 [ 1000000000000/999999999999 1000000000001/999999999998 < ]
 unit-test
+
+[ -3 ] [ -3 10 mod ] unit-test
+[ 7 ] [ -3 10 rem ] unit-test
+
+[ -1 ] [ -12.55 sgn ] unit-test
+[ 1 ] [ 100000000000000000000000000000000 sgn ] unit-test
+[ 0 ] [ 0.0 sgn ] unit-test

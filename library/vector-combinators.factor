@@ -59,9 +59,10 @@ USE: stack
     #! Destructively append v2 to v1.
     [ over vector-push ] vector-each drop ;
 
-: vector-collect ( n quot -- accum )
+: vector-project ( n quot -- accum )
     #! Execute the quotation n times, passing the loop counter
-    #! the quotation, and collect results in a new vector.
+    #! the quotation as it ranges from 0..n-1. Collect results
+    #! in a new vector.
     over <vector> rot [
         -rot 2dup >r >r slip vector-push r> r>
     ] times* nip ;

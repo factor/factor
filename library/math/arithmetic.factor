@@ -64,3 +64,11 @@ USE: stack
 
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
+
+: rem ( x y -- x%y )
+    #! Like modulus, but always gives a positive result.
+    dup >r + r> mod ;
+
+: sgn ( n -- -1/0/1 )
+    #! Push the sign of a real number.
+    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;

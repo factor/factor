@@ -35,5 +35,7 @@ USE: stack
 : -@ ( num var -- ) tuck get swap - put ;
 : *@ ( num var -- ) tuck get * put ;
 : /@ ( num var -- ) tuck get swap / put ;
+: mod@ ( num var -- ) tuck get swap mod put ;
+: rem@ ( num var -- ) tuck get swap rem put ;
 : pred@ ( var -- ) dup get pred put ;
 : succ@ ( var -- ) dup get succ put ;

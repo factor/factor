@@ -30,7 +30,9 @@ USE: combinators
 USE: compiler
 USE: errors
 USE: hashtables
+USE: kernel
 USE: lists
+USE: logic
 USE: math
 USE: namespaces
 USE: parser
@@ -188,3 +190,11 @@ global [ <namespace> "c-types" set ] bind
     "box_c_string" "boxer" set
     "unbox_c_string" "unboxer" set
 ] "char*" define-c-type
+
+[
+    [ alien-4 0 = not ] "getter" set
+    [ 1 0 ? set-alien-4 ] "setter" set
+    cell "width" set
+    "box_boolean" "boxer" set
+    "unbox_boolean" "unboxer" set
+] "bool" define-c-type

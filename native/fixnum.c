@@ -36,7 +36,7 @@ void primitive_fixnum_eq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x == y));
+	box_boolean(x == y);
 }
 
 void primitive_fixnum_add(void)
@@ -174,28 +174,28 @@ void primitive_fixnum_less(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x < y));
+	box_boolean(x < y);
 }
 
 void primitive_fixnum_lesseq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x <= y));
+	box_boolean(x <= y);
 }
 
 void primitive_fixnum_greater(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x > y));
+	box_boolean(x > y);
 }
 
 void primitive_fixnum_greatereq(void)
 {
 	FIXNUM y = to_fixnum(dpop());
 	FIXNUM x = to_fixnum(dpop());
-	dpush(tag_boolean(x >= y));
+	box_boolean(x >= y);
 }
 
 void primitive_fixnum_not(void)

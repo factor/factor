@@ -44,6 +44,11 @@ USE: stack
     #! after the quotation returns.
     over >r call r> ;
 
+: 2keep ( a b quot -- a b )
+    #! Execute the quotation with a and b on the stack, and
+    #! restore a and b after the quotation returns.
+    over >r pick >r call r> r> ;
+
 : apply ( code input -- code output )
     #! Apply code to input.
     swap dup >r call r> swap ;

@@ -21,8 +21,6 @@ SYMBOL: a
 SYMBOL: b
 SYMBOL: c
 SYMBOL: d
-SYMBOL: width
-SYMBOL: height
 
 : next-x ( x y -- x ) a get * sin swap b get * cos - ;
 : next-y ( x y -- y ) swap c get * sin swap d get * cos - ;
@@ -52,15 +50,11 @@ SYMBOL: height
     2.4 c set
     -2.1 d set
 
-    640 dup width set
-    480 dup height set
-    32 SDL_HWSURFACE SDL_SetVideoMode drop
+    640 480 32 SDL_HWSURFACE [
+        [ 0 0 100000 draw-dejong ] with-surface
 
-    [
-        0 0 100000 draw-dejong
-    ] with-surface
-
-    <event> event-loop
-    SDL_Quit ;
+        <event> event-loop
+        SDL_Quit
+    ] with-screen ;
 
 dejong

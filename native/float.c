@@ -80,7 +80,7 @@ void primitive_float_to_bits(void)
 void primitive_float_eq(void)
 {
 	GC_AND_POP_FLOATS(x,y);
-	dpush(tag_boolean(x == y));
+	box_boolean(x == y);
 }
 
 void primitive_float_add(void)
@@ -109,30 +109,26 @@ void primitive_float_divfloat(void)
 
 void primitive_float_less(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
-	dpush(tag_boolean(x < y));
+	GC_AND_POP_FLOATS(x,y);
+	box_boolean(x < y);
 }
 
 void primitive_float_lesseq(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
-	dpush(tag_boolean(x <= y));
+	GC_AND_POP_FLOATS(x,y);
+	box_boolean(x <= y);
 }
 
 void primitive_float_greater(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
-	dpush(tag_boolean(x > y));
+	GC_AND_POP_FLOATS(x,y);
+	box_boolean(x > y);
 }
 
 void primitive_float_greatereq(void)
 {
-	double y = to_float(dpop());
-	double x = to_float(dpop());
-	dpush(tag_boolean(x >= y));
+	GC_AND_POP_FLOATS(x,y);
+	box_boolean(x >= y);
 }
 
 void primitive_facos(void)

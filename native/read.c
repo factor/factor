@@ -102,7 +102,7 @@ bool can_read_line(PORT* port)
 void primitive_can_read_line(void)
 {
 	PORT* port = untag_port(dpop());
-	dpush(tag_boolean(can_read_line(port)));
+	box_boolean(can_read_line(port));
 }
 
 void primitive_add_read_line_io_task(void)
@@ -214,7 +214,7 @@ void primitive_can_read_count(void)
 
 	port = untag_port(dpop());
 	len = to_fixnum(dpop());
-	dpush(tag_boolean(can_read_count(port,len)));
+	box_boolean(can_read_count(port,len));
 }
 
 void primitive_add_read_count_io_task(void)

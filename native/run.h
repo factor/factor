@@ -21,22 +21,6 @@ sigjmp_buf toplevel;
 /* TAGGED currently executing quotation */
 CELL callframe;
 
-/* raw pointer to datastack bottom */
-CELL ds_bot;
-
-/* raw pointer to datastack top */
-#ifdef FACTOR_X86
-register CELL ds asm("%esi");
-#else
-CELL ds;
-#endif
-
-/* raw pointer to callstack bottom */
-CELL cs_bot;
-
-/* raw pointer to callstack top */
-CELL cs;
-
 /* raw pointer to currently executing word */
 WORD* executing;
 

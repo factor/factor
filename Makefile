@@ -1,5 +1,5 @@
-CC = gcc34
-DEFAULT_CFLAGS = -Wall -export-dynamic -g $(SITE_CFLAGS)
+CC = gcc
+DEFAULT_CFLAGS = -Wall -g $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
@@ -16,7 +16,7 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/sbuf.o native/socket.o native/stack.o \
 	native/string.o native/types.o native/vector.o \
 	native/write.o native/word.o native/compiler.o \
-	native/ffi.o native/signal.o
+	native/ffi.o native/signal.o native/boolean.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -24,6 +24,7 @@ default:
 	@echo "bsd"
 	@echo "bsd-nopthread - on FreeBSD 4, if you want to use profiling"
 	@echo "linux"
+	@echo "macosx"
 	@echo "solaris"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
@@ -34,17 +35,22 @@ default:
 
 bsd:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -pthread" \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -pthread" \
 		LIBS="$(DEFAULT_LIBS)"
 
 bsd-nopthread:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
+		LIBS="$(DEFAULT_LIBS)"
+
+macosx:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
 		LIBS="$(DEFAULT_LIBS)"
 
 linux:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS) -ldl"
 
 solaris:

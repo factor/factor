@@ -18,6 +18,7 @@ void run(void)
 	sigsetjmp(toplevel, 1);
 	if(thrown_error != F)
 	{
+		fix_stacks();
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
 		call(userenv[BREAK_ENV]);

@@ -7,27 +7,8 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 
 void memory_signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	if(STACK_UNDERFLOW(ds,ds_bot))
-	{
-		reset_datastack();
-		general_error(ERROR_DATASTACK_UNDERFLOW,F);
-	}
-	else if(STACK_OVERFLOW(ds,ds_bot))
-	{
-		reset_datastack();
-		general_error(ERROR_DATASTACK_OVERFLOW,F);
-	}
-	else if(STACK_UNDERFLOW(cs,cs_bot))
-	{
-		reset_callstack();
-		general_error(ERROR_CALLSTACK_UNDERFLOW,F);
-	}
-	else if(STACK_OVERFLOW(cs,cs_bot))
-	{
-		reset_callstack();
-		general_error(ERROR_CALLSTACK_OVERFLOW,F);
-	}
-	else if(active.here > active.limit)
+	fprintf(stderr,"memory signal\n");
+	if(active.here > active.limit)
 	{
 		fprintf(stderr,"Out of memory\n");
 		fprintf(stderr,"active.base  = %ld\n",active.base);

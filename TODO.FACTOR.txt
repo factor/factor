@@ -36,6 +36,7 @@
 
 + listener/plugin:
 
+- extract word in wrong place
 - twice in completion list
 - accept multi-line input in listener
 - don't show listener on certain commands
@@ -51,6 +52,7 @@
 
 + kernel:
 
+- save restore stacks between longjmp in case they are in registers
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler
 - >lower, >upper for strings

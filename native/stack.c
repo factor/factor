@@ -10,6 +10,18 @@ void reset_callstack(void)
 	cs = cs_bot - CELLS;
 }
 
+void fix_stacks(void)
+{
+	if(STACK_UNDERFLOW(ds,ds_bot))
+		reset_datastack();
+	else if(STACK_OVERFLOW(ds,ds_bot))
+		reset_datastack();
+	else if(STACK_UNDERFLOW(cs,cs_bot))
+		reset_callstack();
+	else if(STACK_OVERFLOW(cs,cs_bot))
+		reset_callstack();
+}
+
 void init_stacks(void)
 {
 	ds_bot = (CELL)alloc_guarded(STACK_SIZE);
