@@ -118,8 +118,8 @@ INLINE void string_to_memory(F_STRING* s, BYTE* string)
 
 void primitive_string_to_memory(void)
 {
-	F_STRING* str = untag_string(dpop());
 	BYTE* address = (BYTE*)unbox_cell();
+	F_STRING* str = untag_string(dpop());
 	string_to_memory(str,address);
 }
 
