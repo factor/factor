@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel-internals
-USING: generic math-internals kernel lists vectors ;
+USING: generic kernel lists math-internals sequences vectors ;
 
 ! An array is a range of memory storing pointers to other
 ! objects. Arrays are not used directly, and their access words
@@ -23,15 +23,6 @@ BUILTIN: array 8 [ 1 "array-capacity" f ] ;
     #! Unsafe.
     swap 2 fixnum+ set-slot ; inline
 
-: (array>list) ( n i array -- list )
-    #! Unsafe.
-    pick pick fixnum<= [
-        3drop [ ]
-    ] [
-        2dup array-nth >r >r 1 fixnum+ r> (array>list) r>
-        swap cons
-    ] ifte ;
-
-: array>list ( n array -- list )
-    #! Unsafe.
-    0 swap (array>list) ;
+M: array length array-capacity ;
+M: array nth array-nth ;
+M: array set-nth set-array-nth ;

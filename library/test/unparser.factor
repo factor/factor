@@ -28,3 +28,5 @@ unit-test
 
 [ ] [ { 1 2 3 } unparse drop ] unit-test
 [ stdin unparse parse ] unit-test-fails
+
+[ "s\" hello world\"" ] [ s" hello world" unparse ] unit-test

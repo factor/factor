@@ -1,6 +1,10 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: generic kernel math ;
+IN: lists USING: generic kernel math sequences ;
+
+! Sequence protocol
+M: cons length 0 swap [ drop 1 + ] each ;
+M: f length drop 0 ;
 
 : 2list ( a b -- [ a b ] )
     unit cons ;
@@ -82,9 +86,6 @@ IN: lists USING: generic kernel math ;
 : remq ( obj list -- list )
     #! Remove all occurrences of the object from the list.
     [ eq? not ] subset-with ;
-
-: length ( list -- length )
-    0 swap [ drop 1 + ] each ;
 
 : prune ( list -- list )
     #! Remove duplicate elements.

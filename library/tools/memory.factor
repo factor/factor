@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: kernel-internals errors generic kernel lists math
-namespaces prettyprint stdio unparser vectors words ;
+USING: errors generic kernel kernel-internals lists math
+namespaces prettyprint sequences stdio unparser vectors words ;
 
 ! Printing an overview of heap usage.
 
@@ -80,7 +80,7 @@ M: object (each-slot) ( quot obj -- )
     #! Return a list of instance count/total size pairs.
     num-types zero-vector num-types zero-vector
     [ >r 2dup r> heap-stat-step ] each-object
-    swap vector>list swap vector>list zip ;
+    swap >list swap >list zip ;
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [

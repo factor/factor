@@ -13,3 +13,5 @@ USE: test
     "World" "buf-clone" get sbuf-append
     "buf" get sbuf>string
 ] unit-test
+
+[ CHAR: h ] [ 0 s" hello world" sbuf-nth ] unit-test

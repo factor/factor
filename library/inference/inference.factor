@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel lists math namespaces
-prettyprint strings unparser vectors words ;
+prettyprint sequences strings unparser vectors words ;
 
 : max-recursion 0 ;
 
@@ -114,7 +114,7 @@ M: computed literal-value ( value -- )
     d-in [ vector-prepend ] change ;
 
 : (present-effect) ( vector -- list )
-    vector>list [ value-class ] map ;
+    >list [ value-class ] map ;
 
 : present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
@@ -184,7 +184,7 @@ M: object apply-object apply-literal ;
 : values-node ( op -- )
     #! Add a #values or #return node to the graph.
     f swap dataflow, [
-        meta-d get vector>list node-consume-d set
+        meta-d get >list node-consume-d set
     ] bind ;
 
 : (infer) ( quot -- )

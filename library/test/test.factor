@@ -2,7 +2,7 @@
 
 IN: test
 USING: errors kernel lists math memory namespaces parser
-prettyprint stdio strings words vectors unparser ;
+prettyprint sequences stdio strings unparser vectors words ;
 
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;
@@ -24,7 +24,7 @@ prettyprint stdio strings words vectors unparser ;
     [
         [
             2dup print-test
-            swap >r >r clear r> call datastack vector>list r>
+            swap >r >r clear r> call datastack >list r>
             = assert
         ] keep-datastack 2drop
     ] time ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
-USING: assembler inference errors kernel lists math namespaces
-strings words vectors ;
+USING: assembler errors inference kernel lists math namespaces
+sequences strings vectors words ;
 
 : generate-node ( [[ op params ]] -- )
     #! Generate machine code for a node.
@@ -22,7 +22,7 @@ strings words vectors ;
 
 : generate-reloc ( -- length )
     relocation-table get
-    dup [ compile-cell ] vector-each
+    dup [ compile-cell ] seq-each
     vector-length cell * ;
 
 : (generate) ( word linear -- )

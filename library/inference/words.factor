@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel lists math namespaces
-strings vectors words hashtables parser prettyprint ;
+sequences strings vectors words hashtables parser prettyprint ;
 
 : with-dataflow ( param op [[ in# out# ]] quot -- )
     #! Take input parameters, execute quotation, take output

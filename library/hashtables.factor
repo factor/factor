@@ -7,7 +7,7 @@ DEFER: set-hash-array
 DEFER: set-hash-size
 
 IN: hashtables
-USING: generic kernel lists math vectors ;
+USING: generic kernel lists math sequences vectors ;
 
 ! We put hash-size in the hashtables vocabulary, and
 ! the other words in kernel-internals.
@@ -117,7 +117,7 @@ IN: hashtables
 
 : buckets>list ( hash -- list )
     #! Push a list of key/value pairs in a hashtable.
-    dup bucket-count swap hash-array array>list ;
+    hash-array >list ;
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap

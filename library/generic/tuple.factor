@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel-internals
 USING: words parser kernel namespaces lists strings math
-hashtables errors vectors ;
+hashtables errors sequences vectors ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -35,6 +35,15 @@ M: tuple delegate 3 slot ;
 
 M: object set-delegate 2drop ;
 M: tuple set-delegate 3 set-slot ;
+
+: check-array ( n array -- )
+    array-capacity 0 swap between? [
+        "Array index out of bounds" throw
+    ] unless ;
+
+M: tuple length array-capacity ;
+M: tuple nth 2dup check-array array-nth ;
+M: tuple set-nth 2dup check-array set-array-nth ;
 
 #! arrayed objects can be passed to array-capacity,
 #! array-nth, and set-array-nth.
@@ -168,27 +177,13 @@ M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
     clone-tuple dup delegate clone over set-delegate ;
 
-: tuple>list ( tuple -- list )
-    dup array-capacity swap array>list ;
-
-M: tuple = ( obj tuple -- ? )
-    over tuple? [
-        over class-tuple over class-tuple eq? [
-            swap tuple>list swap tuple>list =
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 M: tuple hashcode ( vec -- n )
     #! If the capacity is two, then all we have is the class
     #! slot and delegate.
-    dup array-capacity 2 number= [
+    dup length 2 number= [
         drop 0
     ] [
-        2 swap array-nth hashcode
+        2 swap nth hashcode
     ] ifte ;
 
 tuple [

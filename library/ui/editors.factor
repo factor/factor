@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl line-editor
-strings ;
+USING: generic kernel line-editor lists math namespaces sdl
+sequences strings ;
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
@@ -28,7 +28,7 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( str -- wlist )
     #! List of x co-ordinates of each character.
-    0 swap string>list
+    0 swap >list
     [ ch>string shape-w [ + dup ] keep 2 /i - ] map nip ;
 
 : (x>offset) ( n x wlist -- offset )

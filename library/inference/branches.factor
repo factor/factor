@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter kernel lists math namespaces
-strings vectors words hashtables prettyprint ;
+sequences strings vectors words hashtables prettyprint ;
 
 : longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
@@ -213,7 +213,7 @@ SYMBOL: cloned
 \ ifte [ infer-ifte ] "infer" set-word-prop
 
 : vtable>list ( value -- list )
-    dup value-recursion swap literal-value vector>list
+    dup value-recursion swap literal-value >list
     [ over <literal> ] map nip ;
 
 : <dispatch-index> ( value -- value )

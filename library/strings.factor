@@ -1,6 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: strings USING: generic kernel kernel-internals lists math ;
+IN: strings USING: generic kernel kernel-internals lists math
+sequences ;
 
 BUILTIN: string 12 [ 1 "string-length" f ] [ 2 hashcode f ] ;
 M: string = string= ;
@@ -9,6 +10,9 @@ BUILTIN: sbuf 13 ;
 M: sbuf = sbuf= ;
 
 UNION: text string integer ;
+
+M: string length string-length ;
+M: string nth string-nth ;
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
@@ -98,21 +102,6 @@ UNION: text string integer ;
         [ swap string-length + over string-tail ] keep
         rot string-head swap
     ] ifte ;
-
-: (string>list) ( i str -- list )
-    2dup string-length >= [
-        2drop [ ]
-    ] [
-        2dup string-nth >r >r 1 + r> (string>list) r> swons
-    ] ifte ;
-
-: string>list ( str -- list )
-    0 swap (string>list) ;
-
-: string-each ( str quot -- )
-    #! Execute the quotation with each character of the string
-    #! pushed onto the stack.
-    >r string>list r> each ; inline
 
 PREDICATE: integer blank     " \t\n\r" string-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;

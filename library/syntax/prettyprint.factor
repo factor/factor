@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: errors generic hashtables kernel lists math namespaces
-parser presentation stdio streams strings unparser vectors words ;
+parser presentation sequences stdio streams strings unparser
+vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -117,7 +118,7 @@ M: cons prettyprint* ( indent cons -- indent )
 
 M: vector prettyprint* ( indent vector -- indent )
     [
-        \ { swap vector>list \ } prettyprint-sequence
+        \ { swap >list \ } prettyprint-sequence
     ] check-recursion ;
 
 M: hashtable prettyprint* ( indent hashtable -- indent )
@@ -127,7 +128,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 M: tuple prettyprint* ( indent tuple -- indent )
     [
-        \ << swap tuple>list \ >> prettyprint-sequence
+        \ << swap >list \ >> prettyprint-sequence
     ] check-recursion ;
 
 : prettyprint ( obj -- )
@@ -152,7 +153,7 @@ M: tuple prettyprint* ( indent tuple -- indent )
 
 : {.} ( vector -- )
     #! Unparse each element on its own line.
-    vector>list reverse [ . ] each ;
+    >list reverse [ . ] each ;
 
 : .s datastack  {.} ;
 : .r callstack  {.} ;

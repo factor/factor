@@ -16,7 +16,8 @@
 
 IN: image
 USING: errors generic hashtables kernel lists math namespaces
-parser prettyprint stdio streams strings vectors words ;
+parser prettyprint sequences sequences stdio streams strings
+vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -196,7 +197,7 @@ M: cons ' ( c -- tagged )
     tuck string-length - CHAR: \0 fill cat2 ;
 
 : emit-chars ( str -- )
-    string>list "big-endian" get [ reverse ] unless
+    >list "big-endian" get [ reverse ] unless
     0 swap [ swap 16 shift + ] each emit ;
 
 : (pack-string) ( n list -- )
@@ -235,7 +236,7 @@ M: string ' ( string -- pointer )
     align-here r> ;
 
 : emit-vector ( vector -- pointer )
-    dup vector>list emit-array swap vector-length
+    dup >list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )
@@ -309,7 +310,7 @@ M: hashtable ' ( hashtable -- pointer )
     ] ifte ;
 
 : write-image ( image file -- )
-    <file-writer> [ [ write-word ] vector-each ] with-stream ;
+    <file-writer> [ [ write-word ] seq-each ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [
@@ -323,7 +324,7 @@ M: hashtable ' ( hashtable -- pointer )
     #! The quotation leaves a boot quotation on the stack.
     [ begin call end ] with-minimal-image ;
 
-: test-image ( quot -- ) with-image vector>list . ;
+: test-image ( quot -- ) with-image >list . ;
 
 : make-image ( name -- )
     #! Make an image for the C interpreter.

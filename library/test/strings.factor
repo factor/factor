@@ -1,4 +1,6 @@
 IN: temporary
+USING: sequences ;
+
 USE: errors
 USE: kernel
 USE: math
@@ -80,7 +82,7 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1 + ] when ] string-each
+    [ LETTER? [ 1 + ] when ] seq-each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]

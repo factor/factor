@@ -86,7 +86,7 @@ SYMBOL: vocabularies
         "compiler" "debugger" "errors" "files" "generic"
         "hashtables" "inference" "interpreter" "jedit" "kernel"
         "listener" "lists" "math" "memory" "namespaces" "parser"
-        "prettyprint" "processes" "profiler" "streams" "stdio"
-        "strings" "syntax" "test" "threads" "unparser" "vectors"
-        "words" "scratchpad"
+        "prettyprint" "processes" "profiler" "sequences"
+        "streams" "stdio" "strings" "syntax" "test" "threads"
+        "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

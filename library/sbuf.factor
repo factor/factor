@@ -1,6 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: strings USING: kernel lists math namespaces strings ;
+IN: strings
+USING: kernel lists math namespaces sequences strings ;
+
+M: sbuf length sbuf-length ;
+M: sbuf set-length set-sbuf-length ;
+M: sbuf nth sbuf-nth ;
+M: sbuf set-nth set-sbuf-nth ;
 
 : fill ( count char -- string )
     #! Push a string that consists of the same character
@@ -18,7 +24,7 @@ IN: strings USING: kernel lists math namespaces strings ;
     #! Apply a quotation to each character in the string, and
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
-    >r string>list r> map cat ; inline
+    >r >list r> map cat ; inline
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [
@@ -55,3 +61,6 @@ IN: strings USING: kernel lists math namespaces strings ;
 
 : ch>string ( ch -- str )
     1 <sbuf> [ sbuf-append ] keep sbuf>string ;
+
+: string>sbuf ( str -- sbuf )
+    dup string-length <sbuf> [ sbuf-append ] keep ;

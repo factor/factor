@@ -5,9 +5,12 @@ DEFER: (set-vector-length)
 DEFER: vector-array
 DEFER: set-vector-array
 
+IN: sequences
+DEFER: seq-each
+
 IN: vectors
-USING: generic kernel lists math kernel-internals errors
-math-internals ;
+USING: errors generic kernel kernel-internals lists math
+math-internals sequences ;
 
 BUILTIN: vector 11
     [ 1 "vector-length" (set-vector-length) ]
@@ -60,6 +63,11 @@ IN: vectors
     >r >fixnum dup assert-positive r>
     2dup grow-capacity (set-vector-length) ;
 
+M: vector length vector-length ;
+M: vector set-length set-vector-length ;
+M: vector nth vector-nth ;
+M: vector set-nth set-vector-nth ;
+
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
     #! <vector>, which gives an empty vector with a certain
@@ -82,16 +90,10 @@ IN: vectors
 : >pop> ( stack -- stack )
     dup vector-pop drop ;
 
-: vector>list ( vec -- list )
-    dup vector-length swap vector-array array>list ;
-
 : vector-each ( vector quotation -- )
     #! Execute the quotation with each element of the vector
     #! pushed onto the stack.
-    >r vector>list r> each ; inline
-
-: vector-each-with ( obj vector quot -- )
-    swap [ with ] vector-each 2drop ; inline
+    >r >list r> each ; inline
 
 : list>vector ( list -- vector )
     dup length <vector> swap [ over vector-push ] each ;
@@ -100,11 +102,11 @@ IN: vectors
     #! Applies code to each element of the vector, return a new
     #! vector with the results. The code must have stack effect
     #! ( obj -- obj ).
-    >r vector>list r> map list>vector ; inline
+    >r >list r> map list>vector ; inline
 
 : vector-nappend ( v1 v2 -- )
     #! Destructively append v2 to v1.
-    [ over vector-push ] vector-each drop ;
+    [ over vector-push ] seq-each drop ;
 
 : vector-append ( v1 v2 -- vec )
     over vector-length over vector-length + <vector>
@@ -122,34 +124,6 @@ M: vector clone ( vector -- vector )
         vector-array rot vector-array rot copy-array
     ] keep ;
 
-: vector-length= ( vec vec -- ? )
-    vector-length swap vector-length number= ;
-
-M: vector = ( obj vec -- ? )
-    #! Check if two vectors are equal. Two vectors are
-    #! considered equal if they have the same length and contain
-    #! equal elements.
-    2dup eq? [
-        2drop t
-    ] [
-        over vector? [
-            2dup vector-length= [
-                swap vector>list swap vector>list =
-            ] [
-                2drop f
-            ] ifte
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
-
-M: vector hashcode ( vec -- n )
-    dup vector-length 0 number= [
-        drop 0
-    ] [
-        0 swap vector-nth hashcode
-    ] ifte ;
-
 : vector-tail ( n vector -- list )
     #! Return a new list with all elements from the nth
     #! index upwards.
@@ -162,6 +136,13 @@ M: vector hashcode ( vec -- n )
     #! vector. For example, if n=1, this returns a vector of
     #! one element.
     [ vector-length swap - ] keep vector-tail ;
+
+M: vector hashcode ( vec -- n )
+    dup length 0 number= [
+        drop 0
+    ] [
+        0 swap nth hashcode
+    ] ifte ;
 
 ! Find a better place for this
 IN: kernel

@@ -33,6 +33,7 @@ USE: math
 USE: namespaces
 USE: words
 USE: vectors
+USE: sequences
 
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph

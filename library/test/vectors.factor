@@ -29,7 +29,7 @@ USE: kernel-internals
 
 [ t ] [
     100 empty-vector [ drop 0 100 random-int ] vector-map
-    dup vector>list list>vector =
+    dup >list list>vector =
 ] unit-test
 
 [ f ] [ { } { 1 2 3 } = ] unit-test
@@ -40,7 +40,7 @@ USE: kernel-internals
 [ [ 1 4 9 16 ] ]
 [
     [ 1 2 3 4 ]
-    list>vector [ dup * ] vector-map vector>list
+    list>vector [ dup * ] vector-map >list
 ] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test

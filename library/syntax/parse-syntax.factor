@@ -107,16 +107,22 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : CHAR: ( -- ) 0 scan next-char drop swons ; parsing
 
 ! String literal
-: parse-string ( n str -- n )
+: (parse-string) ( n str -- n )
     2dup string-nth CHAR: " = [
         drop 1 +
     ] [
-        [ next-char swap , ] keep parse-string
+        [ next-char swap , ] keep (parse-string)
     ] ifte ;
 
+: parse-string [ "line" get (parse-string) ] make-string ;
 : "
     "col" [
-        "line" get [ parse-string ] make-string swap
+         parse-string swap
+    ] change swons ; parsing
+
+: s"
+    "col" [
+        "line" get skip-blank parse-string string>sbuf swap
     ] change swons ; parsing
 
 ! Comments

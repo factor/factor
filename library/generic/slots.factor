@@ -5,7 +5,7 @@
 ! implement tuples, as well as builtin types.
 IN: generic
 USING: kernel kernel-internals lists math namespaces parser
-strings words ;
+sequences strings words ;
 
 : simple-generic ( class generic def -- )
     #! Just like:

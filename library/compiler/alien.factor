@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler errors generic hashtables inference
-interpreter kernel lists math namespaces parser stdio strings
-unparser words ;
+interpreter kernel lists math namespaces parser sequences stdio
+strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32

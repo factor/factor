@@ -34,6 +34,7 @@ USE: generic
 USE: lists
 USE: math
 USE: errors
+USE: sequences
 
 ! A postfix assembler.
 !
