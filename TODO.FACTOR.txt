@@ -6,7 +6,6 @@
   - index.html
   - if a directory is requested and URL does not end with /, redirect
 - minimize stage2 initialization code, just move it to source files
-_ push call/allot counts as ulong bignums
 
 + bignums:
 

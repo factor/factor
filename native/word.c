@@ -78,7 +78,7 @@ void primitive_set_word_plist(void)
 
 void primitive_word_call_count(void)
 {
-	drepl(tag_fixnum(untag_word(dpeek())->call_count));
+	drepl(tag_unsigned_integer(untag_word(dpeek())->call_count));
 }
 
 void primitive_set_word_call_count(void)
@@ -89,7 +89,7 @@ void primitive_set_word_call_count(void)
 
 void primitive_word_allot_count(void)
 {
-	drepl(tag_fixnum(untag_word(dpeek())->allot_count));
+	drepl(tag_unsigned_integer(untag_word(dpeek())->allot_count));
 }
 
 void primitive_set_word_allot_count(void)

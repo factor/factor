@@ -104,8 +104,8 @@ bool in_zone(ZONE* z, CELL pointer)
 void primitive_room(void)
 {
 	/* push: free total */
-	dpush(tag_fixnum_or_bignum(active->limit - active->here));
-	dpush(tag_fixnum_or_bignum(active->limit - active->base));
+	dpush(tag_integer(active->limit - active->here));
+	dpush(tag_integer(active->limit - active->base));
 }
 
 void primitive_allot_profiling(void)

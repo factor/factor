@@ -428,7 +428,7 @@ s48_bignum_to_long(bignum_type bignum)
 }
 
 bignum_type
-ulong_to_bignum(unsigned long n)
+s48_ulong_to_bignum(unsigned long n)
 {
   bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG];
   bignum_digit_type * end_digits = result_digits;

@@ -2,7 +2,8 @@
 
 CELL upgraded_arithmetic_type(CELL type1, CELL type2);
 
-CELL tag_fixnum_or_bignum(FIXNUM x);
+CELL tag_integer(FIXNUM x);
+CELL tag_unsigned_integer(CELL x);
 
 #define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \

@@ -1,9 +1,17 @@
 #include "factor.h"
 
-CELL tag_fixnum_or_bignum(FIXNUM x)
+CELL tag_integer(FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
 		return tag_object(s48_long_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
+CELL tag_unsigned_integer(CELL x)
+{
+	if(x > FIXNUM_MAX)
+		return tag_object(s48_ulong_to_bignum(x));
 	else
 		return tag_fixnum(x);
 }

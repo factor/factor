@@ -164,8 +164,7 @@ void primitive_string_eq(void)
 
 void primitive_string_hashcode(void)
 {
-	drepl(tag_object(s48_long_to_bignum(
-		untag_string(dpeek())->hashcode)));
+	drepl(tag_fixnum(untag_string(dpeek())->hashcode));
 }
 
 CELL index_of_ch(CELL index, STRING* string, CELL ch)

@@ -40,12 +40,12 @@ CELL number_eq_fixnum(FIXNUM x, FIXNUM y)
 
 CELL add_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_fixnum_or_bignum(x + y);
+	return tag_integer(x + y);
 }
 
 CELL subtract_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_fixnum_or_bignum(x - y);
+	return tag_integer(x - y);
 }
 
 CELL multiply_fixnum(FIXNUM x, FIXNUM y)
@@ -59,7 +59,7 @@ CELL multiply_fixnum(FIXNUM x, FIXNUM y)
 
 CELL divint_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_fixnum_or_bignum(x / y);
+	return tag_integer(x / y);
 }
 
 CELL divfloat_fixnum(FIXNUM x, FIXNUM y)
@@ -69,8 +69,8 @@ CELL divfloat_fixnum(FIXNUM x, FIXNUM y)
 
 CELL divmod_fixnum(FIXNUM x, FIXNUM y)
 {
-	dpush(tag_fixnum_or_bignum(x / y));
-	return tag_fixnum_or_bignum(x % y);
+	dpush(tag_integer(x / y));
+	return tag_integer(x % y);
 }
 
 CELL mod_fixnum(FIXNUM x, FIXNUM y)
@@ -125,12 +125,12 @@ CELL divide_fixnum(FIXNUM x, FIXNUM y)
 	}
 
 	if(y == 1)
-		return tag_fixnum_or_bignum(x);
+		return tag_integer(x);
 	else
 	{
 		return tag_ratio(ratio(
-			tag_fixnum_or_bignum(x),
-			tag_fixnum_or_bignum(y)));
+			tag_integer(x),
+			tag_integer(y)));
 	}
 }
 
