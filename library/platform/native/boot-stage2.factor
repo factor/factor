@@ -158,8 +158,11 @@ USE: stdio
 IN: init
 DEFER: warm-boot
 
+IN: compiler
+DEFER: init-assembler
+
 : set-boot ( quot -- ) 8 setenv ;
-[ warm-boot ] set-boot
+[ init-assembler warm-boot ] set-boot
 
 garbage-collection
 "factor.image" save-image

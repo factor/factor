@@ -205,5 +205,8 @@ USE: combinators
 : JE ( -- fixup )
     HEX: 0f compile-byte HEX: 84 compile-byte  (JUMP) ;
 
+: JNE ( -- fixup )
+    HEX: 0f compile-byte HEX: 85 compile-byte  (JUMP) ;
+
 : RET ( -- )
     HEX: c3 compile-byte ;

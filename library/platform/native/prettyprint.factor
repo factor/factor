@@ -66,6 +66,9 @@ USE: words
 : see-primitive ( word -- )
     "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
 
+: see-symbol ( word -- )
+    "SYMBOL: " write . ;
+
 : see-undefined ( word -- )
     drop "Not defined" print ;
 
@@ -74,6 +77,7 @@ USE: words
     intern
     [
         [ compound? ] [ see-compound ]
+        [ symbol? ] [ see-symbol ]
         [ primitive? ] [ see-primitive ]
         [ drop t ] [ see-undefined ]
     ] cond ;

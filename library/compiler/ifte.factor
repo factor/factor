@@ -33,13 +33,22 @@ USE: kernel
 USE: math
 USE: lists
 
-: compile-f-test ( -- fixup )
-    #! Push addr where we write the branch target address.
+: compile-test ( -- )
     POP-DS
     ! ptr to condition is now in EAX
-    f address EAX CMP-I-[R]
+    f address EAX CMP-I-[R] ;
+
+: compile-f-test ( -- fixup )
+    #! Push addr where we write the branch target address.
+    compile-test
     ! jump w/ address added later
     JE ;
+
+: compile-t-test ( -- fixup )
+    #! Push addr where we write the branch target address.
+    compile-test
+    ! jump w/ address added later
+    JNE ;
 
 : branch-target ( fixup -- )
     compiled-offset swap JUMP-FIXUP ;
@@ -61,4 +70,18 @@ USE: lists
     ( f -- ) compile-quot
     r> end-if ;
 
+: compile-when ( compile-time: true -- )
+    pop-literal  commit-literals
+    compile-f-test >r
+    ( t -- ) compile-quot
+    r> end-if ;
+
+: compile-unless ( compile-time: false -- )
+    pop-literal  commit-literals
+    compile-t-test >r
+    ( t -- ) compile-quot
+    r> end-if ;
+
 [ compile-ifte ] \ ifte "compiling" set-word-property
+[ compile-when ] \ when "compiling" set-word-property
+[ compile-unless ] \ unless "compiling" set-word-property

@@ -104,6 +104,9 @@ USE: unparser
     native? [
         [
             "threads"
+            "x86-compiler/simple"
+            "x86-compiler/ifte"
+            "x86-compiler/generic"
         ] [
             test
         ] each

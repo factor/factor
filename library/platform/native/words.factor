@@ -30,6 +30,7 @@ USE: combinators
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 
@@ -46,7 +47,7 @@ USE: stack
     dup word? [ word-primitive 1 = ] [ drop f ] ifte ;
 
 : primitive? ( obj -- ? )
-    dup word? [ word-primitive 1 = not ] [ drop f ] ifte ;
+    dup word? [ word-primitive 2 > ] [ drop f ] ifte ;
 
 : symbol? ( obj -- ? )
     dup word? [ word-primitive 2 = ] [ drop f ] ifte ;

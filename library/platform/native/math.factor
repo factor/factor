@@ -337,23 +337,23 @@ USE: words
 
 : bitnot ( x -- ~x )
     {
-        [ fixnum-bitnot ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
-        [ bignum-bitnot ]
-        [ no-method     ]
-        [ no-method     ]
-        [ no-method     ]
+        fixnum-bitnot
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        no-method
+        bignum-bitnot
+        no-method
+        no-method
+        no-method
     } generic ;
 
 : shift ( x n -- x<<n )

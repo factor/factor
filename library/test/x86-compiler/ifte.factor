@@ -61,3 +61,34 @@ DEFER: countdown-b
 : countdown-b ( n -- ) dup 0 eq? [ drop ] [ 1 fixnum- countdown-a ] ifte ; compiled
 
 [ ] [ 10 countdown-b ] unit-test
+
+: dummy-when-1 t [ ] when ; compiled
+
+[ ] [ dummy-when-1 ] unit-test
+
+: dummy-when-2 f [ ] when ; compiled
+
+[ ] [ dummy-when-2 ] unit-test
+
+: dummy-when-3 dup [ dup fixnum* ] when ; compiled
+
+[ 16 ] [ 4 dummy-when-3 ] unit-test
+[ f ] [ f dummy-when-3 ] unit-test
+
+: dummy-when-4 dup [ dup dup fixnum* fixnum* ] when swap ; compiled
+
+[ 64 f ] [ f 4 dummy-when-4 ] unit-test
+[ f t ] [ t f dummy-when-4 ] unit-test
+
+: dummy-unless-1 t [ ] unless ; compiled
+
+[ ] [ dummy-unless-1 ] unit-test
+
+: dummy-unless-2 f [ ] unless ; compiled
+
+[ ] [ dummy-unless-2 ] unit-test
+
+: dummy-unless-3 dup [ drop 3 ] unless ; compiled
+
+[ 3 ] [ f dummy-unless-3 ] unit-test
+[ 4 ] [ 4 dummy-unless-3 ] unit-test

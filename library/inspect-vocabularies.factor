@@ -47,7 +47,7 @@ USE: unparser
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.
     words [
-        dup defined? [
+        dup compound? [
             dupd word-uses?
         ] [
             drop f ! Ignore words without a definition
