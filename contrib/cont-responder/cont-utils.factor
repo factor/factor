@@ -85,7 +85,7 @@ USE: html
   #! Run the quotation inside an HTML stream wrapped
   #! around stdio.
   <pre> 
-    "stdio" get <html-stream> [
+    stdio get <html-stream> [
       call
     ] with-stream
   </pre> ;

@@ -41,7 +41,7 @@ USE: prettyprint
   <namespace> [
     "responder" "inspect" put
     <pre> 
-        "stdio" get <html-stream> [   
+        stdio get <html-stream> [   
           apropos.
         ] with-stream              
     </pre>
