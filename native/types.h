@@ -43,7 +43,8 @@ CELL T;
 #define NUMBER_TYPE 103 /* F_COMPLEX or REAL */
 #define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
 
-CELL type_of(CELL tagged);
+/* CELL type_of(CELL tagged); */
+
 bool typep(CELL type, CELL tagged);
 
 INLINE CELL tag_header(CELL cell)
@@ -105,3 +106,17 @@ CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 void primitive_type(void);
 void primitive_size(void);
+
+INLINE CELL type_of(CELL tagged)
+{
+	CELL tag = TAG(tagged);
+	if(tag == OBJECT_TYPE)
+	{
+		if(tagged == F)
+			return F_TYPE;
+		else
+			return untag_header(get(UNTAG(tagged)));
+	}
+	else
+		return tag;
+}

@@ -1,19 +1,5 @@
 #include "factor.h"
 
-CELL type_of(CELL tagged)
-{
-	CELL tag = TAG(tagged);
-	if(tag == OBJECT_TYPE)
-	{
-		if(tagged == F)
-			return F_TYPE;
-		else
-			return untag_header(get(UNTAG(tagged)));
-	}
-	else
-		return tag;
-}
-
 bool typep(CELL type, CELL tagged)
 {
 	return type_of(tagged) == type;
