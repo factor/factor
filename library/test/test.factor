@@ -103,6 +103,7 @@ USE: unparser
         "hsv"
         "alien"
         "line-editor"
+        "gadgets"
     ] [
         test
     ] each

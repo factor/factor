@@ -106,12 +106,6 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/sdl/sdl-utils.factor"
     "/library/sdl/hsv.factor"
 
-    "/library/ui/line-editor.factor"
-    "/library/ui/console.factor"
-    "/library/ui/shapes.factor"
-    "/library/ui/paint.factor"
-    "/library/ui/gadgets.factor"
-
     "/library/bootstrap/image.factor"
 
     "/library/httpd/url-encoding.factor"
@@ -155,6 +149,15 @@ cpu "x86" = [
          "/library/compiler/x86/stack.factor"
          "/library/compiler/x86/generator.factor"
          "/library/compiler/x86/fixnum.factor"
+
+        "/library/ui/line-editor.factor"
+        "/library/ui/console.factor"
+        "/library/ui/shapes.factor"
+        "/library/ui/paint.factor"
+        "/library/ui/gadgets.factor"
+        "/library/ui/boxes.factor"
+        "/library/ui/gestures.factor"
+        "/library/ui/world.factor"
     ] [
         dup print
         run-resource

@@ -15,6 +15,7 @@
 - make see work with union, builtin, predicate
 - doc comments of generics
 - proper ordering for classes
+- tuples: in/out syntax
 
 + ffi:
 

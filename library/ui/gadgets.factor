@@ -5,6 +5,7 @@ USING: generic hashtables kernel lists namespaces ;
 
 ! Gadget protocol.
 GENERIC: pick-up ( point gadget -- gadget )
+GENERIC: handle-gesture* ( gesture gadget -- ? )
 
 ! A gadget is a shape together with paint, and a reference to
 ! the gadget's parent. A gadget delegates to its shape.
@@ -31,52 +32,9 @@ M: gadget draw ( gadget -- )
 
 M: gadget pick-up tuck inside? [ drop f ] unless ;
 
+M: gadget handle-gesture* 2drop t ;
+
 ! An invisible gadget.
 WRAPPER: ghost
 M: ghost draw drop ;
 M: ghost pick-up 2drop f ;
-
-! A box is a gadget holding other gadgets.
-TUPLE: box contents delegate ;
-
-C: box ( gadget -- box )
-    [ set-box-delegate ] keep ;
-
-M: general-list draw ( list -- )
-    [ draw ] each ;
-
-M: box draw ( box -- )
-    dup [
-        dup [
-            dup box-contents draw
-            box-delegate draw
-        ] with-gadget
-    ] with-translation ;
-
-M: general-list pick-up ( point list -- gadget )
-    dup [
-        2dup car pick-up dup [
-            2nip
-        ] [
-            drop cdr pick-up
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-M: box pick-up ( point box -- )
-    #! The logic is thus. If the point is definately outside the
-    #! box, return f. Otherwise, see if the point is contained
-    #! in any subgadget. If not, see if it is contained in the
-    #! box delegate.
-    dup [
-        2dup gadget-delegate inside? [
-            2dup box-contents pick-up dup [
-                2nip
-            ] [
-                drop box-delegate pick-up
-            ] ifte
-        ] [
-            2drop f
-        ] ifte
-    ] with-translation ;

@@ -77,26 +77,29 @@ kernel-internals math hashtables errors ;
     scan-word [ tuple-constructor ] f ; parsing
 
 : tuple-delegate ( tuple -- obj )
-    >tuple dup class "delegate-field" word-property dup [
-        >fixnum slot
+    dup tuple? [
+        dup class "delegate-field" word-property dup [
+            >fixnum slot
+        ] [
+            2drop f
+        ] ifte
     ] [
-        2drop f
+        drop f
     ] ifte ; inline
 
-: tuple-dispatch ( object selector -- object quot )
+: tuple-dispatch ( object selector -- )
     over class over "methods" word-property hash* [
-        cdr ( method is defined )
+        cdr call ( method is defined )
     ] [
         over tuple-delegate [
-            rot drop swap tuple-dispatch ( check delegate )
+            rot drop swap execute ( check delegate )
         ] [
-            [ undefined-method ] ( no delegate )
+            undefined-method ( no delegate )
         ] ifte*
     ] ?ifte ;
 
 : add-tuple-dispatch ( word vtable -- )
-    >r unit [ car tuple-dispatch call ] cons tuple r>
-    set-vtable ;
+    >r unit [ car tuple-dispatch ] cons tuple r> set-vtable ;
 
 M: tuple clone ( tuple -- tuple )
     dup array-capacity dup <tuple> [ -rot copy-array ] keep ;

@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -133,6 +133,8 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		beginPredicate.parsing = new BeginPredicate(beginPredicate);
 		FactorWord beginUnion = define("generic","UNION:");
 		beginUnion.parsing = new BeginUnion(beginUnion);
+		FactorWord tuple = define("generic","TUPLE:");
+		tuple.parsing = new Tuple(tuple);
 	} //}}}
 
 	//{{{ getVocabulary() method

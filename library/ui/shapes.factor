@@ -62,5 +62,5 @@ C: rect ( x y w h -- rect )
     dup rect-y y get + swap rect-h dupd + ;
 
 M: rect inside? ( point rect -- ? )
-    over real over rect-x-extents between? >r
-    swap imaginary swap rect-y-extents between? r> and ;
+    over shape-x over rect-x-extents between? >r
+    swap shape-y swap rect-y-extents between? r> and ;
