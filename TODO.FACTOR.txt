@@ -1,6 +1,6 @@
+
 FFI:
 
-- listener: use console shell api
 - add a socket timeout
 - fix error postoning -- not all errors thrown by i/o code are
   postponed

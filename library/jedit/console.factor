@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: listener
+IN: console
 USE: combinators
 USE: continuations
 USE: init
@@ -77,22 +77,31 @@ USE: unparser
     jnew ;
 
 : actions-key ( -- attr )
-    "factor.jedit.FactorListener" "Actions" jvar-static-get
-    ; inline
+    "console.ConsolePane" "Actions" jvar-static-get ; inline
 
-: <action-menu-item> ( path pair -- pair )
-    uncons >r " " swap cat3 r> cons ;
+: <eval-action> ( label cmd -- action )
+    "console" get [
+        "java.lang.String"
+        "java.lang.String"
+        "console.Console"
+    ] "console.Console$EvalAction" jnew ;
 
-: <actions-menu> ( path actions -- alist )
-    [ dupd <action-menu-item> ] map nip ;
+: <action-menu-item> ( path pair -- action )
+    uncons swapd " " swap cat3 <eval-action> ;
+
+: >action-array ( list -- array )
+    [ "javax.swing.Action" ] coerce ;
+
+: <actions-menu> ( path actions -- array )
+    [ dupd <action-menu-item> ] map nip >action-array ;
 
 : object-actions ( -- list )
     [
-        [ "describe-path"  | "Describe" ]
-        [ "lookup"         | "Push" ]
-        [ "lookup execute" | "Execute" ]
-        [ "lookup jedit"   | "jEdit" ]
-        [ "lookup usages." | "Usages" ]
+        [ "Describe" | "describe-path"  ]
+        [ "Push"     | "lookup"         ]
+        [ "Execute"  | "lookup execute" ]
+        [ "jEdit"    | "lookup jedit"   ]
+        [ "Usages"   | "lookup usages." ]
     ] ;
 
 : <object-actions-menu> ( path -- alist )
@@ -100,10 +109,10 @@ USE: unparser
 
 : file-actions ( -- list )
     [
-        [ ""           | "Push" ]
-        [ "run-file"   | "Run file" ]
-        [ "directory." | "List directory" ]
-        [ "cd"         | "Change directory" ]
+        [ "Push"             | ""           ]
+        [ "Run file"         | "run-file"   ]
+        [ "List directory"   | "directory." ]
+        [ "Change directory" | "cd"         ]
     ] ;
 
 : <file-actions-menu> ( path -- alist )
@@ -140,59 +149,29 @@ USE: unparser
         [ "icon"        icon-attribute ]
     ] assoc-apply ;
 
-: set-character-attrs ( attrs -- )
-    t "listener" get
-    [ "javax.swing.text.AttributeSet" "boolean" ]
-    "javax.swing.JTextPane"
-    "setCharacterAttributes"
-    jinvoke ;
+: console-readln* ( continuation -- )
+    "console" get [ "factor.Cons" "console.Console" ]
+	"factor.jedit.FactorShell" "readLine" jinvoke-static ;
 
-: set-paragraph-attrs ( attrs -- )
-    t "listener" get
-    [ "javax.swing.text.AttributeSet" "boolean" ]
-    "javax.swing.JTextPane"
-    "setCharacterAttributes"
-    jinvoke ;
+: console-readln ( -- line )
+    [ console-readln* toplevel ] callcc1 ;
 
-: reset-attrs ( -- )
-    f default-style style>attribute-set set-character-attrs
-    drop ;
+: console-write-attr ( string style -- )
+    style>attribute-set swap "console" get
+    [ "javax.swing.text.AttributeSet" "java.lang.String" ]
+    "console.Output" "writeAttrs" jinvoke ;
 
-: listener-readln* ( continuation -- )
-    "listener" get
-	[ "factor.Cons" ]
-	"factor.jedit.FactorListener"
-	"readLine" jinvoke ;
-
-: listener-readln ( -- line )
-    reset-attrs [ listener-readln* toplevel ] callcc1 ;
-
-: listener-write-attr ( string style -- )
-    style>attribute-set "listener" get
-    [ "java.lang.String" "javax.swing.text.AttributeSet" ]
-    "factor.jedit.FactorListener"
-    "insertWithAttrs"
-    jinvoke ;
-
-!: listener-edit ( string -- )
-!    "listener" get
-!    [ "java.lang.String" ]
-!    "factor.jedit.FactorListener"
-!    "editLine" jinvoke ;
-
-: <listener-stream> ( listener -- stream )
+: <console-stream> ( console -- stream )
     #! Creates a stream for reading/writing to the given
-    #! listener instance.
+    #! console instance.
     <stream> [
-        "listener" set
+        "console" set
         ( -- string )
-        [ listener-readln ] "freadln" set
+        [ console-readln ] "freadln" set
         ( string -- )
-        [ default-style listener-write-attr ] "fwrite" set
+        [ default-style console-write-attr ] "fwrite" set
         ( string style -- )
-        [ listener-write-attr ] "fwrite-attr" set
-        ( string -- )
-        ![ listener-edit ] "fedit" set
+        [ console-write-attr ] "fwrite-attr" set
         ( -- )
         [ ] "fflush" set
         ( -- )
@@ -201,10 +180,9 @@ USE: unparser
         [ this fwrite "\n" this fwrite ] "fprint" set
     ] extend ;
 
-: new-listener-hook ( listener -- )
-    #! Called when user opens a new listener
+: console-hook ( console -- )
     [
-        dup "listener" set
-        <listener-stream> "stdio" set
+        dup "console" set
+        <console-stream> "stdio" set
         init-interpreter
     ] with-scope ;

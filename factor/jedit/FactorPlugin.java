@@ -35,12 +35,11 @@ import java.util.*;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
+import console.*;
 import sidekick.*;
 
 public class FactorPlugin extends EditPlugin
 {
-	private static final String DOCKABLE_NAME = "factor";
-
 	private static FactorInterpreter interp;
 
 	//{{{ start() method
@@ -50,6 +49,24 @@ public class FactorPlugin extends EditPlugin
 			"import factor.*;\nimport factor.jedit.*;\n");
 	} //}}}
 	
+	//{{{ newInterpreter() method
+	private static FactorInterpreter newInterpreter(String[] args)
+	{
+		try
+		{
+			FactorInterpreter interp = new FactorInterpreter();
+			interp.interactive = false;
+			interp.init(args);
+			return interp;
+		}
+		catch(Exception e)
+		{
+			System.err.println("Failed to initialize interpreter:");
+			e.printStackTrace();
+			return null;
+		}
+	} //}}}
+
 	//{{{ getInterpreter() method
 	/**
 	 * This can be called from the SideKick thread and must be thread safe.
@@ -58,8 +75,7 @@ public class FactorPlugin extends EditPlugin
 	{
 		if(interp == null)
 		{
-			interp = FactorListenerPanel.newInterpreter(
-				new String[] { "-jedit" });
+			interp = newInterpreter(new String[] { "-jedit" });
 		}
 
 		return interp;
@@ -76,10 +92,9 @@ public class FactorPlugin extends EditPlugin
 	public static void eval(View view, String cmd)
 	{
 		DockableWindowManager wm = view.getDockableWindowManager();
-		wm.addDockableWindow(DOCKABLE_NAME);
-		FactorListenerPanel panel = (FactorListenerPanel)
-			wm.getDockableWindow(DOCKABLE_NAME);
-		panel.getListener().eval(cmd);
+		wm.addDockableWindow("console");
+		Console console = (Console)wm.getDockableWindow("console");
+		console.run(Shell.getShell("Factor"),console,cmd);
 	} //}}}
 
 	//{{{ factorWord() method

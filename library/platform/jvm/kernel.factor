@@ -73,6 +73,7 @@ IN: kernel
 : toplevel ( -- )
     interpreter
     [ ] "factor.FactorInterpreter" "topLevel" jinvoke ;
+    interpret-only
 
 : exit* ( code -- )
     [ "int" ] "java.lang.System" "exit" jinvoke-static ;

@@ -604,14 +604,11 @@ public class FactorInterpreter implements FactorObject, Runnable
 		namestack.push(global);
 		catchstack.top = 0;
 		// DEFER: the word
-		define("kernel","exit*");
-		catchstack.push(new Cons(new Integer(1),
-			new Cons(searchVocabulary("kernel","exit*"),null)));
-		define("continuations","suspend");
+		define("kernel","toplevel");
 		define("errors","default-error-handler");
 		catchstack.push(new Cons(searchVocabulary("errors",
 			"default-error-handler"),
-			new Cons(searchVocabulary("continuations","suspend"),
+			new Cons(searchVocabulary("kernel","toplevel"),
 			null)));
 		callframe = null;
 	} //}}}

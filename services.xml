@@ -6,4 +6,7 @@
 	<SERVICE CLASS="sidekick.SideKickParser" NAME="factor">
 		new factor.jedit.FactorSideKickParser();
 	</SERVICE>
+	<SERVICE CLASS="console.Shell" NAME="Factor">
+		new factor.jedit.FactorShell();
+	</SERVICE>
 </SERVICES>

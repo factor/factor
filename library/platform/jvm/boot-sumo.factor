@@ -130,4 +130,4 @@ USE: parser
 "/library/jedit/jedit-local.factor"  run-resource ! jedit
 "/library/jedit/jedit-remote.factor" run-resource ! jedit
 "/library/jedit/jedit.factor"        run-resource ! jedit
-"/library/jedit/listener.factor"     run-resource ! listener
+"/library/jedit/console.factor"      run-resource ! console

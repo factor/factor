@@ -92,8 +92,16 @@ public class WordPreview implements ActionListener, CaretListener
 			textArea.getBuffer().markTokens(line,h);
 			Token tokens = h.getTokens();
 
-			Token token = TextUtilities.getTokenAtOffset(tokens,
-				caret - textArea.getLineStartOffset(line));
+			int offset = caret - textArea.getLineStartOffset(line);
+
+			int len = textArea.getLineLength(line);
+			if(len == 0)
+				return;
+
+			if(offset == len)
+				offset--;
+
+			Token token = TextUtilities.getTokenAtOffset(tokens,offset);
 
 			String name = token.rules.getName();
 
