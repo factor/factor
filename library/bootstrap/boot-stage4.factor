@@ -6,6 +6,8 @@ generic inference kernel-internals listener lists math memory
 namespaces parser presentation random stdio streams unparser
 words ;
 
+"Bootstrap stage 4..." print
+
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
     #! quotation.

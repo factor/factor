@@ -26,8 +26,8 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write class prettyprint-word terpri
-    "Expected type: " write builtin-type prettyprint-word terpri ;
+    "Object type: " write class word. terpri
+    "Expected type: " write builtin-type word. terpri ;
 
 : range-error ( list -- )
     "Range check error" print
@@ -104,9 +104,9 @@ M: object error. ( error -- ) . ;
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ prettyprint-word " " write ] each
+    [ :s :r :n :c ] [ word. " " write ] each
     "show stacks at time of error." print
-    \ :get prettyprint-word
+    \ :get word.
     " ( var -- value ) inspects the error namestack." print ;
 
 : flush-error-handler ( error -- )

@@ -172,7 +172,6 @@ SYMBOL: sym-test
 [ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ reverse ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ contains? ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ tree-contains? ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
 

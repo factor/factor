@@ -39,3 +39,5 @@ complement [
     2dup "complement" set-word-prop
     dupd complement-predicate "predicate" set-word-prop
     complement define-class ;
+
+PREDICATE: word complement metaclass complement = ;

@@ -48,3 +48,5 @@ union [ 2drop t ] "class<" set-word-prop
     [ union-predicate define-compound ] keep
     dupd "members" set-word-prop
     union define-class ;
+
+PREDICATE: word union metaclass union = ;

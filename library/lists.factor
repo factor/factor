@@ -54,28 +54,6 @@ IN: lists USING: generic kernel math ;
         drop
     ] ifte ; inline
 
-! Redefined below
-DEFER: tree-contains?
-
-: =-or-contains? ( element obj -- ? )
-    dup cons? [ tree-contains? ] [ = ] ifte ;
-
-: tree-contains? ( element tree -- ? )
-    dup [
-        2dup car =-or-contains? [
-            nip
-        ] [
-            cdr dup cons? [
-                tree-contains?
-            ] [
-                ! don't bomb on dotted pairs
-                =-or-contains?
-            ] ifte
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 : unique ( elem list -- list )
     #! Prepend an element to a list if it does not occur in the
     #! list.

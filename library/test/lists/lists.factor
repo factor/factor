@@ -45,12 +45,6 @@ USE: strings
 [ [ 1 2 3 ] ] [ 1 [ 1 2 3 ] unique ] unit-test
 [ [ 1 2 3 ] ] [ 2 [ 1 2 3 ] unique ] unit-test
 
-[ f ] [ 3 [ ]             tree-contains?     ] unit-test
-[ f ] [ 3 [ 1 [ 3 ] 2 ]   tree-contains? not ] unit-test
-[ f ] [ 1 [ [ [ 1 ] ] 2 ] tree-contains? not ] unit-test
-[ f ] [ 2 [ 1 2 ]         tree-contains? not ] unit-test
-[ f ] [ 3 [[ 1 [[ 2 3 ]] ]] tree-contains? not ] unit-test
-
 [ [ ]         ] [ 0   count ] unit-test
 [ [ ]         ] [ -10 count ] unit-test
 [ [ 0 1 2 3 ] ] [ 4   count ] unit-test

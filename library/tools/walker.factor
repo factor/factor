@@ -4,6 +4,10 @@ IN: interpreter
 USING: errors kernel listener lists math namespaces prettyprint
 stdio strings vectors words ;
 
+! The single-stepper simulates Factor in Factor to allow
+! single-stepping through the execution of a quotation. It can
+! transfer the continuation to and from the primary interpreter.
+
 : &s
     #! Print stepper data stack.
     meta-d get {.} ;
@@ -46,14 +50,14 @@ stdio strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ prettyprint-word " " write ] each
+    [ &s &r &n &c ] [ word. " " write ] each
     "show stepper stacks." print
-    \ &get prettyprint-word
+    \ &get word.
     " ( var -- value ) inspects the stepper namestack." print
-    \ step prettyprint-word " -- single step over" print
-    \ into prettyprint-word " -- single step into" print
-    \ continue prettyprint-word " -- continue execution" print
-    \ bye prettyprint-word " -- exit single-stepper" print
+    \ step word. " -- single step over" print
+    \ into word. " -- single step into" print
+    \ continue word. " -- continue execution" print
+    \ bye word. " -- exit single-stepper" print
     report ;
 
 : walk-listener walk-banner "walk" listener-prompt set listener ;

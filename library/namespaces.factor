@@ -158,3 +158,32 @@ SYMBOL: list-buffer
     #! Append some code that pushes the word on the stack. Used
     #! when building quotations.
     unit , \ car , ;
+
+! Building hashtables, and computing a transitive closure.
+SYMBOL: hash-buffer
+
+: make-hash ( quot -- hash )
+    [
+        <namespace> hash-buffer set
+        call
+        hash-buffer get
+    ] with-scope ; inline
+
+: hash, ( value key -- ? )
+    hash-buffer get [ hash swap ] 2keep set-hash ;
+
+: (closure) ( key hash -- )
+    tuck hash dup [
+        hash-keys [
+            dup dup hash, [
+                2drop
+            ] [
+                swap (closure)
+            ] ifte
+        ] each-with
+    ] [
+        2drop
+    ] ifte ;
+
+: closure ( key hash -- list )
+    [ (closure) ] make-hash hash-keys ;

@@ -1,11 +1,20 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic inference interpreter
-kernel lists math namespaces parser words hashtables strings
-unparser ;
+USING: assembler compiler errors generic hashtables inference
+interpreter kernel lists math namespaces parser stdio strings
+unparser words ;
 
-! Command line parameters specify libraries to load.
+! ! ! WARNING ! ! !
+! Reloading this file into a running Factor instance on Win32
+! or Unix with FFI I/O will bomb the runtime, since I/O words
+! would become uncompiled, and FFI calls can only be made from
+! compiled code.
+
+! USAGE:
+! 
+! Command line parameters given to the runtime specify libraries
+! to load.
 !
 ! -libraries:<foo>:name=<soname> -- define a library <foo>, to be
 ! loaded from the <soname> DLL.
@@ -134,16 +143,24 @@ SYMBOL: alien-parameters
 
 #alien-invoke [ linearize-alien ] "linearizer" set-word-prop
 
+TUPLE: alien-error lib ;
+
+C: alien-error ( lib -- ) [ set-alien-error-lib ] keep ;
+
+M: alien-error error. ( error -- )
+    [
+        "alien-invoke cannot be interpreted. " ,
+        "Either the compiler is disabled, " ,
+        "or the ``" , alien-error-lib ,
+        "'' library is missing." ,
+    ] make-string print ;
+
 : alien-invoke ( ... returns library function parameters -- ... )
     #! Call a C library function.
     #! 'returns' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
-    [
-        "alien-invoke cannot be interpreted. " ,
-        "Either the compiler is disabled, " ,
-        "or the ``" , rot , "'' library is missing. " ,
-    ] make-string throw ;
+    rot <alien-error> throw ;
 
 \ alien-invoke [ [ object object object object ] [ ] ]
 "infer-effect" set-word-prop

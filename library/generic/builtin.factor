@@ -46,3 +46,5 @@ builtin [ 2drop t ] "class<" set-word-prop
 
 : builtin-type ( n -- symbol )
     unit classes get hash ;
+
+PREDICATE: word builtin metaclass builtin = ;

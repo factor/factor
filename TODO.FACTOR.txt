@@ -10,9 +10,7 @@
 - unix ffi i/o
 - make-image: use a list not a vector
 - powerpc has weird callstack residue
-- make see work with union, builtin, predicate
 - make-vector and make-string should not need a reverse step
-- automatically recompiling defs
 - faster completion
 - console with presentations
 - ui browser
@@ -50,6 +48,7 @@
 
 + kernel:
 
+- unify unparse and prettyprint
 - condition system with restarts
 - nicer way to combine two paths
 - vectors: ensure its ok with bignum indices

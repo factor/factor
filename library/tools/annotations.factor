@@ -9,7 +9,7 @@ IN: words
 USING: interpreter kernel lists stdio strings ;
 
 : annotate ( word quot -- ) #! Quotation: ( word def -- def )
-    over [ word-def swap call ] keep set-word-def ;
+    over [ word-def swap call ] keep (define-compound) ;
 
 : (watch) >r "==> " swap word-name cat2 \ print r> cons cons ;
 

@@ -51,14 +51,11 @@ M: object prettyprint* ( indent obj -- indent )
         drop [ ]
     ] ifte ;
 
-: prettyprint-word ( word -- )
-    dup word-name swap word-attrs write-attr ;
+: word. ( word -- ) dup word-name swap word-attrs write-attr ;
+: word-bl word. " " write ;
 
 M: word prettyprint* ( indent word -- indent )
-    dup parsing? [
-        \ POSTPONE: prettyprint-word " " write
-    ] when
-    prettyprint-word ;
+    dup parsing? [ \ POSTPONE: word-bl ] when word. ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -100,14 +97,11 @@ M: word prettyprint* ( indent word -- indent )
     #! or { }, or << >>. The body of the list is indented,
     #! unless the list is empty.
     over [
-        >r
-        >r prettyprint-word <prettyprint
+        >r >r word. <prettyprint
         r> prettyprint-elements
-        prettyprint> r> prettyprint-word
+        prettyprint> r> word.
     ] [
-        >r >r prettyprint-word " " write
-        r> drop
-        r> prettyprint-word
+        >r >r word. " " write r> drop r> word.
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )

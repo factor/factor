@@ -5,39 +5,16 @@ USING: files generic inspector lists kernel namespaces
 prettyprint stdio streams strings unparser math hashtables
 parser ;
 
-GENERIC: word-uses? ( of in -- ? )
-M: word word-uses? 2drop f ;
-M: compound word-uses? ( of in -- ? )
-    #! Don't say that a word uses itself.
-    2dup = [ 2drop f  ] [ word-def tree-contains? ] ifte ;
-
-: generic-uses? ( of in -- ? )
-    "methods" word-prop hash>alist tree-contains? ;
-
-M: generic word-uses? ( of in -- ? ) generic-uses? ;
-M: 2generic word-uses? ( of in -- ? ) generic-uses? ;
-
-: usages-in-vocab ( of vocab -- usages )
-    #! Push a list of all usages of a word in a vocabulary.
-    words [
-        dup compound? [
-            dupd word-uses?
-        ] [
-            drop f ! Ignore words without a definition
-        ] ifte
-    ] subset nip ;
-
-: usages-in-vocab. ( of vocab -- )
-    #! List all usages of a word in a vocabulary.
-    tuck usages-in-vocab dup [
-        swap "IN: " write print [.]
-    ] [
-        2drop
-    ] ifte ;
-
 : usages. ( word -- )
-    #! List all usages of a word in all vocabularies.
-    vocabs [ usages-in-vocab. ] each-with ;
+    #! List all usages of a word.
+    usages word-sort [.] ;
+
+: usage ( word -- list )
+    crossref get hash dup [ hash-keys ] when ;
+
+: usage. ( word -- )
+    #! List all direct usages of a word.
+    usage word-sort [.] ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names

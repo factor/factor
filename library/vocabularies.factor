@@ -2,6 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words USING: hashtables kernel lists namespaces strings ;
 
+SYMBOL: vocabularies
+
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;
 
@@ -26,6 +28,11 @@ IN: words USING: hashtables kernel lists namespaces strings ;
     #! Apply a quotation to each word in the image.
     vocabs [ words [ swap dup >r call r> ] each ] each drop ;
     inline
+
+: recrossref ( -- )
+    #! Update word cross referencing information.
+    [ f "usages" set-word-prop ] each-word
+    [ add-crossref ] each-word ;
 
 : (search) ( name vocab -- word )
     vocab dup [ hash ] [ 2drop f ] ifte ;

@@ -4,9 +4,11 @@ IN: image
 USING: lists parser namespaces stdio kernel vectors words
 hashtables ;
 
+"Bootstrap stage 1..." print
+
 "/library/bootstrap/primitives.factor" run-resource
 
-: pull-in ( list -- ) [ parse-resource append, ] each ;
+: pull-in ( list -- ) [ dup print parse-resource append, ] each ;
 
 ! The make-list form creates a boot quotation
 [
@@ -27,8 +29,9 @@ hashtables ;
         "/library/vectors.factor"
         "/library/strings.factor"
         "/library/hashtables.factor"
-        "/library/words.factor"
         "/library/namespaces.factor"
+        "/library/words.factor"
+        "/library/vocabularies.factor"
         "/library/sbuf.factor"
         "/library/errors.factor"
         "/library/continuations.factor"
@@ -37,7 +40,6 @@ hashtables ;
         "/library/io/stdio.factor"
         "/library/io/io-internals.factor"
         "/library/io/stream-impl.factor"
-        "/library/vocabularies.factor"
         "/library/syntax/unparser.factor"
         "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"

@@ -42,7 +42,10 @@ predicate [
 ] "class<" set-word-prop
 
 : define-predicate ( class predicate definition -- )
+    pick over "definition" set-word-prop
     pick "superclass" word-prop "predicate" word-prop
     [ \ dup , append, , [ drop f ] , \ ifte , ] make-list
     define-compound
     predicate "metaclass" set-word-prop ;
+
+PREDICATE: word predicate metaclass predicate = ;

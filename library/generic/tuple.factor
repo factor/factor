@@ -75,6 +75,7 @@ UNION: arrayed array tuple ;
     ] ifte ;
 
 : tuple-slots ( tuple slots -- )
+    2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     4 -rot simple-slots ;
 
@@ -202,3 +203,5 @@ tuple [
 tuple 10 "priority" set-word-prop
 
 tuple [ 2drop t ] "class<" set-word-prop
+
+PREDICATE: word tuple-class metaclass tuple = ;

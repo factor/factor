@@ -90,6 +90,9 @@ IN: vectors
     #! pushed onto the stack.
     >r vector>list r> each ; inline
 
+: vector-each-with ( obj vector quot -- )
+    swap [ with ] vector-each 2drop ; inline
+
 : list>vector ( list -- vector )
     dup length <vector> swap [ over vector-push ] each ;
 

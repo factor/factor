@@ -59,5 +59,7 @@ M: compound (compile) ( word -- )
 : decompile ( word -- )
     [ word-primitive ] keep set-word-primitive ;
 
+M: compound (undefine) decompile ;
+
 : recompile ( word -- )
     dup decompile compile ;

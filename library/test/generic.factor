@@ -1,4 +1,6 @@
 IN: scratchpad
+USING: parser prettyprint stdio ;
+
 USE: hashtables
 USE: namespaces
 USE: generic
@@ -118,3 +120,19 @@ TUPLE: another-one ;
 
 [ "Hi" ] [ <for-arguments-sake> empty-method-test empty-method-test ] unit-test
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
+
+! Test generic see and parsing
+[ "IN: scratchpad\nSYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
+[ [ \ bah see ] with-string ] unit-test
+
+[ t ] [
+    DEFER: not-fixnum
+    "IN: scratchpad\nSYMBOL: not-fixnum\nCOMPLEMENT: not-fixnum fixnum\n"
+    dup eval
+    [ \ not-fixnum see ] with-string =
+] unit-test
+
+! Weird bug
+GENERIC: stack-underflow
+M: object stack-underflow 2drop ;
+M: word stack-underflow 2drop ;

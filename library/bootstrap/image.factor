@@ -378,7 +378,7 @@ M: hashtable ' ( hashtable -- pointer )
     #! Make an image for the C interpreter.
     [
         boot-quot off
-        "/library/bootstrap/boot.factor" run-resource
+        "/library/bootstrap/boot-stage1.factor" run-resource
     ] with-image
 
     swap write-image ;
