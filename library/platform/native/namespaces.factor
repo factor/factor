@@ -85,6 +85,3 @@ DEFER: >n
 : namespace-of ;
 : this namespace ;
 : has-namespace? hashtable? ;
-
-! We don't have a workspace in native Factor.
-: <table> <namespace> ;

@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.util.Set;
 import org.objectweb.asm.*;
@@ -41,20 +40,10 @@ public class InterpreterGet extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public InterpreterGet(FactorWord word, Workspace workspace)
+	public InterpreterGet(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ InterpreterGet constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public InterpreterGet(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

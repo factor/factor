@@ -30,10 +30,10 @@
 package factor;
 
 /**
- * Factor is a stack-based language.
+ * A growable array.
  * @author Slava Pestov
  */
-public class FactorArray implements PublicCloneable
+public class FactorArray implements FactorExternalizable, PublicCloneable
 {
 	public Object[] stack;
 	public int top;
@@ -157,6 +157,22 @@ public class FactorArray implements PublicCloneable
 	public int getCapacity()
 	{
 		return stack.length;
+	} //}}}
+	
+	//{{{ toString() method
+	/**
+	 * Returns elementsToString() enclosed with [ and ].
+	 */
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer("{ ");
+		for(int i = 0; i < top; i++)
+		{
+			buf.append(FactorReader.unparseObject(stack[i]));
+			buf.append(' ');
+		}
+
+		return buf.append("}").toString();
 	} //}}}
 	
 	//{{{ toList() method

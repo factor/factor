@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.util.Set;
 
@@ -40,20 +39,10 @@ public class Restack extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Restack(FactorWord word, Workspace workspace)
+	public Restack(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Restack constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Restack(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

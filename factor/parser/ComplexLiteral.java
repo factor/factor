@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import factor.math.*;
 
 public class ComplexLiteral extends FactorParsingDefinition
@@ -41,11 +40,10 @@ public class ComplexLiteral extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public ComplexLiteral(FactorWord word,
-		String end, Workspace workspace)
+	public ComplexLiteral(FactorWord word, String end)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 		this.end = end;
 	} //}}}
 

@@ -29,9 +29,9 @@ IN: errors
 USE: combinators
 USE: continuations
 USE: kernel
-USE: inspector
 USE: logic
 USE: namespaces
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings
@@ -65,14 +65,7 @@ USE: unparser
 
     suspend ;
 
-: ?describe-stack ( stack -- )
-    dup [
-        describe-stack
-    ] [
-        drop "No stack" print
-    ] ifte ;
-
-: :s ( -- ) "error-datastack" get ?describe-stack ;
-: :r ( -- ) "error-callstack" get ?describe-stack ;
-: :n ( -- ) "error-namestack" get ?describe-stack ;
-: :c ( -- ) "error-catchstack" get ?describe-stack ;
+: :s ( -- ) "error-datastack"  get prettyprint ;
+: :r ( -- ) "error-callstack"  get prettyprint ;
+: :n ( -- ) "error-namestack"  get prettyprint ;
+: :c ( -- ) "error-catchstack" get prettyprint ;

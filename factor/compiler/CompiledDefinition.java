@@ -39,7 +39,6 @@ import org.objectweb.asm.*;
  */
 public abstract class CompiledDefinition
 	extends FactorWordDefinition
-	implements factor.db.PersistentIgnore
 {
 	//{{{ CompiledDefinition constructor
 	public CompiledDefinition(FactorWord word)

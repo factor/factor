@@ -39,7 +39,7 @@ USE: strings
 USE: httpd
 
 : <responder> ( -- responder )
-    <table> [
+    <namespace> [
         [
             drop "GET method not implemented" httpd-error
         ] "get" set

@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class CharLiteral extends FactorParsingDefinition
@@ -39,20 +38,10 @@ public class CharLiteral extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public CharLiteral(FactorWord word, Workspace workspace)
+	public CharLiteral(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ CharLiteral constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public CharLiteral(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)

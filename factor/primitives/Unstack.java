@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.util.Set;
 
@@ -40,20 +39,10 @@ public class Unstack extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Unstack(FactorWord word, Workspace workspace)
+	public Unstack(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Unstack constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Unstack(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

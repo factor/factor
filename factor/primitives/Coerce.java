@@ -30,9 +30,7 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
-import java.util.Set;
 import org.objectweb.asm.*;
 
 public class Coerce extends FactorPrimitiveDefinition
@@ -41,20 +39,10 @@ public class Coerce extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Coerce(FactorWord word, Workspace workspace)
+	public Coerce(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Coerce constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Coerce(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -29,8 +29,6 @@
 
 package factor;
 
-import factor.db.PersistentIgnore;
-import factor.db.PersistentObject;
 import java.io.*;
 import java.util.*;
 
@@ -228,28 +226,6 @@ public class FactorReader
 				}
 			}
 		}
-	} //}}}
-
-	//{{{ unparseDBObject() method
-	public static String unparseDBObject(Object obj)
-	{
-		if(obj instanceof PersistentIgnore)
-			return "f";
-		else if(obj instanceof PersistentObject)
-		{
-			PersistentObject pobj = (PersistentObject)obj;
-			if(pobj.getWorkspace() != null
-				&& pobj.getID() != 0L)
-			{
-				return "#O" + pobj.getID();
-			}
-			else
-				return unparseObject(obj);
-		}
-		else if(obj instanceof Cons)
-			return ((Cons)obj).unparseDB();
-		else
-			return unparseObject(obj);
 	} //}}}
 
 	//{{{ unparseObject() method

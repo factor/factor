@@ -118,5 +118,7 @@ USE: strings
         compile-all
     ] when
 
+    t "startup-done" set
+    
     print-banner
     init-interpreter ;

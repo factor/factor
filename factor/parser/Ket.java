@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 
 public class Ket extends FactorParsingDefinition
 {
@@ -40,10 +39,10 @@ public class Ket extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public Ket(FactorWord start, FactorWord end, Workspace workspace)
+	public Ket(FactorWord start, FactorWord end)
 		throws Exception
 	{
-		super(end,workspace);
+		super(end);
 		this.start = start;
 	} //}}}
 

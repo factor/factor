@@ -29,20 +29,13 @@
 
 package factor;
 
-import factor.db.*;
 import factor.parser.*;
 import factor.primitives.*;
 import java.io.*;
 
 public class FactorInterpreter implements FactorObject, Runnable
 {
-	public static final String VERSION = "0.60.6";
-
-	// we need to call the 'boot' word from the init vocabulary.
-	private static final String INIT_VOCAB = "init";
-
-	// we need to call the 'throw' word from the errors vocabulary.
-	private static final String ERRORS_VOCAB = "errors";
+	public static final String VERSION = "0.60.8";
 
 	// command line arguments are stored here.
 	public Cons args;
@@ -52,8 +45,9 @@ public class FactorInterpreter implements FactorObject, Runnable
 	public Throwable error;
 	public boolean dump = false;
 	public boolean verboseCompile = false;
-	public boolean firstTime = false;
 	public boolean mini = false;
+	// if this is false and an error occurs, bail out.
+	public boolean startupDone = false;
 
 	public Cons callframe;
 	public FactorArray callstack = new FactorArray();
@@ -87,11 +81,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 	 */
 	public FactorWord last;
 
-	/**
-	 * Persistent store, maybe null.
-	 */
-	public Workspace workspace;
-
 	public FactorNamespace global;
 
 	private FactorNamespace interpNamespace;
@@ -104,8 +93,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorInterpreter interp = new FactorInterpreter();
 		interp.init(args,null);
 		interp.run();
-		if(interp.workspace != null)
-			interp.workspace.close();
 	} //}}}
 
 	//{{{ init() method
@@ -115,7 +102,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		this.interactive = interp.interactive;
 		this.dump = interp.dump;
 		this.verboseCompile = interp.verboseCompile;
-		this.firstTime = firstTime;
 		this.callframe = interp.callframe;
 		this.callstack = (FactorArray)interp.callstack.clone();
 		this.datastack = (FactorArray)interp.datastack.clone();
@@ -126,7 +112,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		this.in = interp.in;
 		this.builtins = interp.builtins;
 		this.last = interp.last;
-		this.workspace = interp.workspace;
 		this.global = interp.global;
 	} //}}}
 
@@ -136,39 +121,8 @@ public class FactorInterpreter implements FactorObject, Runnable
 		for(int i = 0; i < args.length; i++)
 		{
 			String arg = args[i];
-			if(arg.equals("-no-db"))
-			{
-				workspace = null;
-				args[i] = null;
-			}
-			else if(arg.equals("-db"))
-			{
-				if(workspace != null)
-					workspace.close();
-				workspace = new Workspace(
-					new BTreeStore(new File("factor.db"),
-					(byte)64,false),false,this);
-			}
-			else if(arg.startsWith("-db:"))
-			{
-				if(workspace != null)
-					workspace.close();
-				workspace = parseDBSpec(arg.substring(4));
-				args[i] = null;
-			}
-			// this switch forces a first time init
-			else if(arg.equals("-no-first-time"))
-			{
-				firstTime = false;
-				args[i] = null;
-			}
-			else if(arg.equals("-first-time"))
-			{
-				firstTime = true;
-				args[i] = null;
-			}
 			// this switch forces minimal libraries to be loaded
-			else if(arg.equals("-no-mini"))
+			if(arg.equals("-no-mini"))
 			{
 				mini = false;
 				args[i] = null;
@@ -182,7 +136,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 		this.args = Cons.fromArray(args);
 
-		vocabularies = new Table(workspace);
+		vocabularies = new FactorNamespace();
 		initBuiltinDictionary();
 		initNamespace(root);
 		topLevel();
@@ -190,35 +144,10 @@ public class FactorInterpreter implements FactorObject, Runnable
 		runBootstrap();
 	} //}}}
 
-	//{{{ parseDBSpec() method
-	private Workspace parseDBSpec(String db) throws Exception
-	{
-		int index = db.indexOf(':');
-		String className = db.substring(0,index);
-
-		String arg = db.substring(index + 1);
-
-		boolean readOnly;
-		if(arg.startsWith("ro:"))
-		{
-			readOnly = true;
-			arg = arg.substring(3);
-		}
-		else
-			readOnly = false;
-
-		Class[] consArgClasses = new Class[] { String.class };
-		Object[] consArgs = new Object[] { arg };
-
-		return new Workspace((Store)Class.forName(className)
-			.getConstructor(consArgClasses)
-			.newInstance(consArgs),readOnly,this);
-	} //}}}
-
 	//{{{ initBuiltinDictionary() method
 	private void initBuiltinDictionary() throws Exception
 	{
-		builtins = new Table(null);
+		builtins = new FactorNamespace();
 		vocabularies.setVariable("builtins",builtins);
 
 		in = "builtins";
@@ -226,129 +155,123 @@ public class FactorInterpreter implements FactorObject, Runnable
 
 		// parsing words
 		FactorWord lineComment = define("builtins","!");
-		lineComment.parsing = new LineComment(lineComment,false,null);
+		lineComment.parsing = new LineComment(lineComment,false);
 		FactorWord stackComment = define("builtins","(");
-		stackComment.parsing = new StackComment(stackComment,null);
+		stackComment.parsing = new StackComment(stackComment);
 		FactorWord str = define("builtins","\"");
-		str.parsing = new StringLiteral(str,true,null);
+		str.parsing = new StringLiteral(str,true);
 		FactorWord t = define("builtins","t");
-		t.parsing = new T(t,null);
+		t.parsing = new T(t);
 		FactorWord f = define("builtins","f");
-		f.parsing = new F(f,null);
+		f.parsing = new F(f);
 		FactorWord bra = define("builtins","[");
-		bra.parsing = new Bra(bra,null);
+		bra.parsing = new Bra(bra);
 		FactorWord ket = define("builtins","]");
-		ket.parsing = new Ket(bra,ket,null);
+		ket.parsing = new Ket(bra,ket);
 		FactorWord bar = define("builtins","|");
-		bar.parsing = new Bar(bar,null);
+		bar.parsing = new Bar(bar);
 		FactorWord def = define("builtins",":");
-		def.parsing = new Def(def,null);
+		def.parsing = new Def(def);
 		def.getNamespace().setVariable("doc-comments",Boolean.TRUE);
 		FactorWord ine = define("builtins",";");
-		ine.parsing = new Ine(def,ine,null);
+		ine.parsing = new Ine(def,ine);
 		FactorWord shuffle = define("builtins","~<<");
-		shuffle.parsing = new Shuffle(shuffle,">>~",null);
+		shuffle.parsing = new Shuffle(shuffle,">>~");
 
 		FactorWord noParsing = define("builtins","POSTPONE:");
-		noParsing.parsing = new NoParsing(noParsing,null);
+		noParsing.parsing = new NoParsing(noParsing);
 
 		// #X
 		FactorWord dispatch = define("builtins","#");
-		dispatch.parsing = new Dispatch(dispatch,null);
-		FactorWord getPersistentObject = define("builtins","#O");
-		getPersistentObject.parsing = new GetPersistentObject(
-			getPersistentObject,null);
+		dispatch.parsing = new Dispatch(dispatch);
 		FactorWord ch = define("builtins","#\\");
-		ch.parsing = new CharLiteral(ch,null);
+		ch.parsing = new CharLiteral(ch);
 		FactorWord raw = define("builtins","#\"");
-		raw.parsing = new StringLiteral(raw,false,null);
+		raw.parsing = new StringLiteral(raw,false);
 		FactorWord complex = define("builtins","#{");
-		complex.parsing = new ComplexLiteral(complex,"}",null);
+		complex.parsing = new ComplexLiteral(complex,"}");
 		FactorWord docComment = define("builtins","#!");
-		docComment.parsing = new LineComment(docComment,true,null);
+		docComment.parsing = new LineComment(docComment,true);
 		FactorWord unreadable = define("builtins","#<");
-		unreadable.parsing = new Unreadable(unreadable,null);
+		unreadable.parsing = new Unreadable(unreadable);
 
 		// #: is not handled with a special dispatch. instead, when
 		// a word starting with #: is passed to intern(), it creates
 		// a new symbol
 		FactorWord passthru = define("builtins","#:");
-		passthru.parsing = new PassThrough(passthru,null);
+		passthru.parsing = new PassThrough(passthru);
 
 		// vocabulary parsing words
 		FactorWord defer = define("builtins","DEFER:");
-		defer.parsing = new Defer(defer,null);
+		defer.parsing = new Defer(defer);
 		FactorWord in = define("builtins","IN:");
-		in.parsing = new In(in,null);
+		in.parsing = new In(in);
 		FactorWord use = define("builtins","USE:");
-		use.parsing = new Use(use,null);
+		use.parsing = new Use(use);
 
 		FactorWord interpreterGet = define("builtins","interpreter");
-		interpreterGet.def = new InterpreterGet(interpreterGet,null);
+		interpreterGet.def = new InterpreterGet(interpreterGet);
 		interpreterGet.inline = true;
 
 		// reading numbers with another base
 		FactorWord bin = define("builtins","BIN:");
-		bin.parsing = new Base(defer,null,2);
+		bin.parsing = new Base(bin,2);
 		FactorWord oct = define("builtins","OCT:");
-		oct.parsing = new Base(defer,null,8);
+		oct.parsing = new Base(oct,8);
 		FactorWord hex = define("builtins","HEX:");
-		hex.parsing = new Base(defer,null,16);
+		hex.parsing = new Base(hex,16);
 
 		// primitives used by 'expand' and 'map'
 		FactorWord restack = define("builtins","restack");
-		restack.def = new Restack(restack,null);
+		restack.def = new Restack(restack);
 		FactorWord unstack = define("builtins","unstack");
-		unstack.def = new Unstack(unstack,null);
+		unstack.def = new Unstack(unstack);
 
 		// reflection primitives
 		FactorWord jinvoke = define("builtins","jinvoke");
-		jinvoke.def = new JInvoke(jinvoke,null,false);
+		jinvoke.def = new JInvoke(jinvoke,false);
 		jinvoke.inline = true;
 		FactorWord jinvokeStatic = define("builtins","jinvoke-static");
-		jinvokeStatic.def = new JInvoke(jinvokeStatic,null,true);
+		jinvokeStatic.def = new JInvoke(jinvokeStatic,true);
 		jinvokeStatic.inline = true;
 		FactorWord jnew = define("builtins","jnew");
-		jnew.def = new JNew(jnew,null);
+		jnew.def = new JNew(jnew);
 		jnew.inline = true;
 		FactorWord jvarGet = define("builtins","jvar-get");
-		jvarGet.def = new JVarGet(jvarGet,null);
+		jvarGet.def = new JVarGet(jvarGet);
 		jvarGet.inline = true;
 		FactorWord jvarGetStatic = define("builtins","jvar-static-get");
-		jvarGetStatic.def = new JVarGetStatic(jvarGetStatic,null);
+		jvarGetStatic.def = new JVarGetStatic(jvarGetStatic);
 		jvarGetStatic.inline = true;
 		FactorWord jvarSet = define("builtins","jvar-set");
-		jvarSet.def = new JVarSet(jvarSet,null);
+		jvarSet.def = new JVarSet(jvarSet);
 		jvarSet.inline = true;
 		FactorWord jvarSetStatic = define("builtins","jvar-static-set");
-		jvarSetStatic.def = new JVarSetStatic(jvarSetStatic,null);
+		jvarSetStatic.def = new JVarSetStatic(jvarSetStatic);
 		jvarSetStatic.inline = true;
 		FactorWord coerce = define("builtins","coerce");
-		coerce.def = new Coerce(coerce,null);
+		coerce.def = new Coerce(coerce);
 		coerce.inline = true;
 
 		// definition
 		FactorWord define = define("builtins","define");
-		define.def = new Define(define,null);
+		define.def = new Define(define);
 
 		// combinators
 		FactorWord execute = define("builtins","execute");
-		execute.def = new Execute(execute,null);
+		execute.def = new Execute(execute);
 		FactorWord call = define("builtins","call");
-		call.def = new Call(call,null);
+		call.def = new Call(call);
 		call.inline = true;
 		FactorWord ifte = define("builtins","ifte");
-		ifte.def = new Ifte(ifte,null);
+		ifte.def = new Ifte(ifte);
 		ifte.inline = true;
 	} //}}}
 
 	//{{{ initNamespace() method
 	private void initNamespace(Object root) throws Exception
 	{
-		if(workspace == null)
-			global = new FactorNamespace(null,root);
-		else
-			global = workspace.getRoot();
+		global = new FactorNamespace(null,root);
 
 		global.setVariable("interpreter",this);
 
@@ -357,37 +280,14 @@ public class FactorInterpreter implements FactorObject, Runnable
 				getClass().getField("verboseCompile"),
 				this));
 
-		global.setVariable("global",
+		global.setVariable("startup-done",
 			new FactorNamespace.VarBinding(
-				getClass().getField("global"),
+				getClass().getField("startupDone"),
 				this));
-
-		FactorNamespace newVocabs;
-		try
-		{
-			Object obj = global.getVariable("vocabularies");
-			if(!(obj instanceof FactorNamespace))
-				newVocabs = new Table(workspace);
-			else
-				newVocabs = (FactorNamespace)obj;
-		}
-		catch(Exception e)
-		{
-			System.err.println("Vocabularies table corrupt: " + e);
-			newVocabs = new Table(workspace);
-		}
-
-		vocabularies = newVocabs;
-
-		global.setVariable("vocabularies",
-			new FactorNamespace.VarBinding(
-				getClass().getField("vocabularies"),
-				this));
-
-		// Shouldn't have to do this twice!
-		initBuiltinDictionary();
 
 		String[] boundFields = {
+			"global",
+			"vocabularies",
 			"args",
 			"dump",
 			"interactive",
@@ -420,24 +320,16 @@ public class FactorInterpreter implements FactorObject, Runnable
 	//{{{ runBootstrap() method
 	private void runBootstrap() throws Exception
 	{
-		if(workspace == null || workspace.isFirstTime()
-			|| firstTime)
-		{
-			if(workspace != null)
-				workspace.setFirstTime(false);
-			String initFile = "/library/platform/jvm/boot.factor";
-			FactorReader parser = new FactorReader(
-				initFile,
-				new BufferedReader(
-				new InputStreamReader(
-				getClass().getResourceAsStream(
-				initFile))),
-				this);
-
-			call(parser.parse());
-		}
-		else
-			eval(searchVocabulary(INIT_VOCAB,"boot"));
+		String initFile = "/library/platform/jvm/boot.factor";
+		FactorReader parser = new FactorReader(
+			initFile,
+			new BufferedReader(
+			new InputStreamReader(
+			getClass().getResourceAsStream(
+			initFile))),
+			this);
+                
+		call(parser.parse());
 
 		run();
 	} //}}}
@@ -479,17 +371,27 @@ public class FactorInterpreter implements FactorObject, Runnable
 	private boolean handleError(Throwable e)
 	{
 		error = FactorJava.unwrapException(e);
+		if(!startupDone)
+		{
+			error.printStackTrace();
+			topLevel();
+			return true;
+		}
+		
 		datastack.push(error);
 		try
 		{
-			eval(searchVocabulary(ERRORS_VOCAB,"throw"));
+			FactorWord throwWord = searchVocabulary(
+				"errors","throw");
+			if(throwWord == null)
+				throw new NullPointerException();
+			eval(throwWord);
 			return false;
 		}
 		catch(Throwable e2)
 		{
 			System.err.println("Exception when calling throw:");
 			e.printStackTrace();
-
 			topLevel();
 
 			return true;
@@ -609,7 +511,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 		Object value = vocabularies.getVariable(name);
 		if(value == null)
 		{
-			value = new Table(workspace);
+			value = new FactorNamespace();
 			vocabularies.setVariable(name,value);
 		}
 	} //}}}
@@ -680,7 +582,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 			FactorNamespace v = getVocabulary(vocabulary);
 			if(v == null)
 			{
-				v = new Table(workspace);
+				v = new FactorNamespace();
 				vocabularies.setVariable(vocabulary,v);
 			}
 			Object value = v.getVariable(name);
@@ -688,18 +590,9 @@ public class FactorInterpreter implements FactorObject, Runnable
 				return (FactorWord)value;
 			else
 			{
-				Workspace workspace;
-				if(v instanceof PersistentObject)
-				{
-					workspace = ((PersistentObject)v)
-						.getWorkspace();
-				}
-				else
-					workspace = null;
-
 				// save to same workspace as vocabulary,
 				// or no workspace if vocabulary is builtins
-				FactorWord word = new FactorWord(workspace,
+				FactorWord word = new FactorWord(
 					vocabulary,name,null);
 				v.setVariable(name,word);
 				return word;
@@ -724,8 +617,11 @@ public class FactorInterpreter implements FactorObject, Runnable
 		namestack.push(global);
 		catchstack.top = 0;
 		// DEFER: the word
-		define(ERRORS_VOCAB,"default-error-handler");
-		catchstack.push(new Cons(searchVocabulary(ERRORS_VOCAB,
+		define("kernel","exit*");
+		catchstack.push(new Cons(new Integer(1),
+			new Cons(searchVocabulary("kernel","exit*"),null)));
+		define("errors","default-error-handler");
+		catchstack.push(new Cons(searchVocabulary("errors",
 			"default-error-handler"),null));
 		callframe = null;
 	} //}}}

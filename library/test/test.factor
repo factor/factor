@@ -81,8 +81,6 @@ USE: vocabularies
         "tail"
         "types"
         "vectors"
-        !"store"
-        !"reboot"
     ] [
         test
     ] each

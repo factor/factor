@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
@@ -42,20 +41,10 @@ public class JVarSet extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public JVarSet(FactorWord word, Workspace workspace)
+	public JVarSet(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ JVarSet constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public JVarSet(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
@@ -42,20 +41,9 @@ public class Call extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Call(FactorWord word, Workspace workspace)
-		throws Exception
+	public Call(FactorWord word)
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Call constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Call(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

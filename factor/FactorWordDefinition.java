@@ -29,7 +29,6 @@
 
 package factor;
 
-import factor.db.*;
 import factor.compiler.*;
 import java.io.*;
 import java.util.*;
@@ -37,21 +36,9 @@ import org.objectweb.asm.*;
 
 /**
  * A word definition.
- *
- * The pickled form is an unparsed list. The car of the list is the word,
- * the cdr is toList().
  */
-public abstract class FactorWordDefinition
-	implements Constants, PersistentObject
+public abstract class FactorWordDefinition implements Constants
 {
-	public static final String ENCODING = "UTF8";
-
-	private String unparsed;
-	private boolean initialized;
-
-	private Workspace workspace;
-	private long id;
-
 	protected FactorWord word;
 
 	public boolean compileFailed;
@@ -60,32 +47,9 @@ public abstract class FactorWordDefinition
 	/**
 	 * A new definition.
 	 */
-	public FactorWordDefinition(FactorWord word, Workspace workspace)
-	{
-		this(workspace,workspace == null
-			? 0L : workspace.nextID());
-		this.word = word;
-		initialized = true;
-	} //}}}
-
-	//{{{ FactorWordDefinition constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public FactorWordDefinition(Workspace workspace, long id)
-	{
-		this.workspace = workspace;
-		this.id = id;
-	} //}}}
-
-	//{{{ FactorWordDefinition constructor
-	/**
-	 * A definition that is not saved in the current workspace.
-	 */
 	public FactorWordDefinition(FactorWord word)
 	{
 		this.word = word;
-		initialized = true;
 	} //}}}
 
 	public abstract void eval(FactorInterpreter interp)
@@ -94,15 +58,14 @@ public abstract class FactorWordDefinition
 	//{{{ getWord() method
 	public FactorWord getWord(FactorInterpreter interp)
 	{
-		lazyInit(interp);
 		return word;
 	} //}}}
 	
 	//{{{ fromList() method
 	public void fromList(Cons cons, FactorInterpreter interp)
-		throws FactorRuntimeException, PersistenceException
+		throws FactorRuntimeException
 	{
-		throw new PersistenceException("Cannot unpickle " + this);
+		throw new FactorRuntimeException("Cannot unpickle " + this);
 	} //}}}
 
 	//{{{ toList() method
@@ -123,7 +86,6 @@ public abstract class FactorWordDefinition
 		FactorInterpreter interp) throws Exception
 	{
 		FactorCompiler compiler = new FactorCompiler(interp);
-		lazyInit(interp);
 		recursiveCheck.add(word,new StackEffect(),null,null,null);
 		getStackEffect(recursiveCheck,compiler);
 		recursiveCheck.remove(word);
@@ -134,7 +96,6 @@ public abstract class FactorWordDefinition
 	public void getStackEffect(RecursiveState recursiveCheck,
 		FactorCompiler compiler) throws Exception
 	{
-		lazyInit(compiler.interp);
 		throw new FactorCompilerException("Cannot deduce stack effect of " + word);
 	} //}}}
 
@@ -152,8 +113,6 @@ public abstract class FactorWordDefinition
 	public void compileCallTo(CodeVisitor mw, FactorCompiler compiler,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		lazyInit(compiler.interp);
-		
 		// normal word
 		String defclass;
 		String defmethod;
@@ -262,8 +221,6 @@ public abstract class FactorWordDefinition
 		RecursiveState recursiveCheck,
 		StackEffect immediateEffect) throws Exception
 	{
-		lazyInit(compiler.interp);
-		
 		Cons definition = toList(compiler.getInterpreter());
 
 		Cons endOfDocs = definition;
@@ -370,98 +327,6 @@ public abstract class FactorWordDefinition
 				into.stack[i] = s1.stack[i];
 			}
 		}
-	} //}}}
-
-	//{{{ getWorkspace() method
-	/**
-	 * Each persistent object is stored in one workspace only.
-	 */
-	public Workspace getWorkspace()
-	{
-		return workspace;
-	} //}}}
-
-	//{{{ getID() method
-	/**
-	 * Each persistent object has an associated ID.
-	 */
-	public long getID()
-	{
-		return id;
-	} //}}}
-
-	//{{{ lazyInit() method
-	public synchronized void lazyInit(FactorInterpreter interp)
-	{
-		if(initialized)
-			return;
-
-		initialized = true;
-
-		try
-		{
-			Cons pickle = (Cons)FactorReader.parseObject(
-				unparsed,interp);
-			word = (FactorWord)pickle.car;
-			//System.err.println(word + " unpickled");
-			fromList(pickle.next(),interp);
-		}
-		catch(Exception e)
-		{
-			// should not happen with byte array stream
-			throw new RuntimeException("Unexpected error",e);
-		}
-	} //}}}
-
-	//{{{ pickle() method
-	/**
-	 * Each persistent object can turn itself into a byte array.
-	 */
-	public byte[] pickle()
-		throws PersistenceException
-	{
-		try
-		{
-			ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-
-			Cons pickle = new Cons(word,toList(
-				workspace.getInterpreter()));
-			bytes.write((FactorReader.getVocabularyDeclaration(pickle)
-				+ FactorReader.unparseDBObject(pickle))
-				.getBytes(ENCODING));
-
-			return bytes.toByteArray();
-		}
-		catch(Exception e)
-		{
-			// should not happen with byte array stream
-			throw new PersistenceException("Unexpected error",e);
-		}
-	} //}}}
-
-	//{{{ unpickle() method
-	/**
-	 * Each persistent object can set its state to that in a byte array.
-	 */
-	public void unpickle(byte[] bytes, int offset)
-		throws PersistenceException
-	{
-		try
-		{
-			unparsed = new String(bytes,offset,
-				bytes.length - offset,ENCODING);
-		}
-		catch(Exception e)
-		{
-			// should not happen with byte array stream
-			throw new PersistenceException("Unexpected error",e);
-		}
-	} //}}}
-
-	//{{{ getReferences() method
-	public Cons getReferences()
-	{
-		return toList(workspace.getInterpreter());
 	} //}}}
 
 	//{{{ toString() method

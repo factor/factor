@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class PassThrough extends FactorParsingDefinition
@@ -39,10 +38,10 @@ public class PassThrough extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public PassThrough(FactorWord word, Workspace workspace)
+	public PassThrough(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)

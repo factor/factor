@@ -37,7 +37,7 @@ USE: wiki-responder
 : default-responders ( -- )
     #! Remove all existing responders, and create a blank
     #! responder table.
-    <table> [
+    <namespace> [
         <responder> [
             "test" "responder" set
             [ test-responder ] "get" set
@@ -63,7 +63,7 @@ USE: wiki-responder
             "wiki" "responder" set
             [ wiki-get-responder ] "get" set
             [ wiki-post-responder ] "post" set
-            <table> "wiki" set
+            <namespace> "wiki" set
             "WikiHome" "default-argument" set
         ] extend "wiki" set
     ] extend "httpd-responders" set ;

@@ -28,6 +28,7 @@
 IN: prettyprint
 USE: arithmetic
 USE: combinators
+USE: errors
 USE: format
 USE: kernel
 USE: logic
@@ -39,6 +40,7 @@ USE: stdio
 USE: strings
 USE: styles
 USE: unparser
+USE: vectors
 USE: vocabularies
 USE: words
 
@@ -74,6 +76,22 @@ DEFER: prettyprint*
 
 : prettyprint-[] ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
+
+: prettyprint-{ ( indent -- indent )
+    "{" write
+    tab-size + dup prettyprint-newline ;
+
+: prettyprint-} ( indent -- indent )
+    tab-size - dup prettyprint-newline
+    "}" write
+    prettyprint-space ;
+
+: prettyprint-vector ( indent list -- indent )
+    #! Pretty-print a vector, without { and }.
+    [ prettyprint* ] vector-each ;
+
+: prettyprint-{} ( indent list -- indent )
+    swap prettyprint-{ swap prettyprint-vector prettyprint-} ;
 
 : write-comment ( comment -- )
     [ "comments" ] get-style [ write-attr ] bind ;
@@ -112,6 +130,7 @@ DEFER: prettyprint*
     [
         [ not       ] [ prettyprint-object ]
         [ list?     ] [ prettyprint-[] ]
+        [ vector?   ] [ prettyprint-{} ]
         [ comment?  ] [ prettyprint-comment ]
         [ word?     ] [ prettyprint-word ]
         [ drop t    ] [ prettyprint-object ]
@@ -131,3 +150,8 @@ DEFER: prettyprint*
 : prettyprint-:; ( indent word list -- indent )
     [ [ prettyprint-: ] dip prettyprint-word ] dip
     prettyprint-list prettyprint-; ;
+
+: .n namestack  prettyprint ;
+: .s datastack  prettyprint ;
+: .r callstack  prettyprint ;
+: .c catchstack prettyprint ;

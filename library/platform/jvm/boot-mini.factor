@@ -69,7 +69,6 @@ USE: parser
 "/library/stdio.factor"                     run-resource ! stdio
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
-"/library/platform/jvm/workspace.factor"    run-resource ! workspace
 "/library/styles.factor"                    run-resource ! styles
 
 !!! Math library.

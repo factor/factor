@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import org.objectweb.asm.*;
 
@@ -40,20 +39,10 @@ public class Ifte extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Ifte(FactorWord word, Workspace workspace)
+	public Ifte(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Ifte constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Ifte(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Map;
@@ -44,22 +43,11 @@ public class JInvoke extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public JInvoke(FactorWord word, Workspace workspace,
-		boolean staticMethod)
+	public JInvoke(FactorWord word, boolean staticMethod)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 		this.staticMethod = staticMethod;
-	} //}}}
-
-	//{{{ JInvoke constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public JInvoke(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
 	} //}}}
 
 	//{{{ checkStatic() method

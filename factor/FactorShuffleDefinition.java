@@ -30,7 +30,6 @@
 package factor;
 
 import factor.compiler.*;
-import factor.db.Workspace;
 import java.util.*;
 import org.objectweb.asm.*;
 
@@ -60,20 +59,11 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 	private int shuffleRlength;
 
 	//{{{ FactorShuffleDefinition constructor
-	public FactorShuffleDefinition(Workspace workspace, long id)
-	{
-		super(workspace,id);
-	} //}}}
-
-	//{{{ FactorShuffleDefinition constructor
 	public FactorShuffleDefinition(FactorWord word, Cons definition,
 		FactorInterpreter interp) throws FactorException
 	{
-		super(word,interp.workspace);
+		super(word);
 		fromList(definition,interp);
-
-		if(interp.workspace != null)
-			interp.workspace.put(this);
 	} //}}}
 
 	//{{{ FactorShuffleDefinition constructor
@@ -162,8 +152,6 @@ public class FactorShuffleDefinition extends FactorWordDefinition
 		FactorArray callstack)
 		throws FactorStackException
 	{
-		lazyInit(interp);
-
 		if(datastack.top < consumeD)
 			throw new FactorStackException(consumeD);
 

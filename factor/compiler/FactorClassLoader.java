@@ -29,9 +29,7 @@
 
 package factor.compiler;
 
-import factor.Cons;
-import factor.FactorInterpreter;
-import factor.db.*;
+import factor.*;
 import java.util.*;
 
 /**
@@ -40,28 +38,10 @@ import java.util.*;
  * When compiling a word; add each dependent word to new class loader's
  * delegates map.
  */
-public class FactorClassLoader extends ClassLoader implements PersistentObject
+public class FactorClassLoader extends ClassLoader
 {
-	private Workspace workspace;
 	private long id;
-	private Table table;
-
-	//{{{ FactorClassLoader constructor
-	public FactorClassLoader(Workspace workspace, long id)
-		throws Exception
-	{
-		this.workspace = workspace;
-		this.id = id;
-		table = new Table(null,workspace,0L);
-		if(workspace != null && id != 0L)
-			workspace.put(this);
-	} //}}}
-
-	//{{{ FactorClassLoader constructor
-	public FactorClassLoader(Workspace workspace) throws Exception
-	{
-		this(workspace,workspace == null ? 0L : workspace.nextID());
-	} //}}}
+	private FactorNamespace table = new FactorNamespace();
 
 	//{{{ addDependency() method
 	public void addDependency(String name, FactorClassLoader loader)
@@ -69,66 +49,16 @@ public class FactorClassLoader extends ClassLoader implements PersistentObject
 		try
 		{
 			table.setVariable(name,loader);
-			if(workspace != null && id != 0L)
-				workspace.put(this);
 		}
 		catch(Exception e)
 		{
 			throw new RuntimeException(e);
 		}
-	} //}}}
-
-	//{{{ getWorkspace() method
-	/**
-	 * Each persistent object is stored in one workspace only.
-	 */
-	public Workspace getWorkspace()
-	{
-		return workspace;
-	} //}}}
-
-	//{{{ getID() method
-	/**
-	 * Each persistent object has an associated ID.
-	 */
-	public long getID()
-	{
-		return id;
-	} //}}}
-
-	//{{{ pickle() method
-	/**
-	 * Each persistent object can turn itself into a byte array.
-	 */
-	public byte[] pickle()
-		throws PersistenceException
-	{
-		return table.pickle();
-	} //}}}
-
-	//{{{ unpickle() method
-	/**
-	 * Each persistent object can set its state to that in a byte array.
-	 */
-	public void unpickle(byte[] bytes, int offset)
-		throws PersistenceException
-	{
-		table.unpickle(bytes,offset);
 	} //}}}
 
 	//{{{ addClass() method
 	public Class addClass(String name, byte[] code, int off, int len)
 	{
-		try
-		{
-			table.setVariable(name,
-				new PersistentBinary(workspace,code));
-		}
-		catch(Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-
 		return defineClass(name,code,off,len);
 	} //}}}
 
@@ -153,16 +83,6 @@ public class FactorClassLoader extends ClassLoader implements PersistentObject
 				return ((FactorClassLoader)obj)
 					.loadClass(name,resolve);
 			}
-			else if(obj instanceof PersistentBinary)
-			{
-				byte[] bytes = ((PersistentBinary)obj)
-					.getBytes();
-				c = defineClass(
-					name,bytes,0,bytes.length);
-				if(resolve)
-					resolveClass(c);
-				return c;
-			}
 			else if(obj != null)
 			{
 				System.err.println("WARNING: unknown object in class loader table for " + this + ": " + obj);
@@ -178,11 +98,5 @@ public class FactorClassLoader extends ClassLoader implements PersistentObject
 		{
 			throw new RuntimeException(e);
 		}
-	} //}}}
-
-	//{{{ getReferences() method
-	public Cons getReferences()
-	{
-		return table.getReferences();
 	} //}}}
 }

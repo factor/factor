@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class LineComment extends FactorParsingDefinition
@@ -41,10 +40,10 @@ public class LineComment extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public LineComment(FactorWord word, boolean doc, Workspace workspace)
+	public LineComment(FactorWord word, boolean doc)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 		this.doc = doc;
 	} //}}}
 

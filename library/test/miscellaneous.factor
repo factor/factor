@@ -44,8 +44,6 @@ USE: vocabularies
 
 [ [ 5 1 0 0 ] ] [ [ >=< ] ] [ balance>list ] test-word
 
-[ [ 1 0 0 0 ] ] [ [ throw ] ] [ balance>list ] test-word
-
 [ [ 1 0 0 0 ] ] [ [ exit* ] ] [ balance>list ] test-word
 
 [ [ 0 1 0 0 ] ] [ [ millis ] ] [ balance>list ] test-word

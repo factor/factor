@@ -30,7 +30,6 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
 import java.lang.reflect.*;
 import java.util.Set;
@@ -42,20 +41,10 @@ public class Execute extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Execute(FactorWord word, Workspace workspace)
+	public Execute(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Execute constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Execute(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 
 public class Use extends FactorParsingDefinition
 {
@@ -38,10 +37,10 @@ public class Use extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public Use(FactorWord word, Workspace workspace)
+	public Use(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -30,8 +30,6 @@
 package factor;
 
 import factor.compiler.*;
-import factor.db.Workspace;
-import factor.db.PersistenceException;
 import java.lang.reflect.*;
 import java.io.FileOutputStream;
 import java.util.*;
@@ -52,29 +50,16 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	 * A new definition.
 	 */
 	public FactorCompoundDefinition(FactorWord word, Cons definition,
-		FactorInterpreter interp) throws PersistenceException
+		FactorInterpreter interp)
 	{
-		super(word,interp.workspace);
+		super(word);
 		fromList(definition,interp);
-
-		if(interp.workspace != null)
-			interp.workspace.put(this);
-	} //}}}
-
-	//{{{ FactorCompoundDefinition constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public FactorCompoundDefinition(Workspace workspace, long id)
-	{
-		super(workspace,id);
 	} //}}}
 
 	//{{{ eval() method
 	public void eval(FactorInterpreter interp)
 		throws Exception
 	{
-		lazyInit(interp);
 		interp.call(endOfDocs);
 	} //}}}
 
@@ -82,7 +67,6 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	public void getStackEffect(RecursiveState recursiveCheck,
 		FactorCompiler compiler) throws Exception
 	{
-		lazyInit(compiler.interp);
 		RecursiveForm rec = recursiveCheck.get(word);
 		if(rec.active)
 		{
@@ -111,10 +95,8 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	FactorWordDefinition compile(FactorInterpreter interp,
 		RecursiveState recursiveCheck) throws Exception
 	{
-		lazyInit(interp);
 		// Each word has its own class loader
-		FactorClassLoader loader = new FactorClassLoader(
-			interp.workspace);
+		FactorClassLoader loader = new FactorClassLoader();
 
 		StackEffect effect = getStackEffect(interp);
 

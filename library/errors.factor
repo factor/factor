@@ -36,18 +36,11 @@ USE: stack
 USE: strings
 USE: vectors
 
-: >c ( catch -- )
-    #! Push a catch block on the catchstack. Use the catch word
-    #! instead of invoking this word directly.
-    catchstack* vector-push ;
-
-: c> ( catch -- )
-    #! Pop a catch block from the catchstack. Use the catch word
-    #! instead of invoking this word directly.
-    catchstack* vector-pop ;
+: >c ( catch -- ) catchstack* vector-push ;
+: c> ( catch -- ) catchstack* vector-pop ;
 
 : save-error ( error -- )
-    #! Save the stacks for most-mortem inspection after an
+    #! Save the stacks for post-mortem inspection after an
     #! error.
     global [
         "error" set
@@ -58,18 +51,14 @@ USE: vectors
     ] bind ;
 
 : catch ( try catch -- )
-    #! Call the try quotation, restore the datastack to its
-    #! state before the try quotation, push the error (or f if
-    #! no error occurred) and call the catch quotation.
-    [ >c >r call c> drop f r> f ] callcc1
-    ( try catch error ) rot drop swap ( error catch ) call ;
+    #! Call the try quotation. If an error occurs restore the
+    #! datastack, push the error, and call the catch block.
+    #! If no error occurs, push f and call the catch block.
+    [ >c >r call c> drop f r> f ] callcc1 rot drop swap call ;
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
     #! For convinience, this word is a no-op if error is f.
     [ c> call ] when* ;
 
-: throw ( error -- )
-    #! Throw an error. If no catch handlers are installed, the
-    #! default-error-handler is called.
-    dup save-error rethrow ;
+: throw ( error -- ) dup save-error rethrow ;

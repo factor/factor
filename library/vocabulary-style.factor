@@ -51,7 +51,7 @@ USE: words
     ] ifte ;
 
 : init-vocab-styles ( -- )
-    "styles" get [ <table> "vocabularies" set ] bind
+    "styles" get [ <namespace> "vocabularies" set ] bind
 
     [
         [ "ansi-fg" | "1" ]

@@ -30,7 +30,6 @@
 package factor;
 
 import factor.compiler.*;
-import factor.db.*;
 import java.util.Set;
 
 /**
@@ -42,22 +41,9 @@ public abstract class FactorPrimitiveDefinition extends FactorWordDefinition
 	/**
 	 * A new definition.
 	 */
-	public FactorPrimitiveDefinition(FactorWord word, Workspace workspace)
-		throws Exception
+	public FactorPrimitiveDefinition(FactorWord word)
 	{
-		super(word,workspace);
-		if(workspace != null)
-			workspace.put(this);
-	} //}}}
-
-	//{{{ FactorPrimitiveDefinition constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public FactorPrimitiveDefinition(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ fromList() method

@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 
 public class Defer extends FactorParsingDefinition
 {
@@ -38,10 +37,10 @@ public class Defer extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public Defer(FactorWord word, Workspace workspace)
+	public Defer(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)

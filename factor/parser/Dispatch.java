@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class Dispatch extends FactorParsingDefinition
@@ -39,10 +38,10 @@ public class Dispatch extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public Dispatch(FactorWord word, Workspace workspace)
+	public Dispatch(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)

@@ -160,15 +160,6 @@ public class Cons implements PublicCloneable, FactorExternalizable
 		}
 	} //}}}
 
-	//{{{ unparseDB() method
-	/**
-	 * Returns elementsToDBString() enclosed with [ and ].
-	 */
-	public String unparseDB()
-	{
-		return "[ " + elementsToString(true) + " ]";
-	} //}}}
-
 	//{{{ elementsToString() method
 	/**
 	 * Returns a whitespace separated string of the unparseObject() of each
@@ -176,23 +167,11 @@ public class Cons implements PublicCloneable, FactorExternalizable
 	 */
 	public String elementsToString()
 	{
-		return elementsToString(false);
-	} //}}}
-
-	//{{{ elementsToString() method
-	/**
-	 * Returns a whitespace separated string of the unparseObject() of each
-	 * item.
-	 */
-	public String elementsToString(boolean dbUnparse)
-	{
 		StringBuffer buf = new StringBuffer();
 		Cons iter = this;
 		while(iter != null)
 		{
-			buf.append(dbUnparse ?
-				FactorReader.unparseDBObject(iter.car)
-				: FactorReader.unparseObject(iter.car));
+			buf.append(FactorReader.unparseObject(iter.car));
 			if(iter.cdr instanceof Cons)
 			{
 				buf.append(' ');
@@ -204,9 +183,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 			else
 			{
 				buf.append(" | ");
-				buf.append(dbUnparse ?
-					FactorReader.unparseDBObject(iter.cdr)
-					: FactorReader.unparseObject(iter.cdr));
+				buf.append(FactorReader.unparseObject(iter.cdr));
 				iter = null;
 			}
 		}
@@ -220,7 +197,7 @@ public class Cons implements PublicCloneable, FactorExternalizable
 	 */
 	public String toString()
 	{
-		return "[ " + elementsToString(false) + " ]";
+		return "[ " + elementsToString() + " ]";
 	} //}}}
 
 	//{{{ toArray() method

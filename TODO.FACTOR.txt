@@ -4,7 +4,6 @@
 - minimal use/in for parse-stream
 - prettyprint-1
 - {...} vectors
-- better .s
 - parsing should be parsing
 - telnetd: listening on a socket
 - vocab inspecting ==> worddef>list, assumes . on a list works

@@ -29,13 +29,12 @@
 
 package factor;
 
-import factor.db.*;
 import java.io.IOException;
 
 /**
  * A parsing word definition.
  */
-public abstract class FactorParsingDefinition extends SimplePersistentObject
+public abstract class FactorParsingDefinition
 {
 	public static final String ENCODING = "UTF8";
 
@@ -45,24 +44,10 @@ public abstract class FactorParsingDefinition extends SimplePersistentObject
 	/**
 	 * A new definition.
 	 */
-	public FactorParsingDefinition(FactorWord word, Workspace workspace)
+	public FactorParsingDefinition(FactorWord word)
 		throws Exception
 	{
-		this(workspace,workspace == null
-			? 0L : workspace.nextID());
 		this.word = word;
-		if(workspace != null && id != 0L)
-			workspace.put(this);
-	} //}}}
-
-	//{{{ FactorParsingDefinition constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public FactorParsingDefinition(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
 	} //}}}
 
 	public abstract void eval(FactorInterpreter interp, FactorReader reader)

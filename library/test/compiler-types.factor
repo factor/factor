@@ -2,7 +2,6 @@ IN: scratchpad
 USE: arithmetic
 USE: combinators
 USE: compiler
-USE: inspector
 USE: kernel
 USE: lists
 USE: logic

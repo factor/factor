@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class StringLiteral extends FactorParsingDefinition
@@ -41,11 +40,10 @@ public class StringLiteral extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public StringLiteral(FactorWord word, boolean escapes,
-		Workspace workspace)
+	public StringLiteral(FactorWord word, boolean escapes)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 		this.escapes = escapes;
 	} //}}}
 

@@ -30,9 +30,7 @@
 package factor.primitives;
 
 import factor.compiler.*;
-import factor.db.*;
 import factor.*;
-import java.util.Map;
 
 public class Define extends FactorPrimitiveDefinition
 {
@@ -40,20 +38,10 @@ public class Define extends FactorPrimitiveDefinition
 	/**
 	 * A new definition.
 	 */
-	public Define(FactorWord word, Workspace workspace)
+	public Define(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
-	} //}}}
-
-	//{{{ Define constructor
-	/**
-	 * A blank definition, about to be unpickled.
-	 */
-	public Define(Workspace workspace, long id)
-		throws Exception
-	{
-		super(workspace,id);
+		super(word);
 	} //}}}
 
 	//{{{ eval() method

@@ -27,7 +27,6 @@
 
 IN: inspector
 USE: combinators
-USE: errors
 USE: format
 USE: kernel
 USE: lists
@@ -81,14 +80,6 @@ USE: vocabularies
         [ drop t ]
         [ prettyprint terpri ]
     ] cond ;
-
-: describe-stack ( vector -- )
-    stack>list [.] ;
-
-: .n namestack describe-stack ;
-: .s datastack describe-stack ;
-: .r callstack describe-stack ;
-: .c catchstack describe-stack ;
 
 : describe-object-path ( string -- )
     <namespace> [

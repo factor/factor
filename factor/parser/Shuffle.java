@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 
 public class Shuffle extends FactorParsingDefinition
 {
@@ -40,10 +39,10 @@ public class Shuffle extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public Shuffle(FactorWord word, String end, Workspace workspace)
+	public Shuffle(FactorWord word, String end)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 		this.end = end;
 	} //}}}
 

@@ -30,7 +30,6 @@
 package factor.parser;
 
 import factor.*;
-import factor.db.*;
 import java.io.IOException;
 
 public class NoParsing extends FactorParsingDefinition
@@ -39,10 +38,10 @@ public class NoParsing extends FactorParsingDefinition
 	/**
 	 * A new definition.
 	 */
-	public NoParsing(FactorWord word, Workspace workspace)
+	public NoParsing(FactorWord word)
 		throws Exception
 	{
-		super(word,workspace);
+		super(word);
 	} //}}}
 
 	public void eval(FactorInterpreter interp, FactorReader reader)

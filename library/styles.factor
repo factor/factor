@@ -67,9 +67,9 @@ USE: stack
 
 : init-styles ( -- )
 
-    <table> "styles" set
+    <namespace> "styles" set
     "styles" get [
-        <table> [
+        <namespace> [
             f "ansi-fg"         set
             f "ansi-bg"         set
             f "fg"              set
@@ -82,7 +82,7 @@ USE: stack
         ] extend "default"      set
     
         ! A paragraph break
-        <table> [
+        <namespace> [
             t "paragraph"       set
         ] extend "paragraph"    set
     ] bind

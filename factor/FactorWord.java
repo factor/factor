@@ -30,14 +30,12 @@
 package factor;
 
 import factor.compiler.*;
-import factor.db.*;
 import java.util.*;
 
 /**
  * An internalized symbol.
  */
-public class FactorWord extends SimplePersistentObject
-	implements FactorExternalizable
+public class FactorWord implements FactorExternalizable, FactorObject
 {
 	private static int gensymCount = 0;
 
@@ -75,32 +73,20 @@ public class FactorWord extends SimplePersistentObject
 	public FactorClassLoader loader;
 	public String className;
 
+	private FactorNamespace namespace;
+	
 	//{{{ FactorWord constructor
 	/**
 	 * Do not use this constructor unless you're writing a packages
 	 * implementation or something. Use an FactorDictionary's
 	 * intern() method instead.
 	 */
-	public FactorWord(Workspace workspace, long id) throws Exception
-	{
-		super(workspace,id);
-	} //}}}
-
-	//{{{ FactorWord constructor
-	/**
-	 * Do not use this constructor unless you're writing a packages
-	 * implementation or something. Use an FactorDictionary's
-	 * intern() method instead.
-	 */
-	public FactorWord(Workspace workspace, String vocabulary, String name,
+	public FactorWord(String vocabulary, String name,
 		FactorWordDefinition def) throws Exception
 	{
-		this(workspace,workspace == null ? 0L : workspace.nextID());
 		this.vocabulary = vocabulary;
 		this.name = name;
 		this.def = def;
-		if(workspace != null && id != 0L)
-			workspace.put(this);
 	} //}}}
 
 	//{{{ FactorWord constructor
@@ -115,6 +101,15 @@ public class FactorWord extends SimplePersistentObject
 		this.name = name;
 	} //}}}
 
+	//{{{ getNamespace() method
+	public FactorNamespace getNamespace()
+		throws Exception
+	{
+		if(namespace == null)
+			namespace = new FactorNamespace(this);
+		return namespace;
+	} //}}}
+	
 	//{{{ gensym() method
 	/**
 	 * Returns an un-internalized word with a unique name.
@@ -126,7 +121,6 @@ public class FactorWord extends SimplePersistentObject
 
 	//{{{ define() method
 	public synchronized void define(FactorWordDefinition def)
-		throws PersistenceException
 	{
 		if(compileRef)
 		{
@@ -140,20 +134,14 @@ public class FactorWord extends SimplePersistentObject
 
 		loader = null;
 		className = null;
-
-		if(workspace != null && id != 0L)
-			workspace.put(this);
 	} //}}}
 
 	//{{{ setCompiledInfo() method
 	synchronized void setCompiledInfo(FactorClassLoader loader,
-		String className) throws PersistenceException
+		String className)
 	{
 		this.loader = loader;
 		this.className = className;
-
-		if(workspace != null && id != 0L)
-			workspace.put(this);
 	} //}}}
 
 	//{{{ compile() method
@@ -163,30 +151,6 @@ public class FactorWord extends SimplePersistentObject
 		recursiveCheck.add(this,new StackEffect(),null,null,null);
 		compile(interp,recursiveCheck);
 		recursiveCheck.remove(this);
-	} //}}}
-
-	//{{{ unpickle() method
-	/**
-	 * Each persistent object can set its state to that in a byte array.
-	 */
-	public synchronized void unpickle(byte[] bytes, int offset,
-		FactorInterpreter interp) throws PersistenceException
-	{
-		super.unpickle(bytes,offset);
-
-		if(loader != null && className != null)
-		{
-			try
-			{
-				def = CompiledDefinition.create(interp,
-					this,loader.loadClass(className));
-			}
-			catch(Throwable e)
-			{
-				System.err.println("WARNING: cannot unpickle compiled definition");
-				e.printStackTrace();
-			}
-		}
 	} //}}}
 
 	//{{{ compile() method
