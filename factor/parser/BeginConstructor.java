@@ -31,27 +31,23 @@ package factor.parser;
 
 import factor.*;
 
-public class EndMethod extends FactorParsingDefinition
+public class BeginConstructor extends FactorParsingDefinition
 {
-	public FactorWord start;
+	private FactorWord colon;
 
-	public EndMethod(FactorWord start, FactorWord end)
+	public BeginConstructor(FactorWord word, FactorWord colon)
 	{
-		super(end);
-		this.start = start;
+		super(word);
+		this.colon = colon;
 	}
 
 	public void eval(FactorReader reader)
 		throws Exception
 	{
-		FactorReader.ParseState state = reader.popState(start,word);
-		FactorWord w = state.defining;
-		/* Only ever null with restartable scanner;
-		error already logged, so give up */
-		if(w == null)
+		FactorWord type = reader.nextWord(false);
+		if(type == null)
 			return;
 
-		w.def = new FactorMethodDefinition(null,w,state.first);
-		reader.append(w.def);
+		reader.pushExclusiveState(colon,type);
 	}
 }

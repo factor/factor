@@ -4,6 +4,9 @@ USE: namespaces
 USE: generic
 USE: test
 USE: kernel
+USE: math
+USE: words
+USE: lists
 
 TRAITS: test-traits
 C: test-traits ;
@@ -56,3 +59,21 @@ TRAITS: del2
 C: del2 ( delegate -- del2 ) [ delegate set ] extend ;
 
 [ 5 ] [ <del1> <del2> super ] unit-test
+
+GENERIC: class-of
+
+M: fixnum class-of drop "fixnum" ;
+M: word   class-of drop "word"   ;
+M: cons   class-of drop "cons"   ;
+
+[ "fixnum" ] [ 5 class-of ] unit-test
+[ "cons" ] [ [ 1 2 3 ] class-of ] unit-test
+[ "word" ] [ \ class-of class-of ] unit-test
+[ 3.4 class-of ] unit-test-fails
+
+GENERIC: foobar
+M: object foobar drop "Hello world" ;
+M: fixnum foobar drop "Goodbye cruel world" ;
+
+[ "Hello world" ] [ 4 foobar foobar ] unit-test
+[ "Goodbye cruel world" ] [ 4 foobar ] unit-test

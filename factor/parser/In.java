@@ -33,16 +33,11 @@ import factor.*;
 
 public class In extends FactorParsingDefinition
 {
-	//{{{ In constructor
-	/**
-	 * A new definition.
-	 */
 	public In(FactorWord word)
 	{
 		super(word);
-	} //}}}
+	}
 
-	//{{{ eval() method
 	public void eval(FactorReader reader)
 		throws Exception
 	{
@@ -50,5 +45,5 @@ public class In extends FactorParsingDefinition
 
 		reader.setIn(next);
 		reader.addUse(next);
-	} //}}}
+	}
 }

@@ -50,7 +50,8 @@ public class RestartableFactorScanner extends FactorScanner
 	{
 		String line = getLine();
 		int col = getColumnNumber();
-		if(getReadTable().getCharacterType(line.charAt(col - 1))
+		if(line != null &&
+			getReadTable().getCharacterType(line.charAt(col - 1))
 			== ReadTable.WHITESPACE)
 		{
 			col--;

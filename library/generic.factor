@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: generic
-
 USE: errors
 USE: hashtables
 USE: kernel
@@ -39,18 +38,43 @@ USE: vectors
 
 ! A simple single-dispatch generic word system.
 
+! Catch-all metaclass for providing a default method.
+SYMBOL: object
+
+: define-generic ( word vtable -- )
+    2dup "vtable" set-word-property
+    [ generic ] cons define-compound ;
+
+: <vtable> ( default -- vtable )
+    num-types [ drop dup ] vector-project nip ;
+
+: define-object ( generic definition -- )
+    <vtable> define-generic drop ;
+
+object [ define-object ] "define-method" set-word-property
+
 : predicate-word ( word -- word )
     word-name "?" cat2 "in" get create ;
 
-: builtin-predicate ( symbol type# -- )
-    [ swap type eq? ] cons >r predicate-word r> define-compound ;
+: builtin-predicate ( type# symbol -- )
+    predicate-word swap [ swap type eq? ] cons define-compound ;
+
+: add-method ( definition type vtable -- )
+    >r "builtin-type" word-property r> set-vector-nth ;
+
+: define-builtin ( type generic definition -- )
+    -rot "vtable" word-property add-method ;
+
+: builtin-class ( number type -- )
+    dup undefined? [ dup define-symbol ] when
+    2dup builtin-predicate
+    dup [ define-builtin ] "define-method" set-word-property
+    swap "builtin-type" set-word-property ;
 
 : BUILTIN:
     #! Followed by type name and type number. Define a built-in
     #! type predicate with this number.
-    CREATE dup undefined? [ dup define-symbol ] when scan-word
-    2dup builtin-predicate
-    "builtin-type" set-word-property ; parsing
+    CREATE scan-word swap builtin-class ; parsing
 
 : builtin-type ( symbol -- n )
     "builtin-type" word-property ;
@@ -100,21 +124,17 @@ SYMBOL: delegate
     traits-map [ swap object-map eq? ] cons
     define-compound ;
 
+: define-traits ( type generic definition -- )
+    swap rot traits-map set-hash ;
+
 : TRAITS:
     #! TRAITS: foo creates a new traits type. Instances can be
     #! created with <foo>, and tested with foo?.
     CREATE
     dup define-symbol
     dup init-traits-map
+    dup [ define-traits ] "define-method" set-word-property
     traits-predicate ; parsing
-
-: add-method ( quot class vtable -- )
-    >r "builtin-type" word-property r>
-    set-vector-nth ;
-
-: <vtable> ( word -- vtable )
-    num-types [ drop [ undefined-method ] ] vector-project
-    [ "vtable" set-word-property ] keep ;
 
 : add-traits-dispatch ( word vtable -- )
     >r unit [ car swap traits-method call ] cons \ vector r>
@@ -124,18 +144,14 @@ SYMBOL: delegate
     #! GENERIC: bar creates a generic word bar that calls the
     #! bar method on the traits object, with the traits object
     #! on the stack.
-    CREATE dup <vtable> 2dup add-traits-dispatch
-    [ generic ] cons define-compound ; parsing
+    CREATE [ undefined-method ] <vtable>
+    2dup add-traits-dispatch
+    define-generic ; parsing
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 "in" get create ;
 
-: define-constructor ( word -- )
-    [ constructor-word [ <namespace> ] ] keep
-    traits-map [ traits pick set-hash ] cons append
-    define-compound ;
-
-: (;C) ( constructor traits definition -- )
+: define-constructor ( constructor traits definition -- )
     >r
     traits-map [ traits pick set-hash ] cons \ <namespace> swons
     r> append define-compound ;
@@ -143,19 +159,17 @@ SYMBOL: delegate
 : C: ( -- constructor traits [ ] )
     #! C: foo ... begins definition for <foo> where foo is a
     #! traits type.
-    scan-word [ constructor-word ] keep [ (;C) ] [ ] ; parsing
+    scan-word [ constructor-word ] keep
+    [ define-constructor ] [ ] ; parsing
 
-: (;M) ( type generic definition -- )
-    pick builtin-type [
-        rot "builtin-type" word-property
-        rot "vtable" word-property
-        set-vector-nth
-    ] [
-        rot traits-map [ put ] bind
-    ] ifte ;
+: define-method ( type -- quotation )
+    #! In a vain attempt at something resembling a "meta object
+    #! protocol", we call the "define-method" word property with
+    #! stack ( type generic definition -- ).
+    "define-method" word-property
+    [ [ undefined-method ] ] unless* ;
 
 : M: ( -- type generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word scan-word [ (;M) ] [ ] ;
-    parsing
+    scan-word  dup define-method  scan-word swap [ ] ; parsing

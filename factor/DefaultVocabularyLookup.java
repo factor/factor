@@ -120,9 +120,9 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord traits = define("generic","TRAITS:");
 		traits.parsing = new Traits(traits);
 		FactorWord beginMethod = define("generic","M:");
-		beginMethod.parsing = new BeginMethod(beginMethod);
-		FactorWord endMethod = define("generic",";M");
-		endMethod.parsing = new EndMethod(beginMethod,endMethod);
+		beginMethod.parsing = new BeginMethod(beginMethod,def);
+		FactorWord beginConstructor = define("generic","C:");
+		beginConstructor.parsing = new BeginConstructor(beginConstructor,def);
 	} //}}}
 
 	//{{{ getVocabulary() method

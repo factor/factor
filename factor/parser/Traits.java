@@ -43,6 +43,8 @@ public class Traits extends FactorParsingDefinition
 	{
 		FactorWord w = reader.nextWord(true);
 		w.def = new FactorTraitsDefinition(w);
+		reader.intern("<" + w.name + ">",true);
+		reader.intern(w.name + "?",true);
 		reader.append(w.def);
 	}
 }
