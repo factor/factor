@@ -22,6 +22,7 @@ t [
     "/library/in-thread.factor"
     "/library/random.factor"
 
+    "/library/io/buffer.factor"
     "/library/io/network.factor"
     "/library/io/logging.factor"
     "/library/io/stdio-binary.factor"
@@ -102,7 +103,6 @@ t [
 ] pull-in
 
 os "win32" = [
-    "/library/io/buffer.factor"
     "/library/win32/win32-io.factor"
     "/library/win32/win32-errors.factor"
     "/library/win32/winsock.factor"
