@@ -137,6 +137,8 @@ void collect_roots(void)
 
 void primitive_gc(void)
 {
+	gc_in_progress = true;
+
 	flip_zones();
 	scan = active->here = active->base;
 	collect_roots();
@@ -147,4 +149,6 @@ void primitive_gc(void)
 		collect_next();
 	}
 	gc_debug("gc done",0);
+
+	gc_in_progress = false;
 }

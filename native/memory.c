@@ -38,7 +38,30 @@ void init_arena(CELL size)
 	z1 = zalloc(size);
 	z2 = zalloc(size);
 	active = z1;
+	allot_profiling = false;
+	gc_in_progress = false;
 }
+
+#ifdef FACTOR_PROFILER
+void allot_profile_step(CELL a)
+{
+	CELL depth = (cs - cs_bot) / CELLS;
+	int i;
+	CELL obj;
+
+	if(gc_in_progress)
+		return;
+
+	for(i = profile_depth; i < depth; i++)
+	{
+		obj = get(cs_bot + i * CELLS);
+		if(TAG(obj) == WORD_TYPE)
+			untag_word(obj)->allot_count += a;
+	}
+
+	executing->allot_count += a;
+}
+#endif
 
 void check_memory(void)
 {
@@ -83,4 +106,20 @@ void primitive_room(void)
 	/* push: free total */
 	dpush(tag_fixnum_or_bignum(active->limit - active->here));
 	dpush(tag_fixnum_or_bignum(active->limit - active->base));
+}
+
+void primitive_allot_profiling(void)
+{
+#ifndef FACTOR_PROFILER
+	general_error(ERROR_PROFILING_DISABLED,F);
+#else
+	CELL d = dpop();
+	if(d == F)
+		allot_profiling = false;
+	else
+	{
+		allot_profiling = true;
+		profile_depth = to_fixnum(d);
+	}
+#endif
 }

@@ -84,7 +84,7 @@ USE: words
     "Operating system signal " write . ;
 
 : profiling-disabled-error ( obj -- )
-    drop "Recompile with the EXTRA_CALL_INFO flag." print ;
+    drop "Recompile with the FACTOR_PROFILER flag." print ;
 
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;

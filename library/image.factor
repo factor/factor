@@ -294,7 +294,9 @@ IN: cross-compiler
     r> ( primitive -- ) emit
     r> ( parameter -- ) emit
     ( plist -- ) emit
-    0 emit ( padding ) ;
+    0 emit ( padding )
+    0 emit
+    0 emit ;
 
 : primitive, ( word primitive -- ) f (worddef,) ;
 : compound, ( word definition -- ) 1 swap (worddef,) ;

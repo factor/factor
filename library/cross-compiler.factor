@@ -85,9 +85,12 @@ IN: parser
 DEFER: str>float
 
 IN: profiler
-DEFER: profiling
+DEFER: call-profiling
 DEFER: call-count
 DEFER: set-call-count
+DEFER: allot-profiling
+DEFER: allot-count
+DEFER: set-allot-count
 
 IN: random
 DEFER: init-random
@@ -244,9 +247,12 @@ IN: cross-compiler
         (random-int)
         type-of
         size-of
-        profiling
+        call-profiling
         call-count
         set-call-count
+        allot-profiling
+        allot-count
+        set-allot-count
         dump
     ] [
         swap succ tuck primitive,

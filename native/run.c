@@ -6,7 +6,7 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 }
 
 /* Called from a signal handler. XXX - is this safe? */
-void profiling_step(int signal, siginfo_t* siginfo, void* uap)
+void call_profiling_step(int signal, siginfo_t* siginfo, void* uap)
 {
 	CELL depth = (cs - cs_bot) / CELLS;
 	int i;
@@ -28,7 +28,7 @@ void init_signals(void)
 	struct sigaction ign_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
-	profiling_sigaction.sa_sigaction = profiling_step;
+	profiling_sigaction.sa_sigaction = call_profiling_step;
 	profiling_sigaction.sa_flags = SA_SIGINFO;
 	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
@@ -61,7 +61,7 @@ void run(void)
 		if(callframe == F)
 		{
 			callframe = cpop();
-#ifdef EXTRA_CALL_INFO
+#ifdef FACTOR_PROFILER
 			cpop();
 #endif
 			continue;
@@ -129,9 +129,9 @@ void primitive_setenv(void)
 	userenv[e] = value;
 }
 
-void primitive_profiling(void)
+void primitive_call_profiling(void)
 {
-#ifndef EXTRA_CALL_INFO
+#ifndef FACTOR_PROFILER
 	general_error(ERROR_PROFILING_DISABLED,F);
 #else
 	CELL d = dpop();

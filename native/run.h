@@ -87,7 +87,7 @@ INLINE void call(CELL quot)
 	/* tail call optimization */
 	if(callframe != F)
 	{
-#ifdef EXTRA_CALL_INFO
+#ifdef FACTOR_PROFILER
 		cpush(tag_word(executing));
 #endif
 		cpush(callframe);
@@ -96,7 +96,7 @@ INLINE void call(CELL quot)
 }
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap);
-void profiling_step(int signal, siginfo_t* siginfo, void* uap);
+void call_profiling_step(int signal, siginfo_t* siginfo, void* uap);
 void init_signals(void);
 void clear_environment(void);
 
@@ -110,4 +110,4 @@ void primitive_getenv(void);
 void primitive_setenv(void);
 void primitive_exit(void);
 void primitive_os_env(void);
-void primitive_profiling(void);
+void primitive_call_profiling(void);

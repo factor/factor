@@ -138,9 +138,12 @@ XT primitives[] = {
 	primitive_random_int,
 	primitive_type_of,
 	primitive_size_of,
-	primitive_profiling,
+	primitive_call_profiling,
 	primitive_word_call_count,
 	primitive_set_word_call_count,
+	primitive_allot_profiling,
+	primitive_word_allot_count,
+	primitive_set_word_allot_count,
 	primitive_dump
 };
 

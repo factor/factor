@@ -166,11 +166,17 @@ USE: unparser
 
 : ! until-eol drop ; parsing
 
+: documentation+ ( str word -- )
+    [
+        "documentation" swap word-property [
+            swap "\n" swap cat3
+        ] when*
+    ] keep
+    "documentation" swap set-word-property ;
+
 : parsed-documentation ( parsed str -- parsed )
     over doc-comment-here? [
-        "documentation" word word-property [
-            swap "\n" swap cat3
-        ] when* "documentation" word set-word-property
+        word documentation+
     ] [
         drop
     ] ifte ;

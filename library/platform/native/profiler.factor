@@ -30,15 +30,19 @@ USE: combinators
 USE: kernel
 USE: lists
 USE: math
+USE: namespaces
 USE: prettyprint
 USE: stack
 USE: words
 USE: vectors
 
-: reset-call-counts ( -- )
-    vocabs [ words [ 0 swap set-call-count ] each ] each ;
+! The variable "profile-top-only" toggles between
+! culminative counts, and top of call stack counts.
 
-: sort-call-counts ( alist -- alist )
+: reset-counts ( -- )
+    [ 0 over set-call-count 0 swap set-allot-count ] each-word ;
+
+: sort-counts ( alist -- alist )
     [ swap cdr swap cdr > ] sort ;
 
 : call-count, ( word -- )
@@ -49,14 +53,44 @@ USE: vectors
         cons ,
     ] ifte ;
 
-: call-counts ( -- alist )
-    #! Push an alist of all word/call count pairs.
-    [, [ call-count, ] each-word ,] sort-call-counts ;
+: counts. ( alist -- )
+    sort-counts [ . ] each ;
 
-: profile ( quot -- )
-    #! Execute a quotation with the profiler enabled.
-    reset-call-counts
-    callstack vector-length profiling
+: call-counts. ( -- )
+    #! Print word/call count pairs.
+    [, [ call-count, ] each-word ,] counts. ;
+
+: profile-depth ( -- n )
+    "profile-top-only" get [
+        -1
+    ] [
+        callstack vector-length
+    ] ifte ;
+
+: call-profile ( quot -- )
+    #! Execute a quotation with the CPU profiler enabled.
+    reset-counts
+    profile-depth call-profiling
     call
-    f profiling
-    call-counts [ . ] each ;
+    f call-profiling
+    call-counts. ;
+
+: allot-count, ( word -- )
+    #! Add to constructing list if allot count is non-zero.
+    dup allot-count dup 0 = [
+        2drop
+    ] [
+        cons ,
+    ] ifte ;
+
+: allot-counts. ( -- alist )
+    #! Print word/allot count pairs.
+    [, [ allot-count, ] each-word ,] counts. ;
+
+: allot-profile ( quot -- )
+    #! Execute a quotation with the memory profiler enabled.
+    reset-counts
+    profile-depth allot-profiling
+    call
+    f allot-profiling
+    allot-counts. ;

@@ -1,12 +1,12 @@
+CELL bignum_zero;
+CELL bignum_pos_one;
+CELL bignum_neg_one;
+
 INLINE ARRAY* untag_bignum(CELL tagged)
 {
 	type_check(BIGNUM_TYPE,tagged);
 	return (ARRAY*)UNTAG(tagged);
 }
-
-CELL bignum_zero;
-CELL bignum_pos_one;
-CELL bignum_neg_one;
 
 void primitive_bignump(void);
 ARRAY* to_bignum(CELL tagged);

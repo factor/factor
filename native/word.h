@@ -13,6 +13,9 @@ typedef struct {
 	CELL plist;
 	/* UNTAGGED call count incremented by profiler */
 	CELL call_count;
+	/* UNTAGGED amount of memory allocated in word */
+	CELL allot_count;
+	CELL padding;
 } WORD;
 
 INLINE WORD* untag_word(CELL tagged)
@@ -38,5 +41,7 @@ void primitive_word_plist(void);
 void primitive_set_word_plist(void);
 void primitive_word_call_count(void);
 void primitive_set_word_call_count(void);
+void primitive_word_allot_count(void);
+void primitive_set_word_allot_count(void);
 void fixup_word(WORD* word);
 void collect_word(WORD* word);

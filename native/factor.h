@@ -38,7 +38,7 @@ typedef unsigned short CHAR;
 
 /* This decreases performance slightly but gives more readable backtraces,
 and allows profiling. */
-#define EXTRA_CALL_INFO
+#define FACTOR_PROFILER
 
 #include "memory.h"
 #include "error.h"

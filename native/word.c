@@ -80,6 +80,17 @@ void primitive_set_word_call_count(void)
 	word->call_count = to_fixnum(dpop());
 }
 
+void primitive_word_allot_count(void)
+{
+	drepl(tag_fixnum(untag_word(dpeek())->allot_count));
+}
+
+void primitive_set_word_allot_count(void)
+{
+	WORD* word = untag_word(dpop());
+	word->allot_count = to_fixnum(dpop());
+}
+
 void fixup_word(WORD* word)
 {
 	word->xt = primitive_to_xt(word->primitive);

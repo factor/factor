@@ -1,4 +1,5 @@
 CELL scan;
+bool gc_in_progress;
 
 void* copy_untagged_object(void* pointer, CELL size);
 void copy_object(CELL* handle);
