@@ -1,7 +1,6 @@
 IN: scratchpad
 USE: kernel
 USE: math
-USE: stack
 USE: test
 
 [ f ] [ #{ 5 12.5 } 5 ] [ = ] test-word

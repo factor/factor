@@ -1,6 +1,7 @@
 IN: scratchpad
+USE: compiler
+USE: kernel
 USE: math
-USE: stack
 USE: test
 
 : empty-loop-1 ( n -- )

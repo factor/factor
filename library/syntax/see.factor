@@ -26,10 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: prettyprint
-USE: combinators
+USE: kernel
 USE: lists
 USE: math
-USE: stack
 USE: stdio
 USE: strings
 USE: presentation

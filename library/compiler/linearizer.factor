@@ -26,15 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: lists
-USE: words
-USE: stack
-USE: namespaces
 USE: inference
-USE: combinators
-USE: math
-USE: logic
 USE: kernel
+USE: lists
+USE: math
+USE: namespaces
+USE: words
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching

@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: errors
 USE: generic
 USE: kernel
-USE: stack
 USE: vectors
 USE: words
 

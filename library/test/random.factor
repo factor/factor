@@ -1,11 +1,9 @@
 IN: scratchpad
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: random
-USE: stack
 USE: test
 
 [ t ]

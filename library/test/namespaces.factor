@@ -2,7 +2,6 @@ IN: scratchpad
 USE: kernel
 USE: namespaces
 USE: test
-USE: stack
 USE: words
 
 <namespace> "test-namespace" set

@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: math
 USE: math-internals
 USE: kernel
-USE: logic
-USE: stack
 
 ! Power-related functions:
 !     exp log sqrt pow

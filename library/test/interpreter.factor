@@ -2,11 +2,10 @@ IN: scratchpad
 USE: interpreter
 USE: test
 USE: namespaces
-USE: combinators
-USE: stack
 USE: stdio
 USE: prettyprint
 USE: math
+USE: math-internals
 USE: lists
 USE: kernel
 

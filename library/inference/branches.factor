@@ -26,16 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
-USE: combinators
 USE: errors
 USE: generic
 USE: interpreter
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 USE: words

@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: hashtables
-USE: combinators
 USE: kernel
 USE: lists
 USE: math
-USE: stack
 USE: vectors
 
 ! Note that the length of a hashtable vector must not change

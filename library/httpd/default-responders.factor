@@ -27,8 +27,8 @@
 
 IN: httpd-responder
 USE: httpd
+USE: kernel
 USE: namespaces
-USE: stack
 USE: strings
 
 USE: test-responder

@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: combinators
 USE: compiler
 USE: errors
 USE: kernel

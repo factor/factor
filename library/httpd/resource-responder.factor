@@ -26,16 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: resource-responder
-USE: combinators
 USE: files
 USE: httpd
 USE: httpd-responder
 USE: kernel
 USE: lists
-USE: logic
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

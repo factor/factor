@@ -29,8 +29,6 @@ IN: vectors
 USE: kernel
 USE: lists
 USE: math
-USE: stack
-USE: combinators
 
 : 2vector-nth ( n vec vec -- obj obj )
     >r over >r vector-nth r> r> vector-nth ;

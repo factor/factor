@@ -27,15 +27,12 @@
 
 IN: compiler
 USE: alien
-USE: combinators
 USE: inference
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: words
 USE: vectors

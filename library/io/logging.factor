@@ -27,10 +27,9 @@
 
 IN: logging
 
-USE: combinators
 USE: hashtables
+USE: kernel
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

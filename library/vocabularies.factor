@@ -26,11 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
-USE: combinators
 USE: hashtables
+USE: kernel
 USE: lists
 USE: namespaces
-USE: stack
 
 : (search) ( name vocab -- word )
     vocab dup [ hash ] [ 2drop f ] ifte ;

@@ -26,10 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: logic
-USE: combinators
 USE: kernel
-USE: stack
 
 ! An association list is a list of conses where the car of each
 ! cons is a key, and the cdr is a value. See the Factor

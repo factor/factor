@@ -28,14 +28,10 @@
 IN: interpreter
 USE: vectors
 USE: namespaces
-USE: logic
 USE: kernel
-USE: combinators
 USE: lists
 USE: words
-USE: stack
 USE: errors
-USE: continuations
 USE: strings
 USE: prettyprint
 USE: stdio

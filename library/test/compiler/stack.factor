@@ -1,11 +1,10 @@
 IN: scratchpad
 USE: compiler
 USE: test
-USE: stack
 USE: words
-USE: combinators
 USE: lists
 USE: math
+USE: kernel
 
 ! Make sure that stack ops compile to correct code.
 : compile-call ( quot -- word )

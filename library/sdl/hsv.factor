@@ -7,12 +7,10 @@
 ! Translated to Factor by Slava Pestov.
 
 IN: sdl
-USE: combinators
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 
 : f_ ( h s v i -- f ) >r transp >r 2dup r> 6 * r> - ;
 : p ( v s x -- v p x ) >r dupd neg succ * r> ;

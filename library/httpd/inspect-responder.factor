@@ -29,7 +29,7 @@ IN: inspect-responder
 USE: html
 USE: inspector
 USE: namespaces
-USE: stack
+USE: kernel
 
 USE: httpd
 USE: httpd-responder

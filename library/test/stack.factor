@@ -1,6 +1,5 @@
 IN: scratchpad
 USE: compiler
-USE: stack
 USE: stdio
 USE: test
 

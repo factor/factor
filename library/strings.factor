@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: combinators
 USE: kernel
 USE: lists
-USE: logic
 USE: math
-USE: stack
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;

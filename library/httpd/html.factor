@@ -26,13 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: html
-USE: combinators
 USE: format
 USE: lists
-USE: logic
 USE: kernel
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

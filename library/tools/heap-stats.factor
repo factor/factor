@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: listener
-USE: combinators
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: words
 USE: vectors

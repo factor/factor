@@ -27,12 +27,11 @@
 
 IN: inference
 USE: interpreter
+USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: words
-USE: combinators
 USE: vectors
 
 ! We build a dataflow graph for the compiler.

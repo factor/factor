@@ -2,8 +2,8 @@ IN: scratchpad
 USE: hashtables
 USE: namespaces
 USE: generic
-USE: stack
 USE: test
+USE: kernel
 
 TRAITS: test-traits
 C: test-traits ;C

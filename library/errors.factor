@@ -26,13 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: combinators
-USE: continuations
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: vectors
 

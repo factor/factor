@@ -27,15 +27,12 @@
 
 IN: parser
 
-USE: combinators
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: words
 USE: vectors

@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: combinators
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: strings
-USE: stack
 
 : make-string ( quot -- string )
     #! Call a quotation. The quotation can call , to prepend

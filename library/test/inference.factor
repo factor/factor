@@ -2,12 +2,12 @@ IN: scratchpad
 USE: test
 USE: inference
 USE: math
-USE: stack
-USE: combinators
 USE: vectors
 USE: kernel
 USE: lists
 USE: namespaces
+USE: kernel
+USE: math-internals
 
 [
     [ 1 | 2 ]

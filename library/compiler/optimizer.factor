@@ -27,14 +27,11 @@
 
 IN: compiler
 USE: lists
-USE: stack
-USE: combinators
 USE: namespaces
 USE: kernel
 USE: inference
 USE: words
 USE: prettyprint
-USE: logic
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never

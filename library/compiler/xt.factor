@@ -26,18 +26,15 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: compiler
-USE: combinators
 USE: inference
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: unparser

@@ -26,10 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: combinators
 USE: kernel
 USE: namespaces
-USE: stack
 USE: math
 
 : cons@ ( x var -- )

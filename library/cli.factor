@@ -26,9 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: combinators
 USE: compiler
-USE: continuations
 USE: errors
 USE: files
 USE: listener
@@ -38,7 +36,6 @@ USE: namespaces
 USE: parser
 USE: prettyprint
 USE: random
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

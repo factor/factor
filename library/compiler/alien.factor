@@ -26,14 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
 USE: errors
+USE: kernel
 USE: lists
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: words
 
 : BEGIN-ENUM:

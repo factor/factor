@@ -26,15 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd
-USE: combinators
 USE: errors
 USE: httpd-responder
 USE: kernel
 USE: lists
 USE: logging
-USE: logic
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

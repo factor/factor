@@ -30,12 +30,9 @@ DEFER: vector=
 DEFER: vector-hashcode
 
 IN: kernel
-
-USE: combinators
 USE: lists
 USE: math
 USE: math-internals
-USE: stack
 USE: strings
 USE: vectors
 USE: words

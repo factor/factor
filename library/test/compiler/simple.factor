@@ -2,11 +2,10 @@ IN: scratchpad
 USE: compiler
 USE: test
 USE: math
-USE: stack
 USE: kernel
-USE: logic
-USE: combinators
 USE: words
+USE: kernel
+USE: math-internals
 
 : no-op ; compiled
 

@@ -27,10 +27,10 @@
 
 IN: inference
 USE: interpreter
-USE: stack
-USE: words
+USE: kernel
 USE: lists
 USE: namespaces
+USE: words
 
 \ >r [
     f #>r dataflow, [ 1 0 node-inputs ] extend

@@ -39,17 +39,14 @@
 ! run platform/native/boot-stage2.factor.
 
 IN: image
-USE: combinators
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: prettyprint
 USE: random
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
@@ -57,6 +54,10 @@ USE: test
 USE: vectors
 USE: unparser
 USE: words
+
+USE: stack
+USE: combinators
+USE: logic
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -191,7 +192,13 @@ SYMBOL: boot-quot
     dup pooled-object dup [
         nip
     ] [
-        drop "Not in image: " swap word-name cat2 throw
+        drop
+        [
+            "Not in image: " ,
+            dup word-vocabulary ,
+            " " ,
+            word-name ,
+        ] make-string throw
     ] ifte ;
 
 : fixup-words ( -- )

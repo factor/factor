@@ -1,5 +1,5 @@
 USE: vectors
-USE: stack
+USE: kernel
 USE: math
 USE: compiler
 USE: test

@@ -25,7 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
@@ -33,11 +32,9 @@ USE: math
 USE: math-internals
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: vectors
 USE: vectors
 USE: words
 
@@ -76,6 +73,19 @@ DEFER: type
 DEFER: size
 DEFER: address
 DEFER: heap-stats
+DEFER: drop
+DEFER: dup
+DEFER: over
+DEFER: pick
+DEFER: swap
+DEFER: >r
+DEFER: r>
+DEFER: ifte
+DEFER: call
+DEFER: datastack
+DEFER: callstack
+DEFER: set-datastack
+DEFER: set-callstack
 
 IN: strings
 DEFER: str=
@@ -394,7 +404,7 @@ IN: image
         heap-stats
         throw
     ] [
-        swap succ tuck f define,
+        USE: stack swap succ tuck f define,
     ] each drop ;
 
 : make-image ( name -- )

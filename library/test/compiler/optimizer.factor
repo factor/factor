@@ -4,7 +4,7 @@ USE: compiler
 USE: inference
 USE: words
 USE: math
-USE: combinators
+USE: kernel
 
 : foo 1 2 3 ;
 

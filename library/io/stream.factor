@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: streams
-USE: combinators
 USE: errors
 USE: kernel
 USE: namespaces
-USE: stack
 USE: strings
 USE: generic
 

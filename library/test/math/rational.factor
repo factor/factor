@@ -1,7 +1,6 @@
 IN: scratchpad
 USE: kernel
 USE: math
-USE: stack
 USE: test
 USE: unparser
 

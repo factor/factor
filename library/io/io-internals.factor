@@ -26,11 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: io-internals
-USE: combinators
-USE: continuations
 USE: kernel
 USE: namespaces
-USE: stack
 USE: strings
 USE: threads
 

@@ -2,11 +2,9 @@ IN: scratchpad
 USE: compiler
 USE: test
 USE: math
-USE: stack
 USE: kernel
-USE: logic
-USE: combinators
 USE: words
+USE: math-internals
 
 : dummy-ifte-1 t [ ] [ ] ifte ; compiled
 

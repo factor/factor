@@ -27,14 +27,12 @@
 
 IN: generic
 
-USE: combinators
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
-USE: stack
 USE: strings
 USE: words
 USE: vectors

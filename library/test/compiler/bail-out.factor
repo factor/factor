@@ -1,11 +1,9 @@
 IN: scratchpad
-USE: combinators
 USE: compiler
 USE: errors
-USE: logic
 USE: math
-USE: stack
 USE: test
+USE: kernel
 
 : bail-out call + ;
 

@@ -29,14 +29,10 @@ IN: stdio
 DEFER: stdio
 
 IN: streams
-USE: combinators
-USE: continuations
 USE: io-internals
 USE: errors
 USE: hashtables
 USE: kernel
-USE: logic
-USE: stack
 USE: stdio
 USE: strings
 USE: namespaces

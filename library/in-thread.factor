@@ -26,13 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: threads
-USE: combinators
-USE: continuations
 USE: errors
 USE: io-internals
 USE: kernel
 USE: lists
-USE: stack
 
 : in-thread ( quot -- )
     #! Execute a quotation in a co-operative thread. The

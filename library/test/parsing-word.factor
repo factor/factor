@@ -2,9 +2,9 @@ IN: scratchpad
 
 USE: parser
 USE: test
-USE: stack
 USE: words
 USE: strings
+USE: kernel
 
 DEFER: foo
 

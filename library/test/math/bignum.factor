@@ -1,8 +1,8 @@
 IN: scratchpad
-USE: stack
 USE: math
 USE: test
 USE: unparser
+USE: kernel
 
 [ -1 ] [ -1 >bignum >fixnum ] unit-test
 

@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: files
-USE: combinators
+USE: kernel
 USE: hashtables
 USE: lists
-USE: logic
 USE: namespaces
 USE: presentation
-USE: stack
 USE: stdio
 USE: strings
 

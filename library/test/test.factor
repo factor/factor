@@ -3,16 +3,13 @@
 ! Some of these words should be moved to the standard library.
 
 IN: test
-USE: combinators
 USE: errors
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: words

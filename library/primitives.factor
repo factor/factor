@@ -25,7 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-USE: combinators
 USE: alien
 USE: compiler
 USE: errors
@@ -38,7 +37,6 @@ USE: math-internals
 USE: parser
 USE: profiler
 USE: random
-USE: stack
 USE: strings
 USE: unparser
 USE: vectors

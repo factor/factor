@@ -26,17 +26,14 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
 USE: errors
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: strings
 USE: words
 

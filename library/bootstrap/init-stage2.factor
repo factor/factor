@@ -27,7 +27,6 @@
 
 IN: init
 USE: ansi
-USE: combinators
 USE: compiler
 USE: errors
 USE: inference
@@ -38,7 +37,6 @@ USE: math
 USE: namespaces
 USE: parser
 USE: random
-USE: stack
 USE: streams
 USE: stdio
 USE: presentation

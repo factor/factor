@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: random
-USE: combinators
 USE: kernel
 USE: lists
 USE: math
-USE: stack
 
 : power-of-2? ( n -- ? )
     dup dup neg bitand = ;

@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: namespaces
-USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
-USE: stack
 USE: strings
 USE: vectors
 

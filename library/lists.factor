@@ -26,11 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: combinators
 USE: kernel
-USE: logic
 USE: math
-USE: stack
 USE: vectors
 
 : 2list ( a b -- [ a b ] )

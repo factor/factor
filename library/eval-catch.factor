@@ -26,9 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: parser
+USE: kernel
 USE: errors
-USE: stack
-USE: combinators
 USE: stdio
 
 : eval-catch ( str -- )

@@ -1,7 +1,5 @@
-USE: stack
 USE: math
 USE: kernel
-USE: combinators
 USE: compiler
 USE: test
 

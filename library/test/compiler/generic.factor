@@ -2,10 +2,7 @@ IN: scratchpad
 USE: compiler
 USE: test
 USE: math
-USE: stack
 USE: kernel
-USE: logic
-USE: combinators
 USE: words
 
 : generic-test

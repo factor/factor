@@ -30,19 +30,18 @@ USE: image
 USE: parser
 USE: namespaces
 USE: stdio
-USE: combinators
 USE: kernel
 USE: vectors
 
 primitives,
 [
     "/version.factor"
-    "/library/kernel.factor"
     "/library/stack.factor"
+    "/library/kernel.factor"
     "/library/types.factor"
+    "/library/combinators.factor"
     "/library/math/math.factor"
     "/library/cons.factor"
-    "/library/combinators.factor"
     "/library/logic.factor"
     "/library/vector-combinators.factor"
     "/library/lists.factor"

@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
+USE: kernel
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 USE: unparser
 

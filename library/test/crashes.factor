@@ -4,7 +4,6 @@ USE: kernel
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: strings
 USE: test
 USE: vectors

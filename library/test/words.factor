@@ -3,9 +3,7 @@ USE: math
 USE: test
 USE: words
 USE: namespaces
-USE: logic
 USE: lists
-USE: stack
 USE: kernel
 
 [ 4 ] [

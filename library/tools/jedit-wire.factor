@@ -26,13 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: combinators
+USE: kernel
 USE: lists
 USE: namespaces
 USE: parser
 USE: presentation
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

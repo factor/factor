@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
-USE: combinators
 USE: compiler
 USE: kernel
 USE: lists
 USE: math
 USE: namespaces
-USE: stack
 
 : UNBOX ( name -- )
     #! Move top of datastack to C stack.

@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: presentation
-USE: combinators
 USE: hashtables
 USE: lists
 USE: kernel
 USE: namespaces
-USE: stack
 USE: words
 
 : vocab-style ( vocab -- style )
@@ -52,14 +50,6 @@ USE: words
     [ "fg" | [ 204 0 0 ] ]
 ] "arithmetic" set-vocab-style
 [
-    [ "ansi-fg" | "3" ]
-    [ "fg" | [ 255 132 0 ] ]
-] "combinators" set-vocab-style
-[
-    [ "ansi-fg" | "5" ]
-    [ "fg" | [ 102 0 204 ] ]
-] "continuations" set-vocab-style
-[
     [ "ansi-fg" | "1" ]
     [ "fg" | [ 255 0 0 ] ]
 ] "errors" set-vocab-style
@@ -71,10 +61,6 @@ USE: words
     [ "ansi-fg" | "2" ]
     [ "fg" | [ 0 102 153 ] ]
 ] "lists" set-vocab-style
-[
-    [ "ansi-fg" | "6" ]
-    [ "fg" | [ 0 153 102 ] ]
-] "logic" set-vocab-style
 [
     [ "ansi-fg" | "1" ]
     [ "fg" | [ 204 0 0 ] ]

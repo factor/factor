@@ -26,14 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
-USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
-USE: stack
 USE: strings
 
 : word-property ( word pname -- pvalue )
@@ -104,9 +101,7 @@ USE: strings
         "user"
         "arithmetic"
         "builtins"
-        "combinators"
         "compiler"
-        "continuations"
         "debugger"
         "errors"
         "files"
@@ -119,7 +114,6 @@ USE: strings
         "kernel"
         "listener"
         "lists"
-        "logic"
         "math"
         "namespaces"
         "parser"

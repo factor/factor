@@ -26,15 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: unparser
-USE: combinators
 USE: kernel
 USE: format
 USE: lists
-USE: logic
 USE: math
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: strings
 USE: words

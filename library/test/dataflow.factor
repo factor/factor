@@ -3,15 +3,14 @@ USE: inference
 USE: lists
 USE: math
 USE: test
-USE: logic
-USE: combinators
 USE: hashtables
-USE: stack
 USE: kernel
 USE: vectors
 USE: namespaces
 USE: prettyprint
 USE: words
+USE: kernel
+USE: generic
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.

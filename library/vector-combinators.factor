@@ -26,12 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
-USE: combinators
 USE: kernel
 USE: lists
-USE: logic
 USE: math
-USE: stack
 
 : vector-each ( vector code -- )
     #! Execute the code, with each element of the vector

@@ -26,11 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
-USE: combinators
 USE: kernel
 USE: lists
 USE: parser
-USE: stack
 USE: stdio
 
 "Cold boot in progress..." print

@@ -2,7 +2,6 @@ IN: scratchpad
 USE: errors
 USE: kernel
 USE: namespaces
-USE: stack
 USE: test
 USE: lists
 USE: parser

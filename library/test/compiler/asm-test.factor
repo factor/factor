@@ -1,6 +1,5 @@
 IN: scratchpad
 USE: compiler
-USE: stack
 
 0 EAX I>R
 0 ECX I>R

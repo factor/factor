@@ -26,12 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: ansi
-USE: combinators
 USE: lists
 USE: kernel
 USE: format
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

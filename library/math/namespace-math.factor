@@ -26,10 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
-USE: logic
+USE: kernel
 USE: namespaces
-USE: stack
 
 : +@ ( num var -- ) tuck get + put ;
 : -@ ( num var -- ) tuck get swap - put ;

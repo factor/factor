@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: file-responder
-USE: combinators
 USE: errors
 USE: files
 USE: html
@@ -37,7 +36,6 @@ USE: lists
 USE: logging
 USE: namespaces
 USE: parser
-USE: stack
 USE: stdio
 USE: streams
 USE: strings

@@ -27,12 +27,9 @@
 
 IN: sdl-video
 USE: alien
-USE: combinators
 USE: compiler
 USE: kernel
-USE: logic
 USE: math
-USE: stack
 
 ! These are the currently supported flags for the SDL_surface
 ! Available for SDL_CreateRGBSurface() or SDL_SetVideoMode()

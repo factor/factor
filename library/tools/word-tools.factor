@@ -26,13 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: words
-USE: combinators
 USE: inspector
 USE: lists
 USE: kernel
 USE: namespaces
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: unparser

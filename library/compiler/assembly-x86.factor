@@ -29,8 +29,6 @@ IN: compiler
 USE: kernel
 USE: compiler
 USE: math
-USE: stack
-USE: combinators
 
 : EAX 0 ;
 : ECX 1 ;

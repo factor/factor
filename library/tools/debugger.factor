@@ -26,14 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: combinators
-USE: continuations
 USE: kernel
 USE: lists
-USE: logic
 USE: namespaces
 USE: prettyprint
-USE: stack
 USE: stdio
 USE: strings
 USE: unparser

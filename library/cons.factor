@@ -25,7 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: lists USE: kernel USE: stack
+IN: lists
+USE: kernel
 
 : swons ( cdr car -- [ car | cdr ] )
     #! Push a new cons cell. If the cdr is f or a proper list,

@@ -1,7 +1,6 @@
-USE: stack
 USE: strings
+USE: kernel
 USE: math
-USE: combinators
 USE: test
 USE: lists
 

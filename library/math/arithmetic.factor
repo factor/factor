@@ -26,10 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: combinators
 USE: kernel
-USE: logic
-USE: stack
 
 : integer? dup fixnum? swap bignum? or ;
 : rational? dup integer? swap ratio? or ;
