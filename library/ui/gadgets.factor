@@ -30,6 +30,20 @@ C: gadget ( shape -- gadget )
 : set-action ( gadget quot gesture -- )
     rot gadget-gestures set-hash ;
 
+: redraw ( gadget -- )
+    #! Redraw a gadget before the next iteration of the event
+    #! loop.
+    t over set-gadget-redraw?
+    gadget-parent [ redraw ] when* ;
+
+: relayout ( gadget -- )
+    #! Relayout a gadget before the next iteration of the event
+    #! loop. Since relayout also implies the visual
+    #! representation changed, we redraw the gadget too.
+    t over set-gadget-redraw?
+    t over set-gadget-relayout?
+    gadget-parent [ relayout ] when* ;
+
 : move-gadget ( x y gadget -- )
     [ move-shape ] keep redraw ;
 

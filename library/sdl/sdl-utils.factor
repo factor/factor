@@ -59,7 +59,8 @@ SYMBOL: surface
     SDL_INIT_EVERYTHING SDL_Init drop  TTF_Init
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
-: rgb ( r g b -- n )
+: rgb ( [ r g b ] -- n )
+    3unlist
     255
     swap 8 shift bitor
     swap 16 shift bitor
@@ -73,11 +74,11 @@ SYMBOL: surface
     swap 8 shift bitor
     swap bitor ;
 
-: black 0 0 0 ;
-: white 255 255 255 ;
-: red 255 0 0 ;
-: green 0 255 0 ;
-: blue 0 0 255 ;
+: black [ 0   0   0   ] ;
+: white [ 255 255 255 ] ;
+: red   [ 255 0   0   ] ;
+: green [ 0   255 0   ] ;
+: blue  [ 0   0   255 ] ;
 
 : clear-surface ( color -- )
     >r surface get 0 0 width get height get r> boxColor ;

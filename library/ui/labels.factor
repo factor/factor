@@ -23,5 +23,5 @@ M: label draw-shape ( label -- )
     over shape-y y get +
     rot label-text
     >r font get lookup-font r>
-    color get 3unlist make-color
+    foreground get 3unlist make-color
     draw-string drop ;

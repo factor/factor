@@ -105,7 +105,3 @@ M: rectangle resize-shape ( w h rect -- )
 M: rectangle inside? ( point rect -- ? )
     over shape-x over rectangle-x-extents between? >r
     swap shape-y swap rectangle-y-extents between? r> and ;
-
-! Delegates to a bounded shape, but absorbs all points.
-WRAPPER: everywhere
-M: everywhere inside? ( point world -- ? ) 2drop t ;

@@ -4,7 +4,7 @@ IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
 sdl-video ;
 
-DEFER: pick-up*
+DEFER: pick-up
 
 : pick-up-list ( point list -- gadget )
     dup [
@@ -27,7 +27,7 @@ DEFER: pick-up*
         gadget-children pick-up-list dup [
             2nip
         ] [
-            drop inside?
+            3drop t
         ] ifte
     ] [
         2drop f

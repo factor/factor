@@ -6,23 +6,17 @@ USING: generic hashtables kernel lists math namespaces ;
 GENERIC: layout* ( gadget -- )
 M: gadget layout* drop ;
 
-: relayout ( gadget -- )
-    #! Relayout a gadget before the next iteration of the event
-    #! loop. Since relayout also implies the visual
-    #! representation changed, we redraw the gadget too.
-    t over set-gadget-redraw?
-    t over set-gadget-relayout?
-    gadget-parent [ relayout ] when* ;
-
 : layout ( gadget -- )
     #! Set the gadget's width and height to its preferred width
     #! and height. The gadget's children are laid out first.
     #! Note that nothing is done if the gadget does not need to
     #! be laid out.
     dup gadget-relayout? [
-        f over set-gadget-relayout?
-        dup gadget-children [ layout ] each
-        layout*
+        dup gadget-paint [
+            f over set-gadget-relayout?
+            dup gadget-children [ layout ] each
+            layout*
+        ] bind
     ] [
         drop
     ] ifte ;

@@ -121,11 +121,11 @@ SYMBOL: redraw-console
 
 : draw-line ( str -- )
     >r x get y get console-font get r>
-    foreground make-color background make-color draw-string
+    foreground make-color draw-string
     x [ + ] change ;
 
 : clear-display ( -- )
-    surface get 0 0 width get height get background rgb boxColor ;
+    surface get 0 0 width get height get background 3list rgb boxColor ;
 
 : draw-lines ( -- )
     visible-lines available-lines min [
@@ -142,7 +142,7 @@ SYMBOL: redraw-console
     y get
     over 1 +
     y get line-height get +
-    cursor rgb boxColor ;
+    cursor 3list rgb boxColor ;
 
 : draw-current ( -- )
     output-line get sbuf>str draw-line ;
@@ -169,7 +169,7 @@ SYMBOL: redraw-console
     scrollbar-top
     width get
     scrollbar-bottom
-    black rgb boxColor ;
+    black 3list rgb boxColor ;
 
 : draw-console ( -- )
     [

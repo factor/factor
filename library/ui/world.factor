@@ -10,13 +10,14 @@ sdl-video ;
 TUPLE: world running? hand delegate ;
 
 : <world-box> ( -- box )
-    0 0 0 0 <plain-rect> <everywhere> <gadget>
-    dup [ 216 216 216 ] color set-paint-property ;
+    0 0 0 0 <plain-rect> <gadget> ;
 
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
     dup <hand> over set-world-hand ;
+
+M: world inside? ( point world -- ? ) 2drop t ;
 
 : my-hand ( -- hand ) world get world-hand ;
 
@@ -25,7 +26,7 @@ C: world ( -- world )
         [
             f over set-gadget-redraw?
             dup draw-gadget
-            world-hand draw-gadget
+            dup gadget-paint [ world-hand draw-gadget ] bind
         ] with-surface
     ] [
         drop
@@ -35,25 +36,45 @@ DEFER: handle-event
 
 : layout-world world get layout ;
 
+: eat-events ( event -- )
+    #! Keep polling for events until there are no more events in
+    #! the queue; then block for the next event.
+    dup SDL_PollEvent [
+        dup handle-event eat-events
+    ] [
+        SDL_WaitEvent
+    ] ifte ;
+
 : run-world ( -- )
     world get world-running? [
-        <event> dup SDL_WaitEvent 1 = [
-            handle-event layout-world draw-world run-world
+        layout-world draw-world
+        <event> dup eat-events [
+            handle-event run-world
         ] [
             drop
         ] ifte
     ] when ;
 
-: init-world ( w h -- )
-    t world get set-world-running?
-    world get resize-gadget ;
-
-: world-flags SDL_HWSURFACE SDL_RESIZABLE bitor ;
-
-: start-world ( w h -- )
+: start-world ( -- )
     #! Start the Factor graphics subsystem with the given screen
     #! dimensions.
-    2dup init-world 0 world-flags
-    default-paint [ [ run-world ] with-screen ] bind ;
+    t world get set-world-running?
+    world get shape-w world get shape-h 0 SDL_RESIZABLE
+    [
+        0 x set
+        0 y set
+        [ run-world ] with-screen
+    ] with-scope ;
 
-global [ <world> world set ] bind
+global [
+    <world> world set
+    640 480 world get resize-gadget
+    {{
+        [[ background [ 216 216 216 ] ]]
+        [[ foreground [ 0 0 0 ] ]]
+        [[ bevel-1    [ 240 240 240 ] ]]
+        [[ bevel-2    [ 192 192 192 ] ]]
+        [[ bevel-up?  t ]]
+        [[ font       [[ "Monospaced" 12 ]] ]]
+    }} world get set-gadget-paint
+] bind

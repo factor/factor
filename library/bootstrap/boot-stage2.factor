@@ -157,9 +157,9 @@ cpu "x86" = [
         "/library/ui/paint.factor"
         "/library/ui/gestures.factor"
         "/library/ui/hand.factor"
+        "/library/ui/layouts.factor"
         "/library/ui/world.factor"
         "/library/ui/labels.factor"
-        "/library/ui/layouts.factor"
         "/library/ui/events.factor"
     ] [
         dup print
