@@ -6,6 +6,27 @@ USING: generic hashtables kernel lists math namespaces ;
 GENERIC: layout* ( gadget -- )
 M: gadget layout* drop ;
 
+: relayout ( gadget -- )
+    #! Relayout a gadget before the next iteration of the event
+    #! loop. Since relayout also implies the visual
+    #! representation changed, we redraw the gadget too.
+    t over set-gadget-redraw?
+    t over set-gadget-relayout?
+    gadget-parent [ relayout ] when* ;
+
+: layout ( gadget -- )
+    #! Set the gadget's width and height to its preferred width
+    #! and height. The gadget's children are laid out first.
+    #! Note that nothing is done if the gadget does not need to
+    #! be laid out.
+    dup gadget-relayout? [
+        f over set-gadget-relayout?
+        dup gadget-children [ layout ] each
+        layout*
+    ] [
+        drop
+    ] ifte ;
+
 ! A pile is a box that lays out its contents vertically.
 TUPLE: pile delegate ;
 
@@ -32,23 +53,39 @@ M: shelf layout* ( pile -- )
         uncons 0 rot move-gadget
     ] each ;
 
-: relayout ( gadget -- )
-    #! Relayout a gadget before the next iteration of the event
-    #! loop. Since relayout also implies the visual
-    #! representation changed, we redraw the gadget too.
-    t over set-gadget-redraw?
-    t over set-gadget-relayout?
-    gadget-parent [ relayout ] when* ;
+! A border lays out its children on top of each other, all with
+! a 5-pixel padding.
+TUPLE: border size delegate ;
 
-: layout ( gadget -- )
-    #! Set the gadget's width and height to its preferred width
-    #! and height. The gadget's children are laid out first.
-    #! Note that nothing is done if the gadget does not need to
-    #! be laid out.
-    dup gadget-relayout? [
-        f over set-gadget-relayout?
-        dup gadget-children [ layout ] each
-        layout*
-    ] [
-        drop
-    ] ifte ;
+C: border ( delegate size -- border )
+    [ set-border-size ] keep [ set-border-delegate ] keep ;
+
+: standard-border ( child delegate -- border )
+    5 <border> [ box+ ] keep ;
+
+: empty-border ( child -- border )
+    0 0 0 0 <rectangle> <gadget> standard-border ;
+
+: bevel-border ( child -- border )
+    3 0 0 0 0 <bevel-rect> <gadget> standard-border ;
+
+: size-border ( border -- )
+    dup gadget-children
+    dup max-width pick border-size 2 * +
+    swap max-height pick border-size 2 * +
+    rot resize-gadget ;
+
+: layout-border-x/y ( border -- )
+    dup gadget-children [
+        >r border-size dup r> move-gadget
+    ] each-with ;
+
+: layout-border-w/h ( border -- )
+    [
+        dup shape-h over border-size - >r
+        dup shape-w swap border-size - r>
+    ] keep
+    gadget-children [ >r 2dup r> resize-gadget ] each 2drop ;
+
+M: border layout* ( border -- )
+    dup size-border dup layout-border-x/y layout-border-w/h ;
