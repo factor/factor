@@ -152,8 +152,9 @@ END-STRUCT
 ! SDL_SetGamma: float types
 
 : SDL_FillRect ( surface rect color -- n )
+    #! If rect is null, fills entire surface.
     "int" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "unint" ] alien-call ;
+    [ "surface*" "rect*" "uint" ] alien-call ;
 
 : SDL_LockSurface ( surface -- )
     "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ;
@@ -162,5 +163,5 @@ END-STRUCT
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-call ;
 
 : SDL_MapRGB ( surface r g b -- )
-    "int" "sdl" "SDL_MapRGB"
-    [ "surface*" "char" "char" "char" ] alien-call ;
+    "uint" "sdl" "SDL_MapRGB"
+    [ "surface*" "uchar" "uchar" "uchar" ] alien-call ;

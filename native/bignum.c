@@ -21,7 +21,19 @@ void box_integer(FIXNUM integer)
 }
 
 /* FFI calls this */
+void box_cell(CELL cell)
+{
+	dpush(tag_cell(cell));
+}
+
+/* FFI calls this */
 FIXNUM unbox_integer(void)
+{
+	return to_integer(dpop());
+}
+
+/* FFI calls this */
+CELL unbox_cell(void)
 {
 	return to_integer(dpop());
 }

@@ -1,13 +1,14 @@
 FFI:
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
-- unsigned types
 - SDL_Rect** type
 - struct membres that are not *
 - float types
+- SDL_MapRGB broken
 
 - command line parsing cleanup
 - > 1 ( ) inside word def
+- parsing-word test fails
 
 - when* compilation in jvm
 - compile word twice; no more 'cannot compile' error!

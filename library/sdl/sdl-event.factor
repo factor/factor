@@ -143,7 +143,7 @@ BEGIN-STRUCT: joy-hat-event
         ! SDL_HAT_LEFT     SDL_HAT_CENTERED SDL_HAT_RIGHT
         ! SDL_HAT_LEFTDOWN SDL_HAT_DOWN     SDL_HAT_RIGHTDOWN
         ! Note that zero means the POV is centered.
-END-STRUCT       
+END-STRUCT
 
 BEGIN-STRUCT: joy-button-event
 	FIELD: uchar type   ! SDL_JOYBUTTONDOWN or SDL_JOYBUTTONUP

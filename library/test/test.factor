@@ -113,6 +113,7 @@ USE: unparser
         "crashes" test
         "sbuf" test
         "threads" test
+        "parsing-word" test
 
         cpu "x86" = [
             [

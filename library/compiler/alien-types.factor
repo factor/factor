@@ -119,6 +119,10 @@ USE: words
 : END-UNION ( max -- )
     dup define-constructor define-struct-type ; parsing
 
+: NULL ( -- null )
+    #! C null value.
+    0 <alien> ;
+
 global [ <namespace> "c-types" set ] bind
 
 [
@@ -141,40 +145,40 @@ global [ <namespace> "c-types" set ] bind
     [ alien-4 ] "getter" set
     [ set-alien-4 ] "setter" set
     4 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "uint" define-c-type
 
 [
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_signed_2" "boxer" set
+    "unbox_signed_2" "unboxer" set
 ] "short" define-c-type
 
 [
     [ alien-2 ] "getter" set
     [ set-alien-2 ] "setter" set
     2 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "ushort" define-c-type
 
 [
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_signed_1" "boxer" set
+    "unbox_signed_1" "unboxer" set
 ] "char" define-c-type
 
 [
     [ alien-1 ] "getter" set
     [ set-alien-1 ] "setter" set
     1 "width" set
-    "box_integer" "boxer" set
-    "unbox_integer" "unboxer" set
+    "box_cell" "boxer" set
+    "unbox_cell" "unboxer" set
 ] "uchar" define-c-type
 
 [

@@ -120,7 +120,7 @@ IN: syntax
 : f f parsed ; parsing
 
 ! Lists
-: [ [ ] ; parsing
+: [ f ; parsing
 : ] reverse parsed ; parsing
 
 : | ( syntax: | cdr ] )

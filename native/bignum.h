@@ -10,7 +10,9 @@ INLINE ARRAY* untag_bignum(CELL tagged)
 
 FIXNUM to_integer(CELL x);
 void box_integer(FIXNUM integer);
+void box_cell(CELL cell);
 FIXNUM unbox_integer(void);
+CELL unbox_cell(void);
 ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 void primitive_bignum_eq(void);

@@ -53,8 +53,9 @@ USE: stack
     2dup < [ drop ] [ nip ] ifte ;
 
 : between? ( x min max -- ? )
-    #! Push if min <= x <= max.
-    >r dupd max r> min = ;
+    #! Push if min <= x <= max. Handles case where min > max
+    #! by swapping them.
+    2dup > [ swap ] when  >r dupd max r> min = ;
 
 : sq dup * ; inline
 

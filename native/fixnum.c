@@ -202,3 +202,27 @@ void primitive_fixnum_not(void)
 {
 	drepl(tag_fixnum(~to_fixnum(dpeek())));
 }
+
+/* FFI calls this */
+void box_signed_1(signed char integer)
+{
+	dpush(tag_integer(integer));
+}
+
+/* FFI calls this */
+void box_signed_2(signed short integer)
+{
+	dpush(tag_integer(integer));
+}
+
+/* FFI calls this */
+signed char unbox_signed_1(void)
+{
+	return to_integer(dpop());
+}
+
+/* FFI calls this */
+signed short unbox_signed_2(void)
+{
+	return to_integer(dpop());
+}
