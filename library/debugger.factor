@@ -54,6 +54,10 @@ USE: unparser
 : in-parser? ( -- ? )
     "line" get "pos" get and ;
 
+: error-handler-hook
+    #! The game overrides this.
+    ;
+
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
     [
@@ -63,6 +67,8 @@ USE: unparser
         ":s :r :n :c show stacks at time of error." print
 
         java? [ ":j shows Java stack trace." print ] when
+        error-handler-hook
+
     ] when* ;
 
 : :s ( -- ) "error-datastack"  get . ;

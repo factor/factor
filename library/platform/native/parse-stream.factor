@@ -35,6 +35,7 @@ USE: namespaces
 USE: stack
 USE: stdio
 USE: streams
+USE: strings
 
 : next-line ( -- str )
     "parse-stream" get freadln
@@ -58,8 +59,8 @@ USE: streams
 
 : init-parser ( name -- seed )
     "parse-name" set
-    "user" "in" set
-    [ "builtins" "user" ] "use" set
+    "file-in" get "in" set
+    "file-use" get "use" set
     f ;
 
 : parse-stream ( name stream -- code )
@@ -72,3 +73,9 @@ USE: streams
 
 : run-file ( file -- )
     parse-file call ;
+
+: resource-path ( -- path )
+    "resource-path" get [ "." ] unless* ;
+
+: run-resource ( file -- )
+    resource-path swap cat2 run-file ;

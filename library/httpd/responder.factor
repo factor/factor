@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=0:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !

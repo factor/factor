@@ -94,10 +94,6 @@ USE: stack
         2drop f
     ] ifte ;
 
-: count ( n -- [ 1 2 3 ... n ] )
-    #! If n <= 0, pushes the empty list.
-    [ [ ] times* ] cons expand ;
-
 : nth ( n list -- list[n] )
     #! Gets the nth element of a proper list by successively
     #! iterating down the cdr pointer.
@@ -165,32 +161,20 @@ USE: stack
     #! DESTRUCTIVE. Reverse the given list, without consing.
     f swap nreverse-iter ;
 
-~<< partition-iterI
-    R1 R2 A D C -- A C r:R1 r:R2 r:A r:D r:C >>~
+: partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
+    >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
 
-~<< partition-iterT{
-    r:R1 r:R2 r:A r:D r:C -- A R1 r:R1 r:R2 r:D r:C >>~
+: partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
+    >r 2swap r> -rot >r >r dup >r swap call r> swap r> r>
+    partition-add ; inline
 
-~<< }partition-iterT
-    R1 r:R1X r:R2 r:D r:C -- R1 R2 D C >>~
-
-~<< partition-iterF{
-    r:R1 r:R2 r:A r:D r:C -- A R2 r:R1 r:R2 r:D r:C >>~
-
-~<< }partition-iterF
-    R2 r:R1 r:R2X r:D r:C -- R1 R2 D C >>~
-
-: partition-iter ( ref ret1 ret2 list combinator -- ref ret1 ret2 )
-    #! Helper word for 'partition'.
-    over [
-        ! Note this ifte must be in tail position!
-        >r uncons r> partition-iterI >r >r dup r> r> call [
-            partition-iterT{ cons }partition-iterT partition-iter
-        ] [
-            partition-iterF{ cons }partition-iterF partition-iter
-        ] ifte
+: partition-iter ( ret1 ret2 ref combinator list -- ret1 ret2 )
+    dup [
+        3dup cdr >r >r >r
+        car partition-step
+        r> r> r> partition-iter
     ] [
-        2drop
+        3drop
     ] ifte ; inline interpret-only
 
 : partition ( ref list combinator -- list1 list2 )
@@ -200,19 +184,8 @@ USE: stack
     #! the first or second list.
     #! The combinator must have stack effect:
     #! ( ref element -- ? )
-    [ ] [ ] 2swap partition-iter rot drop ; inline interpret-only
-
-: remove ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
-    dup [
-        2dup car = [
-            cdr remove
-        ] [
-            uncons swapd remove cons
-        ] ifte
-    ] [
-        nip
-    ] ifte ;
+    swap >r >r >r [ ] [ ] r> r> r> partition-iter ;
+    inline interpret-only
 
 : sort ( list comparator -- sorted )
     #! Sort the elements in a proper list using a comparator.
@@ -234,6 +207,18 @@ USE: stack
 : num-sort ( list -- sorted )
     #! Sorts the list into ascending numerical order.
     [ > ] sort ;
+
+: remove ( obj list -- list )
+    #! Remove all occurrences of the object from the list.
+    dup [
+        2dup car = [
+            cdr remove
+        ] [
+            uncons swapd remove cons
+        ] ifte
+    ] [
+        nip
+    ] ifte ;
 
 ! Redefined below
 DEFER: tree-contains?
@@ -292,13 +277,6 @@ DEFER: tree-contains?
         ( accum code elem -- accum code )
         transp over >r >r call r> cons r>
     ] each drop nreverse ; inline interpret-only
-
-: map ( [ items ] [ code ] -- [ mapping ] )
-    #! Applies the code to each item, returns a list that
-    #! contains the result of each application.
-    #!
-    #! This combinator will not compile.
-    2list restack each unstack ; inline interpret-only
 
 : subset-add ( car pred accum -- accum )
     >r over >r call r> r> rot [ cons ] [ nip ] ifte ;

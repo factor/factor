@@ -99,8 +99,9 @@ USE: parser
 "/library/telnetd.factor"                  run-resource ! telnetd
 
 !!! Java -> native VM image cross-compiler.
-"/library/platform/native/image.factor"          run-resource ! cross-compiler
-"/library/platform/native/cross-compiler.factor" run-resource ! cross-compiler
+"/library/image.factor"                       run-resource ! cross-compiler
+"/library/cross-compiler.factor"              run-resource ! cross-compiler
+"/library/platform/jvm/cross-compiler.factor" run-resource ! cross-compiler
 
 !!! HTTPD.
 "/library/httpd/url-encoding.factor"       run-resource ! url-encoding

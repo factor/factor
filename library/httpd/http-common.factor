@@ -53,9 +53,7 @@ USE: url-encoding
 
 : httpd-error ( error -- )
     dup log-error
-    [ "text/html" response ] [ error-body ] cleave
-    cat2
-    print ;
+    <% dup "text/html" response % error-body % %> print ;
 
 : read-header-iter ( alist -- alist )
     read dup "" = [

@@ -57,14 +57,14 @@ USE: stack
     >=< call ; inline interpret-only
 
 : max ( x y -- z )
-    2dup > -rot ? ;
+    2dup > [ drop ] [ nip ] ifte ;
 
 : min ( x y -- z )
-    2dup < -rot ? ;
+    2dup < [ drop ] [ nip ] ifte ;
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max.
-    [ [ dup ] dip max ] dip min = ;
+    >r dupd max r> min = ;
 
 : sq dup * ; inline
 

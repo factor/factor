@@ -110,5 +110,3 @@ IN: strings
 : >char ;
 : >upper ;
 : >lower ;
-IN: lists
-: sort ;

@@ -47,6 +47,7 @@ primitives,
 [
     "/library/ansi.factor"
     "/library/assoc.factor"
+    "/library/cross-compiler.factor"
     "/library/combinators.factor"
     "/library/cons.factor"
     "/library/continuations.factor"
@@ -54,10 +55,12 @@ primitives,
     "/library/errors.factor"
     "/library/format.factor"
     "/library/hashtables.factor"
+    "/library/image.factor"
     "/library/init.factor"
     "/library/inspector.factor"
     "/library/inspect-vocabularies.factor"
     "/library/interpreter.factor"
+    "/library/lists.factor"
     "/library/list-namespaces.factor"
     "/library/logging.factor"
     "/library/logic.factor"
@@ -76,11 +79,12 @@ primitives,
     "/library/words.factor"
     "/library/math/math-combinators.factor"
     "/library/math/namespace-math.factor"
+    "/library/platform/native/arithmetic.factor"
+    "/library/platform/native/cross-compiler.factor"
     "/library/platform/native/errors.factor"
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
     "/library/platform/native/kernel.factor"
-    "/library/platform/native/image.factor"
     "/library/platform/native/namespaces.factor"
     "/library/platform/native/parse-numbers.factor"
     "/library/platform/native/parser.factor"
@@ -96,17 +100,6 @@ primitives,
 ] [
     cross-compile-resource
 ] each
-[
-    ! We don't include all of 'lists' or 'math' yet...
-    between? min max
-    append add remove contains unique
-    pred succ neg fib each nreverse nreverse-iter
-    max 2list length reverse nth list? 2rlist
-    all? clone-list clone-list-iter subset subset-iter
-    subset-add car= cdr= cons= cons-hashcode
-    tree-contains? =-or-contains? 
-    last* last inject integer?
-] [ worddef worddef, ] each
 
 version,
 

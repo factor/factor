@@ -184,7 +184,7 @@ DEFER: '
     object-tag here-as swap
     11 >header emit
     dup str-length emit
-    dup hashcode fixnum-mask bitand emit
+    dup hashcode ( fixnum-mask bitand ) emit
     pack-string
     pad ;
 
@@ -224,7 +224,7 @@ IN: cross-compiler
 
     dup word-name "name" swons ,
     dup word-vocabulary "vocabulary" swons ,
-    [ "parsing" get >boolean ] bind "parsing" swons ,
+    "parsing" swap word-property >boolean "parsing" swons ,
 
     ,] ' ;
 

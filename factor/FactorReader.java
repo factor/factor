@@ -331,12 +331,7 @@ public class FactorReader
 		if(interp.getVocabulary(name) == null)
 			error("Undefined vocabulary: " + name);
 
-		Cons use = getUse();
-
-		if(!Cons.contains(use,name))
-			use = new Cons(name,use);
-
-		setUse(use);
+		setUse(new Cons(name,getUse()));
 	} //}}}
 
 	//{{{ parse() method

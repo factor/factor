@@ -1,10 +1,8 @@
 + native:
 
-- gc when memory is tight
 - f >n: crashes
 - typecases: type error reporting bad
 - image output
-- 64-bit "bignums"
 - floats
 - {...} vectors
 - parsing should be parsing
@@ -48,6 +46,7 @@
 
 + misc:
 
+- compiled stack traces broken
 - should i -i inf -inf be parsing words?
 - namespace clone drops static var bindings
 - ditch map
