@@ -28,15 +28,15 @@
 IN: unparser
 USE: kernel
 USE: strings
+USE: stack
 
 : unparse ( X -- "X" )
     [ "java.lang.Object" ] "factor.FactorReader" "unparseObject"
     jinvoke-static ;
 
 : >base ( num radix -- string )
-    #! Convert a number to a string in a certain base.
-    [ "int" "int" ]
-    "java.lang.Integer" "toString" jinvoke-static ;
+    #! Convert an integer to a string in a certain base.
+    swap [ "int" ] "java.math.BigInteger" "toString" jinvoke ;
 
 : >bin ( num -- string )
     #! Convert a number to its binary representation.

@@ -28,7 +28,6 @@
 IN: cross-compiler
 USE: combinators
 USE: errors
-USE: format
 USE: hashtables
 USE: kernel
 USE: lists
@@ -205,7 +204,7 @@ DEFER: '
 
 ( Strings )
 
-: pad-string ( n str -- )
+: align-string ( n str -- )
     tuck str-length - CHAR: \0 fill cat2 ;
 
 : emit-string ( str -- )
@@ -215,7 +214,7 @@ DEFER: '
 : (pack-string) ( n list -- )
     #! Emit bytes for a string, with n characters per word.
     [
-        2dup str-length < [ dupd pad-string ] when
+        2dup str-length > [ dupd .s align-string ] when
         emit-string
     ] each drop ;
 

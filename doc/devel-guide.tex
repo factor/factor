@@ -287,58 +287,6 @@ a good sign that the word should probably be factored into two or
 more words. Each word should take at most a couple of sentences to describe. Effective factoring is like riding a bicycle -- once you ``get it'', it becomes second nature.
 
 
-\subsection{Combinators}
-
-A quotation a list of objects that can be executed. Words that execute quotations are called \emph{combinators}. Quotations are input
-using the following syntax:
-
-\begin{alltt}
-{[} 2 3 + . {]}
-\end{alltt}
-When input, a quotation is not executed immediately -- rather, it
-is pushed on the stack. Try evaluating the following:
-
-\begin{alltt}
-{[} 1 2 3 + {*} {]} .s
-\emph{\{ {[} 1 2 3 + {*} {]} \}}
-call .s
-\emph{\{ 5 \}}
-\end{alltt}
-\texttt{call} \texttt{( quot -{}- )} executes the quotation at the
-top of the stack. Using \texttt{call} with a literal quotation is
-useless; writing out the elements of the quotation has the same effect.
-However, the \texttt{call} combinator is a building block of more
-powerful combinators, since quotations can be passed around arbitrarily
-and even modified before being called.
-
-\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
-\texttt{true} or \texttt{false} quotations, depending on the boolean
-value of \texttt{cond}. In Factor, there is no real boolean data type
--- instead, a special object \texttt{f} is the only object with a
-{}``false'' boolean value. Every other object is a boolean {}``true''.
-The special object \texttt{t} is the {}``canonical'' truth value.
-
-Here is an example of \texttt{ifte} usage:
-
-\begin{alltt}
-1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
-\end{alltt}
-Compare the order of parameters here with the order of parameters in
-the stack effect of \texttt{ifte}.
-
-That the stack effects of the two \texttt{ifte} branches should be
-the same. If they differ, the word becomes harder to document and
-debug.
-
-\texttt{times ( num quot -{}- )} executes a quotation a number of
-times. It is good style to have the quotation always consume as many
-values from the stack as it produces. This ensures the stack effect
-of the entire \texttt{times} expression stays constant regardless
-of the number of iterations.
-
-More combinators will be introduced in later sections.
-
-
 \subsection{Vocabularies}
 
 When an expression is parsed, each token in turn is looked up in the dictionary. If there is no dictionary entry, the token is parsed as a number instead.
@@ -409,6 +357,94 @@ USE: lists
 USE: math
 USE: strings
 \end{alltt}
+
+\subsection{Booleans and logic}
+
+Words that return a boolean truth value are known as \emph{predicates}. Predicates are usually used to decide what to execute next at branch points. In Factor, there is no special boolean data type
+-- instead, a special object \texttt{f} is the only object with a
+``false'' boolean value. Every other object is a boolean ``true''.
+The special object \texttt{t} is the ``canonical'' truth value. Note that words that return booleans don't return \texttt{t} as a rule; any object that is not equal to \texttt{f} can be returned as the true value.
+
+The usual boolean operations are found in the \texttt{logic} vocabulary. Note that these are not integer bitwise operations; bitwise operations are described in the next chapter.
+
+\texttt{>boolean ( ? -{}- ? )} returns \texttt{t} if the top of stack is anything except \texttt{f}, and \texttt{f} otherwise. So it does not change the boolean value of an object, but rather it converts it to canonical form. This word is rarely used.
+
+\texttt{not ( ? -{}- ? )} returns \texttt{t} if the top of stack is \texttt{f}, and \texttt{f} otherwise.
+
+\texttt{and ( ? ? -{}- ? )} returns a true value if both input parameters are true.
+
+\texttt{or ( ? ? -{}- ? )} returns a true value if at least one of the input parameters is true.
+
+\texttt{xor ( ? ? -{}- ? )} returns a true value if exactly one of the input parameters is true.
+
+\begin{alltt}
+t t and .
+\emph{t}
+5 f and .
+\emph{f}
+f "hi" or .
+\emph{"hi"}
+f f or .
+\emph{f}
+t t xor .
+\emph{f}
+t f xor .
+\emph{t}
+\end{alltt}
+
+\subsection{Combinators}
+
+A quotation a list of objects that can be executed. Words that execute quotations are called \emph{combinators}. Quotations are input
+using the following syntax:
+
+\begin{alltt}
+{[} 2 3 + . {]}
+\end{alltt}
+When input, a quotation is not executed immediately -- rather, it
+is pushed on the stack. Try evaluating the following:
+
+\begin{alltt}
+{[} 1 2 3 + {*} {]} .s
+\emph{\{ {[} 1 2 3 + {*} {]} \}}
+call .s
+\emph{\{ 5 \}}
+\end{alltt}
+\texttt{call} \texttt{( quot -{}- )} executes the quotation at the
+top of the stack. Using \texttt{call} with a literal quotation is
+useless; writing out the elements of the quotation has the same effect.
+However, the \texttt{call} combinator is a building block of more
+powerful combinators, since quotations can be passed around arbitrarily
+and even modified before being called.
+
+\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
+\texttt{true} or \texttt{false} quotations, depending on the boolean
+value of \texttt{cond}. Here is an example of \texttt{ifte} usage:
+
+\begin{alltt}
+1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
+\end{alltt}
+Compare the order of parameters here with the order of parameters in
+the stack effect of \texttt{ifte}.
+
+The stack effects of the two \texttt{ifte} branches should be
+the same. If they differ, the word becomes harder to document and
+debug.
+
+\texttt{when} \texttt{( cond true -{}- )} and \texttt{unless} \texttt{( cond false -{}- )} are variations of \texttt{ifte} with only one active branch. The branches should produce as many values as they consume; this ensures that the stack effect of the entire \texttt{when} or \texttt{unless} expression is consistent regardless of which branch was taken.
+
+\texttt{times ( num quot -{}- )} executes a quotation a number of
+times. It is good style to have the quotation always consume as many
+values from the stack as it produces. This ensures the stack effect
+of the entire \texttt{times} expression stays constant regardless
+of the number of iterations.
+
+More combinators will be introduced in later sections.
+
+\subsection{Recursion}
+
+The idea of \emph{recursion} is key to understanding Factor. A \emph{recursive} word definition is one that refers to itself, usually in one branch of a conditional.
+
+FIXME
 
 \section{Numbers}
 
@@ -810,7 +846,7 @@ Note that the word gives incorrect output if the two parameters are
 equal. However, it will never be called this way.
 
 With this out of the way, the implementation of judge-guess is an
-easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \textttt{2drop} and \texttt{=}, we can write:
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
 
 \begin{alltt}
 : judge-guess ( actual guess -{}- ? )
@@ -1794,6 +1830,16 @@ Compare the following two examples -- both define a word that concatenates toget
     <\% {[} \% {]} each \%> ;
 \end{alltt}
 
+The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, all code executed between two words is part of the scope. This allows the call to \texttt{\%} to occur in a nested word. For example, here is a pair of definitions that turn an association list of strings into a string of the form \texttt{key1=value1 key2=value2 ...}:
+
+\begin{alltt}
+: pair\% ( pair -{}- )
+    unswons \% "=" \% \% ;
+
+: assoc>string ( alist -{}- )
+    <\% [ pair\% " " \% ] each \%> ;
+\end{alltt}
+
 \subsection{String combinators}
 
 A pair of combinators for iterating over strings are provided in the \texttt{strings} vocabulary. The first is the \texttt{str-each} word that does nothing other than applying a quotation to each character. The second is the \texttt{str-map} word that also collects the return values of the quotation into a new string.
@@ -2259,6 +2305,29 @@ USE: vectors
 
 \subsection{Identity and equality}
 
+The previously-mentioned \texttt{=} word in the \texttt{kernel} vocabulary, as well as the \texttt{assoc}, \texttt{contains} and \texttt{unique} words in the \texttt{lists} vocabulary all rely on object equality as part of their operation.
+
+What does it mean for two objects to be ``equal''? In actual fact, there are two ways of comparing objects. Two object references can be compared for \emph{identity} using the \texttt{eq? ( obj obj -{}- ? )} word. This only returns true if both references point to the same object. A weaker form of comparison is the \texttt{= ( obj obj -{}- ? )} word, which checks if two objects ``have the same shape''.
+If two objects are \texttt{eq?}, they will also be \texttt{=}.
+
+For example, two literal objects with the same printed representation are as a general rule not always \texttt{eq?}, however they are \texttt{=}:
+
+\begin{alltt}
+{[} 1 2 3 {]} {[} 1 2 3 {]} eq? .
+\emph{f}
+{[} 1 2 3 {]} {[} 1 2 3 {]} = .
+\emph{t}
+\end{alltt}
+
+On the other hand, duplicating an object reference on the stack using \texttt{dup} or similar, will give two references which are \texttt{eq?}:
+
+\begin{alltt}
+"Hello" dup eq? .
+\emph{t}
+\end{alltt}
+
+An object can be cloned using \texttt{clone ( obj -{}- obj )}. The clone will no longer be \texttt{eq?} to the original (unless the original is immutable, in which case cloning is a no-op); however clones are always \texttt{=}.
+
 \subsection{Hashtables}
 
 A hashtable, much like an association list, stores key/value pairs, and offers lookup by key. However, whereas an association list must be searched linearly to locate keys, a hashtable uses a more sophisticated method. Key/value pairs are sorted into \emph{buckets} using a \emph{hash function}. If two objects are equal, then they must have the same hash code; but not necessarily vice versa. To look up the value associated with a key, only the bucket corresponding to the key has to be searched. A hashtable is simply a vector of buckets, where each bucket is an association list.
@@ -2274,7 +2343,7 @@ set to \texttt{f}, or an undefined value.
 
 \texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
 
-examples, and hash>alist, hash-keys, hash-values
+examples, and hash>alist, alist>hash, hash-keys, hash-values
 
 \subsection{Variables}
 

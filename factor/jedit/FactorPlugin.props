@@ -1,6 +1,6 @@
 ### Plugin properties
 
-plugin.factor.jedit.FactorPlugin.activate=defer
+plugin.factor.jedit.FactorPlugin.activate=startup
 
 plugin.factor.jedit.FactorPlugin.name=Factor
 plugin.factor.jedit.FactorPlugin.version=0.65

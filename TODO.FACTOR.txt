@@ -4,7 +4,6 @@
 - -1.1 3 ^ shouldn't give a complex number
 - don't show listener on certain commands
 - plugin should not exit jEdit on fatal errors
-- IN: format base: work with all types of numbers
 - wordpreview: don't show for string literals and comments
 - 64 bit support
 - alist -vs- assoc terminology
@@ -24,15 +23,12 @@
 
 + docs:
 
-- logic
 - examples of assoc usage
 - unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
 - recursion -vs- iteration in vectors chapter, and combinator
   construction
-- <% % %> and [, , ,] -- mention that % and , are usually in nested
-  words
-- object identity and equality - eq? and =
+- [, , ,] -- mention that , are usually in nested words
 - finish namespaces docs
 - mention word accessors/mutators
 - to document:
@@ -52,6 +48,7 @@
 
 - NPE in activate()/deactivate()
 - NPE in ErrorHighlight
+- caret at start of word: problem
 - don't use jEdit's word finding API
 - some way to not have previous definitions from a source file
   clutter the namespace
