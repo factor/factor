@@ -4,8 +4,9 @@ void ffi_dlopen (DLL *dll)
 {
 #ifdef FFI
 	HMODULE module;
+	char *path = to_c_string(untag_string(dll->path));
 
-	module = LoadLibrary(to_c_string(untag_string(dll->path)));
+	module = LoadLibrary(path);
 
 	if (!module)
 		general_error(ERROR_FFI, tag_object(last_error()));

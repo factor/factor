@@ -25,7 +25,7 @@ DLLEXPORT CELL ds;
 CELL cs_bot;
 
 /* raw pointer to callstack top */
-CELL cs;
+DLLEXPORT CELL cs;
 
 #include <errno.h>
 #include <fcntl.h>

@@ -173,7 +173,6 @@ os "win32" = [
         "/library/io/win32-io-internals.factor"
         "/library/io/win32-stream.factor"
         "/library/io/win32-server.factor"
-        "/library/io/win32-console.factor"
     ] [
         dup print
         run-resource
