@@ -113,6 +113,7 @@ public class FactorInterpreter implements FactorObject, Runnable
 		this.builtins = interp.builtins;
 		this.last = interp.last;
 		this.global = interp.global;
+		this.startupDone = true;
 	} //}}}
 
 	//{{{ init() method
@@ -627,9 +628,12 @@ public class FactorInterpreter implements FactorObject, Runnable
 		define("kernel","exit*");
 		catchstack.push(new Cons(new Integer(1),
 			new Cons(searchVocabulary("kernel","exit*"),null)));
+		define("continuations","suspend");
 		define("errors","default-error-handler");
 		catchstack.push(new Cons(searchVocabulary("errors",
-			"default-error-handler"),null));
+			"default-error-handler"),
+			new Cons(searchVocabulary("continuations","suspend"),
+			null)));
 		callframe = null;
 	} //}}}
 }

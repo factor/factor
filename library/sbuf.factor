@@ -44,7 +44,7 @@ USE: stack
     #! Append a string to the construction buffer.
     "string-buffer" get sbuf-append ;
 
-: %> ( -- )
+: %> ( -- str )
     #! Ends construction and pushes the constructed text on the
     #! stack.
     "string-buffer" get sbuf>str n> drop ;
@@ -55,4 +55,7 @@ USE: stack
     <% swap [ dup % ] times drop %> ;
 
 : str-map ( str code -- str )
+    #! Apply a quotation to each character in the string, and
+    #! push a new string constructed from return values.
+    #! The quotation must have stack effect ( X -- X ).
     <% swap [ swap dup >r call % r> ] str-each drop %> ;

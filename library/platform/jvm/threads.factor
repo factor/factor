@@ -29,6 +29,7 @@ IN: threads
 
 USE: combinators
 USE: continuations
+USE: errors
 USE: kernel
 USE: stack
 
@@ -66,4 +67,8 @@ USE: stack
 
 : in-thread ( quot -- )
     #! Execute a quotation in a new thread.
-    fork [ call toplevel ] [ drop ] ifte ; interpret-only
+    fork [
+        [ call ] [ default-error-handler toplevel ] catch
+    ] [
+        drop
+    ] ifte ; interpret-only

@@ -4,16 +4,16 @@
 #define RETAG(cell,tag) ((CELL)(cell) | (tag))
 #define UNTAG(cell) ((CELL)(cell) & ~TAG_MASK)
 
-/* Tags */
+/*** Tags ***/
 #define FIXNUM_TYPE 0
 #define WORD_TYPE 1
 #define CONS_TYPE 2
 #define OBJECT_TYPE 3
 #define HEADER_TYPE 4
 #define XT_TYPE 5
+#define GC_COLLECTED 6 /* See gc.c */
 
-/* See gc.c */
-#define GC_COLLECTED 6
+/*** Header types ***/
 
 /* Canonical F object */
 #define F_TYPE 6

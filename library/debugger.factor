@@ -56,14 +56,14 @@ USE: unparser
 
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
-    in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
+    [
+        in-parser? [ parse-dump ] [ standard-dump ] ifte terpri
 
-    "Stacks have been reset." print
-    ":s :r :n :c show stacks at time of error." print
+        "Stacks have been reset." print
+        ":s :r :n :c show stacks at time of error." print
 
-    java? [ ":j shows Java stack trace." print ] when
-
-    suspend ;
+        java? [ ":j shows Java stack trace." print ] when
+    ] when* ;
 
 : :s ( -- ) "error-datastack"  get . ;
 : :r ( -- ) "error-callstack"  get . ;

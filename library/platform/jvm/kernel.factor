@@ -90,9 +90,15 @@ IN: kernel
 : garbage-collection ( -- )
     [ ] "java.lang.System" "gc" jinvoke-static ;
 
+IN: arithmetic
+DEFER: >bignum
+
+IN: kernel
+
 : millis ( -- millis )
     ! Pushes the current time, in milliseconds.
-    [ ] "java.lang.System" "currentTimeMillis" jinvoke-static ;
+    [ ] "java.lang.System" "currentTimeMillis" jinvoke-static
+    >bignum ;
 
 : system-property ( name -- value )
     [ "java.lang.String" ] "java.lang.System" "getProperty"

@@ -12,6 +12,8 @@
 - partition, sort
 - inspector: sort
 - index of str
+- accept: return socket, instead of printing msg
+- use div(3)
 
 + interactive:
 
@@ -45,9 +47,7 @@
 
 + misc:
 
-- error handling and threads
 - should i -i inf -inf be parsing words?
-- fix multithreading
 - namespace clone drops static var bindings
 - ditch map
 - ditch expand
