@@ -54,7 +54,7 @@ SYMBOL: file-size
 : init-overlapped ( overlapped -- overlapped )
     0 over set-overlapped-ext-internal
     0 over set-overlapped-ext-internal-high
-    fileptr get over set-overlapped-ext-offset
+    fileptr get dup 0 ? over set-overlapped-ext-offset
     0 over set-overlapped-ext-offset-high
     0 over set-overlapped-ext-event ;
 

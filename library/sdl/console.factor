@@ -252,7 +252,7 @@ SYMBOL: escape-continuation
 
 : start-console ( -- )
     <namespace> [
-        640 480 32 SDL_HWSURFACE init-screen
+        800 600 32 SDL_HWSURFACE init-screen
         init-console
     ] extend console set
 

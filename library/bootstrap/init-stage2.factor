@@ -118,7 +118,11 @@ os "win32" = "compile" get and [
     "kernel32" "kernel32.dll" "stdcall" add-library
     "user32"   "user32.dll"   "stdcall" add-library
     "gdi32"    "gdi32.dll"    "stdcall" add-library
+    "winsock"  "ws2_32.dll"   "stdcall" add-library
+    "mswsock"  "mswsock.dll"  "stdcall" add-library
     "libc"     "msvcrt.dll"   "cdecl"   add-library
+    "sdl"      "SDL.dll"      "cdecl"   add-library
+    "sdl-gfx"  "SDL_gfx.dll"  "cdecl"   add-library
 ] when
 
 ! FIXME: KLUDGE to get FFI-based IO going in Windows.

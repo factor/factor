@@ -79,6 +79,9 @@ USE: words
         ] ifte
     ] bind ;
 
+: size ( name -- size )
+    c-type [ "width" get ] bind ;
+
 : define-c-type ( quot name -- )
     c-types [ >r <c-type> swap extend r> set ] bind ; inline
 

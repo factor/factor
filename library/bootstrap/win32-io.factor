@@ -54,6 +54,7 @@ USE: win32-api
 
 : <filecr> <win32-filecr> ;
 : <filecw> <win32-filecw> ;
+: <server> <win32-server> ;
 
 : init-stdio ( -- )
     win32-init-stdio ;

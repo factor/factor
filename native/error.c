@@ -43,6 +43,7 @@ void early_error(CELL error)
 		else if(type_of(error) == STRING_TYPE)
 			fprintf(stderr,"Error: %s\n",to_c_string(untag_string(error)));
 		fflush(stderr);
+
 		exit(1);
 	}
 }
