@@ -28,8 +28,10 @@
 IN: inferior
 USE: combinators
 USE: errors
+USE: interpreter
 USE: kernel
 USE: lists
+USE: logic
 USE: namespaces
 USE: parser
 USE: prettyprint
@@ -60,6 +62,9 @@ USE: styles
     dup str-length write-big-endian-32
     write ;
 
+: inferior-server-flush ( -- )
+    CHAR: f write flush ;
+
 : <inferior-server-stream> ( stream -- stream )
     <extend-stream> [
         ( -- str )
@@ -74,6 +79,8 @@ USE: styles
         [
             "\n" cat2 default-style inferior-server-write-attr
         ] "fprint" set
+        ( -- )
+        [ inferior-server-flush ] "fflush" set
     ] extend ;
 
 : inferior-client-read ( stream -- ? )
@@ -95,15 +102,13 @@ USE: styles
 : inferior-client-packet ( stream -- ? )
     #! Read from an inferior client socket and print attributed
     #! strings that were read to standard output.
-    read1 dup CHAR: r = [
-        drop inferior-client-read
-    ] [
-        dup CHAR: w = [
-            drop inferior-client-write
-        ] [
-            "Invalid packet type: " swap cat2 throw
-        ] ifte
-    ] ifte ;
+    read1 [
+        [ not       ] [ 2drop f ( EOF ) ]
+        [ CHAR: r = ] [ drop inferior-client-read ]
+        [ CHAR: w = ] [ drop inferior-client-write ]
+        [ CHAR: f = ] [ drop fflush t ]
+        [ drop t    ] [ "Invalid packet type: " swap cat2 throw ]
+    ] cond ;
 
 : inferior-client-loop ( stream -- )
     #! The stream is the stream to write to.
@@ -113,5 +118,22 @@ USE: styles
         drop
     ] ifte ;
 
+: inferior-server ( -- )
+    #! Execute this in the inferior Factor.
+    terpri
+    "inferior-ack" print flush
+    "stdio" get <inferior-server-stream> "stdio" set ;
+
+: inferior-read-ack ( -- )
+    read [
+        "inferior-ack" = [ inferior-read-ack ] unless
+    ] when* ;
+
 : inferior-client ( from -- )
-    "stdio" get swap [ inferior-client-loop ] with-stream ;
+    #! Execute this in the superior Factor, with a socket to
+    #! the inferior Factor as a parameter.
+    "stdio" get swap [
+        "USE: inferior inferior-server" print flush
+        inferior-read-ack
+        inferior-client-loop
+    ] with-stream ;

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: streams
+USE: combinators
 USE: errors
 USE: kernel
 USE: namespaces
@@ -69,7 +70,11 @@ USE: strings
         ( -- string )
         [ "freadln not implemented." throw  ] "freadln" set
         ( -- string )
-        [ 1 namespace fread# 0 swap str-nth ] "fread1" set
+        [
+            1 namespace fread# dup f-or-"" [
+                0 swap str-nth
+            ] unless
+        ] "fread1" set
         ( count -- string )
         [ "fread# not implemented."  throw  ] "fread#" set
         ( string -- )

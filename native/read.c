@@ -86,6 +86,9 @@ bool can_read_line(PORT* port)
 {
 	pending_io_error(port);
 
+	if(port->type != PORT_READ && port->type != PORT_RECV)
+		general_error(ERROR_INCOMPATIBLE_PORT,port);
+
 	if(port->line_ready)
 		return true;
 	else
@@ -179,6 +182,9 @@ bool read_count_step(PORT* port)
 bool can_read_count(PORT* port, FIXNUM count)
 {
 	pending_io_error(port);
+
+	if(port->type != PORT_READ && port->type != PORT_RECV)
+		general_error(ERROR_INCOMPATIBLE_PORT,port);
 
 	if(port->line != F && CAN_READ_COUNT(port,count))
 		return true;

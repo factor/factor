@@ -1,6 +1,4 @@
 - add a socket timeout
-- don't allow multiple reads on the same port
-  (and don't hang when this happends!)
 - >lower, >upper for strings
 - telnetd should use multitasking
 - accept multi-line input in listener
@@ -35,7 +33,6 @@
 + listener/plugin:
 
 - plugin should not exit jEdit on fatal errors
-- make inferior.factor nicer to use
 - auto insert USE:
 - balance needs USE:
 - fedit broken with listener

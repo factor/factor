@@ -92,7 +92,7 @@ USE: vectors
     "quit-flag" on ;
 
 : eval-catch ( str -- )
-    [ eval ] [ default-error-handler ] catch ;
+    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
 
 : interpret ( -- )
     print-prompt read dup [

@@ -23,6 +23,9 @@ bool can_write(PORT* port, FIXNUM len)
 
 	pending_io_error(port);
 
+	if(port->type != PORT_WRITE)
+		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
+
 	switch(port->type)
 	{
 	case PORT_READ:

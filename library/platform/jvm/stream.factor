@@ -55,7 +55,7 @@ USE: strings
     [ ] "java.io.EOFException" jnew ;
 
 : >char/eof ( ch -- ch )
-    dup -1 = [ <eof-exception> throw ] [ >char ] ifte ;
+    dup -1 = [ drop f ] [ >char ] ifte ;
 
 : <byte-stream>/fread1 ( -- string )
     "in" get [ ] "java.io.InputStream" "read" jinvoke

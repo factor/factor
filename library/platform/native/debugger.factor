@@ -43,8 +43,22 @@ USE: vectors
 : expired-port-error ( obj -- )
     "Expired port: " write . ;
 
+: io-task-twice-error ( obj -- )
+    "Attempting to perform two simultaneous I/O operations on "
+    write . ;
+
+: no-io-tasks-error ( obj -- )
+    "No I/O tasks" print ;
+
 : undefined-word-error ( obj -- )
     "Undefined word: " write . ;
+
+: incompatible-port-error ( obj -- )
+    "Unsuitable port for operation: " write . ;
+
+: io-error ( list -- )
+    "I/O error in kernel function " write
+    unswons write ": " write car print ;
 
 : type-check-error ( list -- )
     "Type check error" print
@@ -58,10 +72,6 @@ USE: vectors
     uncons car "Maximum index: " write .
     "Requested index: " write . ;
 
-: io-error ( list -- )
-    "I/O error in kernel function " write
-    unswons write ": " write car print ;
-
 : numerical-comparison-error ( list -- )
     "Cannot compare " write unswons unparse write
     " with " write unparse print ;
@@ -72,28 +82,22 @@ USE: vectors
 : signal-error ( obj -- )
     "Operating system signal " write . ;
 
-: io-task-twice-error ( obj -- )
-    "Attempting to perform two simulatenous I/O operations on "
-    write . ;
-
-: no-io-tasks-error ( obj -- )
-    "No I/O tasks" print ;
-
 : profiling-disabled-error ( obj -- )
     drop "Recompile with the EXTRA_CALL_INFO flag." print ;
 
 : kernel-error. ( obj n -- str )
     {
         expired-port-error
+        io-task-twice-error
+        no-io-tasks-error
+        incompatible-port-error
+        io-error
         undefined-word-error
         type-check-error
         array-range-error
-        io-error
         numerical-comparison-error
         float-format-error
         signal-error
-        io-task-twice-error
-        no-io-tasks-error
         profiling-disabled-error
     } vector-nth execute ;
 
