@@ -43,8 +43,6 @@ USE: stack
 : pi 3.14159265358979323846 ; inline
 : pi/2 1.5707963267948966 ; inline
 
-: /f / >float ; inline
-
 : f>0 ( obj -- obj )
     #! If f at the top of the stack, turn it into 0.
     [ 0 ] unless* ;
@@ -52,9 +50,6 @@ USE: stack
 : 0>f ( obj -- obj )
     #! If 0 at the top of the stack, turn it into f.
     dup 0 = [ drop f ] when ;
-
-: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
-    >=< call ; inline interpret-only
 
 : max ( x y -- z )
     2dup > [ drop ] [ nip ] ifte ;
@@ -73,9 +68,6 @@ USE: stack
 
 : neg 0 swap - ; inline
 : recip 1 swap / ; inline
-
-: round ( x to -- y )
-    dupd rem - ;
 
 : deg2rad pi * 180 / ;
 

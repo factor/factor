@@ -104,11 +104,15 @@ USE: unparser
     #! Some ugly ugly code to handle [ a | b ] expressions.
     >r nreverse dup last* r> swap set-cdr swons ;
 
-: expect-] ( -- )
-    scan "]" = not [ "Expected ]" throw ] when ;
+: expect ( word -- )
+    dup scan = not [
+        "Expected " swap cat2 throw
+    ] [
+        drop
+    ] ifte ;
 
 : parsed ( obj -- )
-    over "|" = [ nip parsed| expect-] ] [ swons ] ifte ;
+    over "|" = [ nip parsed| "]" expect ] [ swons ] ifte ;
 
 : number, ( num -- )
     str>number parsed ;

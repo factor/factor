@@ -62,7 +62,11 @@ USE: unparser
     ] ifte ;
 
 : (str>integer) ( str -- num )
-    0 swap [ digit> digit ] str-each ;
+    dup str-length 0 = [
+        not-a-number
+    ] [
+        0 swap [ digit> digit ] str-each
+    ] ifte ;
 
 : str>integer ( str -- num )
     #! Parse a string representation of an integer.
@@ -70,7 +74,7 @@ USE: unparser
         drop not-a-number
     ] [
         dup "-" str-head? dup [
-            nip str>integer neg
+            nip (str>integer) neg
         ] [
             drop (str>integer)
         ] ifte

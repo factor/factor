@@ -108,6 +108,11 @@ USE: vocabularies
 : unparse-word ( word -- str )
     word-name dup "#<unnamed>" ? ;
 
+: fix-float ( str -- str )
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    "." over str-contains? [ ".0" cat2 ] unless ;
+
 : unparse ( obj -- str )
     [
         [ t eq?    ] [ drop "t" ]
@@ -115,7 +120,7 @@ USE: vocabularies
         [ word?    ] [ unparse-word ]
         [ integer? ] [ unparse-integer ]
         [ ratio?   ] [ unparse-ratio ]
-        [ float?   ] [ unparse-float ]
+        [ float?   ] [ unparse-float fix-float ]
         [ complex? ] [ unparse-complex ]
         [ string?  ] [ unparse-str ]
         [ drop t   ] [ <% "#<" % class-of % ">" % %> ]

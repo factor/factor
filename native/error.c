@@ -15,9 +15,11 @@ void critical_error(char* msg, CELL tagged)
 
 void fix_stacks(void)
 {
-	if(UNDERFLOW(env.ds,env.ds_bot) || OVERFLOW(env.ds,env.ds_bot))
+	if(STACK_UNDERFLOW(env.ds,env.ds_bot)
+		|| STACK_OVERFLOW(env.ds,env.ds_bot))
 		reset_datastack();
-	if(UNDERFLOW(env.cs,env.cs_bot) || OVERFLOW(env.cs,env.cs_bot))
+	if(STACK_UNDERFLOW(env.cs,env.cs_bot)
+		|| STACK_OVERFLOW(env.cs,env.cs_bot))
 		reset_callstack();
 }
 

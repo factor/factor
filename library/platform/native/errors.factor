@@ -60,11 +60,11 @@ USE: vectors
         "Type check: "
         "Array range check: "
         "Underflow"
-        "Bad primitive: "
         "Incompatible handle: "
         "I/O error: "
         "Overflow"
         "Incomparable types: "
+        "Float format: "
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

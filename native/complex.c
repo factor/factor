@@ -114,7 +114,7 @@ CELL add_complex(CELL x, CELL y)
 	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return possibly_complex(
 		add(cx->real,cy->real),
-		add(cx->imaginary,cy->real));
+		add(cx->imaginary,cy->imaginary));
 }
 
 CELL subtract_complex(CELL x, CELL y)
@@ -123,7 +123,7 @@ CELL subtract_complex(CELL x, CELL y)
 	COMPLEX* cy = (COMPLEX*)UNTAG(y);
 	return possibly_complex(
 		subtract(cx->real,cy->real),
-		subtract(cx->imaginary,cy->real));
+		subtract(cx->imaginary,cy->imaginary));
 }
 
 CELL multiply_complex(CELL x, CELL y)

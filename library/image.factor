@@ -69,14 +69,14 @@ USE: words
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
 
-: fixnum-tag   BIN: 000 ;
-: word-tag     BIN: 001 ;
-: cons-tag     BIN: 010 ;
-: object-tag   BIN: 011 ;
-: rational-tag BIN: 100 ;
-: complex-tag  BIN: 101 ;
-: header-tag   BIN: 110 ;
-: gc-fwd-ptr   BIN: 111 ; ( we don't output these )
+: fixnum-tag  BIN: 000 ;
+: word-tag    BIN: 001 ;
+: cons-tag    BIN: 010 ;
+: object-tag  BIN: 011 ;
+: ratio-tag   BIN: 100 ;
+: complex-tag BIN: 101 ;
+: header-tag  BIN: 110 ;
+: gc-fwd-ptr  BIN: 111 ; ( we don't output these )
 
 : f-type      6 ;
 : t-type      7 ;
@@ -128,20 +128,19 @@ USE: words
 ( Floats )
 
 : 'float ( f -- tagged )
-    object-tag here-as
+    object-tag here-as >r
     float-type >header emit
     0 emit ( alignment -- FIXME 64-bit arch )
-    float>bits emit64 ;
+    float>bits emit64 r> ;
 
 ( Bignums )
 
 : 'bignum ( bignum -- tagged )
-    dup .
     #! Very bad!
-    object-tag here-as
+    object-tag here-as >r
     bignum-type >header emit
     0 emit ( alignment -- FIXME 64-bit arch )
-    ( bignum -- ) emit64 ;
+    ( bignum -- ) emit64 r> ;
 
 ( Special objects )
 
@@ -195,6 +194,18 @@ DEFER: '
 
 : cons, ( -- pointer ) cons-tag here-as ;
 : 'cons ( c -- tagged ) uncons ' swap ' cons, -rot emit emit ;
+
+( Ratios -- almost the same as a cons )
+
+: ratio, ( -- pointer ) ratio-tag here-as ;
+: 'ratio ( a/b -- tagged )
+    dup denominator ' swap numerator ' ratio, -rot emit emit ;
+
+( Complex -- almost the same as ratio )
+
+: complex, ( -- pointer ) complex-tag here-as ;
+: 'complex ( #{ a b } -- tagged )
+    dup imaginary ' swap real ' complex, -rot emit emit ;
 
 ( Strings )
 
@@ -299,17 +310,19 @@ IN: cross-compiler
 
 : ' ( obj -- pointer )
     [
-        [ fixnum? ] [ 'fixnum      ]
-        [ bignum? ] [ 'bignum      ]
-        [ float?  ] [ 'float       ]
-        [ word?   ] [ 'word        ]
-        [ cons?   ] [ 'cons        ]
-        [ char?   ] [ 'fixnum      ]
-        [ string? ] [ 'string      ]
-        [ vector? ] [ 'vector      ]
-        [ t =     ] [ drop "t" get ]
-        [ f =     ] [ drop "f" get ]
-        [ drop t  ] [ "Cannot cross-compile: " swap cat2 throw ]
+        [ fixnum?  ] [ 'fixnum      ]
+        [ bignum?  ] [ 'bignum      ]
+        [ float?   ] [ 'float       ]
+        [ ratio?   ] [ 'ratio       ]
+        [ complex? ] [ 'complex     ]
+        [ word?    ] [ 'word        ]
+        [ cons?    ] [ 'cons        ]
+        [ char?    ] [ 'fixnum      ]
+        [ string?  ] [ 'string      ]
+        [ vector?  ] [ 'vector      ]
+        [ t =      ] [ drop "t" get ]
+        [ f =      ] [ drop "f" get ]
+        [ drop t   ] [ "Cannot cross-compile: " swap cat2 throw ]
     ] cond ;
 
 ( End of the image )
@@ -353,7 +366,7 @@ IN: cross-compiler
 : write-image ( image file -- )
     <filebw> [ [ write-word ] vector-each ] with-stream ;
 
-: with-image ( quot -- image )
+: with-minimal-image ( quot -- image )
     <namespace> [
         300000 <vector> "image" set
         521 <hashtable> "objects" set
@@ -362,8 +375,11 @@ IN: cross-compiler
         ! since ; ends up using this variable from nested
         ! parser namespaces.
         1000 <vector> "word-fixups" set
-        begin call end
+        call
         "image" get
     ] bind ;
+
+: with-image ( quot -- image )
+    [ begin call end ] with-minimal-image ;
 
 : test-image ( quot -- ) with-image vector>list . ;

@@ -72,6 +72,19 @@ XT primitives[] = {
 	primitive_lesseq,
 	primitive_greater,
 	primitive_greatereq,
+	primitive_gcd,
+	primitive_facos,
+	primitive_fasin,
+	primitive_fatan,
+        primitive_fatan2,
+        primitive_fcos,
+        primitive_fexp,
+        primitive_fcosh,
+        primitive_flog,
+        primitive_fpow,
+        primitive_fsin,
+        primitive_fsinh,
+        primitive_fsqrt,
 	primitive_wordp,
 	primitive_word,
 	primitive_word_primitive,
@@ -121,7 +134,7 @@ XT primitives[] = {
 CELL primitive_to_xt(CELL primitive)
 {
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
+		critical_error("Bad primitive number",primitive);
 
 	return (CELL)primitives[primitive];
 }

@@ -36,7 +36,7 @@ CELL OP(CELL x, CELL y) \
 		case RATIO_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(FIXNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -44,7 +44,7 @@ CELL OP(CELL x, CELL y) \
 		case COMPLEX_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(FIXNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -54,7 +54,7 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(FIXNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -63,15 +63,17 @@ CELL OP(CELL x, CELL y) \
 			if(anytype) \
 				return OP##_anytype(x,y); \
 			else \
-				type_error(FIXNUM_TYPE,y); \
-			return F; \
+			{ \
+				type_error(NUMBER_TYPE,x); \
+				return F; \
+			} \
 		} \
 \
 	case RATIO_TYPE: \
 \
 		if(integerOnly) \
 		{ \
-			type_error(FIXNUM_TYPE,x); \
+			type_error(INTEGER_TYPE,x); \
 			return F; \
 		} \
 \
@@ -91,15 +93,17 @@ CELL OP(CELL x, CELL y) \
 			if(anytype) \
 				return OP##_anytype(x,y); \
 			else \
-				type_error(FIXNUM_TYPE,y); \
-			return F; \
+			{ \
+				type_error(NUMBER_TYPE,x); \
+				return F; \
+			} \
 		} \
 \
 	case COMPLEX_TYPE: \
 \
 		if(integerOnly) \
 		{ \
-			type_error(FIXNUM_TYPE,x); \
+			type_error(INTEGER_TYPE,x); \
 			return F; \
 		} \
 \
@@ -119,8 +123,10 @@ CELL OP(CELL x, CELL y) \
 			if(anytype) \
 				return OP##_anytype(x,y); \
 			else \
-				type_error(FIXNUM_TYPE,y); \
-			return F; \
+			{ \
+				type_error(NUMBER_TYPE,x); \
+				return F; \
+			} \
 		} \
 \
 	case BIGNUM_TYPE: \
@@ -132,7 +138,7 @@ CELL OP(CELL x, CELL y) \
 		case RATIO_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(BIGNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -140,7 +146,7 @@ CELL OP(CELL x, CELL y) \
 		case COMPLEX_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(BIGNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -150,7 +156,7 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			if(integerOnly) \
 			{ \
-				type_error(BIGNUM_TYPE,y); \
+				type_error(INTEGER_TYPE,y); \
 				return F; \
 			} \
 			else \
@@ -159,15 +165,17 @@ CELL OP(CELL x, CELL y) \
 			if(anytype) \
 				return OP##_anytype(x,y); \
 			else \
-				type_error(BIGNUM_TYPE,y); \
-			return F; \
+			{ \
+				type_error(NUMBER_TYPE,x); \
+				return F; \
+			} \
 		} \
 \
 	case FLOAT_TYPE: \
 \
 		if(integerOnly) \
 		{ \
-			type_error(FIXNUM_TYPE,x); \
+			type_error(INTEGER_TYPE,x); \
 			return F; \
 		} \
 \
@@ -184,8 +192,13 @@ CELL OP(CELL x, CELL y) \
 		case FLOAT_TYPE: \
 			return OP##_float(x,y); \
 		default: \
-			type_error(FLOAT_TYPE,y); \
-			return F; \
+			if(anytype) \
+				return OP##_anytype(x,y); \
+			else \
+			{ \
+				type_error(NUMBER_TYPE,x); \
+				return F; \
+			} \
 		} \
 \
 	default: \
@@ -193,8 +206,10 @@ CELL OP(CELL x, CELL y) \
 		if(anytype) \
 			return OP##_anytype(x,y); \
 		else \
-			type_error(FIXNUM_TYPE,x); \
-		return F; \
+		{ \
+			type_error(NUMBER_TYPE,x); \
+			return F; \
+		} \
 	} \
 } \
 \
@@ -202,6 +217,55 @@ void primitive_##OP(void) \
 { \
 	CELL x = dpop(), y = env.dt; \
 	env.dt = OP(x,y); \
+}
+
+#define UNARY_OP(OP,anytype,integerOnly) \
+CELL OP(CELL x) \
+{ \
+	switch(type_of(x)) \
+	{ \
+	case FIXNUM_TYPE: \
+		return OP##_fixnum(x); \
+	case RATIO_TYPE: \
+		if(integerOnly) \
+		{ \
+			type_error(INTEGER_TYPE,x); \
+			return F; \
+		} \
+		else \
+			return OP##_ratio(x); \
+	case COMPLEX_TYPE: \
+		if(integerOnly) \
+		{ \
+			type_error(INTEGER_TYPE,x); \
+			return F; \
+		} \
+		else \
+			return OP##_complex(x); \
+	case BIGNUM_TYPE: \
+		return OP##_bignum(x); \
+	case FLOAT_TYPE: \
+		if(integerOnly) \
+		{ \
+			type_error(INTEGER_TYPE,x); \
+			return F; \
+		} \
+		else \
+			return OP##_float(x); \
+	default: \
+		if(anytype) \
+			return OP##_anytype(x); \
+		else \
+		{ \
+			type_error(NUMBER_TYPE,x); \
+			return F; \
+		} \
+	} \
+} \
+\
+void primitive_##OP(void) \
+{ \
+	env.dt = OP(env.dt); \
 }
 
 bool realp(CELL tagged);
@@ -252,3 +316,5 @@ CELL shiftleft(CELL x, CELL y);
 void primitive_shiftleft(void);
 CELL shiftright(CELL x, CELL y);
 void primitive_shiftright(void);
+CELL gcd(CELL x, CELL y);
+void primitive_gcd(void);

@@ -35,7 +35,7 @@ unit-test
 [ t ]
 [
     "test-word" intern
-    [ "vocabularies" "test" "test-word" ] object-path
+    global [ [ "vocabularies" "test" "test-word" ] object-path ] bind
     =
 ] unit-test
 

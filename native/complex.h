@@ -9,9 +9,9 @@ INLINE COMPLEX* untag_complex(CELL tagged)
 	return (COMPLEX*)UNTAG(tagged);
 }
 
-INLINE CELL tag_complex(RATIO* ratio)
+INLINE CELL tag_complex(COMPLEX* complex)
 {
-	return RETAG(ratio,COMPLEX_TYPE);
+	return RETAG(complex,COMPLEX_TYPE);
 }
 
 COMPLEX* complex(CELL real, CELL imaginary);

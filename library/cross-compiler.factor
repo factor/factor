@@ -29,7 +29,9 @@ IN: cross-compiler
 USE: arithmetic
 USE: kernel
 USE: lists
+USE: namespaces
 USE: parser
+USE: real-math
 USE: stack
 USE: stdio
 USE: streams
@@ -160,6 +162,19 @@ IN: cross-compiler
         <=
         >
         >=
+        gcd
+        facos
+        fasin
+        fatan
+        fatan2
+        fcos
+        fexp
+        fcosh
+        flog
+        fpow
+        fsin
+        fsinh
+        fsqrt
         word?
         <word>
         word-primitive
@@ -211,12 +226,14 @@ IN: cross-compiler
 : version, ( -- )
     "version" [ "kernel" ] search version unit compound, ;
 
-: make-image ( -- )
+: make-image ( name -- )
     #! Make an image for the C interpreter.
     [
         "/library/platform/native/boot.factor" run-resource
     ] with-image
 
-    ! Uncomment this on sparc and powerpc.
-    ! "big-endian" on
-    "factor.image" write-image ;
+    swap write-image ;
+
+: make-images ( -- )
+    "big-endian" off "factor.image.le" make-image
+    "big-endian" on  "factor.image.be" make-image ;

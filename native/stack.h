@@ -1,15 +1,15 @@
-#define UNDERFLOW_CHECKING
+#define STACK_UNDERFLOW_CHECKING
 
-#define UNDERFLOW(stack,bot) ((stack) < UNTAG(bot) + sizeof(ARRAY))
-#define OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + object_size(bot))
+#define STACK_UNDERFLOW(stack,bot) ((stack) < UNTAG(bot) + sizeof(ARRAY))
+#define STACK_OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + object_size(bot))
 
 INLINE void check_stacks(void)
 {
 
-#ifdef UNDERFLOW_CHECKING
-	if(OVERFLOW(env.ds,env.ds_bot))
+#ifdef STACK_UNDERFLOW_CHECKING
+	if(STACK_OVERFLOW(env.ds,env.ds_bot))
 		general_error(ERROR_OVERFLOW,F);
-	if(OVERFLOW(env.cs,env.cs_bot))
+	if(STACK_OVERFLOW(env.cs,env.cs_bot))
 		general_error(ERROR_OVERFLOW,F);
 #endif
 

@@ -42,6 +42,13 @@ public class FactorClassLoader extends ClassLoader
 {
 	private long id;
 	private FactorNamespace table = new FactorNamespace();
+	private ClassLoader delegate;
+
+	//{{{ FactorClassLoader constructor
+	public FactorClassLoader(ClassLoader delegate)
+	{
+		this.delegate = delegate;
+	} //}}}
 
 	//{{{ addDependency() method
 	public void addDependency(String name, FactorClassLoader loader)
@@ -88,7 +95,15 @@ public class FactorClassLoader extends ClassLoader
 				System.err.println("WARNING: unknown object in class loader table for " + this + ": " + obj);
 			}
 
-			return super.loadClass(name,resolve);
+			if(delegate == null)
+				return super.loadClass(name,resolve);
+			else
+			{
+				c = delegate.loadClass(name);
+				if(resolve)
+					resolveClass(c);
+				return c;
+			}
 		}
 		catch(ClassNotFoundException e)
 		{

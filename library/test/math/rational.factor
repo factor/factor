@@ -77,5 +77,15 @@ USE: test
 [ 1000000000000/999999999999 1000000000001/999999999998 < ]
 unit-test
 
-[ 3 ] [ 10/3 >integer ] unit-test
-[ -3 ] [ -10/3 >integer ] unit-test
+! JVM factor doesn't have >integer yet.
+! [ 3 ] [ 10/3 >integer ] unit-test
+! [ -3 ] [ -10/3 >integer ] unit-test
+
+[ 100 ] [ 100 100 gcd ] unit-test
+[ 100 ] [ 1000 100 gcd ] unit-test
+[ 100 ] [ 100 1000 gcd ] unit-test
+[ 4 ] [ 132 64 gcd ] unit-test
+[ 4 ] [ -132 64 gcd ] unit-test
+[ 4 ] [ -132 -64 gcd ] unit-test
+[ 4 ] [ 132 -64 gcd ] unit-test
+[ 4 ] [ -132 -64 gcd ] unit-test

@@ -40,6 +40,7 @@ CELL empty;
 #define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
 #define RATIONAL_TYPE 101 /* INTEGER or RATIO */
 #define REAL_TYPE 102 /* RATIONAL or FLOAT */
+#define NUMBER_TYPE 103 /* COMPLEX or REAL */
 
 bool typep(CELL type, CELL tagged);
 CELL type_of(CELL tagged);

@@ -134,6 +134,11 @@ USE: unparser
 ! Char literal
 : CHAR: ( -- ) skip-blank next-ch parse-ch parsed ; parsing
 
+! Complex literal
+: #{
+    #! Read #{ real imaginary #}
+    scan str>number scan str>number rect> parsed "}" expect ;
+
 ! Comments
 : ( ")" until drop ; parsing
 : ! until-eol drop ; parsing

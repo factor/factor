@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <math.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>

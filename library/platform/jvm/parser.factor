@@ -29,12 +29,24 @@ IN: parser
 USE: namespaces
 USE: stack
 USE: streams
+USE: strings
 
 : parse-file ( file -- list )
     dup <freader> parse-stream ;
 
 : run-file ( path -- )
     parse-file call ;
+
+: parse-resource* ( resource -- list )
+    dup <rreader> swap "resource:" swap cat2 swap parse-stream ;
+
+: parse-resource ( file -- )
+     #! Override this to be slightly more useful for development.
+    global [ "resource-path" get ] bind dup [
+        swap cat2 parse-file
+    ] [
+        drop parse-resource*
+    ] ifte ;
 
 : <custom-parser> ( filename reader interactive docs -- parser )
     interpreter

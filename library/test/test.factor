@@ -58,16 +58,19 @@ USE: vocabularies
         "namespaces/all"
         "format"
         "parser"
+        "parse-number"
         "prettyprint"
         "inspector"
         "vectors"
         "unparser"
         "random"
+        "math/rational"
+        "math/float"
+        "math/complex"
+        "math/irrational"
         !
         "html"
         "httpd"
-        "math"
-        "parse-number"
         "jvm-compiler/all"
     ] [
         test

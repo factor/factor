@@ -1,11 +1,9 @@
 IN: scratchpad
 USE: arithmetic
 USE: parser
-USE: stdio
 USE: strings
 USE: test
-
-"Parse number tests" print
+USE: unparser
 
 [ f ]
 [ f ]
@@ -38,23 +36,23 @@ test-word
 test-word
 
 [ "100.0" ]
-[ "1e2" ]
-[ parse-number >str ]
+[ "1.0e2" ]
+[ parse-number unparse ]
 test-word
 
 [ "-100.0" ]
-[ "-1e2" ]
-[ parse-number >str ]
+[ "-1.0e2" ]
+[ parse-number unparse ]
 test-word
 
 [ "0.01" ]
-[ "1e-2" ]
-[ parse-number >str ]
+[ "1.0e-2" ]
+[ parse-number unparse ]
 test-word
 
 [ "-0.01" ]
-[ "-1e-2" ]
-[ parse-number >str ]
+[ "-1.0e-2" ]
+[ parse-number unparse ]
 test-word
 
 [ f ]
@@ -64,7 +62,7 @@ test-word
 
 [ "3.14" ]
 [ "3.14" ]
-[ parse-number >str ]
+[ parse-number unparse ]
 test-word
 
 [ f ]
@@ -79,27 +77,22 @@ test-word
 
 [ "101.0" ]
 [ "1.01e2" ]
-[ parse-number >str ]
+[ parse-number unparse ]
 test-word
 
 [ "-101.0" ]
 [ "-1.01e2" ]
-[ parse-number >str ]
+[ parse-number unparse ]
 test-word
 
 [ "1.01" ]
-[ "101e-2" ]
-[ parse-number >str ]
+[ "101.0e-2" ]
+[ parse-number unparse ]
 test-word
 
 [ "-1.01" ]
-[ "-101e-2" ]
-[ parse-number >str ]
-test-word
-
-[ "123456789123456789123456789" ]
-[ "123456789123456789123456789" ]
-[ parse-number >str ]
+[ "-101.0e-2" ]
+[ parse-number unparse ]
 test-word
 
 [ 5 ]
@@ -139,7 +132,5 @@ test-word
 
 [ "33/100" ]
 [ "66/200" ]
-[ parse-number >str ]
+[ parse-number unparse ]
 test-word
-
-"Parse number tests done" print

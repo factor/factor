@@ -57,6 +57,8 @@ USE: stack
     "factor.math.FactorMath" "_divide"
     jinvoke-static ; inline
 
+: /f / >float ; inline
+
 : mod ( a b -- a%b )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.math.FactorMath" "mod"
@@ -92,6 +94,9 @@ USE: stack
         "java.lang.Object" "java.lang.Object"  "java.lang.Object"
     ]
     "factor.FactorLib" "branch3" jinvoke-static ;
+
+: compare ( x y [ if x < y ] [ if x = y ] [ if x > y ] -- )
+    >=< call ; inline interpret-only
 
 : bitand ( x y -- x&y )
     #! Bitwise and.
@@ -139,6 +144,9 @@ USE: stack
 : rem ( x y -- remainder )
     [ "double" "double" ] "java.lang.Math" "IEEEremainder"
     jinvoke-static ; inline
+
+: round ( x to -- y )
+    dupd rem - ;
 
 : gcd ( a b -- c )
     [ "java.lang.Number" "java.lang.Number" ]
