@@ -95,6 +95,7 @@ USE: parser
 "/library/debugger.factor"                 run-resource ! debugger
 "/library/platform/jvm/listener.factor"    run-resource ! listener
 "/library/test/test.factor"                run-resource ! test
+"/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
 "/library/telnetd.factor"                  run-resource ! telnetd
 

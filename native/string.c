@@ -157,7 +157,7 @@ void primitive_string_hashcode(void)
 	env.dt = tag_object(bignum(untag_string(env.dt)->hashcode));
 }
 
-INLINE CELL index_of_ch(CELL index, STRING* string, CELL ch)
+CELL index_of_ch(CELL index, STRING* string, CELL ch)
 {
 	if(index < 0)
 		range_error(tag_object(string),index,string->capacity);
@@ -172,12 +172,36 @@ INLINE CELL index_of_ch(CELL index, STRING* string, CELL ch)
 	return -1;
 }
 
-INLINE CELL index_of_str(CELL index, STRING* string, STRING* substring)
+INLINE FIXNUM index_of_str(FIXNUM index, STRING* string, STRING* substring)
 {
-	if(substring->capacity != 1)
-		fatal_error("index_of_str not supported yet",substring);
+	CELL i = index;
+	CELL limit = string->capacity - substring->capacity;
+	CELL scan;
 
-	return index_of_ch(index,string,string_nth(substring,0));
+	if(substring->capacity == 1)
+		return index_of_ch(index,string,string_nth(substring,0));
+
+	if(substring->capacity > string->capacity)
+		return -1;
+
+outer:	if(i <= limit)
+	{
+		for(scan = 0; scan < substring->capacity; scan++)
+		{
+			if(string_nth(string,i + scan)
+				!= string_nth(substring,scan))
+			{
+				i++;
+				goto outer;
+			}
+		}
+
+		/* We reached here and every char in the substring matched */
+		return i;
+	}
+
+	/* We reached here and nothing matched */
+	return -1;
 }
 
 /* index string substring -- index */
@@ -185,12 +209,14 @@ void primitive_index_of(void)
 {
 	CELL ch = env.dt;
 	STRING* string;
-	CELL index;
+	FIXNUM index;
 	CELL result;
 	check_non_empty(ch);
 	string = untag_string(dpop());
 	index = to_fixnum(dpop());
-	if(TAG(ch) == FIXNUM_TYPE)
+	if(index < 0 || index > string->capacity)
+		range_error(tag_object(string),index,string->capacity);
+	else if(TAG(ch) == FIXNUM_TYPE)
 		result = index_of_ch(index,string,to_fixnum(ch));
 	else
 		result = index_of_str(index,string,untag_string(ch));

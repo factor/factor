@@ -121,18 +121,3 @@ void primitive_setenv(void)
 	env.user[e] = value;
 	env.dt = dpop();
 }
-
-void primitive_exit(void)
-{
-	exit(to_fixnum(env.dt));
-}
-
-void primitive_os_env(void)
-{
-	char* name = to_c_string(untag_string(env.dt));
-	char* value = getenv(name);
-	if(value == NULL)
-		env.dt = F;
-	else
-		env.dt = tag_object(from_c_string(getenv(name)));
-}

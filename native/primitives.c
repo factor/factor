@@ -90,7 +90,8 @@ XT primitives[] = {
 	primitive_flush_fd,                     /* 86 */
 	primitive_shutdown_fd,                  /* 87 */
 	primitive_room,                         /* 88 */
-	primitive_os_env                        /* 89 */
+	primitive_os_env,                       /* 89 */
+	primitive_millis                        /* 90 */
 };
 
 CELL primitive_to_xt(CELL primitive)
@@ -99,11 +100,4 @@ CELL primitive_to_xt(CELL primitive)
 		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
 	
 	return (CELL)primitives[primitive];
-}
-
-void primitive_eq(void)
-{
-	check_non_empty(env.dt);
-	check_non_empty(dpeek());
-	env.dt = tag_boolean(dpop() == env.dt);
 }

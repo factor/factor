@@ -22,21 +22,16 @@ USE: vocabularies
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;
 
-: assert= ( x y -- )
-    = assert ;
+: print-test ( input output -- )
+    "TESTING: " write 2list . ;
 
-: must-compile ( word -- )
-    "compile" get [
-        "Checking if " write dup write " was compiled" print
-        dup compile
-        worddef compiled? assert
-    ] [
-        drop
-    ] ifte ;
+: unit-test ( output input -- )
+    2dup print-test
+    swap >r >r clear r> call datastack vector>list r> = assert ;
 
 : test-word ( output input word -- )
-    3dup 3list .
-    append expand assert= ;
+    #! Old-style test.
+    append unit-test ;
 
 : do-not-test-word ( output input word -- )
     #! Flag for tests that are known not to work.
@@ -55,34 +50,33 @@ USE: vocabularies
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
-        "assoc"
-        "auxiliary"
+        "lists/all"
         "combinators"
+        "continuations"
+        "hashtables"
+        "strings"
+        "namespaces/all"
+        "format"
+        "prettyprint"
+        !
+        "html"
+        "auxiliary"
         "compiler"
         "compiler-types"
-        "continuations"
         "dictionary"
-        "format"
-        "hashtables"
-        "html"
         "httpd"
         "inference"
-        "list"
         "math"
         "miscellaneous"
-        "namespaces"
         "parse-number"
-        "prettyprint"
         "primitives"
         "random"
         "reader"
         "recompile"
         "stack"
-        "string"
         "tail"
         "types"
         "vectors"
     ] [
         test
-    ] each
-    "All tests passed." print ;
+    ] each ;

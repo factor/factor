@@ -52,8 +52,24 @@ USE: vocabularies
 : unparse-integer ( num -- str )
     <% integer- integer% %> ;
 
+: >base ( num radix -- string )
+    #! Convert a number to a string in a certain base.
+    <namespace> [ "base" set unparse-integer ] bind ;
+
+: >bin ( num -- string )
+    #! Convert a number to its binary representation.
+    2 >base ;
+
+: >oct ( num -- string )
+    #! Convert a number to its octal representation.
+    8 >base ;
+
+: >hex ( num -- string )
+    #! Convert a number to its hexadecimal representation.
+    16 >base ;
+
 : unparse-str ( str -- str )
-    #! Not done
+    #! Escapes not done
     <% CHAR: " % % CHAR: " % %> ;
 
 : unparse-word ( word -- str )

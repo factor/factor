@@ -1,41 +1,28 @@
 IN: scratchpad
 USE: arithmetic
-USE: combinators
-USE: compiler
 USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
 USE: namespaces
 USE: stack
-USE: stdio
-USE: strings
 USE: test
-
-"Checking hashtables" print
+USE: vectors
 
 16 <hashtable> "testhash" set
 
-: silly-key/value dup sq swap ;
+: silly-key/value dup dup * swap ;
 
 1000 [ silly-key/value "testhash" get set-hash ] times*
 
 [ f ]
-[ 1000 count ]
-[ [ silly-key/value "testhash" get hash = not ] subset ]
-test-word
+[ 1000 count [ silly-key/value "testhash" get hash = not ] subset ]
+unit-test
 
 [ t ]
-[ "testhash" get ]
-[ hashtable? ]
-test-word
+[ "testhash" get hashtable? ]
+unit-test
 
 [ f ]
-[ [ 1 2 | 3 ] ]
-[ hashtable? ]
-test-word
-
-[ f ]
-[ namestack* ]
-[ hashtable? ]
-test-word
+[ [ 1 2 | 3 ] hashtable? ]
+unit-test

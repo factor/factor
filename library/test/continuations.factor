@@ -9,8 +9,6 @@ USE: stack
 USE: stdio
 USE: test
 
-"Checking continuations." print
-
 : callcc1-test ( x -- list )
     [
         "test-cc" set [ ] [
@@ -28,5 +26,5 @@ USE: test
         ] bind
     ] callcc0 "x" get 5 = ;
 
-[ t ] [ ] [ 10 callcc1-test 10 count = ] test-word
-[ t ] [ ] [ callcc-namespace-test ] test-word
+[ t ] [ 10 callcc1-test 10 count = ] unit-test
+[ t ] [ callcc-namespace-test ] unit-test

@@ -162,6 +162,7 @@ IN: cross-compiler
         shutdown-fd
         room
         os-env
+        millis
     ] [
         swap succ tuck primitive,
     ] each drop ;

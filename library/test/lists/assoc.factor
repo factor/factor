@@ -1,0 +1,27 @@
+IN: scratchpad
+USE: lists
+USE: namespaces
+USE: test
+
+[
+    [ "monkey" | 1       ]
+    [ "banana" | 2       ]
+    [ "Java"   | 3       ]
+    [ t        | "true"  ]
+    [ f        | "false" ]
+    [ [ 1 2 ]  | [ 2 1 ] ]
+] "assoc" set
+
+[ t ] [ "assoc" get assoc? ] unit-test
+[ f ] [ [ 1 2 3 | 4 ] assoc? ] unit-test
+[ f ] [ "assoc" assoc? ] unit-test
+
+[ f       ] [ "monkey" f           assoc ] unit-test
+[ f       ] [ "donkey" "assoc" get assoc ] unit-test
+[ 1       ] [ "monkey" "assoc" get assoc ] unit-test
+[ "false" ] [ f        "assoc" get assoc ] unit-test
+[ [ 2 1 ] ] [ [ 1 2 ]  "assoc" get assoc ] unit-test
+
+"is great" "Java" "assoc" get set-assoc "assoc" set
+
+[ "is great" ] [ "Java" "assoc" get assoc ] unit-test

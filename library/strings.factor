@@ -122,6 +122,8 @@ USE: stack
     ] ifte ;
 
 : split ( string split -- list )
+    #! Split the string at each occurrence of split, and push a
+    #! list of the pieces.
     2dup index-of dup -1 = [
         2drop dup str-length 0 = [
             drop f

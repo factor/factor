@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #define INLINE inline static
 
@@ -43,6 +44,7 @@ typedef unsigned char BYTE;
 #include "fixnum.h"
 #include "bignum.h"
 #include "arithmetic.h"
+#include "misc.h"
 #include "string.h"
 #include "fd.h"
 #include "file.h"

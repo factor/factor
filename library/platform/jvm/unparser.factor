@@ -38,6 +38,14 @@ USE: strings
     [ "int" "int" ]
     "java.lang.Integer" "toString" jinvoke-static ;
 
+: >bin ( num -- string )
+    #! Convert a number to its binary representation.
+    2 >base ;
+
+: >oct ( num -- string )
+    #! Convert a number to its octal representation.
+    8 >base ;
+
 : >hex ( num -- string )
     #! Convert a number to its hexadecimal representation.
     16 >base ;
