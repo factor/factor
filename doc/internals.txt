@@ -1,0 +1,541 @@
+FACTOR INTERNALS GUIDE
+
+This guide focuses on portion of Factor that is written in C. The
+sources can be found in the native/ subdirectory.
+
+Factor defines a few new integer types; they will be mentioned without
+further explanation:
+
+- CELL: unsigned word-size field.
+- FIXNUM: signed word-size field.
+
+The 'CELLS' constant is defined as sizeof(CELL). The idea is to be able
+to write expressions like 4*CELLS.
+
+* The memory manager
+
+Factor's memory manager is concentrated in the files memory.c and gc.c.
+
+A guard page is allocated above the memory heap, and an out of memory
+condition is raised if an attempt is made to write to the guard page.
+Out of memory errors are fatal -- the garbage collector must be
+triggered before this happends.
+
+The alloc_guarded(CELL size) function allocates a block of memory with
+guard pages above and below.
+
+There are two memory zones of identical size; only one is in use at any
+one time -- this is denoted as the 'active' zone. The other is the
+'prior' zone. Each zone is identified with a ZONE struct stored in a
+global variable named after the zone's role.
+
+Memory is allocated in the zone using the allot(CELL a) function. This
+function takes the size of a memory block to allocate. Memory blocks are
+aligned on 8 byte boundaries, due to tagged representation of pointers.
+If a non-8-byte-aligned block is passed in, allot() will round up the
+size accordingly. Memory is allocated in a linear fashion, simply by
+incrementing the 'here' field of the 'active' ZONE struct.
+
+Note that allot() cannot be used in an arbitrary fashion, since doing so
+will confuse the garbage collector. See the section on object
+representation below.
+
+* Tagged pointer representation
+
+A ``tagged value'' is a CELL whose three least significant bits are a
+``type tag''. The type tags are defined in types.h:
+
+#define FIXNUM_TYPE 0
+#define WORD_TYPE 1
+#define CONS_TYPE 2
+#define OBJECT_TYPE 3
+#define RATIO_TYPE 4
+#define COMPLEX_TYPE 5
+#define HEADER_TYPE 6
+#define GC_COLLECTED 7
+
+If the tag is OBJECT_TYPE and the remaining bits of the cell are zero --
+that is, if the tagged cell has integer value 3 -- it is taken to be the
+canonical falsity value, and also the empty list. There is a convinient
+macro:
+
+#define F RETAG(0,OBJECT_TYPE)
+
+If the tag is FIXNUM_TYPE, the most significant 29 bits of the cell are
+taken to be a literal integer value. To decode the integer value, the
+cell must be shifted to the right by three bits.
+
+The role of the header tag is described below.
+
+Any other tag signifies that the cell is a pointer to a 8-byte-aligned
+block of memory; the address of the block is obtained by masking off the
+least significant three bits of the tag.
+
+Some macros for working with tagged cells are provided:
+
+- TAG(cell) -- the tag of the cell
+
+- UNTAG(cell) -- mask off the tag, turning it into a pointer
+
+- RETAG(cell,tag) -- set the tag of a cell
+
+- untag_fixnum_fast(cell) -- shift the cell to the left by three bits,
+without actually checking that the tag is FIXNUM_TYPE. If it is not
+FIXNUM_TYPE, a meaningless value is returned.
+
+* Built-in data types
+
+In Factor, all data types are defined as part of the runtime. There are
+no user-defined types.
+
+For some cells, the type of the object they point to is encoded entirely
+in the tagged cell. This is true for the following types:
+
+#define FIXNUM_TYPE 0
+#define WORD_TYPE 1
+#define CONS_TYPE 2
+#define RATIO_TYPE 4
+#define COMPLEX_TYPE 5
+
+All other data types are pointed to by cells with a tag of OBJECT_TYPE,
+and the first cell of the object must then be a tagged cell with tag
+HEADER_TYPE, and the remaining bits must be one of the following values:
+
+#define T_TYPE 7
+#define ARRAY_TYPE 8
+#define BIGNUM_TYPE 9
+#define FLOAT_TYPE 10
+#define VECTOR_TYPE 11
+#define STRING_TYPE 12
+#define SBUF_TYPE 13
+#define PORT_TYPE 14
+#define DLL_TYPE 15
+#define ALIEN_TYPE 16
+
+There are three fundamental functions for working with types:
+
+- type_of(CELL tagged) -- return one of the above values. Never returns
+OBJECT_TYPE or HEADER_TYPE.
+
+- typep(CELL type, CELL tagged) -- return a boolean value. Behaves
+identically to: type_of(tagged) == type.
+
+- type_check(CELL type, CELL tagged) -- raise an error if the tagged
+cell does not point to an object of the given type.
+
+* Object representation
+
+Object representation details can be found in types.[ch].
+
+There is a fundamental principle guiding object representation in
+Factor: When given a tagged cell, one must be able to determine the size
+of the object it points to, and what other objects this object points
+to.
+
+There are two primary classes of objects:
+
+- Conslikes. The type of a conslike is encoded in the tag. Conslikes are
+represented 'naked' in the heap, with no header. These are exactly
+objects of type CONS_TYPE, RATIO_TYPE, and COMPLEX_TYPE. Note that
+WORD_TYPE also has its own tag, however words do have a header.
+
+Since conslikes lack a header, the garbage collector and relocator
+cannot distinglish between them while doing a linear scan of the heap.
+This has an important consequence: the fields of conslikes must all be
+tagged cells.
+
+- Large objects. So called because the have a header and are larger than
+conslikes. Unlike conslikes, an object with a header permits the garbage
+collector and relocator to behave accordingly. For example, because
+strings have a header, the relocator can skip over the characters of a
+string, instead of treating them as tagged cells and crashing.
+
+Tagged cells pointing to headed objects all have a tag OBJECT_TYPE,
+except for pointers to words which have a tag WORD_TYPE.
+
+* Conses and related types
+
+Conslikes are found in the files cons.[ch], ratio.[ch] and complex.[ch].
+
+Conslikes are one of the most important data types in Factor. They use
+exactly two words of storage in the heap. This may seem surprising --
+however, since all pointers to conslikes are tagged as being such, no
+ambiguity results.
+
+The most important is the CONS_TYPE.
+
+Given a tagged cell pointing to a CONS_TYPE, one can call
+untag_cons(CELL cell) to obtain a pointer to a F_CONS. F_CONS is a
+struct defined as:
+
+typedef struct {
+	CELL car;
+	CELL cdr;
+} F_CONS;
+
+Given an untagged pointer to an F_CONS, one can obtain a tagged cell by
+calling tag_cons(F_CONS* cons).
+
+There are corresponding taggers and untaggers for the other two
+conslikes:
+
+untag_ratio(), tag_ratio(), untag_complex(), tag_complex().
+
+* Image format
+
+Image loading and saving is performed by image.[ch] and relocate.[ch].
+
+On startup Factor loads an image file. The image file format depends on
+the CPU word size and byte order, since it is directly loaded into
+memory.
+
+The image begins with two constants that must exactly equal:
+
+- CELL magic -- 0x0f0e0d0c
+- CELL version -- 0
+
+The next value is used to relocate the image:
+
+- CELL relocation_base
+
+The following two are tagged pointers for user space:
+
+- CELL boot -- quotation to interpret on startup.
+- CELL global -- global namespace.
+
+The last value is the image size, for verification purposes:
+
+- CELL size.
+
+* Image relocation
+
+After the image has been loaded into the heap, a relocation procedure is
+performed. The idea behind relocation is as follows: in memory, the
+image contains absolute addresses to other parts of the image. However,
+it is desirable to be able to load the image into another offset of
+memory; depending on absolute memory mapping is unportable and
+troublesome.
+
+When saving the image, Factor stores the start address of the heap into
+the header field relocation_base.
+
+When loading the image, each address must be manipulated like so:
+
+void fixup(CELL* cell)
+{
+	if(TAG(*cell) != FIXNUM_TYPE && *cell != F)
+		*cell += (active.base - relocation_base);
+}
+
+Where 'active.base' is the heap start offset of the current instance,
+and 'relocation_base' is the value found in the image header.
+
+Relocation relies on total knowledge of object structure; it does this
+by inspecting type tags.
+
+Also the unportable 'xt' field of F_WORD structs is reset during
+relocation, by looking up the word's primitive number in a global table
+of primitives.
+
+* Garbage collection
+
+The garbage collector is defined in gc.c.
+
+Factor's garbage collector is a standard two-space copying collector,
+using Cheney's algorithm. Much has been said about this algorithm in the
+literature, and this information will not be duplicated here.
+
+Garbage collection is manually triggered by calling
+maybe_garbage_collection(). This function checks if free memory is below
+a certain threshold, and if so, commences a garbage collection.
+
+*Beware!* Any local variables in the C stack are not visible to the
+garbage collector, and are not taken as roots. Therefore, the only place
+it is safe to call maybe_garbage_collection() is from inside a primitive
+that was called directly from run(), before any values are stored in
+locals.
+
+For example, consider the following is a safe call to
+maybe_garbage_collection():
+
+void primitive_cons(void)
+{
+	CELL car, cdr;
+	maybe_garbage_collection();
+	cdr = dpop();
+	car = dpop();
+	dpush(cons(car,cdr));
+}
+
+The function primitive_cons() is only ever called from run() or
+primitive_execute(). In both these cases, the C stack does not store any
+heap-allocated values in local variables.
+
+However, the following would not be safe, and would result in a runtime
+crash sooner or later:
+
+void primitive_cons(void)
+{
+	CELL cdr = dpop();
+	CELL car = dpop();
+	maybe_garbage_collection();
+	dpush(cons(car,cdr));
+}
+
+The garbage collector would not update the car and cdr local variables
+to point to their new locations; so after it returned, the primitive
+might have allocated pushed a cons cell that refers to oldspace. A crash
+would follow soon after.
+
+* The stacks
+
+The stacks are defined in run.h.
+
+The runtime maintains exactly two stacks -- the data stack and the
+return stack. (The name stack and catch stack are purely library
+phenomena.) Both the data and return stacks are allocated using
+alloc_guarded(), so stack over/underflow checks are done in hardware
+with no runtime overhead.
+
+Both stacks hold tagged cells, and grow down -- that is, pushing
+increments the pointer.
+
+The data and return stacks are scoped by two global variables each:
+
+- CELL ds_bot/cs_bot -- a pointer to the bottom of the data/return
+stack; this is the first value you can write to, right above the guard
+page.
+
+- CELL ds/cs -- a pointer to the value at the top of the data/return
+stack.
+
+A set of inline functions are provided for pushing and popping the
+stacks:
+
+- dpop()/cpop() -- pop a value off the data/return stack.
+
+- dpush()/cpush() -- push a value on the data/return stack.
+
+- dpeek() -- return the top value on the data stack without popping.
+
+- drepl() -- replace the top of the stack with a given value.
+
+You can acess other values using the get() and set() inline functions.
+For example, to get the value on the data stack under the top value,
+without popping:
+
+get(ds - CELLS);
+
+* The inner interpreter
+
+The inner interpreter is defined in the run() function of run.c.
+
+The inner interpreter is a loop. It does not call itself recursively;
+rather, it pushes and pops the Factor return stack to maintain recursive
+state for interpreted definitions.
+
+The currently executing quotation is stored in the global variable 'cf'.
+This is a tagged cell that must point to a CONS_TYPE; otherwise a type
+error is raised. This quotation will be called the ``call frame''.
+
+If the end of the call frame quotation is reached -- that is, if it
+becomes identically equal to F -- the return stack is popped, and the
+popped value becomes the new call frame.
+
+Each step of the interpreter takes the car of the call frame, referred
+to as ``next'', and advances execution state by setting the call frame
+to its cdr.
+
+The type tag of next is inspected. If it is anything but WORD_TYPE, it
+is pushed on the stack using dpush(). Otherwise, the word is executed as
+described below.
+
+When a word is executed by the inner interpreter, first the global
+variable 'executing' is set to an untagged pointer to the F_WORD struct.
+
+Next, the interpreter calls the C function whose address is stored in
+the 'xt' field of the word using the EXECUTE macro:
+
+#define EXECUTE(w) ((XT)(w->xt))()
+
+An 'xt' is just a function that takes no arguments:
+
+typedef void (*XT)(void);
+
+As soon as the function returns, the inner interpreter loop continues
+iterating down the call frame, pushing literals, and executing words,
+then finally it reaches the end of the call frame, pops the return
+stack, and the whole cycle repeats again.
+
+The run() function never returns. The only way to exit the inner
+interpreter is by calling the exit* primitive, defined in the function
+primitive_exit() in misc.c
+
+* Primitives
+
+Primitives are exported to user space via numbers -- each F_WORD struct
+has a 'primitive' field. During relocation, the 'xt' field of the F_WORD
+is set to the corresponding C function pointer by looking up the
+primitive number in a table.
+
+Six fundamental primitives are:
+
+- #0: undefined() -- undefined words have this primitive/XT. It simply
+raises an error.
+
+- #1: docol() -- compound definitions have this primitive/XT. Recall
+that the inner interpreter sets the 'executing' global variable to the
+word object before calling its XT. The docol() function accesses the
+quotation stored in the 'parameter' field of the executing word, and
+calls it. What exactly is meant by 'calls' is described below.
+
+- #2: dosym() -- symbol definitions have this primitive/XT. It simply
+pushes the executing word on the data stack, thus making it behave like
+a literal.
+
+- #3: primitive_execute() -- defined in user space as 'execute' in the
+'words' vocabulary. Pops a word off the datastack, stores it in the
+'executing' global variable, and calls its XT.
+
+- #4: primitive_call() -- defined in user space as 'call' in the
+'kernel' vocabulary. Pops a cons cell off the datastack, and calls it.
+What exactly is meant by 'calls' is described below.
+
+- #5: primitive_ifte() -- defined in user space as 'ifte' in the
+'kernel' vocabulary. Executes one of two quotations on the stack,
+depending on a boolean value stored below.
+
+A 'boolean value' is of course 'false' if it is identically equal to F,
+and 'true' otherwise.
+* Quotations
+
+Notice that docol(), primitive_call() and primitive_ifte() all take a
+quotation from some source, and 'call' it. They do this using the inline
+function call():
+
+INLINE void call(CELL quot)
+{
+	/* tail call optimization */
+	if(callframe != F)
+	{
+		cpush(tag_word(executing));
+		cpush(callframe);
+	}
+	callframe = quot;
+}
+
+Indeed, this function does not actually call the quotation itself. It
+merely changes inner interpreter state in such a way that the next
+iteration of the interpreter loop will begin executing this quotation;
+then when it is done, the previous quotation is popped off the return
+stack.
+
+Two final points should be said about call(). It also pushes the
+currently executing word for the profiler's sake; the inner interpreter
+itself does not use the word that was pushed on the return stack.
+
+Finally, call() performs tail call optimization. If the current call
+frame is F -- in other words, if the occurrence of docol(),
+primitive_call() or primitive_ifte() was the last in a quotation -- the
+call frame is not pushed on the return stack, since there is nothing to
+return to. If F was pushed on the return stack, it would simply be
+popped again at a later time.
+
+* User environment
+
+At startup, the last thing done by the C code is setting the call frame
+to point to the boot quotation (as defined in the image header). Then,
+it calls run() and execution of the boot quotation begins.
+
+User space makes use of a 'user environment' to store state that does
+not belong on the data stack. The user environment is roughly like
+global variables, however their number is fixed.
+
+The user environment consists of 16 numbered slots, each slot holding
+one tagged cell. User environment slots are accessed using the getenv (
+slot -- value ) and setenv ( value slot -- ) primitives. The slots have
+the following assignment:
+
+#define STDIN_ENV      0
+#define STDOUT_ENV     1
+#define STDERR_ENV     2
+#define NAMESTACK_ENV  3
+#define GLOBAL_ENV     4
+#define BREAK_ENV      5
+#define CATCHSTACK_ENV 6
+#define CPU_ENV        7
+#define BOOT_ENV       8
+#define RUNQUEUE_ENV   9
+#define ARGS_ENV       10
+#define OS_ENV         11
+#define RESERVED_ENV_1 12
+#define RESERVED_ENV_2 13
+#define RESERVED_ENV_3 14
+#define RESERVED_ENV_4 15
+
+STDIN_ENV and STDOUT_ENV are set by the I/O code to point to F_PORTs for
+the appropriate system streams. STDERR_ENV is unused.
+
+NAMESTACK_ENV is not used by the runtime; it is for user space use only.
+GLOBAL_ENV is set by the runtime on startup to the same value as the
+'global' field of the image header. User space makes use of
+NAMESTACK_ENV and GLOBAL_ENV to implement named variables and nested
+namespaces. Both values are initialized in 'init-namespaces' of the
+'namespaces' vocabulary.
+
+BREAK_ENV is a quotation, set by user space. This quotation is called
+when the runtime raises an error. CATCHSTACK_ENV is not set or read by
+the runtime, it is for user space use only. Both are initialized in
+'init-errors' of the 'errors' vocabulary.
+
+CPU_ENV is set by the runtime to one of the two strings "x86" or
+"unknown". It is not intended to be written. The 'cpu' word of the
+'kernel' vocabulary is defined for reading it.
+
+BOOT_ENV is set by the runtime to the same value as the 'boot' field of
+the image header -- that is, the boot quotation. If it is set to a
+different value and then an image is saved, the new image will have this
+boot quotation. This can be used to make 'turnkey' images that start a
+custom app, instead of the listener loop.
+
+RUNQUEUE_ENV is used exclusively by user space, for threading. See the
+'threads' vocabulary.
+
+ARGS_ENV is set by the runtime to a linked list of strings,
+corresponding to command line arguments given to the Factor runtime
+executable. The first of these arguments will always be an image name.
+
+OS_ENV is set by the runtime to one of the two strings "unix" or
+"win32". It is not intended to be written. The 'os' word of the 'kernel'
+vocabulary is defined for reading it.
+
+The remaining four user environment slots must not be read or written by
+user space code.
+
+* Error handling
+
+Error handling goes on inside the error.c file, as well as run.c.
+
+When the inner interpreter loop begins, setjmp is called to save the
+current C stack in the global variable 'toplevel'.
+
+When an error is raised inside the runtime, one of two things happen:
+
+- BREAK_ENV is not yet set, so the interpreter prints an error message
+and immediately exits. This is the case during bootstrapping.
+
+- BREAK_ENV is set, in which case the error is stored in the
+'thrown_error' global variable, and the error handler long-jumps to the
+top level. Execution then resumes at the inner interpreter loop, which
+then checks if there was a thrown error, and if so, it pushes the error
+on the data stack, and calls the quotation stored in BREAK_ENV.
+
+User space takes over from here. The BREAK_ENV is defined as follows in
+the 'init-error-handler' word of debugger.factor:
+
+[ dup save-error rethrow ] 5 setenv
+
+The 'save-error' word snapshots the current stacks -- this is how :s,
+:r, :n and :c work. 'rethrow' then pops a continuation from the catch
+stack and calls it, which results in a certain 'catch' block being
+executed.
