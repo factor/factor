@@ -39,6 +39,8 @@
 
 + listener/plugin:
 
+- lineno/file for native
+- jedit for native with socket communication
 - lineno/file for shuffle defs
 - balance needs USE:
 - input style after clicking link

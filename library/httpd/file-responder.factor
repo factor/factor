@@ -109,7 +109,7 @@ USE: httpd-responder
 
 : parse-object-name ( filename -- argument filename )
     dup [
-        dup #"(.*?)\?(.*)" groups dup [ nip call ] when swap
+        dup "(.*?)\\?(.*)" groups dup [ nip call ] when swap
     ] [
         drop f "/"
     ] ifte ;

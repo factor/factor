@@ -167,8 +167,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		str.parsing = new StringLiteral(str,true);
 		FactorWord ch = define("builtins","CHAR:");
 		ch.parsing = new CharLiteral(ch);
-		FactorWord raw = define("builtins","#\"");
-		raw.parsing = new StringLiteral(raw,false);
 
 		/* constants */
 		FactorWord t = define("builtins","t");
@@ -208,18 +206,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		oct.parsing = new Base(oct,8);
 		FactorWord hex = define("builtins","HEX:");
 		hex.parsing = new Base(hex,16);
-
-		/* specials */
-		FactorWord dispatch = define("builtins","#");
-		dispatch.parsing = new Dispatch(dispatch);
-		FactorWord unreadable = define("builtins","#<");
-		unreadable.parsing = new Unreadable(unreadable);
-
-		// #: is not handled with a special dispatch. instead, when
-		// a word starting with #: is passed to intern(), it creates
-		// a new symbol
-		FactorWord passthru = define("builtins","#:");
-		passthru.parsing = new PassThrough(passthru);
 
 		/* vocabulary parsing words */
 		FactorWord noParsing = define("builtins","POSTPONE:");

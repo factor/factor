@@ -49,7 +49,7 @@ public class FactorDocComment implements FactorExternalizable
 		if(stack)
 			return "( " + msg + " )\n";
 		else
-			return "#!" + msg + "\n";
+			return "#! " + msg + "\n";
 	}
 
 	public boolean isStackComment()

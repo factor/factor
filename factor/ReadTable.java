@@ -52,8 +52,7 @@ public class ReadTable
 
 		DEFAULT_READTABLE.setCharacterType('!',ReadTable.CONSTITUENT);
 		DEFAULT_READTABLE.setCharacterType('"',ReadTable.DISPATCH);
-		DEFAULT_READTABLE.setCharacterType('#',ReadTable.DISPATCH);
-		DEFAULT_READTABLE.setCharacterRange('$','[',ReadTable.CONSTITUENT);
+		DEFAULT_READTABLE.setCharacterRange('#','[',ReadTable.CONSTITUENT);
 		DEFAULT_READTABLE.setCharacterType('\\',ReadTable.SINGLE_ESCAPE);
 		DEFAULT_READTABLE.setCharacterRange(']','~',ReadTable.CONSTITUENT);
 
