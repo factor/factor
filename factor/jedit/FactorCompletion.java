@@ -29,6 +29,7 @@
 
 package factor.jedit;
 
+import factor.*;
 import java.util.*;
 import javax.swing.ListCellRenderer;
 import org.gjt.sp.jedit.textarea.*;
@@ -53,8 +54,21 @@ public class FactorCompletion extends SideKickCompletion
 		this.data = data;
 	} //}}}
 
+	public String getLongestPrefix()
+	{
+		return "";
+	}
+
 	public void insert(int index)
 	{
+		Macros.Recorder recorder = view.getMacroRecorder();
+
+		String insert = ((FactorWord)get(index)).name.substring(
+			word.length());
+
+		if(recorder != null)
+			recorder.recordInput(insert,false);
+		textArea.setSelectedText(insert);
 	}
 
 	public int getTokenLength()
@@ -64,7 +78,23 @@ public class FactorCompletion extends SideKickCompletion
 
 	public boolean handleKeystroke(int selectedIndex, char keyChar)
 	{
-		return false;
+		Macros.Recorder recorder = view.getMacroRecorder();
+
+		boolean ws = (ReadTable.DEFAULT_READTABLE
+			.getCharacterType(keyChar)
+			== ReadTable.WHITESPACE);
+
+		if(ws)
+			insert(selectedIndex);
+
+		if(keyChar != '\n')
+		{
+			if(recorder != null)
+				recorder.recordInput(1,keyChar,false);
+			textArea.userInput(keyChar);
+		}
+
+		return !ws;
 	}
 
 	public ListCellRenderer getRenderer()

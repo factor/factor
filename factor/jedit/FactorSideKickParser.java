@@ -172,10 +172,7 @@ public class FactorSideKickParser extends SideKickParser
 		SideKickParsedData _data = SideKickParsedData
 			.getParsedData(editPane.getView());
 		if(!(_data instanceof FactorParsedData))
-		{
-			System.err.println("exit 1");
 			return null;
-		}
 		FactorParsedData data = (FactorParsedData)_data;
 
 		Buffer buffer = editPane.getBuffer();
@@ -192,7 +189,7 @@ public class FactorSideKickParser extends SideKickParser
 			if(ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
 				== ReadTable.WHITESPACE)
 			{
-				wordStart = i;
+				wordStart = i + 1;
 				break;
 			}
 		}
