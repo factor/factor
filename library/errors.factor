@@ -53,8 +53,8 @@ USE: vectors
             "error-line" set
             "error-col" set
             "error" set
-            datastack >pop> "error-datastack" set
-            callstack >pop> >pop> "error-callstack" set
+            datastack "error-datastack" set
+            callstack "error-callstack" set
             namestack "error-namestack" set
             catchstack "error-catchstack" set
         ] bind

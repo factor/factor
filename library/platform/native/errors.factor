@@ -35,12 +35,3 @@ USE: vectors
 : catchstack ( -- cs ) catchstack* clone ;
 : set-catchstack* ( cs -- ) 6 setenv ;
 : set-catchstack ( cs -- ) clone set-catchstack* ;
-
-DEFER: >c
-DEFER: throw
-
-: init-errors ( -- )
-    64 <vector> set-catchstack*
-    [ 1 exit* ] >c ( last resort )
-    [ default-error-handler 1 exit* ] >c
-    [ throw ] 5 setenv ( kernel calls on error ) ;

@@ -25,14 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: namespaces
-DEFER: init-namespaces
-
 IN: vectors
 DEFER: vector=
-
-IN: errors
-DEFER: init-errors
 
 IN: kernel
 USE: arithmetic
@@ -104,12 +98,6 @@ USE: vectors
         [ 102 | "fixnum/bignum/ratio/float" ]
         [ 103 | "fixnum/bignum/ratio/float/complex" ]
     ] assoc ;
-
-: toplevel ( -- )
-    init-namespaces
-    init-errors
-    0 <vector> set-datastack
-    0 <vector> set-callstack ;
 
 : java? f ;
 : native? t ;

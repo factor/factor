@@ -1,5 +1,5 @@
-#define STACK_UNDERFLOW(stack,bot) ((stack) < UNTAG(bot) + sizeof(ARRAY))
-#define STACK_OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + object_size(bot))
+#define STACK_UNDERFLOW(stack,bot) ((stack) < UNTAG(bot))
+#define STACK_OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + STACK_SIZE)
 
 void reset_datastack(void);
 void reset_callstack(void);

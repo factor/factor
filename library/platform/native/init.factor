@@ -35,6 +35,10 @@ USE: stdio
 USE: streams
 USE: threads
 USE: words
+USE: vectors
+
+: init-errors ( -- )
+    64 <vector> set-catchstack* ;
 
 : init-gc ( -- )
     [ garbage-collection ] 7 setenv ;
@@ -42,10 +46,10 @@ USE: words
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
     init-gc
+    init-errors
     init-namespaces
     init-threads
     init-stdio
-    init-errors
     "HOME" os-env [ "." ] unless* "~" set
     10 "base" set
     "/" "/" set

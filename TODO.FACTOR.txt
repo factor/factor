@@ -6,7 +6,6 @@
 - jvm factor -- still supporting httpd?
 - make inferior.factor nicer to use
 - telnetd printing signal 13, and other problems
-- check error callstack, not enough >pop>?
 
 + docs:
 
@@ -74,7 +73,6 @@
 - namespace clone drops static var bindings
 - ditch expand
 - set-object-path
-- more readable traces
 - telnetd: send errors on socket
 - contains ==> contains?
 

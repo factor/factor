@@ -41,11 +41,17 @@ USE: words
 
 : cli-args ( -- args ) 10 getenv ;
 
+: init-error-handler ( -- )
+    [ 1 exit* ] >c ( last resort )
+    [ default-error-handler 1 exit* ] >c
+    [ throw ] 5 setenv ( kernel calls on error ) ;
+
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
     #! quotation.
     boot
 
+    init-error-handler
     init-random
     "stdio" get <ansi-stream> "stdio" set
 

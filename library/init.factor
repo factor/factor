@@ -117,5 +117,8 @@ USE: words
     [
         interpreter-loop
     ] [
-        [ default-error-handler suspend ] when*
+        [
+            default-error-handler
+            "top-level-continuation" get call
+        ] when*
     ] catch ;

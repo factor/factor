@@ -40,8 +40,8 @@ typedef unsigned short CHAR;
 and allows profiling. */
 #define EXTRA_CALL_INFO
 
-#include "error.h"
 #include "memory.h"
+#include "error.h"
 #include "gc.h"
 #include "types.h"
 #include "array.h"

@@ -68,10 +68,3 @@ USE: vectors
     #! the point after the callcc1 call, and places X at the top
     #! of the original datastack.
     [ [ continue1 ] (callcc) ] reify ;
-
-: suspend ( -- )
-    "top-level-continuation" get dup [
-        call
-    ] [
-        toplevel
-    ] ifte ;

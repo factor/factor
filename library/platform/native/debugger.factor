@@ -94,6 +94,7 @@ USE: vectors
         signal-error
         io-task-twice-error
         no-io-tasks-error
+        profiling-disabled-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

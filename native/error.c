@@ -30,11 +30,6 @@ void throw_error(CELL error)
 	dpush(error);
 	/* Execute the 'throw' word */
 	call(userenv[BREAK_ENV]);
-	if(callframe == 0)
-	{
-		/* Crash at startup */
-		fatal_error("Error thrown before BREAK_ENV set",error);
-	}
 
 	/* Return to run() method */
 	siglongjmp(toplevel,1);
@@ -43,6 +38,20 @@ void throw_error(CELL error)
 void general_error(CELL error, CELL tagged)
 {
 	CONS* c = cons(error,tag_cons(cons(tagged,F)));
+	if(userenv[BREAK_ENV] == 0)
+	{
+		/* Crash at startup */
+		fprintf(stderr,"Error thrown before BREAK_ENV set\n");
+		fprintf(stderr,"Error #%d\n",to_fixnum(error));
+		if(error == ERROR_TYPE)
+		{
+			fprintf(stderr,"Type #%d\n",to_fixnum(
+				untag_cons(tagged)->car));
+			fprintf(stderr,"Got type #%d\n",type_of(
+				untag_cons(tagged)->cdr));
+		}
+		exit(1);
+	}
 	throw_error(tag_cons(c));
 }
 

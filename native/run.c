@@ -129,7 +129,7 @@ void primitive_setenv(void)
 void primitive_profiling(void)
 {
 #ifndef EXTRA_CALL_INFO
-	general_error(PROFILING_DISABLED,F);
+	general_error(ERROR_PROFILING_DISABLED,F);
 #else
 	CELL d = dpop();
 	if(d == F)

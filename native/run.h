@@ -43,11 +43,6 @@ CELL userenv[USER_ENV];
 /* This ensures that words in the user's interpreter do not count */
 CELL profile_depth;
 
-void signal_handler(int signal, siginfo_t* siginfo, void* uap);
-void profiling_step(int signal, siginfo_t* siginfo, void* uap);
-void init_signals(void);
-void clear_environment(void);
-
 INLINE CELL dpop(void)
 {
 	ds -= CELLS;
@@ -99,6 +94,11 @@ INLINE void call(CELL quot)
 	}
 	callframe = quot;
 }
+
+void signal_handler(int signal, siginfo_t* siginfo, void* uap);
+void profiling_step(int signal, siginfo_t* siginfo, void* uap);
+void init_signals(void);
+void clear_environment(void);
 
 void run(void);
 void undefined(void);
