@@ -4,18 +4,7 @@ IN: streams
 USING: io-internals errors hashtables kernel stdio strings
 namespaces unparser generic ;
 
-TUPLE: server port ;
-GENERIC: accept
-
-M: server stream-close ( stream -- )
-    server-port close-port ;
-
-C: server ( port -- stream )
-    #! Starts listening on localhost:port. Returns a stream that
-    #! you can close with stream-close, and accept connections from
-    #! with accept. No other stream operations are supported.
-    [ >r server-socket r> set-server-port ] keep ;
-
+! A TCP client socket stream.
 TUPLE: client-stream host ;
 
 C: client-stream ( host port in out -- stream )
@@ -25,8 +14,20 @@ C: client-stream ( host port in out -- stream )
     dup stream-flush ;
 
 : <client> ( host port -- stream )
+    #! Connect to a port number on a TCP host.
     2dup client-socket <client-stream> ;
 
+! A server socket that listens on a port for TCP connections.
+TUPLE: server port ;
+GENERIC: accept ( server -- socket )
+
+C: server ( port -- stream )
+    #! Starts listening for TCP connections on localhost:port.
+    [ >r server-socket r> set-server-port ] keep ;
+
+M: server stream-close ( stream -- )
+    server-port close-port ;
+
 M: server accept ( server -- client )
-    #! Accept a connection from a server socket.
+    #! Accept a TCP connection from a server socket.
     server-port blocking-accept <client-stream> ;

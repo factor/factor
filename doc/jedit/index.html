@@ -90,43 +90,29 @@ color: #666699;
 
 <h1 align="center">Factor plugin</h1>
 
-<p><a href="http://factor.sourceforge.net">Factor</a> is a programming language with postfix syntax. The Factor plugin for <a href="http://www.jedit.org">jEdit</a> provides many nifty time-saving features for working with Factor code.<p>
+<p>Factor is a programming language with postfix syntax. The Factor plugin for <a href="http://www.jedit.org">jEdit</a> makes for a more pleasant development experience. It provides many time-saving features for working with Factor code. This document only explains the plugin. For information on Factor itself, including extensive documentation in PDF format, see the Factor web site: <a href="http://factor.sourceforge.net">http://factor.sourceforge.net</a>. <p>
 
 <h2 class="fancy-heading">Introduction</h2>
 
-If Factor is compiled with the jEdit classes in the class path, the resulting <code>Factor.jar</code> can then be placed in <code>$HOME/.jedit/jars/</code> and loaded by jEdit.<p>
+The <code>Factor.jar</code> file shipped with the Factor distribution can then be placed in <code>$HOME/.jedit/jars/</code> and loaded by jEdit.<p>
 
-Note that while the Factor plugin requires jEdit 4.2pre15, you will need to download and install the Factor edit mode separately from the <a href="http://factor.sf.net">Factor home page</a>. If you are running jEdit 4.2final, this edit mode is already included.
+<h2 class="fancy-heading">Communication with an external Factor instance</h2>
 
-<h2 class="fancy-heading">Embedded interpreter</h2>
+<p>The Factor plugin needs to communicate with a running instance of a Factor runtime for most features to work. To set up the external instance, go to <b>Plugins</b>&gt;<b>Plugin Options</b>&gt;<b>Factor</b>. You will need to supply a full path to the Factor runtime, as well as a path to the image file.</p>
 
-<p>The plugin embeds a Factor interpreter inside jEdit that gets lazily loaded when first used. The interpreter communicates with the plugin and vice versa to perform various useful tasks.</p>
+<h2 class="fancy-heading">Embedded listener</h2>
 
-<p>The <b>Run current file</b> and <b>Evaluate selection</b> commands can be used to send text from jEdit to the interpreter.<p>
+<p>The embedded listener can be accessed by selecting the <b>Factor</b> shell in the Console plugin. The <b>Run current file</b> and <b>Evaluate selection</b> commands can be used to send text from jEdit to the listener.<p>
 
 <img class="nice-box" src="listener.png">
 
-<p>If you have CFactor installed, it is possible to embed it in jEdit using the <code>inferior.factor</code> socket protocol. Add the following to your <code>$HOME/.factor-rc</code>:
+<h2 class="browsing">Browsing</h2>
 
-<PRE class="nice-box"><SPAN CLASS="syntax17">USE:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">telnetd</SPAN>
-<SPAN CLASS="syntax17">:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">inf</SPAN> <SPAN CLASS="syntax5">9999</SPAN> telnetd <SPAN CLASS="syntax17">;</SPAN>
-<SPAN CLASS="syntax17">:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">cfactor</SPAN> <SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">localhost</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> <SPAN CLASS="syntax5">9999</SPAN> &lt;client&gt; inferior-client <SPAN CLASS="syntax17">;</SPAN>
-</PRE>
-</div>
+<p>The <b>See word at caret</b> command displays a popup showing the word definition at the caret.</p>
 
-<p>Now, start CFactor and type the following phrase:</p>
+<img class="nice-box" src="see.png">
 
-<pre class="nice-box">inf</pre>
-
-<p>Then open the Factor listener window in jEdit, and type the following phrase:</p>
-
-<pre class="nice-box">cfactor</pre>
-
-<p>You will now be talking to the CFactor interpreter prompt. Styled text output and hyperlinks will be transmitted using the <code>inferior.factor</code> socket protocol.</p>
-
-<h2 class="fancy-heading">Cross-referencing</h2>
-
-<p>The <b>Edit word at caret</b> command opens the source file containing the definition of the word at the caret. <b>See word at caret</b> shows the definition of the word at the caret in the Factor listener window.</p>
+<p>The <b>Edit word at caret</b> command opens the source file containing the definition of the word at the caret.</p>
 
 <p>The <b>Edit word</b> command opens a dialog box where the name of a word can be typed -- while the word is being typed, the possible completions is instantly updated, and selecting one opens the source file containing the definition of that word:</p>
 
@@ -137,11 +123,13 @@ Note that while the Factor plugin requires jEdit 4.2pre15, you will need to down
 <pre class="nice-box"><SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">/home/slava/Factor/</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> <SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">resource-path</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> set
 </PRE>
 
+<h2 class="fancy-heading">Cross-referencing</h2>
+
 <p>The <b>Word usages at caret</b> command displays a list of words that refer to the word at the caret in the Factor listener window. Clicking on words in the listener shows a popup menu with various useful actions.</p>
 
 <img class="nice-box" src="usages.png">
 
-<p>Here we see the result of selecting <b>Describe</b>.</p>
+<p>Here we see the result of selecting <b>See</b>.</p>
 
 <img class="nice-box" src="describe.png">
 

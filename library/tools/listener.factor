@@ -14,7 +14,7 @@ global [
 ] bind
 
 : prompt. ( text -- )
-    "prompt" style write-attr
+    [ [[ "bold" t ]] ] write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input

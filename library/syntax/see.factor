@@ -44,7 +44,15 @@ presentation unparser words ;
     \ parsing prettyprint-prop
     \ inline prettyprint-prop ;
 
-: comment. ( comment -- ) "comments" style write-attr ;
+: comment-style
+    #! Feel free to redefine this!
+    [
+        [[ "ansi-fg" "0" ]]
+        [[ "ansi-bg" "2" ]]
+        [[ "fg" [ 255 0 0 ] ]]
+    ] ;
+
+: comment. ( comment -- ) comment-style write-attr ;
 
 : infer-effect. ( indent effect -- indent )
     " " write

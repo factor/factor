@@ -69,3 +69,10 @@ SYMBOL: parser-stream
     ] [
         parser-stream get stream-close rethrow
     ] catch ;
+
+! Standard actions protocol for presentations output to
+! attributed streams.
+: <actions> ( path alist -- alist )
+    #! For each element of the alist, change the value to
+    #! path " " value
+    [ uncons >r over " " r> cat3 cons ] map nip ;

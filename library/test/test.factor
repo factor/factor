@@ -71,7 +71,6 @@ prettyprint stdio strings words vectors unparser ;
         "unparser"
         "random"
         "stream"
-        "styles"
         "math/bignum"
         "math/bitops"
         "math/gcd"

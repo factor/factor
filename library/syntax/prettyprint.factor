@@ -27,7 +27,7 @@ M: object prettyprint* ( indent obj -- indent )
         " ] search" ,
     ] make-string ;
 
-: word-actions ( search -- list )
+: word-actions ( -- list )
     [
         [[ "See"     "see"     ]]
         [[ "Push"    ""        ]]
@@ -36,19 +36,28 @@ M: object prettyprint* ( indent obj -- indent )
         [[ "Usages"  "usages." ]]
     ] ;
 
+: browser-attrs ( word -- style )
+    #! Return the style values for the HTML word browser
+    dup word-vocabulary [ 
+        swap word-name "browser-link-word" swons 
+        swap "browser-link-vocab" swons 
+        2list
+    ] [
+        drop [ ]  
+    ] ifte* ;
+
 : word-attrs ( word -- attrs )
     #! Words without a vocabulary do not get a link or an action
     #! popup.
     dup word-vocabulary [
-        word-link word-actions <actions> "actions" swons unit
+         dup word-link word-actions <actions> "actions" swons unit
+         swap browser-attrs append
     ] [
         drop [ ]
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-name
-    swap dup word-attrs swap word-style append
-    write-attr ;
+    dup word-name swap word-attrs write-attr ;
 
 M: word prettyprint* ( indent word -- indent )
     dup parsing? [
