@@ -58,7 +58,7 @@ C: hand ( world -- hand )
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
-    dup shape-pos over set-hand-click-pos
+    dup screen-pos over set-hand-click-pos
     dup hand-gadget over relative over set-hand-click-rel
     [ hand-buttons unique ] keep set-hand-buttons ;
 

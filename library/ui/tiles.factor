@@ -6,6 +6,7 @@ USING: generic kernel math namespaces ;
 ! A tile is a gadget with a caption. Dragging the caption
 ! moves the gadget. The title bar also has buttons for
 ! performing various actions.
+TUPLE: tile original ( size ) ;
 
 : click-rel ( gadget -- point )
     screen-pos
@@ -14,8 +15,12 @@ USING: generic kernel math namespaces ;
 : move-tile ( tile -- )
     dup click-rel hand screen-pos + >rect rot move-gadget ;
 
+: start-resizing ( tile -- )
+    dup shape-size rect> swap set-tile-original ;
+
 : resize-tile ( tile -- )
-    dup hand relative >rect rot resize-gadget ;
+    dup screen-pos hand hand-click-pos - over tile-original +
+    over hand relative + >rect rot resize-gadget ;
  
 : raise ( gadget -- )
     dup gadget-parent >r dup unparent r> add-gadget ;
@@ -44,11 +49,14 @@ USING: generic kernel math namespaces ;
     dup [ unparent ] [ close-tile ] set-action
     dup [ raise ] [ raise ] set-action
     dup [ move-tile ] [ move-tile ] set-action
-    [ resize-tile ] [ resize-tile ] set-action ;
+    dup [ resize-tile ] [ resize-tile ] set-action
+    dup [ start-resizing ] [ start-resizing ] set-action
+    [ drop ] [ button-down 1 ] set-action ;
 
 : <resizer> ( -- gadget )
     <frame>
     dup [ resize-tile ] [ drag 1 ] link-action
+    dup [ start-resizing ] [ button-down 1 ] link-action
     0 0 40 10 <plain-rect> <gadget>
     dup t reverse-video set-paint-prop
     over add-right ;
@@ -59,7 +67,6 @@ USING: generic kernel math namespaces ;
      [ <resizer> swap add-bottom ] keep
      [ add-center ] keep ;
 
-TUPLE: tile ;
 C: tile ( child caption -- tile )
     [ f line-border swap set-delegate ] keep
     [ >r tile-content r> add-gadget ] keep

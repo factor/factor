@@ -1,10 +1,3 @@
-I wrote down some issues I found while reading the devel-guide.pdf:
-- page 10, colon definition first paragraph: "colon definitino" -> "colon definition"
-- p. 18 and 19, quadratic-d and the following table: the swap before sq should be rot
-- p. 67, definition of class: "distinglishes" -> "distinguishes"
-- p. 69, last paragraph: "user defined tupes" -> "user defined tuples"
-- p. 70, definition of false(f): "sigleton" -> "singleton"
-
 + plugin:
 
 - word preview for remote words
@@ -14,15 +7,12 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 
 + ui:
 
-- single-pixel shuffle
-- resizing: drag relative to initial click pos
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - auto-updating inspector
 - fix up the min thumb size hack
 - faster layout
 - faster repaint
-- check broken
 - frame gap
 
 + compiler/ffi:
