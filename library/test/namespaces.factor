@@ -91,4 +91,7 @@ test-word
 [ <namespace> [ f "some-global" set "some-global" get ] bind ]
 test-word
 
+! I did a n> in extend and forgot the obvious case
+[ t ] [ "dup" intern dup ] [ [ ] extend = ] test-word
+
 "Namespace tests passed." print

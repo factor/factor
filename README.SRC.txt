@@ -17,6 +17,7 @@ build.xml - Ant buildfile for Java interpreter.
 factor/ - source code for Factor interpreter written in Java.
 org/objectweb/asm/ - helper library for Java interpreter.
 Factor.jar - compiled, stand-alone Java interpreter
+library/platform/jvm - JVM-specific Factor code
 
 C interpreter
 -------------
@@ -30,9 +31,6 @@ native/ - source code for Factor interpreter written in C.
 native/build.sh - build script for C interpreter.
 native/f - compiled C interpreter - needs image to run
 native/factor.image - cross-compiler output
-
-library/ - Factor code shared between Java and C backends
-library/platform/jvm - Java interpreter-specific code
 library/platform/native - C interpreter-specific code
 
 Notes on the C interpreter

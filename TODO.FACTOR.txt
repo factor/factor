@@ -1,7 +1,6 @@
 + native:
 
-- parsing: HEX:, #\, |
-- prettyprint-1
+- parsing: #\, |
 - {...} vectors
 - parsing should be parsing
 - telnetd: listening on a socket
@@ -47,6 +46,7 @@
 
 + misc:
 
+- error handling and threads
 - should i -i inf -inf be parsing words?
 - fix multithreading
 - namespace clone drops static var bindings

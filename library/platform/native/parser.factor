@@ -100,7 +100,7 @@ USE: unparser
 : parsing ( -- ) t "parsing" word set-word-property ;
 
 : <parsing "line" set 0 "pos" set ;
-: parsing> f "line" set f "pos" set ;
+: parsing> "line" off "pos" off ;
 : end? ( -- ? ) "pos" get "line" get str-length >= ;
 : ch ( -- ch ) "pos" get "line" get str-nth ;
 : advance ( -- ) "pos" succ@ ;
@@ -138,8 +138,15 @@ USE: unparser
         drop str>fixnum
     ] ifte ;
 
+: parsed| ( obj -- )
+    #! Some ugly ugly code to handle [ a | b ] expressions.
+    >r dup nreverse last* r> swap rplacd swons ;
+
+: expect-] ( -- )
+    scan "]" = not [ "Expected ]" throw ] when ;
+
 : parsed ( obj -- )
-    swons ;
+    over "|" = [ nip parsed| expect-] ] [ swons ] ifte ;
 
 : number, ( num -- )
     str>fixnum parsed ;
@@ -187,15 +194,10 @@ IN: builtins
 : [ f ; parsing
 : ] nreverse parsed ; parsing
 
-: expect-] scan "]" = not [ "Expected ]" throw ] when ;
-
-: one-word ( -- obj ) f scan word, car ;
-
 : | ( syntax: | cdr ] )
-    #! See the word 'parsed'.
-    "|"
-    nreverse dup last* one-word swap rplacd parsed
-    expect-] ; parsing
+    #! See the word 'parsed'. We push a special sentinel, and
+    #! 'parsed' acts accordingly.
+    "|" ; parsing
 
 ! Colon defs
 : :

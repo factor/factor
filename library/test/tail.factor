@@ -3,11 +3,11 @@ USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: test
 USE: words
-USE: unparser
 
 ! Test tail recursive compilation.
 

@@ -18,7 +18,7 @@ USE: words
 ! Just make sure this works.
 
 ! OUTPUT          INPUT               WORD
-[             ] [ "httpd"         ] [ apropos           ] test-word
+[             ] [ "httpd"         ] [ apropos.          ] test-word
 [ t           ] [ "when"          ] [ worddef compound? ] test-word
 [ t           ] [ "dup"           ] [ worddef shuffle?  ] test-word
 [ f           ] [ "ifte"          ] [ worddef shuffle?  ] test-word
