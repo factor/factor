@@ -29,6 +29,7 @@ IN: strings
 USE: arithmetic
 USE: combinators
 USE: kernel
+USE: lists
 USE: namespaces
 USE: strings
 USE: stack
@@ -59,3 +60,22 @@ USE: stack
     #! push a new string constructed from return values.
     #! The quotation must have stack effect ( X -- X ).
     <% swap [ swap dup >r call % r> ] str-each drop %> ;
+
+: split-next ( index string split -- next )
+    3dup index-of* dup -1 = [
+        >r drop swap str-tail , r> ( end of string )
+    ] [
+        swap str-length dupd + >r swap substring , r>
+    ] ifte ;
+
+: (split) ( index string split -- )
+    2dup >r >r split-next dup -1 = [
+        drop r> drop r> drop
+    ] [
+        r> r> (split)
+    ] ifte ;
+
+: split ( string split -- list )
+    #! Split the string at each occurrence of split, and push a
+    #! list of the pieces.
+    [, 0 -rot (split) ,] ;

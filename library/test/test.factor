@@ -25,9 +25,15 @@ USE: vocabularies
 : print-test ( input output -- )
     "TESTING: " write 2list . ;
 
+: keep-datastack ( quot -- )
+    datastack >r call r> set-datastack drop ;
+
 : unit-test ( output input -- )
-    2dup print-test
-    swap >r >r clear r> call datastack vector>list r> = assert ;
+    [
+        2dup print-test
+        swap >r >r clear r> call datastack vector>list r>
+        = assert
+    ] keep-datastack 2drop ;
 
 : test-word ( output input word -- )
     #! Old-style test.
@@ -44,8 +50,12 @@ USE: vocabularies
 
 : test ( name -- )
     ! Run the given test.
+    depth pred >r
     "Testing " write dup write "..." print
-    "/library/test/" swap ".factor" cat3 run-resource ;
+    "/library/test/" swap ".factor" cat3 run-resource
+    "Checking before/after depth..." print
+    depth r> = assert
+    ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
@@ -59,6 +69,7 @@ USE: vocabularies
         "lists/namespaces"
         "combinators"
         "continuations"
+        "errors"
         "hashtables"
         "strings"
         "namespaces/namespaces"

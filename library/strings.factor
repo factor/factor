@@ -114,19 +114,6 @@ USE: stack
         [ = ] dip f ?
     ] ifte ;
 
-: split ( string split -- list )
-    #! Split the string at each occurrence of split, and push a
-    #! list of the pieces.
-    2dup index-of dup -1 = [
-        2drop dup str-length 0 = [
-            drop f
-        ] [
-            unit
-        ] ifte
-    ] [
-        swap [ str// ] dip split cons
-    ] ifte ;
-
 : split1 ( string split -- before after )
     #! The car of the pair is the string up to the first
     #! occurrence of split; the cdr is the remainder of

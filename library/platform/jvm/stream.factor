@@ -139,19 +139,6 @@ USE: strings
         [ <char-stream>/fclose  ] "fclose" set
     ] extend ;
 
-: <string-output-stream> ( size -- stream )
-    #! Creates a new stream for writing to a string buffer.
-    <stream> [
-        <sbuf> "buf" set
-        ( string -- )
-        [ "buf" get sbuf-append ] "fwrite" set
-    ] extend ;
-
-: stream>str ( stream -- string )
-    #! Returns the string written to the given string output
-    #! stream.
-    [ "buf" get ] bind >str ;
-
 : <bwriter> ( writer -- bwriter )
     [ "java.io.Writer" ] "java.io.BufferedWriter" jnew ;
 
@@ -233,6 +220,15 @@ USE: strings
         ] "fclose" set
     ] extend ;
 
+: socket-closed? ( socket -- ? )
+    [ ] "java.net.Socket" "isClosed" jinvoke ;
+
+: close-socket ( socket -- )
+    [ ] "java.net.Socket" "close" jinvoke ;
+
+: ?close-socket ( socket -- )
+    dup socket-closed? [ drop ] [ close-socket ] ifte ;
+
 : <socket-stream> ( socket -- stream )
     #! Wraps a socket inside a byte-stream.
     dup
@@ -245,7 +241,7 @@ USE: strings
         ! We "extend" byte-stream's fclose.
         ( -- )
         "fclose" get [
-            "socket" get [ ] "java.net.Socket" "close" jinvoke
+            "socket" get ?close-socket
         ] append "fclose" set
     ] extend ;
 

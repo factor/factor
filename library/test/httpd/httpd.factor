@@ -65,8 +65,6 @@ USE: url-encoding
 
 [ ] [ "/" "get" ] [ serve-responder ] test-word
 [ ] [ "" "get" ] [ serve-responder ] test-word
-[ ] [ "test" "get" ] [ serve-responder ] test-word
-[ ] [ "test/" "get" ] [ serve-responder ] test-word
 [ ] [ "does-not-exist!" "get" ] [ serve-responder ] test-word
 [ ] [ "does-not-exist!/" "get" ] [ serve-responder ] test-word
 

@@ -44,7 +44,8 @@ DEFER: >n
 : set-global ( g -- ) 4 setenv ;
 
 : init-namespaces ( -- )
-    64 <vector> set-namestack* global >n ;
+    64 <vector> set-namestack* global >n
+    global "global" set ;
 
 : namespace-buckets 23 ;
 

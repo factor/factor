@@ -75,7 +75,7 @@ USE: unparser
     init-scratchpad
     init-styles
     init-vocab-styles
-    ! default-responders
+    default-responders
 
     run-user-init
 

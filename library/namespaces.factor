@@ -121,10 +121,6 @@ USE: vectors
     #! Returns f if any of the objects are not set.
     this swap object-path-iter ;
 
-: global-object-path ( string -- object )
-    #! An object path based from the global namespace.
-    "'" split global [ object-path ] bind ;
-
 : on ( var -- ) t put ;
 : off ( var -- ) f put ;
 : toggle ( var -- ) dup get not put ;

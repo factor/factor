@@ -42,4 +42,8 @@ USE: vectors
     #! Clear the datastack. For interactive use only; invoking
     #! this from a word definition will clobber any values left
     #! on the data stack by the caller.
-    0 <vector> set-datastack ;
+    { } set-datastack ;
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack vector-length ;

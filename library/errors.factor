@@ -58,7 +58,7 @@ USE: vectors
             namestack "error-namestack" set
             catchstack "error-catchstack" set
         ] bind
-    ] when* ;
+    ] when ;
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the

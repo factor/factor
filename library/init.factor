@@ -133,7 +133,11 @@ USE: vocabularies
     [ "top-level-continuation" set ] callcc0 ;
 
 : (word-of-the-day) ( -- word )
-    vocabs random-element words random-element ;
+    vocabs random-element words dup [
+        random-element
+    ] [
+        drop (word-of-the-day) ( empty vocab )
+    ] ifte ;
 
 : word-of-the-day ( -- )
     #! Something to entertain the poor hacker.

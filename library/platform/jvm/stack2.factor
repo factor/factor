@@ -69,3 +69,7 @@ USE: vectors
     #! this from a word definition will clobber any values left
     #! on the data stack by the caller.
     datastack* vector-clear ;
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack vector-length ;

@@ -29,6 +29,7 @@ IN: streams
 USE: errors
 USE: kernel
 USE: namespaces
+USE: strings
 
 ! Generic functions, of sorts...
 
@@ -102,3 +103,16 @@ USE: namespaces
         ( string -- )
         [ "stream" get fprint ] "fprint" set
     ] extend ;
+
+: <string-output-stream> ( size -- stream )
+    #! Creates a new stream for writing to a string buffer.
+    <stream> [
+        <sbuf> "buf" set
+        ( string -- )
+        [ "buf" get sbuf-append ] "fwrite" set
+    ] extend ;
+
+: stream>str ( stream -- string )
+    #! Returns the string written to the given string output
+    #! stream.
+    [ "buf" get ] bind sbuf>str ;

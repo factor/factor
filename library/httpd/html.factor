@@ -122,7 +122,9 @@ USE: url-encoding
     ] extend ;
 
 : with-html-stream ( quot -- )
-    "stdio" get <html-stream> swap with-stream ;
+    [
+        "stdio" get <html-stream> "stdio" set call
+    ] with-scope ;
 
 : html-head ( title -- )
     "<html><head><title>" write

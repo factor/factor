@@ -100,5 +100,5 @@ USE: vocabularies
 : describe-object-path ( string -- )
     [
         dup "object-path" set
-        global-object-path describe
+        "'" split global [ object-path ] bind describe
     ] with-scope ;
