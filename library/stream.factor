@@ -29,6 +29,7 @@ IN: streams
 USE: errors
 USE: kernel
 USE: namespaces
+USE: stack
 USE: strings
 
 ! Generic functions, of sorts...
@@ -48,10 +49,9 @@ USE: strings
 : fwrite ( string stream -- )
     [ "fwrite" get call ] bind ;
 
-: fwrite-attr ( string stream -- )
+: fwrite-attr ( string style stream -- )
     #! Write an attributed string to the given stream.
-    #! The attributes are taken from the current namespace;
-    #! supported keys depend on the type of stream.
+    #! Supported keys depend on the type of stream.
     [ "fwrite-attr" get call ] bind ;
 
 : fedit ( string stream -- )
@@ -69,8 +69,8 @@ USE: strings
         [ "fread# not implemented."  throw ] "fread#" set
         ( string -- )
         [ "fwrite not implemented."  throw ] "fwrite" set
-        ( string attrs -- )
-        [ namespace fwrite ] "fwrite-attr" set
+        ( string style -- )
+        [ drop namespace fwrite ] "fwrite-attr" set
         ( string -- )
         [ "fedit not implemented."   throw ] "fedit" set
         ( -- )
@@ -95,7 +95,7 @@ USE: strings
         [ "stream" get fread# ] "fread#" set
         ( string -- )
         [ "stream" get fwrite ] "fwrite" set
-        ( string attrs -- )
+        ( string style -- )
         [ "stream" get fwrite-attr ] "fwrite-attr" set
         ( string -- )
         [ "stream" get fedit ] "fedit" set

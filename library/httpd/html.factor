@@ -30,6 +30,7 @@ USE: combinators
 USE: format
 USE: lists
 USE: logic
+USE: kernel
 USE: namespaces
 USE: stack
 USE: stdio
@@ -68,7 +69,7 @@ USE: url-encoding
     <% "href=\"/inspect/" % % "\"" % %> ;
 
 : link-tag ( string link -- string )
-    "a" swap link-attrs html-tag ;
+    url-encode "a" swap link-attrs html-tag ;
 
 : bold-tag ( string -- string )
     "b" f html-tag ;
@@ -88,17 +89,18 @@ USE: url-encoding
 : size-tag ( string size -- string )
     "font" swap "size=\"" swap "\"" cat3 html-tag ;
 
-: html-attr-string ( string -- string )
-    chars>entities
-    "fg" get [ fg-tag ] when*
-    "bold" get [ bold-tag ] when
-    "italics" get [ italics-tag ] when
-    "underline" get [ underline-tag ] when
-    "size" get [ size-tag ] when*
-    "link" get [ url-encode link-tag ] when* ;
+: html-attr-string ( string style -- string )
+    [
+        [ "fg"        fg-tag ]
+        [ "bold"      drop bold-tag ]
+        [ "italics"   drop italics-tag ]
+        [ "underline" drop underline-tag ]
+        [ "size"      size-tag ]
+        [ "link"      link-tag ]
+    ] assoc-each ;
 
-: <html-stream>/fwrite-attr ( string stream -- )
-    [ html-attr-string ] dip fwrite ;
+: html-write-attr ( string style stream -- )
+    rot chars>entities rot html-attr-string swap fwrite ;
 
 : <html-stream> ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -115,7 +117,7 @@ USE: url-encoding
     <extend-stream> [
         [ chars>entities "stream" get fwrite ] "fwrite" set
         [ chars>entities "stream" get fprint ] "fprint" set
-        [ "stream" get <html-stream>/fwrite-attr ] "fwrite-attr" set
+        [ "stream" get html-write-attr ] "fwrite-attr" set
     ] extend ;
 
 : with-html-stream ( quot -- )

@@ -12,24 +12,26 @@ USE: test
 
 [ "Hello world" ]
 [
-    "Hello world" <namespace> [ html-attr-string ] bind
+    "Hello world" f html-attr-string
 ] unit-test
 
 [ "<b>Hello world</b>" ]
 [
     "Hello world"
-    <namespace> [ t "bold" set ] extend
-    [ html-attr-string ] bind
+    [ [ "bold" | t ] ]
+    html-attr-string
 ] unit-test
 
 [ "<i>Hello world</i>" ]
 [
-    "Hello world" <namespace> [ t "italics" set ] extend
-    [ html-attr-string ] bind
+    "Hello world"
+    [ [ "italics" | t ] ]
+    html-attr-string
 ] unit-test
 
 [ "<font color=\"#ff00ff\">Hello world</font>" ]
 [
-    "Hello world" <namespace> [ [ 255 0 255 ] "fg" set ] extend
-    [ html-attr-string ] bind
+    "Hello world"
+    [ [ "fg" 255 0 255 ] ]
+    html-attr-string
 ] unit-test

@@ -8,10 +8,11 @@ foo.     - perform "foo", but instead of pushing the result on the
 
 	   Eg: words. vocabs.
 
-.X       - three words to print the contents of the stacks:
+.X       - four words to print the contents of the stacks:
            .s - data stack
 	   .r - call stack
 	   .n - name stack
+	   .c - catch stack
 
 foo*     - a variation of "foo" that takes more parameters.
 
@@ -26,9 +27,25 @@ foo*     - a variation of "foo" that takes more parameters.
 
 	   Eg: last* get*
 
->into    - convert object to type "into".
+(foo)    - a word that is only useful in the implementation of "foo".
+
+           Eg: (vector=) (split)
+
+>to    - convert object to type "to".
 
            Eg: >str >lower >upper >fixnum >realnum
+
+	 - move top of data stack "to" stack.
+	 
+	   Eg: >r >n >c
+
+from>    - convert object from type "from".
+
+           Eg: dec> oct> hex>
+
+         - move top of "from" stack to data stack.
+	 
+	   Eg: r> n> c>
 
 one>two  - convert object of type "one" to "two".
 
@@ -52,15 +69,10 @@ foo-iter - a tail-recursive word used in the implementatin of "foo".
 
            Eg: nreverse-iter partition-iter
 
-nfoo     - on lists, a destructive version of "foo".
+nfoo     - on lists, a destructive (non-consing) version of "foo".
 
            Eg: nappend nreverse
 
 2foo     - like foo but with two operands taken from stack.
 
            Eg: 2drop 2dup 2each
-
-[foo]    - apply "foo" to each element of a list; sometimes with a bit
-           more logic than just [ foo ] each.
-
-	   Eg: [+] [.]

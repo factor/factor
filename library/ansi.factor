@@ -66,15 +66,16 @@ USE: strings
     #! Set foreground color.
     "\e[4" swap "m" cat3 ; inline
 
-: ansi-attrs ( -- esc )
-    "bold"    get [ bold % ] when
-    "ansi-fg" get [ fg % ] when*
-    "ansi-bg" get [ bg % ] when* ;
+: ansi-attrs ( style -- )
+    "bold"    over assoc [ bold % ] when
+    "ansi-fg" over assoc [ fg % ] when*
+    "ansi-bg" over assoc [ bg % ] when*
+    drop ;
 
-: ansi-attr-string ( string -- string )
+: ansi-attr-string ( string style -- string )
     <% ansi-attrs % reset % %> ;
 
-: <ansi-stream>/fwrite-attr ( string stream -- )
+: ansi-write-attr ( string style stream -- )
     [ ansi-attr-string ] dip fwrite ;
 
 : <ansi-stream> ( stream -- stream )
@@ -84,7 +85,6 @@ USE: strings
     #! ansi-fg - foreground color
     #! ansi-bg - background color
     <extend-stream> [
-        [
-            "stream" get <ansi-stream>/fwrite-attr
-        ] "fwrite-attr" set
+        ( string style -- )
+        [ "stream" get ansi-write-attr ] "fwrite-attr" set
     ] extend ;

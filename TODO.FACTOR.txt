@@ -3,19 +3,17 @@
 - maple-like: press enter at old commands to evaluate there
 - standalone listener input style
 - add a socket timeout
-- jedit bug? +line doesn't always work when switching into an existing
-  buffer with a remembered first line
 - balance needs USE:
 - command line arguments
 - socket protocol
+- telnetd and httpd should use multitasking
+- error handling in thread: use a different top-level
+- 'cascading' styles
+- html: order of attrs should not matter
 
 + docs:
 
-- vector-each/map examples
 - unparse examples
-- finish second practical
-- sbuf-hashcode
-- vector-hashcode
 - review doc formatting with latex2html
 - recursion -vs- iteration in vectors chapter
 
@@ -28,6 +26,7 @@
 
 + listener/plugin:
 
+- plugin should not exit jEdit on fatal errors
 - auto insert USE:
 - plugin not unloaded
 - listener backspace overzealous
@@ -37,12 +36,16 @@
 
 + native:
 
+- read# and eof
+- sbuf-hashcode
+- vector-hashcode
+- clarify suspend -vs- yield - toplevel
 - irc: stack underflow?
 - ignore SIGPIPE
 - don't allow multiple i/o requests on the same port
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
-- multitasking
+- better i/o scheduler
 - better error reporting
 
 + JVM compiler:
@@ -60,13 +63,13 @@
 
 + misc:
 
+- prettyprinting an empty vector
 - rethink strhead/strtail&co
 - namespace clone drops static var bindings
 - ditch map
 - ditch expand
 - set-object-path
 - more readable traces
-- 'cascading' styles
 - telnetd: send errors on socket
 - contains ==> contains?
 

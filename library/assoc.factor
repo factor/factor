@@ -64,3 +64,17 @@ USE: stack
     #! list by consing a new key/value pair onto the alist. The
     #! newly-added pair 'shadows' the previous value.
     [ dupd car = not ] subset acons ;
+
+: assoc-each ( value-alist quot-alist -- )
+    #! Looks up the key of each pair in the first list in the
+    #! second list to produce a quotation. The quotation is
+    #! applied to the value of the pair. If there is no
+    #! corresponding quotation, the value is popped off the
+    #! stack.
+    swap [
+        over >r unswons rot assoc* dup [
+            cdr call
+        ] [
+            2drop
+        ] ifte r>
+    ] each drop ;

@@ -58,7 +58,7 @@ USE: streams
 : write ( string -- )
     "stdio" get fwrite ;
 
-: write-attr ( string -- )
+: write-attr ( string style -- )
     #! Write an attributed string to standard output.
     "stdio" get fwrite-attr ;
 

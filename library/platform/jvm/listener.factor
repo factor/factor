@@ -90,16 +90,17 @@ USE: unparser
     over underline-attribute
     <actions-menu> actions-key attribute+ ;
 
-: style>attribute-set ( -- attribute-set )
-    <attribute-set>
-    "link" get [ dupd link-attribute ] when*
-    "bold" get [ dup t "Bold" swing-attribute+ ] when
-    "italics" get [ dup t "Italic" swing-attribute+ ] when
-    "underline" get [ dup t "Underline" swing-attribute+ ] when
-    "fg" get [ dupd >color "Foreground" swing-attribute+ ] when*
-    "bg" get [ dupd >color "Background" swing-attribute+ ] when*
-    "font" get [ dupd "FontFamily" swing-attribute+ ] when*
-    "size" get [ dupd "FontSize" swing-attribute+ ] when* ;
+: style>attribute-set ( style -- attribute-set )
+    <attribute-set> swap [
+        [ "link"      dupd link-attribute ]
+        [ "bold"      drop dup t "Bold" swing-attribute+ ]
+        [ "italics"   drop dup t "Italic" swing-attribute+ ]
+        [ "underline" drop dup t "Underline" swing-attribute+ ]
+        [ "fg"        dupd >color "Foreground" swing-attribute+ ]
+        [ "bg"        dupd >color "Background" swing-attribute+ ]
+        [ "font"      dupd "FontFamily" swing-attribute+ ]
+        [ "size"      dupd "FontSize" swing-attribute+ ]
+    ] assoc-each ;
 
 : reset-attrs ( -- )
     default-style [ style>attribute-set ] bind t
@@ -118,15 +119,12 @@ USE: unparser
 : listener-readln ( -- line )
     reset-attrs [ listener-readln* toplevel ] callcc1 ;
 
-: listener-write-attr ( string -- )
+: listener-write-attr ( string style -- )
     style>attribute-set "listener" get
     [ "java.lang.String" "javax.swing.text.AttributeSet" ]
     "factor.listener.FactorListener"
     "insertWithAttrs"
     jinvoke ;
-
-: listener-write ( string -- )
-    default-style [ listener-write-attr ] bind ;
 
 !: listener-edit ( string -- )
 !    "listener" get
@@ -142,8 +140,8 @@ USE: unparser
         ( -- string )
         [ listener-readln ] "freadln" set
         ( string -- )
-        [ listener-write ] "fwrite" set
-        ( string -- )
+        [ default-style listener-write-attr ] "fwrite" set
+        ( string style -- )
         [ listener-write-attr ] "fwrite-attr" set
         ( string -- )
         ![ listener-edit ] "fedit" set

@@ -39,6 +39,7 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: styles
 USE: words
 
 : stdin ( -- stdin )
@@ -70,6 +71,7 @@ USE: words
     init-environment
     init-search-path
     init-scratchpad
+    init-styles
     default-responders
     "args" get parse-command-line
     run-user-init

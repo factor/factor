@@ -137,7 +137,7 @@ DEFER: prettyprint*
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
 : prettyprint-comment ( comment -- )
-    [ "comments" ] get-style [ trim-newline write-attr ] bind ;
+    trim-newline [ "comments" ] get-style write-attr ;
 
 : word-link ( word -- link )
     <%
@@ -148,15 +148,14 @@ DEFER: prettyprint*
     %> ;
 
 : word-attrs ( word -- attrs )
-    dup word-style clone swap
     dup defined? [
-        swap [ word-link "link" set ] extend
+        dup >r word-link "link" r> word-style acons
     ] [
-        drop
+        word-style
     ] ifte ;
 
 : prettyprint-word ( word -- )
-    dup word-attrs [ word-name write-attr ] bind ;
+    dup word-name swap word-attrs write-attr ;
 
 : prettyprint-object ( indent obj -- indent )
     unparse write ;
@@ -178,10 +177,10 @@ DEFER: prettyprint*
     <% "vocabularies'" % % %> ;
 
 : vocab-attrs ( word -- attrs )
-    default-style clone [ vocab-link "link" set ] extend ;
+    vocab-link "link" default-style acons ;
 
 : prettyprint-vocab ( vocab -- )
-    dup vocab-attrs [ write-attr ] bind ;
+    dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( indent word -- indent )
     "IN:" write prettyprint-space

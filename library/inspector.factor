@@ -48,16 +48,14 @@ USE: vectors
     #! Print a list of defined variables.
     vars [ print ] each ;
 
+: link-style ( path -- style )
+    relative>absolute-object-path "link" default-style acons ;
+
 : var. ( [ name | value ] -- )
-    uncons unparse swap relative>absolute-object-path
-    default-style clone [ "link" set write-attr ] bind ;
+    uncons unparse swap link-style write-attr ;
 
 : var-name. ( max name -- )
-    default-style clone [
-        tuck pad-string write
-        dup relative>absolute-object-path "link" set
-        write-attr
-    ] bind ;
+    tuck pad-string write dup link-style write-attr ;
 
 : value. ( max name value -- )
     >r var-name. ": " write r> . ;

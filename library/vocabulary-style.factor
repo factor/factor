@@ -54,34 +54,34 @@ USE: styles
     [
         [ "ansi-fg" | "1" ]
         [ "fg" | [ 255 0 0 ] ]
-    ] <style> "builtins" set-vocab-style
+    ] "builtins" set-vocab-style
     [
         [ "ansi-fg" | "1" ]
         [ "fg" | [ 255 0 0 ] ]
-    ] <style> "kernel" set-vocab-style
+    ] "kernel" set-vocab-style
     [
         [ "ansi-fg" | "1" ]
         [ "fg" | [ 255 0 0 ] ]
-    ] <style> "combinators" set-vocab-style
+    ] "combinators" set-vocab-style
     [
         [ "ansi-fg" | "2" ]
         [ "fg" | [ 0 255 0 ] ]
-    ] <style> "stack" set-vocab-style
+    ] "stack" set-vocab-style
     [
         [ "ansi-fg" | "3" ]
         [ "fg" | [ 255 255 0 ] ]
-    ] <style> "arithmetic" set-vocab-style
+    ] "arithmetic" set-vocab-style
     [
         [ "ansi-fg" | "3" ]
         [ "fg" | [ 255 255 0 ] ]
-    ] <style> "math" set-vocab-style
+    ] "math" set-vocab-style
     [
         [ "ansi-fg" | "4" ]
         [ "fg" | [ 0 0 255 ] ]
-    ] <style> "namespaces" set-vocab-style
+    ] "namespaces" set-vocab-style
     [
         [ "ansi-fg" | "5" ]
         [ "fg" | [ 255 0 255 ] ]
-    ] <style> "lists" set-vocab-style ;
+    ] "lists" set-vocab-style ;
 
 init-vocab-styles

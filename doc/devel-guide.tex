@@ -664,23 +664,23 @@ USE: stack
 : correct "Correct - you win!" print ;
 
 : inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
+     < {[} too-high {]} {[} too-low {]} ifte ;
 
 : judge-guess ( actual guess -- ? )
-    2dup = [
+    2dup = {[}
         correct f
-    ] [
+    {]} {[}
         inexact-guess t
-    ] ifte ;
+    {]} ifte ;
 
 : number-to-guess ( -- n ) 0 100 random-int ;
 
 : numbers-game-loop ( actual -- )
-    dup guess-prompt read-number judge-guess [
+    dup guess-prompt read-number judge-guess {[}
         numbers-game-loop
-    ] [
+    {]} {[}
         drop
-    ] ifte ;
+    {]} ifte ;
 
 : numbers-game number-to-guess numbers-game-loop ;
 \end{verbatim}
@@ -759,7 +759,7 @@ is a proper list, and in fact it is equivalent to the empty list \texttt{{[}
 {]}}. An \emph{improper list} is a set of cons cells that does not terminate with \texttt{f}. Improper lists are input with the following syntax:
 
 \begin{verbatim}
-[ 1 2 3 | 4 ]
+{[} 1 2 3 | 4 {]}
 \end{verbatim}
 
 The \texttt{list?} word tests if the object at the top of the stack
@@ -1271,7 +1271,28 @@ A pair of combinators for iterating over vectors are provided in the \texttt{vec
 
 \texttt{vector-each ( vector quot -{}- )} pushes each element of the vector in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( obj -- )}. The vector and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the vector for accumilation and so on.
 
+The \texttt{vector>list} word is defined as first creating a list of all elements in the vector in reverse order, and then reversing this list:
+
+\begin{alltt}
+: vector>list ( vector -- list )
+    stack>list nreverse ;
+\end{alltt}
+
+The \texttt{stack>list} word makes use of \texttt{vector-each} to construct the list. In fact, its definition looks exactly like that of \texttt{reverse} except the \texttt{vector-each} combinator is used in place of \texttt{each}:
+
+\begin{alltt}
+: stack>list ( vector -- list )
+    {[} {]} swap {[} swons {]} vector-each ;
+\end{alltt}
+
 \texttt{vector-map ( vector quot -{}- str )} is similar to \texttt{vector-each}, except after each iteration the return value of the quotation is collected into a new vector. The quotation should have a stack effect of \texttt{( obj -- obj )}.
+
+The \texttt{clone-vector} word is implemented as a degenerate case of \texttt{vector-map} -- the elements of the original vector are copied into a new vector without any modification:
+
+\begin{alltt}
+: clone-vector ( vector -- vector )
+    {[} {]} vector-map ;
+\end{alltt}
 
 \section{Strings}
 
@@ -1372,11 +1393,11 @@ first occurrence of a substring or character. If an occurrence was
 found, its index is pushed. Otherwise, -1 is pushed:
 
 \begin{alltt}
-{}``www.sun.com'' CHAR: . index-of .
+"www.sun.com" CHAR: . index-of .
 \emph{3}
-{}``mailto:billg@microsoft.com'' CHAR: / index-of .
+"mailto:billg@microsoft.com" CHAR: / index-of .
 \emph{-1}
-{}``www.lispworks.com'' {}``.com'' index-of .
+"www.lispworks.com" ".com" index-of .
 \emph{13}
 \end{alltt}
 \texttt{index-of{*} ( n str substr -{}- n )} works like \texttt{index-of},
@@ -1508,10 +1529,10 @@ Compare the following two examples -- both define a word that concatenates toget
 
 \begin{alltt}
 : cat ( list -- str )
-    100 <sbuf> swap [ over sbuf-append ] each sbuf>str ;
+    100 <sbuf> swap {[} over sbuf-append {]} each sbuf>str ;
 
 : cat ( list -- str )
-    <\% [ \% ] each \%> ;
+    <\% {[} \% {]} each \%> ;
 \end{alltt}
 
 \subsection{String combinators}
@@ -1522,7 +1543,7 @@ A pair of combinators for iterating over strings are provided in the \texttt{str
 
 \begin{alltt}
 : count-a ( str -- n )
-    0 swap [ CHAR: a = [ 1 + ] when ] str-each ;
+    0 swap {[} CHAR: a = {[} 1 + {]} when {]} str-each ;
 
 "Lets just say that you may stay" count-a .
 \emph{4}
@@ -1531,7 +1552,7 @@ A pair of combinators for iterating over strings are provided in the \texttt{str
 \texttt{str-map ( str quot -{}- str )} is similar to \texttt{str-each}, except after each iteration the return value of the quotation is collected into a new string. The quotation should have a stack effect of \texttt{( ch -- str/ch )}. The following example replaces all occurrences of the space character in the string with \texttt{+}:
 
 \begin{alltt}
-"We do not like spaces" [ CHAR: \textbackslash{}s CHAR: + replace ] str-map .
+"We do not like spaces" {[} CHAR: \textbackslash{}s CHAR: + replace {]} str-map .
 \emph{"We+do+not+like+spaces"}
 \end{alltt}
 
@@ -1580,8 +1601,54 @@ a number.
 
 \section{PRACTICAL: Contractor timesheet}
 
+For the second practical example, we will code a small program that tracks how long you spend working on tasks. It will provide two primary functions, one for adding a new task and measuring how long you spend working on it, and another to print out the timesheet. A typical interaction looks like this:
 
-\subsection{Adding a timesheet entry}
+\begin{alltt}
+timesheet-app
+\emph{
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+a
+\emph{Start work on the task now. Press ENTER when done.
+
+Please enter a description:
+Working on the Factor HTTP server
+
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+a
+\emph{Start work on the task now. Press ENTER when done.
+
+Please enter a description:}
+Writing a kick-ass web app
+\emph{
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+p
+\emph{TIMESHEET:
+Working on the Factor HTTP server                           0:25
+Writing a kick-ass web app                                  1:03
+
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.}
+x
+\end{alltt}
+
+Once you have finished working your way through this tutorial, you might want to try extending the program -- for example, it could print the total hours, prompt for an hourly rate, then print the amount of money that should be billed.
+
+\subsection{Measuring a duration of time}
 
 When you begin working on a new task, you tell the timesheet you want
 to add a new entry. It then measures the elapsed time until you specify
@@ -1600,6 +1667,7 @@ A first attempt at \texttt{measure-duration} might look like this:
 : measure-duration millis read drop millis - ;
 measure-duration .
 \end{alltt}
+
 This word definition has the right general idea, however, the result
 is negative. Also, we would like to measure durations in minutes,
 not milliseconds:
@@ -1610,10 +1678,13 @@ not milliseconds:
     read drop
     millis swap - 1000 /i 60 /i ;
 \end{alltt}
+
 Note that the \texttt{/i} word \texttt{( x y -{}- x/y )}, from the
 \texttt{arithmetic} vocabulary, performs truncating division. This
 makes sense, since we are not interested in fractional parts of a
 minute here.
+
+\subsection{Adding a timesheet entry}
 
 Now that we can measure a time duration at the keyboard, lets write
 the \texttt{add-entry-prompt} word. This word does exactly what one
@@ -1627,6 +1698,7 @@ and leaves those two values on the stack:
     "Please enter a description:" print
     read ;
 \end{alltt}
+
 You should interactively test this word. Measure off a minute or two,
 press ENTER, enter a description, and press ENTER again. The stack
 should now contain two values, in the same order as the stack effect
@@ -1640,6 +1712,7 @@ of the timesheet vector:
 : add-entry ( timesheet -{}- )
     add-entry-prompt cons swap vector-push ;
 \end{alltt}
+
 Recall that timesheet entries are cons cells where the car is the
 duration and the cdr is the description, hence the call to \texttt{cons}.
 Note that this word side-effects the timesheet vector. You can test
@@ -1653,6 +1726,7 @@ it interactively like so:
 .
 \emph{\{ {[} 2 | "Studying Factor" {]} \}}
 \end{alltt}
+
 \subsection{Printing the timesheet}
 
 The hard part of printing the timesheet is turning the duration in
@@ -1663,6 +1737,7 @@ like to make a word like the following:
 135 hh:mm .
 \emph{01:15}
 \end{alltt}
+
 First, we can make a pair of words hh and mm to extract the hours
 and minutes, respectively. This can be achieved using truncating division,
 and the modulo operator -- also, since we would like strings to be
@@ -1674,6 +1749,7 @@ strings:
 : hh ( duration -{}- str ) 60 /i unparse ;
 : mm ( duration -{}- str ) 60 mod unparse ;
 \end{alltt}
+
 The \texttt{hh:mm} word can then be written, concatenating the return
 values of \texttt{hh} and \texttt{mm} into a single string using string
 construction:
@@ -1759,8 +1835,87 @@ print-timesheet
 
 \subsection{The main menu}
 
-Reading a number, showing a menu
+Finally, we will code a main menu that looks like this:
 
+\begin{alltt}
+
+(E)xit
+(A)dd entry
+(P)rint timesheet
+
+Enter a letter between ( ) to execute that action.
+\end{alltt}
+
+We will represent the menu as an association list. Recall that an association list is a list of pairs, where the car of each pair is a key, and the cdr is a value. Our keys will literally be keyboard keys (``e'', ``a'' and ``p''), and the values will themselves be pairs consisting of a menu item label and a quotation.
+
+The first word we will code is \texttt{print-menu}. It takes an association list, and prints the second element of each pair's value. Note that \texttt{terpri} simply prints a blank line:
+
+\begin{alltt}
+: print-menu ( menu -{}- )
+    terpri {[} cdr car print {]} each terpri
+    "Enter a letter between ( ) to execute that action." print ;
+\end{alltt}
+
+You can test \texttt{print-menu} with a short association list:
+
+\begin{alltt}
+{[} {[} "x" "(X)yzzy" 2 2 + . {]} {[} "f" "(F)oo" -1 sqrt . {]} {]} print-menu
+\emph{
+Xyzzy
+Foo
+
+Enter a letter between ( ) to execute that action.}
+\end{alltt}
+
+The next step is to write a \texttt{menu-prompt} word that takes the same association list, reads a line of input from the keyboard, and executes the quotation associated with that line. Recall that the \texttt{assoc} word returns \texttt{f} if the specified key could not be found in the association list. The below definition makes use of a conditional to signal an error in that case:
+
+\begin{alltt}
+: menu-prompt ( menu -{}- )
+    read swap assoc dup {[}
+        cdr call
+    {]} {[}
+        "Invalid input: " swap unparse cat2 throw
+    {]} ifte ;
+\end{alltt}
+
+Try applying the new \texttt{menu-prompt} word to the association list we used to test \texttt{print-menu}. You should verify that entering \texttt{x} causes the quotation \texttt{{[} 2 2 + . {]}} to be executed:
+
+\begin{alltt}
+{[} {[} "x" "(X)yzzy" 2 2 + . {]} {[} "f" "(F)oo" -1 sqrt . {]} {]} menu-prompt
+x
+\emph{4}
+\end{alltt}
+
+Finally, we want a \texttt{menu} word that first prints a menu, then prompts for and acts on input:
+
+\begin{alltt}
+: menu ( menu -{}- )
+    dup print-menu menu-prompt ;
+\end{alltt}
+
+Considering the stack effects of \texttt{print-menu} and \texttt{menu-prompt}, it should be obvious why the \texttt{dup} is needed.
+
+\subsection{Finishing off}
+
+We now need a \texttt{main-menu} word. It takes the timesheet vector from the stack, and recursively calls itself until the user requests that the timesheet application exits:
+
+\begin{alltt}
+: main-menu ( timesheet -{}- )
+    {[}
+        {[} "e" "(E)xit" drop {]}
+        {[} "a" "(A)dd entry" dup add-entry main-menu {]}
+        {[} "p" "(P)rint timesheet" dup print-timesheet main-menu {]}
+    {]} menu ;
+\end{alltt}
+
+Note that unless the first option is selected, the timesheet vector is eventually passed into the recursive \texttt{main-menu} call.
+
+All that remains now is the ``main word'' that runs the program with an empty timesheet vector. Note that the initial capacity of the vector is 10 elements, however this is not a limit -- adding more than 10 elements will grow the vector:
+
+\begin{alltt}
+: timesheet-app ( -{}- )
+    10 <vector> main-menu ;
+\end{alltt}
 
 \section{Variables and namespaces}
 

@@ -1,4 +1,5 @@
 IN: scratchpad
+USE: arithmetic
 USE: lists
 USE: namespaces
 USE: test
@@ -25,3 +26,18 @@ USE: test
 "is great" "Java" "assoc" get set-assoc "assoc" set
 
 [ "is great" ] [ "Java" "assoc" get assoc ] unit-test
+
+[
+    [ "one" | 1 ]
+    [ "two" | 2 ]
+    [ "four" | 4 ]
+] "value-alist" set
+
+[
+    [ "one" + ]
+    [ "three" - ]
+    [ "four" * ]
+] "quot-alist" set
+
+[ 8 ] [ 1 "value-alist" get "quot-alist" get assoc-each ] unit-test
+[ 1 ] [ 1 "value-alist" get f assoc-each ] unit-test
