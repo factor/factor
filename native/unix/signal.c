@@ -33,7 +33,7 @@ void call_profiling_step(int signal, siginfo_t* siginfo, void* uap)
 			untag_word(obj)->call_count++;
 	}
 
-	executing->call_count++;
+	untag_word_fast(executing)->call_count++;
 }
 
 void init_signals(void)

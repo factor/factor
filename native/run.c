@@ -6,9 +6,10 @@ void clear_environment(void)
 	for(i = 0; i < USER_ENV; i++)
 		userenv[i] = F;
 	profile_depth = 0;
+	executing = F;
 }
 
-#define EXECUTE(w) ((XT)(w->xt))()
+#define EXECUTE(w) ((XT)(untag_word_fast(w)->xt))()
 
 void run(void)
 {
@@ -54,7 +55,7 @@ void run(void)
 
 		if(TAG(next) == WORD_TYPE)
 		{
-			executing = (F_WORD*)UNTAG(next);
+			executing = next;
 			EXECUTE(executing);
 		}
 		else
@@ -74,24 +75,25 @@ void run(void)
 /* XT of deferred words */
 void undefined()
 {
-	general_error(ERROR_UNDEFINED_WORD,tag_word(executing));
+	general_error(ERROR_UNDEFINED_WORD,executing);
 }
 
 /* XT of compound definitions */
 void docol(void)
 {
-	call(executing->parameter);
+	call(untag_word_fast(executing)->parameter);
 }
 
 /* pushes word parameter */
 void dosym(void)
 {
-	dpush(executing->parameter);
+	dpush(untag_word_fast(executing)->parameter);
 }
 
 void primitive_execute(void)
 {
-	executing = untag_word(dpop());
+	type_check(WORD_TYPE,dpeek());
+	executing = dpop();
 	EXECUTE(executing);
 }
 

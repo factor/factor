@@ -29,8 +29,8 @@ sigjmp_buf toplevel;
 /* TAGGED currently executing quotation */
 CELL callframe;
 
-/* raw pointer to currently executing word */
-F_WORD* executing;
+/* TAGGED pointer to currently executing word */
+CELL executing;
 
 /* TAGGED user environment data; see getenv/setenv prims */
 CELL userenv[USER_ENV];
@@ -80,7 +80,7 @@ INLINE void call(CELL quot)
 	/* tail call optimization */
 	if(callframe != F)
 	{
-		cpush(tag_word(executing));
+		cpush(executing);
 		cpush(callframe);
 	}
 	callframe = quot;

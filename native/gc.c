@@ -21,6 +21,7 @@ void collect_roots(void)
 	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();
 	copy_object(&callframe);
+	copy_object(&executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
 		copy_object((void*)ptr);

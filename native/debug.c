@@ -121,7 +121,7 @@ void dump_stacks(void)
 	print_obj(callframe);
 	fprintf(stderr,"\n");
 	fprintf(stderr,"*** Executing:\n");
-	print_word(executing);
+	print_obj(executing);
 	fprintf(stderr,"\n");
 	fflush(stderr);
 }

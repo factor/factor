@@ -19,10 +19,15 @@ typedef struct {
 	CELL allot_count;
 } F_WORD;
 
+INLINE F_WORD* untag_word_fast(CELL tagged)
+{
+	return (F_WORD*)UNTAG(tagged);
+}
+
 INLINE F_WORD* untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);
-	return (F_WORD*)UNTAG(tagged);
+	return untag_word_fast(tagged);
 }
 
 INLINE CELL tag_word(F_WORD* word)

@@ -77,7 +77,9 @@ void allot_profile_step(CELL a)
 			untag_word(obj)->allot_count += a;
 	}
 
-	executing->allot_count += a;
+	if(in_zone(&prior,executing))
+		critical_error("executing in prior zone",executing);
+	untag_word_fast(executing)->allot_count += a;
 }
 
 void flip_zones()
