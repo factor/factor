@@ -39,7 +39,7 @@ USE: streams
     "line-number" succ@ ;
 
 : (parse-stream) ( -- )
-    next-line [ (parse) (parse-stream) ] when* ;
+    next-line [ print (parse-stream) ] when* ;
 
 : parse-stream ( name stream -- )
     <namespace> [
@@ -52,3 +52,9 @@ USE: streams
             "parse-stream" get fclose rethrow
         ] catch
     ] bind ;
+
+: parse-file ( file -- code )
+    "r" <file-stream> parse-stream ;
+
+: run-file ( file -- )
+    parse-file call ;

@@ -50,8 +50,10 @@ DEFER: str=
 DEFER: str-hashcode
 
 IN: io-internals
+DEFER: open-file
 DEFER: read-line-8
 DEFER: write-8
+DEFER: close
 
 IN: words
 DEFER: <word>
@@ -131,8 +133,10 @@ IN: cross-compiler
         eq?
         getenv
         setenv
+        open-file
         read-line-8
         write-8
+        close
         garbage-collection
         save-image
         datastack

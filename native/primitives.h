@@ -1,5 +1,5 @@
 extern XT primitives[];
-#define PRIMITIVE_COUNT 77
+#define PRIMITIVE_COUNT 79
 
 CELL primitive_to_xt(CELL primitive);
 

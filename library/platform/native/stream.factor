@@ -26,8 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: streams
+USE: combinators
 USE: io-internals
 USE: kernel
+USE: stack
 USE: namespaces
 
 : <native-stream> ( in out -- stream )
@@ -41,7 +43,15 @@ USE: namespaces
         [ "out" get write-8 ] "fwrite" set
         ( -- string )
         [ "in" get read-line-8 ] "freadln" set
+        ( -- )
+        [
+            "in" get [ close ] when*
+            "out" get [ close ] when*
+        ] "fclose" set
     ] extend ;
+
+: <file-stream> ( path mode -- stream )
+    open-file dup <native-stream> ;
 
 : init-stdio ( -- )
     stdin stdout <native-stream> "stdio" set ;

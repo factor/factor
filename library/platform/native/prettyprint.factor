@@ -35,9 +35,14 @@ USE: vocabularies
 USE: words
 
 : see ( word -- )
+    !!! Ugh!
     intern dup compound? [
         0 swap dup word-parameter
-        prettyprint-:;
+        [
+            [ prettyprint-: ] dip prettyprint-word
+            dup prettyprint-newline
+        ] dip
+        prettyprint-list prettyprint-;
         prettyprint-newline
     ] [
         dup primitive? [

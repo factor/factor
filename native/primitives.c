@@ -68,16 +68,18 @@ XT primitives[] = {
 	primitive_eq,                           /* 64 */
 	primitive_getenv,                       /* 65 */
 	primitive_setenv,                       /* 66 */
-	primitive_read_line_8,                  /* 67 */
-	primitive_write_8,                      /* 68 */
-	primitive_gc,                           /* 69 */
-	primitive_save_image,                   /* 70 */
-	primitive_datastack,                    /* 71 */
-	primitive_callstack,                    /* 72 */
-	primitive_set_datastack,                /* 73 */
-	primitive_set_callstack,                /* 74 */
-	primitive_handlep,                      /* 75 */
-	primitive_exit                          /* 76 */
+	primitive_open_file,                    /* 67 */
+	primitive_read_line_8,                  /* 68 */
+	primitive_write_8,                      /* 69 */
+	primitive_close,                        /* 70 */
+	primitive_gc,                           /* 71 */
+	primitive_save_image,                   /* 72 */
+	primitive_datastack,                    /* 73 */
+	primitive_callstack,                    /* 74 */
+	primitive_set_datastack,                /* 75 */
+	primitive_set_callstack,                /* 76 */
+	primitive_handlep,                      /* 77 */
+	primitive_exit                          /* 78 */
 };
 
 CELL primitive_to_xt(CELL primitive)

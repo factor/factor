@@ -9,6 +9,17 @@ void init_io(void)
 
 #define LINE_SIZE 80
 
+void primitive_open_file(void)
+{
+	char* mode = to_c_string(untag_string(env.dt));
+	char* path = to_c_string(untag_string(dpop()));
+	printf("fopen %s %s\n",path,mode);
+	FILE* file = fopen(path,mode);
+	if(file == 0)
+		printf("error %d\n",errno);
+	env.dt = handle(file);
+}
+
 /* read a line of ASCII text. */
 void primitive_read_line_8(void)
 {
@@ -55,4 +66,10 @@ void primitive_write_8(void)
 
 	for(i = 0; i < strlen; i++)
 		putc(string_nth(str,i),file);
+}
+
+void primitive_close(void)
+{
+	HANDLE* h = untag_handle(env.dt);
+	fclose((FILE*)h->object);
 }

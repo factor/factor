@@ -1,6 +1,7 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
+#include <errno.h>
 #include <setjmp.h>
 #include <stdbool.h>
 #include <stdio.h>
