@@ -31,12 +31,14 @@ USE: errors
 USE: interpreter
 USE: kernel
 USE: lists
+USE: logic
 USE: math
 USE: namespaces
 USE: stack
 USE: strings
 USE: vectors
 USE: words
+USE: hashtables
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -45,8 +47,12 @@ USE: words
 ! - infer - quotation with custom inference behavior; ifte uses
 ! this. Word is passed on the stack.
 
+! Amount of results we had to add to the datastack
 SYMBOL: d-in
+! Amount of results we had to add to the callstack
 SYMBOL: r-in
+! Recursive state. Alist maps words to base case effects
+SYMBOL: recursive-state
 
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
@@ -65,7 +71,7 @@ SYMBOL: r-in
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d get ensure meta-d set  d-in +@ ;
+    meta-d get ensure meta-d set d-in +@ ;
 
 : consume-d ( count -- )
     #! Remove count of elements.
@@ -75,6 +81,9 @@ SYMBOL: r-in
     #! Push count of unknown results.
     [ gensym push-d ] times ;
 
+: consume/produce ( [ in | out ] -- )
+    unswons dup ensure-d consume-d produce-d ;
+
 : standard-effect ( word [ in | out ] -- )
     #! If a word does not have special inference behavior, we
     #! either execute the word in the meta interpreter (if it is
@@ -83,7 +92,7 @@ SYMBOL: r-in
     over "meta-infer" word-property [
         drop host-word
     ] [
-        unswons consume-d produce-d drop
+        nip consume/produce
     ] ifte ;
 
 : apply-effect ( word [ in | out ] -- )
@@ -100,22 +109,49 @@ SYMBOL: r-in
 
 DEFER: (infer)
 
+: apply-compound ( word -- )
+    t over recursive-state acons@
+    word-parameter (infer)
+    recursive-state uncons@ drop ;
+
 : apply-word ( word -- )
-    #! Apply the word's stack effect to the inferencer's state.
+    #! Apply the word's stack effect to the inferencer state.
     dup "infer-effect" word-property dup [
         apply-effect
     ] [
-        drop dup compound? [
-            word-parameter (infer)
+        drop dup compound? [ apply-compound ] [ no-effect ] ifte
+    ] ifte ;
+
+: current-word ( -- word )
+    #! Push word we're currently inferring effect of.
+    recursive-state get car car ;
+
+: no-base-case ( -- )
+    current-word word-name
+    " does not have a base case." cat2 throw ;
+
+: recursive-word ( word effect -- )
+    #! Handle a recursive call, by either applying a previously
+    #! inferred base case, or raising an error.
+    dup t = [ drop no-base-case ] [ nip consume/produce ] ifte ;
+
+: apply-object ( obj -- )
+    #! Apply the object's stack effect to the inferencer state.
+    dup word? [
+        dup recursive-state get assoc [
+            recursive-word
         ] [
-            no-effect
-        ] ifte
+            apply-word
+        ] ifte*
+    ] [
+        push-d
     ] ifte ;
 
 : init-inference ( -- )
     init-interpreter
     0 d-in set
-    0 r-in set ;
+    0 r-in set
+    f recursive-state set ;
 
 : effect ( -- [ in | out ] )
     #! After inference is finished, collect information.
@@ -124,19 +160,19 @@ DEFER: (infer)
 : (infer) ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ dup word? [ apply-word ] [ push-d ] ifte ] each ;
+    [ apply-object ] each ;
 
-: infer ( quot -- [ in | out ] )
-    #! Stack effect of a quotation.
-    [ init-inference (infer)  effect ] with-scope ;
-
-: infer-branch ( quot -- [ in-d | datastack ] )
+: (infer-branch) ( quot -- [ in-d | datastack ] )
     #! Infer the quotation's effect, restoring the meta
     #! interpreter state afterwards.
     [
         copy-interpreter (infer)
         d-in get  meta-d get cons
     ] with-scope ;
+
+: infer-branch ( quot -- [ in-d | datastack ] )
+    #! Push f if inference failed.
+    [ (infer-branch) ] [ [ drop f ] when ] catch ;
 
 : difference ( [ in | stack ] -- diff )
     #! Stack height difference of infer-branch return value.
@@ -175,10 +211,43 @@ DEFER: (infer)
         "Unbalanced ifte branches" throw
     ] ifte ;
 
+: set-base ( [ in | stack ] -- )
+    #! Set the base case of the current word.
+    recursive-state uncons@ car >r
+    uncons vector-length cons r>
+    recursive-state acons@ ;
+
+: recursive-branches ( false true fe te -- fe te )
+    #! At least one of the branches did not have a computable
+    #! stack effect. Set the base case to the other branch, and
+    #! try again.
+    2dup or [
+        dup [
+            dup set-base >r 2drop infer-branch r>
+        ] [
+            drop dup set-base swap infer-branch rot drop
+        ] ifte
+    ] [
+        no-base-case
+    ] ifte ;
+
+: infer-branches ( false true -- [ in | stack ] [ in | stack ] )
+    #! Recursive stack effect inference is done here. If one of
+    #! the branches has an undecidable stack effect, we set the
+    #! base case to this stack effect and try again.
+    over infer-branch over infer-branch 2dup and [
+        2nip ( all good )
+    ] [
+        recursive-branches
+    ] ifte ;
+
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
-    pop-d pop-d pop-d  drop ( condition )
-    >r infer-branch r> infer-branch unify ;
+    pop-d pop-d pop-d drop ( condition ) infer-branches unify ;
+
+: infer ( quot -- [ in | out ] )
+    #! Stack effect of a quotation.
+    [ init-inference (infer)  effect ] with-scope ;
 
 \ call [ pop-d (infer) ] "infer" set-word-property
 \ call [ 1 | 0 ] "infer-effect" set-word-property
@@ -205,6 +274,13 @@ DEFER: (infer)
 \ swap [ 2 | 2 ] "infer-effect" set-word-property
 \ rot t "meta-infer" set-word-property
 \ rot [ 3 | 3 ] "infer-effect" set-word-property
+
+\ type [ 1 | 1 ] "infer-effect" set-word-property
+\ eq? [ 2 | 1 ] "infer-effect" set-word-property
+
+\ car [ 1 | 1 ] "infer-effect" set-word-property
+\ cdr [ 1 | 1 ] "infer-effect" set-word-property
+\ cons [ 2 | 1 ] "infer-effect" set-word-property
 
 \ fixnum+ [ 2 | 1 ] "infer-effect" set-word-property
 \ fixnum- [ 2 | 1 ] "infer-effect" set-word-property

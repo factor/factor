@@ -153,6 +153,7 @@ cpu "x86" = [
         "/library/compiler/compiler.factor"
         "/library/compiler/ifte.factor"
         "/library/compiler/generic.factor"
+        "/library/compiler/stack.factor"
         "/library/compiler/interpret-only.factor"
         "/library/compiler/compile-all.factor"
         "/library/compiler/alien-types.factor"

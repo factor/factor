@@ -2,12 +2,12 @@
 
 void reset_datastack(void)
 {
-	ds = ds_bot;
+	ds = ds_bot - CELLS;
 }
 
 void reset_callstack(void)
 {
-	cs = cs_bot;
+	cs = cs_bot - CELLS;
 }
 
 void init_stacks(void)
@@ -32,44 +32,44 @@ void primitive_dup(void)
 void primitive_swap(void)
 {
 	CELL top = dpeek();
-	CELL next = get(ds - CELLS * 2);
-	put(ds - CELLS,next);
-	put(ds - CELLS * 2,top);
+	CELL next = get(ds - CELLS);
+	put(ds,next);
+	put(ds - CELLS,top);
 }
 
 void primitive_over(void)
 {
-	dpush(get(ds - CELLS * 2));
+	dpush(get(ds - CELLS));
 }
 
 void primitive_pick(void)
 {
-	dpush(get(ds - CELLS * 3));
+	dpush(get(ds - CELLS * 2));
 }
 
 void primitive_nip(void)
 {
 	CELL top = dpop();
-	put(ds - CELLS,top);
+	put(ds,top);
 }
 
 void primitive_tuck(void)
 {
 	CELL top = dpeek();
-	CELL next = get(ds - CELLS * 2);
-	put(ds - CELLS * 2,top);
-	put(ds - CELLS,next);
+	CELL next = get(ds - CELLS);
+	put(ds - CELLS,top);
+	put(ds,next);
 	dpush(top);
 }
 
 void primitive_rot(void)
 {
 	CELL top = dpeek();
-	CELL next = get(ds - CELLS * 2);
-	CELL next_next = get(ds - CELLS * 3);
-	put(ds - CELLS * 3,next);
-	put(ds - CELLS * 2,top);
-	put(ds - CELLS,next_next);
+	CELL next = get(ds - CELLS);
+	CELL next_next = get(ds - CELLS * 2);
+	put(ds - CELLS * 2,next);
+	put(ds - CELLS,top);
+	put(ds,next_next);
 }
 
 void primitive_to_r(void)
@@ -84,7 +84,7 @@ void primitive_from_r(void)
 
 VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
-	CELL depth = (top - bottom) / CELLS;
+	CELL depth = (top - bottom + CELLS) / CELLS;
 	VECTOR* v = vector(depth);
 	ARRAY* a = v->array;
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
@@ -110,7 +110,7 @@ CELL vector_to_stack(VECTOR* vector, CELL bottom)
 	CELL start = bottom;
 	CELL len = vector->top * CELLS;
 	memcpy((void*)start,vector->array + 1,len);
-	return start + len;
+	return start + len - CELLS;
 }
 
 void primitive_set_datastack(void)

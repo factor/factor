@@ -1,5 +1,5 @@
-#define STACK_UNDERFLOW(stack,bot) ((stack) < UNTAG(bot))
-#define STACK_OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + STACK_SIZE)
+#define STACK_UNDERFLOW(stack,bot) ((stack) + CELLS < UNTAG(bot))
+#define STACK_OVERFLOW(stack,bot) ((stack) + CELLS >= UNTAG(bot) + STACK_SIZE)
 
 void reset_datastack(void);
 void reset_callstack(void);

@@ -30,30 +30,25 @@ USE: alien
 
 : LITERAL ( cell -- )
     #! Push literal on data stack.
-    ESI I>[R]
-    4 ESI R+I ;
+    4 ESI R+I
+    ESI I>[R] ;
 
 : [LITERAL] ( cell -- )
     #! Push complex literal on data stack by following an
     #! indirect pointer.
+    4 ESI R+I
     EAX [I]>R
-    EAX ESI R>[R]
-    4 ESI R+I ;
+    EAX ESI R>[R] ;
 
 : PUSH-DS ( -- )
     #! Push contents of EAX onto datastack.
-    EAX ESI R>[R]
-    4 ESI R+I ;
-
-: PEEK-DS ( -- )
-    #! Peek datastack, store pointer to datastack top in EAX.
-    ESI EAX R>R
-    4 EAX R-I ;
+    4 ESI R+I
+    EAX ESI R>[R] ;
 
 : POP-DS ( -- )
     #! Pop datastack, store pointer to datastack top in EAX.
-    PEEK-DS
-    EAX ESI R>R ;
+    ESI EAX [R]>R
+    4 ESI R-I ;
 
 : SELF-CALL ( name -- )
     #! Call named C function in Factor interpreter executable.
@@ -61,14 +56,13 @@ USE: alien
 
 : TYPE ( -- )
     #! Peek datastack, store type # in EAX.
-    PEEK-DS
-    EAX PUSH-[R]
+    ESI PUSH-[R]
     "type_of" SELF-CALL
     4 ESP R+I ;
 
 : ARITHMETIC-TYPE ( -- )
     #! Peek top two on datastack, store arithmetic type # in EAX.
-    PEEK-DS
+    ESI EAX R>R
     EAX PUSH-[R]
     4 EAX R-I
     EAX PUSH-[R]

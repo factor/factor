@@ -120,10 +120,10 @@ void collect_roots(void)
 	copy_bignum_constants();
 	copy_object(&callframe);
 
-	for(ptr = ds_bot; ptr < ds; ptr += CELLS)
+	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
 		copy_object((void*)ptr);
 
-	for(ptr = cs_bot; ptr < cs; ptr += CELLS)
+	for(ptr = cs_bot; ptr <= cs; ptr += CELLS)
 		copy_object((void*)ptr);
 
 	for(i = 0; i < USER_ENV; i++)

@@ -49,41 +49,43 @@ CELL profile_depth;
 
 INLINE CELL dpop(void)
 {
+	CELL value = get(ds);
 	ds -= CELLS;
-	return get(ds);
+	return value;
 }
 
 INLINE void drepl(CELL top)
 {
-	put(ds - CELLS,top);
+	put(ds,top);
 }
 
 INLINE void dpush(CELL top)
 {
-	put(ds,top);
 	ds += CELLS;
+	put(ds,top);
 }
 
 INLINE CELL dpeek(void)
 {
-	return get(ds - CELLS);
+	return get(ds);
 }
 
 INLINE CELL cpop(void)
 {
+	CELL value = get(cs);
 	cs -= CELLS;
-	return get(cs);
+	return value;
 }
 
 INLINE void cpush(CELL top)
 {
-	put(cs,top);
 	cs += CELLS;
+	put(cs,top);
 }
 
 INLINE CELL cpeek(void)
 {
-	return get(cs - CELLS);
+	return get(cs);
 }
 
 INLINE void call(CELL quot)

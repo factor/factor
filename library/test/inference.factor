@@ -6,6 +6,7 @@ USE: stack
 USE: combinators
 USE: vectors
 USE: kernel
+USE: lists
 
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
@@ -57,3 +58,28 @@ USE: kernel
 [
     [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] ifte call
 ] unit-test-fails
+
+: infinite-loop infinite-loop ;
+
+[ [ infinite-loop ] infer ] unit-test-fails
+
+: simple-recursion-1
+    dup [ simple-recursion-1 ] [ ] ifte ;
+
+[ [ 1 | 1 ] ] [ [ simple-recursion-1 ] infer ] unit-test
+
+: simple-recursion-2
+    dup [ ] [ simple-recursion-2 ] ifte ;
+
+[ [ 1 | 1 ] ] [ [ simple-recursion-2 ] infer ] unit-test
+
+[ [ 2 | 1 ] ] [ [ 2list ] infer ] unit-test
+[ [ 3 | 1 ] ] [ [ 3list ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ append ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ swons ] infer ] unit-test
+[ [ 1 | 2 ] ] [ [ uncons ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ unit ] infer ] unit-test
+[ [ 1 | 2 ] ] [ [ unswons ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ last* ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
+! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
