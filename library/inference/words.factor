@@ -126,7 +126,7 @@ USE: prettyprint
     ] [
         [
             swap save-effect get [
-               (  t "no-effect" set-word-property ) drop
+                t "no-effect" set-word-property
             ] [
                 drop
             ] ifte rethrow

@@ -46,14 +46,13 @@ SYMBOL: height
 SYMBOL: bpp
 SYMBOL: surface
 
+: init-screen ( width height bpp flags -- )
+    >r 3dup bpp set height set width set r>
+    SDL_SetVideoMode surface set ;
+
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
-    [
-        >r
-        >r 3dup bpp set height set width set r>
-        SDL_SetVideoMode surface set
-        r> call SDL_Quit
-    ] with-scope ; inline
+    [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgba ( r g b a -- n )
     swap 8 shift bitor

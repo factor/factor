@@ -133,6 +133,7 @@ USE: namespaces
     "/library/sdl/sdl-event.factor"
     "/library/sdl/sdl-gfx.factor"
     "/library/sdl/sdl-keysym.factor"
+    "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-utils.factor"
     "/library/sdl/hsv.factor"
 
