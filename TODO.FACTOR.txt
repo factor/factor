@@ -19,7 +19,6 @@
 - optimize away dispatch
 - layouts with gaps
 - alignment of gadgets inside their bounding boxes needs thought
-- WordPreview calls markTokens() -> NPE
 - faster completion
 - ppc register decls
 - rename f* words to stream-*
@@ -29,6 +28,7 @@
 - slot compile problem
 - sdl console crash
 - x86 register decl
+- UI: don't roll over if mouse button is down
 
 + compiler/ffi:
 

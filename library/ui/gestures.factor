@@ -27,17 +27,20 @@ SYMBOL: motion
 SYMBOL: button-up
 SYMBOL: button-down
 
+: hierarchy-gesture ( gadget ? gesture -- ? )
+    swap [
+        2drop f
+    ] [
+        swap handle-gesture* drop t
+    ] ifte ;
+
 : mouse-enter ( point gadget -- )
     #! If the old point is inside the new gadget, do not fire an
     #! enter gesture, since the mouse did not enter. Otherwise,
     #! fire an enter gesture and go on to the parent.
     [
         [ shape-pos + ] keep
-        2dup inside? [
-            drop f
-        ] [
-            [ mouse-enter ] swap handle-gesture* drop t
-        ] ifte
+        2dup inside? [ mouse-enter ] hierarchy-gesture
     ] each-parent drop ;
 
 : mouse-leave ( point gadget -- )
@@ -46,9 +49,23 @@ SYMBOL: button-down
     #! fire a leave gesture and go on to the parent.
     [
         [ shape-pos + ] keep
-        2dup inside? [
-            drop f
-        ] [
-            [ mouse-leave ] swap handle-gesture* drop t
-        ] ifte
+        2dup inside? [ mouse-leave ] hierarchy-gesture
+    ] each-parent drop ;
+
+: lose-focus ( old new -- )
+    #! If the old focus owner is a child of the new owner, do
+    #! not fire a focus lost gesture, since the focus was not
+    #! lost. Otherwise, fire a focus lost gesture and go to the
+    #! parent.
+    [
+        2dup child? [ lose-focus ] hierarchy-gesture
+    ] each-parent drop ;
+
+: gain-focus ( old new -- )
+    #! If the old focus owner is a child of the new owner, do
+    #! not fire a focus gained gesture, since the focus was not
+    #! gained. Otherwise, fire a focus gained gesture and go on
+    #! to the parent.
+    [
+        2dup child? [ gain-focus ] hierarchy-gesture
     ] each-parent drop ;

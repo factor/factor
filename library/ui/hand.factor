@@ -43,8 +43,11 @@ DEFER: world
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
 ! it is special in that the world does not list it as part of
-! its contents.
-TUPLE: hand click-pos clicked buttons gadget delegate ;
+! its contents. Some comments on the slots:
+! - hand-gadget is the gadget under the mouse position
+! - hand-clicked is the most recently clicked gadget
+! - hand-focus is the gadget holding keyboard focus
+TUPLE: hand click-pos clicked buttons gadget focus delegate ;
 
 C: hand ( world -- hand )
     0 0 0 0 <rectangle> <gadget>
@@ -81,3 +84,9 @@ C: hand ( world -- hand )
     dup r> fire-leave
     dup fire-motion
     r> swap fire-enter ;
+
+: request-focus ( gadget -- )
+    my-hand hand-focus swap
+    2dup lose-focus
+    2dup my-hand set-hand-focus
+    gain-focus ;
