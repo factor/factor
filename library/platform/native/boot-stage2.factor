@@ -78,6 +78,7 @@ USE: stdio
     "/library/presentation.factor"
     "/library/vocabulary-style.factor"
     "/library/syntax/prettyprint.factor"
+    "/library/syntax/see.factor"
     "/library/platform/native/debugger.factor"
     "/library/tools/debugger.factor"
     "/library/platform/native/init.factor"

@@ -81,6 +81,40 @@ DEFER: prettyprint*
         dup prettyprint-newline
     ] unless ;
 
+: word-link ( word -- link )
+    [
+        "vocabularies'" ,
+        dup word-vocabulary ,
+        "'" ,
+        word-name ,
+    ] make-string ;
+
+: word-actions ( -- list )
+    [
+        [ "Describe" | "describe-path"  ]
+        [ "Push"     | "lookup"         ]
+        [ "Execute"  | "lookup execute" ]
+        [ "jEdit"    | "lookup jedit"   ]
+        [ "Usages"   | "lookup usages." ]
+    ] ;
+
+: word-attrs ( word -- attrs )
+    #! Words without a vocabulary do not get a link or an action
+    #! popup.
+    dup word-vocabulary [
+        word-link [ "object-link" swons ] keep
+        word-actions <actions> "actions" swons
+        t "underline" swons
+        3list
+    ] [
+        drop [ ]
+    ] ifte ;
+
+: prettyprint-word ( word -- )
+    dup word-name
+    swap dup word-attrs swap word-style append
+    write-attr ;
+
 : prettyprint-[ ( indent -- indent )
         \ [ prettyprint-word <prettyprint ;
 
@@ -95,7 +129,8 @@ DEFER: prettyprint*
             prettyprint-list
         ] [
             [
-                "|" write prettyprint-space prettyprint-element
+                \ | prettyprint-word
+                prettyprint-space prettyprint-element
             ] when*
         ] ifte
     ] when* ;
@@ -133,52 +168,12 @@ DEFER: prettyprint*
         swap prettyprint-{{ swap prettyprint-list prettyprint-}}
     ] ifte ;
 
-: trim-newline ( str -- str )
-    dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
-
-: prettyprint-comment ( comment -- )
-    trim-newline "comments" style write-attr ;
-
-: word-link ( word -- link )
-    [
-        "vocabularies'" ,
-        dup word-vocabulary ,
-        "'" ,
-        word-name ,
-    ] make-string ;
-
-: word-actions ( -- list )
-    [
-        [ "Describe" | "describe-path"  ]
-        [ "Push"     | "lookup"         ]
-        [ "Execute"  | "lookup execute" ]
-        [ "jEdit"    | "lookup jedit"   ]
-        [ "Usages"   | "lookup usages." ]
-    ] ;
-
-: word-attrs ( word -- attrs )
-    #! Words without a vocabulary do not get a link or an action
-    #! popup.
-    dup word-vocabulary [
-        word-link [ "object-link" swons ] keep
-        word-actions <actions> "actions" swons
-        t "underline" swons
-        3list
-    ] [
-        drop [ ]
-    ] ifte ;
-
-: prettyprint-word ( word -- )
-    dup word-name
-    swap dup word-attrs swap word-style append
-    write-attr ;
-
 : prettyprint-object ( indent obj -- indent )
     unparse write ;
 
 : prettyprint* ( indent obj -- indent )
     over prettyprint-limit >= [
-        unparse write
+        prettyprint-object
     ] [
         [
             [ f =        ] [ prettyprint-object ]
@@ -195,28 +190,6 @@ DEFER: prettyprint*
 
 : vocab-link ( vocab -- link )
     "vocabularies'" swap cat2 ;
-
-: vocab-attrs ( word -- attrs )
-    vocab-link "object-link" default-style acons ;
-
-: prettyprint-vocab ( vocab -- )
-    dup vocab-attrs write-attr ;
-
-: prettyprint-IN: ( indent word -- )
-    \ IN: prettyprint-word prettyprint-space
-    word-vocabulary prettyprint-vocab prettyprint-newline ;
-
-: prettyprint-: ( indent -- indent )
-    \ : prettyprint-word prettyprint-space
-    tab-size + ;
-
-: prettyprint-; ( indent -- indent )
-    \ ; prettyprint-word
-    tab-size - ;
-
-: prettyprint-plist ( word -- )
-    dup "parsing" word-property [ " parsing" write ] when
-    "inline" word-property [ " inline" write ] when ;
 
 : . ( obj -- )
     [
@@ -242,49 +215,3 @@ DEFER: prettyprint*
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
-
-: stack-effect. ( word -- )
-    stack-effect [
-        " " write
-        [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
-    ] when* ;
-
-: documentation. ( indent word -- indent )
-    documentation [
-        "\n" split [
-            "#!" swap cat2 prettyprint-comment
-            dup prettyprint-newline
-        ] each
-    ] when* ;
-
-: prettyprint-docs ( indent word -- indent )
-    [
-        stack-effect. dup prettyprint-newline
-    ] keep documentation. ;
-
-: see-compound ( word -- )
-    0 swap
-    [ dupd prettyprint-IN: prettyprint-: ] keep
-    [ prettyprint-word ] keep
-    [ prettyprint-docs ] keep
-    [ word-parameter prettyprint-list prettyprint-; ] keep
-    prettyprint-plist prettyprint-newline ;
-
-: see-primitive ( word -- )
-    "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
-
-: see-symbol ( word -- )
-    "SYMBOL: " write . ;
-
-: see-undefined ( word -- )
-    drop "Not defined" print ;
-
-: see ( name -- )
-    #! Show a word definition.
-    [
-        [ compound? ] [ see-compound ]
-        [ symbol? ] [ see-symbol ]
-        [ primitive? ] [ see-primitive ]
-        [ word? ] [ see-undefined ]
-        [ drop t ] [ "Not a word: " write . ]
-    ] cond ;

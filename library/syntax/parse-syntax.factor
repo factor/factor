@@ -193,11 +193,17 @@ IN: syntax
     parsing
 
 ! Comments
-: ( ")" until parsed-stack-effect ; parsing
+: (
+    #! Stack comment.
+    ")" until parsed-stack-effect ; parsing
 
-: ! until-eol drop ; parsing
+: !
+    #! EOL comment.
+    until-eol drop ; parsing
 
-: #! until-eol parsed-documentation ; parsing
+: #!
+    #! Documentation comment.
+    until-eol parsed-documentation ; parsing
 
 ! Reading numbers in other bases
 

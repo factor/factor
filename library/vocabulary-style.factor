@@ -115,3 +115,6 @@ USE: words
     [ "ansi-fg" | "3" ]
     [ "fg" | [ 2 185 2 ] ]
 ] "vectors" set-vocab-style
+[
+    [ "fg" | [ 128 128 128 ] ]
+] "syntax" set-vocab-style
