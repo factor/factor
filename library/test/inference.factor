@@ -203,3 +203,4 @@ SYMBOL: sym-test
 [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 [ [ [ object ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
 [ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
+[ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test

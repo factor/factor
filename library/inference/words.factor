@@ -37,7 +37,6 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
-USE: prettyprint
 
 : with-dataflow ( param op [ in | out ] quot -- )
     #! Take input parameters, execute quotation, take output

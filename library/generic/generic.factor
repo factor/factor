@@ -162,6 +162,9 @@ SYMBOL: object
 : type-union ( list list -- list )
     append prune [ > ] sort ;
 
+: type-intersection ( list list -- list )
+    intersection [ > ] sort ;
+
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
     swap builtin-supertypes
@@ -173,7 +176,7 @@ SYMBOL: object
     #! error if this is impossible.
     over builtin-supertypes
     over builtin-supertypes
-    intersection dup [
+    type-intersection dup [
         nip nip classes get hash [ object ] unless*
     ] [
         drop [
@@ -187,4 +190,4 @@ SYMBOL: object
     dup builtin-supertypes [ > ] sort
     classes get set-hash ;
 
-global [ <namespace> classes set ] bind
+global [ classes get [ <namespace> classes set ] unless ] bind

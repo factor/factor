@@ -136,3 +136,5 @@ M: very-funny gooey sq ;
 [ integer ] [ fixnum bignum class-or ] unit-test
 [ integer ] [ fixnum integer class-or ] unit-test
 [ rational ] [ ratio integer class-or ] unit-test
+[ number ] [ number object class-and ] unit-test
+[ number ] [ object number class-and ] unit-test
