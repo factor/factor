@@ -31,6 +31,7 @@ USE: stdio
 USE: stack
 USE: namespaces
 USE: html
+USE: combinators
 
 : simple-page ( title quot -- )
   #! Call the quotation, with all output going to the

@@ -32,6 +32,7 @@ USE: cont-responder
 USE: stdio
 USE: namespaces
 USE: lists
+USE: combinators
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.

@@ -37,6 +37,8 @@ USE: kernel
 USE: prettyprint
 USE: unparser
 USE: url-encoding
+USE: combinators
+USE: files
 
 
 : <todo> ( user password -- <todo> )
