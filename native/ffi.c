@@ -227,7 +227,7 @@ void collect_alien(ALIEN* alien)
 {
 	if(alien->local && alien->ptr != NULL)
 	{
-		STRING* ptr = alien->ptr - sizeof(STRING);
+		STRING* ptr = (STRING*)(alien->ptr - sizeof(STRING));
 		ptr = copy_untagged_object(ptr,SSIZE(ptr));
 		alien->ptr = (CELL)ptr + sizeof(STRING);
 	}

@@ -4,6 +4,7 @@ FFI:
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 
+- fix responder generated links
 - profiler is inaccurate: wrong word on cs
 - buffer change handler in sidekick is screwed
 - dec> bin> oct> hex> throw errors

@@ -58,7 +58,7 @@ void allot_profile_step(CELL a)
 	executing->allot_count += a;
 }
 
-void check_memory(void)
+void garbage_collection_later(void)
 {
 	if(gc_protect)
 		return;

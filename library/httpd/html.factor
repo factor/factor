@@ -111,7 +111,8 @@ USE: url-encoding
     ] ifte* ;
 
 : object-link-href ( path -- href )
-    "/inspect/" swap cat2 ;
+    #! Perhaps this should not be hard-coded.
+    "/responder/inspect/" swap cat2 ;
 
 : object-link-tag ( style quot -- )
     over "object-link" swap assoc [
@@ -122,7 +123,7 @@ USE: url-encoding
 
 : icon-tag ( string style quot -- )
     over "icon" swap assoc dup [
-        <img src= "/resource/" swap cat2 img/>
+        <img src= "/responder/resource/" swap cat2 img/>
         #! Ignore the quotation, since no further style
         #! can be applied
         3drop
