@@ -29,8 +29,25 @@ IN: math
 USE: generic
 USE: kernel
 USE: math
+USE: math-internals
 
 : >rect ( x -- xr xi ) dup real swap imaginary ;
+
+: conjugate ( z -- z* )
+    >rect neg rect> ;
+
+: arg ( z -- arg )
+    #! Compute the complex argument.
+    >rect swap fatan2 ;
+
+: >polar ( z -- abs arg )
+    >rect 2dup swap fatan2 >r mag2 r> ;
+
+: cis ( theta -- cis )
+    dup fcos swap fsin rect> ;
+
+: polar> ( abs arg -- z )
+    cis * ;
 
 IN: math-internals
 
@@ -57,22 +74,6 @@ M: complex / ( x y -- x/y ) complex/ tuck / >r / r> rect> ;
 M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> rect> ;
 
 M: complex abs ( z -- |z| ) >rect mag2 ;
-
-: conjugate ( z -- z* )
-    >rect neg rect> ;
-
-: arg ( z -- arg )
-    #! Compute the complex argument.
-    >rect swap fatan2 ;
-
-: >polar ( z -- abs arg )
-    >rect 2dup swap fatan2 >r mag2 r> ;
-
-: cis ( theta -- cis )
-    dup fcos swap fsin rect> ;
-
-: polar> ( abs arg -- z )
-    cis * ;
 
 M: complex hashcode ( n -- n )
     >rect >fixnum swap >fixnum bitxor ;

@@ -190,4 +190,5 @@ USE: prettyprint
 \ - [ 2 | 1 ] "infer-effect" set-word-property
 \ * [ 2 | 1 ] "infer-effect" set-word-property
 \ / [ 2 | 1 ] "infer-effect" set-word-property
+\ gcd [ 2 | 1 ] "infer-effect" set-word-property
 \ hashcode [ 1 | 1 ] "infer-effect" set-word-property

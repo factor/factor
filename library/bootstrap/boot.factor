@@ -40,7 +40,6 @@ USE: hashtables
 "/library/stack.factor" run-resource
 "/library/combinators.factor" run-resource
 "/library/kernel.factor" run-resource
-"/library/logic.factor" run-resource
 "/library/cons.factor" run-resource
 "/library/assoc.factor" run-resource
 "/library/math/math.factor" run-resource

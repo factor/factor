@@ -45,7 +45,6 @@ USE: stdio
     "/library/stack.factor"
     "/library/combinators.factor"
     "/library/kernel.factor"
-    "/library/logic.factor"
     "/library/cons.factor"
     "/library/assoc.factor"
     "/library/math/math.factor"
@@ -74,7 +73,6 @@ USE: stdio
     "/library/syntax/parser.factor"
     "/library/syntax/parse-stream.factor"
     "/library/bootstrap/init.factor"
-!    "/library/syntax/parse-syntax.factor"
 
     "/library/format.factor"
     "/library/syntax/unparser.factor"

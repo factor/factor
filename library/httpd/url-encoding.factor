@@ -55,7 +55,7 @@ USE: unparser
     2dup url-decode-hex >r 3 + r> ;
 
 : url-decode-+-or-other ( index str ch -- index str )
-    CHAR: + CHAR: \s replace , >r succ r> ;
+    dup CHAR: + = [ drop CHAR: \s ] when , >r succ r> ;
 
 : url-decode-iter ( index str -- )
     2dup str-length >= [

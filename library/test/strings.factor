@@ -98,6 +98,6 @@ unit-test
 [ "Replacing+spaces+with+plus" ]
 [
     "Replacing spaces with plus"
-    [ CHAR: \s CHAR: + replace ] str-map
+    [ dup CHAR: \s = [ drop CHAR: + ] when ] str-map
 ]
 unit-test

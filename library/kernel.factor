@@ -27,13 +27,13 @@
 
 IN: kernel
 USE: generic
-USE: lists
-USE: math
-USE: math-internals
-USE: strings
 USE: vectors
-USE: words
-USE: vectors
+
+GENERIC: hashcode ( obj -- n )
+M: object hashcode drop 0 ;
+
+GENERIC: = ( obj obj -- ? )
+M: object = eq? ;
 
 : cpu ( -- arch )
     #! Returns one of "x86" or "unknown".
@@ -46,15 +46,6 @@ USE: vectors
 : dispatch ( n vtable -- )
     vector-nth call ;
 
-: 2generic ( n n vtable -- )
-    >r arithmetic-type r> dispatch ; inline
-
-GENERIC: hashcode
-M: object hashcode drop 0 ;
-
-GENERIC: =
-M: object = eq? ;
-
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -62,6 +53,17 @@ M: object = eq? ;
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
     17 ;
+
+: ? ( cond t f -- t/f )
+    #! Push t if cond is true, otherwise push f.
+    rot [ drop ] [ nip ] ifte ; inline
+
+: >boolean t f ? ; inline
+
+: and ( a b -- a&b ) f ? ; inline
+: not ( a -- ~a ) f t ? ; inline
+: or ( a b -- a|b) t swap ? ; inline
+: xor ( a b -- a^b ) dup not swap ? ; inline
 
 IN: syntax
 BUILTIN: f 6 FORGET: f?

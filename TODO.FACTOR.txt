@@ -23,10 +23,6 @@
 
 + oop:
 
-- union metaclass
-- 2generic
-- move generic, 2generic from kernel vocabulary
-- generic = hashcode and math ops
 - make see work with generics
 - doc comments of generics
 
@@ -40,6 +36,7 @@
 
 + listener/plugin:
 
+- faster completion
 - word added >1 if external instance dies
 - sidekick: still parsing too much
 - errors don't always disappear

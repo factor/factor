@@ -48,7 +48,7 @@ USE: url-encoding
 
 : url>path ( uri -- path )
     url-decode "http://" ?str-head [
-        "/" split1 f "" replace nip
+        "/" split1 dup "" ? nip
     ] when ;
 
 : secure-path ( path -- path )

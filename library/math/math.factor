@@ -32,6 +32,8 @@ USE: math-internals
 
 ! Math operations
 2GENERIC: number= ( x y -- ? )
+M: object number= 2drop f ;
+
 2GENERIC: <  ( x y -- ? )
 2GENERIC: <= ( x y -- ? )
 2GENERIC: >  ( x y -- ? )
