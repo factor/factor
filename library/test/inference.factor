@@ -11,23 +11,35 @@ USE: kernel
 USE: math-internals
 USE: generic
 
-[ [ [ object object ] f ] ]
-[ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
+[ 0 ]
+[ { 1 2 3 } { 4 5 6 } vector-zip 0 swap raise# ]
 unit-test
 
-[ [ [ cons vector cons integer object cons ] [ cons vector cons ] ] ]
-[
-    [ [ vector ] [ cons vector cons integer object cons ] ]
-    [ [ vector ] [ cons vector cons ] ]
-    decompose
-] unit-test
+[ 2 ]
+[ { 1 2 3 } { 1 2 6 } vector-zip 0 swap raise# ]
+unit-test
 
-[ [ [ object ] [ object ] ] ]
-[
-    [ [ object number ] [ object ] ]
-    [ [ object number ] [ object ] ]
-    decompose
-] unit-test
+[ { 4 5 6 } ]
+[ { 1 2 3 } dup [ 4 5 6 ] unify-entry-effect ]
+unit-test
+
+! [ [ [ object object ] f ] ]
+! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
+! unit-test
+! 
+! [ [ [ cons vector cons integer object cons ] [ cons vector cons ] ] ]
+! [
+!     [ [ vector ] [ cons vector cons integer object cons ] ]
+!     [ [ vector ] [ cons vector cons ] ]
+!     decompose
+! ] unit-test
+! 
+! [ [ [ object ] [ object ] ] ]
+! [
+!     [ [ object number ] [ object ] ]
+!     [ [ object number ] [ object ] ]
+!     decompose
+! ] unit-test
 
 : old-effect ( [ in-types out-types ] -- [ in | out ] )
     uncons car length >r length r> cons ;

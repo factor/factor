@@ -50,7 +50,7 @@ USE: namespaces
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 
 [ { 1 2 3 4 5 6 } ]
-[ { 1 2 3 } vector-clone dup { 4 5 6 } vector-append ] unit-test
+[ { 1 2 3 } { 4 5 6 } vector-append ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a fill ] vector-project ]

@@ -1,6 +1,12 @@
 + compiler:
 
-- type inference fails with some assembler words
+- investigate why : foo t or ; doesn't partially evaluate
+- investigate why ' doesn't infer
+- recursive? and tree-contains? should handle vectors
+- type inference and recursion flaw
+- type inference fails with some assembler words;
+  displaced, register and other predicates need to inherit from list
+  not cons, and need stronger branch partial eval
 - more accurate type inference in some cases
 - optimize away dispatch
 - goal: to compile hash* optimally
@@ -23,33 +29,39 @@
 
 + listener/plugin:
 
+- update plugin docs
+- extract word keeps indent
+- word preview for remote words
 - WordPreview calls markTokens() -> NPE
-- stream server can hang because of exception handler limitations
 - listener should be multithreaded
-- compile all, infer all commands
+- compile all commands
 - faster completion
-- errors don't always disappear
 - NPE in ErrorHighlight
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:
 
++ i/o:
+
+- stream server can hang because of exception handler limitations
+- better i/o scheduler
+- nicer way to combine two paths
+- add a socket timeout
+- rename f* words to stream-*
+- <file[bc][rw]> is badly named -- <file-reader>, <file-writer>
+
 + kernel:
 
 - ppc register decls
 - do partial objects cause problems?
-- better i/o scheduler
 - remove sbufs
 - cat, reverse-cat primitives
 - first-class hashtables
-- add a socket timeout
 
 + misc:
 
 - perhaps /i should work with all numbers
-- unit test weirdness: 2 lines appears at end
 - jedit ==> jedit-word, jedit takes a file name
-- nicer way to combine two paths
 - browser responder for word links in HTTPd
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link

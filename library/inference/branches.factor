@@ -47,7 +47,7 @@ USE: prettyprint
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    dup >r vector-length - computed-value-vector dup r>
+    [ vector-length - computed-value-vector ] keep
     vector-append ;
 
 : unify-lengths ( list -- list )
@@ -89,7 +89,7 @@ USE: prettyprint
     ] ifte ;
 
 : datastack-effect ( list -- )
-    [ [ d-in get meta-d get ] bind cons ] map
+    [ [ effect ] bind ] map
     unify-effect
     meta-d set d-in set ;
 
@@ -161,7 +161,7 @@ SYMBOL: cloned
     #! for the given branch.
     [
         [
-            inferring-base-case get [
+            branches-can-fail? [
                 [
                     infer-branch ,
                 ] [
@@ -182,7 +182,7 @@ SYMBOL: cloned
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again. The inputs
     #! parameter is a vector.
-    (infer-branches)  dup unify-effects unify-dataflow ;
+    (infer-branches) dup unify-effects unify-dataflow ;
 
 : (with-block) ( label quot -- )
     #! Call a quotation in a new namespace, and transfer
@@ -196,7 +196,7 @@ SYMBOL: cloned
     meta-r set meta-d set d-in set ;
 
 : static-branch? ( value -- )
-    literal? inferring-base-case get not and ;
+    literal? branches-can-fail? not and ;
 
 : static-ifte ( true false -- )
     #! If the branch taken is statically known, just infer
@@ -222,11 +222,11 @@ SYMBOL: cloned
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap
-!    peek-d static-branch? [
-!        static-ifte
-!    ] [
+    peek-d static-branch? [
+        static-ifte
+    ] [
         dynamic-ifte
-    ( ] ifte ) ;
+    ] ifte ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 

@@ -39,9 +39,17 @@ USE: hashtables
 USE: generic
 USE: prettyprint
 
-! If this symbol is on, partial evalution of conditionals is
+! If this variable is on, partial evalution of conditionals is
 ! disabled.
 SYMBOL: inferring-base-case
+
+! If this variable is on, we are inferring the entry effect, so
+! we unify all entry point effects to the vecto stored in this
+! variable.
+SYMBOL: inferring-entry-effect
+
+: branches-can-fail? ( -- ? )
+    inferring-base-case get inferring-entry-effect get or ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -130,7 +138,7 @@ M: literal set-value-class ( class value -- )
     ] ifte ;
 
 : vector-prepend ( values stack -- stack )
-    >r list>vector dup r> vector-append ;
+    >r list>vector r> vector-append ;
 
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types
@@ -138,17 +146,23 @@ M: literal set-value-class ( class value -- )
     meta-d [ vector-prepend ] change
     d-in [ vector-prepend ] change ;
 
-: effect ( -- [ in-types out-types ] )
+: (present-effect) ( vector -- list )
+    [ value-class ] vector-map vector>list ;
+
+: present-effect ( [ d-in | meta-d ] -- [ in-types out-types ] )
     #! After inference is finished, collect information.
-    d-in get [ value-class ] vector-map vector>list
-    meta-d get [ value-class ] vector-map vector>list 2list ;
+    uncons >r (present-effect) r> (present-effect) 2list ;
+
+: effect ( -- [ d-in | meta-d ] )
+    d-in get meta-d get cons ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    inferring-base-case off ;
+    inferring-base-case off
+    inferring-entry-effect off ;
 
 DEFER: apply-word
 
@@ -186,7 +200,7 @@ DEFER: apply-word
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
-    [ (infer) effect ] with-scope ;
+    [ (infer) effect present-effect ] with-scope ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.

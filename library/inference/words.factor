@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -88,17 +88,32 @@ USE: prettyprint
         r> call
     ] (with-block) ;
 
+: entry-effect ( quot -- )
+    [
+        meta-d get inferring-entry-effect set
+        copy-inference
+        infer-quot
+        inferring-entry-effect off
+    ] with-scope ;
+
+: recursive? ( word -- ? )
+    dup word-parameter tree-contains? ;
+
 : inline-compound ( word -- effect )
     #! Infer the stack effect of a compound word in the current
-    #! inferencer instance.
-    gensym [ word-parameter infer-quot effect ] with-block ;
+    #! inferencer instance. If the word in question is recursive
+    #! we infer its stack effect inside a new block.
+    gensym [
+        dup recursive? [ dup word-parameter entry-effect ] when
+        word-parameter infer-quot effect
+    ] with-block ;
 
 : infer-compound ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
         recursive-state get init-inference
-        dup dup inline-compound
+        dup dup inline-compound present-effect
         [ "infer-effect" set-word-property ] keep
     ] with-scope consume/produce ;
 
@@ -135,32 +150,77 @@ M: symbol (apply-word) ( word -- )
         ] when
     ] when ;
 
-: decompose ( x y -- effect )
+: decompose ( x y -- [ d-in | meta-d ] )
     #! Return a stack effect such that x*effect = y.
-    2unlist >r
-    swap 2unlist >r
-    over length over length - head nip
-    r> append
-    r> 2list ;
+    uncons >r swap uncons >r
+    over vector-length over vector-length -
+    swap vector-head nip
+    r> vector-append r> cons ;
 
-: base-case ( word -- effect )
-    effect swap
+: base-case ( word -- [ d-in | meta-d ] )
     [
         inferring-base-case on
         copy-inference
         inline-compound
         inferring-base-case off
-    ] with-scope decompose ;
+    ] with-scope effect swap decompose ;
+
+: no-base-case ( word -- )
+    word-name " does not have a base case." cat2 throw ;
+
+: raise# ( n vec -- n )
+    #! Parameter is a vector of pairs. Return the highest index
+    #! where pairs are equal.
+    2dup vector-length >= [
+        drop
+    ] [
+        2dup vector-nth uncons = [
+            >r 1 + r> raise#
+        ] [
+            drop
+        ] ifte
+    ] ifte ;
+
+: raise ( vec1 vec2 -- list )
+    #! Return a new vector consisting of the remainder of vec1,
+    #! without any leading elements equal to those from vec2.
+    over vector-zip 0 swap raise# swap vector-tail ;
+
+: unify-entry-effect ( vector list -- )
+    #! If any elements are not equal, the vector's element is
+    #! replaced with the list's.
+    over vector-length over length - -rot [
+        ( n vector elt )
+        pick pick vector-nth over = [
+            drop
+        ] [
+            pick pick set-vector-nth
+        ] ifte
+        >r 1 + r>
+    ] each 2drop ;
+
+: apply-entry-effect ( word -- )
+    #! Called at a recursive call point. We need this to compute
+    #! the set of literals that is retained across a recursive
+    #! call -- this is NOT the same as the literals present on
+    #! entry. This word mutates the inferring-entry-effect
+    #! vector.
+    base-case uncons raise
+    inferring-entry-effect get swap unify-entry-effect ;
 
 : recursive-word ( word label -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
     inferring-base-case get [
-        drop word-name " does not have a base case." cat2 throw
+        drop no-base-case
     ] [
-        2dup [ drop #call-label ] [ nip #call ] ifte
-        rot base-case (consume/produce)
+        inferring-entry-effect get [
+            apply-entry-effect  "Bail out" throw
+        ] [
+            dup [ #call-label ] [ #call ] ?ifte
+            rot base-case present-effect (consume/produce)
+        ] ifte
     ] ifte ;
 
 : apply-word ( word -- )
@@ -186,6 +246,7 @@ M: symbol (apply-word) ( word -- )
 
 \ call [ infer-call ] "infer" set-word-property
 
+! These hacks will go away soon
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property

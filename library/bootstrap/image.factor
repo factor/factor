@@ -215,7 +215,7 @@ M: f ' ( obj -- ptr )
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary unit search
-    [ "Missing DEFER: " word-error ] ?unless ;
+    [ dup "Missing DEFER: " word-error ] ?unless ;
 
 : fixup-word ( word -- offset )
     dup pooled-object [ "Not in image: " word-error ] ?unless ;

@@ -135,7 +135,7 @@ USE: math-internals
     [ ECX ] IDIV
     EAX 3 SHL
     0 JNO fixup
-    \ fixnum/i compile-call
+    \ fixnum/mod compile-call
     0 JMP fixup >r
     compiled-offset swap patch
     [ ECX -4 ] EAX MOV

@@ -107,9 +107,14 @@ BUILTIN: vector 11
 : vector-all? ( vector pred -- ? )
     vector-map vector-and ; inline
 
-: vector-append ( v1 v2 -- )
+: vector-nappend ( v1 v2 -- )
     #! Destructively append v2 to v1.
     [ over vector-push ] vector-each drop ;
+
+: vector-append ( v1 v2 -- vec )
+    over vector-length over vector-length + <vector>
+    [ rot vector-nappend ] keep
+    [ swap vector-nappend ] keep ;
 
 : vector-project ( n quot -- accum )
     #! Execute the quotation n times, passing the loop counter
@@ -122,7 +127,7 @@ BUILTIN: vector 11
 : vector-zip ( v1 v2 -- v )
     #! Make a new vector with each pair of elements from the
     #! first two in a pair.
-    over vector-length [
+    over vector-length over vector-length min [
         pick pick >r over >r vector-nth r> r> vector-nth cons
     ] vector-project nip nip ;
 
@@ -168,8 +173,13 @@ M: vector hashcode ( vec -- n )
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;
 
+: vector-head ( n vector -- list )
+    #! Return a new list with all elements up to the nth
+    #! element.
+    swap [ over vector-nth ] vector-project nip ;
+
 : vector-tail ( n vector -- list )
-    #! Return a new vector, with all elements from the nth
+    #! Return a new list with all elements from the nth
     #! index upwards.
     2dup vector-length swap - [
         pick + over vector-nth

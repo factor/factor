@@ -105,7 +105,7 @@ M: register register "register" word-property ;
 M: register displacement drop ;
 
 ( Indirect register operands -- eg, [ ECX ]                    )
-PREDICATE: list indirect
+PREDICATE: cons indirect
     dup length 1 = [ car register? ] [ drop f ] ifte ;
 
 M: indirect modifier drop BIN: 00 ;
@@ -117,7 +117,7 @@ M: indirect register
 M: indirect displacement drop ;
 
 ( Displaced indirect register operands -- eg, [ EAX 4 ]        )
-PREDICATE: list displaced
+PREDICATE: cons displaced
     dup length 2 = [
         2unlist integer? swap register? and
     ] [
@@ -130,7 +130,7 @@ M: displaced displacement
     cdr car dup byte? [ compile-byte ] [ compile-cell ] ifte ;
 
 ( Displacement-only operands -- eg, [ 1234 ]                   )
-PREDICATE: list disp-only
+PREDICATE: cons disp-only
     dup length 1 = [ car integer? ] [ drop f ] ifte ;
 
 M: disp-only modifier drop BIN: 00 ;
