@@ -1,3 +1,5 @@
+#include "platform.h"
+
 /* Thanks to Joshua Grams for this code.
 
 On PowerPC processors, we must flush the instruction cache manually
@@ -12,8 +14,8 @@ This function is called from compiler.c. */
 
 /* IN: 3 = start, 4 = len */
 
-	.global _flush_icache
-_flush_icache:
+	.global flush_icache
+flush_icache:
 	/* compute number of cache lines to flush */
 	add 4,4,3
 	clrrwi 3,3,5    /* align addr to next lower cache line boundary */

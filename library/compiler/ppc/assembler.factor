@@ -3,6 +3,9 @@
 IN: assembler
 USING: errors kernel math memory words ;
 
+! See the Motorola or IBM documentation for details. The opcode
+! names are standard.
+
 : insn ( operand opcode -- ) 26 shift bitor compile-cell ;
 
 : b-form ( bo bi bd aa lk -- n )
@@ -10,7 +13,7 @@ USING: errors kernel math memory words ;
     r> bitor r> bitor r> bitor r> bitor ;
 
 : d-form ( d a simm -- n )
-    >r 16 shift >r 21 shift r> bitor r> bitor ;
+    HEX: ffff bitand >r 16 shift >r 21 shift r> bitor r> bitor ;
 
 : i-form ( li aa lk -- n )
     >r 1 shift bitor r> bitor ;
@@ -19,6 +22,7 @@ USING: errors kernel math memory words ;
     1 shift >r 11 shift >r 21 shift r> bitor r> bitor ;
 
 : ADDI d-form 14 insn ;
+: SUBI neg ADDI ;
 : LI 0 rot ADDI ;
 : ADDIS d-form 15 insn ;
 : LIS 0 rot ADDIS ;
@@ -30,5 +34,6 @@ USING: errors kernel math memory words ;
 : MFLR 8 MFSPR ;
 : MTSPR 5 shift 467 xfx-form 31 insn ;
 : MTLR 8 MTSPR ;
+: LWZ d-form 32 insn ;
 : STW d-form 36 insn ;
 : STWU d-form 37 insn ;

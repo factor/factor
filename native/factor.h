@@ -1,11 +1,7 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
-#if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
-    #define FACTOR_X86
-#elif defined(__POWERPC__) || defined(__ppc__) || defined(_ARCH_PPC)
-    #define FACTOR_PPC
-#endif
+#include "platform.h"
 
 #if defined(WIN32)
 	#define DLLEXPORT __declspec(dllexport)

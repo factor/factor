@@ -23,7 +23,7 @@ void primitive_set_literal_top(void);
 void collect_literals(void);
 
 #ifdef FACTOR_PPC
-extern void flush_icache(void *start, int len);
+void flush_icache(void *start, int len);
 #else
 INLINE void flush_icache(void *start, int len) {}
 #endif
