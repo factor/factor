@@ -35,7 +35,7 @@ C: dialog ( content -- gadget )
     [ dialog-actions ] keep ;
 
 : <prompt> ( prompt -- gadget )
-    0 default-gap <pile>
+    0 default-gap 0 <pile>
     [ >r <label> r> add-gadget ] keep
     [ >r "" <field> r> add-gadget ] keep ;
 

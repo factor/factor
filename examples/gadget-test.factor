@@ -15,7 +15,7 @@
 ! "examples/text-demo.factor" run-file
 
 IN: text-demo
-USING: unparser ;
+USING: listener threads unparser ;
 USE: streams
 USE: sdl
 USE: sdl-event
@@ -49,20 +49,19 @@ USE: words
     <line> <gadget> dup moving-actions ;
 
 : junk
-    <default-pile>
-    50 [
-        [ unparse <label> over add-gadget ] keep
-    ] repeat ;
+    <pane>
+    dup [
+        [
+            print-banner
+            listener
+        ] in-thread
+    ] with-stream ;
 
-: scroller
-    junk <viewport> dup <slider>
-    <default-shelf> 
-    [ tuck add-gadget add-gadget ] keep ;
 
 : make-shapes ( -- )
     f world get set-gadget-children
     
-    0 default-gap <pile> "pile" set
+    0 default-gap 0 <pile> "pile" set
 !    <default-shelf> "shelf" set
 !    "Close" [ "dialog" get world get remove-gadget ] <button> "shelf" get add-gadget
 !    "New Rectangle" [ drop 100 100 100 100 <funny-rect> dup [ 255 255 0 ] background set-paint-property world get add-gadget ] <button> "shelf" get add-gadget
@@ -74,7 +73,7 @@ USE: words
 !    "Welcome to Factor " version cat2 <label> "pile" get add-gadget
 !    "A field."  <field> "pile" get add-gadget
 !    "Another field."  <field> "pile" get add-gadget
-    scroller "pile" get add-gadget
+    junk <scroller> "pile" get add-gadget
 
     "pile" get bevel-border dup "dialog" set ! dup  
 ! moving-actions

@@ -13,7 +13,7 @@ words unparser kernel-internals console assembler memory ;
     "smart-terminal" on
     "verbose-compile" on
     "compile" on
-    os "win32" = "sdl" "ansi" ? "shell" set ;
+    os "win32" = "ui" "ansi" ? "shell" set ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot

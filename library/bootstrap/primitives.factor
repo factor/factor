@@ -193,8 +193,8 @@ vocabularies get [
     [ "<tuple>" "kernel-internals"            [ [ number ] [ tuple ] ] ]
     [ "begin-scan" "memory"                   [ [ ] [ ] ] ]
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
-    [ "end-scan" "memory"                     [ [ ] [ object ] ] ]
-    [ "size" "memory"                         [ [ ] [ object ] ] ]
+    [ "end-scan" "memory"                     [ [ ] [ ] ] ]
+    [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
 ] [                                           
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [

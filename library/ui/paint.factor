@@ -151,7 +151,7 @@ SYMBOL: clip
     ] intersect* ;
 
 : clip-rect ( x1 x2 y1 y2 -- rect )
-    over - >r >r over - r> swap r> <rectangle> ;
+    over - 1 + >r >r over - 1 + r> swap r> <rectangle> ;
 
 : intersect ( gadget rect -- rect )
     #! The first gadget's rectangle is relative co-ordinates,

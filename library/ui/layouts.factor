@@ -24,15 +24,19 @@ M: gadget layout* drop ;
 : default-gap 3 ;
 
 ! A pile is a box that lays out its contents vertically.
-TUPLE: pile align gap delegate ;
+TUPLE: pile align gap fill delegate ;
 
-C: pile ( align gap -- pile )
-    <empty-gadget> over set-pile-delegate
+C: pile ( align gap fill -- pile )
+    #! align: 0 left aligns, 1/2 center, 1 right.
+    #! gap: between each child.
+    #! fill: 0 leaves default width, 1 fills to pile width.
+    [ <empty-gadget> swap set-pile-delegate ] keep
+    [ set-pile-fill ] keep
     [ set-pile-gap ] keep
     [ set-pile-align ] keep ;
 
-: <default-pile> ( -- pile )
-    1/2 default-gap <pile> ;
+: <default-pile> 1/2 default-gap 0 <pile> ;
+: <line-pile> 0 0 1 <pile> ;
 
 : horizontal-layout ( gadget y box -- )
     pick shape-w over shape-w swap - swap pile-align * >fixnum
@@ -57,8 +61,8 @@ C: shelf ( align gap -- shelf )
     pick shape-h over shape-h swap - swap shelf-align * >fixnum
     rot move-gadget ;
 
-: <default-shelf> ( -- shelf )
-    1/2 default-gap <shelf> ;
+: <default-shelf> 1/2 default-gap <shelf> ;
+: <line-shelf> 0 0 <shelf> ;
 
 M: shelf layout* ( pile -- )
     dup shelf-gap over gadget-children run-widths >r >r

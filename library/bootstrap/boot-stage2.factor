@@ -167,8 +167,6 @@ cpu "x86" = "mini" get not and [
         "/library/compiler/x86/generator.factor"
         "/library/compiler/x86/fixnum.factor"
 
-        "/library/ui/line-editor.factor"
-        "/library/ui/console.factor"
         "/library/ui/shapes.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/paint.factor"
@@ -178,11 +176,13 @@ cpu "x86" = "mini" get not and [
         "/library/ui/world.factor"
         "/library/ui/labels.factor"
         "/library/ui/buttons.factor"
-        "/library/ui/fields.factor"
+        "/library/ui/line-editor.factor"
+        "/library/ui/editors.factor"
         "/library/ui/halo.factor"
         "/library/ui/dialogs.factor"
         "/library/ui/events.factor"
-        "/library/ui/viewports.factor"
+        "/library/ui/scrolling.factor"
+        "/library/ui/panes.factor"
     ] [
         dup print
         run-resource
