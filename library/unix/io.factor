@@ -13,3 +13,6 @@ USING: errors kernel math ;
 : open-write ( path -- fd )
     O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
     dup io-error ;
+
+: read-step ( fd buffer -- )
+    ;

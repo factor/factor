@@ -58,6 +58,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
 
+! Word definitions
 : :
     #! Begin a word definition. Word name follows.
     CREATE [ define-compound ] [ ] "in-definition" on ; parsing

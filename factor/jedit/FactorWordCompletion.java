@@ -36,20 +36,16 @@ import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
 import sidekick.*;
 
-public class FactorWordCompletion extends AbstractCompletion
+public class FactorWordCompletion extends SideKickCompletion
 {
-	private String word;
+	protected FactorParsedData data;
 
 	//{{{ FactorWordCompletion constructor
 	public FactorWordCompletion(View view, String word, FactorParsedData data)
 	{
-		super(view,data);
-
-		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getWordCompletions(word,false));
-
-		this.items = Arrays.asList(completions);
-		this.word = word;
+		super(view,word,FactorPlugin.toWordArray(
+			FactorPlugin.getWordCompletions(word,false)));
+		this.data = data;
 	} //}}}
 
 	/**
@@ -58,14 +54,14 @@ public class FactorWordCompletion extends AbstractCompletion
 	 */
 	public boolean updateInPlace(EditPane editPane, int caret)
 	{
-		String word = FactorSideKickParser.getCompletionWord(editPane,caret);
+		text = FactorSideKickParser.getCompletionWord(editPane,caret);
 
 		List newItems = new ArrayList();
 		Iterator iter = items.iterator();
 		while(iter.hasNext())
 		{
 			FactorWord w = (FactorWord)iter.next();
-			if(w.name.startsWith(word))
+			if(w.name.startsWith(text))
 				newItems.add(w);
 		}
 
@@ -76,27 +72,10 @@ public class FactorWordCompletion extends AbstractCompletion
 
 	public void insert(int index)
 	{
+		super.insert(index);
 		FactorWord selected = ((FactorWord)get(index));
-		String insert = selected.name.substring(word.length());
-
-		Buffer buffer = textArea.getBuffer();
-
-		try
-		{
-			buffer.beginCompoundEdit();
-			textArea.setSelectedText(insert);
-			if(!FactorPlugin.isUsed(view,selected.vocabulary))
-				FactorPlugin.insertUse(view,selected.vocabulary);
-		}
-		finally
-		{
-			buffer.endCompoundEdit();
-		}
-	}
-
-	public int getTokenLength()
-	{
-		return word.length();
+		if(!FactorPlugin.isUsed(view,selected.vocabulary))
+			FactorPlugin.insertUse(view,selected.vocabulary);
 	}
 
 	public ListCellRenderer getRenderer()

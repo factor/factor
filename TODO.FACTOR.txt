@@ -1,3 +1,4 @@
+- extra chars in completion!
 - set 'end' of artifacts/assets accurately
 - faster layout
 - faster repaint

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: files
-USING: alien kernel math namespaces ;
+USING: alien io-internals kernel math namespaces ;
 
 : cd ( dir -- )
     "void" "libc" "chdir" [ "char*" ] alien-invoke ;

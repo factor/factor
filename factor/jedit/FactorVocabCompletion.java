@@ -36,57 +36,15 @@ import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
 import sidekick.*;
 
-public class FactorVocabCompletion extends AbstractCompletion
+public class FactorVocabCompletion extends SideKickCompletion
 {
-	private String vocab;
+	protected FactorParsedData data;
 
 	//{{{ FactorVocabCompletion constructor
 	public FactorVocabCompletion(View view, String vocab, FactorParsedData data)
 	{
-		super(view,data);
-		String[] completions = FactorPlugin.getVocabCompletions(
-			vocab,false);
-		this.items = Arrays.asList(completions);
-		this.vocab = vocab;
+		super(view,vocab,Arrays.asList(FactorPlugin.getVocabCompletions(
+			vocab,false)));
+		this.data = data;
 	} //}}}
-
-	public String getLongestPrefix()
-	{
-		return MiscUtilities.getLongestPrefix(items,false);
-	}
-
-	public void insert(int index)
-	{
-		String selected = ((String)get(index));
-		String insert = selected.substring(vocab.length());
-
-		Buffer buffer = textArea.getBuffer();
-
-		textArea.setSelectedText(insert);
-	}
-
-	public int getTokenLength()
-	{
-		return vocab.length();
-	}
-
-	public boolean handleKeystroke(int selectedIndex, char keyChar)
-	{
-		if(keyChar == '\t' || keyChar == '\n')
-		{
-			insert(selectedIndex);
-			return false;
-		}
-		else if(keyChar == ' ')
-		{
-			insert(selectedIndex);
-			textArea.userInput(' ');
-			return false;
-		}
-		else
-		{
-			textArea.userInput(keyChar);
-			return true;
-		}
-	}
 }
