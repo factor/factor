@@ -158,10 +158,21 @@ SYMBOL: clip
     #! the second is screen.
     [ intersect-x ] 2keep intersect-y clip-rect ;
 
+: set-clip ( rect -- ? )
+    #! The top/left corner of the clip rectangle is the location
+    #! of the gadget on the screen. The bottom/right is the
+    #! intersected clip rectangle. Return t if the clip region
+    #! is an empty region.
+    surface get swap [ >sdl-rect SDL_SetClipRect drop ] keep
+    dup shape-w 0 = swap shape-h 0 = or ;
+
 : with-clip ( shape quot -- )
-    #!  All drawing done inside the quotation is clipped to the
-    #! shape's bounds.
-    [ >r clip [ intersect ] change r> call ] with-scope ; inline
+    #! All drawing done inside the quotation is clipped to the
+    #! shape's bounds. The quotation is called with a boolean
+    #! that is set to false if 
+    [
+        >r clip [ intersect dup ] change set-clip r> call
+    ] with-scope ; inline
 
 : >sdl-rect ( rectangle -- sdlrect )
     [ rectangle-x ] keep
@@ -170,22 +181,19 @@ SYMBOL: clip
     rectangle-h
     make-rect ;
 
-: set-clip ( -- )
-    #! The top/left corner of the clip rectangle is the location
-    #! of the gadget on the screen. The bottom/right is the
-    #! intersected clip rectangle.
-    surface get clip get >sdl-rect SDL_SetClipRect drop ;
-
 : draw-gadget ( gadget -- )
     #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
     dup gadget-paint [
         dup [
-            set-clip
-            dup draw-shape
-            dup [
-                gadget-children [ draw-gadget ] each
-            ] with-trans
+            [
+                drop
+            ] [
+                dup draw-shape
+                dup [
+                    gadget-children [ draw-gadget ] each
+                ] with-trans
+            ] ifte
         ] with-clip
     ] bind ;

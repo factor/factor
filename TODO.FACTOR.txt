@@ -5,9 +5,16 @@
 - faster completion
 - [ [ dup call ] dup call ] infer hangs
 - code gc
-- don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
+
++ ui:
+
+- fix up the min thumb size hack
+- fix up initial layout of slider
+- clicking in scroll bar: jump
+- clicking thumb: drag
+- console: scroll to bottom
 
 + compiler/ffi:
 
@@ -31,6 +38,8 @@
 
 + i/o:
 
+- udp
+- ipv6
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - nicer way to combine two paths

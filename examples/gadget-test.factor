@@ -48,15 +48,6 @@ USE: words
 : <funny-line>
     <line> <gadget> dup moving-actions ;
 
-: junk
-    <pane>
-    dup [
-        [
-            print-banner
-            listener
-        ] in-thread
-    ] with-stream ;
-
 
 : make-shapes ( -- )
     f world get set-gadget-children
@@ -73,7 +64,7 @@ USE: words
 !    "Welcome to Factor " version cat2 <label> "pile" get add-gadget
 !    "A field."  <field> "pile" get add-gadget
 !    "Another field."  <field> "pile" get add-gadget
-    junk <scroller> "pile" get add-gadget
+    <console-pane> <scroller> "pile" get add-gadget
 
     "pile" get bevel-border dup "dialog" set ! dup  
 ! moving-actions

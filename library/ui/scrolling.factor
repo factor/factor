@@ -5,19 +5,6 @@ USING: kernel lists math namespaces threads ;
 
 TUPLE: viewport x y delegate ;
 
-C: viewport ( content -- viewport )
-    [ <empty-gadget> swap set-viewport-delegate ] keep
-    [ add-gadget ] keep
-    0 over set-viewport-x
-    0 over set-viewport-y
-    640 480 pick resize-gadget ;
-
-M: viewport layout* ( viewport -- )
-    dup gadget-children [
-        >r dup viewport-x swap viewport-y r>
-        move-gadget
-    ] each-with ;
-
 : viewport-h ( viewport -- h ) gadget-children max-height ;
 : viewport-w ( viewport -- w ) gadget-children max-width ;
 
@@ -32,6 +19,31 @@ M: viewport layout* ( viewport -- )
     [ adjust-scroll ] keep
     [ set-viewport-y ] keep
     relayout ;
+
+: scroll>bottom ( viewport -- )
+    1 swap scroll-viewport ;
+
+: viewport-actions ( viewport -- )
+    {{
+        [[ [ scroll>bottom ] [ scroll>bottom ] ]]
+    }} clone swap set-gadget-gestures ;
+
+C: viewport ( content -- viewport )
+    [ <empty-gadget> swap set-viewport-delegate ] keep
+    [ add-gadget ] keep
+    0 over set-viewport-x
+    0 over set-viewport-y
+    dup viewport-actions
+    640 480 pick resize-gadget ;
+
+M: viewport layout* ( viewport -- )
+    dup gadget-children [
+        >r dup viewport-x swap viewport-y r>
+        move-gadget
+    ] each-with ;
+
+: scroll>bottom ( viewport -- )
+    dup viewport-h swap scroll-viewport ;
 
 ! A slider scrolls a viewport.
 
@@ -106,4 +118,3 @@ C: scroller ( gadget -- scroller )
     [ <default-shelf> swap set-scroller-delegate ] keep
     [ >r <viewport> r> add-viewport ] keep
     [ dup scroller-viewport <slider> swap add-slider ] keep ;
-

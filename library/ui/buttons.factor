@@ -14,12 +14,6 @@ USING: generic kernel lists math namespaces sdl ;
 
 : mouse-over? ( gadget -- ? ) my-hand hand-gadget child? ;
 
-: button-rollover? ( button -- ? )
-    mouse-over? 1 button-down? not and ;
-
-: rollover-update ( button -- )
-    dup button-rollover? blue black ? foreground set-paint-property ;
-
 : button-pressed? ( button -- ? )
     #! Return true if the mouse was clicked on the button, and
     #! is currently over the button.
@@ -33,11 +27,8 @@ USING: generic kernel lists math namespaces sdl ;
         drop f
     ] ifte ;
 
-: bevel-update ( button -- )
-    dup button-pressed? not bevel-up? set-paint-property ;
-
 : button-update ( button -- )
-    dup rollover-update dup bevel-update redraw ;
+    dup button-pressed? not bevel-up? set-paint-property redraw ;
 
 : button-clicked ( button -- )
     #! If the mouse is released while still inside the button,

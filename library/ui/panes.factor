@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: kernel line-editor lists namespaces streams strings
-threads ;
+USING: kernel line-editor listener lists namespaces stdio
+streams strings threads ;
 
 ! A pane is an area that can display text.
 
@@ -30,9 +30,12 @@ TUPLE: pane output current input continuation delegate ;
     pane-continuation call ;
  
 : pane-actions ( line -- )
-    dup
-    [ pane-input click-editor ] [ button-down 1 ] set-action
-    [ pane-return ] [ "RETURN" ] set-action ;
+    {{
+        [[ [ button-down 1 ] [ pane-input click-editor ] ]]
+        [[ [ "RETURN" ] [ pane-return ] ]]
+        [[ [ "UP" ] [ pane-input [ history-prev ] with-editor ] ]]
+        [[ [ "DOWN" ] [ pane-input [ history-next ] with-editor ] ]]
+    }} clone swap set-gadget-gestures ;
 
 C: pane ( -- pane )
     <line-pile> over set-pane-delegate
@@ -72,3 +75,8 @@ M: pane stream-write-attr ( string style stream -- )
     nip swap "\n" split pane-write ;
 
 M: pane stream-close ( stream -- ) drop ;
+
+: <console-pane> ( -- pane )
+    <pane> dup [
+        [ print-banner listener ] in-thread
+    ] with-stream ;

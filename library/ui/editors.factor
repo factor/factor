@@ -56,7 +56,7 @@ TUPLE: editor line caret delegate ;
     2dup relative shape-x pick set-caret-x
     request-focus ;
 
-: editor-gestures ( -- hash )
+: editor-actions ( editor -- )
     {{
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
@@ -65,7 +65,7 @@ TUPLE: editor line caret delegate ;
         [[ [ "LEFT" ] [ [ left ] with-editor ] ]]
         [[ [ "RIGHT" ] [ [ right ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
-    }} ;
+    }} clone swap set-gadget-gestures ;
 
 : <caret> ( -- caret )
     0 0 0 0 <plain-rect> <gadget>
@@ -76,7 +76,7 @@ C: editor ( text -- )
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
-    [ editor-gestures swap set-gadget-gestures ] keep ;
+    dup editor-actions ;
 
 : offset>x ( offset str -- x )
     str-head font get swap size-string drop ;
