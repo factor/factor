@@ -16,15 +16,19 @@ plugin.factor.jedit.FactorPlugin.menu=factor \
 	factor-run-file \
 	factor-eval-selection \
 	factor-apropos \
+	factor-edit \
 	factor-see \
-	factor-usages
+	factor-usages \
+	factor-balance
 
 factor.label=Factor Listener
 factor-run-file.label=Run current file
 factor-eval-selection.label=Evaluate selection
 factor-apropos.label=Apropos at caret
 factor-see.label=See word at caret
+factor-edit.label=Edit word at caret
 factor-usages.label=Word usages at caret
+factor-balance.label=Balance selection
 
 factor.title=Factor
 

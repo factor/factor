@@ -37,10 +37,15 @@ USE: strings
 : stdout 1 getenv ;
 : stderr 2 getenv ;
 
+: yield ( -- )
+    next-io-task dup [
+        call
+    ] [
+        drop yield
+    ] ifte ;
+
 : flush-fd ( port -- )
-    [
-        swap add-write-io-task next-io-task call
-    ] callcc0 drop ;
+    [ swap add-write-io-task yield ] callcc0 drop ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ drop ] [ flush-fd ] ifte ;
@@ -51,9 +56,7 @@ USE: strings
     over wait-to-write write-fd-8 ;
 
 : fill-fd ( port -- )
-    [
-        swap add-read-line-io-task next-io-task call
-    ] callcc0 drop ;
+    [ swap add-read-line-io-task yield ] callcc0 drop ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [ drop ] [ fill-fd ] ifte ;
@@ -62,9 +65,7 @@ USE: strings
     dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
 
 : wait-to-accept ( socket -- )
-    [
-        swap add-accept-io-task next-io-task call
-    ] callcc0 drop ;
+    [ swap add-accept-io-task yield ] callcc0 drop ;
 
 : blocking-accept ( socket -- host port in out )
     dup wait-to-accept accept-fd ;

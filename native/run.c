@@ -14,6 +14,7 @@ void init_signals(void)
 	sigaction(SIGFPE,&custom_sigaction,NULL);
 	sigaction(SIGBUS,&custom_sigaction,NULL);
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
+	sigaction(SIGPIPE,&custom_sigaction,NULL);
 }
 
 void clear_environment(void)

@@ -42,6 +42,14 @@ USE: strings
 USE: httpd-responder
 USE: url-encoding
 
+: httpd-log-stream ( -- stream )
+    #! Set httpd-log-file to save httpd log to a file.
+    "httpd-log-file" get dup [
+        <filecr>
+    ] [
+        drop "stdio" get
+    ] ifte ;
+
 : bad-request ( -- )
     "400 Bad request" httpd-error ;
 
@@ -97,11 +105,12 @@ USE: url-encoding
         dup accept httpd-client
     ] while ;
 
+: (httpd) ( port -- )
+    <server> [
+        httpd-loop
+    ] [
+        swap fclose clear-quit-flag rethrow
+    ] catch ;
+
 : httpd ( port -- )
-    [
-        <server> [
-            httpd-loop
-        ] [
-            swap fclose clear-quit-flag rethrow
-        ] catch
-    ] with-logging ;
+    [ httpd-log-stream "log" set (httpd) ] with-scope ;

@@ -158,6 +158,13 @@ public class FactorSideKickParser extends SideKickParser
 		return true;
 	} //}}}
 
+	//{{{ isWhitespace() method
+	private boolean isWhitespace(char ch)
+	{
+		return (ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
+			== ReadTable.WHITESPACE);
+	} //}}}
+	
 	//{{{ complete() method
 	/**
 	 * Returns completions suitable for insertion at the specified position.
@@ -182,12 +189,20 @@ public class FactorSideKickParser extends SideKickParser
 		int lineStart = buffer.getLineStartOffset(caretLine);
 		String text = buffer.getText(lineStart,caret - lineStart);
 
+		/* Don't complete in the middle of a word */
+		int lineEnd = buffer.getLineEndOffset(caretLine) - 1;
+		if(caret != lineEnd)
+		{
+			String end = buffer.getText(caret,lineEnd - caret);
+			if(!isWhitespace(end.charAt(0)))
+				return null;
+		}
+
 		int wordStart = 0;
 		for(int i = text.length() - 1; i >= 0; i--)
 		{
 			char ch = text.charAt(i);
-			if(ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
-				== ReadTable.WHITESPACE)
+			if(isWhitespace(ch))
 			{
 				wordStart = i + 1;
 				break;
@@ -195,6 +210,11 @@ public class FactorSideKickParser extends SideKickParser
 		}
 
 		String word = text.substring(wordStart);
+
+		/* Don't complete empty string */
+		if(word.length() == 0)
+			return null;
+
 		List completions = getCompletions(data.use,word);
 
 		if(completions.size() == 0)

@@ -28,6 +28,7 @@
 IN: httpd-responder
 
 USE: combinators
+USE: kernel
 USE: lists
 USE: logging
 USE: namespaces
@@ -40,10 +41,12 @@ USE: httpd
 
 : <responder> ( -- responder )
     <namespace> [
+        ( url -- )
         [
             drop "GET method not implemented" httpd-error
         ] "get" set
 
+        ( url -- )
         [
             drop "POST method not implemented" httpd-error
         ] "post" set
@@ -62,7 +65,9 @@ USE: httpd
     dup f-or-"" [ drop "default-argument" get ] when ;
 
 : call-responder ( method argument responder -- )
-    [ responder-argument swap get call ] bind ;
+    [
+        over [ responder-argument swap get call ] with-request
+    ] bind ;
 
 : no-such-responder ( name -- )
     "404 no such responder: " swap cat2 httpd-error ;

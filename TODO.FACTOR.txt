@@ -40,6 +40,8 @@
 
 + listener/plugin:
 
+- completion: don't show automatically
+- debug sidekick
 - completion in the listener
 - special completion for USE:/IN:
 - fedit broken with listener

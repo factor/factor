@@ -67,5 +67,20 @@ USE: url-encoding
 : content-length ( alist -- length )
     "Content-Length" swap assoc dec> ;
 
-: read-post-request ( -- string )
-    read-header content-length dup [ read# url-decode ] when ;
+: read-post-request ( header -- string )
+    content-length dup [ read# url-decode ] when ;
+
+: log-user-agent ( alist -- )
+    "User-Agent" swap assoc* [
+        unswons <% % ": " % % %> log
+    ] when* ;
+
+: with-request ( method quot -- )
+    [
+        read-header "header" set
+        "header" get log-user-agent
+        swap "post" = [
+            "header" get read-post-request "response" set
+        ] when
+        call
+    ] with-scope ;

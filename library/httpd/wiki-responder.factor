@@ -114,7 +114,8 @@ USE: httpd-responder
     "wiki" get [ put ] bind ;
 
 : wiki-post-responder ( argument -- )
-    read-post-request dup [
+    #! Handle a page edit.
+    "response" get dup [
         "text=" str-head? dup [
             2dup set-wiki-page serve-existing-page
         ] [

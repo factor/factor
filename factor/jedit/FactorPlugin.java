@@ -31,6 +31,7 @@ package factor.jedit;
 
 import factor.listener.FactorListenerPanel;
 import factor.FactorInterpreter;
+import java.io.InputStreamReader;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.*;
 
@@ -43,7 +44,9 @@ public class FactorPlugin extends EditPlugin
 	//{{{ start() method
 	public void start()
 	{
-		/* Macros.registerHandler(new FactorMacroHandler()); */
+		String path = "/factor/jedit/factor.bsh";
+		BeanShell.runScript(null,path,new InputStreamReader(
+			getClass().getResourceAsStream(path)),false);
 	} //}}}
 
 	//{{{ getInterpreter() method

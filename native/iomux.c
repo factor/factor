@@ -224,15 +224,22 @@ CELL next_io_task(void)
 
 	CELL callback;
 
+	fd_set except_fd_set;
+	int i;
+	FD_ZERO(&except_fd_set);
+
 	if(!reading && !writing)
 		critical_error("next_io_task() called with no IO tasks",0);
 
-	select(read_fd_count > write_fd_count
-		? read_fd_count : write_fd_count,
-		(reading ? &read_fd_set : NULL),
-		(writing ? &write_fd_set : NULL),
-		NULL,NULL);
+	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
+		&read_fd_set,&write_fd_set,&except_fd_set,NULL);
 
+	for(i = 0; i < 100; i++)
+	{
+		if(FD_ISSET(i,&except_fd_set))
+			exit(1);
+	}
+	
 	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
 	if(callback != F)
 		return callback;
@@ -242,15 +249,7 @@ CELL next_io_task(void)
 
 void primitive_next_io_task(void)
 {
-	CELL callback;
-	for(;;)
-	{
-		callback = next_io_task();
-		if(callback != F)
-			break;
-	}
-
-	dpush(callback);
+	dpush(next_io_task());
 }
 
 void collect_io_tasks(void)

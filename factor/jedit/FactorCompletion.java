@@ -78,21 +78,20 @@ public class FactorCompletion extends SideKickCompletion
 
 	public boolean handleKeystroke(int selectedIndex, char keyChar)
 	{
-		Macros.Recorder recorder = view.getMacroRecorder();
-
-		boolean ws = (ReadTable.DEFAULT_READTABLE
-			.getCharacterType(keyChar)
-			== ReadTable.WHITESPACE);
-
-		if(ws)
+		if(keyChar == '\t')
 			insert(selectedIndex);
-
-		if(keyChar != '\n')
+		else
 		{
+			Macros.Recorder recorder = view.getMacroRecorder();
+
 			if(recorder != null)
 				recorder.recordInput(1,keyChar,false);
 			textArea.userInput(keyChar);
 		}
+
+		boolean ws = (ReadTable.DEFAULT_READTABLE
+			.getCharacterType(keyChar)
+			== ReadTable.WHITESPACE);
 
 		return !ws;
 	}

@@ -9,14 +9,14 @@
 			if(sel == null)
 				view.toolkit.beep();
 			else
-				factor.jedit.FactorPlugin.eval(view,sel);
+				factorEval(view,sel);
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-run-file">
 		<CODE>
 			buffer.save(view,null);
 			VFSManager.waitForRequests();
-			factor.jedit.FactorPlugin.eval(view,
+			factorEval(view,
 				"\""
 				+ MiscUtilities.charsToEscapes(buffer.path)
 				+ "\" run-file");
@@ -26,7 +26,7 @@
 		<CODE>
 			if(textArea.selectionCount == 0)
 				textArea.selectWord();
-			factor.jedit.FactorPlugin.eval(view,
+			factorEval(view,
 				"\""
 				+ MiscUtilities.charsToEscapes(
 				textArea.selectedText)
@@ -35,40 +35,28 @@
 	</ACTION>
 	<ACTION NAME="factor-see">
 		<CODE>
-			data = sidekick.SideKickParsedData.getParsedData(view);
-			if(data instanceof factor.jedit.FactorParsedData)
-			{
-				if(textArea.selectionCount == 0)
-					textArea.selectWord();
-				factor.jedit.FactorPlugin.eval(view,
-					"\""
-					+ MiscUtilities.charsToEscapes(
-					textArea.selectedText)
-					+ "\" "
-					+ factor.FactorReader.unparseObject(data.use)
-					+ " search see");
-			}
-			else
-				view.toolkit.beep();
+			factorWordOperation(view,"see");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-edit">
+		<CODE>
+			factorWordOperation(view,"USE: jedit jedit");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-usages">
 		<CODE>
-			data = sidekick.SideKickParsedData.getParsedData(view);
-			if(data instanceof factor.jedit.FactorParsedData)
-			{
-				if(textArea.selectionCount == 0)
-					textArea.selectWord();
-				factor.jedit.FactorPlugin.eval(view,
-					"\""
-					+ MiscUtilities.charsToEscapes(
-					textArea.selectedText)
-					+ "\" "
-					+ factor.FactorReader.unparseObject(data.use)
-					+ " search usages.");
-			}
+			factorWordOperation(view,"usages.");
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-balance">
+		<CODE>
+			if(textArea.selectedText == null)
+				textArea.toolkit.beep();
 			else
-				view.toolkit.beep();
+			{
+				factorEval(view,
+					"[ " + textArea.selectedText + " ] balance");
+			}
 		</CODE>
 	</ACTION>
 </ACTIONS>
