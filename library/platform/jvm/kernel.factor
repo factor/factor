@@ -25,11 +25,13 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: words
 
 : word ( -- word )
     ! Pushes most recently defined word.
     interpreter "factor.FactorInterpreter" "last" jvar-get ;
+
+IN: kernel
 
 : inline ( -- )
     #! Marks the most recently defined word to be inlined.

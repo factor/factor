@@ -30,7 +30,7 @@
 - jedit bug? +line doesn't always work when switching into an existing
   buffer with a remembered first line
 - auto insert USE:
-- why > 1 popup
+- plugin not unloaded
 - listener backspace overzealous
 - lineno/file for shuffle defs
 - completion popups for shuffle defs
