@@ -26,7 +26,7 @@ USING: gadgets kernel lists math namespaces test ;
     [
         1 x set
         1 y set
-        10 10 30 30 <rectangle> <gadget> shape>screen
+        10 10 30 30 <rectangle> <gadget> rect>screen
     ] with-scope
 ] unit-test
 [ t ] [

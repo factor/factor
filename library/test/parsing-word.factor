@@ -18,5 +18,6 @@ DEFER: foo
 
 ! Test > 1 ( ) comment; only the first one should be used.
 [ t ] [
-    "a" ": foo ( a ) ( b ) ;" parse drop word stack-effect str-contains?
+    "a" ": foo ( a ) ( b ) ;" parse drop word
+    "stack-effect" word-property str-contains?
 ] unit-test

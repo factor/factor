@@ -2,7 +2,8 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: dlists io-internals kernel kernel-internals lists namespaces ;
+USING: io-internals kernel kernel-internals lists dlists
+namespaces ;
  
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
