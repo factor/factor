@@ -173,3 +173,20 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
     #! Make a list of elements that occur in list2 but not
     #! list1.
     [ over contains? not ] subset nip ;
+
+: <queue> ( -- queue )
+    #! Make a new functional queue.
+    [[ [ ] [ ] ]] ;
+
+: queue-empty? ( queue -- ? )
+    uncons or not ;
+
+: enque ( obj queue -- queue )
+    uncons >r cons r> cons ;
+
+: deque ( queue -- obj queue )
+    uncons [
+        uncons swapd cons
+    ] [
+        reverse uncons f swons
+    ] ifte* ;
