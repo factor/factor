@@ -51,16 +51,16 @@ GENERIC: fclose      ( stream -- )
 TRAITS: string-output-stream
 
 M: string-output-stream fwrite-attr ( string style stream -- )
-    [ drop "buf" get sbuf-append ] bind ;M
+    [ drop "buf" get sbuf-append ] bind ;
 
 M: string-output-stream fclose ( stream -- )
-    drop ;M
+    drop ;
 
 M: string-output-stream fflush ( stream -- )
-    drop ;M
+    drop ;
 
 M: string-output-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output
@@ -69,4 +69,4 @@ M: string-output-stream fauto-flush ( stream -- )
 
 C: string-output-stream ( size -- stream )
     #! Creates a new stream for writing to a string buffer.
-    [ <sbuf> "buf" set ] extend ;C
+    [ <sbuf> "buf" set ] extend ;

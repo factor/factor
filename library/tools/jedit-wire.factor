@@ -80,16 +80,16 @@ USE: listener
 TRAITS: jedit-stream
 
 M: jedit-stream freadln ( stream -- str )
-    [ CHAR: r write flush read-big-endian-32 read# ] bind ;M
+    [ CHAR: r write flush read-big-endian-32 read# ] bind ;
 
 M: jedit-stream fwrite-attr ( str style stream -- )
-    [ [ default-style ] unless* jedit-write-attr ] bind ;M
+    [ [ default-style ] unless* jedit-write-attr ] bind ;
 
 M: jedit-stream fflush ( stream -- )
-    [ CHAR: f write flush ] bind ;M
+    [ CHAR: f write flush ] bind ;
 
 C: jedit-stream ( stream -- stream )
-    [ dup delegate set stdio set ] extend ;C
+    [ dup delegate set stdio set ] extend ;
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.

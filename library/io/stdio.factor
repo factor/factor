@@ -63,10 +63,10 @@ SYMBOL: stdio
 TRAITS: stdio-stream
 
 M: stdio-stream fauto-flush ( -- )
-    [ delegate get fflush ] bind ;M
+    [ delegate get fflush ] bind ;
 
 M: stdio-stream fclose ( -- )
-    drop ;M
+    drop ;
 
 C: stdio-stream ( delegate -- stream )
-    [ delegate set ] extend ;C
+    [ delegate set ] extend ;

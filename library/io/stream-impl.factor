@@ -41,28 +41,28 @@ USE: generic
 TRAITS: fd-stream
 
 M: fd-stream fwrite-attr ( str style stream -- )
-    [ drop "out" get blocking-write ] bind ;M
+    [ drop "out" get blocking-write ] bind ;
 
 M: fd-stream freadln ( stream -- str )
-    [ "in" get dup [ blocking-read-line ] when ] bind ;M
+    [ "in" get dup [ blocking-read-line ] when ] bind ;
 
 M: fd-stream fread# ( count stream -- str )
-    [ "in" get dup [ blocking-read# ] [ nip ] ifte ] bind ;M
+    [ "in" get dup [ blocking-read# ] [ nip ] ifte ] bind ;
 
 M: fd-stream fflush ( stream -- )
-    [ "out" get [ blocking-flush ] when* ] bind ;M
+    [ "out" get [ blocking-flush ] when* ] bind ;
 
 M: fd-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 M: fd-stream fclose ( -- )
     [
         "out" get [ dup blocking-flush close-port ] when*
         "in" get [ close-port ] when*
-    ] bind ;M
+    ] bind ;
 
 C: fd-stream ( in out -- stream )
-    [ "out" set "in" set ] extend ;C
+    [ "out" set "in" set ] extend ;
 
 : <filecr> ( path -- stream )
     t f open-file <fd-stream> ;

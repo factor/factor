@@ -15,19 +15,19 @@ M: xyzzy-stream fwrite-attr ( str style stream -- )
         drop "<" delegate get fwrite
         delegate get fwrite
         ">" delegate get fwrite
-    ] bind ;M
+    ] bind ;
 
 M: xyzzy-stream fclose ( stream -- )
-    drop ;M
+    drop ;
 
 M: xyzzy-stream fflush ( stream -- )
-    drop ;M
+    drop ;
 
 M: xyzzy-stream fauto-flush ( stream -- )
-    drop ;M
+    drop ;
 
 C: xyzzy-stream ( stream -- stream )
-    [ delegate set ] extend ;C
+    [ delegate set ] extend ;
 
 [
     "<xyzzy>"

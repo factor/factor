@@ -42,11 +42,12 @@ USE: strings
     swap set-word-plist ;
 
 : ?word-primitive ( obj -- prim/0 )
-    dup word? [ word-primitive ] [ drop 0 ] ifte ;
+    dup word? [ word-primitive ] [ drop -1 ] ifte ;
 
 : compound?  ( obj -- ? ) ?word-primitive 1 = ;
 : primitive? ( obj -- ? ) ?word-primitive 2 > ;
 : symbol?    ( obj -- ? ) ?word-primitive 2 = ;
+: undefined? ( obj -- ? ) ?word-primitive 0 = ;
 
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;

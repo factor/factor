@@ -86,9 +86,15 @@ SYMBOL: #return-to ( push addr on C stack )
 : label, ( label -- )
     #label swons , ;
 
-: (linearize-label) ( node -- )
+: linearize-simple-label ( node -- )
+    #! Some labels become simple labels after the optimization
+    #! stage.
     dup [ node-label get ] bind label,
     [ node-param get ] bind (linearize) ;
+
+#simple-label [
+    linearize-simple-label
+] "linearizer" set-word-property
 
 : linearize-label ( node -- )
     #! Labels are tricky, because they might contain non-tail
@@ -98,11 +104,13 @@ SYMBOL: #return-to ( push addr on C stack )
     #! this in the common case where the labelled block does
     #! not contain non-tail recursive calls to itself.
     <label> dup #return-to swons , >r
-    (linearize-label)
+    linearize-simple-label
     [ #return ] ,
     r> label, ;
 
-#label [ linearize-label ] "linearizer" set-word-property
+#label [
+    linearize-label
+] "linearizer" set-word-property
 
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow

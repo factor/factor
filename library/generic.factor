@@ -37,7 +37,23 @@ USE: strings
 USE: words
 USE: vectors
 
-! A simple prototype-based generic word system.
+! A simple single-dispatch generic word system.
+
+: predicate-word ( word -- word )
+    word-name "?" cat2 "in" get create ;
+
+: builtin-predicate ( symbol type# -- )
+    [ swap type eq? ] cons >r predicate-word r> define-compound ;
+
+: BUILTIN:
+    #! Followed by type name and type number. Define a built-in
+    #! type predicate with this number.
+    CREATE dup undefined? [ dup define-symbol ] when scan-word
+    2dup builtin-predicate
+    "builtin-type" set-word-property ; parsing
+
+: builtin-type ( symbol -- n )
+    "builtin-type" word-property ;
 
 ! Hashtable slot holding a selector->method map.
 SYMBOL: traits
@@ -63,7 +79,7 @@ SYMBOL: delegate
 : undefined-method
     "No applicable method." throw ;
 
-: method ( selector traits -- traits quot )
+: traits-method ( selector traits -- traits quot )
     #! Look up the method with the traits object on the stack.
     #! Returns the traits to call the method on; either the
     #! original object, or one of the delegates.
@@ -71,20 +87,17 @@ SYMBOL: delegate
         rot drop cdr ( method is defined )
     ] [
         drop delegate swap hash* dup [
-            cdr method ( check delegate )
+            cdr traits-method ( check delegate )
         ] [
             drop [ undefined-method ] ( no delegate )
         ] ifte
     ] ifte ;
 
-: predicate-word ( word -- word )
-    word-name "?" cat2 "in" get create ;
-
-: define-predicate ( word -- )
+: traits-predicate ( word -- )
     #! foo? where foo is a traits type tests if the top of stack
     #! is of this type.
     dup predicate-word swap
-    [ object-map ] swap traits-map [ eq? ] cons append
+    traits-map [ swap object-map eq? ] cons
     define-compound ;
 
 : TRAITS:
@@ -93,15 +106,26 @@ SYMBOL: delegate
     CREATE
     dup define-symbol
     dup init-traits-map
-    define-predicate ; parsing
+    traits-predicate ; parsing
+
+: add-method ( quot class vtable -- )
+    >r "builtin-type" word-property r>
+    set-vector-nth ;
+
+: <vtable> ( word -- vtable )
+    num-types [ drop [ undefined-method ] ] vector-project
+    [ "vtable" set-word-property ] keep ;
+
+: add-traits-dispatch ( word vtable -- )
+    >r unit [ car swap traits-method call ] cons \ vector r>
+    add-method ;
 
 : GENERIC:
     #! GENERIC: bar creates a generic word bar that calls the
     #! bar method on the traits object, with the traits object
     #! on the stack.
-    CREATE
-    dup unit [ car swap method call ] cons
-    define-compound ; parsing
+    CREATE dup <vtable> 2dup add-traits-dispatch
+    [ generic ] cons define-compound ; parsing
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 "in" get create ;
@@ -111,23 +135,18 @@ SYMBOL: delegate
     traits-map [ traits pick set-hash ] cons append
     define-compound ;
 
-: C: ( -- word [ ] )
-    #! C: foo ... begins definition for <foo> where foo is a
-    #! traits type. We have to reverse the list at the end,
-    #! since the parser conses onto the list, and it will be
-    #! reversed again by ;C.
-    scan-word [ constructor-word [ <namespace> ] ] keep
-    traits-map [ traits pick set-hash ] cons append reverse ;
-    parsing
+: (;C) ( constructor traits definition -- )
+    >r
+    traits-map [ traits pick set-hash ] cons \ <namespace> swons
+    r> append define-compound ;
 
-: ;C ( word [ ] -- )
-    POSTPONE: ; ; parsing
+: C: ( -- constructor traits [ ] )
+    #! C: foo ... begins definition for <foo> where foo is a
+    #! traits type.
+    scan-word [ constructor-word ] keep [ (;C) ] [ ] ; parsing
 
 : M: ( -- type generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word scan-word f ; parsing
-
-: ;M ( type generic def -- )
-    #! ;M ends a method definition.
-    rot traits-map [ reverse put ] bind ; parsing
+    scan-word scan-word [ rot traits-map [ put ] bind ] [ ] ;
+    parsing

@@ -129,17 +129,20 @@ USE: prettyprint
     [ node-param get ] bind can-kill?
 ] "can-kill" set-word-property
 
-: (calls-label?) ( label node -- ? )
-    "calls-label" [ 2drop f ] apply-dataflow ;
-
 #call-label [
     [ node-param get ] bind =
 ] "calls-label" set-word-property
 
 : calls-label? ( label list -- ? )
-    [ dupd (calls-label?) ] some? nip ;
+    [
+        dupd "calls-label" [ 2drop f ] apply-dataflow
+    ] some? nip ;
 
 #label [
+    [ node-param get ] bind calls-label?
+] "calls-label" set-word-property
+
+#simple-label [
     [ node-param get ] bind calls-label?
 ] "calls-label" set-word-property
 
@@ -158,17 +161,16 @@ USE: prettyprint
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
-: recursive-label? ( node -- ? )
+: optimize-label ( -- op )
     #! Does the label node contain calls to itself?
-    [ node-label get node-param get ] bind
-    calls-label? ;
+    node-label get node-param get calls-label?
+    #label #simple-label ? ;
 
 #label [ ( literals node -- )
-    dup recursive-label? [
-       [ node-param [ kill-nodes ] change ] extend ,
-    ] [
-       [ node-param get ] bind (kill-nodes)
-    ] ifte
+    [
+        optimize-label node-op set
+        node-param [ kill-nodes ] change
+    ] extend ,
 ] "kill-node" set-word-property
 
 #ifte [ scan-branches ] "scan-literal" set-word-property

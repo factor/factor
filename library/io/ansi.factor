@@ -82,7 +82,7 @@ M: ansi-stream fwrite-attr ( string style stream -- )
     [
         [ default-style ] unless* ansi-attr-string
         delegate get fwrite
-    ] bind ;M
+    ] bind ;
 
 C: ansi-stream ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams

@@ -42,7 +42,6 @@ IN: image
 USE: errors
 USE: hashtables
 USE: kernel
-USE: kernel-internals
 USE: lists
 USE: math
 USE: namespaces
@@ -83,6 +82,26 @@ SYMBOL: boot-quot
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
+
+: fixnum-tag  BIN: 000 ; inline
+: word-tag    BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: complex-tag BIN: 101 ; inline
+: header-tag  BIN: 110 ; inline
+
+: f-type      6  ; inline
+: t-type      7  ; inline
+: array-type  8  ; inline
+: bignum-type 9  ; inline
+: float-type  10 ; inline
+: vector-type 11 ; inline
+: string-type 12 ; inline
+: sbuf-type   13 ; inline
+: port-type   14 ; inline
+: dll-type    15 ; inline
+: alien-type  16 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
@@ -135,14 +154,14 @@ SYMBOL: boot-quot
 ( Bignums )
 
 : emit-bignum ( bignum -- tagged )
+    #! This can only emit 0, -1 and 1.
     object-tag here-as >r
     bignum-type >header emit
-    dup 0 = 1 2 ? emit ( capacity )
     [
-        [ 0 = ] [ emit pad ]
-        [ 0 < ] [ 1 emit neg emit ]
-        [ 0 > ] [ 0 emit     emit ]
-    ] cond r> ;
+        [ 0  | [ 1 0   ] ]
+        [ -1 | [ 2 1 1 ] ]
+        [ 1  | [ 2 0 1 ] ]
+    ] assoc [ emit ] each pad r> ;
 
 ( Special objects )
 

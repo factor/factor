@@ -27,42 +27,22 @@
 
 USE: kernel
 USE: math
+USE: generic
 
-IN: kernel-internals
-
-: fixnum-tag  BIN: 000 ; inline
-: word-tag    BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
-: object-tag  BIN: 011 ; inline
-: ratio-tag   BIN: 100 ; inline
-: complex-tag BIN: 101 ; inline
-: header-tag  BIN: 110 ; inline
-
-: f-type      6  ; inline
-: t-type      7  ; inline
-: array-type  8  ; inline
-: bignum-type 9  ; inline
-: float-type  10 ; inline
-: vector-type 11 ; inline
-: string-type 12 ; inline
-: sbuf-type   13 ; inline
-: port-type   14 ; inline
-: dll-type    15 ; inline
-: alien-type  16 ; inline
-
-IN: math         : fixnum?  ( obj -- ? ) type fixnum-tag  eq? ;
-IN: words        : word?    ( obj -- ? ) type word-tag    eq? ;
-IN: lists        : cons?    ( obj -- ? ) type cons-tag    eq? ;
-IN: math         : ratio?   ( obj -- ? ) type ratio-tag   eq? ;
-IN: math         : complex? ( obj -- ? ) type complex-tag eq? ;
-IN: math         : bignum?  ( obj -- ? ) type bignum-type eq? ;
-IN: math         : float?   ( obj -- ? ) type float-type  eq? ;
-IN: vectors      : vector?  ( obj -- ? ) type vector-type eq? ;
-IN: strings      : string?  ( obj -- ? ) type string-type eq? ;
-IN: strings      : sbuf?    ( obj -- ? ) type sbuf-type   eq? ;
-IN: io-internals : port?    ( obj -- ? ) type port-type   eq? ;
-IN: alien        : dll?     ( obj -- ? ) type dll-type    eq? ;
-IN: alien        : alien?   ( obj -- ? ) type alien-type  eq? ;
+IN: vectors SYMBOL: vector
+IN: math         BUILTIN: fixnum  0
+IN: words        BUILTIN: word    1
+IN: lists        BUILTIN: cons    2
+IN: math         BUILTIN: ratio   4
+IN: math         BUILTIN: complex 5
+IN: math         BUILTIN: bignum  9
+IN: math         BUILTIN: float   10
+IN: vectors      BUILTIN: vector  11
+IN: strings      BUILTIN: string  12
+IN: strings      BUILTIN: sbuf    13
+IN: io-internals BUILTIN: port    14
+IN: alien        BUILTIN: dll     15
+IN: alien        BUILTIN: alien   16
 
 IN: kernel
 

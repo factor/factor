@@ -144,11 +144,11 @@ IN: syntax
 
 : :
     #! Begin a word definition. Word name follows.
-    CREATE [ ] "in-definition" on ; parsing
+    CREATE [ define-compound ] [ ] "in-definition" on ; parsing
 
 : ;
     #! End a word definition.
-    "in-definition" off reverse define-compound ; parsing
+    "in-definition" off reverse swap call ; parsing
 
 ! Symbols
 : SYMBOL:

@@ -447,6 +447,8 @@ public class FactorPlugin extends EditPlugin
 		String decl = "USE: " + vocab;
 		if(leadingNewline)
 			decl = "\n" + decl;
+		if(lastUseOffset == 0)
+			decl = decl + "\n";
 		buffer.insert(lastUseOffset,decl);
 		showStatus(view,"inserted-use",decl);
 	} //}}}

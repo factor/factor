@@ -40,6 +40,11 @@ SYMBOL: dataflow-graph
 ! Label nodes have the node-label variable set.
 SYMBOL: #label
 
+! A label that is not called recursively at all, or only tail
+! recursively. The optimizer changes some #labels to
+! #simple-labels.
+SYMBOL: #simple-label
+
 SYMBOL: #call ( non-tail call )
 SYMBOL: #call-label
 SYMBOL: #push ( literal )

@@ -151,10 +151,7 @@ USE: math
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
     #! URL-encoding?
-    [
-        [ letter?              ] [ drop t ]
-        [ LETTER?              ] [ drop t ]
-        [ digit?               ] [ drop t ]
-        [ "/_?." str-contains? ] [ drop t ]
-        [                      ] [ drop f ]
-    ] cond ;
+    dup letter?
+    over LETTER? or
+    over digit? or
+    swap "/_?." str-contains? or ;

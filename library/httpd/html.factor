@@ -143,7 +143,7 @@ M: html-stream fwrite-attr ( str style stream -- )
                 ] file-link-tag
             ] object-link-tag
         ] icon-tag
-    ] bind ;M
+    ] bind ;
 
 C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -159,7 +159,7 @@ C: html-stream ( stream -- stream )
     #! underline
     #! size
     #! link - an object path
-    [ dup delegate set stdio set ] extend ;C
+    [ dup delegate set stdio set ] extend ;
 
 : with-html-stream ( quot -- )
     [ stdio [ <html-stream> ] change  call ] with-scope ;
