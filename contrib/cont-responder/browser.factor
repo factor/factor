@@ -55,82 +55,54 @@ USE: errors
 
 : write-vocab-list ( -- )
   #! Write out the HTML for the list of vocabularies
-  <table> [ 
-    <tr> [ <th> [ "Vocabularies" write ] </th> ] </tr>
-    <tr> [
-      <td> [
-        <select name= "vocabs" size= "20" onchange= "document.forms.main.submit()" select> [
-          vocabs [ 
-            dup "current-vocab" get [ "" ] unless* = [
-            "<option selected>" write
-           ] [
-              "<option>" write
-           ] ifte 
-           chars>entities write 
-           "</option>\n" write     
-          ] each
-        ] </select> 
-      ] </td>
-    ] </tr> 
-  ] </table> ;
+  <select name= "vocabs" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> [
+    vocabs [ 
+      dup "current-vocab" get [ "" ] unless* = [
+        "<option selected>" write
+      ] [
+        "<option>" write
+      ] ifte 
+      chars>entities write 
+      "</option>\n" write     
+    ] each
+  ] </select> ;
 
 : write-word-list ( vocab -- )
   #! Write out the HTML for the list of words in a vocabulary.
-  <table> [ 
-    <tr> [ <th> [ "Words" write ] </th> ] </tr>
-    <tr> [
-      <td> [
-        <select name= "words" size= "20" onchange= "document.forms.main.submit()" select> [
-          words [ 
-            dup "current-word" get [ "" ] unless* str-compare 0 = [
-            "<option selected>" write
-           ] [
-              "<option>" write
-           ] ifte 
-           chars>entities write 
-           "</option>\n" write     
-          ] each
-        ] </select> 
-      ] </td>
-    ] </tr> 
-  ] </table> ;
+  <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> [
+    words [ 
+      dup "current-word" get [ "" ] unless* str-compare 0 = [
+      "<option selected>" write
+     ] [
+        "<option>" write
+     ] ifte 
+     chars>entities write 
+     "</option>\n" write     
+   ] each
+ ] </select> ;
 
 : write-editable-word-source ( vocab word -- )
   #! Write the source in a manner allowing it to be edited.
-  <table> [ 
-    <tr> [ <td> [ "<b>Source</b>" write ] </td> ] </tr>
-    <tr> [
-      <td> [
-        <textarea name= "eval" rows= "30" cols= "80" textarea> [
-          1024 <string-output-stream> dup >r [
-            >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-          ] with-stream r> stream>str chars>entities write
-        ] </textarea> <br/>
-        "Accept" button 
-      ] </td>
-    ] </tr> 
-  ] </table> ;
+  <textarea name= "eval" rows= "30" cols= "80" textarea> [
+    1024 <string-output-stream> dup >r [
+      >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
+    ] with-stream r> stream>str chars>entities write
+  ] </textarea> <br/>
+  "Accept" button ;
 
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
-  <table> [ 
-    <tr> [ <td> [ "<b>Source</b>" write ] </td> ] </tr>
-    <tr> [
-      <td> [
-        <namespace> [
-          "responder" "inspect" put
-          "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
-          "edit-state" get [
-            write-editable-word-source 
-          ] [
-            [ 
-              >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
-            ] with-simple-html-output
-          ] ifte
-        ] bind drop 
-      ] </td>
-    ] </tr> 
-  ] </table> ;
+  <namespace> [
+    "responder" "inspect" put
+    "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
+    "edit-state" get [
+      write-editable-word-source 
+    ] [
+      [ 
+        >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
+      ] with-simple-html-output
+    ] ifte
+  ] bind drop ;
 
 : get-vm-runtime ( -- java.lang.Runtime )
   f "java.lang.Runtime" "getRuntime" jinvoke-static ;
@@ -152,13 +124,18 @@ USE: errors
 
 : write-browser-body ( -- )
   #! Write out the HTML for the body of the main browser page.
-  [
-    [ write-vocab-list ] 
-    [ "current-vocab" get write-word-list ] 
-    [ 
-      "current-vocab" get "current-word" get write-word-source
-    ]
-  ] horizontal-layout 
+  <table width= "100%" table> [
+    <tr> [ 
+      <td> [ "<b>Vocabularies</b>" write ] </td>
+      <td> [ "<b>Words</b>" write ] </td>
+      <td> [ "<b>Source</b>" write ] </td>
+    ] </tr>
+    <tr> [ 
+      <td valign= "top" style= "width: 200" td> [ write-vocab-list ] </td> 
+      <td valign= "top" style= "width: 200" td> [ "current-vocab" get write-word-list ] </td> 
+      <td valign= "top" td> [ "current-vocab" get "current-word" get write-word-source ] </td> 
+    ] </tr>
+  ] </table>
   write-vm-statistics ;
 
 : flatten ( tree - list ) 
