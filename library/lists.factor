@@ -164,6 +164,10 @@ DEFER: tree-contains?
     over [ >r uncons r> tuck 2slip each ] [ 2drop ] ifte ;
     inline interpret-only
 
+: reverse ( list -- list )
+    #! Push a new list that is the reverse of a proper list.
+    [ ] swap [ swons ] each ;
+
 : map ( list code -- list )
     #! Applies the code to each item, returns a list that
     #! contains the result of each application.
@@ -232,10 +236,6 @@ DEFER: tree-contains?
 : length ( list -- length )
     #! Pushes the length of the given proper list.
     0 swap [ drop succ ] each ;
-
-: reverse ( list -- list )
-    #! Push a new list that is the reverse of a proper list.
-    [ ] swap [ swons ] each ;
 
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
