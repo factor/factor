@@ -54,9 +54,7 @@ USE: cont-responder
     <html> [
       <head> [ 
         <title> [ "Live Updater Example" write ] </title>
-        <script language= "JavaScript" script> [ 
-          "js/liveUpdater.js" get-live-updater-js write 
-        ] </script>
+        include-live-updater-js
       ] </head>
       <body> [
        [
