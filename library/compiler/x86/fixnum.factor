@@ -36,14 +36,14 @@ USE: lists
 USE: math-internals
 
 ! This file provides compiling definitions for fixnum words
-! that are faster than what C gives us.
+! that are faster than what C gives us. There is a lot of
+! code repetition here. It will be factored out at the same
+! time as rewriting the code to use registers for intermediate
+! values happends. At this point in time, this is just a
+! prototype to test the assembler.
 
 : self ( word -- )
     f swap dup "infer-effect" word-property (consume/produce) ;
-
-\ fixnum- [ \ fixnum- self ] "infer" set-word-property
-
-\ fixnum+ [ \ fixnum+ self ] "infer" set-word-property
 
 : fixnum-insn ( overflow opcode -- )
     #! This needs to be factored.
@@ -63,6 +63,85 @@ USE: math-internals
     drop \ fixnum+ \ ADD fixnum-insn
 ] "generator" set-word-property
 
+\ fixnum+ [ \ fixnum+ self ] "infer" set-word-property
+
 \ fixnum- [
     drop \ fixnum- \ SUB fixnum-insn
 ] "generator" set-word-property
+
+\ fixnum- [ \ fixnum- self ] "infer" set-word-property
+
+\ fixnum* [
+    drop
+    ECX DS>
+    EAX [ ECX -4 ] MOV
+    EAX 3 SHR
+    EAX [ ECX ] IMUL
+    0 JNO fixup
+    \ fixnum* compile-call
+    0 JMP fixup >r
+    compiled-offset swap patch
+    ECX 4 SUB
+    [ ECX ] EAX MOV
+    ECX >DS
+    r> compiled-offset swap patch
+] "generator" set-word-property
+
+\ fixnum* [ \ fixnum* self ] "infer" set-word-property
+
+\ fixnum/i [
+    drop
+    ECX DS>
+    EAX [ ECX -4 ] MOV
+    CDQ
+    [ ECX ] IDIV
+    EAX 3 SHL
+    0 JNO fixup
+    \ fixnum/i compile-call
+    0 JMP fixup >r
+    compiled-offset swap patch
+    ECX 4 SUB
+    [ ECX ] EAX MOV
+    ECX >DS
+    r> compiled-offset swap patch
+] "generator" set-word-property
+
+\ fixnum/i [ \ fixnum/i self ] "infer" set-word-property
+
+\ fixnum-mod [
+    drop
+    ECX DS>
+    EAX [ ECX -4 ] MOV
+    CDQ
+    [ ECX ] IDIV
+    EAX 3 SHL
+    0 JNO fixup
+    \ fixnum/i compile-call
+    0 JMP fixup >r
+    compiled-offset swap patch
+    ECX 4 SUB
+    [ ECX ] EDX MOV
+    ECX >DS
+    r> compiled-offset swap patch
+] "generator" set-word-property
+
+\ fixnum-mod [ \ fixnum-mod self ] "infer" set-word-property
+
+\ fixnum/mod [
+    drop
+    ECX DS>
+    EAX [ ECX -4 ] MOV
+    CDQ
+    [ ECX ] IDIV
+    EAX 3 SHL
+    0 JNO fixup
+    \ fixnum/i compile-call
+    0 JMP fixup >r
+    compiled-offset swap patch
+    [ ECX -4 ] EAX MOV
+    [ ECX ] EDX MOV
+    ECX >DS
+    r> compiled-offset swap patch
+] "generator" set-word-property
+
+\ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-property
