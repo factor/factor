@@ -1,9 +1,12 @@
 #include "factor.h"
 
 /* untagged */
-STRING* allot_string(CELL capacity)
+STRING* allot_string(FIXNUM capacity)
 {
-	STRING* string = allot_object(STRING_TYPE,
+	STRING* string;
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+	string = allot_object(STRING_TYPE,
 		sizeof(STRING) + capacity * CHARS);
 	string->capacity = capacity;
 	return string;
@@ -21,7 +24,7 @@ void hash_string(STRING* str)
 }
 
 /* untagged */
-STRING* string(CELL capacity, CELL fill)
+STRING* string(FIXNUM capacity, CELL fill)
 {
 	CELL i;
 
@@ -35,7 +38,7 @@ STRING* string(CELL capacity, CELL fill)
 	return string;
 }
 
-STRING* grow_string(STRING* string, CELL capacity, CHAR fill)
+STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
@@ -167,9 +170,6 @@ void primitive_string_hashcode(void)
 
 CELL index_of_ch(CELL index, STRING* string, CELL ch)
 {
-	if(index < 0)
-		range_error(tag_object(string),index,string->capacity);
-
 	while(index < string->capacity)
 	{
 		if(string_nth(string,index) == ch)
@@ -240,7 +240,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 	if(start < 0)
 		range_error(tag_object(string),start,string->capacity);
 
-	if(end < start)
+	if(end < start || end > string->capacity)
 		range_error(tag_object(string),end,string->capacity);
 
 	result = allot_string(end - start);

@@ -10,6 +10,7 @@
 #define ERROR_FLOAT_FORMAT (9<<3)
 #define ERROR_SIGNAL (10<<3)
 #define ERROR_PROFILING_DISABLED (11<<3)
+#define ERROR_NEGATIVE_ARRAY_SIZE (12<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

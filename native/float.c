@@ -7,14 +7,17 @@ void primitive_floatp(void)
 
 FLOAT* to_float(CELL tagged)
 {
+	RATIO* r;
+
 	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
-		return fixnum_to_float(tagged);
+		return make_float((double)untag_fixnum_fast(tagged));
 	case BIGNUM_TYPE:
-		return bignum_to_float(tagged);
+		return make_float(s48_bignum_to_double((ARRAY*)UNTAG(tagged)));
 	case RATIO_TYPE:
-		return ratio_to_float(tagged);
+		r = (RATIO*)UNTAG(tagged);
+		return (FLOAT*)UNTAG(divfloat(r->numerator,r->denominator));
 	case FLOAT_TYPE:
 		return (FLOAT*)UNTAG(tagged);
 	default:

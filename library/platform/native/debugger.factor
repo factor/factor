@@ -85,6 +85,9 @@ USE: vectors
 : profiling-disabled-error ( obj -- )
     drop "Recompile with the EXTRA_CALL_INFO flag." print ;
 
+: negative-array-size-error ( obj -- )
+    "Cannot allocate array with negative size " write . ;
+
 : kernel-error. ( obj n -- str )
     {
         expired-port-error
@@ -99,6 +102,7 @@ USE: vectors
         float-format-error
         signal-error
         profiling-disabled-error
+        negative-array-size-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

@@ -27,10 +27,10 @@ void primitive_set_vector_length(void)
 {
 	VECTOR* vector = untag_vector(dpop());
 	FIXNUM length = to_fixnum(dpop());
-	vector->top = length;
 	if(length < 0)
 		range_error(tag_object(vector),length,vector->top);
-	else if(length > vector->array->capacity)
+	vector->top = length;
+	if(length > vector->array->capacity)
 		vector->array = grow_array(vector->array,length,F);
 }
 

@@ -1,6 +1,8 @@
 IN: scratchpad
 USE: combinators
+USE: errors
 USE: kernel
+USE: logic
 USE: math
 USE: namespaces
 USE: stack
@@ -99,3 +101,5 @@ native? [
         "buf" get sbuf>str
     ] unit-test
 ] when
+
+[ f ] [ [ 0 10 "hello" substring ] [ not ] catch ] unit-test

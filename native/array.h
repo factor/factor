@@ -10,15 +10,15 @@ INLINE ARRAY* untag_array(CELL tagged)
 	return (ARRAY*)UNTAG(tagged);
 }
 
-ARRAY* allot_array(CELL type, CELL capacity);
-ARRAY* array(CELL capacity, CELL fill);
-ARRAY* grow_array(ARRAY* array, CELL capacity, CELL fill);
-ARRAY* shrink_array(ARRAY* array, CELL capacity);
+ARRAY* allot_array(CELL type, FIXNUM capacity);
+ARRAY* array(FIXNUM capacity, CELL fill);
+ARRAY* grow_array(ARRAY* array, FIXNUM capacity, CELL fill);
+ARRAY* shrink_array(ARRAY* array, FIXNUM capacity);
 
-#define AREF(array,index) ((CELL)array + sizeof(ARRAY) + index * CELLS)
+#define AREF(array,index) ((CELL)(array) + sizeof(ARRAY) + (index) * CELLS)
 
 #define ASIZE(pointer) align8(sizeof(ARRAY) + \
-	((ARRAY*)pointer)->capacity * CELLS)
+	((ARRAY*)(pointer))->capacity * CELLS)
 
 /* untagged & unchecked */
 INLINE CELL array_nth(ARRAY* array, CELL index)

@@ -1,19 +1,28 @@
+upgraded_arithmetic_type -> need a trick
+automatic to_bignum, to_fixnum for primitives:
+  - upgrading only
+generic >fixnum, >bignum in library
+  - downgrading
+don't crash on bad prim #
+fixnum/string pseudo-type for error reporting
+to_c_string allots too much
+primitive_index_of & index == string->capacity
+
 + bignums:
 
 - cached 0/-1/1 should be cross compiled in image
 - bignum cross compiling
 - move some s48_ functions into bignum.c
 - remove unused functions
-- clean up type coercions in arithmetic.c
-- add a socket timeout
 
+- add a socket timeout
 - >lower, >upper for strings
 - telnetd should use multitasking
 - accept multi-line input in listener
 
 + docs:
 
-- USE: arithmetic in numbers game
+- USE: math in numbers game
 - numbers section
 - examples of assoc usage
 - unparse examples, and difference from prettyprint

@@ -1,13 +1,6 @@
 #include "factor.h"
 
 CELL upgraded_arithmetic_type(CELL type1, CELL type2);
-ARRAY* fixnum_to_bignum(CELL n);
-RATIO* fixnum_to_ratio(CELL n);
-FLOAT* fixnum_to_float(CELL n);
-FIXNUM bignum_to_fixnum(CELL tagged);
-RATIO* bignum_to_ratio(CELL n);
-FLOAT* bignum_to_float(CELL n);
-FLOAT* ratio_to_float(CELL n);
 
 CELL tag_fixnum_or_bignum(FIXNUM x);
 
@@ -17,7 +10,7 @@ CELL OP(CELL x, CELL y) \
 	switch(upgraded_arithmetic_type(type_of(x),type_of(y))) \
 	{ \
 	case FIXNUM_TYPE: \
-		return OP##_fixnum(x,y); \
+		return OP##_fixnum(untag_fixnum_fast(x),untag_fixnum_fast(y)); \
 	case BIGNUM_TYPE: \
 		return OP##_bignum(to_bignum(x),to_bignum(y)); \
 	case RATIO_TYPE: \
@@ -43,9 +36,9 @@ CELL OP(CELL x, FIXNUM y) \
 	switch(type_of(x)) \
 	{ \
 	case FIXNUM_TYPE: \
-		return OP##_fixnum(x,y); \
+		return OP##_fixnum(untag_fixnum_fast(x),y); \
 	case BIGNUM_TYPE: \
-		return OP##_bignum(to_bignum(x),y); \
+		return OP##_bignum((ARRAY*)UNTAG(x),y); \
 	default: \
 		type_error(INTEGER_TYPE,x); \
 		return F; \
@@ -92,7 +85,7 @@ CELL OP(CELL x) \
 	switch(type_of(x)) \
 	{ \
 	case FIXNUM_TYPE: \
-		return OP##_fixnum(x); \
+		return OP##_fixnum(untag_fixnum_fast(x)); \
 	case RATIO_TYPE: \
 		return OP##_ratio((RATIO*)UNTAG(x)); \
 	case COMPLEX_TYPE: \
@@ -140,7 +133,6 @@ CELL OP##_anytype(CELL x) \
 }
 
 bool realp(CELL tagged);
-bool numberp(CELL tagged);
 void primitive_numberp(void);
 
 bool zerop(CELL tagged);

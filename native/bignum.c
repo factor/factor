@@ -24,7 +24,7 @@ ARRAY* to_bignum(CELL tagged)
 	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
-		return fixnum_to_bignum(tagged);
+		return s48_long_to_bignum(untag_fixnum_fast(tagged));
 	case BIGNUM_TYPE:
 		return (ARRAY*)UNTAG(tagged);
 	case RATIO_TYPE:

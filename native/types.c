@@ -71,7 +71,8 @@ CELL untagged_object_size(CELL pointer)
 	switch(untag_header(get(pointer)))
 	{
 	case WORD_TYPE:
-		return align8(sizeof(WORD));
+		size = sizeof(WORD);
+		break;
 	case F_TYPE:
 	case T_TYPE:
 		size = CELLS * 2;

@@ -1,15 +1,18 @@
 #include "factor.h"
 
 /* untagged */
-ARRAY* allot_array(CELL type, CELL capacity)
+ARRAY* allot_array(CELL type, FIXNUM capacity)
 {
-	ARRAY* array = allot_object(type,sizeof(ARRAY) + capacity * CELLS);
+	ARRAY* array;
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+	array = allot_object(type,sizeof(ARRAY) + capacity * CELLS);
 	array->capacity = capacity;
 	return array;
 }
 
 /* untagged */
-ARRAY* array(CELL capacity, CELL fill)
+ARRAY* array(FIXNUM capacity, CELL fill)
 {
 	int i;
 
@@ -21,7 +24,7 @@ ARRAY* array(CELL capacity, CELL fill)
 	return array;
 }
 
-ARRAY* grow_array(ARRAY* array, CELL capacity, CELL fill)
+ARRAY* grow_array(ARRAY* array, FIXNUM capacity, CELL fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	int i;
@@ -36,7 +39,7 @@ ARRAY* grow_array(ARRAY* array, CELL capacity, CELL fill)
 	return new_array;
 }
 
-ARRAY* shrink_array(ARRAY* array, CELL capacity)
+ARRAY* shrink_array(ARRAY* array, FIXNUM capacity)
 {
 	ARRAY* new_array = allot_array(untag_header(array->header),capacity);
 	memcpy(new_array + 1,array + 1,capacity * CELLS);

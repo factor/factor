@@ -15,7 +15,7 @@ FIXNUM to_fixnum(CELL tagged)
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);
 	case BIGNUM_TYPE:
-		return bignum_to_fixnum(tagged);
+		return (FIXNUM)s48_bignum_to_long((ARRAY*)UNTAG(tagged));
 	case RATIO_TYPE:
 		r = (RATIO*)UNTAG(tagged);
 		return to_fixnum(divint(r->numerator,r->denominator));
@@ -33,66 +33,48 @@ void primitive_to_fixnum(void)
 	drepl(tag_fixnum(to_fixnum(dpeek())));
 }
 
-CELL number_eq_fixnum(CELL x, CELL y)
+CELL number_eq_fixnum(FIXNUM x, FIXNUM y)
 {
 	return tag_boolean(x == y);
 }
 
-CELL add_fixnum(CELL x, CELL y)
+CELL add_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_fixnum_or_bignum(untag_fixnum_fast(x)
-		+ untag_fixnum_fast(y));
+	return tag_fixnum_or_bignum(x + y);
 }
 
-CELL subtract_fixnum(CELL x, CELL y)
+CELL subtract_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_fixnum_or_bignum(untag_fixnum_fast(x)
-		- untag_fixnum_fast(y));
+	return tag_fixnum_or_bignum(x - y);
 }
 
-CELL multiply_fixnum(CELL _x, CELL _y)
+CELL multiply_fixnum(FIXNUM x, FIXNUM y)
 {
-	FIXNUM x = untag_fixnum_fast(_x);
-	FIXNUM y = untag_fixnum_fast(_y);
 	long long result = (long long)x * (long long)y;
 	if(result < FIXNUM_MIN || result > FIXNUM_MAX)
-	{
-		return tag_object(s48_bignum_multiply(
-			s48_long_to_bignum(x),
-			s48_long_to_bignum(y)));
-	}
+		return tag_object(s48_long_long_to_bignum(result));
 	else
 		return tag_fixnum(result);
 }
 
-CELL divint_fixnum(CELL x, CELL y)
+CELL divint_fixnum(FIXNUM x, FIXNUM y)
 {
-	/* division takes common factor of 8 out. */
-	/* we have to do SIGNED division here */
-	return tag_fixnum_or_bignum((FIXNUM)x / (FIXNUM)y);
+	return tag_fixnum_or_bignum(x / y);
 }
 
-CELL divfloat_fixnum(CELL x, CELL y)
+CELL divfloat_fixnum(FIXNUM x, FIXNUM y)
 {
-	/* division takes common factor of 8 out. */
-	/* we have to do SIGNED division here */
-	FIXNUM _x = (FIXNUM)x;
-	FIXNUM _y = (FIXNUM)y;
-	return tag_object(make_float((double)_x / (double)_y));
+	return tag_object(make_float((double)x / (double)y));
 }
 
-CELL divmod_fixnum(CELL _x, CELL _y)
+CELL divmod_fixnum(FIXNUM x, FIXNUM y)
 {
-	FIXNUM x = untag_fixnum_fast(_x);
-	FIXNUM y = untag_fixnum_fast(_y);
 	dpush(tag_fixnum_or_bignum(x / y));
 	return tag_fixnum_or_bignum(x % y);
 }
 
-CELL mod_fixnum(CELL _x, CELL _y)
+CELL mod_fixnum(FIXNUM x, FIXNUM y)
 {
-	FIXNUM x = untag_fixnum_fast(_x);
-	FIXNUM y = untag_fixnum_fast(_y);
 	return tag_fixnum(x % y);
 }
 
@@ -123,55 +105,52 @@ FIXNUM gcd_fixnum(FIXNUM x, FIXNUM y)
 	}
 }
 
-CELL divide_fixnum(CELL x, CELL y)
+CELL divide_fixnum(FIXNUM x, FIXNUM y)
 {
-	FIXNUM _x = untag_fixnum_fast(x);
-	FIXNUM _y = untag_fixnum_fast(y);
 	FIXNUM gcd;
 
-	if(_y == 0)
+	if(y == 0)
 		raise(SIGFPE);
-	else if(_y < 0)
+	else if(y < 0)
 	{
-		_x = -_x;
-		_y = -_y;
+		x = -x;
+		y = -y;
 	}
 
-	gcd = gcd_fixnum(_x,_y);
+	gcd = gcd_fixnum(x,y);
 	if(gcd != 1)
 	{
-		_x /= gcd;
-		_y /= gcd;
+		x /= gcd;
+		y /= gcd;
 	}
 
-	if(_y == 1)
-		return tag_fixnum_or_bignum(_x);
+	if(y == 1)
+		return tag_fixnum_or_bignum(x);
 	else
 	{
 		return tag_ratio(ratio(
-			tag_fixnum_or_bignum(_x),
-			tag_fixnum_or_bignum(_y)));
+			tag_fixnum_or_bignum(x),
+			tag_fixnum_or_bignum(y)));
 	}
 }
 
-CELL and_fixnum(CELL x, CELL y)
+CELL and_fixnum(FIXNUM x, FIXNUM y)
 {
 	return x & y;
 }
 
-CELL or_fixnum(CELL x, CELL y)
+CELL or_fixnum(FIXNUM x, FIXNUM y)
 {
 	return x | y;
 }
 
-CELL xor_fixnum(CELL x, CELL y)
+CELL xor_fixnum(FIXNUM x, FIXNUM y)
 {
 	return x ^ y;
 }
 
-CELL shift_fixnum(CELL _x, FIXNUM y)
+CELL shift_fixnum(FIXNUM x, FIXNUM y)
 {
-	FIXNUM x = untag_fixnum_fast(_x);
 	if(y > -CELLS * 8 && y < CELLS * 8)
 	{
 		long long result = (y < 0
@@ -186,27 +165,27 @@ CELL shift_fixnum(CELL _x, FIXNUM y)
 		s48_long_to_bignum(x),y));
 }
 
-CELL less_fixnum(CELL x, CELL y)
+CELL less_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_boolean((FIXNUM)x < (FIXNUM)y);
+	return tag_boolean(x < y);
 }
 
-CELL lesseq_fixnum(CELL x, CELL y)
+CELL lesseq_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_boolean((FIXNUM)x <= (FIXNUM)y);
+	return tag_boolean(x <= y);
 }
 
-CELL greater_fixnum(CELL x, CELL y)
+CELL greater_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_boolean((FIXNUM)x > (FIXNUM)y);
+	return tag_boolean(x > y);
 }
 
-CELL greatereq_fixnum(CELL x, CELL y)
+CELL greatereq_fixnum(FIXNUM x, FIXNUM y)
 {
-	return tag_boolean((FIXNUM)x >= (FIXNUM)y);
+	return tag_boolean(x >= y);
 }
 
-CELL not_fixnum(CELL n)
+CELL not_fixnum(FIXNUM x)
 {
-	return RETAG(UNTAG(~n),FIXNUM_TYPE);
+	return tag_fixnum(~x);
 }

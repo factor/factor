@@ -12,10 +12,10 @@ INLINE STRING* untag_string(CELL tagged)
 	return (STRING*)UNTAG(tagged);
 }
 
-STRING* allot_string(CELL capacity);
-STRING* string(CELL capacity, CELL fill);
+STRING* allot_string(FIXNUM capacity);
+STRING* string(FIXNUM capacity, CELL fill);
 void hash_string(STRING* str);
-STRING* grow_string(STRING* string, CELL capacity, CHAR fill);
+STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill);
 char* to_c_string(STRING* s);
 STRING* from_c_string(const char* c_string);
 
