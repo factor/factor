@@ -32,72 +32,43 @@ USE: kernel
 USE: namespaces
 USE: stack
 USE: strings
+USE: generic
 
-! Generic functions, of sorts...
-
-: fflush ( stream -- )
-    [ "fflush" get call ] bind ;
-
-: freadln ( stream -- string )
-    [ "freadln" get call ] bind ;
+GENERIC: fflush      ( stream -- )
+GENERIC: fauto-flush ( stream -- )
+GENERIC: freadln     ( stream -- string )
+GENERIC: fread#      ( count stream -- string )
+GENERIC: fwrite-attr ( string style stream -- )
+GENERIC: fclose      ( stream -- )
 
 : fread1 ( stream -- string )
-    [ "fread1" get call ] bind ;
-
-: fread# ( count stream -- string )
-    [ "fread#" get call ] bind ;
+    1 swap fread# dup f-or-"" [ 0 swap str-nth ] unless ;
 
 : fprint ( string stream -- )
-    [ "fprint" get call ] bind ;
+    tuck fwrite "\n" over fwrite fauto-flush ;
 
 : fwrite ( string stream -- )
-    [ "fwrite" get call ] bind ;
+    f swap fwrite-attr ;
 
-: fwrite-attr ( string style stream -- )
-    #! Write an attributed string to the given stream.
-    #! Supported keys depend on the type of stream.
-    [ "fwrite-attr" get call ] bind ;
+TRAITS: string-output-stream
 
-: fclose ( stream -- )
-    [ "fclose" get call ] bind ;
+M: string-output-stream fwrite-attr ( string style stream -- )
+    [ drop "buf" get sbuf-append ] bind ;M
 
-: <stream> ( -- stream )
-    #! Create a stream object.
-    <namespace> [
-        ( -- string )
-        [ "freadln not implemented." throw  ] "freadln" set
-        ( -- string )
-        [
-            1 namespace fread# dup f-or-"" [
-                0 swap str-nth
-            ] unless
-        ] "fread1" set
-        ( count -- string )
-        [ "fread# not implemented."  throw  ] "fread#" set
-        ( string -- )
-        [ "fwrite not implemented."  throw  ] "fwrite" set
-        ( string style -- )
-        [ drop namespace fwrite             ] "fwrite-attr" set
-        ( -- )
-        [ ] "fflush" set
-        ( -- )
-        [ ] "fclose" set
-        ( string -- )
-        [
-            namespace fwrite
-            "\n" namespace fwrite
-        ] "fprint" set
-    ] extend ;
+M: string-output-stream fclose ( stream -- )
+    drop ;M
 
-: <string-output-stream> ( size -- stream )
-    #! Creates a new stream for writing to a string buffer.
-    <stream> [
-        <sbuf> "buf" set
-        ( string -- )
-        [ "buf" get sbuf-append ] "fwrite" set
-    ] extend ;
+M: string-output-stream fflush ( stream -- )
+    drop ;M
+
+M: string-output-stream fauto-flush ( stream -- )
+    drop ;M
 
 : stream>str ( stream -- string )
     #! Returns the string written to the given string output
     #! stream.
     [ "buf" get ] bind sbuf>str ;
+
+C: string-output-stream ( size -- stream )
+    #! Creates a new stream for writing to a string buffer.
+    [ <sbuf> "buf" set ] extend ;C

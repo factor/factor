@@ -31,6 +31,19 @@ USE: interpreter
 USE: stack
 USE: words
 USE: lists
+USE: namespaces
+
+\ >r [
+    \ >r CALL dataflow, [ 1 0 node-inputs ] extend
+    pop-d push-r
+    [ 0 1 node-outputs ] bind
+] "infer" set-word-property
+
+\ r> [
+    \ r> CALL dataflow, [ 0 1 node-inputs ] extend
+    pop-r push-d
+    [ 1 0 node-outputs ] bind
+] "infer" set-word-property
 
 : meta-infer ( word -- )
     #! Mark a word as being partially evaluated.
@@ -40,13 +53,6 @@ USE: lists
        [ drop host-word ] ,
        \ with-dataflow ,
     ] make-list "infer" set-word-property ;
-
-\ >r [
-    \ >r CALL dataflow, drop pop-d push-r
-] "infer" set-word-property
-\ r> [
-    \ r> CALL dataflow, drop pop-r push-d
-] "infer" set-word-property
 
 \ drop meta-infer
 \ dup meta-infer

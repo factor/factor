@@ -38,17 +38,18 @@ USE: stdio
 USE: strings
 USE: namespaces
 USE: unparser
+USE: generic
 
-: <server> ( port -- stream )
+TRAITS: server
+
+M: server fclose ( stream -- )
+    [ "socket" get close-port ] bind ;M
+
+C: server ( port -- stream )
     #! Starts listening on localhost:port. Returns a stream that
     #! you can close with fclose, and accept connections from
     #! with accept. No other stream operations are supported.
-    server-socket <stream> [
-        "socket" set
-
-        ( -- )
-        [ "socket" get close-port ] "fclose" set
-    ] extend ;
+    [ server-socket "socket" set ] extend ;C
 
 : <client-stream> ( host port in out -- stream )
     <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;

@@ -64,7 +64,6 @@ primitives,
     "/library/io/io-internals.factor"
     "/library/io/stream-impl.factor"
     "/library/io/stdio.factor"
-    "/library/io/extend-stream.factor"
     "/library/words.factor"
     "/library/vocabularies.factor"
     "/library/syntax/parse-numbers.factor"
@@ -83,5 +82,6 @@ DEFER: boot
 [
     boot
     "Good morning!" print
+    flush
     "/library/bootstrap/boot-stage2.factor" run-resource
 ] boot-quot set

@@ -180,10 +180,10 @@ SYMBOL: boot-quot
 
 ( Words )
 
-: word, ( -- pointer )
-    word-tag here-as word-tag >header emit
-    0 HEX: fffffff random-int emit ( hashcode )
-    0 emit ;
+: word, ( word -- pointer )
+    word-tag here-as >r word-tag >header emit
+    hashcode emit ( hashcode )
+    0 emit r> ;
 
 ! This is to handle mutually recursive words
 
@@ -272,7 +272,7 @@ DEFER: '
 : define, ( word primitive parameter -- )
     #! Write a word definition to the image.
     ' >r >r dup (word+) dup emit-plist >r
-    word, pool-object
+    dup word, pool-object
     r> ( -- plist )
     r> ( primitive -- ) emit
     r> ( parameter -- ) emit

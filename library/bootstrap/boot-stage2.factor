@@ -63,7 +63,6 @@ USE: stdio
     "/library/io/io-internals.factor"
     "/library/io/stream-impl.factor"
     "/library/io/stdio.factor"
-    "/library/io/extend-stream.factor"
     "/library/words.factor"
     "/library/vocabularies.factor"
     "/library/syntax/parse-numbers.factor"

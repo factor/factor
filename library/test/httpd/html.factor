@@ -44,6 +44,9 @@ USE: stack
     ] with-string
 ] unit-test
 
+: html-write-attr ( string style -- string )
+    [ write-attr ] with-html-stream ;
+
 [ "hello world" ]
 [
     [ "hello world" [ ] html-write-attr ] with-string

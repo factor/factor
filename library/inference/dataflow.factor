@@ -89,3 +89,8 @@ SYMBOL: node-param
 : dataflow, ( param op -- node )
     #! Add a node to the dataflow IR.
     <dataflow-node> dup dataflow-graph cons@ ;
+
+: dataflow-drop, ( -- )
+    #! Remove the top stack element and add a dataflow node
+    #! noting this.
+    \ drop CALL dataflow, [ 1 0 node-inputs ] bind ;

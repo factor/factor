@@ -111,8 +111,8 @@ USE: hashtables
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
     3 ensure-d
-    \ drop CALL dataflow, drop pop-d
-    \ drop CALL dataflow, drop pop-d 2list
+    dataflow-drop, pop-d
+    dataflow-drop, pop-d 2list
     IFTE
     pop-d drop ( condition )
     infer-branches ;
@@ -128,7 +128,7 @@ USE: hashtables
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.
     2 ensure-d
-    \ drop CALL dataflow, drop pop-d vtable>list
+    dataflow-drop, pop-d vtable>list
     GENERIC
     peek-d drop ( dispatch )
     infer-branches ;
@@ -136,7 +136,7 @@ USE: hashtables
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
     3 ensure-d
-    \ drop CALL dataflow, drop pop-d vtable>list
+    dataflow-drop, pop-d vtable>list
     2GENERIC
     peek-d drop ( dispatch )
     peek-d drop ( dispatch )

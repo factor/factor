@@ -35,6 +35,8 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: presentation
+USE: generic
 
 ! Some words for outputting ANSI colors.
 
@@ -72,17 +74,22 @@ USE: strings
     "ansi-fg" over assoc [ fg , ] when*
     "ansi-bg" over assoc [ bg , ] when*
     drop ;
-
+    
 : ansi-attr-string ( string style -- string )
     [ ansi-attrs , reset , ] make-string ;
 
-: <ansi-stream> ( stream -- stream )
+TRAITS: ansi-stream
+
+M: ansi-stream fwrite-attr ( string style stream -- )
+    [
+        [ default-style ] unless* ansi-attr-string
+        delegate get fwrite
+    ] bind ;M
+
+C: ansi-stream ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams
     #! support the following character attributes:
     #! bold    - if not f, text is boldface.
     #! ansi-fg - foreground color
     #! ansi-bg - background color
-    <extend-stream> [
-        ( string style -- )
-        [ ansi-attr-string write ] "fwrite-attr" set
-    ] extend ;
+    [ delegate set ] extend ;

@@ -37,6 +37,7 @@ USE: stdio
 USE: streams
 USE: strings
 USE: words
+USE: generic
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -71,35 +72,25 @@ USE: listener
 ! the client:
 ! 4 bytes -- length. -1 means EOF
 ! remaining -- input
-: jedit-read ( -- str )
-    CHAR: r write flush read-big-endian-32 read# ;
-
 : jedit-write-attr ( str style -- )
     CHAR: w write
     [ swap . . ] with-string
     dup str-length write-big-endian-32
     write ;
 
-: jedit-flush ( -- )
-    CHAR: f write flush ;
+TRAITS: jedit-stream
 
-: <jedit-stream> ( stream -- stream )
-    <extend-stream> [
-        ( -- str )
-        [ jedit-read ] "freadln" set
-        ( str -- )
-        [
-            default-style jedit-write-attr
-        ] "fwrite" set
-        ( str style -- )
-        [ jedit-write-attr ] "fwrite-attr" set
-        ( string -- )
-        [
-            "\n" cat2 default-style jedit-write-attr
-        ] "fprint" set
-        ( -- )
-        [ jedit-flush ] "fflush" set
-    ] extend ;
+M: jedit-stream freadln ( stream -- str )
+    [ CHAR: r write flush read-big-endian-32 read# ] bind ;M
+
+M: jedit-stream fwrite-attr ( str style stream -- )
+    [ [ default-style ] unless* jedit-write-attr ] bind ;M
+
+M: jedit-stream fflush ( stream -- )
+    [ CHAR: f write flush ] bind ;M
+
+C: jedit-stream ( stream -- stream )
+    [ dup delegate set "stdio" set ] extend ;C
 
 : stream-server ( -- )
     #! Execute this in the inferior Factor.

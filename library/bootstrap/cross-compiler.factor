@@ -405,6 +405,6 @@ IN: image
 : cross-compile-resource ( resource -- )
     [
         ! Change behavior of ; and SYMBOL:
-        [ pick USE: prettyprint . define, ] "define-hook" set
+        [ define, ] "define-hook" set
         run-resource
     ] with-scope ;

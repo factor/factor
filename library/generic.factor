@@ -65,15 +65,17 @@ SYMBOL: delegate
 : no-method
     "No applicable method." throw ;
 
-: method ( selector traits -- quot )
+: method ( selector traits -- traits quot )
     #! Look up the method with the traits object on the stack.
+    #! Returns the traits to call the method on; either the
+    #! original object, or one of the delegates.
     2dup object-map hash* dup [
-        nip nip cdr ( method is defined )
+        rot drop cdr ( method is defined )
     ] [
         drop delegate swap hash* dup [
             cdr method ( check delegate )
         ] [
-            3drop [ no-method ] ( no delegate )
+            drop [ no-method ] ( no delegate )
         ] ifte
     ] ifte ;
 
@@ -100,7 +102,7 @@ SYMBOL: delegate
     #! bar method on the traits object, with the traits object
     #! on the stack.
     CREATE
-    dup unit [ car over method call ] cons
+    dup unit [ car swap method call ] cons
     define-compound ; parsing
 
 : constructor-word ( word -- word )

@@ -109,7 +109,8 @@ DEFER: apply-word
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup PUSH dataflow, drop  recursive-state get cons push-d ;
+    dup recursive-state get cons push-d
+    PUSH dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )
     #! Apply the object's stack effect to the inferencer state.

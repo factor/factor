@@ -83,9 +83,9 @@ init-error-handler
 
 0 [ drop succ ] each-word unparse write " words" print 
 
-! "Inferring stack effects..." print
-! 0 [ unit try-infer [ succ ] when ] each-word
-! unparse write " words have a stack effect" print
+"Inferring stack effects..." print
+0 [ unit try-infer [ succ ] when ] each-word
+unparse write " words have a stack effect" print
 
 "Bootstrapping is complete." print
 "Now, you can run ./f factor.image" print

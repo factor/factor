@@ -52,7 +52,7 @@
 - jedit ==> jedit-word, jedit takes a file name
 - command line parsing cleanup
 - nicer way to combine two paths
-- OOP
+- finish OOP
 - ditch object paths
 - browser responder for word links in HTTPd; inspect responder for
   objects

@@ -25,9 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: streams
-DEFER: <extend-stream>
-
 IN: stdio
 USE: combinators
 USE: errors
@@ -36,39 +33,22 @@ USE: lists
 USE: namespaces
 USE: stack
 USE: streams
+USE: generic
+USE: strings
 
-: flush ( -- )
-    "stdio" get fflush ;
-
-: read ( -- string )
-    "stdio" get freadln ;
-
-: read1 ( count -- string )
-    "stdio" get fread1 ;
-
-: read# ( count -- string )
-    "stdio" get fread# ;
-
-: write ( string -- )
-    "stdio" get fwrite ;
-
-: write-attr ( string style -- )
-    #! Write an attributed string to standard output.
-    "stdio" get fwrite-attr ;
+: flush      ( -- )              "stdio" get fflush ;
+: read       ( -- string )       "stdio" get freadln ;
+: read1      ( count -- string ) "stdio" get fread1 ;
+: read#      ( count -- string ) "stdio" get fread# ;
+: write      ( string -- )       "stdio" get fwrite ;
+: write-attr ( string style -- ) "stdio" get fwrite-attr ;
+: print      ( string -- )       "stdio" get fprint ;
+: terpri     ( -- )              "\n" write ;
+: close      ( -- )              "stdio" get fclose ;
 
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png
     "icon" swons unit "" swap write-attr ;
-
-: print ( string -- )
-    "stdio" get fprint ;
-
-: terpri ( -- )
-    #! Print a newline to standard output.
-    "\n" write ;
-
-: close ( -- )
-    "stdio" get fclose ;
 
 : with-stream ( stream quot -- )
     [ swap "stdio" set  [ close rethrow ] catch ] with-scope ;
@@ -80,12 +60,13 @@ USE: streams
         call "stdio" get stream>str
     ] with-stream ;
 
-: <stdio-stream> ( stream -- stream )
-    #! We disable fclose on stdio so that various tricks like
-    #! with-stream can work.
-    <extend-stream> [
-        ( string -- )
-        [ write "\n" write flush ] "fprint" set
+TRAITS: stdio-stream
 
-        [ ] "fclose" set
-    ] extend ;
+M: stdio-stream fauto-flush ( -- )
+    [ delegate get fflush ] bind ;M
+
+M: stdio-stream fclose ( -- )
+    drop ;M
+
+C: stdio-stream ( delegate -- stream )
+    [ delegate set ] extend ;C

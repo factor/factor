@@ -38,6 +38,8 @@ USE: streams
 USE: strings
 USE: unparser
 USE: url-encoding
+USE: presentation
+USE: generic
 
 : html-entities ( -- alist )
     [
@@ -133,16 +135,20 @@ USE: url-encoding
         drop call
     ] ifte ;
 
-: html-write-attr ( string style -- )
+TRAITS: html-stream
+
+M: html-stream fwrite-attr ( str style stream -- )
     [
         [
             [
-                [ drop chars>entities write ] span-tag
-            ] file-link-tag
-        ] object-link-tag
-    ] icon-tag ;
+                [
+                    [ drop chars>entities write ] span-tag
+                ] file-link-tag
+            ] object-link-tag
+        ] icon-tag
+    ] bind ;M
 
-: <html-stream> ( stream -- stream )
+C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
     #! converts special characters to entities when being
     #! written, and supports writing attributed strings with
@@ -156,11 +162,7 @@ USE: url-encoding
     #! underline
     #! size
     #! link - an object path
-    <extend-stream> [
-        [ chars>entities write ] "fwrite" set
-        [ chars>entities print ] "fprint" set
-        [ html-write-attr ] "fwrite-attr" set
-    ] extend ;
+    [ dup delegate set "stdio" set ] extend ;
 
 : with-html-stream ( quot -- )
     [ "stdio" get <html-stream> "stdio" set call ] with-scope ;

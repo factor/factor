@@ -37,34 +37,33 @@ USE: stack
 USE: stdio
 USE: strings
 USE: namespaces
+USE: generic
 
-: <fd-stream> ( in out -- stream )
-    #! Create a file descriptor stream object, wrapping a pair
-    #! of file descriptor handles for input and output.
-    <stream> [
-        "out" set
-        "in" set
+TRAITS: fd-stream
 
-        ( str -- )
-        [ "out" get blocking-write ] "fwrite" set
-        
-        ( -- str )
-        [ "in" get dup [ blocking-read-line ] when ] "freadln" set
-        
-        ( count -- str )
-        [
-            "in" get dup [ blocking-read# ] [ nip ] ifte
-        ] "fread#" set
-        
-        ( -- )
-        [ "out" get [ blocking-flush ] when* ] "fflush" set
-        
-        ( -- )
-        [
-            "out" get [ dup blocking-flush close-port ] when*
-            "in" get [ close-port ] when*
-        ] "fclose" set
-    ] extend ;
+M: fd-stream fwrite-attr ( str style stream -- )
+    [ drop "out" get blocking-write ] bind ;M
+
+M: fd-stream freadln ( stream -- str )
+    [ "in" get dup [ blocking-read-line ] when ] bind ;M
+
+M: fd-stream fread# ( count stream -- str )
+    [ "in" get dup [ blocking-read# ] [ nip ] ifte ] bind ;M
+
+M: fd-stream fflush ( stream -- )
+    [ "out" get [ blocking-flush ] when* ] bind ;M
+
+M: fd-stream fauto-flush ( stream -- )
+    drop ;M
+
+M: fd-stream fclose ( -- )
+    [
+        "out" get [ dup blocking-flush close-port ] when*
+        "in" get [ close-port ] when*
+    ] bind ;M
+
+C: fd-stream ( in out -- stream )
+    [ "out" set "in" set ] extend ;C
 
 : <filecr> ( path -- stream )
     t f open-file <fd-stream> ;
