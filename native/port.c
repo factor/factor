@@ -31,8 +31,10 @@ F_PORT* port(PORT_MODE type, CELL fd)
 	else
 		port->buffer = tag_object(string(BUF_SIZE,'\0'));
 
+#ifndef WIN32
 	if(fcntl(port->fd,F_SETFL,O_NONBLOCK,1) == -1)
 		io_error(__FUNCTION__);
+#endif
 
 	return port;
 }

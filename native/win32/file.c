@@ -40,7 +40,6 @@ void primitive_open_file(void)
 	} 
 	else 
 	{
-		CreateIoCompletionPort(fp, completion_port, 0, 0);
 		dpush(read ? tag_object(port(PORT_READ, (CELL)fp)) : F);
 		dpush(write ? tag_object(port(PORT_WRITE, (CELL)fp)) : F);
 	}
@@ -63,7 +62,8 @@ void primitive_stat(void)
 		CELL dirp = tag_boolean(st.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 		CELL size = tag_object(s48_long_long_to_bignum(
 			(int64_t)st.nFileSizeLow | (int64_t)st.nFileSizeHigh << 32));
-		CELL mtime = tag_integer((int)(*(int64_t*)&st.ftLastWriteTime / 100000000 - 172456224));
+		CELL mtime = tag_integer((int)
+			((*(int64_t*)&st.ftLastWriteTime - EPOCH_OFFSET) / 10000000));
 		dpush(
 			cons(dirp,
 			cons(tag_fixnum(0),

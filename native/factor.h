@@ -34,9 +34,13 @@ CELL cs;
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #ifdef WIN32
 	#include <windows.h>
+
+	/* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
+	#define EPOCH_OFFSET 0x019db1ded53e8000LL
 #else
 	#include <dirent.h>
 	#include <sys/mman.h>
@@ -50,8 +54,6 @@ CELL cs;
 	#include <sys/time.h>
 	#include <netdb.h>
 #endif
-
-#include <time.h>
 
 #if defined(_MSC_VER)
 	#pragma warning(disable:4312)

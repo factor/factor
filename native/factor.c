@@ -6,10 +6,7 @@ void init_factor(char* image)
 	load_image(image);
 	init_stacks();
 	init_io();
-
-#ifdef WIN32
 	init_signals();
-#endif
 
 	init_compiler();
 	init_errors();

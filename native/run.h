@@ -13,10 +13,16 @@
 #define ARGS_ENV       10
 
 /* Profiling timer */
+#ifndef WIN32
 struct itimerval prof_timer;
+#endif
 
 /* Error handlers restore this */
+#ifdef WIN32
+jmp_buf toplevel;
+#else
 sigjmp_buf toplevel;
+#endif
 
 /* TAGGED currently executing quotation */
 CELL callframe;

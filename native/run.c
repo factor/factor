@@ -66,7 +66,7 @@ void run(void)
 	__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ?
 		EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
 	{
-	        signal_error(SIGSEGV);
+		signal_error(SIGSEGV);
 	}
 #endif
 }

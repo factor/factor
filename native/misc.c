@@ -29,8 +29,8 @@ int64_t current_millis(void)
 {
 	FILETIME t;
 	GetSystemTimeAsFileTime(&t);
-	return ((int64_t)t.dwLowDateTime | (int64_t)t.dwHighDateTime<<32) / 100000
-		- 172456224000;
+	return (((int64_t)t.dwLowDateTime | (int64_t)t.dwHighDateTime<<32) - EPOCH_OFFSET) 
+		/ 10000;
 }
 #else
 int64_t current_millis(void)
