@@ -26,3 +26,6 @@ USE: stdio
 [ [ "2 car" ] parse ] [ print-error ] catch
 
 ! [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
+
+! This should not raise an error
+[ ] [ f throw ] unit-test

@@ -1,10 +1,5 @@
 IN: temporary
-USE: errors
-USE: kernel
-USE: math
-USE: namespaces
-USE: strings
-USE: test
+USING: namespaces sequences strings test ;
 
 [ "Hello" ] [
     100 <sbuf> "buf" set
@@ -14,4 +9,4 @@ USE: test
     "buf" get sbuf>string
 ] unit-test
 
-[ CHAR: h ] [ 0 s" hello world" sbuf-nth ] unit-test
+[ CHAR: h ] [ 0 SBUF" hello world" nth ] unit-test

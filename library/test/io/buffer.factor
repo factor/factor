@@ -9,7 +9,7 @@ USING: kernel io-internals test ;
 ] unit-test
 
 [ "hello world" "" ] [
-    "hello world" 65536 string>buffer
+    "hello world" string>buffer
     dup buffer-contents
     0 pick buffer-reset
     over buffer-contents
@@ -17,22 +17,22 @@ USING: kernel io-internals test ;
 ] unit-test
 
 [ "hello" ] [
-    "hello world" 65536 string>buffer
+    "hello world" string>buffer
     5 over buffer-first-n swap buffer-free
 ] unit-test
 
 [ 11 ] [
-    "hello world" 65536 string>buffer
+    "hello world" string>buffer
     [ buffer-length ] keep buffer-free
 ] unit-test
 
 [ "hello world" ] [
-    "hello" 65536 string>buffer
+    "hello" 1024 <buffer> [ buffer-set ] keep
     " world" over >buffer
     dup buffer-contents swap buffer-free
 ] unit-test
 
 [ CHAR: e ] [
-    "hello" 65536 string>buffer
+    "hello" string>buffer
     1 over buffer-consume buffer-peek
 ] unit-test

@@ -1,15 +1,6 @@
 IN: temporary
-USE: test
-USE: inference
-USE: math
-USE: vectors
-USE: kernel
-USE: lists
-USE: namespaces
-USE: parser
-USE: kernel
-USE: math-internals
-USE: generic
+USING: generic inference kernel lists math math-internals
+namespaces parser sequences test vectors ;
 
 ! [ [ [ object object ] f ] ]
 ! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]

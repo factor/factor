@@ -1,5 +1,5 @@
 IN: temporary
-USING: words ;
+USING: test words ;
 
 : foo ;
 \ foo watch

@@ -1,10 +1,5 @@
 IN: temporary
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: test
-USE: strings
+USING: kernel lists sequences test ;
 
 [ [ ]           ] [ [ ]   [ ]       append ] unit-test
 [ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test

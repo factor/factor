@@ -1,17 +1,6 @@
 IN: temporary
-USE: inference
-USE: lists
-USE: math
-USE: test
-USE: hashtables
-USE: kernel
-USE: vectors
-USE: namespaces
-USE: prettyprint
-USE: words
-USE: kernel
-USE: kernel-internals
-USE: generic
+USING: hashtables inference kernel lists math namespaces
+sequences test words ;
 
 : dataflow-contains-op? ( object list -- ? )
     #! Check if some dataflow node contains a given operation.

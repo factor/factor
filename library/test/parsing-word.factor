@@ -10,14 +10,14 @@ DEFER: foo
 
 ": foo 2 2 + . ; parsing" eval
 
-[ [ ] ] [ "foo" parse ] unit-test
+[ [ ] ] [ "USE: temporary foo" parse ] unit-test
 
 ": foo 2 2 + . ;" eval
 
-[ [ foo ] ] [ "foo" parse ] unit-test
+[ [ POSTPONE: foo ] ] [ "USE: temporary foo" parse ] unit-test
 
 ! Test > 1 ( ) comment; only the first one should be used.
 [ t ] [
-    "a" ": foo ( a ) ( b ) ;" parse drop word
+    "a" "IN: temporary : foo ( a ) ( b ) ;" parse drop word
     "stack-effect" word-prop string-contains?
 ] unit-test

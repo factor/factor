@@ -30,23 +30,20 @@
 package factor.parser;
 
 import factor.*;
+import java.io.IOException;
 
-public class EndCons extends FactorParsingDefinition
+public class StringBufferLiteral extends FactorParsingDefinition
 {
-	public FactorWord start;
-
-	public EndCons(FactorWord start, FactorWord end)
+	public StringBufferLiteral(FactorWord word)
 	{
-		super(end);
-		this.start = start;
+		super(word);
 	}
 
-	public void eval(FactorReader reader) throws FactorParseException
+	public void eval(FactorReader reader)
+		throws Exception
 	{
-		Cons list = reader.popState(start,word).first;
-		if(Cons.length(list) != 2)
-			reader.getScanner().error("Exactly two objects must be between [[ and ]]");
-		else
-			reader.append(new Cons(list.car,list.next().car));
+		reader.append(new StringBuffer(
+			reader.getScanner()
+			.readUntil('"','"',true)));
 	}
 }

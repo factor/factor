@@ -58,7 +58,9 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 
 		/* strings */
 		FactorWord str = define("syntax","\"");
-		str.parsing = new StringLiteral(str,true);
+		str.parsing = new StringLiteral(str);
+		FactorWord sbuf = define("syntax","SBUF\"");
+		sbuf.parsing = new StringBufferLiteral(str);
 		FactorWord ch = define("syntax","CHAR:");
 		ch.parsing = new CharLiteral(ch);
 

@@ -1,24 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors kernel math sequences strings ;
+USING: errors generic kernel math sequences strings ;
 
-: file-mode OCT: 0600 ;
-
-: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
-
-: open-read ( path -- fd )
-    O_RDONLY file-mode sys-open dup io-error ;
-
-: open-write ( path -- fd )
-    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
-    dup io-error ;
-
-: read-step ( fd buffer -- ? )
-    tuck dup buffer-end swap buffer-capacity sys-read
-    dup 0 >= [ swap n>buffer t ] [ 2drop f ] ifte ;
-
-TUPLE: reader line buffer ready? ;
+TUPLE: reader line buffer ready? error ;
 
 C: reader ( buffer -- reader )
     [ set-reader-buffer ] keep ;
@@ -26,7 +11,7 @@ C: reader ( buffer -- reader )
 : >reader< ( reader -- line buffer )
     dup reader-line swap reader-buffer ;
 
-: pending-error ( reader -- ) drop ;
+: pending-error ( reader -- ) reader-error throw ;
 
 : read-line-loop ( line buffer -- ? )
     dup buffer-length 0 = [
@@ -40,13 +25,13 @@ C: reader ( buffer -- reader )
         ] ifte
     ] ifte ;
 
-: read-line-step ( reader -- ? ) >reader< read-line-loop ;
+: read-line-step ( reader -- ? )
+    [ >reader< read-line-loop dup ] keep  set-reader-ready? ;
 
 : init-reader ( count reader -- ) >r <sbuf> r> set-reader-line ;
 
 : prepare-line ( reader -- ? )
-    80 over init-reader dup read-line-step
-    [ swap set-reader-ready? ] keep ;
+    80 over init-reader read-line-step ;
 
 : can-read-line? ( reader -- ? )
     dup pending-error
@@ -60,7 +45,6 @@ C: reader ( buffer -- reader )
     ] ifte  t swap set-reader-ready? ;
 
 GENERIC: refill* ( reader -- )
-M: reader refill* drop ;
 
 : refill ( reader -- )
     dup reader-buffer buffer-length 0 = [
@@ -111,3 +95,30 @@ M: reader refill* drop ;
     ] [
         "reader not ready" throw
     ] ifte ;
+
+TUPLE: unix-reader fd ;
+
+: file-mode OCT: 0600 ;
+
+: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
+
+: open-read ( path -- fd )
+    O_RDONLY file-mode sys-open dup io-error ;
+
+: open-write ( path -- fd )
+    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
+    dup io-error ;
+
+: read-step ( fd buffer -- ? )
+    tuck dup buffer-end swap buffer-capacity sys-read
+    dup 0 >= [ swap n>buffer t ] [ 2drop f ] ifte ;
+
+C: unix-reader ( fd -- reader )
+    [ set-unix-reader-fd ] keep
+    [ 1024 <buffer> <reader> swap set-delegate ] keep ;
+
+: >unix-reader< ( reader -- fd buffer )
+    dup unix-reader-fd swap reader-buffer ;
+
+M: unix-reader refill* ( reader -- )
+    >unix-reader< read-step drop ;

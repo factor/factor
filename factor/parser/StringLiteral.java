@@ -34,23 +34,14 @@ import java.io.IOException;
 
 public class StringLiteral extends FactorParsingDefinition
 {
-	public boolean escapes;
-
-	//{{{ StringLiteral constructor
-	/**
-	 * A new definition.
-	 */
-	public StringLiteral(FactorWord word, boolean escapes)
+	public StringLiteral(FactorWord word)
 	{
 		super(word);
-		this.escapes = escapes;
-	} //}}}
+	}
 
 	public void eval(FactorReader reader)
 		throws Exception
 	{
-		String literal = reader.getScanner()
-			.readUntil('"','"',escapes);
-		reader.append(literal);
+		reader.append(reader.getScanner().readUntil('"','"',true));
 	}
 }
