@@ -98,11 +98,11 @@ DEFER: (infer)
         [ drop f ] when
     ] catch ;
 
-: infer-branches ( consume instruction branchlist -- )
+: infer-branches ( branchlist consume instruction -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    f over [ recursive-branch or ] each [
+    rot f over [ recursive-branch or ] each [
         [ [ car infer-branch , ] map ] make-list swap
         >r dataflow, r> unify
     ] [
@@ -111,8 +111,10 @@ DEFER: (infer)
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
-    3 IFTE
-    pop-d pop-d 2list
+    3 ensure-d
+    \ drop dataflow-word, pop-d
+    \ drop dataflow-word, pop-d 2list
+    1 inputs IFTE
     pop-d drop ( condition )
     infer-branches ;
 
@@ -126,15 +128,17 @@ DEFER: (infer)
 
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.
-    2 GENERIC
-    pop-d vtable>list
+    2 ensure-d
+    \ drop dataflow-word, pop-d vtable>list
+    1 inputs GENERIC
     peek-d drop ( dispatch )
     infer-branches ;
 
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
-    3 2GENERIC
-    pop-d vtable>list
+    3 ensure-d
+    \ drop dataflow-word, pop-d vtable>list
+    2 inputs 2GENERIC
     peek-d drop ( dispatch )
     peek-d drop ( dispatch )
     infer-branches ;

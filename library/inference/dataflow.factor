@@ -49,19 +49,19 @@ SYMBOL: 2GENERIC
 : get-dataflow ( -- IR )
     dataflow-graph get reverse ;
 
+: inputs ( count -- vector )
+    meta-d get [ vector-length swap - ] keep vector-tail ;
+
 : dataflow, ( consume instruction parameters -- )
     #! Add a node to the dataflow IR. Each node is a list of
     #! three elements:
-    #! - list of elements consumed from stack
+    #! - vector of elements consumed from stack
     #! - a symbol CALL, JUMP or PUSH
     #! - parameter(s) to insn
     unit cons cons  dataflow-graph cons@ ;
 
 : dataflow-literal, ( lit -- )
-    >r f PUSH r> dataflow, ;
-
-: inputs ( count -- vector )
-    meta-d get [ vector-length swap - ] keep vector-tail ;
+    >r 0 inputs PUSH r> dataflow, ;
 
 : dataflow-word, ( word -- )
     [

@@ -19,7 +19,6 @@ PORT* port(PORT_MODE type, CELL fd)
 	port->type = type;
 	port->closed = false;
 	port->fd = fd;
-	port->line = F;
 	port->client_host = F;
 	port->client_port = F;
 	port->client_socket = F;

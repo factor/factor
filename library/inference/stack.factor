@@ -33,10 +33,16 @@ USE: lists
 
 : meta-infer ( word -- )
     #! Mark a word as being partially evaluated.
-    dup unit [ car host-word ] cons  "infer" set-word-property ;
+    dup unit [
+        car dup dataflow-word, host-word
+    ] cons  "infer" set-word-property ;
 
-\ >r [ pop-d push-r ] "infer" set-word-property
-\ r> [ pop-r push-d ] "infer" set-word-property
+\ >r [
+    \ >r dataflow-word, pop-d push-r
+] "infer" set-word-property
+\ r> [
+    \ r> dataflow-word, pop-r push-d
+] "infer" set-word-property
 
 \ drop meta-infer
 \ 2drop meta-infer 

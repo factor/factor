@@ -45,11 +45,11 @@ USE: hashtables
     #! either execute the word in the meta interpreter (if it is
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
-    dup car ensure-d  over dataflow-word,
-    swap "infer" word-property dup [
-        nip call
+    dup car ensure-d 
+    over "infer" word-property dup [
+        nip nip call
     ] [
-        drop consume/produce
+        drop swap dataflow-word, consume/produce
     ] ifte ;
 
 : no-effect ( word -- )
@@ -118,6 +118,7 @@ USE: hashtables
     ] ifte ;
 
 : infer-call ( [ rstate | quot ] -- )
+    \ drop dataflow-word,
     [
         dataflow-graph off
         pop-d uncons recursive-state set (infer)
