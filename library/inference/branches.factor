@@ -79,9 +79,9 @@ SYMBOL: cloned
 : deep-clone ( obj -- obj )
     #! Clone an object if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assq [
+    dup cloned get assq [ ] [
         dup clone [ swap cloned [ acons ] change ] keep
-    ] ?unless ;
+    ] ?ifte ;
 
 : deep-clone-vector ( vector -- vector )
     #! Clone a vector of vectors.

@@ -85,7 +85,7 @@ M: complex unparse ( num -- str )
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [
-        dup ch>ascii-escape [ ch>unicode-escape ] ?unless
+        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte
     ] unless ;
 
 M: string unparse ( str -- str )

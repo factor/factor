@@ -80,10 +80,10 @@ SYMBOL: inspectors
 : inspector ( obj -- gadget )
     #! Return an existing inspector gadget for this object, or
     #! create a new one.
-    dup inspectors get assq [
+    dup inspectors get assq [ ] [
         dup <inspector>
         [ swap inspectors [ acons ] change ] keep
-    ] ?unless ;
+    ] ?ifte ;
 
 : inspector-tile ( obj -- tile )
     inspector <scroller> "Inspector" <tile> ;

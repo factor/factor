@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
 USING: assembler errors generic kernel lists math namespaces
-strings vectors words ;
+prettyprint strings vectors words ;
 
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.
@@ -53,7 +53,7 @@ SYMBOL: compiled-xts
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc [ word-xt ] ?unless ;
+    dup compiled-xts get assoc [ ] [ word-xt ] ?ifte ;
 
 ! Words being compiled are consed onto this list. When a word
 ! is encountered that has not been previously compiled, it is
@@ -74,7 +74,7 @@ TUPLE: relative word where to ;
 : just-compiled compiled-offset 4 - ;
 
 C: relative ( word -- )
-    dup t rel-word
+    over t rel-word
     [ set-relative-word ] keep
     [ just-compiled swap set-relative-where ] keep
     [ compiled-offset swap set-relative-to ] keep ;

@@ -248,29 +248,70 @@ You can even start the HTTP in a separate thread, and look at code in your web b
 
 Since Factor does very little ``static'' or compile-time checking, you will have to learn how to deal with and fix runtime errors. On the upside, the tools available are pretty nice.
 
-\subsection{The debugger}
+\subsection{Looking at stacks}
 
-Talk about .s/.r/.n/.c, and how to read .r.
+To see the contents of the data stack, use the \texttt{.s} word. Similarly, the other stacks can be shown with \texttt{.r} (return stack), \texttt{.n} (name stack), and \texttt{.c} (catch stack). Each stack is printed with each element on its own line; the top of the stack is the first element printed.
+
+\subsection{The debugger}
 
 If the execution of a phrase in the listener causes an error to be thrown, the error
 is printed and the stacks at the time of the error are saved. If you're spent any
 time with Factor at all, you are probably familiar with this type of message:
 
 \begin{alltt}
-\textbf{ok} "quadratic.factor" run-file
-\textbf{/home/slava/quadratic.factor:2: Not a number
-    2 * / neg ;
-       ^
+\textbf{ok} [ 1 2 3 ] 4 append reverse
+\textbf{The generic word car does not have a suitable method for 4
 :s :r :n :c show stacks at time of error.
 :get ( var -- value ) inspects the error namestack.}
 \end{alltt}
 
-The message there pretty much sums it up; you can look at the stacks at the time of the error, as well as look up variables in the scope that was active.
+The words \texttt{:s}, \texttt{:r}, \texttt{:n} and \texttt{:s} behave like their counterparts that are prefixed with \texttt{.}, except they show the stacks as they were when the error was thrown.
 
-In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool.
+The return stack warrants some special attention. To successfully develop Factor, you will need to learn to understand how it works. Lets look at the first few lines of the return stack at the time of the above error:
+
+\begin{verbatim}
+[ swap cdr ]
+uncons
+[ r> tuck 2slip ]
+(each)
+[ swons ]
+[ each ]
+each
+\end{verbatim}
+
+You can see the sequence of calls leading up to the error was \texttt{each} calling \texttt{(each)} calling \texttt{uncons}. The error tells us that the \texttt{car} word is the one that failed. Now, you can stare at the stack dump, at notice that if the call to \texttt{car} was successful and execution returned to \texttt{(each)}, the quotation \texttt{[ r> tuck 2slip ]} would resume executing. The first word there, \texttt{r>}, would take the quotation \texttt{[ swons ]} and put it back on the data stack. After \texttt{(each)} returned, it would then continue executing the quotation \texttt{[ each ]}. So what is going on here is a recursive loop, \texttt{[ swons ] each}. If you look at the definition of \texttt{reverse}, you will see that this is exactly what is being done:
+
+\begin{verbatim}
+: reverse ( list -- list ) [ ] swap [ swons ] each ;
+\end{verbatim}
+
+So a list is being reversed, but at some stage, the \texttt{car} is taken of something that is not a number. Now, you can look at the data stack with \texttt{:s}:
+
+\begin{verbatim}
+<< no-method [ ] 4 car >>
+car
+4
+4
+[ 3 2 1 ]
+\end{verbatim}
+
+So now, the mystery has been solved: as \texttt{reverse} iterates down the input value, it hits a cons cells whose \texttt{cdr} is not a list. Indeed, if you look at the value we are passing to \texttt{reverse}, you will see why:
+
+\begin{alltt}
+\textbf{ok} [ 1 2 3 ] 4 append .
+[[ 1 [[ 2 [[ 3 4 ]] ]] ]]
+\end{alltt}
+
+In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool. Another caveat is that in compiled code, the return stack is not reconstructed if there is an error. Until this is fixed, you should only compile code once it is debugged. Finally, remember that unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
 
 \subsection{The walker}
 
+The walker lets you step through the execution of a qotation. When a colon definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
+
+There are two ways to use the walker. The first is to invoke it at the listener with an explicit quotation:
+
+\begin{alltt}
+\textbf{ok} 
 walker
 annotations: watch and break
 

@@ -66,7 +66,7 @@ global [ string-mode off ] bind
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup "use" get search [ str>number ] ?unless
+            dup "use" get search [ ] [ str>number ] ?ifte
         ] unless
     ] when ;
 

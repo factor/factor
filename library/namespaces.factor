@@ -76,7 +76,7 @@ strings vectors ;
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash [ >r <namespace> dup r> set ] ?unless ;
+    dup namespace hash [ ] [ >r <namespace> dup r> set ] ?ifte ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the

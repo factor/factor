@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel DEFER: callcc1
-IN: streams DEFER: line-number
-IN: parser DEFER: file
-IN: errors USING: kernel-internals lists namespaces streams ;
+IN: kernel
+DEFER: callcc1
+IN: errors
+USING: kernel-internals lists namespaces streams ;
 
 TUPLE: no-method object generic ;
 
@@ -19,27 +19,6 @@ TUPLE: no-method object generic ;
 
 : >c ( catch -- ) catchstack cons set-catchstack ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
-
-: save-error ( error -- )
-    #! Save the stacks and parser state for post-mortem
-    #! inspection after an error.
-    namespace [
-        "col" get
-        "line" get
-        line-number get
-        file get
-        global [
-            "error-file" set
-            "error-line-number" set
-            "error-line" set
-            "error-col" set
-            "error" set
-            datastack "error-datastack" set
-            callstack "error-callstack" set
-            namestack "error-namestack" set
-            catchstack "error-catchstack" set
-        ] bind
-    ] when ;
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the

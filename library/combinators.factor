@@ -66,12 +66,6 @@ IN: kernel
     #! value than it produces.
     over [ drop ] [ nip call ] ifte ; inline
 
-: ?unless ( default cond false -- )
-    #! If cond is true, drop default and leave cond on the
-    #! stack. Otherwise, drop default, and apply false
-    #! quotation to default.
-    >r dup [ nip r> drop ] [ drop r> call ] ifte ; inline
-
 : when ( cond quot -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
@@ -88,12 +82,6 @@ IN: kernel
     #! In order to compile, the quotation must consume one more
     #! value than it produces.
     dupd [ drop ] ifte ; inline
-
-: ?when ( default cond true -- )
-    #! If cond is true, drop default and apply true
-    #! quotation to cond. Otherwise, drop cond, and leave
-    #! default on the stack.
-    >r dup [ nip r> call ] [ r> 2drop ] ifte ; inline
 
 : forever ( quot -- )
     #! The code is evaluated in an infinite loop. Typically, a
