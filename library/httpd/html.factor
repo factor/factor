@@ -101,7 +101,7 @@ USE: url-encoding
     ] when* "/" ?str-tail drop ;
 
 : file-link-href ( path -- href )
-    <% "/file/" % resolve-file-link url-encode % %> ;
+    <% "/" % resolve-file-link url-encode % %> ;
 
 : file-link-tag ( style quot -- )
     over "file-link" swap assoc [

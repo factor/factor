@@ -76,7 +76,7 @@ USE: unparser
 
 : serve-directory ( filename -- )
     "/" ?str-tail [
-        dup "index.html" cat2 dup exists? [
+        dup "/index.html" cat2 dup exists? [
             serve-file
         ] [
             drop list-directory

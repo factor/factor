@@ -58,16 +58,19 @@ SYMBOL: compiled-xts
     cell compile-aligned
     compiled-offset swap compiled-xts acons@ ;
 
+: commit-xt ( xt word -- )
+    t over "compiled" set-word-property  set-word-xt ;
+
 : commit-xts ( -- )
-    compiled-xts get [ unswons set-word-xt ] each
+    compiled-xts get [ unswons commit-xt ] each
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
     dup compiled-xts get assoc [ nip ] [ word-xt ] ifte* ;
 
-! "fixup-xts" is a list of [ where word relative ] pairs; the xt
-! of word when its done compiling will be written to the offset,
-! relative to the offset.
+! "deferred-xts" is a list of [ where word relative ] pairs; the
+! xt of word when its done compiling will be written to the
+! offset, relative to the offset.
 
 SYMBOL: deferred-xts
 
@@ -88,6 +91,19 @@ SYMBOL: compile-words
         drop t
     ] [
         primitive?
+    ] ifte ;
+
+: compiling? ( word -- ? )
+    #! A word that is compiling or already compiled will not be
+    #! added to the list of words to be compiled.
+    dup compiled? [
+        drop t
+    ] [
+        dup compile-words get contains? [
+            drop t
+        ] [
+            compiled-xts get assoc
+        ] ifte
     ] ifte ;
 
 : fixup-deferred-xt ( word where relative -- )

@@ -67,7 +67,7 @@ USE: vectors
     "X re-edit -- edit the expression with number X." print
     "history" get print-numbered-vector ;
 
-: get-history ( index -- )
+: get-history ( index -- str )
     "history" get vector-nth ;
 
 : redo ( index -- )
