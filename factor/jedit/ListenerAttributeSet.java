@@ -29,9 +29,11 @@
 
 package factor.jedit;
 
-import javax.swing.text.*;
-import java.awt.Color;
+import console.*;
 import factor.Cons;
+import javax.swing.text.*;
+import javax.swing.Action;
+import java.awt.Color;
 
 public class ListenerAttributeSet extends SimpleAttributeSet
 {
@@ -63,6 +65,8 @@ public class ListenerAttributeSet extends SimpleAttributeSet
 			addAttribute(StyleConstants.FontFamily,value);
 		else if("size".equals(key))
 			addAttribute(StyleConstants.FontSize,value);
+		else if("actions".equals(key))
+			addAttribute(ConsolePane.Actions,createActionsMenu((Cons)value));
 	} //}}}
 	
 	//{{{ toColor() method
@@ -72,5 +76,25 @@ public class ListenerAttributeSet extends SimpleAttributeSet
 		Number g = (Number)color.next().car;
 		Number b = (Number)color.next().next().car;
 		return new Color(r.intValue(),g.intValue(),b.intValue());
+	} //}}}
+	
+	//{{{ createActionsMenu() method
+	private Action[] createActionsMenu(Cons alist)
+	{
+		if(alist == null)
+			return null;
+
+		int length = alist.length();
+		int i = 0;
+		Action[] actions = new Action[length];
+		while(alist != null)
+		{
+			Cons pair = (Cons)alist.car;
+			actions[i++] = new Console.EvalAction(
+				(String)pair.car,(String)pair.cdr);
+			alist = alist.next();
+		}
+		
+		return actions;
 	} //}}}
 }
