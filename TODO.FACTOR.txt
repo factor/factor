@@ -1,12 +1,8 @@
-73:
++ plugin:
 
 - update plugin docs
 - word preview for remote words
 - faster completion
-- [ [ dup call ] dup call ] infer hangs
-- code gc
-- ffi unicode strings: null char security hole
-- utf16 string boxing
 
 + ui:
 
@@ -18,6 +14,9 @@
 
 + compiler/ffi:
 
+- [ [ dup call ] dup call ] infer hangs
+- ffi unicode strings: null char security hole
+- utf16 string boxing
 - more accurate types for various words
 - declarations
 - type inference fails with some assembler words;
@@ -50,6 +49,7 @@
 
 - vectors: ensure its ok with bignum indices
 - cat, reverse-cat primitives
+- code gc
 - generational gc
 - make see work with union, builtin, predicate
 - doc comments of generics
