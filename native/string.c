@@ -9,7 +9,7 @@ F_STRING* allot_string(CELL capacity)
 	have a length field. The null termination allows us to add
 	the sizeof(F_STRING) to a Factor string to get a C-style
 	UTF16 string for C library calls. */
-	cput(SREF(string,capacity),(uint16_t)'\0');
+	cput(SREF(string,capacity),(u16)'\0');
 	string->length = tag_fixnum(capacity);
 	return string;
 }
@@ -40,7 +40,7 @@ F_STRING* string(CELL capacity, CELL fill)
 	return string;
 }
 
-F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill)
+F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
@@ -98,7 +98,7 @@ char* to_c_string(F_STRING* s)
 	CELL capacity = string_capacity(s);
 	for(i = 0; i < capacity; i++)
 	{
-		uint16_t ch = string_nth(s,i);
+		u16 ch = string_nth(s,i);
 		if(ch == '\0' || ch > 255)
 			general_error(ERROR_C_STRING,tag_object(s));
 	}
@@ -139,10 +139,10 @@ char* unbox_c_string(void)
 }
 
 /* FFI calls this */
-uint16_t* unbox_utf16_string(void)
+u16* unbox_utf16_string(void)
 {
 	/* Return pointer to first character */
-	return (uint16_t*)(untag_string(dpop()) + 1);
+	return (u16*)(untag_string(dpop()) + 1);
 }
 
 void primitive_string_nth(void)
@@ -161,8 +161,8 @@ F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len)
 	CELL i = 0;
 	while(i < len)
 	{
-		uint16_t c1 = string_nth(s1,i);
-		uint16_t c2 = string_nth(s2,i);
+		u16 c1 = string_nth(s1,i);
+		u16 c2 = string_nth(s2,i);
 		if(c1 != c2)
 			return c1 - c2;
 		i++;

@@ -1,7 +1,7 @@
 #include "../factor.h"
 
 void init_sockaddr(struct sockaddr_in* name,
-	const char* hostname, uint16_t port)
+	const char* hostname, u16 port)
 {
 	struct hostent *hostinfo;
 
@@ -15,7 +15,7 @@ void init_sockaddr(struct sockaddr_in* name,
 	name->sin_addr = *((struct in_addr *)hostinfo->h_addr);
 }
 
-int make_client_socket(const char* hostname, uint16_t port)
+int make_client_socket(const char* hostname, u16 port)
 {
 	int sock;
 	struct sockaddr_in servername;
@@ -44,7 +44,7 @@ int make_client_socket(const char* hostname, uint16_t port)
 
 void primitive_client_socket(F_WORD *word)
 {
-	uint16_t p = (uint16_t)to_fixnum(dpop());
+	u16 p = (u16)to_fixnum(dpop());
 	char* host;
 	int sock;
 
@@ -57,7 +57,7 @@ void primitive_client_socket(F_WORD *word)
 	dpush(tag_object(port(PORT_WRITE,sock)));
 }
 
-int make_server_socket(uint16_t port)
+int make_server_socket(u16 port)
 {
 	int sock;
 	struct sockaddr_in name;
@@ -96,7 +96,7 @@ int make_server_socket(uint16_t port)
 
 void primitive_server_socket(F_WORD *word)
 {
-	uint16_t p = (uint16_t)to_fixnum(dpop());
+	u16 p = (u16)to_fixnum(dpop());
 	maybe_garbage_collection();
 	dpush(tag_object(port(PORT_SPECIAL,make_server_socket(p))));
 }

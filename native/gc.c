@@ -109,7 +109,7 @@ INLINE CELL collect_next(CELL scan)
 
 void primitive_gc(void)
 {
-	int64_t start = current_millis();
+	s64 start = current_millis();
 	CELL scan;
 
 	if(heap_scan)

@@ -25,7 +25,7 @@ INLINE CELL string_capacity(F_STRING* str)
 F_STRING* allot_string(CELL capacity);
 F_STRING* string(CELL capacity, CELL fill);
 void rehash_string(F_STRING* str);
-F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill);
+F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill);
 char* to_c_string(F_STRING* s);
 char* to_c_string_unchecked(F_STRING* s);
 void primitive_string_to_memory(void);
@@ -33,7 +33,7 @@ DLLEXPORT void box_c_string(const char* c_string);
 F_STRING* from_c_string(const char* c_string);
 void primitive_memory_to_string(void);
 DLLEXPORT char* unbox_c_string(void);
-DLLEXPORT uint16_t* unbox_utf16_string(void);
+DLLEXPORT u16* unbox_utf16_string(void);
 
 /* untagged & unchecked */
 INLINE CELL string_nth(F_STRING* string, CELL index)
@@ -42,7 +42,7 @@ INLINE CELL string_nth(F_STRING* string, CELL index)
 }
 
 /* untagged & unchecked */
-INLINE void set_string_nth(F_STRING* string, CELL index, uint16_t value)
+INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 {
 	cput(SREF(string,index),value);
 }

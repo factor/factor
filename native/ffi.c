@@ -129,13 +129,13 @@ void primitive_set_alien_4(void)
 
 void primitive_alien_2(void)
 {
-	uint16_t* ptr = alien_pointer();
+	u16* ptr = alien_pointer();
 	box_signed_2(*ptr);
 }
 
 void primitive_set_alien_2(void)
 {
-	uint16_t* ptr = alien_pointer();
+	u16* ptr = alien_pointer();
 	CELL value = unbox_signed_2();
 	*ptr = value;
 }
