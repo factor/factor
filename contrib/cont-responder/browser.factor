@@ -44,12 +44,13 @@ USE: html
 USE: parser
 USE: errors
 
-: <browser> ( vocab word -- )
+: <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
   #! user interface state.
   <namespace> [
     "current-word" set
     "current-vocab" set
+    "allow-edit?" set
   ] extend ;
 
 : write-vocab-list ( -- )
@@ -93,7 +94,7 @@ USE: errors
   #! Write the source for the given word from the vocab as HTML.
   <namespace> [
     "responder" "inspect" put
-    "Edit" [ "edit-state" t put ] quot-href <br/>
+    "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
     ] [
@@ -189,16 +190,25 @@ USE: errors
             ] </form>
           ] </body>
         ] </html> 
-      ] show 
+      ] show [
+        "allow-edit?" get [ 
+          "eval" get [ 
+             "eval" f put
+             "Editing has been disabled." show-message-page 
+          ] when
+        ] unless
+        "allow-edit?" get "allow-edit?" set
+      ] extend
     ] bind [
+      "allow-edit?" get
       "vocabs" get
       "words" get
       "eval" get dup [ "vocabs" get swap eval-string ] [ drop ] ifte
     ] bind <browser>
   ] forever ;
 
-: browser-responder ( -- )
+: browser-responder ( allow-edit? -- )
   #! Start the Smalltalk-like browser.
   "browser" "" <browser> browse ;
 
-"browser" [ browser-responder ] install-cont-responder
+"browser" [ f browser-responder ] install-cont-responder
