@@ -28,23 +28,11 @@
 IN: compiler
 USE: alien
 USE: inference
-USE: errors
 USE: kernel
-USE: lists
-USE: math
 USE: namespaces
-USE: strings
 USE: words
-USE: vectors
 
 : DS ( -- address ) "ds" dlsym-self ;
-
-: PUSH-DS ( -- )
-    #! Push contents of EAX onto datastack.
-    DS ECX [I]>R
-    4 ECX R+I
-    EAX ECX R>[R]
-    ECX DS R>[I] ;
 
 : POP-DS ( -- )
     #! Pop datastack to EAX.
@@ -52,21 +40,6 @@ USE: vectors
     ECX EAX [R]>R
     4 ECX R-I
     ECX DS R>[I] ;
-
-: PEEK-DS ( -- )
-    #! Peek datastack to EAX.
-    DS ECX [I]>R
-    ECX EAX [R]>R ;
-
-: PEEK-2-DS ( -- )
-    #! Peek second value on datastack to EAX.
-    DS ECX [I]>R
-    4 ECX R-I
-    ECX EAX [R]>R ;
-
-: SELF-CALL ( name -- )
-    #! Call named C function in Factor interpreter executable.
-    dlsym-self CALL JUMP-FIXUP ;
 
 #push-immediate [
     DS ECX [I]>R
@@ -110,75 +83,20 @@ USE: vectors
 
 #return [ drop RET ] "generator" set-word-property
 
-[
-    [ #drop drop ]
-    [ #dup  dup  ]
-    [ #swap swap ]
-    [ #over over ]
-    [ #pick pick ]
-    [ #>r   >r   ]
-    [ #r>   r>   ]
-] [
-    uncons [
-        car CALL compiled-offset defer-xt drop
-    ] cons "generator" set-word-property
-] each
-
-: begin-jump-table ( -- )
+#dispatch [
     #! Compile a piece of code that jumps to an offset in a
-    #! jump table indexed by the type of the Factor object in
-    #! EAX.
+    #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    2 EAX R<<I ( -- fixup )
+    drop
+    POP-DS
+    1 EAX R>>I ( -- fixup )
     EAX+/PARTIAL
     EAX JUMP-[R]
     cell compile-aligned
-    compiled-offset swap set-compiled-cell ( fixup -- ) ;
+    compiled-offset swap set-compiled-cell ( fixup -- )
+] "generator" set-word-property
 
-: jump-table-entry ( word -- )
+#target [
     #! Jump table entries are absolute addresses.
-    ( dup postpone-word )
-    compiled-offset 0 compile-cell 0 defer-xt ;
-
-: check-jump-table ( vtable -- )
-    length num-types = [
-        "Jump table must have " num-types " entries" cat3 throw
-    ] unless ;
-
-: compile-jump-table ( vtable -- )
-    #! Compile a table of words as a word-array of XTs.
-    begin-jump-table
-    dup check-jump-table
-    [ jump-table-entry ] each ;
-
-: TYPE ( -- )
-    #! Peek datastack, store type # in EAX.
-    PEEK-DS
-    EAX PUSH-R
-    "type_of" SELF-CALL
-    4 ESP R+I ;
-
-: compile-generic ( vtable -- )
-    #! Compile a faster alternative to
-    #! : generic ( obj vtable -- )
-    #!     >r dup type r> vector-nth execute ;
-    TYPE  compile-jump-table ;
-
-#generic [ compile-generic ] "generator" set-word-property
-
-: ARITHMETIC-TYPE ( -- )
-    #! Peek top two on datastack, store arithmetic type # in EAX.
-    PEEK-DS
-    EAX PUSH-R
-    PEEK-2-DS
-    EAX PUSH-R
-    "arithmetic_type" SELF-CALL
-    8 ESP R+I ;
-
-: compile-2generic ( vtable -- )
-    #! Compile a faster alternative to
-    #! : 2generic ( obj vtable -- )
-    #!     >r 2dup arithmetic-type r> vector-nth execute ;
-    ARITHMETIC-TYPE  compile-jump-table ;
-
-#2generic [ compile-2generic ] "generator" set-word-property
+    compiled-offset 0 compile-cell 0 defer-xt
+] "generator" set-word-property

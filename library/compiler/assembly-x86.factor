@@ -170,6 +170,12 @@ USE: math
     BIN: 100 BIN: 11 MOD-R/M
     compile-byte ;
 
+: R>>I ( imm reg -- )
+    #! SHIFT <reg> BY <imm>, STORE RESULT IN <reg>
+    HEX: c1 compile-byte
+    BIN: 111 BIN: 11 MOD-R/M
+    compile-byte ;
+
 : CMP-I-R ( imm reg -- )
     #! There are three forms of CMP we assemble
     #! 83 f8 03                cmpl   $0x3,%eax

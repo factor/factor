@@ -50,11 +50,14 @@ USE: vectors
 ! It is quite clumsy, however. A higher-level CLOS-style
 ! 'generic words' system will be built later.
 
+: dispatch ( n vtable -- )
+    vector-nth call ;
+
 : generic ( obj vtable -- )
-    >r dup type r> vector-nth call ;
+    >r dup type r> dispatch ; inline
 
 : 2generic ( n n vtable -- )
-    >r 2dup arithmetic-type r> vector-nth call ;
+    >r 2dup arithmetic-type r> dispatch ; inline
 
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.

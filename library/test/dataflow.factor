@@ -63,7 +63,7 @@ USE: generic
 
 [ t ] [
     [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
-    #generic swap dataflow-contains-op? car [
+    #dispatch swap dataflow-contains-op? car [
         node-param get [
             [ [ node-param get \ undefined-method = ] bind ] some?
         ] some?

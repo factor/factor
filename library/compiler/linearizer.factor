@@ -32,6 +32,8 @@ USE: lists
 USE: math
 USE: namespaces
 USE: words
+USE: strings
+USE: errors
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching
@@ -46,6 +48,11 @@ SYMBOL: #jump-label-t ( branch if top of stack is true )
 SYMBOL: #jump-label ( unconditional branch )
 SYMBOL: #jump ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
+
+! #dispatch is linearized as #dispatch followed by a #target
+! for each dispatch table entry. The linearizer ensures the
+! correct number of #targets is emitted.
+SYMBOL: #target ( part of jump table )
 
 : linear, ( node -- )
     #! Add a node to the linear IR.
@@ -128,31 +135,45 @@ SYMBOL: #return-to ( push addr on C stack )
     [ node-param get ] bind linearize-ifte
 ] "linearizer" set-word-property
 
-: generic-head ( param op -- end label/param )
+: dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    >r
+    [ #dispatch ] ,
     <label> ( end label ) swap
-    [ <label> cons ] map
-    dup [ cdr ] map r> swons , ;
+    [ <label> dup #target swons ,  cons ] map ;
 
-: generic-body ( end label/param -- )
+: dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
     [
         uncons label,  (linearize)  dup #jump-label swons ,
     ] each drop ;
 
-: linearize-generic ( param op -- )
+: check-dispatch ( vtable -- )
+    length num-types = [
+        "Dispatch must have " num-types " entries" cat3 throw
+    ] unless ;
+
+: linearize-dispatch ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
-    generic-head dupd generic-body label, ;
+    dup check-dispatch dispatch-head dupd dispatch-body label, ;
 
-#generic [
-    [ node-param get node-op get ] bind linearize-generic
-] "linearizer" set-word-property
-
-#2generic [
-    [ node-param get node-op get ] bind linearize-generic
+#dispatch [
+    [ node-param get ] bind linearize-dispatch
 ] "linearizer" set-word-property
 
 #values [ drop ] "linearizer" set-word-property
+
+[
+    [ #drop drop ]
+    [ #dup  dup  ]
+    [ #swap swap ]
+    [ #over over ]
+    [ #pick pick ]
+    [ #>r   >r   ]
+    [ #r>   r>   ]
+] [
+    uncons
+    [ car #call swons , drop ] cons
+    "linearizer" set-word-property
+] each

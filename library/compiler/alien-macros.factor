@@ -32,6 +32,10 @@ USE: lists
 USE: math
 USE: namespaces
 
+: SELF-CALL ( name -- )
+    #! Call named C function in Factor interpreter executable.
+    dlsym-self CALL JUMP-FIXUP ;
+
 : UNBOX ( name -- )
     #! Move top of datastack to C stack.
     SELF-CALL  EAX PUSH-R ;

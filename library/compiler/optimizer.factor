@@ -153,11 +153,7 @@ USE: prettyprint
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
-#generic [
-    [ node-param get ] bind branches-call-label?
-] "calls-label" set-word-property
-
-#2generic [
+#dispatch [
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
@@ -177,13 +173,9 @@ USE: prettyprint
 #ifte [ can-kill-branches? ] "can-kill" set-word-property
 #ifte [ kill-branches ] "kill-node" set-word-property
 
-#generic [ scan-branches ] "scan-literal" set-word-property
-#generic [ can-kill-branches? ] "can-kill" set-word-property
-#generic [ kill-branches ] "kill-node" set-word-property
-
-#2generic [ scan-branches ] "scan-literal" set-word-property
-#2generic [ can-kill-branches? ] "can-kill" set-word-property
-#2generic [ kill-branches ] "kill-node" set-word-property
+#dispatch [ scan-branches ] "scan-literal" set-word-property
+#dispatch [ can-kill-branches? ] "can-kill" set-word-property
+#dispatch [ kill-branches ] "kill-node" set-word-property
 
 ! Don't care about inputs to recursive combinator calls
 #call-label [ 2drop t ] "can-kill" set-word-property

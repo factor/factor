@@ -106,7 +106,8 @@ USE: hashtables
     [
         f infer-branch [
             d-in get meta-d get vector-length cons
-        ] bind recursive-state get set-base
+            recursive-state get set-base
+        ] bind
     ] [
         [ 2drop ] when
     ] catch ;
@@ -150,27 +151,18 @@ USE: hashtables
     pop-d drop ( condition )
     infer-branches ;
 
+\ ifte [ infer-ifte ] "infer" set-word-property
+
 : vtable>list ( [ vtable | rstate ] -- list )
     unswons vector>list [ over cons ] map nip ;
 
-: infer-generic ( -- )
+: infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
     2 ensure-d
     dataflow-drop, pop-d vtable>list
-    >r 1 meta-d get vector-tail* #generic r>
+    >r 1 meta-d get vector-tail* #dispatch r>
+    pop-d drop ( n )
     infer-branches ;
 
-: infer-2generic ( -- )
-    #! Infer effects for all branches, unify.
-    3 ensure-d
-    dataflow-drop, pop-d vtable>list
-    >r 2 meta-d get vector-tail* #2generic r>
-    infer-branches ;
-
-\ ifte [ infer-ifte ] "infer" set-word-property
-
-\ generic [ infer-generic ] "infer" set-word-property
-\ generic [ 2 | 0 ] "infer-effect" set-word-property
-
-\ 2generic [ infer-2generic ] "infer" set-word-property
-\ 2generic [ 3 | 0 ] "infer-effect" set-word-property
+\ dispatch [ infer-dispatch ] "infer" set-word-property
+\ dispatch [ 2 | 0 ] "infer-effect" set-word-property

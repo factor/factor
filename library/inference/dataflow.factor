@@ -50,8 +50,7 @@ SYMBOL: #call-label
 SYMBOL: #push ( literal )
 
 SYMBOL: #ifte
-SYMBOL: #generic
-SYMBOL: #2generic
+SYMBOL: #dispatch
 
 ! This is purely a marker for values we retain after a
 ! conditional. It does not generate code, but merely alerts the
