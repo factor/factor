@@ -43,7 +43,7 @@ USE: unparser
 : log-client ( -- )
     "client" get [
         "Accepted connection from " swap
-        [ "socket" get unparse ] bind cat2 log
+        "client" swap get* cat2 log
     ] when* ;
 
 : with-logging ( quot -- )

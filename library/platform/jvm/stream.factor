@@ -236,7 +236,7 @@ USE: strings
     [ [ ] "java.net.Socket" "getOutputStream" jinvoke ]
     cleave
     <byte-stream> [
-        "socket" set
+        dup >str "client" set "socket" set
 
         ! We "extend" byte-stream's fclose.
         ( -- )

@@ -8,7 +8,6 @@
 - read#
 - enforce bottom-up in native bootstrap
 - standalone listener input style
-- log-client: fix for native
 - add a socket timeout
 
 + docs:

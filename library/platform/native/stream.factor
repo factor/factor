@@ -36,6 +36,7 @@ USE: stack
 USE: stdio
 USE: strings
 USE: namespaces
+USE: unparser
 
 : <fd-stream> ( in out -- stream )
     #! Create a file descriptor stream object, wrapping a pair
@@ -84,7 +85,7 @@ USE: namespaces
     ] extend ;
 
 : <client-stream> ( host port in out -- stream )
-    <fd-stream> [ "port" set "client" set ] extend ;
+    <fd-stream> [ ":" swap unparse cat3 "client" set ] extend ;
 
 : accept ( server -- client )
     #! Accept a connection from a server socket.
