@@ -74,63 +74,72 @@ public class WordPreview implements ActionListener, CaretListener
 	//{{{ public void actionPerformed() method
 	public void actionPerformed(ActionEvent evt)
 	{
-		showPreview();
+		try
+		{
+			showPreview();
+		}
+		catch(IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	} //}}}
 	
+	//{{{ getWordAtCaret() method
+	private FactorWord getWordAtCaret(FactorParsedData fdata)
+		throws IOException
+	{
+		int line = textArea.getCaretLine();
+		int caret = textArea.getCaretPosition();
+
+		DefaultTokenHandler h = new DefaultTokenHandler();
+		textArea.getBuffer().markTokens(line,h);
+		Token tokens = h.getTokens();
+
+		int offset = caret - textArea.getLineStartOffset(line);
+
+		int len = textArea.getLineLength(line);
+		if(len == 0)
+			return null;
+
+		if(offset == len)
+			offset--;
+
+		Token token = TextUtilities.getTokenAtOffset(tokens,offset);
+
+		String name = token.rules.getName();
+
+		for(int i = 0; i < IGNORED_RULESETS.length; i++)
+		{
+			if(name.equals(IGNORED_RULESETS[i]))
+				return null;
+		}
+
+		String word = FactorPlugin.getWordAtCaret(textArea);
+		if(word == null)
+			return null;
+
+		return FactorPlugin.getExternalInstance()
+			.searchVocabulary(fdata.use,word);
+	} //}}}
+
 	//{{{ showPreview() method
 	private void showPreview()
+		throws IOException
 	{
 		View view = textArea.getView();
+
+		if(SideKickPlugin.isParsingBuffer(view.getBuffer()))
+			return;
 
 		SideKickParsedData data = SideKickParsedData.getParsedData(view);
 		if(data instanceof FactorParsedData)
 		{
-			int line = textArea.getCaretLine();
-			int caret = textArea.getCaretPosition();
-
-			DefaultTokenHandler h = new DefaultTokenHandler();
-			textArea.getBuffer().markTokens(line,h);
-			Token tokens = h.getTokens();
-
-			int offset = caret - textArea.getLineStartOffset(line);
-
-			int len = textArea.getLineLength(line);
-			if(len == 0)
-				return;
-
-			if(offset == len)
-				offset--;
-
-			Token token = TextUtilities.getTokenAtOffset(tokens,offset);
-
-			String name = token.rules.getName();
-
-			for(int i = 0; i < IGNORED_RULESETS.length; i++)
+			FactorWord w = getWordAtCaret((FactorParsedData)data);
+			if(w != null)
 			{
-				if(name.equals(IGNORED_RULESETS[i]))
-					return;
-			}
-
-			String word = FactorPlugin.getWordAtCaret(textArea);
-			if(word == null)
-				return;
-
-			FactorParsedData fdata = (FactorParsedData)data;
-
-			try
-			{
-				FactorWord w = FactorPlugin.getExternalInstance()
-					.searchVocabulary(fdata.use,word);
-				if(w != null)
-				{
-					view.getStatus().setMessageAndClear(
-						FactorWordRenderer.getWordHTMLString(
-						w,true));
-				}
-			}
-			catch(IOException e)
-			{
-				throw new RuntimeException(e);
+				view.getStatus().setMessageAndClear(
+					FactorWordRenderer.getWordHTMLString(
+					w,true));
 			}
 		}
 	} //}}}

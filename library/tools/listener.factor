@@ -44,12 +44,7 @@ USE: unparser
 USE: vectors
 
 : print-banner ( -- )
-    [
-        "This is " ,
-        java? [ "JVM " , ] when
-        native? [ "native " , ] when
-        "Factor " , version ,
-    ] make-string print
+    "Factor " write version print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Copyright (C) 2004 Chris Double" print
     "Type ``exit'' to exit, ``help'' for help." print ;
@@ -74,22 +69,30 @@ USE: vectors
         listener-step listener-loop
     ] ifte ;
 
+: kb. 1024 /i unparse write " KB" write ;
+
+: (room.) ( free total -- )
+    2dup swap - swap ( free used total )
+    kb. " total " write
+    kb. " used " write
+    kb. " free" print ;
+
 : room. ( -- )
     room
-    1024 /i unparse write " KB total, " write
-    1024 /i unparse write " KB free" print ;
+    "Data space: " write (room.)
+    "Code space: " write (room.) ;
 
 : init-listener ( -- )
     print-banner
+    terpri
     room.
+    terpri
 
     listener-loop ;
 
 : help ( -- )
     "SESSION:" print
-    native? [
-        "\"foo.image\" save-image   -- save heap to a file" print
-    ] when
+    "\"foo.image\" save-image   -- save heap to a file" print
     "room.                    -- show memory usage" print
     "heap-stats.              -- memory allocation breakdown" print
     "garbage-collection       -- force a GC" print
@@ -114,7 +117,7 @@ USE: vectors
     "PROFILER:                [ ... ] call-profile" print
     "                         [ ... ] allot-profile" print
     "TRACE:                   [ ... ] trace" print
-    "SINGLE STEP:             [ ... ] step" print
+    "SINGLE STEP:             [ ... ] walk" print
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

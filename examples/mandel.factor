@@ -5,7 +5,7 @@
 !
 ! Then, enter this at the interpreter prompt:
 !
-! "contrib/mandel.factor" run-file
+! "examples/mandel.factor" run-file
 
 IN: mandel
 

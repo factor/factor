@@ -51,7 +51,7 @@ USE: strings
     ] ifte ;
 
 : resource-responder ( filename -- )
-    java? "resource-path" get or [
+    "resource-path" get [
         serve-resource
     ] [
         drop "404 resource-path not set" httpd-error

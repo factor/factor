@@ -55,12 +55,6 @@ USE: unparser
         drop f
     ] ifte ;
 
-: parsing ( -- )
-    #! Mark the most recently defined word to execute at parse
-    #! time, rather than run time. The word can use 'scan' to
-    #! read ahead in the input stream.
-    word t "parsing" set-word-property ;
-
 : end? ( -- ? )
     "col" get "line" get str-length >= ;
 
@@ -187,6 +181,14 @@ USE: unparser
 
 : next-word-ch ( -- ch )
     "col" get "line" get skip-blank "col" set next-ch ;
+
+IN: syntax
+
+: parsing ( -- )
+    #! Mark the most recently defined word to execute at parse
+    #! time, rather than run time. The word can use 'scan' to
+    #! read ahead in the input stream.
+    word t "parsing" set-word-property ;
 
 ! Once this file has loaded, we can use 'parsing' normally.
 ! This hack is needed because in Java Factor, 'parsing' is

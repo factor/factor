@@ -27,6 +27,7 @@
 
 IN: presentation
 USE: combinators
+USE: hashtables
 USE: kernel
 USE: lists
 USE: namespaces
@@ -44,10 +45,10 @@ USE: unparser
 ! significance to the 'fwrite-attr' word when applied to a
 ! stream that supports attributed string output.
 
-: (style) ( name -- style ) "styles" get get* ;
+: (style) ( name -- style ) "styles" get hash ;
 : default-style ( -- style ) "default" (style) ;
 : style ( name -- style ) (style) [ default-style ] unless* ;
-: set-style ( style name -- ) "styles" get set* ;
+: set-style ( style name -- ) "styles" get set-hash ;
 
 <namespace> "styles" set
 

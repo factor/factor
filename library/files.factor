@@ -27,6 +27,7 @@
 
 IN: files
 USE: combinators
+USE: hashtables
 USE: lists
 USE: logic
 USE: namespaces
@@ -44,10 +45,10 @@ USE: strings
     ] ;
 
 : set-mime-types ( assoc -- )
-    "mime-types" global set* ;
+    "mime-types" global set-hash ;
 
 : mime-types ( -- assoc )
-    "mime-types" global get* ;
+    "mime-types" global hash ;
 
 : file-extension ( filename -- extension )
     "." split cdr dup [ last ] when ;

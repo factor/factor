@@ -27,8 +27,9 @@
 
 IN: logging
 
-USE: namespaces
 USE: combinators
+USE: hashtables
+USE: namespaces
 USE: stack
 USE: streams
 USE: strings
@@ -43,7 +44,7 @@ USE: unparser
 : log-client ( -- )
     "client" get [
         "Accepted connection from " swap
-        "client" swap get* cat2 log
+        "client" swap hash cat2 log
     ] when* ;
 
 : with-logging ( quot -- )

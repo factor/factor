@@ -35,7 +35,6 @@ USE: lists
 USE: logic
 USE: math
 USE: namespaces
-USE: parser
 USE: stack
 USE: strings
 USE: words
@@ -113,6 +112,14 @@ USE: unparser
     ] ifte ;
 
 IN: syntax
+
+: recursive-infer ( -- )
+    #! Mark the last word to be recursively inferred (eg, cond).
+    word  t "recursive-infer" set-word-property ; parsing
+
+: inline ( -- )
+    #! Mark the last word to be inlined.
+    word  t "inline" set-word-property ; parsing
 
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"

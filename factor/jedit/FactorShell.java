@@ -220,10 +220,16 @@ public class FactorShell extends Shell
 
 			openStream(output);
 
-			FactorStream.Packet p;
-			while((p = stream.nextPacket()) != null)
+			for(;;)
 			{
-				if(p instanceof FactorStream.ReadLinePacket)
+				FactorStream.Packet p = stream.nextPacket();
+				if(p == null)
+				{
+					/* EOF */
+					closeStream();
+					break;
+				}
+				else if(p instanceof FactorStream.ReadLinePacket)
 				{
 					waitingForInput = true;
 					break;

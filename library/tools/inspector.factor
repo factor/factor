@@ -46,7 +46,7 @@ USE: vectors
 
 : vars. ( -- )
     #! Print a list of defined variables.
-    vars [ print ] each ;
+    namespace hash-keys [.] ;
 
 : object-actions ( -- alist )
     [
@@ -82,9 +82,6 @@ USE: vectors
 : alist-sort ( list -- list )
     [ swap car unparse swap car unparse str-lexi> ] sort ;
 
-: describe-namespace ( namespace -- )
-    [ vars-values ] bind alist-sort describe-assoc ;
-
 : describe-hashtable ( hashtables -- )
     hash>alist alist-sort describe-assoc ;
 
@@ -98,9 +95,6 @@ USE: vectors
         
         [ assoc? ]
         [ describe-assoc ]
-        
-        [ has-namespace? ]
-        [ describe-namespace ]
         
         [ hashtable? ]
         [ describe-hashtable ]

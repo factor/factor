@@ -81,7 +81,7 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			new Object[] { MiscUtilities.charsToEntities(word.name) });
 		if(word.stackEffect != null)
 		{
-			html += jEdit.getProperty("factor.completion.stack",
+			html = jEdit.getProperty("factor.completion.stack",
 				new String[] { html, word.stackEffect });
 		}
 

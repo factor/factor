@@ -33,7 +33,7 @@ package factor;
  * A growable array.
  * @author Slava Pestov
  */
-public class FactorArray implements FactorExternalizable, PublicCloneable
+public class FactorArray implements FactorExternalizable
 {
 	public Object[] array;
 	public int top;

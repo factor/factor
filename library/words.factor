@@ -27,6 +27,7 @@
 
 IN: words
 USE: combinators
+USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
@@ -42,11 +43,11 @@ USE: strings
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    global [ "vocabularies" get [ vars str-sort ] bind ] bind ;
+    global [ "vocabularies" get hash-keys str-sort ] bind ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.
-    global [ "vocabularies" get get* ] bind ;
+    global [ "vocabularies" get hash ] bind ;
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
@@ -55,7 +56,7 @@ USE: strings
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
-    vocab [ values ] bind [ ] subset word-sort ;
+    vocab hash-values [ ] subset word-sort ;
 
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.

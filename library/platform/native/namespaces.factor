@@ -37,26 +37,22 @@ USE: vectors
 
 DEFER: namespace
 
-: namestack* ( -- ns ) 3 getenv ;
-: set-namestack* ( ns -- ) 3 setenv ;
+: namestack ( -- ns ) 3 getenv ;
+: set-namestack ( ns -- ) 3 setenv ;
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    namestack* vector-push ; inline
+    namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.
-    namestack* vector-pop ; inline
-
-: namestack ( -- stack ) namestack* vector-clone ;
-: set-namestack ( stack -- ) vector-clone set-namestack* ;
+    namestack uncons set-namestack ; inline
 
 : global ( -- g ) 4 getenv ;
 : set-global ( g -- ) 4 setenv ;
 
 : init-namespaces ( -- )
-    64 <vector> set-namestack* global >n
-    global "global" set ;
+    global >n  global "global" set ;
 
 : namespace-buckets 23 ;
 
@@ -64,25 +60,22 @@ DEFER: namespace
     #! Create a new namespace.
     namespace-buckets <hashtable> ;
 
-: get* ( var namespace -- value ) hash ;
-: set* ( value variable namespace -- ) set-hash ;
-
-: namestack-search ( var n -- )
+: (get) ( var ns -- value )
     #! Internal word for searching the namestack.
-    dup 0 eq? [
-        2drop f ( not found )
-    ] [
-        pred 2dup >r >r namestack* vector-nth hash* dup [
-            r> drop r> drop ( [ key | value ] -- ) cdr ( found )
+    dup [
+        2dup car hash* dup [
+            nip nip cdr ( found )
         ] [
-            drop r> r> namestack-search ( check next entry )
+            drop cdr (get) ( keep looking )
         ] ifte
+    ] [
+        2drop f
     ] ifte ;
 
 : get ( variable -- value )
     #! Push the value of a variable by searching the namestack
     #! from the top down.
-    namestack* vector-length namestack-search ;
+    namestack (get) ;
 
 : set ( value variable -- ) namespace set-hash ;
 : put ( variable value -- ) swap set ;
@@ -90,10 +83,3 @@ DEFER: namespace
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
-
-: vars-values ( -- list ) namespace hash>alist ;
-: vars ( -- list ) namespace hash-keys ;
-: values ( -- list ) namespace hash-values ;
-
-! We don't have bound objects in native Factor.
-: has-namespace? hashtable? ;

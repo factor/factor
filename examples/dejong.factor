@@ -5,7 +5,7 @@
 !
 ! Then, enter this at the interpreter prompt:
 !
-! "contrib/dejong.factor" run-file
+! "examples/dejong.factor" run-file
 
 ! For details on DeJong attractors, see
 ! http://www.complexification.net/gallery/machines/peterdejong/

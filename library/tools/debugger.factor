@@ -55,14 +55,12 @@ USE: unparser
 : in-parser? ( -- ? )
     "error-line" get "error-col" get and ;
 
-: error-handler-hook
-    #! The game overrides this.
-    ;
-
 : :s ( -- ) "error-datastack"  get {.} ;
 : :r ( -- ) "error-callstack"  get {.} ;
-: :n ( -- ) "error-namestack"  get {.} ;
+: :n ( -- ) "error-namestack"  get [.] ;
 : :c ( -- ) "error-catchstack" get {.} ;
+
+: :get ( var -- value ) "error-namestack" get (get) ;
 
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
@@ -71,8 +69,6 @@ USE: unparser
 
         [ :s :r :n :c ] [ prettyprint-word " " write ] each
         "show stacks at time of error." print
-
-        java? [ ":j shows Java stack trace." print ] when
-        error-handler-hook
-
+        \ :get prettyprint-word
+        " ( var -- value ) inspects the error namestack." print
     ] when* ;

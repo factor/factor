@@ -28,6 +28,7 @@
 IN: httpd-responder
 
 USE: combinators
+USE: hashtables
 USE: httpd
 USE: kernel
 USE: lists
@@ -72,15 +73,15 @@ USE: strings
     ] extend ;
 
 : get-responder ( name -- responder )
-    "httpd-responders" get get* [
-        "404" "httpd-responders" get get*
+    "httpd-responders" get hash [
+        "404" "httpd-responders" get hash
     ] unless* ;
 
 : default-responder ( -- responder )
     "default" get-responder ;
 
 : set-default-responder ( name -- )
-    get-responder "default" "httpd-responders" get set* ;
+    get-responder "default" "httpd-responders" get set-hash ;
 
 : responder-argument ( argument -- argument )
     dup f-or-"" [ drop "default-argument" get ] when ;
@@ -121,4 +122,4 @@ USE: strings
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.
-    "responder" over get*  "httpd-responders" get set* ;
+    "responder" over hash  "httpd-responders" get set-hash ;

@@ -110,7 +110,14 @@ public class FactorSideKickParser extends SideKickParser
 			buffer.readLock();
 
 			text = buffer.getText(0,buffer.getLength());
+		}
+		finally
+		{
+			buffer.readUnlock();
+		}
 
+		try
+		{
 			/* of course wrapping a string reader in a buffered
 			reader is dumb, but the FactorReader uses readLine() */
 			FactorScanner scanner = new RestartableFactorScanner(
@@ -119,12 +126,12 @@ public class FactorSideKickParser extends SideKickParser
 				errorSource);
 			FactorReader r = new FactorReader(scanner,
 				false,FactorPlugin.getExternalInstance());
-
+	
 			Cons parsed = r.parse();
-
+	
 			d.in = r.getIn();
 			d.use = r.getUse();
-
+	
 			addWordDefNodes(d,parsed,buffer);
 		}
 		catch(FactorParseException pe)
@@ -139,10 +146,6 @@ public class FactorSideKickParser extends SideKickParser
 				buffer.getPath(),
 				0,0,0,e.toString());
 			Log.log(Log.DEBUG,this,e);
-		}
-		finally
-		{
-			buffer.readUnlock();
 		}
 
 		return d;

@@ -109,9 +109,3 @@ IN: kernel
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
-
-: java? f ;
-: native? t ;
-
-! No compiler...
-: inline ;

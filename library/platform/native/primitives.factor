@@ -194,7 +194,7 @@ USE: words
     [ add-copy-io-task       " from to callback -- "              [ 3 | 1 ] ]
     [ pending-io-error       " -- "                               [ 0 | 0 ] ]
     [ next-io-task           " -- callback "                      [ 0 | 1 ] ]
-    [ room                   " -- free total "                    [ 0 | 2 ] ]
+    [ room                   " -- free total free total "         [ 0 | 4 ] ]
     [ os-env                 " str -- str "                       [ 1 | 1 ] ]
     [ millis                 " -- n "                             [ 0 | 1 ] ]
     [ init-random            " -- "                               [ 0 | 0 ] ]

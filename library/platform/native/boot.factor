@@ -35,7 +35,6 @@ primitives,
     "/library/platform/native/stack.factor"
     "/library/platform/native/types.factor"
     "/library/math/math.factor"
-    "/library/platform/native/math.factor"
     "/library/cons.factor"
     "/library/combinators.factor"
     "/library/logic.factor"
@@ -70,6 +69,7 @@ primitives,
     "/library/platform/native/parser.factor"
     "/library/platform/native/parse-syntax.factor"
     "/library/platform/native/parse-stream.factor"
+    "/library/platform/native/math.factor"
     "/library/platform/native/init.factor"
 ] [
     cross-compile-resource

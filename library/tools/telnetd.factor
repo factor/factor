@@ -46,12 +46,7 @@ USE: threads
     ] with-stream ;
 
 : telnet-connection ( socket -- )
-    #! We don't do multitasking in JFactor.
-    java? [
-        telnet-client
-    ] [
-        [ telnet-client ] in-thread drop
-    ] ifte ;
+    [ telnet-client ] in-thread drop ;
 
 : quit-flag ( -- ? )
     global [ "telnetd-quit-flag" get ] bind ;

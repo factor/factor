@@ -225,9 +225,9 @@ DEFER: prettyprint*
 
 : {.} ( vector -- )
     #! Unparse each element on its own line.
-    [ . ] vector-each ;
+    stack>list [ . ] each ;
 
-: .n namestack  {.} ;
+: .n namestack  [.] ;
 : .s datastack  {.} ;
 : .r callstack  {.} ;
 : .c catchstack {.} ;

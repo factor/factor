@@ -27,6 +27,7 @@
 
 IN: namespaces
 USE: combinators
+USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
@@ -55,7 +56,7 @@ USE: vectors
 
 : namespace ( -- namespace )
     #! Push the current namespace.
-    namestack* vector-peek ; inline
+    namestack car ; inline
 
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
@@ -76,7 +77,7 @@ USE: vectors
     over get [ drop get ] [ swap >r call dup r> set ] ifte ;
 
 : traverse-path ( name object -- object )
-    dup has-namespace? [ get* ] [ 2drop f ] ifte ;
+    dup hashtable? [ hash ] [ 2drop f ] ifte ;
 
 : (object-path) ( object list -- object )
     [ uncons >r swap traverse-path r> (object-path) ] when* ;
@@ -88,7 +89,7 @@ USE: vectors
     namespace swap (object-path) ;
 
 : (set-object-path) ( name -- namespace )
-    dup namespace get* dup [
+    dup namespace hash dup [
         nip
     ] [
         drop <namespace> tuck put

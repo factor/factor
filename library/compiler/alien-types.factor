@@ -101,7 +101,7 @@ USE: words
     #! Define inline and pointer type for the struct. Pointer
     #! type is exactly like void*.
     [ "width" set ] "struct-name" get define-c-type
-    "void*" c-type "struct-name" get "*" cat2 c-types set* ;
+    "void*" c-type "struct-name" get "*" cat2 c-types set-hash ;
 
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing

@@ -7,7 +7,24 @@ USE: combinators
 USE: vectors
 USE: kernel
 USE: lists
+USE: namespaces
 
+[
+    [ 1 | 2 ]
+    [ 2 | 1 ]
+    [ 0 | 3 ]
+    [ 4 | 2 ]
+    [ 3 | 3 ]
+    [ 0 | 0 ]
+    [ 1 | 5 ]
+    [ 3 | 4 ]
+] "effects" set
+
+[ t ] [
+    "effects" get [
+        dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
+    ] all?
+] unit-test
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
 
 [ 3 ] [ [ { 1 2 } { 1 2 3 } ] max-vector-length ] unit-test
@@ -122,5 +139,12 @@ DEFER: foe
 ! [ [ 1 | 1 ] ] [ [ last ] infer ] unit-test
 ! [ [ 1 | 1 ] ] [ [ list? ] infer ] unit-test
 
+[ [ 2 | 1 ] ] [ [ bitor ] infer ] unit-test
 [ [ 2 | 1 ] ] [ [ bitand ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ bitxor ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ mod ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ /i ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ /f ] infer ] unit-test
+[ [ 2 | 2 ] ] [ [ /mod ] infer ] unit-test
+
 [ [ 2 | 1 ] ] [ [ number= ] infer ] unit-test

@@ -57,7 +57,7 @@ USE: stack
     #! by swapping them.
     2dup > [ swap ] when  >r dupd max r> min = ;
 
-: sq dup * ; inline
+: sq dup * ; inline recursive-infer
 
 : pred 1 - ; inline
 : succ 1 + ; inline

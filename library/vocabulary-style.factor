@@ -27,6 +27,7 @@
 
 IN: presentation
 USE: combinators
+USE: hashtables
 USE: lists
 USE: kernel
 USE: namespaces
@@ -36,10 +37,10 @@ USE: words
 : vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are
     #! to be printed.
-    "vocabularies" style get* ;
+    "vocabularies" style hash ;
 
 : set-vocab-style ( style vocab -- )
-    >r default-style append r> "vocabularies" style set* ;
+    >r default-style append r> "vocabularies" style set-hash ;
 
 : word-style ( word -- style )
     word-vocabulary [ vocab-style ] [ default-style ] ifte* ;
