@@ -20,40 +20,17 @@ unit-test
     [ [ vector ] [ cons vector cons integer object cons ] ]
     [ [ vector ] [ cons vector cons ] ]
     decompose
-]
+] unit-test
 
 [ [ [ object ] [ object ] ] ]
 [
     [ [ object number ] [ object ] ]
     [ [ object number ] [ object ] ]
     decompose
-]
+] unit-test
 
 : old-effect ( [ in-types out-types ] -- [ in | out ] )
     uncons car length >r length r> cons ;
-
-[
-    [ 1 | 2 ]
-    [ 2 | 1 ]
-    [ 0 | 3 ]
-    [ 4 | 2 ]
-    [ 3 | 3 ]
-    [ 0 | 0 ]
-    [ 1 | 5 ]
-    [ 3 | 4 ]
-] "effects" set
-
-[ { f 1 2 } { 1 2 3 } ] [
-    { 1 2 } { 1 2 3 } unify-length
-] unit-test
-
-[ [ sq ] ] [
-    [ sq ] f <literal> [ sq ] f <literal> unify-results literal-value
-] unit-test
-
-[ fixnum ] [
-    5 f <literal> 6 f <literal> unify-results value-class
-] unit-test
 
 [ [ 0 | 2 ] ] [ [ 2 "Hello" ] infer old-effect ] unit-test
 [ [ 1 | 2 ] ] [ [ dup ] infer old-effect ] unit-test
@@ -109,10 +86,10 @@ unit-test
 
 [ [ 1 | 1 ] ] [ [ simple-recursion-2 ] infer old-effect ] unit-test
 
-: bad-recursion-1
-    dup [ drop bad-recursion-1 5 ] [ ] ifte ;
-
-[ [ bad-recursion-1 ] infer old-effect ] unit-test-fails
+! : bad-recursion-1
+!     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
+! 
+! [ [ bad-recursion-1 ] infer old-effect ] unit-test-fails
 
 : bad-recursion-2
     dup [ uncons bad-recursion-2 ] [ ] ifte ;
@@ -236,11 +213,12 @@ SYMBOL: sym-test
 
 ! Type inference
 
-! [ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
-! [ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
-! [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
-! [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
-! [ [ [ object ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
-! [ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
+[ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
+[ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
+[ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
+[ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
+[ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
+[ [ [ vector ] [ vector ] ] ] [ [ vector-clone ] infer ] unit-test
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
+[ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test

@@ -72,7 +72,7 @@ USE: words
     [ sbuf-reverse           " sbuf -- "                          [ [ sbuf ] [ ] ] ]
     [ sbuf-clone             " sbuf -- sbuf "                     [ [ sbuf ] [ sbuf ] ] ]
     [ sbuf=                  " sbuf sbuf -- ? "                   [ [ sbuf sbuf ] [ boolean ] ] ]
-    [ sbuf-hashcode          " sbuf -- n "                        [ [ sbuf ] [ integer ] ] ]
+    [ sbuf-hashcode          " sbuf -- n "                        [ [ sbuf ] [ fixnum ] ] ]
     [ arithmetic-type        " n n -- type "                      [ [ number number ] [ number number fixnum ] ] ]
     [ >fixnum                " n -- fixnum "                      [ [ number ] [ fixnum ] ] ]
     [ >bignum                " n -- bignum "                      [ [ number ] [ bignum ] ] ]

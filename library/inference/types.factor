@@ -38,15 +38,14 @@ USE: strings
 USE: vectors
 USE: words
 USE: stdio
+USE: prettyprint
 
 ! Enhanced inference of primitives relating to data types.
 ! Optimizes type checks and slot access.
 
 : infer-check ( assert class -- )
     peek-d dup value-class pick = [
-        [
-            "Optimized out " , rot word-name , " check." ,
-        ] make-string print 2drop
+        3drop
     ] [
         value-class-and
         dup "infer-effect" word-property consume/produce
@@ -65,6 +64,7 @@ USE: stdio
 ] "infer" set-word-property
 
 \ slot [
+    [ object fixnum ] ensure-d
     dataflow-drop, pop-d literal-value
     peek-d value-class builtin-supertypes dup length 1 = [
         cons #slot dataflow, [
@@ -76,4 +76,27 @@ USE: stdio
     ] [
         "slot called without static type knowledge" throw
     ] ifte
+] "infer" set-word-property
+
+: type-value-map ( value -- )
+    [
+        num-types [
+            dup builtin-type dup [
+                pick swons cons ,
+            ] [
+                2drop
+            ] ifte
+        ] times*
+    ] make-list nip ;
+
+\ type [
+    [ object ] ensure-d
+    \ type #call dataflow, [
+        peek-d type-value-map >r
+        1 0 node-inputs
+        [ object ] consume-d
+        [ fixnum ] produce-d
+        r> peek-d [ type-propagations set ] bind
+        1 0 node-outputs
+    ] bind
 ] "infer" set-word-property

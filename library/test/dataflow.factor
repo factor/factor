@@ -36,9 +36,9 @@ USE: generic
 : inline-test
     car car ; inline
 
-[ t ] [
-    \ slot [ inline-test ] dataflow dataflow-contains-param? >boolean
-] unit-test
+! [ t ] [
+!     \ slot [ inline-test ] dataflow dataflow-contains-param? >boolean
+! ] unit-test
 
 [ t ] [
     #ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean

@@ -34,11 +34,11 @@ USE: math-internals
 
 GENERIC: numerator ( a/b -- a )
 M: integer numerator ;
-M: ratio numerator 0 slot ;
+M: ratio numerator 0 slot %integer ;
 
 GENERIC: denominator ( a/b -- b )
 M: integer denominator drop 1 ;
-M: ratio denominator 1 slot ;
+M: ratio denominator 1 slot %integer ;
 
 IN: math-internals
 

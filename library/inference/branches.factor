@@ -39,42 +39,41 @@ USE: words
 USE: hashtables
 USE: prettyprint
 
-: vector-length< ( vec1 vec2 -- ? )
-    swap vector-length swap vector-length < ;
+: longest-vector ( list -- length )
+    [ vector-length ] map [ > ] top ;
 
-: unify-length ( vec1 vec2 -- vec1 )
-    2dup vector-length< [ swap ] unless [
-        vector-length over vector-length -
-        empty-vector [ swap vector-append ] keep
-    ] keep ;
+: computed-value-vector ( n -- vector )
+    [ drop object <computed> ] vector-project ;
 
-: unify-classes ( value value -- class )
-    #! If one of the values is f, it was added as a result of
-    #! length unification so we just replace it with a computed
-    #! object value.
-    2dup and [
-        value-class swap value-class class-or
+: add-inputs ( count stack -- count stack )
+    #! Add this many inputs to the given stack.
+    [ vector-length - dup ] keep
+    >r computed-value-vector dup r> vector-append ;
+
+: unify-lengths ( list -- list )
+    #! Pad all vectors to the same length. If one vector is
+    #! shorter, pad it with unknown results at the bottom.
+    dup longest-vector swap [ dupd add-inputs nip ] map nip ;
+
+: unify-results ( list -- value )
+    #! If all values in list are equal, return the value.
+    #! Otherwise, unify types.
+    dup all=? [
+        car
     ] [
-        2drop object
+        [ value-class ] map class-or-list <computed>
     ] ifte ;
 
-: unify-results ( value value -- value )
-    #! Replace values with unknown result if they differ,
-    #! otherwise retain them.
-    2dup = [
-        drop
-    ] [
-        unify-classes <computed>
-    ] ifte ;
+: vector-transpose ( list -- vector )
+    #! Turn a list of same-length vectors into a vector of lists.
+    dup car vector-length [
+        over [ dupd vector-nth ] map nip
+    ] vector-project nip ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    uncons [
-        unify-length vector-zip [
-            uncons unify-results
-        ] vector-map
-    ] each ;
+    unify-lengths vector-transpose [ unify-results ] vector-map ;
 
 : balanced? ( list -- ? )
     #! Check if a list of [ instack | outstack ] pairs is
@@ -139,9 +138,16 @@ SYMBOL: cloned
         meta-d off meta-r off d-in off
     ] when ;
 
+: propagate-type ( [ value | class ] -- )
+    #! Type propagation is chained.
+    [
+        unswons 2dup set-value-class
+        [ type-propagations get ] bind assoc propagate-type
+    ] when* ;
+
 : infer-branch ( value -- namespace )
     <namespace> [
-        uncons [ unswons set-value-class ] when*
+        uncons propagate-type
         dup value-recursion recursive-state set
         copy-inference
         literal-value dup infer-quot
@@ -234,9 +240,8 @@ SYMBOL: cloned
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
-    [ f cons ] map
     >r 1 meta-d get vector-tail* #dispatch r>
-    pop-d drop ( n )
+    pop-d ( n ) num-types [ dupd cons ] project nip zip
     infer-branches ;
 
 USE: kernel-internals

@@ -168,13 +168,10 @@ SYMBOL: classes
 SYMBOL: object
 
 : type-union ( list list -- list )
-    append prune [ > ] sort ;
-
-: type-intersection ( list list -- list )
-    intersection [ > ] sort ;
+    append prune ;
 
 : lookup-union ( typelist -- class )
-    classes get hash [ object ] unless* ;
+    [ > ] sort classes get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -182,12 +179,19 @@ SYMBOL: object
     swap builtin-supertypes
     type-union lookup-union ;
 
+: class-or-list ( list -- class )
+    #! Return a class that every class in the list is a
+    #! subclass of.
+    [
+        [ builtin-supertypes [ unique, ] each ] each
+    ] make-list lookup-union ;
+
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or raise an
     #! error if this is impossible.
     over builtin-supertypes
     over builtin-supertypes
-    type-intersection dup [
+    intersection dup [
         nip nip lookup-union
     ] [
         drop [
@@ -196,8 +200,18 @@ SYMBOL: object
         ] make-string throw
     ] ifte ;
 
+: define-promise ( class -- )
+    #! A promise is a word that has no effect during
+    #! interpretation, but instructs the compiler that the value
+    #! at the top of the stack is statically-known to be of the
+    #! given type. Promises should only be used by kernel code.
+    dup word-name "%" swap cat2 "in" get create
+    dup [ ] define-compound
+    swap "promise" set-word-property ;
+
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-property
+    dup define-promise
     dup builtin-supertypes [ > ] sort
     classes get set-hash ;
 

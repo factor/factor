@@ -56,18 +56,24 @@ SYMBOL: d-in
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
 
-! A value has the following slots:
 GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class ( value -- class )
 GENERIC: value-class-and ( class value -- )
 GENERIC: set-value-class ( class value -- )
 
+! A value has the following slots in addition to those relating
+! to generics above:
+
+! An association list mapping values to [ value | class ] pairs
+SYMBOL: type-propagations
+
 TRAITS: computed
 C: computed ( class -- value )
     [
         \ value-class set
         gensym \ literal-value set
+        type-propagations off
     ] extend ;
 M: computed literal-value ( value -- obj )
     "Cannot use a computed value literally." throw ;
@@ -82,7 +88,11 @@ M: computed set-value-class ( class value -- )
 
 TRAITS: literal
 C: literal ( obj rstate -- value )
-    [ recursive-state set \ literal-value set ] extend ;
+    [
+        recursive-state set
+        \ literal-value set
+        type-propagations off
+    ] extend ;
 M: literal literal-value ( value -- obj )
     [ \ literal-value get ] bind ;
 M: literal value= ( literal value -- ? )

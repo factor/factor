@@ -37,11 +37,11 @@ USE: math-internals
 
 GENERIC: real ( #{ re im } -- re )
 M: real real ;
-M: complex real 0 slot ;
+M: complex real 0 slot %real ;
 
 GENERIC: imaginary ( #{ re im } -- im )
 M: real imaginary drop 0 ;
-M: complex imaginary 1 slot ;
+M: complex imaginary 1 slot %real ;
 
 : rect> ( xr xi -- x )
     over real? over real? and [

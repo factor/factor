@@ -112,6 +112,9 @@ M: compound (apply-word) ( word -- )
         infer-compound
     ] ifte ;
 
+M: promise (apply-word) ( word -- )
+    "promise" word-property unit ensure-d ;
+
 M: symbol (apply-word) ( word -- )
     apply-literal ;
 
@@ -125,7 +128,7 @@ M: symbol (apply-word) ( word -- )
     #! diverging recursion. Note that this check is not done for
     #! mutually-recursive words. Generally they should be
     #! avoided.
-    recursive-state get car = [
+    current-word = [
         d-in get vector-length
         meta-d get vector-length > [
             current-word word-name " diverges." cat2 throw
@@ -182,6 +185,8 @@ M: symbol (apply-word) ( word -- )
     ] with-block ;
 
 \ call [ infer-call ] "infer" set-word-property
+
+\ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
 \ not-a-number t "terminator" set-word-property

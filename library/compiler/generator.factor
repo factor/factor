@@ -105,3 +105,7 @@ SYMBOL: previous-offset
     ] catch ;
 
 #label [ save-xt ] "generator" set-word-property
+
+: type-tag ( type -- tag )
+    #! Given a type number, return the tag number.
+    dup 6 > [ drop 3 ] when ;

@@ -54,7 +54,7 @@ BUILTIN: dll   15
 BUILTIN: alien 16
 
 M: alien hashcode ( obj -- n )
-    alien-address ;
+    alien-address >fixnum ;
 
 M: alien = ( obj obj -- ? )
     over alien? [

@@ -37,7 +37,7 @@ USE: strings
 
 BUILTIN: word 1
 
-M: word hashcode 1 slot ;
+M: word hashcode 1 slot %fixnum ;
 
 : word-xt     ( w -- xt ) >word 2 integer-slot ; inline
 : set-word-xt ( xt w -- ) >word 2 set-integer-slot ; inline
@@ -84,7 +84,11 @@ PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 : intern-symbol ( word -- )
     dup undefined? [ define-symbol ] [ drop ] ifte ;
 
-: word-name       ( word -- str ) "name" word-property ;
+#! The type declaration is for the benefit of stack effect
+#! inference.
+: word-name ( word -- str )
+    "name" word-property >string ;
+
 : word-vocabulary ( word -- str ) "vocabulary" word-property ;
 : stack-effect    ( word -- str ) "stack-effect" word-property ;
 : documentation   ( word -- str ) "documentation" word-property ;

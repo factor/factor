@@ -90,3 +90,6 @@ predicate [
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-property ;
+
+PREDICATE: compound promise ( obj -- ? )
+    "promise" word-property ;

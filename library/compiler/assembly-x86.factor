@@ -121,6 +121,10 @@ USE: math
     #! MOV INDIRECT <reg> TO <reg>.
     HEX: 8b compile-byte  0 MOD-R/M ;
 
+: D[R]>R ( disp reg reg -- )
+    #! MOV INDIRECT DISPLACED <reg> TO <reg>.
+    HEX: 8b compile-byte  1 MOD-R/M  compile-byte ;
+
 : R>[R] ( reg reg -- )
     #! MOV <reg> TO INDIRECT <reg>.
     HEX: 89 compile-byte  swap 0 MOD-R/M ;

@@ -34,7 +34,7 @@ USE: math
 
 ! Define methods bound to primitives
 BUILTIN: string 12
-M: string hashcode 2 slot ;
+M: string hashcode 2 slot %fixnum ;
 M: string = str= ;
 
 : str-length ( str -- len ) >string 1 integer-slot ; inline

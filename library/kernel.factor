@@ -31,6 +31,8 @@ USE: kernel
 USE: vectors
 
 : dispatch ( n vtable -- )
+    #! This word is unsafe in compiled code since n is not
+    #! bounds-checked. Do not call it directly.
     vector-nth call ;
 
 IN: kernel

@@ -82,7 +82,9 @@ USE: math
 
 #slot [
     PEEK-DS
-    
+    2unlist type-tag >r cell * r> - EAX EAX D[R]>R
+    DS ECX [I]>R  absolute-ds
+    EAX ECX R>[R]
 ] "generator" set-word-property
 
 #call [
