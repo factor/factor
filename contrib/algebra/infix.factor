@@ -1,5 +1,6 @@
 IN: algebra
-USING: kernel lists math namespaces test stdio words parser generic errors prettyprint vectors ;
+USING: kernel lists math namespaces test stdio words parser
+    generic errors prettyprint vectors kernel-internals ;
 
 SYMBOL: variable?
     #! For word props: will this be a var in an infix expression?
@@ -56,8 +57,6 @@ SYMBOL: arith-1
     #! Word prop for unary mathematical function
 SYMBOL: arith-2
     #! Word prop for binary mathematical function
-SYMBOL: nsmanip?
-    #! Does this manipulate the namestack (Should vars be allowed?)
 
 PREDICATE: cons list2
     #! List of 2 elements
@@ -65,9 +64,6 @@ PREDICATE: cons list2
 PREDICATE: cons list3
     #! List of 3 elements
     length 3 = ;
-PREDICATE: list2 namestack-manip
-    #! List of 2 elements that manipulates the namestack
-    car nsmanip? word-property ;
 
 
 GENERIC: (eval-infix) ( varstuff infix -- quote )
@@ -84,7 +80,7 @@ M: num/con (eval-infix)
 : find ( list item -- index )
     0 -rot swap (find) ;
 M: var (eval-infix)
-    find [ swap vector-nth ] cons ;
+    find [ swap array-nth ] cons ;
 
 : swap-in-infix ( var fix1 fix2 -- [ fix1solved swap fix2solved ] )
     >r dupd (eval-infix) swap r> (eval-infix) \ swap swons append ;
@@ -95,17 +91,19 @@ M: list3 (eval-infix)
 M: list2 (eval-infix)
     2unlist swapd (eval-infix) swap arith-1 word-property unit append ;
 
-M: namestack-manip (eval-infix)
-    nip 2unlist swap 2list \ drop swons ;
+: build-prefix ( num-of-vars -- quote )
+    #! What needs to be placed in front of the eval-infix quote
+    [ dup , \ <array> , dup [
+        2dup - 1 - [ swap set-array-nth ] cons , \ keep , 
+    ] repeat drop ] make-list ;
 
-: eval-infix
+: eval-infix ( vars infix -- quote )
     #! Given a list of variables and an infix expression in s-expression
     #! form, build a quotation which takes as many arguments from the
     #! datastack as there are elements in the varnames list, builds
     #! it into a vector, and calculates the values of the expression with
     #! the values filled in.
-    over length [ f , [ \ cons , ] times ] make-list
-    [ list>vector ] append -rot (eval-infix) append ;
+    over length build-prefix -rot (eval-infix) append ;
 
 DEFER: fold-consts
 : (| f ; parsing
@@ -142,18 +140,17 @@ DEFER: fold-consts
 
 ! Install arithmetic operators into words
 [ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
-  bitxor dot ] [
-    dup arith-2 set-word-property rem
+  bitxor dot rem ] [
+    dup arith-2 set-word-property
 ] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [
     uncons arith-2 set-word-property
 ] each
-[ sqrt abs fac get sq asin denominator rational? rad>deg exp recip sgn >rect acoth arg fixnum
+[ sqrt abs fac sq asin denominator rational? rad>deg exp recip sgn >rect acoth arg fixnum
   bitnot sinh acosec acosh acosech complex? ratio? number? >polar number= cis deg>rad >fixnum
   cot cos sec cosec tan imaginary coth asech atanh absq >float numerator acot acos atan asec
   cosh log bignum? conjugate asinh sin float? real? >bignum tanh sech ] [
     dup arith-1 set-word-property
 ] each
 [ [[ - neg ]] ] [ uncons arith-1 set-word-property ] each
-\ get t nsmanip? set-word-property
 [ pi i e -i inf -inf pi/2 ] [ t constant? set-word-property ] each
