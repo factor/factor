@@ -3,6 +3,7 @@
 ! $Id$
 !
 ! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Chris Double.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -67,8 +68,15 @@ USE: url-encoding
 : content-length ( alist -- length )
     "Content-Length" swap assoc dec> ;
 
+: post-request>alist ( post-request -- alist )
+    #! Return an alist containing name/value pairs from the
+    #! post data.
+    "&" split [ "=" split1 ] inject [
+        uncons >r url-decode r> url-decode cons
+    ] inject ;
+
 : read-post-request ( header -- string )
-    content-length dup [ read# url-decode ] when ;
+    content-length dup [ read# post-request>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
