@@ -31,9 +31,9 @@ package factor.parser;
 
 import factor.*;
 
-public class Def extends FactorParsingDefinition
+public class BeginPredicate extends FactorParsingDefinition
 {
-	public Def(FactorWord word)
+	public BeginPredicate(FactorWord word)
 	{
 		super(word);
 	}
@@ -41,12 +41,18 @@ public class Def extends FactorParsingDefinition
 	public void eval(FactorReader reader)
 		throws Exception
 	{
-		FactorWord newWord = reader.nextWord(true);
+		FactorWord supertype = reader.nextWord(false);
+		if(supertype == null)
+			return;
 
-		if(newWord != null)
-		{
-			newWord.setDefiner(word);
-			reader.pushExclusiveState(word,newWord);
-		}
+		FactorWord type = reader.nextWord(true);
+		if(type == null)
+			return;
+
+		type.setDefiner(word);
+
+		reader.intern(type + "?",true);
+
+		reader.pushExclusiveState(word,type);
 	}
 }

@@ -92,7 +92,7 @@ M: number = ( n n -- ? ) number= ;
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ;
+    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ; inline
 
 : sgn ( n -- -1/0/1 )
     #! Push the sign of a real number.

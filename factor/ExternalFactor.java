@@ -104,7 +104,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			byte[] discard = new byte[2048];
 			int len = in.read(discard,0,discard.length);
 			discardStr = new String(discard,0,len);
-			Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
+			// Log.log(Log.DEBUG,this,"Waiting for ACK: " + discardStr);
 		}
 	} //}}}
 	
@@ -123,7 +123,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized String eval(String cmd) throws IOException
 	{
-		if(isClosed)
+		if(isClosed())
 			throw new IOException("ExternalFactor stream closed");
 
 		try

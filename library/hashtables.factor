@@ -48,7 +48,7 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
-    >r hashcode r> vector-length rem ;
+    >r hashcode r> vector-length rem ; inline
 
 : hash* ( key table -- [ key | value ] )
     #! Look up a value in the hashtable. First the bucket is

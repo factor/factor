@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2003, 2004 Slava Pestov.
+ * Copyright (C) 2003, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,7 +30,7 @@
 package factor;
 
 /**
- * Used to build up linked lists.
+ * Used to build up linked lists in Factor style.
  */
 public class Cons implements FactorExternalizable
 {
@@ -51,38 +51,39 @@ public class Cons implements FactorExternalizable
 	} //}}}
 
 	//{{{ contains() method
-	public boolean contains(Object obj)
+	public static boolean contains(Cons list, Object obj)
 	{
-		Cons iter = this;
-		while(iter != null)
+		while(list != null)
 		{
-			if(FactorLib.objectsEqual(obj,iter.car))
+			if(FactorLib.objectsEqual(obj,list.car))
 				return true;
-			iter = iter.next();
+			list = list.next();
 		}
 		return false;
 	} //}}}
 
-	//{{{ contains() method
-	public static boolean contains(Cons list, Object obj)
-	{
-		if(list == null)
-			return false;
-		else
-			return list.contains(obj);
-	} //}}}
-
 	//{{{ length() method
-	public int length()
+	public static int length(Cons list)
 	{
 		int size = 0;
-		Cons iter = this;
-		while(iter != null)
+		while(list != null)
 		{
-			iter = (Cons)iter.cdr;
 			size++;
+			list = list.next();
 		}
 		return size;
+	} //}}}
+
+	//{{{ reverse() method
+	public static Cons reverse(Cons list)
+	{
+		Cons reversed = null;
+		while(list != null)
+		{
+			reversed = new Cons(list.car,reversed);
+			list = list.next();
+		}
+		return reversed;
 	} //}}}
 
 	//{{{ elementsToString() method

@@ -33,12 +33,9 @@ import factor.*;
 
 public class BeginConstructor extends FactorParsingDefinition
 {
-	private FactorWord colon;
-
-	public BeginConstructor(FactorWord word, FactorWord colon)
+	public BeginConstructor(FactorWord word)
 	{
 		super(word);
-		this.colon = colon;
 	}
 
 	public void eval(FactorReader reader)
@@ -48,6 +45,8 @@ public class BeginConstructor extends FactorParsingDefinition
 		if(type == null)
 			return;
 
-		reader.pushExclusiveState(colon,type);
+		reader.intern("<" + type + ">",true);
+
+		reader.pushExclusiveState(word,type);
 	}
 }

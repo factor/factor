@@ -89,7 +89,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		def.parsing = new Def(def);
 		def.docComment = true;
 		FactorWord ine = define("syntax",";");
-		ine.parsing = new Ine(def,ine);
+		ine.parsing = new Ine(ine);
 		FactorWord symbol = define("syntax","SYMBOL:");
 		symbol.parsing = new Definer(symbol);
 
@@ -120,9 +120,13 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord traits = define("generic","TRAITS:");
 		traits.parsing = new Definer(traits);
 		FactorWord beginMethod = define("generic","M:");
-		beginMethod.parsing = new BeginMethod(beginMethod,def);
+		beginMethod.parsing = new BeginMethod(beginMethod);
 		FactorWord beginConstructor = define("generic","C:");
-		beginConstructor.parsing = new BeginConstructor(beginConstructor,def);
+		beginConstructor.parsing = new BeginConstructor(beginConstructor);
+		FactorWord beginPredicate = define("generic","PREDICATE:");
+		beginPredicate.parsing = new BeginPredicate(beginPredicate);
+		FactorWord beginUnion = define("generic","UNION:");
+		beginUnion.parsing = new BeginUnion(beginUnion);
 	} //}}}
 
 	//{{{ getVocabulary() method

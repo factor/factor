@@ -33,22 +33,16 @@ import factor.*;
 
 public class Ine extends FactorParsingDefinition
 {
-	public FactorWord start;
-
-	public Ine(FactorWord start, FactorWord end)
+	public Ine(FactorWord end)
 	{
 		super(end);
-		this.start = start;
 	}
 
 	public void eval(FactorReader reader)
 		throws Exception
 	{
-		FactorReader.ParseState state = reader.popState(start,word);
-		FactorWord w = state.defining;
-		/* Only ever null with restartable scanner;
-		error already logged, so give up */
-		if(w != null)
-			w.setDefiner(start);
+		FactorReader.ParseState state = reader.popState(null,word);
+		if(state.defining == null)
+			reader.getScanner().error(word + " does not close " + state.start);
 	}
 }

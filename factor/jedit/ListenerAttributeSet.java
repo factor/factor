@@ -87,10 +87,7 @@ public class ListenerAttributeSet extends SimpleAttributeSet
 	//{{{ createActionsMenu() method
 	private Action[] createActionsMenu(Cons alist)
 	{
-		if(alist == null)
-			return null;
-
-		int length = alist.length();
+		int length = Cons.length(alist);
 		int i = 0;
 		Action[] actions = new Action[length];
 		while(alist != null)

@@ -258,7 +258,7 @@ public class FactorReader
 	//{{{ getDefinedWords() method
 	public Cons getDefinedWords()
 	{
-		return definedWords;
+		return Cons.reverse(definedWords);
 	} //}}}
 	
 	//{{{ nextWord() method
@@ -381,12 +381,14 @@ public class FactorReader
 	/**
 	 * Pop a parser state, throw exception if it doesn't match the
 	 * parameter.
+	 * @param start The start parameter that must match. If this is null,
+	 * any start is acceptable.
 	 */
 	public ParseState popState(FactorWord start, FactorWord end)
 		throws FactorParseException
 	{
 		ParseState state = getCurrentState();
-		if(state.start != start)
+		if(start != null && state.start != start)
 			scanner.error(end + " does not close " + state.start);
 		if(states.next() != null)
 			states = states.next();

@@ -1,9 +1,11 @@
 + compiler:
 
 - type inference fails with some assembler words
+- more accurate type inference in some cases
 - optimize away dispatch
+- goal: to compile hash* optimally
+- type check/not-check entry points for compiled words
 - getenv/setenv: if literal arg, compile as a load/store
-- update compiler for new assembler
 
 + oop:
 
