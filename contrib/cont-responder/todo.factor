@@ -34,6 +34,10 @@ USE: lists
 USE: arithmetic
 USE: stdio
 USE: kernel
+USE: prettyprint
+USE: unparser
+USE: url-encoding
+
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
@@ -59,36 +63,53 @@ USE: kernel
 
 : namespace>alist ( namespace -- alist )
   #! Convert a namespace to an alist
-  [ vars-values ] bind ;
-
+  [ vars-values ] bind ;  
+  
 : print-quoted ( str -- )
   #! Print the string with quotes around it
   "\"" write write "\"" print ;
+
+: write-item ( <todo-item> -- )
+  #! write the item in a manner that can be later re-read
+  [
+    "complete?" get [ "yes" url-encode print ] [ "no" url-encode print ] ifte
+    "priority" get url-encode print
+    "description" get url-encode print
+  ] bind ;
+
+: write-items ( list -- )
+  #! write the todo list items
+  dup length unparse print
+  [ write-item ] each ;
 
 : write-todo ( <todo> -- )
   #! Write the todo list to the current output stream
   #! in a format that if loaded by the parser will result
   #! in a <todo> again.
   [ 
-    "USE: namespaces" print
-    "USE: lists" print
-    "<namespace> [" print
-    "password" get print-quoted
-    "password" print-quoted "set" print
-    "user" get print-quoted
-    "user" print-quoted "set" print    
-    "items" get [ namespace>alist ] map "items" swons print
-    "cdr [ alist>namespace ] map" print 
-    "items" print-quoted "set" print
-    "] extend" print
+    "user" get url-encode print
+    "password" get url-encode print
+    "items" get write-items
   ] bind ;
 
 : store-todo ( <todo> filename -- )
   #! store the todo list in the given file.
   <filebw> [ write-todo ] with-stream ;
 
+: read-todo ( -- <todo> )
+  #! Read a todo list from the current input stream.
+  read url-decode read url-decode <todo> 
+  read str>number [
+    dup
+    <namespace> [
+      read url-decode "yes" = "complete?" set
+      read url-decode "priority" set
+      read url-decode "description" set
+    ] extend add-todo-item
+  ] times ;
+
 : load-todo ( filename -- <todo> )
-  run-file ;  
+  <filebr> [ read-todo ] with-stream ;  
 
 : password-matches? ( password <todo> -- <todo> )
   #! Returns the <todo> if the password matches otherwise
@@ -132,7 +153,7 @@ USE: kernel
   #! Return true if item1 is a higher priority than item2
   >r item-priority r> item-priority str-lexi> ;
   
-: todo-items ( <todo> -- )
+: todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.
   [ "items" get ] bind [ priority-comparator ] sort ;
 

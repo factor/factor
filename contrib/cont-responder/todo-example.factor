@@ -45,6 +45,8 @@ USE: todo
 USE: arithmetic
 USE: logic
 USE: kernel
+USE: lazy
+USE: parser-combinators
  
 : todo-stylesheet ( -- string )
   #! Return the stylesheet for the todo list
@@ -189,15 +191,23 @@ USE: kernel
     "Register" login-form
   ] simple-page ;
 
-: re-matches ( a b -- b )
-  drop drop t ;
+: username-parser ( -- parser )
+  #! Return a parser which parses a valid todo username.
+  #! That is, it contains only lowercase, uppercase and digits.
+  [ letter? ] satisfy 
+  [ LETTER? ] satisfy <|> 
+  [ digit? ] satisfy <|> <!+> just ;
+
+: is-valid-username? ( password -- bool )
+  #! Return true if the username parses correctly
+  username-parser call ;
 
 : login-details-valid? ( name password -- )
   #! Ensure that a valid username and password were
   #! entered. In particular, ensure that only alphanumeric
   #! data was entered to prevent security problems by
   #! using .., etc in the name.
-  drop "[a-zA-Z0-9]*" re-matches ;
+  drop is-valid-username? ;
   
 : get-registration-details ( -- name password )
   #! Get the registration details from the user putting
@@ -309,9 +319,13 @@ USE: kernel
     ] form 
   ] bind ;
   
+: priority-parser ( -- parser )
+  #! Return a parser for parsing priorities
+  [ digit? ] satisfy just ;
+
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  str-length 0 > swap "[0-9]" re-matches and ;
+  str-length 0 > swap priority-parser call and ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
