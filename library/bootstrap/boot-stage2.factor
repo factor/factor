@@ -121,7 +121,6 @@ IN: alien : add-library 3drop ;
         "/library/sdl/sdl-keyboard.factor"
         "/library/sdl/sdl-ttf.factor"
         "/library/sdl/sdl-utils.factor"
-        "/library/sdl/hsv.factor"
     
         "/library/bootstrap/image.factor"
     
@@ -168,6 +167,7 @@ cpu "x86" = "mini" get not and [
         "/library/compiler/x86/fixnum.factor"
 
         "/library/ui/shapes.factor"
+        "/library/ui/text.factor"
         "/library/ui/gadgets.factor"
         "/library/ui/paint.factor"
         "/library/ui/gestures.factor"

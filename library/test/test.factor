@@ -90,7 +90,6 @@ prettyprint stdio strings words vectors unparser ;
         "inference"
         "dataflow"
         "interpreter"
-        "hsv"
         "alien"
         "line-editor"
         "gadgets"

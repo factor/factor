@@ -103,34 +103,6 @@ M: plain-ellipse draw-shape ( ellipse -- )
     >r surface get r> ellipse>screen bg rgb
     filledEllipseColor ;
 
-! Strings are shapes too. This is somewhat of a hack and strings
-! do not have x/y co-ordinates.
-M: string shape-x drop 0 ;
-M: string shape-y drop 0 ;
-M: string shape-w
-    font get swap size-string ( h -) drop ;
-
-M: string shape-h ( text -- h )
-    #! This is just the height of the current font.
-    drop font get lookup-font TTF_FontHeight ;
-
-: filter-nulls ( str -- str )
-    "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
-    ] when ;
-
-M: string draw-shape ( text -- )
-    dup string-length 0 = [
-        drop
-    ] [
-        filter-nulls font get lookup-font swap
-        fg 3unlist make-color
-        bg 3unlist make-color
-        TTF_RenderUNICODE_Shaded
-        [ >r x get y get r> draw-surface ] keep
-        SDL_FreeSurface
-    ] ifte ;
-
 ! Clipping
 
 SYMBOL: clip

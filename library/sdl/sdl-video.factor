@@ -1,7 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sdl-video
-USING: alien kernel math ;
+IN: sdl USING: alien kernel math ;
 
 ! These are the currently supported flags for the SDL_surface
 ! Available for SDL_CreateRGBSurface() or SDL_SetVideoMode()

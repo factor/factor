@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sdl-keyboard
-USING: alien lists sdl-keysym namespaces sdl-event kernel
-math hashtables ;
+IN: sdl
+USING: alien lists namespaces kernel math hashtables ;
 
 : SDL_EnableUNICODE ( enable -- )
     "int" "sdl" "SDL_EnableUNICODE" [ "int" ] alien-invoke ;
