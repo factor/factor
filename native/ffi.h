@@ -10,7 +10,7 @@ DLL* untag_dll(CELL tagged);
 
 typedef struct {
 	CELL header;
-	CELL ptr;
+	void* ptr;
 	/* local aliens are heap-allocated as strings and must be collected. */
 	bool local;
 } ALIEN;
@@ -30,8 +30,8 @@ void primitive_dlsym(void);
 void primitive_dlclose(void);
 void primitive_alien(void);
 void primitive_local_alien(void);
-DLLEXPORT CELL unbox_alien(void);
-DLLEXPORT void box_alien(CELL ptr);
+DLLEXPORT void* unbox_alien(void);
+DLLEXPORT void box_alien(void* ptr);
 void primitive_local_alienp(void);
 void primitive_alien_address(void);
 void primitive_alien_cell(void);

@@ -201,6 +201,7 @@ vocabularies get [
     [ "end-scan" "memory"                     [ [ ] [ ] ] ]
     [ "size" "memory"                         [ [ object ] [ fixnum ] ] ]
     [ "die" "kernel"                          [ [ ] [ ] ] ]
+    [ "flush-icache" "assembler"              f ]
 ] [
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [

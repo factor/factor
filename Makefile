@@ -22,7 +22,8 @@ OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/word.o native/compiler.o \
 	native/ffi.o native/boolean.o \
 	native/debug.o \
-	native/hashtable.o
+	native/hashtable.o \
+	native/icache.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -75,3 +76,5 @@ clean:
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
 
+.S.o:
+	$(CC) -c $(CFLAGS) -o $@ $<

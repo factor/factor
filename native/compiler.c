@@ -1,5 +1,11 @@
 #include "factor.h"
 
+void init_compiler(CELL size)
+{
+	init_zone(&compiling,size);
+	last_flush = compiling.base;
+}
+
 void primitive_compiled_offset(void)
 {
 	box_integer(compiling.here);
@@ -22,6 +28,12 @@ void primitive_set_literal_top(void)
 	if(offset >= literal_max)
 		critical_error("Too many compiled literals",offset);
 	literal_top = offset;
+}
+
+void primitive_flush_icache(void)
+{
+	flush_icache((void*)last_flush,compiling.here - last_flush);
+	last_flush = compiling.here;
 }
 
 void collect_literals(void)

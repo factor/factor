@@ -172,7 +172,8 @@ void* primitives[] = {
 	primitive_next_object,
 	primitive_end_scan,
 	primitive_size,
-	primitive_die
+	primitive_die,
+	primitive_flush_icache
 };
 
 CELL primitive_to_xt(CELL primitive)

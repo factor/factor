@@ -3,6 +3,7 @@
 void init_factor(char* image)
 {
 	init_arena(DEFAULT_ARENA);
+	init_compiler(DEFAULT_ARENA);
 	load_image(image);
 	init_stacks();
 	init_io();
