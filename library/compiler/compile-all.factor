@@ -115,5 +115,5 @@ SYMBOL: compilable-word-list
 : init-compiler ( -- )
     #! Compile all words.
     compilable-word-list get [
-        [ compile ] [ cannot-compile ] catch
+        [ compile ] [ [ cannot-compile ] when ] catch
     ] each ;
