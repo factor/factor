@@ -3,6 +3,8 @@ typedef void (*XT)(void);
 typedef struct {
 	/* TAGGED header */
 	CELL header;
+	/* untagged hashcode */
+	CELL hashcode;
 	/* untagged execution token: jump here to execute word */
 	CELL xt;
 	/* untagged on-disk primitive number */
@@ -15,7 +17,6 @@ typedef struct {
 	CELL call_count;
 	/* UNTAGGED amount of memory allocated in word */
 	CELL allot_count;
-	CELL padding;
 } WORD;
 
 INLINE WORD* untag_word(CELL tagged)
@@ -33,6 +34,7 @@ WORD* word(CELL primitive, CELL parameter, CELL plist);
 void update_xt(WORD* word);
 void primitive_wordp(void);
 void primitive_word(void);
+void primitive_word_hashcode(void);
 void primitive_word_primitive(void);
 void primitive_set_word_primitive(void);
 void primitive_word_parameter(void);

@@ -98,6 +98,7 @@ DEFER: (random-int)
 
 IN: words
 DEFER: <word>
+DEFER: word-hashcode
 DEFER: word-primitive
 DEFER: set-word-primitive
 DEFER: word-parameter
@@ -196,6 +197,7 @@ IN: cross-compiler
         fsqrt
         word?
         <word>
+        word-hashcode
         word-primitive
         set-word-primitive
         word-parameter

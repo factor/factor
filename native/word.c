@@ -3,11 +3,13 @@
 WORD* word(CELL primitive, CELL parameter, CELL plist)
 {
 	WORD* word = allot_object(WORD_TYPE,sizeof(WORD));
+	word->hashcode = (CELL)word; /* initial address */
 	word->xt = primitive_to_xt(primitive);
 	word->primitive = primitive;
 	word->parameter = parameter;
 	word->plist = plist;
 	word->call_count = 0;
+	word->allot_count = 0;
 
 	return word;
 }
@@ -33,6 +35,11 @@ void primitive_word(void)
 	CELL parameter = dpop();
 	primitive = to_fixnum(dpop());
 	dpush(tag_word(word(primitive,parameter,plist)));
+}
+
+void primitive_word_hashcode(void)
+{
+	drepl(tag_fixnum(untag_word(dpeek())->hashcode));
 }
 
 void primitive_word_primitive(void)

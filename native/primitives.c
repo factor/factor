@@ -87,6 +87,7 @@ XT primitives[] = {
         primitive_fsqrt,
 	primitive_wordp,
 	primitive_word,
+	primitive_word_hashcode,
 	primitive_word_primitive,
 	primitive_set_word_primitive,
 	primitive_word_parameter,

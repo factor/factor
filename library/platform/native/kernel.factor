@@ -47,6 +47,7 @@ USE: vectors
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
     [
+        [ word? ] [ word-hashcode ]
         [ cons? ] [ 4 cons-hashcode ]
         [ string? ] [ str-hashcode ]
         [ number? ] [ >fixnum ]

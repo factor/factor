@@ -36,6 +36,7 @@ USE: logic
 USE: math
 USE: namespaces
 USE: prettyprint
+USE: random
 USE: stack
 USE: stdio
 USE: streams
@@ -168,7 +169,9 @@ USE: words
 ( Words )
 
 : word, ( -- pointer )
-    word-tag here-as word-tag >header emit 0 emit ;
+    word-tag here-as word-tag >header emit
+    0 HEX: fffffff random-int emit ( hashcode )
+    0 emit ;
 
 ! This is to handle mutually recursive words
 ! It is a hack. A recursive word in the cdr of a
@@ -295,7 +298,6 @@ IN: cross-compiler
     r> ( parameter -- ) emit
     ( plist -- ) emit
     0 emit ( padding )
-    0 emit
     0 emit ;
 
 : primitive, ( word primitive -- ) f (worddef,) ;
