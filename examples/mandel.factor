@@ -72,7 +72,7 @@ SYMBOL: center
     height get 150000 zoom-fact get * / y-inc set
     nb-iter get max-color min <color-map> cols set ;
 
-: c ( #{ i j } -- c )
+: c ( #{ i j }# -- c )
     >rect >r
     x-inc get * center get real x-inc get width get 2 / * - + >float
     r>

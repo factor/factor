@@ -58,7 +58,7 @@ test-word
 
 [ 2 ] [ "[[ 1 2 ]]" parse car cdr ] unit-test
 [ "hello" ] [ "[[ 1 \"hello\" ]]" parse car cdr ] unit-test
-[ #{ 1 2 } ] [ "[[ 1 #{ 1 2 } ]]" parse car cdr ] unit-test
+[ #{ 1 2 }# ] [ "[[ 1 #{ 1 2 }# ]]" parse car cdr ] unit-test
 
 ! Test EOL comments in multiline strings.
 [ [ "Hello" ] ] [ "#! This calls until-eol.\n\"Hello\"" parse ] unit-test 

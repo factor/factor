@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2003, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -132,7 +132,7 @@ DEFER: tree-contains?
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
-    [ dupd = not ] subset nip ;
+    [ = not ] subset-with ;
 
 : length ( list -- length )
     0 swap [ drop 1 + ] each ;

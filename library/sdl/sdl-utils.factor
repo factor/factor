@@ -68,7 +68,7 @@ SYMBOL: surface
 : clear-surface ( color -- )
     >r surface get 0 0 width get height get r> boxColor ;
 
-: pixel-step ( quot #{ x y } -- )
+: pixel-step ( quot #{ x y }# -- )
     tuck >r call >r surface get r> r> >rect rot pixelColor ;
     inline
 

@@ -39,7 +39,7 @@ SYMBOL: d
 : white ( -- rgb )
     HEX: ffffffff ;
 
-: pixel ( #{ x y } color -- )
+: pixel ( #{ x y }# color -- )
     >r >r surface get r> >rect r> pixelColor ;
 
 : iterate-dejong ( x y -- x y )

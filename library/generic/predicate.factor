@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -74,22 +74,17 @@ predicate [
 ] "class<" set-word-property
 
 : define-predicate ( class predicate definition -- )
-    rot "superclass" word-property "predicate" word-property
+    pick "superclass" word-property "predicate" word-property
     [ \ dup , append, , [ drop f ] , \ ifte , ] make-list
-    define-compound ;
+    define-compound
+    predicate define-class ;
 
 : PREDICATE: ( -- class predicate definition )
     #! Followed by a superclass name, then a class name.
     scan-word
     CREATE dup intern-symbol
     dup rot "superclass" set-word-property
-    dup predicate "metaclass" set-word-property
     dup predicate-word
+!    2dup swap "predicate" set-word-property
     [ dupd unit "predicate" set-word-property ] keep
     [ define-predicate ] [ ] ; parsing
-
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-property ;
-
-PREDICATE: compound promise ( obj -- ? )
-    "promise" word-property ;

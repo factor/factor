@@ -1,9 +1,6 @@
 + compiler:
 
-- investigate why : foo t or ; doesn't partially evaluate
-- investigate why ' doesn't infer
 - recursive? and tree-contains? should handle vectors
-- type inference and recursion flaw
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
@@ -17,6 +14,7 @@
 
 - make see work with union, builtin, predicate
 - doc comments of generics
+- proper ordering for classes
 
 + ffi:
 

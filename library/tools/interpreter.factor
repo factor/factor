@@ -72,7 +72,7 @@ SYMBOL: meta-cf
     meta-cf get not ;
 
 : done? ( -- ? )
-    done-cf? meta-r get vector-empty? and ;
+    done-cf? meta-r get vector-length 0 = and ;
 
 ! Callframe.
 : up ( -- )

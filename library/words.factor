@@ -73,6 +73,15 @@ PREDICATE: word primitive ( obj -- ? ) word-primitive 2 > ;
 PREDICATE: word symbol    ( obj -- ? ) word-primitive 2 = ;
 PREDICATE: word undefined ( obj -- ? ) word-primitive 0 = ;
 
+! These should really be somewhere in library/generic/, but
+! during bootstrap, we cannot execute parsing words after they
+! are defined by code loaded into the target image.
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-property ;
+
+PREDICATE: compound promise ( obj -- ? )
+    "promise" word-property ;
+
 : define ( word primitive parameter -- )
     pick set-word-parameter
     over set-word-primitive

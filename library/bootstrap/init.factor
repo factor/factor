@@ -36,7 +36,6 @@ USE: words
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
     init-namespaces
-    init-threads
     init-stdio
     "HOME" os-env [ "." ] unless* "~" set
     init-search-path ;

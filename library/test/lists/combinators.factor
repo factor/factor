@@ -40,3 +40,5 @@ USE: strings
 [ f ] [ [ 1 2 3 ] [ 10 > ] some? ] unit-test
 
 [ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test
+
+[ [ 3 ] ] [ 2 [ 1 2 3 ] [ < ] subset-with ] unit-test

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -51,7 +51,7 @@ USE: kernel
 
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.
-    [ dupd car = not ] subset nip ;
+    [ car = not ] subset-with ;
 
 : acons ( value key alist -- alist )
     #! Adds the key/value pair to the alist. Existing pairs with
@@ -83,11 +83,7 @@ USE: kernel
 : zip ( list list -- list )
     #! Make a new list containing pairs of corresponding
     #! elements from the two given lists.
-    dup [
-        2uncons zip >r cons r> cons
-    ] [
-        2drop [ ]
-    ] ifte ;
+    dup [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
 
 : unzip ( assoc -- keys values )
     #! Split an association list into two lists of keys and

@@ -35,11 +35,11 @@ USE: kernel-internals
 USE: math
 USE: math-internals
 
-GENERIC: real ( #{ re im } -- re )
+GENERIC: real ( #{ re im }# -- re )
 M: real real ;
 M: complex real 0 slot %real ;
 
-GENERIC: imaginary ( #{ re im } -- im )
+GENERIC: imaginary ( #{ re im }# -- im )
 M: real imaginary drop 0 ;
 M: complex imaginary 1 slot %real ;
 

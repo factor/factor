@@ -37,12 +37,12 @@ USE: math-internals
 
 : dead-code-rec
     t [
-        #{ 3 2 }
+        #{ 3 2 }#
     ] [
         dead-code-rec
     ] ifte ; compiled
 
-[ #{ 3 2 } ] [ dead-code-rec ] unit-test
+[ #{ 3 2 }# ] [ dead-code-rec ] unit-test
 
 : one-rec [ f one-rec ] [ "hi" ] ifte ; compiled
 

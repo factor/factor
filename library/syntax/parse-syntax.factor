@@ -55,7 +55,7 @@ USE: unparser
 ! ( and #! then add "stack-effect" and "documentation"
 ! properties to the current word if it is set.
 
-! Constants
+! Booleans
 : t t swons ; parsing
 : f f swons ; parsing
 
@@ -74,6 +74,10 @@ USE: unparser
 ! Hashtables
 : {{ f ; parsing
 : }} alist>hash swons ; parsing
+
+! Complex numbers
+: #{ f ; parsing
+: }# 2unlist swap rect> swons ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
@@ -101,11 +105,13 @@ USE: unparser
     #! Create a word with no definition. Used for mutually
     #! recursive words.
     CREATE drop ; parsing
+
 : FORGET: scan-word forget ; parsing
 
 : USE:
     #! Add vocabulary to search path.
     scan "use" cons@ ; parsing
+
 : IN:
     #! Set vocabulary for new definitions.
     scan dup "use" cons@ "in" set ; parsing
@@ -126,14 +132,6 @@ USE: unparser
     #! the make-string scope up to the original scope.
     [ parse-string "col" get ] make-string
     swap "col" set swons ; parsing
-
-: expect ( word -- )
-    dup scan = [ drop ] [ "Expected " swap cat2 throw ] ifte ;
-
-: #{
-    #! Complex literal - #{ real imaginary #}
-    scan str>number scan str>number rect> "}" expect swons ;
-    parsing
 
 ! Comments
 : (

@@ -54,16 +54,16 @@ USE: kernel
 : fac ( n -- n! )
     1 swap [ 1 + * ] times* ;
 
-: 2times-succ ( #{ a b } #{ c d } -- z )
-    #! Lexicographically add #{ 0 1 } to a complex number.
-    #! If d + 1 == b, return #{ c+1 0 }. Otherwise, #{ c d+1 }.
+: 2times-succ ( #{ a b }# #{ c d }# -- z )
+    #! Lexicographically add #{ 0 1 }# to a complex number.
+    #! If d + 1 == b, return #{ c+1 0 }#. Otherwise, #{ c d+1 }#.
     2dup imaginary 1 + swap imaginary = [
         nip real 1 +
     ] [
         nip >rect 1 + rect>
     ] ifte ; inline
 
-: 2times<= ( #{ a b } #{ c d } -- ? )
+: 2times<= ( #{ a b }# #{ c d }# -- ? )
     swap real swap real <= ; inline
 
 : (2times) ( limit n quot -- )
@@ -73,9 +73,9 @@ USE: kernel
         rot pick dupd 2times-succ pick 3slip (2times)
     ] ifte ; inline
 
-: 2times* ( #{ w h } quot -- )
+: 2times* ( #{ w h }# quot -- )
     #! Apply a quotation to each pair of complex numbers
-    #! #{ a b } such that a < w, b < h.
+    #! #{ a b }# such that a < w, b < h.
     0 swap (2times) ; inline
 
 : (repeat) ( i n quot -- )

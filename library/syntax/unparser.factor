@@ -98,7 +98,7 @@ M: complex unparse ( num -- str )
         real unparse ,
         " " ,
         imaginary unparse ,
-        " }" ,
+        " }#" ,
     ] make-string ;
 
 : ch>ascii-escape ( ch -- esc )

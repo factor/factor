@@ -66,9 +66,6 @@ BUILTIN: vector 11
     #! capacity.
     dup <vector> dup >r set-vector-length r> ;
 
-: vector-empty? ( obj -- ? )
-    vector-length 0 = ;
-
 : vector-push ( obj vector -- )
     #! Push a value on the end of a vector.
     dup vector-length swap set-vector-nth ;
@@ -165,12 +162,9 @@ M: vector = ( obj vec -- ? )
         ] ifte
     ] ifte ;
 
-: ?vector-nth ( n vec -- obj/f )
-    2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
-
 M: vector hashcode ( vec -- n )
-    0 swap 4 [
-        over ?vector-nth hashcode rot bitxor swap
+    0 swap dup vector-length 4 min [
+        over vector-nth hashcode rot bitxor swap
     ] times* drop ;
 
 : vector-head ( n vector -- list )

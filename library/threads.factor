@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -35,14 +35,8 @@ USE: namespaces
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
 
-: run-queue ( -- queue )
-    9 getenv ;
-
-: set-run-queue ( queue -- )
-    9 setenv ;
-
-: init-threads ( -- )
-    f set-run-queue ;
+: run-queue ( -- queue ) 9 getenv ;
+: set-run-queue ( queue -- ) 9 setenv ;
 
 : next-thread ( -- quot )
     #! Get and remove the next quotation from the run queue.

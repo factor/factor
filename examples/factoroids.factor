@@ -163,11 +163,11 @@ C: plasma ( actor dy -- plasma )
 : player-fire ( -- )
     #! Do nothing if player is dead.
     player-actor [
-        #{ 0 -6 } <plasma> player-shots cons@
+        #{ 0 -6 }# <plasma> player-shots cons@
     ] when* ;
 
 : enemy-fire ( actor -- )
-    #{ 0 5 } <plasma> enemy-shots cons@ ;
+    #{ 0 5 }# <plasma> enemy-shots cons@ ;
 
 ! Background of stars
 TRAITS: particle

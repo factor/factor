@@ -11,7 +11,7 @@ USE: namespaces
 [ 3 ] [ { t f t } vector-length ] unit-test
 
 [ 3 { } vector-nth ] unit-test-fails
-[ 3 #{ 1 2 } vector-nth ] unit-test-fails
+[ 3 #{ 1 2 }# vector-nth ] unit-test-fails
 
 [ "hey" [ 1 2 ] set-vector-length ] unit-test-fails
 [ "hey" { 1 2 } set-vector-length ] unit-test-fails

@@ -103,7 +103,7 @@ PREDICATE: general-list list ( list -- ? )
 
 : with ( obj quot elt -- obj quot )
     #! Utility word for each-with, map-with.
-    pick pick >r >r swap call r> r> ;
+    pick pick >r >r swap call r> r> ; inline
 
 : each-with ( obj list quot -- )
     #! Push each element of a proper list in turn, and apply a
@@ -121,3 +121,6 @@ PREDICATE: general-list list ( list -- ? )
     ] [
         drop
     ] ifte ; inline
+
+: subset-with ( obj list quot -- list )
+    swap [ with rot ] subset nip nip ; inline

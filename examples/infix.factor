@@ -14,7 +14,7 @@ SYMBOL: exprs
 DEFER: infix
 : >e exprs get vector-push ;
 : e> exprs get vector-pop ;
-: e@ exprs get dup vector-empty? [ drop f ] [ vector-peek ] ifte ;
+: e@ exprs get dup vector-length 0 = [ drop f ] [ vector-peek ] ifte ;
 : e, ( obj -- ) dup cons? [ [ e, ] each ] [ , ] ifte ;
 : end ( -- ) exprs get [ e, ] vector-each ;
 : >postfix ( op -- ) e@ word? [ e> e> -rot 3list ] when >e ;
