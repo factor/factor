@@ -123,16 +123,16 @@ USE: kernel
 : row ( list -- )
   #! Output an html TR row with each element of the list
   #! being called to produce the output for each TD.
-  <tr> [
-    [ <td> [ call ] </td> ] each
-  ] </tr> ;
+  <tr> 
+    [ <td> call </td> ] each
+  </tr> ;
 
 : styled-row ( class list -- )
   #! Output an html TR row with each element of the list
   #! being called to produce the output for each TD.
-  <tr class= swap tr> [
-    [ <td> [ call ] </td> ] each
-  ] </tr> ;
+  <tr class= swap tr> 
+    [ <td> call </td> ] each
+  </tr> ;
 
 : simple-input ( name -- )
   #! Output a simple HTML input field which will have the
@@ -147,12 +147,12 @@ USE: kernel
 : textarea-input ( name -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name.
-  <textarea name= rows= "10" cols= "40" textarea> [ "Enter description here." write ] </textarea> ;
+  <textarea name= rows= "10" cols= "40" textarea> "Enter description here." write </textarea> ;
 
 : textarea-input-with-value ( name value -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name and value.
-  <textarea name= swap rows= "10" cols= "40" textarea> [ write ] </textarea> ;
+  <textarea name= swap rows= "10" cols= "40" textarea> write </textarea> ;
 
 : password-input ( name -- )
   #! Output an HTML password input field which will have the
@@ -162,7 +162,7 @@ USE: kernel
 : form ( action quot  -- )
   #! Call quot with any output appearing inside an HTML form.
   #! The form is a POST form where the action is as specified.
-  <form method= "post" action= swap form> swap </form> ;
+  <form method= "post" action= swap form> call </form> ;
 
 : input-value ( name -- value )
   #! Get the value of the variable "name". If it is f 
@@ -175,10 +175,10 @@ USE: kernel
   #! in 'button-text'. The form will go to the given URL on
   #! submission.
   swap [
-    <table> [
+    <table> 
       [ [ "Name:" write ] [ "name" simple-input ] ] row
       [ [ "Password:" write ] [ "password" password-input ] ] row
-    ] </table>
+    </table>
     button     
   ] form ;
    
@@ -239,11 +239,11 @@ USE: kernel
 
 : login-request-paragraph ( -- )
   #! Display the paragraph requesting the user to login or register.
-  <p> [ 
+  <p>  
     "Please enter your username and password (" write
     "Click to Register" [ register-new-user ] quot-href
     "):" write
-  ] </p> ;
+  </p> ;
   
 : get-login-information ( -- user password )
   [
@@ -274,12 +274,16 @@ USE: kernel
   #! Display the HTML for a form allowing entry of a 
   #! todo item details.
   [
-    <table> [
-      <tr class= "required" tr> [ <td class= "lbl" td> [ "Priority" write ] </td>
-             <td> [ "priority" simple-input ] </td> ] </tr>
-      <tr class= "required" tr> [ <td class= "lbl" td> [ "Description" write ] </td>
-             <td> [ "description" textarea-input ] </td> ] </tr>
-    ] </table>
+    <table> 
+      <tr class= "required" tr> 
+        <td class= "lbl" td> "Priority" write </td>
+        <td> "priority" simple-input </td> 
+      </tr>
+      <tr class= "required" tr> 
+        <td class= "lbl" td> "Description" write </td>
+        <td> "description" textarea-input </td> 
+      </tr>
+    </table>
     "Add" button
   ] form ;
 
@@ -288,12 +292,16 @@ USE: kernel
   #! todo item details.
   swap [
     [   
-      <table> [
-        <tr class= "required" tr> [ <td class= "lbl" td> [ "Priority" write ] </td>
-               <td> [ "priority" dup get simple-input-with-value  ] </td> ] </tr>
-        <tr class= "required" tr> [ <td class= "lbl" td> [ "Description" write ] </td>
-               <td> [ "description" dup get textarea-input-with-value ] </td> ] </tr>
-      ] </table>
+      <table> 
+        <tr class= "required" tr> 
+          <td class= "lbl" td> "Priority" write </td>
+          <td> "priority" dup get simple-input-with-value  </td> 
+        </tr>
+        <tr class= "required" tr> 
+          <td class= "lbl" td> "Description" write </td>
+          <td> "description" dup get textarea-input-with-value </td> 
+        </tr>
+      </table>
       "Save" button
     ] form 
   ] bind ;
@@ -320,14 +328,20 @@ USE: kernel
   #! Display the HTML for a form allowing entry of a 
   #! new password.
   [
-    <table> [
-      <tr class= "required" tr> [ <td class= "lbl" td> [ "Old Password" write ] </td>
-             <td> [ "old-password" password-input ] </td> ] </tr>
-      <tr class= "required" tr> [ <td class= "lbl" td> [ "New Password" write ] </td>
-             <td> [ "new-password" password-input ] </td> ] </tr>
-      <tr class= "required" tr> [ <td class= "lbl" td> [ "Verify Password" write ] </td>
-             <td> [ "verify-password" password-input ] </td> ] </tr>
-    ] </table>
+    <table> 
+      <tr class= "required" tr> 
+        <td class= "lbl" td> "Old Password" write </td>
+        <td> "old-password" password-input </td> 
+      </tr>
+      <tr class= "required" tr> 
+        <td class= "lbl" td> "New Password" write </td>
+        <td> "new-password" password-input </td> 
+      </tr>
+      <tr class= "required" tr> 
+        <td class= "lbl" td> "Verify Password" write </td>
+        <td> "verify-password" password-input </td> 
+      </tr>
+    </table>
     "Change Password" button
   ] form ;
 
@@ -406,12 +420,12 @@ USE: kernel
 
 : write-item-table ( <todo> -- )
   #! Write the table of items for the todo list.
-  <table> [
+  <table> 
     "heading" [ 
       [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] [ " " write ] 
     ] styled-row
     todo-items [ write-item-row ] each 
-  ] </table> ;
+  </table> ;
 
 : do-add-new-item ( -- )
   #! Request a new item from the user and add it to the current todo list.

@@ -35,47 +35,47 @@ USE: html
 : simple-page ( title quot -- )
   #! Call the quotation, with all output going to the
   #! body of an html page with the given title.
-  <html> [ 
-    <head> [ <title> [ swap write ] </title> ] </head> 
-    <body> [ call ] </body>
-  ] </html> ;
+  <html>  
+    <head> <title> swap write </title> </head> 
+    <body> call </body>
+  </html> ;
 
 : styled-page ( title stylesheet-quot quot -- )
   #! Call the quotation, with all output going to the
   #! body of an html page with the given title. stylesheet-quot
   #! is called to generate the required stylesheet.
-  <html> [ 
-    <head> [ 
-      <title> [ rot write ] </title> 
+  <html>  
+    <head>  
+      <title> rot write </title> 
       swap call 
-    ] </head> 
-    <body> [ call ] </body>
-  ] </html> ;
+    </head> 
+    <body> call </body>
+  </html> ;
 
 : paragraph ( str -- )
   #! Output the string as an html paragraph
-  <p> [ write ] </p> ;
+  <p> write </p> ;
 
 : show-message-page ( message -- )
   #! Display the message in an HTML page with an OK button.
   [
     "Press OK to Continue" [
        swap paragraph 
-       <a href= a> [ "OK" write ] </a>
+       <a href= a> "OK" write </a>
     ] simple-page 
   ] show 2drop ;
 
 : vertical-layout ( list -- )
   #! Given a list of HTML components, arrange them vertically.
-  <table> [
-    [ <tr> [ <td> [ call ] </td> ] </tr> ] each
-  ] </table> ;
+  <table> 
+    [ <tr> <td> call </td> </tr> ] each
+  </table> ;
 
 : horizontal-layout ( list -- )
   #! Given a list of HTML components, arrange them horizontally.
-  <table> [
-    <tr valign= "top" tr> [ [ <td> [ call ] </td> ] each ] </tr>
-  ] </table> ;
+  <table> 
+    <tr valign= "top" tr> [ <td> call </td> ] each </tr>
+  </table> ;
 
 : button ( label -- )
   #! Output an HTML submit button with the given label.
@@ -84,8 +84,8 @@ USE: html
 : with-simple-html-output ( quot -- )
   #! Run the quotation inside an HTML stream wrapped
   #! around stdio.
-  <pre> [
+  <pre> 
     "stdio" get <html-stream> [
       call
     ] with-stream
-  ] </pre> ;
+  </pre> ;

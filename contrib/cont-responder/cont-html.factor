@@ -1,4 +1,4 @@
-! cont-html v0.5
+! cont-html v0.6
 !
 ! Copyright (C) 2004 Chris Double.
 ! 
@@ -41,224 +41,160 @@ USE: logic
 ! HTML tags can be used in a number of different ways. The highest
 ! level involves a similar syntax to HTML:
 ! 
-! <p> [ "someoutput" write ] </p>
+! <p> "someoutput" write </p>
 !
-! <p> will push the tag on the stack and </p> will call the
-! quotation wrapping the output in the tag with no attributes.
+! <p> will outupt the opening tag and </p> will output the closing
+! tag with no attributes.
 !
-! <p class= "red" p> [ "someoutput" write ] </p>
+! <p class= "red" p> "someoutput" write </p>
 !
 ! This time the opening tag does not have the '>'. It pushes
-! the tag on the stack with a boolean at the top for indicating no
-! prior attribute value. The next word is assumed to be an attribute
-! word. These words are the attribute name followed by '='.
-! They set any previous attributes in tbe word and set in the tag
-! the current attribute to be processed. 
-! Immediately after the attribute word should come the value
-! that that attribute will be set to.
-! The next attribute word or finishing word (which is the
-! html word followed by '>') will actually set the attribute to
-! that value in the tag.
-! The remaining words are a quotation and the closing tag which
-! calls the quotation and displays the attributed HTML tag around
-! its output.
+! a namespace on the stack to hold the attributes and values.
+! Any attribute words used will store the attribute and values
+! in that namespace. After the attribute word should come the
+! value of that attribute. The next attribute word or 
+! finishing word (which is the html word followed by '>') 
+! will actually set the attribute to that value in the namespace.
+! The finishing word will print out the operning tag including
+! attributes. 
+! Any writes after this will appear after the opening tag.
 !
-! The opening tag words push the tag onto the namespace stack
-! so values for attributes can be used directly without any stack
+! Values for attributes can be used directly without any stack
 ! operations:
 !
 ! (url -- )
-! <a href= a> [ "Click me" write ] </a>
+! <a href= a> "Click me" write </a>
 !
 ! (url -- )
-! <a href= "http://" swap cat2 a> [ "click" write ] </a>
+! <a href= "http://" swap cat2 a> "click" write </a>
 !
 ! (url -- )
-! <a href= <% "http://" % % %> a> [ "click" write ] </a>
+! <a href= <% "http://" % % %> a> "click" write </a>
 !
 ! Tags that have no 'closing' equivalent have a trailing tag/> form:
 !
 ! <input type= "text" name= "name" size= "20" input/>
 
-: <tag> ( closed? name -- <tag> )
-  #! Return a <tag> object which describes the named
-  #! HTML tag. closed? should be true false if the
-  #! tag does not need have a closing tag printed 
-  #! (eg. <br>, <input>). 'attrs' contains a
-  #! namespace of name/values for the attributes.
-  <namespace> [ 
-    "tag" set
-    "closed?" set 
-    "attrs" <namespace> put
-    "last-name" f put
-  ] extend ;
-  
-: set-attr ( value name <tag> -- )
-  #! Set the attribute of the <tag> to the given value.
-  [ "attrs" get [ set ] bind ] bind ;
-
-: attribute-assign ( <tag> name value -- <tag> )
-  #! If value is not false then set the attribute in the
-  #! tag, otherwise do nothing (ie. just drop the false values).
-  2dup and [ swap pick set-attr ] [ 2drop ] ifte ;
-
-: attrs>string ( namespace -- string )
-  #! Convert the attrs namespace to a string
+: attrs>string ( alist -- string )
+  #! Convert the attrs alist to a string
   #! suitable for embedding in an html tag.
-  [ 
-    vars-values 
-    <% [ dup car % "='" % cdr % "' " % ] each %> 
-  ] bind ;
+  nreverse <% [ dup car % "='" % cdr % "'" % ] each %> ;
 
-: write-open-tag ( <tag> -- )
-  #! Write to standard output the opening HTML tag plus
-  #! attributes if any.
-  [   
-    "<" write
-    "tag" get write
-     "attrs" get [ " " write attrs>string write  ] when* 
-     ">" write 
-  ] bind ;
+: write-attributes ( n: namespace -- )  
+  #! With the attribute namespace on the stack, get the attributes
+  #! and write them to standard output. If no attributes exist, write
+  #! nothing.
+  "attrs" get [ " " write attrs>string write ] when* ;
 
-: write-close-tag ( <tag> -- )
-  #! Write to standard output the closing HTML tag if
-  #! the tag requires it.
-  [
-    "closed?" get [ 
-      "</" write
-      "tag" get write
-      ">" write
-    ] when
-  ] bind ;
-
-: write-tag ( <tag> quot -- )
-  #! Call the quotation, wrapping any output to standard
-  #! output within the given HTML tag.
-  over write-open-tag dip write-close-tag ;
+: store-prev-attribute ( n: tag value -- )   
+  #! Assumes an attribute namespace is on the stack.
+  #! Gets the previous attribute that was used (if any)
+  #! and sets it's value to the current value on the stack.
+  #! If there is no previous attribute, no value is expected
+  #! on the stack.
+  "current-attribute" get [ swons "attrs" cons@ ] when* ;
 
 ! HTML tag words
 ! 
 ! Each closable HTML tag has four words defined. The example below is for
 ! <p>:
 !
-!: <p> ( -- <tag> )
-!  #! Pushes the HTML tag on the stack
-!  t "p" <tag> ;
+!: <p> ( -- )
+!  #! Writes the opening tag to standard output.
+!  "<p>" write ;
+
+!:  <p ( -- n: <namespace> )
+!   #! Used for setting inline attributes. Prints out
+!   #! an unclosed opening tag.
+!   "<p" write <namespace> >n ;
 !
-!:  <p ( -- attr-value n: <tag> )
-!   #! Used for setting inline attributes.
-!   t "p" <tag> >n f ;
-!
-!: p> ( n: <tag> last-value -- <tag> )
+!: p> ( n: <namespace> -- )
 !  #! Used to close off inline attribute version of word.
-!  "last-name" get n> -rot swap attribute-assign ;
+!  #! Prints out attributes and closes opening tag.
+!   store-prev-attribute write-attributes n> drop ">" write ;
 !
-!: </p> ( <tag> quot -- )
-!  #! Calls the quotation, wrapping the output in the tag.
-!  write-tag ;
+!: </p> ( -- )
+!  #! Write out the closing tag.
+!  "</foo>" write ;
 !
 ! Each open only HTML tag has only three words:
 !
 ! : <input/> ( -- )
 !   #! Used for printing the tag with no attributes.
-!   f "input" <tag> [ ] write-tag ;
+!   "<input>" write ;
 !
-! : <input ( -- n: <tag> attr-value )
+! : <input ( -- n: <namespace> )
 !   #! Used for setting inline attributes.
-!   f "input" <tag> >n f ;
+!   "<input" write <namespace> >n ;
 !
-! : input/> ( n: <tag> value or f -- )
+! : input/> ( n: <namespace> -- )
 !   #! Used to close off inline attribute version of word
 !   #! and print the tag/
-!   "last-name" get n> -rot swap attribute-assign [ ] write-tag ;
+!   store-prev-attribute write-attributes n> drop ">" write ;
 !
 ! Each attribute word has the form xxxx= where 'xxxx' is the attribute
 ! name. The example below is for href:
 !
-!: href= ( n: <tag> value or f  -- n: <tag> )
-!  "last-name" get n> -rot swap attribute-assign >n "href" "last-name" set ;
+!: href= ( n: <namespace> optional-value -- )
+!  store-prev-attribute "href" "current-attribute" set ;
 
 : define-compound ( vocab name def -- )
   #! Define 'word creating' word to allow
   #! dynamically creating words.
   >r 2dup swap create r> <compound> define ;
+ 
+: def-for-html-word-<foo> ( name -- name quot )
+  #! Return the name and code for the <foo> patterned
+  #! word.
+  <% "<" % % ">" % %> dup [ write ] cons ;
 
-: closed-html-word-names ( name -- )
-  #! Return a list of the names of the words
-  #! used for a closable HTML tag.
-  dup [ "<" swap ">" cat3 ] dip
-  dup [ "<" swap cat2 ] dip
-  dup [ ">" cat2 ] dip 
-  "</" swap ">" cat3 
-  3list cons ;
+: def-for-html-word-<foo ( name -- name quot )
+  #! Return the name and code for the <foo patterned
+  #! word.
+  <% "<" % % %> dup [ write <namespace> >n ] cons ;
 
-: closed-html-word-code ( name -- )
-  #! Return a list of the code for the words
-  #! used for the closable HTML tag.
-  dup [ <tag> ] cons t swons 
-  swap [ <tag> >n f ] cons t swons
-  [ "last-name" get n> -rot swap attribute-assign ]
-  [ write-tag ]
-  3list cons ;
+: def-for-html-word-foo> ( name -- name quot )
+  #! Return the name and code for the foo> patterned
+  #! word.  
+  <% % ">" % %> [ store-prev-attribute write-attributes n> drop  ">" write ] ;
 
-: 2car>pair ( list1 list2 -- cdr cdr pair )
-  #! Take the car of two lists and put then in a
-  #! pair. The cdr of the two lists remain on the
-  #! stack.
-  >r uncons swap r> uncons -rot cons ;
+: def-for-html-word-</foo> ( name -- name quot )
+  #! Return the name and code for the </foo> patterned
+  #! word.  
+  <% "</" % % ">" % %> dup [ write ] cons ;
 
-: 2list>alist ( list1 list2 alist -- alist )
-  #! Append two lists to an alist by
-  #! taking the car of each list and
-  #! forming it into a pair recursively.
-  >r dup [ 
-    2car>pair r> swap add 2list>alist
-  ] [
-    drop drop r>
-  ] ifte ;
-   
+: def-for-html-word-<foo/> ( name -- name quot )
+  #! Return the name and code for the <foo/> patterned
+  #! word.  
+  <% "<" % dup % "/>" % %> swap <% "<" % % ">" % %> [ write ] cons ;
+
+: def-for-html-word-foo/> ( name -- name quot )
+  #! Return the name and code for the foo/> patterned
+  #! word.  
+  <% % "/>" % %> [ store-prev-attribute write-attributes n> drop  ">" write ] ;
+
 : define-closed-html-word ( name -- ) 
   #! Given an HTML tag name, define the words for
   #! that closable HTML tag.
-  dup closed-html-word-names 
-  swap closed-html-word-code 
-  [ ] 2list>alist
-  [ uncons "cont-html" -rot define-compound ] each ;
-
-: open-html-word-names ( name -- )
-  #! Return a list of the names of the words
-  #! used for a open only HTML tag.
-  dup [ "<" swap "/>" cat3 ] dip
-  dup [ "<" swap cat2 ] dip
-  "/>" cat2 
-  2list cons ;
-
-: open-html-word-code ( name -- )
-  #! Return a list of the code for the words
-  #! used for the open only HTML tag.
-  dup [ <tag> [ ] write-tag ] cons f swons 
-  swap [ <tag> >n f ] cons f swons
-  [ "last-name" get n> -rot swap attribute-assign [ ] write-tag ]
-  2list cons ;
+  "cont-html" swap
+  2dup def-for-html-word-<foo> define-compound
+  2dup def-for-html-word-<foo define-compound
+  2dup def-for-html-word-foo> define-compound
+  def-for-html-word-</foo> define-compound ;
 
 : define-open-html-word ( name -- ) 
   #! Given an HTML tag name, define the words for
-  #! that open only HTML tag.
-  dup open-html-word-names 
-  swap open-html-word-code 
-  [ ] 2list>alist 
-  [ uncons "cont-html" -rot define-compound ] each ;
+  #! that open HTML tag.
+  "cont-html" swap
+  2dup def-for-html-word-<foo/> define-compound
+  2dup def-for-html-word-<foo define-compound
+  def-for-html-word-foo/> define-compound ;
 
 : define-attribute-word ( name -- )
-  #! Given an attribute name, define the word for
-  #! that attribute.
-  "cont-html" swap 
-  dup "=" cat2 
-  swap [ "last-name" get n> -rot swap attribute-assign >n ] swap add  
-  [ "last-name" set ] append
-  define-compound ;
+  "cont-html" swap dup "=" cat2 swap 
+  [ store-prev-attribute ] cons reverse [ "current-attribute" set ] append define-compound ;
 
-! Define some open HTML tags
+! Define some closed HTML tags
 [ 
   "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" 
   "ol" "li" "form" "a" "p" "html" "head" "body" "title"
@@ -266,7 +202,7 @@ USE: logic
   "script" "div" "span" "select" "option"
 ] [ define-closed-html-word ] each
 
-! Define some closed HTML tags
+! Define some open HTML tags
 [ 
   "input" 
   "br" 

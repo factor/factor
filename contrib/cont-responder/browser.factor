@@ -55,7 +55,7 @@ USE: errors
 
 : write-vocab-list ( -- )
   #! Write out the HTML for the list of vocabularies
-  <select name= "vocabs" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> [
+  <select name= "vocabs" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     vocabs [ 
       dup "current-vocab" get [ "" ] unless* = [
         "<option selected>" write
@@ -65,11 +65,11 @@ USE: errors
       chars>entities write 
       "</option>\n" write     
     ] each
-  ] </select> ;
+  </select> ;
 
 : write-word-list ( vocab -- )
   #! Write out the HTML for the list of words in a vocabulary.
-  <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> [
+  <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     words [ 
       dup "current-word" get [ "" ] unless* str-compare 0 = [
       "<option selected>" write
@@ -79,15 +79,15 @@ USE: errors
      chars>entities write 
      "</option>\n" write     
    ] each
- ] </select> ;
+  </select> ;
 
 : write-editable-word-source ( vocab word -- )
   #! Write the source in a manner allowing it to be edited.
-  <textarea name= "eval" rows= "30" cols= "80" textarea> [
+  <textarea name= "eval" rows= "30" cols= "80" textarea> 
     1024 <string-output-stream> dup >r [
       >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
     ] with-stream r> stream>str chars>entities write
-  ] </textarea> <br/>
+  </textarea> <br/>
   "Accept" button ;
 
 : write-word-source ( vocab word -- )
@@ -115,27 +115,31 @@ USE: errors
 
 : write-vm-statistics ( -- )
   #! Display statistics about the JVM in use.
-  <table> [
-    <tr> [ <td> [ "Free Memory" write ] </td>
-           <td> [ get-vm-runtime get-free-memory write ] </td> ] </tr>
-    <tr> [ <td> [ "Total Memory" write ] </td>
-           <td> [ get-vm-runtime get-total-memory write ] </td> ] </tr>
-  ] </table> ;
+  <table> 
+    <tr>  
+      <td> "Free Memory" write </td>
+      <td> get-vm-runtime get-free-memory write </td> 
+    </tr>
+    <tr> 
+      <td> "Total Memory" write </td>
+      <td> get-vm-runtime get-total-memory write </td> 
+    </tr>
+  </table> ;
 
 : write-browser-body ( -- )
   #! Write out the HTML for the body of the main browser page.
-  <table width= "100%" table> [
-    <tr> [ 
-      <td> [ "<b>Vocabularies</b>" write ] </td>
-      <td> [ "<b>Words</b>" write ] </td>
-      <td> [ "<b>Source</b>" write ] </td>
-    ] </tr>
-    <tr> [ 
-      <td valign= "top" style= "width: 200" td> [ write-vocab-list ] </td> 
-      <td valign= "top" style= "width: 200" td> [ "current-vocab" get write-word-list ] </td> 
-      <td valign= "top" td> [ "current-vocab" get "current-word" get write-word-source ] </td> 
-    ] </tr>
-  ] </table>
+  <table width= "100%" table> 
+    <tr>  
+      <td> "<b>Vocabularies</b>" write </td>
+      <td> "<b>Words</b>" write </td>
+      <td> "<b>Source</b>" write </td>
+    </tr>
+    <tr>  
+      <td valign= "top" style= "width: 200" td> write-vocab-list </td> 
+      <td valign= "top" style= "width: 200" td> "current-vocab" get write-word-list </td> 
+      <td valign= "top" td> "current-vocab" get "current-word" get write-word-source </td> 
+    </tr>
+  </table>
   write-vm-statistics ;
 
 : flatten ( tree - list ) 
@@ -179,13 +183,13 @@ USE: errors
 : show-parse-error ( error -- )
   #! Show an error page describing the parse error.
   [
-    <html> [
-      <head> [ <title> [ "Parse error" write ] </title> ] </head>
-      <body> [ 
+    <html> 
+      <head> <title> "Parse error" write </title> </head>
+      <body>  
         swap [ write ] with-simple-html-output
-        <a href= a> [ "Ok" write ] </a>
-      ] </body>
-    ] </html>
+        <a href= a> "Ok" write </a>
+      </body>
+    </html>
   ] show drop drop ;
 
 : eval-string ( vocab to-eval -- )
@@ -204,16 +208,16 @@ USE: errors
   [
     [
       [
-        <html> [
-          <head> [
-            <title> [ "Factor Browser" write ] </title>
-          ] </head>
-          <body> [
-            <form name= "main" action= method= "post" form> [
+        <html> 
+          <head> 
+            <title> "Factor Browser" write </title>
+          </head>
+          <body> 
+            <form name= "main" action= method= "post" form> 
               write-browser-body 
-            ] </form>
-          ] </body>
-        ] </html> 
+            </form>
+          </body>
+        </html> 
       ] show [
         "allow-edit?" get [ 
           "eval" get [ 

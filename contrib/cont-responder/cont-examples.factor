@@ -39,7 +39,7 @@ USE: prettyprint
   #! The page has a link to the 'next' continuation.
   [ 
     swap [ 
-      <a href= a> [ "Next" write ] </a>
+      <a href= a> "Next" write </a>
     ] html-document 
   ] show drop drop ;
 
@@ -47,11 +47,11 @@ USE: prettyprint
   #! Display a page prompting for input of a name and return that name.
   [ 
     "Enter your name" [
-      <form method= "post" action= form> [
+      <form method= "post" action= form> 
         "Name: " write
         <input type= "text" name= "name" size= "20" input/>
         <input type= "submit" value= "Ok" input/>
-      ] </form>
+      </form>
     ] html-document
   ] show [
     "name" get 
@@ -75,10 +75,10 @@ USE: prettyprint
   [ 
     drop     
     "Menu" [ 
-      <ol> [
-        <li> [ "Test responder1" [ test-cont-responder ] quot-href ] </li>
-        <li> [ "Test responder2" [ [ .s ] with-string-stream display-page test-cont-responder2 [ .s ] with-string-stream display-page ] quot-href ] </li>
-      ] </ol>
+      <ol> 
+        <li> "Test responder1" [ test-cont-responder ] quot-href </li>
+        <li> "Test responder2" [ [ .s ] with-string-stream display-page test-cont-responder2 [ .s ] with-string-stream display-page ] quot-href </li>
+      </ol>
     ] html-document 
   ] show drop ;
 
@@ -91,7 +91,7 @@ USE: prettyprint
     #! And we don't need the 'url' argument
     drop         
     "Counter: " over cat2 [ 
-      dup <h2> [ write ] </h2>
+      dup <h2> write </h2>
       "++" over unit [ f ] swap append [ 1 + counter-example ] append quot-href
       "--" over unit [ f ] swap append [ 1 - counter-example ] append quot-href
       drop
@@ -104,24 +104,15 @@ USE: prettyprint
   #!
   0 "counter" set
   [ 
-    #! And we don't need the 'url' argument
+    #! We don't need the 'url' argument
     drop   
     "Counter: " "counter" get cat2 [ 
-      <h2> [ "counter" get write ] </h2>
+      <h2> "counter" get write </h2>
       "++" [ "counter" get 1 + "counter" set ] quot-href
       "--" [ "counter" get 1 - "counter" set ] quot-href
     ] html-document 
   ] show 
   drop ;
-
-!: register-counter-example2 ( -- id )
-!  #! Register the counter-example word so that accessing the
-!  #! URL with the returned ID will call it.
-!  "httpd-responders" get [ 
-!    "cont" get [ 
-!      f [ counter-example2 ] register-continuation 
-!    ] bind 
-!  ] bind ;
 
 #! Install the examples
 "counter1" [ drop 0 counter-example ] install-cont-responder

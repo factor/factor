@@ -55,18 +55,18 @@ USE: vocabularies
 : display-eval-form ( url -- )
   #! Display the components for allowing entry of 
   #! factor words to be evaluated.
-  <form name= "main" method= "post" action= form> [    
+  <form name= "main" method= "post" action= form>     
     [
       [
-        <textarea name= "eval" rows= "10" cols= "40" textarea> [
+        <textarea name= "eval" rows= "10" cols= "40" textarea> 
           "" write 
-        ] </textarea>
+        </textarea>
       ]
       [
         <input type= "submit" value= "Evaluate" accesskey= "e" input/>  
       ]
     ] vertical-layout
-  ] </form> 
+  </form> 
   "<script language='javascript'>document.forms.main.eval.focus()</script>" write ;
 
 : escape-quotes ( string -- string )
@@ -82,14 +82,14 @@ USE: vocabularies
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
-  <a href= "#" onclick= dup make-eval-javascript a> [ write ] </a> ;
+  <a href= "#" onclick= dup make-eval-javascript a> write </a> ;
 
 : display-stack ( list -- )
   #! Write out html to display the stack.
-  <table border= "1" table> [
-    <tr> [ <th> [ "Callstack" write ] </th> ] </tr>
-    [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
-  ] </table> ;
+  <table border= "1" table> 
+    <tr> <th> "Callstack" write </th> </tr>
+    [ <tr> <td> write-eval-link </td> </tr> ] each
+  </table> ;
 
 : display-clear-history-link ( -- )
   #! Write out html to display a link that will clear
@@ -100,10 +100,10 @@ USE: vocabularies
 
 : display-history ( list -- )
   #! Write out html to display the history.
-  <table border= "1" table> [
-    <tr> [ <th> [ "History" write display-clear-history-link ] </th> ] </tr>
-    [ <tr> [ <td> [ write-eval-link ] </td> ] </tr> ] each
-  ] </table> ;
+  <table border= "1" table> 
+    <tr> <th> "History" write display-clear-history-link </th> </tr>
+    [ <tr> <td> write-eval-link </td> </tr> ] each
+  </table> ;
 
 : html-for-word-source ( word-string -- )
   #! Return an html fragment dispaying the source
@@ -111,38 +111,38 @@ USE: vocabularies
   dup dup
   <namespace> [
     "responder" "inspect" put
-    <table border= "1" table> [
-      <tr> [ <th colspan= "2" th> [ "Source" write ] </th> ] </tr>
-      <tr> [ <td colspan= "2" td> [ [ see ] with-simple-html-output ] </td> ] </tr>
-      <tr> [ <th> [ "Apropos" write ] </th> <th> [ "Usages" write ] </th> ] </tr>
-      <tr> [ <td valign= "top" td> [ [ apropos. ] with-simple-html-output ] </td> 
-             <td valign= "top" td> [ [ usages. ] with-simple-html-output ] </td>
-      ] </tr>
-    ] </table>
+    <table border= "1" table> 
+      <tr> <th colspan= "2" th> "Source" write </th> </tr>
+      <tr> <td colspan= "2" td> [ see ] with-simple-html-output </td> </tr>
+      <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
+      <tr> <td valign= "top" td> [ apropos. ] with-simple-html-output </td> 
+           <td valign= "top" td> [ usages. ] with-simple-html-output </td>
+      </tr>
+    </table>
   ] bind ;
 
 : display-word-see-form ( url -- )
   #! Write out the html for code that accepts
   #! the name of a word, and displays the source
   #! code of that word.
-  <form method= "post" action= "." form> [
+  <form method= "post" action= "." form> 
     [
       [ 
         "Enter the name of a word: " write
         "see" [ html-for-word-source ] live-search
       ]
       [
-        <div id= "see" div> [ "" write ] </div>
+        <div id= "see" div> "" write </div>
       ]
     ] vertical-layout
-  ] </form> ;
+  </form> ;
 
 : display-last-output ( string -- )
   #! Write out html to display the last output.
-  <table border= "1" table> [
-    <tr> [ <th> [ "Last Output" write ] </th> ] </tr>
-    <tr> [ <td> [ <pre> [ write ] </pre> ] </td> ] </tr>
-  ] </table> ;
+  <table border= "1" table> 
+    <tr> <th> "Last Output" write </th> </tr>
+    <tr> <td> <pre> write </pre> </td> </tr>
+  </table> ;
   
 
 : get-expr-to-eval (  -- string )
@@ -150,12 +150,12 @@ USE: vocabularies
   #! evaluated. Return the form as a string. Assumes
   #! an evaluator is on the namestack.
   [ 
-    <html> [
-      <head> [
-        <title> [ "Factor Evaluator" write ] </title>
+    <html> 
+      <head> 
+        <title> "Factor Evaluator" write </title>
         include-live-updater-js
-      ] </head>        
-      <body> [
+      </head>        
+      <body> 
         "Use Alt+E to evaluate, or press 'Evaluate'" paragraph
         [
           [ display-eval-form ]
@@ -164,8 +164,8 @@ USE: vocabularies
         ] horizontal-layout
 	display-word-see-form
         "output" get display-last-output
-      ] </body>
-    ] </html>
+      </body>
+    </html>
   ] show [
     "eval" get
   ] bind ;

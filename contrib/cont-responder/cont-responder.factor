@@ -1,4 +1,4 @@
-! cont-responder v0.5
+! cont-responder v0.6
 !
 ! Copyright (C) 2004 Chris Double.
 ! 
@@ -136,11 +136,11 @@ DEFER: show
   drop
   [ 
     drop
-    <html> [               
-      <body> [
-       <p> [ "This page has expired." write ] </p> 
-      ] </body>
-    ] </html> 
+    <html>                
+      <body> 
+       <p> "This page has expired." write  </p> 
+      </body>
+    </html> 
   ] show drop ;
 
 : get-registered-continuation ( id -- cont ) 
@@ -281,16 +281,19 @@ DEFER: show
   ] with-exit-continuation
   print drop ;
 
+: callback-quot ( quot -- quot )
+  #! Convert the given quotation so it works as a callback
+  #! by returning a quotation that will pass the original 
+  #! quotation to the callback continuation.
+  unit "callback-cc" get [ call ] cons append ;
+  
 : quot-href ( text quot -- )
   #! Write to standard output an HTML HREF where the href,
   #! when referenced, will call the quotation and then return
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a href= 
-  unit "callback-cc" get [ call ] cons append t swap register-continuation  
-  a>
-  swap unit [ write ] append </a> ;
+  <a href= callback-quot t swap register-continuation a> write </a> ;
 
 : with-new-session ( quot -- )
   #! Each cont-responder is bound inside their own

@@ -52,9 +52,9 @@ USE: lists
 : include-live-updater-js ( -- )
   #! Write out the HTML script to include the live updater
   #! javascript code.
-  <script language= "JavaScript" src= live-updater-url script> [
+  <script language= "JavaScript" src= live-updater-url script> 
     "" write
-  ] </script> ;
+  </script> ;
 
 : write-live-anchor-tag ( text -- id )
   #! Write out the HTML for the clickable anchor. This
@@ -62,9 +62,9 @@ USE: lists
   #! an onclick is set via DHTML later to make it run a
   #! quotation on the server. The randomly generated id
   #! for the anchor is returned.
-  <a id= get-random-id dup href= "#" a> [ 
+  <a id= get-random-id dup href= "#" a>  
     swap write
-  ] </a> ;  
+  </a> ;  
 
 : register-live-anchor-quot ( div-id div-quot -- kid )
   #! Register the 'quot' with the cont-responder so
@@ -79,7 +79,7 @@ USE: lists
     [
       t "disable-initial-redirect?" set
       [ 
-        <div id= "div-id" get div> [ "div-quot" get call ] </div>    
+        <div id= "div-id" get div> "div-quot" get call </div>    
       ] show 
     ] bind 
   ] cons t swap register-continuation ;
@@ -92,13 +92,13 @@ USE: lists
   #! in a 'div' tag with the 'div-id'. That 'div' tag will
   #! replace whatever HTML DOM object currently has that same
   #! id.
-  <script language= "JavaScript" script> [
+  <script language= "JavaScript" script> 
     "document.getElementById('" write
     write
     "').onclick=liveUpdaterUri('" write
     register-live-anchor-quot write
     "');" write
-  ] </script> ;
+  </script> ;
   
 : live-anchor ( id quot text -- )
   #! Write out the HTML for an anchor that when clicked
@@ -135,7 +135,7 @@ USE: lists
       [ 
         #! Don't need the URL as the 'show' won't be resumed.
         drop
-        <div id= "div-id" get div> [ "div-quot" get call ] </div>    
+        <div id= "div-id" get div> "div-quot" get call </div>    
       ] show 
     ] bind 
   ] cons t swap register-continuation ;
@@ -149,13 +149,13 @@ USE: lists
   #! a 'div' with the id 'div-id' and will 
   #! replace whatever HTML DOM object currently has that same
   #! id.
-  <script language= "JavaScript" script> [
+  <script language= "JavaScript" script> 
     "liveSearch('" write
     write
     "', '" write
     register-live-search-quot write
     "');" write
-  ] </script> ;
+  </script> ;
 
 : live-search ( div-id div-quot -- )
   #! Write an input text field. The keydown of this

@@ -41,41 +41,41 @@ USE: cont-responder
   #! aporpos of that word.
   <namespace> [
     "responder" "inspect" put
-    <pre> [
+    <pre> 
         "stdio" get <html-stream> [   
           apropos.
         ] with-stream              
-    ] </pre>
+    </pre>
   ] bind ;
       
 : live-updater-responder ( -- )
   [
     drop
-    <html> [
-      <head> [ 
-        <title> [ "Live Updater Example" write ] </title>
+    <html> 
+      <head>  
+        <title> "Live Updater Example" write </title>
         include-live-updater-js
-      ] </head>
-      <body> [
+      </head>
+      <body> 
        [
          [ 
            "millis" [ millis write ] "Display Server millis" live-anchor
-           <div id= "millis" div> [ 
+           <div id= "millis" div>  
              "The millisecond time from the server will appear here" write 
-           ] </div>         
+           </div>         
          ]
          [        
            "Enter a word to apropos:" paragraph
            "apropos" [ live-search-apropos-word ] live-search
          ]
          [
-           <div id= "apropos" div> [
+           <div id= "apropos" div> 
              "" write
-           ] </div>
+           </div>
          ] 
        ] vertical-layout
-     ] </body>
-    ] </html>
+     </body>
+    </html>
   ] show ;
 
 "live-updater" [ live-updater-responder ] install-cont-responder
