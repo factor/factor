@@ -43,8 +43,8 @@ USE: words
     "compiling" set-word-property ;
 
 \ call word-interpret-only
+\ execute word-interpret-only
 \ datastack word-interpret-only
 \ callstack word-interpret-only
 \ set-datastack word-interpret-only
 \ set-callstack word-interpret-only
-\ 2generic word-interpret-only

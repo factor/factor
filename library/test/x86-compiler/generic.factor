@@ -8,7 +8,7 @@ USE: logic
 USE: combinators
 USE: words
 
-: generic-test ( obj -- hash )
+: generic-test
     {
         drop
         drop
@@ -33,7 +33,30 @@ USE: words
 [ 2 3 ] [ 2 3 4 generic-test ] unit-test
 [ 2 f ] [ 2 3 f generic-test ] unit-test
 
-: generic-test-alt ( obj -- hash )
+: generic-literal-test
+    4 {
+        drop
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+        nip
+    } generic ; compiled
+
+[ ] [ generic-literal-test ] unit-test
+
+: generic-test-alt
     {
         drop
         drop

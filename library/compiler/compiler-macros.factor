@@ -75,9 +75,18 @@ USE: alien
     #! Call named C function in Factor interpreter executable.
     dlsym-self CALL JUMP-FIXUP ;
 
-: TYPE-OF ( -- )
+: TYPE ( -- )
     #! Peek datastack, store type # in EAX.
     PEEK-DS
     EAX PUSH-[R]
     "type_of" SELF-CALL
     4 ESP R+I ;
+
+: ARITHMETIC-TYPE ( -- )
+    #! Peek top two on datastack, store arithmetic type # in EAX.
+    PEEK-DS
+    EAX PUSH-[R]
+    4 EAX R-I
+    EAX PUSH-[R]
+    "arithmetic_type" SELF-CALL
+    8 ESP R+I ;

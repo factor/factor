@@ -1,9 +1,9 @@
 #include "factor.h"
 
-void primitive_arithmetic_type(void)
+CELL arithmetic_type(CELL obj1, CELL obj2)
 {
-	CELL type2 = type_of(dpop());
-	CELL type1 = type_of(dpop());
+	CELL type1 = type_of(obj1);
+	CELL type2 = type_of(obj2);
 	CELL type;
 
 	switch(type1)
@@ -65,7 +65,15 @@ void primitive_arithmetic_type(void)
 		type = type1;
 		break;
 	}
-	dpush(tag_fixnum(type));
+
+	return type;
+}
+
+void primitive_arithmetic_type(void)
+{
+	CELL obj2 = dpop();
+	CELL obj1 = dpop();
+	dpush(tag_fixnum(arithmetic_type(obj1,obj2)));
 }
 
 bool realp(CELL tagged)

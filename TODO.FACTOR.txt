@@ -3,19 +3,13 @@ FFI:
 
 - BIN: 2: bad
 
-- symbols are not primitives
+- compile word twice; no more 'cannot compile' error!
+
 - compiled? messy
 - compiler: drop literal peephole optimization
-- compiler: type-of { ... } call
-            type-of { ... } execute
-	    arithmetic-type { ... } call
-	    arithmetic-type { ... } execute
-- ditch ds/cs envs, just use dlsym instead
+- compiler: arithmetic-type { ... } execute
 - getenv/setenv: if literal arg, compile as a load/store
 - inline words
-- raise an error when compiling something we can't
-  call, datastack/callstack, set-datastack/callstack,
-  execute
 
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
