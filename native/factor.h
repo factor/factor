@@ -28,10 +28,6 @@ typedef unsigned long int CELL;
 typedef unsigned short CHAR;
 #define CHARS sizeof(CHAR)
 
-/* must always be 8 bits */
-typedef unsigned char BYTE;
-#define BYTES 1
-
 /* Memory heap size */
 #define DEFAULT_ARENA (32 * 1024 * 1024)
 #define STACK_SIZE 1024

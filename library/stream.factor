@@ -78,7 +78,11 @@ USE: strings
         ( -- )
         [ ] "fclose" set
         ( string -- )
-        [ namespace fwrite "\n" namespace fwrite ] "fprint" set
+        [
+            namespace fwrite
+            "\n" namespace fwrite
+            namespace fflush
+        ] "fprint" set
     ] extend ;
 
 : <extend-stream> ( stream -- stream )

@@ -7,11 +7,15 @@ void init_io(void)
 	env.user[STDERR_ENV] = handle(HANDLE_FD,2);
 }
 
-void primitive_close_fd(void)
+void init_buffer(HANDLE* h, int mode)
 {
-	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	close(h->object);
-	env.dt = dpop();
+	if(h->buf_mode == B_NONE)
+		h->buffer = tag_object(string(BUF_SIZE,'\0'));
+	if(h->buf_mode != mode)
+	{
+		h->buf_fill = h->buf_pos = 0;
+		h->buf_mode = mode;
+	}
 }
 
 int fill_buffer(HANDLE* h, int fd, STRING* buf)
@@ -39,11 +43,9 @@ void primitive_read_line_fd_8(void)
 
 	/* read ascii from fd */
 	STRING* buf;
-	if(h->buf_mode != B_READ)
-	{
-		h->buf_mode = B_READ;
-		h->buffer = tag_object(string(BUF_SIZE,'\0'));
-	}
+
+	init_buffer(h,B_READ);
+
 	buf = untag_string(h->buffer);
 
 	for(;;)
@@ -86,24 +88,82 @@ void primitive_read_line_fd_8(void)
 	}
 }
 
+/* keep writing to the stream until everything is written */
+void write_fully(HANDLE* h, char* str, CELL len)
+{
+	FIXNUM amount, written = 0, remains;
+
+	for(;;)
+	{
+		remains = len - written;
+
+		if(remains == 0)
+			break;
+
+		amount = write(h->object,str + written,remains);
+		if(amount < 0)
+			io_error(__FUNCTION__);
+
+		written += amount;
+	}
+}
+
+void flush_buffer(HANDLE* h)
+{
+	STRING* buf;
+
+	if(h->buf_mode != B_WRITE || h->buf_fill == 0)
+		return;
+
+	buf = untag_string(h->buffer);
+
+	write_fully(h,(char*)buf + sizeof(STRING),h->buf_fill);
+	h->buf_fill = 0;
+}
+
 void write_fd_char_8(HANDLE* h, FIXNUM ch)
 {
-	BYTE c = (BYTE)ch;
+	char c = (char)ch;
+	STRING* buf;
 
-	int amount = write(h->object,&c,1);
+	init_buffer(h,B_WRITE);
+	buf = untag_string(h->buffer);
 
-	if(amount < 0)
-		io_error(__FUNCTION__);
+	/* Is the buffer full? */
+	if(h->buf_fill == buf->capacity * CHARS)
+		flush_buffer(h);
+
+	bput((CELL)buf + sizeof(STRING) + h->buf_fill,c);
+	h->buf_fill++;
 }
 
 void write_fd_string_8(HANDLE* h, STRING* str)
 {
 	char* c_str = to_c_string(str);
-	
-	int amount = write(h->object,c_str,str->capacity);
-	
-	if(amount < 0)
-		io_error(__FUNCTION__);
+	STRING* buf;
+
+	init_buffer(h,B_WRITE);
+	buf = untag_string(h->buffer);
+
+	/* Is the string longer than the buffer? */
+	if(str->capacity > buf->capacity * CHARS)
+	{
+		/* Just write it immediately */
+		flush_buffer(h);
+		write_fully(h,c_str,str->capacity);
+	}
+	else
+	{
+		/* Is there enough room in the buffer? If not, flush */
+		if(h->buf_fill + str->capacity > buf->capacity * CHARS)
+			flush_buffer(h);
+
+		/* Append string to buffer */
+		memcpy((void*)((CELL)buf + sizeof(STRING) + h->buf_fill),
+			c_str,str->capacity);
+
+		h->buf_fill += str->capacity;
+	}
 }
 
 void primitive_write_fd_8(void)
@@ -133,27 +193,15 @@ void primitive_write_fd_8(void)
 void primitive_flush_fd(void)
 {
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-
-	if(h->buf_mode == B_WRITE)
-	{
-		
-	}
-
-	/* int fd = h->object;
-
-	if(fsync(fd) < 0)
-		io_error(__FUNCTION__); */
+	flush_buffer(h);
 
 	env.dt = dpop();
 }
 
-void primitive_shutdown_fd(void)
+void primitive_close_fd(void)
 {
-	/* HANDLE* h = untag_handle(HANDLE_FD,env.dt);
-	int fd = h->object;
-
-	if(shutdown(fd,SHUT_RDWR) < 0)
-		io_error(__FUNCTION__); */
-
+	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
+	flush_buffer(h);
+	close(h->object);
 	env.dt = dpop();
 }

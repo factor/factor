@@ -81,7 +81,7 @@ USE: url-encoding
             read [ parse-request ] when*
         ] with-stream
     ] [
-        default-error-handler drop
+        [ default-error-handler drop ] when*
     ] catch ;
 
 : quit-flag ( -- ? )

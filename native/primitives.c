@@ -121,7 +121,6 @@ XT primitives[] = {
 	primitive_read_line_fd_8,
 	primitive_write_fd_8,
 	primitive_flush_fd,
-	primitive_shutdown_fd,
 	primitive_room,
 	primitive_os_env,
 	primitive_millis,

@@ -17,4 +17,4 @@ USE: test
 
 [ 5/3 ] [ 10 20 3 h ] unit-test
 
-[ 1000/3 ] [ 0 10 3 [ sq ] simpson-try ] unit-test
+[ 1000/3 ] [ 0 10 3 [ sq ] simpson ] unit-test

@@ -211,7 +211,6 @@ IN: cross-compiler
         read-line-fd-8
         write-fd-8
         flush-fd
-        shutdown-fd
         room
         os-env
         millis
