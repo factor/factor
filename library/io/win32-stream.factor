@@ -1,8 +1,6 @@
-! :folding=indent:collapseFolds=1:
-
 ! $Id$
 !
-! Copyright (C) 2004 Mackenzie Straight.
+! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,21 +24,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USE: alien
-USE: continuations
-USE: generic
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: math
-USE: namespaces
-USE: prettyprint
-USE: stdio
-USE: streams
-USE: strings
-USE: threads
-USE: win32-api
-USE: win32-io-internals
+USING: alien continuations generic kernel kernel-internals lists math
+       namespaces prettyprint stdio streams strings threads win32-api
+       win32-io-internals ;
 
 TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle
