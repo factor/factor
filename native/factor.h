@@ -1,6 +1,7 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>

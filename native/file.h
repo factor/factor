@@ -2,3 +2,4 @@
 
 void primitive_open_file(void);
 void primitive_stat(void);
+void primitive_read_dir(void);

@@ -61,6 +61,7 @@ IN: io-internals
 DEFER: port?
 DEFER: open-file
 DEFER: stat
+DEFER: read-dir
 DEFER: client-socket
 DEFER: server-socket
 DEFER: close-port
@@ -220,6 +221,7 @@ IN: cross-compiler
         setenv
         open-file
         stat
+        read-dir
         garbage-collection
         save-image
         datastack

@@ -109,6 +109,7 @@ XT primitives[] = {
 	primitive_setenv,
 	primitive_open_file,
 	primitive_stat,
+	primitive_read_dir,
 	primitive_gc,
 	primitive_save_image,
 	primitive_datastack,

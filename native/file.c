@@ -33,14 +33,42 @@ void primitive_stat(void)
 		dpush(F);
 	else
 	{
-		CELL mode = tag_integer(sb.st_mode);
+		CELL dirp = tag_boolean(S_ISDIR(sb.st_mode));
+		CELL mode = tag_fixnum(sb.st_mode & ~S_IFMT);
 		CELL size = tag_object(s48_long_long_to_bignum(sb.st_size));
 		CELL mtime = tag_integer(sb.st_mtime);
 		dpush(tag_cons(cons(
-			mode,
+			dirp,
 			tag_cons(cons(
-				size,
+				mode,
 				tag_cons(cons(
-					mtime,F)))))));
+					size,
+					tag_cons(cons(
+						mtime,F)))))))));
 	}
+}
+
+void primitive_read_dir(void)
+{
+	STRING* path = untag_string(dpop());
+	DIR* dir = opendir(to_c_string(path));
+	CELL result = F;
+	if(dir != NULL)
+	{
+		struct dirent* file;
+
+		while(file = readdir(dir))
+		{
+			CELL name = tag_object(from_c_string(
+				file->d_name));
+			CELL dirp = tag_boolean(
+				file->d_type == DT_DIR);
+			CELL entry = tag_cons(cons(name,dirp));
+			result = tag_cons(cons(entry,result));
+		}
+
+		closedir(dir);
+	}
+
+	dpush(result);
 }
