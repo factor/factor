@@ -39,30 +39,31 @@ USE: vectors
 ! Predicate metaclass for generalized predicate dispatch.
 SYMBOL: predicate
 
-: predicate-dispatch ( class definition existing -- dispatch )
+: predicate-dispatch ( existing definition class -- dispatch )
     [
-        \ dup ,
-        rot "predicate" word-property ,
-        swap , , \ ifte ,
+        \ dup , "predicate" word-property , , , \ ifte ,
     ] make-list ;
 
-: (predicate-method) ( class generic definition type# -- )
-    rot "vtable" word-property
-    [ vector-nth predicate-dispatch ] 2keep
-    set-vector-nth ;
-
-: predicate-method ( class generic definition -- )
-    pick builtin-supertypes [
-        >r 3dup r> (predicate-method)
-    ] each 3drop ;
-
-predicate [
-    predicate-method
-] "define-method" set-word-property
+: (predicate-method) ( vtable definition class type# -- )
+    >r rot r> swap [
+        vector-nth
+        ( vtable definition class existing )
+        -rot predicate-dispatch
+    ] 2keep set-vector-nth ;
 
 predicate [
     "superclass" word-property builtin-supertypes
 ] "builtin-supertypes" set-word-property
+
+predicate [
+    ( vtable definition class -- )
+    dup builtin-supertypes [
+        ( vtable definition class type# )
+        >r 3dup r> (predicate-method)
+    ] each 3drop
+] "add-method" set-word-property
+
+predicate 25 "priority" set-word-property
 
 : define-predicate ( class predicate definition -- )
     rot "superclass" word-property "predicate" word-property

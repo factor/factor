@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
+USE: generic
 USE: kernel
 USE: math
-USE: vectors
 
 : 2list ( a b -- [ a b ] )
     unit cons ;
@@ -152,7 +152,7 @@ DEFER: tree-contains?
     #! partial order with stack effect ( o1 o2 -- ? ).
     swap [ pick >r maximize r> swap ] (top) nip ; inline
 
-: cons= ( obj cons -- ? )
+M: cons = ( obj cons -- ? )
     2dup eq? [
         2drop t
     ] [
@@ -163,22 +163,21 @@ DEFER: tree-contains?
         ] ifte
     ] ifte ;
 
-: (cons-hashcode) ( cons count -- hash )
+: cons-hashcode ( cons count -- hash )
     dup 0 = [
         2drop 0
     ] [
         over cons? [
             pred >r uncons r> tuck
-            (cons-hashcode) >r
-            (cons-hashcode) r>
+            cons-hashcode >r
+            cons-hashcode r>
             bitxor
         ] [
             drop hashcode
         ] ifte
     ] ifte ;
 
-: cons-hashcode ( cons -- hash )
-    4 (cons-hashcode) ;
+M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 
 : project ( n quot -- list )
     #! Execute the quotation n times, passing the loop counter

@@ -120,7 +120,7 @@ BUILTIN: vector  11
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
 
-: vector= ( obj vec -- ? )
+M: vector = ( obj vec -- ? )
     #! Check if two vectors are equal. Two vectors are
     #! considered equal if they have the same length and contain
     #! equal elements.
@@ -141,7 +141,7 @@ BUILTIN: vector  11
 : ?vector-nth ( n vec -- obj/f )
     2dup vector-length >= [ 2drop f ] [ vector-nth ] ifte ;
 
-: vector-hashcode ( vec -- n )
+M: vector hashcode ( vec -- n )
     0 swap 4 [
         over ?vector-nth hashcode rot bitxor swap
     ] times* drop ;

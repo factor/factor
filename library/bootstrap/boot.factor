@@ -43,11 +43,13 @@ USE: hashtables
 "/library/logic.factor" run-resource
 "/library/cons.factor" run-resource
 "/library/assoc.factor" run-resource
-"/library/math/generic.factor" run-resource
-"/library/words.factor" run-resource
-"/library/math/arithmetic.factor" run-resource
-"/library/math/math-combinators.factor" run-resource
 "/library/math/math.factor" run-resource
+"/library/math/integer.factor" run-resource
+"/library/math/ratio.factor" run-resource
+"/library/math/float.factor" run-resource
+"/library/math/complex.factor" run-resource
+"/library/words.factor" run-resource
+"/library/math/math-combinators.factor" run-resource
 "/library/lists.factor" run-resource
 "/library/vectors.factor" run-resource
 "/library/strings.factor" run-resource
@@ -76,6 +78,7 @@ vocabularies get [
 "/library/generic/object.factor" run-resource
 "/library/generic/builtin.factor" run-resource
 "/library/generic/predicate.factor" run-resource
+"/library/generic/union.factor" run-resource
 "/library/generic/traits.factor" run-resource
 
 ! init.factor leaves a boot quotation on the stack

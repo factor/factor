@@ -35,19 +35,22 @@ USE: parser
 USE: strings
 USE: words
 USE: vectors
+USE: math
 
 ! Catch-all metaclass for providing a default method.
 SYMBOL: object
 
-: define-object ( generic definition -- )
-    <vtable> define-generic drop ;
-
 object object "metaclass" set-word-property
-
-object [
-    define-object
-] "define-method" set-word-property
 
 object [
     drop num-types count
 ] "builtin-supertypes" set-word-property
+
+object [
+    ( vtable definition class -- )
+    drop over vector-length [
+        pick pick -rot set-vector-nth
+    ] times* 2drop
+] "add-method" set-word-property
+
+object 100 "priority" set-word-property

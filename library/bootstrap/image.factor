@@ -190,13 +190,6 @@ M: f ' ( obj -- ptr )
 
 ( Words )
 
-: make-plist ( word -- plist )
-    [
-        dup word-name "name" swons ,
-        dup word-vocabulary "vocabulary" swons ,
-        parsing? [ t "parsing" swons , ] when
-    ] make-list ;
-
 : word, ( word -- )
     [
         word-tag >header ,
@@ -204,7 +197,7 @@ M: f ' ( obj -- ptr )
         0 ,
         dup word-primitive ,
         dup word-parameter ' ,
-        dup make-plist ' ,
+        dup word-plist ' ,
         0 ,
         0 ,
     ] make-list

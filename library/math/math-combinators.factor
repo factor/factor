@@ -51,6 +51,9 @@ USE: kernel
     #! than it produces.
     0 swap (times) ; inline
 
+: fac ( n -- n! )
+    1 swap [ succ * ] times* ;
+
 : 2times-succ ( #{ a b } #{ c d } -- z )
     #! Lexicographically add #{ 0 1 } to a complex number.
     #! If d + 1 == b, return #{ c+1 0 }. Otherwise, #{ c d+1 }.

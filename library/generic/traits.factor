@@ -46,14 +46,17 @@ SYMBOL: traits
     #! definitions.
     "traits-map" word-property ;
 
-: traits-method ( class generic definition -- )
-    swap rot traits-map set-hash ;
-
-traits [ traits-method ] "define-method" set-word-property
+traits [
+    ( class generic quotation )
+    
+    swap rot traits-map set-hash
+] "define-method" set-word-property
 
 traits [
     \ vector "builtin-type" word-property unique,
 ] "builtin-supertypes" set-word-property
+
+traits 10 "priority" set-word-property
 
 ! Hashtable slot holding an optional delegate. Any undefined
 ! methods are called on the delegate. The object can also
@@ -100,7 +103,7 @@ SYMBOL: delegate
 
 : add-traits-dispatch ( word vtable -- )
     >r unit [ car swap traits-dispatch call ] cons \ vector r>
-    add-method ;
+    set-vtable ;
 
 : constructor-word ( word -- word )
     word-name "<" swap ">" cat3 "in" get create ;

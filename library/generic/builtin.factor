@@ -39,14 +39,16 @@ USE: vectors
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
 
-: builtin-method ( type generic definition -- )
-    -rot "vtable" word-property add-method ;
-
-builtin [ builtin-method ] "define-method" set-word-property
-
 builtin [
     "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
+
+builtin [
+    ( vtable definition class -- )
+    rot set-vtable
+] "add-method" set-word-property
+
+builtin 50 "priority" set-word-property
 
 : builtin-predicate ( type# symbol -- word )
     predicate-word [

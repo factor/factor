@@ -25,44 +25,54 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
-USE: generic
+IN: generic
+USE: errors
+USE: hashtables
+USE: kernel
 USE: lists
-USE: math
-USE: math-internals
+USE: namespaces
+USE: parser
 USE: strings
-USE: vectors
 USE: words
 USE: vectors
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+! Union metaclass for dispatch on multiple classes.
+SYMBOL: union
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
+union [
+    [ ] swap "members" word-property [
+        builtin-supertypes append
+    ] each
+] "builtin-supertypes" set-word-property
 
-: dispatch ( n vtable -- )
-    vector-nth call ;
+union [
+    ( vtable definition class -- )
+    "members" word-property [ >r 2dup r> add-method ] each 2drop
+] "add-method" set-word-property
 
-: 2generic ( n n vtable -- )
-    >r arithmetic-type r> dispatch ; inline
+union 30 "priority" set-word-property
 
-GENERIC: hashcode
-M: object hashcode drop 0 ;
+: union-predicate ( definition -- list )
+    [
+        [
+            \ dup ,
+            unswons "predicate" word-property ,
+            [ drop t ] ,
+            union-predicate ,
+            \ ifte ,
+        ] make-list
+    ] [
+        [ drop f ]
+    ] ifte* ;
 
-GENERIC: =
-M: object = eq? ;
+: define-union ( class predicate definition -- )
+    [ union-predicate define-compound ] keep
+    "members" set-word-property ;
 
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
-
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    17 ;
-
-IN: syntax
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+: UNION: ( -- class predicate definition )
+    #! Followed by a class name, then a list of union members.
+    CREATE
+    dup union "metaclass" set-word-property
+    dup predicate-word
+    [ dupd "predicate" set-word-property ] keep
+    [ define-union ] [ ] ; parsing

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,37 +26,92 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
+USE: generic
 USE: kernel
-USE: math
 USE: math-internals
 
-: fac ( n -- n! )
-    ! This is the naive implementation, for benchmarking purposes.
-    1 swap [ succ * ] times* ;
+! Math operations
+2GENERIC: number= ( x y -- ? )
+2GENERIC: <  ( x y -- ? )
+2GENERIC: <= ( x y -- ? )
+2GENERIC: >  ( x y -- ? )
+2GENERIC: >= ( x y -- ? )
+
+2GENERIC: +   ( x y -- x+y )
+2GENERIC: -   ( x y -- x-y )
+2GENERIC: *   ( x y -- x*y )
+2GENERIC: /   ( x y -- x/y )
+2GENERIC: /i  ( x y -- x/y )
+2GENERIC: /f  ( x y -- x/y )
+2GENERIC: mod ( x y -- x%y )
+
+2GENERIC: /mod ( x y -- x/y x%y )
+
+2GENERIC: bitand ( x y -- z )
+2GENERIC: bitor  ( x y -- z )
+2GENERIC: bitxor ( x y -- z )
+2GENERIC: shift  ( x n -- y )
+
+GENERIC: bitnot ( n -- n )
+
+! Math types
+BUILTIN: fixnum 0
+BUILTIN: bignum 9
+UNION: integer fixnum bignum ;
+
+BUILTIN: ratio 4
+UNION: rational integer ratio ;
+
+BUILTIN: float 10
+UNION: real rational float ;
+
+BUILTIN: complex 5
+UNION: number real complex ;
+
+M: real hashcode ( n -- n ) >fixnum ;
+
+M: number = ( n n -- ? ) number= ;
+
+: max ( x y -- z )
+    2dup > [ drop ] [ nip ] ifte ;
+
+: min ( x y -- z )
+    2dup < [ drop ] [ nip ] ifte ;
+
+: between? ( x min max -- ? )
+    #! Push if min <= x <= max. Handles case where min > max
+    #! by swapping them.
+    2dup > [ swap ] when  >r dupd max r> min = ;
+
+: sq dup * ; inline
+
+: pred 1 - ; inline
+: succ 1 + ; inline
+
+: neg 0 swap - ; inline
+: recip 1 swap / ; inline
+
+: rem ( x y -- x%y )
+    #! Like modulus, but always gives a positive result.
+    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ;
+
+: sgn ( n -- -1/0/1 )
+    #! Push the sign of a real number.
+    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
 
 : mag2 ( x y -- mag )
     #! Returns the magnitude of the vector (x,y).
     swap sq swap sq + fsqrt ;
 
-: abs ( z -- abs )
-    #! Compute the complex absolute value.
-    dup complex? [ >rect mag2 ] [ dup 0 < [ neg ] when ] ifte ;
+GENERIC: abs ( z -- |z| )
+M: real abs dup 0 < [ neg ] when ;
 
-: conjugate ( z -- z* )
-    >rect neg rect> ;
+: (gcd) ( x y -- z )
+    dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 
-: arg ( z -- arg )
-    #! Compute the complex argument.
-    >rect swap fatan2 ; inline
-
-: >polar ( z -- abs arg )
-    >rect 2dup swap fatan2 >r mag2 r> ;
-
-: cis ( theta -- cis )
-    dup fcos swap fsin rect> ;
-
-: polar> ( abs arg -- z )
-    cis * ; inline
+: gcd ( x y -- z )
+    #! Greatest common divisor.
+    abs swap abs 2dup < [ swap ] when (gcd) ;
 
 : align ( offset width -- offset )
     2dup mod dup 0 = [ 2drop ] [ - + ] ifte ;

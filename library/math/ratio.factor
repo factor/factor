@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=0:
 
 ! $Id$
 !
@@ -25,44 +25,32 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: math-internals
 USE: generic
-USE: lists
+USE: kernel
 USE: math
-USE: math-internals
-USE: strings
-USE: vectors
-USE: words
-USE: vectors
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+: 2>fraction ( a/b c/d -- a c b d )
+    [ swap numerator swap numerator ] 2keep
+    swap denominator swap denominator ; inline
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
+M: ratio number= ( a/b c/d -- ? )
+    2>fraction number= [ number= ] [ 2drop f ] ifte ;
 
-: dispatch ( n vtable -- )
-    vector-nth call ;
+: scale ( a/b c/d -- a*d b*c )
+    2>fraction >r * swap r> * swap ; inline
 
-: 2generic ( n n vtable -- )
-    >r arithmetic-type r> dispatch ; inline
+: ratio+d ( a/b c/d -- b*d )
+    denominator swap denominator * ; inline
 
-GENERIC: hashcode
-M: object hashcode drop 0 ;
+M: ratio < scale < ;
+M: ratio <= scale <= ;
+M: ratio > scale > ;
+M: ratio >= scale >= ;
 
-GENERIC: =
-M: object = eq? ;
-
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
-
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    17 ;
-
-IN: syntax
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+M: ratio + ( x y -- x+y ) 2dup scale + -rot ratio+d integer/ ;
+M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d integer/ ;
+M: ratio * ( x y -- x*y ) 2>fraction * >r * r> integer/ ;
+M: ratio / scale integer/ ;
+M: ratio /i scale /i ;
+M: ratio /f scale /f ;

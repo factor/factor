@@ -35,6 +35,8 @@ USE: parser
 USE: strings
 USE: words
 USE: vectors
+USE: math
+USE: math-internals
 
 ! A simple single-dispatch generic word system.
 
@@ -53,7 +55,10 @@ USE: vectors
 ! The class of an object with traits is determined by the object
 ! identity of the traits method map.
 ! - metaclass: a metaclass is a symbol with a handful of word
-! properties: "define-method" "builtin-types"
+! properties: "define-method" "builtin-types" "priority"
+
+! Metaclasses have priority -- this induces an order in which
+! methods are added to the vtable.
 
 : undefined-method
     "No applicable method." throw ;
@@ -65,33 +70,81 @@ USE: vectors
     #! A list of builtin supertypes of the class.
     dup metaclass "builtin-supertypes" word-property call ;
 
-: add-method ( definition type vtable -- )
+: set-vtable ( definition class vtable -- )
     >r "builtin-type" word-property r> set-vector-nth ;
 
-: define-generic ( word vtable -- )
-    2dup "vtable" set-word-property
-    [ generic ] cons define-compound ;
+: <empty-vtable> ( -- vtable )
+    num-types [ drop [ undefined-method ] ] vector-project ;
 
-: <vtable> ( default -- vtable )
-    num-types [ drop dup ] vector-project nip ;
+: class-ord ( class -- n ) metaclass "priority" word-property ;
+
+: class< ( cls1 cls2 -- ? )
+    swap car class-ord swap car class-ord < ;
+
+: sort-methods ( methods -- alist )
+    hash>alist [ class< ] sort ;
+
+: add-method ( vtable definition class -- )
+    #! Add the method entry to the vtable. Unlike define-method,
+    #! this is called at vtable build time, and in the sorted
+    #! order.
+    dup metaclass "add-method" word-property
+    [ [ undefined-method ] ] unless* call ;
+
+: <vtable> ( methods -- vtable )
+    <empty-vtable> swap sort-methods [
+        dupd unswons add-method
+    ] each ;
 
 DEFER: add-traits-dispatch
 
+: define-generic ( word vtable -- )
+    over "combination" word-property cons define-compound ;
+
+: (define-method) ( definition class generic -- )
+    [ "methods" word-property [ set-hash ] keep <vtable> ] keep
+    swap define-generic ;
+
 ! Defining generic words
+: (GENERIC) ( combination -- )
+    #! Takes a combination parameter. A combination is a
+    #! quotation that takes some objects and a vtable from the
+    #! stack, and calls the appropriate row of the vtable.
+    CREATE 2dup "combination" word-property = [
+        2drop
+    ] [
+        [ swap "combination" set-word-property ] keep
+        dup <namespace> "methods" set-word-property
+        <empty-vtable> [ add-traits-dispatch ] 2keep
+        define-generic
+    ] ifte ;
+
+: single-combination ( obj vtable -- )
+    >r dup type r> dispatch ; inline
+
 : GENERIC:
-    #! GENERIC: bar creates a generic word bar that calls the
-    #! bar method on the traits object, with the traits object
-    #! on the stack.
-    CREATE [ undefined-method ] <vtable>
-    2dup add-traits-dispatch
-    define-generic ; parsing
+    #! GENERIC: bar creates a generic word bar. Add methods to
+    #! the generic word using M:.
+    [ single-combination ] (GENERIC) ; parsing
+
+: arithmetic-combination ( n n vtable -- )
+    #! Note that the numbers remain on the stack, possibly after
+    #! being coerced to a maximal type.
+    >r arithmetic-type r> dispatch ; inline
+
+: 2GENERIC:
+    #! 2GENERIC: bar creates a generic word bar. Add methods to
+    #! the generic word using M:. 2GENERIC words dispatch on
+    #! arithmetic types and should not be used for non-numerical
+    #! types.
+    [ arithmetic-combination ] (GENERIC) ; parsing
 
 : define-method ( class -- quotation )
     #! In a vain attempt at something resembling a "meta object
     #! protocol", we call the "define-method" word property with
     #! stack ( class generic definition -- ).
     metaclass "define-method" word-property
-    [ [ undefined-method ] ] unless* ;
+    [ [ -rot (define-method) ] ] unless* ;
 
 : M: ( -- class generic [ ] )
     #! M: foo bar begins a definition of the bar generic word

@@ -36,6 +36,8 @@ USE: strings
 
 BUILTIN: word 1
 
+M: word hashcode word-hashcode ;
+
 SYMBOL: vocabularies
 
 : word-property ( word pname -- pvalue )

@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=0:
 
 ! $Id$
 !
@@ -25,44 +25,19 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: math-internals
 USE: generic
-USE: lists
+USE: kernel
 USE: math
-USE: math-internals
-USE: strings
-USE: vectors
-USE: words
-USE: vectors
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+M: float number= float= ;
+M: float < float< ;
+M: float <= float<= ;
+M: float > float> ;
+M: float >= float>= ;
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
-
-: dispatch ( n vtable -- )
-    vector-nth call ;
-
-: 2generic ( n n vtable -- )
-    >r arithmetic-type r> dispatch ; inline
-
-GENERIC: hashcode
-M: object hashcode drop 0 ;
-
-GENERIC: =
-M: object = eq? ;
-
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
-
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    17 ;
-
-IN: syntax
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+M: float + float+ ;
+M: float - float- ;
+M: float * float* ;
+M: float / float/f ;
+M: float /f float/f ;

@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=0:
 
 ! $Id$
 !
@@ -25,44 +25,60 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel
+IN: math-internals
 USE: generic
-USE: lists
+USE: kernel
 USE: math
-USE: math-internals
-USE: strings
-USE: vectors
-USE: words
-USE: vectors
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+: reduce ( x y -- x' y' )
+    dup 0 < [ swap neg swap neg ] when
+    2dup gcd tuck /i >r /i r> ; inline
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
+: integer/ ( x y -- x/y )
+    reduce fraction> ; inline
 
-: dispatch ( n vtable -- )
-    vector-nth call ;
+M: fixnum number= fixnum= ;
+M: fixnum < fixnum< ;
+M: fixnum <= fixnum<= ;
+M: fixnum > fixnum> ;
+M: fixnum >= fixnum>= ;
 
-: 2generic ( n n vtable -- )
-    >r arithmetic-type r> dispatch ; inline
+M: fixnum + fixnum+ ;
+M: fixnum - fixnum- ;
+M: fixnum * fixnum* ;
+M: fixnum / integer/ ;
+M: fixnum /i fixnum/i ;
+M: fixnum /f fixnum/f ;
+M: fixnum mod fixnum-mod ;
 
-GENERIC: hashcode
-M: object hashcode drop 0 ;
+M: fixnum /mod fixnum/mod ;
 
-GENERIC: =
-M: object = eq? ;
+M: fixnum bitand fixnum-bitand ;
+M: fixnum bitor fixnum-bitor ;
+M: fixnum bitxor fixnum-bitxor ;
+M: fixnum shift fixnum-shift ;
 
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
+M: fixnum bitnot fixnum-bitnot ;
 
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    17 ;
+M: bignum number= bignum= ;
+M: bignum < bignum< ;
+M: bignum <= bignum<= ;
+M: bignum > bignum> ;
+M: bignum >= bignum>= ;
 
-IN: syntax
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+M: bignum + bignum+ ;
+M: bignum - bignum- ;
+M: bignum * bignum* ;
+M: bignum / integer/ ;
+M: bignum /i bignum/i ;
+M: bignum /f bignum/f ;
+M: bignum mod bignum-mod ;
+
+M: bignum /mod bignum/mod ;
+
+M: bignum bitand bignum-bitand ;
+M: bignum bitor bignum-bitor ;
+M: bignum bitxor bignum-bitxor ;
+M: bignum shift bignum-shift ;
+
+M: bignum bitnot bignum-bitnot ;

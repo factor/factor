@@ -24,15 +24,11 @@
 + oop:
 
 - union metaclass
-- add defined methods to a word prop
-- M: sort method list, build vtable, redefine generic
 - 2generic
 - move generic, 2generic from kernel vocabulary
 - generic = hashcode and math ops
-- no vtable word-prop
 - make see work with generics
 - doc comments of generics
-- GENERIC: don't install empty vtable if already defined
 
 + ffi:
 

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -26,35 +26,53 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
+USE: generic
 USE: kernel
+USE: math
 
-: integer? dup fixnum? swap bignum? or ;
-: rational? dup integer? swap ratio? or ;
-: real? dup number? swap complex? not and ;
+: >rect ( x -- xr xi ) dup real swap imaginary ;
 
-: max ( x y -- z )
-    2dup > [ drop ] [ nip ] ifte ;
+IN: math-internals
 
-: min ( x y -- z )
-    2dup < [ drop ] [ nip ] ifte ;
+: 2>rect ( x y -- xr yr xi yi )
+    [ swap real swap real ] 2keep
+    swap imaginary swap imaginary ;
 
-: between? ( x min max -- ? )
-    #! Push if min <= x <= max. Handles case where min > max
-    #! by swapping them.
-    2dup > [ swap ] when  >r dupd max r> min = ;
+M: complex number= ( x y -- ? )
+    2>rect number= [ number= ] [ 2drop f ] ifte ;
 
-: sq dup * ; inline
+: *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
+: *im ( x y -- xi*yr xr*yi ) 2>rect >r * swap r> * ; inline
 
-: pred 1 - ; inline
-: succ 1 + ; inline
+M: complex + 2>rect + >r + r> rect> ;
+M: complex - 2>rect - >r - r> rect> ;
+M: complex * ( x y -- x*y ) 2dup *re - -rot *im + rect> ;
 
-: neg 0 swap - ; inline
-: recip 1 swap / ; inline
+: abs^2 ( x -- y ) >rect sq swap sq + ; inline
+: complex/ ( x y -- r i m )
+    #! r = xr*yr+xi*yi, i = xi*yr-xr*yi, m = yr*yr+yi*yi
+    dup abs^2 >r 2dup *re + -rot *im - r> ; inline
 
-: rem ( x y -- x%y )
-    #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ;
+M: complex / ( x y -- x/y ) complex/ tuck / >r / r> rect> ;
+M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> rect> ;
 
-: sgn ( n -- -1/0/1 )
-    #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
+M: complex abs ( z -- |z| ) >rect mag2 ;
+
+: conjugate ( z -- z* )
+    >rect neg rect> ;
+
+: arg ( z -- arg )
+    #! Compute the complex argument.
+    >rect swap fatan2 ;
+
+: >polar ( z -- abs arg )
+    >rect 2dup swap fatan2 >r mag2 r> ;
+
+: cis ( theta -- cis )
+    dup fcos swap fsin rect> ;
+
+: polar> ( abs arg -- z )
+    cis * ;
+
+M: complex hashcode ( n -- n )
+    >rect >fixnum swap >fixnum bitxor ;

@@ -31,8 +31,14 @@ USE: kernel
 USE: lists
 USE: math
 
+! Define methods bound to primitives
 BUILTIN: string 12
+M: string hashcode str-hashcode ;
+M: string = str= ;
+
 BUILTIN: sbuf   13
+M: sbuf hashcode sbuf-hashcode ;
+M: sbuf = sbuf= ;
 
 : f-or-"" ( obj -- ? )
     dup not swap "" = or ;
@@ -136,11 +142,11 @@ BUILTIN: sbuf   13
         -rot 2dup >r >r >r str-nth r> call r> r>
     ] times* 2drop ; inline
 
-: blank? ( ch -- ? ) " \t\n\r" str-contains? ;
-: letter? ( ch -- ? ) CHAR: a CHAR: z between? ;
-: LETTER? ( ch -- ? ) CHAR: A CHAR: Z between? ;
-: digit? ( ch -- ? ) CHAR: 0 CHAR: 9 between? ;
-: printable? ( ch -- ? ) CHAR: \s CHAR: ~ between? ;
+PREDICATE: integer blank     " \t\n\r" str-contains? ;
+PREDICATE: integer letter    CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
