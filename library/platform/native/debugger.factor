@@ -62,6 +62,8 @@ USE: vectors
         "Incomparable types: "
         "Float format: "
         "Signal "
+        "Adding I/O task twice on port: "
+        "No I/O tasks"
     } ?vector-nth ;
 
 : ?kernel-error ( cons -- error# param )

@@ -56,7 +56,7 @@ public class FactorCompletion extends SideKickCompletion
 
 	public String getLongestPrefix()
 	{
-		return "";
+		return MiscUtilities.getLongestPrefix(items,false);
 	}
 
 	public void insert(int index)
@@ -78,7 +78,7 @@ public class FactorCompletion extends SideKickCompletion
 
 	public boolean handleKeystroke(int selectedIndex, char keyChar)
 	{
-		if(keyChar == '\t')
+		if(keyChar == '\t' || keyChar == '\n')
 			insert(selectedIndex);
 		else
 		{

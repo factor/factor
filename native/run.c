@@ -8,8 +8,11 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 void init_signals(void)
 {
 	struct sigaction custom_sigaction;
+	struct sigaction ign_sigaction;
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
+	ign_sigaction.sa_handler = SIG_IGN;
+	ign_sigaction.sa_flags = 0;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
 	sigaction(SIGBUS,&custom_sigaction,NULL);

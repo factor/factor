@@ -168,6 +168,19 @@ public class FactorSideKickParser extends SideKickParser
 			== ReadTable.WHITESPACE);
 	} //}}}
 	
+	//{{{ canCompleteAnywhere() method
+	/**
+	 * Returns if completion popups should be shown after any period of
+	 * inactivity. Otherwise, they are only shown if explicitly requested
+	 * by the user.
+	 *
+	 * Returns false by default.
+	 */
+	public boolean canCompleteAnywhere()
+	{
+		return false;
+	} //}}}
+
 	//{{{ complete() method
 	/**
 	 * Returns completions suitable for insertion at the specified position.

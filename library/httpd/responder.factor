@@ -60,7 +60,9 @@ USE: httpd
 
 : redirect ( to -- )
     "301 Moved Permanently" "text/plain" response write
-    "Location: " write print ;
+    "Location: " write write
+    terpri terpri
+    "The resource has moved." print ;
 
 : get-responder ( name -- responder )
     "httpd-responders" get get* ;

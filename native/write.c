@@ -11,8 +11,12 @@ bool write_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-			io_error(__FUNCTION__);
-		return false;
+		{
+			postpone_io_error(port,__FUNCTION__);
+			return true;
+		}
+		else
+			return false;
 	}
 	else
 	{
@@ -24,6 +28,8 @@ bool write_step(PORT* port)
 bool can_write(PORT* port, FIXNUM len)
 {
 	CELL buf_capacity;
+
+	pending_io_error(port);
 
 	switch(port->type)
 	{
@@ -110,6 +116,8 @@ void primitive_write_8(void)
 
 	CELL text = dpop();
 	CELL type = type_of(text);
+
+	pending_io_error(port);
 
 	switch(type)
 	{

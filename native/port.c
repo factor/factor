@@ -25,6 +25,7 @@ PORT* port(PORT_MODE type, CELL fd)
 	port->line_ready = false;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
+	port->io_error = F;
 
 	if(type == PORT_SPECIAL)
 		port->buffer = NULL;
@@ -58,6 +59,7 @@ void fixup_port(PORT* port)
 	fixup(&port->line);
 	fixup(&port->client_host);
 	fixup(&port->client_port);
+	fixup(&port->io_error);
 }
 
 void collect_port(PORT* port)
@@ -67,4 +69,36 @@ void collect_port(PORT* port)
 	copy_object(&port->line);
 	copy_object(&port->client_host);
 	copy_object(&port->client_port);
+	copy_object(&port->io_error);
+}
+
+CELL make_io_error(const char* func)
+{
+	STRING* function = from_c_string(func);
+	STRING* error = from_c_string(strerror(errno));
+
+	CONS* c = cons(tag_object(function),tag_cons(
+		cons(tag_object(error),F)));
+
+	return tag_cons(c);
+}
+
+void postpone_io_error(PORT* port, const char* func)
+{
+	port->io_error = make_io_error(func);
+}
+
+void io_error(const char* func)
+{
+	general_error(ERROR_IO,make_io_error(func));
+}
+
+void pending_io_error(PORT* port)
+{
+	CELL io_error = port->io_error;
+	if(io_error != F)
+	{
+		port->io_error = F;
+		general_error(ERROR_IO,io_error);
+	}
 }

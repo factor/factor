@@ -3,18 +3,13 @@
 - maple-like: press enter at old commands to evaluate there
 - standalone listener input style
 - add a socket timeout
-- drop test in http server
 - jedit bug? +line doesn't always work when switching into an existing
   buffer with a remembered first line
-- jedit bug? ' in noWordSep ignored
-- word names containing ' not quoted properly
-- completion: enter no good
-- completion: don't show automatically
 - balance needs USE:
-- postpone errors until actual read/write op
 - command line arguments
 - socket protocol
 - irc: stack underflow?
+- ignore SIGPIPE
 
 + docs:
 

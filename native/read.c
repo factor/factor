@@ -3,7 +3,7 @@
 /* Return true if something was read */
 bool read_step(PORT* port)
 {
-	FIXNUM  amount = 0;
+	FIXNUM amount = 0;
 
 	if(port->type == PORT_RECV)
 	{
@@ -24,8 +24,12 @@ bool read_step(PORT* port)
 	if(amount < 0)
 	{
 		if(errno != EAGAIN)
-			io_error(__FUNCTION__);
-		return false;
+		{
+			postpone_io_error(port,__FUNCTION__);
+			return true;
+		}
+		else
+			return false;
 	}
 	else
 	{
@@ -76,6 +80,8 @@ bool read_line_step(PORT* port)
 
 bool can_read_line(PORT* port)
 {
+	pending_io_error(port);
+
 	if(port->line_ready)
 		return true;
 	else
@@ -133,6 +139,9 @@ bool perform_read_line_io_task(PORT* port)
 void primitive_read_line_8(void)
 {
 	PORT* port = untag_port(dpeek());
+
+	pending_io_error(port);
+
 	if(port->line_ready)
 	{
 		drepl(port->line);
@@ -170,6 +179,8 @@ bool read_count_step(PORT* port)
 
 bool can_read_count(PORT* port, FIXNUM count)
 {
+	pending_io_error(port);
+
 	if(port->line != F && CAN_READ_COUNT(port,count))
 		return true;
 	else
@@ -222,6 +233,9 @@ void primitive_read_count_8(void)
 	FIXNUM len = to_fixnum(dpop());
 	if(port->count != len)
 		critical_error("read# counts don't match",port);
+
+	pending_io_error(port);
+
 	dpush(port->line);
 	port->line = F;
 	port->line_ready = false;

@@ -14,5 +14,7 @@ USE: test
 "20 <sbuf> \"foo\" set" eval
 "garbage-collection" eval
 
-[ drop ] [ drop ] catch
-[ drop ] [ drop ] catch
+[
+    [ drop ] [ drop ] catch
+    [ drop ] [ drop ] catch
+] keep-datastack

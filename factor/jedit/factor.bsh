@@ -13,7 +13,7 @@ factorWord(view)
 		if(textArea.selectionCount == 0)
 			textArea.selectWord();
 		return "\""
-			+ MiscUtilities.charsToEscapes(textArea.selectedText)
+			+ factor.FactorReader.charsToEscapes(textArea.selectedText)
 			+ "\" " + factor.FactorReader.unparseObject(data.use)
 			+ " search";
 	}

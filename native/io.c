@@ -34,7 +34,7 @@ IO_TASK* add_io_task(
 	int fd = port->fd;
 
 	if(io_tasks[fd].port != F)
-		critical_error("Adding I/O task twice",fd);
+		general_error(ERROR_IO_TASK_TWICE,tag_object(port));
 
 	io_tasks[fd].type = type;
 	io_tasks[fd].port = tag_object(port);
@@ -193,7 +193,7 @@ CELL next_io_task(void)
 		write_fd_count,write_io_tasks);
 
 	if(!reading && !writing)
-		critical_error("next_io_task() called with no IO tasks",0);
+		general_error(ERROR_IO_TASK_NONE,F);
 
 	set_up_fd_set(&except_fd_set,
 		read_fd_count,read_io_tasks);

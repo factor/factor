@@ -28,6 +28,9 @@ typedef struct {
 	CELL client_port;
 	/* untagged fd of accepted connection */
 	CELL client_socket;
+
+	/* a pending I/O error or F */
+	CELL io_error;
 } PORT;
 
 PORT* untag_port(CELL tagged);
@@ -36,3 +39,6 @@ void init_line_buffer(PORT* port, FIXNUM count);
 void primitive_portp(void);
 void fixup_port(PORT* port);
 void collect_port(PORT* port);
+void postpone_io_error(PORT* port, const char* func);
+void io_error(const char* func);
+void pending_io_error(PORT* port);

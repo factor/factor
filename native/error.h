@@ -8,6 +8,8 @@
 #define ERROR_INCOMPARABLE (7<<3)
 #define ERROR_FLOAT_FORMAT (8<<3)
 #define ERROR_SIGNAL (9<<3)
+#define ERROR_IO_TASK_TWICE (10<<3)
+#define ERROR_IO_TASK_NONE (11<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
@@ -16,4 +18,3 @@ void throw_error(CELL object);
 void general_error(CELL error, CELL tagged);
 void type_error(CELL type, CELL tagged);
 void range_error(CELL tagged, CELL index, CELL max);
-void io_error(const char* func);

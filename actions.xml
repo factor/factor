@@ -18,7 +18,7 @@
 			VFSManager.waitForRequests();
 			factorEval(view,
 				"\""
-				+ MiscUtilities.charsToEscapes(buffer.path)
+				+ factor.FactorReader.charsToEscapes(buffer.path)
 				+ "\" run-file");
 		</CODE>
 	</ACTION>
@@ -28,7 +28,7 @@
 				textArea.selectWord();
 			factorEval(view,
 				"\""
-				+ MiscUtilities.charsToEscapes(
+				+ factor.FactorReader.charsToEscapes(
 				textArea.selectedText)
 				+ "\" apropos.");
 		</CODE>
