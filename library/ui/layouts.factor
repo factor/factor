@@ -27,7 +27,7 @@ M: gadget layout* drop ;
 TUPLE: pile align gap delegate ;
 
 C: pile ( align gap -- pile )
-    0 0 0 0 <rectangle> <gadget> over set-pile-delegate
+    <empty-gadget> over set-pile-delegate
     [ set-pile-gap ] keep
     [ set-pile-align ] keep ;
 
@@ -49,7 +49,7 @@ M: pile layout* ( pile -- )
 TUPLE: shelf gap align delegate ;
 
 C: shelf ( align gap -- shelf )
-    0 0 0 0 <rectangle> <gadget> over set-shelf-delegate
+    <empty-gadget> over set-shelf-delegate
     [ set-shelf-gap ] keep
     [ set-shelf-align ] keep ;
 
@@ -78,7 +78,7 @@ C: border ( delegate size -- border )
     5 <border> [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
 
 : empty-border ( child -- border )
-    0 0 0 0 <rectangle> <gadget> standard-border ;
+    <empty-gadget> standard-border ;
 
 : bevel-border ( child -- border )
     3 0 0 0 0 <bevel-rect> <gadget> standard-border ;
@@ -107,7 +107,7 @@ M: border layout* ( border -- )
 ! A stack just lays out all its children on top of each other.
 TUPLE: stack delegate ;
 C: stack ( list -- stack )
-    0 0 0 0 <rectangle> <gadget>
+    <empty-gadget>
     over set-stack-delegate
     swap [ over add-gadget ] each ;
 

@@ -8,7 +8,7 @@ USING: generic kernel lists math namespaces sdl sdl-ttf ;
 TUPLE: label text delegate ;
 
 C: label ( text -- )
-    0 0 0 0 <rectangle> <gadget> over set-label-delegate
+    <empty-gadget> over set-label-delegate
     [ set-label-text ] keep ;
 
 M: label layout* ( label -- )

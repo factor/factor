@@ -182,6 +182,7 @@ cpu "x86" = "mini" get not and [
         "/library/ui/halo.factor"
         "/library/ui/dialogs.factor"
         "/library/ui/events.factor"
+        "/library/ui/viewports.factor"
     ] [
         dup print
         run-resource

@@ -18,6 +18,9 @@ C: gadget ( shape -- gadget )
     [ t swap set-gadget-relayout? ] keep
     [ t swap set-gadget-redraw? ] keep ;
 
+: <empty-gadget> ( -- gadget )
+    0 0 0 0 <rectangle> <gadget> ;
+
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
     #! loop.

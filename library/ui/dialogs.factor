@@ -3,11 +3,14 @@ USING: kernel namespaces threads ;
 
 TUPLE: dialog continuation delegate ;
 
+: dialog-action ( ok dialog -- )
+    dup unparent  dialog-continuation call ;
+
 : dialog-ok ( dialog -- )
-    dup unparent t swap dialog-continuation call ;
+    t swap dialog-action ;
 
 : dialog-cancel ( dialog -- )
-    dup unparent f swap dialog-continuation call ;
+    f swap dialog-action ;
 
 : <dialog-buttons> ( -- gadget )
     <default-shelf>
@@ -16,15 +19,20 @@ TUPLE: dialog continuation delegate ;
     "Cancel" [ [ dialog-cancel ] swap handle-gesture drop ]
     <button> over add-gadget ;
 
-C: dialog ( content continuation -- gadget )
-    [ set-dialog-continuation ] keep
-    <default-pile> over set-dialog-delegate
-    [ add-gadget ] keep
-    [ >r <dialog-buttons> r> add-gadget ] keep
-    ( bevel-border )
+: dialog-actions ( dialog -- )
     dup moving-actions
     dup [ dialog-ok ] dup set-action
-    dup [ dialog-cancel ] dup set-action ;
+    [ dialog-cancel ] dup set-action ;
+
+C: dialog ( content -- gadget )
+    [ f bevel-border swap set-dialog-delegate ] keep
+    [
+        >r <default-pile>
+        [ add-gadget ] keep
+        [ <dialog-buttons> swap add-gadget ] keep
+        r> add-gadget
+    ] keep
+    [ dialog-actions ] keep ;
 
 : <prompt> ( prompt -- gadget )
     0 default-gap <pile>
@@ -32,7 +40,10 @@ C: dialog ( content continuation -- gadget )
     [ >r "" <field> r> add-gadget ] keep ;
 
 : <input-dialog> ( prompt continuation -- gadget )
-    >r <prompt> r> <dialog> ;
+    >r <prompt> <dialog> r> over set-dialog-continuation ;
 
 : input-dialog ( prompt -- input )
+    #! Show an input dialog and resume the current continuation
+    #! when the user clicks OK or Cancel. If they click Cancel,
+    #! push f.
     [ <input-dialog> world get add-gadget (yield) ] callcc1 ;

@@ -51,7 +51,7 @@ TUPLE: hand
     gadget focus delegate ;
 
 C: hand ( world -- hand )
-    0 0 0 0 <rectangle> <gadget>
+    <empty-gadget>
     over set-hand-delegate
     [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
