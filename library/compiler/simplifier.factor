@@ -92,6 +92,8 @@ SYMBOL: simplifying
     car cdr find-label cdr
 ] "next-logical" set-word-prop
 
+#epilogue [ cdr ] "next-logical" set-word-prop
+
 : next-logical? ( op linear -- ? )
     next-logical dup [ car car = ] [ 2drop f ] ifte ;
 

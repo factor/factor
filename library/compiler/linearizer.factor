@@ -31,6 +31,12 @@ SYMBOL: #target ( part of jump table )
 SYMBOL: #target-label
 SYMBOL: #end-dispatch
 
+! on PowerPC, compiled definitions that make subroutine calls
+! must have a prologue and epilogue to set up and tear down the
+! link register.
+SYMBOL: #prologue
+SYMBOL: #epilogue
+
 : linear, ( node -- )
     #! Add a node to the linear IR.
     [ node-op get node-param get ] bind cons , ;
@@ -50,7 +56,7 @@ SYMBOL: #end-dispatch
     #! jumps and labels, and turns dataflow IR nodes into
     #! lists where the first element is an operation, and the
     #! rest is arguments.
-    [ (linearize) ] make-list ;
+    [ [ #prologue ] , (linearize) ] make-list ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -83,6 +89,8 @@ SYMBOL: #end-dispatch
     linearize-simple-label
 ] "linearizer" set-word-prop
 
+: return,  [ #epilogue ] ,  [ #return ] , ;
+
 : linearize-label ( node -- )
     #! Labels are tricky, because they might contain non-tail
     #! calls. So we push the address of the location right after
@@ -92,7 +100,7 @@ SYMBOL: #end-dispatch
     #! not contain non-tail recursive calls to itself.
     <label> dup #return-to swons , >r
     linearize-simple-label
-    [ #return ] ,
+    return,
     r> label, ;
 
 #label [
@@ -136,3 +144,5 @@ SYMBOL: #end-dispatch
 ] "linearizer" set-word-prop
 
 #values [ drop ] "linearizer" set-word-prop
+
+#return [ drop return, ] "linearizer" set-word-prop

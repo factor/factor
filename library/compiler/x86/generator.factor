@@ -4,6 +4,10 @@ IN: compiler
 USING: alien assembler inference kernel kernel-internals lists
 math memory namespaces words ;
 
+! Not used on x86
+#prologue [ drop ] "generator" set-word-prop
+#epilogue [ drop ] "generator" set-word-prop
+
 \ slot [
     PEEK-DS
     2unlist type-tag >r cell * r> - EAX swap 2list EAX swap MOV
