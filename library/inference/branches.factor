@@ -222,7 +222,7 @@ SYMBOL: cloned
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
-    2list >r 1 meta-d get vector-tail* #ifte r>
+    2list >r 1 meta-d get vector-tail* \ ifte r>
     pop-d [
         dup \ general-t cons ,
         \ f cons ,
@@ -246,15 +246,15 @@ SYMBOL: cloned
     dup value-recursion swap literal-value vector>list
     [ over <literal> ] map nip ;
 
+USE: kernel-internals
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
-    >r 1 meta-d get vector-tail* #dispatch r>
+    >r 1 meta-d get vector-tail* \ dispatch r>
     pop-d ( n ) num-types [ dupd cons ] project nip zip
     infer-branches ;
 
-USE: kernel-internals
 \ dispatch [ infer-dispatch ] "infer" set-word-property
 \ dispatch [ [ fixnum vector ] [ ] ]
 "infer-effect" set-word-property

@@ -77,7 +77,7 @@ predicate [
     pick "superclass" word-property "predicate" word-property
     [ \ dup , append, , [ drop f ] , \ ifte , ] make-list
     define-compound
-    predicate define-class ;
+    predicate "metaclass" set-word-property ;
 
 : PREDICATE: ( -- class predicate definition )
     #! Followed by a superclass name, then a class name.

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -117,21 +117,20 @@ USE: unparser
     scan dup "use" cons@ "in" set ; parsing
 
 ! Char literal
-: CHAR: ( -- ) next-word-ch parse-ch swons ; parsing
+: CHAR: ( -- ) 0 scan next-char drop swons ; parsing
 
 ! String literal
-: parse-string ( -- )
-    next-ch dup CHAR: " = [
-        drop
+: parse-string ( n str -- n )
+    2dup str-nth CHAR: " = [
+        drop 1 +
     ] [
-        parse-ch , parse-string
+        [ next-char swap , ] keep parse-string
     ] ifte ;
 
 : "
-    #! Note the ugly hack to carry the new value of 'pos' from
-    #! the make-string scope up to the original scope.
-    [ parse-string "col" get ] make-string
-    swap "col" set swons ; parsing
+    "col" [
+        "line" get [ parse-string ] make-string swap
+    ] change swons ; parsing
 
 ! Comments
 : (

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -48,22 +48,6 @@ USE: unparser
 : parsing? ( word -- ? )
     dup word? [ "parsing" word-property ] [ drop f ] ifte ;
 
-: end? ( -- ? )
-    "col" get "line" get str-length >= ;
-
-: (with-parser) ( quot -- )
-    end? [ drop ] [ [ call ] keep (with-parser) ] ifte ;
-
-: with-parser ( text quot -- )
-    #! Keep calling the quotation until we reach the end of the
-    #! input.
-    swap "line" set 0 "col" set
-    (with-parser)
-    "line" off "col" off ;
-
-: ch ( -- ch ) "col" get "line" get str-nth ;
-: advance ( -- ) "col" [ 1 + ] change ;
-
 : skip ( n line quot -- n )
     #! Find the next character that satisfies the quotation,
     #! which should have stack effect ( ch -- ? ).
@@ -80,9 +64,6 @@ USE: unparser
 : skip-blank ( n line -- n )
     [ blank? not ] skip ;
 
-: skip-word ( n line -- n )
-    [ blank? ] skip ;
-
 : denotation? ( ch -- ? )
     #! Hard-coded for now. Make this customizable later.
     #! A 'denotation' is a character that is treated as its
@@ -93,37 +74,35 @@ USE: unparser
     #! Will call the parsing word ".
     "\"" str-contains? ;
 
-: (scan) ( n line -- start end )
-    dup >r skip-blank dup r>
-    2dup str-length < [
-        2dup str-nth denotation? [
-            drop 1 +
-        ] [
-            skip-word
-        ] ifte
+: skip-word ( n line -- n )
+    2dup str-nth denotation? [
+        drop 1 +
     ] [
-        drop
+        [ blank? ] skip
     ] ifte ;
+
+: (scan) ( n line -- start end )
+    [ skip-blank dup ] keep
+    2dup str-length < [ skip-word ] [ drop ] ifte ;
 
 : scan ( -- token )
     "col" get "line" get dup >r (scan) dup "col" set
-    2dup = [
-        r> 3drop f
-    ] [
-        r> substring
-    ] ifte ;
+    2dup = [ r> 3drop f ] [ r> substring ] ifte ;
 
 : scan-word ( -- obj )
     scan dup [
         dup "use" get search [ str>number ] ?unless
     ] when ;
 
+: parse-loop ( -- )
+    scan-word [
+        dup parsing? [ execute ] [ swons ] ifte  parse-loop
+    ] when* ;
+
 : (parse) ( str -- )
-    [
-        scan-word [
-            dup parsing? [ execute ] [ swons ] ifte
-        ] when*
-    ] with-parser ;
+    "line" set 0 "col" set
+    parse-loop
+    "line" off "col" off ;
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
@@ -151,12 +130,6 @@ USE: unparser
     #! the parser is already line-tokenized.
     (until-eol) (until) ;
 
-: next-ch ( -- ch )
-    end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
-
-: next-word-ch ( -- ch )
-    "col" get "line" get skip-blank "col" set next-ch ;
-
 : CREATE ( -- word )
     scan "in" get create dup set-word
     dup f "documentation" set-word-property
@@ -165,15 +138,7 @@ USE: unparser
     dup "col"         get "col"  set-word-property
     dup "file"        get "file" set-word-property ;
 
-! \x
-: unicode-escape>ch ( -- esc )
-    #! Read \u....
-    next-ch digit> 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + 16 *
-    next-ch digit> + ;
-
-: ascii-escape>ch ( ch -- esc )
+: escape ( ch -- esc )
     [
         [[ CHAR: e  CHAR: \e ]]
         [[ CHAR: n  CHAR: \n ]]
@@ -184,20 +149,21 @@ USE: unparser
         [[ CHAR: 0  CHAR: \0 ]]
         [[ CHAR: \\ CHAR: \\ ]]
         [[ CHAR: \" CHAR: \" ]]
-    ] assoc ;
+    ] assoc dup [ "Bad escape" throw ] unless ;
 
-: escape ( ch -- esc )
-    dup CHAR: u = [
-        drop unicode-escape>ch
+: next-escape ( n str -- ch n )
+    2dup str-nth CHAR: u = [
+        swap 1 + dup 4 + [ rot substring hex> ] keep
     ] [
-        ascii-escape>ch
+        over 1 + >r str-nth escape r>
     ] ifte ;
 
-: parse-escape ( -- )
-    next-ch escape dup [ drop "Bad escape" throw ] unless ;
-
-: parse-ch ( ch -- ch )
-    dup CHAR: \\ = [ drop parse-escape ] when ;
+: next-char ( n str -- ch n )
+    2dup str-nth CHAR: \\ = [
+        >r 1 + r> next-escape
+    ] [
+        over 1 + >r str-nth r>
+    ] ifte ;
 
 : doc-comment-here? ( parsed -- ? )
     not "in-definition" get and ;

@@ -123,6 +123,7 @@ USE: unparser
             "compiler/ifte"
             "compiler/generic"
             "compiler/bail-out"
+            "compiler/linearizer"
         ] [
             test
         ] each

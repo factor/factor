@@ -172,21 +172,7 @@ M: cons = ( obj cons -- ? )
         ] ifte
     ] ifte ;
 
-: cons-hashcode ( cons count -- hash )
-    dup 0 number= [
-        2drop 0
-    ] [
-        over cons? [
-            1 - >r uncons r> tuck
-            cons-hashcode >r
-            cons-hashcode r>
-            bitxor
-        ] [
-            drop hashcode
-        ] ifte
-    ] ifte ;
-
-M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
+M: cons hashcode ( cons -- hash ) car hashcode ;
 
 : project ( n quot -- list )
     #! Execute the quotation n times, passing the loop counter

@@ -84,7 +84,7 @@ USE: words
 
 #return [ drop RET ] "generator" set-word-property
 
-#dispatch [
+\ dispatch [
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.

@@ -34,6 +34,8 @@ USE: namespaces
 USE: words
 USE: strings
 USE: errors
+USE: prettyprint
+USE: kernel-internals
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching
@@ -51,7 +53,7 @@ SYMBOL: #jump ( tail-call )
 SYMBOL: #jump-label ( tail-call )
 SYMBOL: #return-to ( push addr on C stack )
 
-! #dispatch is linearized as #dispatch followed by a #target
+! dispatch is linearized as dispatch followed by a #target
 ! for each dispatch table entry. The linearizer ensures the
 ! correct number of #targets is emitted.
 SYMBOL: #target ( part of jump table )
@@ -127,8 +129,7 @@ SYMBOL: #target ( part of jump table )
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
-    uncons car
-    <label> [
+    2unlist  <label> [
         #jump-t swons ,
         (linearize) ( false branch )
         <label> dup #jump-label swons ,
@@ -136,14 +137,14 @@ SYMBOL: #target ( part of jump table )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
 
-#ifte [
+\ ifte [
     [ node-param get ] bind linearize-ifte
 ] "linearizer" set-word-property
 
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    [ #dispatch ] ,
+    [ dispatch ] ,
     <label> ( end label ) swap
     [ <label> dup #target swons ,  cons ] map ;
 
@@ -163,7 +164,7 @@ SYMBOL: #target ( part of jump table )
     #! take in case the top of stack has that type.
     dup check-dispatch dispatch-head dupd dispatch-body label, ;
 
-#dispatch [
+\ dispatch [
     [ node-param get ] bind linearize-dispatch
 ] "linearizer" set-word-property
 

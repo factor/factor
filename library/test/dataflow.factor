@@ -41,7 +41,7 @@ USE: generic
 ! ] unit-test
 
 [ t ] [
-    #ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
+    \ ifte [ [ drop ] [ + ] ifte ] dataflow dataflow-contains-op? >boolean
 ] unit-test
 
 : dataflow-consume-d-len ( object -- n )
@@ -55,7 +55,7 @@ USE: generic
 [ t ] [ [ 2 ] dataflow car dataflow-produce-d-len 1 = ] unit-test
 
 : dataflow-ifte-node-consume-d ( list -- node )
-    #ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
+    \ ifte swap dataflow-contains-op? car [ node-consume-d get ] bind ;
 
 [ t ] [
     [ [ swap ] [ nip "hi" ] ifte ] dataflow
@@ -64,7 +64,7 @@ USE: generic
 
 ! [ t ] [
 !     [ { [ drop ] [ undefined-method ] [ drop ] [ undefined-method ] } generic ] dataflow
-!     #dispatch swap dataflow-contains-op? car [
+!     \ dispatch swap dataflow-contains-op? car [
 !         node-param get [
 !             [ [ node-param get \ undefined-method = ] bind ] some?
 !         ] some?
@@ -94,6 +94,6 @@ SYMBOL: #test
 ! Somebody (cough) got the order of ifte nodes wrong.
 
 [ t ] [
-    #ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
+    \ ifte [ [ 1 ] [ 2 ] ifte ] dataflow dataflow-contains-op? car
     [ node-param get ] bind car car [ node-param get ] bind 1 =
 ] unit-test

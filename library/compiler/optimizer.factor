@@ -32,6 +32,7 @@ USE: kernel
 USE: inference
 USE: words
 USE: prettyprint
+USE: kernel-internals
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never
@@ -149,11 +150,11 @@ USE: prettyprint
 : branches-call-label? ( label list -- ? )
     [ dupd calls-label? ] some? nip ;
 
-#ifte [
+\ ifte [
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
-#dispatch [
+\ dispatch [
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-property
 
@@ -169,13 +170,13 @@ USE: prettyprint
     ] extend ,
 ] "kill-node" set-word-property
 
-#ifte [ scan-branches ] "scan-literal" set-word-property
-#ifte [ can-kill-branches? ] "can-kill" set-word-property
-#ifte [ kill-branches ] "kill-node" set-word-property
+\ ifte [ scan-branches ] "scan-literal" set-word-property
+\ ifte [ can-kill-branches? ] "can-kill" set-word-property
+\ ifte [ kill-branches ] "kill-node" set-word-property
 
-#dispatch [ scan-branches ] "scan-literal" set-word-property
-#dispatch [ can-kill-branches? ] "can-kill" set-word-property
-#dispatch [ kill-branches ] "kill-node" set-word-property
+\ dispatch [ scan-branches ] "scan-literal" set-word-property
+\ dispatch [ can-kill-branches? ] "can-kill" set-word-property
+\ dispatch [ kill-branches ] "kill-node" set-word-property
 
 ! Don't care about inputs to recursive combinator calls
 #call-label [ 2drop t ] "can-kill" set-word-property

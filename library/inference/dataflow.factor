@@ -49,9 +49,6 @@ SYMBOL: #call ( non-tail call )
 SYMBOL: #call-label
 SYMBOL: #push ( literal )
 
-SYMBOL: #ifte
-SYMBOL: #dispatch
-
 ! This is purely a marker for values we retain after a
 ! conditional. It does not generate code, but merely alerts the
 ! dataflow optimizer to the fact these values must be retained.
