@@ -156,7 +156,7 @@ USE: unparser
     <namespace> [
         dup "listener" set
         <listener-stream> "stdio" set
-        initial-interpreter-loop
+        interpreter-loop
         "listener" get close-listener
     ] bind ;
 

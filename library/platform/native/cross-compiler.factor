@@ -140,6 +140,7 @@ IN: cross-compiler
         set-datastack
         set-callstack
         handle?
+        exit*
     ] [
         swap succ tuck primitive,
     ] each drop ;

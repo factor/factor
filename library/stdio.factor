@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: stdio
+USE: errors
 USE: namespaces
 USE: stack
 USE: streams
@@ -56,7 +57,12 @@ USE: streams
     #! Print a newline to standard output.
     "\n" write ;
 
+: (with-stream) ( stream quot -- )
+    <namespace> [ swap "stdio" set call ] bind ;
+
 : with-stream ( stream quot -- )
-    <namespace> [
-        swap "stdio" set call "stdio" get fclose
-    ] bind ;
+    [
+        (with-stream)
+    ] [
+        >r drop fclose r> rethrow
+    ] catch ;

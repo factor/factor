@@ -50,6 +50,9 @@ USE: stack
     dup vector-length pred ( vector top )
     2dup swap vector-nth >r swap set-vector-length r> ;
 
+: >pop> ( stack -- stack )
+    dup vector-pop drop ;
+
 DEFER: vector-map
 
 : clone-vector ( vector -- vector )

@@ -86,9 +86,7 @@ USE: strings
     "interactive" get [
         [ "top-level-continuation" set ] callcc0
 
-        initial-interpreter-loop
+        interpreter-loop
     ] [
         f "top-level-continuation" set
-        f "initial-interpreter-continuation" set
-        f "initial-interpreter-callstack" set
     ] ifte ;

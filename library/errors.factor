@@ -46,9 +46,6 @@ USE: vectors
     #! instead of invoking this word directly.
     catchstack* vector-pop ;
 
-: >pop> ( stack -- stack )
-    dup vector-pop drop ;
-
 : save-error ( error -- )
     #! Save the stacks for most-mortem inspection after an
     #! error.

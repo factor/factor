@@ -27,46 +27,21 @@
 
 IN: continuations
 USE: combinators
+USE: errors
 USE: kernel
 USE: lists
 USE: namespaces
 USE: stack
+USE: vectors
 
-: continue ( datastack callstack namestack push -- )
-    #! Do not call this directly. Used by callcc.
-    ! Use a trick to carry the push parameter onto the new data stack.
-    3dip
-    set-namestack
-    >r
-    swap
-    >r
-    set-datastack drop
-    r>
-    call
-    r>
-    set-callstack ;
+: reify datastack >pop> callstack >pop> namestack catchstack ;
+: (callcc) cons cons cons cons swap call ;
 
-: callcc ( [ code ] -- )
-    #! Calls the code with a special quotation at the top of the
-    #! stack. The quotation has stack effect:
-    #!
-    #! ( list -- ... )
-    #!
-    #! When called, the quotation restores execution state to
-    #! the point after the callcc call, and pushes each element
-    #! of the list onto the original data stack.
+: continue0 ( ds rs ns cs -- )
+    set-catchstack set-namestack
+    >r set-datastack r> set-callstack ;
 
-    ! Slightly outdated implementation note:
-
-    ! We do a cdr since we don't want the [ code ] to be at the
-    ! top of the stack when execution is restored. Also note
-    ! that callstack's top is the parent callframe, not the
-    ! current callframe
-    datastack callstack namestack
-    [ [ ] continue ] cons cons cons
-    swap call ;
-
-: callcc0 ( [ code ] -- )
+: callcc0 ( code -- )
     #! Calls the code with a special quotation at the top of the
     #! stack. The quotation has stack effect:
     #!
@@ -74,12 +49,13 @@ USE: stack
     #!
     #! When called, the quotation restores execution state to
     #! the point after the callcc0 call.
-    ! Like callcc except no data is pushed onto the original datastack.
-    datastack callstack namestack
-    [ [ f ] continue ] cons cons cons
-    swap call ;
+    reify [ continue0 ] (callcc) ;
 
-: callcc1 ( [ code ] -- )
+: continue1 ( obj ds rs ns cs -- obj )
+    set-catchstack set-namestack
+    rot >r >r set-datastack r> r> swap set-callstack ;
+
+: callcc1 ( code -- )
     #! Calls the code with a special quotation at the top of the
     #! stack. The quotation has stack effect:
     #!
@@ -88,13 +64,9 @@ USE: stack
     #! When called, the quotation restores execution state to
     #! the point after the callcc1 call, and places X at the top
     #! of the original datastack.
-    datastack callstack namestack
-    [ [ unit ] continue ] cons cons cons
-    swap call ;
+    reify [ continue1 ] (callcc) ;
 
 : suspend ( -- )
-    ! Suspend the current fiber.
-    ! Not really implemented yet.
     "top-level-continuation" get dup [
         call
     ] [

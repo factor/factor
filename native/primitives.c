@@ -76,7 +76,8 @@ XT primitives[] = {
 	primitive_callstack,                    /* 72 */
 	primitive_set_datastack,                /* 73 */
 	primitive_set_callstack,                /* 74 */
-	primitive_handlep                       /* 75 */
+	primitive_handlep,                      /* 75 */
+	primitive_exit                          /* 76 */
 };
 
 CELL primitive_to_xt(CELL primitive)
@@ -98,10 +99,4 @@ void primitive_eq(void)
 	check_non_empty(env.dt);
 	check_non_empty(dpeek());
 	env.dt = tag_boolean(dpop() == env.dt);
-}
-
-void primitive_address_of(void)
-{
-	check_non_empty(env.dt);
-	env.dt = RETAG(env.dt,FIXNUM_TYPE);
 }

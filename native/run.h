@@ -79,3 +79,4 @@ void primitive_call(void);
 void primitive_ifte(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
+void primitive_exit(void);

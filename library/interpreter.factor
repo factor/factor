@@ -82,31 +82,22 @@ USE: unparser
 : re-edit ( index -- )
     get-history edit ;
 
-: print-prompt ( prompt -- )
-    history# fixnum>str "] " cat3 [ "prompt" ] get-style
+: print-prompt ( -- )
+    <% "    " % history# fixnum>str % "] " % %>
+    [ "prompt" ] get-style
     [ write-attr ] bind
     flush ;
 
-: interpret ( prompt -- )
+: interpret ( -- )
     print-prompt read dup [
         dup history+ eval
     ] [
-        drop t "quit-flag" set
+        drop "quit-flag" on
     ] ifte ;
 
-: interpreter-loop ( prompt -- )
-    [ "quit-flag" get not ] [ dup >r interpret r> ] while
-    drop f "quit-flag" set ;
-
-: initial-interpreter-loop ( -- )
-    #! Run the stand-alone interpreter
-    ! Used by :r
-    [ "initial-interpreter-continuation" set ] callcc0
-    ! Used by :s
-    ! We use the slightly redundant 'call' to push the current
-    ! callframe.
-    [ callstack "initial-interpreter-callstack" set ] call
-    "    " interpreter-loop ;
+: interpreter-loop ( -- )
+    [ "quit-flag" get not ] [ interpret ] while
+    "quit-flag" off ;
 
 : help
     "clear              -- clear datastack." print

@@ -123,3 +123,8 @@ void primitive_setenv(void)
 	env.user[e] = value;
 	env.dt = dpop();
 }
+
+void primitive_exit(void)
+{
+	exit(untag_fixnum(env.dt));
+}

@@ -27,6 +27,8 @@
 
 IN: telnetd
 USE: combinators
+USE: continuations
+USE: errors
 USE: interpreter
 USE: logging
 USE: logic
@@ -36,13 +38,11 @@ USE: stdio
 USE: streams
 
 : telnet-client ( socket -- )
-    <namespace> [
-        dup
+    [
         "client" set
-        "stdio" set
         log-client
-        "remote " interpreter-loop
-    ] bind ;
+        interpreter-loop
+    ] with-stream ;
 
 : quit-flag ( -- ? )
     global [ "telnetd-quit-flag" get ] bind ;
@@ -54,10 +54,14 @@ USE: streams
     [
         quit-flag not
     ] [
-        dup accept dup telnet-client fclose
+        dup accept telnet-client
     ] while ;
 
 : telnetd ( port -- )
     [
-        <server> telnetd-loop fclose clear-quit-flag
+        <server> [
+            telnetd-loop
+        ] [
+            clear-quit-flag swap fclose rethrow
+        ] catch
     ] with-logging ;
