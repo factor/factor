@@ -60,7 +60,7 @@ CELL object_size(CELL pointer)
 	case OBJECT_TYPE:
 		return untagged_object_size(UNTAG(pointer));
 	default:
-		fatal_error("Cannot determine size",pointer);
+		critical_error("Cannot determine size",pointer);
 		return -1;
 	}
 }
@@ -90,7 +90,7 @@ CELL untagged_object_size(CELL pointer)
 		size = sizeof(SBUF);
 		break;
 	default:
-		fatal_error("Cannot determine size",relocating);
+		critical_error("Cannot determine size",relocating);
 		size = -1;/* can't happen */
 		break;
 	}

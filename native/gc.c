@@ -32,7 +32,7 @@ void copy_object(CELL* handle)
 	CELL header, newpointer;
 
 	if(in_zone(active,pointer))
-		fatal_error("copy_object given newspace ptr",pointer);
+		critical_error("copy_object given newspace ptr",pointer);
 
 	if(tag == FIXNUM_TYPE)
 	{
@@ -56,7 +56,7 @@ void copy_object(CELL* handle)
 	}
 	
 	if(tag == GC_COLLECTED)
-		fatal_error("installing forwarding pointer in newspace",newpointer);
+		critical_error("installing forwarding pointer in newspace",newpointer);
 
 	*handle = RETAG(newpointer,tag);
 }

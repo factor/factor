@@ -26,7 +26,7 @@ CELL allot(CELL a)
 	CELL h = active->here;
 	active->here = align8(active->here + a);
 	if(active->here > active->limit)
-		fatal_error("Out of memory",active->here);
+		critical_error("Out of memory",active->here);
 	return h;
 }
 

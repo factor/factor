@@ -7,18 +7,25 @@ void clear_environment(void)
 		env.user[i] = 0;
 }
 
+void reset_datastack(void)
+{
+	env.ds = UNTAG(env.ds_bot) + sizeof(ARRAY);
+	env.dt = empty;
+}
+
+void reset_callstack(void)
+{
+	env.cs = UNTAG(env.cs_bot) + sizeof(ARRAY);
+	cpush(empty);
+}
+
 void init_environment(void)
 {
 	/* + CELLS * 2 to skip header and length cell */
-	env.ds_bot = (CELL)array(STACK_SIZE,empty);
-	env.ds = env.ds_bot + sizeof(ARRAY);
-	env.ds_bot = tag_object(env.ds_bot);
-	/* dpush(empty); */
-	env.dt = empty;
-	env.cs_bot = (CELL)array(STACK_SIZE,empty);
-	env.cs = env.cs_bot + sizeof(ARRAY);
-	env.cs_bot = tag_object(env.cs_bot);
-	cpush(empty);
+	env.ds_bot = tag_object(array(STACK_SIZE,empty));
+	reset_datastack();
+	env.cs_bot = tag_object(array(STACK_SIZE,empty));
+	reset_callstack();
 	env.cf = env.boot;
 }
 

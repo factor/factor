@@ -87,7 +87,7 @@ CELL primitive_to_xt(CELL primitive)
 	XT xt;
 
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		fatal_error("Invalid primitive",primitive);
+		general_error("Invalid primitive",tag_fixnum(primitive));
 	
 	xt = primitives[primitive];
 	if((CELL)xt % 8 != 0)

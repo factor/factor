@@ -61,7 +61,7 @@ INLINE CELL tag_header(CELL cell)
 INLINE CELL untag_header(CELL cell)
 {
 	if(TAG(cell) != HEADER_TYPE)
-		fatal_error("header type check",cell);
+		critical_error("header type check",cell);
 	return cell >> TAG_BITS;
 }
 

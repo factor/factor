@@ -10,7 +10,8 @@ void load_image(char* filename)
 	
 	file = fopen(filename,"rb");
 
-	fread(&h,sizeof(HEADER),1,file);
+	/* read it in native byte order */
+	fread(&h,sizeof(HEADER)/sizeof(CELL),sizeof(CELL),file);
 
 	if(h.magic != IMAGE_MAGIC)
 		fatal_error("Bad magic number",h.magic);
