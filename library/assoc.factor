@@ -65,7 +65,7 @@ USE: stack
     #! newly-added pair 'shadows' the previous value.
     [ dupd car = not ] subset acons ;
 
-: assoc-each ( value-alist quot-alist -- )
+: assoc-apply ( value-alist quot-alist -- )
     #! Looks up the key of each pair in the first list in the
     #! second list to produce a quotation. The quotation is
     #! applied to the value of the pair. If there is no

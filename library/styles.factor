@@ -66,7 +66,7 @@ USE: stack
     <namespace> "styles" set
 
     [
-        [ "Monospaced" | "font" ]
+        [ "font" | "Monospaced" ]
     ] "default" set-style
 
     [

@@ -100,10 +100,10 @@ USE: unparser
         [ "bg"        dupd >color "Background" swing-attribute+ ]
         [ "font"      dupd "FontFamily" swing-attribute+ ]
         [ "size"      dupd "FontSize" swing-attribute+ ]
-    ] assoc-each ;
+    ] assoc-apply ;
 
 : reset-attrs ( -- )
-    default-style [ style>attribute-set ] bind t
+    default-style style>attribute-set t
     "listener" get
     [ "javax.swing.text.AttributeSet" "boolean" ]
     "javax.swing.JTextPane"
@@ -157,6 +157,6 @@ USE: unparser
     #! Called when user opens a new listener
     [
         dup "listener" set
-       <listener-stream> "stdio" set
+        <listener-stream> "stdio" set
         init-interpreter
     ] with-scope ;

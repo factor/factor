@@ -72,6 +72,7 @@ USE: words
     init-search-path
     init-scratchpad
     init-styles
+    init-vocab-styles
     default-responders
     "args" get parse-command-line
     run-user-init

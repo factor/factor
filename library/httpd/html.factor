@@ -97,7 +97,7 @@ USE: url-encoding
         [ "underline" drop underline-tag ]
         [ "size"      size-tag ]
         [ "link"      link-tag ]
-    ] assoc-each ;
+    ] assoc-apply ;
 
 : html-write-attr ( string style stream -- )
     rot chars>entities rot html-attr-string swap fwrite ;

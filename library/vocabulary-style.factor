@@ -83,5 +83,3 @@ USE: styles
         [ "ansi-fg" | "5" ]
         [ "fg" | [ 255 0 255 ] ]
     ] "lists" set-vocab-style ;
-
-init-vocab-styles

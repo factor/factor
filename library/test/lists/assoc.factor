@@ -39,5 +39,5 @@ USE: test
     [ "four" * ]
 ] "quot-alist" set
 
-[ 8 ] [ 1 "value-alist" get "quot-alist" get assoc-each ] unit-test
-[ 1 ] [ 1 "value-alist" get f assoc-each ] unit-test
+[ 8 ] [ 1 "value-alist" get "quot-alist" get assoc-apply ] unit-test
+[ 1 ] [ 1 "value-alist" get f assoc-apply ] unit-test
