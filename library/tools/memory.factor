@@ -45,6 +45,22 @@ stdio unparser vectors words ;
         ] each-object drop
     ] make-list ;
 
+: vector+ ( n index vector -- )
+    [ vector-nth + ] 2keep set-vector-nth ;
+
+: heap-stat-step ( counts sizes obj -- )
+    [ dup size swap type rot vector+ ] keep
+    1 swap type rot vector+ ;
+
+: zero-vector ( n -- vector )
+    [ drop 0 ] vector-project ;
+
+: heap-stats ( -- stats )
+    #! Return a list of instance count/total size pairs.
+    num-types zero-vector num-types zero-vector
+    [ >r 2dup r> heap-stat-step ] each-object
+    swap vector>list swap vector>list zip ;
+
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
         3drop

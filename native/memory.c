@@ -118,5 +118,57 @@ void primitive_allot_profiling(void)
 
 void primitive_address(void)
 {
-	dpush(tag_bignum(s48_ulong_to_bignum(dpop())));
+	drepl(tag_bignum(s48_ulong_to_bignum(dpeek())));
+}
+
+void primitive_size(void)
+{
+	drepl(tag_fixnum(object_size(dpeek())));
+}
+
+void primitive_begin_scan(void)
+{
+	primitive_gc();
+	heap_scan_ptr = active.base;
+	heap_scan_end = active.here;
+	heap_scan = true;
+}
+
+void primitive_next_object(void)
+{
+	CELL value = get(heap_scan_ptr);
+	CELL obj = heap_scan_ptr;
+	CELL size, type;
+
+	if(!heap_scan)
+		general_error(ERROR_HEAP_SCAN,F);
+
+	if(heap_scan_ptr >= heap_scan_end)
+	{
+		dpush(F);
+		return;
+	}
+	
+	if(headerp(value))
+	{
+		size = align8(untagged_object_size(heap_scan_ptr));
+		type = untag_header(value);
+	}
+	else
+	{
+		size = CELLS * 2;
+		type = CONS_TYPE;
+	}
+
+	heap_scan_ptr += size;
+
+	if(type < HEADER_TYPE)
+		dpush(RETAG(obj,type));
+	else
+		dpush(RETAG(obj,OBJECT_TYPE));
+}
+
+void primitive_end_scan(void)
+{
+	heap_scan = false;
 }

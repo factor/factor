@@ -66,9 +66,16 @@ bool in_zone(ZONE* z, CELL pointer);
 void primitive_room(void);
 void primitive_allot_profiling(void);
 void primitive_address(void);
-void primitive_memory_cell(void);
-void primitive_memory_4(void);
-void primitive_memory_1(void);
-void primitive_set_memory_cell(void);
-void primitive_set_memory_4(void);
-void primitive_set_memory_1(void);
+void primitive_size(void);
+
+/* A heap walk allows useful things to be done, like finding all
+references to an object for debugging purposes. */
+CELL heap_scan_ptr;
+
+/* End of heap when walk was started; prevents infinite loop if
+walk consing */
+CELL heap_scan_end;
+
+void primitive_begin_scan(void);
+void primitive_next_object(void);
+void primitive_end_scan(void);

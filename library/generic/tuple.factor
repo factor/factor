@@ -4,6 +4,10 @@ IN: generic
 USING: words parser kernel namespaces lists strings
 kernel-internals math hashtables errors vectors ;
 
+: class ( obj -- class )
+    #! The class of an object.
+    dup tuple? [ 2 slot ] [ type builtin-type ] ifte ;
+
 : make-tuple ( class -- tuple )
     dup "tuple-size" word-property <tuple>
     [ 0 swap set-array-nth ] keep ;
@@ -105,19 +109,6 @@ kernel-internals math hashtables errors vectors ;
     dup
     dup r> define-slots "slot-words" set-word-property
     default-constructor ;
-
-: TUPLE:
-    #! Followed by a tuple name, then slot names, then ;
-    scan
-    string-mode on
-    [ string-mode off define-tuple ]
-    f ; parsing
-
-: C:
-    #! Followed by a tuple name, then constructor code, then ;
-    #! Constructor code executes with the empty tuple on the
-    #! stack.
-    scan-word [ define-constructor ] f ; parsing
 
 : tuple-delegate ( tuple -- obj )
     dup tuple? [
@@ -222,8 +213,6 @@ M: tuple hashcode ( vec -- n )
     ] [
         1 swap array-nth hashcode
     ] ifte ;
-
-M: tuple class ( obj -- class ) 2 slot ;
 
 tuple [
     ( generic vtable definition class -- )

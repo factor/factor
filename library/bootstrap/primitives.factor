@@ -179,7 +179,6 @@ vocabularies get [
     [ "set-alien-2" "alien"                   [ [ integer alien integer ] [ ] ] ]
     [ "alien-1" "alien"                       [ [ alien integer ] [ fixnum ] ] ]
     [ "set-alien-1" "alien"                   [ [ integer alien integer ] [ ] ] ]
-    [ "heap-stats" "memory"                   [ [ ] [ general-list ] ] ]
     [ "throw" "errors"                        [ [ object ] [ ] ] ]
     [ "string>memory" "kernel-internals"      [ [ string integer ] [ ] ] ]
     [ "memory>string" "kernel-internals"      [ [ integer integer ] [ string ] ] ]
@@ -202,7 +201,8 @@ vocabularies get [
     [ ">tuple" "kernel-internals"             [ [ object ] [ tuple ] ] ]
     [ "begin-scan" "memory"                   [ [ ] [ ] ] ]
     [ "next-object" "memory"                  [ [ ] [ object ] ] ]
-    [ "end-scan" "memory"                     [ [ ] [ object ] ] ]                         
+    [ "end-scan" "memory"                     [ [ ] [ object ] ] ]       
+    [ "size" "memory"                         [ [ ] [ object ] ] ]                       
 ] [                                           
     3unlist >r create >r 1 + r> 2dup swap f define r>
     dup string? [

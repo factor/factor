@@ -38,6 +38,8 @@ words hashtables ;
     "/library/syntax/parse-numbers.factor" parse-resource append,
     "/library/syntax/parser.factor" parse-resource append,
     "/library/syntax/parse-stream.factor" parse-resource append,
+    "/library/syntax/generic.factor" parse-resource append,
+    "/library/syntax/parse-syntax.factor" parse-resource append,
 
     "delegate" [ "generic" ] search
     "object" [ "generic" ] search
@@ -46,7 +48,7 @@ words hashtables ;
 
     reveal
     reveal
-
+    
     "/library/generic/generic.factor" parse-resource append,
     "/library/generic/object.factor" parse-resource append,
     "/library/generic/null.factor" parse-resource append,
@@ -57,7 +59,6 @@ words hashtables ;
     "/library/generic/tuple.factor" parse-resource append,
 
     "/library/bootstrap/init.factor" parse-resource append,
-    "/library/syntax/parse-syntax.factor" parse-resource append,
 ] make-list
 
 "boot" [ "kernel" ] search swons

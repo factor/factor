@@ -92,29 +92,10 @@ namespaces parser strings words vectors math math-internals ;
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
 
-: GENERIC:
-    #! GENERIC: bar creates a generic word bar. Add methods to
-    #! the generic word using M:.
-    [ single-combination ]
-    \ GENERIC: CREATE define-generic ; parsing
-
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
     #! being coerced to a maximal type.
     >r arithmetic-type r> dispatch ; inline
-
-: 2GENERIC:
-    #! 2GENERIC: bar creates a generic word bar. Add methods to
-    #! the generic word using M:. 2GENERIC words dispatch on
-    #! arithmetic types and should not be used for non-numerical
-    #! types.
-    [ arithmetic-combination ]
-    \ 2GENERIC: CREATE define-generic ; parsing
-
-: M: ( -- class generic [ ] )
-    #! M: foo bar begins a definition of the bar generic word
-    #! specialized to the foo type.
-    scan-word scan-word [ define-method ] [ ] ; parsing
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: classes
@@ -162,5 +143,3 @@ SYMBOL: object
     classes get set-hash ;
 
 classes get [ <namespace> classes set ] unless
-
-GENERIC: class ( obj -- class )

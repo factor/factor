@@ -54,7 +54,7 @@ USING: kernel lists parser stdio words namespaces ;
 
     "/library/io/files.factor"
     "/library/eval-catch.factor"
-    "/library/tools/heap-stats.factor"
+    "/library/tools/memory.factor"
     "/library/tools/listener.factor"
     "/library/cli.factor"
 ] [

@@ -158,7 +158,6 @@ void* primitives[] = {
 	primitive_set_alien_2,
 	primitive_alien_1,
 	primitive_set_alien_1,
-	primitive_heap_stats,
 	primitive_throw,
 	primitive_string_to_memory,
 	primitive_memory_to_string,
@@ -181,7 +180,8 @@ void* primitives[] = {
 	primitive_to_tuple,
 	primitive_begin_scan,
 	primitive_next_object,
-	primitive_end_scan
+	primitive_end_scan,
+	primitive_size
 };
 
 CELL primitive_to_xt(CELL primitive)
