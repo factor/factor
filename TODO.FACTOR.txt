@@ -22,7 +22,7 @@
 - fix up the min thumb size hack
 - frame gap
 
-+ fii:
++ ffi:
 
 - replace alien-address, local-alien? primitives with colon defs
 - auto-generate box/unbox, and alien accessors
@@ -38,6 +38,7 @@
 
 + compiler/ffi:
 
+- linux? bsd?
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
@@ -53,6 +54,7 @@
 
 + kernel:
 
+- code walker & exceptions
 - string sub-primitives
 - clean up metaclasses
 - unify unparse and prettyprint
@@ -69,3 +71,21 @@
 
 - vector-map, string-map, seq-each, vector-project: consing
 - map, subset, project, append: not tail recursive
+
++ nice to have libraries:
+
+- regexps
+- XML
+- matrices, vector math
+- HTTP client
+- real Unicode support (strings are already 16 bits and can be extended
+  to 21 if the need arises, but we need full character classification
+  predicates, comparison, case conversion, sorting...)
+- full Win32 binding
+- Cairo binding
+
++ httpd:
+
+- virtual hosts
+- keep alive
+

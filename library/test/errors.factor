@@ -28,4 +28,4 @@ USE: stdio
 ! [ [ "\"\" { } vector-nth" ] parse ] [ type-check-error ] catch
 
 ! This should not raise an error
-[ ] [ f throw ] unit-test
+[ 1 2 3 ] [ 1 2 3 f throw ] unit-test

@@ -64,7 +64,7 @@ M: compound (compile) ( word -- )
         drop
     ] ifte ;
 
-M: compound (undefine)
+M: compound (uncrossref)
     dup f "infer-effect" set-word-prop
     dup f "no-effect" set-word-prop
     decompile ;

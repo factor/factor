@@ -85,8 +85,9 @@ C: buffer ( size -- buffer )
 
 : buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
 
-: buffer-peek ( buffer -- char )
-    buffer@ <alien> 0 alien-unsigned-1 ;
+: buffer-pop ( buffer -- char )
+    [ buffer@ <alien> 0 alien-unsigned-1  1 ] keep
+    buffer-consume ;
 
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory

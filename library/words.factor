@@ -86,17 +86,17 @@ global [ <namespace> crossref set ] bind
     #! the crossref hash.
     crossref get closure  ;
 
-GENERIC: (undefine) ( word -- )
-M: word (undefine) drop ;
+GENERIC: (uncrossref) ( word -- )
+M: word (uncrossref) drop ;
 
-: undefine ( word -- )
-    dup (undefine) usages  [ (undefine) ] each ;
+: uncrossref ( word -- )
+    dup (uncrossref) usages  [ (uncrossref) ] each ;
 
 ! The word primitive combined with the word def specify what the
 ! word does when invoked.
 
 : define ( word primitive parameter -- )
-    pick undefine
+    pick uncrossref
     pick set-word-def
     over set-word-primitive
     f "parsing" set-word-prop ;

@@ -17,11 +17,10 @@ C: reader ( buffer -- reader )
     dup buffer-length 0 = [
         2drop f
     ] [
-        dup buffer-peek dup CHAR: \n = [
+        dup buffer-pop dup CHAR: \n = [
             3drop t
         ] [
-            1 pick buffer-consume pick sbuf-append
-            read-line-loop
+            pick sbuf-append read-line-loop
         ] ifte
     ] ifte ;
 
@@ -85,7 +84,7 @@ GENERIC: refill* ( reader -- )
     ] ifte ;
 
 : pop-line ( reader -- str )
-    dup reader-line sbuf>string >r
+    dup reader-line dup [ sbuf>string ] when >r
     f over set-reader-line
     f swap set-reader-ready? r> ;
 
