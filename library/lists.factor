@@ -69,7 +69,7 @@ USE: vectors
     [ dup cons? [ cdr list? ] [ drop f ] ifte ] [ t ] ifte* ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
+    >r >r [ r> cons r> ] [ r> swap r> cons ] ifte ; inline
 
 : partition-step ( ret1 ret2 ref combinator car -- ret1 ret2 )
     >r rot >r rot r> r> -rot >r >r dup >r swap call r> swap r> r>
@@ -104,9 +104,9 @@ USE: vectors
         ! Partition
         dup >r >r uncons dupd r> partition r>
         ! Recurse
-        tuck sort >r sort r>
+        tuck sort >r sort swap r>
         ! Combine
-        swapd cons append
+        cons append
     ] [
         drop
     ] ifte ; inline interpret-only

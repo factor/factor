@@ -53,7 +53,7 @@ USE: stack
     >rect swap fatan2 ; inline
 
 : >polar ( z -- abs arg )
-    >rect 2dup mag2 transp fatan2 ;
+    >rect 2dup swap fatan2 >r mag2 r> ;
 
 : cis ( theta -- cis )
     dup fcos swap fsin rect> ;

@@ -50,11 +50,9 @@ USE: url-encoding
     ] ifte ;
 
 : url>path ( uri -- path )
-    url-decode dup "http://" str-head? dup [
-        "/" split1 f "" replace nip nip
-    ] [
-        drop
-    ] ifte ;
+    url-decode "http://" ?str-head [
+        "/" split1 f "" replace nip
+    ] when ;
 
 : secure-path ( path -- path )
     ".." over str-contains? [ drop f ] when ;

@@ -2,6 +2,8 @@ IN: scratchpad
 USE: format
 USE: test
 
+[ "123" ] [ 4 "123" decimal-tail ] unit-test
+[ "12" ] [ 2 "123" decimal-tail ] unit-test
 [ "123" ] [ "123" 2 decimal-places ] unit-test
 [ "123.12" ] [ "123.12" 2 decimal-places ] unit-test
 [ "123.123" ] [ "123.123" 5 decimal-places ] unit-test

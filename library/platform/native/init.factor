@@ -50,9 +50,3 @@ USE: vectors
     "HOME" os-env [ "." ] unless* "~" set
     "/" "/" set
     init-search-path ;
-
-: cold-boot ( -- )
-    #! An initially-generated image has this as the boot
-    #! quotation.
-    boot
-    "/library/platform/native/boot-stage2.factor" run-resource ;

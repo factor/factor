@@ -86,7 +86,7 @@ USE: url-encoding
     ] make-string redirect ;
 
 : header-line ( alist line -- alist )
-    ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
+    ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
 
 : (read-header) ( alist -- alist )
     read dup

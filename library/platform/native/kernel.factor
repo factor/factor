@@ -104,7 +104,7 @@ IN: kernel
 
 : 2= ( a b c d -- ? )
     #! Test if a = c, b = d.
-    swapd = [ = ] [ 2drop f ] ifte ;
+    rot = [ = ] [ 2drop f ] ifte ;
 
 : set-boot ( quot -- )
     #! Set the boot quotation.

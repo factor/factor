@@ -64,29 +64,29 @@ USE: stack
     ! Returns if the first string lexicographically follows str2
     str-compare 0 > ;
 
-: str-head ( str index -- str )
+: str-head ( index str -- str )
     #! Returns a new string, from the beginning of the string
     #! until the given index.
-    0 transp substring ;
+    0 -rot substring ;
 
 : str-contains? ( substr str -- ? )
     swap index-of -1 = not ;
 
-: str-tail ( str index -- str )
+: str-tail ( index str -- str )
     #! Returns a new string, from the given index until the end
     #! of the string.
-    over str-length rot substring ;
+    [ str-length ] keep substring ;
 
 : str/ ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string.
-    2dup str-tail >r str-head r> ;
+    [ swap str-head ] 2keep swap str-tail ;
 
 : str// ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
     #! original string, without the character at the given
     #! index.
-    2dup succ str-tail >r str-head r> ;
+    [ swap str-head ] 2keep succ swap str-tail ;
 
 : >title ( str -- str )
     1 str/ >r >upper r> >lower cat2 ;
@@ -121,7 +121,8 @@ USE: stack
     2dup index-of dup -1 = [
         2drop f
     ] [
-        swapd str/ rot str-length str/ nip
+        [ swap str-length + over str-tail ] keep
+        rot str-head swap
     ] ifte ;
 
 : max-str-length ( list -- len )

@@ -40,14 +40,17 @@ USE: words
     dup 0 < [ swap neg swap neg ] when 2dup gcd tuck /i >r /i r> ;
 : ratio ( x y -- x/y ) reduce fraction> ;
 : >fraction ( a/b -- a b ) dup numerator swap denominator ;
-: 2>fraction ( a/b c/d -- a b c d ) >r >fraction r> >fraction ;
+: 2>fraction ( a/b c/d -- a c b d )
+    [ swap numerator swap numerator ] 2keep
+    swap denominator swap denominator ;
 
-: ratio= ( a/b c/d -- ? ) 2>fraction 2= ;
-: ratio-scale ( a/b c/d -- a*d b*c ) 2>fraction -rot * >r * r> ;
+: ratio= ( a/b c/d -- ? ) 2>fraction = [ = ] [ 2drop f ] ifte ;
+: ratio-scale ( a/b c/d -- a*d b*c )
+    2>fraction >r * swap r> * swap ;
 : ratio+d ( a/b c/d -- b*d ) denominator swap denominator * ;
 : ratio+ ( x y -- x+y ) 2dup ratio-scale + -rot ratio+d ratio ;
 : ratio- ( x y -- x-y ) 2dup ratio-scale - -rot ratio+d ratio ;
-: ratio* ( x y -- x*y ) 2>fraction swapd * >r * r> ratio ;
+: ratio* ( x y -- x*y ) 2>fraction * >r * r> ratio ;
 : ratio/ ( x y -- x/y ) ratio-scale ratio ;
 : ratio/f ( x y -- x/y ) ratio-scale /f ;
 
@@ -57,15 +60,17 @@ USE: words
 : ratio>= ( x y -- ? ) ratio-scale >= ;
 
 : >rect ( x -- x:re x: im ) dup real swap imaginary ;
-: 2>rect ( x y -- x:re x:im y:re y:im ) >r >rect r> >rect ;
+: 2>rect ( x y -- x:re y:re x:im y:im )
+    [ swap real swap real ] 2keep
+    swap imaginary swap imaginary ;
 
-: complex= ( x y -- ? ) 2>rect 2= ;
+: complex= ( x y -- ? ) 2>rect = [ = ] [ 2drop f ] ifte ;
 
-: complex+ ( x y -- x+y ) 2>rect swapd + >r + r> rect> ;
-: complex- ( x y -- x-y ) 2>rect swapd - >r - r> rect> ;
-: complex*re ( x y -- zx:re * y:re x:im * r:im )
-    2>rect swapd * >r * r> ;
-: complex*im ( x y -- x:re * y:im x:im * y:re )
+: complex+ ( x y -- x+y ) 2>rect + >r + r> rect> ;
+: complex- ( x y -- x-y ) 2>rect - >r - r> rect> ;
+: complex*re ( x y -- x:re * y:re x:im * r:im )
+    2>rect * >r * r> ;
+: complex*im ( x y -- x:im * y:re x:re * y:im )
     2>rect >r * swap r> * ;
 : complex* ( x y -- x*y )
     2dup complex*re - -rot complex*im + rect> ;

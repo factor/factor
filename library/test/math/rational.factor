@@ -60,6 +60,9 @@ USE: unparser
 [ -1/2 ] [ 1/2 1 >bignum - ] unit-test
 [ 41/20 ] [ 5/4 4/5 + ] unit-test
 
+[ 1 ] [ 1/2 2 * ] unit-test
+[ 1/3 ] [ 1/2 2/3 * ] unit-test
+
 [ 1 ] [ 1/2 1/2 / ] unit-test
 [ 27/4 ] [ 3/2 2/9 / ] unit-test
 

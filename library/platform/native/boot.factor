@@ -27,6 +27,7 @@
 
 USE: lists
 USE: image
+USE: parser
 
 primitives,
 [
@@ -77,6 +78,9 @@ primitives,
 version,
 
 IN: init
-DEFER: cold-boot
+DEFER: boot
 
-[ cold-boot ] (set-boot)
+[
+    boot
+    "/library/platform/native/boot-stage2.factor" run-resource
+] (set-boot)

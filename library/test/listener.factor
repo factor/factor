@@ -1,8 +1,8 @@
 IN: scratchpad
-USE: listener
 USE: namespaces
 USE: stdio
 USE: test
+USE: parser
 
 [
     [ 4 ] [ "2 2 +" eval-catch ] unit-test

@@ -14,7 +14,7 @@ USE: words
 
 SYMBOL: traits
 
-: traits-map ( word -- hash )
+: traits-map ( type -- hash )
     #! The method map word property maps selector words to
     #! definitions.
     "traits-map" word-property ;
@@ -69,11 +69,11 @@ SYMBOL: traits
     dup unit [ car method call ] cons
     define-compound ; parsing
 
-: M:
+: M: ( -- type generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
     scan-word scan-word f ; parsing
 
-: ;M
+: ;M ( type generic def -- )
     #! ;M ends a method definition.
-    reverse transp traits-map set* ; parsing
+    rot traits-map [ reverse put ] bind ; parsing

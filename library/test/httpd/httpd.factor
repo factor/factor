@@ -19,6 +19,17 @@ USE: lists
 [ 5430 ]
 [ f "Content-Length: 5430" header-line content-length ] unit-test
 
+[
+    [
+        [ "X-Spyware-Requested" | "yes" ]
+        [ "User-Agent" | "Internet Explorer 0.4alpha" ]
+    ]
+]
+[
+    [ [ "User-Agent" | "Internet Explorer 0.4alpha" ] ]
+    "X-Spyware-Requested: yes" header-line
+] unit-test
+
 [ ] [ "404 not found" ] [ httpd-error ] test-word
 
 [ "arg" ] [

@@ -60,7 +60,7 @@ USE: stack
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [
-        >r drop swap str-tail , r> ( end of string )
+        >r drop str-tail , r> ( end of string )
     ] [
         swap str-length dupd + >r swap substring , r>
     ] ifte ;

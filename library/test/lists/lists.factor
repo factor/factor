@@ -64,3 +64,5 @@ USE: strings
 [ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] subset ] unit-test
 
 [ [ 43 "a" [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
+
+[ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] num-sort ] unit-test

@@ -28,7 +28,7 @@
 		<CODE>
 			buffer.save(view,null);
 			VFSManager.waitForRequests();
-			FactorPlugin.eval(view,
+			FactorPlugin.evalInListener(view,
 				"\""
 				+ FactorReader.charsToEscapes(buffer.path)
 				+ "\" run-file");
