@@ -120,15 +120,14 @@ USE: parser
 "/library/httpd/quit-responder.factor"     run-resource ! quit-responder
 "/library/httpd/resource-responder.factor" run-resource ! resource-responder
 "/library/httpd/test-responder.factor"     run-resource ! test-responder
-"/library/httpd/wiki-responder.factor"     run-resource ! wiki-responder
 "/library/httpd/default-responders.factor" run-resource ! default-responders
 
-!!! jEdit integration.
-"/library/jedit/jedit-local.factor" run-resource  ! jedit
-"/library/jedit/jedit-remote.factor" run-resource ! jedit
-"/library/jedit/jedit.factor" run-resource        ! jedit
-
 !!! Final initialization...
-"/library/init.factor"                     run-resource ! init
-"/library/platform/jvm/init.factor"        run-resource ! init
-"/library/platform/jvm/listener.factor"    run-resource ! listener
+"/library/init.factor"              run-resource ! init
+"/library/platform/jvm/init.factor" run-resource ! init
+
+!!! jEdit integration.
+"/library/jedit/jedit-local.factor"  run-resource ! jedit
+"/library/jedit/jedit-remote.factor" run-resource ! jedit
+"/library/jedit/jedit.factor"        run-resource ! jedit
+"/library/jedit/listener.factor"     run-resource ! listener

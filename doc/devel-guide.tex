@@ -1,4 +1,4 @@
-% :indentSize=4:tabSize=4:noTabs=true:
+% :indentSize=4:tabSize=4:noTabs=true:mode=tex:
 
 \documentclass[english]{article}
 \usepackage[T1]{fontenc}
@@ -31,7 +31,7 @@
 \newpage
 \section*{Introduction}
 
-Factor is an imperative programming language with functional and object-oriented
+Factor is a programming language with functional and object-oriented
 influences. Factor borrows heavily from Forth, Joy and Lisp. Programmers familiar with these languages will recognize many similarities with Factor.
 
 Factor is \emph{interactive}. This means it is possible to run a Factor interpreter that reads from the keyboard, and immediately executes expressions as they are entered. This allows words to be defined and tested one at a time.
@@ -361,75 +361,270 @@ USE: math
 USE: strings
 \end{alltt}
 
-\subsection{Booleans and logic}
+\section{PRACTICAL: Numbers game}
 
-Words that return a boolean truth value are known as \emph{predicates}. Predicates are usually used to decide what to execute next at branch points. In Factor, there is no special boolean data type
--- instead, a special object \texttt{f} is the only object with a
-``false'' boolean value. Every other object is a boolean ``true''.
-The special object \texttt{t} is the ``canonical'' truth value. Note that words that return booleans don't return \texttt{t} as a rule; any object that is not equal to \texttt{f} can be returned as the true value.
-
-The usual boolean operations are found in the \texttt{logic} vocabulary. Note that these are not integer bitwise operations; bitwise operations are described in the next chapter.
-
-\texttt{not ( ?~-{}- ?~)} returns \texttt{t} if the top of stack is \texttt{f}, and \texttt{f} otherwise.
-
-\texttt{and ( ?~?~-{}- ?~)} returns a true value if both input parameters are true.
-
-\texttt{or ( ?~?~-{}- ?~)} returns a true value if at least one of the input parameters is true.
-
-\texttt{xor ( ?~?~-{}- ?~)} returns a true value if exactly one of the input parameters is true.
+In this section, basic input/output and flow control is introduced.
+We construct a program that repeatedly prompts the user to guess a
+number -- they are informed if their guess is correct, too low, or
+too high. The game ends on a correct guess.
 
 \begin{alltt}
-t t and .
+numbers-game
+\emph{I'm thinking of a number between 0 and 100.}
+\emph{Enter your guess:} 25
+\emph{Too low}
+\emph{Enter your guess:} 38
+\emph{Too high}
+\emph{Enter your guess:} 31
+\emph{Correct - you win!}
+\end{alltt}
+
+\subsection{Getting started}
+
+Start a text editor and create a file named \texttt{numbers-game.factor}.
+
+Write a short comment at the top of the file. Two examples of commenting style supported by Factor:
+
+\begin{alltt}
+! Numbers game.
+( The great numbers game )
+\end{alltt}
+
+It is always a good idea to comment your code. Try to write simple
+code that does not need detailed comments to describe; similarly,
+avoid redundant comments. These two principles are hard to quantify
+in a concrete way, and will become more clear as your skills with
+Factor increase.
+
+We will be defining new words in the \texttt{numbers-game} vocabulary; add
+an \texttt{IN:} statement at the top of the source file:
+
+\begin{alltt}
+IN: numbers-game
+\end{alltt}
+Also in order to be able to test the words, issue a \texttt{USE:}
+statement in the interactive interpreter:
+
+\begin{alltt}
+USE: numbers-game
+\end{alltt}
+This section will develop the numbers game in an incremental fashion.
+After each addition, issue a command like the following to load the
+source file into the Factor interpreter:
+
+\begin{alltt}
+"numbers-game.factor" run-file
+\end{alltt}
+
+\subsection{Reading a number from the keyboard}
+
+A fundamental operation required for the numbers game is to be able
+to read a number from the keyboard. The \texttt{read} word \texttt{(
+-{}- str )} reads a line of input and pushes it on the stack.
+The \texttt{parse-number} word \texttt{( str -{}- n )} turns a decimal
+string representation of an integer into the integer itself. These
+two words can be combined into a single colon definition:
+
+\begin{alltt}
+: read-number ( -{}- n ) read parse-number ;
+\end{alltt}
+You should add this definition to the source file, and try loading
+the file into the interpreter. As you will soon see, this raises an
+error! The problem is that the two words \texttt{read} and \texttt{parse-number}
+are not part of the default, minimal, vocabulary search path used
+when reading files. The solution is to use \texttt{apropos.} to find
+out which vocabularies contain those words, and add the appropriate
+\texttt{USE:} statements to the source file:
+
+\begin{alltt}
+USE: parser
+USE: stdio
+\end{alltt}
+After adding the above two statements, the file should now parse,
+and testing should confirm that the \texttt{read-number} word works correctly.%
+\footnote{There is the possibility of an invalid number being entered at the
+keyboard. In this case, \texttt{parse-number} returns \texttt{f},
+the boolean false value. For the sake of simplicity, we ignore this
+case in the numbers game example. However, proper error handling is
+an essential part of any large program and is covered later.%
+}
+
+
+\subsection{Printing some messages}
+
+Now we need to make some words for printing various messages. They
+are given here without further ado:
+
+\begin{alltt}
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+\end{alltt}
+Note that in the above, stack effect comments are omitted, since they
+are obvious from context. You should ensure the words work correctly
+after loading the source file into the interpreter.
+
+
+\subsection{Taking action based on a guess}
+
+The next logical step is to write a word \texttt{judge-guess} that
+takes the user's guess along with the actual number to be guessed,
+and prints one of the messages \texttt{too-high}, \texttt{too-low},
+or \texttt{correct}. This word will also push a boolean flag, indicating
+if the game should continue or not -- in the case of a correct guess,
+the game does not continue.
+
+This description of judge-guess is a mouthful -- and it suggests that
+it may be best to split it into two words. The first word we write
+handles the more specific case of an \emph{inexact} guess -- so it
+prints either \texttt{too-low} or \texttt{too-high}.
+
+\begin{alltt}
+: inexact-guess ( actual guess -{}- )
+     < {[} too-high {]} {[} too-low {]} ifte ;
+\end{alltt}
+Note that the word gives incorrect output if the two parameters are
+equal. However, it will never be called this way.
+
+With this out of the way, the implementation of judge-guess is an
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
+
+\begin{alltt}
+: judge-guess ( actual guess -{}- ? )
+    2dup = {[}
+        2drop correct f
+    {]} {[}
+        inexact-guess t
+    {]} ifte ;
+\end{alltt}
+
+The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
+consumes both its inputs, we must first duplicate the \texttt{actual} and \texttt{guess} parameters using \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
+in the interpreter to see what's going on:
+
+\begin{alltt}
+clear 1 2 2dup = .s
+\emph{\{ 1 2 f \}}
+clear 4 4 2dup = .s
+\emph{\{ 4 4 t \}}
+\end{alltt}
+
+Test \texttt{judge-guess} with a few inputs:
+
+\begin{alltt}
+1 10 judge-guess .
+\emph{Too low}
 \emph{t}
-5 f and .
-\emph{f}
-f "hi" or .
-\emph{"hi"}
-f f or .
-\emph{f}
-t t xor .
-\emph{f}
-t f xor .
+89 43 judge-guess .
+\emph{Too high}
 \emph{t}
+64 64 judge-guess .
+\emph{Correct}
+\emph{f}
 \end{alltt}
 
-\texttt{?~( cond~true false -{}- obj~)} returns the second argument if the first argument is true, and returns the third argument if the first argument is false.
+\subsection{Generating random numbers}
+
+The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
+random number in a specified range. The range is inclusive, so both
+the minimum and maximum indexes are candidate random numbers. Use
+\texttt{apropos.} to determine that this word is in the \texttt{random}
+vocabulary. For the purposes of this game, random numbers will be
+in the range of 0 to 100, so we can define a word that generates a
+random number in the range of 0 to 100:
 
 \begin{alltt}
-: sgn 0 < -1 1 ? ;
--10 sgn .
-\emph{-1}
-5 sgn .
-\emph{1}
+: number-to-guess ( -{}- n ) 0 100 random-int ;
 \end{alltt}
+Add the word definition to the source file, along with the appropriate
+\texttt{USE:} statement. Load the source file in the interpreter,
+and confirm that the word functions correctly, and that its stack
+effect comment is accurate.
 
-\subsection{\label{sub:Conditionals}Conditionals}
 
-\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
-\texttt{true} or \texttt{false} quotations, depending on the boolean
-value of \texttt{cond}. A quotation a list of objects that can be executed. Quotations are input
-using the following syntax:
+\subsection{The game loop}
+
+The game loop consists of repeated calls to \texttt{guess-prompt},
+\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
+returns \texttt{f}, the loop stops, otherwise it continues. This is
+realized with a recursive implementation:
 
 \begin{alltt}
-{[} 2 3 + . {]}
+: numbers-game-loop ( actual -{}- )
+    dup guess-prompt read-number judge-guess {[}
+        numbers-game-loop
+    {]} {[}
+        drop
+    {]} ifte ;
 \end{alltt}
+In Factor, tail-recursive words consume a bounded amount of call stack
+space. This means you are free to pick recursion or iteration based
+on their own merits when solving a problem. In many other languages,
+the usefulness of recursion is severely limited by the lack of tail-recursive
+call optimization.
 
-Here is an example of \texttt{ifte} usage:
+
+\subsection{Finishing off}
+
+The last task is to combine everything into the main \texttt{numbers-game}
+word. This is easier than it seems:
 
 \begin{alltt}
-1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
+: numbers-game number-to-guess numbers-game-loop ;
 \end{alltt}
+Try it out! Simply invoke the \texttt{numbers-game} word in the interpreter.
+It should work flawlessly, assuming you tested each component of this
+design incrementally!
 
-Compare the order of parameters here with the order of parameters in
-the stack effect of \texttt{ifte}.
 
-The stack effects of the two \texttt{ifte} branches should be
-the same. If they differ, the word becomes harder to document and
-debug.
+\subsection{The complete program}
 
-\texttt{when} \texttt{( cond true -{}- )} and \texttt{unless} \texttt{( cond false -{}- )} are variations of \texttt{ifte} with only one active branch. The branches should produce as many values as they consume; this ensures that the stack effect of the entire \texttt{when} or \texttt{unless} expression is consistent regardless of which branch was taken.
+\begin{verbatim}
+! Numbers game example
 
-\section{Numbers}
+IN: numbers-game
+USE: kernel
+USE: math
+USE: parser
+USE: random
+USE: stdio
+USE: stack
+
+: read-number ( -- n ) read parse-number ;
+
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+
+: inexact-guess ( actual guess -- )
+     < [ too-high ] [ too-low ] ifte ;
+
+: judge-guess ( actual guess -- ? )
+    2dup = [
+        2drop correct f
+    ] [
+        inexact-guess t
+    ] ifte ;
+
+: number-to-guess ( -- n ) 0 100 random-int ;
+
+: numbers-game-loop ( actual -- )
+    dup guess-prompt read-number judge-guess [
+        numbers-game-loop
+    ] [
+        drop
+    ] ifte ;
+
+: numbers-game number-to-guess numbers-game-loop ;
+\end{verbatim}
+
+\section{More about numbers}
 
 Factor provides a rich set of math words. Factor numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
 
@@ -704,269 +899,6 @@ BIN: 11111 -2 shift .b
 
 The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
 
-\section{PRACTICAL: Numbers game}
-
-In this section, basic input/output and flow control is introduced.
-We construct a program that repeatedly prompts the user to guess a
-number -- they are informed if their guess is correct, too low, or
-too high. The game ends on a correct guess.
-
-\begin{alltt}
-numbers-game
-\emph{I'm thinking of a number between 0 and 100.}
-\emph{Enter your guess:} 25
-\emph{Too low}
-\emph{Enter your guess:} 38
-\emph{Too high}
-\emph{Enter your guess:} 31
-\emph{Correct - you win!}
-\end{alltt}
-
-\subsection{Getting started}
-
-Start a text editor and create a file named \texttt{numbers-game.factor}.
-
-Write a short comment at the top of the file. Two examples of commenting style supported by Factor:
-
-\begin{alltt}
-! Numbers game.
-( The great numbers game )
-\end{alltt}
-
-It is always a good idea to comment your code. Try to write simple
-code that does not need detailed comments to describe; similarly,
-avoid redundant comments. These two principles are hard to quantify
-in a concrete way, and will become more clear as your skills with
-Factor increase.
-
-We will be defining new words in the \texttt{numbers-game} vocabulary; add
-an \texttt{IN:} statement at the top of the source file:
-
-\begin{alltt}
-IN: numbers-game
-\end{alltt}
-Also in order to be able to test the words, issue a \texttt{USE:}
-statement in the interactive interpreter:
-
-\begin{alltt}
-USE: numbers-game
-\end{alltt}
-This section will develop the numbers game in an incremental fashion.
-After each addition, issue a command like the following to load the
-source file into the Factor interpreter:
-
-\begin{alltt}
-"numbers-game.factor" run-file
-\end{alltt}
-
-\subsection{Reading a number from the keyboard}
-
-A fundamental operation required for the numbers game is to be able
-to read a number from the keyboard. The \texttt{read} word \texttt{(
--{}- str )} reads a line of input and pushes it on the stack.
-The \texttt{parse-number} word \texttt{( str -{}- n )} turns a decimal
-string representation of an integer into the integer itself. These
-two words can be combined into a single colon definition:
-
-\begin{alltt}
-: read-number ( -{}- n ) read parse-number ;
-\end{alltt}
-You should add this definition to the source file, and try loading
-the file into the interpreter. As you will soon see, this raises an
-error! The problem is that the two words \texttt{read} and \texttt{parse-number}
-are not part of the default, minimal, vocabulary search path used
-when reading files. The solution is to use \texttt{apropos.} to find
-out which vocabularies contain those words, and add the appropriate
-\texttt{USE:} statements to the source file:
-
-\begin{alltt}
-USE: parser
-USE: stdio
-\end{alltt}
-After adding the above two statements, the file should now parse,
-and testing should confirm that the \texttt{read-number} word works correctly.%
-\footnote{There is the possibility of an invalid number being entered at the
-keyboard. In this case, \texttt{parse-number} returns \texttt{f},
-the boolean false value. For the sake of simplicity, we ignore this
-case in the numbers game example. However, proper error handling is
-an essential part of any large program and is covered later.%
-}
-
-
-\subsection{Printing some messages}
-
-Now we need to make some words for printing various messages. They
-are given here without further ado:
-
-\begin{alltt}
-: guess-banner
-    "I'm thinking of a number between 0 and 100." print ;
-: guess-prompt "Enter your guess: " write ;
-: too-high "Too high" print ;
-: too-low "Too low" print ;
-: correct "Correct - you win!" print ;
-\end{alltt}
-Note that in the above, stack effect comments are omitted, since they
-are obvious from context. You should ensure the words work correctly
-after loading the source file into the interpreter.
-
-
-\subsection{Taking action based on a guess}
-
-The next logical step is to write a word \texttt{judge-guess} that
-takes the user's guess along with the actual number to be guessed,
-and prints one of the messages \texttt{too-high}, \texttt{too-low},
-or \texttt{correct}. This word will also push a boolean flag, indicating
-if the game should continue or not -- in the case of a correct guess,
-the game does not continue.
-
-This description of judge-guess is a mouthful -- and it suggests that
-it may be best to split it into two words. The first word we write
-handles the more specific case of an \emph{inexact} guess -- so it
-prints either \texttt{too-low} or \texttt{too-high}.
-
-\begin{alltt}
-: inexact-guess ( actual guess -{}- )
-     < {[} too-high {]} {[} too-low {]} ifte ;
-\end{alltt}
-Note that the word gives incorrect output if the two parameters are
-equal. However, it will never be called this way.
-
-With this out of the way, the implementation of judge-guess is an
-easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
-
-\begin{alltt}
-: judge-guess ( actual guess -{}- ? )
-    2dup = {[}
-        2drop correct f
-    {]} {[}
-        inexact-guess t
-    {]} ifte ;
-\end{alltt}
-
-The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
-consumes both its inputs, we must first duplicate the \texttt{actual} and \texttt{guess} parameters using \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
-in the interpreter to see what's going on:
-
-\begin{alltt}
-clear 1 2 2dup = .s
-\emph{\{ 1 2 f \}}
-clear 4 4 2dup = .s
-\emph{\{ 4 4 t \}}
-\end{alltt}
-
-Test \texttt{judge-guess} with a few inputs:
-
-\begin{alltt}
-1 10 judge-guess .
-\emph{Too low}
-\emph{t}
-89 43 judge-guess .
-\emph{Too high}
-\emph{t}
-64 64 judge-guess .
-\emph{Correct}
-\emph{f}
-\end{alltt}
-
-\subsection{Generating random numbers}
-
-The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
-random number in a specified range. The range is inclusive, so both
-the minimum and maximum indexes are candidate random numbers. Use
-\texttt{apropos.} to determine that this word is in the \texttt{random}
-vocabulary. For the purposes of this game, random numbers will be
-in the range of 0 to 100, so we can define a word that generates a
-random number in the range of 0 to 100:
-
-\begin{alltt}
-: number-to-guess ( -{}- n ) 0 100 random-int ;
-\end{alltt}
-Add the word definition to the source file, along with the appropriate
-\texttt{USE:} statement. Load the source file in the interpreter,
-and confirm that the word functions correctly, and that its stack
-effect comment is accurate.
-
-
-\subsection{The game loop}
-
-The game loop consists of repeated calls to \texttt{guess-prompt},
-\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
-returns \texttt{f}, the loop stops, otherwise it continues. This is
-realized with a recursive implementation:
-
-\begin{alltt}
-: numbers-game-loop ( actual -{}- )
-    dup guess-prompt read-number judge-guess {[}
-        numbers-game-loop
-    {]} {[}
-        drop
-    {]} ifte ;
-\end{alltt}
-In Factor, tail-recursive words consume a bounded amount of call stack
-space. This means you are free to pick recursion or iteration based
-on their own merits when solving a problem. In many other languages,
-the usefulness of recursion is severely limited by the lack of tail-recursive
-call optimization.
-
-
-\subsection{Finishing off}
-
-The last task is to combine everything into the main \texttt{numbers-game}
-word. This is easier than it seems:
-
-\begin{alltt}
-: numbers-game number-to-guess numbers-game-loop ;
-\end{alltt}
-Try it out! Simply invoke the \texttt{numbers-game} word in the interpreter.
-It should work flawlessly, assuming you tested each component of this
-design incrementally!
-
-
-\subsection{The complete program}
-
-\begin{verbatim}
-! Numbers game example
-
-IN: numbers-game
-USE: kernel
-USE: math
-USE: parser
-USE: random
-USE: stdio
-USE: stack
-
-: read-number ( -- n ) read parse-number ;
-
-: guess-banner
-    "I'm thinking of a number between 0 and 100." print ;
-: guess-prompt "Enter your guess: " write ;
-: too-high "Too high" print ;
-: too-low "Too low" print ;
-: correct "Correct - you win!" print ;
-
-: inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
-
-: judge-guess ( actual guess -- ? )
-    2dup = [
-        2drop correct f
-    ] [
-        inexact-guess t
-    ] ifte ;
-
-: number-to-guess ( -- n ) 0 100 random-int ;
-
-: numbers-game-loop ( actual -- )
-    dup guess-prompt read-number judge-guess [
-        numbers-game-loop
-    ] [
-        drop
-    ] ifte ;
-
-: numbers-game number-to-guess numbers-game-loop ;
-\end{verbatim}
-
 \section{Sequences}
 
 Factor supports two primary types for storing sequential data; lists and vectors.
@@ -1092,9 +1024,7 @@ an error, or disregard the hanging cdr at the end of the list.
 List manipulation words usually return newly-created
 lists only. The original parameters are not modified. This may seem
 inefficient, however the absence of side effects makes code much easier
-to test and debug.%
-\footnote{Side effect-free code is the fundamental idea underlying functional
-programming languages.
+to test and debug.
 
 \texttt{append ( list list -{}- list )} Append two lists at the
 top of the stack:
@@ -1500,6 +1430,150 @@ The syntax for the quotations there looks an aweful lot like the syntax for lite
 
 Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine.
 
+\subsection{Booleans and logic}
+
+Words that return a boolean truth value are known as \emph{predicates}. Predicates are usually used to decide what to execute next at branch points. In Factor, there is no special boolean data type
+-- instead, a special object \texttt{f} is the only object with a
+``false'' boolean value. Every other object is a boolean ``true''.
+The special object \texttt{t} is the ``canonical'' truth value. Note that words that return booleans don't return \texttt{t} as a rule; any object that is not equal to \texttt{f} can be returned as the true value.
+
+The usual boolean operations are found in the \texttt{logic} vocabulary. Note that these are not integer bitwise operations; bitwise operations are described in the next chapter.
+
+\texttt{not ( ?~-{}- ?~)} returns \texttt{t} if the top of stack is \texttt{f}, and \texttt{f} otherwise.
+
+\texttt{and ( ?~?~-{}- ?~)} returns a true value if both input parameters are true.
+
+\texttt{or ( ?~?~-{}- ?~)} returns a true value if at least one of the input parameters is true.
+
+\texttt{xor ( ?~?~-{}- ?~)} returns a true value if exactly one of the input parameters is true.
+
+\begin{alltt}
+t t and .
+\emph{t}
+5 f and .
+\emph{f}
+f "hi" or .
+\emph{"hi"}
+f f or .
+\emph{f}
+t t xor .
+\emph{f}
+t f xor .
+\emph{t}
+\end{alltt}
+
+\texttt{?~( cond~true false -{}- obj~)} returns the second argument if the first argument is true, and returns the third argument if the first argument is false.
+
+\begin{alltt}
+: sgn 0 < -1 1 ? ;
+-10 sgn .
+\emph{-1}
+5 sgn .
+\emph{1}
+\end{alltt}
+
+\subsection{\label{sub:Conditionals}Conditionals}
+
+The \texttt{ifte} combinator was already glossed over and hand-waved in the numbers game example. Now, we will take a closer look at \texttt{ifte} and related forms.
+
+\texttt{ifte} \texttt{( cond true false -{}- )} executes either the
+\texttt{true} or \texttt{false} quotations, depending on the boolean
+value of \texttt{cond}. The condition is removed from the stack before one of the two quotations is executed; if it is required as a parameter to a word called by one of the quotations, it must be duplicated first.
+
+A quotation a list of objects that can be executed. Quotations are input
+using the following syntax:
+
+\begin{alltt}
+{[} 2 3 + . {]}
+\end{alltt}
+
+Here is an example of \texttt{ifte} usage:
+
+\begin{alltt}
+1 2 < {[} "1 is less than 2." print {]} {[} "bug!" print {]} ifte
+\end{alltt}
+
+Compare the order of parameters here with the order of parameters in
+the stack effect of \texttt{ifte}.
+
+The stack effects of the two \texttt{ifte} branches should be
+the same. If they differ, the word becomes harder to document and
+debug.
+
+Two minor variations are \texttt{when} \texttt{( cond true -{}- )} and \texttt{unless} \texttt{( cond false -{}- )}. They only have one branch; the other branch is a no-op. The branch should produce as many values as they consume; this ensures that the stack effect of the entire \texttt{when} or \texttt{unless} expression is consistent regardless of which branch was taken.
+
+The following definition pushes the first element of a list if the top of the stack is a list, otherwise it leaves it intact:
+
+\begin{verbatim}
+: first ( obj -- obj )
+    dup cons? [ car ] when ;
+\end{verbatim}
+
+Note that regardless of the value at the top of the stack, the stack height is consistent at the end of the \texttt{when} expression, since \texttt{car} produces as many values as it consumes.
+
+Because the \texttt{ifte} combinator considers any value not equal to \texttt{f} to be true, it is often the case that the same object that was used as the condition is needed for further processing. One solution is to \texttt{dup} the object, so that it is on the stack for the ``true'' branch to use. However, usually the ``false'' branch does not need the extra \texttt{f} on the stack, so it has to \texttt{drop}. This pattern is very common; here is the general shape of the code:
+
+\begin{verbatim}
+dup [
+    do-something
+] [
+    drop handle-failure
+] ifte
+\end{verbatim}
+
+In fact, this pattern is so common that it is embodied by the \texttt{ifte*} combinator. Using \texttt{ifte*}, one would write the above code as follows:
+
+\begin{verbatim}
+[
+    do-something
+] [
+    handle-failure
+] ifte*
+\end{verbatim}
+
+An example of \texttt{ifte*} use can be found in the definition of the \texttt{list?} word. If the top of the stack is not \texttt{f}, further processing needs to be performed; if it is \texttt{f}, it can be discarded, and \texttt{t} must be pushed on the stack, since \texttt{f} is the empty list:
+
+\begin{verbatim}
+: list? ( list -- boolean )
+    #! Proper list test. A proper list is either f, or a cons
+    #! cell whose cdr is a proper list.
+    [
+        dup cons? [ cdr list? ] [ drop f ] ifte 
+    ] [
+        t 
+    ] ifte* ;
+\end{verbatim}
+
+Similarly, there is a \texttt{when*} combinator, with only one branch. A code snippet to print the top of the stack if it is not \texttt{f} might look as follows:
+
+\begin{verbatim}
+[ . ] when*
+\end{verbatim}
+
+It is equivalent to either of the following two lines:
+
+\begin{verbatim}
+[ . ] [ ] ifte*
+dup [ . ] [ drop ] ifte
+\end{verbatim}
+
+The \texttt{unless*} combinator provides a convinient way to place another value on the stack if the top of the stack is \texttt{f}, and leave the stack intact otherwise. The \texttt{mime-type} word uses it to provide a default value in case an association list lookup fails:
+
+\begin{verbatim}
+: mime-type ( filename -- mime-type )
+    file-extension mime-types assoc [ "text/plain" ] unless* ;
+\end{verbatim}
+
+If \texttt{unless*} was not available, the above word could be written as
+follows:
+
+\begin{verbatim}
+: mime-type ( filename -- mime-type )
+    file-extension mime-types assoc dup [
+        drop "text/plain"
+    ] unless ;
+\end{verbatim}
+
 \subsection{The call stack}
 
 So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
@@ -1526,6 +1600,8 @@ Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single
 \end{verbatim}
 
 Basically, the rule is you must leave the call stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can continue executing without seeing your data on the call stack.
+
+One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the callstack before returning.
 
 \subsection{Recursion}
 
@@ -2181,7 +2257,11 @@ set to \texttt{f}, or an undefined value.
 
 \texttt{set-hash ( value key hash -{}- )} stores a key/value pair in a hashtable.
 
-examples, and hash>alist, alist>hash, hash-keys, hash-values
+Hashtables can be converted to association lists and vice versa using
+the \texttt{hash>alist} and \texttt{alist>hash} words. The list of keys and
+list of values can be extracted using the \texttt{hash-keys} and \texttt{hash-values} words.
+
+examples
 
 \subsection{Variables}
 

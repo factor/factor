@@ -77,7 +77,7 @@ USE: unparser
     jnew ;
 
 : actions-key ( -- attr )
-    "factor.listener.FactorListener" "Actions" jvar-static-get
+    "factor.jedit.FactorListener" "Actions" jvar-static-get
     ; inline
 
 : <action-menu-item> ( path pair -- pair )
@@ -161,7 +161,7 @@ USE: unparser
 : listener-readln* ( continuation -- )
     "listener" get
 	[ "factor.Cons" ]
-	"factor.listener.FactorListener"
+	"factor.jedit.FactorListener"
 	"readLine" jinvoke ;
 
 : listener-readln ( -- line )
@@ -170,14 +170,14 @@ USE: unparser
 : listener-write-attr ( string style -- )
     style>attribute-set "listener" get
     [ "java.lang.String" "javax.swing.text.AttributeSet" ]
-    "factor.listener.FactorListener"
+    "factor.jedit.FactorListener"
     "insertWithAttrs"
     jinvoke ;
 
 !: listener-edit ( string -- )
 !    "listener" get
 !    [ "java.lang.String" ]
-!    "factor.listener.FactorListener"
+!    "factor.jedit.FactorListener"
 !    "editLine" jinvoke ;
 
 : <listener-stream> ( listener -- stream )

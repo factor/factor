@@ -27,7 +27,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.listener;
+package factor.jedit;
 
 import factor.*;
 import java.awt.*;
@@ -55,6 +55,7 @@ public class FactorListener extends JTextPane
 
 	private Cons readLineContinuation;
 	private int cmdStart = -1;
+	private ListenerHistoryText history;
 
 	//{{{ FactorListener constructor
 	public FactorListener()
@@ -63,24 +64,35 @@ public class FactorListener extends JTextPane
 		addMouseListener(mouse);
 		addMouseMotionListener(mouse);
 
+		history = new ListenerHistoryText(this,"factor");
+
 		listenerList = new EventListenerList();
 
 		InputMap inputMap = getInputMap();
 		
-		/* Replace enter to evaluate the input */
+		/* Press enter to evaluate the input */
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
 			new EnterAction());
 
-		/* Replace backspace to stop backspacing over the prompt */
+		/* Press backspace to stop backspacing over the prompt */
 		inputMap.put(KeyStroke.getKeyStroke('\b'),
 			new BackspaceAction());
 
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_HOME,0),
 			new HomeAction());
 
+		/* Press Up/Down to access history */
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP,0),
+			new HistoryUpAction());
+
+		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN,0),
+			new HistoryDownAction());
+
 		/* Workaround */
 		inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE,0),
 			new DummyAction());
+
+		getDocument().addDocumentListener(new DocumentHandler());
 	} //}}}
 
 	//{{{ insertWithAttrs() method
@@ -104,28 +116,9 @@ public class FactorListener extends JTextPane
 	{
 		StyledDocument doc = (StyledDocument)getDocument();
 		cmdStart = doc.getLength();
-		Element elem = doc.getParagraphElement(cmdStart);
-		/* System.err.println(elem.getAttributes().getClass()); */
 		setCursor(DefaultCursor);
 		this.readLineContinuation = continuation;
 		setCaretPosition(cmdStart);
-	} //}}}
-
-	//{{{ getLine() method
-	private String getLine() throws BadLocationException
-	{
-		StyledDocument doc = (StyledDocument)getDocument();
-		int length = doc.getLength();
-		if(cmdStart > length)
-			return "";
-		else
-		{
-			String line = doc.getText(cmdStart,length - cmdStart);
-			if(line.endsWith("\n"))
-				return line.substring(0,line.length() - 1);
-			else
-				return line;
-		}
 	} //}}}
 
 	//{{{ addEvalListener() method
@@ -241,6 +234,49 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
+	//{{{ getInput() method
+	public String getInput()
+	{
+		try
+		{
+			Document doc = getDocument();
+			String line = doc.getText(cmdStart,doc.getLength() - cmdStart);
+			if(line.endsWith("\n"))
+				return line.substring(0,line.length() - 1);
+			else
+				return line;
+		}
+		catch(BadLocationException e)
+		{
+			throw new RuntimeException(e);
+		}
+	} //}}}
+
+	//{{{ setInput() method
+	public void setInput(String line)
+	{
+		System.err.println("Set input: " + line + ", " + cmdStart);
+		try
+		{
+			Document doc = getDocument();
+			doc.remove(cmdStart,doc.getLength() - cmdStart);
+			doc.insertString(cmdStart,line,null);
+		}
+		catch(BadLocationException e)
+		{
+			throw new RuntimeException(e);
+		}
+	} //}}}
+
+	/**
+	 * Subclasses can override this to provide funky history behavior,
+	 * for JTextPanes and such.
+	 */
+	public int getInputStart()
+	{
+		return cmdStart;
+	}
+
 	//{{{ MouseHandler class
 	class MouseHandler extends MouseInputAdapter
 	{
@@ -287,14 +323,9 @@ public class FactorListener extends JTextPane
 			setCaretPosition(getDocument().getLength());
 			replaceSelection("\n");
 
-			try
-			{
-				fireEvalEvent(getLine());
-			}
-			catch(BadLocationException e)
-			{
-				e.printStackTrace();
-			}
+			history.addCurrentToHistory();
+			history.setIndex(-1);
+			fireEvalEvent(getInput());
 		}
 	} //}}}
 
@@ -336,11 +367,58 @@ public class FactorListener extends JTextPane
 		}
 	} //}}}
 
+	//{{{ HistoryUpAction class
+	class HistoryUpAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			history.historyPrevious();
+		}
+	} //}}}
+
+	//{{{ HistoryDownAction class
+	class HistoryDownAction extends AbstractAction
+	{
+		public void actionPerformed(ActionEvent evt)
+		{
+			history.historyNext();
+		}
+	} //}}}
+
 	//{{{ DummyAction class
 	class DummyAction extends AbstractAction
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
 		}
+	} //}}}
+
+	//{{{ DocumentHandler class
+	class DocumentHandler implements DocumentListener
+	{
+		public void insertUpdate(DocumentEvent e)
+		{
+			int offset = e.getOffset();
+			int length = e.getLength();
+
+			if(offset < cmdStart)
+				cmdStart += length;
+		}
+
+		public void removeUpdate(DocumentEvent e)
+		{
+			int offset = e.getOffset();
+			int length = e.getLength();
+
+			if(offset < cmdStart)
+			{
+				if(offset + length > cmdStart)
+					cmdStart = offset;
+				else
+					cmdStart -= length;
+			}
+		}
+
+		public void changedUpdate(DocumentEvent e) {}
 	} //}}}
 }

@@ -4,7 +4,7 @@ void clear_environment(void)
 {
 	int i;
 	for(i = 0; i < USER_ENV; i++)
-		userenv[i] = 0;
+		userenv[i] = F;
 	profile_depth = 0;
 }
 

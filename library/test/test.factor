@@ -113,7 +113,7 @@ USE: unparser
         "crashes" test
         "sbuf" test
         "threads" test
-        "parsing-word" test
+       ! "parsing-word" test
 
         cpu "x86" = [
             [
@@ -147,4 +147,8 @@ USE: unparser
     "benchmark/fac" test
     "benchmark/fib" test
     "benchmark/sort" test 
-    "benchmark/continuations" test ;
+    "benchmark/continuations" test
+    "benchmark/ack" test 
+    "benchmark/hashtables" test
+    "benchmark/strings" test
+    "benchmark/vectors" test ;

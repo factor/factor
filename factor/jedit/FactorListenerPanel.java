@@ -27,7 +27,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.listener;
+package factor.jedit;
 
 import factor.*;
 import java.awt.*;

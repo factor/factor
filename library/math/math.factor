@@ -33,10 +33,6 @@ USE: math
 USE: real-math
 USE: stack
 
-: fib ( n -- nth fibonacci number )
-    ! This is the naive implementation, for benchmarking purposes.
-    dup 1 <= [ drop 1 ] [ pred dup fib swap pred fib + ] ifte ;
-
 : fac ( n -- n! )
     ! This is the naive implementation, for benchmarking purposes.
     1 swap [ succ * ] times* ;

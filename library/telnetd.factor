@@ -42,7 +42,6 @@ USE: threads
     dup [
         "client" set
         log-client
-        init-history
         interpreter-loop
     ] with-stream ;
 

@@ -27,43 +27,12 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.listener;
+package factor.jedit;
 
-import factor.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
+import factor.Cons;
+import java.util.EventListener;
 
-public class FactorDesktop extends JFrame
+public interface EvalListener extends EventListener
 {
-	//{{{ main() method
-	public static void main(final String[] args)
-	{
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				new FactorDesktop(args,true);
-			}
-		});
-	} //}}}
-
-	//{{{ FactorDesktop constructor
-	public FactorDesktop(String[] args, boolean standalone)
-	{
-		super("Factor");
-
-		getContentPane().add(BorderLayout.CENTER,
-			new FactorListenerPanel(
-			FactorListenerPanel.newInterpreter(args)));
-
-		setSize(640,480);
-		setDefaultCloseOperation(standalone
-			? EXIT_ON_CLOSE
-			: DISPOSE_ON_CLOSE);
-		show();
-	} //}}}
+	public void eval(Cons code);
 }

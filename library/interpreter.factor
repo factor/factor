@@ -50,43 +50,12 @@ USE: vectors
     "Copyright (C) 2004 Chris Double" print
     "Type ``exit'' to exit, ``help'' for help." print ;
 
-: init-history ( -- )
-    64 <vector> "history" set ;
-
-: history+ ( cmd -- )
-    "history" get vector-push ;
-
-: print-numbered-entry ( index vector -- )
-    <% over unparse % ": " % vector-nth % %> print ;
-
-: print-numbered-vector ( list -- )
-    dup vector-length [ over print-numbered-entry ] times* drop ;
-
-: history. ( -- )
-    "X redo    -- evaluate the expression with number X." print
-    "X re-edit -- edit the expression with number X." print
-    "history" get print-numbered-vector ;
-
-: get-history ( index -- str )
-    "history" get vector-nth ;
-
-: redo ( index -- )
-    get-history dup "  ( " write write " )" print eval ;
-
-: re-edit ( index -- )
-    get-history edit ;
-
-: history# ( -- number )
-    "history" get vector-length ;
-
 : print-prompt ( -- )
-    <% "  ( " % history# unparse % " )" % %>
-    "prompt" get-style write-attr
+    "ok" "prompt" get-style write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
-    " " write
-    flush ;
+    " " write flush ;
 
 : exit ( -- )
     "quit-flag" on ;
@@ -95,11 +64,7 @@ USE: vectors
     [ eval ] [ [ default-error-handler drop ] when* ] catch ;
 
 : interpret ( -- )
-    print-prompt read dup [
-        dup history+ eval-catch
-    ] [
-        drop exit
-    ] ifte ;
+    print-prompt read [ eval-catch ] [ exit ] ifte* ;
 
 : interpreter-loop ( -- )
     "quit-flag" get [
@@ -118,7 +83,6 @@ USE: vectors
     native? [
         "\"foo.image\" save-image   -- save heap to a file" print
     ] when
-    "history.                 -- show previous commands" print
     "room.                    -- show memory usage" print
     "garbage-collection       -- force a GC" print
     "exit                     -- exit interpreter" print
@@ -126,9 +90,9 @@ USE: vectors
     "WORDS:" print
     "vocabs.                  -- list vocabularies" print 
     "\"math\" words.            -- list the math vocabulary" print
-    "\"neg\" see                -- show word definition" print
     "\"str\" apropos.           -- list all words containing str" print
-    "\"car\" usages.            -- list all words invoking car" print
+    "\\ neg see                -- show word definition" print
+    "\\ car usages.            -- list all words invoking car" print
     terpri
     "STACKS:" print
     ".s .r .n .c              -- show contents of the 4 stacks" print

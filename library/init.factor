@@ -99,8 +99,6 @@ USE: words
     parse-switches run-files ;
 
 : init-interpreter ( -- )
-    init-history
-
     print-banner
     room.
 

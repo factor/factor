@@ -33,6 +33,7 @@ void primitive_bignum_greater(void);
 void primitive_bignum_greatereq(void);
 void primitive_bignum_not(void);
 void copy_bignum_constants(void);
+CELL three_test(void* x, unsigned char r, unsigned char g, unsigned char b);
 
 INLINE CELL tag_integer(FIXNUM x)
 {

@@ -1,54 +1,23 @@
 FFI:
+
++ compiler/ffi:
+
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *
 - float types
-- SDL_MapRGB broken
-
-- command line parsing cleanup
-- > 1 ( ) inside word def
-- parsing-word test fails
-
-- when* compilation in jvm
 - compile word twice; no more 'cannot compile' error!
-- doc comments in image, inferior
 - compiler: drop literal peephole optimization
 - compiling when*
 - compiling unless*
 - getenv/setenv: if literal arg, compile as a load/store
 - inline words
 - perhaps /i should work with all numbers
-- profiler is inaccurate: wrong word on cs
-- buffer change handler in sidekick is screwed
-- eval with multilien strings and #!
-- quit responder breaks with multithreading
-- nicer way to combine two paths
-- don't show listener on certain commands
-- plugin should not exit jEdit on fatal errors
-- wordpreview: don't show for string literals and comments
-- alist -vs- assoc terminology
-- file responder: don't show full path in title
-
-- clean up listener's action popups
-- jedit ==> jedit-word, jedit takes a file name
-- add a socket timeout
-- fix error postoning -- not all errors thrown by i/o code are
-  postponed
-- some way to run httpd from command line
-
-+ bignums:
-
-- move some s48_ functions into bignum.c
-- remove unused functions
-
-- >lower, >upper for strings
-- accept multi-line input in listener
 
 + docs:
 
 - explain how log uses >polar and rect>
-- when* unless*
 - simple i/o section
 - unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
@@ -63,14 +32,12 @@ FFI:
   multitasking
   unit testing
 
-+ tests:
-
-- java factor: equal numbers have non-equal hashcodes!
-- FactorLib.equal() not very good
-- investigate mandel.factor
-
 + listener/plugin:
 
+- clean up listener's action popups
+- accept multi-line input in listener
+- don't show listener on certain commands
+- wordpreview: don't show for string literals and comments
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
@@ -83,11 +50,42 @@ FFI:
 - special completion for USE:/IN:
 - inspector links when describe called without object path
 
-+ native:
++ kernel:
 
+- profiler is inaccurate: wrong word on cs
 - better i/o scheduler
+- move some s48_ functions into bignum.c
+- remove unused functions
+- >lower, >upper for strings
+- add a socket timeout
+- fix error postoning -- not all errors thrown by i/o code are
+  postponed
+- don't rehash strings on every startup
 
-+ JVM compiler:
++ misc:
+
+- jedit ==> jedit-word, jedit takes a file name
+- 'cascading' styles
+- command line parsing cleanup
+- > 1 ( ) inside word def
+- parsing-word test fails
+- doc comments in image, inferior
+- eval with multilien strings and #!
+- nicer way to combine two paths
+- alist -vs- assoc terminology
+
++ httpd:
+
+- file responder: don't show full path in title
+- wiki responder:
+  - port to native
+  - text styles
+- log with date
+ basic authentication, using httpdAuth function from a config file
+- file responder; last-modified field
+- quit responder breaks with multithreading
+
++ java factor is going away:
 
 - compiled stack traces broken
 - save classes to disk
@@ -99,18 +97,8 @@ FFI:
 - direct stack access leaks memory on stack
 - unnecessary local allocation: max is instance var, but several methods
   get compiled.
-
-+ misc:
-
-- don't rehash strings on every startup
-- 'cascading' styles
 - ditch expand
-
-+ httpd:
-
-- wiki responder:
-  - port to native
-  - text styles
-- log with date
- basic authentication, using httpdAuth function from a config file
-- file responder; last-modified field
+- when* compilation in jvm
+- plugin should not exit jEdit on fatal errors
+- java factor: equal numbers have non-equal hashcodes!
+- FactorLib.equal() not very good

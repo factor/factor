@@ -27,12 +27,34 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.listener;
+package factor.jedit;
 
-import factor.Cons;
-import java.util.EventListener;
+import javax.swing.text.JTextComponent;
+import org.gjt.sp.jedit.gui.HistoryText;
 
-public interface EvalListener extends EventListener
+public class ListenerHistoryText extends HistoryText
 {
-	public void eval(Cons code);
+	private FactorListener listener;
+
+	public ListenerHistoryText(FactorListener listener, String model)
+	{
+		super(listener,model);
+		this.listener = listener;
+	}
+
+	public int getInputStart()
+	{
+		return listener.getInputStart();
+	}
+	
+	public String getText()
+	{
+		return listener.getInput();
+	}
+	
+	public void setText(String text)
+	{
+		setIndex(-1);
+		listener.setInput(text);
+	}
 }

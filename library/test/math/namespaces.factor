@@ -9,5 +9,5 @@ USE: math
 [ 5 ] [ 1 "x" -@ "x" get ] unit-test
 [ 10 ] [ 2 "x" *@ "x" get ] unit-test
 [ 2 ] [ 5 "x" /@ "x" get ] unit-test
-[ -3 ] [ "x" pred@ "x" get ] unit-test
-[ -2 ] [ "x" succ@ "x" get ] unit-test
+[ 1 ] [ "x" pred@ "x" get ] unit-test
+[ 2 ] [ "x" succ@ "x" get ] unit-test

@@ -213,10 +213,14 @@ DEFER: prettyprint*
     #! Unparse each element on its own line.
     [ . ] each ;
 
-: .n namestack  . ;
-: .s datastack  . ;
-: .r callstack  . ;
-: .c catchstack . ;
+: {.} ( vector -- )
+    #! Unparse each element on its own line.
+    [ . ] vector-each ;
+
+: .n namestack  {.} ;
+: .s datastack  {.} ;
+: .r callstack  {.} ;
+: .c catchstack {.} ;
 
 ! For integers only
 : .b >bin print ;

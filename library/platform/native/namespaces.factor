@@ -36,11 +36,17 @@ USE: strings
 USE: vectors
 
 DEFER: namespace
-DEFER: >n
-DEFER: n>
 
 : namestack* ( -- ns ) 3 getenv ;
 : set-namestack* ( ns -- ) 3 setenv ;
+
+: >n ( namespace -- n:namespace )
+    #! Push a namespace on the namespace stack.
+    namestack* vector-push ; inline
+
+: n> ( n:namespace -- namespace )
+    #! Pop the top of the namespace stack.
+    namestack* vector-pop ; inline
 
 : namestack ( -- stack ) namestack* vector-clone ;
 : set-namestack ( stack -- ) vector-clone set-namestack* ;

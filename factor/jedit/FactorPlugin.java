@@ -29,7 +29,6 @@
 
 package factor.jedit;
 
-import factor.listener.FactorListenerPanel;
 import factor.*;
 import java.io.InputStreamReader;
 import java.util.*;

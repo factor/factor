@@ -1,5 +1,5 @@
 CC = gcc
-DEFAULT_CFLAGS = -Os -Wall -export-dynamic -fomit-frame-pointer $(SITE_CFLAGS)
+DEFAULT_CFLAGS = -Wall -export-dynamic -g $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
@@ -54,7 +54,7 @@ solaris:
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-	$(STRIP) $@
+	# $(STRIP) $@
 
 clean:
 	rm -f $(OBJS)
