@@ -44,6 +44,7 @@ USE: prettyprint
 USE: todo
 USE: arithmetic
 USE: logic
+USE: kernel
  
 : todo-stylesheet ( -- string )
   #! Return the stylesheet for the todo list
@@ -315,6 +316,41 @@ USE: logic
     get-new-todo-item
   ] ifte ;
 
+: write-get-password-form ( url -- )
+  #! Display the HTML for a form allowing entry of a 
+  #! new password.
+  [
+    <table> [
+      <tr class= "required" tr> [ <td class= "lbl" td> [ "Old Password" write ] </td>
+             <td> [ "old-password" password-input ] </td> ] </tr>
+      <tr class= "required" tr> [ <td class= "lbl" td> [ "New Password" write ] </td>
+             <td> [ "new-password" password-input ] </td> ] </tr>
+      <tr class= "required" tr> [ <td class= "lbl" td> [ "Verify Password" write ] </td>
+             <td> [ "verify-password" password-input ] </td> ] </tr>
+    ] </table>
+    "Change Password" button
+  ] form ;
+
+: get-new-password ( <todo> --  password )
+  #! Get a new password for the todo list.
+  [
+    "Enter New Password" [ include-todo-stylesheet ] [ write-get-password-form ] styled-page  
+  ] show [ 
+    "old-password" get 
+    swap password-matches? [
+      "new-password" get
+      "verify-password" get = [
+        "new-password" get        
+      ] [
+        "Your new password did not match. The password was NOT changed." show-message-page
+        f
+      ] ifte
+    ] [
+      "You entered an incorrect old password. The password was NOT changed." show-message-page
+      f
+    ] ifte
+  ] bind ;
+
 : edit-item-details ( item -- )
   #! Allow editing of an existing items details.
   [
@@ -381,6 +417,15 @@ USE: logic
   #! Request a new item from the user and add it to the current todo list.
   "todo" get get-new-todo-item add-todo-item save-current-todo ;
 
+: do-change-password ( -- )
+  #! Allow changing the password for the todo list.
+  "todo" get get-new-password dup [
+    "todo" get [ "password" set ] bind save-current-todo 
+    "Your password has been changed." show-message-page 
+  ] [
+    drop
+  ] ifte ;
+
 : show-todo-list ( -- )
   #! Show the current todo list.
   [
@@ -389,7 +434,10 @@ USE: logic
     [
       drop
       "todo" get write-item-table
-      "Add Item" [ do-add-new-item ] quot-href
+      [
+        [ "Add Item" [ do-add-new-item ] quot-href ]
+        [ "Change Password" [ do-change-password ] quot-href ]
+      ] horizontal-layout
     ] styled-page 
   ] show drop ;
 
