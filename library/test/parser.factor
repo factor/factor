@@ -1,4 +1,5 @@
 IN: scratchpad
+USE: combinators
 USE: parser
 USE: test
 USE: unparser

@@ -97,6 +97,7 @@ USE: vectors
         [ 101 | "fixnum/bignum/ratio" ]
         [ 102 | "fixnum/bignum/ratio/float" ]
         [ 103 | "fixnum/bignum/ratio/float/complex" ]
+        [ 104 | "fixnum/string" ]
     ] assoc ;
 
 : java? f ;

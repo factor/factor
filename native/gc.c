@@ -120,11 +120,10 @@ void collect_roots(void)
 	gc_debug("collect_roots",scan);
 	/* these two must be the first in the heap */
 	copy_object(&F);
-	gc_debug("f",F);
 	copy_object(&T);
-	gc_debug("t",T);
-	copy_object(&callframe);
+	/* the bignum 0 1 -1 constants must be the next three */
 	copy_bignum_constants();
+	copy_object(&callframe);
 
 	for(ptr = ds_bot; ptr < ds; ptr += CELLS)
 		copy_object((void*)ptr);

@@ -31,7 +31,6 @@ USE: kernel
 USE: stack
 
 : (gcd) ( x y -- z )
-    USE: prettyprint .s
     dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 
 : gcd ( x y -- z )

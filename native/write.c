@@ -26,25 +26,16 @@ bool can_write(PORT* port, FIXNUM len)
 	if(port->type != PORT_WRITE)
 		general_error(ERROR_INCOMPATIBLE_PORT,tag_object(port));
 
-	switch(port->type)
+	buf_capacity = port->buffer->capacity * CHARS;
+	/* Is the string longer than the buffer? */
+	if(port->buf_fill == 0 && len > buf_capacity)
 	{
-	case PORT_READ:
-		return false;
-	case PORT_WRITE:
-		buf_capacity = port->buffer->capacity * CHARS;
-		/* Is the string longer than the buffer? */
-		if(port->buf_fill == 0 && len > buf_capacity)
-		{
-			/* Increase the buffer to fit the string */
-			port->buffer = allot_string(len / CHARS + 1);
-			return true;
-		}
-		else
-			return (port->buf_fill + len <= buf_capacity);
-	default:
-		critical_error("Bad port->type",port->type);
-		return false;
+		/* Increase the buffer to fit the string */
+		port->buffer = allot_string(len / CHARS + 1);
+		return true;
 	}
+	else
+		return (port->buf_fill + len <= buf_capacity);
 }
 
 void primitive_can_write(void)
@@ -132,7 +123,7 @@ void primitive_write_8(void)
 		write_string_8(port,str);
 		break;
 	default:
-		type_error(STRING_TYPE,text);
+		type_error(TEXT_TYPE,text);
 		break;
 	}
 }

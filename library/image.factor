@@ -139,13 +139,14 @@ USE: words
 ( Bignums )
 
 : 'bignum ( bignum -- tagged )
-    'fixnum ;
-!    #! Very bad!
-!    object-tag here-as >r
-!    bignum-type >header emit
-!    1 emit ( capacity )
-!    0 emit ( sign XXXX )
-!    ( bignum -- ) emit r> ;
+    object-tag here-as >r
+    bignum-type >header emit
+    dup 0 = 1 2 ? emit ( capacity )
+    dup 0 < [
+        1 emit neg emit
+    ] [
+        0 emit     emit
+    ] ifte r> ;
 
 ( Special objects )
 
@@ -154,10 +155,15 @@ USE: words
 : f, object-tag here-as "f" set f-type >header emit 0 'fixnum emit ;
 : t, object-tag here-as "t" set t-type >header emit 0 'fixnum emit ;
 
-( Beginning of the image )
-! The image proper begins with the header, then F, T
+:  0,  0 'bignum drop ;
+:  1,  1 'bignum drop ;
+: -1, -1 'bignum drop ;
 
-: begin ( -- ) header f, t, ;
+( Beginning of the image )
+! The image proper begins with the header, then F, T,
+! and the bignums 0, 1, and -1.
+
+: begin ( -- ) header f, t, 0, 1, -1, ;
 
 ( Words )
 

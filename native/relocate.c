@@ -45,6 +45,14 @@ void relocate_next()
 	}
 }
 
+void init_object(CELL* handle, CELL type)
+{
+	if(untag_header(get(relocating)) != type)
+		fatal_error("init_object() failed",get(relocating));
+	*handle = tag_object((CELL*)relocating);
+	relocate_next();
+}
+
 void relocate(CELL r)
 {
 	relocation_base = r;
@@ -55,16 +63,14 @@ void relocate(CELL r)
 	relocating = active->base;
 
 	/* The first two objects in the image must always be F, T */
-	if(untag_header(get(relocating)) != F_TYPE)
-		fatal_error("Not F",get(relocating));
-	F = tag_object((CELL*)relocating);
-	relocate_next();
+	init_object(&F,F_TYPE);
+	init_object(&T,T_TYPE);
 
-	if(untag_header(get(relocating)) != T_TYPE)
-		fatal_error("Not T",get(relocating));
-	T = tag_object((CELL*)relocating);
-	relocate_next();
-
+	/* The next three must be bignum 0, 1, -1  */
+	init_object(&bignum_zero,BIGNUM_TYPE);
+	init_object(&bignum_pos_one,BIGNUM_TYPE);
+	init_object(&bignum_neg_one,BIGNUM_TYPE);
+	
 	for(;;)
 	{
 		if(relocating >= active->here)

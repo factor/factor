@@ -1,11 +1,14 @@
-don't crash on bad prim #
-fixnum/string pseudo-type for error reporting
-to_c_string allots too much
+- alist -vs- assoc terminology
+- some way to run httpd from command line
+- 'default responder' for when we go to root
+- file responder:
+  - directory listings
+  - index.html
+  - if a directory is requested and URL does not end with /, redirect
+- doc strings with native factor
 
 + bignums:
 
-- cached 0/-1/1 should be cross compiled in image
-- bignum cross compiling
 - move some s48_ functions into bignum.c
 - remove unused functions
 
@@ -50,7 +53,6 @@ to_c_string allots too much
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
 - input style after clicking link
-- plugin not unloaded
 - listener backspace overzealous
 - completion in the listener
 - special completion for USE:/IN:
@@ -82,10 +84,8 @@ to_c_string allots too much
 
 + misc:
 
-- alist -vs- assoc terminology
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
-- some way to run httpd from command line
 - rethink strhead/strtail&co
 - namespace clone drops static var bindings
 - ditch expand
@@ -94,10 +94,6 @@ to_c_string allots too much
 + httpd:
 
 - quit responder breaks with multithreading
-- 'default responder' for when we go to root
-- file responder:
-  - port to native
-  - if a directory is requested and URL does not end with /, redirect
 - wiki responder:
   - port to native
   - text styles

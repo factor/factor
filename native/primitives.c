@@ -147,7 +147,7 @@ XT primitives[] = {
 CELL primitive_to_xt(CELL primitive)
 {
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
-		critical_error("Bad primitive number",primitive);
+		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
 
 	return (CELL)primitives[primitive];
 }

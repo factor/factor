@@ -89,6 +89,9 @@ USE: words
 : negative-array-size-error ( obj -- )
     "Cannot allocate array with negative size " write . ;
 
+: bad-primitive-error ( obj -- )
+    "Bad primitive number: " write . ;
+
 : kernel-error. ( obj n -- str )
     {
         expired-port-error
@@ -104,6 +107,7 @@ USE: words
         signal-error
         profiling-disabled-error
         negative-array-size-error
+        bad-primitive-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

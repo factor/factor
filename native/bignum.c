@@ -1,16 +1,5 @@
 #include "factor.h"
 
-void init_bignum(void)
-{
-	bignum_zero = bignum_allocate(0,0);
-
-	bignum_pos_one = bignum_allocate(1,0);
-	(BIGNUM_REF (bignum_pos_one, 0)) = 1;
-
-	bignum_neg_one = bignum_allocate(1,1);
-	(BIGNUM_REF (bignum_neg_one, 0)) = 1;
-}
-
 void primitive_bignump(void)
 {
 	drepl(tag_boolean(typep(BIGNUM_TYPE,dpeek())));
@@ -214,7 +203,7 @@ CELL not_bignum(ARRAY* x)
 
 void copy_bignum_constants(void)
 {
-	bignum_zero = copy_array(bignum_zero);
-	bignum_pos_one = copy_array(bignum_pos_one);
-	bignum_neg_one = copy_array(bignum_neg_one);
+	copy_object(&bignum_zero);
+	copy_object(&bignum_pos_one);
+	copy_object(&bignum_neg_one);
 }

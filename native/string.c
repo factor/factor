@@ -74,7 +74,7 @@ STRING* from_c_string(const char* c_string)
 /* untagged */
 char* to_c_string(STRING* s)
 {
-	STRING* _c_str = allot_string(s->capacity + 1 /* null byte */);
+	STRING* _c_str = allot_string(s->capacity / CHARS + 1);
 	CELL i;
 
 	char* c_str = (char*)(_c_str + 1);

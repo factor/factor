@@ -4,11 +4,10 @@ INLINE ARRAY* untag_bignum(CELL tagged)
 	return (ARRAY*)UNTAG(tagged);
 }
 
-ARRAY* bignum_zero;
-ARRAY* bignum_pos_one;
-ARRAY* bignum_neg_one;
+CELL bignum_zero;
+CELL bignum_pos_one;
+CELL bignum_neg_one;
 
-void init_bignum(void);
 void primitive_bignump(void);
 ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);

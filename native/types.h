@@ -37,6 +37,7 @@ CELL T;
 #define RATIONAL_TYPE 101 /* INTEGER or RATIO */
 #define REAL_TYPE 102 /* RATIONAL or FLOAT */
 #define NUMBER_TYPE 103 /* COMPLEX or REAL */
+#define TEXT_TYPE 104 /* FIXNUM or STRING */
 
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);

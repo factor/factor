@@ -16,7 +16,6 @@ int main(int argc, char** argv)
 	load_image(argv[1]);
 	init_stacks();
 	init_io();
-	init_bignum();
 	init_signals();
 
 	args = F;

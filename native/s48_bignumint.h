@@ -102,9 +102,9 @@ typedef long bignum_length_type;
 
 /* These definitions are here to facilitate caching of the constants
    0, 1, and -1. */
-#define BIGNUM_ZERO() bignum_zero
+#define BIGNUM_ZERO() (ARRAY*)UNTAG(bignum_zero)
 #define BIGNUM_ONE(neg_p) \
-   (neg_p ? bignum_neg_one : bignum_pos_one)
+   (ARRAY*)UNTAG(neg_p ? bignum_neg_one : bignum_pos_one)
 
 #define BIGNUM_ONE_P(bignum,negative_p) ((bignum) == BIGNUM_ONE(negative_p))
 

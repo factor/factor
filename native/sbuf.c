@@ -96,7 +96,7 @@ void primitive_sbuf_append(void)
 		sbuf_append_string(sbuf,untag_string(object));
 		break;
 	default:
-		type_error(STRING_TYPE,object);
+		type_error(TEXT_TYPE,object);
 		break;
 	}
 }
