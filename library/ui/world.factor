@@ -45,7 +45,7 @@ DEFER: halo-selected
         dup gadget-parent [
             drop dup gadget-parent [ relayout ] [ drop ] ifte
         ] [
-            unparent drop
+            drop unparent
         ] ifte
     ] [
         2drop

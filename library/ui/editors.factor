@@ -83,7 +83,7 @@ C: editor ( text -- )
     editor-line [ caret get line-text get ] bind offset>x 0 ;
 
 : caret-size ( editor -- w h )
-    0 swap shape-h ;
+    1 swap shape-h ;
 
 M: editor user-input* ( ch field -- ? )
     [ insert-char ] with-editor t ;

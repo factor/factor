@@ -121,8 +121,8 @@ TUPLE: line x y w h ;
 
 M: line shape-x dup line-x dup rot line-w + min ;
 M: line shape-y dup line-y dup rot line-h + min ;
-M: line shape-w line-w abs ;
-M: line shape-h line-h abs ;
+M: line shape-w line-w abs 1 + ;
+M: line shape-h line-h abs 1 + ;
 
 : line-pos ( line -- #{ x y }# )
     dup line-x x get + swap line-y y get + rect> ;
