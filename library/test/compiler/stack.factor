@@ -35,3 +35,18 @@ USE: math
     [ + ] dup over 3drop ;
 
 [ ] [ kill-3 ] unit-test
+
+: kill-4
+    [ 1 2 3 ] [ + ] [ - ] pick >r 2drop r> ; compiled
+
+[ [ 1 2 3 ] [ 1 2 3 ] ] [ kill-4 ] unit-test
+
+: kill-5
+    [ + ] [ - ] [ 1 2 3 ] pick pick 2drop >r 2drop r> ; compiled
+
+[ [ 1 2 3 ] ] [ kill-5 ] unit-test
+
+: kill-6
+    [ 1 2 3 ] [ 4 5 6 ] [ + ] pick >r drop r> ; compiled
+
+[ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test

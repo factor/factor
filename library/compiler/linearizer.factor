@@ -32,6 +32,9 @@ USE: stack
 USE: namespaces
 USE: inference
 USE: combinators
+USE: math
+USE: logic
+USE: kernel
 
 ! The linear IR is close to assembly language. It also resembles
 ! Forth code in some sense. It exists so that pattern matching
@@ -40,6 +43,8 @@ USE: combinators
 ! Linear IR nodes. This is in addition to the symbols already
 ! defined in inference vocab.
 
+SYMBOL: #push-immediate
+SYMBOL: #push-indirect
 SYMBOL: #jump-label-t ( branch if top of stack is true )
 SYMBOL: #jump-label ( unconditional branch )
 SYMBOL: #jump ( tail-call )
@@ -65,6 +70,18 @@ SYMBOL: #return-to ( push addr on C stack )
     #! lists where the first element is an operation, and the
     #! rest is arguments.
     [ (linearize) ] make-list ;
+
+: immediate? ( obj -- ? )
+    #! fixnums and f have a pointerless representation, and
+    #! are compiled immediately. Everything else can be moved
+    #! by GC, and is indexed through a table.
+    dup fixnum? swap f eq? or ;
+
+#push [
+    [ node-param get ] bind
+    dup immediate? #push-immediate #push-indirect ?
+    swons ,
+] "linearizer" set-word-property
 
 : <label> ( -- label )
     gensym ;

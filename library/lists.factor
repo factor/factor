@@ -47,7 +47,7 @@ USE: vectors
     #! from first occurrence where it is true, or return f.
     over [
         dup >r over >r >r car r> call [
-            r> r> 2drop t
+            r> r> drop
         ] [
             r> cdr r> some?
         ] ifte
@@ -57,7 +57,7 @@ USE: vectors
 
 : contains? ( element list -- ? )
     #! Test if a list contains an element.
-    [ over = ] some? nip ;
+    [ over = ] some? >boolean nip ;
 
 : nth ( n list -- list[n] )
     #! nth element of a proper list.

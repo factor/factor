@@ -10,7 +10,6 @@
 - type inference
 - handle odd base cases, with code after ifte
 - handle recursion with when, when* etc
-- optimizer rewrite stack ops
 - alien-call need special nodes
 
 + linearizer/generator:

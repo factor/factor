@@ -104,7 +104,7 @@ USE: logic
 : kill-node ( literals node -- )
     #! Remove the literals from the node and , it if it is not a
     #! NOP.
-    "kill-node" [ (kill-node) ] apply-dataflow ;
+    "kill-node" [ nip , ] apply-dataflow ;
 
 : kill-nodes ( literals dataflow -- dataflow )
     #! Remove literals and construct a list.
@@ -121,12 +121,16 @@ USE: logic
     ] extend , ;
 
 #push [
+    [ node-param get ] bind ,
+] "scan-literal" set-word-property
+
+#push [
     consumes-literal? not
 ] "can-kill" set-word-property
 
 #push [
-    [ node-param get ] bind ,
-] "scan-literal" set-word-property
+    (kill-node)
+] "kill-node" set-word-property
 
 #label [
     [ node-param get ] bind (scan-literals)
@@ -156,28 +160,30 @@ USE: logic
 #call-label [ 2drop t ] "can-kill" set-word-property
 
 #drop [ 2drop t ] "can-kill" set-word-property
+#drop [ (kill-node) ] "kill-node" set-word-property
 #dup [ 2drop t ] "can-kill" set-word-property
+#dup [ (kill-node) ] "kill-node" set-word-property
 #swap [ 2drop t ] "can-kill" set-word-property
+#swap [ (kill-node) ] "kill-node" set-word-property
 
-: reduce-stack-op ( literals node map -- node )
+: kill-mask ( literals node -- mask )
+    [ node-consume-d get ] bind [
+        dup cons? [ car over contains? ] [ drop f ] ifte
+    ] map nip ;
+
+: reduce-stack-op ( literals node map -- )
     #! If certain values passing through a stack op are being
     #! killed, the stack op can be reduced, in extreme cases
     #! to a no-op.
-    -rot [
-        node-consume-d get [
-            dup cons? [ car over contains? ] [ drop f ] ifte
-        ] map nip
-        swap assoc node-op set
-    ] extend ;
+    -rot [ kill-mask swap assoc ] keep
+    over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
 
 #over [ 2drop t ] "can-kill" set-word-property
 #over [
     [
         [ [ f f ] | #over ]
         [ [ f t ] | #dup ]
-        [ [ t f ] | #nop ]
-        [ [ t t ] | #nop ]
-    ] reduce-stack-op ,
+    ] reduce-stack-op
 ] "kill-node" set-word-property
 
 #pick [ 2drop t ] "can-kill" set-word-property
@@ -187,12 +193,10 @@ USE: logic
         [ [ f f t ] | #over ]
         [ [ f t f ] | #over ]
         [ [ f t t ] | #dup ]
-        [ [ t f f ] | #nop ]
-        [ [ t f t ] | #nop ]
-        [ [ t t f ] | #nop ]
-        [ [ t t t ] | #nop ]
-    ] reduce-stack-op ,
+    ] reduce-stack-op
 ] "kill-node" set-word-property
 
 #>r [ 2drop t ] "can-kill" set-word-property
+#>r [ (kill-node) ] "kill-node" set-word-property
 #r> [ 2drop t ] "can-kill" set-word-property
+#r> [ (kill-node) ] "kill-node" set-word-property

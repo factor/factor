@@ -40,31 +40,6 @@ USE: strings
 USE: words
 USE: vectors
 
-: LITERAL ( cell -- )
-    #! Push literal on data stack.
-    4 ESI R+I
-    ESI I>[R] ;
-
-: [LITERAL] ( cell -- )
-    #! Push complex literal on data stack by following an
-    #! indirect pointer.
-    4 ESI R+I
-    EAX [I]>R
-    EAX ESI R>[R] ;
-
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
-
-: compile-literal ( obj -- )
-    dup immediate? [
-        address LITERAL
-    ] [
-        intern-literal [LITERAL]
-    ] ifte ;
-
 : PUSH-DS ( -- )
     #! Push contents of EAX onto datastack.
     4 ESI R+I
@@ -79,7 +54,13 @@ USE: vectors
     #! Call named C function in Factor interpreter executable.
     dlsym-self CALL JUMP-FIXUP ;
 
-#push [ compile-literal ] "generator" set-word-property
+#push-immediate [
+    address  4 ESI R+I  ESI I>[R]
+] "generator" set-word-property
+
+#push-indirect [
+    intern-literal 4 ESI R+I  EAX [I]>R  EAX ESI R>[R]
+] "generator" set-word-property
 
 #call [
     dup postpone-word
