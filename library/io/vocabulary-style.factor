@@ -40,8 +40,22 @@ USE: words
 : set-vocab-style ( style vocab -- )
     >r default-style append r> "vocabularies" style set-hash ;
 
+: browser-styles ( word -- style )
+    #! Return the style values for the HTML word browser
+    dup word-vocabulary [ 
+        swap word-name "browser-link-word" swons 
+        swap "browser-link-vocab" swons 
+        2list
+    ] [
+        drop [ ]  
+    ] ifte* ;
+
 : word-style ( word -- style )
-    word-vocabulary [ vocab-style ] [ default-style ] ifte* ;
+    dup browser-styles swap word-vocabulary [ 
+        vocab-style 
+    ] [ 
+        default-style 
+    ] ifte* append ;
 
 <namespace> "vocabularies" set-style
 

@@ -77,6 +77,19 @@ url-encoding presentation generic ;
         call
     ] ifte* ;
 
+: browser-link-href ( style -- href )
+    dup "browser-link-word" swap assoc url-encode
+    swap "browser-link-vocab" swap assoc url-encode
+    "responder" get url-encode
+    [ "/responder/" , , "/?vocab=" , , "&word=" , , ] make-string ;
+
+: browser-link-tag ( style quot -- style )
+    over "browser-link-word" swap assoc [
+        <a href= over browser-link-href a> call </a>
+    ] [
+        call
+    ] ifte ;
+
 : icon-tag ( string style quot -- )
     over "icon" swap assoc dup [
         <img src= "/responder/resource/" swap cat2 img/>
@@ -93,9 +106,11 @@ M: html-stream fwrite-attr ( str style stream -- )
     wrapper-stream-scope [
         [
             [
-                [ drop chars>entities write ] span-tag
-            ] file-link-tag
-        ] icon-tag
+                [
+                    [ drop chars>entities write ] span-tag
+                ] file-link-tag
+            ] icon-tag
+        ] browser-link-tag
     ] bind ;
 
 C: html-stream ( stream -- stream )

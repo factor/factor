@@ -39,7 +39,6 @@ USE: random
 USE: parser
 USE: html
 USE: cont-responder
-USE: cont-utils
 USE: stdio
 USE: namespaces
 

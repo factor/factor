@@ -29,7 +29,6 @@
 IN: todo-example
 USE: cont-responder
 USE: html
-USE: cont-utils
 USE: html
 USE: stdio
 USE: strings

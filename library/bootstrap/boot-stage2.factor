@@ -119,6 +119,8 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/httpd/test-responder.factor"
     "/library/httpd/quit-responder.factor"
     "/library/httpd/resource-responder.factor"
+    "/library/httpd/cont-responder.factor"
+    "/library/httpd/browser-responder.factor"
     "/library/httpd/default-responders.factor"
 
     "/library/tools/jedit.factor"
