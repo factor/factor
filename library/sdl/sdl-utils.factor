@@ -55,6 +55,7 @@ SYMBOL: surface
 
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
+    SDL_INIT_EVERYTHING SDL_Init drop  TTF_Init
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgb ( r g b -- n )

@@ -4,7 +4,6 @@ IN: gadgets
 USING: generic hashtables kernel lists namespaces ;
 
 ! Gadget protocol.
-
 GENERIC: pick-up* ( point gadget -- gadget/t )
 GENERIC: handle-gesture* ( gesture gadget -- ? )
 
@@ -40,8 +39,17 @@ M: gadget pick-up* inside? ;
 
 M: gadget handle-gesture* 2drop t ;
 
+GENERIC: redraw ( gadget -- )
+
 : move-gadget ( x y gadget -- )
-    [ move-shape ] keep set-gadget-delegate ;
+    [ move-shape ] keep
+    [ set-gadget-delegate ] keep
+    redraw ;
+
+: resize-gadget ( w h gadget -- )
+    [ resize-shape ] keep
+    [ set-gadget-delegate ] keep
+    redraw ;
 
 ! An invisible gadget.
 WRAPPER: ghost

@@ -21,7 +21,13 @@ SYMBOL: filled ! is the interior of the shape filled?
 
 GENERIC: draw ( obj -- )
 
-M: rect draw ( rect -- )
+M: ghost draw ( ghost -- )
+    drop ;
+
+M: number draw ( point -- )
+    >r surface get r> >rect rgb-color pixelColor ;
+
+M: rectangle draw ( rect -- )
     >r surface get r> shape>screen rgb-color
     filled get [ boxColor ] [ rectangleColor ] ifte ;
 

@@ -15,8 +15,9 @@ M: general-list draw ( list -- )
 M: box draw ( box -- )
     dup [
         dup [
-            dup box-contents draw
+            dup
             box-delegate draw
+            box-contents draw
         ] with-gadget
     ] with-translation ;
 
@@ -49,10 +50,18 @@ M: box pick-up* ( point box -- gadget )
     ] with-translation ;
 
 : box- ( gadget box -- )
-    2dup box-contents remove swap set-box-contents
+    2dup box-contents remove swap tuck set-box-contents redraw
     f swap set-gadget-parent ;
+
+: (box+) ( gadget box -- )
+    [ box-contents cons ] keep set-box-contents ;
+
+: unparent ( gadget -- )
+    dup gadget-parent dup [ box- ] [ 2drop ] ifte ;
 
 : box+ ( gadget box -- )
     #! Add a gadget to a box.
-    over gadget-parent [ pick swap box- ] when*
-    [ box-contents cons ] keep set-box-contents ;
+    over unparent
+    dup pick set-gadget-parent
+    tuck (box+)
+    redraw ;

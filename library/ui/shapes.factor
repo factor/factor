@@ -45,38 +45,48 @@ M: number shape-h drop 0 ;
 M: number move-shape ( x y point -- point ) drop rect> ;
 
 ! A rectangle maps trivially to the shape protocol.
-TUPLE: rect x y w h ;
-M: rect shape-x rect-x ;
-M: rect shape-y rect-y ;
-M: rect shape-w rect-w ;
-M: rect shape-h rect-h ;
+TUPLE: rectangle x y w h ;
+M: rectangle shape-x rectangle-x ;
+M: rectangle shape-y rectangle-y ;
+M: rectangle shape-w rectangle-w ;
+M: rectangle shape-h rectangle-h ;
 
 : fix-neg ( a b c -- a+c b -c )
     dup 0 < [ neg tuck >r >r + r> r> ] when ;
 
-C: rect ( x y w h -- rect )
+C: rectangle ( x y w h -- rect )
     #! We handle negative w/h for convinience.
     >r fix-neg >r fix-neg r> r>
-    [ set-rect-h ] keep
-    [ set-rect-w ] keep
-    [ set-rect-y ] keep
-    [ set-rect-x ] keep ;
+    [ set-rectangle-h ] keep
+    [ set-rectangle-w ] keep
+    [ set-rectangle-y ] keep
+    [ set-rectangle-x ] keep ;
 
 M: number resize-shape ( w h point -- rect )
-     >rect 2swap <rect> ;
+     >rect 2swap <rectangle> ;
 
-M: rect move-shape ( x y rect -- rect )
-    [ rect-w ] keep rect-h <rect> ;
+M: rectangle move-shape ( x y rect -- rect )
+    [ rectangle-w ] keep rectangle-h <rectangle> ;
 
-M: rect resize-shape ( w h rect -- rect )
-    [ rect-x ] keep rect-y 2swap <rect> ;
+M: rectangle resize-shape ( w h rect -- rect )
+    [ rectangle-x ] keep rectangle-y 2swap <rectangle> ;
 
-: rect-x-extents ( rect -- x1 x2 )
-    dup rect-x x get + swap rect-w dupd + ;
+: rectangle-x-extents ( rect -- x1 x2 )
+    dup rectangle-x x get + swap rectangle-w dupd + ;
 
-: rect-y-extents ( rect -- x1 x2 )
-    dup rect-y y get + swap rect-h dupd + ;
+: rectangle-y-extents ( rect -- x1 x2 )
+    dup rectangle-y y get + swap rectangle-h dupd + ;
 
-M: rect inside? ( point rect -- ? )
-    over shape-x over rect-x-extents between? >r
-    swap shape-y swap rect-y-extents between? r> and ;
+M: rectangle inside? ( point rect -- ? )
+    over shape-x over rectangle-x-extents between? >r
+    swap shape-y swap rectangle-y-extents between? r> and ;
+
+! Delegates to a bounded shape, but absorbs all points.
+WRAPPER: everywhere
+M: everywhere inside? ( point world -- ? ) 2drop t ;
+
+M: everywhere move-shape ( x y everywhere -- )
+    everywhere-delegate move-shape <everywhere> ;
+
+M: everywhere resize-shape ( w h everywhere -- )
+    everywhere-delegate resize-shape <everywhere> ;

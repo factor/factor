@@ -16,3 +16,9 @@ USING: generic kernel lists sdl-event ;
     ] [
         2drop
     ] ifte ;
+
+TUPLE: redraw-gesture ;
+C: redraw-gesture ;
+
+M: object redraw ( gadget -- )
+    <redraw-gesture> swap handle-gesture ;
