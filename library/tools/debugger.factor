@@ -1,63 +1,64 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: errors USING: generic kernel kernel-internals lists math namespaces
+IN: errors
+USING: generic kernel kernel-internals lists math namespaces
 parser prettyprint stdio streams strings unparser vectors words ;
 
-: expired-error ( obj -- )
+: expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
 
-: io-task-twice-error ( obj -- )
+: io-task-twice-error. ( obj -- )
     "Attempting to perform two simultaneous I/O operations on "
     write . ;
 
-: no-io-tasks-error ( obj -- )
+: no-io-tasks-error. ( obj -- )
     "No I/O tasks" print ;
 
-: undefined-word-error ( obj -- )
+: undefined-word-error. ( obj -- )
     "Undefined word: " write . ;
 
-: incompatible-port-error ( obj -- )
+: incompatible-port-error. ( obj -- )
     "Unsuitable port for operation: " write . ;
 
-: io-error ( list -- )
+: io-error. ( list -- )
     "I/O error in kernel function " write
     unswons write ": " write car print ;
 
-: type-check-error ( list -- )
+: type-check-error. ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
     "Object type: " write class word. terpri
     "Expected type: " write builtin-type word. terpri ;
 
-: range-error ( list -- )
+: range-error. ( list -- )
     "Range check error" print
     unswons [ "Object: " write . ] when*
     unswons "Minimum index: " write .
     unswons "Requested index: " write .
     car "Maximum index: " write . ;
 
-: float-format-error ( list -- )
+: float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;
 
-: signal-error ( obj -- )
+: signal-error. ( obj -- )
     "Operating system signal " write . ;
 
-: negative-array-size-error ( obj -- )
+: negative-array-size-error. ( obj -- )
     "Cannot allocate array with negative size " write . ;
 
-: c-string-error ( obj -- )
+: c-string-error. ( obj -- )
     "Cannot convert to C string: " write . ;
 
-: ffi-disabled-error ( obj -- )
+: ffi-disabled-error. ( obj -- )
     drop "Recompile Factor with #define FFI." print ;
 
-: ffi-error ( obj -- )
+: ffi-error. ( obj -- )
     "FFI: " write print ;
 
-: port-closed-error ( obj -- )
+: port-closed-error. ( obj -- )
     "Port closed: " write . ;
 
-: heap-scan-error ( obj -- )
+: heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" write drop ;
 
 PREDICATE: cons kernel-error ( obj -- ? )
@@ -66,22 +67,22 @@ PREDICATE: cons kernel-error ( obj -- ? )
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
-        expired-error
-        io-task-twice-error
-        no-io-tasks-error
-        incompatible-port-error
-        io-error
-        undefined-word-error
-        type-check-error
-        range-error
-        float-format-error
-        signal-error
-        negative-array-size-error
-        c-string-error
-        ffi-disabled-error
-        ffi-error
-        port-closed-error
-        heap-scan-error
+        expired-error.
+        io-task-twice-error.
+        no-io-tasks-error.
+        incompatible-port-error.
+        io-error.
+        undefined-word-error.
+        type-check-error.
+        range-error.
+        float-format-error.
+        signal-error.
+        negative-array-size-error.
+        c-string-error.
+        ffi-disabled-error.
+        ffi-error.
+        port-closed-error.
+        heap-scan-error.
     } vector-nth execute ;
 
 M: no-method error. ( error -- )

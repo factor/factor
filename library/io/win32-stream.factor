@@ -54,7 +54,7 @@ SYMBOL: file-size
 : flush-output ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get out-buffer get [ buffer-pos+ptr ] keep buffer-length
+        handle get out-buffer get [ buffer@ ] keep buffer-length
         NULL r> WriteFile [ handle-io-error ] unless (yield)
     ] callcc1 pending-error
 
@@ -67,11 +67,11 @@ SYMBOL: file-size
 
 M: integer do-write ( int -- )
     out-buffer get [ buffer-capacity 0 = [ flush-output ] when ] keep
-    buffer-append-char ;
+    >r ch>str r> >buffer ;
 
 M: string do-write ( str -- )
     dup string-length out-buffer get buffer-capacity <= [
-        out-buffer get buffer-append
+        out-buffer get >buffer
     ] [
         dup string-length out-buffer get buffer-size > [
             dup string-length out-buffer get buffer-extend do-write
@@ -81,13 +81,13 @@ M: string do-write ( str -- )
 : fill-input ( -- ) 
     [
         alloc-io-task init-overlapped >r
-        handle get in-buffer get [ buffer-pos+ptr ] keep 
+        handle get in-buffer get [ buffer@ ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         NULL r>
         ReadFile [ handle-io-error ] unless (yield)
     ] callcc1 pending-error
 
-    dup in-buffer get buffer-inc-fill update-file-pointer ;
+    dup in-buffer get >buffer update-file-pointer ;
 
 : consume-input ( count -- str ) 
     in-buffer get buffer-length 0 = [ fill-input ] when

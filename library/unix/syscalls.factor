@@ -81,12 +81,12 @@ END-STRUCT
     "void" "libc" "close" [ "int" ] alien-invoke ;
 
 : sys-read ( fd buf nbytes -- n )
-    "ssize_t" "libc" "read" [ "int" "void*" "size_t" ] alien-invoke ;
+    "ssize_t" "libc" "read" [ "int" "ulong" "size_t" ] alien-invoke ;
 
 : sys-write ( fd buf nbytes -- n )
-    "ssize_t" "libc" "write" [ "int" "void*" "size_t" ] alien-invoke ;
+    "ssize_t" "libc" "write" [ "int" "ulong" "size_t" ] alien-invoke ;
 
 : MSG_OOB HEX: 1 ;
 
 : sys-recv ( fd buf nbytes flags -- )
-    "ssize_t" "libc" "read" [ "int" "void*" "size_t" "int" ] alien-invoke ;
+    "ssize_t" "libc" "read" [ "int" "ulong" "size_t" "int" ] alien-invoke ;

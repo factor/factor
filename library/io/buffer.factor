@@ -47,6 +47,12 @@ C: buffer ( size -- buffer )
         [ 0 swap set-buffer-fill ] keep
     ] when drop ;
 
+: buffer> ( count buffer -- string )
+    [ buffer-first-n ] 2keep buffer-consume ;
+
+: buffer>> ( buffer -- string )
+    [ buffer-contents ] keep 0 swap buffer-reset ;
+
 : buffer-length ( buffer -- length )
     #! Returns the amount of unconsumed input in the buffer.
     dup buffer-fill swap buffer-pos - 0 max ;
@@ -55,27 +61,15 @@ C: buffer ( size -- buffer )
     #! Returns the amount of data that may be added to the buffer.
     dup buffer-size swap buffer-fill - ;
 
-: buffer-set ( string buffer -- )
-    2dup buffer-ptr string>memory
-    >r string-length r> buffer-reset ;
-
 : check-overflow ( string buffer -- )
     buffer-capacity swap string-length < [
         "Buffer overflow" throw
     ] when ;
 
-: buffer-append ( string buffer -- )
+: >buffer ( string buffer -- )
     2dup check-overflow
     [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
     [ buffer-fill swap string-length + ] keep set-buffer-fill ;
-
-: buffer-append-char ( int buffer -- )
-    #! Append a single character to a buffer
-    [
-        dup buffer-ptr swap buffer-fill +
-        <alien> 0 set-alien-signed-1
-    ] keep
-    [ buffer-fill 1 + ] keep set-buffer-fill ;
 
 : buffer-extend ( length buffer -- )
     #! Increases the size of the buffer by length.
@@ -83,9 +77,8 @@ C: buffer ( size -- buffer )
     >r irealloc r>
     [ set-buffer-ptr ] keep set-buffer-size ;
 
-: buffer-inc-fill ( count buffer -- )
+: n>buffer ( count buffer -- )
     #! Increases the fill pointer by count.
     [ buffer-fill + ] keep set-buffer-fill ;
 
-: buffer-pos+ptr ( buffer -- int )
-    [ buffer-ptr ] keep buffer-pos + ;
+: buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;

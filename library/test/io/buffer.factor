@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel kernel-internals test ;
+USING: kernel io-internals test ;
 
 [ "" 65536 ] [
     65536 <buffer>
@@ -7,6 +7,10 @@ USING: kernel kernel-internals test ;
     over buffer-capacity
     rot buffer-free
 ] unit-test
+
+: buffer-set ( string buffer -- )
+    2dup buffer-ptr string>memory
+    >r string-length r> buffer-reset ;
 
 [ "hello world" "" ] [
     "hello world" 65536 <buffer> [ buffer-set ] keep

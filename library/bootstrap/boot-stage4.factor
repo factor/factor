@@ -47,6 +47,10 @@ os "win32" = [
     "/library/bootstrap/win32-io.factor" run-resource
 ] when
 
+os "unix" = [
+    "libc" "libc.so" "cdecl" add-library
+] when
+
 "Compiling system..." print
 "compile" get [ compile-all ] when
 
