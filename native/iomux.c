@@ -217,29 +217,27 @@ CELL perform_io_tasks(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 /* Wait for I/O and return a callback. */
 CELL next_io_task(void)
 {
+	CELL callback;
+	int i;
+
 	bool reading = set_up_fd_set(&read_fd_set,
 		read_fd_count,read_io_tasks);
+
 	bool writing = set_up_fd_set(&write_fd_set,
 		write_fd_count,write_io_tasks);
-
-	CELL callback;
-
-	fd_set except_fd_set;
-	int i;
-	FD_ZERO(&except_fd_set);
 
 	if(!reading && !writing)
 		critical_error("next_io_task() called with no IO tasks",0);
 
 	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
-		&read_fd_set,&write_fd_set,&except_fd_set,NULL);
-
+		&read_fd_set,&write_fd_set,NULL,NULL);
+	
 	for(i = 0; i < 100; i++)
 	{
 		if(FD_ISSET(i,&except_fd_set))
-			exit(1);
+			_exit(1);
 	}
-	
+
 	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
 	if(callback != F)
 		return callback;

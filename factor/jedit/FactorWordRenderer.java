@@ -83,7 +83,7 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			new String[] {
 				MiscUtilities.charsToEntities(word.name),
 				stackEffect == null
-				? 0 :
+				? null :
 				MiscUtilities.charsToEntities(stackEffect)
 			}));
 

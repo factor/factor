@@ -19,6 +19,8 @@ fd_set write_fd_set;
 IO_TASK write_io_tasks[FD_SETSIZE];
 int write_fd_count;
 
+fd_set except_fd_set;
+
 void init_io_tasks(fd_set* fd_set, IO_TASK* io_tasks);
 void init_iomux(void);
 IO_TASK* add_io_task(
