@@ -43,9 +43,11 @@ void primitive_alien(void)
 
 void primitive_local_alien(void)
 {
-	CELL length = unbox_integer();
+	F_FIXNUM length = unbox_integer();
 	ALIEN* alien;
 	F_STRING* local;
+	if(length < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(length));
 	maybe_garbage_collection();
 	alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
 	local = string(length / CHARS,'\0');

@@ -85,7 +85,7 @@ CELL untagged_object_size(CELL pointer)
 		size = sizeof(ALIEN);
 		break;
 	default:
-		critical_error("Cannot determine size",relocating);
+		critical_error("Cannot determine size",pointer);
 		size = -1;/* can't happen */
 		break;
 	}

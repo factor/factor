@@ -29,12 +29,13 @@ IN: compiler
 USE: alien
 USE: math
 USE: kernel
+USE: hashtables
+USE: namespaces
+
+SYMBOL: interned-literals
 
 : cell 4 ; inline
-: literal-table 1024 cell * ; inline
-
-: init-assembler ( -- )
-    compiled-offset literal-table + set-compiled-offset ;
+: compiled-header HEX: 01c3babe ; inline
 
 : set-compiled-byte ( n addr -- )
     <alien> 0 set-alien-1 ; inline
@@ -43,12 +44,19 @@ USE: kernel
     <alien> 0 set-alien-cell ; inline
 
 : compile-aligned ( n -- )
-    compiled-offset swap align set-compiled-offset ; inline
+    compiled-offset cell 2 * align set-compiled-offset ; inline
 
 : intern-literal ( obj -- lit# )
-    address
-    literal-top set-compiled-cell
-    literal-top dup cell + set-literal-top ;
+    dup interned-literals get hash dup [
+        nip
+    ] [
+        drop [
+            address
+            literal-top set-compiled-cell
+            literal-top dup cell + set-literal-top
+            dup
+        ] keep interned-literals get set-hash
+    ] ifte ;
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte
@@ -57,3 +65,10 @@ USE: kernel
 : compile-cell ( n -- )
     compiled-offset set-compiled-cell
     compiled-offset cell + set-compiled-offset ; inline
+
+: begin-assembly ( -- code-len-fixup reloc-len-fixup )
+    compiled-header compile-cell
+    compiled-offset 0 compile-cell
+    compiled-offset 0 compile-cell ;
+
+global [ <namespace> interned-literals set ] bind

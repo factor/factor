@@ -44,9 +44,15 @@ void primitive_to_word(void)
 
 void fixup_word(F_WORD* word)
 {
-	update_xt(word);
-	fixup(&word->parameter);
-	fixup(&word->plist);
+	if(word->xt >= code_relocation_base
+		&& word->xt < code_relocation_base
+		- compiling.base + compiling.limit)
+		code_fixup(&word->xt);
+	else
+		update_xt(word);
+
+	data_fixup(&word->parameter);
+	data_fixup(&word->plist);
 }
 
 void collect_word(F_WORD* word)

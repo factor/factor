@@ -44,26 +44,19 @@ USE: words
 USE: unparser
 USE: kernel-internals
 
-: cli-args ( -- args ) 10 getenv ;
+: init-smart-terminal
+    "smart-terminal" get [
+        stdio smart-term-hook get change 
+    ] when ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
     #! quotation.
     boot
-
     init-error-handler
     init-random
-    init-assembler
-
-    ! Some flags are *on* by default, unless user specifies
-    ! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    t "compile" set
-    t "smart-terminal" set
-
-    ! The first CLI arg is the image name.
-    cli-args uncons parse-command-line "image" set
+    default-cli-args
+    parse-command-line
 
     os "win32" = "compile" get and [
         "kernel32" "kernel32.dll" "stdcall" add-library
@@ -72,15 +65,10 @@ USE: kernel-internals
         "libc"     "msvcrt.dll"   "cdecl"   add-library
     ] when
 
-    "compile" get [ compile-all ] when
-
-    "smart-terminal" get [
-        stdio smart-term-hook get change 
-    ] when
-
+    init-smart-terminal
     run-user-init ;
 
-: auto-inline-count 5 ;
+: auto-inline-count 3 ;
 [
     warm-boot
     garbage-collection
@@ -90,19 +78,25 @@ USE: kernel-internals
 
 init-error-handler
 
-0 [ drop succ ] each-word unparse write " words" print 
-
-"Counting word usages..." print
-tally-usages
+! "Counting word usages..." print
+! tally-usages
 ! 
 ! "Automatically inlining words called " write
 ! auto-inline-count unparse write
 ! " or less times..." print
 ! auto-inline-count auto-inline
 
-"Inferring stack effects..." print
-0 [ unit try-infer [ succ ] when ] each-word
-unparse write " words have a stack effect" print
+default-cli-args
+parse-command-line
+
+"Compiling system..." print
+"compile" get [ compile-all ] when
+
+0 [ compiled? [ succ ] when ] each-word
+unparse write " words compiled" print
+
+0 [ drop succ ] each-word
+unparse write " words total" print 
 
 "Bootstrapping is complete." print
 "Now, you can run ./f factor.image" print

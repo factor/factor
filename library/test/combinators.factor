@@ -20,12 +20,6 @@ USE: test
 [ 1 [ ] 2keep ] unit-test-fails
 [ 3 1 2 ] [ 1 2 [ 2drop 3 ] 2keep ] unit-test
 
-[ cond ] unit-test-fails
-[ [ [ 1 = ] [ ] ] cond ] unit-test-fails
-
-[   ] [ 3 [ ] cond ] unit-test
-[ t ] [ 4 [ [ 1 = ] [ ] [ 4 = ] [ drop t ] [ 2 = ] [ ] ] cond ] unit-test
-
 [ 0 ] [ f [ sq ] [ 0 ] ifte* ] unit-test
 [ 4 ] [ 2 [ sq ] [ 0 ] ifte* ] unit-test
 

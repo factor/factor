@@ -125,7 +125,6 @@ typedef unsigned char BYTE;
 #include "arithmetic.h"
 #include "string.h"
 #include "misc.h"
-#include "relocate.h"
 #include "sbuf.h"
 #include "port.h"
 #include "io.h"
@@ -138,6 +137,7 @@ typedef unsigned char BYTE;
 #include "vector.h"
 #include "stack.h"
 #include "compiler.h"
+#include "relocate.h"
 #include "ffi.h"
 
 #endif /* __FACTOR_H__ */

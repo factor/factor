@@ -12,9 +12,9 @@ INLINE F_STRING* untag_string(CELL tagged)
 	return (F_STRING*)UNTAG(tagged);
 }
 
-F_STRING* allot_string(F_FIXNUM capacity);
-F_STRING* string(F_FIXNUM capacity, CELL fill);
-F_FIXNUM hash_string(F_STRING* str, F_FIXNUM len);
+F_STRING* allot_string(CELL capacity);
+F_STRING* string(CELL capacity, CELL fill);
+F_FIXNUM hash_string(F_STRING* str, CELL len);
 void rehash_string(F_STRING* str);
 F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill);
 BYTE* to_c_string(F_STRING* s);

@@ -40,6 +40,7 @@ USE: stdio
 USE: streams
 USE: strings
 USE: words
+USE: kernel-internals
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
@@ -81,6 +82,18 @@ USE: words
 : run-files ( args -- )
     [ [ run-file ] when* ] each ;
 
-: parse-command-line ( args -- )
+: default-cli-args
+    #! Some flags are *on* by default, unless user specifies
+    #! -no-<flag> CLI switch
+    t "user-init" set
+    t "interactive" set
+    t "smart-terminal" set
+    t "verbose-compile" set
+    t "compile" set ;
+
+: cli-args ( -- args ) 10 getenv ;
+
+: parse-command-line ( -- )
     #! Parse command line arguments.
-    parse-switches run-files ;
+    #! The first CLI arg is the image name.
+    cli-args unswons "image" set parse-switches run-files ;

@@ -17,7 +17,6 @@
 - optimize away dispatch
 - getenv/setenv: if literal arg, compile as a load/store
 - assembler opcodes dispatch on operand types
-- save code in image
 
 + oop:
 

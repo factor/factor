@@ -4,8 +4,6 @@
 F_ARRAY* allot_array(CELL type, CELL capacity)
 {
 	F_ARRAY* array;
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
 	array->capacity = capacity;
 	return array;
@@ -61,7 +59,7 @@ void fixup_array(F_ARRAY* array)
 {
 	int i = 0;
 	for(i = 0; i < array->capacity; i++)
-		fixup((void*)AREF(array,i));
+		data_fixup((void*)AREF(array,i));
 }
 
 void collect_array(F_ARRAY* array)

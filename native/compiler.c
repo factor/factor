@@ -1,11 +1,5 @@
 #include "factor.h"
 
-void init_compiler(void)
-{
-	init_zone(&compiling,COMPILE_ZONE_SIZE);
-	literal_top = compiling.base;
-}
-
 void primitive_compiled_offset(void)
 {
 	box_integer(compiling.here);
@@ -25,6 +19,8 @@ void primitive_literal_top(void)
 void primitive_set_literal_top(void)
 {
 	CELL offset = unbox_integer();
+	if(offset >= literal_max)
+		critical_error("Too many compiled literals",offset);
 	literal_top = offset;
 }
 

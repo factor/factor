@@ -1,12 +1,9 @@
 #include "factor.h"
 
 /* untagged */
-F_STRING* allot_string(F_FIXNUM capacity)
+F_STRING* allot_string(CELL capacity)
 {
-	F_STRING* string;
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
-	string = allot_object(STRING_TYPE,
+	F_STRING* string = allot_object(STRING_TYPE,
 		sizeof(F_STRING) + capacity * CHARS);
 	string->capacity = capacity;
 	return string;
@@ -15,7 +12,7 @@ F_STRING* allot_string(F_FIXNUM capacity)
 /* call this after constructing a string */
 /* uses same algorithm as java.lang.String for compatibility with
 images generated from Java Factor. */
-F_FIXNUM hash_string(F_STRING* str, F_FIXNUM len)
+F_FIXNUM hash_string(F_STRING* str, CELL len)
 {
 	F_FIXNUM hash = 0;
 	CELL i;
@@ -30,7 +27,7 @@ void rehash_string(F_STRING* str)
 }
 
 /* untagged */
-F_STRING* string(F_FIXNUM capacity, CELL fill)
+F_STRING* string(CELL capacity, CELL fill)
 {
 	CELL i;
 

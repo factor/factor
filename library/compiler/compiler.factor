@@ -49,12 +49,12 @@ USE: words
         "Unsupported CPU; compiler disabled" throw
     ] unless ;
 
-: compiling ( word -- definition )
+: compiling ( word -- word parameter )
     check-architecture
     "verbose-compile" get [
         "Compiling " write dup . flush
     ] when
-    cell compile-aligned dup save-xt word-parameter ;
+    dup word-parameter ;
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
@@ -78,15 +78,16 @@ USE: words
     #! Compile the most recently defined word.
     "compile" get [ word compile ] when ; parsing
 
-: cannot-compile ( word -- )
+: cannot-compile ( word error -- )
     "verbose-compile" get [
-        "Cannot compile " write .
+        "Cannot compile " write swap .
+        default-error-handler
     ] [
-        drop
+        2drop
     ] ifte ;
 
 : try-compile ( word -- )
-    [ compile ] [ [ cannot-compile ] when ] catch ;
+    [ compile ] [ [ cannot-compile ] when* ] catch ;
 
 : compile-all ( -- )
     #! Compile all words.
