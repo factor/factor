@@ -67,7 +67,7 @@ TUPLE: editor line caret delegate ;
 
 : <caret> ( -- caret )
     0 0 0 0 <plain-rect> <gadget>
-    dup red background set-paint-property ;
+    dup red background set-paint-prop ;
 
 C: editor ( text -- )
     0 0 0 0 <line> <gadget> over set-editor-delegate

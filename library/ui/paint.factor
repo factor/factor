@@ -9,10 +9,10 @@ sdl-gfx sdl-ttf sdl-video stdio strings ;
 
 ! "Paint" is a namespace containing some or all of these values.
 
-: paint-property ( gadget key -- value )
+: paint-prop ( gadget key -- value )
     swap gadget-paint hash ;
 
-: set-paint-property ( gadget value key -- )
+: set-paint-prop ( gadget value key -- )
     rot gadget-paint set-hash ;
 
 ! Colors are lists of three integers, 0..255.
@@ -114,10 +114,22 @@ M: string shape-h ( text -- h )
     #! This is just the height of the current font.
     drop font get lookup-font TTF_FontHeight ;
 
+: filter-nulls ( str -- str )
+    "\0" over string-contains? [
+        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
+    ] when ;
+
 M: string draw-shape ( text -- )
-    >r x get y get font get r>
-    fg 3unlist make-color
-    draw-string drop ;
+    dup string-length 0 = [
+        drop
+    ] [
+        filter-nulls font get lookup-font swap
+        fg 3unlist make-color
+        bg 3unlist make-color
+        TTF_RenderUNICODE_Shaded
+        [ >r x get y get r> draw-surface ] keep
+        SDL_FreeSurface
+    ] ifte ;
 
 ! Clipping
 
@@ -165,19 +177,13 @@ SYMBOL: clip
     surface get swap [ >sdl-rect SDL_SetClipRect drop ] keep
     dup shape-w 0 = swap shape-h 0 = or ;
 
-GENERIC: shape-clip ( shape -- clip )
-M: object shape-clip
-    #! By default, we clip to the bounds of the shape. However,
-    #! the hand disables clipping for its children.
-    screen-bounds ;
-
 : with-clip ( shape quot -- )
     #! All drawing done inside the quotation is clipped to the
     #! shape's bounds. The quotation is called with a boolean
     #! that is set to false if 
     [
-        >r shape-clip clip [ intersect dup ] change set-clip r>
-        call
+        >r screen-bounds clip [ intersect dup ] change set-clip
+        r> call
     ] with-scope ; inline
 
 : draw-gadget ( gadget -- )

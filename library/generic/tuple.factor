@@ -80,17 +80,6 @@ UNION: arrayed array tuple ;
     dup r> tuple-slots
     default-constructor ;
 
-: tuple-delegate ( tuple -- obj )
-    dup tuple? [
-        dup class "delegate-slot" word-prop dup [
-            >fixnum slot
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        drop f
-    ] ifte ;
-
 : alist>quot ( default alist -- quot )
     #! Turn an association list that maps values to quotations
     #! into a quotation that executes a quotation depending on
@@ -98,7 +87,7 @@ UNION: arrayed array tuple ;
     [
         [
             unswons
-            \ dup , unswons literal, \ = , \ drop swons ,
+            \ dup , unswons literal, \ eq? , \ drop swons ,
             alist>quot , \ ifte ,
         ] make-list
     ] when* ;
@@ -130,7 +119,7 @@ UNION: arrayed array tuple ;
         drop object over hash* dup [
             2nip cdr
         ] [
-            2drop [ dup tuple-delegate ] swap
+            2drop [ dup delegate ] swap
             dup unit swap
             unit [ car ] cons [ undefined-method ] append
             \ ?ifte 3list append

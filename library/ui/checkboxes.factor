@@ -28,7 +28,7 @@ TUPLE: checkbox bevel selected? delegate ;
 
 : checkbox-update ( checkbox -- )
     dup button-pressed? >r checkbox-bevel r>
-    reverse-video set-paint-property ;
+    reverse-video set-paint-prop ;
 
 : checkbox-actions ( checkbox -- )
     dup [ toggle-checkbox ] [ action ] set-action

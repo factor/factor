@@ -51,39 +51,34 @@ M: viewport layout* ( viewport -- )
 
 ! The offset slot is the y co-ordinate of the mouse relative to
 ! the thumb when it was clicked.
-TUPLE: slider viewport thumb offset delegate ;
-
-TUPLE: thumb offset delegate ;
+TUPLE: slider viewport thumb delegate ;
 
 : hand-y ( gadget -- y )
     #! Vertical offset of hand from gadget.
     hand swap relative shape-y ;
 
-: thumb-click ( thumb -- )
-    [ hand-y ] keep set-thumb-offset ;
+: slider-drag ( slider -- y )
+    hand-y hand hand-click-rel shape-y + ;
 
-: thumb-drag ( thumb -- y )
-    [ gadget-parent hand-y ] keep thumb-offset - ;
-
-: thumb-motion ( thumb -- )
-    dup thumb-drag over gadget-parent shape-h /
-    over gadget-parent slider-viewport scroll-viewport
+: slider-motion ( thumb -- )
+    dup slider-drag over shape-h /
+    over slider-viewport scroll-viewport
     relayout ;
 
 : thumb-actions ( thumb -- )
-    dup
-    [ thumb-click ] [ button-down 1 ] set-action
-    [ thumb-motion ] [ drag 1 ] set-action ;
+    dup [ drop ] [ button-down 1 ] set-action
+    dup [ drop ] [ button-up 1 ] set-action
+    [ gadget-parent slider-motion ] [ drag 1 ] set-action ;
 
-C: thumb ( -- thumb )
-    0 0 0 0 <plain-rect> <gadget> over set-thumb-delegate
-    dup t reverse-video set-paint-property
+: <thumb> ( -- thumb )
+    0 0 0 0 <plain-rect> <gadget>
+    dup t reverse-video set-paint-prop
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
     2dup add-gadget set-slider-thumb ;
 
-: slider-size 20 ;
+: slider-size 16 ;
 
 : slider-click ( slider -- )
     [ dup hand-y swap shape-h / ] keep

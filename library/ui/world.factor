@@ -8,27 +8,23 @@ prettyprint sdl sdl-event sdl-video stdio strings threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The menu slot ensures that only one menu is
 ! open at any one time.
-TUPLE: world running? hand menu halo delegate ;
+TUPLE: world running? hand menu delegate ;
 
 : <world-box> ( -- box )
     0 0 0 0 <plain-rect> <gadget> ;
 
-DEFER: <halo>
-
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
-    dup <hand> over set-world-hand
-    dup <halo> over set-world-halo ;
+    dup <hand> over set-world-hand ;
 
 M: world inside? ( point world -- ? ) 2drop t ;
 
 : hand world get world-hand ;
-: halo world get world-halo ;
 
 : draw-world ( world -- )
     dup gadget-redraw? [
-        dup world-hand update-hand [
+        [
             f over set-gadget-redraw?
             dup draw-gadget
             dup gadget-paint [ world-hand draw-gadget ] bind
@@ -38,23 +34,11 @@ M: world inside? ( point world -- ? ) 2drop t ;
     ] ifte ;
 
 DEFER: handle-event
-DEFER: halo-selected
-
-: layout-halo ( world -- )
-    world-halo dup halo-selected dup [
-        dup gadget-parent [
-            drop dup gadget-parent [ relayout ] [ drop ] ifte
-        ] [
-            drop unparent
-        ] ifte
-    ] [
-        2drop
-    ] ifte ;
 
 : layout-world ( world -- )
     dup
-    0 0 width get height get <rectangle> clip set-paint-property
-    dup layout-halo dup layout world-hand update-hand ;
+    0 0 width get height get <rectangle> clip set-paint-prop
+    dup layout world-hand update-hand ;
 
 : world-step ( world -- ? )
     dup world-running? [
@@ -75,7 +59,7 @@ DEFER: halo-selected
 : ensure-ui ( -- )
     #! Raise an error if the UI is not running.
     world get dup [ world-running? ] when [
-        "Inspector cannot be used if UI not running." throw
+        "UI not running." throw
     ] unless ;
 
 : title ( -- str )

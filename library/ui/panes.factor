@@ -18,7 +18,7 @@ TUPLE: pane output current input continuation delegate ;
     <line-shelf> [ tuck add-gadget add-gadget ] keep ;
 
 : pane-paint ( pane -- )
-    [[ "Monospaced" 12 ]] font set-paint-property ;
+    [[ "Monospaced" 12 ]] font set-paint-prop ;
 
 : pane-return ( pane -- )
     [

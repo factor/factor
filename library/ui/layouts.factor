@@ -95,6 +95,9 @@ C: border ( child delegate size -- border )
 : line-border ( child -- border )
     0 0 0 0 <etched-rect> <gadget> 5 <border> ;
 
+: filled-border ( child -- border )
+    0 0 0 0 <plain-rect> <gadget> 5 <border> ;
+
 : size-border ( border -- )
     dup gadget-children
     dup max-width pick border-size 2 * +

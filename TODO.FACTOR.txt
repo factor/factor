@@ -7,17 +7,9 @@
 + ui:
 
 - resizing a gadget should probably relayout children
-- when halo is shown, rollovers don't disappear
-- halo outline should be the clipped rect
-- sometimes releasing moving gadget doesn't work
-- after moving halo, halo is underneath the gadget
 - resizing: drag relative to initial click pos
-- thumb gadgetry breaks with halo sometimes
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
-- scrollable inspector
-- inspector needs prettier nesting
-- <titled> needs to look better
 - auto-updating inspector
 - fix up the min thumb size hack
 - fix up initial layout of slider
@@ -26,7 +18,6 @@
 - remove shelf/pile duplication
 - faster layout
 - faster repaint
-- closing inspectors
 
 + compiler/ffi:
 
@@ -45,7 +36,6 @@
 - #jump-f #jump-f-label
 - value type structs
 - out parameters
-- is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type
 - struct membres that are not *

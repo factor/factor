@@ -8,8 +8,8 @@ parser profiler random strings unparser vectors words
 hashtables ;
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab
-"generic" vocab
+"syntax" vocab clone
+"generic" vocab clone
 
 ! This symbol needs the same hashcode in the target as in the
 ! host.
@@ -21,6 +21,11 @@ vocabularies get [
     "generic" set
     "syntax" set
 ] bind
+
+! We cannot simply copy the delegate generic with all its
+! methods. Rather we must create a new empty generic.
+"delegate" [ "generic" ] search forget
+[ single-combination ] \ GENERIC: "delegate" "generic" create define-generic
 
 <namespace> classes set
 

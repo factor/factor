@@ -134,22 +134,6 @@ global [
         SDL_LockSurface
     ] when drop ;
 
-: filter-nulls ( str -- str )
-    "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] string-map
-    ] when ;
-
-: draw-string ( x y font text fg -- width )
-    >r filter-nulls r> over string-length 0 = [
-        2drop 3drop 0
-    ] [
-        >r >r lookup-font r> r>
-        TTF_RenderUNICODE_Blended
-        [ draw-surface ] keep
-        [ surface-w ] keep
-        SDL_FreeSurface
-    ] ifte ;
-
 : size-string ( font text -- w h )
     >r lookup-font r> filter-nulls dup string-length 0 = [
         drop TTF_FontHeight 0 swap

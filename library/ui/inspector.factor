@@ -19,9 +19,10 @@ lists namespaces strings unparser vectors words ;
     [ >r label-box r> add-gadget ] keep
     [ >r label-box r> add-gadget ] keep ;
 
-: <titled> ( gadget title -- )
-    <line-pile> swap <label> over add-gadget
-    [ >r empty-border r> add-gadget ] keep ;
+: <titled> ( gadget title -- gadget )
+    0 10 0 <shelf>
+    [ >r <label> r> add-gadget ] keep
+    [ add-gadget ] keep ;
 
 : top-sheet ( obj -- sheet )
     dup class word-name <label> "Class:" <titled>
@@ -39,11 +40,10 @@ lists namespaces strings unparser vectors words ;
 GENERIC: custom-sheet ( obj -- gadget )
 
 : <inspector> ( obj -- gadget )
-    0 default-gap 0 <pile>
+    0 10 0 <pile>
     over top-sheet over add-gadget
     over slot-sheet over add-gadget
-    swap custom-sheet over add-gadget
-    <scroller> line-border ;
+    swap custom-sheet over add-gadget ;
 
 M: object custom-sheet drop <empty-gadget> ;
 
@@ -63,7 +63,7 @@ M: word custom-sheet ( word -- gadget )
     word-props <inspector> empty-border "Properties:" <titled> ;
 
 M: tuple custom-sheet ( tuple -- gadget )
-    tuple-delegate [
+    delegate [
         <inspector> empty-border "Delegate:" <titled>
     ] [
         <empty-gadget>
@@ -85,9 +85,14 @@ SYMBOL: inspectors
         [ swap inspectors [ acons ] change ] keep
     ] ?unless ;
 
+: inspector-tile ( obj -- tile )
+    inspector <scroller> "Inspector" <tile> ;
+
 : inspect ( obj -- )
     #! Show an inspector for the object. The inspector lists
     #! slots and entries in collections.
-    ensure-ui global [ inspector world get add-gadget ] bind ;
+    ensure-ui global [
+        inspector-tile world get add-gadget
+    ] bind ;
 
 global [ inspectors off ] bind

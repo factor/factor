@@ -6,8 +6,7 @@ namespaces parser strings words vectors math math-internals ;
 
 ! A simple single-dispatch generic word system.
 
-: predicate-word ( word -- word )
-    word-name "?" cat2 create-in ;
+: predicate-word ( word -- word ) word-name "?" cat2 create-in ;
 
 ! Terminology:
 ! - type: a datatype built in to the runtime, eg fixnum, word

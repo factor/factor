@@ -22,8 +22,8 @@ stdio ;
     ] ifte ;
 
 : button-update ( button -- )
-    dup dup mouse-over? rollover? set-paint-property
-    dup dup button-pressed? reverse-video set-paint-property
+    dup dup mouse-over? rollover? set-paint-prop
+    dup dup button-pressed? reverse-video set-paint-prop
     redraw ;
 
 : button-clicked ( button -- )
@@ -40,7 +40,8 @@ stdio ;
     dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action
     dup [ button-update ] [ mouse-leave ] set-action
-    [ button-update ] [ mouse-enter ] set-action ;
+    dup [ button-update ] [ mouse-enter ] set-action
+    [ drop ] [ drag 1 ] set-action ;
 
 : <button> ( label quot -- button )
     >r <label> line-border dup r> button-actions ;
@@ -51,4 +52,5 @@ stdio ;
 : <roll-button> ( label quot -- gadget )
     #! Thinner border that is only visible when the mouse is
     #! over the button.
-    >r <label> roll-border dup r> button-actions ;
+    >r <label> roll-border dup r> button-actions
+    dup f reverse-video set-paint-prop ;

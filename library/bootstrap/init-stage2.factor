@@ -1,9 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-USING: alien compiler errors inference command-line listener
-lists math namespaces parser random streams stdio presentation
-words unparser kernel-internals console assembler memory ;
+USING: alien assembler command-line compiler console errors
+generic inference kernel-internals listener lists math memory
+namespaces parser presentation random stdio streams unparser
+words ;
 
 : default-cli-args
     #! Some flags are *on* by default, unless user specifies
@@ -55,7 +56,12 @@ os "win32" = [
 ] when
 
 "Compiling system..." print
-"compile" get [ compile-all ] when
+"compile" get [
+    ! Compiling this first compiles a lot of core words and
+    ! leads to a faster compile overall.
+    \ car compile
+    compile-all
+] when
 
 terpri
 "Unless you're working on the compiler, ignore the errors above." print

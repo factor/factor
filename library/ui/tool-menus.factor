@@ -9,23 +9,18 @@ SYMBOL: root-menu
     root-menu get <menu> show-menu ;
 
 : <console> ( -- console )
-    <console-pane> <scroller> line-border ;
+    <console-pane> <scroller> ;
 
 [
-    [[ "Listener" [ <console> world get add-gadget ] ]]
+    [[ "Listener" [ <console> "Listener" <tile> world get add-gadget ] ]]
     [[ "Globals" [ global inspect ] ]]
     [[ "Save image" [ "image" get save-image ] ]]
     [[ "Exit" [ f world get set-world-running? ] ]]
 ] root-menu set
 
-world get [ drop show-root-menu ] [ button-down 1 ] set-action
-
-: gadget-menu ( gadget -- assoc )
-    [
-        [[ "Inspect" [ inspect ] ]]
-        [[ "Unparent" [ unparent ] ]]
-        [[ "Move" [ hand grab ] ]]
-    ] actionize ;
-
-: halo-menu ( halo -- )
-    halo-selected gadget-menu <menu> show-menu ;
+world get [
+    ! Note that we check if the user explicitly clicked the
+    ! world, to avoid showing the root menu on gadgets that
+    ! don't explicitly handle mouse clicks.
+    hand hand-clicked eq? [ show-root-menu ] when
+ ] [ button-down 1 ] set-action
