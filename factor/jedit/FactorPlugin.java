@@ -77,7 +77,7 @@ public class FactorPlugin extends EditPlugin
 		Buffer buffer = jEdit.getFirstBuffer();
 		while(buffer != null)
 		{
-			buffer.setProperty(FactorSideKickParser.PARSED_PROPERTY,null);
+			buffer.setProperty(FactorSideKickParser.WORDS_PROPERTY,null);
 			buffer = buffer.getNext();
 		}
 	} //}}}

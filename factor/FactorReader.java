@@ -40,6 +40,7 @@ public class FactorReader
 {
 	private VocabularyLookup lookup;
 	private FactorScanner scanner;
+	private ParseState topState;
 	private Cons states;
 
 	/**
@@ -51,6 +52,8 @@ public class FactorReader
 	private Cons use;
 	private String in;
 	private int base = 10;
+
+	private Cons definedWords;
 
 	//{{{ getUnreadableString() method
 	public static String getUnreadableString(String str)
@@ -162,6 +165,7 @@ public class FactorReader
 		this.lookup = lookup;
 		this.scanner = scanner;
 		pushState(toplevel,null);
+		topState = (ParseState)states.car;
 		this.alwaysDocComments = alwaysDocComments;
 		this.in = DefaultVocabularyLookup.DEFAULT_IN;
 		this.use = DefaultVocabularyLookup.DEFAULT_USE;
@@ -217,7 +221,8 @@ public class FactorReader
 			if(next())
 			{
 				// eof.
-				return popState(toplevel,toplevel).first;
+				popState(toplevel,toplevel);
+				return topState.first;
 			}
 		}
 	} //}}}
@@ -233,17 +238,29 @@ public class FactorReader
 	public FactorWord intern(String name, boolean define)
 		throws Exception
 	{
+		FactorWord word;
+
 		if(define)
-			return lookup.define(getIn(),name);
+		{
+			word = lookup.define(getIn(),name);
+			definedWords = new Cons(word,definedWords);
+		}
 		else
 		{
-			FactorWord word = searchVocabulary(getUse(),name);
+			word = searchVocabulary(getUse(),name);
 			if(word == null)
 				error("Undefined: " + name);
-			return word;
 		}
+		
+		return word;
 	} //}}}
 
+	//{{{ getDefinedWords() method
+	public Cons getDefinedWords()
+	{
+		return definedWords;
+	} //}}}
+	
 	//{{{ nextWord() method
 	/**
 	 * Read a word from the scanner and intern it. Returns null on EOF.

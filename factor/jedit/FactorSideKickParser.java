@@ -43,7 +43,7 @@ public class FactorSideKickParser extends SideKickParser
 	/**
 	 * We store the file's parse tree in this property.
 	 */
-	public static String PARSED_PROPERTY = "factor-parsed";
+	public static String WORDS_PROPERTY = "factor-parsed";
 
 	private Map previewMap;
 
@@ -98,8 +98,9 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		Cons parsed = (Cons)buffer.getProperty(PARSED_PROPERTY);
-		removeWordDefinitions(parsed);
+		Object words = buffer.getProperty(WORDS_PROPERTY);
+		if(words instanceof Cons)
+			forgetWords((Cons)words);
 
 		FactorParsedData d = new FactorParsedData(
 			this,buffer.getPath());
@@ -117,6 +118,8 @@ public class FactorSideKickParser extends SideKickParser
 			buffer.readUnlock();
 		}
 
+		FactorReader r = null;
+
 		try
 		{
 			/* of course wrapping a string reader in a buffered
@@ -125,15 +128,12 @@ public class FactorSideKickParser extends SideKickParser
 				buffer.getPath(),
 				new BufferedReader(new StringReader(text)),
 				errorSource);
-			FactorReader r = new FactorReader(scanner,
-				false,FactorPlugin.getExternalInstance());
+			r = new FactorReader(scanner,false,FactorPlugin.getExternalInstance());
 
-			parsed = r.parse();
+			Cons parsed = r.parse();
 
 			d.in = r.getIn();
 			d.use = r.getUse();
-	
-			buffer.setProperty(PARSED_PROPERTY,parsed);
 
 			addWordDefNodes(d,parsed,buffer);
 		}
@@ -151,21 +151,20 @@ public class FactorSideKickParser extends SideKickParser
 			Log.log(Log.DEBUG,this,e);
 		}
 
+		if(r != null)
+			buffer.setProperty(WORDS_PROPERTY,r.getDefinedWords());
+
 		return d;
 	} //}}}
 
-	//{{{ removeWordDefinitions() method
-	private void removeWordDefinitions(Cons parsed)
+	//{{{ forgetWords() method
+	private void forgetWords(Cons words)
 	{
-		while(parsed != null)
+		while(words != null)
 		{
-			Object obj = parsed.car;
-			if(obj instanceof FactorWordDefinition)
-			{
-				FactorPlugin.getExternalInstance().forget(
-					((FactorWordDefinition)obj).word);
-			}
-			parsed = parsed.next();
+			Object obj = words.car;
+			FactorPlugin.getExternalInstance().forget((FactorWord)obj);
+			words = words.next();
 		}
 	} //}}}
 
