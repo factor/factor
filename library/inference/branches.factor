@@ -96,7 +96,9 @@ USE: prettyprint
     dup check-lengths unify-stacks ;
 
 : unify-effects ( list -- )
-    filter-terminators dup balanced? [
+    filter-terminators
+    [ "No branch has a stack effect" throw ] unless*
+    dup balanced? [
         dup unify-d-in d-in set
         dup unify-datastacks meta-d set
         unify-callstacks meta-r set
@@ -143,14 +145,19 @@ SYMBOL: dual-recursive-state
     ] catch ;
 
 : infer-base-cases ( branchlist -- list )
-    [ terminator-quot? not ] subset
-    dup [ dupd recursive-branch ] map nip
-    [ ] subset ;
+    dup [ dupd recursive-branch ] map [ ] subset nip ;
 
 : infer-base-case ( branchlist -- )
+    #! Can't do much if there is only one non-terminator branch.
+    #! Either the word is not recursive, or it is recursive
+    #! and the base case throws an error.
     [
-        infer-base-cases unify-effects
-        effect dual-recursive-state get set-base
+        [ terminator-quot? not ] subset dup length 1 > [
+            infer-base-cases unify-effects
+            effect dual-recursive-state get set-base
+        ] [
+            drop
+        ] ifte
     ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )

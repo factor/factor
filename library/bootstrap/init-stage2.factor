@@ -70,6 +70,33 @@ USE: kernel-internals
 
 init-error-handler
 
+! An experiment gone wrong...
+
+! : usage+ ( key -- )
+!     dup "usages" word-property
+!     [ succ ] [ 1 ] ifte*
+!     "usages" set-word-property ;
+! 
+! GENERIC: count-usages ( quot -- )
+! M: object count-usages drop ;
+! M: word count-usages usage+ ;
+! M: cons count-usages unswons count-usages count-usages ;
+! 
+! : tally-usages ( -- )
+!     [ f "usages" set-word-property ] each-word
+!     [ word-parameter count-usages ] each-word ;
+! 
+! : auto-inline ( count -- )
+!     #! Automatically inline all words called less than a count
+!     #! number of times.
+!     [
+!         2dup "usages" word-property dup 0 ? >= [
+!             t "inline" set-word-property
+!         ] [
+!             drop
+!         ] ifte
+!     ] each-word drop ;
+
 ! "Counting word usages..." print
 ! tally-usages
 ! 
@@ -90,6 +117,9 @@ os "win32" = "compile" get and [
 
 "Compiling system..." print
 "compile" get [ compile-all ] when
+
+"Unless you're working on the compiler, ignore the errors above." print
+"Not every word compiles, by design." print
 
 0 [ compiled? [ succ ] when ] each-word
 unparse write " words compiled" print

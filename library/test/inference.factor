@@ -196,7 +196,16 @@ SYMBOL: sym-test
 
 [ [ 1 | 1 ] ] [ [ get ] infer old-effect ] unit-test
 
-! [ [ 1 | 1 ] ] [ [ str>number ] infer old-effect ] unit-test
+: terminator-branch
+    dup [
+        car
+    ] [
+        not-a-number
+    ] ifte ;
+
+[ [ 1 | 1 ] ] [ [ terminator-branch ] infer old-effect ] unit-test
+
+[ [ 1 | 1 ] ] [ [ str>number ] infer old-effect ] unit-test
 
 ! Type inference
 

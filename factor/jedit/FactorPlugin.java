@@ -81,7 +81,17 @@ public class FactorPlugin extends EditPlugin
 			buffer = buffer.getNext();
 		}
 	} //}}}
-	
+
+	//{{{ addNonEmpty() method
+	private static void addNonEmpty(String[] input, List output)
+	{
+		for(int i = 0; i < input.length; i++)
+		{
+			if(input[i].length() != 0)
+				output.add(input[i]);
+		}
+	} //}}}
+
 	//{{{ getExternalInstance() method
 	/**
 	 * Returns the object representing a connection to an external Factor instance.
@@ -97,15 +107,17 @@ public class FactorPlugin extends EditPlugin
 
 			try
 			{
-				String[] args = jEdit.getProperty("factor.external.args","-jedit")
+				List args = new ArrayList();
+				args.add(jEdit.getProperty("factor.external.program"));
+				args.add(jEdit.getProperty("factor.external.image"));
+				args.add("-no-ansi");
+				args.add("-no-smart-terminal");
+				String[] extraArgs = jEdit.getProperty(
+					"factor.external.args","-jedit")
 					.split(" ");
-				String[] nargs = new String[args.length + 4];
-				nargs[0] = jEdit.getProperty("factor.external.program");
-				nargs[1] = jEdit.getProperty("factor.external.image");
-				nargs[2] = "-no-ansi";
-				nargs[3] = "-no-smart-terminal";
-				System.arraycopy(args,0,nargs,4,args.length);
-				p = Runtime.getRuntime().exec(nargs);
+				addNonEmpty(extraArgs,args);
+				p = Runtime.getRuntime().exec((String[])args.toArray(
+					new String[args.size()]));
 				p.getErrorStream().close();
 
 				in = p.getInputStream();

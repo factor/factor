@@ -96,4 +96,8 @@ M: compound (compile) ( word -- )
 
 : compile-all ( -- )
     #! Compile all words.
-    [ try-compile ] each-word ;
+    supported-cpu? [
+        [ try-compile ] each-word
+    ] [
+        "Unsupported CPU" print
+    ] ifte ;
