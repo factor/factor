@@ -31,7 +31,6 @@ USE: prettyprint
 USE: combinators
 USE: errors
 USE: stdio
-default-responders
 
 USE: parser
 
