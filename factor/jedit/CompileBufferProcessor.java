@@ -38,22 +38,11 @@ import org.gjt.sp.util.*;
 
 public class CompileBufferProcessor extends FactorBufferProcessor
 {
-	//{{{ compileWordsInBuffer() method
-	public static void compileWordsInBuffer(View view,
-		Buffer buffer,
-		ExternalFactor factor,
-		Output output) throws Exception
-	{
-		String results = new CompileBufferProcessor(
-			buffer,factor).getResults();
-		output.print(null,results);
-	} //}}}
-	
 	//{{{ CompileBufferProcessor constructor
-	public CompileBufferProcessor(Buffer buffer, ExternalFactor factor)
+	public CompileBufferProcessor(View view, Buffer buffer)
 		throws Exception
 	{
-		super(buffer,factor);
+		super(view,buffer,true);
 	} //}}}
 	
 	//{{{ processWord() method

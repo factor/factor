@@ -27,12 +27,10 @@
 + listener/plugin:
 
 - update plugin docs
-- extract word puts stuff in the wrong place
 - extract word keeps indent
 - word preview for remote words
 - WordPreview calls markTokens() -> NPE
 - listener should be multithreaded
-- compile all commands
 - faster completion
 - NPE in ErrorHighlight
 - maple-like: press enter at old commands to evaluate there

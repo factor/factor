@@ -31,6 +31,7 @@ package factor.jedit;
 
 import factor.*;
 import org.gjt.sp.jedit.Buffer;
+import org.gjt.sp.jedit.View;
 
 /**
  * A class used to compile all words in a file, or infer stack effects of all
@@ -41,8 +42,8 @@ public abstract class FactorBufferProcessor
 	private String results;
 
 	//{{{ FactorBufferProcessor constructor
-	public FactorBufferProcessor(Buffer buffer, ExternalFactor factor)
-		throws Exception
+	public FactorBufferProcessor(View view, Buffer buffer,
+		boolean evalInListener) throws Exception
 	{
 		StringBuffer buf = new StringBuffer();
 
@@ -56,7 +57,10 @@ public abstract class FactorBufferProcessor
 			buf.append("! ");
 			buf.append(expr);
 			buf.append('\n');
-			buf.append(factor.eval(expr));
+			if(evalInListener)
+				FactorPlugin.evalInListener(view,expr);
+			else
+				buf.append(FactorPlugin.evalInWire(expr));
 			words = words.next();
 		}
 		

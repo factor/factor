@@ -44,11 +44,10 @@ public class InferBufferProcessor extends FactorBufferProcessor
 {
 	//{{{ createInferUnitTests() method
 	public static void createInferUnitTests(View view,
-		final Buffer buffer,
-		final ExternalFactor factor)
+		final Buffer buffer)
 		throws Exception
 	{
-		final String results = new InferBufferProcessor(buffer,factor)
+		final String results = new InferBufferProcessor(view,buffer)
 			.getResults();
 
 		final Buffer newBuffer = jEdit.newFile(view);
@@ -70,10 +69,10 @@ public class InferBufferProcessor extends FactorBufferProcessor
 	} //}}}
 	
 	//{{{ InferBufferProcessor constructor
-	public InferBufferProcessor(Buffer buffer, ExternalFactor factor)
+	public InferBufferProcessor(View view, Buffer buffer)
 		throws Exception
 	{
-		super(buffer,factor);
+		super(view,buffer,false);
 	} //}}}
 	
 	//{{{ processWord() method

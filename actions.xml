@@ -94,16 +94,12 @@
 	</ACTION>
 	<ACTION NAME="factor-infer-effects">
 		<CODE>
-			InferBufferProcessor.createInferUnitTests(view,buffer,
-				FactorPlugin.getExternalInstance());
+			InferBufferProcessor.createInferUnitTests(view,buffer);
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-compile-all">
 		<CODE>
-			wm.showDockableWindow("console");
-			CompileBufferProcessor.compileWordsInBuffer(view,buffer,
-				FactorPlugin.getExternalInstance(),
-				wm.getDockableWindow("console"));
+			new CompileBufferProcessor(view,buffer);
 		</CODE>
 	</ACTION>
 </ACTIONS>
