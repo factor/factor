@@ -15,23 +15,9 @@ USE: test
     "Hello world" f html-attr-string
 ] unit-test
 
-[ "<b>Hello world</b>" ]
+[ "<span style=\"color: #ff00ff; font-family: Monospaced; \">car</span>" ]
 [
-    "Hello world"
-    [ [ "bold" | t ] ]
-    html-attr-string
-] unit-test
-
-[ "<i>Hello world</i>" ]
-[
-    "Hello world"
-    [ [ "italics" | t ] ]
-    html-attr-string
-] unit-test
-
-[ "<font color=\"#ff00ff\">Hello world</font>" ]
-[
-    "Hello world"
-    [ [ "fg" 255 0 255 ] ]
-    html-attr-string
+    "car"
+    [ [ "fg" 255 0 255 ] [ "font" | "Monospaced" ] ]
+    span-tag
 ] unit-test

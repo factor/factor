@@ -71,33 +71,42 @@ USE: url-encoding
 : link-tag ( string link -- string )
     url-encode "a" swap link-attrs html-tag ;
 
-: bold-tag ( string -- string )
-    "b" f html-tag ;
-
-: italics-tag ( string -- string )
-    "i" f html-tag ;
-
-: underline-tag ( string -- string )
-    "u" f html-tag ;
-
 : >hex-color ( triplet -- hex )
     [ >hex 2 digits ] inject "#" swons cat ;
 
-: fg-tag ( string color -- string )
-    "font" swap "color=\"" swap >hex-color "\"" cat3 html-tag ;
+: fg-css% ( color -- )
+    "color: " % >hex-color % "; " % ;
 
-: size-tag ( string size -- string )
-    "font" swap "size=\"" swap "\"" cat3 html-tag ;
+: bold-css% ( flag -- )
+    [ "font-weight: bold; " % ] when ;
+
+: italics-css% ( flag -- )
+    [ "font-style: italic; " % ] when ;
+
+: underline-css% ( flag -- )
+    [ "text-decoration: underline; " % ] when ;
+
+: size-css% ( size -- )
+    "font-size: " % unparse % "; " % ;
+
+: font-css% ( font -- )
+    "font-family: " % % "; " % ;
+
+: css-style% ( style -- )
+    [
+        [ "fg"        fg-css% ]
+        [ "bold"      bold-css% ]
+        [ "italics"   italics-css% ]
+        [ "underline" underline-css% ]
+        [ "size"      size-css% ]
+        [ "font"      font-css% ]
+    ] assoc-apply ;
+
+: span-tag ( string style -- string )
+    "span" swap <% "style=\"" % css-style% "\"" % %> html-tag ;
 
 : html-attr-string ( string style -- string )
-    [
-        [ "fg"        fg-tag ]
-        [ "bold"      drop bold-tag ]
-        [ "italics"   drop italics-tag ]
-        [ "underline" drop underline-tag ]
-        [ "size"      size-tag ]
-        [ "link"      link-tag ]
-    ] assoc-apply ;
+    [ span-tag ] keep "link" swap assoc [ link-tag ] when* ;
 
 : html-write-attr ( string style -- )
     swap chars>entities swap html-attr-string write ;
@@ -112,8 +121,10 @@ USE: url-encoding
     #! fg - an rgb triplet in a list
     #! bg - an rgb triplet in a list
     #! bold
-    #! italic
+    #! italics
     #! underline
+    #! size
+    #! link - an object path
     <extend-stream> [
         [ chars>entities write ] "fwrite" set
         [ chars>entities print ] "fprint" set

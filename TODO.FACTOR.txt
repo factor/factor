@@ -1,15 +1,11 @@
-- fedit broken with listener
-- maple-like: press enter at old commands to evaluate there
-- add a socket timeout
-- balance needs USE:
-- html: order of attrs should not matter
-
 + docs:
 
 - unparse examples
 - review doc formatting with latex2html
 - recursion -vs- iteration in vectors chapter
-
+- objects chapter covering namespaces, hashtables, equality and
+  object identity.
+ =
 + tests:
 
 - java factor: equal numbers have non-equal hashcodes!
@@ -19,6 +15,9 @@
 
 + listener/plugin:
 
+- balance needs USE:
+- fedit broken with listener
+- maple-like: press enter at old commands to evaluate there
 - make inferior.factor nicer to use
 - input style after clicking link
 - plugin should not exit jEdit on fatal errors
@@ -31,6 +30,7 @@
 
 + native:
 
+- add a socket timeout
 - read1
 - telnetd and httpd should use multitasking
 - read# and eof
@@ -61,6 +61,7 @@
 
 + misc:
 
+- ifte* and keep combinators
 - 'cascading' styles
 - jedit ==> jedit-word, jedit takes a file name
 - some way to run httpd from command line
@@ -79,6 +80,9 @@
 - file responder:
   - port to native
   - if a directory is requested and URL does not end with /, redirect
+- wiki responder:
+  - port to native
+  - text styles
 - if user clicks stop in browser, doesn't stop sending?
 - log with date
 - return more header fields, like Content-Length, Last-Modified, and so on

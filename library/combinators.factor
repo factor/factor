@@ -61,6 +61,11 @@ USE: stack
     #! This combinator will not compile.
     dup dip forever ; interpret-only
 
+: keep ( a quot -- a )
+    #! Execute the quotation with a on the stack, and restore a
+    #! after the quotation returns.
+    over >r call r> ;
+
 : cond ( x list -- )
     #! The list is of this form:
     #!

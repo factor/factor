@@ -94,6 +94,14 @@ USE: unparser
         test
     ] each
     
+    native? [
+        [
+            "threads"
+        ] [
+            test
+        ] each
+    ] when
+
     java? [
         [
             "lists/java"

@@ -80,6 +80,7 @@ USE: strings
         "errors"
         "debugger"
         "hashtables"
+        "inferior"
         "inspector"
         "interpreter"
         "jedit"
