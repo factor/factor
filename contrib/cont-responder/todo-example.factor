@@ -70,10 +70,6 @@ USE: todo
   #! specified name.
   <input type= "password" size= "20" name= input/> ;
 
-: button ( label -- )
-  #! Output an HTML submit button with the given label.
-  <input type= "submit" value= input/> ;
-
 : form ( action quot  -- )
   #! Call quot with any output appearing inside an HTML form.
   #! The form is a POST form where the action is as specified.

@@ -62,3 +62,7 @@ USE: stack
   <table> [
     <tr valign= "top" tr> [ [ <td> [ call ] </td> ] each ] </tr>
   ] </table> ;
+
+: button ( label -- )
+  #! Output an HTML submit button with the given label.
+  <input type= "submit" value= input/> ;
