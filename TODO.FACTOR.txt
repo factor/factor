@@ -3,8 +3,6 @@
 - image output
 - 32-bit and 64-bit "bignums"
 - floats
-- file i/o using fds
-- handle expiry over image load/save
 - i/o error handling
 - {...} vectors
 - parsing should be parsing

@@ -64,7 +64,7 @@ USE: streams
 
 : parse-stream ( name stream -- code )
     <namespace> [
-        >r init-parser r> [ room. (parse) ] read-lines nreverse
+        >r init-parser r> [ (parse) ] read-lines nreverse
     ] bind ;
 
 : parse-file ( file -- code )

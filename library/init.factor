@@ -85,13 +85,9 @@ USE: strings
 : init-interpreter ( -- )
     #! If we're run stand-alone, start the interpreter on stdio.
     "interactive" get [
-        [
-            [ "top-level-continuation" set ] callcc0
+        [ "top-level-continuation" set ] callcc0
 
-            interpreter-loop
-        ] [
-            [ default-error-handler ] when*
-        ] catch
+        interpreter-loop
     ] [
         f "top-level-continuation" set
     ] ifte ;

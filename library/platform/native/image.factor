@@ -50,7 +50,7 @@ USE: words
 : emit ( cell -- ) image vector-push ;
 : fixup ( value offset -- ) image set-vector-nth ;
 
-!!! Object memory
+( Object memory )
 
 : image-magic HEX: 0f0e0d0c ;
 : image-version 0 ;
@@ -73,7 +73,7 @@ USE: words
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
 
-!!! Image header
+( Image header )
 
 : header ( -- )
     image-magic emit
@@ -88,13 +88,13 @@ USE: words
 : heap-size-offset 5 ;
 : header-size      6 ;
 
-!!! Top of heap pointer
+( Top of heap pointer )
 
 : here ( -- size ) image vector-length header-size - cell * ;
 : here-as ( tag -- pointer ) here swap bitor ;
 : pad ( -- ) here 8 mod 4 = [ 0 emit ] when ;
 
-!!! Remember what objects we've compiled
+( Remember what objects we've compiled )
 
 : pooled-object ( object -- pointer )
     "objects" get hash ;
@@ -102,11 +102,11 @@ USE: words
 : pool-object ( object pointer -- )
     swap "objects" get set-hash ;
 
-!!! Fixnums
+( Fixnums )
 
 : 'fixnum ( n -- tagged ) fixnum-tag immediate ;
 
-!!! Special objects
+( Special objects )
 
 ! Padded with fixnums for 8-byte alignment
 
@@ -114,12 +114,12 @@ USE: words
 : t, object-tag here-as "t" set 7 >header emit 0 'fixnum emit ;
 : empty, 8 >header emit 0 'fixnum emit ;
 
-!!! Beginning of the image
+( Beginning of the image )
 ! The image proper begins with the header, then EMPTY, F, T
 
 : begin ( -- ) header empty, f, t, ;
 
-!!! Words
+( Words )
 
 : word, ( -- pointer ) word-tag here-as xt-tag emit ;
 
@@ -151,14 +151,14 @@ USE: words
         fixup-word-later f
     ] ifte ;
 
-!!! Conses
+( Conses )
 
 DEFER: '
 
 : cons, ( -- pointer ) cons-tag here-as ;
 : 'cons ( c -- tagged ) uncons ' swap ' cons, -rot emit emit ;
 
-!!! Strings
+( Strings )
 
 : pack ( n n -- ) 16 shift< bitor emit ;
 
@@ -195,7 +195,7 @@ DEFER: '
         drop dup string, dup >r pool-object r>
     ] ifte ;
 
-!!! Word definitions
+( Word definitions )
 
 IN: namespaces
 
@@ -237,7 +237,7 @@ IN: cross-compiler
 : primitive, ( word primitive -- ) f (worddef,) ;
 : compound, ( word definition -- ) 1 swap (worddef,) ;
 
-!!! Arrays and vectors
+( Arrays and vectors )
 
 : 'array ( list -- untagged )
     [ ' ] inject
@@ -255,7 +255,7 @@ IN: cross-compiler
     emit ( array ptr )
     pad r> ;
 
-!!! Cross-compile a reference to an object
+( Cross-compile a reference to an object )
 
 : ' ( obj -- pointer )
     [
@@ -270,7 +270,7 @@ IN: cross-compiler
         [ drop t  ] [ "Cannot cross-compile: " swap cat2 throw ]
     ] cond ;
 
-!!! End of the image
+( End of the image )
 
 : (set-boot) ( quot -- ) ' boot-quot-offset fixup ;
 : (set-global) ( namespace -- ) ' global-offset fixup ;
@@ -282,7 +282,7 @@ IN: cross-compiler
 
 : end ( -- ) global, fixup-words here heap-size-offset fixup ;
 
-!!! Image output
+( Image output )
 
 : byte0 ( num -- byte ) 24 shift> HEX: ff bitand ;
 : byte1 ( num -- byte ) 16 shift> HEX: ff bitand ;

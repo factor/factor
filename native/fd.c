@@ -14,12 +14,21 @@ void primitive_close_fd(void)
 	env.dt = dpop();
 }
 
+int fill_buffer(HANDLE* h, int fd, STRING* buf)
+{
+	int amount = read(fd,buf + 1,buf->capacity * 2);
+
+	h->buf_fill = (amount < 0 ? 0 : amount);
+	h->buf_pos = 0;
+
+	return amount;
+}
+
 void primitive_read_line_fd_8(void)
 {
 	HANDLE* h = untag_handle(HANDLE_FD,env.dt);
 	int fd = h->object;
 
-	int amount;
 	int i;
 	int ch;
 
@@ -36,20 +45,17 @@ void primitive_read_line_fd_8(void)
 	{
 		if(h->buf_pos >= h->buf_fill)
 		{
-			amount = read(fd,buf + 1,buf->capacity * 2);
-			
-			if(amount <= 0) /* error or EOF */
+			if(fill_buffer(h,fd,buf) <= 0)
 			{
 				if(line->top == 0)
+				{
 					/* didn't read anything before EOF */
 					env.dt = F;
+				}
 				else
 					env.dt = tag_object(line);
 				return;
 			}
-
-			h->buf_fill = amount;
-			h->buf_pos = 0;
 		}
 
 		for(i = h->buf_pos; i < h->buf_fill; i++)
@@ -64,6 +70,9 @@ void primitive_read_line_fd_8(void)
 			else
 				set_sbuf_nth(line,line->top,ch);
 		}
+		
+		/* We've reached the end of the above loop */
+		h->buf_pos = h->buf_fill;
 	}
 }
 
