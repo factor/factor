@@ -97,10 +97,10 @@ M: win32-server fclose ( server -- )
 
 M: win32-server accept ( server -- client )
     [
-        new-socket 1024 <buffer>
+        new-socket 64 <buffer>
         [
             alloc-io-task init-overlapped >r >r >r socket get r> r> 
-            buffer-ptr <alien> 0 "sockaddr-in" size 16 + dup NULL r> AcceptEx
+            buffer-ptr <alien> 0 32 32 NULL r> AcceptEx
             [ handle-socket-error ] unless (yield)
         ] callcc0
         swap dup add-completion <win32-stream> dupd <win32-client-stream>

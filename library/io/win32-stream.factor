@@ -44,6 +44,7 @@ USE: win32-io-internals
 
 TRAITS: win32-stream
 GENERIC: win32-stream-handle
+GENERIC: do-write
 
 SYMBOL: handle
 SYMBOL: in-buffer
@@ -75,7 +76,11 @@ SYMBOL: file-size
 : maybe-flush-output ( -- )
     out-buffer get buffer-length 0 > [ flush-output ] when ;
 
-: do-write ( str -- )
+M: integer do-write ( int -- )
+    out-buffer get [ buffer-capacity 0 = [ flush-output ] when ] keep
+    buffer-append-char ;
+
+M: string do-write ( str -- )
     dup str-length out-buffer get buffer-capacity <= [
         out-buffer get buffer-append
     ] [

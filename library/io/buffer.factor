@@ -120,6 +120,13 @@ SYMBOL: buf-pos
         buf-fill [ swap str-length + ] change
     ] bind ;
 
+: buffer-append-char ( int buffer -- )
+    #! Append a single character to a buffer.
+    [
+        buf-ptr get buf-fill get + <alien> 0 set-alien-1
+        buf-fill [ 1 + ] change
+    ] bind ;
+
 : buffer-extend ( length buffer -- )
     #! Increases the size of the buffer by length.
     [
