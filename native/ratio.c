@@ -1,13 +1,5 @@
 #include "factor.h"
 
-RATIO* ratio(CELL numerator, CELL denominator)
-{
-	RATIO* ratio = allot(sizeof(RATIO));
-	ratio->numerator = numerator;
-	ratio->denominator = denominator;
-	return ratio;
-}
-
 /* Does not reduce to lowest terms, so should only be used by math
 library implementation, to avoid breaking invariants. */
 void primitive_from_fraction(void)
@@ -19,7 +11,12 @@ void primitive_from_fraction(void)
 	if(onep(denominator))
 		dpush(numerator);
 	else
-		dpush(tag_ratio(ratio(numerator,denominator)));
+	{
+		RATIO* ratio = allot(sizeof(RATIO));
+		ratio->numerator = numerator;
+		ratio->denominator = denominator;
+		dpush(tag_ratio(ratio));
+	}
 }
 
 void primitive_to_fraction(void)

@@ -19,12 +19,6 @@ bool typep(CELL type, CELL tagged)
 	return type_of(tagged) == type;
 }
 
-void type_check(CELL type, CELL tagged)
-{
-	if(type_of(tagged) != type)
-		type_error(type,tagged);
-}
-
 /*
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!

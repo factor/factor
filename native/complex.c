@@ -1,21 +1,5 @@
 #include "factor.h"
 
-COMPLEX* complex(CELL real, CELL imaginary)
-{
-	COMPLEX* complex = allot(sizeof(COMPLEX));
-	complex->real = real;
-	complex->imaginary = imaginary;
-	return complex;
-}
-
-CELL possibly_complex(CELL real, CELL imaginary)
-{
-	if(zerop(imaginary))
-		return real;
-	else
-		return tag_complex(complex(real,imaginary));
-}
-
 void primitive_real(void)
 {
 	switch(type_of(dpeek()))
@@ -87,5 +71,13 @@ void primitive_from_rect(void)
 	if(!realp(real))
 		type_error(REAL_TYPE,real);
 
-	dpush(possibly_complex(real,imaginary));
+	if(zerop(imaginary))
+		dpush(real);
+	else
+	{
+		COMPLEX* complex = allot(sizeof(COMPLEX));
+		complex->real = real;
+		complex->imaginary = imaginary;
+		dpush(tag_complex(complex));
+	}
 }

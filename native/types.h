@@ -42,7 +42,6 @@ CELL T;
 
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);
-void type_check(CELL type, CELL tagged);
 
 INLINE CELL tag_boolean(CELL untagged)
 {
@@ -77,6 +76,17 @@ INLINE CELL tag_object(void* cell)
 INLINE CELL object_type(CELL tagged)
 {
 	return untag_header(get(UNTAG(tagged)));
+}
+
+INLINE void type_check(CELL type, CELL tagged)
+{
+	if(type < HEADER_TYPE)
+	{
+		if(TAG(tagged) != type)
+			type_error(type,tagged);
+	}
+	else if(object_type(tagged) != type)
+		type_error(type,tagged);
 }
 
 void* allot_object(CELL type, CELL length);

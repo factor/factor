@@ -31,28 +31,37 @@ CELL to_cell(CELL x)
 	}
 }
 
-CELL upgraded_arithmetic_type(CELL type1, CELL type2)
+void primitive_arithmetic_type(void)
 {
+	CELL type2 = type_of(dpop());
+	CELL type1 = type_of(dpop());
+	CELL type;
+
 	switch(type1)
 	{
 	case FIXNUM_TYPE:
-		return type2;
+		type = type2;
+		break;
 	case BIGNUM_TYPE:
 		switch(type2)
 		{
 		case FIXNUM_TYPE:
-			return type1;
+			type = type1;
+			break;
 		default:
-			return type2;
+			type = type2;
+			break;
 		}
 	case RATIO_TYPE:
 		switch(type2)
 		{
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
-			return type1;
+			type = type1;
+			break;
 		default:
-			return type2;
+			type = type2;
+			break;
 		}
 	case FLOAT_TYPE:
 		switch(type2)
@@ -60,9 +69,11 @@ CELL upgraded_arithmetic_type(CELL type1, CELL type2)
 		case FIXNUM_TYPE:
 		case BIGNUM_TYPE:
 		case RATIO_TYPE:
-			return type1;
+			type = type1;
+			break;
 		default:
-			return type2;
+			type = type2;
+			break;
 		}
 	case COMPLEX_TYPE:
 		switch(type2)
@@ -71,20 +82,17 @@ CELL upgraded_arithmetic_type(CELL type1, CELL type2)
 		case BIGNUM_TYPE:
 		case RATIO_TYPE:
 		case FLOAT_TYPE:
-			return type1;
+			type = type1;
+			break;
 		default:
-			return type2;
+			type = type2;
+			break;
 		}
 	default:
-		return type1;
+		type = type1;
+		break;
 	}
-}
-
-void primitive_arithmetic_type(void)
-{
-	CELL type2 = type_of(dpop());
-	CELL type1 = type_of(dpop());
-	dpush(tag_fixnum(upgraded_arithmetic_type(type1,type2)));
+	dpush(tag_fixnum(type));
 }
 
 bool realp(CELL tagged)

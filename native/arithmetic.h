@@ -1,6 +1,5 @@
 #include "factor.h"
 
-CELL upgraded_arithmetic_type(CELL type1, CELL type2);
 void primitive_arithmetic_type(void);
 
 CELL tag_integer(FIXNUM x);
