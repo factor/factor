@@ -62,3 +62,7 @@ USE: url-encoding
 [ ] [ "GET /index.html" parse-request ] unit-test
 [ ] [ "GET ../index.html" parse-request ] unit-test
 [ ] [ "POO" parse-request ] unit-test
+
+[ [ [ "Foo" | "Bar" ] ] ] [ "Foo=Bar" post-request>alist ] unit-test
+[ [ [ "Foo" | "Bar" ] [ "Baz" | "Quux" ] ] ]
+[ "Foo=Bar&Baz=Quux" post-request>alist ] unit-test

@@ -69,14 +69,15 @@ USE: url-encoding
     "Content-Length" swap assoc dec> ;
 
 : post-request>alist ( post-request -- alist )
-    #! Return an alist containing name/value pairs from the
-    #! post data.
-    "&" split [ "=" split1 ] inject [
-        uncons >r url-decode r> url-decode cons
-    ] inject ;
+    "&" split [ "=" split1 cons ] inject ;
 
-: read-post-request ( header -- string )
-    content-length dup [ read# post-request>alist ] when ;
+: url-decode-alist ( alist -- alist )
+    [ uncons >r url-decode r> url-decode cons ] inject ;
+
+: read-post-request ( header -- alist )
+    content-length dup [
+        read# post-request>alist url-decode-alist
+    ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
