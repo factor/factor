@@ -133,9 +133,7 @@ USE: stdio
     "/library/httpd/resource-responder.factor"
     "/library/httpd/default-responders.factor"
 
-    "/library/jedit/jedit-no-local.factor"
-    "/library/jedit/jedit-remote.factor"
-    "/library/jedit/jedit.factor"
+    "/library/tools/jedit.factor"
 
     "/library/platform/native/primitives.factor"
 

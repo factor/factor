@@ -37,16 +37,6 @@ USE: stdio
 USE: strings
 USE: words
 
-: jedit-local? ( -- ? )
-    java? [ global [ "jedit" get ] bind ] [ f ] ifte ;
-
-: jedit-line/file ( line dir file -- )
-    jedit-local? [
-        local-jedit-line/file
-    ] [
-        remote-jedit-line/file
-    ] ifte ;
-
 : resource-path ( -- path )
     global [ "resource-path" get ] bind [ "." ] unless* ;
 

@@ -36,6 +36,7 @@ USE: streams
 USE: stdio
 USE: strings
 USE: unparser
+USE: words
 
 : jedit-server-file ( -- path )
     "jedit-server-file" get
@@ -76,10 +77,36 @@ USE: unparser
         write flush
     ] with-stream ;
 
-: remote-jedit-line/file ( line dir file -- )
+: jedit-line/file ( line dir file -- )
     rot "+line:" swap unparse cat2 unit cons swap
     <namespace> [
         "restore" off
         "newView" off
         "newPlainView" off
     ] extend make-jedit-request send-jedit-request ;
+
+: resource-path ( -- path )
+    global [ "resource-path" get ] bind [ "." ] unless* ;
+
+: word-file ( path -- dir file )
+    dup [
+        dup "resource:/" str-head? dup [
+            nip resource-path swap
+        ] [
+            swap ( f file )
+        ] ifte
+    ] [
+        f
+    ] ifte ;
+
+: word-line/file ( word -- line dir file )
+    #! Note that line numbers here start from 1
+    dup "line" word-property swap "file" word-property
+    word-file ;
+
+: jedit ( word -- )
+    word-line/file dup [
+        jedit-line/file
+    ] [
+        3drop "Unknown source" print
+    ] ifte ;
