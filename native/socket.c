@@ -11,11 +11,11 @@ int make_server_socket(CHAR port)
 	sock = socket(PF_INET, SOCK_STREAM, 0);
 	
 	if(sock < 0)
-		io_error(__FUNCTION__);
+		io_error(NULL,__FUNCTION__);
 	
 	/* Reuse port number */
 	if(setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&reuseaddr,sizeof(int)) < 0)
-		io_error(__FUNCTION__);
+		io_error(NULL,__FUNCTION__);
 	
 	/* Give the socket a name */
 	name.sin_family = AF_INET;
@@ -24,14 +24,14 @@ int make_server_socket(CHAR port)
 	if(bind(sock,(struct sockaddr *)&name, sizeof(name)) < 0)
 	{
 		close(sock);
-		io_error(__FUNCTION__);
+		io_error(NULL,__FUNCTION__);
 	}
 
 	/* Start listening for connections */
 	if(listen(sock,1) < 0)
 	{
 		close(sock);
-		io_error(__FUNCTION__);
+		io_error(NULL,__FUNCTION__);
 	}
 
 	return sock;
@@ -40,7 +40,7 @@ int make_server_socket(CHAR port)
 void primitive_server_socket(void)
 {
 	CHAR p = (CHAR)to_fixnum(dpop());
-	dpush(port(make_server_socket(p)));
+	dpush(tag_object(port(make_server_socket(p))));
 }
 
 int accept_connection(int sock)
@@ -50,9 +50,7 @@ int accept_connection(int sock)
 	
 	int new = accept(sock,(struct sockaddr *)&clientname,&size);
 	if(new < 0)
-		io_error(__FUNCTION__);
-
-	set_nonblocking(new);
+		io_error(NULL,__FUNCTION__);
 
 	printf("Connection from host %s, port %hd.\n",
 		inet_ntoa(clientname.sin_addr),
@@ -64,5 +62,6 @@ int accept_connection(int sock)
 void primitive_accept_fd(void)
 {
 	PORT* p = untag_port(dpop());
-	dpush(port(accept_connection(p->fd)));
+	PORT* new = port(accept_connection(p->fd));
+	dpush(tag_object(new));
 }

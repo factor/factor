@@ -7,8 +7,8 @@ void init_io_tasks(fd_set* fdset, IO_TASK* io_tasks)
 	FD_ZERO(fdset);
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
-		read_io_tasks[i].port = F;
-		read_io_tasks[i].callback = F;
+		io_tasks[i].port = F;
+		io_tasks[i].callback = F;
 	}
 }
 
@@ -21,7 +21,7 @@ void init_iomux(void)
 	init_io_tasks(&write_fd_set,write_io_tasks);
 }
 
-IO_TASK* add_io_task_impl(
+IO_TASK* add_io_task(
 	IO_TASK_TYPE type,
 	PORT* port,
 	CELL callback,
@@ -29,6 +29,9 @@ IO_TASK* add_io_task_impl(
 	int* fd_count)
 {
 	int fd = port->fd;
+
+	/* if(io_tasks[fd].port != F)
+		critical_error("Adding I/O task twice",fd); */
 
 	io_tasks[fd].type = type;
 	io_tasks[fd].port = tag_object(port);
@@ -40,24 +43,23 @@ IO_TASK* add_io_task_impl(
 	return &io_tasks[fd];
 }
 
-IO_TASK* add_io_task(IO_TASK_TYPE type, PORT* port, CELL callback)
+void primitive_add_read_line_io_task(void)
 {
-	switch(type)
-	{
-	case IO_TASK_READ_LINE:
-	case IO_TASK_READ_COUNT:
-		return add_io_task_impl(type,port,callback,
-			read_io_tasks,&read_fd_count);
-	case IO_TASK_WRITE:
-		return add_io_task_impl(type,port,callback,
-			write_io_tasks,&write_fd_count);
-	default:
-		fatal_error("Invalid IO_TASK_TYPE",type);
-		return NULL;
-	}
+	PORT* port = untag_port(dpop());
+	CELL callback = dpop();
+	add_io_task(IO_TASK_READ_LINE,port,callback,
+		read_io_tasks,&read_fd_count);
 }
 
-void remove_io_task_impl(
+void primitive_add_write_io_task(void)
+{
+	PORT* port = untag_port(dpop());
+	CELL callback = dpop();
+	add_io_task(IO_TASK_WRITE,port,callback,
+		write_io_tasks,&write_fd_count);
+}
+
+void remove_io_task(
 	IO_TASK_TYPE type,
 	PORT* port,
 	IO_TASK* io_tasks,
@@ -72,64 +74,139 @@ void remove_io_task_impl(
 		*fd_count = *fd_count - 1;
 }
 
-void remove_io_task(IO_TASK_TYPE type, PORT* port)
+void remove_io_tasks(PORT* port)
 {
-	switch(type)
-	{
-	case IO_TASK_READ_LINE:
-	case IO_TASK_READ_COUNT:
-		remove_io_task_impl(type,port,read_io_tasks,&read_fd_count);
-		break;
-	case IO_TASK_WRITE:
-		remove_io_task_impl(type,port,write_io_tasks,&write_fd_count);
-		break;
-	}
+	remove_io_task(IO_TASK_READ_LINE,port,
+		read_io_tasks,&read_fd_count);
+	remove_io_task(IO_TASK_WRITE,port,
+		write_io_tasks,&write_fd_count);
 }
 
-void perform_io_task(IO_TASK* task)
-{
-	if(task->port == F)
-		return;
-
-	switch(task->type)
-	{
-	case IO_TASK_READ_LINE:
-		
-		break;
-	case IO_TASK_WRITE:
-		write_step(untag_port(task->port));
-		break;
-	default:
-		critical_error("Bad I/O task",task->type);
-		break;
-	}
-}
-
-bool set_up_fd_set(fd_set* fdset, IO_TASK* io_tasks)
+bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 {
 	bool retval = false;
-	
 	int i;
-	for(i = 0; i < read_fd_count; i++)
+
+	FD_ZERO(fdset);
+
+	for(i = 0; i < fd_count; i++)
 	{
-		if(read_io_tasks[i].port != F)
+		if(typep(PORT_TYPE,io_tasks[i].port))
 		{
 			retval = true;
-			FD_SET(i,&read_fd_set);
+			FD_SET(i,fdset);
 		}
 	}
 	
 	return retval;
 }
 
-/* Wait for I/O and return a callback. */
-CELL iomux(void)
+bool perform_read_line_io_task(PORT* port)
 {
-	bool reading = set_up_fd_set(&read_fd_set,read_io_tasks);
-	bool writing = set_up_fd_set(&write_fd_set,write_io_tasks);
+	init_buffer(port,B_READ_LINE);
+	if(port->buf_pos >= port->buf_fill)
+	{
+		if(!read_step(port))
+			return false;
+	}
+
+	if(port->buf_fill == 0)
+	{
+		/* EOF */
+		port->line = F;
+		return true;
+	}
+	else
+		return read_line_step(port);
+}
+
+bool perform_write_io_task(PORT* port)
+{
+	init_buffer(port,B_WRITE);
+	if(write_step(port))
+	{
+		if(port->buf_pos == port->buf_fill)
+		{
+			/* All written */
+			port->buf_pos = 0;
+			port->buf_fill = 0;
+			return true;
+		}
+	}
+	return false;
+}
+
+CELL perform_io_task(IO_TASK* task)
+{
+	PORT* port = untag_port(task->port);
+	CELL callback = task->callback;
+	switch(task->type)
+	{
+	case IO_TASK_READ_LINE:
+		remove_io_task(IO_TASK_READ_LINE,port,
+			read_io_tasks,&read_fd_count);
+		if(perform_read_line_io_task(port))
+			return callback;
+		else
+		{
+			add_io_task(IO_TASK_READ_LINE,port,
+				callback,read_io_tasks,
+				&read_fd_count);
+			return F;
+		}
+	case IO_TASK_WRITE:
+		remove_io_task(IO_TASK_WRITE,port,
+			write_io_tasks,&write_fd_count);
+		if(perform_write_io_task(port))
+			return callback;
+		else
+		{
+			add_io_task(IO_TASK_WRITE,port,
+				callback,write_io_tasks,
+				&write_fd_count);
+			return F;
+		}
+	default:
+		critical_error("Bad I/O task",task->type);
+		return F;
+	}
+}
+
+CELL perform_io_tasks(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
+{
+	int i;
+	CELL callback;
+
+	for(i = 0; i < fd_count; i++)
+	{
+		if(FD_ISSET(i,fdset))
+		{
+			if(io_tasks[i].port == F)
+				critical_error("select() returned fd for non-existent task",i);
+			else
+			{
+				callback = perform_io_task(&io_tasks[i]);
+				if(callback != F)
+					return callback;
+			}
+		}
+	}
+
+	return F;
+}
+
+/* Wait for I/O and return a callback. */
+CELL next_io_task(void)
+{
+	bool reading = set_up_fd_set(&read_fd_set,
+		read_fd_count,read_io_tasks);
+	bool writing = set_up_fd_set(&write_fd_set,
+		write_fd_count,write_io_tasks);
+
+	CELL callback;
 
 	if(!reading && !writing)
-		fatal_error("iomux() called with no IO tasks",0);
+		critical_error("next_io_task() called with no IO tasks",0);
 
 	select(read_fd_count > write_fd_count
 		? read_fd_count : write_fd_count,
@@ -137,13 +214,16 @@ CELL iomux(void)
 		(writing ? &write_fd_set : NULL),
 		NULL,NULL);
 
-	/* for(i = 0; i < read_fd_count; i++)
-		perform_io_task(&read_io_tasks[i]);
+	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
+	if(callback != F)
+		return callback;
 
-	for(i = 0; i < write_fd_count; i++)
-		perform_io_task(&write_io_tasks[i]); */
+	return perform_io_tasks(&write_fd_set,write_fd_count,write_io_tasks);
+}
 
-	return F;
+void primitive_next_io_task(void)
+{
+	dpush(next_io_task());
 }
 
 void collect_io_tasks(void)

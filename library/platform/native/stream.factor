@@ -27,6 +27,7 @@
 
 IN: streams
 USE: combinators
+USE: continuations
 USE: io-internals
 USE: errors
 USE: kernel
@@ -44,39 +45,32 @@ USE: namespaces
         "in" set
 
         ( str -- )
-        [ "out" get write-fd-8 ] "fwrite" set
+        [ "out" get blocking-write ] "fwrite" set
         
         ( -- str )
-        [
-            "in" get read-line-fd-8
-        ] "freadln" set
+        [ "in" get dup [ blocking-read-line ] when ] "freadln" set
         
         ( -- )
-        [
-            "out" get [ flush-fd ] when*
-        ] "fflush" set
+        [ "out" get [ flush-fd ] when* ] "fflush" set
         
         ( -- )
         [
             "in" get [ close-fd ] when*
-            "out" get [ close-fd ] when*
+            "out" get [ dup flush-fd close-fd ] when*
         ] "fclose" set
     ] extend ;
 
-: <file-stream> ( path read? write? -- stream )
-    open-file dup <fd-stream> ;
-
 : <filecr> ( path -- stream )
-    t f <file-stream> ;
+    t f open-file f <fd-stream> ;
 
 : <filecw> ( path -- stream )
-    f t <file-stream> ;
+    f t open-file f swap <fd-stream> ;
 
 : <filebr> ( path -- stream )
-    t f <file-stream> ;
+    <filecr> ;
 
 : <filebw> ( path -- stream )
-    f t <file-stream> ;
+    <filecw> ;
 
 : <server> ( port -- stream )
     #! Starts listening on localhost:port. Returns a stream that

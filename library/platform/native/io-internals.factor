@@ -26,10 +26,33 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: io-internals
+USE: combinators
+USE: continuations
 USE: kernel
 USE: namespaces
-USE: combinators
+USE: stack
+USE: strings
 
 : stdin 0 getenv ;
 : stdout 1 getenv ;
 : stderr 2 getenv ;
+
+: flush-fd ( port -- )
+    [ swap add-write-io-task next-io-task drop ( call ) ] callcc0 ;
+
+: wait-to-write ( len port -- )
+    tuck can-write? [ drop ] [ flush-fd ] ifte ;
+
+: blocking-write ( str port -- )
+    over
+    dup string? [ str-length ] [ drop 1 ] ifte
+    over wait-to-write write-fd-8 ;
+
+: fill-fd ( port -- )
+    [ swap add-read-line-io-task next-io-task drop ( call ) ] callcc0 ;
+
+: wait-to-read-line ( port -- )
+    dup can-read-line? [ drop ] [ fill-fd ] ifte ;
+
+: blocking-read-line ( port -- line )
+    dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;

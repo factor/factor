@@ -11,16 +11,20 @@ PORT* untag_port(CELL tagged)
 	return p;
 }
 
-CELL port(CELL fd)
+PORT* port(CELL fd)
 {
 	PORT* port = allot_object(PORT_TYPE,sizeof(PORT));
 	port->fd = fd;
 	port->buffer = NULL;
-	port->line = NULL;
+	port->line = F;
 	port->buf_mode = B_NONE;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
-	return tag_object(port);
+
+	if(fcntl(port->fd,F_SETFL,O_NONBLOCK,1) == -1)
+		io_error(port,__FUNCTION__);
+
+	return port;
 }
 
 void primitive_portp(void)
@@ -37,6 +41,16 @@ void init_buffer(PORT* port, int mode)
 	{
 		port->buf_fill = port->buf_pos = 0;
 		port->buf_mode = mode;
+
+		if(mode == B_READ_LINE)
+			port->line = tag_object(sbuf(LINE_SIZE));
+	}
+	else if(port->buf_mode == B_READ_LINE)
+	{
+		if(port->line == F)
+			port->line = tag_object(sbuf(LINE_SIZE));
+		else
+			untag_sbuf(port->line)->top = 0;
 	}
 }
 
@@ -45,20 +59,12 @@ void fixup_port(PORT* port)
 	port->fd = -1;
 	if(port->buffer != 0)
 		port->buffer = fixup_untagged_string(port->buffer);
-	if(port->line != 0)
-	{
-		port->line = (SBUF*)((CELL)port->line
-			+ (active->base - relocation_base));
-	}
+	fixup(&port->line);
 }
 
 void collect_port(PORT* port)
 {
 	if(port->buffer != 0)
 		port->buffer = copy_untagged_string(port->buffer);
-	if(port->line != 0)
-	{
-		port->line = (SBUF*)copy_untagged_object(
-			port->line,sizeof(SBUF));
-	}
+	copy_object(&port->line);
 }

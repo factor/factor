@@ -9,17 +9,17 @@ void primitive_open_file(void)
 	int fd;
 
 	if(read && write)
-		mode = O_RDWR | O_CREAT | O_NONBLOCK;
+		mode = O_RDWR | O_CREAT;
 	else if(read)
-		mode = O_RDONLY | O_NONBLOCK;
+		mode = O_RDONLY;
 	else if(write)
-		mode = O_WRONLY | O_CREAT | O_TRUNC | O_NONBLOCK;
+		mode = O_WRONLY | O_CREAT | O_TRUNC;
 	else
-		mode = O_NONBLOCK;
+		mode = 0;
 
 	fd = open(path,mode);
 	if(fd < 0)
-		io_error(__FUNCTION__);
+		io_error(NULL,__FUNCTION__);
 
-	dpush(port(fd));
+	dpush(tag_object(port(fd)));
 }

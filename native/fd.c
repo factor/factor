@@ -2,12 +2,20 @@
 
 void init_io(void)
 {
-	env.user[STDIN_ENV]  = port(0);
-	set_nonblocking(0);
-	env.user[STDOUT_ENV] = port(1);
-	set_nonblocking(1);
-	env.user[STDERR_ENV] = port(2);
-	/* set_nonblocking(2); */
+	env.user[STDIN_ENV]  = tag_object(port(0));
+	env.user[STDOUT_ENV] = tag_object(port(1));
+	env.user[STDERR_ENV] = tag_object(port(2));
+}
+
+bool can_read_line(PORT* port)
+{
+	return false;
+}
+
+void primitive_can_read_line(void)
+{
+	PORT* port = untag_port(dpop());
+	dpush(tag_boolean(can_read_line(port)));
 }
 
 /* Return true if something was read */
@@ -20,7 +28,7 @@ bool read_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-			io_error(__FUNCTION__);
+			io_error(port,__FUNCTION__);
 		return false;
 	}
 	else
@@ -31,21 +39,12 @@ bool read_step(PORT* port)
 	}
 }
 
-READLINE_STAT read_line_step(PORT* port)
+bool read_line_step(PORT* port)
 {
 	int i;
 	char ch;
 
-	SBUF* line = port->line;
-
-	if(port->buf_pos >= port->buf_fill)
-	{
-		if(!read_step(port))
-			return READLINE_WAIT;
-
-		if(port->buf_fill == 0)
-			return READLINE_EOF;
-	}
+	SBUF* line = untag_sbuf(port->line);
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
@@ -53,7 +52,7 @@ READLINE_STAT read_line_step(PORT* port)
 		if(ch == '\n')
 		{
 			port->buf_pos = i + 1;
-			return READLINE_EOL;
+			return true;
 		}
 		else
 			set_sbuf_nth(line,line->top,ch);
@@ -63,43 +62,15 @@ READLINE_STAT read_line_step(PORT* port)
 
 	/* We've reached the end of the above loop, without seeing a newline
 	or EOF, so read again */
-	return READLINE_AGAIN;
+	return false;
 }
 
 void primitive_read_line_fd_8(void)
 {
 	PORT* port = untag_port(dpeek());
-	SBUF* line;
-	READLINE_STAT state;
+	drepl(port->line);
+	port->line = F;
 
-	init_buffer(port,B_READ);
-	if(port->line == NULL)
-		port->line = sbuf(LINE_SIZE);
-	else
-		port->line->top = 0;
-	line = port->line;
-
-	add_io_task(IO_TASK_READ_LINE,port,F);
-
-	for(;;)
-	{
-		state = read_line_step(port);
-		if(state == READLINE_WAIT)
-			iomux();
-		else if(state == READLINE_EOF && line->top == 0)
-		{
-			/* didn't read anything before EOF */
-			drepl(F);
-			break;
-		}
-		else if(state == READLINE_EOL)
-		{
-			drepl(tag_object(sbuf_to_string(line)));
-			break;
-		}
-	}
-
-	remove_io_task(IO_TASK_READ_LINE,port);
 }
 
 /* Return true if write was done */
@@ -113,7 +84,7 @@ bool write_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-			io_error(__FUNCTION__);
+			io_error(port,__FUNCTION__);
 		return false;
 	}
 	else
@@ -123,39 +94,48 @@ bool write_step(PORT* port)
 	}
 }
 
-/* keep writing to the stream until everything is written */
-void flush_buffer(PORT* port)
+bool can_write(PORT* port, FIXNUM len)
 {
-	IO_TASK* task;
-	if(port->buf_mode != B_WRITE || port->buf_fill == 0)
-		return;
+	CELL buf_capacity;
 
-	task = add_io_task(IO_TASK_WRITE,port,F);
-
-	for(;;)
+	switch(port->buf_mode)
 	{
-		if(port->buf_fill == port->buf_pos)
-			break;
-
-		if(!write_step(port))
-			iomux();
+	case B_NONE:
+		return true;
+	case B_READ_LINE:
+		return false;
+	case B_WRITE:
+		buf_capacity = port->buffer->capacity * CHARS;
+		/* Is the string longer than the buffer? */
+		if(port->buf_fill == 0 && len > buf_capacity)
+		{
+			/* Increase the buffer to fit the string */
+			port->buffer = allot_string(len / CHARS + 1);
+			return true;
+		}
+		else
+			return (port->buf_fill + len <= buf_capacity);
+	default:
+		critical_error("Bad buf_mode",port->buf_mode);
+		return false;
 	}
+}
 
-	remove_io_task(IO_TASK_WRITE,port);
-
-	port->buf_pos = 0;
-	port->buf_fill = 0;
+void primitive_can_write(void)
+{
+	PORT* port = untag_port(dpop());
+	FIXNUM len = to_fixnum(dpop());
+	dpush(tag_boolean(can_write(port,len)));
 }
 
 void write_fd_char_8(PORT* port, FIXNUM ch)
 {
 	char c = (char)ch;
 
-	init_buffer(port,B_WRITE);
+	if(!can_write(port,1))
+		io_error(port,__FUNCTION__);
 
-	/* Is the buffer full? */
-	if(port->buf_fill == port->buffer->capacity * CHARS)
-		flush_buffer(port);
+	init_buffer(port,B_WRITE);
 
 	bput((CELL)port->buffer + sizeof(STRING) + port->buf_fill,c);
 	port->buf_fill++;
@@ -163,24 +143,15 @@ void write_fd_char_8(PORT* port, FIXNUM ch)
 
 void write_fd_string_8(PORT* port, STRING* str)
 {
-	char* c_str = to_c_string(str);
+	char* c_str;
+
+	/* Note this ensures the buffer is large enough to fit the string */
+	if(!can_write(port,str->capacity))
+		io_error(port,__FUNCTION__);
 
 	init_buffer(port,B_WRITE);
 
-	/* Is the string longer than the buffer? */
-	if(str->capacity > port->buffer->capacity * CHARS)
-	{
-		flush_buffer(port);
-
-		/* Increase the buffer to fit the string */
-		port->buffer = allot_string(str->capacity / CHARS + 1);
-	}
-	/* Is there enough room in the buffer? If not, flush */
-	if(port->buf_fill + str->capacity
-		> port->buffer->capacity * CHARS)
-	{
-		flush_buffer(port);
-	}
+	c_str = to_c_string(str);
 
 	/* Append string to buffer */
 	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
@@ -211,21 +182,20 @@ void primitive_write_fd_8(void)
 	}
 }
 
-void primitive_flush_fd(void)
-{
-	PORT* port = untag_port(dpop());
-	flush_buffer(port);
-}
-
 void primitive_close_fd(void)
 {
+	/* This does not flush. */
 	PORT* port = untag_port(dpop());
-	flush_buffer(port);
 	close(port->fd);
 }
 
-void set_nonblocking(int fd)
+void io_error(PORT* port, const char* func)
 {
-	if(fcntl(fd,F_SETFL,O_NONBLOCK,1) == -1)
-		io_error(__FUNCTION__);
+	STRING* function = from_c_string(func);
+	STRING* error = from_c_string(strerror(errno));
+
+	CONS* c = cons(tag_object(function),tag_cons(
+		cons(tag_object(error),F)));
+
+	general_error(ERROR_IO,tag_cons(c));
 }
