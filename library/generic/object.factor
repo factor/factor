@@ -53,4 +53,6 @@ object [
     ] times* 2drop
 ] "add-method" set-word-property
 
+object [ drop t ] "predicate" set-word-property
+
 object 100 "priority" set-word-property

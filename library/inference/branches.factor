@@ -41,10 +41,18 @@ USE: hashtables
 : longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
 
+: computed-value-vector ( n -- vector )
+    [ drop object <computed> ] vector-project ;
+
+: add-inputs ( count stack -- count stack )
+    #! Add this many inputs to the given stack.
+    [ vector-length - dup ] keep
+    >r computed-value-vector dup r> vector-append ;
+
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup longest-vector swap [ dupd ensure nip ] map nip ;
+    dup longest-vector swap [ dupd add-inputs nip ] map nip ;
 
 : unify-classes ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -159,7 +167,7 @@ USE: hashtables
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
-    3 ensure-d
+    [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap 2list
     >r 1 meta-d get vector-tail* #ifte r>
@@ -174,7 +182,7 @@ USE: hashtables
 
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
-    2 ensure-d
+    [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
     >r 1 meta-d get vector-tail* #dispatch r>
     pop-d drop ( n )

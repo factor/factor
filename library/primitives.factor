@@ -25,10 +25,14 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: alien
+DEFER: alien
+
 USE: alien
 USE: compiler
 USE: errors
 USE: files
+USE: generic
 USE: io-internals
 USE: kernel
 USE: kernel-internals
@@ -47,9 +51,9 @@ USE: words
     [ execute                " word -- "                          f ]
     [ call                   " quot -- "                          [ 1 | 0 ] ]
     [ ifte                   " cond true false -- "               [ 3 | 0 ] ]
-    [ cons                   " car cdr -- [ car | cdr ] "         [ 2 | 1 ] ]
-    [ car                    " [ car | cdr ] -- car "             [ 1 | 1 ] ]
-    [ cdr                    " [ car | cdr ] -- cdr "             [ 1 | 1 ] ]
+    [ cons                   " car cdr -- [ car | cdr ] "         [ [ object object ] [ cons ] ] ]
+    [ car                    " [ car | cdr ] -- car "             [ [ cons ] [ object ] ] ]
+    [ cdr                    " [ car | cdr ] -- cdr "             [ [ cons ] [ object ] ] ]
     [ <vector>               " capacity -- vector"                [ 1 | 1 ] ]
     [ vector-length          " vector -- n "                      [ 1 | 1 ] ]
     [ set-vector-length      " n vector -- "                      [ 2 | 0 ] ]
@@ -229,6 +233,9 @@ USE: words
     [ heap-stats             " -- instances bytes "               [ 0 | 2 ] ]
     [ throw                  " error -- "                         [ 1 | 0 ] ]
     [ string>memory          " str address -- "                   [ 2 | 0 ] ]
+    [ memory>string          " address length -- str "            [ 2 | 1 ] ]
+    [ local-alien?           " alien -- ? "                       [ [ alien ] [ object ] ] ]
+    [ alien-address          " alien -- address "                 [ [ alien ] [ integer ] ] ]
     [ memory>string          " address length -- str "            [ 2 | 1 ] ]
 ] [
     uncons dupd uncons car ( word word stack-effect infer-effect )

@@ -57,9 +57,13 @@ builtin 50 "priority" set-word-property
 : add-builtin-table types get set-vector-nth ;
 
 : builtin-predicate ( type# symbol -- )
-    dup predicate-word
-    [ rot [ swap type eq? ] cons define-compound ] keep 
-    "predicate" set-word-property ;
+    over f type = [
+        nip [ not ] "predicate" set-word-property
+    ] [
+        dup predicate-word
+        [ rot [ swap type eq? ] cons define-compound ] keep 
+        unit "predicate" set-word-property
+    ] ifte ;
 
 : builtin-class ( type# symbol -- )
     2dup swap add-builtin-table

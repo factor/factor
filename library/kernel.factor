@@ -66,5 +66,5 @@ M: object = eq? ;
 : xor ( a b -- a^b ) dup not swap ? ; inline
 
 IN: syntax
-BUILTIN: f 6 FORGET: f?
-BUILTIN: t 7 FORGET: t?
+BUILTIN: f 6
+BUILTIN: t 7

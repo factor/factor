@@ -64,7 +64,6 @@ SYMBOL: recursive-label
 SYMBOL: save-effect
 
 ! A value has the following slots:
-
 GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class ( value -- class )
@@ -95,27 +94,20 @@ M: literal value-class ( value -- class )
 : value-recursion ( value -- rstate )
     [ recursive-state get ] bind ;
 
-: computed-value-vector ( n -- vector )
-    [ drop object <computed> ] vector-project ;
-
-: add-inputs ( count stack -- stack )
-    #! Add this many inputs to the given stack.
-    >r computed-value-vector dup r> vector-append ;
-
-: ensure ( count stack -- count stack )
-    #! Ensure stack has this many elements. Return number of
-    #! elements added.
-    2dup vector-length > [
-        [ vector-length - dup ] keep add-inputs
+: required-inputs ( typelist stack -- values )
+    >r dup length r> vector-length - dup 0 > [
+        head [ <computed> ] map
     ] [
-        >r drop 0 r>
+        2drop f
     ] ifte ;
 
-: ensure-d ( count -- )
-    #! Ensure count of unknown results are on the stack.
-    meta-d [ ensure ] change
-    d-in get swap [ object <computed> over vector-push ] times
-    drop ;
+: vector-prepend ( values stack -- stack )
+    >r list>vector dup r> vector-append ;
+
+: ensure-d ( typelist -- )
+    meta-d get required-inputs dup
+    meta-d [ vector-prepend ] change
+    d-in [ vector-prepend ] change ;
 
 : effect ( -- [ in | out ] )
     #! After inference is finished, collect information.
@@ -206,6 +198,6 @@ DEFER: apply-word
 : type-infer ( quot -- [ in-types out-types ] )
     [
         (infer)
-        d-in get [ value-class ] vector-map
-        meta-d get [ value-class ] vector-map 2list
+        d-in get [ value-class ] vector-map vector>list
+        meta-d get [ value-class ] vector-map vector>list 2list
     ] with-scope ;

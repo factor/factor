@@ -60,3 +60,6 @@ SYMBOL: list-buffer
     #! Append an object to the currently constructing list, only
     #! if the object does not already occur in the list.
     list-buffer unique@ ;
+
+: append, ( list -- )
+    [ , ] each ;

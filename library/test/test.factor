@@ -111,6 +111,7 @@ USE: unparser
         "dataflow"
         "interpreter"
         "hsv"
+        "alien"
     ] [
         test
     ] each

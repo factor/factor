@@ -43,26 +43,25 @@ USE: prettyprint
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
-    >r dup car ensure-d >r dataflow, r> r> rot
-    [ pick swap dataflow-inputs ] keep
-    pick 2slip swap dataflow-outputs ; inline
+    >r dup car dup cons? [ [ drop object ] project ] unless ensure-d >r dataflow, r> r> rot
+    [ pick car swap dataflow-inputs ] keep
+    pick 2slip cdr swap
+    dataflow-outputs ; inline
 
-: consume-d ( count -- )
-    #! Remove count of elements.
-    [ pop-d drop ] times ;
+: consume-d ( typelist -- )
+    [ pop-d 2drop ] each ;
 
-: produce-d ( count -- )
-    #! Push count of unknown results.
-    [ object <computed> push-d ] times ;
+: produce-d ( typelist -- )
+    [ <computed> push-d ] each ;
 
 : (consume/produce) ( param op effect -- )
     [
         dup cdr cons? [
             ( new style )
-            
+            unswons consume-d car produce-d
         ] [
             ( old style, will go away shortly )
-            unswons consume-d produce-d
+            unswons [ pop-d drop ] times [ object <computed> push-d ] times
         ] ifte
     ] with-dataflow ;
 
@@ -77,7 +76,7 @@ USE: prettyprint
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
     over "infer" word-property dup [
-        swap car ensure-d call drop
+        swap car dup cons? [ [ drop object ] project ] unless ensure-d call drop
     ] [
         drop consume/produce
     ] ifte ;
@@ -197,7 +196,7 @@ USE: prettyprint
     ] ifte ;
 
 : infer-call ( -- )
-    1 ensure-d
+    [ general-list ] ensure-d
     dataflow-drop,
     gensym dup [
         drop pop-d dup

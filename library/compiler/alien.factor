@@ -42,6 +42,20 @@ USE: hashtables
 BUILTIN: dll   15
 BUILTIN: alien 16
 
+M: alien hashcode ( obj -- n )
+    alien-address ;
+
+M: alien = ( obj obj -- ? )
+    over alien? [
+        over local-alien? over local-alien? or [
+            eq?
+        ] [
+            alien-address swap alien-address =
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
 : (library) ( name -- object )
     "libraries" get hash ;
 
@@ -76,7 +90,7 @@ SYMBOL: alien-returns
 SYMBOL: alien-parameters
 
 : infer-alien ( -- )
-    4 ensure-d
+    [ object object object object ] ensure-d
     dataflow-drop, pop-d literal-value
     dataflow-drop, pop-d literal-value
     dataflow-drop, pop-d literal-value alien-function >r

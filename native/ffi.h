@@ -26,6 +26,8 @@ void primitive_alien(void);
 void primitive_local_alien(void);
 DLLEXPORT CELL unbox_alien(void);
 DLLEXPORT void box_alien(CELL ptr);
+void primitive_local_alienp(void);
+void primitive_alien_address(void);
 void primitive_alien_cell(void);
 void primitive_set_alien_cell(void);
 void primitive_alien_4(void);

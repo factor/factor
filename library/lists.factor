@@ -188,3 +188,7 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 
 : count ( n -- [ 0 ... n-1 ] )
     [ ] project ;
+
+: head ( list n -- list )
+    #! Return the first n elements of the list.
+    dup 0 > [ >r uncons r> pred head cons ] [ 2drop f ] ifte ;

@@ -8,6 +8,7 @@ USE: lists
 USE: namespaces
 USE: kernel
 USE: math-internals
+USE: generic
 
 [
     [ 1 | 2 ]
@@ -20,20 +21,19 @@ USE: math-internals
     [ 3 | 4 ]
 ] "effects" set
 
-! [ t ] [
-!     "effects" get [
-!         dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
-!     ] all?
-! ] unit-test
-[ 6 ] [ 6 computed-value-vector vector-length ] unit-test
-
 [ 3 ] [ [ { 1 2 } { 1 2 3 } ] longest-vector ] unit-test
 
 [ t ] [
     [ { 1 2 } { 1 2 3 } ] unify-lengths [ vector-length ] map all=?
 ] unit-test
 
-[ [ sq ] ] [ [ sq ] [ sq ] unify-result ] unit-test
+[ [ sq ] ] [
+    [ sq ] f <literal> [ sq ] f <literal> unify-results literal-value
+] unit-test
+
+[ fixnum ] [
+    5 f <literal> 6 f <literal> unify-results value-class
+] unit-test
 
 [ [ 0 | 2 ] ] [ [ 2 "Hello" ] infer ] unit-test
 [ [ 1 | 2 ] ] [ [ dup ] infer ] unit-test
@@ -194,3 +194,10 @@ SYMBOL: sym-test
 [ [ 0 | 1 ] ] [ [ n> ] infer ] unit-test
 
 [ [ 1 | 1 ] ] [ [ get ] infer ] unit-test
+
+! Type inference.
+
+[ [ [ object ] [ ] ] ] [ [ drop ] type-infer ] unit-test
+[ [ [ object ] [ object object ] ] ] [ [ dup ] type-infer ] unit-test
+[ [ [ object object ] [ cons ] ] ] [ [ cons ] type-infer ] unit-test
+[ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] type-infer ] unit-test

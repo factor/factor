@@ -41,7 +41,7 @@ SYMBOL: predicate
 
 : predicate-dispatch ( existing definition class -- dispatch )
     [
-        \ dup , "predicate" word-property , , , \ ifte ,
+        \ dup , "predicate" word-property append, , , \ ifte ,
     ] make-list ;
 
 : predicate-method ( vtable definition class type# -- )
@@ -67,7 +67,7 @@ predicate 25 "priority" set-word-property
 
 : define-predicate ( class predicate definition -- )
     rot "superclass" word-property "predicate" word-property
-    [ \ dup , , , [ drop f ] , \ ifte , ] make-list
+    [ \ dup , append, , [ drop f ] , \ ifte , ] make-list
     define-compound ;
 
 : PREDICATE: ( -- class predicate definition )
@@ -77,5 +77,5 @@ predicate 25 "priority" set-word-property
     dup rot "superclass" set-word-property
     dup predicate "metaclass" set-word-property
     dup predicate-word
-    [ dupd "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-property ] keep
     [ define-predicate ] [ ] ; parsing

@@ -56,7 +56,7 @@ union 30 "priority" set-word-property
     [
         [
             \ dup ,
-            unswons "predicate" word-property ,
+            unswons "predicate" word-property append,
             [ drop t ] ,
             union-predicate ,
             \ ifte ,
@@ -66,6 +66,8 @@ union 30 "priority" set-word-property
     ] ifte* ;
 
 : define-union ( class predicate definition -- )
+    #! We have to turn the f object into the f word.
+    [ [ \ f ] unless* ] map
     [ union-predicate define-compound ] keep
     "members" set-word-property ;
 
@@ -74,5 +76,5 @@ union 30 "priority" set-word-property
     CREATE
     dup union "metaclass" set-word-property
     dup predicate-word
-    [ dupd "predicate" set-word-property ] keep
+    [ dupd unit "predicate" set-word-property ] keep
     [ define-union ] [ ] ; parsing

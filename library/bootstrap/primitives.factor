@@ -239,6 +239,8 @@ vocabularies get [
     [ "errors" | "throw" ]
     [ "kernel-internals" | "string>memory" ]
     [ "kernel-internals" | "memory>string" ]
+    [ "alien" | "local-alien?" ]
+    [ "alien" | "alien-address" ]
 ] [
     unswons create swap succ [ f define ] keep
 ] each drop

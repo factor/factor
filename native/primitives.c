@@ -191,7 +191,9 @@ XT primitives[] = {
 	primitive_heap_stats,
 	primitive_throw,
 	primitive_string_to_memory,
-	primitive_memory_to_string
+	primitive_memory_to_string,
+	primitive_local_alienp,
+	primitive_alien_address,
 };
 
 CELL primitive_to_xt(CELL primitive)

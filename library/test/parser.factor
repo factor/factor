@@ -4,6 +4,8 @@ USE: test
 USE: unparser
 USE: lists
 USE: kernel
+USE: generic
+USE: words
 
 [ [ 1 [ 2 [ 3 ] 4 ] 5 ] ]
 [ "1\n[\n2\n[\n3\n]\n4\n]\n5" ]
@@ -64,3 +66,5 @@ test-word
 [ 4 ] [ "2 2 +" eval-catch ] unit-test
 [ "4\n" ] [ "2 2 + ." eval>string ] unit-test
 [ ] [ "fdafdf" eval-catch ] unit-test
+
+[ word ] [ \ f class ] unit-test
