@@ -60,25 +60,24 @@ C: hand ( world -- hand )
 : button\ ( n hand -- )
     [ hand-buttons remove ] keep set-hand-buttons ;
 
-: fire-leave ( hand -- )
-    dup hand-gadget [ swap shape-pos swap screen-pos - ] keep
-    mouse-leave ;
+: fire-leave ( hand gadget -- )
+    [ swap shape-pos swap screen-pos - ] keep mouse-leave ;
 
 : fire-enter ( oldpos hand -- )
-    hand-gadget [ screen-pos - ] keep
-    mouse-enter ;
-
-: gadget-at-hand ( hand -- gadget )
-    dup gadget-children [ car ] [ world get pick-up ] ?ifte ;
+    hand-gadget [ screen-pos - ] keep mouse-enter ;
 
 : update-hand-gadget ( hand -- )
     #! The hand gadget is the gadget under the hand right now.
-    dup gadget-at-hand [ swap set-hand-gadget ] keep ;
+    dup world get pick-up swap set-hand-gadget ;
+
+: fire-motion ( hand -- )
+    [ motion ] swap hand-gadget handle-gesture ;
 
 : move-hand ( x y hand -- )
     dup shape-pos >r
     [ move-gadget ] keep
-    dup fire-leave
+    dup hand-gadget >r
     dup update-hand-gadget
-    [ motion ] swap handle-gesture
+    dup r> fire-leave
+    dup fire-motion
     r> swap fire-enter ;

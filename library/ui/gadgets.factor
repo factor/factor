@@ -72,3 +72,10 @@ C: gadget ( shape -- gadget )
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.
     0 swap [ shape-pos + t ] each-parent ;
+
+: child? ( parent child -- ? )
+    dup [
+        2dup eq? [ 2drop t ] [ gadget-parent child? ] ifte
+    ] [
+        2drop f
+    ] ifte ;

@@ -1,3 +1,7 @@
++ ui:
+
+- if gadgets are moved, added or deleted, update hand.
+
 + compiler:
 
 - type inference fails with some assembler words;
@@ -15,7 +19,6 @@
 - make see work with union, builtin, predicate
 - doc comments of generics
 - proper ordering for classes
-- tuples: in/out syntax
 - tuples: gracefully handle changing shape
 - keep a list of getter/setter words
 - default constructor

@@ -56,8 +56,11 @@ public class Tuple extends FactorParsingDefinition
 		{
 			next = reader.next(false,false);
 			if(next == FactorScanner.EOF)
+			{
 				reader.getScanner().error("Expected ;");
-			if(next.equals(";"))
+				break;
+			}
+			else if(next.equals(";"))
 				break;
 			else if(next instanceof String)
 			{

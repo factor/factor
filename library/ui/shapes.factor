@@ -35,11 +35,11 @@ GENERIC: resize-shape ( w h shape -- )
 
 : max-width ( list -- n )
     #! The width of the widest shape.
-    [ shape-w ] map [ > ] top ;
+    [ [ shape-w ] map [ > ] top ] [ 0 ] ifte* ;
 
 : max-height ( list -- n )
     #! The height of the tallest shape.
-    [ shape-h ] map [ > ] top ;
+    [ [ shape-h ] map [ > ] top ] [ 0 ] ifte* ;
 
 : run-widths ( list -- w list )
     #! Compute a list of running sums of widths of shapes.
@@ -100,3 +100,51 @@ M: rectangle resize-shape ( w h rect -- )
 M: rectangle inside? ( point rect -- ? )
     over shape-x over rectangle-x-extents between? >r
     swap shape-y swap rectangle-y-extents between? r> and ;
+
+! A line.
+TUPLE: line x y w h ;
+M: line shape-x line-x ;
+M: line shape-y line-y ;
+M: line shape-w line-w ;
+M: line shape-h line-h ;
+
+C: line ( x y w h -- line )
+    #! We handle negative w/h for convinience.
+    >r fix-neg >r fix-neg r> r>
+    [ set-line-h ] keep
+    [ set-line-w ] keep
+    [ set-line-y ] keep
+    [ set-line-x ] keep ;
+
+M: line move-shape ( x y line -- )
+    tuck set-line-y set-line-x ;
+
+M: line resize-shape ( w h line -- )
+    tuck set-line-h set-line-w ;
+
+M: line inside? ( point line -- ? )
+    2drop f ;
+
+! An ellipse.
+TUPLE: ellipse x y w h ;
+M: ellipse shape-x ellipse-x ;
+M: ellipse shape-y ellipse-y ;
+M: ellipse shape-w ellipse-w ;
+M: ellipse shape-h ellipse-h ;
+
+C: ellipse ( x y w h -- line )
+    #! We handle negative w/h for convinience.
+    >r fix-neg >r fix-neg r> r>
+    [ set-ellipse-h ] keep
+    [ set-ellipse-w ] keep
+    [ set-ellipse-y ] keep
+    [ set-ellipse-x ] keep ;
+
+M: ellipse move-shape ( x y line -- )
+    tuck set-ellipse-y set-ellipse-x ;
+
+M: ellipse resize-shape ( w h line -- )
+    tuck set-ellipse-h set-ellipse-w ;
+
+M: ellipse inside? ( point line -- ? )
+    2drop f ;

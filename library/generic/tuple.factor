@@ -4,9 +4,26 @@ IN: generic
 USING: words parser kernel namespaces lists strings
 kernel-internals math hashtables errors ;
 
-: make-tuple ( class -- )
+: make-tuple ( class -- tuple )
     dup "tuple-size" word-property <tuple>
     [ 0 swap set-array-nth ] keep ;
+
+: (literal-tuple) ( list size -- tuple )
+    dup <tuple> swap [
+        ( list tuple n -- list tuple n )
+        pick car pick pick swap set-array-nth
+        >r >r cdr r> r>
+    ] repeat nip ;
+
+: literal-tuple ( list -- tuple )
+    dup car "tuple-size" word-property over length over = [
+        (literal-tuple)
+    ] [
+        "Incorrect tuple length" throw
+    ] ifte ;
+
+: tuple>list ( tuple -- list )
+    >tuple array>list ;
 
 : define-tuple-generic ( tuple word def -- )
     over >r [ single-combination ] \ GENERIC: r> define-generic

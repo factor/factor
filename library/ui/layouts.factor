@@ -55,7 +55,7 @@ C: border ( delegate size -- border )
     [ set-border-size ] keep [ set-border-delegate ] keep ;
 
 : standard-border ( child delegate -- border )
-    5 <border> [ add-gadget ] keep ;
+    5 <border> [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
 
 : empty-border ( child -- border )
     0 0 0 0 <rectangle> <gadget> standard-border ;

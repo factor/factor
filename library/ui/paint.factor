@@ -27,11 +27,13 @@ SYMBOL: font  ! a list of two elements, a font name and size.
 : shape>screen ( shape -- x1 y1 x2 y2 )
     [ shape-x x get + ] keep
     [ shape-y y get + ] keep
-    [ dup shape-x swap shape-w + x get + ] keep
-    dup shape-y swap shape-h + y get + ;
+    [ shape-w pick + ] keep
+    shape-h pick + ;
 
 GENERIC: draw-shape ( obj -- )
 
+! Actual rectangles don't draw; use a hollow-rect, plain-rect
+! or bevel-rect instead.
 M: rectangle draw-shape drop ;
 
 TUPLE: hollow-rect delegate ;
@@ -92,6 +94,38 @@ C: bevel-rect ( bevel x y w h -- rect )
 
 M: bevel-rect draw-shape ( rect -- )
     shape>screen >r >r rect> r> r> rect> 3 draw-bevel ;
+
+M: line draw-shape ( line -- )
+    >r surface get r>
+    shape>screen
+    foreground get rgb
+    lineColor ;
+
+M: ellipse draw-shape drop ;
+
+: ellipse>screen ( shape -- x y rx ry )
+    [ dup shape-x swap shape-w 2 /i + x get + ] keep
+    [ dup shape-y swap shape-h 2 /i + y get + ] keep
+    [ shape-w 2 /i ] keep
+    shape-h 2 /i ;
+
+TUPLE: hollow-ellipse delegate ;
+
+C: hollow-ellipse ( x y w h -- ellipse )
+    [ >r <ellipse> r> set-hollow-ellipse-delegate ] keep ;
+
+M: hollow-ellipse draw-shape ( ellipse -- )
+    >r surface get r> ellipse>screen foreground get rgb
+    ellipseColor ;
+
+TUPLE: plain-ellipse delegate ;
+
+C: plain-ellipse ( x y w h -- ellipse )
+    [ >r <ellipse> r> set-plain-ellipse-delegate ] keep ;
+
+M: plain-ellipse draw-shape ( ellipse -- )
+    >r surface get r> ellipse>screen background get rgb
+     filledEllipseColor ;
 
 : draw-gadget ( gadget -- )
     #! All drawing done inside draw-shape is done with the
