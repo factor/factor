@@ -110,6 +110,7 @@ USE: prettyprint
 : infer-branch ( value save-effect -- namespace )
     <namespace> [
         save-effect set
+        uncons [ unswons [ \ value-class set ] bind ] when*
         dup value-recursion recursive-state set
         meta-r [ deep-clone ] change
         meta-d [ deep-clone ] change
@@ -122,13 +123,13 @@ USE: prettyprint
 : terminator? ( obj -- ? )
     dup word? [ "terminator" word-property ] [ drop f ] ifte ;
 
-: terminator-quot? ( quot -- ? )
-    literal-value [ terminator? ] some? ;
+: terminator-quot? ( [ quot | type-prop ] -- ? )
+    car literal-value [ terminator? ] some? ;
 
 : dual-branch ( branchlist branch -- rstate )
     #! Return a recursive state for a branch other than the
     #! given one in the list.
-    swap [ over eq? not ] subset nip car value-recursion ;
+    swap [ over eq? not ] subset nip car car value-recursion ;
 
 SYMBOL: dual-recursive-state
 
@@ -149,7 +150,7 @@ SYMBOL: dual-recursive-state
     #! Either the word is not recursive, or it is recursive
     #! and the base case throws an error.
     [
-        unzip drop [ terminator-quot? not ] subset dup length 1 > [
+        [ terminator-quot? not ] subset dup length 1 > [
             infer-base-cases unify-effects
             effect dual-recursive-state get set-base
         ] [
@@ -158,7 +159,12 @@ SYMBOL: dual-recursive-state
     ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )
-    dup infer-base-case unzip drop [
+    #! The branchlist is a list of pairs:
+    #! [ value | typeprop ]
+    #! value is either a literal or computed instance; typeprop
+    #! is a pair [ value | class ] indicating a type propagation
+    #! for the given branch.
+    dup infer-base-case [
         dup t infer-branch swap terminator-quot? [
             [ meta-d off meta-r off d-in off ] extend
         ] when
@@ -175,17 +181,32 @@ SYMBOL: dual-recursive-state
     #! parameter is a vector.
     (infer-branches) dup unify-effects unify-dataflow ;
 
+: static-ifte ( true false -- )
+    #! If the branch taken is statically known, just infer
+    #! along that branch.
+    pop-d literal-value [ drop ] [ nip ] ifte
+    literal-value infer-quot ;
+
+: dynamic-ifte ( true false -- )
+    #! If branch taken is computed, infer along both paths and
+    #! unify.
+    2list >r 1 meta-d get vector-tail* #ifte r>
+    pop-d [
+        dup \ object cons ,
+        \ f cons ,
+    ] make-list zip ( condition )
+    infer-branches ;
+
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
-    dataflow-drop, pop-d swap 2list
-    >r 1 meta-d get vector-tail* #ifte r>
-    pop-d [
-        dup \ t cons ,
-        \ f cons ,
-    ] make-list zip ( condition )
-    infer-branches ;
+    dataflow-drop, pop-d swap
+    peek-d literal? [
+        static-ifte
+    ] [
+        dynamic-ifte
+    ] ifte ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 
