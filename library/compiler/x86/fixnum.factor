@@ -47,16 +47,14 @@ USE: math-internals
 
 : fixnum-insn ( overflow opcode -- )
     #! This needs to be factored.
-    ECX DS>
-    EAX [ ECX -4 ] MOV
-    EAX [ ECX ] rot execute
+    EAX [ ESI -4 ] MOV
+    EAX [ ESI ] rot execute
     0 JNO fixup
     swap compile-call
     0 JMP fixup >r
     compiled-offset swap patch
-    ECX 4 SUB
-    [ ECX ] EAX MOV
-    ECX >DS
+    ESI 4 SUB
+    [ ESI ] EAX MOV
     r> compiled-offset swap patch ;
 
 \ fixnum+ [
@@ -73,17 +71,15 @@ USE: math-internals
 
 \ fixnum* [
     drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
+    EAX [ ESI -4 ] MOV
     EAX 3 SHR
-    EAX [ ECX ] IMUL
+    EAX [ ESI ] IMUL
     0 JNO fixup
     \ fixnum* compile-call
     0 JMP fixup >r
     compiled-offset swap patch
-    ECX 4 SUB
-    [ ECX ] EAX MOV
-    ECX >DS
+    ESI 4 SUB
+    [ ESI ] EAX MOV
     r> compiled-offset swap patch
 ] "generator" set-word-property
 
@@ -91,18 +87,16 @@ USE: math-internals
 
 \ fixnum/i [
     drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
+    EAX [ ESI -4 ] MOV
     CDQ
-    [ ECX ] IDIV
+    [ ESI ] IDIV
     EAX 3 SHL
     0 JNO fixup
     \ fixnum/i compile-call
     0 JMP fixup >r
     compiled-offset swap patch
-    ECX 4 SUB
-    [ ECX ] EAX MOV
-    ECX >DS
+    ESI 4 SUB
+    [ ESI ] EAX MOV
     r> compiled-offset swap patch
 ] "generator" set-word-property
 
@@ -110,18 +104,16 @@ USE: math-internals
 
 \ fixnum-mod [
     drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
+    EAX [ ESI -4 ] MOV
     CDQ
-    [ ECX ] IDIV
+    [ ESI ] IDIV
     EAX 3 SHL
     0 JNO fixup
     \ fixnum/i compile-call
     0 JMP fixup >r
     compiled-offset swap patch
-    ECX 4 SUB
-    [ ECX ] EDX MOV
-    ECX >DS
+    ESI 4 SUB
+    [ ESI ] EDX MOV
     r> compiled-offset swap patch
 ] "generator" set-word-property
 
@@ -129,18 +121,16 @@ USE: math-internals
 
 \ fixnum/mod [
     drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
+    EAX [ ESI -4 ] MOV
     CDQ
-    [ ECX ] IDIV
+    [ ESI ] IDIV
     EAX 3 SHL
     0 JNO fixup
     \ fixnum/mod compile-call
     0 JMP fixup >r
     compiled-offset swap patch
-    [ ECX -4 ] EAX MOV
-    [ ECX ] EDX MOV
-    ECX >DS
+    [ ESI -4 ] EAX MOV
+    [ ESI ] EDX MOV
     r> compiled-offset swap patch
 ] "generator" set-word-property
 
@@ -148,10 +138,9 @@ USE: math-internals
 
 \ arithmetic-type [
     drop
-    ECX DS>
-    EAX [ ECX -4 ] MOV
+    EAX [ ESI -4 ] MOV
     EAX BIN: 111 AND
-    EDX [ ECX ] MOV
+    EDX [ ESI ] MOV
     EDX BIN: 111 AND
     EAX EDX CMP
     0 JE fixup >r

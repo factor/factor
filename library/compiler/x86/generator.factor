@@ -6,9 +6,8 @@ math memory namespaces words ;
 
 \ slot [
     PEEK-DS
-    ( EAX [ EAX 3 ] MOV )
     2unlist type-tag >r cell * r> - EAX swap 2list EAX swap MOV
-    [ ECX ] EAX MOV
+    [ ESI ] EAX MOV
 ] "generator" set-word-property
 
 : compile-call-label ( label -- )

@@ -19,7 +19,7 @@ typedef unsigned long int CELL;
 CELL ds_bot;
 
 /* raw pointer to datastack top */
-DLLEXPORT CELL ds;
+register DLLEXPORT CELL ds asm("esi");
 
 /* raw pointer to callstack bottom */
 CELL cs_bot;

@@ -1,36 +1,38 @@
 72/73:
 
-- [ [ dup call ] dup call ] infer hangs
-- move tuple to generic vocab
 - update plugin docs
 - word preview for remote words
-- vectors: ensure its ok with bignum indices
-- code gc
+- faster completion
+
+- [ [ dup call ] dup call ] infer hangs
 - type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
 - print warning on null class
 - optimize away dispatch
-- faster completion
+
+- move tuple to generic vocab
+
+- vectors: ensure its ok with bignum indices
+- code gc
 - ppc register decls
 
+- unit test failure
+- #jump-f #jump-f-label
 - extract word inside M:, C:, and structure browsing for these
 - fix checkbox alignment
 - begin-scan, next-object, end-scan primitives
 - each-object, each-slot combinators
-- port leak
 - references primitive
 - ditch % for tuples?
 - resize window: world not updated until mouse moved
 - x>offset
 - fix completion invoke in middle of word
-- html: word links
 - don't hardcode so many colors
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - slot compile problem
 - sdl console crash
-- x86 register decl
 - UI: don't roll over if mouse button is down
 
 + compiler/ffi:
