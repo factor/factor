@@ -29,6 +29,7 @@ IN: httpd
 USE: arithmetic
 USE: combinators
 USE: errors
+USE: httpd-responder
 USE: kernel
 USE: lists
 USE: logging
@@ -38,8 +39,7 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
-
-USE: httpd-responder
+USE: threads
 USE: url-encoding
 
 : httpd-log-stream ( -- stream )
@@ -92,8 +92,16 @@ USE: url-encoding
         [ default-error-handler drop ] when*
     ] catch ;
 
-: quit-flag ( -- ? )
-    global [ "httpd-quit" get ] bind ;
+: httpd-connection ( socket -- )
+    #! We're single-threaded in Java Factor, and
+    #! multi-threaded in CFactor.
+    java? [
+        httpd-client
+    ] [
+        [
+            httpd-client
+        ] in-thread drop
+    ] ifte ;
 
 : clear-quit-flag ( -- )
     global [ "httpd-quit" off ] bind ;
@@ -102,7 +110,7 @@ USE: url-encoding
     [
         quit-flag not
     ] [
-        dup accept httpd-client
+        dup dup accept httpd-connection
     ] while ;
 
 : (httpd) ( port -- )

@@ -8,7 +8,7 @@ void init_io_tasks(fd_set* fdset, IO_TASK* io_tasks)
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
 		io_tasks[i].port = F;
-		io_tasks[i].callback = F;
+		io_tasks[i].callbacks = F;
 	}
 }
 
@@ -35,12 +35,13 @@ IO_TASK* add_io_task(
 {
 	int fd = port->fd;
 
-	if(io_tasks[fd].port != F)
+	if(io_tasks[fd].callbacks != F && type != IO_TASK_WRITE)
 		general_error(ERROR_IO_TASK_TWICE,tag_object(port));
 
 	io_tasks[fd].type = type;
 	io_tasks[fd].port = tag_object(port);
-	io_tasks[fd].callback = callback;
+	io_tasks[fd].callbacks = tag_cons(cons(callback,
+		io_tasks[fd].callbacks));
 
 	if(fd >= *fd_count)
 		*fd_count = fd + 1;
@@ -65,7 +66,7 @@ void remove_io_task(
 	int fd = port->fd;
 
 	io_tasks[fd].port = F;
-	io_tasks[fd].callback = F;
+	io_tasks[fd].callbacks = F;
 
 	if(fd == *fd_count - 1)
 		*fd_count = *fd_count - 1;
@@ -98,73 +99,62 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 	return retval;
 }
 
-CELL perform_io_task(IO_TASK* task)
+CELL pop_io_task_callback(
+	IO_TASK_TYPE type,
+	PORT* port,
+	IO_TASK* io_tasks,
+	int* fd_count)
 {
-	PORT* port = untag_port(task->port);
-	CELL callback = task->callback;
-
-	switch(task->type)
-	{
-	case IO_TASK_READ_LINE:
-		remove_io_task(IO_TASK_READ_LINE,port,
-			read_io_tasks,&read_fd_count);
-		if(perform_read_line_io_task(port))
-			return callback;
-		else
-		{
-			add_io_task(IO_TASK_READ_LINE,port,
-				callback,read_io_tasks,
-				&read_fd_count);
-			return F;
-		}
-	case IO_TASK_READ_COUNT:
-		remove_io_task(IO_TASK_READ_COUNT,port,
-			read_io_tasks,&read_fd_count);
-		if(perform_read_count_io_task(port))
-			return callback;
-		else
-		{
-			add_io_task(IO_TASK_READ_COUNT,port,
-				callback,read_io_tasks,
-				&read_fd_count);
-			return F;
-		}
-	case IO_TASK_WRITE:
-		remove_io_task(IO_TASK_WRITE,port,
-			write_io_tasks,&write_fd_count);
-		if(perform_write_io_task(port))
-			return callback;
-		else
-		{
-			add_io_task(IO_TASK_WRITE,port,
-				callback,write_io_tasks,
-				&write_fd_count);
-			return F;
-		}
-	case IO_TASK_ACCEPT:
-		remove_io_task(IO_TASK_ACCEPT,port,
-			read_io_tasks,&read_fd_count);
-		if(accept_connection(port))
-			return callback;
-		else
-		{
-			add_io_task(IO_TASK_ACCEPT,port,
-				callback,read_io_tasks,
-				&read_fd_count);
-			return F;
-		}
-	default:
-		critical_error("Bad I/O task",task->type);
-		return F;
-	}
+	int fd = port->fd;
+	CONS* callbacks = untag_cons(io_tasks[fd].callbacks);
+	CELL callback = callbacks->car;
+	if(callbacks->cdr == F)
+		remove_io_task(type,port,io_tasks,fd_count);
+	else
+		io_tasks[fd].callbacks = callbacks->cdr;
+	return callback;
 }
 
-CELL perform_io_tasks(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
+CELL perform_io_task(IO_TASK* io_task, IO_TASK* io_tasks, int* fd_count)
+{
+	bool success;
+	PORT* port = untag_port(io_task->port);
+
+	switch(io_task->type)
+	{
+	case IO_TASK_READ_LINE:
+		success = perform_read_line_io_task(port);
+		break;
+	case IO_TASK_READ_COUNT:
+		success = perform_read_count_io_task(port);
+		break;
+	case IO_TASK_WRITE:
+		success = perform_write_io_task(port);
+		break;
+	case IO_TASK_ACCEPT:
+		success = accept_connection(port);
+		break;
+	default:
+		critical_error("Bad I/O task",io_task->type);
+		success = false;
+		break;
+	}
+
+	if(success)
+	{
+		return pop_io_task_callback(io_task->type,port,
+			io_tasks,fd_count);
+	}
+	else
+		return F;
+}
+
+CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count)
 {
 	int i;
 	CELL callback;
 
-	for(i = 0; i < fd_count; i++)
+	for(i = 0; i < *fd_count; i++)
 	{
 		if(FD_ISSET(i,fdset))
 		{
@@ -172,7 +162,8 @@ CELL perform_io_tasks(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 				critical_error("select() returned fd for non-existent task",i);
 			else
 			{
-				callback = perform_io_task(&io_tasks[i]);
+				callback = perform_io_task(&io_tasks[i],
+					io_tasks,fd_count);
 				if(callback != F)
 					return callback;
 			}
@@ -203,11 +194,11 @@ CELL next_io_task(void)
 	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
 		&read_fd_set,&write_fd_set,&except_fd_set,NULL);
 	
-	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
+	callback = perform_io_tasks(&read_fd_set,read_io_tasks,&read_fd_count);
 	if(callback != F)
 		return callback;
 
-	return perform_io_tasks(&write_fd_set,write_fd_count,write_io_tasks);
+	return perform_io_tasks(&write_fd_set,write_io_tasks,&write_fd_count);
 }
 
 void primitive_next_io_task(void)
@@ -229,12 +220,12 @@ void collect_io_tasks(void)
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
 		copy_object(&read_io_tasks[i].port);
-		copy_object(&read_io_tasks[i].callback);
+		copy_object(&read_io_tasks[i].callbacks);
 	}
 
 	for(i = 0; i < FD_SETSIZE; i++)
 	{
 		copy_object(&write_io_tasks[i].port);
-		copy_object(&write_io_tasks[i].callback);
+		copy_object(&write_io_tasks[i].callbacks);
 	}
 }

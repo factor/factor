@@ -32,7 +32,7 @@
 
 - add a socket timeout
 - don't allow multiple reads on the same port
-- multiple tasks should be able to write to the same port
+  (and don't hang when this happends!)
 - is the profiler using correct stack depth?
 - bignums
 - >lower, >upper for strings
@@ -41,7 +41,6 @@
 - sbuf-hashcode
 - vector-hashcode
 - irc: stack underflow?
-- ignore SIGPIPE
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - better i/o scheduler
@@ -76,6 +75,8 @@
 
 + httpd:
 
+- quit responder breaks with multithreading
+- 'default responder' for when we go to root
 - file responder:
   - port to native
   - if a directory is requested and URL does not end with /, redirect

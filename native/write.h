@@ -1,4 +1,4 @@
-bool write_step(PORT* port);
+void write_step(PORT* port);
 bool can_write(PORT* port, FIXNUM len);
 void primitive_can_write(void);
 void primitive_add_write_io_task(void);

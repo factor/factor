@@ -8,7 +8,9 @@ typedef enum {
 typedef struct {
 	IO_TASK_TYPE type;
 	CELL port;
-	CELL callback;
+	/* TAGGED list of callbacks, or F */
+	/* Multiple callbacks per port are only permitted for IO_TASK_WRITE. */
+	CELL callbacks;
 } IO_TASK;
 
 fd_set read_fd_set;
@@ -36,9 +38,14 @@ void remove_io_task(
 	IO_TASK* io_tasks,
 	int* fd_count);
 void remove_io_tasks(PORT* port);
+CELL pop_io_task_callback(
+	IO_TASK_TYPE type,
+	PORT* port,
+	IO_TASK* io_tasks,
+	int* fd_count);
 bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks);
-CELL perform_io_task(IO_TASK* task);
-CELL perform_io_tasks(fd_set* fdset, int fd_count, IO_TASK* io_tasks);
+CELL perform_io_task(IO_TASK* io_task, IO_TASK* io_tasks, int* fd_count);
+CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count);
 CELL next_io_task(void);
 void primitive_next_io_task(void);
 void primitive_close(void);

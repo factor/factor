@@ -1,7 +1,7 @@
 #include "factor.h"
 
 /* Return true if write was done */
-bool write_step(PORT* port)
+void write_step(PORT* port)
 {
 	char* chars = (char*)port->buffer + sizeof(STRING);
 
@@ -11,18 +11,10 @@ bool write_step(PORT* port)
 	if(amount == -1)
 	{
 		if(errno != EAGAIN)
-		{
 			postpone_io_error(port,__FUNCTION__);
-			return true;
-		}
-		else
-			return false;
 	}
 	else
-	{
 		port->buf_pos += amount;
-		return true;
-	}
 }
 
 bool can_write(PORT* port, FIXNUM len)
@@ -69,18 +61,18 @@ void primitive_add_write_io_task(void)
 
 bool perform_write_io_task(PORT* port)
 {
-	if(write_step(port))
+	if(port->buf_pos == port->buf_fill || port->io_error != F)
 	{
-		if(port->buf_pos == port->buf_fill || port->io_error != F)
-		{
-			/* All written, or I/O error is preventing further
-			transaction */
-			port->buf_pos = 0;
-			port->buf_fill = 0;
-			return true;
-		}
+		/* Nothing to write */
+		port->buf_pos = 0;
+		port->buf_fill = 0;
+		return true;
 	}
-	return false;
+	else
+	{
+		write_step(port);
+		return false;
+	}
 }
 
 void write_char_8(PORT* port, FIXNUM ch)
