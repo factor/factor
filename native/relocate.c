@@ -3,7 +3,7 @@
 void fixup(CELL* cell)
 {
 	if(TAG(*cell) != FIXNUM_TYPE)
-		*cell += (active->base - relocation_base);
+		*cell += (active.base - relocation_base);
 }
 
 void relocate_object()
@@ -63,7 +63,7 @@ void relocate(CELL r)
 	fixup(&userenv[BOOT_ENV]);
 	fixup(&userenv[GLOBAL_ENV]);
 
-	relocating = active->base;
+	relocating = active.base;
 
 	/* The first two objects in the image must always be F, T */
 	init_object(&F,F_TYPE);
@@ -76,7 +76,7 @@ void relocate(CELL r)
 	
 	for(;;)
 	{
-		if(relocating >= active->here)
+		if(relocating >= active.here)
 			break;
 
 		relocate_next();

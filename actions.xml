@@ -50,13 +50,21 @@
 	</ACTION>
 	<ACTION NAME="factor-balance">
 		<CODE>
-			if(textArea.selectedText == null)
+			if(textArea.selectionCount == 0)
 				textArea.toolkit.beep();
 			else
 			{
 				factorEval(view,
 					"[ " + textArea.selectedText + " ] balance .");
 			}
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-insert-use">
+		<CODE>
+			if(textArea.selectionCount == 0)
+				textArea.selectWord();
+			factor.jedit.FactorPlugin.insertUseDialog(view,
+				textArea.selectedText);
 		</CODE>
 	</ACTION>
 </ACTIONS>

@@ -49,7 +49,7 @@ void primitive_substring(void);
 
 INLINE STRING* fixup_untagged_string(STRING* str)
 {
-	return (STRING*)((CELL)str + (active->base - relocation_base));
+	return (STRING*)((CELL)str + (active.base - relocation_base));
 }
 
 INLINE STRING* copy_untagged_string(STRING* str)

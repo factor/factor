@@ -98,6 +98,8 @@ public class FactorCompletion extends SideKickCompletion
 
 	public ListCellRenderer getRenderer()
 	{
-		return new FactorWordRenderer(FactorPlugin.getInterpreter());
+		return new FactorWordRenderer(
+			FactorPlugin.getInterpreter(),
+			false);
 	}
 }

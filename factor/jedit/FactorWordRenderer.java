@@ -36,30 +36,13 @@ import org.gjt.sp.jedit.*;
 
 public class FactorWordRenderer extends DefaultListCellRenderer
 {
-	private FactorInterpreter interp;
-
-	public FactorWordRenderer(FactorInterpreter interp)
+	//{{{ getWordHTMLString() method
+	public static String getWordHTMLString(FactorInterpreter interp,
+		FactorWord word, boolean showIn)
 	{
-		this.interp = interp;
-	}
-
-	public Component getListCellRendererComponent(
-		JList list,
-		Object value,
-		int index,
-		boolean isSelected,
-		boolean cellHasFocus)
-	{
-		super.getListCellRendererComponent(list,value,index,
-			isSelected,cellHasFocus);
-
 		String prop = "factor.completion.plain";
 		String stackEffect = null;
 
-		if(!(value instanceof FactorWord))
-			return this;
-
-		FactorWord word = (FactorWord)value;
 		if(word.def == null)
 		{
 			if(word.parsing != null)
@@ -97,14 +80,52 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			}
 		}
 
-		setText(jEdit.getProperty(prop,
-			new String[] {
+		String in;
+		if(showIn)
+		{
+			in = jEdit.getProperty("factor.completion.in",
+				new Object[] {
+					MiscUtilities.charsToEntities(word.vocabulary)
+				});
+		}
+		else
+			in = "";
+
+		return "<html>" + in + jEdit.getProperty(prop,
+			new Object[] {
 				MiscUtilities.charsToEntities(word.name),
 				stackEffect == null
 				? null :
 				MiscUtilities.charsToEntities(stackEffect)
-			}));
+			});
+	} //}}}
+
+	private FactorInterpreter interp;
+	private boolean showIn;
+
+	//{{{ FactorWordRenderer constructor
+	public FactorWordRenderer(FactorInterpreter interp, boolean showIn)
+	{
+		this.interp = interp;
+		this.showIn = showIn;
+	} //}}}
+
+	//{{{ getListCellRendererComponent() method
+	public Component getListCellRendererComponent(
+		JList list,
+		Object value,
+		int index,
+		boolean isSelected,
+		boolean cellHasFocus)
+	{
+		super.getListCellRendererComponent(list,value,index,
+			isSelected,cellHasFocus);
+
+		if(!(value instanceof FactorWord))
+			return this;
+
+		setText(getWordHTMLString(interp,(FactorWord)value,showIn));
 
 		return this;
-	}
+	} //}}}
 }

@@ -24,10 +24,10 @@ void load_image(char* filename)
 
 	size = h.size / CELLS;
 
-	if(size != fread((void*)active->base,sizeof(CELL),size,file))
+	if(size != fread((void*)active.base,sizeof(CELL),size,file))
 		fatal_error("Wrong image length",h.size);
 
-	active->here = active->base + h.size;
+	active.here = active.base + h.size;
 	fclose(file);
 
 	fprintf(stderr," relocating...");
@@ -56,13 +56,13 @@ bool save_image(char* filename)
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
-	h.relocation_base = active->base;
+	h.relocation_base = active.base;
 	h.boot = userenv[BOOT_ENV];
-	h.size = (active->here - active->base);
+	h.size = (active.here - active.base);
 	h.global = userenv[GLOBAL_ENV];
 
 	fwrite(&h,sizeof(HEADER),1,file);
-	fwrite((void*)active->base,h.size,1,file);
+	fwrite((void*)active.base,h.size,1,file);
 
 	fclose(file);
 

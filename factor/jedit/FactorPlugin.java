@@ -30,10 +30,13 @@
 package factor.jedit;
 
 import factor.listener.FactorListenerPanel;
-import factor.FactorInterpreter;
+import factor.*;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import org.gjt.sp.jedit.gui.*;
+import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
+import sidekick.*;
 
 public class FactorPlugin extends EditPlugin
 {
@@ -73,4 +76,108 @@ public class FactorPlugin extends EditPlugin
 			wm.getDockableWindow(DOCKABLE_NAME);
 		panel.getListener().eval(cmd);
 	} //}}}
+
+	//{{{ getWordAtCaret() method
+	public static String getWordAtCaret(JEditTextArea textArea)
+	{
+		if(textArea.getSelectionCount() != 0)
+			return textArea.getSelectedText();
+
+		String line = textArea.getLineText(textArea.getCaretLine());
+		if(line.length() == 0)
+			return null;
+
+		int caret = textArea.getCaretPosition()
+			- textArea.getLineStartOffset(
+			textArea.getCaretLine());
+		String noWordSep = textArea.getBuffer().getStringProperty(
+			"noWordSep");
+		int wordStart = TextUtilities.findWordStart(line,caret,
+			noWordSep);
+		int wordEnd = TextUtilities.findWordEnd(line,caret,
+			noWordSep);
+		return line.substring(wordStart,wordEnd);
+	} //}}}
+	
+	//{{{ showStatus() method
+	public static void showStatus(View view, String msg, String arg)
+	{
+		view.getStatus().setMessage(
+			jEdit.getProperty("factor.status." + msg,
+			new String[] { arg }));
+	} //}}}
+	
+	//{{{ isUsed() method
+	private static boolean isUsed(View view, String vocab)
+	{
+		SideKickParsedData data = SideKickParsedData
+			.getParsedData(view);
+		if(data instanceof FactorParsedData)
+		{
+			FactorParsedData fdata = (FactorParsedData)data;
+			Cons use = fdata.use;
+			return Cons.contains(use,vocab);
+		}
+		else
+			return false;
+	} //}}}
+
+	//{{{ findAllWordsNamed() method
+	private static FactorWord[] findAllWordsNamed(View view, String word)
+	{
+		ArrayList words = new ArrayList();
+		Cons vocabs = getInterpreter().vocabularies.toValueList();
+		while(vocabs != null)
+		{
+			FactorNamespace vocab = (FactorNamespace)vocabs.car;
+			FactorWord w = (FactorWord)vocab.getVariable(word);
+			if(w != null)
+				words.add(w);
+			vocabs = vocabs.next();
+		}
+		return (FactorWord[])words.toArray(
+			new FactorWord[words.size()]);
+	} //}}}
+
+	//{{{ insertUseDialog() method
+	public static void insertUseDialog(View view, String word)
+	{
+		FactorWord[] words = findAllWordsNamed(view,word);
+		if(words.length == 0)
+			view.getToolkit().beep();
+		else if(words.length == 1)
+			insertUse(view,words[0].vocabulary);
+		else
+			new InsertUseDialog(view,words);
+	} //}}}
+
+	//{{{ insertUse() method
+	public static void insertUse(View view, String vocab)
+	{
+		if(isUsed(view,vocab))
+		{
+			showStatus(view,"already-used",vocab);
+			return;
+		}
+
+		Buffer buffer = view.getBuffer();
+		int lastUseOffset = 0;
+
+		for(int i = 0; i < buffer.getLineCount(); i++)
+		{
+			String text = buffer.getLineText(i).trim();
+			if(text.startsWith("IN:") || text.startsWith("USE:")
+				|| text.startsWith("!")
+				|| text.length() == 0)
+			{
+				lastUseOffset = buffer.getLineStartOffset(i);
+			}
+			else
+				break;
+		}
+
+		String decl = "USE: " + vocab + "\n";
+		buffer.insert(lastUseOffset,decl);
+		showStatus(view,"inserted-use",decl);
+	} //}}]
 }

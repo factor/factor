@@ -45,7 +45,6 @@
 
 - inferior hangs
 - plugin should not exit jEdit on fatal errors
-- auto insert USE:
 - balance needs USE:
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there

@@ -19,25 +19,20 @@ void* alloc_guarded(CELL size)
 	return array + pagesize;
 }
 
-ZONE* zalloc(CELL size)
+void init_zone(ZONE* z, CELL size)
 {
-	ZONE* z = (ZONE*)malloc(sizeof(ZONE));
-	if(z == 0)
-		fatal_error("Cannot allocate zone header",size);
 	z->base = z->here = align8((CELL)malloc(size));
 	if(z->base == 0)
 		fatal_error("Cannot allocate zone",size);
 	z->limit = z->base + size;
 	z->alarm = z->base + (size * 3) / 4;
 	z->base = align8(z->base);
-	return z;
 }
 
 void init_arena(CELL size)
 {
-	z1 = zalloc(size);
-	z2 = zalloc(size);
-	active = z1;
+	init_zone(&active,size);
+	init_zone(&prior,size);
 	allot_profiling = false;
 	gc_in_progress = false;
 }
@@ -65,14 +60,14 @@ void allot_profile_step(CELL a)
 
 void check_memory(void)
 {
-	if(active->here > active->alarm)
+	if(active.here > active.alarm)
 	{
-		if(active->here > active->limit)
+		if(active.here > active.limit)
 		{
 			fprintf(stderr,"Out of memory\n");
-			fprintf(stderr,"active->base  = %ld\n",active->base);
-			fprintf(stderr,"active->here  = %ld\n",active->here);
-			fprintf(stderr,"active->limit = %ld\n",active->limit);
+			fprintf(stderr,"active.base  = %ld\n",active.base);
+			fprintf(stderr,"active.here  = %ld\n",active.here);
+			fprintf(stderr,"active.limit = %ld\n",active.limit);
 			fflush(stderr);
 			exit(1);
 		}
@@ -84,16 +79,9 @@ void check_memory(void)
 
 void flip_zones()
 {
-	if(active == z1)
-	{
-		prior = z1;
-		active = z2;
-	}
-	else
-	{
-		prior = z2;
-		active = z1;
-	}
+	ZONE z = prior;
+	active = prior;
+	prior = z;
 }
 
 bool in_zone(ZONE* z, CELL pointer)
@@ -104,8 +92,8 @@ bool in_zone(ZONE* z, CELL pointer)
 void primitive_room(void)
 {
 	/* push: free total */
-	dpush(tag_integer(active->limit - active->here));
-	dpush(tag_integer(active->limit - active->base));
+	dpush(tag_integer(active.limit - active.here));
+	dpush(tag_integer(active.limit - active.base));
 }
 
 void primitive_allot_profiling(void)

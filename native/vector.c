@@ -72,7 +72,7 @@ void primitive_set_vector_nth(void)
 void fixup_vector(VECTOR* vector)
 {
 	vector->array = (ARRAY*)((CELL)vector->array
-		+ (active->base - relocation_base));
+		+ (active.base - relocation_base));
 }
 
 void collect_vector(VECTOR* vector)

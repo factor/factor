@@ -1,6 +1,8 @@
+import factor.jedit.*;
+
 factorEval(view,str)
 {
-	factor.jedit.FactorPlugin.eval(view,str);
+	FactorPlugin.eval(view,str);
 }
 
 /* Build a Factor expression for pushing the selected word on the stack */
@@ -10,10 +12,11 @@ factorWord(view)
 	data = sidekick.SideKickParsedData.getParsedData(view);
 	if(data instanceof factor.jedit.FactorParsedData)
 	{
-		if(textArea.selectionCount == 0)
-			textArea.selectWord();
+		word = FactorPlugin.getWordAtCaret(textArea);
+		if(word == null)
+			return null;
 		return "\""
-			+ factor.FactorReader.charsToEscapes(textArea.selectedText)
+			+ factor.FactorReader.charsToEscapes(word)
 			+ "\" " + factor.FactorReader.unparseObject(data.use)
 			+ " search";
 	}

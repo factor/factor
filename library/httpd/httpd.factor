@@ -67,10 +67,14 @@ USE: url-encoding
 : post-request ( url -- )
     [ "post" swap serve-responder ] with-request ;
 
+: head-request ( url -- )
+    [ "head" swap serve-responder ] with-request ;
+
 : handle-request ( arg cmd -- )
     [
         [ "GET"  = ] [ drop get-request ]
         [ "POST" = ] [ drop post-request ]
+        [ "HEAD" = ] [ drop head-request ]
         [ drop t   ] [ 2drop bad-request ]
     ] cond ;
 

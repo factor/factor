@@ -106,7 +106,7 @@ public class FactorSideKickParser extends SideKickParser
 
 		return d;
 	} //}}}
-	
+
 	//{{{ addWordDefNodes() method
 	private void addWordDefNodes(SideKickParsedData d, Cons parsed,
 		Buffer buffer)
@@ -167,7 +167,7 @@ public class FactorSideKickParser extends SideKickParser
 		return (ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
 			== ReadTable.WHITESPACE);
 	} //}}}
-	
+
 	//{{{ canCompleteAnywhere() method
 	/**
 	 * Returns if completion popups should be shown after any period of

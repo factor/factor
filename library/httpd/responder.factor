@@ -60,6 +60,10 @@ USE: strings
         [
             drop "POST method not implemented" httpd-error
         ] "post" set
+        ( url -- )
+        [
+            drop "HEAD method not implemented" httpd-error
+        ] "head" set
     ] extend ;
 
 : get-responder ( name -- responder )

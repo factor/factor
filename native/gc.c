@@ -38,7 +38,7 @@ void copy_object(CELL* handle)
 		return;
 	}
 	
-	if(in_zone(active,pointer))
+	if(in_zone(&active,pointer))
 		critical_error("copy_object given newspace ptr",pointer);
 
 	header = get(UNTAG(pointer));
@@ -140,10 +140,10 @@ void primitive_gc(void)
 	gc_in_progress = true;
 
 	flip_zones();
-	scan = active->here = active->base;
+	scan = active.here = active.base;
 	collect_roots();
 	collect_io_tasks();
-	while(scan < active->here)
+	while(scan < active.here)
 	{
 		gc_debug("scan loop",scan);
 		collect_next();

@@ -3,7 +3,7 @@
 plugin.factor.jedit.FactorPlugin.activate=defer
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.64
+plugin.factor.jedit.FactorPlugin.version=0.65
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/plugin.html
 
@@ -15,16 +15,21 @@ plugin.factor.jedit.FactorPlugin.menu=factor \
 	- \
 	factor-run-file \
 	factor-eval-selection \
+	- \
 	factor-apropos \
+	factor-insert-use \
+	- \
 	factor-edit \
 	factor-see \
 	factor-usages \
+	- \
 	factor-balance
 
 factor.label=Factor Listener
 factor-run-file.label=Run current file
 factor-eval-selection.label=Evaluate selection
 factor-apropos.label=Apropos at caret
+factor-insert-use.label=Use word at caret
 factor-see.label=See word at caret
 factor-edit.label=Edit word at caret
 factor-usages.label=Word usages at caret
@@ -35,8 +40,15 @@ factor.title=Factor
 sidekick.parser.factor.label=Factor
 mode.factor.sidekick.parser=factor
 
-factor.completion.plain=<html>: <b>{0}</b>
-factor.completion.defer=<html>DEFER: <b>{0}</b>
-factor.completion.parsing=<html>PARSING: <b>{0}</b>
-factor.completion.stack=<html>: <b>{0}</b> {1}
-factor.completion.shuffle=<html>~&lt;&lt; <b>{0}</b> {1} &gt;&gt;~
+factor.completion.in=<font color="#eeeeee">IN: {0}</font>
+factor.completion.plain=: <b>{0}</b>
+factor.completion.defer=DEFER: <b>{0}</b>
+factor.completion.parsing=PARSING: <b>{0}</b>
+factor.completion.stack=: <b>{0}</b> {1}
+factor.completion.shuffle=~&lt;&lt; <b>{0}</b> {1} &gt;&gt;~
+
+factor.status.inserted-use=Inserted {0}
+factor.status.already-used=Already used {0}
+
+factor.insert-use.title=Insert USE: Declaration
+factor.insert-use.caption=There are multiple words named "{0}". Select the one to use:

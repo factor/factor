@@ -5,15 +5,13 @@ typedef struct {
 	CELL limit;
 } ZONE;
 
-ZONE* z1;
-ZONE* z2;
-ZONE* active; /* either z1 or z2 */
-ZONE* prior; /* if active==z1, z2; if active==z2, z1 */
+ZONE active;
+ZONE prior;
 
 bool allot_profiling;
 
 void* alloc_guarded(CELL size);
-ZONE* zalloc(CELL size);
+void init_zone(ZONE* zone, CELL size);
 void init_arena(CELL size);
 void flip_zones();
 
@@ -27,8 +25,8 @@ INLINE CELL align8(CELL a)
 
 INLINE void* allot(CELL a)
 {
-	CELL h = active->here;
-	active->here += align8(a);
+	CELL h = active.here;
+	active.here += align8(a);
 #ifdef FACTOR_PROFILER
 	if(allot_profiling)
 		allot_profile_step(align8(a));
