@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -45,6 +45,7 @@ USE: namespaces
     "/library/generic/builtin.factor"
     "/library/generic/predicate.factor"
     "/library/generic/union.factor"
+    "/library/generic/complement.factor"
     "/library/generic/traits.factor"
 
     "/version.factor"

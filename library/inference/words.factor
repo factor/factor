@@ -199,14 +199,16 @@ M: symbol (apply-word) ( word -- )
         >r 1 + r>
     ] each 2drop ;
 
-: apply-entry-effect ( word -- )
+: (recursive-word) ( word label effect -- )
+    >r [ #call-label ] [ #call ] ?ifte r> (consume/produce) ;
+
+: apply-entry-effect ( word label -- )
     #! Called at a recursive call point. We need this to compute
     #! the set of literals that is retained across a recursive
     #! call -- this is NOT the same as the literals present on
     #! entry. This word mutates the inferring-entry-effect
     #! vector.
-    base-case uncons raise
-    inferring-entry-effect get swap unify-entry-effect ;
+    over base-case uncons raise present-effect (recursive-word) ;
 
 : recursive-word ( word label -- )
     #! Handle a recursive call, by either applying a previously
@@ -216,10 +218,9 @@ M: symbol (apply-word) ( word -- )
         drop no-base-case
     ] [
         inferring-entry-effect get [
-            apply-entry-effect  "Bail out" throw
+            apply-entry-effect
         ] [
-            dup [ #call-label ] [ #call ] ?ifte
-            rot base-case present-effect (consume/produce)
+            over base-case present-effect (recursive-word)
         ] ifte
     ] ifte ;
 

@@ -78,13 +78,13 @@ union [ 2drop t ] "class<" set-word-property
         ] keep ?
     ] map
     [ union-predicate define-compound ] keep
-    "members" set-word-property ;
+    dupd "members" set-word-property
+    union define-class ;
 
 : UNION: ( -- class predicate definition )
     #! Followed by a class name, then a list of union members.
     CREATE
     dup intern-symbol
-    dup union define-class
     dup predicate-word
     [ dupd unit "predicate" set-word-property ] keep
     [ define-union ] [ ] ; parsing

@@ -80,6 +80,7 @@ USE: math-internals
 : class-ord ( class -- n ) metaclass "priority" word-property ;
 
 : class< ( cls1 cls2 -- ? )
+    #! Test if class1 is a subclass of class2.
     over metaclass over metaclass = [
         dup metaclass "class<" word-property call
     ] [

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -74,7 +74,7 @@ USE: words
     [ sbuf-clone             [ [ sbuf ] [ sbuf ] ] ]
     [ sbuf=                  [ [ sbuf sbuf ] [ boolean ] ] ]
     [ sbuf-hashcode          [ [ sbuf ] [ fixnum ] ] ]
-    [ arithmetic-type        [ [ number number ] [ number number fixnum ] ] ]
+    [ arithmetic-type        [ [ object object ] [ object object fixnum ] ] ]
     [ >fixnum                [ [ number ] [ fixnum ] ] ]
     [ >bignum                [ [ number ] [ bignum ] ] ]
     [ >float                 [ [ number ] [ float ] ] ]

@@ -8,6 +8,7 @@ USE: math
 USE: words
 USE: lists
 USE: vectors
+USE: alien
 
 TRAITS: test-traits
 C: test-traits ;
@@ -145,3 +146,8 @@ M: very-funny gooey sq ;
 
 [ t ] [ \ generic \ compound class< ] unit-test
 [ f ] [ \ compound \ generic class< ] unit-test
+
+DEFER: bah
+FORGET: bah
+UNION: bah fixnum alien ;
+[ bah ] [ fixnum alien class-or ] unit-test

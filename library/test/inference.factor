@@ -234,3 +234,9 @@ SYMBOL: sym-test
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
 [ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test
+
+[ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer ] unit-test
+[ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer ] unit-test
+[ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer ] unit-test
+
+[ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer ] unit-test

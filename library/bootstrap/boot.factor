@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -86,6 +86,7 @@ USE: hashtables
     "/library/generic/builtin.factor" parse-resource append,
     "/library/generic/predicate.factor" parse-resource append,
     "/library/generic/union.factor" parse-resource append,
+    "/library/generic/complement.factor" parse-resource append,
     "/library/generic/traits.factor" parse-resource append,
 
     "/library/bootstrap/init.factor" parse-resource append,

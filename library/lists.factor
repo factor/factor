@@ -209,3 +209,8 @@ M: cons hashcode ( cons -- hash ) 4 cons-hashcode ;
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.
     [ over contains? ] subset nip ;
+
+: difference ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ over contains? not ] subset nip ;

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -195,13 +195,25 @@ SYMBOL: cloned
     r> swap #label dataflow, [ node-label set ] bind
     meta-r set meta-d set d-in set ;
 
-: static-branch? ( value -- )
-    literal? branches-can-fail? not and ;
+: boolean-value? ( value -- ? )
+    #! Return if the value's boolean valuation is known.
+    value-class
+    dup \ f = swap
+    builtin-supertypes
+    \ f builtin-supertypes intersection not
+    or ;
+
+: boolean-value ( value -- ? )
+    #! Only valid if boolean? returns true.
+    value-class \ f = not ;
+
+: static-branch? ( value -- ? )
+    boolean-value? branches-can-fail? not and ;
 
 : static-ifte ( true false -- )
     #! If the branch taken is statically known, just infer
     #! along that branch.
-    dataflow-drop, pop-d literal-value [ drop ] [ nip ] ifte
+    dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
     gensym [
         dup value-recursion recursive-state set
         literal-value infer-quot
@@ -212,7 +224,7 @@ SYMBOL: cloned
     #! unify.
     2list >r 1 meta-d get vector-tail* #ifte r>
     pop-d [
-        dup \ object cons ,
+        dup \ general-t cons ,
         \ f cons ,
     ] make-list zip ( condition )
     infer-branches ;

@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,55 +25,52 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel-internals
-USE: generic
+IN: generic
+USE: errors
+USE: hashtables
 USE: kernel
+USE: lists
+USE: namespaces
+USE: parser
+USE: strings
+USE: words
 USE: vectors
+USE: math
 
-: dispatch ( n vtable -- )
-    #! This word is unsafe in compiled code since n is not
-    #! bounds-checked. Do not call it directly.
-    vector-nth call ;
+! Complement metaclass, contains all objects not in a certain class.
+SYMBOL: complement
 
-IN: kernel
+complement [
+    "complement" word-property builtin-supertypes
+    num-types count
+    difference
+] "builtin-supertypes" set-word-property
 
-GENERIC: hashcode ( obj -- n )
-M: object hashcode drop 0 ;
+complement [
+    ( generic vtable definition class -- )
+    drop num-types [ >r 3dup r> add-method ] times* 3drop
+] "add-method" set-word-property
 
-GENERIC: = ( obj obj -- ? )
-M: object = eq? ;
+complement 90 "priority" set-word-property
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+complement [
+    swap "complement" word-property
+    swap "complement" word-property
+    class< not
+] "class<" set-word-property
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
+: complement-predicate ( complement -- list )
+    "predicate" word-property [ not ] append ;
 
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
+: define-complement ( class predicate complement -- )
+    [ complement-predicate define-compound ] keep
+    dupd "complement" set-word-property
+    complement define-class ;
 
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    17 ;
-
-: ? ( cond t f -- t/f )
-    #! Push t if cond is true, otherwise push f.
-    rot [ drop ] [ nip ] ifte ; inline
-
-: >boolean t f ? ; inline
-
-: and ( a b -- a&b ) f ? ; inline
-: not ( a -- ~a ) f t ? ; inline
-: or ( a b -- a|b ) t swap ? ; inline
-: xor ( a b -- a^b ) dup not swap ? ; inline
-
-IN: syntax
-BUILTIN: f 6
-BUILTIN: t 7
-
-IN: kernel
-UNION: boolean f t ;
-COMPLEMENT: general-t f
+: COMPLEMENT: ( -- class predicate definition )
+    #! Followed by a class name, then a complemented class.
+    CREATE
+    dup intern-symbol
+    dup predicate-word
+    [ dupd unit "predicate" set-word-property ] keep
+    scan-word define-complement ; parsing
