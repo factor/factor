@@ -20,6 +20,7 @@ words hashtables ;
     "/library/math/float.factor" parse-resource append,
     "/library/math/complex.factor" parse-resource append,
     "/library/lists.factor" parse-resource append,
+    "/library/dlists.factor" parse-resource append,
     "/library/vectors.factor" parse-resource append,
     "/library/strings.factor" parse-resource append,
     "/library/hashtables.factor" parse-resource append,

@@ -78,6 +78,7 @@
 - worddef props
 - prettyprint: detect circular structure
 - vectors: ensure its ok with bignum indices
+- parsing words don't print readably
 
 + httpd:
 

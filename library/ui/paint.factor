@@ -36,7 +36,7 @@ C: hollow-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-hollow-rect-delegate ] keep ;
 
 M: hollow-rect draw-shape ( rect -- )
-    >r surface get r> shape>screen foreground get rgb
+    >r surface get r> rect>screen foreground get rgb
     rectangleColor ;
 
 TUPLE: plain-rect delegate ;
@@ -45,7 +45,7 @@ C: plain-rect ( x y w h -- rect )
     [ >r <rectangle> r> set-plain-rect-delegate ] keep ;
 
 M: plain-rect draw-shape ( rect -- )
-    >r surface get r> shape>screen background get rgb
+    >r surface get r> rect>screen background get rgb
      boxColor ;
 
 : x1/x2/y1 ( #{ x1 y1 }# #{ x2 y2 }# -- x1 x2 y1 )
@@ -87,11 +87,11 @@ C: bevel-rect ( bevel x y w h -- rect )
     ] repeat 2drop ;
 
 M: bevel-rect draw-shape ( rect -- )
-    shape>screen >r >r rect> r> r> rect> 3 draw-bevel ;
+    rect>screen >r >r rect> r> r> rect> 3 draw-bevel ;
 
 M: line draw-shape ( line -- )
     >r surface get r>
-    shape>screen
+    line>screen
     foreground get rgb
     lineColor ;
 

@@ -51,8 +51,12 @@ USING: generic kernel lists math namespaces sdl ;
 : <button> ( label quot -- button )
     >r <label> bevel-border dup r> button-actions ;
 
+: <cross> ( w h -- cross )
+    2dup >r >r 0 0 r> r> <line> <gadget>
+    >r tuck neg >r >r >r 0 r> r> r> <line> <gadget> r> 2list <stack> ;
+
 : <check-box> ( label quot -- checkbox )
     >r 0 0 0 0 <rectangle> <shelf>
     [ >r <label> r> add-gadget ] keep
-    [ >r f bevel-border r> add-gadget ] keep dup
+    [ >r 11 11 <cross> bevel-border r> add-gadget ] keep dup
     r> button-actions ;

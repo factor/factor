@@ -27,6 +27,7 @@ USING: kernel lists parser stdio words namespaces ;
     "/library/math/float.factor"
     "/library/math/complex.factor"
     "/library/lists.factor"
+    "/library/dlists.factor"
     "/library/vectors.factor"
     "/library/strings.factor"
     "/library/hashtables.factor"

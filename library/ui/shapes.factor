@@ -23,12 +23,6 @@ GENERIC: shape-h
 GENERIC: move-shape ( x y shape -- )
 GENERIC: resize-shape ( w h shape -- )
 
-: shape>screen ( shape -- x1 y1 x2 y2 )
-    [ shape-x x get + ] keep
-    [ shape-y y get + ] keep
-    [ shape-w pick + ] keep
-    shape-h pick + ;
-
 : with-translation ( shape quot -- )
     #! All drawing done inside the quotation is translated
     #! relative to the shape's origin.
@@ -79,6 +73,12 @@ M: rectangle shape-x rectangle-x ;
 M: rectangle shape-y rectangle-y ;
 M: rectangle shape-w rectangle-w ;
 M: rectangle shape-h rectangle-h ;
+
+: rect>screen ( shape -- x1 y1 x2 y2 )
+    [ rectangle-x x get + ] keep
+    [ rectangle-y y get + ] keep
+    [ rectangle-w pick + ] keep
+    rectangle-h pick + ;
 
 : fix-neg ( a b c -- a+c b -c )
     dup 0 < [ neg tuck >r >r + r> r> ] when ;
@@ -156,8 +156,14 @@ M: line move-shape ( x y line -- )
 M: line resize-shape ( w h line -- )
     tuck resize-line-h resize-line-w ;
 
+: line>screen ( shape -- x1 y1 x2 y2 )
+    [ line-x x get + ] keep
+    [ line-y y get + ] keep
+    [ dup line-w swap line-x + pick + ] keep
+    dup line-h swap line-y + pick + ; 
+
 : line-inside? ( p d -- ? )
-    tuck proj - absq 2 < ;
+    dupd proj - absq 2 < ;
 
 M: line inside? ( point line -- ? )
     2dup inside-rect? [

@@ -1,4 +1,5 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
 USING: io-internals kernel kernel-internals lists namespaces ;
@@ -38,4 +39,3 @@ USING: io-internals kernel kernel-internals lists namespaces ;
     #! eventually be restored by a future call to (yield) or
     #! yield.
     [ schedule-thread (yield) ] callcc0 ;
-

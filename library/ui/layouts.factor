@@ -83,3 +83,17 @@ C: border ( delegate size -- border )
 
 M: border layout* ( border -- )
     dup size-border dup layout-border-x/y layout-border-w/h ;
+
+! A stack just lays out all its children on top of each other.
+TUPLE: stack delegate ;
+C: stack ( list -- stack )
+    0 0 0 0 <rectangle> <gadget>
+    over set-stack-delegate
+    swap [ over add-gadget ] each ;
+
+M: stack layout* ( stack -- )
+    dup gadget-children dup max-width swap max-height
+    rot 3dup resize-gadget
+    gadget-children [
+        >r 2dup r> resize-gadget
+    ] each 2drop ;
