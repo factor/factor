@@ -41,12 +41,21 @@ public class BeginConstructor extends FactorParsingDefinition
 	public void eval(FactorReader reader)
 		throws Exception
 	{
+		// remember the position before the word name
+		FactorScanner scanner = reader.getScanner();
+		int line = scanner.getLineNumber();
+		int col = scanner.getColumnNumber();
+
 		FactorWord type = reader.nextWord(false);
 		if(type == null)
 			return;
 
 		reader.intern("<" + type + ">",true);
-		reader.addArtifact(new ConstructorArtifact(type));
+		ConstructorArtifact artifact = new ConstructorArtifact(type);
+		artifact.setFile(scanner.getFileName());
+		artifact.setLine(line);
+		artifact.setColumn(col);
+		reader.addArtifact(artifact);
 		reader.pushExclusiveState(word,type);
 	}
 }
