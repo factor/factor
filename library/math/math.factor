@@ -98,10 +98,6 @@ M: number = ( n n -- ? ) number= ;
     #! Push the sign of a real number.
     dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ;
 
-: mag2 ( x y -- mag )
-    #! Returns the magnitude of the vector (x,y).
-    swap sq swap sq + fsqrt ;
-
 GENERIC: abs ( z -- |z| )
 M: real abs dup 0 < [ neg ] when ;
 

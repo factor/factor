@@ -66,13 +66,23 @@ M: complex imaginary 1 slot %real ;
     >rect swap fatan2 ;
 
 : >polar ( z -- abs arg )
-    >rect 2dup swap fatan2 >r mag2 r> ;
+    dup abs swap >rect swap fatan2 ;
 
 : cis ( theta -- cis )
     dup fcos swap fsin rect> ;
 
 : polar> ( abs arg -- z )
     cis * ;
+
+: absq >rect swap sq swap sq + ;
+
+: dot ( #{ x1 x2 }# #{ y1 y2 }# -- x1*y1+x2*y2 )
+    over real over real * >r swap imaginary swap imaginary * r>
+    + ;
+
+: proj ( u v -- w )
+    #! Orthogonal projection of u onto v.
+    [ [ dot ] keep absq /f ] keep * ;
 
 IN: math-internals
 
@@ -90,15 +100,14 @@ M: complex + 2>rect + >r + r> (rect>) ;
 M: complex - 2>rect - >r - r> (rect>) ;
 M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
 
-: abs^2 ( x -- y ) >rect sq swap sq + ; inline
 : complex/ ( x y -- r i m )
     #! r = xr*yr+xi*yi, i = xi*yr-xr*yi, m = yr*yr+yi*yi
-    dup abs^2 >r 2dup *re + -rot *im - r> ; inline
+    dup absq >r 2dup *re + -rot *im - r> ; inline
 
 M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
 M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
 
-M: complex abs ( z -- |z| ) >rect mag2 ;
+M: complex abs ( z -- |z| ) absq fsqrt ;
 
 M: complex hashcode ( n -- n )
     >rect >fixnum swap >fixnum bitxor ;

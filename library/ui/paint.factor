@@ -24,12 +24,6 @@ SYMBOL: bevel-up?
 
 SYMBOL: font  ! a list of two elements, a font name and size.
 
-: shape>screen ( shape -- x1 y1 x2 y2 )
-    [ shape-x x get + ] keep
-    [ shape-y y get + ] keep
-    [ shape-w pick + ] keep
-    shape-h pick + ;
-
 GENERIC: draw-shape ( obj -- )
 
 ! Actual rectangles don't draw; use a hollow-rect, plain-rect
@@ -102,12 +96,6 @@ M: line draw-shape ( line -- )
     lineColor ;
 
 M: ellipse draw-shape drop ;
-
-: ellipse>screen ( shape -- x y rx ry )
-    [ dup shape-x swap shape-w 2 /i + x get + ] keep
-    [ dup shape-y swap shape-h 2 /i + y get + ] keep
-    [ shape-w 2 /i ] keep
-    shape-h 2 /i ;
 
 TUPLE: hollow-ellipse delegate ;
 

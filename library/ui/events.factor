@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic kernel lists math namespaces sdl sdl-event
-sdl-video ;
+sdl-keyboard sdl-video ;
 
 GENERIC: handle-event ( event -- )
 
@@ -34,3 +34,6 @@ M: button-up-event handle-event ( event -- )
 
 M: motion-event handle-event ( event -- )
     motion-event-pos my-hand move-hand ;
+
+M: key-down-event handle-event ( event -- )
+    keyboard-event>binding my-hand hand-gadget handle-gesture ;

@@ -1,6 +1,9 @@
 + ui:
 
 - if gadgets are moved, added or deleted, update hand.
+- keyboard focus
+- keyboard gestures
+- text fields
 
 + compiler:
 
