@@ -1,19 +1,22 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: errors generic kernel lists math namespaces stdio strings
-presentation unparser vectors words hashtables ;
+
+! This using kernel-internals is pretty bad. Remove the
+! kernel-internals usage as soon as the tuple class is moved
+! to the generic vocabulary.
+USING: errors generic kernel kernel-internals lists math
+namespaces stdio strings presentation unparser vectors words
+hashtables ;
 
 SYMBOL: prettyprint-limit
+SYMBOL: one-line
+SYMBOL: tab-size
 
 GENERIC: prettyprint* ( indent obj -- indent )
 
 M: object prettyprint* ( indent obj -- indent )
     unparse write ;
-
-: tab-size
-    #! Change this to suit your tastes.
-    4 ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -30,18 +33,15 @@ M: object prettyprint* ( indent obj -- indent )
     ] ifte " " write ;
 
 : <prettyprint ( indent -- indent )
-    tab-size +
-    "prettyprint-single-line" get [
+    tab-size get + one-line get [
         " " write
     ] [
         dup prettyprint-newline
     ] ifte ;
 
 : prettyprint> ( indent -- indent )
-    tab-size -
-    "prettyprint-single-line" get [
-        dup prettyprint-newline
-    ] unless ;
+    tab-size get - one-line get
+    [ dup prettyprint-newline ] unless ;
 
 : word-link ( word -- link )
     [
@@ -74,69 +74,34 @@ M: word prettyprint* ( indent word -- indent )
     swap dup word-attrs swap word-style append
     write-attr ;
 
-: prettyprint-[ ( indent -- indent )
-    \ [ prettyprint* <prettyprint ;
-
-: prettyprint-] ( indent -- indent )
-    prettyprint> \ ] prettyprint* ;
-
-: prettyprint-list ( indent list -- indent )
-    #! Pretty-print a list, without [ and ].
-    [ prettyprint-element ] each ;
+: prettyprint-sequence ( indent start list end -- indent )
+    #! Prettyprint a list, with start/end delimiters; eg, [ ],
+    #! or { }, or << >>. The body of the list is indented,
+    #! unless the list is empty.
+    over [
+        >r
+        >r prettyprint* <prettyprint
+        r> [ prettyprint-element ] each
+        prettyprint> r> prettyprint*
+    ] [
+        >r >r prettyprint* " " write r> drop r> prettyprint*
+    ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
-    [
-        swap prettyprint-[ swap prettyprint-list prettyprint-]
-    ] [
-        f unparse write
-    ] ifte* ;
+    \ [ swap \ ] prettyprint-sequence ;
 
 M: cons prettyprint* ( indent cons -- indent )
-    \ [[ prettyprint* " " write
-            uncons >r prettyprint-element r> prettyprint-element
-    \ ]] prettyprint* ;
-
-: prettyprint-{ ( indent -- indent )
-    \ { prettyprint* <prettyprint ;
-
-: prettyprint-} ( indent -- indent )
-    prettyprint> \ } prettyprint* ;
-
-: prettyprint-vector ( indent list -- indent )
-    #! Pretty-print a vector, without { and }.
-    [ prettyprint-element ] vector-each ;
+    #! Here we turn the cons into a list of two elements.
+    \ [[ swap uncons 2list \ ]] prettyprint-sequence ;
 
 M: vector prettyprint* ( indent vector -- indent )
-    dup vector-length 0 = [
-        drop
-        \ { prettyprint*
-        " " write
-        \ } prettyprint*
-    ] [
-        swap prettyprint-{ swap prettyprint-vector prettyprint-}
-    ] ifte ;
-
-: prettyprint-{{ ( indent -- indent )
-    \ {{ prettyprint* <prettyprint ;
-
-: prettyprint-}} ( indent -- indent )
-    prettyprint> \ }} prettyprint* ;
+    \ { swap vector>list \ } prettyprint-sequence ;
 
 M: hashtable prettyprint* ( indent hashtable -- indent )
-    hash>alist dup length 0 = [
-        drop
-        \ {{ prettyprint*
-        " " write 
-        \ }} prettyprint*
-    ] [
-        swap prettyprint-{{ swap prettyprint-list prettyprint-}}
-    ] ifte ;
+    \ {{ swap hash>alist \ }} prettyprint-sequence ;
 
 M: tuple prettyprint* ( indent tuple -- indent )
-    \ << prettyprint*
-    " " write
-    tuple>list [ prettyprint-element ] each
-    \ >> prettyprint* ;
+    \ << swap tuple>list \ >> prettyprint-sequence ;
 
 : prettyprint-1 ( obj -- )
     0 swap prettyprint* drop ;
@@ -149,7 +114,7 @@ M: tuple prettyprint* ( indent tuple -- indent )
 
 : . ( obj -- )
     [
-        "prettyprint-single-line" on
+        one-line on
         16 prettyprint-limit set
         prettyprint
     ] with-scope ;
@@ -172,4 +137,4 @@ M: tuple prettyprint* ( indent tuple -- indent )
 : .o >oct print ;
 : .h >hex print ;
 
-global [ 40 prettyprint-limit set ] bind
+global [ 40 prettyprint-limit set  4 tab-size set ] bind

@@ -160,6 +160,7 @@ cpu "x86" = [
         "/library/ui/layouts.factor"
         "/library/ui/world.factor"
         "/library/ui/labels.factor"
+        "/library/ui/buttons.factor"
         "/library/ui/events.factor"
     ] [
         dup print

@@ -46,7 +46,7 @@ USING: generic kernel lists math namespaces sdl ;
     dup [ button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action
     dup [ button-update ] [ mouse-leave ] set-action
-    dup [ button-update ] [ mouse-enter ] set-action ;
+    [ button-update ] [ mouse-enter ] set-action ;
 
 : <button> ( label quot -- button )
     >r <label> bevel-border dup r> button-actions ;

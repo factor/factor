@@ -22,6 +22,7 @@
 - tuples: gracefully handle changing shape
 - keep a list of getter/setter words
 - default constructor
+- move tuple to generic vocab
 
 + ffi:
 

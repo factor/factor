@@ -123,7 +123,7 @@ M: line resize-shape ( w h line -- )
     tuck set-line-h set-line-w ;
 
 M: line inside? ( point line -- ? )
-    2drop f ;
+    2drop t ;
 
 ! An ellipse.
 TUPLE: ellipse x y w h ;
@@ -133,7 +133,7 @@ M: ellipse shape-w ellipse-w ;
 M: ellipse shape-h ellipse-h ;
 
 C: ellipse ( x y w h -- line )
-    #! We handle negative w/h for convinience.
+    #! We handle negative w/h for convenience.
     >r fix-neg >r fix-neg r> r>
     [ set-ellipse-h ] keep
     [ set-ellipse-w ] keep
@@ -146,5 +146,9 @@ M: ellipse move-shape ( x y line -- )
 M: ellipse resize-shape ( w h line -- )
     tuck set-ellipse-h set-ellipse-w ;
 
-M: ellipse inside? ( point line -- ? )
-    2drop f ;
+M: ellipse inside? ( point ellipse -- ? )
+    ellipse>screen swap sq swap sq
+    2dup * >r >r >r
+    pick shape-y - sq
+    >r swap shape-x - sq r>
+    r> * r> rot * + r> <= ;

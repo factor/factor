@@ -7,7 +7,7 @@ IN: kernel-internals USING: generic kernel vectors ;
     #! call it directly.
     vector-array array-nth call ;
 
-IN: generic BUILTIN: tuple 18
+BUILTIN: tuple 18
 
 IN: kernel
 
