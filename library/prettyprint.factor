@@ -48,6 +48,10 @@ USE: words
     #! Change this to suit your tastes.
     4 ;
 
+: prettyprint-limit ( -- limit )
+    #! Avoid infinite loops -- maximum indent, 10 levels.
+    "prettyprint-limit" get [ 40 ] unless* ;
+
 : prettyprint-indent ( indent -- )
     #! Print the given number of spaces.
     " " fill write ;
@@ -85,15 +89,32 @@ DEFER: prettyprint*
         dup prettyprint-newline
     ] unless ;
 
+: check-recursion ( indent obj quot -- )
+    >r over prettyprint-limit >= [
+        r> drop drop "#< ... >" write
+    ] [
+        r> call
+    ] ifte ;
+
 : prettyprint-[ ( indent -- indent )
     "[" write <prettyprint ;
 
 : prettyprint-] ( indent -- indent )
     prettyprint> "]" write ;
 
+: (prettyprint-list) ( indent list -- indent )
+    uncons >r prettyprint-element r>
+    dup cons? [
+        (prettyprint-list)
+    ] [
+        [
+            "|" write prettyprint-space prettyprint-element
+        ] when*
+    ] ifte ;
+
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
-    [ prettyprint-element ] each ;
+    [ (prettyprint-list) ] check-recursion ;
 
 : prettyprint-[] ( indent list -- indent )
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
@@ -106,7 +127,7 @@ DEFER: prettyprint*
 
 : prettyprint-vector ( indent list -- indent )
     #! Pretty-print a vector, without { and }.
-    [ prettyprint-element ] vector-each ;
+    [ [ prettyprint-element ] vector-each ] check-recursion ;
 
 : prettyprint-{} ( indent list -- indent )
     swap prettyprint-{ swap prettyprint-vector prettyprint-} ;
@@ -142,7 +163,7 @@ DEFER: prettyprint*
 : prettyprint* ( indent obj -- indent )
     [
         [ f =       ] [ prettyprint-object ]
-        [ list?     ] [ prettyprint-[] ]
+        [ cons?     ] [ prettyprint-[] ]
         [ vector?   ] [ prettyprint-{} ]
         [ comment?  ] [ prettyprint-comment ]
         [ word?     ] [ prettyprint-word ]
@@ -168,7 +189,9 @@ DEFER: prettyprint*
 
 : . ( obj -- )
     <namespace> [
-        "prettyprint-single-line" on prettyprint
+        "prettyprint-single-line" on
+        prettyprint-indent 4 * "prettyprint-limit" set
+        prettyprint
     ] bind ;
 
 : [.] ( list -- )

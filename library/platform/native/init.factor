@@ -58,6 +58,7 @@ USE: unparser
     t "interactive" set
     
     init-stdio
+    "stdio" get <ansi-stream> "stdio" set
     init-errors
     init-search-path
     init-scratchpad

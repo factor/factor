@@ -67,14 +67,6 @@ USE: words
     #! List all usages of a word in all vocabularies.
     intern vocabs [ dupd usages-in-vocab. ] each drop ;
 
-: vocabs. ( -- )
-    #! List vocabularies.
-    "vocabularies" describe-object-path ;
-
-: words. ( vocab -- )
-    #! List a vocabulary.
-    "vocabularies'" swap cat2 describe-object-path ;
-
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.

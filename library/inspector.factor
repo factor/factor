@@ -29,6 +29,7 @@ IN: inspector
 USE: combinators
 USE: format
 USE: kernel
+USE: hashtables
 USE: lists
 USE: namespaces
 USE: stack
@@ -52,19 +53,25 @@ USE: vocabularies
     uncons unparse swap relative>absolute-object-path
     default-style clone [ "link" set write-attr ] bind ;
 
-: value. ( max [ name | value ] -- )
-    dup [ car tuck pad-string write write ] dip
-    ": " write
-    var. terpri ;
+: var-name. ( max name -- )
+    default-style clone [
+        tuck pad-string write
+        dup relative>absolute-object-path "link" set
+        write-attr
+    ] bind ;
 
-: describe-banner ( obj -- )
-    "OBJECT: " write dup .
-    "CLASS : " write class-of print
-    "-------" print ;
+: value. ( max name value -- )
+    >r var-name. ": " write r> . ;
 
+: describe-assoc ( alist -- )
+    dup [ car ] inject max-str-length swap
+    [ dupd uncons value. ] each drop ;
+   
 : describe-namespace ( namespace -- )
-    [ vars max-str-length vars-values ] bind
-    [ dupd value. ] each drop ;
+    [ vars-values ] bind describe-assoc ;
+
+: describe-hashtable ( hashtables -- )
+    hash>alist describe-assoc ;
 
 : describe ( obj -- )
     [
@@ -74,8 +81,14 @@ USE: vocabularies
         [ string? ]
         [ print ]
         
+        [ assoc? ]
+        [ describe-assoc ]
+        
+        [ hashtable? ]
+        [ describe-hashtable ]
+        
         [ has-namespace? ]
-        [ dup describe-banner describe-namespace ]
+        [ describe-namespace ]
         
         [ drop t ]
         [ prettyprint ]

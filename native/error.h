@@ -8,6 +8,7 @@
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 void fix_stacks(void);
+void check_stacks(void);
 void throw_error(CELL object);
 void general_error(CELL error, CELL tagged);
 void type_error(CELL type, CELL tagged);

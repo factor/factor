@@ -1,3 +1,22 @@
+#define UNDERFLOW_CHECKING
+
+#define OVERFLOW(stack,bot) ((stack) >= UNTAG(bot) + object_size(bot))
+
+INLINE void check_stacks(void)
+{
+
+#ifdef UNDERFLOW_CHECKING
+	if(OVERFLOW(env.ds,env.ds_bot))
+		fatal_error("datastack overflow",env.ds);
+	if(OVERFLOW(env.cs,env.cs_bot))
+		fatal_error("callstack overflow",env.ds);
+#endif
+
+}
+
+void reset_datastack(void);
+void reset_callstack(void);
+
 void primitive_drop(void);
 void primitive_dup(void);
 void primitive_swap(void);

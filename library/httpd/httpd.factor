@@ -80,10 +80,10 @@ USE: url-encoding
     ] with-stream ;
 
 : quit-flag ( -- ? )
-    "httpd-quit" get ;
+    global [ "httpd-quit" get ] bind ;
 
 : clear-quit-flag ( -- )
-    "httpd-quit" off ;
+    global [ "httpd-quit" off ] bind ;
 
 : httpd-loop ( server -- server )
     [

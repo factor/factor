@@ -7,18 +7,6 @@ void clear_environment(void)
 		env.user[i] = 0;
 }
 
-void reset_datastack(void)
-{
-	env.ds = UNTAG(env.ds_bot) + sizeof(ARRAY);
-	env.dt = empty;
-}
-
-void reset_callstack(void)
-{
-	env.cs = UNTAG(env.cs_bot) + sizeof(ARRAY);
-	cpush(empty);
-}
-
 void init_environment(void)
 {
 	/* + CELLS * 2 to skip header and length cell */
@@ -40,6 +28,8 @@ void run(void)
 	
 	for(;;)
 	{
+		check_stacks();
+		
 		if(env.cf == F)
 		{
 			if(cpeek() == empty)

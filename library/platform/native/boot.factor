@@ -103,7 +103,8 @@ primitives,
     max 2list length reverse nth list? 2rlist
     all? clone-list clone-list-iter subset subset-iter
     subset-add car= cdr= cons= cons-hashcode
-    tree-contains? =-or-contains? last* last inject
+    tree-contains? =-or-contains? 
+    last* last inject
 ] [ worddef worddef, ] each
 
 version,

@@ -1,5 +1,17 @@
 #include "factor.h"
 
+void reset_datastack(void)
+{
+	env.ds = UNTAG(env.ds_bot) + sizeof(ARRAY);
+	env.dt = empty;
+}
+
+void reset_callstack(void)
+{
+	env.cs = UNTAG(env.cs_bot) + sizeof(ARRAY);
+	cpush(empty);
+}
+
 void primitive_drop(void)
 {
 	check_non_empty(env.dt);

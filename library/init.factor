@@ -29,6 +29,7 @@ IN: init
 USE: combinators
 USE: compiler
 USE: continuations
+USE: errors
 USE: interpreter
 USE: kernel
 USE: lists
@@ -84,9 +85,13 @@ USE: strings
 : init-interpreter ( -- )
     #! If we're run stand-alone, start the interpreter on stdio.
     "interactive" get [
-        [ "top-level-continuation" set ] callcc0
+        [
+            [ "top-level-continuation" set ] callcc0
 
-        interpreter-loop
+            interpreter-loop
+        ] [
+            default-error-handler
+        ] catch
     ] [
         f "top-level-continuation" set
     ] ifte ;

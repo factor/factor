@@ -20,7 +20,7 @@
 
 /* Memory heap size */
 #define DEFAULT_ARENA (4 * 1024 * 1024)
-#define STACK_SIZE 256
+#define STACK_SIZE 1024
 
 #include "error.h"
 #include "memory.h"
