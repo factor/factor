@@ -45,11 +45,25 @@ USE: vectors
     #! Construct a proper list of 2 elements in reverse stack order.
     swap unit cons ;
 
+: copy-cons ( accum cons -- accum cdr )
+    uncons >r unit dup rot set-cdr r> ;
+
+: (clone-list) ( accum list -- last )
+    dup cons? [ copy-cons (clone-list) ] [ over set-cdr ] ifte ;
+
+: clone-list* ( list -- list last )
+    #! Push the cloned list, and the last cons cell of the
+    #! cloned list.
+    uncons >r unit dup r> (clone-list) ;
+
+: clone-list ( list -- list )
+    #! Push a shallow copy of a list.
+    dup [ clone-list* drop ] when ;
+
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    #! Append two lists. The first list must be proper. A new
-    #! list is constructed by copying the first list and setting
-    #! its tail to the second.
-    over [ >r uncons r> append cons ] [ nip ] ifte ;
+    #! Append two lists. A new list is constructed by copying
+    #! the first list and setting its tail to the second.
+    over [ >r clone-list* r> swap set-cdr ] [ nip ] ifte ;
 
 : add ( [ list1 ] elem -- [ list1 elem ] )
     #! Push a new proper list with an element added to the end.
@@ -66,20 +80,6 @@ USE: vectors
 
 : cddr ( list -- cddr )
     cdr cdr ; inline
-
-: clone-list-iter ( result list -- last [ ] )
-    #! DESTRUCTIVE. Helper word for 'clone-list'.
-    [
-        dup cons?
-    ] [
-        uncons >r unit tuck >r set-cdr r> r>
-    ] while ;
-
-: clone-list ( list -- list )
-    #! Push a shallow copy of a list.
-    dup [
-        uncons >r unit dup r> clone-list-iter swap set-cdr
-    ] when ;
 
 : contains ( element list -- remainder )
     #! If the proper list contains the element, push the
@@ -298,10 +298,26 @@ DEFER: tree-contains?
     inline interpret-only
 
 : substitute ( new old list -- list )
-    [ 2dup = [ drop over ] when ] inject ;
+    [ 2dup = [ drop over ] when ] inject nip nip ;
+
+: (head) ( accum list n -- last list )
+    dup 1 = [ drop ] [ pred >r copy-cons r> (head) ] ifte ;
+
+: head* ( n list -- head last rest )
+    #! Push the head of the list, the last cons cell of the
+    #! head, and the rest of the list.
+    uncons >r unit tuck r> rot (head) ;
+
+: head ( n list -- head )
+    #! Push a new list containing the first n elements.
+    over 0 = [ 2drop f ] [ head* 2drop ] ifte ;
 
 : set-nth ( value index list -- list )
-    over 0 = [ nip cdr cons ] [ >r pred r> set-nth ] ifte ;
+    over 0 = [
+        nip cdr cons
+    ] [
+        rot >r head* cdr r> swons swap set-cdr
+    ] ifte ;
 
 : subset-add ( car pred accum -- accum )
     >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
@@ -327,8 +343,9 @@ DEFER: tree-contains?
     #! Remove all occurrences of the object from the list.
     [ dupd = not ] subset nip ;
 
-: remove-nth ( index list -- list )
-    over 0 = [ nip cdr ] [ >r pred r> cdr remove-nth ] ifte ;
+: remove-nth ( n list -- list )
+    #! Push a new list with the nth element removed.
+    over 0 = [ nip cdr ] [ head* cdr swap set-cdr ] ifte ;
 
 : length ( list -- length )
     #! Pushes the length of the given proper list.

@@ -325,9 +325,9 @@ More combinators will be introduced in later sections.
 
 \subsection{Vocabularies}
 
-The dictionary of words is not a flat list -- rather, it is separated
-into a number of \emph{vocabularies}. Each vocabulary is a named list
-of words that have something in common -- for example, the {}``lists''
+When an expression is parsed, each token in turn is looked up in the dictionary. If there is no dictionary entry, the token is parsed as a number instead.
+The dictionary of words is structured as a set of named \emph{vocabularies}. Each vocabulary is a list
+of related words -- for example, the {}``lists''
 vocabulary contains words for working with linked lists.
 
 When a word is read by the parser, the \emph{vocabulary search path}
@@ -774,6 +774,26 @@ is a proper list:
 \emph{t}
 \end{alltt}
 
+It is worth mentioning a few words closely related to and defined in terms of \texttt{cons}, \texttt{car} and \texttt{cdr}.
+
+\texttt{swons ( cdr car -{}- cons )} constructs a cons cell, with the argument order reversed. Usually, it is considered bad practice to define two words that only differ by parameter order, however cons cells are constructed about equally frequently with both orders. Of course, \texttt{swons} is defined as follows:
+
+\begin{alltt}
+: swons swap cons ;
+\end{alltt}
+
+\texttt{uncons ( cons -{}- car cdr )} pushes both constituents of a cons cell. It is defined as thus:
+
+\begin{alltt}
+: uncons dup car swap cdr ;
+\end{alltt}
+
+\texttt{unswons ( cons -{}- cdr car)} is just a swapped version of \texttt{uncons}. It is defined as thus:
+
+\begin{alltt}
+: unswons dup cdr swap car ;
+\end{alltt}
+
 \subsection{Working with lists}
 
 Unless otherwise documented, list manipulation words expect proper
@@ -1030,8 +1050,7 @@ For example, the implementation of \texttt{assoc?} uses \texttt{all?}:
 
 \subsection{\label{sub:List-constructors}List constructors}
 
-The list construction words minimize stack noise with a clever trick.
-They store a partial list in a variable, thus reducing the number
+The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
 of stack elements that have to be juggled.
 
 The word \texttt{{[}, ( -{}- )} begins list construction.
@@ -1229,6 +1248,22 @@ of the vector. This increments the vector's length by one.
 end of the vector and pushes it. This decrements the vector's length
 by one.
 
+The \texttt{vector-push} and \texttt{vector-pop} words can be used to implement additional stacks. For example:
+
+\begin{alltt}
+20 <vector> "state-stack" set
+: push-state ( obj -- ) "state-stack" get vector-push ;
+: pop-state ( -- obj ) "state-stack" get vector-pop ;
+12 push-state
+4 push-state
+pop-state .
+\emph{4}
+0 push-state
+pop-state .
+\emph{0}
+pop-state .
+\emph{12}
+\end{alltt}
 
 \subsection{Vector combinators}
 
@@ -1453,17 +1488,8 @@ new character positions are automatically filled with zeroes.
 
 \subsection{String constructors}
 
-Passing a string buffer on the stack can lead to unnecessary stack
-noise, and overly-complicated stack effects. Often it is better to
-use the string construction words, which operate on a similar principle
-to the list construction words.
-
-As seen in \ref{sub:List-constructors}, the \texttt{{[},} word begins
-list construction; the \texttt{,} word appends elements to the list
-that will be returned by the \texttt{,{]}} word. Similarly, the \texttt{<\%}
-word begins string construction; the \texttt{\%} word appends the
-top of the stack to the string that will be returned by the \texttt{\%>}
-word.
+The string construction words provide an alternative way to build up a string. Instead of passing a string buffer around on the stack, they store the string buffer in a variable. This reduces the number
+of stack elements that have to be juggled.
 
 The word \texttt{<\% ( -{}- )} begins string construction. The word
 definition creates a string buffer. Instead of leaving the string
@@ -1477,6 +1503,16 @@ on a string buffer located by searching the name stack.
 The word \texttt{\%> ( -{}- str )} pushes the complete list. The word
 definition pops the name stack and calls \texttt{sbuf>str} on the
 appropriate string buffer.
+
+Compare the following two examples -- both define a word that concatenates together all elements of a list of strings. The first one uses a string buffer stored on the stack, the second uses string construction words:
+
+\begin{alltt}
+: cat ( list -- str )
+    100 <sbuf> swap [ over sbuf-append ] each sbuf>str ;
+
+: cat ( list -- str )
+    <\% [ \% ] each \%> ;
+\end{alltt}
 
 \subsection{String combinators}
 

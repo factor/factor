@@ -49,7 +49,7 @@ USE: vectors
     "Type ``exit'' to exit, ``help'' for help." print ;
 
 : init-history ( -- )
-    "history" get [ 64 <vector> "history" set ] unless ;
+    64 <vector> "history" set ;
 
 : history+ ( cmd -- )
     "history" get vector-push ;
@@ -98,7 +98,6 @@ USE: vectors
     ] ifte ;
 
 : interpreter-loop ( -- )
-    init-history
     [ "quit-flag" get not ] [ interpret ] while
     "quit-flag" off ;
 

@@ -1,25 +1,19 @@
 0.62:
 
+- stdout hangs
 - read-line: handle \r\n
 - flush output buffer before reading line
 - print: only flush in stdio stream
 - ignore errors from flush
 - can-read-line?
-- client connections broken
-- vocabulary section: what is the dictionary?
-- document swons, uncons, unswons
-- vector-push/pop examples
+- EOF in client connections
 - vector-each/map examples
-- string construction examples
-- string construction ackward
 - sbuf-hashcode
 - vector-hashcode
-- test substitute, set-nth, remove-nth
 - listener backspace overzealous
 - SIGBUS handler
 - handle division by zero
 - log-client: fix for native
-- telnetd: needs own history
 - multitasking
 
 [error] AWT-EventQueue-0: java.lang.NullPointerException

@@ -148,6 +148,8 @@ USE: vocabularies
     ] ifte ;
 
 : init-interpreter ( -- )
+    init-history
+
     print-banner
     word-of-the-day
     room.

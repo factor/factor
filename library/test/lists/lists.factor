@@ -75,3 +75,13 @@ USE: test
 [ [ 0 1 2 3 ] ] [ 4   count ] unit-test
 
 [ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] subset ] unit-test
+
+[ [ t f t f ] ] [ f 1 [ t 1 t 1 ] substitute ] unit-test
+
+[ [ 0 1 2 4 5 6 7 8 9 ] ] [ 3 10 count remove-nth ] unit-test
+[ [ 1 2 3 4 5 6 7 8 9 ] ] [ 0 10 count remove-nth ] unit-test
+[ [ 0 1 2 3 4 5 6 7 8 ] ] [ 9 10 count remove-nth ] unit-test
+
+[ [ 1 2 3 ] ] [ 2 1 [ 1 3 3 ] set-nth ] unit-test
+[ [ 1 2 3 ] ] [ 1 0 [ 2 2 3 ] set-nth ] unit-test
+[ [ 1 2 3 ] ] [ 3 2 [ 1 2 2 ] set-nth ] unit-test
