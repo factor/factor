@@ -186,10 +186,9 @@ DEFER: prettyprint*
 : prettyprint-vocab ( vocab -- )
     dup vocab-attrs write-attr ;
 
-: prettyprint-IN: ( indent word -- indent )
+: prettyprint-IN: ( indent word -- )
     "IN:" write prettyprint-space
-    word-vocabulary prettyprint-vocab
-    dup prettyprint-newline ;
+    word-vocabulary prettyprint-vocab prettyprint-newline ;
 
 : prettyprint-: ( indent -- indent )
     ":" write prettyprint-space
@@ -203,14 +202,6 @@ DEFER: prettyprint*
     "parsing" over word-property [ " parsing" write ] when
     "inline" over word-property [ " inline" write ] when
     drop ;
-
-: prettyprint-:; ( indent word list -- indent )
-    over >r >r dup
-    >r prettyprint-IN: prettyprint-: r>
-    prettyprint-word
-    native? [ dup prettyprint-newline ] [ prettyprint-space ] ifte
-    r>
-    prettyprint-list prettyprint-; r> prettyprint-plist ;
 
 : . ( obj -- )
     [

@@ -35,6 +35,13 @@ USE: stdio
 USE: unparser
 USE: words
 
+: prettyprint-:; ( indent word list -- indent )
+    over >r >r dup
+    >r dupd prettyprint-IN: prettyprint-: r>
+    prettyprint-word prettyprint-space
+    r>
+    prettyprint-list prettyprint-; r> prettyprint-plist ;
+
 : prettyprint-~<< ( indent -- indent )
     "~<<" write prettyprint-space
     tab-size + ;

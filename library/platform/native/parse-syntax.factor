@@ -25,8 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-! Parsing words. 'builtins' is a stupid vocabulary name now
-! that it does not contain Java words anymore!
 IN: syntax
 
 USE: combinators
@@ -43,6 +41,10 @@ USE: strings
 USE: words
 USE: vectors
 USE: unparser
+
+! The variable "in-definition" is set inside a : ... ;.
+! ( and #! then add "stack-effect" and "documentation"
+! properties to the current word if it is set.
 
 ! Constants
 : t t parsed ; parsing
@@ -65,7 +67,9 @@ USE: unparser
 : POSTPONE: ( -- ) scan parse-word parsed ; parsing
 
 ! Colon defs
-: CREATE scan "in" get create ;
+: CREATE
+    scan "in" get create dup set-word
+    f "documentation" pick set-word-property ;
 
 : remember-where ( word -- )
     "line-number" get "line" pick set-word-property
@@ -75,13 +79,15 @@ USE: unparser
 
 : :
     #! Begin a word definition. Word name follows.
-    CREATE dup remember-where [ ] ; parsing
+    CREATE dup remember-where [ ]
+    "in-definition" on ; parsing
 
 : ;-hook ( -- quot )
     ";-hook" get [ [ define-compound ] ] unless* ;
 
 : ;
     #! End a word definition.
+    "in-definition" off
     nreverse
     ;-hook call ; parsing
 
@@ -146,9 +152,30 @@ USE: unparser
     scan str>number scan str>number rect> parsed "}" expect ;
 
 ! Comments
-: ( ")" until drop ; parsing
+: doc-comment-here? ( parsed -- ? )
+    not "in-definition" get and ;
+
+: parsed-stack-effect ( parsed str -- parsed )
+    over doc-comment-here? [
+        "stack-effect" word set-word-property
+    ] [
+        drop
+    ] ifte ;
+
+: ( ")" until parsed-stack-effect ; parsing
+
 : ! until-eol drop ; parsing
-: #! until-eol drop ; parsing
+
+: parsed-documentation ( parsed str -- parsed )
+    over doc-comment-here? [
+        "documentation" word word-property [
+            swap "\n" swap cat3
+        ] when* "documentation" word set-word-property
+    ] [
+        drop
+    ] ifte ;
+
+: #! until-eol parsed-documentation ; parsing
 
 ! Reading numbers in other bases
 

@@ -5,7 +5,6 @@
   - directory listings
   - index.html
   - if a directory is requested and URL does not end with /, redirect
-- doc strings with native factor
 
 + bignums:
 
@@ -47,6 +46,7 @@
 
 + listener/plugin:
 
+- inferior hangs
 - plugin should not exit jEdit on fatal errors
 - auto insert USE:
 - balance needs USE:

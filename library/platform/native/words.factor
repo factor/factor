@@ -59,6 +59,11 @@ USE: stack
 
 : define-compound ( word def -- )
     #! Define a compound word at runtime.
-    over set-word
     over set-word-parameter
     1 swap set-word-primitive ;
+
+: stack-effect ( word -- str )
+    "stack-effect" swap word-property ;
+
+: documentation ( word -- str )
+    "documentation" swap word-property ;

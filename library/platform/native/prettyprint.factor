@@ -27,16 +27,37 @@
 
 IN: prettyprint
 USE: combinators
+USE: lists
 USE: parser
 USE: prettyprint
 USE: stack
 USE: stdio
+USE: strings
 USE: unparser
 USE: words
 
+: prettyprint-docs ( indent word -- indent )
+    [
+        stack-effect [
+            <% CHAR: ( % % CHAR: ) % %> prettyprint-comment
+            dup prettyprint-newline
+        ] when*
+    ] keep
+
+    documentation [
+        "\n" split [
+            "#!" swap cat2 prettyprint-comment
+            dup prettyprint-newline
+        ] each
+    ] when* ;
+
 : see-compound ( word -- )
-    0 swap dup word-parameter prettyprint-:;
-    prettyprint-newline ;
+    0 swap
+    [ dupd prettyprint-IN: prettyprint-: ] keep
+    [ prettyprint-word prettyprint-space ] keep
+    [ prettyprint-docs ] keep
+    [ word-parameter prettyprint-list prettyprint-; ] keep
+    prettyprint-plist prettyprint-newline ;
 
 : see-primitive ( word -- )
     "PRIMITIVE: " write unparse print ;
@@ -45,6 +66,7 @@ USE: words
     drop "Not defined" print ;
 
 : see ( name -- )
+    #! Show a word definition.
     intern
     [
         [ compound? ] [ see-compound ]
