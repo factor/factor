@@ -245,11 +245,10 @@ public class FactorSideKickParser extends SideKickParser
 	 */
 	public SideKickCompletion complete(EditPane editPane, int caret)
 	{
-		SideKickParsedData _data = SideKickParsedData
-			.getParsedData(editPane.getView());
-		if(!(_data instanceof FactorParsedData))
+		FactorParsedData data = FactorPlugin.getParsedData(
+			editPane.getView());
+		if(data == null)
 			return null;
-		FactorParsedData data = (FactorParsedData)_data;
 
 		Buffer buffer = editPane.getBuffer();
 

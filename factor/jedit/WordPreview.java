@@ -134,10 +134,10 @@ public class WordPreview implements ActionListener, CaretListener
 		if(SideKickPlugin.isParsingBuffer(view.getBuffer()))
 			return;
 
-		SideKickParsedData data = SideKickParsedData.getParsedData(view);
-		if(data instanceof FactorParsedData)
+		FactorParsedData data = FactorPlugin.getParsedData(view);
+		if(data != null)
 		{
-			FactorWord w = getWordAtCaret((FactorParsedData)data);
+			FactorWord w = getWordAtCaret(data);
 			if(w != null)
 			{
 				view.getStatus().setMessageAndClear(

@@ -193,6 +193,16 @@ public class FactorPlugin extends EditPlugin
 			"sidekick.SideKickParser","factor");
 	} //}}}
 	
+	//{{{ getParsedData() method
+	public static FactorParsedData getParsedData(View view)
+	{
+		SideKickParsedData data = SideKickParsedData.getParsedData(view);
+		if(data instanceof FactorParsedData)
+			return (FactorParsedData)data;
+		else
+			return null;
+	} //}}}
+
 	//{{{ evalInListener() method
 	public static void evalInListener(View view, String cmd)
 	{
@@ -214,14 +224,11 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static FactorWord lookupWord(View view, String word)
 	{
-		SideKickParsedData data = SideKickParsedData.getParsedData(view);
-		if(data instanceof FactorParsedData)
-		{
-			FactorParsedData fdata = (FactorParsedData)data;
-			return getExternalInstance().searchVocabulary(fdata.use,word);
-		}
-		else
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
 			return null;
+		else
+			return getExternalInstance().searchVocabulary(fdata.use,word);
 	} //}}}
 
 	//{{{ factorWord() method
@@ -230,18 +237,14 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static String factorWord(View view, String word)
 	{
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(data instanceof FactorParsedData)
-		{
-			FactorParsedData fdata = (FactorParsedData)data;
-			return "\""
-				+ FactorReader.charsToEscapes(word)
-				+ "\" " + FactorReader.unparseObject(fdata.use)
-				+ " search";
-		}
-		else
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
 			return null;
+
+		return "\""
+			+ FactorReader.charsToEscapes(word)
+			+ "\" " + FactorReader.unparseObject(fdata.use)
+			+ " search";
 	} //}}}
 
 	//{{{ factorWord() method
@@ -403,16 +406,14 @@ public class FactorPlugin extends EditPlugin
 	//{{{ isUsed() method
 	public static boolean isUsed(View view, String vocab)
 	{
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(data instanceof FactorParsedData)
+		FactorParsedData fdata = getParsedData(view);
+		if(fdata == null)
+			return false;
+		else
 		{
-			FactorParsedData fdata = (FactorParsedData)data;
 			Cons use = fdata.use;
 			return Cons.contains(use,vocab);
 		}
-		else
-			return false;
 	} //}}}
 
 	//{{{ findAllWordsNamed() method
@@ -514,9 +515,8 @@ public class FactorPlugin extends EditPlugin
 		if(selection == null)
 			selection = "";
 
-		SideKickParsedData data = SideKickParsedData
-			.getParsedData(view);
-		if(!(data instanceof FactorParsedData))
+		FactorParsedData data = getParsedData(view);
+		if(data == null)
 		{
 			view.getToolkit().beep();
 			return;
