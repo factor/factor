@@ -30,16 +30,20 @@ USE: ansi
 USE: combinators
 USE: compiler
 USE: errors
-USE: httpd-responder
+USE: inference
 USE: kernel
+USE: listener
 USE: lists
+USE: math
 USE: namespaces
 USE: parser
 USE: random
 USE: stack
 USE: streams
+USE: stdio
 USE: presentation
 USE: words
+USE: unparser
 
 : cli-args ( -- args ) 10 getenv ;
 
@@ -69,6 +73,31 @@ USE: words
 
     "ansi" get [ "stdio" get <ansi-stream> "stdio" set ] when
 
-    "compile" get [ init-compiler ] when
+    "compile" get [ compile-all ] when
 
     run-user-init ;
+
+[
+    warm-boot
+    "interactive" get [ init-listener ] when
+    0 exit*
+] set-boot
+
+init-error-handler
+
+0 [ drop succ ] each-word unparse write " words" print 
+
+"Inferring stack effects..." print
+[ 2 car ] [ ] catch
+0 [ unit try-infer [ succ ] when ] each-word
+unparse write " words have a stack effect" print
+
+"Bootstrapping is complete." print
+"Now, you can run ./f factor.image" print
+
+! Save a bit of space
+global [ "stdio" off ] bind
+
+garbage-collection
+"factor.image" save-image
+0 exit*

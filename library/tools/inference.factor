@@ -130,7 +130,7 @@ DEFER: (infer)
     call
     recursive-state uncons@ drop ;
 
-: infer-word ( word -- )
+: infer-compound ( word -- effect )
     #! Infer a word's stack effect, and cache it.
     [
         recursive-state get init-inference
@@ -145,11 +145,18 @@ DEFER: (infer)
 
 : apply-compound ( word -- )
     #! Infer a compound word's stack effect.
-    [
-        infer-word consume/produce
+    dup "inline" word-property [
+        inline-compound
     ] [
-        [ inline-compound ] when
-    ] catch ;
+        [
+            infer-compound consume/produce
+        ] [
+            [
+                dup t "inline" set-word-property
+                inline-compound
+            ] when
+        ] catch
+    ] ifte ;
 
 : apply-word ( word -- )
     #! Apply the word's stack effect to the inferencer state.

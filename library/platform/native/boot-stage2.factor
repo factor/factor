@@ -27,14 +27,10 @@
 
 IN: init
 USE: combinators
-USE: compiler
-USE: errors
 USE: kernel
 USE: lists
-USE: namespaces
 USE: parser
 USE: stack
-USE: strings
 USE: stdio
 
 "Cold boot in progress..." print
@@ -153,7 +149,6 @@ cpu "x86" = [
         "/library/compiler/generic.factor"
         "/library/compiler/stack.factor"
         "/library/compiler/interpret-only.factor"
-        "/library/compiler/compile-all.factor"
         "/library/compiler/alien-types.factor"
         "/library/compiler/alien-macros.factor"
         "/library/compiler/alien.factor"
@@ -174,31 +169,3 @@ cpu "x86" = [
 ] ifte
 
 "/library/platform/native/init-stage2.factor" dup print run-resource
-
-IN: init
-DEFER: warm-boot
-
-IN: compiler
-DEFER: compilable-words
-DEFER: compilable-word-list
-
-IN: listener
-DEFER: init-listener
-
-[
-    warm-boot
-    "interactive" get [ init-listener ] when
-    0 exit*
-] set-boot
-
-compilable-words compilable-word-list set
-
-"Bootstrapping is complete." print
-"Now, you can run ./f factor.image" print
-
-! Save a bit of space
-global [ "stdio" off ] bind
-
-garbage-collection
-"factor.image" save-image
-0 exit*

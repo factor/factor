@@ -4,7 +4,6 @@
 - type inference
 - some way to step over a word in the stepper
 - step: print NEXT word to execute, not word that JUST executed
-- once generic inference is done, can-compile is "has stack effect!"
 
 + compiler/ffi:
 
