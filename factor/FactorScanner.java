@@ -65,6 +65,11 @@ public class FactorScanner
 	 */
 	private int position = 0;
 
+	/**
+	 * Position of last word read.
+	 */
+	private int lastPosition = 0;
+
 	private ReadTable readtable;
 
 	/**
@@ -93,6 +98,12 @@ public class FactorScanner
 		this.readtable = readtable;
 	} //}}}
 
+	//{{{ getLine() method
+	public String getLine()
+	{
+		return line;
+	} //}}}
+
 	//{{{ getLineNumber() method
 	public int getLineNumber()
 	{
@@ -103,6 +114,12 @@ public class FactorScanner
 	public int getColumnNumber()
 	{
 		return position;
+	} //}}}
+
+	//{{{ getLastColumnNumber() method
+	public int getLastColumnNumber()
+	{
+		return lastPosition;
 	} //}}}
 
 	//{{{ getFileName() method
@@ -117,6 +134,7 @@ public class FactorScanner
 		lineNo++;
 		line = in.readLine();
 		position = 0;
+		lastPosition = 0;
 		if(line != null && line.length() == 0)
 			nextLine();
 	} //}}}
@@ -178,6 +196,8 @@ public class FactorScanner
 		if(position == line.length())
 			return EOL;
 
+		lastPosition = position;
+
 		for(;;)
 		{
 			if(position >= line.length())
@@ -201,6 +221,7 @@ public class FactorScanner
 			case ReadTable.WHITESPACE:
 				if(buf.length() != 0)
 					return word(readNumbers,base);
+				lastPosition = position;
 				break;
 			case ReadTable.DISPATCH:
 				// note that s" is read as the word s", no

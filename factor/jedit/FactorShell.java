@@ -78,13 +78,17 @@ public class FactorShell extends Shell
 	 */
 	public void printPrompt(Console console, Output output)
 	{
+		ConsoleState state = null;
 		try
 		{
-			getConsoleState(console).packetLoop(output);
+			state = getConsoleState(console);
+			state.packetLoop(output);
 		}
 		catch(Exception e)
 		{
 			output.print(console.getErrorColor(),e.toString());
+			if(state != null)
+				state.closeStream();
 			Log.log(Log.ERROR,this,e);
 		}
 	} //}}}
@@ -102,13 +106,17 @@ public class FactorShell extends Shell
 	public void execute(Console console, String input,
 		Output output, Output error, String command)
 	{
+		ConsoleState state = null;
 		try
 		{
-			getConsoleState(console).readResponse(output,command);
+			state = getConsoleState(console);
+			state.readResponse(command,output);
 		}
 		catch(Exception e)
 		{
 			output.print(console.getErrorColor(),e.toString());
+			if(state != null)
+				state.closeStream();
 			Log.log(Log.ERROR,this,e);
 		}
 		finally
@@ -124,6 +132,20 @@ public class FactorShell extends Shell
 	 */
 	public void stop(Console console)
 	{
+	} //}}}
+
+	//{{{ openStreams() method
+	/**
+	 * Open all listener connections. Should be called after Factor is restarted.
+	 */
+	public void openStreams()
+	{
+		Iterator iter = consoles.values().iterator();
+		while(iter.hasNext())
+		{
+			ConsoleState state = (ConsoleState)iter.next();
+			state.openStream();
+		}
 	} //}}}
 
 	//{{{ closeStreams() method
@@ -162,21 +184,40 @@ public class FactorShell extends Shell
 	class ConsoleState
 	{
 		private Console console;
+		private Output output;
 		private FactorStream stream;
 		private boolean waitingForInput;
 		
 		ConsoleState(Console console)
 		{
 			this.console = console;
+			this.output = console.getShellState(FactorShell.this);
 		}
 
-		void openStream(Output output) throws Exception
+		void openStream()
 		{
+			if(stream != null)
+				return;
+
+			output.print(console.getInfoColor(),
+				jEdit.getProperty("factor.shell.opening"));
+
+			stream = FactorPlugin.getExternalInstance().openStream();
 			if(stream == null)
 			{
 				output.print(console.getInfoColor(),
-					jEdit.getProperty("factor.shell.opening"));
-				stream = FactorPlugin.getExternalInstance().openStream();
+					jEdit.getProperty("factor.shell.no-connection"));
+			}
+			else
+			{
+				try
+				{
+					packetLoop(output);
+				}
+				catch(Exception e)
+				{
+					Log.log(Log.ERROR,this,e);
+				}
 			}
 		}
 
@@ -187,7 +228,7 @@ public class FactorShell extends Shell
 				if(stream != null)
 				{
 					waitingForInput = false;
-					console.print(console.getInfoColor(),
+					output.print(console.getInfoColor(),
 						jEdit.getProperty("factor.shell.closing"));
 					stream.close();
 				}
@@ -218,7 +259,10 @@ public class FactorShell extends Shell
 			if(waitingForInput)
 				return;
 
-			openStream(output);
+			openStream();
+
+			if(stream == null)
+				return;
 
 			for(;;)
 			{
@@ -239,11 +283,14 @@ public class FactorShell extends Shell
 			}
 		}
 
-		void readResponse(Output output, String command) throws Exception
+		void readResponse(String command, Output output) throws Exception
 		{
 			if(waitingForInput)
 			{
-				openStream(output);
+				openStream();
+
+				if(stream == null)
+					return;
 
 				stream.readResponse(command);
 				waitingForInput = false;
@@ -251,7 +298,7 @@ public class FactorShell extends Shell
 			}
 			else
 			{
-				console.print(console.getErrorColor(),
+				output.print(console.getErrorColor(),
 					jEdit.getProperty("factor.shell.not-waiting"));
 			}
 		}

@@ -76,6 +76,9 @@ public class WordPreview implements ActionListener, CaretListener
 	{
 		try
 		{
+			if(FactorPlugin.getExternalInstance().isClosed())
+				return;
+
 			showPreview();
 		}
 		catch(IOException e)

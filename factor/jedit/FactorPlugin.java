@@ -35,6 +35,7 @@ import java.util.*;
 import org.gjt.sp.jedit.gui.*;
 import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
+import org.gjt.sp.util.Log;
 import console.*;
 import sidekick.*;
 
@@ -80,36 +81,54 @@ public class FactorPlugin extends EditPlugin
 	 * It will start the interpreter if it's not already running.
 	 */
 	public synchronized static ExternalFactor getExternalInstance()
-		throws IOException, UnsupportedEncodingException
 	{
 		if(external == null)
 		{
-			String[] args = jEdit.getProperty("factor.external.args","-jedit")
-				.split(" ");
-			String[] nargs = new String[args.length + 3];
-			nargs[0] = jEdit.getProperty("factor.external.program");
-			nargs[1] = jEdit.getProperty("factor.external.image");
-			nargs[2] = "-no-ansi";
-			System.arraycopy(args,0,nargs,3,args.length);
-			Process p = Runtime.getRuntime().exec(nargs);
-			p.getErrorStream().close();
+			Process p = null;
+			InputStream in = null;
+			OutputStream out = null;
 
-			external = new ExternalFactor(
-				p.getInputStream(),
-				p.getOutputStream());
+			try
+			{
+				String[] args = jEdit.getProperty("factor.external.args","-jedit")
+					.split(" ");
+				String[] nargs = new String[args.length + 3];
+				nargs[0] = jEdit.getProperty("factor.external.program");
+				nargs[1] = jEdit.getProperty("factor.external.image");
+				nargs[2] = "-no-ansi";
+				System.arraycopy(args,0,nargs,3,args.length);
+				p = Runtime.getRuntime().exec(nargs);
+				p.getErrorStream().close();
+
+				in = p.getInputStream();
+				out = p.getOutputStream();
+			}
+			catch(IOException io)
+			{
+				Log.log(Log.ERROR,FactorPlugin.class,
+					"Cannot start external Factor:");
+				Log.log(Log.ERROR,FactorPlugin.class,io);
+			}
+
+			external = new ExternalFactor(p,in,out);
 		}
 
 		return external;
 	} //}}}
 
+	//{{{ getFactorShell() method
+	public static FactorShell getFactorShell()
+	{
+		return ((FactorShell)ServiceManager.getService("console.Shell","Factor"));
+	} //}}}
+
 	//{{{ stopExternalInstance() method
 	/**
-	 * Stops the external interpreter. It will probably be restarted soon after.
+	 * Stops the external interpreter.
 	 */
 	public static void stopExternalInstance()
 	{
-		((FactorShell)ServiceManager.getService("console.Shell","Factor"))
-			.closeStreams();
+		getFactorShell().closeStreams();
 
 		if(external != null)
 		{
@@ -118,6 +137,17 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 	
+	//{{{ restartExternalInstance() method
+	/**
+	 * Restart the external interpreter.
+	 */
+	public static void restartExternalInstance()
+	{
+		stopExternalInstance();
+		getExternalInstance();
+		FactorPlugin.getFactorShell().openStreams();
+	} //}}}
+
 	//{{{ getSideKickParser() method
 	public static FactorSideKickParser getSideKickParser()
 	{

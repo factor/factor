@@ -323,4 +323,4 @@ SYMBOL: event
 factoroids
 
 ! Currently the plugin doesn't handle GENERIC: and M:, so we
-! disable the parser. too many errors :sidekick.parser=none:
+! disable the parser. too many errors :sidekick.parser=factor:

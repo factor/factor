@@ -48,8 +48,16 @@ public class RestartableFactorScanner extends FactorScanner
 	//{{{ error() method
 	public void error(String msg) throws FactorParseException
 	{
+		String line = getLine();
+		int col = getColumnNumber();
+		if(getReadTable().getCharacterType(line.charAt(col - 1))
+			== ReadTable.WHITESPACE)
+		{
+			col--;
+		}
+
 		errors.addError(ErrorSource.ERROR,getFileName(),
 			/* Factor line #'s are 1-indexed */
-			getLineNumber() - 1,0,0,msg);
+			getLineNumber() - 1,getLastColumnNumber(),col,msg);
 	} //}}}
 }

@@ -43,20 +43,36 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	/**
 	 * We are given two streams that point to a bare REPL.
 	 */
-	public ExternalFactor(InputStream in, OutputStream out)
-		throws IOException
+	public ExternalFactor(Process proc, InputStream in, OutputStream out)
 	{
-		this.in = new DataInputStream(in);
-		this.out = new DataOutputStream(out);
+		if(proc == null || in == null || out == null)
+			closed = true;
+		else
+		{
+			this.proc = proc;
 
-		out.write("USE: jedit wire-server\n".getBytes("ASCII"));
-		out.flush();
+			try
+			{
+				this.in = new DataInputStream(in);
+				this.out = new DataOutputStream(out);
 
-		waitForAck();
+				out.write("USE: jedit wire-server\n".getBytes("ASCII"));
+				out.flush();
 
-		/* Start stream server */
-		streamServer = 9999;
-		eval("USE: telnetd [ 9999 telnetd ] in-thread");
+				waitForAck();
+
+				/* Start stream server */
+				streamServer = 9999;
+				eval("USE: telnetd [ 9999 telnetd ] in-thread");
+
+				/* Ensure we're ready for a connection immediately */
+				eval("nop");
+			}
+			catch(IOException e)
+			{
+				close();
+			}
+		}
 	} //}}}
 
 	//{{{ waitForAck() method
@@ -90,51 +106,75 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized String eval(String cmd) throws IOException
 	{
-		/* Log.log(Log.DEBUG,ExternalFactor.class,"SEND: " + cmd); */
-
-		waitForAck();
-
-		sendEval(cmd);
-
-		int responseLength = in.readInt();
-		byte[] response = new byte[responseLength];
-		in.readFully(response);
-		
-		String responseStr = new String(response,"ASCII");
-		/* Log.log(Log.DEBUG,ExternalFactor.class,"RECV: " + responseStr); */
-		return responseStr;
+		try
+		{
+			waitForAck();
+	
+			sendEval(cmd);
+	
+			int responseLength = in.readInt();
+			byte[] response = new byte[responseLength];
+			in.readFully(response);
+			
+			String responseStr = new String(response,"ASCII");
+			return responseStr;
+		}
+		catch(IOException e)
+		{
+			close();
+			throw e;
+		}
 	} //}}}
 
 	//{{{ openStream() method
 	/**
 	 * Return a listener stream.
 	 */
-	public FactorStream openStream() throws IOException
+	public FactorStream openStream()
 	{
-		Socket client = new Socket("localhost",streamServer);
-		return new FactorStream(client);
+		if(closed)
+			return null;
+		else
+		{
+			try
+			{
+				Socket client = new Socket("localhost",streamServer);
+				return new FactorStream(client);
+			}
+			catch(Exception e)
+			{
+				Log.log(Log.ERROR,this,"Cannot open stream connection to "
+					+ "external Factor:");
+				Log.log(Log.ERROR,this,e);
+				return null;
+			}
+		}
 	} //}}}
 
 	//{{{ getVocabularies() method
-	public Cons getVocabularies()
+	public synchronized Cons getVocabularies()
 	{
 		Cons vocabs = super.getVocabularies();
 
 		try
 		{
-			Cons moreVocabs = (Cons)parseObject(eval("vocabs.")).car;
-			while(moreVocabs != null)
+			if(!closed)
 			{
-				String vocab = (String)moreVocabs.car;
-				if(!Cons.contains(vocabs,vocab))
-					vocabs = new Cons(vocab,vocabs);
-				moreVocabs = moreVocabs.next();
+				Cons moreVocabs = (Cons)parseObject(eval("vocabs.")).car;
+				while(moreVocabs != null)
+				{
+					String vocab = (String)moreVocabs.car;
+					if(!Cons.contains(vocabs,vocab))
+						vocabs = new Cons(vocab,vocabs);
+					moreVocabs = moreVocabs.next();
+				}
 			}
 		}
 		catch(Exception e)
 		{
 			Log.log(Log.ERROR,this,e);
 		}
+
 		return vocabs;
 	} //}}}
 
@@ -142,7 +182,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	/**
 	 * Search through the given vocabulary list for the given word.
 	 */
-	public FactorWord searchVocabulary(Cons vocabulary, String name)
+	public synchronized FactorWord searchVocabulary(Cons vocabulary, String name)
 	{
 		FactorWord w = super.searchVocabulary(vocabulary,name);
 		if(w != null)
@@ -150,32 +190,39 @@ public class ExternalFactor extends DefaultVocabularyLookup
 
 		try
 		{
-			Cons result = parseObject(eval(FactorReader.unparseObject(name)
-				+ " "
-				+ FactorReader.unparseObject(vocabulary)
-				+ " jedit-lookup ."));
-			if(result.car == null)
-				return null;
-
-			result = (Cons)result.car;
-			w = new FactorWord(
-				(String)result.car,
-				(String)result.next().car);
-			w.stackEffect = (String)result.next().next().car;
-			return w;
+			if(!closed)
+			{
+				Cons result = parseObject(eval(FactorReader.unparseObject(name)
+					+ " "
+					+ FactorReader.unparseObject(vocabulary)
+					+ " jedit-lookup ."));
+				if(result.car == null)
+					return null;
+	
+				result = (Cons)result.car;
+				w = new FactorWord(
+					(String)result.car,
+					(String)result.next().car);
+				w.stackEffect = (String)result.next().next().car;
+				return w;
+			}
 		}
 		catch(Exception e)
 		{
 			Log.log(Log.ERROR,this,e);
-			return null;
 		}
+
+		return new FactorWord("unknown",name);
 	} //}}}
 
 	//{{{ getCompletions() method
-	public void getCompletions(String vocab, String word, Set completions,
+	public synchronized void getCompletions(String vocab, String word, Set completions,
 		boolean anywhere)
 	{
 		super.getCompletions(vocab,word,completions,anywhere);
+
+		if(closed)
+			return;
 
 		try
 		{
@@ -212,6 +259,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized void close()
 	{
+		if(closed)
+			return;
+
+		closed = true;
+
 		try
 		{
 			/* don't care about response */
@@ -225,6 +277,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		
 		try
 		{
+			proc.waitFor();
 			in.close();
 			out.close();
 		}
@@ -233,9 +286,22 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			// We don't care...
 			Log.log(Log.DEBUG,this,e);
 		}
+
+		proc = null;
+		in = null;
+		out = null;
+	} //}}}
+
+	//{{{ isClosed() method
+	public boolean isClosed()
+	{
+		return closed;
 	} //}}}
 
 	//{{{ Private members
+	private boolean closed;
+
+	private Process proc;
 	private DataInputStream in;
 	private DataOutputStream out;
 	

@@ -70,10 +70,6 @@ DEFER: vector-map
     #! Shallow copy of a vector.
     [ ] vector-map ;
 
-: ?vector= ( n vec vec -- ? )
-    #! Reached end?
-    drop vector-length number= ;
-
 : vector-length= ( vec vec -- ? )
     vector-length swap vector-length number= ;
 

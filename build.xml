@@ -24,7 +24,7 @@
 
 	<target name="dist" depends="compile">
 		<jar
-			jarfile="Factor.jar"
+			jarfile="../Factor.jar"
 			compress="true"
 		>
 			<fileset dir=".">
@@ -40,10 +40,6 @@
 				<include name="doc/*.html"/>
 			</fileset>
 		</jar>
-	</target>
-
-	<target name="dist-jedit" depends="dist">
-		<copy file="Factor.jar" tofile="../Factor.jar" />
 	</target>
 
 	<target name="clean" description="Clean old stuff.">

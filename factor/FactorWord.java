@@ -29,11 +29,6 @@
 
 package factor;
 
-import java.util.*;
-
-/**
- * An internalized symbol.
- */
 public class FactorWord implements FactorExternalizable
 {
 	public String vocabulary;
@@ -47,7 +42,7 @@ public class FactorWord implements FactorExternalizable
 	public FactorParsingDefinition parsing;
 
 	/**
-	 * Stub for interpreter definitin.
+	 * Stub for interpreter definition.
 	 */
 	public FactorWordDefinition def;
 

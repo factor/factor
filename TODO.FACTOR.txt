@@ -41,7 +41,6 @@
 - errors don't always disappear
 - console: wrong history
 - listener: if too many things popped off the stack, complain
-- gracefully handle non-working cfactor
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
