@@ -28,6 +28,7 @@
 IN: vectors
 USE: combinators
 USE: kernel
+USE: lists
 USE: logic
 USE: math
 USE: stack
@@ -57,3 +58,26 @@ USE: stack
 : vector-append ( v1 v2 -- )
     #! Destructively append v2 to v1.
     [ over vector-push ] vector-each drop ;
+
+: vector-collect ( n quot -- accum )
+    #! Execute the quotation n times, passing the loop counter
+    #! the quotation, and collect results in a new vector.
+    over <vector> rot [
+        -rot 2dup >r >r slip vector-push r> r>
+    ] times* nip ;
+
+: vector-zip ( v1 v2 -- v )
+    #! Make a new vector with each pair of elements from the
+    #! first two in a pair.
+    over vector-length [
+        pick pick 2vector-nth cons
+    ] vector-collect nip nip ;
+
+: vector-2map ( v1 v2 quot -- v )
+    #! Apply a quotation with stack effect ( obj obj -- obj ) to
+    #! each pair of elements from v1 and v2, collecting them
+    #! into a new list. Behavior is undefined if vector lengths
+    #! differ.
+    -rot vector-zip [
+        swap dup >r >r uncons r> call r> swap
+    ] vector-map nip ;

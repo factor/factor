@@ -53,19 +53,19 @@ SYMBOL: r-in
 
 : inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    >r dup d-in +@ gensym-vector dup r> vector-append ;
+    >r gensym-vector dup r> vector-append ;
 
-: ensure ( count stack -- stack )
+: ensure ( count stack -- count stack )
     #! Ensure stack has this many elements.
     2dup vector-length > [
-        [ vector-length - ] keep inputs
+        [ vector-length - dup ] keep inputs
     ] [
-        nip
+        >r drop 0 r>
     ] ifte ;
 
 : ensure-d ( count -- )
     #! Ensure count of unknown results are on the stack.
-    meta-d get ensure meta-d set ;
+    meta-d get ensure meta-d set  d-in +@ ;
 
 : consume-d ( count -- )
     #! Remove count of elements.
@@ -76,6 +76,10 @@ SYMBOL: r-in
     [ gensym push-d ] times ;
 
 : standard-effect ( word [ in | out ] -- )
+    #! If a word does not have special inference behavior, we
+    #! either execute the word in the meta interpreter (if it is
+    #! side-effect-free and all parameters are literal), or
+    #! simply apply its stack effect to the meta-interpreter.
     over "meta-infer" word-property [
         drop host-word
     ] [
@@ -118,35 +122,61 @@ DEFER: (infer)
     d-in get meta-d get vector-length cons ;
 
 : (infer) ( quot -- )
+    #! Recursive calls to this word are made for nested
+    #! quotations.
     [ dup word? [ apply-word ] [ push-d ] ifte ] each ;
 
 : infer ( quot -- [ in | out ] )
     #! Stack effect of a quotation.
     [ init-inference (infer)  effect ] with-scope ;
 
-: infer-branch ( quot -- [ in-d |  datastack ] )
+: infer-branch ( quot -- [ in-d | datastack ] )
+    #! Infer the quotation's effect, restoring the meta
+    #! interpreter state afterwards.
     [
         copy-interpreter (infer)
         d-in get  meta-d get cons
     ] with-scope ;
 
 : difference ( [ in | stack ] -- diff )
+    #! Stack height difference of infer-branch return value.
     uncons vector-length - ;
 
 : balanced? ( [ in | stack ] [ in | stack ] -- ? )
+    #! Check if two stack effects preserve stack height.
     difference swap difference = ;
 
+: max-vector-length ( vector vector -- length )
+    swap vector-length swap vector-length max ;
+
+: unify-lengths ( stack stack -- stack stack )
+    #! If one vector is shorter, pad it with unknown results at
+    #! the bottom.
+    2dup max-vector-length
+    tuck swap ensure nip >r swap ensure nip r> ;
+
+: unify-result ( obj obj -- obj )
+    #! Replace values with unknown result if they differ,
+    #! otherwise retain them.
+    2dup = [ drop ] [ 2drop gensym ] ifte ;
+
 : unify-stacks ( stack stack -- stack )
-    swap vector-length swap vector-length max gensym-vector ;
+    #! Replace differing literals in stacks with unknown
+    #! results.
+    unify-lengths [ unify-result ] vector-2map ;
 
 : unify ( [ in | stack ] [ in | stack ] -- )
+    #! Unify meta-interpreter state from two branches.
     2dup balanced? [
-        2dup 2car max d-in set 2cdr unify-stacks meta-d set
+        2dup
+        2car max d-in set
+        2cdr unify-stacks meta-d set
     ] [
         "Unbalanced ifte branches" throw
     ] ifte ;
 
 : infer-ifte ( -- )
+    #! Infer effects for both branches, unify.
     pop-d pop-d pop-d  drop ( condition )
     >r infer-branch r> infer-branch unify ;
 

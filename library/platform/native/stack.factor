@@ -37,6 +37,7 @@ USE: vectors
 : dupd ( x y -- x x y ) >r dup r> ;
 : swapd ( x y z -- y x z ) >r swap r> ;
 : transp ( x y z -- z y x ) swap rot ;
+: 2swap ( x y z t -- z t x y ) rot >r rot r> ;
 
 : clear ( -- )
     #! Clear the datastack. For interactive use only; invoking

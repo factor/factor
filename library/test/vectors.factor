@@ -35,3 +35,11 @@ USE: vectors
 
 [ { 1 2 3 4 5 6 } ]
 [ { 1 2 3 } vector-clone dup { 4 5 6 } vector-append ] unit-test
+
+[ { 6 8 10 12 } ]
+[ { 1 2 3 4 } { 5 6 7 8 } [ + ] vector-2map ]
+unit-test
+
+[ { [ 1 | 5 ] [ 2 | 6 ] [ 3 | 7 ] [ 4 | 8 ] } ]
+[ { 1 2 3 4 } { 5 6 7 8 } vector-zip ]
+unit-test

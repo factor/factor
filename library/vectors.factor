@@ -31,6 +31,9 @@ USE: lists
 USE: math
 USE: stack
 
+: 2vector-nth ( n vec vec -- obj obj )
+    >r over >r vector-nth r> r> vector-nth ;
+
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike
     #! <vector>, which gives an empty vector with a certain

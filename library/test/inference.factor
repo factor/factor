@@ -5,8 +5,16 @@ USE: math
 USE: stack
 USE: combinators
 USE: vectors
+USE: kernel
 
 [ 6 ] [ 6 gensym-vector vector-length ] unit-test
+
+[ t ] [
+    { 1 2 } { 1 2 3 } 
+    unify-lengths swap vector-length swap vector-length =
+] unit-test
+
+[ [ sq ] ] [ [ sq ] [ sq ] unify-result ] unit-test
 
 [ [ 0 | 2 ] ] [ [ 2 "Hello" ] infer ] unit-test
 [ [ 1 | 2 ] ] [ [ dup ] infer ] unit-test
@@ -41,3 +49,11 @@ USE: vectors
 
 [ [ 1 | 0 ] ] [ [ [ drop ] when* ] infer ] unit-test
 [ [ 1 | 1 ] ] [ [ [ { { [ ] } } ] unless* ] infer ] unit-test
+
+[ [ 0 | 1 ] ] [
+    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer
+] unit-test
+
+[
+    [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] ifte call
+] unit-test-fails
