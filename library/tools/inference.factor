@@ -104,7 +104,7 @@ DEFER: (infer)
         drop dup compound? [
             word-parameter (infer)
         ] [
-            drop no-effect
+            no-effect
         ] ifte
     ] ifte ;
 
@@ -124,22 +124,26 @@ DEFER: (infer)
     #! Stack effect of a quotation.
     [ init-inference (infer)  effect ] with-scope ;
 
-: infer-branch ( quot -- in-d datastack )
+: infer-branch ( quot -- [ in-d |  datastack ] )
     [
         copy-interpreter (infer)
-        d-in get  meta-d get
+        d-in get  meta-d get cons
     ] with-scope ;
 
-: unify ( in stack in stack -- )
-    swapd 2dup vector-length= [
-        drop meta-d set
-        2dup = [
-            drop d-in set
-        ] [
-            "Unbalanced ifte inputs" throw
-        ] ifte
+: difference ( [ in | stack ] -- diff )
+    uncons vector-length - ;
+
+: balanced? ( [ in | stack ] [ in | stack ] -- ? )
+    difference swap difference = ;
+
+: unify-stacks ( stack stack -- stack )
+    swap vector-length swap vector-length max gensym-vector ;
+
+: unify ( [ in | stack ] [ in | stack ] -- )
+    2dup balanced? [
+        2dup 2car max d-in set 2cdr unify-stacks meta-d set
     ] [
-        "Unbalanced ifte outputs" throw
+        "Unbalanced ifte branches" throw
     ] ifte ;
 
 : infer-ifte ( -- )
@@ -171,6 +175,10 @@ DEFER: (infer)
 \ swap [ 2 | 2 ] "infer-effect" set-word-property
 \ rot t "meta-infer" set-word-property
 \ rot [ 3 | 3 ] "infer-effect" set-word-property
+
+\ fixnum+ [ 2 | 1 ] "infer-effect" set-word-property
+\ fixnum- [ 2 | 1 ] "infer-effect" set-word-property
+\ fixnum* [ 2 | 1 ] "infer-effect" set-word-property
 
 \ vector-nth [ 2 | 1 ] "infer-effect" set-word-property
 \ set-vector-nth [ 3 | 0 ] "infer-effect" set-word-property

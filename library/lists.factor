@@ -205,14 +205,15 @@ DEFER: tree-contains?
 : count ( n -- [ 0 ... n-1 ] )
     [ ] (count) ;
 
-: car= swap car swap car = ;
-: cdr= swap cdr swap cdr = ;
-
 : cons= ( obj cons -- ? )
     2dup eq? [
         2drop t
     ] [
-        over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte
+        over cons? [
+            2dup 2car = >r 2cdr = r> and
+        ] [
+            2drop f
+        ] ifte
     ] ifte ;
 
 : (cons-hashcode) ( cons count -- hash )

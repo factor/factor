@@ -43,3 +43,9 @@ IN: lists USE: kernel USE: stack
 : unswons ( [ car | cdr ] -- cdr car )
     #! Push both the head and tail of a list.
     dup cdr swap car ; inline
+
+: 2car ( cons cons -- car car )
+    swap car swap car ;
+
+: 2cdr ( cons cons -- car car )
+    swap cdr swap cdr ;

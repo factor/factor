@@ -1,6 +1,7 @@
 IN: scratchpad
 USE: test
 USE: inference
+USE: math
 USE: stack
 USE: combinators
 USE: vectors
@@ -33,3 +34,10 @@ USE: vectors
         ] ifte
     ] infer
 ] unit-test
+
+[ [ 1 | 1 ] ] [ [ dup [ ] when ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ dup [ dup fixnum* ] when ] infer ] unit-test
+[ [ 2 | 1 ] ] [ [ [ dup fixnum* ] when ] infer ] unit-test
+
+[ [ 1 | 0 ] ] [ [ [ drop ] when* ] infer ] unit-test
+[ [ 1 | 1 ] ] [ [ [ { { [ ] } } ] unless* ] infer ] unit-test
