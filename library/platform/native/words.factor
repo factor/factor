@@ -49,10 +49,9 @@ USE: vocabularies
 : primitive? ( obj -- ? )
     dup word? [ word-primitive 1 = not ] [ drop f ] ifte ;
 
-! Needed to make the prettyprinter work in the native and Java
-! factors.
-
+! Various features not supported by native Factor.
 : comment? drop f ;
+: worddef>list word-parameter ;
 
 ! Bad idea
 

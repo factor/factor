@@ -42,7 +42,11 @@ USE: vocabularies
 : fixnum% ( num -- )
     base /mod swap dup 0 > [ fixnum% ] [ drop ] ifte >digit % ;
 
-: fixnum>str ( num -- str ) <% fixnum% %> ;
+: fixnum- ( num -- num )
+    dup 0 < [ "-" % neg ] when ;
+
+: fixnum>str ( num -- str )
+    <% fixnum- fixnum% %> ;
 
 : unparse-str ( str -- str )
     #! Not done

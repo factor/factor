@@ -47,10 +47,10 @@ USE: words
 : usages-in-vocab ( of vocab -- usages )
     #! Push a list of all usages of a word in a vocabulary.
     words [
-        dup worddef [
+        dup defined? [
             dupd word-uses?
         ] [
-            drop f ! Ignore words without a definition, like parsing words
+            drop f ! Ignore words without a definition
         ] ifte
     ] subset nip ;
 
@@ -64,7 +64,7 @@ USE: words
 
 : usages. ( word -- )
     #! List all usages of a word in all vocabularies.
-    search vocabs [ dupd usages-in-vocab. ] each drop ;
+    intern vocabs [ dupd usages-in-vocab. ] each drop ;
 
 : vocabs. ( -- )
     #! List vocabularies.
@@ -74,22 +74,22 @@ USE: words
     #! List a vocabulary.
     "vocabularies'" swap cat2 describe-object-path ;
 
-: (vocab-apropos) ( substring vocab -- list )
+: vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
     words [ dupd str-contains? ] subset nip ;
 
-: vocab-apropos ( substring vocab -- )
+: vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.
-    tuck (vocab-apropos) dup [
+    tuck vocab-apropos dup [
         "IN: " write swap print [.]
     ] [
         2drop
     ] ifte ;
 
-: apropos ( substring -- )
+: apropos. ( substring -- )
     #! List all words that contain a string.
-    vocabs [ dupd vocab-apropos ] each drop ;
+    vocabs [ dupd vocab-apropos. ] each drop ;
 
 : in. ( -- )
     #! Print the vocabulary where new words are added in

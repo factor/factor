@@ -68,3 +68,5 @@ test-word
 [ "test-shuffle-3" ]
 [ worddef>list ]
 test-word
+
+"car" usages.

@@ -45,12 +45,24 @@ USE: unparser
 : set-base "base" set ;
 : digit? #\0 #\9 between? ;
 : >digit #\0 + ;
-: digit> dup digit? [ #\0 - ] [ "Not a number" throw ] ifte ;
+: not-a-number "Not a number" throw ;
+: digit> dup digit? [ #\0 - ] [ not-a-number ] ifte ;
 : digit ( num digit -- num ) >r base * r> + ;
+
+: (str>fixnum) ( str -- num )
+    0 swap [ digit> digit ] str-each ;
 
 : str>fixnum ( str -- num )
     #! Parse a string representation of an integer.
-    0 swap [ digit> digit ] str-each ;
+    dup str-length 0 = [
+        drop not-a-number
+    ] [
+        dup "-" str-head? dup [
+            nip str>fixnum neg
+        ] [
+            drop (str>fixnum)
+        ] ifte
+    ] ifte ;
 
 ! The parser uses a number of variables:
 ! line - the line being parsed

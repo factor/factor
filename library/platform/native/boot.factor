@@ -56,6 +56,7 @@ primitives,
     "/library/hashtables.factor"
     "/library/init.factor"
     "/library/inspector.factor"
+    "/library/inspect-vocabularies.factor"
     "/library/interpreter.factor"
     "/library/list-namespaces.factor"
     "/library/logging.factor"
@@ -99,6 +100,7 @@ primitives,
     max 2list length reverse nth list? 2rlist
     all? clone-list clone-list-iter subset subset-iter
     subset-add car= cdr= cons= cons-hashcode
+    tree-contains? =-or-contains?
 ] [ worddef worddef, ] each
 
 version,

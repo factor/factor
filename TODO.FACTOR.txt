@@ -1,12 +1,12 @@
 + native:
 
-- parsing: -1, HEX:, #\, |
+- parsing: HEX:, #\, |
 - minimal use/in for parse-stream
 - prettyprint-1
 - {...} vectors
 - parsing should be parsing
 - telnetd: listening on a socket
-- vocab inspecting ==> worddef>list, assumes . on a list works
+- apropos
 - need hashtable inspection too
 - describe-word
 - clone-sbuf
@@ -51,7 +51,6 @@
 
 - should i -i inf -inf be parsing words?
 - fix multithreading
-- errors at startup not handled properly
 - namespace clone drops static var bindings
 - ditch map
 - ditch expand
