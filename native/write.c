@@ -3,7 +3,7 @@
 /* Return true if write was done */
 void write_step(PORT* port)
 {
-	char* chars = (char*)port->buffer + sizeof(STRING);
+	BYTE* chars = (BYTE*)port->buffer + sizeof(STRING);
 
 	FIXNUM amount = write(port->fd,chars + port->buf_pos,
 		port->buf_fill - port->buf_pos);
@@ -70,7 +70,7 @@ bool perform_write_io_task(PORT* port)
 
 void write_char_8(PORT* port, FIXNUM ch)
 {
-	char c = (char)ch;
+	BYTE c = (BYTE)ch;
 
 	pending_io_error(port);
 
@@ -82,7 +82,7 @@ void write_char_8(PORT* port, FIXNUM ch)
 }
 
 /* Caller must ensure buffer is of the right size. */
-void write_string_raw(PORT* port, char* str, CELL len)
+void write_string_raw(PORT* port, BYTE* str, CELL len)
 {
 	/* Append string to buffer */
 	memcpy((void*)((CELL)port->buffer + sizeof(STRING)
@@ -93,7 +93,7 @@ void write_string_raw(PORT* port, char* str, CELL len)
 
 void write_string_8(PORT* port, STRING* str)
 {
-	char* c_str;
+	BYTE* c_str;
 	
 	pending_io_error(port);
 

@@ -33,6 +33,9 @@ typedef unsigned long int CELL;
 typedef unsigned short CHAR;
 #define CHARS ((signed)sizeof(CHAR))
 
+/* must always be 8 bits */
+typedef unsigned char BYTE;
+
 /* Memory heap size */
 #define DEFAULT_ARENA (5 * 1024 * 1024)
 

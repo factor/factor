@@ -55,14 +55,14 @@ INLINE void cput(CELL where, CHAR what)
 	*((CHAR*)where) = what;
 }
 
-INLINE char bget(CELL where)
+INLINE BYTE bget(CELL where)
 {
-	return *((char*)where);
+	return *((BYTE*)where);
 }
 
-INLINE void bput(CELL where, char what)
+INLINE void bput(CELL where, BYTE what)
 {
-	*((char*)where) = what;
+	*((BYTE*)where) = what;
 }
 
 bool in_zone(ZONE* z, CELL pointer);

@@ -42,7 +42,7 @@ bool read_step(PORT* port)
 bool read_line_step(PORT* port)
 {
 	int i;
-	char ch;
+	BYTE ch;
 
 	SBUF* line = untag_sbuf(port->line);
 
@@ -158,7 +158,7 @@ void primitive_read_line_8(void)
 bool read_count_step(PORT* port)
 {
 	int i;
-	char ch;
+	BYTE ch;
 
 	SBUF* line = untag_sbuf(port->line);
 

@@ -54,7 +54,7 @@ STRING* grow_string(STRING* string, FIXNUM capacity, CHAR fill)
 }
 
 /* untagged */
-STRING* from_c_string(const char* c_string)
+STRING* from_c_string(const BYTE* c_string)
 {
 	CELL length = strlen(c_string);
 	STRING* s = allot_string(length);
@@ -72,12 +72,12 @@ STRING* from_c_string(const char* c_string)
 }
 
 /* untagged */
-char* to_c_string(STRING* s)
+BYTE* to_c_string(STRING* s)
 {
 	STRING* _c_str = allot_string(s->capacity / CHARS + 1);
 	CELL i;
 
-	char* c_str = (char*)(_c_str + 1);
+	BYTE* c_str = (BYTE*)(_c_str + 1);
 	
 	for(i = 0; i < s->capacity; i++)
 		c_str[i] = string_nth(s,i);

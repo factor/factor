@@ -92,7 +92,7 @@ bool perform_copy_from_io_task(PORT* port, PORT* other_port)
 	if(can_write(other_port,port->buf_fill))
 	{
 		write_string_raw(other_port,
-			(char*)(port->buffer + 1),
+			(BYTE*)(port->buffer + 1),
 			port->buf_fill);
 		port->buf_pos = port->buf_fill = 0;
 	}
