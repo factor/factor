@@ -46,6 +46,7 @@ typedef unsigned char BYTE;
 #include "fixnum.h"
 #include "bignum.h"
 #include "ratio.h"
+#include "float.h"
 #include "arithmetic.h"
 #include "misc.h"
 #include "string.h"

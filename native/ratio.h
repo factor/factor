@@ -24,6 +24,7 @@ CELL add_ratio(CELL x, CELL y);
 CELL subtract_ratio(CELL x, CELL y);
 CELL multiply_ratio(CELL x, CELL y);
 CELL divide_ratio(CELL x, CELL y);
+CELL divfloat_ratio(CELL x, CELL y);
 CELL less_ratio(CELL x, CELL y);
 CELL lesseq_ratio(CELL x, CELL y);
 CELL greater_ratio(CELL x, CELL y);

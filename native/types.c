@@ -51,11 +51,11 @@ void type_check(CELL type, CELL tagged)
  * It is up to the caller to fill in the object's fields in a meaningful
  * fashion!
  */
-CELL allot_object(CELL type, CELL length)
+void* allot_object(CELL type, CELL length)
 {
 	CELL* object = allot(length);
 	*object = tag_header(type);
-	return (CELL)object;
+	return object;
 }
 
 CELL object_size(CELL pointer)

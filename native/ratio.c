@@ -93,22 +93,43 @@ CELL divide_ratio(CELL x, CELL y)
 		multiply(rx->denominator,ry->numerator));
 }
 
+CELL divfloat_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return divfloat(
+		multiply(rx->numerator,ry->denominator),
+		multiply(rx->denominator,ry->numerator));
+}
+
 CELL less_ratio(CELL x, CELL y)
 {
-	return F;
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return less(multiply(rx->numerator,ry->denominator),
+		multiply(ry->numerator,rx->denominator));
 }
 
 CELL lesseq_ratio(CELL x, CELL y)
 {
-	return F;
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return lesseq(multiply(rx->numerator,ry->denominator),
+		multiply(ry->numerator,rx->denominator));
 }
 
 CELL greater_ratio(CELL x, CELL y)
 {
-	return F;
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return greater(multiply(rx->numerator,ry->denominator),
+		multiply(ry->numerator,rx->denominator));
 }
 
 CELL greatereq_ratio(CELL x, CELL y)
 {
-	return F;
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return greatereq(multiply(rx->numerator,ry->denominator),
+		multiply(ry->numerator,rx->denominator));
 }

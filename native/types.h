@@ -33,6 +33,7 @@ CELL empty;
 #define SBUF_TYPE 12
 #define HANDLE_TYPE 13
 #define BIGNUM_TYPE 14
+#define FLOAT_TYPE 15
 
 bool typep(CELL type, CELL tagged);
 CELL type_of(CELL tagged);
@@ -77,6 +78,6 @@ INLINE CELL object_type(CELL tagged)
 	return untag_header(get(UNTAG(tagged)));
 }
 
-CELL allot_object(CELL type, CELL length);
+void* allot_object(CELL type, CELL length);
 CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);

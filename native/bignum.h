@@ -8,7 +8,7 @@ typedef struct {
 /* untagged */
 INLINE BIGNUM* allot_bignum()
 {
-	return (BIGNUM*)allot_object(BIGNUM_TYPE,sizeof(BIGNUM));
+	return allot_object(BIGNUM_TYPE,sizeof(BIGNUM));
 }
 
 /* untagged */
@@ -25,11 +25,6 @@ INLINE BIGNUM* untag_bignum(CELL tagged)
 	return (BIGNUM*)UNTAG(tagged);
 }
 
-INLINE CELL tag_bignum(BIGNUM* untagged)
-{
-	return RETAG(untagged,OBJECT_TYPE);
-}
-
 void primitive_bignump(void);
 BIGNUM* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
@@ -40,6 +35,7 @@ CELL multiply_bignum(CELL x, CELL y);
 BIGNUM_2 gcd_bignum(BIGNUM_2 x, BIGNUM_2 y);
 CELL divide_bignum(CELL x, CELL y);
 CELL divint_bignum(CELL x, CELL y);
+CELL divfloat_bignum(CELL x, CELL y);
 CELL divmod_bignum(CELL x, CELL y);
 CELL mod_bignum(CELL x, CELL y);
 CELL and_bignum(CELL x, CELL y);

@@ -3,7 +3,7 @@
 /* untagged */
 STRING* allot_string(CELL capacity)
 {
-	STRING* string = (STRING*)allot_object(STRING_TYPE,
+	STRING* string = allot_object(STRING_TYPE,
 		sizeof(STRING) + capacity * CHARS);
 	string->capacity = capacity;
 	return string;

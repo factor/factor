@@ -15,7 +15,7 @@ HANDLE* untag_handle(CELL type, CELL tagged)
 
 CELL handle(CELL type, CELL object)
 {
-	HANDLE* handle = (HANDLE*)allot_object(HANDLE_TYPE,sizeof(HANDLE));
+	HANDLE* handle = allot_object(HANDLE_TYPE,sizeof(HANDLE));
 	handle->type = type;
 	handle->object = object;
 	handle->buffer = F;

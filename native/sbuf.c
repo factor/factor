@@ -2,7 +2,7 @@
 
 SBUF* sbuf(FIXNUM capacity)
 {
-	SBUF* sbuf = (SBUF*)allot_object(SBUF_TYPE,sizeof(SBUF));
+	SBUF* sbuf = allot_object(SBUF_TYPE,sizeof(SBUF));
 	sbuf->top = 0;
 	sbuf->string = string(capacity,'\0');
 	return sbuf;

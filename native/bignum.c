@@ -9,6 +9,7 @@ void primitive_bignump(void)
 BIGNUM* to_bignum(CELL tagged)
 {
 	RATIO* r;
+	FLOAT* f;
 
 	switch(type_of(tagged))
 	{
@@ -19,6 +20,9 @@ BIGNUM* to_bignum(CELL tagged)
 	case RATIO_TYPE:
 		r = (RATIO*)UNTAG(tagged);
 		return to_bignum(divint(r->numerator,r->denominator));
+	case FLOAT_TYPE:
+		f = (FLOAT*)UNTAG(tagged);
+		return bignum((BIGNUM_2)f->n);
 	default:
 		type_error(BIGNUM_TYPE,tagged);
 		return NULL; /* can't happen */
@@ -27,7 +31,7 @@ BIGNUM* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
-	env.dt = tag_bignum(to_bignum(env.dt));
+	env.dt = tag_object(to_bignum(env.dt));
 }
 
 CELL number_eq_bignum(CELL x, CELL y)
@@ -110,8 +114,8 @@ CELL divide_bignum(CELL x, CELL y)
 	else
 	{
 		return tag_ratio(ratio(
-			tag_bignum(bignum(_x)),
-			tag_bignum(bignum(_y))));
+			tag_object(bignum(_x)),
+			tag_object(bignum(_y))));
 	}
 }
 
@@ -119,6 +123,13 @@ CELL divint_bignum(CELL x, CELL y)
 {
 	return tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		/ ((BIGNUM*)UNTAG(y))->n));
+}
+
+CELL divfloat_bignum(CELL x, CELL y)
+{
+	BIGNUM_2 _x = ((BIGNUM*)UNTAG(x))->n;
+	BIGNUM_2 _y = ((BIGNUM*)UNTAG(y))->n;
+	return tag_object(make_float((double)_x / (double)_y));
 }
 
 CELL divmod_bignum(CELL x, CELL y)

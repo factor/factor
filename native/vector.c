@@ -2,7 +2,7 @@
 
 VECTOR* vector(FIXNUM capacity)
 {
-	VECTOR* vector = (VECTOR*)allot_object(VECTOR_TYPE,sizeof(VECTOR));
+	VECTOR* vector = allot_object(VECTOR_TYPE,sizeof(VECTOR));
 	vector->top = 0;
 	vector->array = array(capacity,F);
 	return vector;

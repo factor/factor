@@ -2,7 +2,7 @@
 
 WORD* word(CELL primitive, CELL parameter, CELL plist)
 {
-	WORD* word = (WORD*)allot_object(WORD_TYPE,sizeof(WORD));
+	WORD* word = allot_object(WORD_TYPE,sizeof(WORD));
 	word->xt = primitive_to_xt(primitive);
 	word->primitive = primitive;
 	word->parameter = parameter;

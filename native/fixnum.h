@@ -26,6 +26,7 @@ CELL multiply_fixnum(CELL x, CELL y);
 FIXNUM gcd_fixnum(FIXNUM x, FIXNUM y);
 CELL divide_fixnum(CELL x, CELL y);
 CELL divint_fixnum(CELL x, CELL y);
+CELL divfloat_fixnum(CELL x, CELL y);
 CELL divmod_fixnum(CELL x, CELL y);
 CELL mod_fixnum(CELL x, CELL y);
 CELL and_fixnum(CELL x, CELL y);

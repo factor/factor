@@ -3,7 +3,7 @@
 /* untagged */
 ARRAY* allot_array(CELL capacity)
 {
-	ARRAY* array = (ARRAY*)allot_object(ARRAY_TYPE,
+	ARRAY* array = allot_object(ARRAY_TYPE,
 		sizeof(ARRAY) + capacity * CELLS);
 	array->capacity = capacity;
 	return array;

@@ -10,14 +10,30 @@ RATIO* fixnum_to_ratio(CELL n)
 	return ratio(n,tag_fixnum(1));
 }
 
+FLOAT* fixnum_to_float(CELL n)
+{
+	return make_float((double)untag_fixnum_fast(n));
+}
+
 FIXNUM bignum_to_fixnum(CELL tagged)
 {
-	return (FIXNUM)(untag_bignum(tagged)->n);
+	return (FIXNUM)(((BIGNUM*)UNTAG(tagged))->n);
 }
 
 RATIO* bignum_to_ratio(CELL n)
 {
 	return ratio(n,tag_fixnum(1));
+}
+
+FLOAT* bignum_to_float(CELL tagged)
+{
+	return make_float((double)((BIGNUM*)UNTAG(tagged))->n);
+}
+
+FLOAT* ratio_to_float(CELL tagged)
+{
+	RATIO* r = (RATIO*)UNTAG(tagged);
+	return (FLOAT*)UNTAG(divfloat(r->numerator,r->denominator));
 }
 
 void primitive_numberp(void)
@@ -73,6 +89,7 @@ BINARY_OP(subtract,  false,          false)
 BINARY_OP(multiply,  false,          false)
 BINARY_OP(divide,    false,          false)
 BINARY_OP(divint,    false,          true)
+BINARY_OP(divfloat,  false,          false)
 BINARY_OP(divmod,    false,          true)
 BINARY_OP(mod,       false,          true)
 BINARY_OP(and,       false,          true)

@@ -15,6 +15,7 @@ void primitive_not(void)
 FIXNUM to_fixnum(CELL tagged)
 {
 	RATIO* r;
+	FLOAT* f;
 
 	switch(type_of(tagged))
 	{
@@ -25,6 +26,9 @@ FIXNUM to_fixnum(CELL tagged)
 	case RATIO_TYPE:
 		r = (RATIO*)UNTAG(tagged);
 		return to_fixnum(divint(r->numerator,r->denominator));
+	case FLOAT_TYPE:
+		f = (FLOAT*)UNTAG(tagged);
+		return (FIXNUM)f->n;
 	default:
 		type_error(FIXNUM_TYPE,tagged);
 		return -1; /* can't happen */
@@ -60,7 +64,17 @@ CELL multiply_fixnum(CELL x, CELL y)
 CELL divint_fixnum(CELL x, CELL y)
 {
 	/* division takes common factor of 8 out. */
-	return tag_fixnum(x / y);
+	/* we have to do SIGNED division here */
+	return tag_fixnum((FIXNUM)x / (FIXNUM)y);
+}
+
+CELL divfloat_fixnum(CELL x, CELL y)
+{
+	/* division takes common factor of 8 out. */
+	/* we have to do SIGNED division here */
+	FIXNUM _x = (FIXNUM)x;
+	FIXNUM _y = (FIXNUM)y;
+	return tag_object(make_float((double)_x / (double)_y));
 }
 
 CELL divmod_fixnum(CELL x, CELL y)
@@ -107,6 +121,7 @@ CELL divide_fixnum(CELL x, CELL y)
 {
 	FIXNUM _x = untag_fixnum_fast(x);
 	FIXNUM _y = untag_fixnum_fast(y);
+	FIXNUM gcd;
 
 	if(_y == 0)
 	{
@@ -119,7 +134,7 @@ CELL divide_fixnum(CELL x, CELL y)
 		_y = -_y;
 	}
 
-	FIXNUM gcd = gcd_fixnum(_x,_y);
+	gcd = gcd_fixnum(_x,_y);
 	if(gcd != 1)
 	{
 		_x /= gcd;
