@@ -49,7 +49,7 @@
 	</ACTION>
 	<ACTION NAME="factor-see">
 		<CODE>
-			FactorPlugin.factorWordOutputOp(view,"see");
+			WordPopup.showWordPopup(textArea);
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-edit">

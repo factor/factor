@@ -299,6 +299,26 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 	
+	//{{{ getWordStartIndex() method
+	public static int getWordStartOffset(String line, int caret)
+	{
+		ReadTable readtable = ReadTable.DEFAULT_READTABLE;
+
+		int start = caret;
+		while(start > 0)
+		{
+			if(readtable.getCharacterType(line.charAt(start - 1))
+				== ReadTable.WHITESPACE)
+			{
+				break;
+			}
+			else
+				start--;
+		}
+		
+		return start;
+	} //}}}
+
 	//{{{ getWordAtCaret() method
 	public static String getWordAtCaret(JEditTextArea textArea)
 	{
@@ -323,17 +343,7 @@ public class FactorPlugin extends EditPlugin
 			return null;
 		}
 
-		int start = caret;
-		while(start > 0)
-		{
-			if(readtable.getCharacterType(line.charAt(start - 1))
-				== ReadTable.WHITESPACE)
-			{
-				break;
-			}
-			else
-				start--;
-		}
+		int start = getWordStartOffset(line,caret);
 
 		int end = caret;
 		do
