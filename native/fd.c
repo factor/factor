@@ -89,6 +89,7 @@ bool read_line_step(PORT* port)
 
 	/* We've reached the end of the above loop, without seeing a newline
 	or EOF, so read again */
+	port->buf_pos = port->buf_fill;
 	port->line_ready = false;
 	return false;
 }

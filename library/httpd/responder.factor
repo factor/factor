@@ -69,9 +69,9 @@ USE: httpd
     dup f-or-"" [ drop "default-argument" get ] when ;
 
 : call-responder ( method argument responder -- )
-    [
-        over [ responder-argument swap get call ] with-request
-    ] bind ;
+    pick [
+        [ responder-argument swap get call ] bind
+    ] with-request ;
 
 : no-such-responder ( name -- )
     "404 no such responder: " swap cat2 httpd-error ;

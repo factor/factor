@@ -125,7 +125,9 @@ bool perform_read_line_io_task(PORT* port)
 		return true;
 	}
 	else
+	{
 		return read_line_step(port);
+	}
 }
 
 bool perform_write_io_task(PORT* port)
@@ -232,12 +234,6 @@ CELL next_io_task(void)
 	select(read_fd_count > write_fd_count ? read_fd_count : write_fd_count,
 		&read_fd_set,&write_fd_set,NULL,NULL);
 	
-	for(i = 0; i < 100; i++)
-	{
-		if(FD_ISSET(i,&except_fd_set))
-			_exit(1);
-	}
-
 	callback = perform_io_tasks(&read_fd_set,read_fd_count,read_io_tasks);
 	if(callback != F)
 		return callback;
