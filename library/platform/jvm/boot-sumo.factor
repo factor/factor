@@ -98,7 +98,6 @@ USE: parser
 "/library/test/test.factor"                run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
 "/library/tools/telnetd.factor"            run-resource ! telnetd
-"/library/tools/inferior.factor"           run-resource ! inferior
 
 !!! Java -> native VM image cross-compiler.
 "/library/tools/image.factor"                 run-resource ! cross-compiler

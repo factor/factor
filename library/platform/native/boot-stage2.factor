@@ -109,7 +109,6 @@ USE: stdio
     "/library/test/test.factor"
     "/library/ansi.factor"
     "/library/tools/telnetd.factor"
-    "/library/tools/inferior.factor"
     "/library/tools/jedit-wire.factor"
     "/library/platform/native/profiler.factor"
     "/library/platform/native/heap-stats.factor"
