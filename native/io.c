@@ -177,7 +177,6 @@ CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count)
 CELL next_io_task(void)
 {
 	CELL callback;
-	int i;
 
 	bool reading = set_up_fd_set(&read_fd_set,
 		read_fd_count,read_io_tasks);

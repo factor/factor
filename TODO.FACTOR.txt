@@ -1,12 +1,6 @@
-upgraded_arithmetic_type -> need a trick
-automatic to_bignum, to_fixnum for primitives:
-  - upgrading only
-generic >fixnum, >bignum in library
-  - downgrading
 don't crash on bad prim #
 fixnum/string pseudo-type for error reporting
 to_c_string allots too much
-primitive_index_of & index == string->capacity
 
 + bignums:
 
@@ -22,8 +16,8 @@ primitive_index_of & index == string->capacity
 
 + docs:
 
-- USE: math in numbers game
-- numbers section
+- logic
+- numbers game leaves extra on the stack
 - examples of assoc usage
 - unparse examples, and difference from prettyprint
 - review doc formatting with latex2html
@@ -45,7 +39,6 @@ primitive_index_of & index == string->capacity
 
 - java factor: equal numbers have non-equal hashcodes!
 - FactorLib.equal() not very good
-- do nset-nth, nremove-nth, nsubstitute, ninject
 - IN: format base: work with all types of numbers
 - investigate mandel.factor
 

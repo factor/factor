@@ -23,11 +23,11 @@ USE: vectors
 
 "hello" str>sbuf "x" set
 [ -5 "x" get set-sbuf-length ] [ drop ] catch
-"x" get sbuf>str drop
+[ "x" get sbuf>str drop ] [ drop ] catch
 
 10 <vector> "x" set
 [ -2 "x" get set-vector-length ] [ drop ] catch
-"x" get clone drop
+[ "x" get clone drop ] [ drop ] catch
 
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
 

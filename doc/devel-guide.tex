@@ -404,11 +404,282 @@ Here is an example of a typical series of vocabulary declarations:
 
 \begin{alltt}
 IN: todo-list
-USE: arithmetic
 USE: kernel
 USE: lists
+USE: math
 USE: strings
 \end{alltt}
+
+\section{Numbers}
+
+Factor provides a rich set of math words. Factor numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
+
+\subsection{Integers}
+
+The simplest type of number is the integer. Integers come in two varieties -- \emph{fixnums} and \emph{bignums}. As their names suggest, a fixnum is a fixed-width quantity\footnote{Fixnums range in size from $-2^{w-3}-1$ to $2^{w-3}$, where $w$ is the word size of your processor (for example, 32 bits). Usually, you do not have to worry about details like this.}, and is a bit quicker to manipulate than an arbitrary-precision bignum.
+
+The predicate word \texttt{integer?} tests if the top of the stack is an integer. If this returns true, then exactly one of \texttt{fixnum?} or \texttt{bignum?} would return true for that object. Usually, your code does not have to worry if it is dealing with fixnums or bignums.
+
+Unlike some languages where the programmer has to declare storage size explicitly and worry about overflow, integer operations automatically return bignums if the result would be too big to fit in a fixnum. Here is an example where multiplying two fixnums returns a bignum:
+
+\begin{alltt}
+134217728 fixnum? .
+\emph{t}
+128 fixnum? .
+\emph{t}
+134217728 128 * .
+\emph{17179869184}
+134217728 128 * bignum? .
+\emph{t}
+\end{alltt}
+
+Integers can be entered using a different base. By default, all number entry is in base 10, however this can be changed by prefixing integer literals with one of the parsing words \texttt{BIN:}, \texttt{OCT:}, or \texttt{HEX:}. For example:
+
+\begin{alltt}
+BIN: 1110 BIN: 1 + .
+\emph{15}
+HEX: deadbeef 2 * .
+\emph{7471857118}
+\end{alltt}
+
+The word \texttt{.} prints numbers in decimal, regardless of how they were input. A set of words in the \texttt{unparser} vocabulary is provided for turning integers into string representations in another base. These strings can then be printed using \texttt{print} from the \texttt{stdio} vocabulary.
+
+\begin{alltt}
+1234 >hex print
+\emph{4d2}
+1234 >bin print
+\emph{10011010010}
+\end{alltt}
+
+\subsection{Rational numbers}
+
+If we add, subtract or multiply any two integers, the result is always an integer. However, this is not the case with division. When dividing a numberator by a denominator where the numerator is not a integer multiple of the denominator, a ratio is returned instead.
+
+\begin{alltt}
+1210 11 / .
+\emph{110}
+100 330 / .
+\emph{10/33}
+\end{alltt}
+
+Ratios are printed and can be input literally in the form of the second example. Ratios are always reduced to lowest terms by factoring out the \emph{greatest common divisor} of the numerator and denominator. A ratio with a denominator of 1 becomes an integer. Trying to create a ratio with a denominator of 0 raises an error.
+
+The predicate word \texttt{ratio?} tests if the top of the stack is a ratio. The predicate word \texttt{rational?} returns true if and only if one of \texttt{integer?} or \texttt{ratio?} would return true for that object. So in Factor terms, a ``ratio'' is a rational number whose denominator is not equal to 1.
+
+Ratios behave just like any other number -- all numerical operations work as expected, and in fact they use the formulas for adding, subtracting and multiplying fractions that you learned in high school.
+
+\begin{alltt}
+1/2 1/3 + .
+\emph{5/6}
+100 6 / 3 * .
+\emph{50}
+\end{alltt}
+
+Ratios can be deconstructed into their numerator and denominator components using the \texttt{numerator} and \texttt{denominator} words. The numerator and denominator are both integers, and furthermore the denominator is always positive. When applied to integers, the numerator is the integer itself, and the denominator is 1.
+
+\begin{alltt}
+75/33 numerator .
+\emph{25}
+75/33 denominator .
+\emph{11}
+12 numerator .
+\emph{12}
+\end{alltt}
+
+\subsection{Real numbers}
+
+Rational numbers represent \emph{exact} quantities. On the other hand, a floating point number is an \emph{approximation}. While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point literals are often used to represent irrational numbers, which have no exact representation as a ratio of two integers. Floating point literals are input with a decimal point.
+
+\begin{alltt}
+1.23 1.5 + .
+\emph{1.73}
+\end{alltt}
+
+The predicate word \texttt{float?} tests if the top of the stack is a floating point number. The predicate word \texttt{real?} returns true if and only if one of \texttt{rational?} or \texttt{float?} would return true for that object.
+
+Floating point numbers are \emph{contagious} -- introducing a floating point number in a computation ensures the result is also floating point.
+
+\begin{alltt}
+5/4 1/2 + .
+\emph{7/4}
+5/4 0.5 + .
+\emph{1.75}
+\end{alltt}
+
+Apart from contaigion, there are two ways of obtaining a floating point result from a computation; the word \texttt{>float ( n -{}- f)} converts a rational number into its floating point approximation, and the word \texttt{/f ( x y -{}- x/y)} returns the floating point approximation of a quotient of two numbers.
+
+\begin{alltt}
+7 4 / >float .
+\emph{1.75}
+7 4 /f .
+\emph{1.75}
+\end{alltt}
+
+Indeed, the word \texttt{/f} could be defined as follows:
+
+\begin{alltt}
+: /f / >float ;
+\end{alltt}
+
+However, the actual definition is slightly more efficient, since it computes the floating point result directly.
+
+\subsection{Complex numbers}
+
+Just like we had to widen the integers to the rationals in order to divide, we have to widen the real numbers to the set of \emph{complex numbers} to solve certain kinds of equations. For example, the equation $x^2 + 1 = 0$ has no solution for real $x$, because there is no real number that is a square root of -1. This is so because the real numbers are not \emph{algebraically complete}. 
+
+Complex numbers, however, are algebraically complete, and Factor will find one solution to this equation\footnote{The other, of course being \texttt{\#\{ 0 -1 \}}.}:
+
+\begin{alltt}
+-1 sqrt .
+\emph{\#\{ 0 1 \}}
+\end{alltt}
+
+The literal syntax for a complex number is \texttt{\#\{ re im \}}, where \texttt{re} is the real part and \texttt{im} is the imaginary part. For example, the literal \texttt{\#\{ 1/2 1/3 \}} corresponds to the complex number $1/2 + 1/3i$.
+
+The words \texttt{i} an \texttt{-i} push the literals \texttt{\#\{ 0 1 \}} and \texttt{\#\{ 0 -1 \}}, respectively.
+
+The predicate word \texttt{complex?} tests if the top of the stack is a complex number. Note that unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero.
+
+Complex numbers can be deconstructed into their real and imaginary components using the \texttt{real} and \texttt{imaginary} words. Both components can be pushed at once using the word \texttt{>rect ( z -{}- re im )}.
+
+\begin{alltt}
+-1 sqrt real .
+\emph{0}
+-1 sqrt imaginary .
+\emph{1}
+-1 sqrt sqrt >rect .s
+\emph{\{ 0.7071067811865476 0.7071067811865475 \}}
+\end{alltt}
+
+A complex number can be constructed from a real and imaginary component on the stack using the word \texttt{rect> ( re im -{}- z )}.
+
+\begin{alltt}
+1/3 5 rect> .
+\emph{\#\{ 1/3 5 \}}
+\end{alltt}
+
+Complex numbers are stored in \emph{rectangular form} as a real/imaginary component pair (this is where the names \texttt{>rect} and \texttt{rect>} come from). An alternative complex number representation is \emph{polar form}, consisting of an absolute value and argument. The absolute value and argument can be computed using the words \texttt{abs} and \texttt{arg}, and both can be pushed at once using \texttt{>polar ( z -{}- abs arg )}.
+
+\begin{alltt}
+5.3 abs .
+\emph{5.3}
+i arg .
+\emph{1.570796326794897}
+\#\{ 4 5 \} >polar .s
+\emph{\{ 6.403124237432849 0.8960553845713439 \}}
+\end{alltt}
+
+A new complex number can be created from an absolute value and argument using \texttt{polar> ( abs arg -{}- z )}.
+
+\begin{alltt}
+1 pi polar> .
+\emph{\#\{ -1.0 1.224606353822377e-16 \}}
+\end{alltt}
+
+\subsection{Transcedential functions}
+
+The \texttt{math} vocabulary provides a rich library of mathematical functions that covers exponentiation, logarithms, trigonometry, and hyperbolic functions. All functions accept and return complex number arguments where appropriate. These functions all return floating point values, or complex numbers whose real and imaginary components are floating point values.
+
+\texttt{\^ ( x y -- x\^y )} raises \texttt{x} to the power of \texttt{y}. In the cases of \texttt{y} being equal to $1/2$, -1, or 2, respectively, the words \texttt{sqrt}, \texttt{recip} and \texttt{sq} can be used instead.
+
+\begin{alltt}
+2 4 \^ .
+\emph{16.0}
+i i \^ .
+\emph{0.2078795763507619}
+\end{alltt}
+
+\texttt{exp ( x -- e\^x )} raises the number $e$ to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows:
+
+\begin{alltt}
+: exp ( x -- e\^x ) e swap \^ ;
+\end{alltt}
+
+However, it is actually defined otherwise, for efficiency.\footnote{In fact, the word \texttt{\^} is actually defined in terms of \texttt{exp}, to correctly handle complex number arguments.}
+
+\texttt{log ( x -- y )} computes the natural (base $e$) logarithm. This is the inverse of the \texttt{exp} function.
+
+\begin{alltt}
+-1 log .
+\emph{\#\{ 0.0 3.141592653589793 \}}
+e log .
+\emph{1.0}
+\end{alltt}
+
+\texttt{sin ( x -- y )}, \texttt{cos ( x -- y )} and \texttt{tan ( x -- y )} are the familiar trigonometric functions, and \texttt{asin ( x -- y )}, \texttt{acos ( x -- y )} and \texttt{atan ( x -- y )} are their inverses.
+
+The reciprocals of the sine, cosine and tangent are defined as \texttt{sec}, \texttt{cosec} and \texttt{cot}, respectively. Their inverses are \texttt{asec}, \texttt{acosec} and \texttt{acot}.
+
+\texttt{sinh ( x -- y )}, \texttt{cosh ( x -- y )} and \texttt{tanh ( x -- y )} are the hyperbolic functions, and \texttt{asinh ( x -- y )}, \texttt{acosh ( x -- y )} and \texttt{atanh ( x -- y )} are their inverses.
+
+Similarly, the reciprocals of the hyperbolic functions are defined as \texttt{sech}, \texttt{cosech} and \texttt{coth}, respectively. Their inverses are \texttt{asech}, \texttt{acosech} and \texttt{acoth}.
+
+\subsection{Modular arithmetic}
+
+In addition to the standard division operator \texttt{/}, there are a few related functions that are useful when working with integers.
+
+\texttt{/i ( x y -{}- x\%y )} performs a truncating integer division. It could have been defined as follows:
+
+\begin{alltt}
+: /i / >integer ;
+\end{alltt}
+
+However, the actual definition is a bit more efficient than that.
+
+\texttt{mod ( x y -{}- x\%y )} computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0, then \texttt{x} is a multiple of \texttt{y}.
+
+\texttt{/mod ( x y -{}- x/y x\%y )} pushes both the quotient and remainder.
+
+\begin{alltt}
+100 3 mod .
+\emph{1}
+-546 34 mod .
+\emph{-2}
+\end{alltt}
+
+\texttt{gcd ( x y -- z )} pushes the greatest common divisor of two integers; that is, a common factor, or alternatively, the largest number that both integers could be divided by and still yield integers as results. This word is used behind the scenes to reduce rational numbers to lowest terms when doing ratio arithmetic.
+
+\subsection{Bitwise operations}
+
+There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation faciliates the so-called \emph{bitwise operations}.
+
+\texttt{bitand ( x y -{}- x\&y )} returns a new integer where each bit is set if and only if the corresponding bit is set in both $x$ and $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-and with a mask switches off all flags that are not explicitly set in the mask.
+
+\begin{alltt}
+BIN: 101 BIN: 10 bitand >bin print
+\emph{0}
+BIN: 110 BIN: 10 bitand >bin print
+\emph{10}
+\end{alltt}
+
+\texttt{bitor ( x y -{}- x|y )} returns a new integer where each bit is set if and only if the corresponding bit is set in at least one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-or with a mask switches on all flags that are set in the mask.
+
+\begin{alltt}
+BIN: 101 BIN: 10 bitor >bin print
+\emph{111}
+BIN: 110 BIN: 10 bitor >bin print
+\emph{110}
+\end{alltt}
+
+\texttt{bitxor ( x y -{}- x\^y )} returns a new integer where each bit is set if and only if the corresponding bit is set in exactly one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-xor with a mask toggles on all flags that are set in the mask.
+
+\begin{alltt}
+BIN: 101 BIN: 10 bitxor >bin print
+\emph{111}
+BIN: 110 BIN: 10 bitxor >bin print
+\emph{100}
+\end{alltt}
+
+\texttt{shift ( x n -{}- y )} returns a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
+
+\begin{alltt}
+BIN: 101 5 shift >bin print
+\emph{10100000}
+BIN: 11111 -2 shift >bin print
+\emph{111}
+\end{alltt}
+
+The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
 
 \section{PRACTICAL: Numbers game}
 
@@ -636,8 +907,8 @@ design incrementally!
 ! Numbers game example
 
 IN: numbers-game
-USE: arithmetic
 USE: kernel
+USE: math
 USE: parser
 USE: random
 USE: stdio
@@ -653,30 +924,26 @@ USE: stack
 : correct "Correct - you win!" print ;
 
 : inexact-guess ( actual guess -- )
-     < {[} too-high {]} {[} too-low {]} ifte ;
+     < [ too-high ] [ too-low ] ifte ;
 
 : judge-guess ( actual guess -- ? )
-    2dup = {[}
+    2dup = [
         correct f
-    {]} {[}
+    ] [
         inexact-guess t
-    {]} ifte ;
+    ] ifte ;
 
 : number-to-guess ( -- n ) 0 100 random-int ;
 
 : numbers-game-loop ( actual -- )
-    dup guess-prompt read-number judge-guess {[}
+    dup guess-prompt read-number judge-guess [
         numbers-game-loop
-    {]} {[}
+    ] [
         drop
-    {]} ifte ;
+    ] ifte ;
 
 : numbers-game number-to-guess numbers-game-loop ;
 \end{verbatim}
-
-\section{Numbers}
-
-Arithmetic operations, number tower, deconstructing ratios and complex, irrational functions, numerical integration.
 
 \section{Lists}
 
@@ -1673,7 +1940,7 @@ not milliseconds:
 \end{alltt}
 
 Note that the \texttt{/i} word \texttt{( x y -{}- x/y )}, from the
-\texttt{arithmetic} vocabulary, performs truncating division. This
+\texttt{math} vocabulary, performs truncating division. This
 makes sense, since we are not interested in fractional parts of a
 minute here.
 
@@ -1916,12 +2183,12 @@ All that remains now is the ``main word'' that runs the program with an empty ti
 ! Contractor timesheet example
 
 IN: timesheet
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: format
 USE: kernel
 USE: lists
+USE: math
 USE: parser
 USE: stack
 USE: stdio

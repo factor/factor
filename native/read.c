@@ -218,8 +218,6 @@ void primitive_add_read_count_io_task(void)
 
 bool perform_read_count_io_task(PORT* port)
 {
-	SBUF* line;
-
 	if(port->buf_pos >= port->buf_fill)
 	{
 		if(!read_step(port))

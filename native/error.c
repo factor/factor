@@ -42,12 +42,12 @@ void general_error(CELL error, CELL tagged)
 	{
 		/* Crash at startup */
 		fprintf(stderr,"Error thrown before BREAK_ENV set\n");
-		fprintf(stderr,"Error #%d\n",to_fixnum(error));
+		fprintf(stderr,"Error #%ld\n",to_fixnum(error));
 		if(error == ERROR_TYPE)
 		{
-			fprintf(stderr,"Type #%d\n",to_fixnum(
+			fprintf(stderr,"Type #%ld\n",to_fixnum(
 				untag_cons(tagged)->car));
-			fprintf(stderr,"Got type #%d\n",type_of(
+			fprintf(stderr,"Got type #%ld\n",type_of(
 				untag_cons(tagged)->cdr));
 		}
 		exit(1);

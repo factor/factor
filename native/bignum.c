@@ -179,6 +179,9 @@ CELL lesseq_bignum(ARRAY* x, ARRAY* y)
 		return T;
 	case bignum_comparison_greater:
 		return F;
+	default:
+		critical_error("s48_bignum_compare returns bogus value",0);
+		return F;
 	}
 }
 
@@ -198,6 +201,9 @@ CELL greatereq_bignum(ARRAY* x, ARRAY* y)
 	case bignum_comparison_equal:
 	case bignum_comparison_greater:
 		return T;
+	default:
+		critical_error("s48_bignum_compare returns bogus value",0);
+		return F;
 	}
 }
 

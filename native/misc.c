@@ -51,5 +51,5 @@ void primitive_dump(void)
 	CELL size = object_size(obj);
 	int i;
 	for(i = 0; i < size; i += CELLS)
-		fprintf(stderr,"%x\n",get(UNTAG(obj) + i));
+		fprintf(stderr,"%lx\n",get(UNTAG(obj) + i));
 }

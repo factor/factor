@@ -2,7 +2,6 @@
 
 int main(int argc, char** argv)
 {
-	int i;
 	CELL args;
 
 	if(argc == 1)

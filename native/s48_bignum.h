@@ -60,6 +60,9 @@ bignum_type s48_bignum_add(bignum_type, bignum_type);
 bignum_type s48_bignum_subtract(bignum_type, bignum_type);
 bignum_type s48_bignum_negate(bignum_type);
 bignum_type s48_bignum_multiply(bignum_type, bignum_type);
+void
+s48_bignum_divide(bignum_type numerator, bignum_type denominator,
+		  bignum_type * quotient, bignum_type * remainder);
 bignum_type s48_bignum_quotient(bignum_type, bignum_type);
 bignum_type s48_bignum_remainder(bignum_type, bignum_type);
 bignum_type s48_long_to_bignum(long);

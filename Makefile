@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -g -Os -march=pentiumpro # -Os -march=pentium4 -Wall -Wno-long-long -fomit-frame-pointer
+CFLAGS = -g -Os -mpentiumpro -Wall -fomit-frame-pointer
 LIBS = -lm
 STRIP = strip
 
