@@ -132,7 +132,6 @@ void collect_roots(void)
 
 void primitive_gc(void)
 {
-	fprintf(stderr,"GC!\n");
 	gc_in_progress = true;
 
 	flip_zones();
@@ -156,17 +155,5 @@ are also reachable via the GC roots. */
 void maybe_garbage_collection(void)
 {
 	if(active.here > active.alarm)
-	{
-		if(active.here > active.limit)
-		{
-			fprintf(stderr,"Out of memory\n");
-			fprintf(stderr,"active.base  = %ld\n",active.base);
-			fprintf(stderr,"active.here  = %ld\n",active.here);
-			fprintf(stderr,"active.limit = %ld\n",active.limit);
-			fflush(stderr);
-			exit(1);
-		}
-		else
-			primitive_gc();
-	}
+		primitive_gc();
 }

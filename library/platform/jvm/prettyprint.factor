@@ -57,7 +57,7 @@ USE: words
 
 : see ( word -- )
     0 swap
-    intern dup worddef
+    dup worddef
     [
         [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
         [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]

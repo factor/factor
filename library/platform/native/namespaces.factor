@@ -37,6 +37,7 @@ USE: vectors
 
 DEFER: namespace
 DEFER: >n
+DEFER: n>
 
 : namestack* ( -- ns ) 3 getenv ;
 : set-namestack* ( ns -- ) 3 setenv ;
@@ -58,8 +59,7 @@ DEFER: >n
     namespace-buckets <hashtable> ;
 
 : get* ( var namespace -- value ) hash ;
-: set*  ( value variable namespace -- ) set-hash ;
-: put* swapd set* ;
+: set* ( value variable namespace -- ) set-hash ;
 
 : namestack-search ( var n -- )
     #! Internal word for searching the namestack.
@@ -78,15 +78,16 @@ DEFER: >n
     #! from the top down.
     namestack* vector-length namestack-search ;
 
-: set ( value variable -- ) namespace set* ;
-: put ( variable value -- ) namespace put* ;
+: set ( value variable -- ) namespace set-hash ;
+: put ( variable value -- ) swap set ;
+
+: bind ( namespace quot -- )
+    #! Execute a quotation with a namespace on the namestack.
+    swap >n call n> drop ; inline
 
 : vars-values ( -- list ) namespace hash>alist ;
-: vars ( -- list ) vars-values [ car ] map ;
-: values ( -- list ) vars-values [ cdr ] map ;
+: vars ( -- list ) namespace hash-keys ;
+: values ( -- list ) namespace hash-values ;
 
 ! We don't have bound objects in native Factor.
-: namespace? hashtable? ;
-: namespace-of ;
-: this namespace ;
 : has-namespace? hashtable? ;

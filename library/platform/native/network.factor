@@ -30,6 +30,7 @@ USE: combinators
 USE: continuations
 USE: io-internals
 USE: errors
+USE: hashtables
 USE: kernel
 USE: logic
 USE: stack
@@ -58,4 +59,4 @@ USE: unparser
 
 : accept ( server -- client )
     #! Accept a connection from a server socket.
-    "socket" swap get* blocking-accept <client-stream> ;
+    "socket" swap hash blocking-accept <client-stream> ;

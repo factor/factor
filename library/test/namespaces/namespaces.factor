@@ -10,11 +10,7 @@ USE: words
 : test-namespace ( -- )
     <namespace> dup [ namespace = ] bind ;
 
-: test-this-1 ( -- )
-    <namespace> dup [ this = ] bind ;
-
 [ t ] [ test-namespace ] unit-test
-[ t ] [ test-this-1    ] unit-test
 
 ! Object paths should not resolve further up in the namestack.
 
@@ -28,12 +24,12 @@ unit-test
 unit-test
 
 [ t ]
-[ this [ ] object-path = ]
+[ namespace [ ] object-path = ]
 unit-test
 
 [ t ]
 [
-    "test-word" intern
+    \ test-word
     global [ [ "vocabularies" "test" "test-word" ] object-path ] bind
     =
 ] unit-test

@@ -13,10 +13,13 @@
 #define ERROR_C_STRING (12<<3)
 #define ERROR_FFI_DISABLED (13<<3)
 #define ERROR_FFI (14<<3)
+#define ERROR_DATASTACK_UNDERFLOW (15<<3)
+#define ERROR_DATASTACK_OVERFLOW (16<<3)
+#define ERROR_CALLSTACK_UNDERFLOW (17<<3)
+#define ERROR_CALLSTACK_OVERFLOW (18<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
-void fix_stacks(void);
 void throw_error(CELL object);
 void general_error(CELL error, CELL tagged);
 void type_error(CELL type, CELL tagged);

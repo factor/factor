@@ -34,6 +34,8 @@ USE: stack
 USE: strings
 
 DEFER: namespace
+DEFER: >n
+DEFER: n>
 
 : namestack* ( -- stack )
     #! Push the namespace stack.
@@ -95,6 +97,10 @@ DEFER: namespace
 : namespace-of ( obj -- namespace )
     [ "java.lang.Object" ] "factor.FactorJava" "toNamespace"
     jinvoke-static ;
+
+: bind ( namespace quot -- )
+    #! Execute a quotation with a namespace on the namestack.
+    swap namespace-of >n call n> drop ; inline
 
 : has-namespace? ( a -- boolean )
     "factor.FactorObject" is ; inline

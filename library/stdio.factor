@@ -25,6 +25,9 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: streams
+DEFER: <extend-stream>
+
 IN: stdio
 USE: combinators
 USE: errors
@@ -33,20 +36,6 @@ USE: lists
 USE: namespaces
 USE: stack
 USE: streams
-
-: <stdio-stream> ( stream -- stream )
-    #! We disable fclose on stdio so that various tricks like
-    #! with-stream can work.
-    clone [
-        ( string -- )
-        [
-            namespace fwrite
-            "\n" namespace fwrite
-            namespace fflush
-        ] "fprint" set
-
-        [ ] "fclose" set
-    ] extend ;
 
 : flush ( -- )
     "stdio" get fflush ;
@@ -93,3 +82,13 @@ USE: streams
     1024 <string-output-stream> [
         call "stdio" get stream>str
     ] with-stream ;
+
+: <stdio-stream> ( stream -- stream )
+    #! We disable fclose on stdio so that various tricks like
+    #! with-stream can work.
+    <extend-stream> [
+        ( string -- )
+        [ write "\n" write flush ] "fprint" set
+
+        [ ] "fclose" set
+    ] extend ;

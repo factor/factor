@@ -33,9 +33,14 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
+USE: strings
 
 : worddef? ( obj -- boolean )
     "factor.FactorWordDefinition" is ;
+
+: intern ( "word" -- word )
+    #! Returns the top of the stack if it already been interned.
+    dup string? [ "use" get search ] when ;
 
 : worddef ( word -- worddef )
     dup worddef? [

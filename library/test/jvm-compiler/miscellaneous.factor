@@ -75,7 +75,7 @@ test-word
 
 : doc-test ( -- ) ;
 
-[ t ] [ "doc-test" ] [ intern word-parameter car comment? ] test-word
+[ t ] [ \ doc-test word-parameter car comment? ] unit-test
 
 [ [ 2 1 0 0 ] ] [ [ is ] ] [ balance>list ] test-word
 [ t ] [ "java.lang.Integer" ] [ 0 100 random-int swap is ] test-word
@@ -90,4 +90,4 @@ test-word
 
 [ [ 1 1 0 0 ] ] [ [ system-property ] ] [ balance>list ] test-word
 
-[ t ] [ "ifte" intern dup worddef word-of-worddef = ] unit-test
+[ t ] [ \ ifte dup worddef word-of-worddef = ] unit-test

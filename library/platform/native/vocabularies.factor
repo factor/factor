@@ -27,12 +27,13 @@
 
 IN: words
 USE: combinators
+USE: hashtables
 USE: lists
 USE: namespaces
 USE: stack
 
 : (search) ( name vocab -- word )
-    vocab dup [ get* ] [ 2drop f ] ifte ;
+    vocab dup [ hash ] [ 2drop f ] ifte ;
 
 : search ( name list -- word )
     #! Search for a word in a list of vocabularies.
@@ -53,15 +54,14 @@ USE: stack
     #! Create an undefined word without adding to a vocabulary.
     <plist> 0 f rot <word> ;
 
-: word+ ( name vocab word -- )
-    swap vocab* put* ;
+: reveal ( word -- )
+    #! Add a new word to its vocabulary.
+    "vocabularies" get [
+        dup word-vocabulary over word-name 2list set-object-path
+    ] bind ;
 
 : create ( name vocab -- word )
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup (search) dup [
-        nip nip
-    ] [
-        drop 2dup (create) dup >r word+ r>
-    ] ifte ;
+    2dup (search) [ nip nip ] [ (create) dup reveal ] ifte* ;

@@ -185,7 +185,7 @@ DEFER: word-plist
 DEFER: set-word-plist
 
 IN: unparser
-DEFER: unparse-float
+DEFER: (unparse-float)
 
 IN: image
 
@@ -230,7 +230,7 @@ IN: image
         denominator
         fraction>
         str>float
-        unparse-float
+        (unparse-float)
         float>bits
         real
         imaginary

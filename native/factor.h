@@ -49,11 +49,10 @@ typedef unsigned short CHAR;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-/* Memory heap size */
+/* Memory areas */
 #define DEFAULT_ARENA (64 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (4 * 1024 * 1024)
-
-#define STACK_SIZE 16384
+#define COMPILE_ZONE_SIZE (64 * 1024 * 1024)
+#define STACK_SIZE (2 * 1024 * 1024)
 
 #include "memory.h"
 #include "error.h"
@@ -61,6 +60,7 @@ typedef unsigned char BYTE;
 #include "types.h"
 #include "word.h"
 #include "run.h"
+#include "signal.h"
 #include "fixnum.h"
 #include "array.h"
 #include "s48_bignumint.h"

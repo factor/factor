@@ -60,21 +60,10 @@ USE: words
         integer%
     ] ifte reverse%> ;
 
-: >dec ( num -- string )
-    #! Convert an integer to its decimal representation.
-    10 >base ;
-
-: >bin ( num -- string )
-    #! Convert an integer to its binary representation.
-    2 >base ;
-
-: >oct ( num -- string )
-    #! Convert an integer to its octal representation.
-    8 >base ;
-
-: >hex ( num -- string )
-    #! Convert an integer to its hexadecimal representation.
-    16 >base ;
+: >dec ( num -- string ) 10 >base ;
+: >bin ( num -- string ) 2 >base ;
+: >oct ( num -- string ) 8 >base ;
+: >hex ( num -- string ) 16 >base ;
 
 DEFER: unparse
 
@@ -121,6 +110,8 @@ DEFER: unparse
     #! output.
     "." over str-contains? [ ".0" cat2 ] unless ;
 
+: unparse-float ( float -- str ) (unparse-float) fix-float ;
+
 : unparse-unknown ( obj -- str )
     <% "#<" %
     dup type type-name %
@@ -128,15 +119,26 @@ DEFER: unparse
     address unparse %
     ">" % %> ;
 
+: unparse-t drop "t" ;
+: unparse-f drop "f" ;
+
 : unparse ( obj -- str )
-    [
-        [ t eq?    ] [ drop "t" ]
-        [ f eq?    ] [ drop "f" ]
-        [ word?    ] [ unparse-word ]
-        [ integer? ] [ >dec ]
-        [ ratio?   ] [ unparse-ratio ]
-        [ float?   ] [ unparse-float fix-float ]
-        [ complex? ] [ unparse-complex ]
-        [ string?  ] [ unparse-str ]
-        [ drop t   ] [ unparse-unknown ]
-    ] cond ;
+    {
+        >dec
+        unparse-word
+        unparse-unknown
+        unparse-unknown
+        unparse-ratio
+        unparse-complex
+        unparse-f
+        unparse-t
+        unparse-unknown
+        unparse-unknown
+        unparse-str
+        unparse-unknown
+        unparse-unknown
+        >dec
+        unparse-float
+        unparse-unknown
+        unparse-unknown
+    } generic ;

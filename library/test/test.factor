@@ -28,12 +28,20 @@ USE: unparser
 : keep-datastack ( quot -- )
     datastack >r call r> set-datastack drop ;
 
+: time ( code -- )
+    #! Evaluates the given code and prints the time taken to
+    #! execute it.
+    millis >r call millis r> -
+    unparse write " milliseconds" print ;
+
 : unit-test ( output input -- )
     [
-        2dup print-test
-        swap >r >r clear r> call datastack vector>list r>
-        = assert
-    ] keep-datastack 2drop ;
+        [
+            2dup print-test
+            swap >r >r clear r> call datastack vector>list r>
+            = assert
+        ] keep-datastack 2drop
+    ] time ;
 
 : unit-test-fails ( quot -- )
     #! Assert that the quotation throws an error.
@@ -47,26 +55,18 @@ USE: unparser
     #! Flag for tests that are known not to work.
     3drop ;
 
-: time ( code -- )
-    #! Evaluates the given code and prints the time taken to
-    #! execute it.
-    "Timing " write dup .
-    millis >r call millis r> - . ;
-
 : test ( name -- )
     ! Run the given test.
     depth pred >r
     "Testing " write dup write "..." print
     "/library/test/" swap ".factor" cat3 run-resource
     "Checking before/after depth..." print
-    depth r> = assert
-    ;
+    depth r> = assert ;
 
 : all-tests ( -- )
     "Running Factor test suite..." print
     "vocabularies" get [ f "scratchpad" set ] bind
     [
-        "crashes"
         "lists/cons"
         "lists/lists"
         "lists/assoc"
@@ -76,7 +76,6 @@ USE: unparser
         "errors"
         "hashtables"
         "strings"
-        "sbuf"
         "namespaces/namespaces"
         "files"
         "format"
@@ -111,6 +110,8 @@ USE: unparser
     ] each
     
     native? [
+        "crashes" test
+        "sbuf" test
         "threads" test
 
         cpu "x86" = [
@@ -139,4 +140,10 @@ USE: unparser
         ] [
             test
         ] each
-    ] when ;
+    ] when
+
+    "benchmark/empty-loop" test
+    "benchmark/fac" test
+    "benchmark/fib" test
+    "benchmark/sort" test 
+    "benchmark/continuations" test ;

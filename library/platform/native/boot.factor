@@ -61,6 +61,7 @@ primitives,
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
     "/library/stdio.factor"
+    "/library/extend-stream.factor"
     "/library/platform/native/words.factor"
     "/library/words.factor"
     "/library/platform/native/vocabularies.factor"

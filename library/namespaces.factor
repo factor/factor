@@ -65,10 +65,6 @@ USE: vectors
     #! Push the current namespace.
     namestack* vector-peek ; inline
 
-: bind ( namespace quot -- )
-    #! Execute a quotation with a namespace on the namestack.
-    swap namespace-of >n call n> drop ; inline
-
 : with-scope ( quot -- )
     #! Execute a quotation with a new namespace on the
     #! namestack.
@@ -97,7 +93,7 @@ USE: vectors
     #! An object path is a list of strings. Each string is a
     #! variable name in the object namespace at that level.
     #! Returns f if any of the objects are not set.
-    this swap (object-path) ;
+    namespace swap (object-path) ;
 
 : (set-object-path) ( name -- namespace )
     dup namespace get* dup [

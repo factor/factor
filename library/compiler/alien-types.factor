@@ -29,6 +29,7 @@ IN: alien
 USE: combinators
 USE: compiler
 USE: errors
+USE: hashtables
 USE: lists
 USE: math
 USE: namespaces
@@ -53,7 +54,7 @@ USE: words
 
 : c-type ( name -- type )
     global [
-        dup "c-types" get get* dup [
+        dup "c-types" get hash dup [
             nip
         ] [
             drop "No such C type: " swap cat2 throw

@@ -38,29 +38,24 @@ USE: stack
     swap word-plist assoc ;
 
 : set-word-property ( word pvalue pname -- )
-    pick word-plist pick [ set-assoc ] [ remove-assoc nip ] ifte
+    pick word-plist
+    pick [ set-assoc ] [ remove-assoc nip ] ifte
     swap set-word-plist ;
 
-: defined? ( obj -- ? )
-    dup word? [ word-primitive 0 = not ] [ drop f ] ifte ;
+: ?word-primitive ( obj -- prim/0 )
+    dup word? [ word-primitive ] [ drop 0 ] ifte ;
 
-: compound? ( obj -- ? )
-    dup word? [ word-primitive 1 = ] [ drop f ] ifte ;
+: defined?   ( obj -- ? ) ?word-primitive 0 = not ;
+: compound?  ( obj -- ? ) ?word-primitive 1 = ;
+: primitive? ( obj -- ? ) ?word-primitive 2 > ;
+: symbol?    ( obj -- ? ) ?word-primitive 2 = ;
 
-: primitive? ( obj -- ? )
-    dup word? [ word-primitive 2 > ] [ drop f ] ifte ;
+: comment?
+    #! Comments are not first-class objects in CFactor.
+    drop f ;
 
-: symbol? ( obj -- ? )
-    dup word? [ word-primitive 2 = ] [ drop f ] ifte ;
-
-! Various features not supported by native Factor.
-: comment? drop f ;
-
-: word ( -- word )
-    global [ "last-word" get ] bind ;
-
-: set-word ( word -- )
-    global [ "last-word" set ] bind ;
+: word ( -- word ) global [ "last-word" get ] bind ;
+: set-word ( word -- ) global [ "last-word" set ] bind ;
 
 : define-compound ( word def -- )
     over set-word-parameter
@@ -70,8 +65,5 @@ USE: stack
     dup dup set-word-parameter
     2 swap set-word-primitive ;
 
-: stack-effect ( word -- str )
-    "stack-effect" word-property ;
-
-: documentation ( word -- str )
-    "documentation" word-property ;
+: stack-effect ( word -- str ) "stack-effect" word-property ;
+: documentation ( word -- str ) "documentation" word-property ;

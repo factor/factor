@@ -93,9 +93,6 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void signal_handler(int signal, siginfo_t* siginfo, void* uap);
-void call_profiling_step(int signal, siginfo_t* siginfo, void* uap);
-void init_signals(void);
 void clear_environment(void);
 
 void run(void);
@@ -107,6 +104,3 @@ void primitive_call(void);
 void primitive_ifte(void);
 void primitive_getenv(void);
 void primitive_setenv(void);
-void primitive_exit(void);
-void primitive_os_env(void);
-void primitive_call_profiling(void);

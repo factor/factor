@@ -68,6 +68,7 @@ USE: stdio
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
     "/library/stdio.factor"
+    "/library/extend-stream.factor"
     "/library/platform/native/words.factor"
     "/library/words.factor"
     "/library/platform/native/vocabularies.factor"
@@ -94,7 +95,6 @@ USE: stdio
     "/library/math/arc-trig-hyp.factor"
     "/library/math/list-math.factor"
 
-    "/library/extend-stream.factor"
     "/library/platform/native/in-thread.factor"
     "/library/platform/native/network.factor"
     "/library/logging.factor"

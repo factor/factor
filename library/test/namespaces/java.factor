@@ -39,4 +39,9 @@ USE: words
 [ f ] [ ] [ 10 namespace-tail-call-bug "x" get 0 = ] test-word
 
 ! I did a n> in extend and forgot the obvious case
-[ t ] [ "dup" intern dup ] [ [ ] extend = ] test-word
+[ t ] [ \ dup dup ] [ [ ] extend = ] test-word
+
+: test-this-1 ( -- )
+    <namespace> dup [ this = ] bind ;
+
+[ t ] [ test-this-1    ] unit-test

@@ -30,6 +30,7 @@ USE: combinators
 USE: continuations
 USE: io-internals
 USE: errors
+USE: hashtables
 USE: kernel
 USE: logic
 USE: stack
@@ -84,7 +85,7 @@ USE: namespaces
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'. Use fcopy; this word does not close
     #! streams.
-    "out" swap get* >r "in" swap get* r> blocking-copy ;
+    "out" swap hash >r "in" swap hash r> blocking-copy ;
 
 : fcopy ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the

@@ -69,6 +69,7 @@ USE: parser
 "/library/platform/jvm/stream.factor"       run-resource ! streams
 "/library/platform/jvm/files.factor"        run-resource ! files
 "/library/stdio.factor"                     run-resource ! stdio
+"/library/extend-stream.factor"             run-resource ! streams
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
 "/library/styles.factor"                    run-resource ! styles

@@ -211,7 +211,7 @@ SYMBOL: compile-callstack
 
 : (compile) ( word -- )
     #! Should be called inside the with-compiler scope.
-    intern dup save-xt word-parameter compile-quot RET ;
+    dup save-xt word-parameter compile-quot RET ;
 
 : compile-postponed ( -- )
     compile-words get [

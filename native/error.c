@@ -13,20 +13,8 @@ void critical_error(char* msg, CELL tagged)
 	exit(1);
 }
 
-void fix_stacks(void)
-{
-	if(STACK_UNDERFLOW(ds,ds_bot)
-		|| STACK_OVERFLOW(ds,ds_bot))
-		reset_datastack();
-	if(STACK_UNDERFLOW(cs,cs_bot)
-		|| STACK_OVERFLOW(cs,cs_bot))
-		reset_callstack();
-}
-
 void throw_error(CELL error)
 {
-	fix_stacks();
-
 	dpush(error);
 	/* Execute the 'throw' word */
 	call(userenv[BREAK_ENV]);
