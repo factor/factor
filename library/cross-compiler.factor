@@ -50,7 +50,6 @@ IN: kernel
 DEFER: getenv
 DEFER: setenv
 DEFER: save-image
-DEFER: handle?
 DEFER: room
 DEFER: os-env
 DEFER: type-of
@@ -60,8 +59,10 @@ IN: strings
 DEFER: str=
 DEFER: str-hashcode
 DEFER: sbuf=
+DEFER: clone-sbuf
 
 IN: io-internals
+DEFER: port?
 DEFER: open-file
 DEFER: server-socket
 DEFER: close-fd
@@ -69,7 +70,6 @@ DEFER: accept-fd
 DEFER: read-line-fd-8
 DEFER: write-fd-8
 DEFER: flush-fd
-DEFER: shutdown-fd
 
 IN: parser
 DEFER: str>float
@@ -125,6 +125,7 @@ IN: cross-compiler
         set-sbuf-nth
         sbuf-append
         sbuf>str
+        clone-sbuf
         sbuf=
         number?
         >fixnum
@@ -205,7 +206,7 @@ IN: cross-compiler
         callstack
         set-datastack
         set-callstack
-        handle?
+        port?
         exit*
         server-socket
         close-fd

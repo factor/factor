@@ -27,6 +27,7 @@ void sbuf_append_string(SBUF* sbuf, STRING* string);
 void primitive_sbuf_append(void);
 STRING* sbuf_to_string(SBUF* sbuf);
 void primitive_sbuf_to_string(void);
+void primitive_clone_sbuf(void);
 bool sbuf_eq(SBUF* s1, SBUF* s2);
 void primitive_sbuf_eq(void);
 void fixup_sbuf(SBUF* sbuf);

@@ -20,20 +20,20 @@ int write_fd_count;
 
 void init_io_tasks(fd_set* fd_set, IO_TASK* io_tasks);
 void init_iomux(void);
-void add_io_task_impl(
+IO_TASK* add_io_task_impl(
 	IO_TASK_TYPE type,
 	PORT* port,
 	CELL callback,
-	fd_set* fdset,
 	IO_TASK* io_tasks,
 	int* fd_count);
-void add_io_task(IO_TASK_TYPE type, PORT* port, CELL callback);
+IO_TASK* add_io_task(IO_TASK_TYPE type, PORT* port, CELL callback);
 void remove_io_task_impl(
 	IO_TASK_TYPE type,
 	PORT* port,
-	fd_set* fdset,
 	IO_TASK* io_tasks,
 	int* fd_count);
 void remove_io_task(IO_TASK_TYPE type, PORT* port);
+void perform_io_task(IO_TASK* task);
+bool set_up_fd_set(fd_set* fdset, IO_TASK* io_tasks);
 CELL iomux(void);
 void collect_io_tasks(void);

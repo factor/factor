@@ -71,7 +71,7 @@ void primitive_to_rect(void)
 		dpush(tag_fixnum(0));
 		break;
 	case COMPLEX_TYPE:
-		c = untag_complex(dpeek());
+		c = untag_complex(dpop());
 		dpush(c->real);
 		dpush(c->imaginary);
 		break;

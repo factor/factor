@@ -7,7 +7,7 @@ void init_io(void)
 	env.user[STDOUT_ENV] = port(1);
 	set_nonblocking(1);
 	env.user[STDERR_ENV] = port(2);
-	set_nonblocking(2);
+	/* set_nonblocking(2); */
 }
 
 /* Return true if something was read */
@@ -126,10 +126,11 @@ bool write_step(PORT* port)
 /* keep writing to the stream until everything is written */
 void flush_buffer(PORT* port)
 {
+	IO_TASK* task;
 	if(port->buf_mode != B_WRITE || port->buf_fill == 0)
 		return;
 
-	add_io_task(IO_TASK_WRITE,port,F);
+	task = add_io_task(IO_TASK_WRITE,port,F);
 
 	for(;;)
 	{

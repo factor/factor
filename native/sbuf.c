@@ -114,6 +114,14 @@ void primitive_sbuf_to_string(void)
 	drepl(tag_object(sbuf_to_string(untag_sbuf(dpeek()))));
 }
 
+void primitive_clone_sbuf(void)
+{
+	SBUF* s = untag_sbuf(dpeek());
+	SBUF* new_s = sbuf(s->top);
+	sbuf_append_string(new_s,s->string);
+	drepl(tag_object(new_s));
+}
+
 bool sbuf_eq(SBUF* s1, SBUF* s2)
 {
 	if(s1->top == s2->top)

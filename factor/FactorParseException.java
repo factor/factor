@@ -77,7 +77,7 @@ public class FactorParseException extends FactorException
 		return position;
 	}
 
-	public String getMessage()
+	public String getParserMessage()
 	{
 		return msg;
 	}

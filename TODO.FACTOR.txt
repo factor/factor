@@ -1,3 +1,23 @@
+0.62:
+
+- vocabulary section: what is the dictionary?
+- document swons, uncons, unswons
+- vector-push/pop examples
+- vector-each/map examples
+- string construction examples
+- string construction ackward
+- sbuf-hashcode
+- vector-hashcode
+- test substitute, set-nth, remove-nth
+- listener backspace overzealous
+- SIGBUS handler
+- handle division by zero
+- errors: don't show .factor-rc
+- inspector: sort
+- accept: return socket, instead of printing msg
+- telnetd: needs own history
+- multitasking
+
 [error] AWT-EventQueue-0: java.lang.NullPointerException
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
@@ -14,51 +34,32 @@
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:137)
 [error] AWT-EventQueue-0:  at java.awt.EventDispatchThread.run(EventDispatchThread.java:100)
 
-+ docs:
-
-- vocabulary section: what is the dictionary?
-- document swons, uncons, unswons
-- vector-push/pop examples
-- vector-each/map examples
-- string construction examples
-- string construction ackward
-
 + tests:
 
 - java factor: equal numbers have non-equal hashcodes!
-- sbuf-hashcode
-- vector-hashcode
-- clone-sbuf
 - FactorLib.equal() not very good
-- test substitute, set-nth, remove-nth
 - do nset-nth, nremove-nth, nsubstitute, ninject
 - IN: format base: work with all types of numbers
 - bitwise operations
 
-- tail call optimization broken again
 - rethink strhead/strtail&co
 
-+ listener:
++ listener/plugin:
 
-- backspace overzealous
+- completion
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
 
 + native:
 
-- SIGBUS handler
-- handle division by zero
 - broken pipe errors with httpd and telnetd in cfactor
 - read#
 - to_fixnum and friends: error on float
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
-- errors: don't show .factor-rc
 - parsing should be parsing
 - describe-word
 - contains ==> contains?
 - telnetd: send errors on socket
-- inspector: sort
-- accept: return socket, instead of printing msg
 - enforce bottom-up in native bootstrap
 
 + interactive:
@@ -66,8 +67,9 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 - inspector links when describe called without object path
 - 'cascading' styles
 
-+ compiler:
++ JVM compiler:
 
+- tail call optimization broken again
 - don't compile inline words
 - recursive words with code after ifte
 - less unnecessary args to auxiliary methods
@@ -78,7 +80,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + misc:
 
-- telnetd: needs own history
 - compiled stack traces broken
 - namespace clone drops static var bindings
 - ditch map
@@ -88,7 +89,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 
 + httpd:
 
-- multitasking
 - httpd: don't flush so much
 - log with date
 - log user agent

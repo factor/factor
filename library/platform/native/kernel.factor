@@ -32,6 +32,7 @@ IN: kernel
 USE: arithmetic
 USE: combinators
 USE: errors
+USE: io-internals
 USE: lists
 USE: logic
 USE: namespaces
@@ -70,6 +71,7 @@ USE: unparser
     [
         [ cons? ] [ clone-list ]
         [ vector? ] [ clone-vector ]
+        [ sbuf? ] [ clone-sbuf ]
         [ drop t ] [ ( return the object ) ]
     ] cond ;
 
@@ -87,7 +89,7 @@ USE: unparser
         [ vector?  ] [ drop "vector" ]
         [ string?  ] [ drop "string" ]
         [ sbuf?    ] [ drop "sbuf" ]
-        [ handle?  ] [ drop "handle" ]
+        [ port?    ] [ drop "port" ]
         [ drop t   ] [ drop "unknown" ]
     ] cond ;
 
