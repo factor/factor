@@ -1,0 +1,114 @@
+! Copyright (C) 2004 Chris Double.
+! 
+! Redistribution and use in source and binary forms, with or without
+! modification, are permitted provided that the following conditions are met:
+! 
+! 1. Redistributions of source code must retain the above copyright notice,
+!    this list of conditions and the following disclaimer.
+! 
+! 2. Redistributions in binary form must reproduce the above copyright notice,
+!    this list of conditions and the following disclaimer in the documentation
+!    and/or other materials provided with the distribution.
+! 
+! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+!
+! Routines for managing a simple "To Do list". A todo list has a 'user', 'password'
+! and list of items. Each item has a priority, description, and indication if it is
+! complete. 
+IN: todo
+USE: parser
+USE: stack
+USE: strings
+USE: streams
+USE: namespaces
+USE: lists
+USE: stdio
+USE: kernel
+
+: <todo> ( user password -- <todo> )
+  #! Create an empty todo list
+  <namespace> [
+    "password" set
+     "user" set
+     f "items" set
+  ] extend ;
+
+: <todo-item> ( priority description -- )
+  #! Create a todo item
+  <namespace> [
+    "description" set
+    "priority" set
+    f "complete?" set
+  ] extend ;
+
+: add-todo-item ( <todo> <item> -- )
+  #! Add the item to the todo list
+  swap [
+    "items" add@
+  ] bind ;
+
+: namespace>alist ( namespace -- alist )
+  #! Convert a namespace to an alist
+  [ vars-values ] bind ;
+
+: print-quoted ( str -- )
+  #! Print the string with quotes around it
+  "\"" write write "\"" print ;
+
+: write-todo ( <todo> -- )
+  #! Write the todo list to the current output stream
+  #! in a format that if loaded by the parser will result
+  #! in a <todo> again.
+  [ 
+    "USE: namespaces" print
+    "USE: lists" print
+    "<namespace> [" print
+    "password" get print-quoted
+    "password" print-quoted "set" print
+    "user" get print-quoted
+    "user" print-quoted "set" print    
+    "items" get [ namespace>alist ] map print
+    "[ alist>namespace ] map" print 
+    "items" print-quoted "set" print
+    "] extend" print
+  ] bind ;
+
+: store-todo ( <todo> filename -- )
+  #! store the todo list in the given file.
+  <filebw> [ write-todo ] with-stream ;
+
+: load-todo ( filename -- <todo> )
+  run-file ;  
+
+: password-matches? ( password <todo> -- <todo> )
+  #! Returns the <todo> if the password matches otherwise
+  #! returns false.
+  dup -rot [ "password" get ] bind = [ ] [ drop f ] ifte ;
+
+: user-exists? ( db-path name password -- <todo> )
+  #! Returns a <todo> if a user with the given name exists
+  #! otherwise returns false.
+  -rot ".todo" cat3 dup exists? [ 
+    load-todo password-matches?
+  ] [
+    2drop f 
+  ] ifte ;
+
+: items-each-bind ( quot -- )
+  #! For each item in the currently bound todo list, call the quotation
+  #! with that item bound.
+  unit [ bind ] append "items" get swap each ;
+
+: test-todo 
+  "user" "password" <todo> 
+   dup "1" "item1" <todo-item> add-todo-item
+   dup "2" "item2" <todo-item> add-todo-item ;
