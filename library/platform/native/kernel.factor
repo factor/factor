@@ -29,12 +29,12 @@ IN: vectors
 DEFER: vector=
 
 IN: kernel
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: io-internals
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: stdio

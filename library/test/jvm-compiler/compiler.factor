@@ -1,5 +1,4 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: compiler
 USE: inspector

@@ -26,8 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: combinators
+USE: math
 USE: stack
 
 : quadratic-complete ( a b c -- a b c a b )

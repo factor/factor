@@ -26,11 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: url-encoding
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
 USE: format
+USE: math
 USE: parser
 USE: stack
 USE: strings

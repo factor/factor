@@ -1,7 +1,7 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: kernel
+USE: math
 USE: stack
 USE: stdio
 USE: test

@@ -82,6 +82,7 @@ USE: stdio
     "/library/platform/native/init.factor"
 
     "/library/math/math.factor"
+    "/library/platform/native/math.factor"
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"

@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
+USE: math
 USE: real-math
 USE: stack
 
@@ -57,7 +57,11 @@ USE: stack
 
 : abs ( z -- abs )
     #! Compute the complex absolute value.
-    >rect mag2 ; inline
+    dup complex? [
+        >rect mag2
+    ] [
+        dup 0 < [ neg ] when
+    ] ifte ;
 
 : conjugate ( z -- z* )
     >rect neg rect> ;

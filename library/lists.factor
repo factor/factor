@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: lists
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
+USE: math
 USE: stack
 USE: vectors
 

@@ -26,11 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: namespaces
-USE: arithmetic
 USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 USE: strings
 USE: vectors

@@ -26,13 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: interpreter
-USE: arithmetic
 USE: combinators
 USE: continuations
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: parser
 USE: stack

@@ -9,12 +9,7 @@ RATIO* bignum_to_ratio(CELL n);
 FLOAT* bignum_to_float(CELL n);
 FLOAT* ratio_to_float(CELL n);
 
-#define CELL_TO_INTEGER(result) \
-	FIXNUM _result = (result); \
-	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-		return tag_object(s48_long_to_bignum(_result)); \
-	else \
-		return tag_fixnum(_result);
+CELL tag_fixnum_or_bignum(FIXNUM x);
 
 #define BINARY_OP(OP) \
 CELL OP(CELL x, CELL y) \

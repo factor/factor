@@ -73,7 +73,6 @@ XT primitives[] = {
 	primitive_lesseq,
 	primitive_greater,
 	primitive_greatereq,
-	primitive_gcd,
 	primitive_facos,
 	primitive_fasin,
 	primitive_fatan,

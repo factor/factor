@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: arithmetic
 USE: kernel
 USE: logic
+USE: math
 USE: stack
 
 : cat2 ( "a" "b" -- "ab" )

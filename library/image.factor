@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: cross-compiler
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: format
@@ -34,6 +33,7 @@ USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: prettyprint
 USE: stack

@@ -26,11 +26,11 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: regexp
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
 USE: lists
+USE: math
 USE: stack
 
 : <regex> ( pattern -- regex )

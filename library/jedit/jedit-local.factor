@@ -26,8 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: jedit
-USE: arithmetic
 USE: combinators
+USE: math
 USE: namespaces
 USE: stack
 USE: strings

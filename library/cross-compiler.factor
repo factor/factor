@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: cross-compiler
-USE: arithmetic
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: parser
 USE: real-math
@@ -39,10 +39,6 @@ USE: strings
 USE: vectors
 USE: vectors
 USE: words
-
-IN: arithmetic
-DEFER: number=
-DEFER: /i
 
 IN: kernel
 DEFER: getenv
@@ -78,6 +74,10 @@ DEFER: can-write?
 DEFER: add-write-io-task
 DEFER: write-fd-8
 DEFER: next-io-task
+
+IN: math
+DEFER: number=
+DEFER: /i
 
 IN: parser
 DEFER: str>float
@@ -177,7 +177,6 @@ IN: cross-compiler
         <=
         >
         >=
-        gcd
         facos
         fasin
         fatan

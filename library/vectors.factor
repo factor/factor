@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
-USE: arithmetic
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 
 : empty-vector ( len -- vec )

@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 
 : 2vector-nth ( n vec vec -- obj obj )

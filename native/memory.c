@@ -46,10 +46,11 @@ void check_memory(void)
 	{
 		if(active->here > active->limit)
 		{
-			printf("Out of memory\n");
-			printf("active->base  = %ld\n",active->base);
-			printf("active->here  = %ld\n",active->here);
-			printf("active->limit = %ld\n",active->limit);
+			fprintf(stderr,"Out of memory\n");
+			fprintf(stderr,"active->base  = %ld\n",active->base);
+			fprintf(stderr,"active->here  = %ld\n",active->here);
+			fprintf(stderr,"active->limit = %ld\n",active->limit);
+			fflush(stderr);
 			exit(1);
 		}
 

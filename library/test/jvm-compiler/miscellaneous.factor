@@ -1,11 +1,11 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: compiler
 USE: continuations
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: random
 USE: stack

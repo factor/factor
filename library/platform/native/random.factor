@@ -26,8 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: random
-USE: arithmetic
 USE: kernel
+USE: math
 USE: stack
 
 : power-of-2? ( n -- ? )

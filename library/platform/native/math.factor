@@ -1,8 +1,8 @@
-! :folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=0:
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,35 +25,15 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: prettyprint
+IN: math
 USE: combinators
-USE: lists
-USE: math
-USE: prettyprint
+USE: kernel
 USE: stack
-USE: stdio
-USE: unparser
-USE: words
 
-: prettyprint-~<< ( indent -- indent )
-    "~<<" write prettyprint-space
-    tab-size + ;
+: (gcd) ( x y -- z )
+    USE: prettyprint .s
+    dup 0 = [ drop ] [ tuck mod (gcd) ] ifte ;
 
-: prettyprint->>~ ( indent -- indent )
-    ">>~" write
-    tab-size - ;
-
-: prettyprint-~<<>>~ ( indent word list -- indent )
-    [ [ prettyprint-~<< ] dip prettyprint-word " " write ] dip
-    [ write " " write ] each
-    prettyprint->>~ ;
-
-: see ( word -- )
-    0 swap
-    intern dup worddef
-    [
-        [ compound-or-compiled? ] [ word-parameter prettyprint-:; ]
-        [ shuffle? ] [ word-parameter prettyprint-~<<>>~ ]
-        [ primitive? ] [ "PRIMITIVE: " write unparse write drop ]
-        [ drop t ] [ 2drop "Not defined" write ]
-    ] cond prettyprint-newline ;
+: gcd ( x y -- z )
+    #! Greatest common divisor.
+    abs swap abs 2dup < [ swap ] when (gcd) ;

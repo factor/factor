@@ -26,12 +26,12 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: errors
-USE: arithmetic
 USE: combinators
 USE: continuations
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: prettyprint
 USE: stack
@@ -77,7 +77,7 @@ USE: vectors
     " with " write unparse print ;
 
 : float-format-error ( list -- )
-    "Invalid floating point literal format: " write car . ;
+    "Invalid floating point literal format: " write . ;
 
 : signal-error ( obj -- )
     "Operating system signal " write . ;

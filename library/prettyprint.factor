@@ -26,13 +26,13 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: prettyprint
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: format
 USE: kernel
 USE: logic
 USE: lists
+USE: math
 USE: namespaces
 USE: prettyprint
 USE: stack

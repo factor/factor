@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: random
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 
 : random-digit ( -- digit )

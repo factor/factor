@@ -25,11 +25,11 @@
 
 /* CELL must be 32 bits and your system must have 32-bit pointers */
 typedef unsigned long int CELL;
-#define CELLS sizeof(CELL)
+#define CELLS ((signed)sizeof(CELL))
 
 /* must always be 16 bits */
 typedef unsigned short CHAR;
-#define CHARS sizeof(CHAR)
+#define CHARS ((signed)sizeof(CHAR))
 
 /* Memory heap size */
 #define DEFAULT_ARENA (5 * 1024 * 1024)

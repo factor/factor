@@ -40,12 +40,14 @@ CELL number_eq_fixnum(CELL x, CELL y)
 
 CELL add_fixnum(CELL x, CELL y)
 {
-	CELL_TO_INTEGER(untag_fixnum_fast(x) + untag_fixnum_fast(y));
+	return tag_fixnum_or_bignum(untag_fixnum_fast(x)
+		+ untag_fixnum_fast(y));
 }
 
 CELL subtract_fixnum(CELL x, CELL y)
 {
-	CELL_TO_INTEGER(untag_fixnum_fast(x) - untag_fixnum_fast(y));
+	return tag_fixnum_or_bignum(untag_fixnum_fast(x)
+		- untag_fixnum_fast(y));
 }
 
 CELL multiply_fixnum(CELL _x, CELL _y)
@@ -67,7 +69,7 @@ CELL divint_fixnum(CELL x, CELL y)
 {
 	/* division takes common factor of 8 out. */
 	/* we have to do SIGNED division here */
-	return tag_fixnum((FIXNUM)x / (FIXNUM)y);
+	return tag_fixnum_or_bignum((FIXNUM)x / (FIXNUM)y);
 }
 
 CELL divfloat_fixnum(CELL x, CELL y)
@@ -79,17 +81,19 @@ CELL divfloat_fixnum(CELL x, CELL y)
 	return tag_object(make_float((double)_x / (double)_y));
 }
 
-CELL divmod_fixnum(CELL x, CELL y)
+CELL divmod_fixnum(CELL _x, CELL _y)
 {
-	ldiv_t q = ldiv(x,y);
-	/* division takes common factor of 8 out. */
-	dpush(tag_fixnum(q.quot));
-	return q.rem;
+	FIXNUM x = untag_fixnum_fast(_x);
+	FIXNUM y = untag_fixnum_fast(_y);
+	dpush(tag_fixnum_or_bignum(x / y));
+	return tag_fixnum_or_bignum(x % y);
 }
 
-CELL mod_fixnum(CELL x, CELL y)
+CELL mod_fixnum(CELL _x, CELL _y)
 {
-	return x % y;
+	FIXNUM x = untag_fixnum_fast(_x);
+	FIXNUM y = untag_fixnum_fast(_y);
+	return tag_fixnum(x % y);
 }
 
 FIXNUM gcd_fixnum(FIXNUM x, FIXNUM y)
@@ -141,9 +145,13 @@ CELL divide_fixnum(CELL x, CELL y)
 	}
 
 	if(_y == 1)
-		return tag_fixnum(_x);
+		return tag_fixnum_or_bignum(_x);
 	else
-		return tag_ratio(ratio(tag_fixnum(_x),tag_fixnum(_y)));
+	{
+		return tag_ratio(ratio(
+			tag_fixnum_or_bignum(_x),
+			tag_fixnum_or_bignum(_y)));
+	}
 }
 
 CELL and_fixnum(CELL x, CELL y)
@@ -164,7 +172,7 @@ CELL xor_fixnum(CELL x, CELL y)
 CELL shift_fixnum(CELL _x, FIXNUM y)
 {
 	FIXNUM x = untag_fixnum_fast(_x);
-	if(y > CELLS * -8 && y < CELLS * 8)
+	if(y > -CELLS * 8 && y < CELLS * 8)
 	{
 		long long result = (y < 0
 			? (long long)x >> -y

@@ -26,8 +26,8 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: lists
+USE: math
 USE: stack
 
 : |+ ( list -- sum )

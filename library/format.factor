@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: format
-USE: arithmetic
 USE: combinators
 USE: kernel
+USE: math
 USE: namespaces
 USE: strings
 USE: stack

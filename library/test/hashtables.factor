@@ -1,10 +1,10 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: test

@@ -1,6 +1,6 @@
 IN: scratchpad
-USE: arithmetic
 USE: stack
+USE: math
 USE: test
 USE: unparser
 
@@ -17,3 +17,9 @@ unit-test
 [ 4294967296 ] [ 1 16 shift 16 shift ] unit-test
 [ 4294967296 ] [ 1 32 shift ] unit-test
 [ 1267650600228229401496703205376 ] [ 1 100 shift ] unit-test
+[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
+[ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
+[ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
+[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
+[ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
+[ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test

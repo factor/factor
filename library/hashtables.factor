@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: hashtables
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: stack
 USE: vectors
 

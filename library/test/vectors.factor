@@ -1,6 +1,6 @@
-USE: arithmetic
 USE: lists
 USE: kernel
+USE: math
 USE: random
 USE: stack
 USE: test

@@ -1,5 +1,13 @@
 #include "factor.h"
 
+CELL tag_fixnum_or_bignum(FIXNUM x)
+{
+	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
+		return tag_object(s48_long_to_bignum(x));
+	else
+		return tag_fixnum(x);
+}
+
 CELL upgraded_arithmetic_type(CELL type1, CELL type2)
 {
 	switch(type1)
@@ -192,10 +200,6 @@ BINARY_OP(greater)
 
 BINARY_OP_NUMBER_ONLY(greatereq)
 BINARY_OP(greatereq)
-
-BINARY_OP_INTEGER_ONLY(gcd)
-BINARY_OP_NUMBER_ONLY(gcd)
-BINARY_OP(gcd)
 
 UNARY_OP_INTEGER_ONLY(not)
 UNARY_OP_NUMBER_ONLY(not)

@@ -26,7 +26,6 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: httpd
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: httpd-responder
@@ -34,6 +33,7 @@ USE: kernel
 USE: lists
 USE: logging
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: stdio

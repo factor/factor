@@ -1,6 +1,6 @@
 IN: scratchpad
-USE: arithmetic
 USE: lists
+USE: math
 USE: random
 USE: stack
 USE: test

@@ -1,3 +1,5 @@
+FILE* debug_fd;
+
 typedef enum {
 	IO_TASK_READ_LINE,
 	IO_TASK_READ_COUNT,

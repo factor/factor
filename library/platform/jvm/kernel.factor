@@ -82,7 +82,7 @@ IN: kernel
 : garbage-collection ( -- )
     [ ] "java.lang.System" "gc" jinvoke-static ;
 
-IN: arithmetic
+IN: math
 DEFER: >bignum
 
 IN: kernel
@@ -106,10 +106,12 @@ IN: kernel
 
 : free-memory ( -- int )
   #! Return the free memory in the JVM.
-  jvm-runtime f "java.lang.Runtime" "freeMemory" jinvoke ;
+  jvm-runtime f "java.lang.Runtime" "freeMemory" jinvoke
+  >bignum ;
 
 : total-memory ( -- int )
   #! Return the total memory available to the JVM.
-  jvm-runtime f "java.lang.Runtime" "totalMemory" jinvoke ;
+  jvm-runtime f "java.lang.Runtime" "totalMemory" jinvoke
+  >bignum ;
 
 : room free-memory total-memory ;

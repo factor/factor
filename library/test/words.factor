@@ -1,5 +1,5 @@
 IN: scratchpad
-USE: arithmetic
+USE: math
 USE: test
 USE: words
 

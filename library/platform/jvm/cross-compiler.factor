@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: cross-compiler
-USE: arithmetic
 USE: kernel
 USE: lists
+USE: math
 USE: parser
 USE: stack
 USE: stdio

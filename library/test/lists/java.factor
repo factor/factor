@@ -1,6 +1,6 @@
-USE: arithmetic
 USE: compiler
 USE: lists
+USE: math
 USE: stack
 USE: strings
 USE: test

@@ -31,8 +31,8 @@
 !!! 'math' vocabulary instead.
 
 IN: real-math
-USE: arithmetic
 USE: kernel
+USE: math
 USE: stack
 
 : facos ( x -- acos )

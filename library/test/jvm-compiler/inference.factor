@@ -1,5 +1,4 @@
 IN: scratchpad
-USE: arithmetic
 USE: compiler
 USE: lists
 USE: math

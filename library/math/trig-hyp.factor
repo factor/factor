@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: math
-USE: arithmetic
 USE: combinators
 USE: kernel
+USE: math
 USE: real-math
 USE: stack
 

@@ -3,12 +3,12 @@
 ! Some of these words should be moved to the standard library.
 
 IN: test
-USE: arithmetic
 USE: combinators
 USE: compiler
 USE: errors
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: parser
 USE: prettyprint
@@ -22,7 +22,7 @@ USE: unparser
     [ "Assertion failed!" throw ] unless ;
 
 : print-test ( input output -- )
-    "TESTING: " write 2list . ;
+    "TESTING: " write 2list . flush ;
 
 : keep-datastack ( quot -- )
     datastack >r call r> set-datastack drop ;

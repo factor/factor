@@ -1,8 +1,8 @@
 IN: scratchpad
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: prettyprint
 USE: stack
 USE: stdio

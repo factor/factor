@@ -26,9 +26,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: profiler
-USE: arithmetic
 USE: kernel
 USE: lists
+USE: math
 USE: prettyprint
 USE: stack
 USE: words

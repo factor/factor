@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: strings
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: lists
+USE: math
 USE: namespaces
 USE: strings
 USE: stack

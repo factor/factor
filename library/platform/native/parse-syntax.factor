@@ -29,13 +29,13 @@
 ! that it does not contain Java words anymore!
 IN: builtins
 
-USE: arithmetic
 USE: combinators
 USE: cross-compiler
 USE: errors
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: parser
 USE: stack

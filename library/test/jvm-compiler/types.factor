@@ -1,7 +1,7 @@
 IN: scratchpad
-USE: arithmetic
 USE: compiler
 USE: lists
+USE: math
 USE: stack
 USE: stdio
 USE: strings

@@ -1,8 +1,8 @@
 IN: scratchpad
-USE: arithmetic
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: test

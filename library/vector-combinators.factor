@@ -26,10 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: vectors
-USE: arithmetic
 USE: combinators
 USE: kernel
 USE: logic
+USE: math
 USE: stack
 
 : vector-each ( vector code -- )
