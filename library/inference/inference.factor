@@ -59,12 +59,6 @@ SYMBOL: entry-effect
 ! makes a local jump to this label.
 SYMBOL: recursive-label
 
-! When inferring stack effects of mutually recursive words, we
-! don't want to save the fact that one word does not have a
-! stack effect before the base case of its mutual pair is
-! inferred.
-SYMBOL: save-effect
-
 ! A value has the following slots:
 GENERIC: literal-value ( value -- obj )
 GENERIC: value= ( literal value -- ? )
@@ -149,8 +143,7 @@ M: literal value-class-and ( class value -- )
     init-interpreter
     0 <vector> d-in set
     recursive-state set
-    dataflow-graph off
-    save-effect on ;
+    dataflow-graph off ;
 
 DEFER: apply-word
 

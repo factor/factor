@@ -41,7 +41,6 @@ USE: generic
 [ [ call ] infer old-effect ] unit-test-fails
 
 [ [ 2 | 4 ] ] [ [ 2dup ] infer old-effect ] unit-test
-[ [ 2 | 0 ] ] [ [ set-vector-length ] infer old-effect ] unit-test
 [ [ 2 | 0 ] ] [ [ vector-push ] infer old-effect ] unit-test
 
 [ [ 1 | 0 ] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
@@ -99,6 +98,13 @@ USE: generic
 
 [ [ bad-recursion-2 ] infer old-effect ] unit-test-fails
 
+! Not sure how to fix this one
+
+! : funny-recursion
+!     dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
+! 
+! [ [ 1 | 1 ] ] [ [ funny-recursion ] infer old-effect ] unit-test
+
 ! Simple combinators
 [ [ 1 | 2 ] ] [ [ [ car ] keep cdr ] infer old-effect ] unit-test
 
@@ -122,6 +128,9 @@ DEFER: foe
     ] [
         2drop f
     ] ifte ;
+
+[ [ 2 | 1 ] ] [ [ fie ] infer old-effect ] unit-test
+[ [ 2 | 1 ] ] [ [ foe ] infer old-effect ] unit-test
 
 ! This form should not have a stack effect
 : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
@@ -149,9 +158,8 @@ SYMBOL: sym-test
 
 [ [ 0 | 1 ] ] [ [ sym-test ] infer old-effect ] unit-test
 
-[ [ 2 | 1 ] ] [ [ fie ] infer old-effect ] unit-test
-[ [ 2 | 1 ] ] [ [ foe ] infer old-effect ] unit-test
 
+[ [ 2 | 0 ] ] [ [ set-vector-length ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ 2list ] infer old-effect ] unit-test
 [ [ 3 | 1 ] ] [ [ 3list ] infer old-effect ] unit-test
 [ [ 2 | 1 ] ] [ [ append ] infer old-effect ] unit-test

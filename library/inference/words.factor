@@ -109,29 +109,14 @@ USE: prettyprint
         [ swap <chained-error> rethrow ] when*
     ] catch ;
 
-: (infer-compound) ( word -- effect )
+: infer-compound ( word -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
         recursive-state get init-inference
-        dup inline-compound
+        dup dup inline-compound
         [ "infer-effect" set-word-property ] keep
-    ] with-scope ;
-
-: infer-compound ( word -- )
-    #! Infer the stack effect of a compound word in a separate
-    #! inferencer instance, caching the result.
-    [
-        dup (infer-compound) consume/produce
-    ] [
-        [
-            swap save-effect get [
-                t "no-effect" set-word-property
-            ] [
-                drop
-            ] ifte rethrow
-        ] when*
-    ] catch ;
+    ] with-scope consume/produce ;
 
 GENERIC: (apply-word)
 

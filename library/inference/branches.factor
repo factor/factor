@@ -39,6 +39,10 @@ USE: words
 USE: hashtables
 USE: prettyprint
 
+! If this symbol is on, partial evalution of conditionals is
+! disabled.
+SYMBOL: inferring-base-case
+
 : vector-length< ( vec1 vec2 -- ? )
     swap vector-length swap vector-length < ;
 
@@ -127,9 +131,8 @@ SYMBOL: cloned
     d-in [ deep-clone-vector ] change
     dataflow-graph off ;
 
-: infer-branch ( value save-effect -- namespace )
+: infer-branch ( value -- namespace )
     <namespace> [
-        save-effect set
         uncons [ unswons [ \ value-class set ] bind ] when*
         dup value-recursion recursive-state set
         copy-inference
@@ -154,7 +157,7 @@ SYMBOL: dual-recursive-state
     #! Return effect namespace if inference didn't fail.
     [
         [ dual-branch dual-recursive-state set ] keep
-        f infer-branch
+        infer-branch
     ] [
         [ 2drop f ] when
     ] catch ;
@@ -167,12 +170,16 @@ SYMBOL: dual-recursive-state
     #! Either the word is not recursive, or it is recursive
     #! and the base case throws an error.
     [
+        inferring-base-case on
+
         [ terminator-quot? not ] subset dup length 1 > [
             infer-base-cases unify-effects
             effect dual-recursive-state get set-base
         ] [
             drop
         ] ifte
+        
+        inferring-base-case off
     ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )
@@ -182,7 +189,7 @@ SYMBOL: dual-recursive-state
     #! is a pair [ value | class ] indicating a type propagation
     #! for the given branch.
     dup infer-base-case [
-        dup t infer-branch swap terminator-quot? [
+        dup infer-branch swap terminator-quot? [
             [ meta-d off meta-r off d-in off ] extend
         ] when
     ] map ;
@@ -198,11 +205,17 @@ SYMBOL: dual-recursive-state
     #! parameter is a vector.
     (infer-branches) dup unify-effects unify-dataflow ;
 
+: static-branch? ( value -- )
+    literal? inferring-base-case get not and ;
+
 : static-ifte ( true false -- )
     #! If the branch taken is statically known, just infer
     #! along that branch.
-    pop-d literal-value [ drop ] [ nip ] ifte
-    literal-value infer-quot ;
+    dataflow-drop, pop-d literal-value [ drop ] [ nip ] ifte
+    gensym [
+        dup value-recursion recursive-state set
+        literal-value infer-quot
+    ] (with-block) ;
 
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
@@ -219,11 +232,11 @@ SYMBOL: dual-recursive-state
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap
-!    peek-d literal? [
-!        static-ifte
-!    ] [
-        dynamic-ifte ;
-!    ] ifte ;
+    peek-d static-branch? [
+        static-ifte
+    ] [
+        dynamic-ifte
+    ] ifte ;
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 

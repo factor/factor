@@ -85,11 +85,12 @@ USE: kernel-internals
 : default-cli-args
     #! Some flags are *on* by default, unless user specifies
     #! -no-<flag> CLI switch
-    t "user-init" set
-    t "interactive" set
-    t "smart-terminal" set
-    t "verbose-compile" set
-    t "compile" set ;
+    "user-init" on
+    "interactive" on
+    "smart-terminal" on
+    "verbose-compile" on
+    "compile" on
+    os "win32" = [ "graphical" on ] when ;
 
 : cli-args ( -- args ) 10 getenv ;
 

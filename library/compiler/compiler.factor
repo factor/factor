@@ -41,6 +41,7 @@ USE: strings
 USE: unparser
 USE: vectors
 USE: words
+USE: test
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
@@ -97,7 +98,7 @@ M: compound (compile) ( word -- )
 : compile-all ( -- )
     #! Compile all words.
     supported-cpu? [
-        [ try-compile ] each-word
+        [ [ try-compile ] each-word ] time
     ] [
         "Unsupported CPU" print
     ] ifte ;
