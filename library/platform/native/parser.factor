@@ -135,9 +135,9 @@ USE: unparser
         ] ifte
     ] when ;
 
-: parsed| ( obj -- )
+: parsed| ( parsed parsed obj -- parsed )
     #! Some ugly ugly code to handle [ a | b ] expressions.
-    >r nreverse dup last* r> swap set-cdr swons ;
+    >r unswons r> cons swap [ swons ] each swons ;
 
 : expect ( word -- )
     dup scan = not [
@@ -158,7 +158,7 @@ USE: unparser
 
 : parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
-    f swap (parse) nreverse ;
+    f swap (parse) reverse ;
 
 : eval ( "X" -- X )
     parse call ;

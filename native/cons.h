@@ -29,5 +29,3 @@ INLINE CELL cdr(CELL cons)
 void primitive_cons(void);
 void primitive_car(void);
 void primitive_cdr(void);
-void primitive_set_car(void);
-void primitive_set_cdr(void);

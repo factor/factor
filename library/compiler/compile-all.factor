@@ -110,7 +110,11 @@ SYMBOL: compilable-word-list
     [, [ dup can-compile? [ , ] [ drop ] ifte ] each-word ,] ;
 
 : cannot-compile ( word -- )
-    "verbose-compile" get [ "Cannot compile " write . ] when ;
+    "verbose-compile" get [
+        "Cannot compile " write .
+    ] [
+        drop
+    ] ifte ;
 
 : init-compiler ( -- )
     #! Compile all words.

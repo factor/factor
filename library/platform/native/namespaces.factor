@@ -41,6 +41,9 @@ DEFER: >n
 : namestack* ( -- ns ) 3 getenv ;
 : set-namestack* ( ns -- ) 3 setenv ;
 
+: namestack ( -- stack ) namestack* vector-clone ;
+: set-namestack ( stack -- ) vector-clone set-namestack* ;
+
 : global ( -- g ) 4 getenv ;
 : set-global ( g -- ) 4 setenv ;
 

@@ -24,17 +24,3 @@ void primitive_cdr(void)
 {
 	drepl(cdr(dpeek()));
 }
-
-void primitive_set_car(void)
-{
-	CELL cons = dpop();
-	CELL car = dpop();
-	untag_cons(cons)->car = car;
-}
-
-void primitive_set_cdr(void)
-{
-	CELL cons = dpop();
-	CELL cdr = dpop();
-	untag_cons(cons)->cdr = cdr;
-}

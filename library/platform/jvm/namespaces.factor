@@ -45,6 +45,12 @@ DEFER: namespace
     interpreter
     "factor.FactorInterpreter" "namestack" jvar-set ; inline
 
+: namestack ( -- stack )
+    namestack* clone ; inline
+
+: set-namestack ( stack -- )
+    clone set-namestack* ; inline
+
 : global ( -- namespace )
     interpreter "factor.FactorInterpreter" "global" jvar-get ;
 

@@ -70,7 +70,6 @@ USE: unparser
         "lists/cons"
         "lists/lists"
         "lists/assoc"
-        "lists/destructive"
         "lists/namespaces"
         "combinators"
         "continuations"

@@ -51,8 +51,6 @@ USE: words
     [ cons                   | " car cdr -- [ car | cdr ] " ]
     [ car                    | " [ car | cdr ] -- car " ]
     [ cdr                    | " [ car | cdr ] -- cdr " ]
-    [ set-car                | " car cons -- " ]
-    [ set-cdr                | " cdr cons -- " ]
     [ <vector>               | " capacity -- vector" ]
     [ vector-length          | " vector -- n " ]
     [ set-vector-length      | " n vector -- " ]

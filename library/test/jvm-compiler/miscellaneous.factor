@@ -90,8 +90,4 @@ test-word
 
 [ [ 1 1 0 0 ] ] [ [ system-property ] ] [ balance>list ] test-word
 
-! Make sure callstack only clones callframes, and not
-! everything on the callstack.
-[ ] [ ] [ f unit dup dup set-cdr >r callstack r> 2drop ] test-word
-
 [ t ] [ "ifte" intern dup worddef word-of-worddef = ] unit-test

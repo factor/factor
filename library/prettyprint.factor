@@ -141,7 +141,7 @@ DEFER: prettyprint*
     dup ends-with-newline? dup [ nip ] [ drop ] ifte ;
 
 : prettyprint-comment ( comment -- )
-    trim-newline [ "comments" ] get-style write-attr ;
+    trim-newline "comments" get-style write-attr ;
 
 : word-link ( word -- link )
     <%

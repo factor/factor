@@ -114,7 +114,6 @@ IN: kernel
 
 : clone ( obj -- obj )
     [
-        [ cons? ] [ clone-list ]
         [ vector? ] [ vector-clone ]
         [ sbuf? ] [ sbuf-clone ]
         [ drop t ] [ ( return the object ) ]
@@ -130,11 +129,3 @@ IN: kernel
 ! No compiler...
 : inline ;
 : interpret-only ;
-
-! HACKS
-
-IN: strings
-: char? drop f ;
-: >char ;
-: >upper ;
-: >lower ;

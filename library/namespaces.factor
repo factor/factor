@@ -53,17 +53,6 @@ USE: vectors
 ! bind ( namespace quot -- ) executes a quotation with a
 ! namespace pushed on the namespace stack.
 
-: namestack ( -- stack )
-    #! Push a copy of the namespace stack; same naming
-    #! convention as the primitives datastack and callstack.
-    namestack* clone ; inline
-
-: set-namestack ( stack -- )
-    #! Set the namespace stack to a copy of another stack; same
-    #! naming convention as the primitives datastack and
-    #! callstack.
-    clone set-namestack* ; inline
-
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
     namestack* vector-push ; inline
@@ -97,14 +86,6 @@ USE: vectors
     #! If the value of the variable is f, set the value to the
     #! result of evaluating [ a ].
     over get [ drop get ] [ swap >r call dup r> set ] ifte ;
-
-: alist> ( alist namespace -- )
-    #! Set each key in the alist to its value in the
-    #! namespace.
-    [ [ unswons set ] each ] bind ;
-
-: alist>namespace ( alist -- namespace )
-    <namespace> tuck alist> ;
 
 : traverse-path ( name object -- object )
     dup has-namespace? [ get* ] [ 2drop f ] ifte ;

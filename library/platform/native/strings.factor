@@ -37,3 +37,9 @@ USE: stack
     dup >r sbuf-append r>
     dup >r sbuf-append r>
     sbuf>str ;
+
+! HACKS
+: char? drop f ;
+: >char ;
+: >upper ;
+: >lower ;

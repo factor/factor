@@ -41,45 +41,9 @@ USE: vectors
     #! Construct a proper list of 3 elements.
     2list cons ;
 
-: 2rlist ( a b -- [ b a ] )
-    #! Construct a proper list of 2 elements in reverse stack order.
-    swap unit cons ;
-
-: copy-cons ( accum cons -- accum cdr )
-    uncons >r unit dup rot set-cdr r> ;
-
-: (clone-list) ( accum list -- last )
-    dup cons? [ copy-cons (clone-list) ] [ over set-cdr ] ifte ;
-
-: clone-list* ( list -- list last )
-    #! Push the cloned list, and the last cons cell of the
-    #! cloned list.
-    uncons >r unit dup r> (clone-list) ;
-
-: clone-list ( list -- list )
-    #! Push a shallow copy of a list.
-    dup [ clone-list* drop ] when ;
-
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    #! Append two lists. A new list is constructed by copying
-    #! the first list and setting its tail to the second.
-    over [ >r clone-list* r> swap set-cdr ] [ nip ] ifte ;
-
-: add ( [ list1 ] elem -- [ list1 elem ] )
-    #! Push a new proper list with an element added to the end.
-    unit append ;
-
-: caar ( list -- caar )
-    car car ; inline
-
-: cdar ( list -- cadr )
-    cdr car ; inline
-
-: cadr ( list -- cdar )
-    car cdr ; inline
-
-: cddr ( list -- cddr )
-    cdr cdr ; inline
+    #! Append two lists.
+    over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
     #! If the proper list contains the element, push the
@@ -115,48 +79,7 @@ USE: vectors
 : list? ( list -- boolean )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    dup [
-        dup cons? [
-            cdr list?
-        ] [
-            drop f
-        ] ifte
-    ] [
-        drop t
-    ] ifte ;
-
-: nappend ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    #! DESTRUCTIVE. Append two lists. The last node of the first
-    #! list is destructively modified to point to the second
-    #! list, unless the first list is f, in which case the
-    #! second list is returned.
-    over [ over last* set-cdr ] [ nip ] ifte ;
-
-: first ( list -- obj )
-    #! Push the head of the list, or f if the list is empty.
-    dup [ car ] when ;
-
-: next ( obj list -- obj )
-    #! Push the next object in the list after an object. Wraps
-    #! around to beginning of list if object is at the end.
-    tuck contains? dup [
-        ! Is there another entry in the list?
-        cdr dup [
-            nip car
-        ] [
-            ! No. Pick first
-            drop first
-        ] ifte
-    ] [
-        drop first
-    ] ifte ;
-
-: nreverse-iter ( list cons -- list cons )
-    [ dup dup cdr 2swap set-cdr nreverse-iter ] when* ;
-
-: nreverse ( list -- list )
-    #! DESTRUCTIVE. Reverse the given list, without consing.
-    f swap nreverse-iter ;
+    [ dup cons? [ cdr list? ] [ drop f ] ifte ] [ t ] ifte* ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     >r >r [ r> cons r> ] [ r> r> swapd cons ] ifte ; inline
@@ -196,7 +119,7 @@ USE: vectors
         ! Recurse
         tuck sort >r sort r>
         ! Combine
-        swapd cons nappend
+        swapd cons append
     ] [
         drop
     ] ifte ; inline interpret-only
@@ -209,11 +132,7 @@ USE: vectors
 DEFER: tree-contains?
 
 : =-or-contains? ( element obj -- ? )
-    dup cons? [
-        tree-contains?
-    ] [
-        =
-    ] ifte ;
+    dup cons? [ tree-contains? ] [ = ] ifte ;
 
 : tree-contains? ( element tree -- ? )
     dup [
@@ -254,7 +173,7 @@ DEFER: tree-contains?
     f transp [
         ! accum code elem -- accum code
         transp over >r >r call r> cons r>
-    ] each drop nreverse ; inline interpret-only
+    ] each drop reverse ; inline interpret-only
 
 : 2uncons ( list1 list2 -- car1 car2 cdr1 cdr2 )
     uncons >r >r uncons r> swap r> ;
@@ -283,30 +202,8 @@ DEFER: tree-contains?
     #! two lists in turn, collecting the return value into a
     #! new list. The quotation must have stack effect
     #! ( x y -- z ).
-    <2map [ pick >r 2map-step r> ] 2each drop nreverse ;
+    <2map [ pick >r 2map-step r> ] 2each drop reverse ;
     inline interpret-only
-
-: substitute ( new old list -- list )
-    [ 2dup = [ drop over ] when ] map nip nip ;
-
-: (head) ( accum list n -- last list )
-    dup 1 = [ drop ] [ pred >r copy-cons r> (head) ] ifte ;
-
-: head* ( n list -- head last rest )
-    #! Push the head of the list, the last cons cell of the
-    #! head, and the rest of the list.
-    uncons >r unit tuck r> rot (head) ;
-
-: head ( n list -- head )
-    #! Push a new list containing the first n elements.
-    over 0 = [ 2drop f ] [ head* 2drop ] ifte ;
-
-: set-nth ( value index list -- list )
-    over 0 = [
-        nip cdr cons
-    ] [
-        rot >r head* cdr r> swons swap set-cdr
-    ] ifte ;
 
 : subset-add ( car pred accum -- accum )
     >r over >r call r> r> rot [ cons ] [ nip ] ifte ;
@@ -326,23 +223,15 @@ DEFER: tree-contains?
     #!
     #! In order to compile, the quotation must consume as many
     #! values as it produces.
-    f -rot subset-iter nreverse ; inline interpret-only
+    f -rot subset-iter reverse ; inline interpret-only
 
 : remove ( obj list -- list )
     #! Remove all occurrences of the object from the list.
     [ dupd = not ] subset nip ;
 
-: remove-nth ( n list -- list )
-    #! Push a new list with the nth element removed.
-    over 0 = [ nip cdr ] [ head* cdr swap set-cdr ] ifte ;
-
 : length ( list -- length )
     #! Pushes the length of the given proper list.
     0 swap [ drop succ ] each ;
-
-: leaves ( list -- length )
-    #! Like length, but counts each sub-list recursively.
-    0 swap [ dup list? [ leaves + ] [ drop succ ] ifte ] each ;
 
 : reverse ( list -- list )
     #! Push a new list that is the reverse of a proper list.
@@ -401,4 +290,4 @@ DEFER: tree-contains?
     [ ] swap [ swons ] vector-each ;
 
 : vector>list ( vector -- list )
-    stack>list nreverse ;
+    stack>list reverse ;

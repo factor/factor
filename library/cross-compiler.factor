@@ -198,8 +198,6 @@ IN: image
         cons
         car
         cdr
-        set-car
-        set-cdr
         <vector>
         vector-length
         set-vector-length

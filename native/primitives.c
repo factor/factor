@@ -10,8 +10,6 @@ XT primitives[] = {
 	primitive_cons,
 	primitive_car,
 	primitive_cdr,
-	primitive_set_car,
-	primitive_set_cdr,
 	primitive_vector,
 	primitive_vector_length,
 	primitive_set_vector_length,

@@ -7,14 +7,11 @@ USE: test
 
 [ [ 2 1 0 0 ] ] [ [ 2list ] ] [ balance>list ] test-word
 [ [ 3 1 0 0 ] ] [ [ 3list ] ] [ balance>list ] test-word
-[ [ 2 1 0 0 ] ] [ [ 2rlist ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ append ] ] [ balance>list ] test-word
-[ [ 2 0 0 0 ] ] [ [ append@ ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ array>list ] ] [ balance>list ] test-word
 [ [ 2 0 0 0 ] ] [ [ add@ ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ car ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ cdr ] ] [ balance>list ] test-word
-[ [ 1 1 0 0 ] ] [ [ clone-list ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ cons ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ contains? ] ] [ balance>list ] test-word
 [ [ 2 0 0 0 ] ] [ [ cons@ ] ] [ balance>list ] test-word
@@ -25,12 +22,9 @@ USE: test
 [ [ 1 1 0 0 ] ] [ [ length ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ list? ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ nreverse ] ] [ balance>list ] test-word
-[ [ 2 1 0 0 ] ] [ [ nappend ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ cons? ] ] [ balance>list ] test-word
 [ [ 2 1 0 0 ] ] [ [ remove ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ reverse ] ] [ balance>list ] test-word
-[ [ 2 0 0 0 ] ] [ [ set-car ] ] [ balance>list ] test-word
-[ [ 2 0 0 0 ] ] [ [ set-cdr ] ] [ balance>list ] test-word
 [ [ 2 2 0 0 ] ] [ [ [ < ] partition ] ] [ balance>list ] test-word
 [ [ 2 2 0 0 ] ] [ [ [ nip string? ] partition ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ num-sort ] ] [ balance>list ] test-word
@@ -41,7 +35,6 @@ USE: test
 [ [ 2 1 0 0 ] ] [ [ unique ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ unit ] ] [ balance>list ] test-word
 [ [ 1 2 0 0 ] ] [ [ unswons ] ] [ balance>list ] test-word
-[ [ 1 1 0 0 ] ] [ [ deep-clone ] ] [ balance>list ] test-word
 
 [ [ ]       ] [ [ ]       ] [ array>list ] test-word
 [ [ 1 2 3 ] ] [ [ 1 2 3 ] ] [ array>list ] test-word

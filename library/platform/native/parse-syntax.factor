@@ -124,7 +124,7 @@ IN: syntax
 
 ! Lists
 : [ [ ] ; parsing
-: ] nreverse parsed ; parsing
+: ] reverse parsed ; parsing
 
 : | ( syntax: | cdr ] )
     #! See the word 'parsed'. We push a special sentinel, and
@@ -133,7 +133,7 @@ IN: syntax
 
 ! Vectors
 : { f ; parsing
-: } nreverse list>vector parsed ; parsing
+: } reverse list>vector parsed ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word parsed ; parsing
@@ -149,7 +149,7 @@ IN: syntax
 : ;
     #! End a word definition.
     "in-definition" off
-    nreverse
+    reverse
     ;-hook ; parsing
 
 ! Symbols

@@ -51,14 +51,3 @@ IN: lists USE: kernel USE: stack
 : cons? ( list -- boolean )
     #! Test for cons cell type.
     "factor.Cons" is ; inline
-
-: deep-clone ( cons -- cons )
-    [ "factor.Cons" ] "factor.Cons" "deepClone" jinvoke-static ;
-
-: set-car ( A [ B | C ] -- )
-    #! DESTRUCTIVE. Replace the head of a list.
-    "factor.Cons" "car" jvar-set ; inline
-
-: set-cdr ( A [ B | C ] -- )
-    #! DESTRUCTIVE. Replace the tail of a list.
-    "factor.Cons" "cdr" jvar-set ; inline

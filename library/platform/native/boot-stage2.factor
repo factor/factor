@@ -179,7 +179,14 @@ IN: compiler
 DEFER: compilable-words
 DEFER: compilable-word-list
 
-[ warm-boot ] set-boot
+IN: init
+DEFER: init-interpreter
+
+[
+    warm-boot
+    "interactive" get [ init-interpreter ] when
+    0 exit*
+] set-boot
 
 compilable-words compilable-word-list set
 
