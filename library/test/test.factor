@@ -78,6 +78,7 @@ USE: unparser
         "parser"
         "parse-number"
         "prettyprint"
+        "image"
         "inspector"
         "io/io"
         "vectors"

@@ -125,11 +125,11 @@ USE: words
     object-tag here-as >r
     bignum-type >header emit
     dup 0 = 1 2 ? emit ( capacity )
-    dup 0 < [
-        1 emit neg emit
-    ] [
-        0 emit     emit
-    ] ifte r> ;
+    [
+        [ 0 = ] [ emit pad ]
+        [ 0 < ] [ 1 emit neg emit ]
+        [ 0 > ] [ 0 emit     emit ]
+    ] cond r> ;
 
 ( Special objects )
 
@@ -214,7 +214,7 @@ DEFER: '
 : (pack-string) ( n list -- )
     #! Emit bytes for a string, with n characters per word.
     [
-        2dup str-length > [ dupd .s align-string ] when
+        2dup str-length > [ dupd align-string ] when
         emit-string
     ] each drop ;
 

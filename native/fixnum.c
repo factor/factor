@@ -170,7 +170,12 @@ CELL xor_fixnum(FIXNUM x, FIXNUM y)
 CELL shift_fixnum(FIXNUM x, FIXNUM y)
 {
 	if(y < 0)
-		return tag_fixnum(x >> -y);
+	{
+		if(y <= -WORD_SIZE)
+			return (x < 0 ? tag_fixnum(-1) : tag_fixnum(0));
+		else
+			return tag_fixnum(x >> -y);
+	}
 	else if(y == 0)
 		return tag_fixnum(x);
 	else if(y < WORD_SIZE - TAG_BITS)

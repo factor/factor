@@ -5,12 +5,13 @@
 - don't show listener on certain commands
 - plugin should not exit jEdit on fatal errors
 - wordpreview: don't show for string literals and comments
-- 64 bit support
 - alist -vs- assoc terminology
 - clean up listener's action popups
 - jedit ==> jedit-word, jedit takes a file name
 - introduce ifte* and ?str-head/?str-tail where appropriate
 - namespace clone drops static var bindings
+- solaris: -lsocket -lnsl
+- unparsing: \u000c
 
 + bignums:
 
