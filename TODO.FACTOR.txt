@@ -4,6 +4,7 @@
 - keyboard focus
 - keyboard gestures
 - text fields
+- finish check boxes
 
 + compiler:
 
@@ -15,7 +16,7 @@
 - goal: to compile hash* optimally
 - type check/not-check entry points for compiled words
 - getenv/setenv: if literal arg, compile as a load/store
-- empty ifte: wrong input type.
+- compile tuple dispatch
 
 + oop:
 

@@ -119,7 +119,7 @@ hashtables ;
     [ exit*                  [ [ integer ] [ ] ] ]
     [ client-socket          [ [ string integer ] [ port port ] ] ]
     [ server-socket          [ [ integer ] [ port ] ] ]
-    [ close-port             [ [ port ] ] ]
+    [ close-port             [ [ port ] [ ] ] ]
     [ add-accept-io-task     [ [ port general-list ] [ ] ] ]
     [ accept-fd              [ [ port ] [ string integer port port ] ] ]
     [ can-read-line?         [ [ port ] [ boolean ] ] ]

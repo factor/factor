@@ -44,34 +44,35 @@ presentation unparser words ;
     \ parsing prettyprint-prop
     \ inline prettyprint-prop ;
 
-: prettyprint-comment ( comment -- )
-    "comments" style write-attr ;
+: comment. ( comment -- ) "comments" style write-attr ;
 
-: infer-effect. ( effect -- )
-    0 swap
-    " ( " prettyprint-comment
-    2unlist >r [ prettyprint-element ] each r>
-    "-- " write
-    [ prettyprint-element ] each
-    ")" prettyprint-comment
-    drop ;
+: infer-effect. ( indent effect -- indent )
+    " " write
+    [
+        "(" ,
+        2unlist >r [ " " , unparse , ] each r>
+        " --" ,
+        [ " " , unparse , ] each
+        " )" ,
+    ] make-string comment. ;
 
-: stack-effect. ( word -- )
+: stack-effect. ( indent word -- indent )
     dup "stack-effect" word-property [
         " " write
-        [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
+        [ CHAR: ( , , CHAR: ) , ] make-string
+        comment.
     ] [
         "infer-effect" word-property dup [
             infer-effect.
         ] [
-            2drop
+            drop
         ] ifte
     ] ?ifte ;
 
 : documentation. ( indent word -- indent )
     "documentation" word-property [
         "\n" split [
-            "#!" swap cat2 prettyprint-comment
+            "#!" swap cat2 comment.
             dup prettyprint-newline
         ] each
     ] when* ;
