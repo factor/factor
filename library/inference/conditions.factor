@@ -11,25 +11,23 @@ DEFER: recursive-state
         , , recursive-state get , meta-d get , meta-r get ,
     ] make-list ;
 
-: inference-error ( msg -- )
-    \ inference-error inference-condition throw ;
-
-: inference-warning ( msg -- )
-    \ inference-warning inference-condition error. ;
-
 : inference-condition. ( cond msg -- )
-    write
+    "! " write write
     cdr unswons error.
-    "Recursive state:" print
-    car [.] ;
-!    "Meta data stack:" print
-!    unswons {.}
-!    "Meta return stack:" print
-!    car {.} ;
+    "! Recursive state:" print
+    car [ "! " write . ] each ;
+
+: inference-error ( msg -- )
+    #! Signalled if your code is malformed in some
+    #! statically-provable way.
+    \ inference-error inference-condition throw ;
 
 PREDICATE: cons inference-error car \ inference-error = ;
 M: inference-error error. ( error -- )
     "Inference error: " inference-condition. ;
+
+: inference-warning ( msg -- )
+    \ inference-warning inference-condition error. ;
 
 PREDICATE: cons inference-warning car \ inference-warning = ;
 M: inference-warning error. ( error -- )

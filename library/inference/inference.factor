@@ -28,7 +28,7 @@ SYMBOL: recursive-state
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
 
-TUPLE: value class type-prop recursion ;
+TUPLE: value class recursion class-ties literal-ties ;
 
 C: value ( recursion -- value )
     [ set-value-recursion ] keep ;
@@ -42,7 +42,7 @@ C: computed ( class -- value )
 M: computed value= ( literal value -- ? )
     2drop f ;
 
-: failing-class-and
+: failing-class-and ( class class -- class )
     2dup class-and dup null = [
         drop [
             word-name , " and " , word-name ,

@@ -13,12 +13,12 @@
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - more accurate types for various words
+- declarations
 - write read: write should flush
 
 + compiler/ffi:
 
 - #jump-f #jump-f-label
-- declarations
 - value type structs
 - out parameters
 - is signed -vs- unsigned pointers an issue?

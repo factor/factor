@@ -80,7 +80,7 @@ SYMBOL: cloned
     #! Clone an object if it hasn't already been cloned in this
     #! with-deep-clone scope.
     dup cloned get assq [
-        clone [ dup cloned [ acons ] change ] keep
+        dup clone [ swap cloned [ acons ] change ] keep
     ] ?unless ;
 
 : deep-clone-vector ( vector -- vector )
@@ -96,19 +96,12 @@ SYMBOL: cloned
     d-in [ deep-clone-vector ] change
     dataflow-graph off ;
 
-: propagate-type ( [[ value class ]] -- )
-    #! Type propagation is chained.
-    [
-        unswons 2dup set-value-class
-        value-type-prop assoc propagate-type
-    ] when* ;
-
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
     #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
     <namespace> [
-        uncons propagate-type
+        uncons pull-tie
         dup value-recursion recursive-state set
         copy-inference
         literal-value dup infer-quot
@@ -187,8 +180,8 @@ SYMBOL: cloned
     #! unify.
     2list >r 1 meta-d get vector-tail* \ ifte r>
     pop-d [
-        dup \ general-t cons ,
-        \ f cons ,
+        dup \ general-t <class-tie> ,
+        \ f <class-tie> ,
     ] make-list zip ( condition )
     infer-branches ;
 
@@ -209,13 +202,20 @@ SYMBOL: cloned
     dup value-recursion swap literal-value vector>list
     [ over <literal> ] map nip ;
 
+: <dispatch-index> ( value -- value )
+    value-literal-ties
+    0 recursive-state get <literal>
+    [ set-value-literal-ties ] keep ;
+
 USE: kernel-internals
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
     >r 1 meta-d get vector-tail* \ dispatch r>
-    pop-d drop [ unit ] map infer-branches ;
+    pop-d <dispatch-index>
+    over length [ <literal-tie> ] project-with
+    zip infer-branches ;
 
 \ dispatch [ infer-dispatch ] "infer" set-word-property
 \ dispatch [ [ fixnum vector ] [ ] ]

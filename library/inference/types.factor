@@ -4,17 +4,6 @@ IN: inference
 USING: errors generic interpreter kernel kernel-internals
 lists math namespaces strings vectors words stdio prettyprint ;
 
-! Enhanced inference of primitives relating to data types.
-! Optimizes type checks and slot access.
-
-! : infer-check ( assert class -- )
-!     peek-d dup value-class pick = [
-!         3drop
-!     ] [
-!         value-class-and
-!         dup "infer-effect" word-property consume/produce
-!     ] ifte ;
-
 : fast-slot? ( -- ? )
     #! If the slot number is literal and the object's type is
     #! known, we can compile a slot access into a single
@@ -36,8 +25,9 @@ lists math namespaces strings vectors words stdio prettyprint ;
 ] "infer" set-word-property
 
 : type-value-map ( value -- )
-    num-types [ dup builtin-type pick swons cons ] project
-    [ cdr cdr ] subset nip ;
+    num-types
+    [ tuck builtin-type <class-tie> cons ] project-with
+    [ cdr class-tie-class ] subset ;
 
 \ type [
     [ object ] ensure-d
@@ -46,7 +36,7 @@ lists math namespaces strings vectors words stdio prettyprint ;
         1 0 node-inputs
         [ object ] consume-d
         [ fixnum ] produce-d
-        r> peek-d set-value-type-prop
+        r> peek-d set-value-literal-ties
         1 0 node-outputs
     ] bind
 ] "infer" set-word-property

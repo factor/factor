@@ -97,6 +97,7 @@ IN: alien : add-library 3drop ;
         "/library/inference/conditions.factor"
         "/library/inference/dataflow.factor"
         "/library/inference/inference.factor"
+        "/library/inference/ties.factor"
         "/library/inference/branches.factor"
         "/library/inference/words.factor"
         "/library/inference/stack.factor"
