@@ -1,14 +1,14 @@
-INLINE FIXNUM untag_fixnum_fast(CELL tagged)
+INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
 {
-	return ((FIXNUM)tagged) >> TAG_BITS;
+	return ((F_FIXNUM)tagged) >> TAG_BITS;
 }
 
-INLINE CELL tag_fixnum(FIXNUM untagged)
+INLINE CELL tag_fixnum(F_FIXNUM untagged)
 {
 	return RETAG(untagged << TAG_BITS,FIXNUM_TYPE);
 }
 
-FIXNUM to_fixnum(CELL tagged);
+F_FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
 
 void primitive_fixnum_eq(void);

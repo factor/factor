@@ -42,7 +42,7 @@ MIT in each case. */
    you could write alternate versions that don't require this type). */
 /* #define BIGNUM_NO_ULONG */
 
-typedef ARRAY * bignum_type;
+typedef F_ARRAY * bignum_type;
 #define BIGNUM_OUT_OF_BAND ((bignum_type) 0)
 
 enum bignum_comparison

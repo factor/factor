@@ -17,21 +17,21 @@ typedef struct {
 	CELL call_count;
 	/* UNTAGGED amount of memory allocated in word */
 	CELL allot_count;
-} WORD;
+} F_WORD;
 
-INLINE WORD* untag_word(CELL tagged)
+INLINE F_WORD* untag_word(CELL tagged)
 {
 	type_check(WORD_TYPE,tagged);
-	return (WORD*)UNTAG(tagged);
+	return (F_WORD*)UNTAG(tagged);
 }
 
-INLINE CELL tag_word(WORD* word)
+INLINE CELL tag_word(F_WORD* word)
 {
 	return RETAG(word,WORD_TYPE);
 }
 
-WORD* word(CELL primitive, CELL parameter, CELL plist);
-void update_xt(WORD* word);
+F_WORD* word(CELL primitive, CELL parameter, CELL plist);
+void update_xt(F_WORD* word);
 void primitive_word(void);
 void primitive_word_hashcode(void);
 void primitive_word_primitive(void);
@@ -47,5 +47,5 @@ void primitive_set_word_call_count(void);
 void primitive_word_allot_count(void);
 void primitive_set_word_allot_count(void);
 void primitive_word_compiledp(void);
-void fixup_word(WORD* word);
-void collect_word(WORD* word);
+void fixup_word(F_WORD* word);
+void collect_word(F_WORD* word);

@@ -11,22 +11,22 @@ void relocate_object()
 	switch(untag_header(get(relocating)))
 	{
 	case WORD_TYPE:
-		fixup_word((WORD*)relocating);
+		fixup_word((F_WORD*)relocating);
 		break;
 	case ARRAY_TYPE:
-		fixup_array((ARRAY*)relocating);
+		fixup_array((F_ARRAY*)relocating);
 		break;
 	case VECTOR_TYPE:
-		fixup_vector((VECTOR*)relocating);
+		fixup_vector((F_VECTOR*)relocating);
 		break;
 	case STRING_TYPE:
-		rehash_string((STRING*)relocating);
+		rehash_string((F_STRING*)relocating);
 		break;
 	case SBUF_TYPE:
-		fixup_sbuf((SBUF*)relocating);
+		fixup_sbuf((F_SBUF*)relocating);
 		break;
 	case PORT_TYPE:
-		fixup_port((PORT*)relocating);
+		fixup_port((F_PORT*)relocating);
 		break;
 	case DLL_TYPE:
 		fixup_dll((DLL*)relocating);

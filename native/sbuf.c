@@ -1,8 +1,8 @@
 #include "factor.h"
 
-SBUF* sbuf(FIXNUM capacity)
+F_SBUF* sbuf(F_FIXNUM capacity)
 {
-	SBUF* sbuf = allot_object(SBUF_TYPE,sizeof(SBUF));
+	F_SBUF* sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
 	sbuf->top = 0;
 	sbuf->string = tag_object(string(capacity,'\0'));
 	return sbuf;
@@ -21,9 +21,9 @@ void primitive_sbuf_length(void)
 
 void primitive_set_sbuf_length(void)
 {
-	SBUF* sbuf;
-	FIXNUM length;
-	STRING* str;
+	F_SBUF* sbuf;
+	F_FIXNUM length;
+	F_STRING* str;
 
 	maybe_garbage_collection();
 
@@ -39,7 +39,7 @@ void primitive_set_sbuf_length(void)
 
 void primitive_sbuf_nth(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
+	F_SBUF* sbuf = untag_sbuf(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= sbuf->top)
@@ -47,16 +47,16 @@ void primitive_sbuf_nth(void)
 	dpush(string_nth(untag_string(sbuf->string),index));
 }
 
-void sbuf_ensure_capacity(SBUF* sbuf, FIXNUM top)
+void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
 {
-	STRING* string = untag_string(sbuf->string);
+	F_STRING* string = untag_string(sbuf->string);
 	CELL capacity = string->capacity;
 	if(top >= capacity)
 		sbuf->string = tag_object(grow_string(string,top * 2 + 1,F));
 	sbuf->top = top;
 }
 
-void set_sbuf_nth(SBUF* sbuf, CELL index, uint16_t value)
+void set_sbuf_nth(F_SBUF* sbuf, CELL index, uint16_t value)
 {
 	if(index < 0)
 		range_error(tag_object(sbuf),index,sbuf->top);
@@ -69,8 +69,8 @@ void set_sbuf_nth(SBUF* sbuf, CELL index, uint16_t value)
 
 void primitive_set_sbuf_nth(void)
 {
-	SBUF* sbuf;
-	FIXNUM index;
+	F_SBUF* sbuf;
+	F_FIXNUM index;
 	CELL value;
 
 	maybe_garbage_collection();
@@ -82,20 +82,20 @@ void primitive_set_sbuf_nth(void)
 	set_sbuf_nth(sbuf,index,value);
 }
 
-void sbuf_append_string(SBUF* sbuf, STRING* string)
+void sbuf_append_string(F_SBUF* sbuf, F_STRING* string)
 {
 	CELL top = sbuf->top;
 	CELL strlen = string->capacity;
-	STRING* str;
+	F_STRING* str;
 	sbuf_ensure_capacity(sbuf,top + strlen);
 	str = untag_string(sbuf->string);
-	memcpy((void*)((CELL)str + sizeof(STRING) + top * CHARS),
-		(void*)((CELL)string + sizeof(STRING)),strlen * CHARS);
+	memcpy((void*)((CELL)str + sizeof(F_STRING) + top * CHARS),
+		(void*)((CELL)string + sizeof(F_STRING)),strlen * CHARS);
 }
 
 void primitive_sbuf_append(void)
 {
-	SBUF* sbuf;
+	F_SBUF* sbuf;
 	CELL object;
 
 	maybe_garbage_collection();
@@ -120,8 +120,8 @@ void primitive_sbuf_append(void)
 
 void primitive_sbuf_to_string(void)
 {
-	SBUF* sbuf;
-	STRING* s;
+	F_SBUF* sbuf;
+	F_STRING* s;
 
 	maybe_garbage_collection();
 
@@ -133,14 +133,14 @@ void primitive_sbuf_to_string(void)
 
 void primitive_sbuf_reverse(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
+	F_SBUF* sbuf = untag_sbuf(dpop());
 	string_reverse(untag_string(sbuf->string),sbuf->top);
 }
 
 void primitive_sbuf_clone(void)
 {
-	SBUF* s;
-	SBUF* new_s;
+	F_SBUF* s;
+	F_SBUF* new_s;
 
 	maybe_garbage_collection();
 
@@ -151,7 +151,7 @@ void primitive_sbuf_clone(void)
 	drepl(tag_object(new_s));
 }
 
-bool sbuf_eq(SBUF* s1, SBUF* s2)
+bool sbuf_eq(F_SBUF* s1, F_SBUF* s2)
 {
 	if(s1 == s2)
 		return true;
@@ -166,26 +166,26 @@ bool sbuf_eq(SBUF* s1, SBUF* s2)
 
 void primitive_sbuf_eq(void)
 {
-	SBUF* s1 = untag_sbuf(dpop());
+	F_SBUF* s1 = untag_sbuf(dpop());
 	CELL with = dpop();
 	if(typep(SBUF_TYPE,with))
-		dpush(tag_boolean(sbuf_eq(s1,(SBUF*)UNTAG(with))));
+		dpush(tag_boolean(sbuf_eq(s1,(F_SBUF*)UNTAG(with))));
 	else
 		dpush(F);
 }
 
 void primitive_sbuf_hashcode(void)
 {
-	SBUF* sbuf = untag_sbuf(dpop());
+	F_SBUF* sbuf = untag_sbuf(dpop());
 	dpush(tag_fixnum(hash_string(untag_string(sbuf->string),sbuf->top)));
 }
 
-void fixup_sbuf(SBUF* sbuf)
+void fixup_sbuf(F_SBUF* sbuf)
 {
 	fixup(&sbuf->string);
 }
 
-void collect_sbuf(SBUF* sbuf)
+void collect_sbuf(F_SBUF* sbuf)
 {
 	copy_object(&sbuf->string);
 }

@@ -1,13 +1,13 @@
 #include "factor.h"
 
 /* untagged */
-STRING* allot_string(FIXNUM capacity)
+F_STRING* allot_string(F_FIXNUM capacity)
 {
-	STRING* string;
+	F_STRING* string;
 	if(capacity < 0)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	string = allot_object(STRING_TYPE,
-		sizeof(STRING) + capacity * CHARS);
+		sizeof(F_STRING) + capacity * CHARS);
 	string->capacity = capacity;
 	return string;
 }
@@ -15,26 +15,26 @@ STRING* allot_string(FIXNUM capacity)
 /* call this after constructing a string */
 /* uses same algorithm as java.lang.String for compatibility with
 images generated from Java Factor. */
-FIXNUM hash_string(STRING* str, FIXNUM len)
+F_FIXNUM hash_string(F_STRING* str, F_FIXNUM len)
 {
-	FIXNUM hash = 0;
+	F_FIXNUM hash = 0;
 	CELL i;
 	for(i = 0; i < len; i++)
 		hash = 31*hash + string_nth(str,i);
 	return hash;
 }
 
-void rehash_string(STRING* str)
+void rehash_string(F_STRING* str)
 {
 	str->hashcode = hash_string(str,str->capacity);
 }
 
 /* untagged */
-STRING* string(FIXNUM capacity, CELL fill)
+F_STRING* string(F_FIXNUM capacity, CELL fill)
 {
 	CELL i;
 
-	STRING* string = allot_string(capacity);
+	F_STRING* string = allot_string(capacity);
 
 	for(i = 0; i < capacity; i++)
 		cput(SREF(string,i),fill);
@@ -44,12 +44,12 @@ STRING* string(FIXNUM capacity, CELL fill)
 	return string;
 }
 
-STRING* grow_string(STRING* string, FIXNUM capacity, uint16_t fill)
+F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, uint16_t fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
 
-	STRING* new_string = allot_string(capacity);
+	F_STRING* new_string = allot_string(capacity);
 
 	memcpy(new_string + 1,string + 1,string->capacity * CHARS);
 
@@ -60,10 +60,10 @@ STRING* grow_string(STRING* string, FIXNUM capacity, uint16_t fill)
 }
 
 /* untagged */
-STRING* from_c_string(const BYTE* c_string)
+F_STRING* from_c_string(const BYTE* c_string)
 {
 	CELL length = strlen(c_string);
-	STRING* s = allot_string(length);
+	F_STRING* s = allot_string(length);
 	CELL i;
 
 	for(i = 0; i < length; i++)
@@ -84,7 +84,7 @@ void box_c_string(const BYTE* c_string)
 }
 
 /* untagged */
-BYTE* to_c_string(STRING* s)
+BYTE* to_c_string(F_STRING* s)
 {
 	CELL i;
 
@@ -99,9 +99,9 @@ BYTE* to_c_string(STRING* s)
 }
 
 /* untagged */
-BYTE* to_c_string_unchecked(STRING* s)
+BYTE* to_c_string_unchecked(F_STRING* s)
 {
-	STRING* _c_str = allot_string(s->capacity / CHARS + 1);
+	F_STRING* _c_str = allot_string(s->capacity / CHARS + 1);
 	CELL i;
 
 	BYTE* c_str = (BYTE*)(_c_str + 1);
@@ -127,7 +127,7 @@ void primitive_string_length(void)
 
 void primitive_string_nth(void)
 {
-	STRING* string = untag_string(dpop());
+	F_STRING* string = untag_string(dpop());
 	CELL index = to_fixnum(dpop());
 
 	if(index < 0 || index >= string->capacity)
@@ -135,7 +135,7 @@ void primitive_string_nth(void)
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
-FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len)
+F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len)
 {
 	CELL i = 0;
 	while(i < len)
@@ -150,7 +150,7 @@ FIXNUM string_compare_head(STRING* s1, STRING* s2, CELL len)
 	return 0;
 }
 
-FIXNUM string_compare(STRING* s1, STRING* s2)
+F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
 {
 	CELL len1 = s1->capacity;
 	CELL len2 = s2->capacity;
@@ -166,13 +166,13 @@ FIXNUM string_compare(STRING* s1, STRING* s2)
 
 void primitive_string_compare(void)
 {
-	STRING* s2 = untag_string(dpop());
-	STRING* s1 = untag_string(dpop());
+	F_STRING* s2 = untag_string(dpop());
+	F_STRING* s1 = untag_string(dpop());
 
 	dpush(tag_fixnum(string_compare(s1,s2)));
 }
 
-bool string_eq(STRING* s1, STRING* s2)
+bool string_eq(F_STRING* s1, F_STRING* s2)
 {
 	if(s1 == s2)
 		return true;
@@ -184,10 +184,10 @@ bool string_eq(STRING* s1, STRING* s2)
 
 void primitive_string_eq(void)
 {
-	STRING* s1 = untag_string(dpop());
+	F_STRING* s1 = untag_string(dpop());
 	CELL with = dpop();
 	if(typep(STRING_TYPE,with))
-		dpush(tag_boolean(string_eq(s1,(STRING*)UNTAG(with))));
+		dpush(tag_boolean(string_eq(s1,(F_STRING*)UNTAG(with))));
 	else
 		dpush(F);
 }
@@ -197,7 +197,7 @@ void primitive_string_hashcode(void)
 	drepl(tag_fixnum(untag_string(dpeek())->hashcode));
 }
 
-CELL index_of_ch(CELL index, STRING* string, CELL ch)
+CELL index_of_ch(CELL index, F_STRING* string, CELL ch)
 {
 	while(index < string->capacity)
 	{
@@ -209,7 +209,7 @@ CELL index_of_ch(CELL index, STRING* string, CELL ch)
 	return -1;
 }
 
-INLINE FIXNUM index_of_str(FIXNUM index, STRING* string, STRING* substring)
+INLINE F_FIXNUM index_of_str(F_FIXNUM index, F_STRING* string, F_STRING* substring)
 {
 	CELL i = index;
 	CELL limit = string->capacity - substring->capacity;
@@ -245,8 +245,8 @@ outer:	if(i <= limit)
 void primitive_index_of(void)
 {
 	CELL ch = dpop();
-	STRING* string;
-	FIXNUM index;
+	F_STRING* string;
+	F_FIXNUM index;
 	CELL result;
 	string = untag_string(dpop());
 	index = to_fixnum(dpop());
@@ -262,9 +262,9 @@ void primitive_index_of(void)
 	dpush(tag_fixnum(result));
 }
 
-INLINE STRING* substring(CELL start, CELL end, STRING* string)
+INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
 {
-	STRING* result;
+	F_STRING* result;
 
 	if(start < 0)
 		range_error(tag_object(string),start,string->capacity);
@@ -284,7 +284,7 @@ INLINE STRING* substring(CELL start, CELL end, STRING* string)
 /* start end string -- string */
 void primitive_substring(void)
 {
-	STRING* string;
+	F_STRING* string;
 	CELL end, start;
 
 	maybe_garbage_collection();
@@ -296,7 +296,7 @@ void primitive_substring(void)
 }
 
 /* DESTRUCTIVE - don't use with user-visible strings */
-void string_reverse(STRING* s, int len)
+void string_reverse(F_STRING* s, int len)
 {
 	int i, j;
 	uint16_t ch1, ch2;
@@ -311,16 +311,16 @@ void string_reverse(STRING* s, int len)
 }
 
 /* Doesn't rehash the string! */
-STRING* string_clone(STRING* s, int len)
+F_STRING* string_clone(F_STRING* s, int len)
 {
-	STRING* copy = allot_string(len);
+	F_STRING* copy = allot_string(len);
 	memcpy(copy + 1,s + 1,len * CHARS);
 	return copy;
 }
 
 void primitive_string_reverse(void)
 {
-	STRING* s;
+	F_STRING* s;
 
 	maybe_garbage_collection();
 

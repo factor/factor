@@ -1,10 +1,10 @@
 #include "factor.h"
 
 /* Return true if something was read */
-bool read_step(PORT* port)
+bool read_step(F_PORT* port)
 {
-	FIXNUM amount = 0;
-	STRING* buffer = untag_string(port->buffer);
+	F_FIXNUM amount = 0;
+	F_STRING* buffer = untag_string(port->buffer);
 	CELL capacity = buffer->capacity;
 
 	if(port->type == PORT_RECV)
@@ -36,24 +36,24 @@ bool read_step(PORT* port)
 	}
 }
 
-bool read_line_step(PORT* port)
+bool read_line_step(F_PORT* port)
 {
 	int i;
 	BYTE ch;
 
-	SBUF* line = untag_sbuf(port->line);
-	STRING* buffer = untag_string(port->buffer);
+	F_SBUF* line = untag_sbuf(port->line);
+	F_STRING* buffer = untag_string(port->buffer);
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
-		ch = bget((CELL)buffer + sizeof(STRING) + i);
+		ch = bget((CELL)buffer + sizeof(F_STRING) + i);
 
 		if(ch == '\r')
 		{
 			if(i != port->buf_fill - 1)
 			{
 				ch = bget((CELL)buffer
-					+ sizeof(STRING) + i + 1);
+					+ sizeof(F_STRING) + i + 1);
 				if(ch == '\n')
 					i++;
 			}
@@ -80,7 +80,7 @@ bool read_line_step(PORT* port)
 	return false;
 }
 
-bool can_read_line(PORT* port)
+bool can_read_line(F_PORT* port)
 {
 	pending_io_error(port);
 
@@ -99,7 +99,7 @@ bool can_read_line(PORT* port)
 
 void primitive_can_read_line(void)
 {
-	PORT* port = untag_port(dpop());
+	F_PORT* port = untag_port(dpop());
 	box_boolean(can_read_line(port));
 }
 
@@ -117,7 +117,7 @@ void primitive_add_read_line_io_task(void)
 	init_line_buffer(untag_port(port),LINE_SIZE);
 }
 
-bool perform_read_line_io_task(PORT* port)
+bool perform_read_line_io_task(F_PORT* port)
 {
 	if(port->buf_pos >= port->buf_fill)
 	{
@@ -142,7 +142,7 @@ bool perform_read_line_io_task(PORT* port)
 
 void primitive_read_line_8(void)
 {
-	PORT* port;
+	F_PORT* port;
 
 	maybe_garbage_collection();
 
@@ -161,17 +161,17 @@ void primitive_read_line_8(void)
 
 }
 
-bool read_count_step(PORT* port)
+bool read_count_step(F_PORT* port)
 {
 	int i;
 	BYTE ch;
 
-	SBUF* line = untag_sbuf(port->line);
-	STRING* buffer = untag_string(port->buffer);
+	F_SBUF* line = untag_sbuf(port->line);
+	F_STRING* buffer = untag_string(port->buffer);
 
 	for(i = port->buf_pos; i < port->buf_fill; i++)
 	{
-		ch = bget((CELL)buffer + sizeof(STRING) + i);
+		ch = bget((CELL)buffer + sizeof(F_STRING) + i);
 		set_sbuf_nth(line,line->top,ch);
 		if(line->top == port->count)
 		{
@@ -186,7 +186,7 @@ bool read_count_step(PORT* port)
 	return false;
 }
 
-bool can_read_count(PORT* port, FIXNUM count)
+bool can_read_count(F_PORT* port, F_FIXNUM count)
 {
 	pending_io_error(port);
 
@@ -206,8 +206,8 @@ bool can_read_count(PORT* port, FIXNUM count)
 
 void primitive_can_read_count(void)
 {
-	PORT* port;
-	FIXNUM len;
+	F_PORT* port;
+	F_FIXNUM len;
 
 	maybe_garbage_collection();
 
@@ -219,8 +219,8 @@ void primitive_can_read_count(void)
 void primitive_add_read_count_io_task(void)
 {
 	CELL callback;
-	PORT* port;
-	FIXNUM count;
+	F_PORT* port;
+	F_FIXNUM count;
 
 	maybe_garbage_collection();
 
@@ -235,7 +235,7 @@ void primitive_add_read_count_io_task(void)
 	init_line_buffer(port,count);
 }
 
-bool perform_read_count_io_task(PORT* port)
+bool perform_read_count_io_task(F_PORT* port)
 {
 	if(port->buf_pos >= port->buf_fill)
 	{
@@ -251,8 +251,8 @@ bool perform_read_count_io_task(PORT* port)
 
 void primitive_read_count_8(void)
 {
-	PORT* port;
-	FIXNUM len;
+	F_PORT* port;
+	F_FIXNUM len;
 
 	maybe_garbage_collection();
 

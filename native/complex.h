@@ -1,15 +1,15 @@
 typedef struct {
 	CELL real;
 	CELL imaginary;
-} COMPLEX;
+} F_COMPLEX;
 
-INLINE COMPLEX* untag_complex(CELL tagged)
+INLINE F_COMPLEX* untag_complex(CELL tagged)
 {
 	type_check(COMPLEX_TYPE,tagged);
-	return (COMPLEX*)UNTAG(tagged);
+	return (F_COMPLEX*)UNTAG(tagged);
 }
 
-INLINE CELL tag_complex(COMPLEX* complex)
+INLINE CELL tag_complex(F_COMPLEX* complex)
 {
 	return RETAG(complex,COMPLEX_TYPE);
 }

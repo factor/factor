@@ -63,19 +63,19 @@ void collect_object(void)
 	switch(untag_header(get(scan)))
 	{
 	case WORD_TYPE:
-		collect_word((WORD*)scan);
+		collect_word((F_WORD*)scan);
 		break;
 	case ARRAY_TYPE:
-		collect_array((ARRAY*)scan);
+		collect_array((F_ARRAY*)scan);
 		break;
 	case VECTOR_TYPE:
-		collect_vector((VECTOR*)scan);
+		collect_vector((F_VECTOR*)scan);
 		break;
 	case SBUF_TYPE:
-		collect_sbuf((SBUF*)scan);
+		collect_sbuf((F_SBUF*)scan);
 		break;
 	case PORT_TYPE:
-		collect_port((PORT*)scan);
+		collect_port((F_PORT*)scan);
 		break;
 	}
 	

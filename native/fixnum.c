@@ -1,26 +1,26 @@
 #include "factor.h"
 
-FIXNUM to_fixnum(CELL tagged)
+F_FIXNUM to_fixnum(CELL tagged)
 {
-	RATIO* r;
-	ARRAY* x;
-	ARRAY* y;
-	FLOAT* f;
+	F_RATIO* r;
+	F_ARRAY* x;
+	F_ARRAY* y;
+	F_FLOAT* f;
 
 	switch(type_of(tagged))
 	{
 	case FIXNUM_TYPE:
 		return untag_fixnum_fast(tagged);
 	case BIGNUM_TYPE:
-		return (FIXNUM)s48_bignum_to_long((ARRAY*)UNTAG(tagged));
+		return (F_FIXNUM)s48_bignum_to_long((F_ARRAY*)UNTAG(tagged));
 	case RATIO_TYPE:
-		r = (RATIO*)UNTAG(tagged);
+		r = (F_RATIO*)UNTAG(tagged);
 		x = to_bignum(r->numerator);
 		y = to_bignum(r->denominator);
 		return to_fixnum(tag_object(s48_bignum_quotient(x,y)));
 	case FLOAT_TYPE:
-		f = (FLOAT*)UNTAG(tagged);
-		return (FIXNUM)f->n;
+		f = (F_FLOAT*)UNTAG(tagged);
+		return (F_FIXNUM)f->n;
 	default:
 		type_error(FIXNUM_TYPE,tagged);
 		return -1; /* can't happen */
@@ -34,22 +34,22 @@ void primitive_to_fixnum(void)
 
 void primitive_fixnum_eq(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x == y);
 }
 
 void primitive_fixnum_add(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x + y);
 }
 
 void primitive_fixnum_subtract(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x - y);
 }
 
@@ -59,14 +59,14 @@ void primitive_fixnum_subtract(void)
  */
 void primitive_fixnum_multiply(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 
 	if(x == 0 || y == 0)
 		dpush(tag_fixnum(0));
 	else
 	{
-		FIXNUM prod = x * y;
+		F_FIXNUM prod = x * y;
 		/* if this is not equal, we have overflow */
 		if(prod / x == y)
 			box_integer(prod);
@@ -82,51 +82,51 @@ void primitive_fixnum_multiply(void)
 
 void primitive_fixnum_divint(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x / y);
 }
 
 void primitive_fixnum_divfloat(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_object(make_float((double)x / (double)y)));
 }
 
 void primitive_fixnum_divmod(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_integer(x / y);
 	box_integer(x % y);
 }
 
 void primitive_fixnum_mod(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x % y));
 }
 
 void primitive_fixnum_and(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x & y));
 }
 
 void primitive_fixnum_or(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x | y));
 }
 
 void primitive_fixnum_xor(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(x ^ y));
 }
 
@@ -137,8 +137,8 @@ void primitive_fixnum_xor(void)
  */
 void primitive_fixnum_shift(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 
 	if(y < 0)
 	{
@@ -155,7 +155,7 @@ void primitive_fixnum_shift(void)
 	}
 	else if(y < WORD_SIZE - TAG_BITS)
 	{
-		FIXNUM mask = (1 << (WORD_SIZE - 1 - TAG_BITS - y));
+		F_FIXNUM mask = (1 << (WORD_SIZE - 1 - TAG_BITS - y));
 		if(x > 0)
 			mask = -mask;
 
@@ -172,29 +172,29 @@ void primitive_fixnum_shift(void)
 
 void primitive_fixnum_less(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x < y);
 }
 
 void primitive_fixnum_lesseq(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x <= y);
 }
 
 void primitive_fixnum_greater(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x > y);
 }
 
 void primitive_fixnum_greatereq(void)
 {
-	FIXNUM y = untag_fixnum_fast(dpop());
-	FIXNUM x = untag_fixnum_fast(dpop());
+	F_FIXNUM y = untag_fixnum_fast(dpop());
+	F_FIXNUM x = untag_fixnum_fast(dpop());
 	box_boolean(x >= y);
 }
 

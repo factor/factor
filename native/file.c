@@ -32,7 +32,7 @@ void primitive_open_file(void)
 void primitive_stat(void)
 {
 	struct stat sb;
-	STRING* path;
+	F_STRING* path;
 
 	maybe_garbage_collection();
 
@@ -58,7 +58,7 @@ void primitive_stat(void)
 
 void primitive_read_dir(void)
 {
-	STRING* path;
+	F_STRING* path;
 	DIR* dir;
 	CELL result = F;
 

@@ -37,11 +37,11 @@ CELL T;
 #define TYPE_COUNT 17
 
 /* Pseudo-types. For error reporting only. */
-#define INTEGER_TYPE 100 /* FIXNUM or BIGNUM */
-#define RATIONAL_TYPE 101 /* INTEGER or RATIO */
-#define REAL_TYPE 102 /* RATIONAL or FLOAT */
-#define NUMBER_TYPE 103 /* COMPLEX or REAL */
-#define TEXT_TYPE 104 /* FIXNUM or STRING */
+#define INTEGER_TYPE 100 /* F_FIXNUM or BIGNUM */
+#define RATIONAL_TYPE 101 /* INTEGER or F_RATIO */
+#define REAL_TYPE 102 /* RATIONAL or F_FLOAT */
+#define NUMBER_TYPE 103 /* F_COMPLEX or REAL */
+#define TEXT_TYPE 104 /* F_FIXNUM or F_STRING */
 
 CELL type_of(CELL tagged);
 bool typep(CELL type, CELL tagged);

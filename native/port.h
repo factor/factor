@@ -11,7 +11,7 @@ typedef struct {
 	CELL header;
 	PORT_MODE type;
 	bool closed;
-	FIXNUM fd;
+	F_FIXNUM fd;
 	CELL buffer;
 
 	/* top of buffer */
@@ -26,7 +26,7 @@ typedef struct {
 	bool line_ready;
 
 	/* count for read# */
-	FIXNUM count;
+	F_FIXNUM count;
 
 	/* tagged client info used by accept_fd */
 	CELL client_host;
@@ -36,14 +36,14 @@ typedef struct {
 
 	/* a pending I/O error or F */
 	CELL io_error;
-} PORT;
+} F_PORT;
 
-PORT* untag_port(CELL tagged);
-PORT* port(PORT_MODE type, CELL fd);
-void init_line_buffer(PORT* port, FIXNUM count);
-void fixup_port(PORT* port);
-void collect_port(PORT* port);
-void postpone_io_error(PORT* port, const char* func);
+F_PORT* untag_port(CELL tagged);
+F_PORT* port(PORT_MODE type, CELL fd);
+void init_line_buffer(F_PORT* port, F_FIXNUM count);
+void fixup_port(F_PORT* port);
+void collect_port(F_PORT* port);
+void postpone_io_error(F_PORT* port, const char* func);
 void io_error(const char* func);
-void pending_io_error(PORT* port);
+void pending_io_error(F_PORT* port);
 void primitive_pending_io_error(void);

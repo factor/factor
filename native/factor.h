@@ -84,7 +84,7 @@ CELL cs;
 #define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
 #define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
 
-#define FIXNUM long int /* unboxed */
+#define F_FIXNUM long int /* unboxed */
 
 #define WORD_SIZE (CELLS*8)
 #define HALF_WORD_SIZE (CELLS*4)

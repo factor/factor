@@ -40,16 +40,16 @@ CELL object_size(CELL pointer)
 		size = 0;
 		break;
 	case CONS_TYPE:
-		size = sizeof(CONS);
+		size = sizeof(F_CONS);
 		break;
 	case WORD_TYPE:
-		size = sizeof(WORD);
+		size = sizeof(F_WORD);
 		break;
 	case RATIO_TYPE:
-		size = sizeof(RATIO);
+		size = sizeof(F_RATIO);
 		break;
 	case COMPLEX_TYPE:
-		size = sizeof(COMPLEX);
+		size = sizeof(F_COMPLEX);
 		break;
 	case OBJECT_TYPE:
 		size = untagged_object_size(UNTAG(pointer));
@@ -73,7 +73,7 @@ CELL untagged_object_size(CELL pointer)
 	switch(untag_header(get(pointer)))
 	{
 	case WORD_TYPE:
-		size = sizeof(WORD);
+		size = sizeof(F_WORD);
 		break;
 	case T_TYPE:
 		size = CELLS * 2;
@@ -83,19 +83,19 @@ CELL untagged_object_size(CELL pointer)
 		size = ASIZE(pointer);
 		break;
 	case VECTOR_TYPE:
-		size = sizeof(VECTOR);
+		size = sizeof(F_VECTOR);
 		break;
 	case STRING_TYPE:
 		size = SSIZE(pointer);
 		break;
 	case SBUF_TYPE:
-		size = sizeof(SBUF);
+		size = sizeof(F_SBUF);
 		break;
 	case FLOAT_TYPE:
-		size = sizeof(FLOAT);
+		size = sizeof(F_FLOAT);
 		break;
 	case PORT_TYPE:
-		size = sizeof(PORT);
+		size = sizeof(F_PORT);
 		break;
 	case DLL_TYPE:
 		size = sizeof(DLL);

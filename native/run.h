@@ -22,7 +22,7 @@ sigjmp_buf toplevel;
 CELL callframe;
 
 /* raw pointer to currently executing word */
-WORD* executing;
+F_WORD* executing;
 
 /* TAGGED user environment data; see getenv/setenv prims */
 CELL userenv[USER_ENV];

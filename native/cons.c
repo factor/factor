@@ -2,7 +2,7 @@
 
 CELL cons(CELL car, CELL cdr)
 {
-	CONS* cons = allot(sizeof(CONS));
+	F_CONS* cons = allot(sizeof(F_CONS));
 	cons->car = car;
 	cons->cdr = cdr;
 	return tag_cons(cons);

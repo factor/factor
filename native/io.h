@@ -39,16 +39,16 @@ IO_TASK* add_io_task(
 	IO_TASK* io_tasks,
 	int* fd_count);
 void remove_io_task(
-	PORT* port,
+	F_PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count);
-void remove_io_tasks(PORT* port);
-bool perform_copy_from_io_task(PORT* port, PORT* other_port);
-bool perform_copy_to_io_task(PORT* port, PORT* other_port);
+void remove_io_tasks(F_PORT* port);
+bool perform_copy_from_io_task(F_PORT* port, F_PORT* other_port);
+bool perform_copy_to_io_task(F_PORT* port, F_PORT* other_port);
 void primitive_add_copy_io_task(void);
 CELL pop_io_task_callback(
 	IO_TASK_TYPE type,
-	PORT* port,
+	F_PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count);
 bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks,

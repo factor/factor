@@ -54,7 +54,7 @@ void run(void)
 
 		if(TAG(next) == WORD_TYPE)
 		{
-			executing = (WORD*)UNTAG(next);
+			executing = (F_WORD*)UNTAG(next);
 			EXECUTE(executing);
 		}
 		else
@@ -110,7 +110,7 @@ void primitive_ifte(void)
 
 void primitive_getenv(void)
 {
-	FIXNUM e = to_fixnum(dpeek());
+	F_FIXNUM e = to_fixnum(dpeek());
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);
 	drepl(userenv[e]);
@@ -118,7 +118,7 @@ void primitive_getenv(void)
 
 void primitive_setenv(void)
 {
-	FIXNUM e = to_fixnum(dpop());
+	F_FIXNUM e = to_fixnum(dpop());
 	CELL value = dpop();
 	if(e < 0 || e >= USER_ENV)
 		range_error(F,e,USER_ENV);

@@ -2,18 +2,18 @@ CELL bignum_zero;
 CELL bignum_pos_one;
 CELL bignum_neg_one;
 
-INLINE ARRAY* untag_bignum(CELL tagged)
+INLINE F_ARRAY* untag_bignum(CELL tagged)
 {
 	type_check(BIGNUM_TYPE,tagged);
-	return (ARRAY*)UNTAG(tagged);
+	return (F_ARRAY*)UNTAG(tagged);
 }
 
-FIXNUM to_integer(CELL x);
-void box_integer(FIXNUM integer);
+F_FIXNUM to_integer(CELL x);
+void box_integer(F_FIXNUM integer);
 void box_cell(CELL cell);
-FIXNUM unbox_integer(void);
+F_FIXNUM unbox_integer(void);
 CELL unbox_cell(void);
-ARRAY* to_bignum(CELL tagged);
+F_ARRAY* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
 void primitive_bignum_eq(void);
 void primitive_bignum_add(void);
@@ -35,7 +35,7 @@ void primitive_bignum_not(void);
 void copy_bignum_constants(void);
 CELL three_test(void* x, unsigned char r, unsigned char g, unsigned char b);
 
-INLINE CELL tag_integer(FIXNUM x)
+INLINE CELL tag_integer(F_FIXNUM x)
 {
 	if(x < FIXNUM_MIN || x > FIXNUM_MAX)
 		return tag_object(s48_long_to_bignum(x));

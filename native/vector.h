@@ -5,21 +5,21 @@ typedef struct {
 	CELL top;
 	/* tagged */
 	CELL array;
-} VECTOR;
+} F_VECTOR;
 
-INLINE VECTOR* untag_vector(CELL tagged)
+INLINE F_VECTOR* untag_vector(CELL tagged)
 {
 	type_check(VECTOR_TYPE,tagged);
-	return (VECTOR*)UNTAG(tagged);
+	return (F_VECTOR*)UNTAG(tagged);
 }
 
-VECTOR* vector(FIXNUM capacity);
+F_VECTOR* vector(F_FIXNUM capacity);
 
 void primitive_vector(void);
 void primitive_vector_length(void);
 void primitive_set_vector_length(void);
 void primitive_vector_nth(void);
-void vector_ensure_capacity(VECTOR* vector, CELL index);
+void vector_ensure_capacity(F_VECTOR* vector, CELL index);
 void primitive_set_vector_nth(void);
-void fixup_vector(VECTOR* vector);
-void collect_vector(VECTOR* vector);
+void fixup_vector(F_VECTOR* vector);
+void collect_vector(F_VECTOR* vector);

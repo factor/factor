@@ -1,11 +1,11 @@
 #include "factor.h"
 
 /* Return true if write was done */
-void write_step(PORT* port)
+void write_step(F_PORT* port)
 {
-	BYTE* chars = (BYTE*)untag_string(port->buffer) + sizeof(STRING);
+	BYTE* chars = (BYTE*)untag_string(port->buffer) + sizeof(F_STRING);
 
-	FIXNUM amount = write(port->fd,chars + port->buf_pos,
+	F_FIXNUM amount = write(port->fd,chars + port->buf_pos,
 		port->buf_fill - port->buf_pos);
 
 	if(amount == -1)
@@ -17,7 +17,7 @@ void write_step(PORT* port)
 		port->buf_pos += amount;
 }
 
-bool can_write(PORT* port, FIXNUM len)
+bool can_write(F_PORT* port, F_FIXNUM len)
 {
 	CELL buf_capacity;
 
@@ -38,8 +38,8 @@ bool can_write(PORT* port, FIXNUM len)
 
 void primitive_can_write(void)
 {
-	PORT* port;
-	FIXNUM len;
+	F_PORT* port;
+	F_FIXNUM len;
 
 	maybe_garbage_collection();
 	
@@ -61,7 +61,7 @@ void primitive_add_write_io_task(void)
 		write_io_tasks,&write_fd_count);
 }
 
-bool perform_write_io_task(PORT* port)
+bool perform_write_io_task(F_PORT* port)
 {
 	if(port->buf_pos == port->buf_fill || port->io_error != F)
 	{
@@ -77,7 +77,7 @@ bool perform_write_io_task(PORT* port)
 	}
 }
 
-void write_char_8(PORT* port, FIXNUM ch)
+void write_char_8(F_PORT* port, F_FIXNUM ch)
 {
 	BYTE c = (BYTE)ch;
 
@@ -86,21 +86,21 @@ void write_char_8(PORT* port, FIXNUM ch)
 	if(!can_write(port,1))
 		io_error(__FUNCTION__);
 
-	bput((CELL)untag_string(port->buffer) + sizeof(STRING) + port->buf_fill,c);
+	bput((CELL)untag_string(port->buffer) + sizeof(F_STRING) + port->buf_fill,c);
 	port->buf_fill++;
 }
 
 /* Caller must ensure buffer is of the right size. */
-void write_string_raw(PORT* port, BYTE* str, CELL len)
+void write_string_raw(F_PORT* port, BYTE* str, CELL len)
 {
 	/* Append string to buffer */
-	memcpy((void*)((CELL)untag_string(port->buffer) + sizeof(STRING)
+	memcpy((void*)((CELL)untag_string(port->buffer) + sizeof(F_STRING)
 		+ port->buf_fill),str,len);
 
 	port->buf_fill += len;
 }
 
-void write_string_8(PORT* port, STRING* str)
+void write_string_8(F_PORT* port, F_STRING* str)
 {
 	BYTE* c_str;
 	
@@ -116,9 +116,9 @@ void write_string_8(PORT* port, STRING* str)
 
 void primitive_write_8(void)
 {
-	PORT* port;
+	F_PORT* port;
 	CELL text, type;
-	STRING* str;
+	F_STRING* str;
 
 	maybe_garbage_collection();
 

@@ -1,8 +1,8 @@
 #include "factor.h"
 
-WORD* word(CELL primitive, CELL parameter, CELL plist)
+F_WORD* word(CELL primitive, CELL parameter, CELL plist)
 {
-	WORD* word = allot_object(WORD_TYPE,sizeof(WORD));
+	F_WORD* word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = (CELL)word; /* initial address */
 	word->xt = primitive_to_xt(primitive);
 	word->primitive = primitive;
@@ -17,7 +17,7 @@ WORD* word(CELL primitive, CELL parameter, CELL plist)
 /* When a word is executed we jump to the value of the xt field. However this
    value is an unportable function pointer, so in the image we store a primitive
    number that indexes a list of xts. */
-void update_xt(WORD* word)
+void update_xt(F_WORD* word)
 {
 	word->xt = primitive_to_xt(word->primitive);
 }
@@ -26,7 +26,7 @@ void update_xt(WORD* word)
 void primitive_word(void)
 {
 	CELL plist, parameter;
-	FIXNUM primitive;
+	F_FIXNUM primitive;
 
 	maybe_garbage_collection();
 
@@ -48,7 +48,7 @@ void primitive_word_xt(void)
 
 void primitive_set_word_xt(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->xt = unbox_integer();
 }
 
@@ -59,7 +59,7 @@ void primitive_word_primitive(void)
 
 void primitive_set_word_primitive(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->primitive = to_fixnum(dpop());
 	update_xt(word);
 }
@@ -71,7 +71,7 @@ void primitive_word_parameter(void)
 
 void primitive_set_word_parameter(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->parameter = dpop();
 }
 
@@ -82,7 +82,7 @@ void primitive_word_plist(void)
 
 void primitive_set_word_plist(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->plist = dpop();
 }
 
@@ -93,7 +93,7 @@ void primitive_word_call_count(void)
 
 void primitive_set_word_call_count(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->call_count = to_fixnum(dpop());
 }
 
@@ -104,24 +104,24 @@ void primitive_word_allot_count(void)
 
 void primitive_set_word_allot_count(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	word->allot_count = to_fixnum(dpop());
 }
 
 void primitive_word_compiledp(void)
 {
-	WORD* word = untag_word(dpop());
+	F_WORD* word = untag_word(dpop());
 	box_boolean(word->xt != (CELL)docol && word->xt != (CELL)dosym);
 }
 
-void fixup_word(WORD* word)
+void fixup_word(F_WORD* word)
 {
 	update_xt(word);
 	fixup(&word->parameter);
 	fixup(&word->plist);
 }
 
-void collect_word(WORD* word)
+void collect_word(F_WORD* word)
 {
 	copy_object(&word->parameter);
 	copy_object(&word->plist);

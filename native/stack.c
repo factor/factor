@@ -69,11 +69,11 @@ void primitive_from_r(void)
 	dpush(cpop());
 }
 
-VECTOR* stack_to_vector(CELL bottom, CELL top)
+F_VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
 	CELL depth = (top - bottom + CELLS) / CELLS;
-	VECTOR* v = vector(depth);
-	ARRAY* a = untag_array(v->array);
+	F_VECTOR* v = vector(depth);
+	F_ARRAY* a = untag_array(v->array);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	v->top = depth;
 	return v;
@@ -92,7 +92,7 @@ void primitive_callstack(void)
 }
 
 /* Returns top of stack */
-CELL vector_to_stack(VECTOR* vector, CELL bottom)
+CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;
 	CELL len = vector->top * CELLS;

@@ -31,4 +31,4 @@ void general_error(CELL error, CELL tagged);
 void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
-void range_error(CELL tagged, FIXNUM index, CELL max);
+void range_error(CELL tagged, F_FIXNUM index, CELL max);

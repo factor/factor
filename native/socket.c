@@ -111,7 +111,7 @@ void primitive_add_accept_io_task(void)
 		read_io_tasks,&read_fd_count);
 }
 
-CELL accept_connection(PORT* p)
+CELL accept_connection(F_PORT* p)
 {
 	struct sockaddr_in clientname;
 	size_t size = sizeof(clientname);
@@ -135,7 +135,7 @@ CELL accept_connection(PORT* p)
 
 void primitive_accept_fd(void)
 {
-	PORT* p;
+	F_PORT* p;
 	maybe_garbage_collection();
 	p = untag_port(dpop());
 	pending_io_error(p);

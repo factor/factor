@@ -52,7 +52,7 @@ IO_TASK* add_io_task(
 }
 
 void remove_io_task(
-	PORT* port,
+	F_PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count)
 {
@@ -66,7 +66,7 @@ void remove_io_task(
 		*fd_count = *fd_count - 1;
 }
 
-bool perform_copy_from_io_task(PORT* port, PORT* other_port)
+bool perform_copy_from_io_task(F_PORT* port, F_PORT* other_port)
 {
 	if(port->buf_fill == 0)
 	{
@@ -91,7 +91,7 @@ bool perform_copy_from_io_task(PORT* port, PORT* other_port)
 	return false;
 }
 
-bool perform_copy_to_io_task(PORT* port, PORT* other_port)
+bool perform_copy_to_io_task(F_PORT* port, F_PORT* other_port)
 {
 	bool success = perform_write_io_task(port);
 	/* only return 'true' if the COPY_FROM task is done also. */
@@ -140,12 +140,12 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks,
 
 CELL pop_io_task_callback(
 	IO_TASK_TYPE type,
-	PORT* port,
+	F_PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count)
 {
 	int fd = port->fd;
-	CONS* callbacks = untag_cons(io_tasks[fd].callbacks);
+	F_CONS* callbacks = untag_cons(io_tasks[fd].callbacks);
 	CELL callback = callbacks->car;
 	if(callbacks->cdr == F)
 		remove_io_task(port,io_tasks,fd_count);
@@ -157,7 +157,7 @@ CELL pop_io_task_callback(
 CELL perform_io_task(IO_TASK* io_task, IO_TASK* io_tasks, int* fd_count)
 {
 	bool success;
-	PORT* port = untag_port(io_task->port);
+	F_PORT* port = untag_port(io_task->port);
 
 	switch(io_task->type)
 	{
@@ -207,7 +207,7 @@ CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count)
 
 		if(typep(PORT_TYPE,io_task.port))
 		{
-			PORT* port = untag_port(io_task.port);
+			F_PORT* port = untag_port(io_task.port);
 			if(port->closed)
 			{
 				return pop_io_task_callback(
@@ -276,7 +276,7 @@ void primitive_next_io_task(void)
 void primitive_close(void)
 {
 	/* This does not flush. */
-	PORT* port = untag_port(dpop());
+	F_PORT* port = untag_port(dpop());
 	close(port->fd);
 	port->closed = true;
 }
