@@ -55,23 +55,23 @@ USE: prettyprint
     #! Collect all literals from all branches.
     [ node-param get ] bind [ [ scan-literal ] each ] each ;
 
-: mentions-literal? ( literal list -- )
+: mentions-literal? ( literal list -- ? )
     #! Does the given list of result objects refer to this
     #! literal?
-    [ dup cons? [ car over = ] [ drop f ] ifte ] some? ;
+    [ dupd value= ] some? nip ;
 
 : consumes-literal? ( literal node -- ? )
     #! Does the dataflow node consume the literal?
     [
-        node-consume-d get mentions-literal? swap
-        node-consume-r get mentions-literal? nip or
+        dup node-consume-d get mentions-literal? swap
+        dup node-consume-r get mentions-literal? nip or
     ] bind ;
 
 : produces-literal? ( literal node -- ? )
     #! Does the dataflow node produce the literal?
     [
-        node-produce-d get mentions-literal? swap
-        node-produce-r get mentions-literal? nip or
+        dup node-produce-d get mentions-literal? swap
+        dup node-produce-r get mentions-literal? nip or
     ] bind ;
 
 : (can-kill?) ( literal node -- ? )
@@ -187,16 +187,16 @@ USE: prettyprint
 #swap [ 2drop t ] "can-kill" set-word-property
 #swap [ kill-node ] "kill-node" set-word-property
 
-: kill-mask ( literals node -- mask )
-    [ node-consume-d get ] bind [
-        dup cons? [ car over contains? ] [ drop f ] ifte
-    ] map nip ;
+: kill-mask ( killing inputs -- mask )
+    [ over [ over value= ] some? >boolean nip ] map nip ;
 
 : reduce-stack-op ( literals node map -- )
     #! If certain values passing through a stack op are being
     #! killed, the stack op can be reduced, in extreme cases
     #! to a no-op.
-    -rot [ kill-mask swap assoc ] keep
+    -rot [
+        [ node-consume-d get ] bind kill-mask swap assoc
+    ] keep
     over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
 
 #over [ 2drop t ] "can-kill" set-word-property

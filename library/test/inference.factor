@@ -25,7 +25,7 @@ USE: math-internals
 !         dup [ 7 | 7 ] decompose compose [ 7 | 7 ] =
 !     ] all?
 ! ] unit-test
-[ 6 ] [ 6 gensym-vector vector-length ] unit-test
+[ 6 ] [ 6 computed-value-vector vector-length ] unit-test
 
 [ 3 ] [ [ { 1 2 } { 1 2 3 } ] longest-vector ] unit-test
 

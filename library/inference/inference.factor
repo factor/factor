@@ -36,6 +36,7 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
+USE: generic
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -62,12 +63,42 @@ SYMBOL: recursive-label
 ! inferred.
 SYMBOL: save-effect
 
-: gensym-vector ( n --  vector )
-    dup <vector> swap [ gensym over vector-push ] times ;
+! A value has the following slots:
+
+! the literal object, if any.
+SYMBOL: value
+
+! value-type -- the type, if known.
+SYMBOL: value-type
+
+GENERIC: literal ( value -- obj )
+GENERIC: value= ( literal value -- ? )
+
+TRAITS: computed-value
+C: computed-value ( -- value )
+    [ gensym value set ] extend ;
+M: computed-value literal ( value -- obj )
+    "Cannot use a computed value literally." throw ;
+M: computed-value value= ( literal value -- ? )
+    2drop f ;
+
+TRAITS: literal-value
+C: literal-value ( obj rstate -- value )
+    [ recursive-state set value set ] extend ;
+M: literal-value literal ( value -- obj )
+    [ value get ] bind ;
+M: literal-value value= ( literal value -- ? )
+    literal = ;
+
+: value-recursion ( value -- rstate )
+    [ recursive-state get ] bind ;
+
+: computed-value-vector ( n --  vector )
+    [ drop <computed-value> ] vector-project ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    >r gensym-vector dup r> vector-append ;
+    >r computed-value-vector dup r> vector-append ;
 
 : ensure ( count stack -- count stack )
     #! Ensure stack has this many elements. Return number of
@@ -88,7 +119,7 @@ SYMBOL: save-effect
 
 : produce-d ( count -- )
     #! Push count of unknown results.
-    [ gensym push-d ] times ;
+    [ <computed-value> push-d ] times ;
 
 : effect ( -- [ in | out ] )
     #! After inference is finished, collect information.
@@ -111,7 +142,7 @@ DEFER: apply-word
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup recursive-state get cons push-d
+    dup recursive-state get <literal-value> push-d
     #push dataflow, [ 1 0 node-outputs ] bind ;
 
 : apply-object ( obj -- )

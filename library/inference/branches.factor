@@ -51,7 +51,7 @@ USE: hashtables
 : unify-result ( obj obj -- obj )
     #! Replace values with unknown result if they differ,
     #! otherwise retain them.
-    2dup = [ drop ] [ 2drop gensym ] ifte ;
+    2dup = [ drop ] [ 2drop <computed-value> ] ifte ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
@@ -85,13 +85,13 @@ USE: hashtables
         "Unbalanced branches" throw
     ] ifte ;
 
-: infer-branch ( rstate quot save-effect -- namespace )
+: infer-branch ( value save-effect -- namespace )
     <namespace> [
         save-effect set
-        swap recursive-state set
+        dup value-recursion recursive-state set
         copy-interpreter
         dataflow-graph off
-        infer-quot
+        literal infer-quot
         #values values-node
     ] extend ;
 
@@ -99,9 +99,9 @@ USE: hashtables
     #! This is a hack. undefined-method has a stack effect that
     #! probably does not match any other branch of the generic,
     #! so we handle it specially.
-    \ undefined-method swap tree-contains? ;
+    literal \ undefined-method swap tree-contains? ;
 
-: recursive-branch ( rstate quot -- )
+: recursive-branch ( value -- )
     #! Set base case if inference didn't fail.
     [
         f infer-branch [
@@ -109,13 +109,13 @@ USE: hashtables
             recursive-state get set-base
         ] bind
     ] [
-        [ 2drop ] when
+        [ drop ] when
     ] catch ;
 
 : infer-base-case ( branchlist -- )
     [
-        unswons dup terminator? [
-            2drop
+        dup terminator? [
+            drop
         ] [
             recursive-branch
         ] ifte
@@ -123,7 +123,7 @@ USE: hashtables
 
 : (infer-branches) ( branchlist -- list )
     dup infer-base-case [
-        unswons dup terminator? [
+        dup terminator? [
             t infer-branch [
                 meta-d off meta-r off d-in off
             ] extend
@@ -153,8 +153,9 @@ USE: hashtables
 
 \ ifte [ infer-ifte ] "infer" set-word-property
 
-: vtable>list ( [ vtable | rstate ] -- list )
-    unswons vector>list [ over cons ] map nip ;
+: vtable>list ( value -- list )
+    dup value-recursion swap literal vector>list
+    [ over <literal-value> ] map nip ;
 
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.

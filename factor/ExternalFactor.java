@@ -184,9 +184,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized FactorWord makeWord(Cons info)
 	{
-		FactorWord w = new FactorWord(
-			(String)info.car,
-			(String)info.next().car);
+		String vocabulary = (String)info.car;
+		String name = (String)info.next().car;
+		FactorWord w = super.searchVocabulary(new Cons(vocabulary,null),name);
+		if(w == null)
+			w = new FactorWord(vocabulary,name);
 		w.stackEffect = (String)info.next().next().car;
 		return w;
 	} //}}}

@@ -178,11 +178,13 @@ USE: prettyprint
         ] ifte
     ] ifte ;
 
-: infer-call ( [ rstate | quot ] -- )
+: infer-call ( -- )
     1 ensure-d
     dataflow-drop,
     gensym dup [
-        drop pop-d uncons recursive-state set infer-quot
+        drop pop-d dup
+        value-recursion recursive-state set
+        literal infer-quot
     ] with-block ;
 
 \ call [ infer-call ] "infer" set-word-property
