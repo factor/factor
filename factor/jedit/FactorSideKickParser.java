@@ -33,7 +33,8 @@ import errorlist.*;
 import factor.*;
 import java.io.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import org.gjt.sp.jedit.Buffer;
+import java.util.*;
+import org.gjt.sp.jedit.*;
 import org.gjt.sp.util.Log;
 import sidekick.*;
 
@@ -57,7 +58,7 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		SideKickParsedData d = new SideKickParsedData(buffer.getPath());
+		FactorParsedData d = new FactorParsedData(buffer.getPath());
 
 		FactorInterpreter interp = FactorPlugin.getInterpreter();
 
@@ -71,10 +72,17 @@ public class FactorSideKickParser extends SideKickParser
 
 			/* of course wrapping a string reader in a buffered
 			reader is dumb, but the FactorReader uses readLine() */
-			FactorReader r = new FactorReader(buffer.getPath(),
+			FactorScanner scanner = new RestartableFactorScanner(
+				buffer.getPath(),
 				new BufferedReader(new StringReader(text)),
-				interp);
+				errorSource);
+			FactorReader r = new FactorReader(scanner,
+				false,false,interp);
+
 			Cons parsed = r.parse();
+
+			d.in = r.getIn();
+			d.use = r.getUse();
 
 			addWordDefNodes(d,parsed,buffer);
 		}
@@ -138,4 +146,109 @@ public class FactorSideKickParser extends SideKickParser
 			parsed = parsed.next();
 		}
 	} //}}}
+
+	//{{{ supportsCompletion() method
+	/**
+	 * Returns if the parser supports code completion.
+	 *
+	 * Returns false by default.
+	 */
+	public boolean supportsCompletion()
+	{
+		return true;
+	} //}}}
+
+	//{{{ complete() method
+	/**
+	 * Returns completions suitable for insertion at the specified position.
+	 *
+	 * Returns null by default.
+	 *
+	 * @param editPane The edit pane involved.
+	 * @param caret The caret position.
+	 */
+	public SideKickCompletion complete(EditPane editPane, int caret)
+	{
+		SideKickParsedData _data = SideKickParsedData
+			.getParsedData(editPane.getView());
+		if(!(_data instanceof FactorParsedData))
+		{
+			System.err.println("exit 1");
+			return null;
+		}
+		FactorParsedData data = (FactorParsedData)_data;
+
+		Buffer buffer = editPane.getBuffer();
+
+		// first, we get the word before the caret
+		int caretLine = buffer.getLineOfOffset(caret);
+		int lineStart = buffer.getLineStartOffset(caretLine);
+		String text = buffer.getText(lineStart,caret - lineStart);
+
+		int wordStart = 0;
+		for(int i = text.length() - 1; i >= 0; i--)
+		{
+			char ch = text.charAt(i);
+			if(ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
+				== ReadTable.WHITESPACE)
+			{
+				wordStart = i;
+				break;
+			}
+		}
+
+		String word = text.substring(wordStart);
+		List completions = getCompletions(data.use,word);
+
+		if(completions.size() == 0)
+			return null;
+		else
+		{
+			Collections.sort(completions,
+				new MiscUtilities.StringICaseCompare());
+			return new FactorCompletion(editPane.getView(),
+				completions,word,data);
+		}
+	} //}}}
+
+	//{{{ getCompletions() method
+	private List getCompletions(Cons use, String word)
+	{
+		List completions = new ArrayList();
+		FactorInterpreter interp = FactorPlugin.getInterpreter();
+
+		while(use != null)
+		{
+			String vocab = (String)use.car;
+			getCompletions(interp,vocab,word,completions);
+			use = use.next();
+		}
+		
+		return completions;
+	} //}}}
+
+	//{{{ getCompletions() method
+	private void getCompletions(FactorInterpreter interp, String vocab,
+		String word, List completions)
+	{
+		try
+		{
+			FactorNamespace v = interp.getVocabulary(vocab);
+			Cons words = v.toValueList();
+
+			while(words != null)
+			{
+				FactorWord w = (FactorWord)words.car;
+
+				if(w.name.startsWith(word))
+					completions.add(w);
+
+				words = words.next();
+			}
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,this,e);
+		}
+	}
 }

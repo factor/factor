@@ -27,40 +27,62 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.parser;
+package factor.jedit;
 
 import factor.*;
+import java.awt.Component;
+import javax.swing.*;
+import org.gjt.sp.jedit.jEdit;
 
-public class Def extends FactorParsingDefinition
+public class FactorWordRenderer extends DefaultListCellRenderer
 {
-	//{{{ Def constructor
-	/**
-	 * A new definition.
-	 */
-	public Def(FactorWord word)
-		throws Exception
+	private FactorInterpreter interp;
+
+	public FactorWordRenderer(FactorInterpreter interp)
 	{
-		super(word);
-	} //}}}
+		this.interp = interp;
+	}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws Exception
+	public Component getListCellRendererComponent(
+		JList list,
+		Object value,
+		int index,
+		boolean isSelected,
+		boolean cellHasFocus)
 	{
-		FactorScanner scanner = reader.getScanner();
+		super.getListCellRendererComponent(list,value,index,
+			isSelected,cellHasFocus);
 
-		// remember the position before the word name
-		int line = scanner.getLineNumber();
-		int col = scanner.getColumnNumber();
+		String prop = "factor.completion.plain";
+		String stackEffect = null;
 
-		// Read the word name
-		FactorWord newWord = reader.nextWord(true);
+		FactorWord word = (FactorWord)value;
+		if(word.def == null)
+		{
+			if(word.parsing != null)
+				prop = "factor.completion.parsing";
+			else
+				prop = "factor.completion.defer";
+		}
+		else
+		{
+			Cons def = word.def.toList(interp);
+			if(def != null && def.car instanceof FactorDocComment)
+			{
+				FactorDocComment comment = (FactorDocComment)
+					def.car;
+				if(comment.isStackComment())
+				{
+					prop = "factor.completion.stack";
+					stackEffect = comment.toString();
+				}
+			}
+		}
 
-		if(newWord == null)
-			return;
+		setText(jEdit.getProperty(prop,
+			new String[] { word.name,
+			stackEffect }));
 
-		newWord.line = line;
-		newWord.col = col;
-		newWord.file = scanner.getFileName();
-		reader.pushExclusiveState(word,newWord);
+		return this;
 	}
 }

@@ -43,9 +43,11 @@ The Factor plugin adds a menu to jEdit's <b>Plugins</b> menu with the following 
 
 <ul>
 <li><b>Factor Listener</b> opens a dockable window with an interactive interpreter.</li>
-<li><b>Run Current File</b> evaluates the <code>run-file</code> word with the current buffer's path name as an argument.</li>
-<li><b>Evaluate Selection</b> evaluates the current selection.</li>
-<li><b>Apropos</b> performs an apropos search on the current selection, or the word at the caret if there is no selection. An "apropos search" lists all words in all vocabularies whose names contain a certain string. For example, you can use this to list all string words by searching for "str", or to find out which vocabulary contains the word "unparse" by searching for "unparse".</li>
+<li><b>Run current file</b> evaluates the <code>run-file</code> word with the current buffer's path name as an argument.</li>
+<li><b>Evaluate selection</b> evaluates the current selection.</li>
+<li><b>Apropos word at caret</b> performs an apropos search on the current selection, or the word at the caret if there is no selection. An "apropos search" lists all words in all vocabularies whose names contain a certain string. For example, you can use this to list all string words by searching for "str", or to find out which vocabulary contains the word "unparse" by searching for "unparse".</li>
+<li><b>See word at caret</b> shows the definition of the word at the caret in the listener dockable window.</li>
+<li><b>Word usages at caret</b> shows all usages of the word at the caret in the listener dockable window.</li>
 </ul>
 
 <h2 class="fancy-heading">SideKick parser</h2>
@@ -54,6 +56,7 @@ The Factor plugin uses the SideKick plugin to perform background parsing of Fact
 
 <ul>
 <li><b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Structure Browser</b> displays a list of all words defined in the current buffer.</li>
+<li><b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Show Completion Popup</b> displays a popup listing completions for the partial word at the caret. Completions are searched for in all vocabularies in the current file's search path, as determined by <code>IN:</code> and <code>USE:</code> declarations.</li>
 <li>The navigation commands in the <b>Plugins</b>&gt;<b>SideKick</b> menu will work. SideKick refers to each unit of source structure as an "asset". In Factor, each word definition is an "asset".</li>
 <li>Any parse errors are reported using the ErrorList plugin, which means they will be highlighted in the text area and shown in the ErrorList window.
 </li>

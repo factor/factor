@@ -80,29 +80,6 @@ bool zerop(CELL tagged)
 	}
 }
 
-CELL to_integer(CELL tagged)
-{
-	RATIO* r;
-
-	switch(type_of(tagged))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-		return tagged;
-	case RATIO_TYPE:
-		r = (RATIO*)UNTAG(tagged);
-		return divint(r->numerator,r->denominator);
-	default:
-		type_error(INTEGER_TYPE,tagged);
-		return NULL; /* can't happen */
-	}
-}
-
-void primitive_to_integer(void)
-{
-	drepl(to_integer(dpeek()));
-}
-
 /* EQUALITY */
 CELL number_eq_anytype(CELL x, CELL y)
 {

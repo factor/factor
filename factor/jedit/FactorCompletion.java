@@ -27,40 +27,48 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.parser;
+package factor.jedit;
 
-import factor.*;
+import java.util.*;
+import javax.swing.ListCellRenderer;
+import org.gjt.sp.jedit.textarea.*;
+import org.gjt.sp.jedit.*;
+import sidekick.*;
 
-public class Def extends FactorParsingDefinition
+public class FactorCompletion extends SideKickCompletion
 {
-	//{{{ Def constructor
-	/**
-	 * A new definition.
-	 */
-	public Def(FactorWord word)
-		throws Exception
+	private View view;
+	private JEditTextArea textArea;
+	private String word;
+	private FactorParsedData data;
+
+	//{{{ FactorCompletion constructor
+	public FactorCompletion(View view, List items,
+		String word, FactorParsedData data)
 	{
-		super(word);
+		this.view = view;
+		textArea = view.getTextArea();
+		this.items = items;
+		this.word = word;
+		this.data = data;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws Exception
+	public void insert(int index)
 	{
-		FactorScanner scanner = reader.getScanner();
+	}
 
-		// remember the position before the word name
-		int line = scanner.getLineNumber();
-		int col = scanner.getColumnNumber();
+	public int getTokenLength()
+	{
+		return word.length();
+	}
 
-		// Read the word name
-		FactorWord newWord = reader.nextWord(true);
+	public boolean handleKeystroke(int selectedIndex, char keyChar)
+	{
+		return false;
+	}
 
-		if(newWord == null)
-			return;
-
-		newWord.line = line;
-		newWord.col = col;
-		newWord.file = scanner.getFileName();
-		reader.pushExclusiveState(word,newWord);
+	public ListCellRenderer getRenderer()
+	{
+		return new FactorWordRenderer(FactorPlugin.getInterpreter());
 	}
 }

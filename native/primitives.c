@@ -39,7 +39,6 @@ XT primitives[] = {
 	primitive_numberp,
 	primitive_to_fixnum,
 	primitive_to_bignum,
-	primitive_to_integer,
 	primitive_to_float,
 	primitive_number_eq,
 	primitive_fixnump,

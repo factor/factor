@@ -42,7 +42,6 @@ USE: words
 
 IN: arithmetic
 DEFER: number=
-DEFER: >integer
 DEFER: /i
 
 IN: kernel
@@ -134,7 +133,6 @@ IN: cross-compiler
         number?
         >fixnum
         >bignum
-        >integer
         >float
         number=
         fixnum?

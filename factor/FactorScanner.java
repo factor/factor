@@ -78,6 +78,7 @@ public class FactorScanner
 		this.filename = filename;
 		this.in = in;
 		buf = new StringBuffer();
+		setReadTable(ReadTable.DEFAULT_READTABLE);
 	} //}}}
 
 	//{{{ getReadTable() method
@@ -206,10 +207,16 @@ public class FactorScanner
 		for(;;)
 		{
 			if(position == line.length())
+			{
 				error("Expected " + end + " before EOL");
+				break;
+			}
 
 			if(line == null)
+			{
 				error("Expected " + end + " before EOF");
+				break;
+			}
 
 			char ch = line.charAt(position++);
 
@@ -246,9 +253,15 @@ public class FactorScanner
 	public char readNonEOF() throws FactorParseException, IOException
 	{
 		if(position == line.length())
+		{
 			error("Unexpected EOL");
+			return '\0';
+		}
 		if(line == null)
+		{
 			error("Unexpected EOF");
+			return '\0';
+		}
 
 		return line.charAt(position++);
 	} //}}}
@@ -302,7 +315,10 @@ public class FactorScanner
 			return '\0';
 		case 'u':
 			if(line.length() - position < 4)
+			{
 				error("Unexpected EOL");
+				return '\0';
+			}
 
 			String hex = line.substring(position,position + 4);
 
@@ -319,7 +335,6 @@ public class FactorScanner
 			return '\0';
 		default:
 			error("Unknown escape: " + ch);
-			// can't happen
 			return '\0';
 		}
 	} //}}}

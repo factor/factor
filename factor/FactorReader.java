@@ -41,32 +41,6 @@ public class FactorReader
 	public static final Cons DEFAULT_USE = new Cons("builtins",
 		new Cons("scratchpad",null));
 	public static final String DEFAULT_IN = "scratchpad";
-	public static final ReadTable DEFAULT_READTABLE;
-
-	//{{{ Class initializer
-	static
-	{
-		DEFAULT_READTABLE = new ReadTable();
-
-		DEFAULT_READTABLE.setCharacterType('\t',ReadTable.WHITESPACE);
-		DEFAULT_READTABLE.setCharacterType('\n',ReadTable.WHITESPACE);
-
-		// ^L
-		DEFAULT_READTABLE.setCharacterType((char)12,ReadTable.WHITESPACE);
-
-		DEFAULT_READTABLE.setCharacterType('\r',ReadTable.WHITESPACE);
-		DEFAULT_READTABLE.setCharacterType(' ',ReadTable.WHITESPACE);
-
-		DEFAULT_READTABLE.setCharacterType('!',ReadTable.CONSTITUENT);
-		DEFAULT_READTABLE.setCharacterType('"',ReadTable.DISPATCH);
-		DEFAULT_READTABLE.setCharacterType('#',ReadTable.DISPATCH);
-		DEFAULT_READTABLE.setCharacterRange('$','[',ReadTable.CONSTITUENT);
-		DEFAULT_READTABLE.setCharacterType('\\',ReadTable.SINGLE_ESCAPE);
-		DEFAULT_READTABLE.setCharacterRange(']','~',ReadTable.CONSTITUENT);
-
-		DEFAULT_READTABLE.setCharacterType('!',ReadTable.DISPATCH);
-		DEFAULT_READTABLE.setCharacterType('(',ReadTable.CONSTITUENT);
-	} //}}}
 
 	private FactorInterpreter interp;
 	private FactorScanner scanner;
@@ -153,7 +127,7 @@ public class FactorReader
 				buf.append("\\0");
 				break;
 			default:
-				if(DEFAULT_READTABLE.getCharacterType(ch)
+				if(ReadTable.DEFAULT_READTABLE.getCharacterType(ch)
 					== ReadTable.INVALID)
 				{
 					buf.append("\\u");
@@ -275,9 +249,19 @@ public class FactorReader
 		boolean interactive,
 		FactorInterpreter interp)
 	{
+		this(new FactorScanner(filename,in),alwaysDocComments,
+			interactive,interp);
+	} //}}}
+
+	//{{{ FactorReader constructor
+	public FactorReader(
+		FactorScanner scanner,
+		boolean alwaysDocComments,
+		boolean interactive,
+		FactorInterpreter interp)
+	{
 		this.interp = interp;
-		scanner = new FactorScanner(filename,in);
-		scanner.setReadTable(DEFAULT_READTABLE);
+		this.scanner = scanner;
 		pushState(toplevel,null);
 		this.alwaysDocComments = alwaysDocComments;
 		this.interactive = interactive;
@@ -381,20 +365,16 @@ public class FactorReader
 	public FactorWord nextWord(boolean define) throws Exception
 	{
 		Object next = nextNonEOL(true,false);
-		if(next == FactorScanner.EOF)
-		{
-			scanner.error("Unexpected EOF");
-			// can't happen
-			return null;
-		}
-		else if(next instanceof Number)
+		if(next instanceof Number)
 		{
 			scanner.error("Unexpected " + next);
 			// can't happen
 			return null;
 		}
-		else
+		else if(next instanceof String)
 			return intern((String)next,define);
+		else
+			return null;
 	} //}}}
 
 	//{{{ next() method
@@ -436,6 +416,12 @@ public class FactorReader
 		{
 			FactorWord word = intern((String)next,
 				!getCurrentState().warnUndefined);
+			if(word == null)
+			{
+				/* We're ignoring errors */
+				return false;
+			}
+
 			if(word.parsing != null)
 			{
 				word.parsing.eval(interp,this);
@@ -486,10 +472,9 @@ public class FactorReader
 	{
 		ParseState state = getCurrentState();
 		if(state.start != start)
-		{
 			scanner.error(end + " does not close " + state.start);
-		}
-		states = states.next();
+		else
+			states = states.next();
 		return state;
 	} //}}}
 
@@ -573,7 +558,7 @@ public class FactorReader
 			if(comma)
 			{
 				if(last.cdr != null)
-					scanner.error("Only one token allowed after ,");
+					scanner.error("Only one token allowed after |");
 				last.cdr = obj;
 			}
 			else

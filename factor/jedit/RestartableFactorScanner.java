@@ -27,40 +27,29 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.parser;
+package factor.jedit;
 
+import errorlist.*;
 import factor.*;
+import java.io.BufferedReader;
 
-public class Def extends FactorParsingDefinition
+public class RestartableFactorScanner extends FactorScanner
 {
-	//{{{ Def constructor
-	/**
-	 * A new definition.
-	 */
-	public Def(FactorWord word)
-		throws Exception
+	private DefaultErrorSource errors;
+
+	//{{{ RestartableFactorScanner constructor
+	public RestartableFactorScanner(String filename, BufferedReader in,
+		DefaultErrorSource errors)
 	{
-		super(word);
+		super(filename,in);
+		this.errors = errors;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws Exception
+	//{{{ error() method
+	public void error(String msg) throws FactorParseException
 	{
-		FactorScanner scanner = reader.getScanner();
-
-		// remember the position before the word name
-		int line = scanner.getLineNumber();
-		int col = scanner.getColumnNumber();
-
-		// Read the word name
-		FactorWord newWord = reader.nextWord(true);
-
-		if(newWord == null)
-			return;
-
-		newWord.line = line;
-		newWord.col = col;
-		newWord.file = scanner.getFileName();
-		reader.pushExclusiveState(word,newWord);
-	}
+		errors.addError(ErrorSource.ERROR,getFileName(),
+			/* Factor line #'s are 1-indexed */
+			getLineNumber() - 1,0,0,msg);
+	} //}}}
 }

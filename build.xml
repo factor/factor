@@ -78,7 +78,7 @@
 
 	<target name="docs" description="Build PDF and HTML docs.">
 		<delete>
-			<fileset dir="." includes="doc/devel-guide/*"/>
+			<fileset dir="." includes="doc/devel-guide/*.html"/>
 			<fileset dir="." includes="doc/devel-guide.aux"/>
 			<fileset dir="." includes="doc/devel-guide.log"/>
 			<fileset dir="." includes="doc/devel-guide.pdf"/>
@@ -87,6 +87,7 @@
 			<arg value="devel-guide.tex" />
 		</exec>
 		<exec executable="latex2html" dir="doc">
+			<arg value="-local_icons"/>
 			<arg value="devel-guide.tex" />
 		</exec>
 	</target>

@@ -3,7 +3,7 @@
 plugin.factor.jedit.FactorPlugin.activate=defer
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.62
+plugin.factor.jedit.FactorPlugin.version=0.63
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/plugin.html
 
@@ -15,14 +15,23 @@ plugin.factor.jedit.FactorPlugin.menu=factor \
 	- \
 	factor-run-file \
 	factor-eval-selection \
-	factor-apropos
+	factor-apropos \
+	factor-see \
+	factor-usages
 
 factor.label=Factor Listener
-factor-run-file.label=Run Current File
-factor-eval-selection.label=Evaluate Selection
-factor-apropos.label=Apropos
+factor-run-file.label=Run current file
+factor-eval-selection.label=Evaluate selection
+factor-apropos.label=Apropos at caret
+factor-see.label=See word at caret
+factor-usages.label=Word usages at caret
 
 factor.title=Factor
 
 sidekick.parser.factor.label=Factor
 mode.factor.sidekick.parser=factor
+
+factor.completion.plain=<html>: <b>{0}</b>
+factor.completion.defer=<html>DEFER: <b>{0}</b>
+factor.completion.parsing=<html>PARSING: <b>{0}</b>
+factor.completion.stack=<html>: <b>{0}</b> {1}

@@ -27,40 +27,18 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.parser;
+package factor.jedit;
 
-import factor.*;
+import factor.Cons;
+import sidekick.*;
 
-public class Def extends FactorParsingDefinition
+public class FactorParsedData extends SideKickParsedData
 {
-	//{{{ Def constructor
-	/**
-	 * A new definition.
-	 */
-	public Def(FactorWord word)
-		throws Exception
+	public String in;
+	public Cons use;
+	
+	FactorParsedData(String fileName)
 	{
-		super(word);
-	} //}}}
-
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws Exception
-	{
-		FactorScanner scanner = reader.getScanner();
-
-		// remember the position before the word name
-		int line = scanner.getLineNumber();
-		int col = scanner.getColumnNumber();
-
-		// Read the word name
-		FactorWord newWord = reader.nextWord(true);
-
-		if(newWord == null)
-			return;
-
-		newWord.line = line;
-		newWord.col = col;
-		newWord.file = scanner.getFileName();
-		reader.pushExclusiveState(word,newWord);
+		super(fileName);
 	}
 }

@@ -1,5 +1,3 @@
-0.62:
-
 - gc call in the middle of some ops might affect callstack
 - sending ^C on socket
 - postpone errors until actual read/write op
@@ -9,8 +7,10 @@
 - sbuf-hashcode
 - vector-hashcode
 - listener backspace overzealous
-- log-client: fix for native
 - multitasking
+- review doc formatting with latex2html
+- sidekick: error source not removed
+- array index out of bounds
 
 [error] AWT-EventQueue-0: java.lang.NullPointerException
 [error] AWT-EventQueue-0:  at sidekick.SideKickParsedData.getTreePathForPosition(Unknown Source)
@@ -40,24 +40,21 @@
 
 + listener/plugin:
 
-- completion
+- completion in the listener
+- special completion for USE:/IN:
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
+- inspector links when describe called without object path
 
 + native:
 
 - read#
-- to_fixnum and friends: error on float
 - parsing should be parsing
+- see: show word flags and IN:
 - describe-word
 - contains ==> contains?
 - telnetd: send errors on socket
 - enforce bottom-up in native bootstrap
-
-+ interactive:
-
-- inspector links when describe called without object path
-- 'cascading' styles
 
 + JVM compiler:
 
@@ -78,9 +75,12 @@
 - ditch expand
 - set-object-path
 - more readable traces
+- 'cascading' styles
+- standalone listener input style
 
 + httpd:
 
+- log-client: fix for native
 - if user clicks stop in browser, doesn't stop sending?
 - log with date
 - log user agent

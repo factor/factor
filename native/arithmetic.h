@@ -216,7 +216,6 @@ FIXNUM to_fixnum(CELL tagged);
 void primitive_to_fixnum(void);
 BIGNUM* to_bignum(CELL tagged);
 void primitive_to_bignum(void);
-CELL to_integer(CELL tagged);
 void primitive_to_integer(void);
 CELL number_eq(CELL x, CELL y);
 void primitive_number_eq(void);

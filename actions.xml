@@ -33,4 +33,42 @@
 				+ "\" apropos.");
 		</CODE>
 	</ACTION>
+	<ACTION NAME="factor-see">
+		<CODE>
+			data = sidekick.SideKickParsedData.getParsedData(view);
+			if(data instanceof factor.jedit.FactorParsedData)
+			{
+				if(textArea.selectionCount == 0)
+					textArea.selectWord();
+				factor.jedit.FactorPlugin.eval(view,
+					"\""
+					+ MiscUtilities.charsToEscapes(
+					textArea.selectedText)
+					+ "\" "
+					+ factor.FactorReader.unparseObject(data.use)
+					+ " search see");
+			}
+			else
+				view.toolkit.beep();
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-usages">
+		<CODE>
+			data = sidekick.SideKickParsedData.getParsedData(view);
+			if(data instanceof factor.jedit.FactorParsedData)
+			{
+				if(textArea.selectionCount == 0)
+					textArea.selectWord();
+				factor.jedit.FactorPlugin.eval(view,
+					"\""
+					+ MiscUtilities.charsToEscapes(
+					textArea.selectedText)
+					+ "\" "
+					+ factor.FactorReader.unparseObject(data.use)
+					+ " search usages.");
+			}
+			else
+				view.toolkit.beep();
+		</CODE>
+	</ACTION>
 </ACTIONS>
