@@ -36,11 +36,11 @@ USE: math-internals
 
 BUILTIN: vector 11
 
-: vector-length ( vec -- len ) >vector 1 integer-slot ; inline
+: vector-length ( vec -- len ) >vector 1 slot ; inline
 
 IN: kernel-internals
 
-: (set-vector-length) ( len vec -- ) 1 set-integer-slot ; inline
+: (set-vector-length) ( len vec -- ) 1 set-slot ; inline
 
 : assert-positive ( fx -- )
     0 fixnum<
@@ -107,15 +107,8 @@ IN: vectors
 : >pop> ( stack -- stack )
     dup vector-pop drop ;
 
-: (vector>list) ( i vec -- list )
-    2dup vector-length >= [
-        2drop [ ]
-    ] [
-        2dup vector-nth >r >r 1 + r> (vector>list) r> swons
-    ] ifte ;
-
-: vector>list ( str -- list )
-    0 swap (vector>list) ;
+: vector>list ( vec -- list )
+    dup vector-length swap vector-array array>list ;
 
 : vector-each ( vector quotation -- )
     #! Execute the quotation with each element of the vector

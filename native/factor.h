@@ -135,6 +135,7 @@ typedef unsigned char BYTE;
 #include "image.h"
 #include "primitives.h"
 #include "vector.h"
+#include "hashtable.h"
 #include "stack.h"
 #include "compiler.h"
 #include "relocate.h"

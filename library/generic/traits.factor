@@ -39,7 +39,7 @@ USE: vectors
 ! Traits metaclass for user-defined classes based on hashtables
 
 : traits ( object -- symbol )
-    dup vector? [ \ traits swap hash ] [ drop f ] ifte ;
+    dup hashtable? [ \ traits swap hash ] [ drop f ] ifte ;
 
 ! Hashtable slot holding an optional delegate. Any undefined
 ! methods are called on the delegate. The object can also
@@ -58,7 +58,7 @@ SYMBOL: delegate
     ] ifte ;
 
 : add-traits-dispatch ( word vtable -- )
-    >r unit [ car traits-dispatch call ] cons \ vector r>
+    >r unit [ car traits-dispatch call ] cons \ hashtable r>
     set-vtable ;
 
 \ traits [

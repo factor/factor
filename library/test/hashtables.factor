@@ -58,3 +58,17 @@ f 100000000000000000000000000 "testhash" get set-hash
     "visual basic" "testhash" get remove-hash
     "visual basic" "testhash" get hash*
 ] unit-test
+
+[ 4 ] [
+    "hey"
+    {{ [[ "hey" 4 ]] [[ "whey" 5 ]] }} 2dup (hashcode)
+    >r buckets>list r> [ cdr ] times car assoc
+] unit-test
+
+! Testing the hash element counting
+
+<namespace> "counting" set
+"key" "value" "counting" get set-hash
+[ 1 ] [ "counting" get hash-size ] unit-test
+"key" "value" "counting" get set-hash
+[ 1 ] [ "counting" get hash-size ] unit-test

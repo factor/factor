@@ -41,6 +41,7 @@
 IN: image
 USE: errors
 USE: generic
+USE: kernel-internals
 USE: hashtables
 USE: kernel
 USE: lists
@@ -86,12 +87,12 @@ SYMBOL: boot-quot
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
 
-: f-type      6  ; inline
-: t-type      7  ; inline
-: array-type  8  ; inline
-: vector-type 11 ; inline
-: string-type 12 ; inline
-: word-type   17 ; inline
+: t-type         7  ; inline
+: array-type     8  ; inline
+: hashtable-type 10 ; inline
+: vector-type    11 ; inline
+: string-type    12 ; inline
+: word-type      17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) object-tag immediate ;
@@ -142,6 +143,8 @@ GENERIC: ' ( obj -- ptr )
 
 ( Fixnums )
 
+: emit-fixnum ( n -- ) fixnum-tag immediate emit ;
+
 M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
@@ -154,7 +157,7 @@ M: bignum ' ( bignum -- tagged )
         [[ 0  [ 1 0   ] ]]
         [[ -1 [ 2 1 1 ] ]]
         [[ 1  [ 2 0 1 ] ]]
-    ] assoc [ emit ] each align-here r> ;
+    ] assoc unswons emit-fixnum [ emit ] each align-here r> ;
 
 ( Special objects )
 
@@ -175,7 +178,7 @@ M: f ' ( obj -- ptr )
 : -1, -1 >bignum ' drop ;
 
 ( Beginning of the image )
-! The image proper begins with the header, then T,
+! The image begins with the header, then T,
 ! and the bignums 0, 1, and -1.
 
 : begin ( -- ) header t, 0, 1, -1, ;
@@ -249,7 +252,7 @@ M: cons ' ( c -- tagged )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
-    dup hashcode fixnum-tag immediate emit
+    dup hashcode emit-fixnum
     pack-string
     align-here ;
 
@@ -266,7 +269,7 @@ M: string ' ( string -- pointer )
     [ ' ] map
     object-tag here-as >r
     array-type >header emit
-    dup length emit
+    dup length emit-fixnum
     ( elements -- ) [ emit ] each
     align-here r> ;
 
@@ -274,7 +277,7 @@ M: string ' ( string -- pointer )
     dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
-    emit ( length )
+    emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
 
@@ -284,24 +287,30 @@ M: vector ' ( vector -- pointer )
 : rehash ( hashtable -- )
     ! Now make a rehashing boot quotation
     dup hash>alist [
-        >r dup vector-length [
-            [ f swap pick set-vector-nth ] keep
-        ] repeat r>
+        over hash-clear
         [ unswons rot set-hash ] each-with
     ] cons cons
     boot-quot [ append ] change ;
 
+: emit-hashtable ( hash -- pointer )
+    dup buckets>list emit-array swap hash-size
+    object-tag here-as >r
+    hashtable-type >header emit
+    emit-fixnum ( length )
+    emit ( array ptr )
+    align-here r> ;
+
 M: hashtable ' ( hashtable -- pointer )
     #! Only hashtables are pooled, not vectors!
     dup pooled-object [
-        [ dup emit-vector [ pool-object ] keep ] keep rehash
+        [ dup emit-hashtable [ pool-object ] keep ] keep rehash
     ] ?unless ;
 
 ( End of the image )
 
 : vocabularies, ( vocabularies -- )
     [
-        cdr dup vector? [
+        cdr dup hashtable? [
             [
                 cdr dup word? [ word, ] [ drop ] ifte
             ] hash-each

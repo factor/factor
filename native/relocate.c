@@ -10,6 +10,9 @@ void relocate_object(CELL relocating)
 	case ARRAY_TYPE:
 		fixup_array((F_ARRAY*)relocating);
 		break;
+	case HASHTABLE_TYPE:
+		fixup_hashtable((F_HASHTABLE*)relocating);
+		break;
 	case VECTOR_TYPE:
 		fixup_vector((F_VECTOR*)relocating);
 		break;

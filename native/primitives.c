@@ -168,11 +168,14 @@ void* primitives[] = {
 	primitive_to_vector,
 	primitive_to_string,
 	primitive_to_word,
+	primitive_to_hashtable,
 	primitive_slot,
 	primitive_set_slot,
 	primitive_integer_slot,
 	primitive_set_integer_slot,
-	primitive_grow_array
+	primitive_grow_array,
+	primitive_hashtable,
+	primitive_array
 };
 
 CELL primitive_to_xt(CELL primitive)

@@ -71,6 +71,9 @@ INLINE void collect_object(CELL scan)
 	case ARRAY_TYPE:
 		collect_array((F_ARRAY*)scan);
 		break;
+	case HASHTABLE_TYPE:
+		collect_hashtable((F_HASHTABLE*)scan);
+		break;
 	case VECTOR_TYPE:
 		collect_vector((F_VECTOR*)scan);
 		break;

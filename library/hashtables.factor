@@ -25,37 +25,45 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: kernel-internals
+IN: hashtables
 USE: generic
 USE: kernel
 USE: lists
 USE: math
 USE: vectors
 
-: hash-array vector-array ; inline
-: bucket-count >vector hash-array array-capacity ; inline
+BUILTIN: hashtable 10
+
+! A hashtable is implemented as an array of buckets. The
+! array index is determined using a hash function, and the
+! buckets are associative lists which are searched
+! linearly.
+
+IN: kernel-internals
+
+: hash-array 2 slot ; inline
 
 : hash-bucket ( n hash -- alist )
-    swap >fixnum swap >vector hash-array array-nth ; inline
+    swap >fixnum swap >hashtable hash-array array-nth ; inline
 
 : set-hash-bucket ( obj n hash -- )
-    >r >fixnum r> hash-array set-array-nth ; inline
+    swap >fixnum swap >hashtable hash-array set-array-nth ;
+    inline
+
+: hash-size+ ( hash -- )
+    >hashtable dup 1 slot 1 + swap 1 set-slot ; inline
+
+: hash-size- ( hash -- )
+    >hashtable dup 1 slot 1 - swap 1 set-slot ; inline
 
 IN: hashtables
 
-! Note that the length of a hashtable vector must not change
-! for the lifetime of the hashtable, otherwise problems will
-! occur. Do not use vector words with hashtables.
+: hash-size ( hash -- n )
+    #! Number of elements in the hashtable.
+    >hashtable 1 slot ;
 
-PREDICATE: vector hashtable ( obj -- ? )
-    [ assoc? ] vector-all? ;
-
-: <hashtable> ( buckets -- )
-    #! A hashtable is implemented as an array of buckets. The
-    #! array index is determined using a hash function, and the
-    #! buckets are associative lists which are searched
-    #! linearly. The number of buckets must be a power of two.
-    empty-vector ;
+: bucket-count ( hash -- n )
+    >hashtable hash-array array-capacity ; inline
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
@@ -74,6 +82,8 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : set-hash* ( key table quot -- )
     #! Apply the quotation to yield a new association list.
+    #! If the association list already contains the key,
+    #! decrement the hash size, since it will get removed.
     >r
         2dup (hashcode)
     r> pick >r
@@ -86,27 +96,46 @@ PREDICATE: vector hashtable ( obj -- ? )
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
     #! key/value pair.
+    dup hash-size+
     [ set-assoc ] set-hash* ;
 
 : remove-hash ( key table -- )
     #! Remove a value from a hashtable.
     [ remove-assoc ] set-hash* ;
 
-: hash-each ( hash code -- )
-    #! Apply the code to each key/value pair of the hashtable.
-    swap [ swap dup >r each r> ] vector-each drop ; inline
+: hash-clear ( hash -- )
+    #! Remove all entries from a hashtable.
+    dup bucket-count [
+        [ f swap pick set-hash-bucket ] keep
+    ] repeat drop ;
+
+: buckets>list ( hash -- list )
+    #! Push a list of key/value pairs in a hashtable.
+    dup bucket-count swap hash-array array>list ;
+
+: (hash>alist) ( alist n hash -- alist )
+    2dup bucket-count >= [
+        2drop
+    ] [
+        [ hash-bucket [ swons ] each ] 2keep
+        >r 1 + r> (hash>alist)
+    ] ifte ;
+
+: hash>alist ( hash -- alist )
+    #! Push a list of key/value pairs in a hashtable.
+    [ ] 0 rot (hash>alist) ;
+
+: alist>hash ( alist -- hash )
+    dup length <hashtable> swap [ unswons pick set-hash ] each ;
 
 : hash-keys ( hash -- list )
     #! Push a list of keys in a hashtable.
-    [ ] swap [ car swons ] hash-each ;
+    hash>alist [ car ] map ;
 
 : hash-values ( hash -- alist )
     #! Push a list of values in a hashtable.
-    [ ] swap [ cdr swons ] hash-each ;
+    hash>alist [ cdr ] map ;
 
-: hash>alist ( hash -- list )
-    #! Push a list of key/value pairs in a hashtable.
-    [ ] swap [ swons ] hash-each ;
-
-: alist>hash ( alist -- hash )
-    37 <hashtable> swap [ unswons pick set-hash ] each ;
+: hash-each ( hash code -- )
+    #! Apply the code to each key/value pair of the hashtable.
+    >r hash>alist r> each ; inline

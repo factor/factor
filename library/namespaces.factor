@@ -61,7 +61,7 @@ USE: math
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the namespace stack.
-    >vector namestack cons set-namestack ; inline
+    >hashtable namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
     #! Pop the top of the namespace stack.

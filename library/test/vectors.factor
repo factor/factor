@@ -78,7 +78,7 @@ unit-test
 [ "funky" ] [ "funny-stack" get vector-pop ] unit-test
 
 [ t ] [
-    10 <vector> dup vector-array array-capacity
+    { 1 2 3 4 } dup vector-array array-capacity
     >r vector-clone vector-array array-capacity r>
     =
 ] unit-test

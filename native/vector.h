@@ -1,7 +1,7 @@
 typedef struct {
 	/* always tag_header(VECTOR_TYPE) */
 	CELL header;
-	/* untagged */
+	/* tagged */
 	CELL top;
 	/* tagged */
 	CELL array;

@@ -218,11 +218,14 @@ vocabularies get [
     [[ "vectors" ">vector" ]]
     [[ "strings" ">string" ]]
     [[ "words" ">word" ]]
+    [[ "hashtables" ">hashtable" ]]
     [[ "kernel-internals" "slot" ]]
     [[ "kernel-internals" "set-slot" ]]
     [[ "kernel-internals" "integer-slot" ]]
     [[ "kernel-internals" "set-integer-slot" ]]
     [[ "kernel-internals" "grow-array" ]]
+    [[ "hashtables" "<hashtable>" ]]
+    [[ "kernel-internals" "<array>" ]]
 ] [
     unswons create swap 1 + [ f define ] keep
 ] each drop

@@ -24,7 +24,8 @@ OBJS = native/arithmetic.o native/array.o native/bignum.o \
 	native/unix/read.o \
 	native/unix/write.o \
 	native/unix/ffi.o \
-	native/debug.o
+	native/debug.o \
+	native/hashtable.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"

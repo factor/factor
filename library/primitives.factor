@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: alien
+USE: hashtables
 DEFER: alien
 DEFER: dll
 
@@ -215,12 +216,15 @@ USE: words
     [ >cons                  [ [ object ] [ cons ] ] ]
     [ >vector                [ [ object ] [ vector ] ] ]
     [ >string                [ [ object ] [ string ] ] ]
-    [ >word                  [ [ word ] [ word ] ] ]
+    [ >word                  [ [ object ] [ word ] ] ]
+    [ >hashtable             [ [ object ] [ hashtable ] ] ]
     [ slot                   [ [ object fixnum ] [ object ] ] ]
     [ set-slot               [ [ object object fixnum ] [ ] ] ]
     [ integer-slot           [ [ object fixnum ] [ integer ] ] ]
     [ set-integer-slot       [ [ integer object fixnum ] [ ] ] ]
     [ grow-array             [ [ integer array ] [ object ] ] ]
+    [ <hashtable>            [ [ number ] [ hashtable ] ] ]
+    [ <array>                [ [ number ] [ array ] ] ]
 ] [
     2unlist dup string? [
         "stack-effect" set-word-property

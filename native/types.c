@@ -55,6 +55,9 @@ CELL untagged_object_size(CELL pointer)
 	case BIGNUM_TYPE:
 		size = ASIZE(pointer);
 		break;
+	case HASHTABLE_TYPE:
+		size = sizeof(F_HASHTABLE);
+		break;
 	case VECTOR_TYPE:
 		size = sizeof(F_VECTOR);
 		break;

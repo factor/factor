@@ -27,6 +27,7 @@ CELL T;
 #define F_TYPE 9
 #define F RETAG(0,OBJECT_TYPE)
 
+#define HASHTABLE_TYPE 10
 #define VECTOR_TYPE 11
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
