@@ -87,9 +87,7 @@ USE: vocabularies
     "factor.FactorShuffleDefinition" is ;
 
 : word-of-worddef ( worddef -- word )
-    interpreter swap
-    [ "factor.FactorInterpreter" ]
-    "factor.FactorWordDefinition" "getWord" jinvoke ;
+    "factor.FactorWordDefinition" "word" jvar-get ;
 
 : defined? ( obj -- ? )
     dup word? [ worddef ] [ drop f ] ifte ;
