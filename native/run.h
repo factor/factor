@@ -7,11 +7,10 @@
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
 #define CATCHSTACK_ENV 6 /* used by library only */
-#define GC_ENV         7
+#define CPU_ENV        7
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
 #define ARGS_ENV       10
-#define CPU_ENV        11
 
 /* Profiling timer */
 struct itimerval prof_timer;

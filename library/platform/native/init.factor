@@ -41,12 +41,8 @@ USE: vectors
 : init-errors ( -- )
     64 <vector> set-catchstack* ;
 
-: init-gc ( -- )
-    [ garbage-collection ] 7 setenv ;
-
 : boot ( -- )
     #! Initialize an interpreter with the basic services.
-    init-gc
     init-errors
     init-namespaces
     init-threads

@@ -48,7 +48,7 @@ USE: vectors
 
 : cpu ( -- arch )
     #! Returns one of "x86" or "unknown".
-    11 getenv ;
+    7 getenv ;
 
 ! The 'fake vtable' used here speeds things up a lot.
 ! It is quite clumsy, however. A higher-level CLOS-style
