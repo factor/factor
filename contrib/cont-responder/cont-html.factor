@@ -137,10 +137,10 @@ USE: logic
 ! : href= ( n: <namespace> optional-value -- )
 !  store-prev-attribute "href" "current-attribute" set ;
 
-: define-compound ( vocab name def -- )
+: create-word ( vocab name def -- )
   #! Define 'word creating' word to allow
   #! dynamically creating words.
-  >r 2dup swap create r> <compound> define ;
+  >r swap create r> define-compound ;
  
 : def-for-html-word-<foo> ( name -- name quot )
   #! Return the name and code for the <foo> patterned
@@ -176,22 +176,22 @@ USE: logic
   #! Given an HTML tag name, define the words for
   #! that closable HTML tag.
   "cont-html" swap
-  2dup def-for-html-word-<foo> define-compound
-  2dup def-for-html-word-<foo define-compound
-  2dup def-for-html-word-foo> define-compound
-  def-for-html-word-</foo> define-compound ;
+  2dup def-for-html-word-<foo> create-word
+  2dup def-for-html-word-<foo create-word
+  2dup def-for-html-word-foo> create-word
+  def-for-html-word-</foo> create-word ;
 
 : define-open-html-word ( name -- ) 
   #! Given an HTML tag name, define the words for
   #! that open HTML tag.
   "cont-html" swap
-  2dup def-for-html-word-<foo/> define-compound
-  2dup def-for-html-word-<foo define-compound
-  def-for-html-word-foo/> define-compound ;
+  2dup def-for-html-word-<foo/> create-word
+  2dup def-for-html-word-<foo create-word
+  def-for-html-word-foo/> create-word ;
 
 : define-attribute-word ( name -- )
   "cont-html" swap dup "=" cat2 swap 
-  [ store-prev-attribute ] cons reverse [ "current-attribute" set ] append define-compound ;
+  [ store-prev-attribute ] cons reverse [ "current-attribute" set ] append create-word ;
 
 ! Define some closed HTML tags
 [ 
