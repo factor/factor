@@ -1,7 +1,7 @@
 #ifndef __FACTOR_H__
 #define __FACTOR_H__
 
-#if defined(i386) || defined(__i386) || defined(__i386__)
+#if defined(i386) || defined(__i386) || defined(__i386__) || defined(WIN32)
     #define FACTOR_X86
 #endif
 
