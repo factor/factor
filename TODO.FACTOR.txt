@@ -1,11 +1,9 @@
 FFI:
 
-- wordpreview: don't show for string literals and comments
 - listener: use console shell api
 - add a socket timeout
 - fix error postoning -- not all errors thrown by i/o code are
   postponed
-- file responder: don't show full path in title
 - quit responder breaks with multithreading
 
 + compiler/ffi:

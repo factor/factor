@@ -34,20 +34,15 @@ USE: stack
 USE: vectors
 
 : 2list ( a b -- [ a b ] )
-    #! Construct a proper list of 2 elements.
     unit cons ;
 
 : 3list ( a b c -- [ a b c ] )
-    #! Construct a proper list of 3 elements.
     2list cons ;
 
 : append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
     over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( element list -- remainder )
-    #! If the proper list contains the element, push the
-    #! remainder of the list, starting from the cell whose car
-    #! is elem. Otherwise push f.
     dup [
         2dup car = [ nip ] [ cdr contains? ] ifte
     ] [
@@ -66,7 +61,6 @@ USE: vectors
     dup cdr cons? [ cdr last* ] when ;
 
 : last ( list -- last )
-    #! Pushes last element of a list.
     last* car ;
 
 : list? ( list -- boolean )
@@ -158,7 +152,6 @@ DEFER: tree-contains?
     inline interpret-only
 
 : reverse ( list -- list )
-    #! Push a new list that is the reverse of a proper list.
     [ ] swap [ swons ] each ;
 
 : map ( list quot -- list )
@@ -185,8 +178,13 @@ DEFER: tree-contains?
     [ dupd = not ] subset nip ;
 
 : length ( list -- length )
-    #! Pushes the length of the given proper list.
     0 swap [ drop succ ] each ;
+
+: prune ( list -- list )
+    #! Remove duplicate elements.
+    dup [
+        uncons prune 2dup contains? [ nip ] [ cons ] ifte
+    ] when ;
 
 : all? ( list pred -- ? )
     #! Push if the predicate returns true for each element of
