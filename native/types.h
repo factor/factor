@@ -12,7 +12,7 @@
 #define RATIO_TYPE 4
 #define FLOAT_TYPE 5
 #define COMPLEX_TYPE 6
-#define HEADER_TYPE 7
+#define HEADER_TYPE 7 /* anything less than this is a tag */
 #define GC_COLLECTED 7 /* See gc.c */
 
 /*** Header types ***/
@@ -35,8 +35,9 @@ CELL T;
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
+#define TUPLE_TYPE 18
 
-#define TYPE_COUNT 18
+#define TYPE_COUNT 19
 
 INLINE bool headerp(CELL cell)
 {

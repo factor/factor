@@ -7,6 +7,8 @@ IN: kernel-internals USING: generic kernel vectors ;
     #! call it directly.
     vector-array array-nth call ;
 
+BUILTIN: tuple 18
+
 IN: kernel
 
 GENERIC: hashcode ( obj -- n )
@@ -32,7 +34,7 @@ M: object clone ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    18 ;
+    19 ;
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.

@@ -8,6 +8,7 @@ void relocate_object(CELL relocating)
 		fixup_word((F_WORD*)relocating);
 		break;
 	case ARRAY_TYPE:
+	case TUPLE_TYPE:
 		fixup_array((F_ARRAY*)relocating);
 		break;
 	case HASHTABLE_TYPE:

@@ -10,11 +10,11 @@ F_ARRAY* allot_array(CELL type, CELL capacity)
 }
 
 /* untagged */
-F_ARRAY* array(CELL capacity, CELL fill)
+F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 {
 	int i;
 
-	F_ARRAY* array = allot_array(ARRAY_TYPE, capacity);
+	F_ARRAY* array = allot_array(type, capacity);
 
 	for(i = 0; i < capacity; i++)
 		put(AREF(array,i),fill);
@@ -28,7 +28,16 @@ void primitive_array(void)
 	if(capacity < 0)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
-	dpush(tag_object(array(capacity,F)));
+	dpush(tag_object(array(ARRAY_TYPE,capacity,F)));
+}
+
+void primitive_tuple(void)
+{
+	F_FIXNUM capacity = to_fixnum(dpop());
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+	maybe_garbage_collection();
+	dpush(tag_object(array(TUPLE_TYPE,capacity,F)));
 }
 
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
@@ -43,7 +52,7 @@ F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
 
 	new_array = allot_array(untag_header(array->header),capacity);
 
-	memcpy(new_array + 1,array + 1,array->capacity * CELLS);
+	memcpy(new_array + 1,array + 1,curr_cap * CELLS);
 
 	for(i = curr_cap; i < capacity; i++)
 		put(AREF(new_array,i),fill);

@@ -141,3 +141,8 @@ SYMBOL: list-buffer
 
 : append, ( list -- )
     [ , ] each ;
+
+: literal, ( word -- )
+    #! Append some code that pushes the word on the stack. Used
+    #! when building quotations.
+    unit , \ car , ;

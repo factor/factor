@@ -67,7 +67,7 @@ SYMBOL: delegate
 ] "add-method" set-word-property
 
 \ traits [
-    drop vector "builtin-type" word-property unit
+    drop hashtable "builtin-type" word-property unit
 ] "builtin-supertypes" set-word-property
 
 \ traits 10 "priority" set-word-property

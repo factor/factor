@@ -184,6 +184,7 @@ hashtables ;
     [ grow-array             [ [ integer array ] [ object ] ] ]
     [ <hashtable>            [ [ number ] [ hashtable ] ] ]
     [ <array>                [ [ number ] [ array ] ] ]
+    [ <tuple>                [ [ number ] [ tuple ] ] ]
 ] [
     2unlist dup string? [
         "stack-effect" set-word-property

@@ -53,6 +53,7 @@ CELL untagged_object_size(CELL pointer)
 		break;
 	case ARRAY_TYPE:
 	case BIGNUM_TYPE:
+	case TUPLE_TYPE:
 		size = ASIZE(pointer);
 		break;
 	case HASHTABLE_TYPE:

@@ -101,8 +101,8 @@ DLLEXPORT CELL cs;
 typedef unsigned char BYTE;
 
 /* Memory areas */
-#define DEFAULT_ARENA (64 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (64 * 1024 * 1024)
+#define DEFAULT_ARENA (8 * 1024 * 1024)
+#define COMPILE_ZONE_SIZE (8 * 1024 * 1024)
 #define STACK_SIZE (2 * 1024 * 1024)
 
 #include "memory.h"

@@ -1,49 +1,10 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USE: errors
-USE: hashtables
-USE: kernel
-USE: kernel-internals
-USE: lists
-USE: namespaces
-USE: parser
-USE: strings
-USE: words
-USE: vectors
-USE: math
-USE: math-internals
-USE: unparser
+USING: errors hashtables kernel kernel-internals lists
+namespaces parser strings words vectors math math-internals ;
 
 ! A simple single-dispatch generic word system.
-
-! "if I say I'd rather eat cheese than shit... doesn't mean
-! those are the only two things I can eat." - Tac
 
 : predicate-word ( word -- word )
     word-name "?" cat2 "in" get create ;
@@ -60,7 +21,7 @@ USE: unparser
 ! The class of an object with traits is determined by the object
 ! identity of the traits method map.
 ! - metaclass: a metaclass is a symbol with a handful of word
-! properties: "define-method" "builtin-types" "priority"
+! properties: "builtin-types" "priority"
 
 ! Metaclasses have priority -- this induces an order in which
 ! methods are added to the vtable.
@@ -107,12 +68,13 @@ USE: unparser
         >r 2dup r> unswons add-method
     ] each nip ;
 
-: define-generic ( word vtable -- )
+: make-generic ( word vtable -- )
     over "combination" word-property cons define-compound ;
 
-: (define-method) ( definition class generic -- )
+: define-method ( class generic definition -- )
+    -rot
     [ "methods" word-property set-hash ] keep dup <vtable>
-    define-generic ;
+    make-generic ;
 
 : init-methods ( word -- )
      dup "methods" word-property [
@@ -122,15 +84,14 @@ USE: unparser
      ] ifte ;
 
 ! Defining generic words
-: (GENERIC) ( combination definer -- )
+: define-generic ( combination definer word -- )
     #! Takes a combination parameter. A combination is a
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
-    CREATE
     [ swap "definer" set-word-property ] keep
     [ swap "combination" set-word-property ] keep
     dup init-methods
-    dup <vtable> define-generic ;
+    dup <vtable> make-generic ;
 
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline
@@ -138,7 +99,8 @@ USE: unparser
 : GENERIC:
     #! GENERIC: bar creates a generic word bar. Add methods to
     #! the generic word using M:.
-    [ single-combination ] \ GENERIC: (GENERIC) ; parsing
+    [ single-combination ]
+    \ GENERIC: CREATE define-generic ; parsing
 
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
@@ -150,19 +112,13 @@ USE: unparser
     #! the generic word using M:. 2GENERIC words dispatch on
     #! arithmetic types and should not be used for non-numerical
     #! types.
-    [ arithmetic-combination ] \ 2GENERIC: (GENERIC) ; parsing
-
-: define-method ( class -- quotation )
-    #! In a vain attempt at something resembling a "meta object
-    #! protocol", we call the "define-method" word property with
-    #! stack ( class generic definition -- ).
-    metaclass "define-method" word-property
-    [ [ -rot (define-method) ] ] unless* ;
+    [ arithmetic-combination ]
+    \ 2GENERIC: CREATE define-generic ; parsing
 
 : M: ( -- class generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word  dup define-method  scan-word swap [ ] ; parsing
+    scan-word scan-word [ define-method ] [ ] ; parsing
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: classes
@@ -210,3 +166,5 @@ SYMBOL: object
     classes get set-hash ;
 
 classes get [ <namespace> classes set ] unless
+
+GENERIC: class ( obj -- class )

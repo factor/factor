@@ -69,6 +69,7 @@ INLINE void collect_object(CELL scan)
 		collect_word((F_WORD*)scan);
 		break;
 	case ARRAY_TYPE:
+	case TUPLE_TYPE:
 		collect_array((F_ARRAY*)scan);
 		break;
 	case HASHTABLE_TYPE:

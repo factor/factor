@@ -20,4 +20,4 @@ USE: test
 : vector-benchmark ( n -- )
     0 <vector> over fill-vector rot copy-vector ; compiled
 
-[ ] [ 4000000 vector-benchmark ] unit-test
+[ ] [ 400000 vector-benchmark ] unit-test

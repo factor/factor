@@ -39,6 +39,7 @@
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:
+- support USING:
 
 + i/o:
 

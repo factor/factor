@@ -175,7 +175,8 @@ void* primitives[] = {
 	primitive_set_integer_slot,
 	primitive_grow_array,
 	primitive_hashtable,
-	primitive_array
+	primitive_array,
+	primitive_tuple
 };
 
 CELL primitive_to_xt(CELL primitive)

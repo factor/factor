@@ -83,7 +83,7 @@ builtin [ 2drop t ] "class<" set-word-property
 : builtin-type ( n -- symbol )
     unit classes get hash ;
 
-: class ( obj -- class )
+M: object class ( obj -- class )
     #! Analogous to the type primitive. Pushes the builtin
     #! class of an object.
     type builtin-type ;

@@ -7,7 +7,7 @@ F_VECTOR* vector(F_FIXNUM capacity)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	vector = allot_object(VECTOR_TYPE,sizeof(F_VECTOR));
 	vector->top = tag_fixnum(0);
-	vector->array = tag_object(array(capacity,F));
+	vector->array = tag_object(array(ARRAY_TYPE,capacity,F));
 	return vector;
 }
 
