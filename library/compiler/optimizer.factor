@@ -43,39 +43,47 @@ USE: logic
 ! quotations are lifted to their call sites.
 
 : scan-literal ( node -- )
-    "scan-literal" [ 2drop ] apply-dataflow ;
+    #! If the node represents a literal push, add the literal to
+    #! the list being constructed.
+    "scan-literal" [ drop ] apply-dataflow ;
+
+: (scan-literals) ( dataflow -- )
+    [ scan-literal ] each ;
 
 : scan-literals ( dataflow -- list )
-    [ [ scan-literal ] each ] make-list ;
+    [ (scan-literals) ] make-list ;
 
 : scan-branches ( branches -- )
-    [ [ scan-literal ] each ] each ;
+    #! Collect all literals from all branches.
+    [ node-param get ] bind [ [ scan-literal ] each ] each ;
 
 : mentions-literal? ( literal list -- )
     #! Does the given list of result objects refer to this
     #! literal?
     [ dup cons? [ car over = ] [ drop f ] ifte ] some? ;
 
-: default-kill? ( literal node -- ? )
+: consumes-literal? ( literal node -- ? )
+    #! Does the dataflow node consume the literal?
     [
         node-consume-d get mentions-literal? swap
-        node-consume-r get mentions-literal? nip or not
+        node-consume-r get mentions-literal? nip or
+    ] bind ;
+
+: produces-literal? ( literal node -- ? )
+    #! Does the dataflow node produce the literal?
+    [
+        node-produce-d get mentions-literal? swap
+        node-produce-r get mentions-literal? nip or
     ] bind ;
 
 : (can-kill?) ( literal node -- ? )
     #! Return false if the literal appears as input to this
     #! node, and this node is not a stack operation.
-    dup [ node-op get ] bind dup "shuffle" word-property [
-        3drop t
-    ] [
-        "can-kill" word-property dup [
-            call
-        ] [
-            drop default-kill?
-        ] ifte
-    ] ifte ;
+    "can-kill" [ consumes-literal? not ] apply-dataflow ;
 
 : can-kill? ( literal dataflow -- ? )
+    #! Return false if the literal appears in any node in the
+    #! list.
     [ dupd (can-kill?) ] all? nip ;
 
 : kill-set ( dataflow -- list )
@@ -83,12 +91,54 @@ USE: logic
     dup scan-literals [ over can-kill? ] subset nip ;
 
 : can-kill-branches? ( literal node -- ? )
+    #! Check if the literal appears in either branch.
     [ node-param get ] bind [ dupd can-kill? ] all? nip ;
 
-#push [ , ] "scan-literal" set-word-property
+: kill-literal ( literals node -- )
+    #! Remove the literals from the node and , it if it is not a
+    #! NOP.
+    swap [
+        over 2dup consumes-literal? >r produces-literal? r> or
+    ] some?
+    [ drop ] [ , ] ifte ;
+
+: kill-literals ( literals dataflow -- )
+    #! Remove literals and construct a list.
+    [ dupd kill-literal ] each drop ;
+
+: optimize ( dataflow -- )
+    [ dup kill-set swap kill-literals ] make-list ;
+
+#push [
+    [ node-param get ] bind ,
+] "scan-literal" set-word-property
+
+#label [
+    [ node-param get ] bind (scan-literals)
+] "scan-literal" set-word-property
+
+#label [
+    [ node-param get ] bind can-kill?
+] "can-kill" set-word-property
+
 #ifte [ scan-branches ] "scan-literal" set-word-property
 #ifte [ can-kill-branches? ] "can-kill" set-word-property
 #generic [ scan-branches ] "scan-literal" set-word-property
 #generic [ can-kill-branches? ] "can-kill" set-word-property
 #2generic [ scan-branches ] "scan-literal" set-word-property
 #2generic [ can-kill-branches? ] "can-kill" set-word-property
+
+! Don't care about inputs to recursive combinator calls
+#call-label [ 2drop t ] "can-kill" set-word-property
+
+#drop [ 2drop t ] "can-kill" set-word-property
+#dup [ 2drop t ] "can-kill" set-word-property
+#swap [ 2drop t ] "can-kill" set-word-property
+#over [ 2drop t ] "can-kill" set-word-property
+#pick [ 2drop t ] "can-kill" set-word-property
+#nip [ 2drop t ] "can-kill" set-word-property
+#tuck [ 2drop t ] "can-kill" set-word-property
+#rot [ 2drop t ] "can-kill" set-word-property
+
+#>r [ 2drop t ] "can-kill" set-word-property
+#r> [ 2drop t ] "can-kill" set-word-property

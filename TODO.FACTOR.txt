@@ -10,8 +10,12 @@
 - type inference
 - handle odd base cases, with code after ifte
 - handle recursion with when, when* etc
-- lifting
-- stack ops and alien-call need special nodes
+- optimizer rewrite stack ops
+- optimizer nested ifte
+- optimizer recursive call
+- dataflow make block nodes for inlined words
+- dataflow recursive calls marked as so
+- alien-call need special nodes
 
 + linearizer/generator:
 

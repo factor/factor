@@ -36,19 +36,19 @@ USE: combinators
 ! Linear IR nodes. This is in addition to the symbols already
 ! defined in dataflow vocab.
 
-SYMBOL: #branch-t ( branch if top of stack is true )
-SYMBOL: #branch ( unconditional branch )
-SYMBOL: #label ( branch target )
+SYMBOL: #jump-label-t ( branch if top of stack is true )
+SYMBOL: #jump-label ( unconditional branch )
 SYMBOL: #jump ( tail-call )
 
-: linear, ( param op -- )
-    swons , ;
+: linear, ( node -- )
+    #! Add a node to the linear IR.
+    [ node-op get node-param get ] bind cons , ;
 
 : >linear ( node -- )
     #! Dataflow OPs have a linearizer word property. This
     #! quotation is executed to convert the node into linear
     #! form.
-    "linearizer" [ drop linear, ] apply-dataflow ;
+    "linearizer" [ linear, ] apply-dataflow ;
 
 : (linearize) ( dataflow -- )
     [ >linear ] each ;
@@ -59,24 +59,31 @@ SYMBOL: #jump ( tail-call )
     #! jumps and labels, and turns dataflow IR nodes into
     #! lists where the first element is an operation, and the
     #! rest is arguments.
-    [ (linearize)  f #return linear, ] make-list ;
+    [ (linearize) ] make-list ;
 
 : <label> ( -- label )
     gensym ;
 
 : label, ( label -- )
-    #label linear, ;
+    #label swons , ;
 
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
     uncons car
     <label> [
-        #branch-t linear,
+        #jump-label-t swons ,
         (linearize) ( false branch )
-        <label> dup #branch linear,
+        <label> dup #jump-label swons ,
     ] keep label, ( branch target of BRANCH-T )
     swap (linearize) ( true branch )
     label, ( branch target of false branch end ) ;
 
-#ifte [ linearize-ifte ] "linearizer" set-word-property
+#label [
+    dup [ node-label get ] bind label,
+    [ node-param get ] bind (linearize)
+] "linearizer" set-word-property
+
+#ifte [
+    [ node-param get ] bind linearize-ifte
+] "linearizer" set-word-property

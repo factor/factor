@@ -54,6 +54,10 @@ SYMBOL: recursive-state
 ! ... with keys:
 SYMBOL: base-case
 SYMBOL: entry-effect
+! When a call to a combinator is compiled, recursion cannot
+! simply jump to the definition of the combinator. Instead, it
+! makes a local jump to this label.
+SYMBOL: recursive-label
 
 : gensym-vector ( n --  vector )
     dup <vector> swap [ gensym over vector-push ] times ;
@@ -97,11 +101,6 @@ SYMBOL: entry-effect
     0 d-in set
     recursive-state set
     dataflow-graph off ;
-
-: with-recursive-state ( word quot -- )
-    over <recursive-state> cons recursive-state cons@
-    call
-    recursive-state uncons@ drop ;
 
 DEFER: apply-word
 

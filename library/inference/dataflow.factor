@@ -38,7 +38,10 @@ USE: vectors
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
 
+SYMBOL: #label
+
 SYMBOL: #call ( non-tail call )
+SYMBOL: #call-label
 SYMBOL: #push ( literal )
 
 SYMBOL: #ifte
@@ -64,6 +67,7 @@ SYMBOL: node-produce-d
 SYMBOL: node-consume-r
 SYMBOL: node-produce-r
 SYMBOL: node-op
+SYMBOL: node-label
 
 ! #push nodes have this field set to the value being pushed.
 ! #call nodes have this as the word being called
@@ -110,12 +114,10 @@ SYMBOL: node-param
 : apply-dataflow ( dataflow name default -- )
     #! For the dataflow node, look up named word property,
     #! if its not defined, apply default quotation to
-    #! ( param op ) otherwise apply property quotation to
-    #! ( param ).
-    >r >r [ node-param get  node-op get ] bind dup r>
-    word-property dup [
-        ( param op property )
-        nip call r> drop
+    #! ( node ) otherwise apply property quotation to
+    #! ( node ).
+    >r >r dup [ node-op get ] bind r> word-property dup [
+        call r> drop
     ] [
         drop r> call
     ] ifte ;

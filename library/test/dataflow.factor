@@ -71,14 +71,14 @@ SYMBOL: #test
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ drop succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
 ] unit-test
 
-#test [ sq ] "foobar" set-word-property
+#test [ [ node-param get ] bind sq ] "foobar" set-word-property
 
 [ 25 ] [
     {{
         [ node-op | #test ]
         [ node-param | 5 ]
-    }} "foobar" [ drop succ ] apply-dataflow
+    }} "foobar" [ [ node-param get ] bind succ ] apply-dataflow
 ] unit-test

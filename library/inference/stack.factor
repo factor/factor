@@ -38,19 +38,14 @@ USE: namespaces
     [ 0 1 node-outputs ] bind
 ] "infer" set-word-property
 
-\ >r t "shuffle" set-word-property
-
 \ r> [
     f #r> dataflow, [ 0 1 node-inputs ] extend
     pop-r push-d
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-property
 
-\ r> t "shuffle" set-word-property
-
 : meta-infer ( word op -- )
     #! Mark a word as being partially evaluated.
-    dup t "shuffle" set-word-property
     dupd [
         over unit , \ car ,
         f , ,
