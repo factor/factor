@@ -41,6 +41,7 @@ USE: kernel
 USE: logic
 USE: cont-html
 USE: logging
+USE: url-encoding
 
 : expiry-timeout ( -- timeout-seconds )
   #! Number of seconds to timeout continuations in
@@ -257,19 +258,26 @@ DEFER: show
     "&" split [ "=" split1 ] inject 
   ] [
     "=" split1 unit
-  ] ifte ;
+  ] ifte [ uncons >r url-decode r> url-decode cons ] inject ;
 
 : post-request>namespace ( post-request -- namespace )
   #! Return a namespace containing the name/value's from the 
   #! post data.
-  post-request>alist alist>namespace ;
+  post-request>alist dup log alist>namespace ;
+
+: read-undecoded-post-request ( -- string )
+  #! Read the post request from the socket and return the post data
+  #! before it has been url decoded.
+  read-header content-length dup [
+    read#
+  ] when ;
 
 : cont-post-responder ( id -- )    
   #! httpd responder that retrieves a continuation for the given
   #! id and calls it with the POST data as an alist on the top
   #! of the stack.
   [ 
-    read-post-request dup log post-request>namespace swap resume-continuation 
+    read-undecoded-post-request dup log post-request>namespace swap resume-continuation 
   ] with-exit-continuation
   print drop ;
 
