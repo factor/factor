@@ -51,3 +51,4 @@ CELL less_bignum(CELL x, CELL y);
 CELL lesseq_bignum(CELL x, CELL y);
 CELL greater_bignum(CELL x, CELL y);
 CELL greatereq_bignum(CELL x, CELL y);
+CELL not_bignum(CELL x);

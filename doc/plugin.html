@@ -47,6 +47,11 @@ The Factor plugin adds a menu to jEdit's <b>Plugins</b> menu with the following 
 <li><b>Evaluate selection</b> evaluates the current selection.</li>
 <li><b>Apropos word at caret</b> performs an apropos search on the current selection, or the word at the caret if there is no selection. An "apropos search" lists all words in all vocabularies whose names contain a certain string. For example, you can use this to list all string words by searching for "str", or to find out which vocabulary contains the word "unparse" by searching for "unparse".</li>
 <li><b>See word at caret</b> shows the definition of the word at the caret in the listener dockable window.</li>
+<li><b>Edit word at caret</b> opens the source file containing the definition of the word at the caret.
+For this to work with words defined in the standard library, you must set the "resource-path" variable in your <code>~/.factor-rc</code> to point to the location of the library sources:
+
+<pre>"/home/slava/Factor/" "resource-path" set</pre>
+</li>
 <li><b>Word usages at caret</b> shows all usages of the word at the caret in the listener dockable window.</li>
 </ul>
 
@@ -61,20 +66,6 @@ The Factor plugin uses the SideKick plugin to perform background parsing of Fact
 <li>Any parse errors are reported using the ErrorList plugin, which means they will be highlighted in the text area and shown in the ErrorList window.
 </li>
 </ul>
-
-<h2 class="fancy-heading">Jumping to a word definition</h2>
-
-If you add the following line to your <code>~/.factor-rc</code>:
-
-<pre>USE: jedit</pre>
-
-You can then jump to a word definition using the <code>jedit</code> word in the Factor interpreter:
-
-<pre>"numbers-game" jedit</pre>
-
-For this to work with words defined in the standard library, you must set the "resource-path" variable in your <code>~/.factor-rc</code> to point to the location of the library sources:
-
-<pre>"/home/slava/Factor/" "resource-path" set</pre>
 
 </body>
 </html>

@@ -157,7 +157,7 @@ CELL OP##_anytype(CELL x, CELL y) \
 	return F; \
 }
 
-#define UNARY_OP(OP,anytype,integerOnly) \
+#define UNARY_OP(OP) \
 CELL OP(CELL x) \
 { \
 	switch(type_of(x)) \
@@ -165,45 +165,49 @@ CELL OP(CELL x) \
 	case FIXNUM_TYPE: \
 		return OP##_fixnum(x); \
 	case RATIO_TYPE: \
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
-		else \
-			return OP##_ratio(x); \
+		return OP##_ratio(x); \
 	case COMPLEX_TYPE: \
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
-		else \
-			return OP##_complex(x); \
+		return OP##_complex(x); \
 	case BIGNUM_TYPE: \
 		return OP##_bignum(x); \
 	case FLOAT_TYPE: \
-		if(integerOnly) \
-		{ \
-			type_error(INTEGER_TYPE,x); \
-			return F; \
-		} \
-		else \
-			return OP##_float(x); \
+		return OP##_float(x); \
 	default: \
-		if(anytype) \
-			return OP##_anytype(x); \
-		else \
-		{ \
-			type_error(NUMBER_TYPE,x); \
-			return F; \
-		} \
+		return OP##_anytype(x); \
 	} \
 } \
 \
 void primitive_##OP(void) \
 { \
 	drepl(OP(dpeek())); \
+}
+
+#define UNARY_OP_INTEGER_ONLY(OP) \
+\
+CELL OP##_ratio(CELL x) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+} \
+\
+CELL OP##_complex(CELL x) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+} \
+\
+CELL OP##_float(CELL x) \
+{ \
+	type_error(INTEGER_TYPE,x); \
+	return F; \
+}
+
+#define UNARY_OP_NUMBER_ONLY(OP) \
+\
+CELL OP##_anytype(CELL x) \
+{ \
+	type_error(NUMBER_TYPE,x); \
+	return F; \
 }
 
 bool realp(CELL tagged);

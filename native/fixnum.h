@@ -38,3 +38,4 @@ CELL less_fixnum(CELL x, CELL y);
 CELL lesseq_fixnum(CELL x, CELL y);
 CELL greater_fixnum(CELL x, CELL y);
 CELL greatereq_fixnum(CELL x, CELL y);
+CELL not_fixnum(CELL n);

@@ -5,12 +5,6 @@ void primitive_fixnump(void)
 	drepl(tag_boolean(TAG(dpeek()) == FIXNUM_TYPE));
 }
 
-void primitive_not(void)
-{
-	type_check(FIXNUM_TYPE,dpeek());
-	drepl(RETAG(UNTAG(~dpeek()),FIXNUM_TYPE));
-}
-
 FIXNUM to_fixnum(CELL tagged)
 {
 	RATIO* r;
@@ -191,4 +185,9 @@ CELL greater_fixnum(CELL x, CELL y)
 CELL greatereq_fixnum(CELL x, CELL y)
 {
 	return tag_boolean((FIXNUM)x >= (FIXNUM)y);
+}
+
+CELL not_fixnum(CELL n)
+{
+	return RETAG(UNTAG(~n),FIXNUM_TYPE);
 }

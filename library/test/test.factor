@@ -80,6 +80,7 @@ USE: unparser
         "vectors"
         "unparser"
         "random"
+        "math/bitops"
         "math/rational"
         "math/float"
         "math/complex"

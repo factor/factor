@@ -1,5 +1,3 @@
-- bitwise operations
-- clone-hashtable
 - sidekick: error source not removed
 - lineno/file for native
 - jedit for native with socket communication
@@ -8,7 +6,6 @@
 - maple-like: press enter at old commands to evaluate there
 - sending ^C on socket
 - read#
-- describe-word
 - enforce bottom-up in native bootstrap
 - standalone listener input style
 - log-client: fix for native
@@ -32,8 +29,11 @@
 
 + listener/plugin:
 
+- auto insert USE:
+- why > 1 popup
 - listener backspace overzealous
 - lineno/file for shuffle defs
+- completion popups for shuffle defs
 - balance needs USE:
 - completion: enter no good
 - completion: don't show automatically
@@ -47,6 +47,7 @@
 - postpone errors until actual read/write op
 - multitasking
 - parsing should be parsing
+- better error reporting
 
 + JVM compiler:
 

@@ -198,3 +198,8 @@ CELL greatereq_bignum(CELL x, CELL y)
 	return tag_boolean(((BIGNUM*)UNTAG(x))->n
 		>= ((BIGNUM*)UNTAG(y))->n);
 }
+
+CELL not_bignum(CELL x)
+{
+	return tag_object(bignum(~((BIGNUM*)UNTAG(x))->n));
+}
