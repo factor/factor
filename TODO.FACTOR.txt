@@ -68,3 +68,9 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 - proper ordering for classes
 - make-vector and make-string should not need a reverse step
 - automatically recompiling defs
+
++ slow data structures:
+
+- vector-map, string-map, vector-each, string-each, vector-project:
+  consing
+- map, subset, project, append: not tail recursive

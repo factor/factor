@@ -14,6 +14,8 @@ unparser ;
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
 
+SYMBOL: file
+
 : parsing? ( word -- ? )
     dup word? [ "parsing" word-prop ] [ drop f ] ifte ;
 

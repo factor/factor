@@ -24,9 +24,9 @@ MANGLE(flush_icache):
 	srwi. r4,r4,5     /* note '.' suffix */
 	beqlr             /* if n_lines == 0, just return. */
 	mtctr r4          /* flush cache lines */
-0:	dcbf r0,r3        /* for each line... */
+0:	dcbf 0,r3         /* for each line... */
 	sync
-	icbi r0,r3
+	icbi 0,r3
 	addi r3,r3,0x20
 	bdnz 0b
 	sync              /* finish up */

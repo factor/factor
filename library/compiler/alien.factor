@@ -92,13 +92,13 @@ SYMBOL: alien-parameters
     #! We should fail if the library does not exist, so that
     #! compilation does not keep trying to compile FFI words
     #! over and over again if the library is not loaded.
-   ! 2dup load-dll dlsym
+    2dup load-dll dlsym drop
     cons #alien-invoke dataflow,
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
 : infer-alien ( -- )
-    [ object object object object ] ensure-d
+    [ string string string general-list ] ensure-d
     dataflow-drop, pop-d literal-value
     dataflow-drop, pop-d literal-value >r
     dataflow-drop, pop-d literal-value

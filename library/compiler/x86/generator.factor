@@ -16,6 +16,10 @@ math memory namespaces words ;
 : compile-call-label ( label -- ) 0 CALL relative ;
 : compile-jump-label ( label -- ) 0 JMP relative ;
 
+#call-label [
+    compile-call-label
+] "generator" set-word-prop
+
 #jump [
     dup postpone-word  compile-jump-label
 ] "generator" set-word-prop

@@ -90,6 +90,9 @@ IN: vectors
     #! pushed onto the stack.
     >r vector>list r> each ; inline
 
+: list>vector ( list -- vector )
+    dup length <vector> swap [ over vector-push ] each ;
+
 : vector-map ( vector code -- vector )
     #! Applies code to each element of the vector, return a new
     #! vector with the results. The code must have stack effect
@@ -104,9 +107,6 @@ IN: vectors
     over vector-length over vector-length + <vector>
     [ rot vector-nappend ] keep
     [ swap vector-nappend ] keep ;
-
-: list>vector ( list -- vector )
-    dup length <vector> swap [ over vector-push ] each ;
 
 : vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter

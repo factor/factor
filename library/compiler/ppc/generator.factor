@@ -51,6 +51,14 @@ words ;
         0 BL relative-24
     ] ifte ;
 
+#call-label [
+    ! Hack: length of instruction sequence that follows
+    compiled-offset 20 + 18 LOAD32
+    1 1 -16 STWU
+    18 1 20 STW
+    0 B relative-24
+] "generator" set-word-prop
+
 : compile-jump-far ( n -- )
     19 LOAD
     19 MTCTR

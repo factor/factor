@@ -127,8 +127,14 @@ This is what is meant by the image being an \emph{infinite session}. When you sh
 
 \subsection{Looking at objects}
 
+Probably the most important debugging tool of them all is the \texttt{.} word. It prints the object at the top of the stack in a form that can be parsed by the Factor parser. A related word is \texttt{prettyprint}. It is identical to \texttt{.} except the output is more verbose; lists, vectors and hashtables are broken up into multiple lines and indented.
+
+Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting.
+
+The prettyprinted form of a vector or list with many elements is not always readable. The \texttt{[.]} and \texttt{\{.\}} words output a list or a vector, respectively, with each element on its own line.
+
 . prints an object in almost-readable form
-printing numbers in other bases, [.], {.}
+printing numbers in other bases
 we can inspect memory with  instances references heap-stats
 
 \section{Word tools}
@@ -308,12 +314,50 @@ In the future, the debugger will be linked with the walker, documented below. Ri
 
 The walker lets you step through the execution of a qotation. When a colon definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
 
-There are two ways to use the walker. The first is to invoke it at the listener with an explicit quotation:
+There are two ways to use the walker. First of all, you can call the \texttt{walk} word explicitly, giving it a quotation:
 
 \begin{alltt}
-\textbf{ok} 
-walker
-annotations: watch and break
+\textbf{ok} [ [ 10 [ dup , ] repeat ] make-list ] walk
+\textbf{\&s \&r \&n \&c show stepper stacks.
+\&get ( var -- value ) inspects the stepper namestack.
+step -- single step over
+into -- single step into
+continue -- continue execution
+bye -- exit single-stepper
+[ [ 10 [ dup , ] repeat ] make-list ]
+walk}
+\end{alltt}
+
+As you can see, the walker prints a brief help message, then the currently executing quotation. It changes the listener prompt from \texttt{ok} to \texttt{walk}, to remind you that there is a suspended continuation.
+
+The first element of the quotation shown is the next object to be evaluated. If it is a literal, both \texttt{step} and \texttt{into} have the effect of pushing it on the walker data stack. If it is a colon definition, then \texttt{into} will recurse the walker into the colon definition; otherwise, the word executes in one step.
+
+The \texttt{\&r} word shows the walker return stack, which is laid out just like the primary interpreter's return stack. In fact, a good way to understand how Factor's return stack works is to play with the walker.
+
+Note that the walker does not automatically stop when the quotation originally given finishes executing; it just keeps on walking up the return stack, and even lets you step through the listener's code. You can invoke \texttt{continue} or \texttt{exit} to terminate the walker.
+
+While the walker can be invoked explicitly using the \texttt{walk} word, sometimes it is more convenient to \emph{annotate} a word such that the walker is invoked automatically when the word is called. This can be done using the \texttt{break} word:
+
+\begin{alltt}
+\textbf{ok} \ttbs layout* break
+\end{alltt}
+
+Now, when some piece of code calls \texttt{layout*}, the walker will open, and you will be able to step through execution and see exactly what's going on. An important point to keep in mind is that when the walker is invoked in this manner, \texttt{exit} will not have the desired effect; execution will continue, but the data stack will be inconsistent, and an error will most likely be raised a short time later. Always use \texttt{continue} to resume execution after a break.
+
+The walker is very handy, but sometimes you just want to see if a word is being called at all and when, and you don't care to single-step it. In that case, you can use the \texttt{watch} word:
+
+\begin{alltt}
+\textbf{ok} \ttbs draw-shape break
+\end{alltt}
+
+Now when \texttt{draw-shape} is called, a message will be printed to that effect.
+
+You can undo the effect of \texttt{break} or \texttt{watch} by reloading the original source file containing the word definition in question:
+
+\begin{alltt}
+\textbf{ok} \ttbs layout* reload
+\textbf{ok} \ttbs draw-shape reload
+\end{alltt}
 
 \subsection{Dealing with hangs}
 
