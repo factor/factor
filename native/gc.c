@@ -94,18 +94,17 @@ INLINE CELL collect_next(CELL scan)
 	CELL size;
 	gc_debug("collect_next",scan);
 	gc_debug("collect_next header",get(scan));
-	switch(TAG(get(scan)))
+	if(headerp(get(scan)))
 	{
-	case HEADER_TYPE:
 		size = untagged_object_size(scan);
 		collect_object(scan);
-		break;
-	default:
+	}
+	else
+	{
 		size = CELLS;
 		copy_object((CELL*)scan);
-		break;
 	}
-	
+
 	return scan + size;
 }
 

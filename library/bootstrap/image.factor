@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -82,12 +82,10 @@ SYMBOL: boot-quot
 : tag ( cell -- tag ) tag-mask bitand ;
 
 : fixnum-tag  BIN: 000 ; inline
-: word-tag    BIN: 001 ; inline
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
 : ratio-tag   BIN: 100 ; inline
 : complex-tag BIN: 101 ; inline
-: header-tag  BIN: 110 ; inline
 
 : f-type      6  ; inline
 : t-type      7  ; inline
@@ -100,18 +98,19 @@ SYMBOL: boot-quot
 : port-type   14 ; inline
 : dll-type    15 ; inline
 : alien-type  16 ; inline
+: word-type   17 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
-: >header ( id -- tagged ) header-tag immediate ;
+: >header ( id -- tagged ) object-tag immediate ;
 
 ( Image header )
 
 : base
     #! We relocate the image to after the header, and leaving
-    #! two empty cells. This lets us differentiate an F pointer
+    #! some empty cells. This lets us differentiate an F pointer
     #! (0/tag 3) from a pointer to the first object in the
     #! image.
-    2 cell * ;
+    64 cell * ;
 
 : header ( -- )
     image-magic emit
@@ -192,7 +191,7 @@ M: f ' ( obj -- ptr )
 
 : word, ( word -- )
     [
-        word-tag >header ,
+        word-type >header ,
         dup hashcode fixnum-tag immediate ,
         0 ,
         dup word-primitive ,
@@ -201,7 +200,7 @@ M: f ' ( obj -- ptr )
         0 ,
         0 ,
     ] make-list
-    swap word-tag here-as pool-object
+    swap object-tag here-as pool-object
     [ emit ] each ;
 
 : word-error ( word msg -- )

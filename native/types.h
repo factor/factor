@@ -6,7 +6,6 @@
 
 /*** Tags ***/
 #define FIXNUM_TYPE 0
-#define WORD_TYPE 1
 #define CONS_TYPE 2
 #define OBJECT_TYPE 3
 #define RATIO_TYPE 4
@@ -33,23 +32,31 @@ CELL T;
 #define PORT_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
+#define WORD_TYPE 17
 
-#define TYPE_COUNT 17
+#define TYPE_COUNT 18
+
+INLINE bool headerp(CELL cell)
+{
+	return (cell != F
+		&& TAG(cell) == OBJECT_TYPE
+		&& cell < RETAG(TYPE_COUNT << TAG_BITS,OBJECT_TYPE));
+}
 
 INLINE CELL tag_header(CELL cell)
 {
-	return RETAG(cell << TAG_BITS,HEADER_TYPE);
+	return RETAG(cell << TAG_BITS,OBJECT_TYPE);
 }
 
-/* #define HEADER_DEBUG */
+#define HEADER_DEBUG
 
 INLINE CELL untag_header(CELL cell)
 {
 	CELL type = cell >> TAG_BITS;
 #ifdef HEADER_DEBUG
-	if(TAG(cell) != HEADER_TYPE)
+	if(!headerp(cell))
 		critical_error("header type check",cell);
-	if(type <= HEADER_TYPE && type != WORD_TYPE)
+	if(type <= HEADER_TYPE)
 		critical_error("header invariant check",cell);
 #endif
 	return type;
@@ -69,10 +76,6 @@ INLINE void type_check(CELL type, CELL tagged)
 {
 	if(type < HEADER_TYPE)
 	{
-#ifdef HEADER_DEBUG
-		if(TAG(tagged) == WORD_TYPE && object_type(tagged) != WORD_TYPE)
-			critical_error("word header check",tagged);
-#endif
 		if(TAG(tagged) == type)
 			return;
 	}

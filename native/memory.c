@@ -73,7 +73,7 @@ void allot_profile_step(CELL a)
 	for(i = profile_depth; i < depth; i++)
 	{
 		obj = get(cs_bot + i * CELLS);
-		if(TAG(obj) == WORD_TYPE)
+		if(type_of(obj) == WORD_TYPE)
 			untag_word(obj)->allot_count += a;
 	}
 
@@ -139,7 +139,7 @@ void primitive_heap_stats(void)
 		CELL size;
 		CELL type;
 
-		if(TAG(value) == HEADER_TYPE)
+		if(headerp(value))
 		{
 			size = align8(untagged_object_size(ptr));
 			type = untag_header(value);

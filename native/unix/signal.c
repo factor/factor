@@ -29,7 +29,7 @@ void call_profiling_step(int signal, siginfo_t* siginfo, void* uap)
 	for(i = profile_depth; i < depth; i++)
 	{
 		obj = get(cs_bot + i * CELLS);
-		if(TAG(obj) == WORD_TYPE)
+		if(type_of(obj) == WORD_TYPE)
 			untag_word(obj)->call_count++;
 	}
 

@@ -23,7 +23,7 @@ void primitive_word(void)
 	word->plist = F;
 	word->call_count = 0;
 	word->allot_count = 0;
-	dpush(tag_word(word));
+	dpush(tag_object(word));
 }
 
 void primitive_update_xt(void)

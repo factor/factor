@@ -35,7 +35,7 @@ USE: math
 USE: namespaces
 USE: strings
 
-BUILTIN: word 1
+BUILTIN: word 17
 
 M: word hashcode 1 slot %fixnum ;
 

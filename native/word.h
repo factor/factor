@@ -30,11 +30,6 @@ INLINE F_WORD* untag_word(CELL tagged)
 	return untag_word_fast(tagged);
 }
 
-INLINE CELL tag_word(F_WORD* word)
-{
-	return RETAG(word,WORD_TYPE);
-}
-
 void update_xt(F_WORD* word);
 void primitive_word(void);
 void primitive_update_xt(void);

@@ -23,9 +23,6 @@ CELL object_size(CELL pointer)
 	case CONS_TYPE:
 		size = sizeof(F_CONS);
 		break;
-	case WORD_TYPE:
-		size = sizeof(F_WORD);
-		break;
 	case RATIO_TYPE:
 		size = sizeof(F_RATIO);
 		break;

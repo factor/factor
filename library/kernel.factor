@@ -57,7 +57,7 @@ M: object = eq? ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    17 ;
+    18 ;
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
