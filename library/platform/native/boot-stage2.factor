@@ -26,14 +26,16 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: init
+USE: combinators
+USE: errors
 USE: kernel
 USE: lists
 USE: parser
 USE: stack
+USE: strings
 USE: stdio
 
 "Cold boot in progress..." print
-
 [
     "/library/platform/native/kernel.factor"
     "/library/platform/native/stack.factor"

@@ -36,7 +36,7 @@ USE: stack
 USE: words
 
 : BEGIN-ENUM:
-    #! C-style enumartions. Their use is not encouraged unless
+    #! C-style enumerations. Their use is not encouraged unless
     #! it is for C library interfaces. Used like this:
     #!
     #! BEGIN-ENUM 0
@@ -69,11 +69,11 @@ USE: words
 
 : compile-alien-call
     pop-literal reverse PARAMETERS >r
-    pop-literal pop-literal alien-function CALL drop
+    pop-literal pop-literal alien-function CALL JUMP-FIXUP
     r> CLEANUP
     pop-literal RETURNS ;
 
 global [ <namespace> "libraries" set ] bind
 
 [ alien-call compile-alien-call ]
-unswons "compiling" swap set-word-property
+unswons "compiling" set-word-property

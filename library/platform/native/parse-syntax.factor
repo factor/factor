@@ -68,13 +68,13 @@ USE: unparser
 ! Colon defs
 : CREATE ( -- word )
     scan "in" get create dup set-word
-    f "documentation" pick set-word-property
-    f "stack-effect" pick set-word-property ;
+    f over "documentation" set-word-property
+    f over "stack-effect" set-word-property ;
 
 : remember-where ( word -- )
-    "line-number" get "line" pick set-word-property
-    "col"         get "col"  pick set-word-property
-    "file"        get "file" pick set-word-property
+    "line-number" get over "line" set-word-property
+    "col"         get over "col"  set-word-property
+    "file"        get over "file" set-word-property
     drop ;
 
 : :
@@ -90,6 +90,9 @@ USE: unparser
     "in-definition" off
     nreverse
     ;-hook ; parsing
+
+! Symbols
+: SYMBOL: CREATE define-symbol ; parsing
 
 ! Vocabularies
 : DEFER: CREATE drop ; parsing
@@ -157,7 +160,7 @@ USE: unparser
 
 : parsed-stack-effect ( parsed str -- parsed )
     over doc-comment-here? [
-        "stack-effect" word set-word-property
+        word "stack-effect" set-word-property
     ] [
         drop
     ] ifte ;
@@ -168,11 +171,11 @@ USE: unparser
 
 : documentation+ ( str word -- )
     [
-        "documentation" swap word-property [
+        "documentation" word-property [
             swap "\n" swap cat3
         ] when*
     ] keep
-    "documentation" swap set-word-property ;
+    "documentation" set-word-property ;
 
 : parsed-documentation ( parsed str -- parsed )
     over doc-comment-here? [

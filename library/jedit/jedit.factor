@@ -63,8 +63,8 @@ USE: words
 
 : word-line/file ( word -- line dir file )
     #! Note that line numbers here start from 1
-    "line" over word-property swap
-    "file" swap word-property word-file ;
+    dup "line" word-property swap "file" word-property
+    word-file ;
 
 : jedit ( word -- )
     intern dup [

@@ -147,24 +147,24 @@ USE: combinators
         compile-cell
     ] ifte ;
 
-: fixup ( addr where -- )
+: JUMP-FIXUP ( addr where -- )
     #! Encode a relative offset to addr from where at where.
     #! Add 4 because addr is relative to *after* insn.
     dup >r 4 + - r> set-compiled-cell ;
 
 : (JUMP) ( xt -- fixup )
     #! addr is relative to *after* insn
-    compiled-offset dup >r 4 + - compile-cell r> ;
+    compiled-offset  0 compile-cell ;
 
-: JUMP ( xt -- fixup )
+: JUMP ( -- fixup )
     #! Push address of branch for fixup
     HEX: e9 compile-byte  (JUMP) ;
 
-: CALL ( xt -- fixup )
+: CALL ( -- fixup )
     HEX: e8 compile-byte  (JUMP) ;
 
-: JE ( xt -- fixup )
-    HEX: 0f compile-byte HEX: 84 compile-byte (JUMP) ;
+: JE ( -- fixup )
+    HEX: 0f compile-byte HEX: 84 compile-byte  (JUMP) ;
 
 : RET ( -- )
     HEX: c3 compile-byte ;

@@ -28,6 +28,7 @@
 IN: compiler
 USE: combinators
 USE: errors
+USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
@@ -40,8 +41,69 @@ USE: unparser
 USE: vectors
 USE: words
 
+! We use a hashtable "compiled-xts" that maps words to
+! xt's that are currently being compiled. The commit-xt's word
+! sets the xt of each word in the hashtable to the value in the
+! hastable.
+!
+! This has the advantage that we can compile a word before the
+! words it depends on and perform a fixup later; among other
+! things this enables mutually recursive words.
+
+SYMBOL: compiled-xts
+
+: save-xt ( word -- )
+    cell compile-aligned
+    compiled-offset swap compiled-xts acons@ ;
+
+: commit-xts ( -- )
+    compiled-xts get [ unswons set-word-xt ] each
+    compiled-xts off ;
+
+: compiled-xt ( word -- xt )
+    dup compiled-xts get assoc dup [
+        nip
+    ] [
+        drop word-xt
+    ] ifte ;
+
+! "fixup-xts" is a list of [ where | word ] pairs; the xt of
+! word when its done compiling will be written to the offset.
+
+SYMBOL: deferred-xts
+
+: defer-xt ( word where -- )
+    #! After word is compiled, put a call to it at offset.
+    deferred-xts acons@ ;
+
+: fixup-deferred-xt ( where word -- )
+    compiled-xt swap JUMP-FIXUP ;
+
+: fixup-deferred-xts ( -- )
+    deferred-xts get [ uncons fixup-deferred-xt ] each
+    deferred-xts off ;
+
+! Words being compiled are consed onto this list. When a word
+! is encountered that has not been previously compiled, it is
+! consed onto this list. Compilation stops when the list is
+! empty.
+
+SYMBOL: compile-words
+
+: postpone-word ( word -- )
+    t over "compiled" set-word-property
+    compile-words cons@ ;
+
+! During compilation, these two variables store pending
+! literals. Literals are either consumed at compile-time by
+! words with special compilation behavior, or otherwise they are
+! compiled into code that pushes them.
+
+SYMBOL: compile-datastack
+SYMBOL: compile-callstack
+
 : pop-literal ( -- obj )
-    "compile-datastack" get vector-pop ;
+    compile-datastack get vector-pop ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -57,7 +119,7 @@ USE: words
     ] ifte ;
 
 : commit-literals ( -- )
-    "compile-datastack" get
+    compile-datastack get
     dup vector-empty? [
         drop
     ] [
@@ -65,46 +127,43 @@ USE: words
         0 swap set-vector-length
     ] ifte ;
 
-: postpone ( obj -- )
+: postpone-literal ( obj -- )
     #! Literals are not compiled immediately, so that words like
     #! ifte with special compilation behavior can work.
-    "compile-datastack" get vector-push ;
+    compile-datastack get vector-push ;
 
 : tail? ( -- ? )
-    "compile-callstack" get vector-empty? ;
+    compile-callstack get vector-empty? ;
 
-: compiled-xt ( word -- xt )
-    "compiled-xt" over word-property dup [
-        nip
-    ] [
-        drop word-xt
-    ] ifte ;
+: compiled? ( word -- ? )
+    #! This is a hack.
+    dup "compiled" word-property swap primitive? or ;
 
 : compile-simple-word ( word -- )
     #! Compile a JMP at the end (tail call optimization)
-    commit-literals compiled-xt
-    tail? [ JUMP ] [ CALL ] ifte drop ;
+    dup compiled? [ dup postpone-word ] unless
+    commit-literals tail? [ JUMP ] [ CALL ] ifte defer-xt ;
 
 : compile-word ( word -- )
     #! If a word has a compiling property, then it has special
     #! compilation behavior.
-    "compiling" over word-property dup [
+    dup "compiling" word-property dup [
         nip call
     ] [
         drop compile-simple-word
     ] ifte ;
 
 : begin-compiling-quot ( quot -- )
-    "compile-callstack" get vector-push ;
+    compile-callstack get vector-push ;
 
 : end-compiling-quot ( -- )
-    "compile-callstack" get vector-pop drop ;
+    compile-callstack get vector-pop drop ;
 
 : compiling ( quot -- )
     #! Called on each iteration of compile-loop, with the
     #! remaining quotation.
     [
-        "compile-callstack" get
+        compile-callstack get
         dup vector-length pred
         swap set-vector-nth
     ] [
@@ -112,7 +171,7 @@ USE: words
     ] ifte* ;
 
 : compile-atom ( obj -- )
-    dup word? [ compile-word ] [ postpone ] ifte ;
+    dup word? [ compile-word ] [ postpone-literal ] ifte ;
 
 : compile-loop ( quot -- )
     [
@@ -126,23 +185,23 @@ USE: words
 
 : with-compiler ( quot -- )
     [
-        10 <vector> "compile-datastack" set
-        10 <vector> "compile-callstack" set
+        10 <vector> compile-datastack set
+        10 <vector> compile-callstack set
         call
+        fixup-deferred-xts
+        commit-xts
     ] with-scope ;
 
-: begin-compiling ( word -- )
-    cell compile-aligned
-    compiled-offset "compiled-xt" rot set-word-property ;
+: (compile) ( word -- )
+    #! Should be called inside the with-compiler scope.
+    intern dup save-xt word-parameter compile-quot RET ;
 
-: end-compiling ( word -- xt )
-    "compiled-xt" over word-property over set-word-xt
-    f "compiled-xt" rot set-word-property ;
+: compile-postponed ( -- )
+    compile-words get [
+        uncons compile-words set (compile) compile-postponed
+    ] when* ;
 
 : compile ( word -- )
-    intern dup
-    begin-compiling
-    dup word-parameter [ compile-quot RET ] with-compiler
-    end-compiling ;
+    [ postpone-word compile-postponed ] with-compiler ;
 
 : compiled word compile ; parsing

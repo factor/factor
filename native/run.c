@@ -91,6 +91,12 @@ void docol(void)
 	call(executing->parameter);
 }
 
+/* pushes word parameter */
+void dosym(void)
+{
+	dpush(executing->parameter);
+}
+
 void primitive_execute(void)
 {
 	executing = untag_word(dpop());

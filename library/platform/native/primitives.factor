@@ -236,5 +236,5 @@ USE: words
     [ set-alien-1            | " n alien off -- " ]
     [ heap-stats             | " -- instances bytes " ]
 ] [
-    unswons "stack-effect" swap set-word-property
+    unswons "stack-effect" set-word-property
 ] each

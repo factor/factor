@@ -33,11 +33,11 @@ USE: logic
 USE: namespaces
 USE: stack
 
-: word-property ( pname word -- pvalue )
-    word-plist assoc ;
+: word-property ( word pname -- pvalue )
+    swap word-plist assoc ;
 
-: set-word-property ( pvalue pname word -- )
-    dup >r word-plist set-assoc r> set-word-plist ;
+: set-word-property ( pvalue word pname -- )
+    swap [ word-plist set-assoc ] keep set-word-plist ;
 
 : defined? ( obj -- ? )
     dup word? [ word-primitive 0 = not ] [ drop f ] ifte ;
@@ -47,6 +47,9 @@ USE: stack
 
 : primitive? ( obj -- ? )
     dup word? [ word-primitive 1 = not ] [ drop f ] ifte ;
+
+: symbol? ( obj -- ? )
+    dup word? [ word-primitive 2 = ] [ drop f ] ifte ;
 
 ! Various features not supported by native Factor.
 : comment? drop f ;
@@ -61,8 +64,12 @@ USE: stack
     over set-word-parameter
     1 swap set-word-primitive ;
 
+: define-symbol ( word -- )
+    dup dup set-word-parameter
+    2 swap set-word-primitive ;
+
 : stack-effect ( word -- str )
-    "stack-effect" swap word-property ;
+    "stack-effect" word-property ;
 
 : documentation ( word -- str )
-    "documentation" swap word-property ;
+    "documentation" word-property ;

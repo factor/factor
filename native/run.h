@@ -103,6 +103,7 @@ void clear_environment(void);
 void run(void);
 void undefined(void);
 void docol(void);
+void dosym(void);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);

@@ -57,14 +57,18 @@ USE: stack
     #! Check if two vectors are equal. Two vectors are
     #! considered equal if they have the same length and contain
     #! equal elements.
-    over vector? [
-        2dup vector-length= [
-            0 -rot (vector=)
+    2dup eq? [
+        2drop t
+    ] [
+        over vector? [
+            2dup vector-length= [
+                0 -rot (vector=)
+            ] [
+                2drop f
+            ] ifte
         ] [
             2drop f
         ] ifte
-    ] [
-        2drop f
     ] ifte ;
 
 : ?vector-nth ( n vec -- obj/f )

@@ -374,7 +374,11 @@ DEFER: tree-contains?
 : cdr= swap cdr swap cdr = ;
 
 : cons= ( obj cons -- ? )
-    over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte ;
+    2dup eq? [
+        2drop t
+    ] [
+        over cons? [ 2dup car= >r cdr= r> and ] [ 2drop f ] ifte
+    ] ifte ;
 
 : cons-hashcode ( cons count -- hash )
     dup 0 = [

@@ -3,6 +3,7 @@
 XT primitives[] = {
 	undefined,
 	docol,
+	dosym,
 	primitive_execute,
 	primitive_call,
 	primitive_ifte,

@@ -1,0 +1,56 @@
+SOME NOTES ON FACTOR'S FFI
+
+The FFI is quite a neat design and I think it is better than JNI and
+similar approaches. Also, it offers better performance than libffi et
+al. Of course, both of those technologies are great and Factor FFI has
+its drawbacks -- namely, its not portable.
+
+All FFI words are in the "alien" vocabulary.
+
+The basic principle is generating machine stubs from C function
+prototypes. The main entry point is the 'alien-call' word, which is
+defined as simply throwing an error. However, it is given special
+compilation behavior. This means it can only be used in compiled words.
+
+Here is an example from sdl-video.factor:
+
+: SDL_LockSurface ( surface -- )
+    "int" "sdl" "SDL_LockSurface" [ "surface*" ] alien-call ; compiled
+
+The parameters are:
+
+"int" - return type. later it will be surface*
+"sdl" - library
+"SDL_LockSurface" - function
+[ "surface*" ] - parameters
+
+Note the word ends with 'compiled'. This is a hack and won't be needed
+later.
+
+Parameters and return values are C type names. C types include the
+following:
+
+- char - 1 byte signed
+- short - 2 bytes signed
+- int - 4 bytes signed
+- void* - word-size width field, can only be used as a parameter
+
+Structs can be defined in this fashion:
+
+BEGIN-STRUCT: point
+    FIELD: int x
+    FIELD: int y
+END-STRUCT
+
+And then referred to in parameter type specifiers as "point*". Struct
+return values are not yet supported.
+
+Enumerations can be defined; they simply become words that push
+integers:
+
+BEGIN-ENUM: 0
+    ENUM: int xuzzy
+    ENUM: int bax
+END-ENUM
+
+The parameter to BEGIN-ENUM specifies the starting index.

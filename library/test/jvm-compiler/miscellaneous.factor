@@ -40,11 +40,6 @@ USE: words
 
 [ t           ] [                 ] [ word-parameter-test ] test-word
 
-: words-test ( -- ? )
-    t vocabs [ words [ word? and ] each ] each ;
-
-[ t           ] [                 ] [ words-test        ] test-word
-
 ! At one time we had a bug in FactorShuffleDefinition.toList()
 ~<< test-shuffle-1 A r:B -- A r:B >>~
 
@@ -94,15 +89,6 @@ test-word
 [ [ 0 1 0 0 ] ] [ [ millis ] ] [ balance>list ] test-word
 
 [ [ 1 1 0 0 ] ] [ [ system-property ] ] [ balance>list ] test-word
-
-: test-last ( -- )
-    nop ;
-word >str "last-word-test" set
-
-[ "test-last" ] [ ] [ "last-word-test" get ] test-word
-[ f ] [ 5 ] [ compound? ] test-word
-[ f ] [ 5 ] [ compiled? ] test-word
-[ f ] [ 5 ] [ shuffle?  ] test-word
 
 ! Make sure callstack only clones callframes, and not
 ! everything on the callstack.

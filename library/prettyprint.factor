@@ -199,9 +199,8 @@ DEFER: prettyprint*
     tab-size - ;
 
 : prettyprint-plist ( word -- )
-    "parsing" over word-property [ " parsing" write ] when
-    "inline" over word-property [ " inline" write ] when
-    drop ;
+    dup "parsing" word-property [ " parsing" write ] when
+    "inline" word-property [ " inline" write ] when ;
 
 : . ( obj -- )
     [

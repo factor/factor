@@ -38,16 +38,17 @@ USE: lists
     POP-DS
     ! ptr to condition is now in EAX
     f address EAX CMP-I-[R]
-    compiled-offset JE ;
+    ! jump w/ address added later
+    JE ;
 
 : branch-target ( fixup -- )
-    cell compile-aligned compiled-offset swap fixup ;
+    cell compile-aligned compiled-offset swap JUMP-FIXUP ;
 
 : compile-else ( fixup -- fixup )
     #! Push addr where we write the branch target address,
     #! and fixup branch target address from compile-f-test.
     #! Push f for the fixup if we're tail position.
-    tail? [ RET f ] [ 0 JUMP ] ifte swap branch-target ;
+    tail? [ RET f ] [ JUMP ] ifte swap branch-target ;
 
 : compile-end-if ( fixup -- )
     tail? [ drop RET ] [ branch-target ] ifte ;
@@ -63,5 +64,5 @@ USE: lists
 [
     [ ifte compile-ifte ]
 ] [
-    unswons "compiling" swap set-word-property
+    unswons "compiling" set-word-property
 ] each

@@ -36,14 +36,14 @@ USE: stack
 
 : UNBOX ( name -- )
     #! Move top of datastack to C stack.
-    dlsym-self CALL drop
+    dlsym-self CALL JUMP-FIXUP
     EAX PUSH-R ;
 
 : BOX ( name -- )
     #! Move EAX to datastack.
     24 ESP R-I
     EAX PUSH-R
-    dlsym-self CALL drop
+    dlsym-self CALL JUMP-FIXUP
     28 ESP R+I ;
 
 : PARAMETERS ( params -- count )

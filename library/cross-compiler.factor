@@ -190,7 +190,7 @@ DEFER: unparse-float
 IN: image
 
 : primitives, ( -- )
-    1 [
+    2 [
         execute
         call
         ifte
