@@ -84,10 +84,13 @@ USE: vectors
     #! Push a list of keys in a hashtable.
     [ ] swap [ car swons ] hash-each ;
 
-: hash-values ( hash -- list )
+: hash-values ( hash -- alist )
     #! Push a list of values in a hashtable.
     [ ] swap [ cdr swons ] hash-each ;
 
 : hash>alist ( hash -- list )
     #! Push a list of key/value pairs in a hashtable.
     [ ] swap [ swons ] hash-each ;
+
+: alist>hash ( alist -- hash )
+    37 <hashtable> swap [ unswons pick set-hash ] each ;

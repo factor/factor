@@ -30,27 +30,28 @@ USE: combinators
 USE: kernel
 USE: stack
 
-: times ( n [ code ] -- )
+: times ( n quot -- )
     #! Evaluate a quotation n times.
     #!
     #! In order to compile, the code must produce as many values
     #! as it consumes.
-    [
-        over 0 >
+    tuck >r dup 0 <= [
+        r> 3drop
     ] [
-        tuck >r pred >r call r> r>
-    ] while 2drop ; inline interpret-only
+        pred >r call r> r> times
+    ] ifte ; inline interpret-only
 
-: times* ( n [ code ] -- )
+: (times) ( limit n quot -- )
+    pick pick <= [
+        3drop
+    ] [
+        tuck >r tuck >r rot >r call r> r> succ r> (times)
+    ] ifte ; inline interpret-only
+
+: times* ( n quot -- )
     #! Evaluate a quotation n times, pushing the index at each
     #! iteration. The index ranges from 0 to n-1.
     #!
     #! In order to compile, the code must consume one more value
     #! than it produces.
-    0 rot
-    [
-        2dup <
-    ] [
-        >r 2dup succ >r >r swap call r> r> r>
-    ] while
-    3drop ; inline interpret-only
+    0 swap (times) ; inline interpret-only

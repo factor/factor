@@ -30,13 +30,13 @@ USE: kernel
 USE: lists
 USE: stack
 
-: 2apply ( x y [ code ] -- )
+: 2apply ( x y quot -- )
     #! First applies the code to x, then to y.
     #!
     #! If the quotation compiles, this combinator compiles.
     2dup >r >r nip call r> r> call ; inline interpret-only
 
-: cleave ( x [ code1 ] [ code2 ] -- )
+: cleave ( x quot quot -- )
     #! Executes each quotation, with x on top of the stack.
     #!
     #! If the quotation compiles, this combinator compiles.
@@ -54,7 +54,7 @@ USE: stack
     #! If the quotation compiles, this combinator compiles.
     -rot >r >r call r> r> ; inline interpret-only
 
-: forever ( code -- )
+: forever ( quot -- )
     #! The code is evaluated in an infinite loop. Typically, a
     #! continuation is used to escape the infinite loop.
     #!
@@ -102,7 +102,7 @@ USE: stack
     pick [ drop call ] [ nip nip call ] ifte ;
     inline interpret-only
 
-: interleave ( X list -- )
+: interleave ( X quot -- )
     #! Evaluate each element of the list with X on top of the
     #! stack. When done, X is popped off the stack.
     #!
@@ -116,7 +116,7 @@ USE: stack
         2drop
     ] ifte ; interpret-only
 
-: unless ( cond [ if false ] -- )
+: unless ( cond quot -- )
     #! Execute a quotation only when the condition is f. The
     #! condition is popped off the stack.
     #!
@@ -124,7 +124,7 @@ USE: stack
     #! values as it produces.
     [ ] swap ifte ; inline interpret-only
 
-: unless* ( cond [ if false ] -- )
+: unless* ( cond quot -- )
     #! If cond is f, pop it off the stack and evaluate the
     #! quotation. Otherwise, leave cond on the stack.
     #!
@@ -132,7 +132,7 @@ USE: stack
     #! value than it produces.
     over [ drop ] [ nip call ] ifte ; inline interpret-only
 
-: when ( cond [ if true ] -- )
+: when ( cond quot -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
     #!
@@ -140,7 +140,7 @@ USE: stack
     #! values as it produces.
     [ ] ifte ; inline interpret-only
 
-: when* ( cond [ code ] -- )
+: when* ( cond quot -- )
     #! If the condition is true, it is left on the stack, and
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
@@ -149,12 +149,13 @@ USE: stack
     #! value than it produces.
     dupd [ drop ] ifte ; inline interpret-only
 
-: while ( [ P ] [ R ] -- )
-    #! Evaluate P. If it leaves t on the stack, evaluate R, and
-    #! recurse.
+: while ( cond body -- )
+    #! Evaluate cond. If it leaves t on the stack, evaluate
+    #! body, and recurse.
     #!
-    #! In order to compile, the stack effect of P * ( X -- ) * R
-    #! must consume as many values as it produces.
+    #! In order to compile, the stack effect of
+    #! cond * ( X -- ) * body must consume as many values as
+    #! it produces.
     2dup >r >r >r call [
         r> call r> r> while
     ] [
