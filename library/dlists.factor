@@ -32,7 +32,7 @@ C: dlist-node
 
 : (dlist-each) ( quot dnode -- )
     [
-        [ dlist-node-data swap [ call ] keep ] keep 
+        [ dlist-node-data swap call ] 2keep 
         dlist-node-next (dlist-each)
     ] [
         drop

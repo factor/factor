@@ -21,12 +21,9 @@ void run(void)
 	/* Error handling. */
 #ifdef WIN32
 	setjmp(toplevel);
-	__try
-	{
 #else
 	sigsetjmp(toplevel, 1);
 #endif
-
 	if(thrown_error != F)
 	{
 		if(thrown_keep_stacks)
@@ -61,15 +58,6 @@ void run(void)
 		else
 			dpush(next);
 	}
-
-#ifdef WIN32
-	}
-	__except (GetExceptionCode() == EXCEPTION_ACCESS_VIOLATION ?
-		EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-	{
-		signal_error(SIGSEGV);
-	}
-#endif
 }
 
 /* XT of deferred words */

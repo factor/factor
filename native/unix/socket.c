@@ -42,7 +42,7 @@ int make_client_socket(const char* hostname, uint16_t port)
 	return sock;
 }
 
-void primitive_client_socket(void)
+void primitive_client_socket(F_WORD *word)
 {
 	uint16_t p = (uint16_t)to_fixnum(dpop());
 	char* host;
@@ -94,14 +94,14 @@ int make_server_socket(uint16_t port)
 	return sock;
 }
 
-void primitive_server_socket(void)
+void primitive_server_socket(F_WORD *word)
 {
 	uint16_t p = (uint16_t)to_fixnum(dpop());
 	maybe_garbage_collection();
 	dpush(tag_object(port(PORT_SPECIAL,make_server_socket(p))));
 }
 
-void primitive_add_accept_io_task(void)
+void primitive_add_accept_io_task(F_WORD *word)
 {
 	CELL callback, port;
 	maybe_garbage_collection();
@@ -133,7 +133,7 @@ CELL accept_connection(F_PORT* p)
 	return true;
 }
 
-void primitive_accept_fd(void)
+void primitive_accept_fd(F_WORD *word)
 {
 	F_PORT* p;
 	maybe_garbage_collection();

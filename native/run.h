@@ -92,6 +92,7 @@ INLINE void call(CELL quot)
 void clear_environment(void);
 
 void run(void);
+void platform_run(void);
 void undefined(F_WORD* word);
 void docol(F_WORD* word);
 void dosym(F_WORD* word);

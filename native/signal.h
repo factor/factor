@@ -5,4 +5,4 @@ void call_profiling_step(int signal, siginfo_t* siginfo, void* uap);
 void init_signals(void);
 #endif
 
-void primitive_call_profiling(void);
+void primitive_call_profiling(F_WORD *);

@@ -60,7 +60,7 @@ void init_signals(void)
 	sigaction(SIGQUIT,&dump_sigaction,NULL);
 }
 
-void primitive_call_profiling(void)
+void primitive_call_profiling(F_WORD *word)
 {
 	CELL d = dpop();
 	if(d == F)
