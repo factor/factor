@@ -168,21 +168,26 @@ public class FactorLib
 	public static void copy(InputStream in, OutputStream out)
 		throws IOException
 	{
-		byte[] buf = new byte[4096];
-
-		int count;
-
-		for(;;)
+		try
 		{
-			count = in.read(buf,0,buf.length);
-			if(count == -1 || count == 0)
-				break;
+			byte[] buf = new byte[4096];
 
-			out.write(buf,0,count);
+			int count;
+
+			for(;;)
+			{
+				count = in.read(buf,0,buf.length);
+				if(count == -1 || count == 0)
+					break;
+
+				out.write(buf,0,count);
+			}
 		}
-
-		in.close();
-		out.close();
+		finally
+		{
+			in.close();
+			out.close();
+		}
 	} //}}}
 
 	//{{{ readLine() method

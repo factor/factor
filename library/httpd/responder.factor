@@ -96,3 +96,10 @@ USE: strings
         ! Just a responder name by itself
         drop "/" swap "/" cat3 redirect drop
     ] ifte ;
+
+: no-such-responder ( -- )
+    "404 No such responder" httpd-error ;
+
+: add-responder ( responder -- )
+    #! Add a responder object to the list.
+    "responder" over get*  "httpd-responders" get set* ;

@@ -55,16 +55,6 @@ USE: url-encoding
     #! Convert <, >, &, ' and " to HTML entities.
     [ dup html-entities assoc dup rot ? ] str-map ;
 
-: opening-tag ( tag attrs -- )
-    "<" % swap % [ " " % % ] when* ">" % ;
-
-: closing-tag ( tag -- )
-    "</" % % ">" % ;
-
-: html-tag ( str tag attrs -- str )
-    #! Wrap a string in an HTML tag.
-    <% dupd opening-tag swap % closing-tag %> ;
-
 : >hex-color ( triplet -- hex )
     [ >hex 2 digits ] map "#" swons cat ;
 
@@ -86,21 +76,22 @@ USE: url-encoding
 : font-css% ( font -- )
     "font-family: " % % "; " % ;
 
-: css-style% ( style -- )
-    [
+: css-style ( style -- )
+    <% [
         [ "fg"        fg-css% ]
         [ "bold"      bold-css% ]
         [ "italics"   italics-css% ]
         [ "underline" underline-css% ]
         [ "size"      size-css% ]
         [ "font"      font-css% ]
-    ] assoc-apply ;
+    ] assoc-apply %> ;
 
-: span-tag ( string style -- string )
-    "span" swap <% "style=\"" % css-style% "\"" % %> html-tag ;
-
-: link-tag ( string link -- string )
-    url-encode "a" swap <% "href=" % unparse % %> html-tag ;
+: span-tag ( style quot -- )
+    over css-style dup "" = [
+        drop call
+    ] [
+        <span style= span> call </span>
+    ] ifte ;
 
 : resolve-file-link ( path -- link )
     #! The file responder needs relative links not absolute
@@ -110,20 +101,43 @@ USE: url-encoding
     ] when* "/" ?str-tail drop ;
 
 : file-link-href ( path -- href )
-    <% "/file/" % resolve-file-link % %> ;
+    <% "/file/" % resolve-file-link url-encode % %> ;
+
+: file-link-tag ( style quot -- )
+    over "file-link" swap assoc [
+        <a href= file-link-href a> call </a>
+    ] [
+        call
+    ] ifte* ;
 
 : object-link-href ( path -- href )
-    <% "/inspect/" % % %> ;
+    "/inspect/" swap cat2 ;
 
-: html-attr-string ( string style -- string )
-    [ span-tag ] keep
-    [
-        [ "file-link"   file-link-href   link-tag ]
-        [ "object-link" object-link-href link-tag ]
-    ] assoc-apply ;
+: object-link-tag ( style quot -- )
+    over "object-link" swap assoc [
+        <a href= object-link-href url-encode a> call </a>
+    ] [
+        call
+    ] ifte* ;
+
+: icon-tag ( string style quot -- )
+    over "icon" swap assoc dup [
+        <img src= "/resource/" swap cat2 img/>
+        #! Ignore the quotation, since no further style
+        #! can be applied
+        3drop
+    ] [
+        drop call
+    ] ifte ;
 
 : html-write-attr ( string style -- )
-    swap chars>entities swap html-attr-string write ;
+    [
+        [
+            [
+                [ drop chars>entities write ] span-tag
+            ] file-link-tag
+        ] object-link-tag
+    ] icon-tag ;
 
 : <html-stream> ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -146,24 +160,19 @@ USE: url-encoding
     ] extend ;
 
 : with-html-stream ( quot -- )
-    [
-        "stdio" get <html-stream> "stdio" set call
-    ] with-scope ;
-
-: html-head ( title -- )
-    "<html><head><title>" write
-    dup write
-    "</title></head><body><h1>" write write "</h1>" write ;
-
-: html-tail ( -- ) "</body></html>" print ;
+    [ "stdio" get <html-stream> "stdio" set call ] with-scope ;
 
 : html-document ( title quot -- )
-    swap chars>entities html-head call html-tail ;
-
-: preformatted-html ( quot -- )
-    "<pre>" print call "</pre>" print ;
+    swap chars>entities dup
+    <html>
+        <head>
+            <title> write </title>
+        </head>
+        <body>
+            <h1> write </h1>
+            call
+        </body>
+    </html> ;
 
 : simple-html-document ( title quot -- )
-    swap [
-        [ with-html-stream ] preformatted-html
-    ] html-document ;
+    swap [ <pre> with-html-stream </pre> ] html-document ;

@@ -200,6 +200,9 @@ public class FactorPlugin extends EditPlugin
 		int caret = textArea.getCaretPosition()
 			- textArea.getLineStartOffset(
 			textArea.getCaretLine());
+		if(caret == line.length())
+			caret--;
+
 		String noWordSep = textArea.getBuffer().getStringProperty(
 			"noWordSep");
 		int wordStart = TextUtilities.findWordStart(line,caret,

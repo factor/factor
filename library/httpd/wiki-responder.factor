@@ -54,7 +54,7 @@ USE: httpd-responder
     "wiki" get [ get ] bind ;
 
 : write-wiki-page ( text -- )
-    [ chars>entities wiki-word-links write ] preformatted-html ;
+    [ chars>entities wiki-word-links write ] call ;
 
 : wiki-nodes ( -- alist )
     "wiki" get [ vars-values ] bind ;

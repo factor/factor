@@ -59,5 +59,4 @@ USE: vectors
     #! An initially-generated image has this as the boot
     #! quotation.
     boot
-    "/library/platform/native/boot-stage2.factor" run-resource
-    "finish-cold-boot" [ "init" ] search execute ;
+    "/library/platform/native/boot-stage2.factor" run-resource ;

@@ -68,11 +68,3 @@ USE: words
     "interactive" get [ init-interpreter ] when
 
     0 exit* ;
-
-: finish-cold-boot ( -- )
-    #! After the stage2 bootstrap is done, this word
-    #! completes initialization.
-    init-scratchpad
-    init-styles
-    init-vocab-styles
-    default-responders ;

@@ -25,76 +25,34 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: file-responder
+IN: resource-responder
 USE: combinators
-USE: errors
 USE: files
-USE: html
 USE: httpd
 USE: httpd-responder
 USE: kernel
 USE: lists
-USE: logging
+USE: logic
 USE: namespaces
 USE: parser
 USE: stack
 USE: stdio
 USE: streams
 USE: strings
-USE: unparser
 
-: serving-path ( filename -- filename )
-    f>"" "doc-root" get swap cat2 ;
+: resource-response ( mime-type -- )
+    "Content-Type" swons unit "200 OK" response terpri ;
 
-: file-response ( mime-type length -- )
-    [,
-        unparse "Content-Length" swons ,
-        "Content-Type" swons ,
-    ,] "200 OK" response terpri ;
-
-: serve-static ( filename mime-type -- )
-    over file-length file-response  "method" get "head" = [
+: serve-resource ( filename mime-type -- )
+    dup mime-type resource-response  "method" get "head" = [
         drop
     ] [
-        <filebr> "stdio" get fcopy
+        <resource-stream> "stdio" get fcopy
     ] ifte ;
 
-: serve-file ( filename -- )
-    dup mime-type dup "application/x-factor-server-page" = [
-        drop run-file
+: resource-responder ( filename -- )
+    java? "resource-path" get or [
+        serve-resource
     ] [
-        serve-static
-    ] ifte ;
-
-: list-directory ( directory -- )
-    serving-html
-     "method" get "head" = [
-        drop
-    ] [
-        dup [ directory. ] simple-html-document
-    ] ifte ;
-
-: serve-directory ( filename -- )
-    "/" ?str-tail [
-        dup "index.html" cat2 dup exists? [
-            serve-file
-        ] [
-            drop list-directory
-        ] ifte
-    ] [
-        drop directory-no/
-    ] ifte ;
-
-: serve-object ( filename -- )
-    dup directory? [ serve-directory ] [ serve-file ] ifte ;
-
-: file-responder ( filename -- )
-    "doc-root" get [
-        serving-path dup exists? [
-            serve-object
-        ] [
-            drop "404 not found" httpd-error
-        ] ifte
-    ] [
-        drop "404 doc-root not set" httpd-error
+        drop "404 resource-path not set" httpd-error
     ] ifte ;

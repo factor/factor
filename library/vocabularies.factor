@@ -106,8 +106,3 @@ USE: strings
         "words"
         "scratchpad"
     ] "use" set ;
-
-: init-scratchpad ( -- )
-    #! The contents of the scratchpad vocabulary is not saved
-    #! between runs.
-    <namespace> "scratchpad" "vocabularies" get set* ;

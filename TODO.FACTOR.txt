@@ -1,7 +1,6 @@
-- TEST telnetd should use multitasking
+- move <resource-stream> from parser
 - quit responder breaks with multithreading
 - nicer way to combine two paths
-- icons for file responder
 - -1.1 3 ^ shouldn't give a complex number
 - don't show listener on certain commands
 - inferior hangs

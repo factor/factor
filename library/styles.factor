@@ -63,19 +63,18 @@ USE: stack
     ! XXX: use object path...
     "styles" get [ set ] bind ;
 
-: init-styles ( -- )
-    <namespace> "styles" set
+<namespace> "styles" set
 
-    [
-        [ "font" | "Monospaced" ]
-    ] "default" set-style
+[
+    [ "font" | "Monospaced" ]
+] "default" set-style
 
-    [
-        [ "bold" | t ]
-    ] default-style append "prompt" set-style
-    
-    [
-        [ "ansi-fg" | "0" ]
-        [ "ansi-bg" | "2" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] default-style append "comments" set-style ;
+[
+    [ "bold" | t ]
+] default-style append "prompt" set-style
+
+[
+    [ "ansi-fg" | "0" ]
+    [ "ansi-bg" | "2" ]
+    [ "fg" | [ 255 0 0 ] ]
+] default-style append "comments" set-style

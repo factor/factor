@@ -80,7 +80,13 @@ USE: namespaces
 : init-stdio ( -- )
     stdin stdout <fd-stream> <stdio-stream> "stdio" set ;
 
+: (fcopy) ( from to -- )
+    #! Copy the contents of the fd-stream 'from' to the
+    #! fd-stream 'to'. Use fcopy; this word does not close
+    #! streams.
+    "out" swap get* >r "in" swap get* r> blocking-copy ;
+
 : fcopy ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'.
-    "out" swap get* >r "in" swap get* r> blocking-copy ;
+    [ 2dup (fcopy) ] [ -rot fclose fclose rethrow ] catch ;

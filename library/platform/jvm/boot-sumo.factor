@@ -111,6 +111,7 @@ USE: parser
 
 !!! HTTPD.
 "/library/httpd/url-encoding.factor"       run-resource ! url-encoding
+"/library/httpd/html-tags.factor"          run-resource ! html
 "/library/httpd/html.factor"               run-resource ! html
 "/library/httpd/http-common.factor"        run-resource ! httpd
 "/library/httpd/responder.factor"          run-resource ! httpd-responder
@@ -118,6 +119,7 @@ USE: parser
 "/library/httpd/inspect-responder.factor"  run-resource ! inspect-responder
 "/library/httpd/file-responder.factor"     run-resource ! file-responder
 "/library/httpd/quit-responder.factor"     run-resource ! quit-responder
+"/library/httpd/resource-responder.factor" run-resource ! resource-responder
 "/library/httpd/test-responder.factor"     run-resource ! test-responder
 "/library/httpd/wiki-responder.factor"     run-resource ! wiki-responder
 "/library/httpd/default-responders.factor" run-resource ! default-responders

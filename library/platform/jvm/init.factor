@@ -71,9 +71,6 @@ USE: words
     init-stdio
     init-environment
     init-search-path
-    init-scratchpad
-    init-styles
-    init-vocab-styles
     "args" get parse-command-line
     run-user-init
 

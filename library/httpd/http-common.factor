@@ -79,6 +79,11 @@ USE: url-encoding
     "Location" swons unit
     "301 Moved Permanently" response terpri ;
 
+: directory-no/ ( -- )
+    <% "request" get % CHAR: / %
+    "raw-query" get [ CHAR: ? % % ] when*
+    %> redirect ;
+
 : header-line ( alist line -- alist )
     ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
 

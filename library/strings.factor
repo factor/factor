@@ -169,9 +169,9 @@ USE: stack
     #! In a URL, can this character be used without
     #! URL-encoding?
     [
-        [ letter?             ] [ drop t ]
-        [ LETTER?             ] [ drop t ]
-        [ digit?              ] [ drop t ]
-        [ "/_?" str-contains? ] [ drop t ]
-        [                     ] [ drop f ]
+        [ letter?              ] [ drop t ]
+        [ LETTER?              ] [ drop t ]
+        [ digit?               ] [ drop t ]
+        [ "/_?." str-contains? ] [ drop t ]
+        [                      ] [ drop f ]
     ] cond ;

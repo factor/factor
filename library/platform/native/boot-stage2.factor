@@ -114,6 +114,7 @@ USE: stdio
     "/library/platform/native/cross-compiler.factor"
 
     "/library/httpd/url-encoding.factor"
+    "/library/httpd/html-tags.factor"
     "/library/httpd/html.factor"
     "/library/httpd/http-common.factor"
     "/library/httpd/responder.factor"
@@ -122,6 +123,7 @@ USE: stdio
     "/library/httpd/inspect-responder.factor"
     "/library/httpd/test-responder.factor"
     "/library/httpd/quit-responder.factor"
+    "/library/httpd/resource-responder.factor"
     "/library/httpd/default-responders.factor"
 
     "/library/jedit/jedit-no-local.factor"
@@ -138,9 +140,7 @@ USE: stdio
 ] each
 
 IN: init
-DEFER: finish-cold-boot
 DEFER: warm-boot
-finish-cold-boot
 
 : set-boot ( quot -- ) 8 setenv ;
 [ warm-boot ] set-boot

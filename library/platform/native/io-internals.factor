@@ -73,4 +73,4 @@ USE: threads
     dup wait-to-accept accept-fd ;
 
 : blocking-copy ( in out -- )
-    [ add-copy-io-task (yield) ] callcc0 ;
+    [ add-copy-io-task (yield) ] callcc0 2drop ;
