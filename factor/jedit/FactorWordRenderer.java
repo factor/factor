@@ -39,33 +39,24 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 	//{{{ getWordHTMLString() method
 	public static String getWordHTMLString(FactorWord word, boolean showIn)
 	{
-		String defStr = jEdit.getProperty(
-			"factor.completion.def",
-			new String[] {
-				MiscUtilities.charsToEntities(word.getDefiner().name),
-				MiscUtilities.charsToEntities(word.name)
-			});
+		String str = jEdit.getProperty("factor.completion.def",
+			new String[] { word.getDefiner().name,word.name });
 
-		String in;
 		if(showIn)
 		{
-			in = jEdit.getProperty("factor.completion.in",
+			str = jEdit.getProperty("factor.completion.in",
 				new Object[] {
 					MiscUtilities.charsToEntities(word.vocabulary)
-				});
+				}) + str;
 		}
-		else
-			in = "";
-
-		String html = "<html>" + in + defStr;
 
 		if(word.stackEffect != null)
 		{
-			html = jEdit.getProperty("factor.completion.stack",
-				new String[] { html, word.stackEffect });
+			str = jEdit.getProperty("factor.completion.stack",
+				new String[] { str, word.stackEffect });
 		}
 
-		return html;
+		return str;
 	} //}}}
 
 	private FactorSideKickParser parser;

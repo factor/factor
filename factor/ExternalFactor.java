@@ -252,13 +252,16 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		/* We can't send words across the socket at this point in
 		human history, because of USE: issues. so we send name/vocab
 		pairs. */
-		Cons moreCompletions = (Cons)parseObject(eval(
+		
+		String result = eval(
 			FactorReader.unparseObject(word)
 			+ " "
 			+ FactorReader.unparseObject(Boolean.valueOf(anywhere))
 			+ " "
 			+ FactorReader.unparseObject(use)
-			+ " completions .")).car;
+			+ " completions .");
+
+		Cons moreCompletions = (Cons)parseObject(result).car;
 
 		while(moreCompletions != null)
 		{

@@ -41,12 +41,38 @@ public class FactorWordCompletion extends AbstractCompletion
 	private String word;
 
 	//{{{ FactorWordCompletion constructor
-	public FactorWordCompletion(View view, FactorWord[] items,
-		String word, FactorParsedData data)
+	public FactorWordCompletion(View view, String word, FactorParsedData data)
 	{
-		super(view,items,data);
+		super(view,data);
+
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getWordCompletions(word,false));
+
+		this.items = Arrays.asList(completions);
 		this.word = word;
 	} //}}}
+
+	/**
+	 * @return If this returns false, then we create a new completion
+	 * object after user input.
+	 */
+	public boolean updateInPlace(EditPane editPane, int caret)
+	{
+		String word = FactorSideKickParser.getCompletionWord(editPane,caret);
+
+		List newItems = new ArrayList();
+		Iterator iter = items.iterator();
+		while(iter.hasNext())
+		{
+			FactorWord w = (FactorWord)iter.next();
+			if(w.name.startsWith(word))
+				newItems.add(w);
+		}
+
+		items = newItems;
+
+		return true;
+	}
 
 	public void insert(int index)
 	{
@@ -58,7 +84,6 @@ public class FactorWordCompletion extends AbstractCompletion
 		try
 		{
 			buffer.beginCompoundEdit();
-			
 			textArea.setSelectedText(insert);
 			if(!FactorPlugin.isUsed(view,selected.vocabulary))
 				FactorPlugin.insertUse(view,selected.vocabulary);

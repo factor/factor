@@ -2,7 +2,7 @@
 plugin.factor.jedit.FactorPlugin.activate=startup
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.73
+plugin.factor.jedit.FactorPlugin.version=0.74
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/jedit/index.html
 
@@ -57,11 +57,11 @@ factor-restart.label=Restart Factor
 sidekick.parser.factor.label=Factor
 mode.factor.sidekick.parser=factor
 
-factor.completion.in=<font color="#a0a0a0">IN: {0}</font>\ 
-factor.completion.def={0} <b>{1}</b>
+factor.completion.in=IN: {0}\ 
+factor.completion.def={0} {1}
 factor.completion.stack={0} ( {1})
-factor.completion.method=<html>M: <b>{0} {1}</b>
-factor.completion.constructor=<html>C: <b>{0}</b>
+factor.completion.method=M: {0} {1}
+factor.completion.constructor=C: {0}
 
 # Dialog boxes
 factor.status.inserted-use=Using {0}

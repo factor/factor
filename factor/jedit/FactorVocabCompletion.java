@@ -41,10 +41,12 @@ public class FactorVocabCompletion extends AbstractCompletion
 	private String vocab;
 
 	//{{{ FactorVocabCompletion constructor
-	public FactorVocabCompletion(View view, String[] items,
-		String vocab, FactorParsedData data)
+	public FactorVocabCompletion(View view, String vocab, FactorParsedData data)
 	{
-		super(view,items,data);
+		super(view,data);
+		String[] completions = FactorPlugin.getVocabCompletions(
+			vocab,false);
+		this.items = Arrays.asList(completions);
 		this.vocab = vocab;
 	} //}}}
 
@@ -86,10 +88,5 @@ public class FactorVocabCompletion extends AbstractCompletion
 			textArea.userInput(keyChar);
 			return true;
 		}
-	}
-
-	public ListCellRenderer getRenderer()
-	{
-		return new DefaultListCellRenderer();
 	}
 }

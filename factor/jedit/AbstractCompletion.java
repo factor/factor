@@ -43,12 +43,10 @@ public abstract class AbstractCompletion extends SideKickCompletion
 	protected FactorParsedData data;
 	
 	//{{{ AbstractCompletion constructor
-	public AbstractCompletion(View view, Object[] items,
-		FactorParsedData data)
+	public AbstractCompletion(View view, FactorParsedData data)
 	{
 		this.view = view;
 		textArea = view.getTextArea();
-		this.items = Arrays.asList(items);
 		this.data = data;
 	} //}}}
 
@@ -56,6 +54,16 @@ public abstract class AbstractCompletion extends SideKickCompletion
 	public String getLongestPrefix()
 	{
 		return MiscUtilities.getLongestPrefix(items,false);
+	} //}}}
+
+	//{{{ updateInPlace() method
+	/**
+	 * @return If this returns false, then we create a new completion
+	 * object after user input.
+	 */
+	public boolean updateInPlace(EditPane editPane, int caret)
+	{
+		return false;
 	} //}}}
 
 	//{{{ handleKeystroke() method
