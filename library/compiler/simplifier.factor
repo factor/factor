@@ -42,9 +42,6 @@ USE: unparser
 USE: vectors
 USE: words
 
-! <LittleDan> peephole?
-! <LittleDan> "whose peephole are we optimizing" "your mom's"
-
 : labels ( linear -- list )
     #! Make a list of all labels defined in the linear IR.
     [ [ unswons #label = [ , ] [ drop ] ifte ] each ] make-list ;
@@ -80,7 +77,7 @@ USE: words
     dup [ uncons simplify-node drop (simplify) ] [ drop ] ifte ;
 
 : simplify ( linear -- linear )
-    purge-labels [ (simplify) ] make-list ;
+    ( purge-labels ) [ (simplify) ] make-list ;
 
 : follow ( linear -- linear )
     dup car car "follow" [ ] singleton ;

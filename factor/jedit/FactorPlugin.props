@@ -48,10 +48,7 @@ sidekick.parser.factor.label=Factor
 mode.factor.sidekick.parser=factor
 
 factor.completion.in=<font color="#a0a0a0">IN: {0}</font>\ 
-factor.completion.colon=: <b>{0}</b>
-factor.completion.defer=DEFER: <b>{0}</b>
-factor.completion.parsing=PARSING: <b>{0}</b>
-factor.completion.symbol=SYMBOL: <b>{0}</b>
+factor.completion.def={0} <b>{1}</b>
 factor.completion.stack={0} ( {1})
 
 # Dialog boxes

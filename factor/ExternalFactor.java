@@ -123,6 +123,9 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	 */
 	public synchronized String eval(String cmd) throws IOException
 	{
+		if(isClosed)
+			throw new IOException("ExternalFactor stream closed");
+
 		try
 		{
 			waitForAck();

@@ -91,7 +91,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord ine = define("syntax",";");
 		ine.parsing = new Ine(def,ine);
 		FactorWord symbol = define("syntax","SYMBOL:");
-		symbol.parsing = new Symbol(symbol);
+		symbol.parsing = new Definer(symbol);
 
 		/* reading numbers with another base */
 		FactorWord bin = define("syntax","BIN:");
@@ -105,7 +105,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		FactorWord noParsing = define("syntax","POSTPONE:");
 		noParsing.parsing = new NoParsing(noParsing);
 		FactorWord defer = define("syntax","DEFER:");
-		defer.parsing = new Defer(defer);
+		defer.parsing = new Definer(defer);
 		FactorWord in = define("syntax","IN:");
 		in.parsing = new In(in);
 		FactorWord use = define("syntax","USE:");
@@ -116,9 +116,9 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 
 		/* OOP */
 		FactorWord generic = define("generic","GENERIC:");
-		generic.parsing = new Generic(generic);
+		generic.parsing = new Definer(generic);
 		FactorWord traits = define("generic","TRAITS:");
-		traits.parsing = new Traits(traits);
+		traits.parsing = new Definer(traits);
 		FactorWord beginMethod = define("generic","M:");
 		beginMethod.parsing = new BeginMethod(beginMethod,def);
 		FactorWord beginConstructor = define("generic","C:");

@@ -39,19 +39,12 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 	//{{{ getWordHTMLString() method
 	public static String getWordHTMLString(FactorWord word, boolean showIn)
 	{
-		String prop = "factor.completion.colon";
-
-		/* if(def == null)
-		{
-			if(word.parsing != null)
-				prop = "factor.completion.parsing";
-			else
-				prop = "factor.completion.defer";
-		}
-		else if(def instanceof FactorSymbolDefinition)
-		{
-			prop = "factor.completion.symbol";
-		} */
+		String defStr = jEdit.getProperty(
+			"factor.completion.def",
+			new String[] {
+				MiscUtilities.charsToEntities(word.getDefiner().name),
+				MiscUtilities.charsToEntities(word.name)
+			});
 
 		String in;
 		if(showIn)
@@ -64,8 +57,8 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		else
 			in = "";
 
-		String html = "<html>" + in + jEdit.getProperty(prop,
-			new Object[] { MiscUtilities.charsToEntities(word.name) });
+		String html = "<html>" + in + defStr;
+
 		if(word.stackEffect != null)
 		{
 			html = jEdit.getProperty("factor.completion.stack",

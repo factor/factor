@@ -73,10 +73,10 @@ USE: words
         [ drop ]
         [ drop ]
         [ drop ]
-    } single-combination + ; compiled
+    } single-combination ; compiled
 
-[ 5 ] [ 2 3 4 single-combination-test-alt ] unit-test
-[ 7/2 ] [ 2 3 3/2 single-combination-test-alt ] unit-test
+[ 5 ] [ 2 3 4 single-combination-test-alt + ] unit-test
+[ 7/2 ] [ 2 3 3/2 single-combination-test-alt + ] unit-test
 
 DEFER: single-combination-test-2
 

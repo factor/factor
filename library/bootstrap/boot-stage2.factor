@@ -181,8 +181,9 @@ os "win32" = [
 
 cpu "x86" = [
     [
-         "/library/compiler/assembly-x86.factor"
-         "/library/compiler/generator-x86.factor"
+         "/library/compiler/x86/assembler.factor"
+         "/library/compiler/x86/generator.factor"
+         "/library/compiler/x86/fixnum.factor"
     ] [
         dup print
         run-resource

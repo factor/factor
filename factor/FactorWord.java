@@ -42,9 +42,9 @@ public class FactorWord implements FactorExternalizable
 	public FactorParsingDefinition parsing;
 
 	/**
-	 * Stub for interpreter definition.
+	 * For browsing, the parsing word that was used to define this word.
 	 */
-	public FactorWordDefinition def;
+	private FactorWord definer;
 
 	/**
 	 * Should the parser keep doc comments?
@@ -69,5 +69,20 @@ public class FactorWord implements FactorExternalizable
 	public String toString()
 	{
 		return name == null ? "#<unnamed>" : name;
+	} //}}}
+	
+	//{{{ getDefiner() method
+	public FactorWord getDefiner()
+	{
+		if(definer == null)
+			return new FactorWord(null,"DEFER:");
+		else
+			return definer;
+	} //}}}
+
+	//{{{ setDefiner() method
+	public void setDefiner(FactorWord definer)
+	{
+		this.definer = definer;
 	} //}}}
 }

@@ -1,8 +1,9 @@
 + compiler:
 
+- type inference fails with some assembler words
 - optimize away dispatch
 - getenv/setenv: if literal arg, compile as a load/store
-- assembler opcodes dispatch on operand types
+- update compiler for new assembler
 
 + oop:
 
@@ -33,6 +34,7 @@
 
 + kernel:
 
+- ppc register decls
 - do partial objects cause problems?
 - better i/o scheduler
 - remove sbufs

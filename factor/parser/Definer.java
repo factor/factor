@@ -31,9 +31,13 @@ package factor.parser;
 
 import factor.*;
 
-public class Symbol extends FactorParsingDefinition
+/**
+ * A definer where the word name to be defined follows the parsing word.
+ * Eg, DEFER: SYMBOL: GENERIC: etc.
+ */
+public class Definer extends FactorParsingDefinition
 {
-	public Symbol(FactorWord word)
+	public Definer(FactorWord word)
 	{
 		super(word);
 	}
@@ -42,7 +46,9 @@ public class Symbol extends FactorParsingDefinition
 		throws Exception
 	{
 		FactorWord w = reader.nextWord(true);
-		w.def = new FactorSymbolDefinition(w,w);
-		reader.append(w.def);
+		/* Only ever null with restartable scanner;
+		error already logged, so give up */
+		if(w != null)
+			w.setDefiner(word);
 	}
 }

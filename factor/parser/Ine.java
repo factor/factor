@@ -48,10 +48,7 @@ public class Ine extends FactorParsingDefinition
 		FactorWord w = state.defining;
 		/* Only ever null with restartable scanner;
 		error already logged, so give up */
-		if(w == null)
-			return;
-
-		w.def = new FactorCompoundDefinition(w,state.first);
-		reader.append(w.def);
+		if(w != null)
+			w.setDefiner(start);
 	}
 }
