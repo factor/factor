@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE ACTIONS SYSTEM "actions.dtd">
+
+<ACTIONS>
+	<ACTION NAME="factor-eval-selection">
+		<CODE>
+			sel = textArea.selectedText;
+			if(sel == null)
+				view.toolkit.beep();
+			else
+				factor.jedit.FactorPlugin.eval(view,sel);
+		</CODE>
+	</ACTION>
+	<ACTION NAME="factor-run-file">
+		<CODE>
+			buffer.save(view,null);
+			factor.jedit.FactorPlugin.eval(view,
+				"\""
+				+ MiscUtilities.charsToEscapes(buffer.path)
+				+ "\" run-file");
+		</CODE>
+	</ACTION>
+</ACTIONS>

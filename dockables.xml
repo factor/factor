@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<!-- For jEdit plugin -->
+
+<!DOCTYPE DOCKABLES SYSTEM "dockables.dtd">
+
+<DOCKABLES>
+	<DOCKABLE NAME="factor">
+		new factor.listener.FactorListenerPanel(
+			factor.jedit.FactorPlugin.getInterpreter(view));
+	</DOCKABLE>
+</DOCKABLES>
