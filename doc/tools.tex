@@ -3,7 +3,9 @@
 \usepackage{tabularx}
 \usepackage{alltt}
 
-\newcommand{\ttbs}{\char'134}
+\newcommand{\ttbs}{\symbol{92}}
+\newcommand{\tto}{\symbol{123}}
+\newcommand{\ttc}{\symbol{125}}
 \begin{document}
 
 \title{The Factor Development Environment}
@@ -22,6 +24,8 @@ static executable files and restarting your application after each change, you c
 incrementally make changes to your application and test them immediately. If you
 notice an undesirable behavior, Factor's powerful reflection features will aid in
 pinpointing the error.
+
+If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this document allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
 
 \section{System organization}
 
@@ -129,13 +133,38 @@ This is what is meant by the image being an \emph{infinite session}. When you sh
 
 Probably the most important debugging tool of them all is the \texttt{.} word. It prints the object at the top of the stack in a form that can be parsed by the Factor parser. A related word is \texttt{prettyprint}. It is identical to \texttt{.} except the output is more verbose; lists, vectors and hashtables are broken up into multiple lines and indented.
 
-Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting.
+\begin{alltt}
+\textbf{ok} [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ] .
+[ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ]
+\end{alltt}
 
-The prettyprinted form of a vector or list with many elements is not always readable. The \texttt{[.]} and \texttt{\{.\}} words output a list or a vector, respectively, with each element on its own line.
+Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting. Here is an example -- a vector is created, that holds a list whose first element is the vector itself:
 
-. prints an object in almost-readable form
-printing numbers in other bases
-we can inspect memory with  instances references heap-stats
+\begin{alltt}
+\textbf{ok} \tto \ttc [ unit 0 ] keep [ set-vector-nth ] keep .
+\tto [ ... ] \ttc
+\end{alltt}
+
+The prettyprinted form of a vector or list with many elements is not always readable. The \texttt{[.]} and \texttt{\tto.\ttc} words output a list or a vector, respectively, with each element on its own line. In fact, the stack printing words are defined in terms of \texttt{[.]} and \texttt{\tto.\ttc}:
+
+\begin{verbatim}
+: .s datastack  {.} ;
+: .r callstack  {.} ;
+: .n namestack  [.] ;
+: .c catchstack [.] ;
+\end{verbatim}
+
+Before we move on, one final set of output words comes is used to output integers in
+different numeric bases. The \texttt{.b} word prints an integer in binary, \texttt{.o} in octal, and \texttt{.h} in hexadecimal.
+
+\begin{alltt}
+\textbf{ok} 31337 .b
+\textbf{111101001101001}
+\textbf{ok} 31337 .o
+\textbf{75151}
+\textbf{ok} 31337 .h
+\textbf{7a69}
+\end{alltt}
 
 \section{Word tools}
 
@@ -252,8 +281,6 @@ You can even start the HTTP in a separate thread, and look at code in your web b
 
 \section{Dealing with runtime errors}
 
-Since Factor does very little ``static'' or compile-time checking, you will have to learn how to deal with and fix runtime errors. On the upside, the tools available are pretty nice.
-
 \subsection{Looking at stacks}
 
 To see the contents of the data stack, use the \texttt{.s} word. Similarly, the other stacks can be shown with \texttt{.r} (return stack), \texttt{.n} (name stack), and \texttt{.c} (catch stack). Each stack is printed with each element on its own line; the top of the stack is the first element printed.
@@ -308,7 +335,7 @@ So now, the mystery has been solved: as \texttt{reverse} iterates down the input
 [[ 1 [[ 2 [[ 3 4 ]] ]] ]]
 \end{alltt}
 
-In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool. Another caveat is that in compiled code, the return stack is not reconstructed if there is an error. Until this is fixed, you should only compile code once it is debugged. Finally, remember that unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
+In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool. Another caveat is that in compiled code, the return stack is not reconstructed if there is an error. Until this is fixed, you should only compile code once it is debugged. For more potential compiler pitfalls, see \ref{compiler}.
 
 \subsection{The walker}
 
@@ -361,18 +388,243 @@ You can undo the effect of \texttt{break} or \texttt{watch} by reloading the ori
 
 \subsection{Dealing with hangs}
 
-If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \textbf{Control-\ttbs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
+If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \texttt{Control-\ttbs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
+
+
+\section{Defensive coding}
+
+\subsection{Unit testing}
+
+Unit tests are very easy to write. They are usually placed in source files. A unit test can be executed with the \texttt{unit-test} word in the \texttt{test} vocabulary. This word takes a list and a quotation; the quotation is executed, and the resulting data stack is compared against the list. If they do not equal, the unit test has failed. Here is an example of a unit test:
+
+\begin{verbatim}
+[ "Hello, crazy world" ] [
+    "editor" get [ 0 caret set ] bind
+    ", crazy" 5 "editor" get [ line-insert ] bind
+    "editor" get [ line-text get ] bind
+] unit-test
+\end{verbatim}
+
+To have a unit test assert that a piece of code does not execute successfully, but rather throws an exception, use the \texttt{unit-test-fails} word. It takes only one quotation; if the quotation does \emph{not} throw an exception, the unit test has failed.
+
+\begin{verbatim}
+[ -3 { } vector-nth ] unit-test-fails
+\end{verbatim}
+
+Unit testing is a good habit to get into. Sometimes, writing tests first, before any code, can speed the development process too; by running your unit test script, you can gauge progress.
 
 \subsection{Stack effect inference}
 
+While most programming errors in Factor are only caught at runtime, the stack effect checker can be useful for checking correctness of code before it is run. It can also help narrow down problems with stack shuffling. The stack checker is used by passing a quotation to the \texttt{infer} word. It uses a sophisticated algorithm to infer stack effects of recursive words, combinators, and other tricky constructions, however, it cannot infer the stack effect of all words. In particular, anything using continuations, such as \texttt{catch} and I/O, will stump the stack checker. Despite this fault, it is still a useful tool.
+
+\begin{alltt}
+\textbf{ok} [ pile-fill * >fixnum over pref-size dup y
+\texttt{...} [ + ] change ] infer .
+\textbf{[ [ tuple number tuple ] [ tuple fixnum object number ] ]}
+\end{alltt}
+
+The stack checker will report an error it it cannot infer the stack effect of a quotation. The ``recursive state'' dump is similar to a return stack, but it is not a real return stack, since only a code walk is taking place, not full evaluation. Understanding recursive state dumps is an art, much like understanding return stacks.
+
+\begin{alltt}
+\textbf{ok} [ 100 [ f f cons ] repeat ] infer .
+\textbf{! Inference error: Unbalanced branches
+! Recursive state:
+! [ (repeat) G:54044 pick pick >= [ 3drop ]
+    [ [ swap >r call 1 + r> ] keep (repeat) ] ifte ]
+! [ repeat G:54042 0 -rot (repeat) ]
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+One reason stack inference might fail is if the quotation contains unbalanced branches, as above. For the inference to work, both branches of a conditional must exit with the same stack height.
+
+Another situation when it fails is if your code calls quotations that are not statically known. This can happen if the word in question uses continuations, or if it pulls a quotation from a variable and calls it. This can also happen if you wrote your own combinator, but forgot to mark it as \texttt{inline}. For example, the following will fail:
+
+\begin{alltt}
+\textbf{ok} : dip swap >r call r> ;
+\textbf{ok} [ [ + ] dip * ] infer .
+! Inference error: A literal value was expected where a
+computed value was found: \#<computed @ 679711507>
+...
+\end{alltt}
+
+However, defining \texttt{dip} to be inlined will work:
+
+\begin{alltt}
+\textbf{ok} : dip swap >r call r> ; inline
+\textbf{ok} [ [ + ] dip * ] infer .
+\textbf{[ [ number number number ] [ number ] ]}
+\end{alltt}
+
 \section{Optimization}
+
+While both the Factor interpreter and compiler are relatively slow at this stage, there
+are still ways you can make your Factor code go faster. The key is to find bottlenecks,
+and optimize them.
 
 \subsection{Timing code}
 
-\subsection{\label{compiler}The compiler}
+The \texttt{time} word reports the time taken to execute a quotation, in milliseconds. The portion of time spent in garbage collection is also shown:
 
-precompile
+\begin{alltt}
+\textbf{ok} [ 1000000 [ f f cons drop ] repeat ] time
+\textbf{515 milliseconds run time
+11 milliseconds GC time}
+\end{alltt}
+
+\subsection{Exploring memory usage}
+
+Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
+
+\begin{alltt}
+\textbf{ok} USE: io-internals
+\textbf{ok} [ port? ] instances .
+\textbf{[ \#<port @ 805466443> \#<port @ 805466499> ]}
+\end{alltt}
+
+The \texttt{references} word finds all objects that refer to a given object:
+
+\begin{alltt}
+\textbf{ok} [ float? ] instances car references .
+\textbf{[ \#<array @ 805542171> [ -1.0 0.0 / ] ]}
+\end{alltt}
+
+You can print a memory usage summary with \texttt{room.}:
+
+\begin{alltt}
+\textbf{ok} room.
+\textbf{Data space: 16384 KB total 2530 KB used 13853 KB free
+Code space: 16384 KB total 490 KB used 15893 KB free}
+\end{alltt}
+
+And finally, a detailed memory allocation breakdown by type with \texttt{heap-stats.}:
+
+\begin{alltt}
+\textbf{ok} heap-stats.
+\textbf{bignum: 312 bytes, 17 instances
+cons: 850376 bytes, 106297 instances
+float: 112 bytes, 7 instances
+t: 8 bytes, 1 instances
+array: 202064 bytes, 3756 instances
+hashtable: 54912 bytes, 3432 instances
+vector: 5184 bytes, 324 instances
+string: 391024 bytes, 7056 instances
+sbuf: 64 bytes, 4 instances
+port: 112 bytes, 2 instances
+word: 96960 bytes, 3030 instances
+tuple: 688 bytes, 22 instances}
+\end{alltt}
 
 \subsection{The profiler}
+
+Factor provides a statistical sampling profiler for narrowing down memory and processor bottlenecks.
+The profiler is only supported on Unix platforms. On FreeBSD 4.x, the Factor runtime must
+be compiled without the \texttt{-pthread} switch, since FreeBS 4.x userspace threading makes
+use of a signal that conflicts with the signal used for profiling.
+
+The \texttt{allot-profile} word executes a quotation with the memory profiler enabled, then prints a list of all words that allocated memory, along with the bytes allocated. Note that during particularly long executions, or executions where a lot of memory is allocated, these counters may overrun.
+
+\begin{alltt}
+\textbf{ok} [ "boot.image.le32" make-image ] allot-profile
+\emph{... many lines omitted ...}
+\textbf{[[ write-little-endian-32 673952 ]]
+[[ wait-to-read-line 788640 ]]
+[[ blocking-read-line 821264 ]]
+[[ vocabularies 822624 ]]
+[[ parse-resource 823376 ]]
+[[ next-line 1116440 ]]
+[[ vector-map 1326504 ]]
+[[ fixup-words 1326520 ]]
+[[ vector-each 1768640 ]]
+[[ (parse) 2434208 ]]
+[[ classes 2517920 ]]
+[[ when* 2939088 ]]
+[[ while 3614408 ]]
+[[ (parse-stream) 3634552 ]]
+[[ make-list 3862000 ]]
+[[ object 4143784 ]]
+[[ each 4712080 ]]
+[[ run-resource 5036904 ]]
+[[ (callcc) 5183400 ]]
+[[ catch 5188976 ]]
+[[ 2slip 8631736 ]]
+[[ end 202896600 ]]
+[[ make-image 208611888 ]]
+[[ with-scope 437823992 ]]}
+\end{alltt}
+
+The \texttt{call-profile} word executes a quotation with the CPU profiler enabled, then prints a list of all words that were found on the return stack, along with the number of times they were seen there. This gives a rough idea of what words are taking up the majority of execution time.
+
+\begin{alltt}
+\textbf{ok} [ "boot.image.le32" make-image ] call-profile
+\emph{... many lines omitted ...}
+\textbf{[[ stream-write 7 ]]
+[[ wait-to-write 7 ]]
+[[ vector-map 11 ]]
+[[ fixup-words 11 ]]
+[[ when* 12 ]]
+[[ write 16 ]]
+[[ write-word 17 ]]
+[[ parse-loop 22 ]]
+[[ make-list 24 ]]
+[[ (parse) 29 ]]
+[[ blocking-write 32 ]]
+[[ while 35 ]]
+[[ (parse-stream) 36 ]]
+[[ dispatch 47 ]]
+[[ run-resource 50 ]]
+[[ write-little-endian-32 76 ]]
+[[ (callcc) 173 ]]
+[[ catch 174 ]]
+[[ each 175 ]]
+[[ 2slip 199 ]]
+[[ end 747 ]]
+[[ make-image 785 ]]
+[[ with-scope 1848 ]]}
+\end{alltt}
+
+Normally, the memory and CPU profilers run every millisecond, and increment counters for all words on the return stack. The \texttt{only-top} variable can be switched on, in which case only the counter for the word at the top of the return stack is incremented. This gives a more localized picture of CPU and memory usage.
+
+\subsection{\label{compiler}The compiler}
+
+The compiler can provide a substantial speed boost for words whose stack effect can be inferred. Words without a known stack effect cannot be compiled, and must be run in the interpreter. The compiler generates native code, and so far, x86 and PowerPC backends have been developed.
+
+To compile a single word, call \texttt{compile}:
+
+\begin{alltt}
+\textbf{ok} \ttbs pref-size compile
+\textbf{Compiling pref-size}
+\end{alltt}
+
+During bootstrap, all words in the library with a known stack effect are compiled. You can
+circumvent this, for whatever reason, by passing the \texttt{-no-compile} switch during
+bootstrap:
+
+\begin{alltt}
+\textbf{bash\$} ./f boot.image.le32 -no-compile
+\end{alltt}
+
+The compiler has some limitations you must be aware of. The most important one is that if you
+redefine
+a word that is called from a compiled word, the change will not take effect until the caller words are themselves recompiled.
+The second limitation is that if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Finally, compiled code cannot be profiled, either. All of these limitations will be resolved in a future release.
+
+The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation. To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
+
+\begin{alltt}
+\textbf{ok} \ttbs append precompile
+\textbf{[ \#prologue ]
+[ over ]
+[[ \#jump-t-label G:54091 ]]
+[ swap ]
+[ drop ]
+[ \#return ]
+[[ \#label G:54091 ]]
+[ >r ]
+[[ \#call uncons ]]
+[ r> ]
+[[ \#call append ]]
+[[ \#jump cons ]]}
+\end{alltt}
 
 \end{document}

@@ -5,7 +5,7 @@ USING: errors gadgets generic hashtables kernel kernel-internals
 lists namespaces strings unparser vectors words ;
 
 : label-box ( list -- gadget )
-    <line-pile> swap [ <presentation> over add-gadget ] each ;
+    0 0 0 <pile> swap [ <presentation> over add-gadget ] each ;
 
 : unparse* ( obj -- str ) dup string? [ unparse ] unless ;
 

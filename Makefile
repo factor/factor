@@ -1,5 +1,5 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
+DEFAULT_CFLAGS = -Wall -Os -fomit-frame-pointer $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
@@ -31,6 +31,7 @@ default:
 	@echo "bsd"
 	@echo "bsd-nopthread - on FreeBSD 4, if you want to use profiling"
 	@echo "linux"
+	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
 	@echo "macosx"
 	@echo "solaris"
 	@echo "windows"
@@ -57,6 +58,11 @@ macosx:
 		LIBS="$(DEFAULT_LIBS)" 
 
 linux:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
+		LIBS="$(DEFAULT_LIBS) -ldl" 
+
+linux-ppc:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -mregnames" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 

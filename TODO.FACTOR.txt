@@ -9,11 +9,12 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 
 - word preview for remote words
 - faster completion
+- file properties for constructors, accessors/mutators, predicates
+- set 'end' of artifacts/assets accurately
 
 + ui:
 
 - single-pixel shuffle
-- resizing a gadget should probably relayout children
 - resizing: drag relative to initial click pos
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
@@ -26,6 +27,7 @@ I wrote down some issues I found while reading the devel-guide.pdf:
 
 + compiler/ffi:
 
+- mac os x ffi
 - [ [ dup call ] dup call ] infer hangs
 - ffi unicode strings: null char security hole
 - utf16 string boxing

@@ -7,7 +7,7 @@ USING: generic kernel lists math namespaces sdl ;
 
 : <check> ( -- cross )
     0 0 check-size dup <line> <gadget>
-    >r check-size 1 - 0 check-size neg check-size <line> <gadget> r>
+    >r check-size 0 check-size neg check-size <line> <gadget> r>
     2list <stack> ;
 
 TUPLE: checkbox bevel selected? ;

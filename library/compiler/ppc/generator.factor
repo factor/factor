@@ -39,34 +39,34 @@ words ;
 ! Far calls are made to addresses already known when the
 ! IR node is being generated. No forward reference far
 ! calls are possible.
-: compile-call-far ( n -- )
-    19 LOAD
+: compile-call-far ( word -- )
+    dup word-xt 19 LOAD32 rel-primitive-16/16
     19 MTLR
     BLRL ;
 
 : compile-call-label ( label -- )
     dup primitive? [
-        word-xt compile-call-far
+        compile-call-far
     ] [
         0 BL relative-24
     ] ifte ;
 
 #call-label [
     ! Hack: length of instruction sequence that follows
-    compiled-offset 20 + 18 LOAD32
+    compiled-offset 20 + 18 LOAD32 rel-address-16/16
     1 1 -16 STWU
     18 1 20 STW
     0 B relative-24
 ] "generator" set-word-prop
 
-: compile-jump-far ( n -- )
-    19 LOAD
+: compile-jump-far ( word -- )
+    dup word-xt 19 LOAD32 rel-primitive-16/16
     19 MTCTR
     BCTR ;
 
 : compile-jump-label ( label -- )
     dup primitive? [
-        word-xt compile-jump-far
+        compile-jump-far
     ] [
         0 B relative-24
     ] ifte ;
@@ -94,7 +94,7 @@ words ;
     18 18 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    compiled-offset 24 + 19 LOAD32
+    compiled-offset 24 + 19 LOAD32 rel-address-16/16
     18 18 19 ADD
     18 18 0 LWZ
     18 MTLR

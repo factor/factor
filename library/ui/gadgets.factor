@@ -31,7 +31,7 @@ C: gadget ( shape -- gadget )
     gadget-parent [ relayout ] when* ;
 
 : move-gadget ( x y gadget -- ) [ move-shape ] keep redraw ;
-: resize-gadget ( w h gadget -- ) [ resize-shape ] keep redraw ;
+: resize-gadget ( w h gadget -- ) [ resize-shape ] keep relayout ;
 
 : paint-prop ( gadget key -- value ) swap gadget-paint hash ;
 : set-paint-prop ( gadget value key -- ) rot gadget-paint set-hash ;

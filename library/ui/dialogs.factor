@@ -14,17 +14,19 @@ TUPLE: dialog continuation ;
 
 : <dialog-buttons> ( -- gadget )
     <default-shelf>
-    "OK" [ [ dialog-ok ] swap handle-gesture drop ]
-    <button> over add-gadget
-    "Cancel" [ [ dialog-cancel ] swap handle-gesture drop ]
-    <button> over add-gadget ;
+    "OK" f <button>
+    dup [ dialog-ok ] [ action ] link-action
+    over add-gadget
+    "Cancel" f <button>
+    dup [ dialog-cancel ] [ action ] link-action
+    over add-gadget ;
 
 : dialog-actions ( dialog -- )
     dup [ dialog-ok ] dup set-action
     [ dialog-cancel ] dup set-action ;
 
 C: dialog ( content -- gadget )
-    [ f line-border swap set-delegate ] keep
+    [ <empty-gadget> swap set-delegate ] keep
     [
         >r <default-pile>
         [ add-gadget ] keep
@@ -45,4 +47,7 @@ C: dialog ( content -- gadget )
     #! Show an input dialog and resume the current continuation
     #! when the user clicks OK or Cancel. If they click Cancel,
     #! push f.
-    [ <input-dialog> world get add-gadget (yield) ] callcc1 ;
+    [
+        <input-dialog> "Input" <tile> world get add-gadget
+        (yield)
+    ] callcc1 ;

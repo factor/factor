@@ -29,6 +29,14 @@ SYMBOL: relocation-table
     #! If flag is true; relative.
     over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
 
+! PowerPC relocations
+
+: rel-primitive-16/16 ( word -- )
+    5 rel, relocating word-primitive rel, ;
+
+: rel-address-16/16 ( -- )
+    6 rel, relocating 0 rel, ;
+
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
 ! sets the xt of each word in the hashtable to the value in the

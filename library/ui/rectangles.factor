@@ -75,6 +75,16 @@ C: plain-rect ( x y w h -- rect )
 M: plain-rect draw-shape ( rect -- )
     >r surface get r> plain-rect ;
 
+! A rectangle that is filled with the background color and also
+! has an outline.
+TUPLE: etched-rect ;
+
+C: etched-rect ( x y w h -- rect )
+    [ >r <rectangle> r> set-delegate ] keep ;
+
+M: etched-rect draw-shape ( rect -- )
+    >r surface get r> 2dup plain-rect hollow-rect ;
+
 ! A rectangle that has a visible outline only if the rollover
 ! paint property is set.
 SYMBOL: rollover?

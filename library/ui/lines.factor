@@ -26,6 +26,7 @@ M: line move-shape ( x y line -- )
     tuck move-line-y move-line-x ;
 
 : resize-line-w ( w line -- )
+    >r 1 - r>
     dup line-w 0 >= [
         set-line-w
     ] [
@@ -35,6 +36,7 @@ M: line move-shape ( x y line -- )
     ] ifte ;
 
 : resize-line-h ( w line -- )
+   >r 1 - r>
     dup line-h 0 >= [
         set-line-h
     ] [

@@ -18,9 +18,4 @@ SYMBOL: root-menu
     [[ "Exit" [ f world get set-world-running? ] ]]
 ] root-menu set
 
-world get [
-    ! Note that we check if the user explicitly clicked the
-    ! world, to avoid showing the root menu on gadgets that
-    ! don't explicitly handle mouse clicks.
-    hand hand-clicked eq? [ show-root-menu ] when
- ] [ button-down 1 ] set-action
+world get [ show-root-menu ] [ button-down 1 ] set-action

@@ -16,7 +16,11 @@ typedef enum {
 	F_RELATIVE_DLSYM,
 	F_ABSOLUTE_DLSYM,
 	/* relocate an address to start of code heap */
-	F_ABSOLUTE
+	F_ABSOLUTE,
+	/* PowerPC absolute address in the low 16 bits of two consecutive
+	32-bit words */
+	F_ABSOLUTE_PRIMITIVE_16_16,
+	F_ABSOLUTE_16_16
 } F_RELTYPE;
 
 /* code relocation consists of a table of entries for each fixup */
@@ -35,3 +39,16 @@ INLINE void code_fixup(CELL* cell)
 
 void relocate_data();
 void relocate_code();
+
+/* on PowerPC, return the 32-bit literal being loaded at the code at the
+given address */
+INLINE CELL reloc_get_16_16(CELL* cell)
+{
+	return ((*(cell - 1) & 0xffff) << 16) | (*cell & 0xffff);
+}
+
+INLINE void reloc_set_16_16(CELL* cell, CELL value)
+{
+	*cell = ((*cell & ~0xffff) | (value & 0xffff));
+	*(cell - 1) = ((*(cell - 1) & ~0xffff) | ((value >> 16) & 0xffff));
+}

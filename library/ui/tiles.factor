@@ -11,16 +11,19 @@ USING: generic kernel math namespaces ;
     screen-pos
     hand [ hand-clicked screen-pos - ] keep hand-click-rel - ;
 
-: drag-tile ( tile -- )
+: move-tile ( tile -- )
     dup click-rel hand screen-pos + >rect rot move-gadget ;
 
+: resize-tile ( tile -- )
+    dup hand relative >rect rot resize-gadget ;
+ 
 : raise ( gadget -- )
     dup gadget-parent >r dup unparent r> add-gadget ;
 
 : caption-actions ( caption -- )
-    dup [ [ raise ] swap handle-gesture drop ] [ button-down 1 ] set-action
+    dup [ raise ] [ button-down 1 ] link-action
     dup [ drop ] [ button-up 1 ] set-action
-    [ [ drag-tile ] swap handle-gesture drop ] [ drag 1 ] set-action ;
+    [ move-tile ] [ drag 1 ] link-action ;
 
 : close-tile [ close-tile ] swap handle-gesture drop ;
 
@@ -40,10 +43,21 @@ USING: generic kernel math namespaces ;
 : tile-actions ( tile -- )
     dup [ unparent ] [ close-tile ] set-action
     dup [ raise ] [ raise ] set-action
-    [ drag-tile ] [ drag-tile ] set-action ;
+    dup [ move-tile ] [ move-tile ] set-action
+    [ resize-tile ] [ resize-tile ] set-action ;
+
+: <resizer> ( -- gadget )
+    <frame>
+    dup [ resize-tile ] [ drag 1 ] link-action
+    0 0 40 10 <plain-rect> <gadget>
+    dup t reverse-video set-paint-prop
+    over add-right ;
 
 : tile-content ( child caption -- pile )
-     <frame> [ >r <caption> r> add-top ] keep [ add-center ] keep ;
+     <frame>
+     [ >r <caption> r> add-top ] keep
+     [ <resizer> swap add-bottom ] keep
+     [ add-center ] keep ;
 
 TUPLE: tile ;
 C: tile ( child caption -- tile )

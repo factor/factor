@@ -1,3 +1,6 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
+IN: gadgets
 USING: gadgets generic kernel lists math namespaces sdl words ;
 
 ! A frame arranges left/right/top/bottom gadgets around a
@@ -86,7 +89,7 @@ SYMBOL: frame-bottom-run
 
 : pos-frame-right
     [
-        >r \ frame-right-run get \ frame-top get r> pref-size drop
+        >r \ frame-right get \ frame-top get r> pref-size drop
         \ frame-bottom-run get
     ] keep reshape-gadget ;
 
@@ -97,7 +100,7 @@ SYMBOL: frame-bottom-run
 
 : pos-frame-bottom
     [
-        >r \ frame-left get \ frame-bottom-run get \ frame-right get
+        >r \ frame-left get \ frame-bottom get \ frame-right get
         r> pref-size nip
     ] keep reshape-gadget ;
 

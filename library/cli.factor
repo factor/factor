@@ -50,9 +50,6 @@ kernel-internals ;
     #! Some flags are *on* by default, unless user specifies
     #! -no-<flag> CLI switch
     "user-init" on
-    "interactive" on
-    "smart-terminal" on
-    "verbose-compile" on
     "compile" on
     os "win32" = "ui" "ansi" ? "shell" set ;
 

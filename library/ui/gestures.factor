@@ -26,6 +26,10 @@ USING: alien generic hashtables kernel lists math sdl ;
     #! gesture, otherwise returns f.
     [ dupd handle-gesture* ] each-parent nip ;
 
+: link-action ( gadget to from -- )
+    #! When gadget receives 'from' gesture, send a 'to' gesture.
+    >r [ swap handle-gesture drop ] cons r> set-action ;
+
 : user-input ( ch gadget -- ? )
     [ dupd user-input* ] each-parent nip ;
 
