@@ -8,7 +8,6 @@
 + inference/dataflow:
 
 - type inference
-- handle odd base cases, with code after ifte
 
 + compiler:
 
@@ -37,9 +36,7 @@
 - stream server can hang because of exception handler limitations
 - listener should be multithreaded
 - compile all, infer all commands
-- type something -- no completions -- hit another key -- not inserted
 - faster completion
-- sidekick: still parsing too much
 - errors don't always disappear
 - NPE in ErrorHighlight
 - maple-like: press enter at old commands to evaluate there
@@ -48,6 +45,7 @@
 
 + kernel:
 
+- after bootstrapping, classes hash is messed up
 - do partial objects cause problems?
 - profiler is inaccurate: wrong word on cs
 - better i/o scheduler

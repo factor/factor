@@ -40,15 +40,18 @@ USE: math
         (fraction>)
     ] ifte ; inline
 
+: division-by-zero ( x y -- )
+    "Division by zero" throw drop ;
+
 : integer/ ( x y -- x/y )
     dup 0 number= [
-        "Division by zero" throw drop
+        division-by-zero
     ] [
         dup 0 < [
             swap neg swap neg
         ] when
         2dup gcd tuck /i >r /i r> fraction>
-    ] ifte ;
+    ] ifte ; inline
 
 M: fixnum number= fixnum= ;
 M: fixnum < fixnum< ;

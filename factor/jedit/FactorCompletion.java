@@ -88,15 +88,21 @@ public class FactorCompletion extends SideKickCompletion
 	public boolean handleKeystroke(int selectedIndex, char keyChar)
 	{
 		if(keyChar == '\t' || keyChar == '\n')
+		{
 			insert(selectedIndex);
+			return false;
+		}
+		else if(keyChar == ' ')
+		{
+			insert(selectedIndex);
+			textArea.userInput(' ');
+			return false;
+		}
 		else
+		{
 			textArea.userInput(keyChar);
-
-		boolean ws = (ReadTable.DEFAULT_READTABLE
-			.getCharacterType(keyChar)
-			== ReadTable.WHITESPACE);
-
-		return !ws;
+			return true;
+		}
 	}
 
 	public ListCellRenderer getRenderer()

@@ -132,20 +132,22 @@ M: symbol (apply-word) ( word -- )
         ] when
     ] when ;
 
+: decompose ( x y -- effect )
+    #! Return a stack effect such that x*effect = y.
+    2unlist >r
+    swap 2unlist >r
+    over length over length - head nip
+    r> append
+    r> 2list ;
+
 : base-case ( word -- effect )
+    effect swap
     [
         inferring-base-case on
         copy-inference
         inline-compound
         inferring-base-case off
-    ] with-scope ;
-
-: decompose ( x y -- effect )
-    #! Return a stack effect such that x*effect = y.
-    2unlist >r swap 2unlist swap length tail append
-    ! workaround
-    [ drop object ] map
-    r> 2list ;
+    ] with-scope decompose ;
 
 : recursive-word ( word label -- )
     #! Handle a recursive call, by either applying a previously
@@ -155,7 +157,7 @@ M: symbol (apply-word) ( word -- )
         drop word-name " does not have a base case." cat2 throw
     ] [
         2dup [ drop #call-label ] [ nip #call ] ifte
-        rot base-case effect swap decompose (consume/produce)
+        rot base-case (consume/produce)
     ] ifte ;
 
 : apply-word ( word -- )
@@ -180,10 +182,6 @@ M: symbol (apply-word) ( word -- )
     ] with-block ;
 
 \ call [ infer-call ] "infer" set-word-property
-
-! These are due to bugs and will be removed
-\ * [ [ number number ] [ number ] ] "infer-effect" set-word-property
-\ gcd [ [ number number ] [ number ] ] "infer-effect" set-word-property
 
 \ undefined-method t "terminator" set-word-property
 \ not-a-number t "terminator" set-word-property

@@ -15,12 +15,19 @@ USE: generic
 [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
 unit-test
 
-[ [ [ fixnum fixnum ] f ] ]
+[ [ [ cons vector cons integer object cons ] [ cons vector cons ] ] ]
 [
-    [ [ rational rational ] [ rational fixnum ] ]
-    [ [ object ] f ] decompose
+    [ [ vector ] [ cons vector cons integer object cons ] ]
+    [ [ vector ] [ cons vector cons ] ]
+    decompose
 ]
-unit-test
+
+[ [ [ object ] [ object ] ] ]
+[
+    [ [ object number ] [ object ] ]
+    [ [ object number ] [ object ] ]
+    decompose
+]
 
 : old-effect ( [ in-types out-types ] -- [ in | out ] )
     uncons car length >r length r> cons ;
