@@ -22,47 +22,6 @@ void primitive_to_vector(void)
 	type_check(VECTOR_TYPE,dpeek());
 }
 
-void primitive_vector_nth(void)
-{
-	F_VECTOR* vector = untag_vector(dpop());
-	CELL index = to_fixnum(dpop());
-
-	if(index < 0 || index >= vector->top)
-		range_error(tag_object(vector),0,tag_fixnum(index),vector->top);
-	dpush(array_nth(untag_array(vector->array),index));
-}
-
-void vector_ensure_capacity(F_VECTOR* vector, CELL index)
-{
-	F_ARRAY* array = untag_array(vector->array);
-	CELL capacity = array->capacity;
-	if(index >= capacity)
-		array = grow_array(array,index * 2 + 1,F);
-	vector->top = index + 1;
-	vector->array = tag_object(array);
-}
-
-void primitive_set_vector_nth(void)
-{
-	F_VECTOR* vector;
-	F_FIXNUM index;
-	CELL value;
-
-	maybe_garbage_collection();
-
-	vector = untag_vector(dpop());
-	index = to_fixnum(dpop());
-	value = dpop();
-
-	if(index < 0)
-		range_error(tag_object(vector),0,tag_fixnum(index),vector->top);
-	else if(index >= vector->top)
-		vector_ensure_capacity(vector,index);
-
-	/* the following does not check bounds! */
-	set_array_nth(untag_array(vector->array),index,value);
-}
-
 void fixup_vector(F_VECTOR* vector)
 {
 	data_fixup(&vector->array);

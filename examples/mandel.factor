@@ -32,7 +32,7 @@ USE: test
 
 : scale 255 * >fixnum ;
 
-: scale-rgb ( r g b -- n )
+: scale-rgb ( r g b a -- n )
     scale
     swap scale 8 shift bitor
     swap scale 16 shift bitor
@@ -44,10 +44,10 @@ USE: test
 : <color-map> ( nb-cols -- map )
     [
         dup [
-            dup 360 * over 1 + / 360 / sat val
+            dup 360 * pick 1 + / 360 / sat val
             hsv>rgb 1.0 scale-rgb ,
         ] repeat
-    ] make-list list>vector nip ;
+    ] make-vector nip ;
 
 : absq >rect swap sq swap sq + ; inline
 
@@ -72,7 +72,7 @@ SYMBOL: center
     height get 150000 zoom-fact get * / y-inc set
     nb-iter get max-color min <color-map> cols set ;
 
-: c ( #{ i j }# -- c )
+: c ( i j -- c )
     >r
     x-inc get * center get real x-inc get width get 2 / * - + >float
     r>
@@ -89,7 +89,7 @@ SYMBOL: center
     ] with-pixels ; compiled
 
 : mandel ( -- )
-    640 480 32 SDL_HWSURFACE [
+    640 480 0 SDL_HWSURFACE [
         [
             0.8 zoom-fact set
             -0.65 center set

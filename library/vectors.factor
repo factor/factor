@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,40 +25,65 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+IN: vectors
 USE: generic
 USE: kernel
 USE: lists
 USE: math
-
-IN: errors
-DEFER: throw
-
-IN: kernel-internals
-
-BUILTIN: array 8
-
-! UNSAFE!
-: array-capacity   ( array -- n )   1 integer-slot ; inline
-: vector-array     ( vec -- array ) 2 slot ; inline
-: set-vector-array ( array vec -- ) 2 set-slot ; inline
-
-: grow-vector-array ( len vec -- )
-    [ vector-array grow-array ] keep set-vector-array ; inline
-
-: (set-vector-length) ( len vec -- ) 1 set-integer-slot ; inline
-
-IN: vectors
+USE: kernel-internals
+USE: errors
+USE: math-internals
 
 BUILTIN: vector 11
 
 : vector-length ( vec -- len ) >vector 1 integer-slot ; inline
 
-: set-vector-length ( len vec -- )
-    >vector over 0 < [
-        "Vector length must be positive" throw 2drop
+IN: kernel-internals
+
+: (set-vector-length) ( len vec -- ) 1 set-integer-slot ; inline
+
+: assert-positive ( fx -- )
+    0 fixnum<
+    [ "Vector index must be positive" throw ] when ; inline
+
+: assert-bounds ( fx vec -- )
+    over assert-positive
+    vector-length fixnum>=
+    [ "Vector index out of bounds" throw ] when ; inline
+
+: grow-capacity ( len vec -- )
+    #! If the vector cannot accomodate len elements, resize it
+    #! to exactly len.
+    [ vector-array grow-array ] keep set-vector-array ; inline
+
+: ensure-capacity ( n vec -- )
+    #! If n is beyond the vector's length, increase the length,
+    #! growing the array if necessary, with an optimistic
+    #! doubling of its size.
+    2dup vector-length fixnum>= [
+        >r 1 fixnum+ r>
+        2dup vector-array array-capacity fixnum> [
+            over 2 fixnum* over grow-capacity
+        ] when
+        (set-vector-length)
     ] [
-        2dup (set-vector-length) grow-vector-array
+        2drop
     ] ifte ; inline
+
+IN: vectors
+
+: vector-nth ( n vec -- obj )
+    swap >fixnum swap >vector
+    2dup assert-bounds vector-array array-nth ;
+
+: set-vector-nth ( obj n vec -- )
+    swap >fixnum dup assert-positive swap >vector
+    2dup ensure-capacity vector-array
+    set-array-nth ;
+
+: set-vector-length ( len vec -- )
+    swap >fixnum dup assert-positive swap >vector
+    2dup grow-capacity (set-vector-length) ;
 
 : empty-vector ( len -- vec )
     #! Creates a vector with 'len' elements set to f. Unlike

@@ -63,15 +63,15 @@ USE: prettyprint
     \ >string \ string infer-check
 ] "infer" set-word-property
 
-\ slot [
-    [ object fixnum ] ensure-d
-    dataflow-drop, pop-d literal-value
-    peek-d value-class builtin-supertypes dup length 1 = [
-        cons \ slot [ [ object ] [ object ] ] (consume/produce)
-    ] [
-        "slot called without static type knowledge" throw
-    ] ifte
-] "infer" set-word-property
+! \ slot [
+!     [ object fixnum ] ensure-d
+!     dataflow-drop, pop-d literal-value
+!     peek-d value-class builtin-supertypes dup length 1 = [
+!         cons \ slot [ [ object ] [ object ] ] (consume/produce)
+!     ] [
+!         "slot called without static type knowledge" throw
+!     ] ifte
+! ] "infer" set-word-property
 
 : type-value-map ( value -- )
     num-types [ dup builtin-type pick swons cons ] project

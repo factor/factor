@@ -73,7 +73,7 @@ USE: prettyprint
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths vector-transpose [ unify-results ] vector-map ;
+    unify-lengths vector-transpose [ unify-results ] vector-map ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
@@ -104,7 +104,7 @@ USE: prettyprint
     ] unless* ;
 
 : unify-effects ( list -- )
-    filter-terminators  dup datastack-effect callstack-effect ;
+    filter-terminators dup datastack-effect callstack-effect ;
 
 SYMBOL: cloned
 

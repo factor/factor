@@ -115,6 +115,8 @@ bool save_image(char* filename)
 
 void primitive_save_image(void)
 {
-	F_STRING* filename = untag_string(dpop());
+	F_STRING* filename;
+	primitive_gc();
+	filename = untag_string(dpop());
 	save_image(to_c_string(filename));
 }

@@ -114,6 +114,5 @@ unparse write " words total" print
 ! Save a bit of space
 global [ stdio off ] bind
 
-garbage-collection
 "factor.image" save-image
 0 exit*

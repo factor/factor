@@ -9,6 +9,8 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 		fprintf(stderr,"active.here  = %ld\n",active.here);
 		fprintf(stderr,"active.limit = %ld\n",active.limit);
 		fflush(stderr);
+		flip_zones();
+		dump_stacks();
 		exit(1);
 	}
 	else

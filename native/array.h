@@ -21,17 +21,5 @@ F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity);
 #define ASIZE(pointer) align8(sizeof(F_ARRAY) + \
 	((F_ARRAY*)(pointer))->capacity * CELLS)
 
-/* untagged & unchecked */
-INLINE CELL array_nth(F_ARRAY* array, CELL index)
-{
-	return get(AREF(array,index));
-}
-
-/* untagged & unchecked  */
-INLINE void set_array_nth(F_ARRAY* array, CELL index, CELL value)
-{
-	put(AREF(array,index),value);
-}
-
 void fixup_array(F_ARRAY* array);
 void collect_array(F_ARRAY* array);

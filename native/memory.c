@@ -87,6 +87,7 @@ void flip_zones()
 	ZONE z = active;
 	active = prior;
 	prior = z;
+	active.here = active.base;
 }
 
 bool in_zone(ZONE* z, CELL pointer)

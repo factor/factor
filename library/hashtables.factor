@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2004, 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,12 +25,23 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: hashtables
+IN: kernel-internals
 USE: generic
 USE: kernel
 USE: lists
 USE: math
 USE: vectors
+
+: hash-array vector-array ; inline
+: bucket-count >vector hash-array array-capacity ; inline
+
+: hash-bucket ( n hash -- alist )
+    swap >fixnum swap >vector hash-array array-nth ; inline
+
+: set-hash-bucket ( obj n hash -- )
+    >r >fixnum r> hash-array set-array-nth ; inline
+
+IN: hashtables
 
 ! Note that the length of a hashtable vector must not change
 ! for the lifetime of the hashtable, otherwise problems will
@@ -48,13 +59,13 @@ PREDICATE: vector hashtable ( obj -- ? )
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.
-    >r hashcode r> vector-length rem ; inline
+    >r hashcode r> bucket-count rem ; inline
 
 : hash* ( key table -- [[ key value ]] )
     #! Look up a value in the hashtable. First the bucket is
     #! determined using the hash function, then the association
     #! list therein is searched linearly.
-    2dup (hashcode) swap vector-nth assoc* ;
+    2dup (hashcode) swap hash-bucket assoc* ;
 
 : hash ( key table -- value )
     #! Unlike hash*, this word cannot distinglish between an
@@ -67,9 +78,9 @@ PREDICATE: vector hashtable ( obj -- ? )
         2dup (hashcode)
     r> pick >r
         over >r
-            >r swap vector-nth r> call
+            >r swap hash-bucket r> call
         r>
-    r> set-vector-nth ; inline
+    r> set-hash-bucket ; inline
     
 : set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
@@ -84,12 +95,6 @@ PREDICATE: vector hashtable ( obj -- ? )
 : hash-each ( hash code -- )
     #! Apply the code to each key/value pair of the hashtable.
     swap [ swap dup >r each r> ] vector-each drop ; inline
-
-: hash-subset ( hash code -- hash )
-    #! Return a new hashtable containing all key/value pairs
-    #! for which the predicate yielded a true value. The
-    #! predicate must have stack effect ( obj -- ? ).
-    swap [ swap dup >r subset r> swap ] vector-map nip ; inline
 
 : hash-keys ( hash -- list )
     #! Push a list of keys in a hashtable.

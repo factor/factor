@@ -1,5 +1,5 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -g $(SITE_CFLAGS)
+DEFAULT_CFLAGS = -Wall -Os -fomit-frame-pointer $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip
@@ -68,7 +68,7 @@ solaris:
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-	#$(STRIP) $@
+	$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)

@@ -55,8 +55,6 @@ USE: words
     [ ifte                   [ [ object general-list general-list ] [ ] ] ]
     [ cons                   [ [ object object ] [ cons ] ] ]
     [ <vector>               [ [ integer ] [ vector ] ] ]
-    [ vector-nth             [ [ integer vector ] [ object ] ] ]
-    [ set-vector-nth         [ [ object integer vector ] [ ] ] ]
     [ str-nth                [ [ integer string ] [ integer ] ] ]
     [ str-compare            [ [ string string ] [ integer ] ] ]
     [ str=                   [ [ string string ] [ boolean ] ] ]
@@ -222,7 +220,7 @@ USE: words
     [ set-slot               [ [ object object fixnum ] [ ] ] ]
     [ integer-slot           [ [ object fixnum ] [ integer ] ] ]
     [ set-integer-slot       [ [ integer object fixnum ] [ ] ] ]
-    [ grow-array             [ [ integer array ] [ integer ] ] ]
+    [ grow-array             [ [ integer array ] [ object ] ] ]
 ] [
     2unlist dup string? [
         "stack-effect" set-word-property

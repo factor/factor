@@ -153,6 +153,11 @@ SYMBOL: list-buffer
     #! was called.
     make-rlist reverse ; inline
 
+: make-vector ( quot -- list )
+    #! Return a vector whose entries are in the same order that
+    #! , was called.
+    make-list list>vector ; inline
+
 : , ( obj -- )
     #! Append an object to the currently constructing list.
     list-buffer cons@ ;

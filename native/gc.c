@@ -119,7 +119,7 @@ void primitive_gc(void)
 	fflush(stderr);
 
 	flip_zones();
-	scan = active.here = active.base;
+	scan = active.base;
 	collect_roots();
 	collect_io_tasks();
 	/* collect literal objects referenced from compiled code */

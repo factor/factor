@@ -17,6 +17,9 @@
 
 + ffi:
 
+- value type structs
+- unicode strings
+- out parameters
 - figure out how to load an image referring to missing libraries
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
@@ -49,13 +52,12 @@
 + kernel:
 
 - ppc register decls
-- do partial objects cause problems?
-- remove sbufs
 - cat, reverse-cat primitives
 - first-class hashtables
 
 + misc:
 
+- make-vector and make-string should not need a reverse step
 - perhaps /i should work with all numbers
 - jedit ==> jedit-word, jedit takes a file name
 - browser responder for word links in HTTPd

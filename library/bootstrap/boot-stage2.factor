@@ -48,6 +48,7 @@ USE: namespaces
     "/version.factor"
     "/library/stack.factor"
     "/library/combinators.factor"
+    "/library/arrays.factor"
     "/library/kernel.factor"
     "/library/cons.factor"
     "/library/assoc.factor"

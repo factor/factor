@@ -83,6 +83,9 @@ SYMBOL: input-line
 SYMBOL: console-font
 #! Font height.
 SYMBOL: line-height
+#! If this is on, the console will be redrawn on the next event
+#! refresh cycle.
+SYMBOL: redraw-console
 
 #! The font size is hardcoded here.
 : char-width 8 ;
@@ -174,8 +177,10 @@ SYMBOL: line-height
         0 y set
         clear-display
         draw-lines
-        draw-current
-        draw-input
+        height get y get - line-height get >= [
+            draw-current
+            draw-input
+        ] when
         draw-scrollbar
     ] with-surface ;
 
@@ -186,7 +191,7 @@ SYMBOL: line-height
     lines get vector-push scroll-to-bottom ;
 
 : console-write ( text -- )
-    "\n" split1 [       
+    "\n" split1 [
         swap output-line get sbuf-append
         output-line get empty-buffer add-line
     ] when*
@@ -215,7 +220,7 @@ M: console-stream fflush ( stream -- )
 
 M: console-stream fauto-flush ( stream -- )
     [
-        console get [ draw-console ] bind
+        console get [ redraw-console on ] bind
     ] bind ;
 
 M: console-stream freadln ( stream -- line )
@@ -280,10 +285,10 @@ SYMBOL: keymap
 
 M: key-down-event handle-event ( event -- ? )
     dup keyboard-event>binding keymap get hash [
-        call draw-console
+        call redraw-console on
     ] [
         dup input-key? [
-            keyboard-event-unicode user-input draw-console
+            keyboard-event-unicode user-input redraw-console on
         ] [
             drop
         ] ifte
@@ -296,10 +301,10 @@ SYMBOL: drag-start-line
 
 : scrollbar-click ( y -- )
     dup scrollbar-top < [
-        drop page-scroll-up draw-console
+        drop page-scroll-up redraw-console on
     ] [
         dup scrollbar-bottom > [
-            drop page-scroll-down draw-console
+            drop page-scroll-down redraw-console on
         ] [
             drag-start-y set
             first-line get drag-start-line set
@@ -323,7 +328,7 @@ M: motion-event handle-event ( event -- ? )
         motion-event-y drag-start-y get -
         height get / total-lines * drag-start-line get +
         >fixnum fix-first-line first-line set
-        draw-console
+        redraw-console on
     ] [
         drop
     ] ifte t ;
@@ -332,7 +337,7 @@ M: resize-event handle-event ( event -- ? )
     dup resize-event-w swap resize-event-h
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
     scroll-to-bottom
-    draw-console t ;
+    redraw-console on t ;
 
 M: quit-event handle-event ( event -- ? )
     drop f ;
@@ -366,6 +371,7 @@ M: alien handle-event ( event -- ? )
     SDL_EnableKeyRepeat drop ;
 
 : console-loop ( -- )
+    redraw-console get [ draw-console redraw-console off ] when
     check-event [ console-loop ] when ;
 
 : console-quit ( -- )
@@ -395,7 +401,7 @@ IN: shells
         ] callcc0
 
         console get [
-            draw-console
+            redraw-console on
             console-loop
             console-quit
         ] bind

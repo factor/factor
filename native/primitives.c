@@ -9,8 +9,6 @@ void* primitives[] = {
 	primitive_ifte,
 	primitive_cons,
 	primitive_vector,
-	primitive_vector_nth,
-	primitive_set_vector_nth,
 	primitive_string_nth,
 	primitive_string_compare,
 	primitive_string_eq,

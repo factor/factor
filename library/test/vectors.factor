@@ -6,10 +6,12 @@ USE: test
 USE: vectors
 USE: strings
 USE: namespaces
+USE: kernel-internals
 
 [ [ t f t ] vector-length ] unit-test-fails
 [ 3 ] [ { t f t } vector-length ] unit-test
 
+[ -3 { } vector-nth ] unit-test-fails
 [ 3 { } vector-nth ] unit-test-fails
 [ 3 #{ 1 2 }# vector-nth ] unit-test-fails
 
@@ -74,3 +76,9 @@ unit-test
 [ "funny-stack" get vector-pop ] unit-test-fails
 [ ] [ "funky" "funny-stack" get vector-push ] unit-test
 [ "funky" ] [ "funny-stack" get vector-pop ] unit-test
+
+[ t ] [
+    10 <vector> dup vector-array array-capacity
+    >r vector-clone vector-array array-capacity r>
+    =
+] unit-test

@@ -1,8 +1,8 @@
-! :folding=indent:collapseFolds=1:
+! :folding=none:collapseFolds=1:
 
 ! $Id$
 !
-! Copyright (C) 2004 Slava Pestov.
+! Copyright (C) 2005 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -27,60 +27,27 @@
 
 IN: kernel-internals
 USE: generic
+USE: math-internals
 USE: kernel
-USE: vectors
 
-: dispatch ( n vtable -- )
-    #! This word is unsafe since n is not bounds-checked. Do not
-    #! call it directly.
-    vector-array array-nth call ;
+! An array is a range of memory storing pointers to other
+! objects. Arrays are not used directly, and their access words
+! are not bounds checked. Examples of abstractions built on
+! arrays include vectors, hashtables, and tuples.
 
-IN: kernel
+! These words are unsafe. I'd say "do not call them", but that
+! Java-esque. By all means, do use arrays if you need something
+! low-level... but be aware that vectors are usually a better
+! choice.
 
-GENERIC: hashcode ( obj -- n )
-M: object hashcode drop 0 ;
+BUILTIN: array 8
 
-GENERIC: = ( obj obj -- ? )
-M: object = eq? ;
+: array-capacity   ( array -- n )   1 integer-slot ; inline
+: vector-array     ( vec -- array ) 2 slot ; inline
+: set-vector-array ( array vec -- ) 2 set-slot ; inline
 
-: cpu ( -- arch )
-    #! Returns one of "x86" or "unknown".
-    7 getenv ;
+: array-nth ( n array -- obj )
+    swap 2 fixnum+ slot ; inline
 
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
-
-: set-boot ( quot -- )
-    #! Set the boot quotation.
-    8 setenv ;
-
-: num-types ( -- n )
-    #! One more than the maximum value from type primitive.
-    18 ;
-
-: ? ( cond t f -- t/f )
-    #! Push t if cond is true, otherwise push f.
-    rot [ drop ] [ nip ] ifte ; inline
-
-: >boolean t f ? ; inline
-
-: and ( a b -- a&b ) f ? ; inline
-: not ( a -- ~a ) f t ? ; inline
-: or ( a b -- a|b ) t swap ? ; inline
-: xor ( a b -- a^b ) dup not swap ? ; inline
-
-IN: syntax
-
-! The canonical t is a heap-allocated dummy object. It is always
-! the first in the image.
-BUILTIN: t 7
-
-! In the runtime, the canonical f is represented as a null
-! pointer with tag 3. So
-! f address . ==> 3
-BUILTIN: f 9
-
-IN: kernel
-UNION: boolean f t ;
-COMPLEMENT: general-t f
+: set-array-nth ( obj n array -- )
+    swap 2 fixnum+ set-slot ; inline

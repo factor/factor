@@ -42,6 +42,7 @@ USE: hashtables
     "/version.factor" parse-resource append,
     "/library/stack.factor" parse-resource append,
     "/library/combinators.factor" parse-resource append,
+    "/library/arrays.factor" parse-resource append,
     "/library/kernel.factor" parse-resource append,
     "/library/cons.factor" parse-resource append,
     "/library/assoc.factor" parse-resource append,

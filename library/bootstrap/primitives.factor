@@ -59,8 +59,6 @@ vocabularies get [
     [[ "kernel" "ifte" ]]
     [[ "lists" "cons" ]]
     [[ "vectors" "<vector>" ]]
-    [[ "vectors" "vector-nth" ]]
-    [[ "vectors" "set-vector-nth" ]]
     [[ "strings" "str-nth" ]]
     [[ "strings" "str-compare" ]]
     [[ "strings" "str=" ]]
