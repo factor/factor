@@ -162,15 +162,24 @@ and free memory in the system.
         <body>
           <table border= "1" table>
             <tr> 
-              <td> "Total Memory" write </td>
+              <td> "Total Data Memory" write </td>
               <td> room unparse write </td>
             </tr>
             <tr> 
-              <td> "Free Memory" write </td>
+              <td> "Free Data Memory" write </td>
+              <td> unparse write </td>
+            </tr>
+            <tr> 
+              <td> "Total Code Memory" write </td>
+              <td> unparse write </td>
+            </tr>
+            <tr> 
+              <td> "Free Code Memory" write </td>
               <td> unparse write </td>
             </tr>
 	  </table>
 	</body>
+        <pre> room. </pre>
       </html>
     ] show drop ;
 
@@ -183,14 +192,14 @@ information.
 The HTML output can be refactored into different words. For example:
 
   : memory-stats-table ( free total -- )
-    #! Output a table containing the given statistcs.
+    #! Output a table containing the given statistics.
     <table border= "1" table>
       <tr> 
-        <td> "Total Memory" write </td>
+        <td> "Total Data Memory" write </td>
         <td> unparse write </td>
       </tr>
       <tr> 
-        <td> "Free Memory" write </td>
+        <td> "Free Data Memory" write </td>
         <td> unparse write </td>
       </tr>
     </table> ;
@@ -200,7 +209,7 @@ The HTML output can be refactored into different words. For example:
       drop
       <html>
         <head> <title> "Memory Statistics 2" write </title> </head>
-        <body> room memory-stats-table </body>
+        <body> room memory-stats-table 2drop </body>
       </html>
     ] show drop ;
 
@@ -303,7 +312,7 @@ page.
 
 Notice that after the show that a '3drop' is done whereas
 previously we've only done a single 'drop'. This is due to a side
-effect or 'show' using continuations. 
+effect of 'show' using continuations. 
 
 After the 'show' call returns there will be one item on the stack
 (which we've been dropping and will explain later what it is). The

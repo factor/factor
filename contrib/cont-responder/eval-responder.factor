@@ -117,7 +117,7 @@ USE: logging
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
       <tr> <td valign= "top" td> [ apropos. ] with-simple-html-output </td> 
-           <td valign= "top" td> [ usages. ] with-simple-html-output </td>
+           <td valign= "top" td> [ [ parse ] [ [ "No such word" write ] [ car usages. ] ifte ] catch ] with-simple-html-output </td>
       </tr>
     </table>
   ] bind ;
@@ -126,17 +126,15 @@ USE: logging
   #! Write out the html for code that accepts
   #! the name of a word, and displays the source
   #! code of that word.
-  <form method= "post" action= "." form> 
+  [
+    [ 
+      "Enter the name of a word: " write
+      "see" [ html-for-word-source ] live-search
+    ]
     [
-      [ 
-        "Enter the name of a word: " write
-        "see" [ html-for-word-source ] live-search
-      ]
-      [
-        <div id= "see" div> "" write </div>
-      ]
-    ] vertical-layout
-  </form> ;
+      <div id= "see" div> "" write </div>
+    ]
+  ] vertical-layout ;
 
 : display-last-output ( string -- )
   #! Write out html to display the last output.

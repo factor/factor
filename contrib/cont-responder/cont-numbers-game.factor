@@ -75,7 +75,7 @@ USE: namespaces
 
 : guess-banner
   "I'm thinking of a number between 0 and 100." web-print ;
-: guess-prompt "Enter your guess: " web-print ;
+: guess-prompt  ;
 : too-high "Too high" web-print ;
 : too-low "Too low" web-print ;
 : correct "Correct - you win!" web-print ;

@@ -100,7 +100,7 @@ USE: inspector
 : continuation-items ( -- alist )
   #! Return an alist of all continuation items in the continuation
   #! table with the car as the id and the cdr as the item.
-  continuation-table [ vars-values ] bind ;
+  continuation-table hash>alist ;
 
 : expire-continuations ( timeout-seconds -- )
   #! Expire all continuations in the continuation table

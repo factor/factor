@@ -45,6 +45,7 @@ USE: parser
 USE: errors
 USE: unparser
 USE: logging
+USE: listener
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser
@@ -107,18 +108,8 @@ USE: logging
   ] bind drop ;
 
 : write-vm-statistics ( -- )
-  #! Display statistics about the JVM in use.
-  room swap unparse >r unparse r> 
-  <table> 
-    <tr>  
-      <td> "Free Memory" write </td>
-      <td> write </td> 
-    </tr>
-    <tr> 
-      <td> "Total Memory" write </td>
-      <td> write </td> 
-    </tr>
-  </table> ;
+  #! Display statistics about the vm.
+  <pre> room. </pre> ;
 
 : write-browser-body ( -- )
   #! Write out the HTML for the body of the main browser page.
