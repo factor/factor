@@ -98,9 +98,9 @@ public class FactorSideKickParser extends SideKickParser
 	public SideKickParsedData parse(Buffer buffer,
 		DefaultErrorSource errorSource)
 	{
-		Object words = buffer.getProperty(ARTIFACTS_PROPERTY);
-		if(words instanceof Cons)
-			forgetWords((Cons)words);
+		Object artifacts = buffer.getProperty(ARTIFACTS_PROPERTY);
+		if(artifacts instanceof Cons)
+			forgetArtifacts((Cons)artifacts);
 
 		FactorParsedData d = new FactorParsedData(
 			this,buffer.getPath());
@@ -157,17 +157,13 @@ public class FactorSideKickParser extends SideKickParser
 		return d;
 	} //}}}
 
-	//{{{ forgetWords() method
-	private void forgetWords(Cons words)
+	//{{{ forgetArtifacts() method
+	private void forgetArtifacts(Cons artifacts)
 	{
-		while(words != null)
+		while(artifacts != null)
 		{
-			FactorWord word = (FactorWord)words.car;
-			// We're not allowed to forget parsing words.
-			if(word.parsing != null)
-				return;
-			FactorPlugin.getExternalInstance().forget(word);
-			words = words.next();
+			((FactorArtifact)artifacts.car).forget();
+			artifacts = artifacts.next();
 		}
 	} //}}}
 

@@ -41,9 +41,9 @@ strings vectors words hashtables parser prettyprint ;
     ] ifte* ;
 
 : no-effect ( word -- )
-    "Unknown stack effect: " swap word-name cat2 throw ;
+    "Unknown stack effect: " swap word-name cat2 inference-error ;
 
-: with-block ( word label quot -- node )
+: with-block ( word [[ label quot ]] quot -- node )
     #! Execute a quotation with the word on the stack, and add
     #! its dataflow contribution to a new block node in the IR.
     over [
@@ -60,7 +60,9 @@ strings vectors words hashtables parser prettyprint ;
     #! Infer the stack effect of a compound word in the current
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
-    gensym [ word-parameter infer-quot effect ] with-block ;
+    gensym over word-parameter cons [
+        word-parameter infer-quot effect
+    ] with-block ;
 
 : infer-compound ( word -- )
     #! Infer a word's stack effect in a separate inferencer
@@ -82,6 +84,10 @@ strings vectors words hashtables parser prettyprint ;
     ] catch ;
 
 GENERIC: (apply-word)
+
+M: object (apply-word) ( word -- )
+    #! A primitive with an unknown stack effect.
+    no-effect ;
 
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.
@@ -110,9 +116,9 @@ M: symbol (apply-word) ( word -- )
         rethrow
     ] catch ;
 
-: base-case ( word label -- )
+: base-case ( word [ label quot ] -- )
     [
-        over inline-compound [
+        car over inline-compound [
             drop
             [ #call-label ] [ #call ] ?ifte
             node-op set
@@ -121,9 +127,9 @@ M: symbol (apply-word) ( word -- )
     ] with-recursion ;
 
 : no-base-case ( word -- )
-    word-name " does not have a base case." cat2 throw ;
+    word-name " does not have a base case." cat2 inference-error ;
 
-: recursive-word ( word label -- )
+: recursive-word ( word [ label quot ] -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
@@ -152,11 +158,10 @@ M: symbol (apply-word) ( word -- )
 : infer-call ( -- )
     [ general-list ] ensure-d
     dataflow-drop,
-    gensym dup [
-        drop pop-d dup
-        value-recursion recursive-state set
-        literal-value
-        dup infer-quot
+    pop-d gensym dup pick literal-value cons [
+        drop
+        dup value-recursion recursive-state set
+        literal-value dup infer-quot
     ] with-block drop handle-terminator ;
 
 \ call [ infer-call ] "infer" set-word-property

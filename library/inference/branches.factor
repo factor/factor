@@ -50,7 +50,7 @@ strings vectors words hashtables prettyprint ;
     dup balanced? [
         unzip unify-stacks >r unify-stacks r>
     ] [
-        "Unbalanced branches" throw
+        "Unbalanced branches" inference-error
     ] ifte ;
 
 : datastack-effect ( list -- )
@@ -79,7 +79,7 @@ SYMBOL: cloned
 : deep-clone ( obj -- obj )
     #! Clone an object if it hasn't already been cloned in this
     #! with-deep-clone scope.
-    dup cloned get assoc [
+    dup cloned get assq [
         clone [ dup cloned [ acons ] change ] keep
     ] ?unless ;
 
@@ -146,10 +146,10 @@ SYMBOL: cloned
     #! parameter is a vector.
     (infer-branches) dup unify-effects unify-dataflow ;
 
-: (with-block) ( label quot -- node )
+: (with-block) ( [[ label quot ]] quot -- node )
     #! Call a quotation in a new namespace, and transfer
     #! inference state from the outer scope.
-    swap >r [
+    swap car >r [
         dataflow-graph off
         call
         d-in get meta-d get meta-r get get-dataflow

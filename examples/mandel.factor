@@ -89,10 +89,10 @@ SYMBOL: center
     ] with-pixels ; compiled
 
 : mandel ( -- )
-    640 480 0 SDL_HWSURFACE [
+    1280 1024 0 SDL_HWSURFACE  [
         [
-            0.8 zoom-fact set
-            -0.65 center set
+            3.7 zoom-fact set
+            -0.45 center set
             100 nb-iter set
             init-mandel
             [ render ] time

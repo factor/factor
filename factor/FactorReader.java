@@ -46,7 +46,7 @@ public class FactorReader
 	/**
 	 * Top level of parse tree.
 	 */
-	private FactorWord toplevel = new FactorWord(null,"#<EOF>");
+	private FactorWord toplevel = new FactorWord(null,null,"#<EOF>");
 	private boolean alwaysDocComments;
 
 	private Cons use;

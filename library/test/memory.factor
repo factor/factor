@@ -1,14 +1,12 @@
 IN: scratchpad
-USE: kernel
-USE: math
-USE: memory
-USE: generic
-USE: lists
+USING: generic kernel lists math memory words ;
 
 num-types [
     [
-        builtin-type instances [
-            class drop
-        ] each
+        builtin-type [
+            "predicate" word-property instances [
+                class drop
+            ] each
+        ] when*
     ] keep
 ] repeat

@@ -1,43 +1,8 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
 ! Copyright (C) 2004, 2005 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USE: errors
-USE: interpreter
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: strings
-USE: vectors
-USE: words
-USE: hashtables
-USE: generic
-USE: prettyprint
+USING: generic interpreter kernel lists math namespaces strings
+unparser vectors words ;
 
 : max-recursion 0 ;
 
@@ -77,8 +42,20 @@ C: computed ( class -- value )
 M: computed value= ( literal value -- ? )
     2drop f ;
 
+: failing-class-and
+    2dup class-and dup null = [
+        drop [
+            word-name , " and " , word-name ,
+            " do not intersect" ,
+        ] make-string inference-error
+    ] [
+        2nip
+    ] ifte ;
+
 M: computed value-class-and ( class value -- )
-    [ value-class class-and ] keep set-value-class ;
+    [
+        value-class failing-class-and
+    ] keep set-value-class ;
 
 TUPLE: literal value delegate ;
 
@@ -97,6 +74,10 @@ M: literal value-class-and ( class value -- )
 
 M: literal set-value-class ( class value -- )
     2drop ;
+
+M: computed literal-value ( value -- )
+    "A literal value was expected where a computed value was"
+    " found: " rot unparse cat3 inference-error ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -191,7 +172,7 @@ DEFER: apply-word
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get vector-length 0 = [
-        "Word leaves elements on return stack" throw
+        "Word leaves elements on return stack" inference-error
     ] unless ;
 
 : values-node ( op -- )

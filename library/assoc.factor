@@ -11,13 +11,20 @@ IN: lists USING: kernel ;
     dup list? [ [ cons? ] all? ] [ drop f ] ifte ;
 
 : assoc* ( key alist -- [[ key value ]] )
-    #! Looks up the key in an alist. Push the key/value pair.
-    #! Most of the time you want to use assoc not assoc*.
+    #! Look up a key/value pair.
     [ car = ] some-with?  dup [ car ] when ;
 
 : assoc ( key alist -- value )
-    #! Looks up the key in an alist.
+    #! Look up a value.
     assoc*  dup [ cdr ] when ;
+
+: assq* ( key alist -- [[ key value ]] )
+    #! Looks up a key/value pair using identity comparison.
+    [ car eq? ] some-with?  dup [ car ] when ;
+
+: assq ( key alist -- value )
+    #! Looks up a key/value pair using identity comparison.
+    assq*  dup [ cdr ] when ;
 
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.

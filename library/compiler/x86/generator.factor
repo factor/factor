@@ -40,12 +40,34 @@ math memory namespaces words ;
     compile-jump-label
 ] "generator" set-word-property
 
-#jump-t [
+: compile-jump-t ( word -- )
     POP-DS
     ! condition is now in EAX
     EAX f address CMP
     ! jump w/ address added later
-    0 JNE fixup compiled-offset defer-xt
+    0 JNE fixup compiled-offset defer-xt ;
+
+#jump-t-label [
+    compile-jump-t
+] "generator" set-word-property
+
+#jump-t [
+    dup compile-jump-t t rel-word
+] "generator" set-word-property
+
+: compile-jump-f ( word -- )
+    POP-DS
+    ! condition is now in EAX
+    EAX f address CMP
+    ! jump w/ address added later
+    0 JE fixup compiled-offset defer-xt ;
+
+#jump-f-label [
+    compile-jump-f
+] "generator" set-word-property
+
+#jump-f [
+    dup compile-jump-f t rel-word
 ] "generator" set-word-property
 
 #return-to [

@@ -47,7 +47,7 @@ C: quuux-tuple-2
     100 200 <point>
     
     ! Use eval to sequence parsing explicitly
-    "TUPLE: point y x ;" eval
+    "TUPLE: point x y z ;" eval
     
     point-x
 ] unit-test

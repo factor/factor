@@ -193,7 +193,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		{
 			// save to same workspace as vocabulary,
 			// or no workspace if vocabulary is builtins
-			FactorWord word = new FactorWord(vocabulary,name);
+			FactorWord word = new FactorWord(this,vocabulary,name);
 			v.put(name,word);
 			return word;
 		}

@@ -67,4 +67,6 @@ public abstract class FactorArtifact
 	
 	public abstract String getShortString();
 	public abstract String getLongString();
+	
+	public void forget() {}
 }
