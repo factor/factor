@@ -1,4 +1,4 @@
-!:folding=none:collapseFolds=1:
+! :folding=none:collapseFolds=1:
 
 ! $Id$
 !
@@ -79,8 +79,11 @@ primitives,
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
     "/library/platform/native/kernel.factor"
+    "/library/platform/native/image.factor"
     "/library/platform/native/namespaces.factor"
+    "/library/platform/native/parse-numbers.factor"
     "/library/platform/native/parser.factor"
+    "/library/platform/native/parse-syntax.factor"
     "/library/platform/native/parse-stream.factor"
     "/library/platform/native/prettyprint.factor"
     "/library/platform/native/stack.factor"
@@ -100,7 +103,7 @@ primitives,
     max 2list length reverse nth list? 2rlist
     all? clone-list clone-list-iter subset subset-iter
     subset-add car= cdr= cons= cons-hashcode
-    tree-contains? =-or-contains? last* last
+    tree-contains? =-or-contains? last* last inject
 ] [ worddef worddef, ] each
 
 version,

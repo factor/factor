@@ -1,8 +1,8 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
-! Copyright (C) 2003 Slava Pestov.
+! Copyright (C) 2003, 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:

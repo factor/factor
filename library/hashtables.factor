@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -33,9 +33,9 @@ USE: lists
 USE: stack
 USE: vectors
 
-!!! Note that the length of a hashtable vector must not change
-!!! for the lifetime of the hashtable, otherwise problems will
-!!! occur. Do not use vector words with hashtables.
+! Note that the length of a hashtable vector must not change
+! for the lifetime of the hashtable, otherwise problems will
+! occur. Do not use vector words with hashtables.
 
 : hashtable? ( obj -- ? )
     dup vector? [ [ assoc? ] vector-all? ] [ drop f ] ifte ;

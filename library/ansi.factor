@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -35,7 +35,8 @@ USE: stack
 USE: streams
 USE: strings
 
-!!! Some words for outputting ANSI colors.
+! Some words for outputting ANSI colors.
+
 : black   0 ; inline
 : red     1 ; inline
 : green   2 ; inline

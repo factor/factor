@@ -1,4 +1,4 @@
-!:folding=none:collapseFolds=1:
+! :folding=none:collapseFolds=1:
 
 ! $Id$
 !
@@ -107,7 +107,11 @@ IN: cross-compiler
         mod
         /mod
         bitand
+        bitor
         bitxor
+        bitnot
+        shift>
+        shift<
         <
         <=
         >
@@ -176,4 +180,4 @@ IN: cross-compiler
 
     ! Uncomment this on sparc and powerpc.
     ! "big-endian" on
-    "native/factor.image" write-image ;
+    "factor.image" write-image ;

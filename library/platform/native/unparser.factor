@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -54,7 +54,7 @@ USE: vocabularies
 
 : unparse-str ( str -- str )
     #! Not done
-    <% #\" % % #\" % %> ;
+    <% CHAR: " % % CHAR: " % %> ;
 
 : unparse-word ( word -- str )
     word-name dup "#<unnamed>" ? ;

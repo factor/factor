@@ -42,7 +42,6 @@ void general_error(CELL error, CELL tagged)
 
 void type_error(CELL type, CELL tagged)
 {
-	printf("throwing %d %d\n",type,tagged);
 	CONS* c = cons(tag_fixnum(type),tag_cons(cons(tagged,F)));
 	general_error(ERROR_TYPE,tag_cons(c));
 }

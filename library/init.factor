@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -39,8 +39,8 @@ USE: stdio
 USE: streams
 USE: strings
 
-!!! This file is run as the last stage of boot.factor; it relies
-!!! on all other words already being defined.
+! This file is run as the last stage of boot.factor; it relies
+! on all other words already being defined.
 
 : init-search-path ( -- )
     #! Sets up the default vocabularies.

@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -52,6 +52,12 @@ USE: namespaces
 
 : <file-stream> ( path mode -- stream )
     open-file dup <native-stream> ;
+
+: <filebr> ( path -- stream )
+    "r" <file-stream> ;
+
+: <filebw> ( path -- stream )
+    "w" <file-stream> ;
 
 : init-stdio ( -- )
     stdin stdout <native-stream> "stdio" set ;

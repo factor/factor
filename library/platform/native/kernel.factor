@@ -1,4 +1,4 @@
-!:folding=none:collapseFolds=1:
+! :folding=none:collapseFolds=1:
 
 ! $Id$
 !
@@ -95,9 +95,11 @@ USE: words
 : inline ;
 : interpret-only ;
 
-!!! HACK
+! HACKS
 
 IN: strings
+: char? drop f ;
+: >char ;
 : >upper ;
 : >lower ;
 IN: lists

@@ -1,6 +1,7 @@
 + native:
 
-- parsing: #\, |
+- top level catch should be a continuation
+- parsing: #\
 - {...} vectors
 - parsing should be parsing
 - telnetd: listening on a socket

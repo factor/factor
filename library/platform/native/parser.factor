@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -39,47 +39,6 @@ USE: words
 USE: vocabularies
 USE: unparser
 
-! Number parsing
-
-: letter? #\a #\z between? ;
-: LETTER? #\A #\Z between? ;
-: digit? #\0 #\9 between? ;
-
-: not-a-number "Not a number" throw ;
-
-: digit> ( ch -- n )
-    [
-        [ digit? ] [ #\0 - ]
-        [ letter? ] [ #\a - 10 + ]
-        [ LETTER? ] [ #\A - 10 + ]
-        [ drop t ] [ not-a-number ]
-    ] cond ;
-
-: >digit ( n -- ch )
-    dup 10 < [ #\0 + ] [ 10 - #\a + ] ifte ;
-
-: digit ( num digit -- num )
-    "base" get swap 2dup >= [
-        >r * r> +
-    ] [
-        not-a-number
-    ] ifte ;
-
-: (str>fixnum) ( str -- num )
-    0 swap [ digit> digit ] str-each ;
-
-: str>fixnum ( str -- num )
-    #! Parse a string representation of an integer.
-    dup str-length 0 = [
-        drop not-a-number
-    ] [
-        dup "-" str-head? dup [
-            nip str>fixnum neg
-        ] [
-            drop (str>fixnum)
-        ] ifte
-    ] ifte ;
-
 ! The parser uses a number of variables:
 ! line - the line being parsed
 ! pos  - position in the line
@@ -118,7 +77,7 @@ USE: unparser
     #! "hello world"
     #!
     #! Will call the parsing word ".
-    ch "\"!" str-contains? ;
+    ch "\"" str-contains? ;
 
 : (scan) ( -- start end )
     skip-blank "pos" get
@@ -165,7 +124,7 @@ USE: unparser
 : eval ( "X" -- X )
     parse call ;
 
-!!! Used by parsing words
+! Used by parsing words
 : ch-search ( ch -- index )
     "pos" get "line" get rot index-of* ;
 
@@ -175,87 +134,8 @@ USE: unparser
 : until ( ch -- str )
     ch-search (until) ;
 
-: until-eol ( ch -- str )
+: until-eol ( -- str )
     "line" get str-length (until) ;
 
 : next-ch ( -- ch )
     end? [ "Unexpected EOF" throw ] [ ch advance ] ifte ;
-
-!!! Parsing words. 'builtins' is a stupid vocabulary name now
-!!! that it does not contain Java words anymore!
-
-IN: builtins
-
-! Constants
-: t t parsed ; parsing
-: f f parsed ; parsing
-
-! Lists
-: [ f ; parsing
-: ] nreverse parsed ; parsing
-
-: | ( syntax: | cdr ] )
-    #! See the word 'parsed'. We push a special sentinel, and
-    #! 'parsed' acts accordingly.
-    "|" ; parsing
-
-! Colon defs
-: :
-    #! Begin a word definition. Word name follows.
-    scan "in" get create f ; parsing
-
-: ;
-    #! End a word definition.
-    nreverse define ; parsing
-
-! Vocabularies
-: DEFER: scan "in" get create drop ; parsing
-: USE: scan "use" cons@ ; parsing
-: IN: scan dup "use" cons@ "in" set ; parsing
-
-! \x
-: escape ( ch -- esc )
-    [
-        [ #\e | #\\e ]
-        [ #\n | #\\n ]
-        [ #\r | #\\r ]
-        [ #\t | #\\t ]
-        [ #\s | #\\s ]
-        [ #\\s | #\\s ]
-        [ #\0 | #\\0 ]
-        [ #\\\ | #\\\ ]
-        [ #\\" | #\\" ]
-    ] assoc ;
-
-! String literal
-
-: parse-escape ( -- )
-    next-ch escape dup [ % ] [ drop "Bad escape" throw ] ifte ;
-
-: parse-string ( -- )
-    next-ch dup #\" = [
-        drop
-    ] [
-        dup #\\\ = [ drop parse-escape ] [ % ] ifte parse-string
-    ] ifte ;
-
-: "
-    #! Note the ugly hack to carry the new value of 'pos' from
-    #! the <% %> scope up to the original scope.
-    <% parse-string "pos" get %> swap "pos" set parsed ; parsing
-
-! Comments
-: ( ")" until drop ; parsing
-: ! until-eol drop ; parsing
-: #! until-eol drop ; parsing
-    
-! Reading numbers in other bases
-
-: BASE: ( base -- )
-    #! Read a number in a specific base.
-    "base" get >r "base" set scan number, r> "base" set ;
-
-: HEX: 16 BASE: ; parsing
-: DEC: 10 BASE: ; parsing
-: OCT: 8 BASE: ; parsing
-: BIN: 2 BASE: ; parsing

@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -34,24 +34,24 @@ USE: stack
 USE: strings
 USE: vectors
 
-!!! Other languages have classes, objects, variables, etc.
-!!! Factor has similar concepts.
-!!!
-!!!   5 "x" set
-!!!   "x" get 2 + .
-!!! 7
-!!!   7 "x" set
-!!!   "x" get 2 + .
-!!! 9
-!!!
-!!! get ( name -- value ) and set ( value name -- ) search in
-!!! the namespaces on the namespace stack, in top-down order.
-!!!
-!!! At the bottom of the namespace stack, is the global
-!!! namespace; it is always present.
-!!!
-!!! bind ( namespace quot -- ) executes a quotation with a
-!!! namespace pushed on the namespace stack.
+! Other languages have classes, objects, variables, etc.
+! Factor has similar concepts.
+!
+!   5 "x" set
+!   "x" get 2 + .
+! 7
+!   7 "x" set
+!   "x" get 2 + .
+! 9
+!
+! get ( name -- value ) and set ( value name -- ) search in
+! the namespaces on the namespace stack, in top-down order.
+!
+! At the bottom of the namespace stack, is the global
+! namespace; it is always present.
+!
+! bind ( namespace quot -- ) executes a quotation with a
+! namespace pushed on the namespace stack.
 
 : namestack ( -- stack )
     #! Push a copy of the namespace stack; same naming

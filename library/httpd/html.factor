@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -40,11 +40,11 @@ USE: url-encoding
 
 : html-entities ( -- alist )
     [
-        [ #\< | "&lt;"   ]
-        [ #\> | "&gt;"   ]
-        [ #\& | "&amp;"  ]
-        [ #\' | "&apos;" ]
-        [ #\" | "&quot;" ]
+        [ CHAR: < | "&lt;"   ]
+        [ CHAR: > | "&gt;"   ]
+        [ CHAR: & | "&amp;"  ]
+        [ CHAR: ' | "&apos;" ]
+        [ CHAR: " | "&quot;" ]
     ] ;
 
 : chars>entities ( str -- str )

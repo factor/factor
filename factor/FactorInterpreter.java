@@ -153,23 +153,39 @@ public class FactorInterpreter implements FactorObject, Runnable
 		in = "builtins";
 		use = new Cons(in,null);
 
-		// parsing words
+		/* comments */
 		FactorWord lineComment = define("builtins","!");
 		lineComment.parsing = new LineComment(lineComment,false);
 		FactorWord stackComment = define("builtins","(");
 		stackComment.parsing = new StackComment(stackComment);
+		FactorWord docComment = define("builtins","#!");
+		docComment.parsing = new LineComment(docComment,true);
+
+		/* strings */
 		FactorWord str = define("builtins","\"");
 		str.parsing = new StringLiteral(str,true);
+		FactorWord ch = define("builtins","CHAR:");
+		ch.parsing = new CharLiteral(ch);
+		FactorWord raw = define("builtins","#\"");
+		raw.parsing = new StringLiteral(raw,false);
+
+		/* constants */
 		FactorWord t = define("builtins","t");
 		t.parsing = new T(t);
 		FactorWord f = define("builtins","f");
 		f.parsing = new F(f);
+		FactorWord complex = define("builtins","#{");
+		complex.parsing = new ComplexLiteral(complex,"}");
+
+		/* lists */
 		FactorWord bra = define("builtins","[");
 		bra.parsing = new Bra(bra);
 		FactorWord ket = define("builtins","]");
 		ket.parsing = new Ket(bra,ket);
 		FactorWord bar = define("builtins","|");
 		bar.parsing = new Bar(bar);
+
+		/* word defs */
 		FactorWord def = define("builtins",":");
 		def.parsing = new Def(def);
 		def.getNamespace().setVariable("doc-comments",Boolean.TRUE);
@@ -178,20 +194,17 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorWord shuffle = define("builtins","~<<");
 		shuffle.parsing = new Shuffle(shuffle,">>~");
 
-		FactorWord noParsing = define("builtins","POSTPONE:");
-		noParsing.parsing = new NoParsing(noParsing);
+		/* reading numbers with another base */
+		FactorWord bin = define("builtins","BIN:");
+		bin.parsing = new Base(bin,2);
+		FactorWord oct = define("builtins","OCT:");
+		oct.parsing = new Base(oct,8);
+		FactorWord hex = define("builtins","HEX:");
+		hex.parsing = new Base(hex,16);
 
-		// #X
+		/* specials */
 		FactorWord dispatch = define("builtins","#");
 		dispatch.parsing = new Dispatch(dispatch);
-		FactorWord ch = define("builtins","#\\");
-		ch.parsing = new CharLiteral(ch);
-		FactorWord raw = define("builtins","#\"");
-		raw.parsing = new StringLiteral(raw,false);
-		FactorWord complex = define("builtins","#{");
-		complex.parsing = new ComplexLiteral(complex,"}");
-		FactorWord docComment = define("builtins","#!");
-		docComment.parsing = new LineComment(docComment,true);
 		FactorWord unreadable = define("builtins","#<");
 		unreadable.parsing = new Unreadable(unreadable);
 
@@ -201,7 +214,9 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorWord passthru = define("builtins","#:");
 		passthru.parsing = new PassThrough(passthru);
 
-		// vocabulary parsing words
+		/* vocabulary parsing words */
+		FactorWord noParsing = define("builtins","POSTPONE:");
+		noParsing.parsing = new NoParsing(noParsing);
 		FactorWord defer = define("builtins","DEFER:");
 		defer.parsing = new Defer(defer);
 		FactorWord in = define("builtins","IN:");
@@ -212,14 +227,6 @@ public class FactorInterpreter implements FactorObject, Runnable
 		FactorWord interpreterGet = define("builtins","interpreter");
 		interpreterGet.def = new InterpreterGet(interpreterGet);
 		interpreterGet.inline = true;
-
-		// reading numbers with another base
-		FactorWord bin = define("builtins","BIN:");
-		bin.parsing = new Base(bin,2);
-		FactorWord oct = define("builtins","OCT:");
-		oct.parsing = new Base(oct,8);
-		FactorWord hex = define("builtins","HEX:");
-		hex.parsing = new Base(hex,16);
 
 		// primitives used by 'expand' and 'map'
 		FactorWord restack = define("builtins","restack");

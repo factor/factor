@@ -1,4 +1,4 @@
-!:folding=indent:collapseFolds=1:
+! :folding=indent:collapseFolds=1:
 
 ! $Id$
 !
@@ -31,12 +31,12 @@ USE: kernel
 USE: namespaces
 USE: stack
 
-!!! A style is a namespace whose variable names and values hold
-!!! significance to the 'fwrite-attr' word when applied to a
-!!! stream that supports attributed string output.
-!!!
-!!! The default style enumerates the canonical names and values
-!!! to determine a style.
+! A style is a namespace whose variable names and values hold
+! significance to the 'fwrite-attr' word when applied to a
+! stream that supports attributed string output.
+!
+! The default style enumerates the canonical names and values
+! to determine a style.
 
 : default-style ( -- style )
     #! Push the default style object.
