@@ -36,7 +36,6 @@ USE: namespaces
 USE: stack
 USE: strings
 USE: words
-USE: vocabularies
 USE: unparser
 
 ! The parser uses a number of variables:

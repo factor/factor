@@ -1,13 +1,11 @@
 0.62:
 
-- stdout hangs
 - read-line: handle \r\n
-- flush output buffer before reading line
-- print: only flush in stdio stream
 - ignore errors from flush
 - can-read-line?
-- EOF in client connections
 - vector-each/map examples
+- unparse examples
+- finish second practical
 - sbuf-hashcode
 - vector-hashcode
 - listener backspace overzealous
@@ -52,7 +50,6 @@
 
 - read#
 - to_fixnum and friends: error on float
-ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
 - parsing should be parsing
 - describe-word
 - contains ==> contains?

@@ -25,11 +25,10 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: lists
 USE: namespaces
 USE: stack
-USE: words
 
 : (search) ( name vocab -- word )
     vocab dup [ get* ] [ 2drop f ] ifte ;

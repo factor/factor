@@ -1,8 +1,9 @@
-/* Buffer mode */
-typedef enum { B_READ_LINE, B_WRITE, B_NONE } B_MODE;
+typedef enum { PORT_READ, PORT_WRITE, PORT_SPECIAL } PORT_MODE;
 
 typedef struct {
 	CELL header;
+	/* one of PORT_READ or PORT_WRITE */
+	PORT_MODE type;
 	FIXNUM fd;
 	STRING* buffer;
 	/* tagged partial line used by read_line_fd */
@@ -10,9 +11,8 @@ typedef struct {
 	/* tagged client info used by accept_fd */
 	CELL client_host;
 	CELL client_port;
+	/* untagged fd of accepted connection */
 	CELL client_socket;
-	/* one of B_READ, B_WRITE or B_NONE */
-	B_MODE buf_mode;
 	/* top of buffer */
 	CELL buf_fill;
 	/* current read/write position */
@@ -20,8 +20,7 @@ typedef struct {
 } PORT;
 
 PORT* untag_port(CELL tagged);
-PORT* port(CELL fd);
-void init_buffer(PORT* port, int mode);
+PORT* port(PORT_MODE type, CELL fd);
 void primitive_portp(void);
 void fixup_port(PORT* port);
 void collect_port(PORT* port);

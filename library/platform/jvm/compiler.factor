@@ -32,7 +32,6 @@ USE: namespaces
 USE: stack
 USE: stdio
 USE: words
-USE: vocabularies
 
 : class-name ( class -- name )
     [ ] "java.lang.Class" "getName" jinvoke ;

@@ -38,7 +38,6 @@ USE: stack
 USE: stdio
 USE: strings
 USE: words
-USE: vocabularies
 
 : integer% ( num -- )
     "base" get /mod swap dup 0 > [

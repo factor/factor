@@ -42,7 +42,6 @@ USE: stdio
 USE: streams
 USE: strings
 USE: words
-USE: vocabularies
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.

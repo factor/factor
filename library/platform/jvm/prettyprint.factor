@@ -33,7 +33,6 @@ USE: prettyprint
 USE: stack
 USE: stdio
 USE: unparser
-USE: vocabularies
 USE: words
 
 : prettyprint-~<< ( indent -- indent )

@@ -42,7 +42,6 @@ USE: streams
 USE: strings
 USE: test
 USE: vectors
-USE: vocabularies
 USE: unparser
 USE: words
 

@@ -36,7 +36,6 @@ USE: namespaces
 USE: stack
 USE: strings
 USE: words
-USE: vocabularies
 USE: unparser
 
 ! Number parsing

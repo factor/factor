@@ -81,7 +81,6 @@ USE: strings
         [
             namespace fwrite
             "\n" namespace fwrite
-            namespace fflush
         ] "fprint" set
     ] extend ;
 

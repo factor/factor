@@ -1167,7 +1167,7 @@ Vectors are applicable to a different class of problems than lists.
 Compare the relative performance of common operations on vectors and
 lists:
 
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|r|l|l|}
 \hline 
 &
 Lists&
@@ -1298,7 +1298,7 @@ can write:
 Other special characters, such as quotes and tabs can be input in
 a similar manner. Here is the full list of supported character escapes:
 
-\begin{tabular}{|c|c|}
+\begin{tabular}{|r|l|}
 \hline 
 Character&
 Escape\tabularnewline
@@ -1773,6 +1773,25 @@ Reading a number, showing a menu
 
 \subsection{The name stack}
 
+So far, we have seen what we called ``the stack'' store intermediate values between computations. In fact Factor maintains a number of other stacks, and the formal name for the stack we've been dealing with so far is the \emph{data stack}.
+
+Another stack is the \emph{call stack}. When a colon definition is invoked, the position within the current colon definition is pushed on the stack. This ensures that calling words return to the caller, just as in any other language with subroutines.\footnote{Factor supports a variety of structures for implementing non-local word exits, such as exceptions, co-routines, continuations, and so on. They all rely on manipulating the call stack and are described in later sections.}
+
+The \emph{name stack} is the focus of this section. The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the name stack. Its definition is simpler than one would expect:
+
+\begin{alltt}
+: bind ( namespace quot -- )
+    swap >n call n> drop ;
+\end{alltt}
+
+The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
+
+The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
+
+\begin{alltt}
+: >n ( namespace -- n:namespace ) namestack* vector-push ;
+: n> ( n:namespace -- namespace ) namestack* vector-pop ;
+\end{alltt}
 
 \subsection{The inspector}
 
@@ -1780,15 +1799,75 @@ Reading a number, showing a menu
 \section{PRACTICAL: Music player}
 
 
-\section{Deeper in the beast}
+\section{Metaprogramming}
 
-Text -> objects - parser, objects -> text - unparser for atoms, prettyprinter
-for collections.
+Recall that code quotations are in fact just linked lists. Factor code is data, and vice versa. Essentially, the interpreter iterates through code quotations, pushing literals and executing words. When a word is executed, one of two things happen -- either the word has a colon definition, and the interpreter is invoked recursively on the definition, or the word is primitive, and it is executed by the underlying virtual machine. A word is itself a first-class object.
 
-What really is a word -- primitive, parameter, property list.
+It is the job of the parser to transform source code denoting literals and words into their internal representations. This is done using a vocabulary of \emph{parsing words}. The prettyprinter does the converse, by printing out data structures in a parsable form (both to humans and Factor). Because code is data, text representation of source code doubles as a way to serialize almost any Factor object.
 
-Call stack how it works and >r/r>
+\subsection{Looking at words}
 
+Try pushing a list of words on the stack, and take its first element:
+
+\begin{alltt}
+{[} * + {]} car .s
+\emph{\{ * \}}
+\end{alltt}
+
+What happened here? Instead of being executed, a ``naked'', unquoted word was pushed on the stack. The predicate \texttt{word? ( obj -{}- ? )} from the \texttt{words} vocabulary tests if the top of the stack is a word. Another way to get a word on the stack is to do a vocabulary search using a word name and a list of vocabularies to search in:
+
+\begin{alltt}
+"car" {[} "lists" {]} search .s
+\emph{\{ car \}}
+\end{alltt}
+
+The \texttt{search} word will push \texttt{f} if the word is not defined. A new word can be created in a specified vocabulary explicitly:
+
+\begin{alltt}
+"start-server" "user" create .s
+\emph{\{ start-server \}}
+\end{alltt}
+
+Two words are only ever equal under the \texttt{=} operator if they identify the same underlying object. Word objects are composed of three slots, named as follows.
+
+\begin{tabular}{|r|l|}
+\hline 
+Slot&
+Description\tabularnewline
+\hline
+\hline 
+Primitive&
+A number identifying a virtual machine operation.\tabularnewline
+\hline 
+Parameter&
+An object parameter for the virtual machine operation.\tabularnewline
+\hline 
+Property list&
+An association list of name/value pairs.\tabularnewline
+\hline
+\end{tabular}
+
+If the primitive number is set to 1, the word is a colon definition and the parameter must be a quotation. Any other primitive number denotes a function of the virtual machine, and the parameter is ignored. Do not rely on primitive numbers in your code, instead use the \texttt{compound? ( obj -{}- ? )} and \texttt{primitive? ( obj -{}- ? )} predicates.
+
+The word \texttt{define ( word quot -{}- )} defines a word to have the specified colon definition. Note that \texttt{create} and  \texttt{define} perform an action somewhat analagous to the \texttt{: ... ;} notation for colon definitions, except at parse time rather than run time.
+
+\subsection{The prettyprinter}
+
+We've already seen the word \texttt{.} which prints the top of the stack in a form that may be read back in. The word \texttt{prettyprint} is similar, except the output is in an indented, multiple-line format. Both words are in the \texttt{prettyprint} vocabulary. Here is an example:
+
+\begin{alltt}
+{[} 1 {[} 2 3 4 {]} 5 {]} .
+\emph{{[} 1 {[} 2 3 4 {]} 5 {]}}
+{[} 1 {[} 2 3 4 {]} 5 {]} prettyprint
+\emph{{[}
+    1 {[}
+        2 3 4
+    {]} 5
+{]}}
+\end{alltt}
+
+
+\subsection{The parser}
 
 \subsection{Parsing words}
 
@@ -1863,6 +1942,8 @@ types of objects. Strings are covered in great detail later.
 
 
 \section{Continuations}
+
+Call stack how it works and >r/r>
 
 Generators, co-routines, multitasking, exception handling
 

@@ -32,7 +32,6 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
-USE: vocabularies
 
 : word-property ( pname word -- pvalue )
     word-plist assoc ;

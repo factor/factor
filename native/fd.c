@@ -2,9 +2,8 @@
 
 void init_io(void)
 {
-	env.user[STDIN_ENV]  = tag_object(port(0));
-	env.user[STDOUT_ENV] = tag_object(port(1));
-	env.user[STDERR_ENV] = tag_object(port(2));
+	env.user[STDIN_ENV]  = tag_object(port(PORT_READ,0));
+	env.user[STDOUT_ENV] = tag_object(port(PORT_WRITE,1));
 }
 
 bool can_read_line(PORT* port)
@@ -98,13 +97,11 @@ bool can_write(PORT* port, FIXNUM len)
 {
 	CELL buf_capacity;
 
-	switch(port->buf_mode)
+	switch(port->type)
 	{
-	case B_NONE:
-		return true;
-	case B_READ_LINE:
+	case PORT_READ:
 		return false;
-	case B_WRITE:
+	case PORT_WRITE:
 		buf_capacity = port->buffer->capacity * CHARS;
 		/* Is the string longer than the buffer? */
 		if(port->buf_fill == 0 && len > buf_capacity)
@@ -116,7 +113,7 @@ bool can_write(PORT* port, FIXNUM len)
 		else
 			return (port->buf_fill + len <= buf_capacity);
 	default:
-		critical_error("Bad buf_mode",port->buf_mode);
+		critical_error("Bad port->type",port->type);
 		return false;
 	}
 }
@@ -135,8 +132,6 @@ void write_fd_char_8(PORT* port, FIXNUM ch)
 	if(!can_write(port,1))
 		io_error(port,__FUNCTION__);
 
-	init_buffer(port,B_WRITE);
-
 	bput((CELL)port->buffer + sizeof(STRING) + port->buf_fill,c);
 	port->buf_fill++;
 }
@@ -148,8 +143,6 @@ void write_fd_string_8(PORT* port, STRING* str)
 	/* Note this ensures the buffer is large enough to fit the string */
 	if(!can_write(port,str->capacity))
 		io_error(port,__FUNCTION__);
-
-	init_buffer(port,B_WRITE);
 
 	c_str = to_c_string(str);
 

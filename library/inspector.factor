@@ -40,7 +40,6 @@ USE: words
 USE: prettyprint
 USE: unparser
 USE: vectors
-USE: vocabularies
 
 : relative>absolute-object-path ( string -- string )
     "object-path" get [ "'" rot cat3 ] when* ;

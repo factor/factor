@@ -4,7 +4,6 @@ USE: namespaces
 USE: test
 USE: stack
 USE: words
-USE: vocabularies
 
 <namespace> "test-namespace" set
 

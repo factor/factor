@@ -61,10 +61,10 @@ USE: namespaces
     ] extend ;
 
 : <filecr> ( path -- stream )
-    t f open-file f <fd-stream> ;
+    t f open-file <fd-stream> ;
 
 : <filecw> ( path -- stream )
-    f t open-file f swap <fd-stream> ;
+    f t open-file <fd-stream> ;
 
 : <filebr> ( path -- stream )
     <filecr> ;
@@ -83,8 +83,8 @@ USE: namespaces
         [ "socket" get close-fd ] "fclose" set
     ] extend ;
 
-: <client-stream> ( host port socket -- stream )
-    dup <fd-stream> [ "port" set "client" set ] extend ;
+: <client-stream> ( host port in out -- stream )
+    <fd-stream> [ "port" set "client" set ] extend ;
 
 : accept ( server -- client )
     #! Accept a connection from a server socket.

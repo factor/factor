@@ -38,7 +38,6 @@ USE: streams
 USE: strings
 USE: vectors
 USE: vectors
-USE: vocabularies
 USE: words
 
 IN: arithmetic

@@ -11,18 +11,24 @@ PORT* untag_port(CELL tagged)
 	return p;
 }
 
-PORT* port(CELL fd)
+PORT* port(PORT_MODE type, CELL fd)
 {
 	PORT* port = allot_object(PORT_TYPE,sizeof(PORT));
+	port->type = type;
 	port->fd = fd;
 	port->buffer = NULL;
 	port->line = F;
 	port->client_host = F;
 	port->client_port = F;
 	port->client_socket = F;
-	port->buf_mode = B_NONE;
+	port->line = F;
 	port->buf_fill = 0;
 	port->buf_pos = 0;
+
+	if(type == PORT_SPECIAL)
+		port->buffer = NULL;
+	else
+		port->buffer = string(BUF_SIZE,'\0');
 
 	if(fcntl(port->fd,F_SETFL,O_NONBLOCK,1) == -1)
 		io_error(port,__FUNCTION__);
@@ -35,28 +41,6 @@ void primitive_portp(void)
 	drepl(tag_boolean(typep(PORT_TYPE,dpeek())));
 }
 
-void init_buffer(PORT* port, int mode)
-{
-	if(port->buf_mode == B_NONE)
-		port->buffer = string(BUF_SIZE,'\0');
-
-	if(port->buf_mode != mode)
-	{
-		port->buf_fill = port->buf_pos = 0;
-		port->buf_mode = mode;
-
-		if(mode == B_READ_LINE)
-			port->line = tag_object(sbuf(LINE_SIZE));
-	}
-	else if(port->buf_mode == B_READ_LINE)
-	{
-		if(port->line == F)
-			port->line = tag_object(sbuf(LINE_SIZE));
-		else
-			untag_sbuf(port->line)->top = 0;
-	}
-}
-
 void fixup_port(PORT* port)
 {
 	port->fd = -1;
@@ -65,7 +49,6 @@ void fixup_port(PORT* port)
 	fixup(&port->line);
 	fixup(&port->client_host);
 	fixup(&port->client_port);
-	fixup(&port->client_socket);
 }
 
 void collect_port(PORT* port)
@@ -75,5 +58,4 @@ void collect_port(PORT* port)
 	copy_object(&port->line);
 	copy_object(&port->client_host);
 	copy_object(&port->client_port);
-	copy_object(&port->client_socket);
 }

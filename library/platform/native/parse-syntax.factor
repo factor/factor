@@ -42,7 +42,6 @@ USE: stack
 USE: strings
 USE: words
 USE: vectors
-USE: vocabularies
 USE: unparser
 
 ! Constants

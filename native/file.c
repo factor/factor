@@ -21,5 +21,6 @@ void primitive_open_file(void)
 	if(fd < 0)
 		io_error(NULL,__FUNCTION__);
 
-	dpush(tag_object(port(fd)));
+	dpush(read ? tag_object(port(PORT_READ,fd)) : F);
+	dpush(write ? tag_object(port(PORT_WRITE,fd)) : F);
 }

@@ -31,7 +31,7 @@ USE: combinators
 USE: namespaces
 USE: stack
 USE: strings
-USE: vocabularies
+USE: words
 
 : view ( -- view )
     [ ] "org.gjt.sp.jedit.jEdit"

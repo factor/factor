@@ -36,7 +36,6 @@ USE: streams
 USE: strings
 USE: vectors
 USE: vectors
-USE: vocabularies
 USE: words
 
 : worddef, ( word -- )

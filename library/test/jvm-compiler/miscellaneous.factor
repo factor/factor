@@ -12,7 +12,6 @@ USE: stack
 USE: stdio
 USE: strings
 USE: test
-USE: vocabularies
 USE: words
 
 "Checking dictionary words." print

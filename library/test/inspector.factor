@@ -1,7 +1,7 @@
 IN: scratchpad
 USE: inspector
 USE: namespaces
-USE: vocabularies
+USE: words
 
 "httpd" apropos.
 "car" usages.

@@ -32,7 +32,6 @@ USE: prettyprint
 USE: stack
 USE: stdio
 USE: unparser
-USE: vocabularies
 USE: words
 
 : see-compound ( word -- )

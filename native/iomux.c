@@ -111,7 +111,11 @@ bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks)
 
 bool perform_read_line_io_task(PORT* port)
 {
-	init_buffer(port,B_READ_LINE);
+	if(port->line == F)
+		port->line = tag_object(sbuf(LINE_SIZE));
+	else
+		untag_sbuf(port->line)->top = 0;
+
 	if(port->buf_pos >= port->buf_fill)
 	{
 		if(!read_step(port))
@@ -130,7 +134,6 @@ bool perform_read_line_io_task(PORT* port)
 
 bool perform_write_io_task(PORT* port)
 {
-	init_buffer(port,B_WRITE);
 	if(write_step(port))
 	{
 		if(port->buf_pos == port->buf_fill)
@@ -243,7 +246,15 @@ CELL next_io_task(void)
 
 void primitive_next_io_task(void)
 {
-	dpush(next_io_task());
+	CELL callback;
+	for(;;)
+	{
+		callback = next_io_task();
+		if(callback != F)
+			break;
+	}
+
+	dpush(callback);
 }
 
 void collect_io_tasks(void)

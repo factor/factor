@@ -60,6 +60,6 @@ USE: strings
 : wait-to-accept ( socket -- )
     [ swap add-accept-io-task next-io-task drop ( call ) ] callcc0 ;
 
-: blocking-accept ( socket -- host port socket )
+: blocking-accept ( socket -- host port in out )
     dup wait-to-accept accept-fd ;
 

@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: combinators
 USE: inspector
 USE: lists
@@ -36,7 +36,6 @@ USE: stack
 USE: stdio
 USE: strings
 USE: unparser
-USE: words
 
 : word-uses? ( of in -- ? )
     2dup = [

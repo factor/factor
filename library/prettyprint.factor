@@ -41,7 +41,6 @@ USE: strings
 USE: styles
 USE: unparser
 USE: vectors
-USE: vocabularies
 USE: words
 
 : tab-size

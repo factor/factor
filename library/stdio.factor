@@ -35,7 +35,16 @@ USE: streams
 : <stdio-stream> ( stream -- stream )
     #! We disable fclose on stdio so that various tricks like
     #! with-stream can work.
-    clone [ [ ] "fclose" set ] extend ;
+    clone [
+        ( string -- )
+        [
+            namespace fwrite
+            "\n" namespace fwrite
+            namespace fflush
+        ] "fprint" set
+
+        [ ] "fclose" set
+    ] extend ;
 
 : flush ( -- )
     "stdio" get fflush ;

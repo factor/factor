@@ -17,7 +17,6 @@ USE: stdio
 USE: strings
 USE: words
 USE: unparser
-USE: vocabularies
 
 : assert ( t -- )
     [ "Assertion failed!" throw ] unless ;

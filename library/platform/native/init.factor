@@ -48,7 +48,6 @@ USE: streams
 USE: strings
 USE: styles
 USE: vectors
-USE: vocabularies
 USE: words
 USE: unparser
 

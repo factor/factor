@@ -40,7 +40,7 @@ int make_server_socket(CHAR port)
 void primitive_server_socket(void)
 {
 	CHAR p = (CHAR)to_fixnum(dpop());
-	dpush(tag_object(port(make_server_socket(p))));
+	dpush(tag_object(port(PORT_SPECIAL,make_server_socket(p))));
 }
 
 CELL accept_connection(PORT* p)
@@ -60,15 +60,16 @@ CELL accept_connection(PORT* p)
 	p->client_host = tag_object(from_c_string(inet_ntoa(
 		clientname.sin_addr)));
 	p->client_port = tag_fixnum(ntohs(clientname.sin_port));
-	p->client_socket = tag_object(port(new));
+	p->client_socket = new;
 
 	return true;
 }
 
 void primitive_accept_fd(void)
 {
-	PORT* port = untag_port(dpop());
-	dpush(port->client_host);
-	dpush(port->client_port);
-	dpush(port->client_socket);
+	PORT* p = untag_port(dpop());
+	dpush(p->client_host);
+	dpush(p->client_port);
+	dpush(tag_object(port(PORT_READ,p->client_socket)));
+	dpush(tag_object(port(PORT_WRITE,p->client_socket)));
 }

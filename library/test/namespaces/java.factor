@@ -6,7 +6,6 @@ USE: namespaces
 USE: stack
 USE: test
 USE: words
-USE: vocabularies
 
 [ [ 1 0 0 0 ] ] [ [ >n ] ] [ balance>list ] test-word
 [ [ 1 1 0 0 ] ] [ [ get ] ] [ balance>list ] test-word

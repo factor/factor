@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vocabularies
+IN: words
 USE: combinators
 USE: kernel
 USE: lists
@@ -57,7 +57,8 @@ USE: strings
 
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
-    vocab [ values ] bind ;
+    #! Filter empty slots.
+    vocab [ values ] bind [ ] subset ;
 
 : intern ( "word" -- word )
     #! Returns the top of the stack if it already been interned.

@@ -32,7 +32,6 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: stack
-USE: vocabularies
 
 : worddef? ( obj -- boolean )
     "factor.FactorWordDefinition" is ;
