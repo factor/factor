@@ -43,14 +43,22 @@ USE: words
 USE: unparser
 USE: vectors
 
+SYMBOL: cont-prompt
+SYMBOL: listener-prompt
+
+global [
+    "..." cont-prompt set
+    "ok" listener-prompt set
+] bind
+
 : print-banner ( -- )
     "Factor " write version print
     "Copyright (C) 2003, 2004 Slava Pestov" print
     "Copyright (C) 2004 Chris Double" print
     "Type ``exit'' to exit, ``help'' for help." print ;
 
-: print-prompt ( -- )
-    "ok" "prompt" style write-attr
+: prompt. ( text -- )
+    "prompt" style write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
@@ -59,8 +67,27 @@ USE: vectors
 : exit ( -- )
     "quit-flag" on ;
 
+: (read-multiline) ( quot depth -- quot ? )
+    #! Flag indicates EOF.
+    >r read dup [
+        (parse) depth r> dup >r = [
+            ( we're done ) r> drop t
+        ] [
+            ( more input needed ) r> cont-prompt get prompt.
+            (read-multiline)
+        ] ifte
+    ] [
+        ( EOF ) r> 2drop f
+    ] ifte ;
+
+: read-multiline ( -- quot ? )
+    #! Keep parsing until the end is reached. Flag indicates
+    #! EOF.
+    f depth (read-multiline) >r reverse r> ;
+
 : listener-step ( -- )
-    print-prompt read [ eval-catch ] [ exit ] ifte* ;
+    listener-prompt get prompt.
+    [ read-multiline [ call ] [ exit ] ifte ] print-error ;
 
 : listener-loop ( -- )
     "quit-flag" get [

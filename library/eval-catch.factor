@@ -32,7 +32,7 @@ USE: combinators
 USE: stdio
 
 : eval-catch ( str -- )
-    [ eval ] [ [ default-error-handler drop ] when* ] catch ;
+    [ eval ] print-error ;
 
 : eval>string ( in -- out )
     [ eval-catch ] with-string ;

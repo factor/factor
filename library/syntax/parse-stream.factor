@@ -68,7 +68,7 @@ USE: strings
 
 : (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
-    >r "file" set f r>
+    >r "file" set f ( initial parse tree ) r>
     [ (parse) ] read-lines reverse
     "file" off
     "line-number" off ;

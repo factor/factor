@@ -4,6 +4,7 @@
 - type inference
 - some way to step over a word in the stepper
 - step: print NEXT word to execute, not word that JUST executed
+- step: start a nested listener
 
 + compiler/ffi:
 
@@ -26,13 +27,11 @@
 + listener/plugin:
 
 - gracefully handle non-working cfactor
-- accept multi-line input in listener
 - don't show listener on certain commands
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
 - finish ExternalFactor VocabularyLookup
-- fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
 - completion in the listener
 - special completion for USE:/IN:

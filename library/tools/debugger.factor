@@ -72,3 +72,8 @@ USE: unparser
         \ :get prettyprint-word
         " ( var -- value ) inspects the error namestack." print
     ] when* ;
+
+: print-error ( quot -- )
+    #! Execute a quotation, and if it throws an error, print it
+    #! and return to the caller.
+    [ [ default-error-handler drop ] when* ] catch ;

@@ -63,9 +63,6 @@ USE: streams
 : print ( string -- )
     "stdio" get fprint ;
 
-: edit ( string -- )
-    "stdio" get fedit ;
-
 : terpri ( -- )
     #! Print a newline to standard output.
     "\n" write ;

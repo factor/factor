@@ -48,8 +48,6 @@ USE: strings
         [ write ] "fwrite" set
         ( string style -- )
         [ write-attr ] "fwrite-attr" set
-        ( string -- )
-        [ edit ] "fedit" set
         ( -- )
         [ flush ] "fflush" set
         ( -- )

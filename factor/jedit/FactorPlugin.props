@@ -12,7 +12,9 @@ plugin.factor.jedit.FactorPlugin.depend.2=plugin sidekick.SideKickPlugin 0.3.1
 plugin.factor.jedit.FactorPlugin.depend.3=plugin console.ConsolePlugin 4.0.1
 
 #! Menu
-plugin.factor.jedit.FactorPlugin.menu=factor-run-file \
+plugin.factor.jedit.FactorPlugin.menu=factor-listener \
+	- \
+	factor-run-file \
 	factor-eval-selection \
 	- \
 	factor-apropos \
@@ -27,6 +29,7 @@ plugin.factor.jedit.FactorPlugin.menu=factor-run-file \
 	- \
 	factor-restart
 
+factor-listener.label=Listener
 factor-run-file.label=Run current file
 factor-eval-selection.label=Evaluate selection
 factor-apropos.label=Apropos at caret

@@ -45,10 +45,6 @@ USE: stack
         ! Clear stacks since we never go up from this point
         { } set-catchstack
         { } set-callstack
-        [
-            call
-        ] [
-            [ default-error-handler drop ] when*
-        ] catch
+        print-error
         (yield)
     ] callcc0 drop ;

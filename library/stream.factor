@@ -58,9 +58,6 @@ USE: strings
     #! Supported keys depend on the type of stream.
     [ "fwrite-attr" get call ] bind ;
 
-: fedit ( string stream -- )
-    [ "fedit" get call ] bind ;
-
 : fclose ( stream -- )
     [ "fclose" get call ] bind ;
 
@@ -81,8 +78,6 @@ USE: strings
         [ "fwrite not implemented."  throw  ] "fwrite" set
         ( string style -- )
         [ drop namespace fwrite             ] "fwrite-attr" set
-        ( string -- )
-        [ "fedit not implemented."   throw  ] "fedit" set
         ( -- )
         [ ] "fflush" set
         ( -- )

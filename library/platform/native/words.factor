@@ -50,10 +50,6 @@ USE: stack
 : primitive? ( obj -- ? ) ?word-primitive 2 > ;
 : symbol?    ( obj -- ? ) ?word-primitive 2 = ;
 
-: comment?
-    #! Comments are not first-class objects in CFactor.
-    drop f ;
-
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;
 

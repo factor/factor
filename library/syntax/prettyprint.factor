@@ -61,18 +61,11 @@ USE: words
 : prettyprint-space ( -- )
     " " write ;
 
-: newline-after? ( obj -- ? )
-    comment? ;
-
 ! Real definition follows
 DEFER: prettyprint*
 
 : prettyprint-element ( indent obj -- indent )
-    dup >r prettyprint* r> newline-after? [
-        dup prettyprint-newline
-    ] [
-        prettyprint-space
-    ] ifte ;
+    prettyprint* prettyprint-space ;
 
 : <prettyprint ( indent -- indent )
     tab-size +
@@ -178,7 +171,6 @@ DEFER: prettyprint*
             [ f =       ] [ prettyprint-object ]
             [ cons?     ] [ prettyprint-[] ]
             [ vector?   ] [ prettyprint-{} ]
-            [ comment?  ] [ prettyprint-comment ]
             [ word?     ] [ prettyprint-word ]
             [ drop t    ] [ prettyprint-object ]
         ] cond
@@ -236,3 +228,49 @@ DEFER: prettyprint*
 : .b >bin print ;
 : .o >oct print ;
 : .h >hex print ;
+
+: stack-effect. ( word -- )
+    stack-effect [
+        " " write
+        [ CHAR: ( , , CHAR: ) , ] make-string prettyprint-comment
+    ] when* ;
+
+: documentation. ( indent word -- indent )
+    documentation [
+        "\n" split [
+            "#!" swap cat2 prettyprint-comment
+            dup prettyprint-newline
+        ] each
+    ] when* ;
+
+: prettyprint-docs ( indent word -- indent )
+    [
+        stack-effect. dup prettyprint-newline
+    ] keep documentation. ;
+
+: see-compound ( word -- )
+    0 swap
+    [ dupd prettyprint-IN: prettyprint-: ] keep
+    [ prettyprint-word ] keep
+    [ prettyprint-docs ] keep
+    [ word-parameter prettyprint-list prettyprint-; ] keep
+    prettyprint-plist prettyprint-newline ;
+
+: see-primitive ( word -- )
+    "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
+
+: see-symbol ( word -- )
+    "SYMBOL: " write . ;
+
+: see-undefined ( word -- )
+    drop "Not defined" print ;
+
+: see ( name -- )
+    #! Show a word definition.
+    [
+        [ compound? ] [ see-compound ]
+        [ symbol? ] [ see-symbol ]
+        [ primitive? ] [ see-primitive ]
+        [ word? ] [ see-undefined ]
+        [ drop t ] [ "Not a word: " write . ]
+    ] cond ;
