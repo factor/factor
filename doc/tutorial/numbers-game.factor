@@ -1,6 +1,7 @@
 ! Numbers game example
 
 IN: numbers-game
+USE: combinators
 USE: kernel
 USE: math
 USE: parser
@@ -22,7 +23,7 @@ USE: stack
 
 : judge-guess ( actual guess -- ? )
     2dup = [
-        correct f
+        2drop correct f
     ] [
         inexact-guess t
     ] ifte ;

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head><title>Factor plugin</title>
+
+<style>
+.fancy-heading { background: #c0d0ff; border: 1px solid #2040ff; }
+div.fancy-heading { padding: 1px; margin: 0px 0px 3px 0px; }
+.nice-box {
+	padding: 4px;
+	border-width: 1px;
+	border-style: dashed;
+}
+.syntax0 {
+color: #000000;
+}
+.syntax1 {
+color: #cc0000;
+}
+.syntax2 {
+color: #ff8400;
+}
+.syntax3 {
+color: #6600cc;
+}
+.syntax4 {
+color: #cc6600;
+}
+.syntax5 {
+color: #ff0000;
+}
+.syntax6 {
+color: #9966ff;
+}
+.syntax7 {
+background: #ffffcc;
+color: #ff0066;
+}
+.syntax8 {
+color: #006699;
+font-weight: bold;
+}
+.syntax9 {
+color: #009966;
+font-weight: bold;
+}
+.syntax10 {
+color: #0099ff;
+font-weight: bold;
+}
+.syntax11 {
+color: #66ccff;
+font-weight: bold;
+}
+.syntax12 {
+color: #02b902;
+}
+.syntax13 {
+color: #ff00cc;
+}
+.syntax14 {
+color: #cc00cc;
+}
+.syntax15 {
+color: #9900cc;
+}
+.syntax16 {
+color: #6600cc;
+}
+.syntax17 {
+color: #0000ff;
+}
+.syntax18 {
+color: #000000;
+font-weight: bold;
+}
+.gutter {
+background: #dbdbdb;
+color: #000000;
+}
+.gutterH {
+background: #dbdbdb;
+color: #666699;
+}
+</style>
+
+</head>
+
+<body>
+
+
+<h1 align="center">Factor plugin</h1>
+
+<p><a href="http://factor.sourceforge.net">Factor</a> is a programming language with postfix syntax. The Factor plugin for <a href="http://www.jedit.org">jEdit</a> provides many nifty time-saving features for working with Factor code.<p>
+
+<h2 class="fancy-heading">Introduction</h2>
+
+If Factor is compiled with the jEdit classes in the class path, the resulting <code>Factor.jar</code> can then be placed in <code>$HOME/.jedit/jars/</code> and loaded by jEdit.<p>
+
+Note that while the Factor plugin requires jEdit 4.2pre15, you will need to download and install the Factor edit mode separately from the <a href="http://factor.sf.net">Factor home page</a>. If you are running jEdit 4.2final, this edit mode is already included.
+
+<h2 class="fancy-heading">Embedded interpreter</h2>
+
+<p>The plugin embeds a Factor interpreter inside jEdit that gets lazily loaded when first used. The interpreter communicates with the plugin and vice versa to perform various useful tasks.</p>
+
+<p>The <b>Run current file</b> and <b>Evaluate selection</b> commands can be used to send text from jEdit to the interpreter.<p>
+
+<img class="nice-box" src="listener.png">
+
+<p>If you have CFactor installed, it is possible to embed it in jEdit using the <code>inferior.factor</code> socket protocol. Add the following to your <code>$HOME/.factor-rc</code>:
+
+<PRE class="nice-box"><SPAN CLASS="syntax17">USE:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">telnetd</SPAN>
+<SPAN CLASS="syntax17">:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">inf</SPAN> <SPAN CLASS="syntax5">9999</SPAN> telnetd <SPAN CLASS="syntax17">;</SPAN>
+<SPAN CLASS="syntax17">:</SPAN><SPAN CLASS="syntax17"> </SPAN><SPAN CLASS="syntax17">cfactor</SPAN> <SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">localhost</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> <SPAN CLASS="syntax5">9999</SPAN> &lt;client&gt; inferior-client <SPAN CLASS="syntax17">;</SPAN>
+</PRE>
+</div>
+
+<p>Now, start CFactor and type the following phrase:</p>
+
+<pre class="nice-box">inf</pre>
+
+<p>Then open the Factor listener window in jEdit, and type the following phrase:</p>
+
+<pre class="nice-box">cfactor</pre>
+
+<p>You will now be talking to the CFactor interpreter prompt. Styled text output and hyperlinks will be transmitted using the <code>inferior.factor</code> socket protocol.</p>
+
+<h2 class="fancy-heading">Cross-referencing</h2>
+
+<p>The <b>Edit word at caret</b> command opens the source file containing the definition of the word at the caret. <b>See word at caret</b> shows the definition of the word at the caret in the Factor listener window.</p>
+
+<p>The <b>Edit word</b> command opens a dialog box where the name of a word can be typed -- while the word is being typed, the possible completions is instantly updated, and selecting one opens the source file containing the definition of that word:</p>
+
+<img class="nice-box" src="edit-word.png">
+
+<p>To be able to edit definitions of standard library words, add a phrase like the following to your <code>$HOME/.factor-rc</code>:</p>
+
+<pre class="nice-box"><SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">/home/slava/Factor/</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> <SPAN CLASS="syntax13">&quot;</SPAN><SPAN CLASS="syntax13">resource-path</SPAN><SPAN CLASS="syntax13">&quot;</SPAN> set
+</PRE>
+
+<p>The <b>Word usages at caret</b> command displays a list of words that refer to the word at the caret in the Factor listener window. Clicking on words in the listener shows a popup menu with various useful actions.</p>
+
+<img class="nice-box" src="usages.png">
+
+<p>Here we see the result of selecting <b>Describe</b>.</p>
+
+<img class="nice-box" src="describe.png">
+
+<h2 class="fancy-heading">Error checking</h2>
+
+<p>Factor files are parsed in a background thread and checked for errors, using the framework provided by the SideKick plugin. Errors are underlined in the text area (and listed in the <b>ErrorList</b> plugin window).</p>
+
+<img class="nice-box" src="error.png">
+
+<p>A common error is a missing <code>USE:</code> declaration. The <b>Plugins</b>&gt;<b>Factor</b>&gt;<b>Use word at caret</b> command searches for the word at the caret in all vocabularies, and adds a <code>USE:</code> declaration for the vocabulary to the start of the source file -- in this case, <code>ifte</code> is found in the <code>combinators</code> vocabulary, and the parse error instantly goes away:</p>
+
+<img class="nice-box" src="word-use.png">
+
+<h2 class="fancy-heading">Completion and browsing</h2>
+
+<p>The stack effect of the word at the caret is shown in the status bar.</p>
+
+<img class="nice-box" src="status.png">
+
+<p>Invoking <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Show Completion Popup</b> displays a popup of possible completions for the word at the caret -- bind this to <code>C+SPACE</code> for quick access:</p>
+
+<img class="nice-box" src="complete.png">
+
+<p>The <b>Plugins</b>&gt;<b>SideKick</b>&gt;<b>Structure Browser</b> displays a list of all words defined in the current buffer:</p>
+
+<img class="nice-box" src="word-list.png">
+
+</body>
+</html>
