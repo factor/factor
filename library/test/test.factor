@@ -105,8 +105,9 @@ prettyprint stdio strings words vectors unparser ;
         ] [ test ] each
     ] when    
 
-    cpu "x86" = [
+    cpu "unknown" = [
         [
+            "io/buffer"
             "compiler/optimizer"
             "compiler/simplifier"
             "compiler/simple"
@@ -118,7 +119,7 @@ prettyprint stdio strings words vectors unparser ;
         ] [
             test
         ] each
-    ] when
+    ] unless
 
     [
         "benchmark/empty-loop"

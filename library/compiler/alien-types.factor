@@ -230,3 +230,9 @@ global [ <namespace> c-types set ] bind
 ! FIXME for 64-bit platforms
 "int" "long" alias-c-type
 "uint" "ulong" alias-c-type
+
+: ALIAS:
+    #! Followed by old then new. This is a parsing word so that
+    #! we can define aliased types, and then a C struct, in the
+    #! same source file.
+    scan scan alias-c-type ; parsing
