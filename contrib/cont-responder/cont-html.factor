@@ -263,6 +263,7 @@ USE: logic
   "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9" 
   "ol" "li" "form" "a" "p" "html" "head" "body" "title"
   "b" "i" "ul" "table" "tr" "td" "th" "pre" "textarea"
+  "script" "div" "span"
 ] [ define-closed-html-word ] each
 
 ! Define some closed HTML tags
@@ -276,4 +277,5 @@ USE: logic
   "method" "action" "type" "value" "name" 
   "size" "href" "class" "border" "rows" "cols" 
   "id" "onclick" "style" "valign" "accesskey"
+  "src" "language"
 ] [ define-attribute-word ] each 
