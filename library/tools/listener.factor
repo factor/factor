@@ -105,9 +105,9 @@ global [
     " (OS: " write os write
     " CPU: " write cpu write
     ")" print
-    "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Copyright (C) 2004 Chris Double" print
-    "Copyright (C) 2004 Mackenzie Straight" print
+    "Copyright (C) 2003, 2005 Slava Pestov" print
+    "Copyright (C) 2004, 2005 Chris Double" print
+    "Copyright (C) 2004, 2005 Mackenzie Straight" print
     "Type ``exit'' to exit, ``help'' for help." print
     terpri
     room.

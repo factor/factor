@@ -108,17 +108,25 @@ public class FactorPlugin extends EditPlugin
 
 			try
 			{
+				String exePath = jEdit.getProperty(
+					"factor.external.program");
+				String imagePath = jEdit.getProperty(
+					"factor.external.image");
 				List args = new ArrayList();
-				args.add(jEdit.getProperty("factor.external.program"));
-				args.add(jEdit.getProperty("factor.external.image"));
+				args.add(exePath);
+				args.add(imagePath);
 				args.add("-shell=telnet");
 				args.add("-telnetd-port=" + PORT);
 				String[] extraArgs = jEdit.getProperty(
 					"factor.external.args")
 					.split(" ");
 				addNonEmpty(extraArgs,args);
-				process = Runtime.getRuntime().exec((String[])args.toArray(
-					new String[args.size()]));
+				process = Runtime.getRuntime().exec(
+					(String[])args.toArray(
+					new String[args.size()]),
+					null,
+					new File(MiscUtilities
+					.getParentOfPath(imagePath)));
 
 				external = new ExternalFactor(PORT);
 			}
