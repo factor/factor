@@ -24,7 +24,7 @@
 ! General purpose words for display pages using the continuation 
 ! based responder.
 IN: cont-utils
-USE: cont-html
+USE: html
 USE: cont-responder
 USE: lists
 USE: stdio

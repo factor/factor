@@ -28,7 +28,7 @@
 ! filesystem with the users name.
 IN: todo-example
 USE: cont-responder
-USE: cont-html
+USE: html
 USE: cont-utils
 USE: html
 USE: stdio
@@ -45,70 +45,68 @@ USE: todo
 USE: math
 USE: logic
 USE: kernel
-USE: lazy
-USE: parser-combinators
  
 : todo-stylesheet ( -- string )
   #! Return the stylesheet for the todo list
-  <% 
-    "table.list {" %
-    "  text-align:center;" %
-    "  font-family: Verdana;" %
-    "  font-weight: normal;" %
-    "  font-size: 11px;" %
-    "  color: #404040;" %
-    "  background-color: #fafafa;" %
-    "  border: 1px #6699cc solid;" %
-    "  border-collapse: collapse;" %
-    "  boder-spacing: 0px;" %
-    "}" %
-    "tr.heading {" %
-    "  border-bottom: 2px solid #6699cc;" %
-    "  border-left: 1px solix #6699cc;" %
-    "  background-color: #BEC8D1;" %
-    "  text-align: left;" %
-    "  text-indent: 0px;" %
-    "  font-family: verdana;" %
-    "  font-weight: bold;" %
-    "  color: #404040;" %
-    "}" %
-    "tr.item {" %
-    "  border-bottom: 1px solid #9cf;" %
-    "  border-top: 0px;" %
-    "  border-left: 1px solid #9cf;" %
-    "  border-right: 0px;" %
-    "  text-align: left;" %
-    "  text-indent: 2px;" %
-    "  font-family: verdana, sans-serif, arial;" %
-    "  font-weight: normal;" %
-    "  color: #404040;" %
-    "  background-color: #fafafa;" %
-    "}" %
-    "tr.complete {" %
-    "  border-bottom: 1px solid #9cf;" %
-    "  border-top: 0px;" %
-    "  border-left: 1px solid #9cf;" %
-    "  border-right: 0px;" %
-    "  text-align: left;" %
-    "  text-indent: 2px;" %
-    "  font-family: verdana, sans-serif, arial;" %
-    "  font-weight: normal;" %
-    "  color: #404040;" %
-    "  background-color: #ccc;" %
-    "}" %
-    "td.lbl {" %
-    "  font-weight: bold; text-align: right;" %
-    "}" %
-    "tr.required {" %
-    "  background: #FCC;" %
-    "}" %
-    "input:focus {" %
-    "  background: yellow;" %
-    "}" %
-    "textarea:focus {" %
-    "  background: yellow;" %
-    "}" %
-  %> ;
+  [ 
+    "table.list {" ,
+    "  text-align:center;" ,
+    "  font-family: Verdana;" ,
+    "  font-weight: normal;" ,
+    "  font-size: 11px;" ,
+    "  color: #404040;" ,
+    "  background-color: #fafafa;" ,
+    "  border: 1px #6699cc solid;" ,
+    "  border-collapse: collapse;" ,
+    "  boder-spacing: 0px;" ,
+    "}" ,
+    "tr.heading {" ,
+    "  border-bottom: 2px solid #6699cc;" ,
+    "  border-left: 1px solix #6699cc;" ,
+    "  background-color: #BEC8D1;" ,
+    "  text-align: left;" ,
+    "  text-indent: 0px;" ,
+    "  font-family: verdana;" ,
+    "  font-weight: bold;" ,
+    "  color: #404040;" ,
+    "}" ,
+    "tr.item {" ,
+    "  border-bottom: 1px solid #9cf;" ,
+    "  border-top: 0px;" ,
+    "  border-left: 1px solid #9cf;" ,
+    "  border-right: 0px;" ,
+    "  text-align: left;" ,
+    "  text-indent: 2px;" ,
+    "  font-family: verdana, sans-serif, arial;" ,
+    "  font-weight: normal;" ,
+    "  color: #404040;" ,
+    "  background-color: #fafafa;" ,
+    "}" ,
+    "tr.complete {" ,
+    "  border-bottom: 1px solid #9cf;" ,
+    "  border-top: 0px;" ,
+    "  border-left: 1px solid #9cf;" ,
+    "  border-right: 0px;" ,
+    "  text-align: left;" ,
+    "  text-indent: 2px;" ,
+    "  font-family: verdana, sans-serif, arial;" ,
+    "  font-weight: normal;" ,
+    "  color: #404040;" ,
+    "  background-color: #ccc;" ,
+    "}" ,
+    "td.lbl {" ,
+    "  font-weight: bold; text-align: right;" ,
+    "}" ,
+    "tr.required {" ,
+    "  background: #FCC;" ,
+    "}" ,
+    "input:focus {" ,
+    "  background: yellow;" ,
+    "}" ,
+    "textarea:focus {" ,
+    "  background: yellow;" ,
+    "}" ,
+  ] make-string ;
 
 : todo-stylesheet-url ( -- url )
   #! Generate an URL for the stylesheet.
@@ -209,8 +207,6 @@ USE: parser-combinators
     ] ifte 
   ] str-map ;
 
-: testx ( string -- b ) dup replace-invalid-username-chars = ;
-
 : is-valid-username? ( username -- bool )
   #! Return true if the username parses correctly
   dup replace-invalid-username-chars = ;
@@ -235,7 +231,7 @@ USE: parser-combinators
    
 : get-todo-filename ( database-path <todo> -- filename )
   #! Get the filename containing the todo list details.
-  <% swap % todo-username % ".todo" % %> ;
+  [ swap , todo-username , ".todo" , ] make-string ;
   
 : add-default-todo-item ( <todo> -- )
   #! Add a default todo item. This is a workaround for the 
@@ -332,13 +328,14 @@ USE: parser-combinators
     ] form 
   ] bind ;
   
-: priority-parser ( -- parser )
-  #! Return a parser for parsing priorities
-  [ digit? ] satisfy just ;
+: priority-valid? ( string -- bool )
+  #! Test the string containing a priority to see if it is 
+  #! valid. It should be a single digit from 0-9.
+  dup str-length 1 = [ 0 swap str-nth digit? ] [ drop f ] ifte ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  str-length 0 > swap priority-parser call and ;
+  str-length 0 > [ priority-valid? ] [ drop f ] ifte ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
@@ -473,7 +470,7 @@ USE: parser-combinators
 : show-todo-list ( -- )
   #! Show the current todo list.
   [
-    <% "todo" get todo-username % "'s To Do list" % %>
+    [ "todo" get todo-username , "'s To Do list" , ] make-string
     [ include-todo-stylesheet ]
     [
       drop

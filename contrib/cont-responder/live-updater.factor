@@ -27,7 +27,7 @@ IN: live-updater
 USE: stack
 USE: streams
 USE: strings
-USE: cont-html
+USE: html
 USE: cont-responder
 USE: stdio
 USE: namespaces
@@ -36,11 +36,11 @@ USE: combinators
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.
-  dup freadln dup [ % "\n" % get-live-updater-js* ] [ drop fclose ] ifte ;
+  dup freadln dup [ , "\n" , get-live-updater-js* ] [ drop fclose ] ifte ;
 
 : get-live-updater-js ( filename -- string )
   #! Return the liveUpdater javascript code as a string.
-  <filecr> <% get-live-updater-js* %> ;
+  <filecr> [ get-live-updater-js* ] make-string ;
 
 : live-updater-url ( -- url )
   #! Generate an URL to the liveUpdater.js code.

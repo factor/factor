@@ -35,9 +35,6 @@ USE: stdio
 USE: parser
 
 : l1  
-  "../parser-combinators/lazy.factor" run-file
-  "../parser-combinators/parser-combinators.factor" run-file
-  "cont-html.factor" run-file  
   "cont-responder.factor" run-file 
   "cont-utils.factor" run-file ;
 : l2 

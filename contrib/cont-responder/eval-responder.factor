@@ -24,7 +24,6 @@
 ! An httpd responder that allows executing simple definitions.
 !
 IN: eval-responder
-USE: cont-html
 USE: html
 USE: cont-responder
 USE: cont-utils
@@ -77,7 +76,7 @@ USE: words
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
   #! executed will set the eval textarea to that string.
-  <% "document.forms.main.eval.value=\"" % escape-quotes % "\"" % %> ;
+  [ "document.forms.main.eval.value=\"" , escape-quotes , "\"" , ] make-string ;
 
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when

@@ -1,4 +1,4 @@
-! cont-responder v0.6
+! cont-responder 
 !
 ! Copyright (C) 2004 Chris Double.
 ! 
@@ -29,7 +29,6 @@ USE: httpd-responder
 USE: math
 USE: random
 USE: continuations
-USE: format
 USE: namespaces
 USE: stack
 USE: combinators
@@ -39,7 +38,7 @@ USE: strings
 USE: html
 USE: kernel
 USE: logic
-USE: cont-html
+USE: html
 USE: logging
 USE: url-encoding
 USE: unparser
@@ -60,7 +59,7 @@ USE: hashtables
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  <% 16 [ random-digit unparse % ] times %> ;
+  [ 16 [ random-digit unparse , ] times ] make-string ;
 
 : continuation-table ( -- <namespace> ) 
   #! Return the global table of continuations
@@ -212,8 +211,8 @@ DEFER: show
   ] [
     [ 
       t swap register-continuation 
-      <% "HTTP/1.1 302 Document Moved\nLocation: " % % "\n" % 
-        "Content-Length: 0\nContent-Type: text/plain\n\n" % %>
+      [ "HTTP/1.1 302 Document Moved\nLocation: " , , "\n" , 
+        "Content-Length: 0\nContent-Type: text/plain\n\n" , ] make-string
       call-exit-continuation 
     ] callcc1 drop 
   ] ifte ;
