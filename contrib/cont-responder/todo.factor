@@ -130,7 +130,7 @@ USE: kernel
 
 : priority-comparator ( item1 item2 -- bool )
   #! Return true if item1 is a higher priority than item2
-  >r item-priority r> item-priority > ;
+  >r item-priority r> item-priority str-lexi> ;
   
 : todo-items ( <todo> -- )
   #! Return a list of items for the given todo list.
