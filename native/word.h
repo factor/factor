@@ -1,9 +1,11 @@
 typedef void (*XT)(void);
 
 typedef struct {
-	/* TAGGED execution token: jump here to execute word */
+	/* TAGGED header */
+	CELL header;
+	/* untagged execution token: jump here to execute word */
 	CELL xt;
-	/* on-disk primitive number */
+	/* untagged on-disk primitive number */
 	CELL primitive;
 	/* TAGGED parameter to xt; used for colon definitions */
 	CELL parameter;

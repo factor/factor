@@ -9,7 +9,6 @@ void clear_environment(void)
 
 void init_environment(void)
 {
-	/* + CELLS * 2 to skip header and length cell */
 	env.ds_bot = tag_object(array(STACK_SIZE,empty));
 	reset_datastack();
 	env.cs_bot = tag_object(array(STACK_SIZE,empty));
@@ -17,7 +16,7 @@ void init_environment(void)
 	env.cf = env.boot;
 }
 
-#define EXECUTE(w) ((XT)(UNTAG(w->xt)))()
+#define EXECUTE(w) ((XT)(w->xt))()
 
 void run(void)
 {

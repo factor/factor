@@ -68,7 +68,6 @@ USE: words
 : cons-tag   BIN: 010 ;
 : object-tag BIN: 011 ;
 : header-tag BIN: 100 ;
-: xt-tag     BIN: 101 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
@@ -121,7 +120,8 @@ USE: words
 
 ( Words )
 
-: word, ( -- pointer ) word-tag here-as xt-tag emit ;
+: word, ( -- pointer )
+    word-tag here-as word-tag >header emit 0 emit ;
 
 ! This is to handle mutually recursive words
 ! It is a hack. A recursive word in the cdr of a
@@ -232,7 +232,8 @@ IN: cross-compiler
     r> ( -- plist )
     r> ( primitive -- ) emit
     r> ( parameter -- ) emit
-    ( plist -- ) emit ;
+    ( plist -- ) emit
+    0 emit ( padding ) ;
 
 : primitive, ( word primitive -- ) f (worddef,) ;
 : compound, ( word definition -- ) 1 swap (worddef,) ;

@@ -69,6 +69,9 @@ void collect_object(void)
 	
 	switch(untag_header(get(scan)))
 	{
+	case WORD_TYPE:
+		collect_word((WORD*)scan);
+		break;
 	case ARRAY_TYPE:
 		collect_array((ARRAY*)scan);
 		break;
@@ -91,10 +94,6 @@ void collect_next(void)
 	gc_debug("collect_next header",get(scan));
 	switch(TAG(get(scan)))
 	{
-	case XT_TYPE:
-		collect_word((WORD*)scan);
-		scan += sizeof(WORD);
-		break;
 	case HEADER_TYPE:
 		collect_object();
 		break;

@@ -94,16 +94,10 @@ XT primitives[] = {
 
 CELL primitive_to_xt(CELL primitive)
 {
-	XT xt;
-
 	if(primitive < 0 || primitive >= PRIMITIVE_COUNT)
 		general_error(ERROR_BAD_PRIMITIVE,tag_fixnum(primitive));
 	
-	xt = primitives[primitive];
-	if((CELL)xt % 8 != 0)
-		fatal_error("compile with -falign-functions=8",xt);
-	
-	return RETAG(xt,XT_TYPE);
+	return primitives[primitive];
 }
 
 void primitive_eq(void)

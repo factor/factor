@@ -12,6 +12,9 @@ void relocate_object()
 	size = untagged_object_size(relocating);
 	switch(untag_header(get(relocating)))
 	{
+	case WORD_TYPE:
+		fixup_word((WORD*)relocating);
+		break;
 	case ARRAY_TYPE:
 		fixup_array((ARRAY*)relocating);
 		break;
@@ -32,10 +35,6 @@ void relocate_next()
 {
 	switch(TAG(get(relocating)))
 	{
-	case XT_TYPE:
-		fixup_word((WORD*)relocating);
-		relocating += sizeof(WORD);
-		break;
 	case HEADER_TYPE:
 		relocate_object();
 		break;
