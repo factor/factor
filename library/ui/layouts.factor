@@ -24,32 +24,48 @@ M: gadget layout* drop ;
 : default-gap 3 ;
 
 ! A pile is a box that lays out its contents vertically.
-TUPLE: pile gap delegate ;
+TUPLE: pile align gap delegate ;
 
-C: pile ( gap -- pile )
+C: pile ( align gap -- pile )
     0 0 0 0 <rectangle> <gadget> over set-pile-delegate
-    [ set-pile-gap ] keep ;
+    [ set-pile-gap ] keep
+    [ set-pile-align ] keep ;
+
+: <default-pile> ( -- pile )
+    1/2 default-gap <pile> ;
+
+: horizontal-layout ( gadget y box -- )
+    pick shape-w over shape-w swap - swap pile-align * >fixnum
+    swap rot move-gadget ;
 
 M: pile layout* ( pile -- )
     dup pile-gap over gadget-children run-heights >r >r
     dup gadget-children max-width r> pick resize-gadget
-    gadget-children r> zip [
-        uncons 0 swap rot move-gadget
-    ] each ;
+    dup gadget-children r> zip [
+        uncons rot horizontal-layout
+    ] each-with ;
 
 ! A shelf is a box that lays out its contents horizontally.
-TUPLE: shelf gap delegate ;
+TUPLE: shelf gap align delegate ;
 
-C: shelf ( gap -- pile )
+C: shelf ( align gap -- shelf )
     0 0 0 0 <rectangle> <gadget> over set-shelf-delegate
-    [ set-shelf-gap ] keep ;
+    [ set-shelf-gap ] keep
+    [ set-shelf-align ] keep ;
+
+: vertical-layout ( gadget x box -- )
+    pick shape-h over shape-h swap - swap shelf-align * >fixnum
+    rot move-gadget ;
+
+: <default-shelf> ( -- shelf )
+    1/2 default-gap <shelf> ;
 
 M: shelf layout* ( pile -- )
     dup shelf-gap over gadget-children run-widths >r >r
     dup gadget-children max-height r> swap pick resize-gadget
-    gadget-children r> zip [
-        uncons 0 rot move-gadget
-    ] each ;
+    dup gadget-children r> zip [
+        uncons pick vertical-layout
+    ] each drop ;
 
 ! A border lays out its children on top of each other, all with
 ! a 5-pixel padding.

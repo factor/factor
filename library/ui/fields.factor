@@ -4,8 +4,6 @@ IN: gadgets
 USING: generic kernel lists math namespaces sdl line-editor
 strings ;
 
-TUPLE: field active? editor delegate ;
-
 TUPLE: editor line caret delegate ;
 
 : editor-text ( editor -- text )
@@ -69,32 +67,35 @@ M: editor layout* ( field -- )
 M: editor draw-shape ( label -- )
     dup [ editor-text draw-shape ] with-translation ;
 
+TUPLE: field active? editor delegate ;
+
+: with-editor ( editor quot -- )
+    swap [ editor-line swap bind ] keep relayout ; inline
+
+: set-caret-x ( x editor -- )
+    #! Move the caret to a clicked location.
+    [ line-text get x>offset caret set ] with-editor ;
+
+: click-editor ( editor -- )
+    my-hand
+    2dup relative-pos shape-x pick set-caret-x
+    request-focus ;
+
 : field-border ( gadget -- border )
     bevel-border dup f bevel-up? set-paint-property ;
 
-: with-field-editor ( field quot -- )
-    swap field-editor [ editor-line swap bind ] keep relayout ;
-
 M: field user-input* ( ch field -- ? )
-    [ insert-char ] with-field-editor f ;
-
-: set-caret-x ( x field -- )
-    #! Move the caret to a clicked location.
-    [ line-text get x>offset caret set ] with-field-editor ;
-
-: click-field ( field -- )
-    my-hand dup shape-x pick field-editor screen-pos shape-x -
-    pick set-caret-x  request-focus ;
+    field-editor [ insert-char ] with-editor f ;
 
 : field-gestures ( -- hash )
     {{
         [[ [ gain-focus ] [ field-editor focus-editor ] ]]
         [[ [ lose-focus ] [ field-editor unfocus-editor ] ]]
-        [[ [ button-down 1 ] [ click-field ] ]]
-        [[ [ "BACKSPACE" ] [ [ backspace ] with-field-editor ] ]]
-        [[ [ "LEFT" ] [ [ left ] with-field-editor ] ]]
-        [[ [ "RIGHT" ] [ [ right ] with-field-editor ] ]]
-        [[ [ "CTRL" "k" ] [ [ line-clear ] with-field-editor ] ]]
+        [[ [ button-down 1 ] [ field-editor click-editor ] ]]
+        [[ [ "BACKSPACE" ] [ field-editor [ backspace ] with-editor ] ]]
+        [[ [ "LEFT" ] [ field-editor [ left ] with-editor ] ]]
+        [[ [ "RIGHT" ] [ field-editor [ right ] with-editor ] ]]
+        [[ [ "CTRL" "k" ] [ field-editor [ line-clear ] with-editor ] ]]
     }} ;
 
 C: field ( text -- field )

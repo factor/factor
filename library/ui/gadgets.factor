@@ -80,20 +80,8 @@ C: gadget ( shape -- gadget )
 : each-parent ( gadget quot -- ? )
     >r parent-list r> (each-parent) ; inline
 
-! : each-parent ( gadget quot -- ? )
-!     #! Apply quotation to each parent of the gadget in turn,
-!     #! stopping when the quotation returns f. Return f if a
-!     #! quotation somewhere returned f; if the search bottoms
-!     #! out, return t.
-!     over [
-!         [ call ] 2keep rot [
-!             >r gadget-parent r> each-parent
-!         ] [
-!             2drop f ( quotation returns f )
-!         ] ifte
-!     ] [ 
-!         2drop t ( search bottomed out )
-!     ] ifte ; inline
+: relative-pos ( g1 g2 -- g2-p1 )
+    shape-pos swap screen-pos - ;
 
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.

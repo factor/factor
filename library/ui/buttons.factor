@@ -75,7 +75,7 @@ TUPLE: checkbox bevel selected? delegate ;
     update-checkbox ;
 
 C: checkbox ( label -- checkbox )
-    default-gap <shelf> over set-checkbox-delegate
+    <default-shelf> over set-checkbox-delegate
     [ >r <label> r> add-gadget ] keep
     [ f bevel-border swap init-checkbox-bevel ] keep
     dup [ toggle-checkbox ] button-actions

@@ -19,7 +19,6 @@
 
 - #jump-f #jump-f-label
 - extract word inside M:, C:, and structure browsing for these
-- fix checkbox alignment
 - each-slot combinator
 - references primitive
 - fix completion invoke in middle of word
