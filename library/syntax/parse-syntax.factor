@@ -3,8 +3,8 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: syntax errors generic hashtables kernel lists
-math namespaces parser strings words vectors unparse ;
+USING: alien errors generic hashtables kernel lists math
+namespaces parser strings syntax unparse vectors words ;
 
 : parsing ( -- )
     #! Mark the most recently defined word to execute at parse
@@ -114,16 +114,16 @@ BUILTIN: f 9 ;  : f f swons ; parsing
         [ next-char swap , ] keep (parse-string)
     ] ifte ;
 
-: parse-string [ "line" get (parse-string) ] make-string ;
-: "
+: parse-string ( -- str )
+    #! Read a string from the input stream, until it is
+    #! terminated by a ".
     "col" [
-         parse-string swap
-    ] change swons ; parsing
+        [ "line" get (parse-string) ] make-string swap
+    ] change ;
 
-: s"
-    "col" [
-        "line" get skip-blank parse-string string>sbuf swap
-    ] change swons ; parsing
+: " parse-string swons ; parsing
+
+: SBUF" skip-blank parse-string string>sbuf swons ; parsing
 
 ! Comments
 : (

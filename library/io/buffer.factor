@@ -29,10 +29,6 @@ C: buffer ( size -- buffer )
     dup buffer-ptr over buffer-pos +
     over buffer-fill rot buffer-pos - memory>string ;
 
-: buffer-first-n ( count buffer -- string )
-    [ dup buffer-fill swap buffer-pos - min ] keep
-    dup buffer-ptr swap buffer-pos + swap memory>string ;
-
 : buffer-reset ( count buffer -- )
     #! Reset the position to 0 and the fill pointer to count.
     [ set-buffer-fill ] keep 0 swap set-buffer-pos ;
@@ -46,6 +42,12 @@ C: buffer ( size -- buffer )
         [ 0 swap set-buffer-pos ] keep
         [ 0 swap set-buffer-fill ] keep
     ] when drop ;
+
+: buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;
+
+: buffer-first-n ( count buffer -- string )
+    [ dup buffer-fill swap buffer-pos - min ] keep
+    buffer@ swap memory>string ;
 
 : buffer> ( count buffer -- string )
     [ buffer-first-n ] 2keep buffer-consume ;
@@ -81,4 +83,11 @@ C: buffer ( size -- buffer )
     #! Increases the fill pointer by count.
     [ buffer-fill + ] keep set-buffer-fill ;
 
-: buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;
+: buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
+
+: buffer-peek ( buffer -- char )
+    buffer@ <alien> 0 alien-unsigned-1 ;
+
+: buffer-set ( string buffer -- )
+    2dup buffer-ptr string>memory
+    >r string-length r> buffer-reset ;

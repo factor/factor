@@ -1,5 +1,5 @@
 IN: temporary
-USING: parser prettyprint stdio ;
+USING: parser prettyprint sequences stdio ;
 
 USE: hashtables
 USE: namespaces
@@ -136,3 +136,9 @@ TUPLE: another-one ;
 GENERIC: stack-underflow
 M: object stack-underflow 2drop ;
 M: word stack-underflow 2drop ;
+
+GENERIC: testing
+M: cons testing 2 ;
+M: f testing 3 ;
+M: sequence testing 4 ;
+[ [ 1 2 ] 2 ] [ [ 1 2 ] testing ] unit-test

@@ -18,7 +18,7 @@ union [
     "members" word-prop [ >r 3dup r> add-method ] each 3drop
 ] "add-method" set-word-prop
 
-union 30 "priority" set-word-prop
+union 55 "priority" set-word-prop
 
 union [ 2drop t ] "class<" set-word-prop
 

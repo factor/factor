@@ -111,6 +111,10 @@ os "win32" = [
     "/library/io/win32-server.factor"
 ] pull-in
 
+os "unix" = [
+    "/library/unix/syscalls.factor"
+] pull-in
+
 FORGET: pull-in
 
 "/library/bootstrap/boot-stage4.factor" dup print run-resource

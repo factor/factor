@@ -52,15 +52,18 @@ public abstract class FactorBufferProcessor
 		Cons wordCodeMap = null;
 		while(words != null)
 		{
-			FactorWord word = (FactorWord)words.car;
-			String expr = processWord(word);
-			buf.append("! ");
-			buf.append(expr);
-			buf.append('\n');
-			if(evalInListener)
-				FactorPlugin.evalInListener(view,expr);
-			else
-				buf.append(FactorPlugin.evalInWire(expr));
+			if(words.car instanceof FactorWord)
+			{
+				FactorWord word = (FactorWord)words.car;
+				String expr = processWord(word);
+				buf.append("! ");
+				buf.append(expr);
+				buf.append('\n');
+				if(evalInListener)
+					FactorPlugin.evalInListener(view,expr);
+				else
+					buf.append(FactorPlugin.evalInWire(expr));
+			}
 			words = words.next();
 		}
 		

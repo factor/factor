@@ -16,6 +16,4 @@ GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
-
-GENERIC: (>list) ( n i seq -- list )
-: >list ( seq -- list ) dup length 0 rot (>list) ;
+GENERIC: >list ( seq -- list )

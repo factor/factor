@@ -138,7 +138,7 @@ IN: hashtables
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
     over hash-size over set-hash-size [
-        hash-array swap hash-array dup array-capacity copy-array
+        hash-array swap hash-array dup length copy-array
     ] keep ;
 
 : hash-subset? ( subset of -- ? )

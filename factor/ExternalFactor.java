@@ -202,7 +202,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		String name = (String)info.next().next().car;
 		FactorWord w = super.searchVocabulary(new Cons(vocabulary,null),name);
 		if(w == null)
-			w = new FactorWord(this,vocabulary,name);
+			w = define(vocabulary,name);
 		w.stackEffect = (String)info.next().next().next().car;
 		w.setDefiner(definer);
 		return w;

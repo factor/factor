@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic hashtables inference
-interpreter kernel lists math namespaces parser sequences stdio
-strings unparser words ;
+USING: assembler compiler errors generic hashtables
+inference interpreter kernel lists math namespaces parser
+prettyprint sequences stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -43,14 +43,21 @@ M: alien = ( obj obj -- ? )
         2drop f
     ] ifte ;
 
-M: alien unparse ( obj -- str )
-    [
-        "#<" ,
-        dup local-alien? "local-alien" "alien" ? ,
-        " @ " ,
-        alien-address unparse ,
-        ">" ,
-    ] make-string ;
+: ALIEN: scan <alien> swons ; parsing
+
+: LOCAL-ALIEN: "Local aliens are not readable" throw ; parsing
+
+M: alien prettyprint* ( alien -- str )
+    dup local-alien? [
+        \ LOCAL-ALIEN:
+    ] [
+        \ ALIEN:
+    ] ifte word-bl alien-address unparse write ;
+
+M: dll unparse ( obj -- str )
+    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;
+
+: DLL" skip-blank parse-string dlopen swons ; parsing
 
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;

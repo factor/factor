@@ -5,16 +5,17 @@ USING: generic kernel kernel-internals lists math strings
 vectors ;
 
 ! This is loaded once everything else is available.
-UNION: sequence array vector string sbuf tuple ;
+UNION: sequence array general-list string sbuf tuple vector ;
 
-M: object (>list) ( n i seq -- list )
+: (>list) ( n i seq -- list )
     pick pick <= [
         3drop [ ]
     ] [
         2dup nth >r >r 1 + r> (>list) r> swons
     ] ifte ;
 
-M: vector (>list) vector-array (>list) ;
+M: object >list ( seq -- list ) dup length 0 rot (>list) ;
+M: general-list >list ( list -- list ) ;
 
 : seq-each ( seq quot -- )
     >r >list r> each ; inline
@@ -22,14 +23,13 @@ M: vector (>list) vector-array (>list) ;
 : seq-each-with ( obj seq quot -- )
     swap [ with ] seq-each 2drop ; inline
 
-: length= ( seq seq -- ? )
-    length swap length number= ;
+: length= ( seq seq -- ? ) length swap length number= ;
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [
         2drop t
     ] [
-        over sequence? [
+        over type over type eq? [
             2dup length= [
                 swap >list swap >list =
             ] [

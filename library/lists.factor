@@ -1,10 +1,18 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: generic kernel math sequences ;
+IN: lists USING: errors generic kernel math sequences ;
 
 ! Sequence protocol
-M: cons length 0 swap [ drop 1 + ] each ;
-M: f length drop 0 ;
+M: general-list length 0 swap [ drop 1 + ] each ;
+
+M: f nth "List index out of bounds" throw ;
+
+M: cons nth ( n list -- element )
+    >r dup 0 = [
+        drop r> car
+    ] [
+        1 - r> cdr nth
+    ] ifte ;
 
 : 2list ( a b -- [ a b ] )
     unit cons ;
@@ -121,6 +129,8 @@ M: cons = ( obj cons -- ? )
             2drop f
         ] ifte
     ] ifte ;
+
+M: f = ( obj f -- ? ) eq? ;
 
 M: cons hashcode ( cons -- hash ) car hashcode ;
 

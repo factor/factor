@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: unparser
-USING: generic kernel lists math memory namespaces parser
+USING: alien generic kernel lists math memory namespaces parser
 sequences sequences stdio strings words ;
 
 GENERIC: unparse ( obj -- str )
@@ -94,7 +94,7 @@ M: string unparse ( str -- str )
     [ CHAR: " , unparse-string CHAR: " , ] make-string ;
 
 M: sbuf unparse ( str -- str )
-    [ "s\" " , unparse-string CHAR: " , ] make-string ;
+    [ "SBUF\" " , unparse-string CHAR: " , ] make-string ;
 
 M: word unparse ( obj -- str ) word-name dup "#<unnamed>" ? ;
 

@@ -46,5 +46,5 @@ IN: alien
 
 ! See compiler/alien.factor for the rest; this needs to be here
 ! since primitive stack effects involve alien inputs/outputs.
-BUILTIN: dll   15 ;
+BUILTIN: dll   15 [ 1 "dll-path" f ] ;
 BUILTIN: alien 16 ;

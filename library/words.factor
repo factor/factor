@@ -8,6 +8,7 @@ namespaces sequences strings vectors ;
 GENERIC: (tree-each) ( quot obj -- ) inline
 M: object (tree-each) swap call ;
 M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
+M: f (tree-each) swap call ;
 M: sequence (tree-each) [ swap call ] seq-each-with ;
 : tree-each swap (tree-each) ; inline
 : tree-each-with ( obj vector quot -- )

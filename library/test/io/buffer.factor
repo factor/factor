@@ -8,10 +8,6 @@ USING: kernel io-internals test ;
     rot buffer-free
 ] unit-test
 
-: buffer-set ( string buffer -- )
-    2dup buffer-ptr string>memory
-    >r string-length r> buffer-reset ;
-
 [ "hello world" "" ] [
     "hello world" 65536 <buffer> [ buffer-set ] keep
     dup buffer-contents
@@ -32,6 +28,11 @@ USING: kernel io-internals test ;
 
 [ "hello world" ] [
     "hello" 65536 <buffer> [ buffer-set ] keep
-    " world" over buffer-append
+    " world" over >buffer
     dup buffer-contents swap buffer-free
+] unit-test
+
+[ CHAR: e ] [
+    "hello" 65536 <buffer> [ buffer-set ] keep
+    1 over buffer-consume buffer-peek
 ] unit-test
