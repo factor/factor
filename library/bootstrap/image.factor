@@ -321,7 +321,6 @@ DEFER: '
         [ complex? ] [ 'complex     ]
         [ word?    ] [ 'word        ]
         [ cons?    ] [ 'cons        ]
-        [ char?    ] [ 'fixnum      ]
         [ string?  ] [ 'string      ]
         [ vector?  ] [ 'vector      ]
         [ t =      ] [ drop "t" get ]

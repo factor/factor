@@ -53,41 +53,41 @@ USE: strings
 : byte0 ( num -- byte )           HEX: ff bitand ;
 
 : write-little-endian-64 ( word -- )
-    dup byte0 >char write
-    dup byte1 >char write
-    dup byte2 >char write
-    dup byte3 >char write
-    dup byte4 >char write
-    dup byte5 >char write
-    dup byte6 >char write
-        byte7 >char write ;
+    dup byte0 write
+    dup byte1 write
+    dup byte2 write
+    dup byte3 write
+    dup byte4 write
+    dup byte5 write
+    dup byte6 write
+        byte7 write ;
 
 : write-big-endian-64 ( word -- )
-    dup byte7 >char write
-    dup byte6 >char write
-    dup byte5 >char write
-    dup byte4 >char write
-    dup byte3 >char write
-    dup byte2 >char write
-    dup byte1 >char write
-        byte0 >char write ;
+    dup byte7 write
+    dup byte6 write
+    dup byte5 write
+    dup byte4 write
+    dup byte3 write
+    dup byte2 write
+    dup byte1 write
+        byte0 write ;
 
 : write-little-endian-32 ( word -- )
-    dup byte0 >char write
-    dup byte1 >char write
-    dup byte2 >char write
-        byte3 >char write ;
+    dup byte0 write
+    dup byte1 write
+    dup byte2 write
+        byte3 write ;
 
 : write-big-endian-32 ( word -- )
-    dup byte3 >char write
-    dup byte2 >char write
-    dup byte1 >char write
-        byte0 >char write ;
+    dup byte3 write
+    dup byte2 write
+    dup byte1 write
+        byte0 write ;
 
 : write-little-endian-16 ( char -- )
-    dup byte0 >char write
-        byte1 >char write ;
+    dup byte0 write
+        byte1 write ;
 
 : write-big-endian-16 ( char -- )
-    dup byte1 >char write
-        byte0 >char write ;
+    dup byte1 write
+        byte0 write ;

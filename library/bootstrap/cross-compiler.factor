@@ -392,7 +392,7 @@ IN: image
 : make-image ( name -- )
     #! Make an image for the C interpreter.
     [
-        "/library/platform/native/boot.factor" run-resource
+        "/library/bootstrap/boot.factor" run-resource
     ] with-image
 
     swap write-image ;
@@ -404,3 +404,10 @@ IN: image
     "64-bits" on
     "big-endian" off "boot.image.le64" make-image
     "big-endian" on  "boot.image.be64" make-image ;
+
+: cross-compile-resource ( resource -- )
+    [
+        ! Change behavior of ;
+        [ compound, ] ";-hook" set
+        run-resource
+    ] with-scope ;

@@ -31,15 +31,49 @@ USE: hashtables
 USE: kernel
 USE: lists
 USE: logic
+USE: math
 USE: namespaces
 USE: stack
 USE: strings
+
+: word-property ( word pname -- pvalue )
+    swap word-plist assoc ;
+
+: set-word-property ( word pvalue pname -- )
+    pick word-plist
+    pick [ set-assoc ] [ remove-assoc nip ] ifte
+    swap set-word-plist ;
+
+: ?word-primitive ( obj -- prim/0 )
+    dup word? [ word-primitive ] [ drop 0 ] ifte ;
+
+: defined?   ( obj -- ? ) ?word-primitive 0 = not ;
+: compound?  ( obj -- ? ) ?word-primitive 1 = ;
+: primitive? ( obj -- ? ) ?word-primitive 2 > ;
+: symbol?    ( obj -- ? ) ?word-primitive 2 = ;
+
+: word ( -- word ) global [ "last-word" get ] bind ;
+: set-word ( word -- ) global [ "last-word" set ] bind ;
+
+: define-compound ( word def -- )
+    over set-word-parameter
+    1 over set-word-primitive
+    f "parsing" set-word-property ;
+
+: define-symbol ( word -- )
+    dup dup set-word-parameter
+    2 swap set-word-primitive ;
 
 : word-name ( word -- name )
     "name" word-property ;
 
 : word-vocabulary ( word -- vocab )
     "vocabulary" word-property ;
+
+: stack-effect ( word -- str )
+    "stack-effect" word-property ;
+: documentation ( word -- str )
+    "documentation" word-property ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.

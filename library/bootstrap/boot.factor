@@ -31,46 +31,41 @@ USE: parser
 
 primitives,
 [
-    "/library/platform/native/kernel.factor"
-    "/library/platform/native/stack.factor"
-    "/library/platform/native/types.factor"
+    "/library/kernel.factor"
+    "/library/stack.factor"
+    "/library/types.factor"
     "/library/math/math.factor"
     "/library/cons.factor"
     "/library/combinators.factor"
     "/library/logic.factor"
-    "/library/platform/native/vectors.factor"
     "/library/vector-combinators.factor"
     "/library/lists.factor"
     "/library/assoc.factor"
     "/library/math/arithmetic.factor"
     "/library/math/math-combinators.factor"
     "/library/vectors.factor"
-    "/library/platform/native/strings.factor"
     "/library/strings.factor"
     "/library/hashtables.factor"
-    "/library/platform/native/namespaces.factor"
     "/library/namespaces.factor"
     "/library/math/namespace-math.factor"
     "/library/list-namespaces.factor"
     "/library/sbuf.factor"
     "/library/continuations.factor"
-    "/library/platform/native/errors.factor"
     "/library/errors.factor"
-    "/library/platform/native/threads.factor"
-    "/library/stream.factor"
-    "/library/platform/native/io-internals.factor"
-    "/library/platform/native/stream.factor"
-    "/library/stdio.factor"
-    "/library/extend-stream.factor"
-    "/library/platform/native/words.factor"
+    "/library/threads.factor"
+    "/library/io/stream.factor"
+    "/library/io/io-internals.factor"
+    "/library/io/stream-impl.factor"
+    "/library/io/stdio.factor"
+    "/library/io/extend-stream.factor"
     "/library/words.factor"
-    "/library/platform/native/vocabularies.factor"
+    "/library/vocabularies.factor"
     "/library/syntax/parse-numbers.factor"
     "/library/syntax/parser.factor"
     "/library/syntax/parse-syntax.factor"
     "/library/syntax/parse-stream.factor"
-    "/library/platform/native/math.factor"
-    "/library/platform/native/init.factor"
+    "/library/math/generic.factor"
+    "/library/bootstrap/init.factor"
 ] [
     cross-compile-resource
 ] each
@@ -82,5 +77,5 @@ DEFER: boot
 
 [
     boot
-    "/library/platform/native/boot-stage2.factor" run-resource
+    "/library/bootstrap/boot-stage2.factor" run-resource
 ] (set-boot)

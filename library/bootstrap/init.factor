@@ -25,33 +25,25 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: random
+IN: init
 USE: combinators
+USE: compiler
+USE: errors
 USE: kernel
-USE: math
-USE: stack
+USE: namespaces
+USE: parser
+USE: stdio
+USE: streams
+USE: threads
+USE: words
+USE: vectors
 
-: power-of-2? ( n -- ? )
-    dup dup neg bitand = ;
-
-: (random-int-0) ( n bits val -- n )
-    3dup - + pred 0 < [
-        2drop (random-int) 2dup swap mod (random-int-0)
-    ] [
-        nip nip
-    ] ifte ;
-
-: random-int-0 ( max -- n )
-    succ dup power-of-2? [
-        (random-int) * -31 shift
-    ] [
-        (random-int) 2dup swap mod (random-int-0)
-    ] ifte ;
-
-: random-int ( min max -- n )
-    dupd swap - random-int-0 + ;
-
-: random-boolean ( -- ? )
-    0 1 random-int 0 = ;
-
-! TODO: : random-float ... ;
+: boot ( -- )
+    #! Initialize an interpreter with the basic services.
+    init-errors
+    init-namespaces
+    init-threads
+    init-stdio
+    "HOME" os-env [ "." ] unless* "~" set
+    "/" "/" set
+    init-search-path ;

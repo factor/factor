@@ -37,6 +37,95 @@ USE: stack
 USE: stdio
 USE: strings
 USE: unparser
+USE: vectors
+USE: words
+USE: math
+
+: expired-error ( obj -- )
+    "Object did not survive image save/load: " write . ;
+
+: io-task-twice-error ( obj -- )
+    "Attempting to perform two simultaneous I/O operations on "
+    write . ;
+
+: no-io-tasks-error ( obj -- )
+    "No I/O tasks" print ;
+
+: undefined-word-error ( obj -- )
+    "Undefined word: " write . ;
+
+: incompatible-port-error ( obj -- )
+    "Unsuitable port for operation: " write . ;
+
+: io-error ( list -- )
+    "I/O error in kernel function " write
+    unswons write ": " write car print ;
+
+: type-check-error ( list -- )
+    "Type check error" print
+    uncons car dup "Object: " write .
+    "Object type: " write type type-name print
+    "Expected type: " write type-name print ;
+
+: array-range-error ( list -- )
+    "Array range check error" print
+    unswons "Object: " write .
+    uncons car "Maximum index: " write .
+    "Requested index: " write . ;
+
+: float-format-error ( list -- )
+    "Invalid floating point literal format: " write . ;
+
+: signal-error ( obj -- )
+    "Operating system signal " write . ;
+
+: negative-array-size-error ( obj -- )
+    "Cannot allocate array with negative size " write . ;
+
+: bad-primitive-error ( obj -- )
+    "Bad primitive number: " write . ;
+
+: c-string-error ( obj -- )
+    "Cannot convert to C string: " write . ;
+
+: ffi-disabled-error ( obj -- )
+    drop "Recompile Factor with #define FFI." print ;
+
+: ffi-error ( obj -- )
+    "FFI: " write print ;
+
+: port-closed-error ( obj -- )
+    "Port closed: " write . ;
+
+: kernel-error. ( obj n -- str )
+    {
+        expired-error
+        io-task-twice-error
+        no-io-tasks-error
+        incompatible-port-error
+        io-error
+        undefined-word-error
+        type-check-error
+        array-range-error
+        float-format-error
+        signal-error
+        negative-array-size-error
+        bad-primitive-error
+        c-string-error
+        ffi-disabled-error
+        ffi-error
+        port-closed-error
+    } vector-nth execute ;
+
+: kernel-error? ( obj -- ? )
+    dup cons? [ uncons cons? swap fixnum? and ] [ drop f ] ifte ;
+
+: error. ( error -- str )
+    dup kernel-error? [
+        uncons car swap kernel-error.
+    ] [
+        dup string? [ print ] [ . ] ifte
+    ] ifte ;
 
 : standard-dump ( error -- )
     "ERROR: " write error. ;

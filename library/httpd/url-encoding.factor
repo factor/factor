@@ -51,8 +51,7 @@ USE: unparser
     2dup str-length 2 - >= [
         2drop
     ] [
-        >r succ dup 2 + r> substring
-        catch-hex> [ >char , ] when*
+        >r succ dup 2 + r> substring  catch-hex> [ , ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )

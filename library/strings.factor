@@ -48,6 +48,13 @@ USE: stack
     ! string.
     80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>str ;
 
+: cat2 ( "a" "b" -- "ab" )
+    swap
+    80 <sbuf>
+    dup >r sbuf-append r>
+    dup >r sbuf-append r>
+    sbuf>str ;
+
 : cat3 ( "a" "b" "c" -- "abc" )
     [ ] cons cons cons cat ;
 
@@ -87,9 +94,6 @@ USE: stack
     #! original string, without the character at the given
     #! index.
     [ swap str-head ] 2keep succ swap str-tail ;
-
-: >title ( str -- str )
-    1 str/ >r >upper r> >lower cat2 ;
 
 : str-headcut ( str begin -- str str )
     str-length str/ ;

@@ -36,6 +36,19 @@ USE: stack
 USE: stdio
 USE: strings
 
+: exists? ( file -- ? )
+    stat >boolean ;
+
+: directory? ( file -- ? )
+    stat dup [ car ] when ;
+
+: directory ( dir -- list )
+    #! List a directory.
+    (directory) str-sort ;
+
+: file-length ( file -- length )
+    stat dup [ cdr cdr car ] when ;
+
 : file-actions ( -- list )
     [
         [ "Push"             | ""           ]
