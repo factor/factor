@@ -34,7 +34,7 @@ import factor.*;
 import javax.swing.text.AttributeSet;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.WeakHashMap;
+import java.util.HashMap;
 import org.gjt.sp.jedit.jEdit;
 import org.gjt.sp.jedit.ServiceManager;
 import org.gjt.sp.util.Log;
@@ -45,7 +45,19 @@ public class FactorShell extends Shell
 	public FactorShell()
 	{
 		super("Factor");
-		consoles = new WeakHashMap();
+		consoles = new HashMap();
+	} //}}}
+
+	//{{{ closeConsole() method
+	/**
+	 * Called when a Console dockable is closed.
+	 * @since Console 4.0.2
+	 */
+	public void closeConsole(Console console)
+	{
+		ConsoleState state = (ConsoleState)consoles.get(console);
+		if(state != null)
+			state.closeStream();
 	} //}}}
 
 	//{{{ printInfoMessage() method
@@ -129,7 +141,7 @@ public class FactorShell extends Shell
 	} //}}}
 
 	//{{{ Private members
-	private WeakHashMap consoles;
+	private HashMap consoles;
 	
 	//{{{ getConsoleState() method
 	private ConsoleState getConsoleState(Console console)
@@ -178,7 +190,6 @@ public class FactorShell extends Shell
 					console.print(console.getInfoColor(),
 						jEdit.getProperty("factor.shell.closing"));
 					stream.close();
-					stream = null;
 				}
 			}
 			catch(IOException e)
@@ -186,6 +197,8 @@ public class FactorShell extends Shell
 				/* We don't care */
 				Log.log(Log.ERROR,this,e);
 			}
+
+			stream = null;
 		}
 		
 		void packetLoop(Output output) throws Exception

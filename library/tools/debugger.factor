@@ -59,19 +59,20 @@ USE: unparser
     #! The game overrides this.
     ;
 
+: :s ( -- ) "error-datastack"  get {.} ;
+: :r ( -- ) "error-callstack"  get {.} ;
+: :n ( -- ) "error-namestack"  get {.} ;
+: :c ( -- ) "error-catchstack" get {.} ;
+
 : default-error-handler ( error -- )
     #! Print the error and return to the top level.
     [
         in-parser? [ parse-dump ] [ standard-dump ] ifte
 
-        ":s :r :n :c show stacks at time of error." print
+        [ :s :r :n :c ] [ prettyprint-word " " write ] each
+        "show stacks at time of error." print
 
         java? [ ":j shows Java stack trace." print ] when
         error-handler-hook
 
     ] when* ;
-
-: :s ( -- ) "error-datastack"  get {.} ;
-: :r ( -- ) "error-callstack"  get {.} ;
-: :n ( -- ) "error-namestack"  get {.} ;
-: :c ( -- ) "error-catchstack" get {.} ;
