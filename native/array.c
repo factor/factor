@@ -1,7 +1,12 @@
 #include "factor.h"
 
+/* the array is full of undefined data, and must be correctly filled before the
+next GC. */
 F_ARRAY* allot_array(CELL type, CELL capacity)
 {
+	if(capacity < 0)
+		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
+
 	F_ARRAY* array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
 	array->capacity = tag_fixnum(capacity);
 	return array;
@@ -17,20 +22,14 @@ F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 
 void primitive_array(void)
 {
-	F_FIXNUM capacity = to_fixnum(dpop());
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
-	dpush(tag_object(array(ARRAY_TYPE,capacity,F)));
+	dpush(tag_object(array(ARRAY_TYPE,to_fixnum(dpop()),F)));
 }
 
 void primitive_tuple(void)
 {
-	F_FIXNUM capacity = to_fixnum(dpop());
-	if(capacity < 0)
-		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	maybe_garbage_collection();
-	dpush(tag_object(array(TUPLE_TYPE,capacity,F)));
+	dpush(tag_object(array(TUPLE_TYPE,to_fixnum(dpop()),F)));
 }
 
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)

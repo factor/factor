@@ -179,16 +179,13 @@ void primitive_bignum_shift(void)
 
 void primitive_bignum_less(void)
 {
-	F_ARRAY* y = to_bignum(dpop());
-	F_ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_less);
 }
 
 void primitive_bignum_lesseq(void)
 {
-	F_ARRAY* y = to_bignum(dpop());
-	F_ARRAY* x = to_bignum(dpop());
-
+	GC_AND_POP_BIGNUMS(x,y);
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:
@@ -206,16 +203,13 @@ void primitive_bignum_lesseq(void)
 
 void primitive_bignum_greater(void)
 {
-	F_ARRAY* y = to_bignum(dpop());
-	F_ARRAY* x = to_bignum(dpop());
+	GC_AND_POP_BIGNUMS(x,y);
 	box_boolean(s48_bignum_compare(x,y) == bignum_comparison_greater);
 }
 
 void primitive_bignum_greatereq(void)
 {
-	F_ARRAY* y = to_bignum(dpop());
-	F_ARRAY* x = to_bignum(dpop());
-
+	GC_AND_POP_BIGNUMS(x,y);
 	switch(s48_bignum_compare(x,y))
 	{
 	case bignum_comparison_less:

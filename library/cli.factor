@@ -36,7 +36,11 @@ kernel-internals ;
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
     #! consumed, returns f. Otherwise returns the argument.
-    dup f-or-"" [ "-" ?string-head [ cli-param f ] when ] unless ;
+    #! Parameters that start with + are runtime parameters.
+    dup f-or-"" [
+        "-" ?string-head [ cli-param f ] when
+        dup [ "+" ?string-head [ drop f ] when ] when
+    ] unless ;
 
 : parse-switches ( args -- args )
     [ cli-arg ] map ;

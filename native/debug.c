@@ -1,5 +1,8 @@
 #include "factor.h"
 
+/* Implements some Factor library words in C, to dump a stack in a semi-human-readable
+form without any Factor code executing.. This is not used during normal execution, only
+when the runtime dies. */
 bool equals(CELL obj1, CELL obj2)
 {
 	if(type_of(obj1) == STRING_TYPE

@@ -14,19 +14,21 @@ void fix_stacks(void)
 {
 	if(STACK_UNDERFLOW(ds,ds_bot))
 		reset_datastack();
-	else if(STACK_OVERFLOW(ds,ds_bot))
+	else if(STACK_OVERFLOW(ds,ds_bot,ds_size))
 		reset_datastack();
 	else if(STACK_UNDERFLOW(cs,cs_bot))
 		reset_callstack();
-	else if(STACK_OVERFLOW(cs,cs_bot))
+	else if(STACK_OVERFLOW(cs,cs_bot,cs_size))
 		reset_callstack();
 }
 
-void init_stacks(void)
+void init_stacks(CELL ds_size_, CELL cs_size_)
 {
-	ds_bot = (CELL)alloc_guarded(STACK_SIZE);
+	ds_size = ds_size_;
+	cs_size = cs_size_;
+	ds_bot = (CELL)alloc_guarded(ds_size);
 	reset_datastack();
-	cs_bot = (CELL)alloc_guarded(STACK_SIZE);
+	cs_bot = (CELL)alloc_guarded(cs_size);
 	reset_callstack();
 	callframe = userenv[BOOT_ENV];
 }

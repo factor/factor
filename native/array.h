@@ -20,9 +20,6 @@ F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 
-#define ASIZE(pointer) align8(sizeof(F_ARRAY) + \
-	array_capacity((F_ARRAY*)(pointer)) * CELLS)
-
 INLINE CELL array_capacity(F_ARRAY* array)
 {
 	return untag_fixnum_fast(array->capacity);

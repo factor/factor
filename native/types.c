@@ -10,7 +10,7 @@ CELL object_size(CELL pointer)
 		size = 0;
 		break;
 	case BIGNUM_TYPE:
-		size = ASIZE(UNTAG(pointer));
+		size = untagged_object_size(UNTAG(pointer));
 		break;
 	case CONS_TYPE:
 		size = sizeof(F_CONS);
@@ -54,7 +54,8 @@ CELL untagged_object_size(CELL pointer)
 	case ARRAY_TYPE:
 	case BIGNUM_TYPE:
 	case TUPLE_TYPE:
-		size = ASIZE(pointer);
+		size = align8(sizeof(F_ARRAY) +
+			array_capacity((F_ARRAY*)(pointer)) * CELLS);
 		break;
 	case HASHTABLE_TYPE:
 		size = sizeof(F_HASHTABLE);

@@ -110,11 +110,6 @@ typedef signed long long s64;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-/* Memory areas */
-#define DEFAULT_ARENA (16 * 1024 * 1024)
-#define COMPILE_ZONE_SIZE (8 * 1024 * 1024)
-#define STACK_SIZE (2 * 1024 * 1024)
-
 #include "memory.h"
 #include "error.h"
 #include "types.h"

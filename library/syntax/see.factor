@@ -56,7 +56,6 @@ presentation streams unparser words ;
 
 : stack-effect. ( word -- )
     dup "stack-effect" word-prop [
-        " " write
         [ CHAR: ( , , CHAR: ) , ] make-string
         comment.
     ] [
@@ -76,9 +75,6 @@ presentation streams unparser words ;
     ] when* ;
 
 : definer. ( word -- ) dup definer word-bl word-bl ;
-
-: (see) ( word -- )
-    dup prettyprint-IN: dup definer. stack-effect. terpri ;
 
 GENERIC: (see) ( word -- )
 
