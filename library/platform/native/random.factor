@@ -25,56 +25,32 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: parser
+IN: random
 USE: arithmetic
-USE: combinators
-USE: errors
 USE: kernel
-USE: lists
-USE: logic
-USE: namespaces
 USE: stack
-USE: strings
-USE: words
-USE: vocabularies
-USE: unparser
 
-! Number parsing
+: power-of-2? ( n -- ? )
+    dup dup neg bitand = ;
 
-: not-a-number "Not a number" throw ;
-
-: digit> ( ch -- n )
-    [
-        [ digit? ] [ CHAR: 0 - ]
-        [ letter? ] [ CHAR: a - 10 + ]
-        [ LETTER? ] [ CHAR: A - 10 + ]
-        [ drop t ] [ not-a-number ]
-    ] cond ;
-
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
-
-: digit ( num digit -- num )
-    "base" get swap 2dup > [
-        >r * r> +
+: (random-int-0) ( n bits val -- n )
+    3dup - + pred 0 < [
+        2drop (random-int) 2dup swap mod (random-int-0)
     ] [
-        not-a-number
+        nip nip
     ] ifte ;
 
-: (str>fixnum) ( str -- num )
-    0 swap [ digit> digit ] str-each ;
-
-: str>fixnum ( str -- num )
-    #! Parse a string representation of an integer.
-    dup str-length 0 = [
-        drop not-a-number
+: random-int-0 ( max -- n )
+    succ dup power-of-2? [
+        (random-int) * 31 shift>
     ] [
-        dup "-" str-head? dup [
-            nip str>fixnum neg
-        ] [
-            drop (str>fixnum)
-        ] ifte
+        (random-int) 2dup swap mod (random-int-0)
     ] ifte ;
 
-: parse-number ( str -- num/f )
-    [ str>fixnum ] [ [ drop f ] when ] catch ;
+: random-int ( min max -- n )
+    dupd swap - random-int-0 + ;
+
+: random-boolean ( -- ? )
+    0 1 random-int 0 = ;
+
+! TODO: : random-float ... ;

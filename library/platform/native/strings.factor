@@ -25,56 +25,18 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: parser
+IN: strings
 USE: arithmetic
-USE: combinators
-USE: errors
 USE: kernel
-USE: lists
 USE: logic
-USE: namespaces
 USE: stack
-USE: strings
-USE: words
-USE: vocabularies
-USE: unparser
 
-! Number parsing
+: letter? CHAR: a CHAR: z between? ;
+: LETTER? CHAR: A CHAR: Z between? ;
+: digit? CHAR: 0 CHAR: 9 between? ;
+: printable? CHAR: \s CHAR: ~ between? ;
 
-: not-a-number "Not a number" throw ;
-
-: digit> ( ch -- n )
-    [
-        [ digit? ] [ CHAR: 0 - ]
-        [ letter? ] [ CHAR: a - 10 + ]
-        [ LETTER? ] [ CHAR: A - 10 + ]
-        [ drop t ] [ not-a-number ]
-    ] cond ;
-
-: >digit ( n -- ch )
-    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
-
-: digit ( num digit -- num )
-    "base" get swap 2dup > [
-        >r * r> +
-    ] [
-        not-a-number
-    ] ifte ;
-
-: (str>fixnum) ( str -- num )
-    0 swap [ digit> digit ] str-each ;
-
-: str>fixnum ( str -- num )
-    #! Parse a string representation of an integer.
-    dup str-length 0 = [
-        drop not-a-number
-    ] [
-        dup "-" str-head? dup [
-            nip str>fixnum neg
-        ] [
-            drop (str>fixnum)
-        ] ifte
-    ] ifte ;
-
-: parse-number ( str -- num/f )
-    [ str>fixnum ] [ [ drop f ] when ] catch ;
+: quotable? ( ch -- ? )
+    #! In a string literal, can this character be used without
+    #! escaping?
+    dup printable? swap "\"\\" str-contains? not and ;

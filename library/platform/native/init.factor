@@ -37,6 +37,7 @@ USE: logic
 USE: interpreter
 USE: io-internals
 USE: math
+USE: random
 USE: namespaces
 USE: parser
 USE: prettyprint
@@ -55,19 +56,19 @@ USE: unparser
 
 : boot ( -- )
     init-gc
+    init-random
     init-namespaces
+    init-stdio
+    "stdio" get <ansi-stream> "stdio" set
 
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
     t "user-init" set
     t "interactive" set
-
-    init-stdio
-    "stdio" get <ansi-stream> "stdio" set
-
     "HOME" os-env [ "." ] unless* "~" set
     "/" "/" set
     10 "base" set
+
     init-errors
     init-search-path
     init-scratchpad
@@ -75,9 +76,9 @@ USE: unparser
     init-vocab-styles
 
     print-banner
-    
+
     run-user-init
-    
+
     room.
-    
+
     init-interpreter ;

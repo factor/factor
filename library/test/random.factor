@@ -5,15 +5,12 @@ USE: lists
 USE: logic
 USE: namespaces
 USE: random
-USE: stdio
+USE: stack
 USE: test
 
-"Checking random number generation." print
-
 [ t ]
-[ [ 1 2 3 ] ]
-[ random-element number? ]
-test-word
+[ [ 1 2 3 ] random-element number? ]
+unit-test
 
 [
     [ 10 | t ]
@@ -22,7 +19,12 @@ test-word
 ] "random-pairs" set
 
 [ f ]
-[ "random-pairs" get ]
-[ random-element* [ t f "monkey" ] contains not ] test-word
+[
+    "random-pairs" get
+    random-element* [ t f "monkey" ] contains not
+] unit-test
 
-"Random number checks complete." print
+: check-random-int ( min max -- )
+    2dup random-int -rot between? assert ;
+
+[ ] [ 100 [ -12 674 check-random-int ] times ] unit-test

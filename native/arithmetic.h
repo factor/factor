@@ -13,22 +13,20 @@ INLINE FIXNUM bignum_to_fixnum(CELL tagged)
 #define CELL_TO_INTEGER(result) \
 	FIXNUM _result = (result); \
 	if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-		env.dt = tag_bignum(fixnum_to_bignum(_result)); \
+		return tag_bignum(fixnum_to_bignum(_result)); \
 	else \
-		env.dt = tag_fixnum(_result);
+		return tag_fixnum(_result);
 
 #define BIGNUM_2_TO_INTEGER(result) \
         BIGNUM_2 _result = (result); \
         if(_result < FIXNUM_MIN || _result > FIXNUM_MAX) \
-                env.dt = tag_bignum(bignum(_result)); \
+                return tag_bignum(bignum(_result)); \
         else \
-                env.dt = tag_fixnum(_result);
+                return tag_fixnum(_result);
 
-#define BINARY_OP(OP) \
-void primitive_##OP(void) \
+#define BINARY_OP(OP,anytype) \
+CELL OP(CELL x, CELL y) \
 { \
-	CELL x = dpop(), y = env.dt; \
-\
 	switch(TAG(x)) \
 	{ \
 	case FIXNUM_TYPE: \
@@ -36,21 +34,25 @@ void primitive_##OP(void) \
 		switch(TAG(y)) \
 		{ \
 		case FIXNUM_TYPE: \
-			OP##_fixnum(x,y); \
-			break; \
+			return OP##_fixnum(x,y); \
 		case OBJECT_TYPE: \
 			switch(object_type(y)) \
 			{ \
 			case BIGNUM_TYPE: \
-				OP##_bignum((CELL)fixnum_to_bignum(x),y); \
-				break; \
+				return OP##_bignum((CELL)fixnum_to_bignum(x),y); \
 			default: \
-				type_error(FIXNUM_TYPE,y); \
+				if(anytype) \
+					return OP##_anytype(x,y); \
+				else \
+					type_error(FIXNUM_TYPE,y); \
 				break; \
 			} \
 			break; \
 		default: \
-			type_error(FIXNUM_TYPE,y); \
+			if(anytype) \
+				return OP##_anytype(x,y); \
+			else \
+				type_error(FIXNUM_TYPE,y); \
 			break; \
 		} \
 \
@@ -66,14 +68,13 @@ void primitive_##OP(void) \
 			switch(TAG(y)) \
 			{ \
 			case FIXNUM_TYPE: \
-				OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
-				break; \
+				return OP##_bignum(x,(CELL)fixnum_to_bignum(y)); \
 			case OBJECT_TYPE: \
 \
 				switch(object_type(y)) \
 				{ \
 				case BIGNUM_TYPE: \
-					OP##_bignum(x,y); \
+					return OP##_bignum(x,y); \
 					break; \
 				default: \
 					type_error(BIGNUM_TYPE,y); \
@@ -81,14 +82,20 @@ void primitive_##OP(void) \
 				} \
 				break; \
 			default: \
-				type_error(BIGNUM_TYPE,y); \
+				if(anytype) \
+					return OP##_anytype(x,y); \
+				else \
+					type_error(BIGNUM_TYPE,y); \
 				break; \
 			} \
 			break; \
 \
 		default: \
 \
-			type_error(FIXNUM_TYPE,x); \
+			if(anytype) \
+				return OP##_anytype(x,y); \
+			else \
+				type_error(FIXNUM_TYPE,x); \
 			break; \
 		} \
 \
@@ -96,13 +103,27 @@ void primitive_##OP(void) \
 \
 	default: \
 \
-		type_error(FIXNUM_TYPE,x); \
+		if(anytype) \
+			return OP##_anytype(x,y); \
+		else \
+			type_error(FIXNUM_TYPE,x); \
 		break; \
 	} \
+} \
+\
+void primitive_##OP(void) \
+{ \
+	CELL x = dpop(), y = env.dt; \
+	env.dt = OP(x,y); \
 }
 
+void primitive_numberp(void);
 FIXNUM to_fixnum(CELL tagged);
+void primitive_to_fixnum(void);
+BIGNUM* to_bignum(CELL tagged);
+void primitive_to_bignum(void);
 
+void primitive_number_eq(void);
 void primitive_add(void);
 void primitive_subtract(void);
 void primitive_multiply(void);

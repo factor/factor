@@ -1,13 +1,11 @@
 USE: arithmetic
 USE: lists
-USE: stdio
+USE: stack
 USE: test
 USE: vectors
 
-"Vector tests." print
-
 [ [ 1 4 9 16 ] ] [ [ 1 2 3 4 ] ]
-[ list>vector [ sq ] vector-map vector>list ] test-word
+[ list>vector [ dup * ] vector-map vector>list ] test-word
 [ t ] [ [ 1 2 3 4 ] ]
 [ list>vector [ number? ] vector-all? ] test-word
 [ f ] [ [ 1 2 3 4 ] ]

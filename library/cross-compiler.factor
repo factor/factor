@@ -39,6 +39,9 @@ USE: vectors
 USE: vocabularies
 USE: words
 
+IN: arithmetic
+DEFER: number=
+
 IN: kernel
 DEFER: getenv
 DEFER: setenv
@@ -60,6 +63,10 @@ DEFER: read-line-fd-8
 DEFER: write-fd-8
 DEFER: flush-fd
 DEFER: shutdown-fd
+
+IN: random
+DEFER: init-random
+DEFER: (random-int)
 
 IN: words
 DEFER: <word>
@@ -105,6 +112,10 @@ IN: cross-compiler
         set-sbuf-nth
         sbuf-append
         sbuf>str
+        number?
+        >fixnum
+        >bignum
+        number=
         fixnum?
         bignum?
         +
@@ -163,6 +174,8 @@ IN: cross-compiler
         room
         os-env
         millis
+        init-random
+        (random-int)
     ] [
         swap succ tuck primitive,
     ] each drop ;

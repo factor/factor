@@ -29,6 +29,7 @@ IN: unparser
 USE: arithmetic
 USE: combinators
 USE: kernel
+USE: format
 USE: lists
 USE: logic
 USE: namespaces
@@ -68,9 +69,31 @@ USE: vocabularies
     #! Convert a number to its hexadecimal representation.
     16 >base ;
 
+: ch>ascii-escape ( ch -- esc )
+    [
+        [ CHAR: \e | "\\e" ]
+        [ CHAR: \n | "\\n" ]
+        [ CHAR: \r | "\\r" ]
+        [ CHAR: \t | "\\t" ]
+        [ CHAR: \0 | "\\0" ]
+        [ CHAR: \\ | "\\\\" ]
+        [ CHAR: \" | "\\\"" ]
+    ] assoc ;
+
+: ch>unicode-escape ( ch -- esc )
+    >hex 4 digits "\\u" swap cat2 ;
+
+: unparse-ch ( ch -- ch/str )
+    dup quotable? [
+        dup ch>ascii-escape dup [
+            nip
+        ] [
+            drop ch>unicode-escape
+        ] ifte
+    ] unless ;
+
 : unparse-str ( str -- str )
-    #! Escapes not done
-    <% CHAR: " % % CHAR: " % %> ;
+    <% CHAR: " % [ unparse-ch % ] str-each CHAR: " % %> ;
 
 : unparse-word ( word -- str )
     word-name dup "#<unnamed>" ? ;

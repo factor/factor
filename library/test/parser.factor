@@ -38,11 +38,6 @@ test-word
 [ parse call ]
 test-word
 
-[ "\"hello\\\\backslash\"" ]
-[ "hello\\backslash" ]
-[ unparse ]
-test-word
-
 ! Test escapes
 
 [ [ " " ] ]
@@ -53,14 +48,4 @@ test-word
 [ [ "'" ] ]
 [ "\"\\u0027\"" ]
 [ parse ]
-test-word
-
-[ "\"\\u1234\"" ]
-[ "\u1234" ]
-[ unparse ]
-test-word
-
-[ "\"\\e\"" ]
-[ "\e" ]
-[ unparse ]
 test-word

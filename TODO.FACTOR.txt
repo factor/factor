@@ -3,7 +3,6 @@
 ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable" ]
 
 - prettyprinter: space after #<>, space after ~<< foo
-- bignum=
 - fixup-words is crusty
 - decide if overflow is a fatal error
 - f >n: crashes
@@ -16,7 +15,6 @@ ERROR: I/O error: [ "primitive_read_line_fd_8" "Resource temporarily unavailable
 - contains ==> contains?
 - telnetd: send errors on socket
 - inspector: sort
-- index of str
 - accept: return socket, instead of printing msg
 - enforce bottom-up in native bootstrap
 

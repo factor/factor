@@ -84,14 +84,14 @@ USE: unparser
 : IN: scan dup "use" cons@ "in" set ; parsing
 
 ! \x
-: unicode-escape ( -- esc )
+: unicode-escape>ch ( -- esc )
     #! Read \u....
     next-ch digit> 16 *
     next-ch digit> + 16 *
     next-ch digit> + 16 *
     next-ch digit> + ;
 
-: ascii-escape ( ch -- esc )
+: ascii-escape>ch ( ch -- esc )
     [
         [ CHAR: e | CHAR: \e ]
         [ CHAR: n | CHAR: \n ]
@@ -106,9 +106,9 @@ USE: unparser
 
 : escape ( ch -- esc )
     dup CHAR: u = [
-        drop unicode-escape
+        drop unicode-escape>ch
     ] [
-        ascii-escape
+        ascii-escape>ch
     ] ifte ;
 
 ! String literal

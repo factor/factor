@@ -29,3 +29,14 @@ void primitive_millis(void)
 	dpush(env.dt);
 	env.dt = tag_object(bignum(t.tv_sec * 1000 + t.tv_usec/1000));
 }
+
+void primitive_init_random(void)
+{
+	srandomdev();
+}
+
+void primitive_random_int(void)
+{
+	dpush(env.dt);
+	env.dt = tag_object(bignum(random()));
+}

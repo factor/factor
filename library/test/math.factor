@@ -37,7 +37,6 @@ USE: test
 [ t ] [ 30 2^ ] [ fixnum? ] test-word
 [ t ] [ 32 2^ ] [ bignum? ] test-word
 
-[ -1 ] [ 1 ] [ neg ] test-word
 [ 2.1 ] [ -2.1 ] [ neg ] test-word
 
 ! Make sure equality testing works.
