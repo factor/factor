@@ -7,7 +7,7 @@ USING: generic kernel lists math namespaces sdl ;
 ! shape makes a new shape.
 
 ! These dynamically-bound variables affect the generic word
-! inside?.
+! inside? and others.
 SYMBOL: x
 SYMBOL: y
 
@@ -22,17 +22,6 @@ GENERIC: shape-h
 
 GENERIC: move-shape ( x y shape -- )
 GENERIC: resize-shape ( w h shape -- )
-
-: clip-w ( gadget -- )
-    width [ nip ( over shape-x - swap shape-w min 0 max ) ] change ;
-
-: clip-h ( gadget -- )
-    height [ nip ( over shape-y - swap shape-h min 0 max ) ] change ;
-
-: with-clip ( shape quot -- )
-    #!  All drawing done inside the quotation is clipped to the
-    #! shape's bounds.
-    [ >r dup clip-w clip-h r> call ] with-scope ; inline
 
 : with-trans ( shape quot -- )
     #! All drawing done inside the quotation is translated
@@ -113,15 +102,16 @@ M: rectangle move-shape ( x y rect -- )
 M: rectangle resize-shape ( w h rect -- )
     tuck set-rectangle-h set-rectangle-w ;
 
-: rectangle-x-extents ( rect -- x1 x2 )
-    dup shape-x x get + swap shape-w 1 - dupd + ;
+: rectangle-x-extents ( rect x0 -- x1 x2 )
+    >r dup shape-x r> + swap shape-w dupd + ;
 
-: rectangle-y-extents ( rect -- x1 x2 )
-    dup shape-y y get + swap shape-h 1 - dupd + ;
+: rectangle-y-extents ( rect y0 -- y1 y2 )
+    >r dup shape-y r> + swap shape-h dupd + ;
 
 : inside-rect? ( point rect -- ? )
-    over shape-x over rectangle-x-extents between? >r
-    swap shape-y swap rectangle-y-extents between? r> and ;
+    over shape-x over x get rectangle-x-extents 1 - between? >r
+    swap shape-y swap y get rectangle-y-extents 1 - between? r>
+    and ;
 
 M: rectangle inside? ( point rect -- ? )
     inside-rect? ;

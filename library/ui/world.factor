@@ -72,9 +72,8 @@ DEFER: handle-event
     t world get set-world-running?
     world get shape-w world get shape-h 0 SDL_RESIZABLE
     [
-        0 x set
-        0 y set
-        [
+        0 x set 0 y set [
+            0 0 width get height get <rectangle> clip set
             title dup SDL_WM_SetCaption
             <event> run-world
         ] with-screen

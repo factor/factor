@@ -115,24 +115,6 @@ M: plain-ellipse draw-shape ( ellipse -- )
     >r surface get r> ellipse>screen background get rgb
     filledEllipseColor ;
 
-: set-clip ( -- )
-    surface get x get y get width get height get make-rect
-    SDL_SetClipRect drop ;
-
-: draw-gadget ( gadget -- )
-    #! All drawing done inside draw-shape is done with the
-    #! gadget's paint. If the gadget does not have any custom
-    #! paint, just call the quotation.
-    dup gadget-paint [
-        dup [
-            set-clip
-            dup draw-shape
-            dup [
-                gadget-children [ draw-gadget ] each
-            ] with-trans
-        ] with-clip
-    ] bind ;
-
 ! Strings are shapes too. This is somewhat of a hack and strings
 ! do not have x/y co-ordinates.
 M: string shape-x drop 0 ;
@@ -148,3 +130,62 @@ M: string draw-shape ( text -- )
     >r x get y get font get r>
     foreground get 3unlist make-color
     draw-string drop ;
+
+! Clipping
+
+SYMBOL: clip
+
+: intersect* ( gadget rect quot -- t1 t2 )
+    call >r >r max r> r> min 2dup > [ drop dup ] when ;
+
+: intersect-x ( gadget rect -- x1 x2 )
+    [
+        0 rectangle-x-extents
+        >r swap x get rectangle-x-extents r>
+    ] intersect* ;
+
+: intersect-y ( gadget rect -- y1 y2 )
+    [
+        0 rectangle-y-extents
+        >r swap y get rectangle-y-extents r>
+    ] intersect* ;
+
+: clip-rect ( x1 x2 y1 y2 -- rect )
+    over - >r >r over - r> swap r> <rectangle> ;
+
+: intersect ( gadget rect -- rect )
+    #! The first gadget's rectangle is relative co-ordinates,
+    #! the second is screen.
+    [ intersect-x ] 2keep intersect-y clip-rect ;
+
+: with-clip ( shape quot -- )
+    #!  All drawing done inside the quotation is clipped to the
+    #! shape's bounds.
+    [ >r clip [ intersect ] change r> call ] with-scope ; inline
+
+: >sdl-rect ( rectangle -- sdlrect )
+    [ rectangle-x ] keep
+    [ rectangle-y ] keep
+    [ rectangle-w ] keep
+    rectangle-h
+    make-rect ;
+
+: set-clip ( -- )
+    #! The top/left corner of the clip rectangle is the location
+    #! of the gadget on the screen. The bottom/right is the
+    #! intersected clip rectangle.
+    surface get clip get >sdl-rect SDL_SetClipRect drop ;
+
+: draw-gadget ( gadget -- )
+    #! All drawing done inside draw-shape is done with the
+    #! gadget's paint. If the gadget does not have any custom
+    #! paint, just call the quotation.
+    dup gadget-paint [
+        dup [
+            set-clip
+            dup draw-shape
+            dup [
+                gadget-children [ draw-gadget ] each
+            ] with-trans
+        ] with-clip
+    ] bind ;
