@@ -158,7 +158,6 @@ cpu "x86" = [
     [
          "/library/compiler/assembly-x86.factor"
          "/library/compiler/generator-x86.factor"
-!        "/library/compiler/alien-macros.factor"
     ] [
         dup print
         run-resource

@@ -10,7 +10,6 @@
 - type inference
 - handle odd base cases, with code after ifte
 - handle recursion with when, when* etc
-- alien-call need special nodes
 
 + linearizer/generator:
 
@@ -36,6 +35,7 @@
 
 + ffi:
 
+- port ffi to new compiler
 - is signed -vs- unsigned pointers an issue?
 - bitfields in C structs
 - SDL_Rect** type

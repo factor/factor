@@ -95,3 +95,17 @@ USE: words
     #! Jump table entries are absolute addresses.
     compiled-offset 0 compile-cell 0 defer-xt
 ] "generator" set-word-property
+
+! TODO: to complete alien compilation, must provide generators
+! for #c-call, #box, #unbox and #cleanup.
+! 
+! : UNBOX ( name -- )
+!     #! Move top of datastack to C stack.
+!     SELF-CALL  EAX PUSH-R ;
+! 
+! : BOX ( name -- )
+!     #! Move EAX to datastack.
+!     EAX PUSH-R  SELF-CALL  4 ESP R+I ;
+! 
+! : CLEANUP ( amount -- )
+!     dup 0 = [ drop ] [ ESP R+I ] ifte ;
