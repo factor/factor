@@ -138,6 +138,6 @@ M: string shape-h ( text -- h )
     drop font get lookup-font TTF_FontHeight ;
 
 M: string draw-shape ( text -- )
-    >r x get y get font get lookup-font r>
+    >r x get y get font get r>
     foreground get 3unlist make-color
     draw-string drop ;

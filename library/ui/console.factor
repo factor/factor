@@ -342,8 +342,8 @@ M: alien handle-event ( event -- ? )
     ] ifte ;
 
 : set-console-font ( font ptsize )
-    cons lookup-font dup console-font set
-    TTF_FontHeight line-height set ;
+    cons dup console-font set
+    lookup-font TTF_FontHeight line-height set ;
 
 : init-console ( -- )
     TTF_Init

@@ -137,6 +137,7 @@ global [
     over str-length 0 = [
         2drop 3drop 0
     ] [
+        >r >r lookup-font r> r>
         TTF_RenderUNICODE_Blended
         [ draw-surface ] keep
         [ surface-w ] keep

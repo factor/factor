@@ -11,7 +11,7 @@ TUPLE: editor line delegate ;
     editor-line [ line-text get ] bind ;
 
 : set-editor-text ( text editor -- )
-    editor-line [ line-text set ] bind ;
+    editor-line [ set-line-text ] bind ;
 
 C: editor ( text -- )
     0 0 0 0 <rectangle> <gadget> over set-editor-delegate
@@ -34,4 +34,5 @@ C: field ( text -- field )
         [[ [ lose-focus ] [ dup black foreground set-paint-property redraw ] ]]
         [[ [ button-down 1 ] [ my-hand request-focus ] ]]
         [[ [ "RETURN" ] [ drop "foo!" USE: stdio print ] ]]
+        [[ [ "BACKSPACE" ] [ dup gadget-children car editor-line [ backspace ] bind redraw ] ]]
     }} over set-gadget-gestures ;
