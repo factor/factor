@@ -48,15 +48,13 @@ public class FactorListener extends JTextPane
 		= Cursor.getPredefinedCursor
 		(Cursor.WAIT_CURSOR);
 
-	public static final Object Link = new Object();
+	public static final Object Input = new Object();
 	public static final Object Actions = new Object();
 
 	private EventListenerList listenerList;
 
 	private Cons readLineContinuation;
 	private int cmdStart = -1;
-
-	private SimpleAttributeSet nullAttributes;
 
 	//{{{ FactorListener constructor
 	public FactorListener()
@@ -66,8 +64,6 @@ public class FactorListener extends JTextPane
 		addMouseMotionListener(mouse);
 
 		listenerList = new EventListenerList();
-
-		nullAttributes = new SimpleAttributeSet();
 
 		/* Replace enter to evaluate the input */
 		getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,0),
@@ -102,13 +98,12 @@ public class FactorListener extends JTextPane
 		throws BadLocationException
 	{
 		StyledDocument doc = (StyledDocument)getDocument();
+		cmdStart = doc.getLength();
+		Element elem = doc.getParagraphElement(cmdStart);
+		/* System.err.println(elem.getAttributes().getClass()); */
 		setCursor(DefaultCursor);
 		this.readLineContinuation = continuation;
-		cmdStart = doc.getLength();
 		setCaretPosition(cmdStart);
-		setCharacterAttributes(nullAttributes,true);
-		/* doc.setCharacterAttributes(cmdStart,cmdStart,input,false);
-		setCharacterAttributes(input,false); */
 	} //}}}
 
 	//{{{ getLine() method
@@ -284,6 +279,7 @@ public class FactorListener extends JTextPane
 	{
 		public void actionPerformed(ActionEvent evt)
 		{
+			setCaretPosition(getDocument().getLength());
 			replaceSelection("\n");
 
 			try
@@ -319,7 +315,6 @@ public class FactorListener extends JTextPane
 			try
 			{
 				getDocument().remove(caret - 1,1);
-				setCharacterAttributes(nullAttributes,true);
 			}
 			catch(BadLocationException e)
 			{

@@ -99,8 +99,8 @@ USE: url-encoding
         [ "link"      link-tag ]
     ] assoc-apply ;
 
-: html-write-attr ( string style stream -- )
-    rot chars>entities rot html-attr-string swap fwrite ;
+: html-write-attr ( string style -- )
+    swap chars>entities swap html-attr-string write ;
 
 : <html-stream> ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream
@@ -115,9 +115,9 @@ USE: url-encoding
     #! italic
     #! underline
     <extend-stream> [
-        [ chars>entities "stream" get fwrite ] "fwrite" set
-        [ chars>entities "stream" get fprint ] "fprint" set
-        [ "stream" get html-write-attr ] "fwrite-attr" set
+        [ chars>entities write ] "fwrite" set
+        [ chars>entities print ] "fprint" set
+        [ html-write-attr ] "fwrite-attr" set
     ] extend ;
 
 : with-html-stream ( quot -- )

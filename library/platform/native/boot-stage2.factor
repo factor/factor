@@ -81,6 +81,8 @@ USE: stdio
     "/library/math/list-math.factor"
     "/library/math/simpson.factor"
 
+    "/library/extend-stream.factor"
+    "/library/platform/native/in-thread.factor"
     "/library/platform/native/network.factor"
     "/library/logging.factor"
     "/library/platform/native/random.factor"
@@ -93,6 +95,7 @@ USE: stdio
     "/library/test/test.factor"
     "/library/ansi.factor"
     "/library/telnetd.factor"
+    "/library/inferior.factor"
 
     "/library/image.factor"
     "/library/cross-compiler.factor"

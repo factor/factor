@@ -1,4 +1,4 @@
-! :folding=indent:collapseFolds=1:
+! :folding=none:collapseFolds=1:
 
 ! $Id$
 !
@@ -25,57 +25,27 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: styles
+IN: threads
 USE: combinators
+USE: continuations
+USE: errors
+USE: io-internals
 USE: kernel
 USE: lists
-USE: namespaces
 USE: stack
 
-! A style is an alist whose key/value pairs hold
-! significance to the 'fwrite-attr' word when applied to a
-! stream that supports attributed string output.
-
-: default-style ( -- style )
-    #! Push the default style object.
-    "styles" get [ "default" get ] bind ;
-
-: paragraph ( -- style )
-    #! Push the paragraph break meta-style.
-    "styles" get [ "paragraph" get ] bind ;
-
-: <style> ( alist -- )
-    #! Create a new style object, cloned from the default
-    #! style.
-    default-style clone tuck alist> ;
-
-: get-style ( obj-path -- style )
-    #! Push a style named by an object path, for example
-    #! [ "prompt" ] or [ "vocabularies" "math" ].
-    dup [
-        "styles" get [ object-path ] bind
-        [ default-style ] unless*
-    ] [
-        drop default-style
-    ] ifte ;
-
-: set-style ( style name -- )
-    ! XXX: use object path...
-    "styles" get [ set ] bind ;
-
-: init-styles ( -- )
-    <namespace> "styles" set
-
+: in-thread ( quot -- )
+    #! Execute a quotation in a co-operative thread. The
+    #! quotation begins executing immediately, and execution
+    #! after the 'in-thread' call in the original thread
+    #! resumes when the quotation yields, either due to blocking
+    #! I/O or an explicit call to 'yield'.
     [
-        [ "font" | "Monospaced" ]
-    ] "default" set-style
-
-    [
-        [ "bold" | t ]
-    ] default-style append "prompt" set-style
-    
-    [
-        [ "ansi-fg" | "0" ]
-        [ "ansi-bg" | "2" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] default-style append "comments" set-style ;
+        schedule-thread
+        [
+            call
+        ] [
+            [ default-error-handler drop ] when*
+        ] catch
+        (yield)
+    ] callcc0 drop ;

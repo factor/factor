@@ -244,7 +244,7 @@ DEFER: tree-contains?
         cons
     ] ifte ;
 
-: each ( [ list ] [ quotation ] -- )
+: each ( list quotation -- )
     #! Push each element of a proper list in turn, and apply a
     #! quotation to each element.
     #!

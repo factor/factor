@@ -32,6 +32,7 @@ USE: kernel
 USE: format
 USE: namespaces
 USE: stack
+USE: stdio
 USE: streams
 USE: strings
 
@@ -75,9 +76,6 @@ USE: strings
 : ansi-attr-string ( string style -- string )
     <% ansi-attrs % reset % %> ;
 
-: ansi-write-attr ( string style stream -- )
-    [ ansi-attr-string ] dip fwrite ;
-
 : <ansi-stream> ( stream -- stream )
     #! Wraps the given stream in an ANSI stream. ANSI streams
     #! support the following character attributes:
@@ -86,5 +84,5 @@ USE: strings
     #! ansi-bg - background color
     <extend-stream> [
         ( string style -- )
-        [ "stream" get ansi-write-attr ] "fwrite-attr" set
+        [ ansi-attr-string write ] "fwrite-attr" set
     ] extend ;

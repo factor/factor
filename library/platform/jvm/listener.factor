@@ -102,13 +102,22 @@ USE: unparser
         [ "size"      dupd "FontSize" swing-attribute+ ]
     ] assoc-apply ;
 
-: reset-attrs ( -- )
-    default-style style>attribute-set t
-    "listener" get
+: set-character-attrs ( attrs -- )
+    t "listener" get
     [ "javax.swing.text.AttributeSet" "boolean" ]
     "javax.swing.JTextPane"
     "setCharacterAttributes"
     jinvoke ;
+
+: set-paragraph-attrs ( attrs -- )
+    t "listener" get
+    [ "javax.swing.text.AttributeSet" "boolean" ]
+    "javax.swing.JTextPane"
+    "setCharacterAttributes"
+    jinvoke ;
+
+: reset-attrs ( -- )
+    default-style style>attribute-set set-character-attrs ;
 
 : listener-readln* ( continuation -- )
     "listener" get

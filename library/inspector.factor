@@ -67,9 +67,6 @@ USE: vectors
     #! Unparse non-string keys.
     [ unswons ?unparse swons ] inject ;
 
-: alist-sort ( list -- list )
-    [ swap car swap car str-lexi> ] sort ;
-
 : name-padding ( alist -- col )
     [ car ] inject max-str-length ;
 
@@ -78,8 +75,8 @@ USE: vectors
     [ dupd uncons value. ] each drop ;
 
 : describe-assoc ( alist -- )
-    alist-keys>str alist-sort (describe-assoc) ;
-   
+    alist-keys>str (describe-assoc) ;
+
 : describe-namespace ( namespace -- )
     [ vars-values ] bind describe-assoc ;
 
@@ -97,11 +94,11 @@ USE: vectors
         [ assoc? ]
         [ describe-assoc ]
         
-        [ hashtable? ]
-        [ describe-hashtable ]
-        
         [ has-namespace? ]
         [ describe-namespace ]
+        
+        [ hashtable? ]
+        [ describe-hashtable ]
         
         [ drop t ]
         [ prettyprint ]

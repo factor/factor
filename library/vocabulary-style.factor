@@ -39,7 +39,8 @@ USE: styles
     "vocabularies" 2rlist get-style ;
 
 : set-vocab-style ( style vocab -- )
-    "styles" get [ "vocabularies" get ] bind [ set ] bind ;
+    swap default-style append swap
+    [ "styles" "vocabularies" ] object-path set* ;
 
 : word-style ( word -- style )
     word-vocabulary dup [

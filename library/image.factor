@@ -345,9 +345,9 @@ IN: cross-compiler
 
 : write-word ( word -- )
     "big-endian" get [
-        big-endian-32
+        write-big-endian-32
     ] [
-        little-endian-32
+        write-little-endian-32
     ] ifte ;
 
 : write-image ( image file -- )

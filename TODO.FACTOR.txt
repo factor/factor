@@ -1,14 +1,7 @@
-- input style after clicking link
 - fedit broken with listener
 - maple-like: press enter at old commands to evaluate there
-- standalone listener input style
 - add a socket timeout
 - balance needs USE:
-- command line arguments
-- socket protocol
-- telnetd and httpd should use multitasking
-- error handling in thread: use a different top-level
-- 'cascading' styles
 - html: order of attrs should not matter
 
 + docs:
@@ -26,6 +19,8 @@
 
 + listener/plugin:
 
+- make inferior.factor nicer to use
+- input style after clicking link
 - plugin should not exit jEdit on fatal errors
 - auto insert USE:
 - plugin not unloaded
@@ -36,13 +31,16 @@
 
 + native:
 
+- read1
+- telnetd and httpd should use multitasking
 - read# and eof
 - sbuf-hashcode
 - vector-hashcode
 - clarify suspend -vs- yield - toplevel
 - irc: stack underflow?
 - ignore SIGPIPE
-- don't allow multiple i/o requests on the same port
+- don't allow multiple reads on the same port
+- multiple tasks should be able to write to the same port
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - better i/o scheduler
@@ -63,6 +61,9 @@
 
 + misc:
 
+- 'cascading' styles
+- jedit ==> jedit-word, jedit takes a file name
+- some way to run httpd from command line
 - prettyprinting an empty vector
 - rethink strhead/strtail&co
 - namespace clone drops static var bindings

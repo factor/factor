@@ -10,6 +10,7 @@
 #define GC_ENV         7
 #define BOOT_ENV       8
 #define RUNQUEUE_ENV   9 /* used by library only */
+#define ARGS_ENV       10
 
 /* Error handlers restore this */
 sigjmp_buf toplevel;

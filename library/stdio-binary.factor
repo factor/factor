@@ -31,27 +31,39 @@ USE: stack
 USE: streams
 USE: strings
 
+: read-little-endian-32 ( -- word )
+    read1
+    read1 8  shift< bitor
+    read1 16 shift< bitor
+    read1 24 shift< bitor ;
+
+: read-big-endian-32 ( -- word )
+    read1 24 shift<
+    read1 16 shift< bitor
+    read1 8  shift< bitor
+    read1           bitor ;
+
 : byte3 ( num -- byte ) 24 shift> HEX: ff bitand ;
 : byte2 ( num -- byte ) 16 shift> HEX: ff bitand ;
 : byte1 ( num -- byte )  8 shift> HEX: ff bitand ;
 : byte0 ( num -- byte )           HEX: ff bitand ;
 
-: little-endian-32 ( word -- )
+: write-little-endian-32 ( word -- )
     dup byte0 >char write
     dup byte1 >char write
     dup byte2 >char write
         byte3 >char write ;
 
-: big-endian-32 ( word -- )
+: write-big-endian-32 ( word -- )
     dup byte3 >char write
     dup byte2 >char write
     dup byte1 >char write
         byte0 >char write ;
 
-: little-endian-16 ( char -- )
+: write-little-endian-16 ( char -- )
     dup byte0 >char write
         byte1 >char write ;
 
-: big-endian-16 ( char -- )
+: write-big-endian-16 ( char -- )
     dup byte1 >char write
         byte0 >char write ;

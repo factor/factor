@@ -31,12 +31,15 @@ USE: combinators
 USE: errors
 USE: httpd-responder
 USE: kernel
+USE: lists
 USE: namespaces
 USE: parser
 USE: random
 USE: streams
 USE: styles
 USE: words
+
+: cli-args ( -- args ) 10 getenv ;
 
 : warm-boot ( -- )
     #! A fully bootstrapped image has this as the boot
@@ -51,6 +54,9 @@ USE: words
     t "user-init" set
     t "interactive" set
 
+    ! The first CLI arg is the image name.
+    cli-args uncons parse-command-line "image" set
+    
     run-user-init
 
     "interactive" get [ init-interpreter ] when

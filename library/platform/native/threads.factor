@@ -31,9 +31,10 @@ USE: continuations
 USE: io-internals
 USE: kernel
 USE: lists
-USE: namespaces
 USE: stack
-USE: strings
+
+! Core of the multitasker. Used by io-internals.factor and
+! in-thread.factor.
 
 : run-queue ( -- queue )
     9 getenv ;
@@ -45,21 +46,30 @@ USE: strings
     f set-run-queue ;
 
 : next-thread ( -- quot )
+    #! Get and remove the next quotation from the run queue.
     run-queue dup [ uncons set-run-queue ] when ;
 
 : schedule-thread ( quot -- )
+    #! Add a quotation to the run queue.
     run-queue cons set-run-queue ;
 
-: yield ( -- )
+: (yield) ( -- )
+    #! If there is a quotation in the run queue, call it,
+    #! otherwise wait for I/O. The currently executing
+    #! continuation is suspended. Use yield instead.
     next-thread dup [
         call
     ] [
         drop next-io-task dup [
             call
         ] [
-            drop yield
+            drop (yield)
         ] ifte
     ] ifte ;
 
-: in-thread ( quot -- )
-    [ schedule-thread call yield ] callcc0 drop ;
+: yield ( -- )
+    #! Add the current continuation to the run queue, and yield
+    #! to the next quotation. The current continuation will
+    #! eventually be restored by a future call to (yield) or
+    #! yield.
+    [ schedule-thread (yield) ] callcc0 ;

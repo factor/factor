@@ -2,6 +2,9 @@
 
 int main(int argc, char** argv)
 {
+	int i;
+	CELL args;
+
 	if(argc == 1)
 	{
 		printf("Usage: factor <image file> [ parameters ... ]\n");
@@ -15,6 +18,15 @@ int main(int argc, char** argv)
 	init_stacks();
 	init_io();
 	init_signals();
+
+	args = F;
+	while(--argc != 0)
+	{
+		args = tag_cons(cons(tag_object(from_c_string(argv[argc])),
+			args));
+	}
+
+	userenv[ARGS_ENV] = args;
 
 	run();
 

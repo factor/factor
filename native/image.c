@@ -9,7 +9,7 @@ void load_image(char* filename)
 	fprintf(stderr,"Loading %s...",filename);
 
 	file = fopen(filename,"rb");
-	if(file < 0)
+	if(file == NULL)
 		fatal_error("Cannot open image for reading",errno);
 
 	/* read it in native byte order */
@@ -51,7 +51,7 @@ bool save_image(char* filename)
 	fprintf(stderr,"Saving %s...\n",filename);
 	
 	file = fopen(filename,"wb");
-	if(file < 0)
+	if(file == NULL)
 		fatal_error("Cannot open image for writing",errno);
 
 	h.magic = IMAGE_MAGIC;

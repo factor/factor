@@ -39,7 +39,7 @@ USE: threads
 : stderr 2 getenv ;
 
 : flush-fd ( port -- )
-    [ swap add-write-io-task yield ] callcc0 drop ;
+    [ swap add-write-io-task (yield) ] callcc0 drop ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ drop ] [ flush-fd ] ifte ;
@@ -50,7 +50,7 @@ USE: threads
     over wait-to-write write-fd-8 ;
 
 : fill-fd ( port -- )
-    [ swap add-read-line-io-task yield ] callcc0 drop ;
+    [ swap add-read-line-io-task (yield) ] callcc0 drop ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [ drop ] [ fill-fd ] ifte ;
@@ -59,7 +59,7 @@ USE: threads
     dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
 
 : fill-fd# ( count port -- )
-    [ -rot add-read-count-io-task yield ] callcc0 2drop ;
+    [ -rot add-read-count-io-task (yield) ] callcc0 2drop ;
 
 : wait-to-read# ( count port -- )
     2dup can-read-count? [ 2drop ] [ fill-fd# ] ifte ;
@@ -68,7 +68,7 @@ USE: threads
     2dup wait-to-read# read-count-fd-8 dup [ sbuf>str ] when ;
 
 : wait-to-accept ( socket -- )
-    [ swap add-accept-io-task yield ] callcc0 drop ;
+    [ swap add-accept-io-task (yield) ] callcc0 drop ;
 
 : blocking-accept ( socket -- host port in out )
     dup wait-to-accept accept-fd ;

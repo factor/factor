@@ -40,6 +40,9 @@ USE: strings
 : freadln ( stream -- string )
     [ "freadln" get call ] bind ;
 
+: fread1 ( stream -- string )
+    [ "fread1" get call ] bind ;
+
 : fread# ( count stream -- string )
     [ "fread#" get call ] bind ;
 
@@ -64,15 +67,17 @@ USE: strings
     #! Create a stream object.
     <namespace> [
         ( -- string )
-        [ "freadln not implemented." throw ] "freadln" set
+        [ "freadln not implemented." throw  ] "freadln" set
+        ( -- string )
+        [ 1 namespace fread# 0 swap str-nth ] "fread1" set
         ( count -- string )
-        [ "fread# not implemented."  throw ] "fread#" set
+        [ "fread# not implemented."  throw  ] "fread#" set
         ( string -- )
-        [ "fwrite not implemented."  throw ] "fwrite" set
+        [ "fwrite not implemented."  throw  ] "fwrite" set
         ( string style -- )
-        [ drop namespace fwrite ] "fwrite-attr" set
+        [ drop namespace fwrite             ] "fwrite-attr" set
         ( string -- )
-        [ "fedit not implemented."   throw ] "fedit" set
+        [ "fedit not implemented."   throw  ] "fedit" set
         ( -- )
         [ ] "fflush" set
         ( -- )
@@ -82,29 +87,6 @@ USE: strings
             namespace fwrite
             "\n" namespace fwrite
         ] "fprint" set
-    ] extend ;
-
-: <extend-stream> ( stream -- stream )
-    #! Create a stream that wraps another stream. Override some
-    #! or all of the stream words.
-    <stream> [
-        "stream" set
-        ( -- string )
-        [ "stream" get freadln ] "freadln" set
-        ( count -- string )
-        [ "stream" get fread# ] "fread#" set
-        ( string -- )
-        [ "stream" get fwrite ] "fwrite" set
-        ( string style -- )
-        [ "stream" get fwrite-attr ] "fwrite-attr" set
-        ( string -- )
-        [ "stream" get fedit ] "fedit" set
-        ( -- )
-        [ "stream" get fflush ] "fflush" set
-        ( -- )
-        [ "stream" get fclose ] "fclose" set
-        ( string -- )
-        [ "stream" get fprint ] "fprint" set
     ] extend ;
 
 : <string-output-stream> ( size -- stream )

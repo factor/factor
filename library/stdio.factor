@@ -52,6 +52,9 @@ USE: streams
 : read ( -- string )
     "stdio" get freadln ;
 
+: read1 ( count -- string )
+    "stdio" get fread1 ;
+
 : read# ( count -- string )
     "stdio" get fread# ;
 
@@ -76,3 +79,10 @@ USE: streams
     [
         swap "stdio" set [ "stdio" get fclose rethrow ] catch
     ] with-scope ;
+
+: with-string ( quot -- str )
+    #! Execute a quotation, and push a string containing all
+    #! text printed by the quotation.
+    1024 <string-output-stream> [
+        call "stdio" get stream>str
+    ] with-stream ;

@@ -25,57 +25,35 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: styles
-USE: combinators
+IN: streams
+USE: errors
 USE: kernel
-USE: lists
 USE: namespaces
 USE: stack
+USE: stdio
+USE: strings
 
-! A style is an alist whose key/value pairs hold
-! significance to the 'fwrite-attr' word when applied to a
-! stream that supports attributed string output.
-
-: default-style ( -- style )
-    #! Push the default style object.
-    "styles" get [ "default" get ] bind ;
-
-: paragraph ( -- style )
-    #! Push the paragraph break meta-style.
-    "styles" get [ "paragraph" get ] bind ;
-
-: <style> ( alist -- )
-    #! Create a new style object, cloned from the default
-    #! style.
-    default-style clone tuck alist> ;
-
-: get-style ( obj-path -- style )
-    #! Push a style named by an object path, for example
-    #! [ "prompt" ] or [ "vocabularies" "math" ].
-    dup [
-        "styles" get [ object-path ] bind
-        [ default-style ] unless*
-    ] [
-        drop default-style
-    ] ifte ;
-
-: set-style ( style name -- )
-    ! XXX: use object path...
-    "styles" get [ set ] bind ;
-
-: init-styles ( -- )
-    <namespace> "styles" set
-
-    [
-        [ "font" | "Monospaced" ]
-    ] "default" set-style
-
-    [
-        [ "bold" | t ]
-    ] default-style append "prompt" set-style
-    
-    [
-        [ "ansi-fg" | "0" ]
-        [ "ansi-bg" | "2" ]
-        [ "fg" | [ 255 0 0 ] ]
-    ] default-style append "comments" set-style ;
+: <extend-stream> ( stream -- stream )
+    #! Create a stream that wraps another stream. Override some
+    #! or all of the stream words.
+    <stream> [
+        "stdio" set
+        ( -- string )
+        [ read ] "freadln" set
+        ( -- string )
+        [ read1 ] "fread1" set
+        ( count -- string )
+        [ read# ] "fread#" set
+        ( string -- )
+        [ write ] "fwrite" set
+        ( string style -- )
+        [ write-attr ] "fwrite-attr" set
+        ( string -- )
+        [ edit ] "fedit" set
+        ( -- )
+        [ flush ] "fflush" set
+        ( -- )
+        [ "stdio" get fclose ] "fclose" set
+        ( string -- )
+        [ print ] "fprint" set
+    ] extend ;

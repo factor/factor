@@ -27,6 +27,7 @@
 
 IN: streams
 USE: combinators
+USE: errors
 USE: kernel
 USE: lists
 USE: logic
@@ -49,6 +50,16 @@ USE: strings
     "in" get
     [ "java.io.InputStream" ] "factor.FactorLib" "readLine"
     jinvoke-static ;
+
+: <eof-exception> ( -- ex )
+    [ ] "java.io.EOFException" jnew ;
+
+: >char/eof ( ch -- ch )
+    dup -1 = [ <eof-exception> throw ] [ >char ] ifte ;
+
+: <byte-stream>/fread1 ( -- string )
+    "in" get [ ] "java.io.InputStream" "read" jinvoke
+    >char/eof ;
 
 : <byte-stream>/fread# ( count -- string )
     "in" get
@@ -90,6 +101,8 @@ USE: strings
         ( -- string )
         [ <byte-stream>/freadln ] "freadln" set
         ( count -- string )
+        [ <byte-stream>/fread1  ] "fread1" set
+        ( count -- string )
         [ <byte-stream>/fread#  ] "fread#" set
         ( string -- )
         [ <byte-stream>/fwrite  ] "fwrite" set
@@ -102,6 +115,10 @@ USE: strings
 : <char-stream>/freadln ( -- string )
     "in" get [ ] "java.io.BufferedReader" "readLine"
     jinvoke ;
+
+: <char-stream>/fread1 ( -- string )
+    "in" get [ ] "java.io.Reader" "read" jinvoke
+    >char/eof ;
 
 : <char-stream>/fread# ( -- string )
     "in" get
@@ -129,6 +146,8 @@ USE: strings
         "in" set
         ( -- string )
         [ <char-stream>/freadln ] "freadln" set
+        ( -- string )
+        [ <char-stream>/fread1  ] "fread1" set
         ( count -- string )
         [ <char-stream>/fread#  ] "fread#" set
         ( string -- )

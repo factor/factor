@@ -85,6 +85,7 @@ USE: parser
 "/library/math/simpson.factor"           run-resource ! math
 
 !!! Development tools.
+"/library/extend-stream.factor"            run-resource ! streams
 "/library/stdio-binary.factor"             run-resource ! stdio
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
@@ -99,6 +100,7 @@ USE: parser
 "/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
 "/library/telnetd.factor"                  run-resource ! telnetd
+"/library/inferior.factor"                 run-resource ! inferior
 
 !!! Java -> native VM image cross-compiler.
 "/library/image.factor"                       run-resource ! cross-compiler
