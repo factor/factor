@@ -95,6 +95,7 @@ USE: strings
         "stdio"
         "strings"
         "test"
+        "threads"
         "trace"
         "unparser"
         "vectors"

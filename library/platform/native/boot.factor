@@ -53,6 +53,7 @@ primitives,
     "/library/continuations.factor"
     "/library/platform/native/errors.factor"
     "/library/errors.factor"
+    "/library/platform/native/threads.factor"
     "/library/stream.factor"
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"

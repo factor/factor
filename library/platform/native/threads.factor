@@ -25,50 +25,41 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: io-internals
+IN: threads
 USE: combinators
 USE: continuations
+USE: io-internals
 USE: kernel
+USE: lists
 USE: namespaces
 USE: stack
 USE: strings
-USE: threads
 
-: stdin 0 getenv ;
-: stdout 1 getenv ;
-: stderr 2 getenv ;
+: run-queue ( -- queue )
+    9 getenv ;
 
-: flush-fd ( port -- )
-    [ swap add-write-io-task yield ] callcc0 drop ;
+: set-run-queue ( queue -- )
+    9 setenv ;
 
-: wait-to-write ( len port -- )
-    tuck can-write? [ drop ] [ flush-fd ] ifte ;
+: init-threads ( -- )
+    f set-run-queue ;
 
-: blocking-write ( str port -- )
-    over
-    dup string? [ str-length ] [ drop 1 ] ifte
-    over wait-to-write write-fd-8 ;
+: next-thread ( -- quot )
+    run-queue dup [ uncons set-run-queue ] when ;
 
-: fill-fd ( port -- )
-    [ swap add-read-line-io-task yield ] callcc0 drop ;
+: schedule-thread ( quot -- )
+    run-queue cons set-run-queue ;
 
-: wait-to-read-line ( port -- )
-    dup can-read-line? [ drop ] [ fill-fd ] ifte ;
+: yield ( -- )
+    next-thread dup [
+        call
+    ] [
+        drop next-io-task dup [
+            call
+        ] [
+            drop yield
+        ] ifte
+    ] ifte ;
 
-: blocking-read-line ( port -- line )
-    dup wait-to-read-line read-line-fd-8 dup [ sbuf>str ] when ;
-
-: fill-fd# ( count port -- )
-    [ -rot add-read-count-io-task yield ] callcc0 2drop ;
-
-: wait-to-read# ( count port -- )
-    2dup can-read-count? [ 2drop ] [ fill-fd# ] ifte ;
-
-: blocking-read# ( count port -- str )
-    2dup wait-to-read# read-count-fd-8 dup [ sbuf>str ] when ;
-
-: wait-to-accept ( socket -- )
-    [ swap add-accept-io-task yield ] callcc0 drop ;
-
-: blocking-accept ( socket -- host port in out )
-    dup wait-to-accept accept-fd ;
+: in-thread ( quot -- )
+    [ schedule-thread call yield ] callcc0 drop ;

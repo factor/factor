@@ -3,12 +3,13 @@
 #define STDIN_ENV      0
 #define STDOUT_ENV     1
 #define STDERR_ENV     2
-#define NAMESTACK_ENV  3
+#define NAMESTACK_ENV  3 /* used by library only */
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
-#define CATCHSTACK_ENV 6
+#define CATCHSTACK_ENV 6 /* used by library only */
 #define GC_ENV         7
 #define BOOT_ENV       8
+#define RUNQUEUE_ENV   9 /* used by library only */
 
 /* Error handlers restore this */
 sigjmp_buf toplevel;

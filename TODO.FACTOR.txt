@@ -8,8 +8,6 @@
 - balance needs USE:
 - command line arguments
 - socket protocol
-- irc: stack underflow?
-- ignore SIGPIPE
 
 + docs:
 
@@ -39,6 +37,9 @@
 
 + native:
 
+- irc: stack underflow?
+- ignore SIGPIPE
+- don't allow multiple i/o requests on the same port
 - accept multi-line input in listener
 - gc call in the middle of some ops might affect callstack
 - multitasking

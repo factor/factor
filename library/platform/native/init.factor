@@ -33,6 +33,7 @@ USE: namespaces
 USE: parser
 USE: stdio
 USE: streams
+USE: threads
 USE: words
 
 : init-gc ( -- )
@@ -42,6 +43,7 @@ USE: words
     #! Initialize an interpreter with the basic services.
     init-gc
     init-namespaces
+    init-threads
     init-stdio
     init-errors
     "HOME" os-env [ "." ] unless* "~" set
