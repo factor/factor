@@ -62,6 +62,7 @@ USE: threads
 USE: stdio
 USE: errors
 USE: line-editor
+USE: hashtables
 
 #! A namespace holding console state.
 SYMBOL: console
@@ -110,19 +111,24 @@ SYMBOL: input-line
         next-line
     ] times* ;
 
-: draw-cursor ( -- )
+: draw-cursor ( x -- )
     surface get
-    x get
+    swap
     y get
-    x get char-width +
+    over 1 +
     y get line-height +
     cursor boxColor ;
 
 : draw-current ( -- )
     output-line get sbuf>str draw-line ;
 
+: caret-x ( -- x )
+    x get input-line get [ caret get char-width * + ] bind ;
+
 : draw-input ( -- )
-    input-line get [ line-text get ] bind draw-line draw-cursor ;
+    caret-x >r
+    input-line get [ line-text get ] bind draw-line
+    r> draw-cursor ;
 
 : draw-console ( -- )
     [
@@ -202,51 +208,65 @@ M: console-stream fclose ( stream -- ) drop ;
 ! Event handling
 SYMBOL: event
 
-GENERIC: key-down ( key -- )
+: valid-char? 1 255 between? ;
 
-PREDICATE: integer null-key
-    dup 0 = swap 255 > or ;
-
-M: null-key key-down ( key -- )
-    drop ;
-
-PREDICATE: integer return-key
-    SDLK_RETURN = ;
-
-M: return-key key-down ( key -- )
-    drop
-    input-line get [ line-text get line-clear ] bind
-    dup console-write "\n" console-write
-    input-continuation get call ;
-
-PREDICATE: integer backspace-key
-    SDLK_BACKSPACE = ;
-
-M: backspace-key key-down ( key -- )
-    input-line get [ backspace ] bind ;
-
-PREDICATE: integer left-key
-    SDLK_LEFT = ;
-
-M: left-key key-down ( key -- )
-    input-line get [ left ] bind ;
-
-PREDICATE: integer right-key
-    SDLK_RIGHT = ;
-
-M: right-key key-down ( key -- )
-    input-line get [ right ] bind ;
-
-M: integer key-down ( key -- )
-    input-line get [ insert-char ] bind ;
+! 
+! M: null-key key-down ( key -- )
+!     drop ;
+! 
+! PREDICATE: integer return-key
+!     SDLK_RETURN = ;
+! 
+: return-key
+     input-line get [ line-text get line-clear ] bind
+     dup console-write "\n" console-write
+     input-continuation get call ;
+! 
+! PREDICATE: integer backspace-key
+!     SDLK_BACKSPACE = ;
+! 
+! M: backspace-key key-down ( key -- )
+!     input-line get [ backspace ] bind ;
+! 
+! PREDICATE: integer left-key
+!     SDLK_LEFT = ;
+! 
+! M: left-key key-down ( key -- )
+!     input-line get [ left ] bind ;
+! 
+! PREDICATE: integer right-key
+!     SDLK_RIGHT = ;
+! 
+! M: right-key key-down ( key -- )
+!     input-line get [ right ] bind ;
+! 
+! M: integer key-down ( key -- )
+!     input-line get [ insert-char ] bind ;
 
 GENERIC: handle-event ( event -- ? )
 
 PREDICATE: alien key-down-event
     keyboard-event-type SDL_KEYDOWN = ;
 
+SYMBOL: keymap
+
+{{
+        [ [ "RETURN" ] | [ return-key ] ]
+        [ [ "BACKSPACE" ] | [ input-line get [ backspace ] bind ] ]
+        [ [ "LEFT" ] | [ input-line get [ left ] bind ] ]
+        [ [ "RIGHT" ] | [ input-line get [ right ] bind ] ]
+}} keymap set
+
 M: key-down-event handle-event ( event -- ? )
-    keyboard-event-unicode key-down draw-console t ;
+    dup keyboard-event>binding keymap get hash [
+        call draw-console
+    ] [
+        keyboard-event-unicode dup valid-char? [
+            input-line get [ insert-char ] bind draw-console
+        ] [
+            drop
+        ] ifte
+    ] ?ifte t ;
 
 PREDICATE: alien quit-event
     quit-event-type SDL_QUIT = ;

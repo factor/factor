@@ -88,4 +88,4 @@ SYMBOL: caret
 
 : right ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 + line-text str-length min ] change ;
+    caret [ 1 + line-text get str-length min ] change ;

@@ -27,6 +27,13 @@
 
 IN: sdl-keyboard
 USE: alien
+USE: lists
+USE: sdl-keysym
+USE: namespaces
+USE: sdl-event
+USE: kernel
+USE: math
+USE: hashtables
 
 : SDL_EnableUNICODE ( enable -- )
     "int" "sdl" "SDL_EnableUNICODE" [ "int" ] alien-invoke ;
@@ -36,3 +43,23 @@ USE: alien
 
 : SDL_EnableKeyRepeat ( delay interval -- )
     "int" "sdl" "SDL_EnableKeyRepeat" [ "int" "int" ] alien-invoke ;
+
+: modifiers, ( mod -- )
+    modifiers get [
+        uncons pick bitand 0 = [ drop ] [ unique, ] ifte
+    ] each
+    drop ;
+
+: keysym, ( sym -- )
+    #! Return the original keysym number if its unknown.
+    [ keysyms get hash dup ] keep ? , ;
+
+: keyboard-event>binding ( event -- binding )
+    #! Turn a key event into a binding, which is a list where
+    #! all elements but the last one are modifier names looked
+    #! up the modifiers alist, and the last element is a keysym
+    #! look up in the keysyms hash.
+    [
+        dup keyboard-event-mod modifiers,
+        keyboard-event-sym keysym,
+    ] make-list ;
