@@ -45,6 +45,7 @@ DEFER: setenv
 DEFER: save-image
 DEFER: handle?
 DEFER: room
+DEFER: os-env
 
 IN: strings
 DEFER: str=
@@ -160,6 +161,7 @@ IN: cross-compiler
         flush-fd
         shutdown-fd
         room
+        os-env
     ] [
         swap succ tuck primitive,
     ] each drop ;

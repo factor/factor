@@ -89,7 +89,8 @@ XT primitives[] = {
 	primitive_write_fd_8,                   /* 85 */
 	primitive_flush_fd,                     /* 86 */
 	primitive_shutdown_fd,                  /* 87 */
-	primitive_room                          /* 88 */
+	primitive_room,                         /* 88 */
+	primitive_os_env                        /* 89 */
 };
 
 CELL primitive_to_xt(CELL primitive)

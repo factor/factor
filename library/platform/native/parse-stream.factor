@@ -57,22 +57,27 @@ USE: strings
         "parse-stream" get fclose rethrow
     ] catch ;
 
-: init-parser ( name -- seed )
-    "parse-name" set
+: file-vocabs ( -- )
     "file-in" get "in" set
     "file-use" get "use" set
-    f ;
+     ;
 
 : parse-stream ( name stream -- code )
-    <namespace> [
-        >r init-parser r> [ (parse) ] read-lines nreverse
-    ] bind ;
+    #! Uses the current namespace for temporary variables.
+    >r "parse-name" set f r> [ (parse) ] read-lines nreverse ;
 
 : parse-file ( file -- code )
     dup <filecr> parse-stream ;
 
-: run-file ( file -- )
+: (run-file) ( file -- )
+    #! Run a file. The file is read with the same IN:/USE: as
+    #! the current interactive interpreter.
     parse-file call ;
+
+: run-file ( file -- )
+    #! Run a file. The file is read with the default IN:/USE:
+    #! for files.
+    <namespace> [ file-vocabs parse-file ] bind call ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;

@@ -55,20 +55,26 @@ USE: unparser
 : boot ( -- )
     init-gc
     init-namespaces
-    init-stdio
-    "stdio" get <ansi-stream> "stdio" set
-    init-errors
-    init-search-path
-    init-scratchpad
-    init-styles
-    init-vocab-styles
 
     ! Some flags are *on* by default, unless user specifies
     ! -no-<flag> CLI switch
     t "user-init" set
     t "interactive" set
 
+    init-stdio
+    "stdio" get <ansi-stream> "stdio" set
+
+    "HOME" os-env [ "." ] unless* "~" set
+    "/" "/" set
     10 "base" set
+    init-errors
+    init-search-path
+    init-scratchpad
+    init-styles
+    init-vocab-styles
+
+    run-user-init
+
     print-banner
     room.
     init-interpreter ;

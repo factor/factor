@@ -28,7 +28,9 @@
 IN: streams
 USE: combinators
 USE: io-internals
+USE: errors
 USE: kernel
+USE: logic
 USE: stack
 USE: strings
 USE: namespaces
@@ -103,3 +105,7 @@ USE: namespaces
 
 : init-stdio ( -- )
     stdin stdout <fd-stream> "stdio" set ;
+
+: exists? ( file -- ? )
+    #! This is terrible.
+    [ <filebr> fclose t ] [ nip not ] catch ;

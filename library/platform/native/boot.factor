@@ -80,7 +80,6 @@ primitives,
     "/library/math/math-combinators.factor"
     "/library/math/namespace-math.factor"
     "/library/platform/native/arithmetic.factor"
-    "/library/platform/native/cross-compiler.factor"
     "/library/platform/native/errors.factor"
     "/library/platform/native/io-internals.factor"
     "/library/platform/native/stream.factor"
@@ -96,6 +95,7 @@ primitives,
     "/library/platform/native/vectors.factor"
     "/library/platform/native/vocabularies.factor"
     "/library/platform/native/unparser.factor"
+    "/library/platform/native/cross-compiler.factor"
     "/library/platform/native/init.factor"
 ] [
     cross-compile-resource

@@ -57,7 +57,7 @@ USE: streams
     #! global [ "in" get  ] bind
     f t <custom-parser> parse* ;
 
-: interactive-run-file ( path -- )
+: (run-file) ( path -- )
     dup <freader> interactive-parse-stream call ;
 
 : parse ( string -- list )

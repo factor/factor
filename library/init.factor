@@ -43,6 +43,47 @@ USE: strings
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
 
+: ?run-file ( file -- )
+    dup exists? [ (run-file) ] [ drop ] ifte ;
+
+: run-user-init ( -- )
+    #! Run user init file if it exists
+    "user-init" get [
+        <% "~" get % "/" get % ".factor-" % "rc" % %>
+        ?run-file
+    ] when ;
+
+: cli-param ( param -- )
+    #! Handle a command-line argument starting with '-' by
+    #! setting that variable to t, or if the argument is
+    #! prefixed with 'no-', setting the variable to f.
+    dup "no-" str-head? dup [
+        f put drop
+    ] [
+        drop t put
+    ] ifte ;
+
+: cli-arg ( argument -- argument )
+    #! Handle a command-line argument. If the argument was
+    #! consumed, returns f. Otherwise returns the argument.
+    dup [
+        dup "-" str-head? dup [
+            cli-param drop f
+        ] [
+            drop
+        ] ifte
+    ] when ;
+
+: parse-switches ( args -- args )
+    [ cli-arg ] inject ;
+
+: run-files ( args -- )
+    [ [ run-file ] when* ] each ;
+
+: parse-command-line ( args -- )
+    #! Parse command line arguments.
+    parse-switches run-files ;
+
 : init-search-path ( -- )
     ! For files
     "user" "file-in" set
@@ -84,12 +125,17 @@ USE: strings
     #! between runs.
     <namespace> "scratchpad" "vocabularies" get set* ;
 
+: init-toplevel ( -- )
+    [ "top-level-continuation" set ] callcc0 ;
+
 : init-interpreter ( -- )
     #! If we're run stand-alone, start the interpreter on stdio.
     "interactive" get [
-        [ "top-level-continuation" set ] callcc0
+        init-toplevel
 
-        interpreter-loop
-    ] [
-        f "top-level-continuation" set
-    ] ifte ;
+        [
+            interpreter-loop
+        ] [
+            default-error-handler suspend
+        ] catch
+    ] when ;

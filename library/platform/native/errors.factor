@@ -82,5 +82,5 @@ DEFER: default-error-handler
 : init-errors ( -- )
     64 <vector> set-catchstack*
     [ 1 exit* ] >c ( last resort )
-    [ default-error-handler suspend ] >c
+    [ default-error-handler 1 exit* ] >c
     [ throw ] 5 setenv ( kernel calls on error ) ;

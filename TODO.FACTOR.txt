@@ -10,10 +10,11 @@
 - clone-sbuf
 - contains ==> contains?
 - telnetd: send errors on socket
-- partition, sort
 - inspector: sort
 - index of str
 - accept: return socket, instead of printing msg
+- crash: [ primitives, ] with-image .
+- enforce bottom-up in native bootstrap
 
 + interactive:
 

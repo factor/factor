@@ -92,3 +92,9 @@ USE: words
 : use. ( -- )
     #! Print the vocabulary search path for interactive parsers.
     "use" get . ;
+
+: vocabs. ( -- )
+    vocabs . ;
+
+: words. ( vocab -- )
+    words . ;

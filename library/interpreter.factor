@@ -43,9 +43,10 @@ USE: unparser
 USE: vectors
 
 : print-banner ( -- )
-    "Factor " version cat2 print
+    <% "This is " % java? [ "JVM " % ] when
+    native? [ "native " % ] when "Factor " % version % %> print
     "Copyright (C) 2003, 2004 Slava Pestov" print
-    "Enter ``exit'' to exit." print ;
+    "Type ``exit'' to exit, ``help'' for help." print ;
 
 : init-history ( -- )
     "history" get [ 64 <vector> "history" set ] unless ;
@@ -96,3 +97,31 @@ USE: vectors
     init-history
     [ "quit-flag" get not ] [ interpret ] while
     "quit-flag" off ;
+
+: help ( -- )
+    "SESSION:" print
+    native? [
+        "\"foo.image\" save-image   -- save heap to a file" print
+        "room.                    -- show memory usage" print
+    ] when
+    "garbage-collection       -- force a GC" print
+    "exit                     -- exit interpreter" print
+    terpri
+    "WORDS:" print
+    "vocabs.                  -- list vocabularies" print 
+    "\"math\" words.            -- list the math vocabulary" print
+    "\"neg\" see                -- show word definition" print
+    "\"str\" apropos.           -- list all words containing str" print
+    "\"car\" usages.            -- list all words invoking car" print
+    terpri
+    "STACKS:" print
+    ".s .r .n .c              -- show contents of the 4 stacks" print
+    "clear                    -- clear datastack" print
+    terpri
+    "OBJECTS:" print
+    "global describe          -- list global variables." print
+    "\"foo\" get .              -- print a variable value." print
+    ".                        -- print top of stack." print
+    terpri
+    "HTTP SERVER:             USE: httpd 8888 httpd" print
+    "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

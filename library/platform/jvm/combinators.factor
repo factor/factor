@@ -30,6 +30,8 @@ USE: kernel
 USE: lists
 USE: stack
 
+! These are DEPRECATED!
+
 : expand ( list -- list )
     #! Evaluates a quotation on a new stack, and pushes the
     #! reversed stack onto the original stack.
@@ -40,9 +42,12 @@ USE: stack
         call
     unstack ; interpret-only
 
+IN: lists
+DEFER: each
+
 : map ( [ items ] [ code ] -- [ mapping ] )
     #! Applies the code to each item, returns a list that
     #! contains the result of each application.
     #!
     #! This combinator will not compile.
-    2list restack each unstack ; inline interpret-only
+    unit cons restack each unstack ; inline interpret-only

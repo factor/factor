@@ -40,9 +40,17 @@ USE: vectors
 : c> ( catch -- ) catchstack* vector-pop ;
 
 : save-error ( error -- )
-    #! Save the stacks for post-mortem inspection after an
-    #! error.
+    #! Save the stacks and parser state for post-mortem
+    #! inspection after an error.
+    "pos" get
+    "line" get
+    "line-number" get
+    "parse-name" get
     global [
+        "error-parse-name" set
+        "error-line-number" set
+        "error-line" set
+        "error-pos" set
         "error" set
         datastack >pop> "error-datastack" set
         callstack >pop> >pop> "error-callstack" set
