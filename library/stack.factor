@@ -29,15 +29,15 @@ IN: stack
 USE: vectors
 
 : nop ( -- ) ;
-: 2drop ( x x -- ) drop drop ;
-: 3drop ( x x x -- ) drop drop drop ;
-: 2dup ( x y -- x y x y ) over over ;
-: 3dup ( x y z -- x y z x y z ) pick pick pick ;
-: -rot ( x y z -- z x y ) rot rot ;
-: dupd ( x y -- x x y ) >r dup r> ;
-: swapd ( x y z -- y x z ) >r swap r> ;
-: transp ( x y z -- z y x ) swap rot ;
-: 2nip ( x y z t -- z t ) >r >r drop drop r> r> ;
+: 2drop ( x x -- ) drop drop ; inline
+: 3drop ( x x x -- ) drop drop drop ; inline
+: 2dup ( x y -- x y x y ) over over ; inline
+: 3dup ( x y z -- x y z x y z ) pick pick pick ; inline
+: -rot ( x y z -- z x y ) rot rot ; inline
+: dupd ( x y -- x x y ) >r dup r> ; inline
+: swapd ( x y z -- y x z ) >r swap r> ; inline
+: transp ( x y z -- z y x ) swap rot ; inline
+: 2nip ( x y z t -- z t ) >r >r drop drop r> r> ; inline
 
 : clear ( -- )
     #! Clear the datastack. For interactive use only; invoking

@@ -26,6 +26,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: inference
+USE: dataflow
 USE: interpreter
 USE: stack
 USE: words
@@ -33,31 +34,25 @@ USE: lists
 
 : meta-infer ( word -- )
     #! Mark a word as being partially evaluated.
-    dup unit [
-        car dup dataflow-word, host-word
-    ] cons  "infer" set-word-property ;
+    dup [
+       dup unit , \ car , \ dup ,
+       "infer-effect" word-property ,
+       [ drop host-word ] ,
+       \ with-dataflow ,
+    ] make-list "infer" set-word-property ;
 
 \ >r [
-    \ >r dataflow-word, pop-d push-r
+    \ >r CALL dataflow, drop pop-d push-r
 ] "infer" set-word-property
 \ r> [
-    \ r> dataflow-word, pop-r push-d
+    \ r> CALL dataflow, drop pop-r push-d
 ] "infer" set-word-property
 
 \ drop meta-infer
-\ 2drop meta-infer 
-\ 3drop meta-infer
 \ dup meta-infer
-\ 2dup meta-infer
-\ 3dup meta-infer
 \ swap meta-infer
 \ over meta-infer
 \ pick meta-infer
 \ nip meta-infer
 \ tuck meta-infer
 \ rot meta-infer
-\ -rot meta-infer
-\ 2nip meta-infer
-\ transp meta-infer
-\ dupd meta-infer
-\ swapd meta-infer

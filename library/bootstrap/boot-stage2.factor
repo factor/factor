@@ -35,6 +35,7 @@ USE: stdio
 
 "Cold boot in progress..." print
 [
+    "/version.factor"
     "/library/kernel.factor"
     "/library/stack.factor"
     "/library/types.factor"
@@ -51,6 +52,7 @@ USE: stdio
     "/library/strings.factor"
     "/library/hashtables.factor"
     "/library/namespaces.factor"
+    "/library/generic.factor"
     "/library/math/namespace-math.factor"
     "/library/list-namespaces.factor"
     "/library/sbuf.factor"
@@ -102,6 +104,10 @@ USE: stdio
     "/library/tools/heap-stats.factor"
     "/library/gensym.factor"
     "/library/tools/interpreter.factor"
+
+    ! Inference needs to know primitive stack effects at load time
+    "/library/primitives.factor"
+
     "/library/inference/dataflow.factor"
     "/library/inference/inference.factor"
     "/library/inference/words.factor"
@@ -125,8 +131,6 @@ USE: stdio
     "/library/httpd/default-responders.factor"
 
     "/library/tools/jedit.factor"
-
-    "/library/primitives.factor"
 
     "/library/cli.factor"
 ] [

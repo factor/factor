@@ -383,11 +383,8 @@ IN: image
         heap-stats
         throw
     ] [
-        swap succ tuck primitive,
+        swap succ tuck f define,
     ] each drop ;
-
-: version, ( -- )
-    "version" [ "kernel" ] search version unit compound, ;
 
 : make-image ( name -- )
     #! Make an image for the C interpreter.
@@ -407,7 +404,7 @@ IN: image
 
 : cross-compile-resource ( resource -- )
     [
-        ! Change behavior of ;
-        [ compound, ] ";-hook" set
+        ! Change behavior of ; and SYMBOL:
+        [ pick USE: prettyprint . define, ] "define-hook" set
         run-resource
     ] with-scope ;

@@ -149,15 +149,14 @@ IN: syntax
     #! Begin a word definition. Word name follows.
     CREATE [ ] "in-definition" on ; parsing
 
-: ;-hook ( word def -- )
-    ";-hook" get [ call ] [ define-compound ] ifte* ;
-
 : ;
     #! End a word definition.
-    "in-definition" off reverse ;-hook ; parsing
+    "in-definition" off reverse define-compound ; parsing
 
 ! Symbols
-: SYMBOL: CREATE define-symbol ; parsing
+: SYMBOL:
+    #! A symbol is a word that pushes itself when executed.
+    CREATE define-symbol ; parsing
 
 : \
     #! Parsed as a piece of code that pushes a word on the stack
@@ -165,11 +164,18 @@ IN: syntax
     scan-word unit parsed  \ car parsed ; parsing
 
 ! Vocabularies
-: DEFER: CREATE drop ; parsing
+: DEFER:
+    #! Create a word with no definition. Used for mutually
+    #! recursive words.
+    CREATE drop ; parsing
 : FORGET: scan-word forget ; parsing
 
-: USE: scan "use" cons@ ; parsing
-: IN: scan dup "use" cons@ "in" set ; parsing
+: USE:
+    #! Add vocabulary to search path.
+    scan "use" cons@ ; parsing
+: IN:
+    #! Set vocabulary for new definitions.
+    scan dup "use" cons@ "in" set ; parsing
 
 ! Char literal
 : CHAR: ( -- ) next-word-ch parse-ch parsed ; parsing
@@ -188,9 +194,8 @@ IN: syntax
     [ parse-string "col" get ] make-string
     swap "col" set parsed ; parsing
 
-! Complex literal
 : #{
-    #! Read #{ real imaginary #}
+    #! Complex literal - #{ real imaginary #}
     scan str>number scan str>number rect> "}" expect parsed ;
     parsing
 

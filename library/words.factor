@@ -55,25 +55,23 @@ USE: strings
 : word ( -- word ) global [ "last-word" get ] bind ;
 : set-word ( word -- ) global [ "last-word" set ] bind ;
 
-: define-compound ( word def -- )
-    over set-word-parameter
-    1 over set-word-primitive
+: (define) ( word primitive parameter -- )
+    #! Define a word in the current Factor instance.
+    pick set-word-parameter
+    over set-word-primitive
     f "parsing" set-word-property ;
 
-: define-symbol ( word -- )
-    dup dup set-word-parameter
-    2 swap set-word-primitive ;
+: define ( word primitive parameter -- )
+    #! The define-hook is set by the image bootstrapping code.
+    "define-hook" get [ call ] [ (define) ] ifte* ;
 
-: word-name ( word -- name )
-    "name" word-property ;
+: define-compound ( word def -- ) 1 swap define ;
+: define-symbol   ( word -- ) 2 over define ;
 
-: word-vocabulary ( word -- vocab )
-    "vocabulary" word-property ;
-
-: stack-effect ( word -- str )
-    "stack-effect" word-property ;
-: documentation ( word -- str )
-    "documentation" word-property ;
+: word-name       ( word -- str ) "name" word-property ;
+: word-vocabulary ( word -- str ) "vocabulary" word-property ;
+: stack-effect    ( word -- str ) "stack-effect" word-property ;
+: documentation   ( word -- str ) "documentation" word-property ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.

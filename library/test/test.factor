@@ -78,6 +78,7 @@ USE: unparser
         "hashtables"
         "strings"
         "namespaces"
+        "generic"
         "files"
         "format"
         "parser"
@@ -111,6 +112,7 @@ USE: unparser
         "threads"
         "parsing-word"
         "inference"
+        "dataflow"
         "interpreter"
     ] [
         test

@@ -101,7 +101,7 @@ USE: words
     "PRIMITIVE: " write dup unparse write stack-effect. terpri ;
 
 : see-symbol ( word -- )
-    \ SYMBOL: prettyprint-word . ;
+    \ SYMBOL: prettyprint-word prettyprint-space . ;
 
 : see-undefined ( word -- )
     drop "Not defined" print ;

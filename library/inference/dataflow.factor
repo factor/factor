@@ -25,7 +25,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: inference
+IN: dataflow
+USE: inference
 USE: interpreter
 USE: lists
 USE: math
@@ -46,24 +47,45 @@ SYMBOL: IFTE
 SYMBOL: GENERIC
 SYMBOL: 2GENERIC
 
+SYMBOL: node-consume-d
+SYMBOL: node-produce-d
+SYMBOL: node-consume-r
+SYMBOL: node-produce-r
+SYMBOL: node-op
+
+! PUSH nodes have this field set to the value being pushed.
+! CALL nodes have this as the word being called
+SYMBOL: node-param
+
+: <dataflow-node> ( param op -- node )
+    <namespace> [
+        node-op set
+        node-param set
+        { } node-consume-d set
+        { } node-produce-d set
+        { } node-consume-r set
+        { } node-produce-r set
+    ] extend ;
+
+: node-inputs ( d-count r-count -- )
+    #! Execute in the node's namespace.
+    meta-r get vector-tail* node-consume-r set
+    meta-d get vector-tail* node-consume-d set ;
+
+: dataflow-inputs ( [ in | out ] node -- )
+    [ car 0 node-inputs ] bind ;
+
+: node-outputs ( d-count r-count -- )
+    #! Execute in the node's namespace.
+    meta-r get vector-tail* node-produce-r set
+    meta-d get vector-tail* node-produce-d set ;
+
+: dataflow-outputs ( [ in | out ] node -- )
+    [ cdr 0 node-outputs ] bind ;
+
 : get-dataflow ( -- IR )
     dataflow-graph get reverse ;
 
-: inputs ( count -- vector )
-    meta-d get [ vector-length swap - ] keep vector-tail ;
-
-: dataflow, ( consume instruction parameters -- )
-    #! Add a node to the dataflow IR. Each node is a list of
-    #! three elements:
-    #! - vector of elements consumed from stack
-    #! - a symbol CALL, JUMP or PUSH
-    #! - parameter(s) to insn
-    unit cons cons  dataflow-graph cons@ ;
-
-: dataflow-literal, ( lit -- )
-    >r 0 inputs PUSH r> dataflow, ;
-
-: dataflow-word, ( word -- )
-    [
-        "infer-effect" word-property car inputs CALL
-    ] keep dataflow, ;
+: dataflow, ( param op -- node )
+    #! Add a node to the dataflow IR.
+    <dataflow-node> dup dataflow-graph cons@ ;

@@ -27,6 +27,7 @@
 
 IN: inference
 USE: combinators
+USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
@@ -39,8 +40,6 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
-
-DEFER: (infer)
 
 : infer-branch ( quot -- [ in-d | datastack ] dataflow )
     #! Infer the quotation's effect, restoring the meta
@@ -98,23 +97,23 @@ DEFER: (infer)
         [ drop f ] when
     ] catch ;
 
-: infer-branches ( branchlist consume instruction -- )
+: infer-branches ( branchlist instruction -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    rot f over [ recursive-branch or ] each [
+    swap f over [ recursive-branch or ] each [
         [ [ car infer-branch , ] map ] make-list swap
-        >r dataflow, r> unify
+        >r dataflow, drop r> unify
     ] [
-        "Foo!" throw
+        current-word no-base-case
     ] ifte ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
     3 ensure-d
-    \ drop dataflow-word, pop-d
-    \ drop dataflow-word, pop-d 2list
-    1 inputs IFTE
+    \ drop CALL dataflow, drop pop-d
+    \ drop CALL dataflow, drop pop-d 2list
+    IFTE
     pop-d drop ( condition )
     infer-branches ;
 
@@ -129,16 +128,16 @@ DEFER: (infer)
 : infer-generic ( -- )
     #! Infer effects for all branches, unify.
     2 ensure-d
-    \ drop dataflow-word, pop-d vtable>list
-    1 inputs GENERIC
+    \ drop CALL dataflow, drop pop-d vtable>list
+    GENERIC
     peek-d drop ( dispatch )
     infer-branches ;
 
 : infer-2generic ( -- )
     #! Infer effects for all branches, unify.
     3 ensure-d
-    \ drop dataflow-word, pop-d vtable>list
-    2 inputs 2GENERIC
+    \ drop CALL dataflow, drop pop-d vtable>list
+    2GENERIC
     peek-d drop ( dispatch )
     peek-d drop ( dispatch )
     infer-branches ;

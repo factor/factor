@@ -120,3 +120,9 @@ DEFER: vector-map
     2dup vector-length swap - [
         pick + over vector-nth
     ] vector-project nip nip ;
+
+: vector-tail* ( n vector -- vector )
+    #! Unlike vector-tail, n is an index from the end of the
+    #! vector. For example, if n=1, this returns a vector of
+    #! one element.
+    [ vector-length swap - ] keep vector-tail ;

@@ -145,11 +145,11 @@ SYMBOL: boot-quot
 
 ( Fixnums )
 
-: 'fixnum ( n -- tagged ) fixnum-tag immediate ;
+: emit-fixnum ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
-: 'bignum ( bignum -- tagged )
+: emit-bignum ( bignum -- tagged )
     object-tag here-as >r
     bignum-type >header emit
     dup 0 = 1 2 ? emit ( capacity )
@@ -166,11 +166,11 @@ SYMBOL: boot-quot
 : t,
     object-tag here-as "t" set
     t-type >header emit
-    0 'fixnum emit ;
+    0 emit-fixnum emit ;
 
-:  0,  0 'bignum drop ;
-:  1,  1 'bignum drop ;
-: -1, -1 'bignum drop ;
+:  0,  0 emit-bignum drop ;
+:  1,  1 emit-bignum drop ;
+: -1, -1 emit-bignum drop ;
 
 ( Beginning of the image )
 ! The image proper begins with the header, then T,
@@ -199,36 +199,37 @@ SYMBOL: boot-quot
         dup word? [ fixup-word ] when
     ] vector-map image set ;
 
-: 'word ( word -- pointer )
+: emit-word ( word -- pointer )
     dup pooled-object dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
 DEFER: '
 
-: cons, ( -- pointer ) cons-tag here-as ;
-: 'cons ( c -- tagged ) uncons ' swap ' cons, -rot emit emit ;
+: emit-cons ( c -- tagged )
+    uncons ' swap '
+    cons-tag here-as
+    -rot emit emit ;
 
 ( Strings )
 
 : align-string ( n str -- )
     tuck str-length - CHAR: \0 fill cat2 ;
 
-: emit-string ( str -- )
+: emit-chars ( str -- )
     "big-endian" get [ str-reverse ] unless
     0 swap [ swap 16 shift + ] str-each emit ;
 
 : (pack-string) ( n list -- )
     #! Emit bytes for a string, with n characters per word.
     [
-        2dup str-length > [ dupd align-string ] when
-        emit-string
+        2dup str-length > [ dupd align-string ] when  emit-chars
     ] each drop ;
 
 : pack-string ( string -- )
     char tuck swap split-n (pack-string) ;
 
-: string, ( string -- )
+: (emit-string) ( string -- )
     object-tag here-as swap
     string-type >header emit
     dup str-length emit
@@ -236,13 +237,13 @@ DEFER: '
     pack-string
     pad ;
 
-: 'string ( string -- pointer )
+: emit-string ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
     dup pooled-object dup [
         nip
     ] [
-        drop dup string, dup >r pool-object r>
+        drop dup (emit-string) dup >r pool-object r>
     ] ifte ;
 
 ( Word definitions )
@@ -261,15 +262,16 @@ DEFER: '
     dup word-name over word-vocabulary 
     (vocabulary) set-hash ;
 
-: 'plist ( word -- plist )
+: emit-plist ( word -- plist )
     [
         dup word-name "name" swons ,
         dup word-vocabulary "vocabulary" swons ,
         "parsing" word-property [ t "parsing" swons , ] when
     ] make-list ' ;
 
-: (worddef,) ( word primitive parameter -- )
-    ' >r >r dup (word+) dup 'plist >r
+: define, ( word primitive parameter -- )
+    #! Write a word definition to the image.
+    ' >r >r dup (word+) dup emit-plist >r
     word, pool-object
     r> ( -- plist )
     r> ( primitive -- ) emit
@@ -278,12 +280,9 @@ DEFER: '
     0 emit ( padding )
     0 emit ;
 
-: primitive, ( word primitive -- ) f (worddef,) ;
-: compound, ( word definition -- ) 1 swap (worddef,) ;
-
 ( Arrays and vectors )
 
-: 'array ( list -- pointer )
+: emit-array ( list -- pointer )
     [ ' ] map
     object-tag here-as >r
     array-type >header emit
@@ -291,8 +290,8 @@ DEFER: '
     ( elements -- ) [ emit ] each
     pad r> ;
 
-: 'vector ( vector -- pointer )
-    dup vector>list 'array swap vector-length
+: emit-vector ( vector -- pointer )
+    dup vector>list emit-array swap vector-length
     object-tag here-as >r
     vector-type >header emit
     emit ( length )
@@ -303,15 +302,15 @@ DEFER: '
 
 : ' ( obj -- pointer )
     [
-        [ fixnum?  ] [ 'fixnum      ]
-        [ bignum?  ] [ 'bignum      ]
-        [ word?    ] [ 'word        ]
-        [ cons?    ] [ 'cons        ]
-        [ string?  ] [ 'string      ]
-        [ vector?  ] [ 'vector      ]
-        [ t =      ] [ drop "t" get ]
+        [ fixnum?  ] [ emit-fixnum      ]
+        [ bignum?  ] [ emit-bignum      ]
+        [ word?    ] [ emit-word        ]
+        [ cons?    ] [ emit-cons        ]
+        [ string?  ] [ emit-string      ]
+        [ vector?  ] [ emit-vector      ]
+        [ t =      ] [ drop "t" get     ]
         ! f is #define F RETAG(0,OBJECT_TYPE)
-        [ f =      ] [ drop object-tag ]
+        [ f =      ] [ drop object-tag  ]
         [ drop t   ] [ "Cannot cross-compile: " swap cat2 throw ]
     ] cond ;
 

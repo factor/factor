@@ -36,6 +36,7 @@ USE: vectors
 
 primitives,
 [
+    "/version.factor"
     "/library/kernel.factor"
     "/library/stack.factor"
     "/library/types.factor"
@@ -52,6 +53,7 @@ primitives,
     "/library/strings.factor"
     "/library/hashtables.factor"
     "/library/namespaces.factor"
+    "/library/generic.factor"
     "/library/math/namespace-math.factor"
     "/library/list-namespaces.factor"
     "/library/sbuf.factor"
@@ -75,14 +77,11 @@ primitives,
     cross-compile-resource
 ] each
 
-version,
-
 IN: init
 DEFER: boot
 
 [
     boot
     "Good morning!" print
-    global vector? [ "vocabs set" ] [ "vocabs not set" ] ifte print
     "/library/bootstrap/boot-stage2.factor" run-resource
 ] boot-quot set

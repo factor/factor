@@ -150,7 +150,10 @@ DEFER: prettyprint*
 
 : prettyprint-{} ( indent vector -- indent )
     dup vector-length 0 = [
-        drop prettyprint-{ prettyprint-}
+        drop
+        \ { prettyprint-word
+        prettyprint-space
+        \ } prettyprint-word
     ] [
         swap prettyprint-{ swap prettyprint-vector prettyprint-}
     ] ifte ;
@@ -163,7 +166,10 @@ DEFER: prettyprint*
 
 : prettyprint-{{}} ( indent hashtable -- indent )
     hash>alist dup length 0 = [
-        drop prettyprint-{{ prettyprint-}}
+        drop
+        \ {{ prettyprint-word
+        prettyprint-space 
+        \ }} prettyprint-word
     ] [
         swap prettyprint-{{ swap prettyprint-list prettyprint-}}
     ] ifte ;

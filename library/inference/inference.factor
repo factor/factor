@@ -27,6 +27,7 @@
 
 IN: inference
 USE: combinators
+USE: dataflow
 USE: errors
 USE: interpreter
 USE: kernel
@@ -83,9 +84,6 @@ SYMBOL: entry-effect
     #! Push count of unknown results.
     [ gensym push-d ] times ;
 
-: consume/produce ( [ in | out ] -- )
-    unswons dup ensure-d consume-d produce-d ;
-
 : effect ( -- [ in | out ] )
     #! After inference is finished, collect information.
     d-in get  meta-d get vector-length cons ;
@@ -111,7 +109,7 @@ DEFER: apply-word
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    dup dataflow-literal,  recursive-state get cons push-d ;
+    dup PUSH dataflow, drop  recursive-state get cons push-d ;
 
 : apply-object ( obj -- )
     #! Apply the object's stack effect to the inferencer state.
