@@ -57,12 +57,7 @@ USE: streams
     #! Print a newline to standard output.
     "\n" write ;
 
-: (with-stream) ( stream quot -- )
-    <namespace> [ swap "stdio" set call ] bind ;
-
 : with-stream ( stream quot -- )
-    [
-        (with-stream)
-    ] [
-        >r drop fclose r> rethrow
-    ] catch ;
+    <namespace> [
+        swap "stdio" set [ "stdio" get fclose rethrow ] catch
+    ] bind ;

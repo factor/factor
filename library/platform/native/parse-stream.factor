@@ -2,7 +2,7 @@
 
 ! $Id$
 !
-! Copyright (C) 2003, 2004 Slava Pestov.
+! Copyright (C) 2004 Slava Pestov.
 ! 
 ! Redistribution and use in source and binary forms, with or without
 ! modification, are permitted provided that the following conditions are met:
@@ -25,43 +25,30 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: telnetd
+IN: parser
+USE: arithmetic
 USE: combinators
-USE: continuations
 USE: errors
-USE: interpreter
-USE: logging
-USE: logic
+USE: lists
 USE: namespaces
-USE: stack
 USE: stdio
 USE: streams
 
-: telnet-client ( socket -- )
-    dup [
-        "client" set
-        log-client
-        interpreter-loop
-    ] with-stream ;
+: next-line ( -- str )
+    "parse-stream" get freadln
+    "line-number" succ@ ;
 
-: quit-flag ( -- ? )
-    global [ "telnetd-quit-flag" get ] bind ;
+: (parse-stream) ( -- )
+    next-line [ (parse) (parse-stream) ] when* ;
 
-: clear-quit-flag ( --  )
-    global [ f "telnetd-quit-flag" set ] bind ;
-
-: telnetd-loop ( server -- server )
-    [
-        quit-flag not
-    ] [
-        dup accept telnet-client
-    ] while ;
-
-: telnetd ( port -- )
-    [
-        <server> [
-            telnetd-loop
+: parse-stream ( name stream -- )
+    <namespace> [
+        [
+            "parse-stream" set
+            "parse-name" set
+            0 "line-number" set
+            f (parse-stream) nreverse
         ] [
-            clear-quit-flag swap fclose rethrow
+            "parse-stream" get fclose rethrow
         ] catch
-    ] with-logging ;
+    ] bind ;

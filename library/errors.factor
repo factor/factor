@@ -61,7 +61,7 @@ USE: vectors
     #! Call the try quotation, restore the datastack to its
     #! state before the try quotation, push the error (or f if
     #! no error occurred) and call the catch quotation.
-    [ >c drop call f c> call ] callcc1 ( c> drop )
+    [ >c >r call c> drop f r> f ] callcc1
     ( try catch error ) rot drop swap ( error catch ) call ;
 
 : rethrow ( error -- )

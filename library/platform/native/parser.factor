@@ -64,8 +64,8 @@ USE: vocabularies
 : parsing? ( word -- ? ) "parsing" swap word-property ;
 : parsing ( -- ) t "parsing" word set-word-property ;
 
-: (parsing "line" set 0 "pos" set f ;
-: parsing) f "line" set f "pos" set nreverse ;
+: <parsing "line" set 0 "pos" set ;
+: parsing> f "line" set f "pos" set ;
 : end? ( -- ? ) "pos" get "line" get str-length >= ;
 : ch ( -- ch ) "pos" get "line" get str-nth ;
 : advance ( -- ) "pos" succ@ ;
@@ -108,9 +108,11 @@ USE: vocabularies
         ] ifte
     ] when* ;
 
-: parse ( str -- list )
+: (parse) <parsing [ end? not ] [ scan word, ] while parsing> ;
+
+: parse ( str -- code )
     #! Parse the string into a parse tree that can be executed.
-    (parsing [ end? not ] [ scan word, ] while parsing) ;
+    f swap (parse) nreverse ;
 
 : eval ( "X" -- X )
     parse call ;

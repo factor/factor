@@ -80,6 +80,7 @@ primitives,
     "/library/platform/native/kernel.factor"
     "/library/platform/native/namespaces.factor"
     "/library/platform/native/parser.factor"
+    "/library/platform/native/parse-stream.factor"
     "/library/platform/native/prettyprint.factor"
     "/library/platform/native/stack.factor"
     "/library/platform/native/words.factor"
