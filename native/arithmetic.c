@@ -8,12 +8,26 @@ CELL tag_integer(FIXNUM x)
 		return tag_fixnum(x);
 }
 
-CELL tag_unsigned_integer(CELL x)
+CELL tag_cell(CELL x)
 {
 	if(x > FIXNUM_MAX)
 		return tag_object(s48_ulong_to_bignum(x));
 	else
 		return tag_fixnum(x);
+}
+
+CELL to_cell(CELL x)
+{
+	switch(type_of(x))
+	{
+	case FIXNUM_TYPE:
+		return untag_fixnum_fast(x);
+	case BIGNUM_TYPE:
+		/* really need bignum_to_ulong! */
+		return s48_bignum_to_long(untag_bignum(x));
+	default:
+		type_error(INTEGER_TYPE,x);
+	}
 }
 
 CELL upgraded_arithmetic_type(CELL type1, CELL type2)

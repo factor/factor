@@ -2351,17 +2351,32 @@ Notice that until now, all the code except a handful of examples has only used t
 
 Variables are typically used for longer-term storage of data, and for temporary storage of objects that are being constructed, where using the stack would be ackward. Another use for variables is compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language.
 
-The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. For example:
+The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. Variable names are strings, and they do not have to be declared before use. For example:
 
-blah blah
+\begin{alltt}
+5 "x" set
+"x" get .
+\emph{5}
+\end{alltt}
 
 \subsection{Namespaces}
 
-describe bind and extend combinators
+Only having one list of variable name/value bindings would make the language terribly inflexible. Instead, a variable has any number of potential values, one per namespace. There is a notion of a ``current namespace''; the \texttt{set} word always stores variables in the current namespace. On the other hand, \texttt{get} traverses up the stack of namespace bindings until it finds a variable with the specified name.
 
-namespaces are hashtables
+\texttt{bind ( namespace quot -{}- )} executes a quotation in the dynamic scope of a namespace. For example, the following sets the value of \texttt{x} to 5 in the global namespace, regardless of the current namespace at the time the word was called.
 
-values, vars, vars-values
+\begin{alltt}
+: global-example ( -- )
+    global {[} 5 "x" set {]} bind ;
+\end{alltt}
+
+\texttt{<namespace> ( -{}- namespace )} creates a new namespace object. Actually, a namespace is just a hashtable, with a default capacity.
+
+\texttt{with-scope ( quot -{}- )} combines \texttt{<namespace>} with \texttt{bind} by executing a quotation in a new namespace.
+
+get example
+
+describe
 
 \subsection{The name stack}
 

@@ -42,6 +42,17 @@ void primitive_word_hashcode(void)
 	drepl(tag_fixnum(untag_word(dpeek())->hashcode));
 }
 
+void primitive_word_xt(void)
+{
+	drepl(tag_cell(untag_word(dpeek())->xt));
+}
+
+void primitive_set_word_xt(void)
+{
+	WORD* word = untag_word(dpop());
+	word->xt = to_cell(dpop());
+}
+
 void primitive_word_primitive(void)
 {
 	drepl(tag_fixnum(untag_word(dpeek())->primitive));
@@ -78,7 +89,7 @@ void primitive_set_word_plist(void)
 
 void primitive_word_call_count(void)
 {
-	drepl(tag_unsigned_integer(untag_word(dpeek())->call_count));
+	drepl(tag_cell(untag_word(dpeek())->call_count));
 }
 
 void primitive_set_word_call_count(void)
@@ -89,7 +100,7 @@ void primitive_set_word_call_count(void)
 
 void primitive_word_allot_count(void)
 {
-	drepl(tag_unsigned_integer(untag_word(dpeek())->allot_count));
+	drepl(tag_cell(untag_word(dpeek())->allot_count));
 }
 
 void primitive_set_word_allot_count(void)

@@ -17,6 +17,7 @@ int main(int argc, char** argv)
 	init_stacks();
 	init_io();
 	init_signals();
+	init_compiler();
 
 	args = F;
 	while(--argc != 0)

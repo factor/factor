@@ -37,6 +37,8 @@ void primitive_word(void);
 void primitive_word_hashcode(void);
 void primitive_word_primitive(void);
 void primitive_set_word_primitive(void);
+void primitive_word_xt(void);
+void primitive_set_word_xt(void);
 void primitive_word_parameter(void);
 void primitive_set_word_parameter(void);
 void primitive_word_plist(void);

@@ -109,6 +109,7 @@ USE: stdio
     "/library/telnetd.factor"
     "/library/inferior.factor"
     "/library/platform/native/profiler.factor"
+    "/library/platform/native/compiler.factor"
 
     "/library/image.factor"
     "/library/cross-compiler.factor"

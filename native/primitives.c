@@ -88,6 +88,8 @@ XT primitives[] = {
 	primitive_wordp,
 	primitive_word,
 	primitive_word_hashcode,
+	primitive_word_xt,
+	primitive_set_word_xt,
 	primitive_word_primitive,
 	primitive_set_word_primitive,
 	primitive_word_parameter,
@@ -150,7 +152,10 @@ XT primitives[] = {
 	primitive_set_word_allot_count,
 	primitive_dump,
 	primitive_cwd,
-	primitive_cd
+	primitive_cd,
+	primitive_compile_byte,
+	primitive_compile_cell,
+	primitive_compile_offset
 };
 
 CELL primitive_to_xt(CELL primitive)

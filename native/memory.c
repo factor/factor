@@ -21,7 +21,7 @@ void* alloc_guarded(CELL size)
 
 void init_zone(ZONE* z, CELL size)
 {
-	z->base = z->here = align8((CELL)malloc(size));
+	z->base = z->here = align8((CELL)alloc_guarded(size));
 	if(z->base == 0)
 		fatal_error("Cannot allocate zone",size);
 	z->limit = z->base + size;

@@ -14,8 +14,10 @@ void init_stacks(void)
 {
 	ds_bot = (CELL)alloc_guarded(STACK_SIZE);
 	reset_datastack();
+	userenv[DS_ENV] = tag_integer((CELL)&ds);
 	cs_bot = (CELL)alloc_guarded(STACK_SIZE);
 	reset_callstack();
+	userenv[CS_ENV] = tag_integer((CELL)&cs);
 	callframe = userenv[BOOT_ENV];
 }
 

@@ -42,6 +42,7 @@ typedef unsigned char BYTE;
 
 /* Memory heap size */
 #define DEFAULT_ARENA (5 * 1024 * 1024)
+#define COMPILE_ZONE_SIZE (5 * 1024 * 1024)
 
 #define STACK_SIZE 16384
 
@@ -79,5 +80,6 @@ and allows profiling. */
 #include "primitives.h"
 #include "vector.h"
 #include "stack.h"
+#include "compiler.h"
 
 #endif /* __FACTOR_H__ */

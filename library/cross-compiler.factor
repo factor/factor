@@ -41,6 +41,11 @@ USE: vectors
 USE: vectors
 USE: words
 
+IN: compiler
+DEFER: compile-byte
+DEFER: compile-cell
+DEFER: compile-offset
+
 IN: kernel
 DEFER: getenv
 DEFER: setenv
@@ -106,6 +111,8 @@ DEFER: (random-int)
 IN: words
 DEFER: <word>
 DEFER: word-hashcode
+DEFER: word-xt
+DEFER: set-word-xt
 DEFER: word-primitive
 DEFER: set-word-primitive
 DEFER: word-parameter
@@ -205,6 +212,8 @@ IN: cross-compiler
         word?
         <word>
         word-hashcode
+        word-xt
+        set-word-xt
         word-primitive
         set-word-primitive
         word-parameter
@@ -268,6 +277,9 @@ IN: cross-compiler
         dump
         cwd
         cd
+        compile-byte
+        compile-cell
+        compile-offset
     ] [
         swap succ tuck primitive,
     ] each drop ;
