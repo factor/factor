@@ -13,8 +13,8 @@ STRING* allot_string(CELL capacity)
 /* uses same algorithm as java.lang.String for compatibility */
 void hash_string(STRING* str)
 {
-	CELL hash = 0;
-	int i;
+	FIXNUM hash = 0;
+	CELL i;
 	for(i = 0; i < str->capacity; i++)
 		hash = 31*hash + string_nth(str,i);
 	str->hashcode = hash;
@@ -23,7 +23,7 @@ void hash_string(STRING* str)
 /* untagged */
 STRING* string(CELL capacity, CELL fill)
 {
-	int i;
+	CELL i;
 
 	STRING* string = allot_string(capacity);
 
@@ -38,7 +38,7 @@ STRING* string(CELL capacity, CELL fill)
 STRING* grow_string(STRING* string, CELL capacity, CHAR fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
-	int i;
+	CELL i;
 
 	STRING* new_string = allot_string(capacity);
 
@@ -55,7 +55,7 @@ STRING* from_c_string(const char* c_string)
 {
 	CELL length = strlen(c_string);
 	STRING* s = allot_string(length);
-	int i;
+	CELL i;
 
 	for(i = 0; i < length; i++)
 	{
@@ -72,7 +72,7 @@ STRING* from_c_string(const char* c_string)
 char* to_c_string(STRING* s)
 {
 	STRING* _c_str = allot_string(s->capacity + 1 /* null byte */);
-	int i;
+	CELL i;
 
 	char* c_str = (char*)(_c_str + 1);
 	
@@ -147,14 +147,14 @@ void primitive_string_eq(void)
 	CELL with = dpop();
 	check_non_empty(with);
 	if(typep(STRING_TYPE,with))
-		env.dt = tag_boolean(string_eq(s1,UNTAG(with)));
+		env.dt = tag_boolean(string_eq(s1,(STRING*)UNTAG(with)));
 	else
 		env.dt = F;
 }
 
 void primitive_string_hashcode(void)
 {
-	env.dt = tag_fixnum(untag_string(env.dt)->hashcode);
+	env.dt = tag_object(bignum(untag_string(env.dt)->hashcode));
 }
 
 INLINE CELL index_of_ch(CELL index, STRING* string, CELL ch)

@@ -48,6 +48,7 @@ USE: unparser
         [ cons? ] [ 4 cons-hashcode ]
         [ string? ] [ str-hashcode ]
         [ fixnum? ] [ ( return the object ) ]
+        [ bignum? ] [ ( return the object ) ]
         [ drop t ] [ drop 0 ]
     ] cond ;
 
@@ -97,7 +98,7 @@ USE: unparser
 : room. ( -- )
     room
     unparse write " bytes total, " write
-    unparse write " bytes used" print ;
+    unparse write " bytes free" print ;
 
 ! No compiler...
 : inline ;

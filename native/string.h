@@ -3,7 +3,7 @@ typedef struct {
 	/* untagged */
 	CELL capacity;
 	/* untagged */
-	CELL hashcode;
+	FIXNUM hashcode;
 } STRING;
 
 INLINE STRING* untag_string(CELL tagged)

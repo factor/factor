@@ -39,6 +39,7 @@ USE: io-internals
 USE: math
 USE: namespaces
 USE: parser
+USE: prettyprint
 USE: stack
 USE: stdio
 USE: streams
@@ -77,4 +78,5 @@ USE: unparser
 
     print-banner
     room.
+    
     init-interpreter ;

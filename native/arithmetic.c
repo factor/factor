@@ -34,7 +34,7 @@ INLINE void add_fixnum(CELL x, CELL y)
 	CELL_TO_INTEGER(untag_fixnum_fast(x) + untag_fixnum_fast(y));
 }
 
-INLINE void add_bignum(CELL x, CELL y)
+void add_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		+ ((BIGNUM*)UNTAG(y))->n));
@@ -48,7 +48,7 @@ INLINE void subtract_fixnum(CELL x, CELL y)
 	CELL_TO_INTEGER(untag_fixnum_fast(x) - untag_fixnum_fast(y));
 }
 
-INLINE void subtract_bignum(CELL x, CELL y)
+void subtract_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		- ((BIGNUM*)UNTAG(y))->n));
@@ -63,7 +63,7 @@ INLINE void multiply_fixnum(CELL x, CELL y)
 		* (BIGNUM_2)untag_fixnum_fast(y));
 }
 
-INLINE void multiply_bignum(CELL x, CELL y)
+void multiply_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		* ((BIGNUM*)UNTAG(y))->n));
@@ -80,7 +80,7 @@ INLINE void divmod_fixnum(CELL x, CELL y)
 	env.dt = q.rem;
 }
 
-INLINE void divmod_bignum(CELL x, CELL y)
+void divmod_bignum(CELL x, CELL y)
 {
 	dpush(tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		/ ((BIGNUM*)UNTAG(y))->n)));
@@ -96,7 +96,7 @@ INLINE void mod_fixnum(CELL x, CELL y)
 	env.dt = x % y;
 }
 
-INLINE void mod_bignum(CELL x, CELL y)
+void mod_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		% ((BIGNUM*)UNTAG(y))->n));
@@ -110,7 +110,7 @@ INLINE void and_fixnum(CELL x, CELL y)
 	env.dt = x & y;
 }
 
-INLINE void and_bignum(CELL x, CELL y)
+void and_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		& ((BIGNUM*)UNTAG(y))->n));
@@ -124,7 +124,7 @@ INLINE void or_fixnum(CELL x, CELL y)
 	env.dt = x | y;
 }
 
-INLINE void or_bignum(CELL x, CELL y)
+void or_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		| ((BIGNUM*)UNTAG(y))->n));
@@ -138,7 +138,7 @@ INLINE void xor_fixnum(CELL x, CELL y)
 	env.dt = x ^ y;
 }
 
-INLINE void xor_bignum(CELL x, CELL y)
+void xor_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		^ ((BIGNUM*)UNTAG(y))->n));
@@ -153,7 +153,7 @@ INLINE void shiftleft_fixnum(CELL x, CELL y)
 		<< (BIGNUM_2)untag_fixnum_fast(y));
 }
 
-INLINE void shiftleft_bignum(CELL x, CELL y)
+void shiftleft_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		<< ((BIGNUM*)UNTAG(y))->n));
@@ -168,7 +168,7 @@ INLINE void shiftright_fixnum(CELL x, CELL y)
 		>> (BIGNUM_2)untag_fixnum_fast(y));
 }
 
-INLINE void shiftright_bignum(CELL x, CELL y)
+void shiftright_bignum(CELL x, CELL y)
 {
 	env.dt = tag_object(bignum(((BIGNUM*)UNTAG(x))->n
 		>> ((BIGNUM*)UNTAG(y))->n));
@@ -182,7 +182,7 @@ INLINE void less_fixnum(CELL x, CELL y)
 	env.dt = tag_boolean((FIXNUM)x < (FIXNUM)y);
 }
 
-INLINE void less_bignum(CELL x, CELL y)
+void less_bignum(CELL x, CELL y)
 {
 	env.dt = tag_boolean(((BIGNUM*)UNTAG(x))->n
 		< ((BIGNUM*)UNTAG(y))->n);
@@ -196,7 +196,7 @@ INLINE void lesseq_fixnum(CELL x, CELL y)
 	env.dt = tag_boolean((FIXNUM)x <= (FIXNUM)y);
 }
 
-INLINE void lesseq_bignum(CELL x, CELL y)
+void lesseq_bignum(CELL x, CELL y)
 {
 	env.dt = tag_boolean(((BIGNUM*)UNTAG(x))->n
 		<= ((BIGNUM*)UNTAG(y))->n);
@@ -210,7 +210,7 @@ INLINE void greater_fixnum(CELL x, CELL y)
 	env.dt = tag_boolean((FIXNUM)x > (FIXNUM)y);
 }
 
-INLINE void greater_bignum(CELL x, CELL y)
+void greater_bignum(CELL x, CELL y)
 {
 	env.dt = tag_boolean(((BIGNUM*)UNTAG(x))->n
 		> ((BIGNUM*)UNTAG(y))->n);
@@ -224,7 +224,7 @@ INLINE void greatereq_fixnum(CELL x, CELL y)
 	env.dt = tag_boolean((FIXNUM)x >= (FIXNUM)y);
 }
 
-INLINE void greatereq_bignum(CELL x, CELL y)
+void greatereq_bignum(CELL x, CELL y)
 {
 	env.dt = tag_boolean(((BIGNUM*)UNTAG(x))->n
 		>= ((BIGNUM*)UNTAG(y))->n);
