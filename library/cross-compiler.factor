@@ -70,9 +70,9 @@ DEFER: setenv
 DEFER: save-image
 DEFER: room
 DEFER: os-env
-DEFER: type-of
-DEFER: size-of
-DEFER: address-of
+DEFER: type
+DEFER: size
+DEFER: address
 DEFER: dump
 DEFER: heap-stats
 
@@ -347,8 +347,8 @@ IN: image
         millis
         init-random
         (random-int)
-        type-of
-        size-of
+        type
+        size
         call-profiling
         call-count
         set-call-count
@@ -364,7 +364,7 @@ IN: image
         set-compiled-byte
         literal-top
         set-literal-top
-        address-of
+        address
         dlopen
         dlsym
         dlsym-self

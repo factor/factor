@@ -37,7 +37,7 @@ USE: lists
     #! Push addr where we write the branch target address.
     POP-DS
     ! ptr to condition is now in EAX
-    f address-of EAX CMP-I-[R]
+    f address EAX CMP-I-[R]
     compiled-offset JE ;
 
 : branch-target ( fixup -- )

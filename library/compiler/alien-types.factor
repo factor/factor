@@ -104,17 +104,6 @@ USE: words
         cell "width" set
     ] "struct-name" get "*" cat2 define-c-type ;
 
-: define-struct ( spec name -- )
-    #! Define a set of words for working with a C structure
-    #! alien.
-    [
-        "struct-name" set
-        0 swap [ unswons define-field ] each
-        dup define-constructor
-        dup define-local-constructor
-        define-struct-type
-    ] with-scope ;
-
 : BEGIN-STRUCT: ( -- offset )
     scan "struct-name" set  0 ; parsing
 

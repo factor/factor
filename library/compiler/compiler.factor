@@ -51,7 +51,7 @@ USE: words
 
 : compile-literal ( obj -- )
     dup immediate? [
-        address-of LITERAL
+        address LITERAL
     ] [
         intern-literal [LITERAL]
     ] ifte ;

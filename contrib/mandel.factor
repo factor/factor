@@ -34,7 +34,7 @@ USE: strings
     rect> dup CHAR: ~ mandel-step ;
 
 : mandel-y ( y -- )
-    75 [ dupd 25 / 2 - >float swap mandel-x ] times* drop ;
+    150 [ dupd 50 / 2 - >float swap mandel-x ] times* drop ;
 
 : mandel ( -- )
-    21 [ 10 / 1 - >float mandel-y terpri ] times* ;
+    42 [ 20 / 1 - >float mandel-y terpri ] times* ;

@@ -25,38 +25,24 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: compiler
-USE: combinators
-USE: math
-USE: kernel
-USE: stack
+IN: sdl
+USE: alien
+USE: compiler
 
-: cell 4 ;
-: literal-table 1024 cell * ;
+: SDL_INIT_TIMER        HEX: 00000001 ;
+: SDL_INIT_AUDIO        HEX: 00000010 ;
+: SDL_INIT_VIDEO        HEX: 00000020 ;
+: SDL_INIT_CDROM        HEX: 00000100 ;
+: SDL_INIT_JOYSTICK     HEX: 00000200 ;
+: SDL_INIT_NOPARACHUTE  HEX: 00100000 ;
+: SDL_INIT_EVENTTHREAD  HEX: 01000000 ;
+: SDL_INIT_EVERYTHING   HEX: 0000FFFF ;
 
-: init-assembler ( -- )
-    compiled-offset literal-table + set-compiled-offset ;
+: SDL_Init ( mode -- )
+    "int" "sdl" "SDL_Init" [ "int" ] alien-call ; compiled
 
-: compile-aligned ( n -- )
-    compiled-offset swap align set-compiled-offset ;
+: SDL_GetError ( -- error )
+    "char*" "sdl" "SDL_GetError" [ ] alien-call ; compiled
 
-: intern-literal ( obj -- lit# )
-    address
-    literal-top set-compiled-cell
-    literal-top dup cell + set-literal-top ;
-
-: compile-byte ( n -- )
-    compiled-offset set-compiled-byte
-    compiled-offset 1 + set-compiled-offset ;
-
-: compile-cell ( n -- )
-    compiled-offset set-compiled-cell
-    compiled-offset cell + set-compiled-offset ;
-
-: DATASTACK ( -- ptr )
-    #! A pointer to a pointer to the datastack top.
-    11 getenv ;
-
-: CALLSTACK ( -- ptr )
-    #! A pointer to a pointer to the callstack top.
-    12 getenv ;
+: SDL_Quit ( -- )
+    "void" "sdl" "SDL_Quit" [ ] alien-call ; compiled

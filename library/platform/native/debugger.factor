@@ -64,7 +64,7 @@ USE: words
 : type-check-error ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write type-of type-name print
+    "Object type: " write type type-name print
     "Expected type: " write type-name print ;
 
 : array-range-error ( list -- )

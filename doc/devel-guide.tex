@@ -1608,7 +1608,24 @@ Another fundamental stack is the \emph{call stack}. When invoking an inner colon
 
 The call stack also serves a dual purpose as a temporary storage area. Sometimes, juggling values on the data stack becomes ackward, and in that case \texttt{>r} and \texttt{r>} can be used to move a value from the data stack to the call stack, and vice versa, respectively.
 
-give an example here
+Here is an example:
+
+\begin{verbatim}
+: acons ( value key alist -- alist )
+    >r swons r> cons ;
+\end{verbatim}
+
+When the word is called, \texttt{swons} is applied to \texttt{value} and \texttt{key} creating a cons cell whose car is \texttt{key} and whose cdr is \texttt{value}, then \texttt{cons} is applied to this new cons cell, and \texttt{alist}. So this word adds the \texttt{key}/\texttt{value} pair to the beginning of the \texttt{alist}.
+
+Note that usages of \texttt{>r} and \texttt{r>} must be balanced within a single quotation or word definition. The following examples illustrate the point:
+
+\begin{verbatim}
+: the-good >r 2 + r> * ;
+: the-bad  >r 2 + ;
+: the-ugly r> ;
+\end{verbatim}
+
+Basically, the rule is you must leave the call stack in the same state as you found it so that when the current quotation finishes executing, the interpreter can continue executing without seeing your data on the call stack.
 
 \subsection{Recursion}
 
@@ -1672,7 +1689,7 @@ call .s
 
 Combined with recursion, the \texttt{ifte} and \texttt{call} combinators can be used to construct almost any kind of looping or iteration structure.
 
-\subsection{List combinators}
+\subsection{Sequence combinators}
 
 In a traditional language such as C, every iteration or collection
 must be written out as a loop, with setting up and updating of indexes,
@@ -1680,32 +1697,30 @@ etc. Factor on the other hand relies on combinators and quotations
 to avoid duplicating these loop ``design patterns'' throughout
 the code.
 
-The simplest case is iterating through each element of a list, and
-printing it or otherwise consuming it from the stack.
+Factor provides three primary types of sequences; lists, vectors and strings. For each type, there is a pair of combinators; an \emph{iterator} that pushes each element of the sequence in turn, and executes a given quotation, and a \emph{collector} that also applies a quotation to each sequence element, but collects the results into a new sequence of the same type.
+
+The list iterator/collector combinator words are named \texttt{each} and \texttt{map}.
 
 \texttt{each ( list quot -{}- )} pushes each element of the list in
 turn, and executes the quotation. The list and quotation are not on
 the stack when the quotation is executed. This allows a powerful idiom
 where the quotation makes a copy of a value on the stack, and consumes
-it along with the list element. In fact, this idiom works with all
-well-designed combinators.%
-\footnote{Later, you will learn how to apply it when designing your own combinators.%
-}
+it along with the list element.
 
 The previously-mentioned \texttt{reverse} word is implemented using
 \texttt{each}:
+
 \begin{alltt}
 : reverse ( list -- list ) {[} {]} swap {[} swons {]} each ;
 \end{alltt}
+
 To understand how it works, consider that each element of the original
 list is consed onto the beginning of a new list, in turn. So the last
 element of the original list ends up at the beginning of the new list.
 
-\texttt{inject ( list quot -{}- list )} is similar to \texttt{each},
+\texttt{map ( list quot -{}- list )} is similar to \texttt{each},
 except after each iteration the return value of the quotation is collected into a new
-list. The quotation must have stack effect
-\texttt{( obj -{}- obj )} otherwise the combinator
-will not function properly.
+list. The quotation must only leave one value on the stack; if it leaves more or less, the stack will underflow or overflow.
 
 For example, suppose we have a list where each element stores the
 quantity of a some nutrient in 100 grams of food; we would like to
@@ -1713,50 +1728,16 @@ find out the total nutrients contained in 300 grams:
 
 \begin{alltt}
 : multiply-each ( n list -{}- list )
-    {[} dupd {*} {]} inject nip ;
+    {[} dupd {*} {]} map nip ;
 3 {[} 50 450 101 {]} multiply-each .
 \emph{{[} 180 1350 303 {]}}
 \end{alltt}
+
 Note the use of \texttt{dupd} to preserve the value of \texttt{n} after each iteration, and the final \texttt{nip} to discard the value of \texttt{n}.
 
-\texttt{subset ( list quot -{}- list )} produces a new list containing
-some of the elements of the original list. Which elements to collect
-is determined by the quotation -- the quotation is called with each
-list element on the stack in turn, and those elements for which the
-quotation does not return \texttt{f} are added to the new list. The
-quotation must have stack effect \texttt{( obj -{}- ?~)}.
+The vector iterator/collector combinator words are named \texttt{vector-each} and \texttt{vector-map}.
 
-For example, lets construct a list of all numbers between 0 and 99
-such that the sum of their digits is less than 10:
-
-\begin{alltt}
-: sum-of-digits ( n -{}- n ) 10 /mod + ;
-100 count {[} sum-of-digits 10 < {]} subset .
-\emph{{[} 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 20 21}
-\emph{22 23 24 25 26 27 30 31 32 33 34 35 36 40 41 42 43 44}
-\emph{45 50 51 52 53 54 60 61 62 63 70 71 72 80 81 90 {]} }
-\end{alltt}
-\texttt{all? ( list quot -{}- ?~)} returns \texttt{t} if the quotation
-returns \texttt{t} for all elements of the list, otherwise it returns
-\texttt{f}. In other words, if \texttt{all?} returns \texttt{t}, then
-\texttt{subset} applied to the same list and quotation would return
-the entire list.%
-\footnote{Barring any side effects which modify the execution of the quotation.
-It is best to avoid side effects when using list combinators.%
-}
-
-For example, the implementation of \texttt{assoc?} uses \texttt{all?}:
-
-\begin{alltt}
-: assoc? ( list -{}- ? )
-    dup list? {[} {[} cons? {]} all? {]} {[} drop f {]} ifte ;
-\end{alltt}
-
-\subsection{Vector combinators}
-
-A pair of combinators for iterating over vectors are provided in the \texttt{vectors} vocabulary. The first is the \texttt{vector-each} word that does nothing other than applying a quotation to each element. The second is the \texttt{vector-map} word that also collects the return values of the quotation into a new vector.
-
-\texttt{vector-each ( vector quot -{}- )} pushes each element of the vector in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( obj -- )}. The vector and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the vector for accumilation and so on.
+\texttt{vector-each ( vector quot -{}- )} pushes each element of the vector in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( obj -{}- )}. The vector and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the vector for accumilation and so on.
 
 The \texttt{stack>list} word makes use of \texttt{vector-each} to construct a list containing all elements of a given vector, in reverse order. In fact, its definition looks exactly like that of \texttt{reverse} except the \texttt{vector-each} combinator is used in place of \texttt{each}:
 
@@ -1772,7 +1753,7 @@ The \texttt{vector>list} word is defined as first creating a list of all element
     stack>list nreverse ;
 \end{alltt}
 
-\texttt{vector-map ( vector quot -{}- str )} is similar to \texttt{vector-each}, except after each iteration the return value of the quotation is collected into a new vector. The quotation should have a stack effect of \texttt{( obj -- obj )}.
+\texttt{vector-map ( vector quot -{}- str )} is similar to \texttt{vector-each}, except after each iteration the return value of the quotation is collected into a new vector. The quotation should have a stack effect of \texttt{( obj -{}- obj )}.
 
 The \texttt{clone-vector} word is implemented as a degenerate case of \texttt{vector-map} -- the elements of the original vector are copied into a new vector without any modification:
 
@@ -1781,9 +1762,7 @@ The \texttt{clone-vector} word is implemented as a degenerate case of \texttt{ve
     {[} {]} vector-map ;
 \end{alltt}
 
-\subsection{String combinators}
-
-A pair of combinators for iterating over strings are provided in the \texttt{strings} vocabulary. The first is the \texttt{str-each} word that does nothing other than applying a quotation to each character. The second is the \texttt{str-map} word that also collects the return values of the quotation into a new string.
+The string iterator/collector combinator words are named \texttt{str-each} and \texttt{str-map}.
 
 \texttt{str-each ( str quot -{}- )} pushes each character of the string in turn, and executes the quotation. The quotation should have a stack effect of \texttt{( ch -{}- )}. The string and the quotation are not on the stack when the quotation is executed. This allows the quotation to use values below the string for accumilation and so on. The following example counts the number of occurrences of the letter ``a'' in a string:
 
@@ -1795,7 +1774,7 @@ A pair of combinators for iterating over strings are provided in the \texttt{str
 \emph{4}
 \end{alltt}
 
-\texttt{str-map ( str quot -{}- str )} is similar to \texttt{str-each}, except after each iteration the return value of the quotation is collected into a new string. The quotation should have a stack effect of \texttt{( ch -- str/ch )}. The following example replaces all occurrences of the space character in the string with \texttt{+}:
+\texttt{str-map ( str quot -{}- str )} is similar to \texttt{str-each}, except after each iteration the return value of the quotation is collected into a new string. The quotation should have a stack effect of \texttt{( ch -{}- str/ch )}. The following example replaces all occurrences of the space character in the string with \texttt{+}:
 
 \begin{alltt}
 "We do not like spaces" {[} CHAR: \textbackslash{}s CHAR: + replace {]} str-map .
@@ -1817,10 +1796,10 @@ Enter a letter between ( ) to execute that action.}
 a
 \emph{Start work on the task now. Press ENTER when done.
 
-Please enter a description:
+Please enter a description:}
 Working on the Factor HTTP server
 
-(E)xit
+\emph{(E)xit
 (A)dd entry
 (P)rint timesheet
 
@@ -1941,7 +1920,7 @@ like to make a word like the following:
 \emph{01:15}
 \end{alltt}
 
-First, we can make a pair of words hh and mm to extract the hours
+First, we can make a pair of words \texttt{hh} and \texttt{mm} to extract the hours
 and minutes, respectively. This can be achieved using truncating division,
 and the modulo operator -- also, since we would like strings to be
 returned, the \texttt{unparse} word \texttt{( obj -{}- str )} from
@@ -1975,10 +1954,10 @@ there is a \texttt{digits} word \texttt{( str n -{}- str )} in the
 string to give it the specified length. Try it out:
 
 \begin{alltt}
-{}``23'' 2 digits .
-\emph{{}``23''}
-{}``7'' 2 digits .
-\emph{{}``07''}
+"23" 2 digits .
+\emph{"23"}
+"7"2 digits .
+\emph{"07"}
 \end{alltt}
 We can now change the definition of \texttt{mm} accordingly:
 
@@ -2000,17 +1979,19 @@ print-timesheet
 \emph{Studying Factor: 0:30}
 \emph{Paperwork: 1:05}
 \end{alltt}
+
 It would be much nicer if the time durations lined up in the same
 column. First, lets factor out the body of the \texttt{vector-each}
 loop into a new \texttt{print-entry} word before it gets too long:
 
 \begin{alltt}
 : print-entry ( duration description -{}- )
-    write {}``: '' write hh:mm print ;
+    write ": " write hh:mm print ;
 
 : print-timesheet ( timesheet -{}- )
     {[} uncons print-entry {]} vector-each ;
 \end{alltt}
+
 We can now make \texttt{print-entry} line up columns using the \texttt{pad-string}
 word \texttt{( str n -{}- str )}.
 
@@ -2021,6 +2002,7 @@ word \texttt{( str n -{}- str )}.
     50 swap pad-string write 
     hh:mm print ;
 \end{alltt}
+
 In the above definition, we first print the description, then enough
 blanks to move the cursor to column 60. So the description text is
 left-justified. If we had interchanged the order of the second and
@@ -2201,10 +2183,13 @@ USE: vectors
 
 \section{Structures}
 
+While sequences are very useful, for many programming problems a more structured representation of data is needed. Factor provides a set of tools for solving this problem; association lists, hashtables, and variables.
+All three are closely related to the notion of object equality, which will be covered first.
+
 \subsection{Identity and equality}
 
-What does it mean for two objects to be ``equal''? In actual fact, there are two ways of comparing objects. Two object references can be compared for \emph{identity} using the \texttt{eq? ( obj obj -{}- ? )} word. This only returns true if both references point to the same object. A weaker form of comparison is the \texttt{= ( obj obj -{}- ? )} word, which checks if two objects ``have the same shape''.
-If two objects are \texttt{eq?}, they will also be \texttt{=}.
+What does it mean for two objects to be ``equal''? In actual fact, there are two ways of comparing objects. Two object references can be compared for \emph{identity} using the \texttt{eq?~( obj obj -{}- ?~)} word. This only returns true if both references point to the same object. A weaker form of comparison is the \texttt{= ( obj obj -{}- ?~)} word, which checks if two objects ``have the same shape''.
+If two objects are \texttt{eq?}, they will also be \texttt{=}, however the converse does not hold in the general case.
 
 For example, two literal objects with the same printed representation are as a general rule not always \texttt{eq?}, however they are \texttt{=}:
 
@@ -2222,11 +2207,13 @@ On the other hand, duplicating an object reference on the stack using \texttt{du
 \emph{t}
 \end{alltt}
 
+In most cases, only \texttt{=} needs to be used. In fact, \texttt{eq?} is only used in a handful of places in the Factor standard library.
+
 An object can be cloned using \texttt{clone ( obj -{}- obj )}. The clone will no longer be \texttt{eq?} to the original (unless the original is immutable, in which case cloning is a no-op); however clones are always \texttt{=}.
 
 \subsection{Association lists}
 
-An \emph{association list} is one where every element is a cons. The
+An \emph{association list} is a list where every element is a cons. The
 car of each cons is a name, the cdr is a value. The literal notation
 is suggestive:
 
@@ -2238,7 +2225,7 @@ is suggestive:
 {]}
 \end{alltt}
 
-\texttt{assoc? ( obj -{}- ? )} returns \texttt{t} if the object is
+\texttt{assoc? ( obj -{}- ?~)} returns \texttt{t} if the object is
 a list whose every element is a cons; otherwise it returns \texttt{f}.
 
 \texttt{assoc ( key alist -{}- value )} looks for a pair with this
@@ -2260,7 +2247,7 @@ than \texttt{set-assoc} since it simply conses a new pair onto the
 list. However, if used repeatedly, the list will grow to contain a
 lot of {}``shadowed'' pairs.
 
-The following pair of word definitions from the \texttt{html} vocabulary demonstrates the usage of association lists. It implements a mapping of special characters to their HTML entity names. Note the usage of \texttt{?} to return the original character if the association lookup yields \texttt{f}:
+The following pair of word definitions from the \texttt{html} vocabulary demonstrates the usage of association lists. It implements a mapping of special characters to their HTML entity names. Note the usage of \texttt{?}~to return the original character if the association lookup yields \texttt{f}:
 
 \begin{alltt}
 : html-entities ( -- alist )
@@ -2268,8 +2255,8 @@ The following pair of word definitions from the \texttt{html} vocabulary demonst
         {[} CHAR: < | "\&lt;"   {]}
         {[} CHAR: > | "\&gt;"   {]}
         {[} CHAR: \& | "\&amp;"  {]}
-        {[} CHAR: ' | "\&apos;" {]}
-        {[} CHAR: \" | "\&quot;" {]}
+        {[} CHAR: {'} | "\&apos;" {]}
+        {[} CHAR: {"} | "\&quot;" {]}
     {]} ;
 
 : char>entity ( ch -- str )
@@ -2289,7 +2276,7 @@ A hashtable, much like an association list, stores key/value pairs, and offers l
 
 \texttt{hash ( key hash -{}- value )} looks up the value associated with a key in the hashtable. Pushes \texttt{f} if no pair with this key is present. Note that \texttt{hash} cannot differentiate between a key that is not present at all, or a key with a value of \texttt{f}.
 
-\texttt{hash* ( key hash -{}- {[} key | value {]})} looks for
+\texttt{hash* ( key hash -{}- {[} key | value {]} )} looks for
 a pair with this key, and pushes the pair itself. Unlike \texttt{hash},
 \texttt{hash{*}} returns different values in the cases of a value
 set to \texttt{f}, or an undefined value.
@@ -2298,13 +2285,11 @@ set to \texttt{f}, or an undefined value.
 
 examples, and hash>alist, alist>hash, hash-keys, hash-values
 
-\section{Beyond the stack}
-
 \subsection{Variables}
 
 Notice that until now, all the code except a handful of examples has only used the stack for storage. You can also use variables to store temporary data, much like in other languages, however their use is not so prevalent. This is not a coincidence -- Fator was designed this way, and mastery of the stack is essential. Using variables where the stack is more appropriate leads to ugly, unreusable code.
 
-Variables are typically used for longer-term storage of data, and for temporary storage of objects that are being constructed, where using the stack would be ackward. Another use for variables is compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language.
+Variables are typically used for longer-term storage of data, and compound data structures, realized as nested namespaces of variables. This concept should be instantly familiar to anybody who's used an object-oriented programming language. Variables should only be used for intermediate results if keeping everything on the stack would result in ackward stack flow.
 
 The words \texttt{get ( name -{}- value )} and \texttt{set ( value name -{}- )} retreive and store variable values, respectively. Variable names are strings, and they do not have to be declared before use. For example:
 
@@ -2333,22 +2318,40 @@ get example
 
 describe
 
+\subsection{The name stack}
+
+The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
+
+\begin{alltt}
+: bind ( namespace quot -- )
+    swap >n call n> drop ;
+\end{alltt}
+
+The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
+
+The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
+
+\begin{alltt}
+: >n ( namespace -- n:namespace ) namestack* vector-push ;
+: n> ( n:namespace -- namespace ) namestack* vector-pop ;
+\end{alltt}
+
 \subsection{\label{sub:List-constructors}List constructors}
 
 The list construction words provide an alternative way to build up a list. Instead of passing a partial list around on the stack as it is built, they store the partial list in a variable. This reduces the number
 of stack elements that have to be juggled.
 
-The word \texttt{{[}, ( -{}- )} begins list construction.
+The word \texttt{{[}, ( -{}- )} begins list construction. This also pushes a new namespace on the name stack, so any variable values that are set between calls to \texttt{[,} and \texttt{,]} will be lost.
 
 The word \texttt{, ( obj -{}- )} appends an object to the partial
 list.
 
-The word \texttt{,{]} ( -{}- list )} pushes the complete list.
+The word \texttt{,{]} ( -{}- list )} pushes the complete list, and pops the corresponding namespace from the name stack.
 
-While variables haven't been described yet, keep in mind that a new
-scope is created between \texttt{{[},} and \texttt{,{]}}. This means
-that list constructions can be nested, as long as in the end, the
-number of \texttt{{[},} and \texttt{,{]}} balances out. There is no
+The fact that a new
+scope is created between \texttt{{[},} and \texttt{,{]}} is very important.
+This means
+that list constructions can be nested. There is no
 requirement that \texttt{{[},} and \texttt{,{]}} appear in the same
 word, however, debugging becomes prohibitively difficult when a list
 construction begins in one word and ends with another.
@@ -2396,24 +2399,6 @@ The scope created by \texttt{<\%} and \texttt{\%>} is \emph{dynamic}; that is, a
 
 : assoc>string ( alist -{}- )
     <\% [ pair\% " " \% ] each \%> ;
-\end{alltt}
-
-\subsection{The name stack}
-
-The \texttt{bind} combinator creates dynamic scope by pushing and popping namespaces on the so-called \emph{name stack}. Its definition is simpler than one would expect:
-
-\begin{alltt}
-: bind ( namespace quot -- )
-    swap >n call n> drop ;
-\end{alltt}
-
-The words \texttt{>n} and \texttt{n>} push and pop the name stack, respectively. Observe the stack flow in the definition of \texttt{bind}; the namespace goes on the name stack, the quotation is called, and the name space is popped and discarded.
-
-The name stack is really just a vector. The words \texttt{>n} and \texttt{n>} are implemented as follows:
-
-\begin{alltt}
-: >n ( namespace -- n:namespace ) namestack* vector-push ;
-: n> ( n:namespace -- namespace ) namestack* vector-pop ;
 \end{alltt}
 
 \end{document}

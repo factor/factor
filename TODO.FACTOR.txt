@@ -4,6 +4,27 @@ FFI:
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 [error] SideKick$BufferChangeHandler: We have cplusplus.xml (/home/slava/jEdit/modes/) but got event for DefaultInputHandler.java (/home/slava/jEdit/org/gjt/sp/jedit/gui/)
 
+[error] AWT-EventQueue-0: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] AWT-EventQueue-0:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] AWT-EventQueue-0:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] AWT-EventQueue-0:  at errorlist.DefaultErrorSource.getLineErrors(Unknown Source)
+[error] AWT-EventQueue-0:  at errorlist.ErrorOverview.paintComponent(Unknown Source)
+
+[error] EditBus: Exception while sending message on EditBus:
+[error] EditBus: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] EditBus:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] EditBus:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] EditBus:  at errorlist.ErrorList$ErrorCellRenderer.getTreeCellRendererComponent(Unknown Source)
+[error] EditBus:  at javax.swing.plaf.basic.BasicTreeUI$NodeDimensionsHandler.getNodeDimensions(BasicTreeUI.java:2751)
+
+[error] EditBus: Exception while sending message on EditBus:
+[error] EditBus: java.lang.ArrayIndexOutOfBoundsException: Array index out of range: 98
+[error] EditBus:  at org.gjt.sp.jedit.Buffer.getLineOfOffset(Buffer.java:882)
+[error] EditBus:  at errorlist.DefaultErrorSource$DefaultError.getLineNumber(Unknown Source)
+[error] EditBus:  at errorlist.ErrorList$ErrorCellRenderer.getTreeCellRendererComponent(Unknown Source)
+[error] EditBus:  at javax.swing.plaf.basic.BasicTreeUI$NodeDimensionsHandler.getNodeDimensions(BasicTreeUI.java:2751)
+[error] EditBus:  at javax.swing.tree.AbstractLayoutCache.getNodeDimensions(AbstractLayoutCache.java:475)
+
 - perhaps /i should work with all numbers
 - profiler is inaccurate: wrong word on cs
 - buffer change handler in sidekick is screwed
@@ -48,7 +69,6 @@ FFI:
 - finish namespaces docs
 - mention word accessors/mutators
 - to document:
-  >r r> example
   continuations
   streams
   multitasking

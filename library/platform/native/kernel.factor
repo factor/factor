@@ -50,7 +50,7 @@ USE: vectors
 ! 'generic words' system will be built later.
 
 : generic ( obj vtable -- )
-    over type-of swap vector-nth call ;
+    over type swap vector-nth call ;
 
 : 2generic ( n n map -- )
     >r 2dup arithmetic-type r> vector-nth execute ;

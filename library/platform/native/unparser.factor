@@ -123,9 +123,9 @@ DEFER: unparse
 
 : unparse-unknown ( obj -- str )
     <% "#<" %
-    dup type-of type-name %
+    dup type type-name %
     " @ " % 
-    address-of unparse %
+    address unparse %
     ">" % %> ;
 
 : unparse ( obj -- str )

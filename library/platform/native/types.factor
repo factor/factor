@@ -27,19 +27,19 @@
 
 USE: kernel
 
-IN: math         : fixnum?  ( obj -- ? ) type-of 0  eq? ;
-IN: words        : word?    ( obj -- ? ) type-of 1  eq? ;
-IN: lists        : cons?    ( obj -- ? ) type-of 2  eq? ;
-IN: math         : ratio?   ( obj -- ? ) type-of 4  eq? ;
-IN: math         : complex? ( obj -- ? ) type-of 5  eq? ;
-IN: vectors      : vector?  ( obj -- ? ) type-of 9  eq? ;
-IN: strings      : string?  ( obj -- ? ) type-of 10 eq? ;
-IN: strings      : sbuf?    ( obj -- ? ) type-of 11 eq? ;
-IN: io-internals : port?    ( obj -- ? ) type-of 12 eq? ;
-IN: math         : bignum?  ( obj -- ? ) type-of 13 eq? ;
-IN: math         : float?   ( obj -- ? ) type-of 14 eq? ;
-IN: alien        : dll?     ( obj -- ? ) type-of 15 eq? ;
-IN: alien        : alien?   ( obj -- ? ) type-of 16 eq? ;
+IN: math         : fixnum?  ( obj -- ? ) type 0  eq? ;
+IN: words        : word?    ( obj -- ? ) type 1  eq? ;
+IN: lists        : cons?    ( obj -- ? ) type 2  eq? ;
+IN: math         : ratio?   ( obj -- ? ) type 4  eq? ;
+IN: math         : complex? ( obj -- ? ) type 5  eq? ;
+IN: vectors      : vector?  ( obj -- ? ) type 9  eq? ;
+IN: strings      : string?  ( obj -- ? ) type 10 eq? ;
+IN: strings      : sbuf?    ( obj -- ? ) type 11 eq? ;
+IN: io-internals : port?    ( obj -- ? ) type 12 eq? ;
+IN: math         : bignum?  ( obj -- ? ) type 13 eq? ;
+IN: math         : float?   ( obj -- ? ) type 14 eq? ;
+IN: alien        : dll?     ( obj -- ? ) type 15 eq? ;
+IN: alien        : alien?   ( obj -- ? ) type 16 eq? ;
 
 IN: kernel
 

@@ -181,7 +181,7 @@ public class FactorPlugin extends EditPlugin
 		while(words != null)
 		{
 			FactorWord w = (FactorWord)words.car;
-			if(w.name != null)
+			if(w != null && w.name != null)
 			{
 				if(anywhere)
 				{
