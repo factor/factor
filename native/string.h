@@ -1,10 +1,17 @@
+
+
 typedef struct {
 	CELL header;
-	/* untagged */
+	/* untagged num of chars */
 	CELL capacity;
 	/* tagged */
 	CELL hashcode;
 } F_STRING;
+
+#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
+
+#define SSIZE(pointer) align8(sizeof(F_STRING) + \
+	(((F_STRING*)pointer)->capacity + 1) * CHARS)
 
 INLINE F_STRING* untag_string(CELL tagged)
 {
@@ -25,11 +32,6 @@ F_STRING* from_c_string(const BYTE* c_string);
 void primitive_memory_to_string(void);
 DLLEXPORT BYTE* unbox_c_string(void);
 DLLEXPORT uint16_t* unbox_utf16_string(void);
-
-#define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
-
-#define SSIZE(pointer) align8(sizeof(F_STRING) + \
-	((F_STRING*)pointer)->capacity * CHARS)
 
 /* untagged & unchecked */
 INLINE CELL string_nth(F_STRING* string, CELL index)

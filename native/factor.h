@@ -27,6 +27,9 @@ CELL cs_bot;
 /* raw pointer to callstack top */
 DLLEXPORT CELL cs;
 
+/* TAGGED currently executing quotation */
+CELL callframe;
+
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>

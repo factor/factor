@@ -26,9 +26,6 @@ jmp_buf toplevel;
 sigjmp_buf toplevel;
 #endif
 
-/* TAGGED currently executing quotation */
-CELL callframe;
-
 /* TAGGED pointer to currently executing word */
 CELL executing;
 

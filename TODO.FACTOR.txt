@@ -33,6 +33,7 @@
 - utf16 string boxing
 - slot compile problem
 - nulls at the end of utf16 strings
+- x86 register decl
 
 + compiler/ffi:
 

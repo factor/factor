@@ -253,7 +253,7 @@ M: cons ' ( c -- tagged )
     string-type >header emit
     dup str-length emit
     dup hashcode emit-fixnum
-    pack-string
+    "\0" cat2 pack-string
     align-here ;
 
 M: string ' ( string -- pointer )

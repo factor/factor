@@ -4,7 +4,12 @@
 F_STRING* allot_string(CELL capacity)
 {
 	F_STRING* string = allot_object(STRING_TYPE,
-		sizeof(F_STRING) + capacity * CHARS);
+		sizeof(F_STRING) + (capacity + 1) * CHARS);
+	/* strings are null-terminated in memory, even though they also
+	have a length field. The null termination allows us to add
+	the sizeof(F_STRING) to a Factor string to get a C-style
+	UTF16 string for C library calls. */
+	cput(SREF(string,capacity),(uint16_t)'\0');
 	string->capacity = capacity;
 	return string;
 }
