@@ -212,61 +212,6 @@ defined:
 For obvious reasons, the predicate definition must consume and produce
 exactly one value on the stack.
 
-** The traits metaclass
+** The tuple metaclass
 
-(The name for this metaclass is wrong and will change eventually. The
-original idea was to allow an object to inherit any number of 'traits',
-thus they would behave like mixins. This never materialized.)
-
-The traits metaclass allows one to associate more fine-grained behavior,
-specifically with hashtables.
-
-New classes can be defined like so:
-
-TRAITS: plasma
-
-In terms of behavior, this is actually identical to the following:
-
-PREDICATE: hashtable plasma \ traits swap hash plasma = ;
-
-However, it is far more efficient (and less verbose).
-
-You can define methods as usual:
-
-GENERIC: collide ( actor1 actor2 -- )
-
-M: plasma collide ( actor1 actor2 -- )
-    #! Remove the other actor.
-    deactivate deactivate ;
-
-How does one actually get an object that plasma? responds with t to? You
-define a constructor word by writing C: followed by the class name:
-
-C: plasma ( actor dy -- plasma )
-    [
-        velocity set
-        actor-xy
-        blue color set
-        10 len set
-        5 radius set
-        active on
-    ] extend ;
-
-The constructor word is named after the class, surrounded in angle
-brackets (< and >). For example, the above actually creates a word named
-<plasma>.
-
-The constructor's definition begins with the parameters given by the
-user, underneath a blank plasma object.
-
-That is, a dummy constructor just returns a blank hashtable that
-responds t to the corresponding membership predicate:
-
-TRAITS: foo
-C: foo ;
-
-<foo> foo? .
-==> t
-
-"hello" foo? .
-==> f
+This is quite involved; see tuples.txt.
