@@ -53,7 +53,11 @@ M: fd-stream stream-close ( stream -- )
 : fcopy ( from to -- )
     #! Copy the contents of the fd-stream 'from' to the
     #! fd-stream 'to'.
-    [ 2dup (fcopy) ] [ -rot stream-close stream-close rethrow ] catch ;
+    [
+        2dup (fcopy)
+    ] [
+        -rot stream-close stream-close rethrow
+    ] catch ;
 
 : resource-path ( -- path )
     "resource-path" get [ "." ] unless* ;

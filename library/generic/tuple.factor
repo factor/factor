@@ -49,11 +49,12 @@ kernel-internals math hashtables errors vectors ;
     >r over mutator-word tuck r> [ set-slot ] cons
     define-tuple-generic ;
 
-: define-slot ( word name n -- [[ accessor mutator ]] )
+: define-slot ( word name n -- [ n accessor mutator ] )
     over "delegate" = [
         pick over "delegate-field" set-word-property
     ] when
-    3dup define-mutator >r define-accessor r> cons ;
+    [ 3dup define-mutator >r define-accessor r> ] keep -rot
+    3list ;
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
@@ -91,7 +92,7 @@ kernel-internals math hashtables errors vectors ;
 : default-constructor ( tuple -- )
     dup [
         "slot-words" word-property
-        reverse [ cdr unit , \ keep , ] each
+        reverse [ last unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )

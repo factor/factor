@@ -215,8 +215,7 @@ USE: kernel-internals
     [ object vector ] ensure-d
     dataflow-drop, pop-d vtable>list
     >r 1 meta-d get vector-tail* \ dispatch r>
-    pop-d ( n ) num-types [ dupd cons ] project nip zip
-    infer-branches ;
+    pop-d drop [ unit ] map infer-branches ;
 
 \ dispatch [ infer-dispatch ] "infer" set-word-property
 \ dispatch [ [ fixnum vector ] [ ] ]

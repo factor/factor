@@ -154,19 +154,12 @@ SYMBOL: #end-dispatch
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
-    [
-        uncons label, (linearize) #jump-label swons ,
-    ] each-with ;
-
-: check-dispatch ( vtable -- )
-    length num-types = [
-        "Dispatch must have " num-types " entries" cat3 throw
-    ] unless ;
+    [ uncons label, (linearize) #jump-label swons , ] each-with ;
 
 : linearize-dispatch ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
-    dup check-dispatch dispatch-head dupd dispatch-body label, ;
+    dispatch-head dupd dispatch-body label, ;
 
 \ dispatch [
     [ node-param get ] bind linearize-dispatch

@@ -213,14 +213,14 @@ SYMBOL: sym-test
 
 ! Type inference
 
-[ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
-[ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
-[ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
-[ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
-[ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
+! [ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test
+! [ [ [ object ] [ object object ] ] ] [ [ dup ] infer ] unit-test
+! [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer ] unit-test
+! [ [ [ cons ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
+! [ [ [ general-list ] [ object ] ] ] [ [ dup [ car ] when ] infer ] unit-test
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
-[ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test
+! [ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test
 
 ! [ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer ] unit-test
 ! [ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer ] unit-test

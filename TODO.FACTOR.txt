@@ -17,7 +17,6 @@
 - code gc
 - ppc register decls
 
-- unit test failure
 - #jump-f #jump-f-label
 - extract word inside M:, C:, and structure browsing for these
 - fix checkbox alignment
@@ -35,6 +34,7 @@
 - UI: don't roll over if mouse button is down
 - more accurate types for various words
 - optimize out >array, >tuple, >hashtable etc
+- write read: write should flush
 
 + compiler/ffi:
 

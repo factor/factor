@@ -154,6 +154,9 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
 : project ( n quot -- list )
     >r count r> map ; inline
 
+: project-with ( elt n quot -- list )
+    swap [ with rot ] project 2nip ; inline
+
 : head ( list n -- list )
     #! Return the first n elements of the list.
     dup 0 > [ >r uncons r> 1 - head cons ] [ 2drop f ] ifte ;
