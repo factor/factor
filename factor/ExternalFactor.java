@@ -238,11 +238,11 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		}
 	} //}}}
 
-	//{{{ getCompletions() method
-	public synchronized void getCompletions(Cons use, String word,
+	//{{{ getWordCompletions() method
+	public synchronized void getWordCompletions(Cons use, String word,
 		boolean anywhere, Set completions) throws Exception
 	{
-		super.getCompletions(use,word,anywhere,completions);
+		super.getWordCompletions(use,word,anywhere,completions);
 
 		if(closed)
 			return;

@@ -3,10 +3,7 @@
 - [ [ dup call ] dup call ] infer hangs
 - move tuple to generic vocab
 - update plugin docs
-- extract word keeps indent
 - word preview for remote words
-- support USING:
-- special completion for USE:/IN:
 - vectors: ensure its ok with bignum indices
 - code gc
 - type inference fails with some assembler words;
@@ -14,10 +11,11 @@
   not cons, and need stronger branch partial eval
 - print warning on null class
 - optimize away dispatch
-- alignment of gadgets inside their bounding boxes needs thought
 - faster completion
 - ppc register decls
 
+- extract word inside M:, C:, and structure browsing for these
+- fix checkbox alignment
 - begin-scan, next-object, end-scan primitives
 - each-object, each-slot combinators
 - port leak

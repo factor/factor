@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -31,27 +31,21 @@ package factor.jedit;
 
 import factor.*;
 import java.util.*;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 import org.gjt.sp.jedit.textarea.*;
 import org.gjt.sp.jedit.*;
 import sidekick.*;
 
-public class FactorCompletion extends SideKickCompletion
+public class FactorVocabCompletion extends AbstractCompletion
 {
-	private View view;
-	private JEditTextArea textArea;
-	private String word;
-	private FactorParsedData data;
+	private String vocab;
 
-	//{{{ FactorCompletion constructor
-	public FactorCompletion(View view, FactorWord[] items,
-		String word, FactorParsedData data)
+	//{{{ FactorVocabCompletion constructor
+	public FactorVocabCompletion(View view, String[] items,
+		String vocab, FactorParsedData data)
 	{
-		this.view = view;
-		textArea = view.getTextArea();
-		this.items = Arrays.asList(items);
-		this.word = word;
-		this.data = data;
+		super(view,items,data);
+		this.vocab = vocab;
 	} //}}}
 
 	public String getLongestPrefix()
@@ -61,28 +55,17 @@ public class FactorCompletion extends SideKickCompletion
 
 	public void insert(int index)
 	{
-		FactorWord selected = ((FactorWord)get(index));
-		String insert = selected.name.substring(word.length());
+		String selected = ((String)get(index));
+		String insert = selected.substring(vocab.length());
 
 		Buffer buffer = textArea.getBuffer();
 
-		try
-		{
-			buffer.beginCompoundEdit();
-			
-			textArea.setSelectedText(insert);
-			if(!FactorPlugin.isUsed(view,selected.vocabulary))
-				FactorPlugin.insertUse(view,selected.vocabulary);
-		}
-		finally
-		{
-			buffer.endCompoundEdit();
-		}
+		textArea.setSelectedText(insert);
 	}
 
 	public int getTokenLength()
 	{
-		return word.length();
+		return vocab.length();
 	}
 
 	public boolean handleKeystroke(int selectedIndex, char keyChar)
@@ -107,6 +90,6 @@ public class FactorCompletion extends SideKickCompletion
 
 	public ListCellRenderer getRenderer()
 	{
-		return new FactorWordRenderer(data.parser,false);
+		return new DefaultListCellRenderer();
 	}
 }

@@ -62,8 +62,8 @@ factor.completion.def={0} <b>{1}</b>
 factor.completion.stack={0} ( {1})
 
 # Dialog boxes
-factor.status.inserted-use=Inserted {0}
-factor.status.already-used=Already used {0}
+factor.status.inserted-use=Using {0}
+factor.status.already-used=Already using {0}
 
 factor.insert-use.title=Insert USE: Declaration
 factor.insert-use.caption=There are multiple words named "{0}". Select the one to use:

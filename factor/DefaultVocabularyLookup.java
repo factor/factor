@@ -218,7 +218,7 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 		return vocabs;
 	} //}}}
 
-	//{{{ getCompletions() method
+	//{{{ getWordCompletions() method
 	/**
 	 * @param use A list of vocabularies.
 	 * @param word A substring of the word name to complete
@@ -226,19 +226,36 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 	 * returned; otherwise, only matches from beginning.
 	 * @param completions Set to add completions to
 	 */
-	public void getCompletions(Cons use, String word, boolean anywhere,
+	public void getWordCompletions(Cons use, String word, boolean anywhere,
 		Set completions) throws Exception
 	{
 		while(use != null)
 		{
 			String vocab = (String)use.car;
-			getCompletions(vocab,word,anywhere,completions);
+			getWordCompletions(vocab,word,anywhere,completions);
 			use = use.next();
 		}
 	} //}}}
 
-	//{{{ getCompletions() method
-	public void getCompletions(String vocab, String word, boolean anywhere,
+	//{{{ isCompletion() method
+	public boolean isCompletion(String match, String against, boolean anywhere)
+	{
+		if(anywhere)
+		{
+			if(against.indexOf(match) != -1)
+				return true;
+		}
+		else
+		{
+			if(against.startsWith(match))
+				return true;
+		}
+		
+		return false;
+	} //}}}
+	
+	//{{{ getWordCompletions() method
+	public void getWordCompletions(String vocab, String word, boolean anywhere,
 		Set completions) throws Exception
 	{
 		Map v = (Map)vocabularies.get(vocab);
@@ -254,19 +271,33 @@ public class DefaultVocabularyLookup implements VocabularyLookup
 			{
 				if(!completions.contains(w))
 				{
-					if(anywhere)
-					{
-						if(w.name.indexOf(word) != -1)
-							completions.add(w);
-					}
-					else
-					{
-						if(w.name.startsWith(word))
-							completions.add(w);
-					}
+					if(isCompletion(word,w.name,anywhere))
+						completions.add(w);
 				}
 			}
 		}
+	} //}}}
+
+	//{{{ getVocabCompletions() method
+	/**
+	 * @param vocab A string to complete
+	 * @param anywhere If true, matches anywhere in the vocab name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public String[] getVocabCompletions(String vocab, boolean anywhere)
+		throws Exception
+	{
+		List completions = new ArrayList();
+		Cons vocabs = getVocabularies();
+		while(vocabs != null)
+		{
+			String v = (String)vocabs.car;
+			if(isCompletion(vocab,v,anywhere))
+				completions.add(v);
+			vocabs = vocabs.next();
+		}
+
+		return (String[])completions.toArray(new String[completions.size()]);
 	} //}}}
 
 	//{{{ parseObject() method

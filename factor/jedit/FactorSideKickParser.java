@@ -250,6 +250,12 @@ public class FactorSideKickParser extends SideKickParser
 		if(data == null)
 			return null;
 
+		String ruleset = FactorPlugin.getRulesetAtOffset(
+			editPane.getTextArea(),caret);
+
+		if(ruleset == null)
+			return null;
+
 		Buffer buffer = editPane.getBuffer();
 
 		// first, we get the word before the caret
@@ -283,14 +289,40 @@ public class FactorSideKickParser extends SideKickParser
 		if(word.length() == 0)
 			return null;
 
-		FactorWord[] completions = FactorPlugin.toWordArray(
-			FactorPlugin.getCompletions(word,false));
+		if(ruleset.equals("factor::USING"))
+			return vocabComplete(editPane,data,word,caret);
+		else
+			return wordComplete(editPane,data,word,caret);
+	} //}}}
+	
+	//{{{ vocabComplete() method
+	private SideKickCompletion vocabComplete(EditPane editPane,
+		FactorParsedData data, String vocab, int caret)
+	{
+		String[] completions = FactorPlugin.getVocabCompletions(
+			vocab,false);
 
 		if(completions.length == 0)
 			return null;
 		else
 		{
-			return new FactorCompletion(editPane.getView(),
+			return new FactorVocabCompletion(editPane.getView(),
+				completions,vocab,data);
+		}
+	} //}}}
+	
+	//{{{ wordComplete() method
+	private SideKickCompletion wordComplete(EditPane editPane,
+		FactorParsedData data, String word, int caret)
+	{
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getWordCompletions(word,false));
+
+		if(completions.length == 0)
+			return null;
+		else
+		{
+			return new FactorWordCompletion(editPane.getView(),
 				completions,word,data);
 		}
 	} //}}}
