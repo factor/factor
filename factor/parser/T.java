@@ -38,13 +38,12 @@ public class T extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public T(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
-		throws FactorParseException
+	public void eval(FactorReader reader)
+		throws Exception
 	{
 		reader.append(Boolean.TRUE);
 	}

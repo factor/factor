@@ -37,33 +37,23 @@ import java.io.*;
  */
 public class FactorLib
 {
-	//{{{ branch3() method
-	public static Object branch3(float x, float y,
-		Object o1, Object o2, Object o3)
+	//{{{ toNumber() method
+	public static Number toNumber(Object arg)
 	{
-		if(x > y)
-			return o1;
-		else if(x == y)
-			return o2;
-		else
-			return o3;
+		if(arg instanceof Number)
+			return (Number)arg;
+		else if(arg instanceof Character)
+			return new Integer((int)((Character)arg).charValue());
+		else if(arg instanceof String)
+		{
+			Number num = NumberParser.parseNumber((String)arg,10);
+			if(num != null)
+				return num;
+		}
+
+		throw new NumberFormatException(String.valueOf(arg));
 	} //}}}
 
-	//{{{ error() method
-	public static void error(Object obj) throws Throwable
-	{
-		if(obj instanceof Throwable)
-			throw (Throwable)obj;
-		else
-			throw new FactorRuntimeException(String.valueOf(obj));
-	} //}}}
-
-	//{{{ eq() method
-	public static boolean eq(Object o1, Object o2)
-	{
-		return o1 == o2;
-	} //}}}
-	
 	//{{{ equal() method
 	public static boolean equal(Object o1, Object o2)
 	{
@@ -127,31 +117,6 @@ public class FactorLib
 			return o1.equals(o2);
 	} //}}}
 
-	//{{{ exec() method
-	public static int exec(String[] args, String dir) throws Exception
-	{
-		int exitCode = -1;
-
-		try
-		{
-			Process process = Runtime.getRuntime().exec(args,
-				null,new File(dir));
-			process.getInputStream().close();
-			process.getOutputStream().close();
-			process.getErrorStream().close();
-			exitCode = process.waitFor();
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			// this needs to be handled better
-			/* stack.push(MiscUtilities.throwableToString(e));
-			Console.print(stack,namespace); */
-		}
-
-		return exitCode;
-	} //}}}
-
 	//{{{ objectsEqual() method
 	/**
 	 * Returns if two objects are equal. This correctly handles null
@@ -160,91 +125,5 @@ public class FactorLib
 	public static boolean objectsEqual(Object o1, Object o2)
 	{
 		return (o1 == null ? o2 == null : o1.equals(o2));
-	} //}}}
-
-	//{{{ copy() method
-	/**
-	 * Copies the contents of an input stream to an output stream.
-	 */
-	public static void copy(InputStream in, OutputStream out)
-		throws IOException
-	{
-		try
-		{
-			byte[] buf = new byte[4096];
-
-			int count;
-
-			for(;;)
-			{
-				count = in.read(buf,0,buf.length);
-				if(count == -1 || count == 0)
-					break;
-
-				out.write(buf,0,count);
-			}
-		}
-		finally
-		{
-			in.close();
-			out.close();
-		}
-	} //}}}
-
-	//{{{ readLine() method
-	/**
-	 * Reads a line of text from the given input stream.
-	 */
-	public static String readLine(InputStream in) throws IOException
-	{
-		StringBuffer buf = new StringBuffer();
-		int b;
-		while((b = in.read()) != -1)
-		{
-			if(b == '\r')
-			{
-				if(in.markSupported()/*  && in.available() >= 1 */)
-				{
-					in.mark(1);
-					b = in.read();
-					if(b != '\n')
-						in.reset();
-				}
-				break;
-			}
-			else if(b == '\n')
-				break;
-			buf.append((char)b);
-		}
-
-		/* EOF? */
-		if(b == -1 && buf.length() == 0)
-			return null;
-		else
-			return buf.toString();
-	} //}}}
-
-	//{{{ readCount() method
-	public static String readCount(int count, InputStream in)
-		throws IOException
-	{
-		byte[] bytes = new byte[count];
-		int offset = 0;
-		int read = 0;
-		while((read = in.read(bytes,offset,count - offset)) > 0)
-			offset += read;
-		return new String(bytes,0,offset,"ASCII");
-	} //}}}
-
-	//{{{ readCount() method
-	public static String readCount(int count, Reader in)
-		throws IOException
-	{
-		char[] chars = new char[count];
-		int offset = 0;
-		int read = 0;
-		while((read = in.read(chars,offset,count - offset)) > 0)
-			offset += read;
-		return new String(chars,0,offset);
 	} //}}}
 }

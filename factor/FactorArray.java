@@ -35,130 +35,41 @@ package factor;
  */
 public class FactorArray implements FactorExternalizable, PublicCloneable
 {
-	public Object[] stack;
+	public Object[] array;
 	public int top;
 
 	//{{{ FactorArray constructor
 	public FactorArray()
 	{
-		stack = new Object[64];
+		array = new Object[64];
 	} //}}}
 
 	//{{{ FactorArray constructor
 	public FactorArray(int size)
 	{
-		stack = new Object[size];
+		array = new Object[size];
 	} //}}}
-
+	
 	//{{{ FactorArray constructor
 	public FactorArray(Cons list)
 	{
-		this();
+		this(list == null ? 0 : list.length());
 
-		if(list != null)
+		int i = 0;
+		while(list != null)
 		{
-			ensurePush(list.length());
-			while(list != null)
-			{
-				push(list.car);
-				list = list.next();
-			}
+			array[i++] = list.car;
+			list = list.next();
 		}
 	} //}}}
 
 	//{{{ FactorArray constructor
-	public FactorArray(Object[] stack, int top)
+	public FactorArray(Object[] array, int top)
 	{
-		this.stack = stack;
+		this.array = array;
 		this.top = top;
 	} //}}}
 
-	//{{{ pop() method
-	public Object pop(Class clas) throws Exception
-	{
-		return FactorJava.convertToJavaType(pop(),clas);
-	} //}}}
-
-	//{{{ pop() method
-	public Object pop() throws FactorStackException
-	{
-		ensurePop(1);
-		Object returnValue = stack[--top];
-		stack[top] = null;
-		return returnValue;
-	} //}}}
-
-	//{{{ peek() method
-	public Object peek() throws FactorStackException
-	{
-		ensurePop(1);
-		return stack[top - 1];
-	} //}}}
-
-	//{{{ ensurePop() method
-	public void ensurePop(int amount) throws FactorStackException
-	{
-		if(amount > top)
-			throw new FactorStackException(amount);
-	} //}}}
-
-	//{{{ push() method
-	public void push(Object o)
-	{
-		ensurePush(1);
-		stack[top++] = o;
-	} //}}}
-
-	//{{{ pushAll() method
-	public void pushAll(Object[] array)
-	{
-		ensurePush(array.length);
-		System.arraycopy(array,0,stack,top,array.length);
-		top += array.length;
-	} //}}}
-
-	//{{{ ensureCapacity() method
-	private void ensureCapacity(int index)
-	{
-		if(index >= stack.length)
-		{
-			Object[] newStack = new Object[index * 2 + 1];
-			System.arraycopy(stack,0,newStack,0,top);
-			stack = newStack;
-		}
-	} //}}}
-
-	//{{{ ensurePush() method
-	public void ensurePush(int amount)
-	{
-		ensureCapacity(top + amount);
-	} //}}}
-
-	//{{{ get() method
-	public Object get(int index)
-	{
-		return stack[index];
-	} //}}}
-	
-	//{{{ set() method
-	public void set(Object value, int index)
-	{
-		ensureCapacity(index);
-		if(index >= top)
-		{
-			for(int i = top; i < index; i++)
-				stack[i] = null;
-			top = index + 1;
-		}
-		stack[index] = value;
-	} //}}}
-	
-	//{{{ getCapacity() method
-	public int getCapacity()
-	{
-		return stack.length;
-	} //}}}
-	
 	//{{{ toString() method
 	/**
 	 * Returns elementsToString() enclosed with [ and ].
@@ -168,38 +79,22 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 		StringBuffer buf = new StringBuffer("{ ");
 		for(int i = 0; i < top; i++)
 		{
-			buf.append(FactorReader.unparseObject(stack[i]));
+			buf.append(FactorReader.unparseObject(array[i]));
 			buf.append(' ');
 		}
 
 		return buf.append("}").toString();
 	} //}}}
-	
-	//{{{ toList() method
-	public Cons toList()
-	{
-		Cons first = null, last = null;
-		for(int i = 0; i < top; i++)
-		{
-			Cons cons = new Cons(stack[i],null);
-			if(first == null)
-				first = cons;
-			else
-				last.cdr = cons;
-			last = cons;
-		}
-		return first;
-	} //}}}
 
 	//{{{ clone() method
 	public Object clone()
 	{
-		if(stack == null)
+		if(array == null)
 			return new FactorArray();
 		else
 		{
-			Object[] newArray = new Object[stack.length];
-			System.arraycopy(stack,0,newArray,0,top);
+			Object[] newArray = new Object[array.length];
+			System.arraycopy(array,0,newArray,0,top);
 			return new FactorArray(newArray,top);
 		}
 	} //}}}
@@ -210,7 +105,7 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 		int hashCode = 0;
 		for(int i = 0; i < Math.min(top,4); i++)
 		{
-			Object obj = stack[i];
+			Object obj = array[i];
 			if(obj != null)
 				hashCode ^= obj.hashCode();
 		}
@@ -228,7 +123,7 @@ public class FactorArray implements FactorExternalizable, PublicCloneable
 				return false;
 			for(int i = 0; i < top; i++)
 			{
-				if(!FactorLib.equal(stack[i],a.stack[i]))
+				if(!FactorLib.equal(array[i],a.array[i]))
 					return false;
 			}
 			

@@ -37,8 +37,8 @@ import org.gjt.sp.jedit.*;
 public class FactorWordRenderer extends DefaultListCellRenderer
 {
 	//{{{ getWordHTMLString() method
-	public static String getWordHTMLString(FactorInterpreter interp,
-		FactorWord word, FactorWordDefinition def, boolean showIn)
+	public static String getWordHTMLString(FactorWord word,
+		FactorWordDefinition def, boolean showIn)
 	{
 		String prop = "factor.completion.plain";
 		String stackEffect = null;
@@ -50,28 +50,13 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			else
 				prop = "factor.completion.defer";
 		}
-		else if(def instanceof FactorShuffleDefinition)
-		{
-			prop = "factor.completion.shuffle";
-			StringBuffer buf = new StringBuffer();
-			Cons d = def.toList(interp);
-			while(d != null)
-			{
-				if(buf.length() != 0)
-					buf.append(' ');
-
-				buf.append(d.car);
-				d = d.next();
-			}
-			stackEffect = buf.toString();
-		}
 		else if(def instanceof FactorSymbolDefinition)
 		{
 			prop = "factor.completion.symbol";
 		}
 		else
 		{
-			Cons d = def.toList(interp);
+			Cons d = def.toList();
 			if(d != null && d.car instanceof FactorDocComment)
 			{
 				FactorDocComment comment = (FactorDocComment)
@@ -129,8 +114,7 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 			return this;
 
 		FactorWord word = (FactorWord)value;
-		setText(getWordHTMLString(parser.getInterpreter(),
-			word,
+		setText(getWordHTMLString(word,
 			parser.getWordDefinition(word),
 			showIn));
 

@@ -62,7 +62,6 @@ public class FactorAsset extends Asset
 	
 	public String getLongString()
 	{
-		return FactorWordRenderer.getWordHTMLString(
-			FactorPlugin.getInterpreter(),word,def,false);
+		return FactorWordRenderer.getWordHTMLString(word,def,false);
 	}
 }

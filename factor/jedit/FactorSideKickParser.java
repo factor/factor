@@ -40,7 +40,6 @@ import sidekick.*;
 
 public class FactorSideKickParser extends SideKickParser
 {
-	private FactorInterpreter interp;
 	private WordPreview wordPreview;
 	private Map previewMap;
 
@@ -55,15 +54,8 @@ public class FactorSideKickParser extends SideKickParser
 	public FactorSideKickParser()
 	{
 		super("factor");
-		interp = FactorPlugin.getInterpreter();
 		previewMap = new HashMap();
 		worddefs = new HashMap();
-	} //}}}
-
-	//{{{ getInterpreter() method
-	public FactorInterpreter getInterpreter()
-	{
-		return interp;
 	} //}}}
 
 	//{{{ getWordDefinition() method
@@ -143,7 +135,7 @@ public class FactorSideKickParser extends SideKickParser
 				new BufferedReader(new StringReader(text)),
 				errorSource);
 			FactorReader r = new FactorReader(scanner,
-				false,false,interp);
+				false,FactorPlugin.getExternalInstance());
 
 			Cons parsed = r.parse();
 

@@ -31,6 +31,7 @@ package factor.jedit;
 
 import factor.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.*;
 import javax.swing.event.*;
 import javax.swing.Timer;
@@ -115,14 +116,21 @@ public class WordPreview implements ActionListener, CaretListener
 				return;
 
 			FactorParsedData fdata = (FactorParsedData)data;
-			FactorInterpreter interp = fdata.parser
-				.getInterpreter();
-			FactorWord w = interp.searchVocabulary(fdata.use,word);
-			if(w != null)
+
+			try
 			{
-				view.getStatus().setMessageAndClear(
-					FactorWordRenderer.getWordHTMLString(
-					interp,w,fdata.parser.getWordDefinition(w),true));
+				FactorWord w = FactorPlugin.getExternalInstance()
+					.searchVocabulary(fdata.use,word);
+				if(w != null)
+				{
+					view.getStatus().setMessageAndClear(
+						FactorWordRenderer.getWordHTMLString(
+						w,fdata.parser.getWordDefinition(w),true));
+				}
+			}
+			catch(IOException e)
+			{
+				throw new RuntimeException(e);
 			}
 		}
 	} //}}}

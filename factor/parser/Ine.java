@@ -40,13 +40,12 @@ public class Ine extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Ine(FactorWord start, FactorWord end)
-		throws Exception
 	{
 		super(end);
 		this.start = start;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		FactorReader.ParseState state = reader.popState(start,word);

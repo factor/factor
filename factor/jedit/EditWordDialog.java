@@ -88,8 +88,7 @@ public class EditWordDialog extends WordListDialog
 		}
 		catch(IOException e)
 		{
-			/* Don't care */
-			Log.log(Log.ERROR,this,e);
+			throw new RuntimeException(e);
 		}
 		dispose();
 	} //}}}

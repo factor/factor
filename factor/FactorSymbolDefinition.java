@@ -48,19 +48,6 @@ public class FactorSymbolDefinition extends FactorWordDefinition
 		this.symbol = symbol;
 	} //}}}
 
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws Exception
-	{
-		interp.datastack.push(symbol);
-	} //}}}
-
-	//{{{ fromList() method
-	public void fromList(Cons definition)
-	{
-		this.symbol = definition.car;
-	} //}}}
-
 	//{{{ toList() method
 	public Cons toList()
 	{

@@ -41,19 +41,18 @@ public class ComplexLiteral extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public ComplexLiteral(FactorWord word, String end)
-		throws Exception
 	{
 		super(word);
 		this.end = end;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		// Read two numbers
-		Number real = FactorJava.toNumber(
+		Number real = FactorLib.toNumber(
 			reader.nextNonEOL(true,false));
-		Number imaginary = FactorJava.toNumber(
+		Number imaginary = FactorLib.toNumber(
 			reader.nextNonEOL(true,false));
 
 		// Read the end

@@ -194,8 +194,7 @@ public class FactorShell extends Shell
 			}
 			catch(IOException e)
 			{
-				/* We don't care */
-				Log.log(Log.ERROR,this,e);
+				throw new RuntimeException(e);
 			}
 
 			stream = null;

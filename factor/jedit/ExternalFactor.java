@@ -29,7 +29,7 @@
 
 package factor.jedit;
 
-import factor.FactorInterpreter;
+import factor.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -38,16 +38,15 @@ import org.gjt.sp.util.Log;
 /**
  * Encapsulates a connection to an external Factor instance.
  */
-public class ExternalFactor
+public class ExternalFactor extends DefaultVocabularyLookup
 {
 	//{{{ ExternalFactor constructor
 	/**
 	 * We are given two streams that point to a bare REPL.
 	 */
-	public ExternalFactor(FactorInterpreter interp, InputStream in, OutputStream out)
+	public ExternalFactor(InputStream in, OutputStream out)
 		throws IOException
 	{
-		this.interp = interp;
 		this.in = new DataInputStream(in);
 		this.out = new DataOutputStream(out);
 
@@ -110,7 +109,7 @@ public class ExternalFactor
 	public FactorStream openStream() throws IOException
 	{
 		Socket client = new Socket("localhost",streamServer);
-		return new FactorStream(client,interp);
+		return new FactorStream(client);
 	} //}}}
 
 	//{{{ close() method
@@ -134,7 +133,6 @@ public class ExternalFactor
 	} //}}}
 
 	//{{{ Private members
-	private FactorInterpreter interp;
 	private DataInputStream in;
 	private DataOutputStream out;
 	

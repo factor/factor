@@ -47,7 +47,6 @@ factor.completion.plain=: <b>{0}</b>
 factor.completion.defer=DEFER: <b>{0}</b>
 factor.completion.parsing=PARSING: <b>{0}</b>
 factor.completion.stack=: <b>{0}</b> {1}
-factor.completion.shuffle=~&lt;&lt; <b>{0}</b> {1} &gt;&gt;~
 factor.completion.symbol=SYMBOL: <b>{0}</b>
 
 # Dialog boxes

@@ -47,19 +47,6 @@ public class FactorCompoundDefinition extends FactorWordDefinition
 	public FactorCompoundDefinition(FactorWord word, Cons definition)
 	{
 		super(word);
-		fromList(definition);
-	} //}}}
-
-	//{{{ eval() method
-	public void eval(FactorInterpreter interp)
-		throws Exception
-	{
-		interp.call(endOfDocs);
-	} //}}}
-
-	//{{{ fromList() method
-	public void fromList(Cons definition)
-	{
 		this.definition = definition;
 		if(definition == null)
 			endOfDocs = null;

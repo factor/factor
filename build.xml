@@ -2,11 +2,13 @@
 
 <project name=" Factor" default="dist" basedir=".">
 
-	<target name="init">
-		<available property="jedit" classname="org.gjt.sp.jedit.jEdit" />
-	</target>
+	<path id="jedit-classpath">
+		<pathelement location="${user.home}/.jedit/jars/ErrorList.jar" />
+		<pathelement location="${user.home}/.jedit/jars/SideKick.jar" />
+		<pathelement location="${user.home}/.jedit/jars/Console.jar" />
+	</path>
 
-	<target name="compile" depends="init">
+	<target name="compile">
 		<javac
 			srcdir="."
 			destdir="."
@@ -14,34 +16,15 @@
 			includeJavaRuntime="yes"
 			debug="true"
 			optimize="true"
+			classpathref="jedit-classpath"
 		>
 		<include name="**/*.java"/>
-		<exclude name="factor/jedit/*.java"/>
 		</javac>
 	</target>
 
-	<path id="jedit-classpath">
-		<pathelement location="${user.home}/.jedit/jars/ErrorList.jar" />
-		<pathelement location="${user.home}/.jedit/jars/SideKick.jar" />
-		<pathelement location="${user.home}/.jedit/jars/Console.jar" />
-	</path>
-
-	<target name="compile-jedit" depends="init" if="jedit">
-		<javac
-			classpathref="jedit-classpath"
-			debug="true"
-			deprecation="on"
-			destdir="."
-			optimize="true"
-			srcdir=".">
-			<include name="factor/jedit/*.java"/>
-		</javac>
-	</target>
-
-	<target name="dist" depends="compile,compile-jedit">
+	<target name="dist" depends="compile">
 		<jar
 			jarfile="Factor.jar"
-			manifest="Factor.manifest"
 			compress="true"
 		>
 			<fileset dir=".">
@@ -51,15 +34,9 @@
 				<include name="factor/**/*.bsh"/>
 				<include name="factor/**/*.txt"/>
 				<include name="*.xml"/>
-				<include name="library/**/*.factor"/>
-				<include name="library/**/*.txt"/>
-				<include name="library/**/*.png"/>
-				<include name="org/**/*.class"/>
-				<include name="*.factor"/>
 				<include name="doc/**/*.html"/>
 				<include name="doc/**/*.png"/>
 				<include name="doc/*.html"/>
-				<include name="Factor.manifest"/>
 			</fileset>
 		</jar>
 	</target>

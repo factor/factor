@@ -40,16 +40,15 @@ public class Base extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public Base(FactorWord word, int base)
-		throws Exception
 	{
 		super(word);
 		this.base = base;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
-		Number num = FactorJava.toNumber(
+		Number num = FactorLib.toNumber(
 			reader.getScanner().next(true,false,base));
 		reader.append(num);
 	}

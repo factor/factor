@@ -183,6 +183,7 @@ DEFER: word-parameter
 DEFER: set-word-parameter
 DEFER: word-plist
 DEFER: set-word-plist
+DEFER: compiled?
 
 IN: unparser
 DEFER: (unparse-float)

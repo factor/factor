@@ -40,7 +40,6 @@ import sidekick.*;
 
 public class FactorPlugin extends EditPlugin
 {
-	private static FactorInterpreter interp;
 	private static ExternalFactor external;
 
 	//{{{ getPluginPath() method
@@ -95,7 +94,6 @@ public class FactorPlugin extends EditPlugin
 			p.getErrorStream().close();
 
 			external = new ExternalFactor(
-				getInterpreter(),
 				p.getInputStream(),
 				p.getOutputStream());
 		}
@@ -117,38 +115,6 @@ public class FactorPlugin extends EditPlugin
 			external.close();
 			external = null;
 		}
-	} //}}}
-
-	//{{{ newInterpreter() method
-	private static FactorInterpreter newInterpreter(String[] args)
-	{
-		try
-		{
-			FactorInterpreter interp = new FactorInterpreter();
-			interp.interactive = false;
-			interp.init(args);
-			return interp;
-		}
-		catch(Exception e)
-		{
-			System.err.println("Failed to initialize interpreter:");
-			e.printStackTrace();
-			return null;
-		}
-	} //}}}
-
-	//{{{ getInterpreter() method
-	/**
-	 * This can be called from the SideKick thread and must be thread safe.
-	 */
-	public static synchronized FactorInterpreter getInterpreter()
-	{
-		if(interp == null)
-		{
-			interp = newInterpreter(new String[] { "-jedit", "-no-compile" });
-		}
-
-		return interp;
 	} //}}}
 	
 	//{{{ getSideKickParser() method
@@ -243,8 +209,15 @@ public class FactorPlugin extends EditPlugin
 	 */
 	public static List getCompletions(String word, boolean anywhere)
 	{
-		return getCompletions(interp.vocabularies.toVarList(),word,
-			anywhere);
+		try
+		{
+			return getCompletions(getExternalInstance().getVocabularies(),word,
+				anywhere);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	} //}}}
 	
 	//{{{ getCompletions() method
@@ -252,56 +225,57 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(Cons use,
-		String word, boolean anywhere)
+	public static List getCompletions(Iterator use, String word, boolean anywhere)
 	{
-		List completions = new ArrayList();
-		FactorInterpreter interp = FactorPlugin.getInterpreter();
-
-		while(use != null)
+		try
 		{
-			String vocab = (String)use.car;
-			getCompletions(interp,vocab,word,completions,anywhere);
-			use = use.next();
-		}
-		
-		Collections.sort(completions,
-			new MiscUtilities.StringICaseCompare());
-
-		return completions;
-	} //}}}
-
-	//{{{ getCompletions() method
-	private static void getCompletions(FactorInterpreter interp,
-		String vocab, String word, List completions, boolean anywhere)
-	{
-		FactorNamespace v = interp.getVocabulary(vocab);
-		if(v == null)
-			return;
-
-		Cons words = v.toValueList();
-
-		while(words != null)
-		{
-			FactorWord w = (FactorWord)words.car;
-			if(w != null && w.name != null)
+			List completions = new ArrayList();
+	
+			while(use.hasNext())
 			{
-				if(!completions.contains(w))
-				{
-					if(anywhere)
-					{
-						if(w.name.indexOf(word) != -1)
-							completions.add(w);
-					}
-					else
-					{
-						if(w.name.startsWith(word))
-							completions.add(w);
-					}
-				}
+				String vocab = (String)use.next();
+				getExternalInstance().getCompletions(
+					vocab,word,completions,anywhere);
 			}
-
-			words = words.next();
+			
+			Collections.sort(completions,
+				new MiscUtilities.StringICaseCompare());
+	
+			return completions;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	} //}}}
+	
+	//{{{ getCompletions() method
+	/**
+	 * @param anywhere If true, matches anywhere in the word name are
+	 * returned; otherwise, only matches from beginning.
+	 */
+	public static List getCompletions(Cons use, String word, boolean anywhere)
+	{
+		try
+		{
+			List completions = new ArrayList();
+	
+			while(use != null)
+			{
+				String vocab = (String)use.car;
+				getExternalInstance().getCompletions(
+					vocab,word,completions,anywhere);
+				use = use.next();
+			}
+			
+			Collections.sort(completions,
+				new MiscUtilities.StringICaseCompare());
+	
+			return completions;
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
 		}
 	} //}}}
 	
@@ -382,31 +356,37 @@ public class FactorPlugin extends EditPlugin
 
 	//{{{ findAllWordsNamed() method
 	private static FactorWord[] findAllWordsNamed(View view, String word)
+		throws Exception
 	{
 		ArrayList words = new ArrayList();
-		Cons vocabs = getInterpreter().vocabularies.toValueList();
-		while(vocabs != null)
+		Iterator vocabs = getExternalInstance().getVocabularies();
+		while(vocabs.hasNext())
 		{
-			FactorNamespace vocab = (FactorNamespace)vocabs.car;
-			FactorWord w = (FactorWord)vocab.getVariable(word);
+			Map vocab = (Map)vocabs.next();
+			FactorWord w = (FactorWord)vocab.get(word);
 			if(w != null)
 				words.add(w);
-			vocabs = vocabs.next();
 		}
-		return (FactorWord[])words.toArray(
-			new FactorWord[words.size()]);
+		return (FactorWord[])words.toArray(new FactorWord[words.size()]);
 	} //}}}
 
 	//{{{ insertUseDialog() method
 	public static void insertUseDialog(View view, String word)
 	{
-		FactorWord[] words = findAllWordsNamed(view,word);
-		if(words.length == 0)
-			view.getToolkit().beep();
-		else if(words.length == 1)
-			insertUse(view,words[0].vocabulary);
-		else
-			new InsertUseDialog(view,getSideKickParser(),words);
+		try
+		{
+			FactorWord[] words = findAllWordsNamed(view,word);
+			if(words.length == 0)
+				view.getToolkit().beep();
+			else if(words.length == 1)
+				insertUse(view,words[0].vocabulary);
+			else
+				new InsertUseDialog(view,getSideKickParser(),words);
+		}
+		catch(Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	} //}}}
 
 	//{{{ insertUse() method

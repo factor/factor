@@ -40,13 +40,12 @@ public class EndVector extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public EndVector(FactorWord start, FactorWord end)
-		throws Exception
 	{
 		super(end);
 		this.start = start;
 	} //}}}
 
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws FactorParseException
 	{
 		reader.append(new FactorArray(

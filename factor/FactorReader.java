@@ -38,7 +38,7 @@ import java.util.*;
  */
 public class FactorReader
 {
-	private FactorInterpreter interp;
+	private VocabularyLookup lookup;
 	private FactorScanner scanner;
 	private Cons states;
 
@@ -48,43 +48,9 @@ public class FactorReader
 	private FactorWord toplevel = new FactorWord(null,"#<EOF>");
 	private boolean alwaysDocComments;
 
-	// if interactive, use interp.use & interp.in instead of below two
-	private boolean interactive;
 	private Cons use;
 	private String in;
-
 	private int base = 10;
-	
-	//{{{ parseObject() method
-	/**
-	 * Parse the given string. It must be a single literal object.
-	 * The object is returned.
-	 */
-	public static Object parseObject(String input, FactorInterpreter interp)
-		throws Exception
-	{
-		try
-		{
-			FactorReader parser = new FactorReader(
-				"parseObject()",
-				new BufferedReader(new StringReader(input)),
-				true,false,interp);
-			Cons parsed = parser.parse();
-			if(parsed.cdr != null)
-			{
-				// not a single literal
-				throw new FactorParseException("parseObject()",
-					1,"Not a literal: " + input);
-			}
-			return parsed.car;
-		}
-		catch(IOException io)
-		{
-			// can't happen!
-			throw new FactorParseException("parseObject()",1,
-				io.toString());
-		}
-	} //}}}
 
 	//{{{ getUnreadableString() method
 	public static String getUnreadableString(String str)
@@ -138,66 +104,6 @@ public class FactorReader
 		return buf.toString();
 	} //}}}
 
-	//{{{ getVocabularyDeclaration() method
-	/**
-	 * Return a string of USE: declarations for the given object.
-	 */
-	public static String getVocabularyDeclaration(Object obj)
-	{
-		StringBuffer buf = new StringBuffer();
-		Set vocabs = getAllVocabularies(obj);
-		Iterator iter = vocabs.iterator();
-		while(iter.hasNext())
-		{
-			String name = (String)iter.next();
-			buf.append("USE: ").append(name).append('\n');
-		}
-		return buf.toString();
-	} //}}}
-
-	//{{{ getAllVocabularies() method
-	/**
-	 * Return a set of all vocabularies referenced in the given quotation.
-	 */
-	public static Set getAllVocabularies(Object obj)
-	{
-		Set set = new TreeSet();
-		getAllVocabularies(obj,set);
-		return set;
-	} //}}}
-
-	//{{{ getAllVocabularies() method
-	/**
-	 * Return a set of all vocabularies referenced in the given quotation.
-	 */
-	private static void getAllVocabularies(Object obj, Set set)
-	{
-		if(obj instanceof FactorWord)
-		{
-			String vocab = ((FactorWord)obj).vocabulary;
-			if(vocab != null)
-				set.add(vocab);
-		}
-		else if(obj instanceof Cons)
-		{
-			Cons quotation = (Cons)obj;
-
-			while(quotation != null)
-			{
-				getAllVocabularies(quotation.car,set);
-				if(quotation.car instanceof Cons)
-					getAllVocabularies((Cons)quotation.car,set);
-				if(quotation.cdr instanceof Cons)
-					quotation = quotation.next();
-				else
-				{
-					getAllVocabularies(quotation.cdr,set);
-					return;
-				}
-			}
-		}
-	} //}}}
-
 	//{{{ unparseObject() method
 	public static String unparseObject(Object obj)
 	{
@@ -232,9 +138,9 @@ public class FactorReader
 	public FactorReader(
 		String filename,
 		BufferedReader in,
-		FactorInterpreter interp)
+		VocabularyLookup lookup)
 	{
-		this(filename,in,false,false,interp);
+		this(filename,in,false,lookup);
 	} //}}}
 
 	//{{{ FactorReader constructor
@@ -242,27 +148,23 @@ public class FactorReader
 		String filename,
 		BufferedReader in,
 		boolean alwaysDocComments,
-		boolean interactive,
-		FactorInterpreter interp)
+		VocabularyLookup lookup)
 	{
-		this(new FactorScanner(filename,in),alwaysDocComments,
-			interactive,interp);
+		this(new FactorScanner(filename,in),alwaysDocComments,lookup);
 	} //}}}
 
 	//{{{ FactorReader constructor
 	public FactorReader(
 		FactorScanner scanner,
 		boolean alwaysDocComments,
-		boolean interactive,
-		FactorInterpreter interp)
+		VocabularyLookup lookup)
 	{
-		this.interp = interp;
+		this.lookup = lookup;
 		this.scanner = scanner;
 		pushState(toplevel,null);
 		this.alwaysDocComments = alwaysDocComments;
-		this.interactive = interactive;
-		this.in = FactorInterpreter.DEFAULT_IN;
-		this.use = FactorInterpreter.DEFAULT_USE;
+		this.in = DefaultVocabularyLookup.DEFAULT_IN;
+		this.use = DefaultVocabularyLookup.DEFAULT_USE;
 	} //}}}
 
 	//{{{ getScanner() method
@@ -274,48 +176,30 @@ public class FactorReader
 	//{{{ getIn() method
 	public String getIn()
 	{
-		if(interactive)
-			return interp.in;
-		else
-			return in;
+		return in;
 	} //}}}
 
 	//{{{ setIn() method
-	public void setIn(String in) throws Exception
+	public void setIn(String in)
 	{
-		if(interactive)
-			interp.in = in;
-		else
-			this.in = in;
-
-		if(interp.getVocabulary(in) == null)
-			interp.defineVocabulary(in);
+		this.in = in;
 	} //}}}
 
 	//{{{ getUse() method
 	public Cons getUse()
 	{
-		if(interactive)
-			return interp.use;
-		else
-			return use;
+		return use;
 	} //}}}
 
 	//{{{ setUse() method
 	public void setUse(Cons use)
 	{
-		if(interactive)
-			interp.use = use;
-		else
-			this.use = use;
+		this.use = use;
 	} //}}}
 
 	//{{{ addUse() method
-	public void addUse(String name) throws Exception
+	public void addUse(String name)
 	{
-		if(interp.getVocabulary(name) == null)
-			error("Undefined vocabulary: " + name);
-
 		setUse(new Cons(name,getUse()));
 	} //}}}
 
@@ -338,16 +222,22 @@ public class FactorReader
 		}
 	} //}}}
 
+	//{{{ searchVocabulary() method
+	public FactorWord searchVocabulary(Cons use, String word)
+		throws Exception
+	{
+		return lookup.searchVocabulary(use,word);
+	} //}}}
+
 	//{{{ intern() method
 	public FactorWord intern(String name, boolean define)
 		throws Exception
 	{
 		if(define)
-			return interp.define(getIn(),name);
+			return lookup.define(getIn(),name);
 		else
 		{
-			FactorWord word = interp.searchVocabulary(
-				getUse(),name);
+			FactorWord word = searchVocabulary(getUse(),name);
 			if(word == null)
 				error("Undefined: " + name);
 			return word;
@@ -433,7 +323,7 @@ public class FactorReader
 
 			if(word.parsing != null)
 			{
-				word.parsing.eval(interp,this);
+				word.parsing.eval(this);
 				return false;
 			}
 			append(word);
@@ -529,26 +419,15 @@ public class FactorReader
 
 		ParseState(FactorWord start, Object arg)
 		{
+			docComment = start.docComment;
 			warnUndefined = true;
 			this.start = start;
 			this.arg = arg;
-			try
-			{
-				this.docComment
-					= (start.getNamespace()
-					.getVariable("doc-comments")
-					!= null);
-			}
-			catch(Exception e)
-			{
-				throw new RuntimeException(e);
-			}
 		}
 
 		void append(Object obj) throws FactorParseException
 		{
-			boolean docComment = (this.docComment
-				|| alwaysDocComments);
+			boolean docComment = (this.docComment || alwaysDocComments);
 			// In a doc comment context, first object is always
 			// a word, then followed by doc comments, then followed
 			// by code.

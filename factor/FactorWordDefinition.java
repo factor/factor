@@ -48,16 +48,6 @@ public abstract class FactorWordDefinition
 		this.word = word;
 	} //}}}
 
-	public abstract void eval(FactorInterpreter interp)
-		throws Exception;
-	
-	//{{{ fromList() method
-	public void fromList(Cons cons)
-		throws FactorRuntimeException
-	{
-		throw new FactorRuntimeException("Cannot unpickle " + this);
-	} //}}}
-
 	//{{{ toList() method
 	public Cons toList()
 	{

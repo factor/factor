@@ -34,7 +34,7 @@ import java.util.*;
 /**
  * An internalized symbol.
  */
-public class FactorWord implements FactorExternalizable, FactorObject
+public class FactorWord implements FactorExternalizable
 {
 	private static int gensymCount = 0;
 
@@ -52,14 +52,9 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public FactorParsingDefinition parsing;
 
 	/**
-	 * Should this word be inlined when compiling?
+	 * Should the parser keep doc comments?
 	 */
-	public boolean inline;
-
-	/**
-	 * Raise an error if an attempt is made to compile this word?
-	 */
-	public boolean interpretOnly;
+	public boolean docComment;
 
 	/**
 	 * For text editor integration.
@@ -67,8 +62,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	public String file;
 	public int line;
 	public int col;
-
-	private FactorNamespace namespace;
 
 	//{{{ FactorWord constructor
 	/**
@@ -94,24 +87,6 @@ public class FactorWord implements FactorExternalizable, FactorObject
 	{
 		this.vocabulary = vocabulary;
 		this.name = name;
-	} //}}}
-
-	//{{{ getNamespace() method
-	public FactorNamespace getNamespace()
-		throws Exception
-	{
-		if(namespace == null)
-			namespace = new FactorNamespace(this);
-		return namespace;
-	} //}}}
-	
-	//{{{ gensym() method
-	/**
-	 * Returns an un-internalized word with a unique name.
-	 */
-	public synchronized static FactorWord gensym()
-	{
-		return new FactorWord(null,"#:GENSYM:" + (gensymCount++));
 	} //}}}
 
 	//{{{ define() method

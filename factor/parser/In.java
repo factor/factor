@@ -38,13 +38,12 @@ public class In extends FactorParsingDefinition
 	 * A new definition.
 	 */
 	public In(FactorWord word)
-		throws Exception
 	{
 		super(word);
 	} //}}}
 
 	//{{{ eval() method
-	public void eval(FactorInterpreter interp, FactorReader reader)
+	public void eval(FactorReader reader)
 		throws Exception
 	{
 		String next = (String)reader.nextNonEOL(false,false);

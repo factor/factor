@@ -30,7 +30,6 @@
 package factor.jedit;
 
 import factor.Cons;
-import factor.FactorInterpreter;
 import factor.FactorReader;
 import javax.swing.text.AttributeSet;
 import java.io.*;
@@ -46,9 +45,8 @@ public class FactorStream
 	/**
 	 * We are given a socket that points to a bare REPL.
 	 */
-	public FactorStream(Socket socket, FactorInterpreter interp) throws IOException
+	public FactorStream(Socket socket) throws IOException
 	{
-		this.interp = interp;
 		this.socket = socket;
 		this.in = new DataInputStream(socket.getInputStream());
 		this.out = new DataOutputStream(socket.getOutputStream());
@@ -79,7 +77,7 @@ public class FactorStream
 			int len = in.readInt();
 			byte[] request = new byte[len];
 			in.readFully(request);
-			return new WritePacket(new String(request,0,len),interp);
+			return new WritePacket(new String(request,0,len));
 		case -1:
 			return null;
 		default:
@@ -114,7 +112,6 @@ public class FactorStream
 	private Socket socket;
 	private DataInputStream in;
 	private DataOutputStream out;
-	private FactorInterpreter interp;
 	//}}}
 	
 	//{{{ Packet class
@@ -132,13 +129,13 @@ public class FactorStream
 	//{{{ WritePacket class
 	public static class WritePacket extends Packet
 	{
-		public WritePacket(String input, FactorInterpreter interp)
+		public WritePacket(String input)
 			throws Exception
 		{
 			FactorReader parser = new FactorReader(
 				"parseObject()",
 				new BufferedReader(new StringReader(input)),
-				true,false,interp);
+				true,FactorPlugin.getExternalInstance());
 			Cons pair = parser.parse();
 
 			this.write = (String)pair.car;
