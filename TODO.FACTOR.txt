@@ -1,12 +1,9 @@
 + native:
 
-- top level catch should be a continuation
-- parsing: #\
 - {...} vectors
 - parsing should be parsing
 - telnetd: listening on a socket
 - apropos
-- need hashtable inspection too
 - describe-word
 - clone-sbuf
 - contains ==> contains?
@@ -16,7 +13,6 @@
 
 + interactive:
 
-- words. should output in a nicer form
 - inspector links when describe called without object path
 - 'cascading' styles
 

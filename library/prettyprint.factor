@@ -190,7 +190,7 @@ DEFER: prettyprint*
 : . ( obj -- )
     <namespace> [
         "prettyprint-single-line" on
-        prettyprint-indent 4 * "prettyprint-limit" set
+        tab-size 4 * "prettyprint-limit" set
         prettyprint
     ] bind ;
 
