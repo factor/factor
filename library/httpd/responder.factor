@@ -41,6 +41,7 @@ USE: strings
 ! Responders are called in a new namespace with these
 ! variables:
 
+! - method -- one of get, post, or head.
 ! - request -- the entire URL requested, including responder
 !              name
 ! - raw-query -- raw query string
@@ -64,6 +65,10 @@ USE: strings
         [
             drop "HEAD method not implemented" httpd-error
         ] "head" set
+        ( url -- )
+        [
+            drop bad-request
+        ] "bad" set
     ] extend ;
 
 : get-responder ( name -- responder )

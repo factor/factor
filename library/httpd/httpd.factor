@@ -30,6 +30,7 @@ USE: combinators
 USE: errors
 USE: httpd-responder
 USE: kernel
+USE: lists
 USE: logging
 USE: logic
 USE: namespaces
@@ -48,9 +49,6 @@ USE: url-encoding
         drop "stdio" get
     ] ifte ;
 
-: bad-request ( -- )
-    "400 Bad request" httpd-error ;
-
 : url>path ( uri -- path )
     url-decode dup "http://" str-head? dup [
         "/" split1 f "" replace nip nip
@@ -61,22 +59,19 @@ USE: url-encoding
 : secure-path ( path -- path )
     ".." over str-contains? [ drop f ] when ;
 
-: get-request ( url -- )
-    [ "get" swap serve-responder ] with-request ;
+: request-method ( cmd -- method )
+    [
+        [ "GET" | "get" ]
+        [ "POST" | "post" ]
+        [ "HEAD" | "head" ]
+    ] assoc [ "bad" ] unless* ;
 
-: post-request ( url -- )
-    [ "post" swap serve-responder ] with-request ;
-
-: head-request ( url -- )
-    [ "head" swap serve-responder ] with-request ;
+: (handle-request) ( arg cmd -- url method )
+    request-method dup "method" set swap
+    prepare-url prepare-header ;
 
 : handle-request ( arg cmd -- )
-    [
-        [ "GET"  = ] [ drop get-request ]
-        [ "POST" = ] [ drop post-request ]
-        [ "HEAD" = ] [ drop head-request ]
-        [ drop t   ] [ 2drop bad-request ]
-    ] cond ;
+    [ (handle-request) serve-responder ] with-scope ;
 
 : parse-request ( request -- )
     dup log

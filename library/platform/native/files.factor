@@ -42,3 +42,6 @@ USE: strings
 : directory ( dir -- list )
     #! List a directory.
     (directory) str-sort ;
+
+: file-length ( file -- length )
+    stat dup [ cdr cdr car ] when ;

@@ -68,6 +68,8 @@ USE: wiki-responder
         <responder> [
             "file" "responder" set
             [ file-responder ] "get" set
+            [ file-responder ] "post" set
+            [ file-responder ] "head" set
         ] extend "file" set
 
 !        <responder> [

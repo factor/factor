@@ -33,6 +33,7 @@ USE: html
 USE: httpd
 USE: httpd-responder
 USE: kernel
+USE: lists
 USE: logging
 USE: namespaces
 USE: parser
@@ -40,18 +41,26 @@ USE: stack
 USE: stdio
 USE: streams
 USE: strings
+USE: unparser
 
 : serving-path ( filename -- filename )
     f>"" "doc-root" get swap cat2 ;
 
-: file-header ( mime-type -- header )
-    "200 Document follows" swap response ;
-
 : copy-and-close ( from -- )
     [ dupd "stdio" get fcopy ] [ >r fclose r> rethrow ] catch ;
 
+: file-response ( mime-type length -- )
+    [,
+        unparse "Content-Length" swons ,
+        "Content-Type" swons ,
+    ,] "200 OK" response ;
+
 : serve-static ( filename mime-type -- )
-    file-header print <filebr> "stdio" get fcopy ;
+    over file-length file-response  "method" get "head" = [
+        drop
+    ] [
+        <filebr> "stdio" get copy-and-close
+    ] ifte ;
 
 : serve-file ( filename -- )
     dup mime-type dup "application/x-factor-server-page" = [
@@ -66,7 +75,12 @@ USE: strings
     %> redirect ;
 
 : list-directory ( directory -- )
-    serving-html dup [ directory. ] simple-html-document ;
+    serving-html
+     "method" get "head" = [
+        drop
+    ] [
+        dup [ directory. ] simple-html-document
+    ] ifte ;
 
 : serve-directory ( filename -- )
     "/" ?str-tail [
@@ -82,13 +96,13 @@ USE: strings
 : serve-object ( filename -- )
     dup directory? [ serve-directory ] [ serve-file ] ifte ;
 
-: file-responder ( filename -- )
+: file-responder ( filename method -- )
     "doc-root" get [
         serving-path dup exists? [
             serve-object
         ] [
-            drop "404 not found" httpd-error
+            2drop "404 not found" httpd-error
         ] ifte
     ] [
-        drop "404 doc-root not set" httpd-error
+        2drop "404 doc-root not set" httpd-error
     ] ifte ;

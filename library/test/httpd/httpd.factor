@@ -7,9 +7,14 @@ USE: namespaces
 USE: stdio
 USE: test
 USE: url-encoding
+USE: strings
+USE: stack
+USE: lists
 
-[ "HTTP/1.0 404\nContent-Type: text/html\n" ]
-[ "404" "text/html" response ] unit-test
+[ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n" ]
+[
+    [ "text/html" 12 file-response ] with-string
+] unit-test
 
 [ 5430 ]
 [ f "Content-Length: 5430" header-line content-length ] unit-test

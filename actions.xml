@@ -18,19 +18,22 @@
 			VFSManager.waitForRequests();
 			FactorPlugin.eval(view,
 				"\""
-				+ factor.FactorReader.charsToEscapes(buffer.path)
+				+ FactorReader.charsToEscapes(buffer.path)
 				+ "\" run-file");
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-apropos">
 		<CODE>
-			if(textArea.selectionCount == 0)
-				textArea.selectWord();
-			FactorPlugin.eval(view,
-				"\""
-				+ factor.FactorReader.charsToEscapes(
-				textArea.selectedText)
-				+ "\" apropos.");
+			word = FactorPlugin.getWordAtCaret(textArea);
+			if(word == null)
+				view.toolkit.beep();
+			else
+			{
+				FactorPlugin.eval(view,
+					"\""
+					+ FactorReader.charsToEscapes(word)
+					+ "\" apropos.");
+			}
 		</CODE>
 	</ACTION>
 	<ACTION NAME="factor-see">
@@ -55,10 +58,11 @@
 	</ACTION>
 	<ACTION NAME="factor-insert-use">
 		<CODE>
-			if(textArea.selectionCount == 0)
-				textArea.selectWord();
-			FactorPlugin.insertUseDialog(view,
-				textArea.selectedText);
+			word = FactorPlugin.getWordAtCaret(textArea);
+			if(word == null)
+				view.toolkit.beep();
+			else
+				FactorPlugin.insertUseDialog(view,word);
 		</CODE>
 	</ACTION>
 </ACTIONS>

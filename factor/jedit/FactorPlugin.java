@@ -44,6 +44,13 @@ public class FactorPlugin extends EditPlugin
 
 	private static FactorInterpreter interp;
 
+	//{{{ start() method
+	public void start()
+	{
+		BeanShell.eval(null,BeanShell.getNameSpace(),
+			"import factor.*;\nimport factor.jedit.*;\n");
+	} //}}}
+	
 	//{{{ getInterpreter() method
 	/**
 	 * This can be called from the SideKick thread and must be thread safe.

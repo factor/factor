@@ -57,3 +57,6 @@ USE: strings
     <file> swap <file>
     [ "java.io.File" ] "java.io.File" "renameTo"
     jinvoke ;
+
+: file-length ( file -- size )
+    <file> [ ] "java.io.File" "length" jinvoke ;

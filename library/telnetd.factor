@@ -27,15 +27,16 @@
 
 IN: telnetd
 USE: combinators
-USE: continuations
 USE: errors
 USE: interpreter
+USE: kernel
 USE: logging
 USE: logic
 USE: namespaces
 USE: stack
 USE: stdio
 USE: streams
+USE: threads
 
 : telnet-client ( socket -- )
     dup [
@@ -44,6 +45,14 @@ USE: streams
         init-history
         interpreter-loop
     ] with-stream ;
+
+: telnet-connection ( socket -- )
+    #! We don't do multitasking in JFactor.
+    java? [
+        telnet-client
+    ] [
+        [ telnet-client ] in-thread drop
+    ] ifte ;
 
 : quit-flag ( -- ? )
     global [ "telnetd-quit-flag" get ] bind ;
@@ -55,7 +64,7 @@ USE: streams
     [
         quit-flag not
     ] [
-        dup >r accept telnet-client r>
+        dup >r accept telnet-connection r>
     ] while ;
 
 : telnetd ( port -- )

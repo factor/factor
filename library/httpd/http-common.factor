@@ -42,30 +42,42 @@ USE: unparser
 
 USE: url-encoding
 
-: response ( msg content-type -- response )
-    swap <% "HTTP/1.0 " % % "\nContent-Type: " % % "\n" % %> ;
+: print-header ( alist -- )
+    [ unswons write ": " write url-encode print ] each ;
 
-: response-write ( msg content-type -- )
-    response print ;
+: response ( header msg -- )
+    "HTTP/1.0 " write print print-header ;
 
 : error-body ( error -- body )
-    "\n<html><body><h1>" swap "</h1></body></html>" cat3 ;
+    "<html><body><h1>" swap "</h1></body></html>" cat3 print ;
+
+: error-head ( error -- )
+    dup log-error
+    [ [ "Content-Type" | "text/html" ] ] over response ;
 
 : httpd-error ( error -- )
-    dup log-error
-    <% dup "text/html" response % error-body % %> print ;
+    #! This must be run from handle-request
+    error-head
+    "head" "method" get = [ terpri error-body ] unless ;
+
+: bad-request ( -- )
+    [
+        ! Make httpd-error print a body
+        "get" "method" set
+        "400 Bad request" httpd-error
+    ] with-scope ;
 
 : serving-html ( -- )
-    "200 Document follows" "text/html" response print ;
+    [ [ "Content-Type" | "text/html" ] ]
+    "200 Document follows" response terpri ;
 
 : serving-text ( -- )
-    "200 Document follows" "text/plain" response print ;
+    [ [ "Content-Type" | "text/plain" ] ]
+    "200 Document follows" response terpri ;
 
 : redirect ( to -- )
-    "301 Moved Permanently" "text/plain" response write
-    "Location: " write write
-    terpri terpri
-    "The resource has moved." print ;
+    "Location" swons unit
+    "301 Moved Permanently" response terpri ;
 
 : header-line ( alist line -- alist )
     ": " split1 dup [ transp acons ] [ 2drop ] ifte ;
@@ -107,7 +119,3 @@ USE: url-encoding
     read-header dup "header" set
     dup log-user-agent
     read-post-request "response" set ;
-
-: with-request ( url quot -- )
-    #! The quotation is called with the URL on the stack.
-    [ swap prepare-url swap prepare-header call ] with-scope ;
