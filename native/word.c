@@ -1,6 +1,6 @@
 #include "factor.h"
 
-WORD* word(FIXNUM primitive, CELL parameter, CELL plist)
+WORD* word(CELL primitive, CELL parameter, CELL plist)
 {
 	WORD* word = (WORD*)allot_object(WORD_TYPE,sizeof(WORD));
 	word->xt = primitive_to_xt(primitive);

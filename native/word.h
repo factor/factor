@@ -24,7 +24,7 @@ INLINE CELL tag_word(WORD* word)
 	return RETAG(word,WORD_TYPE);
 }
 
-WORD* word(FIXNUM primitive, CELL parameter, CELL plist);
+WORD* word(CELL primitive, CELL parameter, CELL plist);
 void update_xt(WORD* word);
 void fixup_word(WORD* word);
 void collect_word(WORD* word);

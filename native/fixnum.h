@@ -15,3 +15,25 @@ INLINE CELL tag_fixnum(FIXNUM untagged)
 
 void primitive_fixnump(void);
 void primitive_not(void);
+
+FIXNUM to_fixnum(CELL tagged);
+void primitive_to_fixnum(void);
+
+CELL number_eq_fixnum(CELL x, CELL y);
+CELL add_fixnum(CELL x, CELL y);
+CELL subtract_fixnum(CELL x, CELL y);
+CELL multiply_fixnum(CELL x, CELL y);
+FIXNUM gcd_fixnum(FIXNUM x, FIXNUM y);
+CELL divide_fixnum(CELL x, CELL y);
+CELL divint_fixnum(CELL x, CELL y);
+CELL divmod_fixnum(CELL x, CELL y);
+CELL mod_fixnum(CELL x, CELL y);
+CELL and_fixnum(CELL x, CELL y);
+CELL or_fixnum(CELL x, CELL y);
+CELL xor_fixnum(CELL x, CELL y);
+CELL shiftleft_fixnum(CELL x, CELL y);
+CELL shiftright_fixnum(CELL x, CELL y);
+CELL less_fixnum(CELL x, CELL y);
+CELL lesseq_fixnum(CELL x, CELL y);
+CELL greater_fixnum(CELL x, CELL y);
+CELL greatereq_fixnum(CELL x, CELL y);

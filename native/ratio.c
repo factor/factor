@@ -47,3 +47,68 @@ void primitive_denominator(void)
 		break;
 	}
 }
+
+CELL number_eq_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return tag_boolean(
+		untag_boolean(number_eq(rx->numerator,ry->numerator)) &&
+		untag_boolean(number_eq(rx->denominator,ry->denominator)));
+}
+
+CELL add_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return divide(add(multiply(rx->numerator,ry->denominator),
+		multiply(rx->denominator,ry->numerator)),
+		multiply(rx->denominator,ry->denominator));
+}
+
+CELL subtract_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return divide(subtract(multiply(rx->numerator,ry->denominator),
+		multiply(rx->denominator,ry->numerator)),
+		multiply(rx->denominator,ry->denominator));
+}
+
+CELL multiply_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return divide(
+		multiply(rx->numerator,ry->numerator),
+		multiply(rx->denominator,ry->denominator));
+}
+
+CELL divide_ratio(CELL x, CELL y)
+{
+	RATIO* rx = (RATIO*)UNTAG(x);
+	RATIO* ry = (RATIO*)UNTAG(y);
+	return divide(
+		multiply(rx->numerator,ry->denominator),
+		multiply(rx->denominator,ry->numerator));
+}
+
+CELL less_ratio(CELL x, CELL y)
+{
+	return F;
+}
+
+CELL lesseq_ratio(CELL x, CELL y)
+{
+	return F;
+}
+
+CELL greater_ratio(CELL x, CELL y)
+{
+	return F;
+}
+
+CELL greatereq_ratio(CELL x, CELL y)
+{
+	return F;
+}

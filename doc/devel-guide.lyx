@@ -4202,26 +4202,10 @@ Studying Factor                                   0:30
 Paperwork                                         1:05
 \layout Subsection
 
-The complete program
+The main menu
 \layout Standard
 
-TODO operations:
-\layout Standard
-
-- print a time difference as hours:minutes
-\layout Standard
-
-- begin work
-\layout Standard
-
-- end work & annotate
-\layout Standard
-
-- print an invoice, takes hourly rate as a parameter.
- do simple formatted output, using 'spaces' and 'pad-string'.
-\layout Standard
-
-use a vector to store [ annotation | time ] pairs, pass the vector in
+Reading a number, showing a menu
 \layout Section
 
 Variables and namespaces
