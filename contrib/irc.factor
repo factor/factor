@@ -26,11 +26,10 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: irc
-USE: arithmetic
 USE: combinators
 USE: errors
 USE: inspector
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: logic
@@ -65,7 +64,7 @@ USE: unparser
     "ACTION " write write " :" write print ;
 
 : keep-datastack ( quot -- )
-    datastack [ call ] dip set-datastack drop ;
+    datastack slip set-datastack drop ;
 
 : irc-stream-write ( string -- )
     dup "buf" get sbuf-append
@@ -96,8 +95,7 @@ USE: unparser
 
 : with-irc-stream ( recepient quot -- )
     [
-        [ "stdio" get swap <irc-stream> "stdio" set ] dip
-        call
+        >r "stdio" get swap <irc-stream> "stdio" set r> call
     ] with-scope ;
 
 : irc-action-quot ( action -- quot )

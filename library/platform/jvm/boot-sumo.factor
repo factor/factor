@@ -91,36 +91,22 @@ USE: parser
 "/library/prettyprint.factor"              run-resource ! prettyprint
 "/library/files.factor"                    run-resource ! files
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint
-"/library/interpreter.factor"              run-resource ! interpreter
-"/library/inspector.factor"                run-resource ! inspector
-"/library/inspect-vocabularies.factor"     run-resource ! inspector
+"/library/tools/listener.factor"           run-resource ! listener
+"/library/tools/inspector.factor"          run-resource ! inspector
+"/library/tools/word-tools.factor"         run-resource ! inspector
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
-"/library/debugger.factor"                 run-resource ! debugger
+"/library/tools/debugger.factor"           run-resource ! debugger
 "/library/test/test.factor"                run-resource ! test
 "/library/platform/jvm/test.factor"        run-resource ! test
 "/library/ansi.factor"                     run-resource ! ansi
-"/library/telnetd.factor"                  run-resource ! telnetd
-"/library/inferior.factor"                 run-resource ! inferior
+"/library/tools/telnetd.factor"            run-resource ! telnetd
+"/library/tools/inferior.factor"           run-resource ! inferior
 
 !!! Java -> native VM image cross-compiler.
-"/library/image.factor"                       run-resource ! cross-compiler
-"/library/cross-compiler.factor"              run-resource ! cross-compiler
+"/library/tools/image.factor"                 run-resource ! cross-compiler
+"/library/tools/cross-compiler.factor"        run-resource ! cross-compiler
 "/library/platform/jvm/cross-compiler.factor" run-resource ! cross-compiler
-
-!!! HTTPD.
-"/library/httpd/url-encoding.factor"       run-resource ! url-encoding
-"/library/httpd/html-tags.factor"          run-resource ! html
-"/library/httpd/html.factor"               run-resource ! html
-"/library/httpd/http-common.factor"        run-resource ! httpd
-"/library/httpd/responder.factor"          run-resource ! httpd-responder
-"/library/httpd/httpd.factor"              run-resource ! httpd
-"/library/httpd/inspect-responder.factor"  run-resource ! inspect-responder
-"/library/httpd/file-responder.factor"     run-resource ! file-responder
-"/library/httpd/quit-responder.factor"     run-resource ! quit-responder
-"/library/httpd/resource-responder.factor" run-resource ! resource-responder
-"/library/httpd/test-responder.factor"     run-resource ! test-responder
-"/library/httpd/default-responders.factor" run-resource ! default-responders
 
 !!! Final initialization...
 "/library/init.factor"              run-resource ! init

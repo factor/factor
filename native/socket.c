@@ -115,8 +115,6 @@ CELL accept_connection(PORT* p)
 {
 	struct sockaddr_in clientname;
 	size_t size = sizeof(clientname);
-	
-	/* int oobinline = 1; */
 
 	int new = accept(p->fd,(struct sockaddr *)&clientname,&size);
 	if(new < 0)
@@ -126,9 +124,6 @@ CELL accept_connection(PORT* p)
 		else
 			io_error(__FUNCTION__);
 	}
-
-	/* if(setsockopt(new,SOL_SOCKET,SO_OOBINLINE,&oobinline,sizeof(int)) < 0)
-		io_error(__FUNCTION__); */
 
 	p->client_host = tag_object(from_c_string(inet_ntoa(
 		clientname.sin_addr)));

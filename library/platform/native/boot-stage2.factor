@@ -84,7 +84,7 @@ USE: stdio
     "/library/vocabulary-style.factor"
     "/library/prettyprint.factor"
     "/library/platform/native/debugger.factor"
-    "/library/debugger.factor"
+    "/library/tools/debugger.factor"
     "/library/platform/native/init.factor"
 
     "/library/math/constants.factor"
@@ -103,18 +103,21 @@ USE: stdio
     "/library/platform/native/prettyprint.factor"
     "/library/platform/native/files.factor"
     "/library/files.factor"
-    "/library/interpreter.factor"
-    "/library/inspector.factor"
-    "/library/inspect-vocabularies.factor"
+    "/library/tools/listener.factor"
+    "/library/tools/inspector.factor"
+    "/library/tools/word-tools.factor"
     "/library/test/test.factor"
     "/library/ansi.factor"
-    "/library/telnetd.factor"
-    "/library/inferior.factor"
+    "/library/tools/telnetd.factor"
+    "/library/tools/inferior.factor"
     "/library/platform/native/profiler.factor"
     "/library/platform/native/heap-stats.factor"
+    "/library/platform/native/gensym.factor"
+    "/library/tools/interpreter.factor"
+    "/library/tools/inference.factor"
 
-    "/library/image.factor"
-    "/library/cross-compiler.factor"
+    "/library/tools/image.factor"
+    "/library/tools/cross-compiler.factor"
     "/library/platform/native/cross-compiler.factor"
 
     "/library/httpd/url-encoding.factor"
@@ -179,12 +182,12 @@ IN: compiler
 DEFER: compilable-words
 DEFER: compilable-word-list
 
-IN: init
-DEFER: init-interpreter
+IN: listener
+DEFER: init-listener
 
 [
     warm-boot
-    "interactive" get [ init-interpreter ] when
+    "interactive" get [ init-listener ] when
     0 exit*
 ] set-boot
 

@@ -1,6 +1,11 @@
 - add a socket timeout
-- fix error postoning -- not all errors thrown by i/o code are
-  postponed
+- compiling when*
+- compiling unless*
+- getenv/setenv: if literal arg, compile as a load/store
+- inline words
+- alist -vs- assoc terminology
+- compiler: drop literal peephole optimization
+- [ 2 2 . ] run fails
 
 + compiler/ffi:
 
@@ -10,11 +15,6 @@
 - struct membres that are not *
 - float types
 - compile word twice; no more 'cannot compile' error!
-- compiler: drop literal peephole optimization
-- compiling when*
-- compiling unless*
-- getenv/setenv: if literal arg, compile as a load/store
-- inline words
 - perhaps /i should work with all numbers
 
 + docs:
@@ -61,7 +61,6 @@
 - 'cascading' styles
 - command line parsing cleanup
 - nicer way to combine two paths
-- alist -vs- assoc terminology
 
 + httpd:
 

@@ -25,7 +25,7 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: interpreter
+IN: listener
 USE: combinators
 USE: continuations
 USE: errors
@@ -63,14 +63,14 @@ USE: vectors
 : eval-catch ( str -- )
     [ eval ] [ [ default-error-handler drop ] when* ] catch ;
 
-: interpret ( -- )
+: listener-step ( -- )
     print-prompt read [ eval-catch ] [ exit ] ifte* ;
 
-: interpreter-loop ( -- )
+: listener-loop ( -- )
     "quit-flag" get [
         "quit-flag" off
     ] [
-        interpret interpreter-loop
+        listener-step listener-loop
     ] ifte ;
 
 : room. ( -- )
@@ -78,12 +78,19 @@ USE: vectors
     1024 /i unparse write " KB total, " write
     1024 /i unparse write " KB free" print ;
 
+: init-listener ( -- )
+    print-banner
+    room.
+
+    listener-loop ;
+
 : help ( -- )
     "SESSION:" print
     native? [
         "\"foo.image\" save-image   -- save heap to a file" print
     ] when
     "room.                    -- show memory usage" print
+    "heap-stats.              -- memory allocation breakdown" print
     "garbage-collection       -- force a GC" print
     "exit                     -- exit interpreter" print
     terpri
@@ -102,6 +109,11 @@ USE: vectors
     "global describe          -- list global variables." print
     "\"foo\" get .              -- print a variable value." print
     ".                        -- print top of stack." print
+    terpri
+    "PROFILER:                [ ... ] call-profile" print
+    "                         [ ... ] allot-profile" print
+    "TRACE:                   [ ... ] trace" print
+    "SINGLE STEP:             [ ... ] step" print
     terpri
     "HTTP SERVER:             USE: httpd 8888 httpd" print
     "TELNET SERVER:           USE: telnetd 9999 telnetd" print ;

@@ -28,7 +28,7 @@
 IN: telnetd
 USE: combinators
 USE: errors
-USE: interpreter
+USE: listener
 USE: kernel
 USE: logging
 USE: logic
@@ -42,7 +42,7 @@ USE: threads
     dup [
         "client" set
         log-client
-        interpreter-loop
+        listener-loop
     ] with-stream ;
 
 : telnet-connection ( socket -- )

@@ -1,5 +1,5 @@
 IN: scratchpad
-USE: interpreter
+USE: listener
 USE: namespaces
 USE: stdio
 USE: test

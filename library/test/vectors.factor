@@ -32,3 +32,6 @@ USE: vectors
 [ t ] [ { 1 2 3 } hashcode { 1 2 3 } hashcode = ] unit-test
 [ t ] [ { 1 { 2 } 3 } hashcode { 1 { 2 } 3 } hashcode = ] unit-test
 [ t ] [ { } hashcode { } hashcode = ] unit-test
+
+[ { 1 2 3 4 5 6 } ]
+[ { 1 2 3 } vector-clone dup { 4 5 6 } vector-append ] unit-test

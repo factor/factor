@@ -25,43 +25,23 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: vectors
-USE: kernel
-USE: lists
+IN: words
 USE: math
+USE: namespaces
 USE: stack
+USE: strings
+USE: unparser
 
-: empty-vector ( len -- vec )
-    #! Creates a vector with 'len' elements set to f. Unlike
-    #! <vector>, which gives an empty vector with a certain
-    #! capacity.
-    dup <vector> dup >r set-vector-length r> ;
+SYMBOL: gensym-count
 
-: vector-empty? ( obj -- ? )
-    vector-length 0 = ;
+: (gensym) ( -- name )
+    "G:" global [
+        gensym-count get succ dup gensym-count set
+    ] bind unparse cat2 ;
 
-: vector-clear ( vector -- )
-    #! Clears a vector.
-    0 swap set-vector-length ;
+: gensym ( -- word )
+    #! Return a word that is distinct from every other word, and
+    #! is not contained in any vocabulary.
+    (gensym) f (create) ;
 
-: vector-push ( obj vector -- )
-    #! Push a value on the end of a vector.
-    dup vector-length swap set-vector-nth ;
-
-: vector-peek ( vector -- obj )
-    #! Get value at end of vector without removing it.
-    dup vector-length pred swap vector-nth ;
-
-: vector-pop ( vector -- obj )
-    #! Get value at end of vector and remove it.
-    dup vector-length pred ( vector top )
-    2dup swap vector-nth >r swap set-vector-length r> ;
-
-: >pop> ( stack -- stack )
-    dup vector-pop drop ;
-
-DEFER: vector-map
-
-: vector-clone ( vector -- vector )
-    #! Shallow copy of a vector.
-    [ ] vector-map ;
+global [ 0 gensym-count set ] bind

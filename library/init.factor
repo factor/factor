@@ -31,7 +31,7 @@ USE: compiler
 USE: continuations
 USE: errors
 USE: files
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: namespaces
@@ -97,9 +97,3 @@ USE: words
 : parse-command-line ( args -- )
     #! Parse command line arguments.
     parse-switches run-files ;
-
-: init-interpreter ( -- )
-    print-banner
-    room.
-
-    interpreter-loop ;

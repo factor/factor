@@ -29,7 +29,7 @@ IN: console
 USE: combinators
 USE: continuations
 USE: init
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: namespaces
@@ -152,5 +152,5 @@ USE: unparser
     [
         dup "console" set
         <console-stream> "stdio" set
-        init-interpreter
+        init-listener
     ] with-scope ;

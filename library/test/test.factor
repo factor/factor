@@ -85,8 +85,8 @@ USE: unparser
         "image"
         "init"
         "inspector"
-        "interpreter"
         "io/io"
+        "listener"
         "vectors"
         "words"
         "unparser"
@@ -114,6 +114,8 @@ USE: unparser
         "sbuf" test
         "threads" test
         "parsing-word" test
+        "inference" test
+        "interpreter" test
 
         cpu "x86" = [
             [

@@ -72,7 +72,7 @@ USE: parser
 "/library/extend-stream.factor"             run-resource ! streams
 "/library/platform/jvm/unparser.factor"     run-resource ! unparser
 "/library/platform/jvm/parser.factor"       run-resource ! parser
-"/library/styles.factor"                    run-resource ! styles
+"/library/presentation.factor"              run-resource ! presentation
 
 !!! Math library.
 "/library/platform/jvm/real-math.factor" run-resource ! real-math
@@ -85,12 +85,12 @@ USE: parser
 "/library/vocabulary-style.factor"         run-resource ! style
 "/library/prettyprint.factor"              run-resource ! prettyprint
 "/library/platform/jvm/prettyprint.factor" run-resource ! prettyprint
-"/library/interpreter.factor"              run-resource ! interpreter
-"/library/inspector.factor"                run-resource ! inspector
-"/library/inspect-vocabularies.factor"     run-resource ! inspector
+"/library/tools/listener.factor"           run-resource ! listener
+"/library/tools/inspector.factor"          run-resource ! inspector
+"/library/tools/word-tools.factor"         run-resource ! inspector
 "/library/platform/jvm/compiler.factor"    run-resource ! compiler
 "/library/platform/jvm/debugger.factor"    run-resource ! debugger
-"/library/debugger.factor"                 run-resource ! debugger
+"/library/tools/debugger.factor"           run-resource ! debugger
 
 !!! Final initialization...
 "/library/init.factor"                     run-resource ! init

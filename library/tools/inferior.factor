@@ -28,7 +28,7 @@
 IN: inferior
 USE: combinators
 USE: errors
-USE: interpreter
+USE: listener
 USE: kernel
 USE: lists
 USE: logic

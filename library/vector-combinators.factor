@@ -53,3 +53,7 @@ USE: stack
 
 : vector-all? ( vector pred -- ? )
     vector-map vector-and ;
+
+: vector-append ( v1 v2 -- )
+    #! Destructively append v2 to v1.
+    [ over vector-push ] vector-each drop ;

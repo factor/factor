@@ -84,10 +84,10 @@ SYMBOL: center
     ] with-pixels ;
 
 : mandel ( -- )
-    640 480 32 SDL_HWSURFACE SDL_FULLSCREEN bitor SDL_SetVideoMode drop
+    640 480 32 SDL_HWSURFACE SDL_SetVideoMode drop
 
     [
-        3 zoom-fact set
+        0.8 zoom-fact set
         -0.65 center set
         100 nb-iter set
         [ render ] time
