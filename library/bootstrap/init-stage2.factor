@@ -43,6 +43,7 @@ USE: presentation
 USE: words
 USE: unparser
 USE: kernel-internals
+USE: console
 
 : init-smart-terminal
     "smart-terminal" get [
@@ -56,15 +57,20 @@ USE: kernel-internals
     init-error-handler
     init-random
     default-cli-args
-    parse-command-line
-    init-smart-terminal
-    run-user-init ;
+    parse-command-line ;
 
-: auto-inline-count 3 ;
 [
     warm-boot
     garbage-collection
-    "interactive" get [ print-banner listener ] when
+    init-smart-terminal
+    run-user-init
+    "graphical" get [
+        start-console
+    ] [
+        "interactive" get [
+            print-banner listener
+        ] when
+    ] ifte
     0 exit* 
 ] set-boot
 

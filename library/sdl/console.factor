@@ -11,7 +11,8 @@
 ! Then, start Factor as usual (./f factor.image) and enter this
 ! at the listener:
 !
-! "examples/console.factor" run-file
+! USE: console
+! start-console
 
 IN: console
 USE: generic
@@ -267,5 +268,3 @@ M: alien handle-event ( event -- ? )
             console-quit
         ] bind
     ] callcc0 ;
-
-start-console
