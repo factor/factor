@@ -106,6 +106,9 @@ USE: words
 : callstack-overflow-error ( obj -- )
     drop "Callstack overflow" print ;
 
+: port-closed-error ( obj -- )
+    "Port closed: " write . ;
+
 : kernel-error. ( obj n -- str )
     {
         expired-error
@@ -127,6 +130,7 @@ USE: words
         datastack-overflow-error
         callstack-underflow-error
         callstack-overflow-error
+        port-closed-error
     } vector-nth execute ;
 
 : kernel-error? ( obj -- ? )

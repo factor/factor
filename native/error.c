@@ -31,7 +31,7 @@ void primitive_throw(void)
 void general_error(CELL error, CELL tagged)
 {
 	CELL c = cons(error,cons(tagged,F));
-	if(userenv[BREAK_ENV] == 0)
+	if(userenv[BREAK_ENV] == F)
 	{
 		/* Crash at startup */
 		fprintf(stderr,"Error thrown before BREAK_ENV set\n");

@@ -25,13 +25,13 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: words
+IN: presentation
 USE: combinators
 USE: lists
 USE: kernel
 USE: namespaces
 USE: stack
-USE: presentation
+USE: words
 
 : vocab-style ( vocab -- style )
     #! Each vocab has a style object specifying how words are

@@ -27,12 +27,12 @@
 
 IN: quit-responder
 USE: combinators
-USE: namespaces
-USE: stdio
-USE: stack
-
 USE: httpd
 USE: httpd-responder
+USE: namespaces
+USE: stack
+USE: stdio
+USE: streams
 
 : quit-prohibited ( -- )
     "404 quit prohibited" httpd-error ;
@@ -43,5 +43,5 @@ USE: httpd-responder
     "quit-prohibited" get [
         quit-prohibited
     ] [
-        global [ t "httpd-quit" set ] bind
+        "http-server" get fclose
     ] ifte ;

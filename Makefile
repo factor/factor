@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc34
 DEFAULT_CFLAGS = -Wall -export-dynamic -g $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 

@@ -4,6 +4,7 @@ CELL arithmetic_type(CELL obj1, CELL obj2)
 {
 	CELL type1 = type_of(obj1);
 	CELL type2 = type_of(obj2);
+
 	CELL type;
 
 	switch(type1)

@@ -94,12 +94,10 @@ USE: words
 : f-type      6 ;
 : t-type      7 ;
 : array-type  8 ;
-: vector-type 9 ;
-: string-type 10 ;
-: sbuf-type   11 ;
-: handle-type 12 ;
-: bignum-type 13 ;
-: float-type  14 ;
+: bignum-type 9 ;
+: float-type  10 ;
+: vector-type 11 ;
+: string-type 12 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) header-tag immediate ;

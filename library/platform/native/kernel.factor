@@ -59,23 +59,23 @@ USE: vectors
 : hashcode ( obj -- hash )
     #! If two objects are =, they must have equal hashcodes.
     {
-        nop
-        word-hashcode
-        cons-hashcode
-        default-hashcode
-        >fixnum
-        >fixnum
-        default-hashcode
-        default-hashcode
-        default-hashcode
-        vector-hashcode
-        str-hashcode
-        sbuf-hashcode
-        default-hashcode
-        >fixnum
-        >fixnum
-        default-hashcode
-        default-hashcode
+        nop                ! 0
+        word-hashcode      ! 1
+        cons-hashcode      ! 2
+        default-hashcode   ! 3
+        >fixnum            ! 4
+        >fixnum            ! 5
+        default-hashcode   ! 6
+        default-hashcode   ! 7
+        default-hashcode   ! 8
+        >fixnum            ! 9 
+        >fixnum            ! 10
+        vector-hashcode    ! 11
+        str-hashcode       ! 12
+        sbuf-hashcode      ! 13
+        default-hashcode   ! 14
+        default-hashcode   ! 15
+        default-hashcode   ! 16
     } generic ;
 
 IN: math DEFER: number= ( defined later... )
@@ -83,24 +83,24 @@ IN: kernel
 : = ( obj obj -- ? )
     #! Push t if a is isomorphic to b.
     {
-        number=
-        eq?
-        cons=
-        eq?
-        number=
-        number=
-        eq?
-        eq?
-        eq?
-        vector=
-        str=
-        sbuf=
-        eq?
-        number=
-        number=
-        eq?
-        eq?
-    } generic ;
+        number= ! 0
+        eq?     ! 1
+        cons=   ! 2
+        eq?     ! 3
+        number= ! 4
+        number= ! 5
+        eq?     ! 6
+        eq?     ! 7
+        eq?     ! 8
+        number= ! 9 
+        number= ! 10
+        vector= ! 11
+        str=    ! 12
+        sbuf=   ! 13
+        eq?     ! 14
+        eq?     ! 15 
+        eq?     ! 16
+    } generic ; 
 
 : 2= ( a b c d -- ? )
     #! Test if a = c, b = d.

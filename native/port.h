@@ -1,11 +1,16 @@
 #define BUF_SIZE (8 * 1024)
 
-typedef enum { PORT_READ, PORT_RECV, PORT_WRITE, PORT_SPECIAL } PORT_MODE;
+typedef enum {
+	PORT_READ,
+	PORT_RECV,
+	PORT_WRITE,
+	PORT_SPECIAL
+} PORT_MODE;
 
 typedef struct {
 	CELL header;
-	/* one of PORT_READ, PORT_RECV, PORT_WRITE or PORT_SPECIAL */
 	PORT_MODE type;
+	bool closed;
 	FIXNUM fd;
 	STRING* buffer;
 

@@ -181,6 +181,7 @@ IN: syntax
 : #{
     #! Read #{ real imaginary #}
     scan str>number scan str>number rect> "}" expect parsed ;
+    parsing
 
 ! Comments
 : ( ")" until parsed-stack-effect ; parsing

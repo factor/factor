@@ -97,12 +97,12 @@ USE: words
         (not-=)
         (not-=)
         (not-=)
-        (not-=)
-        (not-=)
-        (not-=)
-        (not-=)
         bignum=
         float=
+        (not-=)
+        (not-=)
+        (not-=)
+        (not-=)
         (not-=)
         (not-=)
     } 2generic ;
@@ -118,12 +118,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum+
         float+
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -139,12 +139,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-
         float-
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -160,12 +160,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum*
         float*
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -181,12 +181,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         ratio
         float/f
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -202,11 +202,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum/i
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -223,12 +223,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum/f
         float/f
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -244,11 +244,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-mod
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -265,11 +265,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum/mod
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -286,11 +286,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-bitand
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -307,11 +307,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-bitor
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -328,11 +328,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-bitxor
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -349,11 +349,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-bitnot
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -370,11 +370,11 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum-shift
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
         no-method
@@ -391,12 +391,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum<
         float<
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -412,12 +412,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum<=
         float<=
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -433,12 +433,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum>
         float>
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;
@@ -454,12 +454,12 @@ USE: words
         no-method
         no-method
         no-method
-        no-method
-        no-method
-        no-method
-        no-method
         bignum>=
         float>=
+        no-method
+        no-method
+        no-method
+        no-method
         no-method
         no-method
     } 2generic ;

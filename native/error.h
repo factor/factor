@@ -17,6 +17,7 @@
 #define ERROR_DATASTACK_OVERFLOW (16<<3)
 #define ERROR_CALLSTACK_UNDERFLOW (17<<3)
 #define ERROR_CALLSTACK_OVERFLOW (18<<3)
+#define ERROR_CLOSED (19<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

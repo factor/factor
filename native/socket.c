@@ -143,6 +143,7 @@ void primitive_accept_fd(void)
 	PORT* p;
 	maybe_garbage_collection();
 	p = untag_port(dpop());
+	pending_io_error(p);
 	dpush(p->client_host);
 	dpush(p->client_port);
 	dpush(tag_object(port(PORT_RECV,p->client_socket)));

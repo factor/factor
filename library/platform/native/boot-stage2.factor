@@ -80,7 +80,7 @@ USE: stdio
 
     "/library/format.factor"
     "/library/platform/native/unparser.factor"
-    "/library/styles.factor"
+    "/library/presentation.factor"
     "/library/vocabulary-style.factor"
     "/library/prettyprint.factor"
     "/library/platform/native/debugger.factor"

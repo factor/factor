@@ -25,13 +25,23 @@ CELL callframe;
 CELL ds_bot;
 
 /* raw pointer to datastack top */
+/* #define X86_STACK */
+
+#ifdef X86_STACK
+register CELL ds asm("%esi");
+#else
 CELL ds;
+#endif
 
 /* raw pointer to callstack bottom */
 CELL cs_bot;
 
 /* raw pointer to callstack top */
+#ifdef X86_STACK
+register CELL cs asm("edi");
+#else
 CELL cs;
+#endif
 
 /* raw pointer to currently executing word */
 WORD* executing;

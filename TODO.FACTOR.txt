@@ -1,9 +1,6 @@
-FFI:
-
 - add a socket timeout
 - fix error postoning -- not all errors thrown by i/o code are
   postponed
-- quit responder breaks with multithreading
 
 + compiler/ffi:
 
@@ -39,7 +36,6 @@ FFI:
 
 + listener/plugin:
 
-- clean up listener's action popups
 - accept multi-line input in listener
 - don't show listener on certain commands
 - NPE in ErrorHighlight

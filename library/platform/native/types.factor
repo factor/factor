@@ -32,12 +32,12 @@ IN: words        : word?    ( obj -- ? ) type 1  eq? ;
 IN: lists        : cons?    ( obj -- ? ) type 2  eq? ;
 IN: math         : ratio?   ( obj -- ? ) type 4  eq? ;
 IN: math         : complex? ( obj -- ? ) type 5  eq? ;
-IN: vectors      : vector?  ( obj -- ? ) type 9  eq? ;
-IN: strings      : string?  ( obj -- ? ) type 10 eq? ;
-IN: strings      : sbuf?    ( obj -- ? ) type 11 eq? ;
-IN: io-internals : port?    ( obj -- ? ) type 12 eq? ;
-IN: math         : bignum?  ( obj -- ? ) type 13 eq? ;
-IN: math         : float?   ( obj -- ? ) type 14 eq? ;
+IN: math         : bignum?  ( obj -- ? ) type 9  eq? ;
+IN: math         : float?   ( obj -- ? ) type 10 eq? ;
+IN: vectors      : vector?  ( obj -- ? ) type 11 eq? ;
+IN: strings      : string?  ( obj -- ? ) type 12 eq? ;
+IN: strings      : sbuf?    ( obj -- ? ) type 13 eq? ;
+IN: io-internals : port?    ( obj -- ? ) type 14 eq? ;
 IN: alien        : dll?     ( obj -- ? ) type 15 eq? ;
 IN: alien        : alien?   ( obj -- ? ) type 16 eq? ;
 
@@ -54,12 +54,12 @@ IN: kernel
         [ 6 | "f" ]
         [ 7 | "t" ]
         [ 8 | "array" ]
-        [ 9 | "vector" ]
-        [ 10 | "string" ]
-        [ 11 | "sbuf" ]
-        [ 12 | "port" ]
-        [ 13 | "bignum" ]
-        [ 14 | "float" ]
+        [ 9 | "bignum" ]
+        [ 10 | "float" ]
+        [ 11 | "vector" ]
+        [ 12 | "string" ]
+        [ 13 | "sbuf" ]
+        [ 14 | "port" ]
         [ 15 | "dll" ]
         [ 16 | "alien" ]
         ! These values are only used by the kernel for error

@@ -16,7 +16,7 @@ void run(void)
 
 	/* Error handling. */
 	sigsetjmp(toplevel, 1);
-	
+
 	for(;;)
 	{
 		if(callframe == F)

@@ -39,7 +39,6 @@ IO_TASK* add_io_task(
 	IO_TASK* io_tasks,
 	int* fd_count);
 void remove_io_task(
-	IO_TASK_TYPE type,
 	PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count);
@@ -52,7 +51,8 @@ CELL pop_io_task_callback(
 	PORT* port,
 	IO_TASK* io_tasks,
 	int* fd_count);
-bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks);
+bool set_up_fd_set(fd_set* fdset, int fd_count, IO_TASK* io_tasks,
+	bool* closed);
 CELL perform_io_task(IO_TASK* io_task, IO_TASK* io_tasks, int* fd_count);
 CELL perform_io_tasks(fd_set* fdset, IO_TASK* io_tasks, int* fd_count);
 CELL next_io_task(void);

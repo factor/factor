@@ -46,8 +46,7 @@ USE: unparser
 
 : (style) ( name -- style ) "styles" get get* ;
 : default-style ( -- style ) "default" (style) ;
-: style ( name -- style )
-    (style) [ default-style ] unless* ;
+: style ( name -- style ) (style) [ default-style ] unless* ;
 : set-style ( style name -- ) "styles" get set* ;
 
 <namespace> "styles" set
