@@ -27,37 +27,27 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package factor.listener;
+package factor.jedit;
 
-import factor.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.text.html.*;
+import factor.listener.FactorListenerPanel;
+import factor.FactorInterpreter;
+import org.gjt.sp.jedit.*;
+import java.util.WeakHashMap;
 
-public class FactorDesktop extends JFrame
+public class FactorPlugin extends EditPlugin
 {
-	//{{{ main() method
-	public static void main(String[] args)
+	private static WeakHashMap views = new WeakHashMap();
+
+	public static FactorInterpreter getInterpreter(View view)
 	{
-		new FactorDesktop(args,true);
-	} //}}}
-
-	//{{{ FactorDesktop constructor
-	public FactorDesktop(String[] args, boolean standalone)
-	{
-		super("Factor");
-
-		getContentPane().add(BorderLayout.CENTER,
-			new FactorListenerPanel(
-			FactorListenerPanel.newInterpreter(args)));
-
-		setSize(640,480);
-		setDefaultCloseOperation(standalone
-			? EXIT_ON_CLOSE
-			: DISPOSE_ON_CLOSE);
-		show();
-	} //}}}
+		FactorInterpreter interp = (FactorInterpreter)
+			views.get(view);
+		if(interp == null)
+		{
+			interp = FactorListenerPanel.newInterpreter(
+				new String[] { "-jedit" });
+			views.put(view,interp);
+		}
+		return interp;
+	}
 }

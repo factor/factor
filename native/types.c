@@ -64,6 +64,9 @@ CELL object_size(CELL pointer)
 
 	switch(TAG(pointer))
 	{
+	case FIXNUM_TYPE:
+		size = 0;
+		break;
 	case CONS_TYPE:
 		size = sizeof(CONS);
 		break;
@@ -129,4 +132,16 @@ CELL untagged_object_size(CELL pointer)
 	}
 
 	return align8(size);
+}
+
+void primitive_type_of(void)
+{
+	check_non_empty(env.dt);
+	env.dt = tag_fixnum(type_of(env.dt));
+}
+
+void primitive_size_of(void)
+{
+	check_non_empty(env.dt);
+	env.dt = tag_fixnum(object_size(env.dt));
 }

@@ -77,5 +77,4 @@ USE: strings
 
     t "startup-done" set
     
-    print-banner
     init-interpreter ;

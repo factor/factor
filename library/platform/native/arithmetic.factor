@@ -22,3 +22,7 @@ USE: stack
 : succ 1 + ; inline
 
 : neg 0 swap - ; inline
+    
+!: e 2.7182818284590452354 ; inline
+!: pi 3.14159265358979323846 ; inline
+!: pi/2 1.5707963267948966 ; inline

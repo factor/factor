@@ -12,9 +12,22 @@
 			optimize="true"
 		>
 		<include name="**/*.java"/>
+		<exclude name="factor/jedit/*.java"/>
 		</javac>
 	</target>
-	<target name="dist" depends="compile">
+	<target name="compile-jedit">
+		<javac
+			srcdir="."
+			destdir="."
+			deprecation="on"
+			includeJavaRuntime="yes"
+			debug="true"
+			optimize="true"
+		>
+		<include name="factor/jedit/*.java"/>
+		</javac>
+	</target>
+	<target name="dist" depends="compile,compile-jedit">
 		<jar
 			jarfile="Factor.jar"
 			manifest="Factor.manifest"
@@ -23,6 +36,8 @@
 			<fileset dir=".">
 				<include name="factor/*.class"/>
 				<include name="factor/**/*.class"/>
+				<include name="factor/**/*.props"/>
+				<include name="*.xml"/>
 				<include name="library/**/*.factor"/>
 				<include name="org/**/*.class"/>
 				<include name="*.factor"/>

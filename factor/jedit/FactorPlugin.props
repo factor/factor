@@ -1,0 +1,21 @@
+### Plugin properties
+
+plugin.factor.jedit.FactorPlugin.activate=defer
+
+plugin.factor.jedit.FactorPlugin.name=Factor
+plugin.factor.jedit.FactorPlugin.version=0.60.10
+plugin.factor.jedit.FactorPlugin.author=Slava Pestov
+plugin.factor.jedit.FactorPlugin.docs=index.html
+
+plugin.factor.jedit.FactorPlugin.depend.0=jedit 04.02.15.00
+
+plugin.factor.jedit.FactorPlugin.menu=factor \
+	- \
+	factor-run-file \
+	factor-eval-selection
+
+factor.label=Factor Listener
+factor-run-file.label=Run Current File
+factor-eval-selection.label=Evaluate Selection
+
+factor.title=Factor

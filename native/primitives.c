@@ -48,6 +48,7 @@ XT primitives[] = {
 	primitive_floatp,
 	primitive_str_to_float,
 	primitive_float_to_str,
+	primitive_float_to_bits,
 	primitive_complexp,
 	primitive_real,
 	primitive_imaginary,
@@ -112,7 +113,9 @@ XT primitives[] = {
 	primitive_os_env,
 	primitive_millis,
 	primitive_init_random,
-	primitive_random_int
+	primitive_random_int,
+	primitive_type_of,
+	primitive_size_of
 };
 
 CELL primitive_to_xt(CELL primitive)

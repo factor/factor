@@ -1,5 +1,9 @@
 typedef struct {
 	CELL header;
+/* FIXME */
+#ifndef FACTOR_64
+	CELL alignment;
+#endif
 	double n;
 } FLOAT;
 
@@ -21,6 +25,7 @@ FLOAT* to_float(CELL tagged);
 void primitive_to_float(void);
 void primitive_str_to_float(void);
 void primitive_float_to_str(void);
+void primitive_float_to_bits(void);
 CELL number_eq_float(CELL x, CELL y);
 CELL add_float(CELL x, CELL y);
 CELL subtract_float(CELL x, CELL y);

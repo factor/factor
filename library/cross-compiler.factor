@@ -51,6 +51,8 @@ DEFER: save-image
 DEFER: handle?
 DEFER: room
 DEFER: os-env
+DEFER: type-of
+DEFER: size-of
 
 IN: strings
 DEFER: str=
@@ -134,6 +136,7 @@ IN: cross-compiler
         float?
         str>float
         unparse-float
+        float>bits
         complex?
         real
         imaginary
@@ -199,6 +202,8 @@ IN: cross-compiler
         millis
         init-random
         (random-int)
+        type-of
+        size-of
     ] [
         swap succ tuck primitive,
     ] each drop ;

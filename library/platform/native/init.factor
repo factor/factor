@@ -75,10 +75,6 @@ USE: unparser
     init-styles
     init-vocab-styles
 
-    print-banner
-
     run-user-init
-
-    room.
 
     init-interpreter ;

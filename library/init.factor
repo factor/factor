@@ -134,6 +134,8 @@ USE: strings
         init-toplevel
 
         [
+            print-banner
+            room.
             interpreter-loop
         ] [
             [ default-error-handler suspend ] when*

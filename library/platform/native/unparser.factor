@@ -60,6 +60,9 @@ USE: vocabularies
     denominator integer- integer%
     %> ;
 
+: unparse-complex ( num -- str )
+    >rect <% "#{ " % swap unparse % " " % unparse % " }" % %> ;
+
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
     <namespace> [ "base" set unparse-integer ] bind ;
@@ -113,6 +116,7 @@ USE: vocabularies
         [ integer? ] [ unparse-integer ]
         [ ratio?   ] [ unparse-ratio ]
         [ float?   ] [ unparse-float ]
+        [ complex? ] [ unparse-complex ]
         [ string?  ] [ unparse-str ]
         [ drop t   ] [ <% "#<" % class-of % ">" % %> ]
     ] cond ;

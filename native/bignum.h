@@ -2,6 +2,10 @@ typedef long long BIGNUM_2;
 
 typedef struct {
 	CELL header;
+/* FIXME */
+#ifndef FACTOR_64
+	CELL alignment;
+#endif
 	BIGNUM_2 n;
 } BIGNUM;
 

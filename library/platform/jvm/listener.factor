@@ -143,28 +143,12 @@ USE: unparser
         [ this fwrite "\n" this fwrite ] "fprint" set
     ] extend ;
 
-: close-listener ( listener -- )
-    #! Closes the listener. If no more listeners remain, the
-    #! desktop exits.
-    "desktop" get
-    [ "factor.listener.FactorListener" ]
-    "factor.listener.FactorDesktop" "closeListener"
-    jinvoke ;
-
 : new-listener-hook ( listener -- )
-    #! Called when user opens a new listener in the desktop.
+    #! Called when user opens a new listener
     <namespace> [
         dup "listener" set
         <listener-stream> "stdio" set
+        print-banner
+        room.
         interpreter-loop
-        "listener" get close-listener
     ] bind ;
-
-: new-listener ( -- )
-    #! Opens a new listener.
-    "desktop" get
-    [ ] "factor.listener.FactorDesktop" "newListener"
-    jinvoke ;
-
-: running-desktop? ( -- )
-    this "factor.listener.FactorDesktop" is ;

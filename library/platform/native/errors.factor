@@ -64,6 +64,7 @@ USE: vectors
         "Incompatible handle: "
         "I/O error: "
         "Overflow"
+        "Incomparable types: "
     ] ?nth ;
 
 : ?kernel-error ( cons -- error# param )

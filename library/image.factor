@@ -48,6 +48,12 @@ USE: words
 
 : image "image" get ;
 : emit ( cell -- ) image vector-push ;
+
+: emit64 ( bignum -- )
+    #! Little endian byte order
+    dup HEX: ffffffff bitand emit
+    32 shift> HEX: ffffffff bitand emit ;
+
 : fixup ( value offset -- ) image set-vector-nth ;
 
 ( Object memory )
@@ -71,6 +77,17 @@ USE: words
 : complex-tag  BIN: 101 ;
 : header-tag   BIN: 110 ;
 : gc-fwd-ptr   BIN: 111 ; ( we don't output these )
+
+: f-type      6 ;
+: t-type      7 ;
+: empty-type  8 ;
+: array-type  9 ;
+: vector-type 10 ;
+: string-type 11 ;
+: sbuf-type   12 ;
+: handle-type 13 ;
+: bignum-type 14 ;
+: float-type  15 ;
 
 : immediate ( x tag -- tagged ) swap tag-bits shift< bitor ;
 : >header ( id -- tagged ) header-tag immediate ;
@@ -108,13 +125,31 @@ USE: words
 
 : 'fixnum ( n -- tagged ) fixnum-tag immediate ;
 
+( Floats )
+
+: 'float ( f -- tagged )
+    object-tag here-as
+    float-type >header emit
+    0 emit ( alignment -- FIXME 64-bit arch )
+    float>bits emit64 ;
+
+( Bignums )
+
+: 'bignum ( bignum -- tagged )
+    dup .
+    #! Very bad!
+    object-tag here-as
+    bignum-type >header emit
+    0 emit ( alignment -- FIXME 64-bit arch )
+    ( bignum -- ) emit64 ;
+
 ( Special objects )
 
 ! Padded with fixnums for 8-byte alignment
 
-: f, object-tag here-as "f" set 6 >header emit 0 'fixnum emit ;
-: t, object-tag here-as "t" set 7 >header emit 0 'fixnum emit ;
-: empty, 8 >header emit 0 'fixnum emit ;
+: f, object-tag here-as "f" set f-type >header emit 0 'fixnum emit ;
+: t, object-tag here-as "t" set t-type >header emit 0 'fixnum emit ;
+: empty, empty-type >header emit 0 'fixnum emit ;
 
 ( Beginning of the image )
 ! The image proper begins with the header, then EMPTY, F, T
@@ -184,7 +219,7 @@ DEFER: '
 
 : string, ( string -- )
     object-tag here-as swap
-    11 >header emit
+    string-type >header emit
     dup str-length emit
     dup hashcode emit
     pack-string
@@ -247,7 +282,7 @@ IN: cross-compiler
 : 'array ( list -- untagged )
     [ ' ] inject
     here >r
-    9 >header emit
+    array-type >header emit
     dup length emit
     ( elements -- ) [ emit ] each
     pad r> ;
@@ -255,7 +290,7 @@ IN: cross-compiler
 : 'vector ( vector -- pointer )
     dup vector>list 'array swap vector-length
     object-tag here-as >r
-    10 >header emit
+    vector-type >header emit
     emit ( length )
     emit ( array ptr )
     pad r> ;
@@ -265,6 +300,8 @@ IN: cross-compiler
 : ' ( obj -- pointer )
     [
         [ fixnum? ] [ 'fixnum      ]
+        [ bignum? ] [ 'bignum      ]
+        [ float?  ] [ 'float       ]
         [ word?   ] [ 'word        ]
         [ cons?   ] [ 'cons        ]
         [ char?   ] [ 'fixnum      ]

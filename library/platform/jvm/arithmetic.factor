@@ -143,3 +143,8 @@ USE: stack
 : gcd ( a b -- c )
     [ "java.lang.Number" "java.lang.Number" ]
     "factor.math.FactorMath" "gcd" jinvoke-static ;
+
+: float>bits ( f -- bignum )
+    [ "double" ]
+    "java.lang.Double" "doubleToRawLongBits"
+    jinvoke-static >bignum ;

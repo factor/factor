@@ -7,6 +7,7 @@
 #define ERROR_HANDLE_INCOMPAT (6<<3)
 #define ERROR_IO (7<<3)
 #define ERROR_OVERFLOW (8<<3)
+#define ERROR_INCOMPARABLE (9<<3)
 
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);

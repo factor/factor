@@ -43,6 +43,11 @@ void primitive_float_to_str(void)
 	env.dt = tag_object(from_c_string(tmp));
 }
 
+void primitive_float_to_bits(void)
+{
+	/* FIXME */
+}
+
 CELL number_eq_float(CELL x, CELL y)
 {
 	return tag_boolean(((FLOAT*)UNTAG(x))->n
