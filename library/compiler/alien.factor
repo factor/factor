@@ -149,7 +149,8 @@ SYMBOL: alien-parameters
     #! namespace.
     "alien-invoke cannot be interpreted." throw ;
 
-\ alien-invoke [ 4 | 0 ] "infer-effect" set-word-property
+\ alien-invoke [ [ object object object object ] [ ] ]
+"infer-effect" set-word-property
 
 \ alien-invoke [ infer-alien ] "infer" set-word-property
 

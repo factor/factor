@@ -141,7 +141,7 @@ M: literal value-class-and ( class value -- )
 
 : <recursive-state> ( -- state )
     <namespace> [
-        base-case off  effect old-effect entry-effect set
+        base-case off  effect entry-effect set
     ] extend ;
 
 : init-inference ( recursive-state -- )
@@ -168,19 +168,25 @@ DEFER: apply-word
     #! quotations.
     [ apply-object ] each ;
 
-: compose ( first second -- total )
-    #! Stack effect composition.
-    >r uncons r> uncons >r -
-    dup 0 < [ neg + r> cons ] [ r> + cons ] ifte ;
-
 : raise ( [ in | out ] -- [ in | out ] )
     uncons 2dup min tuck - >r - r> cons ;
 
+: new-effect ( [ in | out ] -- [ intypes outtypes ] )
+    uncons
+    swap [ drop object ] project
+    swap [ drop object ] project
+    2list ;
+
 : decompose ( first second -- solution )
     #! Return a stack effect such that first*solution = second.
-    2dup 2car
-    2dup > [ "No solution to decomposition" throw ] when
-    swap - -rot 2cdr >r + r> cons raise ;
+    over [ [ ] [ ] ] = [
+        nip
+    ] [
+        swap old-effect swap old-effect
+        2dup 2car
+        2dup > [ "No solution to decomposition" throw ] when
+        swap - -rot 2cdr >r + r> cons raise new-effect
+    ] ifte ;
 
 : set-base ( [ in | out ] rstate -- )
     #! Set the base case of the current word.

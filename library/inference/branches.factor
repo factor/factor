@@ -37,6 +37,7 @@ USE: strings
 USE: vectors
 USE: words
 USE: hashtables
+USE: prettyprint
 
 : longest-vector ( list -- length )
     [ vector-length ] map [ > ] top ;
@@ -94,7 +95,7 @@ USE: hashtables
     [ [ meta-r get ] bind ] map
     dup check-lengths unify-stacks ;
 
-: unify ( list -- )
+: unify-effects ( list -- )
     filter-terminators dup balanced? [
         dup unify-d-in d-in set
         dup unify-datastacks meta-d set
@@ -125,51 +126,50 @@ USE: hashtables
 : terminator-quot? ( quot -- ? )
     literal-value [ terminator? ] some? ;
 
-: recursive-branch ( rstate value -- )
-    #! Set base case if inference didn't fail.
-    [
-        f infer-branch [
-            effect old-effect swap set-base
-        ] bind
-    ] [
-        [ 2drop ] when
-    ] catch ;
-
-: dual-branch ( branch branchlist -- rstate )
+: dual-branch ( branchlist branch -- rstate )
     #! Return a recursive state for a branch other than the
     #! given one in the list.
-    [ over eq? not ] subset nip car value-recursion ;
+    swap [ over eq? not ] subset nip car value-recursion ;
+
+SYMBOL: dual-recursive-state
+
+: recursive-branch ( branchlist value -- namespace )
+    #! Return effect namespace if inference didn't fail.
+    [
+        [ dual-branch dual-recursive-state set ] keep
+        f infer-branch
+    ] [
+        [ 2drop f ] when
+    ] catch ;
+
+: infer-base-cases ( branchlist -- list )
+    [ terminator-quot? not ] subset
+    dup [ dupd recursive-branch ] map nip
+    [ ] subset ;
 
 : infer-base-case ( branchlist -- )
-    dup [
-        dup terminator-quot? [
-            drop
-        ] [
-            [ over dual-branch ] keep
-            recursive-branch
-        ] ifte
-    ] each drop ;
+    [
+        infer-base-cases unify-effects
+        effect dual-recursive-state get set-base
+    ] with-scope ;
 
 : (infer-branches) ( branchlist -- list )
     dup infer-base-case [
-        dup terminator-quot? [
-            t infer-branch [
-                meta-d off meta-r off d-in off
-            ] extend
-        ] [
-            t infer-branch
-        ] ifte
+        dup t infer-branch swap terminator-quot? [
+            [ meta-d off meta-r off d-in off ] extend
+        ] when
     ] map ;
+
+: unify-dataflow ( inputs instruction effectlist -- )
+    [ [ get-dataflow ] bind ] map
+    swap dataflow, [ node-consume-d set ] bind ;
 
 : infer-branches ( inputs instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again. The inputs
     #! parameter is a vector.
-    (infer-branches) [
-        [ [ get-dataflow ] bind ] map
-        swap dataflow, [ node-consume-d set ] bind
-    ] keep unify ;
+    (infer-branches) dup unify-effects unify-dataflow ;
 
 : infer-ifte ( -- )
     #! Infer effects for both branches, unify.
@@ -196,4 +196,5 @@ USE: hashtables
 
 USE: kernel-internals
 \ dispatch [ infer-dispatch ] "infer" set-word-property
-\ dispatch [ 2 | 0 ] "infer-effect" set-word-property
+\ dispatch [ [ fixnum vector ] [ ] ]
+"infer-effect" set-word-property

@@ -2,12 +2,13 @@
 
 void primitive_from_rect(void)
 {
-	CELL imaginary = dpop();
-	CELL real = dpop();
+	CELL real, imaginary;
 	F_COMPLEX* complex;
 
 	maybe_garbage_collection();
 
+	imaginary = dpop();
+	real = dpop();
 	complex = allot(sizeof(F_COMPLEX));
 	complex->real = real;
 	complex->imaginary = imaginary;

@@ -62,6 +62,9 @@ BUILTIN: cons 2
 : 2cdr ( cons cons -- car car )
     swap cdr swap cdr ;
 
+: 2uncons ( cons1 cons2 -- car1 car2 cdr1 cdr2 )
+    [ 2car ] 2keep 2cdr ;
+
 : last* ( list -- last )
     #! Last cons of a list.
     dup cdr cons? [ cdr last* ] when ;

@@ -43,10 +43,10 @@ USE: parser
     #! Take input parameters, execute quotation, take output
     #! parameters, add node. The quotation is called with the
     #! stack effect.
-    >r dup car dup list? [ [ drop object ] project ] unless ensure-d
+    >r dup car ensure-d
     >r dataflow, r> r> rot
     [ pick car swap dataflow-inputs ] keep
-    pick 2slip cdr dup cons? [ car ] when swap
+    pick 2slip cdr car swap
     dataflow-outputs ; inline
 
 : consume-d ( typelist -- )
@@ -56,15 +56,7 @@ USE: parser
     [ <computed> push-d ] each ;
 
 : (consume/produce) ( param op effect -- )
-    [
-        dup cdr list? [
-            ( new style )
-            unswons consume-d car produce-d
-        ] [
-            ( old style, will go away shortly )
-            unswons [ pop-d drop ] times [ object <computed> push-d ] times
-        ] ifte
-    ] with-dataflow ;
+    [ unswons consume-d car produce-d ] with-dataflow ;
 
 : consume/produce ( word [ in-types out-types ] -- )
     #! Add a node to the dataflow graph that consumes and
@@ -77,7 +69,7 @@ USE: parser
     #! side-effect-free and all parameters are literal), or
     #! simply apply its stack effect to the meta-interpreter.
     over "infer" word-property dup [
-        swap car dup list? [ [ drop object ] project ] unless ensure-d call drop
+        swap car ensure-d call drop
     ] [
         drop consume/produce
     ] ifte ;
