@@ -230,7 +230,7 @@ INLINE F_FIXNUM index_of_str(F_FIXNUM index, F_STRING* string, F_STRING* substri
 	CELL i = index;
 	CELL str_cap = string_capacity(string);
 	CELL substr_cap = string_capacity(substring);
-	CELL limit = str_cap - substr_cap;
+	F_FIXNUM limit = str_cap - substr_cap;
 	CELL scan;
 
 	if(substr_cap == 1)
