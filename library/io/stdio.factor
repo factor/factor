@@ -30,8 +30,6 @@ SYMBOL: stdio
     ] with-stream ;
 
 TUPLE: stdio-stream delegate ;
-C: stdio-stream ( delegate -- stream )
-    [ set-stdio-stream-delegate ] keep ;
 
 M: stdio-stream fauto-flush ( -- )
     stdio-stream-delegate fflush ;

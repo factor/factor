@@ -2526,6 +2526,365 @@ USE: vectors
     10 <vector> main-menu ;
 \end{verbatim}
 
+\chapter{Working with classes}
+
+\section{What is object oriented programming?}
+
+Object oriented programming is a commonly-used term, however many people
+define it differently. Most will agree it consists of three key ideas:
+
+\begin{itemize}
+\item Objects are small pieces of state with the required identity and
+equality semantics, along with runtime information
+allowing the object to reflect on itself.
+
+\item Objects are organized in some manner, allowing one to express
+that a given set of objects features common behavior or shape. Factor organizes
+objects into classes and types, however its definition of these terms is
+slightly different from convention.
+
+\item Behavior can be defined on objects, and dispatched in a polymorphic way,
+where invoking a generic operation on an object takes action most
+appropriate to that object.
+\end{itemize}
+
+The separation into three parts is reflected in the design of the Factor
+object system.
+
+The following terminology is used in this guide:
+
+\begin{itemize}
+\item \emph{Class} -- a class is a set of objects given by a predicate
+that distinglishes elements of the class from other objects, along with
+some associated meta-information.
+
+\item \emph{Type} -- a type is a concrete representation of an object
+in runtime memory. There is only a fixed number of built-in types, such as
+integers, strings, and arrays. Each object has a unique type it belongs to,
+whereas it may be a member of an arbitrary number of classes.
+
+\end{itemize}
+
+In many languages, a class refers to a specific object organization,
+typically a specification form for named slots that objects in the class
+shall have. In Factor, the \texttt{tuple} metaclass allows one to create
+such conventional objects. However, we will look at generic words
+and built-in classes first.
+
+\section{Generic words and methods}
+
+To use the generic word system, you must put the following near the
+beginning of your source file:
+
+\begin{verbatim}
+USE: generic
+\end{verbatim}
+
+The motivation for generic words is that sometimes, you want to write a word that has
+differing behavior depending on the class of its argument. For example,
+in a game, a \texttt{draw} word could take different action if given a ship, a
+weapon, a planet, etc. Writing one large \texttt{draw} word that contains type case logic results in
+unnecessary coupling -- adding support for a new type of graphical
+object would require modifying the original definition of \texttt{draw}, for
+example.
+
+A generic word is a word whose behavior depends on the class of the
+object at the top of the stack, however this behavior is defined in a
+decentralized manner.
+
+A new generic word is defined using the following syntax:
+
+\begin{verbatim}
+GENERIC: draw ( actor -- )
+#! Draw the actor.
+\end{verbatim}
+
+A stack effect comment, as shown above, is not required but recommended.
+
+A generic word just defined like that will simply raise an error if
+invoked. Specific behavior is defined using methods.
+
+A method associates behavior with a generic word. Methods are defined by
+writing \texttt{M:}, followed by a class name, followed by the name of a
+previously-defined generic word.
+
+One of the main benefits of generic words is that each method definition
+can potentially occur in a different source file. Generic word
+definitions also hide conditionals.
+
+Here are two methods for the generic \texttt{draw} word:
+
+\begin{verbatim}
+M: ship draw ( actor -- )
+    [
+        surface get screen-xy radius get color get
+        filledCircleColor
+    ] bind ;
+
+M: plasma draw ( actor -- )
+    [
+        surface get screen-xy dup len get + color get
+        vlineColor
+    ] bind ;
+\end{verbatim}
+
+Here, \texttt{ship} and \texttt{class} are user-defined classes.
+
+Every object is a member of the \texttt{object} class. If you provide a method specializing
+on the \texttt{object} class for some generic word, the method will be
+invoked when no other more specific method exists. For example:
+
+\begin{verbatim}
+GENERIC: describe
+M: number describe "The number " write . ;
+M: object describe "I don't know anything about " write . ;
+\end{verbatim}
+
+\section{Classes}
+
+Recall that in Factor, a class is just a predicate that categorizes objects as
+being a member of the class or not. To be useful, it must be consistent
+-- for a given object, it must always return the same truth value.
+
+Classes are not always subsets or supersets of types and new classes can be defined by the user. Classes can be quite arbitrary:
+
+\begin{itemize}
+\item Cons cells where both elements are integers
+
+\item Floating point numbers between -1 and 1
+
+\item Hash tables holding a certain key
+
+\item Any object that occurs as a member of a certain global variable
+holding a list.
+
+\item \... and so on.
+\end{itemize}
+
+The building blocks of classes are the various built-in types, and
+user-defined tupes. Tuples are covered later in this chapter.
+The built-in types each get their own class whose members are precisely
+the objects having that type. The following built-in classes are
+defined:
+
+\begin{itemize}
+\item \texttt{alien}
+\item \texttt{array}
+\item \texttt{bignum}
+\item \texttt{complex}
+\item \texttt{cons}
+\item \texttt{dll}
+\item \texttt{f}
+\item \texttt{fixnum}
+\item \texttt{float}
+\item \texttt{port}
+\item \texttt{ratio}
+\item \texttt{sbuf}
+\item \texttt{string}
+\item \texttt{t}
+\item \texttt{tuple}
+\item \texttt{vector}
+\item \texttt{word}
+\end{itemize}
+
+Each builtin class has a corresponding membership test predicate, named
+after the builtin class suffixed by \texttt{?}. For example, \texttt{cons?}, \texttt{word?}, etc. Automatically-defined predicates is a common theme, and
+in fact \emph{every} class has a corresponding predicate word,
+with the following
+exceptions:
+
+\begin{itemize}
+\item \texttt{object} -- there is no need for a predicate word, since
+every object is an instance of this class.
+\item \texttt{f} -- the only instance of this class is the sigleton
+\texttt{f} signifying falsity, missing value, and empty list, and the predicate testing for this is the built-in library word \texttt{not}.
+\item \texttt{t} -- the only instance of this class is the canonical truth value
+\texttt{t}. You can write \texttt{t =} to test for this object, however usually
+any object distinct from \texttt{f} is taken as a truth value, and \texttt{t} is not tested for directly.
+\end{itemize}
+
+\section{Metaclasses}
+
+So far, we have only seen predefined classes corresponding to built-in
+types. More complicated classes are defined in terms of metaclasses.
+This section will describe how to define new classes belonging to
+predefined metaclasses.
+
+Just like shared object object traits motivates the existence of classes,
+common behavior shared between classes themselves motivates metaclasses.
+For example, classes corresponding to built-in types, such as \texttt{fixnum}
+and \texttt{string}, are instances of
+the \texttt{builtin} metaclass, whereas a user-defined class is not an
+instance of \texttt{builtin}.
+
+\subsection{The \texttt{union} metaclass}
+
+The \texttt{union} metaclass allows new classes to be
+defined as aggregates of existing classes.
+
+For example, the Factor library defines some unions over numeric types:
+
+\begin{verbatim}
+UNION: integer fixnum bignum ;
+UNION: rational integer ratio ;
+UNION: real rational float ;
+UNION: number real complex ;
+\end{verbatim}
+
+Now, the absolute value function can be defined in an efficient manner
+for real numbers, and in a more general fashion for complex numbers:
+
+\begin{verbatim}
+GENERIC: abs ( z -- |z| )
+M: real abs dup 0 < [ neg ] when ;
+M: complex abs >rect mag2 ;
+\end{verbatim}
+
+New unions can be defined as in the numerical classes example:
+you write \texttt{UNION:} followed by the name of the union,
+followed by its members. The list of members is terminated with a
+semi-colon.
+
+A predicate named after the union followed by '?' is
+automatically-defined. For example, the following definition of 'real?'
+was automatically created:
+
+\begin{verbatim}
+: real?
+    dup rational? [
+        drop t 
+    ] [
+        dup float? [
+            drop t 
+        ] [
+            drop f 
+        ] ifte 
+    ] ifte ;
+\end{verbatim}
+
+\subsection{The \texttt{complement} metaclass}
+
+The \texttt{complement} metaclass allows you to define a class whose members
+are exactly those not in another class. For example, the class of all
+truth values is defined in \texttt{library/kernel.factor} by:
+
+\begin{verbatim}
+COMPLEMENT: general-t f
+\end{verbatim}
+
+\subsection{The \texttt{predicate} metaclass}
+
+The predicate metaclass contains classes whose membership test is an
+arbitrary expression. To speed up dispatch, each predicate must be
+defined as a subclass of some other class. That way predicates
+subclassing from disjoint builtin classes do not need to be
+exhaustively tested.
+
+The source file \texttt{library/strings.factor} defines some subclasses of \texttt{integer}
+classifying ASCII characters:
+
+\begin{verbatim}
+PREDICATE: integer blank     " \t\n\r" str-contains? ;
+PREDICATE: integer letter    CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
+\end{verbatim}
+
+Each predicate defines a corresponding predicate word whose name is
+suffixed with '?'; for example, a 'digit?' word is automatically
+defined:
+
+\begin{verbatim}
+: digit?
+    dup integer? [
+        CHAR: 0 CHAR: 9 between?
+    ] [
+        drop f
+    ] ifte ;
+\end{verbatim}
+
+For obvious reasons, the predicate definition must consume and produce
+exactly one value on the stack.
+
+\section{Tuples}
+
+Tuples are user-defined classes whose objects consist of named slots.
+
+New tuple classes are defined with the following syntax:
+
+\begin{verbatim}
+TUPLE: point x y z ;
+\end{verbatim}
+
+This defines a new class named \texttt{point}, along with the
+following set of words:
+
+\begin{verbatim}
+<point> point?
+point-x set-point-x
+point-y set-point-y
+point-z set-point-z
+\end{verbatim}
+
+The word \texttt{<point>} takes the slot values from the stack and
+produces a new \texttt{point}:
+
+\begin{alltt}
+\textbf{ok} 1 2 3 <point> .
+\textbf{<< point 1 2 3 >>}
+\end{alltt}
+
+As you can guess from the above, there is a literal syntax for tuples,
+and the \texttt{point?}~word tests if the top of the stack is an object
+belonging to that class:
+
+\begin{alltt}
+\textbf{ok} << point 1 2 3 >> point? .
+\textbf{t}
+\end{alltt}
+
+The general form of the literal syntax is as follows:
+
+\begin{alltt}
+<< \emph{class} \emph{slots} \... >>
+\end{alltt}
+
+The syntax consists of the tuple class name followed by the
+values of all slots. An error is raised if insufficient or extraneous slot values are specified.
+
+As usual, the distinction between literal syntax and explicit calls is the
+time the tuple is created; literals are created at parse time, whereas
+explicit constructor calls creates a new object each time the code
+runs.
+
+Slots are read and written using the various automatically-defined words with names of the
+form \texttt{\emph{class}-\emph{slot}} and \texttt{set-\emph{class}-\emph{slot}}.
+
+\subsection{Constructors}
+
+A tuple constructor is named after the tuple class surrounded in angle
+brackets (\texttt{<} and \texttt{>}). A default constructor is provided
+that reads slot values from the stack, however a custom constructor can
+be defined using the \texttt{C:} parsing word.
+
+\subsection{Delegation}
+
+If a tuple defines a slot named \texttt{delegate}, any generic words called on
+the tuple that are not defined for the tuple's class will be passed on
+to the delegate.
+
+This idiom is used in the I/O code for wrapper streams. For example, the
+\texttt{ansi-stream} class delegates all generic words to its underlying stream,
+except for \texttt{fwrite-attr}, which outputs the necessary terminal escape
+codes. Another example is \texttt{stdio-stream}, which performs all I/O on its
+underlying stream, except it flushes after every new line (which would
+be undesirable for say, a file).
+
+Delegation is used instead of inheritance in Factor, but it is not a
+substitute; in particular, the semantics differ in that a delegated
+method call receives the delegate on the stack, not the original object.
+
 \input{new-guide.ind}
 
 \end{document}

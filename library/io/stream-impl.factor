@@ -35,10 +35,6 @@ M: fd-stream fclose ( stream -- )
     dup fd-stream-out [ dup blocking-flush close-port ] when*
     fd-stream-in [ close-port ] when* ;
 
-C: fd-stream ( in out -- stream )
-    [ set-fd-stream-out ] keep
-    [ set-fd-stream-in ] keep ;
-
 : <file-reader> ( path -- stream )
     t f open-file <fd-stream> ;
 

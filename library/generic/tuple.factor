@@ -36,7 +36,7 @@ kernel-internals math hashtables errors vectors ;
 : define-accessor ( tuple name n -- accessor )
     #! Generic word with a method specializing on the tuple's
     #! class that reads the right slot.
-    >r over accessor-word  r> [ slot ] cons
+    >r over accessor-word tuck r> [ slot ] cons
     define-tuple-generic ;
 
 : mutator-word ( name tuple -- word )
@@ -46,14 +46,14 @@ kernel-internals math hashtables errors vectors ;
 : define-mutator ( word name n -- mutator )
     #! Generic word with a method specializing on the tuple's
     #! class that writes to the right slot.
-    >r over mutator-word  r> [ set-slot ] cons
+    >r over mutator-word tuck r> [ set-slot ] cons
     define-tuple-generic ;
 
-: define-slot ( word name n -- )
+: define-slot ( word name n -- [[ accessor mutator ]] )
     over "delegate" = [
         pick over "delegate-field" set-word-property
     ] when
-    3dup define-accessor define-mutator ;
+    3dup define-mutator >r define-accessor r> cons ;
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
@@ -61,12 +61,6 @@ kernel-internals math hashtables errors vectors ;
     dup predicate-word swap
     [ swap dup tuple? [ class eq? ] [ 2drop f ] ifte ] cons
     define-compound ;
-
-: begin-tuple ( word -- )
-    dup intern-symbol
-    dup tuple-predicate
-    dup define-promise
-    tuple "metaclass" set-word-property ;
 
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
@@ -81,19 +75,38 @@ kernel-internals math hashtables errors vectors ;
         r> 2drop
     ] ifte ;
 
-: define-slots ( tuple slots -- )
+: define-slots ( tuple slots -- words )
     2dup "slots" set-word-property
     2dup length 1 + "tuple-size" set-word-property
     dup length [ 3 + ] project zip
-    [ uncons define-slot ] each-with ;
+    [ uncons define-slot ] map-with ;
+
+: constructor-word ( word -- word )
+    word-name "<" swap ">" cat3 create-in ;
+
+: define-constructor ( word def -- )
+    over constructor-word >r
+    [ swap literal, \ make-tuple , append, ] make-list
+    r> swap define-compound ;
+
+: default-constructor ( tuple -- )
+    dup [
+        "slot-words" word-property
+        reverse [ cdr unit , \ keep , ] each
+    ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape
     >r
-    create-in dup save-location
-    dup begin-tuple
-    r>
-    define-slots ;
+    create-in
+    dup save-location
+    dup intern-symbol
+    dup tuple-predicate
+    dup define-promise
+    dup tuple "metaclass" set-word-property
+    dup
+    dup r> define-slots "slot-words" set-word-property
+    default-constructor ;
 
 : TUPLE:
     #! Followed by a tuple name, then slot names, then ;
@@ -102,19 +115,11 @@ kernel-internals math hashtables errors vectors ;
     [ string-mode off define-tuple ]
     f ; parsing
 
-: constructor-word ( word -- word )
-    word-name "<" swap ">" cat3 create-in ;
-
-: tuple-constructor ( word def -- )
-    over constructor-word >r
-    [ swap literal, \ make-tuple , append, ] make-list
-    r> swap define-compound ;
-
 : C:
     #! Followed by a tuple name, then constructor code, then ;
     #! Constructor code executes with the empty tuple on the
     #! stack.
-    scan-word [ tuple-constructor ] f ; parsing
+    scan-word [ define-constructor ] f ; parsing
 
 : tuple-delegate ( tuple -- obj )
     dup tuple? [

@@ -112,11 +112,6 @@ M: rectangle inside? ( point rect -- ? )
 
 ! A line.
 TUPLE: line x y w h ;
-C: line ( x y w h -- line )
-    [ set-line-h ] keep
-    [ set-line-w ] keep
-    [ set-line-y ] keep
-    [ set-line-x ] keep ;
 
 M: line shape-x dup line-x dup rot line-w + min ;
 M: line shape-y dup line-y dup rot line-h + min ;

@@ -206,10 +206,6 @@ SYMBOL: input-continuation
 
 TUPLE: console-stream console redraw-continuation ;
 
-C: console-stream ( console console-continuation -- stream )
-    [ set-console-stream-redraw-continuation ] keep
-    [ set-console-stream-console ] keep ;
-
 M: console-stream fflush ( stream -- )
     fauto-flush ;
 
