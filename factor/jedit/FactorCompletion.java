@@ -44,12 +44,12 @@ public class FactorCompletion extends SideKickCompletion
 	private FactorParsedData data;
 
 	//{{{ FactorCompletion constructor
-	public FactorCompletion(View view, List items,
+	public FactorCompletion(View view, FactorWord[] items,
 		String word, FactorParsedData data)
 	{
 		this.view = view;
 		textArea = view.getTextArea();
-		this.items = items;
+		this.items = Arrays.asList(items);
 		this.word = word;
 		this.data = data;
 	} //}}}

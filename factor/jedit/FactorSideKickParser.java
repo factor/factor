@@ -274,10 +274,11 @@ public class FactorSideKickParser extends SideKickParser
 		if(word.length() == 0)
 			return null;
 
-		List completions = FactorPlugin.getCompletions(
-			data.use,word,false);
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getCompletions(
+			data.use,word,false));
 
-		if(completions.size() == 0)
+		if(completions.length == 0)
 			return null;
 		else
 		{

@@ -117,13 +117,11 @@ public class EditWordDialog extends WordListDialog
 	//{{{ updateList() method
 	private void updateList()
 	{
-		List completions = FactorPlugin.getCompletions(
-			field.getText(),true);
-		FactorWord[] completionArray
-			= (FactorWord[])completions.toArray(
-			new FactorWord[completions.size()]);
-		list.setListData(completionArray);
-		if(completionArray.length != 0)
+		FactorWord[] completions = FactorPlugin.toWordArray(
+			FactorPlugin.getCompletions(
+			field.getText(),true));
+		list.setListData(completions);
+		if(completions.length != 0)
 		{
 			list.setSelectedIndex(0);
 			list.ensureIndexIsVisible(0);

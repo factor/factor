@@ -172,7 +172,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	} //}}}
 
 	//{{{ getCompletions() method
-	public void getCompletions(String vocab, String word, List completions,
+	public void getCompletions(String vocab, String word, Set completions,
 		boolean anywhere)
 	{
 		super.getCompletions(vocab,word,completions,anywhere);
@@ -193,8 +193,10 @@ public class ExternalFactor extends DefaultVocabularyLookup
 			while(moreCompletions != null)
 			{
 				Cons completion = (Cons)moreCompletions.car;
-				completions.add(searchVocabulary(completion.next(),
-					(String)completion.car));
+				FactorWord w = searchVocabulary(completion.next(),
+					(String)completion.car);
+				if(w != null)
+					completions.add(w);
 				moreCompletions = moreCompletions.next();
 			}
 		}

@@ -34,7 +34,6 @@ USE: logic
 USE: lists
 USE: math
 USE: namespaces
-USE: prettyprint
 USE: stack
 USE: stdio
 USE: strings
@@ -42,6 +41,7 @@ USE: presentation
 USE: unparser
 USE: vectors
 USE: words
+USE: hashtables
 
 : tab-size
     #! Change this to suit your tastes.
@@ -82,10 +82,10 @@ DEFER: prettyprint*
     ] unless ;
 
 : prettyprint-[ ( indent -- indent )
-    "[" write <prettyprint ;
+        \ [ prettyprint-word <prettyprint ;
 
 : prettyprint-] ( indent -- indent )
-    prettyprint> "]" write ;
+        prettyprint> \ ] prettyprint-word ;
 
 : prettyprint-list ( indent list -- indent )
     #! Pretty-print a list, without [ and ].
@@ -104,10 +104,10 @@ DEFER: prettyprint*
     swap prettyprint-[ swap prettyprint-list prettyprint-] ;
 
 : prettyprint-{ ( indent -- indent )
-    "{" write <prettyprint ;
+    \ { prettyprint-word <prettyprint ;
 
 : prettyprint-} ( indent -- indent )
-    prettyprint> "}" write ;
+    prettyprint> \ } prettyprint-word ;
 
 : prettyprint-vector ( indent list -- indent )
     #! Pretty-print a vector, without { and }.
@@ -115,9 +115,22 @@ DEFER: prettyprint*
 
 : prettyprint-{} ( indent vector -- indent )
     dup vector-length 0 = [
-        drop "{ }" write
+        drop prettyprint-{ prettyprint-}
     ] [
         swap prettyprint-{ swap prettyprint-vector prettyprint-}
+    ] ifte ;
+
+: prettyprint-{{ ( indent -- indent )
+        \ {{ prettyprint-word <prettyprint ;
+
+: prettyprint-}} ( indent -- indent )
+        prettyprint> \ }} prettyprint-word ;
+
+: prettyprint-{{}} ( indent hashtable -- indent )
+    hash>alist dup length 0 = [
+        drop prettyprint-{{ prettyprint-}}
+    ] [
+        swap prettyprint-{{ swap prettyprint-list prettyprint-}}
     ] ifte ;
 
 : trim-newline ( str -- str )
@@ -168,11 +181,12 @@ DEFER: prettyprint*
         unparse write
     ] [
         [
-            [ f =       ] [ prettyprint-object ]
-            [ cons?     ] [ prettyprint-[] ]
-            [ vector?   ] [ prettyprint-{} ]
-            [ word?     ] [ prettyprint-word ]
-            [ drop t    ] [ prettyprint-object ]
+            [ f =        ] [ prettyprint-object ]
+            [ cons?      ] [ prettyprint-[] ]
+            [ hashtable? ] [ prettyprint-{{}} ]
+            [ vector?    ] [ prettyprint-{} ]
+            [ word?      ] [ prettyprint-word ]
+            [ drop t     ] [ prettyprint-object ]
         ] cond
     ] ifte ;
 

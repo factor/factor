@@ -28,7 +28,6 @@
 
 - listener: if too many things popped off the stack, complain
 - gracefully handle non-working cfactor
-- don't show listener on certain commands
 - NPE in ErrorHighlight
 - some way to not have previous definitions from a source file
   clutter the namespace
@@ -64,7 +63,6 @@
   objects
 - worddef props
 - prettyprint: when unparse called due to recursion, write a link
-- prettyprinter should output {{ ... }} syntax for hashtables
 - FORGET: and forget
 
 + httpd:

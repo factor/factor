@@ -4,6 +4,7 @@ USE: kernel
 USE: namespaces
 USE: stack
 USE: test
+USE: lists
 
 [ f ] [ [ ] [ ] catch ] unit-test
 
@@ -14,3 +15,6 @@ USE: test
     global [ "error" get ] bind
     "Hello" =
 ] unit-test
+
+[ ] [ [ ] print-error ] unit-test
+[ ] [ [ 2 car ] print-error ] unit-test

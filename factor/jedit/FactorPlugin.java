@@ -200,6 +200,16 @@ public class FactorPlugin extends EditPlugin
 			evalInWire(word + " " + op);
 	} //}}}
 
+	//{{{ toWordArray() method
+	public static FactorWord[] toWordArray(Set completions)
+	{
+		FactorWord[] w = (FactorWord[])completions.toArray(new FactorWord[
+			completions.size()]);
+		Arrays.sort(w,new MiscUtilities.StringICaseCompare());
+
+		return w;
+	} //}}}
+	
 	//{{{ getCompletions() method
 	/**
 	 * Returns all words in all vocabularies.
@@ -207,7 +217,7 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(String word, boolean anywhere)
+	public static Set getCompletions(String word, boolean anywhere)
 	{
 		try
 		{
@@ -225,11 +235,11 @@ public class FactorPlugin extends EditPlugin
 	 * @param anywhere If true, matches anywhere in the word name are
 	 * returned; otherwise, only matches from beginning.
 	 */
-	public static List getCompletions(Cons use, String word, boolean anywhere)
+	public static Set getCompletions(Cons use, String word, boolean anywhere)
 	{
 		try
 		{
-			List completions = new ArrayList();
+			Set completions = new HashSet();
 	
 			while(use != null)
 			{
@@ -238,10 +248,7 @@ public class FactorPlugin extends EditPlugin
 					vocab,word,completions,anywhere);
 				use = use.next();
 			}
-			
-			Collections.sort(completions,
-				new MiscUtilities.StringICaseCompare());
-	
+
 			return completions;
 		}
 		catch(Exception e)
