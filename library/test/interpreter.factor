@@ -1,4 +1,5 @@
 IN: scratchpad
+USE: vectors
 USE: interpreter
 USE: test
 USE: namespaces
@@ -8,6 +9,9 @@ USE: math
 USE: math-internals
 USE: lists
 USE: kernel
+
+: done-cf? ( -- ? ) meta-cf get not ;
+: done? ( -- ? ) done-cf? meta-r get vector-length 0 = and ;
 
 : interpret ( quot -- )
     #! The quotation is called with each word as its executed.

@@ -31,7 +31,6 @@ void* primitives[] = {
 	primitive_str_to_float,
 	primitive_float_to_str,
 	primitive_from_rect,
-	primitive_fixnum_eq,
 	primitive_fixnum_add,
 	primitive_fixnum_subtract,
 	primitive_fixnum_multiply,

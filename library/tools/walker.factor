@@ -9,8 +9,9 @@ stdio strings vectors words ;
     meta-d get {.} ;
 
 : &r
-    #! Print stepper call stack.
-    meta-r get {.} meta-cf get . ;
+    #! Print stepper call stack, as well as the currently
+    #! executing quotation.
+    meta-cf get . meta-executing get . meta-r get {.} ;
 
 : &n
     #! Print stepper name stack.
@@ -24,27 +25,25 @@ stdio strings vectors words ;
     #! Get stepper variable value.
     meta-n get (get) ;
 
-: stack-report ( -- )
-    meta-r get vector-length "=" fill write
-    meta-d get vector-length "-" fill write ;
-
-: not-done ( quot -- )
-    done? [
-        stack-report "Stepper is done." print drop
-    ] [
-        call
-    ] ifte ;
-
-: report ( -- )
-    stack-report meta-cf get . ;
+: report ( -- ) meta-cf get . ;
 
 : step
     #! Step over current word.
-    [ next do-1 report ] not-done ;
+    next do-1 report ;
 
 : into
     #! Step into current word.
-    [ next do report ] not-done ;
+    next do report ;
+
+: continue
+    #! Continue executing the single-stepped continuation in the
+    #! primary interpreter.
+    meta-d get set-datastack
+    meta-c get set-catchstack
+    meta-cf get
+    meta-r get
+    meta-n get set-namestack
+    set-callstack call ;
 
 : walk-banner ( -- )
     [ &s &r &n &c ] [ prettyprint-word " " write ] each
@@ -53,17 +52,22 @@ stdio strings vectors words ;
     " ( var -- value ) inspects the stepper namestack." print
     \ step prettyprint-word " -- single step over" print
     \ into prettyprint-word " -- single step into" print
-    \ exit prettyprint-word " -- exit single-stepper" print
+    \ continue prettyprint-word " -- continue execution" print
+    \ bye prettyprint-word " -- exit single-stepper" print
     report ;
 
 : walk-listener walk-banner "walk" listener-prompt set listener ;
 
+: init-walk ( quot callstack namestack -- )
+    init-interpreter
+    meta-n set
+    meta-r set
+    meta-cf set
+    datastack meta-d set ;
+
 : walk ( quot -- )
     #! Single-step through execution of a quotation.
-    [
-        init-interpreter
-        meta-cf set
-        datastack meta-d set
+    callstack namestack [
+        init-walk
         walk-listener
-        meta-d get
-    ] with-scope set-datastack ;
+    ] with-scope ;

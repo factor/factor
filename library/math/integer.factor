@@ -28,7 +28,11 @@ USING: errors generic kernel math ;
         2dup gcd tuck /i >r /i r> fraction>
     ] ifte ; inline
 
-M: fixnum number= fixnum= ;
+M: fixnum number=
+    #! Fixnums are immediate values, so equality testing is
+    #! trivial.
+    eq? ;
+
 M: fixnum < fixnum< ;
 M: fixnum <= fixnum<= ;
 M: fixnum > fixnum> ;

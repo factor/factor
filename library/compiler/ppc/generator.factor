@@ -28,9 +28,11 @@ words ;
     REPL-DS
 ] "generator" set-word-prop
 
-! #return-to [
-!     
-! ] "generator" set-word-prop
+#return-to [
+    0 18 LOAD32  absolute-16/16
+    1 1 -16 STWU
+    18 1 20 STW
+] "generator" set-word-prop
 
 #return [ drop compile-epilogue BLR ] "generator" set-word-prop
 

@@ -89,6 +89,10 @@ SYMBOL: alien-parameters
     length 0 node-inputs consume-d ;
 
 : alien-node ( returns params function library -- )
+    #! We should fail if the library does not exist, so that
+    #! compilation does not keep trying to compile FFI words
+    #! over and over again if the library is not loaded.
+   ! 2dup load-dll dlsym
     cons #alien-invoke dataflow,
     [ set-alien-parameters ] keep
     set-alien-returns ;

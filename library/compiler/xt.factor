@@ -90,15 +90,16 @@ M: relative fixup ( relative -- )
 TUPLE: absolute word where ;
 
 C: absolute ( word -- )
-    dup f rel-word
     [ set-absolute-word ] keep
     [ just-compiled swap set-absolute-where ] keep ;
 
-: absolute ( word -- ) <absolute> deferred-xts cons@ ;
+: absolute ( word -- )
+    dup f rel-word <absolute> deferred-xts cons@ ;
+
+: >absolute dup absolute-word compiled-xt swap absolute-where ;
 
 M: absolute fixup ( absolute -- )
-    dup absolute-word compiled-xt
-    swap absolute-where set-compiled-cell ;
+    >absolute set-compiled-cell ;
 
 ! Fixups where the address is inside a bitfield in the
 ! instruction.
@@ -117,11 +118,28 @@ C: relative-bitfld ( word mask -- )
     BIN: 1111111111111100 <relative-bitfld>
     deferred-xts cons@ ;
 
+: or-compiled ( n off -- )
+    [ compiled-cell bitor ] keep set-compiled-cell ;
+
 M: relative-bitfld fixup
     dup relative-fixup over relative-bitfld-mask bitand
     swap relative-where
-    [ compiled-cell bitor ] keep
-    set-compiled-cell ;
+    or-compiled ;
+
+! Fixup where the address is split between two PowerPC D-form
+! instructions (low 16 bits of each instruction is the literal).
+TUPLE: absolute-16/16 ;
+
+C: absolute-16/16 ( word -- )
+    [ >r <absolute> r> set-delegate ] keep ;
+
+: fixup-16/16 ( xt where -- )
+    >r w>h/h r> tuck 4 - or-compiled or-compiled ;
+
+M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
+
+: absolute-16/16 ( word -- )
+    <absolute-16/16> deferred-xts cons@ ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be

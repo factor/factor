@@ -22,12 +22,16 @@ SYMBOL: meta-c
 ! Call frame
 SYMBOL: meta-cf
 
+! Currently executing word.
+SYMBOL: meta-executing
+
 : init-interpreter ( -- )
     10 <vector> meta-r set
     10 <vector> meta-d set
     namestack meta-n set
     f meta-c set
-    f meta-cf set ;
+    f meta-cf set
+    f meta-executing set ;
 
 : copy-interpreter ( -- )
     #! Copy interpreter state from containing namespaces.
@@ -36,11 +40,8 @@ SYMBOL: meta-cf
     meta-n [ ] change
     meta-c [ ] change ;
 
-: done-cf? ( -- ? ) meta-cf get not ;
-: done? ( -- ? ) done-cf? meta-r get vector-length 0 = and ;
-
 ! Callframe.
-: up ( -- ) pop-r meta-cf set ;
+: up ( -- ) pop-r meta-cf set  pop-r drop ;
 
 : next ( -- obj )
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
@@ -55,13 +56,19 @@ SYMBOL: meta-cf
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.
-    meta-cf [ [ push-r ] when* ] change ;
+    meta-cf [
+        [ meta-executing get push-r  push-r ] when*
+    ] change ;
 
 : meta-word ( word -- )
     dup "meta-word" word-prop [
         call
     ] [
-        dup compound? [ word-def meta-call ] [ host-word ] ifte
+        dup compound? [
+            dup word-def meta-call  meta-executing set
+        ] [
+            host-word
+        ] ifte
     ] ?ifte ;
 
 : do ( obj -- ) dup word? [ meta-word ] [ push-d ] ifte ;

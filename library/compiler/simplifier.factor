@@ -150,7 +150,7 @@ SYMBOL: simplifying
 
 #target-label [
     [ #jump-label #target-label double-jump ]
-    [ #jump #target double-jump ]
+!   [ #jump #target double-jump ]
 ] "simplifiers" set-word-prop
 
 #jump [ [ dead-code ] ] "simplifiers" set-word-prop

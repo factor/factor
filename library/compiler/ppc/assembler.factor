@@ -4,7 +4,15 @@ IN: assembler
 USING: errors kernel math memory words ;
 
 ! See the Motorola or IBM documentation for details. The opcode
-! names are standard.
+! names are standard, and the operand order is the same as in
+! the docs, except a few differences, namely, in IBM/Motorola
+! assembler syntax, loads and stores are written like:
+!
+! stw r14,10(r15)
+!
+! In Factor, we write:
+!
+! 14 15 10 STW
 
 : insn ( operand opcode -- ) 26 shift bitor compile-cell ;
 
@@ -59,7 +67,6 @@ USING: errors kernel math memory words ;
 : STWU d-form 37 insn ;
 : CMPI d-form 11 insn ;
 
-: w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;
 : LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;
 
 : LOAD ( n r -- )

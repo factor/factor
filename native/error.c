@@ -25,8 +25,8 @@ void early_error(CELL error)
 		/* Crash at startup */
 		fprintf(stderr,"Error during startup: ");
 		print_obj(error);
-		dump_stacks();
 		fprintf(stderr,"\n");
+		dump_stacks();
 		fflush(stderr);
 		exit(1);
 	}

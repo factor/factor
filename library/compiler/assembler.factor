@@ -41,3 +41,5 @@ SYMBOL: interned-literals
 
 : init-assembler ( -- )
     global [ <namespace> interned-literals set ] bind ;
+
+: w>h/h dup -16 shift HEX: ffff bitand >r HEX: ffff bitand r> ;

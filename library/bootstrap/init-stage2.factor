@@ -26,7 +26,7 @@ words ;
     garbage-collection
     run-user-init
     "shell" get shell
-    0 exit* 
+    0 exit
 ] set-boot
 
 warm-boot
@@ -66,4 +66,4 @@ unparse write " words total" print
 global [ stdio off ] bind
 
 "factor.image" save-image
-0 exit*
+0 exit
