@@ -16,6 +16,9 @@
 - doc comments of generics
 - proper ordering for classes
 - tuples: in/out syntax
+- tuples: gracefully handle changing shape
+- keep a list of getter/setter words
+- default constructor
 
 + ffi:
 
@@ -31,6 +34,7 @@
 
 + listener/plugin:
 
+- command to turn repl session into a source file
 - update plugin docs
 - extract word keeps indent
 - word preview for remote words

@@ -4,10 +4,12 @@ IN: gadgets
 USING: generic hashtables kernel lists namespaces ;
 
 ! A box is a gadget holding other gadgets.
-TUPLE: box contents delegate ;
+TUPLE: box children delegate ;
 
 C: box ( gadget -- box )
     [ set-box-delegate ] keep ;
+
+M: box gadget-children box-children ;
 
 M: general-list draw ( list -- )
     [ draw ] each ;
@@ -17,7 +19,7 @@ M: box draw ( box -- )
         dup [
             dup
             box-delegate draw
-            box-contents draw
+            box-children draw
         ] with-gadget
     ] with-translation ;
 
@@ -37,25 +39,23 @@ M: box pick-up* ( point box -- gadget )
     #! box, return f. Otherwise, see if the point is contained
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
-    dup [
-        2dup inside? [
-            2dup box-contents pick-up dup [
-                2nip
-            ] [
-                drop box-delegate pick-up*
-            ] ifte
+    2dup inside? [
+        2dup [ translate ] keep box-children pick-up dup [
+            2nip
         ] [
-            2drop f
+            drop box-delegate pick-up*
         ] ifte
-    ] with-translation ;
+    ] [
+        2drop f
+    ] ifte ;
 
 : box- ( gadget box -- )
-    [ 2dup box-contents remq swap set-box-contents ] keep
-    redraw
+    [ 2dup box-children remq swap set-box-children ] keep
+    relayout
     f swap set-gadget-parent ;
 
 : (box+) ( gadget box -- )
-    [ box-contents cons ] keep set-box-contents ;
+    [ box-children cons ] keep set-box-children ;
 
 : unparent ( gadget -- )
     dup gadget-parent dup [ box- ] [ 2drop ] ifte ;
@@ -65,4 +65,4 @@ M: box pick-up* ( point box -- gadget )
     over unparent
     dup pick set-gadget-parent
     tuck (box+)
-    redraw ;
+    relayout ;

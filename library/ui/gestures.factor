@@ -24,10 +24,6 @@ USING: alien generic hashtables kernel lists sdl-event ;
         2drop
     ] ifte ;
 
-! Redraw gesture. Don't handle this yourself.
-: redraw ( gadget -- )
-    \ redraw swap handle-gesture ;
-
 ! Mouse gestures are lists where the first element is one of:
 SYMBOL: motion
 SYMBOL: button-up

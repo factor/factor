@@ -7,17 +7,16 @@ USING: generic kernel lists math namespaces sdl ;
 ! box.
 TUPLE: label text delegate ;
 
-: size-label ( label -- )
+C: label ( text -- )
+    0 0 0 0 <rectangle> <gadget> over set-label-delegate
+    [ set-label-text ] keep ;
+
+M: label layout* ( label -- )
     [
         dup label-text swap gadget-paint
         [ font get lookup-font ] bind
         swap size-string
     ] keep resize-gadget ;
-
-C: label ( text -- )
-    0 0 0 0 <rectangle> <gadget> over set-label-delegate
-    [ set-label-text ] keep
-    [ size-label ] keep ;
 
 M: label draw ( label -- )
     dup shape-x x get +

@@ -7,7 +7,7 @@ sdl-video ;
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
 ! world variable.
-TUPLE: world running? hand delegate redraw? ;
+TUPLE: world running? hand delegate ;
 
 : <world-box> ( -- box )
     0 0 0 0 <rectangle> <everywhere> <stamp>
@@ -18,15 +18,14 @@ TUPLE: world running? hand delegate redraw? ;
 C: world ( -- world )
     <world-box> over set-world-delegate
     t over set-world-running?
-    t over set-world-redraw?
     dup <hand> over set-world-hand ;
 
 : my-hand ( -- hand ) world get world-hand ;
 
 : draw-world ( -- )
-    world get dup world-redraw? [
+    world get dup gadget-redraw? [
         [
-            f over set-world-redraw?
+            f over set-gadget-redraw?
             dup draw
             world-hand draw
         ] with-surface
@@ -36,10 +35,12 @@ C: world ( -- world )
 
 DEFER: handle-event
 
+: layout-world world get layout ;
+
 : run-world ( -- )
     world get world-running? [
         <event> dup SDL_WaitEvent 1 = [
-            handle-event draw-world run-world
+            handle-event draw-world layout-world run-world
         ] [
             drop
         ] ifte
@@ -47,8 +48,6 @@ DEFER: handle-event
 
 : init-world ( w h -- )
     t world get set-world-running?
-    t world get set-world-redraw?
-    world get [ t swap set-world-redraw? ] \ redraw set-action
     world get resize-gadget ;
 
 : world-flags SDL_HWSURFACE SDL_RESIZABLE bitor ;

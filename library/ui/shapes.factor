@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel math namespaces ;
+USING: generic kernel lists math namespaces ;
 
 ! Shape protocol. Shapes are immutable; moving or resizing a
 ! shape makes a new shape.
@@ -32,6 +32,21 @@ GENERIC: resize-shape ( w h shape -- shape )
         shape-y y [ + ] change
         r> call
     ] with-scope ; inline
+
+: translate ( point shape -- point )
+    #! Translate a point relative to the shape.
+    #! The rect>'ing of the given point won't be necessary as
+    #! soon as all generics delegate.
+    >r dup shape-x swap shape-y rect> r>
+    dup shape-x swap shape-y rect> - ;
+
+: max-width ( list -- n )
+    #! The width of the widest shape.
+    [ shape-w ] map [ > ] top ;
+
+: run-heights ( list -- h list )
+    #! Compute a list of accumilative sums of heights of shapes.
+    [ 0 swap [ over , shape-h + ] each ] make-list ;
 
 ! A point, represented as a complex number, is the simplest type
 ! of shape.
