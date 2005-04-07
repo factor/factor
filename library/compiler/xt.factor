@@ -2,13 +2,13 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler
 USING: assembler errors generic kernel lists math namespaces
-prettyprint strings vectors words ;
+prettyprint sequences strings vectors words ;
 
 ! To support saving compiled code to disk, generator words
 ! append relocation instructions to this vector.
 SYMBOL: relocation-table
 
-: rel, ( n -- ) relocation-table get vector-push ;
+: rel, ( n -- ) relocation-table get push ;
 
 : relocating compiled-offset cell - rel, ;
 

@@ -39,3 +39,27 @@ M: sequence = ( obj seq -- ? )
             2drop f
         ] ifte
     ] ifte ;
+
+: push ( element sequence -- )
+    #! Push a value on the end of a sequence.
+    dup length swap set-nth ;
+
+: seq-append ( s1 s2 -- )
+    #! Destructively append s2 to s1.
+    [ over push ] seq-each drop ;
+
+: peek ( sequence -- element )
+    #! Get value at end of sequence.
+    dup length 1 - swap nth ;
+
+: pop ( sequence -- element )
+    #! Get value at end of sequence and remove it.
+    dup peek >r dup length 1 - swap set-length r> ;
+
+: >pop> ( stack -- stack ) dup pop drop ;
+
+IN: kernel
+
+: depth ( -- n )
+    #! Push the number of elements on the datastack.
+    datastack length ;

@@ -1,21 +1,21 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
-USING: errors kernel lists math namespaces prettyprint stdio
-strings vectors words ;
+USING: errors kernel lists math namespaces prettyprint sequences
+stdio strings vectors words ;
 
 ! A Factor interpreter written in Factor. Used by compiler for
 ! partial evaluation, also by the walker.
 
 ! Meta-stacks
 SYMBOL: meta-r
-: push-r meta-r get vector-push ;
-: pop-r meta-r get vector-pop ;
+: push-r meta-r get push ;
+: pop-r meta-r get pop ;
 SYMBOL: meta-d
-: push-d meta-d get vector-push ;
-: pop-d meta-d get vector-pop ;
-: peek-d meta-d get vector-peek ;
-: peek-next-d meta-d get [ vector-length 2 - ] keep vector-nth ;
+: push-d meta-d get push ;
+: pop-d meta-d get pop ;
+: peek-d meta-d get peek ;
+: peek-next-d meta-d get [ length 2 - ] keep nth ;
 SYMBOL: meta-n
 SYMBOL: meta-c
 
@@ -51,7 +51,7 @@ SYMBOL: meta-executing
     #! swap in the old stacks. This is so messy.
     push-d datastack push-d
     meta-d get set-datastack
-    >r execute datastack r> tuck vector-push
+    >r execute datastack r> tuck push
     set-datastack meta-d set ;
 
 : meta-call ( quot -- )

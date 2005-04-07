@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel USING: errors lists namespaces vectors ;
+IN: kernel USING: errors lists namespaces sequences ;
 
 : reify ( quot -- )
     >r datastack >pop> callstack >pop> namestack catchstack

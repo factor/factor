@@ -25,9 +25,9 @@ SYMBOL: image
 ! Boot quotation, set by boot.factor
 SYMBOL: boot-quot
 
-: emit ( cell -- ) image get vector-push ;
+: emit ( cell -- ) image get push ;
 
-: fixup ( value offset -- ) image get set-vector-nth ;
+: fixup ( value offset -- ) image get set-nth ;
 
 ( Object memory )
 

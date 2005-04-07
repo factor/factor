@@ -25,3 +25,8 @@ BUILTIN: array 8 [ 1 length f ] ;
 
 M: array nth array-nth ;
 M: array set-nth set-array-nth ;
+
+: dispatch ( n vtable -- )
+    #! This word is unsafe since n is not bounds-checked. Do not
+    #! call it directly.
+    2 slot array-nth call ;

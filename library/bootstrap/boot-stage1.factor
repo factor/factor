@@ -30,6 +30,7 @@ hashtables ;
         "/library/vectors.factor"
         "/library/strings.factor"
         "/library/sequences-epilogue.factor"
+        "/library/vectors-epilogue.factor"
         "/library/hashtables.factor"
         "/library/namespaces.factor"
         "/library/words.factor"

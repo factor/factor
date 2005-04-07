@@ -30,7 +30,7 @@ namespaces parser sequences test vectors ;
 [ [ call ] infer old-effect ] unit-test-fails
 
 [ [[ 2 4 ]] ] [ [ 2dup ] infer old-effect ] unit-test
-[ [[ 2 0 ]] ] [ [ vector-push ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
 
 [ [[ 1 0 ]] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
 [ [ ifte ] infer old-effect ] unit-test-fails
@@ -148,7 +148,7 @@ SYMBOL: sym-test
 [ [[ 0 1 ]] ] [ [ sym-test ] infer old-effect ] unit-test
 
 
-[ [[ 2 0 ]] ] [ [ set-vector-length ] infer old-effect ] unit-test
+[ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ 2list ] infer old-effect ] unit-test
 [ [[ 3 1 ]] ] [ [ 3list ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ append ] infer old-effect ] unit-test

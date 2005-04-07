@@ -1,16 +1,8 @@
 ! Contractor timesheet example
 
 IN: timesheet
-USE: errors
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: parser
-USE: stdio
-USE: strings
-USE: unparser
-USE: vectors
+USING: errors kernel lists math namespaces sequences stdio
+strings unparser vectors ;
 
 ! Adding a new entry to the time sheet.
 
@@ -26,13 +18,16 @@ USE: vectors
     read ;
 
 : add-entry ( timesheet -- )
-    add-entry-prompt cons swap vector-push ;
+    add-entry-prompt cons swap push ;
 
 ! Printing the timesheet.
 
 : hh ( duration -- str ) 60 /i ;
 : mm ( duration -- str ) 60 mod unparse 2 "0" pad ;
 : hh:mm ( millis -- str ) [ dup hh , ":" , mm , ] make-string ;
+
+: pad-string ( len str -- str )
+    length - " " fill ;
 
 : print-entry ( duration description -- )
     dup write
@@ -41,7 +36,7 @@ USE: vectors
 
 : print-timesheet ( timesheet -- )
     "TIMESHEET:" print
-    [ uncons print-entry ] vector-each ;
+    [ uncons print-entry ] seq-each ;
 
 ! Displaying a menu
 

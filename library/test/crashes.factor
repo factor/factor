@@ -2,7 +2,7 @@ IN: temporary
 
 ! Various things that broke CFactor at various times.
 USING: errors kernel lists math memory namespaces parser
-prettyprint strings test vectors words ;
+prettyprint sequences strings test vectors words ;
 
 "20 <sbuf> \"foo\" set" eval
 "garbage-collection" eval
@@ -13,7 +13,6 @@ prettyprint strings test vectors words ;
 ] keep-datastack
 
 10 <vector> "x" set
-[ -2 "x" get set-vector-length ] [ drop ] catch
 [ "x" get clone drop ] [ drop ] catch
 
 10 [ [ -1000000 <vector> ] [ drop ] catch ] times
@@ -47,7 +46,7 @@ prettyprint strings test vectors words ;
 
 ! Forgot to tag out of bounds index
 [ 1 { } vector-nth ] [ garbage-collection drop ] catch
-[ -1 { } set-vector-length ] [ garbage-collection drop ] catch
+[ -1 { } set-length ] [ garbage-collection drop ] catch
 [ 1 "" string-nth ] [ garbage-collection drop ] catch
 
 ! ... and again

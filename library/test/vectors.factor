@@ -1,27 +1,20 @@
-USING: sequences ;
-USE: lists
-USE: kernel
-USE: math
-USE: random
-USE: test
-USE: vectors
-USE: strings
-USE: namespaces
-USE: kernel-internals
+IN: temporary
+USING: kernel kernel-internals math namespaces random sequences
+strings test vectors ;
 
-[ [ t f t ] vector-length ] unit-test-fails
-[ 3 ] [ { t f t } vector-length ] unit-test
+[ 3 ] [ [ t f t ] length ] unit-test
+[ 3 ] [ { t f t } length ] unit-test
 
-[ -3 { } vector-nth ] unit-test-fails
-[ 3 { } vector-nth ] unit-test-fails
-[ 3 #{ 1 2 }# vector-nth ] unit-test-fails
+[ -3 { } nth ] unit-test-fails
+[ 3 { } nth ] unit-test-fails
+[ 3 #{ 1 2 }# nth ] unit-test-fails
 
-[ "hey" [ 1 2 ] set-vector-length ] unit-test-fails
-[ "hey" { 1 2 } set-vector-length ] unit-test-fails
+[ "hey" [ 1 2 ] set-length ] unit-test-fails
+[ "hey" { 1 2 } set-length ] unit-test-fails
 
-[ 3 ] [ 3 0 <vector> [ set-vector-length ] keep vector-length ] unit-test
+[ 3 ] [ 3 0 <vector> [ set-length ] keep length ] unit-test
 [ "yo" ] [
-    "yo" 4 1 <vector> [ set-vector-nth ] keep 4 swap vector-nth
+    "yo" 4 1 <vector> [ set-nth ] keep 4 swap nth
 ] unit-test
 
 [ 5 list>vector ] unit-test-fails
@@ -65,15 +58,15 @@ unit-test
 
 0 <vector> "funny-stack" set
 
-[ ] [ { 1 5 } "funny-stack" get vector-push ] unit-test
-[ ] [ { 2 3 } "funny-stack" get vector-push ] unit-test
-[ { 2 3 } ] [ "funny-stack" get vector-pop ] unit-test
-[ { 1 5 } ] [ "funny-stack" get vector-peek ] unit-test
-[ { 1 5 } ] [ "funny-stack" get vector-pop ] unit-test
-[ "funny-stack" get vector-pop ] unit-test-fails
-[ "funny-stack" get vector-pop ] unit-test-fails
-[ ] [ "funky" "funny-stack" get vector-push ] unit-test
-[ "funky" ] [ "funny-stack" get vector-pop ] unit-test
+[ ] [ { 1 5 } "funny-stack" get push ] unit-test
+[ ] [ { 2 3 } "funny-stack" get push ] unit-test
+[ { 2 3 } ] [ "funny-stack" get pop ] unit-test
+[ { 1 5 } ] [ "funny-stack" get peek ] unit-test
+[ { 1 5 } ] [ "funny-stack" get pop ] unit-test
+[ "funny-stack" get pop ] unit-test-fails
+[ "funny-stack" get pop ] unit-test-fails
+[ ] [ "funky" "funny-stack" get push ] unit-test
+[ "funky" ] [ "funny-stack" get pop ] unit-test
 
 [ t ] [
     { 1 2 3 4 } dup vector-array length
