@@ -96,6 +96,9 @@ PREDICATE: compound generic ( word -- ? )
     "combination" word-prop [ single-combination ] = ;
 M: generic definer drop \ GENERIC: ;
 
+: single-combination ( obj vtable -- )
+    >r dup type r> dispatch ; inline
+
 : arithmetic-combination ( n n vtable -- )
     #! Note that the numbers remain on the stack, possibly after
     #! being coerced to a maximal type.

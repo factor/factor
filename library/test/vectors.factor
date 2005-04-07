@@ -4,6 +4,7 @@ strings test vectors ;
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ { t f t } length ] unit-test
+[ 4 length ] unit-test-fails
 
 [ -3 { } nth ] unit-test-fails
 [ 3 { } nth ] unit-test-fails
@@ -17,6 +18,8 @@ strings test vectors ;
     "yo" 4 1 <vector> [ set-nth ] keep 4 swap nth
 ] unit-test
 
+[ 1 { } nth ] unit-test-fails
+[ -1 { } set-length ] unit-test-fails
 [ 5 list>vector ] unit-test-fails
 [ { } ] [ [ ] list>vector ] unit-test
 [ { 1 2 } ] [ [ 1 2 ] list>vector ] unit-test
@@ -77,4 +80,11 @@ unit-test
 [ f ] [
     { 1 2 3 4 } dup clone
     swap vector-array swap vector-array eq?
+] unit-test
+
+[ 0 ] [
+    [
+        10 <vector> "x" set
+        "x" get clone length
+    ] with-scope
 ] unit-test

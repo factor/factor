@@ -241,7 +241,7 @@ void box_signed_4(s32 n)
 
 s32 unbox_signed_4(void)
 {
-	return s48_bignum_to_long(to_bignum(dpop()));
+	return to_fixnum(dpop());
 }
 
 void box_unsigned_4(u32 n)
@@ -251,7 +251,7 @@ void box_unsigned_4(u32 n)
 
 u32 unbox_unsigned_4(void)
 {
-	return s48_bignum_to_ulong(to_bignum(dpop()));
+	return to_cell(dpop());
 }
 
 void box_signed_8(s64 n)

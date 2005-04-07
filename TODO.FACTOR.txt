@@ -1,21 +1,23 @@
-- set 'end' of artifacts/assets accurately
 - faster layout
 - faster repaint
-- auto-updating inspector
 - linux/ppc and mac os x ffi
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - add a socket timeout
 - unix ffi i/o
-- make-image: use a list not a vector
 - powerpc has weird callstack residue
 - make-vector and make-string should not need a reverse step
 - console with presentations
-- ui browser
-- method doc strings
+
++ plugin:
+
+- introduce quotation command
+- set 'end' of artifacts/assets accurately
 
 + ui:
 
+- ui browser
+- auto-updating inspector
 - word preview for parsing words
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
@@ -36,9 +38,9 @@
 - struct membres that are not *
 - FFI float types
 
-+ compiler/ffi:
++ compiler:
 
-- linux? bsd?
+- linux? bsd? words
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
@@ -52,8 +54,15 @@
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization
 
++ sequences
+
+- generic each some? all? member? memq? all=? top
+  index? subseq?
+
 + kernel:
 
+- method doc strings
+- make-image: use a list not a vector
 - code walker & exceptions
 - string sub-primitives
 - clean up metaclasses

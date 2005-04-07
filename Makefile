@@ -1,5 +1,5 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -g $(SITE_CFLAGS)
+DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
 DEFAULT_LIBS = -lm
 
 STRIP = strip

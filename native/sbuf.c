@@ -79,7 +79,7 @@ void primitive_set_sbuf_nth(void)
 
 	sbuf = untag_sbuf(dpop());
 	index = to_fixnum(dpop());
-	value = dpop();
+	value = to_fixnum(dpop());
 
 	set_sbuf_nth(sbuf,index,value);
 }

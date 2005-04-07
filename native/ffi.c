@@ -1,5 +1,7 @@
 #include "factor.h"
 
+void foo(int fd) { close(fd); }
+
 void primitive_dlopen(void)
 {
 	DLL* dll;

@@ -34,6 +34,8 @@ USE: test
 
 [ "end" ] [ 14 "Beginning and end" string-tail ] unit-test
 
+[ "" 10 string/ ] unit-test-fails
+
 [ "Beginning" " and end" ] [ "Beginning and end" 9 string/ ] unit-test
 
 [ "Beginning" "and end" ] [ "Beginning and end" 9 string// ] unit-test
@@ -94,3 +96,5 @@ unit-test
 
 [ "05" ] [ "5" 2 "0" pad ] unit-test
 [ "666" ] [ "666" 2 "0" pad ] unit-test
+
+[ 1 "" nth ] unit-test-fails

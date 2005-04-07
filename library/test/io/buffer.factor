@@ -34,5 +34,5 @@ USING: kernel io-internals test ;
 
 [ CHAR: e ] [
     "hello" string>buffer
-    1 over buffer-consume buffer-peek
+    1 over buffer-consume [ buffer-pop ] keep buffer-free
 ] unit-test
