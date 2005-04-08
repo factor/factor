@@ -55,7 +55,7 @@ unit-test
 [ [ ] ] [ 0 { } vector-tail ] unit-test
 [ [ ] ] [ 2 { 1 2 } vector-tail ] unit-test
 [ [ 3 4 ] ] [ 2 { 1 2 3 4 } vector-tail ] unit-test
-[ 2 [ ] vector-tail ] unit-test-fails
+[ 2 3 vector-tail ] unit-test-fails
 
 [ [ 3 ] ] [ 1 { 1 2 3 } vector-tail* ] unit-test
 

@@ -28,6 +28,17 @@ vocabularies get [
     "syntax" set
 ] bind
 
+: set-stack-effect ( [ vocab word effect ] -- )
+    3unlist >r unit search r> dup string? [
+        "stack-effect" set-word-prop
+    ] [
+        "infer-effect" set-word-prop
+    ] ifte ;
+
+: make-primitive ( n [ vocab word effect ] -- n )
+    [ 2unlist create >r 1 + r> over f define ] keep
+    set-stack-effect ;
+
 2 [
     [ "execute" "words"                       " word -- " ]
     [ "call" "kernel"                         [ [ general-list ] [ ] ] ]
@@ -212,10 +223,21 @@ vocabularies get [
     [ "die" "kernel"                          [ [ ] [ ] ] ]
     [ "flush-icache" "assembler"              f ]
 ] [
-    3unlist >r create >r 1 + r> 2dup swap f define r>
-    dup string? [
-        "stack-effect" set-word-prop
-    ] [
-        "infer-effect" set-word-prop
-    ] ifte
+    make-primitive
 ] each drop
+
+! These need a more descriptive comment.
+[
+    [ "drop" "kernel" " x -- " ]
+    [ "dup" "kernel"  " x -- x x " ]
+    [ "swap" "kernel" " x y -- y x " ]
+    [ "over" "kernel" " x y -- x y x " ]
+    [ "pick" "kernel" " x y z -- x y z x " ]
+    [ ">r" "kernel"   " x -- r: x " ]
+    [ "r>" "kernel"   " r: x -- x " ]
+] [
+    set-stack-effect
+] each
+
+FORGET: make-primitive
+FORGET: set-stack-effect

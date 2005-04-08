@@ -57,7 +57,7 @@ C: buffer ( size -- buffer )
 
 : buffer-length ( buffer -- length )
     #! Returns the amount of unconsumed input in the buffer.
-    dup buffer-fill swap buffer-pos - 0 max ;
+    dup buffer-fill swap buffer-pos - ;
 
 : buffer-capacity ( buffer -- int )
     #! Returns the amount of data that may be added to the buffer.

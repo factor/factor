@@ -45,7 +45,6 @@ presentation streams unparser words ;
 : comment. ( comment -- ) comment-style write-attr ;
 
 : infer-effect. ( effect -- )
-    " " write
     [
         "(" ,
         2unlist >r [ " " , unparse , ] each r>

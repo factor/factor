@@ -3,15 +3,20 @@
 IN: io-internals
 USING: errors generic kernel math sequences strings ;
 
-TUPLE: reader line buffer ready? error ;
+TUPLE: port handle buffer error ;
 
-C: reader ( buffer -- reader )
-    [ set-reader-buffer ] keep ;
+C: port ( handle buffer -- port )
+    [ set-delegate ] keep [ set-port-handle ] keep ;
 
-: >reader< ( reader -- line buffer )
-    dup reader-line swap reader-buffer ;
+: buffered-port 8192 <port> ;
+: >port< dup port-handle swap delegate ;
 
-: pending-error ( reader -- ) reader-error throw ;
+TUPLE: reader line ready? ;
+
+C: reader ( handle -- reader )
+    [ >r buffered-port r> set-delegate ] keep ;
+
+: pending-error ( reader -- ) port-error throw ;
 
 : read-line-loop ( line buffer -- ? )
     dup buffer-length 0 = [
@@ -25,7 +30,8 @@ C: reader ( buffer -- reader )
     ] ifte ;
 
 : read-line-step ( reader -- ? )
-    [ >reader< read-line-loop dup ] keep  set-reader-ready? ;
+    [ dup reader-line swap read-line-loop dup ] keep
+    set-reader-ready? ;
 
 : init-reader ( count reader -- ) >r <sbuf> r> set-reader-line ;
 
@@ -46,13 +52,9 @@ C: reader ( buffer -- reader )
 GENERIC: refill* ( reader -- )
 
 : refill ( reader -- )
-    dup reader-buffer buffer-length 0 = [
-        refill*
-    ] [
-        drop
-    ] ifte ;
+    dup buffer-length 0 = [ refill* ] [ drop ] ifte ;
 
-: reader-eof? ( reader -- ? ) reader-buffer buffer-fill 0 = ;
+: reader-eof? ( reader -- ? ) buffer-fill 0 = ;
 
 : read-line-task ( reader -- ? )
     dup refill dup reader-eof? [
@@ -62,7 +64,8 @@ GENERIC: refill* ( reader -- )
     ] ifte ;
 
 : read-count-step ( count reader -- ? )
-    >reader< swapd >r over length - r> 2dup buffer-fill <= [
+    dup reader-line -rot >r over length - r>
+    2dup buffer-fill <= [
         buffer> swap sbuf-append t
     ] [
         buffer>> nip swap sbuf-append f
@@ -95,8 +98,6 @@ GENERIC: refill* ( reader -- )
         "reader not ready" throw
     ] ifte ;
 
-TUPLE: unix-reader fd ;
-
 : file-mode OCT: 0600 ;
 
 : io-error ( n -- ) 0 < [ errno strerror throw ] when ;
@@ -112,12 +113,30 @@ TUPLE: unix-reader fd ;
     tuck dup buffer-end swap buffer-capacity sys-read
     dup 0 >= [ swap n>buffer t ] [ 2drop f ] ifte ;
 
-C: unix-reader ( fd -- reader )
-    [ set-unix-reader-fd ] keep
-    [ 1024 <buffer> <reader> swap set-delegate ] keep ;
+M: reader refill* ( reader -- )
+    >port< read-step drop ;
 
-: >unix-reader< ( reader -- fd buffer )
-    dup unix-reader-fd swap reader-buffer ;
+: write-step ( fd buffer -- ? )
+    tuck dup buffer@ swap buffer-length sys-write
+    dup 0 >= [ buffer-consume t ] [ drop f ] ifte ;
 
-M: unix-reader refill* ( reader -- )
-    >unix-reader< read-step drop ;
+: can-write? ( len writer -- ? )
+    #! If the buffer is empty and the string is too long,
+    #! extend the buffer.
+    dup pending-error
+    dup buffer-fill 0 = >r 2dup buffer-capacity > r> and [
+        buffer-extend t
+    ] [
+        [ buffer-fill + ] keep buffer-capacity <=
+    ] ifte ;
+
+: write-task ( writer -- ? )
+    dup buffer-length 0 = over port-error or [
+        buffer-reset t
+    ] [
+        >port< write-step
+    ] ifte ;
+
+: write-fin ( str writer -- )
+    dup pending-error
+    >r dup string? [ ch>string ] unless r> >buffer ;
