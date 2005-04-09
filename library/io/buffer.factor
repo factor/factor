@@ -15,7 +15,7 @@ TUPLE: buffer size ptr fill pos ;
     "int" "libc" "realloc" [ "ulong" "ulong" ] alien-invoke ;
 
 : imemcpy ( dst src size -- )
-    "void" "libc" "realloc" [ "ulong" "ulong" "ulong" ] alien-invoke ;
+    "void" "libc" "memcpy" [ "ulong" "ulong" "ulong" ] alien-invoke ;
 
 C: buffer ( size -- buffer )
     2dup set-buffer-size
@@ -91,6 +91,11 @@ C: buffer ( size -- buffer )
 : buffer-pop ( buffer -- char )
     [ buffer@ <alien> 0 alien-unsigned-1  1 ] keep
     buffer-consume ;
+
+: buffer-append ( buffer buffer -- )
+    #! Append first buffer to second buffer.
+    2dup buffer-end over buffer-ptr rot buffer-fill imemcpy
+    >r buffer-fill r> n>buffer ;
 
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory

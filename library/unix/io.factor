@@ -3,6 +3,10 @@
 IN: io-internals
 USING: errors generic kernel math sequences strings ;
 
+FORGET: can-read-line?
+FORGET: can-read-count?
+FORGET: can-write?
+
 : file-mode OCT: 0600 ;
 
 : io-error ( n -- ) 0 < [ errno strerror throw ] when ;
@@ -13,10 +17,6 @@ USING: errors generic kernel math sequences strings ;
 : open-write ( path -- fd )
     O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
     dup io-error ;
-
-FORGET: can-read-line?
-FORGET: can-read-count?
-FORGET: can-write?
 
 TUPLE: port handle buffer error ;
 
@@ -155,16 +155,13 @@ C: writer ( fd -- writer )
 : can-copy? ( from -- ? )
     dup eof? [ read-step ] [ drop t ] ifte ;
 
-: copy-from-step ( from to -- )
-    >r dup buffer-ptr swap buffer-fill r> buffer@ -rot imemcpy ;
-
 : copy-from-task ( from to -- ? )
     over can-copy? [
         over eof? [
             2drop t
         ] [
             over buffer-fill over can-write? [
-                dupd copy-from-step 0 swap buffer-reset
+                dupd buffer-append 0 swap buffer-reset
             ] [
                 2drop
             ] ifte f

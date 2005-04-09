@@ -36,3 +36,10 @@ USING: kernel io-internals test ;
     "hello" string>buffer
     1 over buffer-consume [ buffer-pop ] keep buffer-free
 ] unit-test
+
+[ "Hello world" ] [
+    " world" string>buffer
+    "Hello" string>buffer
+    2dup buffer-append
+    [ buffer-contents ] keep buffer-free swap buffer-free
+] unit-test
