@@ -54,6 +54,7 @@ hashtables ;
         "/library/syntax/prettyprint.factor"
         "/library/io/files.factor"
         "/library/cli.factor"
+        "/library/alien/aliens.factor"
     ] pull-in
 
     "delegate" [ "generic" ] search

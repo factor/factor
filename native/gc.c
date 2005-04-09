@@ -79,11 +79,11 @@ INLINE void collect_object(CELL scan)
 	case PORT_TYPE:
 		collect_port((F_PORT*)scan);
 		break;
-	case ALIEN_TYPE:
-		collect_alien((ALIEN*)scan);
-		break;
 	case DLL_TYPE:
 		collect_dll((DLL*)scan);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		collect_displaced_alien((DISPLACED_ALIEN*)scan);
 		break;
 	}
 }

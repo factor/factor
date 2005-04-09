@@ -32,6 +32,9 @@ void relocate_object(CELL relocating)
 	case ALIEN_TYPE:
 		fixup_alien((ALIEN*)relocating);
 		break;
+	case DISPLACED_ALIEN_TYPE:
+		fixup_displaced_alien((DISPLACED_ALIEN*)relocating);
+		break;
 	}
 }
 

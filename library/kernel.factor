@@ -29,7 +29,7 @@ M: object clone ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    19 ;
+    21 ;
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
@@ -41,10 +41,3 @@ M: object clone ;
 : not ( a -- ~a ) f t ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
-
-IN: alien
-
-! See compiler/alien.factor for the rest; this needs to be here
-! since primitive stack effects involve alien inputs/outputs.
-BUILTIN: dll   15 [ 1 "dll-path" f ] ;
-BUILTIN: alien 16 ;

@@ -60,7 +60,7 @@ CELL hash(CELL hash, CELL key)
 			return F;
 		}
 
-		a = untag_array(array);
+		a = untag_array_fast(array);
 
 		for(i = 0; i < array_capacity(a); i++)
 		{

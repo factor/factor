@@ -29,7 +29,7 @@ IN: win32-api
 USE: alien
 USE: kernel
 
-: <wsadata> HEX: 190 <local-alien> ;
+: <wsadata> HEX: 190 <byte-array> ;
 
 : AF_INET 2 ;
 : SOCK_STREAM 1 ;

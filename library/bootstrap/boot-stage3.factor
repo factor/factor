@@ -14,6 +14,9 @@ unparser ;
 ] when
 
 t [
+    "/library/alien/enums.factor"
+    "/library/alien/structs.factor"
+
     "/library/math/constants.factor"
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"

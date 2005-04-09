@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic hashtables
-inference interpreter kernel lists math namespaces parser
-prettyprint sequences stdio strings unparser words ;
+USING: assembler errors generic inference kernel lists math
+namespaces sequences stdio strings words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -24,69 +23,10 @@ prettyprint sequences stdio strings unparser words ;
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
 
-: null? ( alien -- ? ) dup [ alien-address 0 = ] when ;
-
-: null>f ( alien -- alien/f )
-    dup alien-address 0 = [ drop f ] when ;
-
-M: alien hashcode ( obj -- n )
-    alien-address >fixnum ;
-
-M: alien = ( obj obj -- ? )
-    over alien? [
-        over local-alien? over local-alien? or [
-            eq?
-        ] [
-            alien-address swap alien-address =
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: ALIEN: scan <alien> swons ; parsing
-
-: LOCAL-ALIEN: "Local aliens are not readable" throw ; parsing
-
-M: alien prettyprint* ( alien -- str )
-    dup local-alien? [
-        \ LOCAL-ALIEN:
-    ] [
-        \ ALIEN:
-    ] ifte word-bl alien-address unparse write ;
-
-M: dll unparse ( obj -- str )
-    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;
-
-: DLL" skip-blank parse-string dlopen swons ; parsing
-
-: library ( name -- object )
-    dup [ "libraries" get hash ] when ;
-
-: load-dll ( name -- dll )
-    #! Higher level wrapper around dlopen primitive.
-    library dup [
-        [
-            "dll" get dup [
-                drop "name" get dlopen dup "dll" set
-            ] unless
-        ] bind
-    ] when ;
-
-: add-library ( library name abi -- )
-    "libraries" get [
-        <namespace> [
-          "abi" set
-          "name" set
-        ] extend put
-    ] bind ;
-    
 SYMBOL: #cleanup ( unwind stack by parameter )
 
 SYMBOL: #unbox ( move top of datastack to C stack )
 SYMBOL: #box ( move EAX to datastack )
-
-: library-abi ( library -- abi )
-    library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
 
 SYMBOL: #alien-invoke
 SYMBOL: #alien-global

@@ -144,7 +144,8 @@ typedef unsigned char BYTE;
 #include "stack.h"
 #include "compiler.h"
 #include "relocate.h"
-#include "ffi.h"
+#include "alien.h"
+#include "dll.h"
 #include "debug.h"
 
 #endif /* __FACTOR_H__ */

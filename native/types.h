@@ -36,8 +36,10 @@ CELL T;
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
 #define TUPLE_TYPE 18
+#define BYTE_ARRAY_TYPE 19
+#define DISPLACED_ALIEN_TYPE 20
 
-#define TYPE_COUNT 19
+#define TYPE_COUNT 21
 
 INLINE bool headerp(CELL cell)
 {

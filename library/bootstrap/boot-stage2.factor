@@ -38,8 +38,9 @@ t [
     "/library/compiler/simplifier.factor"
     "/library/compiler/generator.factor"
     "/library/compiler/compiler.factor"
-    "/library/compiler/alien-types.factor"
-    "/library/compiler/alien.factor"
+
+    "/library/alien/c-types.factor"
+    "/library/alien/compiler.factor"
 ] pull-in
 
 cpu "x86" = [

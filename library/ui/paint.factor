@@ -9,7 +9,7 @@ stdio strings ;
 SYMBOL: clip
 
 : intersect* ( gadget rect quot -- t1 t2 )
-    call >r >r max r> r> min 2dup > [ drop dup ] when ;
+    call >r >r max r> r> min 2dup > [ drop dup ] when ; inline
 
 : intersect-x ( gadget rect -- x1 x2 )
     [

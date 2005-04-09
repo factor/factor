@@ -6,10 +6,8 @@ USE: inference
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> local-alien? ] unit-test
-[ f ] [ 0 <alien> 1024 <local-alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
 [ f ] [ "hello" 1024 <alien> = ] unit-test
-[ t ] [ 1024 <local-alien> local-alien? ] unit-test
 
 ! : alien-inference-1
 !     "void" "foobar" "boo" [ "short" "short" ] alien-invoke ;

@@ -20,7 +20,8 @@ OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/sbuf.o native/stack.o \
 	native/string.o native/types.o native/vector.o \
 	native/word.o native/compiler.o \
-	native/ffi.o native/boolean.o \
+	native/alien.o native/dll.o \
+	native/boolean.o \
 	native/debug.o \
 	native/hashtable.o \
 	native/icache.o

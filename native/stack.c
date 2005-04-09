@@ -75,7 +75,7 @@ F_VECTOR* stack_to_vector(CELL bottom, CELL top)
 {
 	CELL depth = (top - bottom + CELLS) / CELLS;
 	F_VECTOR* v = vector(depth);
-	F_ARRAY* a = untag_array(v->array);
+	F_ARRAY* a = untag_array_fast(v->array);
 	memcpy(a + 1,(void*)bottom,depth * CELLS);
 	v->top = tag_fixnum(depth);
 	return v;
@@ -98,7 +98,7 @@ CELL vector_to_stack(F_VECTOR* vector, CELL bottom)
 {
 	CELL start = bottom;
 	CELL len = untag_fixnum_fast(vector->top) * CELLS;
-	memcpy((void*)start,untag_array(vector->array) + 1,len);
+	memcpy((void*)start,untag_array_fast(vector->array) + 1,len);
 	return start + len - CELLS;
 }
 

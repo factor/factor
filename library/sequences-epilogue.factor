@@ -58,6 +58,15 @@ M: sequence = ( obj seq -- ? )
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
+GENERIC: (tree-each) ( quot obj -- ) inline
+M: object (tree-each) swap call ;
+M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
+M: f (tree-each) swap call ;
+M: sequence (tree-each) [ swap call ] seq-each-with ;
+: tree-each swap (tree-each) ; inline
+: tree-each-with ( obj vector quot -- )
+    swap [ with ] tree-each 2drop ; inline
+
 IN: kernel
 
 : depth ( -- n )

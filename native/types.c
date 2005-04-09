@@ -52,8 +52,9 @@ CELL untagged_object_size(CELL pointer)
 		size = CELLS * 2;
 		break;
 	case ARRAY_TYPE:
-	case BIGNUM_TYPE:
 	case TUPLE_TYPE:
+	case BIGNUM_TYPE:
+	case BYTE_ARRAY_TYPE:
 		size = align8(sizeof(F_ARRAY) +
 			array_capacity((F_ARRAY*)(pointer)) * CELLS);
 		break;
@@ -80,6 +81,9 @@ CELL untagged_object_size(CELL pointer)
 		break;
 	case ALIEN_TYPE:
 		size = sizeof(ALIEN);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		size = sizeof(DISPLACED_ALIEN);
 		break;
 	default:
 		critical_error("Cannot determine size",pointer);

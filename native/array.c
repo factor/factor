@@ -32,6 +32,12 @@ void primitive_tuple(void)
 	dpush(tag_object(array(TUPLE_TYPE,to_fixnum(dpop()),F)));
 }
 
+void primitive_byte_array(void)
+{
+	maybe_garbage_collection();
+	dpush(tag_object(array(BYTE_ARRAY_TYPE,to_fixnum(dpop()),0)));
+}
+
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
@@ -50,7 +56,7 @@ void primitive_grow_array(void)
 {
 	F_ARRAY* array; CELL capacity;
 	maybe_garbage_collection();
-	array = untag_array(dpop());
+	array = untag_array_fast(dpop());
 	capacity = to_fixnum(dpop());
 	dpush(tag_object(grow_array(array,capacity,F)));
 }
