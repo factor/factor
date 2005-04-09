@@ -3,20 +3,37 @@
 IN: io-internals
 USING: errors generic kernel math sequences strings ;
 
+: file-mode OCT: 0600 ;
+
+: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
+
+: open-read ( path -- fd )
+    O_RDONLY file-mode sys-open dup io-error ;
+
+: open-write ( path -- fd )
+    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
+    dup io-error ;
+
+FORGET: can-read-line?
+FORGET: can-read-count?
+FORGET: can-write?
+
 TUPLE: port handle buffer error ;
 
 C: port ( handle buffer -- port )
-    [ set-delegate ] keep [ set-port-handle ] keep ;
+    [ >r <buffer> r> set-delegate ] keep
+    [ set-port-handle ] keep ;
 
 : buffered-port 8192 <port> ;
+
 : >port< dup port-handle swap delegate ;
+
+: pending-error ( reader -- ) port-error throw ;
 
 TUPLE: reader line ready? ;
 
 C: reader ( handle -- reader )
     [ >r buffered-port r> set-delegate ] keep ;
-
-: pending-error ( reader -- ) port-error throw ;
 
 : read-line-loop ( line buffer -- ? )
     dup buffer-length 0 = [
@@ -49,12 +66,19 @@ C: reader ( handle -- reader )
         drop
     ] ifte  t swap set-reader-ready? ;
 
-GENERIC: refill* ( reader -- )
+: read-step ( port -- ? )
+    >port<
+    tuck dup buffer-end swap buffer-capacity sys-read
+    dup 0 >= [ swap n>buffer t ] [ 2drop f ] ifte ;
 
 : refill ( reader -- )
-    dup buffer-length 0 = [ refill* ] [ drop ] ifte ;
+    dup buffer-length 0 = [
+        read-step drop
+    ] [
+        drop
+    ] ifte ;
 
-: reader-eof? ( reader -- ? ) buffer-fill 0 = ;
+: eof? ( buffer -- ? ) buffer-fill 0 = ;
 
 : read-line-task ( reader -- ? )
     dup refill dup reader-eof? [
@@ -98,33 +122,20 @@ GENERIC: refill* ( reader -- )
         "reader not ready" throw
     ] ifte ;
 
-: file-mode OCT: 0600 ;
+TUPLE: writer ;
 
-: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
-
-: open-read ( path -- fd )
-    O_RDONLY file-mode sys-open dup io-error ;
-
-: open-write ( path -- fd )
-    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
-    dup io-error ;
-
-: read-step ( fd buffer -- ? )
-    tuck dup buffer-end swap buffer-capacity sys-read
-    dup 0 >= [ swap n>buffer t ] [ 2drop f ] ifte ;
-
-M: reader refill* ( reader -- )
-    >port< read-step drop ;
+C: writer ( fd -- writer )
+    [ >r buffered-port r> set-delegate ] keep ;
 
 : write-step ( fd buffer -- ? )
     tuck dup buffer@ swap buffer-length sys-write
-    dup 0 >= [ buffer-consume t ] [ drop f ] ifte ;
+    dup 0 >= [ swap buffer-consume t ] [ 2drop f ] ifte ;
 
 : can-write? ( len writer -- ? )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
     dup pending-error
-    dup buffer-fill 0 = >r 2dup buffer-capacity > r> and [
+    dup eof? >r 2dup buffer-capacity > r> and [
         buffer-extend t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=
@@ -132,7 +143,7 @@ M: reader refill* ( reader -- )
 
 : write-task ( writer -- ? )
     dup buffer-length 0 = over port-error or [
-        buffer-reset t
+        0 swap buffer-reset t
     ] [
         >port< write-step
     ] ifte ;
@@ -140,3 +151,24 @@ M: reader refill* ( reader -- )
 : write-fin ( str writer -- )
     dup pending-error
     >r dup string? [ ch>string ] unless r> >buffer ;
+
+: can-copy? ( from -- ? )
+    dup eof? [ read-step ] [ drop t ] ifte ;
+
+: copy-from-step ( from to -- )
+    >r dup buffer-ptr swap buffer-fill r> buffer@ -rot imemcpy ;
+
+: copy-from-task ( from to -- ? )
+    over can-copy? [
+        over eof? [
+            2drop t
+        ] [
+            over buffer-fill over can-write? [
+                dupd copy-from-step 0 swap buffer-reset
+            ] [
+                2drop
+            ] ifte f
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;

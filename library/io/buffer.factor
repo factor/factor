@@ -6,13 +6,16 @@ USING: alien errors kernel kernel-internals math strings ;
 TUPLE: buffer size ptr fill pos ;
 
 : imalloc ( size -- address )
-    "int" "libc" "malloc" [ "int" ] alien-invoke ;
+    "int" "libc" "malloc" [ "ulong" ] alien-invoke ;
 
 : ifree ( address -- )
-    "void" "libc" "free" [ "int" ] alien-invoke ;
+    "void" "libc" "free" [ "ulong" ] alien-invoke ;
 
 : irealloc ( address size -- address )
-    "int" "libc" "realloc" [ "int" "int" ] alien-invoke ;
+    "int" "libc" "realloc" [ "ulong" "ulong" ] alien-invoke ;
+
+: imemcpy ( dst src size -- )
+    "void" "libc" "realloc" [ "ulong" "ulong" "ulong" ] alien-invoke ;
 
 C: buffer ( size -- buffer )
     2dup set-buffer-size

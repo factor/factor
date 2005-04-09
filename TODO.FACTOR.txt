@@ -70,7 +70,6 @@
 - condition system with restarts
 - nicer way to combine two paths
 - vectors: ensure its ok with bignum indices
-- cat, reverse-cat primitives
 - code gc
 - generational gc
 - doc comments of generics
@@ -97,4 +96,3 @@
 
 - virtual hosts
 - keep alive
-
