@@ -100,3 +100,6 @@ M: word unparse ( obj -- str ) word-name dup "#<unnamed>" ? ;
 
 M: t unparse drop "t" ;
 M: f unparse drop "f" ;
+
+M: dll unparse ( obj -- str )
+    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;

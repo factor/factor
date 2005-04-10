@@ -1,13 +1,13 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic kernel lists math namespaces stdio strings
-presentation streams unparser words ;
+USING: generic hashtables kernel lists math namespaces
+presentation stdio streams strings unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
     [
-        [[ "Words"   "words."        ]]
+        [[ "Words"   "words ."       ]]
         [[ "Use"     "\"use\" cons@" ]]
         [[ "In"      "\"in\" set"    ]]
     ] ;
@@ -83,27 +83,21 @@ M: compound (see) ( word -- )
     [ word-def prettyprint-elements \ ; word. ] keep
     prettyprint-plist terpri drop ;
 
-: prettyprint-M: ( indent -- indent )
-    \ M: word-bl tab-size get + ;
+: prettyprint-M: ( -- indent )
+    \ M: word-bl tab-size get ;
 
 : prettyprint-; \ ; word. terpri ;
 
-: see-method ( indent word class method -- indent )
-    >r >r >r prettyprint-M:
-    r> r> word-bl
-    word-bl
-    dup prettyprint-newline
-    r> prettyprint-elements
-    prettyprint-; tab-size get - ;
+: method. ( word [[ class method ]] -- )
+    uncons >r >r >r prettyprint-M: r> r> word-bl word-bl
+    dup prettyprint-newline r> prettyprint-elements
+    prettyprint-; drop ;
 
-: see-generic ( word -- )
-    0 swap dup methods [
-        over >r uncons see-method r>
-    ] each 2drop ;
+: generic. ( word -- ) dup methods [ method. ] each-with ;
 
-M: generic (see) ( word -- ) see-generic ;
+M: generic (see) ( word -- ) generic. ;
 
-M: 2generic (see) ( word -- ) see-generic ;
+M: 2generic (see) ( word -- ) generic. ;
 
 M: word (see) drop ;
 
@@ -146,3 +140,11 @@ M: word class. drop ;
 : see ( word -- )
     dup prettyprint-IN: dup definer.
     dup stack-effect. terpri dup (see) class. ;
+
+: methods. ( class -- )
+    #! List all methods implemented for this class.
+    dup class.
+    dup implementors [
+        dup prettyprint-IN:
+        [ "methods" word-prop hash* ] keep swap method.
+    ] each-with ;

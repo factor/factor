@@ -41,6 +41,10 @@ M: word allot-count ( w -- n ) 7 integer-slot ;
 GENERIC: set-allot-count
 M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
 
+: word-sort ( list -- list )
+    #! Sort a list of words by name.
+    [ swap word-name swap word-name string> ] sort ;
+
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.
 SYMBOL: crossref
@@ -72,9 +76,13 @@ global [ <namespace> crossref set ] bind
     dup word-def [ (remove-crossref) ] tree-each-with ;
 
 : usages ( word -- deps )
-    #! The transitive closure over the relation specified in
-    #! the crossref hash.
-    crossref get closure  ;
+    #! List all usages of a word. This is a transitive closure,
+    #! so indirect usages are reported.
+    crossref get closure word-sort ;
+
+: usage ( word -- list )
+    #! List all direct usages of a word.
+    crossref get hash dup [ hash-keys ] when word-sort ;
 
 GENERIC: (uncrossref) ( word -- )
 M: word (uncrossref) drop ;

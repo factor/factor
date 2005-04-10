@@ -278,7 +278,7 @@ M: hashtable ' ( hashtable -- pointer )
     dup vocabularies,
     <namespace> [
         vocabularies set
-        classes [ ] change
+        typemap [ ] change
         builtins [ ] change
     ] extend '
     global-offset fixup ;

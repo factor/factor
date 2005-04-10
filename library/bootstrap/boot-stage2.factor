@@ -18,6 +18,9 @@ parse-command-line
     ] ifte ;
 
 t [
+    "/library/syntax/unparser.factor"
+    "/library/syntax/prettyprint.factor"
+
     "/library/tools/debugger.factor"
     "/library/tools/gensym.factor"
     "/library/tools/interpreter.factor"

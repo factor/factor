@@ -15,19 +15,21 @@ SYMBOL: vocabularies
     #! Get a vocabulary.
     vocabularies get hash ;
 
-: word-sort ( list -- list )
-    #! Sort a list of words by name.
-    [ swap word-name swap word-name string> ] sort ;
-
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
     vocab dup [ hash-values [ ] subset word-sort ] when ;
 
+: all-words ( -- list )
+    [ vocabs [ words append, ] each ] make-list ;
+
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.
-    vocabs [ words [ swap dup >r call r> ] each ] each drop ;
-    inline
+    all-words swap each ; inline
+
+: word-subset ( pred -- list | pred: word -- ? )
+    #! A list of words matching the predicate.
+    all-words swap subset ; inline
 
 : recrossref ( -- )
     #! Update word cross referencing information.

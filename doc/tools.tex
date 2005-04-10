@@ -172,10 +172,10 @@ different numeric bases. The \texttt{.b} word prints an integer in binary, \text
 
 Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
 
-Entering \texttt{vocabs.}~in the listener produces a list of all existing vocabularies:
+Entering \texttt{vocabs .}~in the listener produces a list of all existing vocabularies:
 
 \begin{alltt}
-\textbf{ok} vocabs.
+\textbf{ok} vocabs .
 \textbf{[ "alien" "ansi" "assembler" "browser-responder"
 "command-line" "compiler" "cont-responder" "errors"
 "file-responder" "files" "gadgets" "generic"
@@ -190,10 +190,10 @@ Entering \texttt{vocabs.}~in the listener produces a list of all existing vocabu
 "threads" "unparser" "url-encoding" "vectors" "words" ]}
 \end{alltt}
 
-As you can see, there are a lot of vocabularies! Now, you can use \texttt{words.}~to list the words inside a given vocabulary:
+As you can see, there are a lot of vocabularies! Now, you can use \texttt{words .}~to list the words inside a given vocabulary:
 
 \begin{alltt}
-\textbf{ok} "namespaces" words.
+\textbf{ok} "namespaces" words .
 \textbf{[ (get) , <namespace> >n append, bind change cons@
 dec extend get global inc init-namespaces list-buffer
 literal, make-list make-rlist make-rstring make-string
@@ -237,13 +237,81 @@ vector-map}
 
 From the above output, you can see that \texttt{map} is for lists, \texttt{string-map} is for strings, and \texttt{vector-map} is for vectors.
 
-The \texttt{usages.} word finds all words that refer to a given word. This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it.
+The \texttt{usage} word finds all words that refer to a given word and pushes a list on the stack. This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it. Usually you print the
+return value of \texttt{usage} using \texttt{.}:
 
 \begin{alltt}
-\textbf{ok} \ttbs string-map usages.
+\textbf{ok} \ttbs string-map usage .
 \textbf{schars>entities
 filter-null
 url-encode}
+\end{alltt}
+
+Another useful word is \texttt{usages}. Unlike \texttt{usage}, it finds all usages, even
+indirect ones -- so if a word refers to another word that refers to the given word,
+both words will be in the output list.
+
+\subsection{Exploring classes}
+
+Factor supports object-oriented programming via generic words. Generic words are called
+like ordinary words, however they can have multiple definitions, one per class, and
+these definitions do not have to appear in the same source file. Such a definition is
+termed a \emph{method}, and the method is said to \emph{specialize} on a certain
+class. A class in the most
+general sense is just a set of objects. You can output a list of classes in the system
+with \texttt{classes .}:
+
+\begin{alltt}
+\textbf{ok} classes.
+\textbf{[ alien alien-error byte-array displaced-alien
+dll ansi-stream disp-only displaced indirect operand
+register absolute absolute-16/16 relative relative-bitfld
+item kernel-error no-method border checkbox dialog editor
+ellipse etched-rect frame gadget hand hollow-ellipse
+hollow-rect label line menu pane pile plain-ellipse
+plain-rect rectangle roll-rect scroller shelf slider
+stack tile viewport world 2generic arrayed builtin
+complement generic null object predicate tuple
+tuple-class union hashtable html-stream class-tie
+computed inference-error inference-warning literal
+literal-tie value buffer port jedit-stream boolean
+general-t array cons general-list list bignum complex
+fixnum float integer number ratio rational real
+parse-error potential-float potential-ratio
+button-down-event button-up-event joy-axis-event
+joy-ball-event joy-button-down-event joy-button-up-event
+joy-hat-event key-down-event key-up-event motion-event
+quit-event resize-event user-event sequence stdio-stream
+client-stream fd-stream null-stream server string-output
+wrapper-stream LETTER blank digit letter printable sbuf
+string text POSTPONE: f POSTPONE: t vector compound
+primitive symbol undefined word ]}
+\end{alltt}
+
+If you \texttt{see} a generic word, all methods defined on the generic word are shown.
+Alternatively, you can use \texttt{methods.} to print all methods specializing on a
+given class:
+
+\begin{alltt}
+\textbf{ok} \ttbs list methods.
+\textbf{PREDICATE: general-list list
+    dup [
+        last* cdr
+    ] when not ;
+IN: gadgets
+M: list custom-sheet
+    [
+        length count
+    ] keep zip alist>sheet "Elements:" <titled> ;
+IN: prettyprint
+M: list prettyprint*
+    [
+        [
+            POSTPONE: [
+        ] car swap [
+            POSTPONE: ]
+        ] car prettyprint-sequence
+    ] check-recursion ;}
 \end{alltt}
 
 \subsection{Browsing via the HTTP server}

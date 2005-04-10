@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: errors generic hashtables kernel lists math namespaces
-parser presentation sequences stdio streams strings unparser
-vectors words ;
+USING: alien errors generic hashtables kernel lists math
+namespaces parser presentation sequences stdio streams strings
+unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -25,11 +25,12 @@ M: object prettyprint* ( indent obj -- indent )
 
 : word-actions ( -- list )
     [
-        [[ "See"     "see"     ]]
-        [[ "Push"    ""        ]]
-        [[ "Execute" "execute" ]]
-        [[ "jEdit"   "jedit"   ]]
-        [[ "Usages"  "usages." ]]
+        [[ "See"        "see"          ]]
+        [[ "Push"       ""             ]]
+        [[ "Execute"    "execute"      ]]
+        [[ "jEdit"      "jedit"        ]]
+        [[ "Usages"     "usages ."     ]]
+        [[ "Implements" "implements ." ]]
     ] ;
 
 : browser-attrs ( word -- style )
@@ -130,6 +131,9 @@ M: tuple prettyprint* ( indent tuple -- indent )
     [
         \ << swap >list \ >> prettyprint-sequence
     ] check-recursion ;
+
+M: alien prettyprint* ( alien -- str )
+    \ ALIEN: word-bl alien-address unparse write ;
 
 : prettyprint ( obj -- )
     [

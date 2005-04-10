@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: hashtables kernel lists math namespaces parser
-prettyprint stdio unparser ;
+USING: hashtables kernel lists math namespaces parser stdio ;
 
 BUILTIN: dll   15 [ 1 "dll-path" f ] ;
 BUILTIN: alien 16 ;
@@ -29,12 +28,6 @@ M: alien = ( obj obj -- ? )
     ] ifte ;
 
 : ALIEN: scan <alien> swons ; parsing
-
-M: alien prettyprint* ( alien -- str )
-    \ ALIEN: word-bl alien-address unparse write ;
-
-M: dll unparse ( obj -- str )
-    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;
 
 : DLL" skip-blank parse-string dlopen swons ; parsing
 

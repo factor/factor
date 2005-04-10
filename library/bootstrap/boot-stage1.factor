@@ -43,7 +43,7 @@ hashtables ;
         "/library/io/stdio.factor"
         "/library/io/io-internals.factor"
         "/library/io/stream-impl.factor"
-        "/library/syntax/unparser.factor"
+        "/library/io/files.factor"
         "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"
         "/library/syntax/parse-errors.factor"
@@ -51,15 +51,13 @@ hashtables ;
         "/library/syntax/parse-stream.factor"
         "/library/syntax/generic.factor"
         "/library/syntax/parse-syntax.factor"
-        "/library/syntax/prettyprint.factor"
-        "/library/io/files.factor"
-        "/library/cli.factor"
         "/library/alien/aliens.factor"
+        "/library/cli.factor"
     ] pull-in
 
     "delegate" [ "generic" ] search
     "object" [ "generic" ] search
-    "classes" [ "generic" ] search
+    "typemap" [ "generic" ] search
     "builtins" [ "generic" ] search
 
     vocabularies get [ "generic" off ] bind

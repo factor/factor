@@ -25,18 +25,18 @@ t [
     "/library/in-thread.factor"
     "/library/random.factor"
 
+    "/library/io/directories.factor"
     "/library/io/buffer.factor"
     "/library/io/network.factor"
     "/library/io/logging.factor"
     "/library/io/stdio-binary.factor"
-    
-    "/library/syntax/see.factor"
     
     "/library/eval-catch.factor"
     "/library/tools/memory.factor"
     "/library/tools/listener.factor"
     "/library/io/ansi.factor"
     "/library/tools/word-tools.factor"
+    "/library/syntax/see.factor"
     "/library/test/test.factor"
     "/library/inference/test.factor"
     "/library/tools/telnetd.factor"

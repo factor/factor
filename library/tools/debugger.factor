@@ -93,6 +93,20 @@ M: no-method error. ( error -- )
         no-method-object unparse ,
     ] make-string print ;
 
+: parse-dump ( error -- )
+    [
+        "Parsing " ,
+        dup parse-error-file [ "<interactive>" ] unless* , ":" ,
+        dup parse-error-line [ 1 ] unless* unparse ,
+    ] make-string print
+    
+    dup parse-error-text dup string? [ print ] [ drop ] ifte
+    
+    [ parse-error-col " " fill , "^" , ] make-string print ;
+
+M: parse-error error. ( error -- )
+    dup parse-dump  delegate error. ;
+
 M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;

@@ -173,7 +173,7 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		{
 			if(!closed)
 			{
-				Cons moreVocabs = (Cons)parseObject(eval("vocabs.")).car;
+				Cons moreVocabs = (Cons)parseObject(eval("vocabs .")).car;
 				while(moreVocabs != null)
 				{
 					String vocab = (String)moreVocabs.car;

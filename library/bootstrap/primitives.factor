@@ -7,25 +7,23 @@ io-internals kernel kernel-internals lists math math-internals
 parser profiler random strings unparser vectors words
 hashtables ;
 
+! This symbol needs the same hashcode in the target as in the
+! host.
+vocabularies
+
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab clone
 "generic" vocab clone
 
-! These symbol needs the same hashcode in the target as in the
-! host.
-vocabularies
-classes
-
 <namespace> vocabularies set
-<namespace> classes set
+<namespace> typemap set
 num-types <vector> builtins set
 <namespace> crossref set
 
 vocabularies get [
-    reveal
-    reveal
     "generic" set
     "syntax" set
+    reveal
 ] bind
 
 : set-stack-effect ( [ vocab word effect ] -- )

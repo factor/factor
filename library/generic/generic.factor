@@ -109,7 +109,7 @@ PREDICATE: compound 2generic ( word -- ? )
 M: 2generic definer drop \ 2GENERIC: ;
 
 ! Maps lists of builtin type numbers to class objects.
-SYMBOL: classes
+SYMBOL: typemap
 
 SYMBOL: object
 
@@ -117,7 +117,7 @@ SYMBOL: object
     append prune ;
 
 : lookup-union ( typelist -- class )
-    [ > ] sort classes get hash [ object ] unless* ;
+    [ > ] sort typemap get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -141,6 +141,6 @@ SYMBOL: object
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
     dup builtin-supertypes [ > ] sort
-    classes get set-hash ;
+    typemap get set-hash ;
 
-classes get [ <namespace> classes set ] unless
+typemap get [ <namespace> typemap set ] unless

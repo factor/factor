@@ -1,5 +1,5 @@
 IN: temporary
-USING: parser prettyprint sequences stdio ;
+USING: parser prettyprint sequences stdio unparser ;
 
 USE: hashtables
 USE: namespaces
@@ -142,3 +142,6 @@ M: cons testing 2 ;
 M: f testing 3 ;
 M: sequence testing 4 ;
 [ [ 1 2 ] 2 ] [ [ 1 2 ] testing ] unit-test
+
+! Bootstrap hashing
+[ f ] [ \ f \ unparse "methods" word-prop hash not ] unit-test

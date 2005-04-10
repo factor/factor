@@ -5,17 +5,6 @@ USING: files generic inspector lists kernel namespaces
 prettyprint stdio streams strings unparser math hashtables
 parser ;
 
-: usages. ( word -- )
-    #! List all usages of a word.
-    usages word-sort [.] ;
-
-: usage ( word -- list )
-    crossref get hash dup [ hash-keys ] when ;
-
-: usage. ( word -- )
-    #! List all direct usages of a word.
-    usage word-sort [.] ;
-
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
@@ -38,12 +27,6 @@ parser ;
     #! List all words that contain a string.
     vocabs [ vocab-apropos. ] each-with ;
 
-: vocabs. ( -- )
-    vocabs . ;
-
-: words. ( vocab -- )
-    words . ;
-
 : word-file ( word -- file )
     "file" word-prop dup [
         "resource:/" ?string-head [
@@ -54,3 +37,13 @@ parser ;
 : reload ( word -- )
     #! Reload the source file the word originated from.
     word-file run-file ;
+
+: implementors ( class -- list )
+    #! Find a list of generics that implement a method
+    #! specializing on this class.
+    [
+        "methods" word-prop [ dupd hash ] [ f ] ifte*
+    ] word-subset word-sort nip ;
+
+: classes ( -- list )
+    [ metaclass ] word-subset ;
