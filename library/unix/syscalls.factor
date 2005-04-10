@@ -90,3 +90,20 @@ END-STRUCT
 
 : sys-recv ( fd buf nbytes flags -- )
     "ssize_t" "libc" "read" [ "int" "ulong" "size_t" "int" ] alien-invoke ;
+
+BEGIN-STRUCT: pollfd
+    FIELD: int fd
+    FIELD: short events
+    FIELD: short revents
+END-STRUCT
+
+: POLLIN     HEX: 0001 ; ! any readable data available
+: POLLPRI    HEX: 0002 ; ! OOB/Urgent readable data
+: POLLOUT    HEX: 0004 ; ! file descriptor is writeable
+: POLLRDNORM HEX: 0040 ; ! non-OOB/URG data available
+: POLLWRNORM POLLOUT   ; ! no write type differentiation
+: POLLRDBAND HEX: 0080 ; ! OOB/Urgent readable data
+: POLLWRBAND HEX: 0100 ; ! OOB/Urgent data can be written
+
+: sys-poll ( pollfds nfds timeout -- n )
+    "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;

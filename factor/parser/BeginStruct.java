@@ -48,6 +48,8 @@ public class BeginStruct extends FactorParsingDefinition
 		}
 		String structName = (String)next;
 		reader.intern("<" + structName + ">",true);
+		reader.intern("<" + structName + "-array>",true);
+		reader.intern(structName + "-nth",true);
 		reader.pushState(word,null);
 	}
 }

@@ -74,10 +74,10 @@ BEGIN-STRUCT: keyboard-event
     FIELD: ushort unicode
 END-STRUCT
 
-PREDICATE: alien key-down-event
+PREDICATE: byte-array key-down-event
     keyboard-event-type SDL_KEYDOWN = ;
 
-PREDICATE: alien key-up-event
+PREDICATE: byte-array key-up-event
     keyboard-event-type SDL_KEYUP = ;
 
 BEGIN-STRUCT: motion-event
@@ -90,7 +90,7 @@ BEGIN-STRUCT: motion-event
     FIELD: short yrel  ! The relative motion in the Y direction 
 END-STRUCT
 
-PREDICATE: alien motion-event
+PREDICATE: byte-array motion-event
     motion-event-type SDL_MOUSEMOTION = ;
 
 BEGIN-STRUCT: button-event
@@ -102,10 +102,10 @@ BEGIN-STRUCT: button-event
     FIELD: ushort y      ! The X/Y coordinates of the mouse at press time
 END-STRUCT
 
-PREDICATE: alien button-down-event
+PREDICATE: byte-array button-down-event
     button-event-type SDL_MOUSEBUTTONDOWN = ;
 
-PREDICATE: alien button-up-event
+PREDICATE: byte-array button-up-event
     button-event-type SDL_MOUSEBUTTONUP = ;
 
 BEGIN-STRUCT: joy-axis-event
@@ -115,7 +115,7 @@ BEGIN-STRUCT: joy-axis-event
     FIELD: short value  ! The axis value
 END-STRUCT
 
-PREDICATE: alien joy-axis-event
+PREDICATE: byte-array joy-axis-event
     joy-axis-event-type SDL_JOYAXISMOTION = ;
 
 BEGIN-STRUCT: joy-ball-event
@@ -126,7 +126,7 @@ BEGIN-STRUCT: joy-ball-event
     FIELD: short yrel  ! The relative motion in the Y direction
 END-STRUCT
 
-PREDICATE: alien joy-ball-event
+PREDICATE: byte-array joy-ball-event
     joy-ball-event-type SDL_JOYBALLMOTION = ;
 
 BEGIN-STRUCT: joy-hat-event
@@ -140,7 +140,7 @@ BEGIN-STRUCT: joy-hat-event
         ! Note that zero means the POV is centered.
 END-STRUCT
 
-PREDICATE: alien joy-hat-event
+PREDICATE: byte-array joy-hat-event
     joy-hat-event-type SDL_JOYHATMOTION = ;
 
 BEGIN-STRUCT: joy-button-event
@@ -150,10 +150,10 @@ BEGIN-STRUCT: joy-button-event
 	FIELD: uchar state  ! SDL_PRESSED or SDL_RELEASED
 END-STRUCT
 
-PREDICATE: alien joy-button-down-event
+PREDICATE: byte-array joy-button-down-event
     joy-button-event-type SDL_JOYBUTTONDOWN = ;
 
-PREDICATE: alien joy-button-up-event
+PREDICATE: byte-array joy-button-up-event
     joy-button-event-type SDL_JOYBUTTONUP = ;
 
 BEGIN-STRUCT: resize-event
@@ -166,14 +166,14 @@ BEGIN-STRUCT: expose-event
     FIELD: uchar type ! SDL_VIDEOEXPOSE
 END-STRUCT
 
-PREDICATE: alien resize-event
+PREDICATE: byte-array resize-event
     resize-event-type SDL_VIDEORESIZE = ;
 
 BEGIN-STRUCT: quit-event
     FIELD: uchar type ! SDL_QUIT
 END-STRUCT
 
-PREDICATE: alien quit-event
+PREDICATE: byte-array quit-event
     quit-event-type SDL_QUIT = ;
 
 BEGIN-STRUCT: user-event
@@ -183,7 +183,7 @@ BEGIN-STRUCT: user-event
     FIELD: void* data2
 END-STRUCT
 
-PREDICATE: alien user-event
+PREDICATE: byte-array user-event
     user-event-type SDL_QUIT = ;
 
 BEGIN-STRUCT: event

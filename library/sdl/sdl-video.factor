@@ -59,10 +59,10 @@ BEGIN-STRUCT: format
 END-STRUCT
 
 BEGIN-STRUCT: rect
-    FIELD: short   clip-x
-    FIELD: short   clip-y
-    FIELD: ushort   clip-w
-    FIELD: ushort   clip-h
+    FIELD: short  clip-x
+    FIELD: short  clip-y
+    FIELD: ushort clip-w
+    FIELD: ushort clip-h
 END-STRUCT
 
 BEGIN-STRUCT: surface

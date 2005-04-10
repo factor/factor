@@ -86,11 +86,11 @@ UNION: arrayed array tuple ;
     2dup length 2 + "tuple-size" set-word-prop
     4 -rot simple-slots ;
 
-: constructor-word ( word -- word )
-    word-name "<" swap ">" cat3 create-in ;
+: constructor-word ( string -- word )
+    "<" swap ">" cat3 create-in ;
 
 : define-constructor ( word def -- )
-    >r [ constructor-word ] keep [
+    >r [ word-name constructor-word ] keep [
         dup literal, "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 

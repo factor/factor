@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors hashtables kernel lists math
-namespaces parser strings words ;
+USING: assembler compiler errors generic hashtables kernel lists
+math namespaces parser strings words ;
 
 ! Some code for interfacing with C structures.
 
@@ -28,18 +28,32 @@ namespaces parser strings words ;
 : define-member ( max type -- max )
     c-type [ "width" get ] bind max ;
 
-: define-constructor ( width -- )
+: struct-constructor ( width -- )
     #! Make a word <foo> where foo is the structure name that
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
-    [ <byte-array> ] cons
-    [ "<" , "struct-name" get , ">" , ] make-string
-    create-in swap
+    "struct-name" get constructor-word
+    swap [ <byte-array> ] cons
+    define-compound ;
+
+: array-constructor ( width -- )
+    #! Make a word <foo-array> ( n -- byte-array ).
+    "struct-name" get "-array" cat2 constructor-word
+    swap [ * <byte-array> ] cons
+    define-compound ;
+
+: define-nth ( width -- )
+    #! Make a word foo-nth ( n alien -- dsplaced-alien ).
+    "struct-name" get "-nth" cat2 create-in
+    swap [ swap >r * r> <displaced-alien> ] cons
     define-compound ;
 
 : define-struct-type ( width -- )
     #! Define inline and pointer type for the struct. Pointer
     #! type is exactly like void*.
+    dup struct-constructor
+    dup array-constructor
+    dup define-nth
     [ "width" set ] "struct-name" get define-c-type
     "void*" c-type "struct-name" get "*" cat2
     c-types get set-hash ;
@@ -51,7 +65,7 @@ namespaces parser strings words ;
     scan scan define-field ; parsing
 
 : END-STRUCT ( length -- )
-    dup define-constructor define-struct-type ; parsing
+    define-struct-type ; parsing
 
 : BEGIN-UNION: ( -- max )
     scan "struct-name" set  0 ; parsing
@@ -60,4 +74,4 @@ namespaces parser strings words ;
     scan define-member ; parsing
 
 : END-UNION ( max -- )
-    dup define-constructor define-struct-type ; parsing
+    define-struct-type ; parsing
