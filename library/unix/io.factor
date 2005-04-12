@@ -80,13 +80,6 @@ C: reader ( handle -- reader )
 
 : eof? ( buffer -- ? ) buffer-fill 0 = ;
 
-: read-line-task ( reader -- ? )
-    dup refill dup reader-eof? [
-        reader-eof t
-    ] [
-        read-line-step
-    ] ifte ;
-
 : read-count-step ( count reader -- ? )
     dup reader-line -rot >r over length - r>
     2dup buffer-fill <= [
@@ -101,13 +94,6 @@ C: reader ( handle -- reader )
         2drop t
     ] [
         2dup init-reader read-count-step
-    ] ifte ;
-
-: read-count-task ( count reader -- ? )
-    dup refill dup reader-eof? [
-        nip reader-eof t
-    ] [
-        read-count-step
     ] ifte ;
 
 : pop-line ( reader -- str )
@@ -139,13 +125,6 @@ C: writer ( fd -- writer )
         buffer-extend t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=
-    ] ifte ;
-
-: write-task ( writer -- ? )
-    dup buffer-length 0 = over port-error or [
-        0 swap buffer-reset t
-    ] [
-        >port< write-step
     ] ifte ;
 
 : write-fin ( str writer -- )

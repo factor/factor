@@ -20,6 +20,15 @@ hashtables errors sequences vectors ;
 
 : class-tuple 2 slot ; inline
 
+! A sequence of all slots in a tuple, used for equality testing.
+TUPLE: tuple-seq tuple ;
+
+M: tuple-seq nth ( n tuple-seq -- elt )
+    tuple-seq-tuple array-nth ;
+
+M: tuple-seq length ( tuple-seq -- len )
+    tuple-seq-tuple array-capacity ;
+
 IN: generic
 
 BUILTIN: tuple 18 [ 1 length f ] ;
@@ -31,18 +40,9 @@ GENERIC: delegate
 GENERIC: set-delegate
 
 M: object delegate drop f ;
+
 M: tuple delegate 3 slot ;
-
-M: object set-delegate 2drop ;
 M: tuple set-delegate 3 set-slot ;
-
-: check-array ( n array -- )
-    array-capacity 0 swap between? [
-        "Array index out of bounds" throw
-    ] unless ;
-
-M: tuple nth 2dup check-array array-nth ;
-M: tuple set-nth 2dup check-array set-array-nth ;
 
 #! arrayed objects can be passed to array-nth, and set-array-nth
 UNION: arrayed array tuple ;
@@ -166,6 +166,14 @@ UNION: arrayed array tuple ;
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
 
+: tuple>list ( tuple -- list )
+    #! We have to type check here, since <tuple-seq> is unsafe.
+    dup tuple? [
+        <tuple-seq> >list
+    ] [
+        "Not a tuple" throw
+    ] ifte ;
+
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
@@ -182,6 +190,17 @@ M: tuple hashcode ( vec -- n )
         drop 0
     ] [
         2 swap nth hashcode
+    ] ifte ;
+
+M: tuple = ( obj tuple -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        over tuple? [
+            swap <tuple-seq> swap <tuple-seq> sequence=
+        ] [
+            2drop f
+        ] ifte
     ] ifte ;
 
 tuple [

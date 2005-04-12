@@ -43,8 +43,8 @@ public class FactorWordCompletion extends SideKickCompletion
 	//{{{ FactorWordCompletion constructor
 	public FactorWordCompletion(View view, String word, FactorParsedData data)
 	{
-		super(view,word,FactorPlugin.toWordArray(
-			FactorPlugin.getWordCompletions(word,false)));
+		super(view,word,FactorPlugin.getWordCompletions(word,
+			VocabularyLookup.COMPLETE_START));
 		this.data = data;
 	} //}}}
 

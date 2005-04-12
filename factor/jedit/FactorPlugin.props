@@ -2,7 +2,7 @@
 plugin.factor.jedit.FactorPlugin.activate=startup
 
 plugin.factor.jedit.FactorPlugin.name=Factor
-plugin.factor.jedit.FactorPlugin.version=0.74
+plugin.factor.jedit.FactorPlugin.version=0.75
 plugin.factor.jedit.FactorPlugin.author=Slava Pestov
 plugin.factor.jedit.FactorPlugin.docs=/doc/jedit/index.html
 

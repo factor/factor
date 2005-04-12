@@ -25,6 +25,9 @@ IN: vectors
     #! in a new vector.
     project list>vector ; inline
 
+: zero-vector ( n -- vector )
+    [ drop 0 ] vector-project ;
+
 : vector-tail ( n vector -- list )
     #! Return a new list with all elements from the nth
     #! index upwards.

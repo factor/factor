@@ -76,15 +76,7 @@ C: jedit-stream ( stream -- stream )
         ] map >r definer r> cons
     ] when ;
 
-: completions ( str anywhere vocabs -- list )
+: completions ( str pred -- list | pred: str word -- ? )
     #! Make a list of completions. Each element of the list is
-    #! a name/vocabulary pair.
-    [
-        [
-            >r 2dup r> swap [
-                vocab-apropos
-            ] [
-                vocab-completions
-            ] ifte [ jedit-lookup , ] each
-        ] each
-    ] make-list ;
+    #! a vocabulary/name/stack-effect triplet list.
+    word-subset-with [ jedit-lookup ] map ;

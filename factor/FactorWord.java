@@ -31,7 +31,8 @@ package factor;
 
 import factor.jedit.FactorWordRenderer;
 
-public class FactorWord extends FactorArtifact implements FactorExternalizable
+public class FactorWord extends FactorArtifact implements FactorExternalizable,
+	Comparable
 {
 	public String vocabulary;
 	public String name;
@@ -101,5 +102,11 @@ public class FactorWord extends FactorArtifact implements FactorExternalizable
 			return;
 		
 		lookup.forget(this);
+	} //}}}
+
+	//{{{ compareTo() method
+	public int compareTo(Object o)
+	{
+		return name.compareTo(((FactorWord)o).name);
 	} //}}}
 }

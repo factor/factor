@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien errors generic hashtables kernel lists math
+USING: alien errors generic hashtables kernel lists math memory
 namespaces parser presentation sequences stdio streams strings
 unparser vectors words ;
 
@@ -129,7 +129,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 M: tuple prettyprint* ( indent tuple -- indent )
     [
-        \ << swap >list \ >> prettyprint-sequence
+        \ << swap tuple>list \ >> prettyprint-sequence
     ] check-recursion ;
 
 M: alien prettyprint* ( alien -- str )

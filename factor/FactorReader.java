@@ -167,8 +167,8 @@ public class FactorReader
 		pushState(toplevel,null);
 		topState = (ParseState)states.car;
 		this.alwaysDocComments = alwaysDocComments;
-		this.in = DefaultVocabularyLookup.DEFAULT_IN;
-		this.use = DefaultVocabularyLookup.DEFAULT_USE;
+		this.in = VocabularyLookup.DEFAULT_IN;
+		this.use = VocabularyLookup.DEFAULT_USE;
 	} //}}}
 
 	//{{{ getScanner() method

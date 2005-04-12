@@ -56,16 +56,27 @@
 
 + sequences
 
-- dipping nmap
+- dipping seq-2nmap, seq-2each
+- remove seq- prefixes
+- seq-append --> nappend
 - generic each some? all? member? memq? all=? top
   index? subseq?
 - index and index* are very slow with lists
-- map, subset, project, append: not tail recursive
+- list map, subset, project, append: not tail recursive
+- non-consing sequence=
+- tuple =
+- decide what to do with sbuf-append and index-of
+- GENERIC: map
+  - list impl same as now
+  - sequence impl: clone sequence and call nmap
+  - string impl: string>sbuf nmap sbuf>string
+- GENERIC: append
+- list>vector --> >vector
 
 + kernel:
 
+- instances: do not use make-list
 - unions containing tuples do not work properly
-- tuples should probably not be sequences
 - need G: combinations
 - method doc strings
 - make-image: use a list not a vector

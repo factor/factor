@@ -321,35 +321,17 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 
-	//{{{ toWordArray() method
-	public static FactorWord[] toWordArray(Set completions)
-	{
-		FactorWord[] w = (FactorWord[])completions.toArray(new FactorWord[
-			completions.size()]);
-		Arrays.sort(w,new MiscUtilities.StringICaseCompare());
-
-		return w;
-	} //}}}
-	
 	//{{{ getWordCompletions() method
 	/**
 	 * Returns all words in all vocabularies whose name starts with
 	 * <code>word</code>.
-	 *
-	 * @param anywhere If true, matches anywhere in the word name are
-	 * returned; otherwise, only matches from beginning.
 	 */
-	public static Set getWordCompletions(String word, boolean anywhere)
+	public static FactorWord[] getWordCompletions(String word, int mode)
 	{
 		try
 		{
-			Set completions = new HashSet();
-			getExternalInstance().getWordCompletions(
-				getExternalInstance().getVocabularies(),
-				word,
-				anywhere,
-				completions);
-			return completions;
+			return getExternalInstance().getWordCompletions(
+				word,mode);
 		}
 		catch(Exception e)
 		{
@@ -461,33 +443,13 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 
-	//{{{ findAllWordsNamed() method
-	private static FactorWord[] findAllWordsNamed(View view, String word)
-		throws Exception
-	{
-		ExternalFactor external = getExternalInstance();
-
-		ArrayList words = new ArrayList();
-
-		Cons vocabs = external.getVocabularies();
-		while(vocabs != null)
-		{
-			String vocab = (String)vocabs.car;
-			FactorWord w = (FactorWord)external.searchVocabulary(
-				new Cons(vocab,null),word);
-			if(w != null)
-				words.add(w);
-			vocabs = vocabs.next();
-		}
-		return (FactorWord[])words.toArray(new FactorWord[words.size()]);
-	} //}}}
-
 	//{{{ insertUseDialog() method
 	public static void insertUseDialog(View view, String word)
 	{
 		try
 		{
-			FactorWord[] words = findAllWordsNamed(view,word);
+			FactorWord[] words = external.getWordCompletions(word,
+				VocabularyLookup.COMPLETE_EQUAL);
 			if(words.length == 0)
 				view.getToolkit().beep();
 			else if(words.length == 1)

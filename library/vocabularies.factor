@@ -31,6 +31,9 @@ SYMBOL: vocabularies
     #! A list of words matching the predicate.
     all-words swap subset ; inline
 
+: word-subset-with ( obj pred -- list | pred: obj word -- ? )
+    all-words swap subset-with ; inline
+
 : recrossref ( -- )
     #! Update word cross referencing information.
     [ f "usages" set-word-prop ] each-word

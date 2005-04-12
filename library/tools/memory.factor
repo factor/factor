@@ -42,7 +42,7 @@ namespaces prettyprint sequences stdio unparser vectors words ;
 GENERIC: (each-slot) ( quot obj -- ) inline
 
 M: arrayed (each-slot) ( quot array -- )
-    dup length [
+    dup array-capacity [
         [
             ( quot obj n -- )
             swap array-nth swap dup slip
@@ -66,15 +66,12 @@ M: object (each-slot) ( quot obj -- )
     #! in the image.
     [ dupd refers? ] instances nip ;
 
-: vector+ ( n index vector -- )
-    [ vector-nth + ] 2keep set-vector-nth ;
+: seq+ ( n index vector -- )
+    [ nth + ] 2keep set-nth ;
 
 : heap-stat-step ( counts sizes obj -- )
-    [ dup size swap type rot vector+ ] keep
-    1 swap type rot vector+ ;
-
-: zero-vector ( n -- vector )
-    [ drop 0 ] vector-project ;
+    [ dup size swap type rot seq+ ] keep
+    1 swap type rot seq+ ;
 
 : heap-stats ( -- stats )
     #! Return a list of instance count/total size pairs.

@@ -3,7 +3,7 @@
 /*
  * $Id$
  *
- * Copyright (C) 2004 Slava Pestov.
+ * Copyright (C) 2004, 2005 Slava Pestov.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,7 +37,7 @@ import org.gjt.sp.util.Log;
 /**
  * Encapsulates a connection to an external Factor instance.
  */
-public class ExternalFactor extends DefaultVocabularyLookup
+public class ExternalFactor extends VocabularyLookup
 {
 	//{{{ ExternalFactor constructor
 	public ExternalFactor(int port)
@@ -241,13 +241,29 @@ public class ExternalFactor extends DefaultVocabularyLookup
 	} //}}}
 
 	//{{{ getWordCompletions() method
-	public synchronized void getWordCompletions(Cons use, String word,
-		boolean anywhere, Set completions) throws Exception
+	public synchronized void getWordCompletions(String word,
+		int mode, Set completions) throws Exception
 	{
-		super.getWordCompletions(use,word,anywhere,completions);
+		super.getWordCompletions(word,mode,completions);
 
 		if(closed)
 			return;
+
+		String predicate;
+		switch(mode)
+		{
+		case COMPLETE_START:
+			predicate = "[ word-name swap string-head? ]";
+			break;
+		case COMPLETE_ANYWHERE:
+			predicate = "[ word-name string-contains? ]";
+			break;
+		case COMPLETE_EQUAL:
+			predicate = "[ word-name = ]";
+			break;
+		default:
+			throw new RuntimeException("Bad mode: " + mode);
+		}
 
 		/* We can't send words across the socket at this point in
 		human history, because of USE: issues. so we send name/vocab
@@ -256,9 +272,8 @@ public class ExternalFactor extends DefaultVocabularyLookup
 		String result = eval(
 			FactorReader.unparseObject(word)
 			+ " "
-			+ FactorReader.unparseObject(Boolean.valueOf(anywhere))
+			+ predicate
 			+ " "
-			+ FactorReader.unparseObject(use)
 			+ " completions .");
 
 		Cons moreCompletions = (Cons)parseObject(result).car;
