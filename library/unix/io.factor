@@ -1,11 +1,17 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors generic kernel math sequences strings ;
+USING: errors generic kernel lists math namespaces sequences
+strings vectors ;
 
 FORGET: can-read-line?
 FORGET: can-read-count?
 FORGET: can-write?
+
+TUPLE: io-task port callback ;
+GENERIC: do-io-task ( task -- ? )
+
+SYMBOL: io-tasks
 
 : file-mode OCT: 0600 ;
 
@@ -80,6 +86,18 @@ C: reader ( handle -- reader )
 
 : eof? ( buffer -- ? ) buffer-fill 0 = ;
 
+TUPLE: read-line-task ;
+
+C: read-line-task ( port callback -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: read-line-task do-io-task
+    io-task-port dup refill dup eof? [
+        reader-eof t
+    ] [
+        read-line-step
+    ] ifte ;
+
 : read-count-step ( count reader -- ? )
     dup reader-line -rot >r over length - r>
     2dup buffer-fill <= [
@@ -94,6 +112,18 @@ C: reader ( handle -- reader )
         2drop t
     ] [
         2dup init-reader read-count-step
+    ] ifte ;
+
+TUPLE: read-task count ;
+
+C: read-task ( port callback -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: read-task do-io-task
+    dup refill dup eof? [
+        nip reader-eof t
+    ] [
+        read-count-step
     ] ifte ;
 
 : pop-line ( reader -- str )
@@ -127,6 +157,18 @@ C: writer ( fd -- writer )
         [ buffer-fill + ] keep buffer-capacity <=
     ] ifte ;
 
+TUPLE: write-task ;
+
+C: write-task ( port callback -- task )
+    [ >r <io-task> r> set-delegate ] keep ;
+
+M: write-task do-io-task
+    dup buffer-length 0 = over port-error or [
+        0 swap buffer-reset t
+    ] [
+        >port< write-step
+    ] ifte ;
+
 : write-fin ( str writer -- )
     dup pending-error
     >r dup string? [ ch>string ] unless r> >buffer ;
@@ -148,3 +190,12 @@ C: writer ( fd -- writer )
     ] [
         2drop f
     ] ifte ;
+
+: cons-nth ( elt n seq -- )
+    [ nth cons ] 2keep set-nth ;
+
+: add-io-task ( task -- )
+    dup io-task-port port-handle io-tasks get cons-nth ;
+
+: init-io ( -- )
+    global [ 100 <vector> io-tasks set ] bind ;
