@@ -37,7 +37,7 @@ M: object set-delegate 2drop ;
 M: tuple set-delegate 3 set-slot ;
 
 : check-array ( n array -- )
-    length 0 swap between? [
+    array-capacity 0 swap between? [
         "Array index out of bounds" throw
     ] unless ;
 
@@ -169,7 +169,7 @@ UNION: arrayed array tuple ;
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
-    dup length dup <tuple> [ -rot copy-array ] keep ;
+    dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
 
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.

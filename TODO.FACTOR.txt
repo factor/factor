@@ -56,11 +56,17 @@
 
 + sequences
 
+- dipping nmap
 - generic each some? all? member? memq? all=? top
   index? subseq?
+- index and index* are very slow with lists
+- map, subset, project, append: not tail recursive
 
 + kernel:
 
+- unions containing tuples do not work properly
+- tuples should probably not be sequences
+- need G: combinations
 - method doc strings
 - make-image: use a list not a vector
 - code walker & exceptions
@@ -74,11 +80,6 @@
 - generational gc
 - doc comments of generics
 - proper ordering for classes
-
-+ slow data structures:
-
-- vector-map, string-map, seq-each, vector-project: consing
-- map, subset, project, append: not tail recursive
 
 + nice to have libraries:
 

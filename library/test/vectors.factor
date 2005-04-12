@@ -88,3 +88,6 @@ unit-test
         "x" get clone length
     ] with-scope
 ] unit-test
+
+[ -1 ] [ 5 { } index ] unit-test
+[ 4 ] [ 5 { 1 2 3 4 5 } index ] unit-test

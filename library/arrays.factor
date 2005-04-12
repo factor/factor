@@ -13,20 +13,13 @@ USING: generic kernel lists math-internals sequences vectors ;
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
-BUILTIN: array 8 [ 1 length f ] ;
+BUILTIN: array 8  ;
 
-: array-nth ( n array -- obj )
-    #! Unsafe.
-    swap 2 fixnum+ slot ; inline
+: array-capacity ( a -- n ) 1 slot ; inline
+: array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
+: set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
+: dispatch ( n vtable -- ) 2 slot array-nth call ;
 
-: set-array-nth ( obj n array -- )
-    #! Unsafe.
-    swap 2 fixnum+ set-slot ; inline
-
+M: array length array-capacity ;
 M: array nth array-nth ;
 M: array set-nth set-array-nth ;
-
-: dispatch ( n vtable -- )
-    #! This word is unsafe since n is not bounds-checked. Do not
-    #! call it directly.
-    2 slot array-nth call ;

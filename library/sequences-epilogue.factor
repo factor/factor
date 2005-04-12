@@ -17,28 +17,55 @@ UNION: sequence array general-list string sbuf tuple vector ;
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 M: general-list >list ( list -- list ) ;
 
-: seq-each ( seq quot -- )
-    >r >list r> each ; inline
+GENERIC: (seq-each) ( quot seq -- ) inline
+
+M: object (seq-each) ( quot seq -- )
+    dup length [
+        3dup >r >r >r swap nth swap call r> r> r>
+    ] repeat 2drop ;
+
+M: general-list (seq-each) ( quot seq -- )
+    swap each ;
+
+: seq-each ( seq quot -- ) swap (seq-each) ; inline
 
 : seq-each-with ( obj seq quot -- )
     swap [ with ] seq-each 2drop ; inline
 
-: length= ( seq seq -- ? ) length swap length number= ;
+GENERIC: (tree-each) ( quot obj -- ) inline
+M: object (tree-each) swap call ;
+M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
+M: f (tree-each) swap call ;
+M: sequence (tree-each) [ swap call ] seq-each-with ;
+: tree-each swap (tree-each) ; inline
+: tree-each-with ( obj vector quot -- )
+    swap [ with ] tree-each 2drop ; inline
 
-M: sequence = ( obj seq -- ? )
-    2dup eq? [
-        2drop t
+: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
+
+: (seq-2nmap) ( seq1 seq2 i quot -- elt3 )
+    pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
+
+: seq-2nmap ( seq1 seq2 quot -- | quot: elt1 elt2 -- elt3 )
+    #! Destructive on seq2.
+    over length [
+        [ >r 3dup r> swap (seq-2nmap) ] keep
+    ] repeat 3drop ; inline
+
+: seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
+    >r clone r> over >r seq-2nmap r> ; inline
+
+: index* ( obj i seq -- n )
+    #! The index of the object in the sequence, starting from i.
+    2dup length >= [
+        3drop -1
     ] [
-        over type over type eq? [
-            2dup length= [
-                swap >list swap >list =
-            ] [
-                2drop f
-            ] ifte
-        ] [
-            2drop f
-        ] ifte
+        3dup nth = [ drop nip ] [ >r 1 + r> index* ] ifte
     ] ifte ;
+
+: index ( obj seq -- n )
+    #! The index of the object in the sequence.
+    0 swap index* ;
 
 : push ( element sequence -- )
     #! Push a value on the end of a sequence.
@@ -58,14 +85,22 @@ M: sequence = ( obj seq -- ? )
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
-GENERIC: (tree-each) ( quot obj -- ) inline
-M: object (tree-each) swap call ;
-M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
-M: f (tree-each) swap call ;
-M: sequence (tree-each) [ swap call ] seq-each-with ;
-: tree-each swap (tree-each) ; inline
-: tree-each-with ( obj vector quot -- )
-    swap [ with ] tree-each 2drop ; inline
+: length= ( seq seq -- ? ) length swap length number= ;
+
+M: sequence = ( obj seq -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        over type over type eq? [
+            2dup length= [
+                swap >list swap >list =
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;
 
 IN: kernel
 
