@@ -91,7 +91,7 @@ M: sequence (tree-each) [ swap call ] seq-each-with ;
 : length= ( seq seq -- ? ) length swap length number= ;
 
 : (sequence=) ( seq seq i -- ? )
-    over length over = [
+    over length over number= [
         3drop t
     ] [
         3dup 2nth = [

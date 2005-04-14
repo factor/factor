@@ -8,9 +8,9 @@
 - powerpc has weird callstack residue
 - make-vector and make-string should not need a reverse step
 - console with presentations
-
 + plugin:
 
+- extract word: if selection empty, move caret to new word after
 - introduce quotation command
 - set 'end' of artifacts/assets accurately
 
@@ -96,7 +96,6 @@
 
 - regexps
 - XML
-- matrices, vector math
 - HTTP client
 - real Unicode support (strings are already 16 bits and can be extended
   to 21 if the need arises, but we need full character classification
@@ -108,3 +107,10 @@
 
 - virtual hosts
 - keep alive
+
++ matrix lib:
+
+- scalar * matrix, vector * matrix, matrix * vector need to work
+- turning vectors into row and column matrices
+- make-matrix is slow and ugly
+- move 2repeat somewhere else

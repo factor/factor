@@ -1,16 +1,24 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors generic kernel lists math namespaces sequences
-strings vectors ;
+USING: errors generic hashtables kernel lists math namespaces
+sequences strings threads vectors ;
 
+! These let us load the code into a CFactor instance using the
+! old C-based I/O. They will be removed soon.
 FORGET: can-read-line?
 FORGET: can-read-count?
 FORGET: can-write?
+FORGET: add-write-io-task
 
-TUPLE: io-task port callback ;
+TUPLE: io-task port callbacks ;
 GENERIC: do-io-task ( task -- ? )
+GENERIC: io-task-events ( task -- events )
 
+! A hashtable in the global namespace mapping fd numbers to
+! io-tasks. This is not a vector, since we need a quick way
+! to find the number of elements, and a hashtable gives us
+! this with the hash-size call.
 SYMBOL: io-tasks
 
 : file-mode OCT: 0600 ;
@@ -88,7 +96,7 @@ C: reader ( handle -- reader )
 
 TUPLE: read-line-task ;
 
-C: read-line-task ( port callback -- task )
+C: read-line-task ( port callbacks -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: read-line-task do-io-task
@@ -97,6 +105,9 @@ M: read-line-task do-io-task
     ] [
         read-line-step
     ] ifte ;
+
+M: read-line-task io-task-events ( task -- events )
+    drop read-events ;
 
 : read-count-step ( count reader -- ? )
     dup reader-line -rot >r over length - r>
@@ -116,15 +127,18 @@ M: read-line-task do-io-task
 
 TUPLE: read-task count ;
 
-C: read-task ( port callback -- task )
+C: read-task ( port callbacks -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: read-task do-io-task
-    dup refill dup eof? [
+    io-task-port dup refill dup eof? [
         nip reader-eof t
     ] [
         read-count-step
     ] ifte ;
+
+M: read-task io-task-events ( task -- events )
+    drop read-events ;
 
 : pop-line ( reader -- str )
     dup reader-line dup [ sbuf>string ] when >r
@@ -159,15 +173,18 @@ C: writer ( fd -- writer )
 
 TUPLE: write-task ;
 
-C: write-task ( port callback -- task )
+C: write-task ( port callbacks -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
 M: write-task do-io-task
-    dup buffer-length 0 = over port-error or [
+    io-task-port dup buffer-length 0 = over port-error or [
         0 swap buffer-reset t
     ] [
         >port< write-step
     ] ifte ;
+
+M: write-task io-task-events ( task -- events )
+    drop write-events ;
 
 : write-fin ( str writer -- )
     dup pending-error
@@ -191,11 +208,68 @@ M: write-task do-io-task
         2drop f
     ] ifte ;
 
-: cons-nth ( elt n seq -- )
-    [ nth cons ] 2keep set-nth ;
+: io-task-fd io-task-port port-handle ;
 
 : add-io-task ( task -- )
-    dup io-task-port port-handle io-tasks get cons-nth ;
+    dup io-task-fd io-tasks get 2dup hash [
+        "Cannot perform multiple I/O ops on the same port" throw
+    ] when set-hash ;
+
+: add-write-io-task ( task -- )
+    dup io-task-fd io-tasks get hash [
+        dup write-task? [
+            [
+                >r io-task-callbacks r> io-task-callbacks append
+            ] keep set-io-task-callbacks
+        ] [
+            add-io-task
+        ] ifte
+    ] [
+        add-io-task
+    ] ifte* ;
+
+: remove-io-task ( task -- )
+    io-task-fd io-tasks get remove-hash ;
+
+: pop-callback ( task -- callback )
+    dup io-task-callbacks uncons dup [
+        rot set-io-task-callbacks
+    ] [
+        drop swap remove-io-task
+    ] ifte ;
+
+: handle-fd ( fd -- )
+    io-tasks get hash dup do-io-task [
+        pop-callback call
+    ] [
+        drop
+    ] ifte ;
+
+: do-io-tasks ( pollfds n -- )
+    [
+        dup pick pollfd-nth dup pollfd-revents 0 = [
+            drop
+        ] [
+            pollfd-fd handle-fd
+        ] ifte
+    ] repeat drop ;
+
+: init-pollfd ( task pollfd -- )
+    over io-task-fd over set-pollfd-fd
+    swap io-task-events swap set-pollfd-events ;
+
+: make-pollfds ( -- pollfds n )
+    io-tasks get dup hash-size [
+        <pollfd-array> swap hash-values [
+            dup io-task-fd pick pollfd-nth init-pollfd
+        ] each
+    ] keep ;
+
+: io-multiplexer ( -- )
+    make-pollfds dupd 0 sys-poll do-io-tasks ;
+
+: io-loop ( -- ) io-multiplexer yield io-loop ;
 
 : init-io ( -- )
-    global [ 100 <vector> io-tasks set ] bind ;
+    global [ <namespace> io-tasks set ] bind
+    [ io-loop ] in-thread ;

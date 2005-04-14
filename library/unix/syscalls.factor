@@ -105,5 +105,8 @@ END-STRUCT
 : POLLRDBAND HEX: 0080 ; ! OOB/Urgent readable data
 : POLLWRBAND HEX: 0100 ; ! OOB/Urgent data can be written
 
+: read-events POLLIN POLLRDNORM bitor POLLRDBAND bitor ;
+: write-events POLLOUT POLLWRNORM bitor POLLWRBAND bitor ;
+
 : sys-poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;
