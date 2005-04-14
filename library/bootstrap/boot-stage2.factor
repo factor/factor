@@ -20,6 +20,10 @@ parse-command-line
 t [
     "/library/syntax/unparser.factor"
     "/library/syntax/prettyprint.factor"
+    
+    ! This has to be loaded here because it overloads sequence
+    ! generics, and we don't want to compile twice.
+    "/library/math/matrices.factor"
 
     "/library/tools/debugger.factor"
     "/library/tools/gensym.factor"

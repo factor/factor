@@ -69,12 +69,15 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-elements ( indent list -- indent )
     [ prettyprint* " " write ] each ;
 
-: <prettyprint ( indent -- indent )
-    tab-size get + one-line get [
-        " " write
+: ?prettyprint-newline ( indent -- )
+    one-line get [
+        " " write drop
     ] [
-        dup prettyprint-newline
+        prettyprint-newline
     ] ifte ;
+
+: <prettyprint ( indent -- indent )
+    tab-size get + dup ?prettyprint-newline ;
 
 : prettyprint> ( indent -- indent )
     tab-size get - one-line get
