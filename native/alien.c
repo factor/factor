@@ -15,7 +15,7 @@ INLINE void* alien_offset(CELL object)
 		return alien->ptr;
 	case BYTE_ARRAY_TYPE:
 		array = untag_byte_array_fast(object);
-		return array + sizeof(F_ARRAY);
+		return array + 1;
 	case DISPLACED_ALIEN_TYPE:
 		d = untag_displaced_alien_fast(object);
 		return alien_offset(d->alien) + d->displacement;

@@ -80,6 +80,12 @@ END-STRUCT
 : sys-close ( fd -- )
     "void" "libc" "close" [ "int" ] alien-invoke ;
 
+: F_SETFL 4 ; ! set file status flags
+: O_NONBLOCK 4 ; ! no delay
+
+: sys-fcntl ( fd cmd key value -- n )
+    "int" "libc" "fcntl" [ "int" "int" "int" "int" ] alien-invoke ;
+
 : sys-read ( fd buf nbytes -- n )
     "ssize_t" "libc" "read" [ "int" "ulong" "size_t" ] alien-invoke ;
 

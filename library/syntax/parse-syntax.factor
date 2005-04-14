@@ -87,7 +87,11 @@ BUILTIN: f 9 ;  : f f swons ; parsing
     #! recursive words.
     CREATE drop ; parsing
 
-: FORGET: scan-word forget ; parsing
+: FORGET:
+    #! Followed by a word name. The word is removed from its
+    #! vocabulary. Note that specifying an undefined word is a
+    #! no-op.
+    scan "use" get search [ forget ] when* ; parsing
 
 : USE:
     #! Add vocabulary to search path.

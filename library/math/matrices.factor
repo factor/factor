@@ -110,7 +110,7 @@ M: col-seq nth col-seq-matrix <col> ;
     #! for being added or subtracted.
     over matrix-rows over matrix-rows = >r
     over matrix-cols over matrix-cols = r> and [
-        "Matrix dimensions do not match"
+        "Matrix dimensions do not match" throw
     ] unless ;
 
 : +dimensions ( matrix -- rows cols )
@@ -128,7 +128,7 @@ M: matrix v* ( m m -- m ) matrix+/- v* <matrix> ;
 : *check ( matrix matrix -- matrix matrix )
     over matrix-rows over matrix-cols = >r
     over matrix-cols over matrix-rows = r> and [
-        "Matrix dimensions inappropriate for composition"
+        "Matrix dimensions inappropriate for composition" throw
     ] unless ;
 
 : *dimensions ( m m -- rows cols )
