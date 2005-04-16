@@ -104,7 +104,7 @@ SYMBOL: io-tasks
     ] keep ;
 
 : io-multiplex ( -- )
-    make-pollfds 2dup -1 sys-poll drop do-io-tasks ;
+    make-pollfds 2dup -1 sys-poll drop do-io-tasks io-multiplex ;
 
 ! Readers
 
@@ -298,7 +298,7 @@ M: write-task io-task-events ( task -- events )
                 nip io-task-callbacks cons
             ] keep set-io-task-callbacks
         ] [
-            add-io-task
+            drop add-io-task
         ] ifte
     ] [
         add-io-task
