@@ -8,7 +8,7 @@ hashtables ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
-: pull-in ( list -- ) [ dup print parse-resource append, ] each ;
+: pull-in ( list -- ) [ dup print parse-resource % ] each ;
 
 ! The make-list form creates a boot quotation
 [
@@ -16,26 +16,26 @@ hashtables ;
         "/version.factor"
         "/library/stack.factor"
         "/library/combinators.factor"
-        "/library/sequences.factor"
-        "/library/arrays.factor"
+        "/library/collections/sequences.factor"
+        "/library/collections/arrays.factor"
         "/library/kernel.factor"
-        "/library/cons.factor"
-        "/library/assoc.factor"
+        "/library/collections/cons.factor"
+        "/library/collections/assoc.factor"
         "/library/math/math.factor"
         "/library/math/integer.factor"
         "/library/math/ratio.factor"
         "/library/math/float.factor"
         "/library/math/complex.factor"
-        "/library/lists.factor"
-        "/library/vectors.factor"
-        "/library/strings.factor"
-        "/library/sequences-epilogue.factor"
-        "/library/vectors-epilogue.factor"
-        "/library/hashtables.factor"
-        "/library/namespaces.factor"
+        "/library/collections/lists.factor"
+        "/library/collections/vectors.factor"
+        "/library/collections/strings.factor"
+        "/library/collections/sequences-epilogue.factor"
+        "/library/collections/vectors-epilogue.factor"
+        "/library/collections/hashtables.factor"
+        "/library/collections/namespaces.factor"
         "/library/words.factor"
         "/library/vocabularies.factor"
-        "/library/sbuf.factor"
+        "/library/collections/sbuf.factor"
         "/library/errors.factor"
         "/library/continuations.factor"
         "/library/threads.factor"

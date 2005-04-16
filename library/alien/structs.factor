@@ -54,7 +54,10 @@ math namespaces parser strings words ;
     dup struct-constructor
     dup array-constructor
     dup define-nth
-    [ "width" set ] "struct-name" get define-c-type
+    [
+        "width" set
+        [ swap <displaced-alien> ] "getter" set
+    ] "struct-name" get define-c-type
     "void*" c-type "struct-name" get "*" cat2
     c-types get set-hash ;
 

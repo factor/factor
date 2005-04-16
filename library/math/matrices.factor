@@ -145,7 +145,7 @@ M: matrix v. ( m1 m2 -- m )
 
 : ]M
     reverse [ dup car length swap length ] keep
-    [ [ append, ] each ] make-vector <matrix> swons ; parsing
+    [ [ % ] each ] make-vector <matrix> swons ; parsing
 
 : row-list ( matrix -- list )
     #! A list of lists, where each sublist is a row of the

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
-USING: hashtables kernel kernel-internals lists math
+USING: hashtables kernel kernel-internals lists math sequences
 strings vectors ;
 
 ! Other languages have classes, objects, variables, etc.
@@ -26,6 +26,7 @@ strings vectors ;
 ! namespace pushed on the namespace stack.
 
 : namestack ( -- ns ) 3 getenv ; inline
+
 : set-namestack ( ns -- ) 3 setenv ; inline
 
 : namespace ( -- namespace )
@@ -33,18 +34,14 @@ strings vectors ;
     namestack car ;
 
 : >n ( namespace -- n:namespace )
-    #! Push a namespace on the namespace stack.
+    #! Push a namespace on the name stack.
     namestack cons set-namestack ; inline
 
 : n> ( n:namespace -- namespace )
-    #! Pop the top of the namespace stack.
+    #! Pop the top of the name stack.
     namestack uncons set-namestack ; inline
 
 : global ( -- g ) 4 getenv ;
-: set-global ( g -- ) 4 setenv ;
-
-: init-namespaces ( -- )
-    global >n ;
 
 : <namespace> ( -- n )
     #! Create a new namespace.
@@ -68,7 +65,10 @@ strings vectors ;
     namestack (get) ;
 
 : set ( value variable -- ) namespace set-hash ;
-: put ( variable value -- ) swap set ;
+
+: on ( var -- ) t swap set ;
+
+: off ( var -- ) f swap set ;
 
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
@@ -90,7 +90,7 @@ strings vectors ;
     #! namestack.
     <namespace> >n call n> drop ; inline
 
-: extend ( object code -- object )
+: extend ( namespace code -- namespace )
     #! Used in code like this:
     #! : <subclass>
     #!      <superclass> [
@@ -98,66 +98,45 @@ strings vectors ;
     #!      ] extend ;
     over >r bind r> ; inline
 
-: on ( var -- ) t put ;
-: off ( var -- ) f put ;
-: inc ( var -- ) [ 1 + ] change ;
-: dec ( var -- ) [ 1 - ] change ;
+! Building sequences
+SYMBOL: sequence
 
-: cons@ ( x var -- )
-    #! Prepend x to the list stored in var.
-    [ cons ] change ;
-
-: unique@ ( elem var -- )
-    #! Prepend an element to the proper list stored in a
-    #! variable if it is not already contained in the list.
-    [ unique ] change ;
-
-SYMBOL: list-buffer
-
-: make-rlist ( quot -- list )
-    #! Call a quotation. The quotation can call , to prepend
-    #! objects to the list that is returned when the quotation
-    #! is done.
-    [ list-buffer off call list-buffer get ] with-scope ;
-    inline
-
-: make-list ( quot -- list )
-    #! Return a list whose entries are in the same order that ,
-    #! was called.
-    make-rlist reverse ; inline
-
-: make-string ( quot -- string )
-    #! Call a quotation. The quotation can call , to prepend
-    #! objects to the list that is returned when the quotation
-    #! is done.
-    make-list cat ; inline
-
-: make-rstring ( quot -- string )
-    #! Return a string whose entries are in the same order that ,
-    #! was called.
-    make-rlist cat ; inline
-
-: make-vector ( quot -- list )
-    #! Return a vector whose entries are in the same order that
-    #! , was called.
-    make-list list>vector ; inline
+: make-seq ( quot sequence -- sequence )
+    #! Call , and % from the quotation to append to a sequence.
+    [ sequence set call sequence get ] with-scope ; inline
 
 : , ( obj -- )
-    #! Append an object to the currently constructing list.
-    list-buffer cons@ ;
-
-: unique, ( obj -- )
-    #! Append an object to the currently constructing list, only
-    #! if the object does not already occur in the list.
-    list-buffer unique@ ;
-
-: append, ( list -- )
-    [ , ] each ;
+    #! Add to the sequence being built with make-seq.
+    sequence get dup sbuf? [ sbuf-append ] [ push ] ifte ;
 
 : literal, ( word -- )
     #! Append some code that pushes the word on the stack. Used
     #! when building quotations.
     unit , \ car , ;
+
+: unique, ( obj -- )
+    #! Add the object to the sequence being built with make-seq
+    #! unless an equal object has already been added.
+    sequence get 2dup index -1 = [ push ] [ 2drop ] ifte ;
+
+: % ( seq -- )
+    #! Append to the sequence being built with make-seq.
+    sequence get swap nappend ;
+
+: make-vector ( quot -- vector )
+    100 <vector> make-seq ; inline
+
+: make-list ( quot -- list )
+    make-vector >list ; inline
+
+: make-sbuf ( quot -- sbuf )
+    100 <sbuf> make-seq ; inline
+
+: make-string ( quot -- string )
+    make-sbuf sbuf>string ; inline
+
+: make-rstring ( quot -- string )
+    make-sbuf dup nreverse sbuf>string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer

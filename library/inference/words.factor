@@ -119,10 +119,10 @@ M: compound apply-word ( word -- )
 
 : with-recursion ( quot -- )
     [
-        inferring-base-case inc
+        inferring-base-case [ 1 + ] change
         call
     ] [
-        inferring-base-case dec
+        inferring-base-case [ 1 - ] change
         rethrow
     ] catch ;
 

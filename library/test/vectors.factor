@@ -1,6 +1,6 @@
 IN: temporary
-USING: kernel kernel-internals math namespaces random sequences
-strings test vectors ;
+USING: kernel kernel-internals lists math namespaces random
+sequences strings test vectors ;
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ { t f t } length ] unit-test
@@ -91,3 +91,9 @@ unit-test
 
 [ -1 ] [ 5 { } index ] unit-test
 [ 4 ] [ 5 { 1 2 3 4 5 } index ] unit-test
+
+[ { "c" "b" "a" } ] [ { "a" "b" "c" } clone dup 0 2 exchange ] unit-test
+
+[ t ] [
+    100 count dup list>vector dup nreverse >list >r reverse r> =
+] unit-test

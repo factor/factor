@@ -91,7 +91,7 @@ USE: words
     #! and sets it's value to the current value on the stack.
     #! If there is no previous attribute, no value is expected
     #! on the stack.
-    "current-attribute" get [ swons "attrs" cons@ ] when* ;
+    "current-attribute" get [ swons "attrs" [ cons ] change ] when* ;
 
 ! HTML tag words
 ! 

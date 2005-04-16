@@ -41,14 +41,10 @@ prettyprint sequences stdio strings unparser vectors words ;
 
 SYMBOL: failures
 
+: failure failures [ cons ] change ;
+
 : test-handler ( name quot -- ? )
-    [
-        [
-            dup error. cons failures cons@ f
-        ] [
-            t
-        ] ifte*
-    ] catch ;
+    [ [ dup error. cons failure f ] [ t ] ifte* ] catch ;
 
 : test-path ( name -- path )
     "/library/test/" swap ".factor" cat3 ;
@@ -80,7 +76,7 @@ SYMBOL: failures
             "inference" "dataflow" "interpreter" "alien"
             "line-editor" "gadgets" "memory" "redefine"
             "annotate"
-        ] append,
+        ] %
         
         os "win32" = [
             "buffer" ,
@@ -93,7 +89,7 @@ SYMBOL: failures
                 "compiler/stack" "compiler/ifte"
                 "compiler/generic" "compiler/bail-out"
                 "compiler/linearizer"
-            ] append,
+            ] %
         ] unless
         
         [
@@ -102,7 +98,7 @@ SYMBOL: failures
             "benchmark/continuations" "benchmark/ack"
             "benchmark/hashtables" "benchmark/strings"
             "benchmark/vectors"
-        ] append,
+        ] %
     ] make-list ;
 
 : passed.

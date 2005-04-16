@@ -3,6 +3,9 @@ USE: lists
 USE: namespaces
 USE: test
 
+: cons@ [ cons ] change ;
+: unique@ [ unique ] change ;
+
 [ [ 1 ] ] [ 1 f "x" set "x" cons@ "x" get ] unit-test
 [ [[ 1 2 ]] ] [ 1 2 "x" set "x" cons@ "x" get ] unit-test
 [ [ 1 2 ] ] [ 1 [ 2 ] "x" set "x" cons@ "x" get ] unit-test

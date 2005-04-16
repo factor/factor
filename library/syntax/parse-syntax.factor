@@ -95,17 +95,17 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 : USE:
     #! Add vocabulary to search path.
-    scan "use" cons@ ; parsing
+    scan use+ ; parsing
 
 : USING:
     #! A list of vocabularies terminated with ;
     string-mode on
-    [ string-mode off [ "use" cons@ ] each ]
+    [ string-mode off [ use+ ] each ]
     f ; parsing
 
 : IN:
     #! Set vocabulary for new definitions.
-    scan dup "use" cons@ "in" set ; parsing
+    scan dup use+ "in" set ; parsing
 
 ! Char literal
 : CHAR: ( -- ) 0 scan next-char drop swons ; parsing

@@ -26,7 +26,7 @@ union [ 2drop t ] "class<" set-word-prop
     [
         [
             \ dup ,
-            unswons "predicate" word-prop append,
+            unswons "predicate" word-prop %
             [ drop t ] ,
             union-predicate ,
             \ ifte ,

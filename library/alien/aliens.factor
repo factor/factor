@@ -49,7 +49,7 @@ M: alien = ( obj obj -- ? )
         <namespace> [
           "abi" set
           "name" set
-        ] extend put
+        ] extend swap set
     ] bind ;
 
 : library-abi ( library -- abi )

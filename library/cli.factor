@@ -22,7 +22,7 @@ kernel-internals ;
 
 : cli-var-param ( name value -- ) swap ":" split set-path ;
 
-: cli-bool-param ( name -- ) "no-" ?string-head not put ;
+: cli-bool-param ( name -- ) "no-" ?string-head not swap set ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by

@@ -156,7 +156,7 @@ SYMBOL: cloned
     over [
         >r
         dupd cons
-        recursive-state cons@
+        recursive-state [ cons ] change
         r> call
     ] (with-block) ;
 

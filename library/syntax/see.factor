@@ -8,7 +8,7 @@ presentation stdio streams strings unparser words ;
 : vocab-actions ( search -- list )
     [
         [[ "Words"   "words ."       ]]
-        [[ "Use"     "\"use\" cons@" ]]
+        [[ "Use"     "use+" ]]
         [[ "In"      "\"in\" set"    ]]
     ] ;
 

@@ -87,7 +87,9 @@ C: relative ( word -- )
     [ just-compiled swap set-relative-where ] keep
     [ compiled-offset swap set-relative-to ] keep ;
 
-: relative ( word -- ) <relative> deferred-xts cons@ ;
+: deferred-xt deferred-xts [ cons ] change ;
+
+: relative ( word -- ) <relative> deferred-xt ;
 
 : relative-fixup ( relative -- addr )
     dup relative-word compiled-xt swap relative-to - ;
@@ -102,7 +104,7 @@ C: absolute ( word -- )
     [ just-compiled swap set-absolute-where ] keep ;
 
 : absolute ( word -- )
-    dup f rel-word <absolute> deferred-xts cons@ ;
+    dup f rel-word <absolute> deferred-xt ;
 
 : >absolute dup absolute-word compiled-xt swap absolute-where ;
 
@@ -120,11 +122,11 @@ C: relative-bitfld ( word mask -- )
 
 : relative-24 ( word -- )
     BIN: 11111111111111111111111100 <relative-bitfld>
-    deferred-xts cons@ ;
+    deferred-xt ;
 
 : relative-14 ( word -- )
     BIN: 1111111111111100 <relative-bitfld>
-    deferred-xts cons@ ;
+    deferred-xt ;
 
 : or-compiled ( n off -- )
     [ compiled-cell bitor ] keep set-compiled-cell ;
@@ -146,8 +148,7 @@ C: absolute-16/16 ( word -- )
 
 M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 
-: absolute-16/16 ( word -- )
-    <absolute-16/16> deferred-xts cons@ ;
+: absolute-16/16 ( word -- ) <absolute-16/16> deferred-xt ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be
@@ -169,4 +170,8 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     [ call  fixup-xts  commit-xts ] with-scope ;
 
 : postpone-word ( word -- )
-    dup compiling? [ drop ] [ compile-words unique@ ] ifte ;
+    dup compiling? [
+        drop
+    ] [
+        compile-words [ unique ] change
+    ] ifte ;

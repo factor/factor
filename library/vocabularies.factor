@@ -21,7 +21,7 @@ SYMBOL: vocabularies
     vocab dup [ hash-values [ ] subset word-sort ] when ;
 
 : all-words ( -- list )
-    [ vocabs [ words append, ] each ] make-list ;
+    [ vocabs [ words % ] each ] make-list ;
 
 : each-word ( quot -- )
     #! Apply a quotation to each word in the image.

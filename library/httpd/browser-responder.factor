@@ -78,7 +78,7 @@ errors unparser logging listener url-encoding hashtables memory ;
 : write-word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
   <namespace> [
-    "allow-edit?" get [ "Edit" [ "edit-state" t put ] quot-href <br/> ] when
+    "allow-edit?" get [ "Edit" [ "edit-state" on ] quot-href <br/> ] when
     "edit-state" get [
       write-editable-word-source 
     ] [ 
@@ -131,10 +131,10 @@ errors unparser logging listener url-encoding hashtables memory ;
   #! Return a list of vocabularies that all words in a vocabulary
   #! uses.
   <namespace> [
-    "result" f put
+    "result" off
     words [
       word-uses [
-        "result" unique@
+        "result" [ unique ] change
       ] each
     ] each 
     "result" get
@@ -202,7 +202,7 @@ errors unparser logging listener url-encoding hashtables memory ;
       ] show [
         "allow-edit?" get [ 
           "eval" get [ 
-             "eval" f put
+             "eval" off
              "Editing has been disabled." show-message-page 
           ] when
         ] unless

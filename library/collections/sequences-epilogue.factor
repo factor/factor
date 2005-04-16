@@ -96,10 +96,17 @@ M: sequence (tree-each) [ swap call ] seq-each-with ;
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
+: (exchange) ( seq i j -- seq[i] j seq )
+    pick >r >r swap nth r> r> ;
+
+: exchange ( seq i j -- )
+    #! Exchange seq[i] and seq[j].
+    3dup >r >r >r (exchange) r> r> r>
+    swap (exchange) set-nth set-nth ;
+
 : (nreverse) ( seq i -- )
     #! Swap seq[i] with seq[length-i-1].
-    
-    ;
+    over length over - 1 - exchange ;
 
 : nreverse ( seq -- )
     #! Destructively reverse seq.
