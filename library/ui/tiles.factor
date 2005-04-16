@@ -6,7 +6,7 @@ USING: generic kernel math namespaces ;
 ! A tile is a gadget with a caption. Dragging the caption
 ! moves the gadget. The title bar also has buttons for
 ! performing various actions.
-TUPLE: tile original ( size ) ;
+TUPLE: tile original ;
 
 : click-rel ( gadget -- point )
     screen-pos

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
 USING: errors generic hashtables kernel lists math namespaces
-sequences streams strings threads vectors ;
+sequences stdio streams strings threads vectors ;
 
 ! These let us load the code into a CFactor instance using the
 ! old C-based I/O. They will be removed soon.
@@ -55,7 +55,13 @@ GENERIC: io-task-events ( task -- events )
 ! this with the hash-size call.
 SYMBOL: io-tasks
 
-: init-io ( -- ) global [ <namespace> io-tasks set ] bind ;
+: init-io ( -- )
+    #! Should only be called on startup. Calling this at any
+    #! other time can have unintended consequences.
+    global [
+        <namespace> io-tasks set
+        0 <reader> 1 <writer> <talk-stream> stdio set
+    ] bind ;
 
 : io-task-fd io-task-port port-handle ;
 

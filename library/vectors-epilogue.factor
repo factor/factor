@@ -16,8 +16,8 @@ IN: vectors
 
 : vector-append ( v1 v2 -- vec )
     over length over length + <vector>
-    [ rot seq-append ] keep
-    [ swap seq-append ] keep ;
+    [ rot nappend ] keep
+    [ swap nappend ] keep ;
 
 : vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter
