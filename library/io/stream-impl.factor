@@ -67,16 +67,6 @@ M: fd-stream stream-close ( stream -- )
     #! Open a file path relative to the Factor source code root.
     resource-path swap path+ <file-reader> ;
 
-! Think '/dev/null'.
-
-TUPLE: null-stream ;
-M: null-stream stream-flush drop ;
-M: null-stream stream-auto-flush drop ;
-M: null-stream stream-read 2drop f ;
-M: null-stream stream-readln drop f ;
-M: null-stream stream-write-attr 3drop ;
-M: null-stream stream-close drop ;
-
 : init-stdio ( -- )
     #! Opens file descriptors 0, 1.
     stdin stdout <fd-stream> <stdio-stream> stdio set ;

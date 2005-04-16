@@ -8,6 +8,7 @@
 - powerpc has weird callstack residue
 - make-vector and make-string should not need a reverse step
 - console with presentations
+
 + plugin:
 
 - extract word: if selection empty, move caret to new word after
@@ -26,7 +27,6 @@
 
 + ffi:
 
-- replace alien-address, local-alien? primitives with colon defs
 - auto-generate box/unbox, and alien accessors
 - box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
@@ -40,6 +40,7 @@
 
 + compiler:
 
+- alien primitives need a more general input type
 - linux? bsd? words
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
@@ -63,9 +64,9 @@
   index? subseq?
 - index and index* are very slow with lists
 - list map, subset, project, append: not tail recursive
-- non-consing sequence=
-- tuple =
-- decide what to do with sbuf-append and index-of
+- : , sequence get push ; : % sequence get nappend ;
+- phase out sbuf-append
+- decide what to do with index-of
 - GENERIC: map
   - list impl same as now
   - sequence impl: clone sequence and call nmap
