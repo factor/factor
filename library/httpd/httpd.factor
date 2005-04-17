@@ -74,3 +74,7 @@ stdio streams strings threads url-encoding ;
 
 : httpd ( port -- )
     [ httpd-log-stream "log" set (httpd) ] with-scope ;
+
+: stop-httpd ( -- )
+    #! Stop the server.
+    "http-server" get stream-close ;

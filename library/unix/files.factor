@@ -1,13 +1,14 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: files
-USING: alien io-internals kernel math namespaces ;
+! We want the system call stat to shadow the word stat we define
+USING: alien io-internals kernel math namespaces unix-internals ;
 
 : cd ( dir -- )
     "void" "libc" "chdir" [ "char*" ] alien-invoke ;
 
 : stat ( path -- [ dir? mode size mtime ] )
-    <stat> tuck sys-stat 0 < [
+    <stat> tuck stat 0 < [
         drop f
     ] [
         [
@@ -19,13 +20,13 @@ USING: alien io-internals kernel math namespaces ;
     ] ifte ;
 
 : (directory) ( path -- list )
-    sys-opendir [
+    opendir [
         [
-            [ dirent-name , ] [ dup sys-readdir null>f ] while
-        ] make-list swap sys-closedir
+            [ dirent-name , ] [ dup readdir null>f ] while
+        ] make-list swap closedir
     ] [
         [ ]
     ] ifte* ;
 
 : cwd ( -- str )
-    <string-box> dup 255 sys-getcwd io-error string-box-value ;
+    <string-box> dup 255 getcwd io-error string-box-value ;

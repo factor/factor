@@ -1,75 +1,58 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd-responder
-USE: httpd
-USE: kernel
-USE: namespaces
-USE: strings
-
-USE: test-responder
-USE: inspect-responder
-USE: quit-responder
-USE: file-responder
-USE: resource-responder
-USE: cont-responder
-USE: browser-responder
+USING: browser-responder cont-responder file-responder kernel
+namespaces prettyprint quit-responder resource-responder
+test-responder ;
 
 #! Remove all existing responders, and create a blank
 #! responder table.
 global [ <namespace> "httpd-responders" set ] bind
 
-<responder> [
-    "404" "responder" set
-    [ drop no-such-responder ] "get" set
-] extend add-responder
-
-<responder> [
-    "test" "responder" set
-    [ test-responder ] "get" set
-] extend add-responder
-
+! This responder lets anybody shut down your httpd. You should
+! disable it if you plan on running a production server!
 <responder> [
     "quit" "responder" set
     [ quit-responder ] "get" set
 ] extend add-responder
 
 <responder> [
+    "posttest" "responder" set
+    [ drop "response" get global [ . ] bind ] "post" set
+] extend add-responder
+
+! Runs all unit tests and dumps result to the client. This uses
+! a lot of server resources, so disable it on a busy server.
+<responder> [
+    "test" "responder" set
+    [ test-responder ] "get" set
+] extend add-responder
+
+! 404 error message pages are served by this guy
+<responder> [
+    "404" "responder" set
+    [ drop no-such-responder ] "get" set
+] extend add-responder
+
+! Serves files from a directory stored in the "doc-root"
+! variable. You can set the variable in the global namespace,
+! or inside the responder.
+<responder> [
+    ! "/var/www/" "doc-root" set
     "file" "responder" set
     [ file-responder ] "get" set
     [ file-responder ] "post" set
     [ file-responder ] "head" set
 ] extend add-responder
 
+! Serves Factor source code 
 <responder> [
     "resource" "responder" set
     [ resource-responder ] "get" set
 ] extend add-responder
 
+! Servers Factor word definitions from the image.
 "browser" [ f browser-responder ] install-cont-responder
 
+! The root directory is served by...
 "file" set-default-responder

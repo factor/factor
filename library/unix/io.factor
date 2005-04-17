@@ -1,8 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors generic hashtables kernel lists math namespaces
-sequences stdio streams strings threads vectors ;
+USING: errors generic hashtables kernel lists math
+sequences stdio streams strings threads unix-internals vectors ;
+
+! We want this bind to shadow the bind system call from
+! unix-internals
+USING: namespaces ;
 
 ! These let us load the code into a CFactor instance using the
 ! old C-based I/O. They will be removed soon.
@@ -22,7 +26,7 @@ FORGET: wait-to-write
 : io-error ( n -- ) 0 < [ errno strerror throw ] when ;
 
 : init-handle ( fd -- )
-    F_SETFL O_NONBLOCK 1 sys-fcntl io-error ;
+    F_SETFL O_NONBLOCK 1 fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
 TUPLE: port handle buffer error ;
@@ -54,14 +58,6 @@ GENERIC: io-task-events ( task -- events )
 ! to find the number of elements, and a hashtable gives us
 ! this with the hash-size call.
 SYMBOL: io-tasks
-
-: init-io ( -- )
-    #! Should only be called on startup. Calling this at any
-    #! other time can have unintended consequences.
-    global [
-        <namespace> io-tasks set
-        0 <reader> 1 <writer> <talk-stream> stdio set
-    ] bind ;
 
 : io-task-fd io-task-port port-handle ;
 
@@ -110,12 +106,12 @@ SYMBOL: io-tasks
     ] keep ;
 
 : io-multiplex ( -- )
-    make-pollfds 2dup -1 sys-poll drop do-io-tasks io-multiplex ;
+    make-pollfds 2dup -1 poll drop do-io-tasks io-multiplex ;
 
 ! Readers
 
 : open-read ( path -- fd )
-    O_RDONLY file-mode sys-open dup io-error ;
+    O_RDONLY file-mode open dup io-error ;
 
 TUPLE: reader line ready? ;
 
@@ -134,7 +130,7 @@ C: reader ( handle -- reader )
         "reader not ready" throw
     ] ifte ;
 
-M: reader stream-close ( stream -- ) port-handle sys-close ;
+M: reader stream-close ( stream -- ) port-handle close ;
 
 ! Reading lines
 : read-line-loop ( line buffer -- ? )
@@ -170,7 +166,7 @@ M: reader stream-close ( stream -- ) port-handle sys-close ;
 
 : read-step ( port -- )
     >port<
-    tuck dup buffer-end swap buffer-capacity sys-read
+    tuck dup buffer-end swap buffer-capacity read
     dup 0 >= [ swap n>buffer ] [ drop postpone-error ] ifte ;
 
 : refill ( reader -- )
@@ -229,7 +225,7 @@ C: read-task ( port -- task )
 
 : >read-task< dup read-task-count swap io-task-port ;
 
-M: read-task do-io-task
+M: read-task do-io-task ( task -- ? )
     >read-task< dup refill dup eof? [
         nip reader-eof t
     ] [
@@ -254,7 +250,7 @@ M: reader stream-read ( count stream -- string )
 ! Writers
 
 : open-write ( path -- fd )
-    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode sys-open
+    O_WRONLY O_CREAT bitor O_TRUNC bitor file-mode open
     dup io-error ;
 
 TUPLE: writer ;
@@ -263,7 +259,7 @@ C: writer ( fd -- writer )
     [ >r buffered-port r> set-delegate ] keep ;
 
 : write-step ( fd buffer -- )
-    tuck dup buffer@ swap buffer-length sys-write dup 0 >= [
+    tuck dup buffer@ swap buffer-length write dup 0 >= [
         swap buffer-consume
     ] [
         drop postpone-error
@@ -327,7 +323,11 @@ M: writer stream-write-attr ( string style writer -- )
     nip >r dup string? [ ch>string ] unless r> blocking-write ;
 
 M: writer stream-close ( stream -- )
-    dup stream-flush port-handle sys-close ;
+    dup stream-flush port-handle close ;
+
+! Make a duplex stream for reading/writing a pair of fds
+: <fd-stream> ( infd outfd flush? -- )
+    >r >r <reader> r> <writer> r> <duplex-stream> ;
 
 ! Copying from a reader to a writer
 
@@ -348,3 +348,11 @@ M: writer stream-close ( stream -- )
     ] [
         2drop f
     ] ifte ;
+
+: init-io ( -- )
+    #! Should only be called on startup. Calling this at any
+    #! other time can have unintended consequences.
+    global [
+        <namespace> io-tasks set
+        0 1 t <fd-stream> stdio set
+    ] bind ;

@@ -20,7 +20,7 @@ SYMBOL: c-types
         "No such C type: " swap cat2 throw f
     ] ?ifte ;
 
-: size ( name -- size )
+: c-size ( name -- size )
     c-type [ "width" get ] bind ;
 
 : define-c-type ( quot name -- )

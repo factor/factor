@@ -56,6 +56,7 @@ math namespaces parser strings words ;
     dup define-nth
     [
         "width" set
+        cell "align" set
         [ swap <displaced-alien> ] "getter" set
     ] "struct-name" get define-c-type
     "void*" c-type "struct-name" get "*" cat2

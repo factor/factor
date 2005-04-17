@@ -27,7 +27,7 @@ M: alien = ( obj obj -- ? )
         2drop f
     ] ifte ;
 
-: ALIEN: scan <alien> swons ; parsing
+: ALIEN: scan-word <alien> swons ; parsing
 
 : DLL" skip-blank parse-string dlopen swons ; parsing
 

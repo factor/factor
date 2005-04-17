@@ -66,13 +66,29 @@ C: wrapper-stream ( stream -- stream )
 
 ! Combine an input and output stream into one, and flush the
 ! stream more often.
-TUPLE: talk-stream in out ;
-M: talk-stream stream-flush talk-stream-out stream-flush ;
-M: talk-stream stream-auto-flush talk-stream-out stream-flush ;
-M: talk-stream stream-readln talk-stream-in stream-readln ;
-M: talk-stream stream-read talk-stream-in stream-read ;
-M: talk-stream stream-write-attr talk-stream-out stream-write-attr ;
-M: talk-stream stream-close talk-stream-out stream-close ;
+TUPLE: duplex-stream in out flush? ;
+
+M: duplex-stream stream-flush
+    duplex-stream-out stream-flush ;
+
+M: duplex-stream stream-auto-flush
+    dup duplex-stream-flush? [
+        duplex-stream-out stream-flush
+    ] [
+        drop
+    ] ifte ;
+
+M: duplex-stream stream-readln
+    duplex-stream-in stream-readln ;
+
+M: duplex-stream stream-read
+    duplex-stream-in stream-read ;
+
+M: duplex-stream stream-write-attr
+    duplex-stream-out stream-write-attr ;
+
+M: duplex-stream stream-close
+    duplex-stream-out stream-close ;
 
 ! Reading lines and counting line numbers.
 SYMBOL: line-number

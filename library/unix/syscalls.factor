@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: io-internals
+IN: unix-internals
 USING: alien errors kernel math namespaces ;
 
 ! Alien wrappers for various Unix libc functions.
@@ -9,6 +9,7 @@ ALIAS: ulonglong off_t
 ALIAS: long ssize_t
 ALIAS: ulong size_t
 ALIAS: uint socklen_t
+ALIAS: uint in_addr_t
 
 BEGIN-STRUCT: stat
     FIELD: uint dev
@@ -38,10 +39,10 @@ END-STRUCT
 : S_IFMT OCT: 0170000 ; inline
 : S_ISDIR ( m -- ? ) OCT: 0170000 bitand OCT: 0040000 = ; inline
 
-: sys-stat ( path stat -- n )
+: stat ( path stat -- n )
     "int" "libc" "stat" [ "char*" "stat*" ] alien-invoke ;
 
-: sys-opendir ( path -- dir* )
+: opendir ( path -- dir* )
     "void*" "libc" "opendir" [ "char*" ] alien-invoke ;
 
 BEGIN-STRUCT: dirent
@@ -52,10 +53,10 @@ BEGIN-STRUCT: dirent
     FIELD: uchar256 name
 END-STRUCT
 
-: sys-readdir ( dir* -- dirent* )
+: readdir ( dir* -- dirent* )
     "dirent*" "libc" "readdir" [ "void*" ] alien-invoke ;
 
-: sys-closedir ( dir* -- )
+: closedir ( dir* -- )
     "void" "libc" "closedir" [ "void*" ] alien-invoke ;
 
 BEGIN-STRUCT: string-box
@@ -70,7 +71,7 @@ END-STRUCT
 : strerror ( n -- str )
     "char*" "libc" "strerror" [ "int" ] alien-invoke ;
 
-: sys-getcwd ( str len -- n )
+: getcwd ( str len -- n )
     "int" "libc" "getcwd" [ "string-box*" "uint" ] alien-invoke ;
 
 : O_RDONLY  HEX: 0000 ;
@@ -79,27 +80,27 @@ END-STRUCT
 : O_CREAT   HEX: 0200 ;
 : O_TRUNC   HEX: 0400 ;
 
-: sys-open ( path flags prot -- fd )
+: open ( path flags prot -- fd )
     "int" "libc" "open" [ "char*" "int" "int" ] alien-invoke ;
 
-: sys-close ( fd -- )
+: close ( fd -- )
     "void" "libc" "close" [ "int" ] alien-invoke ;
 
 : F_SETFL 4 ; ! set file status flags
 : O_NONBLOCK 4 ; ! no delay
 
-: sys-fcntl ( fd cmd key value -- n )
+: fcntl ( fd cmd key value -- n )
     "int" "libc" "fcntl" [ "int" "int" "int" "int" ] alien-invoke ;
 
-: sys-read ( fd buf nbytes -- n )
+: read ( fd buf nbytes -- n )
     "ssize_t" "libc" "read" [ "int" "ulong" "size_t" ] alien-invoke ;
 
-: sys-write ( fd buf nbytes -- n )
+: write ( fd buf nbytes -- n )
     "ssize_t" "libc" "write" [ "int" "ulong" "size_t" ] alien-invoke ;
 
 : MSG_OOB HEX: 1 ;
 
-: sys-recv ( fd buf nbytes flags -- )
+: recv ( fd buf nbytes flags -- )
     "ssize_t" "libc" "read" [ "int" "ulong" "size_t" "int" ] alien-invoke ;
 
 BEGIN-STRUCT: pollfd
@@ -119,25 +120,31 @@ END-STRUCT
 : read-events POLLIN POLLRDNORM bitor POLLRDBAND bitor ;
 : write-events POLLOUT POLLWRNORM bitor POLLWRBAND bitor ;
 
-: sys-poll ( pollfds nfds timeout -- n )
+: poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;
+
+BEGIN-STRUCT: void**
+    FIELD: void* s
+END-STRUCT
 
 BEGIN-STRUCT: hostent
     FIELD: char* name
-    FIELD: void* aliases ( really char**)
+    FIELD: void** aliases
     FIELD: int addrtype
     FIELD: int length
-    FIELD: void* addr-list ( really char**)
+    FIELD: void** addr-list
 END-STRUCT
 
-: sys-gethostbyname ( name -- hostent )
+: hostent-addr hostent-addr-list 0 swap void**-nth void**-s ;
+
+: gethostbyname ( name -- hostent )
     "hostent*" "libc" "gethostbyname" [ "char*" ] alien-invoke ;
 
 BEGIN-STRUCT: sockaddr-in
-    FIELD: uchar len;
-    FIELD: uchar family;
-    FIELD: ushort port;
-! FIELD: struct	in_addr sin_addr;
+    FIELD: uchar len
+    FIELD: uchar family
+    FIELD: ushort port
+    FIELD: in_addr_t addr
 ! FIELD: char	sin_zero[8];
 END-STRUCT
 
@@ -145,29 +152,29 @@ END-STRUCT
 : PF_INET AF_INET ;
 : SOCK_STREAM 1 ;
 
-: sys-socket ( domain type protocol -- n )
+: socket ( domain type protocol -- n )
     "int" "libc" "socket" [ "int" "int" "int" ] alien-invoke ;
 
 : SOL_SOCKET HEX: ffff ; ! options for socket level
 : SO_REUSEADDR HEX: 4 ; ! allow local address reuse
 : INADDR_ANY 0 ;
 
-: sys-setsockopt ( s level optname optval optlen -- n )
+: setsockopt ( s level optname optval optlen -- n )
     "int" "libc" "setsockopt" [ "int" "int" "int" "void*" "socklen_t" ] alien-invoke ;
 
-: sys-connect ( s name namelen -- n )
+: connect ( s name namelen -- n )
     "int" "libc" "connect" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
 
-: sys-bind ( s sockaddr socklen -- n )
+: bind ( s sockaddr socklen -- n )
     "int" "libc" "bind" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
 
-: sys-listen ( s backlog -- n )
+: listen ( s backlog -- n )
     "int" "libc" "listen" [ "int" "int" ] alien-invoke ;
 
-: sys-accept ( s sockaddr socklen -- n )
+: accept ( s sockaddr socklen -- n )
     "int" "libc" "accept" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
 
-: sys-inet-ntoa ( sockaddr -- string )
+: inet-ntoa ( sockaddr -- string )
     "char*" "libc" "inet_ntoa" [ "sockaddr-in" ] alien-invoke ;
 
 : htonl ( n -- n )
