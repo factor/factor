@@ -45,6 +45,7 @@ t [
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
     "/library/tools/jedit.factor"
+    "/library/tools/dump.factor"
     "/library/bootstrap/image.factor"
 
     "/library/httpd/url-encoding.factor"
