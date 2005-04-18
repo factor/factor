@@ -41,7 +41,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! Vectors
 : { f ; parsing
-: } reverse list>vector swons ; parsing
+: } reverse >vector swons ; parsing
 
 ! Hashtables
 : {{ f ; parsing

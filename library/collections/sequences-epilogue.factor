@@ -53,17 +53,38 @@ M: sequence (tree-each) [ swap call ] seq-each-with ;
 : tree-each-with ( obj vector quot -- )
     swap [ with ] tree-each 2drop ; inline
 
-: (seq-2nmap) ( seq1 seq2 i quot -- elt3 )
+: change-nth ( seq i quot -- )
+    pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
+
+: (nmap) ( seq i quot -- )
+    pick length pick <= [
+        3drop
+    ] [
+        3dup >r >r >r change-nth r> r> 1 + r> (nmap)
+    ] ifte ; inline
+
+: nmap ( seq quot -- | quot: elt -- elt )
+    #! Destructive on seq.
+    0 swap (nmap) ; inline
+
+: immutable ( seq quot -- seq | quot: seq -- )
+    swap [ unfreeze ] keep >r dup >r swap call r> r> freeze ;
+    inline
+
+: seq-map ( seq quot -- seq | quot: elt -- elt )
+    swap [ swap nmap ] immutable ; inline
+
+: (2nmap) ( seq1 seq2 i quot -- elt3 )
     pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
 
-: seq-2nmap ( seq1 seq2 quot -- | quot: elt1 elt2 -- elt3 )
+: 2nmap ( seq1 seq2 quot -- | quot: elt1 elt2 -- elt3 )
     #! Destructive on seq2.
     over length [
-        [ >r 3dup r> swap (seq-2nmap) ] keep
+        [ >r 3dup r> swap (2nmap) ] keep
     ] repeat 3drop ; inline
 
 : seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
-    >r clone r> over >r seq-2nmap r> ; inline
+    >r clone r> over >r 2nmap r> ; inline
 
 ! Operations
 : index* ( obj i seq -- n )
@@ -84,7 +105,16 @@ M: sequence (tree-each) [ swap call ] seq-each-with ;
 
 : nappend ( s1 s2 -- )
     #! Destructively append s2 to s1.
+   ! over length over ensure-capacity
     [ over push ] seq-each drop ;
+
+: seq-append ( s1 s2 -- s1+s2 )
+    #! Return a new sequence of the same type as s1.
+    swap [ swap nappend ] immutable ;
+
+: seq-append3 ( s1 s2 s3 -- s1+s2+s3 )
+    #! Return a new sequence of the same type as s1.
+    rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
 : peek ( sequence -- element )
     #! Get value at end of sequence.
@@ -141,6 +171,11 @@ M: sequence = ( obj seq -- ? )
             2drop f
         ] ifte
     ] ifte ;
+
+! A repeated sequence is the same element n times.
+TUPLE: repeated object length ;
+M: repeated length repeated-length ;
+M: repeated nth nip repeated-object ;
 
 IN: kernel
 

@@ -20,13 +20,13 @@ sequences strings test vectors ;
 
 [ 1 { } nth ] unit-test-fails
 [ -1 { } set-length ] unit-test-fails
-[ 5 list>vector ] unit-test-fails
-[ { } ] [ [ ] list>vector ] unit-test
-[ { 1 2 } ] [ [ 1 2 ] list>vector ] unit-test
+[ 5 >vector ] unit-test-fails
+[ { } ] [ [ ] >vector ] unit-test
+[ { 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
     100 empty-vector [ drop 0 100 random-int ] vector-map
-    dup >list list>vector =
+    dup >list >vector =
 ] unit-test
 
 [ f ] [ { } { 1 2 3 } = ] unit-test
@@ -37,7 +37,7 @@ sequences strings test vectors ;
 [ [ 1 4 9 16 ] ]
 [
     [ 1 2 3 4 ]
-    list>vector [ dup * ] vector-map >list
+    >vector [ dup * ] vector-map >list
 ] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test
@@ -95,5 +95,5 @@ unit-test
 [ { "c" "b" "a" } ] [ { "a" "b" "c" } clone dup 0 2 exchange ] unit-test
 
 [ t ] [
-    100 count dup list>vector dup nreverse >list >r reverse r> =
+    100 count dup >vector dup nreverse >list >r reverse r> =
 ] unit-test

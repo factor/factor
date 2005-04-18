@@ -21,7 +21,7 @@ url-encoding presentation generic ;
     [ dup html-entities assoc dup rot ? ] string-map ;
 
 : >hex-color ( triplet -- hex )
-    [ >hex 2 "0" pad ] map "#" swons cat ;
+    [ CHAR: # , [ >hex 2 "0" pad % ] each ] make-string ;
 
 : fg-css, ( color -- )
     "color: " , >hex-color , "; " , ;

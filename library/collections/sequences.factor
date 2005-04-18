@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
-USING: generic kernel kernel-internals math strings
-vectors ;
+USING: generic kernel math strings vectors ;
 
 ! This file is needed very early in bootstrap.
 
@@ -14,6 +13,13 @@ vectors ;
 
 GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
+GENERIC: ensure-capacity ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: >list ( seq -- list )
+GENERIC: unfreeze ( seq -- mutable-seq )
+GENERIC: freeze ( new orig -- new )
+
+M: object ensure-capacity 2drop ;
+M: object unfreeze ;
+M: object freeze drop ;

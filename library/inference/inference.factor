@@ -105,7 +105,7 @@ M: computed literal-value ( value -- )
     ] ifte ;
 
 : vector-prepend ( values stack -- stack )
-    >r list>vector r> vector-append ;
+    >r >vector r> vector-append ;
 
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types

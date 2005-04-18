@@ -29,12 +29,15 @@ M: string nth string-nth ;
 : cat2 ( "a" "b" -- "ab" )
     swap
     80 <sbuf>
-    dup >r sbuf-append r>
-    dup >r sbuf-append r>
+    [ sbuf-append ] keep
+    [ sbuf-append ] keep
     sbuf>string ;
 
 : cat3 ( "a" "b" "c" -- "abc" )
-    [ ] cons cons cons cat ;
+    >r >r >r 80 <sbuf>
+    r> over sbuf-append
+    r> over sbuf-append
+    r> over sbuf-append sbuf>string ;
 
 : index-of ( string substring -- index )
     0 -rot index-of* ;

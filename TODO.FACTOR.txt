@@ -57,7 +57,7 @@
 
 + sequences
 
-- generic ensure-capacity
+- vector's ensure-capacity will crash if not given fixnums!
 - dipping seq-2nmap, seq-2each
 - remove seq- prefixes
 - generic each some? all? member? memq? all=? top
@@ -68,10 +68,6 @@
 - decide what to do with index-of
 - GENERIC: map
   - list impl same as now
-  - sequence impl: clone sequence and call nmap
-  - string impl: string>sbuf nmap sbuf>string
-- GENERIC: append, append3, append*
-- list>vector --> >vector
 - move >list to lists
 
 + kernel:

@@ -125,7 +125,7 @@ UNION: arrayed array tuple ;
 : (hash>quot) ( default hash -- quot )
     [
         \ dup , \ hashcode , dup bucket-count , \ rem ,
-        buckets>list [ alist>quot ] map-with list>vector ,
+        buckets>list [ alist>quot ] map-with >vector ,
         \ dispatch ,
     ] make-list ;
 

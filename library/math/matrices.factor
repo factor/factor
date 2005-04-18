@@ -83,7 +83,7 @@ M: row nth ( n row -- ) >row< matrix-get ;
 
 ! These will be removed after seq-2each is fixed and v. is redone
 M: row set-nth ( value n row -- ) >row< matrix-set ;
-M: row clone >list list>vector ;
+M: row clone >vector ;
 
 ! A sequence of rows.
 TUPLE: row-seq matrix ;
@@ -98,7 +98,7 @@ M: col nth ( n column -- ) >col< swapd matrix-get ;
 
 ! These will be removed after seq-2each is fixed and v. is redone
 M: col set-nth ( value n column ) >col< matrix-set ;
-M: col clone >list list>vector ;
+M: col clone >vector ;
 
 ! A sequence of columns.
 TUPLE: col-seq matrix ;

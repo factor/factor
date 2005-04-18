@@ -62,5 +62,10 @@ M: sbuf set-nth set-sbuf-nth ;
 : ch>string ( ch -- str )
     1 <sbuf> [ sbuf-append ] keep sbuf>string ;
 
+: >sbuf ( list -- vector ) 0 <sbuf> swap seq-append ;
+
 : string>sbuf ( str -- sbuf )
     dup string-length <sbuf> [ sbuf-append ] keep ;
+
+M: string unfreeze string>sbuf ;
+M: string freeze drop sbuf>string ;
