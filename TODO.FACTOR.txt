@@ -26,7 +26,8 @@
 
 + ffi:
 
-- auto-generate box/unbox, and alien accessors
+- if a boxer triggers GC, already-pushed addresses might become
+  invalid!
 - box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
 - utf16 string boxing
@@ -76,7 +77,6 @@
 - unions containing tuples do not work properly
 - need G: combinations
 - method doc strings
-- make-image: use a list not a vector
 - code walker & exceptions
 - string sub-primitives
 - clean up metaclasses

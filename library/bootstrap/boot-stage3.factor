@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: assembler compiler kernel lists namespaces parser stdio
-unparser ;
+USING: assembler compiler kernel lists namespaces parser
+sequences stdio unparser ;
 
 "Bootstrap stage 3..." print
 
@@ -9,6 +9,7 @@ unparser ;
     init-assembler
     \ car compile
     \ = compile
+    \ length compile
     \ unparse compile
     \ scan compile
 ] when

@@ -5,15 +5,14 @@ USING: errors generic interpreter kernel lists math namespaces
 sequences strings vectors words hashtables prettyprint ;
 
 : longest-vector ( list -- length )
-    [ vector-length ] map [ > ] top ;
+    0 swap [ length max ] each ;
 
 : computed-value-vector ( n -- vector )
     [ drop object <computed> ] vector-project ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    [ vector-length - computed-value-vector ] keep
-    vector-append ;
+    [ length - computed-value-vector ] keep seq-append ;
 
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
@@ -38,7 +37,7 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths vector-transpose [ unify-results ] vector-map ; 
+    unify-lengths vector-transpose [ unify-results ] seq-map ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
@@ -83,17 +82,17 @@ SYMBOL: cloned
         dup clone [ swap cloned [ acons ] change ] keep
     ] ?ifte ;
 
-: deep-clone-vector ( vector -- vector )
-    #! Clone a vector of vectors.
-    [ deep-clone ] vector-map ;
+: deep-clone-seq ( seq -- seq )
+    #! Clone a sequence and each object it contains.
+    [ deep-clone ] seq-map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
     cloned off
-    meta-r [ deep-clone-vector ] change
-    meta-d [ deep-clone-vector ] change
-    d-in [ deep-clone-vector ] change
+    meta-r [ deep-clone-seq ] change
+    meta-d [ deep-clone-seq ] change
+    d-in [ deep-clone-seq ] change
     dataflow-graph off ;
 
 : infer-branch ( value -- namespace )

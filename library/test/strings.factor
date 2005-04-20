@@ -8,10 +8,6 @@ USE: namespaces
 USE: strings
 USE: test
 
-[ f ] [ "A string." f-or-"" ] unit-test
-[ t ] [ "" f-or-"" ] unit-test
-[ t ] [ f f-or-"" ] unit-test
-
 [ "abc" ] [ [ "a" "b" "c" ] cat ] unit-test
 
 [ "abc" ] [ "ab" "c" cat2 ] unit-test
@@ -90,7 +86,7 @@ unit-test
 [ "Replacing+spaces+with+plus" ]
 [
     "Replacing spaces with plus"
-    [ dup CHAR: \s = [ drop CHAR: + ] when ] string-map
+    [ dup CHAR: \s = [ drop CHAR: + ] when ] seq-map
 ]
 unit-test
 

@@ -127,7 +127,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 : " parse-string swons ; parsing
 
-: SBUF" skip-blank parse-string string>sbuf swons ; parsing
+: SBUF" skip-blank parse-string >sbuf swons ; parsing
 
 ! Comments
 : (

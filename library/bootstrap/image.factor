@@ -179,7 +179,7 @@ M: f ' ( obj -- ptr )
 : fixup-words ( -- )
     image get [
         dup word? [ fixup-word ] when
-    ] vector-map image set ;
+    ] seq-map image set ;
 
 M: word ' ( word -- pointer )
     transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;

@@ -19,7 +19,3 @@ GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: >list ( seq -- list )
 GENERIC: unfreeze ( seq -- mutable-seq )
 GENERIC: freeze ( new orig -- new )
-
-M: object ensure-capacity 2drop ;
-M: object unfreeze ;
-M: object freeze drop ;

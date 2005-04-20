@@ -103,21 +103,7 @@ M: cons nth ( n list -- element )
 
 : all=? ( list -- ? )
     #! Check if all elements of a list are equal.
-    dup [ uncons [ over = ] all? nip ] [ drop t ] ifte ;
-
-: maximize ( pred o1 o2 -- o1/o2 )
-    #! Return o1 if pred returns true, o2 otherwise.
-    [ rot call ] 2keep ? ; inline
-
-: (top) ( list maximizer -- elt )
-    #! Return the highest element in the list, where maximizer
-    #! has stack effect ( o1 o2 -- max(o1,o2) ).
-    >r uncons r> each ; inline
-
-: top ( list pred -- elt )
-    #! Return the highest element in the list, where pred is a
-    #! partial order with stack effect ( o1 o2 -- ? ).
-    swap [ pick >r maximize r> swap ] (top) nip ; inline
+    [ uncons [ = ] all-with? ] [ t ] ifte* ;
 
 M: cons = ( obj cons -- ? )
     2dup eq? [

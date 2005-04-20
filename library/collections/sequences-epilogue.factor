@@ -10,6 +10,12 @@ vectors ;
 ! defined tuples that respond to the sequence protocol.
 UNION: sequence array string sbuf vector ;
 
+M: object ensure-capacity 2drop ;
+M: object unfreeze clone ;
+M: object freeze drop ;
+
+: empty? ( seq -- ? ) length 0 = ;
+
 : (>list) ( n i seq -- list )
     pick pick <= [
         3drop [ ]
@@ -173,7 +179,7 @@ M: sequence = ( obj seq -- ? )
     ] ifte ;
 
 ! A repeated sequence is the same element n times.
-TUPLE: repeated object length ;
+TUPLE: repeated length object ;
 M: repeated length repeated-length ;
 M: repeated nth nip repeated-object ;
 

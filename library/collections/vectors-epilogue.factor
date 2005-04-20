@@ -5,19 +5,7 @@ math-internals sequences ;
 
 IN: vectors
 
-: >vector ( list -- vector )
-    dup length <vector> swap [ over push ] seq-each ;
-
-: vector-map ( vector code -- vector )
-    #! Applies code to each element of the vector, return a new
-    #! vector with the results. The code must have stack effect
-    #! ( obj -- obj ).
-    >r >list r> map >vector ; inline
-
-: vector-append ( v1 v2 -- vec )
-    over length over length + <vector>
-    [ rot nappend ] keep
-    [ swap nappend ] keep ;
+: >vector ( list -- vector ) 0 <vector> [ swap nappend ] keep ;
 
 : vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter

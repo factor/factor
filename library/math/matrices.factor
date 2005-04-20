@@ -81,10 +81,6 @@ TUPLE: row index matrix ;
 M: row length row-matrix matrix-cols ;
 M: row nth ( n row -- ) >row< matrix-get ;
 
-! These will be removed after seq-2each is fixed and v. is redone
-M: row set-nth ( value n row -- ) >row< matrix-set ;
-M: row clone >vector ;
-
 ! A sequence of rows.
 TUPLE: row-seq matrix ;
 M: row-seq length row-seq-matrix matrix-rows ;
@@ -95,10 +91,6 @@ TUPLE: col index matrix ;
 : >col< dup col-index swap col-matrix ;
 M: col length col-matrix matrix-rows ;
 M: col nth ( n column -- ) >col< swapd matrix-get ;
-
-! These will be removed after seq-2each is fixed and v. is redone
-M: col set-nth ( value n column ) >col< matrix-set ;
-M: col clone >vector ;
 
 ! A sequence of columns.
 TUPLE: col-seq matrix ;

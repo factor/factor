@@ -61,7 +61,7 @@ M: word prettyprint* ( indent word -- indent )
 
 : indent ( indent -- )
     #! Print the given number of spaces.
-    " " fill write ;
+    CHAR: \s fill write ;
 
 : prettyprint-newline ( indent -- )
     "\n" write indent ;

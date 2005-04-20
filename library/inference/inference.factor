@@ -104,14 +104,11 @@ M: computed literal-value ( value -- )
         2drop f
     ] ifte ;
 
-: vector-prepend ( values stack -- stack )
-    >r >vector r> vector-append ;
-
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types
-    meta-d get required-inputs dup
-    meta-d [ vector-prepend ] change
-    d-in [ vector-prepend ] change ;
+    meta-d get required-inputs >vector dup
+    meta-d [ seq-append ] change
+    d-in [ seq-append ] change ;
 
 : (present-effect) ( vector -- list )
     >list [ value-class ] map ;

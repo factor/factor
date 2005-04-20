@@ -81,7 +81,7 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 "0" pad "\\u" swap cat2 ;
+    >hex 4 CHAR: 0 pad "\\u" swap cat2 ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [

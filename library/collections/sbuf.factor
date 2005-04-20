@@ -8,29 +8,24 @@ M: sbuf set-length set-sbuf-length ;
 M: sbuf nth sbuf-nth ;
 M: sbuf set-nth set-sbuf-nth ;
 
-: fill ( count char -- string )
-    #! Push a string that consists of the same character
-    #! repeated.
-    [ swap [ dup , ] times drop ] make-string ;
+: >sbuf ( seq -- sbuf ) 0 <sbuf> [ swap nappend ] keep ;
+
+: >string ( seq -- string ) >sbuf sbuf>string ;
+
+: fill ( count char -- string ) <repeated> >string ;
 
 : pad ( string count char -- string )
-    >r over string-length - dup 0 <= [
+    >r over length - dup 0 <= [
         r> 2drop
     ] [
-        r> fill swap cat2
+        r> fill swap seq-append
     ] ifte ;
-
-: string-map ( str code -- str )
-    #! Apply a quotation to each character in the string, and
-    #! push a new string constructed from return values.
-    #! The quotation must have stack effect ( X -- X ).
-    >r >list r> map cat ; inline
 
 : split-next ( index string split -- next )
     3dup index-of* dup -1 = [
         >r drop string-tail , r> ( end of string )
     ] [
-        swap string-length dupd + >r swap substring , r>
+        swap length dupd + >r swap substring , r>
     ] ifte ;
 
 : (split) ( index string split -- )
@@ -46,10 +41,10 @@ M: sbuf set-nth set-sbuf-nth ;
     [ 0 -rot (split) ] make-list ;
 
 : split-n-advance substring , >r tuck + swap r> ;
-: split-n-finish nip dup string-length swap substring , ;
+: split-n-finish nip dup length swap substring , ;
 
 : (split-n) ( start n str -- )
-    3dup >r dupd + r> 2dup string-length < [
+    3dup >r dupd + r> 2dup length < [
         split-n-advance (split-n)
     ] [
         split-n-finish 3drop
@@ -59,13 +54,7 @@ M: sbuf set-nth set-sbuf-nth ;
     #! Split a string into n-character chunks.
     [ 0 -rot (split-n) ] make-list ;
 
-: ch>string ( ch -- str )
-    1 <sbuf> [ sbuf-append ] keep sbuf>string ;
+: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep sbuf>string ;
 
-: >sbuf ( list -- vector ) 0 <sbuf> swap seq-append ;
-
-: string>sbuf ( str -- sbuf )
-    dup string-length <sbuf> [ sbuf-append ] keep ;
-
-M: string unfreeze string>sbuf ;
+M: string unfreeze >sbuf ;
 M: string freeze drop sbuf>string ;

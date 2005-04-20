@@ -3,9 +3,9 @@ USING: kernel namespaces sequences strings test ;
 
 [ "Hello" ] [
     100 <sbuf> "buf" set
-    "Hello" "buf" get sbuf-append
+    "Hello" "buf" get nappend
     "buf" get sbuf-clone "buf-clone" set
-    "World" "buf-clone" get sbuf-append
+    "World" "buf-clone" get nappend
     "buf" get sbuf>string
 ] unit-test
 

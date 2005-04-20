@@ -140,7 +140,7 @@ M: reader stream-close ( stream -- ) port-handle close ;
         dup buffer-pop dup CHAR: \n = [
             3drop t
         ] [
-            pick sbuf-append read-line-loop
+            pick push read-line-loop
         ] ifte
     ] ifte ;
 
@@ -205,9 +205,9 @@ M: reader stream-readln ( stream -- line )
 : read-count-step ( count reader -- ? )
     dup reader-line -rot >r over length - r>
     2dup buffer-fill <= [
-        buffer> swap sbuf-append t
+        buffer> swap nappend t
     ] [
-        buffer>> nip swap sbuf-append f
+        buffer>> nip swap nappend f
     ] ifte ;
 
 : can-read-count? ( count reader -- ? )

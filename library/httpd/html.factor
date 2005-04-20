@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: lists kernel namespaces stdio streams strings unparser
-url-encoding presentation generic ;
+USING: generic kernel lists namespaces presentation sequences
+stdio streams strings unparser url-encoding ;
 
 : html-entities ( -- alist )
     [
@@ -18,10 +18,14 @@ url-encoding presentation generic ;
 
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
-    [ dup html-entities assoc dup rot ? ] string-map ;
+    [
+        [
+            dup html-entities assoc [ % ] [ , ] ?ifte
+        ] seq-each
+    ] make-string ;
 
 : >hex-color ( triplet -- hex )
-    [ CHAR: # , [ >hex 2 "0" pad % ] each ] make-string ;
+    [ CHAR: # , [ >hex 2 CHAR: 0 pad % ] each ] make-string ;
 
 : fg-css, ( color -- )
     "color: " , >hex-color , "; " , ;

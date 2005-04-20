@@ -3,7 +3,7 @@
 IN: strings USING: generic kernel kernel-internals lists math
 sequences ;
 
-BUILTIN: string 12 [ 1 "string-length" f ] [ 2 hashcode f ] ;
+BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
 M: string = string= ;
 
 BUILTIN: sbuf 13 ;
@@ -11,20 +11,11 @@ M: sbuf = sbuf= ;
 
 UNION: text string integer ;
 
-M: string length string-length ;
 M: string nth string-nth ;
 
-: f-or-"" ( obj -- ? )
-    dup not swap "" = or ;
-
-: string-length< ( str str -- boolean )
-    #! Compare string lengths.
-    swap string-length swap string-length < ;
-
-: cat ( [ "a" "b" "c" ] -- "abc" )
-    ! If f appears in the list, it is not appended to the
-    ! string.
-    80 <sbuf> swap [ [ over sbuf-append ] when* ] each sbuf>string ;
+: length< ( seq seq -- ? )
+    #! Compare sequence lengths.
+    swap length swap length < ;
 
 : cat2 ( "a" "b" -- "ab" )
     swap
@@ -42,6 +33,9 @@ M: string nth string-nth ;
 : index-of ( string substring -- index )
     0 -rot index-of* ;
 
+: string-contains? ( substr str -- ? )
+    swap index-of -1 = not ;
+
 : string> ( str1 str2 -- ? )
     ! Returns if the first string lexicographically follows str2
     string-compare 0 > ;
@@ -51,13 +45,10 @@ M: string nth string-nth ;
     #! until the given index.
     0 -rot substring ;
 
-: string-contains? ( substr str -- ? )
-    swap index-of -1 = not ;
-
 : string-tail ( index str -- str )
     #! Returns a new string, from the given index until the end
     #! of the string.
-    [ string-length ] keep substring ;
+    [ length ] keep substring ;
 
 : string/ ( str index -- str str )
     #! Returns 2 strings, that when concatenated yield the
@@ -71,29 +62,29 @@ M: string nth string-nth ;
     [ swap string-head ] 2keep 1 + swap string-tail ;
 
 : string-head? ( str begin -- ? )
-    2dup string-length< [
+    2dup length< [
         2drop f
     ] [
-        dup string-length rot string-head =
+        dup length rot string-head =
     ] ifte ;
 
 : ?string-head ( str begin -- str ? )
     2dup string-head? [
-        string-length swap string-tail t
+        length swap string-tail t
     ] [
         drop f
     ] ifte ;
 
 : string-tail? ( str end -- ? )
-    2dup string-length< [
+    2dup length< [
         2drop f
     ] [
-        dup string-length pick string-length swap - rot string-tail =
+        dup length pick length swap - rot string-tail =
     ] ifte ;
 
-: ?string-tail ( str end -- ? )
+: ?string-tail ( str end -- str ? )
     2dup string-tail? [
-        string-length swap [ string-length swap - ] keep string-head t
+        length swap [ length swap - ] keep string-head t
     ] [
         drop f
     ] ifte ;
@@ -102,7 +93,7 @@ M: string nth string-nth ;
     2dup index-of dup -1 = [
         2drop f
     ] [
-        [ swap string-length + over string-tail ] keep
+        [ swap length + over string-tail ] keep
         rot string-head swap
     ] ifte ;
 
@@ -124,3 +115,5 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     over LETTER? or
     over digit? or
     swap "/_?." string-contains? or ;
+
+: string-length ( deprecated ) length ;

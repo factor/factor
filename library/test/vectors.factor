@@ -25,7 +25,7 @@ sequences strings test vectors ;
 [ { 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 empty-vector [ drop 0 100 random-int ] vector-map
+    100 empty-vector [ drop 0 100 random-int ] seq-map
     dup >list >vector =
 ] unit-test
 
@@ -37,7 +37,7 @@ sequences strings test vectors ;
 [ [ 1 4 9 16 ] ]
 [
     [ 1 2 3 4 ]
-    >vector [ dup * ] vector-map >list
+    >vector [ dup * ] seq-map >list
 ] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test
@@ -45,8 +45,8 @@ sequences strings test vectors ;
 [ t ] [ { 1 { 2 } 3 } hashcode { 1 { 2 } 3 } hashcode = ] unit-test
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 
-[ { 1 2 3 4 5 6 } ]
-[ { 1 2 3 } { 4 5 6 } vector-append ] unit-test
+[ { 1 2 3 } { 1 2 3 4 5 6 } ]
+[ { 1 2 3 } dup { 4 5 6 } seq-append ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a fill ] vector-project ]
