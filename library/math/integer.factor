@@ -1,12 +1,29 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
+USING: errors generic kernel math ;
+
 BUILTIN: fixnum 0 ;
 BUILTIN: bignum 1 ;
 UNION: integer fixnum bignum ;
 
+: (gcd) ( b a y x -- a d )
+    dup 0 number= [
+        drop nip
+    ] [
+        tuck /mod >r pick * swap >r swapd - r> r> (gcd)
+    ] ifte ;
+
+: gcd ( x y -- a d )
+    #! Compute the greatest common divisor d and multiplier a
+    #! such that a*x=d mod y.
+    swap 0 1 2swap (gcd) abs ;
+
+: mod-inv ( x n -- y )
+    #! Compute the multiplicative inverse of x mod n.
+    gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
+
 IN: math-internals
-USING: errors generic kernel math ;
 
 : fraction> ( a b -- a/b )
     dup 1 number= [
@@ -25,7 +42,7 @@ USING: errors generic kernel math ;
         dup 0 < [
             swap neg swap neg
         ] when
-        2dup gcd tuck /i >r /i r> fraction>
+        2dup gcd nip tuck /i >r /i r> fraction>
     ] ifte ; inline
 
 M: fixnum number=

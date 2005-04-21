@@ -49,3 +49,6 @@ USING: kernel lists sequences test ;
 [ [ 1 2 3 ] ] [ [ 1 2 3 4 ] 3 head ] unit-test
 
 [ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] difference ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
+[ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test

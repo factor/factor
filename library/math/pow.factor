@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: math math-internals kernel ;
+USING: errors kernel math math-internals ;
 
 ! Power-related functions:
-!     exp log sqrt pow
+!     exp log sqrt pow ^mod
 
 : exp >rect swap fexp swap polar> ;
 : log >polar swap flog swap rect> ;
@@ -16,15 +16,45 @@ USING: math math-internals kernel ;
         swap fsqrt swap 2 / polar>
     ] ifte ;
 
+GENERIC: ^ ( z w -- z^w )
+
 : ^mag ( w abs arg -- magnitude )
     >r >r >rect swap r> swap fpow r> rot * fexp / ;
 
 : ^theta ( w abs arg -- theta )
     >r >r >rect r> flog * swap r> * + ;
 
-: ^ ( z w -- z^w )
-    over real? over integer? and [
-        fpow
+M: number ^ ( z w -- z^w )
+    swap >polar 3dup ^theta >r ^mag r> polar> ;
+
+: each-bit ( n quot -- | quot: 0/1 -- )
+    #! Apply the quotation to each bit of the number. The number
+    #! must be positive.
+    over 0 number= [
+        2drop
     ] [
-        swap >polar 3dup ^theta >r ^mag r> polar>
+        2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
+    ] ifte ; inline
+
+: (integer^) ( z w -- z^w )
+    1 swap [ 1 number= [ dupd * ] when >r sq r> ] each-bit nip ;
+
+M: integer ^ ( z w -- z^w )
+    over 0 number= over 0 number= and [
+        "0^0 is not defined" throw
+    ] [
+        dup 0 < [ neg ^ recip ] [ (integer^) ] ifte
+    ] ifte ;
+
+: (^mod) ( n z w -- z^w )
+    1 swap [
+        1 number= [ dupd * pick mod ] when >r sq over mod r>
+    ] each-bit 2nip ;
+
+: ^mod ( z w n -- z^w )
+    #! Compute z^w mod n.
+    over 0 < [
+        [ >r neg r> ^mod ] keep mod-inv
+    ] [
+        -rot (^mod)
     ] ifte ;

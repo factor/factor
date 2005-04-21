@@ -20,7 +20,9 @@ union [
 
 union 55 "priority" set-word-prop
 
-union [ 2drop t ] "class<" set-word-prop
+union [
+    swap builtin-supertypes swap builtin-supertypes contained?
+] "class<" set-word-prop
 
 : union-predicate ( definition -- list )
     [

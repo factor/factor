@@ -145,3 +145,10 @@ M: sequence testing 4 ;
 
 ! Bootstrap hashing
 [ f ] [ \ f \ unparse "methods" word-prop hash not ] unit-test
+
+GENERIC: union-containment
+M: integer union-containment drop 1 ;
+M: number union-containment drop 2 ;
+
+[ 1 ] [ 1 union-containment ] unit-test
+[ 2 ] [ 1.0 union-containment ] unit-test

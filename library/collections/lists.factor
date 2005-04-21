@@ -149,6 +149,10 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
     #! list1.
     [ over contains? not ] subset nip ;
 
+: contained? ( list1 list2 -- ? )
+    #! Is every element of list1 in list2?
+    swap [ swap contains? ] all-with? ;
+
 : <queue> ( -- queue )
     #! Make a new functional queue.
     [[ [ ] [ ] ]] ;
