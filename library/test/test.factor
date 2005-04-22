@@ -10,8 +10,7 @@ prettyprint sequences stdio strings unparser vectors words ;
 : print-test ( input output -- )
     "--> " write 2list . flush ;
 
-: keep-datastack ( quot -- )
-    datastack >r call r> set-datastack drop ;
+: keep-datastack ( quot -- ) datastack slip set-datastack drop ;
 
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to

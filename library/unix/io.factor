@@ -326,7 +326,7 @@ M: writer stream-close ( stream -- )
     dup stream-flush port-handle close ;
 
 ! Make a duplex stream for reading/writing a pair of fds
-: <fd-stream> ( infd outfd flush? -- )
+: <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
 ! Copying from a reader to a writer
