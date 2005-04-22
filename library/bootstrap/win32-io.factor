@@ -32,7 +32,7 @@ USE: kernel
 USE: win32-io-internals
 USE: win32-api
 
-: (yield) ( -- )
+: stop ( -- )
     next-thread [ 
         call
     ] [

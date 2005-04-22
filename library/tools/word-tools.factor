@@ -38,7 +38,17 @@ parser ;
     #! specializing on this class.
     [
         "methods" word-prop [ dupd hash ] [ f ] ifte*
-    ] word-subset word-sort nip ;
+    ] word-subset nip ;
 
 : classes ( -- list )
     [ metaclass ] word-subset ;
+
+: constructors ( -- list )
+    [
+        word-name dup "<" string-head? swap ">" string-tail? and
+    ] word-subset ;
+
+: predicates ( -- list )
+    [
+        word-name dup "?" = not swap "?" string-tail? and
+    ] word-subset ;

@@ -69,7 +69,7 @@ M: pane stream-flush ( stream -- ) relayout ;
 M: pane stream-auto-flush ( stream -- ) relayout ;
 
 M: pane stream-readln ( stream -- line )
-    [ swap set-pane-continuation (yield) ] callcc1 nip ;
+    [ swap set-pane-continuation stop ] callcc1 nip ;
 
 M: pane stream-write-attr ( string style stream -- )
     [ nip swap "\n" split pane-write ] keep scroll>bottom ;

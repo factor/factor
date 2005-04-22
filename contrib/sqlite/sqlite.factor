@@ -218,7 +218,7 @@ END-STRUCT
   over sqlite3_step step-complete? [ 
     2drop
   ] [
-    2dup 2slip sqlite-each
+    [ call ] 2keep sqlite-each
   ] ifte ;
 
 ! For comparison, here is the linrec implementation of sqlite-each

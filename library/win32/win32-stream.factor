@@ -55,7 +55,7 @@ SYMBOL: file-size
     [
         alloc-io-task init-overlapped >r
         handle get out-buffer get [ buffer@ ] keep buffer-length
-        NULL r> WriteFile [ handle-io-error ] unless (yield)
+        NULL r> WriteFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
 
     dup update-file-pointer
@@ -84,7 +84,7 @@ M: string do-write ( str -- )
         handle get in-buffer get [ buffer@ ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         NULL r>
-        ReadFile [ handle-io-error ] unless (yield)
+        ReadFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
 
     dup in-buffer get >buffer update-file-pointer ;

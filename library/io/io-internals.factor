@@ -9,7 +9,7 @@ BUILTIN: port 14 ;
 : stdout 1 getenv ;
 
 : blocking-flush ( port -- )
-    [ add-write-io-task (yield) ] callcc0 drop ;
+    [ add-write-io-task stop ] callcc0 drop ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ drop ] [ blocking-flush ] ifte ;
@@ -20,7 +20,7 @@ BUILTIN: port 14 ;
     over wait-to-write write-fd-8 ;
 
 : blocking-fill ( port -- )
-    [ add-read-line-io-task (yield) ] callcc0 drop ;
+    [ add-read-line-io-task stop ] callcc0 drop ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [ drop ] [ blocking-fill ] ifte ;
@@ -29,7 +29,7 @@ BUILTIN: port 14 ;
     dup wait-to-read-line read-line-fd-8 dup [ sbuf>string ] when ;
 
 : fill-fd ( count port -- )
-    [ add-read-count-io-task (yield) ] callcc0 2drop ;
+    [ add-read-count-io-task stop ] callcc0 2drop ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [ 2drop ] [ fill-fd ] ifte ;
@@ -38,11 +38,11 @@ BUILTIN: port 14 ;
     2dup wait-to-read read-count-fd-8 dup [ sbuf>string ] when ;
 
 : wait-to-accept ( socket -- )
-    [ add-accept-io-task (yield) ] callcc0 drop ;
+    [ add-accept-io-task stop ] callcc0 drop ;
 
 : blocking-accept ( socket -- host port in out )
     dup wait-to-accept accept-fd ;
 
 : blocking-copy ( in out -- )
-    [ add-copy-io-task (yield) ] callcc0
+    [ add-copy-io-task stop ] callcc0
     pending-io-error pending-io-error ;

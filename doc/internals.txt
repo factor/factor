@@ -79,7 +79,7 @@ Some macros for working with tagged cells are provided:
 
 - RETAG(cell,tag) -- set the tag of a cell
 
-- untag_fixnum_fast(cell) -- shift the cell to the left by three bits,
+- untag_fixnum_fast(cell) -- shift the cell to the right by three bits,
 without actually checking that the tag is FIXNUM_TYPE. If it is not
 FIXNUM_TYPE, a meaningless value is returned.
 

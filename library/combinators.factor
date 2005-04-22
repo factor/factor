@@ -5,13 +5,10 @@ IN: kernel
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
-: 2slip ( quot x y -- x y : quot: -- )
-    >r >r call r> r> ; inline
-
-: keep ( a quot -- a | quot: a -- )
+: keep ( x quot -- x | quot: x -- )
     over >r call r> ; inline
 
-: 2keep ( a b quot -- a b | quot: a b -- )
+: 2keep ( x y quot -- x y | quot: x y -- )
     over >r pick >r call r> r> ; inline
 
 : while ( quot generator -- )
@@ -23,7 +20,7 @@ IN: kernel
         r> 2drop r> r> 2drop
     ] ifte ; inline
 
-: ifte* ( cond true false -- )
+: ifte* ( cond true false -- | true: cond -- | false: -- )
     #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
     pick [ drop call ] [ 2nip call ] ifte ; inline
 
@@ -35,35 +32,23 @@ IN: kernel
         drop r> drop r> call
     ] ifte ; inline
 
-: unless ( cond quot -- )
+: unless ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is f. The
     #! condition is popped off the stack.
-    #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
     [ ] swap ifte ; inline
 
-: unless* ( cond quot -- )
+: unless* ( cond quot -- | quot: -- )
     #! If cond is f, pop it off the stack and evaluate the
     #! quotation. Otherwise, leave cond on the stack.
-    #!
-    #! In order to compile, the quotation must consume one less
-    #! value than it produces.
     over [ drop ] [ nip call ] ifte ; inline
 
-: when ( cond quot -- )
+: when ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
-    #!
-    #! In order to compile, the quotation must consume as many
-    #! values as it produces.
     [ ] ifte ; inline
 
-: when* ( cond quot -- )
+: when* ( cond quot -- | quot: cond -- )
     #! If the condition is true, it is left on the stack, and
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
-    #!
-    #! In order to compile, the quotation must consume one more
-    #! value than it produces.
     dupd [ drop ] ifte ; inline

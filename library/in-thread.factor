@@ -14,5 +14,5 @@ IN: threads USING: errors io-internals kernel lists ;
         [ ] set-catchstack
         { } set-callstack
         try
-        (yield)
+        stop
     ] callcc0 drop ;

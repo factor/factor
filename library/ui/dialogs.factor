@@ -48,6 +48,5 @@ C: dialog ( content -- gadget )
     #! when the user clicks OK or Cancel. If they click Cancel,
     #! push f.
     [
-        <input-dialog> "Input" <tile> world get add-gadget
-        (yield)
+        <input-dialog> "Input" <tile> world get add-gadget stop
     ] callcc1 ;

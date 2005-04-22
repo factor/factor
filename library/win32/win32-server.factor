@@ -93,7 +93,7 @@ M: win32-server accept ( server -- client )
         [
             alloc-io-task init-overlapped >r >r >r socket get r> r> 
             buffer-ptr <alien> 0 32 32 NULL r> AcceptEx
-            [ handle-socket-error ] unless (yield)
+            [ handle-socket-error ] unless stop
         ] callcc1 pending-error drop
         swap dup add-completion <win32-stream> dupd <win32-client-stream>
         swap buffer-free

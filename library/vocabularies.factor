@@ -29,7 +29,7 @@ SYMBOL: vocabularies
 
 : word-subset ( pred -- list | pred: word -- ? )
     #! A list of words matching the predicate.
-    all-words swap subset ; inline
+    all-words swap subset word-sort ; inline
 
 : word-subset-with ( obj pred -- list | pred: obj word -- ? )
     all-words swap subset-with ; inline

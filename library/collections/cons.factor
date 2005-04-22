@@ -75,7 +75,7 @@ PREDICATE: general-list list ( list -- ? )
     swap [ with rot ] all? 2nip ; inline
 
 : (each) ( list quot -- list quot )
-    >r uncons r> tuck 2slip ; inline
+    [ >r car r> call ] 2keep >r cdr r> ; inline
 
 : each ( list quot -- )
     #! Push each element of a proper list in turn, and apply a

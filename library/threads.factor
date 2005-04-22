@@ -20,23 +20,18 @@ USING: io-internals kernel kernel-internals lists namespaces ;
 
 : schedule-thread ( quot -- ) run-queue enque set-run-queue ;
 
-: (yield) ( -- )
+: stop ( -- )
     #! If there is a quotation in the run queue, call it,
-    #! otherwise wait for I/O. The currently executing
-    #! continuation is suspended. Use yield instead.
+    #! otherwise wait for I/O.
     next-thread [
         call
     ] [
-        next-io-task [
-            call
-        ] [
-            (yield)
-        ] ifte*
+        next-io-task [ call ] [ stop ] ifte*
     ] ifte* ;
 
 : yield ( -- )
     #! Add the current continuation to the run queue, and yield
     #! to the next quotation. The current continuation will
-    #! eventually be restored by a future call to (yield) or
+    #! eventually be restored by a future call to stop or
     #! yield.
-    [ schedule-thread (yield) ] callcc0 ;
+    [ schedule-thread stop ] callcc0 ;
