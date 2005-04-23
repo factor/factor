@@ -27,8 +27,7 @@ namespaces ;
     next-thread [
         call
     ] [
-        "No more tasks" throw
-        ! next-io-task [ call ] [ stop ] ifte*
+        io-multiplex [ call ] [ stop ] ifte*
     ] ifte* ;
 
 : yield ( -- )

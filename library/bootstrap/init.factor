@@ -7,7 +7,7 @@ USING: io-internals namespaces parser stdio threads words ;
     #! Initialize an interpreter with the basic services.
     global >n
     init-threads
-    init-c-io
+    init-io
     "HOME" os-env [ "." ] unless* "~" set
     init-search-path ;
 

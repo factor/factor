@@ -1,18 +1,3 @@
-- faster layout
-- faster repaint
-- linux/ppc and mac os x ffi
-- stream server can hang because of exception handler limitations
-- better i/o scheduler
-- add a socket timeout
-- unix ffi i/o
-- powerpc has weird callstack residue
-- console with presentations
-- renumber types appopriately
-- stop word needs a fix
-- fix logging
-- re-add httpd to bootstrap
-- linux? freebsd? words, linux i/o stuff
-
 + plugin:
 
 - extract word: if selection empty, move caret to new word after
@@ -21,6 +6,9 @@
 
 + ui:
 
+- faster layout
+- faster repaint
+- console with presentations
 - ui browser
 - auto-updating inspector
 - word preview for parsing words
@@ -79,6 +67,8 @@
 
 + kernel:
 
+- powerpc has weird callstack residue
+- .factor-rc loading errors are not reported properly
 - instances: do not use make-list
 - unions containing tuples do not work properly
 - need G: combinations
@@ -86,7 +76,6 @@
 - code walker & exceptions
 - string sub-primitives
 - clean up metaclasses
-- unify unparse and prettyprint
 - condition system with restarts
 - nicer way to combine two paths
 - vectors: ensure its ok with bignum indices
@@ -94,6 +83,24 @@
 - generational gc
 - doc comments of generics
 - proper ordering for classes
+
++ i/o:
+
+- separate words for writing characters and strings
+- perhaps:
+  GENERIC: set-style ( style stream -- )
+  GENERIC: stream-write
+  GENERIC: stream-write-char
+- linux/ppc and mac os x ffi
+- stream server can hang because of exception handler limitations
+- better i/o scheduler
+- add a socket timeout
+- unix ffi i/o
+- renumber types appopriately
+- linux? freebsd? words, linux i/o stuff
+- clean up errors
+- implement fcopy
+- unify unparse and prettyprint
 
 + nice to have libraries:
 

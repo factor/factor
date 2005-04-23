@@ -48,6 +48,8 @@ t [
 
     "/library/alien/c-types.factor"
     "/library/alien/compiler.factor"
+    "/library/alien/enums.factor"
+    "/library/alien/structs.factor"
 ] pull-in
 
 cpu "x86" = [

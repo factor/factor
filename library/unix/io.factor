@@ -182,7 +182,7 @@ M: read-line-task io-task-events ( task -- events )
         drop
     ] [
         [
-            swap <read-line-task> add-io-task io-multiplex
+            swap <read-line-task> add-io-task stop
         ] callcc0 drop
     ] ifte ;
 
@@ -228,7 +228,7 @@ M: read-task io-task-events ( task -- events )
         2drop
     ] [
         [
-            swap <read-task> add-io-task io-multiplex
+            swap <read-task> add-io-task stop
         ] callcc0 2drop
     ] ifte ;
 
@@ -296,7 +296,7 @@ M: write-task io-task-events ( task -- events )
 
 M: writer stream-flush ( stream -- )
     [
-        swap <write-task> add-write-io-task io-multiplex
+        swap <write-task> add-write-io-task stop
     ] callcc0 drop ;
 
 M: writer stream-auto-flush ( stream -- ) drop ;
@@ -344,3 +344,7 @@ M: writer stream-close ( stream -- )
         <namespace> io-tasks set
         0 1 t <fd-stream> stdio set
     ] bind ;
+
+IN: streams
+
+: fcopy 2drop ;

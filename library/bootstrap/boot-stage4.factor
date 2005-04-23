@@ -33,24 +33,6 @@ words ;
 
 warm-boot
 
-os "win32" = [
-    "kernel32" "kernel32.dll" "stdcall"  add-library
-    "user32"   "user32.dll"   "stdcall"  add-library
-    "gdi32"    "gdi32.dll"    "stdcall"  add-library
-    "winsock"  "ws2_32.dll"   "stdcall"  add-library
-    "mswsock"  "mswsock.dll"  "stdcall"  add-library
-    "libc"     "msvcrt.dll"   "cdecl"    add-library
-    "sdl"      "SDL.dll"      "cdecl"    add-library
-    "sdl-gfx"  "SDL_gfx.dll"  "cdecl"    add-library
-    "sdl-ttf"  "SDL_ttf.dll"  "cdecl"    add-library
-    ! FIXME: KLUDGE to get FFI-based IO going in Windows.
-    "/library/bootstrap/win32-io.factor" run-resource
-] when
-
-os "unix" = [
-    "libc" "libc.so" "cdecl" add-library
-] when
-
 "Compiling system..." print
 "compile" get [ compile-all ] when
 
