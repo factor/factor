@@ -1,12 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: command-line command-line kernel lists parser stdio words ;
+USING: kernel lists parser stdio words ;
 
 "Bootstrap stage 2..." print
 
 recrossref
-default-cli-args
-parse-command-line
 
 : pull-in ( ? list -- )
     swap [
@@ -23,7 +21,7 @@ t [
     
     ! This has to be loaded here because it overloads sequence
     ! generics, and we don't want to compile twice.
-!    "/library/math/matrices.factor"
+    "/library/math/matrices.factor"
 
     "/library/tools/debugger.factor"
     "/library/tools/gensym.factor"

@@ -1,5 +1,6 @@
 + plugin:
 
+- if external factor is down, don't add tons of random shit to the dictionary
 - extract word: if selection empty, move caret to new word after
 - introduce quotation command
 - set 'end' of artifacts/assets accurately
@@ -67,6 +68,7 @@
 
 + kernel:
 
+- get all-tests to run with -no-compile
 - powerpc has weird callstack residue
 - .factor-rc loading errors are not reported properly
 - instances: do not use make-list
@@ -86,6 +88,7 @@
 
 + i/o:
 
+- review errno
 - separate words for writing characters and strings
 - perhaps:
   GENERIC: set-style ( style stream -- )

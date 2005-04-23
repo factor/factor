@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien assembler compiler io-internals kernel lists
-namespaces parser sequences stdio unparser words ;
+USING: alien assembler command-line compiler io-internals kernel
+lists namespaces parser sequences stdio unparser words ;
 
 "Bootstrap stage 3..." print
 
@@ -22,6 +22,9 @@ os "win32" = [
     ! FIXME: KLUDGE to get FFI-based IO going in Windows.
     "/library/bootstrap/win32-io.factor" run-resource
 ] when
+
+default-cli-args
+parse-command-line
 
 "/library/io/buffer.factor" run-resource
 
@@ -80,7 +83,7 @@ t [
     "/library/bootstrap/image.factor"
 ] pull-in
 
-"compile" get "mini" get not and [
+"compile" get supported-cpu? and "mini" get not and [
     "/library/io/logging.factor"
 
     "/library/tools/telnetd.factor"

@@ -40,13 +40,13 @@ words ;
 ! IR node is being generated. No forward reference far
 ! calls are possible.
 : compile-call-far ( word -- )
-    dup word-xt 19 LOAD32 rel-primitive-16/16
+    19 LOAD32
     19 MTLR
     BLRL ;
 
 : compile-call-label ( label -- )
     dup primitive? [
-        compile-call-far
+        dup rel-primitive-16/16 word-xt compile-call-far
     ] [
         0 BL relative-24
     ] ifte ;
@@ -60,13 +60,13 @@ words ;
 ] "generator" set-word-prop
 
 : compile-jump-far ( word -- )
-    dup word-xt 19 LOAD32 rel-primitive-16/16
+    19 LOAD32
     19 MTCTR
     BCTR ;
 
 : compile-jump-label ( label -- )
     dup primitive? [
-        compile-jump-far
+        dup rel-primitive-16/16 word-xt compile-jump-far
     ] [
         0 B relative-24
     ] ifte ;

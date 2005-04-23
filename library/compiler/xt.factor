@@ -32,7 +32,11 @@ SYMBOL: relocation-table
 ! PowerPC relocations
 
 : rel-primitive-16/16 ( word -- )
-    5 rel, relocating word-primitive rel, ;
+    #! This is called before a sequence like
+    #! 19 LOAD32
+    #! 19 MTCTR
+    #! BCTR
+    5 rel, compiled-offset rel, word-primitive rel, ;
 
 : rel-address-16/16 ( -- )
     6 rel, relocating 0 rel, ;

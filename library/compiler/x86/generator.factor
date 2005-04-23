@@ -54,26 +54,3 @@ math memory namespaces words ;
     compile-aligned
     compiled-offset swap set-compiled-cell ( fixup -- )
 ] "generator" set-word-prop
-
-#alien-invoke [
-    uncons load-dll 2dup dlsym CALL t rel-dlsym
-] "generator" set-word-prop
-
-#alien-global [
-    uncons load-dll 2dup dlsym EAX swap unit MOV f rel-dlsym
-] "generator" set-word-prop
-
-#unbox [
-    dup f dlsym CALL f t rel-dlsym
-    EAX PUSH
-] "generator" set-word-prop
-
-#box [
-    EAX PUSH
-    dup f dlsym CALL f t rel-dlsym
-    ESP 4 ADD
-] "generator" set-word-prop
-
-#cleanup [
-    dup 0 = [ drop ] [ ESP swap ADD ] ifte
-] "generator" set-word-prop

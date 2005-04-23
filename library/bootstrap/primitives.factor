@@ -203,7 +203,7 @@ vocabularies get [
     [ "die" "kernel"                          [ [ ] [ ] ] ]
     [ "flush-icache" "assembler"              f ]
     [ "fopen"  "io-internals"                 [ [ string string ] [ alien ] ] ]
-    [ "fgetln" "io-internals"                 [ [ alien ] [ string ] ] ]
+    [ "fgets" "io-internals"                  [ [ alien ] [ string ] ] ]
     [ "fwrite" "io-internals"                 [ [ string alien ] [ ] ] ]
     [ "fflush" "io-internals"                 [ [ alien ] [ ] ] ]
     [ "fclose" "io-internals"                 [ [ alien ] [ ] ] ]

@@ -26,12 +26,17 @@ namespaces sequences stdio strings words ;
 SYMBOL: #cleanup ( unwind stack by parameter )
 
 SYMBOL: #unbox ( move top of datastack to C stack )
+
+! for register parameter passing; move top of C stack to a
+! register. no-op on x86, generates code on PowerPC.
+SYMBOL: #parameter
+
+! for increasing stack space on PowerPC; unused on x86.
+SYMBOL: #parameters
+
 SYMBOL: #box ( move EAX to datastack )
 
-SYMBOL: #alien-invoke
-SYMBOL: #alien-global
-
-! These are set in the #alien-invoke dataflow IR node.
+! These are set in the alien-invoke dataflow IR node.
 SYMBOL: alien-returns
 SYMBOL: alien-parameters
 
@@ -53,7 +58,7 @@ SYMBOL: alien-parameters
     #! compilation does not keep trying to compile FFI words
     #! over and over again if the library is not loaded.
     2dup ensure-dlsym
-    cons #alien-invoke dataflow,
+    cons \ alien-invoke dataflow,
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
@@ -69,7 +74,7 @@ DEFER: alien-invoke
 
 : alien-global-node ( type name library -- )
     2dup ensure-dlsym
-    cons #alien-global dataflow,
+    cons \ alien-global dataflow,
     set-alien-returns ;
 
 DEFER: alien-global
@@ -81,18 +86,26 @@ DEFER: alien-global
     pop-literal -rot
     alien-global-node ;
 
-: box-parameter
-    c-type [
-        "width" get cell align
-        "unboxer" get
-    ] bind #unbox swons , ;
+: parameters [ alien-parameters get reverse ] bind ;
 
-: linearize-parameters ( params -- count )
-    #! Generate code for boxing a list of C types.
+: stack-space ( parameters -- n )
+    0 swap [ c-size cell align + ] each ;
+
+: unbox-parameter ( n parameter -- )
+    c-type [ "unboxer" get ] bind cons #unbox swons , ;
+
+: linearize-parameters ( node -- count )
+    #! Generate code for boxing a list of C types, then generate
+    #! code for moving these parameters to register on
+    #! architectures where parameters are passed in registers
+    #! (PowerPC).
+    #!
     #! Return amount stack must be unwound by.
-    [ alien-parameters get reverse ] bind 0 swap [
-        box-parameter +
-    ] each ;
+    parameters
+    dup stack-space
+    dup #parameters swons , >r
+    dup 0 swap [ dupd unbox-parameter 1 + ] each drop
+    length [ #parameter swons ] project % r> ;
 
 : linearize-returns ( returns -- )
     [ alien-returns get ] bind dup "void" = [
@@ -103,18 +116,18 @@ DEFER: alien-global
 
 : linearize-alien-invoke ( node -- )
     dup linearize-parameters >r
-    dup [ node-param get ] bind #alien-invoke swons ,
+    dup [ node-param get ] bind \ alien-invoke swons ,
     dup [ node-param get cdr library-abi "stdcall" = ] bind
     r> swap [ drop ] [ #cleanup swons , ] ifte
     linearize-returns ;
 
-#alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
+\ alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
 
 : linearize-alien-global ( node -- )
-    dup [ node-param get ] bind #alien-global swons ,
+    dup [ node-param get ] bind \ alien-global swons ,
     linearize-returns ;
 
-#alien-global [ linearize-alien-global ] "linearizer" set-word-prop
+\ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
 
 TUPLE: alien-error lib ;
 
