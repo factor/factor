@@ -16,7 +16,7 @@ OBJS = $(WIN32_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/factor.o native/fixnum.o \
 	native/float.o native/gc.o \
 	native/image.o native/memory.o \
-	native/misc.o native/port.o native/primitives.o \
+	native/misc.o native/primitives.o \
 	native/ratio.o native/relocate.o \
 	native/run.o \
 	native/sbuf.o native/stack.o \
