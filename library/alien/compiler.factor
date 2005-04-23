@@ -23,6 +23,35 @@ namespaces sequences stdio strings words ;
 ! parameter, or a missing abi parameter indicates the cdecl ABI
 ! should be used, which is common on Unix.
 
+! FFI code does not run in the interpreter.
+
+TUPLE: alien-error lib ;
+
+C: alien-error ( lib -- ) [ set-alien-error-lib ] keep ;
+
+M: alien-error error. ( error -- )
+    [
+        "C library interface words cannot be interpreted. " ,
+        "Either the compiler is disabled, " ,
+        "or the ``" , alien-error-lib ,
+        "'' library is missing." ,
+    ] make-string print ;
+
+: alien-invoke ( ... returns library function parameters -- ... )
+    #! Call a C library function.
+    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! type specs. 'library' is an entry in the "libraries"
+    #! namespace.
+    rot <alien-error> throw ;
+
+: alien-global ( type library name -- value )
+    #! Fetch the value of C global variable.
+    #! 'type' is a type spec. 'library' is an entry in the
+    #! "libraries" namespace.
+    swap <alien-error> throw ;
+
+! Linear IR nodes
+
 SYMBOL: #cleanup ( unwind stack by parameter )
 
 SYMBOL: #unbox ( move top of datastack to C stack )
@@ -129,35 +158,10 @@ DEFER: alien-global
 
 \ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
 
-TUPLE: alien-error lib ;
-
-C: alien-error ( lib -- ) [ set-alien-error-lib ] keep ;
-
-M: alien-error error. ( error -- )
-    [
-        "C library interface words cannot be interpreted. " ,
-        "Either the compiler is disabled, " ,
-        "or the ``" , alien-error-lib ,
-        "'' library is missing." ,
-    ] make-string print ;
-
-: alien-invoke ( ... returns library function parameters -- ... )
-    #! Call a C library function.
-    #! 'returns' is a type spec, and 'parameters' is a list of
-    #! type specs. 'library' is an entry in the "libraries"
-    #! namespace.
-    rot <alien-error> throw ;
-
 \ alien-invoke [ [ string string string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
 \ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
-
-: alien-global ( type library name -- value )
-    #! Fetch the value of C global variable.
-    #! 'type' is a type spec. 'library' is an entry in the
-    #! "libraries" namespace.
-    swap <alien-error> throw ;
 
 \ alien-global [ [ string string string ] [ object ] ]
 "infer-effect" set-word-prop
