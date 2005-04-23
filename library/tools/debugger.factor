@@ -17,9 +17,6 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : undefined-word-error. ( obj -- )
     "Undefined word: " write . ;
 
-: incompatible-port-error. ( obj -- )
-    "Unsuitable port for operation: " write . ;
-
 : io-error. ( error -- )
     "I/O error: " write print ;
 
@@ -69,7 +66,7 @@ M: kernel-error error. ( error -- )
         expired-error.
         io-task-twice-error.
         no-io-tasks-error.
-        incompatible-port-error.
+        f
         io-error.
         undefined-word-error.
         type-check-error.

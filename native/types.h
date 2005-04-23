@@ -31,7 +31,6 @@ CELL T;
 #define VECTOR_TYPE 11
 #define STRING_TYPE 12
 #define SBUF_TYPE 13
-#define PORT_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17

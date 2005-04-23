@@ -7,6 +7,11 @@
 - unix ffi i/o
 - powerpc has weird callstack residue
 - console with presentations
+- renumber types appopriately
+- stop word needs a fix
+- fix logging
+- re-add httpd to bootstrap
+- linux? freebsd? words, linux i/o stuff
 
 + plugin:
 
