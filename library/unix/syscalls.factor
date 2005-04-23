@@ -123,19 +123,23 @@ END-STRUCT
 : poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;
 
-BEGIN-STRUCT: void**
+BEGIN-STRUCT: uint*
+    FIELD: uint s
+END-STRUCT
+
+BEGIN-STRUCT: VOID* ( ugly )
     FIELD: void* s
 END-STRUCT
 
 BEGIN-STRUCT: hostent
     FIELD: char* name
-    FIELD: void** aliases
+    FIELD: VOID** aliases
     FIELD: int addrtype
     FIELD: int length
-    FIELD: void** addr-list
+    FIELD: VOID** addr-list
 END-STRUCT
 
-: hostent-addr hostent-addr-list 0 swap void**-nth void**-s ;
+: hostent-addr hostent-addr-list VOID*-s uint*-s ;
 
 : gethostbyname ( name -- hostent )
     "hostent*" "libc" "gethostbyname" [ "char*" ] alien-invoke ;
@@ -145,7 +149,7 @@ BEGIN-STRUCT: sockaddr-in
     FIELD: uchar family
     FIELD: ushort port
     FIELD: in_addr_t addr
-! FIELD: char	sin_zero[8];
+    FIELD: longlong unused
 END-STRUCT
 
 : AF_INET 2 ;
@@ -163,19 +167,19 @@ END-STRUCT
     "int" "libc" "setsockopt" [ "int" "int" "int" "void*" "socklen_t" ] alien-invoke ;
 
 : connect ( s name namelen -- n )
-    "int" "libc" "connect" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
+    "int" "libc" "connect" [ "int" "sockaddr-in*" "socklen_t" ] alien-invoke ;
 
 : bind ( s sockaddr socklen -- n )
-    "int" "libc" "bind" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
+    "int" "libc" "bind" [ "int" "sockaddr-in*" "socklen_t" ] alien-invoke ;
 
 : listen ( s backlog -- n )
     "int" "libc" "listen" [ "int" "int" ] alien-invoke ;
 
 : accept ( s sockaddr socklen -- n )
-    "int" "libc" "accept" [ "int" "sockaddr-in" "socklen_t" ] alien-invoke ;
+    "int" "libc" "accept" [ "int" "sockaddr-in*" "socklen_t" ] alien-invoke ;
 
 : inet-ntoa ( sockaddr -- string )
-    "char*" "libc" "inet_ntoa" [ "sockaddr-in" ] alien-invoke ;
+    "char*" "libc" "inet_ntoa" [ "in_addr_t" ] alien-invoke ;
 
 : htonl ( n -- n )
     "uint" "libc" "htonl" [ "uint" ] alien-invoke ;

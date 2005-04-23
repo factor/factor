@@ -73,9 +73,6 @@ CELL untagged_object_size(CELL pointer)
 	case FLOAT_TYPE:
 		size = sizeof(F_FLOAT);
 		break;
-	case PORT_TYPE:
-		size = sizeof(F_PORT);
-		break;
 	case DLL_TYPE:
 		size = sizeof(DLL);
 		break;

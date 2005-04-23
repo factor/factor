@@ -4,8 +4,7 @@ DEFAULT_LIBS = -lm
 
 STRIP = strip
 
-UNIX_OBJS = native/unix/file.o native/unix/io.o native/unix/socket.o \
-	native/unix/signal.o native/unix/read.o native/unix/write.o \
+UNIX_OBJS = native/unix/file.o native/unix/signal.o \
 	native/unix/ffi.o native/unix/run.o
 
 OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
@@ -14,7 +13,7 @@ OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/factor.o native/fixnum.o \
 	native/float.o native/gc.o \
 	native/image.o native/memory.o \
-	native/misc.o native/port.o native/primitives.o \
+	native/misc.o native/primitives.o \
 	native/ratio.o native/relocate.o \
 	native/run.o \
 	native/sbuf.o native/stack.o \
@@ -24,7 +23,8 @@ OBJS = $(UNIX_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/boolean.o \
 	native/debug.o \
 	native/hashtable.o \
-	native/icache.o
+	native/icache.o \
+	native/io.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"

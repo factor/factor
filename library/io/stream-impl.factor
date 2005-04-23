@@ -1,13 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: files
 USING: io-internals errors hashtables kernel stdio strings
 namespaces generic ;
-
-! We need this early during bootstrap.
-: path+ ( path path -- path )
-    #! Combine two paths. This will be implemented later.
-    "/" swap cat3 ;
 
 IN: stdio
 DEFER: stdio
@@ -59,13 +53,6 @@ M: fd-stream stream-close ( stream -- )
     ] [
         -rot stream-close stream-close rethrow
     ] catch ;
-
-: resource-path ( -- path )
-    "resource-path" get [ "." ] unless* ;
-
-: <resource-stream> ( path -- stream )
-    #! Open a file path relative to the Factor source code root.
-    resource-path swap path+ <file-reader> ;
 
 : init-stdio ( -- )
     #! Opens file descriptors 0, 1.

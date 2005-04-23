@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: telnetd
-USING: errors listener kernel logging namespaces stdio streams
+USING: errors listener kernel namespaces stdio streams
 threads parser ;
 
 : telnet-client ( socket -- )
@@ -14,13 +14,11 @@ threads parser ;
     [ accept telnet-connection ] keep telnetd-loop ;
 
 : telnetd ( port -- )
-    [
-        <server> [
-            telnetd-loop
-        ] [
-            swap stream-close rethrow
-        ] catch
-    ] with-logging ;
+    <server> [
+        telnetd-loop
+    ] [
+        swap stream-close rethrow
+    ] catch ;
 
 IN: shells
 

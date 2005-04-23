@@ -1,34 +1,5 @@
 #include "../factor.h"
 
-void primitive_open_file(void)
-{
-	bool write = unbox_boolean();
-	bool read = unbox_boolean();
-
-	char* path;
-	int mode, fd;
-
-	maybe_garbage_collection();
-
-	path = unbox_c_string();
-
-	if(read && write)
-		mode = O_RDWR | O_CREAT;
-	else if(read)
-		mode = O_RDONLY;
-	else if(write)
-		mode = O_WRONLY | O_CREAT | O_TRUNC;
-	else
-		mode = 0;
-
-	fd = open(path,mode,FILE_MODE);
-	if(fd < 0)
-		io_error(__FUNCTION__);
-
-	dpush(read ? tag_object(port(PORT_READ,fd)) : F);
-	dpush(write ? tag_object(port(PORT_WRITE,fd)) : F);
-}
-
 void primitive_stat(void)
 {
 	struct stat sb;
@@ -88,7 +59,7 @@ void primitive_cwd(void)
 	char wd[MAXPATHLEN];
 	maybe_garbage_collection();
 	if(getcwd(wd,MAXPATHLEN) < 0)
-		io_error(__FUNCTION__);
+		c_stream_error();
 	box_c_string(wd);
 }
 

@@ -56,7 +56,7 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 	return new_string;
 }
 
-INLINE F_STRING* memory_to_string(const BYTE* string, CELL length)
+F_STRING* memory_to_string(const BYTE* string, CELL length)
 {
 	F_STRING* s = allot_string(length);
 	CELL i;
@@ -106,7 +106,7 @@ char* to_c_string(F_STRING* s)
 	return to_c_string_unchecked(s);
 }
 
-INLINE void string_to_memory(F_STRING* s, BYTE* string)
+void string_to_memory(F_STRING* s, BYTE* string)
 {
 	CELL i;
 	CELL capacity = string_capacity(s);

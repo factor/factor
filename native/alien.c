@@ -36,12 +36,17 @@ void* unbox_alien(void)
 	return alien_offset(dpop());
 }
 
-void box_alien(void* ptr)
+ALIEN* alien(void* ptr)
 {
 	ALIEN* alien = allot_object(ALIEN_TYPE,sizeof(ALIEN));
 	alien->ptr = ptr;
 	alien->expired = false;
-	dpush(tag_object(alien));
+	return alien;
+}
+
+void box_alien(void* ptr)
+{
+	dpush(tag_object(alien(ptr)));
 }
 
 void primitive_alien(void)

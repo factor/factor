@@ -26,6 +26,7 @@
 
 + ffi:
 
+- char* struct members
 - if a boxer triggers GC, already-pushed addresses might become
   invalid!
 - box/unbox_signed/unsigned_8

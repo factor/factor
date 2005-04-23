@@ -1,10 +1,18 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: files
+USING: kernel strings ;
+
+! We need this early during bootstrap.
+: path+ ( path path -- path )
+    #! Combine two paths. This will be implemented later.
+    "/" swap cat3 ;
+
 IN: stdio
 DEFER: stdio
+
 IN: streams
-USING: errors generic kernel lists math namespaces sequences
-strings ;
+USING: errors generic lists math namespaces sequences ;
 
 ! Stream protocol.
 GENERIC: stream-flush      ( stream -- )
@@ -101,3 +109,12 @@ SYMBOL: parser-stream
     #! For each element of the alist, change the value to
     #! path " " value
     [ uncons >r swap " " r> seq-append3 cons ] map-with ;
+
+DEFER: <file-reader>
+
+: resource-path ( -- path )
+    "resource-path" get [ "." ] unless* ;
+
+: <resource-stream> ( path -- stream )
+    #! Open a file path relative to the Factor source code root.
+    resource-path swap path+ <file-reader> ;

@@ -4,21 +4,9 @@ IN: io-internals
 USING: errors generic hashtables kernel lists math
 sequences stdio streams strings threads unix-internals vectors ;
 
-! We want this bind to shadow the bind system call from
+! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
 USING: namespaces ;
-
-! These let us load the code into a CFactor instance using the
-! old C-based I/O. They will be removed soon.
-FORGET: can-read-line?
-FORGET: can-read-count?
-FORGET: can-write?
-FORGET: add-write-io-task
-FORGET: blocking-read-line
-FORGET: blocking-write
-FORGET: wait-to-read
-FORGET: wait-to-read-line
-FORGET: wait-to-write
 
 ! Some general stuff
 : file-mode OCT: 0600 ;
@@ -323,7 +311,7 @@ M: writer stream-write-attr ( string style writer -- )
     nip >r dup string? [ ch>string ] unless r> blocking-write ;
 
 M: writer stream-close ( stream -- )
-    dup stream-flush port-handle close ;
+    dup stream-flush dup port-handle close buffer-free ;
 
 ! Make a duplex stream for reading/writing a pair of fds
 : <fd-stream> ( infd outfd flush? -- stream )

@@ -2,7 +2,8 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: io-internals kernel kernel-internals lists namespaces ;
+USING: errors io-internals kernel kernel-internals lists
+namespaces ;
  
 ! Core of the multitasker. Used by io-internals.factor and
 ! in-thread.factor.
@@ -26,7 +27,8 @@ USING: io-internals kernel kernel-internals lists namespaces ;
     next-thread [
         call
     ] [
-        next-io-task [ call ] [ stop ] ifte*
+        "No more tasks" throw
+        ! next-io-task [ call ] [ stop ] ifte*
     ] ifte* ;
 
 : yield ( -- )

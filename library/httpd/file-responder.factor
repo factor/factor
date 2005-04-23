@@ -33,7 +33,6 @@ USE: httpd
 USE: httpd-responder
 USE: kernel
 USE: lists
-USE: logging
 USE: namespaces
 USE: parser
 USE: stdio

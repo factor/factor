@@ -4,10 +4,12 @@
 next GC. */
 F_ARRAY* allot_array(CELL type, CELL capacity)
 {
+	F_ARRAY *array;
+
 	if(capacity < 0)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 
-	F_ARRAY* array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
+	array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }

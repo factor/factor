@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd-responder
-USING: hashtables httpd kernel logging namespaces sequences
+USING: hashtables httpd kernel namespaces sequences streams
 strings ;
 
 ! Responders are called in a new namespace with these

@@ -7,7 +7,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_compiler(code_size);
 	load_image(image);
 	init_stacks(ds_size,cs_size);
-	init_io();
+	init_c_io();
 	init_signals();
 
 	init_errors();

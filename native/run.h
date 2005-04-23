@@ -13,6 +13,8 @@
 #define ARGS_ENV       10
 #define OS_ENV         11
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
+#define IN_ENV         13
+#define OUT_ENV        14
 
 /* Profiling timer */
 #ifndef WIN32

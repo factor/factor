@@ -76,9 +76,6 @@ INLINE void collect_object(CELL scan)
 	case SBUF_TYPE:
 		collect_sbuf((F_SBUF*)scan);
 		break;
-	case PORT_TYPE:
-		collect_port((F_PORT*)scan);
-		break;
 	case DLL_TYPE:
 		collect_dll((DLL*)scan);
 		break;
@@ -124,7 +121,6 @@ void primitive_gc(void)
 	flip_zones();
 	scan = active.base;
 	collect_roots();
-	collect_io_tasks();
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	

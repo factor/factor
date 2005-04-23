@@ -23,9 +23,6 @@ void relocate_object(CELL relocating)
 	case SBUF_TYPE:
 		fixup_sbuf((F_SBUF*)relocating);
 		break;
-	case PORT_TYPE:
-		fixup_port((F_PORT*)relocating);
-		break;
 	case DLL_TYPE:
 		fixup_dll((DLL*)relocating);
 		break;

@@ -27,7 +27,7 @@
 IN: browser-responder
 USING: html cont-responder kernel stdio namespaces words lists
 streams strings inspector kernel prettyprint words html parser
-errors unparser logging listener url-encoding hashtables memory ;
+errors unparser listener url-encoding hashtables memory ;
 
 : <browser> ( allow-edit? vocab word -- )
   #! An object for storing the current browser

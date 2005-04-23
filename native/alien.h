@@ -29,6 +29,7 @@ void fixup_displaced_alien(DISPLACED_ALIEN* d);
 void collect_displaced_alien(DISPLACED_ALIEN* d);
 
 DLLEXPORT void* unbox_alien(void);
+ALIEN* alien(void* ptr);
 DLLEXPORT void box_alien(void* ptr);
 
 void primitive_alien_signed_cell(void);

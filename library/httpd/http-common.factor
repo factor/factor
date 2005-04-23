@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov, Chris Double
 IN: httpd
-USING: kernel lists logging namespaces parser sequences stdio
+USING: kernel lists namespaces parser sequences stdio streams
 strings url-encoding ;
 
 : print-header ( alist -- )

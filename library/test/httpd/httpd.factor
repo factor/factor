@@ -2,7 +2,6 @@ IN: temporary
 USE: file-responder
 USE: httpd
 USE: httpd-responder
-USE: logging
 USE: namespaces
 USE: stdio
 USE: test
@@ -41,9 +40,7 @@ USE: lists
 [ "inspect/global" ] [ "/inspect/global" trim-/ ] unit-test
 
 [ ] [
-    [
-        "unit/test" log-responder
-    ] with-logging
+    "unit/test" log-responder
 ] unit-test
 
 [ "index.html" ]

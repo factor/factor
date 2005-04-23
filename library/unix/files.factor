@@ -30,3 +30,9 @@ USING: alien io-internals kernel math namespaces unix-internals ;
 
 : cwd ( -- str )
     <string-box> dup 255 getcwd io-error string-box-value ;
+
+IN: streams
+
+: <file-reader> ( path -- stream ) open-read <reader> ;
+
+: <file-writer> ( path -- stream ) open-write <writer> ;

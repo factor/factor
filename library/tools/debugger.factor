@@ -20,9 +20,8 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : incompatible-port-error. ( obj -- )
     "Unsuitable port for operation: " write . ;
 
-: io-error. ( list -- )
-    "I/O error in kernel function " write
-    unswons write ": " write car print ;
+: io-error. ( error -- )
+    "I/O error: " write print ;
 
 : type-check-error. ( list -- )
     "Type check error" print
