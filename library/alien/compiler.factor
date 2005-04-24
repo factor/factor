@@ -133,7 +133,7 @@ DEFER: alien-global
     parameters
     dup stack-space
     dup #parameters swons , >r
-    dup 0 swap [ dupd unbox-parameter 1 + ] each drop
+    dup dup length swap [ >r 1 - dup r> unbox-parameter ] each drop
     length [ #parameter swons ] project % r> ;
 
 : linearize-returns ( returns -- )

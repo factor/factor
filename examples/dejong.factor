@@ -69,7 +69,7 @@ SYMBOL: d
     0.8 c set
     -2.1 d set
 
-    1024 768 0 SDL_HWSURFACE [
+    800 600 0 SDL_HWSURFACE [
         [ 0 0 200000 [ draw-dejong ] time ] with-surface
 
         <event> event-loop

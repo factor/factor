@@ -48,13 +48,7 @@ M: compound (compile) ( word -- )
 : try-compile ( word -- )
     [ compile ] [ [ cannot-compile ] when* ] catch ;
 
-: compile-all ( -- )
-    #! Compile all words.
-    supported-cpu? [
-        [ try-compile ] each-word
-    ] [
-        "Unsupported CPU" print
-    ] ifte ;
+: compile-all ( -- ) [ try-compile ] each-word ;
 
 : decompile ( word -- )
     dup compiled? [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: assembler inference kernel kernel-internals lists math
+IN: assembler
+USING: compiler inference kernel kernel-internals lists math
 words ;
 
 ! At the start of each word that calls a subroutine, we store

@@ -1,5 +1,13 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: assembler
+
+DEFER: compile-call-label ( label -- )
+DEFER: compile-jump-label ( label -- )
+
+DEFER: compile-jump-t ( label -- )
+DEFER: compile-jump-f ( label -- )
+
 IN: compiler
 USING: assembler errors inference kernel lists math namespaces
 sequences strings vectors words ;
@@ -56,9 +64,6 @@ SYMBOL: previous-offset
     #! Given a type number, return the tag number.
     dup 6 > [ drop 3 ] when ;
 
-DEFER: compile-call-label ( label -- )
-DEFER: compile-jump-label ( label -- )
-
 : compile-call ( word -- ) dup postpone-word compile-call-label ;
 
 #call [
@@ -68,9 +73,6 @@ DEFER: compile-jump-label ( label -- )
 #jump-label [
     compile-jump-label
 ] "generator" set-word-prop
-
-DEFER: compile-jump-t ( label -- )
-DEFER: compile-jump-f ( label -- )
 
 #jump-t-label [ compile-jump-t ] "generator" set-word-prop
 #jump-t [ compile-jump-t ] "generator" set-word-prop

@@ -33,9 +33,6 @@ words ;
 
 warm-boot
 
-"Compiling system..." print
-"compile" get [ compile-all ] when
-
 terpri
 "Unless you're working on the compiler, ignore the errors above." print
 "Not every word compiles, by design." print

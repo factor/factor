@@ -17,7 +17,7 @@ math memory namespaces words ;
 ] "generator" set-word-prop
 
 #unbox [
-    dup f dlsym CALL f t rel-dlsym
+    cdr dup f dlsym CALL f t rel-dlsym
     EAX PUSH
 ] "generator" set-word-prop
 

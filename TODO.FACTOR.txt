@@ -53,6 +53,9 @@
 
 + sequences
 
+- nappend: instead of using push, enlarge the sequence with set-length
+  then add set the elements with set-nth
+- ensure-capacity: don't be generic
 - vector's ensure-capacity will crash if not given fixnums!
 - dipping seq-2nmap, seq-2each
 - remove seq- prefixes
@@ -98,7 +101,7 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - add a socket timeout
-- unix ffi i/o
+- get sockets working
 - renumber types appopriately
 - linux? freebsd? words, linux i/o stuff
 - clean up errors

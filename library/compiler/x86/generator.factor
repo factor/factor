@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: alien assembler inference kernel kernel-internals lists
+IN: assembler
+USING: alien compiler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 ! Not used on x86

@@ -25,24 +25,6 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-IN: threads
-USE: compiler
-USE: io-internals
-USE: kernel
-USE: win32-io-internals
-USE: win32-api
-
-: stop ( -- )
-    next-thread [ 
-        call
-    ] [
-        next-io-task [
-            call
-        ] [ 
-            win32-next-io-task 
-        ] ifte*
-    ] ifte* ;
-
 IN: streams
 USE: compiler
 USE: namespaces
@@ -56,6 +38,11 @@ USE: win32-api
 : <file-writer> <win32-file-writer> ;
 : <server> <win32-server> ;
 
-: init-stdio ( -- )
+IN: io-internals
+
+: io-multiplex ( -- task )
+    win32-next-io-task ;
+
+: init-io ( -- )
     win32-init-stdio ;
 

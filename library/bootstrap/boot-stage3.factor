@@ -6,7 +6,10 @@ lists namespaces parser sequences stdio unparser words ;
 "Bootstrap stage 3..." print
 
 os "unix" = [
-    "libc" "libc.so" "cdecl" add-library
+    "libc"     "libc.so"       "cdecl"   add-library
+    "sdl"      "libSDL.so"     "cdecl"   add-library
+    "sdl-gfx"  "libSDL_gfx.so" "cdecl"   add-library
+    "sdl-ttf"  "libSDL_ttf.so" "cdecl"   add-library
 ] when
 
 os "win32" = [
@@ -19,41 +22,22 @@ os "win32" = [
     "sdl"      "SDL.dll"      "cdecl"    add-library
     "sdl-gfx"  "SDL_gfx.dll"  "cdecl"    add-library
     "sdl-ttf"  "SDL_ttf.dll"  "cdecl"    add-library
-    ! FIXME: KLUDGE to get FFI-based IO going in Windows.
-    "/library/bootstrap/win32-io.factor" run-resource
 ] when
 
 default-cli-args
 parse-command-line
+init-assembler
 
 "/library/io/buffer.factor" run-resource
 
-"compile" get supported-cpu? and [
-    init-assembler
+: compile? "compile" get supported-cpu? and ;
+
+compile? [
     \ car compile
     \ = compile
     \ length compile
     \ unparse compile
     \ scan compile
-    
-    [
-        "imalloc" "ifree" "irealloc" "imemcpy"
-    ] [
-        [ "io-internals" ] search compile
-    ] each
-
-    os "unix" = [
-        "/library/unix/syscalls.factor"
-        "/library/unix/io.factor"
-        "/library/unix/sockets.factor"
-        "/library/unix/files.factor"
-    ] pull-in
-        
-    os "unix" = [
-        "unix-internals" words [ compile ] each
-    ] when
-    
-    init-io
 ] when
 
 t [
@@ -81,9 +65,7 @@ t [
     "/library/tools/annotations.factor"
     "/library/tools/dump.factor"
     "/library/bootstrap/image.factor"
-] pull-in
-
-"compile" get supported-cpu? and "mini" get not and [
+    
     "/library/io/logging.factor"
 
     "/library/tools/telnetd.factor"
@@ -148,15 +130,33 @@ t [
     "/library/ui/tool-menus.factor"
 ] pull-in
 
-os "win32" = [
-    "/library/win32/win32-io.factor"
-    "/library/win32/win32-errors.factor"
-    "/library/win32/winsock.factor"
-    "/library/win32/win32-io-internals.factor"
-    "/library/win32/win32-stream.factor"
-    "/library/win32/win32-server.factor"
-] pull-in
+compile? [
+    os "win32" = [
+        "/library/win32/win32-io.factor"
+        "/library/win32/win32-errors.factor"
+        "/library/win32/winsock.factor"
+        "/library/win32/win32-io-internals.factor"
+        "/library/win32/win32-stream.factor"
+        "/library/win32/win32-server.factor"
+        "/library/bootstrap/win32-io.factor"
+    ] pull-in
+    
+    os "unix" = [
+        "/library/unix/syscalls.factor"
+        "/library/unix/io.factor"
+        "/library/unix/sockets.factor"
+        "/library/unix/files.factor"
+    ] pull-in
+] when
+
+compile? [
+    "Compiling system..." print
+    compile-all
+    "Initializing native I/O..." print
+    init-io
+] when
 
 FORGET: pull-in
+FORGET: compile?
 
 "/library/bootstrap/boot-stage4.factor" dup print run-resource
