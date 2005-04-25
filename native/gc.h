@@ -20,6 +20,7 @@ INLINE CELL copy_object(CELL pointer)
 {
 	CELL tag;
 	CELL header;
+	CELL untagged;
 
 	if(pointer == F)
 		return F;
@@ -30,8 +31,9 @@ INLINE CELL copy_object(CELL pointer)
 		return pointer;
 
 	header = get(UNTAG(pointer));
-	if(TAG(header) == GC_COLLECTED)
-		return RETAG(UNTAG(header),tag);
+	untagged = UNTAG(header);
+	if(TAG(header) != FIXNUM_TYPE && in_zone(&active,untagged))
+		return RETAG(untagged,tag);
 	else
 		return RETAG(copy_object_impl(pointer),tag);
 }

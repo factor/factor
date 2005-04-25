@@ -43,3 +43,5 @@ USE: math
 [ ] [ "\0" write ] unit-test
 
 [ -1 read ] unit-test-fails
+
+[ "" ] [ 0 read ] unit-test

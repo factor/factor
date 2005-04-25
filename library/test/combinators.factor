@@ -4,6 +4,7 @@ USE: math
 USE: test
 USE: stdio
 USE: prettyprint
+USE: namespaces
 
 [ slip ] unit-test-fails
 [ 1 slip ] unit-test-fails
@@ -11,7 +12,6 @@ USE: prettyprint
 [ 1 2 3 slip ] unit-test-fails
 
 [ 5 ] [ [ 2 2 + ] 1 slip + ] unit-test
-[ 6 ] [ [ 2 2 + ] 1 1 2slip + + ] unit-test
 
 [ [ ] keep ] unit-test-fails
 
@@ -29,3 +29,7 @@ USE: prettyprint
 
 [ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] with-string ] unit-test
 [ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] with-string ] unit-test
+
+[ [ 9 8 7 6 5 4 3 2 1 ] ]
+[ [ 10 [ , ] [ 1 - dup dup 0 = [ drop f ] when ] while ] make-list nip ]
+unit-test

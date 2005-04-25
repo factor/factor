@@ -99,15 +99,15 @@ strings vectors ;
     over >r bind r> ; inline
 
 ! Building sequences
-SYMBOL: sequence
+SYMBOL: building
 
 : make-seq ( quot sequence -- sequence )
     #! Call , and % from the quotation to append to a sequence.
-    [ sequence set call sequence get ] with-scope ; inline
+    [ building set call building get ] with-scope ; inline
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
-    sequence get dup sbuf? [ sbuf-append ] [ push ] ifte ;
+    building get dup sbuf? [ sbuf-append ] [ push ] ifte ;
 
 : literal, ( word -- )
     #! Append some code that pushes the word on the stack. Used
@@ -117,11 +117,11 @@ SYMBOL: sequence
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq
     #! unless an equal object has already been added.
-    sequence get 2dup index -1 = [ push ] [ 2drop ] ifte ;
+    building get 2dup index -1 = [ push ] [ 2drop ] ifte ;
 
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
-    sequence get swap nappend ;
+    building get swap nappend ;
 
 : make-vector ( quot -- vector )
     100 <vector> make-seq ; inline

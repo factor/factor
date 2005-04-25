@@ -51,7 +51,7 @@ CELL copy_object_impl(CELL pointer)
 	gc_debug("copy_object",pointer);
 	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
 		object_size(pointer));
-	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+	put(UNTAG(pointer),RETAG(newpointer,OBJECT_TYPE));
 
 	return newpointer;
 }

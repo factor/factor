@@ -42,7 +42,7 @@ parser prettyprint stdio streams strings unparser vectors words ;
     "FFI: " write print ;
 
 : heap-scan-error. ( obj -- )
-    "Cannot do next-object outside begin/end-scan" write drop ;
+    "Cannot do next-object outside begin/end-scan" print drop ;
 
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;

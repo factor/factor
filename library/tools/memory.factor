@@ -22,13 +22,12 @@ namespaces prettyprint sequences stdio unparser vectors words ;
 ! Some words for iterating through the heap.
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image.
-    [
-        begin-scan
-        [ next-object ] while
-    ] [
-        end-scan rethrow
-    ] catch ;
+    #! Applies the quotation to each object in the image. We
+    #! use the lower-level >c and c> words here to avoid
+    #! copying the stacks.
+    [ end-scan rethrow ] >c
+    begin-scan [ next-object ] while
+    f c> call ;
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
@@ -63,7 +62,8 @@ M: object (each-slot) ( quot obj -- )
 
 : references ( obj -- list )
     #! Return a list of all objects that refer to a given object
-    #! in the image.
+    #! in the image. If only one reference exists, find
+    #! something referencing that, and so on.
     [ dupd refers? ] instances nip ;
 
 : seq+ ( n index vector -- )

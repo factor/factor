@@ -90,6 +90,7 @@
 
 + i/o:
 
+- 0 read broken
 - review errno
 - separate words for writing characters and strings
 - perhaps:

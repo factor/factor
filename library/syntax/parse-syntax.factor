@@ -24,7 +24,7 @@ namespaces parser strings syntax unparse vectors words ;
 
 ! The canonical t is a heap-allocated dummy object. It is always
 ! the first in the image.
-BUILTIN: t 7 ;  : t t swons ; parsing
+BUILTIN: t 14 ; : t t swons ; parsing
 
 ! In the runtime, the canonical f is represented as a null
 ! pointer with tag 3. So

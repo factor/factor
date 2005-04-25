@@ -7,6 +7,8 @@ M: sbuf length sbuf-length ;
 M: sbuf set-length set-sbuf-length ;
 M: sbuf nth sbuf-nth ;
 M: sbuf set-nth set-sbuf-nth ;
+M: sbuf clone sbuf-clone ;
+M: sbuf = sbuf= ;
 
 : >sbuf ( seq -- sbuf ) 0 <sbuf> [ swap nappend ] keep ;
 

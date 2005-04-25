@@ -106,7 +106,9 @@ SYMBOL: io-tasks
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
 
-TUPLE: reader line ready? ;
+! The cr slot is set to true by read-line-loop if the last
+! character read was \r.
+TUPLE: reader line ready? cr ;
 
 C: reader ( handle -- reader )
     [ >r buffered-port r> set-delegate ] keep ;
@@ -123,21 +125,35 @@ C: reader ( handle -- reader )
         "reader not ready" throw
     ] ifte ;
 
+: reader-cr> ( reader -- ? )
+    dup reader-cr >r f swap set-reader-cr r> ;
+
 ! Reading lines
-: read-line-loop ( line buffer -- ? )
+: read-line-char ( reader ch -- )
+    f pick set-reader-cr  swap reader-line push ;
+
+: read-line-loop ( reader -- ? )
     dup buffer-length 0 = [
-        2drop f
+        drop f
     ] [
-        dup buffer-pop dup CHAR: \n = [
-            3drop t
+        dup buffer-pop
+        dup CHAR: \r = [
+            drop t swap set-reader-cr t
         ] [
-            pick push read-line-loop
+            dup CHAR: \n = [
+                drop dup reader-cr> [
+                    read-line-loop
+                ] [
+                    drop t
+                ] ifte
+            ] [
+                dupd read-line-char read-line-loop
+            ] ifte
         ] ifte
     ] ifte ;
 
 : read-line-step ( reader -- ? )
-    [ dup reader-line swap read-line-loop dup ] keep
-    set-reader-ready? ;
+    [ read-line-loop dup ] keep set-reader-ready? ;
 
 : init-reader ( count reader -- ) >r <sbuf> r> set-reader-line ;
 
@@ -182,37 +198,35 @@ M: read-line-task io-task-events ( task -- events )
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [
-        drop
-    ] [
-        [
-            swap <read-line-task> add-io-task stop
-        ] callcc0 drop
-    ] ifte ;
+        [ swap <read-line-task> add-io-task stop ] callcc0
+    ] unless drop ;
 
 M: reader stream-readln ( stream -- line )
     dup wait-to-read-line read-fin ;
 
 ! Reading character counts
 : read-count-step ( count reader -- ? )
-    dup reader-line -rot >r over length - r>
+    dup reader-line -rot >r over length - ( remaining) r>
     2dup buffer-fill <= [
-        buffer> swap nappend t
+        buffer> nappend t
     ] [
-        buffer>> nip swap nappend f
+        buffer>> nip nappend f
     ] ifte ;
 
 : can-read-count? ( count reader -- ? )
     dup pending-error
-    2dup reader-line length >= [
-        2drop t
+    2dup init-reader
+    2dup reader-line length <= [
+        t swap set-reader-ready? drop t
     ] [
-        2dup init-reader read-count-step
+        read-count-step
     ] ifte ;
 
 TUPLE: read-task count ;
 
-C: read-task ( port -- task )
-    [ >r <io-task> r> set-delegate ] keep ;
+C: read-task ( count port -- task )
+    [ >r <io-task> r> set-delegate ] keep
+    [ set-read-task-count ] keep ;
 
 : >read-task< dup read-task-count swap io-task-port ;
 
@@ -220,7 +234,7 @@ M: read-task do-io-task ( task -- ? )
     >read-task< dup refill dup eof? [
         nip reader-eof t
     ] [
-        read-count-step
+        [ read-count-step dup ] keep set-reader-ready?
     ] ifte ;
 
 M: read-task io-task-events ( task -- events )
@@ -228,15 +242,11 @@ M: read-task io-task-events ( task -- events )
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
-        2drop
-    ] [
-        [
-            swap <read-task> add-io-task stop
-        ] callcc0 2drop
-    ] ifte ;
+        [ -rot <read-task> add-io-task stop ] callcc0 
+    ] unless 2drop ;
 
 M: reader stream-read ( count stream -- string )
-    2dup wait-to-read read-fin ;
+    [ wait-to-read ] keep read-fin ;
 
 ! Writers
 

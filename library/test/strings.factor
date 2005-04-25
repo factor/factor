@@ -1,14 +1,13 @@
 IN: temporary
-USING: sequences ;
-
 USE: errors
 USE: kernel
 USE: math
 USE: namespaces
 USE: strings
 USE: test
+USE: sequences
 
-[ "abc" ] [ [ "a" "b" "c" ] cat ] unit-test
+[ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
 
 [ "abc" ] [ "ab" "c" cat2 ] unit-test
 [ "abc" ] [ "a" "b" "c" cat3 ] unit-test

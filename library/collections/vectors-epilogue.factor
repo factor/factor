@@ -5,7 +5,8 @@ math-internals sequences ;
 
 IN: vectors
 
-: >vector ( list -- vector ) 0 <vector> [ swap nappend ] keep ;
+: >vector ( list -- vector )
+    dup length <vector> [ swap nappend ] keep ;
 
 : vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter

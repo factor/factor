@@ -7,8 +7,6 @@ BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
 M: string = string= ;
 
 BUILTIN: sbuf 13 ;
-M: sbuf = sbuf= ;
-
 UNION: text string integer ;
 
 M: string nth string-nth ;

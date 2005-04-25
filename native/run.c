@@ -105,17 +105,13 @@ void primitive_ifte(void)
 
 void primitive_getenv(void)
 {
-	F_FIXNUM e = to_fixnum(dpeek());
-	if(e < 0 || e >= USER_ENV)
-		range_error(F,0,tag_fixnum(e),USER_ENV);
+	F_FIXNUM e = to_fixnum_fast(dpeek());
 	drepl(userenv[e]);
 }
 
 void primitive_setenv(void)
 {
-	F_FIXNUM e = to_fixnum(dpop());
+	F_FIXNUM e = to_fixnum_fast(dpop());
 	CELL value = dpop();
-	if(e < 0 || e >= USER_ENV)
-		range_error(F,0,tag_fixnum(e),USER_ENV);
 	userenv[e] = value;
 }

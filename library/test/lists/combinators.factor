@@ -28,12 +28,6 @@ USE: strings
 [ t ] [ [ 1/2 ] all=? ] unit-test
 [ t ] [ [ 1.0 10/10 1 ] all=? ] unit-test
 
-[ 5 ] [ [ 5 ] [ < ] top ] unit-test
-[ 5 ] [ [ 5 6 ] [ < ] top ] unit-test
-[ 6 ] [ [ 5 6 ] [ > ] top ] unit-test
-[ 99 ] [ 100 count [ > ] top ] unit-test
-[ 0 ] [ 100 count [ < ] top ] unit-test
-
 [ f ] [ [ ] [ ] some? ] unit-test
 [ t ] [ [ 1 ] [ ] some? >boolean ] unit-test
 [ t ] [ [ 1 2 3 ] [ 2 > ] some? >boolean ] unit-test

@@ -5,6 +5,7 @@ USE: parser
 USE: test
 USE: unparser
 USE: kernel
+USE: kernel-internals
 USE: io-internals
 
 [ "\"hello\\\\backslash\"" ]
@@ -27,6 +28,7 @@ unit-test
 [ "1267650600228229401496703205376" ] [ 1 100 shift unparse ] unit-test
 
 [ ] [ { 1 2 3 } unparse drop ] unit-test
-[ stdin unparse parse ] unit-test-fails
+! Unreadable objects
+[ { 1 2 3 } vector-array unparse parse ] unit-test-fails
 
 [ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test

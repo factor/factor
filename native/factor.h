@@ -89,9 +89,9 @@ typedef signed long long s64;
 	#include <netdb.h>
 #endif
 
-#if defined(FFI) && !defined(WIN32)
+#if !defined(WIN32)
 #include <dlfcn.h>
-#endif /* FFI */
+#endif
 
 #define INLINE inline static
 

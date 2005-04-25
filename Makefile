@@ -34,8 +34,6 @@ default:
 	@echo "linux"
 	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
 	@echo "macosx"
-	@echo "solaris"
-	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"
@@ -45,33 +43,28 @@ default:
 
 bsd:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -pthread" \
+		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
 		LIBS="$(DEFAULT_LIBS)"
 
 bsd-nopthread:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
+		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS)"
 
 macosx:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI" \
+		CFLAGS="$(DEFAULT_CFLAGS)" \
 		LIBS="$(DEFAULT_LIBS)" 
 
 linux:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic" \
+		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
 
 linux-ppc:
 	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -export-dynamic -mregnames" \
+		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
-
-solaris:
-	$(MAKE) f \
-		CFLAGS="$(DEFAULT_CFLAGS)" \
-		LIBS="$(DEFAULT_LIBS) -lsocket -lnsl -lm"
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
