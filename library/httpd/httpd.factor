@@ -47,8 +47,8 @@ stdio streams strings threads url-encoding ;
 
 : httpd-client ( socket -- )
     [
-        [
-            stdio get log-client read-line [ parse-request ] when*
+        dup log-client [
+            read-line [ parse-request ] when*
         ] with-stream
     ] try ;
 
@@ -58,11 +58,13 @@ stdio streams strings threads url-encoding ;
 : httpd-loop ( -- ) httpd-connection httpd-loop ;
 
 : httpd ( port -- )
-    <server> "http-server" set [
-        httpd-loop
-    ] [
-        "http-server" get stream-close rethrow
-    ] catch ;
+    [
+        <server> "http-server" set [
+            httpd-loop
+        ] [
+            "http-server" get stream-close rethrow
+        ] catch
+    ] with-logging ;
 
 : stop-httpd ( -- )
     #! Stop the server.

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
 USING: errors generic hashtables kernel lists math
-sequences stdio streams strings threads unix-internals vectors ;
+sequences streams strings threads unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -20,8 +20,13 @@ USING: namespaces ;
 TUPLE: port handle buffer error ;
 
 C: port ( handle buffer -- port )
-    [ >r <buffer> r> set-delegate ] keep
+    [
+        >r dup 0 > [ <buffer> ] [ drop f ] ifte r> set-delegate
+    ] keep
     [ >r dup init-handle r> set-port-handle ] keep ;
+
+M: port stream-close ( port -- )
+    dup port-handle close buffer-free ;
 
 : buffered-port 8192 <port> ;
 
@@ -117,8 +122,6 @@ C: reader ( handle -- reader )
     ] [
         "reader not ready" throw
     ] ifte ;
-
-M: reader stream-close ( stream -- ) port-handle close ;
 
 ! Reading lines
 : read-line-loop ( line buffer -- ? )
@@ -311,7 +314,7 @@ M: writer stream-write-attr ( string style writer -- )
     nip >r dup string? [ ch>string ] unless r> blocking-write ;
 
 M: writer stream-close ( stream -- )
-    dup stream-flush dup port-handle close buffer-free ;
+    dup stream-flush delegate stream-close ;
 
 ! Make a duplex stream for reading/writing a pair of fds
 : <fd-stream> ( infd outfd flush? -- stream )
@@ -336,6 +339,8 @@ M: writer stream-close ( stream -- )
     ] [
         2drop f
     ] ifte ;
+
+USE: stdio
 
 : init-io ( -- )
     #! Should only be called on startup. Calling this at any

@@ -7,13 +7,6 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
 
-: io-task-twice-error. ( obj -- )
-    "Attempting to perform two simultaneous I/O operations on "
-    write . ;
-
-: no-io-tasks-error. ( obj -- )
-    "No I/O tasks" print ;
-
 : undefined-word-error. ( obj -- )
     "Undefined word: " write . ;
 
@@ -45,14 +38,8 @@ parser prettyprint stdio streams strings unparser vectors words ;
 : c-string-error. ( obj -- )
     "Cannot convert to C string: " write . ;
 
-: ffi-disabled-error. ( obj -- )
-    drop "Recompile Factor with #define FFI." print ;
-
 : ffi-error. ( obj -- )
     "FFI: " write print ;
-
-: port-closed-error. ( obj -- )
-    "Port closed: " write . ;
 
 : heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" write drop ;
@@ -64,9 +51,6 @@ M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
         expired-error.
-        io-task-twice-error.
-        no-io-tasks-error.
-        f
         io-error.
         undefined-word-error.
         type-check-error.
@@ -75,9 +59,7 @@ M: kernel-error error. ( error -- )
         signal-error.
         negative-array-size-error.
         c-string-error.
-        ffi-disabled-error.
         ffi-error.
-        port-closed-error.
         heap-scan-error.
     } vector-nth execute ;
 

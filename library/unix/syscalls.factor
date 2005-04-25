@@ -176,7 +176,7 @@ END-STRUCT
     "int" "libc" "listen" [ "int" "int" ] alien-invoke ;
 
 : accept ( s sockaddr socklen -- n )
-    "int" "libc" "accept" [ "int" "sockaddr-in*" "socklen_t" ] alien-invoke ;
+    "int" "libc" "accept" [ "int" "sockaddr-in*" "int-box*" ] alien-invoke ;
 
 : inet-ntoa ( sockaddr -- string )
     "char*" "libc" "inet_ntoa" [ "in_addr_t" ] alien-invoke ;

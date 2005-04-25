@@ -21,8 +21,6 @@
 + ffi:
 
 - char* struct members
-- if a boxer triggers GC, already-pushed addresses might become
-  invalid!
 - box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
 - utf16 string boxing
@@ -88,6 +86,7 @@
 - generational gc
 - doc comments of generics
 - proper ordering for classes
+- M: object should not inhibit delegation
 
 + i/o:
 
@@ -97,14 +96,12 @@
   GENERIC: set-style ( style stream -- )
   GENERIC: stream-write
   GENERIC: stream-write-char
-- linux/ppc and mac os x ffi
+- mac os x ffi
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - add a socket timeout
-- get sockets working
 - renumber types appopriately
 - linux? freebsd? words, linux i/o stuff
-- clean up errors
 - implement fcopy
 - unify unparse and prettyprint
 

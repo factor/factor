@@ -79,3 +79,10 @@ math namespaces parser strings words ;
 
 : END-UNION ( max -- )
     define-struct-type ; parsing
+
+BEGIN-STRUCT: int-box
+    FIELD: int i
+END-STRUCT
+
+: box-int ( n -- box )
+    <int-box> [ set-int-box-i ] keep ;
