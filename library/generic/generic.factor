@@ -44,6 +44,9 @@ namespaces parser strings words vectors math math-internals ;
 : methods ( generic -- alist )
     "methods" word-prop hash>alist [ 2car class< ] sort ;
 
+: order ( generic -- list )
+    "methods" word-prop hash-keys [ class< ] sort ;
+
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
     #! this is called at vtable build time, and in the sorted

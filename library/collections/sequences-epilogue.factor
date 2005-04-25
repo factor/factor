@@ -52,7 +52,7 @@ M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
 
 M: f (tree-each) swap call ;
 
-M: sequence (tree-each) [ swap call ] seq-each-with ;
+M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 
 : tree-each swap (tree-each) ; inline
 
