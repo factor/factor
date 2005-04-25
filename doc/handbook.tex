@@ -519,9 +519,10 @@ Reads the next word from the input string and appends the word to the parse tree
 
 \subsubsection{Mutable literals}
 
-\newcommand{\mutableglos}{\glossary{
-name=mutable object,
-description={an object whose slot values can be modified, or by transitivity, an object that refers to a mutable object via one of its slots}}}
+\newcommand{\mutableglos}{\glossary{name=mutable object,
+description=an object whose slot values can be changed}
+\glossary{name=immutable object,
+description=an object whose slot values cannot be changed}}
 \mutableglos
 
 Using mutable object literals in word definitions requires care, since if those objects
@@ -986,8 +987,8 @@ description=a word that adds definitions to the dictionary}
 description=the collection of vocabularies making up the code in the Factor image}
 Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. Words hold two distinct pieces of information:
 \begin{itemize}
-\item The word definition that determines what action is taken when the word is executed,
-\item A set of word properties, including the name of the word, the vocabulary it belongs do, documentation strings, and other meta-data.
+\item A definition, specifying the behavior of the word when executed,
+\item A set of word properties, including the name of the word, its vocabulary, any documentation strings, and other meta-data.
 \end{itemize}
 \wordtable{
 \ordinaryword{word?}{word?~( object -- ?~)}{words}
@@ -1025,7 +1026,7 @@ The \texttt{vocabs} parameter is a list of vocabulary names. If a word with the 
 }
 Creates a new word \texttt{name} in \texttt{vocabulary}. If the vocabulary already contains a word with this name, the existing word is returned.
 \wordtable{
-\ordinaryword{create-in}{create ( name -- word )}{words}
+\ordinaryword{create-in}{create-in ( name -- word )}{words}
 }
 Creates a new word \texttt{name} in the current vocabulary. Should only be called from parsing words (\ref{parsing-words}), and in fact is defined as:
 \begin{verbatim}
@@ -1158,7 +1159,9 @@ description={a name/value pair stored in a word's properties}}
 \glossary{name=word properties,
 description={a hashtable associated with each word storing various sundry properties}}
 
-Each word has an associated hashtable of properties. A common idiom in the Factor library is to use symbols for their properties. Conventionally, the property names are strings, but nothing requires that this be so.
+Each word has an associated hashtable of properties. Conventionally, the property names are strings, but nothing requires that this be so.
+
+A common idiom in the Factor library is to use symbols for their properties. 
 
 \wordtable{
 \ordinaryword{word-prop}{word-prop ( word name -- value )}{words}\\
@@ -1226,7 +1229,7 @@ This is an even lower-level facility for working with the address containing nat
 \wordtable{
 \ordinaryword{update-xt}{update-xt ( word -- )}{words}
 }
-Updates a word's execution token according to its primitive number. When called with a compiled word, has the effect of decompiling the word. Calling \texttt{set-word-primitive} automatically updates this address.
+Updates a word's execution token according to its primitive number. When called with a compiled word, has the effect of decompiling the word. The execution token is automatically updated after a call to \texttt{set-word-primitive}.
 
 \wordtable{
 \ordinaryword{recrossref}{recrossref ( word -- )}{words}
@@ -1237,8 +1240,21 @@ Updates the cross-referencing database, which you will probably need to do if yo
 
 \glossary{name=object,
 description=a datum that can be identified}
+\mutableglos
+
+Everything in Factor is an object, where an object is a collection of slots. Each object has a unique identity, and references to objects are passed by value on the stack. It is possible to have two references to the same object, and if the object is mutated through one reference, the changes will be visible through the other reference. Not all objects are mutable; the documentation for each class details if its instances are mutable or not.
 
 \subsection{Identity and equality}
+
+There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by having the same type and equal slot values.
+\wordtable{
+\ordinaryword{eq?}{eq?~( object object -- ?~)}{kernel}
+}
+Output \texttt{t} if two references point to the same object, and \texttt{f} otherwise.
+\wordtable{
+\genericword{=}{= ( object object -- ?~)}{kernel}
+}
+Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precise meaning of equality depends on the object's class, however usually two objects are equal if their slot values are equal. If two objects are equal, they have the same printed representation, although the converse is not always true.
 
 \subsection{Generic words and methods}
 
@@ -1265,13 +1281,34 @@ can potentially occur in a different source file.
 
 \subsubsection{\label{method-order}Method ordering}
 
-While not all classes are \emph{comparable}, meaning there is no canonical linear ordering for classes, the methods of a generic word are ordered, and you can inspect this order using the \texttt{order} word:
+If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes. The methods of a generic word are linearly ordered, though, and you can inspect this order using the \texttt{order} word.
+
+Suppose you have the following definitions:
+\begin{verbatim}
+GENERIC: foo
+M: integer foo 1 + ;
+M: number foo 1 - ;
+M: object foo dup 2list ;
+\end{verbatim}
+Since the \texttt{integer} class is strictly smaller than the \texttt{number} class, which in turn is strictly smaller than the \texttt{object} class, the ordering of methods is not surprising in this case:
 \begin{alltt}
-\textbf{ok} \bs = order .
-\textbf{[ object number sequence string cons sbuf alien tuple
-hashtable POSTPONE: f ]}
+\textbf{ok} \bs foo order .
+\textbf{[ object number integer ]}
 \end{alltt}
-Least-specific methods come first in the list.
+However, suppose we had the following set of definitions:
+\begin{verbatim}
+GENERIC: describe
+M: general-t describe drop "a true value" print ;
+M: general-list describe drop "a list" print ;
+M: object describe drop "an object" print ;
+\end{verbatim}
+Neither \texttt{general-t} nor \texttt{general-list} contains the other, and their intersection is the non-empty \texttt{cons} class. So the generic word system will place \texttt{object} first in the method order, however either \texttt{general-t} or \texttt{general-list} may come next, and it is pretty much a random choice that depends on hashing:
+\begin{alltt}
+\textbf{ok} \bs bar order .
+\textbf{[ object general-list general-t ]}
+\end{alltt}
+
+Therefore, the outcome of calling \texttt{bar} with a cons cell is undefined.
 
 \subsection{Classes}
 \glossary{name=class,
@@ -1371,7 +1408,7 @@ M: complex abs >rect mag2 ;
 \glossary{name=complement,
 description={a class whose set of instances is the set of objects that are not instances of a specific class}}
 
-An object is an instance of a complement class if it is not an instance of the complement's parameter.
+An object is an instance of a complement if it is not an instance of the complement's parameter.
 \wordtable{
 \parsingword{COMPLEMENT:}{COMPLEMENT: \emph{name} \emph{parameter}}{syntax}
 }
@@ -1385,17 +1422,16 @@ COMPLEMENT: general-t f
 description={a word with stack effect \texttt{( object -- ?~)}, or more alternatively, a class whose instances are the instances of a superclass that satisfy an arbitrary predicate}}
 An object is an instance of a predicate classes if it is an instance of the predicate's parent class, and if it satisfies the predicate definition.
 
-To speed up dispatch, each predicate must be
-defined as a subclass of some other class. That way predicates
-subclassing from disjoint builtin classes do not need to be
-exhaustively tested.
+Each predicate must be
+defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be
+exhaustively tested during method dispatch.
 \wordtable{
 \parsingword{PREDICATE:}{PREDICATE: \emph{parent} \emph{name} \emph{predicate} ;}{syntax}
 }
 Defines a predicate class deriving from \texttt{parent} whose instances are the instances of \texttt{superclass} that satisfy the \texttt{predicate} quotation. The predicate quotation must have stack effect \texttt{( object -- ?~)}.
 
-For example, the library defines some subclasses of \texttt{integer}
-classifying ASCII characters:
+For example, the \texttt{strings} vocabulary contains subclasses of \texttt{integer}
+classifying various ASCII characters:
 \begin{verbatim}
 PREDICATE: integer blank     " \t\n\r" str-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;
@@ -1407,7 +1443,7 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 \subsubsection{Operations on classes}
 \wordtable{
 \ordinaryword{class-and}{class-and ( class class -- class )}{kernel}\\
-\ordinaryword{class-or}{class-and ( class class -- class )}{kernel}
+\ordinaryword{class-or}{class-or ( class class -- class )}{kernel}
 }
 Intersection and union of classes. Note that the returned class might not be the exact desired class; for example, \texttt{object} is output if no suitable class definition could be found at all.
 \wordtable{
@@ -1422,9 +1458,9 @@ Tuples are user-defined classes composed of named slots. All tuples have the sam
 \wordtable{
 \parsingword{TUPLE:}{TUPLE: \emph{name} \emph{slots} ;}{syntax}
 }
-Defines a new tuple class, along with a predicate \texttt{name?}~and default constructor \texttt{<name>}.
+Defines a new tuple class with membership predicate \texttt{name?}~and constructor \texttt{<name>}.
 
-Slots are read and written using various automatically-defined words with names of the
+The constructor takes slots in left-to-right order from the stack. After construction, slots are read and written using various automatically-defined words with names of the
 form \texttt{\emph{class}-\emph{slot}} and \texttt{set-\emph{class}-\emph{slot}}.
 
 Here is an example:
@@ -1448,8 +1484,8 @@ produces a new \texttt{point}:
 
 \subsubsection{Constructors}
 
-A tuple constructor is named after the tuple class surrounded in angle
-brackets (\texttt{<} and \texttt{>}). A default constructor is provided
+Constructors are named after the tuple class surrounded in angle
+brackets (\texttt{<}~and~\texttt{>}). A default constructor is provided
 that reads slot values from the stack, however a custom constructor can
 be defined using the \texttt{C:} parsing word.
 \wordtable{
@@ -1480,7 +1516,40 @@ Factor uses delegation is used instead of inheritance, but it is not a direct
 substitute; in particular, the semantics differ in that a delegated
 method call receives the delegate on the stack, not the original object.
 
-\section{Numbers}
+\section{Sequences}
+
+\glossary{name=sequence,
+description=an object storing a linearly-ordered set of elements}
+
+\subsection{Sequence operations}
+
+\subsection{Sequence combinators}
+
+\subsection{Lists and cons cells}
+
+\subsubsection{List operations}
+
+\subsubsection{Constructing and destructuring lists}
+
+\subsubsection{Queues}
+
+\subsection{Vectors}
+
+\subsection{Strings}
+
+\subsection{String buffers}
+
+\subsection{Constructing sequences}
+
+\section{Mappings}
+
+\subsection{Association lists}
+
+\subsection{Hashtables}
+
+\subsection{\label{namespaces}Namespaces}
+
+\section{Mathematics}
 
 \numberglos
 
@@ -2460,6 +2529,6 @@ The compiler consists of multiple stages -- first, a dataflow graph is inferred,
 
 \printglossary
 
-\input{spec.ind}
+\input{handbook.ind}
 
 \end{document}

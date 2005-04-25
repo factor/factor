@@ -46,7 +46,10 @@ sequences strings test vectors ;
 [ t ] [ { } hashcode { } hashcode = ] unit-test
 
 [ { 1 2 3 } { 1 2 3 4 5 6 } ]
-[ { 1 2 3 } dup { 4 5 6 } seq-append ] unit-test
+[ { 1 2 3 } dup { 4 5 6 } append ] unit-test
+
+[ f ] [ f concat ] unit-test
+[ { 1 2 3 4 } ] [ [ { 1 } [ 2 ] { 3 4 } ] concat ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
 [ 4 [ CHAR: a fill ] vector-project ]

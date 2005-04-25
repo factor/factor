@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces ;
+USING: generic kernel lists math namespaces sequences ;
 
 : hide-menu ( -- )
     world get

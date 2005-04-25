@@ -23,7 +23,7 @@
 IN: cont-responder
 USING: stdio httpd httpd-responder math random namespaces streams
        lists strings kernel html url-encoding unparser hashtables
-       parser generic ;
+       parser generic sequences ;
 
 #! Used inside the session state of responders to indicate whether the
 #! next request should use the post-refresh-get pattern. It is set to
@@ -109,15 +109,10 @@ TUPLE: item expire? quot id time-added ;
   #! a certain period of time if 'expire?' is true.  
   get-random-id -rot pick continuation-item over continuation-table set-hash ;
   
-: append* ( lists -- list )
-  #! Given a list of lists, append the lists together
-  #! and return the concatenated list.
-  f swap [ append ] each ;
-  
 : register-continuation* ( expire? quots -- id ) 
   #! Like register-continuation but registers a quotation 
   #! that will call all quotations in the list, in the order given.
-  append* register-continuation ;
+  concat register-continuation ;
 
 : get-continuation-item ( id -- <item> )
   #! Get the continuation item associated with the id.

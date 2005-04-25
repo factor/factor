@@ -108,7 +108,7 @@ SYMBOL: parser-stream
 : <actions> ( path alist -- alist )
     #! For each element of the alist, change the value to
     #! path " " value
-    [ uncons >r swap " " r> seq-append3 cons ] map-with ;
+    [ uncons >r swap " " r> append3 cons ] map-with ;
 
 DEFER: <file-reader>
 

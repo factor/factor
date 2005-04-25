@@ -4,7 +4,8 @@
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
 USING: alien errors generic hashtables kernel lists math
-namespaces parser strings syntax unparse vectors words ;
+namespaces parser sequences strings syntax unparse vectors
+words ;
 
 : parsing ( -- )
     #! Mark the most recently defined word to execute at parse
@@ -24,7 +25,7 @@ namespaces parser strings syntax unparse vectors words ;
 
 ! The canonical t is a heap-allocated dummy object. It is always
 ! the first in the image.
-BUILTIN: t 14 ; : t t swons ; parsing
+BUILTIN: t 7 ;  : t t swons ; parsing
 
 ! In the runtime, the canonical f is represented as a null
 ! pointer with tag 3. So

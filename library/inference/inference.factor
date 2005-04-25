@@ -107,8 +107,8 @@ M: computed literal-value ( value -- )
 : ensure-d ( typelist -- )
     dup meta-d get ensure-types
     meta-d get required-inputs >vector dup
-    meta-d [ seq-append ] change
-    d-in [ seq-append ] change ;
+    meta-d [ append ] change
+    d-in [ append ] change ;
 
 : (present-effect) ( vector -- list )
     >list [ value-class ] map ;

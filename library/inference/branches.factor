@@ -12,7 +12,7 @@ sequences strings vectors words hashtables prettyprint ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
-    [ length - computed-value-vector ] keep seq-append ;
+    [ length - computed-value-vector ] keep append ;
 
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is

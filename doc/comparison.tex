@@ -1,0 +1,222 @@
+\documentclass{article}
+\author{Daniel Ehrenberg}
+\title{Comparing Factor to Other Languages}
+\usepackage{alltt}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Factor is a new programming language created by Slava Pestov. Although it is a great new collection of ideas, much of it comes from other languages. If you know certain other languages, like Joy, Forth, or Lisp, it can be much easier to learn Factor when told the relation between the two. This document attempts to show people how Factor compares to other languages. This is not a tutorial, but rather a first look at Factor for people who already program.
+\end{abstract}
+
+\section{Forth}
+
+In many ways, Factor is just like Forth, but with a few additional features: garbage collection, dynamic types, error handling and an object system. If you're a Forth user, you're probably opposed to these features. But the way Factor does these things doesn't (in my experience) make things any more difficult or inextensible for the programmer.
+
+Factor uses essentially the same parsing model as Forth, except there is no interpret mode. That said, if you execute code that has been only parsed, nothing more, it is considered interpreting. In Factor, parsing words don't compile code in as they do in Forth; instead, they merely cons onto a list, building a quotation which can be called. Compiling code entails complex multi-pass manipulation of this quotation, and the resulting machine code is stored in memory or in an image. Factor revolves around executing quotations, which are linked lists of words and data, essentially the source code that has merely been parsed. The return stack consists of these, executing them one word at a time (when Factor is interpreted).
+
+You can put any code as these lists, and you can move it to the return stack for execution using the word call. This technique is used very often for higher-order functions, largely the same way \texttt{[']} or \texttt{'} is used. \texttt{[ word ]} is the Factor equivalent of \texttt{['] word} for most purposes, but if you're going to be inspecting the word with operations like see, prefix it with a backslash (\texttt{\char'134 word}). One of the most visible differences between Factor and Forth is the tendency to use these code quotations where one would use immediate words in Forth.
+
+Like many Forths, Factor uses a vocabulary system. Factor's vocabulary system revolves around two parsing words, \texttt{USE:} and \texttt{IN:}. \texttt{USE:} opens another vocabulary for use in the current one, and \texttt{IN:} changes the current vocabulary. But because of Factor's philosophy of constant testing, vocabularies have no privacy, unlike most Forth wordlist systems.
+
+In place of variables that Forth uses, Factor has dynamic scoping. This makes it easier to isolate the side effects of a piece of code, but sometimes things might not work as expected when scopes are improperly used. The equivalent of the Forth code
+\begin{verbatim}
+variable x
+3 x !
+x @ .
+\end{verbatim}
+is
+\begin{verbatim}
+SYMBOL: x
+3 x set
+x get .
+\end{verbatim}
+The biggest difference there semantically is between \texttt{variable} and \texttt{SYMBOL:}. In Forth, when you make a variable, an actual place in memory is allocated. But in Factor, when you make a symbol using \texttt{SYMBOL:}, all you're doing is making a unique identifier. Technically, when you make a symbol, all you're doing is making a word that pushes itself. \verb|SYMBOL: x| is in that way equivalent to, in Forth, \verb|: x ['] x ;|, but in Factor it's much more useful. The variable system in Factor needs an identifier for each value, and a symbol serves this purpose. You could, if you wanted to, use any other type of data for the identifier for a variable, but it is not recommended. Factor lets you circumvent the local dynamic scopes and use global scope, if needed.
+
+Cheat sheet:
+
+\begin{tabular}{|l|p{3.5cm}|p{4cm}|} \hline
+Forth & Factor & Comments\\ \hline
+\texttt{+} & \texttt{+} & \emph{when applied on integers, it's the same}\\
+\texttt{-} & \texttt{-} & \emph{``''}\\
+\texttt{*} & \texttt{*} & \emph{``''}\\
+\texttt{/} & \texttt{/} & \emph{``''}\\
+\texttt{s" string"} & \texttt{"string"} & \emph{'\"' is still a word in Factor}\\
+\texttt{scan} & \texttt{scan-word} & \emph{Factor and Forth have really similar parsing systems}\\
+\texttt{execute} & \texttt{execute} &\\
+\texttt{,} or \texttt{compile} or \texttt{[compile]} & \texttt{swons} & \emph{swons is helping assemble the quotation, taking the parse tree from the stack}\\
+\texttt{:} & \texttt{:} & \emph{In Factor, redefinition affects prior uses of the word unless you FORGET: the word.}\\
+\texttt{;} & \texttt{;} & \emph{; is more general in Factor than Forth}\\
+\texttt{see word} & \texttt{\ word see} &\\
+\texttt{' word or ['] word} & \texttt{\char'134 word or [ word ]} &\\
+\texttt{if a else b then} & \texttt{[ a ] [ b ] ifte} &\\
+\texttt{if a then} & \texttt{[ a ] when} &\\
+\texttt{for a next} & \texttt{[ a ] repeat} or \texttt{[ a ] times}&\\ \hline
+\end{tabular}
+
+\section{Joy}
+
+Factor derives its code quotation system and combinators from Joy, and it shares concatenativity with Joy. But overall, Factor is much less pure than Joy. Factor has a much stronger emphasis on practicality than Joy, which is more theory-oriented. Factor has mutable datastructures, dynamic scope, and an extensible parser. Factor has doesn't have Joy's sets, but it has all of its other datastructures, and also vectors, hashtables, and tuples (user-defined structures). Factor provides much more reflection capabilities than Joy, and much of Factor is written in Factor.
+
+A big difference between Factor and Joy is the way that Factor encourages you to factor your program into tiny pieces, like Forth. So some words that may have been considered good style in Joy can be considered horrible in Factor. The optimal Factor word contains 7 words. This stylistic difference makes Factor's library very different in order to encourage factoring. For most of Joy's recursive combinators, Factor just uses recursion. Factor does away with some of Joy's words like cond and case, which usually just lead to words that are too big.
+
+Factor's datastructure library differs vastly from Joy's. Joy has 4 types: sets, lists, numbers and strings. Factor, on the other hand, has over 20 types, ranging from unsafe arrays to rational numbers to C pointers. Factor has all of Joy's datastructures except for sets. Factor also has user-defined datastructures called \emph{tuples}.
+
+On a superficial analysis, the biggest difference between Factor's and Joy's syntaxes is the number of spaces used: Factor, unlike Joy, requires that you use spaces on either side of '[', ']', '{', and '}'. Another difference is the definition syntax. Joy provides many keywords for definition, the basic syntax being \verb|DEFINE x == y.|, whereas Factor uses just a few parsing words for definition: \verb|: x y ;|. But Factor has many semanically different forms of definition, such as defining a method and defining a symbol. These all use different parsing words, using Factor's extensible parser.
+
+Cheat sheet:
+
+\begin{tabular}{|l|lp{3.5cm}|lp{4cm}|} \hline
+Joy & Factor & Comments\\ \hline
+\texttt{+} & \texttt{+} &\\
+\texttt{-} & \texttt{-} &\\
+\texttt{*} & \texttt{*} &\\
+\texttt{/} & \texttt{/} &\\
+\texttt{cons} & \texttt{cons} & \emph{Only on lists for Factor}\\
+\texttt{uncons} & \texttt{uncons} & \emph{``''}\\
+\texttt{car} & \texttt{car} & \emph{``''}\\
+\texttt{cdr} & \texttt{cdr} & \emph{``''}\\
+\texttt{unswons} & \texttt{unswons} & \emph{``''}\\
+\texttt{swap} & \texttt{swap} &\\
+\texttt{dup} & \texttt{dup} &\\
+\texttt{pop} & \texttt{drop} &\\
+\texttt{[code] dip} & \texttt{>r code r>} &\\
+\texttt{[code or list]} & \texttt{[ code or list ]} &\\
+\texttt{times} & \texttt{times} &\\
+\texttt{"string"} & \texttt{"string"} &\\
+\texttt{DEFINE x == y.} & \texttt{: x y ;} & \emph{In Factor, words can be redefined}\\
+\texttt{rollup} & \texttt{-rot} &\\
+\texttt{rolldown} & \texttt{rot} &\\
+\texttt{[]} & \texttt{f} or \texttt{[ ]} &\\
+\texttt{false} & \texttt{f} or \texttt{[ ]} &\\
+\texttt{true} & \texttt{t} &\\
+\texttt{[a] [b] [c] ifte} & \texttt{a [ b ] [ c ] ifte} & \emph{Factor doesn't restore the stack}\\
+\texttt{step} & \texttt{each} & \emph{Only on lists in Factor}\\
+\texttt{map} & \texttt{map} & \emph{``'' and Factor doesn't restore the stack}\\
+\hline
+\end{tabular}
+
+\section{Common Lisp and Scheme}
+
+Common Lisp and Scheme don't have many similarities to Factor on the surface, but there are some concepts carried over from one to the other. One of Factor's biggest influences is Lisp.
+
+Factor holds may similarites to CLOS. \texttt{TUPLE:} is vaguely analogous to defstruct, though it doesn't provide nearly as much flexibility. In Factor, you can define methods, but they can only be single-dispatch. In Factor, as in CLOS, generic functions/words must be explicitly declared before defining methods on them.
+
+Factor's builtin datatypes are also similar to Lisp. Lists and vectors have correctly corresponding names and meanings in all three languages we're discussing, and so are hashtables between Common Lisp and Factor. Factor provides library functions for dealing with alists, though not plists.
+
+Factor's \texttt{callcc0} and \texttt{callcc1} are essentially the same as Scheme's \texttt{call-with-current-continuation} (aka \texttt{call/cc}). The two versions in Factor exist because you need to explicitly specify the arity of your continuation, since factor has no variable argument mechanism. But usually in Factor, you would wrap up continuations in a library rather than use them directly. There is no equivalent of \texttt{dynamic-wind}, and instead, \texttt{catch} (the error handler) is used for most of those resource-handing places.
+
+Though Factor's "macros" are actually extensions to the parser, similar to reader macros, certain things, such as the generic word system, are implemented like Common Lisp macros, generating a quote at parsetime and substituting it in. This is possible because Factor shares with Lisp and Scheme the principle that code is data, namely nested lists. Below is a list of analogous or equivalent things in Factor and Lisp.
+
+Cheat sheet:
+
+\begin{tabular}{|lp{2cm}|lp{2cm}|lp{2cm}|lp{2cm}|} \hline
+Common Lisp & Factor & Scheme & Comments
+\texttt{(defun a (b) c)} & \texttt{: a c ;} & \texttt{(define (a b) c)} & \emph{Passing around data is implicit; use the stack}\\
+\texttt{(defvar a b)} & \texttt{: a b ;} & \texttt{(define a b)} & \emph{Make sure B is some kind of mutable structure}\\
+\texttt{(defparameter a b)} & \texttt{SYMBOL: a b a set} & & \emph{New dynamic scopes are explicit}\\
+\texttt{\#'a} & \texttt{[ a ]} & \texttt{a} &\\
+\texttt{(lambda (a) b)} & \texttt{[ b ]} & \texttt{(lambda (a) b)} &\\
+\texttt{'(a b c)} & \texttt{[ a b c ]} & \texttt{'(a b c)} &\\
+\texttt{cons} & \texttt{cons} & \texttt{cons} &\\
+\texttt{car} & \texttt{car} & \texttt{car} & \emph{Factor's f car returns f, unlike Scheme}\\
+\texttt{cdr} & \texttt{cdr} & \texttt{cdr} & \emph{``''}\\
+\texttt{+} & \texttt{+} & \texttt{+} & \emph{Exactly two arguments in Factor}\\
+\texttt{(- x)} & \texttt{x neg} & \texttt{(- x)} &\\
+\texttt{(- a b)} & \texttt{a b -} & \texttt{(- a b)} & \emph{``''}\\
+\texttt{*} & \texttt{*} & \texttt{*} & \emph{``''}\\
+\texttt{/} & \texttt{/} & \texttt{/} & \emph{``''}\\
+\texttt{(funcall x y)} & \texttt{y x call} & \texttt{(x y)} &\\
+\texttt{truncate} & \texttt{/mod} & \emph{This is truncate with 2 args using both values. Only on ints}\\
+& \texttt{callcc0} & \texttt{call/cc} & \emph{When the continuation is used with no args}\\
+& \texttt{callcc1} & \texttt{call/cc} & \emph{When the continuation is used with one arg}\\
+\texttt{"string"} & \texttt{"string"} & \texttt{"string"} &\\
+\texttt{(defstruct name stuff)} & \texttt{TUPLE: name stuff ;} & &\\
+\texttt{(defmacro a blah)}  & \texttt{: a blah ; parsing} & \texttt{(define-syntax a blah)} & \emph{The macro systems are completely different}\\
+\texttt{(loop for a in b do c)} & \texttt{b [ c ] each} & \texttt{(for-each (lambda (a) c) b)} &\\
+\texttt{(loop for a in b collect c)} & \texttt{b [ c ] map} & \texttt{(map (lambda (a) c) b)} &\\
+\hline
+\end{tabular}
+
+\section{Python}
+
+Although Python and Factor aren't the most similar languages, you can still see many similarities through them. Python has some similarities to Common Lisp, and Common Lisp to Factor, so by that proxy, Python has some similarities to Factor. Still, a knowledge of Python can help you in learning Factor.
+
+There's one thing that Python does similarly to Factor seperating them from other languages: privacy. Neither Factor nor Python have any sort of privacy. We're all adults, aren't we? Well, except for the person writing this :). Anyway, Python and Factor both don't have privacy in their module systems or object systems. Another similarity in the module systems is the tendency to require them to be imported for many basic tasks. Factor takes this even further than Python, so far that you can't really do anything without opening a module; it's not even Turing-complete! Factor's modules, called vocabularies, don't have the option of using hierarchical naming. The equivalent of \verb|from module import *| is \verb|USE: module|. If you want to import a bunch of modules, there's a shortcut syntax: \verb|USING: mod1 mod2 mod3 ;| imports everything from mod1, mod2, and mod3. Don't worry about the apparent lack of first-class modules; it's possible to access vocabularies, stored as hashtables, in the vocabulary variable.
+
+Factor's syntax and semantics look so extremely unlike Python, it's hard to believe that they're related at all. Take a simple function to square a number, written using multiplication: In Python, it's
+\begin{verbatim}
+def square(x):
+    return x*x
+\end{verbatim}
+and then look at Factor's: \verb|: square dup * ;| The main reason for this difference is that Python is \emph{applicative} while Factor is \emph{concatenative}. For all intents and purposes, that means that Factor stores data on a \emph{stack} and Python stores data in variables. When calling \texttt{square} in Factor, first \texttt{dup} duplicates the first item on the stack and then \texttt{*} multiplies the top two items on the stack. Don't worry if you don't understand it; I'm not really explaining it very well. Just read the Factor Developer Guide.
+
+For many things, such as iterating through a list, Python uses a builtin syntax while Factor uses a word (the equivalent of a function) defined in a library. These words take what's called a code quotation, the rough equivalent of a lambda, as an argument. Imagine if, in Python for conditionals, you wrote
+\begin{verbatim}
+if x: y
+else: z
+\end{verbatim}
+as \verb|if(x, lambda: y, lambda: z)|. This is essentially what Factor does, in the syntax \verb|x [ y ] [ z ] ifte|. Words like ifte are used for everything from the equivalents of \verb|[x+1 for x in list]| to
+\begin{verbatim}
+while x==y:
+    do(something)
+\end{verbatim}
+
+As I mentioned earlier, Factor has an object system, and like Python's, it has no privacy. But beyond that, there's no resemblance. I'll show you a Python class and its equivalent in Factor:
+\begin{verbatim}
+class Something(object):
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+        return self
+    def amethod(self):
+        result = self.x+self.y+self.z
+        return result
+\end{verbatim}
+The Factor equivalent looks nothing like it. This requires that the generic function \texttt{amethod} already exist.
+\begin{verbatim}
+TUPLE: something x y z ;
+M: something amethod
+    dup dup something-x -rot something-y swap something-z + + ;
+\end{verbatim}
+Factor, like Python, has a small but still existent difference between types and classes on approximately the same lines. Factor's object system is written completely within Factor, but the types are hard-coded in.
+
+Factor has no direct equivalent of Python's lists, but instead it has several other collection types for different purposes. Factor has something called lists, but don't confuse them with Python's lists: Factor lists are linked lists, aka cons cells. These linked lists are immutable. The syntax for creating the equivalent of \verb|[1, 2, 3]| as a linked list in Factor is \verb|[ 1 2 3 ]|. Notice where spaces are: you can't remove any of those. Additionally, you can't put arbitrary expressions in this form; you must use literals. To use arbitrary expressions, you use the \texttt{makelist} combinator. The equivalent of \verb|[1+2, 3+4]| is \verb|[ 1 2 + , 3 4 + , ] make-list|. Notice how you have to put a comma after the last item, not just between items. Another collection type in Factor is the vector. Vectors are used when you want to index it with a number. The syntax is similar to lists: \verb|{ 1 2 3 }| is like \verb|[1, 2, 3]|. There is no equivalent of make-list for vectors. Vectors are fixed-length but they are mutable. Factor has hashtables in place of Pythons's dictionaries. \verb|{"hi": 1, "hello": 2}| is \verb|{{ [[ "hi" 1 ]] [[ "hello" 2 ]] }}|.
+
+Cheat sheet:
+
+\begin{tabular}{|l|lp{3.5cm}|lp{4cm}|} \hline
+Python & Factor & Comments\\ \hline
+%\begin{verbatim}
+%def function(argument):
+%    """Docstring"""
+%    code
+%\end{verbatim}
+%&
+%\begin{verbatim}
+%: function
+%    #! Docstring
+%    code ;
+%\end{verbatim}
+%& emph{Passing arguments is implicit on the stack}\\
+\texttt{a+b} & \texttt{a b +} &\\
+\texttt{a-b} & \texttt{a b -} &\\
+\texttt{a*b} & \texttt{a b *} &\\
+\texttt{a/b} & \texttt{a b /} & \emph{Factor has support for rational numbers}\\
+\verb|a**b| & \texttt{a b \^} & \\
+%\begin{verbatim}
+%for item in list:
+%    code
+%\end{verbatim}
+%& \texttt{list [ code ] each} & \emph{Only for linked lists in Factor. Different words for different collections}\\
+\texttt{[something for item in list]} & \texttt{list [ something ] map} & \emph{Only for linked lists in Factor. Different words for different collections}\\
+\texttt{[item for item in list if test]} & \texttt{list [ test ] filter} & \emph{``''}
+\texttt{\#} \emph{comment} & \texttt{! } \emph{comment} &\\
+\texttt{lambda arg: value} & \texttt{[ value ]} &\\
+\texttt{"string"} or \texttt{'string'} & \texttt{"string"} &\\
+\hline
+\end{tabular}
+
+\end{document}

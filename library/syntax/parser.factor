@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces words ;
+USING: kernel lists namespaces sequences words ;
 
 : parse-loop ( -- )
     scan-word [

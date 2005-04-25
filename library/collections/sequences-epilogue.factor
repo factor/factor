@@ -11,10 +11,10 @@ vectors ;
 UNION: sequence array string sbuf vector ;
 
 M: object ensure-capacity 2drop ;
-M: object unfreeze clone ;
+M: object thaw clone ;
 M: object freeze drop ;
 
-: empty? ( seq -- ? ) length 0 = ;
+M: object empty? ( seq -- ? ) length 0 = ;
 
 : (>list) ( n i seq -- list )
     pick pick <= [
@@ -74,8 +74,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     0 swap (nmap) ; inline
 
 : immutable ( seq quot -- seq | quot: seq -- )
-    swap [ unfreeze ] keep >r dup >r swap call r> r> freeze ;
-    inline
+    swap [ thaw ] keep >r dup >r swap call r> r> freeze ; inline
 
 : seq-map ( seq quot -- seq | quot: elt -- elt )
     swap [ swap nmap ] immutable ; inline
@@ -114,13 +113,19 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
    ! over length over ensure-capacity
     [ over push ] seq-each drop ;
 
-: seq-append ( s1 s2 -- s1+s2 )
+: append ( s1 s2 -- s1+s2 )
     #! Return a new sequence of the same type as s1.
     swap [ swap nappend ] immutable ;
 
-: seq-append3 ( s1 s2 s3 -- s1+s2+s3 )
+: append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
+
+: concat ( list -- seq )
+    #! Append together a list of sequences.
+    dup empty? [
+        unswons [ swap [ nappend ] each-with ] immutable
+    ] unless ;
 
 : peek ( sequence -- element )
     #! Get value at end of sequence.
@@ -147,6 +152,8 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 : nreverse ( seq -- )
     #! Destructively reverse seq.
     dup length 2 /i [ 2dup (nreverse) ] repeat drop ;
+
+M: object reverse ( seq -- seq ) [ nreverse ] immutable ;
 
 ! Equality testing
 : length= ( seq seq -- ? ) length swap length number= ;

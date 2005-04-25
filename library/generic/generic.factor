@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: errors hashtables kernel kernel-internals lists
-namespaces parser strings words vectors math math-internals ;
+namespaces parser sequences strings words vectors math
+math-internals ;
 
 ! A simple single-dispatch generic word system.
 

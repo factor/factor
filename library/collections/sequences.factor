@@ -11,11 +11,14 @@ USING: generic kernel math strings vectors ;
 ! kernel-internals vocabulary, so don't use them unless you have
 ! a good reason.
 
+GENERIC: empty? ( sequence -- ? )
 GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
 GENERIC: ensure-capacity ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
-GENERIC: >list ( seq -- list )
-GENERIC: unfreeze ( seq -- mutable-seq )
+GENERIC: thaw ( seq -- mutable-seq )
 GENERIC: freeze ( new orig -- new )
+GENERIC: reverse ( seq -- seq )
+
+DEFER: append ! remove this when sort is moved from lists to sequences

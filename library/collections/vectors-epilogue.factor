@@ -29,3 +29,6 @@ IN: vectors
     #! vector. For example, if n=1, this returns a vector of
     #! one element.
     [ length swap - ] keep vector-tail ;
+
+M: general-list thaw >vector ;
+M: general-list freeze drop >list ;

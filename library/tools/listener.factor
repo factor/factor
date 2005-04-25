@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors kernel lists math memory namespaces parser stdio
-strings presentation words unparser vectors ansi ;
+USING: errors kernel lists math memory namespaces parser
+sequences stdio strings presentation words unparser vectors ansi ;
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt

@@ -13,6 +13,8 @@ BUILTIN: cons 2 [ 0 "car" f ] [ 1 "cdr" f ] ;
 M: f car ;
 M: f cdr ;
 
+GENERIC: >list ( seq -- list )
+
 : swons ( cdr car -- [[ car cdr ]] )
     #! Push a new cons cell. If the cdr is f or a proper list,
     #! has the effect of prepending the car to the cdr.

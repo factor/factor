@@ -14,6 +14,9 @@ M: cons nth ( n list -- element )
         1 - r> cdr nth
     ] ifte ;
 
+M: f empty? drop t ;
+M: cons empty? drop f ;
+
 : 2list ( a b -- [ a b ] )
     unit cons ;
 
@@ -25,9 +28,6 @@ M: cons nth ( n list -- element )
 
 : 3unlist ( [ a b c ] -- a b c )
     uncons uncons car ;
-
-: append ( [ list1 ] [ list2 ] -- [ list1 list2 ] )
-    over [ >r uncons r> append cons ] [ nip ] ifte ;
 
 : contains? ( obj list -- ? )
     #! Test if a list contains an element equal to an object.
@@ -71,7 +71,7 @@ M: cons nth ( n list -- element )
     #! list.
     2dup contains? [ nip ] [ cons ] ifte ;
 
-: reverse ( list -- list )
+M: general-list reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
 : map ( list quot -- list )
@@ -97,9 +97,7 @@ M: cons nth ( n list -- element )
 
 : prune ( list -- list )
     #! Remove duplicate elements.
-    dup [
-        uncons prune 2dup contains? [ nip ] [ cons ] ifte
-    ] when ;
+    dup [ uncons prune unique ] when ;
 
 : all=? ( list -- ? )
     #! Check if all elements of a list are equal.

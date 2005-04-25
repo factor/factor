@@ -30,6 +30,7 @@ USE: kernel
 USE: stdio
 USE: namespaces
 USE: words
+USE: sequences
 
 ! These words are used to provide a means of writing
 ! formatted HTML to standard output with a familiar 'html' look

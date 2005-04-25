@@ -20,7 +20,7 @@ M: sbuf = sbuf= ;
     >r over length - dup 0 <= [
         r> 2drop
     ] [
-        r> fill swap seq-append
+        r> fill swap append
     ] ifte ;
 
 : split-next ( index string split -- next )
@@ -58,5 +58,5 @@ M: sbuf = sbuf= ;
 
 : ch>string ( ch -- str ) 1 <sbuf> [ push ] keep sbuf>string ;
 
-M: string unfreeze >sbuf ;
+M: string thaw >sbuf ;
 M: string freeze drop sbuf>string ;
