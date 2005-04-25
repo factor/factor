@@ -156,4 +156,4 @@ M: number union-containment drop 2 ;
 ! Testing recovery from bad method definitions
 "GENERIC: unhappy" eval
 [ "M: vocabularies unhappy ;" eval ] unit-test-fails
-[ ] [ "GENERIC: unhapy" eval ] unit-test
+[ ] [ "GENERIC: unhappy" eval ] unit-test

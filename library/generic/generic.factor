@@ -74,6 +74,9 @@ math-internals ;
 
 : define-method ( class generic definition -- )
     -rot
+    over metaclass word? [
+        word-name " is not a class" append throw
+    ] unless
     [ "methods" word-prop set-hash ] keep dup <vtable>
     make-generic ;
 
