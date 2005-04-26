@@ -6,7 +6,7 @@
 \usepackage[style=list,toc]{glossary}
 \usepackage{alltt}
 \usepackage{times}
-\usepackage{longtable}
+\usepackage{tabularx}
 
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
@@ -20,24 +20,30 @@
 \newcommand{\ttc}{\symbol{125}}
 
 \newcommand{\parsingword}[3]{\index{#1}
-\emph{Parsing word:} \texttt{#2} \`\texttt{#3} vocabulary}
+\emph{Parsing word:} \texttt{#2} &&\texttt{IN: #3}}
 
 \newcommand{\ordinaryword}[3]{\index{#1}
-\emph{Word:} \texttt{#2} \`\texttt{#3} vocabulary}
+\emph{Word:} \texttt{#2} &&\texttt{IN: #3}}
 
 \newcommand{\symbolword}[2]{\index{#1}
-\emph{Symbol:} \texttt{#1} \`\texttt{#2} vocabulary}
+\emph{Symbol:} \texttt{#1} &&\texttt{IN: #2}}
 
 \newcommand{\classword}[2]{\index{#1}
-\emph{Class:} \texttt{#1} \`\texttt{#2} vocabulary}
+\emph{Class:} \texttt{#1} &&\texttt{IN: #2}}
 
 \newcommand{\genericword}[3]{\index{#1}
-\emph{Generic word:} \texttt{#2} \`\texttt{#3} vocabulary}
+\emph{Generic word:} \texttt{#2} &&\texttt{IN: #3}}
+
+\setlength{\tabcolsep}{1mm}
 
 \newcommand{\wordtable}[1]{
 
-\hrulefill
-\begin{tabbing}#1\\ \end{tabbing}
+\begin{tabularx}{12cm}[t]{lXr}
+\hline
+#1\\
+\hline
+\end{tabularx}
+
 }
 
 \makeatletter
@@ -149,7 +155,7 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack)
 \item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
 \item[\texttt{<class>}] create a new instance of \texttt{class}
-\item[\texttt{nfoo}] destructive version of \texttt{foo}, that modifies one of its inputs rather than returning a new value. This convention is used by sequence words
+\item[\texttt{nfoo}] destructive version of \texttt{foo}, that modifies one of its inputs rather than returning a new value. The ``n'' prefix denotes ``non-constructive''. This convention is used by sequence words
 \item[\texttt{2foo}] like \texttt{foo} but takes two operands
 \item[\texttt{3foo}] like \texttt{foo} but takes three operands
 \item[\texttt{foo-with}] a form of the \texttt{foo} combinator that takes an extra object, and passes this object on each iteration of the quotation; for example, \texttt{each-with} and \texttt{map-with}
@@ -457,11 +463,12 @@ inserting escape sequences as described in \ref{syntax:char}.
 \textbf{Hello world}
 \end{alltt}
 
-\subsubsection{Lists}
+\subsubsection{\label{listsyntax}Lists}
 \newcommand{\listglos}{\glossary{
 name=list,
 description={an instance of the \texttt{list} class, storing a sequence of elements as a chain of zero or more conses, where the car of each cons is an element, and the cdr is either \texttt{f} or another list}}
-\glossary{name=proper list, description=see list}}
+\glossary{name=proper list, description=see list}
+}
 \listglos
 \wordtable{
 \parsingword{openbracket}{[}{syntax}\\
@@ -549,7 +556,7 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 \subsubsection{Vectors}
 \newcommand{\vectorglos}{\glossary{
 name=vector,
-description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in contiguous memory cells}}}
+description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in a contiguous range of memory}}}
 \vectorglos
 \wordtable{
 \parsingword{opencurly}{\{}{syntax}\\
@@ -871,6 +878,10 @@ Outputs \texttt{t} if at least one of the inputs is true.
 \ordinaryword{xor}{xor ( ?~?~-- ?~)}{kernel}
 }
 Outputs \texttt{t} if exactly one of the inputs is true.
+\wordtable{
+\ordinaryword{implies}{implies ( b1~b2~-- ?~)}{kernel}
+}
+Outputs \texttt{t} if \texttt{b1} is false or both inputs are true.
 
 An alternative set of logical operations operate on individual bits of integers bitwise, rather than generalized boolean truth values. They are documented in \ref{bitwise}.
 
@@ -1244,8 +1255,10 @@ description=a datum that can be identified}
 
 Everything in Factor is an object, where an object is a collection of slots. Each object has a unique identity, and references to objects are passed by value on the stack. It is possible to have two references to the same object, and if the object is mutated through one reference, the changes will be visible through the other reference. Not all objects are mutable; the documentation for each class details if its instances are mutable or not.
 
-\subsection{Identity and equality}
+\subsection{\label{equality}Identity and equality}
 
+\glossary{name=equal,
+description={two objects are equal if they have the same class and if their slots are equal, or alternatively, if both are numbers that denote the same value}}
 There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by having the same type and equal slot values.
 \wordtable{
 \ordinaryword{eq?}{eq?~( object object -- ?~)}{kernel}
@@ -1254,7 +1267,15 @@ Output \texttt{t} if two references point to the same object, and \texttt{f} oth
 \wordtable{
 \genericword{=}{= ( object object -- ?~)}{kernel}
 }
-Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precise meaning of equality depends on the object's class, however usually two objects are equal if their slot values are equal. If two objects are equal, they have the same printed representation, although the converse is not always true.
+Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precise meaning of equality depends on the object's class, however usually two objects are equal if their slot values are equal. If two objects are equal, they have the same printed representation, although the converse is not always true. In particular:
+\begin{itemize}
+\item If no more specific method is defined, \texttt{=} calls \texttt{eq?}.
+\item Two numbers are equal if they have the same numerical value.
+\item Two sequences are equal if they are both instances of the same class, and if they have the same length, and elements.
+\item Two hashtables are equal if they hold the same set of key/value pairs.
+\item Two tuples are equal if they are of the same class and their slots are equal.
+\item Two words are equal if they are the same object.
+\end{itemize}
 
 \subsection{Generic words and methods}
 
@@ -1520,24 +1541,439 @@ method call receives the delegate on the stack, not the original object.
 
 \glossary{name=sequence,
 description=an object storing a linearly-ordered set of elements}
+A sequence is a linearly-ordered collection of objects. The following library classes support sequence operations:
+\begin{verbatim}
+array
+general-list
+sbuf
+string
+vector
+\end{verbatim}
+Additionally, a user-defined class implementing the sequence protocol can support sequence operations.
+
+\subsection{Sequence protocol}
+
+The following set of generic words is the core of the sequence protocol. The mutating words are not supported by all sequences; in particular, lists and strings are immutable.
+
+\glossary{name=resizable sequence,
+description={a sequence implementing the \texttt{set-length} generic word. For example, vectors and string buffers}}
+\glossary{name=mutable sequence,
+description={a sequence implementing the \texttt{set-nth} generic word. For example, vectors and string buffers}}
+The sequence protocol consists of a set of generic words. Any object that is an instance of a class implementing these generic words can be thought of as a sequence, and given to the words in the following sections.
+
+\wordtable{
+\genericword{length}{length ( seq -- n )}{sequences}
+}
+Outputs the length of the sequence.
+\wordtable{
+\genericword{set-length}{set-length ( n seq -- )}{sequences}
+}
+Resizes the sequence. Immutable sequences are never resizable.
+
+\wordtable{
+\genericword{nth}{nth ( n seq -- elt )}{sequences}
+}
+Outputs the \texttt{n}th element of the sequence. Elements are numbered starting from 0, so the last element has an index one less than the length of the sequence. An exception should be thrown if an out-of-bounds index is accessed.
+\wordtable{
+\genericword{set-nth}{set-nth ( elt n seq -- )}{sequences}
+}
+Sets the \texttt{n}th element of the sequence. If the index is out of bounds, the sequence may be resized, or an error may be raised, depending on the sequence. Not all sequences are mutable.
 
 \subsection{Sequence operations}
 
+\subsubsection{Queries}
+
+The following set of operations inspect sequence elements without modifying or creating anything.
+
+\wordtable{
+\genericword{empty?}{empty?~( seq -- ?~)}{sequences}
+}
+Tests if the sequence contains any elements. The default implementation of this word tests if the length is zero; user-defined sequences can provide a custom implementation that is more efficient.
+\wordtable{
+\ordinaryword{index}{index ( obj seq -- n )}{sequences}
+}
+Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$.
+\wordtable{
+\ordinaryword{index*}{index* ( obj i seq -- n )}{sequences}
+}
+Outputs the index of the first element in the sequence equal to \texttt{obj}, starting from \texttt{i}. If no element is found, outputs $-1$.
+\wordtable{
+\ordinaryword{peek}{peek ( sequence -- element )}{sequences}
+}
+Outputs the last element of the sequence. Throws an exception if the sequence is empty.
+\wordtable{
+\ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}{sequences}
+}
+Tests if the two sequences have the same length as elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
+
+\subsubsection{Functional operations}
+
+The following set of sequence operations do not modify their inputs.
+
+\wordtable{
+\ordinaryword{append}{append ( s1 s2 -- seq )}{sequences}
+}
+Output a new sequence consisting of the elements of \texttt{s1} followed by the elements of \texttt{s2}. The new sequence is of the same class as \texttt{s1}.
+\wordtable{
+\ordinaryword{append3}{append3 ( s1 s2 s3 -- seq )}{sequences}
+}
+Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new sequence of the same class as \texttt{s1}.
+\wordtable{
+\ordinaryword{concat}{concat ( sequence -- sequence )}{sequences}
+}
+The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
+\begin{alltt}
+\textbf{ok} [ "a" [ CHAR: b ] { CHAR: c } ] concat .
+\textbf{"abc"}
+\end{alltt}
+\wordtable{
+\genericword{reverse}{reverse ( seq -- seq )}{sequences}
+}
+Outputs a new sequence of the same class, with the reverse element order.
+
+\subsubsection{Imperitive operations}
+
+The following set of sequence operations modify their inputs. The ``n'' prefix denotes ``non-constructive''; these words do not construct new output objects.
+
+\wordtable{
+\ordinaryword{nappend}{nappend ( s1 s2 -- )}{sequences}
+}
+Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified. Throws an exception if \texttt{s1} is immutable.
+\wordtable{
+\ordinaryword{nreverse}{nreverse ( sequence -- )}{sequences}
+}
+Reverses the elements of \texttt{seq}. Nothing is output, and \texttt{seq} is modified. Throws an exception if \texttt{seq} is immutable.
+\wordtable{
+\ordinaryword{push}{push ( element sequence -- )}{sequences}\\
+\ordinaryword{pop}{pop ( sequence -- element )}{sequences}
+}
+
+Adds and removes an element at the end of the sequence. The sequence's length is adjusted accordingly. These are implemented as follows:
+\begin{verbatim}
+: push ( element sequence -- )
+    dup length swap set-nth ;
+: pop ( sequence -- element )
+    dup peek >r dup length 1 - swap set-length r> ;
+\end{verbatim}
+
 \subsection{Sequence combinators}
 
-\subsection{Lists and cons cells}
+\wordtable{
+\ordinaryword{change-nth}{change-nth ( seq i quot -- )}{sequences}\\
+\texttt{quot:~element -- element}
+}
+Applies the quotation to the \texttt{i}th element of the sequence, and store the \texttt{i}th element to the output. This modifies \texttt{seq} and so throws an exception if it is immutable.
+\wordtable{
+\ordinaryword{seq-each}{seq-each ( seq quot -- )}{sequences}\\
+\texttt{quot:~element --}
+}
+Applies the quotation to each element of the sequence.
+\wordtable{
+\ordinaryword{tree-each}{tree-each ( seq quot -- )}{sequences}\\
+\texttt{quot:~element --}
+}
+Applies the quotation to each element of the sequence. Elements that are themselves sequences are iterated recursively.
+\wordtable{
+\ordinaryword{seq-map}{seq-map ( seq quot -- seq )}{sequences}\\
+\texttt{quot:~element -- element}
+}
+Applies the quotation to each element yielding a new element. The new elements are collected into a sequence of the same class as the input sequence.
+\wordtable{
+\ordinaryword{nmap}{nmap ( seq quot -- )}{sequences}\\
+\texttt{quot:~element -- element}
+}
+Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
+\wordtable{
+\ordinaryword{seq-2map}{seq-2map ( s1 s2 quot -- seq )}{sequences}\\
+\texttt{quot:~e1 e2 -- element}
+}
+Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new elements are collected into a sequence of the same class as \texttt{s1}. Here is an example computing the pair-wise product of the elements of two vectors:
+\begin{alltt}
+\textbf{ok} \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] seq-2map .
+\textbf{\tto 40 48 -6 \ttc}
+\end{alltt}
+\wordtable{
+\ordinaryword{2nmap}{2nmap ( s1 s2 quot -- )}{sequences}\\
+\texttt{quot:~e1 e2 -- element}
+}
+Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new element is stored back in \texttt{s1}. This modifies \texttt{s1} and so throws an exception if it is immutable.
+\wordtable{
+\ordinaryword{seq-each-with}{seq-each-with ( object seq quot -- )}{sequences}\\
+\texttt{quot:~object element --}\\
+\ordinaryword{tree-each-with}{tree-each-with ( obj seq quot -- )}{sequences}\\
+\texttt{quot:~obj element --}
+}
+Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
+
+\subsection{Cons cells}
+
+\consglos
+\glossary{name=car,description=the first component of a cons cell}
+\glossary{name=cdr,description=the second component of a cons cell}
+
+\wordtable{
+\classword{cons}{lists}
+}
+A \emph{cons cell} is an ordered pair of values. The first value is called the \emph{car},
+the second is called the \emph{cdr}. The literal syntax of cons cells is documented in \ref{listsyntax}.
+
+\wordtable{
+\ordinaryword{cons?}{cons?~( object -- ?~)}{lists}
+}
+Tests if the object at the top of the stack is a cons cell.
+\wordtable{
+\ordinaryword{cons}{cons ( car cdr -- cons )}{lists}\\
+\ordinaryword{swons}{swons ( cdr car -- cons )}{lists}
+}
+Creates a new cons cell from two components. The \texttt{swons} word is defined as follows:
+\begin{verbatim}
+: swons swap cons ;
+\end{verbatim}
+\wordtable{
+\ordinaryword{car}{car ( cons -- car )}{lists}\\
+\ordinaryword{cdr}{cdr ( cons -- cdr )}{lists}
+}
+Outputs the individual components of a cons cell. Taking the car of cdr of the empty list yields the empty list back.
+\begin{alltt}
+\textbf{ok} 5 "blind mice" cons car .
+\textbf{5}
+\textbf{ok} "peanut butter" "jelly" cons cdr .
+\textbf{"jelly"}
+\end{alltt}
+\wordtable{
+\ordinaryword{uncons}{uncons ( cons -- car cdr )}{lists}\\
+\ordinaryword{unswons}{unswons ( cons -- cdr car )}{lists}
+}
+Pushes both the car and cdr of the cons cell at once. These words are implemented in the obvious way:
+\begin{verbatim}
+: uncons ( cons -- car cdr ) dup car swap cdr ;
+: unswons ( cons -- car cdr ) dup cdr swap car ;
+\end{verbatim}
+Here is an example:
+\begin{alltt}
+\textbf{ok} {[[} "potatoes" "gravy" {]]} uncons .s
+\textbf{"gravy"
+"potatoes"}
+\end{alltt}
+Cons cells, and by extension lists, are immutable.
+
+\subsubsection{Lists}
+
+\listglos
+\glossary{name=improper list,description={a sequence of cons cells where the cdr of the last cons cell is not \texttt{f}}}
+\glossary{name=general list,description={a proper or improper list; that is, either \texttt{f} or a cons cell}}
+
+Lists of values are represented with nested cons cells. The car is the first element of the list; the cdr is the rest of the list. The value \texttt{f} represents the empty list.
+List operations are typically implemented in a recursive fashion, where the cdr of the list is taken until the end is reached.
+
+The following example demonstrates this, along with the literal syntax used to print lists:
+\begin{alltt}
+\textbf{ok} {[} 1 2 3 4 {]} car .
+\textbf{1}
+\textbf{ok} {[} 1 2 3 4 {]} cdr .
+\textbf{{[} 2 3 4 {]}}
+\textbf{ok} {[} 1 2 3 4 {]} cdr cdr .
+\textbf{{[} 3 4 {]}}
+\end{alltt}
+
+\wordtable{
+\classword{general-list}{lists}\\
+\classword{list}{lists}
+}
+A \emph{general list} is either the empty list or a cons cell. A \emph{list} is either the empty list or a cons cell whose cdr is also a list. A list is sometimes also known as a \emph{proper list}, and a general list that is not a proper list is known as a \texttt{improper list}. Not all list operations will function given an improper list,
+however methods are usually defined on \texttt{general-list} not \texttt{list} since dispatching on \texttt{list} involves a costly check.
 
 \subsubsection{List operations}
 
-\subsubsection{Constructing and destructuring lists}
+\wordtable{
+\ordinaryword{>list}{>list ( sequence -- list )}{lists}
+}
+Turn an arbitrary sequence into a list.
+\wordtable{
+\ordinaryword{list?}{list?~( obj -- ?~)}{lists}
+}
+Tests if the object at the top of the stack is a proper list.
+\wordtable{
+\ordinaryword{unit}{unit ( obj -- [ obj ] )}{lists}
+}
+Makes a list of one element.
+\wordtable{
+\ordinaryword{2list}{2list ( o1 o2 -- [ o1 o2 ] )}{lists}
+}
+Makes a list of two elements.
+\wordtable{
+\ordinaryword{2unlist}{2unlist ( [ o1 o2 ] -- o1 o2 )}{lists}
+}
+Pushes the first two elements of a list.
+\wordtable{
+\ordinaryword{3list}{3list ( o1 o2 o3 -- [ o1 o2 o3 ] )}{lists}
+}
+Makes a list of three elements.
+\wordtable{
+\ordinaryword{3unlist}{3unlist ( [ o1 o2 o3 ] -- o1 o2 o3 )}{lists}
+}
+Pushes the first three elements of a list.
+\wordtable{
+\ordinaryword{unique}{unique ( obj list -- list )}{lists}
+}
+If the list already contains an element equal to the object, do nothing, otherwise cons the object into the list.
+\wordtable{
+\ordinaryword{prune}{prune ( list -- list )}{lists}
+}
+Removes all duplicates from the list by testing elements for equality.
+\wordtable{
+\ordinaryword{all=?}{all=?~( list -- ?~)}{lists}
+}
+Tests if all elements of the list are equal. For the empty list, this is vacuously true.
+\wordtable{
+\ordinaryword{head}{head~( list n -- list )}{lists}
+}
+Outputs a new list consisting of the first \texttt{n} elements of \texttt{list}. This allocates memory.
+\wordtable{
+\ordinaryword{tail}{tail~( list n -- list )}{lists}
+}
+Outputs a new list consisting of the elements of \texttt{list} from the \texttt{n}th index onward. This does not allocate memory; rather it simply takes the \texttt{cdr} \texttt{n} times.
+\wordtable{
+\ordinaryword{count}{count~( n -- list )}{lists}
+}
+Return a new list containing all integers from 0 up to $n-1$, inclusive.
+
+\subsubsection{Set-theoretic operations}
+
+\wordtable{
+\ordinaryword{contains?}{contains?~( object list -- ?~)}{lists}
+}
+Tests if \texttt{list} contains an element equal to \texttt{object}.
+\wordtable{
+\ordinaryword{memq?}{memq?~( object list -- ?~)}{lists}
+}
+Tests if \texttt{list} contains \texttt{object}. Elements are compared by identity.
+\wordtable{
+\ordinaryword{contained?}{contained?~( l1 l2 -- ?~)}{lists}
+}
+Tests if every element of \texttt{l1} is equal to some element of \texttt{l2}.
+\wordtable{
+\ordinaryword{remove}{remove ( object list -- list )}{lists}
+}
+Outputs a new list containing all elements of the \texttt{list} except those equal to the \texttt{object}.
+\wordtable{
+\ordinaryword{remq}{remove ( object list -- list )}{lists}
+}
+Outputs a new list containing all elements of the \texttt{list} except \texttt{object}. Elements are compared by identity.
+\wordtable{
+\ordinaryword{intersection}{intersection ( list list -- list )}{lists}
+}
+Outputs a list of elements present in both lists.
+\wordtable{
+\ordinaryword{intersection}{difference ( l1 l2 -- list )}{lists}
+}
+Outputs a list of elements present in \texttt{l2} but not \texttt{l1}.
+
+\subsubsection{List combinators}
+
+\wordtable{
+\ordinaryword{each}{each ( list quot -- )}{lists}\\
+\texttt{quot:~element --}
+}
+Applies the quotation to each element of the list.
+\wordtable{
+\ordinaryword{map}{map ( list quot -- list )}{lists}\\
+\texttt{quot:~element -- element}
+}
+Applies the quotation to each element yielding a new element. The new elements are collected into a new list.
+\wordtable{
+\ordinaryword{subset}{subset ( list quot -- list )}{lists}\\
+\texttt{quot:~element -- ?}
+}
+Applies the quotation to each element, and outputs a new list containing the elements of the original list for which the quotation output true.
+\wordtable{
+\ordinaryword{some?}{some?~( list quot -- list )}{lists}\\
+\texttt{quot:~element -- ?}
+}
+Applies the quotation to each element, and outputs the rest of the list upon encountering an element for which the quotation outputs true. If the quotation did not output true for any element, \texttt{some?}~outputs \texttt{f}. Note that the output is a generalized boolean; if the quotation matched any element, the result is true.
+\wordtable{
+\ordinaryword{all?}{all?~( list quot -- list )}{lists}\\
+\texttt{quot:~element -- ?}
+}
+Outputs \texttt{t} if the quotation yields true when applied to each element, otherwise outputs \texttt{f}. Given the empty list, vacuously outputs \texttt{t}.
+\wordtable{
+\ordinaryword{sort}{all?~( list quot -- list )}{lists}\\
+\texttt{quot:~e1 e2 -- ?}
+}
+Sorts the list by comparing each pair of elements with the quotation. The quotation should output \texttt{t} if \texttt{e2} is to come before \texttt{e1} in the list. For example, to sort a list of numbers in ascending order, you can do the following:
+\begin{alltt}
+\textbf{ok} [ 8 6 9 1 10 3 ] [ > ] sort .
+[ 1 3 6 8 9 10 ]
+\end{alltt}
+\wordtable{
+\ordinaryword{each-with}{each-with ( object list quot -- )}{lists}\\
+\texttt{quot:~object element --}\\
+\ordinaryword{map-with}{map-with ( object list quot -- list )}{lists}\\
+\texttt{quot:~object element -- element}\\
+\ordinaryword{subset-with}{subset-with ( object list quot -- list )}{lists}\\
+\texttt{quot:~object element -- ?}\\
+\ordinaryword{some-with?}{some-with?~( object list quot -- ?~)}{lists}\\
+\texttt{quot:~object element -- ?}\\
+\ordinaryword{all-with?}{all-with?~( object list quot -- ?~)}{lists}\\
+\texttt{quot:~object element -- ?}
+}
+Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
 \subsubsection{Queues}
 
+The following set of words manages LIFO (last-in-first-out) queues. Queues are built up from cons cells, and hence are immutable; queue operations always return a new queue.
+
+\wordtable{
+\ordinaryword{<queue>}{<queue> ( -- queue )}{lists}
+}
+Makes a new queue with no elements.
+\wordtable{
+\ordinaryword{queue-empty?}{queue-empty? ( queue -- ?~)}{lists}
+}
+Outputs \texttt{t} if the given queue does not contain any elements, \texttt{f} otherwise.
+\wordtable{
+\ordinaryword{deque}{deque ( queue -- element queue )}{lists}
+}
+Dequeues an element and outputs a new queue without that element.
+\wordtable{
+\ordinaryword{enque}{deque ( element queue -- queue )}{lists}
+}
+Enqueues an element and outputs a new queue.
+
 \subsection{Vectors}
+
+\wordtable{
+\classword{vector}{vectors}
+}
+\vectorglos
+A vector is a growable, mutable sequence whose elements are stored in a contiguous range of memory.
+
+vectors -vs- lists comparison table
+vector?
+>vector
+
+<vector>
+empty-vector
+zero-vector
+vector-project
+vector-tail
+vector-tail*
 
 \subsection{Strings}
 
+\stringglos
+\wordtable{
+\classword{string}{strings}
+}
+A string is an immutable sequence of characters.
+
 \subsection{String buffers}
+
+\sbufglos
+\wordtable{
+\classword{sbuf}{strings}
+}
+A string buffer is a mutable and growable sequence of characters.
 
 \subsection{Constructing sequences}
 

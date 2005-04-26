@@ -8,15 +8,6 @@ DEFER: set-vector-length
 DEFER: vector-array
 DEFER: set-vector-array
 
-: assert-positive ( fx -- )
-    0 fixnum<
-    [ "Vector index must be positive" throw ] when ; inline
-
-: assert-bounds ( fx seq -- )
-    over assert-positive
-    length fixnum>=
-    [ "Vector index out of bounds" throw ] when ; inline
-
 IN: vectors
 
 BUILTIN: vector 11
@@ -30,6 +21,15 @@ BUILTIN: vector 11
     dup <vector> [ set-length ] keep ;
 
 IN: kernel-internals
+
+: assert-positive ( fx -- )
+    0 fixnum<
+    [ "Vector index must be positive" throw ] when ; inline
+
+: assert-bounds ( fx seq -- )
+    over assert-positive
+    length fixnum>=
+    [ "Vector index out of bounds" throw ] when ; inline
 
 : grow-capacity ( len vec -- )
     #! If the vector cannot accomodate len elements, resize it
@@ -79,6 +79,6 @@ M: vector clone ( vector -- vector )
 
 IN: vectors
 
-: vector-length ( deprecated ) length ;
-: vector-nth ( deprecated ) nth ;
-: set-vector-nth ( deprecated ) set-nth ;
+: vector-nth nth ;
+: set-vector-nth set-nth ;
+: vector-length length ; 

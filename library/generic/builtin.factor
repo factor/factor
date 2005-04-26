@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors hashtables kernel lists namespaces parser strings
-words vectors ;
+USING: errors hashtables kernel lists namespaces parser
+sequences strings words vectors ;
 
 ! Builtin metaclass for builtin types: fixnum, word, cons, etc.
 SYMBOL: builtin
@@ -41,13 +41,13 @@ builtin [ 2drop t ] "class<" set-word-prop
     ] ifte ;
 
 : builtin-class ( symbol type# slotspec -- )
-    >r 2dup builtins get set-vector-nth r>
+    >r 2dup builtins get nth r>
     >r swap
     dup intern-symbol
     2dup builtin-predicate
     [ swap "builtin-type" set-word-prop ] keep
     dup builtin define-class r> define-slots ;
 
-: builtin-type ( n -- symbol ) builtins get vector-nth ;
+: builtin-type ( n -- symbol ) builtins get nth ;
 
 PREDICATE: word builtin metaclass builtin = ;

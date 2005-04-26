@@ -31,7 +31,7 @@ sequences strings vectors words ;
 : generate-reloc ( -- length )
     relocation-table get
     dup [ compile-cell ] seq-each
-    vector-length cell * ;
+    length cell * ;
 
 : (generate) ( word linear -- )
     #! Compile a word definition from linear IR.

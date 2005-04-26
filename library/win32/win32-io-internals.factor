@@ -25,7 +25,7 @@
 
 IN: win32-io-internals
 USING: alien errors kernel kernel-internals lists math namespaces threads 
-       vectors win32-api stdio streams generic io-internals ;
+       vectors win32-api stdio streams generic io-internals sequences ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
@@ -75,12 +75,12 @@ END-STRUCT
 
 : num-callbacks ( -- len )
     #! Returns the length of the callback vector.
-    io-queue get [ callbacks get vector-length ] bind ;
+    io-queue get [ callbacks get length ] bind ;
 
 : set-callback-quot ( quot index -- )
     io-queue get [
-        dup >r callbacks get vector-nth car swap cons
-        r> callbacks get set-vector-nth
+        dup >r callbacks get nth car swap cons
+        r> callbacks get set-nth
     ] bind ;
 
 : new-overlapped ( -- index )
@@ -90,7 +90,7 @@ END-STRUCT
         "overlapped-ext" c-type [ "width" get ] bind imalloc <alien>
         dup num-callbacks swap
         set-overlapped-ext-user-data
-        unit num-callbacks dup >r callbacks get set-vector-nth r>
+        unit num-callbacks dup >r callbacks get set-nth r>
     ] bind ;
 
 : alloc-io-task ( quot -- overlapped )
@@ -99,14 +99,14 @@ END-STRUCT
             uncons free-list set
         ] [ new-overlapped ] ifte*
         [ set-callback-quot ] keep 
-        callbacks get vector-nth car
+        callbacks get nth car
     ] bind ;
 
 : get-io-callback ( index -- callback )
     #! Returns and frees the io queue entry at index.
     io-queue get [
         dup free-list [ cons ] change
-        callbacks get vector-nth cdr
+        callbacks get nth cdr
     ] bind ;
 
 : (wait-for-io) ( timeout -- error overlapped len )

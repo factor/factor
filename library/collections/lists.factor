@@ -5,15 +5,6 @@ IN: lists USING: errors generic kernel math sequences ;
 ! Sequence protocol
 M: general-list length 0 swap [ drop 1 + ] each ;
 
-M: f nth "List index out of bounds" throw ;
-
-M: cons nth ( n list -- element )
-    >r dup 0 = [
-        drop r> car
-    ] [
-        1 - r> cdr nth
-    ] ifte ;
-
 M: f empty? drop t ;
 M: cons empty? drop f ;
 
@@ -137,6 +128,8 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
 : tail ( list n -- tail )
     #! Return the rest of the list, from the nth index onward.
     [ cdr ] times ;
+
+M: general-list nth ( n list -- element ) tail car ;
 
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.

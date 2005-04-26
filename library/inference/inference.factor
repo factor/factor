@@ -84,21 +84,21 @@ M: computed literal-value ( value -- )
 
 : (ensure-types) ( typelist n stack -- )
     pick [
-        3dup >r >r car r> r> vector-nth value-class-and
+        3dup >r >r car r> r> nth value-class-and
         >r >r cdr r> 1 + r> (ensure-types)
     ] [
         3drop
     ] ifte ;
 
 : ensure-types ( typelist stack -- )
-    dup vector-length pick length - dup 0 < [
+    dup length pick length - dup 0 < [
         swap >r neg tail 0 r>
     ] [
         swap
     ] ifte (ensure-types) ;
 
 : required-inputs ( typelist stack -- values )
-    >r dup length r> vector-length - dup 0 > [
+    >r dup length r> length - dup 0 > [
         head [ <computed> ] map
     ] [
         2drop f
@@ -119,7 +119,7 @@ M: computed literal-value ( value -- )
 
 : simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    uncons vector-length >r vector-length r> cons ;
+    uncons length >r length r> cons ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
@@ -174,7 +174,7 @@ M: object apply-object apply-literal ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
-    meta-r get vector-length 0 = [
+    meta-r get length 0 = [
         "Word leaves elements on return stack" inference-error
     ] unless ;
 

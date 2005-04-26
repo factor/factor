@@ -86,7 +86,7 @@ GENERIC: ' ( obj -- ptr )
 ( Allocator )
 
 : here ( -- size ) 
-    image get vector-length header-size - cell * base + ;
+    image get length header-size - cell * base + ;
 
 : here-as ( tag -- pointer )
     here swap bitor ;
@@ -236,7 +236,7 @@ M: string ' ( string -- pointer )
     align-here r> ;
 
 : emit-vector ( vector -- pointer )
-    dup >list emit-array swap vector-length
+    dup >list emit-array swap length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )

@@ -30,8 +30,8 @@ sequences strings vectors words hashtables prettyprint ;
 
 : vector-transpose ( list -- vector )
     #! Turn a list of same-length vectors into a vector of lists.
-    dup car vector-length [
-        over [ vector-nth ] map-with
+    dup car length [
+        over [ nth ] map-with
     ] vector-project nip ;
 
 : unify-stacks ( list -- stack )
@@ -42,7 +42,7 @@ sequences strings vectors words hashtables prettyprint ;
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
     #! balanced.
-    [ uncons vector-length swap vector-length - ] map all=? ;
+    [ uncons length swap length - ] map all=? ;
 
 : unify-effect ( list -- in out )
     #! Unify a list of [[ instack outstack ]] pairs.
@@ -228,7 +228,7 @@ USE: kernel-internals
 : static-dispatch ( vtable -- )
     >r pop-literal r>
     dup literal-value swap value-recursion
-    >r vector-nth r> <literal> infer-quot-value ;
+    >r nth r> <literal> infer-quot-value ;
 
 : dynamic-dispatch ( vtable -- )
     >r 1 meta-d get vector-tail* \ dispatch r>

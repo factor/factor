@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic kernel kernel-internals lists math
-namespaces prettyprint sequences stdio unparser vectors words ;
+USING: errors generic hashtables kernel kernel-internals lists
+math namespaces prettyprint sequences stdio unparser vectors
+words ;
 
 ! Printing an overview of heap usage.
 
@@ -91,3 +92,15 @@ M: object (each-slot) ( quot obj -- )
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
     0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
+
+: orphan? ( word -- ? )
+    #! Test if the word is not a member of its vocabulary.
+    dup dup word-name swap word-vocabulary dup [
+        vocab hash eq? not
+    ] [
+        3drop t
+    ] ifte ;
+
+: orphans ( word -- list )
+    #! Orphans are forgotten but still referenced.
+    [ word? ] instances [ orphan? ] subset ;

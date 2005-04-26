@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
 USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint stdio streams strings unparser vectors words ;
+parser prettyprint sequences stdio streams strings unparser
+vectors words ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -61,7 +62,7 @@ M: kernel-error error. ( error -- )
         c-string-error.
         ffi-error.
         heap-scan-error.
-    } vector-nth execute ;
+    } nth execute ;
 
 M: no-method error. ( error -- )
     [

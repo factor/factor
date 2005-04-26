@@ -30,7 +30,7 @@ math-internals ;
     dup metaclass "builtin-supertypes" word-prop call ;
 
 : set-vtable ( definition class vtable -- )
-    >r "builtin-type" word-prop r> set-vector-nth ;
+    >r "builtin-type" word-prop r> set-nth ;
 
 : class-ord ( class -- n ) metaclass "priority" word-prop ;
 

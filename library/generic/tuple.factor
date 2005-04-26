@@ -97,7 +97,7 @@ UNION: arrayed array tuple ;
 : default-constructor ( tuple -- )
     dup [
         "slots" word-prop
-        reverse [ last unit , \ keep , ] each
+        reverse [ peek unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )

@@ -41,3 +41,4 @@ M: object clone ;
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
+: implies ( a b -- a->b ) t ? ; inline

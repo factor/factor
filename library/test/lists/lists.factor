@@ -12,9 +12,9 @@ USING: kernel lists sequences test ;
 [ t ] [ 1 [ 1 2 ] contains? >boolean ] unit-test
 [ t ] [ 2 [ 1 2 ] contains? >boolean ] unit-test
 
-[ [ 3 ]     ] [ [ 3 ]         last* ] unit-test
-[ [ 3 ]     ] [ [ 1 2 3 ]     last* ] unit-test
-[ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last* ] unit-test
+[ [ 3 ]     ] [ [ 3 ]         last ] unit-test
+[ [ 3 ]     ] [ [ 1 2 3 ]     last ] unit-test
+[ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
 
 [ 3 ] [ [ 3 ]         last ] unit-test
 [ 3 ] [ [ 1 2 3 ]     last ] unit-test

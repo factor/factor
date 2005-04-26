@@ -51,6 +51,7 @@
 
 + sequences
 
+- 2map, sequence= slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
 - ensure-capacity: don't be generic
@@ -65,10 +66,10 @@
 - decide what to do with index-of
 - GENERIC: map
   - list impl same as now
-- move >list to lists
 
 + kernel:
 
+- forgotten words not removed from cross-reference
 - get all-tests to run with -no-compile
 - powerpc has weird callstack residue
 - .factor-rc loading errors are not reported properly
@@ -90,7 +91,6 @@
 
 + i/o:
 
-- 0 read broken
 - review errno
 - separate words for writing characters and strings
 - perhaps:

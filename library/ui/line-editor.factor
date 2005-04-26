@@ -30,6 +30,7 @@ USE: namespaces
 USE: strings
 USE: kernel
 USE: math
+USE: sequences
 USE: vectors
 
 SYMBOL: line-text
@@ -41,7 +42,7 @@ SYMBOL: history-index
 
 : history-length ( -- n )
     #! Call this in the line editor scope.
-    history get vector-length ;
+    history get length ;
 
 : reset-history ( -- )
     #! Call this in the line editor scope. After user input,
@@ -54,7 +55,7 @@ SYMBOL: history-index
     line-text get dup "" = [
         drop
     ] [
-        history-index get history get set-vector-nth
+        history-index get history get set-nth
         reset-history
     ] ifte ;
 
@@ -65,7 +66,7 @@ SYMBOL: history-index
 : goto-history ( n -- )
     #! Call this in the line editor scope.
     dup history-index set
-    history get vector-nth set-line-text ;
+    history get nth set-line-text ;
 
 : history-prev ( -- )
     #! Call this in the line editor scope.

@@ -4,8 +4,7 @@ IN: namespaces
 USING: hashtables kernel kernel-internals lists math sequences
 strings vectors ;
 
-! Other languages have classes, objects, variables, etc.
-! Factor has similar concepts.
+! Variables in Factor:
 !
 !   SYMBOL: x
 !

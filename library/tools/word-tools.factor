@@ -42,13 +42,3 @@ parser ;
 
 : classes ( -- list )
     [ metaclass ] word-subset ;
-
-: constructors ( -- list )
-    [
-        word-name dup "<" string-head? swap ">" string-tail? and
-    ] word-subset ;
-
-: predicates ( -- list )
-    [
-        word-name dup "?" = not swap "?" string-tail? and
-    ] word-subset ;

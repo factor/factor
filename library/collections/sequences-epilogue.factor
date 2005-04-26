@@ -121,13 +121,13 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-: concat ( list -- seq )
-    #! Append together a list of sequences.
+: concat ( seq -- seq )
+    #! Append together a sequence of sequences.
     dup empty? [
-        unswons [ swap [ nappend ] each-with ] immutable
+        unswons [ swap [ nappend ] seq-each-with ] immutable
     ] unless ;
 
-: peek ( sequence -- element )
+M: object peek ( sequence -- element )
     #! Get value at end of sequence.
     dup length 1 - swap nth ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors hashtables kernel lists namespaces parser strings
-words vectors ;
+USING: errors hashtables kernel lists namespaces parser
+sequences strings words vectors ;
 
 ! Predicate metaclass for generalized predicate dispatch.
 SYMBOL: predicate
@@ -14,10 +14,10 @@ SYMBOL: predicate
 
 : predicate-method ( vtable definition class type# -- )
     >r rot r> swap [
-        vector-nth
+        nth
         ( vtable definition class existing )
         -rot predicate-dispatch
-    ] 2keep set-vector-nth ;
+    ] 2keep set-nth ;
 
 predicate [
     "superclass" word-prop builtin-supertypes

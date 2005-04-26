@@ -156,8 +156,8 @@ SYMBOL: sym-test
 [ [[ 1 2 ]] ] [ [ uncons ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ unit ] infer old-effect ] unit-test
 [ [[ 1 2 ]] ] [ [ unswons ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ last* ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ last ] infer old-effect ] unit-test
+[ [[ 1 1 ]] ] [ [ peek ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ list? ] infer old-effect ] unit-test
 
 [ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test

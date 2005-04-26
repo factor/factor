@@ -71,7 +71,7 @@ SYMBOL: branch-returns
         [ node-param get ] bind
         [
             dup [
-                last [ node-consume-d get >vector ] bind
+                peek [ node-consume-d get >vector ] bind
             ] map
             unify-stacks >list
             branch-returns set

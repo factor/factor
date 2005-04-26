@@ -20,5 +20,6 @@ GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq )
 GENERIC: freeze ( new orig -- new )
 GENERIC: reverse ( seq -- seq )
+GENERIC: peek ( seq -- elt )
 
 DEFER: append ! remove this when sort is moved from lists to sequences

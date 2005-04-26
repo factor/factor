@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: generic kernel kernel-internals ;
+IN: lists USING: generic kernel sequences ;
 
 ! This file contains vital list-related words that everything
 ! else depends on, and is loaded early in bootstrap.
@@ -41,20 +41,20 @@ GENERIC: >list ( seq -- list )
 : 2uncons ( cons1 cons2 -- car1 car2 cdr1 cdr2 )
     [ 2car ] 2keep 2cdr ;
 
-: last* ( list -- last )
-    #! Last cons of a list.
-    dup cdr cons? [ cdr last* ] when ;
-
 : last ( list -- last )
+    #! Last cons of a list.
+    dup cdr cons? [ cdr last ] when ;
+
+M: cons peek ( list -- last )
     #! Last element of a list.
-    last* car ;
+    last car ;
 
 UNION: general-list f cons ;
 
 PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
-    dup [ last* cdr ] when not ;
+    dup [ last cdr ] when not ;
 
 : with ( obj quot elt -- obj quot )
     #! Utility word for each-with, map-with.
