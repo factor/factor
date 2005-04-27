@@ -88,9 +88,11 @@ C: buffer ( size -- buffer )
 
 : buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
 
+: buffer-peek ( buffer -- char )
+    buffer@ <alien> 0 alien-unsigned-1 ;
+
 : buffer-pop ( buffer -- char )
-    [ buffer@ <alien> 0 alien-unsigned-1  1 ] keep
-    buffer-consume ;
+    [ buffer-peek  1 ] keep buffer-consume ;
 
 : buffer-append ( buffer buffer -- )
     #! Append first buffer to second buffer.

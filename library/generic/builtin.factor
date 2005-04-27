@@ -41,7 +41,7 @@ builtin [ 2drop t ] "class<" set-word-prop
     ] ifte ;
 
 : builtin-class ( symbol type# slotspec -- )
-    >r 2dup builtins get nth r>
+    >r 2dup builtins get set-nth r>
     >r swap
     dup intern-symbol
     2dup builtin-predicate

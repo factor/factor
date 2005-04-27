@@ -171,13 +171,14 @@ C: reader ( handle -- reader )
         drop
     ] ifte  t swap set-reader-ready? ;
 
-: read-step ( port -- )
-    >port<
-    tuck dup buffer-end swap buffer-capacity read
-    dup 0 >= [ swap n>buffer ] [ drop postpone-error ] ifte ;
-
-: refill ( reader -- )
-    dup buffer-length 0 = [ read-step ] [ drop ] ifte ;
+: refill ( port -- )
+    dup buffer-length 0 = [
+        >port<
+        tuck dup buffer-end swap buffer-capacity read
+        dup 0 >= [ swap n>buffer ] [ drop postpone-error ] ifte
+    ] [
+        drop
+    ] ifte ;
 
 : eof? ( buffer -- ? ) buffer-fill 0 = ;
 
@@ -204,14 +205,33 @@ M: read-line-task io-task-events ( task -- events )
 M: reader stream-readln ( stream -- line )
     dup wait-to-read-line read-fin ;
 
+: trailing-cr ( reader -- )
+    #! Handle a corner case. If the previous request was a line
+    #! read and the line ends with \r\n, the reader stopped
+    #! reading at \r and set the reader-cr flag to true. But we
+    #! must ignore the \n.
+    dup buffer-length 1 >= over reader-cr and [
+        dup buffer-peek CHAR: \n = [
+            1 swap buffer-consume
+        ] [
+            drop
+        ] ifte
+    ] [
+        drop
+    ] ifte ;
+
 ! Reading character counts
-: read-count-step ( count reader -- ? )
+: read-loop ( count reader -- ? )
+    dup trailing-cr
     dup reader-line -rot >r over length - ( remaining) r>
-    2dup buffer-fill <= [
+    2dup buffer-length <= [
         buffer> nappend t
     ] [
         buffer>> nip nappend f
     ] ifte ;
+
+: read-step ( count reader -- ? )
+    [ read-loop dup ] keep set-reader-ready? ;
 
 : can-read-count? ( count reader -- ? )
     dup pending-error
@@ -219,7 +239,7 @@ M: reader stream-readln ( stream -- line )
     2dup reader-line length <= [
         t swap set-reader-ready? drop t
     ] [
-        read-count-step
+        read-step
     ] ifte ;
 
 TUPLE: read-task count ;
@@ -234,7 +254,7 @@ M: read-task do-io-task ( task -- ? )
     >read-task< dup refill dup eof? [
         nip reader-eof t
     ] [
-        [ read-count-step dup ] keep set-reader-ready?
+        read-step
     ] ifte ;
 
 M: read-task io-task-events ( task -- events )
@@ -333,7 +353,7 @@ M: writer stream-close ( stream -- )
 ! Copying from a reader to a writer
 
 : can-copy? ( from -- ? )
-    dup eof? [ read-step ] [ drop t ] ifte ;
+    dup eof? [ refill ] [ drop t ] ifte ;
 
 : copy-from-task ( from to -- ? )
     over can-copy? [

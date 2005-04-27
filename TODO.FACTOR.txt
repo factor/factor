@@ -1,17 +1,27 @@
-+ plugin:
-
-- if external factor is down, don't add tons of random shit to the dictionary
-- extract word: if selection empty, move caret to new word after
-- introduce quotation command
-- set 'end' of artifacts/assets accurately
-
-+ ui:
+0.74:
 
 - faster layout
 - faster repaint
+- linux? bsd? words
+- forgotten words not removed from cross-reference
+- get all-tests to run with -no-compile
+- review errno
+- mac os x ffi
+- linux i/o
+- implement fcopy
+- fix httpd
+- fix jedit plugin
+- if external factor is down, don't add tons of random shit to the dictionary
+- scalar * matrix, vector * matrix, matrix * vector need to work
+- turning vectors into row and column matrices
+- make-matrix is slow and ugly
+- move 2repeat somewhere else
+
++ ui:
+
 - console with presentations
 - ui browser
-- auto-updating inspector
+- auto-updating inspector, mirrors abstraction
 - word preview for parsing words
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
@@ -25,7 +35,7 @@
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - value type structs
-- out parameters
+- out parameter cleanup
 - bitfields in C structs
 - SDL_Rect** type
 - setting struct members that are not *
@@ -35,7 +45,6 @@
 + compiler:
 
 - alien primitives need a more general input type
-- linux? bsd? words
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
@@ -69,8 +78,7 @@
 
 + kernel:
 
-- forgotten words not removed from cross-reference
-- get all-tests to run with -no-compile
+- rename prettyprint to pprint
 - powerpc has weird callstack residue
 - .factor-rc loading errors are not reported properly
 - instances: do not use make-list
@@ -80,30 +88,24 @@
 - code walker & exceptions
 - string sub-primitives
 - clean up metaclasses
-- condition system with restarts
-- nicer way to combine two paths
 - vectors: ensure its ok with bignum indices
 - code gc
 - generational gc
 - doc comments of generics
-- proper ordering for classes
 - M: object should not inhibit delegation
 
 + i/o:
 
-- review errno
+- reader syntax for arrays, byte arrays, displaced aliens
 - separate words for writing characters and strings
 - perhaps:
   GENERIC: set-style ( style stream -- )
   GENERIC: stream-write
   GENERIC: stream-write-char
-- mac os x ffi
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - add a socket timeout
 - renumber types appopriately
-- linux? freebsd? words, linux i/o stuff
-- implement fcopy
 - unify unparse and prettyprint
 
 + nice to have libraries:
@@ -121,10 +123,3 @@
 
 - virtual hosts
 - keep alive
-
-+ matrix lib:
-
-- scalar * matrix, vector * matrix, matrix * vector need to work
-- turning vectors into row and column matrices
-- make-matrix is slow and ugly
-- move 2repeat somewhere else
