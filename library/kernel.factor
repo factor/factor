@@ -14,15 +14,6 @@ M: object = eq? ;
 
 GENERIC: clone ( obj -- obj )
 M: object clone ;
-
-: cpu ( -- arch )
-    #! Returns one of "x86", "ppc", or "unknown".
-    7 getenv ;
-
-: os ( -- arch )
-    #! Returns one of "unix" or "win32".
-    11 getenv ;
-
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -42,3 +33,10 @@ M: object clone ;
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
 : implies ( a b -- a->b ) t ? ; inline
+
+: cpu ( -- arch ) 7 getenv ;
+: os ( -- os ) 11 getenv ;
+: win32? ( -- ? ) os "win32" = ;
+: freebsd? ( -- ? ) os "freebsd" = ;
+: linux? ( -- ? ) os "linux" = ;
+: unix? ( -- ? ) freebsd? linux? or ;

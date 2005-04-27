@@ -22,6 +22,10 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 
 #ifdef WIN32
 	userenv[OS_ENV] = tag_object(from_c_string("win32"));
+#elif defined(__FreeBSD__)
+	userenv[OS_ENV] = tag_object(from_c_string("freebsd"));
+#elif defined(linux)
+	userenv[OS_ENV] = tag_object(from_c_string("linux"));
 #else
 	userenv[OS_ENV] = tag_object(from_c_string("unix"));
 #endif

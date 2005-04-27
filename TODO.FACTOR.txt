@@ -96,6 +96,8 @@
 
 + i/o:
 
+- merge unix and win32 io where appropriate
+- unix io: handle \n\r and \n\0
 - reader syntax for arrays, byte arrays, displaced aliens
 - separate words for writing characters and strings
 - perhaps:

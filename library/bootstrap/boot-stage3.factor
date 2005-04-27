@@ -5,14 +5,14 @@ lists namespaces parser sequences stdio unparser words ;
 
 "Bootstrap stage 3..." print
 
-os "unix" = [
+unix? [
     "libc"     "libc.so"       "cdecl"   add-library
     "sdl"      "libSDL.so"     "cdecl"   add-library
     "sdl-gfx"  "libSDL_gfx.so" "cdecl"   add-library
     "sdl-ttf"  "libSDL_ttf.so" "cdecl"   add-library
 ] when
 
-os "win32" = [
+win32? [
     "kernel32" "kernel32.dll" "stdcall"  add-library
     "user32"   "user32.dll"   "stdcall"  add-library
     "gdi32"    "gdi32.dll"    "stdcall"  add-library
@@ -131,7 +131,14 @@ t [
 ] pull-in
 
 compile? [
-    os "win32" = [
+    unix? [
+        "/library/unix/syscalls.factor"
+        "/library/unix/io.factor"
+        "/library/unix/sockets.factor"
+        "/library/unix/files.factor"
+    ] pull-in
+
+    win32? [
         "/library/win32/win32-io.factor"
         "/library/win32/win32-errors.factor"
         "/library/win32/winsock.factor"
@@ -139,13 +146,6 @@ compile? [
         "/library/win32/win32-stream.factor"
         "/library/win32/win32-server.factor"
         "/library/bootstrap/win32-io.factor"
-    ] pull-in
-    
-    os "unix" = [
-        "/library/unix/syscalls.factor"
-        "/library/unix/io.factor"
-        "/library/unix/sockets.factor"
-        "/library/unix/files.factor"
     ] pull-in
 ] when
 
