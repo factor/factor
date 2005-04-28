@@ -7,6 +7,7 @@
 \usepackage{alltt}
 \usepackage{times}
 \usepackage{tabularx}
+\usepackage{epsfig}
 
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
@@ -176,6 +177,13 @@ The Factor parser performs two kinds of tasks -- it creates objects from their \
 description={a whitespace-delimited piece of text, the primary unit of Factor syntax}}
 \glossary{name=whitespace,
 description={a space (ASCII 32), newline (ASCII 10) or carriage-return (ASCII 13)}}
+
+\begin{figure}
+\begin{center}
+\caption{Parser algorithm}
+\scalebox{0.45}{\epsfig{file=parser.eps}}
+\end{center}
+\end{figure}
 
 At the most abstract level,
 Factor syntax consists of whitespace-separated tokens. The parser tokenizes the input on whitespace boundaries, where whitespace is defined as a sequence or one or more space, tab, newline or carriage-return characters.  The parser is case-sensitive, so
@@ -399,7 +407,7 @@ An analogous distinction holds for the \texttt{t} class and object.
 
 \newcommand{\charglos}{\glossary{
 name=character,
-description={an integer whose value denotes a Unicode code point}}}
+description={an integer whose value denotes a Unicode code point. Character values are limited to the range from $0$ to $2^16-1$ inclusive, however in a later release this can be upgraded to the full 21-bit Unicode space without requiring any changes to user code}}}
 \charglos
 Factor has no distinct character type, however Unicode character value integers can be
 read by specifying a literal character, or an escaped representation thereof.
@@ -444,7 +452,7 @@ CHAR: \bs{}u0078
 \end{alltt}
 While not useful for single characters, this syntax is also permitted inside strings.
 
-\subsubsection{Strings}
+\subsubsection{\label{string-literals}Strings}
 
 \newcommand{\stringglos}{\glossary{
 name=string,
@@ -535,7 +543,7 @@ description=an object whose slot values cannot be changed}}
 Using mutable object literals in word definitions requires care, since if those objects
 are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Strings and lists are immutable; string buffers, vectors, hashtables and tuples are mutable.
 
-\subsubsection{String buffers}
+\subsubsection{\label{sbuf-literals}String buffers}
 
 \newcommand{\sbufglos}{\glossary{
 name=string buffer,
@@ -553,7 +561,7 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 \textbf{Hello world}
 \end{alltt}
 
-\subsubsection{Vectors}
+\subsubsection{\label{vector-literals}Vectors}
 \newcommand{\vectorglos}{\glossary{
 name=vector,
 description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in a contiguous range of memory}}}
@@ -690,6 +698,13 @@ description=the currently executing quotation}}
 \glossary{
 name=interpreter,
 description=executes quotations by iterating them and recursing into nested definitions. see compiler}
+
+\begin{figure}
+\begin{center}
+\caption{Interpreter algorithm}
+\scalebox{0.45}{\epsfig{file=interpreter.eps}}
+\end{center}
+\end{figure}
 
 The Factor interpreter executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the interpreter algorithm.
 
@@ -1247,6 +1262,8 @@ Updates a word's execution token according to its primitive number. When called 
 }
 Updates the cross-referencing database, which you will probably need to do if you mess around with any of the words in this section -- assuming Factor does not crash first, that is.
 
+\chapter{The library}
+
 \section{Objects}
 
 \glossary{name=object,
@@ -1276,6 +1293,10 @@ Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precis
 \item Two tuples are equal if they are of the same class and their slots are equal.
 \item Two words are equal if they are the same object.
 \end{itemize}
+\wordtable{
+\genericword{clone}{clone ( object -- object )}{kernel}
+}
+Make a fresh object that is equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a new shallow copy of the original.
 
 \subsection{Generic words and methods}
 
@@ -1541,15 +1562,21 @@ method call receives the delegate on the stack, not the original object.
 
 \glossary{name=sequence,
 description=an object storing a linearly-ordered set of elements}
-A sequence is a linearly-ordered collection of objects. The following library classes support sequence operations:
-\begin{verbatim}
-array
-general-list
-sbuf
-string
-vector
-\end{verbatim}
-Additionally, a user-defined class implementing the sequence protocol can support sequence operations.
+A sequence is a linearly-ordered collection of objects. A set of built-in sequence types  is provided by the library.
+
+\begin{tabular}[t]{l|c|c|c|c|c|l}
+\multicolumn{4}{l|}{}&\multicolumn{2}{c|}{Adding elements}&\multicolumn{1}{l}{}\\
+\hline
+Class&Mutable&Growable&Lookup&at start&at end&Primary purpose\\
+\hline
+\texttt{array}&$\surd$&&$O(1)$&&&Low-level and unsafe (\ref{unsafe})\\
+\texttt{list}&&&$O(n)$&$O(1)$&$O(n)$&Functional manipulation\\
+\texttt{vector}&$\surd$&$\surd$&$O(1)$&$O(n)$&$O(1)$&Imperitive aggregation\\
+\texttt{sbuf}&$\surd$&$\surd$&$O(1)$&$O(n)$&$O(1)$&Character accumilation\\
+\texttt{string}&&&$O(1)$&&&Immutable text strings
+\end{tabular}
+
+Additionally, user-defined classes can implement the sequence protocol and gain the ability to reuse many of the words in this section.
 
 \subsection{Sequence protocol}
 
@@ -1564,20 +1591,21 @@ The sequence protocol consists of a set of generic words. Any object that is an 
 \wordtable{
 \genericword{length}{length ( seq -- n )}{sequences}
 }
-Outputs the length of the sequence.
+Outputs the length of the sequence. All sequences support this operation.
 \wordtable{
 \genericword{set-length}{set-length ( n seq -- )}{sequences}
 }
-Resizes the sequence. Immutable sequences are never resizable.
+Resizes the sequence. Only vectors and string buffers support this operation.
 
 \wordtable{
 \genericword{nth}{nth ( n seq -- elt )}{sequences}
 }
-Outputs the \texttt{n}th element of the sequence. Elements are numbered starting from 0, so the last element has an index one less than the length of the sequence. An exception should be thrown if an out-of-bounds index is accessed.
+Outputs the $n$th element of the sequence. Elements are numbered starting from 0, so the last element has an index one less than the length of the sequence. An exception should be thrown if an out-of-bounds index is accessed. All sequences support this operation, however with lists it has non-constant running time.
+
 \wordtable{
 \genericword{set-nth}{set-nth ( elt n seq -- )}{sequences}
 }
-Sets the \texttt{n}th element of the sequence. If the index is out of bounds, the sequence may be resized, or an error may be raised, depending on the sequence. Not all sequences are mutable.
+Sets the $n$th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence. Storing to a negative index is always an error.
 
 \subsection{Sequence operations}
 
@@ -1604,7 +1632,7 @@ Outputs the last element of the sequence. Throws an exception if the sequence is
 \wordtable{
 \ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}{sequences}
 }
-Tests if the two sequences have the same length as elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
+Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
 
 \subsubsection{Functional operations}
 
@@ -1623,7 +1651,7 @@ Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new s
 }
 The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
 \begin{alltt}
-\textbf{ok} [ "a" [ CHAR: b ] { CHAR: c } ] concat .
+\textbf{ok} [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
 \textbf{"abc"}
 \end{alltt}
 \wordtable{
@@ -1633,16 +1661,16 @@ Outputs a new sequence of the same class, with the reverse element order.
 
 \subsubsection{Imperitive operations}
 
-The following set of sequence operations modify their inputs. The ``n'' prefix denotes ``non-constructive''; these words do not construct new output objects.
+The following set of sequence operations modify their inputs. The ``n'' prefix denotes ``non-constructive''; these words do not construct new output objects. None of these operations are permitted on immutable sequences like lists and strings.
 
 \wordtable{
 \ordinaryword{nappend}{nappend ( s1 s2 -- )}{sequences}
 }
-Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified. Throws an exception if \texttt{s1} is immutable.
+Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified.
 \wordtable{
 \ordinaryword{nreverse}{nreverse ( sequence -- )}{sequences}
 }
-Reverses the elements of \texttt{seq}. Nothing is output, and \texttt{seq} is modified. Throws an exception if \texttt{seq} is immutable.
+Reverses the elements of \texttt{seq}. Nothing is output, and \texttt{seq} is modified.
 \wordtable{
 \ordinaryword{push}{push ( element sequence -- )}{sequences}\\
 \ordinaryword{pop}{pop ( sequence -- element )}{sequences}
@@ -1705,6 +1733,40 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
+\subsection{Vectors}
+
+\wordtable{
+\classword{vector}{vectors}
+}
+\vectorglos
+A vector is a growable, mutable sequence whose elements are stored in a contiguous range of memory. The literal syntax is covered in \ref{vector-literals}. Very few words operate specifically on vectors; most operations on vectors are done with generic sequence words.
+
+\wordtable{
+\ordinaryword{vector?}{vector?~( object -- ?~)}{vectors}
+}
+Tests if the object at the top of the stack is a vector.
+\wordtable{
+\ordinaryword{>vector}{>vector~( sequence -- vector )}{vectors}
+}
+Turns any type of sequence into a vector. Given a vector, this makes a fresh copy.
+\wordtable{
+\ordinaryword{<vector>}{<vector>~( capacity -- vector )}{vectors}
+}
+Creates a new vector with an initial capacity that determines how many elements it can store before it needs resizing. The initial length is zero.
+\wordtable{
+\ordinaryword{empty-vector}{empty-vector~( length -- vector )}{vectors}
+}
+Creates a new vector of the requested length, where all elements are initially \texttt{f}.
+\wordtable{
+\ordinaryword{zero-vector}{zero-vector~( length -- vector )}{vectors}
+}
+Creates a new vector of the requested length, where all elements are initially \texttt{f}.
+\wordtable{
+\ordinaryword{vector-project}{vector-project~( n quot -- vector )}{vectors}\\
+\texttt{quot:~i -- element}
+}
+Calls the quotation sequentially with integers $0$ up to $n-1$, collecting the results into a new vector.
+
 \subsection{Cons cells}
 
 \consglos
@@ -1764,9 +1826,8 @@ Cons cells, and by extension lists, are immutable.
 \glossary{name=general list,description={a proper or improper list; that is, either \texttt{f} or a cons cell}}
 
 Lists of values are represented with nested cons cells. The car is the first element of the list; the cdr is the rest of the list. The value \texttt{f} represents the empty list.
-List operations are typically implemented in a recursive fashion, where the cdr of the list is taken until the end is reached.
 
-The following example demonstrates this, along with the literal syntax used to print lists:
+The following example demonstrates the construction of lists as chains of cons cells, along with the literal syntax used to print lists:
 \begin{alltt}
 \textbf{ok} {[} 1 2 3 4 {]} car .
 \textbf{1}
@@ -1775,6 +1836,15 @@ The following example demonstrates this, along with the literal syntax used to p
 \textbf{ok} {[} 1 2 3 4 {]} cdr cdr .
 \textbf{{[} 3 4 {]}}
 \end{alltt}
+
+\begin{figure}
+\begin{center}
+\caption{Cons cells making up the list \texttt{[ 1 2 3 ]}}
+\scalebox{0.5}{\epsfig{file=cons.ps}}
+\end{center}
+\end{figure}
+
+List operations are typically implemented in a recursive fashion, where the cdr of the list is taken until the desired element is reached.
 
 \wordtable{
 \classword{general-list}{lists}\\
@@ -1832,7 +1902,7 @@ Outputs a new list consisting of the first \texttt{n} elements of \texttt{list}.
 \wordtable{
 \ordinaryword{tail}{tail~( list n -- list )}{lists}
 }
-Outputs a new list consisting of the elements of \texttt{list} from the \texttt{n}th index onward. This does not allocate memory; rather it simply takes the \texttt{cdr} \texttt{n} times.
+Outputs a new list consisting of the elements of \texttt{list} from the $n$th index onward. This does not allocate memory; rather it simply takes the \texttt{cdr} \texttt{n} times.
 \wordtable{
 \ordinaryword{count}{count~( n -- list )}{lists}
 }
@@ -1940,32 +2010,123 @@ Dequeues an element and outputs a new queue without that element.
 }
 Enqueues an element and outputs a new queue.
 
-\subsection{Vectors}
-
-\wordtable{
-\classword{vector}{vectors}
-}
-\vectorglos
-A vector is a growable, mutable sequence whose elements are stored in a contiguous range of memory.
-
-vectors -vs- lists comparison table
-vector?
->vector
-
-<vector>
-empty-vector
-zero-vector
-vector-project
-vector-tail
-vector-tail*
-
 \subsection{Strings}
 
 \stringglos
 \wordtable{
 \classword{string}{strings}
 }
-A string is an immutable sequence of characters.
+A string is an immutable sequence of characters. The literal syntax is covered in \ref{string-literals}. Characters do not have a distinct data type, so elements taken out of strings appear as integers on the stack.
+
+\wordtable{
+\ordinaryword{string?}{string?~( obj -- ?~)}{strings}
+}
+Tests if the object at the top of the stack is a string.
+%\wordtable{
+%\ordinaryword{>string}{>string~( sequence -- string )}{strings}
+%}
+%Turns any type of sequence with all-integer elements into a string. The integer elements are interpreted as characters.
+\wordtable{
+\ordinaryword{string-compare}{string-compare~( s1 s2 -- n )}{strings}
+}
+Compare two strings lexicographically (dictionary order). The output value is one of the following:
+\begin{description}
+\item[Positive] indicating that \texttt{s1} follows \texttt{s2}
+\item[Zero] indicating that \texttt{s1} is equal to \texttt{s2}
+\item[Negative] indicating that \texttt{s1} precedes \texttt{s2}
+\end{description}
+\wordtable{
+\ordinaryword{string>}{string> ( s1 s2 -- ?~)}{strings}
+}
+Tests if \texttt{s1} follows \texttt{s2}. Implemented as follows:
+\begin{verbatim}
+: string> ( s1 s1 -- ? ) string-compare 0 > ;
+\end{verbatim}
+This is used to sort lists of strings:
+\begin{alltt}
+\textbf{ok} [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
+[ "Apple" "Curry" "Turkey" "Veal" ]
+\end{alltt}
+\wordtable{
+\ordinaryword{fill}{fill~( n char -- string )}{strings}
+}
+Creates a string with \texttt{char} repeated $n$ times.
+\wordtable{
+\ordinaryword{pad}{pad~( string n char -- string )}{strings}
+}
+Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l$ is greater than $n$, the empty string is output.
+
+\subsubsection{Substring testing}
+
+\wordtable{
+\ordinaryword{string-contains?}{string-contains?~( s1 s2 -- ?~)}{strings}
+}
+Tests if \texttt{s2} contains \texttt{s1} as a substring.
+\wordtable{
+\ordinaryword{string-head?}{string-head?~( s1 s2 -- ?~)}{strings}\\
+\ordinaryword{string-tail?}{string-tail?~( s1 s2 -- ?~)}{strings}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
+
+\subsubsection{Slicing and splitting}
+
+\wordtable{
+\ordinaryword{string/}{string/ ( string n -- s1 s2 )}{strings}
+}
+Outputs a pair of strings that equal the original string when concatenated. The first string has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 string .s
+\textbf{" world"
+"Hello"}
+\end{alltt}
+\wordtable{
+\ordinaryword{string//}{string// ( string n -- s1 s2 )}{strings}
+}
+
+Outputs a pair of strings that equal the original string, excluding the $n$th element, when concatenated. The first string has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 string// .s
+\textbf{"world"
+"Hello"}
+\end{alltt}
+\wordtable{
+\ordinaryword{?string-head}{?string-head~( s1 s2 -- string ?~)}{strings}\\
+\ordinaryword{?string-tail}{?string-tail~( s1 s2 -- string ?~)}{strings}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}/
+\wordtable{
+\ordinaryword{split1}{split1~( str split -- before after )}{strings}
+}
+If \texttt{string} does not contain \texttt{split} as a substring, then \texttt{before} is equal to the \texttt{string}, and \texttt{after} is \texttt{f}. Otherwise, \texttt{before} and \texttt{after} are both strings, and yield the input excluding \texttt{split} when concatenated.
+\wordtable{
+\ordinaryword{split}{split~( str split -- list )}{strings}
+}
+Outputs a list of substrings taken between occurrences of \texttt{split} in \texttt{string}. If \texttt{split} does not occur inside \texttt{string}, outputs a singleton list containing \texttt{string} only.
+\begin{alltt}
+\textbf{ok} "/usr/local/bin" CHAR: / split .
+\textbf{[ "" "usr" "local" "bin" ]}
+\end{alltt}
+\wordtable{
+\ordinaryword{split-n}{split-n~( str n -- list )}{strings}
+}
+Splits the string into groups of \texttt{n} characters and collects them in a list. If the string's length is not a multiple of \texttt{n}, the final string in the list might be shorter.
+
+\subsubsection{Characters}
+
+\wordtable{
+\ordinaryword{ch>string}{ch>string ( n -- string )}{strings}
+}
+Turns an integer representing a character value into a single-element string.
+\wordtable{
+\ordinaryword{blank?}{blank?~( n -- ?~)}{strings}\\
+\ordinaryword{letter?}{letter?~( n -- ?~)}{strings}\\
+\ordinaryword{LETTER?}{LETTER?~( n -- ?~)}{strings}\\
+\ordinaryword{digit?}{digit?~( n -- ?~)}{strings}\\
+\ordinaryword{printable?}{printable?~( n -- ?~)}{strings}\\
+\ordinaryword{quotable?}{quotable?~( n -- ?~)}{strings}\\
+\ordinaryword{url-quotable?}{url-quotable?~( n -- ?~)}{strings}
+}
+Various character classification predicates.
 
 \subsection{String buffers}
 
@@ -1973,21 +2134,163 @@ A string is an immutable sequence of characters.
 \wordtable{
 \classword{sbuf}{strings}
 }
-A string buffer is a mutable and growable sequence of characters.
+A string buffer is a mutable and growable sequence of characters. String buffers can be used to construct new strings by accumilating substrings and characters, however usually they are only used indirectly, since the sequence construction words in \ref{make-seq} are more convenient to use in many cases.
+\wordtable{
+\ordinaryword{sbuf?}{sbuf?~( object -- ?~)}{strings}
+}
+Tests if the object at the top of the stack is a string buffer.
+\wordtable{
+\ordinaryword{>sbuf}{>sbuf~( sequence -- sbuf )}{strings}
+}
+Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy
+\wordtable{
+\ordinaryword{sbuf>string}{sbuf>string~( sbuf -- string )}{strings}
+}
+Turns a string buffer into a string holding the same characters.
 
-\subsection{Constructing sequences}
+\subsection{\label{make-seq}Constructing sequences}
+
+The library supports an idiom where sequences can be constructed without passing the partial sequence being built on the stack. This reduces stack noise, and thus simplifies code and makes it easier to understand.
+
+\newcommand{\dynamicscopeglos}{\glossary{
+name=dynamic scope,
+description={a variable binding policy where bindings established in a scope are visible to all code executed while the scope is active}}}
+\dynamicscopeglos
+\wordtable{
+\ordinaryword{make-list}{make-list ( quot -- list )}{namespaces}\\
+\ordinaryword{make-string}{make-string ( quot -- string )}{namespaces}\\
+\ordinaryword{make-sbuf}{make-sbuf ( quot -- string )}{namespaces}\\
+\ordinaryword{make-vector}{make-vector ( quot -- vector )}{namespaces}
+}
+Calls the quotation in a new \texttt{dynamic scope}. The quotation and any words it calls can execute the \texttt{,} and \texttt{\%} words to add elements at the end of the sequence being constructed.
+\wordtable{
+\ordinaryword{,}{,~( element -- )}{namespaces}
+}
+Adds the element to the end of the sequence being constructed by the innermost call to one of the above combinators.
+\wordtable{
+\ordinaryword{unique,}{unique,~( element -- )}{namespaces}
+}
+Adds the element to the end of the sequence being constructed as long as the sequence does not already have an equal element.
+\wordtable{
+\ordinaryword{literal,}{literal,~( element -- )}{namespaces}
+}
+Adds the element wrapped inside a one-element list, then adds the \texttt{car} word. This is used to construct quotations with \texttt{make-list} that must push a word on the stack.
+\wordtable{
+\ordinaryword{\%}{\% ( sequence -- )}{namespaces}
+}
+Appends the subsequence to the end of the sequence being constructed.
+
+Note that the sequence construction combinators will capture any variables set inside the quotation, due to the dynamic scoping behavior. These combinators are actually implemented using variables. See \ref{namespaces}.
 
 \section{Mappings}
 
+\glossary{name=mapping,
+description={an unordered collection of elements, accessed by key. Examples include association lists and hashtables}}
+
+Mappings associate keys with values. The two classes of mappings in the Factor library are association lists and hashtables.
+
+\begin{tabular}[t]{l|c|c|c|l}
+Class&Mutable&Ordered&Lookup&Primary purpose\\
+\hline
+\texttt{assoc}&&$\surd$&$O(n)$&Small, unchanging mappings\\
+\texttt{hashtable}&$\surd$&&$O(1)$&Large or frequently-changing mappings
+\end{tabular}
+
+It might be tempting to just always use hashtables, however for very small mappings, association lists are just as efficient, and are easier to work with since the entire set of list words can be used with them.
+
 \subsection{Association lists}
 
+\glossary{name=association list,
+description={a list of pairs, where the car if each pair is a key and the cdr is the value associated with that key}}
+
+Association lists are built from cons cells. They are structured like a ribbed spine, where the ``spine'' is a list and each ``rib'' is a cons cell holding a key/value pair.
+
+\wordtable{
+\ordinaryword{assoc?}{assoc ( object -- ?~)}{lists}
+}
+Tests if the object at the top of the stack is a proper list whose every element is a cons.
+
+\wordtable{
+\ordinaryword{assoc}{assoc ( k alist -- v )}{lists}\\
+\ordinaryword{assoc*}{assoc* ( k alist -- [[ k v ]] )}{lists}
+}
+These words look up a key in an association list, comparing keys in the list with the given key by equality with \texttt{=}. The list is searched starting from the beginning. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{assoc*} word allows a distinction to be made between a missing value and a value equal to \texttt{f}, since in the case of a missing value it outputs \texttt{f}.
+\wordtable{
+\ordinaryword{assq}{assq ( k alist -- v )}{lists}\\
+\ordinaryword{assq*}{assq* ( k alist -- [[ k v ]] )}{lists}
+}
+These words compare keys by identity with \texttt{eq?}~and are dual to \texttt{assoc} and \texttt{assoc*}.
+\wordtable{
+\ordinaryword{acons}{acons ( v k alist -- alist )}{lists}\\
+\ordinaryword{set-assoc}{set-assoc ( v k alist -- alist )}{lists}
+}
+These words output a new association list containing the key/value pair.
+They differ in that \texttt{set-assoc} removes any existing key/value pairs with the given key first. In both cases, searching for the key in the returned association list gives the new value, however with the slightly faster \texttt{acons}, the old value remains shadowed in the list.
+\wordtable{
+\ordinaryword{remove-assoc}{remove-assoc ( k alist -- alist )}{lists}
+}
+Outputs a new association list which does not have any key/value pairs with the key equal to \texttt{k}.
+
+\begin{figure}
+\caption{An association list and its graphical representation}
+\begin{verbatim}
+[
+    [[ "Salsa" "Hot" ]]
+    [[ "Stir-Fry" "Medium" ]]
+    [[ "Peppers" "Very Hot" ]]
+]
+\end{verbatim}
+
+\begin{center}
+\scalebox{0.45}{\epsfig{file=assoc.eps}}
+\end{center}
+\end{figure}
+
+\subsubsection{Dual representation}
+
+Sometimes it is convenient to decompose an association list into two lists of equal length, containing the keys and values, respectively, in the same order as the association list. This dual representation can be manipulated with a handful of helper words.
+
+\wordtable{
+\ordinaryword{zip}{zip ( keys values -- alist )}{lists}\\
+\ordinaryword{unzip}{unzip ( alist -- keys values )}{lists}
+}
+These words convert between pairs of lists and lists of pairs.
+\begin{alltt}
+\textbf{ok} [ 1 2 3 ] [ 4 5 6 ] zip .
+[ [[ 1 4 ]] [[ 2 5 ]] [[ 3 6 ]] ]
+\textbf{ok} [ [[ 1 2 ]] [[ 3 4 ]] [[ 5 6 ]] ] unzip .s
+[ 2 4 6 ]
+[ 1 3 5 ]
+\end{alltt}
+\wordtable{
+\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}{lists}
+}
+Cons a pair of elements onto a pair of lists.
+\wordtable{
+\ordinaryword{2car}{2car ( c1 c2 -- car1 car2 )}{lists}\\
+\ordinaryword{2cdr}{2cdr ( c1 c2 -- cdr1 cdr2 )}{lists}
+}
+Deconstructs paired lists.
+
 \subsection{Hashtables}
+
+\wordtable{
+\classword{hashtable}{hashtables}
+}
+
 
 \subsection{\label{namespaces}Namespaces}
 
 \section{Mathematics}
 
 \numberglos
+
+\begin{figure}
+\begin{center}
+\caption{Numerical class hierarchy}
+\scalebox{0.5}{\epsfig{file=number.ps}}
+\end{center}
+\end{figure}
 
 Factor's numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
 
