@@ -45,7 +45,7 @@ void relocate_code();
 given address */
 INLINE CELL reloc_get_16_16(CELL* cell)
 {
-	return ((*(cell - 1) & 0xffff) << 16) | (*cell & 0xffff);
+	return ((*cell & 0xffff) << 16) | (*(cell + 1) & 0xffff);
 }
 
 INLINE void reloc_set_16_16(CELL* cell, CELL value)
