@@ -125,6 +125,7 @@ The following abbreviations have conventional meaning in stack effect comments:
 \begin{description}
 \item[\texttt{[ x y z ]}] a list with elements whose types are hinted at by \texttt{x}, \texttt{y}, \texttt{z}
 \item[\texttt{[[ x y ]]}] a cons cell where the type of the cdr is hinted at by \texttt{x}, and the type of the cdr is hinted at by \texttt{y}
+\item[\texttt{ch}] an integer representing a Unicode character
 \item[\texttt{elt}] an arbitrary object that happends to be an element of a collection
 \item[\texttt{i}] a loop counter or index
 \item[\texttt{j}] a loop counter or index
@@ -990,7 +991,7 @@ The following diagram illustrates the nesting of exception handlers on the catch
 \end{center}
 \end{figure}
 
-\subsubsection{Multitasking}
+\subsubsection{\label{threads}Multitasking}
 
 Factor implements co-operative multitasking, where the thread of control switches between tasks at explicit calls to \texttt{yield}, as well as when blocking I/O is performed. Multitasking is implemented via continuations.
 \wordtable{
@@ -2865,7 +2866,14 @@ Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
 
 Input and output is centered around the concept of a \emph{stream}, which is a source or
-sink of characters.
+sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium. A few stream implementations are provided by the library.
+
+\begin{description}
+\item[File streams] read and write local files.
+\item[Network streams] connect to servers and accept connections from clients.
+\item[HTML streams] implement the formatted output protocol to generate HTML from styled text attributes, then direct the HTML to an underlying stream.
+\item[String streams] direct output to a string buffer.
+\end{description}
 
 \subsection{Stream protocol}
 \glossary{name=input stream,
@@ -2873,13 +2881,76 @@ description={a stream that implements the \texttt{stream-readln} and \texttt{str
 \glossary{name=output stream,
 description={a stream that implements the \texttt{stream-write-attr}, \texttt{stream-flush} and \texttt{stream-auto-flush} generic words and can be used for character output}}
 
+There are various subsets of the stream protocol that a class can implement so that its instances may be used as streams. The following generic word is mandatory.
+
+\wordtable{
+\genericword{stream-close}{stream-close ( s -- )}{streams}
+}
+Releases any external resources associated with the stream, such as file handles and network connections. No further operations can be performed on the stream after this call.
+
+You must close streams after you are finished working with them. A convenient way to automate this is by using the \texttt{with-stream} word in \ref{stdio}.
+
+The following two words are optional, and should be implemented on input streams.
+\wordtable{
+\genericword{stream-readln}{stream-readln ( s -- str/f )}{streams}
+}
+Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream; with file and network streams, it is a range of characters terminated by \verb|\n|, \verb|\r| or \verb|\r\n|.
+\wordtable{
+\genericword{stream-read}{stream-read ( n s -- str )}{streams}
+}
+Reads \texttt{n} characters from the stream. If less than \texttt{n} characters are available before the end of the stream, a shorter string is output.
+
+The following three words are optional, and should be implemented on output streams.
+
+\wordtable{
+\genericword{stream-write-attr}{stream-write-attr ( str/ch attrs s -- )}{streams}
+}
+Outputs a character or string to the stream. This might not result in immediate output to the underlying resource if the stream performs buffering, like all file and network streams do. 
+
+The \texttt{attrs} parameter is an association list holding style information, and it may be ignored. See \ref{style} for a full description. Foramtted output is a relatively rare case so most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
+
+\wordtable{
+\genericword{stream-flush}{stream-flush ( s -- )}{streams}
+}
+Blocks until all pending output operations are been complete.
+\wordtable{
+\genericword{stream-auto-flush}{stream-auto-flush ( s -- )}{streams}
+}
+Ensures the user sees prior output. It is not as strong as \texttt{stream-flush}. The contract is as follows: if the stream is connected to an interactive end-point such as a terminal, \texttt{stream-auto-flush} should execute \texttt{stream-flush}. If the stream is a file or network stream used for ``batch'' operations, this word should have an empty definition.
+
+The \texttt{stream-print} word executes \texttt{stream-auto-flush} after each line of output.
+
+With some streams, the above operations may suspend the current thread and execute other threads until input data is available (\ref{threads}).
+
+\subsection{Stream utilities}
+
+The following three words are implemented in terms of the stream protocol, and should work with any stream supporting the required underlying operations.
+\wordtable{
+\ordinaryword{stream-read1}{stream-read1 ( stream -- ch/f )}{streams}
+}
+Reads a single character using \texttt{stream-read} and outputs the character. If the end of the stream has been reached, outputs \texttt{f}.
+\wordtable{
+\ordinaryword{stream-write}{stream-write ( string stream -- )}{streams}
+}
+Outputs a character or string to the stream, without any specific style information. Implemented as follows:
+\begin{verbatim}
+: stream-write ( string stream -- )
+    f swap stream-write-attr ;
+\end{verbatim}
+\wordtable{
+\ordinaryword{stream-print}{stream-print ( string stream -- )}{streams}
+}
+Outputs a character or string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
+
+\subsection{\label{stdio}The standard input/output stream}
+
 \subsection{Reading and writing files}
 
 \subsubsection{File system metadata}
 
 \subsection{TCP/IP networking}
 
-\subsection{Formatted output}
+\subsection{\label{style}Formatted output}
 
 \subsection{Special streams}
 
