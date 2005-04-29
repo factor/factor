@@ -5,17 +5,17 @@ USING: alien compiler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 \ alien-invoke [
-    uncons load-dll dlsym compile-call-far
+    uncons load-dll 2dup rel-dlsym-16/16 dlsym compile-call-far
 ] "generator" set-word-prop
 
 #parameters [
-    dup 0 = [ drop ] [ 1 1 rot SUBI ] ifte
+    dup 0 = [ drop ] [ 16 align 1 1 rot SUBI ] ifte
 ] "generator" set-word-prop
 
-: stack@ cell * neg cell - ;
+: stack@ cell * cell + ;
 
 #unbox [
-    uncons f dlsym compile-call-far
+    uncons f 2dup rel-dlsym-16/16 dlsym compile-call-far
     3 1 rot stack@ STW
 ] "generator" set-word-prop
 
@@ -24,9 +24,9 @@ math memory namespaces words ;
 ] "generator" set-word-prop
 
 #box [
-    f dlsym compile-call-far
+    f 2dup rel-dlsym-16/16 dlsym compile-call-far
 ] "generator" set-word-prop
 
 #cleanup [
-    dup 0 = [ drop ] [ 1 1 rot ADDI ] ifte
+    dup 0 = [ drop ] [ 16 align 1 1 rot ADDI ] ifte
 ] "generator" set-word-prop

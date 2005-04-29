@@ -53,7 +53,7 @@ words ;
 
 #call-label [
     ! Hack: length of instruction sequence that follows
-    compiled-offset 20 + 18 LOAD32 rel-address-16/16
+    rel-address-16/16  compiled-offset 20 + 18 LOAD32
     1 1 -16 STWU
     18 1 20 STW
     0 B relative-24
@@ -94,7 +94,7 @@ words ;
     18 18 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    compiled-offset 24 + 19 LOAD32 rel-address-16/16
+    rel-address-16/16  compiled-offset 24 + 19 LOAD32
     18 18 19 ADD
     18 18 0 LWZ
     18 MTLR

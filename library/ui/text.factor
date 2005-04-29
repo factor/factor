@@ -56,7 +56,7 @@ global [
     ] when ;
 
 : size-string ( font text -- w h )
-    >r lookup-font r> filter-nulls dup string-length 0 = [
+    >r lookup-font r> filter-nulls dup empty? [
         drop TTF_FontHeight 0 swap
     ] [
         <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep
@@ -75,7 +75,7 @@ M: string shape-h ( text -- h )
     drop font get lookup-font TTF_FontHeight ;
 
 M: string draw-shape ( text -- )
-    dup string-length 0 = [
+    dup empty? [
         drop
     ] [
         filter-nulls font get lookup-font swap

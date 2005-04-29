@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien errors kernel kernel-internals math strings ;
+USING: alien errors kernel kernel-internals math sequences
+strings ;
 
 TUPLE: buffer size ptr fill pos ;
 
@@ -67,14 +68,14 @@ C: buffer ( size -- buffer )
     dup buffer-size swap buffer-fill - ;
 
 : check-overflow ( string buffer -- )
-    buffer-capacity swap string-length < [
+    buffer-capacity swap length < [
         "Buffer overflow" throw
     ] when ;
 
 : >buffer ( string buffer -- )
     2dup check-overflow
     [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
-    [ buffer-fill swap string-length + ] keep set-buffer-fill ;
+    [ buffer-fill swap length + ] keep set-buffer-fill ;
 
 : buffer-extend ( length buffer -- )
     #! Increases the size of the buffer by length.
@@ -101,7 +102,7 @@ C: buffer ( size -- buffer )
 
 : buffer-set ( string buffer -- )
     2dup buffer-ptr string>memory
-    >r string-length r> buffer-reset ;
+    >r length r> buffer-reset ;
 
 : string>buffer ( string - -buffer )
-    dup string-length <buffer> tuck buffer-set ;
+    dup length <buffer> tuck buffer-set ;

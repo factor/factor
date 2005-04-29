@@ -1,10 +1,5 @@
 IN: temporary
-USE: namespaces
-USE: line-editor
-USE: test
-USE: strings
-USE: kernel
-USE: prettyprint
+USING: kernel line-editor namespaces sequences strings test ;
 
 <line-editor> "editor" set
 
@@ -15,7 +10,7 @@ USE: prettyprint
 
 [ t ] [
     "editor" get [ caret get ] bind
-    "Hello world" string-length =
+    "Hello world" length =
 ] unit-test
 
 [ "Hello, crazy world" ] [

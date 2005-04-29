@@ -17,7 +17,7 @@ M: object digit> not-a-number ;
     2dup < [ rot * + ] [ not-a-number ] ifte ;
 
 : (base>) ( base str -- num )
-    dup string-length 0 = [
+    dup empty? [
         not-a-number
     ] [
         0 swap [ digit> pick digit+ ] seq-each nip

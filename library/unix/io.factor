@@ -26,7 +26,8 @@ C: port ( handle buffer -- port )
     [ >r dup init-handle r> set-port-handle ] keep ;
 
 M: port stream-close ( port -- )
-    dup port-handle close buffer-free ;
+    dup port-handle close
+    delegate [ buffer-free ] when* ;
 
 : buffered-port 8192 <port> ;
 

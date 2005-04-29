@@ -6,7 +6,6 @@ lists namespaces parser sequences stdio unparser words ;
 "Bootstrap stage 3..." print
 
 unix? [
-    "libc"     "libc.so"       "cdecl"   add-library
     "sdl"      "libSDL.so"     "cdecl"   add-library
     "sdl-gfx"  "libSDL_gfx.so" "cdecl"   add-library
     "sdl-ttf"  "libSDL_ttf.so" "cdecl"   add-library
@@ -131,14 +130,25 @@ t [
 ] pull-in
 
 compile? [
+    os "freebsd" = [
+        "/library/unix/syscalls-freebsd.factor"
+    ] pull-in
+
+    os "linux" = [
+        "/library/unix/syscalls-linux.factor"
+    ] pull-in
+    
     unix? [
         "/library/unix/syscalls.factor"
+    ] pull-in
+
+    unix? [
         "/library/unix/io.factor"
         "/library/unix/sockets.factor"
         "/library/unix/files.factor"
     ] pull-in
-
-    win32? [
+    
+    os "win32" = [
         "/library/win32/win32-io.factor"
         "/library/win32/win32-errors.factor"
         "/library/win32/winsock.factor"

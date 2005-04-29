@@ -4,7 +4,7 @@
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: streams ;
+USING: namespaces streams unparser ;
 USING: alien generic kernel math unix-internals ;
 
 : init-sockaddr ( port -- sockaddr )
@@ -61,6 +61,14 @@ M: accept-task io-task-events ( task -- events )
 
 : wait-to-accept ( server -- )
     [ swap <accept-task> add-io-task io-multiplex ] callcc0 drop ;
+
+: inet-ntoa ( n -- str )
+    ntohl [
+        dup -24 shift HEX: ff bitand unparse % CHAR: . ,
+        dup -16 shift HEX: ff bitand unparse % CHAR: . ,
+        dup -8  shift HEX: ff bitand unparse % CHAR: . ,
+                      HEX: ff bitand unparse %
+    ] make-string ;
 
 : do-accept ( fd -- fd host port )
     <sockaddr-in>

@@ -20,7 +20,7 @@ unparser ;
     [ hex> ] [ [ drop f ] when ] catch ;
 
 : url-decode-hex ( index str -- )
-    2dup string-length 2 - >= [
+    2dup length 2 - >= [
         2drop
     ] [
         >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
@@ -33,10 +33,10 @@ unparser ;
     dup CHAR: + = [ drop CHAR: \s ] when , >r 1 + r> ;
 
 : url-decode-iter ( index str -- )
-    2dup string-length >= [
+    2dup length >= [
         2drop
     ] [
-        2dup string-nth dup CHAR: % = [
+        2dup nth dup CHAR: % = [
             drop url-decode-%
         ] [
             url-decode-+-or-other

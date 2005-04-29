@@ -61,7 +61,7 @@ SYMBOL: history-index
 
 : set-line-text ( text -- )
     #! Call this in the line editor scope.
-    dup line-text set string-length caret set ;
+    dup line-text set length caret set ;
 
 : goto-history ( n -- )
     #! Call this in the line editor scope.
@@ -100,7 +100,7 @@ SYMBOL: history-index
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.
     caret get <= [
-        string-length caret [ + ] change
+        length caret [ + ] change
     ] [
         drop
     ] ifte ;
@@ -146,4 +146,4 @@ SYMBOL: history-index
 
 : right ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 + line-text get string-length min ] change ;
+    caret [ 1 + line-text get length min ] change ;

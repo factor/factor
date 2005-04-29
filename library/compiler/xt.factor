@@ -4,43 +4,6 @@ IN: compiler
 USING: assembler errors generic kernel lists math namespaces
 prettyprint sequences strings vectors words ;
 
-! To support saving compiled code to disk, generator words
-! append relocation instructions to this vector.
-SYMBOL: relocation-table
-
-: rel, ( n -- ) relocation-table get push ;
-
-: relocating compiled-offset cell - rel, ;
-
-: rel-primitive ( word rel/abs -- )
-    #! If flag is true; relative.
-    0 1 ? rel, relocating word-primitive rel, ;
-
-: rel-dlsym ( name dll rel/abs -- )
-    #! If flag is true; relative.
-    2 3 ? rel, relocating cons intern-literal rel, ;
-
-: rel-address ( rel/abs -- )
-    #! Relocate address just compiled. If flag is true,
-    #! relative, and there is nothing to do.
-    [ 4 rel, relocating 0 rel, ] unless ;
-
-: rel-word ( word rel/abs -- )
-    #! If flag is true; relative.
-    over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
-
-! PowerPC relocations
-
-: rel-primitive-16/16 ( word -- )
-    #! This is called before a sequence like
-    #! 19 LOAD32
-    #! 19 MTCTR
-    #! BCTR
-    5 rel, compiled-offset rel, word-primitive rel, ;
-
-: rel-address-16/16 ( -- )
-    6 rel, relocating 0 rel, ;
-
 ! We use a hashtable "compiled-xts" that maps words to
 ! xt's that are currently being compiled. The commit-xt's word
 ! sets the xt of each word in the hashtable to the value in the

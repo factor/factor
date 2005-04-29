@@ -40,6 +40,10 @@ IN: kernel-internals
 : hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
 : hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
 
+: grow-hash ( hash -- )
+    #! A good way to earn a living.
+    dup hash-size 2 * <array> swap set-hash-array ;
+
 IN: hashtables
 
 : bucket-count ( hash -- n ) hash-array length ;
@@ -67,10 +71,6 @@ IN: hashtables
 
 : rehash? ( hash -- ? )
     dup bucket-count 3 * 2 /i swap hash-size < ;
-
-: grow-hash ( hash -- )
-    #! A good way to earn a living.
-    dup hash-size 2 * <array> swap set-hash-array ;
 
 : (hash>alist) ( alist n hash -- alist )
     2dup bucket-count >= [

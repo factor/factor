@@ -37,6 +37,4 @@ M: object clone ;
 : cpu ( -- arch ) 7 getenv ;
 : os ( -- os ) 11 getenv ;
 : win32? ( -- ? ) os "win32" = ;
-: freebsd? ( -- ? ) os "freebsd" = ;
-: linux? ( -- ? ) os "linux" = ;
-: unix? ( -- ? ) freebsd? linux? or ;
+: unix? ( -- ? ) os "freebsd" = os "linux" = or ;

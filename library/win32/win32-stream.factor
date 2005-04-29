@@ -24,9 +24,9 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: win32-stream
-USING: alien continuations generic kernel kernel-internals lists math
-       namespaces prettyprint stdio streams strings threads win32-api
-       win32-io-internals io-internals ;
+USING: alien continuations generic io-internals kernel
+kernel-internals lists math namespaces prettyprint sequences
+stdio streams strings threads win32-api win32-io-internals ;
 
 TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle
@@ -70,11 +70,11 @@ M: integer do-write ( int -- )
     >r ch>string r> >buffer ;
 
 M: string do-write ( str -- )
-    dup string-length out-buffer get buffer-capacity <= [
+    dup length out-buffer get buffer-capacity <= [
         out-buffer get >buffer
     ] [
-        dup string-length out-buffer get buffer-size > [
-            dup string-length out-buffer get buffer-extend do-write
+        dup length out-buffer get buffer-size > [
+            dup length out-buffer get buffer-extend do-write
         ] [ flush-output do-write ] ifte
     ] ifte ;
 
@@ -103,7 +103,7 @@ M: string do-write ( str -- )
         drop sbuf>string 
     ] [
         dup consume-input
-        dup string-length dup 0 = [
+        dup length dup 0 = [
             3drop sbuf>string-or-f
         ] [
             >r swap r> - >r swap [ sbuf-append ] keep r> do-read-count
@@ -114,7 +114,7 @@ M: string do-write ( str -- )
     1 in-buffer get buffer-first-n ;
 
 : do-read-line ( sbuf -- str )
-    1 consume-input dup string-length 0 = [ drop sbuf>string-or-f ] [
+    1 consume-input dup length 0 = [ drop sbuf>string-or-f ] [
         dup "\r" = [
             peek-input "\n" = [ 1 consume-input drop ] when 
             drop sbuf>string

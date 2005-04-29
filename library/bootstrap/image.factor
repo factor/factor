@@ -194,7 +194,7 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : align-string ( n str -- )
-    tuck string-length - CHAR: \0 fill cat2 ;
+    tuck length - CHAR: \0 fill cat2 ;
 
 : emit-chars ( str -- )
     >list "big-endian" get [ reverse ] unless
@@ -203,7 +203,7 @@ M: cons ' ( c -- tagged )
 : (pack-string) ( n list -- )
     #! Emit bytes for a string, with n characters per word.
     [
-        2dup string-length > [ dupd align-string ] when
+        2dup length > [ dupd align-string ] when
         emit-chars
     ] each drop ;
 
@@ -213,7 +213,7 @@ M: cons ' ( c -- tagged )
 : emit-string ( string -- )
     object-tag here-as swap
     string-type >header emit
-    dup string-length emit-fixnum
+    dup length emit-fixnum
     dup hashcode emit-fixnum
     "\0" cat2 pack-string
     align-here ;

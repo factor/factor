@@ -2861,8 +2861,17 @@ Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 \end{tabular}
 
 \section{Streams}
+\glossary{name=stream,
+description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
+
+Input and output is centered around the concept of a \emph{stream}, which is a source or
+sink of characters.
 
 \subsection{Stream protocol}
+\glossary{name=input stream,
+description={a stream that implements the \texttt{stream-readln} and \texttt{stream-read} generic words and can be used for character input}}
+\glossary{name=output stream,
+description={a stream that implements the \texttt{stream-write-attr}, \texttt{stream-flush} and \texttt{stream-auto-flush} generic words and can be used for character output}}
 
 \subsection{Reading and writing files}
 
@@ -2871,6 +2880,12 @@ Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 \subsection{TCP/IP networking}
 
 \subsection{Formatted output}
+
+\subsection{Special streams}
+
+null stream
+duplex stream
+string output stream
 
 \subsection{Printing objects}
 

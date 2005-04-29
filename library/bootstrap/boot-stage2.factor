@@ -37,6 +37,7 @@ t [
     "/library/inference/types.factor"
 
     "/library/compiler/assembler.factor"
+    "/library/compiler/relocate.factor"
     "/library/compiler/xt.factor"
     "/library/compiler/optimizer.factor"
     "/library/compiler/linearizer.factor"

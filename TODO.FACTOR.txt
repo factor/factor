@@ -1,21 +1,21 @@
 0.74:
 
+- trailing newlines in read-line output value
+- local structs are 4 times larger than they should be
+- ppc ffi relocation
 - faster layout
 - faster repaint
-- linux? bsd? words
 - forgotten words not removed from cross-reference
 - get all-tests to run with -no-compile
-- review errno
+- freebsd 4 -pthread errno
 - mac os x ffi
-- linux i/o
 - implement fcopy
-- fix httpd
-- fix jedit plugin
 - if external factor is down, don't add tons of random shit to the dictionary
 - scalar * matrix, vector * matrix, matrix * vector need to work
 - turning vectors into row and column matrices
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
+- rotating cube demo
 
 + ui:
 
@@ -30,6 +30,7 @@
 
 + ffi:
 
+- clarify powerpc passing of value struct parameters
 - char* struct members
 - box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole

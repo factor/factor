@@ -3,13 +3,19 @@
 IN: strings USING: generic kernel kernel-internals lists math
 sequences ;
 
+! Strings
 BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
+UNION: text string integer ;
+
 M: string = string= ;
 
 BUILTIN: sbuf 13 ;
-UNION: text string integer ;
 
 M: string nth string-nth ;
+
+: string> ( str1 str2 -- ? )
+    ! Returns if the first string lexicographically follows str2
+    string-compare 0 > ;
 
 : length< ( seq seq -- ? )
     #! Compare sequence lengths.
@@ -33,10 +39,6 @@ M: string nth string-nth ;
 
 : string-contains? ( substr str -- ? )
     swap index-of -1 = not ;
-
-: string> ( str1 str2 -- ? )
-    ! Returns if the first string lexicographically follows str2
-    string-compare 0 > ;
 
 : string-head ( index str -- str )
     #! Returns a new string, from the beginning of the string
@@ -95,6 +97,7 @@ M: string nth string-nth ;
         rot string-head swap
     ] ifte ;
 
+! Characters
 PREDICATE: integer blank     " \t\n\r" string-contains? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
@@ -113,5 +116,3 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     over LETTER? or
     over digit? or
     swap "/_?." string-contains? or ;
-
-: string-length ( deprecated ) length ;
