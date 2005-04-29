@@ -8,6 +8,8 @@
 \usepackage{times}
 \usepackage{tabularx}
 \usepackage{epsfig}
+\usepackage{amssymb}
+\usepackage{epstopdf}
 
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
@@ -34,6 +36,8 @@
 
 \newcommand{\genericword}[3]{\index{#1}
 \emph{Generic word:} \texttt{#2} &&\texttt{IN: #3}}
+
+\newcommand{\predword}[2]{\ordinaryword{#1}{#1~( object -- ?~)}{#2}}
 
 \setlength{\tabcolsep}{1mm}
 
@@ -99,7 +103,7 @@ Ordinary words are presented in the following notation.
 }
 A compound definition in the library, or primitive in the runtime.
 \wordtable{
-\symbolword{word}{word}{foo}
+\symbolword{word}{foo}
 }
 A symbol definition.
 \wordtable{
@@ -179,9 +183,9 @@ description={a whitespace-delimited piece of text, the primary unit of Factor sy
 description={a space (ASCII 32), newline (ASCII 10) or carriage-return (ASCII 13)}}
 
 \begin{figure}
-\begin{center}
 \caption{Parser algorithm}
-\scalebox{0.45}{\epsfig{file=parser.eps}}
+\begin{center}
+\scalebox{0.40}{\epsfig{file=parser.eps}}
 \end{center}
 \end{figure}
 
@@ -281,7 +285,7 @@ description={an instance of the \texttt{number} class}}}
 
 If a vocabulary lookup of a token fails, the parser attempts to parse it as a number.
 
-\subsubsection{Integers}
+\subsubsection{\label{integer-literals}Integers}
 
 \newcommand{\integerglos}{\glossary{
 name=integer,
@@ -317,6 +321,8 @@ Integers are entered in base 10 unless prefixed with a base change parsing word.
 \textbf{7471857118}
 \end{alltt}
 
+More information on integers can be found in \ref{integers}.
+
 \subsubsection{Ratios}
 
 \newcommand{\ratioglos}{\glossary{
@@ -332,6 +338,8 @@ of the two terms is 1.
 1/10
 -5/-6
 \end{alltt}
+
+More information on ratios can be found in \ref{ratios}.
 
 \subsubsection{Floats}
 
@@ -349,14 +357,16 @@ an optional sign prefix on either the significand or exponent.
 1e-5
 \end{alltt}
 
-\subsubsection{Complex numbers}
+More information on floats can be found in \ref{floats}.
+
+\subsubsection{\label{complex-literals}Complex numbers}
 
 \newcommand{\complexglos}{\glossary{
 name=complex,
 description={an instance of the \texttt{complex} class, representing a complex number with real and imaginary components, where both components are real numbers}}}
 \complexglos
 \wordtable{
-\parsingword{hash-curly}{\#\{ \emph{real} \emph{imaginary} \}\#}{syntax}
+\parsingword{hash-curly}{\#\tto \emph{real} \emph{imaginary} \ttc\#}{syntax}
 }
 A complex number
 is given by two components, a ``real'' part and ''imaginary'' part. The components
@@ -365,6 +375,8 @@ must either be integers, ratios or floats.
 #{ 1/2 1/3 }#   ! the complex number 1/2+1/3i
 #{ 0 1 }#       ! the imaginary unit
 \end{verbatim}
+
+More information on complex numbers can be found in \ref{complex-numbers}.
 
 \subsection{Literals}
 
@@ -567,10 +579,10 @@ name=vector,
 description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in a contiguous range of memory}}}
 \vectorglos
 \wordtable{
-\parsingword{opencurly}{\{}{syntax}\\
-\parsingword{closecurly}{\}}{syntax}
+\parsingword{opencurly}{\tto}{syntax}\\
+\parsingword{closecurly}{\ttc}{syntax}
 }
-Parses a vector, whose elements are read between \texttt{\{} and \texttt{\}}.
+Parses a vector, whose elements are read between \texttt{\tto} and \texttt{\ttc}.
 \begin{verbatim}
 { 3 "blind" "mice" }
 \end{verbatim}
@@ -581,10 +593,10 @@ name=hashtable,
 description={an instance of the \texttt{hashtable} class, providing a mutable mapping of keys to values}}}
 \hashglos
 \wordtable{
-\parsingword{openccurly}{\{\{}{syntax}\\
-\parsingword{closeccurly}{\}\}}{syntax}
+\parsingword{openccurly}{\tto\tto}{syntax}\\
+\parsingword{closeccurly}{\ttc\ttc}{syntax}
 }
-Parses a hashtable. Elements between \texttt{\{\{} and \texttt{\}\}} must be cons cells, where the car is the key and the cdr is a value.
+Parses a hashtable. Elements between \texttt{\tto\tto} and \texttt{\ttc\ttc} must be cons cells, where the car is the key and the cdr is a value.
 \begin{verbatim}
 {{
     [[ "red" [ 255 0 0 ] ]]
@@ -700,8 +712,8 @@ name=interpreter,
 description=executes quotations by iterating them and recursing into nested definitions. see compiler}
 
 \begin{figure}
-\begin{center}
 \caption{Interpreter algorithm}
+\begin{center}
 \scalebox{0.45}{\epsfig{file=interpreter.eps}}
 \end{center}
 \end{figure}
@@ -924,6 +936,7 @@ The difference between \texttt{callcc0} and \texttt{callcc1} lies in the continu
 description=an object representing an exceptional situation that has been detected}
 
 Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a pair of words, \texttt{throw} and \texttt{catch}.
+
 \wordtable{
 \ordinaryword{throw}{throw ( exception -- )}{errors}
 }
@@ -944,7 +957,7 @@ If the \texttt{try} quotation completes successfully, the stacks are \emph{not} 
 
 A common idiom is that the \texttt{catch} block cleans up from the error in some fashion, then passes it on to the next-innermost catch block. The following word is used for this purpose.
 \wordtable{
-\ordinaryword{rethrow}{throw ( exception -- )}{errors}
+\ordinaryword{rethrow}{rethrow ( exception -- )}{errors}
 }
 Raises an exception, without saving the current stacks for post-mortem inspection. This is done so that inspecting the error stacks sheds light on the original cause of the exception, rather than the point where it was rethrown.
 
@@ -956,6 +969,26 @@ Here is a simple example of a word definition that attempts to convert a string 
 Exception handling is implemented using a \emph{catch stack}. The \texttt{catch} word pushes the current continuation on the catch stack, and \texttt{throw} calls the continuation at the top of the catch stack with the raised exception.
 \glossary{name=catch stack,
 description={a stack of exception handler continuations, pushed and popped by \texttt{catch}}}
+
+\begin{figure}
+\caption{Exception handling example}
+The following diagram illustrates the nesting of exception handlers on the catch stack immediately before the call to \texttt{throw} in \texttt{foe}.
+\begin{verbatim}
+: foe
+    [
+        "Fatal error -- hard disk on fire!" throw
+    ] [
+        "foe's catch block" print rethrow
+    ] catch ;
+
+: fie [ foe ] [ "fie's catch block" print rethrow ] catch ;
+: flap [ fie ] [ [ "Exception: " write . ] when* ] catch ;
+\end{verbatim}
+
+\begin{center}
+\scalebox{0.5}{\epsfig{file=catchstack.eps}}
+\end{center}
+\end{figure}
 
 \subsubsection{Multitasking}
 
@@ -1011,6 +1044,9 @@ Save and restore the catch stack, used for exception handling. See \ref{exceptio
 description=a word that adds definitions to the dictionary}
 \glossary{name=dictionary,
 description=the collection of vocabularies making up the code in the Factor image}
+\wordtable{
+\classword{word}{words}
+}
 Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. Words hold two distinct pieces of information:
 \begin{itemize}
 \item A definition, specifying the behavior of the word when executed,
@@ -1020,16 +1056,12 @@ Words are the fundamental unit of code in Factor, analogous to functions or proc
 \ordinaryword{word?}{word?~( object -- ?~)}{words}
 }
 Tests if the \texttt{object} is a word.
-\wordtable{
-\classword{word}{words}
-}
-The class of words.
 
 \subsection{Vocabularies}
 \wordtable{
 \symbolword{vocabularies}{words}
 }
-Words are organized into named vocabularies, stored in the global \texttt{vocabularies} variable.
+Words are organized into named vocabularies, stored in the global \texttt{vocabularies} variable (\ref{namespaces}).
 \wordtable{
 \parsingword{IN:}{IN:~\emph{vocabulary}}{syntax}
 }
@@ -1261,8 +1293,6 @@ Updates a word's execution token according to its primitive number. When called 
 \ordinaryword{recrossref}{recrossref ( word -- )}{words}
 }
 Updates the cross-referencing database, which you will probably need to do if you mess around with any of the words in this section -- assuming Factor does not crash first, that is.
-
-\chapter{The library}
 
 \section{Objects}
 
@@ -1558,6 +1588,8 @@ Factor uses delegation is used instead of inheritance, but it is not a direct
 substitute; in particular, the semantics differ in that a delegated
 method call receives the delegate on the stack, not the original object.
 
+\chapter{The library}
+
 \section{Sequences}
 
 \glossary{name=sequence,
@@ -1569,7 +1601,7 @@ A sequence is a linearly-ordered collection of objects. A set of built-in sequen
 \hline
 Class&Mutable&Growable&Lookup&at start&at end&Primary purpose\\
 \hline
-\texttt{array}&$\surd$&&$O(1)$&&&Low-level and unsafe (\ref{unsafe})\\
+%\texttt{array}&$\surd$&&$O(1)$&&&Low-level and unsafe\\
 \texttt{list}&&&$O(n)$&$O(1)$&$O(n)$&Functional manipulation\\
 \texttt{vector}&$\surd$&$\surd$&$O(1)$&$O(n)$&$O(1)$&Imperitive aggregation\\
 \texttt{sbuf}&$\surd$&$\surd$&$O(1)$&$O(n)$&$O(1)$&Character accumilation\\
@@ -1687,10 +1719,10 @@ Adds and removes an element at the end of the sequence. The sequence's length is
 \subsection{Sequence combinators}
 
 \wordtable{
-\ordinaryword{change-nth}{change-nth ( seq i quot -- )}{sequences}\\
+\ordinaryword{change-nth}{change-nth ( seq n quot -- )}{sequences}\\
 \texttt{quot:~element -- element}
 }
-Applies the quotation to the \texttt{i}th element of the sequence, and store the \texttt{i}th element to the output. This modifies \texttt{seq} and so throws an exception if it is immutable.
+Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
 \wordtable{
 \ordinaryword{seq-each}{seq-each ( seq quot -- )}{sequences}\\
 \texttt{quot:~element --}
@@ -1838,9 +1870,9 @@ The following example demonstrates the construction of lists as chains of cons c
 \end{alltt}
 
 \begin{figure}
-\begin{center}
 \caption{Cons cells making up the list \texttt{[ 1 2 3 ]}}
-\scalebox{0.5}{\epsfig{file=cons.ps}}
+\begin{center}
+\scalebox{0.5}{\epsfig{file=cons.eps}}
 \end{center}
 \end{figure}
 
@@ -1850,7 +1882,9 @@ List operations are typically implemented in a recursive fashion, where the cdr 
 \classword{general-list}{lists}\\
 \classword{list}{lists}
 }
-A \emph{general list} is either the empty list or a cons cell. A \emph{list} is either the empty list or a cons cell whose cdr is also a list. A list is sometimes also known as a \emph{proper list}, and a general list that is not a proper list is known as a \texttt{improper list}. Not all list operations will function given an improper list,
+A \emph{general list} is either the empty list or a cons cell. A \emph{list} is either the empty list or a cons cell whose cdr is also a list. A list is sometimes also known as a \emph{proper list}, and a general list that is not a proper list is known as a \emph{improper list}.
+
+Not all list operations will function given an improper list,
 however methods are usually defined on \texttt{general-list} not \texttt{list} since dispatching on \texttt{list} involves a costly check.
 
 \subsubsection{List operations}
@@ -1858,7 +1892,7 @@ however methods are usually defined on \texttt{general-list} not \texttt{list} s
 \wordtable{
 \ordinaryword{>list}{>list ( sequence -- list )}{lists}
 }
-Turn an arbitrary sequence into a list.
+Converts an arbitrary sequence into a list.
 \wordtable{
 \ordinaryword{list?}{list?~( obj -- ?~)}{lists}
 }
@@ -2029,7 +2063,7 @@ Tests if the object at the top of the stack is a string.
 \wordtable{
 \ordinaryword{string-compare}{string-compare~( s1 s2 -- n )}{strings}
 }
-Compare two strings lexicographically (dictionary order). The output value is one of the following:
+Compares two strings lexicographically (dictionary order). The output value is one of the following:
 \begin{description}
 \item[Positive] indicating that \texttt{s1} follows \texttt{s2}
 \item[Zero] indicating that \texttt{s1} is equal to \texttt{s2}
@@ -2054,7 +2088,7 @@ Creates a string with \texttt{char} repeated $n$ times.
 \wordtable{
 \ordinaryword{pad}{pad~( string n char -- string )}{strings}
 }
-Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l$ is greater than $n$, the empty string is output.
+Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l>n$, the empty string is output.
 
 \subsubsection{Substring testing}
 
@@ -2075,7 +2109,7 @@ Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If \texttt{
 }
 Outputs a pair of strings that equal the original string when concatenated. The first string has length $n$, the second has length $l-n$ where $l$ is the length of the input.
 \begin{alltt}
-\textbf{ok} "Hello world" 5 string .s
+\textbf{ok} "Hello world" 5 string/ .s
 \textbf{" world"
 "Hello"}
 \end{alltt}
@@ -2093,7 +2127,7 @@ Outputs a pair of strings that equal the original string, excluding the $n$th el
 \ordinaryword{?string-head}{?string-head~( s1 s2 -- string ?~)}{strings}\\
 \ordinaryword{?string-tail}{?string-tail~( s1 s2 -- string ?~)}{strings}
 }
-Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}/
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
 \wordtable{
 \ordinaryword{split1}{split1~( str split -- before after )}{strings}
 }
@@ -2116,7 +2150,7 @@ Splits the string into groups of \texttt{n} characters and collects them in a li
 \wordtable{
 \ordinaryword{ch>string}{ch>string ( n -- string )}{strings}
 }
-Turns an integer representing a character value into a single-element string.
+Converts an integer representing a character value into a single-element string.
 \wordtable{
 \ordinaryword{blank?}{blank?~( n -- ?~)}{strings}\\
 \ordinaryword{letter?}{letter?~( n -- ?~)}{strings}\\
@@ -2142,7 +2176,7 @@ Tests if the object at the top of the stack is a string buffer.
 \wordtable{
 \ordinaryword{>sbuf}{>sbuf~( sequence -- sbuf )}{strings}
 }
-Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy
+Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy.
 \wordtable{
 \ordinaryword{sbuf>string}{sbuf>string~( sbuf -- string )}{strings}
 }
@@ -2162,7 +2196,7 @@ description={a variable binding policy where bindings established in a scope are
 \ordinaryword{make-sbuf}{make-sbuf ( quot -- string )}{namespaces}\\
 \ordinaryword{make-vector}{make-vector ( quot -- vector )}{namespaces}
 }
-Calls the quotation in a new \texttt{dynamic scope}. The quotation and any words it calls can execute the \texttt{,} and \texttt{\%} words to add elements at the end of the sequence being constructed.
+Calls the quotation in a new \emph{dynamic scope}. The quotation and any words it calls can execute the \texttt{,} and \texttt{\%} words to add elements at the end of the sequence being constructed.
 \wordtable{
 \ordinaryword{,}{,~( element -- )}{namespaces}
 }
@@ -2179,6 +2213,13 @@ Adds the element wrapped inside a one-element list, then adds the \texttt{car} w
 \ordinaryword{\%}{\% ( sequence -- )}{namespaces}
 }
 Appends the subsequence to the end of the sequence being constructed.
+
+Here is an example of sequence construction:
+\begin{alltt}
+\textbf{ok} : silly [ [ dup , ] repeat ] make-vector , ;
+\textbf{ok} [ 4 [ dup silly ] repeat ] make-list .
+[ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]
+\end{alltt}
 
 Note that the sequence construction combinators will capture any variables set inside the quotation, due to the dynamic scoping behavior. These combinators are actually implemented using variables. See \ref{namespaces}.
 
@@ -2214,7 +2255,7 @@ Tests if the object at the top of the stack is a proper list whose every element
 \ordinaryword{assoc}{assoc ( k alist -- v )}{lists}\\
 \ordinaryword{assoc*}{assoc* ( k alist -- [[ k v ]] )}{lists}
 }
-These words look up a key in an association list, comparing keys in the list with the given key by equality with \texttt{=}. The list is searched starting from the beginning. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{assoc*} word allows a distinction to be made between a missing value and a value equal to \texttt{f}, since in the case of a missing value it outputs \texttt{f}.
+These words look up a key in an association list, comparing keys in the list with the given key by equality with \texttt{=}. The list is searched starting from the beginning. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{assoc*} word allows a distinction to be made between a missing value.
 \wordtable{
 \ordinaryword{assq}{assq ( k alist -- v )}{lists}\\
 \ordinaryword{assq*}{assq* ( k alist -- [[ k v ]] )}{lists}
@@ -2274,35 +2315,251 @@ Deconstructs paired lists.
 
 \subsection{Hashtables}
 
+\hashglos
+\glossary{name=bucket,
+description={a container for key/value pairs inside a hashtable. A hash function assigns each key to a bucket, with the goal of spreading the keys as evenly as possible}}
+\glossary{name=hashcode,
+description={an integer chosen so that equal objects have equal hashcodes, and unequal objects'  hashcodes are distributed as evently as possible}}
 \wordtable{
 \classword{hashtable}{hashtables}
 }
+A hashtable sorts key/value pairs into buckets using a hashing function. The number of buckets is chosen to be approximately equal to the number of key/value pairs in the hashtable, so assuming a good hash function that distributes keys evenly, lookups can be performed in constant time, with a quick hash calculation to determine a bucket, followed by testing of only one or two key/value pairs.
+\wordtable{
+\genericword{hashcode}{hashcode~( object -- n )}{kernel}
+}
+Outputs the hashcode of the object. The contract of this generic word is as follows:
+\begin{itemize}
+\item The hashcode must be a fixnum\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.}
+\item If two objects are equal under \texttt{=}, they must have the same hashcode.
+\end{itemize}
+If mutable objects are used as hashtable keys, they must not be mutated. Doing so will violate bucket sorting invariants and result in undefined behavior.
 
+\wordtable{
+\ordinaryword{hashtable?}{hashtable?~( object -- ?~)}{hashtables}
+}
+Tests if the object at the top of the stack is a hashtable.
+\wordtable{
+\ordinaryword{<hashtable>}{<hashtable>~( n -- hash )}{hashtables}
+}
+Creates a new empty hashtable with \texttt{n} buckets. As more elements are added to the hashtable, the number of buckets is automatically increased and the keys are re-sorted.
+\wordtable{
+\ordinaryword{hash}{hash ( k hash -- v )}{hashtables}\\
+\ordinaryword{hash*}{hash* ( k hash -- [[ k v ]] )}{hashtables}
+}
+Looks up the value associated with a key. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{hash*} word allows a distinction to be made between a missing value and a value equal to \texttt{f}.
+\wordtable{
+\ordinaryword{set-hash}{hash ( v k hash -- )}{hashtables}
+}
+Stores a hashtable entry associating \texttt{k} with \texttt{v}.
+\wordtable{
+\ordinaryword{remove-hash}{remove-hash ( k hash -- )}{hashtables}
+}
+Removes the entry, if any, associated with the key \texttt{k}.
+\wordtable{
+\ordinaryword{hash-clear}{hash-clear ( hash -- )}{hashtables}
+}
+Removes all entries from the hashtable.
+\wordtable{
+\ordinaryword{hash-size}{hash-size ( hash -- n )}{hashtables}
+}
+Outputs the number of key/value pairs in the hashtable.
+\wordtable{
+\ordinaryword{bucket-count}{bucket-count ( hash -- n )}{hashtables}
+}
+Outputs the number of buckets in the hashtable. Ideally, this will be approximately equal to, or greater than \texttt{hash-size}.
 
-\subsection{\label{namespaces}Namespaces}
+\wordtable{
+\ordinaryword{hash-each}{hash-each ( hash quot -- )}{hashtables}\\
+\texttt{quot:~[[ key value ]] --}
+}
+Applies the quotation to each key/value pair in the hashtable.
+
+\subsubsection{Converting between mappings}
+
+\wordtable{
+\ordinaryword{alist>hash}{alist>hash ( assoc -- hash )}{hashtables}
+}
+Creates a hashtable with the same key/value pairs as the association list. If the association list contains duplicate keys, latter keys take precedence; this behavior is the opposite of the \texttt{assoc} word, where prior keys take precedence.
+\wordtable{
+\ordinaryword{hash>alist}{hash>alist ( hash -- assoc )}{hashtables}
+}
+Creates an association list with the same key/valie pairs as the hashtable.
+\wordtable{
+\ordinaryword{hash-keys}{hash-keys ( hash -- list )}{hashtables}\\
+\ordinaryword{hash-values}{hash-values ( hash -- list )}{hashtables}
+}
+Builds lists of keys and values stored in the hashtable.
+\wordtable{
+\ordinaryword{buckets>list}{buckets>list ( hash -- list )}{hashtables}
+}
+Outputs a list of association lists, where each association list contains the key/value pairs in a certain bucket. Useful for debugging hashcode distribution.
+
+\subsubsection{Hashtable construction}
+
+A facility analogous to sequence construction (\ref{make-seq}) exists for hashtables.
+
+\wordtable{
+\ordinaryword{make-hash}{make-hash ( quot -- hash )}{hashtables}
+}
+Calls the quotation in a new dynamic scope. The quotation and any words it calls can execute the \texttt{hash,} word to add key/value pairs to the hashtable being constructed.
+\wordtable{
+\ordinaryword{hash,}{hash,~( value key -- )}{hashtables}
+}
+Adds a key/value pair to the hashtable currently being constructed.
+
+As with sequence construction, care must be taken to mind the effects of dynamic scoping on variable assignment performed by the quotation. Details are in \ref{namespaces}.
+
+\subsection{\label{namespaces}Variables and namespaces}
+
+A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed \emph{namespaces}. Nesting of scopes is implemented with a search order on namespaces, defined by a \emph{name stack}. Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (\ref{symbols}). 
+
+The \texttt{get} and \texttt{set} words read and write variable values. The \texttt{get} word searches up the chain of nested namespaces, while \texttt{set} always sets variable values in the current namespace only. Namespaces are dynamically scoped; when a quotation is called from a nested scope, any words called by the quotation also execute in that scope.
+
+\glossary{name=name stack,
+description={a stack holding namespaces. Entering a dynamic scope pushes the name stack, leaving a scope pops it}}
+\glossary{name=namespace,
+description={a hashtable pushed on the name stack and used as a set of variable bindings}}
+\glossary{name=current namespace,
+description={the namespace at the top of the name stack}}
+\wordtable{
+\ordinaryword{get}{get ( variable -- value )}{namespaces}
+}
+Searches the name stack for a namespace containing \texttt{variable}, and outputs the value. If no such namespace is found, outputs \texttt{f}.
+\wordtable{
+\ordinaryword{set}{set ( value variable -- )}{namespaces}
+}
+Sets the value of \texttt{variable} to \texttt{value} in the current namespace at the top of the name stack.
+\wordtable{
+\ordinaryword{on}{on ( variable -- )}{namespaces}\\
+\ordinaryword{off}{off ( variable -- )}{namespaces}
+}
+Sets the value of \texttt{variable} to \texttt{t} and \texttt{f} respectively, implemented as follows:
+\begin{verbatim}
+: on ( variable -- ) t swap set ;
+: off ( variable -- ) f swap set ;
+\end{verbatim}
+\wordtable{
+\ordinaryword{change}{change ( variable quot -- )}{namespaces}\\
+\texttt{quot:~old -- new}
+}
+Applies the quotation to the current variable value, and stores the return value of the quotation back in the variable.
+\begin{figure}
+\caption{Dynamic scope example}
+The following diagram shows the nesting of scopes resulting inside the \texttt{inner} word call resulting from executing \texttt{outer}.
+\begin{verbatim}
+SYMBOL: rand
+SYMBOL: rator
+SYMBOL: gator
+
+: inner ( -- )
+    rand get gator get * rator set ;
+: middle ( -- )
+    5 rator set [ inner ] with-scope rator get ;
+: outer ( -- )
+    2 gator set
+    3 rand set
+    [ 4 rand set middle ] with-scope ;
+
+outer
+\end{verbatim}
+\begin{center}
+\scalebox{0.5}{\epsfig{file=namestack.eps}}
+\end{center}
+\end{figure}
+\wordtable{
+\ordinaryword{with-scope}{with-scope ( quot -- )}{namespaces}
+}
+Calls the quotation in a new dynamic scope. Any variables set by the quotation are discarded when it returns.
+\wordtable{
+\ordinaryword{<namespace>}{<namespace> ( -- ns )}{namespaces}
+}
+Creates a hashtable with a certain default size.
+\wordtable{
+\ordinaryword{bind}{bind ( ns quot -- )}{namespaces}\\
+\ordinaryword{extend}{extend ( ns quot -- namespace )}{namespaces}
+}
+Calls the quotation in the dynamic scope of \texttt{ns}. When variables are looked up by the quotation, \texttt{ns} is checked first, and setting variables in the quotation stores them in \texttt{ns}. The \texttt{extend} word places the namespace back on the data stack when the quotation returns.
+\wordtable{
+\ordinaryword{namespace}{namespace ( -- ns )}{namespaces}
+}
+Outputs the current namespace.
+Sets the value of \texttt{variable} to \texttt{t} and \texttt{f}, respectively.
+\wordtable{
+\ordinaryword{global}{global ( -- ns )}{namespaces}
+}
+Outputs the global namespace. Most often this is used as a parameter to \texttt{bind}. For example, a global variable is set as follows:
+\begin{verbatim}
+SYMBOL: the-boss
+global [ "Mr. Lahey" the-boss set ] bind
+\end{verbatim}
+\wordtable{
+\ordinaryword{nest}{nest ( variable -- ns )}{namespaces}
+}
+If the variable is set in the current namespace, outputs its value. Otherwise sets its value to a new namespace and output that.
 
 \section{Mathematics}
 
 \numberglos
 
 \begin{figure}
-\begin{center}
 \caption{Numerical class hierarchy}
-\scalebox{0.5}{\epsfig{file=number.ps}}
+\begin{center}
+\scalebox{0.5}{\epsfig{file=number.eps}}
 \end{center}
 \end{figure}
 
-Factor's numbers more closely model the mathematical concept of a number than other languages. Where possible, exact answers are given -- for example, adding or multiplying two integers never results in overflow, and dividing two integers yields a fraction rather than a truncated result. Complex numbers are supported, allowing many functions to be computed with parameters that would raise errors or return ``not a number'' in other languages.
+Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact fraction rather than a floating point approximation. Floating point numbers are also supported, along with complex numbers.
 
-\subsection{Integers}
+\subsection{Number protocol}
+
+The following usual operations are supported by all numbers.
+
+\wordtable{
+\ordinaryword{+}{+ ( n n -- n )}{math}\\
+\ordinaryword{-}{- ( n n -- n )}{math}\\
+\ordinaryword{*}{* ( n n -- n )}{math}\\
+\ordinaryword{/}{/ ( n n -- n )}{math}
+}
+The non-commutative operations \texttt{-} and \texttt{/} take operands from the stack in the natural order; \texttt{6 2 /} divides 6 by 2.
+
+\wordtable{
+\ordinaryword{/i}{/i ( n n -- integer )}{math}\\
+\ordinaryword{/f}{/f ( n n -- float )}{math}
+}
+The \texttt{/} word gives an exact answer where possible. These two words output the answer in other forms. The \texttt{/i} word truncates the result towards zero, and \texttt{/f} converts it to a floating point approximation.
+\wordtable{
+\ordinaryword{\^}{\^{} ( x y -- z )}{math}
+}
+Raises \texttt{x} to the power of \texttt{y}. If \texttt{y} is an integer the answer is computed exactly, otherwise a floating point approximation is used.
+
+The following ordering operations are supported on real numbers only.
+
+\wordtable{
+\ordinaryword{<}{< ( n n -- ?~)}{math}\\
+\ordinaryword{<=}{<= ( n n -- ?~)}{math}\\
+\ordinaryword{>}{> ( n n -- ?~)}{math}\\
+\ordinaryword{>=}{>= ( n n -- ?~)}{math}
+}
+
+\subsection{\label{integers}Integers}
 
 \integerglos
 
-The simplest type of number is the integer. Integers come in two varieties -- \emph{fixnums} and \emph{bignums}. As their names suggest, a fixnum is a fixed-width quantity\footnote{Fixnums range in size from $-2^{w-3}-1$ to $2^{w-3}$, where $w$ is the word size of your processor (for example, 32 bits). Because fixnums automatically grow to bignums, usually you do not have to worry about details like this.}, and is a bit quicker to manipulate than an arbitrary-precision bignum.
+\wordtable{
+\classword{integer}{math}\\
+\classword{fixnum}{math}\\
+\classword{bignum}{math}
+}
+The simplest type of number is the integer. Integers come in two varieties -- \emph{fixnums} and \emph{bignums}. As their names suggest, a fixnum is a fixed-width quantity\footnote{On 32-bit systems, an element of the interval $(-2^{-29},2^{29}]$, and on 64-bit systems, the interval $(-2^{-61},2^{61}]$. Because fixnums automatically grow to bignums, usually you do not have to worry about details like this.}, and is a bit quicker to manipulate than an arbitrary-precision bignum.
 
+\wordtable{
+\predword{integer?}{math}\\
+\predword{fixnum?}{math}\\
+\predword{bignum?}{math}
+}
 The predicate word \texttt{integer?}~tests if the top of the stack is an integer. If this returns true, then exactly one of \texttt{fixnum?}~or \texttt{bignum?}~would return true for that object. Usually, your code does not have to worry if it is dealing with fixnums or bignums.
 
-Unlike some languages where the programmer has to declare storage size explicitly and worry about overflow, integer operations automatically return bignums if the result would be too big to fit in a fixnum. Here is an example where multiplying two fixnums returns a bignum:
+Integer operations automatically return bignums if the result would be too big to fit in a fixnum. Here is an example where multiplying two fixnums returns a bignum:
 
 \begin{alltt}
 \textbf{ok} 134217728 fixnum? .
@@ -2315,27 +2572,110 @@ Unlike some languages where the programmer has to declare storage size explicitl
 \textbf{t}
 \end{alltt}
 
-Integers can be entered using a different base. By default, all number entry is in base 10, however this can be changed by prefixing integer literals with one of the parsing words \texttt{BIN:}, \texttt{OCT:}, or \texttt{HEX:}. For example:
+Integers can be entered using a different base; see \ref{integer-literals}.
 
+The word \texttt{.} prints numbers in decimal, regardless of how they were input. A set of words in the \texttt{prettyprint} vocabulary is provided to print integers using another base.
+
+\wordtable{
+\ordinaryword{.h}{.h ( n -- )}{prettyprint}\\
+\ordinaryword{.o}{.o ( n -- )}{prettyprint}\\
+\ordinaryword{.b}{.b ( n -- )}{prettyprint}
+}
+Prints an integer in hexadecimal, octal or binary.
+
+\subsubsection{Modular arithmetic}
+
+\wordtable{
+\ordinaryword{mod}{mod ( x y -- r )}{math}
+}
+Computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0, then \texttt{x} is a multiple of \texttt{y}.
 \begin{alltt}
-\textbf{ok} BIN: 1110 BIN: 1 + .
-\textbf{15}
-\textbf{ok} HEX: deadbeef 2 * .
-\textbf{7471857118}
+\textbf{ok} 100 3 mod .
+\textbf{1}
+\textbf{ok} -546 34 mod .
+\textbf{-2}
+\end{alltt}
+\wordtable{
+\ordinaryword{rem}{rem ( x y -- r )}{math}
+}
+This is the same as \texttt{mod} except the answer is always positive.
+\begin{alltt}
+\textbf{ok} -546 34 rem .
+\textbf{32}
 \end{alltt}
 
-The word \texttt{.} prints numbers in decimal, regardless of how they were input. A set of words in the \texttt{prettyprint} vocabulary is provided for print integers using another base.
+\wordtable{
+\ordinaryword{/mod}{/mod ( x y -- q r )}{math}
+}
+Computes both the quotient and remainder. That is, \texttt{/mod} could be defined as follows, except in practice it is slightly more efficient:
+\begin{verbatim}
+: /mod ( x y -- q r ) dup /i swap mod ;
+\end{verbatim}
+\wordtable{
+\ordinaryword{gcd}{gcd ( x y -- a c )}{math}
+}
+Applies the Euclidian algorithm to \texttt{x} and \texttt{y}. The output values satisfy the following property for some integer $b$:
+$$ax+by=c$$
+Furthermore, $c$ is the greatest integer having this property; that is, it is the greatest common divisor of $a$ and $b$.
+\wordtable{
+\ordinaryword{mod-inv}{gcd ( x n -- y )}{math}
+}
+Computes a value \texttt{y} that satisfies the following property:
+$$xy \equiv 1 \bmod{n}$$ An exception is thrown if no such \texttt{y} exists.
+\wordtable{
+\ordinaryword{\^{}mod}{\^{}mod ( x y n -- z )}{math}
+}
+Raises \texttt{x} to the power of \texttt{y}, modulo \texttt{n}. This is far more efficient than first calling \texttt{\^{}} followed by \texttt{mod}.
 
+\subsubsection{\label{bitwise}Bitwise operations}
+
+There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation motivates \emph{bitwise operations}.
+\wordtable{
+\ordinaryword{bitand}{bitand ( x y -- z )}{math}
+}
+Outputs a new integer where each bit is set if and only if the corresponding bit is set in both $x$ and $y$.
 \begin{alltt}
-\textbf{ok} 1234 .h
-\textbf{4d2}
-\textbf{ok} 1234 .o
-\textbf{2232}
-\textbf{ok} 1234 .b
-\textbf{10011010010}
+BIN: 101 BIN: 10 bitand .b
+\emph{0}
+BIN: 110 BIN: 10 bitand .b
+\emph{10}
+\end{alltt}
+\wordtable{
+\ordinaryword{bitor}{bitor ( x y -- z )}{math}
+}
+Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of $x$ or $y$.
+\begin{alltt}
+BIN: 101 BIN: 10 bitor .b
+\emph{111}
+BIN: 110 BIN: 10 bitor .b
+\emph{110}
+\end{alltt}
+\wordtable{
+\ordinaryword{bitxor}{bitxor ( x y -{}- x\^{}y )}{math}
+}
+Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of $x$ or $y$.
+\begin{alltt}
+BIN: 101 BIN: 10 bitxor .b
+\emph{111}
+BIN: 110 BIN: 10 bitxor .b
+\emph{100}
+\end{alltt}
+\wordtable{
+\ordinaryword{bitnot}{bitnot ( x -{}- y )}{math}
+}
+Computes the bitwise complement of the input; that is, each bit in the input number is flipped. Because integers are represented in two's complement form, this is actually equivalent to negating the integer, and subtracting 1.
+\wordtable{
+\ordinaryword{shift}{shift ( x n -{}- y )}{math}
+}
+Computes a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
+\begin{alltt}
+BIN: 101 5 shift .b
+\emph{10100000}
+BIN: 11111 -2 shift .b
+\emph{111}
 \end{alltt}
 
-\subsection{Rational numbers}
+\subsection{\label{ratios}Rational numbers}
 
 \newcommand{\rationalglos}{\glossary{
 name=rational,
@@ -2344,30 +2684,35 @@ description={an instance of the \texttt{rational} class, which is a disjoint uni
 \rationalglos
 \ratioglos
 
+\wordtable{
+\classword{ratio}{math}
+}
 If we add, subtract or multiply any two integers, the result is always an integer. However, this is not the case with division. When dividing a numerator by a denominator where the numerator is not a integer multiple of the denominator, a ratio is returned instead.
-
 \begin{alltt}
 1210 11 / .
 \emph{110}
 100 330 / .
 \emph{10/33}
 \end{alltt}
+Ratios are printed and can be input literally in the form above. Ratios are always reduced to lowest terms by factoring out the greatest common divisor of the numerator and denominator. A ratio with a denominator of 1 becomes an integer. Trying to create a ratio with a denominator of 0 raises an error.
 
-Ratios are printed and can be input literally in the form of the second example. Ratios are always reduced to lowest terms by factoring out the greatest common divisor of the numerator and denominator. A ratio with a denominator of 1 becomes an integer. Trying to create a ratio with a denominator of 0 raises an error.
-
-The predicate word \texttt{ratio?}~tests if the top of the stack is a ratio. The predicate word \texttt{rational?}~returns true if and only if one of \texttt{integer?}~or \texttt{ratio?}~would return true for that object. So in Factor terms, a ``ratio'' is a rational number whose denominator is not equal to 1.
-
-Ratios behave just like any other number -- all numerical operations work as expected, and in fact they use the formulas for adding, subtracting and multiplying fractions that you learned in high school.
-
+Ratios behave just like any other number -- all numerical operations work as expected.
 \begin{alltt}
 \textbf{ok} 1/2 1/3 + .
 \textbf{5/6}
 \textbf{ok} 100 6 / 3 * .
 \textbf{50}
 \end{alltt}
-
-Ratios can be deconstructed into their numerator and denominator components using the \texttt{numerator} and \texttt{denominator} words. The numerator and denominator are both integers, and furthermore the denominator is always positive. When applied to integers, the numerator is the integer itself, and the denominator is 1.
-
+\wordtable{
+\predword{ratio?}{math}
+}
+Tests if the top of the stack is a ratio.
+\wordtable{
+\ordinaryword{numerator}{numerator ( rational -- numerator )}{math}\\
+\ordinaryword{denominator}{denominator ( rational -- numerator )}{math}\\
+\predword{ratio?}{math}
+}
+Deconstructs rational numbers into their numerator and denominator. The denominator is always positive; for integers, it equals 1.
 \begin{alltt}
 \textbf{ok} 75/33 numerator .
 \textbf{25}
@@ -2377,8 +2722,11 @@ Ratios can be deconstructed into their numerator and denominator components usin
 \textbf{12}
 \end{alltt}
 
-\subsection{Floating point numbers}
+\subsection{\label{floats}Floating point numbers}
 
+\wordtable{
+\classword{float}{math}
+}
 \newcommand{\realglos}{\glossary{
 name=real,
 description={an instance of the \texttt{real} class, which is a disjoint union of the
@@ -2393,9 +2741,7 @@ Rational numbers represent \emph{exact} quantities. On the other hand, a floatin
 \textbf{1.73}
 \end{alltt}
 
-The predicate word \texttt{float?}~tests if the top of the stack is a floating point number. The predicate word \texttt{real?}~returns true if and only if one of \texttt{rational?}~or \texttt{float?}~would return true for that object.
-
-Floating point numbers are \emph{contagious} -- introducing a floating point number in a computation ensures the result is also floating point.
+Introducing a floating point number in a computation forces the result to be expressed in floating point.
 
 \begin{alltt}
 \textbf{ok} 5/4 1/2 + .
@@ -2404,186 +2750,143 @@ Floating point numbers are \emph{contagious} -- introducing a floating point num
 \textbf{1.75}
 \end{alltt}
 
-Apart from contaigion, there are two ways of obtaining a floating point result from a computation; the word \texttt{>float ( n -{}- f )} converts a rational number into its floating point approximation, and the word \texttt{/f ( x y -{}- x/y )} returns the floating point approximation of a quotient of two numbers.
+\wordtable{
+\predword{float?}{math}
+}
+Tests if the top of the stack is a floating point number.
+\wordtable{
+\ordinaryword{>float}{>float ( real -- float )}{math}
+}
+Turn any real number into a floating point approximation.
 
-\begin{alltt}
-\textbf{ok} 7 4 / >float .
-\textbf{1.75}
-\textbf{ok} 7 4 /f .
-\textbf{1.75}
-\end{alltt}
+\subsection{\label{complex-numbers}Complex numbers}
 
-Indeed, the word \texttt{/f} could be defined as follows:
+\wordtable{
+\classword{complex}{math}
+}
+Complex numbers arise as solutions to quadratic equations whose graph does not intersect the $x$ axis. Their literal syntax is covered in \ref{complex-literals}.
 
-\begin{alltt}
-: /f / >float ;
-\end{alltt}
+\wordtable{
+\predword{complex?}{math}
+}
+Tests if the top of the stack is a complex number. Note that unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero.
 
-However, the actual definition is slightly more efficient, since it computes the floating point result directly.
-
-\subsection{Complex numbers}
-
-Complex numbers arise as solutions to quadratic equations whose graph does not intersect the x axis. For example, the equation $x^2 + 1 = 0$ has no solution for real $x$, because there is no real number that is a square root of -1. However, in the field of complex numbers, this equation has a well-known solution:
-
-\begin{alltt}
-\textbf{ok} -1 sqrt .
-\textbf{\#\{ 0 1 \}}
-\end{alltt}
-
-The literal syntax for a complex number is \texttt{\#\{ re im \}}, where \texttt{re} is the real part and \texttt{im} is the imaginary part. For example, the literal \texttt{\#\{ 1/2 1/3 \}} corresponds to the complex number $1/2 + 1/3i$.
-
-The words \texttt{i} an \texttt{-i} push the literals \texttt{\#\{ 0 1 \}} and \texttt{\#\{ 0 -1 \}}, respectively.
-
-The predicate word \texttt{complex?} tests if the top of the stack is a complex number. Note that unlike math, where all real numbers are also complex numbers, Factor only considers a number to be a complex number if its imaginary part is non-zero.
-
-Complex numbers can be deconstructed into their real and imaginary components using the \texttt{real} and \texttt{imaginary} words. Both components can be pushed at once using the word \texttt{>rect ( z -{}- re im )}.
-
+\wordtable{
+\ordinaryword{real}{real ( n -- n )}{math}\\
+\ordinaryword{imaginary}{imaginary ( n -- n )}{math}
+}
+Deconstructs complex numbers into their real and imaginary components. The imaginary component of a real number is always zero.
 \begin{alltt}
 \textbf{ok} -1 sqrt real .
 \textbf{0}
 \textbf{ok} -1 sqrt imaginary .
 \textbf{1}
+\end{alltt}
+\wordtable{
+\ordinaryword{>rect}{>rect ( n -- re im )}{math}\\
+\ordinaryword{rect>}{rect> ( re im -- n )}{math}
+}
+Converts between complex numbers and pairs of real numbers representing them in rectangular form.
+\begin{alltt}
 \textbf{ok} -1 sqrt sqrt >rect .s
-\textbf{\{ 0.7071067811865476 0.7071067811865475 \}}
-\end{alltt}
-
-A complex number can be constructed from a real and imaginary component on the stack using the word \texttt{rect> ( re im -{}- z )}.
-
-\begin{alltt}
+\textbf{0.7071067811865475
+0.7071067811865476}
 \textbf{ok} 1/3 5 rect> .
-\textbf{\#\{ 1/3 5 \}}
+\textbf{\#\tto 1/3 5 \ttc\#}
 \end{alltt}
 
-Complex numbers are stored in \emph{rectangular form} as a real/imaginary component pair (this is where the names \texttt{>rect} and \texttt{rect>} come from). An alternative complex number representation is \emph{polar form}, consisting of an absolute value and argument. The absolute value and argument can be computed using the words \texttt{abs} and \texttt{arg}, and both can be pushed at once using \texttt{>polar ( z -{}- abs arg )}.
-
+\wordtable{
+\ordinaryword{>polar}{>polar ( n -- r theta )}{math}\\
+\ordinaryword{polar>}{polar> ( r theta -- n )}{math}
+}
+Converts between complex numbers and pairs of real numbers representing them in polar form. The polar form of a complex number consists of an absolute value and argument.
 \begin{alltt}
-\textbf{ok} 5.3 abs .
+\textbf{ok} \#\tto 4 5 \ttc >polar .s
+\textbf{0.8960553845713439
+6.403124237432849}
+\end{alltt}
+
+\wordtable{
+\ordinaryword{abs}{abs ( n -- r )}{math}\\
+\ordinaryword{arg}{arg ( n -- theta )}{math}
+}
+Computes the absolute value and argument individually.
+\begin{alltt}
+\textbf{ok} -5.3 abs .
 \textbf{5.3}
 \textbf{ok} i arg .
 \textbf{1.570796326794897}
-\textbf{ok} \#\{ 4 5 \} >polar .s
-\textbf{\{ 6.403124237432849 0.8960553845713439 \}}
 \end{alltt}
 
-A new complex number can be created from an absolute value and argument using \texttt{polar> ( abs arg -{}- z )}.
+\subsection{Algebraic and transcedential functions}
+
+\wordtable{
+\ordinaryword{sq}{sq ( x -- y )}{math}\\
+\ordinaryword{sqrt}{sqrt ( x -- y )}{math}\\
+\ordinaryword{recip}{recip ( x -- y )}{math}
+}
+Computes the square (power of 2), square root (power of $\frac{1}{2}$), and reciprocal (power of $-1$).
+\wordtable{
+\ordinaryword{exp}{exp ( n -- n )}{math}
+}
+Raises the number $e$\footnote{Approximately equal to $2.718281828459045$} to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows:
 
 \begin{alltt}
-\textbf{ok} 1 pi polar> .
-\textbf{\#\{ -1.0 1.224606353822377e-16 \}}
+: exp ( x -- y ) e swap \^ ;
 \end{alltt}
 
-\subsection{Transcedential functions}
-
-The \texttt{math} vocabulary provides a rich library of mathematical functions that covers exponentiation, logarithms, trigonometry, and hyperbolic functions. All functions accept and return complex number arguments where appropriate. These functions all return floating point values, or complex numbers whose real and imaginary components are floating point values.
-
-\texttt{\^{} ( x y -- x\^{}y )} raises \texttt{x} to the power of \texttt{y}. In the cases of \texttt{y} being equal to $1/2$, -1, or 2, respectively, the words \texttt{sqrt}, \texttt{recip} and \texttt{sq} can be used instead.
-
+However, it is actually defined otherwise, for efficiency.\footnote{In fact, things are done the other way around; the word \texttt{\^{}} is actually defined in terms of \texttt{exp}, to correctly handle complex number arguments.}
+\wordtable{
+\ordinaryword{log}{log ( x -- y )}{math}
+}
+Computes the natural (base $e$) logarithm. This is the inverse of the \texttt{exp} function.
 \begin{alltt}
-\textbf{ok} 2 4 \^ .
-\textbf{16.0}
-\textbf{ok} i i \^ .
-\textbf{0.2078795763507619}
-\end{alltt}
-
-All remaining functions have a stack effect \texttt{( x -{}- y )}, it won't be repeated for brevity.
-
-\texttt{exp} raises the number $e$ to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows:
-
-\begin{alltt}
-: exp ( x -- e^x ) e swap \^ ;
-\end{alltt}
-
-However, it is actually defined otherwise, for efficiency.\footnote{In fact, the word \texttt{\^{}} is actually defined in terms of \texttt{exp}, to correctly handle complex number arguments.}
-
-\texttt{log} computes the natural (base $e$) logarithm. This is the inverse of the \texttt{exp} function.
-
-\begin{alltt}
-\textbf{ok} -1 log .
-\textbf{\#\{ 0.0 3.141592653589793 \}}
 \textbf{ok} e log .
 \textbf{1.0}
+\textbf{ok} -1 log .
+\textbf{\#\tto 0.0 3.141592653589793 \ttc}
 \end{alltt}
+The \texttt{math} vocabulary provides the full set of trigonometric and hyperbolic functions, along with inverses and reciprocals. Complex number arguments are supported.
 
-\texttt{sin}, \texttt{cos} and \texttt{tan} are the familiar trigonometric functions, and \texttt{asin}, \texttt{acos} and \texttt{atan} are their inverses.
+\begin{tabular}{l|l|l|l|l}
+Function&Trigonometric&Hyperbolic&Trig. inverse&Hyp. inverse\\
+\hline
+Sine&\texttt{sin}&\texttt{sinh}&\texttt{asin}&\texttt{asinh}\\
+Cosine&\texttt{cos}&\texttt{cosh}&\texttt{acos}&\texttt{acosh}\\
+Tangent&\texttt{tan}&\texttt{tanh}&\texttt{atan}&\texttt{atanh}\\
+\hline
+Cosecant&\texttt{cosec}&\texttt{cosech}&\texttt{acosec}&\texttt{acosech}\\
+Secant&\texttt{sec}&\texttt{sech}&\texttt{asec}&\texttt{asech}\\
+Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
+\end{tabular}
 
-The reciprocals of the sine, cosine and tangent are defined as \texttt{sec}, \texttt{cosec} and \texttt{cot}, respectively. Their inverses are \texttt{asec}, \texttt{acosec} and \texttt{acot}.
+\section{Streams}
 
-\texttt{sinh}, \texttt{cosh} and \texttt{tanh} are the hyperbolic functions, and \texttt{asinh}, \texttt{acosh} and \texttt{atanh} are their inverses.
+\subsection{Stream protocol}
 
-Similarly, the reciprocals of the hyperbolic functions are defined as \texttt{sech}, \texttt{cosech} and \texttt{coth}, respectively. Their inverses are \texttt{asech}, \texttt{acosech} and \texttt{acoth}.
+\subsection{Reading and writing files}
 
-\subsection{Modular arithmetic}
+\subsubsection{File system metadata}
 
-In addition to the standard division operator \texttt{/}, there are a few related functions that are useful when working with integers.
+\subsection{TCP/IP networking}
 
-\texttt{/i ( x y -{}- x/y )} performs a truncating integer division. It could have been defined as follows:
+\subsection{Formatted output}
 
-\begin{alltt}
-: /i / >integer ;
-\end{alltt}
+\subsection{Printing objects}
 
-However, the actual definition is a bit more efficient than that.
+\subsubsection{The unparser}
 
-\texttt{mod ( x y -{}- x\%y )} computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0, then \texttt{x} is a multiple of \texttt{y}.
+\subsubsection{The prettyprinter}
 
-\texttt{/mod ( x y -{}- x/y x\%y )} pushes both the quotient and remainder.
+\subsubsection{Extending the prettyprinter}
 
-\begin{alltt}
-\textbf{ok} 100 3 mod .
-\textbf{1}
-\textbf{ok} -546 34 mod .
-\textbf{-2}
-\end{alltt}
+\section{The parser}
 
-\texttt{gcd ( x y -{}- z )} pushes the greatest common divisor of two integers; that is, the largest number that both integers could be divided by and still yield integers as results. This word is used behind the scenes to reduce rational numbers to lowest terms when doing ratio arithmetic.
+\subsection{\label{parsing-words}Parsing words}
 
-\subsection{Bitwise operations}
+\section{The HTTP server}
 
-There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation faciliates the so-called \emph{bitwise operations}.
-
-\texttt{bitand ( x y -{}- x\&y )} returns a new integer where each bit is set if and only if the corresponding bit is set in both $x$ and $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-and with a mask switches off all flags that are not explicitly set in the mask.
-
-\begin{alltt}
-BIN: 101 BIN: 10 bitand .b
-\emph{0}
-BIN: 110 BIN: 10 bitand .b
-\emph{10}
-\end{alltt}
-
-\texttt{bitor ( x y -{}- x|y )} returns a new integer where each bit is set if and only if the corresponding bit is set in at least one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-or with a mask switches on all flags that are set in the mask.
-
-\begin{alltt}
-BIN: 101 BIN: 10 bitor .b
-\emph{111}
-BIN: 110 BIN: 10 bitor .b
-\emph{110}
-\end{alltt}
-
-\texttt{bitxor ( x y -{}- x\^{}y )} returns a new integer where each bit is set if and only if the corresponding bit is set in exactly one of $x$ or $y$. If you're considering an integer as a sequence of bit flags, taking the bitwise-xor with a mask toggles on all flags that are set in the mask.
-
-\begin{alltt}
-BIN: 101 BIN: 10 bitxor .b
-\emph{111}
-BIN: 110 BIN: 10 bitxor .b
-\emph{100}
-\end{alltt}
-
-\texttt{bitnot ( x -{}- y )} returns the bitwise complement of the input; that is, each bit in the input number is flipped. This is actually equivalent to negating a number, and subtracting one. So indeed, \texttt{bitnot} could have been defined as thus:
-
-\begin{alltt}
-: bitnot neg pred ;
-\end{alltt}
-
-\texttt{shift ( x n -{}- y )} returns a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
-
-\begin{alltt}
-BIN: 101 5 shift .b
-\emph{10100000}
-BIN: 11111 -2 shift .b
-\emph{111}
-\end{alltt}
-
-The attentive reader will notice that shifting to the left is equivalent to multiplying by a power of two, and shifting to the right is equivalent to performing a truncating division by a power of two.
+\section{C library interface}
 
 \chapter{The development environment}
 
