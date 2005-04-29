@@ -1,5 +1,13 @@
 #include "factor.h"
 
+/* This function is used by FFI I/O. Accessing the errno global is
+too troublesome... on some libc's its a funky macro that reads
+thread-local storage. */
+int factor_errno(void)
+{
+	return errno;
+}
+
 /* Simple wrappers for ANSI C I/O functions, used for bootstrapping.
 The Factor library provides platform-specific code for Unix and Windows
 with many more capabilities.

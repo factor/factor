@@ -101,18 +101,29 @@ void relocate_primitive(F_REL* rel, bool relative)
 		- (relative ? rel->offset + CELLS : 0));
 }
 
-void relocate_dlsym(F_REL* rel, bool relative)
+CELL get_rel_symbol(F_REL* rel)
 {
 	F_CONS* cons = untag_cons(get(rel->argument));
 	F_STRING* symbol = untag_string(cons->car);
 	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
-	put(rel->offset,(CELL)ffi_dlsym(dll,symbol)
-		- (relative ? rel->offset + CELLS : 0));
+	return (CELL)ffi_dlsym(dll,symbol);
 }
 
+void relocate_dlsym(F_REL* rel, bool relative)
+{
+	CELL addr = get_rel_symbol(rel);
+	put(rel->offset,addr - (relative ? rel->offset + CELLS : 0));
+}
+
+/* PowerPC-specific relocations */
 void relocate_primitive_16_16(F_REL* rel)
 {
 	reloc_set_16_16((CELL*)rel->offset,primitive_to_xt(rel->argument));
+}
+
+void relocate_dlsym_16_16(F_REL* rel)
+{
+	reloc_set_16_16((CELL*)rel->offset,get_rel_symbol(rel));
 }
 
 INLINE void code_fixup_16_16(CELL* cell)
@@ -166,6 +177,10 @@ INLINE CELL relocate_code_next(CELL relocating)
 		case F_ABSOLUTE_PRIMITIVE_16_16:
 			relocate_primitive_16_16(rel);
 			break;
+		case F_ABSOLUTE_DLSYM_16_16:
+			code_fixup(&rel->argument);
+			relocate_dlsym_16_16(rel);
+			break;
 		case F_ABSOLUTE_16_16:
 			code_fixup_16_16((CELL*)rel->offset);
 			break;
@@ -187,7 +202,6 @@ void relocate_code()
 
 	for(;;)
 	{
-		/* fprintf(stderr,"relocation %d %d\n",relocating,compiling.here); */
 		if(relocating >= compiling.here)
 			break;
 

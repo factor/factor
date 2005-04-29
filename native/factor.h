@@ -80,13 +80,9 @@ typedef signed long long s64;
 	#include <sys/mman.h>
 	#include <sys/param.h>
 	#include <sys/types.h>
-	#include <sys/socket.h>
 	#include <sys/stat.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
 	#include <unistd.h>
 	#include <sys/time.h>
-	#include <netdb.h>
 #endif
 
 #if !defined(WIN32)
