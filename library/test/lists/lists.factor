@@ -5,7 +5,7 @@ USING: kernel lists sequences test ;
 [ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test
 [ [ 2 ]         ] [ [ ] [ 2 ]       append ] unit-test
 [ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
-[ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] ] [ [ 1 2 3 ] 4 append ] unit-test
+[ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
 
 [ f         ] [ 3 [ ]     contains? ] unit-test
 [ f         ] [ 3 [ 1 2 ] contains? ] unit-test
@@ -16,9 +16,9 @@ USING: kernel lists sequences test ;
 [ [ 3 ]     ] [ [ 1 2 3 ]     last ] unit-test
 [ [[ 3 4 ]] ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
 
-[ 3 ] [ [ 3 ]         last ] unit-test
-[ 3 ] [ [ 1 2 3 ]     last ] unit-test
-[ 3 ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] last ] unit-test
+[ 3 ] [ [ 3 ]         peek ] unit-test
+[ 3 ] [ [ 1 2 3 ]     peek ] unit-test
+[ 3 ] [ [[ 1 [[ 2 [[ 3 4 ]] ]] ]] peek ] unit-test
 
 [ 0 ] [ [ ]       length ] unit-test
 [ 3 ] [ [ 1 2 3 ] length ] unit-test

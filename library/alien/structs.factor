@@ -28,18 +28,20 @@ math namespaces parser strings words ;
 : define-member ( max type -- max )
     c-type [ "width" get ] bind max ;
 
+: bytes>cells cell / ceiling ;
+
 : struct-constructor ( width -- )
     #! Make a word <foo> where foo is the structure name that
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
     "struct-name" get constructor-word
-    swap [ <byte-array> ] cons
+    swap bytes>cells [ <byte-array> ] cons
     define-compound ;
 
 : array-constructor ( width -- )
     #! Make a word <foo-array> ( n -- byte-array ).
     "struct-name" get "-array" cat2 constructor-word
-    swap [ * <byte-array> ] cons
+    swap bytes>cells [ * <byte-array> ] cons
     define-compound ;
 
 : define-nth ( width -- )

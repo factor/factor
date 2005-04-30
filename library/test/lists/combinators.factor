@@ -5,6 +5,7 @@ USE: math
 USE: namespaces
 USE: test
 USE: strings
+USE: sequences
 
 [ [ [ 3 2 1 ] [ 5 4 3 ] [ 6 ] ] ]
 [ [ 1 2 3 ] [ 3 4 5 ] [ 6 ] 3list [ reverse ] map ] unit-test

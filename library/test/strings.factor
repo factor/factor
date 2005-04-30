@@ -6,6 +6,7 @@ USE: namespaces
 USE: strings
 USE: test
 USE: sequences
+USE: lists
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
 
@@ -89,7 +90,7 @@ unit-test
 ]
 unit-test
 
-[ "05" ] [ "5" 2 "0" pad ] unit-test
-[ "666" ] [ "666" 2 "0" pad ] unit-test
+[ "05" ] [ "5" 2 CHAR: 0 pad ] unit-test
+[ "666" ] [ "666" 2 CHAR: 0 pad ] unit-test
 
 [ 1 "" nth ] unit-test-fails
