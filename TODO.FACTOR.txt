@@ -3,16 +3,17 @@
 - faster layout
 - faster repaint
 - forgotten words not removed from cross-reference
-- get all-tests to run with -no-compile
 - freebsd 4 -pthread errno
 - implement fcopy
+- win32 updates
+
+- get all-tests to run with -no-compile
 - if external factor is down, don't add tons of random shit to the dictionary
 - scalar * matrix, vector * matrix, matrix * vector need to work
 - turning vectors into row and column matrices
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
 - rotating cube demo
-- win32 updates
 
 + ui:
 

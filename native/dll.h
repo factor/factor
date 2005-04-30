@@ -8,6 +8,8 @@ typedef struct {
 
 DLL* untag_dll(CELL tagged);
 
+void init_ffi(void);
+
 void ffi_dlopen(DLL *dll);
 void *ffi_dlsym(DLL *dll, F_STRING *symbol);
 void ffi_dlclose(DLL *dll);
