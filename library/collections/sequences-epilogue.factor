@@ -79,6 +79,9 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 : seq-map ( seq quot -- seq | quot: elt -- elt )
     swap [ swap nmap ] immutable ; inline
 
+: seq-map-with ( obj list quot -- list )
+    swap [ with rot ] seq-map 2nip ; inline
+
 : (2nmap) ( seq1 seq2 i quot -- elt3 )
     pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
 
@@ -89,7 +92,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     ] repeat 3drop ; inline
 
 : seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
-    >r clone r> over >r 2nmap r> ; inline
+    swap [ swap 2nmap ] immutable ; inline
 
 ! Operations
 : index* ( obj i seq -- n )

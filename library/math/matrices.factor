@@ -4,19 +4,29 @@ IN: matrices
 USING: errors generic kernel lists math namespaces prettyprint
 sequences stdio test vectors ;
 
-! Vector and matrix math use these generics.
+! The major dimension is the number of elements per row.
+TUPLE: matrix rows cols sequence ;
+
+! Vector and matrix protocol.
 GENERIC: v+
 GENERIC: v-
 GENERIC: v* ( element-wise multiplication )
 GENERIC: v. ( interior multiplication )
 
+: v*n ( vec n -- vec ) swap [ * ] seq-map-with ;
+
 ! On numbers, these operations do the obvious thing
 M: number v+ ( n n -- n ) + ;
 M: number v- ( n n -- n ) - ;
 M: number v* ( n n -- n ) * ;
-M: number v. ( n n -- n ) * ;
+
+M: number v. ( n n -- n )
+    over vector? [ v*n ] [ * ] ifte ;
 
 ! Vector operations
+DEFER: <row-vector>
+DEFER: <col-vector>
+
 M: object v+ ( v v -- v ) [ v+ ] seq-2map ;
 M: object v- ( v v -- v ) [ v- ] seq-2map ;
 M: object v* ( v v -- v ) [ v* ] seq-2map ;
@@ -24,12 +34,15 @@ M: object v* ( v v -- v ) [ v* ] seq-2map ;
 ! Later, this will fixed when seq-2each works properly
 ! M: object v. ( v v -- x ) 0 swap [ * + ] seq-2each ;
 : +/ ( seq -- n ) 0 swap [ + ] seq-each ;
-M: object v. ( v v -- x ) v* +/ ;
 
-! Matrices.
-! The major dimension is the number of elements per row.
-TUPLE: matrix rows cols sequence ;
+GENERIC: vv. ( obj v -- v )
+M: number vv. ( v n -- v ) v*n ;
+M: matrix vv. ( v m -- v )
+    swap <col-vector> v. matrix-sequence ;
+M: object vv. v* +/ ;
+M: object v. ( v v -- x ) swap vv. ;
 
+! Matrices
 M: matrix clone ( matrix -- matrix )
     clone-tuple
     dup matrix-sequence clone over set-matrix-sequence ;
@@ -44,6 +57,14 @@ M: matrix clone ( matrix -- matrix )
 
 : <zero-matrix> ( rows cols -- matrix )
     2dup * zero-vector <matrix> ;
+
+: <row-vector> ( vector -- matrix )
+    #! Turn a vector into a matrix of one row.
+    [ 1 swap length ] keep <matrix> ;
+
+: <col-vector> ( vector -- matrix )
+    #! Turn a vector into a matrix of one column.
+    [ length 1 ] keep <matrix> ;
 
 : 2repeat ( i j quot -- | quot: i j -- i j )
     rot [
@@ -79,7 +100,8 @@ SYMBOL: matrix-maker
 TUPLE: row index matrix ;
 : >row< dup row-index swap row-matrix ;
 M: row length row-matrix matrix-cols ;
-M: row nth ( n row -- ) >row< matrix-get ;
+M: row nth ( n row -- ) >row< swapd matrix-get ;
+M: row thaw >vector ;
 
 ! A sequence of rows.
 TUPLE: row-seq matrix ;
@@ -91,6 +113,7 @@ TUPLE: col index matrix ;
 : >col< dup col-index swap col-matrix ;
 M: col length col-matrix matrix-rows ;
 M: col nth ( n column -- ) >col< swapd matrix-get ;
+M: col thaw >vector ;
 
 ! A sequence of columns.
 TUPLE: col-seq matrix ;
@@ -128,6 +151,7 @@ M: matrix v* ( m m -- m ) matrix+/- v* <matrix> ;
 
 M: matrix v. ( m1 m2 -- m )
     2dup *dimensions [
+        ( m1 m2 row col )
         >r >r 2dup r> rot <row> r> rot <col> v.
     ] make-matrix 2nip ;
 
@@ -136,8 +160,9 @@ M: matrix v. ( m1 m2 -- m )
 : M[ f ; parsing
 
 : ]M
-    reverse [ dup car length swap length ] keep
-    [ [ % ] each ] make-vector <matrix> swons ; parsing
+    reverse
+    [ dup length swap car length ] keep
+    concat >vector <matrix> swons ; parsing
 
 : row-list ( matrix -- list )
     #! A list of lists, where each sublist is a row of the

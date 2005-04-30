@@ -70,6 +70,7 @@ SYMBOL: failures
             "stream" "math/bitops"
             "math/math-combinators" "math/rational" "math/float"
             "math/complex" "math/irrational" "math/integer"
+            "math/matrices"
             "httpd/url-encoding" "httpd/html" "httpd/httpd"
             "crashes" "sbuf" "threads" "parsing-word"
             "inference" "dataflow" "interpreter" "alien"
