@@ -39,5 +39,5 @@ M: ratio /i scale /i ;
 M: ratio /f scale /f ;
 
 M: ratio truncate >fraction /i ;
-M: ratio floor >fraction /mod dup 0 < [ 1 - ] when ;
-M: ratio ceiling >fraction /mod dup 0 > [ 1 + ] when ;
+M: ratio floor >fraction /i dup 0 < [ 1 - ] when ;
+M: ratio ceiling >fraction /i dup 0 > [ 1 + ] when ;

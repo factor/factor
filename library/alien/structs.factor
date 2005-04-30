@@ -39,7 +39,7 @@ math namespaces parser strings words ;
 : array-constructor ( width -- )
     #! Make a word <foo-array> ( n -- byte-array ).
     "struct-name" get "-array" cat2 constructor-word
-    swap cell / ceiling [ * <byte-array> ] cons
+    swap [ * <byte-array> ] cons
     define-compound ;
 
 : define-nth ( width -- )
