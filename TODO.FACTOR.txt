@@ -1,6 +1,5 @@
 0.74:
 
-- local structs are 4 times larger than they should be
 - faster layout
 - faster repaint
 - forgotten words not removed from cross-reference
@@ -13,6 +12,7 @@
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
 - rotating cube demo
+- win32 updates
 
 + ui:
 
