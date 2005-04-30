@@ -73,7 +73,7 @@ USE: sequences
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] string-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -88,7 +88,7 @@ USE: sequences
   #! Write out html to display the stack.
   <table border= "1" table> 
     <tr> <th> "Callstack" write </th> </tr>
-    [ <tr> <td> [ unparse write ] with-string-stream write-eval-link </td> </tr> ] each
+    [ <tr> <td> [ unparse write ] with-string write-eval-link </td> </tr> ] each
   </table> ;
 
 : display-clear-history-link ( -- )
@@ -190,12 +190,11 @@ USE: sequences
   #! Evaluate expression using 'list' as the current callstack.
   #! All output should go to a string which is returned on the
   #! callstack along with the resulting datastack as a list.
-  <namespace> [ 
-    "browser" "responder" set
-    1024 <string-output> dup >r <html-stream> [
-      do-eval 
-    ] with-stream r> stream>str 
-  ] bind ;
+  [
+     "browser" "responder" set
+     stdio [ <html-stream> ] change
+     do-eval
+  ] with-string ;
 
 : forever ( quot -- )
   #! The code is evaluated in an infinite loop. Typically, a

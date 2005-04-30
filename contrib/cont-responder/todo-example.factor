@@ -41,6 +41,7 @@ USE: prettyprint
 USE: todo
 USE: math
 USE: kernel
+USE: sequences
  
 : todo-stylesheet ( -- string )
   #! Return the stylesheet for the todo list
@@ -114,7 +115,7 @@ USE: kernel
 
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
-  [ .s ] with-string-stream chars>entities show-message-page ;
+  [ .s ] with-string chars>entities show-message-page ;
 
 : row ( list -- )
   #! Output an html TR row with each element of the list
@@ -208,7 +209,7 @@ USE: kernel
     ] [ 
       drop CHAR: _ 
     ] ifte 
-  ] string-map ;
+  ] map ;
 
 : is-valid-username? ( username -- bool )
   #! Return true if the username parses correctly
@@ -334,11 +335,11 @@ USE: kernel
 : priority-valid? ( string -- bool )
   #! Test the string containing a priority to see if it is 
   #! valid. It should be a single digit from 0-9.
-  dup string-length 1 = [ 0 swap string-nth digit? ] [ drop f ] ifte ;
+  dup length 1 = [ 0 swap string-nth digit? ] [ drop f ] ifte ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  string-length 0 > [ priority-valid? ] [ drop f ] ifte ;
+  length 0 > [ priority-valid? ] [ drop f ] ifte ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
