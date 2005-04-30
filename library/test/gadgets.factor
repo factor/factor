@@ -78,3 +78,15 @@ USING: gadgets kernel lists math namespaces test ;
 ] unit-test
 
 [ ] [ "pile" get layout* ] unit-test
+
+[
+    1 15
+] [
+    1 15 << line [ ] 0 0 0 14 >> [ resize-shape ] keep shape-size
+] unit-test
+
+[
+    1 15
+] [
+    1 15 << line [ ] 0 22 -1 14 >> [ resize-shape ] keep shape-size
+] unit-test

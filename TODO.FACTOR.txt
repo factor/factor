@@ -14,6 +14,9 @@
 - move 2repeat somewhere else
 - rotating cube demo
 
+- plugin: extra space in stack effects
+- plugin: type "re" in edit word dialog --> hang
+
 + ui:
 
 - console with presentations
@@ -94,6 +97,8 @@
 
 + i/o:
 
+- print [ foo ] car as \ foo
+- printing f inside a list prints ...
 - merge unix and win32 io where appropriate
 - unix io: handle \n\r and \n\0
 - reader syntax for arrays, byte arrays, displaced aliens

@@ -40,8 +40,9 @@ USE: win32-api
 
 IN: io-internals
 
-: io-multiplex ( -- task )
-    win32-next-io-task ;
+: io-multiplex ( timeout -- task )
+    #! FIXME: needs to work given a timeout
+    -1 = [ win32-next-io-task ] when ;
 
 : init-io ( -- )
     win32-init-stdio ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien errors generic kernel lists math memory namespaces
-prettyprint sdl stdio strings threads ;
+prettyprint sdl sequences stdio strings threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -24,7 +24,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     dup gadget-redraw? [
-        [ dup draw-gadget ] with-surface
+        [ draw-gadget ] with-surface
     ] [
         drop
     ] ifte ;
@@ -34,7 +34,7 @@ DEFER: handle-event
 : layout-world ( world -- )
     dup
     0 0 width get height get <rectangle> clip set-paint-prop
-    dup layout world-hand update-hand ;
+    layout ;
 
 : world-step ( world -- ? )
     dup world-running? [
@@ -59,7 +59,7 @@ DEFER: handle-event
     ] unless ;
 
 : title ( -- str )
-    "Factor " version cat2 ;
+    "Factor " version append ;
 
 IN: shells
 

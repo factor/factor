@@ -61,6 +61,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 
 : change-nth ( seq i quot -- )
     pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
+    inline
 
 : (nmap) ( seq i quot -- )
     pick length pick <= [

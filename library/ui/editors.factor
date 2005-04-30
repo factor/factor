@@ -70,7 +70,7 @@ TUPLE: editor line caret ;
     dup red background set-paint-prop ;
 
 C: editor ( text -- )
-    0 0 0 0 <line> <gadget> over set-delegate
+    <empty-gadget> over set-delegate
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
@@ -85,16 +85,19 @@ C: editor ( text -- )
 : caret-size ( editor -- w h )
     1 swap shape-h ;
 
-M: editor user-input* ( ch field -- ? )
+M: editor user-input* ( ch editor -- ? )
     [ [ insert-char ] with-editor ] keep
     scroll>bottom  t ;
 
-M: editor layout* ( field -- )
+M: editor pref-size ( editor -- w h )
+    editor-text shape-size >r 1 + r> ;
+
+M: editor layout* ( editor -- )
     dup [ editor-text shape-size ] keep resize-gadget
     dup editor-caret over caret-size rot resize-gadget
     dup editor-caret swap caret-pos rot move-gadget ;
 
-M: editor draw-shape ( label -- )
+M: editor draw-shape ( editor -- )
     dup [ editor-text draw-shape ] with-trans ;
 
 : <field> ( text -- field )

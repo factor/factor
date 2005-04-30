@@ -99,8 +99,13 @@ SYMBOL: io-tasks
         ] each nip
     ] keep ;
 
-: io-multiplex ( -- )
-    make-pollfds 2dup -1 poll drop do-io-tasks io-multiplex ;
+: io-multiplex ( timeout -- )
+    make-pollfds [ pick poll drop ] 2keep do-io-tasks
+    io-multiplex ;
+
+: pending-io? ( -- ? )
+    #! Output if there are waiting I/O requests.
+    io-tasks get hash-size 0 > ;
 
 ! Readers
 

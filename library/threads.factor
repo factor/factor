@@ -24,11 +24,15 @@ namespaces ;
 : stop ( -- )
     #! If there is a quotation in the run queue, call it,
     #! otherwise wait for I/O.
-    next-thread [
-        call
+    pending-io? [
+        10 io-multiplex
     ] [
-        io-multiplex [ call ] [ stop ] ifte*
-    ] ifte* ;
+        next-thread [
+            call
+        ] [
+            -1 io-multiplex
+        ] ifte*
+    ] ifte ;
 
 : yield ( -- )
     #! Add the current continuation to the run queue, and yield

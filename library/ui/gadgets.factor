@@ -21,25 +21,45 @@ C: gadget ( shape -- gadget )
     #! Redraw a gadget before the next iteration of the event
     #! loop.
     dup gadget-redraw? [
+        drop
+    ] [
         t over set-gadget-redraw?
         gadget-parent [ redraw ] when*
-    ] [
-        drop
     ] ifte ;
 
 : relayout ( gadget -- )
     #! Relayout a gadget before the next iteration of the event
     #! loop. Since relayout also implies the visual
     #! representation changed, we redraw the gadget too.
-    t over set-gadget-redraw?
-    t over set-gadget-relayout?
-    gadget-parent [ relayout ] when* ;
+    dup gadget-relayout? [
+        drop
+    ] [
+        t over set-gadget-redraw?
+        t over set-gadget-relayout?
+        gadget-parent [ relayout ] when*
+    ] ifte ;
 
-: move-gadget ( x y gadget -- ) [ move-shape ] keep redraw ;
-: resize-gadget ( w h gadget -- ) [ resize-shape ] keep relayout ;
+: ?move ( x y gadget quot -- )
+    >r 3dup shape-pos >r rect> r> = [
+        3drop
+    ] r> ifte ; inline
 
-: paint-prop ( gadget key -- value ) swap gadget-paint hash ;
-: set-paint-prop ( gadget value key -- ) rot gadget-paint set-hash ;
+: move-gadget ( x y gadget -- )
+    [ [ move-shape ] keep redraw ] ?move ;
+
+: ?resize ( w h gadget quot -- )
+    >r 3dup shape-size rect> >r rect> r> = [
+        3drop
+    ] r> ifte ; inline
+
+: resize-gadget ( w h gadget -- )
+    [ [ resize-shape ] keep relayout ] ?resize ;
+
+: paint-prop ( gadget key -- value )
+    swap gadget-paint hash ;
+
+: set-paint-prop ( gadget value key -- )
+    rot gadget-paint set-hash ;
 
 GENERIC: pref-size ( gadget -- w h )
 M: gadget pref-size shape-size ;
