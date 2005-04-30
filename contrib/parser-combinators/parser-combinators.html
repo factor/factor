@@ -141,7 +141,7 @@ character code '53'.</p>
 <pre class="code">
   (1) : digit-list>number ( list -- number )
          #! Converts a list of digits to a number
-         [ >digit ] map cat dup string-length 0 = [ 
+         [ >digit ] map >string dup empty? [ 
            drop 0 
          ] [
 	   str>number 
