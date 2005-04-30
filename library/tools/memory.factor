@@ -5,6 +5,10 @@ USING: errors generic hashtables kernel kernel-internals lists
 math namespaces prettyprint sequences stdio unparser vectors
 words ;
 
+: save
+    #! Save the current image.
+    "image" get save-image ;
+    
 ! Printing an overview of heap usage.
 
 : kb. 1024 /i unparse write " KB" write ;

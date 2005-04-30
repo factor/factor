@@ -5,7 +5,7 @@ USING: alien generic kernel lists math namespaces sdl sequences ;
 
 GENERIC: handle-event ( event -- )
 
-M: alien handle-event ( event -- )
+M: object handle-event ( event -- )
     drop ;
 
 M: quit-event handle-event ( event -- )

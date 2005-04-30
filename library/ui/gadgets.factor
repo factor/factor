@@ -20,7 +20,12 @@ C: gadget ( shape -- gadget )
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
     #! loop.
-    t over set-gadget-redraw?  gadget-parent [ redraw ] when* ;
+    dup gadget-redraw? [
+        t over set-gadget-redraw?
+        gadget-parent [ redraw ] when*
+    ] [
+        drop
+    ] ifte ;
 
 : relayout ( gadget -- )
     #! Relayout a gadget before the next iteration of the event

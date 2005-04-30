@@ -5,10 +5,6 @@ lists namespaces parser sequences stdio unparser words ;
 
 "Bootstrap stage 3..." print
 
-os "freebsd" = [
-    "libc"     "libc.so"       "cdecl"    add-library
-] when
-
 unix? [
     "sdl"      "libSDL.so"     "cdecl"    add-library
     "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library

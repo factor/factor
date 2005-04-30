@@ -85,7 +85,7 @@ C: client-stream ( fd host port -- stream )
 
 : <client> ( host port -- stream )
     #! Connect to a port number on a TCP/IP host.
-    2dup client-socket dup <client-stream> ;
+    [ client-socket ] 2keep <client-stream> ;
 
 : <server> ( port -- server )
     #! Starts listening for TCP connections on localhost:port.

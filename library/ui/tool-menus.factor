@@ -14,7 +14,7 @@ SYMBOL: root-menu
 [
     [[ "Listener" [ <console> "Listener" <tile> world get add-gadget ] ]]
     [[ "Globals" [ global inspect ] ]]
-    [[ "Save image" [ "image" get save-image ] ]]
+    [[ "Save image" [ save ] ]]
     [[ "Exit" [ f world get set-world-running? ] ]]
 ] root-menu set
 

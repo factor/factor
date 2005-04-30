@@ -24,11 +24,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     dup gadget-redraw? [
-        [
-            f over set-gadget-redraw?
-            dup draw-gadget
-            dup gadget-paint [ world-hand draw-gadget ] bind
-        ] with-surface
+        [ dup draw-gadget ] with-surface
     ] [
         drop
     ] ifte ;

@@ -63,6 +63,7 @@ SYMBOL: clip
     #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
+    f over set-gadget-redraw?
     dup gadget-paint [
         dup [
             [

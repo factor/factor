@@ -3,7 +3,6 @@
 - faster layout
 - faster repaint
 - forgotten words not removed from cross-reference
-- freebsd 4 -pthread errno
 - implement fcopy
 - win32 updates
 
