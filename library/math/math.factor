@@ -29,11 +29,13 @@ M: object number= 2drop f ;
 
 GENERIC: bitnot ( n -- n )
 
-: max ( x y -- z )
-    2dup > [ drop ] [ nip ] ifte ;
+GENERIC: truncate ( n -- n )
+GENERIC: floor    ( n -- n )
+GENERIC: ceiling  ( n -- n )
 
-: min ( x y -- z )
-    2dup < [ drop ] [ nip ] ifte ;
+: max ( x y -- z ) [ > ] 2keep ? ;
+
+: min ( x y -- z ) [ < ] 2keep ? ;
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max

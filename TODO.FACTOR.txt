@@ -1,14 +1,11 @@
 0.74:
 
-- trailing newlines in read-line output value
 - local structs are 4 times larger than they should be
-- ppc ffi relocation
 - faster layout
 - faster repaint
 - forgotten words not removed from cross-reference
 - get all-tests to run with -no-compile
 - freebsd 4 -pthread errno
-- mac os x ffi
 - implement fcopy
 - if external factor is down, don't add tons of random shit to the dictionary
 - scalar * matrix, vector * matrix, matrix * vector need to work

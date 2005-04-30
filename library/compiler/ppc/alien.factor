@@ -8,11 +8,12 @@ math memory namespaces words ;
     uncons load-dll 2dup rel-dlsym-16/16 dlsym compile-call-far
 ] "generator" set-word-prop
 
-#parameters [
-    dup 0 = [ drop ] [ 16 align 1 1 rot SUBI ] ifte
-] "generator" set-word-prop
+: stack-size 8 + 16 align ;
+: stack@ 3 + cell * ;
 
-: stack@ cell * cell + ;
+#parameters [
+    dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte
+] "generator" set-word-prop
 
 #unbox [
     uncons f 2dup rel-dlsym-16/16 dlsym compile-call-far
@@ -28,5 +29,5 @@ math memory namespaces words ;
 ] "generator" set-word-prop
 
 #cleanup [
-    dup 0 = [ drop ] [ 16 align 1 1 rot ADDI ] ifte
+    dup 0 = [ drop ] [ stack-size 1 1 rot ADDI ] ifte
 ] "generator" set-word-prop

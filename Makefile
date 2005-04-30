@@ -46,11 +46,13 @@ bsd:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
 		LIBS="$(DEFAULT_LIBS)"
+	$(STRIP) f
 
 bsd-nopthread:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS)"
+	$(STRIP) f
 
 macosx:
 	$(MAKE) f \
@@ -61,15 +63,16 @@ linux:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
+	$(STRIP) f
 
 linux-ppc:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
 		LIBS="$(DEFAULT_LIBS) -ldl" 
+	$(STRIP) f
 
 f: $(OBJS)
 	$(CC) $(LIBS) $(CFLAGS) -o $@ $(OBJS)
-	$(STRIP) $@
 
 clean:
 	rm -f $(OBJS)

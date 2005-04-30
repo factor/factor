@@ -9,11 +9,13 @@ UNION: rational integer ratio ;
 M: integer numerator ;
 M: integer denominator drop 1 ;
 
+: >fraction ( a/b -- a b )
+    dup numerator swap denominator ;
+
 IN: math-internals
 
 : 2>fraction ( a/b c/d -- a c b d )
-    [ swap numerator swap numerator ] 2keep
-    swap denominator swap denominator ; inline
+    >r >fraction r> >fraction swapd ;
 
 M: ratio number= ( a/b c/d -- ? )
     2>fraction number= [ number= ] [ 2drop f ] ifte ;
@@ -35,3 +37,7 @@ M: ratio * ( x y -- x*y ) 2>fraction * >r * r> integer/ ;
 M: ratio / scale integer/ ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
+
+M: ratio truncate >fraction /i ;
+M: ratio floor >fraction /mod dup 0 < [ 1 - ] when ;
+M: ratio ceiling >fraction /mod dup 0 > [ 1 + ] when ;

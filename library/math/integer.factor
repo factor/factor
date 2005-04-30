@@ -94,3 +94,7 @@ M: bignum bitxor bignum-bitxor ;
 M: bignum shift bignum-shift ;
 
 M: bignum bitnot bignum-bitnot ;
+
+M: integer truncate ;
+M: integer floor ;
+M: integer ceiling ;

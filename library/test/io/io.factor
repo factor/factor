@@ -26,6 +26,13 @@ USE: math
 ] unit-test
 
 [
+    "This is a line."
+    "This is another line."
+] [
+    "/library/test/io/unix-eol.txt" <resource-stream> lines-test
+] unit-test
+
+[
     "This is a line.\rThis is another line.\r"
 ] [
     "/library/test/io/mac-os-eol.txt" <resource-stream>

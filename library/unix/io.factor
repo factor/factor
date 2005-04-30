@@ -14,7 +14,7 @@ USING: namespaces ;
 : io-error ( n -- ) 0 < [ errno strerror throw ] when ;
 
 : init-handle ( fd -- )
-    F_SETFL O_NONBLOCK 1 fcntl io-error ;
+    F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
 TUPLE: port handle buffer error ;
@@ -196,7 +196,7 @@ M: read-line-task do-io-task ( task -- ? )
     ] ifte ;
 
 M: read-line-task io-task-events ( task -- events )
-    drop read-events ;
+    drop POLLIN ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [
@@ -259,7 +259,7 @@ M: read-task do-io-task ( task -- ? )
     ] ifte ;
 
 M: read-task io-task-events ( task -- events )
-    drop read-events ;
+    drop POLLIN ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
@@ -310,7 +310,7 @@ M: write-task do-io-task
     ] ifte ;
 
 M: write-task io-task-events ( task -- events )
-    drop write-events ;
+    drop POLLOUT ;
 
 : write-fin ( str writer -- )
     dup pending-error >buffer ;

@@ -25,11 +25,8 @@ ALIAS: uint in_addr_t
 : close ( fd -- )
     "void" "libc" "close" [ "int" ] alien-invoke ;
 
-: F_SETFL 4 ; ! set file status flags
-: O_NONBLOCK 4 ; ! no delay
-
-: fcntl ( fd cmd key value -- n )
-    "int" "libc" "fcntl" [ "int" "int" "int" "int" ] alien-invoke ;
+: fcntl ( fd cmd arg -- n )
+    "int" "libc" "fcntl" [ "int" "int" "int" ] alien-invoke ;
 
 : read ( fd buf nbytes -- n )
     "ssize_t" "libc" "read" [ "int" "ulong" "size_t" ] alien-invoke ;
@@ -42,9 +39,6 @@ BEGIN-STRUCT: pollfd
     FIELD: short events
     FIELD: short revents
 END-STRUCT
-
-: read-events POLLIN POLLRDNORM bitor POLLRDBAND bitor ;
-: write-events POLLOUT POLLWRNORM bitor POLLWRBAND bitor ;
 
 : poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;

@@ -9,18 +9,6 @@ test-responder ;
 #! responder table.
 global [ <namespace> "httpd-responders" set ] bind
 
-! This responder lets anybody shut down your httpd. You should
-! disable it if you plan on running a production server!
-<responder> [
-    "quit" "responder" set
-    [ quit-responder ] "get" set
-] extend add-responder
-
-<responder> [
-    "posttest" "responder" set
-    [ drop "response" get global [ . ] bind ] "post" set
-] extend add-responder
-
 ! Runs all unit tests and dumps result to the client. This uses
 ! a lot of server resources, so disable it on a busy server.
 <responder> [

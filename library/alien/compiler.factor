@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler errors generic inference kernel lists math
-namespaces sequences stdio strings words ;
+namespaces sequences stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -25,16 +25,20 @@ namespaces sequences stdio strings words ;
 
 ! FFI code does not run in the interpreter.
 
-TUPLE: alien-error lib ;
+TUPLE: alien-error symbol library ;
 
-C: alien-error ( lib -- ) [ set-alien-error-lib ] keep ;
+C: alien-error ( lib sym -- )
+    [ set-alien-error-symbol ] keep
+    [ set-alien-error-library ] keep ;
 
 M: alien-error error. ( error -- )
     [
-        "C library interface words cannot be interpreted. " ,
-        "Either the compiler is disabled, " ,
-        "or the ``" , alien-error-lib ,
-        "'' library is missing." ,
+        "C library interface words cannot be interpreted. " %
+        "Either the compiler is disabled, " %
+        "or the " % dup alien-error-library unparse %
+        " library does not define the " %
+        alien-error-symbol unparse %
+        " symbol." %
     ] make-string print ;
 
 : alien-invoke ( ... returns library function parameters -- ... )
@@ -42,13 +46,13 @@ M: alien-error error. ( error -- )
     #! 'returns' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
-    rot <alien-error> throw ;
+    drop <alien-error> throw ;
 
 : alien-global ( type library name -- value )
     #! Fetch the value of C global variable.
     #! 'type' is a type spec. 'library' is an entry in the
     #! "libraries" namespace.
-    swap <alien-error> throw ;
+    <alien-error> throw ;
 
 ! Linear IR nodes
 

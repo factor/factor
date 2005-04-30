@@ -4,6 +4,8 @@ USE: math
 USE: test
 USE: unparser
 
+[ 1 2 ] [ 1/2 >fraction ] unit-test
+
 [ 1/2 ] [ 1 >bignum 2 >bignum / ] unit-test
 [ t ] [ 10 3 / ratio? ] unit-test
 [ f ] [ 10 2 / ratio? ] unit-test
@@ -63,3 +65,13 @@ unit-test
 [ -1 ] [ -12.55 sgn ] unit-test
 [ 1 ] [ 100000000000000000000000000000000 sgn ] unit-test
 [ 0 ] [ 0.0 sgn ] unit-test
+
+[ 5 ] [ 5 floor ] unit-test
+[ -5 ] [ -5 floor ] unit-test
+[ 6 ] [ 6 truncate ] unit-test
+[ 3 ] [ 10/3 floor ] unit-test
+[ -4 ] [ -10/3 floor ] unit-test
+[ 4 ] [ 10/3 ceiling ] unit-test
+[ -3 ] [ -10/3 ceiling ] unit-test
+[ 3 ] [ 10/3 truncate ] unit-test
+[ -3 ] [ -10/3 truncate ] unit-test

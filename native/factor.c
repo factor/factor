@@ -3,6 +3,7 @@
 void init_factor(char* image, CELL ds_size, CELL cs_size,
 	CELL data_size, CELL code_size)
 {
+	init_ffi();
 	init_arena(data_size);
 	init_compiler(code_size);
 	load_image(image);
@@ -26,6 +27,8 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	userenv[OS_ENV] = tag_object(from_c_string("freebsd"));
 #elif defined(linux)
 	userenv[OS_ENV] = tag_object(from_c_string("linux"));
+#elif defined(__APPLE__)
+	userenv[OS_ENV] = tag_object(from_c_string("macosx"));
 #else
 	userenv[OS_ENV] = tag_object(from_c_string("unix"));
 #endif

@@ -58,8 +58,8 @@ stdio streams strings threads url-encoding ;
 : httpd-loop ( -- ) httpd-connection httpd-loop ;
 
 : httpd ( port -- )
-    [
-        <server> "http-server" set [
+    <server> "http-server" set [
+        [
             httpd-loop
         ] [
             "http-server" get stream-close rethrow
