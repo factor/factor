@@ -84,7 +84,7 @@ GENERIC: pempty?
 
 M: string pempty? ( object -- bool )
   #! Return true if the collection is empty.
-  string-length 0 = ;
+  length 0 = ;
 
 M: list pempty? ( object -- bool )
   #! Return true if the collection is empty.
@@ -93,7 +93,7 @@ M: list pempty? ( object -- bool )
 : string-take ( n string -- string )
   #! Return a string with the first 'n' characters
   #! of the original string.
-  dup string-length pick < [
+  dup length pick < [
     2drop ""
   ] [
     string-head
@@ -128,7 +128,7 @@ M: list ptake ( n object -- object )
 : string-drop ( n string -- string )
   #! Return a string with the first 'n' characters
   #! of the original string removed.
-  dup string-length pick < [
+  dup length pick < [
     2drop "" 
   ] [
     string-tail 
@@ -469,11 +469,11 @@ USE: stdio
 ! Testing <*> and <:&>
 : test27 "1234" "1" token <*> call [ . ] leach ;
 : test28 "1111234" "1" token <*> call [ . ] leach ;
-: test28a "1111234" "1" token <*> [ car cat unit ] <@ call [ . ] leach ;
+: test28a "1111234" "1" token <*> [ car concat unit ] <@ call [ . ] leach ;
 : test29 "234" "1" token <*> call [ . ] leach ;
 : pdigit [ digit? ] satisfy [ digit> ] <@ ;
 : pnatural pdigit <*> ;
-: pnatural2 pnatural [ car [ >digit ] map cat dup pempty? [ drop 0 ] [ str>number ] ifte unit ] <@ ;
+: pnatural2 pnatural [ car [ >digit ] map >string dup pempty? [ drop 0 ] [ str>number ] ifte unit ] <@ ;
 : test30 "12345" pnatural2 call [ . ] leach ;
   
 ! Testing <+>
