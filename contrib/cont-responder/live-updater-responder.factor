@@ -38,7 +38,7 @@ USE: prettyprint
   #! Given a string that is a factor word, show the
   #! aporpos of that word.
   <namespace> [
-    "responder" "browser" put
+    "browser" "responder" set
     <pre> 
         stdio get <html-stream> [   
           apropos.

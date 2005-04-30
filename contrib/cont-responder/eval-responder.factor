@@ -105,12 +105,17 @@ USE: sequences
     [ <tr> <td> write-eval-link </td> </tr> ] each
   </table> ;
 
+: usages. ( word -- )
+  #! Write to output the words that use the given word, one
+  #! per line.
+  usages [ . ] each ;
+
 : html-for-word-source ( word-string -- )
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
   <namespace> [
-    "responder" "browser" put
+    "browser" "responder" set
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
@@ -172,9 +177,9 @@ USE: sequences
   #! Call the quotation using 'list' as the datastack
   #! return the result datastack as a list.
   datastack >r    
-  swap list>vector tuck vector-push 
+  swap >vector tuck push 
   set-datastack call datastack >list
-  r> >pop> >pop> tuck vector-push set-datastack ;
+  r> >pop> >pop> tuck push set-datastack ;
 
 : do-eval ( list string -- list )
   #! Evaluate the expression in 'string' using 'list' as
@@ -198,6 +203,12 @@ USE: sequences
   #!
   #! This combinator will not compile.
   dup slip forever ;
+
+: cons@ ( value name -- )
+  #! Get the value of the variable named by 'name'
+  #! from the current namespace and cons 'value' to its
+  #! current value.
+  dup get rot swons swap set ;
 
 : run-eval-requester ( evaluator -- )
   #! Enter a loop request an expression to
