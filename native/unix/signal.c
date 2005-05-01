@@ -81,5 +81,5 @@ void primitive_call_profiling(F_WORD *word)
 	}
 
 	if(setitimer(ITIMER_PROF,&prof_timer,NULL) < 0)
-		c_stream_error();
+		io_error();
 }

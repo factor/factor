@@ -24,7 +24,7 @@ void init_c_io(void)
 	userenv[OUT_ENV] = tag_object(alien(stdout));
 }
 
-void c_stream_error(void)
+void io_error(void)
 {
 	CELL error = tag_object(from_c_string(strerror(errno)));
 	general_error(ERROR_IO,error);
@@ -39,7 +39,7 @@ void primitive_fopen(void)
 	path = unbox_c_string();
 	file = fopen(path,mode);
 	if(file == NULL)
-		c_stream_error();
+		io_error();
 	box_alien(file);
 }
 
@@ -58,7 +58,7 @@ void primitive_fgets(void)
 		if(feof(file))
 			dpush(F);
 		else
-			c_stream_error();
+			io_error();
 	}
 	else
 		dpush(tag_object(from_c_string(line)));
@@ -74,7 +74,7 @@ void primitive_fwrite(void)
 	if(fwrite(to_c_string_unchecked(text),1,
 		untag_fixnum_fast(text->length),
 		file) == 0)
-		c_stream_error();
+		io_error();
 }
 
 void primitive_fflush(void)
