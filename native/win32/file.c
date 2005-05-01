@@ -1,50 +1,5 @@
 #include "../factor.h"
 
-void primitive_open_file(void) 
-{
-	bool write = unbox_boolean();
-	bool read = unbox_boolean();
-	char *path;
-	DWORD mode = 0, create = 0;
-	HANDLE fp;
-	SECURITY_ATTRIBUTES sa;
-
-	path = unbox_c_string();
-
-	mode |= write ? GENERIC_WRITE : 0;
-	mode |= read ? GENERIC_READ : 0;
-
-	if (read && write)
-		create = OPEN_ALWAYS;
-	else if (read)
-		create = OPEN_EXISTING;
-	else if (write)
-		create = CREATE_ALWAYS;
-
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-	sa.lpSecurityDescriptor = NULL;
-	sa.bInheritHandle = true;
-
-	fp = CreateFile(
-		path, 
-		mode, 
-		FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE,
-		&sa,
-		create,
-		/* FILE_FLAG_OVERLAPPED TODO */0, 
-		NULL);
-
-	if (fp == INVALID_HANDLE_VALUE) 
-	{
-		io_error(__FUNCTION__);
-	} 
-	else 
-	{
-		dpush(read ? tag_object(port(PORT_READ, (CELL)fp)) : F);
-		dpush(write ? tag_object(port(PORT_WRITE, (CELL)fp)) : F);
-	}
-}
-
 void primitive_stat(void)
 {
 	F_STRING *path;

@@ -6,28 +6,28 @@ DEFAULT_LIBS = -lm
 
 STRIP = strip
 
-WIN32_OBJS = native\win32\ffi.o native\win32\file.o native\win32\io.o \
-	native\win32\misc.o native\win32\read.o native\win32\write.o \
+WIN32_OBJS = native\win32\ffi.o native\win32\file.o \
+	native\win32\misc.o \
 	native\win32\run.o
 
-OBJS = $(WIN32_OBJS) native/arithmetic.o native/array.o native/bignum.o \
-	native/s48_bignum.o \
-	native/complex.o native/cons.o native/error.o \
-	native/factor.o native/fixnum.o \
-	native/float.o native/gc.o \
-	native/image.o native/memory.o \
-	native/misc.o native/primitives.o \
-	native/ratio.o native/relocate.o \
-	native/run.o \
-	native/sbuf.o native/stack.o \
-	native/string.o native/types.o native/vector.o \
-	native/word.o native/compiler.o \
-	native/alien.o native/dll.o \
-	native/boolean.o \
-	native/debug.o \
-	native/hashtable.o \
-	native/icache.o \
-	native/io.o
+OBJS = $(WIN32_OBJS) native\arithmetic.o native\array.o native\bignum.o \
+	native\s48_bignum.o \
+	native\complex.o native\cons.o native\error.o \
+	native\factor.o native\fixnum.o \
+	native\float.o native\gc.o \
+	native\image.o native\memory.o \
+	native\misc.o native\primitives.o \
+	native\ratio.o native\relocate.o \
+	native\run.o \
+	native\sbuf.o native\stack.o \
+	native\string.o native\types.o native\vector.o \
+	native\word.o native\compiler.o \
+	native\alien.o native\dll.o \
+	native\boolean.o \
+	native\debug.o \
+	native\hashtable.o \
+	native\icache.o \
+	native\io.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"
@@ -54,4 +54,10 @@ clean:
 
 .c.o:
 	$(CC) -c $(CFLAGS) -o $@ $<
+
+.S.o:
+	$(CC) -c $(CFLAGS) -o $@ $<
+
+native\icache.o: native\icache.s
+	$(CC) -c $(CFLAGS) -o $@ native\icache.S
 

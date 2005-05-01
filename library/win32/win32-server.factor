@@ -29,7 +29,7 @@ USING: alien errors generic kernel kernel-internals lists math namespaces
        win32-io-internals io-internals ;
 
 TUPLE: win32-server this ;
-TUPLE: win32-client-stream host ;
+TUPLE: win32-client-stream host port ;
 SYMBOL: winsock
 SYMBOL: socket
 
@@ -55,27 +55,28 @@ SYMBOL: socket
     AF_INET over set-sockaddr-in-family ;
 
 : bind-socket ( port socket -- )
-    swap setup-sockaddr "sockaddr-in" size wsa-bind 0 = [
+    swap setup-sockaddr "sockaddr-in" c-size wsa-bind 0 = [
         handle-socket-error
     ] unless ;
 
 : listen-socket ( socket -- )
     20 wsa-listen 0 = [ handle-socket-error ] unless ;
 
-: sockaddr>string ( sockaddr -- string )
-    dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa
-    [ , ":" , unparse , ] make-string ;
+: sockaddr> ( sockaddr -- port host )
+    dup sockaddr-in-port ntohs swap sockaddr-in-addr inet-ntoa ;
 
-: extract-remote-host ( buffer -- host )
+: extract-remote-host ( buffer -- port host )
     buffer-ptr <alien> 0 32 32 <indirect-pointer> <indirect-pointer> 
                                <indirect-pointer> dup >r <indirect-pointer> 
-    GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr>string ;
+    GetAcceptExSockaddrs r> indirect-pointer-value <alien> sockaddr> ;
 
 C: win32-client-stream ( buf stream -- stream )
     [ set-delegate extract-remote-host ] keep
-    [ set-win32-client-stream-host ] keep ;
+    [ set-win32-client-stream-host ] keep 
+    [ set-win32-client-stream-port ] keep ;
 
 M: win32-client-stream client-stream-host win32-client-stream-host ;
+M: win32-client-stream client-stream-port win32-client-stream-port ;
 
 C: win32-server ( port -- server )
     swap <namespace> [ 
@@ -87,7 +88,8 @@ C: win32-server ( port -- server )
 M: win32-server stream-close ( server -- )
     win32-server-this [ socket get CloseHandle drop ] bind ;
 
-M: win32-server accept ( server -- client )
+IN: streams
+: accept ( server -- client )
     win32-server-this [
         new-socket 64 <buffer>
         [

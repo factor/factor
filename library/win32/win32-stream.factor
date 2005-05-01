@@ -46,7 +46,7 @@ SYMBOL: file-size
     0 over set-overlapped-ext-internal-high
     fileptr get dup 0 ? over set-overlapped-ext-offset
     0 over set-overlapped-ext-offset-high
-    0 over set-overlapped-ext-event ;
+    NULL over set-overlapped-ext-event ;
 
 : update-file-pointer ( whence -- )
     file-size get [ fileptr [ + ] change ] [ drop ] ifte ;
@@ -87,7 +87,7 @@ M: string do-write ( str -- )
         ReadFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
 
-    dup in-buffer get >buffer update-file-pointer ;
+    dup in-buffer get n>buffer update-file-pointer ;
 
 : consume-input ( count -- str ) 
     in-buffer get buffer-length 0 = [ fill-input ] when

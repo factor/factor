@@ -1,5 +1,9 @@
 #include "../factor.h"
 
+void init_ffi (void)
+{
+}
+
 void ffi_dlopen (DLL *dll)
 {
 	HMODULE module;
