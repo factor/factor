@@ -57,7 +57,7 @@ void primitive_cwd(void)
 
 	maybe_garbage_collection();
 	if(!GetCurrentDirectory(MAX_PATH, buf))
-		io_error(__FUNCTION__);
+		io_error();
 
 	box_c_string(buf);
 }
