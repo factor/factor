@@ -19,13 +19,13 @@ namespaces ;
         deque set-run-queue
     ] ifte ;
 
-: schedule-thread ( quot -- ) run-queue enque set-run-queue ;
+: schedule-thread ( quot -- )
+    run-queue enque set-run-queue ;
 
 : stop ( -- )
-    #! If there is a quotation in the run queue, call it,
-    #! otherwise wait for I/O.
-    pending-io? [ 10 io-multiplex ] when
-    next-thread [ call ] [ -1 io-multiplex stop ] ifte* ;
+    ! This definition gets replaced by the Unix and Win32 I/O
+    ! code.
+    next-thread [ call ] [ "No more tasks" throw ] ifte* ;
 
 : yield ( -- )
     #! Add the current continuation to the run queue, and yield

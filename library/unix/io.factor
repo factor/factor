@@ -388,3 +388,11 @@ USE: stdio
 IN: streams
 
 : fcopy 2drop ;
+
+IN: threads
+
+: stop ( -- )
+    #! If there is a quotation in the run queue, call it,
+    #! otherwise wait for I/O.
+    pending-io? [ 10 io-multiplex ] when
+    next-thread [ call ] [ -1 io-multiplex stop ] ifte* ;
