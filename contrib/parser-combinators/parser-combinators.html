@@ -248,7 +248,7 @@ continue. The example below extends our natural-parser to parse
 integers with an optional leading minus sign.</p>
 <pre class="code">
   ( 1 ) : integer-parser
-          "-" token <?> natural-parser &lt;&amp;&gt; ;
+          "-" token &lt;?&gt; natural-parser &lt;&amp;&gt; ;
   ( 2 ) "200" integer-parser call [ . ] leach 
        =&gt; [ "" [ ] 200 ]
             [ "0" [ ] 20 ]
