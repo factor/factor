@@ -30,7 +30,9 @@ global [ <namespace> c-types set ] bind
 
 [
     [ alien-unsigned-cell <alien> ] "getter" set
-    [ alien-address set-alien-unsigned-cell ] "setter" set
+    [
+        >r >r alien-address r> r> set-alien-unsigned-cell
+    ] "setter" set
     cell "width" set
     cell "align" set
     "box_alien" "boxer" set
