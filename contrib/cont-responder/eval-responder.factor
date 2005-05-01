@@ -73,7 +73,7 @@ USE: sequences
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] seq-map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
@@ -191,10 +191,11 @@ USE: sequences
   #! All output should go to a string which is returned on the
   #! callstack along with the resulting datastack as a list.
   [
-     "browser" "responder" set
-     stdio [ <html-stream> ] change
-     do-eval
-  ] with-string ;
+    "browser" "responder" set
+    1024 <sbuf> dup >r <html-stream> [
+      do-eval
+    ] with-stream r> sbuf>string
+  ] with-scope ;
 
 : forever ( quot -- )
   #! The code is evaluated in an infinite loop. Typically, a
