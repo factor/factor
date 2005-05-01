@@ -100,8 +100,7 @@ SYMBOL: io-tasks
     ] keep ;
 
 : io-multiplex ( timeout -- )
-    make-pollfds [ pick poll drop ] 2keep do-io-tasks
-    io-multiplex ;
+    >r make-pollfds 2dup r> poll drop do-io-tasks ;
 
 : pending-io? ( -- ? )
     #! Output if there are waiting I/O requests.
