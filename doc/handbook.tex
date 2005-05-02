@@ -77,265 +77,6 @@ Factor is \emph{dynamic}. This means that all objects in the language are fully 
 Factor is \emph{safe}. This means all code executes in an object-oriented runtime that provides
 garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
 
-\chapter{Tutorial}
-
-\section{A number guessing game}
-
-In this section, basic input/output and flow control is introduced.
-We construct a program that repeatedly prompts the user to guess a
-number -- they are informed if their guess is correct, too low, or
-too high. The game ends on a correct guess.
-
-\begin{alltt}
-numbers-game
-\emph{I'm thinking of a number between 0 and 100.}
-\emph{Enter your guess:} 25
-\emph{Too low}
-\emph{Enter your guess:} 38
-\emph{Too high}
-\emph{Enter your guess:} 31
-\emph{Correct - you win!}
-\end{alltt}
-
-\subsection{Getting started}
-
-Start a text editor and create a file named \texttt{numbers-game.factor}.
-
-Write a short comment at the top of the file. Two examples of commenting style supported by Factor:
-
-\begin{alltt}
-! Numbers game.
-( The great numbers game )
-\end{alltt}
-
-It is always a good idea to comment your code. Try to write simple
-code that does not need detailed comments to describe; similarly,
-avoid redundant comments. These two principles are hard to quantify
-in a concrete way, and will become more clear as your skills with
-Factor increase.
-
-We will be defining new words in the \texttt{numbers-game} vocabulary; add
-an \texttt{IN:} statement at the top of the source file:
-
-\begin{alltt}
-IN: numbers-game
-\end{alltt}
-Also in order to be able to test the words, issue a \texttt{USE:}
-statement in the interactive interpreter:
-
-\begin{alltt}
-USE: numbers-game
-\end{alltt}
-This section will develop the numbers game in an incremental fashion.
-After each addition, issue a command like the following to load the
-source file into the Factor interpreter:
-
-\begin{alltt}
-"numbers-game.factor" run-file
-\end{alltt}
-
-\subsection{Reading a number from the keyboard}
-
-A fundamental operation required for the numbers game is to be able
-to read a number from the keyboard. The \texttt{read} word \texttt{(
--{}- str )} reads a line of input and pushes it on the stack.
-The \texttt{parse-number} word \texttt{( str -{}- n )} turns a decimal
-string representation of an integer into the integer itself. These
-two words can be combined into a single colon definition:
-
-\begin{alltt}
-: read-number ( -{}- n ) read parse-number ;
-\end{alltt}
-You should add this definition to the source file, and try loading
-the file into the interpreter. As you will soon see, this raises an
-error! The problem is that the two words \texttt{read} and \texttt{parse-number}
-are not part of the default, minimal, vocabulary search path used
-when reading files. The solution is to use \texttt{apropos.} to find
-out which vocabularies contain those words, and add the appropriate
-\texttt{USING:} statements to the source file:
-
-\begin{alltt}
-USING: parser stdio ;
-\end{alltt}
-After adding the above two statements, the file should now parse,
-and testing should confirm that the \texttt{read-number} word works correctly.%
-\footnote{There is the possibility of an invalid number being entered at the
-keyboard. In this case, \texttt{parse-number} returns \texttt{f},
-the boolean false value. For the sake of simplicity, we ignore this
-case in the numbers game example. However, proper error handling is
-an essential part of any large program and is covered later.%
-}
-
-
-\subsection{Printing some messages}
-
-Now we need to make some words for printing various messages. They
-are given here without further ado:
-
-\begin{alltt}
-: guess-banner
-    "I'm thinking of a number between 0 and 100." print ;
-: guess-prompt "Enter your guess: " write ;
-: too-high "Too high" print ;
-: too-low "Too low" print ;
-: correct "Correct - you win!" print ;
-\end{alltt}
-Note that in the above, stack effect comments are omitted, since they
-are obvious from context. You should ensure the words work correctly
-after loading the source file into the interpreter.
-
-
-\subsection{Taking action based on a guess}
-
-The next logical step is to write a word \texttt{judge-guess} that
-takes the user's guess along with the actual number to be guessed,
-and prints one of the messages \texttt{too-high}, \texttt{too-low},
-or \texttt{correct}. This word will also push a boolean flag, indicating
-if the game should continue or not -- in the case of a correct guess,
-the game does not continue.
-
-This description of judge-guess is a mouthful -- and it suggests that
-it may be best to split it into two words. The first word we write
-handles the more specific case of an \emph{inexact} guess -- so it
-prints either \texttt{too-low} or \texttt{too-high}.
-
-\begin{alltt}
-: inexact-guess ( actual guess -{}- )
-     < {[} too-high {]} {[} too-low {]} ifte ;
-\end{alltt}
-Note that the word gives incorrect output if the two parameters are
-equal. However, it will never be called this way.
-
-With this out of the way, the implementation of judge-guess is an
-easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
-
-\begin{alltt}
-: judge-guess ( actual guess -{}- ? )
-    2dup = {[}
-        2drop correct f
-    {]} {[}
-        inexact-guess t
-    {]} ifte ;
-\end{alltt}
-
-The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
-consumes both its inputs, we must first duplicate the \texttt{actual} and \texttt{guess} parameters using \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
-in the interpreter to see what's going on:
-
-\begin{alltt}
-clear 1 2 2dup = .s
-\emph{\{ 1 2 f \}}
-clear 4 4 2dup = .s
-\emph{\{ 4 4 t \}}
-\end{alltt}
-
-Test \texttt{judge-guess} with a few inputs:
-
-\begin{alltt}
-1 10 judge-guess .
-\emph{Too low}
-\emph{t}
-89 43 judge-guess .
-\emph{Too high}
-\emph{t}
-64 64 judge-guess .
-\emph{Correct}
-\emph{f}
-\end{alltt}
-
-\subsection{Generating random numbers}
-
-The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
-random number in a specified range. The range is inclusive, so both
-the minimum and maximum indexes are candidate random numbers. Use
-\texttt{apropos.} to determine that this word is in the \texttt{random}
-vocabulary. For the purposes of this game, random numbers will be
-in the range of 0 to 100, so we can define a word that generates a
-random number in the range of 0 to 100:
-
-\begin{alltt}
-: number-to-guess ( -{}- n ) 0 100 random-int ;
-\end{alltt}
-Add the word definition to the source file, along with the appropriate
-\texttt{USING:} declaration. Load the source file in the interpreter,
-and confirm that the word functions correctly, and that its stack
-effect comment is accurate.
-
-
-\subsection{The game loop}
-
-The game loop consists of repeated calls to \texttt{guess-prompt},
-\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
-returns \texttt{f}, the loop stops, otherwise it continues. This is
-realized with a recursive implementation:
-
-\begin{alltt}
-: numbers-game-loop ( actual -{}- )
-    dup guess-prompt read-number judge-guess {[}
-        numbers-game-loop
-    {]} {[}
-        drop
-    {]} ifte ;
-\end{alltt}
-In Factor, tail-recursive words consume a bounded amount of call stack
-space. This means you are free to pick recursion or iteration based
-on their own merits when solving a problem. In many other languages,
-the usefulness of recursion is severely limited by the lack of tail-recursive
-call optimization.
-
-
-\subsection{Finishing off}
-
-The last task is to combine everything into the main \texttt{numbers-game}
-word. This is easier than it seems:
-
-\begin{alltt}
-: numbers-game number-to-guess numbers-game-loop ;
-\end{alltt}
-Try it out! Simply invoke the \texttt{numbers-game} word in the interpreter.
-It should work flawlessly, assuming you tested each component of this
-design incrementally!
-
-
-\subsection{The complete program}
-
-\begin{verbatim}
-! Numbers game example
-
-IN: numbers-game
-USING: kernel math parser random stdio ;
-
-: read-number ( -- n ) read parse-number ;
-
-: guess-banner
-    "I'm thinking of a number between 0 and 100." print ;
-: guess-prompt "Enter your guess: " write ;
-: too-high "Too high" print ;
-: too-low "Too low" print ;
-: correct "Correct - you win!" print ;
-
-: inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
-
-: judge-guess ( actual guess -- ? )
-    2dup = [
-        2drop correct f
-    ] [
-        inexact-guess t
-    ] ifte ;
-
-: number-to-guess ( -- n ) 0 100 random-int ;
-
-: numbers-game-loop ( actual -- )
-    dup guess-prompt read-number judge-guess [
-        numbers-game-loop
-    ] [
-        drop
-    ] ifte ;
-
-: numbers-game number-to-guess numbers-game-loop ;
-\end{verbatim}
-
 \chapter{Language reference}
 
 \section{Conventions}
@@ -425,12 +166,12 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{>to}] converts the object at the top of the stack to the \texttt{to} class
 \item[\texttt{from>}] converts an instance of the \texttt{from} class into some canonical form
 \item[\texttt{from>to}] convert an instance of the \texttt{from} class to the \texttt{to} class
-\item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack)
+\item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack). Sometimes, libraries will define their own words following this naming convention, to implement user-defined stacks, typically stored in variables
 \item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
 \item[\texttt{<class>}] create a new instance of \texttt{class}
 \item[\texttt{nfoo}] destructive version of \texttt{foo}, that modifies one of its inputs rather than returning a new value. The ``n'' prefix denotes ``non-constructive''. This convention is used by sequence words
-\item[\texttt{2foo}] like \texttt{foo} but takes two operands
-\item[\texttt{3foo}] like \texttt{foo} but takes three operands
+\item[\texttt{2foo}] like \texttt{foo} but takes or returns two operands
+\item[\texttt{3foo}] like \texttt{foo} but takes or returns three operands
 \item[\texttt{foo-with}] a form of the \texttt{foo} combinator that takes an extra object, and passes this object on each iteration of the quotation; for example, \texttt{each-with} and \texttt{map-with}
 \item[\texttt{with-foo}] executes a quotation in a namespace where \texttt{foo} is configured in a special manner; for example, \texttt{with-stream}
 \item[\texttt{make-foo}] executes a quotation in a namespace where a sequence of type \texttt{foo} is being constructed; for example, \texttt{make-string}
@@ -438,17 +179,18 @@ The following naming conventions are used in the Factor library.
 
 \subsection{Mathematics}
 
-This guide uses the standard mathematical notation to denote intervals (ranges of numbers).
+This guide uses the standard mathematical notation to denote intervals.
 
 \begin{tabular}{l|l}
 Notation&Meaning\\
+\hline
 $(a,b)$&All numbers from $a$ to $b$, excluding $a$ and $b$\\
 $[a,b)$&All numbers from $a$ to $b$, including $a$ and excluding and $b$\\
 $(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including and $b$\\
 $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \end{tabular}
 
-\section{Syntax}
+\section{\label{syntax}Syntax}
 \newcommand{\parseglos}{\glossary{name=parser,
 description={a set of words in the \texttt{parser} vocabulary, primarily \texttt{parse}, \texttt{eval}, \texttt{parse-file} and \texttt{run-file}, that creates objects from their printed representations, and adds word definitions to the dictionary}}}
 \parseglos
@@ -3161,6 +2903,24 @@ The word \texttt{.} prints numbers in decimal, regardless of how they were input
 }
 Prints an integer in hexadecimal, octal or binary.
 
+\subsubsection{Counted loops}
+
+A pair of combinators calls a quotation a fixed number of times.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{times}{times ( n quot -- )}
+\texttt{quot:~-- }\\
+}
+Calls the quotation $n$ times. If $n<0$, the quotation is not called at all.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{repeat}{repeat ( n quot -- )}
+\texttt{quot:~i -- i }\\
+}
+Calls \texttt{quot} $n$ times, with the parameter \texttt{i} ranging from 0 to $n-1$. The quotation must output $i$ unmodified; or indeed, if it modifies it, the loop continues from that index. That is, the value $i$ on the stack is the actual loop counter, not a copy.
+
 \subsubsection{Modular arithmetic}
 
 \wordtable{
@@ -3268,9 +3028,9 @@ BIN: 11111 -2 shift .b
 
 \wordtable{
 \vocabulary{math}
-\ordinaryword{random-int}{random-int ( min max -- n )}
+\ordinaryword{random-int}{random-int ( a b -- n )}
 }
-Outputs a pseudo-random integer in the interval $[min,max]$.
+Outputs a pseudo-random integer in the interval $[a,b]$.
 
 \subsection{\label{ratios}Rational numbers}
 
@@ -3766,20 +3526,47 @@ Outputs the IP address as a dotted-quad string, and the local port number, respe
 
 \subsection{Special streams}
 
-A pair of special streams are useful in certain circumstances.
-
 \wordtable{
 \vocabulary{streams}
 \ordinaryword{<null-stream>}{<null-stream>~( -- stream~)}
-
 }
 Creates a null stream, which ignores output written to it, and returns end of file if an attempt is made to read.
 \wordtable{
 \vocabulary{streams}
 \ordinaryword{<duplex-stream>}{<duplex-stream>~( in out -- stream~)}
-
 }
 Creates a duplex stream. Writing to a duplex stream will write to \texttt{out}, and reading from a duplex stream will read from \texttt{in}. Closing a duplex stream closes both the input and output streams.
+\wordtable{
+\vocabulary{streams}
+\ordinaryword{<wrapper-stream>}{<wrapper-stream>~( stream -- stream~)}
+}
+Creates a stream wrapping \texttt{stream}. The given stream becomes the delegate of the new wrapper stream, so calling any stream operation on the wrapper passes it on to the delegate.
+You can then define your own tuple class that delegates to a wrapper stream, then override methods on this new tuple class, and use the following combinator in your method definitions.
+
+\wordtable{
+\vocabulary{streams}
+\ordinaryword{with-wrapper}{with-wrapper~( stream quot -- ~)}
+}
+Executes the quotation in a dynamic scope where the \texttt{stdio} variable is set to the wrapped stream.
+
+The following example implements a stream that emits \TeX\ markup when a certain attribute is set in the \texttt{attrs} parameter to \texttt{stream-write-attr}.
+
+\begin{verbatim}
+USING: generic kernel lists stdio streams ;
+TUPLE: tex-stream ;
+
+C: tex-stream ( stream -- stream )
+    [ >r <wrapper-stream> r> set-delegate ] keep ;
+
+M: tex-stream stream-write-attr ( string attrs stream -- )
+    [
+        "bold" swap assoc [
+            "\textbf{" write write "}" write
+        ] [
+            write
+        ] ifte
+    ] with-wrapper ;
+\end{verbatim}
 
 \subsection{Printing objects}
 
@@ -3906,6 +3693,71 @@ Decreases the indent level and emits a newline if \texttt{one-line} is off.
 
 \section{The parser}
 
+This section concerns itself with reflective access and extension of the parser. Syntax is documented in \ref{syntax}.
+
+As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables (\ref{namespaces}):
+\begin{description}
+\item["use"] the vocabulary search path; a list of strings
+\item["in"] the current vocabulary; a string
+\end{description}
+
+\wordtable{
+\vocabulary{parser}
+\genericword{parse}{parse~( string -- list )}
+}
+Parses the string and outputs a list of all objects read from that string, indeed, a quotation. The vocabulary search path and current vocabulary are taken from the current scope.
+\begin{alltt}
+\textbf{ok} "1 2 3" parse .
+\textbf{[ 1 2 3 ]}
+\end{alltt}
+
+\wordtable{
+\vocabulary{parser}
+\genericword{eval}{eval~( string -- )}
+}
+Parses a string then calls the resulting quotation.
+\begin{alltt}
+\textbf{ok} "2 2 + ." eval
+\textbf{4}
+\end{alltt}
+The \texttt{eval} word is defined as follows:
+\begin{verbatim}
+: eval parse call ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{parser}
+\genericword{parse-stream}{parse-stream~( name stream -- list )}
+}
+Parses lines of text from the stream and outputs a quotation. The \texttt{name} parameter identifies the stream in error messages. The stream is closed when the end is reached. The vocabulary search path and current vocabulary are set to their default values. The initial vocabulary search path contains two vocabularies:
+\begin{verbatim}
+syntax
+scratchpad
+\end{verbatim}
+The initial current vocabulary is \texttt{scratchpad}.
+
+\wordtable{
+\vocabulary{parser}
+\genericword{parse-file}{parse-file~( path -- list )}
+}
+Parses the contents of a file and outputs a quotation. Defined as follows:
+\begin{verbatim}
+: parse-file dup <file-reader> parse-stream ;
+\end{verbatim}
+\wordtable{
+\vocabulary{parser}
+\genericword{run-file}{run-file~( path -- list )}
+}
+Parses the contents of a file and calls the resulting quotation. Defined as follows:
+\begin{verbatim}
+: run-file parse-file call ;
+\end{verbatim}
+
+\subsection{Resources}
+
+\glossary{name=resource,
+description={a file in the Factor source code}}
+
 \subsection{\label{parsing-words}Parsing words}
 
 \subsubsection{\label{string-mode}String mode}
@@ -3914,29 +3766,36 @@ Decreases the indent level and emits a newline if \texttt{one-line} is off.
 
 \subsection{HTTP client}
 
+\wordtable{
+\vocabulary{http-client}
+\ordinaryword{http-get}{http-get ( url -- code headers stream )}
+}
+Attempts to connect to the server specified in the URL. If the connection fails, an exception is thrown, otherwise the following values are output;
+\begin{description}
+\item[\texttt{code}] an integer with the HTTP response code; for example, 404 denotes ``file not found'' whereas 200 means ``success''.
+\item[\texttt{headers}] an association list of returned headers.
+\item[\texttt{stream}] a stream for reading the resource.
+\end{description}
 
 \subsection{\label{html}HTML output}
 
-HTML streams output text using the stream APIs, and escape special characters as HTML entities. Additionally, HTML streams implement the \texttt{stream-write-attr} word to support output of various HTML tags.
+An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities before being passed on to the wrapped stream. Also, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word may be filled out to wrap the text being written in various HTML tags.
 
 \wordtable{
 \vocabulary{html}
 \ordinaryword{with-html-stream}{with-html-stream ( quot -- )}
-
 }
 Calls the quotation in a new dynamic scope. The \texttt{stdio} variable is set to an HTML stream wrapping the previous value of \texttt{stdio}, so calls to \texttt{write}, \texttt{write-attr} and \texttt{print} go through the HTML stream.
 
 \wordtable{
 \vocabulary{html}
 \ordinaryword{html-document}{html-document ( title quot -- )}
-
 }
-Like \texttt{with-html-stream}, except some tags such as \texttt{<html>}, \texttt{<head>} and \texttt{<body>} are output. The title is output in two places; a \texttt{<title>} tag  and \texttt{<h1>} tag.
+Builds on \texttt{with-html-stream} to emit the basic structure of an HTML document, consisting of \texttt{<html>}, \texttt{<head>} and \texttt{<body>} tags. The title is output in two places; a \texttt{<title>} tag  and \texttt{<h1>} tag.
 
 \wordtable{
 \vocabulary{html}
 \ordinaryword{simple-html-document}{simple-html-document ( title quot -- )}
-
 }
 Like \texttt{html-document}, except the output is wrapped inside a \texttt{<pre>} tag.
 
