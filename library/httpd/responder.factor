@@ -1,8 +1,82 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: httpd-responder
-USING: hashtables httpd kernel namespaces sequences streams
-strings ;
+IN: httpd
+USING: hashtables http kernel lists namespaces parser sequences
+stdio streams strings ;
+
+: print-header ( alist -- )
+    [ unswons write ": " write url-encode print ] each ;
+
+: response ( header msg -- )
+    "HTTP/1.0 " write print print-header ;
+
+: error-body ( error -- body )
+    "<html><body><h1>" swap "</h1></body></html>" cat3 print ;
+
+: error-head ( error -- )
+    dup log-error
+    [ [[ "Content-Type" "text/html" ]] ] over response ;
+
+: httpd-error ( error -- )
+    #! This must be run from handle-request
+    error-head
+    "head" "method" get = [ terpri error-body ] unless ;
+
+: bad-request ( -- )
+    [
+        ! Make httpd-error print a body
+        "get" "method" set
+        "400 Bad request" httpd-error
+    ] with-scope ;
+
+: serving-html ( -- )
+    [ [[ "Content-Type" "text/html" ]] ]
+    "200 Document follows" response terpri ;
+
+: serving-text ( -- )
+    [ [[ "Content-Type" "text/plain" ]] ]
+    "200 Document follows" response terpri ;
+
+: redirect ( to -- )
+    "Location" swons unit
+    "301 Moved Permanently" response terpri ;
+
+: directory-no/ ( -- )
+    [
+        "request" get , CHAR: / ,
+        "raw-query" get [ CHAR: ? , , ] when*
+    ] make-string redirect ;
+
+: content-length ( alist -- length )
+    "Content-Length" swap assoc parse-number ;
+
+: query>alist ( query -- alist )
+    dup [
+        "&" split [
+            "=" split1
+            dup [ url-decode ] when swap
+            dup [ url-decode ] when swap cons
+        ] map
+    ] when ;
+
+: read-post-request ( header -- alist )
+    content-length dup [ read query>alist ] when ;
+
+: log-user-agent ( alist -- )
+    "User-Agent" swap assoc* [
+        unswons [ , ": " , , ] make-string log
+    ] when* ;
+
+: prepare-url ( url -- url )
+    #! This is executed in the with-request namespace.
+    "?" split1
+    dup "raw-query" set query>alist "query" set
+    dup "request" set ;
+
+: prepare-header ( -- )
+    read-header dup "header" set
+    dup log-user-agent
+    read-post-request "response" set ;
 
 ! Responders are called in a new namespace with these
 ! variables:
@@ -57,6 +131,13 @@ strings ;
 : serve-default-responder ( method url -- )
     default-responder call-responder ;
 
+: log-responder ( url -- )
+    "Calling responder " swap cat2 log ;
+
+: trim-/ ( url -- url )
+    #! Trim a leading /, if there is one.
+    "/" ?string-head drop ;
+
 : serve-explicit-responder ( method url -- )
     "/" split1 dup [
         swap get-responder call-responder
@@ -64,13 +145,6 @@ strings ;
         ! Just a responder name by itself
         drop "request" get "/" cat2 redirect drop
     ] ifte ;
-
-: log-responder ( url -- )
-    "Calling responder " swap cat2 log ;
-
-: trim-/ ( url -- url )
-    #! Trim a leading /, if there is one.
-    "/" ?string-head drop ;
 
 : serve-responder ( method url -- )
     #! Responder URLs come in two forms:

@@ -34,10 +34,10 @@ USE: math
 USE: stdio
 USE: kernel
 USE: prettyprint
-USE: url-encoding
 USE: files
 USE: hashtables
 USE: sequences
+USE: http
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list

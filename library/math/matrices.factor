@@ -176,4 +176,4 @@ M: matrix v. ( m1 m2 -- m )
 M: matrix prettyprint* ( indent obj -- indent )
     \ M[ word. >r <prettyprint r>
     row-list matrix-rows.
-    " " write \ ]M word. prettyprint> ;
+    bl \ ]M word. prettyprint> ;

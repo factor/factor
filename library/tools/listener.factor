@@ -18,7 +18,7 @@ global [
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input
-    " " write flush ;
+    bl flush ;
 
 : bye ( -- )
     #! Exit the current listener.

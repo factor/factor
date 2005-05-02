@@ -1,47 +1,11 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004,2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
-USE: errors
-USE: files
-USE: html
-USE: httpd
-USE: httpd-responder
-USE: kernel
-USE: lists
-USE: namespaces
-USE: parser
-USE: stdio
-USE: streams
-USE: strings
-USE: unparser
+USING: files html httpd kernel lists namespaces parser sequences
+stdio streams strings unparser ;
 
 : serving-path ( filename -- filename )
-    [ "" ] unless* "doc-root" get swap cat2 ;
+    [ "" ] unless* "doc-root" get swap append ;
 
 : file-response ( mime-type length -- )
     [
@@ -53,7 +17,7 @@ USE: unparser
     over file-length file-response  "method" get "head" = [
         drop
     ] [
-        <file-reader> stdio get fcopy
+        <file-reader> stdio get stream-copy
     ] ifte ;
 
 : serve-file ( filename -- )
@@ -73,7 +37,7 @@ USE: unparser
 
 : serve-directory ( filename -- )
     "/" ?string-tail [
-        dup "/index.html" cat2 dup exists? [
+        dup "/index.html" append dup exists? [
             serve-file
         ] [
             drop list-directory

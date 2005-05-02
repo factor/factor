@@ -355,26 +355,6 @@ M: writer stream-close ( stream -- )
 : <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
-! Copying from a reader to a writer
-
-: can-copy? ( from -- ? )
-    dup eof? [ refill ] [ drop t ] ifte ;
-
-: copy-from-task ( from to -- ? )
-    over can-copy? [
-        over eof? [
-            2drop t
-        ] [
-            over buffer-fill over can-write? [
-                dupd buffer-append 0 swap buffer-reset
-            ] [
-                2drop
-            ] ifte f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 USE: stdio
 
 : init-io ( -- )
@@ -384,10 +364,6 @@ USE: stdio
         <namespace> io-tasks set
         0 1 t <fd-stream> stdio set
     ] bind ;
-
-IN: streams
-
-: fcopy 2drop ;
 
 IN: threads
 

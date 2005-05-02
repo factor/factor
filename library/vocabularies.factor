@@ -79,6 +79,7 @@ SYMBOL: vocabularies
 
 : forget ( word -- )
     #! Remove a word definition.
+    dup uncrossref
     dup word-vocabulary vocab [ word-name off ] bind ;
 
 : init-search-path ( -- )

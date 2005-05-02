@@ -84,7 +84,7 @@ USE: sequences
     #! With the attribute namespace on the stack, get the attributes
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
-    "attrs" get [ " " write attrs>string write ] when* ;
+    "attrs" get [ bl attrs>string write ] when* ;
 
 : store-prev-attribute ( n: tag value -- )     
     #! Assumes an attribute namespace is on the stack.

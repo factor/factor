@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: httpd-responder
+IN: httpd
 USING: browser-responder cont-responder file-responder kernel
 namespaces prettyprint quit-responder resource-responder
 test-responder ;

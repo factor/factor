@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
 USING: generic kernel lists namespaces presentation sequences
-stdio streams strings unparser url-encoding ;
+stdio streams strings unparser http ;
 
 : html-entities ( -- alist )
     [
@@ -75,17 +75,16 @@ stdio streams strings unparser url-encoding ;
     [ "/" , resolve-file-link url-encode , ] make-string ;
 
 : file-link-tag ( style quot -- )
-    over "file-link" swap assoc [
+    over "file" swap assoc [
         <a href= file-link-href a> call </a>
     ] [
         call
     ] ifte* ;
 
 : browser-link-href ( style -- href )
-    dup "browser-link-word" swap assoc url-encode
-    swap "browser-link-vocab" swap assoc url-encode
-    "responder" get url-encode
-    [ "/responder/" , , "/?vocab=" , , "&word=" , , ] make-string ;
+    dup "word" swap assoc url-encode
+    swap "vocab" swap assoc url-encode
+    [ "/responder/browser/?vocab=" , , "&word=" , , ] make-string ;
 
 : browser-link-tag ( style quot -- style )
     over "browser-link-word" swap assoc [
@@ -123,14 +122,16 @@ C: html-stream ( stream -- stream )
     #! written, and supports writing attributed strings with
     #! the following attributes:
     #!
-    #! link - an object path
     #! fg - an rgb triplet in a list
     #! bg - an rgb triplet in a list
     #! bold
     #! italics
     #! underline
     #! size
-    #! link - an object path
+    #! icon
+    #! file
+    #! word
+    #! vocab
     [ >r <wrapper-stream> r> set-delegate ] keep ;
 
 : with-html-stream ( quot -- )

@@ -453,7 +453,7 @@ USE: sequences
   #! Write the table of items for the todo list.
   <table> 
     "heading" [ 
-      [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] [ " " write ] 
+      [ "Priority" write ] [ "Complete?" write ] [ "Description" write ] [ "Action" write ] [ bl ] 
     ] styled-row
     todo-items [ write-item-row ] each 
   </table> ;

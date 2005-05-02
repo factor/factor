@@ -2,17 +2,17 @@
 
 - faster layout
 - faster repaint
-- forgotten words not removed from cross-reference
 - implement fcopy
 - win32 updates
 
 - get all-tests to run with -no-compile
-- if external factor is down, don't add tons of random shit to the dictionary
 - scalar * matrix, vector * matrix, matrix * vector need to work
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
 - rotating cube demo
 
+- if external factor is down, don't add tons of random shit to the       
+  dictionary
 - plugin: extra space in stack effects
 - plugin: type "re" in edit word dialog --> hang
 
@@ -78,7 +78,6 @@
 
 + kernel:
 
-- rename prettyprint to pprint
 - powerpc has weird callstack residue
 - .factor-rc loading errors are not reported properly
 - instances: do not use make-list
@@ -96,8 +95,8 @@
 
 + i/o:
 
-- print [ foo ] car as \ foo
-- printing f inside a list prints ...
+- rename prettyprint to pprint
+- reading and writing byte arrays
 - merge unix and win32 io where appropriate
 - unix io: handle \n\r and \n\0
 - reader syntax for arrays, byte arrays, displaced aliens

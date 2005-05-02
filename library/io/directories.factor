@@ -19,13 +19,13 @@ streams strings unparser ;
  : file-icon. directory? dir-icon file-icon ? write-icon ;
 
 : file-link. ( dir name -- )
-    tuck "/" swap cat3 dup "file-link" swons swap
+    tuck "/" swap cat3 dup "file" swons swap
     unparse file-actions <actions> "actions" swons
     2list write-attr ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.
-    2dup "/" swap cat3 file-icon. " " write file-link. terpri ;
+    2dup "/" swap cat3 file-icon. bl file-link. terpri ;
 
 : directory. ( dir -- )
     #! If "doc-root" set, create links relative to it.

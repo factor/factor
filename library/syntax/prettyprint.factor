@@ -36,8 +36,8 @@ M: object prettyprint* ( indent obj -- indent )
 : browser-attrs ( word -- style )
     #! Return the style values for the HTML word browser
     dup word-vocabulary [ 
-        swap word-name "browser-link-word" swons 
-        swap "browser-link-vocab" swons 
+        swap word-name "word" swons 
+        swap "vocab" swons 
         2list
     ] [
         drop [ ]  
@@ -54,10 +54,9 @@ M: object prettyprint* ( indent obj -- indent )
     ] ifte ;
 
 : word. ( word -- ) dup word-name swap word-attrs write-attr ;
-: word-bl word. " " write ;
 
 M: word prettyprint* ( indent word -- indent )
-    dup parsing? [ \ POSTPONE: word-bl ] when word. ;
+    dup parsing? [ \ POSTPONE: word. bl ] when word. ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -66,12 +65,29 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-newline ( indent -- )
     "\n" write indent ;
 
+: \? ( list -- ? )
+    #! Is the head of the list a [ foo ] car?
+    dup car dup cons? [
+        cdr [ drop f ] [ cdr car \ car = ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
 : prettyprint-elements ( indent list -- indent )
-    [ prettyprint* " " write ] each ;
+    [
+        dup \? [
+            \ \ word. bl
+            uncons >r car prettyprint* bl
+            r> cdr prettyprint-elements
+        ] [
+            uncons >r prettyprint* bl
+            r> prettyprint-elements
+        ] ifte
+    ] when* ;
 
 : ?prettyprint-newline ( indent -- )
     one-line get [
-        " " write drop
+        bl drop
     ] [
         prettyprint-newline
     ] ifte ;
@@ -106,7 +122,7 @@ M: word prettyprint* ( indent word -- indent )
         r> prettyprint-elements
         prettyprint> r> word.
     ] [
-        >r >r word. " " write r> drop r> word.
+        >r >r word. bl r> drop r> word.
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
@@ -136,7 +152,7 @@ M: tuple prettyprint* ( indent tuple -- indent )
     ] check-recursion ;
 
 M: alien prettyprint* ( alien -- str )
-    \ ALIEN: word-bl alien-address unparse write ;
+    \ ALIEN: word. bl alien-address unparse write ;
 
 : prettyprint ( obj -- )
     [
@@ -154,16 +170,12 @@ M: alien prettyprint* ( alien -- str )
         prettyprint
     ] with-scope ;
 
-: [.] ( list -- )
+: [.] ( sequence -- )
     #! Unparse each element on its own line.
-    [ . ] each ;
+    [ . ] seq-each ;
 
-: {.} ( vector -- )
-    #! Unparse each element on its own line.
-    >list reverse [ . ] each ;
-
-: .s datastack  {.} ;
-: .r callstack  {.} ;
+: .s datastack  reverse [.] ;
+: .r callstack  reverse [.] ;
 : .n namestack  [.] ;
 : .c catchstack [.] ;
 

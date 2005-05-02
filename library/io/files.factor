@@ -8,6 +8,6 @@ USING: kernel lists sequences strings ;
 : exists? ( file -- ? ) stat >boolean ;
 : directory? ( file -- ? ) stat car ;
 : directory ( dir -- list ) (directory) [ string> ] sort ;
-: file-length ( file -- length ) stat dup [ cdr cdr car ] when ;
+: file-length ( file -- length ) stat cdr cdr car ;
 : file-extension ( filename -- extension )
     "." split cdr dup [ peek ] when ;

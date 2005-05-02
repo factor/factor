@@ -26,8 +26,8 @@
 !
 IN: browser-responder
 USING: html cont-responder kernel stdio namespaces words lists
-streams strings inspector kernel prettyprint words html parser
-errors unparser listener url-encoding hashtables memory
+streams strings inspector kernel prettyprint words http parser
+errors unparser listener hashtables memory
 sequences ;
 
 : <browser> ( allow-edit? vocab word -- )

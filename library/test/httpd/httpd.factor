@@ -1,11 +1,10 @@
 IN: temporary
 USE: file-responder
+USE: http
 USE: httpd
-USE: httpd-responder
 USE: namespaces
 USE: stdio
 USE: test
-USE: url-encoding
 USE: strings
 USE: lists
 

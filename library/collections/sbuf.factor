@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: kernel lists math namespaces sequences strings ;
+USING: generic kernel lists math namespaces sequences strings ;
 
 M: sbuf length sbuf-length ;
 M: sbuf set-length set-sbuf-length ;
@@ -12,7 +12,9 @@ M: sbuf = sbuf= ;
 
 : >sbuf ( seq -- sbuf ) 0 <sbuf> [ swap nappend ] keep ;
 
-: >string ( seq -- string ) >sbuf sbuf>string ;
+GENERIC: >string ( seq -- string )
+M: string >string ;
+M: object >string >sbuf sbuf>string ;
 
 : fill ( count char -- string ) <repeated> >string ;
 

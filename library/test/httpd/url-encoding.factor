@@ -1,5 +1,5 @@
 IN: temporary
-USE: url-encoding
+USE: http
 USE: test
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test

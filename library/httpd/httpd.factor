@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: errors httpd-responder kernel lists namespaces
-stdio streams strings threads url-encoding ;
+USING: errors kernel lists namespaces
+stdio streams strings threads http ;
 
 : (url>path) ( uri -- path )
     url-decode "http://" ?string-head [

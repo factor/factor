@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
 USING: errors kernel listener lists math namespaces prettyprint
-stdio strings vectors words ;
+sequences stdio strings vectors words ;
 
 ! The single-stepper simulates Factor in Factor to allow
 ! single-stepping through the execution of a quotation. It can
@@ -10,12 +10,12 @@ stdio strings vectors words ;
 
 : &s
     #! Print stepper data stack.
-    meta-d get {.} ;
+    meta-d get reverse [.] ;
 
 : &r
     #! Print stepper call stack, as well as the currently
     #! executing quotation.
-    meta-cf get . meta-executing get . meta-r get {.} ;
+    meta-cf get . meta-executing get . meta-r get reverse [.] ;
 
 : &n
     #! Print stepper name stack.
@@ -50,7 +50,7 @@ stdio strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ word. " " write ] each
+    [ &s &r &n &c ] [ word. bl ] each
     "show stepper stacks." print
     \ &get word.
     " ( var -- value ) inspects the stepper namestack." print

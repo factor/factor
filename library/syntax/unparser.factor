@@ -40,8 +40,7 @@ M: object unparse ( obj -- str )
 : >oct ( num -- string ) 8 >base ;
 : >hex ( num -- string ) 16 >base ;
 
-M: fixnum unparse ( obj -- str ) >dec ;
-M: bignum unparse ( obj -- str ) >dec ;
+M: integer unparse ( obj -- str ) >dec ;
 
 M: ratio unparse ( num -- str )
     [

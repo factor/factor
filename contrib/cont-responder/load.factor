@@ -24,7 +24,6 @@
 ! Start an httpd server and some words to re-load the continuation
 ! server files.
 USE: kernel
-USE: httpd-responder
 USE: httpd
 USE: threads
 USE: prettyprint

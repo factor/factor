@@ -20,11 +20,11 @@ presentation stdio streams strings unparser words ;
 : vocab. ( vocab -- ) dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: word-bl word-vocabulary vocab. terpri ;
+    \ IN: word. bl word-vocabulary vocab. terpri ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-prop [
-        " " write word.
+        bl word.
     ] [
         drop
     ] ifte ;
@@ -73,7 +73,7 @@ presentation stdio streams strings unparser words ;
         ] each
     ] when* ;
 
-: definer. ( word -- ) dup definer word-bl word-bl ;
+: definer. ( word -- ) dup definer word. bl word. bl ;
 
 GENERIC: (see) ( word -- )
 
@@ -84,12 +84,12 @@ M: compound (see) ( word -- )
     prettyprint-plist terpri drop ;
 
 : prettyprint-M: ( -- indent )
-    \ M: word-bl tab-size get ;
+    \ M: word. bl tab-size get ;
 
 : prettyprint-; \ ; word. terpri ;
 
 : method. ( word [[ class method ]] -- )
-    uncons >r >r >r prettyprint-M: r> r> word-bl word-bl
+    uncons >r >r >r prettyprint-M: r> r> word. bl word. bl
     dup prettyprint-newline r> prettyprint-elements
     prettyprint-; drop ;
 
@@ -104,35 +104,35 @@ M: word (see) drop ;
 GENERIC: class.
 
 M: union class.
-    \ UNION: word-bl
-    dup word-bl
+    \ UNION: word. bl
+    dup word. bl
     0 swap "members" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: complement class.
-    \ COMPLEMENT: word-bl
-    dup word-bl
+    \ COMPLEMENT: word. bl
+    dup word. bl
     "complement" word-prop word. terpri ;
 
 M: builtin class.
-    \ BUILTIN: word-bl
-    dup word-bl
-    dup "builtin-type" word-prop unparse write " " write
+    \ BUILTIN: word. bl
+    dup word. bl
+    dup "builtin-type" word-prop unparse write bl
     0 swap "slots" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: predicate class.
-    \ PREDICATE: word-bl
-    dup "superclass" word-prop word-bl
-    dup word-bl
+    \ PREDICATE: word. bl
+    dup "superclass" word-prop word. bl
+    dup word. bl
     tab-size get dup prettyprint-newline swap
     "definition" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: tuple-class class.
-    \ TUPLE: word-bl
-    dup word-bl
-    "slot-names" word-prop [ write " " write ] each
+    \ TUPLE: word. bl
+    dup word. bl
+    "slot-names" word-prop [ write bl ] each
     prettyprint-; ;
 
 M: word class. drop ;

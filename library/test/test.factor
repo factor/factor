@@ -72,6 +72,7 @@ SYMBOL: failures
             "math/complex" "math/irrational" "math/integer"
             "math/matrices"
             "httpd/url-encoding" "httpd/html" "httpd/httpd"
+            "httpd/http-client"
             "crashes" "sbuf" "threads" "parsing-word"
             "inference" "dataflow" "interpreter" "alien"
             "line-editor" "gadgets" "memory" "redefine"

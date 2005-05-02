@@ -90,15 +90,15 @@ M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;
 
-: :s ( -- ) "error-datastack"  get {.} ;
-: :r ( -- ) "error-callstack"  get {.} ;
+: :s ( -- ) "error-datastack"  get reverse [.] ;
+: :r ( -- ) "error-callstack"  get reverse [.] ;
 : :n ( -- ) "error-namestack"  get [.] ;
 : :c ( -- ) "error-catchstack" get [.] ;
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ word. " " write ] each
+    [ :s :r :n :c ] [ word. bl ] each
     "show stacks at time of error." print
     \ :get word.
     " ( var -- value ) inspects the error namestack." print ;

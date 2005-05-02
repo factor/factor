@@ -21,8 +21,8 @@
 ! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
-USING: stdio httpd httpd-responder math random namespaces streams
-       lists strings kernel html url-encoding unparser hashtables
+USING: stdio http httpd math random namespaces streams
+       lists strings kernel html unparser hashtables
        parser generic sequences ;
 
 #! Used inside the session state of responders to indicate whether the
