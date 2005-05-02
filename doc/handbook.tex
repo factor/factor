@@ -35,7 +35,7 @@
 
 \newcommand{\genericword}[2]{\index{\texttt{#1}}\emph{Generic word:} \texttt{#2}&\\}
 
-\newcommand{\predword}[1]{\ordinaryword{#1}{#1~( object -- ?~)}&\\}
+\newcommand{\predword}[1]{\ordinaryword{#1}{#1~( object -- ?~)}}
 
 \setlength{\tabcolsep}{1mm}
 
@@ -65,11 +65,9 @@
 \maketitle
 \tableofcontents{}
 
-\chapter*{Introduction}
+\chapter*{Preface}
 
 What follows is a detailed guide to the Factor language and development environment. It is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general issues of algorithm and program design.
-
-\chapter{The language}
 
 Factor is a programming language combinding a postfix syntax with a functional and object-oriented
 flavor, building on ideas from Forth, Joy and Lisp.
@@ -79,6 +77,267 @@ Factor is \emph{dynamic}. This means that all objects in the language are fully 
 Factor is \emph{safe}. This means all code executes in an object-oriented runtime that provides
 garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
 
+\chapter{Tutorial}
+
+\section{A number guessing game}
+
+In this section, basic input/output and flow control is introduced.
+We construct a program that repeatedly prompts the user to guess a
+number -- they are informed if their guess is correct, too low, or
+too high. The game ends on a correct guess.
+
+\begin{alltt}
+numbers-game
+\emph{I'm thinking of a number between 0 and 100.}
+\emph{Enter your guess:} 25
+\emph{Too low}
+\emph{Enter your guess:} 38
+\emph{Too high}
+\emph{Enter your guess:} 31
+\emph{Correct - you win!}
+\end{alltt}
+
+\subsection{Getting started}
+
+Start a text editor and create a file named \texttt{numbers-game.factor}.
+
+Write a short comment at the top of the file. Two examples of commenting style supported by Factor:
+
+\begin{alltt}
+! Numbers game.
+( The great numbers game )
+\end{alltt}
+
+It is always a good idea to comment your code. Try to write simple
+code that does not need detailed comments to describe; similarly,
+avoid redundant comments. These two principles are hard to quantify
+in a concrete way, and will become more clear as your skills with
+Factor increase.
+
+We will be defining new words in the \texttt{numbers-game} vocabulary; add
+an \texttt{IN:} statement at the top of the source file:
+
+\begin{alltt}
+IN: numbers-game
+\end{alltt}
+Also in order to be able to test the words, issue a \texttt{USE:}
+statement in the interactive interpreter:
+
+\begin{alltt}
+USE: numbers-game
+\end{alltt}
+This section will develop the numbers game in an incremental fashion.
+After each addition, issue a command like the following to load the
+source file into the Factor interpreter:
+
+\begin{alltt}
+"numbers-game.factor" run-file
+\end{alltt}
+
+\subsection{Reading a number from the keyboard}
+
+A fundamental operation required for the numbers game is to be able
+to read a number from the keyboard. The \texttt{read} word \texttt{(
+-{}- str )} reads a line of input and pushes it on the stack.
+The \texttt{parse-number} word \texttt{( str -{}- n )} turns a decimal
+string representation of an integer into the integer itself. These
+two words can be combined into a single colon definition:
+
+\begin{alltt}
+: read-number ( -{}- n ) read parse-number ;
+\end{alltt}
+You should add this definition to the source file, and try loading
+the file into the interpreter. As you will soon see, this raises an
+error! The problem is that the two words \texttt{read} and \texttt{parse-number}
+are not part of the default, minimal, vocabulary search path used
+when reading files. The solution is to use \texttt{apropos.} to find
+out which vocabularies contain those words, and add the appropriate
+\texttt{USING:} statements to the source file:
+
+\begin{alltt}
+USING: parser stdio ;
+\end{alltt}
+After adding the above two statements, the file should now parse,
+and testing should confirm that the \texttt{read-number} word works correctly.%
+\footnote{There is the possibility of an invalid number being entered at the
+keyboard. In this case, \texttt{parse-number} returns \texttt{f},
+the boolean false value. For the sake of simplicity, we ignore this
+case in the numbers game example. However, proper error handling is
+an essential part of any large program and is covered later.%
+}
+
+
+\subsection{Printing some messages}
+
+Now we need to make some words for printing various messages. They
+are given here without further ado:
+
+\begin{alltt}
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+\end{alltt}
+Note that in the above, stack effect comments are omitted, since they
+are obvious from context. You should ensure the words work correctly
+after loading the source file into the interpreter.
+
+
+\subsection{Taking action based on a guess}
+
+The next logical step is to write a word \texttt{judge-guess} that
+takes the user's guess along with the actual number to be guessed,
+and prints one of the messages \texttt{too-high}, \texttt{too-low},
+or \texttt{correct}. This word will also push a boolean flag, indicating
+if the game should continue or not -- in the case of a correct guess,
+the game does not continue.
+
+This description of judge-guess is a mouthful -- and it suggests that
+it may be best to split it into two words. The first word we write
+handles the more specific case of an \emph{inexact} guess -- so it
+prints either \texttt{too-low} or \texttt{too-high}.
+
+\begin{alltt}
+: inexact-guess ( actual guess -{}- )
+     < {[} too-high {]} {[} too-low {]} ifte ;
+\end{alltt}
+Note that the word gives incorrect output if the two parameters are
+equal. However, it will never be called this way.
+
+With this out of the way, the implementation of judge-guess is an
+easy task to tackle. Using the words \texttt{inexact-guess}, \texttt{2dup}, \texttt{2drop} and \texttt{=}, we can write:
+
+\begin{alltt}
+: judge-guess ( actual guess -{}- ? )
+    2dup = {[}
+        2drop correct f
+    {]} {[}
+        inexact-guess t
+    {]} ifte ;
+\end{alltt}
+
+The word \texttt{=} is found in the \texttt{kernel} vocabulary, and the words \texttt{2dup} and \texttt{2drop} are found in the \texttt{stack} vocabulary. Since \texttt{=}
+consumes both its inputs, we must first duplicate the \texttt{actual} and \texttt{guess} parameters using \texttt{2dup}. The word \texttt{correct} does not need to do anything with these two numbers, so they are popped off the stack using \texttt{2drop}. Try evaluating the following
+in the interpreter to see what's going on:
+
+\begin{alltt}
+clear 1 2 2dup = .s
+\emph{\{ 1 2 f \}}
+clear 4 4 2dup = .s
+\emph{\{ 4 4 t \}}
+\end{alltt}
+
+Test \texttt{judge-guess} with a few inputs:
+
+\begin{alltt}
+1 10 judge-guess .
+\emph{Too low}
+\emph{t}
+89 43 judge-guess .
+\emph{Too high}
+\emph{t}
+64 64 judge-guess .
+\emph{Correct}
+\emph{f}
+\end{alltt}
+
+\subsection{Generating random numbers}
+
+The \texttt{random-int} word \texttt{( min max -{}- n )} pushes a
+random number in a specified range. The range is inclusive, so both
+the minimum and maximum indexes are candidate random numbers. Use
+\texttt{apropos.} to determine that this word is in the \texttt{random}
+vocabulary. For the purposes of this game, random numbers will be
+in the range of 0 to 100, so we can define a word that generates a
+random number in the range of 0 to 100:
+
+\begin{alltt}
+: number-to-guess ( -{}- n ) 0 100 random-int ;
+\end{alltt}
+Add the word definition to the source file, along with the appropriate
+\texttt{USING:} declaration. Load the source file in the interpreter,
+and confirm that the word functions correctly, and that its stack
+effect comment is accurate.
+
+
+\subsection{The game loop}
+
+The game loop consists of repeated calls to \texttt{guess-prompt},
+\texttt{read-number} and \texttt{judge-guess}. If \texttt{judge-guess}
+returns \texttt{f}, the loop stops, otherwise it continues. This is
+realized with a recursive implementation:
+
+\begin{alltt}
+: numbers-game-loop ( actual -{}- )
+    dup guess-prompt read-number judge-guess {[}
+        numbers-game-loop
+    {]} {[}
+        drop
+    {]} ifte ;
+\end{alltt}
+In Factor, tail-recursive words consume a bounded amount of call stack
+space. This means you are free to pick recursion or iteration based
+on their own merits when solving a problem. In many other languages,
+the usefulness of recursion is severely limited by the lack of tail-recursive
+call optimization.
+
+
+\subsection{Finishing off}
+
+The last task is to combine everything into the main \texttt{numbers-game}
+word. This is easier than it seems:
+
+\begin{alltt}
+: numbers-game number-to-guess numbers-game-loop ;
+\end{alltt}
+Try it out! Simply invoke the \texttt{numbers-game} word in the interpreter.
+It should work flawlessly, assuming you tested each component of this
+design incrementally!
+
+
+\subsection{The complete program}
+
+\begin{verbatim}
+! Numbers game example
+
+IN: numbers-game
+USING: kernel math parser random stdio ;
+
+: read-number ( -- n ) read parse-number ;
+
+: guess-banner
+    "I'm thinking of a number between 0 and 100." print ;
+: guess-prompt "Enter your guess: " write ;
+: too-high "Too high" print ;
+: too-low "Too low" print ;
+: correct "Correct - you win!" print ;
+
+: inexact-guess ( actual guess -- )
+     < [ too-high ] [ too-low ] ifte ;
+
+: judge-guess ( actual guess -- ? )
+    2dup = [
+        2drop correct f
+    ] [
+        inexact-guess t
+    ] ifte ;
+
+: number-to-guess ( -- n ) 0 100 random-int ;
+
+: numbers-game-loop ( actual -- )
+    dup guess-prompt read-number judge-guess [
+        numbers-game-loop
+    ] [
+        drop
+    ] ifte ;
+
+: numbers-game number-to-guess numbers-game-loop ;
+\end{verbatim}
+
+\chapter{Language reference}
+
 \section{Conventions}
 
 When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
@@ -87,6 +346,9 @@ output from the interpreter is in boldface:
 \textbf{ok} "Hello, world!" print
 \textbf{Hello, world!}
 \end{alltt}
+
+\subsection{Word definitions}
+
 Parsing words, defined in \ref{parser}, are presented with the following notation.
 \wordtable{
 \vocabulary{foo}
@@ -173,6 +435,18 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{with-foo}] executes a quotation in a namespace where \texttt{foo} is configured in a special manner; for example, \texttt{with-stream}
 \item[\texttt{make-foo}] executes a quotation in a namespace where a sequence of type \texttt{foo} is being constructed; for example, \texttt{make-string}
 \end{description}
+
+\subsection{Mathematics}
+
+This guide uses the standard mathematical notation to denote intervals (ranges of numbers).
+
+\begin{tabular}{l|l}
+Notation&Meaning\\
+$(a,b)$&All numbers from $a$ to $b$, excluding $a$ and $b$\\
+$[a,b)$&All numbers from $a$ to $b$, including $a$ and excluding and $b$\\
+$(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including and $b$\\
+$[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
+\end{tabular}
 
 \section{Syntax}
 \newcommand{\parseglos}{\glossary{name=parser,
@@ -1741,7 +2015,7 @@ Factor uses delegation is used instead of inheritance, but it is not a direct
 substitute; in particular, the semantics differ in that a delegated
 method call receives the delegate on the stack, not the original object.
 
-\chapter{The library}
+\chapter{Library reference}
 
 \section{Sequences}
 
@@ -2052,12 +2326,12 @@ Lists of values are represented with nested cons cells. The car is the first ele
 
 The following example demonstrates the construction of lists as chains of cons cells, along with the literal syntax used to print lists:
 \begin{alltt}
-\textbf{ok} {[} 1 2 3 4 {]} car .
+\textbf{ok} {[} 1 2 3 {]} car .
 \textbf{1}
-\textbf{ok} {[} 1 2 3 4 {]} cdr .
-\textbf{{[} 2 3 4 {]}}
-\textbf{ok} {[} 1 2 3 4 {]} cdr cdr .
-\textbf{{[} 3 4 {]}}
+\textbf{ok} {[} 1 2 3 {]} cdr .
+\textbf{{[} 2 3 {]}}
+\textbf{ok} {[} 1 2 3 {]} cdr cdr .
+\textbf{{[} 3 {]}}
 \end{alltt}
 
 \begin{figure}
@@ -2990,6 +3264,14 @@ BIN: 11111 -2 shift .b
 \emph{111}
 \end{alltt}
 
+\subsubsection{Generating random numbers}
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{random-int}{random-int ( min max -- n )}
+}
+Outputs a pseudo-random integer in the interval $[min,max]$.
+
 \subsection{\label{ratios}Rational numbers}
 
 \newcommand{\rationalglos}{\glossary{
@@ -3134,8 +3416,6 @@ Converts between complex numbers and pairs of real numbers representing them in 
 \wordtable{
 \vocabulary{math}
 \ordinaryword{abs}{abs ( n -- r )}
-\\
-\vocabulary{math}
 \ordinaryword{arg}{arg ( n -- theta )}
 
 }
@@ -3192,6 +3472,22 @@ Secant&\texttt{sec}&\texttt{sech}&\texttt{asec}&\texttt{asech}\\
 Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 \end{tabular}
 
+\subsection{Constants}
+
+The following words in the \texttt{math} vocabulary push constant values on the stack.
+
+\begin{tabular}{l|l}
+Word&Value\\
+\hline
+\texttt{i}&Positive imaginary unit -- \texttt{\pound\tto 0 1 \ttc\pound}\\
+\texttt{-i}&Negative imaginary unit -- \texttt{\pound\tto 0 -1 \ttc\pound}\\
+\texttt{inf}&Positive floating point infinity\\
+\texttt{-inf}&Negative floating point infinity\\
+\texttt{e}&Base of natural logarithm ($e\approx 2.7182818284590452354$)\\
+\texttt{pi}&Ratio of circumference to diameter ($\pi\approx 3.14159265358979323846$)\\
+\texttt{pi/2}&$\frac{\pi}{2}\approx 1.5707963267948966$
+\end{tabular}
+
 \section{Streams}
 \glossary{name=stream,
 description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
@@ -3245,7 +3541,7 @@ The following three words are optional, and should be implemented on output stre
 }
 Outputs a character or string to the stream. This might not result in immediate output to the underlying resource if the stream performs buffering, like all file and network streams do. 
 
-The \texttt{attrs} parameter is an association list holding style information, and it is ignored by most streams -- one exception is HTML streams, documented in \ref{html}. Formatted output is a relatively rare case so most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
+The \texttt{attrs} parameter is an association list holding style information, and it is ignored by most streams -- one exception is HTML streams (\ref{html}). Most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
 
 \wordtable{
 \vocabulary{streams}
@@ -3443,35 +3739,30 @@ Outputs a list of file system attributes, or \texttt{f} if the file does not exi
 \subsection{TCP/IP networking}
 
 \wordtable{
-\vocabulary{files}
+\vocabulary{streams}
 \ordinaryword{<client>}{<client>~( host port -- stream~)}
 
 }
 Connects to TCP/IP port number \texttt{port} on the host named by \texttt{host}, and returns a bidirectional stream. An exception is thrown if the connection attempt fails.
 \wordtable{
-\vocabulary{files}
+\vocabulary{streams}
 \ordinaryword{<server>}{<server>~( port -- server~)}
 
 }
 Begins listening for connections to \texttt{port} on all network interfaces. An exception is thrown if the port cannot be opened. The returned object can be used as an input to the \texttt{stream-close} and \texttt{accept} words.
 \wordtable{
-\vocabulary{files}
+\vocabulary{streams}
 \ordinaryword{accept}{accept~( server -- stream~)}
 
 }
 Waits for a connection to the port number that \texttt{server} is listening on, and outputs a bidirectional stream when the connection has been established.  An exception is thrown if an error occurs.
 \wordtable{
-\vocabulary{files}
+\vocabulary{streams}
+\ordinaryword{client-stream-host}{client-stream-host~( stream -- port~)}
 \ordinaryword{client-stream-port}{client-stream-port~( stream -- port~)}
 
 }
-Outputs the local port number that the client stream is connected to. Only useful for streams returned by \texttt{accept}.
-\wordtable{
-\vocabulary{files}
-\ordinaryword{client-stream-port}{client-stream-port~( stream -- port~)}
-
-}
-Outputs the IP address of the client as a dotted-quad string. Only useful for streams returned by \texttt{accept}.
+Outputs the IP address as a dotted-quad string, and the local port number, respectively, of a client socket returned from \texttt{accept}.
 
 \subsection{Special streams}
 
@@ -3491,6 +3782,11 @@ Creates a null stream, which ignores output written to it, and returns end of fi
 Creates a duplex stream. Writing to a duplex stream will write to \texttt{out}, and reading from a duplex stream will read from \texttt{in}. Closing a duplex stream closes both the input and output streams.
 
 \subsection{Printing objects}
+
+\glossary{name=prettyprinter,
+description={a set of words for printing objects in readable form}}
+
+One of Factor's key features is the ability to print almost any object in a readable form. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities.
 
 \glossary{
 name=unreadable string,
@@ -3519,7 +3815,7 @@ string
 \ordinaryword{prettyprint}{prettyprint~( object --~)}
 
 }
-Prints the object using literal syntax that can be parsed back again. This is not a general serialization mechanism; the following restrictions apply:
+Prints the object using literal syntax that can be parsed back again. While the prettyprinter supports more classes of objects than \texttt{unparse}, it is still not a general serialization mechanism. The following restrictions apply:
 
 \begin{itemize}
 \item Not all objects print in a readable way. Namely, the following classes do not:
@@ -3542,7 +3838,7 @@ Prettyprint the object, except all output is on a single line without indentatio
 \ordinaryword{[.]}{[.]~( sequence --~)}
 
 }
-Prettyprint each element of the sequence on its own line using \texttt{.}.
+Prettyprint each element of the sequence on its own line using the \texttt{.} word.
 
 \subsubsection{Variables controlling the prettyprinter}
 
@@ -3552,7 +3848,7 @@ The following variables affect the prettyprinter if set in the dynamic scope fro
 \vocabulary{prettyprint}
 \symbolword{tab-size}
 }
-Controls the indentation for nested structure such as lists, vectors, hashtables and tuples. The default tab size is 4.
+Specifies the indentation for recursive objects such as lists, vectors, hashtables and tuples. The default tab size is 4.
 
 \wordtable{
 \vocabulary{prettyprint}
@@ -3568,7 +3864,12 @@ If set to true, the prettyprinter does not emit newlines. The default is \texttt
 
 \subsubsection{Extending the prettyprinter}
 
-If define your own data type and wish to add new syntax for it, extending the prettyprinter is one half of the work. The other half is writing parsing words (\ref{parsing-words}).
+If define your own data type and wish to add new syntax for it, you must implement two facilities:
+\begin{itemize}
+\item Parsing word(s) for reading your data type,
+\item A prettyprinter method for printing your data type.
+\end{itemize}
+Parsing words are documented in \ref{parsing-words}.
 
 \wordtable{
 \vocabulary{prettyprint}
@@ -3576,7 +3877,7 @@ If define your own data type and wish to add new syntax for it, extending the pr
 }
 Prettyprints the given object. Unlike \texttt{prettyprint*}, this word does not emit a trailing newline, and the current indent level is given. This word is also generic, so you can add methods to have it print your own data types in a nice way.
 
-The remaining words in this section are useful in the implementation of \texttt{prettyprint*} methods.
+The remaining words in this section are useful in the implementation of prettyprinter methods.
 \wordtable{
 \vocabulary{prettyprint}
 \genericword{word.}{word.~( word -- )}
@@ -3610,6 +3911,9 @@ Decreases the indent level and emits a newline if \texttt{one-line} is off.
 \subsubsection{\label{string-mode}String mode}
 
 \section{Web framework}
+
+\subsection{HTTP client}
+
 
 \subsection{\label{html}HTML output}
 
@@ -3656,7 +3960,7 @@ Hyperlinks to files and words point to the file and browser responders, respecti
 
 \section{C library interface}
 
-\chapter{The development environment}
+\chapter{Development tools}
 
 Factor supports interactive development in a live environment. Instead of working with
 static executable files and restarting your application after each change, you can
@@ -3664,7 +3968,7 @@ incrementally make changes to your application and test them immediately. If you
 notice an undesirable behavior, Factor's powerful reflection features will aid in
 pinpointing the error.
 
-If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this document allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
+If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this chapter allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
 
 \section{System organization}
 

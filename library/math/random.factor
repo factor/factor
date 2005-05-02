@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: random USING: kernel lists math ;
+IN: math USING: kernel ;
 
 : power-of-2? ( n -- ? ) dup dup neg bitand = ;
 
@@ -19,5 +19,3 @@ IN: random USING: kernel lists math ;
     ] ifte ;
 
 : random-int ( min max -- n ) dupd swap - random-int-0 + ;
-: random-boolean ( -- ? ) 0 1 random-int 0 = ;
-: random-digit ( -- digit ) 0 9 random-int ;

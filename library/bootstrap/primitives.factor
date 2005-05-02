@@ -4,7 +4,7 @@ IN: image
 USING: kernel lists math memory namespaces parser words vectors
 hashtables generic alien assembler compiler errors files generic
 io-internals kernel kernel-internals lists math math-internals
-parser profiler random strings unparser vectors words
+parser profiler strings unparser vectors words
 hashtables ;
 
 ! This symbol needs the same hashcode in the target as in the
@@ -147,8 +147,8 @@ vocabularies get [
     [ "room" "memory"                         [ [ ] [ integer integer integer integer ] ] ]
     [ "os-env" "kernel"                       [ [ string ] [ object ] ] ]
     [ "millis" "kernel"                       [ [ ] [ integer ] ] ]
-    [ "init-random" "random"                  [ [ ] [ ] ] ]
-    [ "(random-int)" "random"                 [ [ ] [ integer ] ] ]
+    [ "init-random" "math"                    [ [ ] [ ] ] ]
+    [ "(random-int)" "math"                   [ [ ] [ integer ] ] ]
     [ "type" "kernel"                         [ [ object ] [ fixnum ] ] ]
     [ "cwd" "files"                           [ [ ] [ string ] ] ]
     [ "cd" "files"                            [ [ string ] [ ] ] ]

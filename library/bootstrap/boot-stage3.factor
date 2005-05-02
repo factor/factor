@@ -44,9 +44,9 @@ t [
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
+    "/library/math/random.factor"
 
     "/library/in-thread.factor"
-    "/library/random.factor"
 
     "/library/io/directories.factor"
     "/library/io/stdio-binary.factor"
