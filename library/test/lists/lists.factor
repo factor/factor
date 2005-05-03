@@ -1,6 +1,9 @@
 IN: temporary
 USING: kernel lists sequences test ;
 
+[ 1 ] [ 0 [ 1 2 ] nth ] unit-test
+[ 2 ] [ 1 [ 1 2 ] nth ] unit-test
+
 [ [ ]           ] [ [ ]   [ ]       append ] unit-test
 [ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test
 [ [ 2 ]         ] [ [ ] [ 2 ]       append ] unit-test

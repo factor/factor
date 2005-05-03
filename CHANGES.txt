@@ -1,0 +1,50 @@
+Factor 0.74:
+------------
+
+C library interface ported to Linux/PPC and Mac OS X.
+
+Developer's handbook rewritten to be more up to date and complete.
+
+Added the sequences vocabulary that unifies code for working with lists,
+vectors, strings, and string buffers. There are many changes, and most
+of the old type-specific words such as vector-nth and string-map are
+gone.
+
+Added the matrices vocabulary for working with mathematical vectors and
+matrices.
+
+Added two words for modular arithmetic in the math vocabulary: mod-inv
+and ^mod.
+
+Added HTTP client API supporting GET and POST requests in the
+http-client vocabulary.
+
+Removed some inspection words: vocabs. words. usages. Now, just put a
+space before the . and write vocabs . words . usages .
+
+Redefining words that are used by compiled words automatically
+decompiles the compiled words. This fixes the problem of new definitions
+not taking effect. In a future release, there will be automatic
+recompilation, rather than decompilation.
+
+As a result of the previous change, there is now a cross-referencing
+database, and the usages word lists indirect dependencies and is much
+faster. The usage word behaves like the old usages, and lists direct
+dependencies only.
+
+The dump word in the dump vocabulary prints the memory bytes comprising
+an object. The dump* word prints the bytes at an arbitrary address.
+
+New words in words vocabulary for inspecting classes and methods: classes implements.
+
+The Unix I/O code was rewritten in Factor using the C library interface.
+Many new features will be added in future releases, such as socket
+timeouts and Unicode character encodings.
+
+Lazy lists and parser combinators library in contrib/parser-combinators/
+(Chris Double).
+
+Quotations containing \ foo are prettyprinted in that form.
+
+The watch word now causes annotated words to dump the stack, in addition
+to printing a log message.

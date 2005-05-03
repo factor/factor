@@ -1,5 +1,5 @@
 IN: temporary
-USING: matrices test ;
+USING: kernel lists matrices namespaces test ;
 
 [
     M[ [ 0 ] [ 0 ] [ 0 ] ]M
@@ -34,7 +34,7 @@ USING: matrices test ;
        [ 0 5 0 ]
        [ 6 0 0 ] ]M
 
-    v+
+    m+
 ] unit-test
 
 [
@@ -50,19 +50,31 @@ USING: matrices test ;
        [ 0 -5 0 ]
        [ -6 0 0 ] ]M
 
-    v-
+    m-
 ] unit-test
 
 [
     { 10 20 30 }
 ] [
-    10 { 1 2 3 } v.
+    10 { 1 2 3 } n*v
 ] unit-test
 
 [
-    { 10 20 30 }
+    M[ [ 6 ] ]M
 ] [
-    { 1 2 3 } 10 v.
+    M[ [ 3 ] ]M M[ [ 2 ] ]M m.
+] unit-test
+
+[
+    M[ [ 11 ] ]M
+] [
+    M[ [ 1 3 ] ]M M[ [ 5 ] [ 2 ] ]M m.
+] unit-test
+
+[
+    [ [[ 0 0 ]] [[ 1 0 ]] ]
+] [
+    [ 2 1 [ 2dup cons , ] 2repeat ] make-list
 ] unit-test
 
 [
@@ -73,5 +85,16 @@ USING: matrices test ;
 
     { 3 4 }
 
-    v.
+    m.v
+] unit-test
+
+[
+    { 4 3 }
+] [
+    M[ [ 0 1 ]
+       [ 1 0 ] ]M
+
+    { 3 4 }
+
+    m.v
 ] unit-test

@@ -1,20 +1,9 @@
-USE: random
-USE: kernel
-USE: lists
-USE: math
-USE: test
-USE: namespaces
-
-: nth ( n list -- list[n] )
-    #! nth element of a proper list.
-    #! Supplying n <= 0 pushes the first element of the list.
-    #! Supplying an argument beyond the end of the list raises
-    #! an error.
-    swap [ cdr ] times car ;
+IN: random
+USING: kernel lists math namespaces sequences test ;
 
 : random-element ( list -- random )
     #! Returns a random element from the given list.
-    dup >r length 1 - 0 swap random-int r> nth ;
+    [ length 1 - 0 swap random-int ] keep nth ;
 
 : random-boolean ( -- ? ) 0 1 random-int 0 = ;
 
@@ -78,7 +67,7 @@ USE: namespaces
         [[ 20 f ]]
         [[ 30 "monkey" ]]
         [[ 24 1/2 ]]
-        [ 13 | { "Hello" "Banana" } ]
+        [[ 13 { "Hello" "Banana" } ]]
     ] "random-pairs" set
     
     "random-pairs" get [ cdr ] map "random-values" set
@@ -94,8 +83,4 @@ USE: namespaces
         "random-pairs" get
         check-random-subset
     ] unit-test
-
-    [ 1 ] [  -1 [ 1 2 ] nth ] unit-test
-    [ 1 ] [  0  [ 1 2 ] nth ] unit-test
-    [ 2 ] [  1  [ 1 2 ] nth ] unit-test
 ] with-scope

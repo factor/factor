@@ -46,15 +46,15 @@ prettyprint sequences stdio streams strings words ;
 TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
-    wrapper-stream-scope
-    [ CHAR: r write flush read-big-endian-32 read ] bind ;
+    [
+        CHAR: r write flush read-big-endian-32 read
+    ] with-wrapper ;
 
 M: jedit-stream stream-write-attr ( str style stream -- )
-    wrapper-stream-scope [ jedit-write-attr ] bind ;
+    [ jedit-write-attr ] with-wrapper ;
 
 M: jedit-stream stream-flush ( stream -- )
-    wrapper-stream-scope
-    [ CHAR: f write flush ] bind ;
+    [ CHAR: f write flush ] with-wrapper ;
 
 C: jedit-stream ( stream -- stream )
     [ >r <wrapper-stream> r> set-delegate ] keep ;

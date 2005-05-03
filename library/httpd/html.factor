@@ -106,7 +106,7 @@ stdio streams strings unparser http ;
 TUPLE: html-stream ;
 
 M: html-stream stream-write-attr ( str style stream -- )
-    wrapper-stream-scope [
+    [
         [
             [
                 [
@@ -114,7 +114,7 @@ M: html-stream stream-write-attr ( str style stream -- )
                 ] file-link-tag
             ] icon-tag
         ] browser-link-tag
-    ] bind ;
+    ] with-wrapper ;
 
 C: html-stream ( stream -- stream )
     #! Wraps the given stream in an HTML stream. An HTML stream

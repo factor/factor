@@ -52,10 +52,6 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : << f ; parsing
 : >> reverse literal-tuple swons ; parsing
 
-! Complex numbers
-: #{ f ; parsing
-: }# 2unlist swap rect> swons ; parsing
-
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
 
@@ -142,14 +138,3 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
-
-! Reading numbers in other bases
-
-: (BASE) ( base -- )
-    #! Read a number in a specific base.
-    scan swap base> swons ;
-
-: HEX: 16 (BASE) ; parsing
-: DEC: 10 (BASE) ; parsing
-: OCT: 8 (BASE) ; parsing
-: BIN: 2 (BASE) ; parsing

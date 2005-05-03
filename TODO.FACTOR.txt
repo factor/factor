@@ -2,30 +2,31 @@
 
 - faster layout
 - faster repaint
-- implement fcopy
-- win32 updates
+- open large listener by default
 
-- get all-tests to run with -no-compile
-- scalar * matrix, vector * matrix, matrix * vector need to work
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
-- rotating cube demo
+- fix infix (dan)
+
++ plugin:
 
 - if external factor is down, don't add tons of random shit to the       
   dictionary
 - plugin: extra space in stack effects
 - plugin: type "re" in edit word dialog --> hang
+- word preview for parsing words
 
 + ui:
 
 - console with presentations
 - ui browser
 - auto-updating inspector, mirrors abstraction
-- word preview for parsing words
 - mouse enter onto overlapping with interior, but not child, gadget
 - menu dragging
 - fix up the min thumb size hack
 - frame gap
+- tiled window manager
+- rotating cube demo
 
 + ffi:
 
@@ -44,6 +45,8 @@
 
 + compiler:
 
+- get all-tests to run with -no-compile
+- fix i/o on generic x86/ppc unix
 - alien primitives need a more general input type
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
@@ -66,15 +69,16 @@
 - ensure-capacity: don't be generic
 - vector's ensure-capacity will crash if not given fixnums!
 - dipping seq-2nmap, seq-2each
-- remove seq- prefixes
-- generic each some? all? member? memq? all=? top
-  index? subseq?
+- generic each some? all? member? memq? all=?  index? subseq? map
 - index and index* are very slow with lists
-- list map, subset, project, append: not tail recursive
-- phase out sbuf-append
-- decide what to do with index-of
+- list map, subset: not tail recursive
+- phase out sbuf-append, index-of, substring
+- unsafe-sbuf>string
+- generic subseq
 - GENERIC: map
   - list impl same as now
+- generic parser::scan
+- array sort
 
 + kernel:
 
@@ -92,9 +96,11 @@
 - generational gc
 - doc comments of generics
 - M: object should not inhibit delegation
+- renumber types appopriately
 
 + i/o:
 
+- faster stream-copy
 - rename prettyprint to pprint
 - reading and writing byte arrays
 - merge unix and win32 io where appropriate
@@ -108,21 +114,21 @@
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - add a socket timeout
-- renumber types appopriately
 - unify unparse and prettyprint
+- utf16, utf8 encoding
 
 + nice to have libraries:
 
 - regexps
 - XML
-- HTTP client
 - real Unicode support (strings are already 16 bits and can be extended
   to 21 if the need arises, but we need full character classification
   predicates, comparison, case conversion, sorting...)
 - full Win32 binding
 - Cairo binding
 
-+ httpd:
++ http:
 
+- http client post requests
 - virtual hosts
 - keep alive

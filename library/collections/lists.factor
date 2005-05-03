@@ -129,7 +129,8 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
     #! Return the rest of the list, from the nth index onward.
     [ cdr ] times ;
 
-M: general-list nth ( n list -- element ) tail car ;
+M: cons nth ( n list -- element )
+    over 0 = [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
 
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.

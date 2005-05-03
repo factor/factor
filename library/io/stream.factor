@@ -54,11 +54,13 @@ M: sbuf stream-auto-flush drop ;
 TUPLE: wrapper-stream scope ;
 
 C: wrapper-stream ( stream -- stream )
-    2dup set-delegate
-    [
+    2dup set-delegate [
         >r <namespace> [ stdio set ] extend r>
         set-wrapper-stream-scope
     ] keep ;
+
+: with-wrapper ( stream quot -- )
+    >r wrapper-stream-scope r> bind ;
 
 ! Combine an input and output stream into one, and flush the
 ! stream more often.

@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien errors generic hashtables kernel lists math memory
-namespaces parser presentation sequences stdio streams strings
-unparser vectors words ;
+USING: alien errors generic hashtables kernel lists math
+matrices memory namespaces parser presentation sequences stdio
+streams strings unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -153,6 +153,15 @@ M: tuple prettyprint* ( indent tuple -- indent )
 
 M: alien prettyprint* ( alien -- str )
     \ ALIEN: word. bl alien-address unparse write ;
+
+: matrix-rows. ( indent list -- indent )
+    uncons >r [ one-line on prettyprint* ] with-scope r>
+    [ over ?prettyprint-newline matrix-rows. ] when* ;
+
+M: matrix prettyprint* ( indent obj -- indent )
+    \ M[ word. >r <prettyprint r>
+    row-list matrix-rows.
+    bl \ ]M word. prettyprint> ;
 
 : prettyprint ( obj -- )
     [

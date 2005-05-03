@@ -1,48 +1,31 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: matrices
-USING: errors generic kernel lists math namespaces prettyprint
-sequences stdio test vectors ;
+USING: errors generic kernel lists math namespaces sequences
+vectors ;
 
-! The major dimension is the number of elements per row.
-TUPLE: matrix rows cols sequence ;
-
-! Vector and matrix protocol.
-GENERIC: v+
-GENERIC: v-
-GENERIC: v* ( element-wise multiplication )
-GENERIC: v. ( interior multiplication )
-
-: v*n ( vec n -- vec ) swap [ * ] seq-map-with ;
-
-! On numbers, these operations do the obvious thing
-M: number v+ ( n n -- n ) + ;
-M: number v- ( n n -- n ) - ;
-M: number v* ( n n -- n ) * ;
-
-M: number v. ( n n -- n )
-    over vector? [ v*n ] [ * ] ifte ;
+: n*v ( n vec -- vec )
+    #! Multiply a vector by a scalar.
+    [ * ] seq-map-with ;
 
 ! Vector operations
-DEFER: <row-vector>
-DEFER: <col-vector>
-
-M: object v+ ( v v -- v ) [ v+ ] seq-2map ;
-M: object v- ( v v -- v ) [ v- ] seq-2map ;
-M: object v* ( v v -- v ) [ v* ] seq-2map ;
+: v+ ( v v -- v ) [ + ] seq-2map ;
+: v- ( v v -- v ) [ - ] seq-2map ;
+: v* ( v v -- v ) [ * ] seq-2map ;
 
 ! Later, this will fixed when seq-2each works properly
-! M: object v. ( v v -- x ) 0 swap [ * + ] seq-2each ;
+! : v. ( v v -- x ) 0 swap [ * + ] seq-2each ;
 : +/ ( seq -- n ) 0 swap [ + ] seq-each ;
-
-GENERIC: vv. ( obj v -- v )
-M: number vv. ( v n -- v ) v*n ;
-M: matrix vv. ( v m -- v )
-    swap <col-vector> v. matrix-sequence ;
-M: object vv. v* +/ ;
-M: object v. ( v v -- x ) swap vv. ;
+: v. ( v v -- x ) v* +/ ;
 
 ! Matrices
+! The major dimension is the number of elements per row.
+TUPLE: matrix rows cols sequence ;
+: >matrix<
+    [ matrix-rows ] keep
+    [ matrix-cols ] keep
+    matrix-sequence ;
+
 M: matrix clone ( matrix -- matrix )
     clone-tuple
     dup matrix-sequence clone over set-matrix-sequence ;
@@ -79,9 +62,8 @@ SYMBOL: matrix-maker
         2dup <zero-matrix> matrix set
         [
             [
-                [
-                    swap matrix-maker get call
-                ] 2keep matrix get matrix-set
+                [ matrix-maker get call ] 2keep
+                matrix get matrix-set
             ] 2keep
         ] 2repeat
         matrix get
@@ -103,77 +85,62 @@ M: row length row-matrix matrix-cols ;
 M: row nth ( n row -- ) >row< swapd matrix-get ;
 M: row thaw >vector ;
 
-! A sequence of rows.
-TUPLE: row-seq matrix ;
-M: row-seq length row-seq-matrix matrix-rows ;
-M: row-seq nth row-seq-matrix <row> ;
-
 ! Sequence of elements in a column of a matrix.
 TUPLE: col index matrix ;
 : >col< dup col-index swap col-matrix ;
 M: col length col-matrix matrix-rows ;
-M: col nth ( n column -- ) >col< swapd matrix-get ;
+M: col nth ( n column -- ) >col< matrix-get ;
 M: col thaw >vector ;
 
-! A sequence of columns.
-TUPLE: col-seq matrix ;
-M: col-seq length col-seq-matrix matrix-cols ;
-M: col-seq nth col-seq-matrix <col> ;
-
-: +check ( matrix matrix -- matrix matrix )
+: +check ( matrix matrix -- )
     #! Check if the two matrices have dimensions compatible
     #! for being added or subtracted.
     over matrix-rows over matrix-rows = >r
-    over matrix-cols over matrix-cols = r> and [
-        "Matrix dimensions do not match" throw
+    swap matrix-cols swap matrix-cols = r> and [
+        "Matrix dimensions do not equal" throw
     ] unless ;
 
-: +dimensions ( matrix -- rows cols )
-    dup matrix-rows swap matrix-cols ;
+: element-wise ( m m -- v v )
+    2dup +check >r >matrix< r> matrix-sequence ;
 
-: matrix+/-
-    +check
-    >r dup +dimensions rot r>
-    swap matrix-sequence swap matrix-sequence ;
+! Matrix operations
+: m+ ( m m -- m ) element-wise v+ <matrix> ;
+: m- ( m m -- m ) element-wise v- <matrix> ;
 
-M: matrix v+ ( m m -- m ) matrix+/- v+ <matrix> ;
-M: matrix v- ( m m -- m ) matrix+/- v- <matrix> ;
-M: matrix v* ( m m -- m ) matrix+/- v* <matrix> ;
+: m* ( m m -- m )
+    #! Multiply two matrices element-wise. This is NOT matrix
+    #! multiplication in the usual mathematical sense. For that,
+    #! see the m. word.
+    element-wise v* <matrix> ;
 
-: *check ( matrix matrix -- matrix matrix )
-    over matrix-rows over matrix-cols = >r
-    over matrix-cols over matrix-rows = r> and [
+: *check ( matrix matrix -- )
+    swap matrix-cols swap matrix-rows = [
         "Matrix dimensions inappropriate for composition" throw
     ] unless ;
 
 : *dimensions ( m m -- rows cols )
     swap matrix-rows swap matrix-cols ;
 
-M: matrix v. ( m1 m2 -- m )
-    2dup *dimensions [
-        ( m1 m2 row col )
+: m. ( m1 m2 -- m )
+    #! Composition of two matrices.
+    2dup *check 2dup *dimensions [
+        ( m1 m2 row col -- m1 m2 )
         >r >r 2dup r> rot <row> r> rot <col> v.
     ] make-matrix 2nip ;
 
-! Reading and writing matrices
+: n*m ( n m -- m )
+    #! Multiply a matrix by a scalar.
+    >matrix< >r rot r> n*v <matrix> ;
 
-: M[ f ; parsing
+: m.v ( m v -- v )
+    #! Multiply a matrix by a column vector.
+    <col-vector> m. matrix-sequence ;
 
-: ]M
-    reverse
-    [ dup length swap car length ] keep
-    concat >vector <matrix> swons ; parsing
+: v.m ( v m -- v )
+    #! Multiply a row vector by a matrix.
+    >r <row-vector> r> m. matrix-sequence ;
 
 : row-list ( matrix -- list )
     #! A list of lists, where each sublist is a row of the
     #! matrix.
-    [ <row-seq> [ >list , ] seq-each ] make-list ;
-
-: matrix-rows. ( indent list -- indent )
-    uncons >r [ one-line on prettyprint* ] with-scope r>
-    [ over ?prettyprint-newline matrix-rows. ] when* ;
-
-M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ word. >r <prettyprint r>
-    row-list matrix-rows.
-    bl \ ]M word. prettyprint> ;
+    dup matrix-rows [ swap <row> >list ] project-with ;
