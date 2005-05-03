@@ -33,7 +33,7 @@ TUPLE: tile original ;
 : close-tile [ close-tile ] swap handle-gesture drop ;
 
 : <close-box> ( -- gadget )
-    <check> line-border dup [ close-tile ] button-actions ;
+    <check> line-border dup [ close-tile ] button-gestures ;
 
 : caption-content ( text -- gadget )
     1/2 10 0 <shelf>
@@ -74,3 +74,7 @@ C: tile ( child caption -- tile )
     dup delegate pref-size pick resize-gadget ;
 
 M: tile pref-size shape-size ;
+
+: tile ( gadget title -- )
+    #! Show the gadget in a new tile.
+    <tile> world get add-gadget ;

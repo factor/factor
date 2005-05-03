@@ -9,7 +9,7 @@ USE: alien
 : TTF_ByteSwappedUNICODE ( swapped -- )
     "void" "sdl-ttf" "TTF_ByteSwappedUNICODE" [ "int" ] alien-invoke ;
 
-: TTF_Init ( swapped -- )
+: TTF_Init ( -- )
     "void" "sdl-ttf" "TTF_Init" [ ] alien-invoke ;
 
 : TTF_OpenFont ( file ptsize -- font )

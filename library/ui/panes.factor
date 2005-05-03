@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor listener lists namespaces
+USING: generic kernel line-editor listener lists math namespaces
 stdio streams strings threads ;
 
 ! A pane is an area that can display text.
@@ -76,9 +76,13 @@ M: pane stream-write-attr ( string style stream -- )
 
 M: pane stream-close ( stream -- ) drop ;
 
-: <console-pane> ( -- pane )
+: <console> ( -- pane )
     <pane> dup [
-        [
-            clear  print-banner listener
-        ] in-thread
+        [ clear  print-banner listener ] in-thread
     ] with-stream ;
+
+: console ( -- )
+    #! Open an UI console window.
+    <console> <scroller> "Listener" <tile> world get [
+        shape-size rect> 3/4 * >rect rot resize-gadget
+    ] 2keep add-gadget ;

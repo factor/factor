@@ -8,11 +8,8 @@ SYMBOL: root-menu
 : show-root-menu ( -- )
     root-menu get <menu> show-menu ;
 
-: <console> ( -- console )
-    <console-pane> <scroller> ;
-
 [
-    [[ "Listener" [ <console> "Listener" <tile> world get add-gadget ] ]]
+    [[ "Listener" [ console ] ]]
     [[ "Globals" [ global inspect ] ]]
     [[ "Save image" [ save ] ]]
     [[ "Exit" [ f world get set-world-running? ] ]]

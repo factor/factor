@@ -3,29 +3,24 @@ USING: generic kernel namespaces threads ;
 
 TUPLE: dialog continuation ;
 
-: dialog-action ( ok dialog -- )
-    dup unparent  dialog-continuation call ;
+: dialog-action ( dialog ? -- )
+    over close-tile swap dialog-continuation call ;
 
-: dialog-ok ( dialog -- )
-    t swap dialog-action ;
+: dialog-ok ( dialog -- ) t dialog-action ;
 
-: dialog-cancel ( dialog -- )
-    f swap dialog-action ;
+: dialog-cancel ( dialog -- ) f dialog-action ;
 
 : <dialog-buttons> ( -- gadget )
     <default-shelf>
-    "OK" f <button>
-    dup [ dialog-ok ] [ action ] link-action
-    over add-gadget
-    "Cancel" f <button>
-    dup [ dialog-cancel ] [ action ] link-action
-    over add-gadget ;
+    "OK" [ dialog-ok ] <button> over add-gadget
+    "Cancel" [ dialog-cancel ] <button> over add-gadget ;
 
 : dialog-actions ( dialog -- )
     dup [ dialog-ok ] dup set-action
     [ dialog-cancel ] dup set-action ;
 
-C: dialog ( content -- gadget )
+C: dialog ( content continuation -- gadget )
+    [ set-dialog-continuation ] keep
     [ <empty-gadget> swap set-delegate ] keep
     [
         >r <default-pile>
@@ -35,18 +30,25 @@ C: dialog ( content -- gadget )
     ] keep
     [ dialog-actions ] keep ;
 
-: <prompt> ( prompt -- gadget )
-    0 default-gap 0 <pile>
-    [ >r <label> r> add-gadget ] keep
-    [ >r "" <field> r> add-gadget ] keep ;
+: dialog ( content title -- ? )
+    #! Show a modal dialog and wait until OK or Cancel is
+    #! clicked. Outputs a true value if OK was clicked.
+    [ swap >r <dialog> r> tile stop ] callcc1 2nip ;
 
-: <input-dialog> ( prompt continuation -- gadget )
-    >r <prompt> <dialog> r> over set-dialog-continuation ;
+TUPLE: prompt editor ;
+
+C: prompt ( prompt -- gadget )
+    0 default-gap 0 <pile> over set-delegate
+    [ >r <label> r> add-gadget ] keep
+    "" <editor> over set-prompt-editor
+    dup prompt-editor line-border over add-gadget ;
 
 : input-dialog ( prompt -- input )
     #! Show an input dialog and resume the current continuation
     #! when the user clicks OK or Cancel. If they click Cancel,
     #! push f.
-    [
-        <input-dialog> "Input" <tile> world get add-gadget stop
-    ] callcc1 ;
+    <prompt> dup "Input" dialog [
+        prompt-editor editor-text
+    ] [
+        drop f
+    ] ifte ;

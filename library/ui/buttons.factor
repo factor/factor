@@ -35,7 +35,10 @@ stdio ;
         drop
     ] ifte ;
 
-: button-actions ( button quot -- )
+: button-action ( action -- quot )
+    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] ifte* ;
+
+: button-gestures ( button quot -- )
     over f reverse-video set-paint-prop
     dupd [ action ] set-action
     dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
@@ -44,8 +47,8 @@ stdio ;
     dup [ button-update ] [ mouse-enter ] set-action
     [ drop ] [ drag 1 ] set-action ;
 
-: <button> ( label quot -- button )
-    >r <label> line-border dup r> button-actions ;
+: <button> ( label action -- button )
+    >r <label> line-border dup r> button-action button-gestures ;
 
 : roll-border ( child -- border )
     0 0 0 0 <roll-rect> <gadget> 1 <border> ;
@@ -53,4 +56,4 @@ stdio ;
 : <roll-button> ( label quot -- gadget )
     #! Thinner border that is only visible when the mouse is
     #! over the button.
-    >r <label> roll-border dup r> button-actions ;
+    >r <label> roll-border dup r> button-action button-gestures ;

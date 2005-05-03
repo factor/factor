@@ -3,9 +3,9 @@
 - faster layout
 - faster repaint
 - open large listener by default
-
 - make-matrix is slow and ugly
 - move 2repeat somewhere else
+- http client post requests
 - fix infix (dan)
 
 + plugin:
@@ -129,6 +129,5 @@
 
 + http:
 
-- http client post requests
 - virtual hosts
 - keep alive

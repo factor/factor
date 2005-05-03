@@ -18,7 +18,7 @@ USING: generic kernel lists math namespaces sequences ;
     0 0 0 0 <plain-rect> <gadget> 1 <border> ;
 
 : <menu-item> ( label quot -- gadget )
-    >r <label> menu-item-border dup r> button-actions ;
+    >r <label> menu-item-border dup r> button-gestures ;
 
 TUPLE: menu ;
 

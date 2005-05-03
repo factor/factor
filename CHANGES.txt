@@ -35,7 +35,8 @@ dependencies only.
 The dump word in the dump vocabulary prints the memory bytes comprising
 an object. The dump* word prints the bytes at an arbitrary address.
 
-New words in words vocabulary for inspecting classes and methods: classes implements.
+New words in words vocabulary for inspecting classes and methods:
+classes implements.
 
 The Unix I/O code was rewritten in Factor using the C library interface.
 Many new features will be added in future releases, such as socket
