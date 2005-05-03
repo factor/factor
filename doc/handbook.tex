@@ -1,6 +1,6 @@
 % :indentSize=4:tabSize=4:noTabs=true:mode=tex:wrap=soft:
 
-\documentclass{report}
+\documentclass{book}
 
 \usepackage[plainpages=false,colorlinks]{hyperref}
 \usepackage[style=list,toc]{glossary}
@@ -11,6 +11,8 @@
 \usepackage{amssymb}
 \usepackage{epstopdf}
 
+\pagestyle{headings}
+
 \setcounter{tocdepth}{3}
 \setcounter{secnumdepth}{3}
 
@@ -18,7 +20,7 @@
 \setlength\parindent{0pt}
 
 \newcommand{\bs}{\char'134}
-\newcommand{\dq}{"}
+\newcommand{\dq}{\char'42}
 \newcommand{\tto}{\symbol{123}}
 \newcommand{\ttc}{\symbol{125}}
 \newcommand{\pound}{\char'43}
@@ -194,11 +196,11 @@ $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \newcommand{\parseglos}{\glossary{name=parser,
 description={a set of words in the \texttt{parser} vocabulary, primarily \texttt{parse}, \texttt{eval}, \texttt{parse-file} and \texttt{run-file}, that creates objects from their printed representations, and adds word definitions to the dictionary}}}
 \parseglos
-In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case.
-The Factor parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary. The latter is discussed in \ref{words}.
+In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary. The latter is discussed in \ref{words}. The parser can be extended (\ref{parser}).
 
 \subsection{\label{parser}Parser algorithm}
 
+\parseglos
 \glossary{name=token,
 description={a whitespace-delimited piece of text, the primary unit of Factor syntax}}
 \glossary{name=whitespace,
@@ -236,13 +238,17 @@ Here is the parser algorithm in more detail -- some of the concepts therein will
 Otherwise if the token does not represent a known word, the parser attempts to parse it as a number. If the token is a number, the number object is added to the parse tree. Otherwise, an error is raised and parsing halts.
 \end{itemize}
 
+\newcommand{\stringmodeglos}{
 \glossary{name=string mode,
-description={a parser mode where token strings are added to the parse tree; the parser will not look up tokens in the dictionary. Activated by switching on the \texttt{string-mode} variable}}
+description={a parser mode where token are added to the parse tree as strings, without being looked up in the dictionary or converted into numbers first. Activated by switching on the \texttt{string-mode} variable}}}
+\stringmodeglos
 
 There is one exception to the above process; the parser might be placed in \emph{string mode}, in which case it simply reads tokens and appends them to the parse tree as strings. String mode is activated and deactivated by certain parsing words wishing to read input in an unstructured but tokenized manner -- see \ref{string-mode}.
 
+\newcommand{\parsingwordglos}{
 \glossary{name=parsing word,
-description={a word that is run at parse time. Parsing words can be defined by suffixing the compound definition with \texttt{parsing}. Parsing words have the \texttt{\dq{}parsing\dq{}} word property set to true, and respond with true to the \texttt{parsing?}~word}}
+description={a word that is run at parse time. Parsing words can be defined by suffixing the compound definition with \texttt{parsing}. Parsing words have the \texttt{\dq{}parsing\dq{}} word property set to true, and respond with true to the \texttt{parsing?}~word}}}
+\parsingwordglos
 
 Parsing words play a key role in parsing; while ordinary words and numbers are simply
 added to the parse tree, parsing words execute in the context of the parser, and can
@@ -264,11 +270,12 @@ name=vocabulary,
 description={a collection of words, uniquely identified by name. The hashtable of vocabularies is stored in the \texttt{vocabularies} global variable, and the \texttt{USE:}~and \texttt{USING:}~parsing words add vocabularies to the parser's search path}}}
 \vocabglos
 
-A \emph{word} associates a code definition with its name. Words are organized into \emph{vocabularies}. Words are discussed in depth in \ref{words}.
+A \emph{word} is a code definition identified by a name. Words are sorted into \emph{vocabularies}. Words are discussed in depth in \ref{words}.
 
 When the parser reads a token, it attempts to look up a word named by that token. The
-lookup is performed in the parser's current vocabulary set. By default, this set includes
-two vocabularies:
+lookup is performed in the parser's current vocabulary set.
+
+For a source file the vocabulary search path starts off with two vocabularies:
 \begin{verbatim}
 syntax
 scratchpad
@@ -276,6 +283,8 @@ scratchpad
 The \texttt{syntax} vocabulary consists of a set of parsing words for reading Factor data
 and defining new words. The \texttt{scratchpad} vocabulary is the default vocabulary for new
 word definitions.
+
+At the interactive listener, the default search path contains many more vocabularies. The default search path depends on how the parser was invoked (\ref{parsing-quotations}).
 \wordtable{
 \vocabulary{syntax}
 \parsingword{USE:}{USE: \emph{vocabulary}}
@@ -348,7 +357,7 @@ Integers are entered in base 10 unless prefixed with a base change parsing word.
 
 More information on integers can be found in \ref{integers}.
 
-\subsubsection{Ratios}
+\subsubsection{\label{ratio-literals}Ratios}
 
 \newcommand{\ratioglos}{\glossary{
 name=ratio,
@@ -366,7 +375,7 @@ of the two terms is 1.
 
 More information on ratios can be found in \ref{ratios}.
 
-\subsubsection{Floats}
+\subsubsection{\label{float-literals}Floats}
 
 \newcommand{\floatglos}{\glossary{
 name=float,
@@ -446,7 +455,7 @@ An analogous distinction holds for the \texttt{t} class and object.
 
 \newcommand{\charglos}{\glossary{
 name=character,
-description={an integer whose value denotes a Unicode code point. Character values are limited to the range from $0$ to $2^16-1$ inclusive, however in a later release this can be upgraded to the full 21-bit Unicode space without requiring any changes to user code}}}
+description={an integer whose value denotes a Unicode code point. Character values are limited to the range from $0$ to $2^{16}-1$ inclusive, however in a later release this can be upgraded to the full 21-bit Unicode space without requiring any changes to user code}}}
 \charglos
 Factor has no distinct character type, however Unicode character value integers can be
 read by specifying a literal character, or an escaped representation thereof.
@@ -580,9 +589,9 @@ Reads the next word from the input string and appends the word to the parse tree
 \textbf{Parsing 1}
 \textbf{[ 0 2 4 ]}
 \end{alltt}
-Parsing words are documented in \ref{parsing-words}.
 
 Words are documented in \ref{words}.
+Parsing words are documented in \ref{parsing-words}.
 
 \subsubsection{Mutable literals}
 
@@ -614,7 +623,7 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 \textbf{Hello world}
 \end{alltt}
 
-String buffers are documented in \ref{sbufs}.
+String buffers are documented in \ref{string-buffers}.
 
 \subsubsection{\label{vector-literals}Vectors}
 \newcommand{\vectorglos}{\glossary{
@@ -726,7 +735,9 @@ name=data stack,
 description={the primary means of passing values between words}}}
 \dsglos
 Shuffle words are placed between words taking action to rearrange items on the stack
-as the next word in the quotation would expect them. Their behavior can be understood entirely in terms of their stack effects.
+as the next word in the quotation would expect them. Their behavior can be understood entirely in terms of their stack effects, which are given in table \ref{shuffles}.
+\begin{table}
+\caption{\label{shuffles}Shuffle words}
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{drop}{drop ( x -- )}
@@ -747,6 +758,8 @@ as the next word in the quotation would expect them. Their behavior can be under
 \ordinaryword{rot}{rot ( x y z -- y z x )}
 \ordinaryword{-rot}{-rot ( x y z -- z x y )}
 }
+\end{table}
+
 Try to avoid the complex shuffle words such as \texttt{rot} and \texttt{2dup} as much as possible, for they make data flow harder to understand. If you find yourself using too many shuffle words, or you're writing
 a stack effect comment in the middle of a compound definition to keep track of stack contents, it is
 a good sign that the word should probably be factored into two or
@@ -769,13 +782,6 @@ description=the currently executing quotation}}
 name=interpreter,
 description=executes quotations by iterating them and recursing into nested definitions. see compiler}
 
-\begin{figure}
-\caption{Interpreter algorithm}
-\begin{center}
-\scalebox{0.45}{\epsfig{file=interpreter.eps}}
-\end{center}
-\end{figure}
-
 The Factor interpreter executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the interpreter algorithm.
 
 \begin{itemize}
@@ -790,6 +796,13 @@ The Factor interpreter executes quotations. Quotations are lists, and since list
 \item Otherwise, the car of the call frame is pushed on the data stack.
 \item The call frame is set to the cdr, and the loop continues.
 \end{itemize}
+
+\begin{figure}
+\caption{Interpreter algorithm}
+\begin{center}
+\scalebox{0.45}{\epsfig{file=interpreter.eps}}
+\end{center}
+\end{figure}
 
 The interpreter can be invoked reflectively with the following pair of words.
 \wordtable{
@@ -900,7 +913,7 @@ The simplest style of a conditional form is the \texttt{ifte} word.
 }
 The \texttt{cond} is a generalized boolean. If it is \texttt{f}, the \texttt{false} quotation is called, and if \texttt{cond} is any other value, the \texttt{true} quotation is called. The condition flag is removed from the stack before either quotation executes.
 
-Note that in general, both branches should have the same stack effect. Not only is this good style that makes the word easier to understand, but also unbalanced conditionals cannot be compiled.
+Note that in general, both branches should have the same stack effect. Not only is this good style that makes the word easier to understand, but also unbalanced conditionals cannot be compiled (\ref{compiler}).
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{when}{when ( cond true -- | true:~-- )}
@@ -1105,8 +1118,8 @@ The current state of the interpreter is determined by the contents of the four s
 }
 Save and restore the data stack contents. As an example, here is a word that executes a quotation and restores the data stack to its previous state;
 \begin{verbatim}
-: keep-datastack
-    ( quot -- ) datastack slip set-datastack drop ;
+: keep-datastack ( quot -- )
+    datastack slip set-datastack drop ;
 \end{verbatim}
 Note that the \texttt{drop} call is made to remove the original quotation from the stack.
 \wordtable{
@@ -1139,8 +1152,8 @@ Save and restore the catch stack, used for exception handling. See \ref{exceptio
 
 \wordglos
 \vocabglos
-\glossary{name=defining word,
-description=a word that adds definitions to the dictionary}
+\newcommand{\definingwordglos}{\glossary{name=defining word,
+description=a word that adds definitions to the dictionary}}
 \glossary{name=dictionary,
 description=the collection of vocabularies making up the code in the Factor image}
 \wordtable{
@@ -1182,7 +1195,7 @@ Words whose names are known at parse time -- that is, most words making up your 
 }
 The \texttt{vocabs} parameter is a list of vocabulary names. If a word with the given name is found, it is pushed on the stack, otherwise, \texttt{f} is pushed.
 
-\subsubsection{Creating words}
+\subsubsection{\label{creating-words}Creating words}
 
 \wordtable{
 \vocabulary{words}
@@ -1195,7 +1208,7 @@ Creates a new word \texttt{name} in \texttt{vocabulary}. If the vocabulary alrea
 \ordinaryword{create-in}{create-in ( name -- word )}
 
 }
-Creates a new word \texttt{name} in the current vocabulary. Should only be called from parsing words (\ref{parsing-words}), and in fact is defined as:
+Creates a new word \texttt{name} in the current vocabulary. This word is intended to be called from parsing words (\ref{parsing-words}), and in fact is defined as follows:
 \begin{verbatim}
 : create-in ( name -- word ) "in" get create ;
 \end{verbatim}
@@ -1665,10 +1678,10 @@ Defines a predicate class deriving from \texttt{parent} whose instances are the 
 For example, the \texttt{strings} vocabulary contains subclasses of \texttt{integer}
 classifying various ASCII characters:
 \begin{verbatim}
-PREDICATE: integer blank     " \t\n\r" str-contains? ;
-PREDICATE: integer letter    CHAR: a CHAR: z between? ;
-PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
-PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
+PREDICATE: integer blank " \t\n\r" string-contains? ;
+PREDICATE: integer letter CHAR: a CHAR: z between? ;
+PREDICATE: integer LETTER CHAR: A CHAR: Z between? ;
+PREDICATE: integer digit CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 \end{verbatim}
 
@@ -2187,7 +2200,7 @@ Tests if every element of \texttt{l1} is equal to some element of \texttt{l2}.
 Outputs a new list containing all elements of the \texttt{list} except those equal to the \texttt{object}.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{remq}{remove ( object list -- list )}
+\ordinaryword{remq}{remq ( object list -- list )}
 }
 Outputs a new list containing all elements of the \texttt{list} except \texttt{object}. Elements are compared by identity.
 \wordtable{
@@ -2516,7 +2529,7 @@ It might be tempting to just always use hashtables, however for very small mappi
 \subsection{Association lists}
 
 \glossary{name=association list,
-description={a list of pairs, where the car if each pair is a key and the cdr is the value associated with that key}}
+description={a list of pairs, where the car of each pair is a key and the cdr is the value associated with that key}}
 
 Association lists are built from cons cells. They are structured like a ribbed spine, where the ``spine'' is a list and each ``rib'' is a cons cell holding a key/value pair.
 
@@ -2637,7 +2650,7 @@ Creates a new empty hashtable with \texttt{n} buckets. As more elements are adde
 Looks up the value associated with a key. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{hash*} word allows a distinction to be made between a missing value and a value equal to \texttt{f}.
 \wordtable{
 \vocabulary{hashtables}
-\ordinaryword{set-hash}{hash ( v k hash -- )}
+\ordinaryword{set-hash}{set-hash ( v k hash -- )}
 }
 Stores a hashtable entry associating \texttt{k} with \texttt{v}.
 \wordtable{
@@ -3307,7 +3320,8 @@ The \texttt{attrs} parameter is an association list holding style information, a
 \vocabulary{streams}
 \genericword{stream-flush}{stream-flush ( s -- )}
 }
-Blocks until all pending output operations are been complete.
+Ensures all pending output operations are been complete. With many output streams, written output is buffered and not sent to the underlying resource until either the buffer is full, or an explicit call to \texttt{stream-flush} is made.
+
 \wordtable{
 \vocabulary{streams}
 \genericword{stream-auto-flush}{stream-auto-flush ( s -- )}
@@ -3347,6 +3361,8 @@ Outputs a character or string to the stream, followed by a newline, then execute
 \subsection{\label{stdio}The default stream}
 \glossary{name=default stream,
 description={the value of the \texttt{stdio} variable, used by various words as an implicit stream parameter}}
+\glossary{name=stdio,
+description={see default stream}}
 Various words take an implicit stream parameter from the \texttt{stdio} variable to reduce stack shuffling.
 \wordtable{
 \vocabulary{stdio}
@@ -3426,10 +3442,15 @@ The value of the \texttt{stdio} variable can be rebound inside a quotation with 
 \wordtable{
 \vocabulary{stdio}
 \ordinaryword{with-stream}{with-stream ( stream quot -- )}
-
 }
 Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to \texttt{stream}. The stream is closed when the quotation returns or if an exception
 is thrown.
+\wordtable{
+\vocabulary{stdio}
+\ordinaryword{with-stream*}{with-stream* ( stream quot -- )}
+}
+Like \verb|with-stream| extend the stream is only closed in the case of an error.
+
 \wordtable{
 \vocabulary{stdio}
 \ordinaryword{with-string}{with-string ( quot -- string )}
@@ -3440,6 +3461,10 @@ a string and returned.
 
 \subsection{Reading and writing files}
 
+\glossary{name=file reader,
+description=an input stream reading from a file}
+\glossary{name=file writer,
+description=an output stream writing to a file}
 \wordtable{
 \vocabulary{streams}
 \ordinaryword{<file-reader>}{<file-reader> ( path -- stream )}
@@ -3498,6 +3523,10 @@ Outputs a list of file system attributes, or \texttt{f} if the file does not exi
 
 \subsection{TCP/IP networking}
 
+\glossary{name=server stream,
+description=a stream listening on a TCP/IP socket}
+\glossary{name=client stream,
+description=a bidirectional stream for an to end-point of a TCP/IP connection}
 \wordtable{
 \vocabulary{streams}
 \ordinaryword{<client>}{<client>~( host port -- stream~)}
@@ -3525,6 +3554,13 @@ Waits for a connection to the port number that \texttt{server} is listening on, 
 Outputs the IP address as a dotted-quad string, and the local port number, respectively, of a client socket returned from \texttt{accept}.
 
 \subsection{Special streams}
+
+\glossary{name=null stream,
+description=a bidirectional stream that ignores output and returns end of file on input}
+\glossary{name=duplex stream,
+description=a bidirectional delegating to an input stream for input and an output stream for output}
+\glossary{name=wrapper stream,
+description=a bidirectional stream delegating to an underlying stream and providing a namespace where the delegated stream is the default stream}
 
 \wordtable{
 \vocabulary{streams}
@@ -3575,6 +3611,9 @@ description={a set of words for printing objects in readable form}}
 
 One of Factor's key features is the ability to print almost any object in a readable form. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities.
 
+\subsubsection{The unparser}
+
+The unparser provides a basic facility for turning certain types of objects into strings. A more general facility supporting more types is the prettyprinter (\ref{prettyprint}).
 \glossary{
 name=unreadable string,
 description={a string which raises a parse error when parsed}}
@@ -3584,8 +3623,7 @@ description={a readable form of an object is a string that parses to that object
 
 \wordtable{
 \vocabulary{unparser}
-\ordinaryword{unparse}{unparse~( object -- string~)}
-
+\genericword{unparse}{unparse~( object -- string~)}
 }
 Outputs a string representation of \texttt{object}. Only the following classes of objects are supported; for anything else, an unreadable string is output:
 \begin{verbatim}
@@ -3593,16 +3631,32 @@ boolean
 dll
 number
 sbuf
-word
 string
+word
 \end{verbatim}
+A set of words are provided for converting integers into strings with various bases.
+\wordtable{
+\vocabulary{unparser}
+\ordinaryword{>base}{>base~( n base -- string~)}
+}
+Converts \texttt{n} into a string representation in the given base. The base must be between 2 and 36, inclusive.
+\wordtable{
+\vocabulary{unparser}
+\ordinaryword{>bin}{>bin~( n -- string~)}
+\ordinaryword{>oct}{>oct~( n -- string~)}
+\ordinaryword{>dec}{>dec~( n -- string~)}
+\ordinaryword{>hex}{>hex~( n -- string~)}
+}
+Convenience words defined in terms of \texttt{>base} for converting integers into string representations in base 2, 8, 10 and 16, respectively.
+
+\subsubsection{\label{prettyprint}The prettyprinter}
 
 \wordtable{
 \vocabulary{prettyprint}
 \ordinaryword{prettyprint}{prettyprint~( object --~)}
 
 }
-Prints the object using literal syntax that can be parsed back again. While the prettyprinter supports more classes of objects than \texttt{unparse}, it is still not a general serialization mechanism. The following restrictions apply:
+Prints the object using literal syntax that can be parsed back again. Even though the prettyprinter supports more classes of objects than \texttt{unparse}, it is still not a general serialization mechanism. The following restrictions apply:
 
 \begin{itemize}
 \item Not all objects print in a readable way. Namely, the following classes do not:
@@ -3693,19 +3747,53 @@ Decreases the indent level and emits a newline if \texttt{one-line} is off.
 
 \section{The parser}
 
-This section concerns itself with reflective access and extension of the parser. Syntax is documented in \ref{syntax}.
+This section concerns itself with reflective access and extension of the parser. The parser algorithm and standard syntax is described in \ref{syntax}. Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right.
+
+\subsection{\label{parsing-numbers}Parsing numbers}
+
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{str>number}{str>number~( string -- number )}
+}
+Attempts to parse the string as a number. An exception is thrown if the string does not represent a number in one of the following forms:
+\begin{itemize}
+\item An integer; see \ref{integer-literals}
+\item A ratio; see \ref{ratio-literals}
+\item A float; see \ref{float-literals}
+\end{itemize}
+In particular, complex numbers are parsed by the \verb|#{| and \verb|}#| parsing words, not by the number parser. To parse complex number literals, use the \texttt{parse} word (\ref{parsing-quotations}).
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{parse-number}{parse-number~( string -- number/f )}
+}
+Like \texttt{str>number}, except instead of raising an error, outputs \texttt{f} if the string is not a valid literal number.
+\wordtable{
+\vocabulary{parser}
+\genericword{base>}{base>~( string base -- integer )}
+}
+Converts a string representation of an integer in the given base into an integer. Throws an exception if the string is not a valid representation of an integer.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{bin>}{bin>~( string -- integer )}
+\ordinaryword{oct>}{oct>~( string -- integer )}
+\ordinaryword{dec>}{dec>~( string -- integer )}
+\ordinaryword{hex>}{hex>~( string -- integer )}
+}
+Convenience words defined in terms of \texttt{base>} for parsing integers in base 2, 8, 10 and 16, respectively.
+
+\subsection{\label{parsing-quotations}Parsing quotations}
 
 As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables (\ref{namespaces}):
 \begin{description}
-\item["use"] the vocabulary search path; a list of strings
-\item["in"] the current vocabulary; a string
+\item[\texttt{"use"}] the vocabulary search path; a list of strings
+\item[\texttt{"in"}] the current vocabulary; a string
 \end{description}
 
 \wordtable{
 \vocabulary{parser}
 \genericword{parse}{parse~( string -- list )}
 }
-Parses the string and outputs a list of all objects read from that string, indeed, a quotation. The vocabulary search path and current vocabulary are taken from the current scope.
+Parses the string and outputs a quotation. The vocabulary search path and current vocabulary are taken from the current scope.
 \begin{alltt}
 \textbf{ok} "1 2 3" parse .
 \textbf{[ 1 2 3 ]}
@@ -3725,16 +3813,20 @@ The \texttt{eval} word is defined as follows:
 : eval parse call ;
 \end{verbatim}
 
+\subsection{Parsing from streams}
+
+There are two sets of words for parsing input from streams. The first set uses the following initial values for the \texttt{"use"} and \texttt{"in"} variables:
+
+\begin{description}
+\item[\texttt{"use"}] \texttt{[ "scratchpad" "syntax" ]}
+\item[\texttt{"in"}] \texttt{"scratchpad"}
+\end{description}
+
 \wordtable{
 \vocabulary{parser}
 \genericword{parse-stream}{parse-stream~( name stream -- list )}
 }
-Parses lines of text from the stream and outputs a quotation. The \texttt{name} parameter identifies the stream in error messages. The stream is closed when the end is reached. The vocabulary search path and current vocabulary are set to their default values. The initial vocabulary search path contains two vocabularies:
-\begin{verbatim}
-syntax
-scratchpad
-\end{verbatim}
-The initial current vocabulary is \texttt{scratchpad}.
+Parses lines of text from the stream and outputs a quotation. The \texttt{name} parameter identifies the stream in error messages. The stream is closed when the end is reached.
 
 \wordtable{
 \vocabulary{parser}
@@ -3753,14 +3845,233 @@ Parses the contents of a file and calls the resulting quotation. Defined as foll
 : run-file parse-file call ;
 \end{verbatim}
 
-\subsection{Resources}
+The next set of stream parsing words takes the vocabulary search path and current vocabulary from the current scope. These words are used to load the \texttt{.factor-rc} file on startup, so that any \texttt{USE:}~and \texttt{USING:}~declarations set in that file take effect in the listener (\ref{listener}).
 
-\glossary{name=resource,
-description={a file in the Factor source code}}
+\wordtable{
+\vocabulary{parser}
+\genericword{(parse-stream)}{(parse-stream)~( name stream -- list )}
+\genericword{(parse-file)}{(parse-file)~( path -- list )}
+\genericword{(run-file)}{(run-file)~( path -- )}
+}
+Like the first set of stream parsing words, except the \texttt{"use"} and \texttt{"in"} variables are taken from the current scope.
 
 \subsection{\label{parsing-words}Parsing words}
 
-\subsubsection{\label{string-mode}String mode}
+\parsingwordglos
+Parsing words execute at parse time, and therefore can access and modify the state of the parser, as well as add objects to the parse tree. Parsing words are a difficult concept to grasp, so this section has several examples and explains the workings of some of the parsing words provided in the library.
+
+To define a parsing word, suffix the colon definition with the \texttt{parsing} word.
+
+\wordtable{
+\vocabulary{syntax}
+\parsingword{parsing}{parsing}
+}
+Marks the most recently defined word as a parsing word. For example:
+
+\begin{verbatim}
+: hello "Hello world" print ; parsing
+\end{verbatim}
+
+Now writing \texttt{hello} anywhere will print the message \texttt{"Hello world"} at parse time. Of course, this is a useless definition. In the sequel, we will look into writing useful parsing words that modify parser state.
+
+\subsubsection{Nested structure}
+
+The first thing to look at is how the parse tree is built. When parsing begins, the empty list is pushed on the data stack; whenever the parser algorithm appends an object to the parse tree, it conses the object onto the quotation at the top of the stack. This builds the quotation in reverse order, so when parsing is done, the quotation is reversed before it is called.
+
+Lets look at a simple example; the parsing of \texttt{"1 2 3"}:
+
+\begin{tabular}{l|l|l}
+\hline
+Token&Stack before&Stack after\\
+\hline
+\verb|1|&\verb|[ ]|&\verb|[ 1 ]|\\
+\verb|2|&\verb|[ 1 ]|&\verb|[ 2 1 ]|\\
+\verb|3|&\verb|[ 2 1 ]|&\verb|[ 3 2 1 ]|
+\end{tabular}
+
+Once the end of the string has been reached, the quotation is reversed, and the output, as you would expect, is \verb|[ 1 2 3 ]|.
+
+Nested structure is a bit more involved. The basic idea is that parsing words can push an empty list on the stack, then all subsequent tokens are consed onto this quotation, until another parsing word adds this quotation to the quotation underneath.
+
+The following definitions of the \verb|[| and \verb|]| parsing words illustrate the idiom:
+\begin{verbatim}
+: [ f ; parsing
+: ] reverse swons ; parsing
+\end{verbatim}
+
+Let us look at how the following string parses:
+
+\begin{verbatim}
+"1 [ 2 3 ] 4"
+\end{verbatim}
+
+\begin{tabular}{l|l|l|l}
+\hline
+Token&Stack before&Stack after&Note\\
+\hline
+\verb|1|&\verb|[ ] [ ]|&\verb|[ ] [ 1 ]|&\\
+\textbf{\texttt{[}}&\verb|[ 1 ]|&\verb|[ 1 ] [ ]|&pushes an empty list\\
+\verb|2|&\verb|[ 1 ] [ ]|&\verb|[ 1 ] [ 2 ]|&\\
+\verb|3|&\verb|[ 1 ] [ 2 ]|&\verb|[ 1 ] [ 3 2 ]|&\\
+\textbf{\texttt{]}}&\verb|[ 1 ] [ 3 2 ]|&\verb|[ [ 2 3 ] 1 ]|&calls \verb|reverse swons|\\
+\verb|4|&\verb|[ [ 2 3 ] 1 ]|&\verb|[ 4 [ 2 3 ] 1 ]|&
+\end{tabular}
+
+Now, the parser reverses the original quotation, and the resulting output is clear:
+\begin{verbatim}
+[ 1 [ 2 3 ] 4 ]
+\end{verbatim}
+Data types such as vectors, hashtables and so on are built in a similar way. For example, the vector parsing words are defined as thus:
+\begin{verbatim}
+: { f ; parsing
+: } reverse >vector swons ; parsing
+\end{verbatim}
+Indeed, any type of object can be added to the parse tree in this fashion.
+
+\subsubsection{\label{reading-ahead}Reading ahead}
+
+\glossary{name=reading ahead,
+description=a parsing word reads ahead of it scans following tokens from the input string}
+The next idiom to look at is parsing words that read ahead. The first example is the \verb|HEX:| word, documented in \ref{integer-literals}. This word is defined so that the following two lines are equivalent:
+\begin{verbatim}
+HEX: deadbeef
+3735928559
+\end{verbatim}
+It is defined in terms of a lower-level \texttt{(BASE)} word that takes the numerical base on the data stack, reads the next token from the string, then calls \texttt{base>} (\ref{parsing-numbers}):
+\begin{verbatim}
+: (BASE) ( base -- ) scan swap base> swons ;
+: HEX: 16 (BASE) ; parsing
+\end{verbatim}
+The key word here is \texttt{scan}.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{scan}{scan ( -- string )}
+}
+Outputs the next token as a string, or \texttt{f} if the end of the input has been reached. Advances the parser state to after this token.
+
+The next example of a parsing word we will look at is the \verb|\| word. It reads the next token from the input, and appends code to push that word literally on the stack. That is, the following two phrases both have the effect of pushing the word \verb|+| on the stack, rather than executing it:
+\begin{verbatim}
+\ +
+[ + ] car
+\end{verbatim}
+We can look at how \verb|\| is implemented:
+\begin{verbatim}
+: \ scan-word unit swons \ car swons ; parsing
+\end{verbatim}
+The key word here is \verb|scan-word|. It combines \texttt{scan} word with vocabulary search.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{scan-word}{scan-word ( -- word )}
+}
+Reads the next token from the input and looks up a word with this name. If the lookup fails, attempts to parse the word as a number by calling \verb|str>number|.
+
+\subsubsection{Defining words}
+
+\definingwordglos
+Defining words add definitions to the dictionary without modifying the parse tree.
+The first example to look at is the \verb|SYMBOL:| word. It reads the next token from the input stream, creates a word with that name, and makes it a symbol (\ref{symbols}). The next
+example is the common \verb|:| word, which creates a colon definition. First, it reads the
+name of the new word, then the definition is built up until \verb|;|. The latter
+example will demonstrate building nested structure in defining words.
+
+First, let us look at the \verb|SYMBOL:| word (\ref{symbols}).
+\begin{verbatim}
+: SYMBOL: CREATE define-symbol ; parsing
+\end{verbatim}
+The key factor the above definition is \verb|CREATE|, which reads a token from the input and creates a word with that name. This word is then passed to \verb|define-symbol|.
+
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{CREATE}{CREATE ( -- word )}
+}
+Reads the next token from the input and creates a word in the current vocabulary with that name. It uses \verb|create-in| to do this (\ref{creating-words}).
+
+The definition of \verb|:| introduces the next idiom, and that is building a quotation and then adding a definition using \verb|;|.
+\begin{verbatim}
+: :
+    CREATE [ define-compound ] [ ]
+    "in-definition" on ; parsing
+\end{verbatim}
+The factors of the word are, in order:
+\begin{description}
+\item[\texttt{CREATE}] reads the following token and pushes a new word on the stack,
+\item[\texttt{[ define-compound ]}] a quotation to be called by \verb|;|,
+\item[\texttt{[ ]}] an empty list that the parser will build the colon definition on,
+\item[\texttt{"in-definition" on}] sets a flag that subsequent parsing words can query.
+\end{description}
+While \verb|:| is very specific, \verb|;| is quite general because it takes a quotation pushed by a previous parsing word. You can use \verb|;| in your own parsing words.
+
+\wordtable{
+\parsingword{;}{;~( definer parsed -- )}
+\texttt{definer:~parsed --}\\
+}
+Reverses the \verb|parsed| quotation, and passes it as input to the \verb|definer| quotation.
+The definition of this word is in some sense dual to \verb|:| even thought it is more general:
+\begin{verbatim}
+: ; "in-definition" off reverse swap call ; parsing
+\end{verbatim}
+
+Suppose we are parsing the following string:
+\begin{verbatim}
+: sq dup * ;
+\end{verbatim}
+
+We can trace the parsing as before.
+
+\begin{tabular}{l|l|l}
+\hline
+Token&Stack after&Note\\
+\hline
+\verb|:|&\verb|[ ] sq [ define-compound ] [ ]|&reads the next token\\
+\verb|dup|&\verb|[ ] sq [ define-compound ] [ dup ]|\\
+\verb|*|&\verb|[ ] sq [ define-compound ] [ * dup ]|&\\
+\verb|;|&\verb|[ ]|&reverses and defines
+\end{tabular}
+
+The call to the \verb|;| word proceeds as follows:
+\begin{description}
+\item[\texttt{"in-definition" off}] this variable was switched on by \verb|:|.
+\item[\texttt{reverse}] reverses \verb|[ * dup ]| yielding \verb|[ dup * ]|.
+\item[\texttt{swap call}] calls \texttt{[ define-compound ]}. Thus, \verb|define-compound| is called to define \verb|sq| as the quotation \verb|[ dup * ]|.
+\end{description}
+
+\subsubsection{\label{string-mode}String mode and parser variables}
+\stringmodeglos
+String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly.
+
+String mode is controlled by the \verb|string-mode| variable.
+
+\wordtable{
+\vocabulary{parser}
+\symbolword{string-mode}
+}
+When enabled, the parser adds tokens to the parse tree as strings. This creates a paradox because further parsing words are not executed while string mode is on. However, if the token \verb|";"| is read, there is a special case that calls the \verb|;| parsing word. This parsing word reverses the quotation at the top of the stack, and calls the quotation underneath it, as usual.
+
+An illustration of this idiom is found in the \verb|USING:| parsing word. It reads a list of vocabularies, terminated by \verb|;|. However, the vocabulary names do not name words, except by coincidence; so string mode is used to read them.
+\begin{verbatim}
+: USING: 
+    string-mode on [
+        string-mode off [ use+ ] each
+    ] [ ] ; parsing
+\end{verbatim}
+Make note of the quotation that is left in position for \verb|;| to call. It switches off string mode, so that normal parsing can resume, then adds the given vocabularies to the search path.
+
+If the parser features described in the earlier sections are still insufficient, you can directly access a pair of variables holding parser state:
+\begin{description}
+\item[\texttt{"line"}] the text being parsed,
+\item[\texttt{"col"}] the column number.
+\end{description}
+The \verb|"col"| variable is implicitly changed the \verb|scan| word (\ref{reading-ahead}), and the following word.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{until-eol}{until-eol ( -- string )}
+}
+Outputs the remainder of the line being parsed. The \verb|"col"| variable is set to point to the end of the line.
+
+This word is used to implement end-of-line comments:
+\begin{verbatim}
+: ! until-eol drop ; parsing
+\end{verbatim}
 
 \section{Web framework}
 
@@ -3831,7 +4142,7 @@ If you are used to a statically typed language, you might find Factor's tendency
 
 \section{System organization}
 
-\subsection{The listener}
+\subsection{\label{listener}The listener}
 
 Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. I will have more to say about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 \begin{alltt}
@@ -3865,6 +4176,10 @@ The listener knows when to print a continuation prompt by looking at the height 
 stack. Parsing words such as \texttt{[} and \texttt{:} leave elements on the parser
 stack; these elements are popped by \texttt{]} and \texttt{;}.
 
+On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
+any quick definitions you want available at the listener there. To avoid loading this
+file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image, as described in the next section.
+
 \subsection{Source files}
 
 While it is possible to do all development in the listener and save your work in images, it is far more convenient to work with source files, at least until an in-image structure editor is developed.
@@ -3890,15 +4205,11 @@ Word definitions also retain the line number where they are located in their ori
 
 This word requires that a jEdit instance is already running.
 
-For the \texttt{jedit} word to work with words in the Factor library, you must set the \texttt{"resource-path"} variable to the location of the Factor source tree. One way to do this is to add a phrase like the following to your \texttt{.factor-rc}:
+The \texttt{jedit} word will open word definitions from the Factor library once the full path of the Factor source tree is entered into the \texttt{"resource-path"} variable. One way to do this is to add a phrase like the following to your \texttt{.factor-rc}:
 
 \begin{verbatim}
 "/home/slava/Factor/" "resource-path" set
 \end{verbatim}
-
-On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
-any quick definitions you want available at the listener there. To avoid loading this
-file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image, as described in the next section.
 
 \subsection{Images}
 
@@ -4120,7 +4431,8 @@ A more sophisticated way to browse the library is using the integrated HTTP serv
 
 \begin{alltt}
 \textbf{ok} USE: httpd
-\textbf{ok} 8888 httpd
+\textbf{ok} USE: threads
+\textbf{ok} [ 8888 httpd ] in-thread
 \end{alltt}
 
 Then, point your browser to the following URL, and start browsing:
@@ -4129,19 +4441,7 @@ Then, point your browser to the following URL, and start browsing:
 \texttt{http://localhost:8888/responder/inspect/vocabularies}
 \end{quote}
 
-To stop the HTTP server, point your browser to
-
-\begin{quote}
-\texttt{http://localhost:8888/responder/quit}.
-\end{quote}
-
-You can even start the HTTP in a separate thread, and look at code in your web browser while continuing to play in the listener:
-
-\begin{alltt}
-\textbf{ok} USE: httpd
-\textbf{ok} USE: threads
-\textbf{ok} [ 8888 httpd ] in-thread
-\end{alltt}
+To stop the HTTP server, evaluate the \verb|stop-httpd| word.
 
 \section{Dealing with runtime errors}
 
