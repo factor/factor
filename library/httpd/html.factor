@@ -87,7 +87,7 @@ stdio streams strings unparser http ;
     [ "/responder/browser/?vocab=" , , "&word=" , , ] make-string ;
 
 : browser-link-tag ( style quot -- style )
-    over "browser-link-word" swap assoc [
+    over "word" swap assoc [
         <a href= over browser-link-href a> call </a>
     ] [
         call
