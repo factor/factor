@@ -126,6 +126,7 @@ t [
     "/library/ui/inspector.factor"
     "/library/ui/init-world.factor"
     "/library/ui/tool-menus.factor"
+    "/library/ui/ui.factor"
 ] pull-in
 
 compile? [

@@ -90,7 +90,7 @@ M: editor user-input* ( ch editor -- ? )
     scroll>bottom  t ;
 
 M: editor pref-size ( editor -- w h )
-    editor-text shape-size >r 10 + r> ;
+    editor-text shape-size >r 1 + r> ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-size rot resize-gadget
