@@ -133,8 +133,17 @@ public class ExternalFactor extends VocabularyLookup
 	
 			int responseLength = in.readInt();
 			byte[] response = new byte[responseLength];
-			in.readFully(response);
 			
+			int n = 0;
+			while (n < response.length)
+			{
+				int count = in.read(response,n,response.length - n);
+				if (count < 0)
+					throw new EOFException();
+				System.err.println(new String(response,n,count));
+				n += count;
+			}
+
 			String responseStr = new String(response,"ASCII");
 			return responseStr;
 		}

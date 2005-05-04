@@ -2,7 +2,6 @@
 
 - if external factor is down, don't add tons of random shit to the       
   dictionary
-- plugin: type "re" in edit word dialog --> hang
 - word preview for parsing words
 
 + ui:

@@ -1,10 +1,5 @@
 IN: temporary
-USE: namespaces
-USE: parser
-USE: streams
-USE: test
-USE: stdio
-USE: math
+USING: math parser stdio streams strings test ;
 
 [ 4 ] [ "/library/test/io/no-trailing-eol.factor" run-resource ] unit-test
 
@@ -52,3 +47,5 @@ USE: math
 [ -1 read ] unit-test-fails
 
 [ "" ] [ 0 read ] unit-test
+
+[ ] [ "123" write 9000 CHAR: x fill write flush ] unit-test

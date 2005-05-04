@@ -6,27 +6,30 @@ strings ;
 
 TUPLE: buffer size ptr fill pos ;
 
-: imalloc ( size -- address )
-    "int" "libc" "malloc" [ "ulong" ] alien-invoke ;
+: malloc ( size -- address )
+    "ulong" "libc" "malloc" [ "ulong" ] alien-invoke ;
 
-: ifree ( address -- )
+: free ( address -- )
     "void" "libc" "free" [ "ulong" ] alien-invoke ;
 
-: irealloc ( address size -- address )
-    "int" "libc" "realloc" [ "ulong" "ulong" ] alien-invoke ;
+: realloc ( address size -- address )
+    "ulong" "libc" "realloc" [ "ulong" "ulong" ] alien-invoke ;
 
-: imemcpy ( dst src size -- )
+: memcpy ( dst src size -- )
     "void" "libc" "memcpy" [ "ulong" "ulong" "ulong" ] alien-invoke ;
+
+: check-ptr ( ptr -- ptr )
+    dup 0 = [ "Out of memory" throw ] when ;
 
 C: buffer ( size -- buffer )
     2dup set-buffer-size
-    swap imalloc swap [ set-buffer-ptr ] keep
+    swap malloc check-ptr swap [ set-buffer-ptr ] keep
     0 swap [ set-buffer-fill ] keep
     0 swap [ set-buffer-pos ] keep ;
 
 : buffer-free ( buffer -- )
     #! Frees the C memory associated with the buffer.
-    dup buffer-ptr ifree  0 swap set-buffer-ptr ;
+    dup buffer-ptr free  0 swap set-buffer-ptr ;
 
 : buffer-contents ( buffer -- string )
     #! Returns the current contents of the buffer.
@@ -67,21 +70,28 @@ C: buffer ( size -- buffer )
     #! Returns the amount of data that may be added to the buffer.
     dup buffer-size swap buffer-fill - ;
 
+: eof? ( buffer -- ? ) buffer-fill 0 = ;
+
+: buffer-extend ( length buffer -- )
+    #! Increases the size of the buffer by length.
+    2dup buffer-ptr swap realloc check-ptr
+    over set-buffer-ptr set-buffer-size ;
+
 : check-overflow ( string buffer -- )
-    buffer-capacity swap length < [
-        "Buffer overflow" throw
-    ] when ;
+    over length over buffer-capacity > [
+        dup eof? [
+            >r length r> buffer-extend
+        ] [
+            "Buffer overflow" throw
+        ] ifte
+    ] [
+        2drop
+    ] ifte ;
 
 : >buffer ( string buffer -- )
     2dup check-overflow
     [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
-
-: buffer-extend ( length buffer -- )
-    #! Increases the size of the buffer by length.
-    [ buffer-size + dup ] keep [ buffer-ptr swap ] keep
-    >r irealloc r>
-    [ set-buffer-ptr ] keep set-buffer-size ;
 
 : n>buffer ( count buffer -- )
     #! Increases the fill pointer by count.
@@ -97,7 +107,7 @@ C: buffer ( size -- buffer )
 
 : buffer-append ( buffer buffer -- )
     #! Append first buffer to second buffer.
-    2dup buffer-end over buffer-ptr rot buffer-fill imemcpy
+    2dup buffer-end over buffer-ptr rot buffer-fill memcpy
     >r buffer-fill r> n>buffer ;
 
 : buffer-set ( string buffer -- )

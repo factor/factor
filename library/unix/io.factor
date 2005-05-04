@@ -185,8 +185,6 @@ C: reader ( handle -- reader )
         drop
     ] ifte ;
 
-: eof? ( buffer -- ? ) buffer-fill 0 = ;
-
 TUPLE: read-line-task ;
 
 C: read-line-task ( port -- task )
@@ -295,8 +293,8 @@ C: writer ( fd -- writer )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
     dup pending-error
-    dup eof? >r 2dup buffer-capacity > r> and [
-        buffer-extend t
+    dup eof? [
+        2drop t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=
     ] ifte ;
