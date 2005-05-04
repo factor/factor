@@ -38,13 +38,12 @@ USING: alien generic kernel math unix-internals ;
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
-: reuse-addr ( fd -- )
-    SOL_SOCKET SO_REUSEADDR 1 box-int "int" c-size setsockopt
-    io-error ;
+: sockopt ( fd opt -- )
+    SOL_SOCKET swap 1 box-int "int" c-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
     server-sockaddr [
-        dup reuse-addr
+        dup SO_REUSEADDR sockopt
         swap dupd "sockaddr-in" c-size bind
         dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] ifte
     ] with-socket-fd ;
@@ -81,7 +80,11 @@ IN: streams
 C: client-stream ( fd host port -- stream )
     [ set-client-stream-port ] keep
     [ set-client-stream-host ] keep
-    [ >r dup f <fd-stream> r> set-delegate ] keep ;
+    [
+        >r
+        dup SO_OOBINLINE sockopt
+        dup f <fd-stream> r> set-delegate
+    ] keep ;
 
 : <client> ( host port -- stream )
     #! Connect to a port number on a TCP/IP host.

@@ -10,13 +10,15 @@ IN: unix-internals
 : O_CREAT   HEX: 0200 ;
 : O_TRUNC   HEX: 0400 ;
 
-: POLLIN     HEX: 0001 ; ! any readable data available
-: POLLPRI    HEX: 0002 ; ! OOB/Urgent readable data
-: POLLOUT    HEX: 0004 ; ! file descriptor is writeable
+: POLLIN     HEX: 0001 ;
+: POLLPRI    HEX: 0002 ;
+: POLLOUT    HEX: 0004 ;
 
-: SOL_SOCKET HEX: ffff ; ! options for socket level
-: SO_REUSEADDR HEX: 4 ; ! allow local address reuse
+: SOL_SOCKET HEX: ffff ;
+: SO_REUSEADDR HEX: 4 ;
+: SO_OOBINLINE HEX: ff ;
+
 : INADDR_ANY 0 ;
 
-: F_SETFL 4 ;    ! set file status flags
-: O_NONBLOCK 4 ; ! no delay
+: F_SETFL 4 ;
+: O_NONBLOCK 4 ;

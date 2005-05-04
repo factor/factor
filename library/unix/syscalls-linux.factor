@@ -20,6 +20,7 @@ IN: unix-internals
 
 : SOL_SOCKET 1 ;
 : SO_REUSEADDR 2 ;
+: SO_OOBINLINE 10 ;
 : INADDR_ANY 0 ;
 
 : F_SETFL 4 ;    ! set file status flags

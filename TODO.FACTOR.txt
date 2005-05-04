@@ -90,6 +90,7 @@
 
 + i/o:
 
+- if two tasks write to a unix stream, the buffer can overflow
 - faster stream-copy
 - rename prettyprint to pprint
 - reading and writing byte arrays
