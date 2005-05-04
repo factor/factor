@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien errors generic kernel lists math memory namespaces
-prettyprint sdl sequences stdio strings threads ;
+USING: alien errors generic kernel lists math
+memory namespaces prettyprint sdl sequences stdio strings
+threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -43,10 +44,12 @@ DEFER: handle-event
         drop f
     ] ifte ;
 
+: next-event ( -- event ) <event> dup SDL_PollEvent ;
+
 : run-world ( -- )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
-    <event> dup SDL_PollEvent [
+    next-event [
         [ handle-event ] in-thread drop run-world
     ] [
         drop world get world-step [ yield run-world ] when

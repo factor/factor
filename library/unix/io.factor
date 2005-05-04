@@ -355,6 +355,9 @@ M: writer stream-close ( stream -- )
 : <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
+: idle-io-task ( -- )
+    [ schedule-thread 10 io-multiplex ] callcc0 idle-io-task ;
+
 USE: stdio
 
 : init-io ( -- )
@@ -363,12 +366,5 @@ USE: stdio
     global [
         <namespace> io-tasks set
         0 1 t <fd-stream> stdio set
-    ] bind ;
-
-IN: threads
-
-: stop ( -- )
-    #! If there is a quotation in the run queue, call it,
-    #! otherwise wait for I/O.
-    pending-io? [ 10 io-multiplex ] when
-    next-thread [ call ] [ -1 io-multiplex stop ] ifte* ;
+    ] bind
+    [ idle-io-task ] in-thread ;
