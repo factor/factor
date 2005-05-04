@@ -87,7 +87,7 @@ END-STRUCT
     #! Allocates and returns a new entry for the io queue.
     #! The new index in the callback vector is returned.
     io-queue get [
-        "overlapped-ext" c-type [ "width" get ] bind imalloc <alien>
+        "overlapped-ext" c-type [ "width" get ] bind malloc <alien>
         dup num-callbacks swap
         set-overlapped-ext-user-data
         unit num-callbacks dup >r callbacks get set-nth r>
@@ -141,8 +141,6 @@ END-STRUCT
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
     completion-port set 
-    
-!    << null-stream f >> stdio set
 
     <namespace> [
         32 <vector> callbacks set
