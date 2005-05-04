@@ -67,18 +67,18 @@ math-internals ;
         >r 2dup r> unswons add-method
     ] each nip ;
 
-: make-generic ( word vtable -- )
+: make-generic ( word -- )
     #! (define-compound) is used to avoid resetting generic
     #! word properties.
-    over "combination" word-prop cons (define-compound) ;
+    dup <vtable> over "combination" word-prop cons
+    (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
     over metaclass word? [
         word-name " is not a class" append throw
     ] unless
-    [ "methods" word-prop set-hash ] keep dup <vtable>
-    make-generic ;
+    [ "methods" word-prop set-hash ] keep make-generic ;
 
 : init-methods ( word -- )
      dup "methods" word-prop [
@@ -93,8 +93,7 @@ math-internals ;
     #! quotation that takes some objects and a vtable from the
     #! stack, and calls the appropriate row of the vtable.
     [ swap "combination" set-word-prop ] keep
-    dup init-methods
-    dup <vtable> make-generic ;
+    dup init-methods make-generic ;
 
 : single-combination ( obj vtable -- )
     >r dup type r> dispatch ; inline

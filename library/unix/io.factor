@@ -356,7 +356,8 @@ M: writer stream-close ( stream -- )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
 : idle-io-task ( -- )
-    [ schedule-thread 10 io-multiplex ] callcc0 idle-io-task ;
+    [ schedule-thread 10 io-multiplex stop ] callcc0
+    idle-io-task ;
 
 USE: stdio
 

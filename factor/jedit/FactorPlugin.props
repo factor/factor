@@ -59,7 +59,7 @@ mode.factor.sidekick.parser=factor
 
 factor.completion.in=IN: {0}\ 
 factor.completion.def={0} {1}
-factor.completion.stack={0} ( {1})
+factor.completion.stack={0} ( {1} )
 factor.completion.method=M: {0} {1}
 factor.completion.constructor=C: {0}
 

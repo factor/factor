@@ -44,6 +44,9 @@ IN: kernel-internals
     #! A good way to earn a living.
     dup hash-size 2 * <array> swap set-hash-array ;
 
+: (set-bucket-count) ( n hash -- )
+    >r <array> r> set-hash-array ;
+    
 IN: hashtables
 
 : bucket-count ( hash -- n ) hash-array length ;
@@ -69,7 +72,7 @@ IN: hashtables
         rot call
     ] change-bucket ; inline
 
-: rehash? ( hash -- ? )
+: grow-hash? ( hash -- ? )
     dup bucket-count 3 * 2 /i swap hash-size < ;
 
 : (hash>alist) ( alist n hash -- alist )
@@ -87,13 +90,15 @@ IN: hashtables
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;
 
-: rehash ( hash -- )
+: set-bucket-count ( new hash -- )
+    dup hash>alist >r [ (set-bucket-count) ] keep r>
+    0 pick set-hash-size
+    [ unswons rot (set-hash) ] each-with ;
+
+: grow-hash ( hash -- )
     #! Increase the hashtable size if its too small.
-    dup rehash? [
-        dup hash>alist
-        over grow-hash
-        0 pick set-hash-size
-        [ unswons rot (set-hash) ] each-with
+    dup grow-hash? [
+        dup hash-size 2 * swap set-bucket-count
     ] [
         drop
     ] ifte ;
@@ -102,7 +107,7 @@ IN: hashtables
     #! Store the value in the hashtable. Either replaces an
     #! existing value in the appropriate bucket, or adds a new
     #! key/value pair.
-    dup rehash (set-hash) ;
+    dup grow-hash (set-hash) ;
 
 : remove-hash ( key table -- )
     #! Remove a value from a hashtable.
@@ -135,13 +140,16 @@ IN: hashtables
     #! Apply the code to each key/value pair of the hashtable.
     >r hash>alist r> each ; inline
 
+: hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
+    >r hash>alist r> subset alist>hash ;
+
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
     over hash-size over set-hash-size [
         hash-array swap hash-array dup length copy-array
     ] keep ;
 
-: hash-subset? ( subset of -- ? )
+: hash-contained? ( subset of -- ? )
     hash>alist [ uncons >r swap hash r> = ] all-with? ;
 
 M: hashtable = ( obj hash -- ? )
@@ -149,7 +157,7 @@ M: hashtable = ( obj hash -- ? )
         2drop t
     ] [
         over hashtable? [
-            2dup hash-subset? >r swap hash-subset? r> and
+            2dup hash-contained? >r swap hash-contained? r> and
         ] [
             2drop f
         ] ifte

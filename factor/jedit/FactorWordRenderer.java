@@ -51,7 +51,7 @@ public class FactorWordRenderer extends DefaultListCellRenderer
 		if(word.stackEffect != null)
 		{
 			str = jEdit.getProperty("factor.completion.stack",
-				new String[] { str, word.stackEffect });
+				new String[] { str, word.stackEffect.trim() });
 		}
 
 		return str;

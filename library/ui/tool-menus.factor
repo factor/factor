@@ -15,4 +15,4 @@ SYMBOL: root-menu
     [[ "Exit" [ f world get set-world-running? ] ]]
 ] root-menu set
 
-world get [ show-root-menu ] [ button-down 1 ] set-action
+world get [ drop show-root-menu ] [ button-down 1 ] set-action

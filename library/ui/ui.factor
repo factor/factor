@@ -20,10 +20,10 @@ IN: shells
 : ui ( -- )
     #! Start the Factor graphics subsystem with the given screen
     #! dimensions.
-    t world get set-world-running?
-    world get shape-w world get shape-h 0 SDL_RESIZABLE
-    [
+    world get shape-size 0 SDL_RESIZABLE [
         0 x set 0 y set [
-            title dup SDL_WM_SetCaption first-time run-world
+            title dup SDL_WM_SetCaption first-time
+            start-world
+            run-world
         ] with-screen
     ] with-scope ;

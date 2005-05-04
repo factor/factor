@@ -38,21 +38,22 @@ DEFER: handle-event
     layout ;
 
 : world-step ( world -- ? )
-    dup world-running? [
+    world get dup world-running? [
         dup layout-world draw-world  t
     ] [
         drop f
     ] ifte ;
 
-: next-event ( -- event ) <event> dup SDL_PollEvent ;
+: next-event ( -- event ? )
+    <event> dup SDL_PollEvent ;
 
 : run-world ( -- )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
     next-event [
-        [ handle-event ] in-thread drop run-world
+        handle-event run-world
     ] [
-        drop world get world-step [ yield run-world ] when
+        drop world-step [ yield run-world ] when
     ] ifte ;
 
 : ensure-ui ( -- )
@@ -60,3 +61,6 @@ DEFER: handle-event
     world get dup [ world-running? ] when [
         "UI not running." throw
     ] unless ;
+
+: start-world ( -- )
+    world get t over set-world-running? relayout ;

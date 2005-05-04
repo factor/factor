@@ -23,7 +23,7 @@ USING: generic kernel lists math namespaces sequences ;
 TUPLE: menu ;
 
 : menu-actions ( menu -- )
-    [ drop world get hide-menu ] [ button-down 1 ] set-action ;
+    [ drop hide-menu ] [ button-down 1 ] set-action ;
 
 : assoc>menu ( assoc menu -- )
     #! Given an association list mapping labels to quotations.

@@ -183,10 +183,10 @@ M: matrix prettyprint* ( indent obj -- indent )
     #! Unparse each element on its own line.
     [ . ] seq-each ;
 
-: .s datastack  reverse [.] ;
-: .r callstack  reverse [.] ;
-: .n namestack  [.] ;
-: .c catchstack [.] ;
+: .s datastack  reverse [.] flush ;
+: .r callstack  reverse [.] flush ;
+: .n namestack  [.] flush ;
+: .c catchstack [.] flush ;
 
 ! For integers only
 : .b >bin print ;

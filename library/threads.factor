@@ -22,8 +22,7 @@ USING: errors kernel kernel-internals lists namespaces ;
     run-queue enque set-run-queue ;
 
 : stop ( -- )
-    ! This definition gets replaced by the Unix and Win32 I/O
-    ! code.
+    #! Stop the current thread and begin executing the next one.
     next-thread [ call ] [ "No more tasks" throw ] ifte* ;
 
 : yield ( -- )

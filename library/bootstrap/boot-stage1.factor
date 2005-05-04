@@ -54,6 +54,32 @@ hashtables ;
         "/library/syntax/parse-syntax.factor"
         "/library/alien/aliens.factor"
         "/library/cli.factor"
+        
+        "/library/syntax/unparser.factor"
+        "/library/syntax/prettyprint.factor"
+        
+        "/library/tools/debugger.factor"
+        "/library/tools/gensym.factor"
+        "/library/tools/interpreter.factor"
+        "/library/tools/memory.factor"
+        
+        "/library/inference/conditions.factor"
+        "/library/inference/dataflow.factor"
+        "/library/inference/inference.factor"
+        "/library/inference/ties.factor"
+        "/library/inference/branches.factor"
+        "/library/inference/words.factor"
+        "/library/inference/stack.factor"
+        "/library/inference/types.factor"
+        
+        "/library/compiler/assembler.factor"
+        "/library/compiler/relocate.factor"
+        "/library/compiler/xt.factor"
+        "/library/compiler/optimizer.factor"
+        "/library/compiler/linearizer.factor"
+        "/library/compiler/simplifier.factor"
+        "/library/compiler/generator.factor"
+        "/library/compiler/compiler.factor"
     ] pull-in
 
     "delegate" [ "generic" ] search

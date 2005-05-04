@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces sdl sequences ;
+USING: alien generic kernel lists math namespaces prettyprint
+sdl sequences ;
 
 GENERIC: handle-event ( event -- )
 
@@ -17,7 +18,7 @@ M: resize-event handle-event ( event -- )
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
     world get relayout ;
 
-: button-gesture ( button gesture -- [ gesture button ] )
+: button-gesture ( button gesture -- )
     swap unit append hand hand-clicked handle-gesture drop ;
 
 M: button-down-event handle-event ( event -- )

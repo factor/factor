@@ -1,23 +1,14 @@
-0.74:
-
-- faster layout
-- faster repaint
-- open large listener by default
-- make-matrix is slow and ugly
-- move 2repeat somewhere else
-- http client post requests
-- fix infix (dan)
-
 + plugin:
 
 - if external factor is down, don't add tons of random shit to the       
   dictionary
-- plugin: extra space in stack effects
 - plugin: type "re" in edit word dialog --> hang
 - word preview for parsing words
 
 + ui:
 
+- faster layout
+- faster repaint
 - console with presentations
 - ui browser
 - auto-updating inspector, mirrors abstraction
@@ -119,6 +110,8 @@
 
 + nice to have libraries:
 
+- make-matrix is slow and ugly
+- move 2repeat somewhere else
 - regexps
 - XML
 - real Unicode support (strings are already 16 bits and can be extended

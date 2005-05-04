@@ -87,7 +87,7 @@ UNION: arrayed array tuple ;
     4 -rot simple-slots ;
 
 : constructor-word ( string -- word )
-    "<" swap ">" cat3 create-in ;
+    "<" swap ">" append3 create-in ;
 
 : define-constructor ( word def -- )
     >r [ word-name constructor-word ] keep [
@@ -156,11 +156,15 @@ UNION: arrayed array tuple ;
         ] ifte
     ] ifte ;
 
+: tuple-methods ( generic -- hash )
+    #! A hashtable of methods on tuples.
+    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
+
 : tuple-dispatch-quot ( generic -- quot )
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap "methods" word-prop hash>quot
+    swap tuple-methods hash>quot
     [ dup class-tuple ] swap append ;
 
 : add-tuple-dispatch ( word vtable -- )

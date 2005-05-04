@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel line-editor listener lists math namespaces
-stdio streams strings threads ;
+sequences stdio streams strings threads ;
 
 ! A pane is an area that can display text.
 
@@ -20,6 +20,9 @@ TUPLE: pane output current input continuation ;
 : pane-paint ( pane -- )
     [[ "Monospaced" 12 ]] font set-paint-prop ;
 
+: pop-continuation ( pane -- quot )
+    dup pane-continuation f rot set-pane-continuation ;
+
 : pane-return ( pane -- )
     [
         pane-input [
@@ -27,7 +30,7 @@ TUPLE: pane output current input continuation ;
         ] with-editor
     ] keep
     2dup stream-write "\n" over stream-write
-    pane-continuation call ;
+    pop-continuation in-thread drop ;
  
 : pane-actions ( line -- )
     [
@@ -50,7 +53,8 @@ C: pane ( -- pane )
     >r <label> r> pane-output add-gadget ;
 
 : pane-write-1 ( text pane -- )
-    pane-current [ label-text swap cat2 ] keep set-label-text ;
+    pane-current dup label-text rot append over set-label-text
+    relayout ;
 
 : pane-terpri ( pane -- )
     dup pane-current dup label-text rot add-line
@@ -66,10 +70,10 @@ C: pane ( -- pane )
 
 ! Panes are streams.
 M: pane stream-flush ( stream -- ) relayout ;
-M: pane stream-auto-flush ( stream -- ) relayout ;
+M: pane stream-auto-flush ( stream -- ) stream-flush ;
 
 M: pane stream-readln ( stream -- line )
-    [ swap set-pane-continuation stop ] callcc1 nip ;
+    [ over set-pane-continuation stop ] callcc1 nip ;
 
 M: pane stream-write-attr ( string style stream -- )
     [ nip swap "\n" split pane-write ] keep scroll>bottom ;

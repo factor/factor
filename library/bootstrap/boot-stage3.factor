@@ -52,7 +52,6 @@ t [
     "/library/io/stdio-binary.factor"
     
     "/library/eval-catch.factor"
-    "/library/tools/memory.factor"
     "/library/tools/listener.factor"
     "/library/io/ansi.factor"
     "/library/tools/word-tools.factor"
@@ -93,6 +92,7 @@ t [
     "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-ttf.factor"
     "/library/sdl/sdl-utils.factor"
+
     "/library/ui/shapes.factor"
     "/library/ui/points.factor"
     "/library/ui/rectangles.factor"
@@ -120,8 +120,8 @@ t [
     "/library/ui/editors.factor"
     "/library/ui/menus.factor"
     "/library/ui/presentations.factor"
-    "/library/ui/panes.factor"
     "/library/ui/tiles.factor"
+    "/library/ui/panes.factor"
     "/library/ui/dialogs.factor"
     "/library/ui/inspector.factor"
     "/library/ui/init-world.factor"

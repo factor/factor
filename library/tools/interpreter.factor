@@ -94,4 +94,4 @@ SYMBOL: meta-executing
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
 
-FORGET: set-meta-word
+\ set-meta-word forget
