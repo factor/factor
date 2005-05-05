@@ -113,7 +113,6 @@ void* primitives[] = {
 	primitive_room,
 	primitive_os_env,
 	primitive_millis,
-	primitive_init_random,
 	primitive_random_int,
 	primitive_type,
 	primitive_cwd,

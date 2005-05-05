@@ -16,9 +16,18 @@ math memory namespaces words ;
     drop
 ] "generator" set-word-prop
 
+: UNBOX cdr dup f dlsym CALL f t rel-dlsym ;
+
 #unbox [
-    cdr dup f dlsym CALL f t rel-dlsym
-    EAX PUSH
+    UNBOX  EAX PUSH
+] "generator" set-word-prop
+
+#unbox-float [
+    UNBOX  ESP 4 SUB  [ ESP ] FSTPS
+] "generator" set-word-prop
+
+#unbox-double [
+    UNBOX  ESP 8 SUB  [ ESP ] FSTPL
 ] "generator" set-word-prop
 
 #parameter [
@@ -26,10 +35,18 @@ math memory namespaces words ;
     drop
 ] "generator" set-word-prop
 
+: BOX dup f dlsym CALL f t rel-dlsym  EAX POP ;
+
 #box [
-    EAX PUSH
-    dup f dlsym CALL f t rel-dlsym
-    ESP 4 ADD
+    EAX PUSH  BOX
+] "generator" set-word-prop
+
+#box-float [
+    ESP 4 SUB  [ ESP ] FSTPS  BOX
+] "generator" set-word-prop
+
+#box-double [
+    ESP 8 SUB  [ ESP ] FSTPL  BOX  ECX POP
 ] "generator" set-word-prop
 
 #cleanup [

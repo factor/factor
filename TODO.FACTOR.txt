@@ -1,22 +1,55 @@
-+ plugin:
-
 - if external factor is down, don't add tons of random shit to the       
   dictionary
+- faster layout
+- rotating cube demo
+- out parameter cleanup
+- SDL_Rect** type
+- get all-tests to run with -no-compile
+- fix i/o on generic x86/ppc unix
+- alien primitives need a more general input type
+- 2map, sequence= slow with lists
+- nappend: instead of using push, enlarge the sequence with set-length
+  then add set the elements with set-nth
+- ensure-capacity: don't be generic
+- vector's ensure-capacity will crash if not given fixnums!
+- generic each some? all? member? memq? all=?  index? subseq? map
+- index and index* are very slow with lists
+- unsafe-sbuf>string
+- generic subseq
+- GENERIC: map
+  - list impl same as now
+- generic parser::scan
+- .factor-rc loading errors are not reported properly
+- code walker & exceptions
+- string sub-primitives
+- generational gc
+- if two tasks write to a unix stream, the buffer can overflow
+- rename prettyprint to pprint
+- reader syntax for arrays, byte arrays, displaced aliens
+- add a socket timeout
+- make-matrix is slow and ugly
+- move 2repeat somewhere else
+- virtual hosts
+- keep alive
+- dipping seq-2nmap, seq-2each
+- array sort
+- tiled window manager
+
++ plugin:
+
 - word preview for parsing words
 
 + ui:
 
-- faster layout
 - faster repaint
 - console with presentations
 - ui browser
 - auto-updating inspector, mirrors abstraction
 - mouse enter onto overlapping with interior, but not child, gadget
+- rollovers broken in inspector
 - menu dragging
 - fix up the min thumb size hack
 - frame gap
-- tiled window manager
-- rotating cube demo
 
 + ffi:
 
@@ -26,18 +59,11 @@
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - value type structs
-- out parameter cleanup
 - bitfields in C structs
-- SDL_Rect** type
 - setting struct members that are not *
-- char[14], etc members -- generalize char255
-- FFI float types
 
 + compiler:
 
-- get all-tests to run with -no-compile
-- fix i/o on generic x86/ppc unix
-- alien primitives need a more general input type
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
@@ -53,50 +79,29 @@
 
 + sequences
 
-- 2map, sequence= slow with lists
-- nappend: instead of using push, enlarge the sequence with set-length
-  then add set the elements with set-nth
-- ensure-capacity: don't be generic
-- vector's ensure-capacity will crash if not given fixnums!
-- dipping seq-2nmap, seq-2each
-- generic each some? all? member? memq? all=?  index? subseq? map
-- index and index* are very slow with lists
 - list map, subset: not tail recursive
 - phase out sbuf-append, index-of, substring
-- unsafe-sbuf>string
-- generic subseq
-- GENERIC: map
-  - list impl same as now
-- generic parser::scan
-- array sort
 
 + kernel:
 
 - powerpc has weird callstack residue
-- .factor-rc loading errors are not reported properly
 - instances: do not use make-list
 - unions containing tuples do not work properly
 - need G: combinations
 - method doc strings
-- code walker & exceptions
-- string sub-primitives
 - clean up metaclasses
 - vectors: ensure its ok with bignum indices
 - code gc
-- generational gc
 - doc comments of generics
 - M: object should not inhibit delegation
 - renumber types appopriately
 
 + i/o:
 
-- if two tasks write to a unix stream, the buffer can overflow
 - faster stream-copy
-- rename prettyprint to pprint
 - reading and writing byte arrays
 - merge unix and win32 io where appropriate
 - unix io: handle \n\r and \n\0
-- reader syntax for arrays, byte arrays, displaced aliens
 - separate words for writing characters and strings
 - perhaps:
   GENERIC: set-style ( style stream -- )
@@ -104,14 +109,11 @@
   GENERIC: stream-write-char
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- add a socket timeout
 - unify unparse and prettyprint
 - utf16, utf8 encoding
 
 + nice to have libraries:
 
-- make-matrix is slow and ugly
-- move 2repeat somewhere else
 - regexps
 - XML
 - real Unicode support (strings are already 16 bits and can be extended
@@ -119,8 +121,3 @@
   predicates, comparison, case conversion, sorting...)
 - full Win32 binding
 - Cairo binding
-
-+ http:
-
-- virtual hosts
-- keep alive

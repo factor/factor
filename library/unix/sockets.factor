@@ -38,12 +38,12 @@ USING: alien generic kernel math unix-internals ;
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
-: sockopt ( fd opt -- )
-    SOL_SOCKET swap 1 box-int "int" c-size setsockopt io-error ;
+: sockopt ( fd level opt -- )
+    1 <int> "int" c-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
     server-sockaddr [
-        dup SO_REUSEADDR sockopt
+        dup SOL_SOCKET SO_REUSEADDR sockopt
         swap dupd "sockaddr-in" c-size bind
         dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] ifte
     ] with-socket-fd ;
@@ -75,6 +75,9 @@ M: accept-task io-task-events ( task -- events )
     dup sockaddr-in-addr inet-ntoa
     swap sockaddr-in-port ntohs ;
 
+: <socket-stream> ( fd -- stream )
+    dup f <fd-stream> ;
+
 IN: streams
 
 C: client-stream ( fd host port -- stream )
@@ -82,13 +85,13 @@ C: client-stream ( fd host port -- stream )
     [ set-client-stream-host ] keep
     [
         >r
-        dup SO_OOBINLINE sockopt
-        dup f <fd-stream> r> set-delegate
+        dup SOL_SOCKET SO_OOBINLINE sockopt
+        <socket-stream> r> set-delegate
     ] keep ;
 
 : <client> ( host port -- stream )
     #! Connect to a port number on a TCP/IP host.
-    [ client-socket ] 2keep <client-stream> ;
+    client-socket <socket-stream> ;
 
 : <server> ( port -- server )
     #! Starts listening for TCP connections on localhost:port.

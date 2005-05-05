@@ -54,25 +54,6 @@ M: alien-error error. ( error -- )
     #! "libraries" namespace.
     <alien-error> throw ;
 
-! Linear IR nodes
-
-SYMBOL: #cleanup ( unwind stack by parameter )
-
-SYMBOL: #unbox ( move top of datastack to C stack )
-
-! for register parameter passing; move top of C stack to a
-! register. no-op on x86, generates code on PowerPC.
-SYMBOL: #parameter
-
-! for increasing stack space on PowerPC; unused on x86.
-SYMBOL: #parameters
-
-SYMBOL: #box ( move EAX to datastack )
-
-! These are set in the alien-invoke dataflow IR node.
-SYMBOL: alien-returns
-SYMBOL: alien-parameters
-
 : set-alien-returns ( returns node -- )
     [ dup alien-returns set ] bind
     "void" = [
@@ -125,7 +106,7 @@ DEFER: alien-global
     0 swap [ c-size cell align + ] each ;
 
 : unbox-parameter ( n parameter -- )
-    c-type [ "unboxer" get ] bind cons #unbox swons , ;
+    c-type [ "unboxer" get cons "unbox-op" get ] bind swons , ;
 
 : linearize-parameters ( node -- count )
     #! Generate code for boxing a list of C types, then generate
@@ -144,7 +125,7 @@ DEFER: alien-global
     [ alien-returns get ] bind dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get ] bind #box swons ,
+        c-type [ "boxer" get "box-op" get ] bind swons ,
     ] ifte ;
 
 : linearize-alien-invoke ( node -- )

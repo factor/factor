@@ -13,7 +13,6 @@ words ;
     #! quotation.
     init-assembler
     init-error-handler
-    init-random
     default-cli-args
     parse-command-line
     "null-stdio" get [ << null-stream f >> stdio set ] when ;
@@ -25,7 +24,6 @@ words ;
 [
     boot
     warm-boot
-    garbage-collection
     run-user-init
     "shell" get shell
     0 exit

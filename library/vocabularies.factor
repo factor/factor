@@ -1,6 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: words USING: hashtables kernel lists namespaces strings ;
+IN: words USING: hashtables kernel lists namespaces strings
+sequences ;
 
 SYMBOL: vocabularies
 
@@ -76,6 +77,9 @@ SYMBOL: vocabularies
     ] [
         (create) dup reveal
     ] ?ifte ;
+
+: constructor-word ( string vocab -- word )
+    >r "<" swap ">" append3 r> create ;
 
 : forget ( word -- )
     #! Remove a word definition.

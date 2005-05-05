@@ -196,3 +196,20 @@ void primitive_fsqrt(void)
 	maybe_garbage_collection();
 	drepl(tag_float(sqrt(to_float(dpeek()))));
 }
+
+#define DEFBOX(name,type)                                                      \
+void name (type flo)                                                       \
+{                                                                              \
+	dpush(tag_float(flo));                                               \
+}
+
+#define DEFUNBOX(name,type)                                                    \
+type name(void)                                                                \
+{                                                                              \
+	return to_float(dpop());                                                  \
+}
+
+DEFBOX(box_float,float)
+DEFUNBOX(unbox_float,float)  
+DEFBOX(box_double,double)
+DEFUNBOX(unbox_double,double)

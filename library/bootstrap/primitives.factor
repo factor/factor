@@ -147,7 +147,6 @@ vocabularies get [
     [ "room" "memory"                         [ [ ] [ integer integer integer integer ] ] ]
     [ "os-env" "kernel"                       [ [ string ] [ object ] ] ]
     [ "millis" "kernel"                       [ [ ] [ integer ] ] ]
-    [ "init-random" "math"                    [ [ ] [ ] ] ]
     [ "(random-int)" "math"                   [ [ ] [ integer ] ] ]
     [ "type" "kernel"                         [ [ object ] [ fixnum ] ] ]
     [ "cwd" "files"                           [ [ ] [ string ] ] ]

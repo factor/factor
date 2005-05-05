@@ -55,6 +55,10 @@ global [
         [ dup CHAR: \0 = [ drop CHAR: \s ] when ] seq-map
     ] when ;
 
+BEGIN-STRUCT: int-box
+    FIELD: int i
+END-STRUCT
+
 : size-string ( font text -- w h )
     >r lookup-font r> filter-nulls dup empty? [
         drop TTF_FontHeight 0 swap

@@ -47,11 +47,6 @@ void primitive_millis(void)
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
-void primitive_init_random(void)
-{
-	srand((unsigned)time(NULL));
-}
-
 void primitive_random_int(void)
 {
 	maybe_garbage_collection();

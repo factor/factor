@@ -16,7 +16,7 @@ IN: unix-internals
 
 : SOL_SOCKET HEX: ffff ;
 : SO_REUSEADDR HEX: 4 ;
-: SO_OOBINLINE HEX: ff ;
+: SO_OOBINLINE HEX: 100 ;
 
 : INADDR_ANY 0 ;
 

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler errors generic hashtables kernel lists
-math namespaces parser strings words ;
+math namespaces parser sequences strings words ;
 
 ! Some code for interfacing with C structures.
 
@@ -34,19 +34,19 @@ math namespaces parser strings words ;
     #! Make a word <foo> where foo is the structure name that
     #! allocates a Factor heap-local instance of this structure.
     #! Used for C functions that expect you to pass in a struct.
-    "struct-name" get constructor-word
+    "struct-name" get "in" get constructor-word
     swap bytes>cells [ <byte-array> ] cons
     define-compound ;
 
 : array-constructor ( width -- )
     #! Make a word <foo-array> ( n -- byte-array ).
-    "struct-name" get "-array" cat2 constructor-word
+    "struct-name" get "-array" append "in" get constructor-word
     swap bytes>cells [ * <byte-array> ] cons
     define-compound ;
 
 : define-nth ( width -- )
     #! Make a word foo-nth ( n alien -- dsplaced-alien ).
-    "struct-name" get "-nth" cat2 create-in
+    "struct-name" get "-nth" append create-in
     swap [ swap >r * r> <displaced-alien> ] cons
     define-compound ;
 
@@ -60,8 +60,8 @@ math namespaces parser strings words ;
         "width" set
         cell "align" set
         [ swap <displaced-alien> ] "getter" set
-    ] "struct-name" get define-c-type
-    "void*" c-type "struct-name" get "*" cat2
+    ] "struct-name" get "in" get define-c-type
+    "void*" c-type "struct-name" get "*" append
     c-types get set-hash ;
 
 : BEGIN-STRUCT: ( -- offset )
@@ -81,10 +81,3 @@ math namespaces parser strings words ;
 
 : END-UNION ( max -- )
     define-struct-type ; parsing
-
-BEGIN-STRUCT: int-box
-    FIELD: int i
-END-STRUCT
-
-: box-int ( n -- box )
-    <int-box> [ set-int-box-i ] keep ;

@@ -272,3 +272,13 @@ M: operand CMP HEX: 39 2-operand ;
 
 : LEA ( dst src -- )
     HEX: 8d compile-byte swap register 1-operand ;
+
+( x87 Floating Point Unit )
+
+: FSTPS ( operand -- )
+    HEX: d9 compile-byte HEX: 1c compile-byte
+    BIN: 100 1-operand ;
+
+: FSTPL ( operand -- )
+    HEX: dd compile-byte HEX: 1c compile-byte
+    BIN: 100 1-operand ;

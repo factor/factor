@@ -3,6 +3,7 @@
 void init_factor(char* image, CELL ds_size, CELL cs_size,
 	CELL data_size, CELL code_size)
 {
+	srand((unsigned)time(NULL)); /* initialize random number generator */
 	init_ffi();
 	init_arena(data_size);
 	init_compiler(code_size);
@@ -10,28 +11,9 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_stacks(ds_size,cs_size);
 	init_c_io();
 	init_signals();
-
 	init_errors();
-
-#if defined(FACTOR_X86)
-	userenv[CPU_ENV] = tag_object(from_c_string("x86"));
-#elif defined(FACTOR_PPC)
-	userenv[CPU_ENV] = tag_object(from_c_string("ppc"));
-#else
-	userenv[CPU_ENV] = tag_object(from_c_string("unknown"));
-#endif
-
-#ifdef WIN32
-	userenv[OS_ENV] = tag_object(from_c_string("win32"));
-#elif defined(__FreeBSD__)
-	userenv[OS_ENV] = tag_object(from_c_string("freebsd"));
-#elif defined(linux)
-	userenv[OS_ENV] = tag_object(from_c_string("linux"));
-#elif defined(__APPLE__)
-	userenv[OS_ENV] = tag_object(from_c_string("macosx"));
-#else
-	userenv[OS_ENV] = tag_object(from_c_string("unix"));
-#endif
+	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
+	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)

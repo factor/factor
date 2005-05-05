@@ -80,6 +80,11 @@ hashtables ;
         "/library/compiler/simplifier.factor"
         "/library/compiler/generator.factor"
         "/library/compiler/compiler.factor"
+        
+        "/library/alien/dataflow.factor"
+        "/library/alien/c-types.factor"
+        "/library/alien/enums.factor"
+        "/library/alien/structs.factor"
     ] pull-in
 
     "delegate" [ "generic" ] search

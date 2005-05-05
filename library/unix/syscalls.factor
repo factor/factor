@@ -43,23 +43,15 @@ END-STRUCT
 : poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;
 
-BEGIN-STRUCT: uint*
-    FIELD: uint s
-END-STRUCT
-
-BEGIN-STRUCT: VOID* ( ugly )
-    FIELD: void* s
-END-STRUCT
-
 BEGIN-STRUCT: hostent
     FIELD: char* name
-    FIELD: VOID** aliases
+    FIELD: void* aliases
     FIELD: int addrtype
     FIELD: int length
-    FIELD: VOID** addr-list
+    FIELD: void* addr-list
 END-STRUCT
 
-: hostent-addr hostent-addr-list VOID*-s uint*-s ;
+: hostent-addr hostent-addr-list *void* *uint ;
 
 : gethostbyname ( name -- hostent )
     "hostent*" "libc" "gethostbyname" [ "char*" ] alien-invoke ;
