@@ -1,8 +1,6 @@
 - if external factor is down, don't add tons of random shit to the       
   dictionary
 - faster layout
-- rotating cube demo
-- out parameter cleanup
 - SDL_Rect** type
 - get all-tests to run with -no-compile
 - fix i/o on generic x86/ppc unix
@@ -34,6 +32,7 @@
 - dipping seq-2nmap, seq-2each
 - array sort
 - tiled window manager
+- PPC #box-float #unbox-float
 
 + plugin:
 
@@ -53,8 +52,8 @@
 
 + ffi:
 
+- smarter out parameter handling
 - clarify powerpc passing of value struct parameters
-- char* struct members
 - box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
 - utf16 string boxing

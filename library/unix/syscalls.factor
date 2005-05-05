@@ -84,7 +84,7 @@ END-STRUCT
     "int" "libc" "listen" [ "int" "int" ] alien-invoke ;
 
 : accept ( s sockaddr socklen -- n )
-    "int" "libc" "accept" [ "int" "sockaddr-in*" "int-box*" ] alien-invoke ;
+    "int" "libc" "accept" [ "int" "sockaddr-in*" "void*" ] alien-invoke ;
 
 : htonl ( n -- n )
     "uint" "libc" "htonl" [ "uint" ] alien-invoke ;

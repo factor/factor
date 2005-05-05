@@ -4128,7 +4128,330 @@ Key&Description\\
 
 Hyperlinks to files and words point to the file and browser responders, respectively. These responders must be enabled for such links to function.
 
-\section{C library interface}
+\section{Alien interface}
+
+Factor's alien inteface provides a means of directly calling native libraries written in C and other languages. There are no
+wrappers to write, other than having to specify the return type and parameter types for
+the functions you wish to call.
+
+\subsection{Loading native libraries}
+
+A native library must be made available to Factor under a logical name before use. This is done via command line parameters, or the \verb|add-library| word.
+
+The following two command line parameters can be specified for each library to load; the second parameter is optional.
+\begin{description}
+\item[\texttt{-libraries:\emph{logical}:name=\emph{name}}] associates a logical name with a system-specific native library name,
+\item[\texttt{-libraries:\emph{logical}:abi=\emph{type}}] specifies the calling convention to use; \verb|type| is either \verb|cdecl| or \verb|stdcall|. If not specified, the default is \verb|cdecl|. On Unix, all libraries follow the \verb|cdecl| convention. On Windows, most libraries (but not all) follow \verb|stdcall|.
+\end{description}
+
+For example:
+\begin{alltt}
+\textbf{\$} ./f factor.image -libraries:sdl:name=libSDL-1.2.so
+\end{alltt}
+
+Another option is to add libraries while Factor is running.
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{add-library}{add-library ( library name abi -- )}
+}
+Adds a logical library named \verb|library|. The underlying shared library name is \verb|name|, and the calling convention is \verb|abi| and must be either \verb|"cdecl"| or \verb|"stdcall"|.
+
+For example:
+\begin{alltt}
+\textbf{ok} "kernel32" "kernel32.dll"  "stdcall"  add-library
+\end{alltt}
+The next word is used in the implementation of the alien interface, and it can also be used
+interactively to test if a library can be loaded.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{load-library}{load-library ( library -- dll )}
+}
+Attempts to load the library with the given logical name, and outputs a DLL handle. If the library is already loaded, the existing DLL is output.
+More will be said about DLL handles in \ref{alien-internals}.
+
+\subsection{Calling native functions}
+
+Native functions are called with the \verb|alien-invoke| word. This word can only be used
+from compiled definitions (\ref{compiler}). Executing it inside an interpreted quotation will throw an exception.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{alien-invoke}{alien-invoke ( return lib func parameters -- )}
+}
+Invokes the function named \verb|func| in the library with logical name \verb|lib|.
+
+The \verb|return| value is a string naming a C type, and maybe set to \verb|void|, in the case of the native function not returning a value.
+
+The \verb|parameters| value is a list
+of strings naming C types. C types are listed in table \ref{c-types}.
+
+For example, suppose you have a \verb|foo| library exporting the following function:
+\begin{verbatim}
+void the_answer(char* question, int value) {
+    printf("The answer to %s is %d.\n",question,value);
+}
+\end{verbatim}
+You can define a word for invoking it:
+\begin{verbatim}
+: the-answer ( question value -- answer )
+    "void" "foo" "the_answer" [ "char*" "int" ]
+    alien-invoke ;
+\end{verbatim}
+Now, after being compiled, the word can be executed with two parameters on the stack:
+\begin{alltt}
+\textbf{ok} \bs the-answer compile
+\textbf{Compiling the-answer}
+\textbf{ok} "the question" 42 the-answer
+\textbf{The answer to the question is 42.}
+\end{alltt}
+
+\subsection{\label{aliens}Alien objects}
+
+\glossary{
+name=alien,
+description={an instance of the \verb|alien| class, holding a pointer to native memory outside the Factor heap}}
+The alien interface can work with an assortment of native data types:
+\begin{itemize}
+\item integer and floating point values
+\item null-terminated strings
+\item structures (\ref{alien-structs})
+\item unions (\ref{alien-unions})
+\end{itemize}
+Table \ref{c-types} lists the built-in return value and parameter types. The sizes are given for a 32-bit system. Native numbers and strings are handled in a straight-forward way. Pointers are a bit more complicated, and are wrapped inside alien objects on the Factor side.
+
+\begin{table}
+\caption{\label{c-types}Supported native types}
+\begin{tabular}{l|l|l}
+Name&Size&Representation\\
+\hline
+\texttt{char}        &1&   Signed integer\\
+\texttt{uchar}       &1&   Unsigned integer\\
+\texttt{short}       &2&   Signed integer\\
+\texttt{ushort}      &2&   Unsigned integer\\
+\texttt{int}         &4&   Signed integer\\
+\texttt{uint}        &4&   Unsigned integer\\
+\texttt{long}        &4&   Signed integer\\
+\texttt{ulong}       &4&   Unsigned integer\\
+\texttt{longlong}    &8&   Signed integer\\
+\texttt{ulonglong}   &8&   Unsigned integer\\
+\texttt{float}       &4&   Single-precision float\\
+\texttt{double}      &8&   Double-precision float\\
+\texttt{char*}       &4&   Pointer to null-terminated byte string\\
+\texttt{ushort*}     &4&   Pointer to null-terminated UTF16 string\\
+\texttt{void*}       &4&   Generic pointer
+\end{tabular}
+\end{table}
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{c-size}{c-size ( type -- n )}
+}
+Outputs the size of the given C type. This is just like the \verb|sizeof| operator in C.
+Many native functions expect you to specify sizes for input and output parameters, and
+this word can be used for that purpose.
+
+\wordtable{
+\vocabulary{alien}
+\classword{alien}
+}
+Pointers to native memory, including \verb|void*| and other types, are represented as objects of the \verb|alien| class.
+
+\wordtable{
+\vocabulary{alien}
+\predword{alien?}
+}
+Tests if the object at the top of the stack is an alien pointer.
+
+\subsubsection{\label{alien-structs}Structures}
+
+One way to think of a C-style \verb|struct| is that it abstracts reading and writing field values stored at a range of memory given a pointer, by associating a type and offset with each field. This is the view taken by the alien interface, where defining a C structure creates a set of words for reading and writing fields of various types, offset from a base pointer given by an alien object.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{BEGIN-STRUCT:}{BEGIN-STRUCT: \emph{name}}
+}
+Begins reading a C structure definition.
+\wordtable{
+\vocabulary{alien}
+\parsingword{FIELD:}{FIELD: \emph{type} \emph{name}}
+}
+Adds a field to the structure. The \verb|type| token identifies a C type, and \verb|name| gives a name to the field. A pair of words is defined, where \verb|structure| and \verb|field| are names, respectively:
+\begin{alltt}
+\emph{structure}-\emph{field} ( alien -- value )
+set-\emph{structure}-\emph{field} ( value alien -- )
+\end{alltt}
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{END-STRUCT}{END-STRUCT}
+}
+Ends a structure definition.
+
+Defining a structure adds two new C types, where \verb|name| is the name of the structure:
+\begin{description}
+\item[\texttt{\emph{name}}] the type of the structure itself; structure and union definitions can define members to be of this type.
+\item[\texttt{\emph{name}*}] the type of a pointer to the structure; this type can be used with return values and parameters, and in fact it is an alias for \texttt{void*}.
+\end{description}
+Additionally, the following two words are defined:
+\begin{description}
+\item[\texttt{<\emph{name}> ( -- byte-array )}] allocates a byte array large enough to hold the structure in the Factor heap. The field accessor words can then be used to work with this byte array. This feature allows calling native functions that expect pointers to caller-allocated structures\footnote{
+There is an important restriction, however; the function must not retain the pointer in a global variable after it returns. Since the structure is allocated in the Factor heap, the garbage collector is free to move it between native function calls. If this behavior is undesirable, memory can be managed manually instead (\ref{malloc}).}.
+\item[\texttt{\emph{name}-nth ( n alien -- alien )}] given a pointer and index into an array of structures, returns a pointer to the structure at that index.
+\end{description}
+
+Here is an example of a structure with various fields:
+\begin{verbatim}
+BEGIN-STRUCT: surface
+    FIELD: uint    flags
+    FIELD: format* format
+    FIELD: int     w
+    FIELD: int     h
+    FIELD: ushort  pitch
+    FIELD: void*   pixels
+    FIELD: int     offset
+    FIELD: void*   hwdata
+    FIELD: short   clip-x
+    FIELD: short   clip-y
+    FIELD: ushort   clip-w
+    FIELD: ushort   clip-h
+    FIELD: uint    unused1
+    FIELD: uint    locked
+    FIELD: int     map
+    FIELD: uint    format_version
+    FIELD: int     refcount
+END-STRUCT
+\end{verbatim}
+
+\subsubsection{\label{alien-unions}Unions}
+
+A C-style \verb|union| type allocates enough space for its largest member. In the alien interface, unions are used to allocate byte arrays in the Factor heap that may hold any one of the union's members.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{BEGIN-STRUCT:}{BEGIN-STRUCT: \emph{name}}
+}
+Begins reading a C union definition.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{MEMBER:}{MEMBER: \emph{type}}
+}
+Adds a member type to the union.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{END-UNION}{END-UNION}
+}
+Ends a union definition.
+
+Unions define C types and words analogous to those for structures; see \ref{alien-structs}.
+
+Here is an example:
+\begin{verbatim}
+BEGIN-UNION: event
+    MEMBER: event
+    MEMBER: active-event
+    MEMBER: keyboard-event
+    MEMBER: motion-event
+    MEMBER: button-event
+END-UNION
+\end{verbatim}
+
+\subsubsection{Out parameters}
+
+\subsection{\label{alien-internals}Low-level interface}
+
+The alien interface is built on top of a handful of primitives. Sometimes, it is
+useful to call these primitives directly for debugging purposes.
+
+\wordtable{
+\vocabulary{alien}
+\classword{dll}
+}
+Instances of this class are handles to native libraries.
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{dlopen}{dlopen ( path -- dll )}
+}
+Opens the specified native library and returns a DLL object. The input parameter is the
+name of a native library file,
+\emph{not} a logical library name.
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{dlsym}{dlsym ( symbol dll -- address )}
+}
+Looks up a named symbol in a native library, and outputs it address. If the \verb|dll| is \verb|f|, the lookup is performed in the runtime executable itself.
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{dlclose}{dlclose ( dll -- )}
+}
+Closes a native library and frees associated native resources.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{alien-address}{alien-address ( alien -- address )}
+}
+Outputs the address of an alien, as an integer.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{<alien>}{<alien> ( address -- alien )}
+}
+Creates an alien pointing to the specified address.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{<displaced-alien>}{<displaced-alien> ( offset alien -- alien )}
+}
+Outputs an alien pointing at an offset from the base pointer of the input alien. Displaced aliens are used to access nested structures and native arrays.
+
+\wordtable{
+\vocabulary{alien}
+\ordinaryword{alien-signed-cell}{alien-signed-cell ( alien offset -- n )}
+\ordinaryword{set-alien-signed-cell}{set-alien-signed-cell ( n alien offset -- )}
+\ordinaryword{alien-unsigned-cell}{alien-unsigned-cell ( alien offset -- n )}
+\ordinaryword{set-alien-unsigned-cell}{set-alien-unsigned-cell( n alien offset -- )}
+\ordinaryword{alien-signed-8}{alien-signed-8 ( alien offset -- n )}
+\ordinaryword{set-alien-signed-8}{set-alien-signed-8 ( n alien offset -- )}
+\ordinaryword{alien-unsigned-8}{alien-unsigned-8 ( alien offset -- n )}
+\ordinaryword{set-alien-unsigned-8}{set-alien-unsigned-8 ( n alien offset -- )}
+\ordinaryword{alien-signed-4}{alien-signed-4 ( alien offset -- n )}
+\ordinaryword{set-alien-signed-4}{set-alien-signed-4 ( n alien offset -- )}
+\ordinaryword{alien-unsigned-4}{alien-unsigned-4 ( alien offset -- n )}
+\ordinaryword{set-alien-unsigned-4}{set-alien-unsigned-4 ( n alien offset -- )}
+\ordinaryword{alien-signed-2}{alien-signed-2 ( alien offset -- n )}
+\ordinaryword{set-alien-signed-2}{set-alien-signed-2 ( n alien offset -- )}
+\ordinaryword{alien-unsigned-2}{alien-unsigned-2 ( alien offset -- n )}
+\ordinaryword{set-alien-unsigned-2}{set-alien-unsigned-2 ( n alien offset -- )}
+\ordinaryword{alien-signed-1}{alien-signed-1 ( alien offset -- n )}
+\ordinaryword{set-alien-signed-1}{set-alien-signed-1 ( n alien offset -- )}
+\ordinaryword{alien-unsigned-1}{alien-unsigned-1 ( alien offset -- n )}
+\ordinaryword{set-alien-unsigned-1}{set-alien-unsigned-1 ( n alien offset -- )}
+\ordinaryword{alien-value-string}{alien-value-string ( alien offset -- string )}
+}
+These primitives read and write native memory. They can be given an alien, displaced alien, or byte array. No bounds checking of any kind is performed.
+
+\subsection{\label{malloc}Manual memory management}
+
+If for whatever reason Factor's memory management is unsuitable for a certain task, you can
+directly call the standard C memory management routines. These words are very raw and deal with addresses directly, and of course it is easy to corrupt memory or crash the runtime
+this way.
+\wordtable{
+\vocabulary{kernel-internals}
+\ordinaryword{malloc}{malloc ( size -- address )}
+}
+Allocate a block of size \verb|size| and output a pointer to it.
+\wordtable{
+\vocabulary{kernel-internals}
+\ordinaryword{realloc}{realloc ( address size -- address )}
+}
+Resize a block previously allocated with \verb|malloc|.
+\wordtable{
+\vocabulary{kernel-internals}
+\ordinaryword{free}{free ( address -- )}
+}
+Deallocate a block previously allocated with \verb|malloc|.
 
 \chapter{Development tools}
 

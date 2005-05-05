@@ -137,8 +137,8 @@ global [ c-types nest drop ] bind
 ] "uchar" define-primitive-type
 
 [
-    [ alien-unsigned-4 ] "getter" set
-    [ set-alien-unsigned-4 ] "setter" set
+    [ alien-c-string ] "getter" set
+    [ set-alien-c-string ] "setter" set
     cell "width" set
     cell "align" set
     "box_c_string" "boxer" set
@@ -164,6 +164,8 @@ global [ c-types nest drop ] bind
 ] "bool" define-primitive-type
 
 [
+    [ alien-float ] "getter" set
+    [ set-alien-float ] "setter" set
     cell "width" set
     cell "align" set
     "box_float" "boxer" set
@@ -173,6 +175,8 @@ global [ c-types nest drop ] bind
 ] "float" define-primitive-type
 
 [
+    [ alien-double ] "getter" set
+    [ set-alien-double ] "setter" set
     cell 2 * "width" set
     cell 2 * "align" set
     "box_double" "boxer" set

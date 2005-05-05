@@ -112,8 +112,6 @@ DEF_ALIEN_SLOT(signed_2,s16,signed_2)
 DEF_ALIEN_SLOT(unsigned_2,u16,unsigned_2)
 DEF_ALIEN_SLOT(signed_1,BYTE,signed_1)
 DEF_ALIEN_SLOT(unsigned_1,BYTE,unsigned_1)
-
-void primitive_alien_value_string(void)
-{
-	box_c_string(alien_pointer());
-}
+DEF_ALIEN_SLOT(float,float,float)
+DEF_ALIEN_SLOT(double,double,double)
+DEF_ALIEN_SLOT(c_string,char*,c_string)

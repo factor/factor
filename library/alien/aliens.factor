@@ -34,7 +34,7 @@ M: alien = ( obj obj -- ? )
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;
 
-: load-dll ( name -- dll )
+: load-library ( name -- dll )
     #! Higher level wrapper around dlopen primitive.
     library dup [
         [

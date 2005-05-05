@@ -6,21 +6,6 @@ strings ;
 
 TUPLE: buffer size ptr fill pos ;
 
-: malloc ( size -- address )
-    "ulong" "libc" "malloc" [ "ulong" ] alien-invoke ;
-
-: free ( address -- )
-    "void" "libc" "free" [ "ulong" ] alien-invoke ;
-
-: realloc ( address size -- address )
-    "ulong" "libc" "realloc" [ "ulong" "ulong" ] alien-invoke ;
-
-: memcpy ( dst src size -- )
-    "void" "libc" "memcpy" [ "ulong" "ulong" "ulong" ] alien-invoke ;
-
-: check-ptr ( ptr -- ptr )
-    dup 0 = [ "Out of memory" throw ] when ;
-
 C: buffer ( size -- buffer )
     2dup set-buffer-size
     swap malloc check-ptr swap [ set-buffer-ptr ] keep

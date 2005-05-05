@@ -5,11 +5,11 @@ USING: alien assembler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 \ alien-invoke [
-    uncons load-dll 2dup dlsym CALL t rel-dlsym
+    uncons load-library 2dup dlsym CALL t rel-dlsym
 ] "generator" set-word-prop
 
 \ alien-global [
-    uncons load-dll 2dup dlsym EAX swap unit MOV f rel-dlsym
+    uncons load-library 2dup dlsym EAX swap unit MOV f rel-dlsym
 ] "generator" set-word-prop
 
 #parameters [

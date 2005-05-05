@@ -65,7 +65,7 @@ M: alien-error error. ( error -- )
     [ drop object ] map dup dup ensure-d
     length 0 node-inputs consume-d ;
 
-: ensure-dlsym ( symbol library -- ) load-dll dlsym drop ;
+: ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
 
 : alien-invoke-node ( returns params function library -- )
     #! We should fail if the library does not exist, so that

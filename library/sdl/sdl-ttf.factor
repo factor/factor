@@ -54,7 +54,7 @@ USE: alien
     "char*" "sdl-ttf" "TTF_FontFaceStyleName" [ "void*" ] alien-invoke ;
 
 : TTF_SizeUNICODE ( font text w h -- ? )
-    "bool" "sdl-ttf" "TTF_SizeUNICODE" [ "void*" "ushort*" "int-box*" "int-box*" ] alien-invoke ;
+    "bool" "sdl-ttf" "TTF_SizeUNICODE" [ "void*" "ushort*" "void*" "void*" ] alien-invoke ;
 
 : TTF_RenderUNICODE_Solid ( font text fg -- surface )
     "surface*" "sdl-ttf" "TTF_RenderUNICODE_Solid" [ "void*" "ushort*" "int" ] alien-invoke ;

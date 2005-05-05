@@ -55,16 +55,12 @@ global [
         [ dup CHAR: \0 = [ drop CHAR: \s ] when ] seq-map
     ] when ;
 
-BEGIN-STRUCT: int-box
-    FIELD: int i
-END-STRUCT
-
 : size-string ( font text -- w h )
     >r lookup-font r> filter-nulls dup empty? [
         drop TTF_FontHeight 0 swap
     ] [
-        <int-box> <int-box> [ TTF_SizeUNICODE drop ] 2keep
-        swap int-box-i swap int-box-i
+        0 <int> 0 <int> [ TTF_SizeUNICODE drop ] 2keep
+        swap *int swap *int
     ] ifte ;
 
 global [ <namespace> fonts set ] bind

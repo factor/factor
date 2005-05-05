@@ -5,7 +5,7 @@ USING: alien compiler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 \ alien-invoke [
-    uncons load-dll 2dup rel-dlsym-16/16 dlsym compile-call-far
+    uncons load-library 2dup rel-dlsym-16/16 dlsym compile-call-far
 ] "generator" set-word-prop
 
 : stack-size 8 + 16 align ;

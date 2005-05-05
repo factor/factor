@@ -4,6 +4,8 @@ Factor 0.75:
 The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
 data could fill up the buffer and cause a denial-of-service attack.
 
+The alien interface now supports "float" and "double" types.
+
 Factor 0.74:
 ------------
 

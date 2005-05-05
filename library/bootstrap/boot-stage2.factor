@@ -27,6 +27,7 @@ recrossref
 ! These are loaded here until bootstrap gets some fixes
 t [
     "/library/alien/compiler.factor"
+    "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 ] pull-in
 
@@ -75,8 +76,8 @@ init-assembler
 
 compile? [
     \ car compile
-    \ = compile
     \ length compile
+    \ = compile
     \ unparse compile
     \ scan compile
 ] when

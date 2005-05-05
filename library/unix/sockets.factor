@@ -71,7 +71,7 @@ M: accept-task io-task-events ( task -- events )
 
 : do-accept ( fd -- fd host port )
     <sockaddr-in>
-    [ "sockaddr-in" c-size box-int accept dup io-error ] keep
+    [ "sockaddr-in" c-size <int> accept dup io-error ] keep
     dup sockaddr-in-addr inet-ntoa
     swap sockaddr-in-port ntohs ;
 
