@@ -55,3 +55,8 @@ USING: kernel lists sequences test ;
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
 [ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
+[ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
+[ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
+[ f ] [ [ ] [ 1 2 3 ] sequence= ] unit-test

@@ -5,7 +5,7 @@
 - get all-tests to run with -no-compile
 - fix i/o on generic x86/ppc unix
 - alien primitives need a more general input type
-- 2map, sequence= slow with lists
+- 2map slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
 - ensure-capacity: don't be generic
@@ -25,14 +25,14 @@
 - rename prettyprint to pprint
 - reader syntax for arrays, byte arrays, displaced aliens
 - add a socket timeout
-- make-matrix is slow and ugly
-- move 2repeat somewhere else
 - virtual hosts
 - keep alive
 - dipping seq-2nmap, seq-2each
 - array sort
 - tiled window manager
 - PPC #box-float #unbox-float
+- weird bug uncovered during bootstrap stress-test
+- images saved from plugin do not work
 
 + plugin:
 

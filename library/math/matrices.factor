@@ -49,25 +49,10 @@ M: matrix clone ( matrix -- matrix )
     #! Turn a vector into a matrix of one column.
     [ length 1 ] keep <matrix> ;
 
-: 2repeat ( i j quot -- | quot: i j -- i j )
-    rot [
-        rot [ [ rot dup slip -rot ] repeat ] keep -rot
-    ] repeat 2drop ; inline
-
-SYMBOL: matrix-maker
-
-: make-matrix ( rows cols quot -- matrix )
-    [
-        matrix-maker set
-        2dup <zero-matrix> matrix set
-        [
-            [
-                [ matrix-maker get call ] 2keep
-                matrix get matrix-set
-            ] 2keep
-        ] 2repeat
-        matrix get
-    ] with-scope ;
+: make-matrix ( rows cols quot -- matrix | quot: i j -- elt )
+    -rot [
+        [ [ [ rot call , ] 3keep ] 2repeat ] make-vector nip
+    ] 2keep rot <matrix> ; inline
 
 : <identity-matrix> ( n -- matrix )
     #! Make a nxn identity matrix.
@@ -100,7 +85,7 @@ M: col thaw >vector ;
         "Matrix dimensions do not equal" throw
     ] unless ;
 
-: element-wise ( m m -- v v )
+: element-wise ( m m -- rows cols v v )
     2dup +check >r >matrix< r> matrix-sequence ;
 
 ! Matrix operations

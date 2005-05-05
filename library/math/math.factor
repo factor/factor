@@ -75,3 +75,8 @@ GENERIC: abs ( z -- |z| )
 : times ( n quot -- )
     #! Evaluate a quotation n times.
     swap [ >r dup slip r> ] repeat drop ; inline
+
+: 2repeat ( i j quot -- | quot: i j -- i j )
+    rot [
+        rot [ [ rot dup slip -rot ] repeat ] keep -rot
+    ] repeat 2drop ; inline

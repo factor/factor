@@ -149,15 +149,13 @@ M: hashtable clone ( hash -- hash )
         hash-array swap hash-array dup length copy-array
     ] keep ;
 
-: hash-contained? ( subset of -- ? )
-    hash>alist [ uncons >r swap hash r> = ] all-with? ;
-
 M: hashtable = ( obj hash -- ? )
     2dup eq? [
         2drop t
     ] [
         over hashtable? [
-            2dup hash-contained? >r swap hash-contained? r> and
+            swap hash>alist swap hash>alist 2dup
+            contained? >r swap contained? r> and
         ] [
             2drop f
         ] ifte

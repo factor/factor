@@ -11,6 +11,9 @@ IN: kernel
 : 2keep ( x y quot -- x y | quot: x y -- )
     over >r pick >r call r> r> ; inline
 
+: 3keep ( x y z quot -- x y z | quot: x y z -- )
+    >r 3dup r> swap >r swap >r swap >r call r> r> r> ; inline
+
 : while ( quot generator -- )
     #! Keep applying the quotation to the value produced by
     #! calling the generator until the generator returns f.

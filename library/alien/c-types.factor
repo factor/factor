@@ -34,17 +34,18 @@ SYMBOL: c-types
     c-types get set-hash ; inline
 
 : <c-object> ( type -- byte-array )
-    c-size cell / ceiling <byte-array> ;
+    cell / ceiling <byte-array> ;
 
 : <c-array> ( n type -- byte-array )
-    c-size * cell / ceiling <byte-array> ;
+    * cell / ceiling <byte-array> ;
 
 : define-out ( name -- )
     #! Out parameter constructor for integral types.
     dup "alien" constructor-word
     swap c-type [
         [
-            "width" get , \ <c-object> , 0 , "setter" get %
+            "width" get , \ <c-object> , \ tuck , 0 ,
+            "setter" get %
         ] make-list
     ] bind define-compound ;
 

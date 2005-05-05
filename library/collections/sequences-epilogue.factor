@@ -32,9 +32,7 @@ M: general-list >list ( list -- list ) ;
 GENERIC: (seq-each) ( quot seq -- ) inline
 
 M: object (seq-each) ( quot seq -- )
-    dup length [
-        3dup >r >r >r swap nth swap call r> r> r>
-    ] repeat 2drop ;
+    dup length [ [ swap nth swap call ] 3keep ] repeat 2drop ;
 
 M: general-list (seq-each) ( quot seq -- )
     swap each ;
@@ -67,7 +65,7 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     pick length pick <= [
         3drop
     ] [
-        3dup >r >r >r change-nth r> r> 1 + r> (nmap)
+        [ change-nth ] 3keep >r 1 + r> (nmap)
     ] ifte ; inline
 
 : nmap ( seq quot -- | quot: elt -- elt )
@@ -146,8 +144,7 @@ M: object peek ( sequence -- element )
 
 : exchange ( seq i j -- )
     #! Exchange seq[i] and seq[j].
-    3dup >r >r >r (exchange) r> r> r>
-    swap (exchange) set-nth set-nth ;
+    [ (exchange) ] 3keep swap (exchange) set-nth set-nth ;
 
 : (nreverse) ( seq i -- )
     #! Swap seq[i] with seq[length-i-1].
@@ -176,7 +173,11 @@ M: object reverse ( seq -- seq ) [ nreverse ] immutable ;
 : sequence= ( seq seq -- ? )
     #! Check if two sequences have the same length and elements,
     #! but not necessarily the same class.
-    2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte ;
+    over general-list? over general-list? or [
+        swap >list swap >list =
+    ] [
+        2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte
+    ] ifte ;
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [

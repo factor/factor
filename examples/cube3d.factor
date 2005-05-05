@@ -62,12 +62,12 @@ SYMBOL: theta
 SYMBOL: phi
 SYMBOL: psi
 
+SYMBOL: rotation
+
 : update-matrix
     theta get rotation-matrix-1
     phi get rotation-matrix-2 m.
     psi get rotation-matrix-3 m. rotation set ;
-
-SYMBOL: rotation
 
 : >scene ( { x y z } -- { x y z } )
     rotation get swap m.v ;
