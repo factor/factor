@@ -36,7 +36,7 @@ IN: kernel-internals
     #! to exactly len.
     [ vector-array grow-array ] keep set-vector-array ;
 
-M: vector ensure-capacity ( n vec -- )
+: ensure-capacity ( n vec -- )
     #! If n is beyond the vector's length, increase the length,
     #! growing the array if necessary, with an optimistic
     #! doubling of its size.

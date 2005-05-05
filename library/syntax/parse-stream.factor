@@ -9,16 +9,15 @@ USING: kernel lists namespaces sequences streams strings ;
 
 : (parse-stream) ( name stream -- quot )
     #! Uses the current namespace for temporary variables.
-    >r file set f ( initial parse tree ) r>
-    [ (parse) ] read-lines reverse
-    file off
-    line-number off ;
+    [
+        >r file set f ( initial parse tree ) r>
+        [ (parse) ] read-lines reverse
+        file off
+        line-number off
+    ] with-parser ;
 
 : parse-stream ( name stream -- quot )
-    [
-        file-vocabs
-        [ (parse-stream) ] with-parser
-    ] with-scope ;
+    [ file-vocabs [ (parse-stream) ] with-parser ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;

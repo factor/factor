@@ -14,7 +14,6 @@ USING: generic kernel math strings vectors ;
 GENERIC: empty? ( sequence -- ? )
 GENERIC: length ( sequence -- n )
 GENERIC: set-length ( n sequence -- )
-GENERIC: ensure-capacity ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq )
