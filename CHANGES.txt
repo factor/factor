@@ -6,9 +6,6 @@ data could fill up the buffer and cause a denial-of-service attack.
 
 The alien interface now supports "float" and "double" types.
 
-Moved the 'skip' combinator from the 'parser' vocabulary to 'sequences',
-since its generic now. Implemented 'index*' in terms of 'skip'.
-
 Factor 0.74:
 ------------
 

@@ -120,19 +120,6 @@ void primitive_sbuf_append(void)
 	}
 }
 
-void primitive_sbuf_to_string(void)
-{
-	F_SBUF* sbuf;
-	F_STRING* s;
-
-	maybe_garbage_collection();
-
-	sbuf = untag_sbuf(dpeek());
-	s = string_clone(untag_string(sbuf->string),sbuf->top);
-	rehash_string(s);
-	drepl(tag_object(s));
-}
-
 void primitive_sbuf_clone(void)
 {
 	F_SBUF* s;
@@ -145,29 +132,6 @@ void primitive_sbuf_clone(void)
 
 	sbuf_append_string(new_s,untag_string(s->string));
 	drepl(tag_object(new_s));
-}
-
-bool sbuf_eq(F_SBUF* s1, F_SBUF* s2)
-{
-	if(s1 == s2)
-		return true;
-	else if(s1->top == s2->top)
-	{
-		return (string_compare_head(untag_string(s1->string),
-			untag_string(s2->string),s1->top) == 0);
-	}
-	else
-		return false;
-}
-
-void primitive_sbuf_eq(void)
-{
-	F_SBUF* s1 = untag_sbuf(dpop());
-	CELL with = dpop();
-	if(type_of(with) == SBUF_TYPE)
-		dpush(tag_boolean(sbuf_eq(s1,(F_SBUF*)UNTAG(with))));
-	else
-		dpush(F);
 }
 
 void fixup_sbuf(F_SBUF* sbuf)

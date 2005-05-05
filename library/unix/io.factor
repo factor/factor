@@ -119,7 +119,7 @@ C: reader ( handle -- reader )
     [ >r buffered-port r> set-delegate ] keep ;
 
 : pop-line ( reader -- str )
-    dup reader-line dup [ sbuf>string ] when >r
+    dup reader-line dup [ >string ] when >r
     f over set-reader-line
     f swap set-reader-ready? r> ;
 

@@ -29,6 +29,8 @@
 - PPC #box-float #unbox-float
 - weird bug uncovered during bootstrap stress-test
 - images saved from plugin do not work
+- making an image from plugin hangs
+- generic skip
 
 + plugin:
 

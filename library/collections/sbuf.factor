@@ -1,20 +1,45 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: generic kernel lists math namespaces sequences strings ;
+USING: generic kernel kernel-internals lists math namespaces
+sequences strings ;
 
 M: sbuf length sbuf-length ;
 M: sbuf set-length set-sbuf-length ;
 M: sbuf nth sbuf-nth ;
 M: sbuf set-nth set-sbuf-nth ;
 M: sbuf clone sbuf-clone ;
-M: sbuf = sbuf= ;
+
+M: sbuf =
+    over sbuf? [
+        2dup eq? [
+            2drop t
+        ] [
+            swap >string swap >string =
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
 
 : >sbuf ( seq -- sbuf ) 0 <sbuf> [ swap nappend ] keep ;
 
-GENERIC: >string ( seq -- string )
-M: string >string ;
-M: object >string >sbuf sbuf>string ;
+M: sbuf >string
+    [ 0 swap length ] keep sbuf-string substring ;
+
+M: object >string >sbuf >string ;
+
+: cat2 ( "a" "b" -- "ab" )
+    swap
+    80 <sbuf>
+    [ sbuf-append ] keep
+    [ sbuf-append ] keep
+    >string ;
+
+: cat3 ( "a" "b" "c" -- "abc" )
+    >r >r >r 80 <sbuf>
+    r> over sbuf-append
+    r> over sbuf-append
+    r> over sbuf-append >string ;
 
 : fill ( count char -- string ) <repeated> >string ;
 
@@ -58,7 +83,7 @@ M: object >string >sbuf sbuf>string ;
     #! Split a string into n-character chunks.
     [ 0 -rot (split-n) ] make-list ;
 
-: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep sbuf>string ;
+: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep >string ;
 
 M: string thaw >sbuf ;
-M: string freeze drop sbuf>string ;
+M: string freeze drop >string ;

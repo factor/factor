@@ -1,17 +1,34 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: strings USING: generic kernel kernel-internals lists math
-sequences ;
+IN: kernel-internals
+DEFER: sbuf-string
+DEFER: set-sbuf-string
+
+IN: strings
+USING: generic kernel kernel-internals lists math sequences ;
 
 ! Strings
 BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
 UNION: text string integer ;
 
-M: string = string= ;
-
-BUILTIN: sbuf 13 ;
+M: string =
+    over string? [
+        over hashcode over hashcode number= [
+            string-compare 0 eq?
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop f
+    ] ifte ;
 
 M: string nth string-nth ;
+
+GENERIC: >string ( seq -- string )
+
+M: string >string ;
+
+BUILTIN: sbuf 13 [ 2 sbuf-string set-sbuf-string ] ;
 
 : string> ( str1 str2 -- ? )
     ! Returns if the first string lexicographically follows str2
@@ -20,19 +37,6 @@ M: string nth string-nth ;
 : length< ( seq seq -- ? )
     #! Compare sequence lengths.
     swap length swap length < ;
-
-: cat2 ( "a" "b" -- "ab" )
-    swap
-    80 <sbuf>
-    [ sbuf-append ] keep
-    [ sbuf-append ] keep
-    sbuf>string ;
-
-: cat3 ( "a" "b" "c" -- "abc" )
-    >r >r >r 80 <sbuf>
-    r> over sbuf-append
-    r> over sbuf-append
-    r> over sbuf-append sbuf>string ;
 
 : index-of ( string substring -- index )
     0 -rot index-of* ;

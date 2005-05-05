@@ -17,7 +17,7 @@ USING: kernel lists namespaces sequences streams strings ;
     ] with-parser ;
 
 : parse-stream ( name stream -- quot )
-    [ file-vocabs [ (parse-stream) ] with-parser ] with-scope ;
+    [ file-vocabs (parse-stream) ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;

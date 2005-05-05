@@ -35,7 +35,7 @@ SYMBOL: stdio
 : with-string ( quot -- str )
     #! Execute a quotation, and push a string containing all
     #! text printed by the quotation.
-    1024 <sbuf> [ call stdio get sbuf>string ] with-stream ;
+    1024 <sbuf> [ call stdio get >string ] with-stream ;
 
 TUPLE: stdio-stream ;
 C: stdio-stream ( stream -- stream ) [ set-delegate ] keep ;

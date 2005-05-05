@@ -132,10 +132,10 @@ SYMBOL: building
     100 <sbuf> make-seq ; inline
 
 : make-string ( quot -- string )
-    make-sbuf sbuf>string ; inline
+    make-sbuf >string ; inline
 
 : make-rstring ( quot -- string )
-    make-sbuf dup nreverse sbuf>string ; inline
+    make-sbuf dup nreverse >string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer

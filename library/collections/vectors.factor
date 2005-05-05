@@ -76,9 +76,3 @@ M: vector clone ( vector -- vector )
     dup length dup empty-vector [
         vector-array rot vector-array rot copy-array
     ] keep ;
-
-IN: vectors
-
-: vector-nth nth ;
-: set-vector-nth set-nth ;
-: vector-length length ; 

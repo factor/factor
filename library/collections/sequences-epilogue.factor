@@ -92,23 +92,14 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 : seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
     swap [ swap 2nmap ] immutable ; inline
 
-: skip ( i seq quot -- n | quot: elt -- ? )
-    #! Find the next element starting at i that satisfies the
-    #! quotation.
-    >r 2dup length < [
-        2dup nth r> dup >r call [
-            r> 2drop
-        ] [
-            >r 1 + r> r> skip
-        ] ifte
-    ] [
-        r> drop nip length
-    ] ifte ; inline
-
 ! Operations
 : index* ( obj i seq -- n )
     #! The index of the object in the sequence, starting from i.
-    [ dupd = ] skip nip ;
+    2dup length >= [
+        3drop -1
+    ] [
+        3dup nth = [ drop nip ] [ >r 1 + r> index* ] ifte
+    ] ifte ;
 
 : index ( obj seq -- n )
     #! The index of the object in the sequence.

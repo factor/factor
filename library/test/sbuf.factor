@@ -6,7 +6,7 @@ USING: kernel namespaces sequences strings test ;
     "Hello" "buf" get swap nappend
     "buf" get clone "buf-clone" set
     "World" "buf-clone" get swap nappend
-    "buf" get sbuf>string
+    "buf" get >string
 ] unit-test
 
 [ CHAR: h ] [ 0 SBUF" hello world" nth ] unit-test

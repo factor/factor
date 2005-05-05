@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel lists matrices namespaces test ;
+USING: kernel lists math matrices namespaces test ;
 
 [
     M[ [ 0 ] [ 0 ] [ 0 ] ]M
