@@ -53,7 +53,7 @@ SYMBOL: clip
 : with-clip ( shape quot -- )
     #! All drawing done inside the quotation is clipped to the
     #! shape's bounds. The quotation is called with a boolean
-    #! that is set to false if 
+    #! that is set to false if the gadget is entirely clipped.
     [
         >r screen-bounds clip [ intersect dup ] change set-clip
         r> call
@@ -65,7 +65,7 @@ SYMBOL: clip
     #! paint, just call the quotation.
     f over set-gadget-redraw?
     dup gadget-paint [
-        dup dup [
+        dup [
             [
                 drop
             ] [
@@ -74,5 +74,4 @@ SYMBOL: clip
                 ] with-trans
             ] ifte
         ] with-clip
-        surface get swap [ shape-x x get + ] keep [ shape-y y get + ] keep [ shape-w pick + 1 - ] keep shape-h pick + 1 - red rgb rectangleColor
     ] bind ;

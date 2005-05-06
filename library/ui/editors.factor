@@ -90,11 +90,11 @@ M: editor user-input* ( ch editor -- ? )
     scroll>bottom  t ;
 
 M: editor pref-size ( editor -- w h )
-    editor-text shape-size >r 1 + r> ;
+    dup editor-text label-size >r 1 + r> ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-size rot resize-gadget
     dup editor-caret swap caret-pos rot move-gadget ;
 
 M: editor draw-shape ( editor -- )
-    dup [ editor-text draw-shape ] with-trans ;
+    [ editor-text ] keep [ draw-string ] with-trans ;

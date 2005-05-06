@@ -9,8 +9,11 @@ TUPLE: label text ;
 C: label ( text -- label )
     <empty-gadget> over set-delegate [ set-label-text ] keep ;
 
-M: label pref-size label-text shape-size ;
+: label-size ( gadget text -- w h )
+    >r font paint-prop r> size-string ;
+
+M: label pref-size ( label -- w h )
+    dup label-text label-size ;
 
 M: label draw-shape ( label -- )
-    dup delegate draw-shape
-    dup shape-pos [ label-text draw-shape ] with-trans ;
+    [ label-text ] keep [ draw-string ] with-trans ;

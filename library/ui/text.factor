@@ -63,18 +63,7 @@ global [
         swap *int swap *int
     ] ifte ;
 
-global [ <namespace> fonts set ] bind
-
-M: string shape-x drop 0 ;
-M: string shape-y drop 0 ;
-M: string shape-w
-    font get swap size-string ( h -) drop ;
-
-M: string shape-h ( text -- h )
-    #! This is just the height of the current font.
-    drop font get lookup-font TTF_FontHeight ;
-
-M: string draw-shape ( text -- )
+: draw-string ( text -- )
     dup empty? [
         drop
     ] [
@@ -85,3 +74,5 @@ M: string draw-shape ( text -- )
         [ >r x get y get r> draw-surface ] keep
         SDL_FreeSurface
     ] ifte ;
+
+global [ <namespace> fonts set ] bind

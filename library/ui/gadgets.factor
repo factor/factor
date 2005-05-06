@@ -59,7 +59,15 @@ C: gadget ( shape -- gadget )
     [ [ resize-shape ] keep relayout ] ?resize ;
 
 : paint-prop ( gadget key -- value )
-    swap gadget-paint hash ;
+    over [
+        dup pick gadget-paint hash* dup [
+            2nip cdr
+        ] [
+            drop >r gadget-parent r> paint-prop
+        ] ?ifte
+    ] [
+        2drop f
+    ] ifte ;
 
 : set-paint-prop ( gadget value key -- )
     rot gadget-paint set-hash ;
