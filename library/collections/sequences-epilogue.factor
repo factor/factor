@@ -105,6 +105,8 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
     #! The index of the object in the sequence.
     0 swap index* ;
 
+M: object contains? ( obj seq -- ? ) index -1 > ;
+
 : push ( element sequence -- )
     #! Push a value on the end of a sequence.
     dup length swap set-nth ;

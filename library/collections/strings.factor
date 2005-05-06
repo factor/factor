@@ -1,15 +1,10 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-DEFER: sbuf-string
-DEFER: set-sbuf-string
-
 IN: strings
 USING: generic kernel kernel-internals lists math sequences ;
 
 ! Strings
 BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
-UNION: text string integer ;
 
 M: string =
     over string? [
@@ -22,13 +17,12 @@ M: string =
         2drop f
     ] ifte ;
 
-M: string nth string-nth ;
+M: string nth ( n str -- ch )
+    bounds-check char-slot ;
 
 GENERIC: >string ( seq -- string )
 
 M: string >string ;
-
-BUILTIN: sbuf 13 [ 2 sbuf-string set-sbuf-string ] ;
 
 : string> ( str1 str2 -- ? )
     ! Returns if the first string lexicographically follows str2

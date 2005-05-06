@@ -20,7 +20,7 @@ M: cons empty? drop f ;
 : 3unlist ( [ a b c ] -- a b c )
     uncons uncons car ;
 
-: contains? ( obj list -- ? )
+M: general-list contains? ( obj list -- ? )
     #! Test if a list contains an element equal to an object.
     [ = ] some-with? >boolean ;
 

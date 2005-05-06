@@ -109,7 +109,7 @@ BUILTIN: f 9 ;  : f f swons ; parsing
 
 ! String literal
 : (parse-string) ( n str -- n )
-    2dup string-nth CHAR: " = [
+    2dup nth CHAR: " = [
         drop 1 +
     ] [
         [ next-char swap , ] keep (parse-string)

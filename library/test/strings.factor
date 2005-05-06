@@ -10,8 +10,8 @@ USE: lists
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
 
-[ "abc" ] [ "ab" "c" cat2 ] unit-test
-[ "abc" ] [ "a" "b" "c" cat3 ] unit-test
+[ "abc" ] [ "ab" "c" append ] unit-test
+[ "abc" ] [ "a" "b" "c" append3 ] unit-test
 
 [ 3 ] [ "hola" "a" index-of ] unit-test
 [ -1 ] [ "hola" "x" index-of ] unit-test
@@ -94,3 +94,4 @@ unit-test
 [ "666" ] [ "666" 2 CHAR: 0 pad ] unit-test
 
 [ 1 "" nth ] unit-test-fails
+[ -6 "hello" nth ] unit-test-fails

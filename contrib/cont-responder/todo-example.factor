@@ -335,7 +335,7 @@ USE: sequences
 : priority-valid? ( string -- bool )
   #! Test the string containing a priority to see if it is 
   #! valid. It should be a single digit from 0-9.
-  dup length 1 = [ 0 swap string-nth digit? ] [ drop f ] ifte ;
+  dup length 1 = [ 0 swap nth digit? ] [ drop f ] ifte ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.

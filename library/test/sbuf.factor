@@ -1,5 +1,7 @@
 IN: temporary
-USING: kernel namespaces sequences strings test ;
+USING: kernel math namespaces sequences strings test ;
+
+[ 5 ] [ "Hello" >sbuf length ] unit-test
 
 [ "Hello" ] [
     100 <sbuf> "buf" set
@@ -13,3 +15,5 @@ USING: kernel namespaces sequences strings test ;
 [ CHAR: H ] [
     CHAR: H 0 SBUF" hello world" [ set-nth ] keep 0 swap nth
 ] unit-test
+
+[ SBUF" x" ] [ 1 <sbuf> [ CHAR: x >bignum over push ] keep ] unit-test

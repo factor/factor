@@ -5,8 +5,17 @@ math-internals sequences ;
 
 IN: vectors
 
+: empty-vector ( len -- vec )
+    #! Creates a vector with 'len' elements set to f. Unlike
+    #! <vector>, which gives an empty vector with a certain
+    #! capacity.
+    dup <vector> [ set-length ] keep ;
+
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ;
+
+M: vector clone ( vector -- vector )
+    >vector ;
 
 : vector-project ( n quot -- vector )
     #! Execute the quotation n times, passing the loop counter

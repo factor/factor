@@ -65,7 +65,7 @@ SYMBOL: clip
     #! paint, just call the quotation.
     f over set-gadget-redraw?
     dup gadget-paint [
-        dup [
+        dup dup [
             [
                 drop
             ] [
@@ -74,4 +74,5 @@ SYMBOL: clip
                 ] with-trans
             ] ifte
         ] with-clip
+        surface get swap [ shape-x x get + ] keep [ shape-y y get + ] keep [ shape-w pick + 1 - ] keep shape-h pick + 1 - red rgb rectangleColor
     ] bind ;

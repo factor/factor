@@ -8,10 +8,15 @@ typedef struct {
 
 #define SREF(string,index) ((CELL)string + sizeof(F_STRING) + index * CHARS)
 
+INLINE F_STRING* untag_string_fast(CELL tagged)
+{
+	return (F_STRING*)UNTAG(tagged);
+}
+
 INLINE F_STRING* untag_string(CELL tagged)
 {
 	type_check(STRING_TYPE,tagged);
-	return (F_STRING*)UNTAG(tagged);
+	return untag_string_fast(tagged);
 }
 
 INLINE CELL string_capacity(F_STRING* str)
@@ -26,6 +31,7 @@ F_STRING* allot_string(CELL capacity);
 F_STRING* string(CELL capacity, CELL fill);
 void rehash_string(F_STRING* str);
 F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill);
+void primitive_grow_string(void);
 char* to_c_string(F_STRING* s);
 char* to_c_string_unchecked(F_STRING* s);
 void string_to_memory(F_STRING* s, BYTE* string);
@@ -49,10 +55,9 @@ INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 	cput(SREF(string,index),value);
 }
 
-void primitive_string_nth(void);
-F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len);
+void primitive_char_slot(void);
+void primitive_set_char_slot(void);
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2);
 void primitive_string_compare(void);
 void primitive_index_of(void);
 void primitive_substring(void);
-F_STRING* string_clone(F_STRING* s, int len);

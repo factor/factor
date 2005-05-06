@@ -23,8 +23,7 @@ GENERIC: stream-write-attr ( string style stream -- )
 GENERIC: stream-close      ( stream -- )
 
 : stream-read1 ( stream -- char/f )
-    1 swap stream-read
-    dup empty? [ drop f ] [ 0 swap string-nth ] ifte ;
+    1 swap stream-read dup empty? [ drop f ] [ 0 swap nth ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;

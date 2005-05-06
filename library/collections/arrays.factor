@@ -1,7 +1,5 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-USING: generic kernel lists math-internals sequences vectors ;
 
 ! An array is a range of memory storing pointers to other
 ! objects. Arrays are not used directly, and their access words
@@ -13,6 +11,12 @@ USING: generic kernel lists math-internals sequences vectors ;
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
+IN: math
+DEFER: repeat
+
+IN: kernel-internals
+USING: kernel math-internals sequences ;
+
 BUILTIN: array 8  ;
 
 : array-capacity ( a -- n ) 1 slot ; inline
@@ -20,6 +24,10 @@ BUILTIN: array 8  ;
 : set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
 : dispatch ( n vtable -- ) 2 slot array-nth call ;
 
+: copy-array ( to from n -- )
+    [ 3dup swap array-nth pick rot set-array-nth ] repeat 2drop ;
+
 M: array length array-capacity ;
 M: array nth array-nth ;
 M: array set-nth set-array-nth ;
+M: array (grow) grow-array ;

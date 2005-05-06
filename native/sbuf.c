@@ -6,7 +6,7 @@ F_SBUF* sbuf(F_FIXNUM capacity)
 	if(capacity < 0)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 	sbuf = allot_object(SBUF_TYPE,sizeof(F_SBUF));
-	sbuf->top = 0;
+	sbuf->top = tag_fixnum(0);
 	sbuf->string = tag_object(string(capacity,'\0'));
 	return sbuf;
 }
@@ -15,123 +15,6 @@ void primitive_sbuf(void)
 {
 	maybe_garbage_collection();
 	drepl(tag_object(sbuf(to_fixnum(dpeek()))));
-}
-
-void primitive_sbuf_length(void)
-{
-	drepl(tag_fixnum(untag_sbuf(dpeek())->top));
-}
-
-void primitive_set_sbuf_length(void)
-{
-	F_SBUF* sbuf;
-	F_FIXNUM length;
-	F_STRING* str;
-
-	maybe_garbage_collection();
-
-	sbuf = untag_sbuf(dpop());
-	str = untag_string(sbuf->string);
-	length = to_fixnum(dpop());
-	if(length < 0)
-		range_error(tag_object(sbuf),0,to_fixnum(length),sbuf->top);
-	sbuf->top = length;
-	if(length > string_capacity(str))
-		sbuf->string = tag_object(grow_string(str,length,F));
-}
-
-void primitive_sbuf_nth(void)
-{
-	F_SBUF* sbuf = untag_sbuf(dpop());
-	CELL index = to_fixnum(dpop());
-
-	if(index < 0 || index >= sbuf->top)
-		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
-	dpush(tag_fixnum(string_nth(untag_string(sbuf->string),index)));
-}
-
-void sbuf_ensure_capacity(F_SBUF* sbuf, F_FIXNUM top)
-{
-	F_STRING* string = untag_string(sbuf->string);
-	if(top >= string_capacity(string))
-		sbuf->string = tag_object(grow_string(string,top * 2 + 1,F));
-	sbuf->top = top;
-}
-
-void set_sbuf_nth(F_SBUF* sbuf, CELL index, u16 value)
-{
-	if(index < 0)
-		range_error(tag_object(sbuf),0,tag_fixnum(index),sbuf->top);
-	else if(index >= sbuf->top)
-		sbuf_ensure_capacity(sbuf,index + 1);
-
-	/* the following does not check bounds! */
-	set_string_nth(untag_string(sbuf->string),index,value);
-}
-
-void primitive_set_sbuf_nth(void)
-{
-	F_SBUF* sbuf;
-	F_FIXNUM index;
-	CELL value;
-
-	maybe_garbage_collection();
-
-	sbuf = untag_sbuf(dpop());
-	index = to_fixnum(dpop());
-	value = to_fixnum(dpop());
-
-	set_sbuf_nth(sbuf,index,value);
-}
-
-void sbuf_append_string(F_SBUF* sbuf, F_STRING* string)
-{
-	CELL top = sbuf->top;
-	CELL strlen = string_capacity(string);
-	F_STRING* str;
-	sbuf_ensure_capacity(sbuf,top + strlen);
-	str = untag_string(sbuf->string);
-	memcpy((void*)((CELL)str + sizeof(F_STRING) + top * CHARS),
-		(void*)((CELL)string + sizeof(F_STRING)),strlen * CHARS);
-}
-
-void primitive_sbuf_append(void)
-{
-	F_SBUF* sbuf;
-	CELL object;
-
-	maybe_garbage_collection();
-
-	sbuf = untag_sbuf(dpop());
-	object = dpop();
-
-	switch(type_of(object))
-	{
-	case FIXNUM_TYPE:
-	case BIGNUM_TYPE:
-		set_sbuf_nth(sbuf,sbuf->top,to_fixnum(object));
-		break;
-	case STRING_TYPE:
-		sbuf_append_string(sbuf,untag_string(object));
-		break;
-	default:
-		type_error(STRING_TYPE,object);
-		break;
-	}
-}
-
-void primitive_sbuf_clone(void)
-{
-	F_SBUF* s;
-	F_SBUF* new_s;
-
-	maybe_garbage_collection();
-
-	s = untag_sbuf(dpeek());
-	new_s = sbuf(s->top);
-
-	sbuf_append_string(new_s,untag_string(s->string));
-	drepl(tag_object(new_s));
 }
 
 void fixup_sbuf(F_SBUF* sbuf)

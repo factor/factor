@@ -56,6 +56,15 @@ F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 	return new_string;
 }
 
+void primitive_grow_string(void)
+{
+	F_STRING* string; CELL capacity;
+	maybe_garbage_collection();
+	string = untag_string_fast(dpop());
+	capacity = to_fixnum(dpop());
+	dpush(tag_object(grow_string(string,capacity,F)));
+}
+
 F_STRING* memory_to_string(const BYTE* string, CELL length)
 {
 	F_STRING* s = allot_string(length);
@@ -145,30 +154,19 @@ u16* unbox_utf16_string(void)
 	return (u16*)(untag_string(dpop()) + 1);
 }
 
-void primitive_string_nth(void)
+void primitive_char_slot(void)
 {
-	F_STRING* string = untag_string(dpop());
-	CELL index = to_fixnum(dpop());
-	CELL capacity = string_capacity(string);
-
-	if(index < 0 || index >= capacity)
-		range_error(tag_object(string),0,tag_fixnum(index),capacity);
+	F_STRING* string = untag_string_fast(dpop());
+	CELL index = untag_fixnum_fast(dpop());
 	dpush(tag_fixnum(string_nth(string,index)));
 }
 
-F_FIXNUM string_compare_head(F_STRING* s1, F_STRING* s2, CELL len)
+void primitive_set_char_slot(void)
 {
-	CELL i = 0;
-	while(i < len)
-	{
-		u16 c1 = string_nth(s1,i);
-		u16 c2 = string_nth(s2,i);
-		if(c1 != c2)
-			return c1 - c2;
-		i++;
-	}
-	
-	return 0;
+	F_STRING* string = untag_string_fast(dpop());
+	CELL index = untag_fixnum_fast(dpop());
+	CELL value = untag_fixnum_fast(dpop());
+	set_string_nth(string,index,value);
 }
 
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
@@ -178,11 +176,17 @@ F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
 
 	CELL limit = (len1 < len2 ? len1 : len2);
 
-	CELL comp = string_compare_head(s1,s2,limit);
-	if(comp != 0)
-		return comp;
-	else
-		return len1 - len2;
+	CELL i = 0;
+	while(i < limit)
+	{
+		u16 c1 = string_nth(s1,i);
+		u16 c2 = string_nth(s2,i);
+		if(c1 != c2)
+			return c1 - c2;
+		i++;
+	}
+
+	return len1 - len2;
 }
 
 void primitive_string_compare(void)
@@ -292,12 +296,4 @@ void primitive_substring(void)
 	end = to_fixnum(dpop());
 	start = to_fixnum(dpop());
 	dpush(tag_object(substring(start,end,string)));
-}
-
-/* Doesn't rehash the string! */
-F_STRING* string_clone(F_STRING* s, int len)
-{
-	F_STRING* copy = allot_string(len);
-	memcpy(copy + 1,s + 1,len * CHARS);
-	return copy;
 }

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: files
-USING: kernel hashtables lists namespaces presentation stdio
-streams strings unparser ;
+USING: kernel hashtables lists namespaces presentation
+sequences stdio streams strings unparser ;
 
 ! Hyperlinked directory listings.
 

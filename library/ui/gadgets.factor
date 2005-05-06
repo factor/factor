@@ -27,17 +27,20 @@ C: gadget ( shape -- gadget )
         gadget-parent [ redraw ] when*
     ] ifte ;
 
-: relayout ( gadget -- )
-    #! Relayout a gadget before the next iteration of the event
-    #! loop. Since relayout also implies the visual
-    #! representation changed, we redraw the gadget too.
+: relayout* ( gadget -- )
+    #! Relayout and redraw a gadget and its parent before the
+    #! next iteration of the event loop.
     dup gadget-relayout? [
         drop
     ] [
         t over set-gadget-redraw?
         t over set-gadget-relayout?
-        gadget-parent [ relayout ] when*
+        gadget-parent [ relayout* ] when*
     ] ifte ;
+
+: relayout ( gadget -- )
+    #! Relayout a gadget and its children.
+    dup relayout* gadget-children [ relayout ] each ;
 
 : ?move ( x y gadget quot -- )
     >r 3dup shape-pos >r rect> r> = [

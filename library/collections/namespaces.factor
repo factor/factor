@@ -106,7 +106,13 @@ SYMBOL: building
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
-    building get dup sbuf? [ sbuf-append ] [ push ] ifte ;
+    ! The behavior where a string can be passed is deprecated;
+    ! use % instead!
+    building get dup sbuf? [
+        over string? [ swap nappend ] [ push ] ifte
+    ] [
+        push
+    ] ifte ;
 
 : literal, ( word -- )
     #! Append some code that pushes the word on the stack. Used
