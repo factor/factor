@@ -14,6 +14,7 @@ M: object = eq? ;
 
 GENERIC: clone ( obj -- obj )
 M: object clone ;
+
 : set-boot ( quot -- )
     #! Set the boot quotation.
     8 setenv ;
@@ -41,3 +42,11 @@ M: object clone ;
     os "freebsd" =
     os "linux" = or
     os "macosx" = or ;
+
+: tag-mask BIN: 111 ; inline
+: tag-bits 3 ; inline
+
+: fixnum-tag  BIN: 000 ; inline
+: bignum-tag  BIN: 001 ; inline
+: cons-tag    BIN: 010 ; inline
+: object-tag  BIN: 011 ; inline

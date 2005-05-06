@@ -241,15 +241,35 @@ M: operand CALL HEX: ff compile-byte BIN: 010 1-operand ;
 
 GENERIC: ADD ( dst src -- )
 M: integer ADD HEX: 81 BIN: 000 immediate-8/32 ;
-M: operand ADD HEX: 01 2-operand ;
+M: operand ADD OCT: 001 2-operand ;
 
-GENERIC: SUB ( dst src -- )
-M: integer SUB HEX: 81 BIN: 101 immediate-8/32 ;
-M: operand SUB HEX: 29 2-operand ;
+GENERIC: OR ( dst src -- )
+M: integer OR HEX: 81 BIN: 001 immediate-8/32 ;
+M: operand OR OCT: 011 2-operand ;
+
+GENERIC: ADC ( dst src -- )
+M: integer ADC HEX: 81 BIN: 010 immediate-8/32 ;
+M: operand ADC OCT: 021 2-operand ;
+
+GENERIC: SBB ( dst src -- )
+M: integer SBB HEX: 81 BIN: 011 immediate-8/32 ;
+M: operand SBB OCT: 031 2-operand ;
 
 GENERIC: AND ( dst src -- )
 M: integer AND HEX: 81 BIN: 100 immediate-8/32 ;
-M: operand AND HEX: 21 2-operand ;
+M: operand AND OCT: 041 2-operand ;
+
+GENERIC: SUB ( dst src -- )
+M: integer SUB HEX: 81 BIN: 101 immediate-8/32 ;
+M: operand SUB OCT: 051 2-operand ;
+
+GENERIC: XOR ( dst src -- )
+M: integer XOR HEX: 81 BIN: 110 immediate-8/32 ;
+M: operand XOR OCT: 061 2-operand ;
+
+GENERIC: CMP ( dst src -- )
+M: integer CMP HEX: 81 BIN: 111 immediate-8/32 ;
+M: operand CMP OCT: 071 2-operand ;
 
 : IMUL ( dst src -- )
     HEX: 0f compile-byte HEX: af 2-operand ;
@@ -266,9 +286,6 @@ M: operand AND HEX: 21 2-operand ;
 
 : SHR ( dst src -- ) HEX: c1 BIN: 101 immediate-8 ;
 
-GENERIC: CMP ( dst src -- )
-M: integer CMP HEX: 81 BIN: 111 immediate-8/32 ;
-M: operand CMP HEX: 39 2-operand ;
 
 : LEA ( dst src -- )
     HEX: 8d compile-byte swap register 1-operand ;

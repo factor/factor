@@ -53,7 +53,6 @@ words ;
     out-1
 ] "linearizer" set-word-prop
 
-
 \ >r [
     drop
     in-1
@@ -78,9 +77,10 @@ words ;
 : self ( word -- )
     f swap dup "infer-effect" word-prop (consume/produce) ;
 
-\ slot [
-    \ slot self
-] "infer" set-word-prop
+: intrinsic ( word -- )
+    dup [ literal, \ self , ] make-list "infer" set-word-prop ;
+
+\ slot intrinsic
 
 : slot@ ( seq -- n )
     #! Compute slot offset.
@@ -102,9 +102,7 @@ words ;
     ] ifte  out-1
 ] "linearizer" set-word-prop
 
-\ set-slot [
-    \ set-slot self
-] "infer" set-word-prop
+\ set-slot intrinsic
 
 \ set-slot [
     node-consume-d swap hash
@@ -122,37 +120,49 @@ words ;
     ] ifte
 ] "linearizer" set-word-prop
 
-! : binary-op-reg ( op -- )
-!     in-2
-!     [[ << vreg f 1 >> << vreg f 0 >> ]] cons ,
-!     1 %dec-d , out-1 ;
-! 
-! 
-! : binary-op ( node op -- )
-!     top-literal? [
-!         1 %dec-d ,
-!         in-1
-!         literal-value << vreg f 0 >> swons cons ,
-!         out-1
-!     ] [
-!         drop
-!         binary-op-reg
-!     ] ifte ;
-! 
-! [
-!     fixnum+
-!     fixnum-
-!     fixnum*
-!     fixnum-mod
-!     fixnum-bitand
-!     fixnum-bitor
-!     fixnum-bitxor
-!     fixnum/i
-!     fixnum<=
-!     fixnum<
-!     fixnum>=
-!     fixnum>
-! ] [
-!     dup [ literal, \ binary-op , ] make-list
-!     "linearizer" set-word-prop
-! ] each
+\ type intrinsic
+
+\ type [
+    drop
+    in-1
+    0 %type ,
+    out-1
+] "linearizer" set-word-prop
+
+: binary-op-reg ( op -- )
+    in-2
+    << vreg f 1 >> << vreg f 0 >> rot execute ,
+    1 %dec-d ,
+    out-1 ;
+
+
+: binary-op ( node op -- )
+    node-consume-d rot hash
+    dup top-literal? [
+        1 %dec-d ,
+        in-1
+        peek literal-value << vreg f 0 >> rot execute ,
+        out-1
+    ] [
+        drop
+        binary-op-reg
+    ] ifte ;
+
+[
+    [[ fixnum+       %fixnum+       ]]
+    [[ fixnum-       %fixnum-       ]]
+    [[ fixnum*       %fixnum*       ]]
+    [[ fixnum-mod    %fixnum-mod    ]]
+    [[ fixnum-bitand %fixnum-bitand ]]
+    [[ fixnum-bitor  %fixnum-bitor  ]]
+    [[ fixnum-bitxor %fixnum-bitxor ]]
+    [[ fixnum/i      %fixnum/i      ]]
+    [[ fixnum<=      %fixnum<=      ]]
+    [[ fixnum<       %fixnum<       ]]
+    [[ fixnum>=      %fixnum>=      ]]
+    [[ fixnum>       %fixnum>       ]]
+] [
+    uncons over intrinsic
+    [ literal, \ binary-op , ] make-list
+    "linearizer" set-word-prop
+] each

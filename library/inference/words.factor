@@ -100,8 +100,7 @@ M: compound apply-word ( word -- )
     ] ifte ;
 
 : literal-type? ( -- ? )
-    peek-d value-class builtin-supertypes
-    dup length 1 = >r [ tuple ] = not r> and ;
+    peek-d value-types dup length 1 = >r [ tuple ] = not r> and ;
 
 : dynamic-dispatch-warning ( word -- )
     "Dynamic dispatch for " swap word-name cat2

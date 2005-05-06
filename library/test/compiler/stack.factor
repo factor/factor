@@ -27,6 +27,9 @@ USE: kernel
 [ 1 2 3 1 ] [ 1 [ 2 3 pick ] compile-1 ] unit-test
 [ 1 2 3 1 ] [ 1 2 [ 3 pick ] compile-1 ] unit-test
 [ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-1 ] unit-test
+[ 1 1 2 ] [ [ 1 2 dupd ] compile-1 ] unit-test
+[ 1 1 2 ] [ 1 [ 2 dupd ] compile-1 ] unit-test
+[ 1 1 2 ] [ 1 2 [ dupd ] compile-1 ] unit-test
 
 ! Test various kill combinations
 

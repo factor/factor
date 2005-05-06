@@ -27,7 +27,7 @@ C: gadget ( shape -- gadget )
         gadget-parent [ redraw ] when*
     ] ifte ;
 
-: relayout* ( gadget -- )
+: relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
     #! next iteration of the event loop.
     dup gadget-relayout? [
@@ -35,12 +35,12 @@ C: gadget ( shape -- gadget )
     ] [
         t over set-gadget-redraw?
         t over set-gadget-relayout?
-        gadget-parent [ relayout* ] when*
+        gadget-parent [ relayout ] when*
     ] ifte ;
 
-: relayout ( gadget -- )
+: relayout* ( gadget -- )
     #! Relayout a gadget and its children.
-    dup relayout* gadget-children [ relayout ] each ;
+    dup relayout gadget-children [ relayout* ] each ;
 
 : ?move ( x y gadget quot -- )
     >r 3dup shape-pos >r rect> r> = [
@@ -56,7 +56,7 @@ C: gadget ( shape -- gadget )
     ] r> ifte ; inline
 
 : resize-gadget ( w h gadget -- )
-    [ [ resize-shape ] keep relayout ] ?resize ;
+    [ [ resize-shape ] keep relayout* ] ?resize ;
 
 : paint-prop ( gadget key -- value )
     over [

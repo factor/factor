@@ -28,6 +28,7 @@ GENERIC: generate-node ( vop -- )
 : label-vop ( label) >r f f f r> ;
 : label/src-vop ( label src) swap >r f f r> ;
 : src-vop ( src) f f f ;
+: src/dest-vop ( src dest) f f ;
 
 ! miscellanea
 VOP: %prologue
@@ -53,7 +54,7 @@ VOP: %jump-f
 
 ! dispatch tables
 VOP: %dispatch
-: %dispatch empty-vop <%dispatch> ;
+: %dispatch <vreg> src-vop <%dispatch> ;
 VOP: %target-label
 : %target-label label-vop <%target-label> ;
 VOP: %target
@@ -90,7 +91,7 @@ VOP: %inc-r
 
 ! indirect load of a literal through a table
 VOP: %indirect
-: %indirect ( vreg obj -- ) f -rot f <%indirect> ;
+: %indirect ( vreg obj -- ) >r <vreg> r> f -rot f <%indirect> ;
 
 ! object slot accessors
 VOP: %untag
@@ -102,10 +103,28 @@ VOP: %set-slot
 : %set-slot ( vreg:value vreg:obj n )
     >r >r <vreg> r> <vreg> r> <vreg> f <%set-slot> ;
 
-! In the 'fast' versions, the object's type and slot number is
+! in the 'fast' versions, the object's type and slot number is
 ! known at compile time, so these become a single instruction
 VOP: %fast-slot
 : %fast-slot ( vreg n ) >r >r f r> <vreg> r> f <%fast-slot> ;
 VOP: %fast-set-slot
 : %fast-set-slot ( vreg:value vreg:obj n )
     >r >r <vreg> r> <vreg> r> f <%fast-set-slot> ;
+
+! some slightly optimized inline assembly
+VOP: %type
+: %type ( vreg ) <vreg> src-vop <%type> ;
+
+! fixnum intrinsics
+VOP: %fixnum+       : %fixnum+ src/dest-vop <%fixnum+> ;
+VOP: %fixnum-       : %fixnum- src/dest-vop <%fixnum-> ;
+VOP: %fixnum*       : %fixnum* src/dest-vop <%fixnum*> ;
+VOP: %fixnum-mod    : %fixnum-mod src/dest-vop <%fixnum-mod> ;
+VOP: %fixnum-bitand : %fixnum-bitand src/dest-vop <%fixnum-bitand> ;
+VOP: %fixnum-bitor  : %fixnum-bitor src/dest-vop <%fixnum-bitor> ;
+VOP: %fixnum-bitxor : %fixnum-bitxor src/dest-vop <%fixnum-bitxor> ;
+VOP: %fixnum/i      : %fixnum/i src/dest-vop <%fixnum/i> ;
+VOP: %fixnum<=      : %fixnum<= src/dest-vop <%fixnum<=> ;
+VOP: %fixnum<       : %fixnum< src/dest-vop <%fixnum<> ;
+VOP: %fixnum>=      : %fixnum>= src/dest-vop <%fixnum>=> ;
+VOP: %fixnum>       : %fixnum> src/dest-vop <%fixnum>> ;

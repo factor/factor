@@ -78,7 +78,9 @@ errors prettyprint kernel-internals ;
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
-    %dispatch ,
+    in-1
+    1 %dec-d ,
+    0 %dispatch ,
     <label> ( end label ) swap
     [ <label> dup %target-label ,  cons ] map
     %end-dispatch , ;

@@ -15,9 +15,9 @@
 ! run platform/native/boot-stage2.factor.
 
 IN: image
-USING: errors generic hashtables kernel lists math namespaces
-parser prettyprint sequences sequences stdio streams strings
-vectors words ;
+USING: errors generic hashtables kernel lists
+math namespaces parser prettyprint sequences sequences stdio
+streams strings vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -37,16 +37,8 @@ SYMBOL: boot-quot
 : cell "64-bits" get 8 4 ? ;
 : char "64-bits" get 4 2 ? ;
 
-: tag-mask BIN: 111 ; inline
-: tag-bits 3 ; inline
-
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
-
-: fixnum-tag  BIN: 000 ; inline
-: bignum-tag  BIN: 001 ; inline
-: cons-tag    BIN: 010 ; inline
-: object-tag  BIN: 011 ; inline
 
 : t-type         7  ; inline
 : array-type     8  ; inline
