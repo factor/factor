@@ -5,20 +5,9 @@ IN: assembler
 DEFER: compile-call-label ( label -- )
 DEFER: compile-jump-label ( label -- )
 
-DEFER: compile-jump-t ( label -- )
-DEFER: compile-jump-f ( label -- )
-
 IN: compiler
 USING: assembler errors inference kernel lists math namespaces
 sequences strings vectors words ;
-
-: generate-node ( [[ op params ]] -- )
-    #! Generate machine code for a node.
-    unswons dup "generator" word-prop [
-        call
-    ] [
-        "No generator" throw
-    ] ?ifte ;
 
 : generate-code ( word linear -- length )
     compiled-offset >r
@@ -56,38 +45,22 @@ SYMBOL: previous-offset
         ] when*
     ] catch ;
 
-#label [ save-xt ] "generator" set-word-prop
+! A few VOPs have trivial generators.
 
-#end-dispatch [ drop ] "generator" set-word-prop
+M: %label generate-node ( vop -- )
+    vop-label save-xt ;
 
-: type-tag ( type -- tag )
-    #! Given a type number, return the tag number.
-    dup 6 > [ drop 3 ] when ;
+M: %end-dispatch generate-node ( vop -- ) drop ;
 
 : compile-call ( word -- ) dup postpone-word compile-call-label ;
 
-#call [
-    compile-call
-] "generator" set-word-prop
+M: %call generate-node vop-label compile-call ;
 
-#jump-label [
-    compile-jump-label
-] "generator" set-word-prop
-
-#jump-t-label [ compile-jump-t ] "generator" set-word-prop
-#jump-t [ compile-jump-t ] "generator" set-word-prop
-
-#jump-f-label [ compile-jump-f ] "generator" set-word-prop
-#jump-f [ compile-jump-f ] "generator" set-word-prop
+M: %jump-label generate-node vop-label compile-jump-label ;
 
 : compile-target ( word -- ) 0 compile-cell absolute ;
 
-#target-label [
-    #! Jump table entries are absolute addresses.
-    compile-target
-] "generator" set-word-prop
+M: %target-label generate-node vop-label compile-target ;
 
-#target [
-    #! Jump table entries are absolute addresses.
-    dup postpone-word  compile-target
-] "generator" set-word-prop
+M: %target generate-node
+    vop-label dup postpone-word  compile-target ;

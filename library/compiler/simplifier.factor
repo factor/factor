@@ -56,11 +56,6 @@ SYMBOL: simplifying
     #! its param.
     over next-physical? [ cdr unswons cdr t ] [ f f ] ifte ;
 
-\ >r [ [ \ r> cancel nip ] ] "simplifiers" set-word-prop
-\ r> [ [ \ >r cancel nip ] ] "simplifiers" set-word-prop
-\ dup [ [ \ drop cancel nip ] ] "simplifiers" set-word-prop
-\ swap [ [ \ swap cancel nip ] ] "simplifiers" set-word-prop
-
 \ drop [
     [
         #push-immediate cancel [

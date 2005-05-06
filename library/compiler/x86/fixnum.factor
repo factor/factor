@@ -42,9 +42,6 @@ USE: math-internals
 ! values happends. At this point in time, this is just a
 ! prototype to test the assembler.
 
-: self ( word -- )
-    f swap dup "infer-effect" word-prop (consume/produce) ;
-
 : fixnum-insn ( overflow opcode -- )
     #! This needs to be factored.
     EAX [ ESI -4 ] MOV
@@ -135,6 +132,11 @@ USE: math-internals
 ] "generator" set-word-prop
 
 \ fixnum/mod [ \ fixnum/mod self ] "infer" set-word-prop
+
+: PUSH-DS ( -- )
+    #! Push EAX to datastack.
+    ESI 4 ADD
+    [ ESI ] EAX MOV ;
 
 \ arithmetic-type [
     drop
