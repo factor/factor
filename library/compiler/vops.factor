@@ -135,12 +135,10 @@ VOP: %type
 : %type ( vreg ) <vreg> dest-vop <%type> ;
 
 VOP: %arithmetic-type
-: %arithmetic-type empty-vop <%arithmetic-type> ;
+: %arithmetic-type <vreg> dest-vop <%arithmetic-type> ;
 
 VOP: %tag-fixnum
 : %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;
 
 : check-dest ( vop reg -- )
-    swap vop-dest v>operand = [
-        "invalid VOP destination" throw
-    ] unless ;
+    swap vop-dest = [ "invalid VOP destination" throw ] unless ;

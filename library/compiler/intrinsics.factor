@@ -137,6 +137,7 @@ words ;
     in-1
     0 %arithmetic-type ,
     0 %tag-fixnum ,
+    1 %inc-d ,
     out-1
 ] "linearizer" set-word-prop
 

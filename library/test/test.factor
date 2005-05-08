@@ -4,8 +4,14 @@ IN: test
 USING: errors kernel lists math memory namespaces parser
 prettyprint sequences stdio strings unparser vectors words ;
 
-: assert ( t -- )
-    [ "Assertion failed!" throw ] unless ;
+TUPLE: assert expect got ;
+M: assert error.
+    "Assertion failed" print
+    "Expected: " write dup assert-expect .
+    "Got: " write assert-got . ;
+
+: assert= ( a b -- )
+    2dup = [ <assert> throw ] unless ;
 
 : print-test ( input output -- )
     "--> " write 2list . flush ;
@@ -25,7 +31,7 @@ prettyprint sequences stdio strings unparser vectors words ;
         [
             2dup print-test
             swap >r >r clear r> call
-            datastack >list r> = assert
+            datastack >list r> assert=
         ] keep-datastack 2drop
     ] time ;
 
@@ -34,9 +40,7 @@ prettyprint sequences stdio strings unparser vectors words ;
     [ [ not ] catch ] cons [ f ] swap unit-test ;
 
 : assert-depth ( quot -- )
-    depth slip depth = [
-        "Unequal before/after depth" throw
-    ] unless ;
+    depth slip depth assert= ;
 
 SYMBOL: failures
 

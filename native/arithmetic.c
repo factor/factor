@@ -66,5 +66,5 @@ F_FIXNUM arithmetic_type(void)
 
 void primitive_arithmetic_type(void)
 {
-	dpush(arithmetic_type());
+	dpush(tag_fixnum(arithmetic_type()));
 }

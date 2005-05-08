@@ -125,7 +125,7 @@ M: %type generate-node ( vop -- )
 M: %arithmetic-type generate-node ( vop -- )
     #! This one works directly with the stack. It outputs an
     #! UNBOXED value in vop-dest.
-    EAX check-dest
+    0 <vreg> check-dest
     <label> "end" set
     ! Load top two stack values
     EAX [ ESI -4 ] MOV
@@ -138,5 +138,5 @@ M: %arithmetic-type generate-node ( vop -- )
     "end" get JE
     ! No, they are not equal. Call a runtime function to
     ! coerce the integers to a higher type.
-    "arithmetic_type" compile-c-call
+    "arithmetic_type" f compile-c-call
     "end" get save-xt ;

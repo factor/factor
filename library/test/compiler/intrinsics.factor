@@ -122,3 +122,11 @@ math-internals test words ;
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 
 [ 3 1 ] [ 10 3 [ fixnum/mod ] compile-1 ] unit-test
+
+[ t ] [ 3 type 3 [ type ] compile-1 eq? ] unit-test
+[ t ] [ 3 >bignum type 3 >bignum [ type ] compile-1 eq? ] unit-test
+[ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
+[ t ] [ f type f [ type ] compile-1 eq? ] unit-test
+
+[ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
+[ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
