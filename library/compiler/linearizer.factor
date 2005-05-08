@@ -57,6 +57,10 @@ errors prettyprint kernel-internals ;
     [ node-param get ] bind %call ,
 ] "linearizer" set-word-prop
 
+#call-label [
+    [ node-param get ] bind %call-label ,
+] "linearizer" set-word-prop
+
 : ifte-head ( label -- )
     in-1  1 %dec-d , 0 %jump-t , ;
 
