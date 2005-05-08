@@ -57,14 +57,14 @@ errors prettyprint kernel-internals ;
     [ node-param get ] bind %call ,
 ] "linearizer" set-word-prop
 
-: conditional ( label -- )
+: ifte-head ( label -- )
     in-1  1 %dec-d , 0 %jump-t , ;
 
 : linearize-ifte ( param -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
     2unlist  <label> [
-        conditional
+        ifte-head
         (linearize) ( false branch )
         <label> dup %jump-label ,
     ] keep %label , ( branch target of BRANCH-T )
@@ -80,6 +80,7 @@ errors prettyprint kernel-internals ;
     #! label/branch pairs.
     in-1
     1 %dec-d ,
+    0 %untag-fixnum ,
     0 %dispatch ,
     <label> ( end label ) swap
     [ <label> dup %target-label ,  cons ] map

@@ -4,9 +4,6 @@ IN: compiler
 USING: assembler errors kernel math math-internals memory
 namespaces words ;
 
-: dest/src ( vop -- dest src )
-    dup vop-dest v>operand swap vop-source v>operand ;
-
 : simple-overflow ( dest -- )
     #! If the previous arithmetic operation overflowed, then we
     #! turn the result into a bignum and leave it in EAX. This

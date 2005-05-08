@@ -94,6 +94,7 @@ VOP: %indirect
 : %indirect ( vreg obj -- ) >r <vreg> r> f -rot f <%indirect> ;
 
 ! object slot accessors
+! mask off a tag (see also %untag-fixnum)
 VOP: %untag
 : %untag <vreg> dest-vop <%untag> ;
 VOP: %slot
@@ -139,6 +140,9 @@ VOP: %arithmetic-type
 
 VOP: %tag-fixnum
 : %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;
+
+VOP: %untag-fixnum
+: %untag-fixnum <vreg> dest-vop <%untag-fixnum> ;
 
 : check-dest ( vop reg -- )
     swap vop-dest = [ "invalid VOP destination" throw ] unless ;

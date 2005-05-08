@@ -8,6 +8,9 @@ GENERIC: v>operand
 M: integer v>operand address ;
 M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
 
+: dest/src ( vop -- dest src )
+    dup vop-dest v>operand swap vop-source v>operand ;
+
 ! Not used on x86
 M: %prologue generate-node drop ;
 
@@ -44,14 +47,17 @@ M: %untag generate-node ( vop -- )
 M: %tag-fixnum generate-node ( vop -- )
     vop-dest v>operand 3 SHL ;
 
+M: %untag-fixnum generate-node ( vop -- )
+    vop-dest v>operand 3 SHR ;
+
 M: %slot generate-node ( vop -- )
     #! the untagged object is in vop-dest, the tagged slot
-    #! number is in vop-literal.
-    dup vop-source v>operand swap vop-dest v>operand
+    #! number is in vop-source.
+    dest/src
     ! turn tagged fixnum slot # into an offset, multiple of 4
-    over 1 SHR
+    dup 1 SHR
     ! compute slot address in vop-dest
-    tuck ADD
+    dupd ADD
     ! load slot value in vop-dest
     dup unit MOV ;
 
@@ -85,16 +91,21 @@ M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    vop-source v>operand dup 1 SHR
+    vop-source v>operand
+    ! Multiply by 4 to get a jump table offset
+    dup 2 SHL
+    ! Add to jump table base
     dup HEX: ffff ADD  just-compiled >r f rel-address
+    ! Jump to jump table entry
     unit JMP
+    ! Align for better performance
     compile-aligned
+    ! Fix up jump table pointer
     compiled-offset r> set-compiled-cell ( fixup -- ) ;
 
 M: %type generate-node ( vop -- )
     #! Intrinstic version of type primitive. It outputs an
     #! UNBOXED value in vop-dest.
-    <label> "object" set
     <label> "f" set
     <label> "end" set
     vop-dest v>operand
@@ -104,11 +115,9 @@ M: %type generate-node ( vop -- )
     dup tag-mask AND
     ! Compare with object tag number (3).
     dup object-tag CMP
-    ! Jump if the object stores type info in its header
-    "object" get JE
+    ! Jump if the object doesn't store type info in its header
+    "end" get JNE
     ! It doesn't store type info in its header
-    "end" get JMP
-    "object" get save-xt
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
     ECX object-tag CMP
