@@ -63,29 +63,6 @@ hashtables ;
         "/library/tools/gensym.factor"
         "/library/tools/interpreter.factor"
         "/library/tools/memory.factor"
-        
-        "/library/inference/conditions.factor"
-        "/library/inference/dataflow.factor"
-        "/library/inference/inference.factor"
-        "/library/inference/ties.factor"
-        "/library/inference/branches.factor"
-        "/library/inference/words.factor"
-        "/library/inference/stack.factor"
-        "/library/inference/types.factor"
-        
-        "/library/compiler/assembler.factor"
-        "/library/compiler/relocate.factor"
-        "/library/compiler/xt.factor"
-        "/library/compiler/optimizer.factor"
-        "/library/compiler/linearizer.factor"
-        "/library/compiler/simplifier.factor"
-        "/library/compiler/generator.factor"
-        "/library/compiler/compiler.factor"
-        
-        "/library/alien/dataflow.factor"
-        "/library/alien/c-types.factor"
-        "/library/alien/enums.factor"
-        "/library/alien/structs.factor"
     ] pull-in
 
     "delegate" [ "generic" ] search

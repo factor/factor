@@ -35,8 +35,8 @@ words ;
 \ swap [
     drop
     in-2
-    1 0 %replace-d ,
-    0 1 %replace-d ,
+    0 0 %replace-d ,
+    1 1 %replace-d ,
 ] "linearizer" set-word-prop
 
 \ over [
@@ -97,7 +97,7 @@ words ;
         drop
         in-2
         1 %dec-d ,
-        1 %untag ,
+        0 %untag ,
         1 0 %slot ,
     ] ifte  out-1
 ] "linearizer" set-word-prop
@@ -110,13 +110,13 @@ words ;
         1 %dec-d ,
         in-2
         2 %dec-d ,
-        slot@ >r 1 0 r> %fast-set-slot ,
+        slot@ >r 0 1 r> %fast-set-slot ,
     ] [
         drop
         in-3
         3 %dec-d ,
         1 %untag ,
-        2 1 0 %set-slot ,
+        0 1 2 %set-slot ,
     ] ifte
 ] "linearizer" set-word-prop
 
@@ -126,43 +126,93 @@ words ;
     drop
     in-1
     0 %type ,
+    0 %tag-fixnum ,
     out-1
 ] "linearizer" set-word-prop
 
-: binary-op-reg ( op -- )
-    in-2
-    << vreg f 1 >> << vreg f 0 >> rot execute ,
+\ arithmetic-type intrinsic
+
+\ arithmetic-type [
+    drop
+    in-1
+    0 %arithmetic-type ,
+    0 %tag-fixnum ,
+    out-1
+] "linearizer" set-word-prop
+
+: binary-op-reg ( op out -- )
+    >r in-2
+    1 <vreg> 0 <vreg> rot execute ,
     1 %dec-d ,
-    out-1 ;
+    r> 0 %replace-d , ;
 
-
-: binary-op ( node op -- )
-    node-consume-d rot hash
+: binary-op ( node op out -- )
+    #! out is a vreg where the vop stores the result.
+    >r >r node-consume-d swap hash
     dup top-literal? [
         1 %dec-d ,
         in-1
-        peek literal-value << vreg f 0 >> rot execute ,
-        out-1
+        peek literal-value 0 <vreg> r> execute ,
+        r> 0 %replace-d ,
     ] [
         drop
-        binary-op-reg
+        r> r> binary-op-reg
     ] ifte ;
 
 [
     [[ fixnum+       %fixnum+       ]]
     [[ fixnum-       %fixnum-       ]]
-    [[ fixnum*       %fixnum*       ]]
-    [[ fixnum-mod    %fixnum-mod    ]]
     [[ fixnum-bitand %fixnum-bitand ]]
     [[ fixnum-bitor  %fixnum-bitor  ]]
     [[ fixnum-bitxor %fixnum-bitxor ]]
-    [[ fixnum/i      %fixnum/i      ]]
+    [[ fixnum-shift  %fixnum-shift  ]]
     [[ fixnum<=      %fixnum<=      ]]
     [[ fixnum<       %fixnum<       ]]
     [[ fixnum>=      %fixnum>=      ]]
     [[ fixnum>       %fixnum>       ]]
 ] [
     uncons over intrinsic
-    [ literal, \ binary-op , ] make-list
+    [ literal, 0 , \ binary-op , ] make-list
     "linearizer" set-word-prop
 ] each
+
+\ fixnum* intrinsic
+
+\ fixnum* [
+    drop \ %fixnum* 0 binary-op-reg
+] "linearizer" set-word-prop
+
+\ fixnum-mod intrinsic
+
+\ fixnum-mod [
+    ! This is not clever. Because of x86, %fixnum-mod is
+    ! hard-coded to put its output in vreg 2, which happends to
+    ! be EDX there.
+    drop \ %fixnum-mod 2 binary-op-reg
+] "linearizer" set-word-prop
+
+\ fixnum/i intrinsic
+
+\ fixnum/i [
+    drop \ %fixnum/i 0 binary-op-reg
+] "linearizer" set-word-prop
+
+\ fixnum/mod intrinsic
+
+\ fixnum/mod [
+    ! See the remark on fixnum-mod for vreg usage
+    drop
+    in-2
+    0 <vreg> 1 <vreg> %fixnum/mod ,
+    2 0 %replace-d ,
+    0 1 %replace-d ,
+] "linearizer" set-word-prop
+
+\ fixnum-bitnot intrinsic
+
+\ fixnum-bitnot [
+    drop
+    in-1
+    0 %fixnum-bitnot ,
+    out-1
+] "linearizer" set-word-prop

@@ -10,8 +10,6 @@ stdio prettyprint ;
     [ tuck builtin-type <class-tie> cons ] project-with
     [ cdr class-tie-class ] subset ;
 
-: value-types ( value -- list ) value-class builtin-supertypes ;
-
 : literal-type ( -- )
     dataflow-drop, pop-d value-types car
     apply-literal ;

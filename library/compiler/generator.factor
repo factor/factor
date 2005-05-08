@@ -1,10 +1,5 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
-
-DEFER: compile-call-label ( label -- )
-DEFER: compile-jump-label ( label -- )
-
 IN: compiler
 USING: assembler errors inference kernel lists math namespaces
 sequences strings vectors words ;
@@ -51,12 +46,6 @@ M: %label generate-node ( vop -- )
     vop-label save-xt ;
 
 M: %end-dispatch generate-node ( vop -- ) drop ;
-
-: compile-call ( word -- ) dup postpone-word compile-call-label ;
-
-M: %call generate-node vop-label compile-call ;
-
-M: %jump-label generate-node vop-label compile-jump-label ;
 
 : compile-target ( word -- ) 0 compile-cell absolute ;
 

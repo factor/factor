@@ -5,7 +5,7 @@ USING: alien assembler inference kernel kernel-internals lists
 math memory namespaces words ;
 
 \ alien-invoke [
-    uncons load-library 2dup dlsym CALL t rel-dlsym
+    uncons load-library compile-c-call
 ] "generator" set-word-prop
 
 \ alien-global [

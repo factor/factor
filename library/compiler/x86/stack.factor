@@ -15,7 +15,7 @@ sequences words ;
 
 : reg-stack ( reg n -- op ) cell * neg 2list ;
 : ds-op ( n -- op ) ESI swap reg-stack ;
-: rs-op ( n -- op ) ECX swap reg-stack ;
+: cs-op ( n -- op ) ECX swap reg-stack ;
 
 M: %peek-d generate-node ( vop -- )
     dup vop-dest v>operand swap vop-literal ds-op MOV ;
@@ -35,14 +35,15 @@ M: %immediate generate-node ( vop -- )
 M: %immediate-d generate-node ( vop -- )
     vop-literal [ ESI ] swap address MOV ;
 
+: load-indirect ( dest literal -- )
+    intern-literal unit MOV f rel-address ;
+
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table
-    dup vop-dest v>operand
-    swap vop-literal intern-literal unit MOV
-    f rel-address ;
+    dup vop-dest v>operand swap vop-literal load-indirect ;
 
 M: %peek-r generate-node ( vop -- )
-    ECX CS>  dup vop-dest v>operand swap vop-literal rs-op MOV ;
+    ECX CS>  dup vop-dest v>operand swap vop-literal cs-op MOV ;
 
 M: %dec-r generate-node ( vop -- )
     #! Can only follow a %peek-r
@@ -50,7 +51,7 @@ M: %dec-r generate-node ( vop -- )
 
 M: %replace-r generate-node ( vop -- )
     #! Can only follow a %inc-r
-    dup vop-source v>operand swap vop-literal rs-op swap MOV
+    dup vop-source v>operand swap vop-literal cs-op swap MOV
     ECX >CS ;
 
 M: %inc-r generate-node ( vop -- )

@@ -6,31 +6,6 @@ USE: lists
 USE: math
 USE: kernel
 
-! Make sure that stack ops compile to correct code.
-: compile-1 ( quot -- word )
-    gensym [ swap define-compound ] keep dup compile execute ;
-
-[ ] [ 1 [ drop ] compile-1 ] unit-test
-[ ] [ [ 1 drop ] compile-1 ] unit-test
-[ ] [ [ 1 2 2drop ] compile-1 ] unit-test
-[ ] [ 1 [ 2 2drop ] compile-1 ] unit-test
-[ ] [ 1 2 [ 2drop ] compile-1 ] unit-test
-[ 2 1 ] [ [ 1 2 swap ] compile-1 ] unit-test
-[ 2 1 ] [ 1 [ 2 swap ] compile-1 ] unit-test
-[ 2 1 ] [ 1 2 [ swap ] compile-1 ] unit-test
-[ 1 1 ] [ 1 [ dup ] compile-1 ] unit-test
-[ 1 1 ] [ [ 1 dup ] compile-1 ] unit-test
-[ 1 2 1 ] [ [ 1 2 over ] compile-1 ] unit-test
-[ 1 2 1 ] [ 1 [ 2 over ] compile-1 ] unit-test
-[ 1 2 1 ] [ 1 2 [ over ] compile-1 ] unit-test
-[ 1 2 3 1 ] [ [ 1 2 3 pick ] compile-1 ] unit-test
-[ 1 2 3 1 ] [ 1 [ 2 3 pick ] compile-1 ] unit-test
-[ 1 2 3 1 ] [ 1 2 [ 3 pick ] compile-1 ] unit-test
-[ 1 2 3 1 ] [ 1 2 3 [ pick ] compile-1 ] unit-test
-[ 1 1 2 ] [ [ 1 2 dupd ] compile-1 ] unit-test
-[ 1 1 2 ] [ 1 [ 2 dupd ] compile-1 ] unit-test
-[ 1 1 2 ] [ 1 2 [ dupd ] compile-1 ] unit-test
-
 ! Test various kill combinations
 
 : kill-1

@@ -89,7 +89,7 @@ SYMBOL: failures
                 "compiler/simplifier" "compiler/simple"
                 "compiler/stack" "compiler/ifte"
                 "compiler/generic" "compiler/bail-out"
-                "compiler/linearizer"
+                "compiler/linearizer" "compiler/intrinsics"
             ] %
         ] unless
         

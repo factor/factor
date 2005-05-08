@@ -80,3 +80,5 @@ GENERIC: abs ( z -- |z| )
     rot [
         rot [ [ rot dup slip -rot ] repeat ] keep -rot
     ] repeat 2drop ; inline
+
+: power-of-2? ( n -- ? ) dup dup neg bitand = ;

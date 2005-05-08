@@ -79,6 +79,9 @@ M: computed literal-value ( value -- )
     "A literal value was expected where a computed value was"
     " found: " rot unparse cat3 inference-error ;
 
+: value-types ( value -- list )
+    value-class builtin-supertypes ;
+
 : pop-literal ( -- obj )
     dataflow-drop, pop-d literal-value ;
 

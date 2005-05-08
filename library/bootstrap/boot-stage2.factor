@@ -24,19 +24,42 @@ recrossref
         drop
     ] ifte ;
 
-! These are loaded here until bootstrap gets some fixes
+"Loading compiler and friends..." print
 t [
+    "/library/inference/conditions.factor"
+    "/library/inference/dataflow.factor"
+    "/library/inference/inference.factor"
+    "/library/inference/ties.factor"
+    "/library/inference/branches.factor"
+    "/library/inference/words.factor"
+    "/library/inference/stack.factor"
+    "/library/inference/types.factor"
+
+    "/library/compiler/assembler.factor"
+    "/library/compiler/relocate.factor"
+    "/library/compiler/xt.factor"
+    "/library/compiler/optimizer.factor"
+    "/library/compiler/vops.factor"
+    "/library/compiler/linearizer.factor"
+    "/library/compiler/intrinsics.factor"
+    "/library/compiler/simplifier.factor"
+    "/library/compiler/generator.factor"
+    "/library/compiler/compiler.factor"
+        
+    "/library/alien/dataflow.factor"
+    "/library/alien/c-types.factor"
+    "/library/alien/enums.factor"
+    "/library/alien/structs.factor"
     "/library/alien/compiler.factor"
     "/library/alien/malloc.factor"
+
     "/library/io/buffer.factor"
 ] pull-in
 
-"Loading compiler backend..." print
-
 cpu "x86" = [
     "/library/compiler/x86/assembler.factor"
-    "/library/compiler/x86/stack.factor"
     "/library/compiler/x86/generator.factor"
+    "/library/compiler/x86/stack.factor"
     "/library/compiler/x86/fixnum.factor"
     "/library/compiler/x86/alien.factor"
 ] pull-in
@@ -47,39 +70,5 @@ cpu "ppc" = [
     "/library/compiler/ppc/generator.factor"
     "/library/compiler/ppc/alien.factor"
 ] pull-in
-
-"Compiling base..." print
-
-unix? [
-    "sdl"      "libSDL.so"     "cdecl"    add-library
-    "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library
-    "sdl-ttf"  "libSDL_ttf.so" "cdecl"    add-library
-] when
-
-win32? [
-    "kernel32" "kernel32.dll"  "stdcall"  add-library
-    "user32"   "user32.dll"    "stdcall"  add-library
-    "gdi32"    "gdi32.dll"     "stdcall"  add-library
-    "winsock"  "ws2_32.dll"    "stdcall"  add-library
-    "mswsock"  "mswsock.dll"   "stdcall"  add-library
-    "libc"     "msvcrt.dll"    "cdecl"    add-library
-    "sdl"      "SDL.dll"       "cdecl"    add-library
-    "sdl-gfx"  "SDL_gfx.dll"   "cdecl"    add-library
-    "sdl-ttf"  "SDL_ttf.dll"   "cdecl"    add-library
-] when
-
-default-cli-args
-parse-command-line
-init-assembler
-
-: compile? "compile" get supported-cpu? and ;
-
-compile? [
-    \ car compile
-    \ length compile
-    \ = compile
-    \ unparse compile
-    \ scan compile
-] when
 
 "/library/bootstrap/boot-stage3.factor" run-resource
