@@ -30,10 +30,10 @@ M: %jump generate-node ( vop -- )
     vop-label dup postpone-word JMP ;
 
 M: %jump-f generate-node ( vop -- )
-    dup vop-source v>operand f address CMP vop-label JNE ;
+    dup vop-source v>operand f address CMP vop-label JE ;
 
 M: %jump-t generate-node ( vop -- )
-    dup vop-source v>operand f address CMP vop-label JE ;
+    dup vop-source v>operand f address CMP vop-label JNE ;
 
 M: %return-to generate-node ( vop -- )
     0 PUSH vop-label absolute ;

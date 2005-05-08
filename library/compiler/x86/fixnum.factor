@@ -130,21 +130,3 @@ M: %fixnum>= generate-node ( vop -- )
 
 M: %eq? generate-node ( vop -- )
     fixnum-compare  \ JE  conditional ;
-! 
-! \ arithmetic-type [
-!     drop
-!     EAX [ ESI -4 ] MOV
-!     EAX BIN: 111 AND
-!     EDX [ ESI ] MOV
-!     EDX BIN: 111 AND
-!     EAX EDX CMP
-!     0 JE just-compiled >r
-!     \ arithmetic-type compile-call
-!     0 JMP just-compiled
-!     compiled-offset r> patch
-!     EAX 3 SHL
-!     PUSH-DS
-!     compiled-offset swap patch
-! ] "generator" set-word-prop
-! 
-! \ arithmetic-type [ \ arithmetic-type self ] "infer" set-word-prop
