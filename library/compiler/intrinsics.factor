@@ -143,8 +143,8 @@ words ;
 
 : binary-op-reg ( op out -- )
     >r in-2
-    1 <vreg> 0 <vreg> rot execute ,
     1 %dec-d ,
+    1 <vreg> 0 <vreg> rot execute ,
     r> 0 %replace-d , ;
 
 : binary-op ( node op out -- )

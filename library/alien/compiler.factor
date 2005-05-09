@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler errors generic inference kernel lists math
-namespaces sequences stdio strings unparser words ;
+USING: assembler compiler errors generic inference kernel lists
+math namespaces sequences stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -48,11 +48,9 @@ M: alien-error error. ( error -- )
     #! namespace.
     drop <alien-error> throw ;
 
-: alien-global ( type library name -- value )
-    #! Fetch the value of C global variable.
-    #! 'type' is a type spec. 'library' is an entry in the
-    #! "libraries" namespace.
-    <alien-error> throw ;
+! These are set in the alien-invoke dataflow IR node.
+SYMBOL: alien-returns
+SYMBOL: alien-parameters
 
 : set-alien-returns ( returns node -- )
     [ dup alien-returns set ] bind
@@ -76,8 +74,6 @@ M: alien-error error. ( error -- )
     [ set-alien-parameters ] keep
     set-alien-returns ;
 
-DEFER: alien-invoke
-
 : infer-alien-invoke ( -- )
     \ alien-invoke "infer-effect" word-prop car ensure-d
     pop-literal
@@ -86,27 +82,13 @@ DEFER: alien-invoke
     pop-literal -rot
     r> swap alien-invoke-node ;
 
-: alien-global-node ( type name library -- )
-    2dup ensure-dlsym
-    cons \ alien-global dataflow,
-    set-alien-returns ;
-
-DEFER: alien-global
-
-: infer-alien-global ( -- )
-    \ alien-global "infer-effect" word-prop car ensure-d
-    pop-literal
-    pop-literal
-    pop-literal -rot
-    alien-global-node ;
-
 : parameters [ alien-parameters get reverse ] bind ;
 
 : stack-space ( parameters -- n )
     0 swap [ c-size cell align + ] each ;
 
 : unbox-parameter ( n parameter -- )
-    c-type [ "unboxer" get cons "unbox-op" get ] bind swons , ;
+    c-type [ "unboxer" get cons "unbox-op" get ] bind execute , ;
 
 : linearize-parameters ( node -- count )
     #! Generate code for boxing a list of C types, then generate
@@ -117,41 +99,30 @@ DEFER: alien-global
     #! Return amount stack must be unwound by.
     parameters
     dup stack-space
-    dup #parameters swons , >r
+    dup %parameters , >r
     dup dup length swap [ >r 1 - dup r> unbox-parameter ] each drop
-    length [ #parameter swons ] project % r> ;
+    length [ %parameter ] project % r> ;
 
 : linearize-returns ( returns -- )
     [ alien-returns get ] bind dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get "box-op" get ] bind swons ,
+        c-type [ "boxer" get "box-op" get ] bind execute ,
     ] ifte ;
 
 : linearize-alien-invoke ( node -- )
     dup linearize-parameters >r
-    dup [ node-param get ] bind \ alien-invoke swons ,
+    dup [ node-param get ] bind %alien-invoke ,
     dup [ node-param get cdr library-abi "stdcall" = ] bind
-    r> swap [ drop ] [ #cleanup swons , ] ifte
+    r> swap [ drop ] [ %cleanup , ] ifte
     linearize-returns ;
 
 \ alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
-
-: linearize-alien-global ( node -- )
-    dup [ node-param get ] bind \ alien-global swons ,
-    linearize-returns ;
-
-\ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
 
 \ alien-invoke [ [ string string string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
 \ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
-
-\ alien-global [ [ string string string ] [ object ] ]
-"infer-effect" set-word-prop
-
-\ alien-global [ infer-alien-global ] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

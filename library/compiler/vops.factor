@@ -7,6 +7,9 @@ USING: errors generic kernel namespaces parser ;
 ! representations used by Factor. It is basically a high-level
 ! assembly language. Linear IR operations are called VOPs.
 
+! This file defines all the types of VOPs. A linear IR program
+! is then just a list of VOPs.
+
 ! A virtual register
 TUPLE: vreg n ;
 
@@ -30,6 +33,7 @@ GENERIC: generate-node ( vop -- )
 : src-vop ( src) f f f ;
 : dest-vop ( dest) f swap f f ;
 : src/dest-vop ( src dest) f f ;
+: literal-vop ( literal) >r f f r> f ;
 
 ! miscellanea
 VOP: %prologue
@@ -67,22 +71,22 @@ VOP: %end-dispatch
 VOP: %peek-d
 : %peek-d ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-d> ;
 VOP: %dec-d
-: %dec-d ( n -- ) >r f f r> f <%dec-d> ;
+: %dec-d ( n -- ) literal-vop <%dec-d> ;
 VOP: %replace-d
 : %replace-d ( vreg n -- ) >r <vreg> f r> f <%replace-d> ;
 VOP: %inc-d
-: %inc-d ( n -- ) >r f f r> f <%inc-d> ;
+: %inc-d ( n -- ) literal-vop <%inc-d> ;
 VOP: %immediate
 VOP: %immediate-d
-: %immediate-d ( obj -- ) >r f f r> f <%immediate-d> ;
+: %immediate-d ( obj -- ) literal-vop <%immediate-d> ;
 VOP: %peek-r
 : %peek-r ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-r> ;
 VOP: %dec-r
-: %dec-r ( n -- ) >r f f r> f <%dec-r> ;
+: %dec-r ( n -- ) literal-vop <%dec-r> ;
 VOP: %replace-r
 : %replace-r ( vreg n -- ) >r <vreg> f r> f <%replace-r> ;
 VOP: %inc-r
-: %inc-r ( n -- ) >r f f r> f <%inc-r> ;
+: %inc-r ( n -- ) literal-vop <%inc-r> ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
@@ -146,3 +150,34 @@ VOP: %untag-fixnum
 
 : check-dest ( vop reg -- )
     swap vop-dest = [ "invalid VOP destination" throw ] unless ;
+
+! alien operations
+VOP: %parameters
+: %parameters ( n -- vop ) literal-vop <%parameters> ;
+
+VOP: %parameter
+: %parameter ( n -- vop ) literal-vop <%parameter> ;
+
+VOP: %cleanup
+: %cleanup ( n -- vop ) literal-vop <%cleanup> ;
+
+VOP: %unbox
+: %unbox ( [[ n func ]] -- vop ) literal-vop <%unbox> ;
+
+VOP: %unbox-float
+: %unbox-float ( [[ n func ]] -- vop ) literal-vop <%unbox-float> ;
+
+VOP: %unbox-double
+: %unbox-double ( [[ n func ]] -- vop ) literal-vop <%unbox-double> ;
+
+VOP: %box
+: %box ( func -- vop ) literal-vop <%box> ;
+
+VOP: %box-float
+: %box-float ( func -- vop ) literal-vop <%box-float> ;
+
+VOP: %box-double
+: %box-double ( [[ n func ]] -- vop ) literal-vop <%box-double> ;
+
+VOP: %alien-invoke
+: %alien-invoke ( func -- vop ) literal-vop <%alien-invoke> ;

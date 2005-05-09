@@ -1,17 +1,17 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler errors generic hashtables kernel lists math
-namespaces parser sequences strings words ;
+USING: assembler compiler errors generic hashtables kernel lists
+math namespaces parser sequences strings words ;
 
 : <c-type> ( -- type )
     <namespace> [
         [ "No setter" throw ] "setter" set
         [ "No getter" throw ] "getter" set
         "no boxer" "boxer" set
-        #box "box-op" set
+        \ %box "box-op" set
         "no unboxer" "unboxer" set
-        #unbox "unbox-op" set
+        \ %unbox "unbox-op" set
         0 "width" set
     ] extend ;
 
@@ -170,9 +170,9 @@ global [ c-types nest drop ] bind
     cell "width" set
     cell "align" set
     "box_float" "boxer" set
-    #box-float "box-op" set
+    \ %box-float "box-op" set
     "unbox_float" "unboxer" set
-    #unbox-float "unbox-op" set
+    \ %unbox-float "unbox-op" set
 ] "float" define-primitive-type
 
 [
@@ -181,9 +181,9 @@ global [ c-types nest drop ] bind
     cell 2 * "width" set
     cell 2 * "align" set
     "box_double" "boxer" set
-    #box-double "box-op" set
+    \ %box-double "box-op" set
     "unbox_double" "unboxer" set
-    #unbox-double "unbox-op" set
+    \ %unbox-double "unbox-op" set
 ] "double" define-primitive-type
 
 : alias-c-type ( old new -- )
