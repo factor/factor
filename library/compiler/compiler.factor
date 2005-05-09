@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
-USING: errors inference kernel lists namespaces prettyprint
-stdio words ;
+USING: compiler-backend compiler-frontend errors inference
+kernel lists namespaces prettyprint stdio words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;

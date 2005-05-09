@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: assembler errors kernel math math-internals memory
-namespaces words ;
+IN: compiler-backend
+USING: assembler compiler errors kernel math math-internals
+memory namespaces words ;
 
 : simple-overflow ( dest -- )
     #! If the previous arithmetic operation overflowed, then we
@@ -130,3 +130,22 @@ M: %fixnum>= generate-node ( vop -- )
 
 M: %eq? generate-node ( vop -- )
     fixnum-compare  \ JE  conditional ;
+
+: fixnum-branch ( vop -- label )
+    dup vop-dest v>operand over vop-source v>operand CMP
+    vop-label ;
+
+M: %jump-fixnum< generate-node ( vop -- )
+    fixnum-branch JL ;
+
+M: %jump-fixnum<= generate-node ( vop -- )
+    fixnum-branch JLE ;
+
+M: %jump-fixnum> generate-node ( vop -- )
+    fixnum-branch JG ;
+
+M: %jump-fixnum>= generate-node ( vop -- )
+    fixnum-branch JGE ;
+
+M: %jump-eq? generate-node ( vop -- )
+    fixnum-branch JE ;

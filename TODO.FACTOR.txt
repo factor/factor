@@ -25,11 +25,12 @@
 - dipping seq-2nmap, seq-2each
 - array sort
 - tiled window manager
-- PPC #box-float #unbox-float
+- redo new compiler backend for PowerPC
 - weird bug uncovered during bootstrap stress-test
 - images saved from plugin do not work
 - making an image from plugin hangs
 - generic skip
+- inference needs to be more robust with heavily recursive code
 
 + plugin:
 

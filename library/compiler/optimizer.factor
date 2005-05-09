@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
+IN: compiler-frontend
 USING: inference kernel kernel-internals lists namespaces
 sequences vectors words words ;
 

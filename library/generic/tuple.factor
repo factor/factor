@@ -68,8 +68,9 @@ UNION: arrayed array tuple ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word swap [ swap class eq? ] cons
-    define-compound ;
+    dup predicate-word swap [
+        literal, [ swap class eq? ] %
+    ] make-list define-compound ;
 
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,

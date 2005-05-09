@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: alien assembler inference kernel kernel-internals lists
-math memory namespaces sequences words ;
+IN: compiler-backend
+USING: alien assembler compiler inference kernel
+kernel-internals lists math memory namespaces sequences words ;
 
 GENERIC: v>operand
 M: integer v>operand address ;

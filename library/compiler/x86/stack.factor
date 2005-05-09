@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: alien assembler inference kernel lists math memory
-sequences words ;
+IN: compiler-backend
+USING: alien assembler compiler inference kernel lists math
+memory sequences words ;
 
 : rel-cs ( -- )
     #! Add an entry to the relocation table for the 32-bit
@@ -20,14 +20,12 @@ sequences words ;
 M: %peek-d generate-node ( vop -- )
     dup vop-dest v>operand swap vop-literal ds-op MOV ;
 
-M: %dec-d generate-node ( vop -- )
-    vop-literal ESI swap cell * SUB ;
-
 M: %replace-d generate-node ( vop -- )
     dup vop-source v>operand swap vop-literal ds-op swap MOV ;
 
 M: %inc-d generate-node ( vop -- )
-    vop-literal ESI swap cell * ADD ;
+    ESI swap vop-literal cell *
+    dup 0 > [ ADD ] [ neg SUB ] ifte ;
 
 M: %immediate generate-node ( vop -- )
     dup vop-dest v>operand swap vop-literal address MOV ;

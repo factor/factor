@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: assembler generic hashtables inference kernel
-kernel-internals lists math math-internals namespaces sequences
-words ;
+IN: compiler-frontend
+USING: assembler compiler-backend generic hashtables inference
+kernel kernel-internals lists math math-internals namespaces
+sequences words ;
 
 : immediate? ( obj -- ? )
     #! fixnums and f have a pointerless representation, and
@@ -171,6 +171,7 @@ words ;
     [[ fixnum<       %fixnum<       ]]
     [[ fixnum>=      %fixnum>=      ]]
     [[ fixnum>       %fixnum>       ]]
+    [[ eq?           %eq?           ]]
 ] [
     uncons over intrinsic
     [ literal, 0 , \ binary-op , ] make-list

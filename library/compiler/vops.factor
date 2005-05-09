@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: errors generic kernel namespaces parser ;
+IN: compiler-backend
+USING: errors generic hashtables kernel math namespaces parser
+words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -10,14 +11,22 @@ USING: errors generic kernel namespaces parser ;
 ! This file defines all the types of VOPs. A linear IR program
 ! is then just a list of VOPs.
 
+: <label> ( -- label )
+    #! Make a label.
+    gensym  dup t "label" set-word-prop ;
+
+: label? ( obj -- ? )
+    dup word? [ "label" word-prop ] [ drop f ] ifte ;
+
 ! A virtual register
 TUPLE: vreg n ;
 
 ! A virtual operation
 TUPLE: vop source dest literal label ;
 
-! Compile a VOP.
-GENERIC: generate-node ( vop -- )
+GENERIC: calls-label? ( label vop -- ? )
+
+M: vop calls-label? vop-label = ;
 
 : make-vop ( source dest literal label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
@@ -40,8 +49,14 @@ VOP: %prologue
 : %prologue empty-vop <%prologue> ;
 VOP: %label
 : %label label-vop <%label> ;
+M: %label calls-label? 2drop f ;
+
+! Return vops take a label that is ignored, to have the
+! same stack effect as jumps. This is needed for the
+! simplifier.
 VOP: %return
-: %return empty-vop <%return> ;
+: %return ( label) label-vop <%return> ;
+
 VOP: %return-to
 : %return-to label-vop <%return-to> ;
 VOP: %jump
@@ -70,23 +85,23 @@ VOP: %end-dispatch
 ! stack operations
 VOP: %peek-d
 : %peek-d ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-d> ;
-VOP: %dec-d
-: %dec-d ( n -- ) literal-vop <%dec-d> ;
 VOP: %replace-d
 : %replace-d ( vreg n -- ) >r <vreg> f r> f <%replace-d> ;
 VOP: %inc-d
 : %inc-d ( n -- ) literal-vop <%inc-d> ;
+: %dec-d ( n -- ) neg %inc-d ;
 VOP: %immediate
 VOP: %immediate-d
 : %immediate-d ( obj -- ) literal-vop <%immediate-d> ;
 VOP: %peek-r
 : %peek-r ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-r> ;
-VOP: %dec-r
-: %dec-r ( n -- ) literal-vop <%dec-r> ;
 VOP: %replace-r
 : %replace-r ( vreg n -- ) >r <vreg> f r> f <%replace-r> ;
 VOP: %inc-r
 : %inc-r ( n -- ) literal-vop <%inc-r> ;
+! this exists, unlike %dec-d which does not, due to x86 quirks
+VOP: %dec-r
+: %dec-r ( n -- ) literal-vop <%dec-r> ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
@@ -128,12 +143,27 @@ VOP: %fixnum-bitor  : %fixnum-bitor src/dest-vop <%fixnum-bitor> ;
 VOP: %fixnum-bitxor : %fixnum-bitxor src/dest-vop <%fixnum-bitxor> ;
 VOP: %fixnum-bitnot : %fixnum-bitnot <vreg> dest-vop <%fixnum-bitnot> ;
 VOP: %fixnum-shift  : %fixnum-shift src/dest-vop <%fixnum-shift> ;
+
 VOP: %fixnum<=      : %fixnum<= src/dest-vop <%fixnum<=> ;
 VOP: %fixnum<       : %fixnum< src/dest-vop <%fixnum<> ;
 VOP: %fixnum>=      : %fixnum>= src/dest-vop <%fixnum>=> ;
 VOP: %fixnum>       : %fixnum> src/dest-vop <%fixnum>> ;
-
 VOP: %eq?           : %eq? src/dest-vop <%eq?> ;
+
+VOP: %jump-fixnum<= : %jump-fixnum<= f swap <%jump-fixnum<=> ;
+VOP: %jump-fixnum<  : %jump-fixnum< f swap <%jump-fixnum<> ;
+VOP: %jump-fixnum>= : %jump-fixnum>= f swap <%jump-fixnum>=> ;
+VOP: %jump-fixnum>  : %jump-fixnum> f swap <%jump-fixnum>> ;
+VOP: %jump-eq?      : %jump-eq? f swap <%jump-eq?> ;
+
+: fast-branch ( class -- class )
+    {{
+        [[ %fixnum<= %jump-fixnum<= ]]
+        [[ %fixnum<  %jump-fixnum<  ]]
+        [[ %fixnum>= %jump-fixnum>= ]]
+        [[ %fixnum>  %jump-fixnum>  ]]
+        [[ %eq?      %jump-eq?      ]]
+    }} hash ;
 
 ! some slightly optimized inline assembly
 VOP: %type

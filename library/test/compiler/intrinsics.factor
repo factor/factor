@@ -32,6 +32,9 @@ math-internals test words ;
 [ 1 1 2 ] [ [ 1 2 dupd ] compile-1 ] unit-test
 [ 1 1 2 ] [ 1 [ 2 dupd ] compile-1 ] unit-test
 [ 1 1 2 ] [ 1 2 [ dupd ] compile-1 ] unit-test
+[ 2 ] [ [ 1 2 nip ] compile-1 ] unit-test
+[ 2 ] [ 1 [ 2 nip ] compile-1 ] unit-test
+[ 2 ] [ 1 2 [ nip ] compile-1 ] unit-test
 
 [ 4 ] [ 12 7 [ fixnum-bitand ] compile-1 ] unit-test
 [ 4 ] [ 12 [ 7 fixnum-bitand ] compile-1 ] unit-test

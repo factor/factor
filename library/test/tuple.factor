@@ -51,3 +51,8 @@ C: quuux-tuple-2
     
     point-x
 ] unit-test
+
+TUPLE: predicate-test ;
+: predicate-test drop f ;
+
+[ t ] [ <predicate-test> predicate-test? ] unit-test

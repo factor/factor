@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: compiler
-USING: inference kernel lists math namespaces words strings
-errors prettyprint kernel-internals ;
+IN: compiler-frontend
+USING: compiler-backend inference kernel lists math namespaces
+words strings errors prettyprint kernel-internals ;
 
 : >linear ( node -- )
     #! Dataflow OPs have a linearizer word property. This
@@ -20,12 +20,6 @@ errors prettyprint kernel-internals ;
     #! lists where the first element is an operation, and the
     #! rest is arguments.
     [ %prologue , (linearize) ] make-list ;
-
-: <label> ( -- label )
-    gensym  dup t "label" set-word-prop ;
-
-: label? ( obj -- ? )
-    dup word? [ "label" word-prop ] [ drop f ] ifte ;
 
 : linearize-simple-label ( node -- )
     #! Some labels become simple labels after the optimization
@@ -46,7 +40,7 @@ errors prettyprint kernel-internals ;
     #! not contain non-tail recursive calls to itself.
     <label> dup %return-to , >r
     linearize-simple-label
-    %return ,
+    f %return ,
     r> %label , ;
 
 #label [
@@ -105,4 +99,4 @@ errors prettyprint kernel-internals ;
 
 #values [ drop ] "linearizer" set-word-prop
 
-#return [ drop %return , ] "linearizer" set-word-prop
+#return [ drop f %return , ] "linearizer" set-word-prop

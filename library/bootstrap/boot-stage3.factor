@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler io-internals kernel
-lists namespaces parser sequences stdio unparser words ;
+lists math namespaces parser sequences stdio unparser words ;
 
 "Compiling base..." print
 
@@ -31,6 +31,7 @@ init-assembler
 
 compile? [
     \ car compile
+    \ * compile
     \ length compile
     \ = compile
     \ unparse compile

@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math namespaces
-sequences strings vectors words hashtables parser prettyprint ;
+USING: errors generic interpreter kernel lists math
+math-internals namespaces sequences strings vectors words
+hashtables parser prettyprint ;
 
 : with-dataflow ( param op [[ in# out# ]] quot -- )
     #! Take input parameters, execute quotation, take output
@@ -170,8 +171,17 @@ M: word apply-object ( word -- )
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ integer/ [ [ integer integer ] [ rational ] ] "infer-effect" set-word-prop
+\ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
 \ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ <= [ [ number number ] [ boolean ] ] "infer-effect" set-word-prop
+\ < [ [ number number ] [ boolean ] ] "infer-effect" set-word-prop
+\ >= [ [ number number ] [ boolean ] ] "infer-effect" set-word-prop
+\ > [ [ number number ] [ boolean ] ] "infer-effect" set-word-prop
 \ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
+\ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
+\ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
+\ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
 
 \ no-method t "terminator" set-word-prop
 \ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop

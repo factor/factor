@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic inference kernel lists
-math namespaces sequences stdio strings unparser words ;
+USING: assembler compiler compiler-backend errors generic
+inference kernel lists math namespaces sequences stdio strings
+unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
