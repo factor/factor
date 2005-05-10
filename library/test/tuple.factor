@@ -56,3 +56,14 @@ TUPLE: predicate-test ;
 : predicate-test drop f ;
 
 [ t ] [ <predicate-test> predicate-test? ] unit-test
+
+PREDICATE: tuple silly-pred
+    class \ rect = ;
+
+GENERIC: area
+M: silly-pred area dup rect-w swap rect-h * ;
+
+TUPLE: circle radius ;
+M: circle area circle-radius sq pi * ;
+
+[ 200 ] [ << rect f 0 0 10 20 >> area ] unit-test

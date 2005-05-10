@@ -107,23 +107,17 @@ M: %immediate-d simplify-node ( linear vop -- linear ? )
     uncons >r dup vop-source swap vop-dest r> cdr
     uncons >r vop-label r> ;
 
-M: %fixnum<= simplify-node ( linear vop -- linear ? )
-    drop dup can-fast-branch? [
-        fast-branch-params >r
-        %jump-fixnum<= >r -1 %inc-d r>
+: make-fast-branch ( linear op -- linear ? )
+    >r dup can-fast-branch? [
+        fast-branch-params r> swap >r
+        execute >r -1 %inc-d r>
         r> cons cons t
     ] [
-        f
+        r> drop f
     ] ifte ;
 
-M: %eq? simplify-node ( linear vop -- linear ? )
-    drop dup can-fast-branch? [
-        fast-branch-params >r
-        %jump-eq? >r -1 %inc-d r>
-        r> cons cons t
-    ] [
-        f
-    ] ifte ;
+M: fast-branch simplify-node ( linear vop -- linear ? )
+    class fast-branch make-fast-branch ;
 
 : find-label ( label -- rest )
     simplifying get [
@@ -174,7 +168,8 @@ M: %call-label simplify-node ( linear vop -- ? )
 
 : useless-jump ( linear -- linear ? )
     #! A jump to a label immediately following is not needed.
-    dup car cdr find-label over cdr eq? [ cdr t ] [ f ] ifte ;
+    dup car vop-label find-label find-label
+    over cdr eq? [ cdr t ] [ f ] ifte ;
 
 : (dead-code) ( linear -- linear ? )
     #! Remove all nodes until the next #label.
@@ -200,31 +195,27 @@ M: %jump-label simplify-node ( linear vop -- linear ? )
             t
         ] [
             \ %jump dup double-jump
-            ! [
-            !     t
-            ! ] [
-            !     useless-jump [
-            !         t
-            !     ] [
-            !         dead-code
-            !     ] ifte
-            ! ] ifte
+            [
+                t
+            ] [
+                useless-jump [
+                    t
+                ] [
+                    dead-code
+                ] ifte
+            ] ifte
         ] ifte
     ] ifte ;
-! 
-! #jump-label [
-!     [ #return #return double-jump ]
-!     [ #jump-label #jump-label double-jump ]
-!     [ #jump #jump double-jump ]
-!     [ useless-jump ]
-!     [ dead-code ]
-! ] "simplifiers" set-word-prop
-! 
-! #target-label [
-!     [ #target-label #jump-label double-jump ]
-! !   [ #target #jump double-jump ]
-! ] "simplifiers" set-word-prop
-! 
-! #jump [ [ dead-code ] ] "simplifiers" set-word-prop
-! #return [ [ dead-code ] ] "simplifiers" set-word-prop
-! #end-dispatch [ [ dead-code ] ] "simplifiers" set-word-prop
+
+M: %target-label simplify-node ( linear vop -- linear ? )
+    drop
+    \ %target-label \ %jump-label double-jump ;
+
+M: %jump simplify-node ( linear vop -- linear ? )
+    drop dead-code ;
+
+M: %return simplify-node ( linear vop -- linear ? )
+    drop dead-code ;
+
+M: %end-dispatch simplify-node ( linear vop -- linear ? )
+    drop dead-code ;

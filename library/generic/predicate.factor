@@ -31,7 +31,7 @@ predicate [
     ] each 2drop 2drop
 ] "add-method" set-word-prop
 
-predicate 25 "priority" set-word-prop
+predicate 5 "priority" set-word-prop
 
 predicate [
     2dup = [

@@ -180,6 +180,11 @@ VOP: %jump-eq?      : %jump-eq? f swap <%jump-eq?> ;
         [[ %eq?      %jump-eq?      ]]
     }} hash ;
 
+PREDICATE: tuple fast-branch
+    #! Class of VOPs whose class is a key in fast-branch
+    #! hashtable.
+    class fast-branch ;
+
 ! some slightly optimized inline assembly
 VOP: %type
 : %type ( vreg ) <vreg> dest-vop <%type> ;
