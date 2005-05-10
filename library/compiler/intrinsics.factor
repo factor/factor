@@ -184,6 +184,8 @@ sequences words ;
 
 \ fixnum* intrinsic
 
+: slow-fixnum* \ %fixnum* 0 binary-op-reg ;
+
 \ fixnum* [
     ! Turn multiplication by a power of two into a left shift.
     node-peek dup literal? [
@@ -193,10 +195,10 @@ sequences words ;
             log2 0 <vreg> %fixnum<< ,
             0 0 %replace-d ,
         ] [
-            drop binary-op-reg
+            drop slow-fixnum*
         ] ifte
     ] [
-        drop binary-op-reg
+        drop slow-fixnum*
     ] ifte
 ] "linearizer" set-word-prop
 
