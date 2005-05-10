@@ -1,11 +1,13 @@
 IN: temporary
 USE: test
 USE: compiler
+USE: compiler-frontend
 USE: inference
 USE: words
 USE: math
 USE: kernel
 USE: lists
+USE: sequences
 
 : foo 1 2 3 ;
 

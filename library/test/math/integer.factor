@@ -22,6 +22,8 @@ USING: kernel math test unparser ;
 
 [ -1 ] [ 1 neg ] unit-test
 [ -1 ] [ 1 >bignum neg ] unit-test
+[ 268435456 ] [ -268435456 >fixnum -1 * ] unit-test
+[ 268435456 ] [ -268435456 >fixnum neg ] unit-test
 
 [ 9 3 ] [ 93 10 /mod ] unit-test
 [ 9 3 ] [ 93 >bignum 10 /mod ] unit-test

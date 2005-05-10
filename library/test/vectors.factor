@@ -75,14 +75,14 @@ unit-test
 [ "funky" ] [ "funny-stack" get pop ] unit-test
 
 [ t ] [
-    { 1 2 3 4 } dup vector-array length
-    >r clone vector-array length r>
+    { 1 2 3 4 } dup underlying length
+    >r clone underlying length r>
     =
 ] unit-test
 
 [ f ] [
     { 1 2 3 4 } dup clone
-    swap vector-array swap vector-array eq?
+    swap underlying swap underlying eq?
 ] unit-test
 
 [ 0 ] [

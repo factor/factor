@@ -16,4 +16,4 @@ USING: kernel math namespaces sequences strings test ;
     CHAR: H 0 SBUF" hello world" [ set-nth ] keep 0 swap nth
 ] unit-test
 
-[ SBUF" x" ] [ 1 <sbuf> [ CHAR: x >bignum over push ] keep ] unit-test
+[ SBUF" x" ] [ 1 <sbuf> CHAR: x >bignum over push ] unit-test

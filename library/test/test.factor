@@ -90,7 +90,7 @@ SYMBOL: failures
         cpu "unknown" = [
             [
                 "io/buffer" "compiler/optimizer"
-                "compiler/simplifier" "compiler/simple"
+                "compiler/simple"
                 "compiler/stack" "compiler/ifte"
                 "compiler/generic" "compiler/bail-out"
                 "compiler/linearizer" "compiler/intrinsics"
