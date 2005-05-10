@@ -4,17 +4,33 @@ IN: compiler-backend
 USING: assembler compiler errors kernel math math-internals
 memory namespaces words ;
 
-: simple-overflow ( dest -- )
+: literal-overflow
+    #! If the src operand is a literal.
+    ! Untag the operand.
+    over tag-bits SAR
+    tag-bits neg shift ;
+
+: computed-overflow
+    #! If the src operand is a register.
+    ! Untag both operands.
+    2dup  tag-bits SAR  tag-bits SAR ;
+
+: simple-overflow ( dest src inv word -- )
     #! If the previous arithmetic operation overflowed, then we
-    #! turn the result into a bignum and leave it in EAX. This
-    #! does not trigger a GC if memory is full -- is that bad?
+    #! turn the result into a bignum and leave it in EAX.
+    >r >r
     <label> "end" set
     "end" get JNO
-    ! There was an overflow. Untag the fixnum and add the carry.
-    ! Thanks to Dazhbog for figuring out this trick.
-    dup 1 RCR
-    dup 2 SAR
-    ! Create a bignum
+    ! There was an overflow. Recompute the original operand.
+    2dup r> execute
+    dup integer? [
+        literal-overflow
+    ] [
+        computed-overflow
+    ] ifte
+    ! Compute a result, this time it will fit.
+    dupd r> execute
+    ! Create a bignum.
     PUSH
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
@@ -23,10 +39,10 @@ memory namespaces words ;
     "end" get save-xt ;
 
 M: %fixnum+ generate-node ( vop -- )
-    dest/src dupd ADD  simple-overflow ;
+    dest/src 2dup ADD  \ SUB \ ADD simple-overflow ;
 
 M: %fixnum- generate-node ( vop -- )
-    dest/src dupd SUB  simple-overflow ;
+    dest/src 2dup SUB  \ ADD \ SUB simple-overflow ;
 
 M: %fixnum* generate-node ( vop -- )
     drop

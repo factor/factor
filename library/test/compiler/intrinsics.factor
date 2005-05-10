@@ -48,6 +48,9 @@ math-internals test words ;
 [ 11 ] [ 12 [ 7 fixnum-bitxor ] compile-1 ] unit-test
 [ 11 ] [ [ 12 7 fixnum-bitxor ] compile-1 ] unit-test
 
+[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
+[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
+
 [ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
 [ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
 [ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
