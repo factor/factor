@@ -12,7 +12,7 @@ memory namespaces words ;
     "end" get JNO
     ! There was an overflow. Untag the fixnum and add the carry.
     ! Thanks to Dazhbog for figuring out this trick.
-    dup RCR
+    dup 1 RCR
     dup 2 SAR
     ! Create a bignum
     PUSH
@@ -36,7 +36,6 @@ M: %fixnum* generate-node ( vop -- )
     ECX IMUL
     <label> "end" set
     "end" get JNO
-    ! make a bignum
     EDX PUSH
     EAX PUSH
     "s48_long_long_to_bignum" f compile-c-call
@@ -70,7 +69,7 @@ M: %fixnum-mod generate-node ( vop -- )
     ECX EAX MOV
     ! Tag the value, since division cancelled tags from both
     ! inputs
-    EAX 3 SHL
+    EAX tag-bits SHL
     ! Did it overflow?
     "end" get JNO
     ! There was an overflow, so make ECX into a bignum. we must
@@ -80,7 +79,7 @@ M: %fixnum-mod generate-node ( vop -- )
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in EAX; tag it
     EAX bignum-tag OR
-    ESP 4 ADD
+    ESP cell ADD
     ! the remainder is now in EDX
     EDX POP
     "end" get save-xt ;
@@ -100,6 +99,47 @@ M: %fixnum-bitnot generate-node ( vop -- )
     vop-dest v>operand dup NOT
     ! Mask off the low 3 bits to give a fixnum tag
     tag-mask XOR ;
+
+M: %fixnum<< generate-node
+    ! This has specific register requirements.
+    <label> "no-overflow" set
+    <label> "end" set
+    ! make a copy
+    ECX EAX MOV
+    vop-source
+    ! check for potential overflow
+    1 over cell 8 * swap 1 - - shift ECX over ADD
+    2 * 1 - ECX swap CMP
+    ! is there going to be an overflow?
+    "no-overflow" get JBE
+    ! there is going to be an overflow, make a bignum
+    EAX tag-bits SAR
+    dup ( n) PUSH
+    EAX PUSH
+    "s48_long_to_bignum" f compile-c-call
+    EDX POP
+    EAX PUSH
+    "s48_bignum_arithmetic_shift" f compile-c-call
+    ! tag the result
+    EAX bignum-tag OR
+    ESP cell 2 * ADD
+    "end" get JMP
+    ! there is not going to be an overflow
+    "no-overflow" get save-xt
+    EAX swap SHL
+    "end" get save-xt ;
+
+M: %fixnum>> generate-node
+    ! shift register
+    dup vop-dest v>operand dup rot vop-source SAR
+    ! give it a fixnum tag
+    tag-mask bitnot AND ;
+
+M: %fixnum-sgn generate-node
+    ! store 0 in EDX if EAX is >=0, otherwise store -1.
+    CDQ
+    ! give it a fixnum tag.
+    vop-dest v>operand tag-bits SHL ;
 
 : conditional ( dest cond -- )
     #! Compile this after a conditional jump to store f or t

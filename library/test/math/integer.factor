@@ -80,3 +80,8 @@ unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
 [ 1/8 ] [ 2 -3 ^ ] unit-test
 [ t ] [ 1 100 shift 2 100 ^ = ] unit-test
+
+[ t ] [ 256 power-of-2? ] unit-test
+[ f ] [ 123 power-of-2? ] unit-test
+[ 8 ] [ 256 log2 ] unit-test
+[ 0 ] [ 1 log2 ] unit-test

@@ -35,4 +35,4 @@ TUPLE: box i ;
         swap box-i swap box-i + <box>
     ] ifte ; compiled
 
-[ << box f 9227465 ] [ << box f 34 >> tuple-fib ] unit-test
+[ << box f 9227465 >> ] [ << box f 34 >> tuple-fib ] unit-test

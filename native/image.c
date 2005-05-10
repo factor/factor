@@ -1,6 +1,6 @@
 #include "factor.h"
 
-void load_image(char* filename)
+void load_image(char* filename, int literal_table)
 {
 	FILE* file;
 	HEADER h;
@@ -24,9 +24,9 @@ void load_image(char* filename)
 			fread(&ext_h,sizeof(HEADER_2)/sizeof(CELL),sizeof(CELL),file);
 		else if(h.version == IMAGE_VERSION_0)
 		{
-			ext_h.size = LITERAL_TABLE;
+			ext_h.size = literal_table;
 			ext_h.literal_top = 0;
-			ext_h.literal_max = LITERAL_TABLE;
+			ext_h.literal_max = literal_table;
 			ext_h.relocation_base = compiling.base;
 		}
 		else

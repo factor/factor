@@ -69,10 +69,12 @@ sequences words ;
     out-1
 ] "linearizer" set-word-prop
 
-: top-literal? ( seq -- ? ) peek literal? ;
+: node-peek ( node -- obj ) node-consume-d swap hash peek ;
+
 : peek-2 dup length 2 - swap nth ;
-: next-typed? ( seq -- ? )
-    peek-2 value-types length 1 = ;
+: node-peek-2 ( node -- obj ) node-consume-d swap hash peek-2 ;
+
+: typed? ( value -- ? ) value-types length 1 = ;
 
 : self ( word -- )
     f swap dup "infer-effect" word-prop (consume/produce) ;
@@ -82,14 +84,19 @@ sequences words ;
 
 \ slot intrinsic
 
-: slot@ ( seq -- n )
+: slot@ ( node -- n )
     #! Compute slot offset.
+    node-consume-d swap hash
     dup peek literal-value cell *
     swap peek-2 value-types car type-tag - ;
 
+: typed-literal? ( node -- ? )
+    #! Output if the node's first input is well-typed, and the
+    #! second is a literal.
+    dup node-peek literal? swap node-peek-2 typed? and ;
+
 \ slot [
-    node-consume-d swap hash
-    dup top-literal? over next-typed? and [
+    dup typed-literal? [
         1 %dec-d ,
         in-1
         0 swap slot@ %fast-slot ,
@@ -105,8 +112,7 @@ sequences words ;
 \ set-slot intrinsic
 
 \ set-slot [
-    node-consume-d swap hash
-    dup top-literal? over next-typed? and [
+    dup typed-literal? [
         1 %dec-d ,
         in-2
         2 %dec-d ,
@@ -149,11 +155,10 @@ sequences words ;
 
 : binary-op ( node op out -- )
     #! out is a vreg where the vop stores the result.
-    >r >r node-consume-d swap hash
-    dup top-literal? [
+    >r >r node-peek dup literal? [
         1 %dec-d ,
         in-1
-        peek literal-value 0 <vreg> r> execute ,
+        literal-value 0 <vreg> r> execute ,
         r> 0 %replace-d ,
     ] [
         drop
@@ -166,7 +171,6 @@ sequences words ;
     [[ fixnum-bitand %fixnum-bitand ]]
     [[ fixnum-bitor  %fixnum-bitor  ]]
     [[ fixnum-bitxor %fixnum-bitxor ]]
-    [[ fixnum-shift  %fixnum-shift  ]]
     [[ fixnum<=      %fixnum<=      ]]
     [[ fixnum<       %fixnum<       ]]
     [[ fixnum>=      %fixnum>=      ]]
@@ -181,7 +185,19 @@ sequences words ;
 \ fixnum* intrinsic
 
 \ fixnum* [
-    drop \ %fixnum* 0 binary-op-reg
+    ! Turn multiplication by a power of two into a left shift.
+    node-peek dup literal? [
+        literal-value dup power-of-2? [
+            1 %dec-d ,
+            in-1
+            log2 0 <vreg> %fixnum<< ,
+            0 0 %replace-d ,
+        ] [
+            drop binary-op-reg
+        ] ifte
+    ] [
+        drop binary-op-reg
+    ] ifte
 ] "linearizer" set-word-prop
 
 \ fixnum-mod intrinsic
@@ -217,4 +233,49 @@ sequences words ;
     in-1
     0 %fixnum-bitnot ,
     out-1
+] "linearizer" set-word-prop
+
+: slow-shift ( -- ) \ fixnum-shift %call , ;
+
+: negative-shift ( n -- )
+    1 %dec-d ,
+    in-1
+    dup cell -8 * <= [
+        drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
+        2 0 %replace-d ,
+    ] [
+        neg 0 <vreg> %fixnum>> ,
+        out-1
+    ] ifte ;
+
+: positive-shift ( n -- )
+    dup cell 8 * tag-bits - <= [
+        1 %dec-d ,
+        in-1
+        0 <vreg> %fixnum<< ,
+        out-1
+    ] [
+        drop slow-shift
+    ] ifte ;
+
+: fast-shift ( n -- )
+    dup 0 = [
+        1 %dec-d ,
+        drop
+    ] [
+        dup 0 < [
+            negative-shift
+        ] [
+            positive-shift
+        ] ifte
+    ] ifte ;
+
+\ fixnum-shift intrinsic
+
+\ fixnum-shift [
+    node-peek dup literal? [
+        literal-value fast-shift
+    ] [
+        drop slow-shift
+    ] ifte
 ] "linearizer" set-word-prop

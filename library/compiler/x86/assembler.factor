@@ -202,7 +202,7 @@ M: word JUMPcc ( opcode addr -- )
 : JNO HEX: 81 swap JUMPcc ;
 : JB  HEX: 82 swap JUMPcc ;
 : JAE HEX: 83 swap JUMPcc ;
-: JE  HEX: 84 swap JUMPcc ;
+: JE  HEX: 84 swap JUMPcc ; ! aka JZ
 : JNE HEX: 85 swap JUMPcc ;
 : JBE HEX: 86 swap JUMPcc ;
 : JA  HEX: 87 swap JUMPcc ;
@@ -260,11 +260,13 @@ M: operand CMP OCT: 071 2-operand ;
 
 : CDQ HEX: 99 compile-byte ;
 
+: ROL ( dst n -- ) HEX: c1 BIN: 000 immediate-8 ;
+: ROR ( dst n -- ) HEX: c1 BIN: 001 immediate-8 ;
+: RCL ( dst n -- ) HEX: c1 BIN: 010 immediate-8 ;
+: RCR ( dst n -- ) HEX: c1 BIN: 011 immediate-8 ;
 : SHL ( dst n -- ) HEX: c1 BIN: 100 immediate-8 ;
 : SHR ( dst n -- ) HEX: c1 BIN: 101 immediate-8 ;
 : SAR ( dst n -- ) HEX: c1 BIN: 111 immediate-8 ;
-
-: RCR ( dst -- ) HEX: d1 compile-byte BIN: 011 1-operand ;
 
 : LEA ( dst src -- )
     HEX: 8d compile-byte swap register 1-operand ;

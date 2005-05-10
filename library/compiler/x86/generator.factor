@@ -141,9 +141,9 @@ M: %arithmetic-type generate-node ( vop -- )
     ECX [ ESI ] MOV
     ! Compute their tags
     EAX BIN: 111 AND
-    EDX BIN: 111 AND
+    ECX BIN: 111 AND
     ! Are the tags equal?
-    EAX EDX CMP
+    EAX ECX CMP
     "end" get JE
     ! No, they are not equal. Call a runtime function to
     ! coerce the integers to a higher type.

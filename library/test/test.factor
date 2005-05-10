@@ -4,7 +4,7 @@ IN: test
 USING: errors kernel lists math memory namespaces parser
 prettyprint sequences stdio strings unparser vectors words ;
 
-TUPLE: assert expect got ;
+TUPLE: assert got expect ;
 M: assert error.
     "Assertion failed" print
     "Expected: " write dup assert-expect .

@@ -191,7 +191,7 @@ M: %call-label simplify-node ( linear vop -- ? )
 : dead-code ( linear -- linear ? )
     uncons (dead-code) >r cons r> ;
 
-M: %jump-label simplify-node ( linear vop -- ? )
+M: %jump-label simplify-node ( linear vop -- linear ? )
     drop
     \ %return dup double-jump [
         t
@@ -211,7 +211,6 @@ M: %jump-label simplify-node ( linear vop -- ? )
             ! ] ifte
         ] ifte
     ] ifte ;
-
 ! 
 ! #jump-label [
 !     [ #return #return double-jump ]

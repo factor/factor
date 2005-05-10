@@ -81,4 +81,13 @@ GENERIC: abs ( z -- |z| )
         rot [ [ rot dup slip -rot ] repeat ] keep -rot
     ] repeat 2drop ; inline
 
-: power-of-2? ( n -- ? ) dup dup neg bitand = ;
+: power-of-2? ( n -- ? )
+    dup 0 > [
+        dup dup neg bitand =
+    ] [
+        drop f
+    ] ifte ;
+
+: log2 ( n -- b )
+    #! Log base two for integers.
+    dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte ;

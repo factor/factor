@@ -142,7 +142,6 @@ VOP: %fixnum-bitand : %fixnum-bitand src/dest-vop <%fixnum-bitand> ;
 VOP: %fixnum-bitor  : %fixnum-bitor src/dest-vop <%fixnum-bitor> ;
 VOP: %fixnum-bitxor : %fixnum-bitxor src/dest-vop <%fixnum-bitxor> ;
 VOP: %fixnum-bitnot : %fixnum-bitnot <vreg> dest-vop <%fixnum-bitnot> ;
-VOP: %fixnum-shift  : %fixnum-shift src/dest-vop <%fixnum-shift> ;
 
 VOP: %fixnum<=      : %fixnum<= src/dest-vop <%fixnum<=> ;
 VOP: %fixnum<       : %fixnum< src/dest-vop <%fixnum<> ;
@@ -150,6 +149,22 @@ VOP: %fixnum>=      : %fixnum>= src/dest-vop <%fixnum>=> ;
 VOP: %fixnum>       : %fixnum> src/dest-vop <%fixnum>> ;
 VOP: %eq?           : %eq? src/dest-vop <%eq?> ;
 
+! At the VOP level, the 'shift' operation is split into five
+! distinct operations:
+! - shifts with a large positive count: calls runtime to make
+!   a bignum
+! - shifts with a small positive count: %fixnum<<
+! - shifts with a small negative count: %fixnum>>
+! - shifts with a small negative count: %fixnum>>
+! - shifts with a large negative count: %fixnum-sgn
+VOP: %fixnum<<   : %fixnum<<   src/dest-vop <%fixnum<<> ;
+VOP: %fixnum>>   : %fixnum>>   src/dest-vop <%fixnum>>> ;
+! due to x86 limitations the destination of this VOP must be
+! vreg 2 (EDX), and the source must be vreg 0 (EAX).
+VOP: %fixnum-sgn : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
+
+! Integer comparison followed by a conditional branch is
+! optimized
 VOP: %jump-fixnum<= : %jump-fixnum<= f swap <%jump-fixnum<=> ;
 VOP: %jump-fixnum<  : %jump-fixnum< f swap <%jump-fixnum<> ;
 VOP: %jump-fixnum>= : %jump-fixnum>= f swap <%jump-fixnum>=> ;

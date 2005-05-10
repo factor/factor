@@ -1,13 +1,13 @@
 #include "factor.h"
 
 void init_factor(char* image, CELL ds_size, CELL cs_size,
-	CELL data_size, CELL code_size)
+	CELL data_size, CELL code_size, CELL literal_size)
 {
 	srand((unsigned)time(NULL)); /* initialize random number generator */
 	init_ffi();
 	init_arena(data_size);
 	init_compiler(code_size);
-	load_image(image);
+	load_image(image,literal_size);
 	init_stacks(ds_size,cs_size);
 	init_c_io();
 	init_signals();
@@ -34,6 +34,7 @@ int main(int argc, char** argv)
 	CELL cs_size = 2048;
 	CELL data_size = 16;
 	CELL code_size = 2;
+	CELL literal_size = 64;
 	CELL args;
 	CELL i;
 
@@ -45,6 +46,7 @@ int main(int argc, char** argv)
 		printf(" +Cn   Call stack size, kilobytes\n");
 		printf(" +Mn   Data heap size, megabytes\n");
 		printf(" +Xn   Code heap size, megabytes\n");
+		printf(" +Ln   Literal table size, kilobytes. Only for bootstrapping\n");
 		printf("Other options are handled by the Factor library.\n");
 		printf("See the documentation for details.\n");
 		printf("Send bug reports to Slava Pestov <slava@jedit.org>.\n");
@@ -57,6 +59,7 @@ int main(int argc, char** argv)
 		if(factor_arg(argv[i],"+C%d",&cs_size)) continue;
 		if(factor_arg(argv[i],"+M%d",&data_size)) continue;
 		if(factor_arg(argv[i],"+X%d",&code_size)) continue;
+		if(factor_arg(argv[i],"+L%d",&literal_size)) continue;
 
 		if(strncmp(argv[i],"+",1) == 0)
 		{
@@ -69,7 +72,8 @@ int main(int argc, char** argv)
 		ds_size * 1024,
 		cs_size * 1024,
 		data_size * 1024 * 1024,
-		code_size * 1024 * 1024);
+		code_size * 1024 * 1024,
+		literal_size * 1024);
 
 	args = F;
 	while(--argc != 0)

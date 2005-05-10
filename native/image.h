@@ -28,6 +28,6 @@ typedef struct EXT_HEADER {
 	CELL literal_max;
 } HEADER_2;
 
-void load_image(char* file);
+void load_image(char* file, int literal_size);
 bool save_image(char* file);
 void primitive_save_image(void);
