@@ -6,6 +6,10 @@ data could fill up the buffer and cause a denial-of-service attack.
 
 The alien interface now supports "float" and "double" types.
 
+Defining a predicate subclass of tuple is supported now. Note that
+unions and complements over tuples are still not supported. Also,
+predicate subclasses of concrete tuple classes are not supported either.
+
 Factor 0.74:
 ------------
 

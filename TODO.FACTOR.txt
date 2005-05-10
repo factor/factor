@@ -61,6 +61,7 @@
 
 + compiler:
 
+- optimize the generic word prologue
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
