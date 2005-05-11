@@ -96,34 +96,35 @@ void primitive_type(void)
 	drepl(tag_fixnum(type_of(dpeek())));
 }
 
-#define SLOT(obj,slot) UNTAG(obj) + slot * CELLS
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
 
 void primitive_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = dpop();
+	CELL obj = UNTAG(dpop());
 	dpush(get(SLOT(obj,slot)));
 }
 
 void primitive_set_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = dpop();
+	CELL obj = UNTAG(dpop());
 	CELL value = dpop();
 	put(SLOT(obj,slot),value);
+	write_barrier(obj);
 }
 
 void primitive_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = dpop();
+	CELL obj = UNTAG(dpop());
 	dpush(tag_integer(get(SLOT(obj,slot))));
 }
 
 void primitive_set_integer_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = dpop();
+	CELL obj = UNTAG(dpop());
 	F_FIXNUM value = to_fixnum(dpop());
 	put(SLOT(obj,slot),value);
 }

@@ -107,6 +107,14 @@ public class FactorWord extends FactorArtifact implements FactorExternalizable,
 	//{{{ compareTo() method
 	public int compareTo(Object o)
 	{
-		return name.compareTo(((FactorWord)o).name);
+		int c = name.compareTo(((FactorWord)o).name);
+		if(c == 0)
+		{
+			return String.valueOf(vocabulary)
+				.compareTo(String.valueOf(
+				((FactorWord)o).vocabulary));
+		}
+		else
+			return c;
 	} //}}}
 }

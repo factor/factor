@@ -2,6 +2,8 @@
 
 void relocate_object(CELL relocating)
 {
+	allot_barrier(relocating);
+
 	switch(untag_header(get(relocating)))
 	{
 	case WORD_TYPE:
@@ -51,28 +53,20 @@ INLINE CELL relocate_data_next(CELL relocating)
 	return relocating + size;
 }
 
-INLINE CELL init_object(CELL relocating, CELL* handle, CELL type)
-{
-	if(untag_header(get(relocating)) != type)
-		fatal_error("init_object() failed",get(relocating));
-	*handle = tag_object((CELL*)relocating);
-	return relocate_data_next(relocating);
-}
-
 void relocate_data()
 {
 	CELL relocating = active.base;
 
 	data_fixup(&userenv[BOOT_ENV]);
 	data_fixup(&userenv[GLOBAL_ENV]);
-
-	/* The first object in the image must always T */
-	relocating = init_object(relocating,&T,T_TYPE);
-
-	/* The next three must be bignum 0, 1, -1  */
-	relocating = init_object(relocating,&bignum_zero,BIGNUM_TYPE);
-	relocating = init_object(relocating,&bignum_pos_one,BIGNUM_TYPE);
-	relocating = init_object(relocating,&bignum_neg_one,BIGNUM_TYPE);
+	printf("%d\n",T);
+	printf("%d\n",bignum_zero);
+	printf("%d\n",bignum_pos_one);
+	printf("%d\n",bignum_neg_one);
+	data_fixup(&T);
+	data_fixup(&bignum_zero);
+	data_fixup(&bignum_pos_one);
+	data_fixup(&bignum_neg_one);
 
 	for(;;)
 	{

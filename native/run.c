@@ -1,14 +1,5 @@
 #include "factor.h"
 
-void clear_environment(void)
-{
-	int i;
-	for(i = 0; i < USER_ENV; i++)
-		userenv[i] = F;
-	profile_depth = 0;
-	executing = F;
-}
-
 INLINE void execute(F_WORD* word)
 {
 	((XT)(word->xt))(word);

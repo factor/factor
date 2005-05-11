@@ -85,8 +85,6 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void clear_environment(void);
-
 void run(void);
 void platform_run(void);
 void undefined(F_WORD* word);

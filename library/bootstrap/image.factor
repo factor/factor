@@ -65,12 +65,20 @@ SYMBOL: boot-quot
     ( relocation base at end of header ) base emit
     ( bootstrap quotation set later ) 0 emit
     ( global namespace set later ) 0 emit
+    ( pointer to t object ) 0 emit
+    ( pointer to bignum 0 ) 0 emit
+    ( pointer to bignum 1 ) 0 emit
+    ( pointer to bignum -1 ) 0 emit
     ( size of heap set later ) 0 emit ;
 
 : boot-quot-offset 3 ;
 : global-offset    4 ;
-: heap-size-offset 5 ;
-: header-size      6 ;
+: t-offset         5 ;
+: 0-offset         6 ;
+: 1-offset         7 ;
+: -1-offset        8 ;
+: heap-size-offset 9 ;
+: header-size      10 ;
 
 GENERIC: ' ( obj -- ptr )
 #! Write an object to the image.
@@ -117,7 +125,8 @@ M: bignum ' ( bignum -- tagged )
 ! Padded with fixnums for 8-byte alignment
 
 : t,
-    object-tag here-as "t" set
+    object-tag here-as
+    dup t-offset fixup "t" set
     t-type >header emit
     0 ' emit ;
 
@@ -126,9 +135,9 @@ M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
 
-:  0,  0 >bignum ' drop ;
-:  1,  1 >bignum ' drop ;
-: -1, -1 >bignum ' drop ;
+:  0,  0 >bignum '  0-offset fixup ;
+:  1,  1 >bignum '  1-offset fixup ;
+: -1, -1 >bignum ' -1-offset fixup ;
 
 ( Beginning of the image )
 ! The image begins with the header, then T,

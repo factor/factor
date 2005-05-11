@@ -1,26 +1,23 @@
 #include "factor.h"
 
-/* Stop-and-copy garbage collection using Cheney's algorithm. */
-
-/* #define GC_DEBUG */
-
-INLINE void gc_debug(char* msg, CELL x) {
-#ifdef GC_DEBUG
-	printf("%s %d\n",msg,x);
-#endif
-}
+/* Generational copying garbage collector */
 
 void collect_roots(void)
 {
 	int i;
-
 	CELL ptr;
 
-	/*T must be the first in the heap */
+	gc_debug("root: t",T);
 	COPY_OBJECT(T);
-	/* the bignum 0 1 -1 constants must be the next three */
-	copy_bignum_constants();
+	gc_debug("root: bignum_zero",bignum_zero);
+	COPY_OBJECT(bignum_zero);
+	gc_debug("root: bignum_pos_one",bignum_pos_one);
+	COPY_OBJECT(bignum_pos_one);
+	gc_debug("root: bignum_neg_one",bignum_neg_one);
+	COPY_OBJECT(bignum_neg_one);
+	gc_debug("root: callframe",callframe);
 	COPY_OBJECT(callframe);
+	gc_debug("root: executing",executing);
 	COPY_OBJECT(executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
@@ -33,6 +30,32 @@ void collect_roots(void)
 		copy_handle(&userenv[i]);
 }
 
+void clear_cards(void)
+{
+	BYTE *ptr;
+	for(ptr = cards; ptr < cards_end; ptr++)
+		clear_card(ptr);
+}
+
+void collect_cards(void)
+{
+	BYTE *ptr;
+	for(ptr = cards; ptr < cards_end; ptr++)
+	{
+		CARD c = *ptr;
+		if(card_marked(*ptr))
+		{
+			CELL offset = (c & CARD_BASE_MASK);
+			if(offset == 0x7f)
+				critical_error("bad card",c);
+			CELL ea = (CELL)CARD_TO_ADDR(c) + offset;
+			printf("write barrier hit %d\n",offset);
+			printf("object header: %x\n",get(ea));
+			clear_card(ptr);
+		}
+	}
+}
+
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
@@ -42,11 +65,6 @@ a new forwarding pointer.
 CELL copy_object_impl(CELL pointer)
 {
 	CELL newpointer;
-
-#ifdef GC_DEBUG
-	if(in_zone(&active,pointer))
-		critical_error("copy_object given newspace ptr",pointer);
-#endif
 
 	gc_debug("copy_object",pointer);
 	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
@@ -120,7 +138,10 @@ void primitive_gc(void)
 
 	flip_zones();
 	scan = active.base;
+
 	collect_roots();
+	collect_cards();
+
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	

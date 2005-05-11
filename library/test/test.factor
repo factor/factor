@@ -11,7 +11,7 @@ M: assert error.
     "Got: " write assert-got . ;
 
 : assert= ( a b -- )
-    2dup = [ <assert> throw ] unless ;
+    2dup = [ 2drop ] [ <assert> throw ] ifte ;
 
 : print-test ( input output -- )
     "--> " write 2list . flush ;

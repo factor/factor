@@ -207,13 +207,6 @@ void primitive_bignum_not(void)
 		untag_bignum_fast(dpeek()))));
 }
 
-void copy_bignum_constants(void)
-{
-	COPY_OBJECT(bignum_zero);
-	COPY_OBJECT(bignum_pos_one);
-	COPY_OBJECT(bignum_neg_one);
-}
-
 void box_signed_cell(F_FIXNUM integer)
 {
 	dpush(tag_integer(integer));

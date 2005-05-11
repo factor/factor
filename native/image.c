@@ -1,5 +1,21 @@
 #include "factor.h"
 
+void init_objects(HEADER *h)
+{
+	int i;
+	for(i = 0; i < USER_ENV; i++)
+		userenv[i] = F;
+	profile_depth = 0;
+	executing = F;
+
+	userenv[GLOBAL_ENV] = h->global;
+	userenv[BOOT_ENV] = h->boot;
+	T = h->t;
+	bignum_zero = h->bignum_zero;
+	bignum_pos_one = h->bignum_pos_one;
+	bignum_neg_one = h->bignum_neg_one;
+}
+
 void load_image(char* filename, int literal_table)
 {
 	FILE* file;
@@ -67,10 +83,7 @@ void load_image(char* filename, int literal_table)
 	printf(" relocating...");
 	fflush(stdout);
 
-	clear_environment();
-
-	userenv[GLOBAL_ENV] = h.global;
-	userenv[BOOT_ENV] = h.boot;
+	init_objects(&h);
 
 	relocate_data();
 	relocate_code();
@@ -97,6 +110,10 @@ bool save_image(char* filename)
 	h.boot = userenv[BOOT_ENV];
 	h.size = active.here - active.base;
 	h.global = userenv[GLOBAL_ENV];
+	h.t = T;
+	h.bignum_zero = bignum_zero;
+	h.bignum_pos_one = bignum_pos_one;
+	h.bignum_neg_one = bignum_neg_one;
 	fwrite(&h,sizeof(HEADER),1,file);
 
 	ext_h.size = compiling.here - compiling.base;

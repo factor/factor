@@ -12,6 +12,14 @@ typedef struct {
 	CELL boot;
 	/* tagged pointer to global namespace */
 	CELL global;
+	/* tagged pointer to t singleton */
+	CELL t;
+	/* tagged pointer to bignum 0 */
+	CELL bignum_zero;
+	/* tagged pointer to bignum 1 */
+	CELL bignum_pos_one;
+	/* tagged pointer to bignum -1 */
+	CELL bignum_neg_one;
 	/* size of heap */
 	CELL size;
 } HEADER;
@@ -28,6 +36,7 @@ typedef struct EXT_HEADER {
 	CELL literal_max;
 } HEADER_2;
 
+void init_objects(HEADER *h);
 void load_image(char* file, int literal_size);
 bool save_image(char* file);
 void primitive_save_image(void);

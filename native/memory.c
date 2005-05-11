@@ -1,64 +1,65 @@
 #include "factor.h"
 
-/* set up guard pages to check for under/overflow.
-size must be a multiple of the page size */
-
-#ifdef WIN32
-void *alloc_guarded(CELL size)
+void dump_generations(void)
 {
-       SYSTEM_INFO si;
-       char *mem;
-       DWORD ignore;
+	int i;
+	for(i = 0; i < GC_GENERATIONS; i++)
+	{
+		fprintf(stderr,"Generation %d: base=%d, size=%d, here=%d\n",
+			i,
+			generations[i].base,
+			generations[i].limit - generations[i].base,
+			generations[i].here);
+	}
 
-       GetSystemInfo(&si);
-       mem = (char *)VirtualAlloc(NULL, si.dwPageSize*2 + size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	fprintf(stderr,"Semispace: base=%d, size=%d, here=%d\n",
+		prior.base,
+		prior.limit - prior.base,
+		prior.here);
 
-       if (!VirtualProtect(mem, si.dwPageSize, PAGE_NOACCESS, &ignore))
-	       fatal_error("Cannot allocate low guard page", (CELL)mem);
-
-       if (!VirtualProtect(mem+size+si.dwPageSize, si.dwPageSize, PAGE_NOACCESS, &ignore))
-	       fatal_error("Cannot allocate high guard page", (CELL)mem);
-
-       return mem + si.dwPageSize;
+	fprintf(stderr,"Cards: base=%d, size=%d\n",cards,cards_end - cards);
 }
-#else
-void* alloc_guarded(CELL size)
+
+CELL init_zone(ZONE *z, CELL size, CELL base)
 {
-	int pagesize = getpagesize();
-
-	char* array = mmap((void*)0,pagesize + size + pagesize,
-		PROT_READ | PROT_WRITE | PROT_EXEC,
-		MAP_ANON | MAP_PRIVATE,-1,0);
-
-	if(mprotect(array,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot allocate low guard page",(CELL)array);
-
-	if(mprotect(array + pagesize + size,pagesize,PROT_NONE) == -1)
-		fatal_error("Cannot allocate high guard page",(CELL)array);
-
-	/* return bottom of actual array */
-	return array + pagesize;
-}
-#endif
-
-void init_zone(ZONE* z, CELL size)
-{
-	z->base = z->here = align8((CELL)alloc_guarded(size));
-	if(z->base == 0)
-		fatal_error("Cannot allocate zone",size);
+	z->base = z->here = base;
 	z->limit = z->base + size;
 	z->alarm = z->base + (size * 3) / 4;
-	z->base = align8(z->base);
+	return z->limit;
 }
 
-void init_arena(CELL size)
+/* input parameters must be 8 byte aligned */
+void init_arena(CELL young_size, CELL aging_size)
 {
-	init_zone(&active,size);
-	init_zone(&prior,size);
+	CELL total_size = (GC_GENERATIONS - 1) * young_size + 2 * aging_size;
+	CELL cards_size = total_size / CARD_SIZE;
+
+	heap_start = (CELL)alloc_guarded(total_size);
+	cards = alloc_guarded(cards_size);
+	cards_end = cards + cards_size;
+	clear_cards();
+
+	int i;
+	CELL alloter = heap_start;
+
+	if(heap_start == 0)
+		fatal_error("Cannot allocate data heap",total_size);
+
+	alloter = init_zone(&generations[TENURED],aging_size,alloter);
+	alloter = init_zone(&prior,aging_size,alloter);
+
+	for(i = 0; i < GC_GENERATIONS - 1; i++)
+		alloter = init_zone(&generations[i],young_size,alloter);
+
+	if(alloter != heap_start + total_size)
+		fatal_error("Oops",alloter);
+
 	allot_profiling = false;
 	gc_in_progress = false;
 	heap_scan = false;
 	gc_time = 0;
+	
+	dump_generations();
 }
 
 void allot_profile_step(CELL a)
@@ -88,11 +89,6 @@ void flip_zones()
 	active = prior;
 	prior = z;
 	active.here = active.base;
-}
-
-bool in_zone(ZONE* z, CELL pointer)
-{
-	return pointer >= z->base && pointer < z->limit;
 }
 
 void primitive_room(void)
