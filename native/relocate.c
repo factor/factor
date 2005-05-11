@@ -59,10 +59,6 @@ void relocate_data()
 
 	data_fixup(&userenv[BOOT_ENV]);
 	data_fixup(&userenv[GLOBAL_ENV]);
-	printf("%d\n",T);
-	printf("%d\n",bignum_zero);
-	printf("%d\n",bignum_pos_one);
-	printf("%d\n",bignum_neg_one);
 	data_fixup(&T);
 	data_fixup(&bignum_zero);
 	data_fixup(&bignum_pos_one);

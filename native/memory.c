@@ -5,19 +5,20 @@ void dump_generations(void)
 	int i;
 	for(i = 0; i < GC_GENERATIONS; i++)
 	{
-		fprintf(stderr,"Generation %d: base=%d, size=%d, here=%d\n",
+		fprintf(stderr,"Generation %d: base=%lu, size=%lu, here=%lu\n",
 			i,
 			generations[i].base,
 			generations[i].limit - generations[i].base,
 			generations[i].here);
 	}
 
-	fprintf(stderr,"Semispace: base=%d, size=%d, here=%d\n",
+	fprintf(stderr,"Semispace: base=%lu, size=%lu, here=%lu\n",
 		prior.base,
 		prior.limit - prior.base,
 		prior.here);
 
-	fprintf(stderr,"Cards: base=%d, size=%d\n",cards,cards_end - cards);
+	fprintf(stderr,"Cards: base=%lu, size=%lu\n",(CELL)cards,
+		(CELL)(cards_end - cards));
 }
 
 CELL init_zone(ZONE *z, CELL size, CELL base)
@@ -60,8 +61,6 @@ void init_arena(CELL young_size, CELL aging_size)
 	gc_in_progress = false;
 	heap_scan = false;
 	gc_time = 0;
-	
-	dump_generations();
 }
 
 void allot_profile_step(CELL a)
@@ -91,6 +90,8 @@ void primitive_room(void)
 	int gen;
 	box_signed_cell(compiling.limit - compiling.here);
 	box_signed_cell(compiling.limit - compiling.base);
+	box_signed_cell(cards_end - cards);
+	box_signed_cell(prior.limit - prior.base);
 	for(gen = GC_GENERATIONS - 1; gen >= 0; gen--)
 	{
 		ZONE *z = &generations[gen];

@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
 USING: errors generic hashtables kernel kernel-internals lists
-math namespaces prettyprint sequences stdio unparser vectors
-words ;
+math namespaces prettyprint sequences stdio strings unparser
+vectors words ;
 
 : save
     #! Save the current image.
@@ -11,7 +11,7 @@ words ;
 
 ! Printing an overview of heap usage.
 
-: kb. 1024 /i unparse write " KB" write ;
+: kb. 1024 /i unparse 6 CHAR: \s pad  write " KB" write ;
 
 : (room.) ( free total -- )
     2dup swap - swap ( free used total )
@@ -22,10 +22,12 @@ words ;
 : room. ( -- )
     room
     0 swap [
-        "Generation " write over unparse write ": " write
+        "Generation " write over unparse write ":" write
         uncons (room.) 1 +
     ] each drop
-    "Code space: " write (room.) ;
+    "Semi-space:  " write kb. terpri
+    "Cards:       " write kb. terpri
+    "Code space:  " write (room.) ;
 
 ! Some words for iterating through the heap.
 
