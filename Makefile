@@ -1,10 +1,10 @@
 CC = gcc
-#DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
-DEFAULT_CFLAGS = -g
+DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
+#DEFAULT_CFLAGS = -g
 DEFAULT_LIBS = -lm
 
-#STRIP = strip
-STRIP = touch
+STRIP = strip
+#STRIP = touch
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \

@@ -30,32 +30,6 @@ void collect_roots(void)
 		copy_handle(&userenv[i]);
 }
 
-void clear_cards(void)
-{
-	BYTE *ptr;
-	for(ptr = cards; ptr < cards_end; ptr++)
-		clear_card(ptr);
-}
-
-void collect_cards(void)
-{
-	BYTE *ptr;
-	for(ptr = cards; ptr < cards_end; ptr++)
-	{
-		CARD c = *ptr;
-		if(card_marked(*ptr))
-		{
-			CELL offset = (c & CARD_BASE_MASK);
-			if(offset == 0x7f)
-				critical_error("bad card",c);
-			CELL ea = (CELL)CARD_TO_ADDR(c) + offset;
-			printf("write barrier hit %d\n",offset);
-			printf("object header: %x\n",get(ea));
-			clear_card(ptr);
-		}
-	}
-}
-
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
@@ -122,7 +96,81 @@ INLINE CELL collect_next(CELL scan)
 	return scan + size;
 }
 
-void primitive_gc(void)
+void clear_cards(void)
+{
+	BYTE *ptr;
+	for(ptr = cards; ptr < cards_end; ptr++)
+		clear_card(ptr);
+}
+
+/* scan all the objects in the card */
+void collect_card(CARD *ptr)
+{
+	CARD c = *ptr;
+	CELL offset = (c & CARD_BASE_MASK);
+	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
+	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
+
+	if(offset == 0x7f)
+		critical_error("bad card",c);
+
+	printf("! write barrier hit %d\n",offset);
+	while(card_scan < card_end)
+		card_scan = collect_next(card_scan);
+
+	clear_card(ptr);
+}
+
+void collect_gen_cards(CELL gen)
+{
+	CARD *ptr = ADDR_TO_CARD(generations[gen].base);
+	CARD *last_card = ADDR_TO_CARD(generations[gen].here);
+	for(ptr = cards; ptr <= last_card; ptr++)
+	{
+		if(card_marked(*ptr))
+			collect_card(ptr);
+	}
+}
+
+/* scan cards in all generations older than the one being collected */
+void collect_cards(void)
+{
+	CELL gen;
+	for(gen = collecting_generation; gen < GC_GENERATIONS; gen++)
+		collect_gen_cards(gen);
+}
+
+void begin_gc(CELL gen)
+{
+	collecting_generation = generations[gen].base;
+
+	if(gen == TENURED)
+	{
+		/* when collecting the oldest generation, rotate it
+		with the semispace */
+		ZONE z = generations[gen];
+		generations[gen] = prior;
+		prior = z;
+		generations[gen].here = generations[gen].base;
+		allot_zone = &generations[gen];
+	}
+	else
+	{
+		/* when collecting a younger generation, we copy
+		reachable objects to the next oldest generation,
+		so we set the allot_zone so the next generation. */
+		allot_zone = &generations[gen + 1];
+	}
+}
+
+void end_gc(CELL gen)
+{
+	/* continue allocating from the nursery. */
+	allot_zone = &nursery;
+}
+
+/* collect gen and all younger generations */
+void garbage_collection(CELL gen)
 {
 	s64 start = current_millis();
 	CELL scan;
@@ -136,8 +184,10 @@ void primitive_gc(void)
 
 	gc_in_progress = true;
 
-	flip_zones();
-	scan = active.base;
+	begin_gc(gen);
+
+	/* initialize chase pointer */
+	scan = allot_zone->here;
 
 	collect_roots();
 	collect_cards();
@@ -145,23 +195,30 @@ void primitive_gc(void)
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	
-	while(scan < active.here)
+	while(scan < allot_zone->here)
 	{
 		gc_debug("scan loop",scan);
 		scan = collect_next(scan);
 	}
+
+	end_gc(gen);
+
 	gc_debug("gc done",0);
 
 	gc_in_progress = false;
-
 	gc_time += (current_millis() - start);
+}
+
+void primitive_gc(void)
+{
+	garbage_collection(TENURED);
 }
 
 /* WARNING: only call this from a context where all local variables
 are also reachable via the GC roots. */
 void maybe_garbage_collection(void)
 {
-	if(active.here > active.alarm)
+	if(nursery.here > nursery.alarm)
 		primitive_gc();
 }
 

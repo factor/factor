@@ -8,7 +8,7 @@ words ;
 : save
     #! Save the current image.
     "image" get save-image ;
-    
+
 ! Printing an overview of heap usage.
 
 : kb. 1024 /i unparse write " KB" write ;
@@ -21,7 +21,10 @@ words ;
 
 : room. ( -- )
     room
-    "Data space: " write (room.)
+    0 swap [
+        "Generation " write over unparse write ": " write
+        uncons (room.) 1 +
+    ] each drop
     "Code space: " write (room.) ;
 
 ! Some words for iterating through the heap.

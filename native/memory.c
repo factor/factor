@@ -45,11 +45,13 @@ void init_arena(CELL young_size, CELL aging_size)
 	if(heap_start == 0)
 		fatal_error("Cannot allocate data heap",total_size);
 
-	alloter = init_zone(&generations[TENURED],aging_size,alloter);
+	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);
 
 	for(i = 0; i < GC_GENERATIONS - 1; i++)
 		alloter = init_zone(&generations[i],young_size,alloter);
+
+	allot_zone = &nursery;
 
 	if(alloter != heap_start + total_size)
 		fatal_error("Oops",alloter);
@@ -83,20 +85,21 @@ void allot_profile_step(CELL a)
 	untag_word_fast(executing)->allot_count += a;
 }
 
-void flip_zones()
-{
-	ZONE z = active;
-	active = prior;
-	prior = z;
-	active.here = active.base;
-}
-
 void primitive_room(void)
 {
+	CELL list = F;
+	int gen;
 	box_signed_cell(compiling.limit - compiling.here);
 	box_signed_cell(compiling.limit - compiling.base);
-	box_signed_cell(active.limit - active.here);
-	box_signed_cell(active.limit - active.base);
+	for(gen = GC_GENERATIONS - 1; gen >= 0; gen--)
+	{
+		ZONE *z = &generations[gen];
+		list = cons(cons(
+			tag_fixnum(z->limit - z->here),
+			tag_fixnum(z->limit - z->base)),
+			list);
+	}
+	dpush(list);
 }
 
 void primitive_allot_profiling(void)
@@ -124,8 +127,8 @@ void primitive_size(void)
 void primitive_begin_scan(void)
 {
 	primitive_gc();
-	heap_scan_ptr = active.base;
-	heap_scan_end = active.here;
+	heap_scan_ptr = tenured.base;
+	heap_scan_end = tenured.here;
 	heap_scan = true;
 }
 

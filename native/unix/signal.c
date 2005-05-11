@@ -2,15 +2,11 @@
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	if(active.here > active.limit)
+	if(allot_zone->here > allot_zone->limit)
 	{
-		fprintf(stderr,"Out of memory\n");
-		fprintf(stderr,"active.base  = %ld\n",active.base);
-		fprintf(stderr,"active.here  = %ld\n",active.here);
-		fprintf(stderr,"active.limit = %ld\n",active.limit);
+		fprintf(stderr,"Out of memory!\n");
+		dump_generations();
 		fflush(stderr);
-		flip_zones();
-		dump_stacks();
 		exit(1);
 	}
 	else

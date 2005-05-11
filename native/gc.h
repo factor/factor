@@ -5,6 +5,15 @@ bool heap_scan;
 
 s64 gc_time;
 
+/* only meaningful during a GC */
+CELL collecting_generation;
+
+/* test if the pointer is in generation being collected, or a younger one.
+init_arena() arranges things so that the older generations are first,
+so we have to check that the pointer occurs after the beginning of
+the requested generation. */
+#define COLLECTING_GEN(ptr) (collecting_generation <= ptr)
+
 /* Given a pointer to oldspace, copy it to newspace. */
 INLINE void* copy_untagged_object(void* pointer, CELL size)
 {
@@ -32,6 +41,9 @@ INLINE CELL copy_object(CELL pointer)
 
 	gc_debug("copy object",pointer);
 
+	if(!COLLECTING_GEN(pointer))
+		return pointer;
+
 	if(pointer == F)
 		return F;
 
@@ -42,7 +54,7 @@ INLINE CELL copy_object(CELL pointer)
 
 	header = get(UNTAG(pointer));
 	untagged = UNTAG(header);
-	if(TAG(header) != FIXNUM_TYPE && in_zone(&active,untagged))
+	if(TAG(header) != FIXNUM_TYPE && in_zone(&tenured,untagged))
 	{
 		gc_debug("forwarding",untagged);
 		return RETAG(untagged,tag);
@@ -59,6 +71,8 @@ INLINE void copy_handle(CELL* handle)
 }
 
 void collect_roots(void);
+void collect_card(CARD *ptr);
+void collect_gen_cards(CELL gen);
 void collect_cards(void);
 void clear_cards(void);
 void primitive_gc(void);

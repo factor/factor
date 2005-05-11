@@ -54,10 +54,10 @@ void load_image(char* filename, int literal_table)
 		CELL size = h.size / CELLS;
 		allot(h.size);
 
-		if(size != fread((void*)active.base,sizeof(CELL),size,file))
+		if(size != fread((void*)tenured.base,sizeof(CELL),size,file))
 			fatal_error("Wrong data heap length",h.size);
 
-		active.here = active.base + h.size;
+		tenured.here = tenured.base + h.size;
 		data_relocation_base = h.relocation_base;
 	}
 
@@ -106,9 +106,9 @@ bool save_image(char* filename)
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
-	h.relocation_base = active.base;
+	h.relocation_base = tenured.base;
 	h.boot = userenv[BOOT_ENV];
-	h.size = active.here - active.base;
+	h.size = tenured.here - tenured.base;
 	h.global = userenv[GLOBAL_ENV];
 	h.t = T;
 	h.bignum_zero = bignum_zero;
@@ -122,7 +122,7 @@ bool save_image(char* filename)
 	ext_h.relocation_base = compiling.base;
 	fwrite(&ext_h,sizeof(HEADER_2),1,file);
 
-	fwrite((void*)active.base,h.size,1,file);
+	fwrite((void*)tenured.base,h.size,1,file);
 	fwrite((void*)compiling.base,ext_h.size,1,file);
 
 	fclose(file);
@@ -133,7 +133,8 @@ bool save_image(char* filename)
 void primitive_save_image(void)
 {
 	F_STRING* filename;
-	primitive_gc();
+	/* do a full GC to push everything into tenured space */
+	garbage_collection(TENURED);
 	filename = untag_string(dpop());
 	save_image(to_c_string(filename));
 }

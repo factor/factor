@@ -4,7 +4,7 @@ CELL data_relocation_base;
 INLINE void data_fixup(CELL* cell)
 {
 	if(TAG(*cell) != FIXNUM_TYPE && *cell != F)
-		*cell += (active.base - data_relocation_base);
+		*cell += (tenured.base - data_relocation_base);
 }
 
 typedef enum {

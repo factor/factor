@@ -55,7 +55,7 @@ INLINE CELL relocate_data_next(CELL relocating)
 
 void relocate_data()
 {
-	CELL relocating = active.base;
+	CELL relocating = tenured.base;
 
 	data_fixup(&userenv[BOOT_ENV]);
 	data_fixup(&userenv[GLOBAL_ENV]);
@@ -70,7 +70,7 @@ void relocate_data()
 
 	for(;;)
 	{
-		if(relocating >= active.here)
+		if(relocating >= tenured.here)
 			break;
 
 		relocating = relocate_data_next(relocating);

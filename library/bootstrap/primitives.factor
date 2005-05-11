@@ -134,7 +134,7 @@ vocabularies get [
     [ "set-datastack" "kernel"                " ds -- "          ]
     [ "set-callstack" "kernel"                " cs -- "          ]
     [ "exit" "kernel"                         [ [ integer ] [ ] ] ]
-    [ "room" "memory"                         [ [ ] [ integer integer integer integer ] ] ]
+    [ "room" "memory"                         [ [ ] [ integer integer general-list ] ] ]
     [ "os-env" "kernel"                       [ [ string ] [ object ] ] ]
     [ "millis" "kernel"                       [ [ ] [ integer ] ] ]
     [ "(random-int)" "math"                   [ [ ] [ integer ] ] ]

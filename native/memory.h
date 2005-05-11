@@ -55,12 +55,14 @@ INLINE bool in_zone(ZONE* z, CELL pointer)
 #define TENURED (GC_GENERATIONS-1)
 
 ZONE generations[GC_GENERATIONS];
+ZONE *allot_zone;
+
+#define tenured generations[TENURED]
+#define nursery generations[TENURED] /* XXX */
 
 CELL heap_start;
 
-#define active generations[TENURED]
-
-/* spare semi-space; rotates with generations[TENURED]. */
+/* spare semi-space; rotates with tenured. */
 ZONE prior;
 
 /* card marking write barrier. a card is a byte storing a mark flag,
@@ -82,7 +84,7 @@ it is important that 7 bits is sufficient to represent every
 offset within the card */
 #define CARD_SIZE 16
 #define CARD_BITS 4
-#define CARD_MASK CARD_SIZE-1
+#define CARD_MASK (CARD_SIZE-1)
 
 INLINE CARD card_marked(CARD c)
 {
@@ -104,8 +106,8 @@ INLINE void rebase_card(CARD *c, u8 base)
 	*c = base;
 }
 
-#define ADDR_TO_CARD(a) (CARD*)(((a-heap_start)>>CARD_BITS)+(CELL)cards)
-#define CARD_TO_ADDR(c) (CELL*)(((c-(CELL)cards)<<CARD_BITS)+heap_start)
+#define ADDR_TO_CARD(a) (CARD*)((((CELL)a-heap_start)>>CARD_BITS)+(CELL)cards)
+#define CARD_TO_ADDR(c) (CELL*)((((CELL)c-(CELL)cards)<<CARD_BITS)+heap_start)
 
 /* this is an inefficient write barrier. compiled definitions use a more
 efficient one hand-coded in assembly. the write barrier must be called
@@ -123,7 +125,7 @@ INLINE void allot_barrier(CELL address)
 	CARD *c = ADDR_TO_CARD(address);
 	/* we need to remember the first object allocated in the
 	card */
-	rebase_card(c,MIN(card_base(*c),address & CARD_MASK));
+	rebase_card(c,MIN(card_base(*c),(address & CARD_MASK)));
 }
 
 bool allot_profiling;
@@ -146,9 +148,9 @@ INLINE CELL align8(CELL a)
 
 INLINE void* allot(CELL a)
 {
-	CELL h = active.here;
+	CELL h = allot_zone->here;
 	allot_barrier(h);
-	active.here += align8(a);
+	allot_zone->here = h + align8(a);
 	if(allot_profiling)
 		allot_profile_step(align8(a));
 	return (void*)h;
