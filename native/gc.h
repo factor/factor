@@ -36,3 +36,7 @@ void primitive_gc(void);
 void garbage_collection(CELL gen);
 void maybe_garbage_collection(void);
 void primitive_gc_time(void);
+
+/* in case a generation fills up in the middle of a gc, we jump back
+up to try collecting the next generation. */
+jmp_buf gc_jmp;

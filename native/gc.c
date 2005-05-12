@@ -27,11 +27,13 @@ void collect_roots(void)
 }
 
 /* Given a pointer to oldspace, copy it to newspace. */
-INLINE void* copy_untagged_object(void* pointer, CELL size)
+INLINE void *copy_untagged_object(void *pointer, CELL size)
 {
-	void* newpointer = allot(size);
+	void *newpointer;
+	if(newspace->here + size >= newspace->limit)
+		longjmp(gc_jmp,1);
+	newpointer = allot_zone(newspace,size);
 	memcpy(newpointer,pointer,size);
-
 	return newpointer;
 }
 
@@ -122,6 +124,7 @@ INLINE void collect_object(CELL scan)
 INLINE CELL collect_next(CELL scan)
 {
 	CELL size;
+	
 	if(headerp(get(scan)))
 	{
 		size = untagged_object_size(scan);
@@ -152,7 +155,6 @@ INLINE void collect_card(CARD *ptr, CELL here)
 			return;
 	}
 
-	/* printf("write barrier hit %ld\n",offset); */
 	while(card_scan < card_end && card_scan < here)
 		card_scan = collect_next(card_scan);
 }
@@ -219,15 +221,15 @@ void begin_gc(CELL gen)
 		generations[gen] = prior;
 		prior = z;
 		generations[gen].here = generations[gen].base;
-		allot_zone = &generations[gen];
+		newspace = &generations[gen];
 		clear_cards(TENURED,TENURED);
 	}
 	else
 	{
 		/* when collecting a younger generation, we copy
 		reachable objects to the next oldest generation,
-		so we set the allot_zone so the next generation. */
-		allot_zone = &generations[gen + 1];
+		so we set the newspace so the next generation. */
+		newspace = &generations[gen + 1];
 	}
 }
 
@@ -254,9 +256,6 @@ void end_gc(CELL gen)
 		collected are now empty */
 		reset_generations(NURSERY,gen);
 	}
-
-	/* new objects are allocated from the nursery. */
-	allot_zone = &nursery;
 }
 
 /* collect gen and all younger generations */
@@ -274,13 +273,24 @@ void garbage_collection(CELL gen)
 
 	gc_in_progress = true;
 
+	/* we come back here if a generation is full */
+	if(setjmp(gc_jmp))
+	{
+		if(gen == TENURED)
+		{
+			/* oops, out of memory */
+			critical_error("Out of memory",0);
+		}
+		else
+			gen++;
+	}
+
 	begin_gc(gen);
 
 	printf("collecting generation %ld\n",gen);
-	dump_generations();
 
 	/* initialize chase pointer */
-	scan = allot_zone->here;
+	scan = newspace->here;
 
 	/* collect objects referenced from stacks and environment */
 	collect_roots();
@@ -291,7 +301,7 @@ void garbage_collection(CELL gen)
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	
-	while(scan < allot_zone->here)
+	while(scan < newspace->here)
 		scan = collect_next(scan);
 
 	end_gc(gen);
@@ -309,8 +319,6 @@ void primitive_gc(void)
 	CELL gen = to_fixnum(dpop());
 	gen = MAX(NURSERY,MIN(TENURED,gen));
 	garbage_collection(gen);
-	printf("After:\n");
-	dump_generations();
 }
 
 /* WARNING: only call this from a context where all local variables
@@ -329,9 +337,6 @@ void maybe_garbage_collection(void)
 			printf("Minor GC\n");
 			garbage_collection(NURSERY);
 		}
-		
-		printf("After:\n");
-		dump_generations();
 	}
 }
 

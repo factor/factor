@@ -2,7 +2,7 @@
 
 void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 {
-	if(allot_zone->here > allot_zone->limit)
+	if(nursery.here > nursery.limit)
 	{
 		fprintf(stderr,"Out of memory!\n");
 		factorbug();

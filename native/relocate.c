@@ -83,14 +83,6 @@ void relocate_data()
 	}
 }
 
-void relocate_primitive(F_REL* rel, bool relative)
-{
-	/* this is intended for x86, so the address is relative to after
-	the insn, ie offset + CELLS. */
-	put(rel->offset,primitive_to_xt(rel->argument)
-		- (relative ? rel->offset + CELLS : 0));
-}
-
 CELL get_rel_symbol(F_REL* rel)
 {
 	F_CONS* cons = untag_cons(get(rel->argument));
@@ -99,27 +91,25 @@ CELL get_rel_symbol(F_REL* rel)
 	return (CELL)ffi_dlsym(dll,symbol);
 }
 
-void relocate_dlsym(F_REL* rel, bool relative)
+INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 {
-	CELL addr = get_rel_symbol(rel);
-	put(rel->offset,addr - (relative ? rel->offset + CELLS : 0));
-}
-
-/* PowerPC-specific relocations */
-void relocate_primitive_16_16(F_REL* rel)
-{
-	reloc_set_16_16((CELL*)rel->offset,primitive_to_xt(rel->argument));
-}
-
-void relocate_dlsym_16_16(F_REL* rel)
-{
-	reloc_set_16_16((CELL*)rel->offset,get_rel_symbol(rel));
-}
-
-INLINE void code_fixup_16_16(CELL* cell)
-{
-	CELL difference = (compiling.base - code_relocation_base);
-	reloc_set_16_16(cell,reloc_get_16_16(cell) + difference);
+	switch(rel->type)
+	{
+	case F_PRIMITIVE:
+		return primitive_to_xt(rel->argument);
+	case F_DLSYM:
+		code_fixup(&rel->argument);
+		return get_rel_symbol(rel);
+	case F_ABSOLUTE:
+		return original + (compiling.base - code_relocation_base);
+	case F_USERENV:
+		return (CELL)&userenv;
+	case F_CARDS:
+		return ((CELL)cards - heap_start);
+	default:
+		critical_error("Unsupported rel",rel->type);
+		break;
+	}
 }
 
 INLINE CELL relocate_code_next(CELL relocating)
@@ -140,44 +130,26 @@ INLINE CELL relocate_code_next(CELL relocating)
 
 	while(rel < rel_end)
 	{
+		CELL original;
+		CELL new_value;
+
+		if(rel->risc16_16)
+			original = reloc_get_16_16(rel->offset);
+		else
+			original = get(rel->offset);
+
 		/* to_c_string can fill up the heap */
 		maybe_garbage_collection();
-
 		code_fixup(&rel->offset);
+		new_value = compute_code_rel(rel,original);
 
-		switch(rel->type)
-		{
-		case F_RELATIVE_PRIMITIVE:
-			relocate_primitive(rel,true);
-			break;
-		case F_ABSOLUTE_PRIMITIVE:
-			relocate_primitive(rel,false);
-			break;
-		case F_RELATIVE_DLSYM:
-			code_fixup(&rel->argument);
-			relocate_dlsym(rel,true);
-			break;
-		case F_ABSOLUTE_DLSYM:
-			code_fixup(&rel->argument);
-			relocate_dlsym(rel,false);
-			break;
-		case F_ABSOLUTE:
-			code_fixup((CELL*)rel->offset);
-			break;
-		case F_ABSOLUTE_PRIMITIVE_16_16:
-			relocate_primitive_16_16(rel);
-			break;
-		case F_ABSOLUTE_DLSYM_16_16:
-			code_fixup(&rel->argument);
-			relocate_dlsym_16_16(rel);
-			break;
-		case F_ABSOLUTE_16_16:
-			code_fixup_16_16((CELL*)rel->offset);
-			break;
-		default:
-			critical_error("Unsupported rel",rel->type);
-			break;
-		}
+		if(rel->relative)
+			new_value -= (rel->offset + CELLS);
+
+		if(rel->risc16_16)
+			reloc_set_16_16(rel->offset,new_value);
+		else
+			put(rel->offset,new_value);
 
 		rel++;
 	}

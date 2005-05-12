@@ -39,8 +39,6 @@ void init_arena(CELL young_size, CELL aging_size)
 
 	clear_cards(TENURED,NURSERY);
 
-	allot_zone = &nursery;
-
 	if(alloter != heap_start + total_size)
 		fatal_error("Oops",alloter);
 
@@ -56,9 +54,6 @@ void allot_profile_step(CELL a)
 	int i;
 	CELL obj;
 
-	if(gc_in_progress)
-		return;
-
 	for(i = profile_depth; i < depth; i++)
 	{
 		obj = get(cs_bot + i * CELLS);
@@ -66,8 +61,6 @@ void allot_profile_step(CELL a)
 			untag_word(obj)->allot_count += a;
 	}
 
-	if(in_zone(&prior,executing))
-		critical_error("executing in prior zone",executing);
 	untag_word_fast(executing)->allot_count += a;
 }
 

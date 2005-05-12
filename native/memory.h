@@ -55,7 +55,9 @@ INLINE bool in_zone(ZONE* z, CELL pointer)
 #define TENURED (GC_GENERATIONS-1)
 
 ZONE generations[GC_GENERATIONS];
-ZONE *allot_zone;
+
+/* used during garbage collection only */
+ZONE *newspace;
 
 #define tenured generations[TENURED]
 #define nursery generations[NURSERY]
@@ -124,8 +126,6 @@ INLINE void write_barrier(CELL address)
 INLINE void allot_barrier(CELL address)
 {
 	CARD *ptr = ADDR_TO_CARD(address);
-	/* we need to remember the first object allocated in the
-	card */
 	CARD c = *ptr;
 	*ptr = (card_marked(c) | MIN(card_base(c),(address & ADDR_CARD_MASK)));
 }
@@ -147,14 +147,20 @@ INLINE CELL align8(CELL a)
 	return ((a & 7) == 0) ? a : ((a + 8) & ~7);
 }
 
+INLINE void *allot_zone(ZONE *z, CELL a)
+{
+	CELL h = z->here;
+	z->here = h + align8(a);
+	allot_barrier(h);
+	return (void*)h;
+}
+
 INLINE void *allot(CELL a)
 {
-	CELL h = allot_zone->here;
-	allot_barrier(h);
-	allot_zone->here = h + align8(a);
 	if(allot_profiling)
 		allot_profile_step(align8(a));
-	return (void*)h;
+	allot_barrier(nursery.here);
+	return allot_zone(&nursery,a);
 }
 
 bool in_zone(ZONE* z, CELL pointer);
