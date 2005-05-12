@@ -34,7 +34,7 @@ USE: memory
 
 : indexed-literal-test "hello world" ; compiled
 
-garbage-collection
-garbage-collection
+full-gc
+full-gc
 
 [ "hello world" ] [ indexed-literal-test ] unit-test

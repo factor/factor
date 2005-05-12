@@ -14,6 +14,12 @@ F_ARRAY* allot_array(CELL type, CELL capacity)
 	return array;
 }
 
+/* WARNING: fill must be an immediate type:
+either be F or a fixnum.
+
+if you want to use pass a pointer, you _must_ hit
+the write barrier manually with a write_barrier()
+call with the returned object. */
 F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 {
 	int i; F_ARRAY* array = allot_array(type, capacity);
@@ -40,9 +46,9 @@ void primitive_byte_array(void)
 	dpush(tag_object(array(BYTE_ARRAY_TYPE,to_fixnum(dpop()),0)));
 }
 
+/* see note about fill in array() */
 F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
-	/* later on, do an optimization: if end of array is here, just grow */
 	int i; F_ARRAY* new_array;
 	CELL curr_cap = array_capacity(array);
 	if(curr_cap >= capacity)

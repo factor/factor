@@ -2,8 +2,6 @@
 
 void relocate_object(CELL relocating)
 {
-	allot_barrier(relocating);
-
 	switch(untag_header(get(relocating)))
 	{
 	case WORD_TYPE:
@@ -41,6 +39,8 @@ INLINE CELL relocate_data_next(CELL relocating)
 {
 	CELL size = CELLS;
 	CELL cell = get(relocating);
+
+	allot_barrier(relocating);
 
 	if(headerp(cell))
 	{
@@ -136,7 +136,7 @@ INLINE CELL relocate_code_next(CELL relocating)
 		+ compiled->reloc_length);
 
 	if(compiled->header != COMPILED_HEADER)
-		fatal_error("Wrong compiled header",relocating);
+		critical_error("Wrong compiled header",relocating);
 
 	while(rel < rel_end)
 	{
@@ -175,7 +175,7 @@ INLINE CELL relocate_code_next(CELL relocating)
 			code_fixup_16_16((CELL*)rel->offset);
 			break;
 		default:
-			fatal_error("Unsupported rel",rel->type);
+			critical_error("Unsupported rel",rel->type);
 			break;
 		}
 

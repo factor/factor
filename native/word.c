@@ -54,6 +54,6 @@ void fixup_word(F_WORD* word)
 
 void collect_word(F_WORD* word)
 {
-	COPY_OBJECT(word->def);
-	COPY_OBJECT(word->props);
+	copy_handle(&word->def);
+	copy_handle(&word->props);
 }

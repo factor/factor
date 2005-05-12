@@ -53,5 +53,5 @@ void fixup_dll(DLL* dll)
 
 void collect_dll(DLL* dll)
 {
-	COPY_OBJECT(dll->path);
+	copy_handle(&dll->path);
 }

@@ -1,8 +1,5 @@
 #define USER_ENV 16
 
-#define STDIN_ENV      0
-#define STDOUT_ENV     1
-#define STDERR_ENV     2
 #define NAMESTACK_ENV  3 /* used by library only */
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
@@ -15,6 +12,7 @@
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
 #define IN_ENV         13
 #define OUT_ENV        14
+#define GEN_ENV        15 /* set to GC_GENERATIONS constant */
 
 /* Profiling timer */
 #ifndef WIN32

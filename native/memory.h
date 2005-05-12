@@ -58,9 +58,10 @@ ZONE generations[GC_GENERATIONS];
 ZONE *allot_zone;
 
 #define tenured generations[TENURED]
-#define nursery generations[TENURED] /* XXX */
+#define nursery generations[NURSERY]
 
 CELL heap_start;
+CELL heap_end;
 
 /* spare semi-space; rotates with tenured. */
 ZONE prior;
@@ -82,28 +83,28 @@ CARD *cards_end;
 /* A card is 16 bytes (128 bits), 5 address bits per card.
 it is important that 7 bits is sufficient to represent every
 offset within the card */
-#define CARD_SIZE 16
-#define CARD_BITS 4
-#define CARD_MASK (CARD_SIZE-1)
+#define CARD_SIZE 128
+#define CARD_BITS 7
+#define ADDR_CARD_MASK (CARD_SIZE-1)
 
 INLINE CARD card_marked(CARD c)
 {
 	return c & CARD_MARK_MASK;
 }
 
+INLINE void unmark_card(CARD *c)
+{
+	*c &= CARD_BASE_MASK;
+}
+
 INLINE void clear_card(CARD *c)
 {
-	*c = CARD_BASE_MASK;
+	*c = CARD_BASE_MASK; /* invalid value */
 }
 
 INLINE u8 card_base(CARD c)
 {
 	return c & CARD_BASE_MASK;
-}
-
-INLINE void rebase_card(CARD *c, u8 base)
-{
-	*c = base;
 }
 
 #define ADDR_TO_CARD(a) (CARD*)((((CELL)a-heap_start)>>CARD_BITS)+(CELL)cards)
@@ -122,10 +123,11 @@ INLINE void write_barrier(CELL address)
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	CARD *c = ADDR_TO_CARD(address);
+	CARD *ptr = ADDR_TO_CARD(address);
 	/* we need to remember the first object allocated in the
 	card */
-	rebase_card(c,MIN(card_base(*c),(address & CARD_MASK)));
+	CARD c = *ptr;
+	*ptr = (card_marked(c) | MIN(card_base(c),(address & ADDR_CARD_MASK)));
 }
 
 bool allot_profiling;
@@ -134,7 +136,6 @@ bool allot_profiling;
 size must be a multiple of the page size */
 void* alloc_guarded(CELL size);
 
-void dump_generations(void);
 CELL init_zone(ZONE *z, CELL size, CELL base);
 void init_arena(CELL young_size, CELL aging_size);
 void flip_zones();
@@ -146,7 +147,7 @@ INLINE CELL align8(CELL a)
 	return ((a & 7) == 0) ? a : ((a + 8) & ~7);
 }
 
-INLINE void* allot(CELL a)
+INLINE void *allot(CELL a)
 {
 	CELL h = allot_zone->here;
 	allot_barrier(h);

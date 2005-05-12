@@ -15,6 +15,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_errors();
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
+	userenv[GEN_ENV] = tag_fixnum(GC_GENERATIONS);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
@@ -33,8 +34,8 @@ int main(int argc, char** argv)
 {
 	CELL ds_size = 2048;
 	CELL cs_size = 2048;
-	CELL young_size = 4;
-	CELL aging_size = 8;
+	CELL young_size = 8;
+	CELL aging_size = 16;
 	CELL code_size = 2;
 	CELL literal_size = 64;
 	CELL args;

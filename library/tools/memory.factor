@@ -5,6 +5,10 @@ USING: errors generic hashtables kernel kernel-internals lists
 math namespaces prettyprint sequences stdio strings unparser
 vectors words ;
 
+: generations 15 getenv ;
+
+: full-gc generations 1 - gc ;
+
 : save
     #! Save the current image.
     "image" get save-image ;

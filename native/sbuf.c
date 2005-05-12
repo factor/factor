@@ -24,5 +24,5 @@ void fixup_sbuf(F_SBUF* sbuf)
 
 void collect_sbuf(F_SBUF* sbuf)
 {
-	COPY_OBJECT(sbuf->string);
+	copy_handle(&sbuf->string);
 }

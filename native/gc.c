@@ -7,17 +7,13 @@ void collect_roots(void)
 	int i;
 	CELL ptr;
 
-	gc_debug("root: t",T);
-	COPY_OBJECT(T);
-	gc_debug("root: bignum_zero",bignum_zero);
-	COPY_OBJECT(bignum_zero);
-	gc_debug("root: bignum_pos_one",bignum_pos_one);
-	COPY_OBJECT(bignum_pos_one);
-	gc_debug("root: bignum_neg_one",bignum_neg_one);
-	COPY_OBJECT(bignum_neg_one);
-	gc_debug("root: callframe",callframe);
+	copy_handle(&T);
+	copy_handle(&bignum_zero);
+	copy_handle(&bignum_pos_one);
+	copy_handle(&bignum_neg_one);
+	/* we can't use & here since these two are in
+	registers on PowerPC */
 	COPY_OBJECT(callframe);
-	gc_debug("root: executing",executing);
 	COPY_OBJECT(executing);
 
 	for(ptr = ds_bot; ptr <= ds; ptr += CELLS)
@@ -30,22 +26,68 @@ void collect_roots(void)
 		copy_handle(&userenv[i]);
 }
 
+/* Given a pointer to oldspace, copy it to newspace. */
+INLINE void* copy_untagged_object(void* pointer, CELL size)
+{
+	void* newpointer = allot(size);
+	memcpy(newpointer,pointer,size);
+
+	return newpointer;
+}
+
+INLINE CELL copy_object_impl(CELL pointer)
+{
+	CELL newpointer;
+
+	if(pointer < collecting_generation)
+		critical_error("asked to copy object outside collected generation",pointer);
+	
+	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
+		object_size(pointer));
+
+	/* install forwarding pointer */
+	put(UNTAG(pointer),RETAG(newpointer,GC_COLLECTED));
+
+	return newpointer;
+}
+
 /*
 Given a pointer to a tagged pointer to oldspace, copy it to newspace.
 If the object has already been copied, return the forwarding
 pointer address without copying anything; otherwise, install
 a new forwarding pointer.
 */
-CELL copy_object_impl(CELL pointer)
+CELL copy_object(CELL pointer)
 {
-	CELL newpointer;
+	CELL tag;
+	CELL header;
+	CELL untagged;
 
-	gc_debug("copy_object",pointer);
-	newpointer = (CELL)copy_untagged_object((void*)UNTAG(pointer),
-		object_size(pointer));
-	put(UNTAG(pointer),RETAG(newpointer,OBJECT_TYPE));
+	gc_debug("copy object",pointer);
 
-	return newpointer;
+	if(pointer == F)
+		return F;
+
+	tag = TAG(pointer);
+
+	if(tag == FIXNUM_TYPE)
+		return pointer;
+
+	header = get(UNTAG(pointer));
+	untagged = UNTAG(header);
+	if(TAG(header) == GC_COLLECTED)
+	{
+		header = get(untagged);
+		while(header == GC_COLLECTED)
+		{
+			untagged = UNTAG(header);
+			header = get(untagged);
+		}
+		gc_debug("forwarding",untagged);
+		return RETAG(untagged,tag);
+	}
+	else
+		return RETAG(copy_object_impl(pointer),tag);
 }
 
 INLINE void collect_object(CELL scan)
@@ -80,8 +122,6 @@ INLINE void collect_object(CELL scan)
 INLINE CELL collect_next(CELL scan)
 {
 	CELL size;
-	gc_debug("collect_next",scan);
-	gc_debug("collect_next header",get(scan));
 	if(headerp(get(scan)))
 	{
 		size = untagged_object_size(scan);
@@ -96,15 +136,8 @@ INLINE CELL collect_next(CELL scan)
 	return scan + size;
 }
 
-void clear_cards(void)
-{
-	BYTE *ptr;
-	for(ptr = cards; ptr < cards_end; ptr++)
-		clear_card(ptr);
-}
-
 /* scan all the objects in the card */
-void collect_card(CARD *ptr)
+INLINE void collect_card(CARD *ptr, CELL here)
 {
 	CARD c = *ptr;
 	CELL offset = (c & CARD_BASE_MASK);
@@ -112,32 +145,66 @@ void collect_card(CARD *ptr)
 	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
 
 	if(offset == 0x7f)
-		critical_error("bad card",c);
+	{
+		if(c == 0xff)
+			critical_error("bad card",c);
+		else
+			return;
+	}
 
-	printf("! write barrier hit %d\n",offset);
-	while(card_scan < card_end)
+	/* printf("write barrier hit %ld\n",offset); */
+	while(card_scan < card_end && card_scan < here)
 		card_scan = collect_next(card_scan);
-
-	clear_card(ptr);
 }
 
-void collect_gen_cards(CELL gen)
+INLINE void collect_gen_cards(CELL gen)
 {
 	CARD *ptr = ADDR_TO_CARD(generations[gen].base);
-	CARD *last_card = ADDR_TO_CARD(generations[gen].here);
-	for(ptr = cards; ptr <= last_card; ptr++)
+	CELL here = generations[gen].here;
+	CARD *last_card = ADDR_TO_CARD(here);
+	
+	if(generations[gen].here == generations[gen].limit)
+		last_card--;
+	
+	for(; ptr <= last_card; ptr++)
 	{
 		if(card_marked(*ptr))
-			collect_card(ptr);
+			collect_card(ptr,here);
 	}
 }
 
-/* scan cards in all generations older than the one being collected */
-void collect_cards(void)
+void unmark_cards(CELL from, CELL to)
 {
-	CELL gen;
-	for(gen = collecting_generation; gen < GC_GENERATIONS; gen++)
-		collect_gen_cards(gen);
+	CARD *ptr = ADDR_TO_CARD(generations[from].base);
+	CARD *last_card = ADDR_TO_CARD(generations[to].here);
+	if(generations[to].here == generations[to].limit)
+		last_card--;
+	for(; ptr <= last_card; ptr++)
+		unmark_card(ptr);
+}
+
+void clear_cards(CELL from, CELL to)
+{
+	CARD *ptr = ADDR_TO_CARD(generations[from].base);
+	CARD *last_card = ADDR_TO_CARD(generations[to].limit);
+	for(; ptr < last_card; ptr++)
+		clear_card(ptr);
+}
+
+void reset_generations(CELL from, CELL to)
+{
+	CELL i;
+	for(i = from; i <= to; i++)
+		generations[i].here = generations[i].base;
+	clear_cards(from,to);
+}
+
+/* scan cards in all generations older than the one being collected */
+void collect_cards(CELL gen)
+{
+	int i;
+	for(i = gen + 1; i < GC_GENERATIONS; i++)
+		collect_gen_cards(i);
 }
 
 void begin_gc(CELL gen)
@@ -153,6 +220,7 @@ void begin_gc(CELL gen)
 		prior = z;
 		generations[gen].here = generations[gen].base;
 		allot_zone = &generations[gen];
+		clear_cards(TENURED,TENURED);
 	}
 	else
 	{
@@ -165,7 +233,29 @@ void begin_gc(CELL gen)
 
 void end_gc(CELL gen)
 {
-	/* continue allocating from the nursery. */
+	if(gen == TENURED)
+	{
+		/* we did a full collection; no more
+		old-to-new pointers remain since everything
+		is in tenured space */
+		unmark_cards(TENURED,TENURED);
+		/* all generations except tenured space are
+		now empty */
+		reset_generations(NURSERY,TENURED - 1);
+	}
+	else
+	{
+		/* we collected a younger generation. so the
+		next-oldest generation no longer has any
+		pointers into the younger generation (the
+		younger generation is empty!) */
+		unmark_cards(gen + 1,gen + 1);
+		/* all generations up to and including the one
+		collected are now empty */
+		reset_generations(NURSERY,gen);
+	}
+
+	/* new objects are allocated from the nursery. */
 	allot_zone = &nursery;
 }
 
@@ -186,32 +276,41 @@ void garbage_collection(CELL gen)
 
 	begin_gc(gen);
 
+	printf("collecting generation %ld\n",gen);
+	dump_generations();
+
 	/* initialize chase pointer */
 	scan = allot_zone->here;
 
+	/* collect objects referenced from stacks and environment */
 	collect_roots();
-	collect_cards();
+	
+	/* collect objects referenced from older generations */
+	collect_cards(gen);
 
 	/* collect literal objects referenced from compiled code */
 	collect_literals();
 	
 	while(scan < allot_zone->here)
-	{
-		gc_debug("scan loop",scan);
 		scan = collect_next(scan);
-	}
 
 	end_gc(gen);
 
-	gc_debug("gc done",0);
+	gc_debug("gc done",gen);
 
 	gc_in_progress = false;
 	gc_time += (current_millis() - start);
+	
+	gc_debug("total gc time",gc_time);
 }
 
 void primitive_gc(void)
 {
-	garbage_collection(TENURED);
+	CELL gen = to_fixnum(dpop());
+	gen = MAX(NURSERY,MIN(TENURED,gen));
+	garbage_collection(gen);
+	printf("After:\n");
+	dump_generations();
 }
 
 /* WARNING: only call this from a context where all local variables
@@ -219,7 +318,21 @@ are also reachable via the GC roots. */
 void maybe_garbage_collection(void)
 {
 	if(nursery.here > nursery.alarm)
-		primitive_gc();
+	{
+		if(tenured.here > tenured.alarm)
+		{
+			printf("Major GC\n");
+			garbage_collection(TENURED);
+		}
+		else
+		{
+			printf("Minor GC\n");
+			garbage_collection(NURSERY);
+		}
+		
+		printf("After:\n");
+		dump_generations();
+	}
 }
 
 void primitive_gc_time(void)

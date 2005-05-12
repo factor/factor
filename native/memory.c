@@ -1,26 +1,5 @@
 #include "factor.h"
 
-void dump_generations(void)
-{
-	int i;
-	for(i = 0; i < GC_GENERATIONS; i++)
-	{
-		fprintf(stderr,"Generation %d: base=%lu, size=%lu, here=%lu\n",
-			i,
-			generations[i].base,
-			generations[i].limit - generations[i].base,
-			generations[i].here);
-	}
-
-	fprintf(stderr,"Semispace: base=%lu, size=%lu, here=%lu\n",
-		prior.base,
-		prior.limit - prior.base,
-		prior.here);
-
-	fprintf(stderr,"Cards: base=%lu, size=%lu\n",(CELL)cards,
-		(CELL)(cards_end - cards));
-}
-
 CELL init_zone(ZONE *z, CELL size, CELL base)
 {
 	z->base = z->here = base;
@@ -30,18 +9,24 @@ CELL init_zone(ZONE *z, CELL size, CELL base)
 }
 
 /* input parameters must be 8 byte aligned */
+/* the heap layout is important:
+- two semispaces: tenured and prior
+- younger generations follow */
 void init_arena(CELL young_size, CELL aging_size)
 {
+	int i;
+	CELL alloter;
+
 	CELL total_size = (GC_GENERATIONS - 1) * young_size + 2 * aging_size;
 	CELL cards_size = total_size / CARD_SIZE;
 
 	heap_start = (CELL)alloc_guarded(total_size);
+	heap_end = heap_start + total_size;
+
 	cards = alloc_guarded(cards_size);
 	cards_end = cards + cards_size;
-	clear_cards();
 
-	int i;
-	CELL alloter = heap_start;
+	alloter = heap_start;
 
 	if(heap_start == 0)
 		fatal_error("Cannot allocate data heap",total_size);
@@ -49,8 +34,10 @@ void init_arena(CELL young_size, CELL aging_size)
 	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);
 
-	for(i = 0; i < GC_GENERATIONS - 1; i++)
+	for(i = GC_GENERATIONS - 2; i >= 0; i--)
 		alloter = init_zone(&generations[i],young_size,alloter);
+
+	clear_cards(TENURED,NURSERY);
 
 	allot_zone = &nursery;
 
@@ -127,7 +114,7 @@ void primitive_size(void)
 
 void primitive_begin_scan(void)
 {
-	primitive_gc();
+	garbage_collection(TENURED);
 	heap_scan_ptr = tenured.base;
 	heap_scan_end = tenured.here;
 	heap_scan = true;

@@ -87,7 +87,7 @@ void fixup_displaced_alien(DISPLACED_ALIEN* d)
 
 void collect_displaced_alien(DISPLACED_ALIEN* d)
 {
-	COPY_OBJECT(d->alien);
+	copy_handle(&d->alien);
 }
 
 #define DEF_ALIEN_SLOT(name,type,boxer) \

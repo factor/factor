@@ -14,8 +14,7 @@ void fatal_error(char* msg, CELL tagged)
 void critical_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"Critical error: %s %ld\n",msg,tagged);
-	save_image("factor.crash.image");
-	exit(1);
+	factorbug();
 }
 
 void early_error(CELL error)
@@ -26,9 +25,7 @@ void early_error(CELL error)
 		fprintf(stderr,"Error during startup: ");
 		print_obj(error);
 		fprintf(stderr,"\n");
-		dump_stacks();
-		fflush(stderr);
-		exit(1);
+		factorbug();
 	}
 }
 
@@ -60,9 +57,7 @@ void primitive_throw(void)
 
 void primitive_die(void)
 {
-	dump_stacks();
-	fflush(stderr);
-	exit(1);
+	factorbug();
 }
 
 void general_error(CELL error, CELL tagged)

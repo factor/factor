@@ -5,9 +5,7 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 	if(allot_zone->here > allot_zone->limit)
 	{
 		fprintf(stderr,"Out of memory!\n");
-		dump_generations();
-		fflush(stderr);
-		exit(1);
+		factorbug();
 	}
 	else
 		signal_error(signal);
@@ -15,7 +13,7 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap)
 {
-	dump_stacks();
+	factorbug();
 }
 
 /* Called from a signal handler. XXX - is this safe? */
@@ -40,12 +38,16 @@ void init_signals(void)
 	struct sigaction profiling_sigaction;
 	struct sigaction ign_sigaction;
 	struct sigaction dump_sigaction;
+	sigemptyset(&custom_sigaction.sa_mask);
 	custom_sigaction.sa_sigaction = signal_handler;
 	custom_sigaction.sa_flags = SA_SIGINFO;
+	sigemptyset(&profiling_sigaction.sa_mask);
 	profiling_sigaction.sa_sigaction = call_profiling_step;
 	profiling_sigaction.sa_flags = SA_SIGINFO;
+	sigemptyset(&dump_sigaction.sa_mask);
 	dump_sigaction.sa_sigaction = dump_stack_signal;
 	dump_sigaction.sa_flags = SA_SIGINFO;
+	sigemptyset(&ign_sigaction.sa_mask);
 	ign_sigaction.sa_handler = SIG_IGN;
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
