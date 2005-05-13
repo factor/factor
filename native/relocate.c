@@ -108,7 +108,7 @@ INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 		return ((CELL)cards - heap_start);
 	default:
 		critical_error("Unsupported rel",rel->type);
-		break;
+		return -1;
 	}
 }
 

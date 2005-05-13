@@ -2,6 +2,58 @@
 
 /* Generational copying garbage collector */
 
+CELL init_zone(ZONE *z, CELL size, CELL base)
+{
+	z->base = z->here = base;
+	z->limit = z->base + size;
+	z->alarm = z->base + (size * 3) / 4;
+	return z->limit;
+}
+
+/* input parameters must be 8 byte aligned */
+/* the heap layout is important:
+- two semispaces: tenured and prior
+- younger generations follow
+there are two reasons for this:
+- we can easily check if a pointer is in some generation or a younger one
+- the nursery grows into the guard page, so allot() does not have to
+check for out of memory, whereas allot_zone() (used by the GC) longjmp()s
+back to collecting a higher generation */
+void init_arena(CELL young_size, CELL aging_size)
+{
+	int i;
+	CELL alloter;
+
+	CELL total_size = (GC_GENERATIONS - 1) * young_size + 2 * aging_size;
+	CELL cards_size = total_size / CARD_SIZE;
+
+	heap_start = (CELL)alloc_guarded(total_size);
+	heap_end = heap_start + total_size;
+
+	cards = alloc_guarded(cards_size);
+	cards_end = cards + cards_size;
+
+	alloter = heap_start;
+
+	if(heap_start == 0)
+		fatal_error("Cannot allocate data heap",total_size);
+
+	alloter = init_zone(&tenured,aging_size,alloter);
+	alloter = init_zone(&prior,aging_size,alloter);
+
+	for(i = GC_GENERATIONS - 2; i >= 0; i--)
+		alloter = init_zone(&generations[i],young_size,alloter);
+
+	clear_cards(TENURED,NURSERY);
+
+	if(alloter != heap_start + total_size)
+		fatal_error("Oops",alloter);
+
+	allot_profiling = false;
+	heap_scan = false;
+	gc_time = 0;
+}
+
 void collect_roots(void)
 {
 	int i;
@@ -24,6 +76,18 @@ void collect_roots(void)
 
 	for(i = 0; i < USER_ENV; i++)
 		copy_handle(&userenv[i]);
+}
+
+/* follow a chain of forwarding pointers */
+CELL resolve_forwarding(CELL untagged, CELL tag)
+{
+	CELL header = get(untagged);
+	/* another forwarding pointer */
+	if(TAG(header) == GC_COLLECTED)
+		return resolve_forwarding(UNTAG(header),tag);
+	/* we've found the destination */
+	else
+		return RETAG(untagged,tag);
 }
 
 /* Given a pointer to oldspace, copy it to newspace. */
@@ -63,7 +127,6 @@ CELL copy_object(CELL pointer)
 {
 	CELL tag;
 	CELL header;
-	CELL untagged;
 
 	gc_debug("copy object",pointer);
 
@@ -76,18 +139,8 @@ CELL copy_object(CELL pointer)
 		return pointer;
 
 	header = get(UNTAG(pointer));
-	untagged = UNTAG(header);
 	if(TAG(header) == GC_COLLECTED)
-	{
-		header = get(untagged);
-		while(header == GC_COLLECTED)
-		{
-			untagged = UNTAG(header);
-			header = get(untagged);
-		}
-		gc_debug("forwarding",untagged);
-		return RETAG(untagged,tag);
-	}
+		return resolve_forwarding(UNTAG(header),tag);
 	else
 		return RETAG(copy_object_impl(pointer),tag);
 }
@@ -121,7 +174,7 @@ INLINE void collect_object(CELL scan)
 	}
 }
 
-INLINE CELL collect_next(CELL scan)
+CELL collect_next(CELL scan)
 {
 	CELL size;
 	
@@ -139,74 +192,12 @@ INLINE CELL collect_next(CELL scan)
 	return scan + size;
 }
 
-/* scan all the objects in the card */
-INLINE void collect_card(CARD *ptr, CELL here)
-{
-	CARD c = *ptr;
-	CELL offset = (c & CARD_BASE_MASK);
-	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
-	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
-
-	if(offset == 0x7f)
-	{
-		if(c == 0xff)
-			critical_error("bad card",c);
-		else
-			return;
-	}
-
-	while(card_scan < card_end && card_scan < here)
-		card_scan = collect_next(card_scan);
-}
-
-INLINE void collect_gen_cards(CELL gen)
-{
-	CARD *ptr = ADDR_TO_CARD(generations[gen].base);
-	CELL here = generations[gen].here;
-	CARD *last_card = ADDR_TO_CARD(here);
-	
-	if(generations[gen].here == generations[gen].limit)
-		last_card--;
-	
-	for(; ptr <= last_card; ptr++)
-	{
-		if(card_marked(*ptr))
-			collect_card(ptr,here);
-	}
-}
-
-void unmark_cards(CELL from, CELL to)
-{
-	CARD *ptr = ADDR_TO_CARD(generations[from].base);
-	CARD *last_card = ADDR_TO_CARD(generations[to].here);
-	if(generations[to].here == generations[to].limit)
-		last_card--;
-	for(; ptr <= last_card; ptr++)
-		unmark_card(ptr);
-}
-
-void clear_cards(CELL from, CELL to)
-{
-	CARD *ptr = ADDR_TO_CARD(generations[from].base);
-	CARD *last_card = ADDR_TO_CARD(generations[to].limit);
-	for(; ptr < last_card; ptr++)
-		clear_card(ptr);
-}
-
 void reset_generations(CELL from, CELL to)
 {
 	CELL i;
 	for(i = from; i <= to; i++)
 		generations[i].here = generations[i].base;
 	clear_cards(from,to);
-}
-
-/* scan cards in all generations older than the one being collected */
-void collect_cards(CELL gen)
-{
-	int i;
-	for(i = gen + 1; i < GC_GENERATIONS; i++)
-		collect_gen_cards(i);
 }
 
 void begin_gc(CELL gen)
@@ -243,7 +234,7 @@ void end_gc(CELL gen)
 		unmark_cards(TENURED,TENURED);
 		/* all generations except tenured space are
 		now empty */
-		reset_generations(NURSERY,TENURED - 1);
+		reset_generations(TENURED - 1,NURSERY);
 	}
 	else
 	{
@@ -254,7 +245,7 @@ void end_gc(CELL gen)
 		unmark_cards(gen + 1,gen + 1);
 		/* all generations up to and including the one
 		collected are now empty */
-		reset_generations(NURSERY,gen);
+		reset_generations(gen,NURSERY);
 	}
 }
 
@@ -265,13 +256,7 @@ void garbage_collection(CELL gen)
 	CELL scan;
 
 	if(heap_scan)
-	{
-		fprintf(stderr,"GC disabled\n");
-		fflush(stderr);
-		return;
-	}
-
-	gc_in_progress = true;
+		critical_error("GC disabled during heap scan",gen);
 
 	/* we come back here if a generation is full */
 	if(setjmp(gc_jmp))
@@ -286,8 +271,6 @@ void garbage_collection(CELL gen)
 	}
 
 	begin_gc(gen);
-
-	printf("collecting generation %ld\n",gen);
 
 	/* initialize chase pointer */
 	scan = newspace->here;
@@ -308,7 +291,6 @@ void garbage_collection(CELL gen)
 
 	gc_debug("gc done",gen);
 
-	gc_in_progress = false;
 	gc_time += (current_millis() - start);
 	
 	gc_debug("total gc time",gc_time);
@@ -326,18 +308,7 @@ are also reachable via the GC roots. */
 void maybe_garbage_collection(void)
 {
 	if(nursery.here > nursery.alarm)
-	{
-		if(tenured.here > tenured.alarm)
-		{
-			printf("Major GC\n");
-			garbage_collection(TENURED);
-		}
-		else
-		{
-			printf("Minor GC\n");
-			garbage_collection(NURSERY);
-		}
-	}
+		garbage_collection(NURSERY);
 }
 
 void primitive_gc_time(void)

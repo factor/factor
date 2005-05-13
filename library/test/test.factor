@@ -87,7 +87,7 @@ SYMBOL: failures
             "buffer" ,
         ] when
         
-        cpu "unknown" = [
+        cpu "unknown" = "compile" get and [
             [
                 "io/buffer" "compiler/optimizer"
                 "compiler/simple"

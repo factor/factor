@@ -1,10 +1,13 @@
 CC = gcc
-DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
-#DEFAULT_CFLAGS = -g
-DEFAULT_LIBS = -lm
+ifdef DEBUG
+	DEFAULT_CFLAGS = -g
+	STRIP = touch
+else
+	DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
+	STRIP = strip
+endif
 
-STRIP = strip
-#STRIP = touch
+DEFAULT_LIBS = -lm
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
@@ -35,7 +38,7 @@ OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/ratio.o native/relocate.o \
 	native/run.o \
 	native/sbuf.o native/stack.o \
-	native/string.o native/types.o native/vector.o \
+	native/string.o native/cards.o native/vector.o \
 	native/word.o native/compiler.o \
 	native/alien.o native/dll.o \
 	native/boolean.o \

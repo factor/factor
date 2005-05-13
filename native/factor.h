@@ -106,9 +106,9 @@ typedef signed long long s64;
 /* must always be 8 bits */
 typedef unsigned char BYTE;
 
-#include "memory.h"
 #include "error.h"
-#include "types.h"
+#include "cards.h"
+#include "memory.h"
 #include "gc.h"
 #include "boolean.h"
 #include "word.h"

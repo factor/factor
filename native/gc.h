@@ -1,7 +1,41 @@
-bool gc_in_progress;
+/* generational copying GC divides memory into zones */
+typedef struct {
+	/* start of zone */
+	CELL base;
+	/* allocation pointer */
+	CELL here;
+	/* only for nursery: when it gets this full, call GC */
+	CELL alarm;
+	/* end of zone */
+	CELL limit;
+} ZONE;
 
-/* GC is off during heap walking */
-bool heap_scan;
+/* total number of generations. */
+#define GC_GENERATIONS 3
+/* the 0th generation is where new objects are allocated. */
+#define NURSERY 0
+/* the oldest generation */
+#define TENURED (GC_GENERATIONS-1)
+
+ZONE generations[GC_GENERATIONS];
+
+/* used during garbage collection only */
+ZONE *newspace;
+
+#define tenured generations[TENURED]
+#define nursery generations[NURSERY]
+
+/* spare semi-space; rotates with tenured. */
+ZONE prior;
+
+INLINE bool in_zone(ZONE* z, CELL pointer)
+{
+	return pointer >= z->base && pointer < z->limit;
+}
+
+CELL init_zone(ZONE *z, CELL size, CELL base);
+
+void init_arena(CELL young_size, CELL aging_size);
 
 s64 gc_time;
 
@@ -30,13 +64,46 @@ INLINE void copy_handle(CELL *handle)
 	COPY_OBJECT(*handle);
 }
 
-void clear_cards(CELL from, CELL to);
-void unmark_cards(CELL from, CELL to);
-void primitive_gc(void);
-void garbage_collection(CELL gen);
-void maybe_garbage_collection(void);
-void primitive_gc_time(void);
-
 /* in case a generation fills up in the middle of a gc, we jump back
 up to try collecting the next generation. */
 jmp_buf gc_jmp;
+
+/* A heap walk allows useful things to be done, like finding all
+references to an object for debugging purposes. */
+CELL heap_scan_ptr;
+
+/* GC is off during heap walking */
+bool heap_scan;
+
+INLINE void *allot_zone(ZONE *z, CELL a)
+{
+	CELL h = z->here;
+	z->here = h + align8(a);
+	allot_barrier(h);
+	return (void*)h;
+}
+
+INLINE void *allot(CELL a)
+{
+	if(allot_profiling)
+		allot_profile_step(align8(a));
+	allot_barrier(nursery.here);
+	return allot_zone(&nursery,a);
+}
+
+/*
+ * It is up to the caller to fill in the object's fields in a meaningful
+ * fashion!
+ */
+INLINE void* allot_object(CELL type, CELL length)
+{
+	CELL* object = allot(length);
+	*object = tag_header(type);
+	return object;
+}
+
+CELL collect_next(CELL scan);
+void garbage_collection(CELL gen);
+void primitive_gc(void);
+void maybe_garbage_collection(void);
+void primitive_gc_time(void);

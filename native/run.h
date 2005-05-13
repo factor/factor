@@ -14,6 +14,9 @@
 #define OUT_ENV        14
 #define GEN_ENV        15 /* set to GC_GENERATIONS constant */
 
+/* TAGGED user environment data; see getenv/setenv prims */
+CELL userenv[USER_ENV];
+
 /* Profiling timer */
 #ifndef WIN32
 struct itimerval prof_timer;
@@ -25,9 +28,6 @@ jmp_buf toplevel;
 #else
 sigjmp_buf toplevel;
 #endif
-
-/* TAGGED user environment data; see getenv/setenv prims */
-CELL userenv[USER_ENV];
 
 /* Call stack depth to start profile counter from */
 /* This ensures that words in the user's interpreter do not count */

@@ -1,51 +1,132 @@
 #include "factor.h"
 
-CELL init_zone(ZONE *z, CELL size, CELL base)
+CELL object_size(CELL pointer)
 {
-	z->base = z->here = base;
-	z->limit = z->base + size;
-	z->alarm = z->base + (size * 3) / 4;
-	return z->limit;
+	CELL size;
+
+	switch(TAG(pointer))
+	{
+	case FIXNUM_TYPE:
+		size = 0;
+		break;
+	case BIGNUM_TYPE:
+		size = untagged_object_size(UNTAG(pointer));
+		break;
+	case CONS_TYPE:
+		size = sizeof(F_CONS);
+		break;
+	case RATIO_TYPE:
+		size = sizeof(F_RATIO);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
+		break;
+	case COMPLEX_TYPE:
+		size = sizeof(F_CONS);
+		break;
+	case OBJECT_TYPE:
+		size = untagged_object_size(UNTAG(pointer));
+		break;
+	default:
+		critical_error("Cannot determine object_size",pointer);
+		size = 0; /* Can't happen */
+		break;
+	}
+
+	return align8(size);
 }
 
-/* input parameters must be 8 byte aligned */
-/* the heap layout is important:
-- two semispaces: tenured and prior
-- younger generations follow */
-void init_arena(CELL young_size, CELL aging_size)
+CELL untagged_object_size(CELL pointer)
 {
-	int i;
-	CELL alloter;
+	CELL size;
 
-	CELL total_size = (GC_GENERATIONS - 1) * young_size + 2 * aging_size;
-	CELL cards_size = total_size / CARD_SIZE;
+	if(pointer == F)
+		return 0;
 
-	heap_start = (CELL)alloc_guarded(total_size);
-	heap_end = heap_start + total_size;
+	switch(untag_header(get(pointer)))
+	{
+	case WORD_TYPE:
+		size = sizeof(F_WORD);
+		break;
+	case T_TYPE:
+		size = CELLS * 2;
+		break;
+	case ARRAY_TYPE:
+	case TUPLE_TYPE:
+	case BIGNUM_TYPE:
+	case BYTE_ARRAY_TYPE:
+		size = align8(sizeof(F_ARRAY) +
+			array_capacity((F_ARRAY*)(pointer)) * CELLS);
+		break;
+	case HASHTABLE_TYPE:
+		size = sizeof(F_HASHTABLE);
+		break;
+	case VECTOR_TYPE:
+		size = sizeof(F_VECTOR);
+		break;
+	case STRING_TYPE:
+		size = SSIZE(pointer);
+		break;
+	case SBUF_TYPE:
+		size = sizeof(F_SBUF);
+		break;
+	case FLOAT_TYPE:
+		size = sizeof(F_FLOAT);
+		break;
+	case DLL_TYPE:
+		size = sizeof(DLL);
+		break;
+	case ALIEN_TYPE:
+		size = sizeof(ALIEN);
+		break;
+	case DISPLACED_ALIEN_TYPE:
+		size = sizeof(DISPLACED_ALIEN);
+		break;
+	default:
+		critical_error("Cannot determine untagged_object_size",pointer);
+		size = -1;/* can't happen */
+		break;
+	}
 
-	cards = alloc_guarded(cards_size);
-	cards_end = cards + cards_size;
+	return align8(size);
+}
 
-	alloter = heap_start;
+void primitive_type(void)
+{
+	drepl(tag_fixnum(type_of(dpeek())));
+}
 
-	if(heap_start == 0)
-		fatal_error("Cannot allocate data heap",total_size);
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
 
-	alloter = init_zone(&tenured,aging_size,alloter);
-	alloter = init_zone(&prior,aging_size,alloter);
+void primitive_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(get(SLOT(obj,slot)));
+}
 
-	for(i = GC_GENERATIONS - 2; i >= 0; i--)
-		alloter = init_zone(&generations[i],young_size,alloter);
+void primitive_set_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	CELL value = dpop();
+	put(SLOT(obj,slot),value);
+	write_barrier(obj);
+}
 
-	clear_cards(TENURED,NURSERY);
+void primitive_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	dpush(tag_integer(get(SLOT(obj,slot))));
+}
 
-	if(alloter != heap_start + total_size)
-		fatal_error("Oops",alloter);
-
-	allot_profiling = false;
-	gc_in_progress = false;
-	heap_scan = false;
-	gc_time = 0;
+void primitive_set_integer_slot(void)
+{
+	F_FIXNUM slot = untag_fixnum_fast(dpop());
+	CELL obj = UNTAG(dpop());
+	F_FIXNUM value = to_fixnum(dpop());
+	put(SLOT(obj,slot),value);
 }
 
 void allot_profile_step(CELL a)
@@ -62,25 +143,6 @@ void allot_profile_step(CELL a)
 	}
 
 	untag_word_fast(executing)->allot_count += a;
-}
-
-void primitive_room(void)
-{
-	CELL list = F;
-	int gen;
-	box_signed_cell(compiling.limit - compiling.here);
-	box_signed_cell(compiling.limit - compiling.base);
-	box_signed_cell(cards_end - cards);
-	box_signed_cell(prior.limit - prior.base);
-	for(gen = GC_GENERATIONS - 1; gen >= 0; gen--)
-	{
-		ZONE *z = &generations[gen];
-		list = cons(cons(
-			tag_fixnum(z->limit - z->here),
-			tag_fixnum(z->limit - z->base)),
-			list);
-	}
-	dpush(list);
 }
 
 void primitive_allot_profiling(void)
@@ -105,11 +167,29 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
+void primitive_room(void)
+{
+	CELL list = F;
+	int gen;
+	box_signed_cell(compiling.limit - compiling.here);
+	box_signed_cell(compiling.limit - compiling.base);
+	box_signed_cell(cards_end - cards);
+	box_signed_cell(prior.limit - prior.base);
+	for(gen = GC_GENERATIONS - 1; gen >= 0; gen--)
+	{
+		ZONE *z = &generations[gen];
+		list = cons(cons(
+			tag_fixnum(z->limit - z->here),
+			tag_fixnum(z->limit - z->base)),
+			list);
+	}
+	dpush(list);
+}
+
 void primitive_begin_scan(void)
 {
 	garbage_collection(TENURED);
 	heap_scan_ptr = tenured.base;
-	heap_scan_end = tenured.here;
 	heap_scan = true;
 }
 
@@ -122,7 +202,7 @@ void primitive_next_object(void)
 	if(!heap_scan)
 		general_error(ERROR_HEAP_SCAN,F);
 
-	if(heap_scan_ptr >= heap_scan_end)
+	if(heap_scan_ptr >= tenured.here)
 	{
 		dpush(F);
 		return;

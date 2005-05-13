@@ -109,22 +109,22 @@ sequences words ;
     ] ifte  out-1
 ] "linearizer" set-word-prop
 
-\ set-slot intrinsic
-
-\ set-slot [
-    dup typed-literal? [
-        1 %dec-d ,
-        in-2
-        2 %dec-d ,
-        slot@ >r 0 1 r> %fast-set-slot ,
-    ] [
-        drop
-        in-3
-        3 %dec-d ,
-        1 %untag ,
-        0 1 2 %set-slot ,
-    ] ifte
-] "linearizer" set-word-prop
+! \ set-slot intrinsic
+! 
+! \ set-slot [
+!     dup typed-literal? [
+!         1 %dec-d ,
+!         in-2
+!         2 %dec-d ,
+!         slot@ >r 0 1 r> %fast-set-slot ,
+!     ] [
+!         drop
+!         in-3
+!         3 %dec-d ,
+!         1 %untag ,
+!         0 1 2 %set-slot ,
+!     ] ifte
+! ] "linearizer" set-word-prop
 
 \ type intrinsic
 
