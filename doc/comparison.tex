@@ -36,7 +36,15 @@ Defining words in Factor works just like in Forth. Start a word with \texttt{:},
 
 Like many Forths, Factor uses a vocabulary system. Factor's vocabulary system revolves around two parsing words, \texttt{USE:} and \texttt{IN:}. \texttt{USE:} opens another vocabulary for use in the current one, and \texttt{IN:} changes the current vocabulary. But because of Factor's philosophy of constant testing, vocabularies have no privacy, unlike most Forth wordlist systems. 
 
-When doing operations on words in Forth, you tend to use immediate words, but in Factor, you usually use runtime words. This is possible because words are first-class objects in Factor, just like Forth, except in Factor, a word object holds much more information. As stated above, \texttt{\char'134} is used to refer to words without executing them. A good example of the different ways that Factor and Forth deal with words is \texttt{see}. Factor and Forth both have \texttt{see}, and they both do roughly the same thing, but in Factor, you would write \verb|\ word see| where you would write in Forth \verb|see word|. But, as I showed above, foward parsing is used in some cases, such as \texttt{USE:}, when the argument isn't a word.
+When doing operations on words in Forth, you tend to use immediate words, but in Factor, you usually use runtime words. This is possible because words are first-class objects in Factor, just like Forth, except in Factor, a word object holds much more information. As stated above, \texttt{\char'134} is used to refer to words without executing them. A good example of the different ways that Factor and Forth deal with words is \texttt{see}. Factor and Forth both have \texttt{see}, and they both do roughly the same thing, but in Factor, you would write
+\begin{verb}
+\ word see
+\end{verb}
+where you would write in Forth
+\begin{verbatim}
+see word
+\end{verbatim}
+But as I showed above, foward parsing is used in some cases, such as \texttt{USE:}, when the argument isn't a word.
 
 In place of variables that Forth uses, Factor has dynamic scoping. This makes it easier to isolate the side effects of a piece of code, but sometimes things might not work as expected when scopes are improperly used. The equivalent of the Forth code
 \begin{verbatim}
@@ -128,15 +136,38 @@ Like Lisp, Factor has a large math library. Unsurprisingly, it supports the norm
 
 \subsection{Controlling Flow}
 
-In Factor, code is represented as lists, just like in Scheme and Lisp. But when we say that, we mean it, right up to runtime, at least in interpreted mode. The syntax for creating the equivalent of a lambda is the same as the syntax for creating a list: \verb|[ blah blah blah ] for \verb|'(blah blah blah). (In Factor, symbols aren't automatically interred; you have to define them before refering to them. In case you're wondering, \verb|\ blah| is what you write for \verb|'blah|, but usually, we define special symbol words for this so that \verb|blah| is equivalent to \verb|\ blah|. You can do this with \verb|SYMBOL: blah|.) The reason this isn't as slow as the \texttt{eval} you're used to is because all the Factor runtime needs to do is iterate through the list, calling each word in it. These lists are known as quotations. Because they're just sitting there on the stack, an explicit \texttt{funcall} equivalent is needed, and that equivalent is \texttt{call}. In general, you use \verb|[ a ]| as a replacement for Lisp's \verb|#'a| and Scheme's \verb|a|. Because of the convienent syntax for quotations, they are used much more often than in Lisp and Scheme, which tend to use macros. For example, the equivalent of \verb|(if x y z)| is \texttt|x [ y ] [ z ] ifte|.
+In Factor, code is represented as lists, just like in Scheme and Lisp. But when we say that, we mean it, right up to runtime, at least in interpreted mode. The syntax for creating the equivalent of a lambda is the same as the syntax for creating a list: \verb|[ blah blah blah ] for \verb|'(blah blah blah). (In Factor, symbols aren't automatically interred; you have to define them before refering to them. In case you're wondering, \verb|\ blah| is what you write for \verb|'blah|, but usually, we define special symbol words for this so that \verb|blah| is equivalent to \verb|\ blah|. You can do this with \verb|SYMBOL: blah|.) The reason this isn't as slow as the \texttt{eval} you're used to is because all the Factor runtime needs to do is iterate through the list, calling each word in it. These lists are known as quotations. Because they're just sitting there on the stack, an explicit \texttt{funcall} equivalent is needed, and that equivalent is \texttt{call}. In general, you use \verb|[ a ]| as a replacement for Lisp's \verb|#'a| and Scheme's \verb|a|. Because of the convienent syntax for quotations, they are used much more often than in Lisp and Scheme, which tend to use macros. For example, the equivalent of
+\begin{verbatim}
+(if x y z)
+\end{verbatim}
+is
+\begin{verbatim}
+x [ y ] [ z ] ifte
+\end{verbatim}
 
 Factor's \texttt{callcc0} and \texttt{callcc1} is \texttt{call-with-current-continuation} (aka \texttt{call/cc}) in Scheme, basically. The two versions in Factor exist because you need to explicitly specify the arity of your continuation, since factor has no variable argument mechanism. But usually in Factor, you would wrap up continuations in a library rather than use them directly. There is no equivalent of \texttt{dynamic-wind}, and instead, \texttt{catch} (the error handler) is used for most of those resource-handing places.
 
 \subsection{Words, Variables and Objects}
 
-To define a function (usually called a word in Factor), very simple syntax is used. Where you would write \verb|(define (function arg) body)| in Scheme or \verb|(defun function (arg) body)| in Lisp, you write \verb|: function body ;| in Factor. The lack of arg is possible because Factor implicitly passes around variables using the stack.
+To define a function (usually called a word in Factor), very simple syntax is used. Where you would write
+\begin{verbatim}
+(define (function arg) body)
+\end{verbatim}
+in Scheme or
+\begin{verbatim}
+(defun function (arg) body)
+\end{verbatim}
+in Lisp, you write
+\begin{verbatim}
+: function body ;
+\end{verbatim}
+in Factor. The lack of arg is possible because Factor implicitly passes around variables using the stack.
 
-Though Factor's "macros" are actually extensions to the parser, similar to reader macros, certain things, such as the generic word system, are implemented like Common Lisp macros, generating a quote at parsetime and substituting it in. This is possible because Factor shares with Lisp and Scheme the principle that code is data, namely nested lists. A macro is created with the syntax \verb|: macro-name definition-body ; parsing|. But, as stated above, macros in general are used less frequently in Factor than Forth.
+Though Factor's "macros" are actually extensions to the parser, similar to reader macros, certain things, such as the generic word system, are implemented like Common Lisp macros, generating a quote at parsetime and substituting it in. This is possible because Factor shares with Lisp and Scheme the principle that code is data, namely nested lists. A macro is created with the syntax
+\begin{verbatim}
+: macro-name definition-body ; parsing
+\end{verbatim}
+But, as stated above, macros in general are used less frequently in Factor than Forth.
 
 Like Lisp, Factor has a dynamic scope system. Scopes are stored in a stack of hashtables. There is no direct equivalent of \texttt{defvar} because variables are always, in effect, initialized to zero. There is also no real way to create a variable; all you have to do is, at any arbitrary time, \texttt{set} the variable to a value, and then at any other arbitrary time, \texttt{get} the value of that variable. Usually, symbols are used as variable identifiers. To make a new surrounding scope, you can use the \texttt{with-scope} combinator, because scopes aren't implicitly made anywhere like they are in Lisp.
 
@@ -163,7 +194,15 @@ For many things, such as iterating through a list, Python uses a builtin syntax 
 if x: y
 else: z
 \end{verbatim}
-as \verb|if(x, lambda: y, lambda: z)|. This is essentially what Factor does, in the syntax \verb|x [ y ] [ z ] ifte|. Words like ifte are used for everything from the equivalents of \verb|[x+1 for x in list]| to
+as
+\begin{verbatim}
+if(x, lambda: y, lambda: z)
+\end{verbatim}
+This is essentially what Factor does, in the syntax
+\begin{verbatim}
+x [ y ] [ z ] ifte
+\end{verbatim}
+Words like ifte are used for everything from the equivalents of \verb|[x+1 for x in list]| to
 \begin{verbatim}
 while x==y:
     do(something)
@@ -183,7 +222,14 @@ in Factor. It would be
     #! This is pointless
     do-something ;
 \end{verbatim}
-As you might guess, \texttt{:} starts a definition and \texttt{;} ends it. Right after the colon is the name of the function we are defining here: \texttt{function}. The docstring is anything after \verb|#!|. You have to put a \verb|#!| at the beginning of each line. For a plain old comment, use \texttt{!} wherever you used \verb|#|. But where did the argument go? The argument has no name; it is stored on the stack. That nameless argument is then automatically passed to another function called \texttt{do-something} and then it automatically returns the value. The fact that Factor passes arguments around automatically, basically, makes it \emph{concatenative}, and the fact that Python uses variables explicitly makes it \emph{applicative}. For a slightly more complicated example, we can look at a function that uses multiplication to square a number using multiplication. As you probably know, in Python it's
+As you might guess, \texttt{:} starts a definition and \texttt{;} ends it. Right after the colon is the name of the function we are defining here: \texttt{function}. The docstring is anything after \verb|#!|. You have to put a \verb|#!| at the beginning of each line, for example
+\begin{verbatim}
+#! This is a docstring
+#! that stretches over many lines
+\end{verbatim}
+For a plain old comment, use \texttt{!} wherever you used \verb|#|.
+
+But where did the argument of the function go? The argument has no name; it is stored on the stack. That nameless argument is then automatically passed to another function called \texttt{do-something} and then it automatically returns the value. The fact that Factor passes arguments around automatically, basically, makes it \emph{concatenative}, and the fact that Python uses variables explicitly makes it \emph{applicative}. For a slightly more complicated example, we can look at a function that uses multiplication to square a number using multiplication. As you probably know, in Python it's
 \begin{verbatim}
 def square(x):
     return x*x
@@ -195,25 +241,43 @@ How do we do this in Factor when passing the arguments implicitly? We need to us
 \end{verbatim}
 I've been using consistent whitespace conventions in the above examples, but really, you're free to use or not use new lines whever you want, unless you're inside a string or a comment.
 
-There's one thing that Python does similarly to Factor seperating them from most other languages: privacy. Neither Factor nor Python have any sort of privacy. After all, we're all consenting adults here. So Python and Factor both don't have privacy in their module systems or object systems. Another similarity in the module systems is the tendency to require them to be imported for many basic tasks. Factor takes this even further than Python, so far that you can't really do anything without opening a module; it's not even Turing-complete! Factor's modules, called vocabularies, don't have the option of using hierarchical naming. The equivalent of \verb|from module import *| is \verb|USE: module|. If you want to import a bunch of modules, there's a shortcut syntax: \verb|USING: mod1 mod2 mod3 ;| imports everything from mod1, mod2, and mod3. Don't worry about the apparent lack of first-class modules; it's possible to access vocabularies, stored as hashtables, in the vocabulary variable.
+There's one thing that Python does similarly to Factor seperating them from most other languages: privacy. Neither Factor nor Python have any sort of privacy. After all, we're all consenting adults here. So Python and Factor both don't have privacy in their module systems or object systems. Another similarity in the module systems is the tendency to require them to be imported for many basic tasks. Factor takes this even further than Python, so far that you can't really do anything without opening a module; it's not even Turing-complete! Factor's modules, called vocabularies, don't have the option of using hierarchical naming. The equivalent of
+\begin{verbatim}
+from module import *
+\end{verbatim}
+is
+\begin{verbatim}
+USE: module
+\end{verbatim}
+If you want to import a bunch of modules, there's a shortcut syntax:
+\begin{verbatim}
+USING: mod1 mod2 mod3 ;
+\end{verbatim}
+imports everything from mod1, mod2, and mod3. Don't worry about the apparent lack of first-class modules; it's possible to access vocabularies, stored as hashtables, in the vocabulary variable.
 
 As I mentioned earlier, Factor has an object system, and like Python's, it has no privacy. But beyond that, there's no resemblance. I'll show you a Python class and its equivalent in Factor:
 \begin{verbatim}
-class Something(object):
+class Something:
     def __init__(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
         return self
     def amethod(self):
-        result = self.x+self.y+self.z
-        return result
+        return self.x+self.y+self.z
 \end{verbatim}
 The Factor equivalent looks nothing like it. This requires that the generic function \texttt{amethod} already exist.
 \begin{verbatim}
-TUPLE: something x y z ;
+TUPLE: something x y z ; ! Makes a tuple with three slots, x, y and z. These
+                         ! are filled by the constructor word, <something> ,
+                         ! which takes those three arguments.
 M: something amethod
-    dup dup something-x -rot something-y swap something-z + + ;
+    dup dup something-x ! get the slot called x from the object of class something
+                        ! which is on the top of the stack. Pop the object and push
+                        ! the x value.
+    -rot something-y ! the y slot
+    swap something-z ! the z slot
+    + + ;
 \end{verbatim}
 Factor, like Python, has a small but still existent difference between types and classes on approximately the same lines. Factor's object system is written completely within Factor, but the types are partly hard-coded in.
 
