@@ -6,6 +6,10 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
+- simplifier:
+  - dead loads not optimized out
+  - kill tag-fixnum/untag-fixnum
+- \ foo where foo is parsing is not printed readably
 - faster layout
 - tiled window manager
 - c primitive arrays: or just specialized arrays
@@ -17,6 +21,8 @@
 - sleep word
 - update docs
 - redo new compiler backend for PowerPC
+- type predicates: : foo? type 7 eq? ;
+- remove 'not' word, and move t?/f? to kernel
 
 - plugin: supportsBackspace
 - if external factor is down, don't add tons of random shit to the       

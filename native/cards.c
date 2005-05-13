@@ -18,6 +18,8 @@ INLINE void collect_card(CARD *ptr, CELL here)
 
 	while(card_scan < card_end && card_scan < here)
 		card_scan = collect_next(card_scan);
+	
+	cards_scanned++;
 }
 
 INLINE void collect_gen_cards(CELL gen)
@@ -48,8 +50,9 @@ void unmark_cards(CELL from, CELL to)
 
 void clear_cards(CELL from, CELL to)
 {
-	CARD *ptr = ADDR_TO_CARD(generations[from].base);
-	CARD *last_card = ADDR_TO_CARD(generations[to].limit);
+	/* NOTE: reverse order due to heap layout. */
+	CARD *last_card = ADDR_TO_CARD(generations[from].limit);
+	CARD *ptr = ADDR_TO_CARD(generations[to].base);
 	for(; ptr < last_card; ptr++)
 		clear_card(ptr);
 }

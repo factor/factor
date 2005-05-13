@@ -87,7 +87,7 @@ SYMBOL: failures
             "buffer" ,
         ] when
         
-        cpu "unknown" = "compile" get and [
+        cpu "unknown" = not "compile" get and [
             [
                 "io/buffer" "compiler/optimizer"
                 "compiler/simple"
@@ -95,7 +95,7 @@ SYMBOL: failures
                 "compiler/generic" "compiler/bail-out"
                 "compiler/linearizer" "compiler/intrinsics"
             ] %
-        ] unless
+        ] when
         
         [
             "benchmark/empty-loop" "benchmark/fac"

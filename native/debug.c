@@ -274,10 +274,10 @@ void factorbug(void)
 		else if(strcmp(cmd,"i") == 0)
 		{
 			fprintf(stderr,"Call frame:\n");
-			dump_cell(callframe);
+			print_obj(callframe);
 			fprintf(stderr,"\n");
 			fprintf(stderr,"Executing:\n");
-			dump_cell(executing);
+			print_obj(executing);
 			fprintf(stderr,"\n");
 		}
 		else if(strcmp(cmd,"e") == 0)

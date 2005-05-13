@@ -21,13 +21,17 @@ typedef enum {
 	F_CARDS
 } F_RELTYPE;
 
+/* the rel type is built like a cell to avoid endian-specific code in
+the compiler */
+#define REL_TYPE(r) ((r)->type & 0xff)
+/* on PowerPC, some values are stored in the high 16 bits of a pair
+of consecutive cells */
+#define REL_16_16(r) ((r)->type & 0xff00)
+#define REL_RELATIVE(r) ((r)->type & 0xff0000)
+
 /* code relocation consists of a table of entries for each fixup */
 typedef struct {
-	u8 type;
-	u8 relative;
-	/* on PowerPC, some values are stored in the high 16 bits of a pair
-	of consecutive cells */
-	u8 risc16_16;
+	CELL type;
 	CELL offset;
 	CELL argument;
 } F_REL;

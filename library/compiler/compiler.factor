@@ -13,7 +13,7 @@ kernel lists namespaces prettyprint stdio words ;
 
 : compiling ( word -- word parameter )
     check-architecture
-    "Compiling " write dup . flush
+    "Compiling " write dup word. terpri flush
     dup word-def ;
 
 GENERIC: (compile) ( word -- )
@@ -43,7 +43,7 @@ M: compound (compile) ( word -- )
     "compile" get [ word compile ] when ; parsing
 
 : cannot-compile ( word error -- )
-    "Cannot compile " write swap . print-error ;
+    "Cannot compile " write swap word. terpri print-error ;
 
 : try-compile ( word -- )
     [ compile ] [ [ cannot-compile ] when* ] catch ;
@@ -52,7 +52,7 @@ M: compound (compile) ( word -- )
 
 : decompile ( word -- )
     dup compiled? [
-        "Decompiling " write dup . flush
+        "Decompiling " write dup word. terpri flush
         [ word-primitive ] keep set-word-primitive
     ] [
         drop

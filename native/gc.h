@@ -37,16 +37,20 @@ CELL init_zone(ZONE *z, CELL size, CELL base);
 
 void init_arena(CELL young_size, CELL aging_size);
 
+/* statistics */
 s64 gc_time;
+CELL minor_collections;
+CELL cards_scanned;
 
 /* only meaningful during a GC */
-CELL collecting_generation;
+CELL collecting_gen;
+CELL collecting_gen_start;
 
 /* test if the pointer is in generation being collected, or a younger one.
 init_arena() arranges things so that the older generations are first,
 so we have to check that the pointer occurs after the beginning of
 the requested generation. */
-#define COLLECTING_GEN(ptr) (collecting_generation <= ptr)
+#define COLLECTING_GEN(ptr) (collecting_gen_start <= ptr)
 
 /* #define GC_DEBUG */
 
@@ -54,6 +58,14 @@ INLINE void gc_debug(char* msg, CELL x) {
 #ifdef GC_DEBUG
 	printf("%s %ld\n",msg,x);
 #endif
+}
+
+INLINE bool should_copy(CELL untagged)
+{
+	if(collecting_gen == TENURED)
+		return !in_zone(newspace,untagged);
+	else
+		return(in_zone(&prior,untagged) || COLLECTING_GEN(untagged));
 }
 
 CELL copy_object(CELL pointer);

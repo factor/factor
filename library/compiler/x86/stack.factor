@@ -7,7 +7,7 @@ memory sequences words ;
 : rel-cs ( -- )
     #! Add an entry to the relocation table for the 32-bit
     #! immediate just compiled.
-    "cs" f f rel-dlsym ;
+    "cs" f 0 0 rel-dlsym ;
 
 : CS ( -- [ address ] ) "cs" f dlsym unit ;
 : CS> ( register -- ) CS MOV rel-cs ;
@@ -34,7 +34,7 @@ M: %immediate-d generate-node ( vop -- )
     vop-literal [ ESI ] swap address MOV ;
 
 : load-indirect ( dest literal -- )
-    intern-literal unit MOV f rel-address ;
+    intern-literal unit MOV 0 0 rel-address ;
 
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table

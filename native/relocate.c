@@ -40,8 +40,6 @@ INLINE CELL relocate_data_next(CELL relocating)
 	CELL size = CELLS;
 	CELL cell = get(relocating);
 
-	allot_barrier(relocating);
-
 	if(headerp(cell))
 	{
 		size = untagged_object_size(relocating);
@@ -69,6 +67,7 @@ void relocate_data()
 		if(relocating >= tenured.here)
 			break;
 
+		allot_barrier(relocating);
 		relocating = relocate_data_next(relocating);
 	}
 
@@ -93,7 +92,7 @@ CELL get_rel_symbol(F_REL* rel)
 
 INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 {
-	switch(rel->type)
+	switch(REL_TYPE(rel))
 	{
 	case F_PRIMITIVE:
 		return primitive_to_xt(rel->argument);
@@ -133,7 +132,7 @@ INLINE CELL relocate_code_next(CELL relocating)
 		CELL original;
 		CELL new_value;
 
-		if(rel->risc16_16)
+		if(REL_16_16(rel))
 			original = reloc_get_16_16(rel->offset);
 		else
 			original = get(rel->offset);
@@ -143,10 +142,10 @@ INLINE CELL relocate_code_next(CELL relocating)
 		code_fixup(&rel->offset);
 		new_value = compute_code_rel(rel,original);
 
-		if(rel->relative)
+		if(REL_RELATIVE(rel))
 			new_value -= (rel->offset + CELLS);
 
-		if(rel->risc16_16)
+		if(REL_16_16(rel))
 			reloc_set_16_16(rel->offset,new_value);
 		else
 			put(rel->offset,new_value);

@@ -46,14 +46,14 @@ words ;
 
 : compile-call-label ( label -- )
     dup primitive? [
-        dup rel-primitive-16/16 word-xt compile-call-far
+        dup 1 rel-primitive word-xt compile-call-far
     ] [
         0 BL relative-24
     ] ifte ;
 
 #call-label [
     ! Hack: length of instruction sequence that follows
-    rel-address-16/16  compiled-offset 20 + 18 LOAD32
+    0 1 rel-address  compiled-offset 20 + 18 LOAD32
     1 1 -16 STWU
     18 1 20 STW
     0 B relative-24
@@ -66,7 +66,7 @@ words ;
 
 : compile-jump-label ( label -- )
     dup primitive? [
-        dup rel-primitive-16/16 word-xt compile-jump-far
+        dup 1 rel-primitive word-xt compile-jump-far
     ] [
         0 B relative-24
     ] ifte ;
@@ -94,7 +94,7 @@ words ;
     18 18 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    rel-address-16/16  compiled-offset 24 + 19 LOAD32
+    0 1 rel-address  compiled-offset 24 + 19 LOAD32
     18 18 19 ADD
     18 18 0 LWZ
     18 MTLR

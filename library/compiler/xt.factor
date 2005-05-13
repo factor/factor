@@ -49,7 +49,7 @@ TUPLE: relative word where to ;
 : just-compiled compiled-offset 4 - ;
 
 C: relative ( word -- )
-    over t rel-word
+    over 1 0 rel-word
     [ set-relative-word ] keep
     [ just-compiled swap set-relative-where ] keep
     [ compiled-offset swap set-relative-to ] keep ;
@@ -71,7 +71,7 @@ C: absolute ( word -- )
     [ just-compiled swap set-absolute-where ] keep ;
 
 : absolute ( word -- )
-    dup f rel-word <absolute> deferred-xt ;
+    dup 0 0 rel-word <absolute> deferred-xt ;
 
 : >absolute dup absolute-word compiled-xt swap absolute-where ;
 

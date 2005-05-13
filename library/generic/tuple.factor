@@ -16,7 +16,7 @@ hashtables errors sequences vectors ;
     #! Internal allocation function. Do not call it directly,
     #! since you can fool the runtime and corrupt memory by
     #! specifying an incorrect size.
-    <tuple> [ 0 swap set-array-nth ] keep ;
+    <tuple> [ 2 set-slot ] keep ;
 
 : class-tuple 2 slot ; inline
 

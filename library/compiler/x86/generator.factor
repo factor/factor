@@ -15,7 +15,7 @@ M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
 M: %prologue generate-node drop ;
 
 : compile-c-call ( symbol dll -- )
-    2dup dlsym CALL t rel-dlsym ;
+    2dup dlsym CALL 1 0 rel-dlsym ;
 
 M: %call generate-node ( vop -- )
     vop-label dup postpone-word CALL ;
@@ -58,7 +58,7 @@ M: %dispatch generate-node ( vop -- )
     ! Multiply by 4 to get a jump table offset
     dup 2 SHL
     ! Add to jump table base
-    dup HEX: ffff ADD  just-compiled >r f rel-address
+    dup HEX: ffff ADD  just-compiled >r 0 0 rel-address
     ! Jump to jump table entry
     unit JMP
     ! Align for better performance

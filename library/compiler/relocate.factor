@@ -11,34 +11,20 @@ SYMBOL: relocation-table
 
 : relocating compiled-offset cell - rel, ;
 
-: rel-primitive ( word rel/abs -- )
-    #! If flag is true; relative.
-    0 1 ? rel, relocating word-primitive rel, ;
+: rel-type, ( rel/abs 16/16 type -- )
+    swap 8 shift bitor swap 16 shift bitor rel, ;
 
-: rel-dlsym ( name dll rel/abs -- )
-    #! If flag is true; relative.
-    2 3 ? rel, relocating cons intern-literal rel, ;
+: rel-primitive ( word relative 16/16 -- )
+    0 rel-type, relocating word-primitive rel, ;
 
-: rel-address ( rel/abs -- )
+: rel-dlsym ( name dll rel/abs 16/16 -- )
+    1 rel-type, relocating cons intern-literal rel, ;
+
+: rel-address ( rel/abs 16/16 -- )
     #! Relocate address just compiled. If flag is true,
     #! relative, and there is nothing to do.
-    [ 4 rel, relocating 0 rel, ] unless ;
+    over [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
 
-: rel-word ( word rel/abs -- )
+: rel-word ( word rel/abs 16/16 -- )
     #! If flag is true; relative.
     over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
-
-! PowerPC relocations
-
-: rel-primitive-16/16 ( word -- )
-    #! This is called before a sequence like
-    #! 19 LOAD32
-    #! 19 MTCTR
-    #! BCTR
-    5 rel, compiled-offset rel, word-primitive rel, ;
-
-: rel-dlsym-16/16 ( name dll -- )
-    6 rel, compiled-offset rel, cons intern-literal rel, ;
-
-: rel-address-16/16 ( -- )
-    7 rel, compiled-offset rel, 0 rel, ;
