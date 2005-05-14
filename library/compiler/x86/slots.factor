@@ -22,18 +22,17 @@ M: %fast-slot generate-node ( vop -- )
     dup vop-literal swap vop-dest v>operand tuck >r 2list r>
     swap MOV ;
 
-! : card-bits 5 ;
-! 
-! : card-offset ( -- n )
-!     #! We add this to an address that was shifted by card-bits
-!     #! to get the address of its card.
-!     
-!     ;
-! 
-! : write-barrier ( vreg -- )
-!     #! Mark the card pointed to by vreg.
-!     
-!     ;
+: card-bits
+    #! must be the same as CARD_BITS in native/cards.h.
+    7 ;
+
+: card-offset 1 getenv ;
+: card-mark HEX: 80 ;
+
+: write-barrier ( reg -- )
+    #! Mark the card pointed to by vreg.
+    dup card-bits SHR
+    card-offset 2list card-mark OR ;
 
 M: %set-slot generate-node ( vop -- )
     #! the untagged object is in vop-dest, the new value is in
@@ -41,15 +40,26 @@ M: %set-slot generate-node ( vop -- )
     dup vop-literal v>operand over vop-dest v>operand
     ! turn tagged fixnum slot # into an offset, multiple of 4
     over 1 SHR
-    ! compute slot address in vop-dest
-    dupd ADD
+    ! compute slot address in vop-literal
+    2dup ADD
     ! store new slot value
-    >r vop-source v>operand r> unit swap MOV ;
+    >r >r vop-source v>operand r> unit swap MOV r>
+    write-barrier ;
 
 M: %fast-set-slot generate-node ( vop -- )
     #! the tagged object is in vop-dest, the new value is in
     #! vop-source, the pointer offset is in vop-literal. the
     #! offset already takes the type tag into account, so its
     #! just one instruction to load.
-    dup vop-literal over vop-dest v>operand swap 2list
-    swap vop-source v>operand MOV ;
+    dup vop-literal over vop-dest v>operand
+    [ swap 2list swap vop-source v>operand MOV ] keep
+    write-barrier ;
+
+: userenv@ ( n -- addr )
+    cell * "userenv" f dlsym + ;
+
+M: %getenv generate-node ( vop -- )
+    dup vop-dest v>operand swap vop-literal userenv@ unit MOV ;
+
+M: %setenv generate-node ( vop -- )
+    dup vop-literal userenv@ unit swap vop-source v>operand MOV ;

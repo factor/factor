@@ -1,5 +1,7 @@
 #define USER_ENV 16
 
+#define CARD_OFF_ENV   1 /* for compiling set-slot */
+#define UNUSED_ENV     2
 #define NAMESTACK_ENV  3 /* used by library only */
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
@@ -15,7 +17,7 @@
 #define GEN_ENV        15 /* set to GC_GENERATIONS constant */
 
 /* TAGGED user environment data; see getenv/setenv prims */
-CELL userenv[USER_ENV];
+DLLEXPORT CELL userenv[USER_ENV];
 
 /* Profiling timer */
 #ifndef WIN32

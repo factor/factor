@@ -43,6 +43,8 @@ M: vop calls-label? vop-label = ;
 : dest-vop ( dest) f swap f f ;
 : src/dest-vop ( src dest) f f ;
 : literal-vop ( literal) >r f f r> f ;
+: src/literal-vop ( src literal) f swap f ;
+: dest/literal-vop ( dest literal) >r f swap r> f ;
 
 ! miscellanea
 VOP: %prologue
@@ -201,6 +203,12 @@ VOP: %untag-fixnum
 : check-dest ( vop reg -- )
     swap vop-dest = [ "invalid VOP destination" throw ] unless ;
 
+VOP: %getenv
+: %getenv dest/literal-vop <%getenv> ;
+
+VOP: %setenv
+: %setenv src/literal-vop <%setenv> ;
+
 ! alien operations
 VOP: %parameters
 : %parameters ( n -- vop ) literal-vop <%parameters> ;
@@ -231,3 +239,6 @@ VOP: %box-double
 
 VOP: %alien-invoke
 : %alien-invoke ( func -- vop ) literal-vop <%alien-invoke> ;
+
+VOP: %alien-global
+: %alien-global ( global -- vop ) literal-vop <%alien-global> ;

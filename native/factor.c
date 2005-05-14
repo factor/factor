@@ -4,7 +4,8 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	CELL young_size, CELL aging_size,
 	CELL code_size, CELL literal_size)
 {
-	srand((unsigned)time(NULL)); /* initialize random number generator */
+	/* initialize random number generator */
+	srand((unsigned)time(NULL));
 	init_ffi();
 	init_arena(young_size,aging_size);
 	init_compiler(code_size);
@@ -16,6 +17,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(GC_GENERATIONS);
+	userenv[CARD_OFF_ENV] = tag_cell((CELL)cards - (heap_start >> CARD_BITS));
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)

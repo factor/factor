@@ -125,6 +125,34 @@ SYMBOL: alien-parameters
 
 \ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
 
+: alien-global ( type library name -- value )
+    #! Fetch the value of C global variable.
+    #! 'type' is a type spec. 'library' is an entry in the
+    #! "libraries" namespace.
+    <alien-error> throw ;
+
+: alien-global-node ( type name library -- )
+    2dup ensure-dlsym
+    cons \ alien-global dataflow,
+    set-alien-returns ;
+
+: infer-alien-global ( -- )
+    \ alien-global "infer-effect" word-prop car ensure-d
+    pop-literal
+    pop-literal
+    pop-literal -rot
+    alien-global-node ;
+
+: linearize-alien-global ( node -- )
+    dup [ node-param get ] bind %alien-global ,
+    linearize-returns ;
+
+\ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
+
+\ alien-global [ [ string string string ] [ object ] ] "infer-effect" set-word-prop
+
+\ alien-global [ infer-alien-global ] "infer" set-word-prop
+
 global [
     "libraries" get [ <namespace> "libraries" set ] unless
 ] bind

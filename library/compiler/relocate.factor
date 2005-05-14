@@ -26,5 +26,8 @@ SYMBOL: relocation-table
     over [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
 
 : rel-word ( word rel/abs 16/16 -- )
-    #! If flag is true; relative.
-    over primitive? [ rel-primitive ] [ nip rel-address ] ifte ;
+    pick primitive? [
+        rel-primitive
+    ] [
+        rot drop rel-address
+    ] ifte ;

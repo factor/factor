@@ -1,12 +1,16 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: alien assembler inference kernel kernel-internals lists
-math memory namespaces words ;
+USING: alien assembler compiler inference kernel
+kernel-internals lists math memory namespaces words ;
 
 M: %alien-invoke generate-node
     #! call a C function.
     vop-literal uncons load-library compile-c-call ;
+
+M: %alien-global generate-node
+    vop-literal uncons load-library
+    2dup dlsym EAX swap unit MOV 0 0 rel-dlsym ;
 
 M: %parameters generate-node
     #! x86 does not pass parameters in registers
