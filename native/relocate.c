@@ -102,9 +102,9 @@ INLINE CELL compute_code_rel(F_REL *rel, CELL original)
 	case F_ABSOLUTE:
 		return original + (compiling.base - code_relocation_base);
 	case F_USERENV:
-		return (CELL)&userenv;
+		return (CELL)&userenv[rel->argument];
 	case F_CARDS:
-		return ((CELL)cards - heap_start);
+		return cards_offset;
 	default:
 		critical_error("Unsupported rel",rel->type);
 		return -1;
@@ -132,6 +132,8 @@ INLINE CELL relocate_code_next(CELL relocating)
 		CELL original;
 		CELL new_value;
 
+		code_fixup(&rel->offset);
+		
 		if(REL_16_16(rel))
 			original = reloc_get_16_16(rel->offset);
 		else
@@ -139,7 +141,6 @@ INLINE CELL relocate_code_next(CELL relocating)
 
 		/* to_c_string can fill up the heap */
 		maybe_garbage_collection();
-		code_fixup(&rel->offset);
 		new_value = compute_code_rel(rel,original);
 
 		if(REL_RELATIVE(rel))

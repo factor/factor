@@ -4,13 +4,8 @@ IN: inference
 USING: errors generic interpreter kernel lists math namespaces
 prettyprint sequences strings unparser vectors words ;
 
-: max-recursion 0 ;
-
-! This variable takes a value from 0 up to max-recursion.
+! This variable takes a boolean value.
 SYMBOL: inferring-base-case
-
-: branches-can-fail? ( -- ? )
-    inferring-base-case get max-recursion > ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -82,8 +77,8 @@ M: computed literal-value ( value -- )
 : value-types ( value -- list )
     value-class builtin-supertypes ;
 
-: pop-literal ( -- obj )
-    dataflow-drop, pop-d literal-value ;
+: pop-literal ( -- rstate obj )
+    dataflow-drop, pop-d dup value-recursion swap literal-value ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -129,7 +124,7 @@ M: computed literal-value ( value -- )
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    0 inferring-base-case set ;
+    inferring-base-case off ;
 
 GENERIC: apply-object
 

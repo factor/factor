@@ -38,7 +38,7 @@ vocabularies get [
     set-stack-effect ;
 
 2 [
-    [ "execute" "words"                       " word -- " ]
+    [ "execute" "words"                       [ [ word ] [ ] ] ]
     [ "call" "kernel"                         [ [ general-list ] [ ] ] ]
     [ "ifte" "kernel"                         [ [ object general-list general-list ] [ ] ] ]
     [ "cons" "lists"                          [ [ object object ] [ cons ] ] ]

@@ -77,10 +77,10 @@ SYMBOL: alien-parameters
 
 : infer-alien-invoke ( -- )
     \ alien-invoke "infer-effect" word-prop car ensure-d
-    pop-literal
-    pop-literal >r
-    pop-literal
-    pop-literal -rot
+    pop-literal nip
+    pop-literal nip >r
+    pop-literal nip
+    pop-literal nip -rot
     r> swap alien-invoke-node ;
 
 : parameters [ alien-parameters get reverse ] bind ;
@@ -138,9 +138,9 @@ SYMBOL: alien-parameters
 
 : infer-alien-global ( -- )
     \ alien-global "infer-effect" word-prop car ensure-d
-    pop-literal
-    pop-literal
-    pop-literal -rot
+    pop-literal nip
+    pop-literal nip
+    pop-literal nip -rot
     alien-global-node ;
 
 : linearize-alien-global ( node -- )

@@ -6,6 +6,7 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
+
 - alien-global type wrong
 - simplifier:
   - dead loads not optimized out
@@ -15,7 +16,6 @@
 - tiled window manager
 - c primitive arrays: or just specialized arrays
   float, complex, byte, char, cell...
-- generational gc
 - add a socket timeout
 - virtual hosts
 - keep alive

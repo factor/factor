@@ -32,7 +32,8 @@ M: %fast-slot generate-node ( vop -- )
 : write-barrier ( reg -- )
     #! Mark the card pointed to by vreg.
     dup card-bits SHR
-    card-offset 2list card-mark OR ;
+    card-offset 2list card-mark OR
+    0 rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
     #! the untagged object is in vop-dest, the new value is in
@@ -59,7 +60,10 @@ M: %fast-set-slot generate-node ( vop -- )
     cell * "userenv" f dlsym + ;
 
 M: %getenv generate-node ( vop -- )
-    dup vop-dest v>operand swap vop-literal userenv@ unit MOV ;
+    dup vop-dest v>operand swap vop-literal
+    [ userenv@ unit MOV ] keep 0 rel-userenv ;
 
 M: %setenv generate-node ( vop -- )
-    dup vop-literal userenv@ unit swap vop-source v>operand MOV ;
+    dup vop-literal
+    [ userenv@ unit swap vop-source v>operand MOV ] keep
+    0 rel-userenv ;

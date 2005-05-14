@@ -10,11 +10,7 @@ stdio prettyprint ;
     [ tuck builtin-type <class-tie> cons ] project-with
     [ cdr class-tie-class ] subset ;
 
-: literal-type ( -- )
-    dataflow-drop, pop-d value-types car
-    apply-literal ;
-
-: computed-type ( -- )
+: infer-type ( -- )
     \ type #call dataflow, [
         peek-d type-value-map >r
         1 0 node-inputs
@@ -25,6 +21,5 @@ stdio prettyprint ;
     ] bind ;
 
 \ type [
-    [ object ] ensure-d
-    literal-type? [ literal-type ] [ computed-type ] ifte
+    [ object ] ensure-d infer-type
 ] "infer" set-word-prop

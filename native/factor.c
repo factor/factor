@@ -17,7 +17,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
 	userenv[GEN_ENV] = tag_fixnum(GC_GENERATIONS);
-	userenv[CARD_OFF_ENV] = tag_cell((CELL)cards - (heap_start >> CARD_BITS));
+	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
 }
 
 INLINE bool factor_arg(const char* str, const char* arg, CELL* value)

@@ -52,7 +52,7 @@ hashtables parser prettyprint ;
         ] with-scope consume/produce
     ] [
         [
-            >r branches-can-fail? [
+            >r inferring-base-case get [
                 drop
             ] [
                 t "no-effect" set-word-prop
@@ -100,29 +100,12 @@ M: compound apply-word ( word -- )
         apply-default
     ] ifte ;
 
-: literal-type? ( -- ? )
-    peek-d value-types dup length 1 = >r [ tuple ] = not r> and ;
-
-: dynamic-dispatch-warning ( word -- )
-    "Dynamic dispatch for " swap word-name cat2
-    inference-warning ;
-
-! M: generic apply-word ( word -- )
-!     #! If the type of the value at the top of the stack is
-!     #! known, inline the method body.
-!     [ object ] ensure-d
-!    literal-type? branches-can-fail? not and [
-!        inline-compound 2drop
-!    ] [
-!        dup dynamic-dispatch-warning apply-default ;
-!    ] ifte ;
-
 : with-recursion ( quot -- )
     [
-        inferring-base-case [ 1 + ] change
+        inferring-base-case on
         call
     ] [
-        inferring-base-case [ 1 - ] change
+        inferring-base-case off
         rethrow
     ] catch ;
 
@@ -143,14 +126,10 @@ M: compound apply-word ( word -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
-    inferring-base-case get max-recursion > [
+    inferring-base-case get [
         drop no-base-case
     ] [
-        inferring-base-case get max-recursion = [
-            base-case
-        ] [
-            [ drop inline-compound 2drop ] with-recursion
-        ] ifte
+        base-case
     ] ifte ;
 
 M: word apply-object ( word -- )
@@ -161,11 +140,20 @@ M: word apply-object ( word -- )
         apply-word
     ] ifte* ;
 
-: infer-call ( -- )
-    [ general-list ] ensure-d
-    dataflow-drop, pop-d infer-quot-value ;
+: infer-quot-value ( rstate quot -- )
+    gensym dup pick cons [
+        drop
+        swap recursive-state set
+        dup infer-quot
+    ] with-block drop handle-terminator ;
 
-\ call [ infer-call ] "infer" set-word-prop
+\ call [
+    [ general-list ] ensure-d pop-literal infer-quot-value
+] "infer" set-word-prop
+
+\ execute [
+    [ word ] ensure-d pop-literal unit infer-quot-value
+] "infer" set-word-prop
 
 ! These hacks will go away soon
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop

@@ -32,6 +32,7 @@ void init_arena(CELL young_size, CELL aging_size)
 
 	cards = alloc_guarded(cards_size);
 	cards_end = cards + cards_size;
+	cards_offset = (CELL)cards - (heap_start >> CARD_BITS);
 
 	alloter = heap_start;
 

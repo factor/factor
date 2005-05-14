@@ -119,7 +119,7 @@ SYMBOL: cloned
     #! for the given branch.
     [
         [
-            branches-can-fail? [
+            inferring-base-case get [
                 [ infer-branch , ] [ [ drop ] when ] catch
             ] [
                 infer-branch ,
@@ -127,15 +127,14 @@ SYMBOL: cloned
         ] each
     ] make-list ;
 
-: unify-dataflow ( inputs instruction effectlist -- )
+: unify-dataflow ( input instruction effectlist -- )
     [ [ get-dataflow ] bind ] map
-    swap dataflow, [ node-consume-d set ] bind ;
+    swap dataflow, [ unit node-consume-d set ] bind ;
 
-: infer-branches ( inputs instruction branchlist -- )
+: infer-branches ( input instruction branchlist -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
-    #! base case to this stack effect and try again. The inputs
-    #! parameter is a vector.
+    #! base case to this stack effect and try again.
     (infer-branches) dup unify-effects unify-dataflow ;
 
 : (with-block) ( [[ label quot ]] quot -- node )
@@ -159,39 +158,10 @@ SYMBOL: cloned
         r> call
     ] (with-block) ;
 
-: infer-quot-value ( value -- )
-    gensym dup pick literal-value cons [
-        drop
-        dup value-recursion recursive-state set
-        literal-value dup infer-quot
-    ] with-block drop handle-terminator ;
-
-: boolean-value? ( value -- ? )
-    #! Return if the value's boolean valuation is known.
-    value-class
-    dup \ f = swap
-    builtin-supertypes
-    \ f builtin-supertypes intersection not
-    or ;
-
-: boolean-value ( value -- ? )
-    #! Only valid if boolean? returns true.
-    value-class \ f = not ;
-
-: static-branch? ( value -- ? )
-    drop f ;
-!    boolean-value? branches-can-fail? not and ;
-
-: static-ifte ( true false -- )
-    #! If the branch taken is statically known, just infer
-    #! along that branch.
-    dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
-    infer-quot-value ;
-
 : dynamic-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
-    2list >r 1 meta-d get vector-tail* \ ifte r>
+    2list >r peek-d \ ifte r>
     pop-d [
         dup \ general-t <class-tie> ,
         \ f <class-tie> ,
@@ -203,11 +173,7 @@ SYMBOL: cloned
     [ object general-list general-list ] ensure-d
     dataflow-drop, pop-d
     dataflow-drop, pop-d swap
-    peek-d static-branch? [
-        static-ifte
-    ] [
-        dynamic-ifte
-    ] ifte ;
+    dynamic-ifte ;
 
 \ ifte [ infer-ifte ] "infer" set-word-prop
 
@@ -220,19 +186,11 @@ SYMBOL: cloned
     0 recursive-state get <literal>
     [ set-value-literal-ties ] keep ;
 
-: static-dispatch? ( -- )
-    peek-d literal? branches-can-fail? not and ;
-
 USE: kernel-internals
 
-: static-dispatch ( vtable -- )
-    >r pop-literal r>
-    dup literal-value swap value-recursion
-    >r nth r> <literal> infer-quot-value ;
-
 : dynamic-dispatch ( vtable -- )
-    >r 1 meta-d get vector-tail* \ dispatch r>
-    vtable>list 
+    >r peek-d \ dispatch r>
+    vtable>list
     pop-d <dispatch-index>
     over length [ <literal-tie> ] project-with
     zip infer-branches ;
@@ -240,12 +198,7 @@ USE: kernel-internals
 : infer-dispatch ( -- )
     #! Infer effects for all branches, unify.
     [ object vector ] ensure-d
-    dataflow-drop, pop-d  static-dispatch? [
-        static-dispatch
-    ] [
-        dynamic-dispatch
-    ] ifte ;
+    dataflow-drop, pop-d dynamic-dispatch ;
 
 \ dispatch [ infer-dispatch ] "infer" set-word-prop
-\ dispatch [ [ fixnum vector ] [ ] ]
-"infer-effect" set-word-prop
+\ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop

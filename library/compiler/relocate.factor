@@ -21,9 +21,8 @@ SYMBOL: relocation-table
     1 rel-type, relocating cons intern-literal rel, ;
 
 : rel-address ( rel/abs 16/16 -- )
-    #! Relocate address just compiled. If flag is true,
-    #! relative, and there is nothing to do.
-    over [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
+    #! Relocate address just compiled.
+    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
 
 : rel-word ( word rel/abs 16/16 -- )
     pick primitive? [
@@ -31,3 +30,9 @@ SYMBOL: relocation-table
     ] [
         rot drop rel-address
     ] ifte ;
+
+: rel-userenv ( n 16/16 -- )
+    0 swap 3 rel-type, relocating rel, ;
+
+: rel-cards ( 16/16 -- )
+    0 swap 4 rel-type, compiled-offset cell 2 * - rel, 0 rel, ;

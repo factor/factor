@@ -42,8 +42,10 @@ INLINE u8 card_base(CARD c)
 	return c & CARD_BASE_MASK;
 }
 
-#define ADDR_TO_CARD(a) (CARD*)((((CELL)a-heap_start)>>CARD_BITS)+(CELL)cards)
-#define CARD_TO_ADDR(c) (CELL*)((((CELL)c-(CELL)cards)<<CARD_BITS)+heap_start)
+CELL cards_offset;
+
+#define ADDR_TO_CARD(a) (CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
+#define CARD_TO_ADDR(c) (CELL*)(((CELL)c - cards_offset)<<CARD_BITS)
 
 /* this is an inefficient write barrier. compiled definitions use a more
 efficient one hand-coded in assembly. the write barrier must be called
