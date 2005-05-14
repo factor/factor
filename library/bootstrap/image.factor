@@ -180,7 +180,7 @@ M: f ' ( obj -- ptr )
 : fixup-words ( -- )
     image get [
         dup word? [ fixup-word ] when
-    ] seq-map image set ;
+    ] map image set ;
 
 M: word ' ( word -- pointer )
     transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
@@ -311,7 +311,7 @@ M: hashtable ' ( hashtable -- pointer )
     ] ifte ;
 
 : write-image ( image file -- )
-    <file-writer> [ [ write-word ] seq-each ] with-stream ;
+    <file-writer> [ [ write-word ] each ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [

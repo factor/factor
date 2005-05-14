@@ -6,16 +6,16 @@ vectors ;
 
 : n*v ( n vec -- vec )
     #! Multiply a vector by a scalar.
-    [ * ] seq-map-with ;
+    [ * ] map-with ;
 
 ! Vector operations
-: v+ ( v v -- v ) [ + ] seq-2map ;
-: v- ( v v -- v ) [ - ] seq-2map ;
-: v* ( v v -- v ) [ * ] seq-2map ;
+: v+ ( v v -- v ) [ + ] 2map ;
+: v- ( v v -- v ) [ - ] 2map ;
+: v* ( v v -- v ) [ * ] 2map ;
 
 ! Later, this will fixed when seq-2each works properly
 ! : v. ( v v -- x ) 0 swap [ * + ] seq-2each ;
-: +/ ( seq -- n ) 0 swap [ + ] seq-each ;
+: +/ ( seq -- n ) 0 swap [ + ] each ;
 : v. ( v v -- x ) v* +/ ;
 
 ! Matrices

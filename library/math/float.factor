@@ -3,7 +3,8 @@
 IN: math
 USING: generic kernel math-internals ;
 
-BUILTIN: float 5 ;
+DEFER: float?
+BUILTIN: float 5 float? ;
 UNION: real rational float ;
 
 M: real abs dup 0 < [ neg ] when ;

@@ -17,7 +17,8 @@ math-internals ;
 ! based on type, or some combination of type, predicate, or
 ! method map.
 ! - metaclass: a metaclass is a symbol with a handful of word
-! properties: "builtin-types" "priority"
+! properties: "builtin-supertypes" "priority" "add-method"
+! "class<"
 
 ! Metaclasses have priority -- this induces an order in which
 ! methods are added to the vtable.
@@ -57,9 +58,8 @@ math-internals ;
     ] unless* call ;
 
 : <empty-vtable> ( generic -- vtable )
-    unit num-types
-    [ drop dup [ car no-method ] cons ] vector-project
-    nip ;
+    [ literal, \ no-method , ] make-list
+    num-types swap <repeated> >vector ;
 
 : <vtable> ( generic -- vtable )
     dup <empty-vtable> over methods [
@@ -70,8 +70,12 @@ math-internals ;
 : make-generic ( word -- )
     #! (define-compound) is used to avoid resetting generic
     #! word properties.
-    dup <vtable> over "combination" word-prop cons
-    (define-compound) ;
+    [
+        dup "picker" word-prop %
+        dup "dispatcher" word-prop %
+        dup <vtable> ,
+        \ dispatch ,
+    ] make-list (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
@@ -88,30 +92,25 @@ math-internals ;
      ] ifte ;
 
 ! Defining generic words
-: define-generic ( combination word -- )
-    #! Takes a combination parameter. A combination is a
-    #! quotation that takes some objects and a vtable from the
-    #! stack, and calls the appropriate row of the vtable.
-    [ swap "combination" set-word-prop ] keep
+: define-generic* ( picker dispatcher word -- )
+    [ swap "dispatcher" set-word-prop ] keep
+    [ swap "picker" set-word-prop ] keep
     dup init-methods make-generic ;
 
-: single-combination ( obj vtable -- )
-    >r dup type r> dispatch ; inline
+: define-generic ( word -- )
+    >r [ dup ] [ type ] r> define-generic* ;
 
 PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop [ single-combination ] = ;
+    dup "dispatcher" word-prop [ type ] =
+    swap "picker" word-prop [ dup ] = and ;
 M: generic definer drop \ GENERIC: ;
 
-: single-combination ( obj vtable -- )
-    >r dup type r> dispatch ; inline
-
-: arithmetic-combination ( n n vtable -- )
-    #! Note that the numbers remain on the stack, possibly after
-    #! being coerced to a maximal type.
-    >r arithmetic-type r> dispatch ; inline
+: define-2generic ( word -- )
+    >r [ ] [ arithmetic-type ] r> define-generic* ;
 
 PREDICATE: compound 2generic ( word -- ? )
-    "combination" word-prop [ arithmetic-combination ] = ;
+    dup "dispatcher" word-prop [ arithmetic-type ] =
+    swap "picker" word-prop not and ;
 M: 2generic definer drop \ 2GENERIC: ;
 
 ! Maps lists of builtin type numbers to class objects.

@@ -181,7 +181,7 @@ M: matrix prettyprint* ( indent obj -- indent )
 
 : [.] ( sequence -- )
     #! Unparse each element on its own line.
-    [ . ] seq-each ;
+    [ . ] each ;
 
 : .s datastack  reverse [.] flush ;
 : .r callstack  reverse [.] flush ;

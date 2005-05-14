@@ -87,7 +87,7 @@ M: complex unparse ( num -- str )
         dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte
     ] unless ;
 
-: unparse-string [ unparse-ch , ] seq-each ;
+: unparse-string [ unparse-ch , ] each ;
 
 M: string unparse ( str -- str )
     [ CHAR: " , unparse-string CHAR: " , ] make-string ;

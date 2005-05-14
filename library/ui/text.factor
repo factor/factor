@@ -52,7 +52,7 @@ global [
 
 : filter-nulls ( str -- str )
     "\0" over string-contains? [
-        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] seq-map
+        [ dup CHAR: \0 = [ drop CHAR: \s ] when ] map
     ] when ;
 
 : size-string ( font text -- w h )

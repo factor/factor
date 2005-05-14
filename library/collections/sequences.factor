@@ -22,6 +22,27 @@ GENERIC: reverse ( seq -- seq )
 GENERIC: peek ( seq -- elt )
 GENERIC: contains? ( elt seq -- ? )
 
+G: each ( seq quot -- | quot: elt -- )
+    [ over ] [ type ] ; inline
+
+: each-with ( obj seq quot -- | quot: obj elt -- )
+    swap [ with ] each 2drop ; inline
+
+G: tree-each ( obj quot -- | quot: elt -- )
+    [ over ] [ type ] ; inline
+
+: tree-each-with ( obj vector quot -- )
+    swap [ with ] tree-each 2drop ; inline
+
+G: map ( seq quot -- seq | quot: elt -- elt )
+    [ over ] [ type ] ; inline
+
+: map-with ( obj list quot -- list | quot: obj elt -- elt )
+    swap [ with rot ] map 2nip ; inline
+
+G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
+    [ over ] [ type ] ; inline
+
 DEFER: append ! remove this when sort is moved from lists to sequences
 
 ! Some low-level code used by vectors and string buffers.

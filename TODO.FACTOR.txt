@@ -6,7 +6,7 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
-
+- investigate if COPYING_GEN needs a fix
 - alien-global type wrong
 - simplifier:
   - dead loads not optimized out
@@ -22,8 +22,6 @@
 - sleep word
 - update docs
 - redo new compiler backend for PowerPC
-- type predicates: : foo? type 7 eq? ;
-- remove 'not' word, and move t?/f? to kernel
 
 - plugin: supportsBackspace
 - if external factor is down, don't add tons of random shit to the       
@@ -36,12 +34,10 @@
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
 - faster sequence operations
-- generic each some? all? memq? all=?  index? subseq? map
+- generic some? all? memq? all=?  index? subseq?
 - index and index* are very slow with lists
 - unsafe-sbuf>string
 - generic subseq
-- GENERIC: map
-  - list impl same as now
 - code walker & exceptions
 - if two tasks write to a unix stream, the buffer can overflow
 - rename prettyprint to pprint

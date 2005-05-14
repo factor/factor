@@ -27,13 +27,14 @@ M: object clone ;
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
-: >boolean t f ? ; inline
-: not ( a -- ~a ) f t ? ; inline
+! defined in parse-syntax.factor
+DEFER: not
+DEFER: t?
 
+: >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
 : xor ( a b -- a^b ) dup not swap ? ; inline
-: implies ( a b -- a->b ) t ? ; inline
 
 : cpu ( -- arch ) 7 getenv ;
 : os ( -- os ) 11 getenv ;

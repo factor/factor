@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
-sdl ;
+sdl sequences ;
 
 ! A stack just lays out all its children on top of each other.
 TUPLE: stack ;

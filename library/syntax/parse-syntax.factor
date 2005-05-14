@@ -23,14 +23,15 @@ words ;
 
 ! Booleans
 
-! The canonical t is a heap-allocated dummy object. It is always
-! the first in the image.
-BUILTIN: t 7 ;  : t t swons ; parsing
+! The canonical t is a heap-allocated dummy object.
+BUILTIN: t 7 t? ;
+: t t swons ; parsing
 
 ! In the runtime, the canonical f is represented as a null
 ! pointer with tag 3. So
 ! f address . ==> 3
-BUILTIN: f 9 ;  : f f swons ; parsing
+BUILTIN: f 9 not ;
+: f f swons ; parsing
 
 ! Lists
 : [ f ; parsing

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: lists USING: kernel ;
+IN: lists USING: kernel sequences ;
 
 ! An association list is a list of conses where the car of each
 ! cons is a key, and the cdr is a value. See the Factor

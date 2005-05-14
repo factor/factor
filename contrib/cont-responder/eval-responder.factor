@@ -73,7 +73,7 @@ USE: sequences
 : escape-quotes ( string -- string )
   #! Replace occurrences of single quotes with
   #! backslash quote.
-  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] seq-map ;
+  [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc dup rot ? ] map ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when

@@ -23,38 +23,18 @@ M: object empty? ( seq -- ? ) length 0 = ;
     ] ifte ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
-M: general-list >list ( list -- list ) ;
 
 : 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
 
 ! Combinators
-GENERIC: (seq-each) ( quot seq -- ) inline
+M: object each ( quot seq -- )
+    swap dup length [
+        [ swap nth swap call ] 3keep
+    ] repeat 2drop ;
 
-M: object (seq-each) ( quot seq -- )
-    dup length [ [ swap nth swap call ] 3keep ] repeat 2drop ;
+M: object tree-each call ;
 
-M: general-list (seq-each) ( quot seq -- )
-    swap each ;
-
-: seq-each ( seq quot -- ) swap (seq-each) ; inline
-
-: seq-each-with ( obj seq quot -- )
-    swap [ with ] seq-each 2drop ; inline
-
-GENERIC: (tree-each) ( quot obj -- ) inline
-
-M: object (tree-each) swap call ;
-
-M: cons (tree-each) [ car (tree-each) ] 2keep cdr (tree-each) ;
-
-M: f (tree-each) swap call ;
-
-M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
-
-: tree-each swap (tree-each) ; inline
-
-: tree-each-with ( obj vector quot -- )
-    swap [ with ] tree-each 2drop ; inline
+M: sequence tree-each swap [ swap tree-each ] each-with ;
 
 : change-nth ( seq i quot -- )
     pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
@@ -74,11 +54,8 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
 : immutable ( seq quot -- seq | quot: seq -- )
     swap [ thaw ] keep >r dup >r swap call r> r> freeze ; inline
 
-: seq-map ( seq quot -- seq | quot: elt -- elt )
-    swap [ swap nmap ] immutable ; inline
-
-: seq-map-with ( obj list quot -- list )
-    swap [ with rot ] seq-map 2nip ; inline
+M: object map ( seq quot -- seq | quot: elt -- elt )
+    swap [ swap nmap ] immutable ;
 
 : (2nmap) ( seq1 seq2 i quot -- elt3 )
     pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
@@ -89,8 +66,8 @@ M: sequence (tree-each) [ (tree-each) ] seq-each-with ;
         [ >r 3dup r> swap (2nmap) ] keep
     ] repeat 3drop ; inline
 
-: seq-2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
-    swap [ swap 2nmap ] immutable ; inline
+M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
+    swap [ swap 2nmap ] immutable ;
 
 ! Operations
 : index* ( obj i seq -- n )
@@ -113,7 +90,7 @@ M: object contains? ( obj seq -- ? ) index -1 > ;
 
 : nappend ( s1 s2 -- )
     #! Destructively append s2 to s1.
-    [ over push ] seq-each drop ;
+    [ over push ] each drop ;
 
 : append ( s1 s2 -- s1+s2 )
     #! Return a new sequence of the same type as s1.
@@ -126,7 +103,7 @@ M: object contains? ( obj seq -- ? ) index -1 > ;
 : concat ( seq -- seq )
     #! Append together a sequence of sequences.
     dup empty? [
-        unswons [ swap [ nappend ] seq-each-with ] immutable
+        unswons [ swap [ nappend ] each-with ] immutable
     ] unless ;
 
 M: object peek ( sequence -- element )

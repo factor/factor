@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: compiler-backend inference kernel lists math namespaces
-words strings errors prettyprint kernel-internals ;
+USING: compiler-backend inference kernel kernel-internals lists
+math namespaces words strings errors prettyprint sequences ;
 
 : >linear ( node -- )
     #! Dataflow OPs have a linearizer word property. This

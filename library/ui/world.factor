@@ -3,7 +3,7 @@
 IN: gadgets
 USING: alien errors generic kernel lists math
 memory namespaces prettyprint sdl sequences stdio strings
-threads ;
+threads sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the

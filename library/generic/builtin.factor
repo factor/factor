@@ -24,29 +24,25 @@ builtin 50 "priority" set-word-prop
 ! All builtin types are equivalent in ordering
 builtin [ 2drop t ] "class<" set-word-prop
 
-: builtin-predicate ( type# symbol -- )
-    #! We call search here because we have to know if the symbol
-    #! is t or f, and cannot compare type numbers or symbol
-    #! identity during bootstrapping.
-    dup "f" [ "syntax" ] search = [
-        nip [ not ] "predicate" set-word-prop
-    ] [
-        dup "t" [ "syntax" ] search = [
-            nip [ ] "predicate" set-word-prop
-        ] [
-            dup predicate-word
-            [ rot [ swap type eq? ] cons define-compound ] keep
-            unit "predicate" set-word-prop
-        ] ifte
-    ] ifte ;
+: builtin-predicate ( class -- )
+    dup "predicate" word-prop car swap
+    [
+        \ type , "builtin-type" word-prop , \ eq? ,
+    ] make-list
+    define-compound ;
 
-: builtin-class ( symbol type# slotspec -- )
-    >r 2dup builtins get set-nth r>
-    >r swap
+: register-builtin ( class -- )
+    dup "builtin-type" word-prop builtins get set-nth ;
+
+: define-builtin ( symbol type# predicate slotspec -- )
+    >r >r >r
     dup intern-symbol
-    2dup builtin-predicate
-    [ swap "builtin-type" set-word-prop ] keep
-    dup builtin define-class r> define-slots ;
+    dup r> "builtin-type" set-word-prop
+    dup builtin define-class
+    dup r> unit "predicate" set-word-prop
+    dup builtin-predicate
+    dup r> define-slots
+    register-builtin ;
 
 : builtin-type ( n -- symbol ) builtins get nth ;
 

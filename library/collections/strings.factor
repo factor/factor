@@ -4,7 +4,8 @@ IN: strings
 USING: generic kernel kernel-internals lists math sequences ;
 
 ! Strings
-BUILTIN: string 12 [ 1 length f ] [ 2 hashcode f ] ;
+DEFER: string?
+BUILTIN: string 12 string? [ 1 length f ] [ 2 hashcode f ] ;
 
 M: string =
     over string? [

@@ -11,7 +11,8 @@ USING: generic kernel lists math sequences vectors ;
 
 ! We put hash-size in the hashtables vocabulary, and
 ! the other words in kernel-internals.
-BUILTIN: hashtable 10
+DEFER: hashtable?
+BUILTIN: hashtable 10 hashtable?
     [ 1 "hash-size" set-hash-size ]
     [ 2 hash-array set-hash-array ] ;
 

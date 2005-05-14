@@ -6,20 +6,22 @@ IN: !syntax
 USING: syntax generic kernel lists namespaces parser words ;
 
 : GENERIC:
-    #! GENERIC: bar creates a generic word bar. Add methods to
-    #! the generic word using M:.
-    [ single-combination ] CREATE define-generic ; parsing
+    #! GENERIC: bar == G: bar [ dup ] [ type ] ;
+    CREATE define-generic ; parsing
 
 : 2GENERIC:
-    #! 2GENERIC: bar creates a generic word bar. Add methods to
-    #! the generic word using M:. 2GENERIC words dispatch on
-    #! arithmetic types and should not be used for non-numerical
-    #! types.
-    [ arithmetic-combination ] CREATE define-generic ; parsing
+    #! 2GENERIC: bar == G: bar [ ] [ arithmetic-type ] ;
+    #! 2GENERIC words dispatch on arithmetic types and should
+    #! not be used for non-numerical types.
+    CREATE define-2generic ; parsing
+
+: G:
+    #! G: word picker dispatcher ;
+    CREATE [ 2unlist rot define-generic* ] [ ] ; parsing
 
 : BUILTIN:
-    #! Syntax: BUILTIN: <class> <type#> <slots> ;
-    CREATE scan-word [ builtin-class ] [ ] ; parsing
+    #! Syntax: BUILTIN: <class> <type#> <predicate> <slots> ;
+    CREATE scan-word scan-word [ define-builtin ] [ ] ; parsing
 
 : COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.
@@ -60,4 +62,4 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! Followed by a tuple name, then constructor code, then ;
     #! Constructor code executes with the empty tuple on the
     #! stack.
-    scan-word [ define-constructor ] f ; parsing
+    scan-word [ define-constructor ] [ ] ; parsing

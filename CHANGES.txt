@@ -1,14 +1,37 @@
 Factor 0.75:
 ------------
 
-The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
-data could fill up the buffer and cause a denial-of-service attack.
+New generational garbage collector. There are two command line switches
+for controlling it:
+
+ +Yn   Size of 2 youngest generations, megabytes
+ +An   Size of tenured and semi-spaces, megabytes
 
 The alien interface now supports "float" and "double" types.
 
 Defining a predicate subclass of tuple is supported now. Note that
 unions and complements over tuples are still not supported. Also,
 predicate subclasses of concrete tuple classes are not supported either.
+
+The seq-each and seq-map words have been renamed to each and map, and
+now work with lists. The each and map words in the lists vocabulary have
+been removed; use the new generic equivalents instead.
+
+The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
+data could fill up the buffer and cause a denial-of-service attack.
+
+Generic words can now dispatch on stack elements other than the top one;
+define your generic like this to dispatch on the second element:
+
+ G: foo [ over ] [ type ] ;
+
+Or this for the third:
+
+ G: foo [ pick ] [ type ] ;
+
+Note that GENERIC: foo is the same as
+
+ G: foo [ dup ] [ type ] ;
 
 Factor 0.74:
 ------------

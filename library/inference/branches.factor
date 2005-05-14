@@ -37,7 +37,7 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths vector-transpose [ unify-results ] seq-map ; 
+    unify-lengths vector-transpose [ unify-results ] map ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
@@ -84,7 +84,7 @@ SYMBOL: cloned
 
 : deep-clone-seq ( seq -- seq )
     #! Clone a sequence and each object it contains.
-    [ deep-clone ] seq-map ;
+    [ deep-clone ] map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order

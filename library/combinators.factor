@@ -55,3 +55,7 @@ IN: kernel
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
     dupd [ drop ] ifte ; inline
+
+: with ( obj quot elt -- obj quot )
+    #! Utility word for each-with, map-with.
+    pick pick >r >r swap call r> r> ; inline

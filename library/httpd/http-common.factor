@@ -21,7 +21,7 @@ stdio streams strings unparser ;
             ] [
                 CHAR: % , >hex 2 CHAR: 0 pad %
             ] ifte
-        ] seq-each
+        ] each
     ] make-string ;
 
 : catch-hex> ( str -- n )

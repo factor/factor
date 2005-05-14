@@ -6,7 +6,8 @@ sequences ;
 
 M: string (grow) grow-string ;
 
-BUILTIN: sbuf 13
+DEFER: sbuf?
+BUILTIN: sbuf 13 sbuf?
     [ 1 length set-capacity ]
     [ 2 underlying set-underlying ] ;
 

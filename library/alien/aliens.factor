@@ -3,10 +3,14 @@
 IN: alien
 USING: hashtables kernel lists math namespaces parser stdio ;
 
-BUILTIN: dll   15 [ 1 "dll-path" f ] ;
-BUILTIN: alien 16 ;
-BUILTIN: byte-array 19 ;
-BUILTIN: displaced-alien 20 ;
+DEFER: dll?
+BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
+DEFER: alien?
+BUILTIN: alien 16 alien? ;
+DEFER: byte-array?
+BUILTIN: byte-array 19 byte-array? ;
+DEFER: displaced-alien?
+BUILTIN: displaced-alien 20 displaced-alien? ;
 
 : NULL ( -- null )
     #! C null value.

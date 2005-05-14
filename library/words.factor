@@ -6,7 +6,8 @@ namespaces sequences strings vectors ;
 
 ! The basic word type. Words can be named and compared using
 ! identity. They hold a property map.
-BUILTIN: word 17
+DEFER: word?
+BUILTIN: word 17 word?
     [ 1 hashcode f ]
     [ 4 "word-def" "set-word-def" ]
     [ 5 "word-props" "set-word-props" ] ;
@@ -130,5 +131,6 @@ M: compound definer drop \ : ;
     #! If the word is a generic word, clear the properties 
     #! involved so that 'see' can work properly.
     over f "methods" set-word-prop
-    over f "combination" set-word-prop
+    over f "picker" set-word-prop
+    over f "dispatcher" set-word-prop
     (define-compound) ;

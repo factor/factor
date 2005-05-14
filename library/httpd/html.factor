@@ -19,9 +19,7 @@ stdio streams strings unparser http ;
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [
-        [
-            dup html-entities assoc [ % ] [ , ] ?ifte
-        ] seq-each
+        [ dup html-entities assoc [ % ] [ , ] ?ifte ] each
     ] make-string ;
 
 : >hex-color ( triplet -- hex )

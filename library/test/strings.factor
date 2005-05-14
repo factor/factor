@@ -80,13 +80,13 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1 + ] when ] seq-each
+    [ LETTER? [ 1 + ] when ] each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]
 [
     "Replacing spaces with plus"
-    [ dup CHAR: \s = [ drop CHAR: + ] when ] seq-map
+    [ dup CHAR: \s = [ drop CHAR: + ] when ] map
 ]
 unit-test
 

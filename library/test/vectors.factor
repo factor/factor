@@ -25,7 +25,7 @@ sequences strings test vectors ;
 [ { 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 empty-vector [ drop 0 100 random-int ] seq-map
+    100 empty-vector [ drop 0 100 random-int ] map
     dup >list >vector =
 ] unit-test
 
@@ -37,7 +37,7 @@ sequences strings test vectors ;
 [ [ 1 4 9 16 ] ]
 [
     [ 1 2 3 4 ]
-    >vector [ dup * ] seq-map >list
+    >vector [ dup * ] map >list
 ] unit-test
 
 [ t ] [ { } hashcode { } hashcode = ] unit-test

@@ -31,7 +31,8 @@ M: tuple-seq length ( tuple-seq -- len )
 
 IN: generic
 
-BUILTIN: tuple 18 [ 1 length f ] ;
+DEFER: tuple?
+BUILTIN: tuple 18 tuple? [ 1 length f ] ;
 
 ! So far, only tuples can have delegates, which also must be
 ! tuples (the UI uses numbers as delegates in a couple of places
@@ -162,8 +163,8 @@ UNION: arrayed array tuple ;
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
-    swap tuple-methods hash>quot
-    [ dup class-tuple ] swap append ;
+    over tuple-methods hash>quot
+    >r "picker" word-prop [ class-tuple ] r> append3 ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;

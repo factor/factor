@@ -209,7 +209,7 @@ USE: sequences
     ] [ 
       drop CHAR: _ 
     ] ifte 
-  ] seq-map ;
+  ] map ;
 
 : is-valid-username? ( username -- bool )
   #! Return true if the username parses correctly

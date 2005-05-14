@@ -17,7 +17,8 @@ DEFER: repeat
 IN: kernel-internals
 USING: kernel math-internals sequences ;
 
-BUILTIN: array 8  ;
+DEFER: array?
+BUILTIN: array 8 array? ;
 
 : array-capacity ( a -- n ) 1 slot ; inline
 : array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline

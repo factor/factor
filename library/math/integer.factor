@@ -3,8 +3,10 @@
 IN: math
 USING: errors generic kernel math ;
 
-BUILTIN: fixnum 0 ;
-BUILTIN: bignum 1 ;
+DEFER: fixnum?
+BUILTIN: fixnum 0 fixnum? ;
+DEFER: bignum?
+BUILTIN: bignum 1 bignum? ;
 UNION: integer fixnum bignum ;
 
 : (gcd) ( b a y x -- a d )

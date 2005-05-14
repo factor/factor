@@ -36,7 +36,7 @@ strings unparser vectors ;
 
 : print-timesheet ( timesheet -- )
     "TIMESHEET:" print
-    [ uncons print-entry ] seq-each ;
+    [ uncons print-entry ] each ;
 
 ! Displaying a menu
 

@@ -1,5 +1,5 @@
 IN: temporary
-USING: parser prettyprint sequences stdio unparser ;
+USING: parser prettyprint sequences stdio strings unparser ;
 
 USE: hashtables
 USE: namespaces
@@ -157,3 +157,15 @@ M: number union-containment drop 2 ;
 "GENERIC: unhappy" eval
 [ "M: vocabularies unhappy ;" eval ] unit-test-fails
 [ ] [ "GENERIC: unhappy" eval ] unit-test
+
+G: complex-combination [ over ] [ type ] ;
+M: string complex-combination drop ;
+M: object complex-combination nip ;
+
+[ "hi" ] [ "hi" 3 complex-combination ] unit-test
+[ "hi" ] [ 3 "hi" complex-combination ] unit-test
+
+TUPLE: shit ;
+
+M: shit complex-combination cons ;
+[ [[ << shit f >> 5 ]] ] [ << shit f >> 5 complex-combination ] unit-test

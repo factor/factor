@@ -3,7 +3,8 @@
 IN: lists USING: errors generic kernel math sequences ;
 
 ! Sequence protocol
-M: general-list length 0 swap [ drop 1 + ] each ;
+M: f length drop 0 ;
+M: cons length cdr length 1 + ;
 
 M: f empty? drop t ;
 M: cons empty? drop f ;
@@ -65,17 +66,11 @@ M: general-list contains? ( obj list -- ? )
 M: general-list reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
-: map ( list quot -- list )
+M: general-list map ( list quot -- list )
     #! Push each element of a proper list in turn, and collect
     #! return values of applying a quotation with effect
     #! ( X -- Y ) to each element into a new list.
-    over [ (each) rot >r map r> swons ] [ drop ] ifte ; inline
-
-: map-with ( obj list quot -- list )
-    #! Push each element of a proper list in turn, and collect
-    #! return values of applying a quotation with effect
-    #! ( obj elt -- obj ) to each element into a new list.
-    swap [ with rot ] map 2nip ; inline
+    over [ (each) rot >r map r> swons ] [ drop ] ifte ;
 
 : remove ( obj list -- list )
     #! Remove all occurrences of objects equal to this one from

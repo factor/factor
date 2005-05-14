@@ -17,7 +17,7 @@ GENERIC: generate-node ( vop -- )
 
 : generate-reloc ( -- length )
     relocation-table get
-    dup [ compile-cell ] seq-each
+    dup [ compile-cell ] each
     length cell * ;
 
 : (generate) ( word linear -- )
