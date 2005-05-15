@@ -4,8 +4,8 @@ IN: image
 USING: kernel lists math memory namespaces parser words vectors
 hashtables generic alien assembler compiler errors files generic
 io-internals kernel kernel-internals lists math math-internals
-parser profiler strings unparser vectors words
-hashtables ;
+parser profiler strings unparser vectors words hashtables
+sequences ;
 
 ! This symbol needs the same hashcode in the target as in the
 ! host.

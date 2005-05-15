@@ -33,6 +33,10 @@ Note that GENERIC: foo is the same as
 
  G: foo [ dup ] [ type ] ;
 
+Added two new types of 'virtual' sequences: a range sequence containing
+a range of integers, and a slice sequence containing a subsequence of
+another sequence.
+
 Factor 0.74:
 ------------
 

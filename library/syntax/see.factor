@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic hashtables kernel lists math namespaces
-sequences stdio streams strings unparser words ;
+USING: #<unknown> generic hashtables kernel lists math
+namespaces sequences stdio streams strings unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
@@ -93,11 +93,15 @@ M: compound (see) ( word -- )
     dup prettyprint-newline r> prettyprint-elements
     prettyprint-; drop ;
 
-: generic. ( word -- ) dup methods [ method. ] each-with ;
-
-M: generic (see) ( word -- ) generic. ;
-
-M: 2generic (see) ( word -- ) generic. ;
+M: generic (see) ( word -- )
+    tab-size get dup indent [
+        one-line on
+        over "picker" word-prop prettyprint* bl
+        over "dispatcher" word-prop prettyprint* bl
+    ] with-scope
+    drop
+    \ ; word. terpri
+    dup methods [ method. ] each-with ;
 
 M: word (see) drop ;
 

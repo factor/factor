@@ -80,7 +80,7 @@ SYMBOL: failures
             "crashes" "sbuf" "threads" "parsing-word"
             "inference" "dataflow" "interpreter" "alien"
             "line-editor" "gadgets" "memory" "redefine"
-            "annotate"
+            "annotate" "sequences"
         ] %
         
         os "win32" = [

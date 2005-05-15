@@ -57,9 +57,20 @@ math-internals ;
         [ "Metaclass is missing add-method" throw ]
     ] unless* call ;
 
+: picker% "picker" word-prop % ;
+
+: dispatcher% "dispatcher" word-prop % ;
+
+: empty-method ( generic -- method )
+    [
+        [ dup delegate ] %
+        [ dup , ] make-list ,
+        [ literal, \ no-method , ] make-list ,
+        \ ?ifte ,
+    ] make-list ;
+
 : <empty-vtable> ( generic -- vtable )
-    [ literal, \ no-method , ] make-list
-    num-types swap <repeated> >vector ;
+    empty-method num-types swap <repeated> >vector ;
 
 : <vtable> ( generic -- vtable )
     dup <empty-vtable> over methods [
@@ -67,15 +78,38 @@ math-internals ;
         >r 2dup r> unswons add-method
     ] each nip ;
 
-: make-generic ( word -- )
-    #! (define-compound) is used to avoid resetting generic
-    #! word properties.
+: (small-generic) ( word methods -- quot )
     [
-        dup "picker" word-prop %
-        dup "dispatcher" word-prop %
-        dup <vtable> ,
+        2dup cdr (small-generic) [
+            >r >r picker%
+            r> car unswons "predicate" word-prop %
+            , r> , \ ifte ,
+        ] make-list
+    ] [
+        empty-method
+    ] ifte* ;
+
+: small-generic ( word -- def )
+    dup methods reverse (small-generic) ;
+
+: big-generic ( word -- def )
+    [
+        dup picker%
+        dup dispatcher%
+        <vtable> ,
         \ dispatch ,
-    ] make-list (define-compound) ;
+    ] make-list ;
+
+: small-generic? ( word -- ? )
+    dup "methods" word-prop hash-size 3 <=
+    swap "dispatcher" word-prop [ type ] = and ;
+
+: make-generic ( word -- )
+    dup dup small-generic? [
+        small-generic
+    ] [
+        big-generic
+    ] ifte  (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
@@ -101,17 +135,9 @@ math-internals ;
     >r [ dup ] [ type ] r> define-generic* ;
 
 PREDICATE: compound generic ( word -- ? )
-    dup "dispatcher" word-prop [ type ] =
-    swap "picker" word-prop [ dup ] = and ;
-M: generic definer drop \ GENERIC: ;
+    "dispatcher" word-prop ;
 
-: define-2generic ( word -- )
-    >r [ ] [ arithmetic-type ] r> define-generic* ;
-
-PREDICATE: compound 2generic ( word -- ? )
-    dup "dispatcher" word-prop [ arithmetic-type ] =
-    swap "picker" word-prop not and ;
-M: 2generic definer drop \ 2GENERIC: ;
+M: generic definer drop \ G: ;
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: typemap

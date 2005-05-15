@@ -9,12 +9,6 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! GENERIC: bar == G: bar [ dup ] [ type ] ;
     CREATE define-generic ; parsing
 
-: 2GENERIC:
-    #! 2GENERIC: bar == G: bar [ ] [ arithmetic-type ] ;
-    #! 2GENERIC words dispatch on arithmetic types and should
-    #! not be used for non-numerical types.
-    CREATE define-2generic ; parsing
-
 : G:
     #! G: word picker dispatcher ;
     CREATE [ 2unlist rot define-generic* ] [ ] ; parsing

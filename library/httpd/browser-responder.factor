@@ -131,15 +131,7 @@ sequences ;
 : vocabulary-uses ( vocab -- list )
   #! Return a list of vocabularies that all words in a vocabulary
   #! uses.
-  <namespace> [
-    "result" off
-    words [
-      word-uses [
-        "result" [ unique ] change
-      ] each
-    ] each 
-    "result" get
-  ] bind ;
+  words [ word-uses ] map prune ;
 
 : build-eval-string ( vocab to-eval -- string )
   #! Build a string that can evaluate the string 'to-eval'

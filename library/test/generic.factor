@@ -169,3 +169,23 @@ TUPLE: shit ;
 
 M: shit complex-combination cons ;
 [ [[ << shit f >> 5 ]] ] [ << shit f >> 5 complex-combination ] unit-test
+
+[ t ] [ \ complex-combination generic? >boolean ] unit-test
+
+! TUPLE: delegating-small-generic ;
+! G: small-delegation [ over ] [ type ] ;
+! M: shit small-delegation cons ;
+! 
+! [ [[ << shit f >> 5 ]] ] [ << delegating-small-generic << shit f >> >> 5 small-delegation ] unit-test
+
+GENERIC: big-generic-test
+M: fixnum big-generic-test "fixnum" ;
+M: bignum big-generic-test "bignum" ;
+M: ratio big-generic-test "ratio" ;
+M: string big-generic-test "string" ;
+M: shit big-generic-test "shit" ;
+
+TUPLE: delegating ;
+
+[ << shit f >> "shit" ] [ << shit f >> big-generic-test ] unit-test
+[ << shit f >> "shit" ] [ << delegating << shit f >> >> big-generic-test ] unit-test

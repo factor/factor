@@ -32,7 +32,7 @@ M: tuple-seq length ( tuple-seq -- len )
 IN: generic
 
 DEFER: tuple?
-BUILTIN: tuple 18 tuple? [ 1 length f ] ;
+BUILTIN: tuple 18 tuple? ;
 
 ! So far, only tuples can have delegates, which also must be
 ! tuples (the UI uses numbers as delegates in a couple of places
@@ -69,8 +69,13 @@ UNION: arrayed array tuple ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word swap [
-        literal, [ swap class eq? ] %
+    dup predicate-word
+    2dup unit "predicate" set-word-prop
+    swap [
+        [ dup tuple? ] %
+        [ \ class-tuple , literal, \ eq? , ] make-list ,
+        [ drop f ] ,
+        \ ifte ,
     ] make-list define-compound ;
 
 : check-shape ( word slots -- )
@@ -148,10 +153,7 @@ UNION: arrayed array tuple ;
         drop object over hash* dup [
             2nip cdr
         ] [
-            2drop [ dup delegate ] swap
-            dup unit swap
-            unit [ car ] cons [ no-method ] append
-            \ ?ifte 3list append
+            2drop empty-method
         ] ifte
     ] ifte ;
 

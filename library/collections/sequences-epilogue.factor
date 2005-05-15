@@ -172,6 +172,34 @@ TUPLE: repeated length object ;
 M: repeated length repeated-length ;
 M: repeated nth nip repeated-object ;
 
+! A range of integers
+TUPLE: range from to step ;
+
+C: range ( from to -- range )
+    >r 2dup > -1 1 ? r>
+    [ set-range-step ] keep
+    [ set-range-to ] keep
+    [ set-range-from ] keep ;
+
+M: range length ( range -- n )
+    dup range-to swap range-from - abs 1 + ;
+
+M: range nth ( n range -- n )
+    [ range-step * ] keep range-from + ;
+
+! A slice of another sequence.
+TUPLE: slice seq ;
+
+C: slice ( from to seq -- )
+    [ set-slice-seq ] keep
+    [ >r <range> r> set-delegate ] keep ;
+
+M: slice nth ( n slice -- obj )
+    [ delegate nth ] keep slice-seq nth ;
+
+M: slice set-nth ( obj n slice -- )
+    [ delegate nth ] keep slice-seq set-nth ;
+
 IN: kernel
 
 : depth ( -- n )

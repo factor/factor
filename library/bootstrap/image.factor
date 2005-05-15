@@ -263,16 +263,17 @@ M: hashtable ' ( hashtable -- pointer )
 
 ( End of the image )
 
+: vocabulary, ( hash -- )
+    dup hashtable? [
+        [
+            cdr dup word? [ word, ] [ drop ] ifte
+        ] hash-each
+    ] [
+        drop
+    ] ifte ;
+
 : vocabularies, ( vocabularies -- )
-    [
-        cdr dup hashtable? [
-            [
-                cdr dup word? [ word, ] [ drop ] ifte
-            ] hash-each
-        ] [
-            drop
-        ] ifte
-    ] hash-each ;
+    [ cdr vocabulary, ] hash-each ;
 
 : global, ( -- )
     vocabularies get

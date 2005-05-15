@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
 USING: lists parser namespaces stdio kernel vectors words
-hashtables ;
+hashtables sequences ;
 
 "Bootstrap stage 1..." print
 

@@ -170,8 +170,12 @@ M: word apply-object ( word -- )
 \ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
 \ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
 \ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
+\ real [ [ number ] [ real ] ] "infer-effect" set-word-prop
+\ imaginary [ [ number ] [ real ] ] "infer-effect" set-word-prop
+\ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
 
 \ no-method t "terminator" set-word-prop
 \ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
+\ <no-method> [ [ object word ] [ tuple ] ] "infer-effect" set-word-prop
 \ not-a-number t "terminator" set-word-prop
 \ throw t "terminator" set-word-prop
