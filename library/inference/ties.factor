@@ -40,7 +40,7 @@ M: class-tie pull-tie ( tie -- )
 TUPLE: literal-tie value literal ;
 M: literal-tie pull-tie ( tie -- )
     dup literal-tie-literal swap literal-tie-value
-     2dup set-literal-value
+    dup literal? [ 2dup set-literal-value ] when
     value-literal-ties assoc pull-tie ;
 
 M: f pull-tie ( tie -- )

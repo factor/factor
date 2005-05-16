@@ -21,7 +21,7 @@ M: vector clone ( vector -- vector )
     #! Execute the quotation n times, passing the loop counter
     #! the quotation as it ranges from 0..n-1. Collect results
     #! in a new vector.
-    project >vector ; inline
+    >r 0 swap <range> >vector r> map ; inline
 
 : zero-vector ( n -- vector )
     [ drop 0 ] vector-project ;

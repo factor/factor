@@ -75,24 +75,34 @@ sequences strings vectors words hashtables prettyprint ;
 
 SYMBOL: cloned
 
+GENERIC: (deep-clone)
+
 : deep-clone ( obj -- obj )
-    #! Clone an object if it hasn't already been cloned in this
-    #! with-deep-clone scope.
     dup cloned get assq [ ] [
-        dup clone [ swap cloned [ acons ] change ] keep
+        dup (deep-clone) [ swap cloned [ acons ] change ] keep
     ] ?ifte ;
 
-: deep-clone-seq ( seq -- seq )
+M: tuple (deep-clone) ( obj -- obj )
+    #! Clone an object if it hasn't already been cloned in this
+    #! with-deep-clone scope.
+    clone dup <mirror> [ deep-clone ] nmap ;
+
+M: vector (deep-clone) ( seq -- seq )
     #! Clone a sequence and each object it contains.
     [ deep-clone ] map ;
+
+M: cons (deep-clone) ( cons -- cons )
+    uncons deep-clone >r deep-clone r> cons ;
+
+M: object (deep-clone) ( obj -- obj ) ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
     cloned off
-    meta-r [ deep-clone-seq ] change
-    meta-d [ deep-clone-seq ] change
-    d-in [ deep-clone-seq ] change
+    meta-r [ deep-clone ] change
+    meta-d [ deep-clone ] change
+    d-in [ deep-clone ] change
     dataflow-graph off ;
 
 : infer-branch ( value -- namespace )
@@ -100,9 +110,10 @@ SYMBOL: cloned
     #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
     <namespace> [
-        uncons pull-tie
-        dup value-recursion recursive-state set
         copy-inference
+        uncons deep-clone pull-tie
+        cloned off
+        dup value-recursion recursive-state set
         literal-value dup infer-quot
         active? [
             #values values-node
@@ -137,16 +148,39 @@ SYMBOL: cloned
     #! base case to this stack effect and try again.
     (infer-branches) dup unify-effects unify-dataflow ;
 
+: boolean-value? ( value -- ? )
+    #! Return if the value's boolean valuation is known.
+    value-class dup \ f = >r \ f class-and null = r> or ;
+
+: boolean-value ( value -- ? )
+    #! Only valid if boolean? returns true.
+    value-class \ f = not ;
+
+: static-ifte? ( value -- ? )
+    #! Is the outcome of this branch statically known?
+    dup value-safe? swap boolean-value? and ;
+
+: static-ifte ( true false -- )
+    #! If the branch taken is statically known, just infer
+    #! along that branch.
+    1 dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
+    >literal< infer-quot-value ;
+
 : infer-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
     2list >r pop-d \ ifte r>
-    pick [ general-t POSTPONE: f ] [ <class-tie> ] map-with
+    pick [ POSTPONE: f general-t ] [ <class-tie> ] map-with
     zip ( condition )
     infer-branches ;
 
 \ ifte [
-    2 dataflow-drop, pop-d pop-d swap infer-ifte
+    2 dataflow-drop, pop-d pop-d swap
+    peek-d static-ifte? [
+        static-ifte
+    ] [
+        infer-ifte
+    ] ifte
 ] "infer" set-word-prop
 
 : vtable>list ( rstate vtable -- list  )
@@ -166,5 +200,8 @@ USE: kernel-internals
     over length [ <literal-tie> ] project-with
     zip infer-branches ;
 
-\ dispatch [ pop-literal infer-dispatch ] "infer" set-word-prop
+\ dispatch [
+    pop-literal infer-dispatch
+] "infer" set-word-prop
+
 \ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop

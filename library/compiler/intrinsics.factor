@@ -78,13 +78,7 @@ sequences words ;
 
 : typed? ( value -- ? ) value-types length 1 = ;
 
-: self ( word -- )
-    f swap dup "infer-effect" word-prop (consume/produce) ;
-
-: intrinsic ( word -- )
-    dup [ literal, \ self , ] make-list "infer" set-word-prop ;
-
-\ slot intrinsic
+\ slot t "intrinsic" set-word-prop
 
 : slot@ ( node -- n )
     #! Compute slot offset.
@@ -111,7 +105,7 @@ sequences words ;
     ] ifte  out-1
 ] "linearizer" set-word-prop
 
-\ set-slot intrinsic
+\ set-slot t "intrinsic" set-word-prop
 
 \ set-slot [
     dup typed-literal? [
@@ -128,7 +122,7 @@ sequences words ;
     ] ifte
 ] "linearizer" set-word-prop
 
-\ type intrinsic
+\ type t "intrinsic" set-word-prop
 
 \ type [
     drop
@@ -138,7 +132,7 @@ sequences words ;
     out-1
 ] "linearizer" set-word-prop
 
-\ arithmetic-type intrinsic
+\ arithmetic-type t "intrinsic" set-word-prop
 
 \ arithmetic-type [
     drop
@@ -149,7 +143,7 @@ sequences words ;
     out-1
 ] "linearizer" set-word-prop
 
-\ getenv intrinsic
+\ getenv t "intrinsic" set-word-prop
 
 \ getenv [
     1 %dec-d ,
@@ -158,7 +152,7 @@ sequences words ;
     out-1
 ] "linearizer" set-word-prop
 
-\ setenv intrinsic
+\ setenv t "intrinsic" set-word-prop
 
 \ setenv [
     1 %dec-d ,
@@ -200,12 +194,12 @@ sequences words ;
     [[ fixnum>       %fixnum>       ]]
     [[ eq?           %eq?           ]]
 ] [
-    uncons over intrinsic
+    uncons over t "intrinsic" set-word-prop
     [ literal, 0 , \ binary-op , ] make-list
     "linearizer" set-word-prop
 ] each
 
-\ fixnum* intrinsic
+\ fixnum* t "intrinsic" set-word-prop
 
 : slow-fixnum* \ %fixnum* 0 binary-op-reg ;
 
@@ -225,7 +219,7 @@ sequences words ;
     ] ifte
 ] "linearizer" set-word-prop
 
-\ fixnum-mod intrinsic
+\ fixnum-mod t "intrinsic" set-word-prop
 
 \ fixnum-mod [
     ! This is not clever. Because of x86, %fixnum-mod is
@@ -234,13 +228,13 @@ sequences words ;
     drop \ %fixnum-mod 2 binary-op-reg
 ] "linearizer" set-word-prop
 
-\ fixnum/i intrinsic
+\ fixnum/i t "intrinsic" set-word-prop
 
 \ fixnum/i [
     drop \ %fixnum/i 0 binary-op-reg
 ] "linearizer" set-word-prop
 
-\ fixnum/mod intrinsic
+\ fixnum/mod t "intrinsic" set-word-prop
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
@@ -251,7 +245,7 @@ sequences words ;
     0 1 %replace-d ,
 ] "linearizer" set-word-prop
 
-\ fixnum-bitnot intrinsic
+\ fixnum-bitnot t "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
     drop
@@ -295,7 +289,7 @@ sequences words ;
         ] ifte
     ] ifte ;
 
-\ fixnum-shift intrinsic
+\ fixnum-shift t "intrinsic" set-word-prop
 
 \ fixnum-shift [
     node-peek dup literal? [

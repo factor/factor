@@ -66,11 +66,10 @@ M: general-list contains? ( obj list -- ? )
 M: general-list reverse ( list -- list )
     [ ] swap [ swons ] each ;
 
-M: general-list map ( list quot -- list )
-    #! Push each element of a proper list in turn, and collect
-    #! return values of applying a quotation with effect
-    #! ( X -- Y ) to each element into a new list.
-    over [ (each) rot >r map r> swons ] [ drop ] ifte ;
+M: f map ( list quot -- list ) drop ;
+
+M: cons map ( list quot -- list | quot: elt -- elt )
+    (each) rot >r map r> swons ;
 
 : remove ( obj list -- list )
     #! Remove all occurrences of objects equal to this one from
@@ -104,11 +103,8 @@ M: f = ( obj f -- ? ) eq? ;
 
 M: cons hashcode ( cons -- hash ) car hashcode ;
 
-: (count) ( i n -- list )
-    2dup >= [ 2drop [ ] ] [ >r dup 1 + r> (count) cons ] ifte ;
-
 : count ( n -- [ 0 ... n-1 ] )
-    0 swap (count) ;
+    0 swap <range> >list ;
 
 : project ( n quot -- list )
     >r count r> map ; inline

@@ -76,10 +76,9 @@ PREDICATE: general-list list ( list -- ? )
 : (each) ( list quot -- list quot )
     [ >r car r> call ] 2keep >r cdr r> ; inline
 
-M: general-list each ( list quot -- )
-    #! Push each element of a proper list in turn, and apply a
-    #! quotation with effect ( elt -- ) to each element.
-    over [ (each) each ] [ 2drop ] ifte ;
+M: f each ( list quot -- ) 2drop ;
+
+M: cons each ( list quot -- | quot: elt -- ) (each) each ;
 
 M: cons tree-each ( cons quot -- )
     >r uncons r> tuck >r >r tree-each r> r> tree-each ;

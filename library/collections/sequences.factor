@@ -43,6 +43,7 @@ G: map ( seq quot -- seq | quot: elt -- elt )
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
 
+DEFER: <range>
 DEFER: append ! remove this when sort is moved from lists to sequences
 
 ! Some low-level code used by vectors and string buffers.

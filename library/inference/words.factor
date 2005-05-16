@@ -28,13 +28,17 @@ hashtables parser prettyprint ;
 : consume/produce ( word [ in-types out-types ] -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    #call swap (consume/produce) ;
+    over "intrinsic" word-prop [
+        f -rot
+    ] [
+        #call swap
+    ] ifte (consume/produce) ;
 
 : no-effect ( word -- )
     "Unknown stack effect: " swap word-name cat2 inference-error ;
 
 : inhibit-parital ( -- )
-    meta-d get [ f swap set-literal-safe? ] each ;
+    meta-d get [ f swap set-value-safe? ] each ;
 
 : recursive? ( word -- ? )
     f swap dup word-def [ = or ] tree-each-with ;
@@ -182,12 +186,6 @@ M: word apply-object ( word -- )
         apply-word
     ] ifte* ;
 
-: infer-quot-value ( rstate quot -- )
-    recursive-state get >r
-    swap recursive-state set
-    dup infer-quot handle-terminator
-    r> recursive-state set ;
-
 \ call [
     pop-literal infer-quot-value
 ] "infer" set-word-prop
@@ -204,6 +202,7 @@ M: word apply-object ( word -- )
 \ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
 \ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
 \ not-a-number t "terminator" set-word-prop
+\ inference-error t "terminator" set-word-prop
 \ throw t "terminator" set-word-prop
 \ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
 \ integer/ [ [ integer integer ] [ rational ] ] "infer-effect" set-word-prop

@@ -30,7 +30,6 @@ namespaces parser sequences test vectors ;
 [ [ call ] infer old-effect ] unit-test-fails
 
 [ [[ 2 4 ]] ] [ [ 2dup ] infer old-effect ] unit-test
-[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
 
 [ [[ 1 0 ]] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
 [ [ ifte ] infer old-effect ] unit-test-fails
@@ -147,7 +146,7 @@ SYMBOL: sym-test
 
 [ [[ 0 1 ]] ] [ [ sym-test ] infer old-effect ] unit-test
 
-
+[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
 [ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ 2list ] infer old-effect ] unit-test
 [ [[ 3 1 ]] ] [ [ 3list ] infer old-effect ] unit-test
@@ -220,11 +219,12 @@ M: fixnum potential-hang dup [ potential-hang ] when ;
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
 ! [ [ [ number ] [ real real ] ] ] [ [ >rect ] infer ] unit-test
 
-! [ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer ] unit-test
-! [ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer ] unit-test
-! [ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer ] unit-test
-! 
-! [ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer ] unit-test
+[ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer ] unit-test
+[ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer ] unit-test
+[ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer ] unit-test
+[ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer ] unit-test
+
+[ [ [ object ] [ cons ] ] ] [ [ dup cons? [ drop [[ 1 2 ]] ] unless ] infer ] unit-test
 
 TUPLE: funny-cons car cdr ;
 GENERIC: iterate

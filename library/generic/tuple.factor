@@ -20,15 +20,6 @@ hashtables errors sequences vectors ;
 
 : class-tuple 2 slot ; inline
 
-! A sequence of all slots in a tuple, used for equality testing.
-TUPLE: tuple-seq tuple ;
-
-M: tuple-seq nth ( n tuple-seq -- elt )
-    tuple-seq-tuple array-nth ;
-
-M: tuple-seq length ( tuple-seq -- len )
-    tuple-seq-tuple array-capacity ;
-
 IN: generic
 
 DEFER: tuple?
@@ -69,7 +60,7 @@ UNION: arrayed array tuple ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word 2dup set-predicate
+    dup predicate-word 2dup unit "predicate" set-word-prop
     swap [
         [ dup tuple? ] %
         [ \ class-tuple , literal, \ eq? , ] make-list ,
@@ -173,13 +164,28 @@ UNION: arrayed array tuple ;
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;
 
-: tuple>list ( tuple -- list )
-    #! We have to type check here, since <tuple-seq> is unsafe.
-    dup tuple? [
-        <tuple-seq> >list
+! A sequence of all slots in a tuple, used for equality testing.
+TUPLE: mirror tuple ;
+
+C: mirror ( tuple -- mirror )
+    over tuple? [
+        [ set-mirror-tuple ] keep
     ] [
         "Not a tuple" throw
     ] ifte ;
+
+M: mirror nth ( n mirror -- elt )
+    bounds-check mirror-tuple array-nth ;
+
+M: mirror set-nth ( n mirror -- elt )
+    bounds-check mirror-tuple set-array-nth ;
+
+M: mirror length ( mirror -- len )
+    mirror-tuple array-capacity ;
+
+: tuple>list ( tuple -- list )
+    #! We have to type check here, since <mirror> is unsafe.
+    <mirror> >list ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
@@ -204,7 +210,7 @@ M: tuple = ( obj tuple -- ? )
         2drop t
     ] [
         over tuple? [
-            swap <tuple-seq> swap <tuple-seq> sequence=
+            swap <mirror> swap <mirror> sequence=
         ] [
             2drop f
         ] ifte

@@ -18,8 +18,7 @@ SYMBOL: inferring-base-case
 SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
-    1 dataflow-drop, pop-d
-    dup value-recursion swap literal-value ;
+    1 dataflow-drop, pop-d >literal< ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -104,6 +103,12 @@ M: object apply-object apply-literal ;
     ] [
         drop
     ] ifte ;
+
+: infer-quot-value ( rstate quot -- )
+    recursive-state get >r
+    swap recursive-state set
+    dup infer-quot handle-terminator
+    r> recursive-state set ;
 
 : check-active ( -- )
     active? [ "Provable runtime error" inference-error ] unless ;

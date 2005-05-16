@@ -7,7 +7,9 @@ math-internals ;
 
 ! A simple single-dispatch generic word system.
 
-: predicate-word ( word -- word ) word-name "?" cat2 create-in ;
+: predicate-word ( word -- word )
+    word-name "?" cat2 create-in
+    dup t "inline" set-word-prop ;
 
 ! Terminology:
 ! - type: a datatype built in to the runtime, eg fixnum, word
@@ -173,9 +175,5 @@ SYMBOL: object
     dupd "metaclass" set-word-prop
     dup builtin-supertypes [ > ] sort
     typemap get set-hash ;
-
-: set-predicate ( class word -- )
-    dup t "inline" set-word-prop
-    unit "predicate" set-word-prop ;
 
 typemap get [ <namespace> typemap set ] unless

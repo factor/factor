@@ -39,7 +39,7 @@ builtin [ 2drop t ] "class<" set-word-prop
     dup intern-symbol
     dup r> "builtin-type" set-word-prop
     dup builtin define-class
-    dup r> set-predicate
+    dup r> unit "predicate" set-word-prop
     dup builtin-predicate
     dup r> define-slots
     register-builtin ;

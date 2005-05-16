@@ -5,10 +5,12 @@ USING: generic kernel namespaces sequences unparser words ;
 
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
+GENERIC: safe-literal? ( value -- ? )
 
-TUPLE: value class recursion class-ties literal-ties ;
+TUPLE: value class recursion class-ties literal-ties safe? ;
 
 C: value ( recursion -- value )
+    [ t swap set-value-safe? ] keep
     [ set-value-recursion ] keep ;
 
 TUPLE: computed ;
@@ -35,10 +37,9 @@ M: computed value-class-and ( class value -- )
         value-class  failing-class-and
     ] keep set-value-class ;
 
-TUPLE: literal value safe? ;
+TUPLE: literal value ;
 
 C: literal ( obj rstate -- value )
-    [ t swap set-literal-safe? ] keep
     [
         >r <value> [ >r dup class r> set-value-class ] keep
         r> set-delegate
@@ -54,9 +55,9 @@ M: literal value-class-and ( class value -- )
 M: literal set-value-class ( class value -- )
     2drop ;
 
-M: computed literal-safe? drop f ;
+M: literal safe-literal? ( value -- ? ) value-safe? ;
 
-M: computed set-literal-safe? 2drop ;
+M: computed safe-literal? drop f ;
 
 M: computed literal-value ( value -- )
     "A literal value was expected where a computed value was"
@@ -64,3 +65,6 @@ M: computed literal-value ( value -- )
 
 : value-types ( value -- list )
     value-class builtin-supertypes ;
+
+: >literal< ( literal -- rstate obj )
+    dup value-recursion swap literal-value ;
