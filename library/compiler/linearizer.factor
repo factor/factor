@@ -21,16 +21,6 @@ math namespaces words strings errors prettyprint sequences ;
     #! rest is arguments.
     [ %prologue , (linearize) ] make-list ;
 
-: linearize-simple-label ( node -- )
-    #! Some labels become simple labels after the optimization
-    #! stage.
-    dup [ node-label get ] bind %label ,
-    [ node-param get ] bind (linearize) ;
-
-#simple-label [
-    linearize-simple-label
-] "linearizer" set-word-prop
-
 : linearize-label ( node -- )
     #! Labels are tricky, because they might contain non-tail
     #! calls. So we push the address of the location right after
@@ -39,7 +29,8 @@ math namespaces words strings errors prettyprint sequences ;
     #! this in the common case where the labelled block does
     #! not contain non-tail recursive calls to itself.
     <label> dup %return-to , >r
-    linearize-simple-label
+    dup [ node-label get ] bind %label ,
+    [ node-param get ] bind (linearize)
     f %return ,
     r> %label , ;
 

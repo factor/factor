@@ -109,7 +109,7 @@ M: object (each-slot) ( quot obj -- )
 : orphan? ( word -- ? )
     #! Test if the word is not a member of its vocabulary.
     dup dup word-name swap word-vocabulary dup [
-        vocab hash eq? not
+        vocab dup [ hash eq? not ] [ 3drop t ] ifte
     ] [
         3drop t
     ] ifte ;

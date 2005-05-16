@@ -1,39 +1,11 @@
-! :folding=indent:collapseFolds=1:
-
-! $Id$
-!
-! Copyright (C) 2004 Slava Pestov.
-! 
-! Redistribution and use in source and binary forms, with or without
-! modification, are permitted provided that the following conditions are met:
-! 
-! 1. Redistributions of source code must retain the above copyright notice,
-!    this list of conditions and the following disclaimer.
-! 
-! 2. Redistributions in binary form must reproduce the above copyright notice,
-!    this list of conditions and the following disclaimer in the documentation
-!    and/or other materials provided with the distribution.
-! 
-! THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-! INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-! FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-! DEVELOPERS AND CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-! SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
-! PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
-! OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-! WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-! OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+! Copyright (C) 2004, 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USE: interpreter
-USE: kernel
-USE: lists
-USE: math
-USE: namespaces
-USE: words
-USE: vectors
-USE: sequences
+USING: interpreter kernel lists namespaces sequences vectors
+words ;
+
+! Recursive state. An alist, mapping words to labels.
+SYMBOL: recursive-state
 
 ! We build a dataflow graph for the compiler.
 SYMBOL: dataflow-graph
@@ -41,14 +13,10 @@ SYMBOL: dataflow-graph
 ! Label nodes have the node-label variable set.
 SYMBOL: #label
 
-! A label that is not called recursively at all, or only tail
-! recursively. The optimizer changes some #labels to
-! #simple-labels.
-SYMBOL: #simple-label
-
 SYMBOL: #call ( non-tail call )
 SYMBOL: #call-label
 SYMBOL: #push ( literal )
+SYMBOL: #drop
 
 ! This is purely a marker for values we retain after a
 ! conditional. It does not generate code, but merely alerts the
@@ -101,10 +69,11 @@ SYMBOL: node-param
     #! Add a node to the dataflow IR.
     <dataflow-node> dup dataflow-graph [ cons ] change ;
 
-: dataflow-drop, ( -- )
-    #! Remove the top stack element and add a dataflow node
-    #! noting this.
-    f \ drop dataflow, [ 1 0 node-inputs ] bind ;
+: dataflow-drop, ( n -- )
+    f #drop dataflow, [ 0 node-inputs ] bind ;
+
+: dataflow-push, ( n -- )
+    f #push dataflow, [ 0 node-outputs ] bind ;
 
 : apply-dataflow ( dataflow name default -- )
     #! For the dataflow node, look up named word property,

@@ -33,19 +33,18 @@ GENERIC: truncate ( n -- n )
 GENERIC: floor    ( n -- n )
 GENERIC: ceiling  ( n -- n )
 
-: max ( x y -- z ) [ > ] 2keep ? ;
-
-: min ( x y -- z ) [ < ] 2keep ? ;
+: max ( x y -- z ) [ > ] 2keep ? ; inline
+: min ( x y -- z ) [ < ] 2keep ? ; inline
 
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max
     #! by swapping them.
     2dup > [ swap ] when  >r dupd max r> min = ;
 
-: sq dup * ;
+: sq dup * ; inline
 
-: neg 0 swap - ;
-: recip 1 swap / ;
+: neg 0 swap - ; inline
+: recip 1 swap / ; inline
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.

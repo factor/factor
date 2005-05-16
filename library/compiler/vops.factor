@@ -93,8 +93,8 @@ VOP: %inc-d
 : %inc-d ( n -- ) literal-vop <%inc-d> ;
 : %dec-d ( n -- ) neg %inc-d ;
 VOP: %immediate
-VOP: %immediate-d
-: %immediate-d ( obj -- ) literal-vop <%immediate-d> ;
+: %immediate ( vreg obj -- )
+    >r <vreg> r> dest/literal-vop <%immediate> ;
 VOP: %peek-r
 : %peek-r ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-r> ;
 VOP: %replace-r

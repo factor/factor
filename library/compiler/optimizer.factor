@@ -100,9 +100,26 @@ SYMBOL: branch-returns
         node-param [ [ dupd kill-nodes ] map nip ] change
     ] extend , ;
 
-#push [ [ node-param get ] bind , ] "scan-literal" set-word-prop
-#push [ consumes-literal? not ] "can-kill" set-word-prop
-#push [ kill-node ] "kill-node" set-word-prop
+: kill-literal ( literals values -- values )
+    [
+        swap [ swap value= ] some-with? not
+    ] subset-with ;
+
+#push [
+    [ node-produce-d get ] bind [ literal-value ] map %
+] "scan-literal" set-word-prop
+
+#push [ 2drop t ] "can-kill" set-word-prop
+
+#push [
+    [ node-produce-d [ kill-literal ] change ] extend ,
+] "kill-node" set-word-prop
+
+#drop [ 2drop t ] "can-kill" set-word-prop
+
+#drop [
+    [ node-consume-d [ kill-literal ] change ] extend ,
+] "kill-node" set-word-prop
 
 #label [
     [ node-param get ] bind (scan-literals)
@@ -123,10 +140,6 @@ SYMBOL: branch-returns
     [ node-param get ] bind calls-label?
 ] "calls-label" set-word-prop
 
-#simple-label [
-    [ node-param get ] bind calls-label?
-] "calls-label" set-word-prop
-
 : branches-call-label? ( label list -- ? )
     [ calls-label? ] some-with? ;
 
@@ -138,16 +151,8 @@ SYMBOL: branch-returns
     [ node-param get ] bind branches-call-label?
 ] "calls-label" set-word-prop
 
-: optimize-label ( -- op )
-    #! Does the label node contain calls to itself?
-    node-label get node-param get calls-label?
-    #label #simple-label ? ;
-
 #label [ ( literals node -- )
-    [
-        optimize-label node-op set
-        node-param [ kill-nodes ] change
-    ] extend ,
+    [ node-param [ kill-nodes ] change ] extend ,
 ] "kill-node" set-word-prop
 
 #values [

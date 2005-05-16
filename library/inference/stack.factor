@@ -15,12 +15,13 @@ USING: interpreter kernel namespaces words ;
     [ 1 0 node-outputs ] bind
 ] "infer" set-word-prop
 
-: infer-shuffle ( word -- )
-    f over dup
-    "infer-effect" word-prop
-    [ host-word ] with-dataflow ;
+: partial-eval ( word quot -- | quot: word -- )
+    >r f over dup "infer-effect" word-prop r> with-dataflow ;
 
-\ drop [ \ drop infer-shuffle ] "infer" set-word-prop
+: infer-shuffle ( word -- )
+    [ host-word ] partial-eval ;
+
+\ drop [ 1 dataflow-drop, pop-d drop ] "infer" set-word-prop
 \ dup  [ \ dup  infer-shuffle ] "infer" set-word-prop
 \ swap [ \ swap infer-shuffle ] "infer" set-word-prop
 \ over [ \ over infer-shuffle ] "infer" set-word-prop

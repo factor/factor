@@ -69,7 +69,7 @@ SYMBOL: failures
             "lists/namespaces" "lists/combinators" "combinators"
             "continuations" "errors" "hashtables" "strings"
             "namespaces" "generic" "tuple" "files" "parser"
-            "parse-number" "prettyprint" "image" "init" "io/io"
+            "parse-number" "image" "init" "io/io"
             "listener" "vectors" "words" "unparser" "random"
             "stream" "math/bitops"
             "math/math-combinators" "math/rational" "math/float"
@@ -102,7 +102,7 @@ SYMBOL: failures
             "benchmark/fib" "benchmark/sort"
             "benchmark/continuations" "benchmark/ack"
             "benchmark/hashtables" "benchmark/strings"
-            "benchmark/vectors"
+            "benchmark/vectors" "benchmark/prettyprint"
         ] %
     ] make-list ;
 

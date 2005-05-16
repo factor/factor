@@ -182,7 +182,7 @@ C: range ( from to -- range )
     [ set-range-from ] keep ;
 
 M: range length ( range -- n )
-    dup range-to swap range-from - abs 1 + ;
+    dup range-to swap range-from - abs ;
 
 M: range nth ( n range -- n )
     [ range-step * ] keep range-from + ;
@@ -199,6 +199,9 @@ M: slice nth ( n slice -- obj )
 
 M: slice set-nth ( obj n slice -- )
     [ delegate nth ] keep slice-seq set-nth ;
+
+: tail-slice ( n seq -- slice )
+    [ length [ swap - ] keep ] keep <slice> ;
 
 IN: kernel
 

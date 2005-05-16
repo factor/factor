@@ -41,13 +41,16 @@ C: quuux-tuple-2
 [
     100
 ] [
+    FORGET: point
+    FORGET: point?
+    FORGET: point-x
     TUPLE: point x y ;
     C: point [ set-point-y ] keep [ set-point-x ] keep ;
     
     100 200 <point>
     
     ! Use eval to sequence parsing explicitly
-    "TUPLE: point x y z ;" eval
+    "IN: temporary TUPLE: point x y z ;" eval
     
     point-x
 ] unit-test

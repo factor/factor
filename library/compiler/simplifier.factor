@@ -51,14 +51,15 @@ M: %label simplify-node ( linear vop -- linear ? )
 
 M: %inc-d simplify-node ( linear vop -- linear ? )
     #! %inc-d cancels a following %inc-d.
-    >r dup \ %inc-d next-physical? [
-        vop-literal r> vop-literal + dup 0 = [
-            drop cdr cdr f
-        ] [
-            %inc-d >r cdr cdr r> swons t
-        ] ifte
+    dup vop-literal 0 = [
+        drop cdr t
     ] [
-        r> 2drop f
+        >r dup \ %inc-d next-physical? [
+            vop-literal r> vop-literal + 
+            %inc-d >r cdr cdr r> swons t
+        ] [
+            r> 2drop f
+        ] ifte
     ] ifte ;
 
 : dead-load? ( linear vop -- ? )
@@ -91,8 +92,8 @@ M: %replace-d simplify-node ( linear vop -- linear ? )
         ] ifte
     ] ifte ;
 
-M: %immediate-d simplify-node ( linear vop -- linear ? )
-    over 0 dead-store? [ drop cdr t ] [ drop f ] ifte ;
+! M: %immediate-d simplify-node ( linear vop -- linear ? )
+!     over 0 dead-store? [ drop cdr t ] [ drop f ] ifte ;
 
 : pop? ( vop -- ? ) dup %inc-d? swap vop-literal -1 = and ;
 

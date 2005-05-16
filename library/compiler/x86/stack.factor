@@ -30,9 +30,6 @@ M: %inc-d generate-node ( vop -- )
 M: %immediate generate-node ( vop -- )
     dup vop-dest v>operand swap vop-literal address MOV ;
 
-M: %immediate-d generate-node ( vop -- )
-    vop-literal [ ESI ] swap address MOV ;
-
 : load-indirect ( dest literal -- )
     intern-literal unit MOV 0 0 rel-address ;
 

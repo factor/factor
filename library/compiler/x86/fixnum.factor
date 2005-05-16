@@ -36,7 +36,7 @@ memory namespaces words ;
     ! An untagged pointer to the bignum is now in EAX; tag it
     EAX bignum-tag OR
     ESP 4 ADD
-    "end" get save-xt ;
+    "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
     dest/src 2dup ADD  \ SUB \ ADD simple-overflow ;

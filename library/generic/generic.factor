@@ -174,4 +174,8 @@ SYMBOL: object
     dup builtin-supertypes [ > ] sort
     typemap get set-hash ;
 
+: set-predicate ( class word -- )
+    dup t "inline" set-word-prop
+    unit "predicate" set-word-prop ;
+
 typemap get [ <namespace> typemap set ] unless

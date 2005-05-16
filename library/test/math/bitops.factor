@@ -3,6 +3,7 @@ USE: kernel
 USE: math
 USE: test
 USE: lists
+USE: sequences
 
 [ -2 ] [ 1 bitnot ] unit-test
 [ -2 ] [ 1 >bignum bitnot ] unit-test

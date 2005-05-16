@@ -37,7 +37,7 @@ SYMBOL: vocabularies
 
 : recrossref ( -- )
     #! Update word cross referencing information.
-    [ f "usages" set-word-prop ] each-word
+    global [ <namespace> crossref set ] bind
     [ add-crossref ] each-word ;
 
 : (search) ( name vocab -- word )

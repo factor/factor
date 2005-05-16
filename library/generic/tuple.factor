@@ -69,8 +69,7 @@ UNION: arrayed array tuple ;
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word
-    2dup unit "predicate" set-word-prop
+    dup predicate-word 2dup set-predicate
     swap [
         [ dup tuple? ] %
         [ \ class-tuple , literal, \ eq? , ] make-list ,
@@ -78,12 +77,15 @@ UNION: arrayed array tuple ;
         \ ifte ,
     ] make-list define-compound ;
 
+: forget-tuple ( class -- )
+    dup forget "predicate" word-prop car forget ;
+
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
     >r "use" get search dup [
         dup "tuple-size" word-prop r> length 2 + =
-        [ drop ] [ forget ] ifte
+        [ drop ] [ forget-tuple ] ifte
     ] [
         r> 2drop
     ] ifte ;

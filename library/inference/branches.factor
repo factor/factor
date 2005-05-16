@@ -4,7 +4,7 @@ IN: inference
 USING: errors generic interpreter kernel lists math namespaces
 sequences strings vectors words hashtables prettyprint ;
 
-: longest-vector ( list -- length )
+: longest ( list -- length )
     0 swap [ length max ] each ;
 
 : computed-value-vector ( n -- vector )
@@ -17,7 +17,7 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-lengths ( list -- list )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup longest-vector swap [ add-inputs ] map-with ;
+    dup longest swap [ add-inputs ] map-with ;
 
 : unify-results ( list -- value )
     #! If all values in list are equal, return the value.
@@ -137,49 +137,20 @@ SYMBOL: cloned
     #! base case to this stack effect and try again.
     (infer-branches) dup unify-effects unify-dataflow ;
 
-: (with-block) ( [[ label quot ]] quot -- node )
-    #! Call a quotation in a new namespace, and transfer
-    #! inference state from the outer scope.
-    swap car >r [
-        dataflow-graph off
-        call
-        d-in get meta-d get meta-r get get-dataflow
-    ] with-scope
-    r> swap #label dataflow, [ node-label set ] extend >r
-    meta-r set meta-d set d-in set r> ;
-
-: with-block ( word [[ label quot ]] quot -- node )
-    #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new block node in the IR.
-    over [
-        >r
-        dupd cons
-        recursive-state [ cons ] change
-        r> call
-    ] (with-block) ;
-
-: dynamic-ifte ( true false -- )
+: infer-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
-    2list >r peek-d \ ifte r>
-    pop-d [
-        dup \ general-t <class-tie> ,
-        \ f <class-tie> ,
-    ] make-list zip ( condition )
+    2list >r pop-d \ ifte r>
+    pick [ general-t POSTPONE: f ] [ <class-tie> ] map-with
+    zip ( condition )
     infer-branches ;
 
-: infer-ifte ( -- )
-    #! Infer effects for both branches, unify.
-    [ object general-list general-list ] ensure-d
-    dataflow-drop, pop-d
-    dataflow-drop, pop-d swap
-    dynamic-ifte ;
+\ ifte [
+    2 dataflow-drop, pop-d pop-d swap infer-ifte
+] "infer" set-word-prop
 
-\ ifte [ infer-ifte ] "infer" set-word-prop
-
-: vtable>list ( value -- list )
-    dup value-recursion swap literal-value >list
-    [ over <literal> ] map nip ;
+: vtable>list ( rstate vtable -- list  )
+    [ swap <literal> ] map-with >list ;
 
 : <dispatch-index> ( value -- value )
     value-literal-ties
@@ -188,17 +159,12 @@ SYMBOL: cloned
 
 USE: kernel-internals
 
-: dynamic-dispatch ( vtable -- )
-    >r peek-d \ dispatch r>
+: infer-dispatch ( rstate vtable -- )
+    >r >r peek-d \ dispatch r> r>
     vtable>list
     pop-d <dispatch-index>
     over length [ <literal-tie> ] project-with
     zip infer-branches ;
 
-: infer-dispatch ( -- )
-    #! Infer effects for all branches, unify.
-    [ object vector ] ensure-d
-    dataflow-drop, pop-d dynamic-dispatch ;
-
-\ dispatch [ infer-dispatch ] "infer" set-word-prop
+\ dispatch [ pop-literal infer-dispatch ] "infer" set-word-prop
 \ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop

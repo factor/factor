@@ -11,18 +11,20 @@ sequences words ;
     #! by GC, and is indexed through a table.
     dup fixnum? swap f eq? or ;
 
+: push-1 ( obj -- )
+    0 swap literal-value dup
+    immediate? [ %immediate ] [ %indirect ] ifte , ;
+
 #push [
-    1 %inc-d ,
-    [ node-param get ] bind dup immediate? [
-        %immediate-d ,
-    ] [
-        0 swap %indirect ,  out-1
-    ] ifte
+    [ node-produce-d get ] bind
+    dup length dup %inc-d ,
+    1 - swap [
+        push-1 0 over %replace-d ,
+    ] each drop
 ] "linearizer" set-word-prop
 
-\ drop [
-    drop
-    1 %dec-d ,
+#drop [
+    [ node-consume-d get length ] bind %dec-d ,
 ] "linearizer" set-word-prop
 
 \ dup [
@@ -171,9 +173,12 @@ sequences words ;
     1 <vreg> 0 <vreg> rot execute ,
     r> 0 %replace-d , ;
 
+: literal-fixnum? ( value -- ? )
+    dup literal? [ literal-value fixnum? ] [ drop f ] ifte ;
+
 : binary-op ( node op out -- )
     #! out is a vreg where the vop stores the result.
-    >r >r node-peek dup literal? [
+    >r >r node-peek dup literal-fixnum? [
         1 %dec-d ,
         in-1
         literal-value 0 <vreg> r> execute ,
@@ -206,7 +211,7 @@ sequences words ;
 
 \ fixnum* [
     ! Turn multiplication by a power of two into a left shift.
-    node-peek dup literal? [
+    node-peek dup literal-fixnum? [
         literal-value dup power-of-2? [
             1 %dec-d ,
             in-1
