@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: errors generic hashtables kernel math namespaces parser
-words ;
+USING: errors generic hashtables kernel lists math namespaces
+parser sequences words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -22,13 +22,21 @@ words ;
 TUPLE: vreg n ;
 
 ! A virtual operation
-TUPLE: vop source dest literal label ;
+TUPLE: vop inputs outputs label ;
+: vop-in-1 ( vop -- input ) vop-inputs car ;
+: vop-in-2 ( vop -- input ) vop-inputs cdr car ;
+: vop-in-3 ( vop -- input ) vop-inputs cdr cdr car ;
+: vop-out-1 ( vop -- output ) vop-outputs car ;
+
+GENERIC: basic-block? ( vop -- ? )
+M: vop basic-block? drop f ;
+! simplifies some code
+M: f basic-block? drop f ;
 
 GENERIC: calls-label? ( label vop -- ? )
-
 M: vop calls-label? vop-label = ;
 
-: make-vop ( source dest literal label vop -- vop )
+: make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
 
 : VOP:
@@ -36,19 +44,21 @@ M: vop calls-label? vop-label = ;
     scan dup [ ] define-tuple
     create-in [ make-vop ] define-constructor ; parsing
 
-: empty-vop f f f f ;
-: label-vop ( label) >r f f f r> ;
-: label/src-vop ( label src) swap >r f f r> ;
-: src-vop ( src) f f f ;
-: dest-vop ( dest) f swap f f ;
-: src/dest-vop ( src dest) f f ;
-: literal-vop ( literal) >r f f r> f ;
-: src/literal-vop ( src literal) f swap f ;
-: dest/literal-vop ( dest literal) >r f swap r> f ;
+: empty-vop f f f ;
+: label-vop ( label) >r f f r> ;
+: label/src-vop ( label src) unit swap f swap ;
+: src-vop ( src) unit f f ;
+: dest-vop ( dest) unit dup f ;
+: src/dest-vop ( src dest) >r unit r> unit f ;
+: binary-vop ( src dest) [ 2list ] keep unit f ;
+: 2-in-vop ( in1 in2) 2list f f ;
+: 2-in/label-vop ( in1 in2 label) >r 2list f r> ;
+: ternary-vop ( in1 in2 dest) >r 2list r> unit f ;
 
 ! miscellanea
 VOP: %prologue
 : %prologue empty-vop <%prologue> ;
+
 VOP: %label
 : %label label-vop <%label> ;
 M: %label calls-label? 2drop f ;
@@ -61,49 +71,69 @@ VOP: %return
 
 VOP: %return-to
 : %return-to label-vop <%return-to> ;
+
 VOP: %jump
 : %jump label-vop <%jump> ;
+
 VOP: %jump-label
 : %jump-label label-vop <%jump-label> ;
+
 VOP: %call
 : %call label-vop <%call> ;
+
 VOP: %call-label
 : %call-label label-vop <%call-label> ;
+
 VOP: %jump-t
 : %jump-t <vreg> label/src-vop <%jump-t> ;
+
 VOP: %jump-f
 : %jump-f <vreg> label/src-vop <%jump-f> ;
 
 ! dispatch tables
 VOP: %dispatch
 : %dispatch <vreg> src-vop <%dispatch> ;
+
 VOP: %target-label
 : %target-label label-vop <%target-label> ;
+
 VOP: %target
 : %target label-vop <%target> ;
+
 VOP: %end-dispatch
 : %end-dispatch empty-vop <%end-dispatch> ;
 
 ! stack operations
 VOP: %peek-d
-: %peek-d ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-d> ;
+: %peek-d ( vreg n -- ) swap <vreg> src/dest-vop <%peek-d> ;
+M: %peek-d basic-block? drop t ;
+
 VOP: %replace-d
-: %replace-d ( vreg n -- ) >r <vreg> f r> f <%replace-d> ;
+: %replace-d ( vreg n -- ) swap <vreg> 2-in-vop <%replace-d> ;
+M: %replace-d basic-block? drop t ;
+
 VOP: %inc-d
-: %inc-d ( n -- ) literal-vop <%inc-d> ;
+: %inc-d ( n -- ) src-vop <%inc-d> ;
 : %dec-d ( n -- ) neg %inc-d ;
+M: %inc-d basic-block? drop t ;
+
 VOP: %immediate
 : %immediate ( vreg obj -- )
-    >r <vreg> r> dest/literal-vop <%immediate> ;
+    swap <vreg> src/dest-vop <%immediate> ;
+M: %immediate basic-block? drop t ;
+
 VOP: %peek-r
-: %peek-r ( vreg n -- ) >r >r f r> <vreg> r> f <%peek-r> ;
+: %peek-r ( vreg n -- ) swap <vreg> src/dest-vop <%peek-r> ;
+
 VOP: %replace-r
-: %replace-r ( vreg n -- ) >r <vreg> f r> f <%replace-r> ;
+: %replace-r ( vreg n -- ) swap <vreg> 2-in-vop <%replace-r> ;
+
 VOP: %inc-r
-: %inc-r ( n -- ) literal-vop <%inc-r> ;
+: %inc-r ( n -- ) src-vop <%inc-r> ;
+
 ! this exists, unlike %dec-d which does not, due to x86 quirks
 VOP: %dec-r
-: %dec-r ( n -- ) literal-vop <%dec-r> ;
+: %dec-r ( n -- ) src-vop <%dec-r> ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
@@ -112,44 +142,58 @@ VOP: %dec-r
 
 ! indirect load of a literal through a table
 VOP: %indirect
-: %indirect ( vreg obj -- ) >r <vreg> r> f -rot f <%indirect> ;
+: %indirect ( vreg obj -- )
+    swap <vreg> src/dest-vop <%indirect> ;
+M: %indirect basic-block? drop t ;
 
 ! object slot accessors
 ! mask off a tag (see also %untag-fixnum)
 VOP: %untag
 : %untag <vreg> dest-vop <%untag> ;
+M: %untag basic-block? drop t ;
+
 VOP: %slot
-: %slot ( n vreg ) >r <vreg> r> <vreg> f f <%slot> ;
+: %slot ( n vreg ) >r <vreg> r> <vreg> binary-vop <%slot> ;
+M: %slot basic-block? drop t ;
 
 VOP: %set-slot
-: %set-slot ( vreg:value vreg:obj n )
-    >r >r <vreg> r> <vreg> r> <vreg> f <%set-slot> ;
+: %set-slot ( value obj n )
+    #! %set-slot writes to vreg n.
+    >r >r <vreg> r> <vreg> r> <vreg> [ 3list ] keep unit f
+    <%set-slot> ;
+M: %set-slot basic-block? drop t ;
 
 ! in the 'fast' versions, the object's type and slot number is
 ! known at compile time, so these become a single instruction
 VOP: %fast-slot
-: %fast-slot ( vreg n ) >r >r f r> <vreg> r> f <%fast-slot> ;
+: %fast-slot ( vreg n )
+    swap <vreg> binary-vop <%fast-slot> ;
+M: %fast-slot basic-block? drop t ;
+
 VOP: %fast-set-slot
-: %fast-set-slot ( vreg:value vreg:obj n )
-    >r >r <vreg> r> <vreg> r> f <%fast-set-slot> ;
+: %fast-set-slot ( value obj n )
+    #! %fast-set-slot writes to vreg obj.
+    >r >r <vreg> r> <vreg> r> over >r 3list r> unit f
+    <%fast-set-slot> ;
+M: %fast-set-slot basic-block? drop t ;
 
 ! fixnum intrinsics
-VOP: %fixnum+       : %fixnum+ src/dest-vop <%fixnum+> ;
-VOP: %fixnum-       : %fixnum- src/dest-vop <%fixnum-> ;
-VOP: %fixnum*       : %fixnum* src/dest-vop <%fixnum*> ;
-VOP: %fixnum-mod    : %fixnum-mod src/dest-vop <%fixnum-mod> ;
-VOP: %fixnum/i      : %fixnum/i src/dest-vop <%fixnum/i> ;
-VOP: %fixnum/mod    : %fixnum/mod src/dest-vop <%fixnum/mod> ;
-VOP: %fixnum-bitand : %fixnum-bitand src/dest-vop <%fixnum-bitand> ;
-VOP: %fixnum-bitor  : %fixnum-bitor src/dest-vop <%fixnum-bitor> ;
-VOP: %fixnum-bitxor : %fixnum-bitxor src/dest-vop <%fixnum-bitxor> ;
+VOP: %fixnum+       : %fixnum+ binary-vop <%fixnum+> ;
+VOP: %fixnum-       : %fixnum- binary-vop <%fixnum-> ;
+VOP: %fixnum*       : %fixnum* binary-vop <%fixnum*> ;
+VOP: %fixnum-mod    : %fixnum-mod binary-vop <%fixnum-mod> ;
+VOP: %fixnum/i      : %fixnum/i binary-vop <%fixnum/i> ;
+VOP: %fixnum/mod    : %fixnum/mod binary-vop <%fixnum/mod> ;
+VOP: %fixnum-bitand : %fixnum-bitand binary-vop <%fixnum-bitand> ;
+VOP: %fixnum-bitor  : %fixnum-bitor binary-vop <%fixnum-bitor> ;
+VOP: %fixnum-bitxor : %fixnum-bitxor binary-vop <%fixnum-bitxor> ;
 VOP: %fixnum-bitnot : %fixnum-bitnot <vreg> dest-vop <%fixnum-bitnot> ;
 
-VOP: %fixnum<=      : %fixnum<= src/dest-vop <%fixnum<=> ;
-VOP: %fixnum<       : %fixnum< src/dest-vop <%fixnum<> ;
-VOP: %fixnum>=      : %fixnum>= src/dest-vop <%fixnum>=> ;
-VOP: %fixnum>       : %fixnum> src/dest-vop <%fixnum>> ;
-VOP: %eq?           : %eq? src/dest-vop <%eq?> ;
+VOP: %fixnum<=      : %fixnum<= binary-vop <%fixnum<=> ;
+VOP: %fixnum<       : %fixnum< binary-vop <%fixnum<> ;
+VOP: %fixnum>=      : %fixnum>= binary-vop <%fixnum>=> ;
+VOP: %fixnum>       : %fixnum> binary-vop <%fixnum>> ;
+VOP: %eq?           : %eq? binary-vop <%eq?> ;
 
 ! At the VOP level, the 'shift' operation is split into five
 ! distinct operations:
@@ -159,19 +203,28 @@ VOP: %eq?           : %eq? src/dest-vop <%eq?> ;
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a large negative count: %fixnum-sgn
-VOP: %fixnum<<   : %fixnum<<   src/dest-vop <%fixnum<<> ;
-VOP: %fixnum>>   : %fixnum>>   src/dest-vop <%fixnum>>> ;
+VOP: %fixnum<<   : %fixnum<<   binary-vop <%fixnum<<> ;
+VOP: %fixnum>>   : %fixnum>>   binary-vop <%fixnum>>> ;
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
-VOP: %fixnum-sgn : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
+VOP: %fixnum-sgn : %fixnum-sgn binary-vop <%fixnum-sgn> ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
-VOP: %jump-fixnum<= : %jump-fixnum<= f swap <%jump-fixnum<=> ;
-VOP: %jump-fixnum<  : %jump-fixnum< f swap <%jump-fixnum<> ;
-VOP: %jump-fixnum>= : %jump-fixnum>= f swap <%jump-fixnum>=> ;
-VOP: %jump-fixnum>  : %jump-fixnum> f swap <%jump-fixnum>> ;
-VOP: %jump-eq?      : %jump-eq? f swap <%jump-eq?> ;
+VOP: %jump-fixnum<=
+: %jump-fixnum<= 2-in/label-vop <%jump-fixnum<=> ;
+
+VOP: %jump-fixnum< 
+: %jump-fixnum< 2-in/label-vop <%jump-fixnum<> ;
+
+VOP: %jump-fixnum>=
+: %jump-fixnum>= 2-in/label-vop <%jump-fixnum>=> ;
+
+VOP: %jump-fixnum> 
+: %jump-fixnum> 2-in/label-vop <%jump-fixnum>> ;
+
+VOP: %jump-eq?     
+: %jump-eq? 2-in/label-vop <%jump-eq?> ;
 
 : fast-branch ( class -- class )
     {{
@@ -190,55 +243,62 @@ PREDICATE: tuple fast-branch
 ! some slightly optimized inline assembly
 VOP: %type
 : %type ( vreg ) <vreg> dest-vop <%type> ;
+M: %type basic-block? drop t ;
 
 VOP: %arithmetic-type
 : %arithmetic-type <vreg> dest-vop <%arithmetic-type> ;
 
 VOP: %tag-fixnum
 : %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;
+M: %tag-fixnum basic-block? drop t ;
 
 VOP: %untag-fixnum
 : %untag-fixnum <vreg> dest-vop <%untag-fixnum> ;
+M: %untag-fixnum basic-block? drop t ;
 
 : check-dest ( vop reg -- )
-    swap vop-dest = [ "invalid VOP destination" throw ] unless ;
+    swap vop-out-1 = [
+        "invalid VOP destination" throw
+    ] unless ;
 
 VOP: %getenv
-: %getenv dest/literal-vop <%getenv> ;
+: %getenv swap src/dest-vop <%getenv> ;
+M: %getenv basic-block? drop t ;
 
 VOP: %setenv
-: %setenv src/literal-vop <%setenv> ;
+: %setenv 2-in-vop <%setenv> ;
+M: %setenv basic-block? drop t ;
 
 ! alien operations
 VOP: %parameters
-: %parameters ( n -- vop ) literal-vop <%parameters> ;
+: %parameters ( n -- vop ) src-vop <%parameters> ;
 
 VOP: %parameter
-: %parameter ( n -- vop ) literal-vop <%parameter> ;
+: %parameter ( n -- vop ) src-vop <%parameter> ;
 
 VOP: %cleanup
-: %cleanup ( n -- vop ) literal-vop <%cleanup> ;
+: %cleanup ( n -- vop ) src-vop <%cleanup> ;
 
 VOP: %unbox
-: %unbox ( [[ n func ]] -- vop ) literal-vop <%unbox> ;
+: %unbox ( [[ n func ]] -- vop ) src-vop <%unbox> ;
 
 VOP: %unbox-float
-: %unbox-float ( [[ n func ]] -- vop ) literal-vop <%unbox-float> ;
+: %unbox-float ( [[ n func ]] -- vop ) src-vop <%unbox-float> ;
 
 VOP: %unbox-double
-: %unbox-double ( [[ n func ]] -- vop ) literal-vop <%unbox-double> ;
+: %unbox-double ( [[ n func ]] -- vop ) src-vop <%unbox-double> ;
 
 VOP: %box
-: %box ( func -- vop ) literal-vop <%box> ;
+: %box ( func -- vop ) src-vop <%box> ;
 
 VOP: %box-float
-: %box-float ( func -- vop ) literal-vop <%box-float> ;
+: %box-float ( func -- vop ) src-vop <%box-float> ;
 
 VOP: %box-double
-: %box-double ( [[ n func ]] -- vop ) literal-vop <%box-double> ;
+: %box-double ( [[ n func ]] -- vop ) src-vop <%box-double> ;
 
 VOP: %alien-invoke
-: %alien-invoke ( func -- vop ) literal-vop <%alien-invoke> ;
+: %alien-invoke ( func -- vop ) src-vop <%alien-invoke> ;
 
 VOP: %alien-global
-: %alien-global ( global -- vop ) literal-vop <%alien-global> ;
+: %alien-global ( global -- vop ) src-vop <%alien-global> ;

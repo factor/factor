@@ -9,7 +9,7 @@ M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
 
 : dest/src ( vop -- dest src )
-    dup vop-dest v>operand swap vop-source v>operand ;
+    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
 
 ! Not used on x86
 M: %prologue generate-node drop ;
@@ -30,10 +30,10 @@ M: %jump generate-node ( vop -- )
     vop-label dup postpone-word JMP ;
 
 M: %jump-f generate-node ( vop -- )
-    dup vop-source v>operand f address CMP vop-label JE ;
+    dup vop-in-1 v>operand f address CMP vop-label JE ;
 
 M: %jump-t generate-node ( vop -- )
-    dup vop-source v>operand f address CMP vop-label JNE ;
+    dup vop-in-1 v>operand f address CMP vop-label JNE ;
 
 M: %return-to generate-node ( vop -- )
     0 PUSH vop-label absolute ;
@@ -42,19 +42,19 @@ M: %return generate-node ( vop -- )
     drop RET ;
 
 M: %untag generate-node ( vop -- )
-    vop-dest v>operand BIN: 111 bitnot AND ;
+    vop-out-1 v>operand BIN: 111 bitnot AND ;
 
 M: %tag-fixnum generate-node ( vop -- )
-    vop-dest v>operand 3 SHL ;
+    vop-out-1 v>operand 3 SHL ;
 
 M: %untag-fixnum generate-node ( vop -- )
-    vop-dest v>operand 3 SHR ;
+    vop-out-1 v>operand 3 SHR ;
 
 M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    vop-source v>operand
+    vop-in-1 v>operand
     ! Multiply by 4 to get a jump table offset
     dup 2 SHL
     ! Add to jump table base
@@ -68,10 +68,10 @@ M: %dispatch generate-node ( vop -- )
 
 M: %type generate-node ( vop -- )
     #! Intrinstic version of type primitive. It outputs an
-    #! UNBOXED value in vop-dest.
+    #! UNBOXED value in vop-out-1.
     <label> "f" set
     <label> "end" set
-    vop-dest v>operand
+    vop-out-1 v>operand
     ! Make a copy
     ECX over MOV
     ! Get the tag
@@ -96,7 +96,7 @@ M: %type generate-node ( vop -- )
 
 M: %arithmetic-type generate-node ( vop -- )
     #! This one works directly with the stack. It outputs an
-    #! UNBOXED value in vop-dest.
+    #! UNBOXED value in vop-out-1.
     0 <vreg> check-dest
     <label> "end" set
     ! Load top two stack values

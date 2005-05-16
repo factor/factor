@@ -7,6 +7,9 @@ for controlling it:
  +Yn   Size of 2 youngest generations, megabytes
  +An   Size of tenured and semi-spaces, megabytes
 
+The compiler now does constant folding for certain words with literal
+operands. The compiler's peephole optimizer has been improved.
+
 The alien interface now supports "float" and "double" types.
 
 Defining a predicate subclass of tuple is supported now. Note that

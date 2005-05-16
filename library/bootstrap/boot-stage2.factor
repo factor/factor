@@ -30,11 +30,9 @@ t [
     "/library/inference/dataflow.factor"
     "/library/inference/values.factor"
     "/library/inference/inference.factor"
-    "/library/inference/ties.factor"
     "/library/inference/branches.factor"
     "/library/inference/words.factor"
     "/library/inference/stack.factor"
-    "/library/inference/types.factor"
     "/library/inference/partial-eval.factor"
 
     "/library/compiler/assembler.factor"

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: generic inference kernel lists math namespaces
-prettyprint strings words ;
+prettyprint sequences strings words ;
 
 ! A peephole optimizer operating on the linear IR.
 
@@ -51,51 +51,91 @@ M: %label simplify-node ( linear vop -- linear ? )
 
 M: %inc-d simplify-node ( linear vop -- linear ? )
     #! %inc-d cancels a following %inc-d.
-    dup vop-literal 0 = [
+    dup vop-in-1 0 = [
         drop cdr t
     ] [
         >r dup \ %inc-d next-physical? [
-            vop-literal r> vop-literal + 
+            vop-in-1 r> vop-in-1 + 
             %inc-d >r cdr cdr r> swons t
         ] [
             r> 2drop f
         ] ifte
     ] ifte ;
 
-: dead-load? ( linear vop -- ? )
+: basic-block ( linear quot -- | quot: vop -- ? )
+    #! Keep applying the quotation to each VOP until either a
+    #! VOP answering f to basic-block?, or the quotation answers
+    #! f.
+    over car basic-block? [
+        >r uncons r> tuck >r >r call [
+            r> r> basic-block
+        ] [
+            r> r> 2drop
+        ] ifte
+    ] [
+        2drop
+    ] ifte ; inline
+
+: reads-vreg? ( vreg linear -- ? )
+    #! Tests if the vreg is read before being written in the
+    #! current basic block. Outputs a true value if the vreg
+    #! is not read or written before the end of the basic block.
+    [
+        2dup vop-inputs contains? [
+            ! we are reading the vreg
+            2drop t f
+        ] [
+            2dup vop-outputs contains? [
+                ! we are writing the vreg
+                2drop f f
+            ] [
+                ! keep checking
+                drop t
+            ] ifte
+        ] ifte
+    ] basic-block ;
+
+: dead-load ( vreg linear -- linear ? )
+    #! If the vreg is not read before being written, drop
+    #! the current VOP.
+    tuck cdr reads-vreg? [ f ] [ cdr t ] ifte ;
+
+M: %peek-d simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+M: %immediate simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+M: %indirect simplify-node ( linear vop -- linear ? )
+    vop-out-1 swap dead-load ;
+
+: dead-peek? ( linear vop -- ? )
     #! Is the %replace-d followed by a %peek-d of the same
     #! stack slot and vreg?
     swap cdr car dup %peek-d? [
-        over vop-source over vop-dest = >r
-        swap vop-literal swap vop-literal = r> and
+        over vop-in-2 over vop-out-1 = >r
+        swap vop-in-1 swap vop-in-1 = r> and
     ] [
         2drop f
     ] ifte ;
 
-: dead-store? ( linear n -- ? )
+: dead-replace? ( linear n -- ? )
     #! Is the %replace-d followed by a %dec-d, so the stored
     #! value is lost?
     swap \ %inc-d next-physical? [
-        vop-literal + 0 <
+        vop-in-1 + 0 <
     ] [
         2drop f
     ] ifte ;
 
 M: %replace-d simplify-node ( linear vop -- linear ? )
-    2dup dead-load? [
+    2dup dead-peek? [
         drop uncons cdr cons t
     ] [
-        2dup vop-literal dead-store? [
-            drop cdr t
-        ] [
-            drop f
-        ] ifte
+        dupd vop-in-1 dead-replace? [ cdr t ] [ f ] ifte
     ] ifte ;
 
-! M: %immediate-d simplify-node ( linear vop -- linear ? )
-!     over 0 dead-store? [ drop cdr t ] [ drop f ] ifte ;
-
-: pop? ( vop -- ? ) dup %inc-d? swap vop-literal -1 = and ;
+: pop? ( vop -- ? ) dup %inc-d? swap vop-in-1 -1 = and ;
 
 : can-fast-branch? ( linear -- ? )
     unswons class fast-branch [
@@ -105,7 +145,7 @@ M: %replace-d simplify-node ( linear vop -- linear ? )
     ] ifte ;
 
 : fast-branch-params ( linear -- src dest label linear )
-    uncons >r dup vop-source swap vop-dest r> cdr
+    uncons >r dup vop-in-1 swap vop-out-1 r> cdr
     uncons >r vop-label r> ;
 
 : make-fast-branch ( linear op -- linear ? )

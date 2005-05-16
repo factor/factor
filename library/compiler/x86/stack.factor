@@ -18,38 +18,38 @@ memory sequences words ;
 : cs-op ( n -- op ) ECX swap reg-stack ;
 
 M: %peek-d generate-node ( vop -- )
-    dup vop-dest v>operand swap vop-literal ds-op MOV ;
+    dup vop-out-1 v>operand swap vop-in-1 ds-op MOV ;
 
 M: %replace-d generate-node ( vop -- )
-    dup vop-source v>operand swap vop-literal ds-op swap MOV ;
+    dup vop-in-2 v>operand swap vop-in-1 ds-op swap MOV ;
 
 M: %inc-d generate-node ( vop -- )
-    ESI swap vop-literal cell *
+    ESI swap vop-in-1 cell *
     dup 0 > [ ADD ] [ neg SUB ] ifte ;
 
 M: %immediate generate-node ( vop -- )
-    dup vop-dest v>operand swap vop-literal address MOV ;
+    dup vop-out-1 v>operand swap vop-in-1 address MOV ;
 
 : load-indirect ( dest literal -- )
     intern-literal unit MOV 0 0 rel-address ;
 
 M: %indirect generate-node ( vop -- )
     #! indirect load of a literal through a table
-    dup vop-dest v>operand swap vop-literal load-indirect ;
+    dup vop-out-1 v>operand swap vop-in-1 load-indirect ;
 
 M: %peek-r generate-node ( vop -- )
-    ECX CS>  dup vop-dest v>operand swap vop-literal cs-op MOV ;
+    ECX CS>  dup vop-out-1 v>operand swap vop-in-1 cs-op MOV ;
 
 M: %dec-r generate-node ( vop -- )
     #! Can only follow a %peek-r
-    vop-literal ECX swap cell * SUB  ECX >CS ;
+    vop-in-1 ECX swap cell * SUB  ECX >CS ;
 
 M: %replace-r generate-node ( vop -- )
     #! Can only follow a %inc-r
-    dup vop-source v>operand swap vop-literal cs-op swap MOV
+    dup vop-in-2 v>operand swap vop-in-1 cs-op swap MOV
     ECX >CS ;
 
 M: %inc-r generate-node ( vop -- )
     #! Can only follow a %peek-r
     ECX CS>
-    vop-literal ECX swap cell * ADD ;
+    vop-in-1 ECX swap cell * ADD ;

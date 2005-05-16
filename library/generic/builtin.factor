@@ -25,7 +25,9 @@ builtin 50 "priority" set-word-prop
 builtin [ 2drop t ] "class<" set-word-prop
 
 : builtin-predicate ( class -- )
-    dup "predicate" word-prop car swap
+    dup "predicate" word-prop car
+    dup t "inline" set-word-prop
+    swap
     [
         \ type , "builtin-type" word-prop , \ eq? ,
     ] make-list

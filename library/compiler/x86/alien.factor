@@ -6,10 +6,10 @@ kernel-internals lists math memory namespaces words ;
 
 M: %alien-invoke generate-node
     #! call a C function.
-    vop-literal uncons load-library compile-c-call ;
+    vop-in-1 uncons load-library compile-c-call ;
 
 M: %alien-global generate-node
-    vop-literal uncons load-library
+    vop-in-1 uncons load-library
     2dup dlsym EAX swap unit MOV 0 0 rel-dlsym ;
 
 M: %parameters generate-node
@@ -23,7 +23,7 @@ M: %parameter generate-node
 : UNBOX ( vop -- )
     #! An unboxer function takes a value from the data stack and
     #! converts it into a C value.
-    vop-literal cdr f compile-c-call ;
+    vop-in-1 cdr f compile-c-call ;
 
 M: %unbox generate-node
     #! C functions return integers in EAX.
@@ -49,7 +49,7 @@ M: %unbox-double generate-node
     #! A boxer function takes a C value as a parameter and
     #! converts into a Factor value, and pushes it on the data
     #! stack.
-    vop-literal f compile-c-call ;
+    vop-in-1 f compile-c-call ;
 
 M: %box generate-node
     #! C functions return integers in EAX.
@@ -78,4 +78,4 @@ M: %cleanup generate-node
     #! In the cdecl ABI, the caller must pop input parameters
     #! off the C stack. In stdcall, the callee does it, so
     #! this node is not used in that case.
-    vop-literal dup 0 = [ drop ] [ ESP swap ADD ] ifte ;
+    vop-in-1 dup 0 = [ drop ] [ ESP swap ADD ] ifte ;

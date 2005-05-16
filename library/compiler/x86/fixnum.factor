@@ -112,7 +112,7 @@ M: %fixnum-bitxor generate-node ( vop -- ) dest/src XOR ;
 
 M: %fixnum-bitnot generate-node ( vop -- )
     ! Negate the bits of the operand
-    vop-dest v>operand dup NOT
+    vop-out-1 v>operand dup NOT
     ! Mask off the low 3 bits to give a fixnum tag
     tag-mask XOR ;
 
@@ -122,7 +122,7 @@ M: %fixnum<< generate-node
     <label> "end" set
     ! make a copy
     ECX EAX MOV
-    vop-source
+    vop-in-1
     ! check for potential overflow
     1 over cell 8 * swap 1 - - shift ECX over ADD
     2 * 1 - ECX swap CMP
@@ -147,7 +147,7 @@ M: %fixnum<< generate-node
 
 M: %fixnum>> generate-node
     ! shift register
-    dup vop-dest v>operand dup rot vop-source SAR
+    dup vop-out-1 v>operand dup rot vop-in-1 SAR
     ! give it a fixnum tag
     tag-mask bitnot AND ;
 
@@ -155,7 +155,7 @@ M: %fixnum-sgn generate-node
     ! store 0 in EDX if EAX is >=0, otherwise store -1.
     CDQ
     ! give it a fixnum tag.
-    vop-dest v>operand tag-bits SHL ;
+    vop-out-1 v>operand tag-bits SHL ;
 
 : conditional ( dest cond -- )
     #! Compile this after a conditional jump to store f or t
@@ -170,7 +170,7 @@ M: %fixnum-sgn generate-node
     "end" get save-xt ; inline
 
 : fixnum-compare ( vop -- dest )
-    dup vop-dest v>operand dup rot vop-source v>operand CMP ;
+    dup vop-out-1 v>operand dup rot vop-in-1 v>operand CMP ;
 
 M: %fixnum< generate-node ( vop -- )
     fixnum-compare  \ JL  conditional ;
@@ -188,7 +188,7 @@ M: %eq? generate-node ( vop -- )
     fixnum-compare  \ JE  conditional ;
 
 : fixnum-branch ( vop -- label )
-    dup vop-dest v>operand over vop-source v>operand CMP
+    dup vop-in-2 v>operand over vop-in-1 v>operand CMP
     vop-label ;
 
 M: %jump-fixnum< generate-node ( vop -- )

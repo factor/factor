@@ -69,7 +69,7 @@ UNION: arrayed array tuple ;
     ] make-list define-compound ;
 
 : forget-tuple ( class -- )
-    dup forget "predicate" word-prop car forget ;
+    dup forget "predicate" word-prop car [ forget ] when* ;
 
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,

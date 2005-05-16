@@ -11,6 +11,9 @@ math-internals test words ;
 [ 3 ] [ 3 1 2 cons [ [ 0 set-slot ] keep ] compile-1 car ] unit-test
 [ 3 ] [ 3 1 2 [ cons [ 0 set-slot ] keep ] compile-1 car ] unit-test
 [ 3 ] [ [ 3 1 2 cons [ 0 set-slot ] keep ] compile-1 car ] unit-test
+[ 3 ] [ 3 1 2 cons [ [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+[ 3 ] [ 3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+[ 3 ] [ [ 3 1 2 cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test
@@ -158,3 +161,8 @@ math-internals test words ;
 
 [ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
 [ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
+
+[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test

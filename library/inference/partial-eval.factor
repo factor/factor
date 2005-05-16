@@ -39,6 +39,7 @@ sequences words ;
 
 ! Could probably add more words here
 [
+    eq?
     car
     cdr
     cons
@@ -68,28 +69,6 @@ sequences words ;
 ] [
     stateless
 ] each
-
-: eq-tie ( v1 v2 bool -- )
-    >r swap literal-value <literal-tie> general-t swons unit r>
-    set-value-class-ties ;
-
-: eq-ties ( v1 v2 bool -- )
-    #! If the boolean is true, the values are equal.
-    pick literal? [
-        eq-tie
-    ] [
-        over literal? [
-            swapd eq-tie
-        ] [
-            3drop
-        ] ifte
-    ] ifte ;
-
-\ eq? [
-    peek-d peek-next-d
-    \ eq? infer-eval
-    peek-d eq-ties
-] "infer" set-word-prop
 
 ! Partially-evaluated words need their stack effects to be
 ! entered by hand.

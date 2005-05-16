@@ -7,7 +7,7 @@ GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
 GENERIC: safe-literal? ( value -- ? )
 
-TUPLE: value class recursion class-ties literal-ties safe? ;
+TUPLE: value class recursion safe? ;
 
 C: value ( recursion -- value )
     [ t swap set-value-safe? ] keep

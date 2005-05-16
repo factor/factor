@@ -73,33 +73,11 @@ sequences strings vectors words hashtables prettyprint ;
         terminate
     ] ifte* ;
 
-SYMBOL: cloned
-
-GENERIC: (deep-clone)
-
-: deep-clone ( obj -- obj )
-    dup cloned get assq [ ] [
-        dup (deep-clone) [ swap cloned [ acons ] change ] keep
-    ] ?ifte ;
-
-M: tuple (deep-clone) ( obj -- obj )
-    #! Clone an object if it hasn't already been cloned in this
-    #! with-deep-clone scope.
-    clone dup <mirror> [ deep-clone ] nmap ;
-
-M: vector (deep-clone) ( seq -- seq )
-    #! Clone a sequence and each object it contains.
-    [ deep-clone ] map ;
-
-M: cons (deep-clone) ( cons -- cons )
-    uncons deep-clone >r deep-clone r> cons ;
-
-M: object (deep-clone) ( obj -- obj ) ;
+: deep-clone ( seq -- seq ) [ clone ] map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
-    cloned off
     meta-r [ deep-clone ] change
     meta-d [ deep-clone ] change
     d-in [ deep-clone ] change
@@ -111,8 +89,6 @@ M: object (deep-clone) ( obj -- obj ) ;
     #! terminate was called.
     <namespace> [
         copy-inference
-        uncons deep-clone pull-tie
-        cloned off
         dup value-recursion recursive-state set
         literal-value dup infer-quot
         active? [
@@ -124,10 +100,6 @@ M: object (deep-clone) ( obj -- obj ) ;
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )
-    #! The branchlist is a list of pairs: [[ value typeprop ]]
-    #! value is either a literal or computed instance; typeprop
-    #! is a pair [[ value class ]] indicating a type propagation
-    #! for the given branch.
     [
         [
             inferring-base-case get [
@@ -148,60 +120,23 @@ M: object (deep-clone) ( obj -- obj ) ;
     #! base case to this stack effect and try again.
     (infer-branches) dup unify-effects unify-dataflow ;
 
-: boolean-value? ( value -- ? )
-    #! Return if the value's boolean valuation is known.
-    value-class dup \ f = >r \ f class-and null = r> or ;
-
-: boolean-value ( value -- ? )
-    #! Only valid if boolean? returns true.
-    value-class \ f = not ;
-
-: static-ifte? ( value -- ? )
-    #! Is the outcome of this branch statically known?
-    dup value-safe? swap boolean-value? and ;
-
-: static-ifte ( true false -- )
-    #! If the branch taken is statically known, just infer
-    #! along that branch.
-    1 dataflow-drop, pop-d boolean-value [ drop ] [ nip ] ifte
-    >literal< infer-quot-value ;
-
 : infer-ifte ( true false -- )
     #! If branch taken is computed, infer along both paths and
     #! unify.
-    2list >r pop-d \ ifte r>
-    pick [ POSTPONE: f general-t ] [ <class-tie> ] map-with
-    zip ( condition )
-    infer-branches ;
+    2list >r pop-d \ ifte r> infer-branches ;
 
 \ ifte [
-    2 dataflow-drop, pop-d pop-d swap
-    peek-d static-ifte? [
-        static-ifte
-    ] [
-        infer-ifte
-    ] ifte
+    2 dataflow-drop, pop-d pop-d swap infer-ifte
 ] "infer" set-word-prop
 
 : vtable>list ( rstate vtable -- list  )
     [ swap <literal> ] map-with >list ;
 
-: <dispatch-index> ( value -- value )
-    value-literal-ties
-    0 recursive-state get <literal>
-    [ set-value-literal-ties ] keep ;
-
 USE: kernel-internals
 
 : infer-dispatch ( rstate vtable -- )
-    >r >r peek-d \ dispatch r> r>
-    vtable>list
-    pop-d <dispatch-index>
-    over length [ <literal-tie> ] project-with
-    zip infer-branches ;
+    >r >r pop-d \ dispatch r> r> vtable>list infer-branches ;
 
-\ dispatch [
-    pop-literal infer-dispatch
-] "infer" set-word-prop
+\ dispatch [ pop-literal infer-dispatch ] "infer" set-word-prop
 
 \ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop
