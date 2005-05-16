@@ -194,7 +194,7 @@ USE: sequences
     "browser" "responder" set
     1024 <sbuf> dup >r <html-stream> [
       do-eval
-    ] with-stream r> sbuf>string
+    ] with-stream r> >string
   ] with-scope ;
 
 : forever ( quot -- )
