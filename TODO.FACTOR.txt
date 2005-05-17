@@ -6,8 +6,9 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
+- single-stepper and variable access: wrong namespace?
+- [ over ] generics no-method
 - investigate if COPYING_GEN needs a fix
-- alien-global type wrong
 - simplifier:
   - dead loads not optimized out
   - kill tag-fixnum/untag-fixnum

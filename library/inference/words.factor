@@ -5,37 +5,24 @@ USING: errors generic interpreter kernel lists math
 math-internals namespaces sequences strings vectors words
 hashtables parser prettyprint ;
 
-: with-dataflow ( param op [[ in# out# ]] quot -- )
-    #! Take input parameters, execute quotation, take output
-    #! parameters, add node. The quotation is called with the
-    #! stack effect.
-    >r dup car ensure-d
-    >r dataflow, r> r> rot
-    [ pick car swap [ length 0 node-inputs ] bind ] keep
-    pick >r >r nip call r> r> cdr car swap
-    [ length 0 node-outputs ] bind ; inline
-
 : consume-d ( typelist -- )
     [ pop-d 2drop ] each ;
 
 : produce-d ( typelist -- )
     [ <computed> push-d ] each ;
 
-: (consume/produce) ( param op effect )
-    dup >r -rot r>
-    [ unswons consume-d car produce-d ] with-dataflow ;
-
-: consume/produce ( word [ in-types out-types ] -- )
+: consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    over "intrinsic" word-prop [
-        f -rot
-    ] [
-        #call swap
-    ] ifte (consume/produce) ;
+    swap #call [
+        over [
+            2unlist swap consume-d produce-d
+        ] hairy-node
+    ] keep node, ;
 
 : no-effect ( word -- )
-    "Unknown stack effect: " swap word-name cat2 inference-error ;
+    "Unknown stack effect: " swap word-name append
+    inference-error ;
 
 : inhibit-parital ( -- )
     meta-d get [ f swap set-value-safe? ] each ;
@@ -43,31 +30,16 @@ hashtables parser prettyprint ;
 : recursive? ( word -- ? )
     f swap dup word-def [ = or ] tree-each-with ;
 
-: (with-block) ( [[ label quot ]] quot -- node )
-    #! Call a quotation in a new namespace, and transfer
-    #! inference state from the outer scope.
-    swap car >r [
-        dataflow-graph off
-        call
-        d-in get meta-d get meta-r get get-dataflow
-    ] with-scope
-    r> swap #label dataflow, [ node-label set ] extend >r
-    meta-r set meta-d set d-in set r> ;
-
-: with-block ( word [[ label quot ]] quot -- node )
+: with-block ( word [[ label quot ]] quot -- block-node )
     #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new block node in the IR.
-    over [
-        >r
-        dupd cons
-        recursive-state [ cons ] change
-        r> call
-    ] (with-block) ;
+    #! its dataflow contribution to a new #label node in the IR.
+    >r 2dup cons recursive-state [ cons ] change r>
+    [ swap car #label slip ] with-nesting
+    recursive-state [ cdr ] change ; inline
 
-: inline-block ( word -- effect node )
+: inline-block ( word -- node-block )
     gensym over word-def cons [
-        inhibit-parital
-        word-def infer-quot effect
+        inhibit-parital  word-def infer-quot
     ] with-block ;
 
 : inline-compound ( word -- )
@@ -75,7 +47,7 @@ hashtables parser prettyprint ;
     #! inferencer instance. If the word in question is recursive
     #! we infer its stack effect inside a new block.
     dup recursive? [
-        inline-block 2drop
+        inline-block node,
     ] [
         word-def infer-quot
     ] ifte ;
@@ -86,7 +58,7 @@ hashtables parser prettyprint ;
     [
         [
             recursive-state get init-inference
-            dup dup inline-block drop present-effect
+            dup dup inline-block drop effect present-effect
             [ "infer-effect" set-word-prop ] keep
         ] with-scope consume/produce
     ] [
@@ -153,16 +125,16 @@ M: compound apply-word ( word -- )
 
 : base-case ( word [ label quot ] -- )
     [
-        car over inline-block [
-            drop
-            [ #call-label ] [ #call ] ?ifte
-            node-op set
-            node-param set
-        ] bind
+        >r [ inline-block ] keep r> car [
+            #call-label
+        ] [
+            #call
+        ] ?ifte [ copy-effect ] keep node,
     ] with-recursion ;
 
 : no-base-case ( word -- )
-    word-name " does not have a base case." cat2 inference-error ;
+    word-name " does not have a base case." append
+    inference-error ;
 
 : recursive-word ( word [ label quot ] -- )
     #! Handle a recursive call, by either applying a previously

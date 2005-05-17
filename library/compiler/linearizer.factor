@@ -4,65 +4,68 @@ IN: compiler-frontend
 USING: compiler-backend inference kernel kernel-internals lists
 math namespaces words strings errors prettyprint sequences ;
 
-: >linear ( node -- )
-    #! Dataflow OPs have a linearizer word property. This
-    #! quotation is executed to convert the node into linear
-    #! form.
-    "linearizer" [ "No linearizer" throw ] apply-dataflow ;
+GENERIC: linearize-node* ( node -- )
+M: f linearize-node* ( f -- ) drop ;
 
-: (linearize) ( dataflow -- )
-    [ >linear ] each ;
+: linearize-node ( node -- )
+    [
+        dup linearize-node* node-successor linearize-node
+    ] when* ;
 
 : linearize ( dataflow -- linear )
     #! Transform dataflow IR into linear IR. This strips out
-    #! stack flow information, flattens conditionals into
-    #! jumps and labels, and turns dataflow IR nodes into
-    #! lists where the first element is an operation, and the
-    #! rest is arguments.
-    [ %prologue , (linearize) ] make-list ;
+    #! stack flow information, and flattens conditionals into
+    #! jumps and labels.
+    [ %prologue , linearize-node ] make-list ;
 
-: linearize-label ( node -- )
-    #! Labels are tricky, because they might contain non-tail
-    #! calls. So we push the address of the location right after
-    #! the #label , then linearize the #label , then add a #return
-    #! node to the linear IR. The simplifier will take care of
-    #! this in the common case where the labelled block does
-    #! not contain non-tail recursive calls to itself.
+M: #label linearize-node* ( node -- )
     <label> dup %return-to , >r
-    dup [ node-label get ] bind %label ,
-    [ node-param get ] bind (linearize)
+    dup node-param %label ,
+    node-children car linearize-node
     f %return ,
     r> %label , ;
 
-#label [
-    linearize-label
-] "linearizer" set-word-prop
+M: #call linearize-node* ( node -- )
+    dup node-param
+    dup "intrinsic" word-prop [
+        call
+    ] [
+        %call , drop
+    ] ?ifte ;
 
-#call [
-    [ node-param get ] bind %call ,
-] "linearizer" set-word-prop
+M: #call-label linearize-node* ( node -- )
+    node-param %call-label , ;
 
-#call-label [
-    [ node-param get ] bind %call-label ,
-] "linearizer" set-word-prop
+: immediate? ( obj -- ? )
+    #! fixnums and f have a pointerless representation, and
+    #! are compiled immediately. Everything else can be moved
+    #! by GC, and is indexed through a table.
+    dup fixnum? swap f eq? or ;
+
+: push-1 ( obj -- )
+    0 swap literal-value dup
+    immediate? [ %immediate ] [ %indirect ] ifte , ;
+
+M: #push linearize-node* ( node -- )
+    node-out-d dup length dup %inc-d ,
+    1 - swap [ push-1 0 over %replace-d , ] each drop ;
+
+M: #drop linearize-node* ( node -- )
+    node-in-d length %dec-d , ;
 
 : ifte-head ( label -- )
     in-1  1 %dec-d , 0 %jump-t , ;
 
-: linearize-ifte ( param -- )
+M: #ifte linearize-node* ( node -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
-    2unlist  <label> [
+    node-children 2unlist  <label> [
         ifte-head
-        (linearize) ( false branch )
+        linearize-node ( false branch )
         <label> dup %jump-label ,
     ] keep %label , ( branch target of BRANCH-T )
-    swap (linearize) ( true branch )
+    swap linearize-node ( true branch )
     %label , ( branch target of false branch end ) ;
-
-\ ifte [
-    [ node-param get ] bind linearize-ifte
-] "linearizer" set-word-prop
 
 : dispatch-head ( vtable -- end label/code )
     #! Output the jump table insn and return a list of
@@ -77,17 +80,15 @@ math namespaces words strings errors prettyprint sequences ;
 
 : dispatch-body ( end label/param -- )
     #! Output each branch, with a jump to the end label.
-    [ uncons %label , (linearize) %jump-label , ] each-with ;
+    [ uncons %label , linearize-node %jump-label , ] each-with ;
 
-: linearize-dispatch ( vtable -- )
+M: #dispatch linearize-node* ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
-    dispatch-head dupd dispatch-body %label , ;
+    node-children dispatch-head dupd dispatch-body %label , ;
 
-\ dispatch [
-    [ node-param get ] bind linearize-dispatch
-] "linearizer" set-word-prop
+M: #values linearize-node* ( node -- )
+    drop ;
 
-#values [ drop ] "linearizer" set-word-prop
-
-#return [ drop f %return , ] "linearizer" set-word-prop
+M: #return linearize-node* ( node -- )
+    drop  f %return , ;

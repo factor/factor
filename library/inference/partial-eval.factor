@@ -6,7 +6,7 @@ sequences words ;
 
 : literal-inputs? ( in stack -- )
     tail-slice dup >list [ safe-literal? ] all? [
-        length dataflow-drop, t
+        length #drop node, t
     ] [
         drop f
     ] ifte ;
@@ -16,7 +16,7 @@ sequences words ;
 
 : literal-outputs ( out stack -- )
     tail-slice dup [ recursive-state get <literal> ] nmap
-    length dataflow-push, ;
+    length #push node, ;
 
 : partial-eval? ( word -- ? )
     "infer-effect" word-prop car length

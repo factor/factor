@@ -73,6 +73,9 @@ sequences strings vectors words hashtables prettyprint ;
         terminate
     ] ifte* ;
 
+: unify-dataflow ( effects -- nodes )
+    [ [ dataflow-graph get ] bind ] map ;
+
 : deep-clone ( seq -- seq ) [ clone ] map ;
 
 : copy-inference ( -- )
@@ -81,7 +84,8 @@ sequences strings vectors words hashtables prettyprint ;
     meta-r [ deep-clone ] change
     meta-d [ deep-clone ] change
     d-in [ deep-clone ] change
-    dataflow-graph off ;
+    dataflow-graph off
+    current-node off ;
 
 : infer-branch ( value -- namespace )
     #! Return a namespace with inferencer variables:
@@ -92,7 +96,7 @@ sequences strings vectors words hashtables prettyprint ;
         dup value-recursion recursive-state set
         literal-value dup infer-quot
         active? [
-            #values values-node
+            #values node,
             handle-terminator
         ] [
             drop
@@ -110,23 +114,18 @@ sequences strings vectors words hashtables prettyprint ;
         ] each
     ] make-list ;
 
-: unify-dataflow ( input instruction effectlist -- )
-    [ [ get-dataflow ] bind ] map
-    swap dataflow, [ unit node-consume-d set ] bind ;
-
-: infer-branches ( input instruction branchlist -- )
+: infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    (infer-branches) dup unify-effects unify-dataflow ;
-
-: infer-ifte ( true false -- )
-    #! If branch taken is computed, infer along both paths and
-    #! unify.
-    2list >r pop-d \ ifte r> infer-branches ;
+    [
+        >r (infer-branches) dup unify-effects unify-dataflow
+        r> set-node-children
+    ] keep node, ;
 
 \ ifte [
-    2 dataflow-drop, pop-d pop-d swap infer-ifte
+    2 #drop node, pop-d pop-d swap 2list
+    #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
 
 : vtable>list ( rstate vtable -- list  )
@@ -134,9 +133,9 @@ sequences strings vectors words hashtables prettyprint ;
 
 USE: kernel-internals
 
-: infer-dispatch ( rstate vtable -- )
-    >r >r pop-d \ dispatch r> r> vtable>list infer-branches ;
-
-\ dispatch [ pop-literal infer-dispatch ] "infer" set-word-prop
+\ dispatch [
+    pop-literal vtable>list
+    #dispatch pop-d drop infer-branches
+] "infer" set-word-prop
 
 \ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop

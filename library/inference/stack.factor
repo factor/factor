@@ -4,24 +4,27 @@ IN: inference
 USING: interpreter kernel namespaces words ;
 
 \ >r [
-    f \ >r dataflow, [ 1 0 node-inputs ] extend
+    \ >r #call
+    1 0 pick node-inputs
     pop-d push-r
-    [ 0 1 node-outputs ] bind
+    0 1 pick node-outputs
+    node,
 ] "infer" set-word-prop
 
 \ r> [
-    f \ r> dataflow, [ 0 1 node-inputs ] extend
+    \ r> #call
+    0 1 pick node-inputs
     pop-r push-d
-    [ 1 0 node-outputs ] bind
+    1 0 pick node-outputs
+    node,
 ] "infer" set-word-prop
 
-: partial-eval ( word quot -- | quot: word -- )
-    >r f over dup "infer-effect" word-prop r> with-dataflow ;
-
 : infer-shuffle ( word -- )
-    [ host-word ] partial-eval ;
+    dup #call [
+        over "infer-effect" word-prop [ host-word ] hairy-node
+    ] keep node, ;
 
-\ drop [ 1 dataflow-drop, pop-d drop ] "infer" set-word-prop
+\ drop [ 1 #drop node, pop-d drop ] "infer" set-word-prop
 \ dup  [ \ dup  infer-shuffle ] "infer" set-word-prop
 \ swap [ \ swap infer-shuffle ] "infer" set-word-prop
 \ over [ \ over infer-shuffle ] "infer" set-word-prop

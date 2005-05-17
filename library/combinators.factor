@@ -5,6 +5,9 @@ IN: kernel
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
 
+: 2slip ( quot x y -- x y | quot: -- )
+    >r >r call r> r> ; inline
+
 : keep ( x quot -- x | quot: x -- )
     over >r call r> ; inline
 

@@ -5,55 +5,33 @@ USING: assembler compiler-backend generic hashtables inference
 kernel kernel-internals lists math math-internals namespaces
 sequences words ;
 
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
-
-: push-1 ( obj -- )
-    0 swap literal-value dup
-    immediate? [ %immediate ] [ %indirect ] ifte , ;
-
-#push [
-    [ node-produce-d get ] bind
-    dup length dup %inc-d ,
-    1 - swap [
-        push-1 0 over %replace-d ,
-    ] each drop
-] "linearizer" set-word-prop
-
-#drop [
-    [ node-consume-d get length ] bind %dec-d ,
-] "linearizer" set-word-prop
-
 \ dup [
     drop
     in-1
     1 %inc-d ,
     out-1
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ swap [
     drop
     in-2
     0 0 %replace-d ,
     1 1 %replace-d ,
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ over [
     drop
     0 1 %peek-d ,
     1 %inc-d ,
     out-1
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ pick [
     drop
     0 2 %peek-d ,
     1 %inc-d ,
     out-1
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ >r [
     drop
@@ -61,7 +39,7 @@ sequences words ;
     1 %inc-r ,
     1 %dec-d ,
     0 0 %replace-r ,
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ r> [
     drop
@@ -69,20 +47,18 @@ sequences words ;
     1 %inc-d ,
     1 %dec-r ,
     out-1
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
-: node-peek ( node -- obj ) node-consume-d swap hash peek ;
+: node-peek ( node -- obj ) node-in-d peek ;
 
 : peek-2 dup length 2 - swap nth ;
-: node-peek-2 ( node -- obj ) node-consume-d swap hash peek-2 ;
+: node-peek-2 ( node -- obj ) node-in-d peek-2 ;
 
 : typed? ( value -- ? ) value-types length 1 = ;
 
-\ slot t "intrinsic" set-word-prop
-
 : slot@ ( node -- n )
     #! Compute slot offset.
-    node-consume-d swap hash
+    node-in-d
     dup peek literal-value cell *
     swap peek-2 value-types car type-tag - ;
 
@@ -103,9 +79,7 @@ sequences words ;
         0 %untag ,
         1 0 %slot ,
     ] ifte  out-1
-] "linearizer" set-word-prop
-
-\ set-slot t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ set-slot [
     dup typed-literal? [
@@ -120,9 +94,7 @@ sequences words ;
         1 %untag ,
         0 1 2 %set-slot ,
     ] ifte
-] "linearizer" set-word-prop
-
-\ type t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ type [
     drop
@@ -130,9 +102,7 @@ sequences words ;
     0 %type ,
     0 %tag-fixnum ,
     out-1
-] "linearizer" set-word-prop
-
-\ arithmetic-type t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ arithmetic-type [
     drop
@@ -141,25 +111,21 @@ sequences words ;
     0 %tag-fixnum ,
     1 %inc-d ,
     out-1
-] "linearizer" set-word-prop
-
-\ getenv t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ getenv [
     1 %dec-d ,
     node-peek literal-value 0 <vreg> swap %getenv ,
     1 %inc-d ,
     out-1
-] "linearizer" set-word-prop
-
-\ setenv t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ setenv [
     1 %dec-d ,
     in-1
     node-peek literal-value 0 <vreg> swap %setenv ,
     1 %dec-d ,
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 : binary-op-reg ( op out -- )
     >r in-2
@@ -194,12 +160,9 @@ sequences words ;
     [[ fixnum>       %fixnum>       ]]
     [[ eq?           %eq?           ]]
 ] [
-    uncons over t "intrinsic" set-word-prop
-    [ literal, 0 , \ binary-op , ] make-list
-    "linearizer" set-word-prop
+    uncons [ literal, 0 , \ binary-op , ] make-list
+    "intrinsic" set-word-prop
 ] each
-
-\ fixnum* t "intrinsic" set-word-prop
 
 : slow-fixnum* \ %fixnum* 0 binary-op-reg ;
 
@@ -217,24 +180,20 @@ sequences words ;
     ] [
         drop slow-fixnum*
     ] ifte
-] "linearizer" set-word-prop
-
-\ fixnum-mod t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ fixnum-mod [
     ! This is not clever. Because of x86, %fixnum-mod is
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
     drop \ %fixnum-mod 2 binary-op-reg
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 \ fixnum/i t "intrinsic" set-word-prop
 
 \ fixnum/i [
     drop \ %fixnum/i 0 binary-op-reg
-] "linearizer" set-word-prop
-
-\ fixnum/mod t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ fixnum/mod [
     ! See the remark on fixnum-mod for vreg usage
@@ -243,16 +202,14 @@ sequences words ;
     0 <vreg> 1 <vreg> %fixnum/mod ,
     2 0 %replace-d ,
     0 1 %replace-d ,
-] "linearizer" set-word-prop
-
-\ fixnum-bitnot t "intrinsic" set-word-prop
+] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
     drop
     in-1
     0 %fixnum-bitnot ,
     out-1
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop
 
 : slow-shift ( -- ) \ fixnum-shift %call , ;
 
@@ -289,12 +246,10 @@ sequences words ;
         ] ifte
     ] ifte ;
 
-\ fixnum-shift t "intrinsic" set-word-prop
-
 \ fixnum-shift [
     node-peek dup literal? [
         literal-value fast-shift
     ] [
         drop slow-shift
     ] ifte
-] "linearizer" set-word-prop
+] "intrinsic" set-word-prop

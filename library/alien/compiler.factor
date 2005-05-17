@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler compiler-backend errors generic
-inference kernel lists math namespaces sequences stdio strings
-unparser words ;
+USING: assembler compiler compiler-frontend compiler-backend
+errors generic inference kernel lists math namespaces sequences
+stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -42,48 +42,42 @@ M: alien-error error. ( error -- )
         " symbol." %
     ] make-string print ;
 
-: alien-invoke ( ... returns library function parameters -- ... )
+: alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.
-    #! 'returns' is a type spec, and 'parameters' is a list of
+    #! 'return' is a type spec, and 'parameters' is a list of
     #! type specs. 'library' is an entry in the "libraries"
     #! namespace.
     drop <alien-error> throw ;
 
-! These are set in the alien-invoke dataflow IR node.
-SYMBOL: alien-returns
-SYMBOL: alien-parameters
+TUPLE: alien-node return parameters ;
+C: alien-node make-node ;
 
-: set-alien-returns ( returns node -- )
-    [ dup alien-returns set ] bind
-    "void" = [
-        [ object ] produce-d 1 0 node-outputs
-    ] unless ;
+: set-alien-return ( return node -- )
+    2dup set-alien-node-return
+    swap "void" = [
+        drop
+    ] [
+        [ object ] produce-d 1 0 rot node-outputs
+    ] ifte ;
 
 : set-alien-parameters ( parameters node -- )
-    [ dup alien-parameters set ] bind
-    [ drop object ] map dup dup ensure-d
-    length 0 node-inputs consume-d ;
+    2dup set-alien-node-parameters
+    >r [ drop object ] map dup dup ensure-d
+    length 0 r> node-inputs consume-d ;
 
 : ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
 
-: alien-invoke-node ( returns params function library -- )
+: alien-node ( return params function library -- )
     #! We should fail if the library does not exist, so that
     #! compilation does not keep trying to compile FFI words
     #! over and over again if the library is not loaded.
     2dup ensure-dlsym
-    cons \ alien-invoke dataflow,
+    cons param-node <alien-node>
     [ set-alien-parameters ] keep
-    set-alien-returns ;
+    [ set-alien-return ] keep
+    node, ;
 
-: infer-alien-invoke ( -- )
-    \ alien-invoke "infer-effect" word-prop car ensure-d
-    pop-literal nip
-    pop-literal nip >r
-    pop-literal nip
-    pop-literal nip -rot
-    r> swap alien-invoke-node ;
-
-: parameters [ alien-parameters get reverse ] bind ;
+: parameters alien-node-parameters reverse ;
 
 : stack-space ( parameters -- n )
     0 swap [ c-size cell align + ] each ;
@@ -101,57 +95,35 @@ SYMBOL: alien-parameters
     parameters
     dup stack-space
     dup %parameters , >r
-    dup dup length swap [ >r 1 - dup r> unbox-parameter ] each drop
+    dup dup length swap [
+        >r 1 - dup r> unbox-parameter
+    ] each drop
     length [ %parameter ] project % r> ;
 
-: linearize-returns ( returns -- )
-    [ alien-returns get ] bind dup "void" = [
+: linearize-return ( return -- )
+    alien-node-return dup "void" = [
         drop
     ] [
         c-type [ "boxer" get "box-op" get ] bind execute ,
     ] ifte ;
 
-: linearize-alien-invoke ( node -- )
+M: alien-node linearize-node* ( node -- )
     dup linearize-parameters >r
-    dup [ node-param get ] bind %alien-invoke ,
-    dup [ node-param get cdr library-abi "stdcall" = ] bind
+    dup node-param %alien-invoke ,
+    dup node-param cdr library-abi "stdcall" =
     r> swap [ drop ] [ %cleanup , ] ifte
-    linearize-returns ;
+    linearize-return ;
 
-\ alien-invoke [ linearize-alien-invoke ] "linearizer" set-word-prop
-
-\ alien-invoke [ [ string string string general-list ] [ ] ]
+\ alien-invoke [ [ string object string general-list ] [ ] ]
 "infer-effect" set-word-prop
 
-\ alien-invoke [ infer-alien-invoke ] "infer" set-word-prop
-
-: alien-global ( type library name -- value )
-    #! Fetch the value of C global variable.
-    #! 'type' is a type spec. 'library' is an entry in the
-    #! "libraries" namespace.
-    <alien-error> throw ;
-
-: alien-global-node ( type name library -- )
-    2dup ensure-dlsym
-    cons \ alien-global dataflow,
-    set-alien-returns ;
-
-: infer-alien-global ( -- )
-    \ alien-global "infer-effect" word-prop car ensure-d
+\ alien-invoke [
     pop-literal nip
+    pop-literal nip >r
     pop-literal nip
     pop-literal nip -rot
-    alien-global-node ;
-
-: linearize-alien-global ( node -- )
-    dup [ node-param get ] bind %alien-global ,
-    linearize-returns ;
-
-\ alien-global [ linearize-alien-global ] "linearizer" set-word-prop
-
-\ alien-global [ [ string string string ] [ object ] ] "infer-effect" set-word-prop
-
-\ alien-global [ infer-alien-global ] "infer" set-word-prop
+    r> swap alien-node
+] "infer" set-word-prop
 
 global [
     "libraries" get [ <namespace> "libraries" set ] unless

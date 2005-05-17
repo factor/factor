@@ -18,7 +18,7 @@ SYMBOL: inferring-base-case
 SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
-    1 dataflow-drop, pop-d >literal< ;
+    1 #drop node, pop-d >literal< ;
 
 : (ensure-types) ( typelist n stack -- )
     pick [
@@ -48,6 +48,12 @@ SYMBOL: d-in
     meta-d [ append ] change
     d-in [ append ] change ;
 
+: hairy-node ( node effect quot -- )
+    over car ensure-d
+    -rot 2dup car length 0 rot node-inputs
+    2slip
+    cdr car length 0 rot node-outputs ; inline
+
 : (present-effect) ( vector -- list )
     >list [ value-class ] map ;
 
@@ -64,6 +70,7 @@ SYMBOL: d-in
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
+    current-node off
     inferring-base-case off ;
 
 GENERIC: apply-object
@@ -71,7 +78,7 @@ GENERIC: apply-object
 : apply-literal ( obj -- )
     #! Literals are annotated with the current recursive
     #! state.
-    recursive-state get <literal> push-d  1 dataflow-push, ;
+    recursive-state get <literal> push-d  1 #push node, ;
 
 M: object apply-object apply-literal ;
 
@@ -119,12 +126,6 @@ M: object apply-object apply-literal ;
         "Word leaves elements on return stack" inference-error
     ] unless ;
 
-: values-node ( op -- )
-    #! Add a #values or #return node to the graph.
-    f swap dataflow, [
-        meta-d get >list node-consume-d set
-    ] bind ;
-
 : with-infer ( quot -- )
     [
         f init-inference
@@ -133,10 +134,10 @@ M: object apply-object apply-literal ;
         check-return
     ] with-scope ;
 
-: infer ( quot -- [[ in out ]] )
+: infer ( quot -- effect )
     #! Stack effect of a quotation.
     [ infer-quot effect present-effect ] with-infer ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
-    [ infer-quot #return values-node get-dataflow ] with-infer ;
+    [ infer-quot #return node, dataflow-graph get ] with-infer ;
