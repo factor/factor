@@ -263,7 +263,7 @@ DEFER: list>llist
     drop lnil
   ] ifte ;
 
-M: lcons nth lnth ;
+! M: lcons nth lnth ;
 
 : test1 
   [ 1 ] list>llist
