@@ -62,7 +62,7 @@ USE: sequences
 : test-cont-responder ( - )
   #! Test the cont-responder responder by displaying a few pages in a row.
   "Page one" display-page 
-  "Hello " display-get-name-page cat2 display-page
+  "Hello " display-get-name-page append display-page
   "Page three" display-page ;
 
 : test-cont-responder2 ( - )
@@ -92,7 +92,7 @@ USE: sequences
   [ 
     #! And we don't need the 'url' argument
     drop         
-    "Counter: " over unparse cat2 [ 
+    "Counter: " over unparse append [ 
       dup <h2> unparse write </h2>
       "++" over unit [ f ] swap append [ 1 + counter-example ] append quot-href
       "--" over unit [ f ] swap append [ 1 - counter-example ] append quot-href
@@ -108,7 +108,7 @@ USE: sequences
   [ 
     #! We don't need the 'url' argument
     drop   
-    "Counter: " "counter" get unparse cat2 [ 
+    "Counter: " "counter" get unparse append [ 
       <h2> "counter" get unparse write </h2>
       "++" [ "counter" get 1 + "counter" set ] quot-href
       "--" [ "counter" get 1 - "counter" set ] quot-href
