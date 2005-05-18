@@ -2,22 +2,22 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
 USING: errors kernel lists namespaces
-stdio streams strings threads http ;
+stdio streams strings threads http sequences ;
 
 : (url>path) ( uri -- path )
-    url-decode "http://" ?string-head [
+    url-decode "http://" ?head [
         "/" split1 dup "" ? nip
     ] when ;
 
 : url>path ( uri -- path )
     "?" split1 dup [
-      >r (url>path) "?" r> cat3
+      >r (url>path) "?" r> append3
     ] [
       drop (url>path)
     ] ifte ;
 
 : secure-path ( path -- path )
-    ".." over string-contains? [ drop f ] when ;
+    ".." over subseq? [ drop f ] when ;
 
 : request-method ( cmd -- method )
     [

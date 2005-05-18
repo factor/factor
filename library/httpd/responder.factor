@@ -11,7 +11,7 @@ stdio streams strings ;
     "HTTP/1.0 " write print print-header ;
 
 : error-body ( error -- body )
-    "<html><body><h1>" swap "</h1></body></html>" cat3 print ;
+    "<html><body><h1>" swap "</h1></body></html>" append3 print ;
 
 : error-head ( error -- )
     dup log-error
@@ -132,25 +132,25 @@ stdio streams strings ;
     default-responder call-responder ;
 
 : log-responder ( url -- )
-    "Calling responder " swap cat2 log ;
+    "Calling responder " swap append log ;
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.
-    "/" ?string-head drop ;
+    "/" ?head drop ;
 
 : serve-explicit-responder ( method url -- )
     "/" split1 dup [
         swap get-responder call-responder
     ] [
         ! Just a responder name by itself
-        drop "request" get "/" cat2 redirect drop
+        drop "request" get "/" append redirect drop
     ] ifte ;
 
 : serve-responder ( method url -- )
     #! Responder URLs come in two forms:
     #! /foo/bar... - default-responder used
     #! /responder/foo/bar - responder foo, argument bar
-    dup log-responder trim-/ "responder/" ?string-head [
+    dup log-responder trim-/ "responder/" ?head [
         serve-explicit-responder
     ] [
         serve-default-responder

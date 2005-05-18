@@ -32,7 +32,7 @@ stdio streams strings unparser ;
     2dup length 2 - >= [
         2drop
     ] [
-        >r 1 + dup 2 + r> substring  catch-hex> [ , ] when*
+        >r 1 + dup 2 + r> subseq  catch-hex> [ , ] when*
     ] ifte ;
 
 : url-decode-% ( index str -- index str )

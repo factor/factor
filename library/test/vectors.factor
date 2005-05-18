@@ -52,15 +52,14 @@ sequences strings test vectors ;
 [ { 1 2 3 4 } ] [ [ { 1 } [ 2 ] { 3 4 } ] concat ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] vector-project ]
+[ 4 [ CHAR: a fill ] project >vector ]
 unit-test
 
-[ [ ] ] [ 0 { } vector-tail ] unit-test
-[ [ ] ] [ 2 { 1 2 } vector-tail ] unit-test
-[ [ 3 4 ] ] [ 2 { 1 2 3 4 } vector-tail ] unit-test
-[ 2 3 vector-tail ] unit-test-fails
+[ { } ] [ 0 { } tail ] unit-test
+[ { } ] [ 2 { 1 2 } tail ] unit-test
+[ { 3 4 } ] [ 2 { 1 2 3 4 } tail ] unit-test
 
-[ [ 3 ] ] [ 1 { 1 2 3 } vector-tail* ] unit-test
+[ { 3 } ] [ 1 { 1 2 3 } tail* ] unit-test
 
 0 <vector> "funny-stack" set
 

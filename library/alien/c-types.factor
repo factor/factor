@@ -20,7 +20,7 @@ SYMBOL: c-types
 
 : c-type ( name -- type )
     dup c-types get hash [ ] [
-        "No such C type: " swap cat2 throw f
+        "No such C type: " swap append throw f
     ] ?ifte ;
 
 : c-size ( name -- size )

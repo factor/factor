@@ -30,14 +30,14 @@ SYMBOL: d-in
 
 : ensure-types ( typelist stack -- )
     dup length pick length - dup 0 < [
-        swap >r neg tail 0 r>
+        swap >r neg swap tail 0 r>
     ] [
         swap
     ] ifte (ensure-types) ;
 
 : required-inputs ( typelist stack -- values )
     >r dup length r> length - dup 0 > [
-        head [ <computed> ] map
+        swap head [ <computed> ] map
     ] [
         2drop f
     ] ifte ;

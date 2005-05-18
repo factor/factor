@@ -66,8 +66,8 @@ stdio streams strings unparser http ;
     #! The file responder needs relative links not absolute
     #! links.
     "doc-root" get [
-        ?string-head [ "/" ?string-head drop ] when
-    ] when* "/" ?string-tail drop ;
+        ?head [ "/" ?head drop ] when
+    ] when* "/" ?tail drop ;
 
 : file-link-href ( path -- href )
     [ "/" , resolve-file-link url-encode , ] make-string ;
@@ -93,7 +93,7 @@ stdio streams strings unparser http ;
 
 : icon-tag ( string style quot -- )
     over "icon" swap assoc dup [
-        <img src= "/responder/resource/" swap cat2 img/>
+        <img src= "/responder/resource/" swap append img/>
         #! Ignore the quotation, since no further style
         #! can be applied
         3drop

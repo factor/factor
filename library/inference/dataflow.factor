@@ -24,8 +24,8 @@ TUPLE: node effect param in-d out-d in-r out-r
 : in-d-node ( inputs) >r f f r> f f f f ;
 : out-d-node ( outputs) >r f f f r> f f f ;
 
-: d-tail ( n -- list ) meta-d get vector-tail* ;
-: r-tail ( n -- list ) meta-r get vector-tail* ;
+: d-tail ( n -- list ) meta-d get tail* >list ;
+: r-tail ( n -- list ) meta-r get tail* >list ;
 
 NODE: #label
 : #label ( label -- node ) param-node <#label> ;

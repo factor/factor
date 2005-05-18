@@ -25,6 +25,11 @@ void rehash_string(F_STRING* str)
 	str->hashcode = tag_fixnum(hash);
 }
 
+void primitive_rehash_string(void)
+{
+	rehash_string(untag_string(dpop()));
+}
+
 /* untagged */
 F_STRING* string(CELL capacity, CELL fill)
 {
@@ -195,105 +200,4 @@ void primitive_string_compare(void)
 	F_STRING* s1 = untag_string(dpop());
 
 	dpush(tag_fixnum(string_compare(s1,s2)));
-}
-
-CELL index_of_ch(CELL index, F_STRING* string, CELL ch)
-{
-	CELL capacity = string_capacity(string);
-	
-	while(index < capacity)
-	{
-		if(string_nth(string,index) == ch)
-			return index;
-		index++;
-	}
-
-	return -1;
-}
-
-INLINE F_FIXNUM index_of_str(F_FIXNUM index, F_STRING* string, F_STRING* substring)
-{
-	CELL i = index;
-	CELL str_cap = string_capacity(string);
-	CELL substr_cap = string_capacity(substring);
-	F_FIXNUM limit = str_cap - substr_cap;
-	CELL scan;
-
-	if(substr_cap == 1)
-		return index_of_ch(index,string,string_nth(substring,0));
-
-	if(limit < 0)
-		return -1;
-
-outer:	if(i <= limit)
-	{
-		for(scan = 0; scan < substr_cap; scan++)
-		{
-			if(string_nth(string,i + scan) != string_nth(substring,scan))
-			{
-				i++;
-				goto outer;
-			}
-		}
-
-		/* We reached here and every char in the substring matched */
-		return i;
-	}
-
-	/* We reached here and nothing matched */
-	return -1;
-}
-
-/* index string substring -- index */
-void primitive_index_of(void)
-{
-	CELL ch = dpop();
-	F_STRING* string = untag_string(dpop());
-	CELL capacity = string_capacity(string);
-	F_FIXNUM index = to_fixnum(dpop());
-	CELL result;
-	if(index < 0 || index > capacity)
-	{
-		range_error(tag_object(string),0,tag_fixnum(index),capacity);
-		result = -1; /* can't happen */
-	}
-	else if(TAG(ch) == FIXNUM_TYPE)
-		result = index_of_ch(index,string,to_fixnum(ch));
-	else
-		result = index_of_str(index,string,untag_string(ch));
-	dpush(tag_fixnum(result));
-}
-
-INLINE F_STRING* substring(CELL start, CELL end, F_STRING* string)
-{
-	F_STRING* result;
-	CELL capacity = string_capacity(string);
-
-	if(start < 0)
-		range_error(tag_object(string),0,tag_fixnum(start),capacity);
-
-	if(end < start || end > capacity)
-		range_error(tag_object(string),0,tag_fixnum(end),capacity);
-
-	result = allot_string(end - start);
-	memcpy(result + 1,
-		(void*)((CELL)(string + 1) + CHARS * start),
-		CHARS * (end - start));
-	rehash_string(result);
-
-	return result;
-}
-
-/* start end string -- string */
-void primitive_substring(void)
-{
-	F_STRING* string;
-	CELL end, start;
-
-	maybe_garbage_collection();
-
-	string = untag_string(dpop());
-	end = to_fixnum(dpop());
-	start = to_fixnum(dpop());
-	dpush(tag_object(substring(start,end,string)));
 }

@@ -21,5 +21,6 @@ INLINE F_SBUF* untag_sbuf(CELL tagged)
 F_SBUF* sbuf(F_FIXNUM capacity);
 
 void primitive_sbuf(void);
+void primitive_sbuf_to_string(void);
 void fixup_sbuf(F_SBUF* sbuf);
 void collect_sbuf(F_SBUF* sbuf);

@@ -8,7 +8,7 @@ math-internals ;
 ! A simple single-dispatch generic word system.
 
 : predicate-word ( word -- word )
-    word-name "?" cat2 create-in
+    word-name "?" append create-in
     dup t "inline" set-word-prop ;
 
 ! Terminology:

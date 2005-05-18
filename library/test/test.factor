@@ -50,7 +50,7 @@ SYMBOL: failures
     [ [ dup error. cons failure f ] [ t ] ifte* ] catch ;
 
 : test-path ( name -- path )
-    "/library/test/" swap ".factor" cat3 ;
+    "/library/test/" swap ".factor" append3 ;
 
 : test ( name -- ? )
     [

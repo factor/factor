@@ -21,5 +21,4 @@ M: sbuf set-nth ( ch n sbuf -- )
     growable-check 2dup ensure underlying
     >r >r >fixnum r> r> set-char-slot ;
 
-M: sbuf >string
-    [ 0 swap length ] keep underlying substring ;
+M: sbuf >string sbuf>string ;

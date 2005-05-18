@@ -1,12 +1,12 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: files
-USING: kernel strings ;
+USING: kernel strings sequences ;
 
 ! We need this early during bootstrap.
 : path+ ( path path -- path )
     #! Combine two paths. This will be implemented later.
-    "/" swap cat3 ;
+    "/" swap append3 ;
 
 IN: stdio
 DEFER: stdio

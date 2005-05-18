@@ -195,7 +195,7 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : align-string ( n str -- )
-    tuck length - CHAR: \0 fill cat2 ;
+    tuck length - CHAR: \0 fill append ;
 
 : emit-chars ( str -- )
     >list "big-endian" get [ reverse ] unless
@@ -216,7 +216,7 @@ M: cons ' ( c -- tagged )
     string-type >header emit
     dup length emit-fixnum
     dup hashcode emit-fixnum
-    "\0" cat2 pack-string
+    "\0" append pack-string
     align-here ;
 
 M: string ' ( string -- pointer )

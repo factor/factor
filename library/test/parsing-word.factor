@@ -1,10 +1,5 @@
 IN: temporary
-
-USE: parser
-USE: test
-USE: words
-USE: strings
-USE: kernel
+USING: kernel parser sequences test words ;
 
 DEFER: foo
 
@@ -18,6 +13,6 @@ DEFER: foo
 
 ! Test > 1 ( ) comment; only the first one should be used.
 [ t ] [
-    "a" "IN: temporary : foo ( a ) ( b ) ;" parse drop word
-    "stack-effect" word-prop string-contains?
+    CHAR: a "IN: temporary : foo ( a ) ( b ) ;" parse drop word
+    "stack-effect" word-prop contains?
 ] unit-test

@@ -64,7 +64,7 @@ USE: sequences
 ! <a href= a> "Click me" write </a>
 !
 ! (url -- )
-! <a href= "http://" swap cat2 a> "click" write </a>
+! <a href= "http://" swap append a> "click" write </a>
 !
 ! (url -- )
 ! <a href= [ "http://" , , ] make-string a> "click" write </a>
@@ -146,17 +146,17 @@ USE: sequences
 : def-for-html-word-<foo> ( name -- name quot )
     #! Return the name and code for the <foo> patterned
     #! word.
-    "<" swap ">" cat3 dup [ write ] cons ;
+    "<" swap ">" append3 dup [ write ] cons ;
 
 : def-for-html-word-<foo ( name -- name quot )
     #! Return the name and code for the <foo patterned
     #! word.
-    "<" swap cat2 dup [ write <namespace> >n ] cons ;
+    "<" swap append dup [ write <namespace> >n ] cons ;
 
 : def-for-html-word-foo> ( name -- name quot )
     #! Return the name and code for the foo> patterned
     #! word.
-    ">" cat2 [
+    ">" append [
         store-prev-attribute write-attributes n> drop ">" write
     ] ;
 
@@ -175,7 +175,7 @@ USE: sequences
 : def-for-html-word-foo/> ( name -- name quot )
     #! Return the name and code for the foo/> patterned
     #! word.    
-    "/>" cat2 [
+    "/>" append [
         store-prev-attribute write-attributes n> drop ">" write
     ] ;
 
@@ -197,7 +197,7 @@ USE: sequences
     def-for-html-word-foo/> create-word ;
 
 : define-attribute-word ( name -- )
-    "html" swap dup "=" cat2 swap 
+    "html" swap dup "=" append swap 
     [ store-prev-attribute ] cons reverse
     [ "current-attribute" set ] append create-word ;
 

@@ -17,10 +17,13 @@ GENERIC: set-length ( n sequence -- )
 GENERIC: nth ( n sequence -- obj )
 GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq )
+GENERIC: like ( seq seq -- seq )
 GENERIC: freeze ( new orig -- new )
 GENERIC: reverse ( seq -- seq )
 GENERIC: peek ( seq -- elt )
 GENERIC: contains? ( elt seq -- ? )
+GENERIC: head ( n seq -- seq )
+GENERIC: tail ( n seq -- seq )
 
 G: each ( seq quot -- | quot: elt -- )
     [ over ] [ type ] ; inline
@@ -45,6 +48,7 @@ G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
 
 DEFER: <range>
 DEFER: append ! remove this when sort is moved from lists to sequences
+DEFER: subseq
 
 ! Some low-level code used by vectors and string buffers.
 IN: kernel-internals

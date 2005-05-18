@@ -68,7 +68,7 @@ namespaces sequences stdio streams strings unparser words ;
 : documentation. ( indent word -- indent )
     "documentation" word-prop [
         "\n" split [
-            "#!" swap cat2 comment.
+            "#!" swap append comment.
             dup prettyprint-newline
         ] each
     ] when* ;

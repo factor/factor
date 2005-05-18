@@ -42,7 +42,7 @@ USING: kernel lists namespaces sequences streams strings ;
     #! resource:. This allows words that operate on source
     #! files, like "jedit", to use a different resource path
     #! at run time than was used at parse time.
-    "resource:" over cat2 swap <resource-stream> parse-stream ;
+    "resource:" over append swap <resource-stream> parse-stream ;
 
 : run-resource ( file -- )
     parse-resource call ;

@@ -6,7 +6,7 @@ streams strings unparser words ;
 
 : jedit-server-file ( -- path )
     "jedit-server-file" get
-    [ "~" get "/.jedit/server" cat2 ] unless* ;
+    [ "~" get "/.jedit/server" append ] unless* ;
 
 : jedit-server-info ( -- port auth )
     jedit-server-file <file-reader> [
@@ -31,7 +31,7 @@ streams strings unparser words ;
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
-    unparse "+line:" swap cat2 2list
+    unparse "+line:" swap append 2list
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )

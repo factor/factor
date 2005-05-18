@@ -46,9 +46,11 @@ USING: kernel lists sequences test ;
 [ [ ]         ] [ 0   count ] unit-test
 [ [ 0 1 2 3 ] ] [ 4   count ] unit-test
 
-[ f ] [ f 0 head ] unit-test
-[ f ] [ [ 1 ] 0 head ] unit-test
-[ [ 1 2 3 ] ] [ [ 1 2 3 4 ] 3 head ] unit-test
+[ f ] [ 0 f head ] unit-test
+[ f ] [ 0 [ 1 ] head ] unit-test
+[ [ 1 2 3 ] ] [ 3 [ 1 2 3 4 ] head ] unit-test
+[ f ] [ 3 [ 1 2 3 ] tail ] unit-test
+[ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
 
 [ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] difference ] unit-test
 

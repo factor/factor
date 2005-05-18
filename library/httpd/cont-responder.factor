@@ -121,7 +121,7 @@ TUPLE: item expire? quot id time-added ;
 : id>url ( id -- string )
   #! Convert the continuation id to an URL suitable for
   #! embedding in an HREF or other HTML.
-  url-encode "?id=" swap cat2 ;
+  url-encode "?id=" swap append ;
 
 DEFER: show-final
 DEFER: show 

@@ -70,17 +70,17 @@ M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
     swap [ swap 2nmap ] immutable ;
 
 ! Operations
-: index* ( obj i seq -- n )
+: index* ( obj seq i -- n )
     #! The index of the object in the sequence, starting from i.
-    2dup length >= [
+    over length over <= [
         3drop -1
     ] [
-        3dup nth = [ drop nip ] [ >r 1 + r> index* ] ifte
+        3dup swap nth = [ 2nip ] [ 1 + index* ] ifte
     ] ifte ;
 
 : index ( obj seq -- n )
     #! The index of the object in the sequence.
-    0 swap index* ;
+    0 index* ;
 
 M: object contains? ( obj seq -- ? ) index -1 > ;
 
@@ -166,42 +166,6 @@ M: sequence = ( obj seq -- ? )
             2drop f
         ] ifte
     ] ifte ;
-
-! A repeated sequence is the same element n times.
-TUPLE: repeated length object ;
-M: repeated length repeated-length ;
-M: repeated nth nip repeated-object ;
-
-! A range of integers
-TUPLE: range from to step ;
-
-C: range ( from to -- range )
-    >r 2dup > -1 1 ? r>
-    [ set-range-step ] keep
-    [ set-range-to ] keep
-    [ set-range-from ] keep ;
-
-M: range length ( range -- n )
-    dup range-to swap range-from - abs ;
-
-M: range nth ( n range -- n )
-    [ range-step * ] keep range-from + ;
-
-! A slice of another sequence.
-TUPLE: slice seq ;
-
-C: slice ( from to seq -- )
-    [ set-slice-seq ] keep
-    [ >r <range> r> set-delegate ] keep ;
-
-M: slice nth ( n slice -- obj )
-    [ delegate nth ] keep slice-seq nth ;
-
-M: slice set-nth ( obj n slice -- )
-    [ delegate nth ] keep slice-seq set-nth ;
-
-: tail-slice ( n seq -- slice )
-    [ length [ swap - ] keep ] keep <slice> ;
 
 IN: kernel
 

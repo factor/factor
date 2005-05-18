@@ -112,13 +112,17 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
 : project-with ( elt n quot -- list )
     swap [ with rot ] project 2nip ; inline
 
-: head ( list n -- list )
+M: general-list head ( n list -- list )
     #! Return the first n elements of the list.
-    dup 0 > [ >r uncons r> 1 - head cons ] [ 2drop f ] ifte ;
+    over 0 > [
+        unswons >r >r 1 - r> head r> swons
+    ] [
+        2drop f
+    ] ifte ;
 
-: tail ( list n -- tail )
+M: general-list tail ( n list -- tail )
     #! Return the rest of the list, from the nth index onward.
-    [ cdr ] times ;
+    swap [ cdr ] times ;
 
 M: cons nth ( n list -- element )
     over 0 = [ nip car ] [ >r 1 - r> cdr nth ] ifte ;

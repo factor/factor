@@ -5,17 +5,17 @@ USING: generic interpreter kernel lists math namespaces
 sequences words ;
 
 : literal-inputs? ( in stack -- )
-    tail-slice dup >list [ safe-literal? ] all? [
+    tail-slice* dup >list [ safe-literal? ] all? [
         length #drop node, t
     ] [
         drop f
     ] ifte ;
 
 : literal-inputs ( out stack -- )
-    tail-slice [ literal-value ] nmap ;
+    tail-slice* [ literal-value ] nmap ;
 
 : literal-outputs ( out stack -- )
-    tail-slice dup [ recursive-state get <literal> ] nmap
+    tail-slice* dup [ recursive-state get <literal> ] nmap
     length #push node, ;
 
 : partial-eval? ( word -- ? )

@@ -6,14 +6,15 @@ IN: words
 ! or single-stepping. Note that currently, words referring to
 ! annotated words cannot be compiled; and annotating a word has
 ! no effect of compiled calls to that word.
-USING: interpreter kernel lists prettyprint stdio strings test ;
+USING: interpreter kernel lists prettyprint sequences
+stdio strings test ;
 
 : annotate ( word quot -- | quot: word def -- def )
     over >r >r dup word-def r> call r> swap (define-compound) ;
     inline
 
 : (watch) ( word def -- def )
-    >r "==> " swap word-name cat2 \ print \ .s r>
+    >r "==> " swap word-name append \ print \ .s r>
     cons cons cons ;
 
 : watch ( word -- )

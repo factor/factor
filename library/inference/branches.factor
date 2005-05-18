@@ -8,7 +8,7 @@ sequences strings vectors words hashtables prettyprint ;
     0 swap [ length max ] each ;
 
 : computed-value-vector ( n -- vector )
-    [ drop object <computed> ] vector-project ;
+    [ drop object <computed> ] project >vector ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
@@ -32,7 +32,7 @@ sequences strings vectors words hashtables prettyprint ;
     #! Turn a list of same-length vectors into a vector of lists.
     dup car length [
         over [ nth ] map-with
-    ] vector-project nip ;
+    ] project >vector nip ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown

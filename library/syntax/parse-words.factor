@@ -49,7 +49,7 @@ SYMBOL: file
 
 : scan ( -- token )
     "col" get "line" get dup >r (scan) dup "col" set
-    2dup = [ r> 3drop f ] [ r> substring ] ifte ;
+    2dup = [ r> 3drop f ] [ r> subseq ] ifte ;
 
 : save-location ( word -- )
     #! Remember where this word was defined.
@@ -76,16 +76,16 @@ global [ string-mode off ] bind
 
 ! Used by parsing words
 : ch-search ( ch -- index )
-    "col" get "line" get rot index-of* ;
+    "line" get "col" get index* ;
 
 : (until) ( index -- str )
-    "col" get swap dup 1 + "col" set "line" get substring ;
+    "col" get swap dup 1 + "col" set "line" get subseq ;
 
 : until ( ch -- str )
     ch-search (until) ;
 
 : (until-eol) ( -- index ) 
-    "\n" ch-search dup -1 = [ drop "line" get length ] when ;
+    CHAR: \n ch-search dup -1 = [ drop "line" get length ] when ;
 
 : until-eol ( -- str )
     #! This is just a hack to get "eval" to work with multiline
@@ -108,7 +108,7 @@ global [ string-mode off ] bind
 
 : next-escape ( n str -- ch n )
     2dup nth CHAR: u = [
-        swap 1 + dup 4 + [ rot substring hex> ] keep
+        swap 1 + dup 4 + [ rot subseq hex> ] keep
     ] [
         over 1 + >r nth escape r>
     ] ifte ;
@@ -136,7 +136,7 @@ global [ string-mode off ] bind
 
 : documentation+ ( word str -- )
     over "documentation" word-prop [
-        swap "\n" swap cat3
+        swap "\n" swap append3
     ] when*
     "documentation" set-word-prop ;
 

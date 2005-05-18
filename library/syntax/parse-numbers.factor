@@ -26,17 +26,18 @@ M: object digit> not-a-number ;
 : base> ( str base -- num )
     #! Convert a string to an integer. Throw an error if
     #! conversion fails.
-    swap "-" ?string-head [ (base>) neg ] [ (base>) ] ifte ;
+    swap "-" ?head [ (base>) neg ] [ (base>) ] ifte ;
 
 GENERIC: str>number ( str -- num )
 
 M: string str>number 10 base> ;
 
-PREDICATE: string potential-ratio "/" swap string-contains? ;
+PREDICATE: string potential-ratio CHAR: / swap contains? ;
 M: potential-ratio str>number ( str -- num )
-    dup CHAR: / index-of string// swap 10 base> swap 10 base> / ;
+    dup CHAR: / swap index swap cut*
+    swap 10 base> swap 10 base> / ;
 
-PREDICATE: string potential-float "." swap string-contains? ;
+PREDICATE: string potential-float CHAR: . swap contains? ;
 M: potential-float str>number ( str -- num )
     str>float ;
 

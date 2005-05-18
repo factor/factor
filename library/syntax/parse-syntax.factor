@@ -73,7 +73,11 @@ BUILTIN: f 9 not ;
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word unit swons  \ car swons ; parsing
+    scan-word dup word? [
+        unit swons  \ car swons
+    ] [
+        swons
+    ] ifte ; parsing
 
 ! Vocabularies
 : PRIMITIVE:
@@ -130,7 +134,7 @@ BUILTIN: f 9 not ;
 ! Comments
 : (
     #! Stack comment.
-    ")" until parsed-stack-effect ; parsing
+    CHAR: ) until parsed-stack-effect ; parsing
 
 : !
     #! EOL comment.

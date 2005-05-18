@@ -77,7 +77,7 @@ C: editor ( text -- )
     dup editor-actions ;
 
 : offset>x ( offset str -- x )
-    string-head font get swap size-string drop ;
+    head font get swap size-string drop ;
 
 : caret-pos ( editor -- x y )
     editor-line [ caret get line-text get ] bind offset>x 0 ;

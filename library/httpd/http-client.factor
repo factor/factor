@@ -9,13 +9,13 @@ stdio streams strings unparser ;
     ":" split1 [ parse-number ] [ 80 ] ifte* ;
 
 : parse-url ( url -- host resource )
-    "http://" ?string-head [
+    "http://" ?head [
         "URL must begin with http://" throw
     ] unless
     "/" split1 [ "/" swap append ] [ "/" ] ifte* ;
 
 : parse-response ( line -- code )
-    "HTTP/" ?string-head [ " " split1 nip ] when
+    "HTTP/" ?head [ " " split1 nip ] when
     " " split1 drop parse-number ;
 
 : read-response ( -- code header )

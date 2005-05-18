@@ -30,6 +30,7 @@ INLINE CELL string_capacity(F_STRING* str)
 F_STRING* allot_string(CELL capacity);
 F_STRING* string(CELL capacity, CELL fill);
 void rehash_string(F_STRING* str);
+void primitive_rehash_string(void);
 F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill);
 void primitive_grow_string(void);
 char* to_c_string(F_STRING* s);
@@ -59,5 +60,3 @@ void primitive_char_slot(void);
 void primitive_set_char_slot(void);
 F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2);
 void primitive_string_compare(void);
-void primitive_index_of(void);
-void primitive_substring(void);

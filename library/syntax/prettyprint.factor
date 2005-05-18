@@ -68,7 +68,11 @@ M: word prettyprint* ( indent word -- indent )
 : \? ( list -- ? )
     #! Is the head of the list a [ foo ] car?
     dup car dup cons? [
-        cdr [ drop f ] [ cdr car \ car = ] ifte
+        dup car word? [
+            cdr [ drop f ] [ cdr car \ car = ] ifte
+        ] [
+            2drop f
+        ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -77,7 +81,7 @@ M: word prettyprint* ( indent word -- indent )
     [
         dup \? [
             \ \ word. bl
-            uncons >r car prettyprint* bl
+            uncons >r car word. bl
             r> cdr prettyprint-elements
         ] [
             uncons >r prettyprint* bl
@@ -170,7 +174,7 @@ M: matrix prettyprint* ( indent obj -- indent )
     ] with-scope ;
 
 : vocab-link ( vocab -- link )
-    "vocabularies'" swap cat2 ;
+    "vocabularies'" swap append ;
 
 : . ( obj -- )
     [

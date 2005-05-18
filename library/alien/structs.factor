@@ -15,12 +15,12 @@ math namespaces parser sequences strings words ;
 : define-setter ( offset type name -- )
     #! Define a word with stack effect ( obj alien -- ) in the
     #! current 'in' vocabulary.
-    "set-" swap cat2 create-in >r
+    "set-" swap append create-in >r
     [ "setter" get ] bind cons r> swap define-compound ;
 
 : define-field ( offset type name -- offset )
     >r c-type dup >r [ "align" get ] bind align r> r>
-    "struct-name" get swap "-" swap cat3
+    "struct-name" get swap "-" swap append3
     ( offset type name -- )
     3dup define-getter 3dup define-setter
     drop [ "width" get ] bind + ;

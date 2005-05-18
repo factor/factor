@@ -16,10 +16,6 @@ Defining a predicate subclass of tuple is supported now. Note that
 unions and complements over tuples are still not supported. Also,
 predicate subclasses of concrete tuple classes are not supported either.
 
-The seq-each and seq-map words have been renamed to each and map, and
-now work with lists. The each and map words in the lists vocabulary have
-been removed; use the new generic equivalents instead.
-
 The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
 data could fill up the buffer and cause a denial-of-service attack.
 
@@ -36,9 +32,27 @@ Note that GENERIC: foo is the same as
 
  G: foo [ dup ] [ type ] ;
 
+The seq-each and seq-map words have been renamed to each and map, and
+now work with lists. The each and map words in the lists vocabulary have
+been removed; use the new generic equivalents instead.
+
 Added two new types of 'virtual' sequences: a range sequence containing
 a range of integers, and a slice sequence containing a subsequence of
 another sequence.
+
+Some string words were made generic, and now work with all sequences:
+
+Old word:     New word:
+---------     ---------
+string-head   head
+string-head?  head?
+?string-head  ?head
+string-tail   tail
+string-tail?  tail?
+?string-tail  ?tail
+substring     subseq
+cat2          append
+cat3          append3
 
 Factor 0.74:
 ------------

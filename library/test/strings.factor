@@ -13,40 +13,40 @@ USE: lists
 [ "abc" ] [ "ab" "c" append ] unit-test
 [ "abc" ] [ "a" "b" "c" append3 ] unit-test
 
-[ 3 ] [ "hola" "a" index-of ] unit-test
-[ -1 ] [ "hola" "x" index-of ] unit-test
-[ 0 ] [ "a" "" index-of ] unit-test
-[ 0 ] [ "" "" index-of ] unit-test
-[ 0 ] [ "hola" "hola" index-of ] unit-test
-[ 1 ] [ "hola" "ol" index-of ] unit-test
-[ -1 ] [ "hola" "amigo" index-of ] unit-test
-[ -1 ] [ "hola" "holaa" index-of ] unit-test
+[ 3 ] [ "a" "hola" seq-index ] unit-test
+[ -1 ] [ "x" "hola" seq-index ] unit-test
+[ 0 ] [ "" "a" seq-index ] unit-test
+[ 0 ] [ "" "" seq-index ] unit-test
+[ 0 ] [ "hola" "hola" seq-index ] unit-test
+[ 1 ] [ "ol" "hola" seq-index ] unit-test
+[ -1 ] [ "amigo" "hola" seq-index ] unit-test
+[ -1 ] [ "holaa" "hola" seq-index ] unit-test
 
-[ "Beginning" ] [ 9 "Beginning and end" string-head ] unit-test
+[ "Beginning" ] [ 9 "Beginning and end" head ] unit-test
 
-[ f ] [ "I" "team" string-contains? ] unit-test
-[ t ] [ "ea" "team" string-contains? ] unit-test
-[ f ] [ "actore" "Factor" string-contains? ] unit-test
+[ f ] [ CHAR: I "team" contains? ] unit-test
+[ t ] [ "ea" "team" subseq? ] unit-test
+[ f ] [ "actore" "Factor" subseq? ] unit-test
 
-[ "end" ] [ 14 "Beginning and end" string-tail ] unit-test
+[ "end" ] [ 14 "Beginning and end" tail ] unit-test
 
-[ "" 10 string/ ] unit-test-fails
+[ "" 10 cut ] unit-test-fails
 
-[ "Beginning" " and end" ] [ "Beginning and end" 9 string/ ] unit-test
+[ "Beginning" " and end" ] [ 9 "Beginning and end" cut ] unit-test
 
-[ "Beginning" "and end" ] [ "Beginning and end" 9 string// ] unit-test
+[ "Beginning" "and end" ] [ 9 "Beginning and end" cut* ] unit-test
 
 [ "hello" "world" ] [ "hello world" " " split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test
 
-[ "and end" t ] [ "Beginning and end" "Beginning " ?string-head ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?string-head ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?string-head ] unit-test
+[ "and end" t ] [ "Beginning and end" "Beginning " ?head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?head ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?head ] unit-test
 
-[ "Beginning" t ] [ "Beginning and end" " and end" ?string-tail ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?string-tail ] unit-test
-[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?string-tail ] unit-test
+[ "Beginning" t ] [ "Beginning and end" " and end" ?tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "Beginning x" ?tail ] unit-test
+[ "Beginning and end" f ] [ "Beginning and end" "eginning " ?tail ] unit-test
 
 [ [ "This" "is" "a" "split" "sentence" ] ]
 [ "This is a split sentence" " " split ]
@@ -59,10 +59,10 @@ unit-test
 [ [ "a" "b" "c" "d" "e" "f" ] ]
 [ "aXXbXXcXXdXXeXXf" "XX" split ] unit-test
 
-[ "Hello world" t ] [ "Hello world\n" "\n" ?string-tail ] unit-test
-[ "Hello world" f ] [ "Hello world" "\n" ?string-tail ] unit-test
-[ "" t ] [ "\n" "\n" ?string-tail ] unit-test
-[ "" f ] [ "" "\n" ?string-tail ] unit-test
+[ "Hello world" t ] [ "Hello world\n" "\n" ?tail ] unit-test
+[ "Hello world" f ] [ "Hello world" "\n" ?tail ] unit-test
+[ "" t ] [ "\n" "\n" ?tail ] unit-test
+[ "" f ] [ "" "\n" ?tail ] unit-test
 
 [ t ] [ CHAR: a letter? ] unit-test
 [ f ] [ CHAR: A letter? ] unit-test
@@ -74,7 +74,7 @@ unit-test
 [ t ] [ "abc" "abd" string-compare 0 < ] unit-test
 [ t ] [ "z" "abd" string-compare 0 > ] unit-test
 
-[ f ] [ [ 0 10 "hello" substring ] [ not ] catch ] unit-test
+[ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
 
 [ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" split-n ] unit-test
 
@@ -95,3 +95,5 @@ unit-test
 
 [ 1 "" nth ] unit-test-fails
 [ -6 "hello" nth ] unit-test-fails
+
+[ t ] [ "hello world" dup >list >string = ] unit-test 
