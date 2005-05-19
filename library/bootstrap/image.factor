@@ -209,7 +209,7 @@ M: cons ' ( c -- tagged )
     ] each drop ;
 
 : pack-string ( string -- )
-    char tuck swap split-n (pack-string) ;
+    char tuck swap group (pack-string) ;
 
 : emit-string ( string -- )
     object-tag here-as swap
