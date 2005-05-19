@@ -8,6 +8,7 @@
 \usepackage{times}
 \usepackage{tabularx}
 \usepackage{epsfig}
+\usepackage{epsf}
 \usepackage{amssymb}
 \usepackage{epstopdf}
 
@@ -43,7 +44,10 @@
 
 \newcommand{\wordtable}[1]{
 
-\begin{tabularx}{12cm}[t]{lX}
+%HEVEA\renewcommand{\index}[1]{}
+%HEVEA\renewcommand{\glossary}[1]{}
+
+\begin{tabularx}{12cm}{lX}
 \hline
 #1
 \hline
@@ -209,7 +213,12 @@ description={a space (ASCII 32), newline (ASCII 10) or carriage-return (ASCII 13
 \begin{figure}
 \caption{Parser algorithm}
 \begin{center}
-\scalebox{0.40}{\epsfig{file=parser.eps}}
+\scalebox{0.40}{
+%BEGIN IMAGE
+\epsfbox{parser.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 
@@ -680,6 +689,28 @@ Parses a tuple. The tuple's class must follow \texttt{<<}. The element after tha
 
 Tuples are documented in \ref{tuples}.
 
+\subsubsection{\label{syntax:matrices}Matrices}
+\newcommand{\matrixglos}{\glossary{
+name=matrix,
+description={an instance of the \texttt{matrix} class, representing a mathematical matrix of numbers}}}
+\matrixglos
+\wordtable{
+\vocabulary{syntax}
+\parsingword{M[}{M[}
+\parsingword{]M}{]M}
+}
+Parses a matrix. A matrix is specified as a set of rows, and each row is written like a list and must have the same length. The following is an example:
+\begin{verbatim}
+M[ [  3 -5  1  ]
+   [ -2  7 1/2 ] ]M
+\end{verbatim}
+It corresponds to the following mathematical matrix:
+$$\left( \begin{array}{c c c}
+3 & -5 & 1 \\
+-2 & 7 & \frac{1}{2}
+\end{array} \right)$$
+Matrices are documented in \ref{matrices}.
+
 \subsection{\label{comments}Comments}
 
 \wordtable{
@@ -800,11 +831,23 @@ The Factor interpreter executes quotations. Quotations are lists, and since list
 \begin{figure}
 \caption{Interpreter algorithm}
 \begin{center}
-\scalebox{0.45}{\epsfig{file=interpreter.eps}}
+\scalebox{0.45}{
+%BEGIN IMAGE
+\epsfbox{interpreter.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
+\glossary{name=combinator,
+description=a word taking quotations or other words as input}
+The following pair of words invokes the interpreter reflectively. They are used to implement \emph{combinators}, which are words that take code from the stack. Combinator definitions must be followed by the \texttt{inline} word to mark them as inline in order to compile; for example:
+\begin{verbatim}
+: : keep ( x quot -- x | quot: x -- )
+    over >r call r> ; inline
+\end{verbatim}
+Word inlining is documented in \ref{declarations}.
 
-The interpreter can be invoked reflectively with the following pair of words.
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{call}{call ( quot -- )}
@@ -878,12 +921,21 @@ One exception is that when \texttt{ifte} occurs as the last word in a definition
 There are three words that combine shuffle words with \texttt{call}. They are useful in the implementation of higher-order words taking quotations as inputs.
 \wordtable{
 \vocabulary{kernel}
-\ordinaryword{slip}{slip ( quot x -- x | quot: -- )}
+\ordinaryword{slip}{slip ( quot x -- x | quot:~-- )}
 }
 Call a quotation, while hiding the top of the stack. The implementation is as you would expect.
 \begin{verbatim}
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
+\end{verbatim}
+\wordtable{
+\vocabulary{kernel}
+\ordinaryword{2slip}{2slip ( quot x y -- x y | quot:~-- )}
+}
+Call a quotation, while hiding the top two stack elements.
+\begin{verbatim}
+: 2slip ( quot x y -- x y | quot: -- )
+    >r >r call r> r> ; inline
 \end{verbatim}
 \wordtable{
 \vocabulary{kernel}
@@ -899,10 +951,11 @@ Call a quotation with a value on the stack, restoring the value when the quotati
 \ordinaryword{2keep}{2keep ( x y q -- x y | q:~x y -- )}
 }
 Call a quotation with a pair of values on the stack, restoring the values when the quotation returns.
-\begin{verbatim}
-: 2keep ( x y quot -- x y | quot: x y -- )
-    over >r pick >r call r> r> ; inline
-\end{verbatim}
+\wordtable{
+\vocabulary{kernel}
+\ordinaryword{3keep}{3keep ( x y z q -- x y z | q:~x y z -- )}
+}
+Call a quotation with three values on the stack, restoring the values when the quotation returns.
 
 \subsection{Conditionals}
 
@@ -994,11 +1047,6 @@ Outputs \texttt{t} if at least one of the inputs is true.
 \ordinaryword{xor}{xor ( ?~?~-- ?~)}
 }
 Outputs \texttt{t} if exactly one of the inputs is true.
-\wordtable{
-\vocabulary{kernel}
-\ordinaryword{implies}{implies ( b1~b2~-- ?~)}
-}
-Outputs \texttt{t} if \texttt{b1} is false or both inputs are true.
 
 An alternative set of logical operations operate on individual bits of integers bitwise, rather than generalized boolean truth values. They are documented in \ref{bitwise}.
 
@@ -1080,7 +1128,12 @@ The following diagram illustrates the nesting of exception handlers on the catch
 \end{verbatim}
 
 \begin{center}
-\scalebox{0.5}{\epsfig{file=catchstack.eps}}
+\scalebox{0.5}{
+%BEGIN IMAGE
+\epsfbox{catchstack.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 
@@ -1354,6 +1407,22 @@ Removes the word \texttt{name} from its vocabulary. Existing definitions that re
 }
 Removes the word from its vocabulary. The parsing word \texttt{FORGET:} is implemented using this word.
 
+\subsubsection{\label{declarations}Declarations}
+
+A compound or generic word (\ref{generic}) can be given special behavior with one of the below parsing words.
+
+\wordtable{
+\vocabulary{syntax}
+\parsingword{inline}{inline}
+}
+Marks the most recently defined word as an inline word. The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization; see \ref{compiler}. Inlining does not affect the execution of the word in the interpreter, nor is inlining visible when you \texttt{see} the word (\ref{exploring-vocabs}).
+
+\wordtable{
+\vocabulary{syntax}
+\parsingword{parsing}{parsing}
+}
+Marks the most recently defined word as a parsing word. Parsing words run at parse time. Se \ref{parsing-words}.
+
 \subsection{\label{word-props}Word properties}
 
 \glossary{name=word property,
@@ -1493,7 +1562,7 @@ Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precis
 }
 Make a fresh object that is equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a new shallow copy of the original.
 
-\subsection{Generic words and methods}
+\subsection{\label{generic}Generic words and methods}
 
 \glossary{name=generic word,
 description={a word defined using the \texttt{GENERIC:}~parsing word. The behavior of generic words depends on the class of the object at the top of the stack. A generic word is composed of methods, where each method is specialized on a class}}
@@ -1570,15 +1639,12 @@ M: object describe
     "I don't know anything about " write . ;
 \end{verbatim}
 Each class has a membership predicate named
-after the class with a \texttt{?}~suffix, with the following exceptions:
+after the class with a \texttt{?}~suffix, with the following two exceptions:
 \begin{description}
 \item[object] there is no need for a predicate word, since
 every object is an instance of this class.
 \item[f] the only instance of this class is the singleton
 \texttt{f} signifying falsity, missing value, and empty list, and the predicate testing for this is the built-in library word \texttt{not}.
-\item[t] the only instance of this class is the canonical truth value
-\texttt{t}. You can write \texttt{t =} to test for this object, however usually
-any object distinct from \texttt{f} is taken as a truth value, and \texttt{t} is not tested for directly.
 \end{description}
 
 \subsubsection{Built-in classes}
@@ -1790,7 +1856,13 @@ Class&Mutable&Growable&Lookup&at start&at end&Primary purpose\\
 \texttt{string}&&&$O(1)$&&&Immutable text strings
 \end{tabular}
 
-Additionally, user-defined classes can implement the sequence protocol and gain the ability to reuse many of the words in this section.
+A handful of ``virtual'' sequences are provided by the library. These sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence. Virtual sequences are documented in \ref{virtual-seq} and include:
+\begin{verbatim}
+repeated
+range
+slice
+\end{verbatim}
+User-defined classes can also implement the sequence protocol and gain the ability to reuse many of the words in this section.
 
 \subsection{Sequence protocol}
 
@@ -1829,7 +1901,7 @@ Sets the $n$th element of the sequence. Storing beyond the end of a resizable se
 
 \subsubsection{Queries}
 
-The following set of operations inspect sequence elements without modifying or creating anything.
+The following set of words inspect sequence elements without modifying or creating anything.
 
 \wordtable{
 \vocabulary{sequences}
@@ -1843,6 +1915,23 @@ Tests if the sequence contains any elements. The default implementation of this 
 Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$.
 \wordtable{
 \vocabulary{sequences}
+\ordinaryword{contains?}{contains?~( elt seq -- ?~)}
+}
+Tests if \texttt{seq} contains an element equal to \texttt{elt}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
+}
+Tests if \texttt{s2} contains \texttt{s1} as a subsequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head?}{head?~( s1 s2 -- ?~)}
+\ordinaryword{tail?}{tail?~( s1 s2 -- ?~)}
+
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
+\wordtable{
+\vocabulary{sequences}
 \ordinaryword{index*}{index* ( obj i seq -- n )}
 }
 Outputs the index of the first element in the sequence equal to \texttt{obj}, starting from \texttt{i}. If no element is found, outputs $-1$.
@@ -1854,13 +1943,12 @@ Outputs the last element of the sequence. Throws an exception if the sequence is
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}
-
 }
 Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
 
 \subsubsection{Functional operations}
 
-The following set of sequence operations do not modify their inputs.
+The following set of words do not modify their inputs.
 
 \wordtable{
 \vocabulary{sequences}
@@ -1886,6 +1974,72 @@ The input is a sequence of sequences. If the input is empty, the output is the e
 \genericword{reverse}{reverse ( seq -- seq )}
 }
 Outputs a new sequence of the same class, with the reverse element order.
+
+\subsubsection{\label{subseq}Subsequences}
+
+The following set of words do not modify their inputs.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head}{head~( n seq -- seq )}
+}
+Outputs a new sequence consisting of the first $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail}{tail~( n seq -- seq )}
+}
+Outputs a new sequence consisting of all elements of the sequence, starting at the $n$th index.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail*}{tail*~( n seq -- seq )}
+}
+Outputs a new sequence consisting of the last $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
+\ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a subsequence. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
+}
+Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 cut .s
+\textbf{" world"
+"Hello"}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{cut*}{cut* ( seq n -- s1 s2 )}
+}
+
+Outputs a pair of sequences that equal the original sequence excluding the $n$th element, when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 cut* .s
+\textbf{"world"
+"Hello"}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{split1}{split1~( seq split -- before after )}
+}
+If \texttt{seq} does not contain \texttt{split} as a subsequence, then \texttt{before} is equal to the \texttt{seq}, and \texttt{after} is \texttt{f}. Otherwise, \texttt{before} and \texttt{after} are both sequences, and yield the input excluding \texttt{split} when appended.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{split}{split~( seq split -- list )}
+}
+Outputs a list of subsequences taken between occurrences of \texttt{split} in \texttt{seq}. If \texttt{split} does not occur in \texttt{seq}, outputs a singleton list containing \texttt{seq} only.
+\begin{alltt}
+\textbf{ok} "/usr/local/bin" "/" split .
+\textbf{[ "" "usr" "local" "bin" ]}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{split-n}{split-n~( str n -- list )}
+}
+Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
 
 \subsubsection{Imperitive operations}
 
@@ -1915,7 +2069,7 @@ Adds and removes an element at the end of the sequence. The sequence's length is
     dup peek >r dup length 1 - swap set-length r> ;
 \end{verbatim}
 
-\subsection{Sequence combinators}
+\subsection{\label{sequence-combinators}Sequence combinators}
 
 \wordtable{
 \vocabulary{sequences}
@@ -1925,7 +2079,7 @@ Adds and removes an element at the end of the sequence. The sequence's length is
 Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-each}{seq-each ( seq quot -- )}
+\ordinaryword{each}{each ( seq quot -- )}
 \texttt{quot:~element --}\\
 }
 Applies the quotation to each element of the sequence.
@@ -1937,7 +2091,7 @@ Applies the quotation to each element of the sequence.
 Applies the quotation to each element of the sequence. Elements that are themselves sequences are iterated recursively.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-map}{seq-map ( seq quot -- seq )}
+\ordinaryword{map}{map ( seq quot -- seq )}
 \texttt{quot:~element -- element}\\
 }
 Applies the quotation to each element yielding a new element. The new elements are collected into a sequence of the same class as the input sequence.
@@ -1949,12 +2103,12 @@ Applies the quotation to each element yielding a new element. The new elements a
 Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-2map}{seq-2map ( s1 s2 quot -- seq )}
+\ordinaryword{2map}{2map ( s1 s2 quot -- seq )}
 \texttt{quot:~e1 e2 -- element}\\
 }
 Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new elements are collected into a sequence of the same class as \texttt{s1}. Here is an example computing the pair-wise product of the elements of two vectors:
 \begin{alltt}
-\textbf{ok} \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] seq-2map .
+\textbf{ok} \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] 2map .
 \textbf{\tto 40 48 -6 \ttc}
 \end{alltt}
 \wordtable{
@@ -1965,8 +2119,10 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new element is stored back in \texttt{s1}. This modifies \texttt{s1} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-each-with}{seq-each-with ( object seq quot -- )}
+\ordinaryword{each-with}{each-with ( object seq quot -- )}
 \texttt{quot:~object element --}\\
+\ordinaryword{map-with}{map-with ( object seq quot -- seq )}
+\texttt{quot:~object element -- element}\\
 \ordinaryword{tree-each-with}{tree-each-with ( obj seq quot -- )}
 \texttt{quot:~obj element --}\\
 }
@@ -2092,7 +2248,12 @@ The following example demonstrates the construction of lists as chains of cons c
 \begin{figure}
 \caption{Cons cells making up the list \texttt{[ 1 2 3 ]}}
 \begin{center}
-\scalebox{0.5}{\epsfig{file=cons.eps}}
+\scalebox{0.5}{
+%BEGIN IMAGE
+\epsfbox{cons.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 
@@ -2162,27 +2323,12 @@ Removes all duplicates from the list by testing elements for equality.
 Tests if all elements of the list are equal. For the empty list, this is vacuously true.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{head}{head~( list n -- list )}
-}
-Outputs a new list consisting of the first \texttt{n} elements of \texttt{list}. This allocates memory.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{tail}{tail~( list n -- list )}
-}
-Outputs a new list consisting of the elements of \texttt{list} from the $n$th index onward. This does not allocate memory; rather it simply takes the \texttt{cdr} \texttt{n} times.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{count}{count~( n -- list )}
 }
 Return a new list containing all integers from 0 up to $n-1$, inclusive.
 
 \subsubsection{Set-theoretic operations}
 
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{contains?}{contains?~( object list -- ?~)}
-}
-Tests if \texttt{list} contains an element equal to \texttt{object}.
 \wordtable{
 \vocabulary{lists}
 \ordinaryword{memq?}{memq?~( object list -- ?~)}
@@ -2216,18 +2362,8 @@ Outputs a list of elements present in \texttt{l2} but not \texttt{l1}.
 
 \subsubsection{List combinators}
 
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{each}{each ( list quot -- )}
-\texttt{quot:~element --}\\
-}
-Applies the quotation to each element of the list.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{map}{map ( list quot -- list )}
-\texttt{quot:~element -- element}\\
-}
-Applies the quotation to each element yielding a new element. The new elements are collected into a new list.
+The two most frequently-used combinators are \verb|each| and \verb|map|, they can be used with any sequence and are documented in \ref{sequence-combinators}.
+
 \wordtable{
 \vocabulary{lists}
 \ordinaryword{subset}{subset ( list quot -- list )}
@@ -2258,10 +2394,6 @@ Sorts the list by comparing each pair of elements with the quotation. The quotat
 \end{alltt}
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{each-with}{each-with ( object list quot -- )}
-\texttt{quot:~object element --}\\
-\ordinaryword{map-with}{map-with ( object list quot -- list )}
-\texttt{quot:~object element -- element}\\
 \ordinaryword{subset-with}{subset-with ( object list quot -- list )}
 \texttt{quot:~object element -- ?}\\
 \ordinaryword{some-with?}{some-with?~( object list quot -- ?~)}
@@ -2311,11 +2443,13 @@ A string is an immutable sequence of characters. The literal syntax is covered i
 
 }
 Tests if the object at the top of the stack is a string.
+
 \wordtable{
 \vocabulary{strings}
-\ordinaryword{>string}{>string~( sequence -- string )}
+\ordinaryword{>string}{>string~( sbuf -- string )}
 }
-Turns any type of sequence with all-integer elements into a string. The integer elements are interpreted as characters.
+Turns a sequence of integers into a string. The integer elements are interpreted as characters. Note that this is not a way to turn any object into a printable representation; for that feature, see \ref{prettyprint}.
+
 \wordtable{
 \vocabulary{strings}
 \ordinaryword{string-compare}{string-compare~( s1 s2 -- n )}
@@ -2354,71 +2488,6 @@ Creates a string with \texttt{char} repeated $n$ times.
 }
 Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l>n$, the empty string is output.
 
-\subsubsection{Substring testing}
-
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string-contains?}{string-contains?~( s1 s2 -- ?~)}
-}
-Tests if \texttt{s2} contains \texttt{s1} as a substring.
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string-head?}{string-head?~( s1 s2 -- ?~)}
-\ordinaryword{string-tail?}{string-tail?~( s1 s2 -- ?~)}
-
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
-
-\subsubsection{Slicing and splitting}
-
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string/}{string/ ( string n -- s1 s2 )}
-}
-Outputs a pair of strings that equal the original string when concatenated. The first string has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-\textbf{ok} "Hello world" 5 string/ .s
-\textbf{" world"
-"Hello"}
-\end{alltt}
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string//}{string// ( string n -- s1 s2 )}
-}
-
-Outputs a pair of strings that equal the original string, excluding the $n$th element, when concatenated. The first string has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-\textbf{ok} "Hello world" 5 string// .s
-\textbf{"world"
-"Hello"}
-\end{alltt}
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{?string-head}{?string-head~( s1 s2 -- string ?~)}
-\ordinaryword{?string-tail}{?string-tail~( s1 s2 -- string ?~)}
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1} as a substring. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{split1}{split1~( str split -- before after )}
-
-}
-If \texttt{string} does not contain \texttt{split} as a substring, then \texttt{before} is equal to the \texttt{string}, and \texttt{after} is \texttt{f}. Otherwise, \texttt{before} and \texttt{after} are both strings, and yield the input excluding \texttt{split} when concatenated.
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{split}{split~( str split -- list )}
-}
-Outputs a list of substrings taken between occurrences of \texttt{split} in \texttt{string}. If \texttt{split} does not occur inside \texttt{string}, outputs a singleton list containing \texttt{string} only.
-\begin{alltt}
-\textbf{ok} "/usr/local/bin" CHAR: / split .
-\textbf{[ "" "usr" "local" "bin" ]}
-\end{alltt}
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{split-n}{split-n~( str n -- list )}
-}
-Splits the string into groups of \texttt{n} characters and collects them in a list. If the string's length is not a multiple of \texttt{n}, the final string in the list might be shorter.
-
 \subsubsection{Characters}
 
 \wordtable{
@@ -2456,13 +2525,70 @@ Tests if the object at the top of the stack is a string buffer.
 \ordinaryword{>sbuf}{>sbuf~( sequence -- sbuf )}
 }
 Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy.
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{sbuf>string}{sbuf>string~( sbuf -- string )}
-}
-Turns a string buffer into a string holding the same characters.
 
 String buffers support the stream output protocol (\ref{stream-protocol}).
+
+\subsection{\label{virtual-seq}Virtual sequences}
+
+Virtual sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{<repeated>}{<repeated> ( n object -- seq )}
+}
+Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
+\begin{alltt}
+\textbf{ok} 5 "hey" <repeated> .
+<< repeated [ ] 5 "hey" >>
+\textbf{ok} 5 "hey" <repeated> >list .
+[ "hey" "hey" "hey" "hey" "hey" ]
+\end{alltt}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{<range>}{<range> ( a b -- seq )}
+}
+Creates an immutable sequence consisting of all integers in the interval $[a,b)$ (if $a<b$) or $(b,a]$ (if $a>b$). If $a=b$, the resulting sequence is empty. As with repeated sequences, this is just a tuple implementing the sequence protocol.
+\begin{alltt}
+\textbf{ok} CHAR: a CHAR: z 1 + <range> .
+<< range [ ] 97 123 1 >>
+\textbf{ok} CHAR: a CHAR: z 1 + <range> >string .
+"abcdefghijklmnopqrstuvwxyz"
+\textbf{ok} CHAR: z CHAR: a 1 - <range> >string .
+"zyxwvutsrqponmlkjihgfedcba"
+\end{alltt}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{<slice>}{<slice> ( a b seq -- slice )}
+}
+Creates a mutable sequence that is a view of a subrange of elements of an underlying sequence. Changes to the underlying sequence are reflected in the slice, and vice versa.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head-slice}{head-slice ( n seq -- slice )}
+}
+Creates a slice viewing the first $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail-slice}{tail-slice ( n seq -- slice )}
+}
+Creates a slice viewing all elements of the sequence, starting at the $n$th index.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail-slice*}{tail-slice* ( n seq -- slice )}
+}
+Creates a slice viewing the last $n$ elements of the input sequence.
+
+There is a natural duality between the four slicing words above, and the four subsequence words from \ref{subseq}:
+
+\begin{tabular}[t]{l|l|l}
+Subsequence&Slice\\
+\verb|subseq|&\verb|<slice>|\\
+\verb|head|&\verb|head-slice|\\
+\verb|tail|&\verb|tail-slice|\\
+\verb|tail*|&\verb|tail-slice*|
+\end{tabular}
 
 \subsection{\label{make-seq}Constructing sequences}
 
@@ -2576,7 +2702,12 @@ Outputs a new association list which does not have any key/value pairs with the 
 \end{verbatim}
 
 \begin{center}
-\scalebox{0.45}{\epsfig{file=assoc.eps}}
+\scalebox{0.45}{
+%BEGIN IMAGE
+\epsfbox{assoc.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 
@@ -2781,7 +2912,12 @@ SYMBOL: gator
 outer
 \end{verbatim}
 \begin{center}
-\scalebox{0.5}{\epsfig{file=namestack.eps}}
+\scalebox{0.5}{
+%BEGIN IMAGE
+\epsfbox{namestack.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 \wordtable{
@@ -2828,7 +2964,12 @@ If the variable is set in the current namespace, outputs its value. Otherwise se
 \begin{figure}
 \caption{Numerical class hierarchy}
 \begin{center}
-\scalebox{0.5}{\epsfig{file=number.eps}}
+\scalebox{0.5}{
+%BEGIN IMAGE
+\epsfbox{number.eps}
+%END IMAGE
+%HEVEA\imageflush
+}
 \end{center}
 \end{figure}
 
@@ -3037,6 +3178,18 @@ BIN: 11111 -2 shift .b
 \emph{111}
 \end{alltt}
 
+\wordtable{
+\vocabulary{math}
+\ordinaryword{log2}{log2 ( n -{}- b )}
+}
+Computes the largest integer less than or equal to $log_2 n$. The input must be positive and the result is always an integer. In most cases, the \verb|log| word (\ref{algebraic}) should be used instead, since it allows any complex number as input, and the result is not truncated to an integer.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{each-bit}{each-bit ( n quot -{}- | quot: 0/1 -{}- )}
+}
+Applies the quotation to each bit of the input. The input must be a positive integer.
+
 \subsubsection{Generating random numbers}
 
 \wordtable{
@@ -3200,7 +3353,7 @@ Computes the absolute value and argument individually.
 \textbf{1.570796326794897}
 \end{alltt}
 
-\subsection{Algebraic and transcedential functions}
+\subsection{\label{algebraic}Algebraic and transcedential functions}
 
 \wordtable{
 \vocabulary{math}
@@ -3260,6 +3413,176 @@ Word&Value\\
 \texttt{pi}&Ratio of circumference to diameter ($\pi\approx 3.14159265358979323846$)\\
 \texttt{pi/2}&$\frac{\pi}{2}\approx 1.5707963267948966$
 \end{tabular}
+
+\subsection{Linear algebra}
+
+The \verb|matrices| vocabulary provides a set of words for simple algebraic operations on mathematical vectors and matrices.
+
+\subsubsection{Vectors}
+
+Any Factor sequence can be used to represent a mathematical vector, not just instances of the \verb|vector| class. The usual mathematical operations are supported.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{n*v}{n*v ( n vec -- vec )}
+}
+Multiplies each element of a vector by a scalar.
+\begin{alltt}
+\textbf{ok} 1/2 \tto 5 6 3 \ttc n*v .
+\textbf{\tto 5/2 3 3/2 \ttc}
+\end{alltt}
+
+Mathematically speaking, this is the \emph{action} of the field $\mathbb{C}$ on a vector space ${\mathbb{C}}^n$.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v+}{v+ ( vec vec -- vec )}
+}
+Adds the elements of the two vectors, pairwise. They must be of equal length.
+\begin{alltt}
+\textbf{ok} \tto 0 2 1/2 1 \ttc \tto 5 6 3 8 \ttc v+ .
+\textbf{\tto 5 8 7/2 9 \ttc}
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v*}{v* ( vec vec -- vec )}
+}
+Multiplies the elements of the two vectors, pairwise. They must be of equal length.
+\begin{alltt}
+\textbf{ok} \tto 1 2 3 4 \ttc \tto 2 2 1 1 \ttc v* .
+\textbf{\tto 2 4 3 4 \ttc}
+\end{alltt}
+This is \emph{not} the mathematical dot product or cross product operation.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v.}{v.~( vec vec -- n )}
+}
+Computes the inner product of two vectors. They must be of equal length.
+
+Mathematically speaking, this is a map $<,>: {\mathbb{C}}^n \times {\mathbb{C}}^n \rightarrow \mathbb{C}$. It is the complex inner product; that is, $<a,b> =\overline{<b,a>}$, where $\overline{z}$ is the complex conjugate.
+
+\subsubsection{\label{matrices}Matrices}
+
+Matrix literal syntax is documented in \ref{syntax:matrices}. In addition to the literal syntax, new matrices may be created from scratch in one of several ways.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{<matrix>}{<matrix> ( rows cols seq -- matrix )}
+}
+Creates a new matrix with the given dimensions and underlying sequence. The underlying sequence stores elements in row-major order.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{matrix-sequence}{matrix-sequence ( matrix -- seq )}
+}
+Outputs the underlying sequence of a matrix.
+
+\begin{alltt}
+\textbf{ok} M[ [ 1 2 3 ] [ 4 5 6 ] ]M matrix-sequence .
+\textbf{\tto 1 2 3 4 5 6 \ttc}
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{<zero-matrix>}{<zero-matrix> ( rows cols -- matrix )}
+}
+Creates a new matrix with the given dimensions and all elements set to zero.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{<identity-matrix>}{<identity-matrix> ( n -- matrix )}
+}
+Creates a new $n\times n$ matrix where all elements on the main diagonal are 1, and all other elements are zero; for example:
+
+\begin{alltt}
+\textbf{ok} 3 <identity-matrix> prettyprint
+M[ [ 1 0 0 ]
+   [ 0 1 0 ]
+   [ 0 0 1 ] ]M
+\end{alltt}
+
+The following are the usual algebraic operations on matrices.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{n*m}{n*m ( n matrix -- matrix )}
+}
+Multiplies each element of a matrix by a scalar.
+
+\begin{alltt}
+\textbf{ok} 5 2 <identity-matrix> n*m prettyprint
+\textbf{M[ [ 5 0 ]
+   [ 0 5 ] ]M}
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{m+}{m+ ( matrix matrix -- matrix )}
+}
+Adds two matrices. They must have the same dimensions.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{m+}{m+ ( matrix matrix -- matrix )}
+}
+Subtracts two matrices. They must have the same dimensions.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{m*}{m* ( matrix matrix -- matrix )}
+}
+Multiplies two matrices element-wise. They must have the same dimensions. This is \emph{not} matrix multiplication in the usual mathematical sense.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{m.}{m.~( matrix matrix -- matrix )}
+}
+Composes two matrices as linear operators. This is the usual mathematical matrix multiplication, and the first matrix must have the same number of columns as the second matrix has rows.
+
+\subsubsection{Column and row matrices}
+
+There is a natural isomorphism between the vector space $\mathbb{C}^m$, the $m\times 1$ matrices, and the $1 \times m$ matrices. Additionally, a $m\times n$ matrix acts as a linear operator from the vector space $\mathbb{C}^n$ to $\mathbb{C}^m$ in the same way as multiplying the $m\times n$ matrix by a $n \times 1$ matrix. In Factor, these ideas are embodied by a set of words for converting vectors to matrices, and vice-versa.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{<row-vector>}{<row-vector>~( vector -- matrix )}
+}
+Given a vector with $n$ elements, outputs a $1 \times n$ matrix.
+\begin{alltt}
+\textbf{ok} \tto 1.0 4.43 7.6 0.2 \ttc <row-vector> .
+M[ [ 1.0 4.43 7.6 0.2 ] ]M
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{<col-vector>}{<col-vector>~( vector -- matrix )}
+}
+Given a vector with $n$ elements, outputs a $n \times 1$ matrix.
+\begin{alltt}
+\textbf{ok} \tto 1.0 4.43 7.6 0.2 \ttc <col-vector> .
+M[ [ 1.0 ] [ 4.43 ] [ 7.6 ] [ 0.2 ] ]M
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{m.v}{m.v~( matrix vector -- vector )}
+}
+Applies a matrix to a vector on the right, as a linear transformation. The vector is
+treated as a matrix with one column.
+
+\begin{alltt}
+\textbf{ok} \tto 5 -3 \ttc M[ [ 0 1 ] [ 1 0 ] ]M v.m .
+\textbf{\tto -3 5 \ttc}
+\end{alltt}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v.m}{v.m~( vector matrix -- vector )}
+}
+Applies a matrix to a vector on the left, as a linear transformation. The vector is
+treated as a matrix with one row.
 
 \section{Streams}
 \glossary{name=stream,
@@ -4599,7 +4922,7 @@ different numeric bases. The \texttt{.b} word prints an integer in binary, \text
 
 \section{Word tools}
 
-\subsection{Exploring vocabularies}
+\subsection{\label{exploring-vocabs}Exploring vocabularies}
 
 Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
 
