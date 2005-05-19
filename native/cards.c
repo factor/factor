@@ -11,7 +11,7 @@ INLINE void collect_card(CARD *ptr, CELL here)
 	if(offset == 0x7f)
 	{
 		if(c == 0xff)
-			critical_error("bad card",ptr);
+			critical_error("bad card",(CELL)ptr);
 		else
 			return;
 	}

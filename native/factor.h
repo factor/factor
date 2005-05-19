@@ -70,6 +70,8 @@ typedef signed short s16;
 typedef signed int s32; 	 
 typedef signed long long s64;
 
+#include <sys/param.h>
+
 #ifdef WIN32
 	#include <windows.h>
 
@@ -78,7 +80,6 @@ typedef signed long long s64;
 #else
 	#include <dirent.h>
 	#include <sys/mman.h>
-	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/stat.h>
 	#include <unistd.h>
