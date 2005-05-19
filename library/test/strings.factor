@@ -13,14 +13,14 @@ USE: lists
 [ "abc" ] [ "ab" "c" append ] unit-test
 [ "abc" ] [ "a" "b" "c" append3 ] unit-test
 
-[ 3 ] [ "a" "hola" seq-index ] unit-test
-[ -1 ] [ "x" "hola" seq-index ] unit-test
-[ 0 ] [ "" "a" seq-index ] unit-test
-[ 0 ] [ "" "" seq-index ] unit-test
-[ 0 ] [ "hola" "hola" seq-index ] unit-test
-[ 1 ] [ "ol" "hola" seq-index ] unit-test
-[ -1 ] [ "amigo" "hola" seq-index ] unit-test
-[ -1 ] [ "holaa" "hola" seq-index ] unit-test
+[ 3 ] [ "a" "hola" start ] unit-test
+[ -1 ] [ "x" "hola" start ] unit-test
+[ 0 ] [ "" "a" start ] unit-test
+[ 0 ] [ "" "" start ] unit-test
+[ 0 ] [ "hola" "hola" start ] unit-test
+[ 1 ] [ "ol" "hola" start ] unit-test
+[ -1 ] [ "amigo" "hola" start ] unit-test
+[ -1 ] [ "holaa" "hola" start ] unit-test
 
 [ "Beginning" ] [ 9 "Beginning and end" head ] unit-test
 
@@ -76,7 +76,7 @@ unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
 
-[ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" split-n ] unit-test
+[ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" groups ] unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"

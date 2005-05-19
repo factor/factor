@@ -73,15 +73,14 @@ M: no-method error. ( error -- )
     ] make-string print ;
 
 : parse-dump ( error -- )
-    [
-        "Parsing " %
-        dup parse-error-file [ "<interactive>" ] unless* % ":" %
-        dup parse-error-line [ 1 ] unless* unparse ,
-    ] make-string print
+    "Parsing " write
+    dup parse-error-file [ "<interactive>" ] unless* write
+    ":" write
+    dup parse-error-line [ 1 ] unless* unparse print
     
     dup parse-error-text dup string? [ print ] [ drop ] ifte
     
-    [ parse-error-col CHAR: \s fill % "^" % ] make-string print ;
+    parse-error-col CHAR: \s fill write "^" print ;
 
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;

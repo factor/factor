@@ -1,8 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: kernel-internals
+USING: kernel math strings ;
+
+: (sbuf>string) underlying dup rehash-string ;
+
 IN: strings
-USING: generic kernel kernel-internals math math-internals
-sequences ;
+USING: generic sequences ;
 
 M: string (grow) grow-string ;
 

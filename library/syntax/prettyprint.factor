@@ -163,9 +163,9 @@ M: alien prettyprint* ( alien -- str )
     [ over ?prettyprint-newline matrix-rows. ] when* ;
 
 M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ word. >r <prettyprint r>
+    \ M[ word. bl >r 3 + r>
     row-list matrix-rows.
-    bl \ ]M word. prettyprint> ;
+    bl \ ]M word. 3 - ;
 
 : prettyprint ( obj -- )
     [

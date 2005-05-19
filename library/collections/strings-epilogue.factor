@@ -16,11 +16,11 @@ sequences strings ;
         r> fill swap append
     ] ifte ;
 
-: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep >string ;
+: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep (sbuf>string) ;
 
 : >sbuf ( seq -- sbuf ) dup length <sbuf> [ swap nappend ] keep ;
 
-M: object >string >sbuf underlying dup rehash-string ;
+M: object >string >sbuf (sbuf>string) ;
 
 M: string thaw >sbuf ;
 M: string freeze drop >string ;

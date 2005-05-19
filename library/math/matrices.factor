@@ -12,11 +12,11 @@ vectors ;
 : v+ ( v v -- v ) [ + ] 2map ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
+: v** ( v v -- v ) [ conjugate * ] 2map ;
 
-! Later, this will fixed when seq-2each works properly
-! : v. ( v v -- x ) 0 swap [ * + ] seq-2each ;
-: +/ ( seq -- n ) 0 swap [ + ] each ;
-: v. ( v v -- x ) v* +/ ;
+! Later, this will fixed when 2each works properly
+! : v. ( v v -- x ) 0 swap [ * + ] 2each ;
+: v. ( v v -- x ) v** 0 swap [ + ] each ;
 
 ! Matrices
 ! The major dimension is the number of elements per row.

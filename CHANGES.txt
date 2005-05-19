@@ -48,11 +48,17 @@ string-head   head
 string-head?  head?
 ?string-head  ?head
 string-tail   tail
+vector-tail   tail
+vector-tail*  tail*
 string-tail?  tail?
 ?string-tail  ?tail
 substring     subseq
 cat2          append
 cat3          append3
+string/       cut
+string//      cut*
+split1        split1
+split         split
 
 Factor 0.74:
 ------------

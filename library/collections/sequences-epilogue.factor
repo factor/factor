@@ -167,6 +167,11 @@ M: sequence = ( obj seq -- ? )
         ] ifte
     ] ifte ;
 
+! A repeated sequence is the same element n times.
+TUPLE: repeated length object ;
+M: repeated length repeated-length ;
+M: repeated nth nip repeated-object ;
+
 IN: kernel
 
 : depth ( -- n )

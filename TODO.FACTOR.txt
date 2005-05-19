@@ -21,7 +21,6 @@
 - virtual hosts
 - keep alive
 - sleep word
-- update docs
 - redo new compiler backend for PowerPC
 
 - plugin: supportsBackspace
@@ -36,7 +35,6 @@
 - faster sequence operations
 - generic some? all? memq? all=?
 - index and index* are very slow with lists
-- unsafe-sbuf>string
 - code walker & exceptions
 - if two tasks write to a unix stream, the buffer can overflow
 - rename prettyprint to pprint
