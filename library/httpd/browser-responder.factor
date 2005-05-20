@@ -185,6 +185,13 @@ sequences ;
               " - " write
               "current-word" get write
             </title>
+            <style>
+              "A:link { text-decoration:none}\n" write
+              "A:visited { text-decoration:none}\n" write
+              "A:active { text-decoration:none}\n" write
+              "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: 0px }\n" write
+              "A { margin: 1px }" write
+            </style>
           </head>
           <body> 
             <form name= "main" action= method= "post" form> 
