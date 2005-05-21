@@ -225,8 +225,12 @@ global [ c-types nest drop ] bind
     \ %unbox-double "unbox-op" set
 ] "double" define-primitive-type
 
-: alias-c-type ( old new -- )
+: (alias-c-type)
     c-types get [ >r get r> set ] bind ;
+
+: alias-c-type ( old new -- )
+    over "*" append over "*" append
+    (alias-c-type) (alias-c-type) ;
 
 ! FIXME for 64-bit platforms
 "int" "long" alias-c-type

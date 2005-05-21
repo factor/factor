@@ -18,7 +18,17 @@ vectors ;
 ! : v. ( v v -- x ) 0 swap [ * + ] 2each ;
 : v. ( v v -- x ) v** 0 swap [ + ] each ;
 
-: norm ( v -- a ) dup v. sqrt ;
+: (cross) ( v1 v2 i1 i2 -- n )
+    rot nth >r swap nth r> * ;
+
+: cross ( { x1 y1 z1 } { x2 y2 z2 } -- { z1 z2 z3 } )
+    #! Cross product of two 3-dimensional vectors.
+    [
+        2dup 2 1 (cross) >r 2dup 1 2 (cross) r> - ,
+        2dup 0 2 (cross) >r 2dup 2 0 (cross) r> - ,
+        2dup 1 0 (cross) >r 2dup 0 2 (cross) r> - ,
+        2drop
+    ] make-vector ;
 
 ! Matrices
 ! The major dimension is the number of elements per row.
