@@ -60,6 +60,7 @@ M: compound (compile) ( word -- )
 
 M: compound (uncrossref)
     dup f "infer-effect" set-word-prop
+    dup f "base-case" set-word-prop
     dup f "no-effect" set-word-prop
     decompile ;
 

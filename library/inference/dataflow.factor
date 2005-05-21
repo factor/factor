@@ -95,5 +95,8 @@ SYMBOL: current-node
     over node-out-d over set-node-out-d
     swap node-out-r swap set-node-out-r ;
 
+: node-effect ( node -- [[ d-in meta-d ]] )
+    dup node-in-d swap node-out-d cons ;
+
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state

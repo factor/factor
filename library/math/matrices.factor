@@ -18,6 +18,8 @@ vectors ;
 ! : v. ( v v -- x ) 0 swap [ * + ] 2each ;
 : v. ( v v -- x ) v** 0 swap [ + ] each ;
 
+: norm ( v -- a ) dup v. sqrt ;
+
 ! Matrices
 ! The major dimension is the number of elements per row.
 TUPLE: matrix rows cols sequence ;

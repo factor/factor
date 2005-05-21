@@ -52,23 +52,21 @@ hashtables parser prettyprint ;
         word-def infer-quot
     ] ifte ;
 
-: infer-compound ( word -- )
+: (infer-compound) ( word base-case -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
-        [
-            recursive-state get init-inference
-            dup dup inline-block drop effect present-effect
-            [ "infer-effect" set-word-prop ] keep
-        ] with-scope consume/produce
+        inferring-base-case set
+        recursive-state get init-inference
+        dup inline-block drop
+        effect present-effect
+    ] with-scope [ consume/produce ] keep ;
+
+: infer-compound ( word -- )
+    [
+        dup f (infer-compound) "infer-effect" set-word-prop
     ] [
-        [
-            >r inferring-base-case get [
-                drop
-            ] [
-                t "no-effect" set-word-prop
-            ] ifte r> rethrow
-        ] when*
+        [ swap t "no-effect" set-word-prop rethrow ] when*
     ] catch ;
 
 GENERIC: (apply-word)
@@ -114,40 +112,43 @@ M: compound apply-word ( word -- )
         apply-default
     ] ifte ;
 
-: with-recursion ( quot -- )
+: (base-case) ( word label -- )
+    over "inline" word-prop [
+        over inline-block drop
+        [ #call-label ] [ #call ] ?ifte node,
+    ] [
+        drop dup t (infer-compound) "base-case" set-word-prop
+    ] ifte ;
+
+: base-case ( word label -- )
     [
         inferring-base-case on
-        call
+        (base-case)
     ] [
         inferring-base-case off
         rethrow
     ] catch ;
 
-: base-case ( word [ label quot ] -- )
-    [
-        >r [ inline-block ] keep r> car [
-            #call-label
-        ] [
-            #call
-        ] ?ifte [ copy-effect ] keep node,
-    ] with-recursion ;
-
 : no-base-case ( word -- )
     word-name " does not have a base case." append
     inference-error ;
 
-: recursive-word ( word [ label quot ] -- )
+: recursive-word ( word [[ label quot ]] -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
     #! call is to a local block, emit a label call node.
     over "infer-effect" word-prop [
         nip consume/produce
     ] [
-        inferring-base-case get [
-            drop no-base-case
+        over "base-case" word-prop [
+            nip consume/produce
         ] [
-            base-case
-        ] ifte
+            inferring-base-case get [
+                drop no-base-case
+            ] [
+                car base-case
+            ] ifte
+        ] ifte*
     ] ifte* ;
 
 M: word apply-object ( word -- )

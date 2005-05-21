@@ -92,6 +92,21 @@ IN: sdl USING: alien ;
     [ "surface*" "short" "short" "short" "short" "short" "short" "uint" ]
     alien-invoke ;
 
+: polygonColor ( surface vx vy n color -- )
+    "void" "sdl-gfx" "polygonColor"
+    [ "surface*" "short*" "short*" "int" "int" ]
+    alien-invoke ;
+
+: aapolygonColor ( surface vx vy n color -- )
+    "void" "sdl-gfx" "aapolygonColor"
+    [ "surface*" "short*" "short*" "int" "int" ]
+    alien-invoke ;
+
+: filledPolygonColor ( surface vx vy n color -- )
+    "void" "sdl-gfx" "filledPolygonColor"
+    [ "surface*" "short*" "short*" "int" "int" ]
+    alien-invoke ;
+
 : characterColor ( surface x y c color -- )
     "void" "sdl-gfx" "characterColor"
     [ "surface*" "short" "short" "char" "uint" ]

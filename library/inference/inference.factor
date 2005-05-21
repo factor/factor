@@ -70,8 +70,7 @@ SYMBOL: d-in
     0 <vector> d-in set
     recursive-state set
     dataflow-graph off
-    current-node off
-    inferring-base-case off ;
+    current-node off ;
 
 GENERIC: apply-object
 
@@ -128,6 +127,7 @@ M: object apply-object apply-literal ;
 
 : with-infer ( quot -- )
     [
+        inferring-base-case off
         f init-inference
         call
         check-active

@@ -26,23 +26,51 @@ SYMBOL: c-types
 : c-size ( name -- size )
     c-type [ "width" get ] bind ;
 
-: define-deref ( hash name vocab -- )
-    >r "*" swap append r> create
-    "getter" rot hash 0 swons define-compound ;
+: define-c-type ( quot name -- )
+    >r <c-type> swap extend r> c-types get set-hash ; inline
 
-: define-c-type ( quot name vocab -- )
-    >r >r <c-type> swap extend r> 2dup r> define-deref
-    c-types get set-hash ; inline
-
-: <c-object> ( type -- byte-array )
+: <c-object> ( size -- byte-array )
     cell / ceiling <byte-array> ;
 
-: <c-array> ( n type -- byte-array )
+: <c-array> ( n size -- byte-array )
     * cell / ceiling <byte-array> ;
 
-: define-out ( name -- )
+: define-pointer ( type -- )
+    "void*" c-type swap "*" append c-types get set-hash ;
+
+: define-deref ( name vocab -- )
+    >r dup "*" swap append r> create
+    "getter" rot c-type hash 0 swons define-compound ;
+
+: c-constructor ( name vocab -- )
+    #! Make a word <foo> where foo is the structure name that
+    #! allocates a Factor heap-local instance of this structure.
+    #! Used for C functions that expect you to pass in a struct.
+    dupd constructor-word
+    swap c-size [ <c-object> ] cons
+    define-compound ;
+
+: array-constructor ( name vocab -- )
+    #! Make a word <foo-array> ( n -- byte-array ).
+    >r dup "-array" append r> constructor-word
+    swap c-size [ <c-array> ] cons
+    define-compound ;
+
+: define-nth ( name vocab -- )
+    #! Make a word foo-nth ( n alien -- dsplaced-alien ).
+    >r dup "-nth" append r> create
+    swap dup c-size [ rot * ] cons "getter" rot c-type hash
+    append define-compound ;
+
+: define-set-nth ( name vocab -- )
+    #! Make a word foo-nth ( n alien -- dsplaced-alien ).
+    >r "set-" over "-nth" append3 r> create
+    swap dup c-size [ rot * ] cons "setter" rot c-type hash
+    append define-compound ;
+
+: define-out ( name vocab -- )
     #! Out parameter constructor for integral types.
-    dup "alien" constructor-word
+    dupd constructor-word
     swap c-type [
         [
             "width" get , \ <c-object> , \ tuck , 0 ,
@@ -50,8 +78,18 @@ SYMBOL: c-types
         ] make-list
     ] bind define-compound ;
 
+: init-c-type ( name vocab -- )
+    over define-pointer
+    2dup c-constructor
+    2dup array-constructor
+    define-nth ;
+
 : define-primitive-type ( quot name -- )
-    [ "alien" define-c-type ] keep define-out ;
+    [ define-c-type ] keep "alien"
+    2dup init-c-type
+    2dup define-deref
+    2dup define-set-nth
+    define-out ;
 
 global [ c-types nest drop ] bind
 

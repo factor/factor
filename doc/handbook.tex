@@ -775,7 +775,7 @@ as the next word in the quotation would expect them. Their behavior can be under
 \ordinaryword{2drop}{2drop ( x y -- )}
 \ordinaryword{3drop}{3drop ( x y z -- )}
 \ordinaryword{nip}{nip ( x y -- y )}
-\ordinaryword{2nip}{2nip ( x y -- y )}
+\ordinaryword{2nip}{2nip ( x y z -- z )}
 \ordinaryword{dup}{dup ( x -- x x )}
 \ordinaryword{2dup}{2dup ( x y -- x y x y )}
 \ordinaryword{3dup}{3dup ( x y z -- x y z x y z )}
@@ -846,7 +846,7 @@ The Factor interpreter executes quotations. Quotations are lists, and since list
 description=a word taking quotations or other words as input}
 The following pair of words invokes the interpreter reflectively. They are used to implement \emph{combinators}, which are words that take code from the stack. Combinator definitions must be followed by the \texttt{inline} word to mark them as inline in order to compile; for example:
 \begin{verbatim}
-: : keep ( x quot -- x | quot: x -- )
+: keep ( x quot -- x | quot: x -- )
     over >r call r> ; inline
 \end{verbatim}
 Word inlining is documented in \ref{declarations}.
@@ -4042,7 +4042,7 @@ Parsing words are documented in \ref{parsing-words}.
 \vocabulary{prettyprint}
 \genericword{prettyprint*}{prettyprint* ( indent object -- indent )}
 }
-Prettyprints the given object. Unlike \texttt{prettyprint*}, this word does not emit a trailing newline, and the current indent level is given. This word is also generic, so you can add methods to have it print your own data types in a nice way.
+Prettyprints the given object. Unlike \texttt{prettyprint}, this word does not emit a trailing newline, and the current indent level is given. This word is also generic, so you can add methods to have it print your own data types in a nice way.
 
 The remaining words in this section are useful in the implementation of prettyprinter methods.
 \wordtable{
@@ -5234,7 +5234,7 @@ While most programming errors in Factor are only caught at runtime, the stack ef
 \textbf{[ [ tuple number tuple ] [ tuple fixnum object number ] ]}
 \end{alltt}
 
-The stack checker will report an error it it cannot infer the stack effect of a quotation. The ``recursive state'' dump is similar to a return stack, but it is not a real return stack, since only a code walk is taking place, not full evaluation. Understanding recursive state dumps is an art, much like understanding return stacks.
+The stack checker will report an error if it cannot infer the stack effect of a quotation. The ``recursive state'' dump is similar to a return stack, but it is not a real return stack, since only a code walk is taking place, not full evaluation. Understanding recursive state dumps is an art, much like understanding return stacks.
 
 \begin{alltt}
 \textbf{ok} [ 100 [ f f cons ] repeat ] infer .
