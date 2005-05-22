@@ -134,7 +134,12 @@ M: cons nth ( n list -- element )
 : difference ( list1 list2 -- list )
     #! Make a list of elements that occur in list2 but not
     #! list1.
-    [ over contains? not ] subset nip ;
+    [ swap contains? not ] subset-with ;
+
+: diffq ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ swap memq? not ] subset-with ;
 
 : contained? ( list1 list2 -- ? )
     #! Is every element of list1 in list2?

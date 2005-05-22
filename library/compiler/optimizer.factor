@@ -1,65 +1,176 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: inference kernel kernel-internals lists namespaces
-sequences vectors words words ;
+USING: hashtables inference kernel lists namespaces sequences ;
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never
 ! arise as inputs to any other type of function. Such 'dead'
 ! literals arise when combinators are inlined and quotations are
-! lifted to their call sites. Also, #label nodes are inlined if
-! their children do not make a recursive call to the label.
+! lifted to their call sites.
 
-: scan-literal ( node -- )
-    #! If the node represents a literal push, add the literal to
-    #! the list being constructed.
-    "scan-literal" [ drop ] apply-dataflow ;
+GENERIC: literals* ( node -- )
 
-: (scan-literals) ( dataflow -- )
-    [ scan-literal ] each ;
+: literals, ( node -- )
+    [ dup literals* node-successor literals, ] when* ;
 
-: scan-literals ( dataflow -- list )
-    [ (scan-literals) ] make-list ;
+: literals ( node -- list )
+    [ literals, ] make-list ;
 
-: scan-branches ( branches -- )
-    #! Collect all literals from all branches.
-    [ node-param get ] bind [ [ scan-literal ] each ] each ;
+GENERIC: can-kill* ( literal node -- ? )
 
-: mentions-literal? ( literal list -- ? )
-    #! Does the given list of result objects refer to this
-    #! literal?
-    [ value= ] some-with? ;
-
-: consumes-literal? ( literal node -- ? )
-    #! Does the dataflow node consume the literal?
-    [
-        dup node-consume-d get mentions-literal? swap
-        dup node-consume-r get mentions-literal? nip or
-    ] bind ;
-
-: produces-literal? ( literal node -- ? )
-    #! Does the dataflow node produce the literal?
-    [
-        dup node-produce-d get mentions-literal? swap
-        dup node-produce-r get mentions-literal? nip or
-    ] bind ;
-
-: (can-kill?) ( literal node -- ? )
-    #! Return false if the literal appears as input to this
-    #! node, and this node is not a stack operation.
-    2dup consumes-literal? >r produces-literal? r> or not ;
-
-: can-kill? ( literal dataflow -- ? )
+: can-kill? ( literal node -- ? )
     #! Return false if the literal appears in any node in the
     #! list.
-    [ dupd "can-kill" [ (can-kill?) ] apply-dataflow ] all? nip ;
+    dup [
+        2dup can-kill* [
+            node-successor can-kill?
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop t
+    ] ifte ;
 
-: kill-set ( dataflow -- list )
+: kill-set ( node -- list )
     #! Push a list of literals that may be killed in the IR.
-    dup scan-literals [ over can-kill? ] subset nip ;
+    dup literals [ swap can-kill? ] subset-with ;
 
+GENERIC: kill-node* ( literals node -- )
+
+DEFER: kill-node
+
+: kill-children ( literals node -- )
+    node-children [ kill-node ] each-with ;
+
+: kill-node ( literals node -- )
+    dup [
+        2dup kill-children
+        2dup kill-node* node-successor kill-node
+    ] [
+        2drop
+    ] ifte ;
+
+GENERIC: useless-node? ( node -- ? )
+
+: (prune-nodes) ( node -- )
+    [
+        dup node-successor dup useless-node? [
+            node-successor over set-node-successor
+        ] [
+            nip
+        ] ifte (prune-nodes)
+    ] when* ;
+
+: prune-nodes ( node -- node )
+    dup useless-node? [
+        node-successor prune-nodes
+    ] [
+        [ (prune-nodes) ] keep
+    ] ifte ;
+
+: optimize ( dataflow -- dataflow )
+    #! Remove redundant literals from the IR. The original IR
+    #! is destructively modified.
+    dup kill-set over kill-node prune-nodes ;
+
+! Generic nodes
+M: node literals* ( node -- )
+    node-children [ literals, ] each ;
+
+M: f can-kill* ( literal node -- ? )
+    2drop t ;
+
+M: node can-kill* ( literal node -- ? )
+    2dup consumes-literal? >r produces-literal? r> or not ;
+
+M: node kill-node* ( literals node -- )
+    2drop ;
+
+M: f useless-node? ( node -- ? )
+    drop f ;
+
+M: node useless-node? ( node -- ? )
+    drop f ;
+
+! #push
+M: #push literals* ( node -- )
+    node-out-d % ;
+
+M: #push can-kill* ( literal node -- ? )
+    2drop t ;
+
+M: #push kill-node* ( literals node -- )
+    [ node-out-d diffq ] keep set-node-out-d ;
+
+M: #push useless-node? ( node -- ? )
+    node-out-d empty? ;
+
+! #drop
+M: #drop can-kill* ( literal node -- ? )
+     2drop t ;
+
+M: #drop kill-node* ( literals node -- )
+    [ node-in-d diffq ] keep set-node-in-d ;
+
+M: #drop useless-node? ( node -- ? )
+    node-in-d empty? ;
+
+! #call
+M: #call can-kill* ( literal node -- ? )
+    nip node-param {{
+        [[ dup t ]]
+        [[ drop t ]]
+        [[ swap t ]]
+        [[ over t ]]
+        [[ pick t ]] 
+        [[ >r t ]]
+        [[ r> t ]]
+    }} hash ;
+
+: kill-mask ( killing inputs -- mask )
+    [ swap memq? ] map-with ;
+
+: (kill-shuffle) ( mask -- op )
+    {{
+        [[ [ f f ] over ]]
+        [[ [ f t ] dup  ]]
+        [[ [ f f f ] pick ]]
+        [[ [ f f t ] over ]]
+        [[ [ f t f ] over ]]
+        [[ [ f t t ] dup  ]]
+    }} hash ;
+
+: kill-shuffle ( literals node -- )
+    #! If certain values passing through a stack op are being
+    #! killed, the stack op can be reduced, in extreme cases
+    #! to a no-op.
+    [ node-in-d kill-mask (kill-shuffle) ] keep set-node-param ;
+
+M: #call kill-node* ( literals node -- )
+    dup node-param [ over pick ] memq?
+    [ kill-shuffle ] [ 2drop ] ifte ;
+
+M: #call useless-node? ( node -- ? )
+    node-param not ;
+
+! #call-label
+M: #call-label can-kill* ( literal node -- ? )
+     2drop t ;
+
+! #label
+M: #label can-kill* ( literal node -- ? )
+    node-children car can-kill? ;
+
+! #values
 SYMBOL: branch-returns
+
+M: #values can-kill* ( literal node -- ? )
+    dupd consumes-literal? [
+        branch-returns get memq?
+    ] [
+        drop t
+    ] ifte ;
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This
@@ -68,150 +179,18 @@ SYMBOL: branch-returns
     2dup consumes-literal? [
         2drop f
     ] [
-        [ node-param get ] bind
-        [
-            dup [
-                peek [ node-consume-d get >vector ] bind
-            ] map
-            unify-stacks >list
-            branch-returns set
-            [ dupd can-kill? ] all? nip
+       [
+            node-children dup
+            [ last-node node-in-d >list ] map unify-stacks
+            >list branch-returns set
+            [ can-kill? ] all-with?
         ] with-scope
     ] ifte ;
 
-: kill-node ( literals node -- )
-    swap [ over (can-kill?) ] all? [ , ] [ drop ] ifte ;
+! #ifte
+M: #ifte can-kill* ( literal node -- ? )
+    can-kill-branches? ;
 
-: (kill-nodes) ( literals dataflow -- )
-    #! Append live nodes to currently constructing list.
-    [ "kill-node" [ nip , ] apply-dataflow ] each-with ;
-
-: kill-nodes ( literals dataflow -- dataflow )
-    #! Remove literals and construct a list.
-    [ (kill-nodes) ] make-list ;
-
-: optimize ( dataflow -- dataflow )
-    #! Remove redundant literals from the IR. The original IR
-    #! is destructively modified.
-    dup kill-set swap kill-nodes ;
-
-: kill-branches ( literals node -- )
-    [
-        node-param [ [ dupd kill-nodes ] map nip ] change
-    ] extend , ;
-
-: kill-literal ( literals values -- values )
-    [
-        swap [ swap value= ] some-with? not
-    ] subset-with ;
-
-#push [
-    [ node-produce-d get ] bind [ literal-value ] map %
-] "scan-literal" set-word-prop
-
-#push [ 2drop t ] "can-kill" set-word-prop
-
-#push [
-    [ node-produce-d [ kill-literal ] change ] extend ,
-] "kill-node" set-word-prop
-
-#drop [ 2drop t ] "can-kill" set-word-prop
-
-#drop [
-    [ node-consume-d [ kill-literal ] change ] extend ,
-] "kill-node" set-word-prop
-
-#label [
-    [ node-param get ] bind (scan-literals)
-] "scan-literal" set-word-prop
-
-#label [
-    [ node-param get ] bind can-kill?
-] "can-kill" set-word-prop
-
-#call-label [
-    [ node-param get ] bind =
-] "calls-label" set-word-prop
-
-: calls-label? ( label list -- ? )
-    [ "calls-label" [ 2drop f ] apply-dataflow ] some-with? ;
-
-#label [
-    [ node-param get ] bind calls-label?
-] "calls-label" set-word-prop
-
-: branches-call-label? ( label list -- ? )
-    [ calls-label? ] some-with? ;
-
-\ ifte [
-    [ node-param get ] bind branches-call-label?
-] "calls-label" set-word-prop
-
-\ dispatch [
-    [ node-param get ] bind branches-call-label?
-] "calls-label" set-word-prop
-
-#label [ ( literals node -- )
-    [ node-param [ kill-nodes ] change ] extend ,
-] "kill-node" set-word-prop
-
-#values [
-    dupd consumes-literal? [
-        branch-returns get mentions-literal?
-    ] [
-        drop t
-    ] ifte
-] "can-kill" set-word-prop
-
-\ ifte [ scan-branches ] "scan-literal" set-word-prop
-\ ifte [ can-kill-branches? ] "can-kill" set-word-prop
-\ ifte [ kill-branches ] "kill-node" set-word-prop
-
-\ dispatch [ scan-branches ] "scan-literal" set-word-prop
-\ dispatch [ can-kill-branches? ] "can-kill" set-word-prop
-\ dispatch [ kill-branches ] "kill-node" set-word-prop
-
-! Don't care about inputs to recursive combinator calls
-#call-label [ 2drop t ] "can-kill" set-word-prop
-
-\ drop [ 2drop t ] "can-kill" set-word-prop
-\ drop [ kill-node ] "kill-node" set-word-prop
-\ dup [ 2drop t ] "can-kill" set-word-prop
-\ dup [ kill-node ] "kill-node" set-word-prop
-\ swap [ 2drop t ] "can-kill" set-word-prop
-\ swap [ kill-node ] "kill-node" set-word-prop
-
-: kill-mask ( killing inputs -- mask )
-    [ over [ over value= ] some? >boolean nip ] map nip ;
-
-: reduce-stack-op ( literals node map -- )
-    #! If certain values passing through a stack op are being
-    #! killed, the stack op can be reduced, in extreme cases
-    #! to a no-op.
-    -rot [
-        [ node-consume-d get ] bind kill-mask swap assoc
-    ] keep
-    over [ [ node-op set ] extend , ] [ 2drop ] ifte ;
-
-\ over [ 2drop t ] "can-kill" set-word-prop
-\ over [
-    [
-        [[ [ f f ] over ]]
-        [[ [ f t ] dup  ]]
-    ] reduce-stack-op
-] "kill-node" set-word-prop
-
-\ pick [ 2drop t ] "can-kill" set-word-prop
-\ pick [
-    [
-        [[ [ f f f ] pick ]]
-        [[ [ f f t ] over ]]
-        [[ [ f t f ] over ]]
-        [[ [ f t t ] dup  ]]
-    ] reduce-stack-op
-] "kill-node" set-word-prop
-
-\ >r [ 2drop t ] "can-kill" set-word-prop
-\ >r [ kill-node ] "kill-node" set-word-prop
-\ r> [ 2drop t ] "can-kill" set-word-prop
-\ r> [ kill-node ] "kill-node" set-word-prop
+! #dispatch
+M: #dispatch can-kill* ( literal node -- ? )
+    can-kill-branches? ;

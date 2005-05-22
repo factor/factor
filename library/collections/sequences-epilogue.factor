@@ -82,7 +82,9 @@ M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
     #! The index of the object in the sequence.
     0 index* ;
 
-M: object contains? ( obj seq -- ? ) index -1 > ;
+M: object contains? ( obj seq -- ? )
+    #! Tests for membership using =.
+    index -1 > ;
 
 : push ( element sequence -- )
     #! Push a value on the end of a sequence.

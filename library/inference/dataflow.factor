@@ -98,5 +98,16 @@ SYMBOL: current-node
 : node-effect ( node -- [[ d-in meta-d ]] )
     dup node-in-d swap node-out-d cons ;
 
+: consumes-literal? ( literal node -- ? )
+    #! Does the dataflow node consume the literal?
+    2dup node-in-d memq? >r node-in-r memq? r> or ;
+
+: produces-literal? ( literal node -- ? )
+    #! Does the dataflow node produce the literal?
+    2dup node-out-d memq? >r node-out-r memq? r> or ;
+
+: last-node ( node -- last )
+    dup node-successor [ last-node ] [ ] ?ifte ;
+
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
