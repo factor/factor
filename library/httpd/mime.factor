@@ -15,6 +15,7 @@ USING: files hashtables kernel lists namespaces ;
 [
     [[ "html"   "text/html"                        ]]
     [[ "txt"    "text/plain"                       ]]
+    [[ "xml"    "text/xml"                         ]]
                                                     
     [[ "gif"    "image/gif"                        ]]
     [[ "png"    "image/png"                        ]]
