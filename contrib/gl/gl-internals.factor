@@ -60,3 +60,4 @@ USING: alien kernel sequences stdio math test parser namespaces lists strings wo
 : FUNCTION:
     scan "c-library" get scan string-mode on
       [ string-mode off (function) ] [ ] ; parsing
+
