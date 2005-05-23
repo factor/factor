@@ -13,6 +13,12 @@ SYMBOL: theta
 : flags ( lst -- enum )
     [ execute ] map 0 swap [ bitor ] each ;
 
+USING: parser unparser stdio ;
+: gl-version ( -- float )
+    GL_VERSION glGetString
+    ! we're only interested in the first three characters since we're looking for 1.0, 1.1, etc.
+    2 swap head parse-number ;
+
 : resize ( width height -- )
     2dup colour-depth [ SDL_OPENGL SDL_RESIZABLE SDL_HWSURFACE SDL_DOUBLEBUF ] flags init-screen
     GL_PROJECTION glMatrixMode
@@ -52,6 +58,7 @@ SYMBOL: theta
 
 : simple-gl
     800 600 colour-depth [ SDL_OPENGL SDL_RESIZABLE SDL_HWSURFACE SDL_DOUBLEBUF ] flags [
+    GL_VERSION glGetString
 	0 theta set
         800 600 resize
         GL_FLAT glShadeModel

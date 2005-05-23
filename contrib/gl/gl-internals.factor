@@ -16,7 +16,7 @@ USING: alien kernel sequences stdio math test parser namespaces lists strings wo
 !
 !    FUNCTION: void glEnd ( ) ; -> : glEnd ( -- ) "void" "gl" "glEnd" [ ] alien-invoke ; 
 !
-!    FUNCTION: TODO: something with a return...
+! TODO: show returns in the stack effect
 
 : LIBRARY: scan "c-library" set ; parsing
 
@@ -25,18 +25,6 @@ USING: alien kernel sequences stdio math test parser namespaces lists strings wo
     [ alien-invoke ] cons cons cons cons r> swap define-compound
     word r> "stack-effect" set-word-prop
     word compile ;
-
-: (list-split) ( list1 list2 quot -- list1 list2 )
-    dup >r >r dup
-      [ unswons dup r> call
-        [ r> 2drop ]
-        [ rot cons swap r> (list-split) ] ifte ]
-      [ r> r> 2drop ] ifte ;
-
-: list-split ( list quot -- list1 list2 )
-    #! split the list at the first element where 'elem quot call' is t, removing that element.
-    #! if no elements return true, return 'list [ ]'
-    [ ] -rot (list-split) >r reverse r> ;
 
 : unpair ( list -- list1 list2 )
     [ uncons uncons unpair rot swons >r cons r> ]
@@ -47,11 +35,9 @@ USING: alien kernel sequences stdio math test parser namespaces lists strings wo
       [ head ] 
       [ nip ] ifte ;
 
-: join-stack-effect ( lst -- str )
+: parse-stack-effect ( lst -- str )
+    unpair reverse "--" swons reverse
     [ CHAR: , remove-trailing-char " " append ] map " " swons concat ;
-
-: parse-stack-effect ( lst -- types stack-effect )
-    [ "--" = ] list-split >r unpair r> "--" swons append join-stack-effect ;
 
 : (function) ( type lib func function-args -- )
     unswons drop reverse unswons drop reverse
