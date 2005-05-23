@@ -65,12 +65,9 @@ M: kernel-error error. ( error -- )
     } nth execute ;
 
 M: no-method error. ( error -- )
-    [
-        "The generic word " ,
-        dup no-method-generic unparse ,
-        " does not have a suitable method for " ,
-        no-method-object unparse ,
-    ] make-string print ;
+    "No suitable method." print
+    "Generic word: " write dup no-method-generic .
+    "Object: " write no-method-object . ;
 
 : parse-dump ( error -- )
     "Parsing " write

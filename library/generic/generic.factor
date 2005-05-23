@@ -64,7 +64,7 @@ math-internals ;
 : dispatcher% "dispatcher" word-prop % ;
 
 : error-method ( generic -- method )
-    [ literal, \ no-method , ] make-list ;
+    [ dup picker% literal, \ no-method , ] make-list ;
 
 : empty-method ( generic -- method )
     dup "picker" word-prop [ dup ] = [

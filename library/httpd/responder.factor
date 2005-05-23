@@ -111,16 +111,16 @@ stdio streams strings ;
         ] "bad" set
     ] extend ;
 
-: get-responder ( name -- responder )
+: vhost ( name -- responder )
+    "httpd-vhosts" get hash [ "default" vhost ] unless* ;
+
+: responder ( name -- responder )
     "httpd-responders" get hash [
         "404" "httpd-responders" get hash
     ] unless* ;
 
-: default-responder ( -- responder )
-    "default" get-responder ;
-
 : set-default-responder ( name -- )
-    get-responder "default" "httpd-responders" get set-hash ;
+    responder "default" "httpd-responders" get set-hash ;
 
 : responder-argument ( argument -- argument )
     dup empty? [ drop "default-argument" get ] when ;
@@ -129,9 +129,9 @@ stdio streams strings ;
     [ responder-argument swap get call ] bind ;
 
 : serve-default-responder ( method url -- )
-    default-responder call-responder ;
+    "default" responder call-responder ;
 
-: log-responder ( url -- )
+: log-responder ( path -- )
     "Calling responder " swap append log ;
 
 : trim-/ ( url -- url )
@@ -140,21 +140,23 @@ stdio streams strings ;
 
 : serve-explicit-responder ( method url -- )
     "/" split1 dup [
-        swap get-responder call-responder
+        swap responder call-responder
     ] [
         ! Just a responder name by itself
         drop "request" get "/" append redirect drop
     ] ifte ;
 
-: serve-responder ( method url -- )
-    #! Responder URLs come in two forms:
-    #! /foo/bar... - default-responder used
+: serve-responder ( method path host -- )
+    #! Responder paths come in two forms:
+    #! /foo/bar... - default responder used
     #! /responder/foo/bar - responder foo, argument bar
-    dup log-responder trim-/ "responder/" ?head [
-        serve-explicit-responder
-    ] [
-        serve-default-responder
-    ] ifte ;
+    vhost [
+        dup log-responder trim-/ "responder/" ?head [
+            serve-explicit-responder
+        ] [
+            serve-default-responder
+        ] ifte
+    ] bind ;
 
 : no-such-responder ( -- )
     "404 No such responder" httpd-error ;
