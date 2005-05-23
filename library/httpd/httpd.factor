@@ -26,16 +26,13 @@ stdio streams strings threads http sequences ;
         [[ "HEAD" "head" ]]
     ] assoc [ "bad" ] unless* ;
 
-: (handle-request) ( arg cmd -- method path )
+: (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap
-    prepare-url prepare-header ;
+    prepare-url prepare-header
+    "Host" "header" get assoc ":" split1 drop ;
 
 : handle-request ( arg cmd -- )
-    [
-        (handle-request)
-        "Host" "header" get assoc
-        serve-responder
-    ] with-scope ;
+    [ (handle-request) serve-responder ] with-scope ;
 
 : parse-request ( request -- )
     dup log
