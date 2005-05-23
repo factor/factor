@@ -98,3 +98,11 @@ USING: kernel lists math matrices namespaces test ;
 
     m.v
 ] unit-test
+
+[ { 0 0 1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
+[ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
+[ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
+
+[ M[ [ 1 3 5 ] [ 2 4 6 ] ]M ]
+[ M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose ]
+unit-test

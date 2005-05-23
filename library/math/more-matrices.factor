@@ -3,8 +3,5 @@
 IN: matrices
 USING: kernel math ;
 
-: norm ( v -- a )
-    dup v. sqrt ;
-
-: normalize ( v -- v )
-    [ norm recip ] keep n*v ;
+: norm ( vec -- n ) dup v. sqrt ;
+: normalize ( vec -- vec ) [ norm recip ] keep n*v ;

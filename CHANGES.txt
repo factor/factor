@@ -7,6 +7,8 @@ for controlling it:
  +Yn   Size of 2 youngest generations, megabytes
  +An   Size of tenured and semi-spaces, megabytes
 
+OpenGL binding in contrib/gl/ (Alex Chapman).
+
 The compiler now does constant folding for certain words with literal
 operands. The compiler's peephole optimizer has been improved.
 

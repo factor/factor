@@ -3423,7 +3423,9 @@ The \verb|matrices| vocabulary provides a set of words for simple algebraic oper
 
 \subsubsection{Vectors}
 
-Any Factor sequence can be used to represent a mathematical vector, not just instances of the \verb|vector| class. The usual mathematical operations are supported.
+Any Factor sequence can be used to represent a mathematical vector, not just instances of the \verb|vector| class. Anywhere a vector is mentioned in this section, keep in mind it is a mathematical term, not a Factor data type.
+
+The usual mathematical operations on vectors are supported.
 
 \wordtable{
 \vocabulary{matrices}
@@ -3465,6 +3467,35 @@ This is \emph{not} the mathematical dot product or cross product operation.
 Computes the inner product of two vectors. They must be of equal length.
 
 Mathematically speaking, this is a map $<,>: {\mathbb{C}}^n \times {\mathbb{C}}^n \rightarrow \mathbb{C}$. It is the complex inner product; that is, $<a,b> =\overline{<b,a>}$, where $\overline{z}$ is the complex conjugate.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{norm}{norm~( vec -- n )}
+}
+Computes the norm (``length'') of a vector. The norm of a vector $v$ is defined as $\sqrt{<v,v>}$.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{normalize}{normalize~( vec -- vec )}
+}
+Outputs a vector with the same direction, but length 1. Defined as follows:
+\begin{verbatim}
+: normalize ( vec -- vec ) [ norm recip ] keep n*v ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{cross}{cross~( v1 v2 -- vec )}
+}
+Computes the cross product $v_1\times v_2$. The following example illustrates the mathematical fact that a cross product of two vectors is always orthogonal to either vector.
+\begin{alltt}
+\textbf{ok} \tto 1 6/7 -8 \ttc \tto 8/5 3 -2 \ttc cross .
+\textbf{\tto 156/7 -54/5 -118/35 \ttc}
+\textbf{ok} \tto 156/7 -54/5 57/35 \ttc \tto 1 6/7 -8 \ttc v. .
+\textbf{0}
+\textbf{ok} \tto 156/7 -54/5 57/35 \ttc \tto 8/5 3 -2 \ttc v. .
+\textbf{0}
+\end{alltt}
 
 \subsubsection{\label{matrices}Matrices}
 
@@ -3513,7 +3544,6 @@ The following are the usual algebraic operations on matrices.
 \ordinaryword{n*m}{n*m ( n matrix -- matrix )}
 }
 Multiplies each element of a matrix by a scalar.
-
 \begin{alltt}
 \textbf{ok} 5 2 <identity-matrix> n*m prettyprint
 \textbf{M[ [ 5 0 ]
@@ -3543,6 +3573,17 @@ Multiplies two matrices element-wise. They must have the same dimensions. This i
 \ordinaryword{m.}{m.~( matrix matrix -- matrix )}
 }
 Composes two matrices as linear operators. This is the usual mathematical matrix multiplication, and the first matrix must have the same number of columns as the second matrix has rows.
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{transpose}{transpose~( matrix -- matrix )}
+}
+Outputs a matrix where each row is a column of the original matrix, and each column is a row of the original matrix.
+\begin{alltt}
+\textbf{ok} 
+\textbf{M[ [ 5 0 ]
+   [ 0 5 ] ]M}
+\end{alltt}
 
 \subsubsection{Column and row matrices}
 
