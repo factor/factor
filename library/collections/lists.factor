@@ -84,9 +84,10 @@ M: cons map ( list quot -- list | quot: elt -- elt )
     #! Remove duplicate elements.
     dup [ uncons prune unique ] when ;
 
-: all=? ( list -- ? )
-    #! Check if all elements of a list are equal.
-    [ uncons [ = ] all-with? ] [ t ] ifte* ;
+: fiber? ( list quot -- ? | quot: elt elt -- ? )
+    #! Check if all elements in the list are equivalent under
+    #! the relation.
+    over [ >r uncons r> all-with? ] [ 2drop t ] ifte ; inline
 
 M: cons = ( obj cons -- ? )
     2dup eq? [
@@ -129,7 +130,7 @@ M: cons nth ( n list -- element )
 
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.
-    [ over contains? ] subset nip ;
+    [ swap contains? ] subset-with ;
 
 : difference ( list1 list2 -- list )
     #! Make a list of elements that occur in list2 but not

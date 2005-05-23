@@ -22,7 +22,7 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-results ( list -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify types.
-    dup all=? [
+    dup [ eq? ] fiber? [
         car
     ] [
         [ value-class ] map class-or-list <computed>
@@ -42,7 +42,7 @@ sequences strings vectors words hashtables prettyprint ;
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
     #! balanced.
-    [ uncons length swap length - ] map all=? ;
+    [ uncons length swap length - ] map [ = ] fiber? ;
 
 : unify-effect ( list -- in out )
     #! Unify a list of [[ instack outstack ]] pairs.
@@ -76,14 +76,15 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
 
-: deep-clone ( seq -- seq ) [ clone ] map ;
+: clone-values ( seq -- seq ) [ clone-value ] map ;
 
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
-    meta-r [ deep-clone ] change
-    meta-d [ deep-clone ] change
-    d-in [ deep-clone ] change
+    cloned off
+    meta-r [ clone-values ] change
+    meta-d [ clone-values ] change
+    d-in [ clone-values ] change
     dataflow-graph off
     current-node off ;
 

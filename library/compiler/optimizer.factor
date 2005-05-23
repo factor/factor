@@ -53,8 +53,15 @@ DEFER: kill-node
 
 GENERIC: useless-node? ( node -- ? )
 
+DEFER: prune-nodes
+
+: prune-children ( node -- )
+    [ node-children [ prune-nodes ] map ] keep
+    set-node-children ;
+
 : (prune-nodes) ( node -- )
     [
+        dup prune-children
         dup node-successor dup useless-node? [
             node-successor over set-node-successor
         ] [
@@ -131,24 +138,38 @@ M: #call can-kill* ( literal node -- ? )
 : kill-mask ( killing inputs -- mask )
     [ swap memq? ] map-with ;
 
-: (kill-shuffle) ( mask -- op )
+: (kill-shuffle) ( word -- map )
     {{
-        [[ [ f f ] over ]]
-        [[ [ f t ] dup  ]]
-        [[ [ f f f ] pick ]]
-        [[ [ f f t ] over ]]
-        [[ [ f t f ] over ]]
-        [[ [ f t t ] dup  ]]
+        [[ over
+            {{
+                [[ [ f t ] dup  ]]
+            }}
+        ]]
+        [[ pick
+            {{
+                [[ [ f f t ] over ]]
+                [[ [ f t f ] over ]]
+                [[ [ f t t ] dup  ]]
+            }}
+        ]]
+        [[ swap {{ }} ]]
+        [[ dup {{ }} ]]
+        [[ >r {{ }} ]]
+        [[ r> {{ }} ]]
     }} hash ;
+
+: lookup-mask ( mask word -- word )
+    over [ not ] all? [ nip ] [ (kill-shuffle) hash ] ifte ;
 
 : kill-shuffle ( literals node -- )
     #! If certain values passing through a stack op are being
     #! killed, the stack op can be reduced, in extreme cases
     #! to a no-op.
-    [ node-in-d kill-mask (kill-shuffle) ] keep set-node-param ;
+    [ [ node-in-d kill-mask ] keep node-param lookup-mask ] keep
+    set-node-param ;
 
 M: #call kill-node* ( literals node -- )
-    dup node-param [ over pick ] memq?
+    dup node-param (kill-shuffle)
     [ kill-shuffle ] [ 2drop ] ifte ;
 
 M: #call useless-node? ( node -- ? )
@@ -167,10 +188,16 @@ SYMBOL: branch-returns
 
 M: #values can-kill* ( literal node -- ? )
     dupd consumes-literal? [
-        branch-returns get memq?
+        branch-returns get
+        [ memq? ] subset-with
+        [ [ eq? ] fiber? ] all?
     ] [
         drop t
     ] ifte ;
+
+: branch-values ( branches -- )
+    [ last-node node-in-d >list ] map
+    unify-lengths vector-transpose >list branch-returns set ;
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This
@@ -179,10 +206,8 @@ M: #values can-kill* ( literal node -- ? )
     2dup consumes-literal? [
         2drop f
     ] [
-       [
-            node-children dup
-            [ last-node node-in-d >list ] map unify-stacks
-            >list branch-returns set
+        [
+            node-children dup branch-values
             [ can-kill? ] all-with?
         ] with-scope
     ] ifte ;

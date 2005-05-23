@@ -1,11 +1,14 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic kernel namespaces sequences unparser words ;
+USING: generic kernel lists namespaces sequences unparser words ;
 
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
 GENERIC: safe-literal? ( value -- ? )
+
+SYMBOL: cloned
+GENERIC: clone-value ( value -- value )
 
 TUPLE: value class recursion safe? ;
 
@@ -46,6 +49,8 @@ C: literal ( obj rstate -- value )
     ] keep
     [ set-literal-value ] keep ;
 
+M: literal clone-value ( value -- value ) ;
+
 M: literal value= ( literal value -- ? )
     literal-value = ;
 
@@ -56,6 +61,11 @@ M: literal set-value-class ( class value -- )
     2drop ;
 
 M: literal safe-literal? ( value -- ? ) value-safe? ;
+
+M: computed clone-value ( value -- value )
+    dup cloned get assq [ ] [
+        dup clone [ swap cloned [ acons ] change ] keep
+    ] ?ifte ;
 
 M: computed safe-literal? drop f ;
 
