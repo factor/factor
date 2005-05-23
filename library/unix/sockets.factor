@@ -38,7 +38,7 @@ USING: alien generic kernel math unix-internals ;
 : server-sockaddr ( port -- sockaddr )
     init-sockaddr  INADDR_ANY htonl over set-sockaddr-in-addr ;
 
-: sockopt ( fd level opt -- )
+: sockopt ( fd level opt value -- )
     1 <int> "int" c-size setsockopt io-error ;
 
 : server-socket ( port -- fd )
@@ -78,6 +78,9 @@ M: accept-task io-task-events ( task -- events )
 : <socket-stream> ( fd -- stream )
     dup f <fd-stream> ;
 
+: timeout-opt ( fd level opt value -- )
+    "timeval" c-size setsockopt io-error ;
+
 IN: streams
 
 C: client-stream ( fd host port -- stream )
@@ -100,3 +103,10 @@ C: client-stream ( fd host port -- stream )
 : accept ( server -- client )
     #! Wait for a client connection.
     dup wait-to-accept port-handle do-accept <client-stream> ;
+
+: set-timeout ( timeout client -- )
+    swap 0 make-timeval 2dup
+    >r duplex-stream-out port-handle SOL_SOCKET SO_SNDTIMEO r>
+    timeout-opt
+    >r duplex-stream-in port-handle SOL_SOCKET SO_RCVTIMEO r>
+    timeout-opt ;

@@ -4,6 +4,10 @@ IN: httpd
 USING: hashtables http kernel lists namespaces parser sequences
 stdio streams strings ;
 
+! Variables
+SYMBOL: vhosts
+SYMBOL: responders
+
 : print-header ( alist -- )
     [ unswons write ": " write url-encode print ] each ;
 
@@ -112,15 +116,13 @@ stdio streams strings ;
     ] extend ;
 
 : vhost ( name -- responder )
-    "httpd-vhosts" get hash [ "default" vhost ] unless* ;
+    vhosts get hash [ "default" vhost ] unless* ;
 
 : responder ( name -- responder )
-    "httpd-responders" get hash [
-        "404" "httpd-responders" get hash
-    ] unless* ;
+    responders get hash [ "404" responder ] unless* ;
 
 : set-default-responder ( name -- )
-    responder "default" "httpd-responders" get set-hash ;
+    responder "default" responders get set-hash ;
 
 : responder-argument ( argument -- argument )
     dup empty? [ drop "default-argument" get ] when ;
@@ -163,4 +165,4 @@ stdio streams strings ;
 
 : add-responder ( responder -- )
     #! Add a responder object to the list.
-    "responder" over hash  "httpd-responders" get set-hash ;
+    "responder" over hash  responders get set-hash ;

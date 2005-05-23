@@ -10,7 +10,6 @@
 - investigate if COPYING_GEN needs a fix
 - faster layout
 - add a socket timeout
-- virtual hosts
 - keep alive
 - sleep word
 - redo new compiler backend for PowerPC
@@ -24,7 +23,7 @@
 - index and index* are very slow with lists
 - code walker & exceptions
 - if two tasks write to a unix stream, the buffer can overflow
-- rename prettyprint to pprint
+- rename prettyprint* to pprint, prettyprint to pp
 - reader syntax for arrays, byte arrays, displaced aliens
 - dipping seq-2nmap, seq-2each
 - array sort
@@ -72,7 +71,6 @@
   - merge inc-d's across VOPs that don't touch the stack
 - [ EAX 0 ] --> [ EAX ]
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
-- optimize the generic word prologue
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
 - declarations
@@ -80,7 +78,6 @@
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
 - optimize away arithmetic dispatch
-- dataflow optimizer needs eq not =
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization

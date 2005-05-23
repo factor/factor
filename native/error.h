@@ -2,13 +2,12 @@
 #define ERROR_IO (1<<3)
 #define ERROR_UNDEFINED_WORD (2<<3)
 #define ERROR_TYPE (3<<3)
-#define ERROR_RANGE (4<<3)
-#define ERROR_FLOAT_FORMAT (5<<3)
-#define ERROR_SIGNAL (6<<3)
-#define ERROR_NEGATIVE_ARRAY_SIZE (7<<3)
-#define ERROR_C_STRING (8<<3)
-#define ERROR_FFI (9<<3)
-#define ERROR_HEAP_SCAN (10<<3)
+#define ERROR_FLOAT_FORMAT (4<<3)
+#define ERROR_SIGNAL (5<<3)
+#define ERROR_NEGATIVE_ARRAY_SIZE (6<<3)
+#define ERROR_C_STRING (7<<3)
+#define ERROR_FFI (8<<3)
+#define ERROR_HEAP_SCAN (9<<3)
 
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
@@ -31,5 +30,3 @@ void signal_error(int signal);
 void type_error(CELL type, CELL tagged);
 void primitive_throw(void);
 void primitive_die(void);
-/* index must be tagged */
-void range_error(CELL tagged, CELL min, CELL index, CELL max);

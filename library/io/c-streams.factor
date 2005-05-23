@@ -52,6 +52,7 @@ TUPLE: client-stream host port ;
 : <client> c-stream-error ;
 : <server> c-stream-error ;
 : accept c-stream-error ;
+: set-timeout c-stream-error ;
 
 : (stream-copy) ( in out -- )
     4096 pick stream-read [

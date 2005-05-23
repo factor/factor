@@ -26,10 +26,13 @@ stdio streams strings threads http sequences ;
         [[ "HEAD" "head" ]]
     ] assoc [ "bad" ] unless* ;
 
+: host ( -- string )
+    #! The host the current responder was called from.
+    "Host" "header" get assoc ":" split1 drop ;
+
 : (handle-request) ( arg cmd -- method path host )
     request-method dup "method" set swap
-    prepare-url prepare-header
-    "Host" "header" get assoc ":" split1 drop ;
+    prepare-url prepare-header host ;
 
 : handle-request ( arg cmd -- )
     [ (handle-request) serve-responder ] with-scope ;
@@ -49,6 +52,7 @@ stdio streams strings threads http sequences ;
 : httpd-client ( socket -- )
     [
         dup log-client [
+            1 stdio get set-timeout
             read-line [ parse-request ] when*
         ] with-stream
     ] try ;

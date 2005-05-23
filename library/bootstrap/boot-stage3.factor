@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
-io-internals kernel lists math namespaces parser sequences stdio
-unparser words ;
+compiler-frontend io-internals kernel lists math namespaces
+parser sequences stdio unparser words ;
 
 "Compiling base..." print
 
@@ -37,6 +37,7 @@ compile? [
     \ = compile
     \ unparse compile
     \ scan compile
+    \ optimize compile
     \ (generate) compile
 ] when
 

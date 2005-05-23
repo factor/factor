@@ -80,11 +80,3 @@ void type_error(CELL type, CELL tagged)
 	CELL c = cons(tag_fixnum(type),cons(tagged,F));
 	general_error(ERROR_TYPE,c);
 }
-
-/* index must be tagged */
-void range_error(CELL tagged, CELL min, CELL index, CELL max)
-{
-	CELL c = cons(tagged,cons(tag_cell(min),
-		cons(index,cons(tag_cell(max),F))));
-	general_error(ERROR_RANGE,c);
-}

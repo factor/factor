@@ -97,3 +97,13 @@ END-STRUCT
 
 : ntohs ( n -- n )
     "ushort" "libc" "ntohs" [ "ushort" ] alien-invoke ;
+
+BEGIN-STRUCT: timeval
+    FIELD: long sec
+    FIELD: long usec
+END-STRUCT
+
+: make-timeval ( sec usec -- timeval )
+    <timeval>
+    [ set-timeval-usec ] keep
+    [ set-timeval-sec ] keep ;

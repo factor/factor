@@ -20,13 +20,6 @@ vectors words ;
     "Object type: " write class word. terpri
     "Expected type: " write builtin-type word. terpri ;
 
-: range-error. ( list -- )
-    "Range check error" print
-    unswons [ "Object: " write . ] when*
-    unswons "Minimum index: " write .
-    unswons "Requested index: " write .
-    car "Maximum index: " write . ;
-
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;
 
@@ -55,7 +48,6 @@ M: kernel-error error. ( error -- )
         io-error.
         undefined-word-error.
         type-check-error.
-        range-error.
         float-format-error.
         signal-error.
         negative-array-size-error.

@@ -15,8 +15,12 @@ IN: unix-internals
 : POLLOUT    HEX: 0004 ;
 
 : SOL_SOCKET 1 ;
+
 : SO_REUSEADDR 2 ;
 : SO_OOBINLINE 10 ;
+: SO_SNDTIMEO HEX: 15 ;
+: SO_RCVTIMEO HEX: 14 ;
+
 : INADDR_ANY 0 ;
 
 : F_SETFL 4 ;    ! set file status flags

@@ -307,12 +307,12 @@ SYMBOL: root-continuation
      over "responder" set
      reset-continuation-table 
      permanent register-continuation root-continuation set 
-   ] extend swap "httpd-responders" get set-hash ;
+   ] extend swap responders get set-hash ;
 
 : responder-items ( name -- items )
   #! Return the table of continuation items for a given responder. 
   #! Useful for debugging.
-  "httpd-responders" get hash [ continuation-table ] bind ;
+  responders get hash [ continuation-table ] bind ;
 
 
 : simple-page ( title quot -- )

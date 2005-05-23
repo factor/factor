@@ -34,6 +34,8 @@ Note that GENERIC: foo is the same as
 Sequence API refactoring, as described in
 http://www.jroller.com/page/slava/20050518.
 
+HTTP server now supports virtual hosting.
+
 Factor 0.74:
 ------------
 
