@@ -3487,7 +3487,7 @@ Outputs a vector with the same direction, but length 1. Defined as follows:
 \vocabulary{matrices}
 \ordinaryword{cross}{cross~( v1 v2 -- vec )}
 }
-Computes the cross product $v_1\times v_2$. The following example illustrates the mathematical fact that a cross product of two vectors is always orthogonal to either vector.
+Computes the cross product $v_1\times v_2$. The following example illustrates the fact that a cross product of two vectors is always orthogonal to either vector.
 \begin{alltt}
 \textbf{ok} \tto 1 6/7 -8 \ttc \tto 8/5 3 -2 \ttc cross .
 \textbf{\tto 156/7 -54/5 -118/35 \ttc}
@@ -3532,9 +3532,9 @@ Creates a new $n\times n$ matrix where all elements on the main diagonal are 1, 
 
 \begin{alltt}
 \textbf{ok} 3 <identity-matrix> prettyprint
-M[ [ 1 0 0 ]
+\textbf{M[ [ 1 0 0 ]
    [ 0 1 0 ]
-   [ 0 0 1 ] ]M
+   [ 0 0 1 ] ]M}
 \end{alltt}
 
 The following are the usual algebraic operations on matrices.
@@ -3552,19 +3552,19 @@ Multiplies each element of a matrix by a scalar.
 
 \wordtable{
 \vocabulary{matrices}
-\ordinaryword{m+}{m+ ( matrix matrix -- matrix )}
+\ordinaryword{m+}{m+~( matrix matrix -- matrix )}
 }
 Adds two matrices. They must have the same dimensions.
 
 \wordtable{
 \vocabulary{matrices}
-\ordinaryword{m+}{m+ ( matrix matrix -- matrix )}
+\ordinaryword{m-}{m-~( matrix matrix -- matrix )}
 }
 Subtracts two matrices. They must have the same dimensions.
 
 \wordtable{
 \vocabulary{matrices}
-\ordinaryword{m*}{m* ( matrix matrix -- matrix )}
+\ordinaryword{m*}{m*~( matrix matrix -- matrix )}
 }
 Multiplies two matrices element-wise. They must have the same dimensions. This is \emph{not} matrix multiplication in the usual mathematical sense.
 
@@ -3580,9 +3580,8 @@ Composes two matrices as linear operators. This is the usual mathematical matrix
 }
 Outputs a matrix where each row is a column of the original matrix, and each column is a row of the original matrix.
 \begin{alltt}
-\textbf{ok} 
-\textbf{M[ [ 5 0 ]
-   [ 0 5 ] ]M}
+\textbf{ok} M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose .
+\textbf{M[ [ 1 3 5 ] [ 2 4 6 ] ]M}
 \end{alltt}
 
 \subsubsection{Column and row matrices}
