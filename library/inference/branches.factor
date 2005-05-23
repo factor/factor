@@ -28,16 +28,13 @@ sequences strings vectors words hashtables prettyprint ;
         [ value-class ] map class-or-list <computed>
     ] ifte ;
 
-: vector-transpose ( list -- vector )
-    #! Turn a list of same-length vectors into a vector of lists.
-    dup car length [
-        over [ nth ] map-with
-    ] project >vector nip ;
+: dual ( list -- list )
+    0 over nth length [ swap [ nth ] map-with ] project-with ;
 
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths vector-transpose [ unify-results ] map ; 
+    unify-lengths dual [ unify-results ] map >vector ; 
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is
@@ -105,24 +102,13 @@ sequences strings vectors words hashtables prettyprint ;
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )
-    [
-        [
-            inferring-base-case get [
-                [ infer-branch , ] [ [ drop ] when ] catch
-            ] [
-                infer-branch ,
-            ] ifte
-        ] each
-    ] make-list ;
+    [ infer-branch ] map dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    [
-        >r (infer-branches) dup unify-effects unify-dataflow
-        r> set-node-children
-    ] keep node, ;
+    [ >r (infer-branches) r> set-node-children ] keep node, ;
 
 \ ifte [
     2 #drop node, pop-d pop-d swap 2list

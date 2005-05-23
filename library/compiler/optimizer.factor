@@ -197,7 +197,7 @@ M: #values can-kill* ( literal node -- ? )
 
 : branch-values ( branches -- )
     [ last-node node-in-d >list ] map
-    unify-lengths vector-transpose >list branch-returns set ;
+    unify-lengths dual branch-returns set ;
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This

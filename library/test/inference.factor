@@ -64,7 +64,7 @@ namespaces parser sequences test vectors ;
 
 : infinite-loop infinite-loop ;
 
-[ [ infinite-loop ] infer old-effect ] unit-test-fails
+! [ [ infinite-loop ] infer old-effect ] unit-test-fails
 
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] ifte ;

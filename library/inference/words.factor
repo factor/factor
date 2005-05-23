@@ -144,7 +144,7 @@ M: compound apply-word ( word -- )
             nip consume/produce
         ] [
             inferring-base-case get [
-                drop no-base-case
+                2drop terminate
             ] [
                 car base-case
             ] ifte

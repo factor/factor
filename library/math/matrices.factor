@@ -4,9 +4,7 @@ IN: matrices
 USING: errors generic kernel lists math namespaces sequences
 vectors ;
 
-: n*v ( n vec -- vec )
-    #! Multiply a vector by a scalar.
-    [ * ] map-with ;
+: n*v ( n vec -- vec ) [ * ] map-with ;
 
 ! Vector operations
 : v+ ( v v -- v ) [ + ] 2map ;
@@ -15,7 +13,7 @@ vectors ;
 : v** ( v v -- v ) [ conjugate * ] 2map ;
 
 ! Later, this will fixed when 2each works properly
-! : v. ( v v -- x ) 0 swap [ * + ] 2each ;
+! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
 : v. ( v v -- x ) v** 0 swap [ + ] each ;
 
 : cross-trace ( v1 v2 i1 i2 -- v1 v2 n )
@@ -44,7 +42,7 @@ M: matrix clone ( matrix -- matrix )
     clone-tuple
     dup matrix-sequence clone over set-matrix-sequence ;
 
-: matrix@ ( row col matrix -- n ) matrix-rows * + ;
+: matrix@ ( row col matrix -- n ) matrix-cols rot * + ;
 
 : matrix-get ( row col matrix -- elt )
     [ matrix@ ] keep matrix-sequence nth ;
@@ -124,7 +122,7 @@ M: col thaw >vector ;
     #! Composition of two matrices.
     2dup *check 2dup *dimensions [
         ( m1 m2 row col -- m1 m2 )
-        >r >r 2dup r> rot <row> r> rot <col> v.
+        pick <col> >r pick <row> r> v.
     ] make-matrix 2nip ;
 
 : n*m ( n m -- m )

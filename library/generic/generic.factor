@@ -63,13 +63,20 @@ math-internals ;
 
 : dispatcher% "dispatcher" word-prop % ;
 
+: error-method ( generic -- method )
+    [ literal, \ no-method , ] make-list ;
+
 : empty-method ( generic -- method )
-    [
-        [ dup delegate ] %
-        [ dup , ] make-list ,
-        [ literal, \ no-method , ] make-list ,
-        \ ?ifte ,
-    ] make-list ;
+    dup "picker" word-prop [ dup ] = [
+        [
+            [ dup delegate ] %
+            [ dup , ] make-list ,
+            error-method ,
+            \ ?ifte ,
+        ] make-list
+    ] [
+        error-method
+    ] ifte ;
 
 : <empty-vtable> ( generic -- vtable )
     empty-method num-types swap <repeated> >vector ;
