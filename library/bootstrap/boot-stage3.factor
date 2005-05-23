@@ -65,7 +65,6 @@ t [
     "/library/tools/profiler.factor"
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
-    "/library/tools/dump.factor"
     "/library/bootstrap/image.factor"
     
     "/library/io/logging.factor"

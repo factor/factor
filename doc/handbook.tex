@@ -2359,7 +2359,7 @@ Outputs a new list containing all elements of the \texttt{list} except \texttt{o
 Outputs a list of elements present in both lists.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{intersection}{difference ( l1 l2 -- list )}
+\ordinaryword{difference}{difference ( l1 l2 -- list )}
 }
 Outputs a list of elements present in \texttt{l2} but not \texttt{l1}.
 
@@ -2533,6 +2533,11 @@ String buffers support the stream output protocol (\ref{stream-protocol}).
 
 \subsection{\label{virtual-seq}Virtual sequences}
 
+\glossary{name=virtual sequence,
+description={a sequence that is not backed by actual storage, but instead either computes its values, or take them from an underlying sequence}}
+\glossary{name=repeated sequence,
+description={an instance of the \texttt{repeated} class, which is a virtual, immutable sequence consisting of a fixed element repeated a certain number of times}}
+
 Virtual sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence.
 
 \wordtable{
@@ -2547,6 +2552,8 @@ Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No
 [ "hey" "hey" "hey" "hey" "hey" ]
 \end{alltt}
 
+\glossary{name=range sequence,
+description={an instance of the \texttt{range} class, which is a virtual sequence of integers}}
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{<range>}{<range> ( a b -- seq )}
@@ -2560,6 +2567,8 @@ Creates an immutable sequence consisting of all integers in the interval $[a,b)$
 \textbf{ok} CHAR: z CHAR: a 1 - <range> >string .
 "zyxwvutsrqponmlkjihgfedcba"
 \end{alltt}
+\glossary{name=slice,
+description={an instance of the \texttt{slice} class, which is a virtual sequence sharing structure with a subrange of some underlying sequence}}
 
 \wordtable{
 \vocabulary{sequences}
@@ -2583,15 +2592,18 @@ Creates a slice viewing all elements of the sequence, starting at the $n$th inde
 }
 Creates a slice viewing the last $n$ elements of the input sequence.
 
-There is a natural duality between the four slicing words above, and the four subsequence words from \ref{subseq}:
+There is a correspondence between the four slicing words above, and the subsequence words from \ref{subseq}:
 
-\begin{tabular}[t]{l|l|l}
+\begin{tabular}[t]{l|l}
 Subsequence&Slice\\
+\hline
 \verb|subseq|&\verb|<slice>|\\
 \verb|head|&\verb|head-slice|\\
 \verb|tail|&\verb|tail-slice|\\
 \verb|tail*|&\verb|tail-slice*|
 \end{tabular}
+
+The slice words output a new virtual sequence that shares structure with the original sequence, whereas the subsequence words output a fresh copied sequence.
 
 \subsection{\label{make-seq}Constructing sequences}
 

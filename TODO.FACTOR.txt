@@ -9,31 +9,19 @@
 - single-stepper and variable access: wrong namespace?
 - [ over ] generics no-method
 - investigate if COPYING_GEN needs a fix
-- simplifier:
-  - kill tag-fixnum/untag-fixnum
-  - kill replace after a peek
-  - merge inc-d's across VOPs that don't touch the stack
 - faster layout
-- tiled window manager
-- c primitive arrays: or just specialized arrays
-  float, complex, byte, char, cell...
 - add a socket timeout
 - virtual hosts
 - keep alive
 - sleep word
 - redo new compiler backend for PowerPC
-
-- plugin: supportsBackspace
-- if external factor is down, don't add tons of random shit to the       
-  dictionary
-- SDL_Rect** type
 - fix i/o on generic x86/ppc unix
 - alien primitives need a more general input type
 - 2map slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
 - faster sequence operations
-- generic some? all? memq? all=?
+- generic some? all? memq? fiber?
 - index and index* are very slow with lists
 - code walker & exceptions
 - if two tasks write to a unix stream, the buffer can overflow
@@ -42,7 +30,6 @@
 - dipping seq-2nmap, seq-2each
 - array sort
 - images saved from plugin do not work
-- making an image from plugin hangs
 - generic skip
 - inference needs to be more robust with heavily recursive code
 - investigate orphans
@@ -50,9 +37,13 @@
 + plugin:
 
 - word preview for parsing words
+- plugin: supportsBackspace
+- if external factor is down, don't add tons of random shit to the       
+  dictionary
 
 + ui:
 
+- tiled window manager
 - faster repaint
 - console with presentations
 - ui browser
@@ -76,6 +67,10 @@
 
 + compiler:
 
+- simplifier:
+  - kill tag-fixnum/untag-fixnum
+  - kill replace after a peek
+  - merge inc-d's across VOPs that don't touch the stack
 - [ EAX 0 ] --> [ EAX ]
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - optimize the generic word prologue
@@ -93,6 +88,7 @@
 
 + sequences
 
+- specialized arrays
 - list map, subset: not tail recursive
 - phase out sbuf-append
 
