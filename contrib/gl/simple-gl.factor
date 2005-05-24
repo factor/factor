@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: simple-gl
-USING: kernel sdl gl glu math words sequences namespaces ;
+USING: kernel sdl gl glu math words sequences namespaces generic prettyprint ;
 
 : colour-depth 16 ; inline
 : fov          60.0 ; inline
@@ -9,30 +9,36 @@ USING: kernel sdl gl glu math words sequences namespaces ;
 : far          100.0 ; inline
 
 SYMBOL: theta
+SYMBOL: phi
+SYMBOL: width
+SYMBOL: height
 
-: flags ( lst -- enum )
-    [ execute ] map 0 swap [ bitor ] each ;
+: flags
+    SDL_OPENGL SDL_RESIZABLE bitor SDL_HWSURFACE bitor SDL_DOUBLEBUF bitor ;
 
-USING: parser unparser stdio ;
-: gl-version ( -- float )
-    GL_VERSION glGetString
-    ! we're only interested in the first three characters since we're looking for 1.0, 1.1, etc.
-    2 swap head parse-number ;
-
-: resize ( width height -- )
-    2dup colour-depth [ SDL_OPENGL SDL_RESIZABLE SDL_HWSURFACE SDL_DOUBLEBUF ] flags init-screen
+: init-gl
+    0 0 width get height get glViewport
     GL_PROJECTION glMatrixMode
     glLoadIdentity
-    /f fov swap near far gluPerspective
+    fov width get height get /f near far gluPerspective
     GL_MODELVIEW glMatrixMode
-    glLoadIdentity ;
+    glLoadIdentity
+    GL_FLAT glShadeModel
+    0.0 0.0 0.0 0.0 glClearColor 
+    1.0 0.0 0.0 glColor3f ;
+
+: resize ( width height -- )
+    2dup height set width set
+    colour-depth flags SDL_SetVideoMode drop
+    init-gl ;
 
 : render ( -- )
     GL_COLOR_BUFFER_BIT glClear
     GL_MODELVIEW glMatrixMode
     glLoadIdentity
-    0.0 0.0 -2.0 glTranslatef
-    theta get 0.0 1.0 0.0 glRotatef
+    1 1 1 0 0 0 2 2 2 gluLookAt
+    theta get 0 1 0 glRotatef
+    phi get 1 0 0 glRotatef
     GL_TRIANGLES glBegin
         0.0 0.5 0.0 glVertex3f
        -0.5 0.0 0.0 glVertex3f
@@ -40,30 +46,33 @@ USING: parser unparser stdio ;
     glEnd
     SDL_GL_SwapBuffers ;
 
+GENERIC: process-event ( event -- ? )
+M: quit-event process-event 
+    drop f ;
+M: resize-event process-event 
+    dup resize-event-w swap resize-event-h resize t ;
+M: object process-event 
+    drop t ;
+
 : event-loop ( event -- )
-    theta [ 1 + ] change
+    theta [ 1 + 360 mod ] change
+    phi [ 2 + 360 mod ] change
     render
     dup SDL_PollEvent [
-        dup quit-event? [
-	    drop
-        ] [
-	    dup resize-event? [
-	        dup resize-event-w resize-event-h resize ! broken
-	    ] when
+        dup process-event [
 	    event-loop
+	] [
+	    drop
 	] ifte
     ] [
-        event-loop
+	event-loop
     ] ifte ;
 
 : simple-gl
-    800 600 colour-depth [ SDL_OPENGL SDL_RESIZABLE SDL_HWSURFACE SDL_DOUBLEBUF ] flags [
-    GL_VERSION glGetString
+    800 600 colour-depth flags [
+        init-gl
 	0 theta set
-        800 600 resize
-        GL_FLAT glShadeModel
-        0.0 0.0 0.0 0.0 glClearColor 
-        1.0 0.0 0.0 glColor3f
+	0 phi set
 	<event> event-loop
     ] with-screen ;
 
