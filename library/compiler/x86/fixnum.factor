@@ -157,7 +157,7 @@ M: %fixnum-sgn generate-node
     ! give it a fixnum tag.
     vop-out-1 v>operand tag-bits SHL ;
 
-: conditional ( dest cond -- )
+: load-boolean ( dest cond -- )
     #! Compile this after a conditional jump to store f or t
     #! in dest depending on the jump being taken or not.
     <label> "true" set
@@ -173,19 +173,19 @@ M: %fixnum-sgn generate-node
     dup vop-out-1 v>operand dup rot vop-in-1 v>operand CMP ;
 
 M: %fixnum< generate-node ( vop -- )
-    fixnum-compare  \ JL  conditional ;
+    fixnum-compare  \ JL  load-boolean ;
 
 M: %fixnum<= generate-node ( vop -- )
-    fixnum-compare  \ JLE  conditional ;
+    fixnum-compare  \ JLE  load-boolean ;
 
 M: %fixnum> generate-node ( vop -- )
-    fixnum-compare  \ JG  conditional ;
+    fixnum-compare  \ JG  load-boolean ;
 
 M: %fixnum>= generate-node ( vop -- )
-    fixnum-compare  \ JGE  conditional ;
+    fixnum-compare  \ JGE  load-boolean ;
 
 M: %eq? generate-node ( vop -- )
-    fixnum-compare  \ JE  conditional ;
+    fixnum-compare  \ JE  load-boolean ;
 
 : fixnum-branch ( vop -- label )
     dup vop-in-2 v>operand over vop-in-1 v>operand CMP

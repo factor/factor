@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: errors kernel math memory words ;
+USING: compiler errors kernel math memory words ;
 
 ! See the Motorola or IBM documentation for details. The opcode
 ! names are standard, and the operand order is the same as in
@@ -45,9 +45,19 @@ USING: errors kernel math memory words ;
 : SUBI neg ADDI ;
 : ORI d-form 24 insn ;
 : SRAWI 824 0 x-form 31 insn ;
-: BL 0 1 i-form 18 insn ;
-: B 0 0 i-form 18 insn ;
-: BC 0 0 b-form 16 insn ;
+
+GENERIC: BL
+M: integer BL 0 1 i-form 18 insn ;
+M: word BL 0 BL relative-24 ;
+
+GENERIC: B
+M: integer B 0 0 i-form 18 insn ;
+M: word B 0 B relative-24 ;
+
+GENERIC: BC
+M: integer BC 0 0 b-form 16 insn ;
+M: word BC >r 0 BC r> relative-14 ;
+
 : BEQ 12 2 rot BC ;
 : BNE 4 2 rot BC ;
 : BCLR 0 8 0 0 b-form 19 insn ;

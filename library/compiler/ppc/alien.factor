@@ -1,33 +1,27 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien compiler inference kernel kernel-internals lists
-math memory namespaces words ;
+USING: alien compiler compiler-backend inference kernel
+kernel-internals lists math memory namespaces words ;
 
-\ alien-invoke [
-    uncons load-library 2dup 1 rel-dlsym dlsym compile-call-far
-] "generator" set-word-prop
+M: %alien-invoke generate-node ( vop -- )
+    uncons load-library 2dup 1 rel-dlsym dlsym compile-call-far ;
 
 : stack-size 8 + 16 align ;
 : stack@ 3 + cell * ;
 
-#parameters [
-    dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte
-] "generator" set-word-prop
+M: %parameters generate-node ( vop -- )
+    dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte ;
 
-#unbox [
+M: %unbox generate-node ( vop -- )
     uncons f 2dup 1 rel-dlsym dlsym compile-call-far
-    3 1 rot stack@ STW
-] "generator" set-word-prop
+    3 1 rot stack@ STW ;
 
-#parameter [
-    dup 3 + 1 rot stack@ LWZ
-] "generator" set-word-prop
+M: %parameter generate-node ( vop -- )
+    dup 3 + 1 rot stack@ LWZ ;
 
-#box [
-    f 2dup 1 rel-dlsym dlsym compile-call-far
-] "generator" set-word-prop
+M: %box generate-node ( vop -- )
+    f 2dup 1 rel-dlsym dlsym compile-call-far ;
 
-#cleanup [
-    dup 0 = [ drop ] [ stack-size 1 1 rot ADDI ] ifte
-] "generator" set-word-prop
+M: %cleanup generate-node ( vop -- )
+    dup 0 = [ drop ] [ stack-size 1 1 rot ADDI ] ifte ;

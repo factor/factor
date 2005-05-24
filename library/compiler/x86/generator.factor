@@ -20,20 +20,23 @@ M: %prologue generate-node drop ;
 M: %call generate-node ( vop -- )
     vop-label dup postpone-word CALL ;
 
-M: %jump-label generate-node ( vop -- )
-    vop-label JMP ;
-
 M: %call-label generate-node ( vop -- )
     vop-label CALL ;
 
 M: %jump generate-node ( vop -- )
     vop-label dup postpone-word JMP ;
 
+M: %jump-label generate-node ( vop -- )
+    vop-label JMP ;
+
+: conditional ( vop -- label )
+    dup vop-in-1 v>operand f address CMP vop-label ;
+
 M: %jump-f generate-node ( vop -- )
-    dup vop-in-1 v>operand f address CMP vop-label JE ;
+    conditional JE ;
 
 M: %jump-t generate-node ( vop -- )
-    dup vop-in-1 v>operand f address CMP vop-label JNE ;
+    conditional JNE ;
 
 M: %return-to generate-node ( vop -- )
     0 PUSH vop-label absolute ;

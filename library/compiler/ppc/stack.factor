@@ -1,51 +1,35 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: assembler
-USING: compiler errors kernel math memory words ;
+IN: compiler-backend
+USING: assembler compiler errors kernel math memory words ;
 
-! Pushing and popping the data stack.
-: PEEK-DS 18 14 0 LWZ ;
-: POP-DS PEEK-DS 14 14 4 SUBI ;
-: PUSH-DS 18 14 4 STWU ;
-: REPL-DS 18 14 0 STW ;
+: ds-op cell * neg 14 swap ;
+: cs-op cell * neg 15 swap ;
 
-! Pushing and popping the return stack.
-: PEEK-CS 18 15 0 LWZ ;
-: POP-CS PEEK-CS 15 15 4 SUBI ;
-: PUSH-CS 18 15 4 STWU ;
+M: %immediate generate-node ( vop -- )
+    dup vop-in-1 address swap vop-out-1 v>operand LOAD32 ;
 
-: indirect-literal ( obj -- )
-    intern-literal 19 LOAD
-    18 19 0 LWZ ;
+M: %indirect generate-node ( vop -- )
+    dup vop-out-1 v>operand swap vop-in-1 intern-literal
+    over LOAD dup 0 LWZ ;
 
-#push-immediate [
-     address 18 LOAD PUSH-DS
-] "generator" set-word-prop
+M: %peek-d generate-node ( vop -- )
+    dup vop-out-1 v>operand swap vop-in-1 ds-op LWZ ;
 
-#push-indirect [
-    indirect-literal  PUSH-DS
-] "generator" set-word-prop
+M: %replace-d generate-node ( vop -- )
+    dup vop-in-2 v>operand swap vop-in-1 ds-op STW ;
 
-#replace-immediate [
-     address 18 LOAD REPL-DS
-] "generator" set-word-prop
+M: %inc-d generate-node ( vop -- )
+    14 14 rot vop-in-1 cell * ADDI ;
 
-#replace-indirect [
-    indirect-literal  REPL-DS
-] "generator" set-word-prop
+M: %inc-r generate-node ( vop -- )
+    15 15 rot vop-in-1 cell * ADDI ;
 
-\ drop [ drop  14 14 4 SUBI ] "generator" set-word-prop
-\ dup [ drop  PEEK-DS PUSH-DS ] "generator" set-word-prop
-\ over [ drop  18 14 -4 LWZ  PUSH-DS ] "generator" set-word-prop
-\ pick [ drop  18 14 -8 LWZ  PUSH-DS ] "generator" set-word-prop
+M: %dec-r generate-node ( vop -- )
+    15 15 rot vop-in-1 cell * SUBI ;
 
-\ swap [
-    drop
-    18 14 -4 LWZ
-    19 14 0 LWZ
-    19 14 -4 STW
-    18 14 0 STW
-] "generator" set-word-prop
+M: %peek-r generate-node ( vop -- )
+    dup vop-out-1 v>operand swap vop-in-1 cs-op LWZ ;
 
-\ >r [ drop  POP-DS PUSH-CS ] "generator" set-word-prop
-\ r> [ drop  POP-CS PUSH-DS ] "generator" set-word-prop
+M: %replace-r generate-node ( vop -- )
+    dup vop-in-2 v>operand swap vop-in-2 cs-op STW ;
