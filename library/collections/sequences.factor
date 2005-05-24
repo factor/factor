@@ -24,6 +24,7 @@ GENERIC: peek ( seq -- elt )
 GENERIC: contains? ( elt seq -- ? )
 GENERIC: head ( n seq -- seq )
 GENERIC: tail ( n seq -- seq )
+GENERIC: concat ( seq -- seq )
 
 G: each ( seq quot -- | quot: elt -- )
     [ over ] [ type ] ; inline

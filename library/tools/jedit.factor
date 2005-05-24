@@ -25,8 +25,8 @@ streams strings unparser words ;
 
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <client> [
-        write-big-endian-32
-        dup length write-big-endian-16
+        write-be32
+        dup length write-be16
         write flush
     ] with-stream ;
 

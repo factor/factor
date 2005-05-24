@@ -49,6 +49,9 @@ void primitive_fsin(void);
 void primitive_fsinh(void);
 void primitive_fsqrt(void);
 
+void primitive_float_bits(void);
+void primitive_double_bits(void);
+
 void box_float(float flo);
 float unbox_float(void);
 void box_double(double flo);

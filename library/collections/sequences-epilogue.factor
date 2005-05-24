@@ -102,11 +102,13 @@ M: object contains? ( obj seq -- ? )
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-: concat ( seq -- seq )
-    #! Append together a sequence of sequences.
-    dup empty? [
-        unswons [ swap [ nappend ] each-with ] immutable
-    ] unless ;
+M: f concat ;
+
+M: cons concat
+    unswons [ swap [ nappend ] each-with ] immutable ;
+
+M: object concat
+    >list concat ;
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.

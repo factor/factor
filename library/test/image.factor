@@ -23,7 +23,7 @@ USE: math
 
 [ "\0\0\0\0\u000f\u000e\r\u000c" ]
 [
-    [ image-magic write-big-endian-64 ] with-string
+    [ image-magic write-be64 ] with-string
 ] unit-test
 
 [

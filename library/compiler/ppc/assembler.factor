@@ -37,29 +37,98 @@ USING: compiler errors kernel math memory words ;
     >r 1 shift >r 10 shift >r 11 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor r> bitor ;
 
-: ADDI d-form 14 insn ;
-: LI 0 rot ADDI ;
-: ADDIS d-form 15 insn ;
-: LIS 0 rot ADDIS ;
-: ADD 0 266 0 xo-form 31 insn ;
-: SUBI neg ADDI ;
+: ADDI d-form 14 insn ;   : LI 0 rot ADDI ;   : SUBI neg ADDI ;
+: ADDIS d-form 15 insn ;  : LIS 0 rot ADDIS ;
+
+: ADDIC d-form 12 insn ;  : SUBIC neg ADDIC ;
+
+: ADDIC. d-form 13 insn ; : SUBIC. neg ADDIC. ;
+
+: (ADD) 266 swap xo-form 31 insn ;
+: ADD 0 0 (ADD) ;
+: ADD. 0 1 (ADD) ;
+: ADDO 1 0 (ADD) ;
+: ADDO. 1 1 (ADD) ;
+
+: (ADDC) 10 swap xo-form 31 insn ;
+: ADDC 0 0 (ADDC) ;
+: ADDC. 0 1 (ADDC) ;
+: ADDCO 1 0 (ADDC) ;
+: ADDCO. 1 1 (ADDC) ;
+
+: (ADDE) 138 swap xo-form 31 insn ;
+: ADDE 0 0 (ADDE) ;
+: ADDE. 0 1 (ADDE) ;
+: ADDEO 1 0 (ADDE) ;
+: ADDEO. 1 1 (ADDE) ;
+
+: ANDI d-form 28 insn ;
+: ANDIS d-form 29 insn ;
+
+: (AND) 31 swap x-form 31 insn ;
+: AND 0 (AND) ;
+: AND. 0 (AND) ;
+
+: (DIVW) 491 swap xo-form 31 insn ;
+: DIVW 0 0 (DIVW) ;
+: DIVW. 0 1 (DIVW) ;
+: DIVWO 1 0 (DIVW) ;
+: DIVWO 1 1 (DIVW) ;
+
+: (DIVWU) 459 swap xo-form 31 insn ;
+: DIVWU 0 0 (DIVWU) ;
+: DIVWU. 0 1 (DIVWU) ;
+: DIVWUO 1 0 (DIVWU) ;
+: DIVWUO. 1 1 (DIVWU) ;
+
+: (EQV) 284 swap x-form 31 insn ;
+: EQV 0 (EQV) ;
+: EQV. 1 (EQV) ;
+
+: (NAND) 476 swap x-form 31 insn ;
+: NAND 0 (NAND) ;
+: NAND. 1 (NAND) ;
+
+: (NOR) 124 swap x-form 31 insn ;
+: NOR 0 (NOR) ;
+: NOR. 1 (NOR) ;
+
 : ORI d-form 24 insn ;
+: ORIS d-form 25 insn ;
+
+: (OR) 444 swap x-form 31 insn ;
+: OR 0 (OR) ;
+: OR. 1 (OR) ;
+
+: (ORC) 412 swap x-form 31 insn ;
+: ORC 0 (ORC) ;
+: ORC. 1 (ORC) ;
+
+: XORI d-form 26 insn ;
+: XORIS d-form 27 insn ;
+
+: (XOR) 316 swap x-form 31 insn ;
+: XOR 0 (XOR) ;
+: XOR. 1 (XOR) ;
+
 : SRAWI 824 0 x-form 31 insn ;
 
-GENERIC: BL
-M: integer BL 0 1 i-form 18 insn ;
-M: word BL 0 BL relative-24 ;
+: LWZ d-form 32 insn ;
+: STW d-form 36 insn ;
+: STWU d-form 37 insn ;
 
-GENERIC: B
-M: integer B 0 0 i-form 18 insn ;
-M: word B 0 B relative-24 ;
+G: (B) ( dest aa lk -- ) [ pick ] [ type ] ;
+M: integer (B) i-form 18 insn ;
+M: word (B) 0 -rot (B) relative-24 ;
+
+: B 0 0 (B) ; : BA 1 0 (B) ; : BL 0 1 (B) ; : BLA 1 1 (B) ;
 
 GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
 M: word BC >r 0 BC r> relative-14 ;
 
-: BEQ 12 2 rot BC ;
-: BNE 4 2 rot BC ;
+: BEQ 12 2 rot BC ;  : BNE 4 2 rot BC ;
+
 : BCLR 0 8 0 0 b-form 19 insn ;
 : BLR 20 BCLR ;
 : BCLRL 0 8 0 1 b-form 19 insn ;
@@ -72,9 +141,6 @@ M: word BC >r 0 BC r> relative-14 ;
 : MTSPR 5 shift 467 xfx-form 31 insn ;
 : MTLR 8 MTSPR ;
 : MTCTR 9 MTSPR ;
-: LWZ d-form 32 insn ;
-: STW d-form 36 insn ;
-: STWU d-form 37 insn ;
 : CMPI d-form 11 insn ;
 
 : LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;

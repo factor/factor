@@ -197,6 +197,21 @@ void primitive_fsqrt(void)
 	drepl(tag_float(sqrt(to_float(dpeek()))));
 }
 
+void primitive_float_bits(void)
+{
+	double x = to_float(dpeek());
+	float x_ = (float)x;
+	CELL x_bits = *(CELL*)(&x_);
+	drepl(tag_cell(x_bits));
+}
+
+void primitive_double_bits(void)
+{
+	double x = to_float(dpeek());
+	u64 x_bits = *(u64*)(&x);
+	drepl(tag_bignum(s48_long_long_to_bignum(x_bits)));
+}
+
 #define DEFBOX(name,type)                                                      \
 void name (type flo)                                                       \
 {                                                                              \

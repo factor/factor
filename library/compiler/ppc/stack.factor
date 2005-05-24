@@ -32,4 +32,4 @@ M: %peek-r generate-node ( vop -- )
     dup vop-out-1 v>operand swap vop-in-1 cs-op LWZ ;
 
 M: %replace-r generate-node ( vop -- )
-    dup vop-in-2 v>operand swap vop-in-2 cs-op STW ;
+    dup vop-in-2 v>operand swap vop-in-1 cs-op STW ;

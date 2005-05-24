@@ -54,6 +54,8 @@ vocabularies get [
     [ "(fraction>)" "math-internals"          [ [ integer integer ] [ rational ] ] ]
     [ "str>float" "parser"                    [ [ string ] [ float ] ] ]
     [ "(unparse-float)" "unparser"            [ [ float ] [ string ] ] ]
+    [ "float-bits" "math"                     [ [ real ] [ integer ] ] ]
+    [ "double-bits" "math"                    [ [ real ] [ integer ] ] ]
     [ "<complex>" "math-internals"            [ [ real real ] [ number ] ] ]
     [ "fixnum+" "math-internals"              [ [ fixnum fixnum ] [ integer ] ] ]
     [ "fixnum-" "math-internals"              [ [ fixnum fixnum ] [ integer ] ] ]

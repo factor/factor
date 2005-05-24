@@ -87,3 +87,8 @@ unit-test
 [ f ] [ 123 power-of-2? ] unit-test
 [ 8 ] [ 256 log2 ] unit-test
 [ 0 ] [ 1 log2 ] unit-test
+
+[ 1 ] [ 7/8 ceiling ] unit-test
+[ 2 ] [ 3/2 ceiling ] unit-test
+[ 0 ] [ -7/8 ceiling ] unit-test
+[ -1 ] [ -3/2 ceiling ] unit-test

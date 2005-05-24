@@ -3,13 +3,13 @@
 IN: stdio
 USING: kernel math ;
 
-: read-little-endian-32 ( -- word )
+: read-le32 ( -- word )
     read1
     read1 8  shift bitor
     read1 16 shift bitor
     read1 24 shift bitor ;
 
-: read-big-endian-32 ( -- word )
+: read-be32 ( -- word )
     read1 24 shift
     read1 16 shift bitor
     read1 8  shift bitor
@@ -24,7 +24,7 @@ USING: kernel math ;
 : byte1 ( num -- byte )  -8 shift HEX: ff bitand ;
 : byte0 ( num -- byte )           HEX: ff bitand ;
 
-: write-little-endian-64 ( word -- )
+: write-le64 ( word -- )
     dup byte0 write
     dup byte1 write
     dup byte2 write
@@ -34,7 +34,7 @@ USING: kernel math ;
     dup byte6 write
         byte7 write ;
 
-: write-big-endian-64 ( word -- )
+: write-be64 ( word -- )
     dup byte7 write
     dup byte6 write
     dup byte5 write
@@ -44,22 +44,22 @@ USING: kernel math ;
     dup byte1 write
         byte0 write ;
 
-: write-little-endian-32 ( word -- )
+: write-le32 ( word -- )
     dup byte0 write
     dup byte1 write
     dup byte2 write
         byte3 write ;
 
-: write-big-endian-32 ( word -- )
+: write-be32 ( word -- )
     dup byte3 write
     dup byte2 write
     dup byte1 write
         byte0 write ;
 
-: write-little-endian-16 ( char -- )
+: write-le16 ( char -- )
     dup byte0 write
         byte1 write ;
 
-: write-big-endian-16 ( char -- )
+: write-be16 ( char -- )
     dup byte1 write
         byte0 write ;

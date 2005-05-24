@@ -412,6 +412,34 @@ s48_long_long_to_bignum(s64 n)
   }
 }
 
+bignum_type
+s48_ulong_long_to_bignum(u64 n)
+{
+  bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG_LONG];
+  bignum_digit_type * end_digits = result_digits;
+  /* Special cases win when these small constants are cached. */
+  if (n == 0) return (BIGNUM_ZERO ());
+  if (n == 1) return (BIGNUM_ONE (0));
+  {
+    u64 accumulator = n;
+    do
+      {
+	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);
+	accumulator >>= BIGNUM_DIGIT_LENGTH;
+      }
+    while (accumulator != 0);
+  }
+  {
+    bignum_type result =
+      (bignum_allocate ((end_digits - result_digits), 0));
+    bignum_digit_type * scan_digits = result_digits;
+    bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));
+    while (scan_digits < end_digits)
+      (*scan_result++) = (*scan_digits++);
+    return (result);
+  }
+}
+
 long
 s48_bignum_to_long(bignum_type bignum)
 {

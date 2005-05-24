@@ -20,6 +20,8 @@ void* primitives[] = {
 	primitive_from_fraction,
 	primitive_str_to_float,
 	primitive_float_to_str,
+	primitive_float_bits,
+	primitive_double_bits,
 	primitive_from_rect,
 	primitive_fixnum_add,
 	primitive_fixnum_subtract,
