@@ -9,7 +9,6 @@
 - single-stepper and variable access: wrong namespace?
 - investigate if COPYING_GEN needs a fix
 - faster layout
-- add a socket timeout
 - keep alive
 - sleep word
 - redo new compiler backend for PowerPC

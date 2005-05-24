@@ -103,10 +103,3 @@ C: client-stream ( fd host port -- stream )
 : accept ( server -- client )
     #! Wait for a client connection.
     dup wait-to-accept port-handle do-accept <client-stream> ;
-
-: set-timeout ( timeout client -- )
-    swap 0 make-timeval 2dup
-    >r duplex-stream-out port-handle SOL_SOCKET SO_SNDTIMEO r>
-    timeout-opt
-    >r duplex-stream-in port-handle SOL_SOCKET SO_RCVTIMEO r>
-    timeout-opt ;

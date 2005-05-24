@@ -36,6 +36,9 @@ http://www.jroller.com/page/slava/20050518.
 
 HTTP server now supports virtual hosting.
 
+You can now set timeouts for I/O operations with the set-timeout generic
+word. The HTTP server sets a timeout of 60 seconds for client requests.
+
 Factor 0.74:
 ------------
 

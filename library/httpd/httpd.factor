@@ -52,7 +52,7 @@ stdio streams strings threads http sequences ;
 : httpd-client ( socket -- )
     [
         dup log-client [
-            1 stdio get set-timeout
+            60000 stdio get set-timeout
             read-line [ parse-request ] when*
         ] with-stream
     ] try ;
