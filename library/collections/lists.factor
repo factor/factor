@@ -125,7 +125,7 @@ M: general-list tail ( n list -- tail )
     #! Return the rest of the list, from the nth index onward.
     swap [ cdr ] times ;
 
-M: cons nth ( n list -- element )
+M: general-list nth ( n list -- element )
     over 0 = [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
 
 : intersection ( list list -- list )

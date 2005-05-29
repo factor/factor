@@ -89,4 +89,8 @@ GENERIC: abs ( z -- |z| )
 
 : log2 ( n -- b )
     #! Log base two for integers.
-    dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte ;
+    dup 0 < [
+        "Input must be positive" throw
+    ] [
+        dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte
+    ] ifte ;

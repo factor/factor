@@ -12,9 +12,12 @@ vectors ;
 : v* ( v v -- v ) [ * ] 2map ;
 : v** ( v v -- v ) [ conjugate * ] 2map ;
 
+: sum ( v -- n ) 0 swap [ + ] each ;
+: product 1 swap [ * ] each ;
+
 ! Later, this will fixed when 2each works properly
 ! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
-: v. ( v v -- x ) v** 0 swap [ + ] each ;
+: v. ( v v -- x ) v** sum ;
 
 : cross-trace ( v1 v2 i1 i2 -- v1 v2 n )
     pick nth >r pick nth r> * ;
@@ -53,11 +56,11 @@ M: matrix clone ( matrix -- matrix )
 : <zero-matrix> ( rows cols -- matrix )
     2dup * zero-vector <matrix> ;
 
-: <row-vector> ( vector -- matrix )
+: <row-matrix> ( vector -- matrix )
     #! Turn a vector into a matrix of one row.
     [ 1 swap length ] keep <matrix> ;
 
-: <col-vector> ( vector -- matrix )
+: <col-matrix> ( vector -- matrix )
     #! Turn a vector into a matrix of one column.
     [ length 1 ] keep <matrix> ;
 
@@ -79,15 +82,30 @@ M: matrix clone ( matrix -- matrix )
 TUPLE: row index matrix ;
 : >row< dup row-index swap row-matrix ;
 M: row length row-matrix matrix-cols ;
-M: row nth ( n row -- ) >row< swapd matrix-get ;
+M: row nth ( n row -- n ) >row< swapd matrix-get ;
 M: row thaw >vector ;
 
 ! Sequence of elements in a column of a matrix.
 TUPLE: col index matrix ;
 : >col< dup col-index swap col-matrix ;
 M: col length col-matrix matrix-rows ;
-M: col nth ( n column -- ) >col< matrix-get ;
+M: col nth ( n column -- n ) >col< matrix-get ;
 M: col thaw >vector ;
+
+! Sequence of elements on a diagonal. Positive indices are above
+! and negative indices are below the main diagonal. Only for
+! square matrices.
+TUPLE: diagonal index matrix ;
+: >diagonal< dup diagonal-index swap diagonal-matrix ;
+M: diagonal length ( daig -- n )
+    >diagonal< matrix-rows swap abs - ;
+M: diagonal nth ( n diag -- n )
+    >diagonal< >r [ neg 0 max over + ] keep 0 max rot + r>
+    matrix-get ;
+
+: trace ( matrix -- tr )
+    #! Product of diagonal elements.
+    0 swap <diagonal> product ;
 
 : +check ( matrix matrix -- )
     #! Check if the two matrices have dimensions compatible
@@ -131,11 +149,11 @@ M: col thaw >vector ;
 
 : m.v ( m v -- v )
     #! Multiply a matrix by a column vector.
-    <col-vector> m. matrix-sequence ;
+    <col-matrix> m. matrix-sequence ;
 
 : v.m ( v m -- v )
     #! Multiply a row vector by a matrix.
-    >r <row-vector> r> m. matrix-sequence ;
+    >r <row-matrix> r> m. matrix-sequence ;
 
 : row-list ( matrix -- list )
     #! A list of lists, where each sublist is a row of the

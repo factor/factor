@@ -51,6 +51,10 @@ DEFER: <range>
 DEFER: append ! remove this when sort is moved from lists to sequences
 DEFER: subseq
 
+: first 0 swap nth ; inline
+: second 1 swap nth ; inline
+: third 2 swap nth ; inline
+
 ! Some low-level code used by vectors and string buffers.
 IN: kernel-internals
 

@@ -4,12 +4,8 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
-GENERIC: v>operand
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
-
-: dest/src ( vop -- dest src )
-    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
 
 ! Not used on x86
 M: %prologue generate-node drop ;

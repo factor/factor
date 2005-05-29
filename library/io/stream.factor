@@ -24,7 +24,7 @@ GENERIC: stream-close      ( stream -- )
 GENERIC: set-timeout       ( timeout stream -- )
 
 : stream-read1 ( stream -- char/f )
-    1 swap stream-read dup empty? [ drop f ] [ 0 swap nth ] ifte ;
+    1 swap stream-read dup empty? [ drop f ] [ first ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;

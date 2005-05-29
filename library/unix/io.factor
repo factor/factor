@@ -356,9 +356,7 @@ M: write-task io-task-events ( task -- events )
     ] ifte* ;
 
 M: writer stream-flush ( stream -- )
-    [
-        swap <write-task> add-write-io-task stop
-    ] callcc0 drop ;
+    [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
 M: writer stream-auto-flush ( stream -- ) drop ;
 

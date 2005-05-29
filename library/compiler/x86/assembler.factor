@@ -100,10 +100,10 @@ PREDICATE: cons displaced
         drop f
     ] ifte ;
 
-M: displaced modifier cdr car byte? BIN: 01 BIN: 10 ? ;
+M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
 M: displaced displacement
-    cdr car dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+    second dup byte? [ compile-byte ] [ compile-cell ] ifte ;
 
 ( Displacement-only operands -- eg, [ 1234 ]                   )
 PREDICATE: cons disp-only
@@ -155,11 +155,6 @@ UNION: operand register indirect displaced disp-only ;
 : from ( addr -- addr )
     #! Relative to after next 32-bit immediate.
     compiled-offset - 4 - ;
-
-: patch ( addr where -- )
-    #! Encode a relative offset to addr from where at where.
-    #! Add 4 because addr is relative to *after* insn.
-    dup >r 4 + - r> set-compiled-cell ;
 
 ( Moving stuff                                                 )
 GENERIC: PUSH ( op -- )

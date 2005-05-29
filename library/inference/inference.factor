@@ -52,7 +52,7 @@ SYMBOL: d-in
     over car ensure-d
     -rot 2dup car length 0 rot node-inputs
     2slip
-    cdr car length 0 rot node-outputs ; inline
+    second length 0 rot node-outputs ; inline
 
 : (present-effect) ( vector -- list )
     >list [ value-class ] map ;

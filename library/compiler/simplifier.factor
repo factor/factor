@@ -44,7 +44,7 @@ M: %label simplify-node ( linear vop -- linear ? )
     #! If the following op has given class, remove it and
     #! return it.
     over cdr dup [
-        car class = [ cdr car t ] [ f ] ifte
+        car class = [ second t ] [ f ] ifte
     ] [
         3drop f f
     ] ifte ;
@@ -112,7 +112,7 @@ M: %indirect simplify-node ( linear vop -- linear ? )
 : dead-peek? ( linear vop -- ? )
     #! Is the %replace-d followed by a %peek-d of the same
     #! stack slot and vreg?
-    swap cdr car dup %peek-d? [
+    swap second dup %peek-d? [
         over vop-in-2 over vop-out-1 = >r
         swap vop-in-1 swap vop-in-1 = r> and
     ] [

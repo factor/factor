@@ -26,6 +26,10 @@ USING: compiler errors kernel math memory words ;
 : i-form ( li aa lk -- n )
     >r 1 shift bitor r> bitor ;
 
+: m-form ( s a b mb me -- n )
+    >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
+    r> bitor r> bitor r> bitor r> bitor r> bitor ;
+
 : x-form ( s a b xo rc -- n )
     >r 1 shift >r 11 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor ;
@@ -104,6 +108,20 @@ USING: compiler errors kernel math memory words ;
 : ORC 0 (ORC) ;
 : ORC. 1 (ORC) ;
 
+: (SLW) 24 swap x-form 31 insn ;
+: SLW 0 (SLW) ;
+: SLW. 1 (SLW) ;
+
+: (SRAW) 792 swap x-form 31 insn ;
+: SRAW 0 (SRAW) ;
+: SRAW. 1 (SRAW) ;
+
+: (SRW) 536 swap x-form 31 insn ;
+: SRW 0 (SRW) ;
+: SRW. 1 (SRW) ;
+
+: SRAWI 824 0 x-form 31 insn ;
+
 : XORI d-form 26 insn ;
 : XORIS d-form 27 insn ;
 
@@ -111,7 +129,9 @@ USING: compiler errors kernel math memory words ;
 : XOR 0 (XOR) ;
 : XOR. 1 (XOR) ;
 
-: SRAWI 824 0 x-form 31 insn ;
+: (RLWINM) m-form 21 insn ;
+: RLWINM 0 (RLWINM) ;
+: RLWINM. 1 (RLWINM) ;
 
 : LWZ d-form 32 insn ;
 : STW d-form 36 insn ;
@@ -119,7 +139,7 @@ USING: compiler errors kernel math memory words ;
 
 G: (B) ( dest aa lk -- ) [ pick ] [ type ] ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) relative-24 ;
+M: word (B) 0 swap (B) relative-24 ;
 
 : B 0 0 (B) ; : BA 1 0 (B) ; : BL 0 1 (B) ; : BLA 1 1 (B) ;
 

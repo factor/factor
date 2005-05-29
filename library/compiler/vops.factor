@@ -23,9 +23,9 @@ TUPLE: vreg n ;
 
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
-: vop-in-1 ( vop -- input ) vop-inputs car ;
-: vop-in-2 ( vop -- input ) vop-inputs cdr car ;
-: vop-in-3 ( vop -- input ) vop-inputs cdr cdr car ;
+: vop-in-1 ( vop -- input ) vop-inputs first ;
+: vop-in-2 ( vop -- input ) vop-inputs second ;
+: vop-in-3 ( vop -- input ) vop-inputs third ;
 : vop-out-1 ( vop -- output ) vop-outputs car ;
 
 GENERIC: basic-block? ( vop -- ? )

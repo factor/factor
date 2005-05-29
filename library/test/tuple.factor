@@ -72,3 +72,7 @@ M: circle area circle-radius sq pi * ;
 [ 200 ] [ << rect f 0 0 10 20 >> area ] unit-test
 
 [ ] [ "IN: temporary  SYMBOL: #x  TUPLE: #x ;" eval ] unit-test
+
+! Hashcode breakage
+TUPLE: empty ;
+[ t ] [ <empty> hashcode fixnum? ] unit-test

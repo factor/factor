@@ -69,7 +69,7 @@ M: word prettyprint* ( indent word -- indent )
     #! Is the head of the list a [ foo ] car?
     dup car dup cons? [
         dup car word? [
-            cdr [ drop f ] [ cdr car \ car = ] ifte
+            cdr [ drop f ] [ second \ car = ] ifte
         ] [
             2drop f
         ] ifte

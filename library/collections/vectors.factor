@@ -19,8 +19,4 @@ M: vector set-nth ( obj n vec -- )
     growable-check 2dup ensure underlying set-array-nth ;
 
 M: vector hashcode ( vec -- n )
-    dup length 0 number= [
-        drop 0
-    ] [
-        0 swap nth hashcode
-    ] ifte ;
+    dup length 0 number= [ drop 0 ] [ first hashcode ] ifte ;

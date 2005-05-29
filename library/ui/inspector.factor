@@ -31,7 +31,7 @@ lists namespaces sequences strings unparser vectors words ;
 
 : object>alist ( obj -- assoc )
     dup class "slots" word-prop [
-        cdr car [ execute ] keep swons
+        second [ execute ] keep swons
     ] map-with ;
 
 : slot-sheet ( obj -- sheet )

@@ -202,7 +202,7 @@ M: tuple hashcode ( vec -- n )
     dup length 2 number= [
         drop 0
     ] [
-        2 swap nth hashcode
+        2 swap array-nth hashcode
     ] ifte ;
 
 M: tuple = ( obj tuple -- ? )

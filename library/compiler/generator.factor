@@ -56,3 +56,8 @@ M: %target-label generate-node vop-label compile-target ;
 
 M: %target generate-node
     vop-label dup postpone-word  compile-target ;
+
+GENERIC: v>operand
+
+: dest/src ( vop -- dest src )
+    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
