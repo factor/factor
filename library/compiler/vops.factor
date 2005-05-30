@@ -257,9 +257,10 @@ VOP: %untag-fixnum
 M: %untag-fixnum basic-block? drop t ;
 
 : check-dest ( vop reg -- )
-    swap vop-out-1 = [
-        "invalid VOP destination" throw
-    ] unless ;
+    swap vop-out-1 = [ "bad VOP destination" throw ] unless ;
+
+: check-src ( vop reg -- )
+    swap vop-out-1 = [ "bad VOP source" throw ] unless ;
 
 VOP: %getenv
 : %getenv swap src/dest-vop <%getenv> ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: assembler compiler inference kernel kernel-internals
-lists math memory words ;
+lists math memory namespaces words ;
 
 ! PowerPC register assignments
 ! r14 data stack
@@ -79,8 +79,13 @@ M: %untag generate-node ( vop -- )
 M: %untag-fixnum generate-node ( vop -- )
     dest/src tag-bits SRAWI ;
 
+M: %tag-fixnum generate-node ( vop -- )
+    ! todo: formalize scratch register usage
+    3 19 LI
+    dest/src 19 SLW ;
+
 M: %dispatch generate-node ( vop -- )
-    drop
+    0 <vreg> check-src
     2 18 LI
     17 17 18 SLW
     ! The value 24 is a magic number. It is the length of the
@@ -90,3 +95,20 @@ M: %dispatch generate-node ( vop -- )
     17 17 0 LWZ
     17 MTLR
     BLR ;
+
+M: %arithmetic-type generate-node ( vop -- )
+    0 <vreg> check-dest
+    <label> "end" set
+    ! Load top two stack values
+    17 14 -4 LWZ
+    18 14 0 LWZ
+    ! Compute their tags
+    17 17 tag-mask ANDI
+    18 18 tag-mask ANDI
+    ! Are the tags equal?
+    0 17 18 CMPL
+    "end" get BEQ
+    ! No, they are not equal. Call a runtime function to
+    ! coerce the integers to a higher type.
+    "arithmetic_type" f compile-c-call
+    "end" get save-xt ;

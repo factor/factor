@@ -47,3 +47,11 @@ VOPs:
 		on x86, in the cdecl ABI, the caller must pop input
 		parameters off the C stack. In stdcall, the callee does
 		it, so this node is not used in that case.
+		
+%untag		mask off the low 3 bits of vop-in-1, store result in
+		vop-in-1 (which should equal vop-out-1!)
+
+%untag-fixnum	shift vop-in-1 to the right by 3 bits, store result in
+		vop-in-1 (which should equal vop-out-1!)
+
+

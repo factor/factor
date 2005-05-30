@@ -102,8 +102,8 @@ M: %arithmetic-type generate-node ( vop -- )
     EAX [ ESI -4 ] MOV
     ECX [ ESI ] MOV
     ! Compute their tags
-    EAX BIN: 111 AND
-    ECX BIN: 111 AND
+    EAX tag-mask AND
+    ECX tag-mask AND
     ! Are the tags equal?
     EAX ECX CMP
     "end" get JE

@@ -129,6 +129,12 @@ USING: compiler errors kernel math memory words ;
 : XOR 0 (XOR) ;
 : XOR. 1 (XOR) ;
 
+: CMPI d-form 11 insn ;
+: CMPLI d-form 10 insn ;
+
+: CMP 0 0 x-form 31 insn ;
+: CMPL 32 0 x-form 31 insn ;
+
 : (RLWINM) m-form 21 insn ;
 : RLWINM 0 (RLWINM) ;
 : RLWINM. 1 (RLWINM) ;
@@ -166,7 +172,6 @@ M: word BC >r 0 BC r> relative-14 ;
 : MTSPR 5 shift 467 xfx-form 31 insn ;
 : MTLR 8 MTSPR ;
 : MTCTR 9 MTSPR ;
-: CMPI d-form 11 insn ;
 
 : LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;
 
