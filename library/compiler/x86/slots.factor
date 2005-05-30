@@ -5,8 +5,6 @@ USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 M: %slot generate-node ( vop -- )
-    #! the untagged object is in vop-out-1, the tagged slot
-    #! number is in vop-in-1.
     dest/src
     ! turn tagged fixnum slot # into an offset, multiple of 4
     dup 1 SHR
@@ -16,18 +14,10 @@ M: %slot generate-node ( vop -- )
     dup unit MOV ;
 
 M: %fast-slot generate-node ( vop -- )
-    #! the tagged object is in vop-out-1, the pointer offset is
-    #! in vop-in-1. the offset already takes the type tag
-    #! into account, so its just one instruction to load.
     dup vop-in-1 swap vop-out-1 v>operand tuck >r 2list r>
     swap MOV ;
 
-: card-bits
-    #! must be the same as CARD_BITS in native/cards.h.
-    7 ;
-
 : card-offset 1 getenv ;
-: card-mark HEX: 80 ;
 
 : write-barrier ( reg -- )
     #! Mark the card pointed to by vreg.
@@ -36,8 +26,6 @@ M: %fast-slot generate-node ( vop -- )
     0 rel-cards ;
 
 M: %set-slot generate-node ( vop -- )
-    #! the new value is vop-in-1, the object is vop-in-2, and
-    #! the slot number is vop-in-3.
     dup vop-in-3 v>operand over vop-in-2 v>operand
     ! turn tagged fixnum slot # into an offset, multiple of 4
     over 1 SHR
@@ -48,10 +36,6 @@ M: %set-slot generate-node ( vop -- )
     write-barrier ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    #! the new value is vop-in-1, the object is vop-in-2, and
-    #! the slot offset is vop-in-3.
-    #! the offset already takes the type tag into account, so
-    #! it's just one instruction to load.
     dup vop-in-3 over vop-in-2 v>operand
     [ swap 2list swap vop-in-1 v>operand MOV ] keep
     write-barrier ;

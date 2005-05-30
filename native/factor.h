@@ -36,18 +36,10 @@ CELL cs_bot;
 #endif
 
 /* TAGGED currently executing quotation */
-#if defined(FACTOR_PPC)
-	register CELL callframe asm("r16");
-#else
-	CELL callframe;
-#endif
+CELL callframe;
 
 /* TAGGED pointer to currently executing word */
-#if defined(FACTOR_PPC)
-	register CELL executing asm("r17");
-#else
-	CELL executing;
-#endif
+CELL executing;
 
 #include <errno.h>
 #include <fcntl.h>

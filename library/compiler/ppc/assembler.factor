@@ -133,9 +133,14 @@ USING: compiler errors kernel math memory words ;
 : RLWINM 0 (RLWINM) ;
 : RLWINM. 1 (RLWINM) ;
 
-: LWZ d-form 32 insn ;
-: STW d-form 36 insn ;
-: STWU d-form 37 insn ;
+: LBZ d-form 34 insn ;  : LBZU d-form 35 insn ;
+: LHA d-form 42 insn ;  : LHAU d-form 43 insn ;
+: LHZ d-form 40 insn ;  : LHZU d-form 41 insn ;
+: LWZ d-form 32 insn ;  : LWZU d-form 33 insn ;
+
+: STB d-form 38 insn ;  : STBU d-form 39 insn ;
+: STH d-form 44 insn ;  : STHU d-form 45 insn ;
+: STW d-form 36 insn ;  : STWU d-form 37 insn ;
 
 G: (B) ( dest aa lk -- ) [ pick ] [ type ] ;
 M: integer (B) i-form 18 insn ;

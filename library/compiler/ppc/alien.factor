@@ -4,6 +4,8 @@ IN: assembler
 USING: alien compiler compiler-backend inference kernel
 kernel-internals lists math memory namespaces words ;
 
+: compile-call-far ( addr -- ) 19 LOAD32  19 MTLR  BLRL ;
+
 M: %alien-invoke generate-node ( vop -- )
     uncons load-library 2dup 1 rel-dlsym dlsym compile-call-far ;
 

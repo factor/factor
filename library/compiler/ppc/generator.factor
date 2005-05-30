@@ -7,17 +7,12 @@ lists math memory words ;
 ! PowerPC register assignments
 ! r14 data stack
 ! r15 call stack
-! r16 callframe
-! r17 executing
-! r18-r30 vregs
+! r16-r30 vregs
 
 M: integer v>operand tag-bits shift ;
-M: vreg v>operand vreg-n 18 + ;
+M: vreg v>operand vreg-n 17 + ;
 
 M: %prologue generate-node ( vop -- )
-    #! At the start of each word that calls a subroutine, we
-    #! store the link register in r0, then push r0 on the C
-    #! stack.
     drop
     1 1 -16 STWU
     0 MFLR
@@ -83,9 +78,6 @@ M: %untag generate-node ( vop -- )
     dest/src 0 0 28 RLWINM ;
 
 M: %dispatch generate-node ( vop -- )
-    ! Compile a piece of code that jumps to an offset in a
-    ! jump table indexed by the fixnum at the top of the stack.
-    ! The jump table must immediately follow this macro.
     drop
    ! POP-DS
     18 18 1 SRAWI

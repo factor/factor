@@ -5,8 +5,6 @@ USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
 M: %slot generate-node ( vop -- )
-    #! the untagged object is in vop-out-1, the tagged slot
-    #! number is in vop-in-1.
     dest/src
     ! turn tagged fixnum slot # into an offset, multiple of 4
     dup dup 1 SRAWI
@@ -16,10 +14,28 @@ M: %slot generate-node ( vop -- )
     dup 0 LWZ ;
 
 M: %fast-slot generate-node ( vop -- )
-    #! the tagged object is in vop-out-1, the pointer offset is
-    #! in vop-in-1. the offset already takes the type tag
-    #! into account, so its just one instruction to load.
     dup vop-out-1 v>operand dup rot vop-in-1 LWZ ;
+
+: write-barrier ( reg -- )
+    #! Mark the card pointed to by vreg.
+    dup dup card-bits SRAWI
+    dup dup 16 ADD
+    20 over 0 LBZ
+    20 20 card-mark ORI
+    20 swap 0 STB ;
+
+M: %set-slot generate-node ( vop -- )
+    dup vop-in-3 v>operand over vop-in-2 v>operand
+    ! turn tagged fixnum slot # into an offset, multiple of 4
+    over dup 1 SRAWI
+    ! compute slot address in vop-in-2
+    over dup pick ADD
+    ! store new slot value
+    >r >r vop-in-1 v>operand r> 0 STW r> write-barrier ;
+
+M: %fast-set-slot generate-node ( vop -- )
+    dup vop-in-1 v>operand over vop-in-2 v>operand
+    [ rot vop-in-3 STW ] keep write-barrier ;
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a virtual register.

@@ -75,7 +75,4 @@ M: %box-double generate-node
     ESP 8 ADD ;
 
 M: %cleanup generate-node
-    #! In the cdecl ABI, the caller must pop input parameters
-    #! off the C stack. In stdcall, the callee does it, so
-    #! this node is not used in that case.
     vop-in-1 dup 0 = [ drop ] [ ESP swap ADD ] ifte ;

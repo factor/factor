@@ -61,3 +61,7 @@ GENERIC: v>operand
 
 : dest/src ( vop -- dest src )
     dup vop-out-1 v>operand swap vop-in-1 v>operand ;
+
+! These constants must match native/card.h
+: card-bits 7 ;
+: card-mark HEX: 80 ;
