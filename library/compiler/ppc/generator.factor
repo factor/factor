@@ -74,17 +74,19 @@ M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
 
 M: %untag generate-node ( vop -- )
-    ! todo: formalize scratch registers
     dest/src 0 0 28 RLWINM ;
+
+M: %untag-fixnum generate-node ( vop -- )
+    dest/src tag-bits SRAWI ;
 
 M: %dispatch generate-node ( vop -- )
     drop
-   ! POP-DS
-    18 18 1 SRAWI
+    2 18 LI
+    17 17 18 SLW
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    0 1 rel-address  compiled-offset 24 + 19 LOAD32
-    18 18 19 ADD
-    18 18 0 LWZ
-    18 MTLR
+    0 1 rel-address  compiled-offset 24 + 18 LOAD32
+    17 17 18 ADD
+    17 17 0 LWZ
+    17 MTLR
     BLR ;
