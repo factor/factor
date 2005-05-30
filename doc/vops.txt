@@ -1,0 +1,49 @@
+VOPs:
+
+%prologue	on x86, this does nothing. On PowerPC, at the start of
+		each word that calls a subroutine, we store the link
+		register in r0, then push r0 on the C stack.
+
+%call-label	on PowerPC, uses near calling convention, where the
+		caller pushes the return address.
+
+%dispatch	compile a piece of code that jumps to an offset in a
+		jump table indexed by an integer. The jump table must immediately follow this VOP.
+
+%slot		the untagged object is in vop-out-1, the tagged slot
+		number is in vop-in-1.
+
+%fast-slot	the tagged object is in vop-out-1, the pointer offset is
+		in vop-in-1. the offset already takes the type tag into
+		account, so its just one instruction to load.
+
+%set-slot	the new value is vop-in-1, the object is vop-in-2, and
+		the slot number is vop-in-3.
+
+%fast-set-slot	the new value is vop-in-1, the object is vop-in-2, and
+		the slot offset is vop-in-3.
+		the offset already takes the type tag into account, so
+		it's just one instruction to load.
+
+%parameters	ignored on x86.
+
+%parameter	ignored on x86.
+
+%unbox		an unboxer function takes a value from the data stack
+		and converts it into a C value.
+		
+%box		a boxer function takes a C value as a parameter and
+		converts into a Factor value, and pushes it on the data
+		stack.
+
+		on x86, C functions return integers in EAX.
+
+%box-float	on x86, C functions return floats on the FP stack.
+
+%box-double	on x86, C functions return doubles on the FP stack.
+
+%cleanup	ignored on PowerPC.
+
+		on x86, in the cdecl ABI, the caller must pop input
+		parameters off the C stack. In stdcall, the callee does
+		it, so this node is not used in that case.
