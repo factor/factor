@@ -1,13 +1,16 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: assembler compiler inference kernel kernel-internals
-lists math memory namespaces words ;
+USING: alien assembler compiler inference kernel
+kernel-internals lists math memory namespaces words ;
 
 ! PowerPC register assignments
 ! r14 data stack
 ! r15 call stack
 ! r16-r30 vregs
+
+: compile-c-call ( symbol dll -- )
+    2dup 1 1 rel-dlsym dlsym  19 LOAD32  19 MTLR  BLRL ;
 
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n 17 + ;
@@ -95,6 +98,30 @@ M: %dispatch generate-node ( vop -- )
     17 17 0 LWZ
     17 MTLR
     BLR ;
+
+M: %type generate-node ( vop -- )
+    0 <vreg> check-src
+    <label> "f" set
+    <label> "end" set
+    ! Get the tag
+    17 18 tag-mask ANDI
+    ! Compare with object tag number (3).
+    0 18 object-tag CMPI
+    ! Jump if the object doesn't store type info in its header
+    "end" get BNE
+    ! It does store type info in its header
+    ! Is the pointer itself equal to 3? Then its F_TYPE (9).
+    0 17 object-tag CMPI
+    "f" get BEQ
+    ! The pointer is not equal to 3. Load the object header.
+    18 17 object-tag neg LWZ
+    18 18 3 SRAWI
+    "end" get B
+    "f" get save-xt
+    ! The pointer is equal to 3. Load F_TYPE (9).
+    f type 18 LI
+    "end" get save-xt
+    18 17 MR ;
 
 M: %arithmetic-type generate-node ( vop -- )
     0 <vreg> check-dest

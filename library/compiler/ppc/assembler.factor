@@ -108,6 +108,9 @@ USING: compiler errors kernel math memory words ;
 : ORC 0 (ORC) ;
 : ORC. 1 (ORC) ;
 
+: MR over OR ;
+: MR. over OR. ;
+
 : (SLW) 24 swap x-form 31 insn ;
 : SLW 0 (SLW) ;
 : SLW. 1 (SLW) ;

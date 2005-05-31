@@ -54,4 +54,5 @@ VOPs:
 %untag-fixnum	shift vop-in-1 to the right by 3 bits, store result in
 		vop-in-1 (which should equal vop-out-1!)
 
-
+%type		Intrinstic version of type primitive. It outputs an
+		unboxed value in vop-out-1.
