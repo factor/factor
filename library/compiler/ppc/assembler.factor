@@ -30,8 +30,8 @@ USING: compiler errors kernel math memory words ;
     >r 1 shift >r 6 shift >r 11 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor r> bitor ;
 
-: x-form ( s a b xo rc -- n )
-    >r 1 shift >r 11 shift >r 16 shift >r 21 shift
+: x-form ( a s b xo rc -- n )
+    >r 1 shift >r 11 shift >r swap 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor ;
 
 : xfx-form ( d spr xo -- n )
@@ -69,7 +69,7 @@ USING: compiler errors kernel math memory words ;
 : ANDI d-form 28 insn ;
 : ANDIS d-form 29 insn ;
 
-: (AND) 31 swap x-form 31 insn ;
+: (AND) 28 swap x-form 31 insn ;
 : AND 0 (AND) ;
 : AND. 0 (AND) ;
 
@@ -96,6 +96,9 @@ USING: compiler errors kernel math memory words ;
 : (NOR) 124 swap x-form 31 insn ;
 : NOR 0 (NOR) ;
 : NOR. 1 (NOR) ;
+
+: NOT over NOR ;
+: NOT. over NOR. ;
 
 : ORI d-form 24 insn ;
 : ORIS d-form 25 insn ;
@@ -124,6 +127,24 @@ USING: compiler errors kernel math memory words ;
 : SRW. 1 (SRW) ;
 
 : SRAWI 824 0 x-form 31 insn ;
+
+: (SUBF) 40 swap xo-form 31 insn ;
+: SUBF 0 0 (SUBF) ;
+: SUBF. 0 1 (SUBF) ;
+: SUBFO 1 0 (SUBF) ;
+: SUBFO. 1 1 (SUBF) ;
+
+: (SUBFC) 8 swap xo-form 31 insn ;
+: SUBFC 0 0 (SUBFC) ;
+: SUBFC. 0 1 (SUBFC) ;
+: SUBFCO 1 0 (SUBFC) ;
+: SUBFCO. 1 1 (SUBFC) ;
+
+: (SUBFE) 136 swap xo-form 31 insn ;
+: SUBFE 0 0 (SUBFE) ;
+: SUBFE. 0 1 (SUBFE) ;
+: SUBFEO 1 0 (SUBFE) ;
+: SUBFEO. 1 1 (SUBFE) ;
 
 : XORI d-form 26 insn ;
 : XORIS d-form 27 insn ;
@@ -161,7 +182,10 @@ GENERIC: BC
 M: integer BC 0 0 b-form 16 insn ;
 M: word BC >r 0 BC r> relative-14 ;
 
+: BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
+: BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;
 : BEQ 12 2 rot BC ;  : BNE 4 2 rot BC ;
+: BO  12 3 rot BC ;  : BNO 4 3 rot BC ;
 
 : BCLR 0 8 0 0 b-form 19 insn ;
 : BLR 20 BCLR ;

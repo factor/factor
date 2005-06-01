@@ -76,8 +76,10 @@ M: %return-to generate-node ( vop -- )
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
 
+: untag ( dest src -- ) 0 0 28 RLWINM ;
+
 M: %untag generate-node ( vop -- )
-    dest/src 0 0 28 RLWINM ;
+    dest/src untag ;
 
 M: %untag-fixnum generate-node ( vop -- )
     dest/src tag-bits SRAWI ;

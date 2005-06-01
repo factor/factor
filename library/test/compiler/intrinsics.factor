@@ -51,31 +51,6 @@ math-internals test words ;
 [ 11 ] [ 12 [ 7 fixnum-bitxor ] compile-1 ] unit-test
 [ 11 ] [ [ 12 7 fixnum-bitxor ] compile-1 ] unit-test
 
-[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
-[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
-
-[ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
-[ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
-[ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
-
-[ 8 ] [ 1 3 [ fixnum-shift ] compile-1 ] unit-test
-[ 8 ] [ 1 [ 3 fixnum-shift ] compile-1 ] unit-test
-[ 8 ] [ [ 1 3 fixnum-shift ] compile-1 ] unit-test
-[ -8 ] [ -1 3 [ fixnum-shift ] compile-1 ] unit-test
-[ -8 ] [ -1 [ 3 fixnum-shift ] compile-1 ] unit-test
-[ -8 ] [ [ -1 3 fixnum-shift ] compile-1 ] unit-test
-
-[ 2 ] [ 8 -2 [ fixnum-shift ] compile-1 ] unit-test
-[ 2 ] [ 8 [ -2 fixnum-shift ] compile-1 ] unit-test
-
-[ 0 ] [ [ 123 -64 fixnum-shift ] compile-1 ] unit-test
-[ 0 ] [ 123 -64 [ fixnum-shift ] compile-1 ] unit-test
-[ -1 ] [ [ -123 -64 fixnum-shift ] compile-1 ] unit-test
-[ -1 ] [ -123 -64 [ fixnum-shift ] compile-1 ] unit-test
-
 [ f ] [ 12 7 [ fixnum< ] compile-1 ] unit-test
 [ f ] [ 12 [ 7 fixnum< ] compile-1 ] unit-test
 [ f ] [ [ 12 7 fixnum< ] compile-1 ] unit-test
@@ -121,6 +96,31 @@ math-internals test words ;
 
 [ -1 ] [ 0 [ fixnum-bitnot ] compile-1 ] unit-test
 [ -1 ] [ [ 0 fixnum-bitnot ] compile-1 ] unit-test
+
+[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
+[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
+
+[ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
+[ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
+[ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
+
+[ 8 ] [ 1 3 [ fixnum-shift ] compile-1 ] unit-test
+[ 8 ] [ 1 [ 3 fixnum-shift ] compile-1 ] unit-test
+[ 8 ] [ [ 1 3 fixnum-shift ] compile-1 ] unit-test
+[ -8 ] [ -1 3 [ fixnum-shift ] compile-1 ] unit-test
+[ -8 ] [ -1 [ 3 fixnum-shift ] compile-1 ] unit-test
+[ -8 ] [ [ -1 3 fixnum-shift ] compile-1 ] unit-test
+
+[ 2 ] [ 8 -2 [ fixnum-shift ] compile-1 ] unit-test
+[ 2 ] [ 8 [ -2 fixnum-shift ] compile-1 ] unit-test
+
+[ 0 ] [ [ 123 -64 fixnum-shift ] compile-1 ] unit-test
+[ 0 ] [ 123 -64 [ fixnum-shift ] compile-1 ] unit-test
+[ -1 ] [ [ -123 -64 fixnum-shift ] compile-1 ] unit-test
+[ -1 ] [ -123 -64 [ fixnum-shift ] compile-1 ] unit-test
 
 [ 3 ] [ 13 10 [ fixnum-mod ] compile-1 ] unit-test
 [ 3 ] [ 13 [ 10 fixnum-mod ] compile-1 ] unit-test

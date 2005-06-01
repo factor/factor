@@ -9,9 +9,11 @@ USING: assembler compiler errors kernel math memory words ;
 M: %immediate generate-node ( vop -- )
     dup vop-in-1 address swap vop-out-1 v>operand LOAD32 ;
 
+: load-indirect ( dest literal -- )
+    intern-literal over LOAD dup 0 LWZ ;
+
 M: %indirect generate-node ( vop -- )
-    dup vop-out-1 v>operand swap vop-in-1 intern-literal
-    over LOAD dup 0 LWZ ;
+    dup vop-out-1 v>operand swap vop-in-1 load-indirect ;
 
 M: %peek-d generate-node ( vop -- )
     dup vop-out-1 v>operand swap vop-in-1 ds-op LWZ ;

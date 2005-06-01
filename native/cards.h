@@ -13,12 +13,7 @@ the offset of the first object is set by the allocator.
 #define CARD_BASE_MASK 0x7f
 typedef u8 CARD;
 
-#ifdef FACTOR_PPC
-	register CARD *cards asm("r16");
-#else
-	CARD *cards;
-#endif
-
+CARD *cards;
 CARD *cards_end;
 
 /* A card is 16 bytes (128 bits), 5 address bits per card.
@@ -48,7 +43,11 @@ INLINE u8 card_base(CARD c)
 	return c & CARD_BASE_MASK;
 }
 
-CELL cards_offset;
+#ifdef FACTOR_PPC
+	register CELL cards_offset asm("r16");
+#else
+	CELL cards_offset;
+#endif
 
 #define ADDR_TO_CARD(a) (CARD*)(((CELL)a >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)c - cards_offset)<<CARD_BITS)
