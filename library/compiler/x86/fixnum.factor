@@ -187,21 +187,12 @@ M: %fixnum>= generate-node ( vop -- )
 M: %eq? generate-node ( vop -- )
     fixnum-compare  \ JE  load-boolean ;
 
-: fixnum-branch ( vop -- label )
+: fixnum-jump ( vop -- label )
     dup vop-in-2 v>operand over vop-in-1 v>operand CMP
     vop-label ;
 
-M: %jump-fixnum< generate-node ( vop -- )
-    fixnum-branch JL ;
-
-M: %jump-fixnum<= generate-node ( vop -- )
-    fixnum-branch JLE ;
-
-M: %jump-fixnum> generate-node ( vop -- )
-    fixnum-branch JG ;
-
-M: %jump-fixnum>= generate-node ( vop -- )
-    fixnum-branch JGE ;
-
-M: %jump-eq? generate-node ( vop -- )
-    fixnum-branch JE ;
+M: %jump-fixnum<  generate-node ( vop -- ) fixnum-jump JL ;
+M: %jump-fixnum<= generate-node ( vop -- ) fixnum-jump JLE ;
+M: %jump-fixnum>  generate-node ( vop -- ) fixnum-jump JG ;
+M: %jump-fixnum>= generate-node ( vop -- ) fixnum-jump JGE ;
+M: %jump-eq?      generate-node ( vop -- ) fixnum-jump JE ;

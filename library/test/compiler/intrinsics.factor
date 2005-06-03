@@ -97,15 +97,41 @@ math-internals test words ;
 [ -1 ] [ 0 [ fixnum-bitnot ] compile-1 ] unit-test
 [ -1 ] [ [ 0 fixnum-bitnot ] compile-1 ] unit-test
 
-[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
-[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
+[ 3 ] [ 13 10 [ fixnum-mod ] compile-1 ] unit-test
+[ 3 ] [ 13 [ 10 fixnum-mod ] compile-1 ] unit-test
+[ 3 ] [ [ 13 10 fixnum-mod ] compile-1 ] unit-test
+[ -3 ] [ -13 10 [ fixnum-mod ] compile-1 ] unit-test
+[ -3 ] [ -13 [ 10 fixnum-mod ] compile-1 ] unit-test
+[ -3 ] [ [ -13 10 fixnum-mod ] compile-1 ] unit-test
 
-[ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
-[ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
-[ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-1 ] unit-test
-[ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
+[ 2 ] [ 4 2 [ fixnum/i ] compile-1 ] unit-test
+[ 2 ] [ 4 [ 2 fixnum/i ] compile-1 ] unit-test
+[ -2 ] [ 4 [ -2 fixnum/i ] compile-1 ] unit-test
+[ 3 1 ] [ 10 3 [ fixnum/mod ] compile-1 ] unit-test
+
+[ 4 ] [ 1 3 [ fixnum+ ] compile-1 ] unit-test
+[ 4 ] [ 1 [ 3 fixnum+ ] compile-1 ] unit-test
+[ 4 ] [ [ 1 3 fixnum+ ] compile-1 ] unit-test
+
+[ 6 ] [ 2 3 [ fixnum* ] compile-1 ] unit-test
+[ 6 ] [ 2 [ 3 fixnum* ] compile-1 ] unit-test
+[ 6 ] [ [ 2 3 fixnum* ] compile-1 ] unit-test
+[ -6 ] [ 2 -3 [ fixnum* ] compile-1 ] unit-test
+[ -6 ] [ 2 [ -3 fixnum* ] compile-1 ] unit-test
+[ -6 ] [ [ 2 -3 fixnum* ] compile-1 ] unit-test
+
+[ t ] [ 3 type 3 [ type ] compile-1 eq? ] unit-test
+[ t ] [ 3 >bignum type 3 >bignum [ type ] compile-1 eq? ] unit-test
+[ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
+[ t ] [ f type f [ type ] compile-1 eq? ] unit-test
+
+[ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
+[ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
+
+[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
 
 [ 8 ] [ 1 3 [ fixnum-shift ] compile-1 ] unit-test
 [ 8 ] [ 1 [ 3 fixnum-shift ] compile-1 ] unit-test
@@ -122,47 +148,21 @@ math-internals test words ;
 [ -1 ] [ [ -123 -64 fixnum-shift ] compile-1 ] unit-test
 [ -1 ] [ -123 -64 [ fixnum-shift ] compile-1 ] unit-test
 
-[ 3 ] [ 13 10 [ fixnum-mod ] compile-1 ] unit-test
-[ 3 ] [ 13 [ 10 fixnum-mod ] compile-1 ] unit-test
-[ 3 ] [ [ 13 10 fixnum-mod ] compile-1 ] unit-test
-[ -3 ] [ -13 10 [ fixnum-mod ] compile-1 ] unit-test
-[ -3 ] [ -13 [ 10 fixnum-mod ] compile-1 ] unit-test
-[ -3 ] [ [ -13 10 fixnum-mod ] compile-1 ] unit-test
+[ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
+[ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
 
-[ 4 ] [ 1 3 [ fixnum+ ] compile-1 ] unit-test
-[ 4 ] [ 1 [ 3 fixnum+ ] compile-1 ] unit-test
-[ 4 ] [ [ 1 3 fixnum+ ] compile-1 ] unit-test
+[ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
+[ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
+[ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-1 ] unit-test
+[ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
 
 [ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-1 1 28 fixnum-shift = ] unit-test
 [ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
-
-[ 6 ] [ 2 3 [ fixnum* ] compile-1 ] unit-test
-[ 6 ] [ 2 [ 3 fixnum* ] compile-1 ] unit-test
-[ 6 ] [ [ 2 3 fixnum* ] compile-1 ] unit-test
-[ -6 ] [ 2 -3 [ fixnum* ] compile-1 ] unit-test
-[ -6 ] [ 2 [ -3 fixnum* ] compile-1 ] unit-test
-[ -6 ] [ [ 2 -3 fixnum* ] compile-1 ] unit-test
 
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-1 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-1 1 40 shift neg = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-1 1 40 shift = ] unit-test
 
-[ 2 ] [ 4 2 [ fixnum/i ] compile-1 ] unit-test
-[ 2 ] [ 4 [ 2 fixnum/i ] compile-1 ] unit-test
-[ -2 ] [ 4 [ -2 fixnum/i ] compile-1 ] unit-test
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
-
-[ 3 1 ] [ 10 3 [ fixnum/mod ] compile-1 ] unit-test
-
-[ t ] [ 3 type 3 [ type ] compile-1 eq? ] unit-test
-[ t ] [ 3 >bignum type 3 >bignum [ type ] compile-1 eq? ] unit-test
-[ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
-[ t ] [ f type f [ type ] compile-1 eq? ] unit-test
-
-[ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
-[ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
-
-[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test

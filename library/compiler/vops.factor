@@ -26,7 +26,8 @@ TUPLE: vop inputs outputs label ;
 : vop-in-1 ( vop -- input ) vop-inputs first ;
 : vop-in-2 ( vop -- input ) vop-inputs second ;
 : vop-in-3 ( vop -- input ) vop-inputs third ;
-: vop-out-1 ( vop -- output ) vop-outputs car ;
+: vop-out-1 ( vop -- output ) vop-outputs first ;
+: vop-out-2 ( vop -- output ) vop-outputs second ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
@@ -50,10 +51,10 @@ M: vop calls-label? vop-label = ;
 : src-vop ( src) unit f f ;
 : dest-vop ( dest) unit dup f ;
 : src/dest-vop ( src dest) >r unit r> unit f ;
-: binary-vop ( src dest) [ 2list ] keep unit f ;
 : 2-in-vop ( in1 in2) 2list f f ;
 : 2-in/label-vop ( in1 in2 label) >r 2list f r> ;
-: ternary-vop ( in1 in2 dest) >r 2list r> unit f ;
+: 2-vop ( in dest) [ 2list ] keep unit f ;
+: 3-vop ( in1 in2 dest) >r 2list r> unit f ;
 
 ! miscellanea
 VOP: %prologue
@@ -153,7 +154,7 @@ VOP: %untag
 M: %untag basic-block? drop t ;
 
 VOP: %slot
-: %slot ( n vreg ) >r <vreg> r> <vreg> binary-vop <%slot> ;
+: %slot ( n vreg ) >r <vreg> r> <vreg> 2-vop <%slot> ;
 M: %slot basic-block? drop t ;
 
 VOP: %set-slot
@@ -167,7 +168,7 @@ M: %set-slot basic-block? drop t ;
 ! known at compile time, so these become a single instruction
 VOP: %fast-slot
 : %fast-slot ( vreg n )
-    swap <vreg> binary-vop <%fast-slot> ;
+    swap <vreg> 2-vop <%fast-slot> ;
 M: %fast-slot basic-block? drop t ;
 
 VOP: %fast-set-slot
@@ -178,22 +179,22 @@ VOP: %fast-set-slot
 M: %fast-set-slot basic-block? drop t ;
 
 ! fixnum intrinsics
-VOP: %fixnum+       : %fixnum+ binary-vop <%fixnum+> ;
-VOP: %fixnum-       : %fixnum- binary-vop <%fixnum-> ;
-VOP: %fixnum*       : %fixnum* binary-vop <%fixnum*> ;
-VOP: %fixnum-mod    : %fixnum-mod binary-vop <%fixnum-mod> ;
-VOP: %fixnum/i      : %fixnum/i binary-vop <%fixnum/i> ;
-VOP: %fixnum/mod    : %fixnum/mod binary-vop <%fixnum/mod> ;
-VOP: %fixnum-bitand : %fixnum-bitand binary-vop <%fixnum-bitand> ;
-VOP: %fixnum-bitor  : %fixnum-bitor binary-vop <%fixnum-bitor> ;
-VOP: %fixnum-bitxor : %fixnum-bitxor binary-vop <%fixnum-bitxor> ;
+VOP: %fixnum+       : %fixnum+ 3-vop <%fixnum+> ;
+VOP: %fixnum-       : %fixnum- 3-vop <%fixnum-> ;
+VOP: %fixnum*       : %fixnum* 3-vop <%fixnum*> ;
+VOP: %fixnum-mod    : %fixnum-mod 3-vop <%fixnum-mod> ;
+VOP: %fixnum/i      : %fixnum/i 3-vop <%fixnum/i> ;
+VOP: %fixnum/mod    : %fixnum/mod f <%fixnum/mod> ;
+VOP: %fixnum-bitand : %fixnum-bitand 3-vop <%fixnum-bitand> ;
+VOP: %fixnum-bitor  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
+VOP: %fixnum-bitxor : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
 VOP: %fixnum-bitnot : %fixnum-bitnot <vreg> dest-vop <%fixnum-bitnot> ;
 
-VOP: %fixnum<=      : %fixnum<= binary-vop <%fixnum<=> ;
-VOP: %fixnum<       : %fixnum< binary-vop <%fixnum<> ;
-VOP: %fixnum>=      : %fixnum>= binary-vop <%fixnum>=> ;
-VOP: %fixnum>       : %fixnum> binary-vop <%fixnum>> ;
-VOP: %eq?           : %eq? binary-vop <%eq?> ;
+VOP: %fixnum<=      : %fixnum<= 3-vop <%fixnum<=> ;
+VOP: %fixnum<       : %fixnum< 3-vop <%fixnum<> ;
+VOP: %fixnum>=      : %fixnum>= 3-vop <%fixnum>=> ;
+VOP: %fixnum>       : %fixnum> 3-vop <%fixnum>> ;
+VOP: %eq?           : %eq? 3-vop <%eq?> ;
 
 ! At the VOP level, the 'shift' operation is split into five
 ! distinct operations:
@@ -203,11 +204,11 @@ VOP: %eq?           : %eq? binary-vop <%eq?> ;
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a large negative count: %fixnum-sgn
-VOP: %fixnum<<   : %fixnum<<   binary-vop <%fixnum<<> ;
-VOP: %fixnum>>   : %fixnum>>   binary-vop <%fixnum>>> ;
+VOP: %fixnum<<   : %fixnum<<   3-vop <%fixnum<<> ;
+VOP: %fixnum>>   : %fixnum>>   3-vop <%fixnum>>> ;
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
-VOP: %fixnum-sgn : %fixnum-sgn binary-vop <%fixnum-sgn> ;
+VOP: %fixnum-sgn : %fixnum-sgn 3-vop <%fixnum-sgn> ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized

@@ -130,7 +130,7 @@ sequences words ;
 : binary-op-reg ( op out -- )
     >r in-2
     1 %dec-d ,
-    1 <vreg> 0 <vreg> rot execute ,
+    >r 1 <vreg> 0 <vreg> 0 <vreg> r> execute ,
     r> 0 %replace-d , ;
 
 : literal-fixnum? ( value -- ? )
@@ -141,7 +141,7 @@ sequences words ;
     >r >r node-peek dup literal-fixnum? [
         1 %dec-d ,
         in-1
-        literal-value 0 <vreg> r> execute ,
+        literal-value 0 <vreg> 0 <vreg> r> execute ,
         r> 0 %replace-d ,
     ] [
         drop
@@ -172,7 +172,7 @@ sequences words ;
         literal-value dup power-of-2? [
             1 %dec-d ,
             in-1
-            log2 0 <vreg> %fixnum<< ,
+            log2 0 <vreg> 0 <vreg> %fixnum<< ,
             0 0 %replace-d ,
         ] [
             drop slow-fixnum*
@@ -186,7 +186,11 @@ sequences words ;
     ! This is not clever. Because of x86, %fixnum-mod is
     ! hard-coded to put its output in vreg 2, which happends to
     ! be EDX there.
-    drop \ %fixnum-mod 2 binary-op-reg
+    drop
+    in-2
+    1 %dec-d ,
+    1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
+    2 0 %replace-d ,
 ] "intrinsic" set-word-prop
 
 \ fixnum/i t "intrinsic" set-word-prop
@@ -199,7 +203,9 @@ sequences words ;
     ! See the remark on fixnum-mod for vreg usage
     drop
     in-2
-    0 <vreg> 1 <vreg> %fixnum/mod ,
+    [ << vreg f 1 >> << vreg f 0 >> ]
+    [ << vreg f 2 >> << vreg f 0 >> ]
+    %fixnum/mod ,
     2 0 %replace-d ,
     0 1 %replace-d ,
 ] "intrinsic" set-word-prop
@@ -217,10 +223,10 @@ sequences words ;
     1 %dec-d ,
     in-1
     dup cell -8 * <= [
-        drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
+        drop 0 <vreg> 2 <vreg> 2 <vreg> %fixnum-sgn ,
         2 0 %replace-d ,
     ] [
-        neg 0 <vreg> %fixnum>> ,
+        neg 0 <vreg> 0 <vreg> %fixnum>> ,
         out-1
     ] ifte ;
 
@@ -228,7 +234,7 @@ sequences words ;
     dup cell 8 * tag-bits - <= [
         1 %dec-d ,
         in-1
-        0 <vreg> %fixnum<< ,
+        0 <vreg> 0 <vreg> %fixnum<< ,
         out-1
     ] [
         drop slow-shift

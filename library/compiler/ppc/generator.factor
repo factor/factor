@@ -84,10 +84,11 @@ M: %untag generate-node ( vop -- )
 M: %untag-fixnum generate-node ( vop -- )
     dest/src tag-bits SRAWI ;
 
+: tag-fixnum ( dest src -- ) 3 21 LI 21 SLW ;
+
 M: %tag-fixnum generate-node ( vop -- )
     ! todo: formalize scratch register usage
-    3 19 LI
-    dest/src 19 SLW ;
+    dest/src tag-fixnum ;
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
@@ -123,7 +124,7 @@ M: %type generate-node ( vop -- )
     ! The pointer is equal to 3. Load F_TYPE (9).
     f type 18 LI
     "end" get save-xt
-    18 17 MR ;
+    17 18 MR ;
 
 M: %arithmetic-type generate-node ( vop -- )
     0 <vreg> check-dest

@@ -31,6 +31,7 @@ USING: compiler errors kernel math memory words ;
     r> bitor r> bitor r> bitor r> bitor r> bitor ;
 
 : x-form ( a s b xo rc -- n )
+    swap
     >r 1 shift >r 11 shift >r swap 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor ;
 
@@ -38,6 +39,7 @@ USING: compiler errors kernel math memory words ;
     1 shift >r 11 shift >r 21 shift r> bitor r> bitor ;
 
 : xo-form ( d a b oe xo rc -- n )
+    swap
     >r 1 shift >r 10 shift >r 11 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor r> bitor ;
 
@@ -48,19 +50,19 @@ USING: compiler errors kernel math memory words ;
 
 : ADDIC. d-form 13 insn ; : SUBIC. neg ADDIC. ;
 
-: (ADD) 266 swap xo-form 31 insn ;
+: (ADD) 266 xo-form 31 insn ;
 : ADD 0 0 (ADD) ;
 : ADD. 0 1 (ADD) ;
 : ADDO 1 0 (ADD) ;
 : ADDO. 1 1 (ADD) ;
 
-: (ADDC) 10 swap xo-form 31 insn ;
+: (ADDC) 10 xo-form 31 insn ;
 : ADDC 0 0 (ADDC) ;
 : ADDC. 0 1 (ADDC) ;
 : ADDCO 1 0 (ADDC) ;
 : ADDCO. 1 1 (ADDC) ;
 
-: (ADDE) 138 swap xo-form 31 insn ;
+: (ADDE) 138 xo-form 31 insn ;
 : ADDE 0 0 (ADDE) ;
 : ADDE. 0 1 (ADDE) ;
 : ADDEO 1 0 (ADDE) ;
@@ -69,31 +71,31 @@ USING: compiler errors kernel math memory words ;
 : ANDI d-form 28 insn ;
 : ANDIS d-form 29 insn ;
 
-: (AND) 28 swap x-form 31 insn ;
+: (AND) 28 x-form 31 insn ;
 : AND 0 (AND) ;
 : AND. 0 (AND) ;
 
-: (DIVW) 491 swap xo-form 31 insn ;
+: (DIVW) 491 xo-form 31 insn ;
 : DIVW 0 0 (DIVW) ;
 : DIVW. 0 1 (DIVW) ;
 : DIVWO 1 0 (DIVW) ;
 : DIVWO 1 1 (DIVW) ;
 
-: (DIVWU) 459 swap xo-form 31 insn ;
+: (DIVWU) 459 xo-form 31 insn ;
 : DIVWU 0 0 (DIVWU) ;
 : DIVWU. 0 1 (DIVWU) ;
 : DIVWUO 1 0 (DIVWU) ;
 : DIVWUO. 1 1 (DIVWU) ;
 
-: (EQV) 284 swap x-form 31 insn ;
+: (EQV) 284 x-form 31 insn ;
 : EQV 0 (EQV) ;
 : EQV. 1 (EQV) ;
 
-: (NAND) 476 swap x-form 31 insn ;
+: (NAND) 476 x-form 31 insn ;
 : NAND 0 (NAND) ;
 : NAND. 1 (NAND) ;
 
-: (NOR) 124 swap x-form 31 insn ;
+: (NOR) 124 x-form 31 insn ;
 : NOR 0 (NOR) ;
 : NOR. 1 (NOR) ;
 
@@ -103,44 +105,60 @@ USING: compiler errors kernel math memory words ;
 : ORI d-form 24 insn ;
 : ORIS d-form 25 insn ;
 
-: (OR) 444 swap x-form 31 insn ;
+: (OR) 444 x-form 31 insn ;
 : OR 0 (OR) ;
 : OR. 1 (OR) ;
 
-: (ORC) 412 swap x-form 31 insn ;
+: (ORC) 412 x-form 31 insn ;
 : ORC 0 (ORC) ;
 : ORC. 1 (ORC) ;
 
-: MR over OR ;
-: MR. over OR. ;
+: MR dup OR ;
+: MR. dup OR. ;
 
-: (SLW) 24 swap x-form 31 insn ;
+: (MULHW) 75 xo-form 31 insn ;
+: MULHW 0 0 (MULHW) ;
+: MULHW. 0 1 (MULHW) ;
+
+: MULLI d-form 7 insn ;
+
+: (MULHWU) 11 xo-form 31 insn ;
+: MULHWU 0 0 (MULHWU) ;
+: MULHWU. 0 1 (MULHWU) ;
+
+: (MULLW) 235 xo-form 31 insn ;
+: MULLW 0 0 (MULLW) ;
+: MULLW. 0 1 (MULLW) ;
+: MULLWC 1 0 (MULLW) ;
+: MULLWC. 1 1 (MULLW) ;
+
+: (SLW) 24 x-form 31 insn ;
 : SLW 0 (SLW) ;
 : SLW. 1 (SLW) ;
 
-: (SRAW) 792 swap x-form 31 insn ;
+: (SRAW) 792 x-form 31 insn ;
 : SRAW 0 (SRAW) ;
 : SRAW. 1 (SRAW) ;
 
-: (SRW) 536 swap x-form 31 insn ;
+: (SRW) 536 x-form 31 insn ;
 : SRW 0 (SRW) ;
 : SRW. 1 (SRW) ;
 
-: SRAWI 824 0 x-form 31 insn ;
+: SRAWI 0 824 x-form 31 insn ;
 
-: (SUBF) 40 swap xo-form 31 insn ;
+: (SUBF) 40 xo-form 31 insn ;
 : SUBF 0 0 (SUBF) ;
 : SUBF. 0 1 (SUBF) ;
 : SUBFO 1 0 (SUBF) ;
 : SUBFO. 1 1 (SUBF) ;
 
-: (SUBFC) 8 swap xo-form 31 insn ;
+: (SUBFC) 8 xo-form 31 insn ;
 : SUBFC 0 0 (SUBFC) ;
 : SUBFC. 0 1 (SUBFC) ;
 : SUBFCO 1 0 (SUBFC) ;
 : SUBFCO. 1 1 (SUBFC) ;
 
-: (SUBFE) 136 swap xo-form 31 insn ;
+: (SUBFE) 136 xo-form 31 insn ;
 : SUBFE 0 0 (SUBFE) ;
 : SUBFE. 0 1 (SUBFE) ;
 : SUBFEO 1 0 (SUBFE) ;
@@ -149,7 +167,7 @@ USING: compiler errors kernel math memory words ;
 : XORI d-form 26 insn ;
 : XORIS d-form 27 insn ;
 
-: (XOR) 316 swap x-form 31 insn ;
+: (XOR) 316 x-form 31 insn ;
 : XOR 0 (XOR) ;
 : XOR. 1 (XOR) ;
 
@@ -157,7 +175,7 @@ USING: compiler errors kernel math memory words ;
 : CMPLI d-form 10 insn ;
 
 : CMP 0 0 x-form 31 insn ;
-: CMPL 32 0 x-form 31 insn ;
+: CMPL 0 32 x-form 31 insn ;
 
 : (RLWINM) m-form 21 insn ;
 : RLWINM 0 (RLWINM) ;
