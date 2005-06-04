@@ -95,6 +95,45 @@ public class FactorPlugin extends EditPlugin
 		}
 	} //}}}
 
+	//{{{ startExternalProcess() method
+	private static void startExternalProcess(int port)
+	{
+		try
+		{
+			String exePath = jEdit.getProperty(
+				"factor.external.program");
+			String imagePath = jEdit.getProperty(
+				"factor.external.image");
+			List args = new ArrayList();
+			args.add(exePath);
+			args.add(imagePath);
+			args.add("-null-stdio");
+			args.add("-shell=telnet");
+			args.add("-telnetd-port=" + port);
+			String[] extraArgs = jEdit.getProperty(
+				"factor.external.args")
+				.split(" ");
+			addNonEmpty(extraArgs,args);
+			process = Runtime.getRuntime().exec(
+				(String[])args.toArray(
+				new String[args.size()]),
+				null,
+				new File(MiscUtilities
+				.getParentOfPath(imagePath)));
+
+			process.getOutputStream().close();
+			process.getInputStream().close();
+			process.getErrorStream().close();
+		}
+		catch(Exception e)
+		{
+			Log.log(Log.ERROR,FactorPlugin.class,
+				"Cannot start external Factor:");
+			Log.log(Log.ERROR,FactorPlugin.class,e);
+			process = null;
+		}
+	} //}}}
+	
 	//{{{ getExternalInstance() method
 	/**
 	 * Returns the object representing a connection to an external Factor instance.
@@ -107,42 +146,18 @@ public class FactorPlugin extends EditPlugin
 			InputStream in = null;
 			OutputStream out = null;
 
-			try
+			String type = jEdit.getProperty("factor.external.type");
+			String host;
+			int port = jEdit.getIntegerProperty("factor.external.port",PORT);;
+			if("program".equals(type))
 			{
-				String exePath = jEdit.getProperty(
-					"factor.external.program");
-				String imagePath = jEdit.getProperty(
-					"factor.external.image");
-				List args = new ArrayList();
-				args.add(exePath);
-				args.add(imagePath);
-				args.add("-null-stdio");
-				args.add("-shell=telnet");
-				args.add("-telnetd-port=" + PORT);
-				String[] extraArgs = jEdit.getProperty(
-					"factor.external.args")
-					.split(" ");
-				addNonEmpty(extraArgs,args);
-				process = Runtime.getRuntime().exec(
-					(String[])args.toArray(
-					new String[args.size()]),
-					null,
-					new File(MiscUtilities
-					.getParentOfPath(imagePath)));
-
-				external = new ExternalFactor(PORT);
-
-				process.getOutputStream().close();
-				process.getInputStream().close();
-				process.getErrorStream().close();
+				host = "localhost";
+				startExternalProcess(port);
 			}
-			catch(Exception e)
-			{
-				Log.log(Log.ERROR,FactorPlugin.class,
-					"Cannot start external Factor:");
-				Log.log(Log.ERROR,FactorPlugin.class,e);
-				process = null;
-			}
+			else
+				host = jEdit.getProperty("factor.external.host");
+
+			external = new ExternalFactor(host,port);
 		}
 
 		return external;
@@ -604,8 +619,7 @@ public class FactorPlugin extends EditPlugin
 			return;
 		}
 
-		Asset asset = data.getAssetAtPosition(
-			textArea.getCaretPosition());
+		IAsset asset = data.getAssetAtOffset(textArea.getCaretPosition());
 
 		if(asset == null)
 		{
@@ -618,7 +632,7 @@ public class FactorPlugin extends EditPlugin
 		if(newWord == null)
 			return;
 
-		int start = asset.start.getOffset();
+		int start = asset.getStart().getOffset();
 		/* Hack */
 		start = buffer.getLineStartOffset(
 			buffer.getLineOfOffset(start));

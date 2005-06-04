@@ -40,10 +40,11 @@ import org.gjt.sp.util.Log;
 public class ExternalFactor extends VocabularyLookup
 {
 	//{{{ ExternalFactor constructor
-	public ExternalFactor(int port)
+	public ExternalFactor(String host, int port)
 	{
 		/* Start stream server */;
-		streamServer = port;
+		this.port = port;
+		this.host = host;
 
 		for(int i = 1; i < 6; i++)
 		{
@@ -74,7 +75,7 @@ public class ExternalFactor extends VocabularyLookup
 	{
 		if(closed)
 			throw new IOException("Socket closed");
-		return new Socket("localhost",streamServer);
+		return new Socket(host,port);
 	} //}}}
 
 	//{{{ openWire() method
@@ -343,6 +344,7 @@ public class ExternalFactor extends VocabularyLookup
 	private DataInputStream in;
 	private DataOutputStream out;
 	
-	private int streamServer;
+	private String host;
+	private int port;
 	//}}}
 }

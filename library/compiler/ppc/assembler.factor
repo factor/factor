@@ -211,12 +211,12 @@ M: word BC >r 0 BC r> relative-14 ;
 : BLRL 20 BCLRL ;
 : BCCTR 0 264 0 0 b-form 19 insn ;
 : BCTR 20 BCCTR ;
+
 : MFSPR 5 shift 339 xfx-form 31 insn ;
-: MFLR 8 MFSPR ;
-: MFCTR 9 MFSPR ;
+: MFXER 1 MFSPR ;  : MFLR 8 MFSPR ;  : MFCTR 9 MFSPR ;
+
 : MTSPR 5 shift 467 xfx-form 31 insn ;
-: MTLR 8 MTSPR ;
-: MTCTR 9 MTSPR ;
+: MTXER 1 MTSPR ;  : MTLR 8 MTSPR ;  : MTCTR 9 MTSPR ;
 
 : LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;
 

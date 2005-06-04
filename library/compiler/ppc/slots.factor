@@ -16,26 +16,28 @@ M: %slot generate-node ( vop -- )
 M: %fast-slot generate-node ( vop -- )
     dup vop-out-1 v>operand dup rot vop-in-1 LWZ ;
 
-: write-barrier ( reg -- )
-    #! Mark the card pointed to by vreg.
-    dup dup card-bits SRAWI
-    dup dup 16 ADD
-    20 over 0 LBZ
-    20 20 card-mark ORI
-    20 swap 0 STB ;
-
 M: %set-slot generate-node ( vop -- )
     dup vop-in-3 v>operand over vop-in-2 v>operand
     ! turn tagged fixnum slot # into an offset, multiple of 4
     over dup 1 SRAWI
     ! compute slot address in vop-in-2
-    over dup pick ADD
+    over dup rot ADD
     ! store new slot value
-    >r >r vop-in-1 v>operand r> 0 STW r> write-barrier ;
+    >r vop-in-1 v>operand r> 0 STW ;
 
 M: %fast-set-slot generate-node ( vop -- )
-    dup vop-in-1 v>operand over vop-in-2 v>operand
-    [ rot vop-in-3 STW ] keep write-barrier ;
+    [ vop-in-1 v>operand ] keep
+    [ vop-in-2 v>operand ] keep
+    vop-in-3 STW ;
+
+M: %write-barrier generate-node ( vop -- )
+    #! Mark the card pointed to by vreg.
+    vop-in-1 v>operand
+    dup dup card-bits SRAWI
+    dup dup 16 ADD
+    20 over 0 LBZ
+    20 20 card-mark ORI
+    20 swap 0 STB ;
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a virtual register.

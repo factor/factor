@@ -87,12 +87,14 @@ sequences words ;
         in-2
         2 %dec-d ,
         slot@ >r 0 1 r> %fast-set-slot ,
+        0 %write-barrier ,
     ] [
         drop
         in-3
         3 %dec-d ,
         1 %untag ,
         0 1 2 %set-slot ,
+        1 %write-barrier ,
     ] ifte
 ] "intrinsic" set-word-prop
 

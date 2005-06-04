@@ -178,6 +178,9 @@ VOP: %fast-set-slot
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 
+VOP: %write-barrier
+: %write-barrier ( ptr ) <vreg> unit f f <%write-barrier> ;
+
 ! fixnum intrinsics
 VOP: %fixnum+       : %fixnum+ 3-vop <%fixnum+> ;
 VOP: %fixnum-       : %fixnum- 3-vop <%fixnum-> ;
@@ -261,7 +264,7 @@ M: %untag-fixnum basic-block? drop t ;
     swap vop-out-1 = [ "bad VOP destination" throw ] unless ;
 
 : check-src ( vop reg -- )
-    swap vop-out-1 = [ "bad VOP source" throw ] unless ;
+    swap vop-in-1 = [ "bad VOP source" throw ] unless ;
 
 VOP: %getenv
 : %getenv swap src/dest-vop <%getenv> ;

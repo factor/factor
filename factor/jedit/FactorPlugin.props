@@ -91,9 +91,16 @@ plugin.factor.jedit.FactorPlugin.option-pane=factor
 
 options.factor.label=Factor
 options.factor.code=new factor.jedit.FactorOptionPane();
+options.factor.port=Port number:
+options.factor.type.program=Communicate with local Factor
 options.factor.program=Factor runtime executable:
 options.factor.image=Factor image:
 options.factor.choose=Choose file...
 options.factor.args=Additional arguments:
+options.factor.type.remote=Communicate with remote Factor
+options.factor.host=Host name:
 
 factor.external.args=-jedit
+factor.external.host=localhost
+factor.external.port=9999
+factor.external.type=process

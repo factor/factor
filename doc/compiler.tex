@@ -1,0 +1,198 @@
+\documentclass{article}
+
+\usepackage[plainpages=false,colorlinks]{hyperref}
+\usepackage[style=list,toc]{glossary}
+\usepackage{alltt}
+\usepackage{times}
+\usepackage{tabularx}
+\usepackage{epsfig}
+\usepackage{epsf}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+
+\pagestyle{headings}
+
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+\setlength\parskip{\medskipamount}
+\setlength\parindent{0pt}
+
+\newcommand{\bs}{\char'134}
+\newcommand{\dq}{\char'42}
+\newcommand{\tto}{\symbol{123}}
+\newcommand{\ttc}{\symbol{125}}
+\newcommand{\pound}{\char'43}
+
+\newcommand{\vocabulary}[1]{\emph{Vocabulary:} \texttt{#1}&\\}
+
+\newcommand{\parsingword}[2]{\index{\texttt{#1}}\emph{Parsing word:} \texttt{#2}&\\}
+
+\newcommand{\ordinaryword}[2]{\index{\texttt{#1}}\emph{Word:} \texttt{#2}&\\}
+
+\newcommand{\symbolword}[1]{\index{\texttt{#1}}\emph{Symbol:} \texttt{#1}&\\}
+
+\newcommand{\classword}[1]{\index{\texttt{#1}}\emph{Class:} \texttt{#1}&\\}
+
+\newcommand{\genericword}[2]{\index{\texttt{#1}}\emph{Generic word:} \texttt{#2}&\\}
+
+\newcommand{\predword}[1]{\ordinaryword{#1}{#1~( object -- ?~)}}
+
+\setlength{\tabcolsep}{1mm}
+
+\newcommand{\wordtable}[1]{
+
+%HEVEA\renewcommand{\index}[1]{}
+%HEVEA\renewcommand{\glossary}[1]{}
+
+\begin{tabularx}{12cm}{lX}
+\hline
+#1
+\hline
+\end{tabularx}
+
+}
+
+\makeatletter
+
+\makeatother
+
+\begin{document}
+
+\title{The Factor compiler}
+
+\author{Slava Pestov}
+
+\maketitle
+\tableofcontents{}
+
+\section{The compiler}
+
+The compiler can provide a substantial speed boost for words whose stack effect can be inferred. Words without a known stack effect cannot be compiled, and must be run in the interpreter. The compiler generates native code, and so far, x86 and PowerPC backends have been developed.
+
+To compile a single word, call \texttt{compile}:
+
+\begin{alltt}
+\textbf{ok} \bs pref-size compile
+\textbf{Compiling pref-size}
+\end{alltt}
+
+During bootstrap, all words in the library with a known stack effect are compiled. You can
+circumvent this, for whatever reason, by passing the \texttt{-no-compile} switch during
+bootstrap:
+
+\begin{alltt}
+\textbf{bash\$} ./f boot.image.le32 -no-compile
+\end{alltt}
+
+The compiler has two limitations you must be aware of. First, if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Second, compiled code cannot be profiled. These limitations will be resolved in a future release.
+
+The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation.
+
+\subsection{Linear intermediate representation}
+
+The linear IR is the second of the two intermediate
+representations used by Factor. It is basically a high-level
+assembly language. Linear IR operations are called VOPs. The last stage of the compiler generates machine code instructions corresponding to each \emph{virtual operation} in the linear IR.
+
+To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
+ 
+\begin{alltt}
+\textbf{ok} \bs append precompile
+\textbf{<< \%prologue << vop [ ] [ ] [ ] [ ] >> >>
+<< \%peek-d << vop [ ] [ 1 ] [ << vreg ... 0 >> ] [ ] >> >>
+<< \%peek-d << vop [ ] [ 0 ] [ << vreg ... 1 >> ] [ ] >> >>
+<< \%replace-d << vop [ ] [ 0 << vreg ... 0 >> ] [ ] [ ] >> >>
+<< \%replace-d << vop [ ] [ 1 << vreg ... 1 >> ] [ ] [ ] >> >>
+<< \%inc-d << vop [ ] [ -1 ] [ ] [ ] >> >>
+<< \%return << vop [ ] [ ] [ ] [ ] >> >>}
+\end{alltt}
+
+\subsubsection{Control flow}
+
+\begin{description}
+
+\item[\texttt{\%prologue}] On x86, this does nothing. On PowerPC, at the start of
+  each word that calls a subroutine, we store the link
+  register in r0, then push r0 on the C stack.
+
+\item[\texttt{\%call-label}] On PowerPC, uses near calling convention, where the
+  caller pushes the return address.
+
+\item[\texttt{\%call}] On PowerPC, if calling a primitive, compiles a sequence that loads a 32-bit literal and jumps to that address. For other compiled words, compiles an immediate branch with link, so all compiled word definitions must be within 64 megabytes of each other.
+
+\item[\texttt{\%jump-label}] Like \texttt{\%call-label} except the return address is not saved. Used for tail calls.
+
+\item[\texttt{\%jump}] Like \texttt{\%call} except the return address is not saved. Used for tail calls.
+
+\item[\texttt{\%dispatch}] Compile a piece of code that jumps to an offset in a
+  jump table indexed by an integer. The jump table consists of \texttt{\%target-label} and \texttt{\%target} must immediately follow this VOP.
+
+\item[\texttt{\%target}] Not supported on PowerPC.
+
+\item[\texttt{\%target-label}] A jump table entry.
+
+\end{description}
+
+\subsubsection{Slots and objects}
+
+\begin{description}
+
+\item[\texttt{\%slot}]  The untagged object is in \texttt{vop-out-1}, the tagged slot
+  number is in \texttt{vop-in-1}.
+
+\item[\texttt{\%fast-slot}] The tagged object is in \texttt{vop-out-1}, the pointer offset is
+  in \texttt{vop-in-1}. the offset already takes the type tag into
+  account, so its just one instruction to load.
+
+\item[\texttt{\%set-slot}] The new value is \texttt{vop-in-1}, the object is \texttt{vop-in-2}, and
+  the slot number is \texttt{vop-in-3}.
+
+\item[\texttt{\%fast-set-slot}] The new value is \texttt{vop-in-1}, the object is \texttt{vop-in-2}, and
+  the slot offset is \texttt{vop-in-3}.
+  the offset already takes the type tag into account, so
+  it's just one instruction to load.
+
+\item[\texttt{\%write-barrier}] Mark the card containing the object pointed by \texttt{vop-in-1}.
+  
+\item[\texttt{\%untag}]  Mask off the tag bits of \texttt{vop-in-1}, store result in
+  \texttt{vop-in-1} (which should equal \texttt{vop-out-1}!)
+
+\item[\texttt{\%untag-fixnum}] Shift \texttt{vop-in-1} to the right by 3 bits, store result in
+  \texttt{vop-in-1} (which should equal \texttt{vop-out-1}!)
+
+\item[\texttt{\%type}]  Intrinstic version of type primitive. It outputs an
+  unboxed value in \texttt{vop-out-1}.
+
+\end{description}
+
+\subsubsection{Alien interface}
+
+\begin{description}
+
+\item[\texttt{\%parameters}] Ignored on x86.
+
+\item[\texttt{\%parameter}] Ignored on x86.
+
+\item[\texttt{\%unbox}]  An unboxer function takes a value from the data stack
+  and converts it into a C value.
+  
+\item[\texttt{\%box}]  A boxer function takes a C value as a parameter and
+  converts into a Factor value, and pushes it on the data
+  stack.
+
+  On x86, C functions return integers in EAX.
+
+\item[\texttt{\%box-float}] On x86, C functions return floats on the FP stack.
+
+\item[\texttt{\%box-double}] On x86, C functions return doubles on the FP stack.
+
+\item[\texttt{\%cleanup}] Ignored on PowerPC.
+
+  On x86, in the cdecl ABI, the caller must pop input
+  parameters off the C stack. In stdcall, the callee does
+  it, so this node is not used in that case.
+  
+\end{description}
+
+\end{document}
