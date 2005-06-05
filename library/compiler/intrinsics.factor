@@ -215,7 +215,7 @@ sequences words ;
 \ fixnum-bitnot [
     drop
     in-1
-    0 %fixnum-bitnot ,
+    0 <vreg> 0 <vreg> %fixnum-bitnot ,
     out-1
 ] "intrinsic" set-word-prop
 
@@ -225,7 +225,7 @@ sequences words ;
     1 %dec-d ,
     in-1
     dup cell -8 * <= [
-        drop 0 <vreg> 2 <vreg> 2 <vreg> %fixnum-sgn ,
+        drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
         2 0 %replace-d ,
     ] [
         neg 0 <vreg> 0 <vreg> %fixnum>> ,

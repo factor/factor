@@ -76,7 +76,7 @@ M: %return-to generate-node ( vop -- )
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
 
-: untag ( dest src -- ) 0 0 28 RLWINM ;
+: untag ( dest src -- ) 0 0 31 tag-bits - RLWINM ;
 
 M: %untag generate-node ( vop -- )
     dest/src untag ;
@@ -84,7 +84,7 @@ M: %untag generate-node ( vop -- )
 M: %untag-fixnum generate-node ( vop -- )
     dest/src tag-bits SRAWI ;
 
-: tag-fixnum ( dest src -- ) 3 21 LI 21 SLW ;
+: tag-fixnum ( dest src -- ) tag-bits SLWI ;
 
 M: %tag-fixnum generate-node ( vop -- )
     ! todo: formalize scratch register usage
@@ -92,8 +92,7 @@ M: %tag-fixnum generate-node ( vop -- )
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
-    2 18 LI
-    17 17 18 SLW
+    17 17 2 SLWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
     0 1 rel-address  compiled-offset 24 + 18 LOAD32

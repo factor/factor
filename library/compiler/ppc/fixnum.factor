@@ -16,11 +16,30 @@ namespaces words ;
         >r >r >3-vop< v>operand swap r> drop r> execute
     ] ifte ; inline
 
+: simple-overflow ( vop inv word -- )
+    >r >r
+    <label> "end" set
+    "end" get BNO
+    dup >3-vop< v>operand 3dup swapd r> execute
+    2dup
+    dup tag-bits SRAWI
+    dup tag-bits SRAWI
+    drop
+    3 -rot r> execute
+    "s48_long_to_bignum" f compile-c-call
+    ! An untagged pointer to the bignum is now in r3; tag it
+    3 swap vop-out-1 v>operand bignum-tag ORI
+    "end" get save-xt ; inline
+
 M: %fixnum+ generate-node ( vop -- )
-    \ ADDI \ ADD maybe-immediate ;
+    0 MTXER
+    dup \ ADDI \ ADDO. maybe-immediate
+    \ SUBF \ ADD simple-overflow ;
 
 M: %fixnum- generate-node ( vop -- )
-    \ SUBI \ SUBF maybe-immediate ;
+    0 MTXER
+    dup \ SUBI \ SUBFO. maybe-immediate
+    \ ADD \ SUBF simple-overflow ;
 
 M: %fixnum* generate-node ( vop -- )
     dup \ MULLI \ MULLW maybe-immediate
@@ -59,18 +78,17 @@ M: %fixnum-bitxor generate-node ( vop -- )
     \ XORI \ XOR maybe-immediate ;
 
 M: %fixnum-bitnot generate-node ( vop -- )
-    dup vop-in-1 v>operand swap vop-out-1 v>operand
-    2dup NOT untag ;
+    dest/src dupd NOT dup untag ;
 
 M: %fixnum<< generate-node ( vop -- )
     dup vop-in-1 20 LI
     dup vop-out-1 v>operand swap vop-in-2 v>operand 20 SLW ;
 
 M: %fixnum>> generate-node ( vop -- )
-    >3-vop< >r 2dup r> SRAWI untag ;
+    >3-vop< >r dupd r> SRAWI dup untag ;
 
 M: %fixnum-sgn generate-node ( vop -- )
-    >3-vop< >r 2dup r> drop 31 SRAWI untag ;
+    dest/src dupd 31 SRAWI dup untag ;
 
 : MULLW 0 0 (MULLW) ;
 : MULLW. 0 1 (MULLW) ;

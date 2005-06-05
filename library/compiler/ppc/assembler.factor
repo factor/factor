@@ -99,8 +99,8 @@ USING: compiler errors kernel math memory words ;
 : NOR 0 (NOR) ;
 : NOR. 1 (NOR) ;
 
-: NOT over NOR ;
-: NOT. over NOR. ;
+: NOT dup NOR ;
+: NOT. dup NOR. ;
 
 : ORI d-form 24 insn ;
 : ORIS d-form 25 insn ;
@@ -180,6 +180,9 @@ USING: compiler errors kernel math memory words ;
 : (RLWINM) m-form 21 insn ;
 : RLWINM 0 (RLWINM) ;
 : RLWINM. 1 (RLWINM) ;
+
+: SLWI 0 31 pick - RLWINM ;
+: SLWI. 0 31 pick - RLWINM. ;
 
 : LBZ d-form 34 insn ;  : LBZU d-form 35 insn ;
 : LHA d-form 42 insn ;  : LHAU d-form 43 insn ;

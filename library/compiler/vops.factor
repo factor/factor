@@ -191,7 +191,7 @@ VOP: %fixnum/mod    : %fixnum/mod f <%fixnum/mod> ;
 VOP: %fixnum-bitand : %fixnum-bitand 3-vop <%fixnum-bitand> ;
 VOP: %fixnum-bitor  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
 VOP: %fixnum-bitxor : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
-VOP: %fixnum-bitnot : %fixnum-bitnot <vreg> dest-vop <%fixnum-bitnot> ;
+VOP: %fixnum-bitnot : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
 
 VOP: %fixnum<=      : %fixnum<= 3-vop <%fixnum<=> ;
 VOP: %fixnum<       : %fixnum< 3-vop <%fixnum<> ;
@@ -211,7 +211,7 @@ VOP: %fixnum<<   : %fixnum<<   3-vop <%fixnum<<> ;
 VOP: %fixnum>>   : %fixnum>>   3-vop <%fixnum>>> ;
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
-VOP: %fixnum-sgn : %fixnum-sgn 3-vop <%fixnum-sgn> ;
+VOP: %fixnum-sgn : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized

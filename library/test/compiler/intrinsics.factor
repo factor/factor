@@ -151,15 +151,15 @@ math-internals test words ;
 [ HEX: 10000000 ] [ HEX: -10000000 >fixnum [ 0 swap fixnum- ] compile-1 ] unit-test
 [ HEX: 10000000 ] [ HEX: -fffffff >fixnum [ 1 swap fixnum- ] compile-1 ] unit-test
 
+[ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-1 1 28 fixnum-shift = ] unit-test
+[ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
+
 [ 4294967296 ] [ 1 32 [ fixnum-shift ] compile-1 ] unit-test
 [ 4294967296 ] [ 1 [ 32 fixnum-shift ] compile-1 ] unit-test
 [ 4294967296 ] [ 1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
 [ -4294967296 ] [ -1 32 [ fixnum-shift ] compile-1 ] unit-test
 [ -4294967296 ] [ -1 [ 32 fixnum-shift ] compile-1 ] unit-test
 [ -4294967296 ] [ -1 [ 16 fixnum-shift 16 fixnum-shift ] compile-1 ] unit-test
-
-[ t ] [ 1 27 fixnum-shift dup [ fixnum+ ] compile-1 1 28 fixnum-shift = ] unit-test
-[ -268435457 ] [ 1 28 shift neg >fixnum [ -1 fixnum+ ] compile-1 ] unit-test
 
 [ t ] [ 1 20 shift 1 20 shift [ fixnum* ] compile-1 1 40 shift = ] unit-test
 [ t ] [ 1 20 shift neg 1 20 shift [ fixnum* ] compile-1 1 40 shift neg = ] unit-test
