@@ -114,11 +114,13 @@ public class FactorPlugin extends EditPlugin
 				"factor.external.args")
 				.split(" ");
 			addNonEmpty(extraArgs,args);
+			String[] argsArray = (String[])args.toArray(
+				new String[args.size()]);
+			for(int i = 0; i < argsArray.length; i++)
+				System.out.println(argsArray[i]);
+
 			process = Runtime.getRuntime().exec(
-				(String[])args.toArray(
-				new String[args.size()]),
-				null,
-				new File(MiscUtilities
+				argsArray, null, new File(MiscUtilities
 				.getParentOfPath(imagePath)));
 
 			process.getOutputStream().close();

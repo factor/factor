@@ -126,7 +126,7 @@ M: general-list tail ( n list -- tail )
     swap [ cdr ] times ;
 
 M: general-list nth ( n list -- element )
-    over 0 = [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
+    over 0 number= [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
 
 : intersection ( list list -- list )
     #! Make a list of elements that occur in both lists.

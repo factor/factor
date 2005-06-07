@@ -5,6 +5,11 @@ USING: assembler compiler-backend generic hashtables inference
 kernel kernel-internals lists math math-internals namespaces
 sequences words ;
 
+! Architecture description
+: fixnum-imm?
+    #! Can fixnum operations take immediate operands?
+    cpu "x86" = ;
+
 \ dup [
     drop
     in-1
@@ -138,16 +143,22 @@ sequences words ;
 : literal-fixnum? ( value -- ? )
     dup literal? [ literal-value fixnum? ] [ drop f ] ifte ;
 
+: binary-op-imm ( node imm op out -- )
+    >r >r 1 %dec-d ,
+    in-1
+    0 <vreg> dup r> execute ,
+    r> 0 %replace-d , ;
+
 : binary-op ( node op out -- )
     #! out is a vreg where the vop stores the result.
-    >r >r node-peek dup literal-fixnum? [
-        1 %dec-d ,
-        in-1
-        literal-value 0 <vreg> 0 <vreg> r> execute ,
-        r> 0 %replace-d ,
+    fixnum-imm? [
+        >r >r node-peek dup literal-fixnum? [
+            literal-value r> r> binary-op-imm
+        ] [
+            drop r> r> binary-op-reg
+        ] ifte
     ] [
-        drop
-        r> r> binary-op-reg
+        binary-op-reg drop
     ] ifte ;
 
 [

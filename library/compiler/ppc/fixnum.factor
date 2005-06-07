@@ -4,28 +4,24 @@ IN: compiler-backend
 USING: assembler compiler kernel math math-internals memory
 namespaces words ;
 
-: >3-vop< ( vop -- out1 in2 in1 )
+: >3-imm< ( vop -- out1 in2 in1 )
     [ vop-out-1 v>operand ] keep
     [ vop-in-2 v>operand ] keep
     vop-in-1 ;
 
-: maybe-immediate ( vop imm comp -- )
-    pick vop-in-1 integer? [
-        >r >r >3-vop< v>operand r> execute r> drop
-    ] [
-        >r >r >3-vop< v>operand swap r> drop r> execute
-    ] ifte ; inline
+: >3-vop< ( vop -- out1 in1 in2 )
+    >3-imm< v>operand swap ;
 
 : simple-overflow ( vop inv word -- )
     >r >r
     <label> "end" set
     "end" get BNO
-    dup >3-vop< v>operand 3dup swapd r> execute
+    dup >3-vop< 3dup r> execute
     2dup
     dup tag-bits SRAWI
     dup tag-bits SRAWI
-    drop
     3 -rot r> execute
+    drop
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in r3; tag it
     3 swap vop-out-1 v>operand bignum-tag ORI
@@ -33,20 +29,33 @@ namespaces words ;
 
 M: %fixnum+ generate-node ( vop -- )
     0 MTXER
-    dup \ ADDI \ ADDO. maybe-immediate
+    dup >3-vop< ADDO.
     \ SUBF \ ADD simple-overflow ;
 
 M: %fixnum- generate-node ( vop -- )
     0 MTXER
-    dup \ SUBI \ SUBFO. maybe-immediate
+    dup >3-vop< SUBFO.
     \ ADD \ SUBF simple-overflow ;
 
 M: %fixnum* generate-node ( vop -- )
-    dup \ MULLI \ MULLW maybe-immediate
-    vop-out-1 v>operand dup tag-bits SRAWI ;
+    dup >3-vop< dup dup tag-bits SRAWI
+    0 MTXER
+    [ >r >r drop 4 r> r> MULLWO. 3 ] 2keep
+    <label> "end" set
+    "end" get BNO
+    MULHW
+    "s48_long_long_to_bignum" f compile-c-call
+    ! now we have to shift it by three bits to remove the second
+    ! tag
+    tag-bits neg 4 LI
+    "s48_bignum_arithmetic_shift" f compile-c-call
+    ! An untagged pointer to the bignum is now in r3; tag it
+    3 4 bignum-tag ORI
+    "end" get save-xt
+    vop-out-1 v>operand 4 MR ;
 
 M: %fixnum/i generate-node ( vop -- )
-    dup >3-vop< v>operand DIVW
+    dup >3-vop< swap DIVW
     vop-out-1 v>operand dup tag-fixnum ;
 
 : generate-fixnum/mod ( -- )
@@ -69,23 +78,43 @@ M: %fixnum/mod generate-node ( vop -- )
     17 17 tag-fixnum ;
 
 M: %fixnum-bitand generate-node ( vop -- )
-    \ ANDI \ AND maybe-immediate ;
+    >3-vop< AND ;
 
 M: %fixnum-bitor generate-node ( vop -- )
-    \ ORI \ OR maybe-immediate ;
+    >3-vop< OR ;
 
 M: %fixnum-bitxor generate-node ( vop -- )
-    \ XORI \ XOR maybe-immediate ;
+    >3-vop< XOR ;
 
 M: %fixnum-bitnot generate-node ( vop -- )
     dest/src dupd NOT dup untag ;
 
 M: %fixnum<< generate-node ( vop -- )
-    dup vop-in-1 20 LI
-    dup vop-out-1 v>operand swap vop-in-2 v>operand 20 SLW ;
+    ! This has specific register requirements.
+    <label> "no-overflow" set
+    <label> "end" set
+    vop-in-1
+    ! check for potential overflow
+    dup shift-add dup 19 LOAD
+    18 17 19 ADD
+    0 18 rot 2 * 1 - CMPLI
+    ! is there going to be an overflow?
+    "no-overflow" get BGE
+    ! there is going to be an overflow, make a bignum
+    3 17 tag-bits SRAWI
+    "s48_long_to_bignum" f compile-c-call
+    dup 4 LI
+    "s48_bignum_arithmetic_shift" f compile-c-call
+    ! tag the result
+    3 17 bignum-tag ORI
+    "end" get B
+    ! there is not going to be an overflow
+    "no-overflow" get save-xt
+    17 17 rot SLWI
+    "end" get save-xt ;
 
 M: %fixnum>> generate-node ( vop -- )
-    >3-vop< >r dupd r> SRAWI dup untag ;
+    >3-imm< pick >r SRAWI r> dup untag ;
 
 M: %fixnum-sgn generate-node ( vop -- )
     dest/src dupd 31 SRAWI dup untag ;

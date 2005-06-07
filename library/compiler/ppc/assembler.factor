@@ -38,7 +38,7 @@ USING: compiler errors kernel math memory words ;
 : xfx-form ( d spr xo -- n )
     1 shift >r 11 shift >r 21 shift r> bitor r> bitor ;
 
-: xo-form ( d a b oe xo rc -- n )
+: xo-form ( d a b oe rc xo -- n )
     swap
     >r 1 shift >r 10 shift >r 11 shift >r 16 shift >r 21 shift
     r> bitor r> bitor r> bitor r> bitor r> bitor ;
@@ -129,8 +129,8 @@ USING: compiler errors kernel math memory words ;
 : (MULLW) 235 xo-form 31 insn ;
 : MULLW 0 0 (MULLW) ;
 : MULLW. 0 1 (MULLW) ;
-: MULLWC 1 0 (MULLW) ;
-: MULLWC. 1 1 (MULLW) ;
+: MULLWO 1 0 (MULLW) ;
+: MULLWO. 1 1 (MULLW) ;
 
 : (SLW) 24 x-form 31 insn ;
 : SLW 0 (SLW) ;

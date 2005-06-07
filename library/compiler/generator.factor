@@ -65,3 +65,7 @@ GENERIC: v>operand
 ! These constants must match native/card.h
 : card-bits 7 ;
 : card-mark HEX: 80 ;
+
+: shift-add ( by -- n )
+    #! Used in fixnum-shift overflow check.
+    1 swap cell 8 * swap 1 - - shift ;

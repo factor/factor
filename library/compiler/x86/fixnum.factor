@@ -124,7 +124,7 @@ M: %fixnum<< generate-node
     ECX EAX MOV
     vop-in-1
     ! check for potential overflow
-    1 over cell 8 * swap 1 - - shift ECX over ADD
+    dup shift-add ECX over ADD
     2 * 1 - ECX swap CMP
     ! is there going to be an overflow?
     "no-overflow" get JBE

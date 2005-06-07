@@ -134,7 +134,13 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     deferred-xts get [ fixup ] each  deferred-xts off ;
 
 : with-compiler ( quot -- )
-    [ call  fixup-xts  commit-xts ] with-scope ;
+    [
+        deferred-xts off
+        compiled-xts off
+        call
+        fixup-xts
+        commit-xts
+    ] with-scope ;
 
 : postpone-word ( word -- )
     dup compiling? [
