@@ -50,11 +50,11 @@ void relocate_code();
 given address */
 INLINE CELL reloc_get_16_16(CELL cell)
 {
-	return ((get(cell) & 0xffff) << 16) | (get(cell + 1) & 0xffff);
+	return ((get(cell - CELLS) & 0xffff) << 16) | (get(cell) & 0xffff);
 }
 
 INLINE void reloc_set_16_16(CELL cell, CELL value)
 {
-	put(cell,((get(cell) & ~0xffff) | ((value >> 16) & 0xffff)));
-	put(cell + 1,((get(cell + 1) & ~0xffff) | (value & 0xffff)));
+	put(cell - CELLS,((get(cell - CELLS) & ~0xffff) | ((value >> 16) & 0xffff)));
+	put(cell,((get(cell) & ~0xffff) | (value & 0xffff)));
 }

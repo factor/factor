@@ -40,7 +40,7 @@ M: %call-label generate-node ( vop -- )
     B ;
 
 : word-addr ( word -- )
-    dup 0 1 rel-primitive word-xt 19 LOAD32 ;
+    dup word-xt 19 LOAD32  0 1 rel-word ;
 
 : compile-call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.

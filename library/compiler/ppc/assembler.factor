@@ -195,7 +195,7 @@ USING: compiler errors kernel math memory words ;
 
 G: (B) ( dest aa lk -- ) [ pick ] [ type ] ;
 M: integer (B) i-form 18 insn ;
-M: word (B) 0 swap (B) relative-24 ;
+M: word (B) 0 (B) relative-24 ;
 
 : B 0 0 (B) ; : BA 1 0 (B) ; : BL 0 1 (B) ; : BLA 1 1 (B) ;
 
