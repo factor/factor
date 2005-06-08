@@ -6,13 +6,14 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
+- make head? tail? more efficient with slices
 - fix ceiling
 - single-stepper and variable access: wrong namespace?
 - investigate if COPYING_GEN needs a fix
 - faster layout
 - keep alive
 - sleep word
-- redo new compiler backend for PowerPC
+- fix fixnum<< overflow on PowerPC
 - fix i/o on generic x86/ppc unix
 - alien primitives need a more general input type
 - 2map slow with lists
@@ -66,7 +67,6 @@
 + compiler:
 
 - simplifier:
-  - kill tag-fixnum/untag-fixnum
   - kill replace after a peek
   - merge inc-d's across VOPs that don't touch the stack
 - [ EAX 0 ] --> [ EAX ]

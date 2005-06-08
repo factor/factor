@@ -10,7 +10,7 @@ kernel-internals lists math memory namespaces words ;
 ! r16-r30 vregs
 
 : compile-c-call ( symbol dll -- )
-    2dup 1 1 rel-dlsym dlsym  19 LOAD32  19 MTLR  BLRL ;
+    2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
 
 M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n 17 + ;
@@ -135,7 +135,7 @@ M: %arithmetic-type generate-node ( vop -- )
     3 3 tag-mask ANDI
     4 4 tag-mask ANDI
     ! Are the tags equal?
-    0 3 3 CMPL
+    0 3 4 CMPL
     "end" get BEQ
     ! No, they are not equal. Call a runtime function to
     ! coerce the integers to a higher type.

@@ -62,6 +62,18 @@ M: %inc-d simplify-node ( linear vop -- linear ? )
         ] ifte
     ] ifte ;
 
+: operands= ( vop vop -- ? )
+    over vop-inputs over vop-inputs =
+    >r swap vop-outputs swap vop-outputs = r> and ;
+
+: cancel ( linear class -- linear ? )
+    dupd next-physical?
+    [ over first operands= [ cdr cdr t ] [ f ] ifte ]
+    [ drop f ] ifte ;
+
+M: %tag-fixnum simplify-node ( linear vop -- linear ? )
+    drop \ %untag-fixnum cancel ;
+
 : basic-block ( linear quot -- | quot: vop -- ? )
     #! Keep applying the quotation to each VOP until either a
     #! VOP answering f to basic-block?, or the quotation answers
