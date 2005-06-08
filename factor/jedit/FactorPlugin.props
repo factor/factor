@@ -36,7 +36,9 @@ plugin.factor.jedit.FactorPlugin.menu=factor-listener \
 	- \
 	factor-extract-word \
 	- \
-	factor-restart
+	factor-restart \
+	- \
+	factor-keymap
 
 factor-listener.label=Listener
 factor-run-file.label=Run current file
@@ -54,6 +56,7 @@ factor-infer-effects.label=Infer all words in buffer
 factor-compile.label=Compile word at caret
 factor-compile-all.label=Compile all words in buffer
 factor-restart.label=Restart Factor
+factor-keymap.label=Install default keymap
 
 # SideKick stuff
 sidekick.parser.factor.label=Factor
