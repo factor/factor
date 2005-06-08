@@ -115,7 +115,8 @@ C: absolute-16/16 ( word -- )
 
 M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
 
-: absolute-16/16 ( word -- ) <absolute-16/16> deferred-xt ;
+: absolute-16/16 ( word -- )
+    <absolute-16/16> deferred-xt 0 1 rel-address ;
 
 : compiling? ( word -- ? )
     #! A word that is compiling or already compiled will not be

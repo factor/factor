@@ -42,9 +42,16 @@ M: #call-label linearize-node* ( node -- )
     #! by GC, and is indexed through a table.
     dup fixnum? swap f eq? or ;
 
-: push-1 ( obj -- )
-    0 swap literal-value dup
+GENERIC: load-value ( vreg n value -- )
+
+M: computed load-value ( vreg n value -- )
+    drop %peek-d , ;
+
+M: literal load-value ( vreg n value -- )
+    nip literal-value dup
     immediate? [ %immediate ] [ %indirect ] ifte , ;
+
+: push-1 ( value -- ) >r 0 0 r> load-value ;
 
 M: #push linearize-node* ( node -- )
     node-out-d dup length dup %inc-d ,

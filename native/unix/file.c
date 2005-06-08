@@ -58,7 +58,7 @@ void primitive_cwd(void)
 {
 	char wd[MAXPATHLEN];
 	maybe_garbage_collection();
-	if(getcwd(wd,MAXPATHLEN) < 0)
+	if(getcwd(wd,MAXPATHLEN) == NULL)
 		io_error();
 	box_c_string(wd);
 }

@@ -199,7 +199,7 @@ M: tuple clone ( tuple -- tuple )
 M: tuple hashcode ( vec -- n )
     #! If the capacity is two, then all we have is the class
     #! slot and delegate.
-    dup length 2 number= [
+    dup array-capacity 2 number= [
         drop 0
     ] [
         2 swap array-nth hashcode

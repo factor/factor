@@ -9,9 +9,7 @@ void init_ffi(void)
 
 void ffi_dlopen(DLL *dll)
 {
-	void *dllptr;
-	
-	dllptr = dlopen(to_c_string(untag_string(dll->path)), RTLD_LAZY);
+	void *dllptr = dlopen(to_c_string(untag_string(dll->path)), RTLD_LAZY);
 
 	if(dllptr == NULL)
 	{
@@ -37,7 +35,7 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol)
 
 void ffi_dlclose(DLL *dll)
 {
-	if(dlclose(dll->dll) == -1)
+	if(dlclose(dll->dll) != NULL)
 	{
 		general_error(ERROR_FFI,tag_object(
 			from_c_string(dlerror())));

@@ -134,14 +134,6 @@ sequences words ;
     1 %dec-d ,
 ] "intrinsic" set-word-prop
 
-GENERIC: load-value ( vreg n value -- )
-
-M: computed load-value ( vreg n value -- )
-    drop %peek-d , ;
-
-M: literal load-value ( vreg n value -- )
-    nip literal-value %immediate , ;
-
 : value/vreg-list ( in -- list )
     [ 0 swap length 1 - ] keep
     [ >r 2dup r> 3list >r 1 - >r 1 + r> r> ] map 2nip ;

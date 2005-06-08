@@ -34,7 +34,7 @@ NODE: #call
 : #call ( word -- node ) param-node <#call> ;
 
 NODE: #call-label
-: #call-label ( label -- node ) param-node <#call> ;
+: #call-label ( label -- node ) param-node <#call-label> ;
 
 NODE: #push
 : #push ( outputs -- node ) d-tail out-d-node <#push> ;
