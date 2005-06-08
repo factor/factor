@@ -62,50 +62,6 @@ SYMBOL: failures
     failures off
     vocabularies get [ "temporary" off ] bind ;
 
-: eligible-tests ( -- list )
-    [
-        [
-            "lists/cons" "lists/lists" "lists/assoc"
-            "lists/namespaces" "lists/combinators" "combinators"
-            "continuations" "errors" "hashtables" "strings"
-            "namespaces" "generic" "tuple" "files" "parser"
-            "parse-number" "image" "init" "io/io"
-            "listener" "vectors" "words" "unparser" "random"
-            "stream" "math/bitops"
-            "math/math-combinators" "math/rational" "math/float"
-            "math/complex" "math/irrational" "math/integer"
-            "math/matrices"
-            "httpd/url-encoding" "httpd/html" "httpd/httpd"
-            "httpd/http-client"
-            "crashes" "sbuf" "threads" "parsing-word"
-            "inference" "dataflow" "interpreter" "alien"
-            "line-editor" "gadgets" "memory" "redefine"
-            "annotate" "sequences"
-        ] %
-        
-        os "win32" = [
-            "buffer" ,
-        ] when
-        
-        cpu "unknown" = not "compile" get and [
-            [
-                "io/buffer" "compiler/optimizer"
-                "compiler/simple"
-                "compiler/stack" "compiler/ifte"
-                "compiler/generic" "compiler/bail-out"
-                "compiler/linearizer" "compiler/intrinsics"
-            ] %
-        ] when
-        
-        [
-            "benchmark/empty-loop" "benchmark/fac"
-            "benchmark/fib" "benchmark/sort"
-            "benchmark/continuations" "benchmark/ack"
-            "benchmark/hashtables" "benchmark/strings"
-            "benchmark/vectors" "benchmark/prettyprint"
-        ] %
-    ] make-list ;
-
 : passed.
     "Tests passed:" print . ;
 
@@ -113,6 +69,45 @@ SYMBOL: failures
     "Tests failed:" print
     failures get [ unswons write ": " write error. ] each ;
 
-: all-tests ( -- )
-    prepare-tests eligible-tests [ test ] subset
-    terpri passed. failed. ;
+: run-tests ( list -- )
+    prepare-tests [ test ] subset terpri passed. failed. ;
+
+: tests
+    [
+        "lists/cons" "lists/lists" "lists/assoc"
+        "lists/namespaces" "lists/combinators" "combinators"
+        "continuations" "errors" "hashtables" "strings"
+        "namespaces" "generic" "tuple" "files" "parser"
+        "parse-number" "image" "init" "io/io"
+        "listener" "vectors" "words" "unparser" "random"
+        "stream" "math/bitops"
+        "math/math-combinators" "math/rational" "math/float"
+        "math/complex" "math/irrational" "math/integer"
+        "math/matrices"
+        "httpd/url-encoding" "httpd/html" "httpd/httpd"
+        "httpd/http-client"
+        "crashes" "sbuf" "threads" "parsing-word"
+        "inference" "dataflow" "interpreter" "alien"
+        "line-editor" "gadgets" "memory" "redefine"
+        "annotate" "sequences"
+    ] run-tests ;
+
+: benchmarks
+    [
+        "benchmark/empty-loop" "benchmark/fac"
+        "benchmark/fib" "benchmark/sort"
+        "benchmark/continuations" "benchmark/ack"
+        "benchmark/hashtables" "benchmark/strings"
+        "benchmark/vectors" "benchmark/prettyprint"
+    ] run-tests ;
+
+: compiler-tests
+    [
+        "io/buffer" "compiler/optimizer"
+        "compiler/simple"
+        "compiler/stack" "compiler/ifte"
+        "compiler/generic" "compiler/bail-out"
+        "compiler/linearizer" "compiler/intrinsics"
+    ] run-tests ;
+
+: all-tests tests compiler-tests benchmarks ;

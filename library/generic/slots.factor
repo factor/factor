@@ -46,7 +46,7 @@ sequences strings words ;
     [ 3unlist define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    [ swap word-name , "-" , , ] make-string create-in ;
+    >r word-name "-" r> append3 create-in ;
 
 : writer-word ( class name -- word )
     [ swap "set-" , word-name , "-" , , ] make-string create-in ;

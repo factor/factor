@@ -38,9 +38,25 @@ public class FactorParsedData extends SideKickParsedData
 	public String in;
 	public Cons use;
 
-	FactorParsedData(FactorSideKickParser parser, String fileName)
+	public FactorParsedData(FactorSideKickParser parser, String fileName)
 	{
 		super(fileName);
 		this.parser = parser;
+	}
+	
+	public String getVocabularyDeclarations()
+	{
+		StringBuffer buf = new StringBuffer("IN: ");
+		buf.append(in);
+		buf.append("\nUSING: ");
+		Cons u = use;
+		while(u != null)
+		{
+			buf.append(" ");
+			buf.append(u.car);
+			u = u.next();
+		}
+		buf.append(" ;");
+		return buf.toString();
 	}
 }

@@ -25,8 +25,10 @@ BUILTIN: array 8 array? ;
 : set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
 : dispatch ( n vtable -- ) 2 slot array-nth call ;
 
-: copy-array ( to from n -- )
-    [ 3dup swap array-nth pick rot set-array-nth ] repeat 2drop ;
+: copy-array ( to from -- )
+    dup array-capacity [
+        3dup swap array-nth pick rot set-array-nth
+    ] repeat 2drop ;
 
 M: array length array-capacity ;
 M: array nth array-nth ;

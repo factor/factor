@@ -15,6 +15,7 @@ plugin.factor.jedit.FactorPlugin.depend.3=plugin console.ConsolePlugin 4.0.2
 plugin.factor.jedit.FactorPlugin.menu=factor-listener \
 	factor-run-file \
 	factor-eval-selection \
+	factor-eval-word-def \
 	- \
 	sidekick-tree \
 	- \
@@ -40,6 +41,7 @@ plugin.factor.jedit.FactorPlugin.menu=factor-listener \
 factor-listener.label=Listener
 factor-run-file.label=Run current file
 factor-eval-selection.label=Evaluate selection
+factor-eval-word-def.label=Evaluate word definition
 factor-apropos.label=Apropos at caret
 factor-insert-use.label=Use word at caret
 factor-see.label=See word at caret

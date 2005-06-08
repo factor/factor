@@ -123,9 +123,9 @@ public class FactorPlugin extends EditPlugin
 				argsArray, null, new File(MiscUtilities
 				.getParentOfPath(imagePath)));
 
-			process.getOutputStream().close();
+			/* process.getOutputStream().close();
 			process.getInputStream().close();
-			process.getErrorStream().close();
+			process.getErrorStream().close(); */
 		}
 		catch(Exception e)
 		{
@@ -690,5 +690,33 @@ public class FactorPlugin extends EditPlugin
 		Token token = TextUtilities.getTokenAtOffset(tokens,offset);
 		
 		return token.rules.getName();
+	} //}}}
+
+	//{{{ evalWordDef() method
+	public static void evalWordDef(View view)
+	{
+		FactorParsedData data = getParsedData(view);
+                if(data == null)
+                {
+                        view.getToolkit().beep();
+                        return;
+                }
+
+                JEditTextArea textArea = view.getTextArea();
+
+                IAsset asset = data.getAssetAtOffset(textArea.getCaretPosition());
+
+                if(asset == null || asset.getEnd() == null)
+                {
+                        view.getToolkit().beep();
+                        return;
+                }
+		
+		int start = asset.getStart().getOffset();
+		String text = textArea.getBuffer().getText(start,
+			asset.getEnd().getOffset() - start);
+		
+		String eval = data.getVocabularyDeclarations() + "\n" + text;
+		evalInListener(view,eval);
 	} //}}}
 }

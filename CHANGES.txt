@@ -39,6 +39,11 @@ HTTP server now supports virtual hosting.
 You can now set timeouts for I/O operations with the set-timeout generic
 word. The HTTP server sets a timeout of 60 seconds for client requests.
 
+The Factor plugin now supports connecting to Factor instances on
+arbitrary host and port names. This allows interactive development on
+one machine while testing on another. A new command was added to
+evaluate the word definition at the caret in the listener.
+
 Factor 0.74:
 ------------
 

@@ -38,6 +38,10 @@ IN: kernel-internals
     [ array-nth swap call ] 2keep
     set-array-nth ; inline
 
+: each-bucket ( hash quot -- | quot: n hash -- )
+    over bucket-count [ [ -rot call ] 3keep ] repeat 2drop ;
+    inline
+
 : hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
 : hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
 
@@ -76,17 +80,9 @@ IN: hashtables
 : grow-hash? ( hash -- ? )
     dup bucket-count 3 * 2 /i swap hash-size < ;
 
-: (hash>alist) ( alist n hash -- alist )
-    2dup bucket-count >= [
-        2drop
-    ] [
-        [ hash-bucket [ swons ] each ] 2keep
-        >r 1 + r> (hash>alist)
-    ] ifte ;
-
 : hash>alist ( hash -- alist )
     #! Push a list of key/value pairs in a hashtable.
-    [ ] 0 rot (hash>alist) ;
+    [ ] swap [ hash-bucket [ swons ] each ] each-bucket ;
 
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;
@@ -116,10 +112,7 @@ IN: hashtables
 
 : hash-clear ( hash -- )
     #! Remove all entries from a hashtable.
-    0 over set-hash-size
-    dup bucket-count [
-        [ f swap pick set-hash-bucket ] keep
-    ] repeat drop ;
+    0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
 : buckets>list ( hash -- list )
     #! Push a list of key/value pairs in a hashtable.
@@ -146,9 +139,8 @@ IN: hashtables
 
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
-    over hash-size over set-hash-size [
-        hash-array swap hash-array dup length copy-array
-    ] keep ;
+    over hash-size over set-hash-size
+    [ hash-array swap hash-array copy-array ] keep ;
 
 M: hashtable = ( obj hash -- ? )
     2dup eq? [

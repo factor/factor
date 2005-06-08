@@ -23,6 +23,11 @@
 				FactorPlugin.evalInListener(view,sel);
 		</CODE>
 	</ACTION>
+	<ACTION NAME="factor-eval-word-def">
+		<CODE>
+			FactorPlugin.evalWordDef(view);
+		</CODE>
+	</ACTION>
 	<ACTION NAME="factor-run-file">
 		<CODE>
 			buffer.save(view,null);

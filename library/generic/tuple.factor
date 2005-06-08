@@ -100,7 +100,6 @@ UNION: arrayed array tuple ;
 : define-tuple ( tuple slots -- )
     2dup check-shape
     >r create-in
-    dup save-location
     dup intern-symbol
     dup tuple-predicate
     dup tuple "metaclass" set-word-prop
@@ -190,7 +189,7 @@ M: mirror length ( mirror -- len )
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.
-    dup array-capacity dup <tuple> [ -rot copy-array ] keep ;
+    [ array-capacity <tuple> dup ] keep copy-array ;
 
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
