@@ -35,6 +35,7 @@ USE: math
 USE: parser
 USE: alien
 USE: words
+USE: sequences
 
 : CONSTANT: CREATE 
     [ [ [ swons ] each ] cons define-compound POSTPONE: parsing ] 
