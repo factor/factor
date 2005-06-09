@@ -11,7 +11,7 @@ M: %alien-invoke generate-node ( vop -- )
 : stack@ 3 + cell * ;
 
 M: %parameters generate-node ( vop -- )
-    dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte ;
+    vop-in-1 dup 0 = [ drop ] [ stack-size 1 1 rot SUBI ] ifte ;
 
 M: %unbox generate-node ( vop -- )
     vop-in-1 uncons f compile-c-call 3 1 rot stack@ STW ;

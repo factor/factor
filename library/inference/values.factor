@@ -5,7 +5,6 @@ USING: generic kernel lists namespaces sequences unparser words ;
 
 GENERIC: value= ( literal value -- ? )
 GENERIC: value-class-and ( class value -- )
-GENERIC: safe-literal? ( value -- ? )
 
 SYMBOL: cloned
 GENERIC: clone-value ( value -- value )
@@ -60,14 +59,10 @@ M: literal value-class-and ( class value -- )
 M: literal set-value-class ( class value -- )
     2drop ;
 
-M: literal safe-literal? ( value -- ? ) value-safe? ;
-
 M: computed clone-value ( value -- value )
     dup cloned get assq [ ] [
         dup clone [ swap cloned [ acons ] change ] keep
     ] ?ifte ;
-
-M: computed safe-literal? drop f ;
 
 M: computed literal-value ( value -- )
     "A literal value was expected where a computed value was"
@@ -78,3 +73,6 @@ M: computed literal-value ( value -- )
 
 : >literal< ( literal -- rstate obj )
     dup value-recursion swap literal-value ;
+
+PREDICATE: tuple safe-literal ( obj -- ? )
+    dup literal? [ value-safe? ] [ drop f ] ifte ;

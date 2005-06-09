@@ -76,3 +76,8 @@ M: circle area circle-radius sq pi * ;
 ! Hashcode breakage
 TUPLE: empty ;
 [ t ] [ <empty> hashcode fixnum? ] unit-test
+
+TUPLE: delegate-clone ;
+
+[ << delegate-clone << empty f >> >> ]
+[ << delegate-clone << empty f >> >> clone ] unit-test

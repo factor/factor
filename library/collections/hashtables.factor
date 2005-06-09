@@ -25,6 +25,8 @@ BUILTIN: hashtable 10 hashtable?
 ! if it is somewhat 'implementation detail', is in the
 ! public 'hashtables' vocabulary.
 
+: bucket-count ( hash -- n ) hash-array length ;
+
 IN: kernel-internals
 
 : hash-bucket ( n hash -- alist )
@@ -53,8 +55,6 @@ IN: kernel-internals
     >r <array> r> set-hash-array ;
     
 IN: hashtables
-
-: bucket-count ( hash -- n ) hash-array length ;
 
 : (hashcode) ( key table -- index )
     #! Compute the index of the bucket for a key.

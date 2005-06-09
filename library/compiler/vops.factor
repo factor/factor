@@ -160,7 +160,7 @@ M: %slot basic-block? drop t ;
 VOP: %set-slot
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg n.
-    >r >r <vreg> r> <vreg> r> <vreg> [ 3list ] keep unit f
+    >r >r <vreg> r> <vreg> r> <vreg> 3list dup second f
     <%set-slot> ;
 M: %set-slot basic-block? drop t ;
 
@@ -179,7 +179,7 @@ VOP: %fast-set-slot
 M: %fast-set-slot basic-block? drop t ;
 
 VOP: %write-barrier
-: %write-barrier ( ptr ) <vreg> unit f f <%write-barrier> ;
+: %write-barrier ( ptr ) <vreg> unit dup f <%write-barrier> ;
 
 ! fixnum intrinsics
 VOP: %fixnum+       : %fixnum+ 3-vop <%fixnum+> ;

@@ -7,7 +7,7 @@ USING: assembler compiler errors kernel math memory words ;
 : cs-op cell * neg 15 swap ;
 
 M: %immediate generate-node ( vop -- )
-    dup vop-in-1 address swap vop-out-1 v>operand LOAD32 ;
+    dup vop-in-1 address swap vop-out-1 v>operand LOAD ;
 
 : load-indirect ( dest literal -- )
     intern-literal over LOAD dup 0 LWZ ;

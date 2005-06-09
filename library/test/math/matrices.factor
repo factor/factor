@@ -13,7 +13,7 @@ USING: kernel lists math matrices namespaces sequences test ;
 [
     M[ [ 1 ] [ 2 ] [ 3 ] ]M
 ] [
-    { 1 2 3 } <col-vector>
+    { 1 2 3 } <col-matrix>
 ] unit-test
 
 [

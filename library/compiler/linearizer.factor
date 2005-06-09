@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: compiler-backend inference kernel kernel-internals lists
-math namespaces words strings errors prettyprint sequences ;
+USING: compiler-backend errors generic inference kernel
+kernel-internals lists math namespaces prettyprint sequences
+strings words ;
 
 GENERIC: linearize-node* ( node -- )
 M: f linearize-node* ( f -- ) drop ;
@@ -44,14 +45,17 @@ M: #call-label linearize-node* ( node -- )
 
 GENERIC: load-value ( vreg n value -- )
 
-M: computed load-value ( vreg n value -- )
+M: object load-value ( vreg n value -- )
     drop %peek-d , ;
 
-M: literal load-value ( vreg n value -- )
-    nip literal-value dup
+: push-literal ( vreg value -- )
+    literal-value dup
     immediate? [ %immediate ] [ %indirect ] ifte , ;
 
-: push-1 ( value -- ) >r 0 0 r> load-value ;
+M: safe-literal load-value ( vreg n value -- )
+    nip push-literal ;
+
+: push-1 ( value -- ) 0 swap push-literal ;
 
 M: #push linearize-node* ( node -- )
     node-out-d dup length dup %inc-d ,

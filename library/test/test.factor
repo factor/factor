@@ -87,7 +87,7 @@ SYMBOL: failures
         "httpd/url-encoding" "httpd/html" "httpd/httpd"
         "httpd/http-client"
         "crashes" "sbuf" "threads" "parsing-word"
-        "inference" "dataflow" "interpreter" "alien"
+        "inference" "interpreter" "alien"
         "line-editor" "gadgets" "memory" "redefine"
         "annotate" "sequences"
     ] run-tests ;
