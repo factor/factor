@@ -1,7 +1,7 @@
 #include "factor.h"
 
 /* This function is called by the compiler. It returns an untagged fixnum. */
-F_FIXNUM arithmetic_type(void)
+CELL arithmetic_type(void)
 {
 	CELL obj1 = dpeek(), obj2 = get(ds - CELLS);
 	CELL type1 = TAG(obj1), type2 = TAG(obj2);
