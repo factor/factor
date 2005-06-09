@@ -310,7 +310,10 @@ void garbage_collection(CELL gen)
 void primitive_gc(void)
 {
 	CELL gen = to_fixnum(dpop());
-	gen = MAX(NURSERY,MIN(TENURED,gen));
+	if(gen <= NURSERY)
+		gen = NURSERY;
+	else if(gen >= TENURED)
+		gen = TENURED;
 	garbage_collection(gen);
 }
 

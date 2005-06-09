@@ -218,8 +218,10 @@ void dump_generations(void)
 
 void factorbug(void)
 {
+#ifndef WIN32
 	fcntl(0,F_SETFL,0);
 	fcntl(1,F_SETFL,0);
+#endif
 
 	fprintf(stderr,"Factor low-level debugger\n");
 	fprintf(stderr,"d <addr> <count> -- dump memory\n");

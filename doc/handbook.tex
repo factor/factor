@@ -25,6 +25,7 @@
 \newcommand{\tto}{\symbol{123}}
 \newcommand{\ttc}{\symbol{125}}
 \newcommand{\pound}{\char'43}
+\newcommand{\hhat}{\symbol{94}}
 
 \newcommand{\vocabulary}[1]{\emph{Vocabulary:} \texttt{#1}&\\}
 
@@ -83,6 +84,8 @@ Factor is \emph{dynamic}. This means that all objects in the language are fully 
 Factor is \emph{safe}. This means all code executes in an object-oriented runtime that provides
 garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
 
+\part{Foo}
+
 \chapter{Language reference}
 
 \section{Conventions}
@@ -137,7 +140,7 @@ The following abbreviations have conventional meaning in stack effect comments:
 
 \begin{description}
 \item[\texttt{[ x y z ]}] a list with elements whose types are hinted at by \texttt{x}, \texttt{y}, \texttt{z}
-\item[\texttt{[[ x y ]]}] a cons cell where the type of the cdr is hinted at by \texttt{x}, and the type of the cdr is hinted at by \texttt{y}
+\item[\texttt{[[ x y ]]}] a cons cell where the type of the car is hinted at by \texttt{x}, and the type of the cdr is hinted at by \texttt{y}
 \item[\texttt{ch}] an integer representing a Unicode character
 \item[\texttt{elt}] an arbitrary object that happends to be an element of a collection
 \item[\texttt{i}] a loop counter or index
@@ -196,13 +199,13 @@ $(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including and $b$\\
 $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \end{tabular}
 
-\section{\label{syntax}Syntax}
+\section{Syntax}\label{syntax}
 \newcommand{\parseglos}{\glossary{name=parser,
 description={a set of words in the \texttt{parser} vocabulary, primarily \texttt{parse}, \texttt{eval}, \texttt{parse-file} and \texttt{run-file}, that creates objects from their printed representations, and adds word definitions to the dictionary}}}
 \parseglos
 In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary. The latter is discussed in \ref{words}. The parser can be extended (\ref{parser}).
 
-\subsection{\label{parser}Parser algorithm}
+\subsection{Parser algorithm}\label{parser}
 
 \parseglos
 \glossary{name=token,
@@ -268,7 +271,7 @@ While parsing words supporting arbitrary syntax can be defined, the default set 
 in the \texttt{syntax} vocabulary and provides the basis for all further syntactic
 interaction with Factor.
 
-\subsection{\label{vocabsearch}Vocabulary search}
+\subsection{Vocabulary search}\label{vocabsearch}
 
 \newcommand{\wordglos}{\glossary{
 name=word,
@@ -327,7 +330,7 @@ description={an instance of the \texttt{number} class}}}
 
 If a vocabulary lookup of a token fails, the parser attempts to parse it as a number.
 
-\subsubsection{\label{integer-literals}Integers}
+\subsubsection{Integers}\label{integer-literals}
 
 \newcommand{\integerglos}{\glossary{
 name=integer,
@@ -366,7 +369,7 @@ Integers are entered in base 10 unless prefixed with a base change parsing word.
 
 More information on integers can be found in \ref{integers}.
 
-\subsubsection{\label{ratio-literals}Ratios}
+\subsubsection{Ratios}\label{ratio-literals}
 
 \newcommand{\ratioglos}{\glossary{
 name=ratio,
@@ -384,7 +387,7 @@ of the two terms is 1.
 
 More information on ratios can be found in \ref{ratios}.
 
-\subsubsection{\label{float-literals}Floats}
+\subsubsection{Floats}\label{float-literals}
 
 \newcommand{\floatglos}{\glossary{
 name=float,
@@ -402,7 +405,7 @@ an optional sign prefix on either the significand or exponent.
 
 More information on floats can be found in \ref{floats}.
 
-\subsubsection{\label{complex-literals}Complex numbers}
+\subsubsection{Complex numbers}\label{complex-literals}
 
 \newcommand{\complexglos}{\glossary{
 name=complex,
@@ -428,7 +431,7 @@ Many different types of objects can be constructed at parse time via literal syn
 
 If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are ``live''.
 
-\subsubsection{\label{boolean}Booleans}
+\subsubsection{Booleans}\label{boolean}
 
 \newcommand{\boolglos}{
 \glossary{
@@ -460,7 +463,7 @@ Note that the \texttt{f} parsing word and class is not the same as the \texttt{f
 \end{alltt}
 An analogous distinction holds for the \texttt{t} class and object.
 
-\subsubsection{\label{syntax:char}Characters}
+\subsubsection{Characters}\label{syntax:char}
 
 \newcommand{\charglos}{\glossary{
 name=character,
@@ -510,7 +513,7 @@ CHAR: \bs{}u0078
 \end{alltt}
 While not useful for single characters, this syntax is also permitted inside strings.
 
-\subsubsection{\label{string-literals}Strings}
+\subsubsection{Strings}\label{string-literals}
 
 \newcommand{\stringglos}{\glossary{
 name=string,
@@ -532,7 +535,7 @@ inserting escape sequences as described in \ref{syntax:char}.
 
 Strings are documented in \ref{strings}.
 
-\subsubsection{\label{listsyntax}Lists}
+\subsubsection{Lists}\label{listsyntax}
 \newcommand{\listglos}{\glossary{
 name=list,
 description={an instance of the \texttt{list} class, storing a sequence of elements as a chain of zero or more conses, where the car of each cons is an element, and the cdr is either \texttt{f} or another list}}
@@ -613,7 +616,7 @@ description=an object whose slot values cannot be changed}}
 Using mutable object literals in word definitions requires care, since if those objects
 are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Strings and lists are immutable; string buffers, vectors, hashtables and tuples are mutable.
 
-\subsubsection{\label{sbuf-literals}String buffers}
+\subsubsection{String buffers}\label{sbuf-literals}
 
 \newcommand{\sbufglos}{\glossary{
 name=string buffer,
@@ -634,7 +637,7 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 
 String buffers are documented in \ref{string-buffers}.
 
-\subsubsection{\label{vector-literals}Vectors}
+\subsubsection{Vectors}\label{vector-literals}
 \newcommand{\vectorglos}{\glossary{
 name=vector,
 description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in a contiguous range of memory}}}
@@ -689,7 +692,7 @@ Parses a tuple. The tuple's class must follow \texttt{<<}. The element after tha
 
 Tuples are documented in \ref{tuples}.
 
-\subsubsection{\label{syntax:matrices}Matrices}
+\subsubsection{Matrices}\label{syntax:matrices}
 \newcommand{\matrixglos}{\glossary{
 name=matrix,
 description={an instance of the \texttt{matrix} class, representing a mathematical matrix of numbers}}}
@@ -711,7 +714,7 @@ $$\left( \begin{array}{c c c}
 \end{array} \right)$$
 Matrices are documented in \ref{matrices}.
 
-\subsection{\label{comments}Comments}
+\subsection{Comments}\label{comments}
 
 \wordtable{
 \vocabulary{syntax}
@@ -796,7 +799,7 @@ a stack effect comment in the middle of a compound definition to keep track of s
 a good sign that the word should probably be factored into two or
 more smaller words.
 
-\subsection{\label{quotations}Quotations}
+\subsection{Quotations}\label{quotations}
 
 \newcommand{\csglos}{\glossary{
 name=return stack,
@@ -1073,7 +1076,7 @@ Calling one of these words calls the given quotation with the continuation on th
 
 The difference between \texttt{callcc0} and \texttt{callcc1} lies in the continuation object. When \texttt{callcc1} is used, calling the continuation takes one value from the top of the data stack, and places it back on the \emph{restored} data stack. This allows idioms such as exception handling, co-routines and generators to be implemented via continuations.
 
-\subsubsection{\label{exceptions}Handling exceptional situations}
+\subsubsection{Handling exceptional situations}\label{exceptions}
 \glossary{name=exception,
 description=an object representing an exceptional situation that has been detected}
 
@@ -1140,7 +1143,7 @@ The following diagram illustrates the nesting of exception handlers on the catch
 \end{center}
 \end{figure}
 
-\subsubsection{\label{threads}Multitasking}
+\subsubsection{Multitasking}\label{threads}
 
 Factor implements co-operative multitasking, where the thread of control switches between tasks at explicit calls to \texttt{yield}, as well as when blocking I/O is performed. Multitasking is implemented via continuations.
 \wordtable{
@@ -1204,7 +1207,7 @@ Save and restore the name stack, used for dynamic variable bindings. See \ref{na
 }
 Save and restore the catch stack, used for exception handling. See \ref{exceptions}.
 
-\section{\label{words}Words}
+\section{Words}\label{words}
 
 \wordglos
 \vocabglos
@@ -1251,7 +1254,7 @@ Words whose names are known at parse time -- that is, most words making up your 
 }
 The \texttt{vocabs} parameter is a list of vocabulary names. If a word with the given name is found, it is pushed on the stack, otherwise, \texttt{f} is pushed.
 
-\subsubsection{\label{creating-words}Creating words}
+\subsubsection{Creating words}\label{creating-words}
 
 \wordtable{
 \vocabulary{words}
@@ -1277,7 +1280,7 @@ There are two ways to create a word definition:
 \item Using defining words at run-time. This is a more dynamic feature that can be used to implement code generation and such, and in fact parse-time defining words are implemented in terms of run-time defining words.
 \end{itemize}
 
-\subsubsection{\label{colondefs}Compound definitions}
+\subsubsection{Compound definitions}\label{colondefs}
 
 \newcommand{\colonglos}{\glossary{
 name=compound definition,
@@ -1319,7 +1322,7 @@ Tests if the \texttt{object} is a compound word definition.
 }
 The class that all compound words are an instance of.
 
-\subsubsection{\label{symbols}Symbols}
+\subsubsection{Symbols}\label{symbols}
 
 \newcommand{\symbolglos}{\glossary{
 name=symbol,
@@ -1348,7 +1351,7 @@ Tests if the \texttt{object} is a symbol.
 }
 The class that all symbols are an instance of.
 
-\subsubsection{\label{primitives}Primitives}
+\subsubsection{Primitives}\label{primitives}
 \newcommand{\primglos}{\glossary{
 name=primitive,
 description=a word implemented as native code in the Factor runtime}}
@@ -1367,7 +1370,7 @@ Tests if the \texttt{object} is a primitive.
 }
 The class that all primitives are an instance of.
 
-\subsubsection{\label{deferred}Deferred words and mutual recursion}
+\subsubsection{Deferred words and mutual recursion}\label{deferred}
 
 \glossary{
 name=deferred word,
@@ -1410,7 +1413,7 @@ Removes the word \texttt{name} from its vocabulary. Existing definitions that re
 }
 Removes the word from its vocabulary. The parsing word \texttt{FORGET:} is implemented using this word.
 
-\subsubsection{\label{declarations}Declarations}
+\subsubsection{Declarations}\label{declarations}
 
 A compound or generic word (\ref{generic}) can be given special behavior with one of the below parsing words.
 
@@ -1426,7 +1429,7 @@ Marks the most recently defined word as an inline word. The compiler copies the 
 }
 Marks the most recently defined word as a parsing word. Parsing words run at parse time. Se \ref{parsing-words}.
 
-\subsection{\label{word-props}Word properties}
+\subsection{Word properties}\label{word-props}
 
 \glossary{name=word property,
 description={a name/value pair stored in a word's properties}}
@@ -1536,7 +1539,7 @@ description=a datum that can be identified}
 
 Everything in Factor is an object, where an object is a collection of slots. Each object has a unique identity, and references to objects are passed by value on the stack. It is possible to have two references to the same object, and if the object is mutated through one reference, the changes will be visible through the other reference. Not all objects are mutable; the documentation for each class details if its instances are mutable or not.
 
-\subsection{\label{equality}Identity and equality}
+\subsection{Identity and equality}\label{equality}
 
 \glossary{name=equal,
 description={two objects are equal if they have the same class and if their slots are equal, or alternatively, if both are numbers that denote the same value}}
@@ -1565,7 +1568,7 @@ Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precis
 }
 Make a fresh object that is equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a new shallow copy of the original.
 
-\subsection{\label{generic}Generic words and methods}
+\subsection{Generic words and methods}\label{generic}
 
 \glossary{name=generic word,
 description={a word defined using the \texttt{GENERIC:}~parsing word. The behavior of generic words depends on the class of the object at the top of the stack. A generic word is composed of methods, where each method is specialized on a class}}
@@ -1590,7 +1593,7 @@ Defines a new generic word. Initially, it contains no methods, and thus will rai
 Defines a method, that is, a behavior for the generic \texttt{word} specialized on instances of \texttt{class}. Each method definition
 can potentially occur in a different source file.
 
-\subsubsection{\label{method-order}Method ordering}
+\subsubsection{Method ordering}\label{method-order}
 
 If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes. The methods of a generic word are linearly ordered, though, and you can inspect this order using the \texttt{order} word.
 
@@ -1768,7 +1771,7 @@ Intersection and union of classes. Note that the returned class might not be the
 }
 Classes are partially ordered. This ordering determines the method ordering of a generic word (\ref{method-order}).
 
-\subsection{\label{tuples}Tuples}
+\subsection{Tuples}\label{tuples}
 \tupleglos
 
 Tuples are user-defined classes composed of named slots. All tuples have the same type, however distinct classes of tuples are defined.
@@ -1978,7 +1981,7 @@ The input is a sequence of sequences. If the input is empty, the output is the e
 }
 Outputs a new sequence of the same class, with the reverse element order.
 
-\subsubsection{\label{subseq}Subsequences}
+\subsubsection{Subsequences}\label{subseq}
 
 The following set of words do not modify their inputs.
 
@@ -2072,7 +2075,7 @@ Adds and removes an element at the end of the sequence. The sequence's length is
     dup peek >r dup length 1 - swap set-length r> ;
 \end{verbatim}
 
-\subsection{\label{sequence-combinators}Sequence combinators}
+\subsection{Sequence combinators}\label{sequence-combinators}
 
 \wordtable{
 \vocabulary{sequences}
@@ -2131,7 +2134,7 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
-\subsection{\label{vectors}Vectors}
+\subsection{Vectors}\label{vectors}
 
 \wordtable{
 \vocabulary{vectors}
@@ -2230,7 +2233,7 @@ Here is an example:
 \end{alltt}
 Cons cells, and by extension lists, are immutable.
 
-\subsubsection{\label{lists}Lists}
+\subsubsection{Lists}\label{lists}
 
 \listglos
 \glossary{name=improper list,description={a sequence of cons cells where the cdr of the last cons cell is not \texttt{f}}}
@@ -2431,7 +2434,7 @@ Dequeues an element and outputs a new queue without that element.
 }
 Enqueues an element and outputs a new queue.
 
-\subsection{\label{strings}Strings}
+\subsection{Strings}\label{strings}
 
 \stringglos
 \wordtable{
@@ -2510,7 +2513,7 @@ Converts an integer representing a character value into a single-element string.
 }
 Various character classification predicates.
 
-\subsection{\label{string-buffers}String buffers}
+\subsection{String buffers}\label{string-buffers}
 
 \sbufglos
 \wordtable{
@@ -2531,7 +2534,7 @@ Turns any type of sequence into a string buffer. Given a string buffer, this mak
 
 String buffers support the stream output protocol (\ref{stream-protocol}).
 
-\subsection{\label{virtual-seq}Virtual sequences}
+\subsection{Virtual sequences}\label{virtual-seq}
 
 \glossary{name=virtual sequence,
 description={a sequence that is not backed by actual storage, but instead either computes its values, or take them from an underlying sequence}}
@@ -2605,7 +2608,7 @@ Subsequence&Slice\\
 
 The slice words output a new virtual sequence that shares structure with the original sequence, whereas the subsequence words output a fresh copied sequence.
 
-\subsection{\label{make-seq}Constructing sequences}
+\subsection{Constructing sequences}\label{make-seq}
 
 The library supports an idiom where sequences can be constructed without passing the partial sequence being built on the stack. This reduces stack noise, and thus simplifies code and makes it easier to understand.
 
@@ -2755,7 +2758,7 @@ Cons a pair of elements onto a pair of lists.
 }
 Deconstructs paired lists.
 
-\subsection{\label{hashtables}Hashtables}
+\subsection{Hashtables}\label{hashtables}
 
 \hashglos
 \glossary{name=bucket,
@@ -2868,7 +2871,7 @@ Adds a key/value pair to the hashtable currently being constructed.
 
 As with sequence construction, care must be taken to mind the effects of dynamic scoping on variable assignment performed by the quotation. Details are in \ref{namespaces}.
 
-\subsection{\label{namespaces}Variables and namespaces}
+\subsection{Variables and namespaces}\label{namespaces}
 
 A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed \emph{namespaces}. Nesting of scopes is implemented with a search order on namespaces, defined by a \emph{name stack}. Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (\ref{symbols}). 
 
@@ -3011,7 +3014,7 @@ The non-commutative operations \texttt{-} and \texttt{/} take operands from the 
 The \texttt{/} word gives an exact answer where possible. These two words output the answer in other forms. The \texttt{/i} word truncates the result towards zero, and \texttt{/f} converts it to a floating point approximation.
 \wordtable{
 \vocabulary{math}
-\ordinaryword{\^}{\^{} ( x y -- z )}
+\ordinaryword{\hhat}{\^{} ( x y -- z )}
 
 }
 Raises \texttt{x} to the power of \texttt{y}. If \texttt{y} is an integer the answer is computed exactly, otherwise a floating point approximation is used.
@@ -3026,7 +3029,7 @@ The following ordering operations are supported on real numbers only.
 \ordinaryword{>=}{>= ( n n -- ?~)}
 }
 
-\subsection{\label{integers}Integers}
+\subsection{Integers}\label{integers}
 
 \integerglos
 
@@ -3136,11 +3139,11 @@ Computes a value \texttt{y} that satisfies the following property:
 $$xy \equiv 1 \bmod{n}$$ An exception is thrown if no such \texttt{y} exists.
 \wordtable{
 \vocabulary{math}
-\ordinaryword{\^{}mod}{\^{}mod ( x y n -- z )}
+\ordinaryword{\hhat{}mod}{\hhat{}mod ( x y n -- z )}
 }
 Raises \texttt{x} to the power of \texttt{y}, modulo \texttt{n}. This is far more efficient than first calling \texttt{\^{}} followed by \texttt{mod}.
 
-\subsubsection{\label{bitwise}Bitwise operations}
+\subsubsection{Bitwise operations}\label{bitwise}
 
 There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation motivates \emph{bitwise operations}.
 \wordtable{
@@ -3213,7 +3216,7 @@ Applies the quotation to each bit of the input. The input must be a positive int
 }
 Outputs a pseudo-random integer in the interval $[a,b]$.
 
-\subsection{\label{ratios}Rational numbers}
+\subsection{Rational numbers}\label{ratios}
 
 \newcommand{\rationalglos}{\glossary{
 name=rational,
@@ -3262,7 +3265,7 @@ Deconstructs rational numbers into their numerator and denominator. The denomina
 \textbf{12}
 \end{alltt}
 
-\subsection{\label{floats}Floating point numbers}
+\subsection{Floating point numbers}\label{floats}
 
 \wordtable{
 \vocabulary{math}
@@ -3302,7 +3305,7 @@ Tests if the top of the stack is a floating point number.
 }
 Turn any real number into a floating point approximation.
 
-\subsection{\label{complex-numbers}Complex numbers}
+\subsection{Complex numbers}\label{complex-numbers}
 
 \wordtable{
 \vocabulary{math}
@@ -3368,7 +3371,7 @@ Computes the absolute value and argument individually.
 \textbf{1.570796326794897}
 \end{alltt}
 
-\subsection{\label{algebraic}Algebraic and transcedential functions}
+\subsection{Algebraic and transcedential functions}\label{algebraic}
 
 \wordtable{
 \vocabulary{math}
@@ -3509,7 +3512,7 @@ Computes the cross product $v_1\times v_2$. The following example illustrates th
 \textbf{0}
 \end{alltt}
 
-\subsubsection{\label{matrices}Matrices}
+\subsubsection{Matrices}\label{matrices}
 
 Matrix literal syntax is documented in \ref{syntax:matrices}. In addition to the literal syntax, new matrices may be created from scratch in one of several ways.
 
@@ -3656,7 +3659,7 @@ sink of characters. Streams also support formatted output, which may be used to 
 
 String buffers support the stream output protocol. See \ref{stdio}.
 
-\subsection{\label{stream-protocol}Stream protocol}
+\subsection{Stream protocol}\label{stream-protocol}
 \glossary{name=input stream,
 description={a stream that implements the \texttt{stream-readln} and \texttt{stream-read} generic words and can be used for character input}}
 \glossary{name=output stream,
@@ -3736,7 +3739,7 @@ Outputs a character or string to the stream, without any specific style informat
 }
 Outputs a character or string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
 
-\subsection{\label{stdio}The default stream}
+\subsection{The default stream}\label{stdio}
 \glossary{name=default stream,
 description={the value of the \texttt{stdio} variable, used by various words as an implicit stream parameter}}
 \glossary{name=stdio,
@@ -4027,7 +4030,7 @@ Converts \texttt{n} into a string representation in the given base. The base mus
 }
 Convenience words defined in terms of \texttt{>base} for converting integers into string representations in base 2, 8, 10 and 16, respectively.
 
-\subsubsection{\label{prettyprint}The prettyprinter}
+\subsubsection{The prettyprinter}\label{prettyprint}
 
 \wordtable{
 \vocabulary{prettyprint}
@@ -4127,7 +4130,7 @@ Decreases the indent level and emits a newline if \texttt{one-line} is off.
 
 This section concerns itself with reflective access and extension of the parser. The parser algorithm and standard syntax is described in \ref{syntax}. Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right.
 
-\subsection{\label{parsing-numbers}Parsing numbers}
+\subsection{Parsing numbers}\label{parsing-numbers}
 
 \wordtable{
 \vocabulary{parser}
@@ -4159,7 +4162,7 @@ Converts a string representation of an integer in the given base into an integer
 }
 Convenience words defined in terms of \texttt{base>} for parsing integers in base 2, 8, 10 and 16, respectively.
 
-\subsection{\label{parsing-quotations}Parsing quotations}
+\subsection{Parsing quotations}\label{parsing-quotations}
 
 As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables (\ref{namespaces}):
 \begin{description}
@@ -4233,7 +4236,7 @@ The next set of stream parsing words takes the vocabulary search path and curren
 }
 Like the first set of stream parsing words, except the \texttt{"use"} and \texttt{"in"} variables are taken from the current scope.
 
-\subsection{\label{parsing-words}Parsing words}
+\subsection{Parsing words}\label{parsing-words}
 
 \parsingwordglos
 Parsing words execute at parse time, and therefore can access and modify the state of the parser, as well as add objects to the parse tree. Parsing words are a difficult concept to grasp, so this section has several examples and explains the workings of some of the parsing words provided in the library.
@@ -4306,7 +4309,7 @@ Data types such as vectors, hashtables and so on are built in a similar way. For
 \end{verbatim}
 Indeed, any type of object can be added to the parse tree in this fashion.
 
-\subsubsection{\label{reading-ahead}Reading ahead}
+\subsubsection{Reading ahead}\label{reading-ahead}
 
 \glossary{name=reading ahead,
 description=a parsing word reads ahead of it scans following tokens from the input string}
@@ -4413,7 +4416,7 @@ The call to the \verb|;| word proceeds as follows:
 \item[\texttt{swap call}] calls \texttt{[ define-compound ]}. Thus, \verb|define-compound| is called to define \verb|sq| as the quotation \verb|[ dup * ]|.
 \end{description}
 
-\subsubsection{\label{string-mode}String mode and parser variables}
+\subsubsection{String mode and parser variables}\label{string-mode}
 \stringmodeglos
 String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly.
 
@@ -4466,7 +4469,7 @@ Attempts to connect to the server specified in the URL. If the connection fails,
 \item[\texttt{stream}] a stream for reading the resource.
 \end{description}
 
-\subsection{\label{html}HTML output}
+\subsection{HTML output}\label{html}
 
 An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities before being passed on to the wrapped stream. Also, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word may be filled out to wrap the text being written in various HTML tags.
 
@@ -4584,7 +4587,7 @@ Now, after being compiled, the word can be executed with two parameters on the s
 \textbf{The answer to the question is 42.}
 \end{alltt}
 
-\subsection{\label{aliens}Alien objects}
+\subsection{Alien objects}\label{aliens}
 
 \glossary{
 name=alien,
@@ -4641,7 +4644,7 @@ Pointers to native memory, including \verb|void*| and other types, are represent
 }
 Tests if the object at the top of the stack is an alien pointer.
 
-\subsubsection{\label{alien-structs}Structures}
+\subsubsection{Structures}\label{alien-structs}
 
 One way to think of a C-style \verb|struct| is that it abstracts reading and writing field values stored at a range of memory given a pointer, by associating a type and offset with each field. This is the view taken by the alien interface, where defining a C structure creates a set of words for reading and writing fields of various types, offset from a base pointer given by an alien object.
 
@@ -4701,7 +4704,7 @@ BEGIN-STRUCT: surface
 END-STRUCT
 \end{verbatim}
 
-\subsubsection{\label{alien-unions}Unions}
+\subsubsection{Unions}\label{alien-unions}
 
 A C-style \verb|union| type allocates enough space for its largest member. In the alien interface, unions are used to allocate byte arrays in the Factor heap that may hold any one of the union's members.
 
@@ -4736,7 +4739,7 @@ BEGIN-UNION: event
 END-UNION
 \end{verbatim}
 
-\subsection{\label{alien-internals}Low-level interface}
+\subsection{Low-level interface}\label{alien-internals}
 
 The alien interface is built on top of a handful of primitives. Sometimes, it is
 useful to call these primitives directly for debugging purposes.
@@ -4808,7 +4811,7 @@ Outputs an alien pointing at an offset from the base pointer of the input alien.
 }
 These primitives read and write native memory. They can be given an alien, displaced alien, or byte array. No bounds checking of any kind is performed.
 
-\subsection{\label{malloc}Manual memory management}
+\subsection{Manual memory management}\label{malloc}
 
 If for whatever reason Factor's memory management is unsuitable for a certain task, you can
 directly call the standard C memory management routines. These words are very raw and deal with addresses directly, and of course it is easy to corrupt memory or crash the runtime
@@ -4841,7 +4844,7 @@ If you are used to a statically typed language, you might find Factor's tendency
 
 \section{System organization}
 
-\subsection{\label{listener}The listener}
+\subsection{The listener}\label{listener}
 
 Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. I will have more to say about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 \begin{alltt}
@@ -4977,7 +4980,7 @@ different numeric bases. The \texttt{.b} word prints an integer in binary, \text
 
 \section{Word tools}
 
-\subsection{\label{exploring-vocabs}Exploring vocabularies}
+\subsection{Exploring vocabularies}\label{exploring-vocabs}
 
 Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
 
@@ -5460,7 +5463,7 @@ The \texttt{call-profile} word executes a quotation with the CPU profiler enable
 
 Normally, the memory and CPU profilers run every millisecond, and increment counters for all words on the return stack. The \texttt{only-top} variable can be switched on, in which case only the counter for the word at the top of the return stack is incremented. This gives a more localized picture of CPU and memory usage.
 
-\subsection{\label{compiler}The compiler}
+\subsection{The compiler}\label{compiler}
 
 The compiler can provide a substantial speed boost for words whose stack effect can be inferred. Words without a known stack effect cannot be compiled, and must be run in the interpreter. The compiler generates native code, and so far, x86 and PowerPC backends have been developed.
 

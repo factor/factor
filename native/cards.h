@@ -67,7 +67,9 @@ INLINE void allot_barrier(CELL address)
 {
 	CARD *ptr = ADDR_TO_CARD(address);
 	CARD c = *ptr;
-	*ptr = (card_marked(c) | MIN(card_base(c),(address & ADDR_CARD_MASK)));
+	CELL b = card_base(c);
+	CELL a = (address & ADDR_CARD_MASK);
+	*ptr = (card_marked(c) | ((b < a) ? b : a));
 }
 
 void unmark_cards(CELL from, CELL to);
