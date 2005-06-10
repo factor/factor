@@ -47,33 +47,32 @@ void primitive_byte_array(void)
 }
 
 /* see note about fill in array() */
-F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill)
+F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill)
 {
-	int i; F_ARRAY* new_array;
-	CELL curr_cap = array_capacity(array);
-	if(curr_cap >= capacity)
-		return array;
+	int i;
+	F_ARRAY* new_array;
+	
+	CELL to_copy = array_capacity(array);
+	if(capacity < to_copy)
+		to_copy = capacity;
+	
 	new_array = allot_array(untag_header(array->header),capacity);
-	memcpy(new_array + 1,array + 1,curr_cap * CELLS);
-	for(i = curr_cap; i < capacity; i++)
+	
+	memcpy(new_array + 1,array + 1,to_copy * CELLS);
+	
+	for(i = to_copy; i < capacity; i++)
 		put(AREF(new_array,i),fill);
+
 	return new_array;
 }
 
-void primitive_grow_array(void)
+void primitive_resize_array(void)
 {
 	F_ARRAY* array; CELL capacity;
 	maybe_garbage_collection();
 	array = untag_array_fast(dpop());
 	capacity = to_fixnum(dpop());
-	dpush(tag_object(grow_array(array,capacity,F)));
-}
-
-F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity)
-{
-	F_ARRAY* new_array = allot_array(untag_header(array->header),capacity);
-	memcpy(new_array + 1,array + 1,capacity * CELLS);
-	return new_array;
+	dpush(tag_object(resize_array(array,capacity,F)));
 }
 
 void fixup_array(F_ARRAY* array)

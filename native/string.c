@@ -45,29 +45,32 @@ F_STRING* string(CELL capacity, CELL fill)
 	return string;
 }
 
-F_STRING* grow_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
+F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 {
 	/* later on, do an optimization: if end of array is here, just grow */
 	CELL i;
-	CELL old_capacity = string_capacity(string);
+	CELL to_copy = string_capacity(string);
+
+	if(capacity < to_copy)
+		to_copy = capacity;
 
 	F_STRING* new_string = allot_string(capacity);
 
-	memcpy(new_string + 1,string + 1,old_capacity * CHARS);
+	memcpy(new_string + 1,string + 1,to_copy * CHARS);
 
-	for(i = old_capacity; i < capacity; i++)
+	for(i = to_copy; i < capacity; i++)
 		cput(SREF(new_string,i),fill);
 
 	return new_string;
 }
 
-void primitive_grow_string(void)
+void primitive_resize_string(void)
 {
 	F_STRING* string; CELL capacity;
 	maybe_garbage_collection();
 	string = untag_string_fast(dpop());
 	capacity = to_fixnum(dpop());
-	dpush(tag_object(grow_string(string,capacity,F)));
+	dpush(tag_object(resize_string(string,capacity,F)));
 }
 
 F_STRING* memory_to_string(const BYTE* string, CELL length)

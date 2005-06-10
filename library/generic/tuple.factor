@@ -12,6 +12,11 @@ hashtables errors sequences vectors ;
 ! slot 2 - the class, a word
 ! slot 3 - the delegate tuple, or f
 
+: copy-array ( to from -- )
+    dup array-capacity [
+        3dup swap array-nth pick rot set-array-nth
+    ] repeat 2drop ;
+
 : make-tuple ( class size -- tuple )
     #! Internal allocation function. Do not call it directly,
     #! since you can fool the runtime and corrupt memory by

@@ -8,9 +8,9 @@ TUPLE: buffer size ptr fill pos ;
 
 C: buffer ( size -- buffer )
     2dup set-buffer-size
-    swap malloc check-ptr swap [ set-buffer-ptr ] keep
-    0 swap [ set-buffer-fill ] keep
-    0 swap [ set-buffer-pos ] keep ;
+    [ >r malloc check-ptr r> set-buffer-ptr ] keep
+    0 over set-buffer-fill
+    0 over set-buffer-pos ;
 
 : buffer-free ( buffer -- )
     #! Frees the C memory associated with the buffer.
@@ -31,8 +31,8 @@ C: buffer ( size -- buffer )
     [ buffer-fill min ] keep
     [ set-buffer-pos ] keep
     dup buffer-pos over buffer-fill = [
-        [ 0 swap set-buffer-pos ] keep
-        [ 0 swap set-buffer-fill ] keep
+        0 over set-buffer-pos
+        0 over set-buffer-fill
     ] when drop ;
 
 : buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;
@@ -99,5 +99,5 @@ C: buffer ( size -- buffer )
     2dup buffer-ptr string>memory
     >r length r> buffer-reset ;
 
-: string>buffer ( string - -buffer )
+: string>buffer ( string -- buffer )
     dup length <buffer> tuck buffer-set ;

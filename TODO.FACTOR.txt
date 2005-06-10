@@ -7,15 +7,11 @@
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
 <erg> if write returns -1  and errno == EINTR then it's not a real error, you can try again
-
-- make head? tail? more efficient with slices
-- fix ceiling
 - single-stepper and variable access: wrong namespace?
 - investigate if COPYING_GEN needs a fix
 - faster layout
-- keep alive
+- http keep alive, and range get
 - sleep word
-- fix fixnum<< overflow on PowerPC
 - fix i/o on generic x86/ppc unix
 - alien primitives need a more general input type
 - 2map slow with lists
@@ -68,6 +64,8 @@
 
 + compiler:
 
+- powerpc: float ffi parameters
+- fix fixnum<< and /i overflow on PowerPC
 - simplifier:
   - kill replace after a peek
   - merge inc-d's across VOPs that don't touch the stack

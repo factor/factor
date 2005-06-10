@@ -5,12 +5,6 @@ USING: alien errors kernel math namespaces ;
 
 ! Alien wrappers for various Unix libc functions.
 
-ALIAS: ulonglong off_t
-ALIAS: long ssize_t
-ALIAS: ulong size_t
-ALIAS: uint socklen_t
-ALIAS: uint in_addr_t
-
 : EINPROGRESS 36 ;
 
 : errno ( -- n )

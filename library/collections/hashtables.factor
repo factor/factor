@@ -140,7 +140,7 @@ IN: hashtables
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
     over hash-size over set-hash-size
-    [ hash-array swap hash-array copy-array ] keep ;
+    [ hash-array swap hash-array copy-into ] keep ;
 
 M: hashtable = ( obj hash -- ? )
     2dup eq? [

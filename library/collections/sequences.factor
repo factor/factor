@@ -25,6 +25,7 @@ GENERIC: contains? ( elt seq -- ? )
 GENERIC: head ( n seq -- seq )
 GENERIC: tail ( n seq -- seq )
 GENERIC: concat ( seq -- seq )
+GENERIC: resize ( n seq -- seq )
 
 G: each ( seq quot -- | quot: elt -- )
     [ over ] [ type ] ; inline
@@ -76,12 +77,9 @@ IN: kernel-internals
 GENERIC: underlying
 GENERIC: set-underlying
 GENERIC: set-capacity
-GENERIC: (grow)
 
-: grow ( len seq -- )
-    #! If the sequence cannot accomodate len elements, resize it
-    #! to exactly len.
-    [ underlying (grow) ] keep set-underlying ;
+: expand ( len seq -- )
+    [ underlying resize ] keep set-underlying ;
 
 : ensure ( n seq -- )
     #! If n is beyond the sequence's length, increase the length,
@@ -90,7 +88,7 @@ GENERIC: (grow)
     2dup length fixnum>= [
         >r 1 fixnum+ r>
         2dup underlying length fixnum> [
-            over 2 fixnum* over grow
+            over 2 fixnum* over expand
         ] when
         set-capacity
     ] [

@@ -80,6 +80,10 @@ t [
 ] pull-in
 
 compile? [
+    unix? [
+        "/library/unix/types.factor"
+    ] pull-in
+
     os "freebsd" = [
         "/library/unix/syscalls-freebsd.factor"
     ] pull-in

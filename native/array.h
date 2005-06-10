@@ -21,9 +21,8 @@ void primitive_array(void);
 void primitive_tuple(void);
 void primitive_byte_array(void);
 
-F_ARRAY* grow_array(F_ARRAY* array, CELL capacity, CELL fill);
-void primitive_grow_array(void);
-F_ARRAY* shrink_array(F_ARRAY* array, CELL capacity);
+F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill);
+void primitive_resize_array(void);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 

@@ -298,9 +298,9 @@ M: hashtable ' ( hashtable -- pointer )
 
 : write-word ( word -- )
     "64-bits" get [
-        "big-endian" get [ write-be64 ] [ write-le64 ] ifte
+        "big-endian" get [ write-be8 ] [ write-le8 ] ifte
     ] [
-         "big-endian" get [ write-be32 ] [ write-le32 ] ifte
+         "big-endian" get [ write-be4 ] [ write-le4 ] ifte
     ] ifte ;
 
 : write-image ( image file -- )

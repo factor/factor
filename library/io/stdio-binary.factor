@@ -1,65 +1,20 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: stdio
-USING: kernel math ;
+USING: kernel lists math sequences strings ;
 
-: read-le32 ( -- word )
-    read1
-    read1 8  shift bitor
-    read1 16 shift bitor
-    read1 24 shift bitor ;
+: be> ( seq -- x ) 0 swap [ >r 8 shift r> bitor ] each ;
+: le> ( seq -- x ) reverse be> ;
 
-: read-be32 ( -- word )
-    read1 24 shift
-    read1 16 shift bitor
-    read1 8  shift bitor
-    read1          bitor ;
+: nth-byte ( x n -- b ) -8 * shift HEX: ff bitand ;
 
-: byte7 ( num -- byte ) -56 shift HEX: ff bitand ;
-: byte6 ( num -- byte ) -48 shift HEX: ff bitand ;
-: byte5 ( num -- byte ) -40 shift HEX: ff bitand ;
-: byte4 ( num -- byte ) -32 shift HEX: ff bitand ;
-: byte3 ( num -- byte ) -24 shift HEX: ff bitand ;
-: byte2 ( num -- byte ) -16 shift HEX: ff bitand ;
-: byte1 ( num -- byte )  -8 shift HEX: ff bitand ;
-: byte0 ( num -- byte )           HEX: ff bitand ;
+: >le ( x n -- string ) [ nth-byte ] project-with >string ;
+: >be ( x n -- string ) >le reverse ;
 
-: write-le64 ( word -- )
-    dup byte0 write
-    dup byte1 write
-    dup byte2 write
-    dup byte3 write
-    dup byte4 write
-    dup byte5 write
-    dup byte6 write
-        byte7 write ;
+: read-le2 ( -n) 2 read le> ; : read-be2 ( -n) 2 read be> ;
+: read-le4 ( -n) 4 read le> ; : read-be4 ( -n) 4 read be> ;
+: read-le8 ( -n) 8 read le> ; : read-be8 ( -n) 8 read be> ;
 
-: write-be64 ( word -- )
-    dup byte7 write
-    dup byte6 write
-    dup byte5 write
-    dup byte4 write
-    dup byte3 write
-    dup byte2 write
-    dup byte1 write
-        byte0 write ;
-
-: write-le32 ( word -- )
-    dup byte0 write
-    dup byte1 write
-    dup byte2 write
-        byte3 write ;
-
-: write-be32 ( word -- )
-    dup byte3 write
-    dup byte2 write
-    dup byte1 write
-        byte0 write ;
-
-: write-le16 ( char -- )
-    dup byte0 write
-        byte1 write ;
-
-: write-be16 ( char -- )
-    dup byte1 write
-        byte0 write ;
+: write-le2 ( n-) 2 >le write ; : write-be2 ( n-) 2 >be write ;
+: write-le4 ( n-) 4 >le write ; : write-be4 ( n-) 4 >be write ;
+: write-le8 ( n-) 8 >le write ; : write-be8 ( n-) 8 >be write ;

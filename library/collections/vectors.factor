@@ -10,7 +10,7 @@ BUILTIN: vector 11 vector?
     [ 2 underlying set-underlying ] ;
 
 M: vector set-length ( len vec -- )
-    growable-check 2dup grow set-capacity ;
+    growable-check 2dup expand set-capacity ;
 
 M: vector nth ( n vec -- obj )
     bounds-check underlying array-nth ;

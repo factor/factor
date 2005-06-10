@@ -8,7 +8,7 @@ USING: kernel math strings ;
 IN: strings
 USING: generic sequences ;
 
-M: string (grow) grow-string ;
+M: string resize resize-string ;
 
 DEFER: sbuf?
 BUILTIN: sbuf 13 sbuf?
@@ -16,7 +16,7 @@ BUILTIN: sbuf 13 sbuf?
     [ 2 underlying set-underlying ] ;
 
 M: sbuf set-length ( n sbuf -- )
-    growable-check 2dup grow set-capacity ;
+    growable-check 2dup expand set-capacity ;
 
 M: sbuf nth ( n sbuf -- ch )
     bounds-check underlying char-slot ;
