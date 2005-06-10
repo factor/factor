@@ -3840,6 +3840,32 @@ Like \verb|with-stream| extend the stream is only closed in the case of an error
 Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string buffer. Executing \texttt{write}, \texttt{write-attr} or \texttt{print} will append text to the string buffer. When the quotation returns, the string buffer is coverted to
 a string and returned.
 
+\subsection{Reading and writing binary data}
+
+\glossary{name=big endian,
+description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, Alpha and ARM processors}}
+\glossary{name=little endian,
+description={a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86 and x86-64 processors}}
+The core stream words read and write strings. Integers and floats can be read and written by converting to and from sequences of bytes.
+
+There are two ways to order the bytes making up an integer; \emph{little endian} byte order outputs the least significant byte first, and the most significant byte last, whereas \emph{big endian} is the other way around.
+
+Consider the hexadecimal integer \texttt{HEX: cafebabe}. Big endian byte order yields the following sequence of bytes:
+
+\begin{tabular}{l|c|c|c|c}
+Byte:&1&2&3&4\\
+\hline
+Value:&\verb|be|&\verb|ba|&\verb|fe|&\verb|ca|\\
+\end{tabular}
+
+Compare this with little endian byte order:
+
+\begin{tabular}{l|c|c|c|c}
+Byte:&1&2&3&4\\
+\hline
+Value:&\verb|ca|&\verb|fe|&\verb|ba|&\verb|be|\\
+\end{tabular}
+
 \subsection{Reading and writing files}
 
 \glossary{name=file reader,

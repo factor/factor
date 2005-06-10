@@ -296,15 +296,23 @@ M: hashtable ' ( hashtable -- pointer )
 
 ( Image output )
 
-: write-word ( word -- )
+: (write-image) ( image -- )
     "64-bits" get [
-        "big-endian" get [ write-be8 ] [ write-le8 ] ifte
+        "big-endian" get [
+            [ write-be8 ] each
+        ] [
+            [ write-le8 ] each
+        ] ifte
     ] [
-         "big-endian" get [ write-be4 ] [ write-le4 ] ifte
+        "big-endian" get [
+            [ write-be4 ] each
+        ] [
+            [ write-le4 ] each
+        ] ifte
     ] ifte ;
 
 : write-image ( image file -- )
-    <file-writer> [ [ write-word ] each ] with-stream ;
+    <file-writer> [ (write-image) ] with-stream ;
 
 : with-minimal-image ( quot -- image )
     [

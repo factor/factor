@@ -89,7 +89,7 @@ SYMBOL: failures
         "crashes" "sbuf" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "line-editor" "gadgets" "memory" "redefine"
-        "annotate" "sequences"
+        "annotate" "sequences" "binary"
     ] run-tests ;
 
 : benchmarks

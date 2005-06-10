@@ -11,6 +11,9 @@
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
+IN: math
+DEFER: repeat
+
 IN: kernel-internals
 USING: kernel math-internals sequences ;
 
@@ -26,3 +29,8 @@ M: array length array-capacity ;
 M: array nth array-nth ;
 M: array set-nth set-array-nth ;
 M: array resize resize-array ;
+
+: copy-array ( to from -- )
+    dup array-capacity [
+        3dup swap array-nth pick rot set-array-nth
+    ] repeat 2drop ;

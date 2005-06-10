@@ -137,9 +137,6 @@ M: object peek ( sequence -- element )
 
 M: object reverse ( seq -- seq ) [ nreverse ] immutable ;
 
-: copy-into ( to from -- )
-    dup length [ 3dup swap nth pick rot set-nth ] repeat 3drop ;
-
 ! Equality testing
 : length= ( seq seq -- ? ) length swap length number= ;
 
