@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors generic hashtables kernel lists math
+USING: alien errors generic hashtables kernel lists math
 sequences streams strings threads unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
@@ -11,10 +11,13 @@ USING: namespaces ;
 ! Some general stuff
 : file-mode OCT: 0600 ;
 
-: io-error ( n -- ) 0 < [ errno strerror throw ] when ;
+: (io-error) errno strerror throw ;
 
-: init-handle ( fd -- )
-    F_SETFL O_NONBLOCK fcntl io-error ;
+: check-null ( n -- ) dup 0 = [ (io-error) ] when ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
+
+: init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
 TUPLE: port handle buffer error timeout cutoff ;

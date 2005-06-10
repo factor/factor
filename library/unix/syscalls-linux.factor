@@ -1,6 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: unix-internals
+USING: alien ;
 
 ! Linux.
 
@@ -25,3 +26,10 @@ IN: unix-internals
 
 : F_SETFL 4 ;    ! set file status flags
 : O_NONBLOCK 4 ; ! no delay
+
+BEGIN-STRUCT: sockaddr-in
+    FIELD: ushort family
+    FIELD: ushort port
+    FIELD: in_addr_t addr
+    FIELD: longlong unused
+END-STRUCT

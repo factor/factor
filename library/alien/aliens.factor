@@ -16,7 +16,7 @@ BUILTIN: displaced-alien 20 displaced-alien? ;
     #! C null value.
     0 <alien> ;
 
-: null? ( alien -- ? ) dup [ alien-address 0 = ] when ;
+: null? ( alien -- ? ) dup alien? [ alien-address 0 = ] when ;
 
 : null>f ( alien -- alien/f )
     dup alien-address 0 = [ drop f ] when ;

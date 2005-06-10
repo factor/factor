@@ -1,6 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: unix-internals
+USING: alien ;
 
 ! Mac OS X
 
@@ -24,3 +25,11 @@ IN: unix-internals
 
 : F_SETFL 4 ;
 : O_NONBLOCK 4 ;
+
+BEGIN-STRUCT: sockaddr-in
+    FIELD: uchar len
+    FIELD: uchar family
+    FIELD: ushort port
+    FIELD: in_addr_t addr
+    FIELD: longlong unused
+END-STRUCT

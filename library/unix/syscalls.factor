@@ -56,14 +56,6 @@ END-STRUCT
 : gethostbyname ( name -- hostent )
     "hostent*" "libc" "gethostbyname" [ "char*" ] alien-invoke ;
 
-BEGIN-STRUCT: sockaddr-in
-    FIELD: uchar len
-    FIELD: uchar family
-    FIELD: ushort port
-    FIELD: in_addr_t addr
-    FIELD: longlong unused
-END-STRUCT
-
 : AF_INET 2 ;
 : PF_INET AF_INET ;
 : SOCK_STREAM 1 ;

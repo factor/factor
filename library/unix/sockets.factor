@@ -15,9 +15,8 @@ USING: alien generic kernel math unix-internals ;
 : client-sockaddr ( host port -- sockaddr )
     #! Error handling here
     init-sockaddr [
-        >r gethostbyname hostent-addr
-        dup 0 = [ -1 io-error ] when r>
-        set-sockaddr-in-addr
+        >r gethostbyname dup [ "Host lookup failed" ] unless
+        hostent-addr dup check-null r> set-sockaddr-in-addr
     ] keep ;
 
 : socket-fd ( -- socket )
