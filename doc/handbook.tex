@@ -3373,13 +3373,43 @@ Computes the absolute value and argument individually.
 
 \subsection{Algebraic and transcedential functions}\label{algebraic}
 
+The library includes the standard set of words for rounding real numbers to integers.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{ceiling}{ceiling ( x -- n )}
+}
+Outputs the smallest integer greater than or equal to $x$.
+\wordtable{
+\vocabulary{math}
+\ordinaryword{floor}{floor ( x -- n )}
+}
+Outputs the greatest integer smaller than or equal to $x$.
+\wordtable{
+\vocabulary{math}
+\ordinaryword{truncate}{floor ( x -- n )}
+}
+Outputs the integer that results from subtracting the fractional component of $x$.
+
+The relation between these three words can be seen in the following table:
+
+\begin{tabular}{r|r|r|r}
+$x$&\verb|ceiling|&\verb|floor|&\verb|truncate|\\
+\hline
+$3/2$&$2$&$1$&$1$\\
+$-3/2$&$-1$&$-2$&$-1$\\
+$2$&$2$&$2$&$2$
+\end{tabular}
+
+The next set of words computes powers and logarithms.
+
 \wordtable{
 \vocabulary{math}
 \ordinaryword{sq}{sq ( x -- y )}
 \ordinaryword{sqrt}{sqrt ( x -- y )}
 \ordinaryword{recip}{recip ( x -- y )}
 }
-Computes the square (power of 2), square root (power of $\frac{1}{2}$), and reciprocal (power of $-1$).
+Computes the square (raised to power 2), square root (raised to power $1/2$), and reciprocal (raised to power $-1$).
 \wordtable{
 \vocabulary{math}
 \ordinaryword{exp}{exp ( n -- n )}
@@ -3846,7 +3876,7 @@ a string and returned.
 description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, Alpha and ARM processors}}
 \glossary{name=little endian,
 description={a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86 and x86-64 processors}}
-The core stream words read and write strings. Integers and floats can be read and written by converting to and from sequences of bytes.
+The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes.
 
 There are two ways to order the bytes making up an integer; \emph{little endian} byte order outputs the least significant byte first, and the most significant byte last, whereas \emph{big endian} is the other way around.
 
@@ -3866,7 +3896,42 @@ Byte:&1&2&3&4\\
 Value:&\verb|ca|&\verb|fe|&\verb|ba|&\verb|be|\\
 \end{tabular}
 
+With the above explanation of byte ordering, the behavior of the following words should be clear.
+
+\wordtable{
+\vocabulary{stdio}
+\ordinaryword{be>}{be> ( seq -- x )}
+\ordinaryword{le>}{le> ( seq -- x )}
+}
+Converts a sequence of bytes in big or little endian order into an unsigned integer.
+\wordtable{
+\vocabulary{stdio}
+\ordinaryword{>be}{>be ( x n -- string )}
+\ordinaryword{>le}{>le ( x n -- string )}
+}
+Converts an integer into a string of $n$ bytes in big or little endian order. Truncation will occur if the integer is not in the range $[-2^{8n},2^{8n})$.
+
+These words are then composed with \verb|read| and \verb|write| to form a set of words for reading and writing packed integers on the default stream (\ref{stdio}).
+
+\wordtable{
+\vocabulary{stdio}
+\ordinaryword{read-be2}{read-be2 ( -- n )}
+\ordinaryword{read-le2}{read-le2 ( -- n )}
+\ordinaryword{read-be4}{read-be4 ( -- n )}
+\ordinaryword{read-le4}{read-le4 ( -- n )}
+\ordinaryword{read-be8}{read-be8 ( -- n )}
+\ordinaryword{read-le8}{read-le8 ( -- n )}
+\ordinaryword{write-be2}{write-be2 ( n -- )}
+\ordinaryword{write-le2}{write-le2 ( n -- )}
+\ordinaryword{write-be4}{write-be4 ( n -- )}
+\ordinaryword{write-le4}{write-le4 ( n -- )}
+\ordinaryword{write-be8}{write-be8 ( n -- )}
+\ordinaryword{write-le8}{write-le8 ( n -- )}
+}
+
 \subsection{Reading and writing files}
+
+Files are read and written in a standard way, by attaching a reader or writer stream to the file. It is vital that file streams are closed after all input/output operations have been performed; a convenient way is to use the \verb|with-stream| word (\ref{stdio}).
 
 \glossary{name=file reader,
 description=an input stream reading from a file}
