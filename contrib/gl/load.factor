@@ -1,5 +1,5 @@
 IN: gl
-USING: alien parser sequences kernel ;
+USING: alien compiler kernel parser sequences words ;
 
 win32? [
     "gl" "opengl32.dll" "stdcall" add-library
