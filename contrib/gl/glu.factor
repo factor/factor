@@ -4,11 +4,11 @@ IN: gl
 USING: alien gl-internals gl ;
 
 ! These are defined as structs in glu.h, but we only ever use pointers to them
-ALIAS: void* GLUnurbs*
-ALIAS: void* GLUquadric*
-ALIAS: void* GLUtesselator*
-ALIAS: char* GLubyte* ! is this right?
-ALIAS: void* GLUfuncptr ! will this work?
+TYPEDEF: void* GLUnurbs*
+TYPEDEF: void* GLUquadric*
+TYPEDEF: void* GLUtesselator*
+TYPEDEF: char* GLubyte* ! is this right?
+TYPEDEF: void* GLUfuncptr ! will this work?
 
 ! StringName
 : GLU_VERSION                        100800 ;

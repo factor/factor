@@ -102,9 +102,6 @@ compile? [
     
     unix? [
         "/library/unix/syscalls.factor"
-    ] pull-in
-
-    unix? [
         "/library/unix/io.factor"
         "/library/unix/sockets.factor"
         "/library/unix/files.factor"

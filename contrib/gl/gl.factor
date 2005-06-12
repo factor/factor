@@ -6,30 +6,30 @@
 IN: gl 
 USING: alien gl-internals ;
 
-ALIAS: uint    GLenum
-ALIAS: uchar   GLboolean
-ALIAS: uchar*  GLboolean*
-ALIAS: uint    GLbitfield
-ALIAS: char    GLbyte
-ALIAS: short   GLshort
-ALIAS: short*  GLshort*
-ALIAS: int     GLint
-ALIAS: int*    GLint*
-ALIAS: int     GLsizei
-ALIAS: uchar   GLubyte
-ALIAS: uchar*  GLubyte*
-ALIAS: ushort  GLushort
-ALIAS: ushort* GLushort*
-ALIAS: uint    GLuint
-ALIAS: uint*   GLuint*
-ALIAS: float   GLfloat
-ALIAS: float*  GLfloat*
-ALIAS: float   GLclampf
-ALIAS: double  GLdouble
-ALIAS: double* GLdouble*
-ALIAS: double  GLclampd
-ALIAS: void*   GLvoid*
-ALIAS: void*   GLvoid**
+TYPEDEF: uint    GLenum
+TYPEDEF: uchar   GLboolean
+TYPEDEF: uchar*  GLboolean*
+TYPEDEF: uint    GLbitfield
+TYPEDEF: char    GLbyte
+TYPEDEF: short   GLshort
+TYPEDEF: short*  GLshort*
+TYPEDEF: int     GLint
+TYPEDEF: int*    GLint*
+TYPEDEF: int     GLsizei
+TYPEDEF: uchar   GLubyte
+TYPEDEF: uchar*  GLubyte*
+TYPEDEF: ushort  GLushort
+TYPEDEF: ushort* GLushort*
+TYPEDEF: uint    GLuint
+TYPEDEF: uint*   GLuint*
+TYPEDEF: float   GLfloat
+TYPEDEF: float*  GLfloat*
+TYPEDEF: float   GLclampf
+TYPEDEF: double  GLdouble
+TYPEDEF: double* GLdouble*
+TYPEDEF: double  GLclampd
+TYPEDEF: void*   GLvoid*
+TYPEDEF: void*   GLvoid**
 
 ! Constants
 
