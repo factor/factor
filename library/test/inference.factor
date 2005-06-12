@@ -2,24 +2,6 @@ IN: temporary
 USING: generic inference kernel lists math math-internals
 namespaces parser sequences test vectors ;
 
-! [ [ [ object object ] f ] ]
-! [ [ [ object ] [ object object ] ] [ [ object ] f ] decompose ]
-! unit-test
-! 
-! [ [ [ cons vector cons integer object cons ] [ cons vector cons ] ] ]
-! [
-!     [ [ vector ] [ cons vector cons integer object cons ] ]
-!     [ [ vector ] [ cons vector cons ] ]
-!     decompose
-! ] unit-test
-! 
-! [ [ [ object ] [ object ] ] ]
-! [
-!     [ [ object number ] [ object ] ]
-!     [ [ object number ] [ object ] ]
-!     decompose
-! ] unit-test
-
 : old-effect ( [ in-types out-types ] -- [[ in out ]] )
     uncons car length >r length r> cons ;
 
@@ -232,3 +214,7 @@ M: real iterate drop ;
 [ [[ 2 1 ]] ] [ [ contains? ] infer old-effect ] unit-test
 [ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
+
+: no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
+
+[ [ no-base-case ] infer ] unit-test-fails

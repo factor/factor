@@ -5,10 +5,10 @@ USING: hashtables kernel lists math namespaces parser stdio ;
 
 DEFER: dll?
 BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
+
 DEFER: alien?
 BUILTIN: alien 16 alien? ;
-DEFER: byte-array?
-BUILTIN: byte-array 19 byte-array? ;
+
 DEFER: displaced-alien?
 BUILTIN: displaced-alien 20 displaced-alien? ;
 
@@ -30,10 +30,6 @@ M: alien = ( obj obj -- ? )
     ] [
         2drop f
     ] ifte ;
-
-: ALIEN: scan-word <alien> swons ; parsing
-
-: DLL" skip-blank parse-string dlopen swons ; parsing
 
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;
@@ -58,3 +54,19 @@ M: alien = ( obj obj -- ? )
 
 : library-abi ( library -- abi )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
+
+! This will go elsewhere soon
+: byte-bit ( n alien -- byte bit )
+    over -3 shift alien-unsigned-1 swap 7 bitand ;
+
+: bit-nth ( n alien -- ? )
+    byte-bit 1 swap shift bitand 0 > ;
+
+: set-bit ( ? byte bit -- byte )
+    1 swap shift rot [ bitor ] [ bitnot bitand ] ifte ;
+
+: set-bit-nth ( ? n alien -- )
+    [ byte-bit set-bit ] 2keep
+    swap -3 shift set-alien-unsigned-1 ;
+
+: ALIEN: scan-word <alien> swons ; parsing

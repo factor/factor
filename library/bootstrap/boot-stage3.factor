@@ -43,7 +43,11 @@ compile? [
 
 "Loading more library code..." print
 
+
 t [
+    "/library/alien/malloc.factor"
+    "/library/io/buffer.factor"
+
     "/library/math/constants.factor"
     "/library/math/pow.factor"
     "/library/math/more-matrices.factor"

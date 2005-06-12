@@ -37,6 +37,14 @@ END-STRUCT
 : poll ( pollfds nfds timeout -- n )
     "int" "libc" "poll" [ "pollfd*" "uint" "int" ] alien-invoke ;
 
+BEGIN-STRUCT: timeval
+    FIELD: long sec
+    FIELD: long usec
+END-STRUCT
+
+: select ( nfds readfds writefds exceptfds timeout -- n )
+    "int" "libc" "select" [ "int" "void*" "void*" "void*" "timeval*" ] alien-invoke ;
+
 BEGIN-STRUCT: hostent
     FIELD: char* name
     FIELD: void* aliases

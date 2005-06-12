@@ -21,7 +21,7 @@ M: vector clone ( vector -- vector )
     0 <repeated> >vector ;
 
 M: general-list thaw >vector ;
-M: general-list freeze drop >list ;
+
 M: general-list like drop >list ;
 
 M: vector like drop >vector ;

@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend errors generic
-hashtables kernel lists math namespaces parser sequences strings
-words ;
+hashtables kernel kernel-internals lists math namespaces parser
+sequences strings words ;
 
 : <c-type> ( -- type )
     <namespace> [
@@ -90,6 +90,11 @@ SYMBOL: c-types
     2dup define-deref
     2dup define-set-nth
     define-out ;
+
+: (typedef) c-types get [ >r get r> set ] bind ;
+
+: typedef ( old new -- )
+    over "*" append over "*" append (typedef) (typedef) ;
 
 global [ c-types nest drop ] bind
 
@@ -225,19 +230,6 @@ global [ c-types nest drop ] bind
     \ %unbox-double "unbox-op" set
 ] "double" define-primitive-type
 
-: (alias-c-type)
-    c-types get [ >r get r> set ] bind ;
-
-: alias-c-type ( old new -- )
-    over "*" append over "*" append
-    (alias-c-type) (alias-c-type) ;
-
 ! FIXME for 64-bit platforms
-"int" "long" alias-c-type
-"uint" "ulong" alias-c-type
-
-: ALIAS:
-    #! Followed by old then new. This is a parsing word so that
-    #! we can define aliased types, and then a C struct, in the
-    #! same source file.
-    scan scan alias-c-type ; parsing
+"int" "long" typedef
+"uint" "ulong" typedef

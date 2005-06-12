@@ -31,7 +31,7 @@ void primitive_rehash_string(void)
 }
 
 /* untagged */
-F_STRING* string(CELL capacity, CELL fill)
+F_STRING *string(CELL capacity, CELL fill)
 {
 	CELL i;
 
@@ -73,7 +73,7 @@ void primitive_resize_string(void)
 	dpush(tag_object(resize_string(string,capacity,F)));
 }
 
-F_STRING* memory_to_string(const BYTE* string, CELL length)
+F_STRING *memory_to_string(const BYTE* string, CELL length)
 {
 	F_STRING* s = allot_string(length);
 	CELL i;
@@ -92,24 +92,24 @@ F_STRING* memory_to_string(const BYTE* string, CELL length)
 void primitive_memory_to_string(void)
 {
 	CELL length = unbox_unsigned_cell();
-	BYTE* string = (BYTE*)unbox_unsigned_cell();
+	BYTE *string = (BYTE*)unbox_unsigned_cell();
 	dpush(tag_object(memory_to_string(string,length)));
 }
 
 /* untagged */
-F_STRING* from_c_string(const char* c_string)
+F_STRING *from_c_string(const char *c_string)
 {
 	return memory_to_string((BYTE*)c_string,strlen(c_string));
 }
 
 /* FFI calls this */
-void box_c_string(const char* c_string)
+void box_c_string(const char *c_string)
 {
-	dpush(tag_object(from_c_string(c_string)));
+	dpush(c_string ? tag_object(from_c_string(c_string)) : F);
 }
 
 /* untagged */
-char* to_c_string(F_STRING* s)
+char *to_c_string(F_STRING *s)
 {
 	CELL i;
 	CELL capacity = string_capacity(s);
@@ -123,7 +123,7 @@ char* to_c_string(F_STRING* s)
 	return to_c_string_unchecked(s);
 }
 
-void string_to_memory(F_STRING* s, BYTE* string)
+void string_to_memory(F_STRING *s, BYTE *string)
 {
 	CELL i;
 	CELL capacity = string_capacity(s);
@@ -133,26 +133,27 @@ void string_to_memory(F_STRING* s, BYTE* string)
 
 void primitive_string_to_memory(void)
 {
-	BYTE* address = (BYTE*)unbox_unsigned_cell();
-	F_STRING* str = untag_string(dpop());
+	BYTE *address = (BYTE*)unbox_unsigned_cell();
+	F_STRING *str = untag_string(dpop());
 	string_to_memory(str,address);
 }
 
 /* untagged */
-char* to_c_string_unchecked(F_STRING* s)
+char *to_c_string_unchecked(F_STRING *s)
 {
 	CELL capacity = string_capacity(s);
-	F_STRING* _c_str = allot_string(capacity / CHARS + 1);
-	BYTE* c_str = (BYTE*)(_c_str + 1);
+	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
+	BYTE *c_str = (BYTE*)(_c_str + 1);
 	string_to_memory(s,c_str);
 	c_str[capacity] = '\0';
 	return (char*)c_str;
 }
 
 /* FFI calls this */
-char* unbox_c_string(void)
+char *unbox_c_string(void)
 {
-	return to_c_string(untag_string(dpop()));
+	CELL str = dpop();
+	return (str ? to_c_string(untag_string(str)) : NULL);
 }
 
 /* FFI calls this */

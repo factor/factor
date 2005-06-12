@@ -9,5 +9,8 @@ win32? [
     "glu" "libGLU.so" "cdecl" add-library
 ] ifte
 
-[ "gl-internals.factor" "sdl-gl.factor" "gl.factor" "glu.factor" ]
+[ "sdl-gl.factor" "gl.factor" "glu.factor" ]
 [ "contrib/gl/" swap append run-file ] each
+
+"gl" words [ try-compile ] each
+"glu" words [ try-compile ] each

@@ -23,7 +23,6 @@ BUILTIN: array 8 array? ;
 : array-capacity ( a -- n ) 1 slot ; inline
 : array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
 : set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
-: dispatch ( n vtable -- ) 2 slot array-nth call ;
 
 M: array length array-capacity ;
 M: array nth array-nth ;
@@ -34,3 +33,9 @@ M: array resize resize-array ;
     dup array-capacity [
         3dup swap array-nth pick rot set-array-nth
     ] repeat 2drop ;
+
+DEFER: byte-array?
+BUILTIN: byte-array 19 byte-array? ;
+
+M: byte-array length array-capacity ;
+M: byte-array resize resize-array ;

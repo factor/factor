@@ -7,6 +7,7 @@ void* primitives[] = {
 	primitive_execute,
 	primitive_call,
 	primitive_ifte,
+	primitive_dispatch,
 	primitive_cons,
 	primitive_vector,
 	primitive_string_compare,

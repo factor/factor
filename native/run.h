@@ -93,5 +93,6 @@ void dosym(F_WORD* word);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);
+void primitive_dispatch(void);
 void primitive_getenv(void);
 void primitive_setenv(void);

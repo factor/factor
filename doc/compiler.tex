@@ -66,7 +66,127 @@
 \maketitle
 \tableofcontents{}
 
+\section{Stack effect inference}
+
+The stack effect inference tool checks correctness of code before it is run.
+A \emph{stack effect} is a list of input classes and a list of output classes corresponding to
+the effect a quotation has on the stack when called. For example, the stack effect of \verb|[ dup * ]| is \verb|[ [ integer ] [ integer ] ]|. The stack checker is used by passing a quotation to the \texttt{infer} word. It uses a sophisticated algorithm to infer stack effects of recursive words, combinators, and other tricky constructions, however, it cannot infer the stack effect of all words. In particular, anything using continuations, such as \texttt{catch} and I/O, will stump the stack checker.
+
+\subsection{Usage}
+
+The main entry point of the stack checker is a single word.
+
+\wordtable{
+\vocabulary{inference}
+\ordinaryword{infer}{infer ( quot -- effect )}
+}
+
+Takes a quotation and attempts to infer its stack effect. An exception is thrown if the stack effect cannot be inferred.
+
+You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
+
+\begin{alltt}
+\textbf{ok} [ draw-shape ] infer>test.
+\textbf{[ [ [ object ] [  ] ] ]
+[ [ draw-shape ] infer ]
+unit-test}
+\end{alltt}
+
+You can then copy and paste this snippet into a test script, and run the test script after
+making changes to the word to ensure its stack effect signature has not changed.
+
+\subsection{The algorithm}
+
+The stack effect inference algorithm mirrors the interpreter algorithm. A ``meta data stack'' holds two types of entries; computed values, whose type is known but literal value will only be known at runtime, and literals, whose value is known statically. When a literal value is encountered, it is simply placed on the meta data stack. When a word is encountered, one of several actions are taken, depending on the type of the word:
+
+\begin{itemize}
+\item If the word has special stack effect inference behavior, this behavior is invoked. Shuffle words and various primitives fall into this category.
+\item If the word's stack effect is already known, then the inputs are removed from the meta data stack, and output values are added. If the meta data stack contains insufficient values, more values are added, and the newly added values are placed in the input list. Since inference begins with an empty stack, the input list contains all required input values when inference is complete.
+\item If the word is marked to be inlined, stack effect inference recurses into the word definition and uses the same meta data stack. See \ref{declarations}.
+\item Otherwise, the word's stack effect is inferred in a fresh inferencer instance, and the stack effect is cached. The fresh inferencer is used rather than the current one, so that type information and literals on the current meta data stack do not affect the subsequently-cached stack effect.
+\end{itemize}
+
+The following two examples demonstrate some simple cases:
+\begin{alltt}
+\textbf{ok} [ 1 2 3 ] infer .
+\textbf{[ [ ] [ fixnum fixnum fixnum ] ]}
+\textbf{ok} [ "hi" swap ] infer .
+\textbf{[ [ object ] [ string object ] ]}
+\end{alltt}
+
+\subsubsection{Combinators}
+
+A simple combinator such as \verb|keep| does not by itself have a stack effect, since \verb|call| takes an arbitrary quotation from the stack, which itself may have an arbitrary stack effect.
+\begin{verbatim}
+IN: kernel
+: keep ( x quot -- x | quot: x -- )
+    over >r call r> ; inline
+\end{verbatim}
+On the other hand, the stack effect of word that passes a literal quotation to \verb|keep| can be inferred. The quotation is a literal on the meta data stack, and since \verb|keep| is marked \verb|inline|, the special inference behavior of \verb|call| receives this quotation.
+\begin{alltt}
+\textbf{ok} [ [ dup * ] keep ] infer .
+\textbf{[ [ number ] [ number number ] ]}
+\end{alltt}
+Note that if \verb|call| is applied to a computed value, for example, a quotation taken from a variable, or a quotation that is constructed immediately before the \verb|call|, the stack effect inferencer will raise an error.
+\begin{alltt}
+\textbf{ok} [ frog get call ] infer .
+\textbf{! Inference error: A literal value was expected where a
+computed value was found: \#<computed @ 716167923>
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+Another word with special inference behavior is \verb|execute|. It is used much more rarely than \verb|call|, but does pretty much the same thing, except it takes a word as input rather than a string.
+
+\subsubsection{Conditionals}
+
+Simpler than a stack effect is the concept of a stack height difference. This is simply the input value count subtracted from the output value count. A conditional's stack effect can be inferred if each branch has the same stack height difference; in this case, we say that the conditional is \emph{balanced}, and the total stack effect is computed by performing a unification of types across each branch.
+
+The following two examples exhibit balanced conditionals:
+\begin{verbatim}
+[ 1 ] [ dup ] ifte
+dup cons? [ unit ] when cons
+\end{verbatim}
+The following example is not balanced and raises an error when we attempt to infer its stack effect:
+\begin{alltt}
+\textbf{ok} [ [ dup ] [ drop ] ifte ] infer .
+\textbf{! Inference error: Unbalanced branches
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+\subsubsection{Recursive words}
+
+Recursive words all have the same general form; there is a conditional, and one branch of the conditional is the \emph{base case} terminating the recursion, and the other branch is the \emph{inductive case}, which reduces the problem and recurses on the reduced problem. A key observation one must make is that in a well-formed recursion, the recursive call in the inductive case eventually results in the base case being called, so we can take the stack effect of the recursive call to be the stack effect of the base case.
+
+Consider the following implementation of a word that measures the length of a list:
+\begin{verbatim}
+: length ( list -- n )
+    [ cdr length 1 + ] [ 0 ] ifte* ;
+\end{verbatim}
+The stack effect can be inferred without difficulty:
+\begin{alltt}
+\textbf{ok} [ length ] infer .
+\textbf{[ [ object ] [ integer ] ]}
+\end{alltt}
+The base case is taken if the top of the stack is \verb|f|, and the base case has a stack effect \verb|[ [ object ] [ fixnum ] ]|.
+
+On the other hand if the top of the stack is something else, the inductive case is taken. The inductive case makes a recursive call to \verb|length|, and once we substitute the stack effect of the base case into this call point, we can infer that the stack effect of the recursive case is \verb|[ [ object ] [ integer ] ]|.
+
+If both branches contain a recursive call, the stack effect inferencer gives up.
+\begin{alltt}
+\textbf{ok} : fie [ fie ] [ fie ] ifte ;
+\textbf{ok} [ fie ] infer .
+\textbf{! Inference error: fie does not have a base case
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
 \section{The compiler}
+
+\subsection{Basic usage}
 
 The compiler can provide a substantial speed boost for words whose stack effect can be inferred. Words without a known stack effect cannot be compiled, and must be run in the interpreter. The compiler generates native code, and so far, x86 and PowerPC backends have been developed.
 
@@ -88,6 +208,61 @@ bootstrap:
 The compiler has two limitations you must be aware of. First, if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Second, compiled code cannot be profiled. These limitations will be resolved in a future release.
 
 The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation.
+
+\subsection{Stack effect inference}
+
+While most programming errors in Factor are only caught at runtime, the stack effect checker can be useful for checking correctness of code before it is run. It can also help narrow down problems with stack shuffling. The stack checker is used by passing a quotation to the \texttt{infer} word. It uses a sophisticated algorithm to infer stack effects of recursive words, combinators, and other tricky constructions, however, it cannot infer the stack effect of all words. In particular, anything using continuations, such as \texttt{catch} and I/O, will stump the stack checker. Despite this fault, it is still a useful tool.
+
+\begin{alltt}
+\textbf{ok} [ pile-fill * >fixnum over pref-size dup y
+\texttt{...} [ + ] change ] infer .
+\textbf{[ [ tuple number tuple ] [ tuple fixnum object number ] ]}
+\end{alltt}
+
+The stack checker will report an error if it cannot infer the stack effect of a quotation. The ``recursive state'' dump is similar to a return stack, but it is not a real return stack, since only a code walk is taking place, not full evaluation. Understanding recursive state dumps is an art, much like understanding return stacks.
+
+\begin{alltt}
+\textbf{ok} [ 100 [ f f cons ] repeat ] infer .
+\textbf{! Inference error: Unbalanced branches
+! Recursive state:
+! [ (repeat) G:54044 pick pick >= [ 3drop ]
+    [ [ swap >r call 1 + r> ] keep (repeat) ] ifte ]
+! [ repeat G:54042 0 -rot (repeat) ]
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+One reason stack inference might fail is if the quotation contains unbalanced branches, as above. For the inference to work, both branches of a conditional must exit with the same stack height.
+
+Another situation when it fails is if your code calls quotations that are not statically known. This can happen if the word in question uses continuations, or if it pulls a quotation from a variable and calls it. This can also happen if you wrote your own combinator, but forgot to mark it as \texttt{inline}. For example, the following will fail:
+
+\begin{alltt}
+\textbf{ok} : dip swap >r call r> ;
+\textbf{ok} [ [ + ] dip * ] infer .
+! Inference error: A literal value was expected where a
+computed value was found: \#<computed @ 679711507>
+...
+\end{alltt}
+
+However, defining \texttt{dip} to be inlined will work:
+
+\begin{alltt}
+\textbf{ok} : dip swap >r call r> ; inline
+\textbf{ok} [ [ + ] dip * ] infer .
+\textbf{[ [ number number number ] [ number ] ]}
+\end{alltt}
+
+You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
+
+\begin{alltt}
+\textbf{ok} [ draw-shape ] infer>test.
+\textbf{[ [ [ object ] [  ] ] ]
+[ [ draw-shape ] infer ]
+unit-test}
+\end{alltt}
+
+You can then copy and paste this snippet into a test script, and run the test script after
+making changes to the word to ensure its stack effect signature has not changed.
 
 \subsection{Linear intermediate representation}
 

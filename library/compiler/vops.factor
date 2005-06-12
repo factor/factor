@@ -40,11 +40,6 @@ M: vop calls-label? vop-label = ;
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
 
-: VOP:
-    #! Followed by a VOP name.
-    scan dup [ ] define-tuple
-    create-in [ make-vop ] define-constructor ; parsing
-
 : empty-vop f f f ;
 : label-vop ( label) >r f f r> ;
 : label/src-vop ( label src) unit swap f swap ;
@@ -57,83 +52,105 @@ M: vop calls-label? vop-label = ;
 : 3-vop ( in1 in2 dest) >r 2list r> unit f ;
 
 ! miscellanea
-VOP: %prologue
+TUPLE: %prologue ;
+C: %prologue make-vop ;
 : %prologue empty-vop <%prologue> ;
 
-VOP: %label
+TUPLE: %label ;
+C: %label make-vop ;
 : %label label-vop <%label> ;
 M: %label calls-label? 2drop f ;
 
 ! Return vops take a label that is ignored, to have the
 ! same stack effect as jumps. This is needed for the
 ! simplifier.
-VOP: %return
+TUPLE: %return ;
+C: %return make-vop ;
 : %return ( label) label-vop <%return> ;
 
-VOP: %return-to
+TUPLE: %return-to ;
+C: %return-to make-vop ;
 : %return-to label-vop <%return-to> ;
 
-VOP: %jump
+TUPLE: %jump ;
+C: %jump make-vop ;
 : %jump label-vop <%jump> ;
 
-VOP: %jump-label
+TUPLE: %jump-label ;
+C: %jump-label make-vop ;
 : %jump-label label-vop <%jump-label> ;
 
-VOP: %call
+TUPLE: %call ;
+C: %call make-vop ;
 : %call label-vop <%call> ;
 
-VOP: %call-label
+TUPLE: %call-label ;
+C: %call-label make-vop ;
 : %call-label label-vop <%call-label> ;
 
-VOP: %jump-t
+TUPLE: %jump-t ;
+C: %jump-t make-vop ;
 : %jump-t <vreg> label/src-vop <%jump-t> ;
 
-VOP: %jump-f
+TUPLE: %jump-f ;
+C: %jump-f make-vop ;
 : %jump-f <vreg> label/src-vop <%jump-f> ;
 
 ! dispatch tables
-VOP: %dispatch
+TUPLE: %dispatch ;
+C: %dispatch make-vop ;
 : %dispatch <vreg> src-vop <%dispatch> ;
 
-VOP: %target-label
+TUPLE: %target-label ;
+C: %target-label make-vop ;
 : %target-label label-vop <%target-label> ;
 
-VOP: %target
+TUPLE: %target ;
+C: %target make-vop ;
 : %target label-vop <%target> ;
 
-VOP: %end-dispatch
+TUPLE: %end-dispatch ;
+C: %end-dispatch make-vop ;
 : %end-dispatch empty-vop <%end-dispatch> ;
 
 ! stack operations
-VOP: %peek-d
+TUPLE: %peek-d ;
+C: %peek-d make-vop ;
 : %peek-d ( vreg n -- ) swap <vreg> src/dest-vop <%peek-d> ;
 M: %peek-d basic-block? drop t ;
 
-VOP: %replace-d
+TUPLE: %replace-d ;
+C: %replace-d make-vop ;
 : %replace-d ( vreg n -- ) swap <vreg> 2-in-vop <%replace-d> ;
 M: %replace-d basic-block? drop t ;
 
-VOP: %inc-d
+TUPLE: %inc-d ;
+C: %inc-d make-vop ;
 : %inc-d ( n -- ) src-vop <%inc-d> ;
 : %dec-d ( n -- ) neg %inc-d ;
 M: %inc-d basic-block? drop t ;
 
-VOP: %immediate
+TUPLE: %immediate ;
+C: %immediate make-vop ;
 : %immediate ( vreg obj -- )
     swap <vreg> src/dest-vop <%immediate> ;
 M: %immediate basic-block? drop t ;
 
-VOP: %peek-r
+TUPLE: %peek-r ;
+C: %peek-r make-vop ;
 : %peek-r ( vreg n -- ) swap <vreg> src/dest-vop <%peek-r> ;
 
-VOP: %replace-r
+TUPLE: %replace-r ;
+C: %replace-r make-vop ;
 : %replace-r ( vreg n -- ) swap <vreg> 2-in-vop <%replace-r> ;
 
-VOP: %inc-r
+TUPLE: %inc-r ;
+C: %inc-r make-vop ;
 : %inc-r ( n -- ) src-vop <%inc-r> ;
 
 ! this exists, unlike %dec-d which does not, due to x86 quirks
-VOP: %dec-r
+TUPLE: %dec-r ;
+C: %dec-r make-vop ;
 : %dec-r ( n -- ) src-vop <%dec-r> ;
 
 : in-1 0 0 %peek-d , ;
@@ -142,22 +159,26 @@ VOP: %dec-r
 : out-1 0 0 %replace-d , ;
 
 ! indirect load of a literal through a table
-VOP: %indirect
+TUPLE: %indirect ;
+C: %indirect make-vop ;
 : %indirect ( vreg obj -- )
     swap <vreg> src/dest-vop <%indirect> ;
 M: %indirect basic-block? drop t ;
 
 ! object slot accessors
 ! mask off a tag (see also %untag-fixnum)
-VOP: %untag
+TUPLE: %untag ;
+C: %untag make-vop ;
 : %untag <vreg> dest-vop <%untag> ;
 M: %untag basic-block? drop t ;
 
-VOP: %slot
+TUPLE: %slot ;
+C: %slot make-vop ;
 : %slot ( n vreg ) >r <vreg> r> <vreg> 2-vop <%slot> ;
 M: %slot basic-block? drop t ;
 
-VOP: %set-slot
+TUPLE: %set-slot ;
+C: %set-slot make-vop ;
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg n.
     >r >r <vreg> r> <vreg> r> <vreg> 3list dup second f
@@ -166,38 +187,56 @@ M: %set-slot basic-block? drop t ;
 
 ! in the 'fast' versions, the object's type and slot number is
 ! known at compile time, so these become a single instruction
-VOP: %fast-slot
+TUPLE: %fast-slot ;
+C: %fast-slot make-vop ;
 : %fast-slot ( vreg n )
     swap <vreg> 2-vop <%fast-slot> ;
 M: %fast-slot basic-block? drop t ;
 
-VOP: %fast-set-slot
+TUPLE: %fast-set-slot ;
+C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
     >r >r <vreg> r> <vreg> r> over >r 3list r> unit f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 
-VOP: %write-barrier
+TUPLE: %write-barrier ;
+C: %write-barrier make-vop ;
 : %write-barrier ( ptr ) <vreg> unit dup f <%write-barrier> ;
 
 ! fixnum intrinsics
-VOP: %fixnum+       : %fixnum+ 3-vop <%fixnum+> ;
-VOP: %fixnum-       : %fixnum- 3-vop <%fixnum-> ;
-VOP: %fixnum*       : %fixnum* 3-vop <%fixnum*> ;
-VOP: %fixnum-mod    : %fixnum-mod 3-vop <%fixnum-mod> ;
-VOP: %fixnum/i      : %fixnum/i 3-vop <%fixnum/i> ;
-VOP: %fixnum/mod    : %fixnum/mod f <%fixnum/mod> ;
-VOP: %fixnum-bitand : %fixnum-bitand 3-vop <%fixnum-bitand> ;
-VOP: %fixnum-bitor  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
-VOP: %fixnum-bitxor : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
-VOP: %fixnum-bitnot : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
+TUPLE: %fixnum+ ;
+C: %fixnum+ make-vop ;       : %fixnum+ 3-vop <%fixnum+> ;
+TUPLE: %fixnum- ;
+C: %fixnum- make-vop ;       : %fixnum- 3-vop <%fixnum-> ;
+TUPLE: %fixnum* ;
+C: %fixnum* make-vop ;       : %fixnum* 3-vop <%fixnum*> ;
+TUPLE: %fixnum-mod ;
+C: %fixnum-mod make-vop ;    : %fixnum-mod 3-vop <%fixnum-mod> ;
+TUPLE: %fixnum/i ;
+C: %fixnum/i make-vop ;      : %fixnum/i 3-vop <%fixnum/i> ;
+TUPLE: %fixnum/mod ;
+C: %fixnum/mod make-vop ;    : %fixnum/mod f <%fixnum/mod> ;
+TUPLE: %fixnum-bitand ;
+C: %fixnum-bitand make-vop ; : %fixnum-bitand 3-vop <%fixnum-bitand> ;
+TUPLE: %fixnum-bitor ;
+C: %fixnum-bitor make-vop ;  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
+TUPLE: %fixnum-bitxor ;
+C: %fixnum-bitxor make-vop ; : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
+TUPLE: %fixnum-bitnot ;
+C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
 
-VOP: %fixnum<=      : %fixnum<= 3-vop <%fixnum<=> ;
-VOP: %fixnum<       : %fixnum< 3-vop <%fixnum<> ;
-VOP: %fixnum>=      : %fixnum>= 3-vop <%fixnum>=> ;
-VOP: %fixnum>       : %fixnum> 3-vop <%fixnum>> ;
-VOP: %eq?           : %eq? 3-vop <%eq?> ;
+TUPLE: %fixnum<= ;
+C: %fixnum<= make-vop ;      : %fixnum<= 3-vop <%fixnum<=> ;
+TUPLE: %fixnum< ;
+C: %fixnum< make-vop ;       : %fixnum< 3-vop <%fixnum<> ;
+TUPLE: %fixnum>= ;
+C: %fixnum>= make-vop ;      : %fixnum>= 3-vop <%fixnum>=> ;
+TUPLE: %fixnum> ;
+C: %fixnum> make-vop ;       : %fixnum> 3-vop <%fixnum>> ;
+TUPLE: %eq? ;
+C: %eq? make-vop ;           : %eq? 3-vop <%eq?> ;
 
 ! At the VOP level, the 'shift' operation is split into five
 ! distinct operations:
@@ -207,27 +246,35 @@ VOP: %eq?           : %eq? 3-vop <%eq?> ;
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a small negative count: %fixnum>>
 ! - shifts with a large negative count: %fixnum-sgn
-VOP: %fixnum<<   : %fixnum<<   3-vop <%fixnum<<> ;
-VOP: %fixnum>>   : %fixnum>>   3-vop <%fixnum>>> ;
+TUPLE: %fixnum<< ;
+C: %fixnum<< make-vop ;   : %fixnum<<   3-vop <%fixnum<<> ;
+TUPLE: %fixnum>> ;
+C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
-VOP: %fixnum-sgn : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
+TUPLE: %fixnum-sgn ;
+C: %fixnum-sgn make-vop ; : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
-VOP: %jump-fixnum<=
+TUPLE: %jump-fixnum<= ;
+C: %jump-fixnum<= make-vop ;
 : %jump-fixnum<= 2-in/label-vop <%jump-fixnum<=> ;
 
-VOP: %jump-fixnum< 
+TUPLE: %jump-fixnum< ;
+C: %jump-fixnum< make-vop ; 
 : %jump-fixnum< 2-in/label-vop <%jump-fixnum<> ;
 
-VOP: %jump-fixnum>=
+TUPLE: %jump-fixnum>= ;
+C: %jump-fixnum>= make-vop ;
 : %jump-fixnum>= 2-in/label-vop <%jump-fixnum>=> ;
 
-VOP: %jump-fixnum> 
+TUPLE: %jump-fixnum> ;
+C: %jump-fixnum> make-vop ; 
 : %jump-fixnum> 2-in/label-vop <%jump-fixnum>> ;
 
-VOP: %jump-eq?     
+TUPLE: %jump-eq? ;
+C: %jump-eq? make-vop ;     
 : %jump-eq? 2-in/label-vop <%jump-eq?> ;
 
 : fast-branch ( class -- class )
@@ -245,18 +292,22 @@ PREDICATE: tuple fast-branch
     class fast-branch ;
 
 ! some slightly optimized inline assembly
-VOP: %type
+TUPLE: %type ;
+C: %type make-vop ;
 : %type ( vreg ) <vreg> dest-vop <%type> ;
 M: %type basic-block? drop t ;
 
-VOP: %arithmetic-type
+TUPLE: %arithmetic-type ;
+C: %arithmetic-type make-vop ;
 : %arithmetic-type <vreg> dest-vop <%arithmetic-type> ;
 
-VOP: %tag-fixnum
+TUPLE: %tag-fixnum ;
+C: %tag-fixnum make-vop ;
 : %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;
 M: %tag-fixnum basic-block? drop t ;
 
-VOP: %untag-fixnum
+TUPLE: %untag-fixnum ;
+C: %untag-fixnum make-vop ;
 : %untag-fixnum <vreg> dest-vop <%untag-fixnum> ;
 M: %untag-fixnum basic-block? drop t ;
 
@@ -266,44 +317,57 @@ M: %untag-fixnum basic-block? drop t ;
 : check-src ( vop reg -- )
     swap vop-in-1 = [ "bad VOP source" throw ] unless ;
 
-VOP: %getenv
+TUPLE: %getenv ;
+C: %getenv make-vop ;
 : %getenv swap src/dest-vop <%getenv> ;
 M: %getenv basic-block? drop t ;
 
-VOP: %setenv
+TUPLE: %setenv ;
+C: %setenv make-vop ;
 : %setenv 2-in-vop <%setenv> ;
 M: %setenv basic-block? drop t ;
 
 ! alien operations
-VOP: %parameters
+TUPLE: %parameters ;
+C: %parameters make-vop ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
-VOP: %parameter
+TUPLE: %parameter ;
+C: %parameter make-vop ;
 : %parameter ( n -- vop ) src-vop <%parameter> ;
 
-VOP: %cleanup
+TUPLE: %cleanup ;
+C: %cleanup make-vop ;
 : %cleanup ( n -- vop ) src-vop <%cleanup> ;
 
-VOP: %unbox
+TUPLE: %unbox ;
+C: %unbox make-vop ;
 : %unbox ( [[ n func ]] -- vop ) src-vop <%unbox> ;
 
-VOP: %unbox-float
+TUPLE: %unbox-float ;
+C: %unbox-float make-vop ;
 : %unbox-float ( [[ n func ]] -- vop ) src-vop <%unbox-float> ;
 
-VOP: %unbox-double
+TUPLE: %unbox-double ;
+C: %unbox-double make-vop ;
 : %unbox-double ( [[ n func ]] -- vop ) src-vop <%unbox-double> ;
 
-VOP: %box
+TUPLE: %box ;
+C: %box make-vop ;
 : %box ( func -- vop ) src-vop <%box> ;
 
-VOP: %box-float
+TUPLE: %box-float ;
+C: %box-float make-vop ;
 : %box-float ( func -- vop ) src-vop <%box-float> ;
 
-VOP: %box-double
+TUPLE: %box-double ;
+C: %box-double make-vop ;
 : %box-double ( [[ n func ]] -- vop ) src-vop <%box-double> ;
 
-VOP: %alien-invoke
+TUPLE: %alien-invoke ;
+C: %alien-invoke make-vop ;
 : %alien-invoke ( func -- vop ) src-vop <%alien-invoke> ;
 
-VOP: %alien-global
+TUPLE: %alien-global ;
+C: %alien-global make-vop ;
 : %alien-global ( global -- vop ) src-vop <%alien-global> ;

@@ -129,10 +129,6 @@ M: compound apply-word ( word -- )
         rethrow
     ] catch ;
 
-: no-base-case ( word -- )
-    word-name " does not have a base case." append
-    inference-error ;
-
 : recursive-word ( word [[ label quot ]] -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive

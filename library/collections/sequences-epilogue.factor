@@ -11,7 +11,8 @@ vectors ;
 UNION: sequence array string sbuf vector ;
 
 M: object thaw clone ;
-M: object freeze drop ;
+
+M: object like drop ;
 
 M: object empty? ( seq -- ? ) length 0 = ;
 
@@ -52,7 +53,7 @@ M: sequence tree-each swap [ swap tree-each ] each-with ;
     0 swap (nmap) ; inline
 
 : immutable ( seq quot -- seq | quot: seq -- )
-    swap [ thaw ] keep >r dup >r swap call r> r> freeze ; inline
+    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 M: object map ( seq quot -- seq | quot: elt -- elt )
     swap [ swap nmap ] immutable ;

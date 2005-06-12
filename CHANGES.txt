@@ -1,48 +1,68 @@
 Factor 0.75:
 ------------
 
-New generational garbage collector. There are two command line switches
-for controlling it:
++ Runtime and core library
 
- +Yn   Size of 2 youngest generations, megabytes
- +An   Size of tenured and semi-spaces, megabytes
+- New generational garbage collector. There are two command line
+  switches for controlling it:
 
-OpenGL binding in contrib/gl/ (Alex Chapman).
+   +Yn   Size of 2 youngest generations, megabytes
+   +An   Size of tenured and semi-spaces, megabytes
 
-The compiler now does constant folding for certain words with literal
-operands. The compiler's peephole optimizer has been improved.
+- Generic words can now dispatch on stack elements other than the top
+  one; define your generic like this to dispatch on the second element:
 
-The alien interface now supports "float" and "double" types, and arrays
-of C types.
+   G: foo [ over ] [ type ] ;
 
-The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
-data could fill up the buffer and cause a denial-of-service attack.
+  Or this for the third:
 
-Generic words can now dispatch on stack elements other than the top one;
-define your generic like this to dispatch on the second element:
+   G: foo [ pick ] [ type ] ;
 
- G: foo [ over ] [ type ] ;
+  Note that GENERIC: foo is the same as
 
-Or this for the third:
+   G: foo [ dup ] [ type ] ;
 
- G: foo [ pick ] [ type ] ;
+- Sequence API refactoring, as described in
+  http://www.jroller.com/page/slava/20050518.
 
-Note that GENERIC: foo is the same as
+- The SO_OOBINLINE socket flag is now set. In 0.74, sending out-of-band
+  data could fill up the buffer and cause a denial-of-service attack.
 
- G: foo [ dup ] [ type ] ;
+- You can now set timeouts for I/O operations with the set-timeout
+  generic word. The HTTP server sets a timeout of 60 seconds for client
+  requests.
 
-Sequence API refactoring, as described in
-http://www.jroller.com/page/slava/20050518.
++ Compiler
 
-HTTP server now supports virtual hosting.
+- The compiler now does constant folding for certain words with literal
+  operands. The compiler's peephole optimizer has been improved.
 
-You can now set timeouts for I/O operations with the set-timeout generic
-word. The HTTP server sets a timeout of 60 seconds for client requests.
+- The alien interface now supports "float" and "double" types, and
+  arrays of C types.
 
-The Factor plugin now supports connecting to Factor instances on
-arbitrary host and port names. This allows interactive development on
-one machine while testing on another. A new command was added to
-evaluate the word definition at the caret in the listener.
+- New short-hand syntax for defining words that alien-invoke
+  (Alex Chapman).
+  
+  LIBRARY: gl
+  FUNCTION: void glTranslatef ( GLfloat x, GLfloat y, GLfloat z ) ;
+
+  should be the same as doing:
+
+  : glTranslatef ( x y z -- )
+      "void" "gl" "glTranslatef"
+      [ "GLfloat" "GLfloat" "GLfloat" ] alien-invoke ;
+  \ glTranslatef compile
+
++ Framework
+
+- OpenGL binding in contrib/gl/ (Alex Chapman).
+
+- HTTP server now supports virtual hosting.
+
+- The Factor plugin now supports connecting to Factor instances on
+  arbitrary host and port names. This allows interactive development on
+  one machine while testing on another. A new command was added to
+  evaluate the word definition at the caret in the listener.
 
 Factor 0.74:
 ------------

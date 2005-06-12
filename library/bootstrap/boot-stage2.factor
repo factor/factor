@@ -4,17 +4,6 @@ USING: alien assembler command-line compiler generic hashtables
 kernel lists memory namespaces parser sequences stdio unparser
 words ;
 
-"Making the image happy..." print
-
-! Rehash hashtables
-[ hashtable? ] instances
-[ dup hash-size swap set-bucket-count ] each
-
-! Update generics
-[ dup generic? [ make-generic ] [ drop ] ifte ] each-word
-
-recrossref
-
 : pull-in ( ? list -- )
     swap [
         [
@@ -24,36 +13,7 @@ recrossref
         drop
     ] ifte ;
 
-"Loading compiler and friends..." print
-t [
-    "/library/inference/conditions.factor"
-    "/library/inference/dataflow.factor"
-    "/library/inference/values.factor"
-    "/library/inference/inference.factor"
-    "/library/inference/branches.factor"
-    "/library/inference/words.factor"
-    "/library/inference/stack.factor"
-    "/library/inference/partial-eval.factor"
-
-    "/library/compiler/assembler.factor"
-    "/library/compiler/relocate.factor"
-    "/library/compiler/xt.factor"
-    "/library/compiler/optimizer.factor"
-    "/library/compiler/vops.factor"
-    "/library/compiler/linearizer.factor"
-    "/library/compiler/intrinsics.factor"
-    "/library/compiler/simplifier.factor"
-    "/library/compiler/generator.factor"
-    "/library/compiler/compiler.factor"
-        
-    "/library/alien/c-types.factor"
-    "/library/alien/enums.factor"
-    "/library/alien/structs.factor"
-    "/library/alien/compiler.factor"
-    "/library/alien/malloc.factor"
-
-    "/library/io/buffer.factor"
-] pull-in
+"Loading compiler backend..." print
 
 cpu "x86" = [
     "/library/compiler/x86/assembler.factor"

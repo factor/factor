@@ -10,7 +10,3 @@ USING: io-internals namespaces parser stdio threads words ;
     init-io
     "HOME" os-env [ "." ] unless* "~" set
     init-search-path ;
-
-"Good morning!" print
-flush
-"/library/bootstrap/boot-stage2.factor" run-resource

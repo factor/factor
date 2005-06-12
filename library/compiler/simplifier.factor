@@ -18,21 +18,19 @@ GENERIC: next-logical ( linear vop -- linear )
 ! No delegation.
 M: tuple simplify-node drop f ;
 
+: (simplify-1) ( ? list -- ? )
+    dup [
+        [ car simplify-node swap , or ] keep cdr (simplify-1)
+    ] when ;
+
 : simplify-1 ( list -- list ? )
     #! Return a new linear IR.
-     dup [
-         dup car simplify-node
-         [ uncons simplify-1 drop cons t ]
-         [ uncons simplify-1 >r cons r> ] ifte
-     ] [
-         f
-     ] ifte ;
+    [ (simplify-1) ] make-list swap ;
 
 : simplify ( linear -- linear )
     #! Keep simplifying until simplify-1 returns f.
-    [
-        dup simplifying set  simplify-1
-    ] with-scope  [ simplify ] when ;
+    [ dup simplifying set  simplify-1 ] with-scope
+    [ simplify ] when ;
 
 : label-called? ( label -- ? )
     simplifying get [ calls-label? ] some-with? ;

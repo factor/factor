@@ -124,5 +124,3 @@ USE: kernel-internals
     pop-literal vtable>list
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop
-
-\ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop

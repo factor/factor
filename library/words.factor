@@ -50,8 +50,6 @@ M: word set-allot-count ( n w -- ) 7 set-integer-slot ;
 ! words can be recompiled when redefined.
 SYMBOL: crossref
 
-global [ <namespace> crossref set ] bind
-
 : (add-crossref)
     dup word? [
         crossref get [ dupd nest set-hash ] bind

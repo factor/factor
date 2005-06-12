@@ -146,6 +146,9 @@ M: general-list nth ( n list -- element )
     #! Is every element of list1 in list2?
     swap [ swap contains? ] all-with? ;
 
+: unpair ( list -- list1 list2 )
+    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
+
 : <queue> ( -- queue )
     #! Make a new functional queue.
     [[ [ ] [ ] ]] ;

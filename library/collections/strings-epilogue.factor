@@ -23,8 +23,8 @@ sequences strings ;
 M: object >string >sbuf (sbuf>string) ;
 
 M: string thaw >sbuf ;
-M: string freeze drop >string ;
-M: string like ( seq sbuf -- sbuf ) drop >string ;
+
+M: string like ( seq sbuf -- string ) drop >string ;
 
 M: sbuf clone ( sbuf -- sbuf )
     [ length <sbuf> dup ] keep nappend ;

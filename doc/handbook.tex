@@ -72,23 +72,17 @@
 \maketitle
 \tableofcontents{}
 
-\chapter*{Preface}
+\chapter*{Foreword}
 
-What follows is a detailed guide to the Factor language and development environment. It is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general issues of algorithm and program design.
+This handbook documents release 0.75 of the Factor programming language.
 
-Factor is a programming language combinding a postfix syntax with a functional and object-oriented
-flavor, building on ideas from Forth, Joy and Lisp.
+Note that this handbook is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general algorithm and program design.
 
-Factor is \emph{dynamic}. This means that all objects in the language are fully reflective at run time, and that new definitions can be entered without restarting the runtime. Factor code can be used interchangably as data, meaning that sophisticated language extensions can be realized as libraries of words.
+The Factor homepage can be found at \verb|http://factor.sourceforge.net|.
 
-Factor is \emph{safe}. This means all code executes in an object-oriented runtime that provides
-garbage collection and prohibits direct pointer arithmetic. There is no way to get a dangling reference by deallocating a live object, and it is not possible to corrupt memory by overwriting the bounds of an array.
+\part{Language reference}
 
-\part{Foo}
-
-\chapter{Language reference}
-
-\section{Conventions}
+\chapter{Conventions}
 
 When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
 output from the interpreter is in boldface:
@@ -97,7 +91,7 @@ output from the interpreter is in boldface:
 \textbf{Hello, world!}
 \end{alltt}
 
-\subsection{Word definitions}
+\section{Word definitions}
 
 Parsing words, defined in \ref{parser}, are presented with the following notation.
 \wordtable{
@@ -131,7 +125,7 @@ A generic word definition.
 }
 A class that generic word methods can specialize on.
 
-\subsection{Stack effects}
+\section{Stack effects}
 
 Within a stack effect comment, the top of the stack is the rightmost entry in both the
 list of inputs and outputs, so \texttt{( x y -- x-y )} indicates that the top stack element will be subtracted from the element underneath.
@@ -160,7 +154,7 @@ If the stack effect identifies quotations, the stack effect of each quotation ma
 ( list quot -- list | quot: elt -- elt )
 \end{verbatim}
 
-\subsection{Naming conventions}
+\section{Naming conventions}
 
 The following naming conventions are used in the Factor library.
 
@@ -186,7 +180,7 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{make-foo}] executes a quotation in a namespace where a sequence of type \texttt{foo} is being constructed; for example, \texttt{make-string}
 \end{description}
 
-\subsection{Mathematics}
+\section{Mathematics}
 
 This guide uses the standard mathematical notation to denote intervals.
 
@@ -199,13 +193,13 @@ $(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including and $b$\\
 $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \end{tabular}
 
-\section{Syntax}\label{syntax}
+\chapter{Syntax}\label{syntax}
 \newcommand{\parseglos}{\glossary{name=parser,
 description={a set of words in the \texttt{parser} vocabulary, primarily \texttt{parse}, \texttt{eval}, \texttt{parse-file} and \texttt{run-file}, that creates objects from their printed representations, and adds word definitions to the dictionary}}}
 \parseglos
 In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary. The latter is discussed in \ref{words}. The parser can be extended (\ref{parser}).
 
-\subsection{Parser algorithm}\label{parser}
+\section{Parser algorithm}\label{parser}
 
 \parseglos
 \glossary{name=token,
@@ -271,7 +265,7 @@ While parsing words supporting arbitrary syntax can be defined, the default set 
 in the \texttt{syntax} vocabulary and provides the basis for all further syntactic
 interaction with Factor.
 
-\subsection{Vocabulary search}\label{vocabsearch}
+\section{Vocabulary search}\label{vocabsearch}
 
 \newcommand{\wordglos}{\glossary{
 name=word,
@@ -321,7 +315,7 @@ USING: lists strings vectors ;
 
 Due to the way the parser works, words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. For a way around this, see \ref{deferred}.
 
-\subsection{Numbers}
+\section{Numbers}
 
 \newcommand{\numberglos}{\glossary{
 name=number,
@@ -330,7 +324,7 @@ description={an instance of the \texttt{number} class}}}
 
 If a vocabulary lookup of a token fails, the parser attempts to parse it as a number.
 
-\subsubsection{Integers}\label{integer-literals}
+\subsection{Integers}\label{integer-literals}
 
 \newcommand{\integerglos}{\glossary{
 name=integer,
@@ -369,7 +363,7 @@ Integers are entered in base 10 unless prefixed with a base change parsing word.
 
 More information on integers can be found in \ref{integers}.
 
-\subsubsection{Ratios}\label{ratio-literals}
+\subsection{Ratios}\label{ratio-literals}
 
 \newcommand{\ratioglos}{\glossary{
 name=ratio,
@@ -387,7 +381,7 @@ of the two terms is 1.
 
 More information on ratios can be found in \ref{ratios}.
 
-\subsubsection{Floats}\label{float-literals}
+\subsection{Floats}\label{float-literals}
 
 \newcommand{\floatglos}{\glossary{
 name=float,
@@ -405,7 +399,7 @@ an optional sign prefix on either the significand or exponent.
 
 More information on floats can be found in \ref{floats}.
 
-\subsubsection{Complex numbers}\label{complex-literals}
+\subsection{Complex numbers}\label{complex-literals}
 
 \newcommand{\complexglos}{\glossary{
 name=complex,
@@ -425,13 +419,13 @@ must either be integers, ratios or floats.
 
 More information on complex numbers can be found in \ref{complex-numbers}.
 
-\subsection{Literals}
+\section{Literals}
 
 Many different types of objects can be constructed at parse time via literal syntax. Numbers are a special case since support for reading them is built-in to the parser. All other literals are constructed via parsing words.
 
 If a quotation contains a literal object, the same literal object instance is used each time the quotation executes; that is, literals are ``live''.
 
-\subsubsection{Booleans}\label{boolean}
+\subsection{Booleans}\label{boolean}
 
 \newcommand{\boolglos}{
 \glossary{
@@ -463,7 +457,7 @@ Note that the \texttt{f} parsing word and class is not the same as the \texttt{f
 \end{alltt}
 An analogous distinction holds for the \texttt{t} class and object.
 
-\subsubsection{Characters}\label{syntax:char}
+\subsection{Characters}\label{syntax:char}
 
 \newcommand{\charglos}{\glossary{
 name=character,
@@ -513,7 +507,7 @@ CHAR: \bs{}u0078
 \end{alltt}
 While not useful for single characters, this syntax is also permitted inside strings.
 
-\subsubsection{Strings}\label{string-literals}
+\subsection{Strings}\label{string-literals}
 
 \newcommand{\stringglos}{\glossary{
 name=string,
@@ -535,7 +529,7 @@ inserting escape sequences as described in \ref{syntax:char}.
 
 Strings are documented in \ref{strings}.
 
-\subsubsection{Lists}\label{listsyntax}
+\subsection{Lists}\label{listsyntax}
 \newcommand{\listglos}{\glossary{
 name=list,
 description={an instance of the \texttt{list} class, storing a sequence of elements as a chain of zero or more conses, where the car of each cons is an element, and the cdr is either \texttt{f} or another list}}
@@ -571,7 +565,7 @@ The empty list is denoted by \texttt{f}, along with boolean falsity, and the con
 
 Lists are documented in \ref{lists}.
 
-\subsubsection{Words}
+\subsection{Words}
 
 While words parse as themselves, a word occurring inside a quotation is executed when the quotation is called. Sometimes it is desirable to have a word be pushed on the data stack during the execution of a quotation, usually for reflective access to the word's slots.
 \wordtable{
@@ -605,7 +599,7 @@ Reads the next word from the input string and appends the word to the parse tree
 Words are documented in \ref{words}.
 Parsing words are documented in \ref{parsing-words}.
 
-\subsubsection{Mutable literals}
+\subsection{Mutable literals}
 
 \newcommand{\mutableglos}{\glossary{name=mutable object,
 description=an object whose slot values can be changed}
@@ -616,7 +610,7 @@ description=an object whose slot values cannot be changed}}
 Using mutable object literals in word definitions requires care, since if those objects
 are mutated, the actual word definition will be changed, which is in most cases not what you would expect. Strings and lists are immutable; string buffers, vectors, hashtables and tuples are mutable.
 
-\subsubsection{String buffers}\label{sbuf-literals}
+\subsection{String buffers}\label{sbuf-literals}
 
 \newcommand{\sbufglos}{\glossary{
 name=string buffer,
@@ -637,7 +631,7 @@ As with strings, the escape codes described in \ref{syntax:char} are permitted.
 
 String buffers are documented in \ref{string-buffers}.
 
-\subsubsection{Vectors}\label{vector-literals}
+\subsection{Vectors}\label{vector-literals}
 \newcommand{\vectorglos}{\glossary{
 name=vector,
 description={an instance of the \texttt{vector} class, storing a mutable and growable sequence of elements in a contiguous range of memory}}}
@@ -654,7 +648,7 @@ Parses a vector, whose elements are read between \texttt{\tto} and \texttt{\ttc}
 
 Vectors are documented in \ref{vectors}.
 
-\subsubsection{Hashtables}
+\subsection{Hashtables}
 \newcommand{\hashglos}{\glossary{
 name=hashtable,
 description={an instance of the \texttt{hashtable} class, providing a mutable mapping of keys to values}}}
@@ -675,7 +669,7 @@ Parses a hashtable. Elements between \texttt{\tto\tto} and \texttt{\ttc\ttc} mus
 
 Hashtables are documented in \ref{hashtables}.
 
-\subsubsection{Tuples}
+\subsection{Tuples}
 \newcommand{\tupleglos}{\glossary{
 name=tuple,
 description={an instance of a user-defined class whose metaclass is the \texttt{tuple} metaclass, storing a fixed set of elements in named slots, with optional delegation method dispatch semantics}}}
@@ -692,7 +686,7 @@ Parses a tuple. The tuple's class must follow \texttt{<<}. The element after tha
 
 Tuples are documented in \ref{tuples}.
 
-\subsubsection{Matrices}\label{syntax:matrices}
+\subsection{Matrices}\label{syntax:matrices}
 \newcommand{\matrixglos}{\glossary{
 name=matrix,
 description={an instance of the \texttt{matrix} class, representing a mathematical matrix of numbers}}}
@@ -714,7 +708,7 @@ $$\left( \begin{array}{c c c}
 \end{array} \right)$$
 Matrices are documented in \ref{matrices}.
 
-\subsection{Comments}\label{comments}
+\section{Comments}\label{comments}
 
 \wordtable{
 \vocabulary{syntax}
@@ -757,9 +751,9 @@ A stack effect comment has no effect on the generated parse tree, but if it is t
 
 Word properties are described in \ref{word-props}.
 
-\section{Data and control flow}
+\chapter{Data and control flow}
 
-\subsection{Shuffle words}
+\section{Shuffle words}
 
 \newcommand{\dsglos}{\glossary{
 name=stack,
@@ -799,7 +793,7 @@ a stack effect comment in the middle of a compound definition to keep track of s
 a good sign that the word should probably be factored into two or
 more smaller words.
 
-\subsection{Quotations}\label{quotations}
+\section{Quotations}\label{quotations}
 
 \newcommand{\csglos}{\glossary{
 name=return stack,
@@ -876,7 +870,7 @@ Execute a word definition, taking action based on the word definition, as above.
 \textbf{Hello world}
 \end{alltt}
 
-\subsubsection{Tail call optimization}
+\subsection{Tail call optimization}
 
 \newcommand{\tailglos}{\glossary{
 name=tail call,
@@ -888,7 +882,7 @@ description=the elimination of call stack pushes when making a tail call}}
 When a call is made to a quotation from the last word in the call frame, there is no
 purpose in pushing the empty call frame on the call stack. Therefore the last call in a quotation does not grow the call stack, and tail recursion executes in bounded space.
 
-\subsubsection{Call stack manipulation}
+\subsection{Call stack manipulation}
 
 Because of the way the interpreter is described in \ref{quotations}, the top of the call stack is not accessed during the execution of a quotation; it is only popped when the interpreter reaches the end of the quotation. In effect, the call stack can be used as a temporary storage area, as long as pushes and pops are balanced out within a single quotation.
 \wordtable{
@@ -922,7 +916,7 @@ One exception is that when \texttt{ifte} occurs as the last word in a definition
     >r [ r> + ] [ drop r> ] ifte ; ! Okay
 \end{verbatim}
 
-\subsubsection{Quotation variants}
+\subsection{Quotation variants}
 
 There are some words that combine shuffle words with \texttt{call}. They are useful in the implementation of higher-order words taking quotations as inputs.
 \wordtable{
@@ -963,7 +957,7 @@ Call a quotation with a pair of values on the stack, restoring the values when t
 }
 Call a quotation with three values on the stack, restoring the values when the quotation returns.
 
-\subsection{Conditionals}
+\section{Conditionals}
 
 The simplest style of a conditional form is the \texttt{ifte} word.
 \wordtable{
@@ -1015,7 +1009,7 @@ X [ Y ] [ Z ] ?ifte
 X dup [ nip Y ] [ drop Z ] ifte
 \end{verbatim}
 
-\subsubsection{Boolean logic}
+\subsection{Boolean logic}
 
 The \texttt{?}~word chooses between two values, rather than two quotations.
 \wordtable{
@@ -1056,7 +1050,7 @@ Outputs \texttt{t} if exactly one of the inputs is true.
 
 An alternative set of logical operations operate on individual bits of integers bitwise, rather than generalized boolean truth values. They are documented in \ref{bitwise}.
 
-\subsection{Continuations}
+\section{Continuations}
 
 \newcommand{\contglos}{
 \glossary{name=continuation,
@@ -1076,7 +1070,7 @@ Calling one of these words calls the given quotation with the continuation on th
 
 The difference between \texttt{callcc0} and \texttt{callcc1} lies in the continuation object. When \texttt{callcc1} is used, calling the continuation takes one value from the top of the data stack, and places it back on the \emph{restored} data stack. This allows idioms such as exception handling, co-routines and generators to be implemented via continuations.
 
-\subsubsection{Handling exceptional situations}\label{exceptions}
+\subsection{Handling exceptional situations}\label{exceptions}
 \glossary{name=exception,
 description=an object representing an exceptional situation that has been detected}
 
@@ -1143,7 +1137,7 @@ The following diagram illustrates the nesting of exception handlers on the catch
 \end{center}
 \end{figure}
 
-\subsubsection{Multitasking}\label{threads}
+\subsection{Multitasking}\label{threads}
 
 Factor implements co-operative multitasking, where the thread of control switches between tasks at explicit calls to \texttt{yield}, as well as when blocking I/O is performed. Multitasking is implemented via continuations.
 \wordtable{
@@ -1166,7 +1160,7 @@ Add the current continuation to the end of the run queue, and call the continuat
 }
 Call the continuation at the front of run queue, without saving the current continuation. In effect, this stops the current thread.
 
-\subsubsection{Interpreter state}
+\subsection{Interpreter state}
 
 The current state of the interpreter is determined by the contents of the four stacks. A set of words for getting and setting stack contents are the primitive building blocks for continuations, and in turn abstractions such as exception handling and multitasking.
 \wordtable{
@@ -1207,7 +1201,7 @@ Save and restore the name stack, used for dynamic variable bindings. See \ref{na
 }
 Save and restore the catch stack, used for exception handling. See \ref{exceptions}.
 
-\section{Words}\label{words}
+\chapter{Words}\label{words}
 
 \wordglos
 \vocabglos
@@ -1230,7 +1224,7 @@ Words are the fundamental unit of code in Factor, analogous to functions or proc
 }
 Tests if the \texttt{object} is a word.
 
-\subsection{Vocabularies}
+\section{Vocabularies}
 \wordtable{
 \vocabulary{words}
 \symbolword{vocabularies}
@@ -1244,7 +1238,7 @@ Sets the current vocabulary for new word definitions, and adds the vocabulary to
 
 Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to \texttt{scratchpad}.
 
-\subsubsection{Searching for words}
+\subsection{Searching for words}
 
 Words whose names are known at parse time -- that is, most words making up your program -- can be referenced by stating their name. However, the parser itself, and sometimes code you write, will need to look up words dynamically.
 \wordtable{
@@ -1254,7 +1248,7 @@ Words whose names are known at parse time -- that is, most words making up your 
 }
 The \texttt{vocabs} parameter is a list of vocabulary names. If a word with the given name is found, it is pushed on the stack, otherwise, \texttt{f} is pushed.
 
-\subsubsection{Creating words}\label{creating-words}
+\subsection{Creating words}\label{creating-words}
 
 \wordtable{
 \vocabulary{words}
@@ -1272,7 +1266,7 @@ Creates a new word \texttt{name} in the current vocabulary. This word is intende
 : create-in ( name -- word ) "in" get create ;
 \end{verbatim}
 
-\subsection{Word definition}
+\section{Word definition}
 
 There are two ways to create a word definition:
 \begin{itemize}
@@ -1280,7 +1274,7 @@ There are two ways to create a word definition:
 \item Using defining words at run-time. This is a more dynamic feature that can be used to implement code generation and such, and in fact parse-time defining words are implemented in terms of run-time defining words.
 \end{itemize}
 
-\subsubsection{Compound definitions}\label{colondefs}
+\subsection{Compound definitions}\label{colondefs}
 
 \newcommand{\colonglos}{\glossary{
 name=compound definition,
@@ -1322,7 +1316,7 @@ Tests if the \texttt{object} is a compound word definition.
 }
 The class that all compound words are an instance of.
 
-\subsubsection{Symbols}\label{symbols}
+\subsection{Symbols}\label{symbols}
 
 \newcommand{\symbolglos}{\glossary{
 name=symbol,
@@ -1351,7 +1345,7 @@ Tests if the \texttt{object} is a symbol.
 }
 The class that all symbols are an instance of.
 
-\subsubsection{Primitives}\label{primitives}
+\subsection{Primitives}\label{primitives}
 \newcommand{\primglos}{\glossary{
 name=primitive,
 description=a word implemented as native code in the Factor runtime}}
@@ -1370,7 +1364,7 @@ Tests if the \texttt{object} is a primitive.
 }
 The class that all primitives are an instance of.
 
-\subsubsection{Deferred words and mutual recursion}\label{deferred}
+\subsection{Deferred words and mutual recursion}\label{deferred}
 
 \glossary{
 name=deferred word,
@@ -1399,7 +1393,7 @@ Tests if the \texttt{object} is an undefined (deferred) word.
 }
 The class that all undefined words are an instance of.
 
-\subsubsection{Undefining words}
+\subsection{Undefining words}
 
 \wordtable{
 \vocabulary{syntax}
@@ -1413,7 +1407,7 @@ Removes the word \texttt{name} from its vocabulary. Existing definitions that re
 }
 Removes the word from its vocabulary. The parsing word \texttt{FORGET:} is implemented using this word.
 
-\subsubsection{Declarations}\label{declarations}
+\subsection{Declarations}\label{declarations}
 
 A compound or generic word (\ref{generic}) can be given special behavior with one of the below parsing words.
 
@@ -1429,7 +1423,7 @@ Marks the most recently defined word as an inline word. The compiler copies the 
 }
 Marks the most recently defined word as a parsing word. Parsing words run at parse time. Se \ref{parsing-words}.
 
-\subsection{Word properties}\label{word-props}
+\section{Word properties}\label{word-props}
 
 \glossary{name=word property,
 description={a name/value pair stored in a word's properties}}
@@ -1475,7 +1469,7 @@ Sort a list of words by name.
 }
 Retreive and store the entire set of word properties.
 
-\subsection{Low-level details}
+\section{Low-level details}
 
 The actual behavior of a word when executed is determined by the values of two slots:
 \begin{itemize}
@@ -1531,7 +1525,7 @@ Updates a word's execution token according to its primitive number. When called 
 }
 Updates the cross-referencing database, which you will probably need to do if you mess around with any of the words in this section -- assuming Factor does not crash first, that is.
 
-\section{Objects}
+\chapter{Objects}
 
 \glossary{name=object,
 description=a datum that can be identified}
@@ -1539,7 +1533,7 @@ description=a datum that can be identified}
 
 Everything in Factor is an object, where an object is a collection of slots. Each object has a unique identity, and references to objects are passed by value on the stack. It is possible to have two references to the same object, and if the object is mutated through one reference, the changes will be visible through the other reference. Not all objects are mutable; the documentation for each class details if its instances are mutable or not.
 
-\subsection{Identity and equality}\label{equality}
+\section{Identity and equality}\label{equality}
 
 \glossary{name=equal,
 description={two objects are equal if they have the same class and if their slots are equal, or alternatively, if both are numbers that denote the same value}}
@@ -1568,7 +1562,7 @@ Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precis
 }
 Make a fresh object that is equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a new shallow copy of the original.
 
-\subsection{Generic words and methods}\label{generic}
+\section{Generic words and methods}\label{generic}
 
 \glossary{name=generic word,
 description={a word defined using the \texttt{GENERIC:}~parsing word. The behavior of generic words depends on the class of the object at the top of the stack. A generic word is composed of methods, where each method is specialized on a class}}
@@ -1593,7 +1587,7 @@ Defines a new generic word. Initially, it contains no methods, and thus will rai
 Defines a method, that is, a behavior for the generic \texttt{word} specialized on instances of \texttt{class}. Each method definition
 can potentially occur in a different source file.
 
-\subsubsection{Method ordering}\label{method-order}
+\subsection{Method ordering}\label{method-order}
 
 If two classes have a non-empty intersection, there is no guarantee that one is a subclass of the other. This means there is no canonical linear ordering of classes. The methods of a generic word are linearly ordered, though, and you can inspect this order using the \texttt{order} word.
 
@@ -1624,7 +1618,7 @@ Neither \texttt{general-t} nor \texttt{general-list} contains the other, and the
 
 Therefore, the outcome of calling \texttt{bar} with a cons cell is undefined.
 
-\subsection{Classes}
+\section{Classes}
 \glossary{name=class,
 description=a set of objects defined in a formal manner. Methods specialize generic words on classes}
 \glossary{name=metaclass,
@@ -1653,7 +1647,7 @@ every object is an instance of this class.
 \texttt{f} signifying falsity, missing value, and empty list, and the predicate testing for this is the built-in library word \texttt{not}.
 \end{description}
 
-\subsubsection{Built-in classes}
+\subsection{Built-in classes}
 \glossary{name=type,
 description={an object invariant that describes its shape. An object's type is constant for the lifetime of the object, and there is only a fixed number of types built-in to the run-time. See class}}
 \glossary{name=built-in class,
@@ -1696,7 +1690,7 @@ Outputs the canonical class of a given object. While an object may be an instanc
 \textbf{point}
 \end{alltt}
 
-\subsubsection{Unions}
+\subsection{Unions}
 \glossary{name=union,
 description={a class whose set of instances is the union of the set of instances of a list of member classes}}
 An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates.
@@ -1719,7 +1713,7 @@ M: real abs dup 0 < [ neg ] when ;
 M: complex abs >rect mag2 ;
 \end{verbatim}
 
-\subsubsection{Complements}
+\subsection{Complements}
 \glossary{name=complement,
 description={a class whose set of instances is the set of objects that are not instances of a specific class}}
 
@@ -1733,7 +1727,7 @@ Defines a complement class. For example, the class of all values denoting ``true
 COMPLEMENT: general-t f
 \end{verbatim}
 
-\subsubsection{Predicates}
+\subsection{Predicates}
 \glossary{name=predicate,
 description={a word with stack effect \texttt{( object -- ?~)}, or more alternatively, a class whose instances are the instances of a superclass that satisfy an arbitrary predicate}}
 An object is an instance of a predicate classes if it is an instance of the predicate's parent class, and if it satisfies the predicate definition.
@@ -1757,7 +1751,7 @@ PREDICATE: integer digit CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 \end{verbatim}
 
-\subsubsection{Operations on classes}
+\subsection{Operations on classes}
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{class-and}{class-and ( class class -- class )}
@@ -1771,7 +1765,7 @@ Intersection and union of classes. Note that the returned class might not be the
 }
 Classes are partially ordered. This ordering determines the method ordering of a generic word (\ref{method-order}).
 
-\subsection{Tuples}\label{tuples}
+\section{Tuples}\label{tuples}
 \tupleglos
 
 Tuples are user-defined classes composed of named slots. All tuples have the same type, however distinct classes of tuples are defined.
@@ -1803,7 +1797,7 @@ produces a new \texttt{point}:
 \textbf{<< point 1 2 3 >>}
 \end{alltt}
 
-\subsubsection{Constructors}
+\subsection{Constructors}
 
 Constructors are named after the tuple class surrounded in angle
 brackets (\texttt{<}~and~\texttt{>}). A default constructor is provided
@@ -1815,7 +1809,7 @@ be defined using the \texttt{C:} parsing word.
 }
 Define a \texttt{<class>} word that creates a tuple instance of the \texttt{class}, then applies the \texttt{definition} to this new tuple. The \texttt{definition} quotation must have stack effect \texttt{( tuple -- tuple )}.
 
-\subsubsection{Delegation}
+\subsection{Delegation}
 
 \glossary{name=delegate,
 description={a fa\,cade object's delegate receives unhandled methods that are called on the fa\,cade}}
@@ -1842,9 +1836,9 @@ Factor uses delegation is used instead of inheritance, but it is not a direct
 substitute; in particular, the semantics differ in that a delegated
 method call receives the delegate on the stack, not the original object.
 
-\chapter{Library reference}
+\part{Library reference}
 
-\section{Sequences}
+\chapter{Sequences}
 
 \glossary{name=sequence,
 description=an object storing a linearly-ordered set of elements}
@@ -1870,7 +1864,7 @@ slice
 \end{verbatim}
 User-defined classes can also implement the sequence protocol and gain the ability to reuse many of the words in this section.
 
-\subsection{Sequence protocol}
+\section{Sequence protocol}
 
 The following set of generic words is the core of the sequence protocol. The mutating words are not supported by all sequences; in particular, lists and strings are immutable.
 
@@ -1903,9 +1897,9 @@ Outputs the $n$th element of the sequence. Elements are numbered starting from 0
 }
 Sets the $n$th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence. Storing to a negative index is always an error.
 
-\subsection{Sequence operations}
+\section{Sequence operations}
 
-\subsubsection{Queries}
+\subsection{Queries}
 
 The following set of words inspect sequence elements without modifying or creating anything.
 
@@ -1952,7 +1946,7 @@ Outputs the last element of the sequence. Throws an exception if the sequence is
 }
 Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
 
-\subsubsection{Functional operations}
+\subsection{Functional operations}
 
 The following set of words do not modify their inputs.
 
@@ -1981,7 +1975,7 @@ The input is a sequence of sequences. If the input is empty, the output is the e
 }
 Outputs a new sequence of the same class, with the reverse element order.
 
-\subsubsection{Subsequences}\label{subseq}
+\subsection{Subsequences}\label{subseq}
 
 The following set of words do not modify their inputs.
 
@@ -2047,7 +2041,7 @@ Outputs a list of subsequences taken between occurrences of \texttt{split} in \t
 }
 Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
 
-\subsubsection{Imperitive operations}
+\subsection{Imperitive operations}
 
 The following set of sequence operations modify their inputs. The ``n'' prefix denotes ``non-constructive''; these words do not construct new output objects. None of these operations are permitted on immutable sequences like lists and strings.
 
@@ -2075,7 +2069,7 @@ Adds and removes an element at the end of the sequence. The sequence's length is
     dup peek >r dup length 1 - swap set-length r> ;
 \end{verbatim}
 
-\subsection{Sequence combinators}\label{sequence-combinators}
+\section{Sequence combinators}\label{sequence-combinators}
 
 \wordtable{
 \vocabulary{sequences}
@@ -2134,7 +2128,7 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
-\subsection{Vectors}\label{vectors}
+\section{Vectors}\label{vectors}
 
 \wordtable{
 \vocabulary{vectors}
@@ -2176,7 +2170,7 @@ Creates a new vector of the requested length, where all elements are initially \
 }
 Calls the quotation sequentially with integers $0$ up to $n-1$, collecting the results into a new vector.
 
-\subsection{Cons cells}
+\section{Cons cells}
 
 \consglos
 \glossary{name=car,description=the first component of a cons cell}
@@ -2233,7 +2227,7 @@ Here is an example:
 \end{alltt}
 Cons cells, and by extension lists, are immutable.
 
-\subsubsection{Lists}\label{lists}
+\subsection{Lists}\label{lists}
 
 \listglos
 \glossary{name=improper list,description={a sequence of cons cells where the cdr of the last cons cell is not \texttt{f}}}
@@ -2275,7 +2269,7 @@ A \emph{general list} is either the empty list or a cons cell. A \emph{list} is 
 Not all list operations will function given an improper list,
 however methods are usually defined on \texttt{general-list} not \texttt{list} since dispatching on \texttt{list} involves a costly check.
 
-\subsubsection{List operations}
+\subsection{List operations}
 
 \wordtable{
 \vocabulary{lists}
@@ -2333,7 +2327,7 @@ Tests if all elements of the list are equal. For the empty list, this is vacuous
 }
 Return a new list containing all integers from 0 up to $n-1$, inclusive.
 
-\subsubsection{Set-theoretic operations}
+\subsection{Set-theoretic operations}
 
 \wordtable{
 \vocabulary{lists}
@@ -2366,7 +2360,7 @@ Outputs a list of elements present in both lists.
 }
 Outputs a list of elements present in \texttt{l2} but not \texttt{l1}.
 
-\subsubsection{List combinators}
+\subsection{List combinators}
 
 The two most frequently-used combinators are \verb|each| and \verb|map|, they can be used with any sequence and are documented in \ref{sequence-combinators}.
 
@@ -2409,7 +2403,7 @@ Sorts the list by comparing each pair of elements with the quotation. The quotat
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
-\subsubsection{Queues}
+\subsection{Queues}
 
 The following set of words manages LIFO (last-in-first-out) queues. Queues are built up from cons cells, and hence are immutable; queue operations always return a new queue.
 
@@ -2434,7 +2428,7 @@ Dequeues an element and outputs a new queue without that element.
 }
 Enqueues an element and outputs a new queue.
 
-\subsection{Strings}\label{strings}
+\section{Strings}\label{strings}
 
 \stringglos
 \wordtable{
@@ -2494,7 +2488,7 @@ Creates a string with \texttt{char} repeated $n$ times.
 }
 Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l>n$, the empty string is output.
 
-\subsubsection{Characters}
+\subsection{Characters}
 
 \wordtable{
 \vocabulary{strings}
@@ -2513,7 +2507,7 @@ Converts an integer representing a character value into a single-element string.
 }
 Various character classification predicates.
 
-\subsection{String buffers}\label{string-buffers}
+\section{String buffers}\label{string-buffers}
 
 \sbufglos
 \wordtable{
@@ -2534,7 +2528,7 @@ Turns any type of sequence into a string buffer. Given a string buffer, this mak
 
 String buffers support the stream output protocol (\ref{stream-protocol}).
 
-\subsection{Virtual sequences}\label{virtual-seq}
+\section{Virtual sequences}\label{virtual-seq}
 
 \glossary{name=virtual sequence,
 description={a sequence that is not backed by actual storage, but instead either computes its values, or take them from an underlying sequence}}
@@ -2608,7 +2602,7 @@ Subsequence&Slice\\
 
 The slice words output a new virtual sequence that shares structure with the original sequence, whereas the subsequence words output a fresh copied sequence.
 
-\subsection{Constructing sequences}\label{make-seq}
+\section{Constructing sequences}\label{make-seq}
 
 The library supports an idiom where sequences can be constructed without passing the partial sequence being built on the stack. This reduces stack noise, and thus simplifies code and makes it easier to understand.
 
@@ -2654,7 +2648,7 @@ Here is an example of sequence construction:
 
 Note that the sequence construction combinators will capture any variables set inside the quotation, due to the dynamic scoping behavior. These combinators are actually implemented using variables. See \ref{namespaces}.
 
-\section{Mappings}
+\chapter{Mappings}
 
 \glossary{name=mapping,
 description={an unordered collection of elements, accessed by key. Examples include association lists and hashtables}}
@@ -2670,7 +2664,7 @@ Class&Mutable&Ordered&Lookup&Primary purpose\\
 
 It might be tempting to just always use hashtables, however for very small mappings, association lists are just as efficient, and are easier to work with since the entire set of list words can be used with them.
 
-\subsection{Association lists}
+\section{Association lists}
 
 \glossary{name=association list,
 description={a list of pairs, where the car of each pair is a key and the cdr is the value associated with that key}}
@@ -2729,7 +2723,7 @@ Outputs a new association list which does not have any key/value pairs with the 
 \end{center}
 \end{figure}
 
-\subsubsection{Dual representation}
+\subsection{Dual representation}
 
 Sometimes it is convenient to decompose an association list into two lists of equal length, containing the keys and values, respectively, in the same order as the association list. This dual representation can be manipulated with a handful of helper words.
 
@@ -2758,7 +2752,7 @@ Cons a pair of elements onto a pair of lists.
 }
 Deconstructs paired lists.
 
-\subsection{Hashtables}\label{hashtables}
+\section{Hashtables}\label{hashtables}
 
 \hashglos
 \glossary{name=bucket,
@@ -2830,7 +2824,7 @@ Outputs the number of buckets in the hashtable. Ideally, this will be approximat
 }
 Applies the quotation to each key/value pair in the hashtable.
 
-\subsubsection{Converting between mappings}
+\subsection{Converting between mappings}
 
 \wordtable{
 \vocabulary{hashtables}
@@ -2854,7 +2848,7 @@ Builds lists of keys and values stored in the hashtable.
 }
 Outputs a list of association lists, where each association list contains the key/value pairs in a certain bucket. Useful for debugging hashcode distribution.
 
-\subsubsection{Hashtable construction}
+\subsection{Hashtable construction}
 
 A facility analogous to sequence construction (\ref{make-seq}) exists for hashtables.
 
@@ -2871,7 +2865,7 @@ Adds a key/value pair to the hashtable currently being constructed.
 
 As with sequence construction, care must be taken to mind the effects of dynamic scoping on variable assignment performed by the quotation. Details are in \ref{namespaces}.
 
-\subsection{Variables and namespaces}\label{namespaces}
+\section{Variables and namespaces}\label{namespaces}
 
 A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed \emph{namespaces}. Nesting of scopes is implemented with a search order on namespaces, defined by a \emph{name stack}. Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (\ref{symbols}). 
 
@@ -2975,7 +2969,7 @@ global [ "Mr. Lahey" the-boss set ] bind
 }
 If the variable is set in the current namespace, outputs its value. Otherwise sets its value to a new namespace and output that.
 
-\section{Mathematics}
+\chapter{Mathematics}
 
 \numberglos
 
@@ -2993,7 +2987,7 @@ If the variable is set in the current namespace, outputs its value. Otherwise se
 
 Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact fraction rather than a floating point approximation. Floating point numbers are also supported, along with complex numbers.
 
-\subsection{Number protocol}
+\section{Number protocol}
 
 The following usual operations are supported by all numbers.
 
@@ -3029,7 +3023,7 @@ The following ordering operations are supported on real numbers only.
 \ordinaryword{>=}{>= ( n n -- ?~)}
 }
 
-\subsection{Integers}\label{integers}
+\section{Integers}\label{integers}
 
 \integerglos
 
@@ -3075,7 +3069,7 @@ The word \texttt{.} prints numbers in decimal, regardless of how they were input
 }
 Prints an integer in hexadecimal, octal or binary.
 
-\subsubsection{Counted loops}
+\subsection{Counted loops}
 
 A pair of combinators calls a quotation a fixed number of times.
 
@@ -3093,7 +3087,7 @@ Calls the quotation $n$ times. If $n<0$, the quotation is not called at all.
 }
 Calls \texttt{quot} $n$ times, with the parameter \texttt{i} ranging from 0 to $n-1$. The quotation must output $i$ unmodified; or indeed, if it modifies it, the loop continues from that index. That is, the value $i$ on the stack is the actual loop counter, not a copy.
 
-\subsubsection{Modular arithmetic}
+\subsection{Modular arithmetic}
 
 \wordtable{
 \vocabulary{math}
@@ -3143,7 +3137,7 @@ $$xy \equiv 1 \bmod{n}$$ An exception is thrown if no such \texttt{y} exists.
 }
 Raises \texttt{x} to the power of \texttt{y}, modulo \texttt{n}. This is far more efficient than first calling \texttt{\^{}} followed by \texttt{mod}.
 
-\subsubsection{Bitwise operations}\label{bitwise}
+\subsection{Bitwise operations}\label{bitwise}
 
 There are two ways of looking at an integer -- as a mathematical entity, or as a string of bits. The latter representation motivates \emph{bitwise operations}.
 \wordtable{
@@ -3208,7 +3202,7 @@ Computes the largest integer less than or equal to $log_2 n$. The input must be 
 }
 Applies the quotation to each bit of the input. The input must be a positive integer.
 
-\subsubsection{Generating random numbers}
+\subsection{Generating random numbers}
 
 \wordtable{
 \vocabulary{math}
@@ -3216,7 +3210,7 @@ Applies the quotation to each bit of the input. The input must be a positive int
 }
 Outputs a pseudo-random integer in the interval $[a,b]$.
 
-\subsection{Rational numbers}\label{ratios}
+\section{Rational numbers}\label{ratios}
 
 \newcommand{\rationalglos}{\glossary{
 name=rational,
@@ -3265,7 +3259,7 @@ Deconstructs rational numbers into their numerator and denominator. The denomina
 \textbf{12}
 \end{alltt}
 
-\subsection{Floating point numbers}\label{floats}
+\section{Floating point numbers}\label{floats}
 
 \wordtable{
 \vocabulary{math}
@@ -3305,7 +3299,7 @@ Tests if the top of the stack is a floating point number.
 }
 Turn any real number into a floating point approximation.
 
-\subsection{Complex numbers}\label{complex-numbers}
+\section{Complex numbers}\label{complex-numbers}
 
 \wordtable{
 \vocabulary{math}
@@ -3371,7 +3365,7 @@ Computes the absolute value and argument individually.
 \textbf{1.570796326794897}
 \end{alltt}
 
-\subsection{Algebraic and transcedential functions}\label{algebraic}
+\section{Algebraic and transcedential functions}\label{algebraic}
 
 The library includes the standard set of words for rounding real numbers to integers.
 
@@ -3446,7 +3440,7 @@ Secant&\texttt{sec}&\texttt{sech}&\texttt{asec}&\texttt{asech}\\
 Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 \end{tabular}
 
-\subsection{Constants}
+\section{Constants}
 
 The following words in the \texttt{math} vocabulary push constant values on the stack.
 
@@ -3462,11 +3456,11 @@ Word&Value\\
 \texttt{pi/2}&$\frac{\pi}{2}\approx 1.5707963267948966$
 \end{tabular}
 
-\subsection{Linear algebra}
+\section{Linear algebra}
 
 The \verb|matrices| vocabulary provides a set of words for simple algebraic operations on mathematical vectors and matrices.
 
-\subsubsection{Vectors}
+\subsection{Vectors}
 
 Any Factor sequence can be used to represent a mathematical vector, not just instances of the \verb|vector| class. Anywhere a vector is mentioned in this section, keep in mind it is a mathematical term, not a Factor data type.
 
@@ -3542,7 +3536,7 @@ Computes the cross product $v_1\times v_2$. The following example illustrates th
 \textbf{0}
 \end{alltt}
 
-\subsubsection{Matrices}\label{matrices}
+\subsection{Matrices}\label{matrices}
 
 Matrix literal syntax is documented in \ref{syntax:matrices}. In addition to the literal syntax, new matrices may be created from scratch in one of several ways.
 
@@ -3629,7 +3623,7 @@ Outputs a matrix where each row is a column of the original matrix, and each col
 \textbf{M[ [ 1 3 5 ] [ 2 4 6 ] ]M}
 \end{alltt}
 
-\subsubsection{Column and row matrices}
+\subsection{Column and row matrices}
 
 There is a natural isomorphism between the vector space $\mathbb{C}^m$, the $m\times 1$ matrices, and the $1 \times m$ matrices. Additionally, a $m\times n$ matrix acts as a linear operator from the vector space $\mathbb{C}^n$ to $\mathbb{C}^m$ in the same way as multiplying the $m\times n$ matrix by a $n \times 1$ matrix. In Factor, these ideas are embodied by a set of words for converting vectors to matrices, and vice-versa.
 
@@ -3672,7 +3666,7 @@ treated as a matrix with one column.
 Applies a matrix to a vector on the left, as a linear transformation. The vector is
 treated as a matrix with one row.
 
-\section{Streams}
+\chapter{Streams}
 \glossary{name=stream,
 description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
 
@@ -3689,7 +3683,7 @@ sink of characters. Streams also support formatted output, which may be used to 
 
 String buffers support the stream output protocol. See \ref{stdio}.
 
-\subsection{Stream protocol}\label{stream-protocol}
+\section{Stream protocol}\label{stream-protocol}
 \glossary{name=input stream,
 description={a stream that implements the \texttt{stream-readln} and \texttt{stream-read} generic words and can be used for character input}}
 \glossary{name=output stream,
@@ -3743,7 +3737,7 @@ The \texttt{stream-print} word executes \texttt{stream-auto-flush} after each li
 
 With some streams, the above operations may suspend the current thread and execute other threads until input data is available (\ref{threads}).
 
-\subsection{Stream utilities}
+\section{Stream utilities}
 
 The following three words are implemented in terms of the stream protocol, and should work with any stream supporting the required underlying operations.
 \wordtable{
@@ -3769,7 +3763,7 @@ Outputs a character or string to the stream, without any specific style informat
 }
 Outputs a character or string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
 
-\subsection{The default stream}\label{stdio}
+\section{The default stream}\label{stdio}
 \glossary{name=default stream,
 description={the value of the \texttt{stdio} variable, used by various words as an implicit stream parameter}}
 \glossary{name=stdio,
@@ -3870,7 +3864,7 @@ Like \verb|with-stream| extend the stream is only closed in the case of an error
 Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string buffer. Executing \texttt{write}, \texttt{write-attr} or \texttt{print} will append text to the string buffer. When the quotation returns, the string buffer is coverted to
 a string and returned.
 
-\subsection{Reading and writing binary data}
+\section{Reading and writing binary data}
 
 \glossary{name=big endian,
 description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, Alpha and ARM processors}}
@@ -3929,7 +3923,7 @@ These words are then composed with \verb|read| and \verb|write| to form a set of
 \ordinaryword{write-le8}{write-le8 ( n -- )}
 }
 
-\subsection{Reading and writing files}
+\section{Reading and writing files}
 
 Files are read and written in a standard way, by attaching a reader or writer stream to the file. It is vital that file streams are closed after all input/output operations have been performed; a convenient way is to use the \verb|with-stream| word (\ref{stdio}).
 
@@ -3993,7 +3987,7 @@ Outputs a list of file system attributes, or \texttt{f} if the file does not exi
 \item[Last modification time] milliseconds since midnight, January 1st 1970 GMT
 \end{description}
 
-\subsection{TCP/IP networking}
+\section{TCP/IP networking}
 
 \glossary{name=server stream,
 description=a stream listening on a TCP/IP socket}
@@ -4025,7 +4019,7 @@ Waits for a connection to the port number that \texttt{server} is listening on, 
 }
 Outputs the IP address as a dotted-quad string, and the local port number, respectively, of a client socket returned from \texttt{accept}.
 
-\subsection{Special streams}
+\section{Special streams}
 
 \glossary{name=null stream,
 description=a bidirectional stream that ignores output and returns end of file on input}
@@ -4076,14 +4070,14 @@ M: tex-stream stream-write-attr ( string attrs stream -- )
     ] with-wrapper ;
 \end{verbatim}
 
-\subsection{Printing objects}
+\section{Printing objects}
 
 \glossary{name=prettyprinter,
 description={a set of words for printing objects in readable form}}
 
 One of Factor's key features is the ability to print almost any object in a readable form. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities.
 
-\subsubsection{The unparser}
+\subsection{The unparser}
 
 The unparser provides a basic facility for turning certain types of objects into strings. A more general facility supporting more types is the prettyprinter (\ref{prettyprint}).
 \glossary{
@@ -4121,7 +4115,7 @@ Converts \texttt{n} into a string representation in the given base. The base mus
 }
 Convenience words defined in terms of \texttt{>base} for converting integers into string representations in base 2, 8, 10 and 16, respectively.
 
-\subsubsection{The prettyprinter}\label{prettyprint}
+\subsection{The prettyprinter}\label{prettyprint}
 
 \wordtable{
 \vocabulary{prettyprint}
@@ -4153,7 +4147,7 @@ Prettyprint the object, except all output is on a single line without indentatio
 }
 Prettyprint each element of the sequence on its own line using the \texttt{.} word.
 
-\subsubsection{Variables controlling the prettyprinter}
+\subsection{Variables controlling the prettyprinter}
 
 The following variables affect the prettyprinter if set in the dynamic scope from which \texttt{prettyprint} is called.
 
@@ -4175,7 +4169,7 @@ Controls the maximum nesting depth. Printing structures that nest further than t
 }
 If set to true, the prettyprinter does not emit newlines. The default is \texttt{f}. Inside calls to \texttt{.}, set to \texttt{t}.
 
-\subsubsection{Extending the prettyprinter}
+\subsection{Extending the prettyprinter}
 
 If define your own data type and wish to add new syntax for it, you must implement two facilities:
 \begin{itemize}
@@ -4217,11 +4211,11 @@ Increases the indent level and emits a newline if \texttt{one-line} is off.
 }
 Decreases the indent level and emits a newline if \texttt{one-line} is off.
 
-\section{The parser}
+\chapter{The parser}
 
 This section concerns itself with reflective access and extension of the parser. The parser algorithm and standard syntax is described in \ref{syntax}. Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right.
 
-\subsection{Parsing numbers}\label{parsing-numbers}
+\section{Parsing numbers}\label{parsing-numbers}
 
 \wordtable{
 \vocabulary{parser}
@@ -4253,7 +4247,7 @@ Converts a string representation of an integer in the given base into an integer
 }
 Convenience words defined in terms of \texttt{base>} for parsing integers in base 2, 8, 10 and 16, respectively.
 
-\subsection{Parsing quotations}\label{parsing-quotations}
+\section{Parsing quotations}\label{parsing-quotations}
 
 As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables (\ref{namespaces}):
 \begin{description}
@@ -4285,7 +4279,7 @@ The \texttt{eval} word is defined as follows:
 : eval parse call ;
 \end{verbatim}
 
-\subsection{Parsing from streams}
+\section{Parsing from streams}
 
 There are two sets of words for parsing input from streams. The first set uses the following initial values for the \texttt{"use"} and \texttt{"in"} variables:
 
@@ -4327,7 +4321,7 @@ The next set of stream parsing words takes the vocabulary search path and curren
 }
 Like the first set of stream parsing words, except the \texttt{"use"} and \texttt{"in"} variables are taken from the current scope.
 
-\subsection{Parsing words}\label{parsing-words}
+\section{Parsing words}\label{parsing-words}
 
 \parsingwordglos
 Parsing words execute at parse time, and therefore can access and modify the state of the parser, as well as add objects to the parse tree. Parsing words are a difficult concept to grasp, so this section has several examples and explains the workings of some of the parsing words provided in the library.
@@ -4346,7 +4340,7 @@ Marks the most recently defined word as a parsing word. For example:
 
 Now writing \texttt{hello} anywhere will print the message \texttt{"Hello world"} at parse time. Of course, this is a useless definition. In the sequel, we will look into writing useful parsing words that modify parser state.
 
-\subsubsection{Nested structure}
+\subsection{Nested structure}
 
 The first thing to look at is how the parse tree is built. When parsing begins, the empty list is pushed on the data stack; whenever the parser algorithm appends an object to the parse tree, it conses the object onto the quotation at the top of the stack. This builds the quotation in reverse order, so when parsing is done, the quotation is reversed before it is called.
 
@@ -4400,7 +4394,7 @@ Data types such as vectors, hashtables and so on are built in a similar way. For
 \end{verbatim}
 Indeed, any type of object can be added to the parse tree in this fashion.
 
-\subsubsection{Reading ahead}\label{reading-ahead}
+\subsection{Reading ahead}\label{reading-ahead}
 
 \glossary{name=reading ahead,
 description=a parsing word reads ahead of it scans following tokens from the input string}
@@ -4437,7 +4431,7 @@ The key word here is \verb|scan-word|. It combines \texttt{scan} word with vocab
 }
 Reads the next token from the input and looks up a word with this name. If the lookup fails, attempts to parse the word as a number by calling \verb|str>number|.
 
-\subsubsection{Defining words}
+\subsection{Defining words}
 
 \definingwordglos
 Defining words add definitions to the dictionary without modifying the parse tree.
@@ -4507,7 +4501,7 @@ The call to the \verb|;| word proceeds as follows:
 \item[\texttt{swap call}] calls \texttt{[ define-compound ]}. Thus, \verb|define-compound| is called to define \verb|sq| as the quotation \verb|[ dup * ]|.
 \end{description}
 
-\subsubsection{String mode and parser variables}\label{string-mode}
+\subsection{String mode and parser variables}\label{string-mode}
 \stringmodeglos
 String mode allows custom parsing of tokenized input. For even more esoteric situations, the input text can be accessed directly.
 
@@ -4545,9 +4539,9 @@ This word is used to implement end-of-line comments:
 : ! until-eol drop ; parsing
 \end{verbatim}
 
-\section{Web framework}
+\chapter{Web framework}
 
-\subsection{HTTP client}
+\section{HTTP client}
 
 \wordtable{
 \vocabulary{http-client}
@@ -4560,7 +4554,7 @@ Attempts to connect to the server specified in the URL. If the connection fails,
 \item[\texttt{stream}] a stream for reading the resource.
 \end{description}
 
-\subsection{HTML output}\label{html}
+\section{HTML output}\label{html}
 
 An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities before being passed on to the wrapped stream. Also, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word may be filled out to wrap the text being written in various HTML tags.
 
@@ -4600,13 +4594,13 @@ Key&Description\\
 
 Hyperlinks to files and words point to the file and browser responders, respectively. These responders must be enabled for such links to function.
 
-\section{Alien interface}
+\chapter{Alien interface}
 
 Factor's alien inteface provides a means of directly calling native libraries written in C and other languages. There are no
 wrappers to write, other than having to specify the return type and parameter types for
 the functions you wish to call.
 
-\subsection{Loading native libraries}
+\section{Loading native libraries}
 
 A native library must be made available to Factor under a logical name before use. This is done via command line parameters, or the \verb|add-library| word.
 
@@ -4642,7 +4636,7 @@ interactively to test if a library can be loaded.
 Attempts to load the library with the given logical name, and outputs a DLL handle. If the library is already loaded, the existing DLL is output.
 More will be said about DLL handles in \ref{alien-internals}.
 
-\subsection{Calling native functions}
+\section{Calling native functions}
 
 Native functions are called with the \verb|alien-invoke| word. This word can only be used
 from compiled definitions (\ref{compiler}). Executing it inside an interpreted quotation will throw an exception.
@@ -4678,7 +4672,7 @@ Now, after being compiled, the word can be executed with two parameters on the s
 \textbf{The answer to the question is 42.}
 \end{alltt}
 
-\subsection{Alien objects}\label{aliens}
+\section{Alien objects}\label{aliens}
 
 \glossary{
 name=alien,
@@ -4735,7 +4729,7 @@ Pointers to native memory, including \verb|void*| and other types, are represent
 }
 Tests if the object at the top of the stack is an alien pointer.
 
-\subsubsection{Structures}\label{alien-structs}
+\subsection{Structures}\label{alien-structs}
 
 One way to think of a C-style \verb|struct| is that it abstracts reading and writing field values stored at a range of memory given a pointer, by associating a type and offset with each field. This is the view taken by the alien interface, where defining a C structure creates a set of words for reading and writing fields of various types, offset from a base pointer given by an alien object.
 
@@ -4795,7 +4789,7 @@ BEGIN-STRUCT: surface
 END-STRUCT
 \end{verbatim}
 
-\subsubsection{Unions}\label{alien-unions}
+\subsection{Unions}\label{alien-unions}
 
 A C-style \verb|union| type allocates enough space for its largest member. In the alien interface, unions are used to allocate byte arrays in the Factor heap that may hold any one of the union's members.
 
@@ -4830,7 +4824,52 @@ BEGIN-UNION: event
 END-UNION
 \end{verbatim}
 
-\subsection{Low-level interface}\label{alien-internals}
+\subsection{Enumerations}
+
+A C-style \verb|enum| type defines a set of integer constants. The alien interface lets you define a set of words that push integers on the stack in much the same way as you would in C. While these words can be used for any purpose, using them outside of interfacing with C is discouraged.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{BEGIN-ENUM:}{BEGIN-ENUM \emph{start}}
+}
+Begins an enumeration that numbers constants starting from \verb|start|.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{ENUM:}{ENUM: \emph{name}}
+}
+Defines a compound word \verb|name| that pushes a integer. The integer's value is incremented each time \verb|ENUM:| defines a new word.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{END-ENUM}{END-ENUM}
+}
+Ends an enumeration.
+
+Here is an example:
+\begin{verbatim}
+BEGIN-ENUM: 0
+    ENUM: monday
+    ENUM: tuesday
+    ENUM: wednesday
+    ENUM: thursday
+    ENUM: friday
+    ENUM: saturday
+    ENUM: sunday
+END-ENUM
+\end{verbatim}
+This is in fact functionally equivalent to the following code:
+\begin{verbatim}
+: monday    0 ;
+: tuesday   1 ;
+: wednesday 2 ;
+: thursday  3 ;
+: friday    4 ;
+: saturday  5 ;
+: sunday    6 ;
+\end{verbatim}
+
+\section{Low-level interface}\label{alien-internals}
 
 The alien interface is built on top of a handful of primitives. Sometimes, it is
 useful to call these primitives directly for debugging purposes.
@@ -4902,7 +4941,7 @@ Outputs an alien pointing at an offset from the base pointer of the input alien.
 }
 These primitives read and write native memory. They can be given an alien, displaced alien, or byte array. No bounds checking of any kind is performed.
 
-\subsection{Manual memory management}\label{malloc}
+\section{Manual memory management}\label{malloc}
 
 If for whatever reason Factor's memory management is unsuitable for a certain task, you can
 directly call the standard C memory management routines. These words are very raw and deal with addresses directly, and of course it is easy to corrupt memory or crash the runtime
@@ -4923,7 +4962,7 @@ Resize a block previously allocated with \verb|malloc|.
 }
 Deallocate a block previously allocated with \verb|malloc|.
 
-\chapter{Development tools}
+\part{Development tools}
 
 Factor supports interactive development in a live environment. Instead of working with
 static executable files and restarting your application after each change, you can
@@ -4931,11 +4970,11 @@ incrementally make changes to your application and test them immediately. If you
 notice an undesirable behavior, Factor's powerful reflection features will aid in
 pinpointing the error.
 
-If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this chapter allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
+If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this part allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
 
-\section{System organization}
+\chapter{System organization}
 
-\subsection{The listener}\label{listener}
+\section{The listener}\label{listener}
 
 Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. I will have more to say about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
 \begin{alltt}
@@ -4973,7 +5012,7 @@ On startup, Factor reads the \texttt{.factor-rc} file from your home directory. 
 any quick definitions you want available at the listener there. To avoid loading this
 file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image, as described in the next section.
 
-\subsection{Source files}
+\section{Source files}
 
 While it is possible to do all development in the listener and save your work in images, it is far more convenient to work with source files, at least until an in-image structure editor is developed.
 
@@ -5004,7 +5043,7 @@ The \texttt{jedit} word will open word definitions from the Factor library once 
 "/home/slava/Factor/" "resource-path" set
 \end{verbatim}
 
-\subsection{Images}
+\section{Images}
 
 The \texttt{factor.image} file is basically a dump of all objects in the heap. A new image can be saved as follows:
 
@@ -5032,7 +5071,7 @@ Factor will save the image and exit. Now start it again and see that the reminde
 
 This is what is meant by the image being an \emph{infinite session}. When you shut down and restart Factor, what happends is much closer to a Laptop's ``suspend'' mode, than a desktop computer being fully shut down.
 
-\subsection{Looking at objects}
+\section{Looking at objects}
 
 Probably the most important debugging tool of them all is the \texttt{.} word. It prints the object at the top of the stack in a form that can be parsed by the Factor parser. A related word is \texttt{prettyprint}. It is identical to \texttt{.} except the output is more verbose; lists, vectors and hashtables are broken up into multiple lines and indented.
 
@@ -5069,9 +5108,9 @@ different numeric bases. The \texttt{.b} word prints an integer in binary, \text
 \textbf{7a69}
 \end{alltt}
 
-\section{Word tools}
+\chapter{Word tools}
 
-\subsection{Exploring vocabularies}\label{exploring-vocabs}
+\section{Exploring vocabularies}\label{exploring-vocabs}
 
 Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
 
@@ -5117,7 +5156,7 @@ You can look at the definition of any word, including library words, using \text
 
 The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
 
-\subsection{Cross-referencing words}
+\section{Cross-referencing words}
 
 The \texttt{apropos.} word is handy when searching for related words. It lists all words
 whose names contain a given string. The \texttt{apropos.} word is also useful when you know the exact name of a word, but are unsure what vocabulary it is in. For example, if you're looking for ways to iterate over various collections, you can do an apropos search for \texttt{map}:
@@ -5154,7 +5193,7 @@ Another useful word is \texttt{usages}. Unlike \texttt{usage}, it finds all usag
 indirect ones -- so if a word refers to another word that refers to the given word,
 both words will be in the output list.
 
-\subsection{Exploring classes}
+\section{Exploring classes}
 
 Factor supports object-oriented programming via generic words. Generic words are called
 like ordinary words, however they can have multiple definitions, one per class, and
@@ -5217,7 +5256,7 @@ M: list prettyprint*
     ] check-recursion ;}
 \end{alltt}
 
-\subsection{Browsing via the HTTP server}
+\section{Browsing via the HTTP server}
 
 
 A more sophisticated way to browse the library is using the integrated HTTP server. You can start the HTTP server using the following pair of commands:
@@ -5236,13 +5275,13 @@ Then, point your browser to the following URL, and start browsing:
 
 To stop the HTTP server, evaluate the \verb|stop-httpd| word.
 
-\section{Dealing with runtime errors}
+\chapter{Dealing with runtime errors}
 
-\subsection{Looking at stacks}
+\section{Looking at stacks}
 
 To see the contents of the data stack, use the \texttt{.s} word. Similarly, the other stacks can be shown with \texttt{.r} (return stack), \texttt{.n} (name stack), and \texttt{.c} (catch stack). Each stack is printed with each element on its own line; the top of the stack is the first element printed.
 
-\subsection{The debugger}
+\section{The debugger}
 
 If the execution of a phrase in the listener causes an error to be thrown, the error
 is printed and the stacks at the time of the error are saved. If you're spent any
@@ -5294,7 +5333,7 @@ So now, the mystery has been solved: as \texttt{reverse} iterates down the input
 
 In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool. Another caveat is that in compiled code, the return stack is not reconstructed if there is an error. Until this is fixed, you should only compile code once it is debugged. For more potential compiler pitfalls, see \ref{compiler}.
 
-\subsection{The walker}
+\section{The walker}
 
 The walker lets you step through the execution of a qotation. When a compound definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
 
@@ -5343,14 +5382,14 @@ You can undo the effect of \texttt{break} or \texttt{watch} by reloading the ori
 \textbf{ok} \bs draw-shape reload
 \end{alltt}
 
-\subsection{Dealing with hangs}
+\section{Dealing with hangs}
 
 If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \texttt{Control-\bs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
 
 
-\section{Defensive coding}
+\chapter{Defensive coding}
 
-\subsection{Unit testing}
+\section{Unit testing}
 
 Unit tests are very easy to write. They are usually placed in source files. A unit test can be executed with the \texttt{unit-test} word in the \texttt{test} vocabulary. This word takes a list and a quotation; the quotation is executed, and the resulting data stack is compared against the list. If they do not equal, the unit test has failed. Here is an example of a unit test:
 
@@ -5370,68 +5409,13 @@ To have a unit test assert that a piece of code does not execute successfully, b
 
 Unit testing is a good habit to get into. Sometimes, writing tests first, before any code, can speed the development process too; by running your unit test script, you can gauge progress.
 
-\subsection{Stack effect inference}
-
-While most programming errors in Factor are only caught at runtime, the stack effect checker can be useful for checking correctness of code before it is run. It can also help narrow down problems with stack shuffling. The stack checker is used by passing a quotation to the \texttt{infer} word. It uses a sophisticated algorithm to infer stack effects of recursive words, combinators, and other tricky constructions, however, it cannot infer the stack effect of all words. In particular, anything using continuations, such as \texttt{catch} and I/O, will stump the stack checker. Despite this fault, it is still a useful tool.
-
-\begin{alltt}
-\textbf{ok} [ pile-fill * >fixnum over pref-size dup y
-\texttt{...} [ + ] change ] infer .
-\textbf{[ [ tuple number tuple ] [ tuple fixnum object number ] ]}
-\end{alltt}
-
-The stack checker will report an error if it cannot infer the stack effect of a quotation. The ``recursive state'' dump is similar to a return stack, but it is not a real return stack, since only a code walk is taking place, not full evaluation. Understanding recursive state dumps is an art, much like understanding return stacks.
-
-\begin{alltt}
-\textbf{ok} [ 100 [ f f cons ] repeat ] infer .
-\textbf{! Inference error: Unbalanced branches
-! Recursive state:
-! [ (repeat) G:54044 pick pick >= [ 3drop ]
-    [ [ swap >r call 1 + r> ] keep (repeat) ] ifte ]
-! [ repeat G:54042 0 -rot (repeat) ]
-:s :r :n :c show stacks at time of error.
-:get ( var -- value ) inspects the error namestack.}
-\end{alltt}
-
-One reason stack inference might fail is if the quotation contains unbalanced branches, as above. For the inference to work, both branches of a conditional must exit with the same stack height.
-
-Another situation when it fails is if your code calls quotations that are not statically known. This can happen if the word in question uses continuations, or if it pulls a quotation from a variable and calls it. This can also happen if you wrote your own combinator, but forgot to mark it as \texttt{inline}. For example, the following will fail:
-
-\begin{alltt}
-\textbf{ok} : dip swap >r call r> ;
-\textbf{ok} [ [ + ] dip * ] infer .
-! Inference error: A literal value was expected where a
-computed value was found: \#<computed @ 679711507>
-...
-\end{alltt}
-
-However, defining \texttt{dip} to be inlined will work:
-
-\begin{alltt}
-\textbf{ok} : dip swap >r call r> ; inline
-\textbf{ok} [ [ + ] dip * ] infer .
-\textbf{[ [ number number number ] [ number ] ]}
-\end{alltt}
-
-You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
-
-\begin{alltt}
-\textbf{ok} [ draw-shape ] infer>test.
-\textbf{[ [ [ object ] [  ] ] ]
-[ [ draw-shape ] infer ]
-unit-test}
-\end{alltt}
-
-You can then copy and paste this snippet into a test script, and run the test script after
-making changes to the word to ensure its stack effect signature has not changed.
-
-\section{Optimization}
+\chapter{Optimization}
 
 While both the Factor interpreter and compiler are relatively slow at this stage, there
 are still ways you can make your Factor code go faster. The key is to find bottlenecks,
 and optimize them.
 
-\subsection{Timing code}
+\section{Timing code}
 
 The \texttt{time} word reports the time taken to execute a quotation, in milliseconds. The portion of time spent in garbage collection is also shown:
 
@@ -5441,7 +5425,7 @@ The \texttt{time} word reports the time taken to execute a quotation, in millise
 11 milliseconds GC time}
 \end{alltt}
 
-\subsection{Exploring memory usage}
+\section{Exploring memory usage}
 
 Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
 
@@ -5484,7 +5468,7 @@ word: 96960 bytes, 3030 instances
 tuple: 688 bytes, 22 instances}
 \end{alltt}
 
-\subsection{The profiler}
+\section{The profiler}
 
 Factor provides a statistical sampling profiler for narrowing down memory and processor bottlenecks.
 The profiler is only supported on Unix platforms. On FreeBSD 4.x, the Factor runtime must
@@ -5554,7 +5538,127 @@ The \texttt{call-profile} word executes a quotation with the CPU profiler enable
 
 Normally, the memory and CPU profilers run every millisecond, and increment counters for all words on the return stack. The \texttt{only-top} variable can be switched on, in which case only the counter for the word at the top of the return stack is incremented. This gives a more localized picture of CPU and memory usage.
 
-\subsection{The compiler}\label{compiler}
+\chapter{Stack effect inference}
+
+The stack effect inference tool checks correctness of code before it is run.
+A \emph{stack effect} is a list of input classes and a list of output classes corresponding to
+the effect a quotation has on the stack when called. For example, the stack effect of \verb|[ dup * ]| is \verb|[ [ integer ] [ integer ] ]|. The stack checker is used by passing a quotation to the \texttt{infer} word. It uses a sophisticated algorithm to infer stack effects of recursive words, combinators, and other tricky constructions, however, it cannot infer the stack effect of all words. In particular, anything using continuations, such as \texttt{catch} and I/O, will stump the stack checker.
+
+\section{Usage}
+
+The main entry point of the stack checker is a single word.
+
+\wordtable{
+\vocabulary{inference}
+\ordinaryword{infer}{infer ( quot -- effect )}
+}
+
+Takes a quotation and attempts to infer its stack effect. An exception is thrown if the stack effect cannot be inferred.
+
+You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
+
+\begin{alltt}
+\textbf{ok} [ draw-shape ] infer>test.
+\textbf{[ [ [ object ] [  ] ] ]
+[ [ draw-shape ] infer ]
+unit-test}
+\end{alltt}
+
+You can then copy and paste this snippet into a test script, and run the test script after
+making changes to the word to ensure its stack effect signature has not changed.
+
+\section{The algorithm}
+
+The stack effect inference algorithm mirrors the interpreter algorithm. A ``meta data stack'' holds two types of entries; computed values, whose type is known but literal value will only be known at runtime, and literals, whose value is known statically. When a literal value is encountered, it is simply placed on the meta data stack. When a word is encountered, one of several actions are taken, depending on the type of the word:
+
+\begin{itemize}
+\item If the word has special stack effect inference behavior, this behavior is invoked. Shuffle words and various primitives fall into this category.
+\item If the word's stack effect is already known, then the inputs are removed from the meta data stack, and output values are added. If the meta data stack contains insufficient values, more values are added, and the newly added values are placed in the input list. Since inference begins with an empty stack, the input list contains all required input values when inference is complete.
+\item If the word is marked to be inlined, stack effect inference recurses into the word definition and uses the same meta data stack. See \ref{declarations}.
+\item Otherwise, the word's stack effect is inferred in a fresh inferencer instance, and the stack effect is cached. The fresh inferencer is used rather than the current one, so that type information and literals on the current meta data stack do not affect the subsequently-cached stack effect.
+\end{itemize}
+
+The following two examples demonstrate some simple cases:
+\begin{alltt}
+\textbf{ok} [ 1 2 3 ] infer .
+\textbf{[ [ ] [ fixnum fixnum fixnum ] ]}
+\textbf{ok} [ "hi" swap ] infer .
+\textbf{[ [ object ] [ string object ] ]}
+\end{alltt}
+
+\subsection{Combinators}
+
+A simple combinator such as \verb|keep| does not by itself have a stack effect, since \verb|call| takes an arbitrary quotation from the stack, which itself may have an arbitrary stack effect.
+\begin{verbatim}
+IN: kernel
+: keep ( x quot -- x | quot: x -- )
+    over >r call r> ; inline
+\end{verbatim}
+On the other hand, the stack effect of word that passes a literal quotation to \verb|keep| can be inferred. The quotation is a literal on the meta data stack, and since \verb|keep| is marked \verb|inline|, the special inference behavior of \verb|call| receives this quotation.
+\begin{alltt}
+\textbf{ok} [ [ dup * ] keep ] infer .
+\textbf{[ [ number ] [ number number ] ]}
+\end{alltt}
+Note that if \verb|call| is applied to a computed value, for example, a quotation taken from a variable, or a quotation that is constructed immediately before the \verb|call|, the stack effect inferencer will raise an error.
+\begin{alltt}
+\textbf{ok} [ frog get call ] infer .
+\textbf{! Inference error: A literal value was expected where a
+computed value was found: \#<computed @ 716167923>
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+Another word with special inference behavior is \verb|execute|. It is used much more rarely than \verb|call|, but does pretty much the same thing, except it takes a word as input rather than a string.
+
+\subsection{Conditionals}
+
+Simpler than a stack effect is the concept of a stack height difference. This is simply the input value count subtracted from the output value count. A conditional's stack effect can be inferred if each branch has the same stack height difference; in this case, we say that the conditional is \emph{balanced}, and the total stack effect is computed by performing a unification of types across each branch.
+
+The following two examples exhibit balanced conditionals:
+\begin{verbatim}
+[ 1 ] [ dup ] ifte
+dup cons? [ unit ] when cons
+\end{verbatim}
+The following example is not balanced and raises an error when we attempt to infer its stack effect:
+\begin{alltt}
+\textbf{ok} [ [ dup ] [ drop ] ifte ] infer .
+\textbf{! Inference error: Unbalanced branches
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+\subsection{Recursive words}
+
+Recursive words all have the same general form; there is a conditional, and one branch of the conditional is the \emph{base case} terminating the recursion, and the other branch is the \emph{inductive case}, which reduces the problem and recurses on the reduced problem. A key observation one must make is that in a well-formed recursion, the recursive call in the inductive case eventually results in the base case being called, so we can take the stack effect of the recursive call to be the stack effect of the base case.
+
+Consider the following implementation of a word that measures the length of a list:
+\begin{verbatim}
+: length ( list -- n )
+    [ cdr length 1 + ] [ 0 ] ifte* ;
+\end{verbatim}
+The stack effect can be inferred without difficulty:
+\begin{alltt}
+\textbf{ok} [ length ] infer .
+\textbf{[ [ object ] [ integer ] ]}
+\end{alltt}
+The base case is taken if the top of the stack is \verb|f|, and the base case has a stack effect \verb|[ [ object ] [ fixnum ] ]|.
+
+On the other hand if the top of the stack is something else, the inductive case is taken. The inductive case makes a recursive call to \verb|length|, and once we substitute the stack effect of the base case into this call point, we can infer that the stack effect of the recursive case is \verb|[ [ object ] [ integer ] ]|.
+
+If both branches contain a recursive call, the stack effect inferencer gives up.
+\begin{alltt}
+\textbf{ok} : fie [ fie ] [ fie ] ifte ;
+\textbf{ok} [ fie ] infer .
+\textbf{! Inference error: fie does not have a base case
+! Recursive state:
+:s :r :n :c show stacks at time of error.
+:get ( var -- value ) inspects the error namestack.}
+\end{alltt}
+
+\chapter{The compiler}\label{compiler}
+
+\section{Basic usage}
 
 The compiler can provide a substantial speed boost for words whose stack effect can be inferred. Words without a known stack effect cannot be compiled, and must be run in the interpreter. The compiler generates native code, and so far, x86 and PowerPC backends have been developed.
 
@@ -5575,23 +5679,113 @@ bootstrap:
 
 The compiler has two limitations you must be aware of. First, if an exception is thrown in compiled code, the return stack will be incomplete, since compiled words do not push themselves there. Second, compiled code cannot be profiled. These limitations will be resolved in a future release.
 
-The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation. To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
+The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation.
 
+\section{Linear intermediate representation}
+
+The linear IR is the second of the two intermediate
+representations used by Factor. It is basically a high-level
+assembly language. Linear IR operations are called VOPs. The last stage of the compiler generates machine code instructions corresponding to each \emph{virtual operation} in the linear IR.
+
+To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
+ 
 \begin{alltt}
 \textbf{ok} \bs append precompile
-\textbf{[ \#prologue ]
-[ over ]
-[[ \#jump-t-label G:54091 ]]
-[ swap ]
-[ drop ]
-[ \#return ]
-[[ \#label G:54091 ]]
-[ >r ]
-[[ \#call uncons ]]
-[ r> ]
-[[ \#call append ]]
-[[ \#jump cons ]]}
+\textbf{<< \%prologue << vop [ ] [ ] [ ] [ ] >> >>
+<< \%peek-d << vop [ ] [ 1 ] [ << vreg ... 0 >> ] [ ] >> >>
+<< \%peek-d << vop [ ] [ 0 ] [ << vreg ... 1 >> ] [ ] >> >>
+<< \%replace-d << vop [ ] [ 0 << vreg ... 0 >> ] [ ] [ ] >> >>
+<< \%replace-d << vop [ ] [ 1 << vreg ... 1 >> ] [ ] [ ] >> >>
+<< \%inc-d << vop [ ] [ -1 ] [ ] [ ] >> >>
+<< \%return << vop [ ] [ ] [ ] [ ] >> >>}
 \end{alltt}
+
+\subsection{Control flow}
+
+\begin{description}
+
+\item[\texttt{\%prologue}] On x86, this does nothing. On PowerPC, at the start of
+  each word that calls a subroutine, we store the link
+  register in r0, then push r0 on the C stack.
+
+\item[\texttt{\%call-label}] On PowerPC, uses near calling convention, where the
+  caller pushes the return address.
+
+\item[\texttt{\%call}] On PowerPC, if calling a primitive, compiles a sequence that loads a 32-bit literal and jumps to that address. For other compiled words, compiles an immediate branch with link, so all compiled word definitions must be within 64 megabytes of each other.
+
+\item[\texttt{\%jump-label}] Like \texttt{\%call-label} except the return address is not saved. Used for tail calls.
+
+\item[\texttt{\%jump}] Like \texttt{\%call} except the return address is not saved. Used for tail calls.
+
+\item[\texttt{\%dispatch}] Compile a piece of code that jumps to an offset in a
+  jump table indexed by an integer. The jump table consists of \texttt{\%target-label} and \texttt{\%target} must immediately follow this VOP.
+
+\item[\texttt{\%target}] Not supported on PowerPC.
+
+\item[\texttt{\%target-label}] A jump table entry.
+
+\end{description}
+
+\subsection{Slots and objects}
+
+\begin{description}
+
+\item[\texttt{\%slot}]  The untagged object is in \texttt{vop-out-1}, the tagged slot
+  number is in \texttt{vop-in-1}.
+
+\item[\texttt{\%fast-slot}] The tagged object is in \texttt{vop-out-1}, the pointer offset is
+  in \texttt{vop-in-1}. the offset already takes the type tag into
+  account, so its just one instruction to load.
+
+\item[\texttt{\%set-slot}] The new value is \texttt{vop-in-1}, the object is \texttt{vop-in-2}, and
+  the slot number is \texttt{vop-in-3}.
+
+\item[\texttt{\%fast-set-slot}] The new value is \texttt{vop-in-1}, the object is \texttt{vop-in-2}, and
+  the slot offset is \texttt{vop-in-3}.
+  the offset already takes the type tag into account, so
+  it's just one instruction to load.
+
+\item[\texttt{\%write-barrier}] Mark the card containing the object pointed by \texttt{vop-in-1}.
+  
+\item[\texttt{\%untag}]  Mask off the tag bits of \texttt{vop-in-1}, store result in
+  \texttt{vop-in-1} (which should equal \texttt{vop-out-1}!)
+
+\item[\texttt{\%untag-fixnum}] Shift \texttt{vop-in-1} to the right by 3 bits, store result in
+  \texttt{vop-in-1} (which should equal \texttt{vop-out-1}!)
+
+\item[\texttt{\%type}]  Intrinstic version of type primitive. It outputs an
+  unboxed value in \texttt{vop-out-1}.
+
+\end{description}
+
+\subsection{Alien interface}
+
+\begin{description}
+
+\item[\texttt{\%parameters}] Ignored on x86.
+
+\item[\texttt{\%parameter}] Ignored on x86.
+
+\item[\texttt{\%unbox}]  An unboxer function takes a value from the data stack
+  and converts it into a C value.
+  
+\item[\texttt{\%box}]  A boxer function takes a C value as a parameter and
+  converts into a Factor value, and pushes it on the data
+  stack.
+
+  On x86, C functions return integers in EAX.
+
+\item[\texttt{\%box-float}] On x86, C functions return floats on the FP stack.
+
+\item[\texttt{\%box-double}] On x86, C functions return doubles on the FP stack.
+
+\item[\texttt{\%cleanup}] Ignored on PowerPC.
+
+  On x86, in the cdecl ABI, the caller must pop input
+  parameters off the C stack. In stdcall, the callee does
+  it, so this node is not used in that case.
+  
+\end{description}
 
 \printglossary
 

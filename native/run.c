@@ -94,6 +94,13 @@ void primitive_ifte(void)
 	call(cond == F ? f : t);
 }
 
+void primitive_dispatch(void)
+{
+	F_VECTOR *v = (F_VECTOR*)UNTAG(dpop());
+	F_FIXNUM n = untag_fixnum_fast(dpop());
+	call(get(AREF(untag_array_fast(v->array),n)));
+}
+
 void primitive_getenv(void)
 {
 	F_FIXNUM e = untag_fixnum_fast(dpeek());

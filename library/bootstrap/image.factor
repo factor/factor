@@ -46,6 +46,7 @@ SYMBOL: boot-quot
 : vector-type    11 ; inline
 : string-type    12 ; inline
 : word-type      17 ; inline
+: tuple-type     18 ; inline
 
 : immediate ( x tag -- tagged ) swap tag-bits shift bitor ;
 : >header ( id -- tagged ) object-tag immediate ;
@@ -228,16 +229,19 @@ M: string ' ( string -- pointer )
 
 ( Arrays and vectors )
 
-: emit-array ( list -- pointer )
-    [ ' ] map
+: emit-array ( list type -- pointer )
+    >r [ ' ] map r>
     object-tag here-as >r
-    array-type >header emit
+    >header emit
     dup length emit-fixnum
     ( elements -- ) [ emit ] each
     align-here r> ;
 
+M: tuple ' ( tuple -- pointer )
+    <mirror> >list tuple-type emit-array ;
+
 : emit-vector ( vector -- pointer )
-    dup >list emit-array swap length
+    dup >list array-type emit-array swap length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )
@@ -248,7 +252,8 @@ M: vector ' ( vector -- pointer )
     emit-vector ;
 
 : emit-hashtable ( hash -- pointer )
-    dup buckets>list emit-array swap hash>alist length
+    dup buckets>list array-type emit-array
+    swap hash>alist length
     object-tag here-as >r
     hashtable-type >header emit
     emit-fixnum ( length )
@@ -265,9 +270,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : vocabulary, ( hash -- )
     dup hashtable? [
-        [
-            cdr dup word? [ word, ] [ drop ] ifte
-        ] hash-each
+        [ cdr dup word? [ word, ] [ drop ] ifte ] hash-each
     ] [
         drop
     ] ifte ;
@@ -282,6 +285,7 @@ M: hashtable ' ( hashtable -- pointer )
         vocabularies set
         typemap [ ] change
         builtins [ ] change
+        crossref [ ] change
     ] extend '
     global-offset fixup ;
 

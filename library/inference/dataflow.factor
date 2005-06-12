@@ -14,11 +14,6 @@ TUPLE: node effect param in-d out-d in-r out-r
 : make-node ( effect param in-d out-d in-r out-r node -- node )
     [ >r f <node> r> set-delegate ] keep ;
 
-: NODE:
-    #! Followed by a node name.
-    scan dup [ ] define-tuple
-    create-in [ make-node ] define-constructor ; parsing
-
 : empty-node f f f f f f f f f ;
 : param-node ( label) f swap f f f f f ;
 : in-d-node ( inputs) >r f f r> f f f f ;
@@ -27,31 +22,40 @@ TUPLE: node effect param in-d out-d in-r out-r
 : d-tail ( n -- list ) meta-d get tail* >list ;
 : r-tail ( n -- list ) meta-r get tail* >list ;
 
-NODE: #label
+TUPLE: #label ;
+C: #label make-node ;
 : #label ( label -- node ) param-node <#label> ;
 
-NODE: #call
+TUPLE: #call ;
+C: #call make-node ;
 : #call ( word -- node ) param-node <#call> ;
 
-NODE: #call-label
+TUPLE: #call-label ;
+C: #call-label make-node ;
 : #call-label ( label -- node ) param-node <#call-label> ;
 
-NODE: #push
+TUPLE: #push ;
+C: #push make-node ;
 : #push ( outputs -- node ) d-tail out-d-node <#push> ;
 
-NODE: #drop
+TUPLE: #drop ;
+C: #drop make-node ;
 : #drop ( inputs -- node ) d-tail in-d-node <#drop> ;
 
-NODE: #values
+TUPLE: #values ;
+C: #values make-node ;
 : #values ( -- node ) meta-d get >list in-d-node <#values> ;
 
-NODE: #return
+TUPLE: #return ;
+C: #return make-node ;
 : #return ( -- node ) meta-d get >list in-d-node <#return> ;
 
-NODE: #ifte
+TUPLE: #ifte ;
+C: #ifte make-node ;
 : #ifte ( in -- node ) 1 d-tail in-d-node <#ifte> ;
 
-NODE: #dispatch
+TUPLE: #dispatch ;
+C: #dispatch make-node ;
 : #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
 
 : node-inputs ( d-count r-count node -- )
