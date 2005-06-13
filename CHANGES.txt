@@ -32,6 +32,9 @@ Factor 0.75:
   generic word. The HTTP server sets a timeout of 60 seconds for client
   requests.
 
+- Improved the words for doing binary I/O; see library/io/binary.factor
+  and the section in the handbook on binary I/O.
+
 + Compiler
 
 - The compiler now does constant folding for certain words with literal

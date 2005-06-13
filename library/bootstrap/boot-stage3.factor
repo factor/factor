@@ -58,7 +58,7 @@ t [
     "/library/in-thread.factor"
 
     "/library/io/directories.factor"
-    "/library/io/stdio-binary.factor"
+    "/library/io/binary.factor"
     
     "/library/eval-catch.factor"
     "/library/tools/listener.factor"
