@@ -11,9 +11,7 @@ USING: alien ;
 : O_CREAT   HEX: 0200 ;
 : O_TRUNC   HEX: 0400 ;
                         
-: POLLIN     HEX: 0001 ;
-: POLLPRI    HEX: 0002 ;
-: POLLOUT    HEX: 0004 ;
+: FD_SETSIZE 1024 ;
 
 : SOL_SOCKET HEX: ffff ;
 : SO_REUSEADDR HEX: 4 ;

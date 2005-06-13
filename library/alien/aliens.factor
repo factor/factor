@@ -52,18 +52,4 @@ M: alien = ( obj obj -- ? )
 : library-abi ( library -- abi )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
 
-! This will go elsewhere soon
-: byte-bit ( n alien -- byte bit )
-    over -3 shift alien-unsigned-1 swap 7 bitand ;
-
-: bit-nth ( n alien -- ? )
-    byte-bit 1 swap shift bitand 0 > ;
-
-: set-bit ( ? byte bit -- byte )
-    1 swap shift rot [ bitor ] [ bitnot bitand ] ifte ;
-
-: set-bit-nth ( ? n alien -- )
-    [ byte-bit set-bit ] 2keep
-    swap -3 shift set-alien-unsigned-1 ;
-
 : ALIEN: scan-word <alien> swons ; parsing

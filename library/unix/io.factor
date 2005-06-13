@@ -1,17 +1,41 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien errors generic hashtables kernel lists math
-sequences streams strings threads unix-internals vectors ;
+USING: alien assembler errors generic hashtables kernel
+kernel-internals lists math sequences streams strings threads
+unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
 USING: namespaces ;
 
+! This will go elsewhere soon
+: byte-bit ( n alien -- byte bit )
+    over -3 shift alien-unsigned-1 swap 7 bitand ;
+
+: <bit-array> ( n -- array )
+    cell / ceiling <byte-array> ;
+
+: bit-nth ( n alien -- ? )
+    byte-bit 1 swap shift bitand 0 > ;
+
+: set-bit ( ? byte bit -- byte )
+    1 swap shift rot [ bitor ] [ bitnot bitand ] ifte ;
+
+: set-bit-nth ( ? n alien -- )
+    [ byte-bit set-bit ] 2keep
+    swap -3 shift set-alien-unsigned-1 ;
+
+! Global variables
+SYMBOL: read-fdset
+SYMBOL: read-tasks
+SYMBOL: write-fdset
+SYMBOL: write-tasks
+
 ! Some general stuff
 : file-mode OCT: 0600 ;
 
-: (io-error) errno strerror throw ;
+: (io-error) err_no strerror throw ;
 
 : check-null ( n -- ) 0 = [ (io-error) ] when ;
 
@@ -52,7 +76,7 @@ M: port set-timeout ( timeout port -- )
 : pending-error ( reader -- ) port-error throw ;
 
 : postpone-error ( reader -- )
-    errno strerror swap set-port-error ;
+    err_no strerror swap set-port-error ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -61,26 +85,18 @@ C: io-task ( port -- ) [ set-io-task-port ] keep ;
 
 ! Multiplexer
 GENERIC: do-io-task ( task -- ? )
-GENERIC: io-task-events ( task -- events )
-
-! A hashtable in the global namespace mapping fd numbers to
-! io-tasks. This is not a vector, since we need a quick way
-! to find the number of elements, and a hashtable gives us
-! this with the hash-size call.
-SYMBOL: io-tasks
-
-: io-task ( pollfd -- io-task ) pollfd-fd io-tasks get hash ;
+GENERIC: task-container ( task -- vector )
 
 : io-task-fd io-task-port port-handle ;
 
 : add-io-task ( callback task -- )
     [ >r unit r> set-io-task-callbacks ] keep
-    dup io-task-fd io-tasks get 2dup hash [
+    dup io-task-fd over task-container 2dup hash [
         "Cannot perform multiple I/O ops on the same port" throw
     ] when set-hash ;
 
 : remove-io-task ( task -- )
-    io-task-fd io-tasks get remove-hash ;
+    dup io-task-fd swap task-container remove-hash ;
 
 : pop-callback ( task -- callback )
     dup io-task-callbacks uncons dup [
@@ -89,50 +105,37 @@ SYMBOL: io-tasks
         drop swap remove-io-task
     ] ifte ;
 
-: handle-fd ( pollfd -- quot )
-    io-task dup do-io-task [
-        dup io-task-port touch-port pop-callback
+: handle-fd ( task -- )
+    dup do-io-task [
+        dup io-task-port touch-port pop-callback [ call ] when*
     ] [
-        drop f
+        drop
     ] ifte ;
 
 : timeout? ( port -- ? )
     port-cutoff dup 0 = not swap millis < and ;
 
-: handle-fd? ( pollfd -- ? )
-    dup pollfd-revents 0 = not >r
-    io-task io-task-port timeout? r> or ;
+: handle-fd? ( fdset task -- ? )
+    dup io-task-port timeout?
+    [ 2drop t ] [ io-task-fd swap bit-nth ] ifte ;
 
-: do-io-tasks ( pollfds n -- )
+: handle-fdset ( fdset tasks -- )
     [
-        dup pick pollfd-nth dup handle-fd? [
-            handle-fd [ call ] when*
-        ] [
-            drop
-        ] ifte
-    ] repeat drop ;
+        cdr tuck handle-fd? [ handle-fd ] [ drop ] ifte
+    ] hash-each-with ;
 
-: io-task# io-tasks get hash-size ;
+: init-fdset ( fdset tasks -- )
+    [ car t swap rot set-bit-nth ] hash-each-with ;
 
-: io-task-list io-tasks get hash-values ;
-
-: init-pollfd ( task pollfd -- )
-    over io-task-fd over set-pollfd-fd
-    swap io-task-events swap set-pollfd-events ;
-
-: make-pollfds ( -- pollfds n )
-    io-task# [
-        <pollfd-array> 0 io-task-list [
-            pick pick swap pollfd-nth init-pollfd 1 +
-        ] each drop
-    ] keep ;
+: init-fdsets ( -- read write except )
+    read-fdset get [ read-tasks get init-fdset ] keep
+    write-fdset get [ write-tasks get init-fdset ] keep
+    NULL ;
 
 : io-multiplex ( timeout -- )
-    >r make-pollfds 2dup r> poll drop do-io-tasks ;
-
-: pending-io? ( -- ? )
-    #! Output if there are waiting I/O requests.
-    io-tasks get hash-size 0 > ;
+    >r FD_SETSIZE init-fdsets r> make-timeval select drop
+    read-fdset get read-tasks get handle-fdset
+    write-fdset get write-tasks get handle-fdset ;
 
 ! Readers
 
@@ -225,8 +228,7 @@ M: read-line-task do-io-task ( task -- ? )
         read-line-step
     ] ifte ;
 
-M: read-line-task io-task-events ( task -- events )
-    drop POLLIN ;
+M: read-line-task task-container drop read-tasks get ;
 
 : wait-to-read-line ( port -- )
     dup can-read-line? [
@@ -288,8 +290,7 @@ M: read-task do-io-task ( task -- ? )
         read-step
     ] ifte ;
 
-M: read-task io-task-events ( task -- events )
-    drop POLLIN ;
+M: read-task task-container drop read-tasks get ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
@@ -339,18 +340,16 @@ M: write-task do-io-task
         >port< write-step f
     ] ifte ;
 
-M: write-task io-task-events ( task -- events )
-    drop POLLOUT ;
+M: write-task task-container drop write-tasks get ;
 
 : write-fin ( str writer -- )
     dup pending-error >buffer ;
 
 : add-write-io-task ( callback task -- )
-    dup io-task-fd io-tasks get hash [
+    dup io-task-fd write-tasks get hash [
         dup write-task? [
-            [
-                nip io-task-callbacks cons
-            ] keep set-io-task-callbacks
+            [ nip io-task-callbacks cons ] keep
+            set-io-task-callbacks
         ] [
             drop add-io-task
         ] ifte
@@ -389,7 +388,10 @@ USE: stdio
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        <namespace> io-tasks set
+        <namespace> read-tasks set
+        FD_SETSIZE <bit-array> read-fdset set
+        <namespace> write-tasks set
+        FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
     ] bind
     [ idle-io-task ] in-thread ;

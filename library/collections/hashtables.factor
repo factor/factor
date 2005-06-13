@@ -129,6 +129,9 @@ IN: hashtables
 : hash-each ( hash quot -- )
     swap hash-array [ swap each ] each-with ; inline
 
+: hash-each-with ( obj hash quot -- | quot: obj elt -- )
+    swap [ with ] hash-each 2drop ; inline
+
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ;
 

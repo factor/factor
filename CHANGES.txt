@@ -3,6 +3,8 @@ Factor 0.75:
 
 + Runtime and core library
 
+- Fix for a fatal bug where Factor was not functional on Mac OS X 10.4.
+
 - New generational garbage collector. There are two command line
   switches for controlling it:
 

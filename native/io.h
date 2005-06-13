@@ -1,4 +1,4 @@
-int factor_errno(void);
+int err_no(void);
 void init_c_io(void);
 void io_error(void);
 void primitive_fopen(void);

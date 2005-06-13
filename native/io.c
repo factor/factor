@@ -3,7 +3,7 @@
 /* This function is used by FFI I/O. Accessing the errno global is
 too troublesome... on some libc's its a funky macro that reads
 thread-local storage. */
-int factor_errno(void)
+int err_no(void)
 {
 	return errno;
 }

@@ -26,7 +26,7 @@ USING: alien generic kernel math unix-internals ;
 
 : with-socket-fd ( quot -- fd | quot: socket -- n )
     socket-fd [ swap call ] keep  swap 0 < [
-        errno EINPROGRESS = [
+        err_no EINPROGRESS = [
             dup close -1 io-error
         ] unless
     ] when ; inline
@@ -56,8 +56,7 @@ C: accept-task ( port -- task )
 
 M: accept-task do-io-task ( task -- ? ) drop t ;
 
-M: accept-task io-task-events ( task -- events )
-    drop POLLIN ;
+M: accept-task task-container drop read-tasks get ;
 
 : wait-to-accept ( server -- )
     [ swap <accept-task> add-io-task stop ] callcc0 drop ;
