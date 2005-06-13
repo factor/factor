@@ -13,7 +13,7 @@ USING: namespaces ;
 
 : (io-error) errno strerror throw ;
 
-: check-null ( n -- ) dup 0 = [ (io-error) ] when ;
+: check-null ( n -- ) 0 = [ (io-error) ] when ;
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
 

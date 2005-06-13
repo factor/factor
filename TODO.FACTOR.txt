@@ -8,7 +8,6 @@
 
 <erg> if write returns -1  and errno == EINTR then it's not a real error, you can try again
 - single-stepper and variable access: wrong namespace?
-- investigate if COPYING_GEN needs a fix
 - http keep alive, and range get
 - sleep word
 - fix i/o on generic x86/ppc unix

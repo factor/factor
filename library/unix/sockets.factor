@@ -4,7 +4,7 @@
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: namespaces streams threads unparser ;
+USING: errors namespaces streams threads unparser ;
 USING: alien generic kernel math unix-internals ;
 
 : init-sockaddr ( port -- sockaddr )
@@ -15,8 +15,10 @@ USING: alien generic kernel math unix-internals ;
 : client-sockaddr ( host port -- sockaddr )
     #! Error handling here
     init-sockaddr [
-        >r gethostbyname dup [ "Host lookup failed" ] unless
-        hostent-addr dup check-null r> set-sockaddr-in-addr
+        >r gethostbyname dup [
+            "Host lookup failed" throw
+        ] unless hostent-addr dup check-null
+        r> set-sockaddr-in-addr
     ] keep ;
 
 : socket-fd ( -- socket )

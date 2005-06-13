@@ -29,7 +29,7 @@ SYMBOL: meta-executing
     10 <vector> meta-r set
     10 <vector> meta-d set
     namestack meta-n set
-    f meta-c set
+    catchstack meta-c set
     f meta-cf set
     f meta-executing set ;
 
@@ -51,7 +51,11 @@ SYMBOL: meta-executing
     #! swap in the old stacks. This is so messy.
     push-d datastack push-d
     meta-d get set-datastack
+    catchstack >r meta-c set-catchstack
+    namestack >r meta-n set-namestack
     >r execute datastack r> tuck push
+    r> set-namestack
+    r> set-catchstack
     set-datastack meta-d set ;
 
 : meta-call ( quot -- )
@@ -82,14 +86,10 @@ SYMBOL: meta-executing
 
 \ datastack [ meta-d get clone push-d ] set-meta-word
 \ set-datastack [ pop-d clone meta-d set ] set-meta-word
-\ >r   [ pop-d push-r ] set-meta-word
-\ r>   [ pop-r push-d ] set-meta-word
+\ >r [ pop-d push-r ] set-meta-word
+\ r> [ pop-r push-d ] set-meta-word
 \ callstack [ meta-r get clone push-d ] set-meta-word
 \ set-callstack [ pop-d clone meta-r set ] set-meta-word
-\ namestack [ meta-n get push-d ] set-meta-word
-\ set-namestack [ pop-d meta-n set ] set-meta-word
-\ catchstack [ meta-c get push-d ] set-meta-word
-\ set-catchstack [ pop-d meta-c set ] set-meta-word
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
