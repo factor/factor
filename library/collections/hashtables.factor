@@ -111,11 +111,9 @@ IN: hashtables
     [ remove-assoc ] set-hash* ;
 
 : hash-clear ( hash -- )
-    #! Remove all entries from a hashtable.
     0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
 : buckets>list ( hash -- list )
-    #! Push a list of key/value pairs in a hashtable.
     hash-array >list ;
 
 : alist>hash ( alist -- hash )
@@ -123,16 +121,13 @@ IN: hashtables
     [ unswons pick set-hash ] each ;
 
 : hash-keys ( hash -- list )
-    #! Push a list of keys in a hashtable.
     hash>alist [ car ] map ;
 
 : hash-values ( hash -- alist )
-    #! Push a list of values in a hashtable.
     hash>alist [ cdr ] map ;
 
-: hash-each ( hash code -- )
-    #! Apply the code to each key/value pair of the hashtable.
-    >r hash>alist r> each ; inline
+: hash-each ( hash quot -- )
+    swap hash-array [ swap each ] each-with ; inline
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ;

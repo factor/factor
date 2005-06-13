@@ -119,3 +119,13 @@ f 100000000000000000000000000 "testhash" get set-hash
 10 [ f f "f-hash-test" get set-hash ] times
 
 [ 1 ] [ "f-hash-test" get hash-size ] unit-test
+
+[ 21 ] [
+    0 {{
+        [[ 1 2 ]]
+        [[ 3 4 ]]
+        [[ 5 6 ]]
+    }} [
+        uncons + +
+    ] hash-each
+] unit-test
