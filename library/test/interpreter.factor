@@ -1,4 +1,5 @@
 IN: temporary
+USING: unparser ;
 USE: vectors
 USE: interpreter
 USE: test
@@ -61,6 +62,26 @@ USE: sequences
 
 [ { 4 } ] [
     [ 2 2 + ] test-interpreter
+] unit-test
+
+[ { 3 } ] [
+    [ 3 "x" set "x" get ] test-interpreter
+] unit-test
+
+[ { } ] [
+    [ 2 2 + . ] test-interpreter
+] unit-test
+
+[ { "hi\n" } ] [
+    [ [ "hi" print ] with-string ] test-interpreter
+] unit-test
+
+[ { "4\n" } ] [
+    [ [ 2 2 + unparse print ] with-string ] test-interpreter
+] unit-test
+
+[ { "4" } ] [
+    [ [ 0 2 2 + prettyprint* drop ] with-string ] test-interpreter
 ] unit-test
 
 [ { "4\n" } ] [

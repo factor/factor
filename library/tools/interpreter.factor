@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
-USING: errors kernel lists math namespaces prettyprint sequences
-stdio strings vectors words ;
+USING: errors kernel kernel-internals lists math namespaces
+prettyprint sequences stdio strings vectors words ;
 
 ! A Factor interpreter written in Factor. Used by compiler for
 ! partial evaluation, also by the walker.
@@ -93,5 +93,6 @@ SYMBOL: meta-executing
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d meta-word ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
+\ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
 
 \ set-meta-word forget
