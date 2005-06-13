@@ -28,6 +28,7 @@
 IN: win32-api
 USE: alien
 USE: kernel
+USE: kernel-internals
 
 : <wsadata> HEX: 190 <byte-array> ;
 

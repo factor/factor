@@ -5,6 +5,8 @@ Factor 0.75:
 
 - Fix for a fatal bug where Factor was not functional on Mac OS X 10.4.
 
+- Client sockets were not functional on Linux.
+
 - New generational garbage collector. There are two command line
   switches for controlling it:
 

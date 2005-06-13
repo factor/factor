@@ -55,6 +55,7 @@ default:
 	@echo "linux"
 	@echo "linux-ppc - to compile Factor on Linux/PowerPC"
 	@echo "macosx"
+	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
 	@echo "variable to enable some CPU-specific optimizations; this"
