@@ -205,11 +205,25 @@ void primitive_float_bits(void)
 	drepl(tag_cell(x_bits));
 }
 
+void primitive_bits_float(void)
+{
+	CELL x_ = unbox_unsigned_4();
+	float x = *(float*)(&x_);
+	dpush(tag_float(x));
+}
+
 void primitive_double_bits(void)
 {
-	double x = to_float(dpeek());
+	double x = to_float(dpop());
 	u64 x_bits = *(u64*)(&x);
-	drepl(tag_bignum(s48_long_long_to_bignum(x_bits)));
+	box_unsigned_8(x_bits);
+}
+
+void primitive_bits_double(void)
+{
+	u64 x_ = unbox_unsigned_8();
+	double x = *(double*)(&x_);
+	dpush(tag_float(x));
 }
 
 #define DEFBOX(name,type)                                                      \

@@ -315,7 +315,7 @@ void factorbug(void)
 			throw_error(T,true);
 		else if(strcmp(cmd,"x") == 0)
 			return;
-		else if(strcmp(cmd,"y") == 0)
+		else if(strcmp(cmd,"im") == 0)
 			save_image("factor.crash.image");
 		else
 			fprintf(stderr,"unknown command\n");

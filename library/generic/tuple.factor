@@ -25,14 +25,6 @@ IN: generic
 DEFER: tuple?
 BUILTIN: tuple 18 tuple? ;
 
-! So far, only tuples can have delegates, which also must be
-! tuples (the UI uses numbers as delegates in a couple of places
-! but this is Unsupported(tm)).
-GENERIC: delegate
-GENERIC: set-delegate
-
-M: object delegate drop f ;
-
 M: tuple delegate 3 slot ;
 M: tuple set-delegate 3 set-slot ;
 

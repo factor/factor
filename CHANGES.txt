@@ -57,6 +57,8 @@ Factor 0.75:
 
 - OpenGL binding in contrib/gl/ (Alex Chapman).
 
+- PostgreSQL binding in contrib/postgresql/ (Doug Coleman).
+
 - HTTP server now supports virtual hosting.
 
 - The Factor plugin now supports connecting to Factor instances on

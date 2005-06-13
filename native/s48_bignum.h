@@ -71,6 +71,8 @@ DLLEXPORT bignum_type s48_ulong_long_to_bignum(u64 n);
 DLLEXPORT bignum_type s48_ulong_to_bignum(unsigned long);
 long s48_bignum_to_long(bignum_type);
 unsigned long s48_bignum_to_ulong(bignum_type);
+s64 s48_bignum_to_long_long(bignum_type);
+u64 s48_bignum_to_ulong_long(bignum_type);
 bignum_type s48_double_to_bignum(double);
 double s48_bignum_to_double(bignum_type);
 int s48_bignum_fits_in_word_p(bignum_type, long word_length,

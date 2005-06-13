@@ -69,7 +69,7 @@ INLINE bool should_copy(CELL untagged)
 }
 
 CELL copy_object(CELL pointer);
-#define COPY_OBJECT(lvalue) if(COLLECTING_GEN(lvalue)) lvalue = copy_object(lvalue)
+#define COPY_OBJECT(lvalue) if(should_copy(lvalue)) lvalue = copy_object(lvalue)
 
 INLINE void copy_handle(CELL *handle)
 {

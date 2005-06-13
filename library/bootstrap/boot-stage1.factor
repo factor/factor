@@ -107,14 +107,12 @@ parser prettyprint sequences stdio vectors words ;
     ] pull-in
 ] make-list
 
-"delegate" [ "generic" ] search
 "object" [ "generic" ] search
 "typemap" [ "generic" ] search
 "builtins" [ "generic" ] search
 
 vocabularies get [ "generic" off ] bind
 
-reveal
 reveal
 reveal
 reveal
@@ -146,8 +144,6 @@ reveal
     
         "/library/bootstrap/init.factor"
     ] pull-in
-    
-    ! uncomment this if type numbers change. it takes a long time...
 
     [
         "Building generics..." print

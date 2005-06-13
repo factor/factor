@@ -1,19 +1,34 @@
 IN: temporary
-USE: alien
-USE: kernel
-USE: test
-USE: inference
+USING: alien kernel kernel-internals namespaces test ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test
 [ f ] [ "hello" 1024 <alien> = ] unit-test
 
-! : alien-inference-1
-!     "void" "foobar" "boo" [ "short" "short" ] alien-invoke ;
-! 
-! [ [[ 2 0 ]] ] [ [ alien-inference-1 ] infer old-effect ] unit-test
-! 
-! : alien-inference-2
-!     "int" "foobar" "boo" [ "short" "short" ] alien-invoke ;
-! 
-! [ [[ 2 1 ]] ] [ [ alien-inference-2 ] infer old-effect ] unit-test
+! Testing the various bignum accessor
+10 <byte-array> "dump" set
+
+[ 123 ] [
+    123 "dump" get 0 set-alien-signed-1
+    "dump" get 0 alien-signed-1
+] unit-test
+
+[ 12345 ] [
+    12345 "dump" get 0 set-alien-signed-2
+    "dump" get 0 alien-signed-2
+] unit-test
+
+[ 12345678 ] [
+    12345678 "dump" get 0 set-alien-signed-4
+    "dump" get 0 alien-signed-4
+] unit-test
+
+[ 12345678901234567 ] [
+    12345678901234567 "dump" get 0 set-alien-signed-8
+    "dump" get 0 alien-signed-8
+] unit-test
+
+[ -1 ] [
+    -1 "dump" get 0 set-alien-signed-8
+    "dump" get 0 alien-signed-8
+] unit-test

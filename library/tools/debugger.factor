@@ -69,7 +69,7 @@ M: no-method error. ( error -- )
     
     dup parse-error-text dup string? [ print ] [ drop ] ifte
     
-    parse-error-col CHAR: \s fill write "^" print ;
+    parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
 
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;

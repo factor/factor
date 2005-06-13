@@ -1911,13 +1911,20 @@ Tests if the sequence contains any elements. The default implementation of this 
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{index}{index ( obj seq -- n )}
+\ordinaryword{index*}{index* ( obj i seq -- n )}
 }
-Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$.
+Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$. The \verb|index*| form allows a start index to be specified.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{contains?}{contains?~( elt seq -- ?~)}
 }
 Tests if \texttt{seq} contains an element equal to \texttt{elt}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{start}{start ( subseq seq -- n )}
+\ordinaryword{start*}{start* ( subseq i seq -- n )}
+}
+Outputs the start index of a subsequence, or $-1$ if the subsequence does not occur in the sequence. The \verb|start*| form allows a start index to be specified.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
@@ -1930,11 +1937,7 @@ Tests if \texttt{s2} contains \texttt{s1} as a subsequence.
 
 }
 Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{index*}{index* ( obj i seq -- n )}
-}
-Outputs the index of the first element in the sequence equal to \texttt{obj}, starting from \texttt{i}. If no element is found, outputs $-1$.
+
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{peek}{peek ( sequence -- element )}
@@ -3259,7 +3262,7 @@ Deconstructs rational numbers into their numerator and denominator. The denomina
 \textbf{12}
 \end{alltt}
 
-\section{Floating point numbers}\label{floats}
+\section{Floats}\label{floats}
 
 \wordtable{
 \vocabulary{math}
@@ -3298,6 +3301,24 @@ Tests if the top of the stack is a floating point number.
 \ordinaryword{>float}{>float ( real -- float )}
 }
 Turn any real number into a floating point approximation.
+
+\subsection{Binary representation of floats}\label{float-bits}
+
+Floating point numbers are represented internally in IEEE 754 double-precision format. This internal representation can be accessed for advanced operations and input/output purposes.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{float>bits}{float>bits ( x -- n )}
+\ordinaryword{double>bits}{double>bits ( x -- n )}
+}
+Converts the floating point number $x$ into IEEE 754 single or double precision form, and outputs an integer holding the binary representation of the result.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{bits>float}{float>bits ( n -- x )}
+\ordinaryword{bits>double}{double>bits ( n -- x )}
+}
+Converts an integer representation $n$ of an IEEE 754 single or double precision float into a \verb|float| object.
 
 \section{Complex numbers}\label{complex-numbers}
 
@@ -3870,7 +3891,7 @@ a string and returned.
 description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, Alpha and ARM processors}}
 \glossary{name=little endian,
 description={a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86 and x86-64 processors}}
-The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes.
+The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (\ref{float-bits}).
 
 There are two ways to order the bytes making up an integer; \emph{little endian} byte order outputs the least significant byte first, and the most significant byte last, whereas \emph{big endian} is the other way around.
 
@@ -4541,6 +4562,8 @@ This word is used to implement end-of-line comments:
 
 \chapter{Web framework}
 
+Factor includes facilities for interoperating with web-based services. This includes an HTTP client, and an HTTP server with a continuation-based web application framework.
+
 \section{HTTP client}
 
 \wordtable{
@@ -4553,6 +4576,58 @@ Attempts to connect to the server specified in the URL. If the connection fails,
 \item[\texttt{headers}] an association list of returned headers.
 \item[\texttt{stream}] a stream for reading the resource.
 \end{description}
+
+\section{HTTP server}\label{httpd}
+
+The HTTP server listens for requests on a port and hands them off to responders. A responder takes action based on the type of request.
+
+\wordtable{
+\vocabulary{httpd}
+\ordinaryword{httpd}{httpd ( port -- )}
+}
+Starts listening for HTTP requests on \verb|port|.
+
+The HTTP server is usually started with a phrase like the following:
+\begin{alltt}
+\textbf{ok} USING: httpd threads ;
+\textbf{ok} [ 8888 httpd ] in-thread
+\end{alltt}
+
+\wordtable{
+\vocabulary{httpd}
+\ordinaryword{stop-httpd}{stop-httpd ( -- )}
+}
+Stops the HTTP server.
+
+A useful application of the HTTP server is the built-in vocabulary browser. You can use it simply by starting the HTTP server then visiting the following location:
+
+\begin{verbatim}
+http://localhost:8888/responder/browser/
+\end{verbatim}
+
+\subsection{Serving static content}
+
+Static content may be served by setting the \verb|"doc-root"| variable to a directory holding the content. This variable may be set in the global namespace, or indeed, individually on each virtual host.
+\begin{verbatim}
+"/var/www/" "doc-root" set
+\end{verbatim}
+
+If a directory holds an \verb|index.html| file, the file is served when the directory is requested, otherwise a directory listing is produced. The directory listing references icons sent via the resource responder. The icons are located in the Factor source tree, and the \verb|"resource-path"| variable may be set to the root of the source tree in order for the icons to be located:
+\begin{verbatim}
+"/home/slava/work/Factor/" "resource-path" set
+\end{verbatim}
+A facility for ad-hoc server-side scripting exists. If a file with the \verb|.factsp| filename extension is requested, the file is run with \verb|run-file| and any output it sends to the default stream is sent to the client (\ref{stdio}). These ``Factor server pages'' are slower and less powerful than responders, so it is recommended that responders be used instead.
+
+\subsection{Responders}
+
+\glossary{name=responder,
+description={A named handler for HTTP requests, installed in the \texttt{responders} variable}}
+\glossary{name=HTTP responder,
+description={See responder}}
+
+The HTTP server listens on a port number for HTTP requests and issues requests to \emph{responders}.
+
+\subsection{Virtual hosts}
 
 \section{HTML output}\label{html}
 
@@ -5255,25 +5330,6 @@ M: list prettyprint*
         ] car prettyprint-sequence
     ] check-recursion ;}
 \end{alltt}
-
-\section{Browsing via the HTTP server}
-
-
-A more sophisticated way to browse the library is using the integrated HTTP server. You can start the HTTP server using the following pair of commands:
-
-\begin{alltt}
-\textbf{ok} USE: httpd
-\textbf{ok} USE: threads
-\textbf{ok} [ 8888 httpd ] in-thread
-\end{alltt}
-
-Then, point your browser to the following URL, and start browsing:
-
-\begin{quote}
-\texttt{http://localhost:8888/responder/inspect/vocabularies}
-\end{quote}
-
-To stop the HTTP server, evaluate the \verb|stop-httpd| word.
 
 \chapter{Dealing with runtime errors}
 

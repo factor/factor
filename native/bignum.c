@@ -236,15 +236,15 @@ void box_signed_8(s64 n)
 
 s64 unbox_signed_8(void)
 {
-	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
+	return s48_bignum_to_long_long(to_bignum(dpop()));
 }
 
 void box_unsigned_8(u64 n)
 {
-	dpush(tag_bignum(s48_long_long_to_bignum(n)));
+	dpush(tag_bignum(s48_ulong_long_to_bignum(n)));
 }
 
 u64 unbox_unsigned_8(void)
 {
-	return 0; /* s48_bignum_to_long_long(to_bignum(dpop())); */
+	return s48_bignum_to_ulong_long(to_bignum(dpop()));
 }

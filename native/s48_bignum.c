@@ -1,4 +1,4 @@
-/* -*-C-*-
+/* :tabSize=2:indentSize=2:noTabs=true:
 
 $Id$
 
@@ -43,12 +43,13 @@ MIT in each case. */
 /* Changes for Factor:
  *  - Add s48_ prefix to file names
  *  - Adapt s48_bignumint.h for Factor memory manager
+ *  - Add more bignum <-> C type conversions
  */
 
 #include "factor.h"
 #include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>	/* abort */
+#include <stdlib.h>        /* abort */
 #include <math.h>
 
 /* Exports */
@@ -60,10 +61,10 @@ s48_bignum_equal_p(bignum_type x, bignum_type y)
     ((BIGNUM_ZERO_P (x))
      ? (BIGNUM_ZERO_P (y))
      : ((! (BIGNUM_ZERO_P (y)))
-	&& ((BIGNUM_NEGATIVE_P (x))
-	    ? (BIGNUM_NEGATIVE_P (y))
-	    : (! (BIGNUM_NEGATIVE_P (y))))
-	&& (bignum_equal_p_unsigned (x, y))));
+        && ((BIGNUM_NEGATIVE_P (x))
+            ? (BIGNUM_NEGATIVE_P (y))
+            : (! (BIGNUM_NEGATIVE_P (y))))
+        && (bignum_equal_p_unsigned (x, y))));
 }
 
 enum bignum_comparison
@@ -83,21 +84,21 @@ s48_bignum_compare(bignum_type x, bignum_type y)
   return
     ((BIGNUM_ZERO_P (x))
      ? ((BIGNUM_ZERO_P (y))
-	? bignum_comparison_equal
-	: (BIGNUM_NEGATIVE_P (y))
-	? bignum_comparison_greater
-	: bignum_comparison_less)
+        ? bignum_comparison_equal
+        : (BIGNUM_NEGATIVE_P (y))
+        ? bignum_comparison_greater
+        : bignum_comparison_less)
      : (BIGNUM_ZERO_P (y))
      ? ((BIGNUM_NEGATIVE_P (x))
-	? bignum_comparison_less
-	: bignum_comparison_greater)
+        ? bignum_comparison_less
+        : bignum_comparison_greater)
      : (BIGNUM_NEGATIVE_P (x))
      ? ((BIGNUM_NEGATIVE_P (y))
-	? (bignum_compare_unsigned (y, x))
-	: (bignum_comparison_less))
+        ? (bignum_compare_unsigned (y, x))
+        : (bignum_comparison_less))
      : ((BIGNUM_NEGATIVE_P (y))
-	? (bignum_comparison_greater)
-	: (bignum_compare_unsigned (x, y))));
+        ? (bignum_comparison_greater)
+        : (bignum_compare_unsigned (x, y))));
 }
 
 bignum_type
@@ -109,12 +110,12 @@ s48_bignum_add(bignum_type x, bignum_type y)
      : (BIGNUM_ZERO_P (y))
      ? (BIGNUM_MAYBE_COPY (x))
      : ((BIGNUM_NEGATIVE_P (x))
-	? ((BIGNUM_NEGATIVE_P (y))
-	   ? (bignum_add_unsigned (x, y, 1))
-	   : (bignum_subtract_unsigned (y, x)))
-	: ((BIGNUM_NEGATIVE_P (y))
-	   ? (bignum_subtract_unsigned (x, y))
-	   : (bignum_add_unsigned (x, y, 0)))));
+        ? ((BIGNUM_NEGATIVE_P (y))
+           ? (bignum_add_unsigned (x, y, 1))
+           : (bignum_subtract_unsigned (y, x)))
+        : ((BIGNUM_NEGATIVE_P (y))
+           ? (bignum_subtract_unsigned (x, y))
+           : (bignum_add_unsigned (x, y, 0)))));
 }
 
 bignum_type
@@ -123,17 +124,17 @@ s48_bignum_subtract(bignum_type x, bignum_type y)
   return
     ((BIGNUM_ZERO_P (x))
      ? ((BIGNUM_ZERO_P (y))
-	? (BIGNUM_MAYBE_COPY (y))
-	: (bignum_new_sign (y, (! (BIGNUM_NEGATIVE_P (y))))))
+        ? (BIGNUM_MAYBE_COPY (y))
+        : (bignum_new_sign (y, (! (BIGNUM_NEGATIVE_P (y))))))
      : ((BIGNUM_ZERO_P (y))
-	? (BIGNUM_MAYBE_COPY (x))
-	: ((BIGNUM_NEGATIVE_P (x))
-	   ? ((BIGNUM_NEGATIVE_P (y))
-	      ? (bignum_subtract_unsigned (y, x))
-	      : (bignum_add_unsigned (x, y, 1)))
-	   : ((BIGNUM_NEGATIVE_P (y))
-	      ? (bignum_add_unsigned (x, y, 0))
-	      : (bignum_subtract_unsigned (x, y))))));
+        ? (BIGNUM_MAYBE_COPY (x))
+        : ((BIGNUM_NEGATIVE_P (x))
+           ? ((BIGNUM_NEGATIVE_P (y))
+              ? (bignum_subtract_unsigned (y, x))
+              : (bignum_add_unsigned (x, y, 1)))
+           : ((BIGNUM_NEGATIVE_P (y))
+              ? (bignum_add_unsigned (x, y, 0))
+              : (bignum_subtract_unsigned (x, y))))));
 }
 
 bignum_type
@@ -162,24 +163,24 @@ s48_bignum_multiply(bignum_type x, bignum_type y)
     {
       bignum_digit_type digit = (BIGNUM_REF (x, 0));
       if (digit == 1)
-	return (bignum_maybe_new_sign (y, negative_p));
+        return (bignum_maybe_new_sign (y, negative_p));
       if (digit < BIGNUM_RADIX_ROOT)
-	return (bignum_multiply_unsigned_small_factor (y, digit, negative_p));
+        return (bignum_multiply_unsigned_small_factor (y, digit, negative_p));
     }
   if (y_length == 1)
     {
       bignum_digit_type digit = (BIGNUM_REF (y, 0));
       if (digit == 1)
-	return (bignum_maybe_new_sign (x, negative_p));
+        return (bignum_maybe_new_sign (x, negative_p));
       if (digit < BIGNUM_RADIX_ROOT)
-	return (bignum_multiply_unsigned_small_factor (x, digit, negative_p));
+        return (bignum_multiply_unsigned_small_factor (x, digit, negative_p));
     }
   return (bignum_multiply_unsigned (x, y, negative_p));
 }
 
 void
 s48_bignum_divide(bignum_type numerator, bignum_type denominator,
-		  bignum_type * quotient, bignum_type * remainder)
+                  bignum_type * quotient, bignum_type * remainder)
 {
   if (BIGNUM_ZERO_P (denominator))
     {
@@ -195,57 +196,57 @@ s48_bignum_divide(bignum_type numerator, bignum_type denominator,
     {
       int r_negative_p = (BIGNUM_NEGATIVE_P (numerator));
       int q_negative_p =
-	((BIGNUM_NEGATIVE_P (denominator)) ? (! r_negative_p) : r_negative_p);
+        ((BIGNUM_NEGATIVE_P (denominator)) ? (! r_negative_p) : r_negative_p);
       switch (bignum_compare_unsigned (numerator, denominator))
-	{
-	case bignum_comparison_equal:
-	  {
-	    (*quotient) = (BIGNUM_ONE (q_negative_p));
-	    (*remainder) = (BIGNUM_ZERO ());
-	    break;
-	  }
-	case bignum_comparison_less:
-	  {
-	    (*quotient) = (BIGNUM_ZERO ());
-	    (*remainder) = (BIGNUM_MAYBE_COPY (numerator));
-	    break;
-	  }
-	case bignum_comparison_greater:
-	  {
-	    if ((BIGNUM_LENGTH (denominator)) == 1)
-	      {
-		bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
-		if (digit == 1)
-		  {
-		    (*quotient) =
-		      (bignum_maybe_new_sign (numerator, q_negative_p));
-		    (*remainder) = (BIGNUM_ZERO ());
-		    break;
-		  }
-		else if (digit < BIGNUM_RADIX_ROOT)
-		  {
-		    bignum_divide_unsigned_small_denominator
-		      (numerator, digit,
-		       quotient, remainder,
-		       q_negative_p, r_negative_p);
-		    break;
-		  }
-		else
-		  {
-		    bignum_divide_unsigned_medium_denominator
-		      (numerator, digit,
-		       quotient, remainder,
-		       q_negative_p, r_negative_p);
-		    break;
-		  }
-	      }
-	    bignum_divide_unsigned_large_denominator
-	      (numerator, denominator,
-	       quotient, remainder,
-	       q_negative_p, r_negative_p);
-	    break;
-	  }
-	}
+        {
+        case bignum_comparison_equal:
+          {
+            (*quotient) = (BIGNUM_ONE (q_negative_p));
+            (*remainder) = (BIGNUM_ZERO ());
+            break;
+          }
+        case bignum_comparison_less:
+          {
+            (*quotient) = (BIGNUM_ZERO ());
+            (*remainder) = (BIGNUM_MAYBE_COPY (numerator));
+            break;
+          }
+        case bignum_comparison_greater:
+          {
+            if ((BIGNUM_LENGTH (denominator)) == 1)
+              {
+                bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
+                if (digit == 1)
+                  {
+                    (*quotient) =
+                      (bignum_maybe_new_sign (numerator, q_negative_p));
+                    (*remainder) = (BIGNUM_ZERO ());
+                    break;
+                  }
+                else if (digit < BIGNUM_RADIX_ROOT)
+                  {
+                    bignum_divide_unsigned_small_denominator
+                      (numerator, digit,
+                       quotient, remainder,
+                       q_negative_p, r_negative_p);
+                    break;
+                  }
+                else
+                  {
+                    bignum_divide_unsigned_medium_denominator
+                      (numerator, digit,
+                       quotient, remainder,
+                       q_negative_p, r_negative_p);
+                    break;
+                  }
+              }
+            bignum_divide_unsigned_large_denominator
+              (numerator, denominator,
+               quotient, remainder,
+               q_negative_p, r_negative_p);
+            break;
+          }
+        }
     }
 }
 
@@ -267,36 +268,36 @@ s48_bignum_quotient(bignum_type numerator, bignum_type denominator)
     switch (bignum_compare_unsigned (numerator, denominator))
       {
       case bignum_comparison_equal:
-	return (BIGNUM_ONE (q_negative_p));
+        return (BIGNUM_ONE (q_negative_p));
       case bignum_comparison_less:
-	return (BIGNUM_ZERO ());
+        return (BIGNUM_ZERO ());
       case bignum_comparison_greater:
-      default:					/* to appease gcc -Wall */
-	{
-	  bignum_type quotient;
-	  if ((BIGNUM_LENGTH (denominator)) == 1)
-	    {
-	      bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
-	      if (digit == 1)
-		return (bignum_maybe_new_sign (numerator, q_negative_p));
-	      if (digit < BIGNUM_RADIX_ROOT)
-		bignum_divide_unsigned_small_denominator
-		  (numerator, digit,
-		   (&quotient), ((bignum_type *) 0),
-		   q_negative_p, 0);
-	      else
-		bignum_divide_unsigned_medium_denominator
-		  (numerator, digit,
-		   (&quotient), ((bignum_type *) 0),
-		   q_negative_p, 0);
-	    }
-	  else
-	    bignum_divide_unsigned_large_denominator
-	      (numerator, denominator,
-	       (&quotient), ((bignum_type *) 0),
-	       q_negative_p, 0);
-	  return (quotient);
-	}
+      default:                                        /* to appease gcc -Wall */
+        {
+          bignum_type quotient;
+          if ((BIGNUM_LENGTH (denominator)) == 1)
+            {
+              bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
+              if (digit == 1)
+                return (bignum_maybe_new_sign (numerator, q_negative_p));
+              if (digit < BIGNUM_RADIX_ROOT)
+                bignum_divide_unsigned_small_denominator
+                  (numerator, digit,
+                   (&quotient), ((bignum_type *) 0),
+                   q_negative_p, 0);
+              else
+                bignum_divide_unsigned_medium_denominator
+                  (numerator, digit,
+                   (&quotient), ((bignum_type *) 0),
+                   q_negative_p, 0);
+            }
+          else
+            bignum_divide_unsigned_large_denominator
+              (numerator, denominator,
+               (&quotient), ((bignum_type *) 0),
+               q_negative_p, 0);
+          return (quotient);
+        }
       }
   }
 }
@@ -318,194 +319,109 @@ s48_bignum_remainder(bignum_type numerator, bignum_type denominator)
     case bignum_comparison_less:
       return (BIGNUM_MAYBE_COPY (numerator));
     case bignum_comparison_greater:
-    default:					/* to appease gcc -Wall */
+    default:                                        /* to appease gcc -Wall */
       {
-	bignum_type remainder;
-	if ((BIGNUM_LENGTH (denominator)) == 1)
-	  {
-	    bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
-	    if (digit == 1)
-	      return (BIGNUM_ZERO ());
-	    if (digit < BIGNUM_RADIX_ROOT)
-	      return
-		(bignum_remainder_unsigned_small_denominator
-		 (numerator, digit, (BIGNUM_NEGATIVE_P (numerator))));
-	    bignum_divide_unsigned_medium_denominator
-	      (numerator, digit,
-	       ((bignum_type *) 0), (&remainder),
-	       0, (BIGNUM_NEGATIVE_P (numerator)));
-	  }
-	else
-	  bignum_divide_unsigned_large_denominator
-	    (numerator, denominator,
-	     ((bignum_type *) 0), (&remainder),
-	     0, (BIGNUM_NEGATIVE_P (numerator)));
-	return (remainder);
+        bignum_type remainder;
+        if ((BIGNUM_LENGTH (denominator)) == 1)
+          {
+            bignum_digit_type digit = (BIGNUM_REF (denominator, 0));
+            if (digit == 1)
+              return (BIGNUM_ZERO ());
+            if (digit < BIGNUM_RADIX_ROOT)
+              return
+                (bignum_remainder_unsigned_small_denominator
+                 (numerator, digit, (BIGNUM_NEGATIVE_P (numerator))));
+            bignum_divide_unsigned_medium_denominator
+              (numerator, digit,
+               ((bignum_type *) 0), (&remainder),
+               0, (BIGNUM_NEGATIVE_P (numerator)));
+          }
+        else
+          bignum_divide_unsigned_large_denominator
+            (numerator, denominator,
+             ((bignum_type *) 0), (&remainder),
+             0, (BIGNUM_NEGATIVE_P (numerator)));
+        return (remainder);
       }
     }
 }
 
-/* These procedures depend on the non-portable type `unsigned long'.
-   If your compiler doesn't support this type, either define the
-   switch `BIGNUM_NO_ULONG' to disable them (in "bignum.h"), or write
-   new versions that don't use this type. */
+#define FOO_TO_BIGNUM(name,type,utype) \
+  bignum_type s48_##name##_to_bignum(type n)                           \
+  {                                                                    \
+    int negative_p;                                                    \
+    bignum_digit_type result_digits [BIGNUM_DIGITS_FOR(type)];         \
+    bignum_digit_type * end_digits = result_digits;                    \
+    /* Special cases win when these small constants are cached. */     \
+    if (n == 0) return (BIGNUM_ZERO ());                               \
+    if (n == 1) return (BIGNUM_ONE (0));                               \
+    if (n == -1) return (BIGNUM_ONE (1));                              \
+    {                                                                  \
+      utype accumulator = ((negative_p = (n < 0)) ? (-n) : n);         \
+      do                                                               \
+        {                                                              \
+          (*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);         \
+          accumulator >>= BIGNUM_DIGIT_LENGTH;                         \
+        }                                                              \
+      while (accumulator != 0);                                        \
+    }                                                                  \
+    {                                                                  \
+      bignum_type result =                                             \
+        (bignum_allocate ((end_digits - result_digits), negative_p));  \
+      bignum_digit_type * scan_digits = result_digits;                 \
+      bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));   \
+      while (scan_digits < end_digits)                                 \
+        (*scan_result++) = (*scan_digits++);                           \
+      return (result);                                                 \
+    }                                                                  \
+  }
 
-#ifndef BIGNUM_NO_ULONG
+FOO_TO_BIGNUM(long,long,unsigned long)
+FOO_TO_BIGNUM(ulong,unsigned long,unsigned long)
+FOO_TO_BIGNUM(long_long,s64,u64)
+FOO_TO_BIGNUM(ulong_long,u64,u64)
 
-bignum_type
-s48_long_to_bignum(long n)
-{
-  int negative_p;
-  bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG];
-  bignum_digit_type * end_digits = result_digits;
-  /* Special cases win when these small constants are cached. */
-  if (n == 0) return (BIGNUM_ZERO ());
-  if (n == 1) return (BIGNUM_ONE (0));
-  if (n == -1) return (BIGNUM_ONE (1));
-  {
-    unsigned long accumulator = ((negative_p = (n < 0)) ? (-n) : n);
-    do
-      {
-	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);
-	accumulator >>= BIGNUM_DIGIT_LENGTH;
-      }
-    while (accumulator != 0);
+#define BIGNUM_TO_FOO(name,type,utype) \
+  type s48_bignum_to_##name(bignum_type bignum)                                     \
+  {                                                                                 \
+    if (BIGNUM_ZERO_P (bignum))                                                     \
+      return (0);                                                                   \
+    {                                                                               \
+      utype accumulator = 0;                                                        \
+      bignum_digit_type * start = (BIGNUM_START_PTR (bignum));                      \
+      bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));                \
+      while (start < scan)                                                          \
+        accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));           \
+      return ((BIGNUM_NEGATIVE_P (bignum)) ? (-((type)accumulator)) : accumulator); \
+    }                                                                               \
   }
-  {
-    bignum_type result =
-      (bignum_allocate ((end_digits - result_digits), negative_p));
-    bignum_digit_type * scan_digits = result_digits;
-    bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));
-    while (scan_digits < end_digits)
-      (*scan_result++) = (*scan_digits++);
-    return (result);
-  }
-}
 
-bignum_type
-s48_long_long_to_bignum(s64 n)
-{
-  int negative_p;
-  bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG_LONG];
-  bignum_digit_type * end_digits = result_digits;
-  /* Special cases win when these small constants are cached. */
-  if (n == 0) return (BIGNUM_ZERO ());
-  if (n == 1) return (BIGNUM_ONE (0));
-  if (n == -1) return (BIGNUM_ONE (1));
-  {
-    u64 accumulator = ((negative_p = (n < 0)) ? (-n) : n);
-    do
-      {
-	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);
-	accumulator >>= BIGNUM_DIGIT_LENGTH;
-      }
-    while (accumulator != 0);
-  }
-  {
-    bignum_type result =
-      (bignum_allocate ((end_digits - result_digits), negative_p));
-    bignum_digit_type * scan_digits = result_digits;
-    bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));
-    while (scan_digits < end_digits)
-      (*scan_result++) = (*scan_digits++);
-    return (result);
-  }
-}
+BIGNUM_TO_FOO(long,long,unsigned long)
+BIGNUM_TO_FOO(ulong,unsigned long,unsigned long)
+BIGNUM_TO_FOO(long_long,s64,u64)
+BIGNUM_TO_FOO(ulong_long,u64,u64)
 
-bignum_type
-s48_ulong_long_to_bignum(u64 n)
-{
-  bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG_LONG];
-  bignum_digit_type * end_digits = result_digits;
-  /* Special cases win when these small constants are cached. */
-  if (n == 0) return (BIGNUM_ZERO ());
-  if (n == 1) return (BIGNUM_ONE (0));
-  {
-    u64 accumulator = n;
-    do
-      {
-	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);
-	accumulator >>= BIGNUM_DIGIT_LENGTH;
-      }
-    while (accumulator != 0);
-  }
-  {
-    bignum_type result =
-      (bignum_allocate ((end_digits - result_digits), 0));
-    bignum_digit_type * scan_digits = result_digits;
-    bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));
-    while (scan_digits < end_digits)
-      (*scan_result++) = (*scan_digits++);
-    return (result);
-  }
-}
-
-long
-s48_bignum_to_long(bignum_type bignum)
+double
+s48_bignum_to_double(bignum_type bignum)
 {
   if (BIGNUM_ZERO_P (bignum))
     return (0);
   {
-    unsigned long accumulator = 0;
+    double accumulator = 0;
     bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
     bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));
     while (start < scan)
-      accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));
-    return ((BIGNUM_NEGATIVE_P (bignum)) ? (-((long)accumulator)) : accumulator);
+      accumulator = ((accumulator * BIGNUM_RADIX) + (*--scan));
+    return ((BIGNUM_NEGATIVE_P (bignum)) ? (-accumulator) : accumulator);
   }
 }
 
-bignum_type
-s48_ulong_to_bignum(unsigned long n)
-{
-  bignum_digit_type result_digits [BIGNUM_DIGITS_FOR_LONG];
-  bignum_digit_type * end_digits = result_digits;
-  /* Special cases win when these small constants are cached. */
-  if (n == 0) return (BIGNUM_ZERO ());
-  if (n == 1) return (BIGNUM_ONE (0));
-  {
-    unsigned long accumulator = n;
-    do
-      {
-	(*end_digits++) = (accumulator & BIGNUM_DIGIT_MASK);
-	accumulator >>= BIGNUM_DIGIT_LENGTH;
-      }
-    while (accumulator != 0);
-  }
-  {
-    bignum_type result =
-      (bignum_allocate ((end_digits - result_digits), 0));
-    bignum_digit_type * scan_digits = result_digits;
-    bignum_digit_type * scan_result = (BIGNUM_START_PTR (result));
-    while (scan_digits < end_digits)
-      (*scan_result++) = (*scan_digits++);
-    return (result);
-  }
-}
-
-unsigned long
-s48_bignum_to_ulong(bignum_type bignum)
-{
-  if (BIGNUM_ZERO_P (bignum))
-    return (0);
-  {
-    unsigned long accumulator = 0;
-    bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
-    bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));
-    while (start < scan)
-      accumulator = ((accumulator << BIGNUM_DIGIT_LENGTH) + (*--scan));
-    return (accumulator);
-  }
-}
-
-#endif /* not BIGNUM_NO_ULONG */
-
-#define DTB_WRITE_DIGIT(factor)						\
-{									\
-  significand *= (factor);						\
-  digit = ((bignum_digit_type) significand);				\
-  (*--scan) = digit;							\
-  significand -= ((double) digit);					\
+#define DTB_WRITE_DIGIT(factor)                                                \
+{                                                                        \
+  significand *= (factor);                                                \
+  digit = ((bignum_digit_type) significand);                                \
+  (*--scan) = digit;                                                        \
+  significand -= ((double) digit);                                        \
 }
 
 bignum_type
@@ -527,13 +443,13 @@ s48_double_to_bignum(double x)
       DTB_WRITE_DIGIT (1L << odd_bits);
     while (start < scan)
       {
-	if (significand == 0)
-	  {
-	    while (start < scan)
-	      (*--scan) = 0;
-	    break;
-	  }
-	DTB_WRITE_DIGIT (BIGNUM_RADIX);
+        if (significand == 0)
+          {
+            while (start < scan)
+              (*--scan) = 0;
+            break;
+          }
+        DTB_WRITE_DIGIT (BIGNUM_RADIX);
       }
     return (result);
   }
@@ -541,24 +457,9 @@ s48_double_to_bignum(double x)
 
 #undef DTB_WRITE_DIGIT
 
-double
-s48_bignum_to_double(bignum_type bignum)
-{
-  if (BIGNUM_ZERO_P (bignum))
-    return (0);
-  {
-    double accumulator = 0;
-    bignum_digit_type * start = (BIGNUM_START_PTR (bignum));
-    bignum_digit_type * scan = (start + (BIGNUM_LENGTH (bignum)));
-    while (start < scan)
-      accumulator = ((accumulator * BIGNUM_RADIX) + (*--scan));
-    return ((BIGNUM_NEGATIVE_P (bignum)) ? (-accumulator) : accumulator);
-  }
-}
-
 int
 s48_bignum_fits_in_word_p(bignum_type bignum, long word_length,
-			  int twos_complement_p)
+                          int twos_complement_p)
 {
   unsigned int n_bits = (twos_complement_p ? (word_length - 1) : word_length);
   BIGNUM_ASSERT (n_bits > 0);
@@ -569,11 +470,11 @@ s48_bignum_fits_in_word_p(bignum_type bignum, long word_length,
     return
       ((length < max_digits) ||
        ((length == max_digits) &&
-	((((msd = (BIGNUM_REF (bignum, (length - 1)))) <
-	   (max = (1L << (n_bits - ((length - 1) * BIGNUM_DIGIT_LENGTH))))) ||
-	  (twos_complement_p &&
-	   (msd == max) &&
-	   (BIGNUM_NEGATIVE_P (bignum)))))));
+        ((((msd = (BIGNUM_REF (bignum, (length - 1)))) <
+           (max = (1L << (n_bits - ((length - 1) * BIGNUM_DIGIT_LENGTH))))) ||
+          (twos_complement_p &&
+           (msd == max) &&
+           (BIGNUM_NEGATIVE_P (bignum)))))));
   }
 }
 
@@ -591,8 +492,8 @@ s48_bignum_length_in_bits(bignum_type bignum)
     bignum_destructive_scale_up (result, BIGNUM_DIGIT_LENGTH);
     while (digit > 0)
       {
-	bignum_destructive_add (result, ((bignum_digit_type) 1));
-	digit >>= 1;
+        bignum_destructive_add (result, ((bignum_digit_type) 1));
+        digit >>= 1;
       }
     return (bignum_trim (result));
   }
@@ -609,10 +510,10 @@ s48_bignum_length_upper_limit(void)
 
 bignum_type
 s48_digit_stream_to_bignum(unsigned int n_digits,
-			   unsigned int *producer(bignum_procedure_context),
-			   bignum_procedure_context context,
-			   unsigned int radix,
-			   int negative_p)
+                           unsigned int *producer(bignum_procedure_context),
+                           bignum_procedure_context context,
+                           unsigned int radix,
+                           int negative_p)
 {
   BIGNUM_ASSERT ((radix > 1) && (radix <= BIGNUM_RADIX_ROOT));
   if (n_digits == 0)
@@ -628,21 +529,21 @@ s48_digit_stream_to_bignum(unsigned int n_digits,
       unsigned int radix_copy = radix;
       unsigned int log_radix = 0;
       while (radix_copy > 0)
-	{
-	  radix_copy >>= 1;
-	  log_radix += 1;
-	}
+        {
+          radix_copy >>= 1;
+          log_radix += 1;
+        }
       /* This length will be at least as large as needed. */
       length = (BIGNUM_BITS_TO_DIGITS (n_digits * log_radix));
     }
     {
       bignum_type result = (bignum_allocate_zeroed (length, negative_p));
       while ((n_digits--) > 0)
-	{
-	  bignum_destructive_scale_up (result, ((bignum_digit_type) radix));
-	  bignum_destructive_add
-	    (result, ((bignum_digit_type) ((*producer) (context))));
-	}
+        {
+          bignum_destructive_scale_up (result, ((bignum_digit_type) radix));
+          bignum_destructive_add
+            (result, ((bignum_digit_type) ((*producer) (context))));
+        }
       return (bignum_trim (result));
     }
   }
@@ -668,8 +569,8 @@ bignum_equal_p_unsigned(bignum_type x, bignum_type y)
       bignum_digit_type * scan_y = (BIGNUM_START_PTR (y));
       bignum_digit_type * end_x = (scan_x + length);
       while (scan_x < end_x)
-	if ((*scan_x++) != (*scan_y++))
-	  return (0);
+        if ((*scan_x++) != (*scan_y++))
+          return (0);
       return (1);
     }
 }
@@ -689,12 +590,12 @@ bignum_compare_unsigned(bignum_type x, bignum_type y)
     bignum_digit_type * scan_y = ((BIGNUM_START_PTR (y)) + y_length);
     while (start_x < scan_x)
       {
-	bignum_digit_type digit_x = (*--scan_x);
-	bignum_digit_type digit_y = (*--scan_y);
-	if (digit_x < digit_y)
-	  return (bignum_comparison_less);
-	if (digit_x > digit_y)
-	  return (bignum_comparison_greater);
+        bignum_digit_type digit_x = (*--scan_x);
+        bignum_digit_type digit_y = (*--scan_y);
+        if (digit_x < digit_y)
+          return (bignum_comparison_less);
+        if (digit_x > digit_y)
+          return (bignum_comparison_greater);
       }
   }
   return (bignum_comparison_equal);
@@ -722,42 +623,42 @@ bignum_add_unsigned(bignum_type x, bignum_type y, int negative_p)
       bignum_digit_type * scan_y = (BIGNUM_START_PTR (y));
       bignum_digit_type * end_y = (scan_y + (BIGNUM_LENGTH (y)));
       while (scan_y < end_y)
-	{
-	  sum = ((*scan_x++) + (*scan_y++) + carry);
-	  if (sum < BIGNUM_RADIX)
-	    {
-	      (*scan_r++) = sum;
-	      carry = 0;
-	    }
-	  else
-	    {
-	      (*scan_r++) = (sum - BIGNUM_RADIX);
-	      carry = 1;
-	    }
-	}
+        {
+          sum = ((*scan_x++) + (*scan_y++) + carry);
+          if (sum < BIGNUM_RADIX)
+            {
+              (*scan_r++) = sum;
+              carry = 0;
+            }
+          else
+            {
+              (*scan_r++) = (sum - BIGNUM_RADIX);
+              carry = 1;
+            }
+        }
     }
     {
       bignum_digit_type * end_x = ((BIGNUM_START_PTR (x)) + x_length);
       if (carry != 0)
-	while (scan_x < end_x)
-	  {
-	    sum = ((*scan_x++) + 1);
-	    if (sum < BIGNUM_RADIX)
-	      {
-		(*scan_r++) = sum;
-		carry = 0;
-		break;
-	      }
-	    else
-	      (*scan_r++) = (sum - BIGNUM_RADIX);
-	  }
+        while (scan_x < end_x)
+          {
+            sum = ((*scan_x++) + 1);
+            if (sum < BIGNUM_RADIX)
+              {
+                (*scan_r++) = sum;
+                carry = 0;
+                break;
+              }
+            else
+              (*scan_r++) = (sum - BIGNUM_RADIX);
+          }
       while (scan_x < end_x)
-	(*scan_r++) = (*scan_x++);
+        (*scan_r++) = (*scan_x++);
     }
     if (carry != 0)
       {
-	(*scan_r) = 1;
-	return (r);
+        (*scan_r) = 1;
+        return (r);
       }
     return (bignum_shorten_length (r, x_length));
   }
@@ -775,9 +676,9 @@ bignum_subtract_unsigned(bignum_type x, bignum_type y)
       return (BIGNUM_ZERO ());
     case bignum_comparison_less:
       {
-	bignum_type z = x;
-	x = y;
-	y = z;
+        bignum_type z = x;
+        x = y;
+        y = z;
       }
       negative_p = 1;
       break;
@@ -796,38 +697,38 @@ bignum_subtract_unsigned(bignum_type x, bignum_type y)
       bignum_digit_type * scan_y = (BIGNUM_START_PTR (y));
       bignum_digit_type * end_y = (scan_y + (BIGNUM_LENGTH (y)));
       while (scan_y < end_y)
-	{
-	  difference = (((*scan_x++) - (*scan_y++)) - borrow);
-	  if (difference < 0)
-	    {
-	      (*scan_r++) = (difference + BIGNUM_RADIX);
-	      borrow = 1;
-	    }
-	  else
-	    {
-	      (*scan_r++) = difference;
-	      borrow = 0;
-	    }
-	}
+        {
+          difference = (((*scan_x++) - (*scan_y++)) - borrow);
+          if (difference < 0)
+            {
+              (*scan_r++) = (difference + BIGNUM_RADIX);
+              borrow = 1;
+            }
+          else
+            {
+              (*scan_r++) = difference;
+              borrow = 0;
+            }
+        }
     }
     {
       bignum_digit_type * end_x = ((BIGNUM_START_PTR (x)) + x_length);
       if (borrow != 0)
-	while (scan_x < end_x)
-	  {
-	    difference = ((*scan_x++) - borrow);
-	    if (difference < 0)
-	      (*scan_r++) = (difference + BIGNUM_RADIX);
-	    else
-	      {
-		(*scan_r++) = difference;
-		borrow = 0;
-		break;
-	      }
-	  }
+        while (scan_x < end_x)
+          {
+            difference = ((*scan_x++) - borrow);
+            if (difference < 0)
+              (*scan_r++) = (difference + BIGNUM_RADIX);
+            else
+              {
+                (*scan_r++) = difference;
+                borrow = 0;
+                break;
+              }
+          }
       BIGNUM_ASSERT (borrow == 0);
       while (scan_x < end_x)
-	(*scan_r++) = (*scan_x++);
+        (*scan_r++) = (*scan_x++);
     }
     return (bignum_trim (r));
   }
@@ -835,9 +736,9 @@ bignum_subtract_unsigned(bignum_type x, bignum_type y)
 
 /* Multiplication
    Maximum value for product_low or product_high:
-	((R * R) + (R * (R - 2)) + (R - 1))
+        ((R * R) + (R * (R - 2)) + (R - 1))
    Maximum value for carry: ((R * (R - 1)) + (R - 1))
-	where R == BIGNUM_RADIX_ROOT */
+        where R == BIGNUM_RADIX_ROOT */
 
 bignum_type
 bignum_multiply_unsigned(bignum_type x, bignum_type y, int negative_p)
@@ -871,33 +772,33 @@ bignum_multiply_unsigned(bignum_type x, bignum_type y, int negative_p)
 #define product_high carry
     while (scan_x < end_x)
       {
-	x_digit = (*scan_x++);
-	x_digit_low = (HD_LOW (x_digit));
-	x_digit_high = (HD_HIGH (x_digit));
-	carry = 0;
-	scan_y = start_y;
-	scan_r = (start_r++);
-	while (scan_y < end_y)
-	  {
-	    y_digit = (*scan_y++);
-	    y_digit_low = (HD_LOW (y_digit));
-	    y_digit_high = (HD_HIGH (y_digit));
-	    product_low =
-	      ((*scan_r) +
-	       (x_digit_low * y_digit_low) +
-	       (HD_LOW (carry)));
-	    product_high =
-	      ((x_digit_high * y_digit_low) +
-	       (x_digit_low * y_digit_high) +
-	       (HD_HIGH (product_low)) +
-	       (HD_HIGH (carry)));
-	    (*scan_r++) =
-	      (HD_CONS ((HD_LOW (product_high)), (HD_LOW (product_low))));
-	    carry =
-	      ((x_digit_high * y_digit_high) +
-	       (HD_HIGH (product_high)));
-	  }
-	(*scan_r) += carry;
+        x_digit = (*scan_x++);
+        x_digit_low = (HD_LOW (x_digit));
+        x_digit_high = (HD_HIGH (x_digit));
+        carry = 0;
+        scan_y = start_y;
+        scan_r = (start_r++);
+        while (scan_y < end_y)
+          {
+            y_digit = (*scan_y++);
+            y_digit_low = (HD_LOW (y_digit));
+            y_digit_high = (HD_HIGH (y_digit));
+            product_low =
+              ((*scan_r) +
+               (x_digit_low * y_digit_low) +
+               (HD_LOW (carry)));
+            product_high =
+              ((x_digit_high * y_digit_low) +
+               (x_digit_low * y_digit_high) +
+               (HD_HIGH (product_low)) +
+               (HD_HIGH (carry)));
+            (*scan_r++) =
+              (HD_CONS ((HD_LOW (product_high)), (HD_LOW (product_low))));
+            carry =
+              ((x_digit_high * y_digit_high) +
+               (HD_HIGH (product_high)));
+          }
+        (*scan_r) += carry;
       }
     return (bignum_trim (r));
 #undef x_digit
@@ -908,7 +809,7 @@ bignum_multiply_unsigned(bignum_type x, bignum_type y, int negative_p)
 
 bignum_type
 bignum_multiply_unsigned_small_factor(bignum_type x, bignum_digit_type y,
-				      int negative_p)
+                                      int negative_p)
 {
   bignum_length_type length_x = (BIGNUM_LENGTH (x));
   bignum_type p = (bignum_allocate ((length_x + 1), negative_p));
@@ -933,9 +834,9 @@ bignum_destructive_scale_up(bignum_type bignum, bignum_digit_type factor)
       two_digits = (*scan);
       product_low = ((factor * (HD_LOW (two_digits))) + (HD_LOW (carry)));
       product_high =
-	((factor * (HD_HIGH (two_digits))) +
-	 (HD_HIGH (product_low)) +
-	 (HD_HIGH (carry)));
+        ((factor * (HD_HIGH (two_digits))) +
+         (HD_HIGH (product_low)) +
+         (HD_HIGH (carry)));
       (*scan++) = (HD_CONS ((HD_LOW (product_high)), (HD_LOW (product_low))));
       carry = (HD_HIGH (product_high));
     }
@@ -964,10 +865,10 @@ bignum_destructive_add(bignum_type bignum, bignum_digit_type n)
     {
       digit = ((*scan) + 1);
       if (digit < BIGNUM_RADIX)
-	{
-	  (*scan) = digit;
-	  return;
-	}
+        {
+          (*scan) = digit;
+          return;
+        }
       (*scan++) = (digit - BIGNUM_RADIX);
     }
 }
@@ -981,11 +882,11 @@ bignum_destructive_add(bignum_type bignum, bignum_digit_type n)
 
 void
 bignum_divide_unsigned_large_denominator(bignum_type numerator,
-					 bignum_type denominator,
-					 bignum_type * quotient,
-					 bignum_type * remainder,
-					 int q_negative_p,
-					 int r_negative_p)
+                                         bignum_type denominator,
+                                         bignum_type * quotient,
+                                         bignum_type * remainder,
+                                         int q_negative_p,
+                                         int r_negative_p)
 {
   bignum_length_type length_n = ((BIGNUM_LENGTH (numerator)) + 1);
   bignum_length_type length_d = (BIGNUM_LENGTH (denominator));
@@ -1000,8 +901,8 @@ bignum_divide_unsigned_large_denominator(bignum_type numerator,
     bignum_digit_type v1 = (BIGNUM_REF ((denominator), (length_d - 1)));
     while (v1 < (BIGNUM_RADIX / 2))
       {
-	v1 <<= 1;
-	shift += 1;
+        v1 <<= 1;
+        shift += 1;
       }
   }
   if (shift == 0)
@@ -1018,7 +919,7 @@ bignum_divide_unsigned_large_denominator(bignum_type numerator,
       bignum_divide_unsigned_normalized (u, v, q);
       BIGNUM_DEALLOCATE (v);
       if (remainder != ((bignum_type *) 0))
-	bignum_destructive_unnormalization (u, shift);
+        bignum_destructive_unnormalization (u, shift);
     }
   if (quotient != ((bignum_type *) 0))
     (*quotient) = (bignum_trim (q));
@@ -1043,60 +944,60 @@ bignum_divide_unsigned_normalized(bignum_type u, bignum_type v, bignum_type q)
   bignum_digit_type * q_scan;
   bignum_digit_type v1 = (v_end[-1]);
   bignum_digit_type v2 = (v_end[-2]);
-  bignum_digit_type ph;	/* high half of double-digit product */
-  bignum_digit_type pl;	/* low half of double-digit product */
+  bignum_digit_type ph;        /* high half of double-digit product */
+  bignum_digit_type pl;        /* low half of double-digit product */
   bignum_digit_type guess;
-  bignum_digit_type gh;	/* high half-digit of guess */
-  bignum_digit_type ch;	/* high half of double-digit comparand */
+  bignum_digit_type gh;        /* high half-digit of guess */
+  bignum_digit_type ch;        /* high half of double-digit comparand */
   bignum_digit_type v2l = (HD_LOW (v2));
   bignum_digit_type v2h = (HD_HIGH (v2));
-  bignum_digit_type cl;	/* low half of double-digit comparand */
-#define gl ph			/* low half-digit of guess */
+  bignum_digit_type cl;        /* low half of double-digit comparand */
+#define gl ph                        /* low half-digit of guess */
 #define uj pl
 #define qj ph
-  bignum_digit_type gm;		/* memory loc for reference parameter */
+  bignum_digit_type gm;                /* memory loc for reference parameter */
   if (q != BIGNUM_OUT_OF_BAND)
     q_scan = ((BIGNUM_START_PTR (q)) + (BIGNUM_LENGTH (q)));
   while (u_scan_limit < u_scan)
     {
       uj = (*--u_scan);
       if (uj != v1)
-	{
-	  /* comparand =
-	     (((((uj * BIGNUM_RADIX) + uj1) % v1) * BIGNUM_RADIX) + uj2);
-	     guess = (((uj * BIGNUM_RADIX) + uj1) / v1); */
-	  cl = (u_scan[-2]);
-	  ch = (bignum_digit_divide (uj, (u_scan[-1]), v1, (&gm)));
-	  guess = gm;
-	}
+        {
+          /* comparand =
+             (((((uj * BIGNUM_RADIX) + uj1) % v1) * BIGNUM_RADIX) + uj2);
+             guess = (((uj * BIGNUM_RADIX) + uj1) / v1); */
+          cl = (u_scan[-2]);
+          ch = (bignum_digit_divide (uj, (u_scan[-1]), v1, (&gm)));
+          guess = gm;
+        }
       else
-	{
-	  cl = (u_scan[-2]);
-	  ch = ((u_scan[-1]) + v1);
-	  guess = (BIGNUM_RADIX - 1);
-	}
+        {
+          cl = (u_scan[-2]);
+          ch = ((u_scan[-1]) + v1);
+          guess = (BIGNUM_RADIX - 1);
+        }
       while (1)
-	{
-	  /* product = (guess * v2); */
-	  gl = (HD_LOW (guess));
-	  gh = (HD_HIGH (guess));
-	  pl = (v2l * gl);
-	  ph = ((v2l * gh) + (v2h * gl) + (HD_HIGH (pl)));
-	  pl = (HD_CONS ((HD_LOW (ph)), (HD_LOW (pl))));
-	  ph = ((v2h * gh) + (HD_HIGH (ph)));
-	  /* if (comparand >= product) */
-	  if ((ch > ph) || ((ch == ph) && (cl >= pl)))
-	    break;
-	  guess -= 1;
-	  /* comparand += (v1 << BIGNUM_DIGIT_LENGTH) */
-	  ch += v1;
-	  /* if (comparand >= (BIGNUM_RADIX * BIGNUM_RADIX)) */
-	  if (ch >= BIGNUM_RADIX)
-	    break;
-	}
+        {
+          /* product = (guess * v2); */
+          gl = (HD_LOW (guess));
+          gh = (HD_HIGH (guess));
+          pl = (v2l * gl);
+          ph = ((v2l * gh) + (v2h * gl) + (HD_HIGH (pl)));
+          pl = (HD_CONS ((HD_LOW (ph)), (HD_LOW (pl))));
+          ph = ((v2h * gh) + (HD_HIGH (ph)));
+          /* if (comparand >= product) */
+          if ((ch > ph) || ((ch == ph) && (cl >= pl)))
+            break;
+          guess -= 1;
+          /* comparand += (v1 << BIGNUM_DIGIT_LENGTH) */
+          ch += v1;
+          /* if (comparand >= (BIGNUM_RADIX * BIGNUM_RADIX)) */
+          if (ch >= BIGNUM_RADIX)
+            break;
+        }
       qj = (bignum_divide_subtract (v_start, v_end, guess, (--u_scan_start)));
       if (q != BIGNUM_OUT_OF_BAND)
-	(*--q_scan) = qj;
+        (*--q_scan) = qj;
     }
   return;
 #undef gl
@@ -1106,9 +1007,9 @@ bignum_divide_unsigned_normalized(bignum_type u, bignum_type v, bignum_type q)
 
 bignum_digit_type
 bignum_divide_subtract(bignum_digit_type * v_start,
-		       bignum_digit_type * v_end,
-		       bignum_digit_type guess,
-		       bignum_digit_type * u_start)
+                       bignum_digit_type * v_end,
+                       bignum_digit_type guess,
+                       bignum_digit_type * u_start)
 {
   bignum_digit_type * v_scan = v_start;
   bignum_digit_type * u_scan = u_start;
@@ -1125,22 +1026,22 @@ bignum_divide_subtract(bignum_digit_type * v_start,
 #define diff pl
     while (v_scan < v_end)
       {
-	v = (*v_scan++);
-	vl = (HD_LOW (v));
-	vh = (HD_HIGH (v));
-	pl = ((vl * gl) + (HD_LOW (carry)));
-	ph = ((vl * gh) + (vh * gl) + (HD_HIGH (pl)) + (HD_HIGH (carry)));
-	diff = ((*u_scan) - (HD_CONS ((HD_LOW (ph)), (HD_LOW (pl)))));
-	if (diff < 0)
-	  {
-	    (*u_scan++) = (diff + BIGNUM_RADIX);
-	    carry = ((vh * gh) + (HD_HIGH (ph)) + 1);
-	  }
-	else
-	  {
-	    (*u_scan++) = diff;
-	    carry = ((vh * gh) + (HD_HIGH (ph)));
-	  }
+        v = (*v_scan++);
+        vl = (HD_LOW (v));
+        vh = (HD_HIGH (v));
+        pl = ((vl * gl) + (HD_LOW (carry)));
+        ph = ((vl * gh) + (vh * gl) + (HD_HIGH (pl)) + (HD_HIGH (carry)));
+        diff = ((*u_scan) - (HD_CONS ((HD_LOW (ph)), (HD_LOW (pl)))));
+        if (diff < 0)
+          {
+            (*u_scan++) = (diff + BIGNUM_RADIX);
+            carry = ((vh * gh) + (HD_HIGH (ph)) + 1);
+          }
+        else
+          {
+            (*u_scan++) = diff;
+            carry = ((vh * gh) + (HD_HIGH (ph)));
+          }
       }
     if (carry == 0)
       return (guess);
@@ -1149,8 +1050,8 @@ bignum_divide_subtract(bignum_digit_type * v_start,
       (*u_scan) = (diff + BIGNUM_RADIX);
     else
       {
-	(*u_scan) = diff;
-	return (guess);
+        (*u_scan) = diff;
+        return (guess);
       }
 #undef vh
 #undef ph
@@ -1165,15 +1066,15 @@ bignum_divide_subtract(bignum_digit_type * v_start,
     {
       bignum_digit_type sum = ((*v_scan++) + (*u_scan) + carry);
       if (sum < BIGNUM_RADIX)
-	{
-	  (*u_scan++) = sum;
-	  carry = 0;
-	}
+        {
+          (*u_scan++) = sum;
+          carry = 0;
+        }
       else
-	{
-	  (*u_scan++) = (sum - BIGNUM_RADIX);
-	  carry = 1;
-	}
+        {
+          (*u_scan++) = (sum - BIGNUM_RADIX);
+          carry = 1;
+        }
     }
   if (carry == 1)
     {
@@ -1185,11 +1086,11 @@ bignum_divide_subtract(bignum_digit_type * v_start,
 
 void
 bignum_divide_unsigned_medium_denominator(bignum_type numerator,
-					  bignum_digit_type denominator,
-					  bignum_type * quotient,
-					  bignum_type * remainder,
-					  int q_negative_p,
-					  int r_negative_p)
+                                          bignum_digit_type denominator,
+                                          bignum_type * quotient,
+                                          bignum_type * remainder,
+                                          int q_negative_p,
+                                          int r_negative_p)
 {
   bignum_length_type length_n = (BIGNUM_LENGTH (numerator));
   bignum_length_type length_q;
@@ -1220,24 +1121,24 @@ bignum_divide_unsigned_medium_denominator(bignum_type numerator,
     bignum_digit_type qj;
     if (quotient != ((bignum_type *) 0))
       {
-	while (start < scan)
-	  {
-	    r = (bignum_digit_divide (r, (*--scan), denominator, (&qj)));
-	    (*scan) = qj;
-	  }
-	(*quotient) = (bignum_trim (q));
+        while (start < scan)
+          {
+            r = (bignum_digit_divide (r, (*--scan), denominator, (&qj)));
+            (*scan) = qj;
+          }
+        (*quotient) = (bignum_trim (q));
       }
     else
       {
-	while (start < scan)
-	  r = (bignum_digit_divide (r, (*--scan), denominator, (&qj)));
-	BIGNUM_DEALLOCATE (q);
+        while (start < scan)
+          r = (bignum_digit_divide (r, (*--scan), denominator, (&qj)));
+        BIGNUM_DEALLOCATE (q);
       }
     if (remainder != ((bignum_type *) 0))
       {
-	if (shift != 0)
-	  r >>= shift;
-	(*remainder) = (bignum_digit_to_bignum (r, r_negative_p));
+        if (shift != 0)
+          r >>= shift;
+        (*remainder) = (bignum_digit_to_bignum (r, r_negative_p));
       }
   }
   return;
@@ -1245,7 +1146,7 @@ bignum_divide_unsigned_medium_denominator(bignum_type numerator,
 
 void
 bignum_destructive_normalization(bignum_type source, bignum_type target,
-				 int shift_left)
+                                 int shift_left)
 {
   bignum_digit_type digit;
   bignum_digit_type * scan_source = (BIGNUM_START_PTR (source));
@@ -1291,34 +1192,34 @@ bignum_destructive_unnormalization(bignum_type bignum, int shift_right)
    case of dividing two bignum digits by one bignum digit.  It is
    assumed that the numerator, denominator are normalized. */
 
-#define BDD_STEP(qn, j)							\
-{									\
-  uj = (u[j]);								\
-  if (uj != v1)								\
-    {									\
-      uj_uj1 = (HD_CONS (uj, (u[j + 1])));				\
-      guess = (uj_uj1 / v1);						\
-      comparand = (HD_CONS ((uj_uj1 % v1), (u[j + 2])));		\
-    }									\
-  else									\
-    {									\
-      guess = (BIGNUM_RADIX_ROOT - 1);					\
-      comparand = (HD_CONS (((u[j + 1]) + v1), (u[j + 2])));		\
-    }									\
-  while ((guess * v2) > comparand)					\
-    {									\
-      guess -= 1;							\
-      comparand += (v1 << BIGNUM_HALF_DIGIT_LENGTH);			\
-      if (comparand >= BIGNUM_RADIX)					\
-	break;								\
-    }									\
-  qn = (bignum_digit_divide_subtract (v1, v2, guess, (&u[j])));		\
+#define BDD_STEP(qn, j)                                                        \
+{                                                                        \
+  uj = (u[j]);                                                                \
+  if (uj != v1)                                                                \
+    {                                                                        \
+      uj_uj1 = (HD_CONS (uj, (u[j + 1])));                                \
+      guess = (uj_uj1 / v1);                                                \
+      comparand = (HD_CONS ((uj_uj1 % v1), (u[j + 2])));                \
+    }                                                                        \
+  else                                                                        \
+    {                                                                        \
+      guess = (BIGNUM_RADIX_ROOT - 1);                                        \
+      comparand = (HD_CONS (((u[j + 1]) + v1), (u[j + 2])));                \
+    }                                                                        \
+  while ((guess * v2) > comparand)                                        \
+    {                                                                        \
+      guess -= 1;                                                        \
+      comparand += (v1 << BIGNUM_HALF_DIGIT_LENGTH);                        \
+      if (comparand >= BIGNUM_RADIX)                                        \
+        break;                                                                \
+    }                                                                        \
+  qn = (bignum_digit_divide_subtract (v1, v2, guess, (&u[j])));                \
 }
 
 bignum_digit_type
 bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
-		    bignum_digit_type v,
-		    bignum_digit_type * q) /* return value */
+                    bignum_digit_type v,
+                    bignum_digit_type * q) /* return value */
 {
   bignum_digit_type guess;
   bignum_digit_type comparand;
@@ -1332,15 +1233,15 @@ bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
   if (uh == 0)
     {
       if (ul < v)
-	{
-	  (*q) = 0;
-	  return (ul);
-	}
+        {
+          (*q) = 0;
+          return (ul);
+        }
       else if (ul == v)
-	{
-	  (*q) = 1;
-	  return (0);
-	}
+        {
+          (*q) = 1;
+          return (0);
+        }
     }
   (u[0]) = (HD_HIGH (uh));
   (u[1]) = (HD_LOW (uh));
@@ -1356,40 +1257,40 @@ bignum_digit_divide(bignum_digit_type uh, bignum_digit_type ul,
 
 #undef BDD_STEP
 
-#define BDDS_MULSUB(vn, un, carry_in)					\
-{									\
-  product = ((vn * guess) + carry_in);					\
-  diff = (un - (HD_LOW (product)));					\
-  if (diff < 0)								\
-    {									\
-      un = (diff + BIGNUM_RADIX_ROOT);					\
-      carry = ((HD_HIGH (product)) + 1);				\
-    }									\
-  else									\
-    {									\
-      un = diff;							\
-      carry = (HD_HIGH (product));					\
-    }									\
+#define BDDS_MULSUB(vn, un, carry_in)                                        \
+{                                                                        \
+  product = ((vn * guess) + carry_in);                                        \
+  diff = (un - (HD_LOW (product)));                                        \
+  if (diff < 0)                                                                \
+    {                                                                        \
+      un = (diff + BIGNUM_RADIX_ROOT);                                        \
+      carry = ((HD_HIGH (product)) + 1);                                \
+    }                                                                        \
+  else                                                                        \
+    {                                                                        \
+      un = diff;                                                        \
+      carry = (HD_HIGH (product));                                        \
+    }                                                                        \
 }
 
-#define BDDS_ADD(vn, un, carry_in)					\
-{									\
-  sum = (vn + un + carry_in);						\
-  if (sum < BIGNUM_RADIX_ROOT)						\
-    {									\
-      un = sum;								\
-      carry = 0;							\
-    }									\
-  else									\
-    {									\
-      un = (sum - BIGNUM_RADIX_ROOT);					\
-      carry = 1;							\
-    }									\
+#define BDDS_ADD(vn, un, carry_in)                                        \
+{                                                                        \
+  sum = (vn + un + carry_in);                                                \
+  if (sum < BIGNUM_RADIX_ROOT)                                                \
+    {                                                                        \
+      un = sum;                                                                \
+      carry = 0;                                                        \
+    }                                                                        \
+  else                                                                        \
+    {                                                                        \
+      un = (sum - BIGNUM_RADIX_ROOT);                                        \
+      carry = 1;                                                        \
+    }                                                                        \
 }
 
 bignum_digit_type
 bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
-			     bignum_digit_type guess, bignum_digit_type * u)
+                             bignum_digit_type guess, bignum_digit_type * u)
 {
   {
     bignum_digit_type product;
@@ -1404,8 +1305,8 @@ bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
       (u[0]) = (diff + BIGNUM_RADIX);
     else
       {
-	(u[0]) = diff;
-	return (guess);
+        (u[0]) = diff;
+        return (guess);
       }
   }
   {
@@ -1424,11 +1325,11 @@ bignum_digit_divide_subtract(bignum_digit_type v1, bignum_digit_type v2,
 
 void
 bignum_divide_unsigned_small_denominator(bignum_type numerator,
-					 bignum_digit_type denominator,
-					 bignum_type * quotient,
-					 bignum_type * remainder,
-					 int q_negative_p,
-					 int r_negative_p)
+                                         bignum_digit_type denominator,
+                                         bignum_type * quotient,
+                                         bignum_type * remainder,
+                                         int q_negative_p,
+                                         int r_negative_p)
 {
   bignum_type q = (bignum_new_sign (numerator, q_negative_p));
   bignum_digit_type r = (bignum_destructive_scale_down (q, denominator));
@@ -1478,9 +1379,9 @@ bignum_remainder_unsigned_small_denominator(
     {
       two_digits = (*--scan);
       r =
-	((HD_CONS (((HD_CONS (r, (HD_HIGH (two_digits)))) % d),
-		   (HD_LOW (two_digits))))
-	 % d);
+        ((HD_CONS (((HD_CONS (r, (HD_HIGH (two_digits)))) % d),
+                   (HD_LOW (two_digits))))
+         % d);
     }
   return (bignum_digit_to_bignum (r, negative_p));
 }
@@ -1587,7 +1488,7 @@ bignum_maybe_new_sign(bignum_type bignum, int negative_p)
 #endif /* not BIGNUM_FORCE_NEW_RESULTS */
     {
       bignum_type result =
-	(bignum_allocate ((BIGNUM_LENGTH (bignum)), negative_p));
+        (bignum_allocate ((BIGNUM_LENGTH (bignum)), negative_p));
       bignum_destructive_copy (bignum, result);
       return (result);
     }
@@ -1639,7 +1540,7 @@ s48_bignum_arithmetic_shift(bignum_type arg1, long n)
   if (BIGNUM_NEGATIVE_P(arg1) && n < 0)
     return
       s48_bignum_bitwise_not(bignum_magnitude_ash(s48_bignum_bitwise_not(arg1),
-						  n));
+                                                  n));
   else
     return bignum_magnitude_ash(arg1, n);
 }
@@ -1651,7 +1552,7 @@ s48_bignum_integer_length(bignum_type arg1)
 {
  return((BIGNUM_NEGATIVE_P (arg1)) 
         ? bignum_length_in_bits (s48_bignum_bitwise_not (arg1))
-	: bignum_length_in_bits (arg1));
+        : bignum_length_in_bits (arg1));
 }
 */
 
@@ -1660,7 +1561,7 @@ s48_bignum_bit_count(bignum_type arg1)
 {
  return((BIGNUM_NEGATIVE_P (arg1)) 
         ? bignum_unsigned_logcount (s48_bignum_bitwise_not (arg1))
-	: bignum_unsigned_logcount (arg1));
+        : bignum_unsigned_logcount (arg1));
 }
 
 #define AND_OP 0
@@ -1671,42 +1572,42 @@ bignum_type
 s48_bignum_bitwise_and(bignum_type arg1, bignum_type arg2)
 {
   return(
-	 (BIGNUM_NEGATIVE_P (arg1))
-	 ? (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_negneg_bitwise_op(AND_OP, arg1, arg2)
-	   : bignum_posneg_bitwise_op(AND_OP, arg2, arg1)
-	 : (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_posneg_bitwise_op(AND_OP, arg1, arg2)
-	   : bignum_pospos_bitwise_op(AND_OP, arg1, arg2)
-	 );
+         (BIGNUM_NEGATIVE_P (arg1))
+         ? (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_negneg_bitwise_op(AND_OP, arg1, arg2)
+           : bignum_posneg_bitwise_op(AND_OP, arg2, arg1)
+         : (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_posneg_bitwise_op(AND_OP, arg1, arg2)
+           : bignum_pospos_bitwise_op(AND_OP, arg1, arg2)
+         );
 }
 
 bignum_type
 s48_bignum_bitwise_ior(bignum_type arg1, bignum_type arg2)
 {
   return(
-	 (BIGNUM_NEGATIVE_P (arg1))
-	 ? (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_negneg_bitwise_op(IOR_OP, arg1, arg2)
-	   : bignum_posneg_bitwise_op(IOR_OP, arg2, arg1)
-	 : (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_posneg_bitwise_op(IOR_OP, arg1, arg2)
-	   : bignum_pospos_bitwise_op(IOR_OP, arg1, arg2)
-	 );
+         (BIGNUM_NEGATIVE_P (arg1))
+         ? (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_negneg_bitwise_op(IOR_OP, arg1, arg2)
+           : bignum_posneg_bitwise_op(IOR_OP, arg2, arg1)
+         : (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_posneg_bitwise_op(IOR_OP, arg1, arg2)
+           : bignum_pospos_bitwise_op(IOR_OP, arg1, arg2)
+         );
 }
 
 bignum_type
 s48_bignum_bitwise_xor(bignum_type arg1, bignum_type arg2)
 {
   return(
-	 (BIGNUM_NEGATIVE_P (arg1))
-	 ? (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_negneg_bitwise_op(XOR_OP, arg1, arg2)
-	   : bignum_posneg_bitwise_op(XOR_OP, arg2, arg1)
-	 : (BIGNUM_NEGATIVE_P (arg2))
-	   ? bignum_posneg_bitwise_op(XOR_OP, arg1, arg2)
-	   : bignum_pospos_bitwise_op(XOR_OP, arg1, arg2)
-	 );
+         (BIGNUM_NEGATIVE_P (arg1))
+         ? (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_negneg_bitwise_op(XOR_OP, arg1, arg2)
+           : bignum_posneg_bitwise_op(XOR_OP, arg2, arg1)
+         : (BIGNUM_NEGATIVE_P (arg2))
+           ? bignum_posneg_bitwise_op(XOR_OP, arg1, arg2)
+           : bignum_pospos_bitwise_op(XOR_OP, arg1, arg2)
+         );
 }
 
 /* ash for the magnitude */
@@ -1728,7 +1629,7 @@ bignum_magnitude_ash(bignum_type arg1, long n)
     bit_offset =   n % BIGNUM_DIGIT_LENGTH;
     
     result = bignum_allocate_zeroed (BIGNUM_LENGTH (arg1) + digit_offset + 1,
-				     BIGNUM_NEGATIVE_P(arg1));
+                                     BIGNUM_NEGATIVE_P(arg1));
 
     scanr = BIGNUM_START_PTR (result) + digit_offset;
     scan1 = BIGNUM_START_PTR (arg1);
@@ -1743,7 +1644,7 @@ bignum_magnitude_ash(bignum_type arg1, long n)
     }
   }
   else if (n < 0
-	   && (-n >= (BIGNUM_LENGTH (arg1) * (bignum_length_type) BIGNUM_DIGIT_LENGTH)))
+           && (-n >= (BIGNUM_LENGTH (arg1) * (bignum_length_type) BIGNUM_DIGIT_LENGTH)))
     result = BIGNUM_ZERO ();
 
   else if (n < 0) {
@@ -1751,7 +1652,7 @@ bignum_magnitude_ash(bignum_type arg1, long n)
     bit_offset =   -n % BIGNUM_DIGIT_LENGTH;
     
     result = bignum_allocate_zeroed (BIGNUM_LENGTH (arg1) - digit_offset,
-				     BIGNUM_NEGATIVE_P(arg1));
+                                     BIGNUM_NEGATIVE_P(arg1));
     
     scanr = BIGNUM_START_PTR (result);
     scan1 = BIGNUM_START_PTR (arg1) + digit_offset;
@@ -1760,7 +1661,7 @@ bignum_magnitude_ash(bignum_type arg1, long n)
     while (scanr < end) {
       *scanr =  (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset ;
       *scanr = (*scanr | 
-	*scan1 << (BIGNUM_DIGIT_LENGTH - bit_offset)) & BIGNUM_DIGIT_MASK;
+        *scan1 << (BIGNUM_DIGIT_LENGTH - bit_offset)) & BIGNUM_DIGIT_MASK;
       scanr++;
     }
     *scanr =  (*scan1++ & BIGNUM_DIGIT_MASK) >> bit_offset ;
@@ -1797,8 +1698,8 @@ bignum_pospos_bitwise_op(int op, bignum_type arg1, bignum_type arg2)
     digit2 = (scan2 < end2) ? *scan2++ : 0;
     /*
     fprintf(stderr, "[pospos op = %d, i = %ld, d1 = %lx, d2 = %lx]\n",
-	    op, endr - scanr, digit1, digit2);
-	    */
+            op, endr - scanr, digit1, digit2);
+            */
     *scanr++ = (op == 0) ? digit1 & digit2 :
                (op == 1) ? digit1 | digit2 :
                            digit1 ^ digit2;
@@ -1841,8 +1742,8 @@ bignum_posneg_bitwise_op(int op, bignum_type arg1, bignum_type arg2)
       carry2 = 0;
     else
       {
-	digit2 = (digit2 - BIGNUM_RADIX);
-	carry2 = 1;
+        digit2 = (digit2 - BIGNUM_RADIX);
+        carry2 = 1;
       }
     
     *scanr++ = (op == AND_OP) ? digit1 & digit2 :
@@ -1891,16 +1792,16 @@ bignum_negneg_bitwise_op(int op, bignum_type arg1, bignum_type arg2)
       carry1 = 0;
     else
       {
-	digit1 = (digit1 - BIGNUM_RADIX);
-	carry1 = 1;
+        digit1 = (digit1 - BIGNUM_RADIX);
+        carry1 = 1;
       }
     
     if (digit2 < BIGNUM_RADIX)
       carry2 = 0;
     else
       {
-	digit2 = (digit2 - BIGNUM_RADIX);
-	carry2 = 1;
+        digit2 = (digit2 - BIGNUM_RADIX);
+        carry2 = 1;
       }
     
     *scanr++ = (op == 0) ? digit1 & digit2 :
@@ -1934,8 +1835,8 @@ bignum_negate_magnitude(bignum_type arg)
       carry = 0;
     else
       {
-	digit = (digit - BIGNUM_RADIX);
-	carry = 1;
+        digit = (digit - BIGNUM_RADIX);
+        carry = 1;
       }
     
     *scan++ = digit;
@@ -1963,7 +1864,7 @@ bignum_unsigned_logcount(bignum_type arg)
   while (scan < end) {
       digit = *scan++ & BIGNUM_DIGIT_MASK;
       for (i = 0; i++ < BIGNUM_DIGIT_LENGTH; digit = digit >> 1L)
-	  result += digit & 1L;
+          result += digit & 1L;
   }
 
   return (result);
@@ -1973,8 +1874,8 @@ int
 bignum_logbitp(int shift, bignum_type arg)
 {
   return((BIGNUM_NEGATIVE_P (arg)) 
-	 ? !bignum_unsigned_logbitp (shift, s48_bignum_bitwise_not (arg))
-	 : bignum_unsigned_logbitp (shift,arg));
+         ? !bignum_unsigned_logbitp (shift, s48_bignum_bitwise_not (arg))
+         : bignum_unsigned_logbitp (shift,arg));
 }
 
 int

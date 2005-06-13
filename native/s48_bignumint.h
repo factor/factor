@@ -114,11 +114,8 @@ typedef long bignum_length_type;
 #define BIGNUM_BITS_TO_DIGITS(n)					\
   (((n) + (BIGNUM_DIGIT_LENGTH - 1)) / BIGNUM_DIGIT_LENGTH)
 
-#define BIGNUM_DIGITS_FOR_LONG						\
-  (BIGNUM_BITS_TO_DIGITS ((sizeof (long)) * CHAR_BIT))
-
-#define BIGNUM_DIGITS_FOR_LONG_LONG					\
-  (BIGNUM_BITS_TO_DIGITS ((sizeof (s64)) * CHAR_BIT))
+#define BIGNUM_DIGITS_FOR(type) \
+  (BIGNUM_BITS_TO_DIGITS ((sizeof (type)) * CHAR_BIT))
 
 #ifndef BIGNUM_DISABLE_ASSERTION_CHECKS
 

@@ -22,6 +22,14 @@ math-internals ;
 ! properties: "builtin-supertypes" "priority" "add-method"
 ! "class<"
 
+! So far, only tuples can have delegates, which also must be
+! tuples (the UI uses numbers as delegates in a couple of places
+! but this is Unsupported(tm)).
+GENERIC: delegate
+GENERIC: set-delegate
+
+M: object delegate drop f ;
+
 ! Metaclasses have priority -- this induces an order in which
 ! methods are added to the vtable.
 
