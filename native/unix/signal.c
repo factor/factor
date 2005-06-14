@@ -52,6 +52,7 @@ void init_signals(void)
 	sigaction(SIGABRT,&custom_sigaction,NULL);
 	sigaction(SIGFPE,&custom_sigaction,NULL);
 	sigaction(SIGBUS,&custom_sigaction,NULL);
+	sigaction(SIGILL,&custom_sigaction,NULL);
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
 	sigaction(SIGPIPE,&ign_sigaction,NULL);
 	sigaction(SIGPROF,&profiling_sigaction,NULL);

@@ -1,5 +1,20 @@
 #include "factor.h"
 
+float f_test(void)
+{
+	return 1.0f;
+}
+
+double d_test(void)
+{
+	return 1.0;
+}
+
+float in_f_test(float x, float y)
+{
+	return x + y;
+}
+
 double to_float(CELL tagged)
 {
 	F_RATIO* r;

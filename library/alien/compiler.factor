@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler compiler-frontend compiler-backend
-errors generic inference kernel lists math namespaces sequences
-stdio strings unparser words ;
+USING: assembler compiler compiler-backend compiler-frontend
+errors generic hashtables inference kernel lists math namespaces
+sequences stdio strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -83,35 +83,33 @@ C: alien-node make-node ;
     0 swap [ c-size cell align + ] each ;
 
 : unbox-parameter ( n parameter -- )
-    c-type [ "unboxer" get cons "unbox-op" get ] bind execute , ;
+    c-type [ "unboxer" get "reg-class" get ] bind %unbox , ;
 
-: linearize-parameters ( node -- count )
+: load-parameter ( n parameter -- )
+    c-type "reg-class" swap hash %parameter , ;
+
+: linearize-parameters ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
     #! code for moving these parameters to register on
     #! architectures where parameters are passed in registers
     #! (PowerPC).
-    #!
-    #! Return amount stack must be unwound by.
-    parameters
-    dup stack-space
-    dup %parameters , >r
-    dup dup length swap [
-        >r 1 - dup r> unbox-parameter
-    ] each drop
-    length [ %parameter ] project % r> ;
+    dup stack-space %parameters ,
+    [ length ] keep 2dup
+    [ >r 1 - dup r> unbox-parameter ] each drop
+    [ >r 1 - dup r> load-parameter ] each drop ;
 
 : linearize-return ( return -- )
     alien-node-return dup "void" = [
         drop
     ] [
-        c-type [ "boxer" get "box-op" get ] bind execute ,
+        c-type [ "boxer" get "reg-class" get ] bind %box ,
     ] ifte ;
 
 M: alien-node linearize-node* ( node -- )
-    dup linearize-parameters >r
-    dup node-param %alien-invoke ,
-    dup node-param cdr library-abi "stdcall" =
-    r> swap [ drop ] [ %cleanup , ] ifte
+    dup parameters linearize-parameters
+    dup node-param dup uncons %alien-invoke ,
+    cdr library-abi "stdcall" =
+    [ dup parameters stack-space %cleanup , ] unless
     linearize-return ;
 
 \ alien-invoke [ [ string object string general-list ] [ ] ]

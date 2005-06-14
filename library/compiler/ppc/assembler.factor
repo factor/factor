@@ -51,125 +51,92 @@ USING: compiler errors kernel math memory words ;
 : ADDIC. d-form 13 insn ; : SUBIC. neg ADDIC. ;
 
 : (ADD) 266 xo-form 31 insn ;
-: ADD 0 0 (ADD) ;
-: ADD. 0 1 (ADD) ;
-: ADDO 1 0 (ADD) ;
-: ADDO. 1 1 (ADD) ;
+: ADD 0 0 (ADD) ;  : ADD. 0 1 (ADD) ;
+: ADDO 1 0 (ADD) ; : ADDO. 1 1 (ADD) ;
 
 : (ADDC) 10 xo-form 31 insn ;
-: ADDC 0 0 (ADDC) ;
-: ADDC. 0 1 (ADDC) ;
-: ADDCO 1 0 (ADDC) ;
-: ADDCO. 1 1 (ADDC) ;
+: ADDC 0 0 (ADDC) ;  : ADDC. 0 1 (ADDC) ;
+: ADDCO 1 0 (ADDC) ; : ADDCO. 1 1 (ADDC) ;
 
 : (ADDE) 138 xo-form 31 insn ;
-: ADDE 0 0 (ADDE) ;
-: ADDE. 0 1 (ADDE) ;
-: ADDEO 1 0 (ADDE) ;
-: ADDEO. 1 1 (ADDE) ;
+: ADDE 0 0 (ADDE) ;  : ADDE. 0 1 (ADDE) ;
+: ADDEO 1 0 (ADDE) ; : ADDEO. 1 1 (ADDE) ;
 
 : ANDI d-form 28 insn ;
 : ANDIS d-form 29 insn ;
 
 : (AND) 28 x-form 31 insn ;
-: AND 0 (AND) ;
-: AND. 0 (AND) ;
+: AND 0 (AND) ;  : AND. 0 (AND) ;
 
 : (DIVW) 491 xo-form 31 insn ;
-: DIVW 0 0 (DIVW) ;
-: DIVW. 0 1 (DIVW) ;
-: DIVWO 1 0 (DIVW) ;
-: DIVWO 1 1 (DIVW) ;
+: DIVW 0 0 (DIVW) ;  : DIVW. 0 1 (DIVW) ;
+: DIVWO 1 0 (DIVW) ; : DIVWO 1 1 (DIVW) ;
 
 : (DIVWU) 459 xo-form 31 insn ;
-: DIVWU 0 0 (DIVWU) ;
-: DIVWU. 0 1 (DIVWU) ;
-: DIVWUO 1 0 (DIVWU) ;
-: DIVWUO. 1 1 (DIVWU) ;
+: DIVWU 0 0 (DIVWU) ;  : DIVWU. 0 1 (DIVWU) ;
+: DIVWUO 1 0 (DIVWU) ; : DIVWUO. 1 1 (DIVWU) ;
 
 : (EQV) 284 x-form 31 insn ;
-: EQV 0 (EQV) ;
-: EQV. 1 (EQV) ;
+: EQV 0 (EQV) ;  : EQV. 1 (EQV) ;
 
 : (NAND) 476 x-form 31 insn ;
-: NAND 0 (NAND) ;
-: NAND. 1 (NAND) ;
+: NAND 0 (NAND) ;  : NAND. 1 (NAND) ;
 
 : (NOR) 124 x-form 31 insn ;
-: NOR 0 (NOR) ;
-: NOR. 1 (NOR) ;
+: NOR 0 (NOR) ;  : NOR. 1 (NOR) ;
 
-: NOT dup NOR ;
-: NOT. dup NOR. ;
+: NOT dup NOR ;   : NOT. dup NOR. ;
 
-: ORI d-form 24 insn ;
-: ORIS d-form 25 insn ;
+: ORI d-form 24 insn ;  : ORIS d-form 25 insn ;
 
 : (OR) 444 x-form 31 insn ;
-: OR 0 (OR) ;
-: OR. 1 (OR) ;
+: OR 0 (OR) ;  : OR. 1 (OR) ;
 
 : (ORC) 412 x-form 31 insn ;
-: ORC 0 (ORC) ;
-: ORC. 1 (ORC) ;
+: ORC 0 (ORC) ;  : ORC. 1 (ORC) ;
 
-: MR dup OR ;
-: MR. dup OR. ;
+: MR dup OR ;  : MR. dup OR. ;
 
 : (MULHW) 75 xo-form 31 insn ;
-: MULHW 0 0 (MULHW) ;
-: MULHW. 0 1 (MULHW) ;
+: MULHW 0 0 (MULHW) ;  : MULHW. 0 1 (MULHW) ;
 
 : MULLI d-form 7 insn ;
 
 : (MULHWU) 11 xo-form 31 insn ;
-: MULHWU 0 0 (MULHWU) ;
-: MULHWU. 0 1 (MULHWU) ;
+: MULHWU 0 0 (MULHWU) ;  : MULHWU. 0 1 (MULHWU) ;
 
 : (MULLW) 235 xo-form 31 insn ;
-: MULLW 0 0 (MULLW) ;
-: MULLW. 0 1 (MULLW) ;
-: MULLWO 1 0 (MULLW) ;
-: MULLWO. 1 1 (MULLW) ;
+: MULLW 0 0 (MULLW) ;  : MULLW. 0 1 (MULLW) ;
+: MULLWO 1 0 (MULLW) ; : MULLWO. 1 1 (MULLW) ;
 
 : (SLW) 24 x-form 31 insn ;
-: SLW 0 (SLW) ;
-: SLW. 1 (SLW) ;
+: SLW 0 (SLW) ;  : SLW. 1 (SLW) ;
 
 : (SRAW) 792 x-form 31 insn ;
-: SRAW 0 (SRAW) ;
-: SRAW. 1 (SRAW) ;
+: SRAW 0 (SRAW) ;  : SRAW. 1 (SRAW) ;
 
 : (SRW) 536 x-form 31 insn ;
-: SRW 0 (SRW) ;
-: SRW. 1 (SRW) ;
+: SRW 0 (SRW) ;  : SRW. 1 (SRW) ;
 
 : SRAWI 0 824 x-form 31 insn ;
 
 : (SUBF) 40 xo-form 31 insn ;
-: SUBF 0 0 (SUBF) ;
-: SUBF. 0 1 (SUBF) ;
-: SUBFO 1 0 (SUBF) ;
-: SUBFO. 1 1 (SUBF) ;
+: SUBF 0 0 (SUBF) ;  : SUBF. 0 1 (SUBF) ;
+: SUBFO 1 0 (SUBF) ; : SUBFO. 1 1 (SUBF) ;
 
 : (SUBFC) 8 xo-form 31 insn ;
-: SUBFC 0 0 (SUBFC) ;
-: SUBFC. 0 1 (SUBFC) ;
-: SUBFCO 1 0 (SUBFC) ;
-: SUBFCO. 1 1 (SUBFC) ;
+: SUBFC 0 0 (SUBFC) ;  : SUBFC. 0 1 (SUBFC) ;
+: SUBFCO 1 0 (SUBFC) ; : SUBFCO. 1 1 (SUBFC) ;
 
 : (SUBFE) 136 xo-form 31 insn ;
-: SUBFE 0 0 (SUBFE) ;
-: SUBFE. 0 1 (SUBFE) ;
-: SUBFEO 1 0 (SUBFE) ;
-: SUBFEO. 1 1 (SUBFE) ;
+: SUBFE 0 0 (SUBFE) ;  : SUBFE. 0 1 (SUBFE) ;
+: SUBFEO 1 0 (SUBFE) ; : SUBFEO. 1 1 (SUBFE) ;
 
 : XORI d-form 26 insn ;
 : XORIS d-form 27 insn ;
 
 : (XOR) 316 x-form 31 insn ;
-: XOR 0 (XOR) ;
-: XOR. 1 (XOR) ;
+: XOR 0 (XOR) ;  : XOR. 1 (XOR) ;
 
 : CMPI d-form 11 insn ;
 : CMPLI d-form 10 insn ;
@@ -178,11 +145,9 @@ USING: compiler errors kernel math memory words ;
 : CMPL 0 32 x-form 31 insn ;
 
 : (RLWINM) m-form 21 insn ;
-: RLWINM 0 (RLWINM) ;
-: RLWINM. 1 (RLWINM) ;
+: RLWINM 0 (RLWINM) ;  : RLWINM. 1 (RLWINM) ;
 
-: SLWI 0 31 pick - RLWINM ;
-: SLWI. 0 31 pick - RLWINM. ;
+: SLWI 0 31 pick - RLWINM ;  : SLWI. 0 31 pick - RLWINM. ;
 
 : LBZ d-form 34 insn ;  : LBZU d-form 35 insn ;
 : LHA d-form 42 insn ;  : LHAU d-form 43 insn ;
@@ -226,3 +191,12 @@ M: word BC >r 0 BC r> relative-14 ;
 : LOAD ( n r -- )
     #! PowerPC cannot load a 32 bit literal in one instruction.
    >r dup dup HEX: ffff bitand = [ r> LI ] [ r> LOAD32 ] ifte ;
+
+! Floating point
+: (FMR) >r 0 -rot 72 r> x-form 63 insn ;
+: FMR 0 (FMR) ;  : FMR. 1 (FMR) ;
+
+: LFS d-form 48 insn ;  : LFSU d-form 49 insn ;
+: LFD d-form 50 insn ;  : LFDU d-form 51 insn ;
+: STFS d-form 52 insn ; : STFSU d-form 53 insn ;
+: STFD d-form 54 insn ; : STFDU d-form 55 insn ;

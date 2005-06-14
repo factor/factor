@@ -13,10 +13,11 @@ prettyprint sequences stdio streams strings words ;
 ! jEdit sends a packet with code to eval, it receives the output
 ! captured with with-string.
 
-: write-packet ( string -- )
-    dup length write-be4 write flush ;
+: write-len ( seq -- ) length 4 >be write ;
 
-: read-packet ( -- string ) read-be4 read ;
+: write-packet ( string -- ) dup write-len write flush ;
+
+: read-packet ( -- string ) 4 read be> read ;
 
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return
@@ -39,13 +40,12 @@ prettyprint sequences stdio streams strings words ;
 : jedit-write-attr ( str style -- )
     CHAR: w write
     [ swap . . ] with-string
-    dup length write-be4
-    write ;
+    dup write-len write ;
 
 TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
-    [ CHAR: r write flush read-be4 read ] with-wrapper ;
+    [ CHAR: r write flush 4 read be> read ] with-wrapper ;
 
 M: jedit-stream stream-write-attr ( str style stream -- )
     [ jedit-write-attr ] with-wrapper ;

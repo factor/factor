@@ -301,18 +301,10 @@ M: hashtable ' ( hashtable -- pointer )
 ( Image output )
 
 : (write-image) ( image -- )
-    "64-bits" get [
-        "big-endian" get [
-            [ write-be8 ] each
-        ] [
-            [ write-le8 ] each
-        ] ifte
+    "64-bits" get 8 4 ? swap "big-endian" get [
+        [ swap >be write ] each-with
     ] [
-        "big-endian" get [
-            [ write-be4 ] each
-        ] [
-            [ write-le4 ] each
-        ] ifte
+        [ swap >le write ] each-with
     ] ifte ;
 
 : write-image ( image file -- )

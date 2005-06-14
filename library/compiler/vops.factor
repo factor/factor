@@ -21,6 +21,11 @@ parser sequences words ;
 ! A virtual register
 TUPLE: vreg n ;
 
+! Register classes
+TUPLE: int-regs ;
+TUPLE: float-regs ;
+TUPLE: double-regs ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 : vop-in-1 ( vop -- input ) vop-inputs first ;
@@ -47,6 +52,7 @@ M: vop calls-label? vop-label = ;
 : dest-vop ( dest) unit dup f ;
 : src/dest-vop ( src dest) >r unit r> unit f ;
 : 2-in-vop ( in1 in2) 2list f f ;
+: 3-in-vop ( in1 in2 in3) 3list f f ;
 : 2-in/label-vop ( in1 in2 label) >r 2list f r> ;
 : 2-vop ( in dest) [ 2list ] keep unit f ;
 : 3-vop ( in1 in2 dest) >r 2list r> unit f ;
@@ -334,7 +340,7 @@ C: %parameters make-vop ;
 
 TUPLE: %parameter ;
 C: %parameter make-vop ;
-: %parameter ( n -- vop ) src-vop <%parameter> ;
+: %parameter ( n reg-class -- vop ) 2-in-vop <%parameter> ;
 
 TUPLE: %cleanup ;
 C: %cleanup make-vop ;
@@ -342,32 +348,12 @@ C: %cleanup make-vop ;
 
 TUPLE: %unbox ;
 C: %unbox make-vop ;
-: %unbox ( [[ n func ]] -- vop ) src-vop <%unbox> ;
-
-TUPLE: %unbox-float ;
-C: %unbox-float make-vop ;
-: %unbox-float ( [[ n func ]] -- vop ) src-vop <%unbox-float> ;
-
-TUPLE: %unbox-double ;
-C: %unbox-double make-vop ;
-: %unbox-double ( [[ n func ]] -- vop ) src-vop <%unbox-double> ;
+: %unbox ( n func reg-class -- vop ) 3-in-vop <%unbox> ;
 
 TUPLE: %box ;
 C: %box make-vop ;
-: %box ( func -- vop ) src-vop <%box> ;
-
-TUPLE: %box-float ;
-C: %box-float make-vop ;
-: %box-float ( func -- vop ) src-vop <%box-float> ;
-
-TUPLE: %box-double ;
-C: %box-double make-vop ;
-: %box-double ( [[ n func ]] -- vop ) src-vop <%box-double> ;
+: %box ( func reg-class -- vop ) 2-in-vop <%box> ;
 
 TUPLE: %alien-invoke ;
 C: %alien-invoke make-vop ;
-: %alien-invoke ( func -- vop ) src-vop <%alien-invoke> ;
-
-TUPLE: %alien-global ;
-C: %alien-global make-vop ;
-: %alien-global ( global -- vop ) src-vop <%alien-global> ;
+: %alien-invoke ( func lib -- vop ) 2-in-vop <%alien-invoke> ;
