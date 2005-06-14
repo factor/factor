@@ -340,7 +340,7 @@ C: %parameters make-vop ;
 
 TUPLE: %parameter ;
 C: %parameter make-vop ;
-: %parameter ( n reg-class -- vop ) 2-in-vop <%parameter> ;
+: %parameter ( n reg reg-class -- vop ) 3-in-vop <%parameter> ;
 
 TUPLE: %cleanup ;
 C: %cleanup make-vop ;

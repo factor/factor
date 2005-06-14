@@ -82,11 +82,25 @@ C: alien-node make-node ;
 : stack-space ( parameters -- n )
     0 swap [ c-size cell align + ] each ;
 
-: unbox-parameter ( n parameter -- )
-    c-type [ "unboxer" get "reg-class" get ] bind %unbox , ;
+: unbox-parameter ( n parameter -- node )
+    c-type [ "unboxer" get "reg-class" get ] bind %unbox ;
 
-: load-parameter ( n parameter -- )
-    c-type "reg-class" swap hash %parameter , ;
+: unbox-parameters ( len params -- )
+    [ >r 1 - dup r> unbox-parameter ] map nip % ;
+
+: load-parameter ( n parameter -- node )
+    c-type "reg-class" swap hash
+    [ class dup get dup 1 + rot set ] keep
+    %parameter ;
+
+: load-parameters ( params -- )
+    [
+        0 int-regs set
+        0 float-regs set
+        0 double-regs set
+        reverse 0 swap
+        [ dupd load-parameter >r 1 + r> ] map nip
+    ] with-scope % ;
 
 : linearize-parameters ( parameters -- )
     #! Generate code for boxing a list of C types, then generate
@@ -94,9 +108,8 @@ C: alien-node make-node ;
     #! architectures where parameters are passed in registers
     #! (PowerPC).
     dup stack-space %parameters ,
-    [ length ] keep 2dup
-    [ >r 1 - dup r> unbox-parameter ] each drop
-    [ >r 1 - dup r> load-parameter ] each drop ;
+    [ length ] keep tuck
+    unbox-parameters load-parameters ;
 
 : linearize-return ( return -- )
     alien-node-return dup "void" = [

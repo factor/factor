@@ -3388,6 +3388,19 @@ Computes the absolute value and argument individually.
 
 \section{Algebraic and transcedential functions}\label{algebraic}
 
+There is a pair of words for computing additive and multiplicative inverses.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{neg}{neg ( x -- -x )}
+\ordinaryword{recip}{recip ( x -- -x )}
+}
+These words are defined in the obvious way:
+\begin{verbatim}
+: neg 0 swap - ;
+: recip 1 swap / ;
+\end{verbatim}
+
 The library includes the standard set of words for rounding real numbers to integers.
 
 \wordtable{
