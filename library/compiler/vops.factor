@@ -23,8 +23,7 @@ TUPLE: vreg n ;
 
 ! Register classes
 TUPLE: int-regs ;
-TUPLE: float-regs ;
-TUPLE: double-regs ;
+TUPLE: float-regs size ;
 
 ! A virtual operation
 TUPLE: vop inputs outputs label ;

@@ -22,13 +22,10 @@ GENERIC: push-reg ( reg-class -- )
 M: int-regs reg-size drop cell ;
 M: int-regs push-reg drop EAX PUSH ;
 
-M: float-regs reg-size drop 4 ;
+M: float-regs reg-size float-reg-size ;
 M: float-regs push-reg
-    ESP swap reg-size SUB  [ ESP ] FSTPS ;
-
-M: double-regs reg-size drop 8 ;
-M: double-regs push-reg
-    ESP swap reg-size SUB  [ ESP ] FSTPL ;
+    ESP swap reg-size [ SUB  [ ESP ] ] keep
+    4 = [ FSTPS ] [ FSTPL ] ifte ;
 
 M: %unbox generate-node
     dup vop-in-2 f compile-c-call  vop-in-3 push-reg ;

@@ -214,7 +214,7 @@ global [ c-types nest drop ] bind
     cell "align" set
     "box_float" "boxer" set
     "unbox_float" "unboxer" set
-    << float-regs f >> "reg-class" set
+    << float-regs f 4 >> "reg-class" set
 ] "float" define-primitive-type
 
 [
@@ -224,7 +224,7 @@ global [ c-types nest drop ] bind
     cell 2 * "align" set
     "box_double" "boxer" set
     "unbox_double" "unboxer" set
-    << double-regs f >> "reg-class" set
+    << float-regs f 8 >> "reg-class" set
 ] "double" define-primitive-type
 
 ! FIXME for 64-bit platforms

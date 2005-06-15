@@ -29,15 +29,3 @@ prettyprint sequences strings test vectors words ;
     full-gc
     full-gc
 ] unit-test
-
-! Out of memory handling
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop
-1000000 <vector> drop

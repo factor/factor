@@ -27,6 +27,13 @@ void in_if_test(float x, int y, float z)
 	printf("%f\n",z);
 }
 
+void in_id_test(double x, int y, double z)
+{
+	printf("%f\n",x);
+	printf("%d\n",y);
+	printf("%f\n",z);
+}
+
 double to_float(CELL tagged)
 {
 	F_RATIO* r;
