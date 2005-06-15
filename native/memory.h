@@ -123,10 +123,6 @@ INLINE void type_check(CELL type, CELL tagged)
 	type_error(type,tagged);
 }
 
-void allot_profile_step(CELL a);
-
-bool allot_profiling;
-
 INLINE CELL type_of(CELL tagged)
 {
 	CELL tag = TAG(tagged);
@@ -138,7 +134,6 @@ INLINE CELL type_of(CELL tagged)
 
 CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
-void primitive_allot_profiling(void);
 void primitive_room(void);
 void primitive_type(void);
 void primitive_slot(void);

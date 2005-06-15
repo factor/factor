@@ -1,39 +1,5 @@
 #include "factor.h"
 
-float f_test(void)
-{
-	return 1.0f;
-}
-
-double d_test(void)
-{
-	return 1.0;
-}
-
-float in_f_test(float x, float y, float z)
-{
-	return (x + y) * z;
-}
-
-float in_i_test(int x, int y, int z)
-{
-	return x + y + z;
-}
-
-void in_if_test(float x, int y, float z)
-{
-	printf("%f\n",x);
-	printf("%d\n",y);
-	printf("%f\n",z);
-}
-
-void in_id_test(double x, int y, double z)
-{
-	printf("%f\n",x);
-	printf("%d\n",y);
-	printf("%f\n",z);
-}
-
 double to_float(CELL tagged)
 {
 	F_RATIO* r;

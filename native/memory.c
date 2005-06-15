@@ -129,34 +129,6 @@ void primitive_set_integer_slot(void)
 	put(SLOT(obj,slot),value);
 }
 
-void allot_profile_step(CELL a)
-{
-	CELL depth = (cs - cs_bot) / CELLS;
-	int i;
-	CELL obj;
-
-	for(i = profile_depth; i < depth; i++)
-	{
-		obj = get(cs_bot + i * CELLS);
-		if(type_of(obj) == WORD_TYPE)
-			untag_word(obj)->allot_count += a;
-	}
-
-	untag_word_fast(executing)->allot_count += a;
-}
-
-void primitive_allot_profiling(void)
-{
-	CELL d = dpop();
-	if(d == F)
-		allot_profiling = false;
-	else
-	{
-		allot_profiling = true;
-		profile_depth = to_fixnum(d);
-	}
-}
-
 void primitive_address(void)
 {
 	drepl(tag_bignum(s48_ulong_to_bignum(dpeek())));

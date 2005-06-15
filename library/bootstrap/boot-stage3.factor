@@ -67,7 +67,6 @@ t [
     "/library/syntax/see.factor"
     "/library/test/test.factor"
     "/library/inference/test.factor"
-    "/library/tools/profiler.factor"
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
     "/library/bootstrap/image.factor"

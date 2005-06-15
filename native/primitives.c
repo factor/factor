@@ -82,8 +82,6 @@ void* primitives[] = {
         primitive_fsqrt,
 	primitive_word,
 	primitive_update_xt,
-	primitive_call_profiling,
-	primitive_allot_profiling,
 	primitive_word_compiledp,
 	primitive_drop,
 	primitive_dup,

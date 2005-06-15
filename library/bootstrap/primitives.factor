@@ -116,8 +116,6 @@ vocabularies get [
     [ "fsqrt" "math-internals"                [ [ real ] [ float ] ] ]
     [ "<word>" "words"                        [ [ ] [ word ] ] ]
     [ "update-xt" "words"                     [ [ word ] [ ] ] ]
-    [ "call-profiling" "profiler"             [ [ integer ] [ ] ] ]
-    [ "allot-profiling" "profiler"            [ [ integer ] [ ] ] ]
     [ "compiled?" "words"                     [ [ word ] [ boolean ] ] ]
     [ "drop" "kernel"                         [ [ object ] [ ] ] ]
     [ "dup" "kernel"                          [ [ object ] [ object object ] ] ]

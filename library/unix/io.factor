@@ -11,7 +11,7 @@ USING: namespaces ;
 
 ! This will go elsewhere soon
 : byte-bit ( n alien -- byte bit )
-    over -3 shift alien-unsigned-1 swap 7 bitand ;
+    over -5 shift alien-unsigned-4 swap 31 bitand ;
 
 : <bit-array> ( n -- array )
     cell / ceiling <byte-array> ;
@@ -24,7 +24,7 @@ USING: namespaces ;
 
 : set-bit-nth ( ? n alien -- )
     [ byte-bit set-bit ] 2keep
-    swap -3 shift set-alien-unsigned-1 ;
+    swap -5 shift set-alien-unsigned-4 ;
 
 ! Global variables
 SYMBOL: read-fdset
@@ -117,7 +117,12 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fd? ( fdset task -- ? )
     dup io-task-port timeout?
-    [ 2drop t ] [ io-task-fd swap bit-nth ] ifte ;
+    [
+        2drop t
+    ] [
+        io-task-fd swap 2dup bit-nth
+        >r f -rot set-bit-nth r>
+    ] ifte ;
 
 : handle-fdset ( fdset tasks -- )
     [

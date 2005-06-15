@@ -63,8 +63,8 @@ M: %fixnum/i generate-node ( vop -- )
     #! mdest is vreg where to put the modulus. Note this has
     #! precise vreg requirements.
     20 17 18 DIVW  ! divide in2 by in1, store result in out1
-    18 20 18 MULLW ! multiply out1 by in1, store result in in1
-    19 18 17 SUBF  ! subtract in2 from in1, store result in out1.
+    21 20 18 MULLW ! multiply out1 by in1, store result in in1
+    19 21 17 SUBF  ! subtract in2 from in1, store result in out1.
     ;
 
 M: %fixnum-mod generate-node ( vop -- )

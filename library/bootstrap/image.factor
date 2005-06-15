@@ -156,8 +156,6 @@ M: f ' ( obj -- ptr )
         dup word-primitive ,
         dup word-def ' ,
         dup word-props ' ,
-        0 ,
-        0 ,
     ] make-list
     swap object-tag here-as pool-object
     [ emit ] each ;

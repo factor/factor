@@ -97,9 +97,6 @@ INLINE void *allot_zone(ZONE *z, CELL a)
 
 INLINE void *allot(CELL a)
 {
-	if(allot_profiling)
-		allot_profile_step(align8(a));
-	allot_barrier(nursery.here);
 	return allot_zone(&nursery,a);
 }
 

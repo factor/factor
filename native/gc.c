@@ -50,7 +50,6 @@ void init_arena(CELL young_size, CELL aging_size)
 	if(alloter != heap_start + total_size)
 		fatal_error("Oops",alloter);
 
-	allot_profiling = false;
 	heap_scan = false;
 	gc_time = 0;
 	minor_collections = 0;

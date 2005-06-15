@@ -21,8 +21,6 @@ void primitive_word(void)
 	word->primitive = 0;
 	word->def = F;
 	word->props = F;
-	word->call_count = 0;
-	word->allot_count = 0;
 	dpush(tag_object(word));
 }
 

@@ -11,10 +11,6 @@ typedef struct {
 	CELL def;
 	/* TAGGED property hash for library code */
 	CELL props;
-	/* UNTAGGED call count incremented by profiler */
-	CELL call_count;
-	/* UNTAGGED amount of memory allocated in word */
-	CELL allot_count;
 } F_WORD;
 
 typedef void (*XT)(F_WORD* word);

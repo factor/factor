@@ -22,7 +22,7 @@ GENERIC: push-reg ( reg-class -- )
 M: int-regs reg-size drop cell ;
 M: int-regs push-reg drop EAX PUSH ;
 
-M: float-regs reg-size float-reg-size ;
+M: float-regs reg-size float-regs-size ;
 M: float-regs push-reg
     ESP swap reg-size [ SUB  [ ESP ] ] keep
     4 = [ FSTPS ] [ FSTPL ] ifte ;
