@@ -318,9 +318,9 @@ void primitive_gc(void)
 
 /* WARNING: only call this from a context where all local variables
 are also reachable via the GC roots. */
-void maybe_garbage_collection(void)
+void maybe_gc(CELL size)
 {
-	if(nursery.here > nursery.alarm)
+	if(nursery.here + size > nursery.alarm)
 	{
 		CELL gen = NURSERY;
 		while(gen < TENURED)
@@ -337,6 +337,6 @@ void maybe_garbage_collection(void)
 
 void primitive_gc_time(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	dpush(tag_bignum(s48_long_long_to_bignum(gc_time)));
 }

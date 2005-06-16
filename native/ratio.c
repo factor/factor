@@ -7,7 +7,7 @@ void primitive_from_fraction(void)
 	CELL numerator, denominator;
 	F_RATIO* ratio;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	denominator = dpop();
 	numerator = dpop();

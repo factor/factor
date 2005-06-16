@@ -14,6 +14,11 @@ INLINE F_ARRAY* untag_byte_array_fast(CELL tagged)
 	return (F_ARRAY*)UNTAG(tagged);
 }
 
+INLINE CELL array_size(CELL size)
+{
+	return align8(sizeof(F_ARRAY) + size * CELLS);
+}
+
 F_ARRAY* allot_array(CELL type, CELL capacity);
 F_ARRAY* array(CELL type, CELL capacity, CELL fill);
 

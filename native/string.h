@@ -24,8 +24,10 @@ INLINE CELL string_capacity(F_STRING* str)
 	return untag_fixnum_fast(str->length);
 }
 
-#define SSIZE(pointer) align8(sizeof(F_STRING) + \
-	(string_capacity((F_STRING*)(pointer)) + 1) * CHARS)
+INLINE CELL string_size(CELL size)
+{
+	return align8(sizeof(F_STRING) + (size + 1) * CHARS);
+}
 
 F_STRING* allot_string(CELL capacity);
 F_STRING* string(CELL capacity, CELL fill);

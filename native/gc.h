@@ -114,5 +114,5 @@ INLINE void* allot_object(CELL type, CELL length)
 CELL collect_next(CELL scan);
 void garbage_collection(CELL gen);
 void primitive_gc(void);
-void maybe_garbage_collection(void);
+void maybe_gc(CELL size);
 void primitive_gc_time(void);

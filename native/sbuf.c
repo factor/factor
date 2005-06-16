@@ -13,8 +13,9 @@ F_SBUF* sbuf(F_FIXNUM capacity)
 
 void primitive_sbuf(void)
 {
-	maybe_garbage_collection();
-	drepl(tag_object(sbuf(to_fixnum(dpeek()))));
+	CELL size = to_fixnum(dpeek());
+	maybe_gc(sizeof(F_SBUF) + string_size(size));
+	drepl(tag_object(sbuf(size)));
 }
 
 void primitive_sbuf_to_string(void)

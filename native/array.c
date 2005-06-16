@@ -9,7 +9,7 @@ F_ARRAY* allot_array(CELL type, CELL capacity)
 	if(capacity < 0)
 		general_error(ERROR_NEGATIVE_ARRAY_SIZE,tag_fixnum(capacity));
 
-	array = allot_object(type,sizeof(F_ARRAY) + capacity * CELLS);
+	array = allot_object(type,array_size(capacity));
 	array->capacity = tag_fixnum(capacity);
 	return array;
 }
@@ -30,20 +30,23 @@ F_ARRAY* array(CELL type, CELL capacity, CELL fill)
 
 void primitive_array(void)
 {
-	maybe_garbage_collection();
-	dpush(tag_object(array(ARRAY_TYPE,to_fixnum(dpop()),F)));
+	CELL size = to_fixnum(dpop());
+	maybe_gc(array_size(size));
+	dpush(tag_object(array(ARRAY_TYPE,size,F)));
 }
 
 void primitive_tuple(void)
 {
-	maybe_garbage_collection();
-	dpush(tag_object(array(TUPLE_TYPE,to_fixnum(dpop()),F)));
+	CELL size = to_fixnum(dpop());
+	maybe_gc(array_size(size));
+	dpush(tag_object(array(TUPLE_TYPE,size,F)));
 }
 
 void primitive_byte_array(void)
 {
-	maybe_garbage_collection();
-	dpush(tag_object(array(BYTE_ARRAY_TYPE,to_fixnum(dpop()),0)));
+	CELL size = to_fixnum(dpop());
+	maybe_gc(array_size(size));
+	dpush(tag_object(array(BYTE_ARRAY_TYPE,size,0)));
 }
 
 /* see note about fill in array() */
@@ -69,7 +72,7 @@ F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill)
 void primitive_resize_array(void)
 {
 	F_ARRAY* array; CELL capacity;
-	maybe_garbage_collection();
+	maybe_gc(0);
 	array = untag_array_fast(dpop());
 	capacity = to_fixnum(dpop());
 	dpush(tag_object(resize_array(array,capacity,F)));

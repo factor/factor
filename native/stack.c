@@ -83,13 +83,13 @@ F_VECTOR* stack_to_vector(CELL bottom, CELL top)
 
 void primitive_datastack(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	dpush(tag_object(stack_to_vector(ds_bot,ds)));
 }
 
 void primitive_callstack(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	dpush(tag_object(stack_to_vector(cs_bot,cs)));
 }
 

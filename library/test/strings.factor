@@ -90,8 +90,8 @@ unit-test
 ]
 unit-test
 
-[ "05" ] [ "5" 2 CHAR: 0 pad ] unit-test
-[ "666" ] [ "666" 2 CHAR: 0 pad ] unit-test
+[ "05" ] [ "5" 2 CHAR: 0 pad-left ] unit-test
+[ "666" ] [ "666" 2 CHAR: 0 pad-left ] unit-test
 
 [ 1 "" nth ] unit-test-fails
 [ -6 "hello" nth ] unit-test-fails

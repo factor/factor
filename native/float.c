@@ -1,13 +1,5 @@
 #include "factor.h"
 
-void foobar(int x, int y, int z, int t)
-{
-	printf("%d\n",x);
-	printf("%d\n",y);
-	printf("%d\n",z);
-	printf("%d\n",t);
-}
-
 double to_float(CELL tagged)
 {
 	F_RATIO* r;
@@ -35,7 +27,7 @@ double to_float(CELL tagged)
 
 void primitive_to_float(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(to_float(dpeek())));
 }
 
@@ -45,7 +37,7 @@ void primitive_str_to_float(void)
 	char *c_str, *end;
 	double f;
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 
 	str = untag_string(dpeek());
 	c_str = to_c_string(str);
@@ -60,7 +52,7 @@ void primitive_float_to_str(void)
 {
 	char tmp[33];
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 
 	snprintf(tmp,32,"%.16g",to_float(dpop()));
 	tmp[32] = '\0';
@@ -69,7 +61,7 @@ void primitive_float_to_str(void)
 
 #define GC_AND_POP_FLOATS(x,y) \
 	double x, y; \
-	maybe_garbage_collection(); \
+	maybe_gc(sizeof(F_FLOAT)); \
 	y = untag_float_fast(dpop()); \
 	x = untag_float_fast(dpop());
 
@@ -129,26 +121,26 @@ void primitive_float_greatereq(void)
 
 void primitive_facos(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(acos(to_float(dpeek()))));
 }
 
 void primitive_fasin(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(asin(to_float(dpeek()))));
 }
 
 void primitive_fatan(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(atan(to_float(dpeek()))));
 }
 
 void primitive_fatan2(void)
 {
 	double x, y;
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	y = to_float(dpop());
 	x = to_float(dpop());
 	dpush(tag_float(atan2(x,y)));
@@ -156,32 +148,32 @@ void primitive_fatan2(void)
 
 void primitive_fcos(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(cos(to_float(dpeek()))));
 }
 
 void primitive_fexp(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(exp(to_float(dpeek()))));
 }
 
 void primitive_fcosh(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(cosh(to_float(dpeek()))));
 }
 
 void primitive_flog(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(log(to_float(dpeek()))));
 }
 
 void primitive_fpow(void)
 {
 	double x, y;
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	y = to_float(dpop());
 	x = to_float(dpop());
 	dpush(tag_float(pow(x,y)));
@@ -189,19 +181,19 @@ void primitive_fpow(void)
 
 void primitive_fsin(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(sin(to_float(dpeek()))));
 }
 
 void primitive_fsinh(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(sinh(to_float(dpeek()))));
 }
 
 void primitive_fsqrt(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_FLOAT));
 	drepl(tag_float(sqrt(to_float(dpeek()))));
 }
 

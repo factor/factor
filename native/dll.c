@@ -5,7 +5,7 @@ void primitive_dlopen(void)
 	DLL* dll;
 	F_STRING* path;
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(DLL));
 
 	path = untag_string(dpop());
 	dll = allot_object(DLL_TYPE,sizeof(DLL));
@@ -20,7 +20,7 @@ void primitive_dlsym(void)
 	CELL dll;
 	F_STRING* sym;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	dll = dpop();
 	sym = untag_string(dpop());
@@ -32,7 +32,6 @@ void primitive_dlsym(void)
 
 void primitive_dlclose(void)
 {
-	maybe_garbage_collection();
 	ffi_dlclose(untag_dll(dpop()));
 }
 

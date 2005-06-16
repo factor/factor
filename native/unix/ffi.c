@@ -35,7 +35,7 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol)
 
 void ffi_dlclose(DLL *dll)
 {
-	if(dlclose(dll->dll) != NULL)
+	if(dlclose(dll->dll))
 	{
 		general_error(ERROR_FFI,tag_object(
 			from_c_string(dlerror())));

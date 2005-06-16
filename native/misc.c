@@ -9,7 +9,7 @@ void primitive_os_env(void)
 {
 	char *name, *value;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	name = unbox_c_string();
 	value = getenv(name);
@@ -43,13 +43,13 @@ s64 current_millis(void)
 
 void primitive_millis(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
 void primitive_random_int(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	dpush(tag_bignum(s48_long_to_bignum(rand())));
 }
 

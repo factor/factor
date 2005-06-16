@@ -140,7 +140,7 @@ INLINE CELL relocate_code_next(CELL relocating)
 			original = get(rel->offset);
 
 		/* to_c_string can fill up the heap */
-		maybe_garbage_collection();
+		maybe_gc(0);
 		new_value = compute_code_rel(rel,original);
 
 		if(REL_RELATIVE(rel))

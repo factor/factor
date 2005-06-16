@@ -34,7 +34,7 @@ void primitive_fopen(void)
 {
 	char *path, *mode;
 	FILE* file;
-	maybe_garbage_collection();
+	maybe_gc(0);
 	mode = unbox_c_string();
 	path = unbox_c_string();
 	file = fopen(path,mode);
@@ -50,7 +50,7 @@ void primitive_fgets(void)
 	FILE* file;
 	char line[FACTOR_LINE_LEN];
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	file = (FILE*)unbox_alien();
 	if(fgets(line,FACTOR_LINE_LEN,file) == NULL) 
@@ -68,7 +68,7 @@ void primitive_fwrite(void)
 {
 	FILE* file;
 	F_STRING* text;
-	maybe_garbage_collection();
+	maybe_gc(0);
 	file = (FILE*)unbox_alien();
 	text = untag_string(dpop());
 	if(fwrite(to_c_string_unchecked(text),1,

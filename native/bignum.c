@@ -43,13 +43,13 @@ F_ARRAY* to_bignum(CELL tagged)
 
 void primitive_to_bignum(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	drepl(tag_bignum(to_bignum(dpeek())));
 }
 
 #define GC_AND_POP_BIGNUMS(x,y) \
 	F_ARRAY *x, *y; \
-	maybe_garbage_collection(); \
+	maybe_gc(0); \
 	y = untag_bignum_fast(dpop()); \
 	x = untag_bignum_fast(dpop());
 
@@ -128,7 +128,7 @@ void primitive_bignum_shift(void)
 {
 	F_FIXNUM y;
         F_ARRAY* x;
-	maybe_garbage_collection();
+	maybe_gc(0);
 	y = to_fixnum(dpop());
 	x = to_bignum(dpop());
 	dpush(tag_bignum(s48_bignum_arithmetic_shift(x,y)));
@@ -184,7 +184,7 @@ void primitive_bignum_greatereq(void)
 
 void primitive_bignum_not(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	drepl(tag_bignum(s48_bignum_bitwise_not(
 		untag_bignum_fast(dpeek()))));
 }

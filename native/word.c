@@ -13,7 +13,7 @@ void primitive_word(void)
 {
 	F_WORD* word;
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_WORD));
 
 	word = allot_object(WORD_TYPE,sizeof(F_WORD));
 	word->hashcode = tag_fixnum((CELL)word); /* initial address */

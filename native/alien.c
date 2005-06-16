@@ -52,7 +52,7 @@ void box_alien(void* ptr)
 void primitive_alien(void)
 {
 	void* ptr = (void*)unbox_signed_cell();
-	maybe_garbage_collection();
+	maybe_gc(sizeof(ALIEN));
 	box_alien(ptr);
 }
 
@@ -61,7 +61,7 @@ void primitive_displaced_alien(void)
 	CELL alien;
 	CELL displacement;
 	DISPLACED_ALIEN* d;
-	maybe_garbage_collection();
+	maybe_gc(sizeof(DISPLACED_ALIEN));
 	alien = dpop();
 	displacement = unbox_unsigned_cell();
 	d = allot_object(DISPLACED_ALIEN_TYPE,sizeof(DISPLACED_ALIEN));

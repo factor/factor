@@ -5,7 +5,7 @@ void primitive_stat(void)
 	struct stat sb;
 	F_STRING* path;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	path = untag_string(dpop());
 	if(stat(to_c_string(path),&sb) < 0)
@@ -33,7 +33,7 @@ void primitive_read_dir(void)
 	DIR* dir;
 	CELL result = F;
 
-	maybe_garbage_collection();
+	maybe_gc(0);
 
 	path = untag_string(dpop());
 	dir = opendir(to_c_string(path));
@@ -57,7 +57,7 @@ void primitive_read_dir(void)
 void primitive_cwd(void)
 {
 	char wd[MAXPATHLEN];
-	maybe_garbage_collection();
+	maybe_gc(0);
 	if(getcwd(wd,MAXPATHLEN) == NULL)
 		io_error();
 	box_c_string(wd);
@@ -65,7 +65,7 @@ void primitive_cwd(void)
 
 void primitive_cd(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	chdir(unbox_c_string());
 }
 

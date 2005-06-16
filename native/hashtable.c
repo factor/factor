@@ -13,7 +13,7 @@ F_HASHTABLE* hashtable(F_FIXNUM capacity)
 
 void primitive_hashtable(void)
 {
-	maybe_garbage_collection();
+	maybe_gc(0);
 	drepl(tag_object(hashtable(to_fixnum(dpeek()))));
 }
 

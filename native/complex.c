@@ -5,7 +5,7 @@ void primitive_from_rect(void)
 	CELL real, imaginary;
 	F_CONS* complex;
 
-	maybe_garbage_collection();
+	maybe_gc(sizeof(F_CONS));
 
 	imaginary = dpop();
 	real = dpop();
