@@ -19,7 +19,7 @@ stdio streams strings unparser ;
             dup url-quotable? [
                 ,
             ] [
-                CHAR: % , >hex 2 CHAR: 0 pad %
+                CHAR: % , >hex 2 CHAR: 0 pad-left %
             ] ifte
         ] each
     ] make-string ;

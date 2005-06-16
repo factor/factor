@@ -46,17 +46,19 @@ SYMBOL: meta-executing
 : next ( -- obj )
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
 
+: meta-interp ( -- interp )
+    meta-d get meta-r get meta-n get meta-c get <interp> ;
+
+: set-meta-interp ( interp -- )
+    >interp< meta-c set meta-n set meta-r set meta-d set ;
+
 : host-word ( word -- )
-    #! Swap in the meta-interpreter's stacks, execute the word,
-    #! swap in the old stacks. This is so messy.
-    push-d datastack push-d
-    meta-d get set-datastack
-    catchstack >r meta-c set-catchstack
-    namestack >r meta-n set-namestack
-    >r execute datastack r> tuck push
-    r> set-namestack
-    r> set-catchstack
-    set-datastack meta-d set ;
+    [
+        \ call push-r  interp [
+            interp over interp-data push
+            set-interp
+        ] cons cons push-r  meta-interp set-interp
+    ] call  set-meta-interp  pop-d 2drop ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.

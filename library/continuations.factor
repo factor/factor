@@ -2,37 +2,30 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel USING: errors lists namespaces sequences ;
 
-: reify ( quot -- )
-    >r datastack >pop> callstack >pop> namestack catchstack
-    r> call ;
+TUPLE: interp data call name catch ;
 
-: (callcc) cons cons cons cons swap call ;
+: interp ( -- interp )
+    datastack callstack >pop> >pop>
+    namestack catchstack <interp> ;
 
-: continue0 ( ds rs ns cs -- )
-    set-catchstack set-namestack
+: >interp< ( interp -- data call name catch )
+    [ interp-data ] keep
+    [ interp-call ] keep
+    [ interp-name ] keep
+    interp-catch ;
+
+: set-interp ( interp -- )
+    >interp< set-catchstack set-namestack
     >r set-datastack r> set-callstack ;
 
-: callcc0 ( code -- )
-    #! Calls the code with a special quotation at the top of the
-    #! stack. The quotation has stack effect:
-    #!
-    #! ( -- ... )
-    #!
-    #! When called, the quotation restores execution state to
-    #! the point after the callcc0 call.
-    [ [ continue0 ] (callcc) ] reify ;
+: continuation ( interp -- )
+    interp dup interp-call >pop> >pop> drop
+    dup interp-data >pop> drop ;
 
-: continue1 ( obj ds rs ns cs -- obj )
-    set-catchstack set-namestack
-    rot >r >r set-datastack r> r> swap set-callstack ;
+: callcc0 ( quot ++ | quot: cont -- | cont: ++ )
+    continuation
+    [ set-interp ] cons swap call ;
 
-: callcc1 ( code -- )
-    #! Calls the code with a special quotation at the top of the
-    #! stack. The quotation has stack effect:
-    #!
-    #! ( X -- ... )
-    #!
-    #! When called, the quotation restores execution state to
-    #! the point after the callcc1 call, and places X at the top
-    #! of the original datastack.
-    [ [ continue1 ] (callcc) ] reify ;
+: callcc1 ( quot ++ obj | quot: cont -- | cont: obj ++ obj )
+    continuation
+    [ [ interp-data push ] keep set-interp ] cons swap call ;

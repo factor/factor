@@ -23,7 +23,7 @@ stdio streams strings unparser http ;
     ] make-string ;
 
 : >hex-color ( triplet -- hex )
-    [ CHAR: # , [ >hex 2 CHAR: 0 pad % ] each ] make-string ;
+    [ CHAR: # , [ >hex 2 CHAR: 0 pad-left % ] each ] make-string ;
 
 : fg-css, ( color -- )
     "color: " , >hex-color , "; " , ;

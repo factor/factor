@@ -91,10 +91,21 @@ C: alien-node make-node ;
     [ stack-space ] keep
     [ [ c-aligned - dup ] keep unbox-parameter ] map nip % ;
 
+: incr-param ( reg-class -- )
+    #! OS X is so ugly.
+    dup class [ 1 + ] change  dup float-regs? [
+        os "macosx" = [
+            int-regs [ swap float-regs-size 4 / + ] change
+        ] [
+            drop
+        ] ifte
+    ] [
+        drop
+    ] ifte ;
+
 : load-parameter ( n parameter -- node )
     c-type "reg-class" swap hash
-    [ class dup get dup 1 + rot set ] keep
-    %parameter ;
+    [ [ class get ] keep  incr-param ] keep  %parameter ;
 
 : load-parameters ( params -- )
     [

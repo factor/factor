@@ -121,7 +121,7 @@ UNION: arrayed array tuple ;
     #! Turn a hash  table that maps values to quotations into a
     #! quotation that executes a quotation depending on the
     #! value on the stack.
-    dup hash-size 4 <= [
+    ( dup hash-size 4 <= ) t [
         hash>alist alist>quot
     ] [
         (hash>quot)

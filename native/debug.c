@@ -223,7 +223,6 @@ void factorbug(void)
 	fcntl(1,F_SETFL,0);
 #endif
 
-	fprintf(stderr,"Factor low-level debugger\n");
 	fprintf(stderr,"d <addr> <count> -- dump memory\n");
 	fprintf(stderr,". <addr>         -- print object at <addr>\n");
 	fprintf(stderr,"sz <addr>        -- print size of object at <addr>\n");
@@ -243,7 +242,7 @@ void factorbug(void)
 	{
 		char cmd[1024];
 
-		fprintf(stderr,"ldb ");
+		fprintf(stderr,"fep ");
 		fflush(stdout);
 
 		if(scanf("%s",cmd) <= 0)

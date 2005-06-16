@@ -76,7 +76,11 @@ M: object (apply-word) ( word -- )
     no-effect ;
 
 M: primitive (apply-word) ( word -- )
-    dup "infer-effect" word-prop consume/produce ;
+    dup "infer-effect" word-prop [
+        consume/produce
+    ] [
+        no-effect
+    ] ifte ;
 
 M: compound (apply-word) ( word -- )
     #! Infer a compound word's stack effect.

@@ -75,7 +75,7 @@
 + sequences
 
 - generic skip
-- dipping seq-2nmap, seq-2each
+- dipping 2nmap, 2each
 - array sort
 - 2map slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length

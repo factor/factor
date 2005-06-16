@@ -1,5 +1,13 @@
 #include "factor.h"
 
+void foobar(int x, int y, int z, int t)
+{
+	printf("%d\n",x);
+	printf("%d\n",y);
+	printf("%d\n",z);
+	printf("%d\n",t);
+}
+
 double to_float(CELL tagged)
 {
 	F_RATIO* r;

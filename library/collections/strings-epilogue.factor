@@ -9,12 +9,14 @@ sequences strings ;
 
 : fill ( count char -- string ) <repeated> >string ;
 
-: pad ( string count char -- string )
-    >r over length - dup 0 <= [
-        r> 2drop
-    ] [
-        r> fill swap append
-    ] ifte ;
+: padding ( string count char -- string )
+    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] ifte ;
+
+: pad-left ( string count char -- string )
+    pick >r padding r> append ;
+
+: pad-right ( string count char -- string )
+    pick >r padding r> swap append ;
 
 : ch>string ( ch -- str ) 1 <sbuf> [ push ] keep (sbuf>string) ;
 

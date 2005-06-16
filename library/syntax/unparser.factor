@@ -80,7 +80,7 @@ M: complex unparse ( num -- str )
     ] assoc ;
 
 : ch>unicode-escape ( ch -- esc )
-    >hex 4 CHAR: 0 pad "\\u" swap append ;
+    >hex 4 CHAR: 0 pad-left "\\u" swap append ;
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [

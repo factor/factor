@@ -64,6 +64,10 @@ USE: sequences
     [ 2 2 + ] test-interpreter
 ] unit-test
 
+[ { } ] [
+    [ 3 "x" set ] test-interpreter
+] unit-test
+
 [ { 3 } ] [
     [ 3 "x" set "x" get ] test-interpreter
 ] unit-test

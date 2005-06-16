@@ -5344,7 +5344,7 @@ M: list prettyprint*
     ] check-recursion ;}
 \end{alltt}
 
-\chapter{Dealing with runtime errors}
+\chapter{Debugging and optimizing}
 
 \section{Looking at stacks}
 
@@ -5455,9 +5455,6 @@ You can undo the effect of \texttt{break} or \texttt{watch} by reloading the ori
 
 If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \texttt{Control-\bs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
 
-
-\chapter{Defensive coding}
-
 \section{Unit testing}
 
 Unit tests are very easy to write. They are usually placed in source files. A unit test can be executed with the \texttt{unit-test} word in the \texttt{test} vocabulary. This word takes a list and a quotation; the quotation is executed, and the resulting data stack is compared against the list. If they do not equal, the unit test has failed. Here is an example of a unit test:
@@ -5477,12 +5474,6 @@ To have a unit test assert that a piece of code does not execute successfully, b
 \end{verbatim}
 
 Unit testing is a good habit to get into. Sometimes, writing tests first, before any code, can speed the development process too; by running your unit test script, you can gauge progress.
-
-\chapter{Optimization}
-
-While both the Factor interpreter and compiler are relatively slow at this stage, there
-are still ways you can make your Factor code go faster. The key is to find bottlenecks,
-and optimize them.
 
 \section{Timing code}
 
@@ -5536,76 +5527,6 @@ port: 112 bytes, 2 instances
 word: 96960 bytes, 3030 instances
 tuple: 688 bytes, 22 instances}
 \end{alltt}
-
-\section{The profiler}
-
-Factor provides a statistical sampling profiler for narrowing down memory and processor bottlenecks.
-The profiler is only supported on Unix platforms. On FreeBSD 4.x, the Factor runtime must
-be compiled without the \texttt{-pthread} switch, since FreeBS 4.x userspace threading makes
-use of a signal that conflicts with the signal used for profiling.
-
-The \texttt{allot-profile} word executes a quotation with the memory profiler enabled, then prints a list of all words that allocated memory, along with the bytes allocated. Note that during particularly long executions, or executions where a lot of memory is allocated, these counters may overrun.
-
-\begin{alltt}
-\textbf{ok} [ "boot.image.le32" make-image ] allot-profile
-\emph{... many lines omitted ...}
-\textbf{[[ write-little-endian-32 673952 ]]
-[[ wait-to-read-line 788640 ]]
-[[ blocking-read-line 821264 ]]
-[[ vocabularies 822624 ]]
-[[ parse-resource 823376 ]]
-[[ next-line 1116440 ]]
-[[ vector-map 1326504 ]]
-[[ fixup-words 1326520 ]]
-[[ vector-each 1768640 ]]
-[[ (parse) 2434208 ]]
-[[ classes 2517920 ]]
-[[ when* 2939088 ]]
-[[ while 3614408 ]]
-[[ (parse-stream) 3634552 ]]
-[[ make-list 3862000 ]]
-[[ object 4143784 ]]
-[[ each 4712080 ]]
-[[ run-resource 5036904 ]]
-[[ (callcc) 5183400 ]]
-[[ catch 5188976 ]]
-[[ 2slip 8631736 ]]
-[[ end 202896600 ]]
-[[ make-image 208611888 ]]
-[[ with-scope 437823992 ]]}
-\end{alltt}
-
-The \texttt{call-profile} word executes a quotation with the CPU profiler enabled, then prints a list of all words that were found on the return stack, along with the number of times they were seen there. This gives a rough idea of what words are taking up the majority of execution time.
-
-\begin{alltt}
-\textbf{ok} [ "boot.image.le32" make-image ] call-profile
-\emph{... many lines omitted ...}
-\textbf{[[ stream-write 7 ]]
-[[ wait-to-write 7 ]]
-[[ vector-map 11 ]]
-[[ fixup-words 11 ]]
-[[ when* 12 ]]
-[[ write 16 ]]
-[[ write-word 17 ]]
-[[ parse-loop 22 ]]
-[[ make-list 24 ]]
-[[ (parse) 29 ]]
-[[ blocking-write 32 ]]
-[[ while 35 ]]
-[[ (parse-stream) 36 ]]
-[[ dispatch 47 ]]
-[[ run-resource 50 ]]
-[[ write-little-endian-32 76 ]]
-[[ (callcc) 173 ]]
-[[ catch 174 ]]
-[[ each 175 ]]
-[[ 2slip 199 ]]
-[[ end 747 ]]
-[[ make-image 785 ]]
-[[ with-scope 1848 ]]}
-\end{alltt}
-
-Normally, the memory and CPU profilers run every millisecond, and increment counters for all words on the return stack. The \texttt{only-top} variable can be switched on, in which case only the counter for the word at the top of the return stack is incremented. This gives a more localized picture of CPU and memory usage.
 
 \chapter{Stack effect inference}
 

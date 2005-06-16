@@ -15,7 +15,7 @@ vectors words ;
 
 ! Printing an overview of heap usage.
 
-: kb. 1024 /i unparse 6 CHAR: \s pad  write " KB" write ;
+: kb. 1024 /i unparse 6 CHAR: \s pad-left  write " KB" write ;
 
 : (room.) ( free total -- )
     2dup swap - swap ( free used total )

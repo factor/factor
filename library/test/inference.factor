@@ -215,6 +215,8 @@ M: real iterate drop ;
 [ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
 [ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
 
+[ [ callstack ] infer ] unit-test-fails
+
 : no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
 
 [ [ no-base-case ] infer ] unit-test-fails
