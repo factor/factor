@@ -66,11 +66,11 @@ F_STRING* resize_string(F_STRING* string, F_FIXNUM capacity, u16 fill)
 
 void primitive_resize_string(void)
 {
-	F_STRING* string; CELL capacity;
-	maybe_gc(0);
+	F_STRING* string;
+	CELL capacity = to_fixnum(dpeek2());
+	maybe_gc(string_size(capacity));
 	string = untag_string_fast(dpop());
-	capacity = to_fixnum(dpop());
-	dpush(tag_object(resize_string(string,capacity,F)));
+	drepl(tag_object(resize_string(string,capacity,F)));
 }
 
 F_STRING *memory_to_string(const BYTE* string, CELL length)

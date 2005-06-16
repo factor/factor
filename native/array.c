@@ -71,11 +71,11 @@ F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill)
 
 void primitive_resize_array(void)
 {
-	F_ARRAY* array; CELL capacity;
-	maybe_gc(0);
+	F_ARRAY* array;
+	CELL capacity = to_fixnum(dpeek2());
+	maybe_gc(array_size(capacity));
 	array = untag_array_fast(dpop());
-	capacity = to_fixnum(dpop());
-	dpush(tag_object(resize_array(array,capacity,F)));
+	drepl(tag_object(resize_array(array,capacity,F)));
 }
 
 void fixup_array(F_ARRAY* array)
