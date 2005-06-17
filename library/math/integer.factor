@@ -25,6 +25,11 @@ UNION: integer fixnum bignum ;
     #! Compute the multiplicative inverse of x mod n.
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
 
+: bitroll ( n s w -- n )
+    #! Roll n by s bits to the right, wrapping around after
+    #! w bits.
+    [ mod shift ] 3keep over 0 >= [ - ] [ + ] ifte shift bitor ;
+
 IN: math-internals
 
 : fraction> ( a b -- a/b )

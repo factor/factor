@@ -1,3 +1,16 @@
+Factor 0.76:
+------------
+
++ Framework
+
+- md5 hashing algorithm in contrib/crypto/ (Doug Coleman).
+
+- New words:
+
+  math bitroll ( n s w -- n )
+  unparser hex-string ( str -- str )
+  sequences fourth ( seq -- elt )
+
 Factor 0.75:
 ------------
 

@@ -16,20 +16,6 @@ SYMBOL: old-d
 : nth-int ( string n -- int )
     4 * dup 4 + rot subseq le> ;
 
-: rotate ( integer shift -- integer )
-    32 mod [ shift ] 2keep dup 0 >= [
-        32 -
-    ] [
-        32 +
-    ] ifte shift bitor ;
-
-: hexstring ( str -- str )
-    [
-        [
-            dup -4 shift >hex % HEX: f bitand >hex %
-        ] each
-    ] make-string ;
-
 : initialize ( -- )
     HEX: 67452301 dup a set old-a set
     HEX: efcdab89 dup b set old-b set
@@ -55,12 +41,12 @@ SYMBOL: old-d
 ! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
 
 : (F) ( vars func -- vars result )
-    >r dup second get over third get pick 3 swap nth get r> call ; inline
+    >r dup second get over third get pick fourth get r> call ; inline
 
 ! # bits to shift, input to float-sin, x, func
 : (ABCD) ( s i x vars func -- )
     (F) swap >r w+ swap float-sin w+ r> dup first >r swap r> update
-    dup first get rot rotate
+    dup first get rot 32 bitroll
     over second get w+ swap first set ; inline
 
 : ABCD [ a b c d ] swap (ABCD) ; inline
@@ -194,7 +180,7 @@ SYMBOL: old-d
 : get-md5 ( -- str )
     [
         [ a b c d ] [ get 4 >le % ] each
-    ] make-string hexstring ;
+    ] make-string hex-string ;
 
 : string>md5 ( string -- md5 )
     [
