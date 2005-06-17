@@ -1,3 +1,7 @@
++ bugs to fix soon
+
+<erg> if write returns -1  and errno == EINTR then it's not a real error, you can try again
+
 <magnus--> http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
 <magnus--> not *too* long
@@ -7,7 +11,6 @@
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
 - there is a problem with hashcodes of words and bootstrapping
-<erg> if write returns -1  and errno == EINTR then it's not a real error, you can try again
 - http keep alive, and range get
 - sleep word
 - fix i/o on generic x86/ppc unix
