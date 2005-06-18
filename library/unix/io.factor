@@ -75,8 +75,12 @@ M: port set-timeout ( timeout port -- )
 
 : pending-error ( reader -- ) port-error throw ;
 
-: postpone-error ( reader -- )
-    err_no strerror swap set-port-error ;
+: EAGAIN 35 ;
+: EINTR 4 ;
+
+: postpone-error ( port -- )
+    err_no dup EAGAIN = over EINTR = or
+    [ 2drop ] [ strerror swap set-port-error ] ifte ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -116,13 +120,14 @@ GENERIC: task-container ( task -- vector )
     port-cutoff dup 0 = not swap millis < and ;
 
 : handle-fd? ( fdset task -- ? )
-    dup io-task-port timeout?
-    [
+    dup io-task-port timeout? [
         2drop t
     ] [
         io-task-fd swap 2dup bit-nth
         >r f -rot set-bit-nth r>
     ] ifte ;
+
+: debug-out 14 getenv fwrite ;
 
 : handle-fdset ( fdset tasks -- )
     [
@@ -212,10 +217,12 @@ C: reader ( handle -- reader )
         drop
     ] ifte  t swap set-reader-ready? ;
 
+: (refill) ( port -- n )
+    >port< tuck dup buffer-end swap buffer-capacity read ;
+
 : refill ( port -- )
     dup buffer-length 0 = [
-        >port<
-        tuck dup buffer-end swap buffer-capacity read
+        (refill)
         dup 0 >= [ swap n>buffer ] [ drop postpone-error ] ifte
     ] [
         drop

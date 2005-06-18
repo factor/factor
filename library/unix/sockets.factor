@@ -49,12 +49,44 @@ USING: alien generic kernel math unix-internals ;
         dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] ifte
     ] with-socket-fd ;
 
+IN: streams
+
+C: client-stream ( host port fd -- stream )
+    [ >r <socket-stream> r> set-delegate ] keep
+    [ set-client-stream-port ] keep
+    [ set-client-stream-host ] keep ;
+
+: <client> ( host port -- stream )
+    #! Connect to a port number on a TCP/IP host.
+    client-socket <socket-stream> ;
+
+TUPLE: server client ;
+
+C: server ( port -- server )
+    #! Starts listening for TCP connections on localhost:port.
+    [ >r server-socket 0 <port> r> set-delegate ] keep ;
+
+IN: io-internals
+USE: unix-internals
+
 TUPLE: accept-task ;
 
 C: accept-task ( port -- task )
     [ >r <io-task> r> set-delegate ] keep ;
 
-M: accept-task do-io-task ( task -- ? ) drop t ;
+: init-socket ( fd -- ) SOL_SOCKET SO_OOBINLINE sockopt ;
+
+: do-accept ( port sockaddr fd -- )
+    [
+        init-socket
+        dup sockaddr-in-addr inet-ntoa
+        swap sockaddr-in-port ntohs
+    ] keep <client-stream> swap set-server-client ;
+
+M: accept-task do-io-task ( task -- ? )
+    io-task-port <sockaddr-in>
+    over port-handle over "sockaddr-in" c-size <int> accept
+    dup 0 >= [ do-accept t ] [ 2drop postpone-error f ] ifte ;
 
 M: accept-task task-container drop read-tasks get ;
 
@@ -69,12 +101,6 @@ M: accept-task task-container drop read-tasks get ;
                       HEX: ff bitand unparse %
     ] make-string ;
 
-: do-accept ( fd -- fd host port )
-    <sockaddr-in>
-    [ "sockaddr-in" c-size <int> accept dup io-error ] keep
-    dup sockaddr-in-addr inet-ntoa
-    swap sockaddr-in-port ntohs ;
-
 : <socket-stream> ( fd -- stream )
     dup f <fd-stream> ;
 
@@ -83,23 +109,6 @@ M: accept-task task-container drop read-tasks get ;
 
 IN: streams
 
-C: client-stream ( fd host port -- stream )
-    [ set-client-stream-port ] keep
-    [ set-client-stream-host ] keep
-    [
-        >r
-        dup SOL_SOCKET SO_OOBINLINE sockopt
-        <socket-stream> r> set-delegate
-    ] keep ;
-
-: <client> ( host port -- stream )
-    #! Connect to a port number on a TCP/IP host.
-    client-socket <socket-stream> ;
-
-: <server> ( port -- server )
-    #! Starts listening for TCP connections on localhost:port.
-    server-socket 0 <port> ;
-
 : accept ( server -- client )
     #! Wait for a client connection.
-    dup wait-to-accept port-handle do-accept <client-stream> ;
+    dup wait-to-accept server-client ;
