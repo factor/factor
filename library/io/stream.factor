@@ -64,12 +64,3 @@ C: wrapper-stream ( stream -- stream )
     #! For each element of the alist, change the value to
     #! path " " value
     [ uncons >r swap " " r> append3 cons ] map-with ;
-
-DEFER: <file-reader>
-
-: resource-path ( -- path )
-    "resource-path" get [ "." ] unless* ;
-
-: <resource-stream> ( path -- stream )
-    #! Open a file path relative to the Factor source code root.
-    resource-path swap path+ <file-reader> ;

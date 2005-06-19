@@ -9,10 +9,10 @@ io strings unparser ;
 
 : infer-fail ( quot error -- )
     "! " , dup string? [ unparse ] unless , "\n" ,
-    [ [ infer ] cons . \ unit-test-fails . ] with-string , ;
+    [ [ infer ] cons . \ unit-test-fails . ] string-out , ;
 
 : infer-pass ( quot effect -- )
-    [ unit . [ infer ] cons . \ unit-test . ] with-string , ;
+    [ unit . [ infer ] cons . \ unit-test . ] string-out , ;
 
 : infer>test ( quot -- str )
     #! Make a string representing a unit test for the stack

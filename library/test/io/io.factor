@@ -1,5 +1,5 @@
 IN: temporary
-USING: math parser io strings test ;
+USING: io kernel math parser strings test ;
 
 [ 4 ] [ "/library/test/io/no-trailing-eol.factor" run-resource ] unit-test
 
@@ -49,3 +49,14 @@ USING: math parser io strings test ;
 [ "" ] [ 0 read ] unit-test
 
 [ ] [ "123" write 9000 CHAR: x fill write flush ] unit-test
+
+[ "line 1" CHAR: l ]
+[
+    "line 1\nline 2\nline 3" <string-reader>
+    dup stream-readln swap stream-read1
+]
+unit-test
+
+[ f ]
+[ "" <string-reader> stream-readln ]
+unit-test

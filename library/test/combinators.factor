@@ -27,8 +27,8 @@ USE: namespaces
 [ 0 ] [ f [ 0 ] unless* ] unit-test
 [ t ] [ t [ "Hello" ] unless* ] unit-test
 
-[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] with-string ] unit-test
-[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] with-string ] unit-test
+[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] string-out ] unit-test
+[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] string-out ] unit-test
 
 [ [ 9 8 7 6 5 4 3 2 1 ] ]
 [ [ 10 [ , ] [ 1 - dup dup 0 = [ drop f ] when ] while ] make-list nip ]

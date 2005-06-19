@@ -6,4 +6,4 @@ IN: parser USING: kernel errors io ;
     [ eval ] [ [ print-error debug-help drop ] when* ] catch ;
 
 : eval>string ( in -- out )
-    [ eval-catch ] with-string ;
+    [ eval-catch ] string-out ;

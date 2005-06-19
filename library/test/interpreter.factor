@@ -77,17 +77,17 @@ USE: sequences
 ] unit-test
 
 [ { "hi\n" } ] [
-    [ [ "hi" print ] with-string ] test-interpreter
+    [ [ "hi" print ] string-out ] test-interpreter
 ] unit-test
 
 [ { "4\n" } ] [
-    [ [ 2 2 + unparse print ] with-string ] test-interpreter
+    [ [ 2 2 + unparse print ] string-out ] test-interpreter
 ] unit-test
 
 [ { "4" } ] [
-    [ [ 0 2 2 + prettyprint* drop ] with-string ] test-interpreter
+    [ [ 0 2 2 + prettyprint* drop ] string-out ] test-interpreter
 ] unit-test
 
 [ { "4\n" } ] [
-    [ [ 2 2 + . ] with-string ] test-interpreter
+    [ [ 2 2 + . ] string-out ] test-interpreter
 ] unit-test

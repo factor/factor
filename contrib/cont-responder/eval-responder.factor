@@ -89,7 +89,7 @@ USE: sequences
   #! Write out html to display the stack.
   <table border= "1" table> 
     <tr> <th> "Callstack" write </th> </tr>
-    [ <tr> <td> [ unparse write ] with-string write-eval-link </td> </tr> ] each
+    [ <tr> <td> [ unparse write ] string-out write-eval-link </td> </tr> ] each
   </table> ;
 
 : display-clear-history-link ( -- )

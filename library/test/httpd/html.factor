@@ -24,14 +24,14 @@ USE: kernel
         ""
         [ [[ "icon" "library/icons/File.png" ]] ]
         [ drop ] icon-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
 [ "" ]
 [
     [
         [ ] [ drop ] span-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
@@ -40,7 +40,7 @@ USE: kernel
         [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
         [ drop "car" write ]
         span-tag
-    ] with-string
+    ] string-out
 ] unit-test
 
 : html-write-attr ( string style -- string )
@@ -48,7 +48,7 @@ USE: kernel
 
 [ "hello world" ]
 [
-    [ "hello world" [ ] html-write-attr ] with-string
+    [ "hello world" [ ] html-write-attr ] string-out
 ] unit-test
 
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
@@ -57,7 +57,7 @@ USE: kernel
         "car"
         [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
         html-write-attr
-    ] with-string
+    ] string-out
 ] unit-test
 
 [
@@ -65,7 +65,7 @@ USE: kernel
 ] [
     [
         "Foo" [ ] html-document
-    ] with-string
+    ] string-out
 ] unit-test
 
 [
@@ -73,5 +73,5 @@ USE: kernel
 ] [
     [
         "Foo" [ "Hi" write ] simple-html-document
-    ] with-string
+    ] string-out
 ] unit-test

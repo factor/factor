@@ -10,7 +10,7 @@ USE: lists
 
 [ "HTTP/1.0 200 OK\nContent-Length: 12\nContent-Type: text/html\n\n" ]
 [
-    [ "text/html" 12 file-response ] with-string
+    [ "text/html" 12 file-response ] string-out
 ] unit-test
 
 [ 5430 ]

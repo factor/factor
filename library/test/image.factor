@@ -23,7 +23,7 @@ USE: math
 
 [ "\0\0\0\0\u000f\u000e\r\u000c" ]
 [
-    [ image-magic 8 >be write ] with-string
+    [ image-magic 8 >be write ] string-out
 ] unit-test
 
 [

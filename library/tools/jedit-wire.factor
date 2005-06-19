@@ -11,7 +11,7 @@ prettyprint sequences io strings words ;
 ! <n> bytes data
 !
 ! jEdit sends a packet with code to eval, it receives the output
-! captured with with-string.
+! captured with string-out.
 
 : write-len ( seq -- ) length 4 >be write ;
 
@@ -39,7 +39,7 @@ prettyprint sequences io strings words ;
 ! remaining -- input
 : jedit-write-attr ( str style -- )
     CHAR: w write
-    [ swap . . ] with-string
+    [ swap . . ] string-out
     dup write-len write ;
 
 TUPLE: jedit-stream ;

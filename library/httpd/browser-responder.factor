@@ -72,7 +72,7 @@ sequences ;
   <textarea name= "eval" rows= "30" cols= "80" textarea> 
     [
       >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-    ] with-string chars>entities write
+    ] string-out chars>entities write
   </textarea> <br/>
   "Accept" button ;
 

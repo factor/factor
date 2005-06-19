@@ -2528,7 +2528,7 @@ Tests if the object at the top of the stack is a string buffer.
 }
 Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy.
 
-String buffers support the stream output protocol (\ref{stream-protocol}).
+String buffers support the stream input and output protocol (\ref{string-streams}).
 
 \section{Virtual sequences}\label{virtual-seq}
 
@@ -3725,7 +3725,7 @@ description={a stream that implements the \texttt{stream-write-attr}, \texttt{st
 There are various subsets of the stream protocol that a class can implement so that its instances may be used as streams. The following generic word is mandatory.
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \genericword{stream-close}{stream-close ( s -- )}
 }
 Releases any external resources associated with the stream, such as file handles and network connections. No further operations can be performed on the stream after this call.
@@ -3734,12 +3734,18 @@ You must close streams after you are finished working with them. A convenient wa
 
 The following two words are optional, and should be implemented on input streams.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \genericword{stream-readln}{stream-readln ( s -- str/f )}
 }
 Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream; with file and network streams, it is a range of characters terminated by \verb|\n|, \verb|\r| or \verb|\r\n|.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
+\genericword{stream-read1}{stream-read1 ( s -- char/f )}
+}
+Reads a character from the stream. If the end of the stream is reached, outputs \verb|f|.
+
+\wordtable{
+\vocabulary{io}
 \genericword{stream-read}{stream-read ( n s -- str )}
 }
 Reads \texttt{n} characters from the stream. If less than \texttt{n} characters are available before the end of the stream, a shorter string is output.
@@ -3747,7 +3753,7 @@ Reads \texttt{n} characters from the stream. If less than \texttt{n} characters 
 The following three words are optional, and should be implemented on output streams.
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \genericword{stream-write-attr}{stream-write-attr ( str/ch attrs s -- )}
 }
 Outputs a character or string to the stream. This might not result in immediate output to the underlying resource if the stream performs buffering, like all file and network streams do. 
@@ -3755,13 +3761,13 @@ Outputs a character or string to the stream. This might not result in immediate 
 The \texttt{attrs} parameter is an association list holding style information, and it is ignored by most streams -- one exception is HTML streams (\ref{html}). Most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \genericword{stream-flush}{stream-flush ( s -- )}
 }
 Ensures all pending output operations are been complete. With many output streams, written output is buffered and not sent to the underlying resource until either the buffer is full, or an explicit call to \texttt{stream-flush} is made.
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \genericword{stream-auto-flush}{stream-auto-flush ( s -- )}
 }
 Ensures the user sees prior output. It is not as strong as \texttt{stream-flush}. The contract is as follows: if the stream is connected to an interactive end-point such as a terminal, \texttt{stream-auto-flush} should execute \texttt{stream-flush}. If the stream is a file or network stream used for ``batch'' operations, this word should have an empty definition.
@@ -3774,13 +3780,13 @@ With some streams, the above operations may suspend the current thread and execu
 
 The following three words are implemented in terms of the stream protocol, and should work with any stream supporting the required underlying operations.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{stream-read1}{stream-read1 ( stream -- ch/f )}
 
 }
 Reads a single character using \texttt{stream-read} and outputs the character. If the end of the stream has been reached, outputs \texttt{f}.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{stream-write}{stream-write ( string stream -- )}
 
 }
@@ -3790,7 +3796,7 @@ Outputs a character or string to the stream, without any specific style informat
     f swap stream-write-attr ;
 \end{verbatim}
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{stream-print}{stream-print ( string stream -- )}
 
 }
@@ -3803,7 +3809,7 @@ description={the value of the \texttt{stdio} variable, used by various words as 
 description={see default stream}}
 Various words take an implicit stream parameter from the \texttt{stdio} variable to reduce stack shuffling.
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{close}{close ( -- )}
 
 }
@@ -3811,7 +3817,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : close stdio get stream-close ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{read-line}{read-line ( -- str/f )}
 
 }
@@ -3819,7 +3825,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : read-line stdio get stream-readln ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{read}{read ( n -- str )}
 
 }
@@ -3827,7 +3833,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : read stdio get stream-read ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{read1}{read1 ( n -- str )}
 
 }
@@ -3835,7 +3841,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : read1 stdio get stream-read1 ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{write}{write ( str -- )}
 
 }
@@ -3843,7 +3849,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : write stdio get stream-write ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{write-attr}{write-attr ( str attrs -- )}
 
 }
@@ -3851,7 +3857,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : write-attr stdio get stream-write-attr ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{print}{print ( str -- )}
 
 }
@@ -3859,7 +3865,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : print stdio get stream-print ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{terpri}{terpri ( -- )}
 
 }
@@ -3867,7 +3873,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 : terpri "\n" stdio get stream-write ;
 \end{verbatim}
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{flush}{flush ( -- )}
 
 }
@@ -3878,24 +3884,41 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 The value of the \texttt{stdio} variable can be rebound inside a quotation with the following combinators.
 
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{with-stream}{with-stream ( stream quot -- )}
 }
 Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to \texttt{stream}. The stream is closed when the quotation returns or if an exception
 is thrown.
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{with-stream*}{with-stream* ( stream quot -- )}
 }
 Like \verb|with-stream| extend the stream is only closed in the case of an error.
 
-\wordtable{
-\vocabulary{stdio}
-\ordinaryword{with-string}{with-string ( quot -- string )}
+\section{String streams}\label{string-streams}
 
+Calling stream output words on a string buffer will append text to the string buffer.
+
+\wordtable{
+\vocabulary{io}
+\ordinaryword{string-out}{string-out ( quot -- string )}
 }
 Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string buffer. Executing \texttt{write}, \texttt{write-attr} or \texttt{print} will append text to the string buffer. When the quotation returns, the string buffer is coverted to
 a string and returned.
+
+String buffers also support the input stream protocol, with the exception of \verb|stream-readln|. Characters are read in reverse. Usually, string buffers are not used as input streams directly, since lines cannot be read and the input string must be reversed. Instead, the following pair of words is used.
+
+\wordtable{
+\vocabulary{io}
+\ordinaryword{<string-reader>}{<string-reader> ( string -- stream )}
+}
+Creates a new stream for reading the characters of the string in order. This converts the string to a string buffer, reverses it, and wraps it in a line stream (\ref{special-streams})..
+
+\wordtable{
+\vocabulary{io}
+\ordinaryword{string-in}{string-in ( string quot -- )}
+}
+Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string reader that reads from the given string. Executing \texttt{read1}, \texttt{read} or \texttt{read-line} will take text from the string reader.
 
 \section{Reading and writing binary data}
 
@@ -3926,13 +3949,13 @@ Value:&\verb|ca|&\verb|fe|&\verb|ba|&\verb|be|\\
 With the above explanation of byte ordering, the behavior of the following words should be clear.
 
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{be>}{be> ( seq -- x )}
 \ordinaryword{le>}{le> ( seq -- x )}
 }
 Converts a sequence of bytes in big or little endian order into an unsigned integer.
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{>be}{>be ( x n -- string )}
 \ordinaryword{>le}{>le ( x n -- string )}
 }
@@ -3941,7 +3964,7 @@ Converts an integer into a string of $n$ bytes in big or little endian order. Tr
 These words are then composed with \verb|read| and \verb|write| to form a set of words for reading and writing packed integers on the default stream (\ref{stdio}).
 
 \wordtable{
-\vocabulary{stdio}
+\vocabulary{io}
 \ordinaryword{read-be2}{read-be2 ( -- n )}
 \ordinaryword{read-le2}{read-le2 ( -- n )}
 \ordinaryword{read-be4}{read-be4 ( -- n )}
@@ -3965,13 +3988,13 @@ description=an input stream reading from a file}
 \glossary{name=file writer,
 description=an output stream writing to a file}
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<file-reader>}{<file-reader> ( path -- stream )}
 
 }
 Opens the file for reading and returns an input stream. An exception is thrown if the file could not be opened.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<file-writer>}{<file-writer> ( path -- stream )}
 
 }
@@ -3980,7 +4003,7 @@ Opens the file for writing and returns an output stream. An exception is thrown 
 The following set of words provide access to file system metadata.
 
 \wordtable{
-\vocabulary{files}
+\vocabulary{io}
 \ordinaryword{file-extension}{file-extension~( path -- string/f )}
 
 }
@@ -3990,25 +4013,25 @@ Outputs the remainder of the file's name after the last occurrence of a period, 
 \textbf{"txt"}
 \end{alltt}
 \wordtable{
-\vocabulary{files}
+\vocabulary{io}
 \ordinaryword{exists?}{exists?~( path -- ?~)}
 
 }
 Tests if a file exists.
 \wordtable{
-\vocabulary{files}
+\vocabulary{io}
 \ordinaryword{directory?}{directory?~( path -- ?~)}
 
 }
 Tests if a file is a directory. Outputs \texttt{f} if the file does not exist..
 \wordtable{
-\vocabulary{files}
+\vocabulary{io}
 \ordinaryword{file-length}{file-length~( path -- n/f~)}
 
 }
 Outputs the size of the file, or \texttt{f} if it does not exist.
 \wordtable{
-\vocabulary{files}
+\vocabulary{io}
 \ordinaryword{stat}{stat~( path -- list~)}
 
 }
@@ -4027,32 +4050,32 @@ description=a stream listening on a TCP/IP socket}
 \glossary{name=client stream,
 description=a bidirectional stream for an to end-point of a TCP/IP connection}
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<client>}{<client>~( host port -- stream~)}
 
 }
 Connects to TCP/IP port number \texttt{port} on the host named by \texttt{host}, and returns a bidirectional stream. An exception is thrown if the connection attempt fails.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<server>}{<server>~( port -- server~)}
 
 }
 Begins listening for connections to \texttt{port} on all network interfaces. An exception is thrown if the port cannot be opened. The returned object can be used as an input to the \texttt{stream-close} and \texttt{accept} words.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{accept}{accept~( server -- stream~)}
 
 }
 Waits for a connection to the port number that \texttt{server} is listening on, and outputs a bidirectional stream when the connection has been established.  An exception is thrown if an error occurs.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{client-stream-host}{client-stream-host~( stream -- port~)}
 \ordinaryword{client-stream-port}{client-stream-port~( stream -- port~)}
 
 }
 Outputs the IP address as a dotted-quad string, and the local port number, respectively, of a client socket returned from \texttt{accept}.
 
-\section{Special streams}
+\section{Special streams}\label{special-streams}
 
 \glossary{name=null stream,
 description=a bidirectional stream that ignores output and returns end of file on input}
@@ -4060,26 +4083,34 @@ description=a bidirectional stream that ignores output and returns end of file o
 description=a bidirectional delegating to an input stream for input and an output stream for output}
 \glossary{name=wrapper stream,
 description=a bidirectional stream delegating to an underlying stream and providing a namespace where the delegated stream is the default stream}
+\glossary{name=line stream,
+description=an input stream that reads lines a character at a time from an underlying stream}
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<null-stream>}{<null-stream>~( -- stream~)}
 }
 Creates a null stream, which ignores output written to it, and returns end of file if an attempt is made to read.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{<duplex-stream>}{<duplex-stream>~( in out -- stream~)}
 }
 Creates a duplex stream. Writing to a duplex stream will write to \texttt{out}, and reading from a duplex stream will read from \texttt{in}. Closing a duplex stream closes both the input and output streams.
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
+\ordinaryword{<line-stream>}{<line-stream>~( stream -- stream~)}
+}
+Wrapping a stream in a line stream saves you from having to implement the \verb|stream-readln| generic word. Calling \verb|stream-readln| on a line stream reads a line a character at a time from the underlying stream. Lines are terminated by either \verb|\n|, \verb|\r| or \verb|\r\n|.
+
+\wordtable{
+\vocabulary{io}
 \ordinaryword{<wrapper-stream>}{<wrapper-stream>~( stream -- stream~)}
 }
 Creates a stream wrapping \texttt{stream}. The given stream becomes the delegate of the new wrapper stream, so calling any stream operation on the wrapper passes it on to the delegate.
 You can then define your own tuple class that delegates to a wrapper stream, then override methods on this new tuple class, and use the following combinator in your method definitions.
 
 \wordtable{
-\vocabulary{streams}
+\vocabulary{io}
 \ordinaryword{with-wrapper}{with-wrapper~( stream quot -- ~)}
 }
 Executes the quotation in a dynamic scope where the \texttt{stdio} variable is set to the wrapped stream.

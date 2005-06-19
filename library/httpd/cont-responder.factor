@@ -232,7 +232,7 @@ SYMBOL: callback-cc
   store-callback-cc  redirect-to-here 
   [ 
     expirable register-continuation id>url swap 
-    \ serving-html swons with-string call-exit-continuation
+    \ serving-html swons string-out call-exit-continuation
   ] callcc1 
   nip ;
 
@@ -244,7 +244,7 @@ SYMBOL: callback-cc
   #! use is an optimisation to save having to generate and save a continuation
   #! in that special case.
   store-callback-cc  redirect-to-here 
-  \ serving-html swons with-string call-exit-continuation ;
+  \ serving-html swons string-out call-exit-continuation ;
 
 #! Name of variable for holding initial continuation id that starts
 #! the responder.

@@ -67,7 +67,7 @@ USE: sequences
 
 : test-cont-responder2 ( - )
   #! Test the cont-responder responder by displaying a few pages in a loop.
-  [ "one" "two" "three" "four" ] [ display-page [ .s ] with-string display-page ]  each 
+  [ "one" "two" "three" "four" ] [ display-page [ .s ] string-out display-page ]  each 
   "Done!" display-page  ;
 
 : test-cont-responder3 ( - )
@@ -79,7 +79,7 @@ USE: sequences
     "Menu" [ 
       <ol> 
         <li> "Test responder1" [ test-cont-responder ] quot-href </li>
-        <li> "Test responder2" [ [ .s ] with-string display-page test-cont-responder2 [ .s ] with-string display-page ] quot-href </li>
+        <li> "Test responder2" [ [ .s ] string-out display-page test-cont-responder2 [ .s ] string-out display-page ] quot-href </li>
       </ol>
     ] html-document 
   ] show drop ;

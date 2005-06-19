@@ -51,9 +51,9 @@ parser prettyprint sequences io vectors words ;
 
         "/library/io/stream.factor"
         "/library/io/duplex-stream.factor"
-        "/library/io/string-streams.factor"
         "/library/io/stdio.factor"
         "/library/io/lines.factor"
+        "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
 
