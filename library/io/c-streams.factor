@@ -21,7 +21,10 @@ M: c-stream stream-write-attr ( str style stream -- )
     c-stream-out fwrite ;
 
 M: c-stream stream-readln ( stream -- str )
-    dup stream-flush  c-stream-in dup [ fgets ] when ;
+    c-stream-in dup [ fgets ] when ;
+
+M: c-stream stream-read1 ( stream -- str )
+    c-stream-in dup [ fgetc ] when ;
 
 M: c-stream stream-flush ( stream -- )
     c-stream-out [ fflush ] when* ;
@@ -52,17 +55,3 @@ TUPLE: client-stream host port ;
 : <client> c-stream-error ;
 : <server> c-stream-error ;
 : accept c-stream-error ;
-
-: (stream-copy) ( in out -- )
-    4096 pick stream-read [
-        over stream-write (stream-copy)
-    ] [
-        2drop
-    ] ifte* ;
-
-: stream-copy ( in out -- )
-    [
-        2dup (stream-copy)
-    ] [
-        >r stream-close stream-close r> [ rethrow ] when*
-    ] catch ;

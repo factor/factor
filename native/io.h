@@ -6,3 +6,4 @@ void primitive_fwrite(void);
 void primitive_fflush(void);
 void primitive_fclose(void);
 void primitive_fgets(void);
+void primitive_fgetc(void);

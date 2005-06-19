@@ -64,6 +64,16 @@ void primitive_fgets(void)
 		dpush(tag_object(from_c_string(line)));
 }
 
+void primitive_fgetc(void)
+{
+	FILE* file = (FILE*)unbox_alien();
+	int c = fgetc(file);
+	if(c == EOF)
+		dpush(F);
+	else
+		dpush(tag_fixnum(c));
+}
+
 void primitive_fwrite(void)
 {
 	FILE* file;

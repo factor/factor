@@ -167,22 +167,15 @@ GENERIC: task-container ( task -- vector )
 
 ! The cr slot is set to true by read-line-loop if the last
 ! character read was \r.
-TUPLE: reader line ready? cr ;
+TUPLE: reader line cr ;
 
 C: reader ( handle -- reader )
     [ >r buffered-port r> set-delegate ] keep ;
 
-: pop-line ( reader -- str )
-    dup reader-line dup [ >string ] when >r
-    f over set-reader-line
-    f swap set-reader-ready? r> ;
+: pop-line ( reader -- sbuf/f )
+    dup pending-error [ reader-line f ] keep set-reader-line ;
 
-: read-fin ( reader -- str )
-    dup pending-error  dup reader-ready? [
-        pop-line
-    ] [
-        "reader not ready" throw
-    ] ifte ;
+: read-fin ( reader -- str ) pop-line dup [ >string ] when ;
 
 : reader-cr> ( reader -- ? )
     dup reader-cr >r f swap set-reader-cr r> ;
@@ -211,24 +204,17 @@ C: reader ( handle -- reader )
         ] ifte
     ] ifte ;
 
-: read-line-step ( reader -- ? )
-    [ read-line-loop dup ] keep set-reader-ready? ;
-
 : init-reader ( count reader -- ) >r <sbuf> r> set-reader-line ;
 
-: prepare-line ( reader -- ? )
-    80 over init-reader read-line-step ;
-
 : can-read-line? ( reader -- ? )
-    dup pending-error
-    dup reader-ready? [ drop t ] [ prepare-line ] ifte ;
+    dup pending-error 80 over init-reader read-line-loop ;
 
 : reader-eof ( reader -- )
-    dup reader-line dup [
-        length 0 = [ f over set-reader-line ] when
+    dup reader-line empty? [
+        f swap set-reader-line
     ] [
         drop
-    ] ifte  t swap set-reader-ready? ;
+    ] ifte ;
 
 : (refill) ( port -- n )
     >port< dup buffer-end swap buffer-capacity read ;
@@ -255,7 +241,7 @@ M: read-line-task do-io-task ( task -- ? )
         dup eof? [
             reader-eof t
         ] [
-            read-line-step
+            read-line-loop
         ] ifte
     ] [
         drop f
@@ -291,7 +277,7 @@ M: reader stream-readln ( stream -- line )
     ] ifte ;
 
 ! Reading character counts
-: read-loop ( count reader -- ? )
+: read-step ( count reader -- ? )
     dup trailing-cr
     dup reader-line -rot >r over length - ( remaining) r>
     2dup buffer-length <= [
@@ -300,17 +286,8 @@ M: reader stream-readln ( stream -- line )
         buffer>> nip nappend f
     ] ifte ;
 
-: read-step ( count reader -- ? )
-    [ read-loop dup ] keep set-reader-ready? ;
-
 : can-read-count? ( count reader -- ? )
-    dup pending-error
-    2dup init-reader
-    2dup reader-line length <= [
-        t swap set-reader-ready? drop t
-    ] [
-        read-step
-    ] ifte ;
+    dup pending-error 2dup init-reader read-step ;
 
 TUPLE: read-task count ;
 
@@ -323,7 +300,7 @@ C: read-task ( count port -- task )
 M: read-task do-io-task ( task -- ? )
     >read-task< dup refill [
         dup eof? [
-            nip reader-eof t
+            reader-eof drop t
         ] [
             read-step
         ] ifte
@@ -340,6 +317,9 @@ M: read-task task-container drop read-tasks get ;
 
 M: reader stream-read ( count stream -- string )
     [ wait-to-read ] keep read-fin ;
+
+M: reader stream-read1 ( stream -- string )
+    1 over wait-to-read reader-line first ;
 
 ! Writers
 

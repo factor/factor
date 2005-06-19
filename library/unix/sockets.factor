@@ -7,6 +7,9 @@ IN: io-internals
 USING: errors namespaces streams threads unparser alien generic
 kernel math unix-internals ;
 
+: <socket-stream> ( fd -- stream )
+    dup f <fd-stream> ;
+
 : init-sockaddr ( port -- sockaddr )
     <sockaddr-in>
     [ AF_INET swap set-sockaddr-in-family ] keep
@@ -104,9 +107,6 @@ M: accept-task task-container drop read-tasks get ;
 
 : wait-to-accept ( server -- )
     [ swap <accept-task> add-io-task stop ] callcc0 drop ;
-
-: <socket-stream> ( fd -- stream )
-    dup f <fd-stream> ;
 
 : timeout-opt ( fd level opt value -- )
     "timeval" c-size setsockopt io-error ;

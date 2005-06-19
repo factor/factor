@@ -19,12 +19,10 @@ GENERIC: stream-flush      ( stream -- )
 GENERIC: stream-auto-flush ( stream -- )
 GENERIC: stream-readln     ( stream -- string )
 GENERIC: stream-read       ( count stream -- string )
+GENERIC: stream-read1      ( stream -- char/f )
 GENERIC: stream-write-attr ( string style stream -- )
 GENERIC: stream-close      ( stream -- )
 GENERIC: set-timeout       ( timeout stream -- )
-
-: stream-read1 ( stream -- char/f )
-    1 swap stream-read dup empty? [ drop f ] [ first ] ifte ;
 
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
@@ -40,6 +38,7 @@ M: null-stream stream-flush drop ;
 M: null-stream stream-auto-flush drop ;
 M: null-stream stream-readln drop f ;
 M: null-stream stream-read 2drop f ;
+M: null-stream stream-read1 drop f ;
 M: null-stream stream-write-attr 3drop ;
 M: null-stream stream-close drop ;
 
@@ -81,6 +80,9 @@ M: duplex-stream stream-readln
 
 M: duplex-stream stream-read
     duplex-stream-in stream-read ;
+
+M: duplex-stream stream-read1
+    duplex-stream-in stream-read1 ;
 
 M: duplex-stream stream-write-attr
     duplex-stream-out stream-write-attr ;
@@ -125,3 +127,17 @@ DEFER: <file-reader>
 : <resource-stream> ( path -- stream )
     #! Open a file path relative to the Factor source code root.
     resource-path swap path+ <file-reader> ;
+
+: (stream-copy) ( in out -- )
+    4096 pick stream-read [
+        over stream-write (stream-copy)
+    ] [
+        2drop
+    ] ifte* ;
+
+: stream-copy ( in out -- )
+    [
+        2dup (stream-copy)
+    ] [
+        >r stream-close stream-close r> [ rethrow ] when*
+    ] catch ;

@@ -204,6 +204,7 @@ vocabularies get [
     [ "flush-icache" "assembler"              f ]
     [ "fopen"  "io-internals"                 [ [ string string ] [ alien ] ] ]
     [ "fgets" "io-internals"                  [ [ alien ] [ string ] ] ]
+    [ "fgetc" "io-internals"                  [ [ alien ] [ object ] ] ]
     [ "fwrite" "io-internals"                 [ [ string alien ] [ ] ] ]
     [ "fflush" "io-internals"                 [ [ alien ] [ ] ] ]
     [ "fclose" "io-internals"                 [ [ alien ] [ ] ] ]
