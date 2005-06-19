@@ -3,8 +3,6 @@
 IN: io
 USING: errors kernel lists namespaces generic strings ;
 
-SYMBOL: stdio
-
 : flush      ( -- )              stdio get stream-flush ;
 : read-line  ( -- string )       stdio get stream-readln ;
 : read1      ( -- char )         stdio get stream-read1 ;
@@ -31,11 +29,6 @@ SYMBOL: stdio
         swap stdio set
         [ [ close rethrow ] when* ] catch
     ] with-scope ;
-
-: with-string ( quot -- str )
-    #! Execute a quotation, and push a string containing all
-    #! text printed by the quotation.
-    1024 <sbuf> [ call stdio get >string ] with-stream ;
 
 TUPLE: stdio-stream ;
 C: stdio-stream ( stream -- stream ) [ set-delegate ] keep ;
