@@ -4,8 +4,8 @@
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: errors namespaces streams threads unparser ;
-USING: alien generic kernel math unix-internals ;
+USING: errors namespaces streams threads unparser alien generic
+kernel math unix-internals ;
 
 : init-sockaddr ( port -- sockaddr )
     <sockaddr-in>
@@ -76,6 +76,14 @@ C: accept-task ( port -- task )
 
 : init-socket ( fd -- ) SOL_SOCKET SO_OOBINLINE sockopt ;
 
+: inet-ntoa ( n -- str )
+    ntohl [
+        dup -24 shift HEX: ff bitand unparse % CHAR: . ,
+        dup -16 shift HEX: ff bitand unparse % CHAR: . ,
+        dup -8  shift HEX: ff bitand unparse % CHAR: . ,
+                      HEX: ff bitand unparse %
+    ] make-string ;
+
 : do-accept ( port sockaddr fd -- )
     [
         init-socket
@@ -86,20 +94,16 @@ C: accept-task ( port -- task )
 M: accept-task do-io-task ( task -- ? )
     io-task-port <sockaddr-in>
     over port-handle over "sockaddr-in" c-size <int> accept
-    dup 0 >= [ do-accept t ] [ 2drop postpone-error f ] ifte ;
+    dup 0 >= [
+        do-accept t
+    ] [
+        2drop defer-error
+    ] ifte ;
 
 M: accept-task task-container drop read-tasks get ;
 
 : wait-to-accept ( server -- )
     [ swap <accept-task> add-io-task stop ] callcc0 drop ;
-
-: inet-ntoa ( n -- str )
-    ntohl [
-        dup -24 shift HEX: ff bitand unparse % CHAR: . ,
-        dup -16 shift HEX: ff bitand unparse % CHAR: . ,
-        dup -8  shift HEX: ff bitand unparse % CHAR: . ,
-                      HEX: ff bitand unparse %
-    ] make-string ;
 
 : <socket-stream> ( fd -- stream )
     dup f <fd-stream> ;
@@ -111,4 +115,4 @@ IN: streams
 
 : accept ( server -- client )
     #! Wait for a client connection.
-    dup wait-to-accept server-client ;
+    dup wait-to-accept  dup pending-error  server-client ;

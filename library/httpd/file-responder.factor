@@ -38,7 +38,7 @@ stdio streams strings unparser ;
 : serve-directory ( filename -- )
     "/" ?tail [
         dup "/index.html" append dup exists? [
-            serve-file
+            nip serve-file
         ] [
             drop list-directory
         ] ifte
