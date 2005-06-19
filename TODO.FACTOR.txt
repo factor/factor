@@ -10,6 +10,7 @@
 <magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
 <magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
+- set-length should not shorten the underlying sequence
 - there is a problem with hashcodes of words and bootstrapping
 - http keep alive, and range get
 - sleep word

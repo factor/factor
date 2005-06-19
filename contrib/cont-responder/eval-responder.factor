@@ -27,9 +27,8 @@ IN: eval-responder
 USE: html
 USE: cont-responder
 USE: kernel
-USE: stdio
 USE: namespaces
-USE: streams
+USE: io
 USE: parser
 USE: lists
 USE: errors

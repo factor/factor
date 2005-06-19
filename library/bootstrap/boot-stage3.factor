@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
 compiler-frontend io-internals kernel lists math namespaces
-parser sequences stdio unparser words ;
+parser sequences io unparser words ;
 
 "Compiling base..." print
 

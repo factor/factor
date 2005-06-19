@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: test
 USING: errors inference kernel lists namespaces prettyprint
-stdio strings unparser ;
+io strings unparser ;
 
 : try-infer ( quot -- effect error )
     [ infer f ] [ [ >r drop f r> ] when* ] catch ;

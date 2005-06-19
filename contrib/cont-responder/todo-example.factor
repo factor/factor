@@ -29,8 +29,7 @@
 IN: todo-example
 USE: cont-responder
 USE: html
-USE: html
-USE: stdio
+USE: io
 USE: strings
 USE: namespaces
 USE: inspector

@@ -1,8 +1,7 @@
 ! A simple IRC client written in Factor.
 
 IN: irc
-USING: kernel lists math namespaces stdio streams strings
-threads words ;
+USING: kernel lists math namespaces io strings threads words ;
 
 SYMBOL: irc-stream
 SYMBOL: channels

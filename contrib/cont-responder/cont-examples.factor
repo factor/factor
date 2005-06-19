@@ -26,7 +26,7 @@ IN: cont-examples
 USE: cont-responder
 USE: html
 USE: kernel
-USE: stdio
+USE: io
 USE: html
 USE: lists
 USE: strings

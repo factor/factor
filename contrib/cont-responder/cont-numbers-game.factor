@@ -39,7 +39,7 @@ USE: random
 USE: parser
 USE: html
 USE: cont-responder
-USE: stdio
+USE: io
 USE: namespaces
 
 : web-print ( str -- )

@@ -3,7 +3,7 @@
 IN: kernel
 USING: alien assembler command-line compiler console errors
 generic inference kernel-internals listener lists math memory
-namespaces parser presentation prettyprint random stdio streams
+namespaces parser presentation prettyprint random io
 unparser words ;
 
 "Bootstrap stage 4..." print

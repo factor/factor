@@ -1,5 +1,5 @@
 IN: temporary
-USING: math parser stdio streams strings test ;
+USING: math parser io strings test ;
 
 [ 4 ] [ "/library/test/io/no-trailing-eol.factor" run-resource ] unit-test
 

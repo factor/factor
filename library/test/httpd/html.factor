@@ -1,8 +1,7 @@
 IN: temporary
 USE: html
 USE: namespaces
-USE: stdio
-USE: streams
+USE: io
 USE: strings
 USE: test
 USE: kernel

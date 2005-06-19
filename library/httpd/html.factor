@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
 USING: generic kernel lists namespaces presentation sequences
-stdio streams strings unparser http ;
+io strings unparser http ;
 
 : html-entities ( -- alist )
     [

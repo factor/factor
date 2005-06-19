@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
 USING: hashtables http kernel lists namespaces parser sequences
-stdio streams strings ;
+io strings ;
 
 ! Variables
 SYMBOL: vhosts

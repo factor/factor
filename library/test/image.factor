@@ -1,7 +1,7 @@
 USE: test
 USE: image
 USE: namespaces
-USE: stdio
+USE: io
 USE: parser
 USE: kernel
 USE: generic

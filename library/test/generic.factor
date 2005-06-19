@@ -1,5 +1,5 @@
 IN: temporary
-USING: parser prettyprint sequences stdio strings unparser ;
+USING: parser prettyprint sequences io strings unparser ;
 
 USE: hashtables
 USE: namespaces

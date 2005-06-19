@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: alien errors generic hashtables kernel lists math
-matrices memory namespaces parser presentation sequences stdio
-streams strings unparser vectors words ;
+matrices memory namespaces parser presentation sequences io
+strings unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line

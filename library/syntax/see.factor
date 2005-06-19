@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: #<unknown> generic hashtables kernel lists math
-namespaces sequences stdio streams strings unparser words ;
+USING: generic hashtables io kernel lists namespaces sequences
+streams strings unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )

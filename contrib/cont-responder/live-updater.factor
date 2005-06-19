@@ -25,11 +25,10 @@
 ! and the 'liveUpdater.js' code.
 IN: live-updater
 USE: kernel
-USE: streams
+USE: io
 USE: strings
 USE: html
 USE: cont-responder
-USE: stdio
 USE: namespaces
 USE: lists
 

@@ -2,7 +2,7 @@
 ! do not have x/y co-ordinates.
 IN: gadgets
 USING: alien hashtables kernel lists namespaces sdl sequences
-streams strings ;
+io strings ;
 
 SYMBOL: fonts
 

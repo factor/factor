@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: resource-responder
-USING: httpd kernel lists namespaces stdio streams ;
+USING: httpd kernel lists namespaces io ;
 
 : resource-response ( mime-type -- )
     "Content-Type" swons unit "200 OK" response terpri ;

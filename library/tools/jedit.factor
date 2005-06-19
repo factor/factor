@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: files kernel lists namespaces parser sequences stdio
-streams strings unparser words ;
+USING: kernel lists namespaces parser sequences io strings
+unparser words ;
 
 : jedit-server-file ( -- path )
     "jedit-server-file" get

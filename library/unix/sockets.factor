@@ -4,7 +4,7 @@
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: errors namespaces streams threads unparser alien generic
+USING: errors namespaces io threads unparser alien generic
 kernel math unix-internals ;
 
 : <socket-stream> ( fd -- stream )
@@ -52,7 +52,7 @@ kernel math unix-internals ;
         dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] ifte
     ] with-socket-fd ;
 
-IN: streams
+IN: io
 
 C: client-stream ( host port fd -- stream )
     [ >r <socket-stream> r> set-delegate ] keep
@@ -111,7 +111,7 @@ M: accept-task task-container drop read-tasks get ;
 : timeout-opt ( fd level opt value -- )
     "timeval" c-size setsockopt io-error ;
 
-IN: streams
+IN: io
 
 : accept ( server -- client )
     #! Wait for a client connection.

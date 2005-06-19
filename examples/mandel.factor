@@ -28,7 +28,7 @@ USE: sdl-video
 USE: vectors
 USE: prettyprint
 USE: sequences
-USE: stdio
+USE: io
 USE: test
 
 : f_ ( h s v i -- f ) >r swap rot >r 2dup r> 6 * r> - ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: dump
 USING: alien assembler generic kernel kernel-internals lists
-math memory sequences stdio strings unparser ;
+math memory sequences io strings unparser ;
 
 : cell. >hex cell 2 * CHAR: 0 pad write ;
 

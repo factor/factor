@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl stdio
-sequences ;
+USING: generic kernel lists math namespaces sdl io sequences ;
 
 ! A label gadget draws a string.
 TUPLE: label text ;

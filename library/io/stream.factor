@@ -1,18 +1,15 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: files
-USING: kernel strings sequences ;
+IN: io
+USING: errors generic kernel lists math namespaces sequences
+strings ;
 
 ! We need this early during bootstrap.
 : path+ ( path path -- path )
     #! Combine two paths. This will be implemented later.
     "/" swap append3 ;
 
-IN: stdio
 DEFER: stdio
-
-IN: streams
-USING: errors generic lists math namespaces sequences ;
 
 ! Stream protocol.
 GENERIC: stream-flush      ( stream -- )

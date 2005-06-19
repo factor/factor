@@ -1,6 +1,6 @@
 IN: turing
 USING: hashtables kernel lists namespaces sequences vectors math
-prettyprint stdio strings words ;
+prettyprint io strings words ;
 
 ! A turing machine simulator.
 

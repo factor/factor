@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
 USING: generic hashtables kernel lists math memory namespaces
-parser prettyprint sequences stdio vectors words ;
+parser prettyprint sequences io vectors words ;
 
 "Bootstrap stage 1..." print
 
@@ -51,6 +51,7 @@ parser prettyprint sequences stdio vectors words ;
 
         "/library/io/stream.factor"
         "/library/io/stdio.factor"
+        "/library/io/lines.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
 

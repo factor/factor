@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien errors generic kernel lists math
-memory namespaces prettyprint sdl sequences stdio strings
+memory namespaces prettyprint sdl sequences io strings
 threads sequences ;
 
 ! The world gadget is the top level gadget that all (visible)

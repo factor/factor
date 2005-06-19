@@ -3,7 +3,7 @@
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
 errors generic hashtables inference kernel lists math namespaces
-sequences stdio strings unparser words ;
+sequences io strings unparser words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel lists math namespaces prettyprint sdl
-sequences stdio sequences ;
+sequences io sequences ;
 
 : button-down? ( n -- ? ) hand hand-buttons contains? ;
 

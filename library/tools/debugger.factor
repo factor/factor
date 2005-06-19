@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
 USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint sequences stdio streams strings unparser
+parser prettyprint sequences io strings unparser
 vectors words ;
 
 : expired-error. ( obj -- )

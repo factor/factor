@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
 USING: errors kernel lists math memory namespaces parser
-sequences stdio strings presentation words unparser vectors ansi ;
+sequences io strings presentation words unparser vectors ansi ;
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt

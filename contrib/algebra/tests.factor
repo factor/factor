@@ -1,4 +1,4 @@
-USING: algebra test math kernel prettyprint stdio ;
+USING: algebra test math kernel prettyprint io ;
 
 [ [ - [ + x [ mod [ * 2 pi ] 4 ] ] ] ] [
     ([ - x + [ 2 * pi ] mod 4 ])

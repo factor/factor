@@ -43,27 +43,6 @@ void primitive_fopen(void)
 	box_alien(file);
 }
 
-#define FACTOR_LINE_LEN 1024
-
-void primitive_fgets(void)
-{
-	FILE* file;
-	char line[FACTOR_LINE_LEN];
-
-	maybe_gc(0);
-
-	file = (FILE*)unbox_alien();
-	if(fgets(line,FACTOR_LINE_LEN,file) == NULL) 
-	{
-		if(feof(file))
-			dpush(F);
-		else
-			io_error();
-	}
-	else
-		dpush(tag_object(from_c_string(line)));
-}
-
 void primitive_fgetc(void)
 {
 	FILE* file = (FILE*)unbox_alien();

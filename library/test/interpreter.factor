@@ -4,7 +4,7 @@ USE: vectors
 USE: interpreter
 USE: test
 USE: namespaces
-USE: stdio
+USE: io
 USE: prettyprint
 USE: math
 USE: math-internals

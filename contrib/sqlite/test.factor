@@ -34,7 +34,7 @@
 !  Then run this file.
 USE: sqlite
 USE: kernel
-USE: stdio
+USE: io
 USE: prettyprint
 
 : show-people ( statement -- )

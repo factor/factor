@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: http-client
 USING: errors http kernel lists namespaces parser sequences
-stdio streams strings unparser ;
+io strings unparser ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.

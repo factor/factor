@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces sequences streams strings ;
+USING: kernel lists namespaces sequences io ;
 
 : file-vocabs ( -- )
     "file-in" get "in" set

@@ -1,4 +1,4 @@
-USING: sequences kernel math stdio strings ;
+USING: sequences kernel math io strings ;
 
 : lcd-digit ( digit row -- str )
     {

@@ -29,7 +29,7 @@ USE: live-updater
 USE: namespaces
 USE: html
 USE: words
-USE: stdio
+USE: io
 USE: kernel
 USE: cont-responder
 USE: prettyprint

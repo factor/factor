@@ -27,14 +27,12 @@
 IN: todo
 USE: parser
 USE: strings
-USE: streams
+USE: io
 USE: namespaces
 USE: lists
 USE: math
-USE: stdio
 USE: kernel
 USE: prettyprint
-USE: files
 USE: hashtables
 USE: sequences
 USE: http

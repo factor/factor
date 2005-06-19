@@ -169,7 +169,6 @@ void* primitives[] = {
 	primitive_die,
 	primitive_flush_icache,
 	primitive_fopen,
-	primitive_fgets,
 	primitive_fgetc,
 	primitive_fwrite,
 	primitive_fflush,

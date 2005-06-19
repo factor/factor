@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2004 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: command-line
-USING: files kernel kernel-internals lists namespaces parser
+USING: io kernel kernel-internals lists namespaces parser
 sequences strings ;
 
 ! This file is run as the last stage of boot.factor; it relies

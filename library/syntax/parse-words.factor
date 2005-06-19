@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors kernel lists math namespaces sequences streams
+USING: errors kernel lists math namespaces sequences io
 strings unparser words ;
 
 ! The parser uses a number of variables:

@@ -1,4 +1,4 @@
-USING: kernel parser sequences stdio ;
+USING: kernel parser sequences io ;
 [
     "/library/ui/shapes.factor"
     "/library/ui/points.factor"

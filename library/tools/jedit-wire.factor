@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
 USING: generic kernel listener lists namespaces parser
-prettyprint sequences stdio streams strings words ;
+prettyprint sequences io strings words ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:

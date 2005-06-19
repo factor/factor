@@ -1,5 +1,5 @@
 IN: temporary
-USING: stdio test ;
+USING: io test ;
 
 [ "\0\0\u0004\u00d2" ] [ 1234 4 >be ] unit-test
 [ "\u00d2\u0004\0\0" ] [ 1234 4 >le ] unit-test

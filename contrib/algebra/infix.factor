@@ -1,5 +1,5 @@
 IN: algebra
-USING: kernel lists math namespaces test stdio words parser
+USING: kernel lists math namespaces test io words parser
     generic errors prettyprint vectors kernel-internals ;
 
 SYMBOL: variable?

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel line-editor listener lists math namespaces
-sequences stdio streams strings threads ;
+sequences io strings threads ;
 
 ! A pane is an area that can display text.
 

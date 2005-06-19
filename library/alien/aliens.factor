@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: hashtables kernel lists math namespaces parser stdio ;
+USING: hashtables kernel lists math namespaces parser io ;
 
 DEFER: dll?
 BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;

@@ -1,6 +1,6 @@
 IN: temporary
 USE: namespaces
-USE: stdio
+USE: io
 USE: test
 USE: parser
 

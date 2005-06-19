@@ -25,7 +25,7 @@
 
 IN: win32-stream
 USING: alien errors generic kernel kernel-internals lists math namespaces
-       prettyprint sequences stdio streams strings threads unparser win32-api
+       prettyprint sequences io strings threads unparser win32-api
        win32-io-internals io-internals ;
 
 TUPLE: win32-server this ;
@@ -88,7 +88,7 @@ C: win32-server ( port -- server )
 M: win32-server stream-close ( server -- )
     win32-server-this [ socket get CloseHandle drop ] bind ;
 
-IN: streams
+IN: io
 : accept ( server -- client )
     win32-server-this [
         new-socket 64 <buffer>

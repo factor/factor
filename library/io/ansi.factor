@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: ansi
-USING: lists kernel namespaces stdio streams strings
+USING: lists kernel namespaces io strings
 presentation generic sequences ;
 
 ! <ansi-stream> raps the given stream in an ANSI stream. ANSI

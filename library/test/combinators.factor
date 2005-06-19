@@ -2,7 +2,7 @@ IN: temporary
 USE: kernel
 USE: math
 USE: test
-USE: stdio
+USE: io
 USE: prettyprint
 USE: namespaces
 

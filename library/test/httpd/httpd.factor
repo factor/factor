@@ -3,7 +3,7 @@ USE: file-responder
 USE: http
 USE: httpd
 USE: namespaces
-USE: stdio
+USE: io
 USE: test
 USE: strings
 USE: lists

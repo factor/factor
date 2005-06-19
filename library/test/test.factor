@@ -2,7 +2,7 @@
 
 IN: test
 USING: errors kernel lists math memory namespaces parser
-prettyprint sequences stdio strings unparser vectors words ;
+prettyprint sequences io strings unparser vectors words ;
 
 TUPLE: assert got expect ;
 

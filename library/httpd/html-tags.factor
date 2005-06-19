@@ -27,7 +27,7 @@ IN: html
 USE: strings
 USE: lists
 USE: kernel
-USE: stdio
+USE: io
 USE: namespaces
 USE: words
 USE: sequences

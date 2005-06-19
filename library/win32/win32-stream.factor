@@ -26,7 +26,7 @@
 IN: win32-stream
 USING: alien continuations generic io-internals kernel
 kernel-internals lists math namespaces prettyprint sequences
-stdio streams strings threads win32-api win32-io-internals ;
+io strings threads win32-api win32-io-internals ;
 
 TUPLE: win32-stream this ; ! FIXME: rewrite using tuples
 GENERIC: win32-stream-handle

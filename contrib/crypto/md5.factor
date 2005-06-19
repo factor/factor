@@ -1,5 +1,6 @@
 IN: crypto
-USING: kernel streams strings stdio sequences namespaces math prettyprint unparser test parser lists ;
+USING: kernel io strings sequences namespaces math prettyprint
+unparser test parser lists ;
 
 SYMBOL: a
 SYMBOL: b

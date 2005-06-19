@@ -5,7 +5,7 @@ USE: namespaces
 USE: test
 USE: lists
 USE: parser
-USE: stdio
+USE: io
 
 [ f ] [ [ ] [ ] catch ] unit-test
 

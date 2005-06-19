@@ -25,8 +25,8 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: html cont-responder kernel stdio namespaces words lists
-streams strings inspector kernel prettyprint words http parser
+USING: html cont-responder kernel io namespaces words lists
+io strings inspector kernel prettyprint words http parser
 errors unparser listener hashtables memory
 sequences ;
 

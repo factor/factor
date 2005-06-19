@@ -93,10 +93,10 @@ SYMBOL: vocabularies
     ! For interactive
     "scratchpad" "in" set
     [
-        "compiler" "debugger" "errors" "files" "generic"
+        "compiler" "debugger" "errors" "generic"
         "hashtables" "inference" "interpreter" "jedit" "kernel"
-        "listener" "lists" "math" "memory" "namespaces" "parser"
-        "prettyprint" "processes" "profiler" "sequences"
-        "streams" "stdio" "strings" "syntax" "test" "threads"
+        "listener" "lists" "math" "matrices" "memory"
+        "namespaces" "parser" "prettyprint" "processes"
+        "sequences" "io" "strings" "syntax" "test" "threads"
         "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

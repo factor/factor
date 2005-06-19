@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: files hashtables kernel lists namespaces ;
+USING: io hashtables kernel lists namespaces ;
 
 : set-mime-types ( assoc -- )
     "mime-types" global set-hash ;

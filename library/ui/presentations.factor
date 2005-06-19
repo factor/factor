@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: kernel lists namespaces prettyprint stdio unparser ;
+USING: kernel lists namespaces prettyprint io unparser ;
 
 DEFER: inspect
 

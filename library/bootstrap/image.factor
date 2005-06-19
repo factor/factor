@@ -16,8 +16,8 @@
 
 IN: image
 USING: errors generic hashtables kernel lists
-math namespaces parser prettyprint sequences sequences stdio
-streams strings vectors words ;
+math namespaces parser prettyprint sequences sequences io
+strings vectors words ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image

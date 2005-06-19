@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
 USING: errors kernel listener lists math namespaces prettyprint
-sequences stdio strings vectors words ;
+sequences io strings vectors words ;
 
 ! The single-stepper simulates Factor in Factor to allow
 ! single-stepping through the execution of a quotation. It can

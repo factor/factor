@@ -1,7 +1,7 @@
 ! Contractor timesheet example
 
 IN: timesheet
-USING: errors kernel lists math namespaces sequences stdio
+USING: errors kernel lists math namespaces sequences io
 strings unparser vectors ;
 
 ! Adding a new entry to the time sheet.

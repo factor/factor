@@ -1,7 +1,6 @@
 IN: temporary
 USE: namespaces
-USE: streams
-USE: stdio
+USE: io
 USE: test
 USE: generic
 USE: kernel

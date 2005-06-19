@@ -1,15 +1,11 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: errors kernel kernel-internals namespaces stdio streams
+USING: errors kernel kernel-internals namespaces io
 strings threads ;
 
 ! Simple wrappers for ANSI C I/O functions, used for
 ! bootstrapping only.
-
-! Note that c-streams are pretty limited and broken. Namely,
-! there is a limit of 1024 characters per line, and lines
-! containing \0 are not read properly.
 
 ! More elaborate platform-specific I/O code is used on Unix and
 ! Windows; see library/unix and library/win32.
@@ -19,9 +15,6 @@ TUPLE: c-stream in out flush? ;
 M: c-stream stream-write-attr ( str style stream -- )
     nip >r dup string? [ ch>string ] unless r>
     c-stream-out fwrite ;
-
-M: c-stream stream-readln ( stream -- str )
-    c-stream-in dup [ fgets ] when ;
 
 M: c-stream stream-read1 ( stream -- str )
     c-stream-in dup [ fgetc ] when ;
@@ -37,12 +30,12 @@ M: c-stream stream-close ( stream -- )
     c-stream-out [ fclose ] when* ;
 
 : init-io ( -- )
-    13 getenv  14 getenv  t <c-stream> stdio set ;
+    13 getenv  14 getenv  t <c-stream> <line-reader> stdio set ;
 
-IN: streams
+IN: io
 
 : <file-reader> ( path -- stream )
-    "rb" fopen f f <c-stream> ;
+    "rb" fopen f f <c-stream> <line-reader> ;
 
 : <file-writer> ( path -- stream )
     "wb" fopen f swap f <c-stream> ;

@@ -177,7 +177,7 @@ DEFER: lappend*
 DEFER: (lappend*)
 TUPLE: lappend*-state current rest ;
 
-USE: stdio 
+USE: io 
 
 : (lappend*-cdr) ( state -- llist )
   #! Given the state object, do the cdr portion of the

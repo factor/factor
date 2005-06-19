@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USING: files generic inspector lists kernel namespaces
-prettyprint stdio streams strings sequences unparser math
+USING: generic inspector lists kernel namespaces
+prettyprint io strings sequences unparser math
 hashtables parser ;
 
 : vocab-apropos ( substring vocab -- list )
