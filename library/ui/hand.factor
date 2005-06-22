@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic kernel lists math namespaces prettyprint
-sequences sdl io ;
+USING: alien generic io kernel lists math namespaces prettyprint
+sdl sequences vectors ;
 
 DEFER: pick-up
 
@@ -46,8 +46,10 @@ DEFER: pick-up
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
 TUPLE: hand world
-    click-pos click-rel clicked buttons
+    click-loc click-rel clicked buttons
     gadget focus ;
+
+: hand-click-pos hand-click-loc 3unseq drop rect> ;
 
 C: hand ( world -- hand )
     <empty-gadget>
@@ -58,7 +60,7 @@ C: hand ( world -- hand )
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
-    dup screen-pos over set-hand-click-pos
+    dup screen-loc over set-hand-click-loc
     dup hand-gadget over relative over set-hand-click-rel
     [ hand-buttons unique ] keep set-hand-buttons ;
 

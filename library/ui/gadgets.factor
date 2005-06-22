@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces
-sequences ;
+USING: generic hashtables kernel lists math namespaces sequences
+vectors ;
 
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
@@ -43,21 +43,19 @@ C: gadget ( shape -- gadget )
     #! Relayout a gadget and its children.
     dup relayout gadget-children [ relayout* ] each ;
 
-: ?move ( x y gadget quot -- )
-    >r 3dup shape-pos >r rect> r> = [
-        3drop
-    ] r> ifte ; inline
+: set-gadget-loc ( loc gadget -- )
+    2dup shape-loc =
+    [ 2drop ] [ [ set-shape-loc ] keep redraw ] ifte ;
 
 : move-gadget ( x y gadget -- )
-    [ [ move-shape ] keep redraw ] ?move ;
+    >r 0 3vector r> set-gadget-loc ;
 
-: ?resize ( w h gadget quot -- )
-    >r 3dup shape-size rect> >r rect> r> = [
-        3drop
-    ] r> ifte ; inline
+: set-gadget-dim ( dim gadget -- )
+    2dup shape-dim =
+    [ 2drop ] [ [ set-shape-dim ] keep relayout* ] ifte ;
 
 : resize-gadget ( w h gadget -- )
-    [ [ resize-shape ] keep relayout* ] ?resize ;
+    >r 0 3vector r> set-gadget-dim ;
 
 : paint-prop ( gadget key -- value )
     over [
@@ -74,7 +72,10 @@ C: gadget ( shape -- gadget )
     rot gadget-paint set-hash ;
 
 GENERIC: pref-size ( gadget -- w h )
+
 M: gadget pref-size shape-size ;
+
+: pref-dim pref-size 0 3vector ;
 
 GENERIC: layout* ( gadget -- )
 

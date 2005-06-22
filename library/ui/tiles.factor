@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel math namespaces ;
+USING: generic kernel math matrices namespaces ;
 
 ! A tile is a gadget with a caption. Dragging the caption
 ! moves the gadget. The title bar also has buttons for
@@ -9,18 +9,18 @@ USING: generic kernel math namespaces ;
 TUPLE: tile original ;
 
 : click-rel ( gadget -- point )
-    screen-pos
-    hand [ hand-clicked screen-pos - ] keep hand-click-rel - ;
+    screen-loc
+    hand [ hand-clicked screen-loc v- ] keep hand-click-rel v- ;
 
 : move-tile ( tile -- )
-    dup click-rel hand screen-pos + >rect rot move-gadget ;
+    dup click-rel hand screen-loc v+ swap set-gadget-loc ;
 
 : start-resizing ( tile -- )
-    dup shape-size rect> swap set-tile-original ;
+    dup shape-dim swap set-tile-original ;
 
 : resize-tile ( tile -- )
-    dup screen-pos hand hand-click-pos - over tile-original +
-    over hand relative + >rect rot resize-gadget ;
+    dup screen-loc hand hand-click-loc v- over tile-original v+
+    over hand relative v+ swap set-gadget-dim ;
  
 : raise ( gadget -- )
     dup gadget-parent >r dup unparent r> add-gadget ;

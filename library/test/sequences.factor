@@ -12,3 +12,5 @@ USING: lists sequences test vectors ;
 [ { 3 4 } ] [ 2 4 1 10 <range> subseq ] unit-test
 [ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
+
+[ 1 2 3 ] [ 1 2 3 3vector 3unseq ] unit-test

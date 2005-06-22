@@ -25,3 +25,9 @@ M: general-list thaw >vector ;
 M: general-list like drop >list ;
 
 M: vector like drop >vector ;
+
+: 3vector ( x y z -- { x y z } )
+    3 <vector>
+    [ >r rot r> push ] keep
+    [ swapd push ] keep
+    [ push ] keep ;

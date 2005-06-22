@@ -10,7 +10,11 @@ vectors ;
 : v+ ( v v -- v ) [ + ] 2map ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
+: v/ ( v v -- v ) [ / ] 2map ;
 : v** ( v v -- v ) [ conjugate * ] 2map ;
+: vmax ( v v -- v ) [ max ] 2map ;
+: vmin ( v v -- v ) [ min ] 2map ;
+: vneg ( v -- v ) [ neg ] map ;
 
 : sum ( v -- n ) 0 swap [ + ] each ;
 : product 1 swap [ * ] each ;

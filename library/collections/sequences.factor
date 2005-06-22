@@ -56,6 +56,9 @@ DEFER: subseq
 : third 2 swap nth ; inline
 : fourth 3 swap nth ; inline
 
+: 3unseq ( { x y z } -- x y z )
+    dup first over second rot third ;
+
 ! Some low-level code used by vectors and string buffers.
 IN: kernel-internals
 

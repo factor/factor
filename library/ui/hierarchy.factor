@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces
+USING: generic hashtables kernel lists math matrices namespaces
 sequences ;
 
 : remove-gadget ( gadget box -- )
@@ -54,8 +54,12 @@ sequences ;
     #! The position of the gadget on the screen.
     0 swap [ shape-pos + t ] each-parent drop ;
 
+: screen-loc ( gadget -- point )
+    #! The position of the gadget on the screen.
+    { 0 0 0 } swap [ shape-loc v+ t ] each-parent drop ;
+
 : relative ( g1 g2 -- g2-g1 )
-    screen-pos swap screen-pos - ;
+    screen-loc swap screen-loc v- ;
 
 : child? ( parent child -- ? )
     dup [
