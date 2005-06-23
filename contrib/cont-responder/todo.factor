@@ -56,7 +56,7 @@ USE: http
 : add-todo-item ( <todo> <item> -- )
   #! Add the item to the todo list
   swap [
-    "items" get swap unit append "items" set
+    "items" get swap add "items" set
   ] bind ;
 
 : >yes/no ( bool -- str )

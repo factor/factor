@@ -96,8 +96,12 @@ M: object contains? ( obj seq -- ? )
     [ over push ] each drop ;
 
 : append ( s1 s2 -- s1+s2 )
-    #! Return a new sequence of the same type as s1.
+    #! Outputs a new sequence of the same type as s1.
     swap [ swap nappend ] immutable ;
+
+: add ( seq elt -- seq )
+    #! Outputs a new sequence of the same type as seq.
+    unit append ;
 
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.

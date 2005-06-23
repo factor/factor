@@ -90,7 +90,7 @@ M: list3 (eval-infix)
     swap-in-infix \ dup swons swap append ;
 
 M: list2 (eval-infix)
-    2unlist swapd (eval-infix) swap arith-1 word-prop unit append ;
+    2unlist swapd (eval-infix) swap arith-1 word-prop add ;
 
 : build-prefix ( num-of-vars -- quote )
     #! What needs to be placed in front of the eval-infix quote

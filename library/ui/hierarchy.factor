@@ -11,7 +11,7 @@ sequences ;
 
 : (add-gadget) ( gadget box -- )
     #! This is inefficient.
-    [ gadget-children swap unit append ] keep
+    [ gadget-children swap add ] keep
     set-gadget-children ;
 
 : unparent ( gadget -- )

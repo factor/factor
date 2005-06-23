@@ -78,7 +78,7 @@ C: hand ( world -- hand )
 
 : motion-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].
-    rot hand-buttons car unit append swap handle-gesture drop ;
+    rot hand-buttons car add swap handle-gesture drop ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,

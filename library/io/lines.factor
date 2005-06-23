@@ -30,9 +30,11 @@ M: line-reader stream-readln ( line -- string )
 
 M: line-reader stream-read ( count line -- string )
     [ delegate stream-read ] keep dup cr> [
-        over empty?
-        [ drop ]
-        [ >r 1 swap tail r> stream-read1 [ append ] when* ] ifte
+        over empty? [
+            drop
+        ] [
+            >r 1 swap tail r> stream-read1 [ add ] when*
+        ] ifte
     ] [
         drop
     ] ifte ;

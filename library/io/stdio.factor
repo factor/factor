@@ -29,8 +29,3 @@ USING: errors kernel lists namespaces generic strings ;
         swap stdio set
         [ [ close rethrow ] when* ] catch
     ] with-scope ;
-
-TUPLE: stdio-stream ;
-C: stdio-stream ( stream -- stream ) [ set-delegate ] keep ;
-M: stdio-stream stream-auto-flush ( -- ) delegate stream-flush ;
-M: stdio-stream stream-close ( -- ) drop ;

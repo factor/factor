@@ -19,7 +19,7 @@ M: resize-event handle-event ( event -- )
     world get relayout ;
 
 : button-gesture ( button gesture -- )
-    swap unit append hand hand-clicked handle-gesture drop ;
+    swap add hand hand-clicked handle-gesture drop ;
 
 M: button-down-event handle-event ( event -- )
     button-event-button dup hand button/
