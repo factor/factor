@@ -24,6 +24,8 @@ M: duplex-stream stream-write-attr
     duplex-stream-out stream-write-attr ;
 
 M: duplex-stream stream-close
+    dup
+    duplex-stream-in stream-close
     duplex-stream-out stream-close ;
 
 M: duplex-stream set-timeout
