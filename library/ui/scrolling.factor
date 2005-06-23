@@ -57,12 +57,19 @@ TUPLE: slider viewport thumb vector ;
 : >viewport ( pos slider -- pos )
     slider-viewport visible-portion v/ ;
 
-: slider-drag ( slider -- pos )
-    hand swap relative hand hand-click-rel v+ ;
+: slider-current ( slider -- pos )
+    dup slider-viewport viewport-origin
+    dup rot slider-vector v* v- ;
+
+: slider-pos ( slider pos -- pos )
+    hand pick relative v+ over slider-vector v* swap >viewport ;
+
+: slider-click ( slider pos -- )
+    dupd slider-pos over slider-current v+
+    over slider-viewport scroll relayout ;
 
 : slider-motion ( slider -- )
-    dup slider-drag over >viewport
-    over slider-viewport scroll relayout ;
+    hand hand-click-rel slider-click ;
 
 : thumb-actions ( thumb -- )
     dup [ drop ] [ button-down 1 ] set-action
@@ -70,26 +77,15 @@ TUPLE: slider viewport thumb vector ;
     [ gadget-parent slider-motion ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    0 0 0 0 <plain-rect> <gadget>
+    <plain-gadget>
     dup t reverse-video set-paint-prop
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
     2dup add-gadget set-slider-thumb ;
 
-: slider-current ( slider -- pos )
-    dup slider-viewport viewport-origin
-    dup rot slider-vector v* v- ;
-
-: slider-pos ( slider -- pos )
-    hand over relative over slider-vector v* swap >viewport ;
-
-: slider-click ( slider -- )
-    dup slider-pos over slider-current v+
-    swap slider-viewport scroll ;
-
 : slider-actions ( slider -- )
-    [ slider-click ] [ button-down 1 ] set-action ;
+    [ { 0 0 0 } slider-click ] [ button-down 1 ] set-action ;
 
 C: slider ( viewport vector -- slider )
     [ set-slider-vector ] keep

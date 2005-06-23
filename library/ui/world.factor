@@ -12,7 +12,7 @@ threads sequences ;
 TUPLE: world running? hand menu ;
 
 : <world-box> ( -- box )
-    0 0 0 0 <plain-rect> <gadget> ;
+    <plain-gadget> ;
 
 C: world ( -- world )
     <world-box> over set-delegate

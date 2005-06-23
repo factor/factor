@@ -15,7 +15,7 @@ USING: generic kernel lists math namespaces sequences ;
     add-gadget ;
 
 : menu-item-border ( child -- border )
-    0 0 0 0 <plain-rect> <gadget> 1 <border> ;
+    <plain-gadget> 1 <border> ;
 
 : <menu-item> ( label quot -- gadget )
     >r <label> menu-item-border dup r> button-gestures ;

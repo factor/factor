@@ -66,8 +66,7 @@ TUPLE: editor line caret ;
     ] swap add-actions ;
 
 : <caret> ( -- caret )
-    0 0 0 0 <plain-rect> <gadget>
-    dup red background set-paint-prop ;
+    <plain-gadget> dup red background set-paint-prop ;
 
 C: editor ( text -- )
     <empty-gadget> over set-delegate

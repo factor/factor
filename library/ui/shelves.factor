@@ -8,6 +8,9 @@ sdl sequences ;
 TUPLE: shelf gap align fill ;
 
 C: shelf ( align gap fill -- shelf )
+    #! align: 0 left aligns, 1/2 center, 1 right.
+    #! gap: between each child.
+    #! fill: 0 leaves default width, 1 fills to pile width.
     <empty-gadget> over set-delegate
     [ set-shelf-fill ] keep
     [ set-shelf-gap ] keep

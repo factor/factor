@@ -18,6 +18,8 @@ C: gadget ( shape -- gadget )
 
 : <empty-gadget> ( -- gadget ) 0 0 0 0 <rectangle> <gadget> ;
 
+: <plain-gadget> ( -- gadget ) 0 0 0 0 <plain-rect> <gadget> ;
+
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
     #! loop.

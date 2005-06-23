@@ -20,7 +20,7 @@ C: border ( child delegate size -- border )
     0 0 0 0 <etched-rect> <gadget> 5 <border> ;
 
 : filled-border ( child -- border )
-    0 0 0 0 <plain-rect> <gadget> 5 <border> ;
+    <plain-gadget> 5 <border> ;
 
 : gadget-child gadget-children car ;
 
