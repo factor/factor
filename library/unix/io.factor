@@ -306,7 +306,9 @@ M: port stream-write-attr ( string style writer -- )
     nip >r dup string? [ ch>string ] unless r> blocking-write ;
 
 M: port stream-close ( stream -- )
-    dup stream-flush delegate [ buffer-free ] when* ;
+    dup stream-flush
+    dup port-handle close
+    delegate [ buffer-free ] when* ;
 
 ! Make a duplex stream for reading/writing a pair of fds
 
