@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math namespaces sequences
-vectors ;
+USING: generic hashtables kernel lists math matrices namespaces
+sequences vectors ;
 
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
@@ -88,4 +88,13 @@ M: gadget layout*
     gadget-children [ prefer ] each ;
 
 GENERIC: user-input* ( ch gadget -- ? )
+
 M: gadget user-input* 2drop t ;
+
+GENERIC: orientation ( gadget -- vector )
+
+: orient* ( x y axis -- v )
+    2dup v* >r >r drop dup r> v* v- r> v+ ;
+
+: orient ( x y gadget -- vec )
+    orientation orient* ;

@@ -68,12 +68,14 @@ TUPLE: tile original ;
      [ add-center ] keep ;
 
 C: tile ( child caption -- tile )
-    [ f line-border swap set-delegate ] keep
+    f line-border over set-delegate
     [ >r tile-content r> add-gadget ] keep
-    [ tile-actions ] keep ;
+    dup tile-actions ;
 
 M: tile pref-size shape-size ;
 
 : tile ( gadget title -- )
     #! Show the gadget in a new tile.
-    <tile> [ world get add-gadget ] keep prefer ;
+    <tile> [
+        world get add-gadget { 100 100 0 }
+    ] keep set-gadget-dim ;

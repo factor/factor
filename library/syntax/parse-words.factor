@@ -146,3 +146,17 @@ global [ string-mode off ] bind
     ] [
         drop
     ] ifte ;
+
+: (parse-string) ( n str -- n )
+    2dup nth CHAR: " = [
+        drop 1 +
+    ] [
+        [ next-char swap , ] keep (parse-string)
+    ] ifte ;
+
+: parse-string ( -- str )
+    #! Read a string from the input stream, until it is
+    #! terminated by a ".
+    "col" [
+        [ "line" get (parse-string) ] make-string swap
+    ] change ;

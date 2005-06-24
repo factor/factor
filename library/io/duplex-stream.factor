@@ -24,9 +24,12 @@ M: duplex-stream stream-write-attr
     duplex-stream-out stream-write-attr ;
 
 M: duplex-stream stream-close
+    #! The output stream is closed first, in case both streams
+    #! are attached to the same file descriptor, the output
+    #! buffer needs to be flushed before we close the fd.
     dup
-    duplex-stream-in stream-close
-    duplex-stream-out stream-close ;
+    duplex-stream-out stream-close
+    duplex-stream-in stream-close ;
 
 M: duplex-stream set-timeout
     2dup

@@ -5,6 +5,7 @@ USING: errors generic kernel lists math namespaces sequences
 vectors ;
 
 : n*v ( n vec -- vec ) [ * ] map-with ;
+: v*n ( vec n -- vec ) swap n*v ;
 
 ! Vector operations
 : v+ ( v v -- v ) [ + ] 2map ;

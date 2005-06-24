@@ -113,20 +113,6 @@ BUILTIN: f 9 not ;
 : CHAR: ( -- ) 0 scan next-char drop swons ; parsing
 
 ! String literal
-: (parse-string) ( n str -- n )
-    2dup nth CHAR: " = [
-        drop 1 +
-    ] [
-        [ next-char swap , ] keep (parse-string)
-    ] ifte ;
-
-: parse-string ( -- str )
-    #! Read a string from the input stream, until it is
-    #! terminated by a ".
-    "col" [
-        [ "line" get (parse-string) ] make-string swap
-    ] change ;
-
 : " parse-string swons ; parsing
 
 : SBUF" skip-blank parse-string >sbuf swons ; parsing
