@@ -192,7 +192,7 @@ M: object next-logical ( linear vop -- linear )
 : next-logical? ( op linear -- ? )
     dup car next-logical dup [ car class = ] [ 2drop f ] ifte ;
 
-: reduce ( linear op new -- linear ? )
+: collapse ( linear op new -- linear ? )
     >r over cdr next-logical? [
         dup car vop-label
         r> execute swap cdr cons t
@@ -202,11 +202,11 @@ M: object next-logical ( linear vop -- linear )
 
 M: %call simplify-node ( linear vop -- ? )
     #! Tail call optimization.
-    drop \ %return \ %jump reduce ;
+    drop \ %return \ %jump collapse ;
 
 M: %call-label simplify-node ( linear vop -- ? )
     #! Tail call optimization.
-    drop \ %return \ %jump-label reduce ;
+    drop \ %return \ %jump-label collapse ;
 
 : double-jump ( linear op2 op1 -- linear ? )
     #! A jump to a jump is just a jump. If the next logical node
