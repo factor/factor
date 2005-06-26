@@ -64,7 +64,7 @@ M: general-list contains? ( obj list -- ? )
     2dup contains? [ nip ] [ cons ] ifte ;
 
 M: general-list reverse ( list -- list )
-    [ ] swap [ swons ] each ;
+    [ ] [ swons ] reduce ;
 
 M: f map ( list quot -- list ) drop ;
 

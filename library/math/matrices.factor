@@ -17,8 +17,11 @@ vectors ;
 : vmin ( v v -- v ) [ min ] 2map ;
 : vneg ( v -- v ) [ neg ] map ;
 
-: sum ( v -- n ) 0 swap [ + ] each ;
-: product 1 swap [ * ] each ;
+: sum ( v -- n ) 0 [ + ] reduce ;
+: product 1 [ * ] reduce ;
+
+: set-axis ( x y axis -- v )
+    2dup v* >r >r drop dup r> v* v- r> v+ ;
 
 ! Later, this will fixed when 2each works properly
 ! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;

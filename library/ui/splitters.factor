@@ -1,13 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists matrices namespaces sequences ;
+USING: generic kernel lists math matrices namespaces sequences ;
 
 TUPLE: divider splitter ;
-
-C: divider ( -- divider )
-    <plain-gadget> over set-delegate
-    dup t reverse-video set-paint-prop ;
 
 : divider-size { 8 8 0 } ;
 
@@ -15,7 +11,23 @@ M: divider pref-size drop divider-size 3unseq drop ;
 
 TUPLE: splitter vector split ;
 
-M: splitter orientation splitter-vector ;
+: hand>split ( splitter -- n )
+    hand relative hand hand-click-rel v- divider-size 1/2 v*n v+ ;
+
+: divider-motion ( splitter -- )
+    dup hand>split
+    over shape-dim { 1 1 1 } vmax v/ over splitter-vector v.
+    0 max 1 min over set-splitter-split relayout ;
+
+: divider-actions ( thumb -- )
+    dup [ drop ] [ button-down 1 ] set-action
+    dup [ drop ] [ button-up 1 ] set-action
+    [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
+
+C: divider ( -- divider )
+    <plain-gadget> over set-delegate
+    dup t reverse-video set-paint-prop
+    dup divider-actions ;
 
 C: splitter ( first second vector -- splitter )
     <empty-gadget> over set-delegate
@@ -26,16 +38,16 @@ C: splitter ( first second vector -- splitter )
     [ add-gadget ] keep
     1/2 over set-splitter-split ;
 
-: <x-splitter> { 1 0 0 } <splitter> ;
+: <x-splitter> { 0 1 0 } <splitter> ;
 
-: <y-splitter> { 0 1 0 } <splitter> ;
+: <y-splitter> { 1 0 0 } <splitter> ;
 
 M: splitter pref-size
     [
         gadget-children [ pref-dim ] map
-        dup { 0 0 0 } swap [ vmax ] each
-        swap { 0 0 0 } swap [ v+ ] each
-    ] keep orient 3unseq drop ;
+        dup { 0 0 0 } [ vmax ] reduce
+        swap { 0 0 0 } [ v+ ] reduce
+    ] keep splitter-vector set-axis 3unseq drop ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;
@@ -47,10 +59,22 @@ M: splitter pref-size
         dup shape-dim swap splitter-part v- ,
     ] make-list ;
 
+: packed-locs ( axis sizes gadget -- )
+    >r
+    { 0 0 0 } [ v+ ] accumulate
+    [ { 0 0 0 } swap rot set-axis ] map-with
+    r> gadget-children zip [ uncons set-gadget-loc ] each ;
+
+: packed-dims ( axis sizes gadget -- dims )
+    [
+        shape-dim swap [ >r 2dup r> rot set-axis ] map 2nip
+    ] keep gadget-children zip [ uncons set-gadget-dim ] each ;
+
 : layout-divider ( assoc -- )
     [ uncons set-gadget-dim ] each ;
 
+: packed-layout ( axis sizes gadgets -- )
+    3dup packed-locs packed-dims ;
+
 M: splitter layout* ( splitter -- )
-    [
-        dup splitter-layout [ nip ( { 0 0 0 } rot orient ) ] map-with
-    ] keep gadget-children zip layout-divider ;
+    dup splitter-vector over splitter-layout rot packed-layout ;

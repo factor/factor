@@ -20,7 +20,7 @@ M: object digit> not-a-number ;
     dup empty? [
         not-a-number
     ] [
-        0 swap [ digit> pick digit+ ] each nip
+        0 [ digit> pick digit+ ] reduce nip
     ] ifte ;
 
 : base> ( str base -- num )

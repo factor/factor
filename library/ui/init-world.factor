@@ -16,4 +16,10 @@ global [
     }} world get set-gadget-paint
     
     1024 768 world get resize-gadget
+    
+    <plain-gadget> world get add-gadget
+
+    <console> "Stack display goes here" <label> <y-splitter>
+    3/4 over set-splitter-split
+    world get add-gadget
 ] bind

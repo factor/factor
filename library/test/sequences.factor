@@ -1,5 +1,5 @@
 IN: temporary
-USING: lists sequences test vectors ;
+USING: lists math sequences test vectors ;
 
 [ [ 1 2 3 4 ] ] [ 1 5 <range> >list ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
@@ -14,3 +14,8 @@ USING: lists sequences test vectors ;
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
 [ 1 2 3 ] [ 1 2 3 3vector 3unseq ] unit-test
+
+[ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
+
+[ [ 1 1 2 6 24 120 720 ] ]
+[ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumilate ] unit-test

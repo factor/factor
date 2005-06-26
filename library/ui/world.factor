@@ -11,11 +11,8 @@ threads sequences ;
 ! open at any one time.
 TUPLE: world running? hand menu ;
 
-: <world-box> ( -- box )
-    <plain-gadget> ;
-
 C: world ( -- world )
-    <world-box> over set-delegate
+    f <stack> over set-delegate
     t over set-world-running?
     dup <hand> over set-world-hand ;
 

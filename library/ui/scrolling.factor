@@ -78,7 +78,7 @@ TUPLE: slider viewport thumb vector ;
 
 : <thumb> ( -- thumb )
     <plain-gadget>
-    dup t reverse-video set-paint-prop
+    dup gray background set-paint-prop
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )

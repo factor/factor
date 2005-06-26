@@ -90,11 +90,3 @@ M: gadget layout*
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
-
-GENERIC: orientation ( gadget -- vector )
-
-: orient* ( x y axis -- v )
-    2dup v* >r >r drop dup r> v* v- r> v+ ;
-
-: orient ( x y gadget -- vec )
-    orientation orient* ;

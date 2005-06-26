@@ -32,6 +32,9 @@ G: each ( seq quot -- | quot: elt -- )
 : each-with ( obj seq quot -- | quot: obj elt -- )
     swap [ with ] each 2drop ; inline
 
+: reduce ( list identity quot -- value | quot: x y -- z )
+    swapd each ; inline
+
 G: tree-each ( obj quot -- | quot: elt -- )
     [ over ] [ type ] ; inline
 
@@ -43,6 +46,9 @@ G: map ( seq quot -- seq | quot: elt -- elt )
 
 : map-with ( obj list quot -- list | quot: obj elt -- elt )
     swap [ with rot ] map 2nip ; inline
+
+: accumulate ( list identity quot -- values | quot: x y -- z )
+    rot [ pick >r swap call r> ] map-with nip ; inline
 
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
