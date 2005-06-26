@@ -76,9 +76,6 @@ M: port set-timeout ( timeout port -- )
 : pending-error ( port -- )
     dup port-error f rot set-port-error throw ;
 
-: EAGAIN 11 ;
-: EINTR 4 ;
-
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
     err_no dup EAGAIN = over EINTR = or [

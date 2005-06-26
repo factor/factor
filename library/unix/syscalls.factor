@@ -5,8 +5,6 @@ USING: alien errors kernel math namespaces ;
 
 ! Alien wrappers for various Unix libc functions.
 
-: EINPROGRESS 36 ;
-
 LIBRARY: factor
 FUNCTION: int err_no ( ) ;
 

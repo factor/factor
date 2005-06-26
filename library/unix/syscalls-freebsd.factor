@@ -31,3 +31,7 @@ BEGIN-STRUCT: sockaddr-in
     FIELD: in_addr_t addr
     FIELD: longlong unused
 END-STRUCT
+
+: EINTR HEX: 4 ;
+: EAGAIN HEX: 23 ;
+: EINPROGRESS HEX: 24 ;
