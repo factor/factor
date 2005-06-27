@@ -58,6 +58,7 @@ parser prettyprint sequences io vectors words ;
         "/library/io/files.factor"
 
         "/library/threads.factor"
+        "/library/styles.factor"
 
         "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"

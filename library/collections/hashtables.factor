@@ -158,3 +158,10 @@ M: hashtable hashcode ( hash -- n )
     ] [
         0 swap hash-bucket hashcode
     ] ifte ;
+
+: cache ( key hash quot -- value | quot: key -- value )
+    pick pick hash [
+        >r 3drop r>
+    ] [
+        pick rot >r >r call dup r> r> set-hash
+    ] ifte* ; inline

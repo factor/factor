@@ -15,7 +15,7 @@ SYMBOL: surface
 
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
-    SDL_INIT_EVERYTHING SDL_Init drop  TTF_Init
+    SDL_INIT_EVERYTHING SDL_Init drop
     1 SDL_EnableUNICODE drop
     SDL_DEFAULT_REPEAT_DELAY SDL_DEFAULT_REPEAT_INTERVAL
     SDL_EnableKeyRepeat drop

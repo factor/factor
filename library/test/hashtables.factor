@@ -129,3 +129,10 @@ f 100000000000000000000000000 "testhash" get set-hash
         uncons + +
     ] hash-each
 ] unit-test
+
+<namespace> "cache-test" set
+
+[ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
+[ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
+[ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
+[ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test

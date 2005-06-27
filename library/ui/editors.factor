@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel line-editor lists math namespaces sdl
-sequences strings ;
+sequences strings styles ;
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
@@ -75,11 +75,11 @@ C: editor ( text -- )
     [ set-editor-text ] keep
     dup editor-actions ;
 
-: offset>x ( offset str -- x )
-    head font get swap size-string drop ;
+: offset>x ( gadget offset str -- x )
+    head >r gadget-font r> size-string drop ;
 
 : caret-pos ( editor -- x y )
-    editor-line [ caret get line-text get ] bind offset>x 0 ;
+    dup editor-line [ caret get line-text get ] bind offset>x 0 ;
 
 : caret-size ( editor -- w h )
     1 swap shape-h ;
@@ -96,4 +96,5 @@ M: editor layout* ( editor -- )
     dup editor-caret swap caret-pos rot move-gadget ;
 
 M: editor draw-shape ( editor -- )
-    [ editor-text ] keep [ draw-string ] with-trans ;
+    [ dup gadget-font swap editor-text ] keep
+    [ draw-string ] with-trans ;

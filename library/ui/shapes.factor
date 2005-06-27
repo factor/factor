@@ -32,17 +32,7 @@ GENERIC: resize-shape ( w h shape -- )
     >r 3unseq drop r> resize-shape ;
 
 ! The painting protocol. Painting is controlled by various
-! dynamically-scoped variables.
-
-! Colors are lists of three integers, 0..255.
-SYMBOL: foreground ! Used for text and outline shapes.
-SYMBOL: background ! Used for filled shapes.
-SYMBOL: reverse-video
-
-: fg reverse-video get background foreground ? get ;
-: bg reverse-video get foreground background ? get ;
-
-SYMBOL: font  ! a list of two elements, a font name and size.
+! dynamically-scoped variables. See library/styles.factor.
 
 GENERIC: draw-shape ( obj -- )
 

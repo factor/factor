@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: generic hashtables io kernel lists namespaces sequences
-streams strings unparser words ;
+streams strings styles unparser words ;
 
 ! Prettyprinting words
 : vocab-actions ( search -- list )
@@ -40,6 +40,7 @@ streams strings unparser words ;
         [[ "ansi-fg" "0" ]]
         [[ "ansi-bg" "2" ]]
         [[ "fg" [ 255 0 0 ] ]]
+        [[ foreground [ 192 0 0 ] ]]
     ] ;
 
 : comment. ( comment -- ) comment-style write-attr ;

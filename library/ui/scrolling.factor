@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel lists math matrices namespaces sequences
-threads vectors ;
+threads vectors styles ;
 
 ! A viewport can be scrolled.
 

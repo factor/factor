@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel line-editor listener lists math namespaces
-sequences io strings threads ;
+sequences io strings threads styles ;
 
 ! A pane is an area that can display text.
 
@@ -23,7 +23,7 @@ TUPLE: pane output active current input continuation ;
     2dup set-pane-active add-gadget ;
 
 : pane-paint ( pane -- )
-    [[ "Monospaced" 12 ]] font set-paint-prop ;
+    "Monospaced" font set-paint-prop ;
 
 : pop-continuation ( pane -- quot )
     dup pane-continuation f rot set-pane-continuation ;
@@ -81,9 +81,3 @@ M: pane stream-close ( stream -- ) drop ;
     <pane> dup
     [ [ clear  print-banner listener ] in-thread ] with-stream
     <scroller> ;
-
-: console ( -- )
-    #! Open an UI console window.
-    <console> "Listener" <tile> world get [
-        shape-size rect> 3/4 * >rect rot resize-gadget
-    ] 2keep add-gadget ;

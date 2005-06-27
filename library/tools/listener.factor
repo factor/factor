@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
-USING: errors kernel lists math memory namespaces parser
-sequences io strings presentation words unparser vectors ansi ;
+USING: ansi errors io kernel lists math memory namespaces parser
+presentation sequences strings styles unparser vectors words ;
 
 SYMBOL: cont-prompt
 SYMBOL: listener-prompt
@@ -14,7 +14,7 @@ global [
 ] bind
 
 : prompt. ( text -- )
-    [ [[ "bold" t ]] ] write-attr
+    [ [[ "bold" t ]] [[ font-style bold ]] ] write-attr
     ! Print the space without a style, to workaround a bug in
     ! the GUI listener where the style from the prompt carries
     ! over to the input

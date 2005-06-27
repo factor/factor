@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl ;
+USING: generic kernel lists math namespaces sdl styles ;
 
 ! A rectangle maps trivially to the shape protocol.
 TUPLE: rectangle x y w h ;

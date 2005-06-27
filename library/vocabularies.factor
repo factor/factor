@@ -97,6 +97,6 @@ SYMBOL: vocabularies
         "hashtables" "inference" "interpreter" "jedit" "kernel"
         "listener" "lists" "math" "matrices" "memory"
         "namespaces" "parser" "prettyprint" "processes"
-        "sequences" "io" "strings" "syntax" "test" "threads"
-        "unparser" "vectors" "words" "scratchpad"
+        "sequences" "io" "strings" "styles" "syntax" "test"
+        "threads" "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

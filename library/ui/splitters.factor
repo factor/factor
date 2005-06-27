@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math matrices namespaces sequences ;
+USING: generic kernel lists math matrices namespaces sequences
+styles ;
 
 TUPLE: divider splitter ;
 

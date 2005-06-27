@@ -9,6 +9,7 @@ USING: kernel parser sequences io ;
     "/library/ui/gadgets.factor"
     "/library/ui/hierarchy.factor"
     "/library/ui/paint.factor"
+    "/library/ui/fonts.factor"
     "/library/ui/text.factor"
     "/library/ui/gestures.factor"
     "/library/ui/hand.factor"
