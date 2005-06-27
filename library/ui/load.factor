@@ -1,5 +1,6 @@
 USING: kernel parser sequences io ;
 [
+    "/library/ui/colors.factor"
     "/library/ui/shapes.factor"
     "/library/ui/points.factor"
     "/library/ui/rectangles.factor"
@@ -29,11 +30,7 @@ USING: kernel parser sequences io ;
     "/library/ui/presentations.factor"
     "/library/ui/tiles.factor"
     "/library/ui/splitters.factor"
-    "/library/ui/panes.factor"
-    "/library/ui/dialogs.factor"
-    "/library/ui/inspector.factor"
     "/library/ui/init-world.factor"
-    "/library/ui/tool-menus.factor"
     "/library/ui/ui.factor"
 ] [
     dup print run-resource

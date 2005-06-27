@@ -3,18 +3,6 @@
 IN: gadgets
 USING: kernel namespaces sdl sequences ;
 
-: title ( -- str )
-    "Factor " version append ;
-
-SYMBOL: first-time?
-global [ first-time? on ] bind
-
-: first-time ( -- )
-    first-time? get [
-        world get gadget-paint [ console ] bind
-        global [ first-time? off ] bind
-    ] when ;
-
 IN: shells
 
 : ui ( -- )
@@ -22,7 +10,7 @@ IN: shells
     #! dimensions.
     world get shape-size 0 SDL_RESIZABLE [
         0 x set 0 y set [
-            title dup SDL_WM_SetCaption first-time
+            "Factor " version append dup SDL_WM_SetCaption
             start-world
             run-world
         ] with-screen
