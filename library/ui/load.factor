@@ -28,8 +28,8 @@ USING: kernel parser sequences io ;
     "/library/ui/editors.factor"
     "/library/ui/menus.factor"
     "/library/ui/presentations.factor"
-    "/library/ui/tiles.factor"
     "/library/ui/splitters.factor"
+    "/library/ui/panes.factor"
     "/library/ui/init-world.factor"
     "/library/ui/ui.factor"
 ] [
