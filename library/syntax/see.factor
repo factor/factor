@@ -37,8 +37,6 @@ streams strings styles unparser words ;
 : comment-style
     #! Feel free to redefine this!
     [
-        [[ "ansi-fg" "0" ]]
-        [[ "ansi-bg" "2" ]]
         [[ "fg" [ 255 0 0 ] ]]
         [[ foreground [ 192 0 0 ] ]]
     ] ;

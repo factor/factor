@@ -62,7 +62,6 @@ t [
     
     "/library/eval-catch.factor"
     "/library/tools/listener.factor"
-    "/library/io/ansi.factor"
     "/library/tools/word-tools.factor"
     "/library/syntax/see.factor"
     "/library/test/test.factor"

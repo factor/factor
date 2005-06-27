@@ -55,7 +55,7 @@ sequences strings ;
     #! -no-<flag> CLI switch
     "user-init" on
     "compile" on
-    os "win32" = "ui" "ansi" ? "shell" set ;
+    os "win32" = "ui" "tty" ? "shell" set ;
 
 : parse-command-line ( -- )
     #! Parse command line arguments.

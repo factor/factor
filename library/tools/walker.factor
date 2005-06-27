@@ -60,7 +60,7 @@ sequences io strings vectors words ;
     \ bye word. " -- exit single-stepper" print
     report ;
 
-: walk-listener walk-banner "walk" listener-prompt set listener ;
+: walk-listener walk-banner "walk " listener-prompt set listener ;
 
 : init-walk ( quot callstack namestack -- )
     init-interpreter
