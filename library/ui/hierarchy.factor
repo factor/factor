@@ -15,7 +15,10 @@ sequences ;
     set-gadget-children ;
 
 : unparent ( gadget -- )
-    dup gadget-parent dup [ remove-gadget ] [ 2drop ] ifte ;
+    [
+        dup gadget-parent dup
+        [ remove-gadget ] [ 2drop ] ifte
+    ] when* ;
 
 : add-gadget ( gadget box -- )
     #! Add a gadget to a box.

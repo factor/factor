@@ -9,12 +9,22 @@ threads sequences ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The menu slot ensures that only one menu is
 ! open at any one time.
-TUPLE: world running? hand menu ;
+TUPLE: world running? hand menu glass ;
 
 C: world ( -- world )
     f <stack> over set-delegate
     t over set-world-running?
     dup <hand> over set-world-hand ;
+
+: add-layer ( gadget -- )
+    world get add-gadget ;
+
+: show-glass ( gadget world -- )
+    >r <empty-gadget> [ add-gadget ] keep
+    r> 2dup set-world-glass add-gadget ;
+
+: hide-glass ( world -- )
+    [ world-glass unparent f ] keep set-world-glass ;
 
 M: world inside? ( point world -- ? ) 2drop t ;
 

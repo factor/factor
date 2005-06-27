@@ -5,14 +5,15 @@ USING: generic kernel lists math namespaces sequences ;
 
 : hide-menu ( -- )
     world get
-    dup world-menu [ unparent ] when* f swap set-world-menu ;
+    dup hide-glass
+    [ world-menu unparent f ] keep set-world-menu ;
 
 : show-menu ( menu -- )
     hide-menu
     world get
     2dup set-world-menu
     2dup world-hand screen-pos >rect rot move-gadget
-    add-gadget ;
+    show-glass ;
 
 : menu-item-border ( child -- border )
     <plain-gadget> 1 <border> ;

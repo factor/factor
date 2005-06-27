@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor listener lists math namespaces
-sequences io strings threads styles ;
+USING: generic hashtables io kernel line-editor listener lists
+math namespaces prettyprint sequences strings styles threads ;
 
 ! A pane is an area that can display text.
 
@@ -12,13 +12,14 @@ sequences io strings threads styles ;
 TUPLE: pane output active current input continuation ;
 
 : add-output 2dup set-pane-output add-gadget ;
+
 : add-input 2dup set-pane-input add-gadget ;
 
 : <active-line> ( input current -- line )
     <line-shelf> [ add-gadget ] keep [ add-gadget ] keep ;
 
 : init-active-line ( pane -- )
-    dup pane-active [ unparent ] when*
+    dup pane-active unparent
     [ dup pane-input swap pane-current <active-line> ] keep
     2dup set-pane-active add-gadget ;
 
@@ -67,6 +68,7 @@ C: pane ( -- pane )
 
 ! Panes are streams.
 M: pane stream-flush ( stream -- ) relayout ;
+
 M: pane stream-auto-flush ( stream -- ) stream-flush ;
 
 M: pane stream-readln ( stream -- line )

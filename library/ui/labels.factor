@@ -19,6 +19,3 @@ M: label pref-size ( label -- w h )
 M: label draw-shape ( label -- )
     [ dup gadget-font swap label-text ] keep
     [ draw-string ] with-trans ;
-
-: <styled-label> ( style text -- label )
-    <label> swap alist>hash over set-gadget-paint ;

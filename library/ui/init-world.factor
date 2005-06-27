@@ -10,6 +10,7 @@ global [
     {{
 
         [[ background [ 255 255 255 ] ]]
+        [[ rollover-bg [ 216 216 216 ] ]]
         [[ foreground [ 0 0 0 ] ]]
         [[ reverse-video f ]]
         [[ font "Sans Serif" ]]
@@ -22,6 +23,5 @@ global [
     <plain-gadget> world get add-gadget
 
     <console> "Stack display goes here" <label> <y-splitter>
-    3/4 over set-splitter-split
-    world get add-gadget
+    3/4 over set-splitter-split add-layer
 ] bind
