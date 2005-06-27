@@ -33,7 +33,7 @@ global [ "  " listener-prompt set ] bind
 : listen ( -- )
     #! Wait for user input, and execute.
     listener-prompt get write flush
-    [ read-multiline [ terpri flush call ] [ bye ] ifte ] try ;
+    [ read-multiline [ call ] [ bye ] ifte ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.
