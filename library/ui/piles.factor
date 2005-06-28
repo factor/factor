@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
-sdl sequences ;
+sdl sequences vectors ;
 
 ! A pile is a box that lays out its contents vertically.
 TUPLE: pile align gap fill ;
@@ -20,15 +20,8 @@ C: pile ( align gap fill -- pile )
 : <line-pile> 0 0 1 <pile> ;
 
 M: pile pref-size ( pile -- w h )
-    [
-        dup pile-gap swap gadget-children
-        [ length 1 - 0 max * height set ] keep
-        [
-            pref-size
-            height [ + ] change
-            width [ max ] change
-        ] each
-    ] with-pref-size ;
+    dup gadget-children swap pile-gap dup dup 3vector { 0 1 0 }
+    packed-pref-dim 3unseq drop ;
 
 : w- swap shape-w swap pref-size drop - ;
 : pile-x/y ( pile gadget offset -- )
