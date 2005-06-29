@@ -4,7 +4,20 @@ IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
 sdl sequences vectors ;
 
-! A pile is a box that lays out its contents vertically.
+! pile-align
+!
+! if the component is smaller than its allocated space, where to
+! place the component inside the allocated space.
+!
+! pile-gap
+! 
+! amount of space, in pixels, between components.
+! 
+! pile-fill
+! 
+! if the component is smaller than its allocated space, how much
+! to scale the size, where a value of 0 represents no scaling, and
+! a value of 1 represents resizing to fully fill allocated space.
 TUPLE: pile align gap fill ;
 
 C: pile ( align gap fill -- pile )
@@ -16,18 +29,16 @@ C: pile ( align gap fill -- pile )
     [ set-pile-gap ] keep
     [ set-pile-align ] keep ;
 
-: <default-pile> 1/2 default-gap 0 <pile> ;
-: <line-pile> 0 0 1 <pile> ;
+: <line-pile> 0 { 0 0 0 } 1 <pile> ;
 
-M: pile pref-size ( pile -- w h )
-    dup gadget-children swap pile-gap dup dup 3vector { 0 1 0 }
-    packed-pref-dim 3unseq drop ;
+M: pile pref-dim ( pile -- dim )
+    dup gadget-children swap pile-gap { 0 1 0 } packed-pref-dim ;
 
 : w- swap shape-w swap pref-size drop - ;
 : pile-x/y ( pile gadget offset -- )
     rot pile-align * >fixnum y get rot move-gadget ;
 : pile-w/h ( pile gadget offset -- )
-    rot dup pile-gap y [ + ] change
+    rot dup pile-gap first y [ + ] change
     pile-fill * >fixnum over pref-size dup y [ + ] change
     >r + r> rot resize-gadget ;
 : vertically ( pile gadget -- ) 2dup w- 3dup pile-x/y pile-w/h ;

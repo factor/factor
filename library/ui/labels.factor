@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables io kernel lists math namespaces sdl
-sequences styles ;
+sequences styles vectors ;
 
 ! A label gadget draws a string.
 TUPLE: label text ;
@@ -13,8 +13,8 @@ C: label ( text -- label )
 : label-size ( gadget text -- w h )
     >r gadget-font r> size-string ;
 
-M: label pref-size ( label -- w h )
-    dup label-text label-size ;
+M: label pref-dim ( label -- dim )
+    dup label-text label-size 0 3vector ;
 
 M: label draw-shape ( label -- )
     [ dup gadget-font swap label-text ] keep

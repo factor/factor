@@ -27,8 +27,6 @@ namespaces sdl sequences ;
 : with-layout ( quot -- )
     [ 0 x set 0 y set call ] with-scope ; inline
 
-: default-gap 3 ;
-
 : packed-pref-dim ( children gap axis -- dim )
     #! The preferred size of the gadget, if all children are
     #! packed in the direction of the given axis.

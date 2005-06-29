@@ -73,15 +73,15 @@ C: gadget ( shape -- gadget )
 : set-paint-prop ( gadget value key -- )
     rot gadget-paint set-hash ;
 
-GENERIC: pref-size ( gadget -- w h )
+GENERIC: pref-dim ( gadget -- dim )
 
-M: gadget pref-size shape-size ;
+M: gadget pref-dim shape-dim ;
 
-: pref-dim pref-size 0 3vector ;
+: pref-size pref-dim 3unseq drop ;
 
 GENERIC: layout* ( gadget -- )
 
-: prefer ( gadget -- ) [ pref-size ] keep resize-gadget ;
+: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
 
 M: gadget layout*
     #! Trivial layout gives each child its preferred size.

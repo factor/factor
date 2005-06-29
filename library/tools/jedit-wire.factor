@@ -39,7 +39,7 @@ prettyprint sequences io strings words ;
 ! remaining -- input
 : jedit-write-attr ( str style -- )
     CHAR: w write
-    [ swap . . ] string-out
+    [ swap . "USE: styles" print . ] string-out
     dup write-len write ;
 
 TUPLE: jedit-stream ;

@@ -13,7 +13,7 @@ C: stack ( list -- stack )
 : max-dim ( shapelist -- dim )
     { 0 0 0 } [ shape-dim vmax ] reduce ;
 
-M: stack pref-size gadget-children max-dim 3unseq drop ;
+M: stack pref-dim gadget-children max-dim ;
 
 M: stack layout* ( stack -- )
     dup shape-dim swap gadget-children

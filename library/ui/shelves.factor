@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: errors generic hashtables kernel lists math namespaces
-sdl sequences ;
+sdl sequences vectors ;
 
 ! A shelf is a box that lays out its contents horizontally.
 TUPLE: shelf gap align fill ;
@@ -16,10 +16,10 @@ C: shelf ( align gap fill -- shelf )
     [ set-shelf-gap ] keep
     [ set-shelf-align ] keep ;
 
-: <default-shelf> 1/2 default-gap 0 <shelf> ;
+: <default-shelf> 1/2 { 3 3 3 } 0 <shelf> ;
 : <line-shelf> 0 0 1 <shelf> ;
 
-M: shelf pref-size ( pile -- w h )
+M: shelf pref-dim ( pile -- dim )
     [
         dup shelf-gap swap gadget-children
         [ length 1 - 0 max * width set ] keep
@@ -28,7 +28,7 @@ M: shelf pref-size ( pile -- w h )
             height [ max ] change
             width [ + ] change
         ] each
-    ] with-pref-size ;
+    ] with-pref-size 0 3vector ;
 
 : h- swap shape-h swap pref-size nip - ;
 : shelf-x/y rot shelf-align * >fixnum >r x get r> rot move-gadget ;

@@ -207,6 +207,7 @@ vocabularies get [
     [ "fwrite" "io-internals"                 [ [ string alien ] [ ] ] ]
     [ "fflush" "io-internals"                 [ [ alien ] [ ] ] ]
     [ "fclose" "io-internals"                 [ [ alien ] [ ] ] ]
+    [ "expired?" "alien"                      [ [ object ] [ boolean ] ] ]
 ] [
     make-primitive
 ] each drop

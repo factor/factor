@@ -35,7 +35,7 @@ global [ open-fonts nest drop ] bind
 
 : ttf-init ( -- )
     TTF_Init
-    open-fonts [ [ cdr null? not ] hash-subset ] change ;
+    open-fonts [ [ cdr expired? not ] hash-subset ] change ;
 
 : gadget-font ( gadget -- font )
     [ font paint-prop ] keep

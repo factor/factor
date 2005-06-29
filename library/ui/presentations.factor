@@ -1,10 +1,12 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: hashtables io kernel lists namespaces prettyprint ;
+USING: hashtables io kernel lists namespaces parser prettyprint
+sequences ;
 
 : actions-menu ( -- )
-    "actions" get <menu> show-menu ;
+    "actions" get [ uncons [ eval ] append cons ] map
+    <menu> show-menu ;
 
 : init-actions ( gadget -- )
     [ "actions" get actions-menu ] button-gestures ;

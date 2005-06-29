@@ -8,7 +8,7 @@ TUPLE: divider splitter ;
 
 : divider-size { 8 8 0 } ;
 
-M: divider pref-size drop divider-size 3unseq drop ;
+M: divider pref-dim drop divider-size ;
 
 TUPLE: splitter vector split ;
 
@@ -43,9 +43,9 @@ C: splitter ( first second vector -- splitter )
 
 : <y-splitter> { 1 0 0 } <splitter> ;
 
-M: splitter pref-size
-    dup gadget-children swap splitter-vector { 0 0 0 } swap
-    packed-pref-dim 3unseq drop ;
+M: splitter pref-dim
+    dup gadget-children swap splitter-vector
+    { 0 0 0 } swap packed-pref-dim ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;

@@ -20,6 +20,7 @@ INLINE DISPLACED_ALIEN* untag_displaced_alien_fast(CELL tagged)
 	return (DISPLACED_ALIEN*)UNTAG(tagged);
 }
 
+void primitive_expired(void);
 void primitive_alien(void);
 void primitive_displaced_alien(void);
 void primitive_alien_address(void);

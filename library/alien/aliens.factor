@@ -16,8 +16,6 @@ BUILTIN: displaced-alien 20 displaced-alien? ;
     #! C null value.
     0 <alien> ;
 
-: null? ( alien -- ? ) dup alien? [ alien-address 0 = ] when ;
-
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
 

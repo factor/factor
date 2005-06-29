@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: gadgets generic kernel lists math namespaces sdl
-sequences words ;
+sequences vectors words ;
 
 ! A frame arranges left/right/top/bottom gadgets around a
 ! center gadget, which gets any leftover space.
@@ -43,7 +43,7 @@ C: frame ( -- frame )
 : add-h pref-size nip height [ + ] change ;
 : add-w pref-size drop width [ + ] change ;
 
-M: frame pref-size ( glue -- w h )
+M: frame pref-dim ( glue -- dim )
     [
         dup frame-major [ max-w ] each
         dup frame-minor [ max-h ] each
@@ -51,7 +51,7 @@ M: frame pref-size ( glue -- w h )
         dup frame-right add-w
         dup frame-top add-h
         frame-bottom add-h
-    ] with-pref-size ;
+    ] with-pref-size 0 3vector ;
 
 SYMBOL: frame-right-run
 SYMBOL: frame-bottom-run

@@ -1,15 +1,24 @@
 Factor 0.76:
 ------------
 
-+ Framework
-
-- md5 hashing algorithm in contrib/crypto/ (Doug Coleman).
++ Core language
 
 - New words:
 
   math bitroll ( n s w -- n )
   unparser hex-string ( str -- str )
   sequences fourth ( seq -- elt )
+
+- String input streams.
+
+  with-string is now string-out ( quot -- string )
+
+  new string-in ( string quot -- ) word, calls quot with stdio bound to
+  a stream that reads from the given string.
+
++ Framework
+
+- md5 hashing algorithm in contrib/crypto/ (Doug Coleman).
 
 Factor 0.75:
 ------------

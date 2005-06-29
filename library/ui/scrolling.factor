@@ -34,7 +34,7 @@ C: viewport ( content -- viewport )
     [ add-gadget ] keep
     { 0 0 0 } over set-viewport-origin ;
 
-M: viewport pref-size gadget-child pref-size ;
+M: viewport pref-dim gadget-child pref-dim ;
 
 M: viewport layout* ( viewport -- )
     dup viewport-origin
@@ -106,7 +106,7 @@ C: slider ( viewport vector -- slider )
 : thumb-dim ( slider -- h )
     [ shape-dim dup ] keep >thumb slider-dim vmax vmin ;
 
-M: slider pref-size drop slider-dim 3unseq drop ;
+M: slider pref-dim drop slider-dim ;
 
 M: slider layout* ( slider -- )
     dup thumb-loc over slider-vector v*
@@ -122,7 +122,9 @@ TUPLE: scroller viewport x y ;
 
 : add-y-slider 2dup set-scroller-y add-right ;
 
-: viewport>bottom -1 swap scroll-viewport ;
+: viewport>bottom ( -- viewport )
+    dup viewport-dim vneg over viewport-origin
+    { 0 1 0 } set-axis swap scroll ;
 
 : (scroll>bottom) ( scroller -- )
     dup scroller-viewport viewport>bottom
