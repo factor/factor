@@ -4,13 +4,18 @@ IN: gadgets
 USING: hashtables io kernel lists namespaces parser prettyprint
 sequences ;
 
-: actions-menu ( -- )
-    "actions" get [ uncons [ eval ] append cons ] map
-    <menu> show-menu ;
+: actions-menu ( pane actions -- menu )
+    [ uncons rot [ pane-eval ] cons cons cons ] map-with <menu> ;
 
-: init-actions ( gadget -- )
-    [ "actions" get actions-menu ] button-gestures ;
+: init-actions ( gadget pane -- )
+    over "actions" paint-prop dup [
+        actions-menu [ show-menu ] cons button-gestures
+    ] [
+        3drop
+    ] ifte ;
 
 : <styled-label> ( style text -- label )
-    <label> "actions" pick assoc [ dup init-actions ] when
-    swap alist>hash over set-gadget-paint ;
+    <label> swap alist>hash over set-gadget-paint ;
+
+: <presentation> ( style text pane -- presentation )
+    >r <styled-label> dup r> init-actions ;

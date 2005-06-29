@@ -32,7 +32,7 @@ C: pile ( align gap fill -- pile )
 : <line-pile> 0 { 0 0 0 } 1 <pile> ;
 
 M: pile pref-dim ( pile -- dim )
-    dup gadget-children swap pile-gap { 0 1 0 } packed-pref-dim ;
+    dup pile-gap { 0 1 0 } packed-pref-dim ;
 
 : w- swap shape-w swap pref-size drop - ;
 : pile-x/y ( pile gadget offset -- )

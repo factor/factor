@@ -27,10 +27,13 @@ namespaces sdl sequences ;
 : with-layout ( quot -- )
     [ 0 x set 0 y set call ] with-scope ; inline
 
-: packed-pref-dim ( children gap axis -- dim )
+: pref-dims ( gadget -- list )
+    gadget-children [ pref-dim ] map ;
+
+: packed-pref-dim ( gadget gap axis -- dim )
     #! The preferred size of the gadget, if all children are
     #! packed in the direction of the given axis.
     >r
-    over length 0 max v*n >r [ pref-dim ] map r>
+    over length 0 max v*n >r pref-dims r>
     2dup [ v+ ] reduce >r [ vmax ] reduce r>
     r> set-axis ;

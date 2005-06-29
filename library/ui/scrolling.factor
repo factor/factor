@@ -123,7 +123,7 @@ TUPLE: scroller viewport x y ;
 : add-y-slider 2dup set-scroller-y add-right ;
 
 : viewport>bottom ( -- viewport )
-    dup viewport-dim vneg over viewport-origin
+    dup viewport-origin over viewport-dim vneg
     { 0 1 0 } set-axis swap scroll ;
 
 : (scroll>bottom) ( scroller -- )

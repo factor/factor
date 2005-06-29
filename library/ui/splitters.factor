@@ -44,8 +44,7 @@ C: splitter ( first second vector -- splitter )
 : <y-splitter> { 1 0 0 } <splitter> ;
 
 M: splitter pref-dim
-    dup gadget-children swap splitter-vector
-    { 0 0 0 } swap packed-pref-dim ;
+    { 0 0 0 } over splitter-vector packed-pref-dim ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;

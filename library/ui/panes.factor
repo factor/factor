@@ -29,14 +29,15 @@ TUPLE: pane output active current input continuation ;
 : pop-continuation ( pane -- quot )
     dup pane-continuation f rot set-pane-continuation ;
 
-: pane-return ( pane -- )
-    [
-        pane-input [
-            commit-history line-text get line-clear
-        ] with-editor
-    ] keep
+: pane-eval ( line pane -- )
     2dup stream-write "\n" over stream-write
     pop-continuation in-thread drop ;
+
+: pane-return ( pane -- )
+    [
+        pane-input
+        [ commit-history line-text get line-clear ] with-editor
+    ] keep pane-eval ;
  
 : pane-actions ( line -- )
     [
@@ -55,15 +56,15 @@ C: pane ( -- pane )
     dup pane-paint
     dup pane-actions ;
 
-: pane-write-1 ( style pane text -- )
-    swap >r <styled-label> r> pane-current add-gadget ;
+: pane-write-1 ( style text pane -- )
+    [ <presentation> ] keep pane-current add-gadget ;
 
 : pane-terpri ( pane -- )
     dup pane-current over pane-output add-gadget
     <line-shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )
-    3dup car pane-write-1 cdr dup
+    3dup car swap pane-write-1 cdr dup
     [ over pane-terpri pane-write ] [ 3drop ] ifte ;
 
 ! Panes are streams.
