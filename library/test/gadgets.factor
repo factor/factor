@@ -67,16 +67,6 @@ USING: gadgets kernel lists math namespaces test sequences ;
     ] with-scope
 ] unit-test
 
-[
-    300 620
-] [
-    0 { 10 10 10 } 0 <pile> "pile" set
-    0 0 100 100 <rectangle> <gadget> "pile" get add-gadget
-    0 0 200 200 <rectangle> <gadget> "pile" get add-gadget
-    0 0 300 300 <rectangle> <gadget> "pile" get add-gadget
-    "pile" get pref-size
-] unit-test
-
 [ ] [ "pile" get layout* ] unit-test
 
 [

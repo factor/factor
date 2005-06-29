@@ -13,8 +13,6 @@ TUPLE: viewport origin ;
 : set-viewport-x [ viewport-y 0 3vector ] keep set-viewport-origin ;
 : set-viewport-y [ viewport-x swap 0 3vector ] keep set-viewport-origin ;
 
-: viewport-h ( viewport -- h ) gadget-child pref-size nip ;
-
 : viewport-dim ( viewport -- h ) gadget-child pref-dim ;
 
 : fix-scroll ( origin viewport -- origin )
@@ -22,12 +20,6 @@ TUPLE: viewport origin ;
 
 : scroll ( origin viewport -- )
     [ fix-scroll ] keep [ set-viewport-origin ] keep relayout ;
-
-: scroll-viewport ( y viewport -- )
-    #! y is a number between -1 and 0..
-    [ viewport-h * >fixnum ] keep
-    [ viewport-x swap 0 3vector ] keep 
-    scroll ;
 
 C: viewport ( content -- viewport )
     [ <empty-gadget> swap set-delegate ] keep

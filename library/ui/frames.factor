@@ -113,4 +113,4 @@ SYMBOL: frame-bottom-run
     frame-bottom pos-frame-bottom ;
 
 M: frame layout* ( frame -- )
-    [ dup setup-frame  layout-frame ] with-layout ;
+    [ 0 x set 0 y set dup setup-frame layout-frame ] with-scope ;

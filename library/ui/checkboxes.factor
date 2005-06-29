@@ -41,7 +41,7 @@ TUPLE: checkbox bevel selected? ;
     [ checkbox-bevel button-update ] [ mouse-enter ] set-action ;
 
 C: checkbox ( label -- checkbox )
-    <default-shelf> over set-delegate
+    <line-shelf> over set-delegate
     [ f line-border swap init-checkbox-bevel ] keep
     [ >r <label> r> add-gadget ] keep
     dup checkbox-actions

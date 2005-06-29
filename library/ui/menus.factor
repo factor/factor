@@ -12,7 +12,7 @@ USING: generic kernel lists math namespaces sequences ;
     hide-menu
     world get
     2dup set-world-menu
-    2dup world-hand screen-pos >rect rot move-gadget
+    2dup world-hand screen-loc swap set-gadget-loc
     show-glass ;
 
 : menu-item-border ( child -- border )

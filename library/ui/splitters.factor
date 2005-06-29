@@ -43,8 +43,13 @@ C: splitter ( first second vector -- splitter )
 
 : <y-splitter> { 1 0 0 } <splitter> ;
 
-M: splitter pref-dim
-    { 0 0 0 } over splitter-vector packed-pref-dim ;
+M: splitter orientation splitter-vector ;
+
+M: splitter filling drop 1 ;
+
+M: splitter alignment drop 0 ;
+
+M: splitter pref-dim packed-pref-dim ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;
@@ -56,22 +61,5 @@ M: splitter pref-dim
         dup shape-dim swap splitter-part v- ,
     ] make-list ;
 
-: packed-locs ( axis sizes gadget -- )
-    >r
-    { 0 0 0 } [ v+ ] accumulate
-    [ { 0 0 0 } swap rot set-axis ] map-with
-    r> gadget-children zip [ uncons set-gadget-loc ] each ;
-
-: packed-dims ( axis sizes gadget -- dims )
-    [
-        shape-dim swap [ >r 2dup r> rot set-axis ] map 2nip
-    ] keep gadget-children zip [ uncons set-gadget-dim ] each ;
-
-: layout-divider ( assoc -- )
-    [ uncons set-gadget-dim ] each ;
-
-: packed-layout ( axis sizes gadgets -- )
-    3dup packed-locs packed-dims ;
-
 M: splitter layout* ( splitter -- )
-    dup splitter-vector over splitter-layout rot packed-layout ;
+    dup splitter-layout packed-layout ;

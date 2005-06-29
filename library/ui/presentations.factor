@@ -4,6 +4,8 @@ IN: gadgets
 USING: hashtables io kernel lists namespaces parser prettyprint
 sequences ;
 
+DEFER: pane-eval
+
 : actions-menu ( pane actions -- menu )
     [ uncons rot [ pane-eval ] cons cons cons ] map-with <menu> ;
 

@@ -60,19 +60,16 @@ GENERIC: abs ( z -- |z| )
     2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ;
 
 : (repeat) ( i n quot -- )
-    pick pick >= [
-        3drop
-    ] [
-        [ swap >r call 1 + r> ] keep (repeat)
-    ] ifte ; inline
+    pick pick >=
+    [ 3drop ] [ [ swap >r call 1 + r> ] keep (repeat) ] ifte ;
+    inline
 
-: repeat ( n quot -- )
-    #! Execute a quotation n times. The loop counter is kept on
-    #! the stack, and ranges from 0 to n-1.
+: repeat ( n quot -- | quot: n -- n )
+    #! The loop counter is kept on the stack, and ranges from
+    #! 0 to n-1.
     0 -rot (repeat) ; inline
 
-: times ( n quot -- )
-    #! Evaluate a quotation n times.
+: times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
 : 2repeat ( i j quot -- | quot: i j -- i j )

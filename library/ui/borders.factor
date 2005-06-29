@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: errors generic hashtables kernel lists math namespaces
-sdl vectors ;
+USING: errors generic hashtables kernel lists math matrices
+namespaces sdl vectors ;
 
 ! A border lays out its children on top of each other, all with
 ! a 5-pixel padding.
@@ -34,8 +34,8 @@ C: border ( child delegate size -- border )
     gadget-child resize-gadget ;
 
 M: border pref-dim ( border -- dim )
-    [ border-size 2 * ] keep
-    gadget-child pref-size >r over + r> rot + 0 3vector ;
+    [ border-size dup dup 3vector 2 v*n ] keep
+    gadget-child pref-dim v+ ;
 
 M: border layout* ( border -- )
     dup layout-border-x/y layout-border-w/h ;

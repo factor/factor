@@ -19,21 +19,84 @@ namespaces sdl sequences ;
         drop
     ] ifte ;
 
-: with-pref-size ( quot -- )
-    [
-        0 width set  0 height set  call  width get height get
-    ] with-scope ; inline
-
-: with-layout ( quot -- )
-    [ 0 x set 0 y set call ] with-scope ; inline
+GENERIC: alignment
+GENERIC: filling
+GENERIC: orientation
 
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
 
-: packed-pref-dim ( gadget gap axis -- dim )
+: packed-pref-dim ( gadget -- dim )
     #! The preferred size of the gadget, if all children are
     #! packed in the direction of the given axis.
-    >r
-    over length 0 max v*n >r pref-dims r>
-    2dup [ v+ ] reduce >r [ vmax ] reduce r>
-    r> set-axis ;
+    [
+        pref-dims
+        [ { 0 0 0 } [ vmax ] reduce ] keep
+        { 0 0 0 } [ v+ ] reduce
+    ] keep orientation set-axis ;
+
+: orient ( gadget list1 list2 -- list )
+    zip >r orientation r> [ uncons rot set-axis ] map-with ;
+
+: packed-dim-2 ( gadget sizes -- list )
+    [ over shape-dim over v- rot filling v*n v+ ] map-with ;
+
+: (packed-dims) ( gadget sizes -- list )
+    2dup packed-dim-2 swap orient ;
+
+: packed-dims ( gadget sizes -- list )
+    over gadget-children >r (packed-dims) r>
+    zip [ uncons set-gadget-dim ] each ;
+
+: packed-loc-1 ( sizes -- list )
+    { 0 0 0 } [ v+ ] accumulate ;
+
+: packed-loc-2 ( gadget sizes -- list )
+    >r dup shape-dim over r> packed-dim-2 [ v- ] map-with
+    >r dup alignment swap shape-dim r>
+    [ >r 2dup r> v- n*v ] map 2nip ;
+
+: (packed-locs) ( gadget sizes -- list )
+    dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
+
+: packed-locs ( gadget sizes -- )
+    over gadget-children >r (packed-locs) r>
+    zip [ uncons set-gadget-loc ] each ;
+
+: packed-layout ( gadget sizes -- )
+    2dup packed-locs packed-dims ;
+
+TUPLE: pack align fill vector ;
+
+C: pack ( align fill vector -- pack )
+    #! align: 0 left aligns, 1/2 center, 1 right.
+    #! gap: between each child.
+    #! fill: 0 leaves default width, 1 fills to pack width.
+    [ <empty-gadget> swap set-delegate ] keep
+    [ set-pack-vector ] keep
+    [ set-pack-fill ] keep
+    [ set-pack-align ] keep ;
+
+: <pile> { 0 1 0 } <pack> ;
+
+: <line-pile> 0 1 <pile> ;
+
+: <shelf> { 1 0 0 } <pack> ;
+
+: <line-shelf> 0 1 <shelf> ;
+
+M: pack orientation pack-vector ;
+
+M: pack filling pack-fill ;
+
+M: pack alignment pack-align ;
+
+M: pack pref-dim packed-pref-dim ;
+
+M: pack layout* ( pack -- )
+    dup pref-dims packed-layout ;
+
+: <stack> ( list -- gadget )
+    #! A stack lays out all its children on top of each other.
+    0 1 { 0 0 1 } <pack>
+    swap [ over add-gadget ] each ;

@@ -18,9 +18,9 @@ global [
         [[ font-style plain ]]
     }} world get set-gadget-paint
     
-    1024 768 world get resize-gadget
+    { 1024 768 0 } world get set-gadget-dim
     
-    <plain-gadget> world get add-gadget
+    <plain-gadget> add-layer
 
     <console> "Stack display goes here" <label> <y-splitter>
     3/4 over set-splitter-split add-layer
