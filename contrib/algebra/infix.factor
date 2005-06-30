@@ -175,8 +175,8 @@ M: infix-word see
 : || ;
 
 ! Install arithmetic operators into words
-[ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor proj
-  bitxor dot rem || ] [
+[ + - / * ^ and or xor mod +- min gcd max bitand polar> align shift /mod /i /f rect> bitor
+  bitxor rem || ] [
     dup arith-2 set-word-prop
 ] each
 [ [[ = new= ]] [[ > new> ]] [[ < new< ]] [[ >= new>= ]] [[ <= new<= ]] ] [

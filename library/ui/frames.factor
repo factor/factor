@@ -37,6 +37,8 @@ C: frame ( -- frame )
         dup frame-left , dup frame-center , frame-right ,
     ] make-list ;
 
+: pref-size pref-dim 3unseq drop ;
+
 : max-h pref-size nip height [ max ] change ;
 : max-w pref-size drop width [ max ] change ;
 

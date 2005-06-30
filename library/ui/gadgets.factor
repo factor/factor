@@ -9,6 +9,8 @@ sequences vectors ;
 ! delegates to its shape.
 TUPLE: gadget paint gestures relayout? redraw? parent children ;
 
+: gadget-child gadget-children car ;
+
 C: gadget ( shape -- gadget )
     [ set-delegate ] keep
     [ <namespace> swap set-gadget-paint ] keep
@@ -76,8 +78,6 @@ C: gadget ( shape -- gadget )
 GENERIC: pref-dim ( gadget -- dim )
 
 M: gadget pref-dim shape-dim ;
-
-: pref-size pref-dim 3unseq drop ;
 
 GENERIC: layout* ( gadget -- )
 

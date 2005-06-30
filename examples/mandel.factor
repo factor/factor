@@ -94,8 +94,6 @@ USE: test
         ] repeat
     ] make-vector nip ;
 
-: absq >rect swap sq swap sq + ; inline
-
 : iter ( c z nb-iter -- x )
     over absq 4 >= over 0 = or [
         nip nip

@@ -10,11 +10,11 @@ TUPLE: label text ;
 C: label ( text -- label )
     <empty-gadget> over set-delegate [ set-label-text ] keep ;
 
-: label-size ( gadget text -- w h )
-    >r gadget-font r> size-string ;
+: label-size ( gadget text -- dim )
+    >r gadget-font r> size-string 0 3vector ;
 
 M: label pref-dim ( label -- dim )
-    dup label-text label-size 0 3vector ;
+    dup label-text label-size ;
 
 M: label draw-shape ( label -- )
     [ dup gadget-font swap label-text ] keep

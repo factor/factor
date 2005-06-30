@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor lists math namespaces sdl
-sequences strings styles vectors ;
+USING: generic kernel line-editor lists math matrices namespaces
+sdl sequences strings styles vectors ;
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
@@ -89,7 +89,7 @@ M: editor user-input* ( ch editor -- ? )
     scroll>bottom  t ;
 
 M: editor pref-dim ( editor -- dim )
-    dup editor-text label-size >r 1 + r> 0 3vector ;
+    dup editor-text label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-size rot resize-gadget

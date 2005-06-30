@@ -32,16 +32,13 @@
 + ui:
 
 - faster layout
-- tiled window manager
 - faster repaint
-- console with presentations
 - ui browser
 - auto-updating inspector, mirrors abstraction
 - mouse enter onto overlapping with interior, but not child, gadget
 - rollovers broken in inspector
 - menu dragging
 - fix up the min thumb size hack
-- frame gap
 
 + ffi:
 

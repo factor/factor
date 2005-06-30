@@ -4,10 +4,12 @@ IN: matrices
 USING: errors generic kernel lists math namespaces sequences
 vectors ;
 
+! Vector operations
 : n*v ( n vec -- vec ) [ * ] map-with ;
 : v*n ( vec n -- vec ) swap n*v ;
+: n/v ( n vec -- vec ) [ / ] map-with ;
+: v/n ( vec n -- vec ) swap [ swap / ] map-with ;
 
-! Vector operations
 : v+ ( v v -- v ) [ + ] 2map ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
@@ -27,6 +29,13 @@ vectors ;
 ! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
 : v. ( v v -- x ) v** sum ;
 
+: norm-sq ( v -- n ) 0 [ absq + ] reduce ;
+: norm ( v -- n ) norm-sq sqrt ;
+
+: proj ( u v -- w )
+    #! Orthogonal projection of u onto v.
+    [ [ v. ] keep norm-sq v/n ] keep n*v ;
+
 : cross-trace ( v1 v2 i1 i2 -- v1 v2 n )
     pick nth >r pick nth r> * ;
 
@@ -44,6 +53,7 @@ vectors ;
 ! Matrices
 ! The major dimension is the number of elements per row.
 TUPLE: matrix rows cols sequence ;
+
 : >matrix<
     [ matrix-rows ] keep
     [ matrix-cols ] keep
