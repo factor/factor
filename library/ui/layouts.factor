@@ -26,15 +26,6 @@ GENERIC: orientation
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
 
-: packed-pref-dim ( gadget -- dim )
-    #! The preferred size of the gadget, if all children are
-    #! packed in the direction of the given axis.
-    [
-        pref-dims
-        [ { 0 0 0 } [ vmax ] reduce ] keep
-        { 0 0 0 } [ v+ ] reduce
-    ] keep orientation set-axis ;
-
 : orient ( gadget list1 list2 -- list )
     zip >r orientation r> [ uncons rot set-axis ] map-with ;
 
@@ -91,12 +82,16 @@ M: pack filling pack-fill ;
 
 M: pack alignment pack-align ;
 
-M: pack pref-dim packed-pref-dim ;
+M: pack pref-dim ( pack -- dim )
+    [
+        pref-dims
+        [ { 0 0 0 } [ vmax ] reduce ] keep
+        { 0 0 0 } [ v+ ] reduce
+    ] keep orientation set-axis ;
 
 M: pack layout* ( pack -- )
     dup pref-dims packed-layout ;
 
 : <stack> ( list -- gadget )
     #! A stack lays out all its children on top of each other.
-    0 1 { 0 0 1 } <pack>
-    swap [ over add-gadget ] each ;
+    0 1 { 0 0 1 } <pack>  swap [ over add-gadget ] each ;

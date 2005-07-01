@@ -10,14 +10,14 @@ TUPLE: divider splitter ;
 
 M: divider pref-dim drop divider-size ;
 
-TUPLE: splitter vector split ;
+TUPLE: splitter split ;
 
 : hand>split ( splitter -- n )
     hand relative hand hand-click-rel v- divider-size 1/2 v*n v+ ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over shape-dim { 1 1 1 } vmax v/ over splitter-vector v.
+    over shape-dim { 1 1 1 } vmax v/ over orientation v.
     0 max 1 min over set-splitter-split relayout ;
 
 : divider-actions ( thumb -- )
@@ -31,8 +31,7 @@ C: divider ( -- divider )
     dup divider-actions ;
 
 C: splitter ( first second vector -- splitter )
-    <empty-gadget> over set-delegate
-    [ set-splitter-vector ] keep
+    [ >r 0 1 rot <pack> r> set-delegate ] keep
     swapd
     [ add-gadget ] keep
     <divider> over add-gadget
@@ -42,14 +41,6 @@ C: splitter ( first second vector -- splitter )
 : <x-splitter> { 0 1 0 } <splitter> ;
 
 : <y-splitter> { 1 0 0 } <splitter> ;
-
-M: splitter orientation splitter-vector ;
-
-M: splitter filling drop 1 ;
-
-M: splitter alignment drop 0 ;
-
-M: splitter pref-dim packed-pref-dim ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;
