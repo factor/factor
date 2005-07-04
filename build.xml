@@ -17,6 +17,8 @@
 			debug="true"
 			optimize="true"
 			classpathref="jedit-classpath"
+			source="1.4"
+			target="1.4"
 		>
 		<include name="**/*.java"/>
 		</javac>

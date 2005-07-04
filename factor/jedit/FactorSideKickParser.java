@@ -64,8 +64,7 @@ public class FactorSideKickParser extends SideKickParser
 	public void activate(EditPane editPane)
 	{
 		super.activate(editPane);
-		WordPreview preview = new WordPreview(this,
-			editPane.getTextArea());
+		WordPreview preview = new WordPreview(this,editPane);
 		previewMap.put(editPane,preview);
 		editPane.getTextArea().addCaretListener(preview);
 	} //}}}
@@ -271,8 +270,7 @@ public class FactorSideKickParser extends SideKickParser
 		if(data == null)
 			return null;
 
-		String ruleset = FactorPlugin.getRulesetAtOffset(
-			editPane.getTextArea(),caret);
+		String ruleset = FactorPlugin.getRulesetAtOffset(editPane,caret);
 
 		if(ruleset == null)
 			return null;

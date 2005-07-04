@@ -17,9 +17,7 @@ strings styles io ;
     ] when drop ;
 
 : filter-nulls ( str -- str )
-    0 over contains? [
-        [ dup 0 = [ drop CHAR: \s ] when ] map
-    ] when ;
+    [ dup 0 = [ drop CHAR: \s ] when ] map ;
 
 : size-string ( font text -- w h )
     filter-nulls dup empty? [

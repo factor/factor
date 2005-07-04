@@ -30,7 +30,7 @@ GENERIC: orientation
     zip >r orientation r> [ uncons rot set-axis ] map-with ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [ over shape-dim over v- rot filling v*n v+ ] map-with ;
+    [ over shape-dim { 1 1 1 } vmax over v- rot filling v*n v+ ] map-with ;
 
 : (packed-dims) ( gadget sizes -- list )
     2dup packed-dim-2 swap orient ;
@@ -43,8 +43,8 @@ GENERIC: orientation
     { 0 0 0 } [ v+ ] accumulate ;
 
 : packed-loc-2 ( gadget sizes -- list )
-    >r dup shape-dim over r> packed-dim-2 [ v- ] map-with
-    >r dup alignment swap shape-dim r>
+    >r dup shape-dim { 1 1 1 } vmax over r> packed-dim-2 [ v- ] map-with
+    >r dup alignment swap shape-dim { 1 1 1 } vmax r>
     [ >r 2dup r> v- n*v ] map 2nip ;
 
 : (packed-locs) ( gadget sizes -- list )

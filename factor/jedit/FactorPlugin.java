@@ -609,7 +609,7 @@ public class FactorPlugin extends EditPlugin
 	public static void extractWord(View view)
 	{
 		JEditTextArea textArea = view.getTextArea();
-		Buffer buffer = textArea.getBuffer();
+		Buffer buffer = view.getBuffer();
 		String selection = textArea.getSelectedText();
 		if(selection == null)
 			selection = "";
@@ -670,12 +670,14 @@ public class FactorPlugin extends EditPlugin
 	} //}}}
 
 	//{{{ getRulesetAtOffset() method
-	public static String getRulesetAtOffset(JEditTextArea textArea, int caret)
+	public static String getRulesetAtOffset(EditPane editPane, int caret)
 	{
+		JEditTextArea textArea = editPane.getTextArea();
+
 		int line = textArea.getLineOfOffset(caret);
 
 		DefaultTokenHandler h = new DefaultTokenHandler();
-		textArea.getBuffer().markTokens(line,h);
+		editPane.getBuffer().markTokens(line,h);
 		Token tokens = h.getTokens();
 
 		int offset = caret - textArea.getLineStartOffset(line);
