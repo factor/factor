@@ -22,6 +22,9 @@ global [
     
     <plain-gadget> add-layer
 
-    <console> "Stack display goes here" <label> <y-splitter>
+    <console> dup
+    "Stack display goes here" <label> <y-splitter>
     3/4 over set-splitter-split add-layer
+    
+    request-focus
 ] bind

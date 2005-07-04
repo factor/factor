@@ -50,11 +50,14 @@ TUPLE: pane output active current input continuation ;
 C: pane ( -- pane )
     <line-pile> over set-delegate
     <line-pile> over add-output
-    "" <label> over set-pane-current
+    <line-shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
     dup pane-paint
     dup pane-actions ;
+
+M: pane focusable-child* ( pane -- editor )
+    pane-input ;
 
 : pane-write-1 ( style text pane -- )
     [ <presentation> ] keep pane-current add-gadget ;

@@ -104,8 +104,9 @@ C: hand ( world -- hand )
     #! Called when a gadget is removed or added.
     [ dup shape-x swap shape-y ] keep move-hand ;
 
-: request-focus ( gadget hand -- )
-    dup >r hand-focus
+: request-focus ( gadget -- )
+    focusable-child
+    hand hand-focus
     2dup lose-focus
-    swap dup r> set-hand-focus
+    swap dup hand set-hand-focus
     gain-focus ;

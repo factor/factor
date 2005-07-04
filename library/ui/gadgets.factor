@@ -90,3 +90,11 @@ M: gadget layout*
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
+
+GENERIC: focusable-child* ( gadget -- gadget/t )
+
+M: gadget focusable-child* drop t ;
+
+: focusable-child ( gadget -- gadget )
+    dup focusable-child*
+    dup t = [ drop ] [ nip focusable-child ] ifte ;

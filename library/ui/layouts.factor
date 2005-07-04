@@ -70,11 +70,11 @@ C: pack ( align fill vector -- pack )
 
 : <pile> { 0 1 0 } <pack> ;
 
-: <line-pile> 0 1 <pile> ;
+: <line-pile> 0 0 <pile> ;
 
 : <shelf> { 1 0 0 } <pack> ;
 
-: <line-shelf> 0 1 <shelf> ;
+: <line-shelf> 0 0 <shelf> ;
 
 M: pack orientation pack-vector ;
 

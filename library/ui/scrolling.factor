@@ -32,6 +32,9 @@ M: viewport layout* ( viewport -- )
     dup viewport-origin
     swap gadget-child dup prefer set-gadget-loc ;
 
+M: viewport focusable-child* ( viewport -- gadget )
+    gadget-child ;
+
 : visible-portion ( viewport -- vector )
     dup shape-dim { 1 1 1 } vmax
     swap viewport-dim { 1 1 1 } vmax
@@ -135,3 +138,6 @@ C: scroller ( gadget -- scroller )
     dup scroller-viewport <x-slider> over add-x-slider
     dup scroller-viewport <y-slider> over add-y-slider
     dup scroller-actions ;
+
+M: scroller focusable-child* ( viewport -- gadget )
+    scroller-viewport ;

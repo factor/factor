@@ -50,9 +50,7 @@ TUPLE: editor line caret ;
     [ line-text get x>offset caret set ] with-editor ;
 
 : click-editor ( editor -- )
-    hand
-    2dup relative shape-x pick set-caret-x
-    request-focus ;
+    dup hand relative shape-x over set-caret-x request-focus ;
 
 : editor-actions ( editor -- )
     [
