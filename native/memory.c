@@ -25,7 +25,10 @@ CELL object_size(CELL pointer)
 		size = sizeof(F_CONS);
 		break;
 	case OBJECT_TYPE:
-		size = untagged_object_size(UNTAG(pointer));
+		if(pointer == F)
+			size = 0;
+		else
+			size = untagged_object_size(UNTAG(pointer));
 		break;
 	default:
 		critical_error("Cannot determine object_size",pointer);
@@ -39,9 +42,6 @@ CELL object_size(CELL pointer)
 CELL untagged_object_size(CELL pointer)
 {
 	CELL size;
-
-	if(pointer == F)
-		return 0;
 
 	switch(untag_header(get(pointer)))
 	{
