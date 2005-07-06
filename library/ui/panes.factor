@@ -29,9 +29,11 @@ TUPLE: pane output active current input continuation ;
 : pop-continuation ( pane -- quot )
     dup pane-continuation f rot set-pane-continuation ;
 
-: pane-eval ( line pane -- )
-    2dup stream-write "\n" over stream-write
-    pop-continuation in-thread drop ;
+: pane-eval ( string pane -- )
+    2dup stream-print pop-continuation in-thread drop ;
+
+: pane-call ( quot pane -- )
+    [ "(Structured input) " write dup . call ] with-stream* ;
 
 : pane-return ( pane -- )
     [
@@ -49,7 +51,7 @@ TUPLE: pane output active current input continuation ;
 
 C: pane ( -- pane )
     <line-pile> over set-delegate
-    <line-pile> <incremental> over add-output
+    <line-pile> ( <incremental> ) over add-output
     <line-shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
@@ -60,10 +62,10 @@ M: pane focusable-child* ( pane -- editor )
     pane-input ;
 
 : pane-write-1 ( style text pane -- )
-    [ <presentation> ] keep pane-current add-incremental ;
+    [ <presentation> ] keep pane-current add-gadget ;
 
 : pane-terpri ( pane -- )
-    dup pane-current over pane-output add-incremental
+    dup pane-current over pane-output ( add-incremental ) add-gadget
     <line-shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )

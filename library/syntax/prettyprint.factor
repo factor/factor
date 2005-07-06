@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien errors generic hashtables kernel lists math
-matrices memory namespaces parser presentation sequences io
-strings unparser vectors words ;
+USING: alien errors generic hashtables io kernel lists math
+matrices memory namespaces parser presentation sequences strings
+styles unparser vectors words ;
 
 SYMBOL: prettyprint-limit
 SYMBOL: one-line
@@ -15,43 +15,17 @@ GENERIC: prettyprint* ( indent obj -- indent )
 M: object prettyprint* ( indent obj -- indent )
     unparse write ;
 
-: word-link ( word -- link )
-    [
-        dup word-name unparse ,
-        " [ " ,
-        word-vocabulary unparse ,
-        " ] search" ,
-    ] make-string ;
-
-: word-actions ( -- list )
-    [
-        [[ "See"        "see"          ]]
-        [[ "Push"       ""             ]]
-        [[ "Execute"    "execute"      ]]
-        [[ "jEdit"      "jedit"        ]]
-        [[ "Usages"     "usages ."     ]]
-        [[ "Implements" "implements ." ]]
-    ] ;
-
-: browser-attrs ( word -- style )
+: word-attrs ( word -- style )
     #! Return the style values for the HTML word browser
-    dup word-vocabulary [ 
-        swap word-name "word" swons 
-        swap "vocab" swons 
-        2list
-    ] [
-        drop [ ]  
-    ] ifte* ;
-
-: word-attrs ( word -- attrs )
-    #! Words without a vocabulary do not get a link or an action
-    #! popup.
-    dup word-vocabulary [
-         dup word-link word-actions <actions> "actions" swons unit
-         swap browser-attrs append
-    ] [
-        drop [ ]
-    ] ifte ;
+    [
+        presented over cons ,
+        dup word-vocabulary [ 
+            "word" over word-name cons ,
+            "vocab" swap word-vocabulary cons ,
+        ] [
+            drop
+        ] ifte
+    ] make-list ;
 
 : word. ( word -- ) dup word-name swap word-attrs write-attr ;
 

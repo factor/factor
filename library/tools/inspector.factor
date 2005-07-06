@@ -29,13 +29,6 @@ M: hashtable sheet hash>alist unzip 2list ;
     [ [ length ] map 0 [ max ] reduce ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
-: describe ( obj -- list )
-    sheet dup first length count swons
-    dup peek over first zip [ uncons set ] each
-    [ column ] map
-    seq-transpose
-    [ " " join ] map ;
-
 : (join) ( list glue -- )
     over [
         over car % >r cdr dup
@@ -47,6 +40,13 @@ M: hashtable sheet hash>alist unzip 2list ;
 : join ( list glue -- seq )
     #! The new sequence is of the same type as glue.
     [ [ (join) ] make-vector ] keep like ;
+
+: describe ( obj -- list )
+    sheet dup first length count swons
+    dup peek over first zip [ uncons set ] each
+    [ column ] map
+    seq-transpose
+    [ " | " join ] map ;
 
 : a/an ( noun -- str )
     first "aeiouAEIOU" contains? "an " "a " ? ;
@@ -82,6 +82,8 @@ M: hashtable sheet hash>alist unzip 2list ;
         "The word is a uniquely generated symbol." print
     ] ifte ;
 
+GENERIC: extra-banner ( obj -- )
+
 M: word extra-banner ( obj -- )
     dup vocab-banner swap class-banner ;
 
@@ -92,14 +94,16 @@ M: object extra-banner ( obj -- ) drop ;
     "You are looking at " write dup class unparse a/an.
     " object with the following printed representation:" print
     "  " write dup unparse print
+    "The object has been placed in the inspecting variable." print
     "It is located at address " write dup address >hex write
     " and takes up " write dup size unparse write
     " bytes of memory." print
     "This object is referenced from " write r> unparse write
     " other objects in the heap." print
-    extra-banner ;
+    extra-banner
+    "The object's slots, if any, are stored in integer variables," print
+    "numbered starting from 0." print ;
 
 : inspect ( obj -- )
-    dup inspect-banner
     dup inspecting set
-    describe [ print ] each ;
+    dup inspect-banner describe [ print ] each ;

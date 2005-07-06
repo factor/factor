@@ -19,6 +19,8 @@ namespaces sdl sequences ;
         drop
     ] ifte ;
 
+TUPLE: pack align fill vector ;
+
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
 
@@ -56,8 +58,6 @@ namespaces sdl sequences ;
 
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;
-
-TUPLE: pack align fill vector ;
 
 C: pack ( align fill vector -- pack )
     #! align: 0 left aligns, 1/2 center, 1 right.

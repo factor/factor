@@ -28,3 +28,5 @@ SYMBOL: plain
 SYMBOL: bold
 SYMBOL: italic
 SYMBOL: bold-italic
+
+SYMBOL: presented

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
 USING: generic kernel listener lists namespaces parser
-prettyprint sequences io strings words ;
+prettyprint sequences io strings words styles ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:
@@ -39,7 +39,7 @@ prettyprint sequences io strings words ;
 ! remaining -- input
 : jedit-write-attr ( str style -- )
     CHAR: w write
-    [ swap . "USE: styles" print . ] string-out
+    [ swap . "USE: styles" print [ car presented = not ] subset . ] string-out
     dup write-len write ;
 
 TUPLE: jedit-stream ;

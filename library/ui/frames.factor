@@ -45,6 +45,11 @@ C: frame ( -- frame )
 : add-h pref-size nip height [ + ] change ;
 : add-w pref-size drop width [ + ] change ;
 
+: with-pref-size ( quot -- )
+    [
+        0 width set 0 height set call width get height get
+    ] with-scope ; inline
+
 M: frame pref-dim ( glue -- dim )
     [
         dup frame-major [ max-w ] each
