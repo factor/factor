@@ -68,6 +68,7 @@ t [
     "/library/inference/test.factor"
     "/library/tools/walker.factor"
     "/library/tools/annotations.factor"
+    "/library/tools/inspector.factor"
     "/library/bootstrap/image.factor"
     
     "/library/io/logging.factor"

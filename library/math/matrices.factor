@@ -30,7 +30,6 @@ vectors ;
 : v. ( v v -- x ) v** sum ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
-: norm ( v -- n ) norm-sq sqrt ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.

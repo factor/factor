@@ -94,9 +94,9 @@ SYMBOL: vocabularies
     "scratchpad" "in" set
     [
         "compiler" "debugger" "errors" "generic"
-        "hashtables" "inference" "interpreter" "jedit" "kernel"
-        "listener" "lists" "math" "matrices" "memory"
-        "namespaces" "parser" "prettyprint" "processes"
+        "hashtables" "inference" "inspector" "interpreter"
+        "jedit" "kernel" "listener" "lists" "math" "matrices"
+        "memory" "namespaces" "parser" "prettyprint" "processes"
         "sequences" "io" "strings" "styles" "syntax" "test"
         "threads" "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

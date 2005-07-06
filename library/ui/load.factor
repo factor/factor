@@ -24,6 +24,7 @@ USING: kernel parser sequences io ;
     "/library/ui/menus.factor"
     "/library/ui/splitters.factor"
     "/library/ui/presentations.factor"
+    "/library/ui/incremental.factor"
     "/library/ui/panes.factor"
     "/library/ui/init-world.factor"
     "/library/ui/ui.factor"

@@ -49,7 +49,7 @@ TUPLE: pane output active current input continuation ;
 
 C: pane ( -- pane )
     <line-pile> over set-delegate
-    <line-pile> over add-output
+    <line-pile> <incremental> over add-output
     <line-shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
@@ -60,10 +60,10 @@ M: pane focusable-child* ( pane -- editor )
     pane-input ;
 
 : pane-write-1 ( style text pane -- )
-    [ <presentation> ] keep pane-current add-gadget ;
+    [ <presentation> ] keep pane-current add-incremental ;
 
 : pane-terpri ( pane -- )
-    dup pane-current over pane-output add-gadget
+    dup pane-current over pane-output add-incremental
     <line-shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )

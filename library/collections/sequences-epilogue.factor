@@ -181,6 +181,11 @@ TUPLE: repeated length object ;
 M: repeated length repeated-length ;
 M: repeated nth nip repeated-object ;
 
+: seq-transpose ( list -- list )
+    #! An example illustrates this word best:
+    #! [ [ 1 2 3 ] [ 4 5 6 ] ] ==> [ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]
+    0 over nth length [ swap [ nth ] map-with ] project-with ;
+
 IN: kernel
 
 : depth ( -- n )
