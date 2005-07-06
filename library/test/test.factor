@@ -91,7 +91,7 @@ SYMBOL: failures
         "inference" "interpreter"
         "alien"
         "line-editor" "gadgets" "memory" "redefine"
-        "annotate" "sequences" "binary"
+        "annotate" "sequences" "binary" "inspector"
     ] run-tests ;
 
 : benchmarks
