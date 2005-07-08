@@ -15,7 +15,7 @@ global [ 100 <vector> commands set ] bind
     commands get >list
     [ car "predicate" word-prop call ] subset-with ;
 
-DEFER: pane-eval
+DEFER: pane-call
 
 : command-menu ( pane -- menu )
     presented get dup applicable [
