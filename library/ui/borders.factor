@@ -15,7 +15,7 @@ C: border ( child delegate size -- border )
     0 0 0 0 <etched-rect> <gadget> { 5 5 0 } <border> ;
 
 : layout-border-loc ( border -- )
-    dup border-size swap gadget-child set-gadget-loc ;
+    dup border-size swap gadget-child set-shape-loc ;
 
 : layout-border-dim ( border -- )
     dup shape-dim over border-size 2 v*n v-

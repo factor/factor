@@ -7,24 +7,40 @@ threads sequences ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
-! world variable. The menu slot ensures that only one menu is
-! open at any one time.
-TUPLE: world running? hand menu glass ;
+! world variable. The invalid slot is a list of gadgets that
+! need to be layout.
+TUPLE: world running? hand glass invalid ;
 
 C: world ( -- world )
     f <stack> over set-delegate
     t over set-world-running?
+    t over set-gadget-root?
     dup <hand> over set-world-hand ;
+
+: add-invalid ( gadget world -- )
+    [ world-invalid cons ] keep set-world-invalid ;
+
+: pop-invalid ( world -- list )
+    [ world-invalid f ] keep set-world-invalid ;
+
+: layout-world ( world -- )
+    dup world-invalid [
+        dup pop-invalid [ layout ] each layout-world
+    ] [
+        drop
+    ] ifte ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
-: show-glass ( gadget world -- )
-    >r <empty-gadget> [ add-gadget ] keep
-    r> 2dup set-world-glass add-gadget ;
+: show-glass ( gadget -- )
+    <empty-gadget> dup
+    world get 2dup add-gadget set-world-glass
+    add-gadget ;
 
-: hide-glass ( world -- )
-    [ world-glass unparent f ] keep set-world-glass ;
+: hide-glass ( -- )
+    world get world-glass unparent f
+    world get set-world-glass ;
 
 M: world inside? ( point world -- ? ) 2drop t ;
 
@@ -32,17 +48,15 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     dup gadget-redraw? [
-        [ draw-gadget ] with-surface
+        [
+            dup 0 0 width get height get <rectangle> clip set-paint-prop
+            draw-gadget
+        ] with-surface
     ] [
         drop
     ] ifte ;
 
 DEFER: handle-event
-
-: layout-world ( world -- )
-    dup
-    0 0 width get height get <rectangle> clip set-paint-prop
-    layout ;
 
 : world-step ( world -- ? )
     world get dup world-running? [

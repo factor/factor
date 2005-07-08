@@ -22,7 +22,8 @@ TUPLE: viewport origin ;
     [ fix-scroll ] keep [ set-viewport-origin ] keep relayout ;
 
 C: viewport ( content -- viewport )
-    [ <empty-gadget> swap set-delegate ] keep
+    <empty-gadget> over set-delegate
+    t over set-gadget-root?
     [ add-gadget ] keep
     { 0 0 0 } over set-viewport-origin ;
 
@@ -30,7 +31,7 @@ M: viewport pref-dim gadget-child pref-dim ;
 
 M: viewport layout* ( viewport -- )
     dup viewport-origin
-    swap gadget-child dup prefer set-gadget-loc ;
+    swap gadget-child dup prefer set-shape-loc ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
@@ -73,6 +74,7 @@ TUPLE: slider viewport thumb vector ;
 
 : <thumb> ( -- thumb )
     <plain-gadget>
+    t over set-gadget-root?
     dup gray background set-paint-prop
     dup thumb-actions ;
 
@@ -105,7 +107,7 @@ M: slider pref-dim drop slider-dim ;
 
 M: slider layout* ( slider -- )
     dup thumb-loc over slider-vector v*
-    over slider-thumb set-gadget-loc
+    over slider-thumb set-shape-loc
     dup thumb-dim over slider-vector v* slider-dim vmax
     swap slider-thumb set-gadget-dim ;
 

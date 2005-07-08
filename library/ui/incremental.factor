@@ -31,8 +31,10 @@ C: incremental ( pack -- incremental )
 
 : incremental-loc ( gadget incremental -- )
     dup incremental-cursor dup rot pack-vector v* v-
-    swap set-gadget-loc ;
+    swap set-shape-loc ;
 
 : add-incremental ( gadget incremental -- )
-    ( 2dup add-gadget ) (  over prefer )  f over set-gadget-relayout?
-    ( 2dup incremental-loc ) ( update-cursor ) 2drop ;
+    2dup add-gadget
+    >r dup dup pref-dim swap set-shape-dim r>
+    f over set-gadget-relayout?
+    2dup incremental-loc update-cursor ;

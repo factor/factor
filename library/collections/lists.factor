@@ -160,8 +160,5 @@ M: general-list nth ( n list -- element )
     uncons >r cons r> cons ;
 
 : deque ( queue -- obj queue )
-    uncons [
-        uncons swapd cons
-    ] [
-        reverse uncons f swons
-    ] ifte* ;
+    uncons
+    [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;

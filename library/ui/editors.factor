@@ -76,11 +76,12 @@ C: editor ( text -- )
 : offset>x ( gadget offset str -- x )
     head >r gadget-font r> size-string drop ;
 
-: caret-pos ( editor -- x y )
-    dup editor-line [ caret get line-text get ] bind offset>x 0 ;
+: caret-loc ( editor -- x y )
+    dup editor-line [ caret get line-text get ] bind offset>x
+    0 0 3vector ;
 
-: caret-size ( editor -- w h )
-    1 swap shape-h ;
+: caret-dim ( editor -- w h )
+    shape-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
     [ [ insert-char ] with-editor ] keep
@@ -90,8 +91,8 @@ M: editor pref-dim ( editor -- dim )
     dup editor-text label-size { 1 0 0 } v+ ;
 
 M: editor layout* ( editor -- )
-    dup editor-caret over caret-size rot resize-gadget
-    dup editor-caret swap caret-pos rot move-gadget ;
+    dup editor-caret over caret-dim swap set-gadget-dim
+    dup editor-caret swap caret-loc swap set-shape-loc ;
 
 M: editor draw-shape ( editor -- )
     [ dup gadget-font swap editor-text ] keep

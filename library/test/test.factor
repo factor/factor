@@ -76,7 +76,8 @@ SYMBOL: failures
 : tests
     [
         "lists/cons" "lists/lists" "lists/assoc"
-        "lists/namespaces" "lists/combinators" "combinators"
+        "lists/namespaces" "lists/combinators" "lists/queues"
+        "combinators"
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
         "parse-number" "image" "init" "io/io"

@@ -7,30 +7,28 @@ sequences vectors ;
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
 ! delegates to its shape.
-TUPLE: gadget paint gestures relayout? redraw? parent children ;
+TUPLE: gadget
+    paint gestures
+    relayout? redraw? root?
+    parent children ;
 
 : gadget-child gadget-children car ;
 
 C: gadget ( shape -- gadget )
     [ set-delegate ] keep
-    [ <namespace> swap set-gadget-paint ] keep
-    [ <namespace> swap set-gadget-gestures ] keep
-    [ t swap set-gadget-relayout? ] keep
-    [ t swap set-gadget-redraw? ] keep ;
+    <namespace> over set-gadget-paint
+    <namespace> over set-gadget-gestures ;
 
 : <empty-gadget> ( -- gadget ) 0 0 0 0 <rectangle> <gadget> ;
 
 : <plain-gadget> ( -- gadget ) 0 0 0 0 <plain-rect> <gadget> ;
 
-: redraw ( gadget -- )
-    #! Redraw a gadget before the next iteration of the event
-    #! loop.
-    dup gadget-redraw? [
-        drop
-    ] [
-        t over set-gadget-redraw?
-        gadget-parent [ redraw ] when*
-    ] ifte ;
+DEFER: relayout
+DEFER: add-invalid
+
+: invalidate ( gadget -- )
+    t over set-gadget-redraw?
+    t swap set-gadget-relayout? ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
@@ -38,28 +36,23 @@ C: gadget ( shape -- gadget )
     dup gadget-relayout? [
         drop
     ] [
-        t over set-gadget-redraw?
-        t over set-gadget-relayout?
-        gadget-parent [ relayout ] when*
+        dup invalidate
+        dup gadget-root?
+        [ world get add-invalid ]
+        [ gadget-parent [ relayout ] when* ] ifte
     ] ifte ;
 
-: relayout* ( gadget -- )
+: relayout-down ( gadget -- )
     #! Relayout a gadget and its children.
-    dup relayout gadget-children [ relayout* ] each ;
-
-: set-gadget-loc ( loc gadget -- )
-    2dup shape-loc =
-    [ 2drop ] [ [ set-shape-loc ] keep redraw ] ifte ;
+    dup world get add-invalid
+    dup invalidate gadget-children [ relayout-down ] each ;
 
 : move-gadget ( x y gadget -- )
-    >r 0 3vector r> set-gadget-loc ;
+    >r 0 3vector r> set-shape-loc ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup shape-dim =
-    [ 2drop ] [ [ set-shape-dim ] keep relayout* ] ifte ;
-
-: resize-gadget ( w h gadget -- )
-    >r 0 3vector r> set-gadget-dim ;
+    [ 2drop ] [ [ set-shape-dim ] keep relayout-down ] ifte ;
 
 : paint-prop ( gadget key -- value )
     over [

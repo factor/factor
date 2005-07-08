@@ -54,7 +54,7 @@ TUPLE: pack align fill vector ;
 
 : packed-locs ( gadget sizes -- )
     over gadget-children >r (packed-locs) r>
-    zip [ uncons set-gadget-loc ] each ;
+    zip [ uncons set-shape-loc ] each ;
 
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;

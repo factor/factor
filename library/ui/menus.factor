@@ -3,16 +3,9 @@
 IN: gadgets
 USING: generic kernel lists math namespaces sequences ;
 
-: hide-menu ( -- )
-    world get
-    dup hide-glass
-    [ world-menu unparent f ] keep set-world-menu ;
-
 : show-menu ( menu -- )
-    hide-menu
-    world get
-    2dup set-world-menu
-    2dup world-hand screen-loc swap set-gadget-loc
+    hide-glass
+    hand screen-loc over set-shape-loc
     show-glass ;
 
 : menu-item-border ( child -- border )
@@ -24,7 +17,7 @@ USING: generic kernel lists math namespaces sequences ;
 TUPLE: menu ;
 
 : menu-actions ( menu -- )
-    [ drop hide-menu ] [ button-down 1 ] set-action ;
+    [ drop world get hide-glass ] [ button-down 1 ] set-action ;
 
 : assoc>menu ( assoc menu -- )
     #! Given an association list mapping labels to quotations.

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic kernel lists math namespaces prettyprint
-sdl sequences ;
+sdl sequences vectors ;
 
 GENERIC: handle-event ( event -- )
 
@@ -14,7 +14,7 @@ M: quit-event handle-event ( event -- )
 
 M: resize-event handle-event ( event -- )
     dup resize-event-w swap resize-event-h
-    [ world get resize-gadget ] 2keep
+    [ 0 3vector world get set-gadget-dim ] 2keep
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
     world get relayout ;
 

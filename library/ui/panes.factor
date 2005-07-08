@@ -73,9 +73,9 @@ M: pane focusable-child* ( pane -- editor )
     [ over pane-terpri pane-write ] [ 3drop ] ifte ;
 
 ! Panes are streams.
-M: pane stream-flush ( stream -- ) relayout ;
+M: pane stream-flush ( stream -- ) drop ;
 
-M: pane stream-auto-flush ( stream -- ) stream-flush ;
+M: pane stream-auto-flush ( stream -- ) drop ;
 
 M: pane stream-readln ( stream -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
