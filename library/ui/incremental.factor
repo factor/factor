@@ -14,11 +14,13 @@ USING: generic kernel matrices ;
 
 TUPLE: incremental cursor ;
 
-M: incremental pref-dim incremental-cursor ;
-
 C: incremental ( pack -- incremental )
     [ set-delegate ] keep
     { 0 0 0 } over set-incremental-cursor ;
+
+M: incremental pref-dim incremental-cursor ;
+
+M: incremental layout* drop ;
 
 : next-cursor ( gadget incremental -- cursor )
     [
@@ -33,8 +35,12 @@ C: incremental ( pack -- incremental )
     dup incremental-cursor dup rot pack-vector v* v-
     swap set-shape-loc ;
 
+: prefer-incremental ( gadget -- )
+    dup pref-dim swap set-shape-dim ;
+
 : add-incremental ( gadget incremental -- )
-    2dup add-gadget
-    >r dup dup pref-dim swap set-shape-dim r>
-    f over set-gadget-relayout?
-    2dup incremental-loc update-cursor ;
+    2dup (add-gadget)
+    over prefer-incremental
+    2dup incremental-loc
+    tuck update-cursor
+    prefer-incremental ;

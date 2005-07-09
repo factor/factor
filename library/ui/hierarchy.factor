@@ -4,15 +4,10 @@ IN: gadgets
 USING: generic hashtables kernel lists math matrices namespaces
 sequences ;
 
-: remove-gadget ( gadget box -- )
+: remove-gadget ( gadget parent -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep
     relayout
     f swap set-gadget-parent ;
-
-: (add-gadget) ( gadget box -- )
-    #! This is inefficient.
-    [ gadget-children swap add ] keep
-    set-gadget-children ;
 
 : unparent ( gadget -- )
     [
@@ -20,20 +15,23 @@ sequences ;
         [ remove-gadget ] [ 2drop ] ifte
     ] when* ;
 
-: add-gadget ( gadget box -- )
-    #! Add a gadget to a box.
+: (add-gadget) ( gadget box -- )
+    #! This is inefficient.
     over unparent
     dup pick set-gadget-parent
-    tuck (add-gadget)
-    relayout ;
+    [ gadget-children swap add ] keep set-gadget-children ;
 
-: (parent-list) ( gadget -- )
-    [ dup gadget-parent (parent-list) , ] when* ;
+: add-gadget ( gadget parent -- )
+    #! Add a gadget to a parent gadget.
+    [ (add-gadget) ] keep relayout ;
 
-: parent-list ( gadget -- list )
+: (parents) ( gadget -- )
+    [ dup gadget-parent (parents) , ] when* ;
+
+: parents ( gadget -- list )
     #! A list of all parents of the gadget, including the
     #! gadget itself.
-    [ (parent-list) ] make-list ;
+    [ (parents) ] make-list ;
 
 : (each-parent) ( list quot -- ? )
     over [
@@ -51,7 +49,7 @@ sequences ;
 : each-parent ( gadget quot -- ? )
     #! Keep executing the quotation on higher and higher
     #! parents until it returns f.
-    >r parent-list r> (each-parent) ; inline
+    >r parents r> (each-parent) ; inline
 
 : screen-pos ( gadget -- point )
     #! The position of the gadget on the screen.

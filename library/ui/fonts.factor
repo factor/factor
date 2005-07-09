@@ -5,7 +5,7 @@ USING: alien hashtables io kernel lists namespaces sdl sequences
 styles ;
 
 : ttf-name ( font style -- name )
-    cons [
+    cons {{
         [[ [[ "Monospaced" plain       ]] "VeraMono" ]]
         [[ [[ "Monospaced" bold        ]] "VeraMoBd" ]]
         [[ [[ "Monospaced" bold-italic ]] "VeraMoBI" ]]
@@ -18,7 +18,7 @@ styles ;
         [[ [[ "Serif" bold             ]] "VeraSeBd" ]]
         [[ [[ "Serif" bold-italic      ]] "VeraBI"   ]]
         [[ [[ "Serif" italic           ]] "VeraIt"   ]]
-    ] assoc ;
+    }} hash ;
 
 : ttf-path ( name -- string )
     [ resource-path % "/fonts/" % % ".ttf" % ] make-string ;
@@ -35,7 +35,9 @@ global [ open-fonts nest drop ] bind
 
 : ttf-init ( -- )
     TTF_Init
-    open-fonts [ [ cdr expired? not ] hash-subset ] change ;
+    global [
+        open-fonts [ [ cdr expired? not ] hash-subset ] change
+    ] bind ;
 
 : gadget-font ( gadget -- font )
     [ font paint-prop ] keep

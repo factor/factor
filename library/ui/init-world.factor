@@ -1,16 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel math namespaces styles ;
+USING: generic io kernel listener math namespaces styles threads ;
 
 
 global [
     <world> world set
     
     {{
-
         [[ background [ 255 255 255 ] ]]
-        [[ rollover-bg [ 216 216 216 ] ]]
+        [[ rollover-bg [ 255 255 204 ] ]]
         [[ foreground [ 0 0 0 ] ]]
         [[ reverse-video f ]]
         [[ font "Sans Serif" ]]
@@ -22,9 +21,13 @@ global [
     
     <plain-gadget> add-layer
 
-    <console> dup
-    "Stack display goes here" <label> <y-splitter>
+    <pane> dup
+    
+    <scroller> "Stack display goes here" <label> <y-splitter>
     3/4 over set-splitter-split add-layer
+    
+    dup
+    [ [ clear  print-banner listener ] in-thread ] with-stream
     
     request-focus
 ] bind
