@@ -84,6 +84,3 @@ M: pane stream-write-attr ( string style stream -- )
     [ rot "\n" split pane-write ] keep scroll>bottom ;
 
 M: pane stream-close ( stream -- ) drop ;
-
-: <console> ( -- pane )
-    <pane> <scroller> ;

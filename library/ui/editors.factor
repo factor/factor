@@ -9,22 +9,23 @@ sdl sequences strings styles vectors ;
 
 TUPLE: editor line caret ;
 
+: with-editor ( editor quot -- )
+    #! Execute a quotation in the line editor scope, then
+    #! update the display.
+    swap [ editor-line swap bind ] keep
+    dup relayout scroll>bottom ; inline
+
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;
 
 : set-editor-text ( text editor -- )
-    editor-line [ set-line-text ] bind ;
+    [ set-line-text ] with-editor ;
 
 : focus-editor ( editor -- )
     dup editor-caret swap add-gadget ;
 
 : unfocus-editor ( editor -- )
     editor-caret unparent ;
-
-: with-editor ( editor quot -- )
-    #! Execute a quotation in the line editor scope, then
-    #! update the display.
-    swap [ editor-line swap bind ] keep relayout ; inline
 
 : run-char-widths ( str -- wlist )
     #! List of x co-ordinates of each character.
@@ -84,8 +85,7 @@ C: editor ( text -- )
     shape-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
-    [ [ insert-char ] with-editor ] keep
-    scroll>bottom  t ;
+    [ insert-char ] with-editor  t ;
 
 M: editor pref-dim ( editor -- dim )
     dup editor-text label-size { 1 0 0 } v+ ;

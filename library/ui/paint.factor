@@ -7,12 +7,7 @@ io strings sequences ;
 : redraw ( gadget -- )
     #! Redraw a gadget before the next iteration of the event
     #! loop.
-    dup gadget-redraw? [
-        drop
-    ] [
-        t over set-gadget-redraw?
-        gadget-parent [ redraw ] when*
-    ] ifte ;
+    drop  t world get set-gadget-redraw? ;
 
 ! Clipping
 

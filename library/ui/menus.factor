@@ -17,13 +17,13 @@ USING: generic kernel lists math namespaces sequences ;
 TUPLE: menu ;
 
 : menu-actions ( menu -- )
-    [ drop world get hide-glass ] [ button-down 1 ] set-action ;
+    [ drop hide-glass ] [ button-down 1 ] set-action ;
 
 : assoc>menu ( assoc menu -- )
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
     [
-        uncons \ hide-menu swons <menu-item> swap add-gadget
+        uncons \ hide-glass swons <menu-item> swap add-gadget
     ] each-with ;
 
 C: menu ( assoc -- gadget )

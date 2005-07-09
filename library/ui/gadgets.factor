@@ -27,12 +27,12 @@ DEFER: relayout
 DEFER: add-invalid
 
 : invalidate ( gadget -- )
-    t over set-gadget-redraw?
     t swap set-gadget-relayout? ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
     #! next iteration of the event loop.
+    dup redraw
     dup gadget-relayout? [
         drop
     ] [

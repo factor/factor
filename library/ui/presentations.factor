@@ -20,14 +20,20 @@ DEFER: pane-call
 : command-menu ( pane -- menu )
     presented get dup applicable [
         3dup third [
-            [ swap literal, % ] make-list , , \ pane-call ,
+            [ swap literal, % ] make-list , ,
+            [ pane-call drop ] %
         ] make-list >r second r> cons
     ] map 2nip ;
 
 : init-commands ( gadget pane -- )
-    over presented paint-prop
-    [ [ command-menu <menu> show-menu ] cons button-gestures ]
-    [ 2drop ] ifte ;
+    over presented paint-prop [
+        [ drop ] swap
+        unit
+        [ command-menu <menu> show-menu ] append3
+        button-gestures
+    ] [
+        2drop
+    ] ifte ;
 
 : <styled-label> ( style text -- label )
     <label> swap alist>hash over set-gadget-paint ;
