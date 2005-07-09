@@ -23,11 +23,9 @@ global [
 
     <pane> dup
     
-    <scroller> "Stack display goes here" <label> <y-splitter>
-    3/4 over set-splitter-split add-layer
+    <scroller> "Stack display goes here" <label> 3/4 <y-splitter> add-layer
     
-    dup
-    [ [ clear  print-banner listener ] in-thread ] with-stream
+    dup [ [ clear  print-banner listener ] in-thread ] with-stream
     
     request-focus
 ] bind

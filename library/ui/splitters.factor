@@ -30,17 +30,19 @@ C: divider ( -- divider )
     dup t reverse-video set-paint-prop
     dup divider-actions ;
 
-C: splitter ( first second vector -- splitter )
+C: splitter ( first second split vector -- splitter )
     [ >r 0 1 rot <pack> r> set-delegate ] keep
+    [ set-splitter-split ] keep
     swapd
     [ add-gadget ] keep
     <divider> over add-gadget
-    [ add-gadget ] keep
-    1/2 over set-splitter-split ;
+    [ add-gadget ] keep ;
 
-: <x-splitter> { 0 1 0 } <splitter> ;
+: <x-splitter> ( first second split -- splitter )
+    { 0 1 0 } <splitter> ;
 
-: <y-splitter> { 1 0 0 } <splitter> ;
+: <y-splitter> ( first second split -- splitter )
+    { 1 0 0 } <splitter> ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;

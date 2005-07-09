@@ -32,7 +32,7 @@ M: incremental layout* drop ;
     [ next-cursor ] keep set-incremental-cursor ;
 
 : incremental-loc ( gadget incremental -- )
-    dup incremental-cursor dup rot pack-vector v* v-
+    dup incremental-cursor swap pack-vector v*
     swap set-shape-loc ;
 
 : prefer-incremental ( gadget -- )
