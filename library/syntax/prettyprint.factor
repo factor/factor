@@ -13,7 +13,7 @@ SYMBOL: recursion-check
 GENERIC: prettyprint* ( indent obj -- indent )
 
 M: object prettyprint* ( indent obj -- indent )
-    unparse write ;
+    dup unparse swap presented swons unit write-attr ;
 
 : word-attrs ( word -- style )
     #! Return the style values for the HTML word browser

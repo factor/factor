@@ -48,6 +48,7 @@ parser prettyprint sequences io vectors words ;
         "/library/vocabularies.factor"
         "/library/errors.factor"
         "/library/continuations.factor"
+        "/library/styles.factor"
 
         "/library/io/stream.factor"
         "/library/io/duplex-stream.factor"
@@ -58,7 +59,6 @@ parser prettyprint sequences io vectors words ;
         "/library/io/files.factor"
 
         "/library/threads.factor"
-        "/library/styles.factor"
 
         "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"

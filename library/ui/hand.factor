@@ -49,8 +49,6 @@ TUPLE: hand world
     click-loc click-rel clicked buttons
     gadget focus ;
 
-: hand-click-pos hand-click-loc 3unseq drop rect> ;
-
 C: hand ( world -- hand )
     <empty-gadget>
     over set-delegate

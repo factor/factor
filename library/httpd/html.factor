@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic kernel lists namespaces presentation sequences
-io strings unparser http ;
+USING: generic http io kernel lists namespaces presentation
+sequences strings styles unparser words ;
 
 : html-entities ( -- alist )
     [
@@ -22,36 +22,35 @@ io strings unparser http ;
         [ dup html-entities assoc [ % ] [ , ] ?ifte ] each
     ] make-string ;
 
-: >hex-color ( triplet -- hex )
-    [ CHAR: # , [ >hex 2 CHAR: 0 pad-left % ] each ] make-string ;
+: hex-color, ( triplet -- )
+    [ >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )
-    "color: " , >hex-color , "; " , ;
+    "color: #" % hex-color, "; " % ;
 
-: bold-css, ( flag -- )
-    [ "font-weight: bold; " , ] when ;
-
-: italics-css, ( flag -- )
-    [ "font-style: italic; " , ] when ;
+: style-css, ( flag -- )
+    dup [ italic bold-italic ] contains?
+    [ "font-style: italic; " % ] when
+    [ bold bold-italic ] contains?
+    [ "font-weight: bold; " % ] when ;
 
 : underline-css, ( flag -- )
-    [ "text-decoration: underline; " , ] when ;
+    [ "text-decoration: underline; " % ] when ;
 
 : size-css, ( size -- )
-    "font-size: " , unparse , "; " , ;
+    "font-size: " % unparse % "; " % ;
 
 : font-css, ( font -- )
-    "font-family: " , , "; " , ;
+    "font-family: " % % "; " % ;
 
 : css-style ( style -- )
     [
         [
-            [ "fg"        fg-css, ]
-            [ "bold"      bold-css, ]
-            [ "italics"   italics-css, ]
-            [ "underline" underline-css, ]
-            [ "size"      size-css, ]
-            [ "font"      font-css, ]
+            [ foreground  fg-css, ]
+            [ font        font-css, ]
+            [ font-style  style-css, ]
+            [ font-size   size-css, ]
+            [ underline   underline-css, ]
         ] assoc-apply
     ] make-string ;
 
@@ -70,7 +69,7 @@ io strings unparser http ;
     ] when* "/" ?tail drop ;
 
 : file-link-href ( path -- href )
-    [ "/" , resolve-file-link url-encode , ] make-string ;
+    [ "/" % resolve-file-link url-encode % ] make-string ;
 
 : file-link-tag ( style quot -- )
     over "file" swap assoc [
@@ -79,20 +78,19 @@ io strings unparser http ;
         call
     ] ifte* ;
 
-: browser-link-href ( style -- href )
-    dup "word" swap assoc url-encode
-    swap "vocab" swap assoc url-encode
-    [ "/responder/browser/?vocab=" , , "&word=" , , ] make-string ;
+: browser-link-href ( word -- href )
+    dup word-name swap word-vocabulary
+    [ "/responder/browser/?vocab=" % % "&word=" % % ] make-string ;
 
 : browser-link-tag ( style quot -- style )
-    over "word" swap assoc [
-        <a href= over browser-link-href a> call </a>
+    over presented swap assoc dup word? [
+        <a href= browser-link-href a> call </a>
     ] [
-        call
+        drop call
     ] ifte ;
 
 : icon-tag ( string style quot -- )
-    over "icon" swap assoc dup [
+    over icon swap assoc dup [
         <img src= "/responder/resource/" swap append img/>
         #! Ignore the quotation, since no further style
         #! can be applied
@@ -120,12 +118,12 @@ C: html-stream ( stream -- stream )
     #! written, and supports writing attributed strings with
     #! the following attributes:
     #!
-    #! fg - an rgb triplet in a list
-    #! bg - an rgb triplet in a list
-    #! bold
-    #! italics
+    #! foreground - an rgb triplet in a list
+    #! background - an rgb triplet in a list
+    #! font
+    #! font-style
+    #! font-size
     #! underline
-    #! size
     #! icon
     #! file
     #! word

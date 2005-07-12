@@ -7,10 +7,7 @@ sequences vectors ;
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
 ! delegates to its shape.
-TUPLE: gadget
-    paint gestures
-    relayout? redraw? root?
-    parent children ;
+TUPLE: gadget paint gestures relayout? root? parent children ;
 
 : gadget-child gadget-children car ;
 
@@ -23,7 +20,6 @@ C: gadget ( shape -- gadget )
 
 : <plain-gadget> ( -- gadget ) 0 0 0 0 <plain-rect> <gadget> ;
 
-DEFER: relayout
 DEFER: add-invalid
 
 : invalidate ( gadget -- )
@@ -32,20 +28,21 @@ DEFER: add-invalid
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
     #! next iteration of the event loop.
-    dup redraw
     dup gadget-relayout? [
         drop
     ] [
         dup invalidate
         dup gadget-root?
-        [ world get add-invalid ]
+        [ add-invalid ]
         [ gadget-parent [ relayout ] when* ] ifte
     ] ifte ;
 
+: (relayout-down)
+    dup invalidate gadget-children [ (relayout-down) ] each ;
+
 : relayout-down ( gadget -- )
     #! Relayout a gadget and its children.
-    dup world get add-invalid
-    dup invalidate gadget-children [ relayout-down ] each ;
+    dup add-invalid (relayout-down) ;
 
 : move-gadget ( x y gadget -- )
     >r 0 3vector r> set-shape-loc ;

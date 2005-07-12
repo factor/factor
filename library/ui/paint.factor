@@ -4,11 +4,6 @@ IN: gadgets
 USING: generic hashtables kernel lists math namespaces sdl
 io strings sequences ;
 
-: redraw ( gadget -- )
-    #! Redraw a gadget before the next iteration of the event
-    #! loop.
-    drop  t world get set-gadget-redraw? ;
-
 ! Clipping
 
 SYMBOL: clip
@@ -68,7 +63,6 @@ SYMBOL: clip
     #! All drawing done inside draw-shape is done with the
     #! gadget's paint. If the gadget does not have any custom
     #! paint, just call the quotation.
-    f over set-gadget-redraw?
     dup gadget-paint [
         dup [
             [

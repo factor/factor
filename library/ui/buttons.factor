@@ -21,7 +21,7 @@ sequences io sequences styles ;
 : button-update ( button -- )
     dup dup mouse-over? rollover set-paint-prop
     dup dup button-pressed? reverse-video set-paint-prop
-    redraw ;
+    relayout ;
 
 : button-clicked ( button -- )
     #! If the mouse is released while still inside the button,

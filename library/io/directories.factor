@@ -6,33 +6,19 @@ sequences strings unparser ;
 
 ! Hyperlinked directory listings.
 
-: file-actions ( -- list )
-    [
-        [[ "Push"             ""           ]]
-        [[ "Run file"         "run-file"   ]]
-        [[ "List directory"   "directory." ]]
-        [[ "Change directory" "cd"         ]]
-    ] ;
-
 : dir-icon "/library/icons/Folder.png" ;
- : file-icon "/library/icons/File.png" ;
- : file-icon. directory? dir-icon file-icon ? write-icon ;
+: file-icon "/library/icons/File.png" ;
+: file-icon. directory? dir-icon file-icon ? write-icon ;
 
 : file-link. ( dir name -- )
-    tuck "/" swap append3 dup "file" swons swap
-    unparse file-actions <actions> "actions" swons
-    2list write-attr ;
+    tuck path+ "file" swons unit write-attr ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.
-    2dup "/" swap append3 file-icon. bl file-link. terpri ;
+    2dup path+ file-icon. bl file-link. terpri ;
 
 : directory. ( dir -- )
     #! If "doc-root" set, create links relative to it.
     dup directory [
-        dup [ "." ".." ] contains? [
-            2drop
-        ] [
-            file.
-        ] ifte
+        dup [ "." ".." ] contains? [ 2drop ] [ file. ] ifte
     ] each-with ;

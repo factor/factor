@@ -17,18 +17,15 @@ C: world ( -- world )
     t over set-gadget-root?
     dup <hand> over set-world-hand ;
 
-: add-invalid ( gadget world -- )
-    [ world-invalid cons ] keep set-world-invalid ;
+: add-invalid ( gadget -- )
+    world get [ world-invalid cons ] keep set-world-invalid ;
 
-: pop-invalid ( world -- list )
-    [ world-invalid f ] keep set-world-invalid ;
+: pop-invalid ( -- list )
+    world get [ world-invalid f ] keep set-world-invalid ;
 
-: layout-world ( world -- )
-    dup world-invalid [
-        dup pop-invalid [ layout ] each layout-world
-    ] [
-        drop
-    ] ifte ;
+: layout-world ( -- )
+    world get world-invalid
+    [ pop-invalid [ layout ] each layout-world ] when ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
@@ -47,23 +44,16 @@ M: world inside? ( point world -- ? ) 2drop t ;
 : hand world get world-hand ;
 
 : draw-world ( world -- )
-    dup gadget-redraw? [
-        [
-            dup 0 0 width get height get <rectangle> clip set-paint-prop
-            draw-gadget
-        ] with-surface
-    ] [
-        drop
-    ] ifte ;
+    [
+        dup 0 0 width get height get <rectangle> clip set-paint-prop
+        draw-gadget
+    ] with-surface ;
 
 DEFER: handle-event
 
-: world-step ( world -- ? )
-    world get dup world-running? [
-        dup layout-world draw-world  t
-    ] [
-        drop f
-    ] ifte ;
+: world-step ( -- ? )
+    world get dup world-invalid >r layout-world r>
+    [ draw-world ] [ drop ] ifte ;
 
 : next-event ( -- event ? )
     <event> dup SDL_PollEvent ;
@@ -74,7 +64,8 @@ DEFER: handle-event
     next-event [
         handle-event run-world
     ] [
-        drop world-step [ yield run-world ] when
+        drop world-step
+        world get world-running? [ yield run-world ] when
     ] ifte ;
 
 : ensure-ui ( -- )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: errors kernel lists namespaces generic strings ;
+USING: errors generic kernel lists namespaces strings styles ;
 
 : flush      ( -- )              stdio get stream-flush ;
 : read-line  ( -- string )       stdio get stream-readln ;
@@ -17,7 +17,7 @@ USING: errors kernel lists namespaces generic strings ;
 
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png
-    "icon" swons unit "" swap write-attr ;
+    icon swons unit "" swap write-attr ;
 
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happends.
