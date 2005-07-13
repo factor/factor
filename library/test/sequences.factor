@@ -18,4 +18,4 @@ USING: lists math sequences test vectors ;
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
 [ [ 1 1 2 6 24 120 720 ] ]
-[ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumilate ] unit-test
+[ [ 1 2 3 4 5 6 7 ] 1 [ * ] accumulate ] unit-test

@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 {
 	CELL ds_size = 2048;
 	CELL cs_size = 2048;
-	CELL generations = 3;
+	CELL generations = 2;
 	CELL young_size = 8;
 	CELL aging_size = 16;
 	CELL code_size = 2;

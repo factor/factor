@@ -1,10 +1,5 @@
 IN: temporary
-USE: html
-USE: namespaces
-USE: io
-USE: strings
-USE: test
-USE: kernel
+USING: html io kernel namespaces styles test ;
 
 [
     "&lt;html&gt;&amp;&apos;sgml&apos;"
@@ -22,7 +17,7 @@ USE: kernel
 [
     [
         ""
-        [ [[ "icon" "library/icons/File.png" ]] ]
+        [ [[ icon "library/icons/File.png" ]] ]
         [ drop ] icon-tag
     ] string-out
 ] unit-test
@@ -37,7 +32,7 @@ USE: kernel
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
 [
     [
-        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
+        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
         [ drop "car" write ]
         span-tag
     ] string-out
@@ -55,7 +50,7 @@ USE: kernel
 [
     [
         "car"
-        [ [ "fg" 255 0 255 ] [[ "font" "Monospaced" ]] ]
+        [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
         html-write-attr
     ] string-out
 ] unit-test

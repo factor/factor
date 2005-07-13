@@ -30,4 +30,4 @@ prettyprint sequences strings test vectors words ;
     full-gc
 ] unit-test
 
-[ ] [ f size ] unit-test
+[ 0 ] [ f size ] unit-test
