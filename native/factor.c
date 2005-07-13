@@ -1,14 +1,14 @@
 #include "factor.h"
 
 void init_factor(char* image, CELL ds_size, CELL cs_size,
-	CELL generations,
+	CELL gen_count,
 	CELL young_size, CELL aging_size,
 	CELL code_size, CELL literal_size)
 {
 	/* initialize random number generator */
 	srand((unsigned)time(NULL));
 	init_ffi();
-	init_arena(generations,young_size,aging_size);
+	init_arena(gen_count,young_size,aging_size);
 	init_compiler(code_size);
 	load_image(image,literal_size);
 	init_stacks(ds_size,cs_size);
@@ -17,7 +17,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_errors();
 	userenv[CPU_ENV] = tag_object(from_c_string(FACTOR_CPU_STRING));
 	userenv[OS_ENV] = tag_object(from_c_string(FACTOR_OS_STRING));
-	userenv[GEN_ENV] = tag_fixnum(gc_generations);
+	userenv[GEN_ENV] = tag_fixnum(gen_count);
 	userenv[CARD_OFF_ENV] = tag_cell(cards_offset);
 }
 

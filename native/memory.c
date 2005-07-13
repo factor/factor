@@ -146,7 +146,7 @@ void primitive_room(void)
 	box_signed_cell(compiling.limit - compiling.base);
 	box_signed_cell(cards_end - cards);
 	box_signed_cell(prior.limit - prior.base);
-	for(gen = gc_generations - 1; gen >= 0; gen--)
+	for(gen = gen_count - 1; gen >= 0; gen--)
 	{
 		ZONE *z = &generations[gen];
 		list = cons(cons(

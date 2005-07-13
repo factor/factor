@@ -11,12 +11,12 @@ typedef struct {
 } ZONE;
 
 /* total number of generations. */
-CELL gc_generations;
+CELL gen_count;
 
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
 /* the oldest generation */
-#define TENURED (gc_generations-1)
+#define TENURED (gen_count-1)
 
 ZONE *generations;
 

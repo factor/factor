@@ -203,7 +203,7 @@ void dump_generation(ZONE *z)
 void dump_generations(void)
 {
 	int i;
-	for(i = 0; i < gc_generations; i++)
+	for(i = 0; i < gen_count; i++)
 	{
 		fprintf(stderr,"Generation %d: ",i);
 		dump_generation(&generations[i]);
