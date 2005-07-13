@@ -61,6 +61,6 @@ void clear_cards(CELL from, CELL to)
 void collect_cards(CELL gen)
 {
 	int i;
-	for(i = gen + 1; i < GC_GENERATIONS; i++)
+	for(i = gen + 1; i < gc_generations; i++)
 		collect_gen_cards(i);
 }

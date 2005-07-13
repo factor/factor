@@ -1,7 +1,11 @@
 Factor 0.76:
 ------------
 
-+ Core language
++ Runtime and core library:
+
+- The number of generations used for garbage collection can now be set
+  with the +G command line switch; eg, +G3 is the default. You must
+  specify at least 2 generations.
 
 - New words:
 

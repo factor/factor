@@ -19,13 +19,16 @@ there are two reasons for this:
 - the nursery grows into the guard page, so allot() does not have to
 check for out of memory, whereas allot_zone() (used by the GC) longjmp()s
 back to collecting a higher generation */
-void init_arena(CELL young_size, CELL aging_size)
+void init_arena(CELL gen_count, CELL young_size, CELL aging_size)
 {
 	int i;
 	CELL alloter;
 
-	CELL total_size = (GC_GENERATIONS - 1) * young_size + 2 * aging_size;
+	CELL total_size = (gc_generations - 1) * young_size + 2 * aging_size;
 	CELL cards_size = total_size / CARD_SIZE;
+
+	gc_generations = gen_count;
+	generations = malloc(sizeof(ZONE) * gen_count);
 
 	heap_start = (CELL)alloc_guarded(total_size);
 	heap_end = heap_start + total_size;
@@ -42,7 +45,7 @@ void init_arena(CELL young_size, CELL aging_size)
 	alloter = init_zone(&tenured,aging_size,alloter);
 	alloter = init_zone(&prior,aging_size,alloter);
 
-	for(i = GC_GENERATIONS - 2; i >= 0; i--)
+	for(i = gc_generations - 2; i >= 0; i--)
 		alloter = init_zone(&generations[i],young_size,alloter);
 
 	clear_cards(NURSERY,TENURED);

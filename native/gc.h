@@ -11,13 +11,14 @@ typedef struct {
 } ZONE;
 
 /* total number of generations. */
-#define GC_GENERATIONS 3
+CELL gc_generations;
+
 /* the 0th generation is where new objects are allocated. */
 #define NURSERY 0
 /* the oldest generation */
-#define TENURED (GC_GENERATIONS-1)
+#define TENURED (gc_generations-1)
 
-ZONE generations[GC_GENERATIONS];
+ZONE *generations;
 
 /* used during garbage collection only */
 ZONE *newspace;
@@ -35,7 +36,7 @@ INLINE bool in_zone(ZONE* z, CELL pointer)
 
 CELL init_zone(ZONE *z, CELL size, CELL base);
 
-void init_arena(CELL young_size, CELL aging_size);
+void init_arena(CELL gen_count, CELL young_size, CELL aging_size);
 
 /* statistics */
 s64 gc_time;

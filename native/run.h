@@ -14,7 +14,7 @@
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
 #define IN_ENV         13
 #define OUT_ENV        14
-#define GEN_ENV        15 /* set to GC_GENERATIONS constant */
+#define GEN_ENV        15 /* set to gc_generations */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
