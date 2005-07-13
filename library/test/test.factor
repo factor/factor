@@ -91,7 +91,7 @@ SYMBOL: failures
         "crashes" "sbuf" "threads" "parsing-word"
         "inference" "interpreter"
         "alien"
-        "line-editor" "gadgets" "memory" "redefine"
+        "line-editor" "gadgets/rectangles" "memory" "redefine"
         "annotate" "sequences" "binary" "inspector"
     ] run-tests ;
 

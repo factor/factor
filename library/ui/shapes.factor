@@ -1,42 +1,26 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl sequences
-vectors ;
+USING: generic kernel lists math matrices namespaces sdl
+sequences vectors ;
 
-! Shape protocol. Shapes are immutable; moving or resizing a
-! shape makes a new shape.
-
-! These dynamically-bound variables affect the generic word
-! inside? and others.
 SYMBOL: x
 SYMBOL: y
 
-GENERIC: inside? ( point shape -- ? )
+: origin ( -- loc ) x get y get 0 3vector ;
 
-! A shape is an object with a defined bounding
-! box, and a notion of interior.
-GENERIC: shape-x
-GENERIC: shape-y
-GENERIC: shape-w
-GENERIC: shape-h
+GENERIC: inside? ( loc shape -- ? )
+GENERIC: shape-loc ( shape -- loc )
+GENERIC: set-shape-loc ( loc shape -- )
+GENERIC: shape-dim ( shape -- dim )
+GENERIC: set-shape-dim ( dim shape -- )
 
-GENERIC: move-shape ( x y shape -- )
+: shape-x shape-loc first ;
+: shape-y shape-loc second ;
+: shape-w shape-dim first ;
+: shape-h shape-dim second ;
 
-: set-shape-loc ( loc shape -- )
-    >r 3unseq drop r> move-shape ;
-
-GENERIC: resize-shape ( w h shape -- )
-
-: set-shape-dim ( loc shape -- )
-    >r 3unseq drop r> resize-shape ;
-
-! The painting protocol. Painting is controlled by various
-! dynamically-scoped variables. See library/styles.factor.
-
-GENERIC: draw-shape ( obj -- )
-
-! Utility words
+GENERIC: draw-shape ( shape -- )
 
 : with-trans ( shape quot -- )
     #! All drawing done inside the quotation is translated
@@ -51,11 +35,15 @@ GENERIC: draw-shape ( obj -- )
 : shape-pos ( shape -- pos )
     dup shape-x swap shape-y rect> ;
 
-: shape-size ( shape -- w h )
-    dup shape-w swap shape-h ;
+: shape-bounds ( shape -- loc dim )
+    dup shape-loc swap shape-dim ;
 
-: shape-dim ( shape -- dim )
-    dup shape-w swap shape-h 0 3vector ;
+: shape-extent ( shape -- loc dim )
+    dup shape-loc dup rot shape-dim v+ ;
 
-: shape-loc ( shape -- loc )
-    dup shape-x swap shape-y 0 3vector ;
+: translate ( shape shape -- point )
+    #! Translate a point relative to the shape.
+    swap shape-loc swap shape-loc v- ;
+
+M: vector shape-loc ;
+M: vector shape-dim drop { 0 0 0 } ;

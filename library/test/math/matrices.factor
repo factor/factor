@@ -136,3 +136,11 @@ unit-test
     M[ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] ]M
     5 [ 2 - swap <diagonal> ] project-with [ >list ] map
 ] unit-test
+
+[ { t t t } ]
+[ { 1 2 3 } { -1 -2 -3 } { 4 5 6 } vbetween? ]
+unit-test
+
+[ { t f t } ]
+[ { 1 10 3 } { -1 -2 -3 } { 4 5 6 } vbetween? ]
+unit-test

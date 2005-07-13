@@ -1,58 +1,41 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel lists math namespaces sdl styles ;
+USING: generic kernel lists math matrices namespaces sdl styles
+vectors ;
 
-! A rectangle maps trivially to the shape protocol.
-TUPLE: rectangle x y w h ;
-M: rectangle shape-x rectangle-x ;
-M: rectangle shape-y rectangle-y ;
-M: rectangle shape-w rectangle-w ;
-M: rectangle shape-h rectangle-h ;
+TUPLE: rectangle loc dim ;
 
-: rect>screen ( shape -- x1 y1 x2 y2 )
-    [ rectangle-x x get + ] keep
-    [ rectangle-y y get + ] keep
-    [ rectangle-w pick + ] keep
-    rectangle-h pick + ;
+M: rectangle shape-loc rectangle-loc ;
+M: rectangle set-shape-loc set-rectangle-loc ;
 
-: fix-neg ( a b c -- a+c b -c )
-    dup 0 < [ neg tuck >r >r + r> r> ] when ;
+M: rectangle shape-dim rectangle-dim ;
+M: rectangle set-shape-dim set-rectangle-dim ;
 
-C: rectangle ( x y w h -- rect )
-    #! We handle negative w/h for convinience.
-    >r fix-neg >r fix-neg r> r>
-    [ set-rectangle-h ] keep
-    [ set-rectangle-w ] keep
-    [ set-rectangle-y ] keep
-    [ set-rectangle-x ] keep ;
+: screen-bounds ( shape -- rect )
+    shape-bounds >r origin v+ r> <rectangle> ;
 
-M: rectangle move-shape ( x y rect -- )
-    tuck set-rectangle-y set-rectangle-x ;
-
-M: rectangle resize-shape ( w h rect -- )
-    tuck set-rectangle-h set-rectangle-w ;
-
-: rectangle-x-extents ( rect x0 -- x1 x2 )
-    >r dup shape-x r> + swap shape-w dupd + ;
-
-: rectangle-y-extents ( rect y0 -- y1 y2 )
-    >r dup shape-y r> + swap shape-h dupd + ;
-
-: inside-rect? ( point rect -- ? )
-    over shape-x over x get rectangle-x-extents 1 - between? >r
-    swap shape-y swap y get rectangle-y-extents 1 - between? r>
-    and ;
-
-M: rectangle inside? ( point rect -- ? )
-    inside-rect? ;
+M: rectangle inside? ( loc rect -- ? )
+    screen-bounds shape-bounds
+    >r v- { 0 0 0 } r> vbetween? conj ;
 
 M: rectangle draw-shape drop ;
+
+: intersect ( shape shape -- rect )
+    >r shape-extent r> shape-extent
+    swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
+    <rectangle> ;
+
+: rect>screen ( shape -- x1 y1 x2 y2 )
+    [ shape-x x get + ] keep
+    [ shape-y y get + ] keep
+    [ shape-w pick + ] keep
+    shape-h pick + ;
 
 ! A rectangle only whose outline is visible.
 TUPLE: hollow-rect ;
 
-C: hollow-rect ( x y w h -- rect )
+C: hollow-rect ( loc dim -- rect )
     [ >r <rectangle> r> set-delegate ] keep ;
 
 : hollow-rect ( shape -- )
@@ -65,7 +48,7 @@ M: hollow-rect draw-shape ( rect -- )
 ! A rectangle that is filled.
 TUPLE: plain-rect ;
 
-C: plain-rect ( x y w h -- rect )
+C: plain-rect ( loc dim -- rect )
     [ >r <rectangle> r> set-delegate ] keep ;
 
 : plain-rect ( shape -- )
@@ -79,7 +62,7 @@ M: plain-rect draw-shape ( rect -- )
 ! has an outline.
 TUPLE: etched-rect ;
 
-C: etched-rect ( x y w h -- rect )
+C: etched-rect ( loc dim -- rect )
     [ >r <rectangle> r> set-delegate ] keep ;
 
 M: etched-rect draw-shape ( rect -- )

@@ -16,9 +16,11 @@ C: gadget ( shape -- gadget )
     <namespace> over set-gadget-paint
     <namespace> over set-gadget-gestures ;
 
-: <empty-gadget> ( -- gadget ) 0 0 0 0 <rectangle> <gadget> ;
+: <empty-gadget> ( -- gadget )
+    { 0 0 0 } dup <rectangle> <gadget> ;
 
-: <plain-gadget> ( -- gadget ) 0 0 0 0 <plain-rect> <gadget> ;
+: <plain-gadget> ( -- gadget )
+    { 0 0 0 } dup <plain-rect> <gadget> ;
 
 DEFER: add-invalid
 
@@ -43,9 +45,6 @@ DEFER: add-invalid
 : relayout-down ( gadget -- )
     #! Relayout a gadget and its children.
     dup add-invalid (relayout-down) ;
-
-: move-gadget ( x y gadget -- )
-    >r 0 3vector r> set-shape-loc ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup shape-dim =
@@ -73,9 +72,7 @@ GENERIC: layout* ( gadget -- )
 
 : prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
 
-M: gadget layout*
-    #! Trivial layout gives each child its preferred size.
-    gadget-children [ prefer ] each ;
+M: gadget layout* drop ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 

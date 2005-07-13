@@ -62,6 +62,9 @@ DEFER: subseq
 : third 2 swap nth ; inline
 : fourth 3 swap nth ; inline
 
+: 2unseq ( { x y } -- x y )
+    dup first swap second ;
+
 : 3unseq ( { x y z } -- x y z )
     dup first over second rot third ;
 

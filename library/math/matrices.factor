@@ -14,19 +14,31 @@ vectors ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
 : v/ ( v v -- v ) [ / ] 2map ;
-: v** ( v v -- v ) [ conjugate * ] 2map ;
+: vand ( v v -- v ) [ and ] 2map ;
+: vor ( v v -- v ) [ or ] 2map ;
 : vmax ( v v -- v ) [ max ] 2map ;
 : vmin ( v v -- v ) [ min ] 2map ;
+: v< ( v v -- v ) [ < ] 2map ;
+: v<= ( v v -- v ) [ <= ] 2map ;
+: v> ( v v -- v ) [ > ] 2map ;
+: v>= ( v v -- v ) [ >= ] 2map ;
+
+: vbetween? ( v from to -- v )
+    >r over >r v>= r> r> v<= vand ;
+
 : vneg ( v -- v ) [ neg ] map ;
 
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product 1 [ * ] reduce ;
+: conj ( v -- ? ) t [ and ] reduce ;
+: disj ( v -- ? ) f [ or ] reduce ;
 
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
 ! Later, this will fixed when 2each works properly
 ! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
+: v** ( v v -- v ) [ conjugate * ] 2map ;
 : v. ( v v -- x ) v** sum ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;

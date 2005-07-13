@@ -25,7 +25,7 @@ USING: generic io kernel listener math namespaces styles threads ;
         
         <scroller> "Stack display goes here" <label> 3/4 <y-splitter> add-layer
         
-        dup [ [ clear  print-banner listener ] in-thread ] with-stream
+        [ [ clear  print-banner listener ] with-stream ] in-thread
         
         request-focus
     ] bind ;

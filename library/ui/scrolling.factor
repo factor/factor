@@ -8,11 +8,6 @@ threads vectors styles ;
 
 TUPLE: viewport origin ;
 
-: viewport-x viewport-origin first ;
-: viewport-y viewport-origin second ;
-: set-viewport-x [ viewport-y 0 3vector ] keep set-viewport-origin ;
-: set-viewport-y [ viewport-x swap 0 3vector ] keep set-viewport-origin ;
-
 : viewport-dim ( viewport -- h ) gadget-child pref-dim ;
 
 : fix-scroll ( origin viewport -- origin )

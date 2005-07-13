@@ -1,18 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic io kernel lists math namespaces prettyprint
-sdl sequences vectors ;
+USING: alien generic io kernel lists math matrices namespaces
+prettyprint sdl sequences vectors ;
 
 DEFER: pick-up
 
 : pick-up-list ( point list -- gadget )
     dup [
-        2dup car pick-up dup [
-            2nip
-        ] [
-            drop cdr pick-up-list
-        ] ifte
+        2dup car pick-up dup
+        [ 2nip ] [ drop cdr pick-up-list ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -24,11 +21,8 @@ DEFER: pick-up
     #! box delegate.
     2dup inside? [
         2dup [ translate ] keep
-        gadget-children reverse pick-up-list dup [
-            2nip
-        ] [
-            3drop t
-        ] ifte
+        gadget-children reverse pick-up-list dup
+        [ 2nip ] [ 3drop t ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -45,13 +39,13 @@ DEFER: pick-up
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand world
+TUPLE: hand
+    world
     click-loc click-rel clicked buttons
     gadget focus ;
 
 C: hand ( world -- hand )
-    <empty-gadget>
-    over set-delegate
+    <empty-gadget> over set-delegate
     [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
@@ -66,10 +60,10 @@ C: hand ( world -- hand )
     [ hand-buttons remove ] keep set-hand-buttons ;
 
 : fire-leave ( hand gadget -- )
-    [ swap shape-pos swap screen-pos - ] keep mouse-leave ;
+    [ swap shape-loc swap screen-loc v- ] keep mouse-leave ;
 
 : fire-enter ( oldpos hand -- )
-    hand-gadget [ screen-pos - ] keep mouse-enter ;
+    hand-gadget [ screen-loc v- ] keep mouse-enter ;
 
 : update-hand-gadget ( hand -- )
     dup dup hand-world pick-up swap set-hand-gadget ;
@@ -83,15 +77,12 @@ C: hand ( world -- hand )
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
-    dup hand-buttons [
-        dup hand-clicked [ drag ] motion-gesture
-    ] [
-        drop
-    ] ifte ;
+    dup hand-buttons
+    [ dup hand-clicked [ drag ] motion-gesture ] [ drop ] ifte ;
 
-: move-hand ( x y hand -- )
-    dup shape-pos >r
-    [ move-gadget ] keep
+: move-hand ( loc hand -- )
+    dup shape-loc >r
+    [ set-shape-loc ] keep
     dup hand-gadget >r
     dup update-hand-gadget
     dup r> fire-leave
@@ -100,7 +91,7 @@ C: hand ( world -- hand )
 
 : update-hand ( hand -- )
     #! Called when a gadget is removed or added.
-    [ dup shape-x swap shape-y ] keep move-hand ;
+    dup shape-loc swap move-hand ;
 
 : request-focus ( gadget -- )
     focusable-child

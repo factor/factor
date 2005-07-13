@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic hashtables kernel lists math sdl
+USING: alien generic hashtables kernel lists math matrices sdl
 sequences ;
 
 : action ( gadget gesture -- quot )
@@ -14,11 +14,8 @@ sequences ;
     swap [ unswons set-action ] each-with ;
 
 : handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures hash* dup [
-        cdr call f
-    ] [
-        2drop t
-    ] ifte ;
+    tuck gadget-gestures hash* dup
+    [ cdr call f ] [ 2drop t ] ifte ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the
@@ -41,18 +38,14 @@ SYMBOL: button-up
 SYMBOL: button-down
 
 : hierarchy-gesture ( gadget ? gesture -- ? )
-    swap [
-        2drop f
-    ] [
-        swap handle-gesture* drop t
-    ] ifte ;
+    swap [ 2drop f ] [ swap handle-gesture* drop t ] ifte ;
 
 : mouse-enter ( point gadget -- )
     #! If the old point is inside the new gadget, do not fire an
     #! enter gesture, since the mouse did not enter. Otherwise,
     #! fire an enter gesture and go on to the parent.
     [
-        [ shape-pos + ] keep
+        [ shape-loc v+ ] keep
         2dup inside? [ mouse-enter ] hierarchy-gesture
     ] each-parent 2drop ;
 
@@ -61,7 +54,7 @@ SYMBOL: button-down
     #! leave gesture, since the mouse did not leave. Otherwise,
     #! fire a leave gesture and go on to the parent.
     [
-        [ shape-pos + ] keep
+        [ shape-loc v+ ] keep
         2dup inside? [ mouse-leave ] hierarchy-gesture
     ] each-parent 2drop ;
 

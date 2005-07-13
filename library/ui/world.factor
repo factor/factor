@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien errors generic kernel lists math
-memory namespaces prettyprint sdl sequences io strings
-threads sequences ;
+USING: alien errors generic io kernel lists math memory
+namespaces prettyprint sdl sequences sequences strings threads
+vectors ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -30,14 +30,15 @@ C: world ( -- world )
 : add-layer ( gadget -- )
     world get add-gadget ;
 
-: show-glass ( gadget -- )
-    <empty-gadget> dup
-    world get 2dup add-gadget set-world-glass
-    add-gadget ;
-
 : hide-glass ( -- )
     world get world-glass unparent f
     world get set-world-glass ;
+
+: show-glass ( gadget -- )
+    hide-glass
+    <empty-gadget> dup
+    world get 2dup add-gadget set-world-glass
+    dupd add-gadget prefer ;
 
 M: world inside? ( point world -- ? ) 2drop t ;
 
@@ -45,7 +46,10 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     [
-        dup 0 0 width get height get <rectangle> clip set-paint-prop
+        dup
+        { 0 0 0 }
+        width get height get 0 3vector <rectangle>
+        clip set-paint-prop
         draw-gadget
     ] with-surface ;
 

@@ -9,7 +9,7 @@ IN: shells
     #! Start the Factor graphics subsystem with the given screen
     #! dimensions.
     ?init-world
-    world get shape-size 0 SDL_RESIZABLE [
+    world get shape-dim 2unseq 0 SDL_RESIZABLE [
         0 x set 0 y set [
             "Factor " version append dup SDL_WM_SetCaption
             ttf-init

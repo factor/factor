@@ -51,10 +51,6 @@ sequences ;
     #! parents until it returns f.
     >r parents r> (each-parent) ; inline
 
-: screen-pos ( gadget -- point )
-    #! The position of the gadget on the screen.
-    0 swap [ shape-pos + t ] each-parent drop ;
-
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
     { 0 0 0 } swap [ shape-loc v+ t ] each-parent drop ;

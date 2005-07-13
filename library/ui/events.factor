@@ -29,11 +29,11 @@ M: button-up-event handle-event ( event -- )
     button-event-button dup hand button\
     [ button-up ] button-gesture ;
 
-: motion-event-pos ( event -- x y )
-    dup motion-event-x swap motion-event-y ;
+: motion-event-loc ( event -- loc )
+    dup motion-event-x swap motion-event-y 0 3vector ;
 
 M: motion-event handle-event ( event -- )
-    motion-event-pos hand move-hand ;
+    motion-event-loc hand move-hand ;
 
 M: key-down-event handle-event ( event -- )
     dup keyboard-event>binding

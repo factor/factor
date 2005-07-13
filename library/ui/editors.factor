@@ -27,28 +27,27 @@ TUPLE: editor line caret ;
 : unfocus-editor ( editor -- )
     editor-caret unparent ;
 
-: run-char-widths ( str -- wlist )
+: run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    0 swap >list
-    [ ch>string shape-w [ + dup ] keep 2 /i - ] map nip ;
+    >list [ ch>string size-string drop ] map-with
+    dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : (x>offset) ( n x wlist -- offset )
     dup [
-        uncons >r over > [
-            r> 2drop
-        ] [
-            >r 1 + r> r> (x>offset)
-        ] ifte
+        uncons >r over >
+        [ r> 2drop ] [ >r 1 + r> r> (x>offset) ] ifte
     ] [
         2drop
     ] ifte ;
 
-: x>offset ( x str -- offset )
-    0 -rot run-char-widths (x>offset) ;
+: x>offset ( x font str -- offset )
+    run-char-widths 0 -rot (x>offset) ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
-    [ line-text get x>offset caret set ] with-editor ;
+    dup [
+        gadget-font line-text get x>offset caret set
+    ] with-editor ;
 
 : click-editor ( editor -- )
     dup hand relative shape-x over set-caret-x request-focus ;
