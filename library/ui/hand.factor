@@ -6,31 +6,27 @@ prettyprint sdl sequences vectors ;
 
 DEFER: pick-up
 
-: pick-up-list ( point list -- gadget )
+: (pick-up) ( point list -- gadget )
     dup [
         2dup car pick-up dup
-        [ 2nip ] [ drop cdr pick-up-list ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: pick-up* ( point gadget -- gadget/t )
-    #! The logic is thus. If the point is definately outside the
-    #! box, return f. Otherwise, see if the point is contained
-    #! in any subgadget. If not, see if it is contained in the
-    #! box delegate.
-    2dup inside? [
-        2dup [ translate ] keep
-        gadget-children reverse pick-up-list dup
-        [ 2nip ] [ 3drop t ] ifte
+        [ 2nip ] [ drop cdr (pick-up) ] ifte
     ] [
         2drop f
     ] ifte ;
 
 : pick-up ( point gadget -- gadget )
-    #! pick-up* returns t to mean 'this gadget', avoiding the
-    #! exposed facade issue.
-    tuck pick-up* dup t = [ drop ] [ nip ] ifte ;
+    #! The logic is thus. If the point is definately outside the
+    #! box, return f. Otherwise, see if the point is contained
+    #! in any subgadget. If not, see if it is contained in the
+    #! box delegate.
+    2dup inside? [
+        [
+            [ translate ] keep
+            gadget-children reverse (pick-up) dup
+        ] keep ?
+    ] [
+        2drop f
+    ] ifte ;
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
@@ -39,14 +35,10 @@ DEFER: pick-up
 ! - hand-gadget is the gadget under the mouse position
 ! - hand-clicked is the most recently clicked gadget
 ! - hand-focus is the gadget holding keyboard focus
-TUPLE: hand
-    world
-    click-loc click-rel clicked buttons
-    gadget focus ;
+TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( world -- hand )
     <empty-gadget> over set-delegate
-    [ set-hand-world ] 2keep
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
@@ -66,7 +58,7 @@ C: hand ( world -- hand )
     hand-gadget [ screen-loc v- ] keep mouse-enter ;
 
 : update-hand-gadget ( hand -- )
-    dup dup hand-world pick-up swap set-hand-gadget ;
+    [ world get pick-up ] keep set-hand-gadget ;
 
 : motion-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].

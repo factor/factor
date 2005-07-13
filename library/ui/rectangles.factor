@@ -16,7 +16,7 @@ M: rectangle set-shape-dim set-rectangle-dim ;
     shape-bounds >r origin v+ r> <rectangle> ;
 
 M: rectangle inside? ( loc rect -- ? )
-    screen-bounds shape-bounds
+    screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
     >r v- { 0 0 0 } r> vbetween? conj ;
 
 M: rectangle draw-shape drop ;

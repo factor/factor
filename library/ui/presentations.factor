@@ -13,7 +13,7 @@ global [ 100 <vector> commands set ] bind
 
 : applicable ( object -- )
     commands get >list
-    [ car "predicate" word-prop call ] subset-with ;
+    [ car call ] subset-with ;
 
 DEFER: pane-call
 
@@ -39,13 +39,22 @@ DEFER: pane-call
     <label> swap alist>hash over set-gadget-paint ;
 
 : <presentation> ( style text pane -- presentation )
-    >r <styled-label> dup r> init-commands ;
+    pick gadget swap assoc dup [
+        >r 3drop r>
+    ] [
+        drop >r <styled-label> dup r> init-commands
+    ] ifte ;
 
-object "Prettyprint" [ prettyprint ] define-command
-object "Inspect" [ inspect ] define-command
-object "References" [ references inspect ] define-command
+: gadget. ( gadget -- )
+    gadget swons unit "" swap write-attr ;
 
-\ word "See" [ see ] define-command
-\ word "Execute" [ execute ] define-command
-\ word "Usage" [ usage . ] define-command
-\ word "jEdit" [ jedit ] define-command
+[ drop t ] "Prettyprint" [ prettyprint ] define-command
+[ drop t ] "Inspect" [ inspect ] define-command
+[ drop t ] "References" [ references inspect ] define-command
+
+[ word? ] "See" [ see ] define-command
+[ word? ] "Execute" [ execute ] define-command
+[ word? ] "Usage" [ usage . ] define-command
+[ word? ] "jEdit" [ jedit ] define-command
+
+[ [ gadget? ] is? ] "Display" [ ] define-command
