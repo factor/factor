@@ -121,3 +121,7 @@ M: compound definer drop \ : ;
     over f "picker" set-word-prop
     over f "dispatcher" set-word-prop
     (define-compound) ;
+
+: literalize ( word/obj -- quot )
+    #! Produce a quotation that pushes this object.
+    dup word? [ unit [ car ] ] [ f ] ifte cons ;

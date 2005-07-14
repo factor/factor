@@ -11,6 +11,8 @@ vectors ;
 ! need to be layout.
 TUPLE: world running? hand glass invalid ;
 
+DEFER: <hand>
+
 C: world ( -- world )
     f <stack> over set-delegate
     t over set-world-running?
@@ -42,11 +44,8 @@ C: world ( -- world )
 
 M: world inside? ( point world -- ? ) 2drop t ;
 
-: hand world get world-hand ;
-
 : draw-world ( world -- )
     [
-        dup
         { 0 0 0 } width get height get 0 3vector <rectangle> clip set
         draw-gadget
     ] with-surface ;
@@ -55,7 +54,7 @@ DEFER: handle-event
 
 : world-step ( -- ? )
     world get dup world-invalid >r layout-world r>
-    [ dup world-hand update-hand draw-world ] [ drop ] ifte ;
+    [ draw-world ] [ drop ] ifte ;
 
 : next-event ( -- event ? )
     <event> dup SDL_PollEvent ;

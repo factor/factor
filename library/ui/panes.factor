@@ -4,6 +4,8 @@ IN: gadgets
 USING: generic hashtables io kernel line-editor listener lists
 math namespaces prettyprint sequences strings styles threads ;
 
+DEFER: <presentation>
+
 ! A pane is an area that can display text.
 
 ! output: pile
@@ -62,7 +64,7 @@ M: pane focusable-child* ( pane -- editor )
     pane-input ;
 
 : pane-write-1 ( style text pane -- )
-    [ <presentation> ] keep pane-current add-gadget ;
+    >r <presentation> r> pane-current add-gadget ;
 
 : pane-terpri ( pane -- )
     dup pane-current over pane-output add-incremental

@@ -11,39 +11,36 @@ global [ 100 <vector> commands set ] bind
 : define-command ( class name quot -- )
     3list commands get push ;
 
-: applicable ( object -- )
-    commands get >list
-    [ car call ] subset-with ;
+: applicable ( object -- list )
+    commands get >list [ car call ] subset-with ;
 
-DEFER: pane-call
+: command-quot ( presented quot -- quot )
+    [ swap literal, % ] make-list
+    [ pane get pane-call drop ] cons ;
 
-: command-menu ( pane -- menu )
-    presented get dup applicable [
-        3dup third [
-            [ swap literal, % ] make-list , ,
-            [ pane-call drop ] %
-        ] make-list >r second r> cons
-    ] map 2nip ;
+: command-menu ( presented -- menu )
+    dup applicable
+    [ [ third command-quot ] keep second swons ] map-with
+    <menu> ;
 
-: init-commands ( gadget pane -- )
-    over presented paint-prop [
-        [ drop ] swap
-        unit
-        [ command-menu <menu> show-menu ] append3
+: init-commands ( gadget -- )
+    dup presented paint-prop dup [
+        [
+            \ drop ,
+            literal,
+            [ command-menu show-menu ] %
+        ] make-list
         button-gestures
     ] [
         2drop
     ] ifte ;
 
 : <styled-label> ( style text -- label )
-    <label> swap alist>hash over set-gadget-paint ;
+    <label> swap dup [ alist>hash ] when over set-gadget-paint ;
 
-: <presentation> ( style text pane -- presentation )
-    pick gadget swap assoc dup [
-        >r 3drop r>
-    ] [
-        drop >r <styled-label> dup r> init-commands
-    ] ifte ;
+: <presentation> ( style text -- presentation )
+    gadget pick assoc dup
+    [ 2nip ] [ drop <styled-label> dup init-commands ] ifte ;
 
 : gadget. ( gadget -- )
     gadget swons unit "" swap write-attr ;

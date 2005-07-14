@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: namespaces
 USING: hashtables kernel kernel-internals lists math sequences
-strings vectors ;
+strings vectors words ;
 
 ! Variables in Factor:
 !
@@ -117,7 +117,7 @@ SYMBOL: building
 : literal, ( word -- )
     #! Append some code that pushes the word on the stack. Used
     #! when building quotations.
-    unit , \ car , ;
+    literalize % ;
 
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq

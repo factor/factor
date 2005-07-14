@@ -5,9 +5,6 @@ USING: generic io kernel listener math namespaces styles threads ;
 
 SYMBOL: stack-display
 
-: <stack-display>
-     ;
-
 : init-world
     global [
         <world> world set

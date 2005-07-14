@@ -12,25 +12,14 @@ SYMBOL: recursion-check
 
 GENERIC: prettyprint* ( indent obj -- indent )
 
-M: object prettyprint* ( indent obj -- indent )
+: unparse. ( obj -- )
     dup unparse swap presented swons unit write-attr ;
 
-: word-attrs ( word -- style )
-    #! Return the style values for the HTML word browser
-    [
-        presented over cons ,
-        dup word-vocabulary [ 
-            "word" over word-name cons ,
-            "vocab" swap word-vocabulary cons ,
-        ] [
-            drop
-        ] ifte
-    ] make-list ;
-
-: word. ( word -- ) dup word-name swap word-attrs write-attr ;
+M: object prettyprint* ( indent obj -- indent )
+    unparse. ;
 
 M: word prettyprint* ( indent word -- indent )
-    dup parsing? [ \ POSTPONE: word. bl ] when word. ;
+    dup parsing? [ \ POSTPONE: unparse. bl ] when unparse. ;
 
 : indent ( indent -- )
     #! Print the given number of spaces.
@@ -54,8 +43,8 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-elements ( indent list -- indent )
     [
         dup \? [
-            \ \ word. bl
-            uncons >r car word. bl
+            \ \ unparse. bl
+            uncons >r car unparse. bl
             r> cdr prettyprint-elements
         ] [
             uncons >r prettyprint* bl
@@ -96,11 +85,11 @@ M: word prettyprint* ( indent word -- indent )
     #! or { }, or << >>. The body of the list is indented,
     #! unless the list is empty.
     over [
-        >r >r word. <prettyprint
+        >r >r unparse. <prettyprint
         r> prettyprint-elements
-        prettyprint> r> word.
+        prettyprint> r> unparse.
     ] [
-        >r >r word. bl r> drop r> word.
+        >r >r unparse. bl r> drop r> unparse.
     ] ifte ;
 
 M: list prettyprint* ( indent list -- indent )
@@ -130,25 +119,22 @@ M: tuple prettyprint* ( indent tuple -- indent )
     ] check-recursion ;
 
 M: alien prettyprint* ( alien -- str )
-    \ ALIEN: word. bl alien-address unparse write ;
+    \ ALIEN: unparse. bl alien-address unparse write ;
 
 : matrix-rows. ( indent list -- indent )
     uncons >r [ one-line on prettyprint* ] with-scope r>
     [ over ?prettyprint-newline matrix-rows. ] when* ;
 
 M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ word. bl >r 3 + r>
+    \ M[ unparse. bl >r 3 + r>
     row-list matrix-rows.
-    bl \ ]M word. 3 - ;
+    bl \ ]M unparse. 3 - ;
 
 : prettyprint ( obj -- )
     [
         recursion-check off
         0 swap prettyprint* drop terpri
     ] with-scope ;
-
-: vocab-link ( vocab -- link )
-    "vocabularies'" swap append ;
 
 : . ( obj -- )
     [

@@ -50,14 +50,14 @@ sequences io strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ word. bl ] each
+    [ &s &r &n &c ] [ unparse. bl ] each
     "show stepper stacks." print
-    \ &get word.
+    \ &get unparse.
     " ( var -- value ) inspects the stepper namestack." print
-    \ step word. " -- single step over" print
-    \ into word. " -- single step into" print
-    \ continue word. " -- continue execution" print
-    \ bye word. " -- exit single-stepper" print
+    \ step unparse. " -- single step over" print
+    \ into unparse. " -- single step into" print
+    \ continue unparse. " -- continue execution" print
+    \ bye unparse. " -- exit single-stepper" print
     report ;
 
 : walk-listener walk-banner "walk " listener-prompt set listener ;

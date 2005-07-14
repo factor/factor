@@ -73,11 +73,7 @@ BUILTIN: f 9 not ;
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word dup word? [
-        unit swons  \ car swons
-    ] [
-        swons
-    ] ifte ; parsing
+    scan-word literalize [ swons ] each ; parsing
 
 ! Vocabularies
 : PRIMITIVE:

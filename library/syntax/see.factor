@@ -20,11 +20,11 @@ streams strings styles unparser words ;
 : vocab. ( vocab -- ) dup vocab-attrs write-attr ;
 
 : prettyprint-IN: ( word -- )
-    \ IN: word. bl word-vocabulary vocab. terpri ;
+    \ IN: unparse. bl word-vocabulary vocab. terpri ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-prop [
-        bl word.
+        bl unparse.
     ] [
         drop
     ] ifte ;
@@ -72,23 +72,23 @@ streams strings styles unparser words ;
         ] each
     ] when* ;
 
-: definer. ( word -- ) dup definer word. bl word. bl ;
+: definer. ( word -- ) dup definer unparse. bl unparse. bl ;
 
 GENERIC: (see) ( word -- )
 
 M: compound (see) ( word -- )
     tab-size get dup indent swap
     [ documentation. ] keep
-    [ word-def prettyprint-elements \ ; word. ] keep
+    [ word-def prettyprint-elements \ ; unparse. ] keep
     prettyprint-plist terpri drop ;
 
 : prettyprint-M: ( -- indent )
-    \ M: word. bl tab-size get ;
+    \ M: unparse. bl tab-size get ;
 
-: prettyprint-; \ ; word. terpri ;
+: prettyprint-; \ ; unparse. terpri ;
 
 : method. ( word [[ class method ]] -- )
-    uncons >r >r >r prettyprint-M: r> r> word. bl word. bl
+    uncons >r >r >r prettyprint-M: r> r> unparse. bl unparse. bl
     dup prettyprint-newline r> prettyprint-elements
     prettyprint-; drop ;
 
@@ -99,7 +99,7 @@ M: generic (see) ( word -- )
         over "dispatcher" word-prop prettyprint* bl
     ] with-scope
     drop
-    \ ; word. terpri
+    \ ; unparse. terpri
     dup methods [ method. ] each-with ;
 
 M: word (see) drop ;
@@ -107,34 +107,34 @@ M: word (see) drop ;
 GENERIC: class.
 
 M: union class.
-    \ UNION: word. bl
-    dup word. bl
+    \ UNION: unparse. bl
+    dup unparse. bl
     0 swap "members" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: complement class.
-    \ COMPLEMENT: word. bl
-    dup word. bl
-    "complement" word-prop word. terpri ;
+    \ COMPLEMENT: unparse. bl
+    dup unparse. bl
+    "complement" word-prop unparse. terpri ;
 
 M: builtin class.
-    \ BUILTIN: word. bl
-    dup word. bl
+    \ BUILTIN: unparse. bl
+    dup unparse. bl
     dup "builtin-type" word-prop unparse write bl
     0 swap "slots" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: predicate class.
-    \ PREDICATE: word. bl
-    dup "superclass" word-prop word. bl
-    dup word. bl
+    \ PREDICATE: unparse. bl
+    dup "superclass" word-prop unparse. bl
+    dup unparse. bl
     tab-size get dup prettyprint-newline swap
     "definition" word-prop prettyprint-elements drop
     prettyprint-; ;
 
 M: tuple-class class.
-    \ TUPLE: word. bl
-    dup word. bl
+    \ TUPLE: unparse. bl
+    dup unparse. bl
     "slot-names" word-prop [ write bl ] each
     prettyprint-; ;
 

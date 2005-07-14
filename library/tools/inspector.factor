@@ -48,19 +48,13 @@ M: hashtable sheet hash>alist unzip 2list ;
     seq-transpose
     [ " | " join ] map ;
 
-: a/an ( noun -- str )
-    first "aeiouAEIOU" contains? "an " "a " ? ;
-
-: a/an. ( noun -- )
-    dup a/an write write ;
-
 : interned? ( word -- ? )
     dup word-name swap word-vocabulary vocab hash ;
 
 : class-banner ( word -- )
     dup metaclass dup [
         "This is a class whose behavior is specifed by the " write
-        unparse write " metaclass," print
+        unparse. " metaclass," print
         "currently having " write
         "predicate" word-prop instances length unparse write
         " instances." print
@@ -91,9 +85,9 @@ M: object extra-banner ( obj -- ) drop ;
 
 : inspect-banner ( obj -- )
     dup references length >r
-    "You are looking at " write dup class unparse a/an.
-    " object with the following printed representation:" print
-    "  " write dup unparse print
+    "You are looking at an instance of the " write dup class unparse.
+    " class:" print
+    "  " write dup unparse. terpri
     "The object has been placed in the inspecting variable." print
     "It is located at address " write dup address >hex write
     " and takes up " write dup size unparse write

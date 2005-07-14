@@ -42,6 +42,8 @@ C: hand ( world -- hand )
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
+: hand world get world-hand ;
+
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
     dup screen-loc over set-hand-click-loc
