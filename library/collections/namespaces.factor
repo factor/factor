@@ -1,5 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: words
+DEFER: literalize
+
 IN: namespaces
 USING: hashtables kernel kernel-internals lists math sequences
 strings vectors words ;
@@ -114,11 +117,6 @@ SYMBOL: building
         push
     ] ifte ;
 
-: literal, ( word -- )
-    #! Append some code that pushes the word on the stack. Used
-    #! when building quotations.
-    literalize % ;
-
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq
     #! unless an equal object has already been added.
@@ -127,6 +125,11 @@ SYMBOL: building
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
     building get swap nappend ;
+
+: literal, ( word -- )
+    #! Append some code that pushes the word on the stack. Used
+    #! when building quotations.
+    literalize % ;
 
 : make-vector ( quot -- vector )
     100 <vector> make-seq ; inline

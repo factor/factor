@@ -63,6 +63,9 @@ C: pane ( -- pane )
 M: pane focusable-child* ( pane -- editor )
     pane-input ;
 
+: pane-clear ( pane -- )
+    dup pane-output clear-incremental pane-current clear-gadget ;
+
 : pane-write-1 ( style text pane -- )
     >r <presentation> r> pane-current add-gadget ;
 

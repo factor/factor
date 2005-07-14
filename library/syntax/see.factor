@@ -4,23 +4,8 @@ IN: prettyprint
 USING: generic hashtables io kernel lists namespaces sequences
 streams strings styles unparser words ;
 
-! Prettyprinting words
-: vocab-actions ( search -- list )
-    [
-        [[ "Words"   "words ."       ]]
-        [[ "Use"     "use+" ]]
-        [[ "In"      "\"in\" set"    ]]
-    ] ;
-
-: vocab-attrs ( vocab -- attrs )
-    #! Words without a vocabulary do not get a link or an action
-    #! popup.
-    unparse vocab-actions <actions> "actions" swons unit ;
-
-: vocab. ( vocab -- ) dup vocab-attrs write-attr ;
-
 : prettyprint-IN: ( word -- )
-    \ IN: unparse. bl word-vocabulary vocab. terpri ;
+    \ IN: unparse. bl word-vocabulary write terpri ;
 
 : prettyprint-prop ( word prop -- )
     tuck word-name word-prop [

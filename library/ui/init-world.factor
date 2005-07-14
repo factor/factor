@@ -1,9 +1,15 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic io kernel listener math namespaces styles threads ;
+USING: generic io kernel listener math namespaces prettyprint
+sequences styles threads ;
 
 SYMBOL: stack-display
+
+: ui.s ( -- )
+    stack-display get dup pane-clear [
+        datastack reverse [ unparse. terpri ] each
+    ] with-stream* ;
 
 : init-world
     global [
@@ -27,7 +33,12 @@ SYMBOL: stack-display
         <pane> dup stack-display set <scroller>
         3/4 <y-splitter> add-layer
         
-        [ pane get [ clear print-banner listener ] with-stream ] in-thread
+        [
+            pane get [
+                [ ui.s ] listener-hook set
+                clear print-banner listener
+            ] with-stream
+        ] in-thread
         
         pane get request-focus
     ] bind ;

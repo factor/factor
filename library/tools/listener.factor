@@ -6,6 +6,7 @@ presentation sequences strings styles unparser vectors words ;
 
 SYMBOL: listener-prompt
 SYMBOL: quit-flag
+SYMBOL: listener-hook
 
 global [ "  " listener-prompt set ] bind
 
@@ -32,8 +33,10 @@ global [ "  " listener-prompt set ] bind
 
 : listen ( -- )
     #! Wait for user input, and execute.
-    listener-prompt get write flush
-    [ read-multiline [ call ] [ bye ] ifte ] try ;
+    listener-prompt get write flush [
+        read-multiline
+        [ call listener-hook get call ] [ bye ] ifte
+    ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.

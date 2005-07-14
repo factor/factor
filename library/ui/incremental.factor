@@ -44,3 +44,6 @@ M: incremental layout* drop ;
     2dup incremental-loc
     tuck update-cursor
     prefer-incremental ;
+
+: clear-incremental ( incremental -- )
+    dup clear-gadget { 0 0 0 } swap set-incremental-cursor ;

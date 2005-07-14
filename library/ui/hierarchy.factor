@@ -15,6 +15,10 @@ sequences ;
         [ remove-gadget ] [ 2drop ] ifte
     ] when* ;
 
+: clear-gadget ( gadget -- )
+    dup gadget-children [ f swap set-gadget-parent ] each
+    f over set-gadget-children relayout ;
+
 : (add-gadget) ( gadget box -- )
     #! This is inefficient.
     over unparent
