@@ -39,19 +39,22 @@ GENERIC: draw-gadget* ( gadget -- )
 
 M: gadget draw-gadget* ( gadget -- ) drop ;
 
+: paint-prop* ( gadget key -- value )
+    swap gadget-paint ?hash ;
+
 : paint-prop ( gadget key -- value )
     over [
-        dup pick gadget-paint hash* dup [
-            2nip cdr
+        2dup paint-prop* dup [
+            2nip
         ] [
             drop >r gadget-parent r> paint-prop
-        ] ?ifte
+        ] ifte
     ] [
         2drop f
     ] ifte ;
 
 : set-paint-prop ( gadget value key -- )
-    rot gadget-paint set-hash ;
+    pick gadget-paint ?set-hash swap set-gadget-paint ;
 
 : fg ( gadget -- color )
     dup reverse-video paint-prop

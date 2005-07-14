@@ -5,17 +5,16 @@ USING: alien generic hashtables kernel lists math matrices sdl
 sequences ;
 
 : action ( gadget gesture -- quot )
-    swap gadget-gestures hash ;
+    swap gadget-gestures ?hash ;
 
 : set-action ( gadget quot gesture -- )
-    rot gadget-gestures set-hash ;
+    pick gadget-gestures ?set-hash swap set-gadget-gestures ;
 
 : add-actions ( alist gadget -- )
     swap [ unswons set-action ] each-with ;
 
 : handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures hash* dup
-    [ cdr call f ] [ 2drop t ] ifte ;
+    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] ifte ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the
