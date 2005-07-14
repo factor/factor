@@ -3,6 +3,11 @@
 IN: gadgets
 USING: generic io kernel listener math namespaces styles threads ;
 
+SYMBOL: stack-display
+
+: <stack-display>
+     ;
+
 : init-world
     global [
         <world> world set
@@ -21,15 +26,13 @@ USING: generic io kernel listener math namespaces styles threads ;
         
         <plain-gadget> add-layer
     
-        <pane> dup
+        <pane> dup pane set <scroller>
+        <pane> dup stack-display set <scroller>
+        3/4 <y-splitter> add-layer
         
-        <scroller> "Stack display goes here" <label> 3/4 <y-splitter> add-layer
+        [ pane get [ clear print-banner listener ] with-stream ] in-thread
         
-        [ [ clear  print-banner listener ] with-stream ] in-thread
-        
-        dup request-focus
-        
-        pane set
+        pane get request-focus
     ] bind ;
 
 SYMBOL: first-time

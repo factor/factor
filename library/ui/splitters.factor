@@ -45,13 +45,14 @@ C: splitter ( first second split vector -- splitter )
     { 1 0 0 } <splitter> ;
 
 : splitter-part ( splitter -- vec )
-    dup splitter-split swap shape-dim n*v divider-size 1/2 v*n v- ;
+    dup splitter-split swap shape-dim
+    n*v divider-size 1/2 v*n v- ;
 
 : splitter-layout ( splitter -- [ a b c ] )
     [
         dup splitter-part ,
         divider-size ,
-        dup shape-dim swap splitter-part v- ,
+        dup shape-dim divider-size v- swap splitter-part v- ,
     ] make-list ;
 
 M: splitter layout* ( splitter -- )
