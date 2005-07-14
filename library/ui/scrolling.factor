@@ -17,7 +17,7 @@ TUPLE: viewport origin ;
     [ fix-scroll ] keep [ set-viewport-origin ] keep relayout ;
 
 C: viewport ( content -- viewport )
-    <empty-gadget> over set-delegate
+    <gadget> over set-delegate
     t over set-gadget-root?
     [ add-gadget ] keep
     { 0 0 0 } over set-viewport-origin ;

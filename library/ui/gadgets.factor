@@ -11,16 +11,18 @@ TUPLE: gadget paint gestures relayout? root? parent children ;
 
 : gadget-child gadget-children car ;
 
-C: gadget ( shape -- gadget )
-    [ set-delegate ] keep
+C: gadget ( -- gadget )
+    { 0 0 0 } dup <rectangle> over set-delegate
     <namespace> over set-gadget-paint
     <namespace> over set-gadget-gestures ;
 
-: <empty-gadget> ( -- gadget )
-    { 0 0 0 } dup <rectangle> <gadget> ;
+TUPLE: plain-gadget ;
 
-: <plain-gadget> ( -- gadget )
-    { 0 0 0 } dup <plain-rect> <gadget> ;
+C: plain-gadget <gadget> over set-delegate ;
+
+TUPLE: etched-gadget ;
+
+C: etched-gadget <gadget> over set-delegate ;
 
 DEFER: add-invalid
 
@@ -49,20 +51,6 @@ DEFER: add-invalid
 : set-gadget-dim ( dim gadget -- )
     2dup shape-dim =
     [ 2drop ] [ [ set-shape-dim ] keep relayout-down ] ifte ;
-
-: paint-prop ( gadget key -- value )
-    over [
-        dup pick gadget-paint hash* dup [
-            2nip cdr
-        ] [
-            drop >r gadget-parent r> paint-prop
-        ] ?ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: set-paint-prop ( gadget value key -- )
-    rot gadget-paint set-hash ;
 
 GENERIC: pref-dim ( gadget -- dim )
 

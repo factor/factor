@@ -20,12 +20,12 @@ TUPLE: frame left right top bottom center ;
     dup frame-bottom unparent 2dup set-frame-bottom add-gadget ;
 
 C: frame ( -- frame )
-    [ <empty-gadget> swap set-delegate ] keep
-    [ <empty-gadget> swap set-frame-center ] keep
-    [ <empty-gadget> swap set-frame-left ] keep
-    [ <empty-gadget> swap set-frame-right ] keep
-    [ <empty-gadget> swap set-frame-top ] keep
-    [ <empty-gadget> swap set-frame-bottom ] keep ;
+    [ <gadget> swap set-delegate ] keep
+    [ <gadget> swap set-frame-center ] keep
+    [ <gadget> swap set-frame-left ] keep
+    [ <gadget> swap set-frame-right ] keep
+    [ <gadget> swap set-frame-top ] keep
+    [ <gadget> swap set-frame-bottom ] keep ;
 
 : frame-major ( frame -- list )
     [

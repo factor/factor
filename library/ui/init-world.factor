@@ -27,7 +27,9 @@ USING: generic io kernel listener math namespaces styles threads ;
         
         [ [ clear  print-banner listener ] with-stream ] in-thread
         
-        request-focus
+        dup request-focus
+        
+        pane set
     ] bind ;
 
 SYMBOL: first-time

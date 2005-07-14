@@ -20,8 +20,6 @@ GENERIC: set-shape-dim ( dim shape -- )
 : shape-w shape-dim first ;
 : shape-h shape-dim second ;
 
-GENERIC: draw-shape ( shape -- )
-
 : with-trans ( shape quot -- )
     #! All drawing done inside the quotation is translated
     #! relative to the shape's origin.
@@ -47,3 +45,29 @@ GENERIC: draw-shape ( shape -- )
 
 M: vector shape-loc ;
 M: vector shape-dim drop { 0 0 0 } ;
+
+TUPLE: rectangle loc dim ;
+
+M: rectangle shape-loc rectangle-loc ;
+M: rectangle set-shape-loc set-rectangle-loc ;
+
+M: rectangle shape-dim rectangle-dim ;
+M: rectangle set-shape-dim set-rectangle-dim ;
+
+: screen-bounds ( shape -- rect )
+    shape-bounds >r origin v+ r> <rectangle> ;
+
+M: rectangle inside? ( loc rect -- ? )
+    screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
+    >r v- { 0 0 0 } r> vbetween? conj ;
+
+: intersect ( shape shape -- rect )
+    >r shape-extent r> shape-extent
+    swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
+    <rectangle> ;
+
+: rect>screen ( shape -- x1 y1 x2 y2 )
+    [ shape-x x get + ] keep
+    [ shape-y y get + ] keep
+    [ shape-w pick + ] keep
+    shape-h pick + ;

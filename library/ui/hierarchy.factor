@@ -25,35 +25,19 @@ sequences ;
     #! Add a gadget to a parent gadget.
     [ (add-gadget) ] keep relayout ;
 
-: (parents) ( gadget -- )
-    [ dup gadget-parent (parents) , ] when* ;
-
 : parents ( gadget -- list )
-    #! A list of all parents of the gadget, including the
-    #! gadget itself.
-    [ (parents) ] make-list ;
-
-: (each-parent) ( list quot -- ? )
-    over [
-        over car gadget-paint [
-            2dup >r >r >r cdr r> (each-parent) [
-                r> car r> call
-            ] [
-                r> r> 2drop f
-            ] ifte
-        ] bind
-    ] [
-        2drop t
-    ] ifte ; inline
+    #! A list of all parents of the gadget, the first element
+    #! is the gadget itself.
+    dup [ dup gadget-parent parents cons ] when ;
 
 : each-parent ( gadget quot -- ? )
     #! Keep executing the quotation on higher and higher
     #! parents until it returns f.
-    >r parents r> (each-parent) ; inline
+    >r parents r> all? ; inline
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    { 0 0 0 } swap [ shape-loc v+ t ] each-parent drop ;
+    parents { 0 0 0 } [ shape-loc v+ ] reduce ;
 
 : relative ( g1 g2 -- g2-g1 )
     screen-loc swap screen-loc v- ;

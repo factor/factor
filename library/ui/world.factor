@@ -36,7 +36,7 @@ C: world ( -- world )
 
 : show-glass ( gadget -- )
     hide-glass
-    <empty-gadget> dup
+    <gadget> dup
     world get 2dup add-gadget set-world-glass
     dupd add-gadget prefer ;
 
@@ -47,9 +47,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 : draw-world ( world -- )
     [
         dup
-        { 0 0 0 }
-        width get height get 0 3vector <rectangle>
-        clip set-paint-prop
+        { 0 0 0 } width get height get 0 3vector <rectangle> clip set
         draw-gadget
     ] with-surface ;
 

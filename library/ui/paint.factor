@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables io kernel lists math matrices
-namespaces sdl sequences strings ;
+namespaces sdl sequences strings styles ;
 
 SYMBOL: clip
 
@@ -26,16 +26,54 @@ SYMBOL: clip
         r> call
     ] with-scope ; inline
 
+GENERIC: draw-gadget* ( gadget -- )
+
 : draw-gadget ( gadget -- )
-    #! All drawing done inside draw-shape is done with the
-    #! gadget's paint. If the gadget does not have any custom
-    #! paint, just call the quotation.
-    dup gadget-paint [
-        dup [
-            [
-                dup draw-shape dup [
-                    gadget-children [ draw-gadget ] each
-                ] with-trans
-            ] [ drop ] ifte
-        ] with-clip
-    ] bind ;
+    dup [
+        [
+            dup draw-gadget* dup [
+                gadget-children [ draw-gadget ] each
+            ] with-trans
+        ] [ drop ] ifte
+    ] with-clip ;
+
+M: gadget draw-gadget* ( gadget -- ) drop ;
+
+: paint-prop ( gadget key -- value )
+    over [
+        dup pick gadget-paint hash* dup [
+            2nip cdr
+        ] [
+            drop >r gadget-parent r> paint-prop
+        ] ?ifte
+    ] [
+        2drop f
+    ] ifte ;
+
+: set-paint-prop ( gadget value key -- )
+    rot gadget-paint set-hash ;
+
+: fg ( gadget -- color )
+    dup reverse-video paint-prop
+    background foreground ? paint-prop ;
+
+: bg ( gadget -- color )
+    dup reverse-video paint-prop [
+        foreground
+    ] [
+        dup rollover paint-prop rollover-bg background ?
+    ] ifte paint-prop ;
+
+: plain-rect ( shape -- )
+    #! Draw a filled rect with the bounds of an arbitrary shape.
+    [ rect>screen ] keep bg rgb boxColor ;
+
+M: plain-gadget draw-gadget* ( gadget -- )
+    >r surface get r> plain-rect ;
+
+: hollow-rect ( shape -- )
+    #! Draw a hollow rect with the bounds of an arbitrary shape.
+    [ rect>screen >r 1 - r> 1 - ] keep fg rgb rectangleColor ;
+
+M: etched-gadget draw-gadget* ( gadget -- )
+    >r surface get r> 2dup plain-rect hollow-rect ;

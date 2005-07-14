@@ -27,11 +27,12 @@ strings styles io ;
         swap *int swap *int
     ] ifte ;
 
-: draw-string ( font text -- )
+: draw-string ( gadget text -- )
     filter-nulls dup empty? [
         2drop
     ] [
-        fg 3unlist make-color
+        >r [ gadget-font ] keep r> swap
+        [ fg 3unlist make-color ] keep
         bg 3unlist make-color
         TTF_RenderUNICODE_Shaded
         [ >r x get y get r> draw-surface ] keep

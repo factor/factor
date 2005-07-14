@@ -11,10 +11,8 @@ namespaces sdl sequences ;
     #! be laid out.
     dup gadget-relayout? [
         f over set-gadget-relayout?
-        dup gadget-paint [
-            dup layout*
-            gadget-children [ layout ] each
-        ] bind
+        dup layout*
+        gadget-children [ layout ] each
     ] [
         drop
     ] ifte ;
@@ -63,7 +61,7 @@ C: pack ( align fill vector -- pack )
     #! align: 0 left aligns, 1/2 center, 1 right.
     #! gap: between each child.
     #! fill: 0 leaves default width, 1 fills to pack width.
-    [ <empty-gadget> swap set-delegate ] keep
+    [ <gadget> swap set-delegate ] keep
     [ set-pack-vector ] keep
     [ set-pack-fill ] keep
     [ set-pack-align ] keep ;

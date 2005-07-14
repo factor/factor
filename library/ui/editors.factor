@@ -67,7 +67,7 @@ TUPLE: editor line caret ;
     <plain-gadget> dup red background set-paint-prop ;
 
 C: editor ( text -- )
-    <empty-gadget> over set-delegate
+    <gadget> over set-delegate
     [ <line-editor> swap set-editor-line ] keep
     [ <caret> swap set-editor-caret ] keep
     [ set-editor-text ] keep
@@ -93,6 +93,5 @@ M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim
     dup editor-caret swap caret-loc swap set-shape-loc ;
 
-M: editor draw-shape ( editor -- )
-    [ dup gadget-font swap editor-text ] keep
-    [ draw-string ] with-trans ;
+M: editor draw-gadget* ( editor -- )
+    dup editor-text over [ draw-string ] with-trans ;

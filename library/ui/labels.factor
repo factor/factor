@@ -8,7 +8,7 @@ sequences styles vectors ;
 TUPLE: label text ;
 
 C: label ( text -- label )
-    <empty-gadget> over set-delegate [ set-label-text ] keep ;
+    <gadget> over set-delegate [ set-label-text ] keep ;
 
 : label-size ( gadget text -- dim )
     >r gadget-font r> size-string 0 3vector ;
@@ -16,6 +16,5 @@ C: label ( text -- label )
 M: label pref-dim ( label -- dim )
     dup label-text label-size ;
 
-M: label draw-shape ( label -- )
-    [ dup gadget-font swap label-text ] keep
-    [ draw-string ] with-trans ;
+M: label draw-gadget* ( label -- )
+    dup label-text over [ draw-string ] with-trans ;

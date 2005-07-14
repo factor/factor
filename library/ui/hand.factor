@@ -38,7 +38,7 @@ DEFER: pick-up
 TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( world -- hand )
-    <empty-gadget> over set-delegate
+    <gadget> over set-delegate
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
