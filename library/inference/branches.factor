@@ -8,7 +8,7 @@ sequences strings vectors words hashtables prettyprint ;
     [ length ] map 0 [ max ] reduce ;
 
 : computed-value-vector ( n -- vector )
-    empty-vector [ object <computed> ] map ;
+    empty-vector [ drop object <computed> ] map ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.

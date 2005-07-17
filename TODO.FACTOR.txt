@@ -33,7 +33,6 @@
 - faster layout
 - faster repaint
 - ui browser
-- auto-updating inspector, mirrors abstraction
 - mouse enter onto overlapping with interior, but not child, gadget
 - rollovers broken in inspector
 - menu dragging
@@ -74,17 +73,12 @@
 
 + sequences
 
-- generic skip
 - dipping 2nmap, 2each
 - array sort
-- 2map slow with lists
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
 - faster sequence operations
-- generic some? all? memq? fiber?
-- index and index* are very slow with lists
 - specialized arrays
-- list map, subset: not tail recursive
 - phase out sbuf-append
 
 + kernel:

@@ -37,8 +37,14 @@ M: object each ( seq quot -- )
     #! Destructive on seq.
     0 swap (nmap) ; inline
 
-M: object map ( seq quot -- seq | quot: elt -- elt )
-    swap [ swap nmap ] immutable ;
+: map ( seq quot -- seq | quot: elt -- elt )
+    swap [ swap nmap ] immutable ; inline
+
+: map-with ( obj list quot -- list | quot: obj elt -- elt )
+    swap [ with rot ] map 2nip ; inline
+
+: accumulate ( list identity quot -- values | quot: x y -- z )
+    rot [ pick >r swap call r> ] map-with nip ; inline
 
 : (2nmap) ( seq1 seq2 i quot -- elt3 )
     pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
@@ -183,25 +189,25 @@ M: object peek ( sequence -- element )
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
+M: object reversed ( seq -- seq ) <reversed> ;
+
 M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 ! Set theoretic operations
-: seq-intersect ( seq seq -- seq )
-    #! Make a list of elements that occur in both lists.
+: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
     [ swap member? ] subset-with ;
 
-: seq-diff ( list1 list2 -- list )
-    #! Make a list of elements that occur in list2 but not
-    #! list1.
+: seq-diff ( seq1 seq2 -- seq2-seq1 )
     [ swap member? not ] subset-with ;
 
-: seq-diffq ( list1 list2 -- list )
-    #! Make a list of elements that occur in list2 but not
-    #! list1.
+: seq-diffq ( seq1 seq2 -- seq2-seq1 )
     [ swap memq? not ] subset-with ;
 
-: contained? ( list1 list2 -- ? )
-    #! Is every element of list1 in list2?
+: seq-union ( seq1 seq2 -- seq1\/seq2 )
+    append prune ;
+
+: contained? ( seq1 seq2 -- ? )
+    #! Is every element of seq1 in seq2
     swap [ swap member? ] all-with? ;
 
 IN: kernel

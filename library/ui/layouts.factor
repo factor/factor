@@ -20,7 +20,7 @@ namespaces sdl sequences ;
 TUPLE: pack align fill vector ;
 
 : pref-dims ( gadget -- list )
-    gadget-children [ pref-dim ] map ;
+    gadget-children [ pref-dim ] map >list ;
 
 : orient ( gadget list1 list2 -- list )
     zip >r pack-vector r> [ uncons rot set-axis ] map-with ;

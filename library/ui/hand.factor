@@ -4,10 +4,8 @@ IN: gadgets
 USING: alien generic io kernel lists math matrices namespaces
 prettyprint sdl sequences vectors ;
 
-DEFER: pick-up
-
 : (pick-up) ( point gadget -- gadget )
-    gadget-children <reversed> [ pick-up ] find nip ;
+    gadget-children reversed [ inside? ] find-with nip ;
 
 : pick-up ( point gadget -- gadget )
     #! The logic is thus. If the point is definately outside the
@@ -15,7 +13,8 @@ DEFER: pick-up
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
     2dup inside? [
-        [ [ translate ] keep (pick-up) dup ] keep ?
+        [ translate ] keep 2dup
+        (pick-up) [ pick-up ] [ nip ] ?ifte
     ] [
         2drop f
     ] ifte ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math matrices namespaces
-sequences ;
+sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep
@@ -20,7 +20,7 @@ sequences ;
     0 over gadget-children set-length relayout ;
 
 : ?push ( elt seq/f -- seq )
-    [ push ] [ 1vector ] ifte* ;
+    [ [ push ] keep ] [ 1vector ] ifte* ;
 
 : (add-gadget) ( gadget box -- )
     over unparent

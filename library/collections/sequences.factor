@@ -19,11 +19,15 @@ GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq )
 GENERIC: like ( seq seq -- seq )
 GENERIC: reverse ( seq -- seq )
+GENERIC: reversed ( seq -- seq )
 GENERIC: peek ( seq -- elt )
 GENERIC: head ( n seq -- seq )
 GENERIC: tail ( n seq -- seq )
 GENERIC: concat ( seq -- seq )
 GENERIC: resize ( n seq -- seq )
+
+: immutable ( seq quot -- seq | quot: seq -- )
+    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 G: each ( seq quot -- | quot: elt -- )
     [ over ] [ type ] ; inline
@@ -33,15 +37,6 @@ G: each ( seq quot -- | quot: elt -- )
 
 : reduce ( list identity quot -- value | quot: x y -- z )
     swapd each ; inline
-
-G: map ( seq quot -- seq | quot: elt -- elt )
-    [ over ] [ type ] ; inline
-
-: map-with ( obj list quot -- list | quot: obj elt -- elt )
-    swap [ with rot ] map 2nip ; inline
-
-: accumulate ( list identity quot -- values | quot: x y -- z )
-    rot [ pick >r swap call r> ] map-with nip ; inline
 
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
@@ -55,9 +50,6 @@ G: find* [ over ] [ type ] ; inline
 
 : find-with* ( obj i seq quot -- i elt )
     -rot [ with rot ] find* 2swap 2drop ; inline
-
-: immutable ( seq quot -- seq | quot: seq -- )
-    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
