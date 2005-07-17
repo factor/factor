@@ -10,9 +10,6 @@ IN: styles
 : green [ 0   255 0   ] ;
 : blue  [ 0   0   255 ] ;
 
-SYMBOL: filled
-SYMBOL: etched
-
 SYMBOL: foreground ! Used for text and outline shapes.
 SYMBOL: background ! Used for filled shapes.
 SYMBOL: rollover-bg
