@@ -6,6 +6,7 @@ USE: math
 USE: namespaces
 USE: test
 USE: vectors
+USE: sequences
 
 16 <hashtable> "testhash" set
 

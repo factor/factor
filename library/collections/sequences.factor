@@ -20,7 +20,6 @@ GENERIC: thaw ( seq -- mutable-seq )
 GENERIC: like ( seq seq -- seq )
 GENERIC: reverse ( seq -- seq )
 GENERIC: peek ( seq -- elt )
-GENERIC: contains? ( elt seq -- ? )
 GENERIC: head ( n seq -- seq )
 GENERIC: tail ( n seq -- seq )
 GENERIC: concat ( seq -- seq )
@@ -35,12 +34,6 @@ G: each ( seq quot -- | quot: elt -- )
 : reduce ( list identity quot -- value | quot: x y -- z )
     swapd each ; inline
 
-G: tree-each ( obj quot -- | quot: elt -- )
-    [ over ] [ type ] ; inline
-
-: tree-each-with ( obj vector quot -- )
-    swap [ with ] tree-each 2drop ; inline
-
 G: map ( seq quot -- seq | quot: elt -- elt )
     [ over ] [ type ] ; inline
 
@@ -53,14 +46,29 @@ G: map ( seq quot -- seq | quot: elt -- elt )
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
 
-DEFER: <range>
-DEFER: append ! remove this when sort is moved from lists to sequences
-DEFER: subseq
+G: find [ over ] [ type ] ; inline
+
+: find-with ( obj seq quot -- i elt )
+    swap [ with rot ] find 2swap 2drop ; inline
+
+G: find* [ over ] [ type ] ; inline
+
+: find-with* ( obj i seq quot -- i elt )
+    -rot [ with rot ] find* 2swap 2drop ; inline
+
+: immutable ( seq quot -- seq | quot: seq -- )
+    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
 : third 2 swap nth ; inline
 : fourth 3 swap nth ; inline
+
+: push ( element sequence -- )
+    #! Push a value on the end of a sequence.
+    dup length swap set-nth ;
+
+: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
 
 : 2unseq ( { x y } -- x y )
     dup first swap second ;

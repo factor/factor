@@ -22,7 +22,7 @@ M: sbuf stream-read ( count sbuf -- string )
     ] ifte ;
 
 : <string-reader> ( string -- stream )
-    >sbuf dup nreverse <line-reader> ;
+    <reversed> >sbuf <line-reader> ;
 
 : string-in ( str quot -- )
     [ swap <string-reader> stdio set call ] with-scope ;

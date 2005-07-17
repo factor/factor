@@ -20,5 +20,5 @@ sequences strings unparser ;
 : directory. ( dir -- )
     #! If "doc-root" set, create links relative to it.
     dup directory [
-        dup [ "." ".." ] contains? [ 2drop ] [ file. ] ifte
+        dup [ "." ".." ] member? [ 2drop ] [ file. ] ifte
     ] each-with ;

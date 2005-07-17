@@ -184,7 +184,7 @@ SYMBOL: object
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
     swap builtin-supertypes swap builtin-supertypes
-    intersection lookup-union ;
+    seq-intersect lookup-union ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop

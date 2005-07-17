@@ -76,7 +76,7 @@ global [ string-mode off ] bind
 
 ! Used by parsing words
 : ch-search ( ch -- index )
-    "line" get "col" get index* ;
+    "col" get "line" get index* ;
 
 : (until) ( index -- str )
     "col" get swap dup 1 + "col" set "line" get subseq ;

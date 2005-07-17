@@ -24,7 +24,7 @@ USE: lists
 
 [ "Beginning" ] [ 9 "Beginning and end" head ] unit-test
 
-[ f ] [ CHAR: I "team" contains? ] unit-test
+[ f ] [ CHAR: I "team" member? ] unit-test
 [ t ] [ "ea" "team" subseq? ] unit-test
 [ f ] [ "actore" "Factor" subseq? ] unit-test
 

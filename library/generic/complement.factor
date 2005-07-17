@@ -11,7 +11,7 @@ SYMBOL: complement
 complement [
     "complement" word-prop builtin-supertypes
     num-types count
-    difference
+    seq-diff
 ] "builtin-supertypes" set-word-prop
 
 complement [

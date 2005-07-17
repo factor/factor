@@ -53,7 +53,7 @@ M: ratio unparse ( num -- str )
 : fix-float ( str -- str )
     #! This is terrible. Will go away when we do our own float
     #! output.
-    CHAR: . over contains? [ ".0" append ] unless ;
+    CHAR: . over member? [ ".0" append ] unless ;
 
 M: float unparse ( float -- str )
     (unparse-float) fix-float ;

@@ -29,9 +29,9 @@ sequences strings styles unparser words ;
     "color: #" % hex-color, "; " % ;
 
 : style-css, ( flag -- )
-    dup [ italic bold-italic ] contains?
+    dup [ italic bold-italic ] member?
     [ "font-style: italic; " % ] when
-    [ bold bold-italic ] contains?
+    [ bold bold-italic ] member?
     [ "font-weight: bold; " % ] when ;
 
 : underline-css, ( flag -- )

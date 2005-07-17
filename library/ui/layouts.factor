@@ -35,7 +35,7 @@ TUPLE: pack align fill vector ;
     2dup packed-dim-2 swap orient ;
 
 : packed-dims ( gadget sizes -- list )
-    over gadget-children >r (packed-dims) r>
+    over gadget-children >list >r (packed-dims) r>
     zip [ uncons set-gadget-dim ] each ;
 
 : packed-loc-1 ( sizes -- list )
@@ -51,7 +51,7 @@ TUPLE: pack align fill vector ;
     dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
 
 : packed-locs ( gadget sizes -- )
-    over gadget-children >r (packed-locs) r>
+    over gadget-children >list >r (packed-locs) r>
     zip [ uncons set-shape-loc ] each ;
 
 : packed-layout ( gadget sizes -- )

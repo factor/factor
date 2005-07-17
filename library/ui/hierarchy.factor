@@ -17,13 +17,15 @@ sequences ;
 
 : clear-gadget ( gadget -- )
     dup gadget-children [ f swap set-gadget-parent ] each
-    f over set-gadget-children relayout ;
+    0 over gadget-children set-length relayout ;
+
+: ?push ( elt seq/f -- seq )
+    [ push ] [ 1vector ] ifte* ;
 
 : (add-gadget) ( gadget box -- )
-    #! This is inefficient.
     over unparent
     dup pick set-gadget-parent
-    [ gadget-children swap add ] keep set-gadget-children ;
+    [ gadget-children ?push ] keep set-gadget-children ;
 
 : add-gadget ( gadget parent -- )
     #! Add a gadget to a parent gadget.

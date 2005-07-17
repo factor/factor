@@ -30,7 +30,7 @@ M: string >string ;
     string-compare 0 > ;
 
 ! Characters
-PREDICATE: integer blank     " \t\n\r" contains? ;
+PREDICATE: integer blank     " \t\n\r" member? ;
 PREDICATE: integer letter    CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER    CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
@@ -39,7 +39,7 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
     #! escaping?
-    dup printable? swap "\"\\" contains? not and ;
+    dup printable? swap "\"\\" member? not and ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -47,4 +47,4 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
     dup letter?
     over LETTER? or
     over digit? or
-    swap "/_?." contains? or ;
+    swap "/_?." member? or ;

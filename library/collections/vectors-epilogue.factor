@@ -26,8 +26,10 @@ M: general-list like drop >list ;
 
 M: vector like drop >vector ;
 
-: 3vector ( x y z -- { x y z } )
-    3 <vector>
-    [ >r rot r> push ] keep
-    [ swapd push ] keep
-    [ push ] keep ;
+: (1vector) [ push ] keep ; inline
+: (2vector) [ swapd push ] keep (1vector) ; inline
+: (3vector) [ >r rot r> push ] keep (2vector) ; inline
+
+: 1vector ( x -- { x } ) 1 <vector> (1vector) ;
+: 2vector ( x y -- { x y } ) 2 <vector> (2vector) ;
+: 3vector ( x y z -- { x y z } ) 3 <vector> (3vector) ;

@@ -30,17 +30,19 @@ parser prettyprint sequences io vectors words ;
         "/library/math/complex.factor"
 
         "/library/collections/cons.factor"
-        "/library/collections/assoc.factor"
-        "/library/collections/lists.factor"
         "/library/collections/vectors.factor"
+        "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
-        "/library/collections/sequences-epilogue.factor"
+        "/library/collections/assoc.factor"
+        "/library/collections/lists.factor"
         "/library/collections/hashtables.factor"
         "/library/collections/namespaces.factor"
         "/library/collections/vectors-epilogue.factor"
+        "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/strings-epilogue.factor"
+        "/library/collections/tree-each.factor"
 
         "/library/math/matrices.factor"
 

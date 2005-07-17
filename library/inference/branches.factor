@@ -5,10 +5,10 @@ USING: errors generic interpreter kernel lists math namespaces
 sequences strings vectors words hashtables prettyprint ;
 
 : longest ( list -- length )
-    0 swap [ length max ] each ;
+    [ length ] map 0 [ max ] reduce ;
 
 : computed-value-vector ( n -- vector )
-    [ drop object <computed> ] project >vector ;
+    empty-vector [ object <computed> ] map ;
 
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.

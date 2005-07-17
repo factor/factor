@@ -94,8 +94,6 @@ unit-test
 [ -1 ] [ 5 { } index ] unit-test
 [ 4 ] [ 5 { 1 2 3 4 5 } index ] unit-test
 
-[ { "c" "b" "a" } ] [ { "a" "b" "c" } clone dup 0 2 exchange ] unit-test
-
 [ t ] [
-    100 count dup >vector dup nreverse >list >r reverse r> =
+    100 count dup >vector <reversed> >list >r reverse r> =
 ] unit-test

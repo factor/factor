@@ -8,112 +8,79 @@ IN: lists USING: generic kernel sequences ;
 
 DEFER: cons?
 BUILTIN: cons 2 cons? [ 0 "car" f ] [ 1 "cdr" f ] ;
-UNION: general-list f cons ;
 
 ! We borrow an idiom from Common Lisp. The car/cdr of an empty
 ! list is the empty list.
 M: f car ;
 M: f cdr ;
 
+UNION: general-list f cons ;
+
 GENERIC: >list ( seq -- list )
 M: general-list >list ( list -- list ) ;
-
-: swons ( cdr car -- [[ car cdr ]] )
-    #! Push a new cons cell. If the cdr is f or a proper list,
-    #! has the effect of prepending the car to the cdr.
-    swap cons ;
-
-: uncons ( [[ car cdr ]] -- car cdr )
-    #! Push both the head and tail of a list.
-    dup car swap cdr ;
-
-: unit ( a -- [ a ] )
-    #! Construct a proper list of one element.
-    f cons ;
-
-: unswons ( [[ car cdr ]] -- cdr car )
-    #! Push both the head and tail of a list.
-    dup cdr swap car ;
-
-: 2car ( cons cons -- car car )
-    swap car swap car ;
-
-: 2cdr ( cons cons -- car car )
-    swap cdr swap cdr ;
-
-: 2uncons ( cons1 cons2 -- car1 car2 cdr1 cdr2 )
-    [ 2car ] 2keep 2cdr ;
 
 : last ( list -- last )
     #! Last cons of a list.
     dup cdr cons? [ cdr last ] when ;
-
-M: cons peek ( list -- last )
-    #! Last element of a list.
-    last car ;
 
 PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
     #! cell whose cdr is a proper list.
     dup [ last cdr ] when not ;
 
-: all? ( list pred -- ? )
-    #! Push if the predicate returns true for each element of
-    #! the list.
-    over [
-        dup >r swap uncons >r swap call [
-            r> r> all?
-        ] [
-            r> drop r> drop f
-        ] ifte
-    ] [
+: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ;
+: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ;
+
+: swons ( cdr car -- [[ car cdr ]] ) swap cons ;
+: unit ( a -- [ a ] ) f cons ;
+: 2list ( a b -- [ a b ] ) unit cons ;
+: 3list ( a b c -- [ a b c ] ) 2list cons ;
+: 2unlist ( [ a b ] -- a b ) uncons car ;
+: 3unlist ( [ a b c ] -- a b c ) uncons uncons car ;
+
+: 2car ( cons cons -- car car ) swap car swap car ;
+: 2cdr ( cons cons -- car car ) swap cdr swap cdr ;
+: 2cons ( ca1 ca2 cd1 cd2 -- c1 c2 ) rot swons >r cons r> ;
+: 2uncons ( c1 c2 -- ca1 ca2 cd1 cd2 ) [ 2car ] 2keep 2cdr ;
+
+: zip ( list list -- list )
+    #! Make a new list containing pairs of corresponding
+    #! elements from the two given lists.
+    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
+
+: unzip ( assoc -- keys values )
+    #! Split an association list into two lists of keys and
+    #! values.
+    [ uncons >r uncons r> unzip 2cons ] [ [ ] [ ] ] ifte* ;
+
+: unpair ( list -- list1 list2 )
+    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
+
+: <queue> ( -- queue )
+    #! Make a new functional queue.
+    [[ [ ] [ ] ]] ;
+
+: queue-empty? ( queue -- ? )
+    uncons or not ;
+
+: enque ( obj queue -- queue )
+    uncons >r cons r> cons ;
+
+: deque ( queue -- obj queue )
+    uncons
+    [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;
+
+M: cons = ( obj cons -- ? )
+    2dup eq? [
         2drop t
-    ] ifte ; inline
-
-: all-with? ( obj list pred -- ? )
-    swap [ with rot ] all? 2nip ; inline
-
-: (each) ( list quot -- list quot )
-    [ >r car r> call ] 2keep >r cdr r> ; inline
-
-M: f each ( list quot -- ) 2drop ;
-
-M: cons each ( list quot -- | quot: elt -- ) (each) each ;
-
-M: cons tree-each ( cons quot -- )
-    >r uncons r> tuck >r >r tree-each r> r> tree-each ;
-
-: subset ( list quot -- list )
-    #! Applies a quotation with effect ( X -- ? ) to each
-    #! element of a list; all elements for which the quotation
-    #! returned a value other than f are collected in a new
-    #! list.
-    over [
-        over car >r (each)
-        rot >r subset r> [ r> swons ] [ r> drop ] ifte
     ] [
-        drop
-    ] ifte ; inline
-
-: subset-with ( obj list quot -- list )
-    swap [ with rot ] subset 2nip ; inline
-
-: some? ( list pred -- ? )
-    #! Apply predicate with stack effect ( elt -- ? ) to each
-    #! element, return remainder of list from first occurrence
-    #! where it is true, or return f.
-    over [
-        dup >r over >r >r car r> call [
-            r> r> drop
+        over cons? [
+            2dup 2car = >r 2cdr = r> and
         ] [
-            r> cdr r> some?
+            2drop f
         ] ifte
-    ] [
-        2drop f
-    ] ifte ; inline
+    ] ifte ;
 
-: some-with? ( obj list pred -- ? )
-    #! Apply predicate with stack effect ( obj elt -- ? ) to
-    #! each element, return remainder of list from first
-    #! occurrence where it is true, or return f.
-    swap [ with rot ] some? 2nip ; inline
+M: f = ( obj f -- ? ) eq? ;
+
+M: cons hashcode ( cons -- hash ) car hashcode ;

@@ -9,25 +9,33 @@ M: cons length cdr length 1 + ;
 M: f empty? drop t ;
 M: cons empty? drop f ;
 
-: 2list ( a b -- [ a b ] )
-    unit cons ;
+M: cons peek ( list -- last )
+    #! Last element of a list.
+    last car ;
 
-: 2unlist ( [ a b ] -- a b )
-    uncons car ;
+: (each) ( list quot -- list quot )
+    [ >r car r> call ] 2keep >r cdr r> ; inline
 
-: 3list ( a b c -- [ a b c ] )
-    2list cons ;
+M: f each ( list quot -- ) 2drop ;
 
-: 3unlist ( [ a b c ] -- a b c )
-    uncons uncons car ;
+M: cons each ( list quot -- | quot: elt -- ) (each) each ;
 
-M: general-list contains? ( obj list -- ? )
-    #! Test if a list contains an element equal to an object.
-    [ = ] some-with? >boolean ;
+: (list-find) ( list quot i -- i elt )
+    pick [
+        >r 2dup >r >r >r car r> call [
+            r> car r> drop r> swap
+        ] [
+            r> cdr r> r> 1 + (list-find)
+        ] ifte
+    ] [
+        3drop -1 f
+    ] ifte ; inline
 
-: memq? ( obj list -- ? )
-    #! Test if a list contains an object.
-    [ eq? ] some-with? >boolean ;
+M: general-list find ( list quot -- i elt )
+    0 (list-find) ;
+
+M: general-list find* ( start list quot -- i elt )
+    >r tail r> find ;
 
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
@@ -61,7 +69,7 @@ M: general-list contains? ( obj list -- ? )
 : unique ( elem list -- list )
     #! Prepend an element to a list if it does not occur in the
     #! list.
-    2dup contains? [ nip ] [ cons ] ifte ;
+    2dup member? [ nip ] [ cons ] ifte ;
 
 M: general-list reverse ( list -- list )
     [ ] [ swons ] reduce ;
@@ -71,38 +79,10 @@ M: f map ( list quot -- list ) drop ;
 M: cons map ( list quot -- list | quot: elt -- elt )
     (each) rot >r map r> swons ;
 
-: remove ( obj list -- list )
-    #! Remove all occurrences of objects equal to this one from
-    #! the list.
-    [ = not ] subset-with ;
+IN: sequences
+DEFER: <range>
 
-: remq ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
-    [ eq? not ] subset-with ;
-
-: prune ( list -- list )
-    #! Remove duplicate elements.
-    dup [ uncons prune unique ] when ;
-
-: fiber? ( list quot -- ? | quot: elt elt -- ? )
-    #! Check if all elements in the list are equivalent under
-    #! the relation.
-    over [ >r uncons r> all-with? ] [ 2drop t ] ifte ; inline
-
-M: cons = ( obj cons -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over cons? [
-            2dup 2car = >r 2cdr = r> and
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
-
-M: f = ( obj f -- ? ) eq? ;
-
-M: cons hashcode ( cons -- hash ) car hashcode ;
+IN: lists
 
 : count ( n -- [ 0 ... n-1 ] )
     0 swap <range> >list ;
@@ -112,6 +92,11 @@ M: cons hashcode ( cons -- hash ) car hashcode ;
 
 : project-with ( elt n quot -- list )
     swap [ with rot ] project 2nip ; inline
+
+: seq-transpose ( seq -- list )
+    #! An example illustrates this word best:
+    #! [ [ 1 2 3 ] [ 4 5 6 ] ] ==> [ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]
+    dup first length [ swap [ nth ] map-with ] project-with ;
 
 M: general-list head ( n list -- list )
     #! Return the first n elements of the list.
@@ -127,38 +112,3 @@ M: general-list tail ( n list -- tail )
 
 M: general-list nth ( n list -- element )
     over 0 number= [ nip car ] [ >r 1 - r> cdr nth ] ifte ;
-
-: intersection ( list list -- list )
-    #! Make a list of elements that occur in both lists.
-    [ swap contains? ] subset-with ;
-
-: difference ( list1 list2 -- list )
-    #! Make a list of elements that occur in list2 but not
-    #! list1.
-    [ swap contains? not ] subset-with ;
-
-: diffq ( list1 list2 -- list )
-    #! Make a list of elements that occur in list2 but not
-    #! list1.
-    [ swap memq? not ] subset-with ;
-
-: contained? ( list1 list2 -- ? )
-    #! Is every element of list1 in list2?
-    swap [ swap contains? ] all-with? ;
-
-: unpair ( list -- list1 list2 )
-    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
-
-: <queue> ( -- queue )
-    #! Make a new functional queue.
-    [[ [ ] [ ] ]] ;
-
-: queue-empty? ( queue -- ? )
-    uncons or not ;
-
-: enque ( obj queue -- queue )
-    uncons >r cons r> cons ;
-
-: deque ( queue -- obj queue )
-    uncons
-    [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;

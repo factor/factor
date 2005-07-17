@@ -9,20 +9,20 @@ sequences vectors ;
 ! delegates to its shape.
 TUPLE: gadget paint gestures relayout? root? parent children ;
 
-: gadget-child gadget-children car ;
+: gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rectangle> over set-delegate
-    <namespace> over set-gadget-paint
-    <namespace> over set-gadget-gestures ;
+    { 0 0 0 } dup <rectangle> over set-delegate ;
 
 TUPLE: plain-gadget ;
 
-C: plain-gadget <gadget> over set-delegate ;
+C: plain-gadget ( -- gadget )
+    <gadget> over set-delegate ;
 
 TUPLE: etched-gadget ;
 
-C: etched-gadget <gadget> over set-delegate ;
+C: etched-gadget ( -- gadget )
+    <gadget> over set-delegate ;
 
 DEFER: add-invalid
 

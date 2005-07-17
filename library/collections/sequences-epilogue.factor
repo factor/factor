@@ -4,38 +4,23 @@ IN: sequences
 USING: generic kernel kernel-internals lists math strings
 vectors ;
 
-! This is loaded once everything else is available.
+! A reversal of an underlying sequence.
+TUPLE: reversed ;
+C: reversed [ set-delegate ] keep ;
+: reversed@ delegate [ length swap - 1 - ] keep ;
+M: reversed nth ( n seq -- elt ) reversed@ nth ;
+M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 
-! Note that the sequence union does not include lists, or user
-! defined tuples that respond to the sequence protocol.
-UNION: sequence array string sbuf vector ;
-
-M: object thaw clone ;
-
-M: object like drop ;
-
-M: object empty? ( seq -- ? ) length 0 = ;
-
-: (>list) ( n i seq -- list )
-    pick pick <= [
-        3drop [ ]
-    ] [
-        2dup nth >r >r 1 + r> (>list) r> swons
-    ] ifte ;
-
-M: object >list ( seq -- list ) dup length 0 rot (>list) ;
-
-: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
+! A repeated sequence is the same element n times.
+TUPLE: repeated length object ;
+M: repeated length repeated-length ;
+M: repeated nth nip repeated-object ;
 
 ! Combinators
-M: object each ( quot seq -- )
+M: object each ( seq quot -- )
     swap dup length [
         [ swap nth swap call ] 3keep
     ] repeat 2drop ;
-
-M: object tree-each call ;
-
-M: sequence tree-each swap [ swap tree-each ] each-with ;
 
 : change-nth ( seq i quot -- )
     pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
@@ -52,9 +37,6 @@ M: sequence tree-each swap [ swap tree-each ] each-with ;
     #! Destructive on seq.
     0 swap (nmap) ; inline
 
-: immutable ( seq quot -- seq | quot: seq -- )
-    swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
-
 M: object map ( seq quot -- seq | quot: elt -- elt )
     swap [ swap nmap ] immutable ;
 
@@ -70,26 +52,94 @@ M: object map ( seq quot -- seq | quot: elt -- elt )
 M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
     swap [ swap 2nmap ] immutable ;
 
-! Operations
-: index* ( obj seq i -- n )
-    #! The index of the object in the sequence, starting from i.
-    over length over <= [
-        3drop -1
+M: object find* ( i seq quot -- i elt  )
+    pick pick length >= [
+        3drop -1 f
     ] [
-        3dup swap nth = [ 2nip ] [ 1 + index* ] ifte
+        3dup >r >r >r >r nth r> call [
+            r> dup r> nth r> drop
+        ] [
+            r> 1 + r> r> find*
+        ] ifte
     ] ifte ;
+
+M: object find ( seq quot -- i elt )
+    0 -rot find* ;
+
+: contains? ( seq quot -- ? )
+    find drop -1 > ; inline
+
+: contains-with? ( obj seq quot -- ? )
+    find-with drop -1 > ; inline
+
+: all? ( seq quot -- ? )
+    #! ForAll(P in X) <==> !Exists(!P in X)
+    swap [ swap call not ] contains-with? not ; inline
+
+: all-with? ( obj list pred -- ? )
+    swap [ with rot ] all? 2nip ; inline
+
+: subset ( seq quot -- seq | quot: elt -- ? )
+    #! all elements for which the quotation returned a value
+    #! other than f are collected in a new list.
+    swap [
+        dup length <vector> -rot [
+            rot >r 2dup >r >r swap call [
+                r> r> r> [ push ] keep swap
+            ] [
+                r> r> drop r> swap
+            ] ifte
+        ] each drop
+    ] keep like ; inline
+
+: subset-with ( obj list quot -- list )
+    swap [ with rot ] subset 2nip ; inline
+
+: fiber? ( seq quot -- ? | quot: elt elt -- ? )
+    #! Tests if all elements are equivalent under the relation.
+    over empty?
+    [ >r [ first ] keep r> all-with? ] [ 2drop t ] ifte ; inline
+
+! Operations
+M: object thaw clone ;
+
+M: object like drop ;
+
+M: object empty? ( seq -- ? ) length 0 = ;
+
+: (>list) ( n i seq -- list )
+    pick pick <= [
+        3drop [ ]
+    ] [
+        2dup nth >r >r 1 + r> (>list) r> swons
+    ] ifte ;
+
+M: object >list ( seq -- list ) dup length 0 rot (>list) ;
+
+: index* ( obj i seq -- n )
+    #! The index of the object in the sequence, starting from i.
+    [ = ] find-with* drop ;
 
 : index ( obj seq -- n )
     #! The index of the object in the sequence.
-    0 index* ;
+    [ = ] find-with drop ;
 
-M: object contains? ( obj seq -- ? )
+: member? ( obj seq -- ? )
     #! Tests for membership using =.
-    index -1 > ;
+    [ = ] contains-with? ;
 
-: push ( element sequence -- )
-    #! Push a value on the end of a sequence.
-    dup length swap set-nth ;
+: memq? ( obj seq -- ? )
+    #! Tests for membership using eq?
+    [ eq? ] contains-with? ;
+
+: remove ( obj list -- list )
+    #! Remove all occurrences of objects equal to this one from
+    #! the list.
+    [ = not ] subset-with ;
+
+: remq ( obj list -- list )
+    #! Remove all occurrences of the object from the list.
+    [ eq? not ] subset-with ;
 
 : nappend ( s1 s2 -- )
     #! Destructively append s2 to s1.
@@ -123,68 +173,36 @@ M: object peek ( sequence -- element )
     #! Get value at end of sequence and remove it.
     dup peek >r dup length 1 - swap set-length r> ;
 
+: push-new ( elt seq -- )
+    2dup member? [ 2drop ] [ push ] ifte ;
+
+: prune ( seq -- seq )
+    [
+        dup length <vector> swap [ over push-new ] each
+    ] keep like ;
+
 : >pop> ( stack -- stack ) dup pop drop ;
 
-: (exchange) ( seq i j -- seq[i] j seq )
-    pick >r >r swap nth r> r> ;
+M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
-: exchange ( seq i j -- )
-    #! Exchange seq[i] and seq[j].
-    [ (exchange) ] 3keep swap (exchange) set-nth set-nth ;
+! Set theoretic operations
+: seq-intersect ( seq seq -- seq )
+    #! Make a list of elements that occur in both lists.
+    [ swap member? ] subset-with ;
 
-: (nreverse) ( seq i -- )
-    #! Swap seq[i] with seq[length-i-1].
-    over length over - 1 - exchange ;
+: seq-diff ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ swap member? not ] subset-with ;
 
-: nreverse ( seq -- )
-    #! Destructively reverse seq.
-    dup length 2 /i [ 2dup (nreverse) ] repeat drop ;
+: seq-diffq ( list1 list2 -- list )
+    #! Make a list of elements that occur in list2 but not
+    #! list1.
+    [ swap memq? not ] subset-with ;
 
-M: object reverse ( seq -- seq ) [ nreverse ] immutable ;
-
-! Equality testing
-: length= ( seq seq -- ? ) length swap length number= ;
-
-: (sequence=) ( seq seq i -- ? )
-    over length over number= [
-        3drop t
-    ] [
-        3dup 2nth = [
-            1 + (sequence=)
-        ] [
-            3drop f
-        ] ifte
-    ] ifte ;
-
-: sequence= ( seq seq -- ? )
-    #! Check if two sequences have the same length and elements,
-    #! but not necessarily the same class.
-    over general-list? over general-list? or [
-        swap >list swap >list =
-    ] [
-        2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte
-    ] ifte ;
-
-M: sequence = ( obj seq -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over type over type eq? [
-            sequence=
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
-
-! A repeated sequence is the same element n times.
-TUPLE: repeated length object ;
-M: repeated length repeated-length ;
-M: repeated nth nip repeated-object ;
-
-: seq-transpose ( list -- list )
-    #! An example illustrates this word best:
-    #! [ [ 1 2 3 ] [ 4 5 6 ] ] ==> [ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]
-    0 over nth length [ swap [ nth ] map-with ] project-with ;
+: contained? ( list1 list2 -- ? )
+    #! Is every element of list1 in list2?
+    swap [ swap member? ] all-with? ;
 
 IN: kernel
 

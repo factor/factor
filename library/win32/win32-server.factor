@@ -41,7 +41,7 @@ SYMBOL: socket
 : handle-socket-error ( -- )
     WSAGetLastError [
       ERROR_IO_PENDING ERROR_SUCCESS
-    ] contains? [
+    ] member? [
       win32-error-message throw 
     ] unless ;
 

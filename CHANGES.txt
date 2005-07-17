@@ -1,7 +1,11 @@
 Factor 0.76:
 ------------
 
-+ Runtime and core library:
+- The main focus of this release was getting the UI framework in a state
+  where the graphical listener is usable. This goal has largely been
+  achieved. Many performance problems were fixed, and the listener now
+  supports styled text output, presentations, and an
+  automatically-updated data stack display.
 
 - The number of generations used for garbage collection can now be set
   with the +G command line switch. You must specify at least 2
@@ -10,11 +14,7 @@ Factor 0.76:
 - Only 2 generations are used by default now, since there seems to be no
   performance benefit to having 3 after running some brief benchmarks.
 
-- New words:
-
-  math bitroll ( n s w -- n )
-  unparser hex-string ( str -- str )
-  sequences fourth ( seq -- elt )
+- Many improvements to the matrices library.
 
 - String input streams.
 
@@ -24,8 +24,6 @@ Factor 0.76:
   a stream that reads from the given string.
 
 - Improved inspector. Call it with inspect ( obj -- ).
-
-+ Framework
 
 - md5 hashing algorithm in contrib/crypto/ (Doug Coleman).
 

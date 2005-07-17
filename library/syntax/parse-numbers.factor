@@ -32,12 +32,12 @@ GENERIC: str>number ( str -- num )
 
 M: string str>number 10 base> ;
 
-PREDICATE: string potential-ratio CHAR: / swap contains? ;
+PREDICATE: string potential-ratio CHAR: / swap member? ;
 M: potential-ratio str>number ( str -- num )
     dup CHAR: / swap index swap cut*
     swap 10 base> swap 10 base> / ;
 
-PREDICATE: string potential-float CHAR: . swap contains? ;
+PREDICATE: string potential-float CHAR: . swap member? ;
 M: potential-float str>number ( str -- num )
     str>float ;
 

@@ -35,7 +35,7 @@ SYMBOL: callbacks
 : expected-error? ( -- bool )
     [ 
         ERROR_IO_PENDING ERROR_HANDLE_EOF ERROR_SUCCESS WAIT_TIMEOUT 
-    ] contains? ;
+    ] member? ;
 
 : handle-io-error ( -- )
     GetLastError expected-error? [ win32-throw-error ] unless ;

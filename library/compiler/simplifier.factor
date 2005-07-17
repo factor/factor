@@ -35,7 +35,7 @@ M: tuple simplify-node drop f ;
     ] with-scope  [ simplify ] when ;
 
 : label-called? ( label -- ? )
-    simplifying get [ calls-label? ] some-with? ;
+    simplifying get [ calls-label? ] contains-with? ;
 
 M: %label simplify-node ( linear vop -- linear ? )
     vop-label label-called? [ f ] [ cdr t ] ifte ;
@@ -93,11 +93,11 @@ M: %tag-fixnum simplify-node ( linear vop -- linear ? )
     #! current basic block. Outputs a true value if the vreg
     #! is not read or written before the end of the basic block.
     [
-        2dup vop-inputs contains? [
+        2dup vop-inputs member? [
             ! we are reading the vreg
             2drop t f
         ] [
-            2dup vop-outputs contains? [
+            2dup vop-outputs member? [
                 ! we are writing the vreg
                 2drop f f
             ] [
@@ -172,10 +172,16 @@ M: %replace-d simplify-node ( linear vop -- linear ? )
 M: fast-branch simplify-node ( linear vop -- linear ? )
     class fast-branch make-fast-branch ;
 
+: ?label ( symbol linear -- ? )
+    car dup %label? [ vop-label = ] [ 2drop f ] ifte ;
+
+: (find-label) ( label linear -- linear )
+    dup
+    [ 2dup ?label [ nip ] [ cdr (find-label) ] ifte ]
+    [ 2drop f ] ifte ;
+
 : find-label ( label -- rest )
-    simplifying get [
-        dup %label? [ vop-label = ] [ 2drop f ] ifte
-    ] some-with? ;
+    simplifying get (find-label) ;
 
 M: %label next-logical ( linear vop -- linear )
     drop cdr dup car next-logical ;

@@ -10,13 +10,13 @@ IN: lists USING: kernel sequences ;
 
 : assoc* ( key alist -- [[ key value ]] )
     #! Look up a key/value pair.
-    [ car = ] some-with?  car ;
+    [ car = ] find-with nip ;
 
 : assoc ( key alist -- value ) assoc* cdr ;
 
 : assq* ( key alist -- [[ key value ]] )
     #! Looks up a key/value pair using identity comparison.
-    [ car eq? ] some-with?  car ;
+    [ car eq? ] find-with nip ;
 
 : assq ( key alist -- value ) assq* cdr ;
 
@@ -43,16 +43,3 @@ IN: lists USING: kernel sequences ;
     swap [
         unswons rot assoc* dup [ cdr call ] [ 2drop ] ifte
     ] each-with ;
-
-: 2cons ( car1 car2 cdr1 cdr2 -- cons1 cons2 )
-    rot swons >r cons r> ;
-
-: zip ( list list -- list )
-    #! Make a new list containing pairs of corresponding
-    #! elements from the two given lists.
-    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
-
-: unzip ( assoc -- keys values )
-    #! Split an association list into two lists of keys and
-    #! values.
-    [ uncons >r uncons r> unzip 2cons ] [ [ ] [ ] ] ifte* ;

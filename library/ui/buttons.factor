@@ -4,7 +4,7 @@ IN: gadgets
 USING: generic kernel lists math namespaces prettyprint sdl
 sequences io sequences styles ;
 
-: button-down? ( n -- ? ) hand hand-buttons contains? ;
+: button-down? ( n -- ? ) hand hand-buttons member? ;
 
 : mouse-over? ( gadget -- ? ) hand hand-gadget child? ;
 

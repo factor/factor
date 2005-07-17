@@ -6,13 +6,8 @@ prettyprint sdl sequences vectors ;
 
 DEFER: pick-up
 
-: (pick-up) ( point list -- gadget )
-    dup [
-        2dup car pick-up dup
-        [ 2nip ] [ drop cdr (pick-up) ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+: (pick-up) ( point gadget -- gadget )
+    gadget-children <reversed> [ pick-up ] find nip ;
 
 : pick-up ( point gadget -- gadget )
     #! The logic is thus. If the point is definately outside the
@@ -20,10 +15,7 @@ DEFER: pick-up
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
     2dup inside? [
-        [
-            [ translate ] keep
-            gadget-children reverse (pick-up) dup
-        ] keep ?
+        [ [ translate ] keep (pick-up) dup ] keep ?
     ] [
         2drop f
     ] ifte ;

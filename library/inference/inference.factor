@@ -99,7 +99,7 @@ M: object apply-object apply-literal ;
 : handle-terminator ( quot -- )
     #! If the quotation throws an error, do not count its stack
     #! effect.
-    [ terminator? ] some? [ terminate ] when ;
+    [ terminator? ] find drop -1 > [ terminate ] when ;
 
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested

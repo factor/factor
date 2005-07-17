@@ -124,7 +124,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     dup compiled? [
         drop t
     ] [
-        dup compile-words get contains? [
+        dup compile-words get member? [
             drop t
         ] [
             compiled-xts get assoc

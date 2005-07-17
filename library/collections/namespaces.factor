@@ -144,7 +144,7 @@ SYMBOL: building
     make-sbuf >string ; inline
 
 : make-rstring ( quot -- string )
-    make-sbuf dup nreverse >string ; inline
+    make-sbuf <reversed> >string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer
