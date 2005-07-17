@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables kernel lists math matrices namespaces
-sequences vectors ;
+sequences styles vectors ;
 
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
@@ -16,16 +16,6 @@ TUPLE: gadget
 C: gadget ( -- gadget )
     { 0 0 0 } dup <rectangle> over set-delegate
     t over set-gadget-visible? ;
-
-TUPLE: plain-gadget ;
-
-C: plain-gadget ( -- gadget )
-    <gadget> over set-delegate ;
-
-TUPLE: etched-gadget ;
-
-C: etched-gadget ( -- gadget )
-    <gadget> over set-delegate ;
 
 DEFER: add-invalid
 

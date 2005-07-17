@@ -40,3 +40,6 @@ sequences io sequences styles ;
     dup [ button-update ] [ mouse-leave ] set-action
     dup [ button-update ] [ mouse-enter ] set-action
     [ drop ] [ drag 1 ] set-action ;
+
+: <button> ( label quot -- button )
+    >r <label> line-border dup r> button-gestures ;

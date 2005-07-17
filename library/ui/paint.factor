@@ -36,18 +36,13 @@ GENERIC: draw-gadget* ( gadget -- )
         ] with-clip
     ] [ drop ] ifte ;
 
-M: gadget draw-gadget* ( gadget -- ) drop ;
-
 : paint-prop* ( gadget key -- value )
     swap gadget-paint ?hash ;
 
 : paint-prop ( gadget key -- value )
     over [
-        2dup paint-prop* dup [
-            2nip
-        ] [
-            drop >r gadget-parent r> paint-prop
-        ] ifte
+        2dup paint-prop* dup
+        [ 2nip ] [ drop >r gadget-parent r> paint-prop ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -66,16 +61,39 @@ M: gadget draw-gadget* ( gadget -- ) drop ;
         dup rollover paint-prop rollover-bg background ?
     ] ifte paint-prop ;
 
-: plain-rect ( shape -- )
-    #! Draw a filled rect with the bounds of an arbitrary shape.
-    [ rect>screen ] keep bg rgb boxColor ;
+: filled-rect
+    >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
 
-M: plain-gadget draw-gadget* ( gadget -- )
-    >r surface get r> plain-rect ;
+: etched-rect
+    >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
+    fg rgb rectangleColor ;
 
-: hollow-rect ( shape -- )
-    #! Draw a hollow rect with the bounds of an arbitrary shape.
-    [ rect>screen >r 1 - r> 1 - ] keep fg rgb rectangleColor ;
+! Paint properties
+SYMBOL: interior
+SYMBOL: boundary
 
-M: etched-gadget draw-gadget* ( gadget -- )
-    >r surface get r> 2dup plain-rect hollow-rect ;
+GENERIC: draw-interior ( gadget interior -- )
+GENERIC: draw-boundary ( gadget boundary -- )
+
+M: f draw-interior 2drop ;
+M: f draw-boundary 2drop ;
+
+TUPLE: solid ;
+
+M: solid draw-interior
+    drop >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
+
+M: solid draw-boundary
+    drop >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
+    fg rgb rectangleColor ;
+
+M: gadget draw-gadget* ( gadget -- )
+    dup
+    dup interior paint-prop* draw-interior
+    dup boundary paint-prop* draw-boundary ;
+
+: <plain-gadget> ( -- gadget )
+    <gadget> dup << solid f >> interior set-paint-prop ;
+
+: <etched-gadget> ( -- gadget )
+    <plain-gadget> dup << solid f >> boundary set-paint-prop ;
