@@ -24,9 +24,9 @@ SYMBOL: surface
 : rgb ( [ r g b ] -- n )
     3unlist
     255
-    swap 8 shift bitor
-    swap 16 shift bitor
-    swap 24 shift bitor ;
+    swap >fixnum 8 shift bitor
+    swap >fixnum 16 shift bitor
+    swap >fixnum 24 shift bitor ;
 
 : make-color ( r g b -- color )
     #! Make an SDL_Color struct. This will go away soon in favor

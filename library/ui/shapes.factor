@@ -65,9 +65,3 @@ M: rectangle inside? ( loc rect -- ? )
     >r shape-extent r> shape-extent
     swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
     <rectangle> ;
-
-: rect>screen ( shape -- x1 y1 x2 y2 )
-    [ shape-x x get + ] keep
-    [ shape-y y get + ] keep
-    [ shape-w pick + ] keep
-    shape-h pick + ;

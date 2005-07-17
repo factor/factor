@@ -17,4 +17,4 @@ M: label pref-dim ( label -- dim )
     dup label-text label-size ;
 
 M: label draw-gadget* ( label -- )
-    dup label-text over [ draw-string ] with-trans ;
+    dup label-text draw-string ;

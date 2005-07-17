@@ -32,9 +32,8 @@ strings styles io ;
         2drop
     ] [
         >r [ gadget-font ] keep r> swap
-        [ fg 3unlist make-color ] keep
-        bg 3unlist make-color
-        TTF_RenderUNICODE_Shaded
+        fg 3unlist make-color
+        TTF_RenderUNICODE_Blended
         [ >r x get y get r> draw-surface ] keep
         SDL_FreeSurface
     ] ifte ;

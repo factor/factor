@@ -91,7 +91,8 @@ SYMBOL: failures
         "crashes" "sbuf" "threads" "parsing-word"
         "inference" "interpreter"
         "alien"
-        "gadgets/line-editor" "gadgets/rectangles" "memory"
+        "gadgets/line-editor" "gadgets/rectangles"
+        "gadgets/gradients" "memory"
         "redefine" "annotate" "sequences" "binary" "inspector"
     ] run-tests ;
 

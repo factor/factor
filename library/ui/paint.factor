@@ -30,7 +30,8 @@ GENERIC: draw-gadget* ( gadget -- )
 : draw-gadget ( gadget -- )
     dup gadget-visible? [
         dup [
-            dup draw-gadget* dup [
+            dup [
+                dup draw-gadget*
                 gadget-children [ draw-gadget ] each
             ] with-trans
         ] with-clip
@@ -61,13 +62,6 @@ GENERIC: draw-gadget* ( gadget -- )
         dup rollover paint-prop rollover-bg background ?
     ] ifte paint-prop ;
 
-: filled-rect
-    >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
-
-: etched-rect
-    >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
-    fg rgb rectangleColor ;
-
 ! Paint properties
 SYMBOL: interior
 SYMBOL: boundary
@@ -80,12 +74,47 @@ M: f draw-boundary 2drop ;
 
 TUPLE: solid ;
 
+: rect>screen ( shape -- x1 y1 x2 y2 )
+    >r x get y get r> dup shape-w swap shape-h
+    >r pick + r> pick + ;
+
 M: solid draw-interior
     drop >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
 
 M: solid draw-boundary
     drop >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
     fg rgb rectangleColor ;
+
+TUPLE: gradient vector from to ;
+
+: gradient-color ( gradient prop -- color )
+    over gradient-from 1 pick - v*n
+    >r swap gradient-to n*v r> v+ ;
+
+: (gradient-x) ( gradient dim y -- x1 x2 y color )
+    dup pick second / >r rot r> gradient-color >r
+    >r >r x get r> first x get + r> y get + r> ;
+
+: gradient-x ( gradient dim y -- )
+    >r >r >r surface get r> r> r> (gradient-x) rgb hlineColor ;
+
+: vert-gradient ( gradient dim -- )
+    dup second [ 3dup gradient-x ] repeat 2drop ;
+
+: (gradient-y) ( gradient dim x -- x y1 y2 color )
+    dup pick first / >r rot r> gradient-color
+    >r x get + y get rot second y get + r> ;
+
+: gradient-y ( gradient dim x -- )
+    >r >r >r surface get r> r> r> (gradient-y) rgb vlineColor ;
+
+: horiz-gradient ( gradient dim -- )
+    dup first [ 3dup gradient-y ] repeat 2drop ;
+
+M: gradient draw-interior ( gadget gradient -- )
+    swap shape-dim { 1 1 1 } vmax
+    over gradient-vector { 1 0 0 } =
+    [ horiz-gradient ] [ vert-gradient ] ifte ;
 
 M: gadget draw-gadget* ( gadget -- )
     dup
