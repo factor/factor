@@ -7,13 +7,7 @@ sequences sequences stdio strings words ;
 GENERIC: unparse ( obj -- str )
 
 M: object unparse ( obj -- str )
-    [
-        "#<" ,
-        dup class unparse ,
-        " @ " , 
-        address unparse ,
-        ">" ,
-    ] make-string ;
+    "( " swap class word-name " )" append3 ;
 
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
@@ -45,9 +39,9 @@ M: integer unparse ( obj -- str ) >dec ;
 M: ratio unparse ( num -- str )
     [
         dup
-        numerator unparse ,
+        numerator unparse %
         CHAR: / ,
-        denominator unparse ,
+        denominator unparse %
     ] make-string ;
 
 : fix-float ( str -- str )
@@ -60,12 +54,12 @@ M: float unparse ( float -- str )
 
 M: complex unparse ( num -- str )
     [
-        "#{ " ,
+        "#{ " %
         dup
-        real unparse ,
-        " " ,
-        imaginary unparse ,
-        " }#" ,
+        real unparse %
+        " " %
+        imaginary unparse %
+        " }#" %
     ] make-string ;
 
 : ch>ascii-escape ( ch -- esc )
@@ -93,15 +87,15 @@ M: string unparse ( str -- str )
     [ CHAR: " , unparse-string CHAR: " , ] make-string ;
 
 M: sbuf unparse ( str -- str )
-    [ "SBUF\" " , unparse-string CHAR: " , ] make-string ;
+    [ "SBUF\" " % unparse-string CHAR: " , ] make-string ;
 
-M: word unparse ( obj -- str ) word-name dup "#<unnamed>" ? ;
+M: word unparse ( obj -- str ) word-name dup "( unnamed )" ? ;
 
 M: t unparse drop "t" ;
 M: f unparse drop "f" ;
 
 M: dll unparse ( obj -- str )
-    [ "DLL\" " , dll-path unparse-string CHAR: " , ] make-string ;
+    [ "DLL\" " % dll-path unparse-string CHAR: " , ] make-string ;
 
 : hex-string ( str -- str )
     [ [ >hex 2 CHAR: 0 pad-left % ] each ] make-string ;

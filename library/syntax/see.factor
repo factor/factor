@@ -19,27 +19,21 @@ streams strings styles unparser words ;
     \ parsing prettyprint-prop
     \ inline prettyprint-prop ;
 
-: comment-style
-    #! Feel free to redefine this!
-    [
-        [[ "fg" [ 255 0 0 ] ]]
-        [[ foreground [ 192 0 0 ] ]]
-    ] ;
-
-: comment. ( comment -- ) comment-style write-attr ;
+: comment. ( comment -- )
+    [ [[ font-style italic ]] ] write-attr ;
 
 : infer-effect. ( effect -- )
     [
-        "(" ,
-        2unlist >r [ " " , unparse , ] each r>
-        " --" ,
-        [ " " , unparse , ] each
-        " )" ,
+        "(" %
+        2unlist >r [ " " % unparse % ] each r>
+        " --" %
+        [ " " % unparse % ] each
+        " )" %
     ] make-string comment. ;
 
 : stack-effect. ( word -- )
     dup "stack-effect" word-prop [
-        [ CHAR: ( , , CHAR: ) , ] make-string
+        [ CHAR: ( , % CHAR: ) , ] make-string
         comment.
     ] [
         "infer-effect" word-prop dup [

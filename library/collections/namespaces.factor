@@ -120,7 +120,7 @@ SYMBOL: building
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq
     #! unless an equal object has already been added.
-    building get 2dup index -1 = [ push ] [ 2drop ] ifte ;
+    building get 2dup member? [ 2drop ] [ push ] ifte ;
 
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.

@@ -12,6 +12,9 @@ strings threads ;
 
 TUPLE: c-stream in out flush? ;
 
+M: c-stream stream-write1 ( char stream -- )
+    >r ch>string r> c-stream-out fwrite ;
+
 M: c-stream stream-write-attr ( str style stream -- )
     nip >r dup string? [ ch>string ] unless r>
     c-stream-out fwrite ;

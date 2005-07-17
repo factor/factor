@@ -1,49 +1,37 @@
-+ bugs to fix soon
+76:
+---
 
-<magnus--> http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
-<magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
-<magnus--> not *too* long
-<magnus--> but we'd need to longjmp the main thread from the exception handler thread
-<magnus--> or cause a signal in the main thread
-<magnus--> http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
-<magnus--> http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
-
-- i/o: don't keep creating new sbufs
 - set-length should not shorten the underlying sequence
-- there is a problem with hashcodes of words and bootstrapping
-- http keep alive, and range get
-- sleep word
-- fix i/o on generic x86/ppc unix
-- code walker & exceptions
-- if two tasks write to a unix stream, the buffer can overflow
-- rename prettyprint* to pprint, prettyprint to pp
-- reader syntax for arrays, byte arrays, displaced aliens
-- images saved from plugin do not work
-- investigate orphans
-
-+ plugin:
-
-- word preview for parsing words
-- plugin: supportsBackspace
-- if external factor is down, don't add tons of random shit to the       
-  dictionary
-
-+ ui:
-
-- faster layout
-- faster repaint
-- ui browser
-- mouse enter onto overlapping with interior, but not child, gadget
-- rollovers broken in inspector
+- i/o: don't keep creating new sbufs
+- [ EAX 0 ] --> [ EAX ]
+- rollovers broken with menus
 - menu dragging
 - fix up the min thumb size hack
+- bevel borders
+- nicer scrollbars with up/down buttons
+- gaps in pack layout
+- fix listener prompt display after presentation commands invoked
+- stack display bugs
+- simple tutorial
+- parser::skip clean up
+
++ misc
+
+Investigate:
+
+  http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
+  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
+  http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4764.html
+  http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
+
+- http keep alive, and range get
+- code walker & exceptions
+- faster repaint
 
 + ffi:
 
-- alien primitives need a more general input type
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
-- box/unbox_signed/unsigned_8
 - ffi unicode strings: null char security hole
 - utf16 string boxing
 - value type structs
@@ -58,7 +46,6 @@
 - simplifier:
   - kill replace after a peek
   - merge inc-d's across VOPs that don't touch the stack
-- [ EAX 0 ] --> [ EAX ]
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - [ [ dup call ] dup call ] infer hangs
 - more accurate types for various words
@@ -77,12 +64,13 @@
 - array sort
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth
-- faster sequence operations
 - specialized arrays
 - phase out sbuf-append
 
 + kernel:
 
+- sleep word
+- there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue
 - instances: do not use make-list
@@ -99,17 +87,18 @@
 
 - faster stream-copy
 - reading and writing byte arrays
-- merge unix and win32 io where appropriate
+- clean up line reading code in win32-io
 - unix io: handle \n\r and \n\0
 - separate words for writing characters and strings
-- perhaps:
-  GENERIC: set-style ( style stream -- )
-  GENERIC: stream-write
-  GENERIC: stream-write-char
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - unify unparse and prettyprint
 - utf16, utf8 encoding
+- fix i/o on generic x86/ppc unix
+- if two tasks write to a unix stream, the buffer can overflow
+- rename prettyprint* to pprint, prettyprint to pp
+- reader syntax for arrays, byte arrays, displaced aliens
+- print parsing words in bold
 
 + nice to have libraries:
 

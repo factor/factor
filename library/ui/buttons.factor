@@ -34,6 +34,7 @@ sequences io sequences styles ;
 
 : button-gestures ( button quot -- )
     over f reverse-video set-paint-prop
+    over << solid f >> interior set-paint-prop
     dupd [ action ] set-action
     dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action

@@ -14,16 +14,33 @@ Factor 0.76:
 - Only 2 generations are used by default now, since there seems to be no
   performance benefit to having 3 after running some brief benchmarks.
 
+- The following formely list-specific words are now generic:
+    
+    all? all-with? subset subset-with fiber? prune
+
+- The contains? word for testing membership in a sequence has been
+  renamed to member?.
+
+- The some? and some-with? combinators are gone. Their replacements
+  are contains?, contains-with?, find, find*, find-with, and find-with*.
+  See the documentation for details.
+
+- The nreverse word has been removed.
+
+- reversed ( seq -- seq ) outputs a new sequence that shares structure
+  with the given sequence, but presents elements in reverse order.
+
 - Many improvements to the matrices library.
 
-- String input streams.
+- with-string word renamed to string-out ( quot -- string )
 
-  with-string is now string-out ( quot -- string )
-
-  new string-in ( string quot -- ) word, calls quot with stdio bound to
+- new string-in ( string quot -- ) word, calls quot with stdio bound to
   a stream that reads from the given string.
 
 - Improved inspector. Call it with inspect ( obj -- ).
+
+- Fixed bug where images saved from the jEdit plugin would fail to
+  start.
 
 - md5 hashing algorithm in contrib/crypto/ (Doug Coleman).
 

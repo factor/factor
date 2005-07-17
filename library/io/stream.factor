@@ -10,8 +10,9 @@ SYMBOL: stdio
 GENERIC: stream-flush      ( stream -- )
 GENERIC: stream-auto-flush ( stream -- )
 GENERIC: stream-readln     ( stream -- string )
-GENERIC: stream-read       ( count stream -- string )
 GENERIC: stream-read1      ( stream -- char/f )
+GENERIC: stream-read       ( count stream -- string )
+GENERIC: stream-write1     ( char stream -- )
 GENERIC: stream-write-attr ( string style stream -- )
 GENERIC: stream-close      ( stream -- )
 GENERIC: set-timeout       ( timeout stream -- )
@@ -42,6 +43,7 @@ M: null-stream stream-auto-flush drop ;
 M: null-stream stream-readln drop f ;
 M: null-stream stream-read 2drop f ;
 M: null-stream stream-read1 drop f ;
+M: null-stream stream-write1 2drop ;
 M: null-stream stream-write-attr 3drop ;
 M: null-stream stream-close drop ;
 
@@ -57,10 +59,3 @@ C: wrapper-stream ( stream -- stream )
 
 : with-wrapper ( stream quot -- )
     >r wrapper-stream-scope r> bind ;
-
-! Standard actions protocol for presentations output to
-! attributed streams.
-: <actions> ( path alist -- alist )
-    #! For each element of the alist, change the value to
-    #! path " " value
-    [ uncons >r swap " " r> append3 cons ] map-with ;

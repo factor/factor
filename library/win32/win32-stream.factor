@@ -100,13 +100,13 @@ M: string do-write ( str -- )
 
 : do-read-count ( sbuf count -- str )
     dup 0 = [ 
-        drop sbuf>string 
+        drop >string 
     ] [
         dup consume-input
         dup length dup 0 = [
             3drop >string-or-f
         ] [
-            >r swap r> - >r swap [ sbuf-append ] keep r> do-read-count
+            >r swap r> - >r swap [ swap nappend ] keep r> do-read-count
         ] ifte
     ] ifte ;
 
@@ -123,7 +123,7 @@ M: string do-write ( str -- )
                 peek-input "\r" = [ 1 consume-input drop ] when 
                 drop >string
             ] [
-                over sbuf-append do-read-line 
+                dupd nappend do-read-line 
             ] ifte
         ] ifte
     ] ifte ;

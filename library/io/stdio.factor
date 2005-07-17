@@ -8,6 +8,7 @@ USING: errors generic kernel lists namespaces strings styles ;
 : read1      ( -- char )         stdio get stream-read1 ;
 : read       ( count -- string ) stdio get stream-read ;
 : write      ( string -- )       stdio get stream-write ;
+: write1     ( char -- )         stdio get stream-write1 ;
 : write-attr ( string style -- ) stdio get stream-write-attr ;
 : print      ( string -- )       stdio get stream-print ;
 : terpri     ( -- )              "\n" write ;

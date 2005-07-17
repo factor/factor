@@ -24,7 +24,7 @@ M: assert error.
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
     [
-        unparse , " ms run / " , unparse , " ms GC time" ,
+        unparse % " ms run / " % unparse % " ms GC time" %
     ] make-string print ;
 
 : unit-test ( output input -- )

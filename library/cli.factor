@@ -12,10 +12,8 @@ sequences strings ;
 
 : run-user-init ( -- )
     #! Run user init file if it exists
-    "user-init" get [
-        [ "~" get , "/" , ".factor-" , "rc" , ] make-string
-        ?run-file
-    ] when ;
+    "user-init" get
+    [ "~" get "/.factor-rc" append ?run-file ] when ;
 
 : set-path ( value list -- )
     unswons over [ nest [ set-path ] bind ] [ nip set ] ifte ;
@@ -55,6 +53,7 @@ sequences strings ;
     #! -no-<flag> CLI switch
     "user-init" on
     "compile" on
+    "null-stdio" off
     os "win32" = "ui" "tty" ? "shell" set ;
 
 : parse-command-line ( -- )

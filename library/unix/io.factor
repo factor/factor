@@ -271,9 +271,6 @@ M: write-task do-io-task
 
 M: write-task task-container drop write-tasks get ;
 
-: write-fin ( str writer -- )
-    dup pending-error >buffer ;
-
 : add-write-io-task ( callback task -- )
     dup io-task-fd write-tasks get hash [
         dup write-task? [
@@ -294,10 +291,16 @@ M: port stream-flush ( stream -- )
 M: port stream-auto-flush ( stream -- ) drop ;
 
 : wait-to-write ( len port -- )
-    tuck can-write? [ drop ] [ stream-flush ] ifte ;
+    tuck can-write? [ dup stream-flush ] unless pending-error ;
+
+: blocking-write1 ( str writer -- )
+    1 over wait-to-write >buffer ;
+
+M: port stream-write1 ( char writer -- )
+    nip >r dup string? [ ch>string ] unless r> blocking-write ;
 
 : blocking-write ( str writer -- )
-    over length over wait-to-write write-fin ;
+    over length over wait-to-write >buffer ;
 
 M: port stream-write-attr ( string style writer -- )
     nip >r dup string? [ ch>string ] unless r> blocking-write ;

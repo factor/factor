@@ -101,6 +101,11 @@ sequences strings styles unparser words ;
 
 TUPLE: html-stream ;
 
+M: html-stream stream-write1 ( char stream -- )
+    [
+        dup html-entities assoc [ write ] [ write1 ] ?ifte
+    ] with-wrapper ;
+
 M: html-stream stream-write-attr ( str style stream -- )
     [
         [

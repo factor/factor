@@ -40,7 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 0 9 random-int unparse , ] times ] make-string str>number 36 >base ;
+  [ 32 [ 0 9 random-int unparse % ] times ] make-string str>number 36 >base ;
 
 #! Name of variable holding the table of continuations.
 SYMBOL: table 
@@ -199,8 +199,8 @@ SYMBOL: callback-cc
   #! HTTP 302 to occur to instruct the browser to forward to
   #! the request URL.
   [ 
-    "HTTP/1.1 302 Document Moved\nLocation: " , ,
-    "\nContent-Length: 0\nContent-Type: text/plain\n\n" , 
+    "HTTP/1.1 302 Document Moved\nLocation: " % %
+    "\nContent-Length: 0\nContent-Type: text/plain\n\n" %
   ] make-string call-exit-continuation ;
 
 : redirect-to-here ( -- )

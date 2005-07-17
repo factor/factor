@@ -85,6 +85,9 @@ M: pane stream-auto-flush ( stream -- ) drop ;
 M: pane stream-readln ( stream -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
+M: pane stream-write1 ( string style stream -- )
+    [ rot ch>string unit pane-write ] keep scroll>bottom ;
+
 M: pane stream-write-attr ( string style stream -- )
     [ rot "\n" split pane-write ] keep scroll>bottom ;
 

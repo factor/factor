@@ -7,9 +7,6 @@ sequences strings ;
 : empty-sbuf ( len -- sbuf )
     dup <sbuf> [ set-length ] keep ;
 
-: sbuf-append ( ch/str sbuf -- )
-    over string? [ swap nappend ] [ push ] ifte ;
-
 : fill ( count char -- string ) <repeated> >string ;
 
 : padding ( string count char -- string )

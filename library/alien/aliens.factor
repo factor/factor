@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: hashtables kernel lists math namespaces parser io ;
+USING: hashtables io kernel kernel-internals lists math
+namespaces parser ;
 
 DEFER: dll?
 BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
@@ -11,6 +12,8 @@ BUILTIN: alien 16 alien? ;
 
 DEFER: displaced-alien?
 BUILTIN: displaced-alien 20 displaced-alien? ;
+
+UNION: c-ptr byte-array alien displaced-alien ;
 
 : NULL ( -- null )
     #! C null value.

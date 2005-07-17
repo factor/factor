@@ -17,10 +17,10 @@ unparser words ;
 
 : make-jedit-request ( files params -- code )
     [
-        "EditServer.handleClient(false,false,false,null," ,
-        "new String[] {" ,
-        [ unparse , "," , ] each
-        "null});\n" ,
+        "EditServer.handleClient(false,false,false,null," %
+        "new String[] {" %
+        [ unparse % "," % ] each
+        "null});\n" %
     ] make-string ;
 
 : send-jedit-request ( request -- )

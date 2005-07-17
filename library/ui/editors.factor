@@ -94,4 +94,5 @@ M: editor layout* ( editor -- )
     dup editor-caret swap caret-loc swap set-shape-loc ;
 
 M: editor draw-gadget* ( editor -- )
+    dup delegate draw-gadget*
     dup editor-text draw-string ;

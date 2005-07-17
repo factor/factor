@@ -14,11 +14,14 @@ M: duplex-stream stream-auto-flush
 M: duplex-stream stream-readln
     duplex-stream-in stream-readln ;
 
+M: duplex-stream stream-read1
+    duplex-stream-in stream-read1 ;
+
 M: duplex-stream stream-read
     duplex-stream-in stream-read ;
 
-M: duplex-stream stream-read1
-    duplex-stream-in stream-read1 ;
+M: duplex-stream stream-write1
+    duplex-stream-out stream-write1 ;
 
 M: duplex-stream stream-write-attr
     duplex-stream-out stream-write-attr ;

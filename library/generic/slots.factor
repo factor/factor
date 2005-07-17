@@ -49,7 +49,7 @@ sequences strings words ;
     >r word-name "-" r> append3 create-in ;
 
 : writer-word ( class name -- word )
-    [ swap "set-" , word-name , "-" , , ] make-string create-in ;
+    [ swap "set-" % word-name % "-" % % ] make-string create-in ;
 
 : simple-slot ( class name -- [ reader writer ] )
     [ reader-word ] 2keep writer-word 2list ;

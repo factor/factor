@@ -137,9 +137,9 @@ sequences ;
   #! Build a string that can evaluate the string 'to-eval'
   #! by first doing an 'IN: vocab' and a 'USE:' of all
   #! necessary vocabs for existing words in that vocab.
-  [ >r "IN: " , dup , "\n" ,
-     vocabulary-uses [ "USE: " , , "\n" , ] each
-     r> , "\n" , ] make-string ;
+  [ >r "IN: " % dup % "\n" %
+     vocabulary-uses [ "USE: " % % "\n" % ] each
+     r> % "\n" % ] make-string ;
 
 : show-parse-error ( error -- )
   #! Show an error page describing the parse error.
@@ -169,8 +169,8 @@ sequences ;
   #! URL which, when requested, will display the source to that
   #! word.
   [ 
-    ".?word=" , url-encode ,
-    "&vocab=" , url-encode ,
+    ".?word=" % url-encode %
+    "&vocab=" % url-encode %
   ] make-string ;
 
 : browse ( <browser> -- )

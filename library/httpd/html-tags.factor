@@ -67,7 +67,7 @@ USE: sequences
 ! <a href= "http://" swap append a> "click" write </a>
 !
 ! (url -- )
-! <a href= [ "http://" , , ] make-string a> "click" write </a>
+! <a href= [ "http://" % % ] make-string a> "click" write </a>
 !
 ! Tags that have no 'closing' equivalent have a trailing tag/> form:
 !
@@ -77,7 +77,7 @@ USE: sequences
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
     reverse [
-        [ dup car , "='" , cdr , "'" , ] each
+        [ dup car % "='" % cdr % "'" % ] each
     ] make-string ;
 
 : write-attributes ( n: namespace -- )    
@@ -163,13 +163,13 @@ USE: sequences
 : def-for-html-word-</foo> ( name -- name quot )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    [ "</" , , ">" , ] make-string dup [ write ] cons ;
+    [ "</" % % ">" % ] make-string dup [ write ] cons ;
 
 : def-for-html-word-<foo/> ( name -- name quot )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    [ "<" , dup , "/>" , ] make-string swap
-    [ "<" , , ">" , ] make-string
+    [ "<" % dup % "/>" % ] make-string swap
+    [ "<" % % ">" % ] make-string
     [ write ] cons ;
 
 : def-for-html-word-foo/> ( name -- name quot )

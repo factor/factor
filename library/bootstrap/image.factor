@@ -161,12 +161,8 @@ M: f ' ( obj -- ptr )
     [ emit ] each ;
 
 : word-error ( word msg -- )
-    [
-        ,
-        dup word-vocabulary ,
-        " " ,
-        word-name ,
-    ] make-string throw ;
+    [ % dup word-vocabulary % " " % word-name % ] make-string
+    throw ;
 
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
