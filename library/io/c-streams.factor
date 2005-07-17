@@ -16,8 +16,7 @@ M: c-stream stream-write1 ( char stream -- )
     >r ch>string r> c-stream-out fwrite ;
 
 M: c-stream stream-write-attr ( str style stream -- )
-    nip >r dup string? [ ch>string ] unless r>
-    c-stream-out fwrite ;
+    nip c-stream-out fwrite ;
 
 M: c-stream stream-read1 ( stream -- str )
     c-stream-in dup [ fgetc ] when ;

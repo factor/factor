@@ -293,17 +293,11 @@ M: port stream-auto-flush ( stream -- ) drop ;
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;
 
-: blocking-write1 ( str writer -- )
-    1 over wait-to-write >buffer ;
-
 M: port stream-write1 ( char writer -- )
-    nip >r dup string? [ ch>string ] unless r> blocking-write ;
-
-: blocking-write ( str writer -- )
-    over length over wait-to-write >buffer ;
+    1 over wait-to-write ch>buffer ;
 
 M: port stream-write-attr ( string style writer -- )
-    nip >r dup string? [ ch>string ] unless r> blocking-write ;
+    nip over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )
     dup stream-flush

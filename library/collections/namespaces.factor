@@ -109,13 +109,7 @@ SYMBOL: building
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
-    ! The behavior where a string can be passed is deprecated;
-    ! use % instead!
-    building get dup sbuf? [
-        over string? [ swap nappend ] [ push ] ifte
-    ] [
-        push
-    ] ifte ;
+    building get push ;
 
 : unique, ( obj -- )
     #! Add the object to the sequence being built with make-seq

@@ -37,6 +37,8 @@ C: buffer ( size -- buffer )
 
 : buffer@ ( buffer -- int ) dup buffer-ptr swap buffer-pos + ;
 
+: buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
+
 : buffer-first-n ( count buffer -- string )
     [ dup buffer-fill swap buffer-pos - min ] keep
     buffer@ swap memory>string ;
@@ -62,10 +64,10 @@ C: buffer ( size -- buffer )
     2dup buffer-ptr swap realloc check-ptr
     over set-buffer-ptr set-buffer-size ;
 
-: check-overflow ( string buffer -- )
-    over length over buffer-capacity > [
+: check-overflow ( length buffer -- )
+    2dup buffer-capacity > [
         dup eof? [
-            >r length r> buffer-extend
+            buffer-extend
         ] [
             "Buffer overflow" throw
         ] ifte
@@ -74,30 +76,21 @@ C: buffer ( size -- buffer )
     ] ifte ;
 
 : >buffer ( string buffer -- )
-    2dup check-overflow
-    [ dup buffer-ptr swap buffer-fill + string>memory ] 2keep
+    over length over check-overflow
+    [ buffer-end string>memory ] 2keep
     [ buffer-fill swap length + ] keep set-buffer-fill ;
+
+: ch>buffer ( char buffer -- )
+    1 over check-overflow
+    [ buffer-end <alien> 0 set-alien-unsigned-1 ] keep
+    [ buffer-fill 1 + ] keep set-buffer-fill ;
 
 : n>buffer ( count buffer -- )
     #! Increases the fill pointer by count.
     [ buffer-fill + ] keep set-buffer-fill ;
-
-: buffer-end ( buffer -- int ) dup buffer-ptr swap buffer-fill + ;
 
 : buffer-peek ( buffer -- char )
     buffer@ <alien> 0 alien-unsigned-1 ;
 
 : buffer-pop ( buffer -- char )
     [ buffer-peek  1 ] keep buffer-consume ;
-
-: buffer-append ( buffer buffer -- )
-    #! Append first buffer to second buffer.
-    2dup buffer-end over buffer-ptr rot buffer-fill memcpy
-    >r buffer-fill r> n>buffer ;
-
-: buffer-set ( string buffer -- )
-    2dup buffer-ptr string>memory
-    >r length r> buffer-reset ;
-
-: string>buffer ( string -- buffer )
-    dup length <buffer> tuck buffer-set ;

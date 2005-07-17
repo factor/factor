@@ -38,20 +38,20 @@ prettyprint sequences io strings words styles ;
 ! 4 bytes -- length. -1 means EOF
 ! remaining -- input
 : jedit-write-attr ( str style -- )
-    CHAR: w write
+    CHAR: w write1
     [ drop . f . ] string-out
     dup write-len write ;
 
 TUPLE: jedit-stream ;
 
 M: jedit-stream stream-readln ( stream -- str )
-    [ CHAR: r write flush 4 read be> read ] with-wrapper ;
+    [ CHAR: r write1 flush 4 read be> read ] with-wrapper ;
 
 M: jedit-stream stream-write-attr ( str style stream -- )
     [ jedit-write-attr ] with-wrapper ;
 
 M: jedit-stream stream-flush ( stream -- )
-    [ CHAR: f write flush ] with-wrapper ;
+    [ CHAR: f write1 flush ] with-wrapper ;
 
 C: jedit-stream ( stream -- stream )
     [ >r <wrapper-stream> r> set-delegate ] keep ;
