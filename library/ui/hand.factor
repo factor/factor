@@ -5,14 +5,14 @@ USING: alien generic io kernel lists math matrices namespaces
 prettyprint sdl sequences vectors ;
 
 : (pick-up) ( point gadget -- gadget )
-    gadget-children reversed [ inside? ] find-with nip ;
+    gadget-children reverse-slice [ inside? ] find-with nip ;
 
 : pick-up ( point gadget -- gadget )
     #! The logic is thus. If the point is definately outside the
     #! box, return f. Otherwise, see if the point is contained
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
-    2dup inside? [
+    dup gadget-visible? >r 2dup inside? r> drop [
         [ translate ] keep 2dup
         (pick-up) [ pick-up ] [ nip ] ?ifte
     ] [

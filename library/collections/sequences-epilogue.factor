@@ -104,7 +104,7 @@ M: object find ( seq quot -- i elt )
 : fiber? ( seq quot -- ? | quot: elt elt -- ? )
     #! Tests if all elements are equivalent under the relation.
     over empty?
-    [ >r [ first ] keep r> all-with? ] [ 2drop t ] ifte ; inline
+    [ 2drop t ] [ >r [ first ] keep r> all-with? ] ifte ; inline
 
 ! Operations
 M: object thaw clone ;
@@ -189,7 +189,7 @@ M: object peek ( sequence -- element )
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
-M: object reversed ( seq -- seq ) <reversed> ;
+M: object reverse-slice ( seq -- seq ) <reversed> ;
 
 M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 

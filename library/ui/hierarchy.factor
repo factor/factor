@@ -15,9 +15,13 @@ sequences vectors ;
         [ remove-gadget ] [ 2drop ] ifte
     ] when* ;
 
+: (clear-gadget) ( gadget -- )
+    gadget-children [
+        dup [ f swap set-gadget-parent ] each 0 swap set-length
+    ] when* ;
+
 : clear-gadget ( gadget -- )
-    dup gadget-children [ f swap set-gadget-parent ] each
-    0 over gadget-children set-length relayout ;
+    dup (clear-gadget) relayout ;
 
 : ?push ( elt seq/f -- seq )
     [ [ push ] keep ] [ 1vector ] ifte* ;

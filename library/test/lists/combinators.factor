@@ -10,7 +10,7 @@ USE: sequences
 [ [ [ 3 2 1 ] [ 5 4 3 ] [ 6 ] ] ]
 [ [ 1 2 3 ] [ 3 4 5 ] [ 6 ] 3list [ reverse ] map ] unit-test
 
-[ [ 43 "a" [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
+[ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
 [ "fdsfs" [ > ] sort ] unit-test-fails
 [ [ ] ] [ [ ] [ > ] sort ] unit-test

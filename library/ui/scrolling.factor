@@ -6,9 +6,9 @@ threads vectors styles ;
 
 ! A viewport can be scrolled.
 
-TUPLE: viewport origin ;
+TUPLE: viewport origin bottom? ;
 
-: viewport-dim ( viewport -- h ) gadget-child pref-dim ;
+: viewport-dim gadget-child pref-dim ;
 
 : fix-scroll ( origin viewport -- origin )
     dup shape-dim swap viewport-dim v- vmax { 0 0 0 } vmin ;
@@ -24,9 +24,18 @@ C: viewport ( content -- viewport )
 
 M: viewport pref-dim gadget-child pref-dim ;
 
+: viewport-origin* ( viewport -- point )
+    dup viewport-bottom? [
+        f over set-viewport-bottom?
+        dup viewport-dim { 0 -1 0 } v* over fix-scroll
+        [ swap set-viewport-origin ] keep
+    ] [
+        viewport-origin
+    ] ifte ;
+
 M: viewport layout* ( viewport -- )
-    dup viewport-origin
-    swap gadget-child dup prefer set-shape-loc ;
+    dup gadget-child dup prefer
+    >r viewport-origin* r> set-shape-loc ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
@@ -49,7 +58,7 @@ TUPLE: slider viewport thumb vector ;
     slider-viewport visible-portion v/ ;
 
 : slider-current ( slider -- pos )
-    dup slider-viewport viewport-origin
+    dup slider-viewport viewport-origin*
     dup rot slider-vector v* v- ;
 
 : slider-pos ( slider pos -- pos )
@@ -91,7 +100,7 @@ C: slider ( viewport vector -- slider )
 : <y-slider> ( viewport -- slider ) { 0 1 0 } <slider> ;
 
 : thumb-loc ( slider -- loc )
-    dup slider-viewport viewport-origin vneg swap >thumb ;
+    dup slider-viewport viewport-origin* vneg swap >thumb ;
 
 : slider-dim { 16 16 16 } ;
 
@@ -114,12 +123,8 @@ TUPLE: scroller viewport x y ;
 
 : add-y-slider 2dup set-scroller-y add-right ;
 
-: viewport>bottom ( -- viewport )
-    dup viewport-origin over viewport-dim vneg
-    { 0 1 0 } set-axis swap scroll ;
-
 : (scroll>bottom) ( scroller -- )
-    dup scroller-viewport viewport>bottom
+    t over scroller-viewport set-viewport-bottom?
     dup scroller-x relayout scroller-y relayout ;
 
 : scroll>bottom ( gadget -- )

@@ -7,12 +7,15 @@ sequences vectors ;
 ! A gadget is a shape, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent. A gadget
 ! delegates to its shape.
-TUPLE: gadget paint gestures relayout? root? parent children ;
+TUPLE: gadget
+    paint gestures visible? relayout? root?
+    parent children ;
 
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rectangle> over set-delegate ;
+    { 0 0 0 } dup <rectangle> over set-delegate
+    t over set-gadget-visible? ;
 
 TUPLE: plain-gadget ;
 

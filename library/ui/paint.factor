@@ -19,23 +19,22 @@ SYMBOL: clip
 
 : with-clip ( shape quot -- )
     #! All drawing done inside the quotation is clipped to the
-    #! shape's bounds. The quotation is called with a boolean
-    #! that is set to false if the gadget is entirely clipped.
+    #! shape's bounds.
     [
         >r screen-bounds clip [ intersect dup ] change set-clip
-        r> call
+        [ r> call ] [ r> 2drop ] ifte
     ] with-scope ; inline
 
 GENERIC: draw-gadget* ( gadget -- )
 
 : draw-gadget ( gadget -- )
-    dup [
-        [
+    dup gadget-visible? [
+        dup [
             dup draw-gadget* dup [
                 gadget-children [ draw-gadget ] each
             ] with-trans
-        ] [ drop ] ifte
-    ] with-clip ;
+        ] with-clip
+    ] [ drop ] ifte ;
 
 M: gadget draw-gadget* ( gadget -- ) drop ;
 

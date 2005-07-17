@@ -71,10 +71,10 @@ M: general-list find* ( start list quot -- i elt )
     #! list.
     2dup member? [ nip ] [ cons ] ifte ;
 
-M: general-list reversed ( list -- list )
+M: general-list reverse-slice ( list -- list )
     [ ] [ swons ] reduce ;
 
-M: general-list reverse reversed ;
+M: general-list reverse reverse-slice ;
 
 IN: sequences
 DEFER: <range>
