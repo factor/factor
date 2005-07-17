@@ -78,10 +78,12 @@ M: complex unparse ( num -- str )
 
 : unparse-ch ( ch -- ch/str )
     dup quotable? [
-        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte
-    ] unless ;
+        ,
+    ] [
+        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte %
+    ] ifte ;
 
-: unparse-string [ unparse-ch , ] each ;
+: unparse-string [ unparse-ch ] each ;
 
 M: string unparse ( str -- str )
     [ CHAR: " , unparse-string CHAR: " , ] make-string ;

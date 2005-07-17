@@ -151,11 +151,11 @@ public class ExternalFactor extends VocabularyLookup
 	/**
 	 * Return a listener stream.
 	 */
-	public FactorStream openStream()
+	public Socket openStream()
 	{
 		try
 		{
-			return new FactorStream(openWireSocket());
+			return openWireSocket();
 		}
 		catch(Exception e)
 		{

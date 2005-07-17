@@ -4,7 +4,7 @@ IN: telnetd
 USING: errors listener kernel namespaces io threads parser ;
 
 : telnet-client ( socket -- )
-    dup [ log-client listener ] with-stream ;
+    dup [ log-client print-banner listener ] with-stream ;
 
 : telnet-connection ( socket -- )
     [ telnet-client ] in-thread drop ;

@@ -4,6 +4,9 @@ IN: jedit
 USING: kernel lists namespaces parser sequences io strings
 unparser words ;
 
+! Some words to send requests to a running jEdit instance to
+! edit files and position the cursor on a specific line number.
+
 : jedit-server-file ( -- path )
     "jedit-server-file" get
     [ "~" get "/.jedit/server" append ] unless* ;
@@ -44,3 +47,41 @@ unparser words ;
     ] [
         2drop "Unknown source" print
     ] ifte ;
+
+! Wire protocol for jEdit to evaluate Factor code.
+! Packets are of the form:
+!
+! 4 bytes length
+! <n> bytes data
+!
+! jEdit sends a packet with code to eval, it receives the output
+! captured with string-out.
+
+: write-len ( seq -- ) length 4 >be write ;
+
+: write-packet ( string -- ) dup write-len write flush ;
+
+: read-packet ( -- string ) 4 read be> read ;
+
+: wire-server ( -- )
+    #! Repeatedly read jEdit requests and execute them. Return
+    #! on EOF.
+    read-packet [ eval>string write-packet wire-server ] when* ;
+
+: jedit-lookup ( word -- list )
+    #! A utility word called by the Factor plugin to get some
+    #! required word info.
+    dup [
+        [
+            "vocabulary"
+            "name"
+            "stack-effect"
+        ] [
+            dupd word-prop
+        ] map >r definer r> cons
+    ] when ;
+
+: completions ( str pred -- list | pred: str word -- ? )
+    #! Make a list of completions. Each element of the list is
+    #! a vocabulary/name/stack-effect triplet list.
+    word-subset-with [ jedit-lookup ] map ;

@@ -45,7 +45,6 @@ compile? [
 
 "Loading more library code..." print
 
-
 t [
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
@@ -76,7 +75,6 @@ t [
     "/library/io/logging.factor"
 
     "/library/tools/telnetd.factor"
-    "/library/tools/jedit-wire.factor"
     "/library/tools/jedit.factor"
 
     "/library/httpd/load.factor"
