@@ -77,9 +77,9 @@ TUPLE: slider viewport thumb vector ;
     [ gadget-parent slider-motion ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    <plain-gadget>
+    <bevel-gadget>
     t over set-gadget-root?
-    dup gray background set-paint-prop
+    dup [ 192 192 192 ] background set-paint-prop
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
@@ -89,9 +89,10 @@ TUPLE: slider viewport thumb vector ;
     [ { 0 0 0 } slider-click ] [ button-down 1 ] set-action ;
 
 C: slider ( viewport vector -- slider )
+    <plain-gadget> over set-delegate
+    dup [ 128 128 128 ] background set-paint-prop
     [ set-slider-vector ] keep
     [ set-slider-viewport ] keep
-    f line-border over set-delegate
     <thumb> over add-thumb
     dup slider-actions ;
 

@@ -17,7 +17,9 @@ SYMBOL: stack-display
         
         {{
             [[ background [ 255 255 255 ] ]]
-            [[ rollover-bg [ 255 255 204 ] ]]
+            [[ rollover-bg [ 216 216 255 ] ]]
+            [[ bevel-1 [ 160 160 160 ] ]]
+            [[ bevel-2 [ 216 216 216 ] ]]
             [[ foreground [ 0 0 0 ] ]]
             [[ reverse-video f ]]
             [[ font "Sans Serif" ]]

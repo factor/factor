@@ -43,4 +43,8 @@ sequences io sequences styles ;
     [ drop ] [ drag 1 ] set-action ;
 
 : <button> ( label quot -- button )
-    >r <label> line-border dup r> button-gestures ;
+    >r
+    <label> bevel-border
+    dup [ 216 216 216 ] background set-paint-prop
+    dup
+    r> button-gestures ;

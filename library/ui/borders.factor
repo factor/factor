@@ -11,8 +11,14 @@ C: border ( child delegate size -- border )
     [ set-delegate ] keep
     [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
 
+: empty-border ( child -- border )
+    <gadget> { 5 5 0 } <border> ;
+
 : line-border ( child -- border )
     <etched-gadget> { 5 5 0 } <border> ;
+
+: bevel-border ( child -- border )
+    <bevel-gadget> { 5 5 0 } <border> ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-shape-loc ;

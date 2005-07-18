@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables io kernel lists math matrices
-namespaces sdl sequences strings styles ;
+namespaces sdl sequences strings styles vectors ;
 
 SYMBOL: clip
 
@@ -62,7 +62,7 @@ GENERIC: draw-gadget* ( gadget -- )
         dup rollover paint-prop rollover-bg background ?
     ] ifte paint-prop ;
 
-! Paint properties
+! Pen paint properties
 SYMBOL: interior
 SYMBOL: boundary
 
@@ -78,6 +78,7 @@ TUPLE: solid ;
     >r x get y get r> dup shape-w swap shape-h
     >r pick + r> pick + ;
 
+! Solid pen
 M: solid draw-interior
     drop >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
 
@@ -85,6 +86,7 @@ M: solid draw-boundary
     drop >r surface get r> [ rect>screen >r 1 - r> 1 - ] keep
     fg rgb rectangleColor ;
 
+! Gradient pen
 TUPLE: gradient vector from to ;
 
 : gradient-color ( gradient prop -- color )
@@ -116,6 +118,40 @@ M: gradient draw-interior ( gadget gradient -- )
     over gradient-vector { 1 0 0 } =
     [ horiz-gradient ] [ vert-gradient ] ifte ;
 
+! Bevel pen
+TUPLE: bevel width ;
+
+: x1/x2/y1 surface get pick pick >r 2unseq r> first swap ;
+: x1/x2/y2 surface get pick pick >r first r> 2unseq ;
+: x1/y1/y2 surface get pick pick >r 2unseq r> second ;
+: x2/y1/y2 surface get pick pick >r second r> 2unseq swapd ;
+
+SYMBOL: bevel-1
+SYMBOL: bevel-2
+
+: bevel-up ( gadget -- rgb )
+    dup reverse-video paint-prop bevel-1 bevel-2 ? paint-prop rgb ;
+
+: bevel-down ( gadget -- rgb )
+    dup reverse-video paint-prop bevel-2 bevel-1 ? paint-prop rgb ;
+
+: draw-bevel ( v1 v2 gadget -- )
+    [ >r x1/x2/y1 r> bevel-up   hlineColor ] keep
+    [ >r x1/x2/y2 r> bevel-down hlineColor ] keep
+    [ >r x1/y1/y2 r> bevel-up   vlineColor ] keep
+    [ >r x2/y1/y2 r> bevel-down vlineColor ] keep
+    3drop ;
+
+M: bevel draw-boundary ( gadget boundary -- )
+    #! Ugly code.
+    bevel-width [
+        [
+            >r x get y get 0 3vector over shape-dim over v+ r>
+            { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
+            rot draw-bevel
+        ] 2keep
+    ] repeat drop ;
+
 M: gadget draw-gadget* ( gadget -- )
     dup
     dup interior paint-prop* draw-interior
@@ -126,3 +162,6 @@ M: gadget draw-gadget* ( gadget -- )
 
 : <etched-gadget> ( -- gadget )
     <plain-gadget> dup << solid f >> boundary set-paint-prop ;
+
+: <bevel-gadget> ( -- gadget )
+    <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;

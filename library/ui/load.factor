@@ -23,6 +23,8 @@ USING: kernel parser sequences io ;
     "/library/ui/incremental.factor"
     "/library/ui/panes.factor"
     "/library/ui/presentations.factor"
+    "/library/ui/books.factor"
+    "/library/ui/tutorial.factor"
     "/library/ui/init-world.factor"
     "/library/ui/ui.factor"
 ] [
