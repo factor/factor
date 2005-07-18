@@ -133,7 +133,7 @@ IN: hashtables
     swap [ with ] hash-each 2drop ; inline
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
-    >r hash>alist r> subset alist>hash ;
+    >r hash>alist r> subset alist>hash ; inline
 
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
