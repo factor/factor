@@ -4,4 +4,4 @@ IN: matrices
 USING: kernel math ;
 
 : norm ( vec -- n ) norm-sq sqrt ;
-: normalize ( vec -- vec ) [ norm recip ] keep n*v ;
+: normalize ( vec -- vec ) dup norm v/n ;

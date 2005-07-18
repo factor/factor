@@ -34,7 +34,6 @@ DEFER: t?
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
-: xor ( a b -- a^b ) dup not swap ? ; inline
 
 : cpu ( -- arch ) 7 getenv ;
 : os ( -- os ) 11 getenv ;

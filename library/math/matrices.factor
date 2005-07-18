@@ -5,6 +5,8 @@ USING: errors generic kernel lists math namespaces sequences
 vectors ;
 
 ! Vector operations
+: vneg ( v -- v ) [ neg ] map ;
+
 : n*v ( n vec -- vec ) [ * ] map-with ;
 : v*n ( vec n -- vec ) swap n*v ;
 : n/v ( n vec -- vec ) [ / ] map-with ;
@@ -14,10 +16,10 @@ vectors ;
 : v- ( v v -- v ) [ - ] 2map ;
 : v* ( v v -- v ) [ * ] 2map ;
 : v/ ( v v -- v ) [ / ] 2map ;
-: vand ( v v -- v ) [ and ] 2map ;
-: vor ( v v -- v ) [ or ] 2map ;
 : vmax ( v v -- v ) [ max ] 2map ;
 : vmin ( v v -- v ) [ min ] 2map ;
+: vand ( v v -- v ) [ and ] 2map ;
+: vor ( v v -- v ) [ or ] 2map ;
 : v< ( v v -- v ) [ < ] 2map ;
 : v<= ( v v -- v ) [ <= ] 2map ;
 : v> ( v v -- v ) [ > ] 2map ;
@@ -26,12 +28,10 @@ vectors ;
 : vbetween? ( v from to -- v )
     >r over >r v>= r> r> v<= vand ;
 
-: vneg ( v -- v ) [ neg ] map ;
-
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product 1 [ * ] reduce ;
-: conj ( v -- ? ) t [ and ] reduce ;
-: disj ( v -- ? ) f [ or ] reduce ;
+: conj ( v -- ? ) [ ] all? ;
+: disj ( v -- ? ) [ ] contains? ;
 
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;

@@ -41,12 +41,14 @@ G: each ( seq quot -- | quot: elt -- )
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
 
-G: find [ over ] [ type ] ; inline
+G: find ( seq quot -- i elt )
+    [ over ] [ type ] ; inline
 
 : find-with ( obj seq quot -- i elt )
     swap [ with rot ] find 2swap 2drop ; inline
 
-G: find* [ over ] [ type ] ; inline
+G: find* ( i seq quot -- i elt )
+    [ over ] [ type ] ; inline
 
 : find-with* ( obj i seq quot -- i elt )
     -rot [ with rot ] find* 2swap 2drop ; inline

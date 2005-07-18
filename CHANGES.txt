@@ -7,13 +7,6 @@ Factor 0.76:
   supports styled text output, presentations, and an
   automatically-updated data stack display.
 
-- The number of generations used for garbage collection can now be set
-  with the +G command line switch. You must specify at least 2
-  generations.
-
-- Only 2 generations are used by default now, since there seems to be no
-  performance benefit to having 3 after running some brief benchmarks.
-
 - The following formely list-specific words are now generic:
     
     all? all-with? subset subset-with fiber? prune
@@ -27,8 +20,21 @@ Factor 0.76:
 
 - The nreverse word has been removed.
 
-- reversed ( seq -- seq ) outputs a new sequence that shares structure
-  with the given sequence, but presents elements in reverse order.
+- The , word no longer accepts a string as input. Formely, the following
+  two lines were equivalent:
+  
+  [ "Hello" , " world" , ] make-string
+  [ "Hello" % " world" % ] make-string
+  
+  Now, the former raises a type error.
+  
+- The stream-write, stream-write-attr, write and write-attr generic   
+  words no longer accept a character as an argument. Use the new
+  stream-write1 and write1 generic words to write single characters.
+
+- reverse-slice ( seq -- seq ) outputs a new sequence that shares
+  structure with the given sequence, but presents elements in reverse
+  order.
 
 - Many improvements to the matrices library.
 
@@ -38,6 +44,13 @@ Factor 0.76:
   a stream that reads from the given string.
 
 - Improved inspector. Call it with inspect ( obj -- ).
+
+- The number of generations used for garbage collection can now be set
+  with the +G command line switch. You must specify at least 2
+  generations.
+
+- Only 2 generations are used by default now, since there seems to be no
+  performance benefit to having 3 after running some brief benchmarks.
 
 - Fixed bug where images saved from the jEdit plugin would fail to
   start.

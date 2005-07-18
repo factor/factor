@@ -10,6 +10,7 @@ C: reversed [ set-delegate ] keep ;
 : reversed@ delegate [ length swap - 1 - ] keep ;
 M: reversed nth ( n seq -- elt ) reversed@ nth ;
 M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
+M: reversed thaw ( seq -- seq ) delegate reverse ;
 
 ! A repeated sequence is the same element n times.
 TUPLE: repeated length object ;

@@ -73,7 +73,7 @@
 
 \chapter*{Foreword}
 
-This handbook documents release 0.75 of the Factor programming language.
+This handbook documents release 0.76 of the Factor programming language.
 
 Note that this handbook is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general algorithm and program design.
 
@@ -1041,11 +1041,6 @@ Outputs \texttt{t} if both of the inputs are true.
 \ordinaryword{or}{or ( ?~?~-- ?~)}
 }
 Outputs \texttt{t} if at least one of the inputs is true.
-\wordtable{
-\vocabulary{kernel}
-\ordinaryword{xor}{xor ( ?~?~-- ?~)}
-}
-Outputs \texttt{t} if exactly one of the inputs is true.
 
 An alternative set of logical operations operate on individual bits of integers bitwise, rather than generalized boolean truth values. They are documented in \ref{bitwise}.
 
@@ -1184,17 +1179,12 @@ Save and restore the call stack contents. The call stack does not include the cu
 \wordtable{
 \vocabulary{namespaces}
 \ordinaryword{namestack}{namestack ( -- list )}
-\\
-\vocabulary{namespaces}
 \ordinaryword{set-namestack}{set-namestack ( list -- )}
-
 }
 Save and restore the name stack, used for dynamic variable bindings. See \ref{namespaces}.
 \wordtable{
 \vocabulary{errors}
 \ordinaryword{catchstack}{catchstack ( -- list )}
-\\
-\vocabulary{errors}
 \ordinaryword{set-catchstack}{set-catchstack ( list -- )}
 
 }
@@ -1743,7 +1733,7 @@ Defines a predicate class deriving from \texttt{parent} whose instances are the 
 For example, the \texttt{strings} vocabulary contains subclasses of \texttt{integer}
 classifying various ASCII characters:
 \begin{verbatim}
-PREDICATE: integer blank " \t\n\r" string-contains? ;
+PREDICATE: integer blank " \t\n\r" member? ;
 PREDICATE: integer letter CHAR: a CHAR: z between? ;
 PREDICATE: integer LETTER CHAR: A CHAR: Z between? ;
 PREDICATE: integer digit CHAR: 0 CHAR: 9 between? ;
@@ -1819,13 +1809,13 @@ Each tuple can have an optional delegate tuple. Generic words called on
 the tuple that do not have a method for the tuple's class will be passed on
 to the delegate. Note that delegation to objects that are not tuples is not fully supported at this stage and might not work as you might expect.
 \wordtable{
-\vocabulary{syntax}
+\vocabulary{generic}
 \ordinaryword{delegate}{delegate ( object -- object )}
 
 }
 Returns an object's delegate, or \texttt{f} if no delegate is set. Note that in this case,  undefined methods will be passed to \texttt{f}; rather an error is raised immediately.
 \wordtable{
-\vocabulary{syntax}
+\vocabulary{generic}
 \ordinaryword{set-delegate}{set-delegate ( object tuple -- )}
 
 }
@@ -1834,6 +1824,16 @@ Sets a tuple's delegate.
 Factor uses delegation is used instead of inheritance, but it is not a direct
 substitute; in particular, the semantics differ in that a delegated
 method call receives the delegate on the stack, not the original object.
+
+Class membership test pridicates only test if an object is a direct instance of that class. Sometimes, you need to check if an object \emph{or its delegate} is an instance of a class. This can be done with the \verb|is?| combinator.
+
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{is?}{is?~( object quot -- ?~)}
+\texttt{quot:~obj -- ?~)}\\
+}
+
+Tests if the quotation outputs a true value when applied to the object or some object that it delegates to.
 
 \part{Library reference}
 
@@ -1859,19 +1859,20 @@ A handful of ``virtual'' sequences are provided by the library. These sequences 
 \begin{verbatim}
 repeated
 range
+reversed
 slice
 \end{verbatim}
 User-defined classes can also implement the sequence protocol and gain the ability to reuse many of the words in this section.
 
 \section{Sequence protocol}
 
-The following set of generic words is the core of the sequence protocol. The mutating words are not supported by all sequences; in particular, lists and strings are immutable.
+The following set of generic words constitutes the sequence protocol. The mutating words are not supported by all sequences; in particular, lists and strings are immutable.
 
 \glossary{name=resizable sequence,
 description={a sequence implementing the \texttt{set-length} generic word. For example, vectors and string buffers}}
 \glossary{name=mutable sequence,
 description={a sequence implementing the \texttt{set-nth} generic word. For example, vectors and string buffers}}
-The sequence protocol consists of a set of generic words. Any object that is an instance of a class implementing these generic words can be thought of as a sequence, and given to the words in the following sections.
+An object that is an instance of a class implementing these generic words can be thought of as a sequence, and given to the words in the following sections.
 
 \wordtable{
 \vocabulary{sequences}
@@ -1882,7 +1883,7 @@ Outputs the length of the sequence. All sequences support this operation.
 \vocabulary{sequences}
 \genericword{set-length}{set-length ( n seq -- )}
 }
-Resizes the sequence. Only vectors and string buffers support this operation.
+Resizes the sequence. Not all sequences can be resized.
 
 \wordtable{
 \vocabulary{sequences}
@@ -1898,199 +1899,47 @@ Sets the $n$th element of the sequence. Storing beyond the end of a resizable se
 
 \section{Sequence operations}
 
-\subsection{Queries}
+\subsection{Iteration}\label{iteration}
 
-The following set of words inspect sequence elements without modifying or creating anything.
-
-\wordtable{
-\vocabulary{sequences}
-\genericword{empty?}{empty?~( seq -- ?~)}
-}
-Tests if the sequence contains any elements. The default implementation of this word tests if the length is zero; user-defined sequences can provide a custom implementation that is more efficient.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{index}{index ( obj seq -- n )}
-\ordinaryword{index*}{index* ( obj i seq -- n )}
-}
-Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$. The \verb|index*| form allows a start index to be specified.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{contains?}{contains?~( elt seq -- ?~)}
-}
-Tests if \texttt{seq} contains an element equal to \texttt{elt}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{start}{start ( subseq seq -- n )}
-\ordinaryword{start*}{start* ( subseq i seq -- n )}
-}
-Outputs the start index of a subsequence, or $-1$ if the subsequence does not occur in the sequence. The \verb|start*| form allows a start index to be specified.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
-}
-Tests if \texttt{s2} contains \texttt{s1} as a subsequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{head?}{head?~( s1 s2 -- ?~)}
-\ordinaryword{tail?}{tail?~( s1 s2 -- ?~)}
-
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
+Standard iteration patterns are abstracted away in these words.
 
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{peek}{peek ( sequence -- element )}
-}
-Outputs the last element of the sequence. Throws an exception if the sequence is empty.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}
-}
-Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
-
-\subsection{Functional operations}
-
-The following set of words do not modify their inputs.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{append}{append ( s1 s2 -- seq )}
-}
-Output a new sequence consisting of the elements of \texttt{s1} followed by the elements of \texttt{s2}. The new sequence is of the same class as \texttt{s1}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{append3}{append3 ( s1 s2 s3 -- seq )}
-}
-Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new sequence of the same class as \texttt{s1}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{concat}{concat ( sequence -- sequence )}
-}
-The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
-\begin{alltt}
-\textbf{ok} [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
-\textbf{"abc"}
-\end{alltt}
-\wordtable{
-\vocabulary{sequences}
-\genericword{reverse}{reverse ( seq -- seq )}
-}
-Outputs a new sequence of the same class, with the reverse element order.
-
-\subsection{Subsequences}\label{subseq}
-
-The following set of words do not modify their inputs.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{head}{head~( n seq -- seq )}
-}
-Outputs a new sequence consisting of the first $n$ elements of the input sequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail}{tail~( n seq -- seq )}
-}
-Outputs a new sequence consisting of all elements of the sequence, starting at the $n$th index.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail*}{tail*~( n seq -- seq )}
-}
-Outputs a new sequence consisting of the last $n$ elements of the input sequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
-\ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1} as a subsequence. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
-}
-Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-\textbf{ok} "Hello world" 5 cut .s
-\textbf{" world"
-"Hello"}
-\end{alltt}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{cut*}{cut* ( seq n -- s1 s2 )}
-}
-
-Outputs a pair of sequences that equal the original sequence excluding the $n$th element, when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-\textbf{ok} "Hello world" 5 cut* .s
-\textbf{"world"
-"Hello"}
-\end{alltt}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{split1}{split1~( seq split -- before after )}
-}
-If \texttt{seq} does not contain \texttt{split} as a subsequence, then \texttt{before} is equal to the \texttt{seq}, and \texttt{after} is \texttt{f}. Otherwise, \texttt{before} and \texttt{after} are both sequences, and yield the input excluding \texttt{split} when appended.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{split}{split~( seq split -- list )}
-}
-Outputs a list of subsequences taken between occurrences of \texttt{split} in \texttt{seq}. If \texttt{split} does not occur in \texttt{seq}, outputs a singleton list containing \texttt{seq} only.
-\begin{alltt}
-\textbf{ok} "/usr/local/bin" "/" split .
-\textbf{[ "" "usr" "local" "bin" ]}
-\end{alltt}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{split-n}{split-n~( str n -- list )}
-}
-Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
-
-\subsection{Imperitive operations}
-
-The following set of sequence operations modify their inputs. The ``n'' prefix denotes ``non-constructive''; these words do not construct new output objects. None of these operations are permitted on immutable sequences like lists and strings.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{nappend}{nappend ( s1 s2 -- )}
-}
-Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{nreverse}{nreverse ( sequence -- )}
-}
-Reverses the elements of \texttt{seq}. Nothing is output, and \texttt{seq} is modified.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{push}{push ( element sequence -- )}
-\ordinaryword{pop}{pop ( sequence -- element )}
-}
-
-Adds and removes an element at the end of the sequence. The sequence's length is adjusted accordingly. These are implemented as follows:
-\begin{verbatim}
-: push ( element sequence -- )
-    dup length swap set-nth ;
-: pop ( sequence -- element )
-    dup peek >r dup length 1 - swap set-length r> ;
-\end{verbatim}
-
-\section{Sequence combinators}\label{sequence-combinators}
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{change-nth}{change-nth ( seq n quot -- )}
-\texttt{quot:~element -- element}\\
-}
-Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{each}{each ( seq quot -- )}
+\genericword{each}{each ( seq quot -- )}
 \texttt{quot:~element --}\\
 }
 Applies the quotation to each element of the sequence.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{tree-each}{tree-each ( seq quot -- )}
+\ordinaryword{reduce}{reduce ( seq ident quot -- result )}
+\texttt{quot:~previous element -- next}\\
+}
+Combines successive elements of the sequence using a binary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is \verb|ident|. For example, the \verb|sum| word adds a sequence of numbers together, and is defined as follows:
+\begin{alltt}
+: sum ( seq -- n ) 0 [ + ] reduce ;
+\end{alltt}
+The \verb|reduce| word has a very simple implementation:
+\begin{verbatim}
+: reduce ( seq ident quot -- result ) swapd each ; inline
+\end{verbatim}
+So indeed, it is an expression of an idiom rather than an algorithm. Various words that combine the \verb|reduce| combinator together with an identity and mathematical operation are defined in \ref{reductions}.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{accumulate}{accumulate ( seq ident quot -- results )}
+\texttt{quot:~previous element -- next}\\
+}
+Like \verb|reduce|, but instead outputs a sequence of intermediate values. The first element of the resulting sequence is always \verb|ident|. For example,
+\begin{alltt}
+\textbf{ok} { 2 2 2 2 2 } 0 [ + ] accumulate .
+{ 0 2 4 6 8 }
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\genericword{tree-each}{tree-each ( seq quot -- )}
 \texttt{quot:~element --}\\
 }
-Applies the quotation to each element of the sequence. Elements that are themselves sequences are iterated recursively.
+Applies the quotation to each element of the sequence. Elements that are themselves sequences are iterated recursively. Note that this word only operates on lists, strings, string buffers and vectors, not on virtual sequences or user-defined sequences.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{map}{map ( seq quot -- seq )}
@@ -2121,12 +1970,295 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new element is stored back in \texttt{s1}. This modifies \texttt{s1} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{each-with}{each-with ( object seq quot -- )}
-\texttt{quot:~object element --}\\
-\ordinaryword{map-with}{map-with ( object seq quot -- seq )}
-\texttt{quot:~object element -- element}\\
+\genericword{find}{find ( seq quot -- i elt )}
+\genericword{find*}{find*~( i seq quot -- i elt )}
+\texttt{quot:~elt -- ?}\\
+}
+Applies the quotation to each element of the sequence in turn, until it outputs a true value or the end of the sequence is reached. If the quotation yields a true value for some sequence element, the element index and the element itself are output. Otherwise, outputs $-1$ and \verb|f|. The \verb|find*| combinator is a variation that takes a starting index as a parameter. Various higher-level words are built on this combinator. Usually, they are used instead:
+\begin{verbatim}
+contains? ( seq quot -- ? )
+all? ( seq quot -- ? )
+index ( elt seq -- i )
+index* ( i elt seq -- i )
+member? ( elt seq -- ? )
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{each-with}{each-with ( obj seq quot -- )}
+\texttt{quot:~obj elt --}\\
+\ordinaryword{map-with}{map-with ( obj seq quot -- seq )}
+\texttt{quot:~obj elt -- elt}\\
 \ordinaryword{tree-each-with}{tree-each-with ( obj seq quot -- )}
-\texttt{quot:~obj element --}\\
+\texttt{quot:~obj elt --}\\
+\ordinaryword{find-with}{find-with ( obj seq quot -- i elt )}
+\texttt{quot:~obj elt -- ?}\\
+\ordinaryword{find-with*}{find-with*~( obj i seq quot -- i elt )}
+\texttt{quot:~obj elt -- ?}\\
+}
+Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
+
+\subsection{Stack operations}
+
+The following words allow any mutable, growable sequence to be used as a LIFO (last in, first out) stack.
+
+\wordtable{
+\vocabulary{sequences}
+\genericword{empty?}{empty?~( seq -- ?~)}
+}
+Tests if the sequence contains any elements. The default implementation of this word tests if the length is zero; user-defined sequences can provide a custom implementation that is more efficient.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{peek}{peek ( sequence -- element )}
+}
+Outputs the last element of the sequence. Throws an exception if the sequence is empty. This word has a trivial implementation:
+\begin{verbatim}
+: peek ( sequence -- element ) dup length 1 - swap nth ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{push}{push ( element sequence -- )}
+\ordinaryword{pop}{pop ( sequence -- element )}
+}
+
+Adds and removes an element at the end of the sequence. The sequence's length is adjusted accordingly. These are implemented as follows:
+\begin{verbatim}
+: push ( element sequence -- )
+    dup length swap set-nth ;
+: pop ( sequence -- element )
+    dup peek >r dup length 1 - swap set-length r> ;
+\end{verbatim}
+
+\subsection{Aggregation}\label{aggregation}
+
+A set of words for combining sequences into new sequences.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{append}{append ( s1 s2 -- seq )}
+}
+Output a new sequence consisting of the elements of \texttt{s1} followed by the elements of \texttt{s2}. The new sequence is of the same class as \texttt{s1}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{append3}{append3 ( s1 s2 s3 -- seq )}
+}
+Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new sequence of the same class as \texttt{s1}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{concat}{concat ( sequence -- sequence )}
+}
+The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
+\begin{alltt}
+\textbf{ok} [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
+\textbf{"abc"}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{nappend}{nappend ( s1 s2 -- )}
+}
+Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified.
+\wordtable{
+\vocabulary{sequences}
+\genericword{reverse}{reverse ( seq -- seq )}
+}
+Outputs a new sequence of the same class, with the reverse element order. A related word is \verb|reverse-slice|; see \ref{virtual-seq}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}
+}
+Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
+
+\subsection{Indexing}
+
+A set of words dealing with sequence element indices.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{change-nth}{change-nth ( seq n quot -- )}
+\texttt{quot:~element -- element}\\
+}
+Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{index}{index ( obj seq -- n )}
+\ordinaryword{index*}{index* ( obj i seq -- n )}
+}
+Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$. The \verb|index*| form allows a start index to be specified. A related word is \verb|member?|.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{start}{start ( subseq seq -- n )}
+\ordinaryword{start*}{start* ( subseq i seq -- n )}
+}
+Outputs the start index of a subsequence, or $-1$ if the subsequence does not occur in the sequence. The \verb|start*| form allows a start index to be specified. A related word is \verb|subseq?|.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
+}
+Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 cut .s
+\textbf{" world"
+"Hello"}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{cut*}{cut* ( seq n -- s1 s2 )}
+}
+Outputs a pair of sequences that equal the original sequence excluding the $n$th element, when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+\textbf{ok} "Hello world" 5 cut* .s
+\textbf{"world"
+"Hello"}
+\end{alltt}
+
+\subsection{Subsequences}\label{subseq}
+
+A set of words for extracting subsequences of contiguous elements, and performing operations on them.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
+}
+Tests if \texttt{s2} contains \texttt{s1} as a subsequence. A related word is \verb|start|.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head?}{head?~( s1 s2 -- ?~)}
+\ordinaryword{tail?}{tail?~( s1 s2 -- ?~)}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head}{head~( n seq -- seq )}
+}
+Outputs a new sequence consisting of the first $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail}{tail~( n seq -- seq )}
+}
+Outputs a new sequence consisting of all elements of the sequence, starting at the $n$th index.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail*}{tail*~( n seq -- seq )}
+}
+Outputs a new sequence consisting of the last $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
+\ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a subsequence. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{split1}{split1~( seq split -- before after )}
+}
+If \texttt{seq} does not contain \texttt{split} as a subsequence, then \texttt{before} is equal to the \texttt{seq}, and \texttt{after} is \texttt{f}. Otherwise, \texttt{before} and \texttt{after} are both sequences, and yield the input excluding \texttt{split} when appended.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{split}{split~( seq split -- list )}
+}
+Outputs a list of subsequences taken between occurrences of \texttt{split} in \texttt{seq}. If \texttt{split} does not occur in \texttt{seq}, outputs a singleton list containing \texttt{seq} only.
+\begin{alltt}
+\textbf{ok} "/usr/local/bin" "/" split .
+\textbf{[ "" "usr" "local" "bin" ]}
+\end{alltt}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{group}{group~( str n -- list )}
+}
+Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
+
+\section{Set-theoretic operations}
+
+A set of words for testing membership, and aggregating sequences without regard for element order.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{member?}{member?~( elt seq -- ?~)}
+}
+Tests if \texttt{seq} contains an element equal to \texttt{elt}. A related word is \verb|index|.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{memq?}{memq?~( elt seq -- ?~)}
+}
+Tests if the sequence contains the actual object given. Elements are compared by identity.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{contained?}{contained?~( s1 s2 -- ?~)}
+}
+Tests if every element of \texttt{s1} is equal to some element of \texttt{s2}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{remove}{remove ( object seq -- seq )}
+}
+Outputs a new sequence containing all elements of the input sequence except those equal to the \texttt{object}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{remq}{remq ( object seq -- seq )}
+}
+Outputs a new sequence containing all elements of the \texttt{list} except \texttt{object}. Elements are compared by identity.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{prune}{prune ( seq -- seq )}
+}
+Outputs a new sequence with each element of \verb|seq| appearing only once.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{seq-union}{seq-union ( seq seq -- seq )}
+}
+Outputs a sequence of elements present in one or both sequences, filtering duplicates by comparing elements for equality.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{seq-intersect}{seq-intersect ( seq seq -- seq )}
+}
+Outputs a sequence of elements present in both sequences, comparing elements for equality.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{seq-diff}{seq-diff ( s1 s2 -- seq )}
+}
+Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for equality.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{seq-diffq}{seq-diff ( s1 s2 -- seq )}
+}
+Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for identity.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{subset}{subset ( seq quot -- seq )}
+\texttt{quot:~element -- ?}\\
+}
+Applies the quotation to each element, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{contains?}{contains?~( seq quot -- ?~)}
+\texttt{quot:~element -- ?}\\
+}
+Applies the quotation to each element of the sequence. If an element is found for which the quotation outputs a true value, a true value is output. Otherwise if the end of the sequence is reached, \verb|f| is output.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{all?}{all?~( seq quot -- ?~)}
+\texttt{quot:~element -- ?}\\
+}
+Outputs \texttt{t} if the quotation yields true when applied to each element, otherwise outputs \texttt{f}. Given an empty sequence, vacuously outputs \texttt{t}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{fiber?}{fiber?~( seq quot -- ?~)}
+\texttt{quot:~element element -- ?}\\
+}
+Tests if all elements of the sequence are equivalent under the relation. The quotation should be an equality relation, otherwise the result will not be useful. This is implemented by vacuously outputting \verb|t| if the sequence is empty, or otherwise, by applying the quotation to each element together with the first element in turn, and testing if it always yields a true value. Usually, this word is used to test if all elements of a sequence are equal, or the same element:
+\begin{verbatim}
+[ = ] fiber?
+[ eq? ] fiber?
+\end{verbatim}
+
+\wordtable{
+\ordinaryword{subset-with}{subset-with ( object seq quot -- seq )}
+\texttt{quot:~object element -- ?}\\
+\ordinaryword{some-with?}{some-with?~( object seq quot -- ?~)}
+\texttt{quot:~object element -- ?}\\
+\ordinaryword{all-with?}{all-with?~( object seq quot -- ?~)}
+\texttt{quot:~object element -- ?}\\
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
@@ -2165,14 +2297,8 @@ Creates a new vector of the requested length, where all elements are initially \
 \ordinaryword{zero-vector}{zero-vector~( length -- vector )}
 }
 Creates a new vector of the requested length, where all elements are initially \texttt{f}.
-\wordtable{
-\vocabulary{vectors}
-\ordinaryword{vector-project}{vector-project~( n quot -- vector )}
-\texttt{quot:~i -- element}\\
-}
-Calls the quotation sequentially with integers $0$ up to $n-1$, collecting the results into a new vector.
 
-\section{Cons cells}
+\section{Cons cells}\label{cons-cells}
 
 \consglos
 \glossary{name=car,description=the first component of a cons cell}
@@ -2271,8 +2397,6 @@ A \emph{general list} is either the empty list or a cons cell. A \emph{list} is 
 Not all list operations will function given an improper list,
 however methods are usually defined on \texttt{general-list} not \texttt{list} since dispatching on \texttt{list} involves a costly check.
 
-\subsection{List operations}
-
 \wordtable{
 \vocabulary{lists}
 \ordinaryword{>list}{>list ( sequence -- list )}
@@ -2315,78 +2439,13 @@ Pushes the first three elements of a list.
 If the list already contains an element equal to the object, do nothing, otherwise cons the object into the list.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{prune}{prune ( list -- list )}
-}
-Removes all duplicates from the list by testing elements for equality.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{all=?}{all=?~( list -- ?~)}
-}
-Tests if all elements of the list are equal. For the empty list, this is vacuously true.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{count}{count~( n -- list )}
 }
 Return a new list containing all integers from 0 up to $n-1$, inclusive.
 
-\subsection{Set-theoretic operations}
-
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{memq?}{memq?~( object list -- ?~)}
-}
-Tests if \texttt{list} contains \texttt{object}. Elements are compared by identity.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{contained?}{contained?~( l1 l2 -- ?~)}
-}
-Tests if every element of \texttt{l1} is equal to some element of \texttt{l2}.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{remove}{remove ( object list -- list )}
-}
-Outputs a new list containing all elements of the \texttt{list} except those equal to the \texttt{object}.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{remq}{remq ( object list -- list )}
-}
-Outputs a new list containing all elements of the \texttt{list} except \texttt{object}. Elements are compared by identity.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{intersection}{intersection ( list list -- list )}
-}
-Outputs a list of elements present in both lists.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{difference}{difference ( l1 l2 -- list )}
-}
-Outputs a list of elements present in \texttt{l2} but not \texttt{l1}.
-
-\subsection{List combinators}
-
-The two most frequently-used combinators are \verb|each| and \verb|map|, they can be used with any sequence and are documented in \ref{sequence-combinators}.
-
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{subset}{subset ( list quot -- list )}
-\texttt{quot:~element -- ?}\\
-}
-Applies the quotation to each element, and outputs a new list containing the elements of the original list for which the quotation output true.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{some?}{some?~( list quot -- list )}
-\texttt{quot:~element -- ?}\\
-}
-Applies the quotation to each element, and outputs the rest of the list upon encountering an element for which the quotation outputs true. If the quotation did not output true for any element, \texttt{some?}~outputs \texttt{f}. Note that the output is a generalized boolean; if the quotation matched any element, the result is true.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{all?}{all?~( list quot -- list )}
-\texttt{quot:~element -- ?}\\
-}
-Outputs \texttt{t} if the quotation yields true when applied to each element, otherwise outputs \texttt{f}. Given the empty list, vacuously outputs \texttt{t}.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{sort}{all?~( list quot -- list )}
+\ordinaryword{sort}{sort~( list quot -- list )}
 \texttt{quot:~e1 e2 -- ?}\\
 }
 Sorts the list by comparing each pair of elements with the quotation. The quotation should output \texttt{t} if \texttt{e2} is to come before \texttt{e1} in the list. For example, to sort a list of numbers in ascending order, you can do the following:
@@ -2394,16 +2453,6 @@ Sorts the list by comparing each pair of elements with the quotation. The quotat
 \textbf{ok} [ 8 6 9 1 10 3 ] [ > ] sort .
 [ 1 3 6 8 9 10 ]
 \end{alltt}
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{subset-with}{subset-with ( object list quot -- list )}
-\texttt{quot:~object element -- ?}\\
-\ordinaryword{some-with?}{some-with?~( object list quot -- ?~)}
-\texttt{quot:~object element -- ?}\\
-\ordinaryword{all-with?}{all-with?~( object list quot -- ?~)}
-\texttt{quot:~object element -- ?}\\
-}
-Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
 \subsection{Queues}
 
@@ -2485,10 +2534,11 @@ This is used to sort lists of strings:
 Creates a string with \texttt{char} repeated $n$ times.
 \wordtable{
 \vocabulary{strings}
-\ordinaryword{pad}{pad~( string n char -- string )}
+\ordinaryword{pad-left}{pad-left~( string n char -- string )}
+\ordinaryword{pad-right}{pad-right~( string n char -- string )}
 
 }
-Creates a string with \texttt{char} repeated $l-n$ times, where $l$ is the length of \texttt{string}. If $l>n$, the empty string is output.
+Creates a string with \texttt{char} repeated $\max(0,l-n)$ times, where $l$ is the length of \texttt{string}, then appends this new string on the left or the right of the input string.
 
 \subsection{Characters}
 
@@ -2539,18 +2589,6 @@ description={an instance of the \texttt{repeated} class, which is a virtual, imm
 
 Virtual sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence.
 
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{<repeated>}{<repeated> ( n object -- seq )}
-}
-Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
-\begin{alltt}
-\textbf{ok} 5 "hey" <repeated> .
-<< repeated [ ] 5 "hey" >>
-\textbf{ok} 5 "hey" <repeated> >list .
-[ "hey" "hey" "hey" "hey" "hey" ]
-\end{alltt}
-
 \glossary{name=range sequence,
 description={an instance of the \texttt{range} class, which is a virtual sequence of integers}}
 \wordtable{
@@ -2568,6 +2606,25 @@ Creates an immutable sequence consisting of all integers in the interval $[a,b)$
 \end{alltt}
 \glossary{name=slice,
 description={an instance of the \texttt{slice} class, which is a virtual sequence sharing structure with a subrange of some underlying sequence}}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{<repeated>}{<repeated> ( n object -- seq )}
+}
+Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
+\begin{alltt}
+\textbf{ok} 5 "hey" <repeated> .
+<< repeated [ ] 5 "hey" >>
+\textbf{ok} 5 "hey" <repeated> >list .
+[ "hey" "hey" "hey" "hey" "hey" ]
+\end{alltt}
+
+\wordtable{
+\vocabulary{sequences}
+\genericword{reverse-slice}{reverse-slice ( seq -- seq )}
+}
+Outputs a sequence with the same length as the input sequence, that presents the elements of the input sequence in reverse order. The new sequence shares storage with the given sequence.
+A related word is \verb|reverse|, see \ref{aggregation}.
 
 \wordtable{
 \vocabulary{sequences}
@@ -2751,8 +2808,14 @@ Cons a pair of elements onto a pair of lists.
 \vocabulary{lists}
 \ordinaryword{2car}{2car ( c1 c2 -- car1 car2 )}
 \ordinaryword{2cdr}{2cdr ( c1 c2 -- cdr1 cdr2 )}
+\ordinaryword{2uncons}{2uncons ( c1 c2 -- car1 car2 cdr1 cdr2 )}
 }
-Deconstructs paired lists.
+Deconstructs paired lists. Compare the stack effects with those of \verb|car|, \verb|cdr| and \verb|uncons| in \ref{cons-cells}.
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}
+}
+Cons a pair of elements onto a pair of lists.
 
 \section{Hashtables}\label{hashtables}
 
@@ -2825,6 +2888,20 @@ Outputs the number of buckets in the hashtable. Ideally, this will be approximat
 \texttt{quot:~[[ key value ]] --}\\
 }
 Applies the quotation to each key/value pair in the hashtable.
+
+\wordtable{
+\vocabulary{hashtables}
+\ordinaryword{hash-subset}{hash-subset ( hash quot -- hash )}
+\texttt{quot:~[[ key value ]] -- ?}\\
+}
+Applies the quotation to each key/value pair, collecting the key/value pairs for which the quotation output a true value into a new hashtable.
+
+\wordtable{
+\vocabulary{hashtables}
+\ordinaryword{cache}{cache ( key hash quot -- value )}
+\texttt{quot:~key -- value}\\
+}
+If the key is present in the hashtable, return the associated value, otherwise apply the quotation to the key, yielding a new value that is then stored in the hashtable.
 
 \subsection{Converting between mappings}
 
@@ -3088,6 +3165,12 @@ Calls the quotation $n$ times. If $n<0$, the quotation is not called at all.
 \texttt{quot:~i -- i }\\
 }
 Calls \texttt{quot} $n$ times, with the parameter \texttt{i} ranging from 0 to $n-1$. The quotation must output $i$ unmodified; or indeed, if it modifies it, the loop continues from that index. That is, the value $i$ on the stack is the actual loop counter, not a copy.
+
+If you wish to perform an iteration over a range of integers that does not begin from zero, or an iteration that starts at a specific index and decreases towards zero, use the \verb|each| combinator (\ref{iteration}) in conjunction with a \verb|<range>| sequence (\ref{virtual-seq}), for example like so:
+\begin{verbatim}
+! Print all integers from 9 down to 4, inclusive
+9 3 <range> [ . ] each
+\end{verbatim}
 
 \subsection{Modular arithmetic}
 
@@ -3414,7 +3497,7 @@ Outputs the smallest integer greater than or equal to $x$.
 Outputs the greatest integer smaller than or equal to $x$.
 \wordtable{
 \vocabulary{math}
-\ordinaryword{truncate}{floor ( x -- n )}
+\ordinaryword{truncate}{truncate ( x -- n )}
 }
 Outputs the integer that results from subtracting the fractional component of $x$.
 
@@ -3441,7 +3524,7 @@ Computes the square (raised to power 2), square root (raised to power $1/2$), an
 \vocabulary{math}
 \ordinaryword{exp}{exp ( n -- n )}
 }
-Raises the number $e$\footnote{Approximately equal to $2.718281828459045$} to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows:
+Raises the number $e$ to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows\footnote{Of course, $e\approx 2.718281828459045$}:
 
 \begin{alltt}
 : exp ( x -- y ) e swap \^ ;
@@ -3480,8 +3563,8 @@ The following words in the \texttt{math} vocabulary push constant values on the 
 \begin{tabular}{l|l}
 Word&Value\\
 \hline
-\texttt{i}&Positive imaginary unit -- \texttt{\pound\tto 0 1 \ttc\pound}\\
-\texttt{-i}&Negative imaginary unit -- \texttt{\pound\tto 0 -1 \ttc\pound}\\
+\texttt{i}&Positive imaginary unit -- \texttt{\pound\tto~0 1 \ttc\pound}\\
+\texttt{-i}&Negative imaginary unit -- \texttt{\pound\tto~0 -1 \ttc\pound}\\
 \texttt{inf}&Positive floating point infinity\\
 \texttt{-inf}&Negative floating point infinity\\
 \texttt{e}&Base of natural logarithm ($e\approx 2.7182818284590452354$)\\
@@ -3499,38 +3582,89 @@ Any Factor sequence can be used to represent a mathematical vector, not just ins
 
 The usual mathematical operations on vectors are supported.
 
+\subsubsection{Scaling operations}
+
 \wordtable{
 \vocabulary{matrices}
+\ordinaryword{vneg}{vneg ( vec -- vec )}
+}
+Negates each element of a vector.
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v*n}{v*n ( vec n -- vec )}
 \ordinaryword{n*v}{n*v ( n vec -- vec )}
 }
-Multiplies each element of a vector by a scalar.
-\begin{alltt}
-\textbf{ok} 1/2 \tto 5 6 3 \ttc n*v .
-\textbf{\tto 5/2 3 3/2 \ttc}
-\end{alltt}
+Multiplies each element of the vector by a scalar. The two words only differ in argument order.
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{v/n}{v/n ( vec n -- vec )}
+\ordinaryword{n/v}{n/v ( n vec -- vec )}
+}
+Divides each element of the vector by a scalar, or alternatively, divides the scalar by each element of a vector. The two words yield different results; the elements of the two resulting vector are reciprocals of each other.
 
-Mathematically speaking, this is the \emph{action} of the field $\mathbb{C}$ on a vector space ${\mathbb{C}}^n$.
+\subsubsection{Pairwise operations}
+
+These words all expect a pair of vectors of equal length. They apply a binary operation to each pair of elements, producing a new vector. They are all implemented using the \verb|2map| combinator (\ref{iteration}).
 
 \wordtable{
 \vocabulary{matrices}
 \ordinaryword{v+}{v+ ( vec vec -- vec )}
+\ordinaryword{v-}{v-~( vec vec -- vec )}
+\ordinaryword{v*}{v*~( vec vec -- vec )}
+\ordinaryword{v/}{v/~( vec vec -- vec )}
+\ordinaryword{vmax}{vmax~( vec vec -- vec )}
+\ordinaryword{vmin}{vmin~( vec vec -- vec )}
+\ordinaryword{v<}{v<~( vec vec -- vec )}
+\ordinaryword{v<=}{v<=~( vec vec -- vec )}
+\ordinaryword{v>}{v>~( vec vec -- vec )}
+\ordinaryword{v>=}{v>=~( vec vec -- vec )}
+\ordinaryword{vand}{vand~( vec vec -- vec )}
+\ordinaryword{vor}{vor~( vec vec -- vec )}
 }
-Adds the elements of the two vectors, pairwise. They must be of equal length.
+
+Note that \verb|v*| is not the inner product. The inner product is the \verb|v.| word (\ref{inner-product}).
+
 \begin{alltt}
 \textbf{ok} \tto 0 2 1/2 1 \ttc \tto 5 6 3 8 \ttc v+ .
 \textbf{\tto 5 8 7/2 9 \ttc}
 \end{alltt}
 
+\subsubsection{Reducing operations}\label{reductions}
+
+These words take a vector as input and produce a single number (or boolean).
+
 \wordtable{
 \vocabulary{matrices}
-\ordinaryword{v*}{v* ( vec vec -- vec )}
+\ordinaryword{sum}{sum~( vec -- n )}
+\ordinaryword{product}{product~( vec -- n )}
 }
-Multiplies the elements of the two vectors, pairwise. They must be of equal length.
-\begin{alltt}
-\textbf{ok} \tto 1 2 3 4 \ttc \tto 2 2 1 1 \ttc v* .
-\textbf{\tto 2 4 3 4 \ttc}
-\end{alltt}
-This is \emph{not} the mathematical dot product or cross product operation.
+
+Adds or multiplies all numbers in the vector. These are implemented as follows:
+\begin{verbatim}
+: sum ( v -- n ) 0 [ + ] reduce ;
+: product 1 [ * ] reduce ;
+\end{verbatim}
+
+using the \verb|reduce| combinator (\ref{iteration}).
+
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{conj}{conj~( vec -- ?~)}
+}
+Tests if all elements in the vector are true values. This is implemented as follows:
+\begin{verbatim}
+: conj [ ] all? ;
+\end{verbatim}
+\wordtable{
+\vocabulary{matrices}
+\ordinaryword{disj}{disj~( vec -- ?~)}
+}
+Tests if at least one element in the vector is a true value. This is implemented as follows:
+\begin{verbatim}
+: conj [ ] contains? ;
+\end{verbatim}
+
+\subsubsection{Inner and cross products}\label{inner-product}
 
 \wordtable{
 \vocabulary{matrices}
@@ -3552,7 +3686,7 @@ Computes the norm (``length'') of a vector. The norm of a vector $v$ is defined 
 }
 Outputs a vector with the same direction, but length 1. Defined as follows:
 \begin{verbatim}
-: normalize ( vec -- vec ) [ norm recip ] keep n*v ;
+: normalize ( vec -- vec ) dup norm v/n ;
 \end{verbatim}
 
 \wordtable{
@@ -3704,11 +3838,17 @@ treated as a matrix with one row.
 description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
 
 Input and output is centered around the concept of a \emph{stream}, which is a source or
-sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium. A few stream implementations are provided by the library.
+sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium. There are two stream implementations that read and write external resources:
 
 \begin{description}
 \item[File streams] read and write local files.
 \item[Network streams] connect to servers and accept connections from clients.
+\end{description}
+
+The remaining types of streams wrap underlying streams and transform the data as it is read or written:
+
+\begin{description}
+\item[Line streams] read lines of text from an underlying stream supporting only character input.
 \item[HTML streams] implement the formatted output protocol to generate HTML from styled text attributes, then direct the HTML to an underlying stream.
 \item[Duplex streams] combine an input and output stream into a single bidirectional stream.
 \item[Null streams] return end of file on input, and ignore output.
@@ -3737,7 +3877,7 @@ The following two words are optional, and should be implemented on input streams
 \vocabulary{io}
 \genericword{stream-readln}{stream-readln ( s -- str/f )}
 }
-Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream; with file and network streams, it is a range of characters terminated by \verb|\n|, \verb|\r| or \verb|\r\n|.
+Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream. Streams that do not support this generic word can be wrapped in a line stream that reads lines terminated by \verb|\n|, \verb|\r| or \verb|\r\n|. File and network streams are automatically wrapped in line streams.
 \wordtable{
 \vocabulary{io}
 \genericword{stream-read1}{stream-read1 ( s -- char/f )}
@@ -3754,9 +3894,15 @@ The following three words are optional, and should be implemented on output stre
 
 \wordtable{
 \vocabulary{io}
-\genericword{stream-write-attr}{stream-write-attr ( str/ch attrs s -- )}
+\genericword{stream-write1}{stream-write1 ( ch s -- )}
 }
-Outputs a character or string to the stream. This might not result in immediate output to the underlying resource if the stream performs buffering, like all file and network streams do. 
+Outputs a character to the stream. This might not result in immediate output to the underlying resource if the stream performs buffering, like all file and network streams do. Output can be forced with \verb|stream-flush|.
+
+\wordtable{
+\vocabulary{io}
+\genericword{stream-write-attr}{stream-write-attr ( str attrs s -- )}
+}
+Outputs a string to the stream. As with \verb|stream-write1|, this may not result in an immediate output operation unless \verb|stream-flush| is called.
 
 The \texttt{attrs} parameter is an association list holding style information, and it is ignored by most streams -- one exception is HTML streams (\ref{html}). Most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
 
@@ -3779,18 +3925,12 @@ With some streams, the above operations may suspend the current thread and execu
 \section{Stream utilities}
 
 The following three words are implemented in terms of the stream protocol, and should work with any stream supporting the required underlying operations.
-\wordtable{
-\vocabulary{io}
-\ordinaryword{stream-read1}{stream-read1 ( stream -- ch/f )}
 
-}
-Reads a single character using \texttt{stream-read} and outputs the character. If the end of the stream has been reached, outputs \texttt{f}.
 \wordtable{
 \vocabulary{io}
 \ordinaryword{stream-write}{stream-write ( string stream -- )}
-
 }
-Outputs a character or string to the stream, without any specific style information. Implemented as follows:
+Outputs a string to the stream, without any specific style information. Implemented as follows:
 \begin{verbatim}
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
@@ -3798,9 +3938,8 @@ Outputs a character or string to the stream, without any specific style informat
 \wordtable{
 \vocabulary{io}
 \ordinaryword{stream-print}{stream-print ( string stream -- )}
-
 }
-Outputs a character or string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
+Outputs a string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
 
 \section{The default stream}\label{stdio}
 \glossary{name=default stream,
@@ -3826,6 +3965,14 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
+\ordinaryword{read1}{read1 ( n -- str )}
+
+}
+\begin{verbatim}
+: read1 stdio get stream-read1 ;
+\end{verbatim}
+\wordtable{
+\vocabulary{io}
 \ordinaryword{read}{read ( n -- str )}
 
 }
@@ -3834,11 +3981,11 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{read1}{read1 ( n -- str )}
+\ordinaryword{write1}{write ( ch -- )}
 
 }
 \begin{verbatim}
-: read1 stdio get stream-read1 ;
+: write1 stdio get stream-write1 ;
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
@@ -3912,7 +4059,7 @@ String buffers also support the input stream protocol, with the exception of \ve
 \vocabulary{io}
 \ordinaryword{<string-reader>}{<string-reader> ( string -- stream )}
 }
-Creates a new stream for reading the characters of the string in order. This converts the string to a string buffer, reverses it, and wraps it in a line stream (\ref{special-streams})..
+Creates a new stream for reading the characters of the string in order. This converts the string to a string buffer, reverses it, and wraps it in a line stream so that \verb|stream-readln| may be used (\ref{special-streams})..
 
 \wordtable{
 \vocabulary{io}
@@ -3960,24 +4107,6 @@ Converts a sequence of bytes in big or little endian order into an unsigned inte
 \ordinaryword{>le}{>le ( x n -- string )}
 }
 Converts an integer into a string of $n$ bytes in big or little endian order. Truncation will occur if the integer is not in the range $[-2^{8n},2^{8n})$.
-
-These words are then composed with \verb|read| and \verb|write| to form a set of words for reading and writing packed integers on the default stream (\ref{stdio}).
-
-\wordtable{
-\vocabulary{io}
-\ordinaryword{read-be2}{read-be2 ( -- n )}
-\ordinaryword{read-le2}{read-le2 ( -- n )}
-\ordinaryword{read-be4}{read-be4 ( -- n )}
-\ordinaryword{read-le4}{read-le4 ( -- n )}
-\ordinaryword{read-be8}{read-be8 ( -- n )}
-\ordinaryword{read-le8}{read-le8 ( -- n )}
-\ordinaryword{write-be2}{write-be2 ( n -- )}
-\ordinaryword{write-le2}{write-le2 ( n -- )}
-\ordinaryword{write-be4}{write-be4 ( n -- )}
-\ordinaryword{write-le4}{write-le4 ( n -- )}
-\ordinaryword{write-be8}{write-be8 ( n -- )}
-\ordinaryword{write-le8}{write-le8 ( n -- )}
-}
 
 \section{Reading and writing files}
 
@@ -4070,7 +4199,7 @@ Waits for a connection to the port number that \texttt{server} is listening on, 
 \wordtable{
 \vocabulary{io}
 \ordinaryword{client-stream-host}{client-stream-host~( stream -- port~)}
-\ordinaryword{client-stream-port}{client-stream-port~( stream -- port~)}
+\ordinaryword{client-stream-port}{client-stream-port~( stream -- host~)}
 
 }
 Outputs the IP address as a dotted-quad string, and the local port number, respectively, of a client socket returned from \texttt{accept}.
@@ -4100,7 +4229,7 @@ Creates a duplex stream. Writing to a duplex stream will write to \texttt{out}, 
 \vocabulary{io}
 \ordinaryword{<line-stream>}{<line-stream>~( stream -- stream~)}
 }
-Wrapping a stream in a line stream saves you from having to implement the \verb|stream-readln| generic word. Calling \verb|stream-readln| on a line stream reads a line a character at a time from the underlying stream. Lines are terminated by either \verb|\n|, \verb|\r| or \verb|\r\n|.
+A line stream provides an implementation of the \verb|stream-readln| generic word that reads lines a character at a time from the underlying stream. Lines are terminated by either \verb|\n|, \verb|\r| or \verb|\r\n|.
 
 \wordtable{
 \vocabulary{io}
@@ -4251,9 +4380,9 @@ Prettyprints the given object. Unlike \texttt{prettyprint}, this word does not e
 The remaining words in this section are useful in the implementation of prettyprinter methods.
 \wordtable{
 \vocabulary{prettyprint}
-\genericword{word.}{word.~( word -- )}
+\genericword{unparse.}{unparse.~( object -- )}
 }
-Prints a word. Unlike \texttt{prettyprint*}, does not prefix the word with \texttt{POSTPONE:} in the case that it is a parsing word.
+Prints the textual representation of an object as returned by \verb|unparse|. Generally \texttt{prettyprint*} is used instead; one important distinction with \verb|unparse.| is that if the given object is a parsing word, the output is not prefixed with \texttt{POSTPONE:}.
 \wordtable{
 \vocabulary{prettyprint}
 \genericword{prettyprint-newline}{prettyprint-newline ( indent -- )}

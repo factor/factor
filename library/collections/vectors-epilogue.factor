@@ -14,6 +14,8 @@ IN: vectors
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ;
 
+M: repeated thaw >vector ;
+
 M: vector clone ( vector -- vector )
     >vector ;
 

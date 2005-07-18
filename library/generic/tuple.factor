@@ -229,4 +229,4 @@ PREDICATE: word tuple-class metaclass tuple = ;
         2drop t
     ] [
         over [ >r delegate r> is? ] [ 2drop f ] ifte
-    ] ifte ;
+    ] ifte ; inline
