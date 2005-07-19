@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic io kernel listener math namespaces prettyprint
-sequences styles threads words ;
+USING: generic help io kernel listener math namespaces
+prettyprint sequences styles threads words ;
 
 SYMBOL: stack-display
 
