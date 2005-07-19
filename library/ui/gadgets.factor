@@ -4,9 +4,34 @@ IN: gadgets
 USING: generic hashtables kernel lists math matrices namespaces
 sequences styles vectors ;
 
-! A gadget is a shape, a paint, a mapping of gestures to
-! actions, and a reference to the gadget's parent. A gadget
-! delegates to its shape.
+SYMBOL: origin
+
+global [ { 0 0 0 } origin set ] bind
+
+TUPLE: rectangle loc dim ;
+
+GENERIC: inside? ( loc shape -- ? )
+
+: shape-bounds ( shape -- loc dim )
+    dup rectangle-loc swap rectangle-dim ;
+
+: shape-extent ( shape -- loc dim )
+    dup rectangle-loc dup rot rectangle-dim v+ ;
+
+: screen-bounds ( shape -- rect )
+    shape-bounds >r origin get v+ r> <rectangle> ;
+
+M: rectangle inside? ( loc rect -- ? )
+    screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
+    >r v- { 0 0 0 } r> vbetween? conj ;
+
+: intersect ( shape shape -- rect )
+    >r shape-extent r> shape-extent
+    swapd vmin >r vmax dup r> swap v- { 0 0 0 } vmax
+    <rectangle> ;
+
+! A gadget is a rectangle, a paint, a mapping of gestures to
+! actions, and a reference to the gadget's parent.
 TUPLE: gadget
     paint gestures visible? relayout? root?
     parent children ;

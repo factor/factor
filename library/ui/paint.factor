@@ -29,10 +29,9 @@ GENERIC: draw-gadget* ( gadget -- )
 : draw-gadget ( gadget -- )
     dup gadget-visible? [
         dup [
-            dup [
-                dup draw-gadget*
-                gadget-children [ draw-gadget ] each
-            ] with-trans
+            dup rectangle-loc origin [ v+ ] change
+            dup draw-gadget*
+            gadget-children [ draw-gadget ] each
         ] with-clip
     ] [ drop ] ifte ;
 
@@ -74,7 +73,7 @@ M: f draw-boundary 2drop ;
 TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
-    >r origin dup r> rectangle-dim v+ >r 2unseq r> 2unseq ;
+    >r origin get dup r> rectangle-dim v+ >r 2unseq r> 2unseq ;
 
 ! Solid pen
 M: solid draw-interior
@@ -93,7 +92,8 @@ TUPLE: gradient vector from to ;
 
 : (gradient-x) ( gradient dim y -- x1 x2 y color )
     dup pick second / >r rot r> gradient-color >r
-    >r >r x get r> first x get + r> y get + r> ;
+    >r >r origin get first r> origin get v+ first
+    r> origin get second + r> ;
 
 : gradient-x ( gradient dim y -- )
     >r >r >r surface get r> r> r> (gradient-x) rgb hlineColor ;
@@ -103,7 +103,8 @@ TUPLE: gradient vector from to ;
 
 : (gradient-y) ( gradient dim x -- x y1 y2 color )
     dup pick first / >r rot r> gradient-color
-    >r x get + y get rot second y get + r> ;
+    >r origin get first + origin get second rot
+    origin get v+ second r> ;
 
 : gradient-y ( gradient dim x -- )
     >r >r >r surface get r> r> r> (gradient-y) rgb vlineColor ;
@@ -144,7 +145,7 @@ M: bevel draw-boundary ( gadget boundary -- )
     #! Ugly code.
     bevel-width [
         [
-            >r origin over rectangle-dim over v+ r>
+            >r origin get over rectangle-dim over v+ r>
             { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
             rot draw-bevel
         ] 2keep

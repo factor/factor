@@ -11,7 +11,7 @@ IN: shells
     ttf-init
     ?init-world
     world get rectangle-dim 2unseq 0 SDL_RESIZABLE [
-        0 x set 0 y set [
+        [
             "Factor " version append dup SDL_WM_SetCaption
             start-world
             run-world

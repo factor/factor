@@ -4,6 +4,9 @@ IN: gadgets
 USING: gadgets generic kernel lists math namespaces sdl
 sequences vectors words ;
 
+SYMBOL: x
+SYMBOL: y
+
 ! A frame arranges left/right/top/bottom gadgets around a
 ! center gadget, which gets any leftover space.
 TUPLE: frame left right top bottom center ;
@@ -69,11 +72,11 @@ SYMBOL: frame-bottom-run
 : var-frame-top \ frame-top var-frame-y ;
 : var-frame-right
     dup \ frame-right var-frame-x
-    swap shape-w \ frame-right [ - ] change
+    swap rectangle-dim first \ frame-right [ - ] change
     \ frame-right get \ frame-left get - frame-right-run set ;
 : var-frame-bottom
     dup \ frame-bottom var-frame-y
-    swap shape-h \ frame-bottom [ - ] change
+    swap rectangle-dim second \ frame-bottom [ - ] change
     \ frame-bottom get \ frame-top get - frame-bottom-run set ;
 
 : setup-frame ( frame -- )

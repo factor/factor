@@ -12,6 +12,7 @@
 - fix listener prompt display after presentation commands invoked
 - tutorial: clickable code snippets
 - theme abstraction in ui
+- stray gesture son stack
 
 + misc
 

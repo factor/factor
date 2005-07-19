@@ -1,6 +1,5 @@
 USING: kernel parser sequences io ;
 [
-    "/library/ui/shapes.factor"
     "/library/ui/gadgets.factor"
     "/library/ui/hierarchy.factor"
     "/library/ui/paint.factor"
