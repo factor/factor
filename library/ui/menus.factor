@@ -33,10 +33,3 @@ C: menu ( assoc -- gadget )
 ! While a menu is open, clicking anywhere sends the click to
 ! the menu.
 M: menu inside? ( point menu -- ? ) 2drop t ;
-
-: actionize ( obj assoc -- assoc )
-    #! Prepends an object to each cdr of the assoc list. Utility
-    #! word for constructing menu action association lists.
-    [
-        unswons >r >r unit [ car ] cons r> append r> swons
-    ] map-with ;

@@ -40,9 +40,6 @@ sequences vectors ;
     #! is the gadget itself.
     dup [ dup gadget-parent parents cons ] when ;
 
-: find-parent ( gadget quot -- ? )
-    >r parents r> find nip ;
-
 : each-parent ( gadget quot -- ? )
     #! Keep executing the quotation on higher and higher
     #! parents until it returns f.

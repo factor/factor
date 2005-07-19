@@ -67,7 +67,11 @@ M: pane focusable-child* ( pane -- editor )
     dup pane-output clear-incremental pane-current clear-gadget ;
 
 : pane-write-1 ( style text pane -- )
-    >r <presentation> r> pane-current add-gadget ;
+    pick empty? pick empty? and [
+        3drop
+    ] [
+        >r <presentation> r> pane-current add-gadget
+    ] ifte ;
 
 : pane-terpri ( pane -- )
     dup pane-current over pane-output add-incremental
