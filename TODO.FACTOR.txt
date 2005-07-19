@@ -7,12 +7,11 @@
 - rollovers broken with menus
 - menu dragging
 - fix up the min thumb size hack
-- bevel borders
 - nicer scrollbars with up/down buttons
 - gaps in pack layout
 - fix listener prompt display after presentation commands invoked
 - stack display bugs
-- simple tutorial
+- tutorial: clickable code snippets
 - parser::skip clean up
 
 + misc

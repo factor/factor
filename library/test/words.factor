@@ -58,6 +58,22 @@ GENERIC: testing
 
 [ f ] [ \ testing generic? ] unit-test
 
+[ f ] [ gensym interned? ] unit-test
+
+: forgotten ;
+: another-forgotten ;
+
+[ f ] [ \ forgotten interned? ] unit-test
+
+FORGET: forgotten
+
+[ f ] [ \ another-forgotten interned? ] unit-test
+
+FORGET: another-forgotten
+: another-forgotten ;
+
+[ t ] [ \ car interned? ] unit-test
+
 ! This has to be the last test in the file.
 : test-last ( -- ) ;
 word word-name "last-word-test" set

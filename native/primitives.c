@@ -10,7 +10,6 @@ void* primitives[] = {
 	primitive_dispatch,
 	primitive_cons,
 	primitive_vector,
-	primitive_string_compare,
 	primitive_rehash_string,
 	primitive_sbuf,
 	primitive_sbuf_to_string,

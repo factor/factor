@@ -27,7 +27,7 @@ TUPLE: pack align fill vector ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [
-        over shape-dim { 1 1 1 } vmax over v-
+        over rectangle-dim { 1 1 1 } vmax over v-
         rot pack-fill v*n v+
     ] map-with ;
 
@@ -42,9 +42,9 @@ TUPLE: pack align fill vector ;
     { 0 0 0 } [ v+ ] accumulate ;
 
 : packed-loc-2 ( gadget sizes -- list )
-    >r dup shape-dim { 1 1 1 } vmax over r>
+    >r dup rectangle-dim { 1 1 1 } vmax over r>
     packed-dim-2 [ v- ] map-with
-    >r dup pack-align swap shape-dim { 1 1 1 } vmax r>
+    >r dup pack-align swap rectangle-dim { 1 1 1 } vmax r>
     [ >r 2dup r> v- n*v ] map 2nip ;
 
 : (packed-locs) ( gadget sizes -- list )
@@ -52,7 +52,7 @@ TUPLE: pack align fill vector ;
 
 : packed-locs ( gadget sizes -- )
     over gadget-children >list >r (packed-locs) r>
-    zip [ uncons set-shape-loc ] each ;
+    zip [ uncons set-rectangle-loc ] each ;
 
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;

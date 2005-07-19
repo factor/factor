@@ -11,7 +11,7 @@ TUPLE: viewport origin bottom? ;
 : viewport-dim gadget-child pref-dim ;
 
 : fix-scroll ( origin viewport -- origin )
-    dup shape-dim swap viewport-dim v- vmax { 0 0 0 } vmin ;
+    dup rectangle-dim swap viewport-dim v- vmax { 0 0 0 } vmin ;
 
 : scroll ( origin viewport -- )
     [ fix-scroll ] keep [ set-viewport-origin ] keep relayout ;
@@ -35,13 +35,13 @@ M: viewport pref-dim gadget-child pref-dim ;
 
 M: viewport layout* ( viewport -- )
     dup gadget-child dup prefer
-    >r viewport-origin* r> set-shape-loc ;
+    >r viewport-origin* r> set-rectangle-loc ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
 : visible-portion ( viewport -- vector )
-    dup shape-dim { 1 1 1 } vmax
+    dup rectangle-dim { 1 1 1 } vmax
     swap viewport-dim { 1 1 1 } vmax
     v/ { 1 1 1 } vmin ;
 
@@ -106,13 +106,13 @@ C: slider ( viewport vector -- slider )
 : slider-dim { 16 16 16 } ;
 
 : thumb-dim ( slider -- h )
-    [ shape-dim dup ] keep >thumb slider-dim vmax vmin ;
+    [ rectangle-dim dup ] keep >thumb slider-dim vmax vmin ;
 
 M: slider pref-dim drop slider-dim ;
 
 M: slider layout* ( slider -- )
     dup thumb-loc over slider-vector v*
-    over slider-thumb set-shape-loc
+    over slider-thumb set-rectangle-loc
     dup thumb-dim over slider-vector v* slider-dim vmax
     swap slider-thumb set-gadget-dim ;
 

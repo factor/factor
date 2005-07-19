@@ -5,22 +5,16 @@ math-internals sequences ;
 
 IN: vectors
 
-: empty-vector ( len -- vec )
-    #! Creates a vector with 'len' elements set to f. Unlike
-    #! <vector>, which gives an empty vector with a certain
-    #! capacity.
-    dup <vector> [ set-length ] keep ;
+: empty-vector ( len -- vec ) dup <vector> [ set-length ] keep ;
 
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ;
 
 M: repeated thaw >vector ;
 
-M: vector clone ( vector -- vector )
-    >vector ;
+M: vector clone ( vector -- vector ) >vector ;
 
-: zero-vector ( n -- vector )
-    0 <repeated> >vector ;
+: zero-vector ( n -- vector ) 0 <repeated> >vector ;
 
 M: general-list thaw >vector ;
 

@@ -40,6 +40,9 @@ sequences vectors ;
     #! is the gadget itself.
     dup [ dup gadget-parent parents cons ] when ;
 
+: find-parent ( gadget quot -- ? )
+    >r parents r> find nip ;
+
 : each-parent ( gadget quot -- ? )
     #! Keep executing the quotation on higher and higher
     #! parents until it returns f.
@@ -47,7 +50,7 @@ sequences vectors ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents { 0 0 0 } [ shape-loc v+ ] reduce ;
+    parents { 0 0 0 } [ rectangle-loc v+ ] reduce ;
 
 : relative ( g1 g2 -- g2-g1 )
     screen-loc swap screen-loc v- ;

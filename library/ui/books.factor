@@ -14,9 +14,9 @@ M: book pref-dim ( book -- dim )
     gadget-children { 0 0 0 } [ pref-dim vmax ] reduce ;
 
 M: book layout* ( book -- )
-    dup shape-dim over gadget-children [
+    dup rectangle-dim over gadget-children [
         f over set-gadget-visible?
-        { 0 0 0 } over set-shape-loc
+        { 0 0 0 } over set-rectangle-loc
         set-gadget-dim
     ] each-with
     dup book-page swap gadget-children nth

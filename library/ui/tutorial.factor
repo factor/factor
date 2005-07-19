@@ -320,4 +320,5 @@ sequences styles ;
     dup 18 font-size set-paint-prop
     <book-browser> ;
 
-: tutorial <tutorial> gadget. ;
+: tutorial ( -- )
+    ensure-ui <tutorial> gadget. ;

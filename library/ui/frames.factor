@@ -83,7 +83,7 @@ SYMBOL: frame-bottom-run
     var-frame-bottom ;
 
 : move-gadget ( x y gadget -- )
-    >r 0 3vector r> set-shape-loc ;
+    >r 0 3vector r> set-rectangle-loc ;
 
 : reshape-gadget ( x y w h gadget -- )
     [ >r 0 3vector r> set-gadget-dim ] keep move-gadget ;

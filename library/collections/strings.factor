@@ -7,27 +7,11 @@ USING: generic kernel kernel-internals lists math sequences ;
 DEFER: string?
 BUILTIN: string 12 string? [ 1 length f ] [ 2 hashcode f ] ;
 
-M: string =
-    over string? [
-        over hashcode over hashcode number= [
-            string-compare 0 eq?
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-M: string nth ( n str -- ch )
-    bounds-check char-slot ;
+M: string nth ( n str -- ch ) bounds-check char-slot ;
 
 GENERIC: >string ( seq -- string )
 
 M: string >string ;
-
-: string> ( str1 str2 -- ? )
-    ! Returns if the first string lexicographically follows str2
-    string-compare 0 > ;
 
 ! Characters
 PREDICATE: integer blank     " \t\n\r" member? ;

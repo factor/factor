@@ -42,12 +42,12 @@ DEFER: add-invalid
     dup add-invalid (relayout-down) ;
 
 : set-gadget-dim ( dim gadget -- )
-    2dup shape-dim =
-    [ 2drop ] [ [ set-shape-dim ] keep relayout-down ] ifte ;
+    2dup rectangle-dim =
+    [ 2drop ] [ [ set-rectangle-dim ] keep relayout-down ] ifte ;
 
 GENERIC: pref-dim ( gadget -- dim )
 
-M: gadget pref-dim shape-dim ;
+M: gadget pref-dim rectangle-dim ;
 
 GENERIC: layout* ( gadget -- )
 

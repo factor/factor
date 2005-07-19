@@ -60,5 +60,3 @@ INLINE void set_string_nth(F_STRING* string, CELL index, u16 value)
 
 void primitive_char_slot(void);
 void primitive_set_char_slot(void);
-F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2);
-void primitive_string_compare(void);

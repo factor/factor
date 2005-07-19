@@ -21,10 +21,10 @@ C: border ( child delegate size -- border )
     <bevel-gadget> { 5 5 0 } <border> ;
 
 : layout-border-loc ( border -- )
-    dup border-size swap gadget-child set-shape-loc ;
+    dup border-size swap gadget-child set-rectangle-loc ;
 
 : layout-border-dim ( border -- )
-    dup shape-dim over border-size 2 v*n v-
+    dup rectangle-dim over border-size 2 v*n v-
     swap gadget-child set-gadget-dim ;
 
 M: border pref-dim ( border -- dim )

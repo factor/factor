@@ -27,7 +27,11 @@ Factor 0.76:
   [ "Hello" % " world" % ] make-string
   
   Now, the former raises a type error.
-  
+
+- The string-compare primitive has been replaced with the lexi word
+  which now operates on any pair of sequences of numbers. The
+  string> word has been replaced with lexi>.
+
 - The stream-write, stream-write-attr, write and write-attr generic   
   words no longer accept a character as an argument. Use the new
   stream-write1 and write1 generic words to write single characters.

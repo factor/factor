@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic io kernel listener math namespaces prettyprint
-sequences styles threads ;
+sequences styles threads words ;
 
 SYMBOL: stack-display
 
@@ -38,7 +38,9 @@ SYMBOL: stack-display
         [
             pane get [
                 [ ui.s ] listener-hook set
-                clear print-banner listener
+                clear print-banner
+                "Tutorial" [ [ tutorial ] pane get pane-call ] <button> gadget.
+                listener
             ] with-stream
         ] in-thread
         

@@ -24,7 +24,7 @@ M: incremental layout* drop ;
 
 : next-cursor ( gadget incremental -- cursor )
     [
-        swap shape-dim swap incremental-cursor
+        swap rectangle-dim swap incremental-cursor
         2dup v+ >r vmax r>
     ] keep  pack-vector set-axis ;
 
@@ -33,10 +33,10 @@ M: incremental layout* drop ;
 
 : incremental-loc ( gadget incremental -- )
     dup incremental-cursor swap pack-vector v*
-    swap set-shape-loc ;
+    swap set-rectangle-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup pref-dim swap set-shape-dim ;
+    dup pref-dim swap set-rectangle-dim ;
 
 : add-incremental ( gadget incremental -- )
     2dup (add-gadget)
@@ -46,4 +46,6 @@ M: incremental layout* drop ;
     prefer-incremental ;
 
 : clear-incremental ( incremental -- )
-    dup (clear-gadget) { 0 0 0 } swap set-incremental-cursor ;
+    dup (clear-gadget)
+    { 0 0 0 } over set-incremental-cursor
+    gadget-parent [ relayout ] when* ;

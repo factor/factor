@@ -177,31 +177,3 @@ void primitive_set_char_slot(void)
 	CELL value = untag_fixnum_fast(dpop());
 	set_string_nth(string,index,value);
 }
-
-F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
-{
-	CELL len1 = string_capacity(s1);
-	CELL len2 = string_capacity(s2);
-
-	CELL limit = (len1 < len2 ? len1 : len2);
-
-	CELL i = 0;
-	while(i < limit)
-	{
-		u16 c1 = string_nth(s1,i);
-		u16 c2 = string_nth(s2,i);
-		if(c1 != c2)
-			return c1 - c2;
-		i++;
-	}
-
-	return len1 - len2;
-}
-
-void primitive_string_compare(void)
-{
-	F_STRING* s2 = untag_string(dpop());
-	F_STRING* s1 = untag_string(dpop());
-
-	dpush(tag_fixnum(string_compare(s1,s2)));
-}

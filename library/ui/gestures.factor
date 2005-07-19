@@ -44,7 +44,7 @@ SYMBOL: button-down
     #! enter gesture, since the mouse did not enter. Otherwise,
     #! fire an enter gesture and go on to the parent.
     [
-        [ shape-loc v+ ] keep
+        [ rectangle-loc v+ ] keep
         2dup inside? [ mouse-enter ] hierarchy-gesture
     ] each-parent 2drop ;
 
@@ -53,7 +53,7 @@ SYMBOL: button-down
     #! leave gesture, since the mouse did not leave. Otherwise,
     #! fire a leave gesture and go on to the parent.
     [
-        [ shape-loc v+ ] keep
+        [ rectangle-loc v+ ] keep
         2dup inside? [ mouse-leave ] hierarchy-gesture
     ] each-parent 2drop ;
 

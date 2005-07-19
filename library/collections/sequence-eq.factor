@@ -31,3 +31,11 @@ M: sequence = ( obj seq -- ? )
     ] [
         over type over type eq? [ sequence= ] [ 2drop f ] ifte
     ] ifte ;
+
+M: string = ( obj str -- ? )
+    over string? [
+        over hashcode over hashcode number=
+        [ sequence= ] [ 2drop f ] ifte
+    ] [
+        2drop f
+    ] ifte ;

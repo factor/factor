@@ -13,7 +13,7 @@ prettyprint sdl sequences vectors ;
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
     dup gadget-visible? >r 2dup inside? r> drop [
-        [ translate ] keep 2dup
+        [ rectangle-loc v- ] keep 2dup
         (pick-up) [ pick-up ] [ nip ] ?ifte
     ] [
         2drop f
@@ -45,13 +45,13 @@ C: hand ( world -- hand )
     [ hand-buttons remove ] keep set-hand-buttons ;
 
 : fire-leave ( hand gadget -- )
-    [ swap shape-loc swap screen-loc v- ] keep mouse-leave ;
+    [ swap rectangle-loc swap screen-loc v- ] keep mouse-leave ;
 
 : fire-enter ( oldpos hand -- )
     hand-gadget [ screen-loc v- ] keep mouse-enter ;
 
 : update-hand-gadget ( hand -- )
-    [ world get pick-up ] keep set-hand-gadget ;
+    [ rectangle-loc world get pick-up ] keep set-hand-gadget ;
 
 : motion-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].
@@ -66,8 +66,8 @@ C: hand ( world -- hand )
     [ dup hand-clicked [ drag ] motion-gesture ] [ drop ] ifte ;
 
 : move-hand ( loc hand -- )
-    dup shape-loc >r
-    [ set-shape-loc ] keep
+    dup rectangle-loc >r
+    [ set-rectangle-loc ] keep
     dup hand-gadget >r
     dup update-hand-gadget
     dup r> fire-leave
@@ -76,7 +76,7 @@ C: hand ( world -- hand )
 
 : update-hand ( hand -- )
     #! Called when a gadget is removed or added.
-    dup shape-loc swap move-hand ;
+    dup rectangle-loc swap move-hand ;
 
 : request-focus ( gadget -- )
     focusable-child

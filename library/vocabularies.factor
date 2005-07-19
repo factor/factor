@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: words USING: hashtables kernel lists namespaces strings
-sequences ;
+IN: words
+USING: hashtables kernel lists namespaces strings sequences ;
 
 SYMBOL: vocabularies
 
@@ -10,7 +10,7 @@ SYMBOL: vocabularies
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    vocabularies get hash-keys [ string> ] sort ;
+    vocabularies get hash-keys [ lexi> ] sort ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.
@@ -85,6 +85,14 @@ SYMBOL: vocabularies
     #! Remove a word definition.
     dup uncrossref
     dup word-vocabulary vocab [ word-name off ] bind ;
+
+: interned? ( word -- ? )
+    #! Test if the word is a member of its vocabulary.
+    dup dup word-name swap word-vocabulary dup [
+        vocab dup [ hash eq? ] [ 3drop f ] ifte
+    ] [
+        3drop f
+    ] ifte ;
 
 : init-search-path ( -- )
     ! For files

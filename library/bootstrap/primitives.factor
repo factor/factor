@@ -44,7 +44,6 @@ vocabularies get [
     [ "dispatch" "kernel-internals"           [ [ fixnum vector ] [ ] ] ]
     [ "cons" "lists"                          [ [ object object ] [ cons ] ] ]
     [ "<vector>" "vectors"                    [ [ integer ] [ vector ] ] ]
-    [ "string-compare" "strings"              [ [ string string ] [ integer ] ] ]
     [ "rehash-string" "strings"               [ [ string ] [ ] ] ]
     [ "<sbuf>" "strings"                      [ [ integer ] [ sbuf ] ] ]
     [ "sbuf>string" "strings"                 [ [ sbuf ] [ string ] ] ]

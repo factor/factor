@@ -211,6 +211,29 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Is every element of seq1 in seq2
     swap [ swap member? ] all-with? ;
 
+! Lexicographic comparison
+: (lexi) ( seq seq i limit -- n )
+    2dup >= [
+        2drop swap length swap length -
+    ] [
+        >r 3dup 2nth 2dup = [
+            2drop 1 + r> (lexi)
+        ] [
+            r> drop - >r 3drop r>
+        ] ifte
+    ] ifte ;
+
+: lexi ( s1 s2 -- n )
+    #! Lexicographically compare two sequences of numbers
+    #! (usually strings). Negative if s1<s2, zero if s1=s2,
+    #! positive if s1>s2.
+    0 pick length pick length min (lexi) ;
+
+: lexi> ( seq seq -- ? )
+    #! Test if the first sequence follows the second
+    #! lexicographically.
+    lexi 0 > ;
+
 IN: kernel
 
 : depth ( -- n )

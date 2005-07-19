@@ -4,8 +4,7 @@ IN: strings
 USING: generic kernel kernel-internals lists math namespaces
 sequences strings ;
 
-: empty-sbuf ( len -- sbuf )
-    dup <sbuf> [ set-length ] keep ;
+: empty-sbuf ( len -- sbuf ) dup <sbuf> [ set-length ] keep ;
 
 : fill ( count char -- string ) <repeated> >string ;
 
@@ -28,7 +27,6 @@ M: string thaw >sbuf ;
 
 M: string like ( seq sbuf -- string ) drop >string ;
 
-M: sbuf clone ( sbuf -- sbuf )
-    [ length <sbuf> dup ] keep nappend ;
+M: sbuf clone ( sbuf -- sbuf ) >sbuf ;
 
 M: sbuf like ( seq sbuf -- sbuf ) drop >sbuf ;

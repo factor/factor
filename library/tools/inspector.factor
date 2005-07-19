@@ -48,9 +48,6 @@ M: hashtable sheet hash>alist unzip 2list ;
     seq-transpose
     [ " | " join ] map ;
 
-: interned? ( word -- ? )
-    dup word-name swap word-vocabulary vocab hash ;
-
 : class-banner ( word -- )
     dup metaclass dup [
         "This is a class whose behavior is specifed by the " write

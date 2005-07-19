@@ -57,7 +57,7 @@ sequences ;
   #! Write out the HTML for the list of words in a vocabulary.
   <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
     words [ 
-      word-name dup "current-word" get [ "" ] unless* string-compare 0 = [
+      word-name dup "current-word" get [ "" ] unless* = [
       "<option selected>" write
      ] [
         "<option>" write

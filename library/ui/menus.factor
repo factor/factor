@@ -4,7 +4,7 @@ IN: gadgets
 USING: generic kernel lists math namespaces sequences ;
 
 : show-menu ( menu -- )
-    hand screen-loc over set-shape-loc show-glass ;
+    hand screen-loc over set-rectangle-loc show-glass ;
 
 : menu-item-border ( child -- border )
     <plain-gadget> { 1 1 0 } <border> ;
