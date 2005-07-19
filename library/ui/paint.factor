@@ -7,8 +7,7 @@ namespaces sdl sequences strings styles vectors ;
 SYMBOL: clip
 
 : >sdl-rect ( rectangle -- sdlrect )
-    [ shape-x ] keep [ shape-y ] keep [ shape-w ] keep shape-h
-    make-rect ;
+    [ rectangle-loc 2unseq ] keep rectangle-dim 2unseq make-rect ;
 
 : set-clip ( rect -- ? )
     #! The top/left corner of the clip rectangle is the location
@@ -75,8 +74,7 @@ M: f draw-boundary 2drop ;
 TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
-    >r x get y get r> dup shape-w swap shape-h
-    >r pick + r> pick + ;
+    >r origin dup r> rectangle-dim v+ >r 2unseq r> 2unseq ;
 
 ! Solid pen
 M: solid draw-interior

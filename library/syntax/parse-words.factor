@@ -22,34 +22,22 @@ strings unparser words ;
 SYMBOL: file
 
 : skip ( i seq quot -- n | quot: elt -- ? )
-    #! Find the next element starting at i that satisfies the
-    #! quotation.
-    >r 2dup length < [
-        2dup nth r> dup >r call [
-            r> 2drop
-        ] [
-            >r 1 + r> r> skip
-        ] ifte
-    ] [
-        r> drop nip length
-    ] ifte ; inline
-
-: (skip-blank) ( n line -- n )
-    [ blank? not ] skip ;
+    over >r find* drop dup -1 =
+    [ drop r> length ] [ r> drop ] ifte ; inline
 
 : skip-blank ( -- )
-    "col" [ "line" get (skip-blank) ] change ;
+    "col" [ "line" get [ blank? not ] skip ] change ;
 
 : skip-word ( n line -- n )
     2dup nth CHAR: " = [ drop 1 + ] [ [ blank? ] skip ] ifte ;
 
 : (scan) ( n line -- start end )
-    [ (skip-blank) dup ] keep
-    2dup length < [ skip-word ] [ drop ] ifte ;
+    dupd 2dup length < [ skip-word ] [ drop ] ifte ;
 
 : scan ( -- token )
-    "col" get "line" get dup >r (scan) dup "col" set
-    2dup = [ r> 3drop f ] [ r> subseq ] ifte ;
+    skip-blank
+    "col" [ "line" get (scan) dup ] change
+    2dup = [ 2drop f ] [ "line" get subseq ] ifte ;
 
 : save-location ( word -- )
     #! Remember where this word was defined.

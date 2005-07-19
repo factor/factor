@@ -11,7 +11,7 @@
 - gaps in pack layout
 - fix listener prompt display after presentation commands invoked
 - tutorial: clickable code snippets
-- parser::skip clean up
+- theme abstraction in ui
 
 + misc
 
