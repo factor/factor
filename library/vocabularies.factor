@@ -101,10 +101,10 @@ SYMBOL: vocabularies
     ! For interactive
     "scratchpad" "in" set
     [
-        "compiler" "debugger" "errors" "generic"
-        "hashtables" "inference" "inspector" "interpreter"
+        "compiler" "errors" "gadgets" "generic"
+        "hashtables" "help" "inference" "inspector" "interpreter"
         "jedit" "kernel" "listener" "lists" "math" "matrices"
-        "memory" "namespaces" "parser" "prettyprint" "processes"
+        "memory" "namespaces" "parser" "prettyprint"
         "sequences" "io" "strings" "styles" "syntax" "test"
         "threads" "unparser" "vectors" "words" "scratchpad"
     ] "use" set ;

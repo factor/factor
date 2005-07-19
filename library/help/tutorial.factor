@@ -1,5 +1,5 @@
-IN: gadgets
-USING: generic kernel lists math matrices namespaces sdl
+IN: help
+USING: gadgets generic kernel lists math matrices namespaces sdl
 sequences styles ;
 
 : <title> ( text -- gadget )
