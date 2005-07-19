@@ -10,7 +10,6 @@
 - nicer scrollbars with up/down buttons
 - gaps in pack layout
 - fix listener prompt display after presentation commands invoked
-- stack display bugs
 - tutorial: clickable code snippets
 - parser::skip clean up
 

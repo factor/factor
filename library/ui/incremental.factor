@@ -36,7 +36,7 @@ M: incremental layout* drop ;
     swap set-rectangle-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup pref-dim swap set-rectangle-dim ;
+    dup pref-dim over set-rectangle-dim layout ;
 
 : add-incremental ( gadget incremental -- )
     2dup (add-gadget)
