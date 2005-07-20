@@ -228,7 +228,7 @@ M: read-task task-container drop read-tasks get ;
 M: port stream-read ( count stream -- string )
     [ wait-to-read ] keep read-fin ;
 
-M: port stream-read1 ( stream -- string )
+M: port stream-read1 ( stream -- char/f )
     1 over wait-to-read port-sbuf first ;
 
 ! Writers

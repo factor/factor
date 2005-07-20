@@ -18,7 +18,7 @@ M: c-stream stream-write1 ( char stream -- )
 M: c-stream stream-write-attr ( str style stream -- )
     nip c-stream-out fwrite ;
 
-M: c-stream stream-read1 ( stream -- str )
+M: c-stream stream-read1 ( stream -- char/f )
     c-stream-in dup [ fgetc ] when ;
 
 M: c-stream stream-flush ( stream -- )

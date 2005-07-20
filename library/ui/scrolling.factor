@@ -27,7 +27,7 @@ M: viewport pref-dim gadget-child pref-dim ;
 : viewport-origin* ( viewport -- point )
     dup viewport-bottom? [
         f over set-viewport-bottom?
-        dup viewport-dim { 0 -1 0 } v* over fix-scroll
+        dup viewport-dim { 0 -1 0 } v*
         [ swap set-viewport-origin ] keep
     ] [
         viewport-origin
@@ -35,7 +35,8 @@ M: viewport pref-dim gadget-child pref-dim ;
 
 M: viewport layout* ( viewport -- )
     dup gadget-child dup prefer
-    >r viewport-origin* r> set-rectangle-loc ;
+    >r dup viewport-origin* swap fix-scroll r>
+    set-rectangle-loc ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
@@ -101,7 +102,9 @@ C: slider ( viewport vector -- slider )
 : <y-slider> ( viewport -- slider ) { 0 1 0 } <slider> ;
 
 : thumb-loc ( slider -- loc )
-    dup slider-viewport viewport-origin* vneg swap >thumb ;
+    dup slider-viewport
+    dup viewport-origin* swap fix-scroll
+    vneg swap >thumb ;
 
 : slider-dim { 16 16 16 } ;
 

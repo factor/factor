@@ -66,8 +66,17 @@ M: pane focusable-child* ( pane -- editor )
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
 
+: pane-ignore? ( style text pane -- ? )
+    #! If we already have stuff in the current pack, and there
+    #! is no style information or text to write, ignore it.
+    #! Otherwise, we either have a fancy style (like an icon
+    #! or gadget being output), or we want the current pack to
+    #! have a minimal height so we put the empty label there.
+    pane-current gadget-children empty? not
+    rot not and swap empty? and ;
+
 : pane-write-1 ( style text pane -- )
-    pick empty? pick empty? and [
+    3dup pane-ignore? [
         3drop
     ] [
         >r <presentation> r> pane-current add-gadget

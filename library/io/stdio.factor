@@ -5,7 +5,7 @@ USING: errors generic kernel lists namespaces strings styles ;
 
 : flush      ( -- )              stdio get stream-flush ;
 : read-line  ( -- string )       stdio get stream-readln ;
-: read1      ( -- char )         stdio get stream-read1 ;
+: read1      ( -- char/f )       stdio get stream-read1 ;
 : read       ( count -- string ) stdio get stream-read ;
 : write      ( string -- )       stdio get stream-write ;
 : write1     ( char -- )         stdio get stream-write1 ;
