@@ -5,10 +5,32 @@
 - rollovers broken with menus
 - menu dragging
 - fix up the min thumb size hack
-- nicer scrollbars with up/down buttons
 - gaps in pack layout
 - fix listener prompt display after presentation commands invoked
 - theme abstraction in ui
+
++ ui:
+
+- find out why so many small bignums get consed
+- repaint only dirty regions of the screen
+- faster mouse tracking
+- binary search to locate visible children of packs
+- rewrite frame layout for new style
+- an interior paint that is only painted on rollover and mouse press;
+  use it for menu items. give menus a gradient background
+- scroll bar: more intuitive behavior when clicking inside the elevator
+- timers
+- nicer scrollbars with up/down buttons
+- icons
+- use incremental strategy for all pack layouts where possible
+- multiline editing in listener
+- sort out clipping off-by-one flaw when filling rectangles
+
++ tutorial:
+
+- multiline code snippets
+- s-expression text styling language
+- word wrap
 
 + misc
 
@@ -21,7 +43,6 @@ Investigate:
 
 - http keep alive, and range get
 - code walker & exceptions
-- faster repaint
 
 + ffi:
 

@@ -13,7 +13,7 @@ TUPLE: viewport origin bottom? ;
 : fix-scroll ( origin viewport -- origin )
     dup rectangle-dim swap viewport-dim v- vmax { 0 0 0 } vmin ;
 
-: scroll ( origin viewport -- )
+: scroll-viewport ( origin viewport -- )
     [ fix-scroll ] keep [ set-viewport-origin ] keep relayout ;
 
 C: viewport ( content -- viewport )
@@ -50,7 +50,13 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 ! The offset slot is the y co-ordinate of the mouse relative to
 ! the thumb when it was clicked.
-TUPLE: slider viewport thumb vector ;
+TUPLE: slider thumb vector ;
+
+: slider-scroller ( slider -- scroller )
+    [ scroller? ] find-parent ;
+
+: slider-viewport ( slider -- viewport )
+    slider-scroller scroller-viewport ;
 
 : >thumb ( pos slider -- pos )
     slider-viewport visible-portion v* ;
@@ -65,9 +71,13 @@ TUPLE: slider viewport thumb vector ;
 : slider-pos ( slider pos -- pos )
     hand pick relative v+ over slider-vector v* swap >viewport ;
 
+: scroll ( origin scroller -- )
+    [ scroller-viewport scroll-viewport ] keep
+    dup scroller-x relayout scroller-y relayout ;
+
 : slider-click ( slider pos -- )
     dupd slider-pos over slider-current v+
-    over slider-viewport scroll relayout ;
+    swap slider-scroller scroll ;
 
 : slider-motion ( slider -- )
     hand hand-click-rel slider-click ;
@@ -89,24 +99,23 @@ TUPLE: slider viewport thumb vector ;
 : slider-actions ( slider -- )
     [ { 0 0 0 } slider-click ] [ button-down 1 ] set-action ;
 
-C: slider ( viewport vector -- slider )
+C: slider ( vector -- slider )
     <plain-gadget> over set-delegate
     dup [ 128 128 128 ] background set-paint-prop
     [ set-slider-vector ] keep
-    [ set-slider-viewport ] keep
     <thumb> over add-thumb
     dup slider-actions ;
 
-: <x-slider> ( viewport -- slider ) { 1 0 0 } <slider> ;
+: <x-slider> ( -- slider ) { 1 0 0 } <slider> ;
 
-: <y-slider> ( viewport -- slider ) { 0 1 0 } <slider> ;
+: <y-slider> ( -- slider ) { 0 1 0 } <slider> ;
 
 : thumb-loc ( slider -- loc )
     dup slider-viewport
     dup viewport-origin* swap fix-scroll
     vneg swap >thumb ;
 
-: slider-dim { 16 16 16 } ;
+: slider-dim { 12 12 12 } ;
 
 : thumb-dim ( slider -- h )
     [ rectangle-dim dup ] keep >thumb slider-dim vmax vmin ;
@@ -134,15 +143,20 @@ TUPLE: scroller viewport x y ;
 : scroll>bottom ( gadget -- )
     [ scroll>bottom ] swap handle-gesture drop ;
 
+: scroll-by ( scroller amount -- )
+    over scroller-viewport viewport-origin v+ swap scroll ;
+
 : scroller-actions ( scroller -- )
-    [ (scroll>bottom) ] [ scroll>bottom ] set-action ;
+    dup [ (scroll>bottom) ] [ scroll>bottom ] set-action
+    dup [ { 0 32 0 } scroll-by ] [ button-down 4 ] set-action
+    [ { 0 -32 0 } scroll-by ] [ button-down 5 ] set-action ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
     <frame> over set-delegate
     [ >r <viewport> r> add-viewport ] keep
-    dup scroller-viewport <x-slider> over add-x-slider
-    dup scroller-viewport <y-slider> over add-y-slider
+    <x-slider> over add-x-slider
+    <y-slider> over add-y-slider
     dup scroller-actions ;
 
 M: scroller focusable-child* ( viewport -- gadget )

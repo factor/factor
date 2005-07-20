@@ -41,9 +41,10 @@ sequences vectors ;
     dup [ dup gadget-parent parents cons ] when ;
 
 : each-parent ( gadget quot -- ? )
-    #! Keep executing the quotation on higher and higher
-    #! parents until it returns f.
     >r parents r> all? ; inline
+
+: find-parent ( gadget quot -- ? )
+    >r parents r> find nip ; inline
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
