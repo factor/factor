@@ -1,5 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: help
+DEFER: tutorial
+
 IN: gadgets
 USING: generic help io kernel listener math namespaces
 prettyprint sequences styles threads words ;
@@ -39,7 +42,7 @@ SYMBOL: stack-display
             pane get [
                 [ ui.s ] listener-hook set
                 clear print-banner
-                "Tutorial" [ [ tutorial ] pane get pane-call ] <button> gadget.
+                "Tutorial" [ drop [ tutorial ] pane get pane-call ] <button> gadget.
                 listener
             ] with-stream
         ] in-thread
