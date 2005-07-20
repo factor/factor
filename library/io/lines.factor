@@ -1,5 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: io
 USING: errors generic io kernel math namespaces sequences ;
 
 TUPLE: line-reader cr ;
