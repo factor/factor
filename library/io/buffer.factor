@@ -57,7 +57,7 @@ C: buffer ( size -- buffer )
     #! Returns the amount of data that may be added to the buffer.
     dup buffer-size swap buffer-fill - ;
 
-: eof? ( buffer -- ? ) buffer-fill 0 = ;
+: buffer-empty? ( buffer -- ? ) buffer-fill 0 = ;
 
 : buffer-extend ( length buffer -- )
     #! Increases the size of the buffer by length.
@@ -66,7 +66,7 @@ C: buffer ( size -- buffer )
 
 : check-overflow ( length buffer -- )
     2dup buffer-capacity > [
-        dup eof? [
+        dup buffer-empty? [
             buffer-extend
         ] [
             "Buffer overflow" throw

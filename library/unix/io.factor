@@ -51,7 +51,7 @@ SYMBOL: write-tasks
 : init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle buffer error timeout cutoff output? sbuf ;
+TUPLE: port handle buffer error timeout cutoff output? sbuf eof? ;
 
 : make-buffer ( n -- buffer/f )
     dup 0 > [ <buffer> ] [ drop f ] ifte ;
@@ -60,7 +60,8 @@ C: port ( handle buffer -- port )
     [ 0 swap set-port-timeout ] keep
     [ 0 swap set-port-cutoff ] keep
     [ >r make-buffer r> set-delegate ] keep
-    [ >r dup init-handle r> set-port-handle ] keep ;
+    [ >r dup init-handle r> set-port-handle ] keep
+    80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
     dup port-timeout dup 0 =
@@ -158,19 +159,8 @@ GENERIC: task-container ( task -- vector )
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
 
-: pop-line ( reader -- sbuf/f )
-    dup pending-error [ port-sbuf f ] keep set-port-sbuf ;
-
-: read-fin ( reader -- str ) pop-line dup [ >string ] when ;
-
-: init-reader ( count reader -- ) >r <sbuf> r> set-port-sbuf ;
-
 : reader-eof ( reader -- )
-    dup port-sbuf empty? [
-        f swap set-port-sbuf
-    ] [
-        drop
-    ] ifte ;
+    dup port-sbuf empty? [ t swap set-port-eof? ] [ drop ] ifte ;
 
 : (refill) ( port -- n )
     >port< dup buffer-end swap buffer-capacity read ;
@@ -197,7 +187,7 @@ GENERIC: task-container ( task -- vector )
     ] ifte ;
 
 : can-read-count? ( count reader -- ? )
-    dup pending-error 2dup init-reader read-step ;
+    dup pending-error 0 over port-sbuf set-length read-step ;
 
 TUPLE: read-task count ;
 
@@ -209,7 +199,7 @@ C: read-task ( count port -- task )
 
 M: read-task do-io-task ( task -- ? )
     >read-task< dup refill [
-        dup eof? [
+        dup buffer-empty? [
             reader-eof drop t
         ] [
             read-step
@@ -226,10 +216,12 @@ M: read-task task-container drop read-tasks get ;
     ] unless 2drop ;
 
 M: port stream-read ( count stream -- string )
-    [ wait-to-read ] keep read-fin ;
+    [ wait-to-read ] keep dup port-eof?
+    [ drop f ] [ port-sbuf >string ] ifte ;
 
 M: port stream-read1 ( stream -- char/f )
-    1 over wait-to-read port-sbuf first ;
+    1 over wait-to-read dup port-eof?
+    [ drop f ] [ port-sbuf first ] ifte ;
 
 ! Writers
 
@@ -251,7 +243,7 @@ M: port stream-read1 ( stream -- char/f )
     #! If the buffer is empty and the string is too long,
     #! extend the buffer.
     dup pending-error
-    dup eof? [
+    dup buffer-empty? [
         2drop t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=

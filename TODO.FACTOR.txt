@@ -1,7 +1,6 @@
 76:
 ---
 
-- i/o: don't keep creating new sbufs
 - fix listener prompt display after presentation commands invoked
 - theme abstraction in ui
 
