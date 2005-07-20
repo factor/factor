@@ -12,10 +12,10 @@ vectors ;
 TUPLE: world running? hand glass invalid ;
 
 DEFER: <hand>
+DEFER: update-hand
 
 C: world ( -- world )
     f <stack> over set-delegate
-    t over set-world-running?
     t over set-gadget-root?
     dup <hand> over set-world-hand ;
 
@@ -54,7 +54,7 @@ DEFER: handle-event
 
 : world-step ( -- ? )
     world get dup world-invalid >r layout-world r>
-    [ hand update-hand draw-world ] [ drop ] ifte ;
+    [ dup world-hand update-hand draw-world ] [ drop ] ifte ;
 
 : next-event ( -- event ? )
     <event> dup SDL_PollEvent ;
@@ -68,12 +68,6 @@ DEFER: handle-event
         drop world-step
         world get world-running? [ yield run-world ] when
     ] ifte ;
-
-: ensure-ui ( -- )
-    #! Raise an error if the UI is not running.
-    world get dup [ world-running? ] when [
-        "UI not running." throw
-    ] unless ;
 
 : start-world ( -- )
     world get t over set-world-running? relayout ;

@@ -5,8 +5,13 @@ USING: generic kernel lists math matrices namespaces sequences
 threads vectors styles ;
 
 ! A viewport can be scrolled.
-
 TUPLE: viewport origin bottom? ;
+
+! A slider scrolls a viewport.
+TUPLE: slider thumb vector ;
+
+! A scroller combines a viewport with two x and y sliders.
+TUPLE: scroller viewport x y ;
 
 : viewport-dim gadget-child pref-dim ;
 
@@ -45,12 +50,6 @@ M: viewport focusable-child* ( viewport -- gadget )
     dup rectangle-dim { 1 1 1 } vmax
     swap viewport-dim { 1 1 1 } vmax
     v/ { 1 1 1 } vmin ;
-
-! A slider scrolls a viewport.
-
-! The offset slot is the y co-ordinate of the mouse relative to
-! the thumb when it was clicked.
-TUPLE: slider thumb vector ;
 
 : slider-scroller ( slider -- scroller )
     [ scroller? ] find-parent ;
@@ -127,8 +126,6 @@ M: slider layout* ( slider -- )
     over slider-thumb set-rectangle-loc
     dup thumb-dim over slider-vector v* slider-dim vmax
     swap slider-thumb set-gadget-dim ;
-
-TUPLE: scroller viewport x y ;
 
 : add-viewport 2dup set-scroller-viewport add-center ;
 

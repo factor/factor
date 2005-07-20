@@ -35,27 +35,31 @@ sequences vectors ;
     #! Add a gadget to a parent gadget.
     [ (add-gadget) ] keep relayout ;
 
-: parents ( gadget -- list )
+: (parents-down) ( list gadget -- list )
+    [ [ swons ] keep gadget-parent (parents-down) ] when* ;
+
+: parents-down ( gadget -- list )
+    #! A list of all parents of the gadget, the last element
+    #! is the gadget itself.
+    f swap (parents-down) ;
+
+: parents-up ( gadget -- list )
     #! A list of all parents of the gadget, the first element
     #! is the gadget itself.
-    dup [ dup gadget-parent parents cons ] when ;
+    dup [ dup gadget-parent parents-up cons ] when ;
 
 : each-parent ( gadget quot -- ? )
-    >r parents r> all? ; inline
+    >r parents-up r> all? ; inline
 
 : find-parent ( gadget quot -- ? )
-    >r parents r> find nip ; inline
+    >r parents-up r> find nip ; inline
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents { 0 0 0 } [ rectangle-loc v+ ] reduce ;
+    parents-up { 0 0 0 } [ rectangle-loc v+ ] reduce ;
 
 : relative ( g1 g2 -- g2-g1 )
     screen-loc swap screen-loc v- ;
 
 : child? ( parent child -- ? )
-    dup [
-        2dup eq? [ 2drop t ] [ gadget-parent child? ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+    parents-down memq? ;

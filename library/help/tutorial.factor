@@ -333,4 +333,4 @@ M: general-list tutorial-line
     <book-browser> ;
 
 : tutorial ( -- )
-    ensure-ui <tutorial> gadget. ;
+    <tutorial> gadget. ;

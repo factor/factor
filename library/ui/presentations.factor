@@ -43,14 +43,15 @@ global [ 100 <vector> commands set ] bind
     [ 2nip ] [ drop <styled-label> dup init-commands ] ifte ;
 
 : gadget. ( gadget -- )
-    gadget swons unit "" swap write-attr terpri ;
+    gadget swons unit
+    "This stream does not support live gadgets"
+    swap write-attr terpri ;
 
 [ drop t ] "Prettyprint" [ prettyprint ] define-command
 [ drop t ] "Inspect" [ inspect ] define-command
 [ drop t ] "References" [ references inspect ] define-command
 
 [ word? ] "See" [ see ] define-command
-[ word? ] "Execute" [ execute ] define-command
 [ word? ] "Usage" [ usage . ] define-command
 [ word? ] "jEdit" [ jedit ] define-command
 

@@ -46,16 +46,7 @@ C: hand ( world -- hand )
 : button\ ( n hand -- )
     [ hand-buttons remove ] keep set-hand-buttons ;
 
-: fire-leave ( hand gadget -- )
-    [ swap rectangle-loc swap screen-loc v- ] keep mouse-leave ;
-
-: fire-enter ( oldpos hand -- )
-    hand-gadget [ screen-loc v- ] keep mouse-enter ;
-
-: update-hand-gadget ( hand -- )
-    [ rectangle-loc world get pick-up ] keep set-hand-gadget ;
-
-: motion-gesture ( hand gadget gesture -- )
+: drag-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].
     rot hand-buttons car add swap handle-gesture drop ;
 
@@ -65,24 +56,36 @@ C: hand ( world -- hand )
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
     dup hand-buttons
-    [ dup hand-clicked [ drag ] motion-gesture ] [ drop ] ifte ;
+    [ dup hand-clicked [ drag ] drag-gesture ] [ drop ] ifte ;
+
+: drop-prefix ( l1 l2 -- l1 l2 )
+    2dup and [ 2dup 2car eq? [ 2cdr drop-prefix ] when ] when ;
+
+: each-gesture ( gesture seq -- )
+    [ handle-gesture* drop ] each-with ;
+
+: hand-gestures ( hand new old -- )
+    drop-prefix
+    reverse [ mouse-leave ] swap each-gesture
+    swap fire-motion
+    [ mouse-enter ] swap each-gesture ;
 
 : move-hand ( loc hand -- )
-    dup rectangle-loc >r
-    [ set-rectangle-loc ] keep
-    dup hand-gadget >r
-    dup update-hand-gadget
-    dup r> fire-leave
-    dup fire-motion
-    r> swap fire-enter ;
+    dup hand-gadget parents-down >r
+    2dup set-rectangle-loc
+    [ >r world get pick-up r> set-hand-gadget ] keep
+    dup hand-gadget parents-down r> hand-gestures ;
 
 : update-hand ( hand -- )
     #! Called when a gadget is removed or added.
     dup rectangle-loc swap move-hand ;
 
+: focus-gestures ( new old -- )
+    drop-prefix
+    reverse [ lose-focus ] swap each-gesture
+    [ gain-focus ] swap each-gesture ;
+
 : request-focus ( gadget -- )
     focusable-child
-    hand hand-focus
-    2dup lose-focus
-    swap dup hand set-hand-focus
-    gain-focus ;
+    hand dup hand-focus parents-down >r
+    dupd set-hand-focus parents-down r> focus-gestures ;
