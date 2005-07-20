@@ -1,15 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USE: compiler
 IN: assembler
-USE: words
-USE: kernel
-USE: parser
-USE: generic
-USE: lists
-USE: math
-USE: errors
-USE: sequences
+USING: compiler errors generic kernel lists math parser
+sequences words ;
 
 ! A postfix assembler.
 !
@@ -59,6 +52,9 @@ USE: sequences
 GENERIC: modifier ( op -- mod )
 GENERIC: register ( op -- reg )
 GENERIC: displacement ( op -- )
+GENERIC: canonicalize ( op -- op )
+
+M: object canonicalize ;
 
 ( Register operands -- eg, ECX                                 )
 : REGISTER:
@@ -82,28 +78,24 @@ M: register displacement drop ;
 
 ( Indirect register operands -- eg, [ ECX ]                    )
 PREDICATE: cons indirect
-    dup length 1 = [ car register? ] [ drop f ] ifte ;
+    dup cdr [ drop f ] [ car register? ] ifte ;
 
 M: indirect modifier drop BIN: 00 ;
-M: indirect register
-    car register dup BIN: 101 = [
-        "x86 does not support [ EBP ]. Use [ EBP 0 ] instead."
-        throw
-    ] when ;
+M: indirect register car register ;
 M: indirect displacement drop ;
+M: indirect canonicalize dup car EBP = [ drop [ EBP 0 ] ] when ;
 
 ( Displaced indirect register operands -- eg, [ EAX 4 ]        )
 PREDICATE: cons displaced
-    dup length 2 = [
-        2unlist integer? swap register? and
-    ] [
-        drop f
-    ] ifte ;
+    dup length 2 =
+    [ 2unlist integer? swap register? and ] [ drop f ] ifte ;
 
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
 M: displaced displacement
-    second dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+    dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+M: displaced canonicalize
+    dup first EBP = not over second 0 = and [ first unit ] when ;
 
 ( Displacement-only operands -- eg, [ 1234 ]                   )
 PREDICATE: cons disp-only
@@ -125,8 +117,8 @@ UNION: operand register indirect displaced disp-only ;
     swap register + compile-byte ;
 
 : 1-operand ( op reg -- )
-    >r dup modifier 6 shift over register bitor r> 3 shift bitor
-    compile-byte displacement ;
+    >r canonicalize dup modifier 6 shift over register bitor r>
+    3 shift bitor compile-byte displacement ;
 
 : immediate-8/32 ( dst imm code reg -- )
     #! If imm is a byte, compile the opcode and the byte.
