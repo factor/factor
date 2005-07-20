@@ -5,7 +5,9 @@ USING: alien generic io kernel lists math matrices namespaces
 prettyprint sdl sequences vectors ;
 
 : (pick-up) ( point gadget -- gadget )
-    gadget-children reverse-slice [ inside? ] find-with nip ;
+    gadget-children reverse-slice [
+        dup gadget-visible? [ inside? ] [ 2drop f ] ifte
+    ] find-with nip ;
 
 : pick-up ( point gadget -- gadget )
     #! The logic is thus. If the point is definately outside the

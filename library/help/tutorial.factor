@@ -1,6 +1,6 @@
 IN: help
 USING: gadgets generic kernel lists math matrices namespaces sdl
-sequences styles ;
+sequences strings styles ;
 
 : <title> ( text -- gadget )
     <label> dup 36 font-size set-paint-prop ;
@@ -10,11 +10,20 @@ sequences styles ;
     dup << gradient f { 1 0 0 } [ 64 64 64 ] [ 255 255 255 ] >> interior set-paint-prop
     { 0 10 0 } over set-gadget-dim ;
 
+GENERIC: tutorial-line ( object -- gadget )
+
+M: string tutorial-line <label> ;
+
+M: general-list tutorial-line
+    car dup <label> dup rot [ pane get pane-input set-editor-text drop ] cons
+    button-gestures
+    dup "Monospaced" font set-paint-prop ;
+
 : <page> ( list -- gadget )
     0 1 <pile>
     over car <title> over add-gadget
     <underline> over add-gadget
-    swap cdr [ <label> over add-gadget ] each
+    swap cdr [ tutorial-line over add-gadget ] each
     empty-border ;
 
 : tutorial-pages
@@ -25,6 +34,13 @@ sequences styles ;
             ""
             "Factor is interactive, which means you can test out the code"
             "in this tutorial immediately."
+            ""
+            "Code examples will insert themselves in the listener's input"
+            "area when clicked:"
+            ""
+            [ "\"hello world\" print" ]
+            ""
+            "You can then press ENTER to execute the code, or edit it first."
             ""
             "http://factor.sourceforge.net"
         ] [
@@ -38,9 +54,9 @@ sequences styles ;
         ] [
             "Basic syntax"
             "Factor code is made up of whitespace-speparated tokens."
-            "Here is a program that prints ``Hello world'':"
+            "Recall the example from the first slide:"
             ""
-            "  \"hello world\" print"
+            [ "\"hello world\" print" ]
             ""
             "The first token (\"hello world\") is a string."
             "The second token (print) is a word."
@@ -53,7 +69,7 @@ sequences styles ;
             ""
             "Here is another code example:"
             ""
-            "  2 3 + ."
+            [ "2 3 + ." ]
             ""
             "Try running it in the listener now."
         ] [
@@ -71,16 +87,16 @@ sequences styles ;
             "Colon definitions"
             "We can define new words in terms of existing words."
             ""
-            "  : twice  2 * ;"
+            [ ": twice  2 * ;" ]
             ""
             "This defines a new word named ``twice'' that calls ``2 *''."
             "Try the following in the listener:"
             ""
-            "  3 twice twice ."
+            [ "3 twice twice ." ]
             ""
             "The result is the same as if you wrote:"
             ""
-            "  3 2 * 2 * ."
+            [ "3 2 * 2 * ." ]
         ] [
             "Stack effects"
             "When we look at the definition of the ``twice'' word,"
@@ -111,7 +127,7 @@ sequences styles ;
             "The squared word"
             "Try entering the following word definition:"
             ""
-            "  : squared ( n -- n*n ) dup * ;"
+            [ ": squared ( n -- n*n ) dup * ;" ]
             ""
             "Shuffle words solve the problem where we need to compose"
             "two words, but their stack effects do not ``fit''."
@@ -126,15 +142,15 @@ sequences styles ;
             "Now let us write a word that negates a number."
             "Start by entering the following in the listener"
             ""
-            "  0 10 - ."
+            [ "0 10 - ." ]
             ""
             "It will print -10, as expected. Now notice that this the same as:"
             ""
-            "  10 0 swap - ."
+            [ "10 0 swap - ." ]
             ""
             "So indeed, we can factor out the definition ``0 swap -'':"
             ""
-            "  : negate ( n -- -n ) 0 swap - ;"
+            [ ": negate ( n -- -n ) 0 swap - ;" ]
         ] [
             "Seeing words"
             "If you have entered every definition in this tutorial,"
@@ -147,9 +163,9 @@ sequences styles ;
             "You can look at previously-entered word definitions using 'see'."
             "Try the following:"
             ""
-            "  \ negated see"
+            [ "\\ negated see" ]
             ""
-            "Prefixing a word with \ pushes it on the stack, instead of"
+            "Prefixing a word with \\ pushes it on the stack, instead of"
             "executing it. So the see word has stack effect ( word -- )."
         ] [
             "Booleans"
@@ -159,15 +175,14 @@ sequences styles ;
             ""
             "Here is a word that outputs a boolean:"
             ""
-            "  : negative? ( n -- ? ) 0 < ;"
+            [ ": negative? ( n -- ? ) 0 < ;" ]
         ] [
             "Branches"
             "Now suppose we want to write a word that computes the"
             "absolute value of a number; that is, if it is less than 0,"
             "the number will be negated to yield a positive result."
             ""
-            "  : absolute ( x -- |x| )"
-            "    dup negative? [ negated ] when ;"
+            [ ": absolute ( x -- |x| ) dup 0 < [ negated ] when ;" ]
             ""
             "It duplicates the top of the stack, since negative? pops it."
             "Then if the top of the stack was found to be negative,"
@@ -176,15 +191,15 @@ sequences styles ;
             "More branches"
             "On the previous slide, you saw the 'when' conditional:"
             ""
-            "  ... condition ... [ ... code to run if true ... ] when"
+            [ "  ... condition ... [ ... code to run if true ... ] when" ]
             ""
             "Another commonly-used form is 'unless':"
             ""
-            "  ... condition ... [ ... code to run if true ... ] unless"
+            [ "  ... condition ... [ ... code to run if true ... ] unless" ]
             ""
             "The 'ifte' conditional takes action on both branches:"
             ""
-            "  ... condition ... [ ... ] [ ... ] ifte"
+            [ "  ... condition ... [ ... ] [ ... ] ifte" ]
         ] [
             "Combinators"
             "ifte, when, unless are words that take lists of code as input."
@@ -197,7 +212,7 @@ sequences styles ;
             ""
             "Try this:"
             ""
-            "  10 [ \"Hello combinators\" print ] times"
+            [ "10 [ \"Hello combinators\" print ] times" ]
         ] [
             "Sequences"
             "You have already seen strings, very briefly:"
@@ -220,7 +235,7 @@ sequences styles ;
             ""
             "Try this:"
             ""
-            "  [ 10 20 30 ] [ . ] each"
+            [ "[ 10 20 30 ] [ . ] each" ]
             ""
             "A closely-related combinator is map ( seq quot -- seq )."
             "It also calls a quotation with each element."
@@ -229,7 +244,7 @@ sequences styles ;
             ""
             "Try this:"
             ""
-            "  [ 10 20 30 ] [ 3 + ] map ."
+            [ "[ 10 20 30 ] [ 3 + ] map ." ]
             "==> [ 13 23 33 ]"
         ] [
             "Numbers - integers and ratios"
@@ -237,49 +252,46 @@ sequences styles ;
             ""
             "Try the following:"
             ""
-            "  : factorial ( n -- n! ) 0 <range> product ;"
-            "  100 factorial ."
+            [ ": factorial ( n -- n! ) 0 <range> product ;" ]
+            [ "100 factorial ." ]
             ""
-            "  1 3 / 1 2 / + ."
-            "==> 5/6"
+            [ "1 3 / 1 2 / + ." ]
             ""
             "Rational numbers are added, multiplied and reduced to"
             "lowest terms in the same way you learned in grade school."
         ] [
             "Numbers - higher math"
-            "  2 sqrt ."
-            "==> 1.414213562373095"
             ""
-            "  -1 sqrt ."
-            "==> #{ 0 1.0 }#"
+            [ "2 sqrt ." ]
             ""
-            "  M[ [ 10 3 ] [ 7 5 ] [ -2 0 ] ]M M[ [ 11 2 ] [ 4 8 ] ]M"
-            "==> M[ [ 122 44 ] [ 97 54 ] [ -22 -4 ] ]M"
+            [ "-1 sqrt ." ]
             ""
-            "... and there is much more."
+            [ "M[ [ 10 3 ] [ 7 5 ] [ -2 0 ] ]M M[ [ 11 2 ] [ 4 8 ] ]M m." ]
+            ""
+            "... and there is much more for the math geeks."
         ] [
             "Object oriented programming"
             "Each object belongs to a class."
             "Generic words act differently based on an object's class."
             ""
-            "  GENERIC: describe ( object -- )"
-            "  M: integer describe \"The integer \" write . ;"
-            "  M: string describe \"The string \" write . ;"
-            "  M: object describe drop \"Unknown object\" print ;"
+            [ "GENERIC: describe ( object -- )" ]
+            [ "M: integer describe \"The integer \" write . ;" ]
+            [ "M: string describe \"The string \" write . ;" ]
+            [ "M: object describe drop \"Unknown object\" print ;" ]
             ""
             "Each M: line defines a ``method.''"
             "Method definitions may appear in independent source files."
             ""
             "integer, string, object are built-in classes."
         ] [
-            "Defining new classes with tuples"
+            "Defining new classes"
             "New classes can be defined:"
             ""
-            "  TUPLE: point x y ;"
-            "  M: point describe"
-            "    \"x =\" write dup point-x ."
-            "    \"y =\" write point-y . ;"
-            "  100 200 <point> describe"
+            [ "TUPLE: point x y ;" ]
+            [ "M: point describe" ]
+            [ "  \"x =\" write dup point-x ." ]
+            [ "  \"y =\" write point-y . ;" ]
+            [ "100 200 <point> describe" ]
             ""
             "A tuple is a collection of named slots."
             ""

@@ -93,7 +93,7 @@ PREDICATE: cons displaced
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
 M: displaced displacement
-    dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+    second dup byte? [ compile-byte ] [ compile-cell ] ifte ;
 M: displaced canonicalize
     dup first EBP = not over second 0 = and [ first unit ] when ;
 
