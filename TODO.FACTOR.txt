@@ -1,7 +1,6 @@
 76:
 ---
 
-- set-length should not shorten the underlying sequence
 - i/o: don't keep creating new sbufs
 - [ EAX 0 ] --> [ EAX ]
 - rollovers broken with menus
@@ -12,7 +11,6 @@
 - fix listener prompt display after presentation commands invoked
 - tutorial: clickable code snippets
 - theme abstraction in ui
-- stray gestures on stack
 
 + misc
 

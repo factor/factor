@@ -108,3 +108,7 @@ GENERIC: set-capacity
     ] [
         2drop
     ] ifte ;
+
+: grow-length ( len seq -- )
+    growable-check 2dup length > [ 2dup expand ] when
+    set-capacity ;
