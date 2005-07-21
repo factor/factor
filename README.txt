@@ -1,263 +1,174 @@
-THE CONCATENATIVE LANGUAGE FACTOR
+The Factor programming language
+-------------------------------
 
-* Introduction
+This file covers installation and basic usage of the Factor
+implementation. It is not an introduction to the language itself.
 
-Factor supports various data types; atomic types include numbers of
-various kinds, strings of characters, and booleans. Compound data types
-include lists consisting of cons cells, vectors, and string buffers.
+* Platform support
 
-Factor encourages programming in a functional style where new objects
-are returned and input parameters remain unmodified, but does not
-enforce this. No manifest type declarations are necessary, and all data
-types use exactly one slot each on the stack (unlike, say, FORTH).
+Factor is fully supported on the following platforms:
 
-The internal representation of a Factor program is a linked list. Linked
-lists that are to be executed are referred to as ``quotations.'' The
-interpreter iterates the list, executing words, and pushing all other
-types of objects on the data stack. A word is a unique data type because
-it can be executed. Words come in two varieties: primitive and compound.
-Primitive words have an implementation coded in the host language (C or
-Java). Compound words are executed by invoking the interpreter
-recursively on their definition, which is also a linked list.
+  Linux/x86
+  FreeBSD/x86
+  Microsoft Windows 2000 or later
+  Mac OS X/PowerPC
+  Linux/PowerPC
 
-* A note about code examples
+While Factor may run on other platforms (Solaris/Sparc, Linux/Alpha, and
+so on), the native compiler will not be available, and thus much
+functionality will be missing. In particular, the following features
+require the native compiler and only work on supported platforms:
 
-Factor words are separated out into multiple ``vocabularies''. Each code
-example given here is preceeded with a series of declarations, such as
-the following:
+  C library interface
+  Non-blocking I/O
+  Networking
 
-   USE: math
-   USE: streams
+* Compiling Factor
 
-When entering code at the interactive interpreter loop, most
-vocabularies are already in the search path, and the USE: declarations
-can be omitted. However, in a source file they must all be specified,
-by convention at the beginning of the file.
+The Factor runtime is written in C, and is built with GNU make and gcc.
 
-* Control flow
+Note that on x86 systems, Factor _cannot_ be compiled with gcc 3.3. This
+is due to a bug in gcc and there is nothing we can do about it. Please
+use gcc 2.95, 3.4, or 4.0.
 
-Control flow rests on two basic concepts: recursion, and branching.
-Words with compound definitions may refer to themselves, and there is
-exactly one primitive for performing conditional execution:
+Run 'make' (or 'gmake' on non-Linux platforms) with one of the following
+parameters to build the Factor runtime:
 
-    USE: combinators
+  bsd
+  linux
+  linux-ppc
+  macosx
+  windows
 
-    1 10 < [ "1 is less than 10." print ] [ "whoa!" print ] ifte
-    ==> 1 is less than 10.
+The following options can be given to make:
 
-Here is an example of a word that uses these two concepts:
+  SITE_CFLAGS="..."
+  DEBUG=1
 
-: contains? ( element list -- remainder )
-    #! If the proper list contains the element, push the
-    #! remainder of the list, starting from the cell whose car
-    #! is elem. Otherwise push f.
-    dup [
-        2dup car = [ nip ] [ cdr contains? ] ifte
-    ] [
-        2drop f
-    ] ifte ;
+The former allows optimization flags to be specified, for example
+"-march=pentium4 -ffast-math -O3". Optimization flags can make a *huge*
+difference in Factor's performance, so willing hackers should
+experiment.
 
-An example:
+The latter flag disables optimization and builds an executable with
+debug symbols. This is probably only of interest to people intending to
+hack on the runtime sources.
 
-    USE: lists
+Compilation may print a handful of warnings about singled/unsigned
+comparisons, and violated aliasing contracts. They may safely be
+ignored.
 
-    3 [ 1 2 3 4 ] contains?
-    ==> [ 3 4 ]
-    5 [ 1 2 3 4 ] contains?
-    ==> f
+Compilation will yield an executable named 'f'.
 
-It recurses down the list, until it reaches the end, in which case the
-outer ifte's 'false' branch is executed.
+* Building Factor
 
-A quick overview of the words used here, along with their stack effects:
+The Factor source distribution ships with four boot image files:
 
-Shuffle words:
+  boot.image.le32 - for x86
+  boot.image.be32 - for PowerPC, SPARC
+  boot.image.le64 - for x86-64
+  boot.image.be64 - for Alpha, PowerPC/64, UltraSparc
 
-dup ( x -- x x )
-nip ( x y -- y )
-2dup ( x y -- x y x y )
-2drop ( x y -- )
+Once you have compiled the Factor runtime, you must bootstrap the Factor
+system using the image that corresponds to your CPU architecture.
 
-Linked list deconstruction:
+The system is bootstrapped with the following command line:
 
-car ( [ x | y ] -- x )
-cdr ( [ x | y ] -- y ) - push the "tail" of a list.
+./f boot.image.<foo>
 
-Equality:
+Additional options may be specified to load external C libraries; see
+the next section for details.
 
-= ( x y -- ? )
+Bootstrap can take a while, depending on your system. When the process
+completes, a 'factor.image' file will be generated. Note that this image
+is both CPU and OS-specific, so in general cannot be shared between
+machines.
 
-More complicated control flow constructs, such as loops and higher order
-functions, are usually built with the help of another primitive that
-simply executes a quotation at the top of the stack, removing it from
-the stack:
+* Running Factor
 
-    USE: math
-    USE: prettyprint
+To run the Factor system, issue the following command:
 
-    [ 2 2 + . ] call
-    ==> 4
+  ./f factor.image
 
-Here is an example of a word that applies a quotation to each element of
-a list. Note that it uses 'call' to execute the given quotation:
+This will start the interactive listener where Factor expressions may
+be entered.
 
-: each ( list quotation -- )
-    #! Push each element of a proper list in turn, and apply a
-    #! quotation to each element.
-    over [
-        >r uncons r> tuck >r >r call r> r> each
-    ] [
-        2drop
-    ] ifte ;
+To run the graphical user interface, issue the following command:
 
-An example:
+  ./f factor.image -shell=ui
 
-    USE: lists
-    USE: math
-    USE: stack
+Note that on Windows, this is the default.
 
-    [ 1 2 3 4 ] [ dup * . ] each
-    ==> 1
-        4
-	9
-	16
-
-A quick overview of the words used here:
-
-Printing top of stack:
-
-. ( x -- ) print top of stack in a form that is valid Factor syntax.
-
-Shuffle words:
-
-over ( x y -- x y x )
-tuck ( x y -- y x y )
->r ( x -- r:x ) - move top of data stack to/from 'extra hand'.
-r> ( r:x -- x )
-
-Writing >r foo r> is analogous to '[ foo ] dip' in Joy. Occurrences of
->r and r> must be balanced within a single word definition.
-
-Linked list deconstruction:
-
-uncons ( [ x | y ] -- x y )
-
-* Variables
-
-Factor supports a notion of ``variables''. Whereas the stack is used for
-transient, intermediate values, variables are used for more permanent
-data.
-
-Variables are retreived and stored using the 'get' and 'set' words. For
-example:
-
-    USE: math
-    USE: namespaces
-    USE: prettyprint
-
-    "~" get .
-    ==> "/home/slava"
-
-    5 "x" set
-    "x" get 2 * .
-    ==> 10
-
-The set of available variables is determined using ``dynamic scope''.
-A ``namespace'' is a set of variable name/value pairs. Namespaces can be
-pushed onto the ``name stack'', and later popped. The 'get' word
-searches all namespaces on the namestack in turn. The 'set' word stores
-a variable value into the namespace at the top of the name stack.
-
-While it is possible to push/pop the namestack directly using the words
->n and n>, most of the time using the 'bind' combinator is more
-desirable.
-
-Good examples of namespace use are found in the I/O system.
-
-Factor provides two sets of words for working with I/O streams: words
-whose stream operand is specified on the stack (freadln, fwrite,
-fprint...) and words that use the standard input/output stream (read,
-write, print...).
-
-An I/O stream is a namespace with a slot for each I/O operation. I/O
-operations taking an explicit stream operand are all defined as follows:
-
-: freadln ( stream -- string )
-    [ "freadln" get call ] bind ;
-
-: fwrite ( string stream -- )
-    [ "fwrite" get call ] bind ;
-
-: fclose ( stream -- )
-    [ "fclose" get call ] bind ;
-
-( ... et cetera )
-
-The second set of I/O operations, whose stream is the implicit 'standard
-input/output' stream, are defined as follows:
-
-: read ( -- string )
-    "stdio" get freadln ;
-
-: write ( string -- )
-    "stdio" get fwrite ;
-
-( ... et cetera )
-
-In the global namespace, the 'stdio' variable corresponds to a stream
-whose operations read/write from the standard file descriptors 0 and 1.
-
-However, the 'with-stream' combinator provides a way to rebind the
-standard input/output stream for the duration of the execution of a
-single quotation. The following example writes the source of a word
-definition to a file named 'definition.txt':
-
-    USE: prettyprint
-    USE: streams
-
-    "definition.txt" <filebw> [ "with-stream" see ] with-stream
-
-The 'with-stream' word is implemented by pushing a new namespace on the
-namestack, setting the 'stdio' variable therein, and execution the given
-quotation.
-
-* Continuations
-
-A continuation is a quotation that restores execution to the point where
-it was captured. Continuations are captured using the callcc0 and
-callcc1 words in the 'continuations' vocabulary.
-
-The word names are abbreviations for 'call with current continuation';
-the 0 or 1 refers to the arity of the continuation.
-
-Consider the phrase 'call with current continuation':
-
-- 'call'                 -- it calls a quotation given as a parameter...
-- 'with'                 -- with a value on the stack....
-- 'current continuation' -- that is a quotation that can be called
-                            to restore execution at the current point.
-
-A continuation can either have arity 0 or 1. This refers to the number
-of parameters the quotation transfers from the caller stack to the
-restored point.
-
-Three very simple examples:
-
-    [ call ] callcc0 "Hello world." print
-                    ^
-                    ------- captured continuation restores here.
-    ==> Hello world.
-
-    [ "my-c" set ] callcc0 "Hello world." print
-                          ^
-                          -------- captured continuation restores here.
-    ==> Hello world.
-    
-    "my-c" get call
-    ==> Hello world.
-
-Continuations are an advanced feature and are used in the implementation
-of error handling, multi-tasking, co-routines, and generators.
-
-(This is for my editor. It can be removed.
-:tabSize=4:indentSize=4:noTabs=true:)
+On Unix, this might fail if the SDL libraries are not installed, or are
+installed under unconventional names. This can be solved by explicitly
+naming the libraries during bootstrap, as in the next section.
+
+* Setting up SDL libraries for use with Factor
+
+Factor's UI requires recent versions of the following three libraries in
+order to operate:
+
+  libSDL.so
+  libSDL_ttf.so
+  libSDL_gfx.so
+
+If you have installed these libraries but the UI still fails with an
+error, you will need to find out the exact names that they are installed
+as, and issue a command similar to the following to bootstrap Factor:
+
+  ./f boot.image.<foo> -libraries:sdl:name=libSDL-1.2.so
+                       -libraries:sdl-ttf:name=libSDL_ttf.so
+                       -libraries:sdl-gfx:name=libSDL_gfx.so
+
+* Source organization
+
+  doc/ - the developer's handbook, and various other bits and pieces
+  native/ - sources for the Factor runtime, written in C
+  library/ - sources for the library, written in Factor
+    alien/ - C library interface
+    bootstrap/ - code for generating boot images
+    collections/ - data types including but not limited to lists,
+      vectors, hashtables, and operations on them
+    compiler/ - optimizing native compiler
+    generic/ - generic words, for object oriented programming style
+    help/ - online help system
+    httpd/ - HTTP client, server, and web application framework
+    icons/ - images used by web framework and UI
+    inference/ - stack effect inference, used by compiler, as well as a
+      useful development tool of its own
+    io/ - input and output streams
+    math/ - integers, ratios, floats, complex numbers, vectors, matrices
+    sdl/ - bindings for libSDL, libSDL_ttf and libSDL_gfx
+    syntax/ - parser and object prettyprinter
+    test/ - unit test framework and test suite
+    tools/ - interactive development tools
+    ui/ - UI framework
+    unix/ - Unix-specific I/O code
+    win32/ - Windows-specific I/O code
+  contrib/ - various handy libraries not part of the core
+  examples/ - small examples illustrating various language features
+  factor/ - Java code for the Factor jEdit plugin
+  fonts/ - TrueType fonts used by UI
+
+* Learning Factor
+
+The UI has a simple tutorial that will show you the most basic concepts.
+
+There is a detailed language and library reference available at
+http://factor.sourceforge.net/handbook.pdf.
+
+You can browse the source code; it is organized into small,
+well-commented files and should be easy to follow once you have a good
+grasp of the language.
+
+* Community
+
+The Factor homepage is located at http://factor.sourceforge.net/.
+
+Factor developers meet in the #concatenative channel on the
+irc.freenode.net server. Drop by if you want to discuss anything related
+to Factor or language design in general.
+
+Have fun!
+
+:tabSize=2:indentSize=2:noTabs=true:

@@ -1,11 +1,13 @@
 Factor 0.76:
 ------------
 
-- The main focus of this release was getting the UI framework in a state
-  where the graphical listener is usable. This goal has largely been
-  achieved. Many performance problems were fixed, and the listener now
-  supports styled text output, presentations, and an
-  automatically-updated data stack display.
+- Major improvements to the GUI:
+
+  - The listener supports styled text output and presentations
+  - Gradient paint, bevel border paint
+  - Wheel mouse scrolling
+  - Slide-show tutorial with live code examples
+  - Performance improvements, code cleanups, bug fixes
 
 - The following formely list-specific words are now generic:
     
