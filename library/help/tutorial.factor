@@ -306,11 +306,11 @@ M: general-list tutorial-line
             "- Graphical user interface framework"
             "Browsing the library:"
             "- To list all vocabularies:"
-            "  vocabs ."
+            [ "vocabs ." ]
             "- To list all words in a vocabulary:"
-            "  \"sequences\" words ."
+            [ "\"sequences\" words ." ]
             "- To show a word definition:"
-            "  \ reverse see"
+            [ "\\ reverse see" ]
         ] [
             "Learning more"
             "Hopefully this tutorial has sparked your interest in Factor."

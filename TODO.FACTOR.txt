@@ -1,11 +1,10 @@
 76:
 ---
 
-- fix listener prompt display after presentation commands invoked
-- theme abstraction in ui
-
 + ui:
 
+- fix listener prompt display after presentation commands invoked
+- theme abstraction in ui
 - menu dragging
 - fix up the min thumb size hack
 - gaps in pack layout

@@ -86,7 +86,7 @@ The Factor homepage can be found at \verb|http://factor.sourceforge.net|.
 When examples of interpreter interactions are given in this guide, the input is in a roman font, and any
 output from the interpreter is in boldface:
 \begin{alltt}
-\textbf{ok} "Hello, world!" print
+  "Hello, world!" print
 \textbf{Hello, world!}
 \end{alltt}
 
@@ -354,9 +354,9 @@ Integers are entered in base 10 unless prefixed with a base change parsing word.
 \parsingword{HEX:}{HEX: \emph{integer}}
 }
 \begin{alltt}
-\textbf{ok} BIN: 1110 BIN: 1 + .
+  BIN: 1110 BIN: 1 + .
 \textbf{15}
-\textbf{ok} HEX: deadbeef 2 * .
+  HEX: deadbeef 2 * .
 \textbf{7471857118}
 \end{alltt}
 
@@ -451,7 +451,7 @@ Adds the \texttt{f} and \texttt{t} objects to the parse tree.
 
 Note that the \texttt{f} parsing word and class is not the same as the \texttt{f} object. The former can be obtained by writing \texttt{\bs~f} inside a quotation, or \texttt{POSTPONE: f} inside a list that will not be evaluated.
 \begin{alltt}
-\textbf{ok} f \bs f = .
+  f \bs f = .
 \textbf{f}
 \end{alltt}
 An analogous distinction holds for the \texttt{t} class and object.
@@ -492,11 +492,11 @@ Escape code&Character\\
 \end{table}
 Examples:
 \begin{alltt}
-\textbf{ok} CHAR: a .
+  CHAR: a .
 \textbf{97}
-\textbf{ok} CHAR: \bs{}0 .
+  CHAR: \bs{}0 .
 \textbf{0}
-\textbf{ok} CHAR: \bs{}n .
+  CHAR: \bs{}n .
 \textbf{10}
 \end{alltt}
 A Unicode character can be specified by its code number by writing \texttt{\bs{}u} followed by a four-digit hexadecimal. That is, the following two expressions are equivalent:
@@ -522,7 +522,7 @@ Strings containing
 the \texttt{"} character and various other special characters can be read by
 inserting escape sequences as described in \ref{syntax:char}.
 \begin{alltt}
-\textbf{ok} "Hello world" print
+  "Hello world" print
 \textbf{Hello world}
 \end{alltt}
 
@@ -582,14 +582,14 @@ Reads the next word from the input string and appends some \emph{code} to the pa
 }
 Reads the next word from the input string and appends the word to the parse tree, even if it is a parsing word. For an word \texttt{foo}, \texttt{POSTPONE: foo} and \texttt{foo} are equivalent; however, if \texttt{foo} is a parsing word, the latter will execute it at parse time, while the former will execute it at runtime. Usually used inside parsing words that wish to delegate some action to a further parsing word.
 \begin{alltt}
-\textbf{ok} : parsing1
+  : parsing1
     "Parsing 1" print 2 swons ; parsing
-\textbf{ok} : parsing2
+  : parsing2
     "Parsing 2" print POSTPONE: parsing1 ; parsing
-\textbf{ok} [ 1 parsing1 3 ] .
+  [ 1 parsing1 3 ] .
 \textbf{Parsing 1}
 \textbf{[ 1 2 3 ]}
-\textbf{ok} [ 0 parsing2 2 4 ] .
+  [ 0 parsing2 2 4 ] .
 \textbf{Parsing 2}
 \textbf{Parsing 1}
 \textbf{[ 0 2 4 ]}
@@ -624,7 +624,7 @@ Reads from the input string until the next occurrence of
 \texttt{"}, converts the string to a string buffer, and appends it to the parse tree.
 As with strings, the escape codes described in \ref{syntax:char} are permitted.
 \begin{alltt}
-\textbf{ok} SBUF" Hello world" sbuf>string print
+  SBUF" Hello world" sbuf>string print
 \textbf{Hello world}
 \end{alltt}
 
@@ -853,7 +853,7 @@ Word inlining is documented in \ref{declarations}.
 }
 Push the current call frame on the call stack, and set the call stack to the given quotation. Conceptually: calls the quotation, as if its definition was substituted at the location of the \texttt{call}.
 \begin{alltt}
-\textbf{ok} [ 2 2 + 3 * ] call .
+  [ 2 2 + 3 * ] call .
 \textbf{12}
 \end{alltt}
 \wordtable{
@@ -862,9 +862,9 @@ Push the current call frame on the call stack, and set the call stack to the giv
 }
 Execute a word definition, taking action based on the word definition, as above.
 \begin{alltt}
-\textbf{ok} : hello "Hello world" print ;
-\textbf{ok} : twice dup execute execute ;
-\textbf{ok} \bs hello twice
+  : hello "Hello world" print ;
+  : twice dup execute execute ;
+  \bs hello twice
 \textbf{Hello world}
 \textbf{Hello world}
 \end{alltt}
@@ -897,7 +897,7 @@ Moves the top of the call stack to the data stack.
 
 The top of the data stack is ``hidden'' between \texttt{>r} and \texttt{r>}.
 \begin{alltt}
-\textbf{ok} 1 2 3 >r .s r>
+  1 2 3 >r .s r>
 \textbf{2
 1}
 \end{alltt}
@@ -1589,7 +1589,7 @@ M: object foo dup 2list ;
 \end{verbatim}
 Since the \texttt{integer} class is strictly smaller than the \texttt{number} class, which in turn is strictly smaller than the \texttt{object} class, the ordering of methods is not surprising in this case:
 \begin{alltt}
-\textbf{ok} \bs foo order .
+  \bs foo order .
 \textbf{[ object number integer ]}
 \end{alltt}
 However, suppose we had the following set of definitions:
@@ -1601,7 +1601,7 @@ M: object describe drop "an object" print ;
 \end{verbatim}
 Neither \texttt{general-t} nor \texttt{general-list} contains the other, and their intersection is the non-empty \texttt{cons} class. So the generic word system will place \texttt{object} first in the method order, however either \texttt{general-t} or \texttt{general-list} may come next, and it is pretty much a random choice that depends on hashing:
 \begin{alltt}
-\textbf{ok} \bs bar order .
+  \bs bar order .
 \textbf{[ object general-list general-t ]}
 \end{alltt}
 
@@ -1672,10 +1672,10 @@ Outputs the type number of a given object. Most often, the \texttt{class} word i
 }
 Outputs the canonical class of a given object. While an object may be an instance of more than one class, the canonical class is either the built-in class, or if the object is a tuple, the tuple class. Examples:
 \begin{alltt}
-\textbf{ok} 1.0 class .
+  1.0 class .
 \textbf{float}
-\textbf{ok} TUPLE: point x y z ;
-\textbf{ok} << point f 1 2 3 >> class .
+  TUPLE: point x y z ;
+  << point f 1 2 3 >> class .
 \textbf{point}
 \end{alltt}
 
@@ -1782,7 +1782,7 @@ point-z set-point-z
 The word \texttt{<point>} takes the slot values from the stack and
 produces a new \texttt{point}:
 \begin{alltt}
-\textbf{ok} 1 2 3 <point> .
+  1 2 3 <point> .
 \textbf{<< point 1 2 3 >>}
 \end{alltt}
 
@@ -1931,7 +1931,7 @@ So indeed, it is an expression of an idiom rather than an algorithm. Various wor
 }
 Like \verb|reduce|, but instead outputs a sequence of intermediate values. The first element of the resulting sequence is always \verb|ident|. For example,
 \begin{alltt}
-\textbf{ok} { 2 2 2 2 2 } 0 [ + ] accumulate .
+  { 2 2 2 2 2 } 0 [ + ] accumulate .
 { 0 2 4 6 8 }
 \end{alltt}
 \wordtable{
@@ -1959,7 +1959,7 @@ Applies the quotation to each element yielding a new element, storing the new el
 }
 Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new elements are collected into a sequence of the same class as \texttt{s1}. Here is an example computing the pair-wise product of the elements of two vectors:
 \begin{alltt}
-\textbf{ok} \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] 2map .
+  \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] 2map .
 \textbf{\tto 40 48 -6 \ttc}
 \end{alltt}
 \wordtable{
@@ -2051,7 +2051,7 @@ Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new s
 }
 The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
 \begin{alltt}
-\textbf{ok} [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
+  [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
 \textbf{"abc"}
 \end{alltt}
 \wordtable{
@@ -2098,7 +2098,7 @@ Outputs the start index of a subsequence, or $-1$ if the subsequence does not oc
 }
 Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
 \begin{alltt}
-\textbf{ok} "Hello world" 5 cut .s
+  "Hello world" 5 cut .s
 \textbf{" world"
 "Hello"}
 \end{alltt}
@@ -2108,7 +2108,7 @@ Outputs a pair of sequences that equal the original sequence when appended. The 
 }
 Outputs a pair of sequences that equal the original sequence excluding the $n$th element, when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
 \begin{alltt}
-\textbf{ok} "Hello world" 5 cut* .s
+  "Hello world" 5 cut* .s
 \textbf{"world"
 "Hello"}
 \end{alltt}
@@ -2160,7 +2160,7 @@ If \texttt{seq} does not contain \texttt{split} as a subsequence, then \texttt{b
 }
 Outputs a list of subsequences taken between occurrences of \texttt{split} in \texttt{seq}. If \texttt{split} does not occur in \texttt{seq}, outputs a singleton list containing \texttt{seq} only.
 \begin{alltt}
-\textbf{ok} "/usr/local/bin" "/" split .
+  "/usr/local/bin" "/" split .
 \textbf{[ "" "usr" "local" "bin" ]}
 \end{alltt}
 \wordtable{
@@ -2169,7 +2169,7 @@ Outputs a list of subsequences taken between occurrences of \texttt{split} in \t
 }
 Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
 
-\section{Set-theoretic operations}
+\subsection{Set-theoretic operations}
 
 A set of words for testing membership, and aggregating sequences without regard for element order.
 
@@ -2332,9 +2332,9 @@ Creates a new cons cell from two components. The \texttt{swons} word is defined 
 }
 Outputs the individual components of a cons cell. Taking the car of cdr of the empty list yields the empty list back.
 \begin{alltt}
-\textbf{ok} 5 "blind mice" cons car .
+  5 "blind mice" cons car .
 \textbf{5}
-\textbf{ok} "peanut butter" "jelly" cons cdr .
+  "peanut butter" "jelly" cons cdr .
 \textbf{"jelly"}
 \end{alltt}
 \wordtable{
@@ -2349,7 +2349,7 @@ Pushes both the car and cdr of the cons cell at once. These words are implemente
 \end{verbatim}
 Here is an example:
 \begin{alltt}
-\textbf{ok} {[[} "potatoes" "gravy" {]]} uncons .s
+  {[[} "potatoes" "gravy" {]]} uncons .s
 \textbf{"gravy"
 "potatoes"}
 \end{alltt}
@@ -2365,11 +2365,11 @@ Lists of values are represented with nested cons cells. The car is the first ele
 
 The following example demonstrates the construction of lists as chains of cons cells, along with the literal syntax used to print lists:
 \begin{alltt}
-\textbf{ok} {[} 1 2 3 {]} car .
+  {[} 1 2 3 {]} car .
 \textbf{1}
-\textbf{ok} {[} 1 2 3 {]} cdr .
+  {[} 1 2 3 {]} cdr .
 \textbf{{[} 2 3 {]}}
-\textbf{ok} {[} 1 2 3 {]} cdr cdr .
+  {[} 1 2 3 {]} cdr cdr .
 \textbf{{[} 3 {]}}
 \end{alltt}
 
@@ -2450,7 +2450,7 @@ Return a new list containing all integers from 0 up to $n-1$, inclusive.
 }
 Sorts the list by comparing each pair of elements with the quotation. The quotation should output \texttt{t} if \texttt{e2} is to come before \texttt{e1} in the list. For example, to sort a list of numbers in ascending order, you can do the following:
 \begin{alltt}
-\textbf{ok} [ 8 6 9 1 10 3 ] [ > ] sort .
+  [ 8 6 9 1 10 3 ] [ > ] sort .
 [ 1 3 6 8 9 10 ]
 \end{alltt}
 
@@ -2523,7 +2523,7 @@ Tests if \texttt{s1} follows \texttt{s2}. Implemented as follows:
 \end{verbatim}
 This is used to sort lists of strings:
 \begin{alltt}
-\textbf{ok} [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
+  [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
 [ "Apple" "Curry" "Turkey" "Veal" ]
 \end{alltt}
 \wordtable{
@@ -2597,11 +2597,11 @@ description={an instance of the \texttt{range} class, which is a virtual sequenc
 }
 Creates an immutable sequence consisting of all integers in the interval $[a,b)$ (if $a<b$) or $(b,a]$ (if $a>b$). If $a=b$, the resulting sequence is empty. As with repeated sequences, this is just a tuple implementing the sequence protocol.
 \begin{alltt}
-\textbf{ok} CHAR: a CHAR: z 1 + <range> .
+  CHAR: a CHAR: z 1 + <range> .
 << range [ ] 97 123 1 >>
-\textbf{ok} CHAR: a CHAR: z 1 + <range> >string .
+  CHAR: a CHAR: z 1 + <range> >string .
 "abcdefghijklmnopqrstuvwxyz"
-\textbf{ok} CHAR: z CHAR: a 1 - <range> >string .
+  CHAR: z CHAR: a 1 - <range> >string .
 "zyxwvutsrqponmlkjihgfedcba"
 \end{alltt}
 \glossary{name=slice,
@@ -2613,9 +2613,9 @@ description={an instance of the \texttt{slice} class, which is a virtual sequenc
 }
 Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
 \begin{alltt}
-\textbf{ok} 5 "hey" <repeated> .
+  5 "hey" <repeated> .
 << repeated [ ] 5 "hey" >>
-\textbf{ok} 5 "hey" <repeated> >list .
+  5 "hey" <repeated> >list .
 [ "hey" "hey" "hey" "hey" "hey" ]
 \end{alltt}
 
@@ -2700,8 +2700,8 @@ Appends the subsequence to the end of the sequence being constructed.
 
 Here is an example of sequence construction:
 \begin{alltt}
-\textbf{ok} : silly [ [ dup , ] repeat ] make-vector , ;
-\textbf{ok} [ 4 [ dup silly ] repeat ] make-list .
+  : silly [ [ dup , ] repeat ] make-vector , ;
+  [ 4 [ dup silly ] repeat ] make-list .
 [ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]
 \end{alltt}
 
@@ -2793,9 +2793,9 @@ Sometimes it is convenient to decompose an association list into two lists of eq
 }
 These words convert between pairs of lists and lists of pairs.
 \begin{alltt}
-\textbf{ok} [ 1 2 3 ] [ 4 5 6 ] zip .
+  [ 1 2 3 ] [ 4 5 6 ] zip .
 [ [[ 1 4 ]] [[ 2 5 ]] [[ 3 6 ]] ]
-\textbf{ok} [ [[ 1 2 ]] [[ 3 4 ]] [[ 5 6 ]] ] unzip .s
+  [ [[ 1 2 ]] [[ 3 4 ]] [[ 5 6 ]] ] unzip .s
 [ 2 4 6 ]
 [ 1 3 5 ]
 \end{alltt}
@@ -3125,13 +3125,13 @@ The predicate word \texttt{integer?}~tests if the top of the stack is an integer
 Integer operations automatically return bignums if the result would be too big to fit in a fixnum. Here is an example where multiplying two fixnums returns a bignum:
 
 \begin{alltt}
-\textbf{ok} 134217728 fixnum? .
+  134217728 fixnum? .
 \textbf{t}
-\textbf{ok} 128 fixnum? .
+  128 fixnum? .
 \textbf{t}
-\textbf{ok} 134217728 128 * .
+  134217728 128 * .
 \textbf{17179869184}
-\textbf{ok} 134217728 128 * bignum? .
+  134217728 128 * bignum? .
 \textbf{t}
 \end{alltt}
 
@@ -3180,9 +3180,9 @@ If you wish to perform an iteration over a range of integers that does not begin
 }
 Computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0, then \texttt{x} is a multiple of \texttt{y}.
 \begin{alltt}
-\textbf{ok} 100 3 mod .
+  100 3 mod .
 \textbf{1}
-\textbf{ok} -546 34 mod .
+  -546 34 mod .
 \textbf{-2}
 \end{alltt}
 \wordtable{
@@ -3191,7 +3191,7 @@ Computes the remainder of dividing \texttt{x} by \texttt{y}. If the result is 0,
 }
 This is the same as \texttt{mod} except the answer is always positive.
 \begin{alltt}
-\textbf{ok} -546 34 rem .
+  -546 34 rem .
 \textbf{32}
 \end{alltt}
 
@@ -3319,9 +3319,9 @@ Ratios are printed and can be input literally in the form above. Ratios are alwa
 
 Ratios behave just like any other number -- all numerical operations work as expected.
 \begin{alltt}
-\textbf{ok} 1/2 1/3 + .
+  1/2 1/3 + .
 \textbf{5/6}
-\textbf{ok} 100 6 / 3 * .
+  100 6 / 3 * .
 \textbf{50}
 \end{alltt}
 \wordtable{
@@ -3336,11 +3336,11 @@ Tests if the top of the stack is a ratio.
 }
 Deconstructs rational numbers into their numerator and denominator. The denominator is always positive; for integers, it equals 1.
 \begin{alltt}
-\textbf{ok} 75/33 numerator .
+  75/33 numerator .
 \textbf{25}
-\textbf{ok} 75/33 denominator .
+  75/33 denominator .
 \textbf{11}
-\textbf{ok} 12 numerator .
+  12 numerator .
 \textbf{12}
 \end{alltt}
 
@@ -3360,16 +3360,16 @@ description={an instance of the \texttt{real} class, which is a disjoint union o
 Rational numbers represent \emph{exact} quantities. On the other hand, a floating point number is an \emph{approximation}. While rationals can grow to any required precision, floating point numbers are fixed-width, and manipulating them is usually faster than manipulating ratios or bignums (but slower than manipulating fixnums). Floating point literals are often used to represent irrational numbers, which have no exact representation as a ratio of two integers. Floating point literals are input with a decimal point.
 
 \begin{alltt}
-\textbf{ok} 1.23 1.5 + .
+  1.23 1.5 + .
 \textbf{1.73}
 \end{alltt}
 
 Introducing a floating point number in a computation forces the result to be expressed in floating point.
 
 \begin{alltt}
-\textbf{ok} 5/4 1/2 + .
+  5/4 1/2 + .
 \textbf{7/4}
-\textbf{ok} 5/4 0.5 + .
+  5/4 0.5 + .
 \textbf{1.75}
 \end{alltt}
 
@@ -3423,9 +3423,9 @@ Tests if the top of the stack is a complex number. Note that unlike math, where 
 }
 Deconstructs complex numbers into their real and imaginary components. The imaginary component of a real number is always zero.
 \begin{alltt}
-\textbf{ok} -1 sqrt real .
+  -1 sqrt real .
 \textbf{0}
-\textbf{ok} -1 sqrt imaginary .
+  -1 sqrt imaginary .
 \textbf{1}
 \end{alltt}
 \wordtable{
@@ -3435,10 +3435,10 @@ Deconstructs complex numbers into their real and imaginary components. The imagi
 }
 Converts between complex numbers and pairs of real numbers representing them in rectangular form.
 \begin{alltt}
-\textbf{ok} -1 sqrt sqrt >rect .s
+  -1 sqrt sqrt >rect .s
 \textbf{0.7071067811865475
 0.7071067811865476}
-\textbf{ok} 1/3 5 rect> .
+  1/3 5 rect> .
 \textbf{\#\tto 1/3 5 \ttc\#}
 \end{alltt}
 
@@ -3449,7 +3449,7 @@ Converts between complex numbers and pairs of real numbers representing them in 
 }
 Converts between complex numbers and pairs of real numbers representing them in polar form. The polar form of a complex number consists of an absolute value and argument.
 \begin{alltt}
-\textbf{ok} \#\tto 4 5 \ttc >polar .s
+  \#\tto 4 5 \ttc >polar .s
 \textbf{0.8960553845713439
 6.403124237432849}
 \end{alltt}
@@ -3462,9 +3462,9 @@ Converts between complex numbers and pairs of real numbers representing them in 
 }
 Computes the absolute value and argument individually.
 \begin{alltt}
-\textbf{ok} -5.3 abs .
+  -5.3 abs .
 \textbf{5.3}
-\textbf{ok} i arg .
+  i arg .
 \textbf{1.570796326794897}
 \end{alltt}
 
@@ -3537,9 +3537,9 @@ However, it is actually defined otherwise, for efficiency.\footnote{In fact, thi
 }
 Computes the natural (base $e$) logarithm. This is the inverse of the \texttt{exp} function.
 \begin{alltt}
-\textbf{ok} e log .
+  e log .
 \textbf{1.0}
-\textbf{ok} -1 log .
+  -1 log .
 \textbf{\#\tto 0.0 3.141592653589793 \ttc}
 \end{alltt}
 The \texttt{math} vocabulary provides the full set of trigonometric and hyperbolic functions, along with inverses and reciprocals. Complex number arguments are supported.
@@ -3625,7 +3625,7 @@ These words all expect a pair of vectors of equal length. They apply a binary op
 Note that \verb|v*| is not the inner product. The inner product is the \verb|v.| word (\ref{inner-product}).
 
 \begin{alltt}
-\textbf{ok} \tto 0 2 1/2 1 \ttc \tto 5 6 3 8 \ttc v+ .
+  \tto 0 2 1/2 1 \ttc \tto 5 6 3 8 \ttc v+ .
 \textbf{\tto 5 8 7/2 9 \ttc}
 \end{alltt}
 
@@ -3695,11 +3695,11 @@ Outputs a vector with the same direction, but length 1. Defined as follows:
 }
 Computes the cross product $v_1\times v_2$. The following example illustrates the fact that a cross product of two vectors is always orthogonal to either vector.
 \begin{alltt}
-\textbf{ok} \tto 1 6/7 -8 \ttc \tto 8/5 3 -2 \ttc cross .
+  \tto 1 6/7 -8 \ttc \tto 8/5 3 -2 \ttc cross .
 \textbf{\tto 156/7 -54/5 -118/35 \ttc}
-\textbf{ok} \tto 156/7 -54/5 57/35 \ttc \tto 1 6/7 -8 \ttc v. .
+  \tto 156/7 -54/5 57/35 \ttc \tto 1 6/7 -8 \ttc v. .
 \textbf{0}
-\textbf{ok} \tto 156/7 -54/5 57/35 \ttc \tto 8/5 3 -2 \ttc v. .
+  \tto 156/7 -54/5 57/35 \ttc \tto 8/5 3 -2 \ttc v. .
 \textbf{0}
 \end{alltt}
 
@@ -3720,7 +3720,7 @@ Creates a new matrix with the given dimensions and underlying sequence. The unde
 Outputs the underlying sequence of a matrix.
 
 \begin{alltt}
-\textbf{ok} M[ [ 1 2 3 ] [ 4 5 6 ] ]M matrix-sequence .
+  M[ [ 1 2 3 ] [ 4 5 6 ] ]M matrix-sequence .
 \textbf{\tto 1 2 3 4 5 6 \ttc}
 \end{alltt}
 
@@ -3737,7 +3737,7 @@ Creates a new matrix with the given dimensions and all elements set to zero.
 Creates a new $n\times n$ matrix where all elements on the main diagonal are 1, and all other elements are zero; for example:
 
 \begin{alltt}
-\textbf{ok} 3 <identity-matrix> prettyprint
+  3 <identity-matrix> prettyprint
 \textbf{M[ [ 1 0 0 ]
    [ 0 1 0 ]
    [ 0 0 1 ] ]M}
@@ -3751,7 +3751,7 @@ The following are the usual algebraic operations on matrices.
 }
 Multiplies each element of a matrix by a scalar.
 \begin{alltt}
-\textbf{ok} 5 2 <identity-matrix> n*m prettyprint
+  5 2 <identity-matrix> n*m prettyprint
 \textbf{M[ [ 5 0 ]
    [ 0 5 ] ]M}
 \end{alltt}
@@ -3786,7 +3786,7 @@ Composes two matrices as linear operators. This is the usual mathematical matrix
 }
 Outputs a matrix where each row is a column of the original matrix, and each column is a row of the original matrix.
 \begin{alltt}
-\textbf{ok} M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose .
+  M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose .
 \textbf{M[ [ 1 3 5 ] [ 2 4 6 ] ]M}
 \end{alltt}
 
@@ -3800,7 +3800,7 @@ There is a natural isomorphism between the vector space $\mathbb{C}^m$, the $m\t
 }
 Given a vector with $n$ elements, outputs a $1 \times n$ matrix.
 \begin{alltt}
-\textbf{ok} \tto 1.0 4.43 7.6 0.2 \ttc <row-vector> .
+  \tto 1.0 4.43 7.6 0.2 \ttc <row-vector> .
 M[ [ 1.0 4.43 7.6 0.2 ] ]M
 \end{alltt}
 
@@ -3810,7 +3810,7 @@ M[ [ 1.0 4.43 7.6 0.2 ] ]M
 }
 Given a vector with $n$ elements, outputs a $n \times 1$ matrix.
 \begin{alltt}
-\textbf{ok} \tto 1.0 4.43 7.6 0.2 \ttc <col-vector> .
+  \tto 1.0 4.43 7.6 0.2 \ttc <col-vector> .
 M[ [ 1.0 ] [ 4.43 ] [ 7.6 ] [ 0.2 ] ]M
 \end{alltt}
 
@@ -3822,7 +3822,7 @@ Applies a matrix to a vector on the right, as a linear transformation. The vecto
 treated as a matrix with one column.
 
 \begin{alltt}
-\textbf{ok} \tto 5 -3 \ttc M[ [ 0 1 ] [ 1 0 ] ]M v.m .
+  \tto 5 -3 \ttc M[ [ 0 1 ] [ 1 0 ] ]M v.m .
 \textbf{\tto -3 5 \ttc}
 \end{alltt}
 
@@ -4042,6 +4042,29 @@ is thrown.
 }
 Like \verb|with-stream| extend the stream is only closed in the case of an error.
 
+\section{Styled output}\label{styles}
+
+HTML streams (\ref{html}) and pane streams (\ref{panes}) support styled text output using the \verb|stream-write-attr| word. The style association list given to this word can contain any of the following keys:
+
+\begin{tabular}{l|l}
+Key&Description\\
+\hline
+\texttt{foreground}&The foreground color, as a list with red, green, blue components\\
+\texttt{background}&The background color, as a list with red, green, blue components\\
+\texttt{font}&A font family name\\
+\texttt{font-style}&One of \verb|plain|, \verb|bold|, \verb|italic|, or \verb|bold-italic|\\
+\texttt{font-size}&An integer\\
+\texttt{underline}&A boolean\\
+\texttt{presented}&If set, a presentation for this object is output\\
+\texttt{"file"}&If set, a hyperlink to that file is output\\
+\texttt{icon}&If set, the icon named by this resource path is output\\
+\end{tabular}
+
+Note that
+HTML streams only use the \verb|presented| key if it is set to a word; in that case, a link to the browser responder is output. The \verb|"file"| key causes an HTML stream to output a link to the file responder. Both responders must be enabled for such links to function.
+
+Pane streams support presentation of any object, whereas the  \verb|"file"| key is not supported.
+
 \section{String streams}\label{string-streams}
 
 Calling stream output words on a string buffer will append text to the string buffer.
@@ -4138,7 +4161,7 @@ The following set of words provide access to file system metadata.
 }
 Outputs the remainder of the file's name after the last occurrence of a period, or \texttt{f} if there is no extension.
 \begin{alltt}
-\textbf{ok} "world.takeover.plan.txt" file-extension .
+  "world.takeover.plan.txt" file-extension .
 \textbf{"txt"}
 \end{alltt}
 \wordtable{
@@ -4454,7 +4477,7 @@ As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary 
 }
 Parses the string and outputs a quotation. The vocabulary search path and current vocabulary are taken from the current scope.
 \begin{alltt}
-\textbf{ok} "1 2 3" parse .
+  "1 2 3" parse .
 \textbf{[ 1 2 3 ]}
 \end{alltt}
 
@@ -4464,7 +4487,7 @@ Parses the string and outputs a quotation. The vocabulary search path and curren
 }
 Parses a string then calls the resulting quotation.
 \begin{alltt}
-\textbf{ok} "2 2 + ." eval
+  "2 2 + ." eval
 \textbf{4}
 \end{alltt}
 The \texttt{eval} word is defined as follows:
@@ -4732,6 +4755,20 @@ This word is used to implement end-of-line comments:
 : ! until-eol drop ; parsing
 \end{verbatim}
 
+\chapter{UI framework}
+
+\section{Low-level graphics rendering}
+
+\section{Gadgets}
+
+\section{Buttons}
+
+\section{Panes}\label{panes}
+
+\section{Scrolling}
+
+\section{Splitters}
+
 \chapter{Web framework}
 
 Factor includes facilities for interoperating with web-based services. This includes an HTTP client, and an HTTP server with a continuation-based web application framework.
@@ -4742,12 +4779,29 @@ Factor includes facilities for interoperating with web-based services. This incl
 \vocabulary{http-client}
 \ordinaryword{http-get}{http-get ( url -- code headers stream )}
 }
-Attempts to connect to the server specified in the URL. If the connection fails, an exception is thrown, otherwise the following values are output;
+Connects to the server specified in the URL, and makes a \verb|GET| request to retreive that resource.
+
+\wordtable{
+\vocabulary{http-client}
+\ordinaryword{http-post}{http-post ( type content url -- code headers stream )}
+}
+Attempts to connect to the server specified in the URL, and makes a \verb|POST| request with the specified content type and content. The content is automatically URL-encoded for you.
+
+With both words, the output values are as follows:
 \begin{description}
 \item[\texttt{code}] an integer with the HTTP response code; for example, 404 denotes ``file not found'' whereas 200 means ``success''.
 \item[\texttt{headers}] an association list of returned headers.
 \item[\texttt{stream}] a stream for reading the resource.
 \end{description}
+
+The following pair of words convert a string to and from its URL-encoded form.
+
+\wordtable{
+\vocabulary{http}
+\ordinaryword{url-encode}{url-encode ( string -- string )}
+\ordinaryword{url-decode}{url-decode ( string -- string )}
+}
+These words are called automatically by much of the web framework, however they are sometimes useful to call directly.
 
 \section{HTTP server}\label{httpd}
 
@@ -4761,8 +4815,8 @@ Starts listening for HTTP requests on \verb|port|.
 
 The HTTP server is usually started with a phrase like the following:
 \begin{alltt}
-\textbf{ok} USING: httpd threads ;
-\textbf{ok} [ 8888 httpd ] in-thread
+  USING: httpd threads ;
+  [ 8888 httpd ] in-thread
 \end{alltt}
 
 \wordtable{
@@ -4790,6 +4844,8 @@ If a directory holds an \verb|index.html| file, the file is served when the dire
 \end{verbatim}
 A facility for ad-hoc server-side scripting exists. If a file with the \verb|.factsp| filename extension is requested, the file is run with \verb|run-file| and any output it sends to the default stream is sent to the client (\ref{stdio}). These ``Factor server pages'' are slower and less powerful than responders, so it is recommended that responders be used instead.
 
+A different static site can be associated with each virtual host by setting the \verb|"doc-root"| variable in each virtual host (\ref{vhosts}).
+
 \subsection{Responders}
 
 \glossary{name=responder,
@@ -4797,13 +4853,87 @@ description={A named handler for HTTP requests, installed in the \texttt{respond
 \glossary{name=HTTP responder,
 description={See responder}}
 
-The HTTP server listens on a port number for HTTP requests and issues requests to \emph{responders}.
+The HTTP server listens on a port number for HTTP requests and issues requests to \emph{responders}. The following form of request is understood specially by the HTTP server:
+\begin{verbatim}
+http://myhost/responder/foo/bar
+\end{verbatim}
+Such a request results in the \verb|foo| responder being invoked with the \verb|bar| argument. Requesting a path that does not begin with \verb|/responder| simply invokes the file responder with that path, as documented in the previous section.
 
-\subsection{Virtual hosts}
+\subsubsection{Managing responders}
 
-\section{HTML output}\label{html}
+\wordtable{
+\vocabulary{httpd}
+\symbolword{responders}
+}
+Responders are located in a hashtable stored in the \verb|responders| variable. This variable must be in scope when the \verb|httpd| word is invoked. This is usually the case, as the global namespace includes a default value filled out with all responders that are included as part of the library.
 
-An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities before being passed on to the wrapped stream. Also, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word may be filled out to wrap the text being written in various HTML tags.
+The following words manage the set of installed responders:
+
+\wordtable{
+\vocabulary{httpd}
+\ordinaryword{set-default-responder}{set-default-responder ( name -- )}
+}
+Sets the default responder, that is, the one handling requests not prefixed by \verb|/responder|, to the responder \verb|name|. The initial value for the default responder is \verb|"file"|, identifying the file responder.
+\wordtable{
+\vocabulary{httpd}
+\ordinaryword{add-responder}{add-responder ( responder -- )}
+}
+Adds a responder to the hashtable stored in the \verb|responders| variable that is in scope.
+
+\subsubsection{Developing a responder}
+
+A responder is a hashtable where the following keys must be set:
+
+\begin{description}
+\item[\texttt{"responder"}] The name of the responder
+\item[\texttt{"get"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path \texttt{/responder/\emph{name}/\emph{resource}} using the \texttt{GET} method
+\item[\texttt{"post"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path using the \texttt{POST} method
+\item[\texttt{"head"}] A quotation with stack effect \verb|( resource -- )|, invoked when a client requests the path using the \texttt{HEAD} method
+\end{description}
+
+The quotations are called by the HTTP server in the dynamic scope of the responder, with the following additional variables set:
+
+\begin{description}
+\item[\texttt{"method"}] The HTTP method requested by the client; one of \texttt{"get"}, \texttt{"post"} or \texttt{"head"}
+\item[\texttt{"request"}] The full URL requested by the client, sans any query parameters trailing a \verb|?| character
+\item[\texttt{"query"}] An association list of URL-decoded string pairs, obtained by splitting the query string, if any
+\item[\texttt{"raw-query"}] The raw query string. Usually not used
+\item[\texttt{"header"}] An association list of URL-decoded string pairs, obtained from the headers sent by the client
+\item[\texttt{"response"}] Only set in the \verb|POST| method, an association list of string pairs, obtained from the response sent by the client
+\end{description}
+
+\subsection{Virtual hosts}\label{vhosts}
+
+\glossary{name=virtual hosting,
+description={A technique where a server is given several host name aliases via DNS; then the server serves different web sites, depending on the particular host name alias requested by the client}}
+
+Factor's HTTP server supports virtual hosting. This is done with an additional layer of indirection, where each virtual host has its own set of responders. Virtual hosting is optional; by default, all virtual hosts share the same set of responders.
+
+\wordtable{
+\vocabulary{httpd}
+\symbolword{vhosts}
+}
+
+Virtual hosts are defined in a hashtable mapping virtual host names to hashtables of responders. An initial value for this variable is defined in the global namespace; it provides an empty default virtual host. The default virtual host is the value associated with the \verb|"default"| key.
+
+When a client makes a request, the HTTP server first searches for a responder in the requested virtual host; if no responder is found there, the default virtual host is checked. If this also fails, the global \verb|responders| variable is tested.
+
+As an example, suppose the machine running the HTTP server has two DNS aliases, \verb|porky.ham.net| and \verb|spam.ham.net|. The following setup will serve two different static web sites from each virtual host, whereas all other responders are taken from the global table, and are shared between the two hosts:
+
+\begin{verbatim}
+vhosts get [
+    "porky.ham.net" {{
+        [[ "doc-root" "/var/www/porky/" ]]
+    }} set
+    "spam.ham.net" {{
+        [[ "doc-root" "/var/www/spam/" ]]
+    }} set
+] bind
+\end{verbatim}
+
+\section{HTML streams}\label{html}
+
+An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities via the \verb|chars>entities| word documented below. In addition, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word is inspected for style attributes that direct the stream to wrap the output in various HTML tags; see \ref{styles}.
 
 \wordtable{
 \vocabulary{html}
@@ -4823,23 +4953,21 @@ Builds on \texttt{with-html-stream} to emit the basic structure of an HTML docum
 }
 Like \texttt{html-document}, except the output is wrapped inside a \texttt{<pre>} tag.
 
-Calls to \texttt{write-attr} inside a quotation given to one of the above combinators will perform HTML output. The following keys may be set in the \texttt{attrs} association list given to \texttt{write-attr}:
+\wordtable{
+\vocabulary{html}
+\ordinaryword{chars>entities}{chars>entities ( string -- string )}
+}
+Converts various special characters in the input string (or any sequence of characters) into corresponding HTML entities. The following characters are converted:
 
 \begin{tabular}{l|l}
-Key&Description\\
+Character&Entity\\
 \hline
-\texttt{"fg"}&The foreground color, as a list with red, green, blue components\\
-\texttt{"bg"}&The background color, as a list with red, green, blue components\\
-\texttt{"bold"}&A boolean\\
-\texttt{"italics"}&A boolean\\
-\texttt{"underline"}&A boolean\\
-\texttt{"size"}&An integer\\
-\texttt{"file"}&If set, a hyperlink to that file is output\\
-\texttt{"word"}&If set, a hyperlink to that word is output\\
-\texttt{"vocab"}&Must be set of \texttt{"word"} is set
+\verb|<|   &\verb|&lt;|\\
+\verb|>|   &\verb|&gt;|\\
+\verb|&|   &\verb|&amp;|\\
+\verb|'|   &\verb|&apos;|\\
+\verb|"|   &\verb|&quot;|
 \end{tabular}
-
-Hyperlinks to files and words point to the file and browser responders, respectively. These responders must be enabled for such links to function.
 
 \chapter{Alien interface}
 
@@ -4871,7 +4999,7 @@ Adds a logical library named \verb|library|. The underlying shared library name 
 
 For example:
 \begin{alltt}
-\textbf{ok} "kernel32" "kernel32.dll"  "stdcall"  add-library
+  "kernel32" "kernel32.dll"  "stdcall"  add-library
 \end{alltt}
 The next word is used in the implementation of the alien interface, and it can also be used
 interactively to test if a library can be loaded.
@@ -4885,19 +5013,24 @@ More will be said about DLL handles in \ref{alien-internals}.
 
 \section{Calling native functions}
 
-Native functions are called with the \verb|alien-invoke| word. This word can only be used
-from compiled definitions (\ref{compiler}). Executing it inside an interpreted quotation will throw an exception.
+Native function bindings are established using a pair of parsing words.
 
 \wordtable{
 \vocabulary{alien}
-\ordinaryword{alien-invoke}{alien-invoke ( return lib func parameters -- )}
+\parsingword{LIBARARY:}{LIBARARY:~\emph{name}}
 }
-Invokes the function named \verb|func| in the library with logical name \verb|lib|.
+Specifies the logical name of the C library in which the following functions are found.
 
-The \verb|return| value is a string naming a C type, and maybe set to \verb|void|, in the case of the native function not returning a value.
+\wordtable{
+\vocabulary{alien}
+\parsingword{FUNCTION:}{FUNCTION:~\emph{returns} \emph{name} ( \emph{type} \emph{name}, \emph{...} )}
+}
+Defines a new word \verb|name| that calls the C function with the same name, found in the library given by the most recent \verb|LIBRARY:| declaration.
 
-The \verb|parameters| value is a list
-of strings naming C types. C types are listed in table \ref{c-types}.
+The \verb|return| value names a C type, or \verb|void| if no return value is expected.
+Parameters are given by consecutive type/name pairs, where the type is again a C type, and the name is for documentation purposes. C types are documented in \ref{aliens}.
+
+The word generated by \verb|FUNCTION:| must be compiled before use \ref{compiler}). Executing it without compiling will throw an exception.
 
 For example, suppose you have a \verb|foo| library exporting the following function:
 \begin{verbatim}
@@ -4907,17 +5040,22 @@ void the_answer(char* question, int value) {
 \end{verbatim}
 You can define a word for invoking it:
 \begin{verbatim}
-: the-answer ( question value -- answer )
-    "void" "foo" "the_answer" [ "char*" "int" ]
-    alien-invoke ;
+LIBRARY: foo
+FUNCTION: the_answer ( char* question, int value ) ;
 \end{verbatim}
 Now, after being compiled, the word can be executed with two parameters on the stack:
 \begin{alltt}
-\textbf{ok} \bs the-answer compile
+  \bs the-answer compile
 \textbf{Compiling the-answer}
-\textbf{ok} "the question" 42 the-answer
+  "the question" 42 the-answer
 \textbf{The answer to the question is 42.}
 \end{alltt}
+
+Note that the parentheses and commas are only syntax sugar; the following two definitions are equivalent, although the former is slightly more readable:
+\begin{verbatim}
+FUNCTION: void glHint ( GLenum target, GLenum mode ) ;
+FUNCTION: void glHint GLenum target GLenum mode ;
+\end{verbatim}
 
 \section{Alien objects}\label{aliens}
 
@@ -4955,6 +5093,14 @@ Name&Size&Representation\\
 \texttt{void*}       &4&   Generic pointer
 \end{tabular}
 \end{table}
+
+A facility similar to C's \verb|typedef| type aliasing is provided. It can help with readability, as well as ease of development of library bindings.
+
+\wordtable{
+\vocabulary{alien}
+\parsingword{TYPEDEF:}{TYPEDEF:~\emph{old} \emph{new}}
+}
+Defines a C type named \verb|new| that is identical to \verb|old|, along with a pointer type \verb|new*| that is identical to \verb|old*|.
 
 \wordtable{
 \vocabulary{alien}
@@ -5235,7 +5381,7 @@ ok}
 An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating the listener is ready to execute Factor phrases. The listener is a piece of Factor code, like any other; however, it helps to think of it as the primary interface to the Factor system. The listener reads Factor code and executes it. You can try the classical first program:
 
 \begin{alltt}
-\textbf{ok} "Hello, world." print
+  "Hello, world." print
 \textbf{Hello, world.}
 \end{alltt}
 
@@ -5243,7 +5389,7 @@ An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating t
 Multi-line phrases are supported; if there are unclosed brackets, the listener outputs \texttt{...} instead of the \texttt{ok} prompt, and the entire phrase is executed once all brackets are closed:
 
 \begin{alltt}
-\textbf{ok} [ 1 2 3 ] [
+  [ 1 2 3 ] [
 \textbf{...} .
 \textbf{...} ] each
 \textbf{1
@@ -5266,20 +5412,20 @@ While it is possible to do all development in the listener and save your work in
 By convention, Factor source files are saved with the \texttt{.factor} filename extension. They can be loaded into the image as follows:
 
 \begin{alltt}
-\textbf{ok} "examples/numbers-game.factor" run-file
+  "examples/numbers-game.factor" run-file
 \end{alltt}
 
 In Factor, loading a source file replaces any existing definitions\footnote{But see \ref{compiler} for this is not true of compiled code.}. Each word definition remembers what source file it was loaded from (if any). To reload the source file associated with a definition, use the \texttt{reload} word:
 
 \begin{alltt}
-\textbf{ok} \bs draw reload
+  \bs draw reload
 \end{alltt}
 
 Word definitions also retain the line number where they are located in their original source file. This allows you to open a word definition in jEdit\footnote{\texttt{http://www.jedit.org}} for editing using the
 \texttt{jedit} word:
 
 \begin{alltt}
-\textbf{ok} \bs compile jedit
+  \bs compile jedit
 \end{alltt}
 
 This word requires that a jEdit instance is already running.
@@ -5295,7 +5441,7 @@ The \texttt{jedit} word will open word definitions from the Factor library once 
 The \texttt{factor.image} file is basically a dump of all objects in the heap. A new image can be saved as follows:
 
 \begin{alltt}
-\textbf{ok} "work.image" save-image
+  "work.image" save-image
 \textbf{Saving work.image...}
 \end{alltt}
 
@@ -5303,8 +5449,8 @@ When you save an image before exiting Factor, then start Factor again, everythin
 
 \begin{alltt}
 ./f factor.image
-\textbf{ok} "Learn Factor" "reminder" set
-\textbf{ok} "factor.image" save-image bye
+  "Learn Factor" "reminder" set
+  "factor.image" save-image bye
 \textbf{Saving factor.image...}
 \end{alltt}
 
@@ -5312,7 +5458,7 @@ Factor will save the image and exit. Now start it again and see that the reminde
 
 \begin{alltt}
 ./f factor.image
-\textbf{ok} "reminder" get .
+  "reminder" get .
 \textbf{"Learn Factor"}
 \end{alltt}
 
@@ -5323,14 +5469,14 @@ This is what is meant by the image being an \emph{infinite session}. When you sh
 Probably the most important debugging tool of them all is the \texttt{.} word. It prints the object at the top of the stack in a form that can be parsed by the Factor parser. A related word is \texttt{prettyprint}. It is identical to \texttt{.} except the output is more verbose; lists, vectors and hashtables are broken up into multiple lines and indented.
 
 \begin{alltt}
-\textbf{ok} [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ] .
+  [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ] .
 [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ]
 \end{alltt}
 
 Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting. Here is an example -- a vector is created, that holds a list whose first element is the vector itself:
 
 \begin{alltt}
-\textbf{ok} \tto \ttc [ unit 0 ] keep [ set-vector-nth ] keep .
+  \tto \ttc [ unit 0 ] keep [ set-vector-nth ] keep .
 \tto [ ... ] \ttc
 \end{alltt}
 
@@ -5347,11 +5493,11 @@ Before we move on, one final set of output words comes is used to output integer
 different numeric bases. The \texttt{.b} word prints an integer in binary, \texttt{.o} in octal, and \texttt{.h} in hexadecimal.
 
 \begin{alltt}
-\textbf{ok} 31337 .b
+  31337 .b
 \textbf{111101001101001}
-\textbf{ok} 31337 .o
+  31337 .o
 \textbf{75151}
-\textbf{ok} 31337 .h
+  31337 .h
 \textbf{7a69}
 \end{alltt}
 
@@ -5364,7 +5510,7 @@ Factor organizes code in a two-tier structure of vocabularies and words. A word 
 Entering \texttt{vocabs .}~in the listener produces a list of all existing vocabularies:
 
 \begin{alltt}
-\textbf{ok} vocabs .
+  vocabs .
 \textbf{[ "alien" "ansi" "assembler" "browser-responder"
 "command-line" "compiler" "cont-responder" "errors"
 "file-responder" "files" "gadgets" "generic"
@@ -5382,7 +5528,7 @@ Entering \texttt{vocabs .}~in the listener produces a list of all existing vocab
 As you can see, there are a lot of vocabularies! Now, you can use \texttt{words .}~to list the words inside a given vocabulary:
 
 \begin{alltt}
-\textbf{ok} "namespaces" words .
+  "namespaces" words .
 \textbf{[ (get) , <namespace> >n append, bind change cons@
 dec extend get global inc init-namespaces list-buffer
 literal, make-list make-rlist make-rstring make-string
@@ -5393,8 +5539,8 @@ set-global set-namestack unique, unique@ with-scope ]}
 You can look at the definition of any word, including library words, using \texttt{see}. Keep in mind you might have to \texttt{USE:} the vocabulary first.
 
 \begin{alltt}
-\textbf{ok} USE: httpd
-\textbf{ok} \bs httpd-connection see
+  USE: httpd
+  \bs httpd-connection see
 \textbf{IN: httpd : httpd-connection ( socket -- )
     "http-server" get accept [
         httpd-client
@@ -5409,7 +5555,7 @@ The \texttt{apropos.} word is handy when searching for related words. It lists a
 whose names contain a given string. The \texttt{apropos.} word is also useful when you know the exact name of a word, but are unsure what vocabulary it is in. For example, if you're looking for ways to iterate over various collections, you can do an apropos search for \texttt{map}:
 
 \begin{alltt}
-\textbf{ok} "map" apropos.
+  "map" apropos.
 \textbf{IN: inference
 type-value-map
 IN: lists
@@ -5430,7 +5576,7 @@ The \texttt{usage} word finds all words that refer to a given word and pushes a 
 return value of \texttt{usage} using \texttt{.}:
 
 \begin{alltt}
-\textbf{ok} \bs string-map usage .
+  \bs string-map usage .
 \textbf{schars>entities
 filter-null
 url-encode}
@@ -5451,7 +5597,7 @@ general sense is just a set of objects. You can output a list of classes in the 
 with \texttt{classes .}:
 
 \begin{alltt}
-\textbf{ok} classes.
+  classes.
 \textbf{[ alien alien-error byte-array displaced-alien
 dll ansi-stream disp-only displaced indirect operand
 register absolute absolute-16/16 relative relative-bitfld
@@ -5482,7 +5628,7 @@ Alternatively, you can use \texttt{methods.} to print all methods specializing o
 given class:
 
 \begin{alltt}
-\textbf{ok} \bs list methods.
+  \bs list methods.
 \textbf{PREDICATE: general-list list
     dup [
         last* cdr
@@ -5516,7 +5662,7 @@ is printed and the stacks at the time of the error are saved. If you're spent an
 time with Factor at all, you are probably familiar with this type of message:
 
 \begin{alltt}
-\textbf{ok} [ 1 2 3 ] 4 append reverse
+  [ 1 2 3 ] 4 append reverse
 \textbf{The generic word car does not have a suitable method for 4
 :s :r :n :c show stacks at time of error.
 :get ( var -- value ) inspects the error namestack.}
@@ -5555,7 +5701,7 @@ car
 So now, the mystery has been solved: as \texttt{reverse} iterates down the input value, it hits a cons cells whose \texttt{cdr} is not a list. Indeed, if you look at the value we are passing to \texttt{reverse}, you will see why:
 
 \begin{alltt}
-\textbf{ok} [ 1 2 3 ] 4 append .
+  [ 1 2 3 ] 4 append .
 [[ 1 [[ 2 [[ 3 4 ]] ]] ]]
 \end{alltt}
 
@@ -5568,7 +5714,7 @@ The walker lets you step through the execution of a qotation. When a compound de
 There are two ways to use the walker. First of all, you can call the \texttt{walk} word explicitly, giving it a quotation:
 
 \begin{alltt}
-\textbf{ok} [ [ 10 [ dup , ] repeat ] make-list ] walk
+  [ [ 10 [ dup , ] repeat ] make-list ] walk
 \textbf{\&s \&r \&n \&c show stepper stacks.
 \&get ( var -- value ) inspects the stepper namestack.
 step -- single step over
@@ -5590,7 +5736,7 @@ Note that the walker does not automatically stop when the quotation originally g
 While the walker can be invoked explicitly using the \texttt{walk} word, sometimes it is more convenient to \emph{annotate} a word such that the walker is invoked automatically when the word is called. This can be done using the \texttt{break} word:
 
 \begin{alltt}
-\textbf{ok} \bs layout* break
+  \bs layout* break
 \end{alltt}
 
 Now, when some piece of code calls \texttt{layout*}, the walker will open, and you will be able to step through execution and see exactly what's going on. An important point to keep in mind is that when the walker is invoked in this manner, \texttt{exit} will not have the desired effect; execution will continue, but the data stack will be inconsistent, and an error will most likely be raised a short time later. Always use \texttt{continue} to resume execution after a break.
@@ -5598,7 +5744,7 @@ Now, when some piece of code calls \texttt{layout*}, the walker will open, and y
 The walker is very handy, but sometimes you just want to see if a word is being called at all and when, and you don't care to single-step it. In that case, you can use the \texttt{watch} word:
 
 \begin{alltt}
-\textbf{ok} \bs draw-shape break
+  \bs draw-shape break
 \end{alltt}
 
 Now when \texttt{draw-shape} is called, a message will be printed to that effect.
@@ -5606,8 +5752,8 @@ Now when \texttt{draw-shape} is called, a message will be printed to that effect
 You can undo the effect of \texttt{break} or \texttt{watch} by reloading the original source file containing the word definition in question:
 
 \begin{alltt}
-\textbf{ok} \bs layout* reload
-\textbf{ok} \bs draw-shape reload
+  \bs layout* reload
+  \bs draw-shape reload
 \end{alltt}
 
 \section{Dealing with hangs}
@@ -5639,7 +5785,7 @@ Unit testing is a good habit to get into. Sometimes, writing tests first, before
 The \texttt{time} word reports the time taken to execute a quotation, in milliseconds. The portion of time spent in garbage collection is also shown:
 
 \begin{alltt}
-\textbf{ok} [ 1000000 [ f f cons drop ] repeat ] time
+  [ 1000000 [ f f cons drop ] repeat ] time
 \textbf{515 milliseconds run time
 11 milliseconds GC time}
 \end{alltt}
@@ -5649,22 +5795,22 @@ The \texttt{time} word reports the time taken to execute a quotation, in millise
 Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
 
 \begin{alltt}
-\textbf{ok} USE: io-internals
-\textbf{ok} [ port? ] instances .
+  USE: io-internals
+  [ port? ] instances .
 \textbf{[ \#<port @ 805466443> \#<port @ 805466499> ]}
 \end{alltt}
 
 The \texttt{references} word finds all objects that refer to a given object:
 
 \begin{alltt}
-\textbf{ok} [ float? ] instances car references .
+  [ float? ] instances car references .
 \textbf{[ \#<array @ 805542171> [ -1.0 0.0 / ] ]}
 \end{alltt}
 
 You can print a memory usage summary with \texttt{room.}:
 
 \begin{alltt}
-\textbf{ok} room.
+  room.
 \textbf{Data space: 16384 KB total 2530 KB used 13853 KB free
 Code space: 16384 KB total 490 KB used 15893 KB free}
 \end{alltt}
@@ -5672,7 +5818,7 @@ Code space: 16384 KB total 490 KB used 15893 KB free}
 And finally, a detailed memory allocation breakdown by type with \texttt{heap-stats.}:
 
 \begin{alltt}
-\textbf{ok} heap-stats.
+  heap-stats.
 \textbf{bignum: 312 bytes, 17 instances
 cons: 850376 bytes, 106297 instances
 float: 112 bytes, 7 instances
@@ -5707,7 +5853,7 @@ Takes a quotation and attempts to infer its stack effect. An exception is thrown
 You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
 
 \begin{alltt}
-\textbf{ok} [ draw-shape ] infer>test.
+  [ draw-shape ] infer>test.
 \textbf{[ [ [ object ] [  ] ] ]
 [ [ draw-shape ] infer ]
 unit-test}
@@ -5729,9 +5875,9 @@ The stack effect inference algorithm mirrors the interpreter algorithm. A ``meta
 
 The following two examples demonstrate some simple cases:
 \begin{alltt}
-\textbf{ok} [ 1 2 3 ] infer .
+  [ 1 2 3 ] infer .
 \textbf{[ [ ] [ fixnum fixnum fixnum ] ]}
-\textbf{ok} [ "hi" swap ] infer .
+  [ "hi" swap ] infer .
 \textbf{[ [ object ] [ string object ] ]}
 \end{alltt}
 
@@ -5745,12 +5891,12 @@ IN: kernel
 \end{verbatim}
 On the other hand, the stack effect of word that passes a literal quotation to \verb|keep| can be inferred. The quotation is a literal on the meta data stack, and since \verb|keep| is marked \verb|inline|, the special inference behavior of \verb|call| receives this quotation.
 \begin{alltt}
-\textbf{ok} [ [ dup * ] keep ] infer .
+  [ [ dup * ] keep ] infer .
 \textbf{[ [ number ] [ number number ] ]}
 \end{alltt}
 Note that if \verb|call| is applied to a computed value, for example, a quotation taken from a variable, or a quotation that is constructed immediately before the \verb|call|, the stack effect inferencer will raise an error.
 \begin{alltt}
-\textbf{ok} [ frog get call ] infer .
+  [ frog get call ] infer .
 \textbf{! Inference error: A literal value was expected where a
 computed value was found: \#<computed @ 716167923>
 ! Recursive state:
@@ -5770,7 +5916,7 @@ dup cons? [ unit ] when cons
 \end{verbatim}
 The following example is not balanced and raises an error when we attempt to infer its stack effect:
 \begin{alltt}
-\textbf{ok} [ [ dup ] [ drop ] ifte ] infer .
+  [ [ dup ] [ drop ] ifte ] infer .
 \textbf{! Inference error: Unbalanced branches
 ! Recursive state:
 :s :r :n :c show stacks at time of error.
@@ -5788,7 +5934,7 @@ Consider the following implementation of a word that measures the length of a li
 \end{verbatim}
 The stack effect can be inferred without difficulty:
 \begin{alltt}
-\textbf{ok} [ length ] infer .
+  [ length ] infer .
 \textbf{[ [ object ] [ integer ] ]}
 \end{alltt}
 The base case is taken if the top of the stack is \verb|f|, and the base case has a stack effect \verb|[ [ object ] [ fixnum ] ]|.
@@ -5797,8 +5943,8 @@ On the other hand if the top of the stack is something else, the inductive case 
 
 If both branches contain a recursive call, the stack effect inferencer gives up.
 \begin{alltt}
-\textbf{ok} : fie [ fie ] [ fie ] ifte ;
-\textbf{ok} [ fie ] infer .
+  : fie [ fie ] [ fie ] ifte ;
+  [ fie ] infer .
 \textbf{! Inference error: fie does not have a base case
 ! Recursive state:
 :s :r :n :c show stacks at time of error.
@@ -5814,7 +5960,7 @@ The compiler can provide a substantial speed boost for words whose stack effect 
 To compile a single word, call \texttt{compile}:
 
 \begin{alltt}
-\textbf{ok} \bs pref-size compile
+  \bs pref-size compile
 \textbf{Compiling pref-size}
 \end{alltt}
 
@@ -5839,7 +5985,7 @@ assembly language. Linear IR operations are called VOPs. The last stage of the c
 To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
  
 \begin{alltt}
-\textbf{ok} \bs append precompile
+  \bs append precompile
 \textbf{<< \%prologue << vop [ ] [ ] [ ] [ ] >> >>
 << \%peek-d << vop [ ] [ 1 ] [ << vreg ... 0 >> ] [ ] >> >>
 << \%peek-d << vop [ ] [ 0 ] [ << vreg ... 1 >> ] [ ] >> >>

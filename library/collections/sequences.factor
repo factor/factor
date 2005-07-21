@@ -35,7 +35,7 @@ G: each ( seq quot -- | quot: elt -- )
 : each-with ( obj seq quot -- | quot: obj elt -- )
     swap [ with ] each 2drop ; inline
 
-: reduce ( list identity quot -- value | quot: x y -- z )
+: reduce ( seq identity quot -- value | quot: x y -- z )
     swapd each ; inline
 
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
