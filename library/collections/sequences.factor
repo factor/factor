@@ -7,7 +7,7 @@ USING: errors generic kernel math math-internals strings vectors ;
 
 ! Sequences support the following protocol. Concrete examples
 ! are strings, string buffers, vectors, and arrays. Arrays are
-! low level and not bounds-checked; they are in the
+! low level and no | quot: elt -- ? t bounds-checked; they are in the
 ! kernel-internals vocabulary, so don't use them unless you have
 ! a good reason.
 
@@ -41,16 +41,16 @@ G: each ( seq quot -- | quot: elt -- )
 G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     [ over ] [ type ] ; inline
 
-G: find ( seq quot -- i elt )
+G: find ( seq quot -- i elt | quot: elt -- ? )
     [ over ] [ type ] ; inline
 
-: find-with ( obj seq quot -- i elt )
+: find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
 
-G: find* ( i seq quot -- i elt )
+G: find* ( i seq quot -- i elt | quot: elt -- ? )
     [ over ] [ type ] ; inline
 
-: find-with* ( obj i seq quot -- i elt )
+: find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
     -rot [ with rot ] find* 2swap 2drop ; inline
 
 : first 0 swap nth ; inline

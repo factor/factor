@@ -20,7 +20,7 @@ streams strings styles unparser words ;
     \ inline prettyprint-prop ;
 
 : comment. ( comment -- )
-    [ [[ font-style italic ]] ] write-attr ;
+    [ [[ font-style italic ]] ] format ;
 
 : infer-effect. ( effect -- )
     [

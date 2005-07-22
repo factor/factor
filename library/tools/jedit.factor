@@ -13,9 +13,9 @@ unparser words ;
 
 : jedit-server-info ( -- port auth )
     jedit-server-file <file-reader> [
-        read-line drop
-        read-line parse-number
-        read-line parse-number
+        readln drop
+        readln parse-number
+        readln parse-number
     ] with-stream ;
 
 : make-jedit-request ( files params -- code )

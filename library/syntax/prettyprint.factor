@@ -13,7 +13,7 @@ SYMBOL: recursion-check
 GENERIC: prettyprint* ( indent obj -- indent )
 
 : unparse. ( obj -- )
-    dup unparse swap presented swons unit write-attr ;
+    dup unparse swap presented swons unit format ;
 
 M: object prettyprint* ( indent obj -- indent )
     unparse. ;

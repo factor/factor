@@ -38,12 +38,12 @@ USING: html io kernel namespaces styles test ;
     ] string-out
 ] unit-test
 
-: html-write-attr ( string style -- string )
-    [ write-attr ] with-html-stream ;
+: html-format ( string style -- string )
+    [ format ] with-html-stream ;
 
 [ "hello world" ]
 [
-    [ "hello world" [ ] html-write-attr ] string-out
+    [ "hello world" [ ] html-format ] string-out
 ] unit-test
 
 [ "<span style='color: #ff00ff; font-family: Monospaced; '>car</span>" ]
@@ -51,7 +51,7 @@ USING: html io kernel namespaces styles test ;
     [
         "car"
         [ [ foreground 255 0 255 ] [[ font "Monospaced" ]] ]
-        html-write-attr
+        html-format
     ] string-out
 ] unit-test
 

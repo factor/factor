@@ -4,7 +4,7 @@ USING: io kernel math parser strings test ;
 [ 4 ] [ "/library/test/io/no-trailing-eol.factor" run-resource ] unit-test
 
 : lines-test ( stream -- line1 line2 )
-    [ read-line read-line ] with-stream ;
+    [ readln readln ] with-stream ;
 
 [
     "This is a line."

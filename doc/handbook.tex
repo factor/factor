@@ -3872,7 +3872,7 @@ String buffers support the stream output protocol. See \ref{stdio}.
 \glossary{name=input stream,
 description={a stream that implements the \texttt{stream-readln} and \texttt{stream-read} generic words and can be used for character input}}
 \glossary{name=output stream,
-description={a stream that implements the \texttt{stream-write-attr}, \texttt{stream-flush} and \texttt{stream-auto-flush} generic words and can be used for character output}}
+description={a stream that implements the \texttt{stream-write-attr}, \texttt{stream-flush} and \texttt{stream-finish} generic words and can be used for character output}}
 
 There are various subsets of the stream protocol that a class can implement so that its instances may be used as streams. The following generic word is mandatory.
 
@@ -3926,11 +3926,11 @@ Ensures all pending output operations are been complete. With many output stream
 
 \wordtable{
 \vocabulary{io}
-\genericword{stream-auto-flush}{stream-auto-flush ( s -- )}
+\genericword{stream-finish}{stream-finish ( s -- )}
 }
-Ensures the user sees prior output. It is not as strong as \texttt{stream-flush}. The contract is as follows: if the stream is connected to an interactive end-point such as a terminal, \texttt{stream-auto-flush} should execute \texttt{stream-flush}. If the stream is a file or network stream used for ``batch'' operations, this word should have an empty definition.
+Ensures the user sees prior output. It is not as strong as \texttt{stream-flush}. The contract is as follows: if the stream is connected to an interactive end-point such as a terminal, \texttt{stream-finish} should execute \texttt{stream-flush}. If the stream is a file or network stream used for ``batch'' operations, this word should have an empty definition.
 
-The \texttt{stream-print} word executes \texttt{stream-auto-flush} after each line of output.
+The \texttt{stream-print} word executes \texttt{stream-finish} after each line of output.
 
 With some streams, the above operations may suspend the current thread and execute other threads until input data is available (\ref{threads}).
 
@@ -3951,7 +3951,7 @@ Outputs a string to the stream, without any specific style information. Implemen
 \vocabulary{io}
 \ordinaryword{stream-print}{stream-print ( string stream -- )}
 }
-Outputs a string to the stream, followed by a newline, then executes \texttt{stream-auto-flush} to force the line to be displayed on interactive streams.
+Outputs a string to the stream, followed by a newline, then executes \texttt{stream-finish} to force the line to be displayed on interactive streams.
 
 \section{The default stream}\label{stdio}
 \glossary{name=default stream,

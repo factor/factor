@@ -1,0 +1,113 @@
+<html>
+<head><title>Factor change log</title></head>
+<body>
+
+<h1>Factor 0.76:</h1>
+<!-- :noWordSep=+-*\=><;.?/'()%,_|: -->
+
+<ul>
+<li>
+Major improvements to the GUI:
+<ul>
+<li>Now uses 3-dimensional co-ordinates throughout</li>
+<li>The listener supports styled text output and presentations</li>
+<li>Gradient paint, bevel border paint</li>
+<li>Wheel mouse scrolling</li>
+<li>Slide-show tutorial with live code examples</li>
+<li>Performance improvements, code cleanups, bug fixes</li>
+</ul>
+</li>
+<li>
+Sequences:
+<ul>
+<li>The following formely list-specific words are now generic:
+    
+    <pre>all? ( seq quot -- ? | quot: elt -- ? )
+all-with? ( obj seq quot -- ? | quot: elt -- ? )
+subset ( seq quot -- seq | quot: elt -- ? )
+subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
+fiber? ( seq quot -- ? | quot: elt elt -- ? )
+prune ( seq -- seq )</pre>
+
+<li> The <code>contains?</code> word for testing membership in a sequence has been
+  renamed to <code>member? ( elt seq -- ? )</code>.
+
+<li> The list-specific <code>some?</code> and <code>some-with?</code> combinators are gone. Their replacements are generic:
+  
+  <pre>contains? ( seq quot -- ? | quot: elt -- ? )
+contains-with? ( obj seq quot -- ? | quot: obj elt -- ? )
+find ( seq quot -- i elt | quot: elt -- ? )
+find* ( i seq quot -- i elt | quot: elt -- ? )
+find-with ( obj seq quot -- i elt | quot: elt -- ? )
+find-with* ( obj i seq quot -- i elt | quot: elt -- ? )</pre>
+
+  See the developer's handbook for details.
+
+<li> The <code>nreverse ( seq -- )</code> word has been removed.
+
+<li> <code>reverse-slice ( seq -- seq )</code> outputs a new sequence that shares
+  structure with the given sequence, but presents elements in reverse
+  order.
+
+<li> The <code>string-compare</code> primitive has been replaced with the lexi word
+  which now operates on any pair of sequences of numbers. The
+  string> word has been replaced with <code>>lexi></code>.
+
+<li> The <code>,</code> word no longer accepts a string as input inside a <code>make-string</code>. In 0.75, the following
+  two lines were equivalent:
+  
+  <pre>[ "Hello" , " world" , ] make-string
+[ "Hello" % " world" % ] make-string</pre>
+  
+<li> Now, the former raises a type error. Use <code>,</code> with characters, and <code>%</code> with
+  strings inside make-string.
+</ul>
+
+<li>Streams:
+
+<ul>
+<li>The following words have been renamed:
+  
+    <pre>stream-auto-flush ==> stream-finish ( stream -- )
+stream-write-attr ==> stream-format ( string style stream -- )
+write-attr ==> format ( string style -- )</pre>
+
+<li>The following words no longer accept character arguments:
+  
+    <pre>stream-format ( string style stream -- )
+format ( string style -- )
+stream-write ( string stream -- )
+write ( string -- )
+stream-print ( string -- )
+print ( string -- )</pre>
+
+<li>Use the new words to write characters:
+  
+    <pre>stream-write1 ( char stream -- )
+write1 ( char -- )</pre>
+
+  Note that <code>stream-write1</code> is generic and your stream must implement it.
+
+<li><code>with-string</code> word renamed to <code>string-out ( quot -- string )</code>
+
+<li>New <code>string-in ( string quot -- )</code> word, calls <code>quot</code> with <code>stdio</code> bound to
+  a stream that reads from the given string.
+</ul>
+
+<li>Many improvements to the matrices library.
+
+<li>Improved inspector. Call it with <code>inspect ( obj -- )</code>.
+
+<li>The number of generations used for garbage collection can now be set
+  with the +G command line switch. You must specify at least 2
+  generations.
+
+<li>Only 2 generations are used by default now, since there seems to be no
+  performance benefit to having 3 after running some brief benchmarks.
+
+<li>Fixed bug where images saved from the jEdit plugin would fail to
+  start.
+
+<li>md5 hashing algorithm in <code>contrib/crypto/</code> (Doug Coleman).
+
+</ul>

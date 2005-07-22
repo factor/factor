@@ -101,7 +101,7 @@ M: pane stream-readln ( stream -- line )
 M: pane stream-write1 ( string style stream -- )
     [ rot ch>string unit pane-write ] keep scroll>bottom ;
 
-M: pane stream-write-attr ( string style stream -- )
+M: pane stream-format ( string style stream -- )
     [ rot "\n" split pane-write ] keep scroll>bottom ;
 
 M: pane stream-close ( stream -- ) drop ;

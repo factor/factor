@@ -15,7 +15,7 @@ TUPLE: c-stream in out flush? ;
 M: c-stream stream-write1 ( char stream -- )
     >r ch>string r> c-stream-out fwrite ;
 
-M: c-stream stream-write-attr ( str style stream -- )
+M: c-stream stream-format ( str style stream -- )
     nip c-stream-out fwrite ;
 
 M: c-stream stream-read1 ( stream -- char/f )

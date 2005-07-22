@@ -288,7 +288,7 @@ M: port stream-finish ( stream -- ) drop ;
 M: port stream-write1 ( char writer -- )
     1 over wait-to-write ch>buffer ;
 
-M: port stream-write-attr ( string style writer -- )
+M: port stream-format ( string style writer -- )
     nip over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )

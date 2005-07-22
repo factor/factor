@@ -23,8 +23,8 @@ M: duplex-stream stream-read
 M: duplex-stream stream-write1
     duplex-stream-out stream-write1 ;
 
-M: duplex-stream stream-write-attr
-    duplex-stream-out stream-write-attr ;
+M: duplex-stream stream-format
+    duplex-stream-out stream-format ;
 
 M: duplex-stream stream-close
     #! The output stream is closed first, in case both streams

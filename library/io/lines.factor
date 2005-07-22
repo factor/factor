@@ -9,16 +9,16 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
 
 : cr> dup line-reader-cr f rot set-line-reader-cr ;
 
-: (read-line) ( ? line -- ? )
+: (readln) ( ? line -- ? )
     #! The flag is set after the first character is read.
     dup delegate stream-read1 dup [
         >r >r drop t r> r> dup CHAR: \r = [
             drop t swap set-line-reader-cr
         ] [
             dup CHAR: \n = [
-                drop dup cr> [ (read-line) ] [ drop ] ifte
+                drop dup cr> [ (readln) ] [ drop ] ifte
             ] [
-                , (read-line)
+                , (readln)
             ] ifte
         ] ifte
     ] [
@@ -26,7 +26,7 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
     ] ifte ;
 
 M: line-reader stream-readln ( line -- string )
-    [ f swap (read-line) ] make-string
+    [ f swap (readln) ] make-string
     dup empty? [ f ? ] [ nip ] ifte ;
 
 M: line-reader stream-read ( count line -- string )

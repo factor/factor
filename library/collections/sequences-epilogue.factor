@@ -83,7 +83,7 @@ M: object find ( seq quot -- i elt )
     #! ForAll(P in X) <==> !Exists(!P in X)
     swap [ swap call not ] contains-with? not ; inline
 
-: all-with? ( obj list pred -- ? )
+: all-with? ( obj seq quot -- ? | quot: elt -- ? )
     swap [ with rot ] all? 2nip ; inline
 
 : subset ( seq quot -- seq | quot: elt -- ? )
@@ -99,7 +99,7 @@ M: object find ( seq quot -- i elt )
         ] each drop
     ] keep like ; inline
 
-: subset-with ( obj list quot -- list )
+: subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
 
 : fiber? ( seq quot -- ? | quot: elt elt -- ? )

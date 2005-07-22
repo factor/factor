@@ -7,7 +7,7 @@ io strings unparser ;
     ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
 
 : (read-header) ( alist -- alist )
-    read-line dup
+    readln dup
     empty? [ drop ] [ header-line (read-header) ] ifte ;
 
 : read-header ( -- alist )

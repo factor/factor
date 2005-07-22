@@ -16,7 +16,7 @@ global [ "  " listener-prompt set ] bind
 
 : (read-multiline) ( quot depth -- quot ? )
     #! Flag indicates EOF.
-    >r read-line dup [
+    >r readln dup [
         (parse) depth r> dup >r <= [
             ( we're done ) r> drop t
         ] [

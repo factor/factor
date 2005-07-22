@@ -106,7 +106,7 @@ M: html-stream stream-write1 ( char stream -- )
         dup html-entities assoc [ write ] [ write1 ] ?ifte
     ] with-wrapper ;
 
-M: html-stream stream-write-attr ( str style stream -- )
+M: html-stream stream-format ( str style stream -- )
     [
         [
             [

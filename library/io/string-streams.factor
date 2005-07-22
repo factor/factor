@@ -2,7 +2,7 @@ USING: io kernel math namespaces sequences strings ;
 
 ! String buffers support the stream output protocol.
 M: sbuf stream-write1 push ;
-M: sbuf stream-write-attr rot nappend drop ;
+M: sbuf stream-format rot nappend drop ;
 M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
 M: sbuf stream-finish drop ;

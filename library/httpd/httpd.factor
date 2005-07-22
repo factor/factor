@@ -52,7 +52,7 @@ sequences ;
 : httpd-client ( socket -- )
     dup log-client [
         60000 stdio get set-timeout
-        read-line [ parse-request ] when*
+        readln [ parse-request ] when*
     ] with-stream ;
 
 : httpd-connection ( socket -- )

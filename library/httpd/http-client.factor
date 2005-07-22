@@ -21,7 +21,7 @@ io strings unparser ;
 : read-response ( -- code header )
     #! After sending a GET oR POST we read a response line and
     #! header.
-    flush read-line parse-response read-header ;
+    flush readln parse-response read-header ;
 
 : http-request ( host resource method -- )
     write CHAR: \s write write " HTTP/1.0" write crlf
