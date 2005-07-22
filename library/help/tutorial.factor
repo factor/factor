@@ -112,6 +112,15 @@ M: general-list tutorial-line
             "The stack effect of + is ( x y -- x+y )."
             "The stack effect of . is ( object -- )."
         ] [
+            "Reading user input"
+            "User input is read using the readln ( -- string ) word."
+            "Note its stack effect; it puts a string on the stack."
+            ""
+            "This program will ask your name, then greet you:"
+            ""
+            [ "\"What is your name?\" print" ]
+            [ "readln \"Hello, \" write print" ]
+        ] [
             "Shuffle words"
             "The word ``twice'' we defined is useless."
             "Let's try something more useful: squaring a number."

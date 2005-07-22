@@ -7,7 +7,6 @@ SYMBOL: surface
 SYMBOL: width
 SYMBOL: height
 SYMBOL: bpp
-SYMBOL: surface
 
 : init-screen ( width height bpp flags -- )
     >r 3dup bpp set height set width set r>

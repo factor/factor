@@ -11,7 +11,7 @@ sequences strings unparser ;
 : file-icon. directory? dir-icon file-icon ? write-icon ;
 
 : file-link. ( dir name -- )
-    tuck path+ "file" swons unit format ;
+    tuck path+ file swons unit format ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.

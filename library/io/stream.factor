@@ -21,10 +21,10 @@ GENERIC: set-timeout   ( timeout stream -- )
     f swap stream-format ;
 
 : stream-terpri ( stream -- )
-    "\n" swap stream-write ;
+    "\n" over stream-write stream-finish ;
 
 : stream-print ( string stream -- )
-    [ stream-write ] keep dup stream-terpri stream-finish ;
+    [ stream-write ] keep stream-terpri ;
 
 : (stream-copy) ( in out -- )
     4096 pick stream-read

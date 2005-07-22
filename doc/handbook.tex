@@ -26,6 +26,8 @@
 \newcommand{\pound}{\char'43}
 \newcommand{\hhat}{\symbol{94}}
 
+\newcommand{\ttindex}[1]{\texttt{#1}\index{\texttt{#1}}}
+
 \newcommand{\vocabulary}[1]{\emph{Vocabulary:} \texttt{#1}&\\}
 
 \newcommand{\parsingword}[2]{\index{\texttt{#1}}\emph{Parsing word:} \texttt{#2}&\\}
@@ -158,6 +160,7 @@ If the stack effect identifies quotations, the stack effect of each quotation ma
 The following naming conventions are used in the Factor library.
 
 \begin{description}
+\item[\texttt{<class>}] create a new instance of \texttt{class}
 \item[\texttt{FOO:}] a parsing word that reads ahead from the input string
 \item[\texttt{FOO}] a parsing word that does not read ahead, but rather takes a fixed action at parse time
 \item[\texttt{FOO"}] a parsing word that reads characters from the input string until the next occurrence of \texttt{"}
@@ -165,17 +168,17 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{foo.}] a word whose primary action is to print something, rather than to return a value. The basic case is the \texttt{.}~word, which prints the object at the top of the stack
 \item[\texttt{foo*}] a variation of the \texttt{foo} word that takes more parameters
 \item[\texttt{(foo)}] a word that is only useful for the implementation of \texttt{foo}
-\item[\texttt{>to}] converts the object at the top of the stack to the \texttt{to} class
-\item[\texttt{from>}] converts an instance of the \texttt{from} class into some canonical form
-\item[\texttt{from>to}] convert an instance of the \texttt{from} class to the \texttt{to} class
-\item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack). Sometimes, libraries will define their own words following this naming convention, to implement user-defined stacks, typically stored in variables
-\item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
-\item[\texttt{<class>}] create a new instance of \texttt{class}
 \item[\texttt{2foo}] like \texttt{foo} but takes or returns two operands
 \item[\texttt{3foo}] like \texttt{foo} but takes or returns three operands
 \item[\texttt{foo-with}] a form of the \texttt{foo} combinator that takes an extra object, and passes this object on each iteration of the quotation; for example, \texttt{each-with} and \texttt{map-with}
-\item[\texttt{with-foo}] executes a quotation in a namespace where \texttt{foo} is configured in a special manner; for example, \texttt{with-stream}
+\item[\texttt{from>}] converts an instance of the \texttt{from} class into some canonical form
+\item[\texttt{from>to}] convert an instance of the \texttt{from} class to the \texttt{to} class
 \item[\texttt{make-foo}] executes a quotation in a namespace where a sequence of type \texttt{foo} is being constructed; for example, \texttt{make-string}
+\item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack). Sometimes, libraries will define their own words following this naming convention, to implement user-defined stacks, typically stored in variables
+\item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
+\item[\texttt{style}] an association list holding text formatting information, possible keys are described in \ref{styles}
+\item[\texttt{>to}] converts the object at the top of the stack to the \texttt{to} class
+\item[\texttt{with-foo}] executes a quotation in a namespace where \texttt{foo} is configured in a special manner; for example, \texttt{with-stream}
 \end{description}
 
 \section{Mathematics}
@@ -1279,7 +1282,7 @@ A compound definition associates a word name with a quotation that is called whe
 A word \texttt{name} is created in the current vocabulary, and is associated with \texttt{definition}.
 \begin{verbatim}
 : ask-name ( -- name )
-    "What is your name? " write read-line ;
+    "What is your name? " write readln ;
 : greet ( name -- )
     "Greetings, " write print ;
 : friend ( -- )
@@ -2046,7 +2049,7 @@ member? ( elt seq -- ? )
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
-\subsection{Stack operations}
+\subsection{Stack operations}\label{stack-seq}
 
 The following words allow any mutable, growable sequence to be used as a LIFO (last in, first out) stack.
 
@@ -3872,7 +3875,7 @@ String buffers support the stream output protocol. See \ref{stdio}.
 \glossary{name=input stream,
 description={a stream that implements the \texttt{stream-readln} and \texttt{stream-read} generic words and can be used for character input}}
 \glossary{name=output stream,
-description={a stream that implements the \texttt{stream-write-attr}, \texttt{stream-flush} and \texttt{stream-finish} generic words and can be used for character output}}
+description={a stream that implements the \texttt{stream-format}, \texttt{stream-flush} and \texttt{stream-finish} generic words and can be used for character output}}
 
 There are various subsets of the stream protocol that a class can implement so that its instances may be used as streams. The following generic word is mandatory.
 
@@ -3912,11 +3915,11 @@ Outputs a character to the stream. This might not result in immediate output to 
 
 \wordtable{
 \vocabulary{io}
-\genericword{stream-write-attr}{stream-write-attr ( str attrs s -- )}
+\genericword{stream-format}{stream-format ( str attrs s -- )}
 }
 Outputs a string to the stream. As with \verb|stream-write1|, this may not result in an immediate output operation unless \verb|stream-flush| is called.
 
-The \texttt{attrs} parameter is an association list holding style information (\ref{styles}). Most of the time no style information needs to be output, and either the \texttt{stream-write} or \texttt{stream-print} word is used. Those words wrap \verb|stream-write-attr| and are described in the next section.
+The \texttt{attrs} parameter is an association list holding style information (\ref{styles}). Most of the time no style information needs to be output, and either the \texttt{stream-write} or \texttt{stream-print} word is used. Those words wrap \verb|stream-format| and are described in the next section.
 
 \wordtable{
 \vocabulary{io}
@@ -3945,13 +3948,22 @@ The following three words are implemented in terms of the stream protocol, and s
 Outputs a string to the stream, without any specific style information. Implemented as follows:
 \begin{verbatim}
 : stream-write ( string stream -- )
-    f swap stream-write-attr ;
+    f swap stream-format ;
 \end{verbatim}
+\wordtable{
+\vocabulary{io}
+\ordinaryword{stream-terpri}{stream-terpri ( stream -- )}
+}
+Outputs a newline to the stream, then executes \texttt{stream-finish} to force the line to be displayed on interactive streams.
 \wordtable{
 \vocabulary{io}
 \ordinaryword{stream-print}{stream-print ( string stream -- )}
 }
-Outputs a string to the stream, followed by a newline, then executes \texttt{stream-finish} to force the line to be displayed on interactive streams.
+Outputs a string to the stream, then calls \verb|stream-terpri| to force a newline. Defined as follows:
+\begin{verbatim}
+: stream-print ( string stream -- )
+    [ stream-write ] keep stream-terpri ;
+\end{verbatim}
 
 \section{The default stream}\label{stdio}
 \glossary{name=default stream,
@@ -3969,15 +3981,15 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{read-line}{read-line ( -- str/f )}
+\ordinaryword{readln}{readln ( -- str/f )}
 
 }
 \begin{verbatim}
-: read-line stdio get stream-readln ;
+: readln stdio get stream-readln ;
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{read1}{read1 ( n -- str )}
+\ordinaryword{read1}{read1 ( n -- char/f )}
 
 }
 \begin{verbatim}
@@ -3985,7 +3997,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{read}{read ( n -- str )}
+\ordinaryword{read}{read ( n -- str/f )}
 
 }
 \begin{verbatim}
@@ -3993,7 +4005,7 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{write1}{write ( ch -- )}
+\ordinaryword{write1}{write ( char -- )}
 
 }
 \begin{verbatim}
@@ -4009,11 +4021,19 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
-\ordinaryword{write-attr}{write-attr ( str attrs -- )}
+\ordinaryword{format}{format ( str attrs -- )}
 
 }
 \begin{verbatim}
-: write-attr stdio get stream-write-attr ;
+: format stdio get stream-format ;
+\end{verbatim}
+\wordtable{
+\vocabulary{io}
+\ordinaryword{terpri}{terpri ( -- )}
+
+}
+\begin{verbatim}
+: terpri stdio get stream-terpri ;
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
@@ -4022,14 +4042,6 @@ Various words take an implicit stream parameter from the \texttt{stdio} variable
 }
 \begin{verbatim}
 : print stdio get stream-print ;
-\end{verbatim}
-\wordtable{
-\vocabulary{io}
-\ordinaryword{terpri}{terpri ( -- )}
-
-}
-\begin{verbatim}
-: terpri "\n" stdio get stream-write ;
 \end{verbatim}
 \wordtable{
 \vocabulary{io}
@@ -4056,51 +4068,60 @@ Like \verb|with-stream| extend the stream is only closed in the case of an error
 
 \section{Styled output}\label{styles}
 
-HTML streams (\ref{html}) and pane streams (\ref{panes}) support styled text output using the \verb|stream-write-attr| word. The style association list given to this word can contain any of the following keys:
+HTML streams (\ref{html}) and pane streams (\ref{panes}) support styled text output using the \verb|stream-format| word. The style association list given to this word can contain any of the following keys:
 
 \begin{tabular}{l|l}
 Key&Description\\
 \hline
-\texttt{foreground}&The foreground color, as a list with red, green, blue components\\
-\texttt{background}&The background color, as a list with red, green, blue components\\
-\texttt{font}&A font family name\\
-\texttt{font-style}&One of \verb|plain|, \verb|bold|, \verb|italic|, or \verb|bold-italic|\\
-\texttt{font-size}&An integer\\
-\texttt{underline}&A boolean\\
-\texttt{presented}&If set, a presentation for this object is output\\
-\texttt{"file"}&If set, a hyperlink to that file is output\\
-\texttt{icon}&If set, the icon named by this resource path is output\\
+\ttindex{foreground}&The foreground color, as a list with red, green, blue components\\
+\ttindex{background}&The background color, as a list with red, green, blue components\\
+\ttindex{font}&A font family name\\
+\ttindex{font-style}&One of \ttindex{plain}, \ttindex{bold}, \ttindex{italic}, or \ttindex|bold-italic|\\
+\ttindex{font-size}&An integer\\
+\ttindex{underline}&A boolean\\
+\ttindex{presented}&If set, a presentation for this object is output\\
+\ttindex{file}&If set, a hyperlink to that file is output\\
+\ttindex{icon}&If set, the icon named by this resource path is output\\
 \end{tabular}
 
-Note that
-HTML streams only use the \verb|presented| key if it is set to a word; in that case, a link to the browser responder is output. The \verb|"file"| key causes an HTML stream to output a link to the file responder. Both responders must be enabled for such links to function.
+All keys are symbols in the \verb|styles| vocabulary.
 
-Pane streams support presentation of any object, whereas the  \verb|"file"| key is not supported.
+Note that
+HTML streams only use the \verb|presented| key if it is set to a word; in that case, a link to the browser responder is output. The \verb|file| key causes an HTML stream to output a link to the file responder. Both responders must be enabled for such links to function.
+
+Pane streams support presentation of any object, but do not support the \verb|file| key.
 
 \section{String streams}\label{string-streams}
 
-Calling stream output words on a string buffer will append text to the string buffer.
-
-\wordtable{
-\vocabulary{io}
-\ordinaryword{string-out}{string-out ( quot -- string )}
-}
-Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string buffer. Executing \texttt{write}, \texttt{write-attr} or \texttt{print} will append text to the string buffer. When the quotation returns, the string buffer is coverted to
-a string and returned.
-
-String buffers also support the input stream protocol, with the exception of \verb|stream-readln|. Characters are read in reverse. Usually, string buffers are not used as input streams directly, since lines cannot be read and the input string must be reversed. Instead, the following pair of words is used.
+String buffers support both the stream input and output protocol directly, with the exception of \verb|stream-readln|.
 
 \wordtable{
 \vocabulary{io}
 \ordinaryword{<string-reader>}{<string-reader> ( string -- stream )}
 }
-Creates a new stream for reading the characters of the string in order. This converts the string to a string buffer, reverses it, and wraps it in a line stream so that \verb|stream-readln| may be used (\ref{special-streams})..
+Creates a new stream for reading characters from a string. First, a string buffer is created holding the reversed string, since characters are read in reverse by repeated calls to \verb|pop| (\ref{stack-seq}). The result is wrapped in a line stream providing a \verb|stream-readln| implementation (\ref{special-streams}):
+\begin{verbatim}
+: <string-reader> ( string -- stream )
+    <reversed> >sbuf <line-reader> ;
+\end{verbatim}
 
 \wordtable{
 \vocabulary{io}
 \ordinaryword{string-in}{string-in ( string quot -- )}
 }
-Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string reader that reads from the given string. Executing \texttt{read1}, \texttt{read} or \texttt{read-line} will take text from the string reader.
+Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a stream reading from a string. Executing \texttt{read1}, \texttt{read} or \texttt{readln} will take text from the string reader.
+
+\wordtable{
+\vocabulary{io}
+\ordinaryword{string-out}{string-out ( quot -- string )}
+}
+Calls the quotation in a new dynamic scope, with the \texttt{stdio} variable set to a new string output stream. Executing \texttt{write}, \texttt{format} or \texttt{print} will append text to the string buffer. When the quotation returns, the string accumulated by the stream is output.
+
+The stream output protocol is very natural with a string buffer:
+\begin{verbatim}
+M: sbuf stream-write1 push ;
+M: sbuf stream-format rot nappend drop ;
+\end{verbatim}
 
 \section{Reading and writing binary data}
 
@@ -4241,6 +4262,8 @@ Outputs the IP address as a dotted-quad string, and the local port number, respe
 
 \section{Special streams}\label{special-streams}
 
+These special streams wrap other streams. 
+
 \glossary{name=null stream,
 description=a bidirectional stream that ignores output and returns end of file on input}
 \glossary{name=duplex stream,
@@ -4279,7 +4302,7 @@ You can then define your own tuple class that delegates to a wrapper stream, the
 }
 Executes the quotation in a dynamic scope where the \texttt{stdio} variable is set to the wrapped stream.
 
-The following example implements a stream that emits \TeX\ markup when a certain attribute is set in the \texttt{attrs} parameter to \texttt{stream-write-attr}.
+The following example implements a stream that emits \TeX\ markup when a certain attribute is set in the \texttt{attrs} parameter to \texttt{stream-format}.
 
 \begin{verbatim}
 USING: generic kernel lists stdio streams ;
@@ -4288,9 +4311,9 @@ TUPLE: tex-stream ;
 C: tex-stream ( stream -- stream )
     [ >r <wrapper-stream> r> set-delegate ] keep ;
 
-M: tex-stream stream-write-attr ( string attrs stream -- )
+M: tex-stream stream-format ( string attrs stream -- )
     [
-        "bold" swap assoc [
+        font-style swap assoc bold = [
             "\textbf{" write write "}" write
         ] [
             write
@@ -4769,17 +4792,277 @@ This word is used to implement end-of-line comments:
 
 \chapter{UI framework}
 
+\begin{itemize}
+
+\item An object on the screen is a 'gadget'
+
+\item Every gadget can have child gadgets
+
+\item The world gadget is the parent of all other gadgets
+
+\item Everything is drawn on an SDL surface.
+
+\item The hand gadget holds mouse and keyboard focus state.
+
+\end{itemize}
+
 \section{Low-level graphics rendering}
+
+\begin{itemize}
+
+\item SDL - with-screen, with-surface, make-rect, with-pixels, rgb, make-color, surface, width, height, bpp
+
+\item keysyms: modifiers and keysyms hash
+
+\item SDL\_ttf
+
+\item SDL\_gfx
+
+\end{itemize}
 
 \section{Gadgets}
 
-\section{Buttons}
+\begin{itemize}
 
-\section{Panes}\label{panes}
+\item rectangles
 
-\section{Scrolling}
+\item intersection, union, other stuff, inside?
 
-\section{Splitters}
+\item co-ordinates are 3-vectors
+
+\end{itemize}
+
+\subsection{Hierarchy}
+
+\begin{itemize}
+
+\item Words for adding, removing gadgets
+
+\item Layout protocol - relayout, layout*, pref-dim
+
+\item pick-up
+
+\end{itemize}
+
+\subsection{Painting}
+
+\begin{itemize}
+
+\item Paint properties, are inherited from the parent
+
+\item paint-prop set-paint-prop paint-prop*
+
+\item Interior fill
+
+\item Boundary fill
+
+\end{itemize}
+
+\subsection{Solid interior and boundary}
+
+\begin{itemize}
+
+\item uses foreground, background paint-props
+
+\item reverse video and rollover
+
+\end{itemize}
+
+\subsubsection{Bevel boundary}
+
+\begin{itemize}
+
+\item width specified in bevel tuple
+
+\item uses bevel-1, bevel-2, reverse-video paint-props
+
+\end{itemize}
+
+\subsubsection{Gradient interior}
+
+\begin{itemize}
+
+\item from/to color specified in tuple
+
+\end{itemize}
+
+\subsection{Gestures}
+
+\begin{itemize}
+
+\item Gestures table
+
+\item Mouse, keyboard, focus gestures
+
+\item Custom gestures
+
+\end{itemize}
+
+\section{Basic gadgets}
+
+\subsection{Labels and text rendering}
+
+\begin{itemize}
+
+\item A label is a piece of uneditable text
+
+\item <label>
+
+\item lookup-font
+
+\item gadget-font
+
+\item label-size
+
+\item size-string
+
+\item draw-string
+
+\end{itemize}
+
+\subsection{Borders}
+
+\begin{itemize}
+
+\item Borders position a child inside a delegate, padded by a certain amount at the top and bottom
+
+\item empty-border
+
+\item line-border
+
+\item bevel-border
+
+\end{itemize}
+
+\subsection{Buttons}
+
+\begin{itemize}
+
+\item button-actions
+
+\item <button>
+
+\end{itemize}
+
+\subsection{Pack layouts}
+
+\begin{itemize}
+
+\item Pack layouts arrange gadgets along an axis
+
+\item Align and fill parameters
+
+\item <pile>, <line-pile>, <shelf>, <line-shelf>, <stack>, <pack>
+
+\end{itemize}
+
+\subsubsection{Incremental layout}
+
+\begin{itemize}
+
+\item General idea, when it can be used
+
+\item <incremental>
+
+\item add-incremental
+
+\item clear-incremental
+
+\end{itemize}
+
+\subsection{Frame layout}
+
+\begin{itemize}
+
+\item <frame>
+
+\item add-left, add-top, add-bottom, add-right, add-center
+
+\end{itemize}
+
+\section{Composed gadgets}
+
+\subsection{Editors}
+
+\subsection{Menus}
+
+\begin{itemize}
+
+\item <menu>, show-menu
+
+\end{itemize}
+
+\subsection{Presentations and commands}
+
+\begin{itemize}
+
+\item Presentations show a menu of commands when clicked
+
+\item <presentation>
+
+\item define-command
+
+\item applicable
+
+\end{itemize}
+
+\subsection{Scrolling}
+
+\begin{itemize}
+
+\item Scrollers are scrolled via a pair of sliders, or the mouse wheel
+
+\item <scroller>
+
+\item scroll
+
+\item scroll>bottom
+
+\end{itemize}
+
+\subsection{Panes}\label{panes}
+
+\begin{itemize}
+
+\item A pane is a text input and output stream gadget displaying styled text and presentations.
+
+\item <pane>
+
+\item pane-clear
+
+\item panes are bidirectional streams
+
+\item panes are wrapped in scrollers
+
+\end{itemize}
+
+\subsection{Splitters}
+
+\begin{itemize}
+
+\item A splitter displays two components side-by-side, separated with a draggable divider.
+
+\item <splitter>, <x-splitter>, <y-splitter>
+
+\end{itemize}
+
+\subsection{Books}
+
+\begin{itemize}
+
+\item A book lets you flick through pages.
+
+\item <book>
+
+\item show-page
+
+\item first-page, prev-page, next-page, last-page
+
+\item book-buttons
+
+\item <book-browser>
+
+\end{itemize}
 
 \chapter{Web framework}
 
@@ -4945,13 +5228,13 @@ vhosts get [
 
 \section{HTML streams}\label{html}
 
-An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities via the \verb|chars>entities| word documented below. In addition, the \texttt{attrs} parameter to the \texttt{stream-write-attr} word is inspected for style attributes that direct the stream to wrap the output in various HTML tags; see \ref{styles}.
+An HTML stream wraps an existing stream. Strings written to the HTML stream have their special characters converted to HTML entities via the \verb|chars>entities| word documented below. In addition, the \texttt{attrs} parameter to the \texttt{stream-format} word is inspected for style attributes that direct the stream to wrap the output in various HTML tags; see \ref{styles}.
 
 \wordtable{
 \vocabulary{html}
 \ordinaryword{with-html-stream}{with-html-stream ( quot -- )}
 }
-Calls the quotation in a new dynamic scope. The \texttt{stdio} variable is set to an HTML stream wrapping the previous value of \texttt{stdio}, so calls to \texttt{write}, \texttt{write-attr} and \texttt{print} go through the HTML stream.
+Calls the quotation in a new dynamic scope. The \texttt{stdio} variable is set to an HTML stream wrapping the previous value of \texttt{stdio}, so calls to \texttt{write}, \texttt{format} and \texttt{print} go through the HTML stream.
 
 \wordtable{
 \vocabulary{html}

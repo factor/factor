@@ -72,7 +72,7 @@ sequences strings styles unparser words ;
     [ "/" % resolve-file-link url-encode % ] make-string ;
 
 : file-link-tag ( style quot -- )
-    over "file" swap assoc [
+    over file swap assoc [
         <a href= file-link-href a> call </a>
     ] [
         call

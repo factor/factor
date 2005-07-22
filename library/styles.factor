@@ -30,3 +30,4 @@ SYMBOL: underline
 SYMBOL: icon
 
 SYMBOL: presented
+SYMBOL: file
