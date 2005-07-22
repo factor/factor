@@ -45,7 +45,7 @@ global [ 100 <vector> commands set ] bind
 : gadget. ( gadget -- )
     gadget swons unit
     "This stream does not support live gadgets"
-    swap write-attr terpri ;
+    swap format terpri ;
 
 [ drop t ] "Prettyprint" [ prettyprint ] define-command
 [ drop t ] "Inspect" [ inspect ] define-command
