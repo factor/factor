@@ -93,7 +93,7 @@ M: pane focusable-child* ( pane -- editor )
 ! Panes are streams.
 M: pane stream-flush ( stream -- ) drop ;
 
-M: pane stream-auto-flush ( stream -- ) drop ;
+M: pane stream-finish ( stream -- ) drop ;
 
 M: pane stream-readln ( stream -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;

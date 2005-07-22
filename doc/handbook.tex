@@ -171,7 +171,6 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack). Sometimes, libraries will define their own words following this naming convention, to implement user-defined stacks, typically stored in variables
 \item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
 \item[\texttt{<class>}] create a new instance of \texttt{class}
-\item[\texttt{nfoo}] destructive version of \texttt{foo}, that modifies one of its inputs rather than returning a new value. The ``n'' prefix denotes ``non-constructive''. This convention is used by sequence words
 \item[\texttt{2foo}] like \texttt{foo} but takes or returns two operands
 \item[\texttt{3foo}] like \texttt{foo} but takes or returns three operands
 \item[\texttt{foo-with}] a form of the \texttt{foo} combinator that takes an extra object, and passes this object on each iteration of the quotation; for example, \texttt{each-with} and \texttt{map-with}
@@ -196,7 +195,7 @@ $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \newcommand{\parseglos}{\glossary{name=parser,
 description={a set of words in the \texttt{parser} vocabulary, primarily \texttt{parse}, \texttt{eval}, \texttt{parse-file} and \texttt{run-file}, that creates objects from their printed representations, and adds word definitions to the dictionary}}}
 \parseglos
-In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary. The latter is discussed in \ref{words}. The parser can be extended (\ref{parser}).
+In Factor, an \emph{object} is a piece of data that can be identified. Code is data, so Factor syntax is actually a syntax for describing objects, of which code is a special case. Factor syntax is read by the parser. The parser performs two kinds of tasks -- it creates objects from their \emph{printed representations}, and it adds \emph{word definitions} to the dictionary (\ref{words}). The parser can be extended (\ref{parser}).
 
 \section{Parser algorithm}\label{parser}
 
@@ -891,7 +890,7 @@ Because of the way the interpreter is described in \ref{quotations}, the top of 
 Moves the top of the data stack to the call stack.
 \wordtable{
 \vocabulary{kernel}
-\ordinaryword{r>}{r> ( x -- r:x )}
+\ordinaryword{r>}{r> ( r:x -- x )}
 }
 Moves the top of the call stack to the data stack.
 
@@ -1252,7 +1251,7 @@ Creates a new word \texttt{name} in \texttt{vocabulary}. If the vocabulary alrea
 }
 Creates a new word \texttt{name} in the current vocabulary. This word is intended to be called from parsing words (\ref{parsing-words}), and in fact is defined as follows:
 \begin{verbatim}
-: create-in ( name -- word ) "in" get create ;
+: create-in ( name -- word ) "in" get create dup save-location ;
 \end{verbatim}
 
 \section{Word definition}
@@ -1421,8 +1420,6 @@ description={a hashtable associated with each word storing various sundry proper
 
 Each word has an associated hashtable of properties. Conventionally, the property names are strings, but nothing requires that this be so.
 
-A common idiom in the Factor library is to use symbols for their properties. 
-
 \wordtable{
 \vocabulary{words}
 \ordinaryword{word-prop}{word-prop ( word name -- value )}
@@ -1430,6 +1427,19 @@ A common idiom in the Factor library is to use symbols for their properties.
 
 }
 Retrieve and store word properties. Note that the stack effect is designed so that it is most convenient when \texttt{name} is a literal that is pushed on the stack right before executing these words. This is usually the case.
+
+The following properties are commonly-set:
+
+\begin{description}
+\item[\texttt{"name"}] The name of the word
+\item[\texttt{"vocabulary"}] The vocabulary containing the word
+\item[\texttt{"parsing"}] A boolean specifying if this is a parsing word (\ref{parsing-words})
+\item[\texttt{"inline"}] A boolean specifying if this word is compiled inline (\ref{declarations})
+\item[\texttt{"methods"}] Only defined on generic words; a hashtable mapping classes to quotations (\ref{generic})
+\item[\texttt{"file"}] The source file storing the word definition
+\item[\texttt{"line"}] The line number in the source file storing the word definition
+\item[\texttt{"col"}] The column number in the source file storing the word definition
+\end{description}
 
 \wordtable{
 \vocabulary{words}
@@ -1699,7 +1709,7 @@ for real numbers, and in a more general fashion for complex numbers:
 \begin{verbatim}
 GENERIC: abs ( z -- |z| )
 M: real abs dup 0 < [ neg ] when ;
-M: complex abs >rect mag2 ;
+M: complex absq fsqrt ;
 \end{verbatim}
 
 \subsection{Complements}
@@ -1808,6 +1818,11 @@ description=an object with a delegate}
 Each tuple can have an optional delegate tuple. Generic words called on
 the tuple that do not have a method for the tuple's class will be passed on
 to the delegate. Note that delegation to objects that are not tuples is not fully supported at this stage and might not work as you might expect.
+
+Factor uses delegation instead of inheritance, but it is not a direct
+substitute; in particular, the semantics differ in that a delegated
+method call receives the delegate on the stack, not the original object.
+
 \wordtable{
 \vocabulary{generic}
 \ordinaryword{delegate}{delegate ( object -- object )}
@@ -1820,10 +1835,6 @@ Returns an object's delegate, or \texttt{f} if no delegate is set. Note that in 
 
 }
 Sets a tuple's delegate.
-
-Factor uses delegation is used instead of inheritance, but it is not a direct
-substitute; in particular, the semantics differ in that a delegated
-method call receives the delegate on the stack, not the original object.
 
 Class membership test pridicates only test if an object is a direct instance of that class. Sometimes, you need to check if an object \emph{or its delegate} is an instance of a class. This can be done with the \verb|is?| combinator.
 
@@ -1899,6 +1910,40 @@ Sets the $n$th element of the sequence. Storing beyond the end of a resizable se
 
 \section{Sequence operations}
 
+\subsection{Comparison}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}
+}
+Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{lexi}{lexi~( s1 s2 -- n )}
+
+}
+Compares two sequences of integers lexicographically (dictionary order). The output value is one of the following:
+\begin{description}
+\item[Positive] indicating that \texttt{s1} follows \texttt{s2}
+\item[Zero] indicating that \texttt{s1} is equal to \texttt{s2}
+\item[Negative] indicating that \texttt{s1} precedes \texttt{s2}
+\end{description}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{lexi>}{lexi> ( s1 s2 -- ?~)}
+
+}
+Tests if \texttt{s1} follows \texttt{s2}. Implemented as follows:
+\begin{verbatim}
+: lexi> ( s1 s1 -- ? ) lexi 0 > ;
+\end{verbatim}
+This is usually used to sort lists of strings:
+\begin{alltt}
+  [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
+[ "Apple" "Curry" "Turkey" "Veal" ]
+\end{alltt}
+
 \subsection{Iteration}\label{iteration}
 
 Standard iteration patterns are abstracted away in these words.
@@ -1962,6 +2007,9 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
   \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] 2map .
 \textbf{\tto 40 48 -6 \ttc}
 \end{alltt}
+
+In fact the \verb|v*| word in the \verb|matrices| vocabulary is defined to call \verb|[ * ] 2map|; see \ref{pairwise} for documentation on this and similar words.
+
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{2nmap}{2nmap ( s1 s2 quot -- )}
@@ -2064,11 +2112,6 @@ Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modifie
 \genericword{reverse}{reverse ( seq -- seq )}
 }
 Outputs a new sequence of the same class, with the reverse element order. A related word is \verb|reverse-slice|; see \ref{virtual-seq}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{sequence=}{sequence= ( s1 s2 -- ?~)}
-}
-Tests if the two sequences have the same length and elements. This is weaker than \texttt{=}, since it does not ensure that the sequences are instances of the same class.
 
 \subsection{Indexing}
 
@@ -2220,7 +2263,7 @@ Outputs a sequence of elements present in both sequences, comparing elements for
 Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for equality.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-diffq}{seq-diff ( s1 s2 -- seq )}
+\ordinaryword{seq-diffq}{seq-diffq ( s1 s2 -- seq )}
 }
 Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for identity.
 \wordtable{
@@ -2465,7 +2508,7 @@ The following set of words manages LIFO (last-in-first-out) queues. Queues are b
 Makes a new queue with no elements.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{queue-empty?}{queue-empty? ( queue -- ?~)}
+\ordinaryword{queue-empty?}{queue-empty?~( queue -- ?~)}
 }
 Outputs \texttt{t} if the given queue does not contain any elements, \texttt{f} otherwise.
 \wordtable{
@@ -2501,31 +2544,6 @@ Tests if the object at the top of the stack is a string.
 }
 Turns a sequence of integers into a string. The integer elements are interpreted as characters. Note that this is not a way to turn any object into a printable representation; for that feature, see \ref{prettyprint}.
 
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string-compare}{string-compare~( s1 s2 -- n )}
-
-}
-Compares two strings lexicographically (dictionary order). The output value is one of the following:
-\begin{description}
-\item[Positive] indicating that \texttt{s1} follows \texttt{s2}
-\item[Zero] indicating that \texttt{s1} is equal to \texttt{s2}
-\item[Negative] indicating that \texttt{s1} precedes \texttt{s2}
-\end{description}
-\wordtable{
-\vocabulary{strings}
-\ordinaryword{string>}{string> ( s1 s2 -- ?~)}
-
-}
-Tests if \texttt{s1} follows \texttt{s2}. Implemented as follows:
-\begin{verbatim}
-: string> ( s1 s1 -- ? ) string-compare 0 > ;
-\end{verbatim}
-This is used to sort lists of strings:
-\begin{alltt}
-  [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
-[ "Apple" "Curry" "Turkey" "Veal" ]
-\end{alltt}
 \wordtable{
 \vocabulary{strings}
 \ordinaryword{fill}{fill~( n char -- string )}
@@ -2702,7 +2720,7 @@ Here is an example of sequence construction:
 \begin{alltt}
   : silly [ [ dup , ] repeat ] make-vector , ;
   [ 4 [ dup silly ] repeat ] make-list .
-[ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]
+\textbf{[ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]}
 \end{alltt}
 
 Note that the sequence construction combinators will capture any variables set inside the quotation, due to the dynamic scoping behavior. These combinators are actually implemented using variables. See \ref{namespaces}.
@@ -2811,11 +2829,6 @@ Cons a pair of elements onto a pair of lists.
 \ordinaryword{2uncons}{2uncons ( c1 c2 -- car1 car2 cdr1 cdr2 )}
 }
 Deconstructs paired lists. Compare the stack effects with those of \verb|car|, \verb|cdr| and \verb|uncons| in \ref{cons-cells}.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}
-}
-Cons a pair of elements onto a pair of lists.
 
 \section{Hashtables}\label{hashtables}
 
@@ -2835,7 +2848,7 @@ A hashtable sorts key/value pairs into buckets using a hashing function. The num
 }
 Outputs the hashcode of the object. The contract of this generic word is as follows:
 \begin{itemize}
-\item The hashcode must be a fixnum\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.}
+\item The hashcode must be a fixnum (\ref{integers})\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.}
 \item If two objects are equal under \texttt{=}, they must have the same hashcode.
 \end{itemize}
 If mutable objects are used as hashtable keys, they must not be mutated. Doing so will violate bucket sorting invariants and result in undefined behavior.
@@ -3231,10 +3244,10 @@ There are two ways of looking at an integer -- as a mathematical entity, or as a
 }
 Outputs a new integer where each bit is set if and only if the corresponding bit is set in both $x$ and $y$.
 \begin{alltt}
-BIN: 101 BIN: 10 bitand .b
-\emph{0}
-BIN: 110 BIN: 10 bitand .b
-\emph{10}
+  BIN: 101 BIN: 10 bitand .b
+\textbf{0}
+  BIN: 110 BIN: 10 bitand .b
+\textbf{10}
 \end{alltt}
 \wordtable{
 \vocabulary{math}
@@ -3242,10 +3255,10 @@ BIN: 110 BIN: 10 bitand .b
 }
 Outputs a new integer where each bit is set if and only if the corresponding bit is set in at least one of $x$ or $y$.
 \begin{alltt}
-BIN: 101 BIN: 10 bitor .b
-\emph{111}
-BIN: 110 BIN: 10 bitor .b
-\emph{110}
+  BIN: 101 BIN: 10 bitor .b
+\textbf{111}
+  BIN: 110 BIN: 10 bitor .b
+\textbf{110}
 \end{alltt}
 \wordtable{
 \vocabulary{math}
@@ -3253,10 +3266,10 @@ BIN: 110 BIN: 10 bitor .b
 }
 Outputs a new integer where each bit is set if and only if the corresponding bit is set in exactly one of $x$ or $y$.
 \begin{alltt}
-BIN: 101 BIN: 10 bitxor .b
-\emph{111}
-BIN: 110 BIN: 10 bitxor .b
-\emph{100}
+  BIN: 101 BIN: 10 bitxor .b
+\textbf{111}
+  BIN: 110 BIN: 10 bitxor .b
+\textbf{100}
 \end{alltt}
 \wordtable{
 \vocabulary{math}
@@ -3269,10 +3282,10 @@ Computes the bitwise complement of the input; that is, each bit in the input num
 }
 Computes a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
 \begin{alltt}
-BIN: 101 5 shift .b
-\emph{10100000}
-BIN: 11111 -2 shift .b
-\emph{111}
+  BIN: 101 5 shift .b
+\textbf{10100000}
+  BIN: 11111 -2 shift .b
+\textbf{111}
 \end{alltt}
 
 \wordtable{
@@ -3310,10 +3323,10 @@ description={an instance of the \texttt{rational} class, which is a disjoint uni
 }
 If we add, subtract or multiply any two integers, the result is always an integer. However, this is not the case with division. When dividing a numerator by a denominator where the numerator is not a integer multiple of the denominator, a ratio is returned instead.
 \begin{alltt}
-1210 11 / .
-\emph{110}
-100 330 / .
-\emph{10/33}
+  1210 11 / .
+\textbf{110}
+  100 330 / .
+\textbf{10/33}
 \end{alltt}
 Ratios are printed and can be input literally in the form above. Ratios are always reduced to lowest terms by factoring out the greatest common divisor of the numerator and denominator. A ratio with a denominator of 1 becomes an integer. Trying to create a ratio with a denominator of 0 raises an error.
 
@@ -3525,7 +3538,6 @@ Computes the square (raised to power 2), square root (raised to power $1/2$), an
 \ordinaryword{exp}{exp ( n -- n )}
 }
 Raises the number $e$ to a specified power. The number $e$ can be pushed on the stack with the \texttt{e} word, so \texttt{exp} could have been defined as follows\footnote{Of course, $e\approx 2.718281828459045$}:
-
 \begin{alltt}
 : exp ( x -- y ) e swap \^ ;
 \end{alltt}
@@ -3602,7 +3614,7 @@ Multiplies each element of the vector by a scalar. The two words only differ in 
 }
 Divides each element of the vector by a scalar, or alternatively, divides the scalar by each element of a vector. The two words yield different results; the elements of the two resulting vector are reciprocals of each other.
 
-\subsubsection{Pairwise operations}
+\subsubsection{Pairwise operations}\label{pairwise}
 
 These words all expect a pair of vectors of equal length. They apply a binary operation to each pair of elements, producing a new vector. They are all implemented using the \verb|2map| combinator (\ref{iteration}).
 
@@ -3801,7 +3813,7 @@ There is a natural isomorphism between the vector space $\mathbb{C}^m$, the $m\t
 Given a vector with $n$ elements, outputs a $1 \times n$ matrix.
 \begin{alltt}
   \tto 1.0 4.43 7.6 0.2 \ttc <row-vector> .
-M[ [ 1.0 4.43 7.6 0.2 ] ]M
+\textbf{M[ [ 1.0 4.43 7.6 0.2 ] ]M}
 \end{alltt}
 
 \wordtable{
@@ -3811,7 +3823,7 @@ M[ [ 1.0 4.43 7.6 0.2 ] ]M
 Given a vector with $n$ elements, outputs a $n \times 1$ matrix.
 \begin{alltt}
   \tto 1.0 4.43 7.6 0.2 \ttc <col-vector> .
-M[ [ 1.0 ] [ 4.43 ] [ 7.6 ] [ 0.2 ] ]M
+\textbf{M[ [ 1.0 ] [ 4.43 ] [ 7.6 ] [ 0.2 ] ]M}
 \end{alltt}
 
 \wordtable{
@@ -3877,7 +3889,7 @@ The following two words are optional, and should be implemented on input streams
 \vocabulary{io}
 \genericword{stream-readln}{stream-readln ( s -- str/f )}
 }
-Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream. Streams that do not support this generic word can be wrapped in a line stream that reads lines terminated by \verb|\n|, \verb|\r| or \verb|\r\n|. File and network streams are automatically wrapped in line streams.
+Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream. Streams that do not support this generic word can be wrapped in a line stream that reads lines terminated by \verb|\n|, \verb|\r| or \verb|\r\n| (\ref{special-stream}). File and network streams are automatically wrapped in line streams.
 \wordtable{
 \vocabulary{io}
 \genericword{stream-read1}{stream-read1 ( s -- char/f )}
@@ -3904,7 +3916,7 @@ Outputs a character to the stream. This might not result in immediate output to 
 }
 Outputs a string to the stream. As with \verb|stream-write1|, this may not result in an immediate output operation unless \verb|stream-flush| is called.
 
-The \texttt{attrs} parameter is an association list holding style information, and it is ignored by most streams -- one exception is HTML streams (\ref{html}). Most of the time either the \texttt{stream-write} or \texttt{stream-print} word is used. They are described in the next section.
+The \texttt{attrs} parameter is an association list holding style information (\ref{styles}). Most of the time no style information needs to be output, and either the \texttt{stream-write} or \texttt{stream-print} word is used. Those words wrap \verb|stream-write-attr| and are described in the next section.
 
 \wordtable{
 \vocabulary{io}

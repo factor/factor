@@ -14,14 +14,17 @@ Factor is fully supported on the following platforms:
   Mac OS X/PowerPC
   Linux/PowerPC
 
-While Factor may run on other platforms (Solaris/Sparc, Linux/Alpha, and
-so on), the native compiler will not be available, and thus much
-functionality will be missing. In particular, the following features
-require the native compiler and only work on supported platforms:
+While Factor may run on other Unix platforms (Solaris/Sparc,
+Linux/Alpha, and so on), the native compiler will not be available, and
+thus much functionality will be missing. In particular, the following
+features require the native compiler and only work on supported
+platforms:
 
   C library interface
   Non-blocking I/O
   Networking
+
+Factor _will not_ run, at all, on Windows NT or Windows 9x.
 
 * Compiling Factor
 

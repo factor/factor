@@ -7,7 +7,7 @@ TUPLE: duplex-stream in out flush? ;
 M: duplex-stream stream-flush
     duplex-stream-out stream-flush ;
 
-M: duplex-stream stream-auto-flush
+M: duplex-stream stream-finish
     dup duplex-stream-flush?
     [ duplex-stream-out stream-flush ] [ drop ] ifte ;
 

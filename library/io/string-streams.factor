@@ -5,7 +5,7 @@ M: sbuf stream-write1 push ;
 M: sbuf stream-write-attr rot nappend drop ;
 M: sbuf stream-close drop ;
 M: sbuf stream-flush drop ;
-M: sbuf stream-auto-flush drop ;
+M: sbuf stream-finish drop ;
 
 : string-out ( quot -- str )
     [ 512 <sbuf> stdio set call stdio get >string ] with-scope ;

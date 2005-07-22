@@ -11,7 +11,7 @@ USING: errors generic kernel lists namespaces strings styles ;
 : write1     ( char -- )         stdio get stream-write1 ;
 : write-attr ( string style -- ) stdio get stream-write-attr ;
 : print      ( string -- )       stdio get stream-print ;
-: terpri     ( -- )              "\n" write ;
+: terpri     ( -- )              stdio get stream-terpri ;
 : crlf       ( -- )              "\r\n" write ;
 : bl         ( -- )              " " write ;
 : close      ( -- )              stdio get stream-close ;

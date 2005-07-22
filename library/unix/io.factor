@@ -280,7 +280,7 @@ M: port stream-flush ( stream -- )
         [ swap <write-task> add-write-io-task stop ] callcc0
     ] when drop ;
 
-M: port stream-auto-flush ( stream -- ) drop ;
+M: port stream-finish ( stream -- ) drop ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;

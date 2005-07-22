@@ -24,7 +24,7 @@ M: c-stream stream-read1 ( stream -- char/f )
 M: c-stream stream-flush ( stream -- )
     c-stream-out [ fflush ] when* ;
 
-M: c-stream stream-auto-flush ( stream -- )
+M: c-stream stream-finish ( stream -- )
     dup c-stream-flush? [ stream-flush ] [ drop ] ifte ;
 
 M: c-stream stream-close ( stream -- )

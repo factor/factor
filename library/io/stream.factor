@@ -8,7 +8,7 @@ SYMBOL: stdio
 
 ! Stream protocol.
 GENERIC: stream-flush      ( stream -- )
-GENERIC: stream-auto-flush ( stream -- )
+GENERIC: stream-finish     ( stream -- )
 GENERIC: stream-readln     ( stream -- string )
 GENERIC: stream-read1      ( stream -- char/f )
 GENERIC: stream-read       ( count stream -- string )
@@ -17,13 +17,16 @@ GENERIC: stream-write-attr ( string style stream -- )
 GENERIC: stream-close      ( stream -- )
 GENERIC: set-timeout       ( timeout stream -- )
 
+: stream-terpri ( stream -- )
+    "\n" swap stream-write ;
+
 : stream-write ( string stream -- )
     f swap stream-write-attr ;
 
 : stream-print ( string stream -- )
     [ stream-write ] keep
-    [ "\n" swap stream-write ] keep
-    stream-auto-flush ;
+    [ stream-write ] keep
+    stream-finish ;
 
 : (stream-copy) ( in out -- )
     4096 pick stream-read [
@@ -39,7 +42,7 @@ GENERIC: set-timeout       ( timeout stream -- )
 ! Think '/dev/null'.
 TUPLE: null-stream ;
 M: null-stream stream-flush drop ;
-M: null-stream stream-auto-flush drop ;
+M: null-stream stream-finish drop ;
 M: null-stream stream-readln drop f ;
 M: null-stream stream-read 2drop f ;
 M: null-stream stream-read1 drop f ;
