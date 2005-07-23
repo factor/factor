@@ -152,3 +152,5 @@ SYMBOL: theta
         make-plot
         <event> event-loop SDL_Quit
     ] with-screen ;
+
+plot3d
