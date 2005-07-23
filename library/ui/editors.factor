@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor lists math matrices namespaces
+USING: generic kernel line-editor math matrices namespaces
 sdl sequences strings styles vectors ;
 
 ! An editor gadget wraps a line editor object and passes
@@ -29,19 +29,11 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    >list [ ch>string size-string drop ] map-with
+    >vector [ ch>string size-string drop ] map-with
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
-: (x>offset) ( n x wlist -- offset )
-    dup [
-        uncons >r over >
-        [ r> 2drop ] [ >r 1 + r> r> (x>offset) ] ifte
-    ] [
-        2drop
-    ] ifte ;
-
 : x>offset ( x font str -- offset )
-    run-char-widths 0 -rot (x>offset) ;
+    run-char-widths [ <= ] find-with drop ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
