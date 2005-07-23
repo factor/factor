@@ -33,7 +33,7 @@ GENERIC: handle-irc
 PREDICATE: string privmsg "PRIVMSG" swap subseq? ;
 
 M: string handle-irc ( line -- )
-    drop ( print flush ) ;
+    drop ;
 
 : parse-privmsg ( line -- text )
     ":" ?head drop
@@ -72,7 +72,7 @@ M: privmsg handle-irc ( line -- )
 
 : irc-loop ( -- )
     irc-stream get stream-readln
-    [ handle-irc irc-loop ] when* ;
+    [ dup print flush handle-irc irc-loop ] when* ;
 
 : factorbot
     "irc.freenode.net" connect
@@ -90,10 +90,8 @@ IN: factorbot-commands
     ] [
         nip [
             dup word-string " -- " rot word-url append3 respond
-        ] each-with
+        ] each
     ] ifte ;
 
 : quit ( text -- )
-    drop speaker "slava" = [ disconnect ] when ;
-
-factorbot
+    drop speaker get "slava" = [ disconnect ] when ;
