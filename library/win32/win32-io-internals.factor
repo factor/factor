@@ -25,12 +25,15 @@
 
 IN: win32-io-internals
 USING: alien errors kernel kernel-internals lists math namespaces threads 
-       vectors win32-api io generic io-internals sequences ;
+       vectors win32-api io generic io-internals sequences prettyprint ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
-SYMBOL: free-list
-SYMBOL: callbacks
+
+TUPLE: io-queue free-list callbacks ;
+TUPLE: io-callback overlapped quotation stream ;
+
+GENERIC: expire
 
 : expected-error? ( -- bool )
     [ 
@@ -73,41 +76,31 @@ BEGIN-STRUCT: indirect-pointer
     FIELD: int value
 END-STRUCT
 
-: num-callbacks ( -- len )
-    #! Returns the length of the callback vector.
-    io-queue get [ callbacks get length ] bind ;
+: <overlapped> ( -- overlapped )
+    "overlapped-ext" c-size malloc <alien> ;
 
-: set-callback-quot ( quot index -- )
-    io-queue get [
-        dup >r callbacks get nth car swap cons
-        r> callbacks get set-nth
-    ] bind ;
+C: io-queue ( -- queue )
+    0 <vector> over set-io-queue-callbacks ;
 
-: new-overlapped ( -- index )
-    #! Allocates and returns a new entry for the io queue.
-    #! The new index in the callback vector is returned.
-    io-queue get [
-        "overlapped-ext" c-type [ "width" get ] bind malloc <alien>
-        dup num-callbacks swap
-        set-overlapped-ext-user-data
-        unit num-callbacks dup >r callbacks get set-nth r>
-    ] bind ;
+C: io-callback ( -- callback )
+    io-queue get io-queue-callbacks [ push ] 2keep
+    length 1 - <overlapped> [ set-overlapped-ext-user-data ] keep
+    swap [ set-io-callback-overlapped ] keep ;
 
-: alloc-io-task ( quot -- overlapped )
-    io-queue get [
-        free-list get [
-            uncons free-list set
-        ] [ new-overlapped ] ifte*
-        [ set-callback-quot ] keep 
-        callbacks get nth car
-    ] bind ;
+: alloc-io-callback ( quot stream -- overlapped )
+    io-queue get io-queue-free-list [ 
+        uncons io-queue get [ set-io-queue-free-list ] keep
+        io-queue-callbacks nth
+    ] [ <io-callback> ] ifte*
+    [ set-io-callback-stream ] keep
+    [ set-io-callback-quotation ] keep
+    io-callback-overlapped ;
 
 : get-io-callback ( index -- callback )
-    #! Returns and frees the io queue entry at index.
-    io-queue get [
-        dup free-list [ cons ] change
-        callbacks get nth cdr
-    ] bind ;
+    dup io-queue get io-queue-callbacks nth swap
+    io-queue get [ io-queue-free-list cons ] keep set-io-queue-free-list 
+    [ f swap set-io-callback-stream ] keep
+    io-callback-quotation ;
 
 : (wait-for-io) ( timeout -- error overlapped len )
     >r completion-port get 
@@ -123,6 +116,10 @@ END-STRUCT
         <alien> overlapped-ext-user-data get-io-callback
     ] ifte ;
 
+: cancel-timedout ( -- )
+    io-queue get 
+    io-queue-callbacks [ io-callback-stream [ expire ] when* ] each ;
+
 : wait-for-io ( timeout -- callback len )
     (wait-for-io) overlapped>callback swap indirect-pointer-value 
     rot [ queue-error ] unless ;
@@ -131,7 +128,7 @@ END-STRUCT
     INFINITE wait-for-io swap call ;
 
 : win32-io-thread ( -- )
-    10 wait-for-io swap [
+    cancel-timedout 10 wait-for-io swap [
         [ schedule-thread call ] callcc0 2drop
     ] [
         drop yield
@@ -141,11 +138,6 @@ END-STRUCT
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
     completion-port set 
-
-    <namespace> [
-        32 <vector> callbacks set
-        f free-list set
-    ] extend io-queue set 
-    
+    <io-queue> io-queue set 
     [ win32-io-thread ] in-thread ;
 

@@ -118,4 +118,7 @@ END-STRUCT
 
 : CloseHandle ( handle -- ? )
     "bool" "kernel32" "CloseHandle" [ "void*" ] alien-invoke ;
-   
+
+: CancelIo ( handle -- ) 
+    "bool" "kernel32" "CancelIo" [ "void*" ] alien-invoke drop ;
+

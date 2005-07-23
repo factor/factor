@@ -83,21 +83,31 @@ C: win32-server ( port -- server )
         maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
         dup add-completion
         socket set
+        dup stream set
     ] extend over set-win32-server-this ;
 
 M: win32-server stream-close ( server -- )
     win32-server-this [ socket get CloseHandle drop ] bind ;
 
+M: win32-server set-timeout ( timeout server -- )
+    win32-server-this [ timeout set ] bind ;
+
+M: win32-server expire ( -- )
+    win32-server-this [
+        timeout get [ millis cutoff get > [ socket get CancelIo ] when ] when
+    ] bind ;
+
 IN: io
 : accept ( server -- client )
     win32-server-this [
-        new-socket 64 <buffer>
+        update-timeout new-socket 64 <buffer>
         [
-            alloc-io-task init-overlapped >r >r >r socket get r> r> 
+            stream get alloc-io-callback init-overlapped
+            >r >r >r socket get r> r> 
             buffer-ptr <alien> 0 32 32 NULL r> AcceptEx
             [ handle-socket-error ] unless stop
         ] callcc1 pending-error drop
-        swap dup add-completion <win32-stream> dupd <win32-client-stream>
-        swap buffer-free
+        swap dup add-completion <win32-stream> <line-reader> 
+        dupd <win32-client-stream> swap buffer-free
     ] bind ;
 

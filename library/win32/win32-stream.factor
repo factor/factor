@@ -37,6 +37,9 @@ SYMBOL: in-buffer
 SYMBOL: out-buffer
 SYMBOL: fileptr
 SYMBOL: file-size
+SYMBOL: stream
+SYMBOL: timeout
+SYMBOL: cutoff
 
 : pending-error ( len/status -- len/status )
     dup [ win32-throw-error ] unless ;
@@ -51,9 +54,12 @@ SYMBOL: file-size
 : update-file-pointer ( whence -- )
     file-size get [ fileptr [ + ] change ] [ drop ] ifte ;
 
+: update-timeout ( -- )
+    timeout get [ millis + cutoff set ] when* ;
+
 : flush-output ( -- ) 
-    [
-        alloc-io-task init-overlapped >r
+    update-timeout [
+        stream get alloc-io-callback init-overlapped >r
         handle get out-buffer get [ buffer@ ] keep buffer-length
         NULL r> WriteFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
@@ -79,8 +85,8 @@ M: string do-write ( str -- )
     ] ifte ;
 
 : fill-input ( -- ) 
-    [
-        alloc-io-task init-overlapped >r
+    update-timeout [
+        stream get alloc-io-callback init-overlapped >r
         handle get in-buffer get [ buffer@ ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
         NULL r>
@@ -113,34 +119,21 @@ M: string do-write ( str -- )
 : peek-input ( -- str )
     1 in-buffer get buffer-first-n ;
 
-: do-read-line ( sbuf -- str )
-    1 consume-input dup length 0 = [ drop >string-or-f ] [
-        dup "\r" = [
-            peek-input "\n" = [ 1 consume-input drop ] when 
-            drop >string
-        ] [ 
-            dup "\n" = [
-                peek-input "\r" = [ 1 consume-input drop ] when 
-                drop >string
-            ] [
-                dupd nappend do-read-line 
-            ] ifte
-        ] ifte
-    ] ifte ;
-
-M: win32-stream stream-write-attr ( str style stream -- )
+M: win32-stream stream-format ( str style stream -- )
     win32-stream-this nip [ do-write ] bind ;
-
-M: win32-stream stream-readln ( stream -- str )
-    win32-stream-this [ 80 <sbuf> do-read-line ] bind ;
 
 M: win32-stream stream-read ( count stream -- str )
     win32-stream-this [ dup <sbuf> swap do-read-count ] bind ;
 
+M: win32-stream stream-read1 ( stream -- str )
+    win32-stream-this [
+        1 consume-input dup length 0 = [ drop f ] when first 
+    ] bind ;
+
 M: win32-stream stream-flush ( stream -- )
     win32-stream-this [ maybe-flush-output ] bind ;
 
-M: win32-stream stream-auto-flush ( stream -- )
+M: win32-stream stream-finish ( stream -- )
     drop ;
 
 M: win32-stream stream-close ( stream -- )
@@ -154,6 +147,14 @@ M: win32-stream stream-close ( stream -- )
 M: win32-stream win32-stream-handle ( stream -- handle )
     win32-stream-this [ handle get ] bind ;
 
+M: win32-stream set-timeout ( timeout stream -- )
+    win32-stream-this [ timeout set ] bind ;
+
+M: win32-stream expire ( stream -- )
+    win32-stream-this [
+        timeout get [ millis cutoff get > [ handle get CancelIo ] when ] when
+    ] bind ;
+
 C: win32-stream ( handle -- stream )
     swap <namespace> [
         dup NULL GetFileSize dup -1 = not [
@@ -163,10 +164,11 @@ C: win32-stream ( handle -- stream )
         4096 <buffer> in-buffer set 
         4096 <buffer> out-buffer set
         0 fileptr set 
+        dup stream set
     ] extend over set-win32-stream-this ;
 
 : <win32-file-reader> ( path -- stream )
-    t f win32-open-file <win32-stream> ;
+    t f win32-open-file <win32-stream> <line-reader> ;
 
 : <win32-file-writer> ( path -- stream )
     f t win32-open-file <win32-stream> ;
