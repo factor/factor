@@ -25,7 +25,7 @@
 
 IN: win32-io-internals
 USING: alien errors kernel kernel-internals lists math namespaces threads 
-       vectors win32-api io generic io-internals sequences prettyprint ;
+       vectors win32-api io generic io-internals sequences ;
 
 SYMBOL: completion-port
 SYMBOL: io-queue
