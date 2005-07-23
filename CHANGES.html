@@ -7,12 +7,14 @@
 
 <ul>
 <li>
-Major improvements to the GUI:
+UI framework:
 <ul>
 <li>Now uses 3-dimensional co-ordinates throughout</li>
-<li>The listener supports styled text output and presentations</li>
 <li>Gradient paint, bevel border paint</li>
-<li>Wheel mouse scrolling</li>
+<li>Split pane gadget</li>
+<li>Horizontal scroll bars and wheel mouse scrolling in scroller gadgets</li>
+<li>Incremental layout improves listener responsiveness</li>
+<li>The listener supports styled text output and presentations</li>
 <li>Slide-show tutorial with live code examples</li>
 <li>Performance improvements, code cleanups, bug fixes</li>
 </ul>
@@ -51,7 +53,7 @@ find-with* ( obj i seq quot -- i elt | quot: elt -- ? )</pre>
 
 <li> The <code>string-compare</code> primitive has been replaced with the lexi word
   which now operates on any pair of sequences of numbers. The
-  string> word has been replaced with <code>>lexi></code>.
+  string> word has been replaced with <code>lexi></code>.
 
 <li> The <code>,</code> word no longer accepts a string as input inside a <code>make-string</code>. In 0.75, the following
   two lines were equivalent:
@@ -94,6 +96,10 @@ write1 ( char -- )</pre>
   a stream that reads from the given string.
 </ul>
 
+<li>Everything else:
+
+<ul>
+
 <li>Many improvements to the matrices library.
 
 <li>Improved inspector. Call it with <code>inspect ( obj -- )</code>.
@@ -109,5 +115,7 @@ write1 ( char -- )</pre>
   start.
 
 <li>md5 hashing algorithm in <code>contrib/crypto/</code> (Doug Coleman).
+
+</ul>
 
 </ul>

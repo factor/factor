@@ -64,6 +64,7 @@ C: port ( handle buffer -- port )
     80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
+    ! "touch-port called\n" 14 getenv fwrite 14 getenv fflush
     dup port-timeout dup 0 =
     [ 2drop ] [ millis + swap set-port-cutoff ] ifte ;
 
@@ -77,16 +78,17 @@ M: port set-timeout ( timeout port -- )
 : pending-error ( port -- )
     dup port-error f rot set-port-error throw ;
 
+: report-error ( error port -- )
+    [
+        "Error on fd " %
+        dup port-handle unparse %
+        ": " % swap %
+    ] make-string swap set-port-error ;
+
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
-    err_no dup EAGAIN = over EINTR = or [
-        2drop f
-    ] [
-        [
-            "Error on fd " % over port-handle unparse %
-            ": " % strerror %
-        ] make-string swap set-port-error  t
-    ] ifte ;
+    err_no dup EAGAIN = over EINTR = or
+    [ 2drop f ] [ strerror swap report-error ] ifte ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -117,7 +119,7 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fd ( task -- )
     dup do-io-task [
-        dup io-task-port touch-port pop-callback [ call ] when*
+        dup io-task-port touch-port pop-callback call
     ] [
         drop
     ] ifte ;
@@ -125,16 +127,15 @@ GENERIC: task-container ( task -- vector )
 : timeout? ( port -- ? )
     port-cutoff dup 0 = not swap millis < and ;
 
-: handle-fd? ( fdset task -- ? )
-    dup io-task-port timeout? [
-        2drop t
-    ] [
-        io-task-fd swap bit-nth
-    ] ifte ;
-
 : handle-fdset ( fdset tasks -- )
     [
-        cdr tuck handle-fd? [ handle-fd ] [ drop ] ifte
+        cdr dup io-task-port timeout? [
+            dup io-task-port "Timeout" swap report-error
+            nip pop-callback call
+        ] [
+            tuck io-task-fd swap bit-nth
+            [ handle-fd ] [ drop ] ifte
+        ] ifte
     ] hash-each-with ;
 
 : init-fdset ( fdset tasks -- )

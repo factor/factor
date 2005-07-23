@@ -193,7 +193,7 @@ M: cons ' ( c -- tagged )
     tuck length - CHAR: \0 fill append ;
 
 : emit-chars ( str -- )
-    >list "big-endian" get [ reverse ] unless
+    "big-endian" get [ reverse ] unless
     0 swap [ swap 16 shift + ] each emit ;
 
 : (pack-string) ( n list -- )
@@ -232,10 +232,10 @@ M: string ' ( string -- pointer )
     align-here r> ;
 
 M: tuple ' ( tuple -- pointer )
-    <mirror> >list tuple-type emit-array ;
+    <mirror> tuple-type emit-array ;
 
 : emit-vector ( vector -- pointer )
-    dup >list array-type emit-array swap length
+    dup array-type emit-array swap length
     object-tag here-as >r
     vector-type >header emit
     emit-fixnum ( length )
@@ -315,8 +315,6 @@ M: hashtable ' ( hashtable -- pointer )
 : with-image ( quot -- image )
     #! The quotation leaves a boot quotation on the stack.
     [ begin call end ] with-minimal-image ;
-
-: test-image ( quot -- ) with-image >list . ;
 
 : make-image ( name -- )
     #! Make an image for the C interpreter.

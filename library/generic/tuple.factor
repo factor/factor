@@ -174,10 +174,6 @@ M: mirror set-nth ( n mirror -- elt )
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
 
-: tuple>list ( tuple -- list )
-    #! We have to type check here, since <mirror> is unsafe.
-    <mirror> >list ;
-
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its
     #! delegate.

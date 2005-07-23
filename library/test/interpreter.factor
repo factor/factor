@@ -72,10 +72,6 @@ USE: sequences
     [ 3 "x" set "x" get ] test-interpreter
 ] unit-test
 
-[ { } ] [
-    [ 2 2 + . ] test-interpreter
-] unit-test
-
 [ { "hi\n" } ] [
     [ [ "hi" print ] string-out ] test-interpreter
 ] unit-test

@@ -115,7 +115,7 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 M: tuple prettyprint* ( indent tuple -- indent )
     [
-        \ << swap tuple>list \ >> prettyprint-sequence
+        \ << swap <mirror> >list \ >> prettyprint-sequence
     ] check-recursion ;
 
 M: alien prettyprint* ( alien -- str )

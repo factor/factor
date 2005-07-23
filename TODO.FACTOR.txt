@@ -1,5 +1,4 @@
-76:
----
+- timeouts broken on unix
 
 + ui:
 
@@ -9,7 +8,6 @@
 - fix up the min thumb size hack
 - gaps in pack layout
 - find out why so many small bignums get consed
-- repaint only dirty regions of the screen
 - faster mouse tracking
 - binary search to locate visible children of packs
 - rewrite frame layout for new style
@@ -22,6 +20,12 @@
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener
 - sort out clipping off-by-one flaw when filling rectangles
+- better menu positioning
+- only redraw dirty gadgets
+- get stuff in examples dir running in the ui
+- opengl rendering
+- text selection
+- clipboard support
 
 + tutorial:
 
@@ -31,7 +35,7 @@
 
 + misc
 
-Investigate:
+- sigsegv handling on OS X:
 
   http://developer.apple.com/technotes/tn2004/tn2123.html#SECLIMITATIONS
   http://www.caddr.com/macho/archives/sbcl-devel/2005-3/4742.html
@@ -40,6 +44,7 @@ Investigate:
 
 - http keep alive, and range get
 - code walker & exceptions
+- sleep word
 
 + ffi:
 
@@ -81,7 +86,6 @@ Investigate:
 
 + kernel:
 
-- sleep word
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue
@@ -93,13 +97,11 @@ Investigate:
 - code gc
 - doc comments of generics
 - M: object should not inhibit delegation
-- renumber types appopriately
 
 + i/o:
 
 - faster stream-copy
 - reading and writing byte arrays
-- clean up line reading code in win32-io
 - unix io: handle \n\r and \n\0
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
