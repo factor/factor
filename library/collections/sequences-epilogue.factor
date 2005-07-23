@@ -164,13 +164,13 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ;
 
-M: f concat ;
-
-M: cons concat
-    unswons [ swap [ nappend ] each-with ] immutable ;
-
-M: object concat
-    >list concat ;
+: concat ( seq -- seq )
+    #! Append a sequence of sequences together. The new sequence
+    #! has the same type as the first sequence.
+    dup empty? [
+        [ 1024 <vector> swap [ dupd nappend ] each ] keep
+        first like
+    ] unless ;
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.

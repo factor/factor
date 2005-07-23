@@ -196,7 +196,7 @@ M: #values can-kill* ( literal node -- ? )
     ] ifte ;
 
 : branch-values ( branches -- )
-    [ last-node node-in-d >list ] map
+    [ last-node node-in-d ] map
     unify-lengths seq-transpose branch-returns set ;
 
 : can-kill-branches? ( literal node -- ? )

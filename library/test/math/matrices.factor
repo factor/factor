@@ -1,5 +1,6 @@
 IN: temporary
-USING: kernel lists math matrices namespaces sequences test ;
+USING: kernel lists math matrices namespaces sequences test
+vectors ;
 
 [ [ [ 1 4 ] [ 2 5 ] [ 3 6 ] ] ]
 [ M[ [ 1 4 ] [ 2 5 ] [ 3 6 ] ]M row-list ] unit-test
@@ -131,10 +132,10 @@ unit-test
 ] unit-test
 
 [
-    [ [ 7 ] [ 4 8 ] [ 1 5 9 ] [ 2 6 ] [ 3 ] ]
+    [ { 7 } { 4 8 } { 1 5 9 } { 2 6 } { 3 } ]
 ] [
     M[ [ 1 2 3 ] [ 4 5 6 ] [ 7 8 9 ] ]M
-    5 [ 2 - swap <diagonal> ] project-with [ >list ] map
+    5 [ 2 - swap <diagonal> ] project-with [ >vector ] map
 ] unit-test
 
 [ { t t t } ]

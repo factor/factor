@@ -1,4 +1,5 @@
 IN: temporary
+USING: vectors ;
 USE: errors
 USE: kernel
 USE: math
@@ -96,4 +97,4 @@ unit-test
 [ 1 "" nth ] unit-test-fails
 [ -6 "hello" nth ] unit-test-fails
 
-[ t ] [ "hello world" dup >list >string = ] unit-test 
+[ t ] [ "hello world" dup >vector >string = ] unit-test 

@@ -5,11 +5,8 @@ USING: generic interpreter kernel lists math namespaces
 sequences words ;
 
 : literal-inputs? ( in stack -- )
-    tail-slice* dup >list [ safe-literal? ] all? [
-        length #drop node, t
-    ] [
-        drop f
-    ] ifte ;
+    tail-slice* dup [ safe-literal? ] all?
+    [ length #drop node, t ] [ drop f ] ifte ;
 
 : literal-inputs ( out stack -- )
     tail-slice* [ literal-value ] nmap ;

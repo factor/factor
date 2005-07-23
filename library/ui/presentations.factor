@@ -11,8 +11,8 @@ global [ 100 <vector> commands set ] bind
 : define-command ( class name quot -- )
     3list commands get push ;
 
-: applicable ( object -- list )
-    commands get >list [ car call ] subset-with ;
+: applicable ( object -- seq )
+    commands get [ car call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
     [ swap literal, % ] make-list

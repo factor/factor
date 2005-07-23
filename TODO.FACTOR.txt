@@ -1,5 +1,3 @@
-- timeouts broken on unix
-
 + ui:
 
 - fix listener prompt display after presentation commands invoked
