@@ -103,6 +103,7 @@ SYMBOL: failures
         "benchmark/continuations" "benchmark/ack"
         "benchmark/hashtables" "benchmark/strings"
         "benchmark/vectors" "benchmark/prettyprint"
+        "benchmark/image"
     ] run-tests ;
 
 : compiler-tests

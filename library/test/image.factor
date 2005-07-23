@@ -1,3 +1,4 @@
+IN: temporary
 USE: test
 USE: image
 USE: namespaces
@@ -25,10 +26,3 @@ USE: math
 [
     [ image-magic 8 >be write ] string-out
 ] unit-test
-
-[
-    boot-quot off
-    "/library/bootstrap/boot-stage1.factor" run-resource
-] with-image drop
-
-[ fixnum ] [ 4 class ] unit-test

@@ -33,20 +33,17 @@ SYMBOL: vocabularies
     all-words swap subset word-sort ; inline
 
 : word-subset-with ( obj pred -- list | pred: obj word -- ? )
-    all-words swap subset-with ; inline
+    all-words swap subset-with word-sort ; inline
 
 : recrossref ( -- )
     #! Update word cross referencing information.
     global [ <namespace> crossref set ] bind
     [ add-crossref ] each-word ;
 
-: (search) ( name vocab -- word )
-    vocab dup [ hash ] [ 2drop f ] ifte ;
-
 : search ( name list -- word )
     #! Search for a word in a list of vocabularies.
     dup [
-        2dup car (search) [ nip ] [ cdr search ] ?ifte
+        2dup car vocab ?hash [ nip ] [ cdr search ] ?ifte
     ] [
         2drop f
     ] ifte ;
@@ -70,7 +67,7 @@ SYMBOL: vocabularies
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup (search) [
+    2dup vocab ?hash [
         nip
         dup f "documentation" set-word-prop
         dup f "stack-effect" set-word-prop
