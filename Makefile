@@ -7,7 +7,16 @@ else
 	STRIP = strip
 endif
 
-DEFAULT_LIBS = -lm
+ifdef STATIC
+	DEFAULT_LIBS = -lm -Wl,-static -Wl,-whole-archive \
+		-Wl,-export-dynamic \
+		-lSDL -lSDL_gfx -lSDL_ttf \
+		-Wl,-no-whole-archive \
+		-lfreetype -lz -L/usr/X11R6/lib -lX11 -lXext \
+		-Wl,-Bdynamic
+else
+	DEFAULT_LIBS = -lm
+endif
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
@@ -76,13 +85,13 @@ macosx:
 linux:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
-		LIBS="$(DEFAULT_LIBS) -ldl"
+		LIBS="-ldl $(DEFAULT_LIBS)"
 	$(STRIP) f
 
 linux-ppc:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
-		LIBS="$(DEFAULT_LIBS) -ldl"
+		LIBS="-ldl $(DEFAULT_LIBS)"
 	$(STRIP) f
 
 windows:

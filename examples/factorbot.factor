@@ -30,15 +30,15 @@ SYMBOL: receiver
     "JOIN " irc-write irc-print ;
 
 GENERIC: handle-irc
-PREDICATE: string privmsg "PRIVMSG" swap subseq? ;
+PREDICATE: string privmsg " " split1 nip "PRIVMSG" head? ;
+PREDICATE: string ping "PING" head? ;
 
 M: string handle-irc ( line -- )
     drop ;
 
 : parse-privmsg ( line -- text )
-    ":" ?head drop
-    "!" split1 swap speaker set
-    "PRIVMSG " split1 nip
+    " " split1 nip
+    "PRIVMSG " ?head drop
     " " split1 swap receiver set
     ":" ?head drop ;
 
@@ -47,6 +47,9 @@ M: privmsg handle-irc ( line -- )
     " " split1 swap
     [ "factorbot-commands" ] search dup
     [ execute ] [ 2drop ] ifte ;
+
+: parse-irc ( line -- )
+    ":" ?head [ "!" split1 swap speaker set ] when handle-irc ;
 
 : say ( line nick -- )
     "PRIVMSG " irc-write irc-write " :" irc-write irc-print ;
@@ -72,7 +75,7 @@ M: privmsg handle-irc ( line -- )
 
 : irc-loop ( -- )
     irc-stream get stream-readln
-    [ dup print flush handle-irc irc-loop ] when* ;
+    [ dup print flush parse-irc irc-loop ] when* ;
 
 : factorbot
     "irc.freenode.net" connect

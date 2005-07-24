@@ -6,23 +6,25 @@ parser sequences io unparser words ;
 
 "Compiling base..." print
 
-unix? [
-    "sdl"      "libSDL.so"     "cdecl"    add-library
-    "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library
-    "sdl-ttf"  "libSDL_ttf.so" "cdecl"    add-library
-] when
-
-win32? [
-    "kernel32" "kernel32.dll"  "stdcall"  add-library
-    "user32"   "user32.dll"    "stdcall"  add-library
-    "gdi32"    "gdi32.dll"     "stdcall"  add-library
-    "winsock"  "ws2_32.dll"    "stdcall"  add-library
-    "mswsock"  "mswsock.dll"   "stdcall"  add-library
-    "libc"     "msvcrt.dll"    "cdecl"    add-library
-    "sdl"      "SDL.dll"       "cdecl"    add-library
-    "sdl-gfx"  "SDL_gfx.dll"   "cdecl"    add-library
-    "sdl-ttf"  "SDL_ttf.dll"   "cdecl"    add-library
-] when
+"statically-linked" get [
+    unix? [
+        "sdl"      "libSDL.so"     "cdecl"    add-library
+        "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library
+        "sdl-ttf"  "libSDL_ttf.so" "cdecl"    add-library
+    ] when
+    
+    win32? [
+        "kernel32" "kernel32.dll"  "stdcall"  add-library
+        "user32"   "user32.dll"    "stdcall"  add-library
+        "gdi32"    "gdi32.dll"     "stdcall"  add-library
+        "winsock"  "ws2_32.dll"    "stdcall"  add-library
+        "mswsock"  "mswsock.dll"   "stdcall"  add-library
+        "libc"     "msvcrt.dll"    "cdecl"    add-library
+        "sdl"      "SDL.dll"       "cdecl"    add-library
+        "sdl-gfx"  "SDL_gfx.dll"   "cdecl"    add-library
+        "sdl-ttf"  "SDL_ttf.dll"   "cdecl"    add-library
+    ] when
+] unless
 
 default-cli-args
 parse-command-line
