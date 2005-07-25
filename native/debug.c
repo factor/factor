@@ -137,6 +137,8 @@ void print_string(F_STRING* str)
 
 void print_obj(CELL obj)
 {
+	F_ARRAY *array;
+
 	switch(type_of(obj))
 	{
 	case FIXNUM_TYPE:
@@ -153,6 +155,12 @@ void print_obj(CELL obj)
 		break;
 	case F_TYPE:
 		fprintf(stderr,"f");
+		break;
+	case TUPLE_TYPE:
+		array = untag_array_fast(obj);
+		fprintf(stderr,"<< ");
+		print_word(untag_word(get(AREF(array,0))));
+		fprintf(stderr," ... >>\n");
 		break;
 	default:
 		fprintf(stderr,"#<type %ld @ %lx>",type_of(obj),obj);
@@ -207,6 +215,8 @@ void dump_cell(CELL cell)
 
 void dump_memory(CELL from, CELL to)
 {
+	from = UNTAG(from);
+
 	for(; from <= to; from += CELLS)
 		dump_cell(from);
 }

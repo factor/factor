@@ -54,3 +54,7 @@ USING: kernel lists math sequences strings test vectors ;
 [ { 4 2 6 } ] [ { 1 4 2 5 3 6 } [ 2 mod 0 = ] subset ] unit-test
 
 [ [ 3 ] ] [ 2 [ 1 2 3 ] [ < ] subset-with ] unit-test
+
+[ "hello world how are you" ]
+[ { "hello" "world" "how" "are" "you" } " " join ]
+unit-test

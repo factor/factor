@@ -19,11 +19,6 @@
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];
 
-/* Profiling timer */
-#ifndef WIN32
-struct itimerval prof_timer;
-#endif
-
 /* Error handlers restore this */
 #ifdef WIN32
 jmp_buf toplevel;

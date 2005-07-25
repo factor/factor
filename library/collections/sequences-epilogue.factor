@@ -23,23 +23,11 @@ M: object each ( seq quot -- )
         [ swap nth swap call ] 3keep
     ] repeat 2drop ;
 
-: change-nth ( seq i quot -- )
-    pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
-    inline
-
-: (nmap) ( seq i quot -- )
-    pick length pick <= [
-        3drop
-    ] [
-        [ change-nth ] 3keep >r 1 + r> (nmap)
-    ] ifte ; inline
-
-: nmap ( seq quot -- | quot: elt -- elt )
-    #! Destructive on seq.
-    0 swap (nmap) ; inline
-
 : map ( seq quot -- seq | quot: elt -- elt )
-    swap [ swap nmap ] immutable ; inline
+    over [
+        length <vector> rot
+        [ -rot [ slip push ] 2keep ] each nip
+    ] keep like ; inline
 
 : map-with ( obj list quot -- list | quot: obj elt -- elt )
     swap [ with rot ] map 2nip ; inline
@@ -47,17 +35,23 @@ M: object each ( seq quot -- )
 : accumulate ( list identity quot -- values | quot: x y -- z )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
-: (2nmap) ( seq1 seq2 i quot -- elt3 )
-    pick pick >r >r >r 2nth r> call r> r> swap set-nth ; inline
+: change-nth ( seq i quot -- )
+    pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
+    inline
 
-: 2nmap ( seq1 seq2 quot -- | quot: elt1 elt2 -- elt3 )
-    #! Destructive on seq2.
-    over length [
-        [ >r 3dup r> swap (2nmap) ] keep
-    ] repeat 3drop ; inline
+: nmap ( seq quot -- seq | quot: elt -- elt )
+    over length [ [ swap change-nth ] 3keep ] repeat 2drop ; inline
 
-M: object 2map ( seq1 seq2 quot -- seq | quot: elt1 elt2 -- elt3 )
-    swap [ swap 2nmap ] immutable ;
+: 2each ( seq seq quot -- | quot: elt -- )
+    over length >r >r cons r> r>
+    [ [ swap >r >r uncons r> 2nth r> call ] 3keep ] repeat
+    2drop ; inline
+
+: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
+    over [
+        length <vector> 2swap
+        [ 2swap [ slip push ] 2keep ] 2each nip
+    ] keep like ; inline
 
 M: object find* ( i seq quot -- i elt  )
     pick pick length >= [
@@ -158,7 +152,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : add ( seq elt -- seq )
     #! Outputs a new sequence of the same type as seq.
-    unit append ;
+    swap [ push ] immutable ;
 
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
@@ -189,6 +183,12 @@ M: object peek ( sequence -- element )
     ] keep like ;
 
 : >pop> ( stack -- stack ) dup pop drop ;
+
+: join ( seq glue -- seq )
+    #! The new sequence is of the same type as glue.
+    swap dup length <vector> swap
+    [ over push 2dup push ] each nip >pop>
+    concat ;
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 

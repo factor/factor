@@ -36,10 +36,7 @@ vectors ;
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
-! Later, this will fixed when 2each works properly
-! : v. ( v v -- x ) 0 swap [ conjugate * + ] 2each ;
-: v** ( v v -- v ) [ conjugate * ] 2map ;
-: v. ( v v -- x ) v** sum ;
+: v. ( v v -- x ) 0 -rot [ conjugate * + ] 2each ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
 

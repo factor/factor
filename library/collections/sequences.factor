@@ -38,9 +38,6 @@ G: each ( seq quot -- | quot: elt -- )
 : reduce ( seq identity quot -- value | quot: x y -- z )
     swapd each ; inline
 
-G: 2map ( seq seq quot -- seq | quot: elt elt -- elt )
-    [ over ] [ type ] ; inline
-
 G: find ( seq quot -- i elt | quot: elt -- ? )
     [ over ] [ type ] ; inline
 
