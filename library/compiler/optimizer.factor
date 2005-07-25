@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: hashtables inference kernel lists namespaces sequences ;
+USING: generic hashtables inference kernel lists matrices
+namespaces sequences ;
 
 ! The optimizer transforms dataflow IR to dataflow IR. Currently
 ! it removes literals that are eventually dropped, and never
@@ -125,7 +126,7 @@ M: #drop useless-node? ( node -- ? )
 
 ! #call
 M: #call can-kill* ( literal node -- ? )
-    nip node-param {{
+    dup node-param {{
         [[ dup t ]]
         [[ drop t ]]
         [[ swap t ]]
@@ -133,9 +134,10 @@ M: #call can-kill* ( literal node -- ? )
         [[ pick t ]] 
         [[ >r t ]]
         [[ r> t ]]
-    }} hash ;
+    }} hash >r delegate can-kill* r> or ;
 
-: kill-mask ( killing inputs -- mask )
+: kill-mask ( killing node -- mask )
+    dup node-param \ r> = [ node-in-r ] [ node-in-d ] ifte
     [ swap memq? ] map-with ;
 
 : (kill-shuffle) ( word -- map )
@@ -159,13 +161,13 @@ M: #call can-kill* ( literal node -- ? )
     }} hash ;
 
 : lookup-mask ( mask word -- word )
-    over [ not ] all? [ nip ] [ (kill-shuffle) hash ] ifte ;
+    over disj [ (kill-shuffle) hash ] [ nip ] ifte ;
 
 : kill-shuffle ( literals node -- )
     #! If certain values passing through a stack op are being
     #! killed, the stack op can be reduced, in extreme cases
     #! to a no-op.
-    [ [ node-in-d kill-mask ] keep node-param lookup-mask ] keep
+    [ [ kill-mask ] keep node-param lookup-mask ] keep
     set-node-param ;
 
 M: #call kill-node* ( literals node -- )

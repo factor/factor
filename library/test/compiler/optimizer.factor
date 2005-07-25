@@ -21,9 +21,9 @@ USE: sequences
 
 [ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
 
-[ [ t t f ] ] [ [ 1 2 3 ] [
-    f <literal> ] map
-    [ [ literal-value 2 <= ] subset ] keep kill-mask
+[ [ t t f ] ] [
+    [ 1 2 3 ] [ f <literal> ] map
+    [ [ literal-value 2 <= ] subset ] keep in-d-node <#drop> kill-mask
 ] unit-test
 
 [ t ] [
@@ -69,3 +69,7 @@ USE: sequences
 
 [ [ 5 [ dup ] [ dup ] ] ] [ \ literal-kill-test-6 word-def kill-set* ] unit-test
 
+: literal-kill-test-7
+    [ 1 2 3 ] >r + r> drop ; compiled
+
+[ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
