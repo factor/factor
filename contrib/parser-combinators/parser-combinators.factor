@@ -27,6 +27,7 @@ USE: sequences
 USE: strings
 USE: lists
 USE: math
+USE: io
 
 GENERIC: phead
 
