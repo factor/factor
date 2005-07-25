@@ -76,7 +76,6 @@
 
 + sequences
 
-- dipping 2nmap, 2each
 - array sort
 - nappend: instead of using push, enlarge the sequence with set-length
   then add set the elements with set-nth

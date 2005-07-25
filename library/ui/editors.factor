@@ -33,7 +33,8 @@ TUPLE: editor line caret ;
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : x>offset ( x font str -- offset )
-    run-char-widths [ <= ] find-with drop ;
+    dup >r run-char-widths [ <= ] find-with drop dup -1 =
+    [ drop r> length ] [ r> drop ] ifte ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
