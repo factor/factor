@@ -9,10 +9,17 @@ SYMBOL: inspecting
 
 GENERIC: sheet ( obj -- sheet )
 
-M: object sheet ( obj -- sheet )
+: object-sheet ( obj -- names values )
     dup class "slots" word-prop
     [ second ] map
-    tuck [ execute ] map-with 2list ;
+    tuck [ execute ] map-with ;
+
+M: object sheet object-sheet 2list ;
+
+M: tuple sheet
+    dup object-sheet
+    >r >r \ delegate swap delegate r> r>
+    2cons 2list ;
 
 PREDICATE: list nonvoid cons? ;
 
