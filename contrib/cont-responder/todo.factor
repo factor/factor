@@ -36,6 +36,7 @@ USE: prettyprint
 USE: hashtables
 USE: sequences
 USE: http
+USE: unparser
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
@@ -93,13 +94,13 @@ USE: http
 
 : read-todo ( -- <todo> )
   #! Read a todo list from the current input stream.
-  read-line url-decode read-line url-decode <todo> 
-  read-line str>number [
+  readln url-decode readln url-decode <todo> 
+  readln str>number [
     dup
     <namespace> [
-      read-line url-decode "yes" = "complete?" set
-      read-line url-decode "priority" set
-      read-line url-decode "description" set
+      readln url-decode "yes" = "complete?" set
+      readln url-decode "priority" set
+      readln url-decode "description" set
     ] extend add-todo-item
   ] times ;
 
@@ -149,7 +150,7 @@ USE: http
 
 : priority-comparator ( item1 item2 -- bool )
   #! Return true if item1 is a higher priority than item2
-  >r item-priority r> item-priority string> ;
+  >r item-priority r> item-priority lexi> ;
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.

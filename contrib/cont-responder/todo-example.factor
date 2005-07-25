@@ -45,63 +45,63 @@ USE: sequences
 : todo-stylesheet ( -- string )
   #! Return the stylesheet for the todo list
   [ 
-    "table.list {" ,
-    "  text-align:center;" ,
-    "  font-family: Verdana;" ,
-    "  font-weight: normal;" ,
-    "  font-size: 11px;" ,
-    "  color: #404040;" ,
-    "  background-color: #fafafa;" ,
-    "  border: 1px #6699cc solid;" ,
-    "  border-collapse: collapse;" ,
-    "  boder-spacing: 0px;" ,
-    "}" ,
-    "tr.heading {" ,
-    "  border-bottom: 2px solid #6699cc;" ,
-    "  border-left: 1px solix #6699cc;" ,
-    "  background-color: #BEC8D1;" ,
-    "  text-align: left;" ,
-    "  text-indent: 0px;" ,
-    "  font-family: verdana;" ,
-    "  font-weight: bold;" ,
-    "  color: #404040;" ,
-    "}" ,
-    "tr.item {" ,
-    "  border-bottom: 1px solid #9cf;" ,
-    "  border-top: 0px;" ,
-    "  border-left: 1px solid #9cf;" ,
-    "  border-right: 0px;" ,
-    "  text-align: left;" ,
-    "  text-indent: 2px;" ,
-    "  font-family: verdana, sans-serif, arial;" ,
-    "  font-weight: normal;" ,
-    "  color: #404040;" ,
-    "  background-color: #fafafa;" ,
-    "}" ,
-    "tr.complete {" ,
-    "  border-bottom: 1px solid #9cf;" ,
-    "  border-top: 0px;" ,
-    "  border-left: 1px solid #9cf;" ,
-    "  border-right: 0px;" ,
-    "  text-align: left;" ,
-    "  text-indent: 2px;" ,
-    "  font-family: verdana, sans-serif, arial;" ,
-    "  font-weight: normal;" ,
-    "  color: #404040;" ,
-    "  background-color: #ccc;" ,
-    "}" ,
-    "td.lbl {" ,
-    "  font-weight: bold; text-align: right;" ,
-    "}" ,
-    "tr.required {" ,
-    "  background: #FCC;" ,
-    "}" ,
-    "input:focus {" ,
-    "  background: yellow;" ,
-    "}" ,
-    "textarea:focus {" ,
-    "  background: yellow;" ,
-    "}" ,
+    "table.list {" %
+    "  text-align:center;" %
+    "  font-family: Verdana;" %
+    "  font-weight: normal;" %
+    "  font-size: 11px;" %
+    "  color: #404040;" %
+    "  background-color: #fafafa;" %
+    "  border: 1px #6699cc solid;" %
+    "  border-collapse: collapse;" %
+    "  boder-spacing: 0px;" %
+    "}" %
+    "tr.heading {" %
+    "  border-bottom: 2px solid #6699cc;" %
+    "  border-left: 1px solix #6699cc;" %
+    "  background-color: #BEC8D1;" %
+    "  text-align: left;" %
+    "  text-indent: 0px;" %
+    "  font-family: verdana;" %
+    "  font-weight: bold;" %
+    "  color: #404040;" %
+    "}" %
+    "tr.item {" %
+    "  border-bottom: 1px solid #9cf;" %
+    "  border-top: 0px;" %
+    "  border-left: 1px solid #9cf;" %
+    "  border-right: 0px;" %
+    "  text-align: left;" %
+    "  text-indent: 2px;" %
+    "  font-family: verdana, sans-serif, arial;" %
+    "  font-weight: normal;" %
+    "  color: #404040;" %
+    "  background-color: #fafafa;" %
+    "}" %
+    "tr.complete {" %
+    "  border-bottom: 1px solid #9cf;" %
+    "  border-top: 0px;" %
+    "  border-left: 1px solid #9cf;" %
+    "  border-right: 0px;" %
+    "  text-align: left;" %
+    "  text-indent: 2px;" %
+    "  font-family: verdana, sans-serif, arial;" %
+    "  font-weight: normal;" %
+    "  color: #404040;" %
+    "  background-color: #ccc;" %
+    "}" %
+    "td.lbl {" %
+    "  font-weight: bold; text-align: right;" %
+    "}" %
+    "tr.required {" %
+    "  background: #FCC;" %
+    "}" %
+    "input:focus {" %
+    "  background: yellow;" %
+    "}" %
+    "textarea:focus {" %
+    "  background: yellow;" %
+    "}" %
   ] make-string ;
 
 : todo-stylesheet-url ( -- url )
@@ -234,7 +234,7 @@ USE: sequences
    
 : get-todo-filename ( database-path <todo> -- filename )
   #! Get the filename containing the todo list details.
-  [ swap , todo-username , ".todo" , ] make-string ;
+  [ swap % todo-username % ".todo" % ] make-string ;
   
 : add-default-todo-item ( <todo> -- )
   #! Add a default todo item. This is a workaround for the 
@@ -473,7 +473,7 @@ USE: sequences
 : show-todo-list ( -- )
   #! Show the current todo list.
   [
-    [ "todo" get todo-username , "'s To Do list" , ] make-string
+    [ "todo" get todo-username % "'s To Do list" % ] make-string
     [ include-todo-stylesheet ]
     [
       "todo" get write-item-table
