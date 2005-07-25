@@ -87,11 +87,10 @@ M: object (each-slot) ( quot obj -- )
     [ dup size swap type rot seq+ ] keep
     1 swap type rot seq+ ;
 
-: heap-stats ( -- stats )
+: heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
     num-types zero-vector num-types zero-vector
-    [ >r 2dup r> heap-stat-step ] each-object
-    swap >list swap >list zip ;
+    [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( type instances bytes -- )
     dup 0 = [
@@ -104,7 +103,7 @@ M: object (each-slot) ( quot obj -- )
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ dupd uncons heap-stat. 1 + ] each drop ;
+    0 heap-stats [ >r >r dup r> r> heap-stat. 1 + ] 2each drop ;
 
 : orphans ( word -- list )
     #! Orphans are forgotten but still referenced.

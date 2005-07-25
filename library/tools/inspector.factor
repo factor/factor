@@ -31,7 +31,7 @@ M: hashtable sheet hash>alist unzip 2list ;
 
 : describe ( obj -- list )
     sheet dup first length count swons
-    dup peek over first zip [ uncons set ] each
+    dup peek over first [ set ] 2each
     [ column ] map
     seq-transpose
     [ " | " join ] map ;

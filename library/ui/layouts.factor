@@ -20,7 +20,7 @@ namespaces sdl sequences ;
 TUPLE: pack align fill vector ;
 
 : pref-dims ( gadget -- list )
-    gadget-children [ pref-dim ] map >list ;
+    gadget-children [ pref-dim ] map ;
 
 : orient ( gadget list1 list2 -- list )
     zip >r pack-vector r> [ uncons rot set-axis ] map-with ;
@@ -31,28 +31,28 @@ TUPLE: pack align fill vector ;
         rot pack-fill v*n v+
     ] map-with ;
 
-: (packed-dims) ( gadget sizes -- list )
+: (packed-dims) ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
 
-: packed-dims ( gadget sizes -- list )
-    over gadget-children >list >r (packed-dims) r>
-    zip [ uncons set-gadget-dim ] each ;
+: packed-dims ( gadget sizes -- seq )
+    over gadget-children >r (packed-dims) r>
+    [ set-gadget-dim ] 2each ;
 
-: packed-loc-1 ( sizes -- list )
+: packed-loc-1 ( sizes -- seq )
     { 0 0 0 } [ v+ ] accumulate ;
 
-: packed-loc-2 ( gadget sizes -- list )
+: packed-loc-2 ( gadget sizes -- seq )
     >r dup rectangle-dim { 1 1 1 } vmax over r>
     packed-dim-2 [ v- ] map-with
     >r dup pack-align swap rectangle-dim { 1 1 1 } vmax r>
     [ >r 2dup r> v- n*v ] map 2nip ;
 
-: (packed-locs) ( gadget sizes -- list )
+: (packed-locs) ( gadget sizes -- seq )
     dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
 
 : packed-locs ( gadget sizes -- )
-    over gadget-children >list >r (packed-locs) r>
-    zip [ uncons set-rectangle-loc ] each ;
+    over gadget-children >r (packed-locs) r>
+    [ set-rectangle-loc ] 2each ;
 
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;
