@@ -160,7 +160,7 @@ void print_obj(CELL obj)
 		array = untag_array_fast(obj);
 		fprintf(stderr,"<< ");
 		print_word(untag_word(get(AREF(array,0))));
-		fprintf(stderr," ... >>\n");
+		fprintf(stderr," %ld >>\n",obj);
 		break;
 	default:
 		fprintf(stderr,"#<type %ld @ %lx>",type_of(obj),obj);

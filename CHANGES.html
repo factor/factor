@@ -1,9 +1,29 @@
+<!-- :noWordSep=+-*\=><;.?/'()%,_|: -->
+
 <html>
 <head><title>Factor change log</title></head>
 <body>
 
+<h1>Factor 0.77:</h1>
+
+<ul>
+<li>Sequences:
+
+<ul>
+<li><code>2each ( seq seq quot -- quot: elt -- elt )</code> combinator</li>
+<li><code>join ( seq glue -- seq )</code> combinator. Takes a sequence of sequences, and constructs a new sequence with the glue in between each sequence. For example:
+<pre>  [ "usr" "bin" "grep" ] "/" join
+<b>"usr/bin/grep"</b></pre></li>
+</ul>
+
+</li>
+</ul>
+
+<ul>Everything else:
+<li>Object slots are now clickable in the inspector</li>
+</ul>
+
 <h1>Factor 0.76:</h1>
-<!-- :noWordSep=+-*\=><;.?/'()%,_|: -->
 
 <ul>
 <li>
