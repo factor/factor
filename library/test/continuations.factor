@@ -27,3 +27,8 @@ USE: test
 
 [ t ] [ 10 callcc1-test 10 count = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
+
+: multishot-test ( -- stack )
+    [ dup "cc" set 5 swap call ] callcc1 "cc" get car interp-data ;
+
+[ 5 { } ] [ multishot-test ] unit-test

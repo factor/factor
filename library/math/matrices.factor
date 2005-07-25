@@ -29,7 +29,7 @@ vectors ;
     >r over >r v>= r> r> v<= vand ;
 
 : sum ( v -- n ) 0 [ + ] reduce ;
-: product 1 [ * ] reduce ;
+: product ( v -- n ) 1 [ * ] reduce ;
 : conj ( v -- ? ) [ ] all? ;
 : disj ( v -- ? ) [ ] contains? ;
 
