@@ -22,8 +22,8 @@ TUPLE: pack align fill vector ;
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
 
-: orient ( gadget list1 list2 -- list )
-    zip >r pack-vector r> [ uncons rot set-axis ] map-with ;
+: orient ( gadget seq1 seq2 -- seq )
+    >r >r pack-vector r> r> [ pick set-axis ] 2map nip ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [

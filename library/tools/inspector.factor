@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
 USING: generic hashtables io kernel kernel-internals lists math
-memory namespaces prettyprint sequences strings test unparser
-vectors words ;
+memory namespaces prettyprint sequences strings styles test
+unparser vectors words ;
 
 SYMBOL: inspecting
 
@@ -16,11 +16,11 @@ M: object sheet ( obj -- sheet )
 
 PREDICATE: list nonvoid cons? ;
 
-M: nonvoid sheet >list unit ;
+M: nonvoid sheet unit ;
 
-M: vector sheet >list unit ;
+M: vector sheet unit ;
 
-M: array sheet >list unit ;
+M: array sheet unit ;
 
 M: hashtable sheet hash>alist unzip 2list ;
 
@@ -29,8 +29,8 @@ M: hashtable sheet hash>alist unzip 2list ;
     [ [ length ] map 0 [ max ] reduce ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
-: describe ( obj -- list )
-    sheet dup first length count swons
+: format-sheet ( sheet -- list )
+    dup first length count swons
     dup peek over first [ set ] 2each
     [ column ] map
     seq-transpose
@@ -68,6 +68,10 @@ M: object extra-banner ( obj -- ) drop ;
     "It takes up " write dup size unparse write " bytes of memory." print
     extra-banner ;
 
+: describe ( obj -- )
+    sheet dup format-sheet
+    swap peek [ presented swons unit ] map
+    [ format terpri ] 2each ;
+
 : inspect ( obj -- )
-    dup inspecting set
-    dup inspect-banner describe [ print ] each ;
+    dup inspecting set dup inspect-banner describe ;
