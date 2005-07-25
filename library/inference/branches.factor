@@ -31,7 +31,7 @@ sequences strings vectors words hashtables prettyprint ;
 : unify-stacks ( list -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths seq-transpose [ unify-results ] map >vector ; 
+    unify-lengths seq-transpose [ unify-results ] map ;
 
 : balanced? ( list -- ? )
     #! Check if a list of [[ instack outstack ]] pairs is

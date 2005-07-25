@@ -43,11 +43,6 @@ PREDICATE: general-list list ( list -- ? )
 : 2cons ( ca1 ca2 cd1 cd2 -- c1 c2 ) rot swons >r cons r> ;
 : 2uncons ( c1 c2 -- ca1 ca2 cd1 cd2 ) [ 2car ] 2keep 2cdr ;
 
-: zip ( list list -- list )
-    #! Make a new list containing pairs of corresponding
-    #! elements from the two given lists.
-    2dup and [ 2uncons zip >r cons r> cons ] [ 2drop [ ] ] ifte ;
-
 : unzip ( assoc -- keys values )
     #! Split an association list into two lists of keys and
     #! values.

@@ -7,7 +7,7 @@ USING: kernel lists math sequences vectors words ;
 SYMBOL: object
 
 object [
-    drop num-types count
+    drop num-types >list
 ] "builtin-supertypes" set-word-prop
 
 object [

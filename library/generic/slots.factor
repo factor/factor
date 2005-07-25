@@ -41,8 +41,6 @@ sequences strings words ;
     #! given class. The spec is a list of lists of length 3 of
     #! the form [ slot reader writer ]. slot is an integer,
     #! reader and writer are either words, strings or f.
-    intern-slots
-    2dup "slots" set-word-prop
     [ 3unlist define-slot ] each-with ;
 
 : reader-word ( class name -- word )
@@ -51,17 +49,13 @@ sequences strings words ;
 : writer-word ( class name -- word )
     [ swap "set-" % word-name % "-" % % ] make-string create-in ;
 
-: simple-slot ( class name -- [ reader writer ] )
-    [ reader-word ] 2keep writer-word 2list ;
+: simple-slot ( class name -- reader writer )
+    [ reader-word ] 2keep writer-word ;
 
-: simple-slot-spec ( class slots -- spec )
-    [ simple-slot ] map-with ;
-
-: simple-slots ( base class slots -- )
+: simple-slots ( class slots base -- spec )
     #! Takes a list of slot names, and for each slot name
     #! defines a pair of words <class>-<slot> and 
     #! set-<class>-<slot>. Slot numbering is consecutive and
     #! begins at base.
-    >r tuck r>
-    simple-slot-spec [ length [ + ] project-with ] keep zip
-    define-slots ;
+    over length [ + ] map-with
+    [ >r dupd simple-slot r> -rot 3list ] 2map nip ;

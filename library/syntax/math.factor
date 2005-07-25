@@ -20,9 +20,9 @@ vectors ;
 : BIN: 2 (BASE) ; parsing
 
 ! Matrices
-: M[ f ; parsing
+: M{ f ; parsing
 
-: ]M
+: }M
     reverse
     [ dup length swap car length ] keep
     concat >vector <matrix> swons ; parsing

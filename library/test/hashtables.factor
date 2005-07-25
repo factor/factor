@@ -15,7 +15,7 @@ USE: sequences
 1000 [ [ silly-key/value "testhash" get set-hash ] keep ] repeat
 
 [ f ]
-[ 1000 count [ silly-key/value "testhash" get hash = not ] subset ]
+[ 1000 >list [ silly-key/value "testhash" get hash = not ] subset ]
 unit-test
 
 [ t ]

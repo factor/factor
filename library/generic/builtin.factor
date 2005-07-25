@@ -43,7 +43,8 @@ builtin [ 2drop t ] "class<" set-word-prop
     dup builtin define-class
     dup r> unit "predicate" set-word-prop
     dup builtin-predicate
-    dup r> define-slots
+    dup r> intern-slots 2dup "slots" set-word-prop
+    define-slots
     register-builtin ;
 
 : builtin-type ( n -- symbol ) builtins get nth ;

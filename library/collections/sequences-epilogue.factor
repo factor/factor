@@ -234,6 +234,11 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! lexicographically.
     lexi 0 > ;
 
+: seq-transpose ( seq -- list )
+    #! An example illustrates this word best:
+    #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
+    dup first length [ swap [ nth ] map-with ] map-with ;
+
 IN: kernel
 
 : depth ( -- n )

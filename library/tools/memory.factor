@@ -52,24 +52,14 @@ vectors words ;
         ] each-object drop
     ] make-list ;
 
-GENERIC: (each-slot) ( quot obj -- ) inline
+G: each-slot ( obj quot -- ) [ over ] [ type ] ; inline
 
-M: arrayed (each-slot) ( quot array -- )
-    dup array-capacity [
-        [
-            ( quot obj n -- )
-            swap array-nth swap dup slip
-        ] 2keep
-    ] repeat 2drop ;
+M: array each-slot ( array quot -- ) each ;
 
-M: object (each-slot) ( quot obj -- )
-    dup class "slots" word-prop [
-        pick pick >r >r car slot swap call r> r>
+M: object each-slot ( obj quot -- )
+    over class "slots" word-prop [
+        -rot [ >r swap first slot r> call ] 2keep
     ] each 2drop ;
-
-: each-slot ( obj quot -- )
-    #! Apply the quotation to each slot value of the object.
-    swap (each-slot) ; inline
 
 : refers? ( to obj -- ? )
     f swap [ pick eq? or ] each-slot nip ;

@@ -38,8 +38,8 @@ USING: kernel lists sequences test ;
 [ [ 1 2 3 ] ] [ 1 [ 1 2 3 ] unique ] unit-test
 [ [ 1 2 3 ] ] [ 2 [ 1 2 3 ] unique ] unit-test
 
-[ [ ]         ] [ 0   count ] unit-test
-[ [ 0 1 2 3 ] ] [ 4   count ] unit-test
+[ [ ]         ] [ 0   >list ] unit-test
+[ [ 0 1 2 3 ] ] [ 4   >list ] unit-test
 
 [ f ] [ 0 f head ] unit-test
 [ f ] [ 0 [ 1 ] head ] unit-test

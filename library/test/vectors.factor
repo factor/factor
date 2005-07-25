@@ -4,7 +4,6 @@ sequences strings test vectors ;
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ { t f t } length ] unit-test
-[ 4 length ] unit-test-fails
 
 [ -3 { } nth ] unit-test-fails
 [ 3 { } nth ] unit-test-fails
@@ -20,7 +19,6 @@ sequences strings test vectors ;
 
 [ 1 { } nth ] unit-test-fails
 [ -1 { } set-length ] unit-test-fails
-[ 5 >vector ] unit-test-fails
 [ { } ] [ [ ] >vector ] unit-test
 [ { 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
@@ -52,7 +50,7 @@ sequences strings test vectors ;
 [ { 1 2 3 4 } ] [ [ { 1 } [ 2 ] { 3 4 } ] concat ] unit-test
 
 [ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] project >vector ]
+[ 4 [ CHAR: a fill ] map ]
 unit-test
 
 [ { } ] [ 0 { } tail ] unit-test
@@ -95,5 +93,5 @@ unit-test
 [ 4 ] [ 5 { 1 2 3 4 5 } index ] unit-test
 
 [ t ] [
-    100 count dup >vector <reversed> >list >r reverse r> =
+    100 >list dup >vector <reversed> >list >r reverse r> =
 ] unit-test

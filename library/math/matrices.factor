@@ -184,4 +184,4 @@ M: diagonal nth ( n diag -- n )
 : row-list ( matrix -- list )
     #! A list of lists, where each sublist is a row of the
     #! matrix.
-    dup matrix-rows [ swap <row> >list ] project-with ;
+    dup matrix-rows [ swap <row> >vector ] map-with >list ;

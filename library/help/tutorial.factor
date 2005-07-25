@@ -275,7 +275,7 @@ M: general-list tutorial-line
             ""
             [ "-1 sqrt ." ]
             ""
-            [ "M[ [ 10 3 ] [ 7 5 ] [ -2 0 ] ]M M[ [ 11 2 ] [ 4 8 ] ]M m." ]
+            [ "M{ { 10 3 } { 7 5 } { -2 0 } }M M{ { 11 2 } { 4 8 } }M m." ]
             ""
             "... and there is much more for the math geeks."
         ] [

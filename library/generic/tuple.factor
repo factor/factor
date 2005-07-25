@@ -28,9 +28,6 @@ BUILTIN: tuple 18 tuple? ;
 M: tuple delegate 3 slot ;
 M: tuple set-delegate 3 set-slot ;
 
-#! arrayed objects can be passed to array-nth, and set-array-nth
-UNION: arrayed array tuple ;
-
 : class ( obj -- class )
     #! The class of an object.
     dup tuple? [ class-tuple ] [ type builtin-type ] ifte ;
@@ -76,7 +73,10 @@ UNION: arrayed array tuple ;
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
-    4 -rot simple-slots ;
+    dupd 4 simple-slots
+    2dup { [ 3 delegate set-delegate ] } swap append
+    "slots" set-word-prop
+    define-slots ;
 
 : define-constructor ( word def -- )
     >r [ word-name "in" get constructor-word ] keep [
@@ -85,8 +85,8 @@ UNION: arrayed array tuple ;
 
 : default-constructor ( tuple -- )
     dup [
-        "slots" word-prop
-        reverse [ peek unit , \ keep , ] each
+        "slots" word-prop 1 swap tail-slice reverse-slice
+        [ peek unit , \ keep , ] each
     ] make-list define-constructor ;
 
 : define-tuple ( tuple slots -- )

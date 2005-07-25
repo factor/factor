@@ -53,11 +53,7 @@ M: word prettyprint* ( indent word -- indent )
     ] when* ;
 
 : ?prettyprint-newline ( indent -- )
-    one-line get [
-        bl drop
-    ] [
-        prettyprint-newline
-    ] ifte ;
+    one-line get [ bl drop ] [ prettyprint-newline ] ifte ;
 
 : <prettyprint ( indent -- indent )
     tab-size get + dup ?prettyprint-newline ;
@@ -126,9 +122,9 @@ M: alien prettyprint* ( alien -- str )
     [ over ?prettyprint-newline matrix-rows. ] when* ;
 
 M: matrix prettyprint* ( indent obj -- indent )
-    \ M[ unparse. bl >r 3 + r>
+    \ M{ unparse. bl >r 3 + r>
     row-list matrix-rows.
-    bl \ ]M unparse. 3 - ;
+    bl \ }M unparse. 3 - ;
 
 : prettyprint ( obj -- )
     [

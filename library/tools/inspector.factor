@@ -9,17 +9,11 @@ SYMBOL: inspecting
 
 GENERIC: sheet ( obj -- sheet )
 
-: object-sheet ( obj -- names values )
+M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
     [ second ] map
-    tuck [ execute ] map-with ;
-
-M: object sheet object-sheet 2list ;
-
-M: tuple sheet
-    dup object-sheet
-    >r >r \ delegate swap delegate r> r>
-    2cons 2list ;
+    tuck [ execute ] map-with
+    2list ;
 
 PREDICATE: list nonvoid cons? ;
 
@@ -37,7 +31,7 @@ M: hashtable sheet hash>alist unzip 2list ;
     [ swap CHAR: \s pad-right ] map-with ;
 
 : format-sheet ( sheet -- list )
-    dup first length count swons
+    dup first length >vector swons
     dup peek over first [ set ] 2each
     [ column ] map
     seq-transpose

@@ -13,12 +13,10 @@ M: cons peek ( list -- last )
     #! Last element of a list.
     last car ;
 
-: (each) ( list quot -- list quot )
-    [ >r car r> call ] 2keep >r cdr r> ; inline
-
 M: f each ( list quot -- ) 2drop ;
 
-M: cons each ( list quot -- | quot: elt -- ) (each) each ;
+M: cons each ( list quot -- | quot: elt -- )
+    [ >r car r> call ] 2keep >r cdr r> each ;
 
 : (list-find) ( list quot i -- i elt )
     pick [
@@ -75,25 +73,6 @@ M: general-list reverse-slice ( list -- list )
     [ ] [ swons ] reduce ;
 
 M: general-list reverse reverse-slice ;
-
-IN: sequences
-DEFER: <range>
-
-IN: lists
-
-: count ( n -- [ 0 ... n-1 ] )
-    0 swap <range> >list ;
-
-: project ( n quot -- list )
-    >r count r> map ; inline
-
-: project-with ( elt n quot -- list )
-    swap [ with rot ] project 2nip ; inline
-
-: seq-transpose ( seq -- list )
-    #! An example illustrates this word best:
-    #! [ [ 1 2 3 ] [ 4 5 6 ] ] ==> [ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]
-    dup first length [ swap [ nth ] map-with ] project-with ;
 
 M: general-list head ( n list -- list )
     #! Return the first n elements of the list.

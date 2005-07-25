@@ -8,5 +8,5 @@ USING: kernel lists math sequences strings ;
 
 : nth-byte ( x n -- b ) -8 * shift HEX: ff bitand ;
 
-: >le ( x n -- string ) [ nth-byte ] project-with >string ;
+: >le ( x n -- string ) [ nth-byte ] map-with >string ;
 : >be ( x n -- string ) >le reverse ;
