@@ -239,6 +239,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
     dup first length [ swap [ nth ] map-with ] map-with ;
 
+: max-length ( seq -- n )
+    #! Longest sequence length in a sequence of sequences.
+    0 [ length max ] reduce ;
+
 IN: kernel
 
 : depth ( -- n )

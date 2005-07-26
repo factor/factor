@@ -10,9 +10,14 @@ TUPLE: testing x y z ;
     num-types [
         [
             builtin-type [
-                "predicate" word-prop instances [
-                    class drop
-                ] each
+                dup \ cons = [
+                    ! too many conses!
+                    drop
+                ] [
+                    "predicate" word-prop instances [
+                        class drop
+                    ] each
+                ] ifte
             ] when*
         ] keep
     ] repeat

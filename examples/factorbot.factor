@@ -1,8 +1,8 @@
 ! Simple IRC bot written in Factor.
 
-IN: factorbot
 USING: generic hashtables http io kernel math namespaces
 prettyprint sequences strings words ;
+IN: factorbot
 
 SYMBOL: irc-stream
 SYMBOL: nickname
@@ -47,6 +47,9 @@ M: privmsg handle-irc ( line -- )
     " " split1 swap
     [ "factorbot-commands" ] search dup
     [ execute ] [ 2drop ] ifte ;
+
+M: ping handle-irc ( line -- )
+    "PING " ?head drop "PONG " swap append irc-print ;
 
 : parse-irc ( line -- )
     ":" ?head [ "!" split1 swap speaker set ] when handle-irc ;

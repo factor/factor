@@ -23,11 +23,11 @@ M: vector sheet unit ;
 
 M: array sheet unit ;
 
-M: hashtable sheet hash>alist unzip 2list ;
+M: hashtable sheet dup hash-keys swap hash-values 2list ;
 
 : column ( list -- list )
     [ unparse ] map
-    [ [ length ] map 0 [ max ] reduce ] keep
+    [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
 : format-sheet ( sheet -- list )

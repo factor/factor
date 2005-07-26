@@ -1,11 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math namespaces
-sequences strings vectors words hashtables prettyprint ;
-
-: longest ( list -- length )
-    [ length ] map 0 [ max ] reduce ;
+USING: errors generic hashtables interpreter kernel lists math
+matrices namespaces prettyprint sequences strings vectors words ;
 
 : computed-value-vector ( n -- vector )
     empty-vector [ drop object <computed> ] map ;
@@ -14,53 +11,48 @@ sequences strings vectors words hashtables prettyprint ;
     #! Add this many inputs to the given stack.
     [ length - computed-value-vector ] keep append ;
 
-: unify-lengths ( list -- list )
+: unify-lengths ( seq -- list )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup longest swap [ add-inputs ] map-with ;
+    dup max-length swap [ add-inputs ] map-with ;
 
-: unify-results ( list -- value )
+: unify-results ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify types.
-    dup [ eq? ] fiber? [
-        car
-    ] [
-        [ value-class ] map class-or-list <computed>
-    ] ifte ;
+    dup [ eq? ] fiber?
+    [ first ]
+    [ [ value-class ] map class-or-list <computed> ] ifte ;
 
-: unify-stacks ( list -- stack )
+: unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
     unify-lengths seq-transpose [ unify-results ] map ;
 
-: balanced? ( list -- ? )
-    #! Check if a list of [[ instack outstack ]] pairs is
-    #! balanced.
-    [ uncons length swap length - ] map [ = ] fiber? ;
+: balanced? ( in out -- ? )
+    swap [ length ] map swap [ length ] map v- [ = ] fiber? ;
 
-: unify-effect ( list -- in out )
-    #! Unify a list of [[ instack outstack ]] pairs.
-    dup balanced? [
-        unzip unify-stacks >r unify-stacks r>
-    ] [
-        "Unbalanced branches" inference-error
-    ] ifte ;
+: unify-effect ( in out -- in out )
+    2dup balanced?
+    [ unify-stacks >r unify-stacks r> ]
+    [ "Unbalanced branches" inference-error ] ifte ;
 
-: datastack-effect ( list -- )
-    [ [ effect ] bind ] map
+: datastack-effect ( seq -- )
+    dup [ d-in swap hash ] map
+    swap [ meta-d swap hash ] map
     unify-effect
     meta-d set d-in set ;
 
-: callstack-effect ( list -- )
-    [ [ { } meta-r get ] bind cons ] map
+: callstack-effect ( seq -- )
+    dup length { } <repeated>
+    swap [ meta-r swap hash ] map
     unify-effect
     meta-r set drop ;
 
-: filter-terminators ( list -- list )
+: filter-terminators ( seq -- seq )
     #! Remove branches that unconditionally throw errors.
     [ [ active? ] bind ] subset ;
 
-: unify-effects ( list -- )
+: unify-effects ( seq -- )
     filter-terminators [
         dup datastack-effect callstack-effect
     ] [

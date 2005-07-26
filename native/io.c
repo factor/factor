@@ -60,6 +60,10 @@ void primitive_fwrite(void)
 	maybe_gc(0);
 	file = (FILE*)unbox_alien();
 	text = untag_string(dpop());
+
+	if(string_capacity(text) == 0)
+		return;
+
 	if(fwrite(to_c_string_unchecked(text),1,
 		untag_fixnum_fast(text->length),
 		file) == 0)

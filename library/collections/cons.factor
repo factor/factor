@@ -40,13 +40,6 @@ PREDICATE: general-list list ( list -- ? )
 
 : 2car ( cons cons -- car car ) swap car swap car ;
 : 2cdr ( cons cons -- car car ) swap cdr swap cdr ;
-: 2cons ( ca1 ca2 cd1 cd2 -- c1 c2 ) rot swons >r cons r> ;
-: 2uncons ( c1 c2 -- ca1 ca2 cd1 cd2 ) [ 2car ] 2keep 2cdr ;
-
-: unzip ( assoc -- keys values )
-    #! Split an association list into two lists of keys and
-    #! values.
-    [ uncons >r uncons r> unzip 2cons ] [ [ ] [ ] ] ifte* ;
 
 : unpair ( list -- list1 list2 )
     [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
