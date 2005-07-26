@@ -142,16 +142,15 @@ void primitive_room(void)
 {
 	CELL list = F;
 	int gen;
-	box_signed_cell(compiling.limit - compiling.here);
-	box_signed_cell(compiling.limit - compiling.base);
-	box_signed_cell(cards_end - cards);
-	box_signed_cell(prior.limit - prior.base);
+	box_unsigned_cell(compiling.limit - compiling.here);
+	box_unsigned_cell(compiling.limit - compiling.base);
+	box_unsigned_cell(cards_end - cards);
+	box_unsigned_cell(prior.limit - prior.base);
 	for(gen = gen_count - 1; gen >= 0; gen--)
 	{
 		ZONE *z = &generations[gen];
-		list = cons(cons(
-			tag_fixnum(z->limit - z->here),
-			tag_fixnum(z->limit - z->base)),
+		list = cons(cons(tag_cell(z->limit - z->here),
+			tag_cell(z->limit - z->base)),
 			list);
 	}
 	dpush(list);
