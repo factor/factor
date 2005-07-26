@@ -54,7 +54,7 @@ void primitive_bits_float(void);
 void primitive_double_bits(void);
 void primitive_bits_double(void);
 
-void box_float(float flo);
-float unbox_float(void);
-void box_double(double flo);
-double unbox_double(void);
+DLLEXPORT void box_float(float flo);
+DLLEXPORT float unbox_float(void);
+DLLEXPORT void box_double(double flo);
+DLLEXPORT double unbox_double(void);
