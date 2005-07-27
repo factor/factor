@@ -20,31 +20,14 @@ SYMBOL: d-in
 : pop-literal ( -- rstate obj )
     1 #drop node, pop-d >literal< ;
 
-: (ensure-types) ( typelist n stack -- )
-    pick [
-        3dup >r >r car r> r> nth value-class-and
-        >r >r cdr r> 1 + r> (ensure-types)
-    ] [
-        3drop
-    ] ifte ;
-
-: ensure-types ( typelist stack -- )
-    dup length pick length - dup 0 < [
-        swap >r neg swap tail 0 r>
-    ] [
-        swap
-    ] ifte (ensure-types) ;
+: computed-value-vector ( n -- vector )
+    empty-vector dup [ drop <computed> ] nmap ;
 
 : required-inputs ( typelist stack -- values )
-    >r dup length r> length - dup 0 > [
-        swap head [ <computed> ] map
-    ] [
-        2drop f
-    ] ifte ;
+    >r length r> length - abs computed-value-vector ;
 
 : ensure-d ( typelist -- )
-    dup meta-d get ensure-types
-    meta-d get required-inputs >vector dup
+    meta-d get required-inputs dup
     meta-d [ append ] change
     d-in [ append ] change ;
 
@@ -54,16 +37,9 @@ SYMBOL: d-in
     2slip
     second length 0 rot node-outputs ; inline
 
-: (present-effect) ( vector -- list )
-    >list [ value-class ] map ;
-
-: present-effect ( [[ d-in meta-d ]] -- [ in-types out-types ] )
+: present-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    uncons >r (present-effect) r> (present-effect) 2list ;
-
-: simple-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
-    #! After inference is finished, collect information.
-    uncons length >r length r> cons ;
+    uncons length >r length r> 2list ;
 
 : init-inference ( recursive-state -- )
     init-interpreter

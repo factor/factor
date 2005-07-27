@@ -58,3 +58,9 @@ USING: kernel lists math sequences strings test vectors ;
 [ "hello world how are you" ]
 [ { "hello" "world" "how" "are" "you" } " " join ]
 unit-test
+
+[ "" ] [ { } "" join ] unit-test
+
+[ { "three" "three" "two" "two" "one" "one" } ]
+[ { "one" "two" "three" } { 1 2 3 } { 3 3 2 2 1 1 } subst ]
+unit-test

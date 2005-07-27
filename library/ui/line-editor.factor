@@ -117,3 +117,11 @@ SYMBOL: history-index
 : right ( -- )
     #! Call this in the line editor scope.
     caret [ 1 + line-text get length min ] change ;
+
+: home ( -- )
+    #! Call this in the line editor scope.
+    0 caret set ;
+
+: end ( -- )
+    #! Call this in the line editor scope.
+    line-text get length caret set ;

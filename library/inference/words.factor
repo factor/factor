@@ -9,7 +9,7 @@ hashtables parser prettyprint ;
     [ pop-d 2drop ] each ;
 
 : produce-d ( typelist -- )
-    [ <computed> push-d ] each ;
+    [ drop <computed> push-d ] each ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and

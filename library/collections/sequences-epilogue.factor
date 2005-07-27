@@ -186,9 +186,13 @@ M: object peek ( sequence -- element )
 
 : join ( seq glue -- seq )
     #! The new sequence is of the same type as glue.
-    swap dup length <vector> swap
-    [ over push 2dup push ] each nip >pop>
-    concat ;
+    swap dup empty? [
+        swap like
+    ] [
+        dup length <vector> swap
+        [ over push 2dup push ] each nip >pop>
+        concat
+    ] ifte ;
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
@@ -242,6 +246,14 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
     0 [ length max ] reduce ;
+
+: subst ( new old seq -- seq )
+    #! Substitute elements of old in seq with corresponding
+    #! elements from new.
+    [
+        dup pick index dup -1 =
+        [ drop ] [ nip pick nth ] ifte
+    ] map 2nip ;
 
 IN: kernel
 

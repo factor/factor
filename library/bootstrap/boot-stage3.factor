@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
-compiler-frontend io-internals kernel lists math namespaces
-parser sequences io unparser words ;
+compiler-frontend inference io-internals kernel lists math
+namespaces parser sequences io unparser words ;
 
 "Compiling base..." print
 

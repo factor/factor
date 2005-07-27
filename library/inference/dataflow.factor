@@ -8,16 +8,16 @@ sequences vectors words ;
 ! representations used by Factor. It annotates concatenative
 ! code with stack flow information and types.
 
-TUPLE: node effect param in-d out-d in-r out-r
+TUPLE: node param in-d out-d in-r out-r
        successor children ;
 
 : make-node ( effect param in-d out-d in-r out-r node -- node )
     [ >r f <node> r> set-delegate ] keep ;
 
-: empty-node f f f f f f f f f ;
-: param-node ( label) f swap f f f f f ;
-: in-d-node ( inputs) >r f f r> f f f f ;
-: out-d-node ( outputs) >r f f f r> f f f ;
+: empty-node f f f f f f f f ;
+: param-node ( label) f f f f f ;
+: in-d-node ( inputs) >r f r> f f f f ;
+: out-d-node ( outputs) >r f f r> f f f ;
 
 : d-tail ( n -- list ) meta-d get tail* >list ;
 : r-tail ( n -- list ) meta-r get tail* >list ;
@@ -57,6 +57,10 @@ C: #ifte make-node ;
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
 : #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
+
+TUPLE: #merge ;
+C: #merge make-node ;
+: #merge ( values -- node ) in-d-node <#merge> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck

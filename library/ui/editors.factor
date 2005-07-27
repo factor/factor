@@ -54,6 +54,8 @@ TUPLE: editor line caret ;
         [[ [ "LEFT" ] [ [ left ] with-editor ] ]]
         [[ [ "RIGHT" ] [ [ right ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
+        [[ [ "HOME" ] [ [ home ] with-editor ] ]]
+        [[ [ "END" ] [ [ end ] with-editor ] ]]
     ] swap add-actions ;
 
 : <caret> ( -- caret )

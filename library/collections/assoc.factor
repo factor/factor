@@ -14,12 +14,6 @@ IN: lists USING: kernel sequences ;
 
 : assoc ( key alist -- value ) assoc* cdr ;
 
-: assq* ( key alist -- [[ key value ]] )
-    #! Looks up a key/value pair using identity comparison.
-    [ car eq? ] find-with nip ;
-
-: assq ( key alist -- value ) assq* cdr ;
-
 : remove-assoc ( key alist -- alist )
     #! Remove all key/value pairs with this key.
     [ car = not ] subset-with ;

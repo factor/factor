@@ -4,9 +4,6 @@ IN: inference
 USING: errors generic hashtables interpreter kernel lists math
 matrices namespaces prettyprint sequences strings vectors words ;
 
-: computed-value-vector ( n -- vector )
-    empty-vector [ drop object <computed> ] map ;
-
 : add-inputs ( count stack -- stack )
     #! Add this many inputs to the given stack.
     [ length - computed-value-vector ] keep append ;
@@ -18,10 +15,8 @@ matrices namespaces prettyprint sequences strings vectors words ;
 
 : unify-results ( seq -- value )
     #! If all values in list are equal, return the value.
-    #! Otherwise, unify types.
-    dup [ eq? ] fiber?
-    [ first ]
-    [ [ value-class ] map class-or-list <computed> ] ifte ;
+    #! Otherwise, unify.
+    dup [ eq? ] fiber? [ first ] [ <meet> ] ifte ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
@@ -53,24 +48,19 @@ matrices namespaces prettyprint sequences strings vectors words ;
     [ [ active? ] bind ] subset ;
 
 : unify-effects ( seq -- )
-    filter-terminators [
-        dup datastack-effect callstack-effect
-    ] [
-        terminate
-    ] ifte* ;
+    filter-terminators
+    [ dup datastack-effect callstack-effect ]
+    [ terminate ] ifte* ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
 
-: clone-values ( seq -- seq ) [ clone-value ] map ;
-
 : copy-inference ( -- )
     #! We avoid cloning the same object more than once in order
     #! to preserve identity structure.
-    cloned off
-    meta-r [ clone-values ] change
-    meta-d [ clone-values ] change
-    d-in [ clone-values ] change
+    meta-r [ clone ] change
+    meta-d [ clone ] change
+    d-in [ clone ] change
     dataflow-graph off
     current-node off ;
 
@@ -82,34 +72,31 @@ matrices namespaces prettyprint sequences strings vectors words ;
         copy-inference
         dup value-recursion recursive-state set
         literal-value dup infer-quot
-        active? [
-            #values node,
-            handle-terminator
-        ] [
-            drop
-        ] ifte
+        active? [ #values node, handle-terminator ] [ drop ] ifte
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects unify-dataflow ;
+    [ infer-branch ] map dup unify-effects
+    unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
-    [ >r (infer-branches) r> set-node-children ] keep node, ;
+    [ >r (infer-branches) r> set-node-children ] keep
+    node, meta-d get >list #merge node, ;
 
 \ ifte [
-    2 #drop node, pop-d pop-d swap 2list
+    2 #drop node, pop-d pop-d swap 2vector
     #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
 
-: vtable>list ( rstate vtable -- list  )
-    [ swap <literal> ] map-with >list ;
+: vtable-value ( rstate vtable -- seq  )
+    [ swap <literal> ] map-with ;
 
 USE: kernel-internals
 
 \ dispatch [
-    pop-literal vtable>list
+    pop-literal vtable-value
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop

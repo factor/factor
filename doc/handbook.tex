@@ -6271,6 +6271,144 @@ The compiler has two limitations you must be aware of. First, if an exception is
 
 The compiler consists of multiple stages -- first, a dataflow graph is inferred, then various optimizations are done on this graph, then it is transformed into a linear representation, further optimizations are done, and finally, machine code is generated from the linear representation.
 
+\section{Dataflow intermediate representation}
+
+The dataflow IR represents nested control structure, and annotates all calls with stack input and output annotations. Such annotations consists of lists of values, where a value abstracts over a possibly unknown computation result. It has a tree shape, where each node is a tuple delegating to an instance of the \verb|node| tuple class.
+
+The \verb|node| tuple has the following slots:
+
+\begin{description}
+\item[\texttt{param}] The meaning is determined by the tuple wrapping the node instance. For example with \verb|#call| nodes, this is the word being called.
+\item[\texttt{in-d}] A list of input values popped the data stack.
+\item[\texttt{in-r}] A list of input values popped the return stack. Only used by \verb|#call >r| nodes.
+\item[\texttt{out-d}] A list of output values pushed on the data stack.
+\item[\texttt{out-r}] A list of output values pushed on the return stack. Only used by \verb|#call r>| nodes.
+\item[\texttt{node-successor}] The direct successor of the node.
+\item[\texttt{node-children}] A list of the node's children, for example if this is a branch or label node. The number of children depends on the type of node.
+\end{description}
+
+Note that nodes are linked by the \verb|node-successor| slot. Nested structure is realized by a list value in the \verb|node-children| slot.
+
+The stack effect inferencer transforms quotations into dataflow IR.
+
+\wordtable{
+\vocabulary{inference}
+\ordinaryword{dataflow}{dataflow ( quot -- node )}
+}
+
+Produces the dataflow IR of a quotation.
+
+\wordtable{
+\vocabulary{inference}
+\ordinaryword{dataflow.}{dataflow.~( node -- )}
+}
+
+Prints dataflow IR in human-readable form.
+
+\subsection{Values}
+
+Values are an abstraction over possibly known computation inputs and outputs. There are three types of values:
+
+\begin{description}
+\item[Literal values] represent a known constant
+\item[Computed values] represent inputs and outputs whose specific value is not known
+\item[Joined values] represent a unification of possible values of a stack slot where branched control flow meets
+\end{description}
+
+The \verb|value| tuple has the following slots:
+
+\begin{description}
+\item[\texttt{recursion}] A list of nested lexical scopes, used to resolve recursive stack effects
+\item[\texttt{safe?}] This is a hack. If this is false, the value's type at that point might not potentially be known, since a entry to this block from another entry point can potentially occur
+\end{description}
+
+\subsection{Straight-line code}
+
+\begin{description}
+
+\item[\texttt{\#push}] Pushes literal values on the data stack.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-out-d|&A list of literals.
+\end{tabular}
+
+\item[\texttt{\#drop}] Pops literal values from the data stack.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-in-d|&A list of literals.
+\end{tabular}
+
+\item[\texttt{\#call}] Invokes the word identified by \verb|node-param|.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-param|&A word.\\
+\verb|node-in-d|&Input values.\\
+\verb|node-out-d|&Output values.
+\end{tabular}
+
+\item[\texttt{\#call-label}] Like \verb|#call| but \verb|node-param| refers to a parent \verb|#label| node.
+
+\end{description}
+
+\subsection{Branching and recursion}
+
+\begin{description}
+
+\item[\texttt{\#ifte}] A conditional expression.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-in-d|&A singleton list holding the condition being tested.\\
+\verb|node-children|&A list of two nodes, the true and false branches.
+\end{tabular}
+
+\item[\texttt{\#dispatch}] A jump table.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-in-d|&A singleton list holding the jump table index.\\
+\verb|node-children|&A list of nodes, in consecutive jump table order.
+\end{tabular}
+
+\item[\texttt{\#values}] Found at the end of each branch in an \verb|#ifte| or \verb|#dispatch| node.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-out-d|&A list of values present on the data stack at the end of the branch.\\
+\end{tabular}
+
+\item[\texttt{\#label}] A named block of code. Child \verb|#call-label| nodes can recurse on this label.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-param|&A gensym identifying the label.\\
+\verb|node-children|&A singleton list whose sole element is the labelled node.
+\end{tabular}
+
+\item[\texttt{\#return}] Found at the end of a word's dataflow IR.
+
+\begin{tabular}{l|l}
+Slot&Role\\
+\hline
+\verb|node-out-d|&Values present on the stack when the word returns.
+\end{tabular}
+
+\end{description}
+
+\section{Dataflow optimizer}
+
+\subsection{Killing unused literals}
+
 \section{Linear intermediate representation}
 
 The linear IR is the second of the two intermediate

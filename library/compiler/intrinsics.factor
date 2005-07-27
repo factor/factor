@@ -59,6 +59,8 @@ sequences words ;
 : peek-2 dup length 2 - swap nth ;
 : node-peek-2 ( node -- obj ) node-in-d peek-2 ;
 
+: value-types drop f ;
+
 : typed? ( value -- ? ) value-types length 1 = ;
 
 : slot@ ( node -- n )
