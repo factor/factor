@@ -4,12 +4,6 @@ IN: inference
 USING: generic hashtables inference kernel lists matrices
 namespaces sequences vectors ;
 
-! The optimizer transforms dataflow IR to dataflow IR. Currently
-! it removes literals that are eventually dropped, and never
-! arise as inputs to any other type of function. Such 'dead'
-! literals arise when combinators are inlined and quotations are
-! lifted to their call sites.
-
 GENERIC: literals* ( node -- )
 
 : literals, ( node -- )
@@ -24,11 +18,8 @@ GENERIC: can-kill* ( literal node -- ? )
     #! Return false if the literal appears in any node in the
     #! list.
     dup [
-        2dup can-kill* [
-            node-successor can-kill?
-        ] [
-            2drop f
-        ] ifte
+        2dup can-kill*
+        [ node-successor can-kill? ] [ 2drop f ] ifte
     ] [
         2drop t
     ] ifte ;
@@ -37,11 +28,15 @@ GENERIC: can-kill* ( literal node -- ? )
     #! Push a list of literals that may be killed in the IR.
     dup literals [ swap can-kill? ] subset-with ;
 
-: kill-in-d [ node-in-d seq-diffq ] keep set-node-in-d ;
-
-: kill-out-d [ node-out-d seq-diffq ] keep set-node-out-d ;
+: remove-value ( value node -- )
+    2dup [ node-in-d seq-diffq ] keep set-node-in-d
+    2dup [ node-out-d seq-diffq ] keep set-node-out-d
+    2dup [ node-in-r seq-diffq ] keep set-node-in-r
+    [ node-out-r seq-diffq ] keep set-node-out-r ;
 
 GENERIC: kill-node* ( literals node -- )
+
+M: node kill-node* ( literals node -- ) 2drop ;
 
 DEFER: kill-node
 
@@ -51,7 +46,9 @@ DEFER: kill-node
 : kill-node ( literals node -- )
     dup [
         2dup kill-children
-        2dup kill-node* node-successor kill-node
+        2dup kill-node*
+        2dup remove-value
+        node-successor kill-node
     ] [
         2drop
     ] ifte ;
@@ -121,9 +118,6 @@ M: #push optimize-node* ( node -- node/t )
 ! #drop
 M: #drop can-kill* ( literal node -- ? )
     2drop t ;
-
-M: #drop kill-node* ( literals node -- )
-    kill-in-d ;
 
 M: #drop optimize-node*  ( node -- node/t )
     [ node-in-d empty? ] prune-if ;
@@ -267,9 +261,5 @@ M: #values can-kill* ( literal node -- ? )
 M: #values optimize-node* ( node -- node )
     dup node-successor #merge? [ post-split ] [ drop t ] ifte ;
 
-M: #values kill-node* ( literals node -- ) kill-in-d ;
-
 ! #merge
 M: #merge can-kill* ( literal node -- ? ) 2drop t ;
-
-M: #merge kill-node* ( literals node -- ) kill-in-d ;
