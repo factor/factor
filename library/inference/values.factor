@@ -11,6 +11,8 @@ C: value ( recursion -- value )
     [ t swap set-value-safe? ] keep
     [ set-value-recursion ] keep ;
 
+M: value = eq? ;
+
 TUPLE: computed ;
 
 C: computed ( -- value )

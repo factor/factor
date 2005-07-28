@@ -29,10 +29,10 @@ GENERIC: can-kill* ( literal node -- ? )
     dup literals [ swap can-kill? ] subset-with ;
 
 : remove-value ( value node -- )
-    2dup [ node-in-d seq-diffq ] keep set-node-in-d
-    2dup [ node-out-d seq-diffq ] keep set-node-out-d
-    2dup [ node-in-r seq-diffq ] keep set-node-in-r
-    [ node-out-r seq-diffq ] keep set-node-out-r ;
+    2dup [ node-in-d seq-diff ] keep set-node-in-d
+    2dup [ node-out-d seq-diff ] keep set-node-out-d
+    2dup [ node-in-r seq-diff ] keep set-node-in-r
+    [ node-out-r seq-diff ] keep set-node-out-r ;
 
 GENERIC: kill-node* ( literals node -- )
 
@@ -92,7 +92,7 @@ M: f can-kill* ( literal node -- ? )
     2drop t ;
 
 M: node can-kill* ( literal node -- ? )
-    2dup consumes-literal? >r produces-literal? r> or not ;
+    uses-value? ;
 
 M: node kill-node* ( literals node -- )
     2drop ;
@@ -110,7 +110,7 @@ M: #push can-kill* ( literal node -- ? )
     2drop t ;
 
 M: #push kill-node* ( literals node -- )
-    [ node-out-d seq-diffq ] keep set-node-out-d ;
+    [ node-out-d seq-diff ] keep set-node-out-d ;
 
 M: #push optimize-node* ( node -- node/t )
     [ node-out-d empty? ] prune-if ;
@@ -198,7 +198,7 @@ SYMBOL: branch-returns
     #! Check if the literal appears in either branch. This
     #! assumes that the last element of each branch is a #values
     #! node.
-    2dup consumes-literal? [
+    2dup uses-value? [
         2drop f
     ] [
         [
@@ -229,7 +229,7 @@ M: #dispatch can-kill* ( literal node -- ? )
 
 ! #values
 M: #values can-kill* ( literal node -- ? )
-    dupd consumes-literal? [
+    dupd uses-value? [
         branch-returns get
         [ memq? ] subset-with
         [ [ eq? ] fiber? ] all?

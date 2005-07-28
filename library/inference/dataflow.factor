@@ -9,15 +9,16 @@ sequences vectors words ;
 ! code with stack flow information and types.
 
 TUPLE: node param in-d out-d in-r out-r
-       successor children ;
+       classes successor children ;
 
-: make-node ( effect param in-d out-d in-r out-r node -- node )
-    [ >r f <node> r> set-delegate ] keep ;
+M: node = eq? ;
 
-: empty-node f f f f f f f f ;
-: param-node ( label) f f f f f ;
-: in-d-node ( inputs) >r f r> f f f f ;
-: out-d-node ( outputs) >r f f r> f f f ;
+: make-node ( param in-d out-d in-r out-r node -- node )
+    [ >r f f f <node> r> set-delegate ] keep ;
+
+: param-node ( label) f f f f ;
+: in-d-node ( inputs) >r f r> f f f ;
+: out-d-node ( outputs) >r f f r> f f ;
 
 : d-tail ( n -- list ) meta-d get tail* >vector ;
 : r-tail ( n -- list ) meta-r get tail* >vector ;
@@ -106,13 +107,13 @@ SYMBOL: current-node
 : node-effect ( node -- [[ d-in meta-d ]] )
     dup node-in-d swap node-out-d cons ;
 
-: consumes-literal? ( literal node -- ? )
-    #! Does the dataflow node consume the literal?
-    2dup node-in-d memq? >r node-in-r memq? r> or ;
+: node-values ( node -- values )
+    [
+        dup node-in-d % dup node-out-d %
+        dup node-in-r % node-out-r %
+    ] make-vector ;
 
-: produces-literal? ( literal node -- ? )
-    #! Does the dataflow node produce the literal?
-    2dup node-out-d memq? >r node-out-r memq? r> or ;
+: uses-value? ( value node -- ? ) node-values memq? ;
 
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;

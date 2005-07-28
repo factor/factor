@@ -118,9 +118,7 @@ M: object empty? ( seq -- ? ) length 0 = ;
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : index   ( obj seq -- n )     [ = ] find-with drop ;
-: indq    ( obj seq -- n )     [ eq? ] find-with drop ;
 : index*  ( obj i seq -- n )   [ = ] find-with* drop ;
-: indq*   ( obj i seq -- n )   [ eq? ] find-with* drop ;
 : member? ( obj seq -- ? )     [ = ] contains-with? ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ;
 : remove  ( obj list -- list ) [ = not ] subset-with ;
@@ -189,9 +187,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 : seq-diff ( seq1 seq2 -- seq2-seq1 )
     [ swap member? not ] subset-with ;
 
-: seq-diffq ( seq1 seq2 -- seq2-seq1 )
-    [ swap memq? not ] subset-with ;
-
 : seq-union ( seq1 seq2 -- seq1\/seq2 )
     append prune ;
 
@@ -237,7 +232,7 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Substitute elements of old in seq with corresponding
     #! elements from new.
     [
-        dup pick indq dup -1 = [ drop ] [ nip pick nth ] ifte
+        dup pick index dup -1 = [ drop ] [ nip pick nth ] ifte
     ] map 2nip ;
 
 : copy-into ( to from -- )

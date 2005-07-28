@@ -166,6 +166,10 @@ M: hashtable hashcode ( hash -- n )
         pick rot >r >r call dup r> r> set-hash
     ] ifte* ; inline
 
+: map>hash ( seq quot -- hash | quot: elt -- value )
+    over >r map r> dup length <hashtable> -rot
+    [ pick set-hash ] 2each ; inline
+
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] ifte ;
 

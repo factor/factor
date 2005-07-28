@@ -1,6 +1,6 @@
 IN: inference
-USING: generic inference io kernel kernel-internals math
-namespaces prettyprint sequences vectors words ;
+USING: generic hashtables inference io kernel kernel-internals
+math namespaces prettyprint sequences vectors words ;
 
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.
@@ -13,13 +13,16 @@ M: annotation prettyprint* ( ann -- )
     "( " over annotation-text " )" append3
     swap annotation-node object. ;
 
-: value-str ( values -- str )
-    length "x" <repeated> " " join ;
+: value-str ( classes values -- str )
+    [ swap ?hash [ [ object ] ] unless* ] map-with
+    [ word-name ] map
+    " " join ;
 
 : effect-str ( node -- str )
     [
-        dup node-in-d value-str %
-        "-" %
+        dup node-classes swap
+        2dup node-in-d value-str %
+        "--" %
         node-out-d value-str %
     ] make-string ;
 
