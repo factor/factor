@@ -37,6 +37,10 @@ GENERIC: can-kill* ( literal node -- ? )
     #! Push a list of literals that may be killed in the IR.
     dup literals [ swap can-kill? ] subset-with ;
 
+: kill-in-d [ node-in-d seq-diffq ] keep set-node-in-d ;
+
+: kill-out-d [ node-out-d seq-diffq ] keep set-node-out-d ;
+
 GENERIC: kill-node* ( literals node -- )
 
 DEFER: kill-node
@@ -57,26 +61,31 @@ GENERIC: optimize-node* ( node -- node )
 DEFER: optimize-node ( node -- node/t )
 
 : optimize-children ( node -- )
-    dup node-children [ optimize-node ] map
-    swap set-node-children ;
+    f swap [
+        node-children [ optimize-node swap >r or r> ] map
+    ] keep set-node-children ;
 
-: keep-optimizing ( node -- node )
+: keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
-    [ drop ] [ nip keep-optimizing ] ifte ;
+    [ drop f ] [ nip keep-optimizing t or ] ifte ;
 
-: optimize-node ( node -- node )
-    keep-optimizing dup [
-        dup optimize-children
-        dup node-successor optimize-node over set-node-successor
-    ] when ;
+: optimize-node ( node -- node ? )
+    #! Outputs t if any changes were made.
+    keep-optimizing >r dup [
+        dup optimize-children >r
+        dup node-successor optimize-node >r
+        over set-node-successor r> r> r> or or
+    ] [ r> ] ifte ;
 
 : optimize ( dataflow -- dataflow )
     #! Remove redundant literals from the IR. The original IR
     #! is destructively modified.
-    dup kill-set over kill-node optimize-node ;
+    dup kill-set over kill-node optimize-node
+    [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] ifte ;
+    inline
 
 ! Generic nodes
 M: node literals* ( node -- )
@@ -111,49 +120,42 @@ M: #push optimize-node* ( node -- node/t )
 
 ! #drop
 M: #drop can-kill* ( literal node -- ? )
-     2drop t ;
+    2drop t ;
 
 M: #drop kill-node* ( literals node -- )
-    [ node-in-d seq-diffq ] keep set-node-in-d ;
+    kill-in-d ;
 
 M: #drop optimize-node*  ( node -- node/t )
     [ node-in-d empty? ] prune-if ;
 
 ! #call
-M: #call can-kill* ( literal node -- ? )
-    dup node-param {{
-        [[ dup t ]]
-        [[ drop t ]]
-        [[ swap t ]]
-        [[ over t ]]
-        [[ pick t ]] 
-        [[ >r t ]]
-        [[ r> t ]]
-    }} hash >r delegate can-kill* r> or ;
-
-: kill-mask ( killing node -- mask )
-    dup node-param \ r> = [ node-in-r ] [ node-in-d ] ifte
-    [ swap memq? ] map-with ;
-
 : (kill-shuffle) ( word -- map )
     {{
+        [[ dup {{ }} ]]
+        [[ drop {{ }} ]]
+        [[ swap {{ }} ]]
         [[ over
             {{
-                [[ [ f t ] dup  ]]
+                [[ { f t } dup  ]]
             }}
         ]]
         [[ pick
             {{
-                [[ [ f f t ] over ]]
-                [[ [ f t f ] over ]]
-                [[ [ f t t ] dup  ]]
+                [[ { f f t } over ]]
+                [[ { f t f } over ]]
+                [[ { f t t } dup  ]]
             }}
         ]]
-        [[ swap {{ }} ]]
-        [[ dup {{ }} ]]
         [[ >r {{ }} ]]
         [[ r> {{ }} ]]
     }} hash ;
+
+M: #call can-kill* ( literal node -- ? )
+    dup node-param (kill-shuffle) >r delegate can-kill* r> or ;
+
+: kill-mask ( killing node -- mask )
+    dup node-param \ r> = [ node-in-r ] [ node-in-d ] ifte
+    [ swap memq? ] map-with ;
 
 : lookup-mask ( mask word -- word )
     over disj [ (kill-shuffle) hash ] [ nip ] ifte ;
@@ -189,19 +191,10 @@ M: #call-label can-kill* ( literal node -- ? )
 
 ! #label
 M: #label can-kill* ( literal node -- ? )
-    node-children car can-kill? ;
+    node-children first can-kill? ;
 
-! #values
+! #ifte
 SYMBOL: branch-returns
-
-M: #values can-kill* ( literal node -- ? )
-    dupd consumes-literal? [
-        branch-returns get
-        [ memq? ] subset-with
-        [ [ eq? ] fiber? ] all?
-    ] [
-        drop t
-    ] ifte ;
 
 : branch-values ( branches -- )
     [ last-node node-in-d ] map
@@ -220,7 +213,6 @@ M: #values can-kill* ( literal node -- ? )
         ] with-scope
     ] ifte ;
 
-! #ifte
 : static-branch? ( node -- lit ? )
     node-in-d first dup safe-literal? ;
 
@@ -242,6 +234,15 @@ M: #dispatch can-kill* ( literal node -- ? )
     can-kill-branches? ;
 
 ! #values
+M: #values can-kill* ( literal node -- ? )
+    dupd consumes-literal? [
+        branch-returns get
+        [ memq? ] subset-with
+        [ [ eq? ] fiber? ] all?
+    ] [
+        drop t
+    ] ifte ;
+
 : subst-values ( new old node -- )
     dup [
         3dup [ node-in-d subst ] keep set-node-in-d
@@ -253,13 +254,22 @@ M: #dispatch can-kill* ( literal node -- ? )
         3drop
     ] ifte ;
 
+: values/merge ( #values #merge -- new old )
+    >r >r node-in-d r> node-in-d 2vector unify-lengths 2unseq r> ;
+
 : post-split ( #values -- node )
     #! If a #values is followed by a #merge, we need to replace
     #! meet values after the merge with their branch value in
     #! #values.
     dup node-successor dup node-successor
-    >r >r node-in-d reverse-slice r> node-in-d reverse-slice r>
-    [ subst-values ] keep ;
+    values/merge [ subst-values ] keep ;
 
 M: #values optimize-node* ( node -- node )
     dup node-successor #merge? [ post-split ] [ drop t ] ifte ;
+
+M: #values kill-node* ( literals node -- ) kill-in-d ;
+
+! #merge
+M: #merge can-kill* ( literal node -- ? ) 2drop t ;
+
+M: #merge kill-node* ( literals node -- ) kill-in-d ;

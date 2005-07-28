@@ -89,7 +89,7 @@ M: viewport focusable-child* ( viewport -- gadget )
 : <thumb> ( -- thumb )
     <bevel-gadget>
     t over set-gadget-root?
-    dup [ 192 192 192 ] background set-paint-prop
+    dup { 192 192 192 } background set-paint-prop
     dup thumb-actions ;
 
 : add-thumb ( thumb slider -- )
@@ -100,7 +100,7 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 C: slider ( vector -- slider )
     <plain-gadget> over set-delegate
-    dup [ 128 128 128 ] background set-paint-prop
+    dup { 128 128 128 } background set-paint-prop
     [ set-slider-vector ] keep
     <thumb> over add-thumb
     dup slider-actions ;

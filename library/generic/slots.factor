@@ -5,7 +5,7 @@
 ! implement tuples, as well as builtin types.
 IN: generic
 USING: kernel kernel-internals lists math namespaces parser
-sequences strings words ;
+sequences strings vectors words ;
 
 : simple-generic ( class generic def -- )
     #! Just like:
@@ -34,14 +34,14 @@ sequences strings words ;
 : intern-slots ( spec -- spec )
     #! For convenience, we permit reader/writers to be specified
     #! as strings.
-    [ 3unlist swap ?create-in swap ?create-in 3list ] map ;
+    [ 3unseq swap ?create-in swap ?create-in 3vector ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the
     #! given class. The spec is a list of lists of length 3 of
     #! the form [ slot reader writer ]. slot is an integer,
     #! reader and writer are either words, strings or f.
-    [ 3unlist define-slot ] each-with ;
+    [ 3unseq define-slot ] each-with ;
 
 : reader-word ( class name -- word )
     >r word-name "-" r> append3 create-in ;
@@ -58,4 +58,4 @@ sequences strings words ;
     #! set-<class>-<slot>. Slot numbering is consecutive and
     #! begins at base.
     over length [ + ] map-with
-    [ >r dupd simple-slot r> -rot 3list ] 2map nip ;
+    [ >r dupd simple-slot r> -rot 3vector ] 2map nip ;

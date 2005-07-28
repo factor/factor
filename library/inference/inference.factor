@@ -23,11 +23,11 @@ SYMBOL: d-in
 : computed-value-vector ( n -- vector )
     empty-vector dup [ drop <computed> ] nmap ;
 
-: required-inputs ( typelist stack -- values )
-    >r length r> length - abs computed-value-vector ;
+: required-inputs ( n stack -- values )
+    length - 0 max computed-value-vector ;
 
 : ensure-d ( typelist -- )
-    meta-d get required-inputs dup
+    length meta-d get required-inputs dup
     meta-d [ append ] change
     d-in [ append ] change ;
 
@@ -37,9 +37,9 @@ SYMBOL: d-in
     2slip
     second length 0 rot node-outputs ; inline
 
-: present-effect ( [[ d-in meta-d ]] -- [[ in# out# ]] )
+: effect ( -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    uncons length >r length r> 2list ;
+    d-in get length meta-d get length 2list ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
@@ -61,9 +61,6 @@ M: object apply-object apply-literal ;
     #! Is this branch not terminated?
     d-in get meta-d get and ;
 
-: effect ( -- [[ d-in meta-d ]] )
-    d-in get meta-d get cons ;
-
 : terminate ( -- )
     #! Ignore this branch's stack effect.
     meta-d off meta-r off d-in off ;
@@ -75,7 +72,7 @@ M: object apply-object apply-literal ;
 : handle-terminator ( quot -- )
     #! If the quotation throws an error, do not count its stack
     #! effect.
-    [ terminator? ] find drop -1 > [ terminate ] when ;
+    [ terminator? ] contains? [ terminate ] when ;
 
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
@@ -112,7 +109,7 @@ M: object apply-object apply-literal ;
 
 : infer ( quot -- effect )
     #! Stack effect of a quotation.
-    [ infer-quot effect present-effect ] with-infer ;
+    [ infer-quot effect ] with-infer ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.

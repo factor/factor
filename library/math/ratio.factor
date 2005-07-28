@@ -4,7 +4,7 @@ IN: math
 USING: generic kernel kernel-internals math math-internals ;
 
 DEFER: ratio?
-BUILTIN: ratio 4 ratio? [ 0 "numerator" f ] [ 1 "denominator" f ] ;
+BUILTIN: ratio 4 ratio? { 0 "numerator" f } { 1 "denominator" f } ;
 UNION: rational integer ratio ;
 
 M: integer numerator ;

@@ -18,6 +18,8 @@ words ;
 "Loading compiler backend..." print
 
 cpu "x86" = [
+    "/library/compiler/vops.factor"
+    "/library/compiler/intrinsics.factor"
     "/library/compiler/x86/assembler.factor"
     "/library/compiler/x86/generator.factor"
     "/library/compiler/x86/slots.factor"

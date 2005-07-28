@@ -12,8 +12,8 @@ M: string resize resize-string ;
 
 DEFER: sbuf?
 BUILTIN: sbuf 13 sbuf?
-    [ 1 length set-capacity ]
-    [ 2 underlying set-underlying ] ;
+    { 1 length set-capacity }
+    { 2 underlying set-underlying } ;
 
 M: sbuf set-length ( n sbuf -- ) grow-length ;
 

@@ -28,10 +28,10 @@ M: #push node>quot ( node -- )
 
 M: #drop node>quot ( node -- )
     node-in-d length dup 3 > [
-        \ drop <repeated> %
+        \ drop <repeated>
     ] [
-        { f drop 2drop 3drop } nth ,
-    ] ifte ;
+        { f [ drop ] [ 2drop ] [ 3drop ] } nth
+    ] ifte % ;
 
 DEFER: dataflow>quot
 

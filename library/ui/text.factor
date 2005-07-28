@@ -32,7 +32,7 @@ strings styles io ;
         2drop
     ] [
         >r [ gadget-font ] keep r> swap
-        fg 3unlist make-color
+        fg 3unseq make-color
         TTF_RenderUNICODE_Blended
         [ >r origin get 2unseq r> draw-surface ] keep
         SDL_FreeSurface

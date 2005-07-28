@@ -6,8 +6,8 @@ math-internals sequences ;
 
 DEFER: vector?
 BUILTIN: vector 11 vector?
-    [ 1 length set-capacity ]
-    [ 2 underlying set-underlying ] ;
+    { 1 length set-capacity }
+    { 2 underlying set-underlying } ;
 
 M: vector set-length ( len vec -- ) grow-length ;
 

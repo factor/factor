@@ -91,17 +91,18 @@ M: pane focusable-child* ( pane -- editor )
     [ over pane-terpri pane-write ] [ 3drop ] ifte ;
 
 ! Panes are streams.
-M: pane stream-flush ( stream -- ) drop ;
+M: pane stream-flush ( pane -- ) drop ;
 
-M: pane stream-finish ( stream -- ) drop ;
+M: pane stream-finish ( pane -- ) drop ;
 
-M: pane stream-readln ( stream -- line )
+M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-M: pane stream-write1 ( string style stream -- )
-    [ rot ch>string unit pane-write ] keep scroll>bottom ;
+M: pane stream-write1 ( char pane -- )
+    [ >r ch>string <label> r> pane-current add-gadget ] keep
+    scroll>bottom ;
 
-M: pane stream-format ( string style stream -- )
+M: pane stream-format ( string style pane -- )
     [ rot "\n" split pane-write ] keep scroll>bottom ;
 
-M: pane stream-close ( stream -- ) drop ;
+M: pane stream-close ( pane -- ) drop ;

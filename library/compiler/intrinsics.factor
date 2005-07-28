@@ -3,7 +3,7 @@
 IN: compiler-frontend
 USING: assembler compiler-backend generic hashtables inference
 kernel kernel-internals lists math math-internals namespaces
-sequences words ;
+sequences vectors words ;
 
 ! Architecture description
 : fixnum-imm?
@@ -138,19 +138,19 @@ sequences words ;
 
 : value/vreg-list ( in -- list )
     [ 0 swap length 1 - ] keep
-    [ >r 2dup r> 3list >r 1 - >r 1 + r> r> ] map 2nip ;
+    [ >r 2dup r> 3vector >r 1 - >r 1 + r> r> ] map 2nip ;
 
 : values>vregs ( in -- in )
     value/vreg-list
-    dup [ 3unlist load-value ] each
-    [ car <vreg> ] map ;
+    dup [ 3unseq load-value ] each
+    [ first <vreg> ] map ;
 
 : load-inputs ( node -- in )
     dup node-in-d values>vregs
     [ length swap node-out-d length - %dec-d , ] keep ;
 
 : binary-op-reg ( node op -- )
-    >r load-inputs 2unlist swap dup r> execute ,
+    >r load-inputs 2unseq swap dup r> execute ,
     0 0 %replace-d , ; inline
 
 : literal-fixnum? ( value -- ? )

@@ -45,6 +45,6 @@ sequences io sequences styles ;
 : <button> ( label quot -- button )
     >r
     <label> bevel-border
-    dup [ 216 216 216 ] background set-paint-prop
+    dup { 216 216 216 } background set-paint-prop
     dup
     r> button-gestures ;

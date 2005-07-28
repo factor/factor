@@ -117,30 +117,14 @@ M: object empty? ( seq -- ? ) length 0 = ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
-: index* ( obj i seq -- n )
-    #! The index of the object in the sequence, starting from i.
-    [ = ] find-with* drop ;
-
-: index ( obj seq -- n )
-    #! The index of the object in the sequence.
-    [ = ] find-with drop ;
-
-: member? ( obj seq -- ? )
-    #! Tests for membership using =.
-    [ = ] contains-with? ;
-
-: memq? ( obj seq -- ? )
-    #! Tests for membership using eq?
-    [ eq? ] contains-with? ;
-
-: remove ( obj list -- list )
-    #! Remove all occurrences of objects equal to this one from
-    #! the list.
-    [ = not ] subset-with ;
-
-: remq ( obj list -- list )
-    #! Remove all occurrences of the object from the list.
-    [ eq? not ] subset-with ;
+: index   ( obj seq -- n )     [ = ] find-with drop ;
+: indq    ( obj seq -- n )     [ eq? ] find-with drop ;
+: index*  ( obj i seq -- n )   [ = ] find-with* drop ;
+: indq*   ( obj i seq -- n )   [ eq? ] find-with* drop ;
+: member? ( obj seq -- ? )     [ = ] contains-with? ;
+: memq?   ( obj seq -- ? )     [ eq? ] contains-with? ;
+: remove  ( obj list -- list ) [ = not ] subset-with ;
+: remq    ( obj list -- list ) [ eq? not ] subset-with ;
 
 : nappend ( s1 s2 -- )
     #! Destructively append s2 to s1.
@@ -238,10 +222,12 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! lexicographically.
     lexi 0 > ;
 
-: seq-transpose ( seq -- list )
+: seq-transpose ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
-    dup first length [ swap [ nth ] map-with ] map-with ;
+    dup empty? [
+        dup first length [ swap [ nth ] map-with ] map-with
+    ] unless ;
 
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
@@ -251,9 +237,11 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Substitute elements of old in seq with corresponding
     #! elements from new.
     [
-        dup pick index dup -1 =
-        [ drop ] [ nip pick nth ] ifte
+        dup pick indq dup -1 = [ drop ] [ nip pick nth ] ifte
     ] map 2nip ;
+
+: copy-into ( to from -- )
+    dup length [ pick set-nth ] 2each drop ;
 
 IN: kernel
 

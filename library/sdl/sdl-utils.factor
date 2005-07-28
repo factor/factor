@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl
-USING: kernel lists math namespaces ;
+USING: kernel lists math namespaces sequences ;
 
 SYMBOL: surface
 SYMBOL: width
@@ -21,7 +21,7 @@ SYMBOL: bpp
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgb ( [ r g b ] -- n )
-    3unlist
+    3unseq
     255
     swap >fixnum 8 shift bitor
     swap >fixnum 16 shift bitor

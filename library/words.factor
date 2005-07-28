@@ -8,9 +8,9 @@ namespaces sequences strings vectors ;
 ! identity. They hold a property map.
 DEFER: word?
 BUILTIN: word 17 word?
-    [ 1 hashcode f ]
-    [ 4 "word-def" "set-word-def" ]
-    [ 5 "word-props" "set-word-props" ] ;
+    { 1 hashcode f }
+    { 4 "word-def" "set-word-def" }
+    { 5 "word-props" "set-word-props" } ;
 
 : word-prop ( word name -- value ) swap word-props hash ;
 : set-word-prop ( word value name -- ) rot word-props set-hash ;

@@ -59,7 +59,7 @@ hashtables parser prettyprint ;
         inferring-base-case set
         recursive-state get init-inference
         dup inline-block drop
-        effect present-effect
+        effect
     ] with-scope [ consume/produce ] keep ;
 
 : infer-compound ( word -- )

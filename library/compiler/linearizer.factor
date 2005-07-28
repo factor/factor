@@ -70,7 +70,7 @@ M: #drop linearize-node* ( node -- )
 M: #ifte linearize-node* ( node -- )
     #! The parameter is a list of two lists, each one a dataflow
     #! IR.
-    node-children 2unlist  <label> [
+    node-children 2unseq  <label> [
         ifte-head
         linearize-node ( false branch )
         <label> dup %jump-label ,
@@ -99,6 +99,9 @@ M: #dispatch linearize-node* ( vtable -- )
     node-children dispatch-head dupd dispatch-body %label , ;
 
 M: #values linearize-node* ( node -- )
+    drop ;
+
+M: #merge linearize-node* ( node -- )
     drop ;
 
 M: #return linearize-node* ( node -- )

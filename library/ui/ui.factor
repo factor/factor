@@ -19,11 +19,11 @@ SYMBOL: stack-display
         <world> world set
         
         {{
-            [[ background [ 255 255 255 ] ]]
-            [[ rollover-bg [ 216 216 255 ] ]]
-            [[ bevel-1 [ 160 160 160 ] ]]
-            [[ bevel-2 [ 216 216 216 ] ]]
-            [[ foreground [ 0 0 0 ] ]]
+            [[ background { 255 255 255 } ]]
+            [[ rollover-bg { 216 216 255 } ]]
+            [[ bevel-1 { 160 160 160 } ]]
+            [[ bevel-2 { 216 216 216 } ]]
+            [[ foreground { 0 0 0 } ]]
             [[ reverse-video f ]]
             [[ font "Sans Serif" ]]
             [[ font-size 12 ]]

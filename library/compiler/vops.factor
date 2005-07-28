@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: errors generic hashtables kernel lists math namespaces
-parser sequences words ;
+parser sequences vectors words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -46,15 +46,15 @@ M: vop calls-label? vop-label = ;
 
 : empty-vop f f f ;
 : label-vop ( label) >r f f r> ;
-: label/src-vop ( label src) unit swap f swap ;
+: label/src-vop ( label src) 1vector swap f swap ;
 : src-vop ( src) unit f f ;
 : dest-vop ( dest) unit dup f ;
-: src/dest-vop ( src dest) >r unit r> unit f ;
-: 2-in-vop ( in1 in2) 2list f f ;
-: 3-in-vop ( in1 in2 in3) 3list f f ;
-: 2-in/label-vop ( in1 in2 label) >r 2list f r> ;
-: 2-vop ( in dest) [ 2list ] keep unit f ;
-: 3-vop ( in1 in2 dest) >r 2list r> unit f ;
+: src/dest-vop ( src dest) >r 1vector r> 1vector f ;
+: 2-in-vop ( in1 in2) 2vector f f ;
+: 3-in-vop ( in1 in2 in3) 3vector f f ;
+: 2-in/label-vop ( in1 in2 label) >r 2vector f r> ;
+: 2-vop ( in dest) [ 2vector ] keep 1vector f ;
+: 3-vop ( in1 in2 dest) >r 2vector r> 1vector f ;
 
 ! miscellanea
 TUPLE: %prologue ;
@@ -186,7 +186,7 @@ TUPLE: %set-slot ;
 C: %set-slot make-vop ;
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg n.
-    >r >r <vreg> r> <vreg> r> <vreg> 3list dup second f
+    >r >r <vreg> r> <vreg> r> <vreg> 3vector dup second f
     <%set-slot> ;
 M: %set-slot basic-block? drop t ;
 
@@ -202,7 +202,7 @@ TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
-    >r >r <vreg> r> <vreg> r> over >r 3list r> unit f
+    >r >r <vreg> r> <vreg> r> over >r 3vector r> unit f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 

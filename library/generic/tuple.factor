@@ -32,20 +32,6 @@ M: tuple set-delegate 3 set-slot ;
     #! The class of an object.
     dup tuple? [ class-tuple ] [ type builtin-type ] ifte ;
 
-: (literal-tuple) ( list size -- tuple )
-    dup <tuple> swap [
-        ( list tuple n -- list tuple n )
-        pick car pick pick swap set-array-nth
-        >r >r cdr r> r>
-    ] repeat nip ;
-
-: literal-tuple ( list -- tuple )
-    dup car "tuple-size" word-prop over length over = [
-        (literal-tuple)
-    ] [
-        "Incorrect tuple length" throw
-    ] ifte ;
-
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
@@ -173,6 +159,10 @@ M: mirror set-nth ( n mirror -- elt )
 
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
+
+: literal-tuple ( list -- tuple )
+    dup first "tuple-size" word-prop <tuple>
+    [ <mirror> swap copy-into ] keep ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its

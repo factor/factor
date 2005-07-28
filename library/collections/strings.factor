@@ -5,7 +5,7 @@ USING: generic kernel kernel-internals lists math sequences ;
 
 ! Strings
 DEFER: string?
-BUILTIN: string 12 string? [ 1 length f ] [ 2 hashcode f ] ;
+BUILTIN: string 12 string? { 1 length f } { 2 hashcode f } ;
 
 M: string nth ( n str -- ch ) bounds-check char-slot ;
 

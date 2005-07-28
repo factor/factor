@@ -2,16 +2,13 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic hashtables interpreter kernel lists math
-matrices namespaces prettyprint sequences strings vectors words ;
+namespaces prettyprint sequences strings vectors words ;
 
-: add-inputs ( count stack -- stack )
-    #! Add this many inputs to the given stack.
-    [ length - computed-value-vector ] keep append ;
-
-: unify-lengths ( seq -- list )
+: unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup max-length swap [ add-inputs ] map-with ;
+    dup max-length swap
+    [ [ required-inputs ] keep append ] map-with ;
 
 : unify-results ( seq -- value )
     #! If all values in list are equal, return the value.
@@ -24,7 +21,7 @@ matrices namespaces prettyprint sequences strings vectors words ;
     unify-lengths seq-transpose [ unify-results ] map ;
 
 : balanced? ( in out -- ? )
-    swap [ length ] map swap [ length ] map v- [ = ] fiber? ;
+    [ swap length swap length - ] 2map [ = ] fiber? ;
 
 : unify-effect ( in out -- in out )
     2dup balanced?
@@ -48,9 +45,9 @@ matrices namespaces prettyprint sequences strings vectors words ;
     [ [ active? ] bind ] subset ;
 
 : unify-effects ( seq -- )
-    filter-terminators
-    [ dup datastack-effect callstack-effect ]
-    [ terminate ] ifte* ;
+    filter-terminators dup empty?
+    [ drop terminate ]
+    [ dup datastack-effect callstack-effect ] ifte ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
@@ -91,7 +88,7 @@ matrices namespaces prettyprint sequences strings vectors words ;
     #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
 
-: vtable-value ( rstate vtable -- seq  )
+: vtable-value ( rstate vtable -- seq )
     [ swap <literal> ] map-with ;
 
 USE: kernel-internals

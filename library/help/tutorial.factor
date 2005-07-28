@@ -7,7 +7,7 @@ sequences strings styles ;
 
 : <underline> ( -- gadget )
     <gadget>
-    dup << gradient f { 1 0 0 } [ 64 64 64 ] [ 255 255 255 ] >> interior set-paint-prop
+    dup << gradient f { 1 0 0 } { 64 64 64 } { 255 255 255 } >> interior set-paint-prop
     { 0 10 0 } over set-gadget-dim ;
 
 GENERIC: tutorial-line ( object -- gadget )
@@ -244,7 +244,7 @@ M: general-list tutorial-line
             ""
             "Try this:"
             ""
-            [ "[ 10 20 30 ] [ . ] each" ]
+            [ "{ 10 20 30 } [ . ] each" ]
             ""
             "A closely-related combinator is map ( seq quot -- seq )."
             "It also calls a quotation with each element."
@@ -253,8 +253,8 @@ M: general-list tutorial-line
             ""
             "Try this:"
             ""
-            [ "[ 10 20 30 ] [ 3 + ] map ." ]
-            "==> [ 13 23 33 ]"
+            [ "{ 10 20 30 } [ 3 + ] map ." ]
+            "==> { 13 23 33 }"
         ] [
             "Numbers - integers and ratios"
             "Factor's supports arbitrary-precision integers and ratios."
@@ -335,8 +335,8 @@ M: general-list tutorial-line
 
 : <tutorial> ( pages -- browser )
     tutorial-pages [ <page> ] map <book>
-    dup [ 204 204 255 ] background set-paint-prop
-    dup << gradient f { 0 1 0 } [ 204 204 255 ] [ 255 204 255 ] >> interior set-paint-prop
+    dup { 204 204 255 } background set-paint-prop
+    dup << gradient f { 0 1 0 } { 204 204 255 } { 255 204 255 } >> interior set-paint-prop
     dup "Sans Serif" font set-paint-prop
     dup 18 font-size set-paint-prop
     <book-browser> ;

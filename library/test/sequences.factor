@@ -64,3 +64,8 @@ unit-test
 [ { "three" "three" "two" "two" "one" "one" } ]
 [ { "one" "two" "three" } { 1 2 3 } { 3 3 2 2 1 1 } subst ]
 unit-test
+
+[ { 1 2 }   ] [ 1 2   2vector ] unit-test
+[ { 1 2 3 } ] [ 1 2 3 3vector ] unit-test
+
+[ { } ] [ { } seq-transpose ] unit-test

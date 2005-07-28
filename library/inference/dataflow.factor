@@ -19,8 +19,8 @@ TUPLE: node param in-d out-d in-r out-r
 : in-d-node ( inputs) >r f r> f f f f ;
 : out-d-node ( outputs) >r f f r> f f f ;
 
-: d-tail ( n -- list ) meta-d get tail* >list ;
-: r-tail ( n -- list ) meta-r get tail* >list ;
+: d-tail ( n -- list ) meta-d get tail* >vector ;
+: r-tail ( n -- list ) meta-r get tail* >vector ;
 
 TUPLE: #label ;
 C: #label make-node ;
@@ -44,11 +44,11 @@ C: #drop make-node ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get >list in-d-node <#values> ;
+: #values ( -- node ) meta-d get in-d-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
-: #return ( -- node ) meta-d get >list in-d-node <#return> ;
+: #return ( -- node ) meta-d get in-d-node <#return> ;
 
 TUPLE: #ifte ;
 C: #ifte make-node ;

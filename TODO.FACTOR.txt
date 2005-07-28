@@ -64,15 +64,15 @@
   - merge inc-d's across VOPs that don't touch the stack
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - [ [ dup call ] dup call ] infer hangs
-- more accurate types for various words
 - declarations
-- type inference fails with some assembler words;
   displaced, register and other predicates need to inherit from list
   not cons, and need stronger branch partial eval
 - optimize away arithmetic dispatch
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization
+- recursion is iffy; no base case needs to throw an error, and if the
+  stack at the recursive call doesn't match up, throw an error
 
 + sequences
 

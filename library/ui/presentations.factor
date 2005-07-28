@@ -9,10 +9,10 @@ SYMBOL: commands
 global [ 100 <vector> commands set ] bind
 
 : define-command ( class name quot -- )
-    3list commands get push ;
+    3vector commands get push ;
 
 : applicable ( object -- seq )
-    commands get [ car call ] subset-with ;
+    commands get [ first call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
     [ swap literal, % ] make-list

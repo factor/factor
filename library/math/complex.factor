@@ -11,7 +11,7 @@ USING: errors generic kernel kernel-internals math ;
 IN: math
 
 DEFER: complex?
-BUILTIN: complex 6 complex? [ 0 "real" f ] [ 1 "imaginary" f ] ;
+BUILTIN: complex 6 complex? { 0 "real" f } { 1 "imaginary" f } ;
 UNION: number real complex ;
 
 M: real real ;

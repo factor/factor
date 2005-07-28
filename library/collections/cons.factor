@@ -7,7 +7,7 @@ IN: lists USING: generic kernel sequences ;
 ! lists.factor has everything else.
 
 DEFER: cons?
-BUILTIN: cons 2 cons? [ 0 "car" f ] [ 1 "cdr" f ] ;
+BUILTIN: cons 2 cons? { 0 "car" f } { 1 "cdr" f } ;
 
 ! We borrow an idiom from Common Lisp. The car/cdr of an empty
 ! list is the empty list.
@@ -34,9 +34,7 @@ PREDICATE: general-list list ( list -- ? )
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ;
 : unit ( a -- [ a ] ) f cons ;
 : 2list ( a b -- [ a b ] ) unit cons ;
-: 3list ( a b c -- [ a b c ] ) 2list cons ;
 : 2unlist ( [ a b ] -- a b ) uncons car ;
-: 3unlist ( [ a b c ] -- a b c ) uncons uncons car ;
 
 : 2car ( cons cons -- car car ) swap car swap car ;
 : 2cdr ( cons cons -- car car ) swap cdr swap cdr ;

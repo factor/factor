@@ -5,7 +5,7 @@ USING: hashtables io kernel kernel-internals lists math
 namespaces parser ;
 
 DEFER: dll?
-BUILTIN: dll 15 dll? [ 1 "dll-path" f ] ;
+BUILTIN: dll 15 dll? { 1 "dll-path" f } ;
 
 DEFER: alien?
 BUILTIN: alien 16 alien? ;

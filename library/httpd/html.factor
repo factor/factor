@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists namespaces presentation
-sequences strings styles unparser words ;
+USING: #<unknown> generic http io kernel lists namespaces
+presentation sequences strings styles unparser words ;
 
 : html-entities ( -- alist )
     [
@@ -80,7 +80,12 @@ sequences strings styles unparser words ;
 
 : browser-link-href ( word -- href )
     dup word-name swap word-vocabulary
-    [ "/responder/browser/?vocab=" % % "&word=" % % ] make-string ;
+    [
+        "/responder/browser/?vocab=" %
+        url-encode %
+        "&word=" %
+        url-encode %
+    ] make-string ;
 
 : browser-link-tag ( style quot -- style )
     over presented swap assoc dup word? [

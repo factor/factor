@@ -2,42 +2,39 @@ IN: temporary
 USING: generic inference kernel lists math math-internals
 namespaces parser sequences test vectors ;
 
-: old-effect ( [ in-types out-types ] -- [[ in out ]] )
-    uncons car length >r length r> cons ;
+[ [ 0 2 ] ] [ [ 2 "Hello" ] infer ] unit-test
+[ [ 1 2 ] ] [ [ dup ] infer ] unit-test
 
-[ [[ 0 2 ]] ] [ [ 2 "Hello" ] infer old-effect ] unit-test
-[ [[ 1 2 ]] ] [ [ dup ] infer old-effect ] unit-test
+[ [ 1 2 ] ] [ [ [ dup ] call ] infer ] unit-test
+[ [ call ] infer ] unit-test-fails
 
-[ [[ 1 2 ]] ] [ [ [ dup ] call ] infer old-effect ] unit-test
-[ [ call ] infer old-effect ] unit-test-fails
+[ [ 2 4 ] ] [ [ 2dup ] infer ] unit-test
 
-[ [[ 2 4 ]] ] [ [ 2dup ] infer old-effect ] unit-test
+[ [ 1 0 ] ] [ [ [ ] [ ] ifte ] infer ] unit-test
+[ [ ifte ] infer ] unit-test-fails
+[ [ [ ] ifte ] infer ] unit-test-fails
+[ [ [ 2 ] [ ] ifte ] infer ] unit-test-fails
+[ [ 4 3 ] ] [ [ [ rot ] [ -rot ] ifte ] infer ] unit-test
 
-[ [[ 1 0 ]] ] [ [ [ ] [ ] ifte ] infer old-effect ] unit-test
-[ [ ifte ] infer old-effect ] unit-test-fails
-[ [ [ ] ifte ] infer old-effect ] unit-test-fails
-[ [ [ 2 ] [ ] ifte ] infer old-effect ] unit-test-fails
-[ [[ 4 3 ]] ] [ [ [ rot ] [ -rot ] ifte ] infer old-effect ] unit-test
-
-[ [[ 4 3 ]] ] [
+[ [ 4 3 ] ] [
     [
         [
             [ swap 3 ] [ nip 5 5 ] ifte
         ] [
             -rot
         ] ifte
-    ] infer old-effect
+    ] infer 
 ] unit-test
 
-[ [[ 1 1 ]] ] [ [ dup [ ] when ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ dup [ dup fixnum* ] when ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ [ dup fixnum* ] when ] infer old-effect ] unit-test
+[ [ 1 1 ] ] [ [ dup [ ] when ] infer ] unit-test
+[ [ 1 1 ] ] [ [ dup [ dup fixnum* ] when ] infer ] unit-test
+[ [ 2 1 ] ] [ [ [ dup fixnum* ] when ] infer ] unit-test
 
-[ [[ 1 0 ]] ] [ [ [ drop ] when* ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ [ { { [ ] } } ] unless* ] infer old-effect ] unit-test
+[ [ 1 0 ] ] [ [ [ drop ] when* ] infer ] unit-test
+[ [ 1 1 ] ] [ [ [ { { [ ] } } ] unless* ] infer ] unit-test
 
-[ [[ 0 1 ]] ] [
-    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer old-effect
+[ [ 0 1 ] ] [
+    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer 
 ] unit-test
 
 [
@@ -46,37 +43,30 @@ namespaces parser sequences test vectors ;
 
 : infinite-loop infinite-loop ;
 
-! [ [ infinite-loop ] infer old-effect ] unit-test-fails
-
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] ifte ;
 
-[ [[ 1 1 ]] ] [ [ simple-recursion-1 ] infer old-effect ] unit-test
+[ [ 1 1 ] ] [ [ simple-recursion-1 ] infer ] unit-test
 
 : simple-recursion-2
     dup [ ] [ simple-recursion-2 ] ifte ;
 
-[ [[ 1 1 ]] ] [ [ simple-recursion-2 ] infer old-effect ] unit-test
-
-! : bad-recursion-1
-!     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
-! 
-! [ [ bad-recursion-1 ] infer old-effect ] unit-test-fails
+[ [ 1 1 ] ] [ [ simple-recursion-2 ] infer ] unit-test
 
 : bad-recursion-2
     dup [ uncons bad-recursion-2 ] [ ] ifte ;
 
-[ [ bad-recursion-2 ] infer old-effect ] unit-test-fails
+[ [ bad-recursion-2 ] infer ] unit-test-fails
 
 ! Not sure how to fix this one
 
 : funny-recursion
     dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
 
-[ [[ 1 1 ]] ] [ [ funny-recursion ] infer old-effect ] unit-test
+[ [ 1 1 ] ] [ [ funny-recursion ] infer ] unit-test
 
 ! Simple combinators
-[ [[ 1 2 ]] ] [ [ [ car ] keep cdr ] infer old-effect ] unit-test
+[ [ 1 2 ] ] [ [ [ car ] keep cdr ] infer ] unit-test
 
 ! Mutual recursion
 DEFER: foe
@@ -99,12 +89,8 @@ DEFER: foe
         2drop f
     ] ifte ;
 
-[ [[ 2 1 ]] ] [ [ fie ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ foe ] infer old-effect ] unit-test
-
-! This form should not have a stack effect
-! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
-! [ [ bad-bin ] infer old-effect ] unit-test-fails
+[ [ 2 1 ] ] [ [ fie ] infer ] unit-test
+[ [ 2 1 ] ] [ [ foe ] infer ] unit-test
 
 : nested-when ( -- )
     t [
@@ -113,7 +99,7 @@ DEFER: foe
         ] when
     ] when ;
 
-[ [[ 0 0 ]] ] [ [ nested-when ] infer old-effect ] unit-test
+[ [ 0 0 ] ] [ [ nested-when ] infer ] unit-test
 
 : nested-when* ( -- )
     [
@@ -122,40 +108,11 @@ DEFER: foe
         ] when*
     ] when* ;
 
-[ [[ 1 0 ]] ] [ [ nested-when* ] infer old-effect ] unit-test
+[ [ 1 0 ] ] [ [ nested-when* ] infer ] unit-test
 
 SYMBOL: sym-test
 
-[ [[ 0 1 ]] ] [ [ sym-test ] infer old-effect ] unit-test
-
-[ [[ 2 1 ]] ] [ [ 2list ] infer old-effect ] unit-test
-[ [[ 3 1 ]] ] [ [ 3list ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ swons ] infer old-effect ] unit-test
-[ [[ 1 2 ]] ] [ [ uncons ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ unit ] infer old-effect ] unit-test
-[ [[ 1 2 ]] ] [ [ unswons ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ last ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ list? ] infer old-effect ] unit-test
-
-[ [[ 1 0 ]] ] [ [ >n ] infer old-effect ] unit-test
-[ [[ 0 1 ]] ] [ [ n> ] infer old-effect ] unit-test
-
-[ [[ 2 1 ]] ] [ [ bitor ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ bitand ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ bitxor ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ mod ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ /i ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ /f ] infer old-effect ] unit-test
-[ [[ 2 2 ]] ] [ [ /mod ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ + ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ - ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ * ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ / ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ < ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ <= ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ > ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ >= ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ number= ] infer old-effect ] unit-test
+[ [ 0 1 ] ] [ [ sym-test ] infer ] unit-test
 
 : terminator-branch
     dup [
@@ -164,7 +121,79 @@ SYMBOL: sym-test
         not-a-number
     ] ifte ;
 
-[ [[ 1 1 ]] ] [ [ terminator-branch ] infer old-effect ] unit-test
+[ [ 1 1 ] ] [ [ terminator-branch ] infer ] unit-test
+
+: recursive-terminator
+    dup [
+        recursive-terminator
+    ] [
+        not-a-number
+    ] ifte ;
+
+[ [ 1 1 ] ] [ [ recursive-terminator ] infer ] unit-test
+
+GENERIC: potential-hang
+M: fixnum potential-hang dup [ potential-hang ] when ;
+
+[ ] [ [ 5 potential-hang ] infer drop ] unit-test
+
+TUPLE: funny-cons car cdr ;
+GENERIC: iterate
+M: funny-cons iterate funny-cons-cdr iterate ;
+M: f iterate drop ;
+M: real iterate drop ;
+
+[ [ 1 0 ] ] [ [ iterate ] infer ] unit-test
+
+[ [ callstack ] infer ] unit-test-fails
+
+! : no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
+! 
+! [ [ no-base-case ] infer ] unit-test-fails
+
+[ [ 2 1 ] ] [ [ 2vector ] infer ] unit-test
+[ [ 3 1 ] ] [ [ 3vector ] infer ] unit-test
+[ [ 2 1 ] ] [ [ swons ] infer ] unit-test
+[ [ 1 2 ] ] [ [ uncons ] infer ] unit-test
+[ [ 1 1 ] ] [ [ unit ] infer ] unit-test
+[ [ 1 2 ] ] [ [ unswons ] infer ] unit-test
+[ [ 1 1 ] ] [ [ last ] infer ] unit-test
+[ [ 1 1 ] ] [ [ list? ] infer ] unit-test
+
+[ [ 1 0 ] ] [ [ >n ] infer ] unit-test
+[ [ 0 1 ] ] [ [ n> ] infer ] unit-test
+
+[ [ 2 1 ] ] [ [ bitor ] infer ] unit-test
+[ [ 2 1 ] ] [ [ bitand ] infer ] unit-test
+[ [ 2 1 ] ] [ [ bitxor ] infer ] unit-test
+[ [ 2 1 ] ] [ [ mod ] infer ] unit-test
+[ [ 2 1 ] ] [ [ /i ] infer ] unit-test
+[ [ 2 1 ] ] [ [ /f ] infer ] unit-test
+[ [ 2 2 ] ] [ [ /mod ] infer ] unit-test
+[ [ 2 1 ] ] [ [ + ] infer ] unit-test
+[ [ 2 1 ] ] [ [ - ] infer ] unit-test
+[ [ 2 1 ] ] [ [ * ] infer ] unit-test
+[ [ 2 1 ] ] [ [ / ] infer ] unit-test
+[ [ 2 1 ] ] [ [ < ] infer ] unit-test
+[ [ 2 1 ] ] [ [ <= ] infer ] unit-test
+[ [ 2 1 ] ] [ [ > ] infer ] unit-test
+[ [ 2 1 ] ] [ [ >= ] infer ] unit-test
+[ [ 2 1 ] ] [ [ number= ] infer ] unit-test
+
+[ [ 1 1 ] ] [ [ str>number ] infer ] unit-test
+[ [ 2 1 ] ] [ [ = ] infer ] unit-test
+[ [ 1 1 ] ] [ [ get ] infer ] unit-test
+
+[ [ 2 0 ] ] [ [ push ] infer ] unit-test
+[ [ 2 0 ] ] [ [ set-length ] infer ] unit-test
+[ [ 2 1 ] ] [ [ append ] infer ] unit-test
+[ [ 1 1 ] ] [ [ peek ] infer ] unit-test
+
+[ [ 1 1 ] ] [ [ length ] infer ] unit-test
+[ [ 1 1 ] ] [ [ reverse ] infer ] unit-test
+[ [ 2 1 ] ] [ [ member? ] infer ] unit-test
+[ [ 2 1 ] ] [ [ remove ] infer ] unit-test
+[ [ 1 1 ] ] [ [ prune ] infer ] unit-test
 
 ! Type inference
 
@@ -175,11 +204,6 @@ SYMBOL: sym-test
 ! [ [ [ general-list ] [ cons ] ] ] [ [ uncons cons ] infer ] unit-test
 
 ! [ [ 5 car ] infer ] unit-test-fails
-
-GENERIC: potential-hang
-M: fixnum potential-hang dup [ potential-hang ] when ;
-
-[ ] [ [ 5 potential-hang ] infer drop ] unit-test
 
 ! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer ] unit-test
 ! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer ] unit-test
@@ -192,31 +216,13 @@ M: fixnum potential-hang dup [ potential-hang ] when ;
 
 ! [ [ [ object ] [ cons ] ] ] [ [ dup cons? [ drop [[ 1 2 ]] ] unless ] infer ] unit-test
 
-TUPLE: funny-cons car cdr ;
-GENERIC: iterate
-M: funny-cons iterate funny-cons-cdr iterate ;
-M: f iterate drop ;
-M: real iterate drop ;
+! This form should not have a stack effect
+! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
+! [ [ bad-bin ] infer ] unit-test-fails
 
-[ [[ 1 0 ]] ] [ [ iterate ] infer old-effect ] unit-test
+! [ [ infinite-loop ] infer ] unit-test-fails
 
-[ [[ 1 1 ]] ] [ [ str>number ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ = ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ get ] infer old-effect ] unit-test
-
-[ [[ 2 0 ]] ] [ [ push ] infer old-effect ] unit-test
-[ [[ 2 0 ]] ] [ [ set-length ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ append ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ peek ] infer old-effect ] unit-test
-
-[ [[ 1 1 ]] ] [ [ length ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ reverse ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ member? ] infer old-effect ] unit-test
-[ [[ 2 1 ]] ] [ [ remove ] infer old-effect ] unit-test
-[ [[ 1 1 ]] ] [ [ prune ] infer old-effect ] unit-test
-
-[ [ callstack ] infer ] unit-test-fails
-
-: no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
-
-[ [ no-base-case ] infer ] unit-test-fails
+! : bad-recursion-1
+!     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
+! 
+! [ [ bad-recursion-1 ] infer ] unit-test-fails
