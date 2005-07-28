@@ -18,8 +18,6 @@ hashtables errors sequences vectors ;
     #! specifying an incorrect size.
     <tuple> [ 2 set-slot ] keep ;
 
-: class-tuple 2 slot ; inline
-
 IN: generic
 
 DEFER: tuple?
@@ -30,18 +28,15 @@ M: tuple set-delegate 3 set-slot ;
 
 : class ( obj -- class )
     #! The class of an object.
-    dup tuple? [ class-tuple ] [ type builtin-type ] ifte ;
+    dup tuple? [ 2 slot ] [ type builtin-type ] ifte ; inline
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
-    dup predicate-word 2dup unit "predicate" set-word-prop
-    swap [
-        [ dup tuple? ] %
-        [ \ class-tuple , literal, \ eq? , ] make-list ,
-        [ drop f ] ,
-        \ ifte ,
-    ] make-list define-compound ;
+    dup predicate-word
+    2dup register-predicate
+    swap [ \ class , literal, \ eq? , ] make-list
+    define-compound ;
 
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop car [ forget ] when* ;
@@ -136,7 +131,7 @@ M: tuple set-delegate 3 set-slot ;
     #! for methods defined on the given generic.
     dup default-tuple-method \ drop swons
     over tuple-methods hash>quot
-    >r "picker" word-prop [ class-tuple ] r> append3 ;
+    >r "picker" word-prop [ class ] r> append3 ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;

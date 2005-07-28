@@ -90,6 +90,7 @@ parser prettyprint sequences io vectors words ;
         "/library/inference/words.factor"
         "/library/inference/stack.factor"
         "/library/inference/partial-eval.factor"
+        "/library/inference/class-infer.factor"
         "/library/inference/optimizer.factor"
         "/library/inference/print-dataflow.factor"
         

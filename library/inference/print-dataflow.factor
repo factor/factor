@@ -14,7 +14,7 @@ M: annotation prettyprint* ( ann -- )
     swap annotation-node object. ;
 
 : value-str ( classes values -- str )
-    [ swap ?hash [ [ object ] ] unless* ] map-with
+    [ swap ?hash [ object ] unless* ] map-with
     [ word-name ] map
     " " join ;
 

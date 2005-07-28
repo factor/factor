@@ -69,3 +69,5 @@ unit-test
 [ { 1 2 3 } ] [ 1 2 3 3vector ] unit-test
 
 [ { } ] [ { } seq-transpose ] unit-test
+
+[ [ 1 2 3 ] [ 3 4 5 ] [ 6 ] 3vector [ reverse ] map ] unit-test

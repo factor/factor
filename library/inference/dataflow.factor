@@ -9,12 +9,12 @@ sequences vectors words ;
 ! code with stack flow information and types.
 
 TUPLE: node param in-d out-d in-r out-r
-       classes successor children ;
+       classes literals successor children ;
 
 M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [ >r f f f <node> r> set-delegate ] keep ;
+    [ >r f f f f <node> r> set-delegate ] keep ;
 
 : param-node ( label) f f f f ;
 : in-d-node ( inputs) >r f r> f f f ;

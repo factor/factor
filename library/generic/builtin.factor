@@ -24,13 +24,9 @@ builtin 50 "priority" set-word-prop
 ! All builtin types are equivalent in ordering
 builtin [ 2drop t ] "class<" set-word-prop
 
-: builtin-predicate ( class -- )
-    dup "predicate" word-prop car
-    dup t "inline" set-word-prop
-    swap
-    [
-        \ type , "builtin-type" word-prop , \ eq? ,
-    ] make-list
+: builtin-predicate ( class predicate -- )
+    2dup register-predicate
+    [ \ type , swap "builtin-type" word-prop , \ eq? , ] make-list
     define-compound ;
 
 : register-builtin ( class -- )
@@ -41,8 +37,7 @@ builtin [ 2drop t ] "class<" set-word-prop
     dup intern-symbol
     dup r> "builtin-type" set-word-prop
     dup builtin define-class
-    dup r> unit "predicate" set-word-prop
-    dup builtin-predicate
+    dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
     define-slots
     register-builtin ;

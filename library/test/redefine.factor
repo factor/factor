@@ -8,4 +8,4 @@ USE: test
 : foo 1 2 3 ;
 
 [ 1 2 3 1 2 3 ] [ bar ] unit-test
-[ [ [ ] [ fixnum fixnum fixnum ] ] ] [ [ foo ] infer ] unit-test
+[ [ [ 0 3 ] ] ] [ [ foo ] infer ] unit-test

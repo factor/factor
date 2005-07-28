@@ -92,7 +92,7 @@ M: f can-kill* ( literal node -- ? )
     2drop t ;
 
 M: node can-kill* ( literal node -- ? )
-    uses-value? ;
+    uses-value? not ;
 
 M: node kill-node* ( literals node -- )
     2drop ;

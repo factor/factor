@@ -4,8 +4,6 @@ USING: alien assembler command-line compiler generic hashtables
 kernel lists memory namespaces parser sequences io unparser
 words ;
 
-\ fiber? t "inline" set-word-prop
-
 : pull-in ( ? list -- )
     swap [
         [

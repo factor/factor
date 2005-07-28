@@ -8,23 +8,12 @@ math-internals ;
 ! A simple single-dispatch generic word system.
 
 : predicate-word ( word -- word )
-    word-name "?" append create-in
-    dup t "inline" set-word-prop ;
+    word-name "?" append create-in ;
 
-! Terminology:
-! - type: a datatype built in to the runtime, eg fixnum, word
-! cons. All objects have exactly one type, new types cannot be
-! defined, and types are disjoint.
-! - class: a user defined way of differentiating objects, either
-! based on type, or some combination of type, predicate, or
-! method map.
-! - metaclass: a metaclass is a symbol with a handful of word
-! properties: "builtin-supertypes" "priority" "add-method"
-! "class<"
+: register-predicate ( class predicate -- )
+    2dup unit "predicate" set-word-prop
+    swap "predicating" set-word-prop ;
 
-! So far, only tuples can have delegates, which also must be
-! tuples (the UI uses numbers as delegates in a couple of places
-! but this is Unsupported(tm)).
 GENERIC: delegate
 GENERIC: set-delegate
 
