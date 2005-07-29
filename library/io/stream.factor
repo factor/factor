@@ -56,4 +56,4 @@ C: wrapper-stream ( stream -- stream )
     ] keep ;
 
 : with-wrapper ( stream quot -- )
-    >r wrapper-stream-scope r> bind ;
+    >r wrapper-stream-scope r> bind ; inline

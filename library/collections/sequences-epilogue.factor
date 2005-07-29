@@ -96,7 +96,7 @@ M: object find ( seq quot -- i elt )
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
 
-: fiber? ( seq quot -- ? | quot: elt elt -- ? )
+: every? ( seq quot -- ? | quot: elt elt -- ? )
     #! Tests if all elements are equivalent under the relation.
     over empty?
     [ 2drop t ] [ >r [ first ] keep r> all-with? ] ifte ; inline

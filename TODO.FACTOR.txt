@@ -65,8 +65,6 @@
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - [ [ dup call ] dup call ] infer hangs
 - declarations
-  displaced, register and other predicates need to inherit from list
-  not cons, and need stronger branch partial eval
 - optimize away arithmetic dispatch
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
@@ -83,6 +81,7 @@
 
 + kernel:
 
+- clear "predicating" word prop when redefining words
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue

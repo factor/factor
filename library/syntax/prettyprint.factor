@@ -77,7 +77,7 @@ M: word prettyprint* ( indent word -- indent )
         over recursion-check [ cons ] change
         call
         recursion-check [ cdr ] change
-    ] ifte ;
+    ] ifte ; inline
 
 : prettyprint-sequence ( indent start list end -- indent )
     #! Prettyprint a list, with start/end delimiters; eg, [ ],

@@ -88,7 +88,7 @@ M: node child-ties ( node -- seq )
 M: #call infer-classes* ( node -- )
     dup create-ties
     dup node-param "infer-effect" word-prop 2unseq
-    pick node-out-d assume-classes
+    pick node-out-d intersect-classes
     swap node-in-d intersect-classes ;
 
 M: #push infer-classes* ( node -- )

@@ -13,9 +13,6 @@ presentation sequences strings styles unparser words ;
         [[ CHAR: " "&quot;" ]]
     ] ;
 
-: char>entity ( ch -- str )
-    dup >r html-entities assoc dup r> ? ;
-
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [

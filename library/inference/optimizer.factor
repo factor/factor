@@ -232,7 +232,7 @@ M: #values can-kill* ( literal node -- ? )
     dupd uses-value? [
         branch-returns get
         [ memq? ] subset-with
-        [ [ eq? ] fiber? ] all?
+        [ [ eq? ] every? ] all?
     ] [
         drop t
     ] ifte ;
