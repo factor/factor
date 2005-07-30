@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
 USING: alien errors generic hashtables io kernel lists math
-matrices memory namespaces parser presentation sequences strings
+memory namespaces parser presentation sequences strings
 styles unparser vectors words ;
 
 SYMBOL: prettyprint-limit
@@ -119,15 +119,6 @@ M: tuple prettyprint* ( indent tuple -- indent )
 
 M: alien prettyprint* ( alien -- str )
     \ ALIEN: unparse. bl alien-address unparse write ;
-
-: matrix-rows. ( indent list -- indent )
-    uncons >r [ one-line on prettyprint* ] with-scope r>
-    [ over ?prettyprint-newline matrix-rows. ] when* ;
-
-M: matrix prettyprint* ( indent obj -- indent )
-    \ M{ unparse. bl >r 3 + r>
-    row-list matrix-rows.
-    bl \ }M unparse. 3 - ;
 
 : prettyprint ( obj -- )
     [

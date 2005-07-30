@@ -2,57 +2,48 @@ IN: temporary
 USING: kernel lists math matrices namespaces sequences test
 vectors ;
 
-[ [ { 1 4 } { 2 5 } { 3 6 } ] ]
-[ M{ { 1 4 } { 2 5 } { 3 6 } }M row-list ] unit-test
-
 [
-    M{ { 0 } { 0 } { 0 } }M
+    { { 0 } { 0 } { 0 } }
 ] [
-    3 1 <zero-matrix>
+    3 1 zero-matrix
 ] unit-test
 
 [
-    M{ { 1 } { 2 } { 3 } }M
-] [
-    { 1 2 3 } <col-matrix>
-] unit-test
-
-[
-    M{ { 1 0 0 }
+    { { 1 0 0 }
        { 0 1 0 }
-       { 0 0 1 } }M
+       { 0 0 1 } }
 ] [
-    3 <identity-matrix>
+    3 identity-matrix
 ] unit-test
 
 [
-    M{ { 1 0 4 }
+    { { 1 0 4 }
        { 0 7 0 }
-       { 6 0 3 } }M
+       { 6 0 3 } }
 ] [
-    M{ { 1 0 0 }
+    { { 1 0 0 }
        { 0 2 0 }
-       { 0 0 3 } }M
+       { 0 0 3 } }
        
-    M{ { 0 0 4 }
+    { { 0 0 4 }
        { 0 5 0 }
-       { 6 0 0 } }M
+       { 6 0 0 } }
 
     m+
 ] unit-test
 
 [
-    M{ { 1 0 4 }
+    { { 1 0 4 }
        { 0 7 0 }
-       { 6 0 3 } }M
+       { 6 0 3 } }
 ] [
-    M{ { 1 0 0 }
+    { { 1 0 0 }
        { 0 2 0 }
-       { 0 0 3 } }M
+       { 0 0 3 } }
        
-    M{ { 0 0 -4 }
+    { { 0 0 -4 }
        { 0 -5 0 }
-       { -6 0 0 } }M
+       { -6 0 0 } }
 
     m-
 ] unit-test
@@ -64,28 +55,10 @@ vectors ;
 ] unit-test
 
 [
-    M{ { 6 } }M
-] [
-    M{ { 3 } }M M{ { 2 } }M m.
-] unit-test
-
-[
-    M{ { 11 } }M
-] [
-    M{ { 1 3 } }M M{ { 5 } { 2 } }M m.
-] unit-test
-
-[
-    [ [[ 0 0 ]] [[ 1 0 ]] ]
-] [
-    [ 2 1 [ 2dup cons , ] 2repeat ] make-list
-] unit-test
-
-[
     { 3 4 }
 ] [
-    M{ { 1 0 }
-       { 0 1 } }M
+    { { 1 0 }
+       { 0 1 } }
 
     { 3 4 }
 
@@ -95,46 +68,41 @@ vectors ;
 [
     { 4 3 }
 ] [
-    M{ { 0 1 }
-       { 1 0 } }M
+    { { 0 1 }
+       { 1 0 } }
 
     { 3 4 }
 
     m.v
 ] unit-test
 
+[
+    { { 8 2 3 } { 9 5 6 } }
+] [
+    { { 1 2 3 } { 4 5 6 } } clone
+    dup <flipped> { 8 9 } 0 rot set-nth 
+] unit-test
+
 [ { 0 0 1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
 [ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
 [ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
 
-[ M{ { 1 2 } { 3 4 } { 5 6 } }M ]
-[ M{ { 1 2 } { 3 4 } { 5 6 } }M transpose transpose ]
+[ { { 1 2 } { 3 4 } { 5 6 } } ]
+[ { { 1 2 } { 3 4 } { 5 6 } } flip flip ]
 unit-test
 
-[ M{ { 1 3 5 } { 2 4 6 } }M ]
-[ M{ { 1 3 5 } { 2 4 6 } }M transpose transpose ]
+[ { { 1 3 5 } { 2 4 6 } } ]
+[ { { 1 3 5 } { 2 4 6 } } flip flip ]
 unit-test
 
-[ M{ { 1 3 5 } { 2 4 6 } }M ]
-[ M{ { 1 2 } { 3 4 } { 5 6 } }M transpose ]
+[ { { 1 3 5 } { 2 4 6 } } ]
+[ { { 1 2 } { 3 4 } { 5 6 } } flip ]
 unit-test
-
-[
-    M{ { 28 } }M
-] [
-    M{ { 2 4 6 } }M
-
-    M{ { 1 }
-       { 2 }
-       { 3 } }M
-    
-    m.
-] unit-test
 
 [
     { { 7 } { 4 8 } { 1 5 9 } { 2 6 } { 3 } }
 ] [
-    M{ { 1 2 3 } { 4 5 6 } { 7 8 9 } }M
+    { { 1 2 3 } { 4 5 6 } { 7 8 9 } }
     5 [ 2 - swap <diagonal> >vector ] map-with
 ] unit-test
 
@@ -145,3 +113,27 @@ unit-test
 [ { t f t } ]
 [ { 1 10 3 } { -1 -2 -3 } { 4 5 6 } vbetween? ]
 unit-test
+
+[
+    { { 6 } }
+] [
+    { { 3 } } { { 2 } } m.
+] unit-test
+
+[
+    { { 11 } }
+] [
+    { { 1 3 } } { { 5 } { 2 } } m.
+] unit-test
+
+[
+    { { 28 } }
+] [
+    { { 2 4 6 } }
+
+    { { 1 }
+       { 2 }
+       { 3 } }
+    
+    m.
+] unit-test

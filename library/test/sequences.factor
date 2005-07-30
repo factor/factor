@@ -68,6 +68,9 @@ unit-test
 [ { 1 2 }   ] [ 1 2   2vector ] unit-test
 [ { 1 2 3 } ] [ 1 2 3 3vector ] unit-test
 
-[ { } ] [ { } seq-transpose ] unit-test
+[ { } ] [ { } flip ] unit-test
 
-[ [ 1 2 3 ] [ 3 4 5 ] [ 6 ] 3vector [ reverse ] map ] unit-test
+[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } <column> >vector ] unit-test
+
+[ { { 1 4 } { 2 5 } { 3 6 } } ]
+[ { { 1 2 3 } { 4 5 6 } } flip ] unit-test

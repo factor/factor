@@ -77,11 +77,7 @@ M: object apply-object apply-literal ;
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    active? [
-        [ unswons apply-object infer-quot ] when*
-    ] [
-        drop
-    ] ifte ;
+    [ active? [ apply-object t ] [ drop f ] ifte ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r

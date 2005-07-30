@@ -18,7 +18,7 @@ namespaces prettyprint sequences strings vectors words ;
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths seq-transpose [ unify-results ] map ;
+    unify-lengths flip [ unify-results ] map ;
 
 : balanced? ( in out -- ? )
     [ swap length swap length - ] 2map [ = ] every? ;

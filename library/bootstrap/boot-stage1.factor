@@ -32,6 +32,7 @@ parser prettyprint sequences io vectors words ;
         "/library/collections/growable.factor"
         "/library/collections/cons.factor"
         "/library/collections/vectors.factor"
+        "/library/collections/virtual-sequences.factor"
         "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"

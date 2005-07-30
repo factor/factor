@@ -14,6 +14,9 @@ SYMBOL: value-classes
 ! Current value --> literal mapping
 SYMBOL: value-literals
 
+! Maps ties to ties
+SYMBOL: ties
+
 GENERIC: apply-tie ( tie -- )
 
 M: f apply-tie ( f -- ) drop ;
@@ -38,9 +41,6 @@ TUPLE: literal-tie value literal ;
 M: literal-tie apply-tie ( tie -- )
     dup literal-tie-literal swap literal-tie-value
     set-value-literal ;
-
-! Maps ties to ties
-SYMBOL: ties
 
 GENERIC: infer-classes* ( node -- )
 

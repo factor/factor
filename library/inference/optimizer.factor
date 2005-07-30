@@ -192,7 +192,7 @@ SYMBOL: branch-returns
 
 : branch-values ( branches -- )
     [ last-node node-in-d ] map
-    unify-lengths seq-transpose branch-returns set ;
+    unify-lengths flip branch-returns set ;
 
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This

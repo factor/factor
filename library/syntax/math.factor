@@ -2,12 +2,11 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 
 IN: !syntax
-USING: kernel lists math matrices parser sequences syntax
-vectors ;
+USING: kernel lists math parser sequences syntax vectors ;
 
 ! Complex numbers
 : #{ f ; parsing
-: }# 2unlist swap rect> swons ; parsing
+: }# dup first swap second rect> swons ; parsing
 
 ! Reading integers in other bases
 : (BASE) ( base -- )
@@ -18,11 +17,3 @@ vectors ;
 : DEC: 10 (BASE) ; parsing
 : OCT: 8 (BASE) ; parsing
 : BIN: 2 (BASE) ; parsing
-
-! Matrices
-: M{ f ; parsing
-
-: }M
-    reverse
-    [ dup length swap car length ] keep
-    concat >vector <matrix> swons ; parsing

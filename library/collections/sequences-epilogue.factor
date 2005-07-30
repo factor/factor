@@ -4,19 +4,6 @@ IN: sequences
 USING: generic kernel kernel-internals lists math strings
 vectors ;
 
-! A reversal of an underlying sequence.
-TUPLE: reversed ;
-C: reversed [ set-delegate ] keep ;
-: reversed@ delegate [ length swap - 1 - ] keep ;
-M: reversed nth ( n seq -- elt ) reversed@ nth ;
-M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
-M: reversed thaw ( seq -- seq ) delegate reverse ;
-
-! A repeated sequence is the same element n times.
-TUPLE: repeated length object ;
-M: repeated length repeated-length ;
-M: repeated nth nip repeated-object ;
-
 ! Combinators
 M: object each ( seq quot -- )
     swap dup length [
@@ -102,8 +89,6 @@ M: object find ( seq quot -- i elt )
     [ 2drop t ] [ >r [ first ] keep r> all-with? ] ifte ; inline
 
 ! Operations
-M: object thaw clone ;
-
 M: object like drop ;
 
 M: object empty? ( seq -- ? ) length 0 = ;
@@ -217,12 +202,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! lexicographically.
     lexi 0 > ;
 
-: seq-transpose ( seq -- seq )
+: flip ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
-    dup empty? [
-        dup first length [ swap [ nth ] map-with ] map-with
-    ] unless ;
+    <flipped> [ dup like ] map ;
 
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
@@ -237,6 +220,8 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 : copy-into ( to from -- )
     dup length [ pick set-nth ] 2each drop ;
+
+M: flipped set-nth ( elt n flipped -- ) nth swap copy-into ;
 
 IN: kernel
 

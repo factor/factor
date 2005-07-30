@@ -10,15 +10,15 @@ IN: vectors
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ;
 
-M: repeated thaw >vector ;
+M: object thaw >vector ;
 
 M: vector clone ( vector -- vector ) >vector ;
 
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
 
-M: general-list thaw >vector ;
-
 M: general-list like drop >list ;
+
+M: range like drop >vector ;
 
 M: vector like drop >vector ;
 

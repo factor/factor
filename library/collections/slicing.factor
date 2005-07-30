@@ -4,46 +4,6 @@ IN: sequences
 USING: generic kernel kernel-internals lists math namespaces
 strings vectors ;
 
-! A range of integers.
-TUPLE: range from to step ;
-
-C: range ( from to -- range )
-    >r 2dup > -1 1 ? r>
-    [ set-range-step ] keep
-    [ set-range-to ] keep
-    [ set-range-from ] keep ;
-
-M: range length ( range -- n )
-    dup range-to swap range-from - abs ;
-
-M: range nth ( n range -- n )
-    [ range-step * ] keep range-from + ;
-
-M: range like ( seq range -- range )
-    drop >vector ;
-
-M: range thaw ( range -- seq )
-    >vector ;
-
-! A slice of another sequence.
-TUPLE: slice seq ;
-
-C: slice ( from to seq -- )
-    [ set-slice-seq ] keep
-    [ >r <range> r> set-delegate ] keep ;
-
-M: slice nth ( n slice -- obj )
-    [ delegate nth ] keep slice-seq nth ;
-
-M: slice set-nth ( obj n slice -- )
-    [ delegate nth ] keep slice-seq set-nth ;
-
-M: slice like ( seq slice -- seq )
-    slice-seq like ;
-
-M: slice thaw ( slice -- seq )
-    >vector ;
-
 : head-slice ( n seq -- slice )
     0 -rot <slice> ;
 
@@ -115,6 +75,7 @@ M: object tail ( index seq -- seq )
     [ head ] 2keep >r 1 + r> tail ;
 
 : group-advance subseq , >r tuck + swap r> ;
+
 : group-finish nip dup length swap subseq , ;
 
 : (group) ( start n seq -- )
