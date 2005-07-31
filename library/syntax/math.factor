@@ -6,7 +6,7 @@ USING: kernel lists math parser sequences syntax vectors ;
 
 ! Complex numbers
 : #{ f ; parsing
-: }# dup first swap second rect> swons ; parsing
+: }# dup second swap first rect> swons ; parsing
 
 ! Reading integers in other bases
 : (BASE) ( base -- )

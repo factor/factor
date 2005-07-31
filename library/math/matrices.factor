@@ -1,10 +1,11 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: matrices
-USING: errors generic kernel lists math namespaces sequences
-vectors ;
+IN: math
+USING: kernel sequences vectors ;
 
 ! Vectors
+: zero-vector ( n -- vector ) 0 <repeated> >vector ;
+
 : vneg ( v -- v ) [ neg ] map ;
 
 : n*v ( n v -- v ) [ * ] map-with ;
@@ -29,13 +30,12 @@ vectors ;
 
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product ( v -- n ) 1 [ * ] reduce ;
-: conj ( v -- ? ) [ ] all? ;
-: disj ( v -- ? ) [ ] contains? ;
 
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
-: v. ( v v -- x ) 0 -rot [ conjugate * + ] 2each ;
+: v. ( v v -- x ) 0 -rot [ * + ] 2each ; inline
+: c. ( v v -- x ) 0 -rot [ conjugate * + ] 2each ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
 
@@ -84,8 +84,8 @@ vectors ;
 : m>   ( m m -- m ) [ v> ]   2map ;
 : m>=  ( m m -- m ) [ v>= ]  2map ;
 
-: v.m ( v m -- v ) <flipped> [ v. ] map-with ;
-: m.v ( m v -- v ) swap [ v. ] map-with ;
-: m.  ( m m -- m ) >r <flipped> r> [ m.v ] map-with ;
+: v.m ( v m -- v ) <flipped> [ v. ] map-with ; inline
+: m.v ( m v -- v ) swap [ v. ] map-with ; inline
+: m.  ( m m -- m ) <flipped> swap [ m.v ] map-with ;
 
 : trace ( matrix -- tr ) 0 swap <diagonal> product ;

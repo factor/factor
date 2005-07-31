@@ -17,7 +17,7 @@ vocabularies
 
 <namespace> vocabularies set
 <namespace> typemap set
-num-types <vector> builtins set
+num-types empty-vector builtins set
 <namespace> crossref set
 
 vocabularies get [
@@ -33,11 +33,10 @@ vocabularies get [
         "infer-effect" set-word-prop
     ] ifte ;
 
-: make-primitive ( n { vocab word effect } -- n )
-    [ 2unseq create >r 1 + r> over f define ] keep
-    set-stack-effect ;
+: make-primitive ( { vocab word effect } n -- )
+    >r dup 2unseq create r> f define set-stack-effect ;
 
-2 {
+{
     { "execute" "words"                       [ [ word ] [ ] ] }
     { "call" "kernel"                         [ [ general-list ] [ ] ] }
     { "ifte" "kernel"                         [ [ object general-list general-list ] [ ] ] }
@@ -207,9 +206,9 @@ vocabularies get [
     { "fflush" "io-internals"                 [ [ alien ] [ ] ] }
     { "fclose" "io-internals"                 [ [ alien ] [ ] ] }
     { "expired?" "alien"                      [ [ object ] [ boolean ] ] }
-} [
+} dup length 3 swap [ + ] map-with [
     make-primitive
-] each drop
+] 2each
 
 ! These need a more descriptive comment.
 {

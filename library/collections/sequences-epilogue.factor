@@ -102,6 +102,9 @@ M: object empty? ( seq -- ? ) length 0 = ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
+: conj ( v -- ? ) [ ] all? ;
+: disj ( v -- ? ) [ ] contains? ;
+
 : index   ( obj seq -- n )     [ = ] find-with drop ;
 : index*  ( obj i seq -- n )   [ = ] find-with* drop ;
 : member? ( obj seq -- ? )     [ = ] contains-with? ;

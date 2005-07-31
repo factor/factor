@@ -74,6 +74,13 @@ M: no-method error. ( error -- )
 M: parse-error error. ( error -- )
     dup parse-dump  delegate error. ;
 
+M: bounds-error error. ( error -- )
+    "Sequence index out of bounds" print
+    "Sequence: " write dup bounds-error-seq .
+    "Minimum: 0" print
+    "Maximum: " write dup bounds-error-seq length .
+    "Requested: " write bounds-error-index . ;
+
 M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;

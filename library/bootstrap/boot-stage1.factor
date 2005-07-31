@@ -6,13 +6,13 @@ parser prettyprint sequences io vectors words ;
 
 "Bootstrap stage 1..." print
 
-"/library/bootstrap/primitives.factor" run-resource
-
 : pull-in ( list -- ) [ dup print parse-resource % ] each ;
+
+"/library/bootstrap/primitives.factor" run-resource
 
 ! The make-list form creates a boot quotation
 [
-    [
+    {
         "/version.factor"
 
         "/library/stack.factor"
@@ -114,7 +114,7 @@ parser prettyprint sequences io vectors words ;
         "/library/cli.factor"
         
         "/library/tools/memory.factor"
-    ] pull-in
+    } pull-in
 ] make-list
 
 "object" [ "generic" ] search
@@ -141,7 +141,7 @@ reveal
         recrossref
     ] %
 
-    [
+    {
         "/library/generic/generic.factor"
         "/library/generic/slots.factor"
         "/library/generic/object.factor"
@@ -153,7 +153,7 @@ reveal
         "/library/generic/tuple.factor"
     
         "/library/bootstrap/init.factor"
-    ] pull-in
+    } pull-in
 
     [
         "Building generics..." print

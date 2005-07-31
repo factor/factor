@@ -14,8 +14,6 @@ M: object thaw >vector ;
 
 M: vector clone ( vector -- vector ) >vector ;
 
-: zero-vector ( n -- vector ) 0 <repeated> >vector ;
-
 M: general-list like drop >list ;
 
 M: range like drop >vector ;

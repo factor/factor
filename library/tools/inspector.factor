@@ -25,7 +25,7 @@ M: array sheet unit ;
 
 M: hashtable sheet dup hash-keys swap hash-values 2list ;
 
-: column ( list -- list )
+: format-column ( list -- list )
     [ unparse ] map
     [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
@@ -33,7 +33,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2list ;
 : format-sheet ( sheet -- list )
     dup first length >vector swons
     dup peek over first [ set ] 2each
-    [ column ] map
+    [ format-column ] map
     flip
     [ " | " join ] map ;
 

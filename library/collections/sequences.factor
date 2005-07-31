@@ -66,3 +66,14 @@ G: find* ( i seq quot -- i elt | quot: elt -- ? )
 
 : 3unseq ( { x y z } -- x y z )
     dup first over second rot third ;
+
+TUPLE: bounds-error index seq ;
+: bounds-error <bounds-error> throw ;
+
+: growable-check ( n seq -- fx seq )
+    >r >fixnum dup 0 fixnum<
+    [ r> 2dup bounds-error ] [ r> ] ifte ; inline
+
+: bounds-check ( n seq -- fx seq )
+    growable-check 2dup length fixnum>=
+    [ 2dup bounds-error ] when ; inline

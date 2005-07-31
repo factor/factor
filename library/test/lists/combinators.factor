@@ -7,8 +7,6 @@ USE: test
 USE: strings
 USE: sequences
 
-[ { [ 3 2 1 ] [ 5 4 3 ] [ 6 ] } ]
-
 [ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
 [ "fdsfs" [ > ] sort ] unit-test-fails
