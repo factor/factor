@@ -86,10 +86,14 @@ M: node child-ties ( node -- seq )
     ] ifte ;
 
 M: #call infer-classes* ( node -- )
-    dup create-ties
-    dup node-param "infer-effect" word-prop 2unseq
-    pick node-out-d intersect-classes
-    swap node-in-d intersect-classes ;
+    dup node-param [
+        dup create-ties
+        dup node-param "infer-effect" word-prop 2unseq
+        pick node-out-d intersect-classes
+        swap node-in-d intersect-classes
+    ] [
+        drop
+    ] ifte ;
 
 M: #push infer-classes* ( node -- )
     node-out-d [ safe-literal? ] subset
@@ -117,10 +121,12 @@ DEFER: (infer-classes)
     ] 2each ;
 
 : (infer-classes) ( node -- )
-    dup infer-classes*
-    dup annotate-node
-    dup infer-children
-    node-successor [ (infer-classes) ] when* ;
+    [
+        dup infer-classes*
+        dup annotate-node
+        dup infer-children
+        node-successor (infer-classes)
+    ] when* ;
 
 : infer-classes ( node -- )
     [

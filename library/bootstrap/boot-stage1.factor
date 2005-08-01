@@ -93,6 +93,7 @@ parser prettyprint sequences io vectors words ;
         "/library/inference/partial-eval.factor"
         "/library/inference/class-infer.factor"
         "/library/inference/optimizer.factor"
+        "/library/inference/inline-methods.factor"
         "/library/inference/print-dataflow.factor"
         
         "/library/compiler/assembler.factor"

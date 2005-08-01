@@ -77,7 +77,9 @@ DEFER: optimize-node ( node -- node/t )
 : optimize ( dataflow -- dataflow )
     #! Remove redundant literals from the IR. The original IR
     #! is destructively modified.
-    dup kill-set over kill-node optimize-node
+    dup kill-set over kill-node
+    dup infer-classes
+    optimize-node
     [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
@@ -172,13 +174,6 @@ M: #call kill-node* ( literals node -- )
 : flip-branches ( #ifte -- )
     dup node-children 2unseq swap 2vector swap set-node-children ;
 
-M: #call optimize-node* ( node -- node )
-     dup optimize-not? [
-         node-successor dup flip-branches
-     ] [
-         [ node-param not ] prune-if
-     ] ifte ;
-
 ! #call-label
 M: #call-label can-kill* ( literal node -- ? )
      2drop t ;
@@ -258,7 +253,7 @@ M: #values can-kill* ( literal node -- ? )
     dup node-successor dup node-successor
     values/merge [ subst-values ] keep ;
 
-M: #values optimize-node* ( node -- node )
+M: #values optimize-node* ( node -- node ? )
     dup node-successor #merge? [ post-split ] [ drop t ] ifte ;
 
 ! #merge

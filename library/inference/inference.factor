@@ -39,7 +39,8 @@ SYMBOL: d-in
 
 : effect ( -- [[ in# out# ]] )
     #! After inference is finished, collect information.
-    d-in get length meta-d get length 2list ;
+    d-in get length object <repeated> >list
+    meta-d get length object <repeated> >list 2list ;
 
 : init-inference ( recursive-state -- )
     init-interpreter

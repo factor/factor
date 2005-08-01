@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: kernel sequences vectors ;
+USING: generic kernel sequences vectors ;
 
 ! Vectors
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
@@ -56,12 +56,24 @@ USING: kernel sequences vectors ;
     0 1 cross-minor 3vector ;
 
 ! Matrices
+
+! A diagonal of a matrix stored as a sequence of rows.
+TUPLE: diagonal index ;
+
+C: diagonal ( seq -- diagonal ) [ set-delegate ] keep ;
+
+: diagonal@ ( n diag -- n vec ) dupd delegate nth ;
+
+M: diagonal nth ( n diag -- elt ) diagonal@ nth ;
+
+M: diagonal set-nth ( elt n diag -- ) diagonal@ set-nth ;
+
 : zero-matrix ( m n -- matrix )
     swap [ drop zero-vector ] map-with ;
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    dup zero-matrix dup 0 <diagonal> [ drop 1 ] nmap ;
+    dup zero-matrix dup <diagonal> [ drop 1 ] nmap ;
 
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
@@ -88,4 +100,4 @@ USING: kernel sequences vectors ;
 : m.v ( m v -- v ) swap [ v. ] map-with ;
 : m.  ( m m -- m ) flip swap [ m.v ] map-with ;
 
-: trace ( matrix -- tr ) 0 <diagonal> product ;
+: trace ( matrix -- tr ) <diagonal> product ;

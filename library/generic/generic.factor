@@ -154,6 +154,12 @@ PREDICATE: compound generic ( word -- ? )
 
 M: generic definer drop \ G: ;
 
+PREDICATE: generic simple-generic ( word -- ? )
+    "picker" word-prop [ dup ] = ;
+
+PREDICATE: generic 2generic ( word -- ? )
+    "dispatcher" word-prop [ arithmetic-type ] = ;
+
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: typemap
 

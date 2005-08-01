@@ -91,16 +91,14 @@ M: word prettyprint* ( indent word -- indent )
         >r >r unparse. bl r> drop r> unparse.
     ] ifte ;
 
-M: list prettyprint* ( indent list -- indent )
+M: cons prettyprint* ( indent list -- indent )
    [
-       \ [ swap \ ] prettyprint-sequence
+       dup list? [
+           \ [ swap \ ]
+       ] [
+           \ [[ swap uncons 2list \ ]]
+       ] ifte prettyprint-sequence
    ] check-recursion ;
-
-M: cons prettyprint* ( indent cons -- indent )
-    #! Here we turn the cons into a list of two elements.
-    [
-        \ [[ swap uncons 2list \ ]] prettyprint-sequence
-    ] check-recursion ;
 
 M: vector prettyprint* ( indent vector -- indent )
     [

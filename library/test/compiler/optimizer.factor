@@ -1,4 +1,5 @@
 IN: temporary
+USING: generic kernel-internals strings vectors ;
 USE: test
 USE: assembler
 USE: compiler
@@ -73,3 +74,28 @@ USE: sequences
     [ 1 2 3 ] >r + r> drop ; compiled
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
+
+[ t ] [
+    \ string
+    [ range repeated integer string mirror array reversed sbuf
+    slice vector diagonal general-list ]
+    min-class?
+] unit-test
+
+[ f ] [
+    \ fixnum
+    [ fixnum integer letter ]
+    min-class?
+] unit-test
+
+[ t ] [
+    \ fixnum
+    [ fixnum integer object ]
+    min-class?
+] unit-test
+
+[ f ] [
+    \ fixnum
+    [ integer object ]
+    min-class?
+] unit-test

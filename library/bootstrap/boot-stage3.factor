@@ -41,7 +41,6 @@ compile? [
     \ = compile
     \ unparse compile
     \ scan compile
-    \ optimize compile
     \ (generate) compile
 ] when
 

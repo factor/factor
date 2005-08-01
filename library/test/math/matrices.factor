@@ -92,13 +92,6 @@ unit-test
 [ { { 1 2 } { 3 4 } { 5 6 } } flip ]
 unit-test
 
-[
-    { { 7 } { 4 8 } { 1 5 9 } { 2 6 } { 3 } }
-] [
-    { { 1 2 3 } { 4 5 6 } { 7 8 9 } }
-    5 [ 2 - <diagonal> >vector ] map-with
-] unit-test
-
 [ { t t t } ]
 [ { 1 2 3 } { -1 -2 -3 } { 4 5 6 } vbetween? ]
 unit-test
