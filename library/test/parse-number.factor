@@ -1,9 +1,9 @@
 IN: temporary
-USE: math
-USE: parser
-USE: strings
-USE: test
-USE: unparser
+USING: errors kernel math parser test unparser ;
+
+: parse-number ( str -- num )
+    #! Convert a string to a number; return f on error.
+    [ str>number ] [ [ drop f ] when ] catch ;
 
 [ f ]
 [ f parse-number ]

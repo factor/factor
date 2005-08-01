@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: interpreter kernel namespaces words ;
+USING: interpreter kernel namespaces sequences words ;
 
 \ >r [
     \ >r #call
@@ -19,9 +19,17 @@ USING: interpreter kernel namespaces words ;
     node,
 ] "infer" set-word-prop
 
+: with-datastack ( stack word -- stack )
+    datastack >r >r set-datastack r> execute
+    datastack r> [ push ] keep set-datastack 2nip ;
+
+: apply-datastack ( word -- )
+    meta-d [ swap with-datastack ] change ;
+
 : infer-shuffle ( word -- )
     dup #call [
-        over "infer-effect" word-prop [ host-word ] hairy-node
+        over "infer-effect" word-prop
+        [ apply-datastack ] hairy-node
     ] keep node, ;
 
 \ drop [ 1 #drop node, pop-d drop ] "infer" set-word-prop

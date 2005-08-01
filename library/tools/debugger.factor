@@ -87,13 +87,11 @@ M: object error. ( error -- ) . ;
 
 : :s ( -- ) "error-datastack"  get reverse [.] ;
 : :r ( -- ) "error-callstack"  get reverse [.] ;
-: :n ( -- ) "error-namestack"  get [.] ;
-: :c ( -- ) "error-catchstack" get [.] ;
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r :n :c ] [ unparse. bl ] each
+    [ :s :r ] [ unparse. bl ] each
     "show stacks at time of error." print
     \ :get unparse.
     " ( var -- value ) inspects the error namestack." print ;

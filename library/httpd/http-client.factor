@@ -6,7 +6,7 @@ io strings unparser ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.
-    ":" split1 [ parse-number ] [ 80 ] ifte* ;
+    ":" split1 [ str>number ] [ 80 ] ifte* ;
 
 : parse-url ( url -- host resource )
     "http://" ?head [
@@ -16,7 +16,7 @@ io strings unparser ;
 
 : parse-response ( line -- code )
     "HTTP/" ?head [ " " split1 nip ] when
-    " " split1 drop parse-number ;
+    " " split1 drop str>number ;
 
 : read-response ( -- code header )
     #! After sending a GET oR POST we read a response line and

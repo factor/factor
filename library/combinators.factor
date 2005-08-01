@@ -1,6 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
+USING: words ;
 
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
@@ -62,3 +63,6 @@ IN: kernel
 : with ( obj quot elt -- obj quot )
     #! Utility word for each-with, map-with.
     pick pick >r >r swap call r> r> ; inline
+
+: keep-datastack ( quot -- )
+    datastack slip set-datastack drop ;

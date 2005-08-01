@@ -8,17 +8,15 @@ TUPLE: testing x y z ;
 
 [ ] [
     num-types [
-        [
-            builtin-type [
-                dup \ cons = [
-                    ! too many conses!
-                    drop
-                ] [
-                    "predicate" word-prop instances [
-                        class drop
-                    ] each
-                ] ifte
-            ] when*
-        ] keep
-    ] repeat
+        builtin-type [
+            dup \ cons = [
+                ! too many conses!
+                drop
+            ] [
+                "predicate" word-prop instances [
+                    class drop
+                ] each
+            ] ifte
+        ] when*
+    ] each
 ] unit-test

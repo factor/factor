@@ -92,6 +92,16 @@ M: very-funny gooey sq ;
 
 [ cons ] [ [ 1 2 ] class ] unit-test
 
+[ t ] [ \ fixnum \ integer class< ] unit-test
+[ t ] [ \ fixnum \ fixnum class< ] unit-test
+[ f ] [ \ integer \ fixnum class< ] unit-test
+[ t ] [ \ integer \ object class< ] unit-test
+[ f ] [ \ integer \ null class< ] unit-test
+[ t ] [ \ null \ object class< ] unit-test
+[ t ] [ \ list \ general-list class< ] unit-test
+[ t ] [ \ list \ object class< ] unit-test
+[ t ] [ \ null \ list class< ] unit-test
+
 [ t ] [ \ generic \ compound class< ] unit-test
 [ f ] [ \ compound \ generic class< ] unit-test
 

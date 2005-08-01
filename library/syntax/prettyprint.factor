@@ -139,8 +139,6 @@ M: alien prettyprint* ( alien -- str )
 
 : .s datastack  reverse [.] flush ;
 : .r callstack  reverse [.] flush ;
-: .n namestack  [.] flush ;
-: .c catchstack [.] flush ;
 
 ! For integers only
 : .b >bin print ;

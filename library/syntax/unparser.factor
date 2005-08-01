@@ -98,6 +98,3 @@ M: f unparse drop "f" ;
 
 M: dll unparse ( obj -- str )
     [ "DLL\" " % dll-path unparse-string CHAR: " , ] make-string ;
-
-: hex-string ( str -- str )
-    [ [ >hex 2 CHAR: 0 pad-left % ] each ] make-string ;

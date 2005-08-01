@@ -195,6 +195,10 @@ M: real iterate drop ;
 [ [ 2 1 ] ] [ [ remove ] infer ] unit-test
 [ [ 1 1 ] ] [ [ prune ] infer ] unit-test
 
+: bad-code "1234" car ;
+
+[ [ 0 1 ] ] [ [ bad-code ] infer ] unit-test
+
 ! Type inference
 
 ! [ [ [ object ] [ ] ] ] [ [ drop ] infer ] unit-test

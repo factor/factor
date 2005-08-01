@@ -3,7 +3,7 @@ USING: compiler kernel math sequences test vectors ;
 ! http://inferno.bell-labs.com/cm/cs/who/bwk/interps/pap.html
 
 : fill-vector ( n -- vector )
-    dup <vector> swap [ [ dup pick set-nth ] keep ] repeat ; compiled
+    dup <vector> swap [ dup pick set-nth ] each ; compiled
 
 : copy-elt ( vec-y vec-x n -- )
     #! Copy nth element from vec-x to vec-y.

@@ -70,7 +70,7 @@ unit-test
 
 [ { } ] [ { } flip ] unit-test
 
-[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } <column> >vector ] unit-test
+[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } flip nth ] unit-test
 
 [ { { 1 4 } { 2 5 } { 3 6 } } ]
 [ { { 1 2 3 } { 4 5 6 } } flip ] unit-test

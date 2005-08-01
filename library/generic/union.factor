@@ -18,11 +18,9 @@ union [
     "members" word-prop [ >r 3dup r> add-method ] each 3drop
 ] "add-method" set-word-prop
 
-union 55 "priority" set-word-prop
+union 50 "priority" set-word-prop
 
-union [
-    swap builtin-supertypes swap builtin-supertypes contained?
-] "class<" set-word-prop
+union [ (class<) ] "class<" set-word-prop
 
 : union-predicate ( definition -- list )
     [

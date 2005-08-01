@@ -1,11 +1,13 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: kernel lists math memory namespaces parser words vectors
-hashtables generic alien assembler compiler errors files generic
-io-internals kernel kernel-internals lists math math-internals
-parser profiler strings unparser vectors words hashtables
-sequences ;
+USING: alien assembler compiler errors files generic generic
+hashtables hashtables io io-internals kernel kernel
+kernel-internals lists lists math math math-internals memory
+namespaces parser parser profiler sequences strings unparser
+vectors vectors words words ;
+
+"Creating primitives and basic runtime structures..." print
 
 ! This symbol needs the same hashcode in the target as in the
 ! host.

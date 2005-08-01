@@ -32,14 +32,23 @@ M: object delegate drop f ;
 : set-vtable ( definition class vtable -- )
     >r "builtin-type" word-prop r> set-nth ;
 
+: 2types ( class class -- seq seq )
+    swap builtin-supertypes swap builtin-supertypes ;
+
+: (class<) ( class class -- ? )
+    2types contained? ;
+
 : class-ord ( class -- n ) metaclass "priority" word-prop ;
+
+: metaclass= ( class class -- ? )
+    swap metaclass swap metaclass = ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
-    over metaclass over metaclass = [
-        dup metaclass "class<" word-prop call
+    over class-ord over class-ord - dup 0 = [
+        drop dup metaclass "class<" word-prop call
     ] [
-        swap class-ord swap class-ord <
+        0 < 2nip
     ] ifte ;
 
 : methods ( generic -- alist )
@@ -155,9 +164,15 @@ SYMBOL: object
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
-    swap builtin-supertypes
-    swap builtin-supertypes
-    seq-union lookup-union ;
+    2dup class< [
+        nip
+    ] [
+        2dup swap class< [
+            drop
+        ] [
+            2types seq-union lookup-union
+        ] ifte
+    ] ifte ;
 
 : class-or-list ( list -- class )
     #! Return a class that every class in the list is a
@@ -169,8 +184,15 @@ SYMBOL: object
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
-    swap builtin-supertypes swap builtin-supertypes
-    seq-intersect lookup-union ;
+    2dup class< [
+        drop
+    ] [
+        2dup swap class< [
+            nip 
+        ] [
+            2types seq-intersect lookup-union
+        ] ifte
+    ] ifte ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop

@@ -4,36 +4,24 @@ IN: parser
 USING: kernel lists namespaces sequences io ;
 
 : file-vocabs ( -- )
-    "file-in" get "in" set
-    "file-use" get "use" set ;
+    "scratchpad" "in" set
+    [ "syntax" "scratchpad" ] "use" set ;
 
-: (parse-stream) ( name stream -- quot )
-    #! Uses the current namespace for temporary variables.
-    [
-        >r file set f ( initial parse tree ) r>
-        [ (parse) ] read-lines reverse
-        file off
-        line-number off
-    ] with-parser ;
+: (parse-stream) ( stream -- quot )
+    [ f swap [ (parse) ] read-lines reverse ] with-parser ;
 
 : parse-stream ( name stream -- quot )
-    [ file-vocabs (parse-stream) ] with-scope ;
+    [
+        swap file set file-vocabs
+        (parse-stream)
+        file off line-number off
+    ] with-scope ;
 
 : parse-file ( file -- quot )
     dup <file-reader> parse-stream ;
 
 : run-file ( file -- )
-    #! Run a file. The file is read with the default IN:/USE:
-    #! for files.
     parse-file call ;
-
-: (parse-file) ( file -- quot )
-    dup <file-reader> (parse-stream) ;
-
-: (run-file) ( file -- )
-    #! Run a file. The file is read with the same IN:/USE: as
-    #! the current interactive interpreter.
-    (parse-file) call ;
 
 : parse-resource ( path -- quot )
     #! Resources are loaded from the resource-path variable, or

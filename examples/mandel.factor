@@ -87,12 +87,10 @@ USE: test
 : val 0.85 ;
 
 : <color-map> ( nb-cols -- map )
-    [
-        dup [
-            dup 360 * pick 1 + / 360 / sat val
-            hsv>rgb 1.0 scale-rgb ,
-        ] repeat
-    ] make-vector nip ;
+    dup [
+        360 * swap 1 + / 360 / sat val
+        hsv>rgb 1.0 scale-rgb
+    ] map-with ;
 
 : iter ( c z nb-iter -- x )
     over absq 4 >= over 0 = or [

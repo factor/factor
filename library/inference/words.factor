@@ -52,7 +52,7 @@ hashtables parser prettyprint ;
         word-def infer-quot
     ] ifte ;
 
-: (infer-compound) ( word base-case -- effect )
+: infer-compound ( word base-case -- effect )
     #! Infer a word's stack effect in a separate inferencer
     #! instance.
     [
@@ -62,66 +62,47 @@ hashtables parser prettyprint ;
         effect
     ] with-scope [ consume/produce ] keep ;
 
-: infer-compound ( word -- )
+GENERIC: apply-word
+
+M: object apply-word ( word -- )
+    #! A primitive with an unknown stack effect.
+    no-effect ;
+
+M: compound apply-word ( word -- )
+    #! Infer a compound word's stack effect.
     [
-        dup f (infer-compound) "infer-effect" set-word-prop
+        dup f infer-compound "infer-effect" set-word-prop
     ] [
         [ swap t "no-effect" set-word-prop rethrow ] when*
     ] catch ;
 
-GENERIC: (apply-word)
-
-M: object (apply-word) ( word -- )
-    #! A primitive with an unknown stack effect.
-    no-effect ;
-
-M: primitive (apply-word) ( word -- )
-    dup "infer-effect" word-prop [
-        consume/produce
-    ] [
-        no-effect
-    ] ifte ;
-
-M: compound (apply-word) ( word -- )
-    #! Infer a compound word's stack effect.
+: apply-default ( word -- )
     dup "no-effect" word-prop [
         no-effect
     ] [
-        infer-compound
+        dup "infer-effect" word-prop [
+            over "infer" word-prop [
+                swap car ensure-d call drop
+            ] [
+                consume/produce
+            ] ifte*
+        ] [
+            apply-word
+        ] ifte*
     ] ifte ;
 
-M: symbol (apply-word) ( word -- )
-    apply-literal ;
-
-GENERIC: apply-word
-
-: apply-default ( word -- )
-    dup "infer-effect" word-prop [
-        over "infer" word-prop [
-            swap car ensure-d call drop
-        ] [
-            consume/produce
-        ] ifte*
-    ] [
-        (apply-word)
-    ] ifte* ;
-
-M: word apply-word ( word -- )
+M: word apply-object ( word -- )
     apply-default ;
 
-M: compound apply-word ( word -- )
-    dup "inline" word-prop [
-        inline-compound
-    ] [
-        apply-default
-    ] ifte ;
+M: symbol apply-object ( word -- )
+    apply-literal ;
 
 : (base-case) ( word label -- )
     over "inline" word-prop [
         over inline-block drop
         [ #call-label ] [ #call ] ?ifte node,
     ] [
-        drop dup t (infer-compound) "base-case" set-word-prop
+        drop dup t infer-compound "base-case" set-word-prop
     ] ifte ;
 
 : base-case ( word label -- )
@@ -151,12 +132,16 @@ M: compound apply-word ( word -- )
         ] ifte*
     ] ifte* ;
 
-M: word apply-object ( word -- )
+M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
-        apply-word
+        dup "inline" word-prop [
+            inline-compound
+        ] [
+            apply-default
+        ] ifte
     ] ifte* ;
 
 \ call [

@@ -34,7 +34,7 @@ USING: kernel sequences vectors ;
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
-: v. ( v v -- x ) 0 -rot [ * + ] 2each ; inline
+: v. ( v v -- x ) 0 -rot [ * + ] 2each ;
 : c. ( v v -- x ) 0 -rot [ conjugate * + ] 2each ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
@@ -61,7 +61,7 @@ USING: kernel sequences vectors ;
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    dup zero-matrix 0 over <diagonal> [ drop 1 ] nmap ;
+    dup zero-matrix dup 0 <diagonal> [ drop 1 ] nmap ;
 
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
@@ -84,8 +84,8 @@ USING: kernel sequences vectors ;
 : m>   ( m m -- m ) [ v> ]   2map ;
 : m>=  ( m m -- m ) [ v>= ]  2map ;
 
-: v.m ( v m -- v ) <flipped> [ v. ] map-with ; inline
-: m.v ( m v -- v ) swap [ v. ] map-with ; inline
-: m.  ( m m -- m ) <flipped> swap [ m.v ] map-with ;
+: v.m ( v m -- v ) flip [ v. ] map-with ;
+: m.v ( m v -- v ) swap [ v. ] map-with ;
+: m.  ( m m -- m ) flip swap [ m.v ] map-with ;
 
-: trace ( matrix -- tr ) 0 swap <diagonal> product ;
+: trace ( matrix -- tr ) 0 <diagonal> product ;

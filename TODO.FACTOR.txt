@@ -86,7 +86,6 @@
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue
 - instances: do not use make-list
-- unions containing tuples do not work properly
 - method doc strings
 - clean up metaclasses
 - vectors: ensure its ok with bignum indices

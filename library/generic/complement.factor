@@ -17,20 +17,14 @@ complement [
 complement [
     ( generic vtable definition class -- )
     drop num-types [
-        [
-            >r 3dup r> builtin-type
-            dup [ add-method ] [ 2drop 2drop ] ifte
-        ] keep
-    ] repeat 3drop
+        >r 3dup r> builtin-type
+        dup [ add-method ] [ 2drop 2drop ] ifte
+    ] each 3drop
 ] "add-method" set-word-prop
 
-complement 90 "priority" set-word-prop
+complement 50 "priority" set-word-prop
 
-complement [
-    swap "complement" word-prop
-    swap "complement" word-prop
-    class< not
-] "class<" set-word-prop
+complement [ (class<) ] "class<" set-word-prop
 
 : complement-predicate ( complement -- list )
     "predicate" word-prop [ not ] append ;

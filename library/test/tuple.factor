@@ -81,3 +81,9 @@ TUPLE: delegate-clone ;
 
 [ << delegate-clone << empty f >> >> ]
 [ << delegate-clone << empty f >> >> clone ] unit-test
+
+[ t ] [ \ null \ delegate-clone class< ] unit-test
+[ f ] [ \ object \ delegate-clone class< ] unit-test
+[ f ] [ \ object \ delegate-clone class< ] unit-test
+[ t ] [ \ delegate-clone \ tuple class< ] unit-test
+[ f ] [ \ tuple \ delegate-clone class< ] unit-test

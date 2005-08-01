@@ -178,6 +178,9 @@ SYMBOL: old-d
 : get-block ( string num -- string )
     64 * dup 64 + rot subseq ;
 
+: hex-string ( str -- str )
+    [ >hex 2 CHAR: 0 pad-left ] map concat ;
+
 : get-md5 ( -- str )
     [
         [ a b c d ] [ get 4 >le % ] each

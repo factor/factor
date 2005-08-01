@@ -197,9 +197,11 @@ tuple [
     drop tuple "builtin-type" word-prop unit
 ] "builtin-supertypes" set-word-prop
 
-tuple 10 "priority" set-word-prop
+tuple 50 "priority" set-word-prop
 
-tuple [ 2drop t ] "class<" set-word-prop
+tuple [
+    2dup metaclass= [ = ] [ 2drop f ] ifte
+] "class<" set-word-prop
 
 PREDICATE: word tuple-class metaclass tuple = ;
 

@@ -76,13 +76,6 @@ vectors ;
     m.v
 ] unit-test
 
-[
-    { { 8 2 3 } { 9 5 6 } }
-] [
-    { { 1 2 3 } { 4 5 6 } } clone
-    dup <flipped> { 8 9 } 0 rot set-nth 
-] unit-test
-
 [ { 0 0 1 } ] [ { 1 0 0 } { 0 1 0 } cross ] unit-test
 [ { 1 0 0 } ] [ { 0 1 0 } { 0 0 1 } cross ] unit-test
 [ { 0 1 0 } ] [ { 0 0 1 } { 1 0 0 } cross ] unit-test
@@ -103,7 +96,7 @@ unit-test
     { { 7 } { 4 8 } { 1 5 9 } { 2 6 } { 3 } }
 ] [
     { { 1 2 3 } { 4 5 6 } { 7 8 9 } }
-    5 [ 2 - swap <diagonal> >vector ] map-with
+    5 [ 2 - <diagonal> >vector ] map-with
 ] unit-test
 
 [ { t t t } ]

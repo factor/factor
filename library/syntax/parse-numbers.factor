@@ -41,10 +41,6 @@ PREDICATE: string potential-float CHAR: . swap member? ;
 M: potential-float str>number ( str -- num )
     str>float ;
 
-: parse-number ( str -- num )
-    #! Convert a string to a number; return f on error.
-    [ str>number ] [ [ drop f ] when ] catch ;
-
 : bin> 2 base> ;
 : oct> 8 base> ;
 : dec> 10 base> ;

@@ -208,7 +208,9 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 : flip ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
-    <flipped> [ dup like ] map ;
+    dup empty? [
+        dup first length [ swap [ nth ] map-with ] map-with
+    ] unless ;
 
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
@@ -223,8 +225,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 : copy-into ( to from -- )
     dup length [ pick set-nth ] 2each drop ;
-
-M: flipped set-nth ( elt n flipped -- ) nth swap copy-into ;
 
 IN: kernel
 

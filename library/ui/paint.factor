@@ -144,12 +144,10 @@ SYMBOL: bevel-2
 M: bevel draw-boundary ( gadget boundary -- )
     #! Ugly code.
     bevel-width [
-        [
-            >r origin get over rectangle-dim over v+ r>
-            { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
-            rot draw-bevel
-        ] 2keep
-    ] repeat drop ;
+        >r origin get over rectangle-dim over v+ r>
+        { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
+        rot draw-bevel
+    ] each-with ;
 
 M: gadget draw-gadget* ( gadget -- )
     dup

@@ -17,14 +17,6 @@ sequences io strings vectors words ;
     #! executing quotation.
     meta-cf get . meta-executing get . meta-r get reverse [.] ;
 
-: &n
-    #! Print stepper name stack.
-    meta-n get [.] ;
-
-: &c
-    #! Print stepper catch stack.
-    meta-c get [.] ;
-
 : &get ( var -- value )
     #! Get stepper variable value.
     meta-n get (get) ;
@@ -50,7 +42,7 @@ sequences io strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r &n &c ] [ unparse. bl ] each
+    [ &s &r ] [ unparse. bl ] each
     "show stepper stacks." print
     \ &get unparse.
     " ( var -- value ) inspects the stepper namestack." print

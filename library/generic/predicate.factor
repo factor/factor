@@ -31,13 +31,17 @@ predicate [
     ] each 2drop 2drop
 ] "add-method" set-word-prop
 
-predicate 5 "priority" set-word-prop
+predicate 50 "priority" set-word-prop
 
 predicate [
     2dup = [
         2drop t
     ] [
-        >r "superclass" word-prop r> class<
+        2dup metaclass= [
+            >r "superclass" word-prop r> class<
+        ] [
+            2drop f
+        ] ifte
     ] ifte
 ] "class<" set-word-prop
 

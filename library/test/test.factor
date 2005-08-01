@@ -17,8 +17,6 @@ M: assert error.
 : print-test ( input output -- )
     "--> " write 2list . flush ;
 
-: keep-datastack ( quot -- ) datastack slip set-datastack drop ;
-
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
     #! execute it.
@@ -80,7 +78,7 @@ SYMBOL: failures
         "combinators"
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
-        "parse-number" "image" "init" "io/io"
+        "parse-number" "init" "io/io"
         "listener" "vectors" "words" "unparser" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"

@@ -107,6 +107,17 @@ M: object apply-object apply-literal ;
     #! Stack effect of a quotation.
     [ infer-quot effect ] with-infer ;
 
+: infer-from ( quot stack -- effect )
+    #! Infer starting from a stack of values.
+    [ meta-d set infer-quot effect ] with-infer ;
+
+: (dataflow) ( quot -- dataflow )
+    infer-quot #return node, dataflow-graph get ;
+
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.
-    [ infer-quot #return node, dataflow-graph get ] with-infer ;
+    [ (dataflow) ] with-infer ;
+
+: dataflow-with ( quot stack -- effect )
+    #! Infer starting from a stack of values.
+    [ meta-d set (dataflow) ] with-infer ;

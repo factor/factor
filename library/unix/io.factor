@@ -29,9 +29,7 @@ USING: namespaces ;
     swap -5 shift set-alien-unsigned-4 ;
 
 : clear-bits ( alien len -- )
-    bit-length [
-        0 pick pick set-alien-unsigned-cell
-    ] repeat drop ;
+    bit-length [ 0 -rot set-alien-unsigned-cell ] each-with ;
 
 ! Global variables
 SYMBOL: read-fdset

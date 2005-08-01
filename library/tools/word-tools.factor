@@ -8,7 +8,7 @@ hashtables parser ;
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names
     #! contain a string.
-    words [ word-name dupd subseq? ] subset nip ;
+    words [ word-name subseq? ] subset-with ;
 
 : vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.

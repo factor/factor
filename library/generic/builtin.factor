@@ -22,7 +22,7 @@ builtin [
 builtin 50 "priority" set-word-prop
 
 ! All builtin types are equivalent in ordering
-builtin [ 2drop t ] "class<" set-word-prop
+builtin [ (class<) ] "class<" set-word-prop
 
 : builtin-predicate ( class predicate -- )
     2dup register-predicate

@@ -51,9 +51,6 @@ SYMBOL: responders
         "raw-query" get [ CHAR: ? , % ] when*
     ] make-string redirect ;
 
-: content-length ( alist -- length )
-    "Content-Length" swap assoc parse-number ;
-
 : query>alist ( query -- alist )
     dup [
         "&" split [
@@ -64,7 +61,8 @@ SYMBOL: responders
     ] when ;
 
 : read-post-request ( header -- alist )
-    content-length dup [ read query>alist ] when ;
+    "Content-Length" swap assoc dup
+    [ str>number read query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [

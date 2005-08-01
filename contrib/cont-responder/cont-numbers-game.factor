@@ -69,7 +69,7 @@ USE: namespaces
         </form>
       </body>
     </html>
-  ] show [ "num" get ] bind parse-number ;
+  ] show [ "num" get ] bind str>number ;
 
 : guess-banner
   "I'm thinking of a number between 0 and 100." web-print ;

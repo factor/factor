@@ -12,7 +12,7 @@ USE: sequences
 
 : silly-key/value dup dup * swap ;
 
-1000 [ [ silly-key/value "testhash" get set-hash ] keep ] repeat
+1000 [ silly-key/value "testhash" get set-hash ] each
 
 [ f ]
 [ 1000 >list [ silly-key/value "testhash" get hash = not ] subset ]

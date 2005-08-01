@@ -27,6 +27,8 @@ SYMBOL: boot-quot
 
 : emit ( cell -- ) image get push ;
 
+: emit-seq ( seq -- ) image get swap nappend ;
+
 : fixup ( value offset -- ) image get set-nth ;
 
 ( Object memory )
@@ -95,14 +97,6 @@ GENERIC: ' ( obj -- ptr )
 : align-here ( -- )
     here 8 mod 4 = [ 0 emit ] when ;
 
-( Remember what objects we've compiled )
-
-: pooled-object ( object -- pointer )
-    "objects" get hash ;
-
-: pool-object ( object pointer -- )
-    swap "objects" get set-hash ;
-
 ( Fixnums )
 
 : emit-fixnum ( n -- ) fixnum-tag immediate emit ;
@@ -148,7 +142,7 @@ M: f ' ( obj -- ptr )
 
 ( Words )
 
-: word, ( word -- )
+: emit-word ( word -- )
     [
         word-type >header ,
         dup hashcode fixnum-tag immediate ,
@@ -157,7 +151,7 @@ M: f ' ( obj -- ptr )
         dup word-def ' ,
         dup word-props ' ,
     ] make-vector
-    swap object-tag here-as pool-object
+    swap object-tag here-as swap "objects" get set-hash
     [ emit ] each ;
 
 : word-error ( word msg -- )
@@ -169,16 +163,18 @@ M: f ' ( obj -- ptr )
     dup dup word-name swap word-vocabulary unit search
     [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
 
+: pooled-object ( object -- ptr ) "objects" get hash ;
+
 : fixup-word ( word -- offset )
-    dup pooled-object [ ] [ "Not in image: " word-error ] ?ifte ;
+    dup pooled-object
+    [ ] [ "Not in image: " word-error ] ?ifte ;
 
 : fixup-words ( -- )
-    image get [
-        dup word? [ fixup-word ] when
-    ] map image set ;
+    image get [ dup word? [ fixup-word ] when ] nmap ;
 
 M: word ' ( word -- pointer )
-    transfer-word dup pooled-object dup [ nip ] [ drop ] ifte ;
+    transfer-word dup pooled-object
+    dup [ nip ] [ drop ] ifte ;
 
 ( Conses )
 
@@ -189,37 +185,25 @@ M: cons ' ( c -- tagged )
 
 ( Strings )
 
-: align-string ( n str -- )
-    tuck length - CHAR: \0 fill append ;
+: emit-chars ( seq -- )
+    "big-endian" get [ [ reverse ] map ] unless
+    [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
-: emit-chars ( str -- )
-    "big-endian" get [ reverse ] unless
-    0 swap [ swap 16 shift + ] each emit ;
+: pack-string ( string -- seq )
+    dup length 1 + char align CHAR: \0 pad-right char swap group ;
 
-: (pack-string) ( n list -- )
-    #! Emit bytes for a string, with n characters per word.
-    [
-        2dup length > [ dupd align-string ] when
-        emit-chars
-    ] each drop ;
-
-: pack-string ( string -- )
-    char tuck swap group (pack-string) ;
-
-: emit-string ( string -- )
+: emit-string ( string -- ptr )
     object-tag here-as swap
     string-type >header emit
     dup length emit-fixnum
     dup hashcode emit-fixnum
-    "\0" append pack-string
+    pack-string emit-chars
     align-here ;
 
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    dup pooled-object [ ] [
-        dup emit-string dup >r pool-object r>
-    ] ?ifte ;
+    "objects" get [ emit-string ] cache ;
 
 ( Arrays and vectors )
 
@@ -228,7 +212,7 @@ M: string ' ( string -- pointer )
     object-tag here-as >r
     >header emit
     dup length emit-fixnum
-    ( elements -- ) [ emit ] each
+    ( elements -- ) emit-seq
     align-here r> ;
 
 M: tuple ' ( tuple -- pointer )
@@ -255,31 +239,17 @@ M: vector ' ( vector -- pointer )
     align-here r> ;
 
 M: hashtable ' ( hashtable -- pointer )
-    #! Only hashtables are pooled, not vectors!
-    dup pooled-object [ ] [
-        dup emit-hashtable [ pool-object ] keep
-    ] ?ifte ;
+    "objects" get [ emit-hashtable ] cache ;
 
 ( End of the image )
 
-: vocabulary, ( hash -- )
-    dup hashtable? [
-        [ cdr dup word? [ word, ] [ drop ] ifte ] hash-each
-    ] [
-        drop
-    ] ifte ;
-
-: vocabularies, ( vocabularies -- )
-    [ cdr vocabulary, ] hash-each ;
+: words, ( -- )
+    all-words [ emit-word ] each ;
 
 : global, ( -- )
-    vocabularies get
-    dup vocabularies,
     <namespace> [
-        vocabularies set
-        typemap [ ] change
-        builtins [ ] change
-        crossref [ ] change
+        { vocabularies typemap builtins crossref }
+        [ [ ] change ] each
     ] extend '
     global-offset fixup ;
 
@@ -287,8 +257,13 @@ M: hashtable ' ( hashtable -- pointer )
     boot-quot get swap append ' boot-quot-offset fixup ;
 
 : end ( quot -- )
+    "Generating words..." print
+    words,
+    "Generating global namespace..." print
     global,
+    "Generating boot quotation..." print
     boot,
+    "Performing some word fixups..." print
     fixup-words
     here base - heap-size-offset fixup ;
 
@@ -302,6 +277,7 @@ M: hashtable ' ( hashtable -- pointer )
     ] ifte ;
 
 : write-image ( image file -- )
+    "Writing image to " write dup write "..." print
     <file-writer> [ (write-image) ] with-stream ;
 
 : with-minimal-image ( quot -- image )
@@ -317,7 +293,7 @@ M: hashtable ' ( hashtable -- pointer )
     [ begin call end ] with-minimal-image ;
 
 : make-image ( name -- )
-    #! Make an image for the C interpreter.
+    #! Make a bootstrap image.
     [
         boot-quot off
         "/library/bootstrap/boot-stage1.factor" run-resource

@@ -81,10 +81,6 @@ SYMBOL: vocabularies
     dup word-name over word-vocabulary vocab ?hash eq? ;
 
 : init-search-path ( -- )
-    ! For files
-    "scratchpad" "file-in" set
-    [ "syntax" "scratchpad" ] "file-use" set
-    ! For interactive
     "scratchpad" "in" set
     [
         "compiler" "errors" "gadgets" "generic"

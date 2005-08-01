@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic interpreter kernel lists math namespaces
+USING: errors generic interpreter kernel lists math namespaces
 sequences words ;
 
 : literal-inputs? ( in stack -- )
@@ -22,10 +22,13 @@ sequences words ;
 : infer-eval ( word -- )
     dup partial-eval? [
         dup "infer-effect" word-prop 2unlist
-        >r length meta-d get
-        literal-inputs
-        host-word
-        r> length meta-d get literal-outputs
+        -rot length meta-d get
+        literal-inputs [
+            apply-datastack
+        ] [
+            [ "infer-effect" word-prop consume/produce ]
+            [ length meta-d get literal-outputs ] ifte
+        ] catch
     ] [
         dup "infer-effect" word-prop consume/produce
     ] ifte ;
@@ -75,7 +78,7 @@ sequences words ;
 \ <= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
 \ > [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
 \ >= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ number= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
+\ number= [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
 \ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
 \ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
