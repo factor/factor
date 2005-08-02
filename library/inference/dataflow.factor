@@ -118,5 +118,8 @@ SYMBOL: current-node
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
 
+: drop-inputs ( node -- #drop )
+    node-in-d in-d-node <#drop> ;
+
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state

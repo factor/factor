@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic hashtables kernel sequences words ;
+USING: generic hashtables kernel lists sequences vectors words ;
 
 ! Method inlining optimization
+
 : min-class? ( class seq -- ? )
     #! Is this class the smallest class in the sequence?
     2dup member? [
@@ -14,42 +15,83 @@ USING: generic hashtables kernel sequences words ;
         2drop f
     ] ifte ;
 
-: node-dispatching-class ( node -- class )
-    dup node-in-d peek dup value-safe? [
-        swap node-classes ?hash
-    ] [
-        2drop object
-    ] ifte ;
+GENERIC: dispatching-values ( node word -- seq )
+
+M: object dispatching-values 2drop { } ;
+
+M: simple-generic dispatching-values drop node-in-d peek 1vector ;
+
+M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
+
+: safe-node-classes ( node seq -- seq )
+    >r node-classes r> [
+        dup value-safe? [
+            swap ?hash [ object ] unless*
+        ] [
+            2drop object
+        ] ifte
+    ] map-with ;
+
+: dispatching-classes ( node -- seq )
+    dup dup node-param dispatching-values safe-node-classes ;
 
 : inline-method? ( #call -- ? )
-    dup node-param "picker" word-prop [ dup ] = [
-        dup node-dispatching-class dup [
-            swap node-param order min-class?
+    dup dispatching-classes dup empty? [
+        2drop f
+    ] [
+        dup [ = ] every? [
+            first swap node-param order min-class?
         ] [
             2drop f
         ] ifte
-    ] [
-        drop f
     ] ifte ;
 
-: subst-node ( old new -- )
-    last-node set-node-successor ;
+: subst-node
+    [ last-node set-node-successor ] keep ;
 
 : inline-method ( node -- node )
-    dup node-dispatching-class
+    dup dispatching-classes first
     over node-param "methods" word-prop hash
     over node-in-d dataflow-with
-    [ subst-node ] keep ;
+    subst-node ;
+
+: related? ( class class -- ? )
+    #! If one of the two classes is contained in the other.
+    2dup class< >r swap class< r> or ;
+
+: optimize-predicate? ( #call -- ? )
+    dup node-param "predicating" word-prop dup [
+        swap dup node-in-d safe-node-classes first related?
+    ] [
+        2drop f
+    ] ifte ;
+
+: subst-literal ( successor literal -- #push )
+    #! Make #push -> #return -> successor
+    literalize dataflow [ last-node set-node-successor ] keep ;
+
+: inline-literal ( node literal -- node )
+    over drop-inputs
+    [ >r subst-literal r> set-node-successor ] keep ;
+
+: optimize-predicate ( #call -- node )
+    dup node-param "predicating" word-prop
+    over dup node-in-d safe-node-classes first class<
+    inline-literal ;
 
 M: #call optimize-node* ( node -- node/t )
     dup node-param [
         dup inline-method? [
             inline-method
         ] [
-            dup optimize-not? [
-                node-successor dup flip-branches
+            dup optimize-predicate? [
+                optimize-predicate
             ] [
-                drop t
+                dup optimize-not? [
+                    node-successor dup flip-branches
+                ] [
+                    drop t
+                ] ifte
             ] ifte
         ] ifte
     ] [

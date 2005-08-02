@@ -199,3 +199,8 @@ TUPLE: delegating ;
 
 [ << shit f >> "shit" ] [ << shit f >> big-generic-test ] unit-test
 [ << shit f >> "shit" ] [ << delegating << shit f >> >> big-generic-test ] unit-test
+
+[ t ] [ \ = simple-generic? ] unit-test
+[ f ] [ \ each simple-generic? ] unit-test
+[ f ] [ \ object simple-generic? ] unit-test
+[ t ] [ \ + 2generic? ] unit-test

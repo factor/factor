@@ -7,7 +7,7 @@ IN: generic
 USING: kernel kernel-internals lists math namespaces parser
 sequences strings vectors words ;
 
-: simple-generic ( class generic def -- )
+: define-typecheck ( class generic def -- )
     #! Just like:
     #! GENERIC: generic
     #! M: class generic def ;
@@ -15,7 +15,7 @@ sequences strings vectors words ;
 
 : define-slot-word ( class slot word quot -- )
     over [
-        >r swap >fixnum r> cons simple-generic
+        >r swap >fixnum r> cons define-typecheck
     ] [
         2drop 2drop
     ] ifte ;

@@ -88,9 +88,8 @@ M: node child-ties ( node -- seq )
 M: #call infer-classes* ( node -- )
     dup node-param [
         dup create-ties
-        dup node-param "infer-effect" word-prop 2unseq
-        pick node-out-d intersect-classes
-        swap node-in-d intersect-classes
+        dup node-param "infer-effect" word-prop second
+        swap node-out-d intersect-classes
     ] [
         drop
     ] ifte ;

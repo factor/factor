@@ -206,7 +206,7 @@ SYMBOL: branch-returns
     node-in-d first dup safe-literal? ;
 
 : static-branch ( conditional n -- node )
-    >r [ node-in-d in-d-node <#drop> ] keep r>
+    >r [ drop-inputs ] keep r>
     over node-children nth
     over node-successor over last-node set-node-successor
     pick set-node-successor drop ;

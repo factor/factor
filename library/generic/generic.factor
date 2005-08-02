@@ -180,13 +180,6 @@ SYMBOL: object
         ] ifte
     ] ifte ;
 
-: class-or-list ( list -- class )
-    #! Return a class that every class in the list is a
-    #! subclass of.
-    [
-        [ builtin-supertypes [ unique, ] each ] each
-    ] make-list lookup-union ;
-
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
