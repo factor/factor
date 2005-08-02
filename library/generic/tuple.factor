@@ -15,7 +15,8 @@ hashtables errors sequences vectors ;
 : make-tuple ( class size -- tuple )
     #! Internal allocation function. Do not call it directly,
     #! since you can fool the runtime and corrupt memory by
-    #! specifying an incorrect size.
+    #! specifying an incorrect size. Note that this word is also
+    #! handled specially by the compiler's type inferencer.
     <tuple> [ 2 set-slot ] keep ;
 
 IN: generic

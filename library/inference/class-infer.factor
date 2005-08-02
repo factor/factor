@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic hashtables kernel namespaces sequences vectors
-words ;
+USING: generic hashtables kernel kernel-internals namespaces
+sequences vectors words ;
 
 ! Infer possible classes of values in a dataflow IR.
 
@@ -85,11 +85,21 @@ M: node child-ties ( node -- seq )
         2drop
     ] ifte ;
 
+\ make-tuple [
+    dup node-in-d first literal-value 1vector
+] "output-classes" set-word-prop
+
+: output-classes ( node -- seq )
+    dup node-param "output-classes" word-prop [
+        call
+    ] [
+        node-param "infer-effect" word-prop second
+    ] ?ifte ;
+
 M: #call infer-classes* ( node -- )
     dup node-param [
         dup create-ties
-        dup node-param "infer-effect" word-prop second
-        swap node-out-d intersect-classes
+        dup output-classes swap node-out-d intersect-classes
     ] [
         drop
     ] ifte ;
