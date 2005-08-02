@@ -85,17 +85,23 @@ USE: sequences
 [ f ] [
     \ fixnum
     [ fixnum integer letter ]
-    min-class?
+    min-class
 ] unit-test
 
-[ t ] [
+[ fixnum ] [
     \ fixnum
     [ fixnum integer object ]
-    min-class?
+    min-class
 ] unit-test
 
-[ f ] [
+[ integer ] [
     \ fixnum
-    [ integer object ]
-    min-class?
+    [ integer float object ]
+    min-class
+] unit-test
+
+[ object ] [
+    \ word
+    [ integer float object ]
+    min-class
 ] unit-test

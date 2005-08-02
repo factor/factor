@@ -14,10 +14,7 @@ math-internals ;
     2dup unit "predicate" set-word-prop
     swap "predicating" set-word-prop ;
 
-GENERIC: delegate
-GENERIC: set-delegate
-
-M: object delegate drop f ;
+DEFER: delegate
 
 ! Metaclasses have priority -- this induces an order in which
 ! methods are added to the vtable.

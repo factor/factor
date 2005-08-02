@@ -5,15 +5,10 @@ USING: generic hashtables kernel lists sequences vectors words ;
 
 ! Method inlining optimization
 
-: min-class? ( class seq -- ? )
+: min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
-    2dup member? [
-        [ dupd class-and ] map
-        [ null = not ] subset
-        [ class< ] all-with?
-    ] [
-        2drop f
-    ] ifte ;
+    [ dupd class-and null = not ] subset [ class< not ] sort
+    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
 GENERIC: dispatching-values ( node word -- seq )
 
@@ -35,12 +30,14 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : dispatching-classes ( node -- seq )
     dup dup node-param dispatching-values safe-node-classes ;
 
-: inline-method? ( #call -- ? )
+: inlining-class ( #call -- class )
+    #! If the generic dispatch can be eliminated, return the
+    #! class of the method that will always be invoked here.
     dup dispatching-classes dup empty? [
         2drop f
     ] [
         dup [ = ] every? [
-            first swap node-param order min-class?
+            first swap node-param order min-class
         ] [
             2drop f
         ] ifte
@@ -49,8 +46,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : subst-node
     [ last-node set-node-successor ] keep ;
 
-: inline-method ( node -- node )
-    dup dispatching-classes first
+: inline-method ( node class -- node )
     over node-param "methods" word-prop hash
     over node-in-d dataflow-with
     subst-node ;
@@ -82,10 +78,10 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 M: #call optimize-node* ( node -- node/t )
     dup node-param [
-        dup inline-method? [
+        dup inlining-class dup [
             inline-method
         ] [
-            dup optimize-predicate? [
+            drop dup optimize-predicate? [
                 optimize-predicate
             ] [
                 dup optimize-not? [

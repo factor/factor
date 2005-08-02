@@ -7,11 +7,14 @@ math namespaces prettyprint sequences vectors words ;
 
 GENERIC: node>quot ( node -- )
 
-TUPLE: annotation node text ;
+TUPLE: comment node text ;
 
-M: annotation prettyprint* ( ann -- )
-    "( " over annotation-text " )" append3
-    swap annotation-node object. ;
+M: comment prettyprint* ( ann -- )
+    "( " over comment-text " )" append3
+    swap comment-node object. ;
+
+: comment, ( ? node text -- )
+    rot [ <comment> , ] [ 2drop ] ifte ;
 
 : value-str ( classes values -- str )
     [ swap ?hash [ object ] unless* ] map-with
@@ -26,48 +29,55 @@ M: annotation prettyprint* ( ann -- )
         node-out-d value-str %
     ] make-string ;
 
-M: #push node>quot ( node -- )
-    node-out-d [ literal-value literalize ] map concat % ;
+M: #push node>quot ( ? node -- )
+    node-out-d [ literal-value literalize ] map concat % drop ;
 
-M: #drop node>quot ( node -- )
+M: #drop node>quot ( ? node -- )
     node-in-d length dup 3 > [
         \ drop <repeated>
     ] [
         { f [ drop ] [ 2drop ] [ 3drop ] } nth
-    ] ifte % ;
+    ] ifte % drop ;
 
 DEFER: dataflow>quot
 
-M: #call node>quot ( node -- )
-    dup node-param , dup effect-str <annotation> , ;
+M: #call node>quot ( ? node -- )
+    dup node-param , dup effect-str comment, ;
 
-M: #call-label node>quot ( node -- )
-    "#call-label: " over node-param word-name append <annotation> , ;
+M: #call-label node>quot ( ? node -- )
+    #! Even if the flag is off, we still output the annotation.
+    >r drop t r>
+    "#call-label: " over node-param word-name append comment, ;
 
-M: #label node>quot ( node -- )
-    dup "#label: " over node-param word-name append <annotation> ,
-    node-children first dataflow>quot , \ call ,  ;
+M: #label node>quot ( ? node -- )
+    [ "#label: " over node-param word-name append comment, ] 2keep
+    node-children first swap dataflow>quot , \ call ,  ;
 
-M: #ifte node>quot ( node -- )
-    dup "#ifte" <annotation> ,
-    node-children [ dataflow>quot ] map % \ ifte , ;
+M: #ifte node>quot ( ? node -- )
+    [ "#ifte" comment, ] 2keep
+    node-children [ swap dataflow>quot ] map-with % \ ifte , ;
 
-M: #dispatch node>quot ( node -- )
-    dup "#dispatch" <annotation> ,
-    node-children [ dataflow>quot ] map >vector % \ dispatch , ;
+M: #dispatch node>quot ( ? node -- )
+    [ "#dispatch" comment, ] 2keep
+    node-children [ swap dataflow>quot ] map-with , \ dispatch , ;
 
-M: #return node>quot ( node -- ) "#return" <annotation> , ;
+M: #return node>quot ( ? node -- ) "#return" comment, ;
 
-M: #values node>quot ( node -- ) "#values" <annotation> , ;
+M: #values node>quot ( ? node -- ) "#values" comment, ;
 
-M: #merge node>quot ( node -- ) "#merge" <annotation> , ;
+M: #merge node>quot ( ? node -- ) "#merge" comment, ;
 
-: (dataflow>quot) ( node -- )
-    [ dup node>quot node-successor (dataflow>quot) ] when* ;
+: (dataflow>quot) ( ? node -- )
+    dup [
+        2dup node>quot node-successor (dataflow>quot)
+    ] [
+        2drop
+    ] ifte ;
 
-: dataflow>quot ( node -- quot )
-    [ (dataflow>quot) ] make-list ;
+: dataflow>quot ( node ? -- quot )
+    [ swap (dataflow>quot) ] make-list ;
 
-: dataflow. ( quot -- )
-    #! Print dataflow IR for a word.
-    dataflow>quot prettyprint ;
+: dataflow. ( quot ? -- )
+    #! Print dataflow IR for a quotation. Flag indicates if
+    #! annotations should be printed or not.
+    >r dataflow optimize r> dataflow>quot prettyprint ;

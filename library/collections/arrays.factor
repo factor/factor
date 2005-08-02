@@ -39,3 +39,10 @@ BUILTIN: byte-array 19 byte-array? ;
 
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
+
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size. Note that this word is also
+    #! handled specially by the compiler's type inferencer.
+    <tuple> [ 2 set-slot ] keep ;

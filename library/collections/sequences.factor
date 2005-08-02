@@ -59,7 +59,7 @@ G: find* ( i seq quot -- i elt | quot: elt -- ? )
     #! Push a value on the end of a sequence.
     dup length swap set-nth ;
 
-: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ;
+: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
 
 : 2unseq ( { x y } -- x y )
     dup first swap second ;

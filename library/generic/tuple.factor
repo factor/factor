@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-USING: words parser kernel namespaces lists strings math
-hashtables errors sequences vectors ;
+IN: generic
+USING: errors hashtables kernel kernel-internals lists math
+namespaces parser sequences strings vectors words ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -12,23 +12,16 @@ hashtables errors sequences vectors ;
 ! slot 2 - the class, a word
 ! slot 3 - the delegate tuple, or f
 
-: make-tuple ( class size -- tuple )
-    #! Internal allocation function. Do not call it directly,
-    #! since you can fool the runtime and corrupt memory by
-    #! specifying an incorrect size. Note that this word is also
-    #! handled specially by the compiler's type inferencer.
-    <tuple> [ 2 set-slot ] keep ;
-
-IN: generic
-
 DEFER: tuple?
 BUILTIN: tuple 18 tuple? ;
 
-M: tuple delegate 3 slot ;
-M: tuple set-delegate 3 set-slot ;
+: delegate ( object -- delegate )
+    dup tuple? [ 3 slot ] [ drop f ] ifte ; inline
 
-: class ( obj -- class )
-    #! The class of an object.
+: set-delegate ( delegate tuple -- )
+    dup tuple? [ 3 set-slot ] [ 2drop ] ifte ; inline
+
+: class ( object -- class )
     dup tuple? [ 2 slot ] [ type builtin-type ] ifte ; inline
 
 : tuple-predicate ( word -- )
