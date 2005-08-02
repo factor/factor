@@ -28,16 +28,16 @@ PREDICATE: general-list list ( list -- ? )
     #! cell whose cdr is a proper list.
     dup [ last cdr ] when not ;
 
-: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ;
-: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ;
+: uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
+: unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
 
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ;
 : unit ( a -- [ a ] ) f cons ;
 : 2list ( a b -- [ a b ] ) unit cons ;
 : 2unlist ( [ a b ] -- a b ) uncons car ;
 
-: 2car ( cons cons -- car car ) swap car swap car ;
-: 2cdr ( cons cons -- car car ) swap cdr swap cdr ;
+: 2car ( cons cons -- car car ) swap car swap car ; inline
+: 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
 
 : unpair ( list -- list1 list2 )
     [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
