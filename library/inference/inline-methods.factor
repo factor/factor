@@ -55,13 +55,14 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     over node-in-d dataflow-with
     subst-node ;
 
-: related? ( class class -- ? )
-    #! If one of the two classes is contained in the other.
-    2dup class< >r swap class< r> or ;
+: related? ( actual testing -- ? )
+    #! If actual is a subset of testing or if the two classes
+    #! are disjoint, return t.
+    2dup class< >r class-and null = r> or ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
-        swap dup node-in-d safe-node-classes first related?
+        >r dup node-in-d safe-node-classes first r> related?
     ] [
         2drop f
     ] ifte ;
