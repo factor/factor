@@ -7,6 +7,15 @@
 <h1>Factor 0.77:</h1>
 
 <ul>
+<li>Compiler:
+<ul>
+<li>Optimizing out conditionals where the test value is a constant.</li>
+<li>Optimizing out type checks that are always/never satisfied.</li>
+<li>Inlining method bodies when generic words are called on values with known compile-time types.</li>
+</ul>
+
+</li>
+
 <li>Sequences:
 
 <ul>
@@ -14,8 +23,8 @@
 <li><code>join ( seq glue -- seq )</code> combinator. Takes a sequence of sequences, and constructs a new sequence with the glue in between each sequence. For example:
 <pre>  [ "usr" "bin" "grep" ] "/" join
 <b>"usr/bin/grep"</b></pre></li>
-<li><code>indq ( elt seq -- i )</code> and <code>indq* ( i elt seq -- i )</code> are like <code>index</code> and <code>index*</code>, except they compare elements for identity.</li>
 <li>Integers now support the sequence protocol. An integer is an increasing sequence of its predecessors. This means the <code>count ( n -- [ 0 ... n-1 ] )</code> word is gone; just use <code>&gt;vector</code> instead. Also, <code>project</code> has been made redundant by <code>map</code>.</li>
+<li>The <code>seq-transpose ( seq -- seq )</code> word is now named <code>flip</code>.
 </ul>
 
 </li>
