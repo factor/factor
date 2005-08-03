@@ -28,9 +28,8 @@ BUILTIN: tuple 18 tuple? ;
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
     dup predicate-word
-    2dup register-predicate
-    swap [ \ class , literal, \ eq? , ] make-list
-    define-compound ;
+    [ \ class , over literal, \ eq? , ] make-list
+    define-predicate ;
 
 : forget-tuple ( class -- )
     dup forget "predicate" word-prop car [ forget ] when* ;

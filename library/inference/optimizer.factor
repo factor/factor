@@ -1,8 +1,12 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic hashtables inference kernel lists matrices
-namespaces sequences vectors ;
+USING: #<unknown> generic hashtables inference kernel lists
+matrices namespaces sequences vectors ;
+
+! We use the recursive-state variable here, to track nested
+! label scopes, to prevent infinite loops when inlining
+! recursive methods.
 
 GENERIC: literals* ( node -- )
 
@@ -57,10 +61,17 @@ GENERIC: optimize-node* ( node -- node )
 
 DEFER: optimize-node ( node -- node/t )
 
-: optimize-children ( node -- )
+GENERIC: optimize-children
+
+M: node optimize-children ( node -- )
     f swap [
         node-children [ optimize-node swap >r or r> ] map
     ] keep set-node-children ;
+
+: optimize-label ( node -- node )
+    dup node-param recursive-state [ cons ] change
+    delegate optimize-children
+    recursive-state [ cdr ] change ;
 
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
@@ -77,10 +88,12 @@ DEFER: optimize-node ( node -- node/t )
 : optimize ( dataflow -- dataflow )
     #! Remove redundant literals from the IR. The original IR
     #! is destructively modified.
-    dup kill-set over kill-node
-    dup infer-classes
-    optimize-node
-    [ optimize ] when ;
+    [
+        recursive-state off
+        dup kill-set over kill-node
+        dup infer-classes
+        optimize-node
+    ] with-scope [ optimize ] when ;
 
 : prune-if ( node quot -- successor/t )
     over >r call [ r> node-successor ] [ r> drop t ] ifte ;
@@ -181,6 +194,13 @@ M: #call-label can-kill* ( literal node -- ? )
 ! #label
 M: #label can-kill* ( literal node -- ? )
     node-children first can-kill? ;
+
+M: #simple-label can-kill* ( literal node -- ? )
+    node-children first can-kill? ;
+
+M: #label optimize-children optimize-label ;
+
+M: #simple-label optimize-children optimize-label ;
 
 ! #ifte
 SYMBOL: branch-returns

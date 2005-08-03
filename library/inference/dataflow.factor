@@ -27,6 +27,10 @@ TUPLE: #label ;
 C: #label make-node ;
 : #label ( label -- node ) param-node <#label> ;
 
+TUPLE: #simple-label ;
+C: #simple-label make-node ;
+: #simple-label ( label -- node ) param-node <#simple-label> ;
+
 TUPLE: #call ;
 C: #call make-node ;
 : #call ( word -- node ) param-node <#call> ;
@@ -117,6 +121,13 @@ SYMBOL: current-node
 
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
+
+: penultimate-node ( node -- penultimate )
+    dup node-successor dup [
+        dup node-successor [ nip penultimate-node ] [ drop ] ifte
+    ] [
+        2drop f
+    ] ifte ;
 
 : drop-inputs ( node -- #drop )
     node-in-d in-d-node <#drop> ;

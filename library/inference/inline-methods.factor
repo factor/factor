@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic hashtables kernel lists sequences vectors words ;
+USING: namespaces generic hashtables kernel lists sequences
+vectors words ;
 
 ! Method inlining optimization
 
@@ -33,23 +34,40 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : inlining-class ( #call -- class )
     #! If the generic dispatch can be eliminated, return the
     #! class of the method that will always be invoked here.
-    dup dispatching-classes dup empty? [
-        2drop f
+    dup node-param recursive-state get member? [
+        drop f
     ] [
-        dup [ = ] every? [
-            first swap node-param order min-class
-        ] [
+        dup dispatching-classes dup empty? [
             2drop f
+        ] [
+            dup [ = ] every? [
+                first swap node-param order min-class
+            ] [
+                2drop f
+            ] ifte
         ] ifte
     ] ifte ;
 
-: subst-node
-    [ last-node set-node-successor ] keep ;
+: unlink-last ( node -- butlast last )
+    dup penultimate-node
+    dup node-successor
+    f rot set-node-successor ;
+
+: subst-node ( label old new -- new )
+    #! #simple-label<label> ---> new-last ---> old
+    #!     |---> new-butlast
+    dup node-successor [
+        unlink-last rot over set-node-successor
+        >r >r #simple-label r> 1vector over set-node-children
+        r> over set-node-successor
+    ] [
+        [ set-node-successor drop ] keep
+    ] ifte ;
 
 : inline-method ( node class -- node )
     over node-param "methods" word-prop hash
     over node-in-d dataflow-with
-    subst-node ;
+    >r [ node-param ] keep r> subst-node ;
 
 : related? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
@@ -72,8 +90,8 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     [ >r subst-literal r> set-node-successor ] keep ;
 
 : optimize-predicate ( #call -- node )
-    dup node-param "predicating" word-prop
-    over dup node-in-d safe-node-classes first class<
+    dup node-param "predicating" word-prop >r
+    dup dup node-in-d safe-node-classes first r> class<
     inline-literal ;
 
 M: #call optimize-node* ( node -- node/t )

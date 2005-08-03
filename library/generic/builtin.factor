@@ -25,9 +25,9 @@ builtin 50 "priority" set-word-prop
 builtin [ (class<) ] "class<" set-word-prop
 
 : builtin-predicate ( class predicate -- )
-    2dup register-predicate
-    [ \ type , swap "builtin-type" word-prop , \ eq? , ] make-list
-    define-compound ;
+    [
+        \ type , over "builtin-type" word-prop , \ eq? ,
+    ] make-list define-predicate ;
 
 : register-builtin ( class -- )
     dup "builtin-type" word-prop builtins get set-nth ;

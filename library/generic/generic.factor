@@ -10,7 +10,8 @@ math-internals ;
 : predicate-word ( word -- word )
     word-name "?" append create-in ;
 
-: register-predicate ( class predicate -- )
+: define-predicate ( class predicate quot -- )
+    dupd define-compound
     2dup unit "predicate" set-word-prop
     swap "predicating" set-word-prop ;
 

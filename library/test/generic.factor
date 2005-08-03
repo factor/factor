@@ -109,6 +109,7 @@ DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;
 [ bah ] [ fixnum alien class-or ] unit-test
+[ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 DEFER: complement-test
 FORGET: complement-test

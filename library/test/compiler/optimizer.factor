@@ -1,4 +1,8 @@
-IN: temporary
+
+GENERIC: xyz
+M: cons xyz xyz ;
+
+[ ] [ \ xyz compile ] unit-testIN: temporary
 USING: generic kernel-internals strings vectors ;
 USE: test
 USE: assembler
@@ -111,3 +115,42 @@ GENERIC: xyz
 M: cons xyz xyz ;
 
 [ ] [ \ xyz compile ] unit-test
+
+! Test predicate inlining
+: pred-test-1
+    dup cons? [
+        dup general-list? [ "general-list" ] [ "nope" ] ifte
+    ] [
+        "not a cons"
+    ] ifte ; compiled
+
+[ [[ 1 2 ]] "general-list" ] [ [[ 1 2 ]] pred-test-1 ] unit-test
+
+: pred-test-2
+    dup fixnum? [
+        dup integer? [ "integer" ] [ "nope" ] ifte
+    ] [
+        "not a fixnum"
+    ] ifte ; compiled
+
+[ 1 "integer" ] [ 1 pred-test-2 ] unit-test
+
+TUPLE: pred-test ;
+
+: pred-test-3
+    dup tuple? [
+        dup pred-test? [ "pred-test" ] [ "nope" ] ifte
+    ] [
+        "not a tuple"
+    ] ifte ; compiled
+
+[ 1 "pred-test" ] [ << pred-test >> pred-test-3 ] unit-test
+
+: pred-test-4
+    dup pred-test? [
+        dup tuple? [ "pred-test" ] [ "nope" ] ifte
+    ] [
+        "not a tuple"
+    ] ifte ; compiled
+
+[ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-4 ] unit-test

@@ -14,7 +14,7 @@ BUILTIN: cons 2 cons? { 0 "car" f } { 1 "cdr" f } ;
 M: f car ;
 M: f cdr ;
 
-UNION: general-list f cons ;
+UNION: general-list POSTPONE: f cons ;
 
 GENERIC: >list ( seq -- list )
 M: general-list >list ( list -- list ) ;

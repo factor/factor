@@ -3,7 +3,7 @@
 IN: kernel
 USING: generic kernel-internals vectors ;
 
-UNION: boolean f t ;
+UNION: boolean POSTPONE: f POSTPONE: t ;
 COMPLEMENT: general-t f
 
 GENERIC: hashcode ( obj -- n )

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: compiler-backend errors generic inference kernel
-kernel-internals lists math namespaces prettyprint sequences
+USING: compiler-backend errors generic lists inference kernel
+kernel-internals math namespaces prettyprint sequences
 strings words ;
 
 GENERIC: linearize-node* ( node -- )
@@ -22,9 +22,12 @@ M: f linearize-node* ( f -- ) drop ;
 M: #label linearize-node* ( node -- )
     <label> dup %return-to , >r
     dup node-param %label ,
-    node-children car linearize-node
+    node-children first linearize-node
     f %return ,
     r> %label , ;
+
+M: #simple-label linearize-node* ( node -- )
+    node-children first linearize-node ;
 
 M: #call linearize-node* ( node -- )
     dup node-param

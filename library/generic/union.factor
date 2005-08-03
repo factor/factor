@@ -22,7 +22,7 @@ union 50 "priority" set-word-prop
 
 union [ (class<) ] "class<" set-word-prop
 
-: union-predicate ( definition -- list )
+: union-predicate ( members -- list )
     [
         [
             \ dup ,
@@ -35,18 +35,10 @@ union [ (class<) ] "class<" set-word-prop
         [ drop f ]
     ] ifte* ;
 
-: define-union ( class predicate definition -- )
+: define-union ( class predicate members -- )
     #! We have to turn the f object into the f word, same for t.
-    [
-        [
-            [
-                [[ f POSTPONE: f ]]
-                [[ t POSTPONE: t ]]
-            ] assoc dup
-        ] keep ?
-    ] map
-    [ union-predicate define-compound ] keep
-    dupd "members" set-word-prop
-    union define-class ;
+    3dup nip "members" set-word-prop
+    pick union define-class
+    union-predicate define-predicate ;
 
 PREDICATE: word union metaclass union = ;

@@ -37,8 +37,7 @@ USING: syntax generic kernel lists namespaces parser words ;
     CREATE dup intern-symbol
     dup rot "superclass" set-word-prop
     dup predicate-word
-    [ dupd unit "predicate" set-word-prop ] keep
-    [ define-predicate ] [ ] ; parsing
+    [ define-predicate-class ] [ ] ; parsing
 
 : TUPLE:
     #! Followed by a tuple name, then slot names, then ;
