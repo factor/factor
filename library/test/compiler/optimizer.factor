@@ -105,3 +105,9 @@ USE: sequences
     [ integer float object ]
     min-class
 ] unit-test
+
+! Infinite loop in method inlining
+GENERIC: xyz
+M: cons xyz xyz ;
+
+[ ] [ \ xyz compile ] unit-test
