@@ -47,6 +47,7 @@ SYMBOL: boot-quot
 : hashtable-type 10 ; inline
 : vector-type    11 ; inline
 : string-type    12 ; inline
+: wrapper-type   14 ; inline
 : word-type      17 ; inline
 : tuple-type     18 ; inline
 
@@ -173,8 +174,15 @@ M: f ' ( obj -- ptr )
     image get [ dup word? [ fixup-word ] when ] nmap ;
 
 M: word ' ( word -- pointer )
-    transfer-word dup pooled-object
-    dup [ nip ] [ drop ] ifte ;
+    transfer-word dup pooled-object [ ] [ ] ?ifte ;
+
+( Wrappers )
+
+M: wrapper ' ( wrapper -- pointer )
+    wrapped '
+    object-tag here-as >r
+    wrapper-type >header emit
+    emit r> ;
 
 ( Conses )
 

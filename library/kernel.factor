@@ -27,6 +27,12 @@ M: object clone ;
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
+DEFER: wrapper?
+BUILTIN: wrapper 14 wrapper? { 1 "wrapped" "set-wrapped" } ;
+
+M: wrapper = ( obj wrapper -- ? )
+    over wrapper? [ swap wrapped = ] [ 2drop f ] ifte ;
+
 ! defined in parse-syntax.factor
 DEFER: not
 DEFER: t?

@@ -31,30 +31,6 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-newline ( indent -- )
     "\n" write indent ;
 
-: \? ( list -- ? )
-    #! Is the head of the list a [ foo ] car?
-    dup car dup cons? [
-        dup car word? [
-            cdr [ drop f ] [ second \ car = ] ifte
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
-: prettyprint-elements ( indent list -- indent )
-    [
-        dup \? [
-            \ \ unparse. bl
-            uncons >r car unparse. bl
-            r> cdr prettyprint-elements
-        ] [
-            uncons >r prettyprint* bl
-            r> prettyprint-elements
-        ] ifte
-    ] when* ;
-
 : ?prettyprint-newline ( indent -- )
     one-line get [ bl drop ] [ prettyprint-newline ] ifte ;
 
@@ -79,6 +55,9 @@ M: word prettyprint* ( indent word -- indent )
         recursion-check [ cdr ] change
     ] ifte ; inline
 
+: prettyprint-elements ( indent list -- indent )
+    [ prettyprint* bl ] each ;
+
 : prettyprint-sequence ( indent start list end -- indent )
     #! Prettyprint a list, with start/end delimiters; eg, [ ],
     #! or { }, or << >>. The body of the list is indented,
@@ -102,7 +81,7 @@ M: cons prettyprint* ( indent list -- indent )
 
 M: vector prettyprint* ( indent vector -- indent )
     [
-        \ { swap >list \ } prettyprint-sequence
+        \ { swap \ } prettyprint-sequence
     ] check-recursion ;
 
 M: hashtable prettyprint* ( indent hashtable -- indent )
@@ -112,11 +91,18 @@ M: hashtable prettyprint* ( indent hashtable -- indent )
 
 M: tuple prettyprint* ( indent tuple -- indent )
     [
-        \ << swap <mirror> >list \ >> prettyprint-sequence
+        \ << swap <mirror> \ >> prettyprint-sequence
     ] check-recursion ;
 
-M: alien prettyprint* ( alien -- str )
+M: alien prettyprint* ( alien -- )
     \ ALIEN: unparse. bl alien-address unparse write ;
+
+M: wrapper prettyprint* ( wrapper -- )
+    dup wrapped word? [
+        \ \ unparse. bl wrapped unparse.
+    ] [
+        \ W[ unparse. bl wrapped prettyprint* \ ]W unparse.
+    ] ifte ;
 
 : prettyprint ( obj -- )
     [

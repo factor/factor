@@ -208,6 +208,7 @@ vocabularies get [
     { "fflush" "io-internals"                 [ [ alien ] [ ] ] }
     { "fclose" "io-internals"                 [ [ alien ] [ ] ] }
     { "expired?" "alien"                      [ [ object ] [ boolean ] ] }
+    { "<wrapper>" "kernel"                    [ [ object ] [ wrapper ] ] }
 } dup length 3 swap [ + ] map-with [
     make-primitive
 ] 2each

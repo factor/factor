@@ -15,7 +15,7 @@ global [ 100 <vector> commands set ] bind
     commands get [ first call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
-    [ swap literal, % ] make-list
+    [ swap literalize , % ] make-list
     [ pane get pane-call drop ] cons ;
 
 : command-menu ( presented -- menu )

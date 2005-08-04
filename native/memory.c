@@ -81,6 +81,9 @@ CELL untagged_object_size(CELL pointer)
 	case DISPLACED_ALIEN_TYPE:
 		size = sizeof(DISPLACED_ALIEN);
 		break;
+	case WRAPPER_TYPE:
+		size = sizeof(F_WRAPPER);
+		break;
 	default:
 		critical_error("Cannot determine untagged_object_size",pointer);
 		size = -1;/* can't happen */

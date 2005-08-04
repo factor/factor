@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: interpreter
-USING: errors kernel kernel-internals lists math namespaces
-prettyprint sequences io strings vectors words ;
+USING: errors generic io kernel kernel-internals lists math
+namespaces prettyprint sequences strings vectors words ;
 
 ! A Factor interpreter written in Factor. Used by compiler for
 ! partial evaluation, also by the walker.
@@ -14,8 +14,6 @@ SYMBOL: meta-r
 SYMBOL: meta-d
 : push-d meta-d get push ;
 : pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
-: peek-next-d meta-d get [ length 2 - ] keep nth ;
 SYMBOL: meta-n
 SYMBOL: meta-c
 
@@ -66,7 +64,9 @@ SYMBOL: meta-executing
         [ meta-executing get push-r  push-r ] when*
     ] change ;
 
-: meta-word ( word -- )
+GENERIC: do ( obj -- )
+
+M: word do ( word -- )
     dup "meta-word" word-prop [
         call
     ] [
@@ -77,12 +77,18 @@ SYMBOL: meta-executing
         ] ifte
     ] ?ifte ;
 
-: do ( obj -- ) dup word? [ meta-word ] [ push-d ] ifte ;
+M: wrapper do ( wrapper -- ) wrapped push-d ;
 
-: meta-word-1 ( word -- )
+M: object do ( object -- ) push-d ;
+
+GENERIC: do-1 ( object -- )
+
+M: word do-1 ( word -- )
     dup "meta-word" word-prop [ call ] [ host-word ] ?ifte ;
 
-: do-1 ( obj -- ) dup word? [ meta-word-1 ] [ push-d ] ifte ;
+M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
+
+M: object do-1 ( object -- ) push-d ;
 
 : set-meta-word ( word quot -- ) "meta-word" set-word-prop ;
 
@@ -93,7 +99,7 @@ SYMBOL: meta-executing
 \ callstack [ meta-r get clone push-d ] set-meta-word
 \ set-callstack [ pop-d clone meta-r set ] set-meta-word
 \ call [ pop-d meta-call ] set-meta-word
-\ execute [ pop-d meta-word ] set-meta-word
+\ execute [ pop-d do ] set-meta-word
 \ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
 \ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
 

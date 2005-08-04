@@ -131,6 +131,7 @@ typedef unsigned char BYTE;
 #include "relocate.h"
 #include "alien.h"
 #include "dll.h"
+#include "wrapper.h"
 #include "debug.h"
 
 #endif /* __FACTOR_H__ */

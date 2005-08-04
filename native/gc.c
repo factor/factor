@@ -179,6 +179,9 @@ INLINE void collect_object(CELL scan)
 	case DISPLACED_ALIEN_TYPE:
 		collect_displaced_alien((DISPLACED_ALIEN*)scan);
 		break;
+	case WRAPPER_TYPE:
+		collect_wrapper((F_WRAPPER*)scan);
+		break;
 	}
 }
 

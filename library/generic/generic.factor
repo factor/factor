@@ -68,7 +68,7 @@ DEFER: delegate
 : dispatcher% "dispatcher" word-prop % ;
 
 : error-method ( generic -- method )
-    [ dup picker% literal, \ no-method , ] make-list ;
+    [ dup picker% literalize , \ no-method , ] make-list ;
 
 : empty-method ( generic -- method )
     dup "picker" word-prop [ dup ] = [

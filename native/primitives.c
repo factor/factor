@@ -172,7 +172,8 @@ void* primitives[] = {
 	primitive_fwrite,
 	primitive_fflush,
 	primitive_fclose,
-	primitive_expired
+	primitive_expired,
+	primitive_wrapper
 };
 
 CELL primitive_to_xt(CELL primitive)

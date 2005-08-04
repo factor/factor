@@ -50,10 +50,18 @@ void run(void)
 		next = get(callframe);
 		callframe = get(callframe + CELLS);
 
-		if(type_of(next) == WORD_TYPE)
+		switch(type_of(next))
+		{
+		case WORD_TYPE:
 			execute(untag_word_fast(next));
-		else
+			break;
+		case WRAPPER_TYPE:
+			dpush(untag_wrapper_fast(next)->object);
+			break;
+		default:
 			dpush(next);
+			break;
+		}
 	}
 }
 

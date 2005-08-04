@@ -58,6 +58,8 @@ GENERIC: apply-object
 
 M: object apply-object apply-literal ;
 
+M: wrapper apply-object wrapped apply-literal ;
+
 : active? ( -- ? )
     #! Is this branch not terminated?
     d-in get meta-d get and ;

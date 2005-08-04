@@ -54,7 +54,8 @@ OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
 	native/debug.o \
 	native/hashtable.o \
 	native/icache.o \
-	native/io.o
+	native/io.o \
+	native/wrapper.o
 
 default:
 	@echo "Run 'make' with one of the following parameters:"

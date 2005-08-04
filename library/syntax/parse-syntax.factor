@@ -73,7 +73,12 @@ BUILTIN: f 9 not ;
 : \
     #! Parsed as a piece of code that pushes a word on the stack
     #! \ foo ==> [ foo ] car
-    scan-word literalize [ swons ] each ; parsing
+    scan-word literalize swons ; parsing
+
+! Long wrapper syntax. Only used in the rare case that another
+! wrapper is being wrapped.
+: W[ [ ] ; parsing
+: ]W first <wrapper> swons ; parsing
 
 ! Vocabularies
 : PRIMITIVE:

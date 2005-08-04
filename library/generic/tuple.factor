@@ -28,7 +28,7 @@ BUILTIN: tuple 18 tuple? ;
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
     dup predicate-word
-    [ \ class , over literal, \ eq? , ] make-list
+    [ \ class , over literalize , \ eq? , ] make-list
     define-predicate ;
 
 : forget-tuple ( class -- )
@@ -54,7 +54,7 @@ BUILTIN: tuple 18 tuple? ;
 
 : define-constructor ( word def -- )
     >r [ word-name "in" get constructor-word ] keep [
-        dup literal, "tuple-size" word-prop , \ make-tuple ,
+        dup literalize , "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
@@ -79,7 +79,7 @@ BUILTIN: tuple 18 tuple? ;
     [
         [
             unswons
-            \ dup , unswons literal, \ eq? , \ drop swons ,
+            \ dup , unswons literalize , \ eq? , \ drop swons ,
             alist>quot , \ ifte ,
         ] make-list
     ] when* ;

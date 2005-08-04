@@ -165,3 +165,25 @@ M: compound apply-object ( word -- )
 \ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
 \ integer/ [ [ integer integer ] [ rational ] ] "infer-effect" set-word-prop
 \ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
+\ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
+\ cdr [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
+\ < [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
+\ <= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
+\ > [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
+\ >= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
+\ number= [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ / [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ /i [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ /f [ [ number number ] [ number ] ] "infer-effect" set-word-prop
+\ mod [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
+\ /mod [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
+\ bitand [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
+\ bitor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
+\ bitxor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
+\ shift [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
+\ bitnot [ [ integer ] [ integer ] ] "infer-effect" set-word-prop
+\ real [ [ number ] [ real ] ] "infer-effect" set-word-prop
+\ imaginary [ [ number ] [ real ] ] "infer-effect" set-word-prop
