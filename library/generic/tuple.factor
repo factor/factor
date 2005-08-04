@@ -148,9 +148,9 @@ M: mirror set-nth ( n mirror -- elt )
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
 
-: literal-tuple ( list -- tuple )
+: literal-tuple ( seq -- tuple )
     dup first "tuple-size" word-prop <tuple>
-    [ <mirror> swap copy-into ] keep ;
+    [ <mirror> 0 swap rot copy-into ] keep ;
 
 : clone-tuple ( tuple -- tuple )
     #! Make a shallow copy of a tuple, without cloning its

@@ -112,9 +112,13 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : remove  ( obj list -- list ) [ = not ] subset-with ;
 : remq    ( obj list -- list ) [ eq? not ] subset-with ;
 
-: nappend ( s1 s2 -- )
-    #! Destructively append s2 to s1.
-    [ over push ] each drop ;
+: copy-into ( start to from -- )
+    dup length [ >r pick r> + pick set-nth ] 2each 2drop ;
+
+: nappend ( to from -- )
+    >r dup length swap r>
+    over length over length + pick set-length
+    copy-into ;
 
 : append ( s1 s2 -- s1+s2 )
     #! Outputs a new sequence of the same type as s1.
@@ -222,9 +226,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     [
         dup pick index dup -1 = [ drop ] [ nip pick nth ] ifte
     ] map 2nip ;
-
-: copy-into ( to from -- )
-    dup length [ pick set-nth ] 2each drop ;
 
 IN: kernel
 

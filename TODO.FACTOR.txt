@@ -65,7 +65,6 @@
 - intrinsic char-slot set-char-slot integer-slot set-integer-slot
 - [ [ dup call ] dup call ] infer hangs
 - declarations
-- optimize away arithmetic dispatch
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization
@@ -75,8 +74,6 @@
 + sequences
 
 - array sort
-- nappend: instead of using push, enlarge the sequence with set-length
-  then add set the elements with set-nth
 - specialized arrays
 
 + kernel:
