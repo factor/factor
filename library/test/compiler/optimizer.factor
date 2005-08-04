@@ -1,8 +1,4 @@
-
-GENERIC: xyz
-M: cons xyz xyz ;
-
-[ ] [ \ xyz compile ] unit-testIN: temporary
+IN: temporary
 USING: generic kernel-internals strings vectors ;
 USE: test
 USE: assembler
@@ -79,11 +75,11 @@ USE: sequences
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
 
-[ t ] [
+[ string ] [
     \ string
     [ range repeated integer string mirror array reversed sbuf
     slice vector diagonal general-list ]
-    min-class?
+    min-class
 ] unit-test
 
 [ f ] [
@@ -144,7 +140,7 @@ TUPLE: pred-test ;
         "not a tuple"
     ] ifte ; compiled
 
-[ 1 "pred-test" ] [ << pred-test >> pred-test-3 ] unit-test
+[ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-3 ] unit-test
 
 : pred-test-4
     dup pred-test? [

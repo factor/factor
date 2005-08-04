@@ -83,7 +83,8 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : subst-literal ( successor literal -- #push )
     #! Make #push -> #return -> successor
-    literalize dataflow [ last-node set-node-successor ] keep ;
+    literalize unit dataflow
+    [ last-node set-node-successor ] keep ;
 
 : inline-literal ( node literal -- node )
     over drop-inputs

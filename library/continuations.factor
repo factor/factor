@@ -28,4 +28,4 @@ TUPLE: interp data call name catch ;
 
 : callcc1 ( quot ++ obj | quot: cont -- | cont: obj ++ obj )
     continuation
-    [ swap literalize set-interp ] cons swap call ;
+    [ swap literalize unit set-interp ] cons swap call ;

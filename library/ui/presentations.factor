@@ -27,7 +27,7 @@ global [ 100 <vector> commands set ] bind
     dup presented paint-prop dup [
         [
             \ drop ,
-            literal,
+            literalize ,
             [ command-menu show-menu ] %
         ] make-list
         button-gestures

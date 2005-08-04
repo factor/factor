@@ -30,7 +30,7 @@ M: comment prettyprint* ( ann -- )
     ] make-string ;
 
 M: #push node>quot ( ? node -- )
-    node-out-d [ literal-value literalize ] map concat % drop ;
+    node-out-d [ literal-value literalize ] map % drop ;
 
 M: #drop node>quot ( ? node -- )
     node-in-d length dup 3 > [
