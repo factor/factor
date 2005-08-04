@@ -283,7 +283,7 @@ DEFER: list>llist
   [ 1 2 3 ] list>llist
   [ 4 5 6 ] list>llist
   [ 7 8 9 ] list>llist
-  3list
+  2list cons
   list>llist
   lappend* ;
 
