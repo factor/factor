@@ -41,13 +41,12 @@ M: #drop node>quot ( ? node -- )
 
 DEFER: dataflow>quot
 
-M: #call node>quot ( ? node -- )
+: #call>quot ( ? node -- )
     dup node-param , dup effect-str comment, ;
 
-M: #call-label node>quot ( ? node -- )
-    #! Even if the flag is off, we still output the annotation.
-    >r drop t r>
-    "#call-label: " over node-param word-name append comment, ;
+M: #call node>quot ( ? node -- ) #call>quot ;
+
+M: #call-label node>quot ( ? node -- ) #call>quot ;
 
 M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
@@ -69,6 +68,10 @@ M: #return node>quot ( ? node -- ) "#return" comment, ;
 M: #values node>quot ( ? node -- ) "#values" comment, ;
 
 M: #merge node>quot ( ? node -- ) "#merge" comment, ;
+
+M: #entry node>quot ( ? node -- ) "#entry" comment, ;
+
+M: #split node>quot ( ? node -- ) "#split" comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [

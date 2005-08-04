@@ -10,7 +10,18 @@ namespaces prettyprint sequences strings vectors words ;
     dup max-length swap
     [ [ required-inputs ] keep append ] map-with ;
 
-: unify-results ( seq -- value )
+: flatten-values ( seq -- seq )
+    [
+        [
+            dup meet? [
+                meet-values [ unique, ] each
+            ] [
+                unique,
+            ] ifte
+        ] each
+    ] make-vector ;
+
+: unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
     dup [ eq? ] every? [ first ] [ <meet> ] ifte ;
@@ -18,7 +29,7 @@ namespaces prettyprint sequences strings vectors words ;
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths flip [ unify-results ] map ;
+    unify-lengths flip [ flatten-values unify-values ] map ;
 
 : balanced? ( in out -- ? )
     [ swap length swap length - ] 2map [ = ] every? ;

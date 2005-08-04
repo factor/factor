@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: #<unknown> generic hashtables inference kernel lists
+USING: generic hashtables inference kernel lists
 matrices namespaces sequences vectors ;
 
 ! We use the recursive-state variable here, to track nested
@@ -10,11 +10,8 @@ matrices namespaces sequences vectors ;
 
 GENERIC: literals* ( node -- )
 
-: literals, ( node -- )
-    [ dup literals* node-successor literals, ] when* ;
-
-: literals ( node -- list )
-    [ literals, ] make-list ;
+: literals ( node -- seq )
+    [ [ literals* ] each-node ] make-vector ;
 
 GENERIC: can-kill* ( literal node -- ? )
 
@@ -32,7 +29,7 @@ GENERIC: can-kill* ( literal node -- ? )
     #! Push a list of literals that may be killed in the IR.
     dup literals [ swap can-kill? ] subset-with ;
 
-: remove-value ( value node -- )
+: remove-values ( values node -- )
     2dup [ node-in-d seq-diff ] keep set-node-in-d
     2dup [ node-out-d seq-diff ] keep set-node-out-d
     2dup [ node-in-r seq-diff ] keep set-node-in-r
@@ -42,20 +39,8 @@ GENERIC: kill-node* ( literals node -- )
 
 M: node kill-node* ( literals node -- ) 2drop ;
 
-DEFER: kill-node
-
-: kill-children ( literals node -- )
-    node-children [ kill-node ] each-with ;
-
 : kill-node ( literals node -- )
-    dup [
-        2dup kill-children
-        2dup kill-node*
-        2dup remove-value
-        node-successor kill-node
-    ] [
-        2drop
-    ] ifte ;
+    [ 2dup kill-node* remove-values ] each-node-with ;
 
 GENERIC: optimize-node* ( node -- node )
 
@@ -67,11 +52,6 @@ M: node optimize-children ( node -- )
     f swap [
         node-children [ optimize-node swap >r or r> ] map
     ] keep set-node-children ;
-
-: optimize-label ( node -- node )
-    dup node-param recursive-state [ cons ] change
-    delegate optimize-children
-    recursive-state [ cdr ] change ;
 
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
@@ -100,17 +80,9 @@ M: node optimize-children ( node -- )
     inline
 
 ! Generic nodes
-M: node literals* ( node -- )
-    node-children [ literals, ] each ;
+M: node literals* ( node -- ) drop ;
 
-M: f can-kill* ( literal node -- ? )
-    2drop t ;
-
-M: node can-kill* ( literal node -- ? )
-    uses-value? not ;
-
-M: node kill-node* ( literals node -- )
-    2drop ;
+M: node can-kill* ( literal node -- ? ) uses-value? not ;
 
 M: f optimize-node* drop t ;
 
@@ -197,6 +169,11 @@ M: #label can-kill* ( literal node -- ? )
 
 M: #simple-label can-kill* ( literal node -- ? )
     node-children first can-kill? ;
+
+: optimize-label ( node -- node )
+    dup node-param recursive-state [ cons ] change
+    delegate optimize-children
+    recursive-state [ cdr ] change ;
 
 M: #label optimize-children optimize-label ;
 

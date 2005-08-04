@@ -39,7 +39,7 @@ hashtables parser prettyprint ;
 
 : inline-block ( word -- node-block )
     gensym over word-def cons [
-        inhibit-parital  word-def infer-quot
+        #entry node,  inhibit-parital  word-def infer-quot
     ] with-block ;
 
 : inline-compound ( word -- )
@@ -99,8 +99,10 @@ M: symbol apply-object ( word -- )
 
 : (base-case) ( word label -- )
     over "inline" word-prop [
+        meta-d get clone >r
         over inline-block drop
-        [ #call-label ] [ #call ] ?ifte node,
+        [ #call-label ] [ #call ] ?ifte
+        r> over set-node-in-d node,
     ] [
         drop dup t infer-compound "base-case" set-word-prop
     ] ifte ;

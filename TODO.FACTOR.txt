@@ -56,6 +56,8 @@
 
 + compiler:
 
+- changing a word to be 'inline' after it was already defined doesn't
+  work properly
 - inference needs to be more robust with heavily recursive code
 - powerpc: float ffi parameters
 - fix fixnum<< and /i overflow on PowerPC

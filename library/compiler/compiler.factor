@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
 USING: compiler-backend compiler-frontend errors inference
-kernel lists math namespaces prettyprint io words ;
+io kernel lists math namespaces prettyprint words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
@@ -57,12 +57,6 @@ M: compound (compile) ( word -- )
     ] [
         drop
     ] ifte ;
-
-M: compound (uncrossref)
-    dup f "infer-effect" set-word-prop
-    dup f "base-case" set-word-prop
-    dup f "no-effect" set-word-prop
-    decompile ;
 
 : recompile ( word -- )
     dup decompile compile ;

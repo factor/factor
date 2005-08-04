@@ -31,6 +31,14 @@ TUPLE: #simple-label ;
 C: #simple-label make-node ;
 : #simple-label ( label -- node ) param-node <#simple-label> ;
 
+TUPLE: #entry ;
+C: #entry make-node ;
+: #entry ( -- node ) meta-d get clone in-d-node <#entry> ;
+
+TUPLE: #split ;
+C: #split make-node ;
+: #split ( stack -- node ) in-d-node <#split> ;
+
 TUPLE: #call ;
 C: #call make-node ;
 : #call ( word -- node ) param-node <#call> ;
@@ -124,7 +132,8 @@ SYMBOL: current-node
 
 : penultimate-node ( node -- penultimate )
     dup node-successor dup [
-        dup node-successor [ nip penultimate-node ] [ drop ] ifte
+        dup node-successor
+        [ nip penultimate-node ] [ drop ] ifte
     ] [
         2drop f
     ] ifte ;
@@ -134,3 +143,15 @@ SYMBOL: current-node
 
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
+
+: each-node ( node quot -- )
+    over [
+        [ call ] 2keep swap
+        [ node-children [ swap each-node ] each-with ] 2keep
+        node-successor swap each-node
+    ] [
+        2drop
+    ] ifte ; inline
+
+: each-node-with ( obj node quot -- | quot: obj node -- )
+    swap [ with ] each-node 2drop ; inline

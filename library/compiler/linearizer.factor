@@ -6,7 +6,10 @@ kernel-internals math namespaces prettyprint sequences
 strings words ;
 
 GENERIC: linearize-node* ( node -- )
+
 M: f linearize-node* ( f -- ) drop ;
+
+M: node linearize-node* ( node -- ) drop ;
 
 : linearize-node ( node -- )
     [
@@ -100,12 +103,6 @@ M: #dispatch linearize-node* ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
     node-children dispatch-head dupd dispatch-body %label , ;
-
-M: #values linearize-node* ( node -- )
-    drop ;
-
-M: #merge linearize-node* ( node -- )
-    drop ;
 
 M: #return linearize-node* ( node -- )
     drop  f %return , ;

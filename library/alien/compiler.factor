@@ -151,3 +151,13 @@ M: alien-node linearize-node* ( node -- )
 global [
     "libraries" get [ <namespace> "libraries" set ] unless
 ] bind
+
+M: compound (uncrossref)
+    dup word-def \ alien-invoke swap member? [
+        drop
+    ] [
+        dup f "infer-effect" set-word-prop
+        dup f "base-case" set-word-prop
+        dup f "no-effect" set-word-prop
+        decompile
+    ] ifte ;
