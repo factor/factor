@@ -5,21 +5,20 @@ USING: generic kernel lists namespaces sequences unparser words ;
 
 TUPLE: value recursion safe? ;
 
-C: value ( recursion -- value )
-    [ t swap set-value-safe? ] keep
-    [ set-value-recursion ] keep ;
+C: value ( rstate -- value )
+    t over set-value-safe?
+    recursive-state get over set-value-recursion ;
 
 M: value = eq? ;
 
 TUPLE: computed ;
 
-C: computed ( -- value )
-    recursive-state get <value> over set-delegate ;
+C: computed ( -- value ) <value> over set-delegate ;
 
 TUPLE: literal value ;
 
-C: literal ( obj rstate -- value )
-    [ >r <value> r> set-delegate ] keep
+C: literal ( obj -- value )
+    <value> over set-delegate
     [ set-literal-value ] keep ;
 
 M: value literal-value ( value -- )
@@ -34,7 +33,7 @@ M: value literal-value ( value -- )
 TUPLE: meet values ;
 
 C: meet ( values -- value )
-    [ set-meet-values ] keep f <value> over set-delegate ;
+    <value> over set-delegate [ set-meet-values ] keep ;
 
 PREDICATE: tuple safe-literal ( obj -- ? )
     dup literal? [ value-safe? ] [ drop f ] ifte ;

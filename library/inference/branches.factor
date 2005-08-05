@@ -103,12 +103,9 @@ namespaces prettyprint sequences strings unparser vectors words ;
     #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
 
-: vtable-value ( rstate vtable -- seq )
-    [ swap <literal> ] map-with ;
-
 USE: kernel-internals
 
 \ dispatch [
-    pop-literal vtable-value
+    pop-literal nip [ <literal> ] map
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop

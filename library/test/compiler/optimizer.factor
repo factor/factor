@@ -23,7 +23,7 @@ USE: sequences
 [ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
 
 [ [ t t f ] ] [
-    [ 1 2 3 ] [ f <literal> ] map
+    [ 1 2 3 ] [ <literal> ] map
     [ [ literal-value 2 <= ] subset ] keep in-d-node <#drop> kill-mask
 ] unit-test
 
