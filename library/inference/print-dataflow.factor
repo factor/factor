@@ -71,8 +71,6 @@ M: #merge node>quot ( ? node -- ) "#merge" comment, ;
 
 M: #entry node>quot ( ? node -- ) "#entry" comment, ;
 
-M: #split node>quot ( ? node -- ) "#split" comment, ;
-
 : (dataflow>quot) ( ? node -- )
     dup [
         2dup node>quot node-successor (dataflow>quot)

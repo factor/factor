@@ -27,11 +27,6 @@ USE: sequences
     [ [ literal-value 2 <= ] subset ] keep in-d-node <#drop> kill-mask
 ] unit-test
 
-[ t ] [
-    3 [ 3 over [ ] [ ] ifte drop ] dataflow
-    kill-set [ value= ] contains-with?
-] unit-test
-
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
 
 [ 4 ] [ literal-kill-test-1 drop ] unit-test

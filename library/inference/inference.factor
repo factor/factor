@@ -1,11 +1,23 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter kernel lists math namespaces
-prettyprint sequences strings unparser vectors words ;
+USING: errors generic interpreter io kernel lists math
+namespaces prettyprint sequences strings unparser vectors words ;
 
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
+
+TUPLE: inference-error message rstate data-stack call-stack ;
+
+: inference-error ( msg -- )
+    recursive-state get meta-d get meta-r get
+    <inference-error> throw ;
+
+M: inference-error error. ( error -- )
+    "! Inference error:" print
+    dup inference-error-message print
+    "! Recursive state:" print
+    inference-error-rstate [.] ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
@@ -18,7 +30,7 @@ SYMBOL: inferring-base-case
 SYMBOL: d-in
 
 : pop-literal ( -- rstate obj )
-    1 #drop node, pop-d >literal< ;
+    1 #drop node, pop-d dup value-recursion swap literal-value ;
 
 : computed-value-vector ( n -- vector )
     empty-vector dup [ drop <computed> ] nmap ;
@@ -88,13 +100,12 @@ M: wrapper apply-object wrapped apply-literal ;
     dup infer-quot handle-terminator
     r> recursive-state set ;
 
-: check-active ( -- )
-    active? [ "Provable runtime error" inference-error ] unless ;
-
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get empty? [
-        "Word leaves elements on return stack" inference-error
+        "Word leaves " meta-r get length unparse
+        " element(s) on return stack. Check >r/r> usage." append3
+        inference-error
     ] unless ;
 
 : with-infer ( quot -- )
@@ -102,17 +113,12 @@ M: wrapper apply-object wrapped apply-literal ;
         inferring-base-case off
         f init-inference
         call
-        check-active
         check-return
     ] with-scope ;
 
 : infer ( quot -- effect )
     #! Stack effect of a quotation.
     [ infer-quot effect ] with-infer ;
-
-: infer-from ( quot stack -- effect )
-    #! Infer starting from a stack of values.
-    [ meta-d set infer-quot effect ] with-infer ;
 
 : (dataflow) ( quot -- dataflow )
     infer-quot #return node, dataflow-graph get ;

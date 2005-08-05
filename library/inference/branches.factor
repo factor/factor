@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic hashtables interpreter kernel lists math
-namespaces prettyprint sequences strings vectors words ;
+namespaces prettyprint sequences strings unparser vectors words ;
 
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
@@ -37,7 +37,11 @@ namespaces prettyprint sequences strings vectors words ;
 : unify-effect ( in out -- in out )
     2dup balanced?
     [ unify-stacks >r unify-stacks r> ]
-    [ "Unbalanced branches" inference-error ] ifte ;
+    [
+        { "Unbalanced branches:" } -rot [
+            swap length unparse " " rot length unparse append3
+        ] 2map append "\n" join inference-error
+    ] ifte ;
 
 : datastack-effect ( seq -- )
     dup [ d-in swap hash ] map

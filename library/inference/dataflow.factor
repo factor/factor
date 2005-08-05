@@ -35,10 +35,6 @@ TUPLE: #entry ;
 C: #entry make-node ;
 : #entry ( -- node ) meta-d get clone in-d-node <#entry> ;
 
-TUPLE: #split ;
-C: #split make-node ;
-: #split ( stack -- node ) in-d-node <#split> ;
-
 TUPLE: #call ;
 C: #call make-node ;
 : #call ( word -- node ) param-node <#call> ;

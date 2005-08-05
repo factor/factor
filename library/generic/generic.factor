@@ -131,6 +131,9 @@ DEFER: delegate
     ] unless
     [ "methods" word-prop set-hash ] keep make-generic ;
 
+: forget-method ( class generic -- )
+    [ "methods" word-prop remove-hash ] keep make-generic ;
+
 : init-methods ( word -- )
      dup "methods" word-prop [
          drop

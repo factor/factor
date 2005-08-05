@@ -3,9 +3,6 @@
 IN: inference
 USING: kernel namespaces prettyprint sequences vectors ;
 
-! Technical detail: need to figure out which values survive
-! inner recursions in #labels.
-
 GENERIC: collect-recursion* ( label node -- )
 
 M: node collect-recursion* ( label node -- ) 2drop ;
@@ -18,14 +15,17 @@ M: #call-label collect-recursion* ( label node -- )
     #! call given label.
     [ [ collect-recursion* ] each-node-with ] make-vector ;
 
-: first-child ( child node -- )
-    [ node-children first over set-node-successor 1vector ] keep
-    set-node-children ;
+GENERIC: solve-recursion*
 
-M: #label optimize-node* ( node -- node/t )
-    dup dup node-param over collect-recursion >r
-    node-children first node-in-d r> swap add
-    unify-stacks #split swap first-child t ;
+M: node solve-recursion* ( node -- ) drop ;
 
-M: #split optimize-node* ( node -- node/t )
-    node-successor ;
+M: #label solve-recursion* ( node -- )
+    dup node-param over collect-recursion >r
+    node-children first dup node-in-d r> swap add
+    unify-stacks swap [ node-in-d ] keep
+    node-successor subst-values ;
+
+: solve-recursion ( node -- )
+    #! Figure out which values survive inner recursions in
+    #! #labels, and those that don't should be fudged.
+    ( [ solve-recursion* ] each-node ) drop ;

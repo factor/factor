@@ -21,7 +21,8 @@ hashtables parser prettyprint ;
     ] keep node, ;
 
 : no-effect ( word -- )
-    "Unknown stack effect: " swap word-name append
+    "Stack effect inference of the word " swap word-name
+    " was already attempted, and failed" append3
     inference-error ;
 
 : inhibit-parital ( -- )

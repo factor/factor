@@ -70,6 +70,7 @@ M: node optimize-children ( node -- )
     #! is destructively modified.
     [
         recursive-state off
+        dup solve-recursion
         dup kill-set over kill-node
         dup infer-classes
         optimize-node
@@ -213,7 +214,7 @@ M: #ifte can-kill* ( literal node -- ? )
 
 M: #ifte optimize-node* ( node -- node )
     dup static-branch?
-    [ f swap value= 1 0 ? static-branch ] [ 2drop t ] ifte ;
+    [ literal-value 0 1 ? static-branch ] [ 2drop t ] ifte ;
 
 ! #dispatch
 M: #dispatch can-kill* ( literal node -- ? )
@@ -255,3 +256,6 @@ M: #values optimize-node* ( node -- node ? )
 
 ! #merge
 M: #merge can-kill* ( literal node -- ? ) 2drop t ;
+
+! #entry
+M: #entry can-kill* ( literal node -- ? ) 2drop t ;
