@@ -10,17 +10,6 @@ namespaces prettyprint sequences strings unparser vectors words ;
     dup max-length swap
     [ [ required-inputs ] keep append ] map-with ;
 
-: flatten-values ( seq -- seq )
-    [
-        [
-            dup meet? [
-                meet-values [ unique, ] each
-            ] [
-                unique,
-            ] ifte
-        ] each
-    ] make-vector ;
-
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
@@ -29,7 +18,7 @@ namespaces prettyprint sequences strings unparser vectors words ;
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths flip [ flatten-values unify-values ] map ;
+    unify-lengths flip [ unify-values ] map ;
 
 : balanced? ( in out -- ? )
     [ swap length swap length - ] 2map [ = ] every? ;
@@ -96,7 +85,7 @@ namespaces prettyprint sequences strings unparser vectors words ;
     #! the branches has an undecidable stack effect, we set the
     #! base case to this stack effect and try again.
     [ >r (infer-branches) r> set-node-children ] keep
-    node, meta-d get >list #merge node, ;
+    node, #merge node, ;
 
 \ ifte [
     2 #drop node, pop-d pop-d swap 2vector

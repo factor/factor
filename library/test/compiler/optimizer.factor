@@ -11,6 +11,20 @@ USE: kernel
 USE: lists
 USE: sequences
 
+! Some dataflow tests
+[ 3 ] [ 1 2 3 (subst-value) ] unit-test
+[ 1 ] [ 1 2 2 (subst-value) ] unit-test
+
+[ { "one" "one" "three" "three" } ]
+[
+    { "one" "two" "three" } { 1 2 3 } { 1 1 3 3 }
+    clone [ (subst-values) ] keep
+] unit-test
+
+[ << meet f { "one" 2 3 } >> ]
+[ "one" 1 << meet f { 1 2 3 } >> clone (subst-value) ] unit-test
+
+! Literal kill tests
 : kill-set*
     dataflow kill-set [ literal-value ] map ;
 
@@ -70,6 +84,7 @@ USE: sequences
 
 [ 4 ] [ 2 2 literal-kill-test-7 ] unit-test
 
+! Test method inlining
 [ string ] [
     \ string
     [ range repeated integer string mirror array reversed sbuf
@@ -101,7 +116,6 @@ USE: sequences
     min-class
 ] unit-test
 
-! Infinite loop in method inlining
 GENERIC: xyz
 M: cons xyz xyz ;
 

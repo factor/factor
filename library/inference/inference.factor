@@ -21,7 +21,7 @@ M: inference-error error. ( error -- )
 
 TUPLE: value recursion safe? ;
 
-C: value ( rstate -- value )
+C: value ( -- value )
     t over set-value-safe?
     recursive-state get over set-value-recursion ;
 
@@ -54,13 +54,29 @@ C: meet ( values -- value )
 PREDICATE: tuple safe-literal ( obj -- ? )
     dup literal? [ value-safe? ] [ drop f ] ifte ;
 
+DEFER: subst-value
+
+: (subst-value) ( new old value -- value )
+    dup meet? [
+        [ meet-values subst-value ] keep
+    ] [
+        tuck eq? [ drop ] [ nip ] ifte
+    ] ifte ;
+
+: subst-value ( new old seq -- )
+    [ >r 2dup r> (subst-value) ] nmap 2drop ;
+
+: (subst-values) ( newseq oldseq seq -- )
+    #! Mutates seq.
+    -rot [ pick subst-value ] 2each drop ;
+
 : subst-values ( new old node -- )
+    #! Mutates the node.
     [
-        dup .
-        3dup [ node-in-d subst ] keep set-node-in-d
-        3dup [ node-in-r subst ] keep set-node-in-r
-        3dup [ node-out-d subst ] keep set-node-out-d
-        3dup [ node-out-r subst ] keep set-node-out-r
+        3dup node-in-d  (subst-values)
+        3dup node-in-r  (subst-values)
+        3dup node-out-d (subst-values)
+        3dup node-out-r (subst-values)
         drop
     ] each-node 2drop ;
 

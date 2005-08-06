@@ -16,9 +16,9 @@ M: node = eq? ;
 : make-node ( param in-d out-d in-r out-r node -- node )
     [ >r f f f f <node> r> set-delegate ] keep ;
 
-: param-node ( label) f f f f ;
-: in-d-node ( inputs) >r f r> f f f ;
-: out-d-node ( outputs) >r f f r> f f ;
+: param-node ( label) { } { } { } { } ;
+: in-d-node ( inputs) >r f r> { } { } { } ;
+: out-d-node ( outputs) >r f { } r> { } { } ;
 
 : d-tail ( n -- list ) meta-d get tail* >vector ;
 : r-tail ( n -- list ) meta-r get tail* >vector ;
@@ -53,11 +53,11 @@ C: #drop make-node ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get in-d-node <#values> ;
+: #values ( -- node ) meta-d get clone in-d-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
-: #return ( -- node ) meta-d get in-d-node <#return> ;
+: #return ( -- node ) meta-d get clone in-d-node <#return> ;
 
 TUPLE: #ifte ;
 C: #ifte make-node ;
@@ -69,7 +69,7 @@ C: #dispatch make-node ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( values -- node ) in-d-node <#merge> ;
+: #merge ( -- node ) meta-d get clone in-d-node <#merge> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -99,7 +99,7 @@ SYMBOL: current-node
     current-node get    current-node off ;
 
 : unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get unit over set-node-children
+    >r >r dataflow-graph get 1vector over set-node-children
     r> dataflow-graph set
     r> current-node set ;
 
@@ -135,7 +135,7 @@ SYMBOL: current-node
     ] ifte ;
 
 : drop-inputs ( node -- #drop )
-    node-in-d in-d-node <#drop> ;
+    node-in-d clone in-d-node <#drop> ;
 
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state

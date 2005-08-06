@@ -220,13 +220,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Longest sequence length in a sequence of sequences.
     0 [ length max ] reduce ;
 
-: subst ( new old seq -- seq )
-    #! Substitute elements of old in seq with corresponding
-    #! elements from new.
-    [
-        dup pick index dup -1 = [ drop ] [ nip pick nth ] ifte
-    ] map 2nip ;
-
 IN: kernel
 
 : depth ( -- n )
