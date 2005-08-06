@@ -84,7 +84,6 @@ parser prettyprint sequences io vectors words ;
         "/library/tools/memory.factor"
 
         "/library/inference/dataflow.factor"
-        "/library/inference/values.factor"
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"
         "/library/inference/words.factor"

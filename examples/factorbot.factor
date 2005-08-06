@@ -1,7 +1,7 @@
 ! Simple IRC bot written in Factor.
 
-USING: generic hashtables http io kernel math namespaces
-prettyprint sequences strings words ;
+USING: errors generic hashtables http io kernel math namespaces
+parser prettyprint sequences strings unparser words ;
 IN: factorbot
 
 SYMBOL: irc-stream

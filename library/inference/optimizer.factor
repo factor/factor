@@ -230,17 +230,6 @@ M: #values can-kill* ( literal node -- ? )
         drop t
     ] ifte ;
 
-: subst-values ( new old node -- )
-    dup [
-        3dup [ node-in-d subst ] keep set-node-in-d
-        3dup [ node-in-r subst ] keep set-node-in-r
-        3dup [ node-out-d subst ] keep set-node-out-d
-        3dup [ node-out-r subst ] keep set-node-out-r
-        node-successor subst-values
-    ] [
-        3drop
-    ] ifte ;
-
 : values/merge ( #values #merge -- new old )
     >r >r node-in-d r> node-in-d 2vector unify-lengths 2unseq r> ;
 

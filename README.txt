@@ -69,8 +69,8 @@ The Factor source distribution ships with four boot image files:
 
   boot.image.le32 - for x86
   boot.image.be32 - for PowerPC, SPARC
-  boot.image.le64 - for x86-64
-  boot.image.be64 - for Alpha, PowerPC/64, UltraSparc
+  boot.image.le64 - for x86-64, Alpha
+  boot.image.be64 - for PowerPC/64, UltraSparc
 
 Once you have compiled the Factor runtime, you must bootstrap the Factor
 system using the image that corresponds to your CPU architecture.

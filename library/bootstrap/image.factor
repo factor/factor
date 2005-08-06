@@ -290,7 +290,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : with-minimal-image ( quot -- image )
     [
-        300000 <vector> image set
+        800000 <vector> image set
         <namespace> "objects" set
         call
         image get
