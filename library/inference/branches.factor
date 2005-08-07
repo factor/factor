@@ -10,6 +10,9 @@ namespaces prettyprint sequences strings unparser vectors words ;
     dup max-length swap
     [ [ required-inputs ] keep append ] map-with ;
 
+: unify-length ( seq seq -- seq )
+    2vector unify-lengths 2unseq ;
+
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
@@ -86,15 +89,3 @@ namespaces prettyprint sequences strings unparser vectors words ;
     #! base case to this stack effect and try again.
     [ >r (infer-branches) r> set-node-children ] keep
     node, #merge node, ;
-
-\ ifte [
-    2 #drop node, pop-d pop-d swap 2vector
-    #ifte pop-d drop infer-branches
-] "infer" set-word-prop
-
-USE: kernel-internals
-
-\ dispatch [
-    pop-literal nip [ <literal> ] map
-    #dispatch pop-d drop infer-branches
-] "infer" set-word-prop

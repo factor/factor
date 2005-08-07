@@ -72,7 +72,7 @@ sequences vectors words ;
 : typed-literal? ( node -- ? )
     #! Output if the node's first input is well-typed, and the
     #! second is a literal.
-    dup node-peek safe-literal? swap node-peek-2 typed? and ;
+    dup node-peek literal? swap node-peek-2 typed? and ;
 
 \ slot [
     dup typed-literal? [
@@ -154,7 +154,7 @@ sequences vectors words ;
     0 0 %replace-d , ; inline
 
 : literal-fixnum? ( value -- ? )
-    dup safe-literal? [ literal-value fixnum? ] [ drop f ] ifte ;
+    dup literal? [ literal-value fixnum? ] [ drop f ] ifte ;
 
 : binary-op-imm ( imm op -- )
     1 %dec-d , in-1

@@ -1,5 +1,5 @@
 IN: temporary
-USING: generic kernel test math parser ;
+USING: errors generic kernel math parser sequences test ;
 
 TUPLE: rect x y w h ;
 C: rect
@@ -87,3 +87,6 @@ TUPLE: delegate-clone ;
 [ f ] [ \ object \ delegate-clone class< ] unit-test
 [ t ] [ \ delegate-clone \ tuple class< ] unit-test
 [ f ] [ \ tuple \ delegate-clone class< ] unit-test
+
+! Compiler regression
+[ t ] [ [ t length ] [ no-method-object ] catch ] unit-test

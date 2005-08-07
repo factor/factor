@@ -58,7 +58,7 @@ M: object load-value ( vreg n value -- )
     literal-value dup
     immediate? [ %immediate ] [ %indirect ] ifte , ;
 
-M: safe-literal load-value ( vreg n value -- )
+M: literal load-value ( vreg n value -- )
     nip push-literal ;
 
 : push-1 ( value -- ) 0 swap push-literal ;

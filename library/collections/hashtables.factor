@@ -113,8 +113,8 @@ IN: hashtables
 : hash-clear ( hash -- )
     0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
-: buckets>list ( hash -- list )
-    hash-array >list ;
+: buckets>vector ( hash -- vector )
+    hash-array >vector ;
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap

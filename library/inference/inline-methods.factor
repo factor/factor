@@ -19,17 +19,12 @@ M: simple-generic dispatching-values drop node-in-d peek 1vector ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
-: safe-node-classes ( node seq -- seq )
-    >r node-classes r> [
-        dup value-safe? [
-            swap ?hash [ object ] unless*
-        ] [
-            2drop object
-        ] ifte
-    ] map-with ;
+: node-classes* ( node seq -- seq )
+    >r node-classes r>
+    [ swap ?hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
-    dup dup node-param dispatching-values safe-node-classes ;
+    dup dup node-param dispatching-values node-classes* ;
 
 : inlining-class ( #call -- class )
     #! If the generic dispatch can be eliminated, return the
@@ -76,7 +71,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
-        >r dup node-in-d safe-node-classes first r> related?
+        >r dup node-in-d node-classes* first r> related?
     ] [
         2drop f
     ] ifte ;
@@ -92,7 +87,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
-    dup dup node-in-d safe-node-classes first r> class<
+    dup dup node-in-d node-classes* first r> class<
     inline-literal ;
 
 M: #call optimize-node* ( node -- node/t )

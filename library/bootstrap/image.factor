@@ -22,8 +22,17 @@ strings vectors words ;
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 
+! Object cache
+SYMBOL: objects
+
 ! Boot quotation, set by boot.factor
 SYMBOL: boot-quot
+
+! Image output format
+SYMBOL: big-endian
+SYMBOL: 64-bits
+
+SYMBOL: t-object
 
 : emit ( cell -- ) image get push ;
 
@@ -36,8 +45,8 @@ SYMBOL: boot-quot
 : image-magic HEX: 0f0e0d0c ;
 : image-version 0 ;
 
-: cell "64-bits" get 8 4 ? ;
-: char "64-bits" get 4 2 ? ;
+: cell 64-bits get 8 4 ? ;
+: char 64-bits get 4 2 ? ;
 
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
@@ -56,12 +65,7 @@ SYMBOL: boot-quot
 
 ( Image header )
 
-: base
-    #! We relocate the image to after the header, and leaving
-    #! some empty cells. This lets us differentiate an F pointer
-    #! (0/tag 3) from a pointer to the first object in the
-    #! image.
-    64 cell * ;
+: base 1024 ;
 
 : header ( -- )
     image-magic emit
@@ -110,11 +114,11 @@ M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     bignum-tag here-as >r
     bignum-tag >header emit
-    [
+    {{
         [[ 0  [ 1 0   ] ]]
         [[ -1 [ 2 1 1 ] ]]
         [[ 1  [ 2 0 1 ] ]]
-    ] assoc unswons emit-fixnum [ emit ] each align-here r> ;
+    }} hash unswons emit-fixnum emit-seq align-here r> ;
 
 ( Special objects )
 
@@ -122,11 +126,11 @@ M: bignum ' ( bignum -- tagged )
 
 : t,
     object-tag here-as
-    dup t-offset fixup "t" set
+    dup t-offset fixup t-object set
     t-type >header emit
     0 ' emit ;
 
-M: t ' ( obj -- ptr ) drop "t" get ;
+M: t ' ( obj -- ptr ) drop t-object get ;
 M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
@@ -144,16 +148,15 @@ M: f ' ( obj -- ptr )
 ( Words )
 
 : emit-word ( word -- )
-    [
-        word-type >header ,
-        dup hashcode fixnum-tag immediate ,
-        0 ,
-        dup word-primitive ,
-        dup word-def ' ,
-        dup word-props ' ,
-    ] make-vector
-    swap object-tag here-as swap "objects" get set-hash
-    [ emit ] each ;
+    dup word-props ' >r
+    dup word-def ' >r
+    object-tag here-as over objects get set-hash
+    word-type >header emit
+    dup hashcode emit-fixnum
+    0 emit
+    word-primitive emit
+    r> emit
+    r> emit ;
 
 : word-error ( word msg -- )
     [ % dup word-vocabulary % " " % word-name % ] make-string
@@ -164,17 +167,16 @@ M: f ' ( obj -- ptr )
     dup dup word-name swap word-vocabulary unit search
     [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
 
-: pooled-object ( object -- ptr ) "objects" get hash ;
+: pooled-object ( object -- ptr ) objects get hash ;
 
 : fixup-word ( word -- offset )
-    dup pooled-object
-    [ ] [ "Not in image: " word-error ] ?ifte ;
+    transfer-word dup pooled-object dup
+    [ nip ] [ "Not in image: " word-error ] ifte ;
 
 : fixup-words ( -- )
     image get [ dup word? [ fixup-word ] when ] nmap ;
 
-M: word ' ( word -- pointer )
-    transfer-word dup pooled-object [ ] [ ] ?ifte ;
+M: word ' ( word -- pointer ) ;
 
 ( Wrappers )
 
@@ -194,7 +196,7 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : emit-chars ( seq -- )
-    "big-endian" get [ [ reverse ] map ] unless
+    big-endian get [ [ reverse ] map ] unless
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )
@@ -211,7 +213,7 @@ M: cons ' ( c -- tagged )
 M: string ' ( string -- pointer )
     #! We pool strings so that each string is only written once
     #! to the image
-    "objects" get [ emit-string ] cache ;
+    objects get [ emit-string ] cache ;
 
 ( Arrays and vectors )
 
@@ -226,7 +228,7 @@ M: string ' ( string -- pointer )
 M: tuple ' ( tuple -- pointer )
     <mirror> tuple-type emit-array ;
 
-: emit-vector ( vector -- pointer )
+M: vector ' ( vector -- pointer )
     dup array-type emit-array swap length
     object-tag here-as >r
     vector-type >header emit
@@ -234,20 +236,16 @@ M: tuple ' ( tuple -- pointer )
     emit ( array ptr )
     align-here r> ;
 
-M: vector ' ( vector -- pointer )
-    emit-vector ;
+( Hashes )
 
-: emit-hashtable ( hash -- pointer )
-    dup buckets>list array-type emit-array
-    swap hash>alist length
+M: hashtable ' ( hashtable -- pointer )
+    dup buckets>vector array-type emit-array
+    swap hash-size
     object-tag here-as >r
     hashtable-type >header emit
     emit-fixnum ( length )
     emit ( array ptr )
     align-here r> ;
-
-M: hashtable ' ( hashtable -- pointer )
-    "objects" get [ emit-hashtable ] cache ;
 
 ( End of the image )
 
@@ -264,6 +262,8 @@ M: hashtable ' ( hashtable -- pointer )
 : boot, ( quot -- )
     boot-quot get swap append ' boot-quot-offset fixup ;
 
+: heap-size image get length header-size - cell * ;
+
 : end ( quot -- )
     "Generating words..." print
     words,
@@ -273,12 +273,12 @@ M: hashtable ' ( hashtable -- pointer )
     boot,
     "Performing some word fixups..." print
     fixup-words
-    here base - heap-size-offset fixup ;
+    heap-size heap-size-offset fixup ;
 
 ( Image output )
 
 : (write-image) ( image -- )
-    "64-bits" get 8 4 ? swap "big-endian" get [
+    64-bits get 8 4 ? swap big-endian get [
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
@@ -291,8 +291,10 @@ M: hashtable ' ( hashtable -- pointer )
 : with-minimal-image ( quot -- image )
     [
         800000 <vector> image set
-        <namespace> "objects" set
+        20000 <hashtable> objects set
         call
+        "Image length: " write image get length .
+        "Object cache size: " write objects get hash-size .
         image get
     ] with-scope ;
 
@@ -310,10 +312,10 @@ M: hashtable ' ( hashtable -- pointer )
     swap write-image ;
 
 : make-images ( -- )
-    "64-bits" off
-    "big-endian" off "boot.image.le32" make-image
-    "big-endian" on  "boot.image.be32" make-image
-    "64-bits" on
-    "big-endian" off "boot.image.le64" make-image
-    "big-endian" on  "boot.image.be64" make-image
-    "64-bits" off ;
+    64-bits off
+    big-endian off "boot.image.le32" make-image
+    big-endian on  "boot.image.be32" make-image
+    64-bits on
+    big-endian off "boot.image.le64" make-image
+    big-endian on  "boot.image.be64" make-image
+    64-bits off ;

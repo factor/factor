@@ -5,10 +5,11 @@ math-internals sequences ;
 
 IN: vectors
 
-: empty-vector ( len -- vec ) dup <vector> [ set-length ] keep ;
+: empty-vector ( len -- vec )
+    dup <vector> [ set-length ] keep ; inline
 
 : >vector ( list -- vector )
-    dup length <vector> [ swap nappend ] keep ;
+    dup length <vector> [ swap nappend ] keep ; inline
 
 M: object thaw >vector ;
 

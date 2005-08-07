@@ -4,6 +4,43 @@ IN: inference
 USING: generic interpreter kernel lists namespaces parser
 sequences vectors words ;
 
+! Recursive state. An alist, mapping words to labels.
+SYMBOL: recursive-state
+
+TUPLE: value recursion uid ;
+
+C: value ( -- value )
+    gensym over set-value-uid
+    recursive-state get over set-value-recursion ;
+
+M: value = eq? ;
+
+TUPLE: computed ;
+
+C: computed ( -- value ) <value> over set-delegate ;
+
+TUPLE: literal value ;
+
+C: literal ( obj -- value )
+    <value> over set-delegate
+    [ set-literal-value ] keep ;
+
+TUPLE: meet values ;
+
+C: meet ( values -- value )
+    <value> over set-delegate [ set-meet-values ] keep ;
+
+: value-refers? ( referee referrer -- ? )
+    2dup eq? [
+        2drop t
+    ] [
+        dup meet? [
+            meet-values [ value-refers? ] contains-with?
+        ] [
+            2drop f
+        ] ifte
+    ] ifte ;
+
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
 ! code with stack flow information and types.
@@ -121,7 +158,8 @@ SYMBOL: current-node
         dup node-in-r % node-out-r %
     ] make-vector ;
 
-: uses-value? ( value node -- ? ) node-values memq? ;
+: uses-value? ( value node -- ? )
+    node-values [ value-refers? ] contains-with? ;
 
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
@@ -137,9 +175,6 @@ SYMBOL: current-node
 : drop-inputs ( node -- #drop )
     node-in-d clone in-d-node <#drop> ;
 
-! Recursive state. An alist, mapping words to labels.
-SYMBOL: recursive-state
-
 : each-node ( node quot -- )
     over [
         [ call ] 2keep swap
@@ -151,3 +186,54 @@ SYMBOL: recursive-state
 
 : each-node-with ( obj node quot -- | quot: obj node -- )
     swap [ with ] each-node 2drop ; inline
+
+SYMBOL: substituted
+
+DEFER: subst-value
+
+: subst-meet ( new old meet -- )
+    #! We avoid mutating the same meet more than once, since
+    #! doing so can introduce cycles.
+    dup substituted get memq? [
+        3drop
+    ] [
+        dup substituted get push meet-values subst-value
+    ] ifte ;
+
+: (subst-value) ( new old value -- value )
+    2dup eq? [
+        2drop
+    ] [
+        dup meet? [
+            pick over eq? [
+                2nip ! don't substitute a meet into itself
+            ] [
+                [ subst-meet ] keep
+            ] ifte
+        ] [
+            2nip
+        ] ifte
+    ] ifte ;
+
+: subst-value ( new old seq -- )
+    pick pick eq? over empty? or [
+        3drop
+    ] [
+        [ >r 2dup r> (subst-value) ] nmap 2drop
+    ] ifte ;
+
+: (subst-values) ( newseq oldseq seq -- )
+    #! Mutates seq.
+    -rot [ pick subst-value ] 2each drop ;
+
+: subst-values ( new old node -- )
+    #! Mutates the node.
+    [
+        10 <vector> substituted set [
+            3dup node-in-d  (subst-values)
+            3dup node-in-r  (subst-values)
+            3dup node-out-d (subst-values)
+            3dup node-out-r (subst-values)
+            drop
+        ] each-node 2drop
+    ] with-scope ;

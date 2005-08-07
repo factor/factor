@@ -44,15 +44,18 @@ M: word prettyprint* ( indent word -- indent )
 : prettyprint-limit? ( indent -- ? )
     prettyprint-limit get dup [ >= ] [ nip ] ifte ;
 
-: check-recursion ( indent obj quot -- ? indent )
+: check-recursion ( indent obj quot -- indent )
     #! We detect circular structure.
-    pick prettyprint-limit? >r
-    over recursion-check get memq? r> or [
-        2drop "..." write
+    pick prettyprint-limit? [
+        2drop "#" write
     ] [
-        over recursion-check [ cons ] change
-        call
-        recursion-check [ cdr ] change
+        over recursion-check get memq? [
+            2drop "&" write
+        ] [
+            over recursion-check [ cons ] change
+            call
+            recursion-check [ cdr ] change
+        ] ifte
     ] ifte ; inline
 
 : prettyprint-elements ( indent list -- indent )

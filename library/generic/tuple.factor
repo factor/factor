@@ -87,7 +87,7 @@ BUILTIN: tuple 18 tuple? ;
 : (hash>quot) ( default hash -- quot )
     [
         \ dup , \ hashcode , dup bucket-count , \ rem ,
-        buckets>list [ alist>quot ] map-with >vector ,
+        buckets>vector [ alist>quot ] map-with ,
         \ dispatch ,
     ] make-list ;
 

@@ -15,13 +15,10 @@ parser prettyprint sequences io vectors words ;
     {
         "/version.factor"
 
-        "/library/stack.factor"
-        "/library/combinators.factor"
+        "/library/kernel.factor"
 
         "/library/collections/sequences.factor"
         "/library/collections/arrays.factor"
-
-        "/library/kernel.factor"
 
         "/library/math/math.factor"
         "/library/math/integer.factor"
@@ -38,9 +35,9 @@ parser prettyprint sequences io vectors words ;
         "/library/collections/sbuf.factor"
         "/library/collections/assoc.factor"
         "/library/collections/lists.factor"
+        "/library/collections/vectors-epilogue.factor"
         "/library/collections/hashtables.factor"
         "/library/collections/namespaces.factor"
-        "/library/collections/vectors-epilogue.factor"
         "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
         "/library/collections/strings-epilogue.factor"
@@ -87,12 +84,13 @@ parser prettyprint sequences io vectors words ;
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"
         "/library/inference/words.factor"
-        "/library/inference/stack.factor"
         "/library/inference/recursive-values.factor"
         "/library/inference/class-infer.factor"
+        "/library/inference/kill-literals.factor"
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
         "/library/inference/print-dataflow.factor"
+        "/library/inference/known-words.factor"
         
         "/library/compiler/assembler.factor"
         "/library/compiler/relocate.factor"

@@ -22,8 +22,8 @@ M: node solve-recursion* ( node -- ) drop ;
 M: #label solve-recursion* ( node -- )
     dup node-param over collect-recursion >r
     node-children first dup node-in-d r> swap add
-    unify-stacks swap [ node-in-d ] keep 
-    node-successor dup . subst-values ;
+    unify-stacks swap [ node-in-d unify-length ] keep
+    subst-values ;
 
 : solve-recursion ( node -- )
     #! Figure out which values survive inner recursions in

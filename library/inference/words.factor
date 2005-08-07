@@ -25,9 +25,6 @@ hashtables parser prettyprint ;
     " was already attempted, and failed" append3
     inference-error ;
 
-: inhibit-parital ( -- )
-    meta-d get [ f swap set-value-safe? ] each ;
-
 : recursive? ( word -- ? )
     f swap dup word-def [ = or ] tree-each-with ;
 
@@ -39,9 +36,8 @@ hashtables parser prettyprint ;
     recursive-state [ cdr ] change ; inline
 
 : inline-block ( word -- node-block )
-    gensym over word-def cons [
-        #entry node,  inhibit-parital  word-def infer-quot
-    ] with-block ;
+    gensym over word-def cons
+    [ #entry node,  word-def infer-quot ] with-block ;
 
 : inline-compound ( word -- )
     #! Infer the stack effect of a compound word in the current
@@ -147,46 +143,15 @@ M: compound apply-object ( word -- )
         ] ifte
     ] ifte* ;
 
-\ call [
-    pop-literal infer-quot-value
-] "infer" set-word-prop
+: with-datastack ( stack word -- stack )
+    datastack >r >r set-datastack r> execute
+    datastack r> [ push ] keep set-datastack 2nip ;
 
-\ execute [
-    pop-literal unit infer-quot-value
-] "infer" set-word-prop
+: apply-datastack ( word -- )
+    meta-d [ swap with-datastack ] change ;
 
-! These hacks will go away soon
-\ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
-\ no-method t "terminator" set-word-prop
-\ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
-\ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
-\ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ not-a-number t "terminator" set-word-prop
-\ inference-error t "terminator" set-word-prop
-\ throw t "terminator" set-word-prop
-\ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ integer/ [ [ integer integer ] [ rational ] ] "infer-effect" set-word-prop
-\ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
-\ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
-\ cdr [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
-\ < [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ <= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ > [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ >= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ number= [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ / [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ /i [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ /f [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ mod [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ /mod [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
-\ bitand [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitxor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ shift [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitnot [ [ integer ] [ integer ] ] "infer-effect" set-word-prop
-\ real [ [ number ] [ real ] ] "infer-effect" set-word-prop
-\ imaginary [ [ number ] [ real ] ] "infer-effect" set-word-prop
+: infer-shuffle ( word -- )
+    dup #call [
+        over "infer-effect" word-prop
+        [ apply-datastack ] hairy-node
+    ] keep node, ;

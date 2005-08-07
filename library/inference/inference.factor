@@ -19,24 +19,6 @@ M: inference-error error. ( error -- )
     "! Recursive state:" print
     inference-error-rstate [.] ;
 
-TUPLE: value recursion safe? ;
-
-C: value ( -- value )
-    t over set-value-safe?
-    recursive-state get over set-value-recursion ;
-
-M: value = eq? ;
-
-TUPLE: computed ;
-
-C: computed ( -- value ) <value> over set-delegate ;
-
-TUPLE: literal value ;
-
-C: literal ( obj -- value )
-    <value> over set-delegate
-    [ set-literal-value ] keep ;
-
 M: value literal-value ( value -- )
     {
         "A literal value was expected where a computed value was found.\n"
@@ -45,40 +27,6 @@ M: value literal-value ( value -- )
         "at compile time. The value might become known if the word\n"
         "is marked 'inline'. See the handbook for details."
     } concat inference-error ;
-
-TUPLE: meet values ;
-
-C: meet ( values -- value )
-    <value> over set-delegate [ set-meet-values ] keep ;
-
-PREDICATE: tuple safe-literal ( obj -- ? )
-    dup literal? [ value-safe? ] [ drop f ] ifte ;
-
-DEFER: subst-value
-
-: (subst-value) ( new old value -- value )
-    dup meet? [
-        [ meet-values subst-value ] keep
-    ] [
-        tuck eq? [ drop ] [ nip ] ifte
-    ] ifte ;
-
-: subst-value ( new old seq -- )
-    [ >r 2dup r> (subst-value) ] nmap 2drop ;
-
-: (subst-values) ( newseq oldseq seq -- )
-    #! Mutates seq.
-    -rot [ pick subst-value ] 2each drop ;
-
-: subst-values ( new old node -- )
-    #! Mutates the node.
-    [
-        3dup node-in-d  (subst-values)
-        3dup node-in-r  (subst-values)
-        3dup node-out-d (subst-values)
-        3dup node-out-r (subst-values)
-        drop
-    ] each-node 2drop ;
 
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs

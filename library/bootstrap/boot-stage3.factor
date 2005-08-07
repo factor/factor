@@ -32,8 +32,6 @@ init-assembler
 
 : compile? "compile" get supported-cpu? and ;
 
-"library/inference/branches.factor" run-file
-
 compile? [
     \ car compile
     \ * compile
