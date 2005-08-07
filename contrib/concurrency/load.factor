@@ -7,7 +7,8 @@ USE: io
 
 USE: parser
 
-: a "concurrency.factor" run-file ;
+: a "../dlists.factor" run-file 
+    "concurrency.factor" run-file ;
 : b "concurrency-examples.factor" run-file ;
 : c "concurrency-tests.factor" run-file ;
 a
