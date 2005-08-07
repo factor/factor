@@ -35,8 +35,6 @@ USE: lists
 
 [ "Beginning" " and end" ] [ 9 "Beginning and end" cut ] unit-test
 
-[ "Beginning" "and end" ] [ 9 "Beginning and end" cut* ] unit-test
-
 [ "hello" "world" ] [ "hello world" " " split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
 [ "" "" ] [ "great" "great" split1 ] unit-test

@@ -19,11 +19,13 @@ GENERIC: solve-recursion*
 
 M: node solve-recursion* ( node -- ) drop ;
 
+: join-values ( calls entry -- new old )
+    add unify-lengths [ unify-stacks ] keep peek ;
+
 M: #label solve-recursion* ( node -- )
     dup node-param over collect-recursion >r
-    node-children first dup node-in-d r> swap add
-    unify-stacks swap [ node-in-d unify-length ] keep
-    subst-values ;
+    node-children first dup node-in-d r> swap
+    join-values rot subst-values ;
 
 : solve-recursion ( node -- )
     #! Figure out which values survive inner recursions in

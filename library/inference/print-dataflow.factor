@@ -42,7 +42,8 @@ M: #drop node>quot ( ? node -- )
 DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )
-    dup node-param , dup effect-str comment, ;
+    dup node-param dup
+    [ , dup effect-str comment, ] [ 3drop ] ifte ;
 
 M: #call node>quot ( ? node -- ) #call>quot ;
 

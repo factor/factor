@@ -5,12 +5,19 @@ USING: generic kernel kernel-internals lists math namespaces
 strings vectors ;
 
 : head-slice ( n seq -- slice )
+    #! n is an index from the start of the sequence.
     0 -rot <slice> ;
 
+: head-slice* ( n seq -- slice )
+    #! n is an index from the end of the sequence.
+    [ length swap - ] keep head-slice ;
+
 : tail-slice ( n seq -- slice )
+    #! n is an index from the start of the sequence.
     [ length ] keep <slice> ;
 
 : tail-slice* ( n seq -- slice )
+    #! n is an index from the end of the sequence.
     [ length swap - ] keep tail-slice ;
 
 : subseq ( from to seq -- seq )
@@ -19,18 +26,16 @@ strings vectors ;
     [ <slice> ] keep like ;
 
 M: object head ( index seq -- seq )
-    0 -rot subseq ;
+    [ head-slice ] keep like ;
+
+: head* ( n seq -- seq )
+    [ head-slice* ] keep like ;
 
 M: object tail ( index seq -- seq )
-    #! Returns a new string, from the given index until the end
-    #! of the string.
-    [ length ] keep subseq ;
+    [ tail-slice ] keep like ;
 
 : tail* ( n seq -- seq )
-    #! Unlike tail, n is an index from the end of the
-    #! sequence. For example, if n=1, this returns a sequence of
-    #! one element.
-    [ length swap - ] keep tail ;
+    [ tail-slice* ] keep like ;
 
 : length< ( seq seq -- ? )
     swap length swap length < ;
@@ -43,36 +48,22 @@ M: object tail ( index seq -- seq )
     ] ifte ;
 
 : ?head ( seq begin -- str ? )
-    2dup head? [
-        length swap tail t
-    ] [
-        drop f
-    ] ifte ;
+    2dup head? [ length swap tail t ] [ drop f ] ifte ;
 
 : tail? ( seq end -- ? )
     2dup length< [
         2drop f
     ] [
-        dup length pick length swap - rot tail-slice sequence=
+        dup length rot tail-slice* sequence=
     ] ifte ;
 
 : ?tail ( seq end -- seq ? )
-    2dup tail? [
-        length swap [ length swap - ] keep head t
-    ] [
-        drop f
-    ] ifte ;
+    2dup tail? [ length swap head* t ] [ drop f ] ifte ;
 
 : cut ( index seq -- seq seq )
     #! Returns 2 sequences, that when concatenated yield the
     #! original sequence.
     [ head ] 2keep tail ;
-
-: cut* ( index seq -- seq seq )
-    #! Returns 2 sequences, that when concatenated yield the
-    #! original sequences, without the element at the given
-    #! index.
-    [ head ] 2keep >r 1 + r> tail ;
 
 : group-advance subseq , >r tuck + swap r> ;
 

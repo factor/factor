@@ -61,7 +61,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : inline-method ( node class -- node )
     over node-param "methods" word-prop hash
-    over node-in-d dataflow-with
+    over node-in-d dataflow-with dup solve-recursion
     >r [ node-param ] keep r> subst-node ;
 
 : related? ( actual testing -- ? )

@@ -75,8 +75,8 @@ namespaces prettyprint sequences strings unparser vectors words ;
     <namespace> [
         copy-inference
         dup value-recursion recursive-state set
-        literal-value dup infer-quot
-        active? [ #values node, handle-terminator ] [ drop ] ifte
+        literal-value dup infer-quot handle-terminator
+        active? [ #values node, ] when
     ] extend ;
 
 : (infer-branches) ( branchlist -- list )
