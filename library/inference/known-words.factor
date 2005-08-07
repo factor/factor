@@ -1,4 +1,6 @@
 IN: inference
+USING: errors generic interpreter kernel kernel-internals lists
+math math-internals parser sequences vectors words ;
 
 ! Primitive combinators
 \ call [
@@ -41,18 +43,6 @@ IN: inference
 \ swap [ \ swap infer-shuffle ] "infer" set-word-prop
 \ over [ \ over infer-shuffle ] "infer" set-word-prop
 \ pick [ \ pick infer-shuffle ] "infer" set-word-prop
-
-! Type conversion
-{
-    { >boolean boolean      }
-    { >list    general-list }
-    { >bignum  bignum       }
-    { >fixnum  fixnum       }
-    { >float   float        }
-    { >sbuf    sbuf         }
-    { >string  string       }
-    { >vector  vector       }
-} [ 2unseq "converter" set-word-prop ] each
 
 ! These hacks will go away soon
 \ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
