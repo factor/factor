@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
 USING: generic kernel kernel-internals lists math strings
-vectors ;
+vectors words ;
 
 ! Combinators
 M: object each ( seq quot -- )
@@ -225,3 +225,14 @@ IN: kernel
 : depth ( -- n )
     #! Push the number of elements on the datastack.
     datastack length ;
+
+: cond ( conditions -- )
+    #! Conditions is a sequence of quotation pairs.
+    #! { { [ X ] [ Y ] } { [ Z ] [ T ] }
+    #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
+    #! The last condition should be a catch-all 't'.
+    [ first call ] find nip second call ;
+
+: with-datastack ( stack word -- stack )
+    datastack >r >r set-datastack r> execute
+    datastack r> [ push ] keep set-datastack 2nip ;

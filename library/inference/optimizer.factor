@@ -60,10 +60,6 @@ M: #drop optimize-node*  ( node -- node/t )
     [ node-in-d empty? ] prune-if ;
 
 ! #call
-: optimize-not? ( #call -- ? )
-    dup node-param \ not =
-    [ node-successor #ifte? ] [ drop f ] ifte ;
-
 : flip-branches ( #ifte -- )
     dup node-children 2unseq swap 2vector swap set-node-children ;
 

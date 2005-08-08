@@ -44,6 +44,17 @@ math math-internals parser sequences vectors words ;
 \ over [ \ over infer-shuffle ] "infer" set-word-prop
 \ pick [ \ pick infer-shuffle ] "infer" set-word-prop
 
+! Flipping branches
+\ not {
+    { [ dup node-successor #ifte? ] [ node-successor dup flip-branches ] }
+} define-optimizers
+
+! Partial evaluation. Most stateless words are colon defs, and
+! so are marked as 'stateless'. However primitives are set here.
+{
+    eq?
+} [ t "stateless" set-word-prop ] each
+
 ! These hacks will go away soon
 \ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
 \ no-method t "terminator" set-word-prop

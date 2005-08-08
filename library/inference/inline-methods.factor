@@ -59,7 +59,8 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         [ set-node-successor drop ] keep
     ] ifte ;
 
-: inline-method ( node class -- node )
+: inline-method ( node -- node )
+    dup inlining-class
     over node-param "methods" word-prop hash
     over node-in-d dataflow-with dup solve-recursion
     >r [ node-param ] keep r> subst-node ;
@@ -76,42 +77,10 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         2drop f
     ] ifte ;
 
-: subst-literal ( successor literal -- #push )
-    #! Make #push -> #return -> successor
-    literalize unit dataflow
-    [ last-node set-node-successor ] keep ;
-
-: inline-literal ( node literal -- node )
-    over drop-inputs
-    [ >r subst-literal r> set-node-successor ] keep ;
-
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
     dup dup node-in-d node-classes* first r> class<
-    inline-literal ;
-
-M: #call optimize-node* ( node -- node/t )
-    dup node-param [
-        dup inlining-class dup [
-            inline-method
-        ] [
-            drop dup optimize-predicate? [
-                optimize-predicate
-            ] [
-                dup optimize-not? [
-                    node-successor dup flip-branches
-                ] [
-                    drop t
-                ] ifte
-            ] ifte
-        ] ifte
-    ] [
-        node-successor
-    ] ifte ;
-
-: post-inline ( #return #call -- node )
-    [ >r node-in-d r> node-out-d ] keep
-    node-successor [ subst-values ] keep ;
+    unit inline-literals ;
 
 M: #return optimize-node* ( node -- node/t )
     #! A #return followed by another node is a result of

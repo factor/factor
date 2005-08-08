@@ -1,4 +1,5 @@
 IN: temporary
+USING: alien strings ;
 USE: kernel
 USE: math
 USE: test
@@ -33,3 +34,26 @@ USE: namespaces
 [ [ 9 8 7 6 5 4 3 2 1 ] ]
 [ [ 10 [ , ] [ 1 - dup dup 0 = [ drop f ] when ] while ] make-list nip ]
 unit-test
+
+[ "even" ] [
+    2 {
+        { [ dup 2 mod 0 = ] [ drop "even" ] }
+        { [ dup 2 mod 1 = ] [ drop "odd" ] }
+    } cond
+] unit-test
+
+[ "odd" ] [
+    3 {
+        { [ dup 2 mod 0 = ] [ drop "even" ] }
+        { [ dup 2 mod 1 = ] [ drop "odd" ] }
+    } cond
+] unit-test
+
+[ "neither" ] [
+    3 {
+        { [ dup string? ] [ drop "string" ] }
+        { [ dup float? ] [ drop "float" ] }
+        { [ dup alien? ] [ drop "alien" ] }
+        { [ t ] [ drop "neither" ] }
+    } cond
+] unit-test

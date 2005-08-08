@@ -175,6 +175,21 @@ SYMBOL: current-node
 : drop-inputs ( node -- #drop )
     node-in-d clone in-d-node <#drop> ;
 
+: post-inline ( #return #call -- node )
+    [ >r node-in-d r> node-out-d ] keep
+    node-successor [ subst-values ] keep ;
+
+: subst-literals ( successor literals -- #push )
+    #! Make #push -> #return -> successor
+    [ literalize ] map dataflow
+    dup last-node rot post-inline swap
+    [ set-node-successor ] keep ;
+
+: inline-literals ( node literals -- node )
+    #! See the #return optimizer.
+    over drop-inputs
+    [ >r subst-literals r> set-node-successor ] keep ;
+
 : each-node ( node quot -- )
     over [
         [ call ] 2keep swap

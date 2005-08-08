@@ -17,6 +17,11 @@ words ;
     #! Mark the last word to be inlined.
     word  t "inline" set-word-prop ; parsing
 
+: stateless ( -- )
+    #! Mark the last word to be evaluated at compile time if
+    #! all inputs are literals.
+    word  t "stateless" set-word-prop ; parsing
+
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"
 ! properties to the current word if it is set.

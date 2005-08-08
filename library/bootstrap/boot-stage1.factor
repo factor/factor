@@ -89,8 +89,9 @@ parser prettyprint sequences io vectors words ;
         "/library/inference/kill-literals.factor"
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
-        "/library/inference/print-dataflow.factor"
         "/library/inference/known-words.factor"
+        "/library/inference/call-optimizers.factor"
+        "/library/inference/print-dataflow.factor"
         
         "/library/compiler/assembler.factor"
         "/library/compiler/relocate.factor"

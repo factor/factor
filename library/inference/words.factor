@@ -143,15 +143,8 @@ M: compound apply-object ( word -- )
         ] ifte
     ] ifte* ;
 
-: with-datastack ( stack word -- stack )
-    datastack >r >r set-datastack r> execute
-    datastack r> [ push ] keep set-datastack 2nip ;
-
-: apply-datastack ( word -- )
-    meta-d [ swap with-datastack ] change ;
-
 : infer-shuffle ( word -- )
     dup #call [
         over "infer-effect" word-prop
-        [ apply-datastack ] hairy-node
+        [ meta-d [ swap with-datastack ] change ] hairy-node
     ] keep node, ;

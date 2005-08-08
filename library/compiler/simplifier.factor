@@ -221,9 +221,7 @@ M: %call-label simplify-node ( linear vop -- ? )
     pick next-logical? [
         >r dup dup car next-logical car vop-label
         r> execute swap cdr cons t
-    ] [
-        drop f
-    ] ifte ; inline
+    ] [ drop f ] ifte ; inline
 
 : useless-jump ( linear -- linear ? )
     #! A jump to a label immediately following is not needed.
@@ -233,38 +231,21 @@ M: %call-label simplify-node ( linear vop -- ? )
 : (dead-code) ( linear -- linear ? )
     #! Remove all nodes until the next #label.
     dup [
-        dup car %label? [
-            f
-        ] [
-            cdr (dead-code) t or
-        ] ifte
-    ] [
-        f
-    ] ifte ;
+        dup car %label?
+        [ f ] [ cdr (dead-code) t or ] ifte
+    ] [ f ] ifte ;
 
 : dead-code ( linear -- linear ? )
     uncons (dead-code) >r cons r> ;
 
 M: %jump-label simplify-node ( linear vop -- linear ? )
-    drop
-    \ %return dup double-jump [
-        t
-    ] [
-        \ %jump-label dup double-jump [
-            t
-        ] [
-            \ %jump dup double-jump
-            [
-                t
-            ] [
-                useless-jump [
-                    t
-                ] [
-                    dead-code
-                ] ifte
-            ] ifte
-        ] ifte
-    ] ifte ;
+    drop {
+        { [ \ %return dup double-jump ] [ t ] }
+        { [ \ %jump-label dup double-jump ] [ t ] }
+        { [ \ %jump dup double-jump ] [ t ] }
+        { [ useless-jump ] [ t ] }
+        { [ t ] [ dead-code ] }
+    } cond ;
 
 M: %target-label simplify-node ( linear vop -- linear ? )
     drop
