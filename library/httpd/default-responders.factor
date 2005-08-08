@@ -41,7 +41,7 @@ global [
     ] extend add-responder
     
     ! Servers Factor word definitions from the image.
-    "browser" [ f browser-responder ] install-cont-responder
+    "browser" [ browser-responder ] install-cont-responder
     
     ! The root directory is served by...
     "file" set-default-responder

@@ -25,77 +25,50 @@
 ! cont-responder facilities.
 !
 IN: browser-responder
-USING: html cont-responder kernel io namespaces words lists
-io strings inspector kernel prettyprint words http parser
-errors unparser listener hashtables memory
-sequences ;
+USING: html cont-responder kernel io namespaces words lists prettyprint 
+       memory sequences ;
 
-: <browser> ( allow-edit? vocab word -- )
-  #! An object for storing the current browser
-  #! user interface state.
-  <namespace> [
-    "current-word" set
-    "current-vocab" set
-    "allow-edit?" set
-  ] extend ;
+: option ( current text -- )
+  #! Output the HTML option tag for the given text. If
+  #! it is equal to the current string, make the option selected.
+  2dup = [
+    "<option selected>" write
+  ] [
+    "<option>" write
+  ] ifte      
+  chars>entities write 
+  "</option>\n" write drop ;
 
-: write-vocab-list ( -- )
-  #! Write out the HTML for the list of vocabularies
-  <select name= "vocabs" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
-    vocabs [ 
-      dup "current-vocab" get [ "" ] unless* = [
-        "<option selected>" write
-      ] [
-        "<option>" write
-      ] ifte 
-      chars>entities write 
-      "</option>\n" write     
-    ] each
+: vocab-list ( vocab -- )
+  #! Write out the HTML for the list of vocabularies. Make the currently 
+  #! selected vocab be 'vocab'.
+  <select name= "vocab" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
+    vocabs [ over swap option ] each drop
   </select> ;
 
-: write-word-list ( vocab -- )
-  #! Write out the HTML for the list of words in a vocabulary.
-  <select name= "words" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
-    words [ 
-      word-name dup "current-word" get [ "" ] unless* = [
-      "<option selected>" write
-     ] [
-        "<option>" write
-     ] ifte 
-     chars>entities write 
-     "</option>\n" write     
-   ] each
+: word-list ( vocab word -- )
+  #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
+  #! the currently selected option.
+  <select name= "word" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
+    swap words [ word-name over swap option ] each drop
   </select> ;
 
-: write-editable-word-source ( vocab word -- )
-  #! Write the source in a manner allowing it to be edited.
-  <textarea name= "eval" rows= "30" cols= "80" textarea> 
-    [
-      >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop    
-    ] string-out chars>entities write
-  </textarea> <br/>
-  "Accept" button ;
+: find-word ( vocab string -- word )
+  #! Given the name of a word, find it in the given vocab. Return the
+  #! word object itself if successfull, otherwise return false.
+  swap unit search ;
 
-: write-word-source ( vocab word -- )
+: word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
-  <namespace> [
-    "allow-edit?" get [ "Edit" [ "edit-state" on ] quot-href <br/> ] when
-    "edit-state" get [
-      write-editable-word-source 
-    ] [ 
-      2dup swap unit search [
-        [ 
-          >r words r> swap [ over swap dup word-name rot = [ see ] [ drop ] ifte ] each drop
-        ] with-simple-html-output
-      ] when
-    ] ifte
-  ] bind drop ;
+  find-word [
+    [ see ] with-simple-html-output
+  ] when* ;
 
-: write-vm-statistics ( -- )
+: vm-statistics ( -- )
   #! Display statistics about the vm.
   <pre> room. </pre> ;
 
-: write-browser-body ( -- )
+: browser-body ( vocab word -- )
   #! Write out the HTML for the body of the main browser page.
   <table width= "100%" table> 
     <tr>  
@@ -104,127 +77,48 @@ sequences ;
       <td> "<b>Source</b>" write </td>
     </tr>
     <tr>  
-      <td valign= "top" style= "width: 200" td> write-vocab-list </td> 
-      <td valign= "top" style= "width: 200" td> "current-vocab" get write-word-list </td> 
-      <td valign= "top" td> "current-vocab" get "current-word" get write-word-source </td> 
+      <td valign= "top" style= "width: 200" td> over vocab-list </td> 
+      <td valign= "top" style= "width: 200" td> 2dup word-list </td> 
+      <td valign= "top" td> word-source </td> 
     </tr>
   </table>
-  write-vm-statistics ;
+  vm-statistics ;
 
-: flatten ( tree - list ) 
-  #! Flatten a tree into a list.
-  dup f = [  
-  ] [ 
-    dup cons? [ 
-      dup car flatten swap cdr flatten append 
-    ] [ 
-      [ ] cons 
-    ] ifte 
-  ] ifte ;
+: browser-title ( vocab word -- )
+  #! Output the HTML title for the browser.
+  <title> 
+    "Factor Browser - " write 
+    swap write
+    " - " write
+    write
+  </title> ;
 
-: word-uses ( word -- list )
-  #! Return a list of vocabularies that the given word uses.
-  word-def flatten [ word? ] subset [
-    word-vocabulary
-  ] map ;
+: browser-style ( -- )
+  #! Stylesheet for browser pages
+  <style>
+    "A:link { text-decoration:none}\n" write
+    "A:visited { text-decoration:none}\n" write
+    "A:active { text-decoration:none}\n" write
+    "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: 0px }\n" write
+    "A { margin: 1px }" write
+  </style> ;
 
-: vocabulary-uses ( vocab -- list )
-  #! Return a list of vocabularies that all words in a vocabulary
-  #! uses.
-  words [ word-uses ] map prune ;
-
-: build-eval-string ( vocab to-eval -- string )
-  #! Build a string that can evaluate the string 'to-eval'
-  #! by first doing an 'IN: vocab' and a 'USE:' of all
-  #! necessary vocabs for existing words in that vocab.
-  [ >r "IN: " % dup % "\n" %
-     vocabulary-uses [ "USE: " % % "\n" % ] each
-     r> % "\n" % ] make-string ;
-
-: show-parse-error ( error -- )
-  #! Show an error page describing the parse error.
+: browse ( vocab word -- )
+  #! Display a Smalltalk like browser for exploring words.
   [
     <html> 
-      <head> <title> "Parse error" write </title> </head>
-      <body>  
-        swap [ write ] with-simple-html-output
-        <a href= a> "Ok" write </a>
+      <head> 2dup browser-title browser-style </head>
+      <body> 
+        <form name= "main" action= "" method= "get" form> browser-body </form>
       </body>
-    </html>
-  ] show drop drop ;
+    </html> 
+  ] show-final ;
 
-: eval-string ( vocab to-eval -- )
-  #! Evaluate the 'to-eval' within the given vocabulary.
-  build-eval-string [
-    parse call
-  ] [
-    [
-      show-parse-error
-      drop
-    ] when*
-  ] catch ;
-
-: browser-url ( vocab word -- url )
-  #! Given a vocabulary and word as strings, return a browser
-  #! URL which, when requested, will display the source to that
-  #! word.
-  [ 
-    ".?word=" % url-encode %
-    "&vocab=" % url-encode %
-  ] make-string ;
-
-: browse ( <browser> -- )
-  #! Display a Smalltalk like browser for exploring/modifying words.
-    [
-      [
-        <html> 
-          <head> 
-            <title> 
-              "Factor Browser - " write 
-              "current-vocab" get write
-              " - " write
-              "current-word" get write
-            </title>
-            <style>
-              "A:link { text-decoration:none}\n" write
-              "A:visited { text-decoration:none}\n" write
-              "A:active { text-decoration:none}\n" write
-              "A:hover, A.nav:hover { border: 1px solid black; text-decoration: none; margin: 0px }\n" write
-              "A { margin: 1px }" write
-            </style>
-          </head>
-          <body> 
-            <form name= "main" action= method= "post" form> 
-              write-browser-body 
-            </form>
-          </body>
-        </html> 
-      ] show [
-        "allow-edit?" get [ 
-          "eval" get [ 
-             "eval" off
-             "Editing has been disabled." show-message-page 
-          ] when
-        ] unless
-        "allow-edit?" get "allow-edit?" set
-      ] extend
-    ] bind [
-      "allow-edit?" get
-      "vocabs" get 
-      "words" get 
-      "eval" get dup [ "vocabs" get swap eval-string ] [ drop ] ifte
-      [
-	"vocabs" get dup [ ] [ drop "unknown" ] ifte "words" get dup [ ] [ drop "unknown" ] ifte browser-url 
-	forward-to-url
-      ] show-final
-    ] bind <browser> ;
-
-: browser-responder ( allow-edit? -- )
+: browser-responder ( -- )
   #! Start the Smalltalk-like browser.
-  "query" get dup [
-    dup >r "vocab" swap assoc r> "word" swap assoc
+  "query" get [     
+     [ "vocab" swap assoc ] keep
+     "word" swap assoc
   ] [
-    drop "browser-responder" "<browser>" 
-  ] ifte <browser> browse ;
-
-! "browser-edit" [ t browser-responder ] install-cont-responder
+    "browser-responder" "<browser>" 
+  ] ifte* browse ;
