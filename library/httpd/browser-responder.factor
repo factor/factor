@@ -120,5 +120,5 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
      [ "vocab" swap assoc ] keep
      "word" swap assoc
   ] [
-    "browser-responder" "<browser>" 
+    "browser-responder" "browse" 
   ] ifte* browse ;
