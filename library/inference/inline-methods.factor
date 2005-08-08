@@ -60,6 +60,9 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     ] ifte ;
 
 : inline-method ( node class -- node )
+    USING: io prettyprint ;
+    "Inlining " write over node-param .
+    "Method " write dup .
     over node-param "methods" word-prop hash
     over node-in-d dataflow-with dup solve-recursion
     >r [ node-param ] keep r> subst-node ;

@@ -205,7 +205,7 @@ DEFER: subst-value
         2drop
     ] [
         dup meet? [
-            pick over eq? [
+            pick over swap value-refers? [
                 2nip ! don't substitute a meet into itself
             ] [
                 [ subst-meet ] keep
