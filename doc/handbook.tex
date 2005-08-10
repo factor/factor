@@ -75,7 +75,7 @@
 
 \chapter*{Foreword}
 
-This handbook documents release 0.76 of the Factor programming language.
+This handbook documents release 0.77 of the Factor programming language.
 
 Note that this handbook is not a tutorial or introductory guide, nor does it cover some background material that you are expected to understand, such as object-oriented programming, higher-order functions, continuations, or general algorithm and program design.
 
@@ -280,7 +280,9 @@ description={a collection of words, uniquely identified by name. The hashtable o
 A \emph{word} is a code definition identified by a name. Words are sorted into \emph{vocabularies}. Words are discussed in depth in \ref{words}.
 
 When the parser reads a token, it attempts to look up a word named by that token. The
-lookup is performed in the parser's current vocabulary set.
+lookup is performed by searching each vocabulary in the search path, in order.
+
+Due to the way the parser works, words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. For a way around this, see \ref{deferred}.
 
 For a source file the vocabulary search path starts off with two vocabularies:
 \begin{verbatim}
@@ -291,7 +293,7 @@ The \texttt{syntax} vocabulary consists of a set of parsing words for reading Fa
 and defining new words. The \texttt{scratchpad} vocabulary is the default vocabulary for new
 word definitions.
 
-At the interactive listener, the default search path contains many more vocabularies. The default search path depends on how the parser was invoked (\ref{parsing-quotations}).
+At the interactive listener, the default search path contains many more vocabularies. Details on the default search path and parser invocation are found in \ref{parsing-quotations}.
 \wordtable{
 \vocabulary{syntax}
 \parsingword{USE:}{USE: \emph{vocabulary}}
@@ -301,7 +303,7 @@ name=search path,
 description={the list of vocabularies that the parser looks up tokens in. You can add to this list with the \texttt{USE:} and \texttt{USING:} parsing words}}}
 \useglos
 
-The \texttt{USE:} parsing word adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first.
+Adds a new vocabulary at the front of the search path. Subsequent word lookups by the parser will search this vocabulary first.
 \begin{alltt}
 USE: lists
 \end{alltt}
@@ -314,7 +316,41 @@ Consecutive \texttt{USE:} declarations can be merged into a single \texttt{USING
 USING: lists strings vectors ;
 \end{alltt}
 
-Due to the way the parser works, words cannot be referenced before they are defined; that is, source files must order definitions in a strictly bottom-up fashion. For a way around this, see \ref{deferred}.
+\wordtable{
+\vocabulary{syntax}
+\parsingword{IN:}{IN:~\emph{vocabulary}}
+}
+Sets the current vocabulary for new word definitions, and adds the vocabulary at the front of the search path (\ref{vocabsearch}).
+
+Here is an example demonstrating the vocabulary search path. If you can understand this example, then you have grasped vocabularies.
+\begin{verbatim}
+IN: foe
+USE: sequences
+
+: append
+    #! Prints a message, then calls sequences::append.
+    "foe::append calls sequences::append" print append ;
+
+IN: fee
+
+: append
+    #! Loops, calling fee::append.
+    "fee::append calls fee::append" print append ;
+    
+USE: foe
+
+: append
+    #! Redefining fee::append to call foe::append.
+    "fee::append calls foe::append" print append ;
+
+"1234" "5678" append print
+\end{verbatim}
+When placed in a source file and run, the above code produces the following output:
+\begin{verbatim}
+fee::append calls foe::append
+foe::append calls sequences::append
+12345678
+\end{verbatim}
 
 \section{Numbers}
 
@@ -568,16 +604,20 @@ Lists are documented in \ref{lists}.
 
 \subsection{Words}
 
-While words parse as themselves, a word occurring inside a quotation is executed when the quotation is called. Sometimes it is desirable to have a word be pushed on the data stack during the execution of a quotation, usually for reflective access to the word's slots.
+\newcommand{\wrapglos}{
+\glossary{
+name=wrapper,
+description={an instance of the \texttt{wrapper} class, holding a reference to a single object. When the evaluator encounters a wrapper, it pushes the wrapped object on the data stack. Wrappers are used to push words literally on the data stack}}}
+\wrapglos
+While words parse as themselves, a word occurring inside a quotation is executed when the quotation is called. Sometimes it is desirable to have a word be pushed on the data stack during the execution of a quotation. The canonical use-case for this is passing the word to the \verb|execute| word (\ref{quotations}), or alternatively, reflectively accessing word properties (\ref{word-props}).
 \wordtable{
 \vocabulary{syntax}
 \parsingword{\bs}{\bs~\emph{word}}
 }
-Reads the next word from the input string and appends some \emph{code} to the parse tree that pushes the word on the stack when the code is called. The following two lines are equivalent:
-\begin{verbatim}
-\ length
-[ length ] car
-\end{verbatim}
+Reads the next word from the input string and appends a \emph{wrapper} holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped object literally on the data stack.
+
+Wrappers and the implementation of the \verb|\| word are discussed in detail in \ref{reading-ahead}.
+
 \wordtable{
 \vocabulary{syntax}
 \parsingword{POSTPONE:}{POSTPONE: \emph{word}}
@@ -626,7 +666,7 @@ Reads from the input string until the next occurrence of
 \texttt{"}, converts the string to a string buffer, and appends it to the parse tree.
 As with strings, the escape codes described in \ref{syntax:char} are permitted.
 \begin{alltt}
-  SBUF" Hello world" sbuf>string print
+  SBUF" Hello world" >string print
 \textbf{Hello world}
 \end{alltt}
 
@@ -680,34 +720,12 @@ description={an instance of a user-defined class whose metaclass is the \texttt{
 \parsingword{<<}{<<}
 \parsingword{>>}{>>}
 }
-Parses a tuple. The tuple's class must follow \texttt{<<}. The element after that is always the tuple's delegate. Further elements until \texttt{>>} are specified according to the tuple's slot definition, and an error is raised if an incorrect number of elements is given.
+Parses a tuple. The tuple's class must follow \texttt{<<}. The element after that is always the tuple's delegate. Further elements until \texttt{>>} are specified according to the tuple's slot definition. If an insufficient number of elements is given, the remaining slots of the tuple are set to \verb|f|. Listing too many elements raises a parse error.
 \begin{verbatim}
 << color f 255 0 0 >>
 \end{verbatim}
 
 Tuples are documented in \ref{tuples}.
-
-\subsection{Matrices}\label{syntax:matrices}
-\newcommand{\matrixglos}{\glossary{
-name=matrix,
-description={an instance of the \texttt{matrix} class, representing a mathematical matrix of numbers}}}
-\matrixglos
-\wordtable{
-\vocabulary{syntax}
-\parsingword{M[}{M[}
-\parsingword{]M}{]M}
-}
-Parses a matrix. A matrix is specified as a set of rows, and each row is written like a list and must have the same length. The following is an example:
-\begin{verbatim}
-M[ [  3 -5  1  ]
-   [ -2  7 1/2 ] ]M
-\end{verbatim}
-It corresponds to the following mathematical matrix:
-$$\left( \begin{array}{c c c}
-3 & -5 & 1 \\
--2 & 7 & \frac{1}{2}
-\end{array} \right)$$
-Matrices are documented in \ref{matrices}.
 
 \section{Comments}\label{comments}
 
@@ -808,13 +826,18 @@ name=call frame,
 description=the currently executing quotation}}
 \cfglos
 \glossary{
+name=evaluator,
+description={a process by which code is evaluated, taking quotations as input. Two possibilities are the interpreter, which evaluates a quotation directly, and the compiler, which transforms quotations into machine code which evaluates the quotation when invoked}}
+\glossary{
 name=interpreter,
 description=executes quotations by iterating them and recursing into nested definitions. see compiler}
 \glossary{
 name=quotation,
 description=a list containing Factor code to be executed}
 
-The Factor interpreter executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the interpreter algorithm.
+A Factor evaluator executes quotations. Quotations are lists, and since lists can contain any Factor object, they can contain words. It is words that give quotations their operational behavior, as you can see in the following description of the evaluator algorithm.
+
+The Factor interpreter performs the below steps literally. The compiler generates machine code which perform the steps in a more efficient manner than the interpreter (\ref{compiler}).
 
 \begin{itemize}
 \item If the call frame is \texttt{f}, the call stack is popped and becomes the new call frame.
@@ -825,12 +848,13 @@ The Factor interpreter executes quotations. Quotations are lists, and since list
 \item If the word is compiled or primitive, the interpreter jumps to a machine code definition. See \ref{primitives}.
 \item If the word is undefined, an error is raised. See \ref{deferred}.
 \end{itemize}
+\item If the car of the call frame is a wrapper, the wrapped object is pushed on the data stack.
 \item Otherwise, the car of the call frame is pushed on the data stack.
 \item The call frame is set to the cdr, and the loop continues.
 \end{itemize}
 
 \begin{figure}
-\caption{Interpreter algorithm}
+\caption{Evaluator semantics}
 \begin{center}
 \scalebox{0.45}{
 %BEGIN IMAGE
@@ -842,12 +866,7 @@ The Factor interpreter executes quotations. Quotations are lists, and since list
 \end{figure}
 \glossary{name=combinator,
 description=a word taking quotations or other words as input}
-The following pair of words invokes the interpreter reflectively. They are used to implement \emph{combinators}, which are words that take code from the stack. Combinator definitions must be followed by the \texttt{inline} word to mark them as inline in order to compile; for example:
-\begin{verbatim}
-: keep ( x quot -- x | quot: x -- )
-    over >r call r> ; inline
-\end{verbatim}
-Word inlining is documented in \ref{declarations}.
+The following pair of words invokes the interpreter reflectively.
 
 \wordtable{
 \vocabulary{kernel}
@@ -871,6 +890,13 @@ Execute a word definition, taking action based on the word definition, as above.
 \textbf{Hello world}
 \end{alltt}
 
+These words are used to implement \emph{combinators}, which are words that take code from the stack. Combinator definitions must be followed by the \texttt{inline} word to mark them as inline in order to compile; for example:
+\begin{verbatim}
+: keep ( x quot -- x | quot: x -- )
+    over >r call r> ; inline
+\end{verbatim}
+Word inlining is documented in \ref{declarations}.
+
 \subsection{Tail call optimization}
 
 \newcommand{\tailglos}{\glossary{
@@ -885,7 +911,7 @@ purpose in pushing the empty call frame on the call stack. Therefore the last ca
 
 \subsection{Call stack manipulation}
 
-Because of the way the interpreter is described in \ref{quotations}, the top of the call stack is not accessed during the execution of a quotation; it is only popped when the interpreter reaches the end of the quotation. In effect, the call stack can be used as a temporary storage area, as long as pushes and pops are balanced out within a single quotation.
+The definition of evaluator semantics in \ref{quotations} stipulates that the top of the call stack is not accessed during the execution of a quotation; the call stack is only popped when the end of the quotation is reached. In effect, the call stack can be used as a temporary storage area, as long as pushes and pops are balanced out within a single quotation.
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{>r}{>r ( x -- r:x )}
@@ -996,6 +1022,17 @@ X dup [ Y ] [ drop Z ] ifte
 \ordinaryword{unless*}{unless*~( cond false -- | false:~-- )}
 }
 These are variations of \texttt{ifte*} where one of the quotations is \texttt{[ ]}.
+
+The following two lines are equivalent:
+\begin{verbatim}
+X [ Y ] when*
+X dup [ Y ] [ drop ] ifte
+\end{verbatim}
+The following two lines are equivalent:
+\begin{verbatim}
+X [ Y ] unless*
+X dup [ ] [ drop Y ] ifte
+\end{verbatim}
 
 There is one final conditional form that is used to implement the ``default value'' idiom.
 \wordtable{
@@ -1221,13 +1258,8 @@ Tests if the \texttt{object} is a word.
 \symbolword{vocabularies}
 }
 Words are organized into named vocabularies, stored in the global \texttt{vocabularies} variable (\ref{namespaces}).
-\wordtable{
-\vocabulary{syntax}
-\parsingword{IN:}{IN:~\emph{vocabulary}}
-}
-Sets the current vocabulary for new word definitions, and adds the vocabulary to the search path (\ref{vocabsearch}).
 
-Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to \texttt{scratchpad}.
+Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to \texttt{scratchpad}. The current vocabulary may be changed with the \verb|IN:| parsing word (\ref{vocabsearch}).
 
 \subsection{Searching for words}
 
@@ -1254,7 +1286,8 @@ Creates a new word \texttt{name} in \texttt{vocabulary}. If the vocabulary alrea
 }
 Creates a new word \texttt{name} in the current vocabulary. This word is intended to be called from parsing words (\ref{parsing-words}), and in fact is defined as follows:
 \begin{verbatim}
-: create-in ( name -- word ) "in" get create dup save-location ;
+: create-in ( name -- word )
+    "in" get create dup save-location ;
 \end{verbatim}
 
 \section{Word definition}
@@ -1406,13 +1439,19 @@ A compound or generic word (\ref{generic}) can be given special behavior with on
 \vocabulary{syntax}
 \parsingword{inline}{inline}
 }
-Marks the most recently defined word as an inline word. The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization; see \ref{compiler}. Inlining does not affect the execution of the word in the interpreter, nor is inlining visible when you \texttt{see} the word (\ref{exploring-vocabs}).
+Declares the most recently defined word as an inline word. The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization; see \ref{compiler}. Inlining does not affect the execution of the word in the interpreter, nor is inlining visible when you \texttt{see} the word (\ref{exploring-vocabs}).
 
 \wordtable{
 \vocabulary{syntax}
 \parsingword{parsing}{parsing}
 }
-Marks the most recently defined word as a parsing word. Parsing words run at parse time. Se \ref{parsing-words}.
+Declares the most recently defined word as a parsing word. Parsing words run at parse time. See \ref{parsing-words}.
+
+\wordtable{
+\vocabulary{syntax}
+\parsingword{stateless}{parsing}
+}
+Declares the most recently defined word as a stateless word, whose outputs only depend on the input values, and not on any runtime state such as variable values. Stateless words are evaluated at compile-time if their inputs are literals; for example, \verb|2 2 +| is compiled to a literal \verb|4|, because \verb|+| is declared as stateless.
 
 \section{Word properties}\label{word-props}
 
@@ -1438,6 +1477,7 @@ The following properties are commonly-set:
 \item[\texttt{"vocabulary"}] The vocabulary containing the word
 \item[\texttt{"parsing"}] A boolean specifying if this is a parsing word (\ref{parsing-words})
 \item[\texttt{"inline"}] A boolean specifying if this word is compiled inline (\ref{declarations})
+\item[\texttt{"stateless"}] A boolean specifying if this word can be evaluated at compile-time if all inputs are literal (\ref{declarations})
 \item[\texttt{"methods"}] Only defined on generic words; a hashtable mapping classes to quotations (\ref{generic})
 \item[\texttt{"file"}] The source file storing the word definition
 \item[\texttt{"line"}] The line number in the source file storing the word definition
@@ -1539,7 +1579,13 @@ Everything in Factor is an object, where an object is a collection of slots. Eac
 
 \glossary{name=equal,
 description={two objects are equal if they have the same class and if their slots are equal, or alternatively, if both are numbers that denote the same value}}
-There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by having the same type and equal slot values.
+There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object, or you can test if two objects are equal in some sense, usually by being instances of the same class, and having equal slot values. Both notions of equality are equality relations in the mathematical sense; that is, they obey the following axioms:
+\begin{itemize}
+\item They are reflexive: $x\sim x$
+\item They are symmetric: $x\sim y$ if and only if $y\sim x$
+\item They are transitive: if $x\sim y$ and $y\sim z$, then $x\sim z$
+\end{itemize}
+
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{eq?}{eq?~( object object -- ?~)}
@@ -1552,8 +1598,8 @@ Output \texttt{t} if two references point to the same object, and \texttt{f} oth
 Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precise meaning of equality depends on the object's class, however usually two objects are equal if their slot values are equal. If two objects are equal, they have the same printed representation, although the converse is not always true. In particular:
 \begin{itemize}
 \item If no more specific method is defined, \texttt{=} calls \texttt{eq?}.
-\item Two numbers are equal if they have the same numerical value.
-\item Two sequences are equal if they are both instances of the same class, and if they have the same length, and elements.
+\item Two numbers are equal if they have the same numerical value after being upgraded to the highest type of the two (\ref{number-protocol}).
+\item Two lists, vectors, strings, string buffers or arrays are equal if they have the same length, and elements.
 \item Two hashtables are equal if they hold the same set of key/value pairs.
 \item Two tuples are equal if they are of the same class and their slots are equal.
 \item Two words are equal if they are the same object.
@@ -1662,6 +1708,7 @@ bignum
 byte-array
 complex
 cons
+displaced-alien
 dll
 f
 fixnum
@@ -1673,6 +1720,7 @@ t
 tuple
 vector
 word
+wrapper
 \end{verbatim}
 \wordtable{
 \vocabulary{kernel}
@@ -1756,16 +1804,29 @@ PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 \subsection{Operations on classes}
 \wordtable{
 \vocabulary{kernel}
+\ordinaryword{class<}{class< ( class1 class2 -- ?~)}
+}
+Tests if all instances of \verb|class1| are also instances of \verb|class2|. This is a partial order with top and bottom in the mathematical sense; that is, it obeys the following axioms:
+\begin{itemize}
+\item It is reflexive: $X\subset X$
+\item It is transitive: if $X\subset Y$ and $Y\subset Z$, then $X\subset Z$
+\item There is a bottom element: for all classes $X$, $\texttt{null}\subset X$
+\item There is a top element: for all classes $X$, $X\subset\texttt{object}$
+\end{itemize}
+
+This ordering determines the method ordering of a generic word (\ref{method-order}).
+
+\wordtable{
+\vocabulary{kernel}
 \ordinaryword{class-and}{class-and ( class class -- class )}
 \ordinaryword{class-or}{class-or ( class class -- class )}
 
 }
-Intersection and union of classes. Note that the returned class might not be the exact desired class; for example, \texttt{object} is output if no suitable class definition could be found at all.
-\wordtable{
-\vocabulary{kernel}
-\ordinaryword{class<}{class< ( class class -- class )}
-}
-Classes are partially ordered. This ordering determines the method ordering of a generic word (\ref{method-order}).
+Intersection and union of classes. Note that the returned class might not be the exact desired class; for example, \texttt{object} is output if no suitable class definition could be found at all. However, the following axioms are satisfied:
+\begin{itemize}
+\item If $X\subset Y$, then $X\cup Y=Y$
+\item If $X\subset Y$, then $X\cap Y=X$
+\end{itemize}
 
 \section{Tuples}\label{tuples}
 \tupleglos
@@ -1796,7 +1857,7 @@ The word \texttt{<point>} takes the slot values from the stack and
 produces a new \texttt{point}:
 \begin{alltt}
   1 2 3 <point> .
-\textbf{<< point 1 2 3 >>}
+\textbf{<< point f 1 2 3 >>}
 \end{alltt}
 
 \subsection{Constructors}
@@ -1831,11 +1892,10 @@ method call receives the delegate on the stack, not the original object.
 \ordinaryword{delegate}{delegate ( object -- object )}
 
 }
-Returns an object's delegate, or \texttt{f} if no delegate is set. Note that in this case,  undefined methods will be passed to \texttt{f}; rather an error is raised immediately.
+Returns an object's delegate, or \texttt{f} if no delegate is set. A direct consequence of this behavior is that an object may not have a delegate of \texttt{f}.
 \wordtable{
 \vocabulary{generic}
 \ordinaryword{set-delegate}{set-delegate ( object tuple -- )}
-
 }
 Sets a tuple's delegate.
 
@@ -1869,7 +1929,7 @@ Class&Mutable&Growable&Lookup&at start&at end&Primary purpose\\
 \texttt{string}&&&$O(1)$&&&Immutable text strings
 \end{tabular}
 
-A handful of ``virtual'' sequences are provided by the library. These sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence. Virtual sequences are documented in \ref{virtual-seq} and include:
+A handful of ``virtual'' sequences are provided by the library. These sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence. Virtual sequences include:
 \begin{verbatim}
 repeated
 range
@@ -1877,6 +1937,11 @@ reversed
 slice
 \end{verbatim}
 User-defined classes can also implement the sequence protocol and gain the ability to reuse many of the words in this section.
+
+Finally, integers implement the sequence protocol, allowing counted loops to fall out as a trivial case of sequence iteration (\ref{counted-loops}).
+
+\glossary{name=virtual sequence,
+description={a sequence that is not backed by actual storage, but instead either computes its values, or take them from an underlying sequence}}
 
 \section{Sequence protocol}
 
@@ -1910,6 +1975,18 @@ Outputs the $n$th element of the sequence. Elements are numbered starting from 0
 \genericword{set-nth}{set-nth ( elt n seq -- )}
 }
 Sets the $n$th element of the sequence. Storing beyond the end of a resizable sequence such as a vector or string buffer grows the sequence. Storing to a negative index is always an error.
+
+\wordtable{
+\vocabulary{sequences}
+\genericword{like}{like ( seq template -- seq )}
+}
+Outputs a sequence with the same elements as the input sequence, but ``like'' the template sequence, meaning it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing.
+
+\wordtable{
+\vocabulary{sequences}
+\genericword{thaw}{thaw ( seq -- seq )}
+}
+Outputs a sequence with the same elements as the input sequence, but mutable. The default implementation converts the sequence into a vector.
 
 \section{Sequence operations}
 
@@ -1979,8 +2056,8 @@ So indeed, it is an expression of an idiom rather than an algorithm. Various wor
 }
 Like \verb|reduce|, but instead outputs a sequence of intermediate values. The first element of the resulting sequence is always \verb|ident|. For example,
 \begin{alltt}
-  { 2 2 2 2 2 } 0 [ + ] accumulate .
-{ 0 2 4 6 8 }
+  \tto 2 2 2 2 2 \ttc 0 [ + ] accumulate .
+\tto 0 2 4 6 8 \ttc
 \end{alltt}
 \wordtable{
 \vocabulary{sequences}
@@ -2002,6 +2079,23 @@ Applies the quotation to each element yielding a new element. The new elements a
 Applies the quotation to each element yielding a new element, storing the new elements back in the original sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
+\ordinaryword{2each}{2each ( s1 s2 quot -- )}
+\texttt{quot:~e1 e2 --}\\
+}
+Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}. Here is an example computing the dot product of two vectors:
+\begin{alltt}
+  0 \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * + ] 2each .
+\textbf{82}
+\end{alltt}
+
+In fact the dot product is encapsulated in the \verb|v.| word of the \verb|math| vocabulary:
+\begin{verbatim}
+: v. ( v v -- n ) 0 -rot [ * + ] 2each ;
+\end{verbatim}
+See \ref{inner-product} for details.
+
+\wordtable{
+\vocabulary{sequences}
 \ordinaryword{2map}{2map ( s1 s2 quot -- seq )}
 \texttt{quot:~e1 e2 -- element}\\
 }
@@ -2011,14 +2105,8 @@ Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yie
 \textbf{\tto 40 48 -6 \ttc}
 \end{alltt}
 
-In fact the \verb|v*| word in the \verb|matrices| vocabulary is defined to call \verb|[ * ] 2map|; see \ref{pairwise} for documentation on this and similar words.
+In fact the \verb|v*| word in the \verb|math| vocabulary is defined to call \verb|[ * ] 2map|; see \ref{pairwise} for documentation on this and similar words.
 
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{2nmap}{2nmap ( s1 s2 quot -- )}
-\texttt{quot:~e1 e2 -- element}\\
-}
-Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new element is stored back in \texttt{s1}. This modifies \texttt{s1} and so throws an exception if it is immutable.
 \wordtable{
 \vocabulary{sequences}
 \genericword{find}{find ( seq quot -- i elt )}
@@ -2049,152 +2137,98 @@ member? ( elt seq -- ? )
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
 
-\subsection{Stack operations}\label{stack-seq}
+\subsection{Counted loops}\label{counted-loops}
 
-The following words allow any mutable, growable sequence to be used as a LIFO (last in, first out) stack.
+Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, 2. This is very useful for performing counted loops.
 
+For example, the \verb|each| combinator, given an integer, simply calls the quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:
+\begin{alltt}
+  3 [ . ] each
+0
+1
+2
+\end{alltt}
+A common idiom is to iterate over a sequence, while maintaining a loop counter. This can be done using \verb|2each|:
+\begin{alltt}
+  \tto "a" "b" "c" \ttc dup length [
+      "Index: " write . "Element: " write .
+  ] 2each
+\textbf{Index: 0
+Element: "a"
+Index: 1
+Element: "b"
+Index: 2
+Element: "c"}
+\end{alltt}
+Combinators that produce new sequences, such as \verb|map|, will output a vector if the input is an integer.
+
+If you wish to perform an iteration over a range of integers that does not begin from zero, or an iteration that starts at a specific index and decreases towards zero, use a \verb|<range>| sequence.
+
+\glossary{name=range sequence,
+description={an instance of the \texttt{range} class, which is a virtual sequence of integers}}
 \wordtable{
 \vocabulary{sequences}
-\genericword{empty?}{empty?~( seq -- ?~)}
+\ordinaryword{<range>}{<range> ( a b -- seq )}
 }
-Tests if the sequence contains any elements. The default implementation of this word tests if the length is zero; user-defined sequences can provide a custom implementation that is more efficient.
+Creates an immutable sequence consisting of all integers in the interval $[a,b)$ (if $a<b$) or $(b,a]$ (if $a>b$). If $a=b$, the resulting sequence is empty. This is just a tuple implementing the sequence protocol.
+\begin{alltt}
+  CHAR: a CHAR: z 1 + <range> .
+<< range [ ] 97 123 1 >>
+  CHAR: a CHAR: z 1 + <range> >string .
+"abcdefghijklmnopqrstuvwxyz"
+  CHAR: z CHAR: a 1 - <range> >string .
+"zyxwvutsrqponmlkjihgfedcba"
+\end{alltt}
 
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{peek}{peek ( sequence -- element )}
-}
-Outputs the last element of the sequence. Throws an exception if the sequence is empty. This word has a trivial implementation:
-\begin{verbatim}
-: peek ( sequence -- element ) dup length 1 - swap nth ;
-\end{verbatim}
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{push}{push ( element sequence -- )}
-\ordinaryword{pop}{pop ( sequence -- element )}
-}
-
-Adds and removes an element at the end of the sequence. The sequence's length is adjusted accordingly. These are implemented as follows:
-\begin{verbatim}
-: push ( element sequence -- )
-    dup length swap set-nth ;
-: pop ( sequence -- element )
-    dup peek >r dup length 1 - swap set-length r> ;
-\end{verbatim}
-
-\subsection{Aggregation}\label{aggregation}
-
-A set of words for combining sequences into new sequences.
+\subsection{Aggregation and grouping}\label{aggregation}
 
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{append}{append ( s1 s2 -- seq )}
 }
-Output a new sequence consisting of the elements of \texttt{s1} followed by the elements of \texttt{s2}. The new sequence is of the same class as \texttt{s1}.
+Outputs a new sequence consisting of the elements of \texttt{s1} followed by the elements of \texttt{s2}. The new sequence is of the same class as \texttt{s1}.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{add}{add ( seq elt -- seq )}
+}
+Outputs a new sequence consisting of the elements of \texttt{seq} followed by \verb|elt|.
+The new sequence is of the same type as \texttt{seq}.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{append3}{append3 ( s1 s2 s3 -- seq )}
 }
-Append the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new sequence of the same class as \texttt{s1}.
+Appends the three sequences \texttt{s1}, \texttt{s2} and \texttt{s3} into a new sequence of the same class as \texttt{s1}.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{nappend}{nappend ( s1 s2 -- )}
+}
+Appends \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{copy-into}{copy-into ( start to from -- )}
+}
+Copies all elements of \verb|from| into \verb|to|, with destination indices starting from \verb|start|. The \verb|to| sequence must be large enough, or an exception is thrown.
+
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{concat}{concat ( sequence -- sequence )}
 }
 The input is a sequence of sequences. If the input is empty, the output is the empty list (\texttt{f}). Otherwise, the elements of the input sequence are concatenated together, and a new sequence of the same type as the first element is output.
 \begin{alltt}
-  [ "a" [ CHAR: b ] \tto CHAR: c \ttc ] concat .
+  \tto "a" [ CHAR: b ] \tto CHAR: c \ttc \ttc concat .
 \textbf{"abc"}
 \end{alltt}
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{nappend}{nappend ( s1 s2 -- )}
+\ordinaryword{join}{join ( sequence glue -- sequence )}
 }
-Append \texttt{s2} to \texttt{s1}. Nothing is output, and \texttt{s1} is modified.
-\wordtable{
-\vocabulary{sequences}
-\genericword{reverse}{reverse ( seq -- seq )}
-}
-Outputs a new sequence of the same class, with the reverse element order. A related word is \verb|reverse-slice|; see \ref{virtual-seq}.
-
-\subsection{Indexing}
-
-A set of words dealing with sequence element indices.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{change-nth}{change-nth ( seq n quot -- )}
-\texttt{quot:~element -- element}\\
-}
-Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{index}{index ( obj seq -- n )}
-\ordinaryword{index*}{index* ( obj i seq -- n )}
-}
-Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$. The \verb|index*| form allows a start index to be specified. A related word is \verb|member?|.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{start}{start ( subseq seq -- n )}
-\ordinaryword{start*}{start* ( subseq i seq -- n )}
-}
-Outputs the start index of a subsequence, or $-1$ if the subsequence does not occur in the sequence. The \verb|start*| form allows a start index to be specified. A related word is \verb|subseq?|.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
-}
-Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+Like \verb|concat|, but \verb|glue| is placed between each pair of sequences, and the resulting sequence has the same type as \verb|glue|.
 \begin{alltt}
-  "Hello world" 5 cut .s
-\textbf{" world"
-"Hello"}
+  \tto "alpha" "beta" "gamma" \ttc ", " join .
+\textbf{"alpha, beta, gamma"}
 \end{alltt}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{cut*}{cut* ( seq n -- s1 s2 )}
-}
-Outputs a pair of sequences that equal the original sequence excluding the $n$th element, when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-  "Hello world" 5 cut* .s
-\textbf{"world"
-"Hello"}
-\end{alltt}
-
-\subsection{Subsequences}\label{subseq}
-
-A set of words for extracting subsequences of contiguous elements, and performing operations on them.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
-}
-Tests if \texttt{s2} contains \texttt{s1} as a subsequence. A related word is \verb|start|.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{head?}{head?~( s1 s2 -- ?~)}
-\ordinaryword{tail?}{tail?~( s1 s2 -- ?~)}
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{head}{head~( n seq -- seq )}
-}
-Outputs a new sequence consisting of the first $n$ elements of the input sequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail}{tail~( n seq -- seq )}
-}
-Outputs a new sequence consisting of all elements of the sequence, starting at the $n$th index.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail*}{tail*~( n seq -- seq )}
-}
-Outputs a new sequence consisting of the last $n$ elements of the input sequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
-\ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
-}
-Tests if \texttt{s1} starts or ends with \texttt{s1} as a subsequence. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{split1}{split1~( seq split -- before after )}
@@ -2215,7 +2249,110 @@ Outputs a list of subsequences taken between occurrences of \texttt{split} in \t
 }
 Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
 
-\subsection{Set-theoretic operations}
+\subsection{Searching}\label{seq-searching}
+
+A set of words dealing with sequence element indices.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{index}{index ( obj seq -- n )}
+\ordinaryword{index*}{index* ( obj i seq -- n )}
+}
+Outputs the index of the first element in the sequence equal to \texttt{obj}. If no element is found, outputs $-1$. The \verb|index*| form allows a start index to be specified. A related word is \verb|member?| (\ref{set-theoretic}).
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{start}{start ( subseq seq -- n )}
+\ordinaryword{start*}{start* ( subseq i seq -- n )}
+}
+Outputs the start index of a subsequence, or $-1$ if the subsequence does not occur in the sequence. The \verb|start*| form allows a start index to be specified. A related word is \verb|subseq?|.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
+}
+Tests if \texttt{s2} contains \texttt{s1} as a subsequence.
+
+\subsection{Slicing and reshaping}\label{reshaping}
+\glossary{name=slice,
+description={an instance of the \texttt{slice} class, which is a virtual sequence sharing structure with a subrange of some underlying sequence}}
+
+The first set of words are concerned with taking subsequences of a sequence. Each of the below words comes in dual pairs; the first of the pair outputs a new copied sequence, the second outputs a virtual sequence sharing structure with the underlying sequence.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head}{head~( n seq -- seq )}
+\ordinaryword{head-slice}{head-slice ( n seq -- slice )}
+}
+Outputs a new sequence consisting of the first $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail}{tail~( n seq -- seq )}
+\ordinaryword{tail-slice}{tail-slice ( n seq -- slice )}
+}
+Outputs a new sequence consisting of all elements of the sequence, starting at the $n$th index.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head*}{head~( n seq -- seq )}
+\ordinaryword{head-slice*}{head-slice*~( n seq -- slice )}
+}
+Outputs a new sequence consisting of all elements of the sequence, until the $n$th element from the end. In other words, it outputs a sequence of the first $l-n$ elements of the input sequence, where $l$ is its length.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{tail*}{tail*~( n seq -- seq )}
+\ordinaryword{tail-slice*}{tail-slice*~( n seq -- slice )}
+}
+Outputs a new sequence consisting of the last $n$ elements of the input sequence.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{subseq}{subseq~( from to seq -- seq )}
+\ordinaryword{<slice>}{<slice> ( from to seq -- slice )}
+}
+Outputs a new sequence consisting of all elements in the interval $[from,to)$.
+\wordtable{
+\vocabulary{sequences}
+\genericword{reverse}{reverse ( seq -- seq )}
+\genericword{reverse}{reverse-slice ( seq -- seq )}
+}
+Outputs a new sequence with the reverse element order.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{head?}{head?~( s1 s2 -- ?~)}
+\ordinaryword{tail?}{tail?~( s1 s2 -- ?~)}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer than \texttt{s2}, outputs \texttt{f}.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
+}
+Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
+\begin{alltt}
+  "Hello world" 5 cut .s
+\textbf{" world"
+"Hello"}
+\end{alltt}
+This word has a simple definition:
+\begin{verbatim}
+: cut ( n seq -- seq seq )
+    [ head ] 2keep tail ;
+\end{verbatim}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
+\ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
+}
+Tests if \texttt{s1} starts or ends with \texttt{s1} as a subsequence. If there is a match, outputs the subrange of \texttt{s1} excluding \texttt{s1} followed by \texttt{t}. If there is no match, outputs \texttt{s1} followed by \texttt{f}.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{flip}{flip ( seq -- seq )}
+}
+Outputs the two-dimensional transpose of the sequence of sequences, all of which must have equal length. An example:
+\begin{alltt}
+  \tto \tto 1 2 3 \ttc \tto 4 5 6 \ttc \ttc flip
+\textbf{\tto \tto 1 2 \ttc \tto 3 4 \ttc \tto 5 6 \ttc \ttc}
+\end{alltt}
+
+\subsection{Set-theoretic operations}\label{set-theoretic}
 
 A set of words for testing membership, and aggregating sequences without regard for element order.
 
@@ -2223,7 +2360,7 @@ A set of words for testing membership, and aggregating sequences without regard 
 \vocabulary{sequences}
 \ordinaryword{member?}{member?~( elt seq -- ?~)}
 }
-Tests if \texttt{seq} contains an element equal to \texttt{elt}. A related word is \verb|index|.
+Tests if \texttt{seq} contains an element equal to \texttt{elt}. A related word is \verb|index| (\ref{seq-searching})..
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{memq?}{memq?~( elt seq -- ?~)}
@@ -2253,7 +2390,7 @@ Outputs a new sequence with each element of \verb|seq| appearing only once.
 \vocabulary{sequences}
 \ordinaryword{seq-union}{seq-union ( seq seq -- seq )}
 }
-Outputs a sequence of elements present in one or both sequences, filtering duplicates by comparing elements for equality.
+Outputs a sequence of elements present in at least one of the sequences, filtering duplicates by comparing elements for equality.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{seq-intersect}{seq-intersect ( seq seq -- seq )}
@@ -2266,11 +2403,6 @@ Outputs a sequence of elements present in both sequences, comparing elements for
 Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for equality.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{seq-diffq}{seq-diffq ( s1 s2 -- seq )}
-}
-Outputs a sequence of elements present in \texttt{sl2} but not \texttt{s1}, comparing elements for identity.
-\wordtable{
-\vocabulary{sequences}
 \ordinaryword{subset}{subset ( seq quot -- seq )}
 \texttt{quot:~element -- ?}\\
 }
@@ -2280,7 +2412,7 @@ Applies the quotation to each element, and outputs a new sequence containing the
 \ordinaryword{contains?}{contains?~( seq quot -- ?~)}
 \texttt{quot:~element -- ?}\\
 }
-Applies the quotation to each element of the sequence. If an element is found for which the quotation outputs a true value, a true value is output. Otherwise if the end of the sequence is reached, \verb|f| is output.
+Applies the quotation to each element of the sequence. If an element is found for which the quotation outputs a true value, a true value is output. Otherwise if the end of the sequence is reached, \verb|f| is output. Given an empty sequence, vacuously outputs \texttt{f}.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{all?}{all?~( seq quot -- ?~)}
@@ -2289,13 +2421,25 @@ Applies the quotation to each element of the sequence. If an element is found fo
 Outputs \texttt{t} if the quotation yields true when applied to each element, otherwise outputs \texttt{f}. Given an empty sequence, vacuously outputs \texttt{t}.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{fiber?}{fiber?~( seq quot -- ?~)}
+\ordinaryword{every?}{every?~( seq quot -- ?~)}
 \texttt{quot:~element element -- ?}\\
 }
-Tests if all elements of the sequence are equivalent under the relation. The quotation should be an equality relation, otherwise the result will not be useful. This is implemented by vacuously outputting \verb|t| if the sequence is empty, or otherwise, by applying the quotation to each element together with the first element in turn, and testing if it always yields a true value. Usually, this word is used to test if all elements of a sequence are equal, or the same element:
+Tests if all elements of the sequence are equivalent under the relation. The quotation should be an equality relation (see \ref{equality}), otherwise the result will not be useful. This is implemented by vacuously outputting \verb|t| if the sequence is empty, or otherwise, by applying the quotation to each element together with the first element in turn, and testing if it always yields a true value. Usually, this word is used to test if all elements of a sequence are equal, or the same element:
 \begin{verbatim}
-[ = ] fiber?
-[ eq? ] fiber?
+[ = ] every?
+[ eq? ] every?
+\end{verbatim}
+
+A pair of utility words test of every element in a sequence is true, or if the sequence contains at least one true element.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{conjunction}{conjunction~( seq -- ?~)}
+\ordinaryword{disjunction}{disjunction~( seq -- ?~)}
+}
+The implementations are trivial:
+\begin{verbatim}
+: conjunction ( v -- ? ) [ ] all? ;
+: disjunction ( v -- ? ) [ ] contains? ;
 \end{verbatim}
 
 \wordtable{
@@ -2307,6 +2451,85 @@ Tests if all elements of the sequence are equivalent under the relation. The quo
 \texttt{quot:~object element -- ?}\\
 }
 Curried forms of the above combinators. They pass an additional object to each invocation of the quotation.
+
+\section{Oddball operations}\label{oddball-seq}
+
+These operations do not fit into any clearly-defined functional category, but are nonetheless useful.
+\wordtable{
+\vocabulary{sequences}
+\genericword{empty?}{empty?~( seq -- ?~)}
+}
+Tests if the sequence contains any elements. The default implementation of this word tests if the length is zero; user-defined sequences can provide a custom implementation that is more efficient.
+
+A few convenience words are defined for accessing the first few elements.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{first}{first ( seq -- elt )}
+\ordinaryword{second}{second ( seq -- elt )}
+\ordinaryword{third}{third ( seq -- elt )}
+\ordinaryword{fourth}{fourth ( seq -- elt )}
+}
+Note the naming convention here; the \verb|first| word actually gets the 0th element:
+\begin{verbatim}
+: first 0 swap nth ; inline
+\end{verbatim}
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{2unseq}{2unseq ( seq -- first second )}
+\ordinaryword{3unseq}{3unseq ( seq -- first second third )}
+}
+Outputs the first two, or the first three elements of the sequence, respectively.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{peek}{peek ( sequence -- element )}
+}
+Outputs the last element of the sequence. Throws an exception if the sequence is empty. This word has a trivial implementation:
+\begin{verbatim}
+: peek ( sequence -- element ) dup length 1 - swap nth ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{push}{push ( element sequence -- )}
+\ordinaryword{pop}{pop ( sequence -- element )}
+}
+
+Adds and removes an element at the end of the sequence. The sequence's length is adjusted accordingly. These are implemented as follows:
+\begin{verbatim}
+: push ( element sequence -- )
+    dup length swap set-nth ;
+: pop ( sequence -- element )
+    dup peek >r dup length 1 - swap set-length r> ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{push-new}{push-new ( element sequence -- )}
+}
+
+Adds the element to the sequence if the sequence does not already contain an equal element.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{change-nth}{change-nth ( seq n quot -- )}
+\texttt{quot:~element -- element}\\
+}
+Applies the quotation to the $n$th element of the sequence, and store the output back in the $n$th slot of the sequence. This modifies \texttt{seq} and so throws an exception if it is immutable.
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{<repeated>}{<repeated> ( n object -- seq )}
+}
+Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
+\begin{alltt}
+  5 "hey" <repeated> .
+<< repeated [ ] 5 "hey" >>
+  5 "hey" <repeated> >list .
+[ "hey" "hey" "hey" "hey" "hey" ]
+\end{alltt}
+
+\glossary{name=repeated sequence,
+description={an instance of the \texttt{repeated} class, which is a virtual, immutable sequence consisting of a fixed element repeated a certain number of times}}
 
 \section{Vectors}\label{vectors}
 
@@ -2356,6 +2579,7 @@ Creates a new vector of the requested length, where all elements are initially \
 }
 A \emph{cons cell} is an ordered pair of values. The first value is called the \emph{car},
 the second is called the \emph{cdr}. The literal syntax of cons cells is documented in \ref{listsyntax}.
+Cons cells, and by extension lists, are immutable.
 
 \wordtable{
 \vocabulary{lists}
@@ -2399,7 +2623,19 @@ Here is an example:
 \textbf{"gravy"
 "potatoes"}
 \end{alltt}
-Cons cells, and by extension lists, are immutable.
+
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}
+}
+Cons a pair of elements onto a pair of lists.
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{2car}{2car ( c1 c2 -- car1 car2 )}
+\ordinaryword{2cdr}{2cdr ( c1 c2 -- cdr1 cdr2 )}
+\ordinaryword{2uncons}{2uncons ( c1 c2 -- car1 car2 cdr1 cdr2 )}
+}
+Deconstructs paired lists. Compare the stack effects with those of \verb|car|, \verb|cdr| and \verb|uncons|
 
 \subsection{Lists}\label{lists}
 
@@ -2470,24 +2706,9 @@ Makes a list of two elements.
 Pushes the first two elements of a list.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{3list}{3list ( o1 o2 o3 -- [ o1 o2 o3 ] )}
-}
-Makes a list of three elements.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{3unlist}{3unlist ( [ o1 o2 o3 ] -- o1 o2 o3 )}
-}
-Pushes the first three elements of a list.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{unique}{unique ( obj list -- list )}
 }
 If the list already contains an element equal to the object, do nothing, otherwise cons the object into the list.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{count}{count~( n -- list )}
-}
-Return a new list containing all integers from 0 up to $n-1$, inclusive.
 
 \wordtable{
 \vocabulary{lists}
@@ -2497,7 +2718,7 @@ Return a new list containing all integers from 0 up to $n-1$, inclusive.
 Sorts the list by comparing each pair of elements with the quotation. The quotation should output \texttt{t} if \texttt{e2} is to come before \texttt{e1} in the list. For example, to sort a list of numbers in ascending order, you can do the following:
 \begin{alltt}
   [ 8 6 9 1 10 3 ] [ > ] sort .
-[ 1 3 6 8 9 10 ]
+\textbf{[ 1 3 6 8 9 10 ]}
 \end{alltt}
 
 \subsection{Queues}
@@ -2597,90 +2818,9 @@ Tests if the object at the top of the stack is a string buffer.
 \vocabulary{strings}
 \ordinaryword{>sbuf}{>sbuf~( sequence -- sbuf )}
 }
-Turns any type of sequence into a string buffer. Given a string buffer, this makes a fresh copy.
+Turns a sequence of integers into a string buffer. Given a string buffer, this makes a fresh copy.
 
 String buffers support the stream input and output protocol (\ref{string-streams}).
-
-\section{Virtual sequences}\label{virtual-seq}
-
-\glossary{name=virtual sequence,
-description={a sequence that is not backed by actual storage, but instead either computes its values, or take them from an underlying sequence}}
-\glossary{name=repeated sequence,
-description={an instance of the \texttt{repeated} class, which is a virtual, immutable sequence consisting of a fixed element repeated a certain number of times}}
-
-Virtual sequences are not backed by actual storage, but instead either compute their values, or take them from an underlying sequence.
-
-\glossary{name=range sequence,
-description={an instance of the \texttt{range} class, which is a virtual sequence of integers}}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{<range>}{<range> ( a b -- seq )}
-}
-Creates an immutable sequence consisting of all integers in the interval $[a,b)$ (if $a<b$) or $(b,a]$ (if $a>b$). If $a=b$, the resulting sequence is empty. As with repeated sequences, this is just a tuple implementing the sequence protocol.
-\begin{alltt}
-  CHAR: a CHAR: z 1 + <range> .
-<< range [ ] 97 123 1 >>
-  CHAR: a CHAR: z 1 + <range> >string .
-"abcdefghijklmnopqrstuvwxyz"
-  CHAR: z CHAR: a 1 - <range> >string .
-"zyxwvutsrqponmlkjihgfedcba"
-\end{alltt}
-\glossary{name=slice,
-description={an instance of the \texttt{slice} class, which is a virtual sequence sharing structure with a subrange of some underlying sequence}}
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{<repeated>}{<repeated> ( n object -- seq )}
-}
-Creates an immutable sequence consisting of \verb|object| repeated $n$ times. No storage allocation of $n$ elements is made; rather a repeated sequence is just a tuple where the \verb|nth| word is implemented to return the same value on each invocation.
-\begin{alltt}
-  5 "hey" <repeated> .
-<< repeated [ ] 5 "hey" >>
-  5 "hey" <repeated> >list .
-[ "hey" "hey" "hey" "hey" "hey" ]
-\end{alltt}
-
-\wordtable{
-\vocabulary{sequences}
-\genericword{reverse-slice}{reverse-slice ( seq -- seq )}
-}
-Outputs a sequence with the same length as the input sequence, that presents the elements of the input sequence in reverse order. The new sequence shares storage with the given sequence.
-A related word is \verb|reverse|, see \ref{aggregation}.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{<slice>}{<slice> ( a b seq -- slice )}
-}
-Creates a mutable sequence that is a view of a subrange of elements of an underlying sequence. Changes to the underlying sequence are reflected in the slice, and vice versa.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{head-slice}{head-slice ( n seq -- slice )}
-}
-Creates a slice viewing the first $n$ elements of the input sequence.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail-slice}{tail-slice ( n seq -- slice )}
-}
-Creates a slice viewing all elements of the sequence, starting at the $n$th index.
-
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{tail-slice*}{tail-slice* ( n seq -- slice )}
-}
-Creates a slice viewing the last $n$ elements of the input sequence.
-
-There is a correspondence between the four slicing words above, and the subsequence words from \ref{subseq}:
-
-\begin{tabular}[t]{l|l}
-Subsequence&Slice\\
-\hline
-\verb|subseq|&\verb|<slice>|\\
-\verb|head|&\verb|head-slice|\\
-\verb|tail|&\verb|tail-slice|\\
-\verb|tail*|&\verb|tail-slice*|
-\end{tabular}
-
-The slice words output a new virtual sequence that shares structure with the original sequence, whereas the subsequence words output a fresh copied sequence.
 
 \section{Constructing sequences}\label{make-seq}
 
@@ -2710,11 +2850,6 @@ Adds the element to the end of the sequence being constructed by the innermost c
 Adds the element to the end of the sequence being constructed as long as the sequence does not already have an equal element.
 \wordtable{
 \vocabulary{namespaces}
-\ordinaryword{literal,}{literal,~( element -- )}
-}
-Adds the element wrapped inside a one-element list, then adds the \texttt{car} word. This is used to construct quotations with \texttt{make-list} that must push a word on the stack.
-\wordtable{
-\vocabulary{namespaces}
 \ordinaryword{\%}{\% ( sequence -- )}
 }
 Appends the subsequence to the end of the sequence being constructed.
@@ -2722,7 +2857,7 @@ Appends the subsequence to the end of the sequence being constructed.
 Here is an example of sequence construction:
 \begin{alltt}
   : silly [ [ dup , ] repeat ] make-vector , ;
-  [ 4 [ dup silly ] repeat ] make-list .
+  [ 4 [ silly ] each ] make-list .
 \textbf{[ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]}
 \end{alltt}
 
@@ -2765,12 +2900,6 @@ Tests if the object at the top of the stack is a proper list whose every element
 These words look up a key in an association list, comparing keys in the list with the given key by equality with \texttt{=}. The list is searched starting from the beginning. The two words differ in that the latter returns the key/value pair located, whereas the former only returns the value. The \texttt{assoc*} word allows a distinction to be made between a missing value.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{assq}{assq ( k alist -- v )}
-\ordinaryword{assq*}{assq* ( k alist -- [[ k v ]] )}
-}
-These words compare keys by identity with \texttt{eq?}~and are dual to \texttt{assoc} and \texttt{assoc*}.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{acons}{acons ( v k alist -- alist )}
 \ordinaryword{set-assoc}{set-assoc ( v k alist -- alist )}
 }
@@ -2803,36 +2932,6 @@ Outputs a new association list which does not have any key/value pairs with the 
 \end{center}
 \end{figure}
 
-\subsection{Dual representation}
-
-Sometimes it is convenient to decompose an association list into two lists of equal length, containing the keys and values, respectively, in the same order as the association list. This dual representation can be manipulated with a handful of helper words.
-
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{zip}{zip ( keys values -- alist )}
-\ordinaryword{unzip}{unzip ( alist -- keys values )}
-}
-These words convert between pairs of lists and lists of pairs.
-\begin{alltt}
-  [ 1 2 3 ] [ 4 5 6 ] zip .
-[ [[ 1 4 ]] [[ 2 5 ]] [[ 3 6 ]] ]
-  [ [[ 1 2 ]] [[ 3 4 ]] [[ 5 6 ]] ] unzip .s
-[ 2 4 6 ]
-[ 1 3 5 ]
-\end{alltt}
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}
-}
-Cons a pair of elements onto a pair of lists.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{2car}{2car ( c1 c2 -- car1 car2 )}
-\ordinaryword{2cdr}{2cdr ( c1 c2 -- cdr1 cdr2 )}
-\ordinaryword{2uncons}{2uncons ( c1 c2 -- car1 car2 cdr1 cdr2 )}
-}
-Deconstructs paired lists. Compare the stack effects with those of \verb|car|, \verb|cdr| and \verb|uncons| in \ref{cons-cells}.
-
 \section{Hashtables}\label{hashtables}
 
 \hashglos
@@ -2854,7 +2953,7 @@ Outputs the hashcode of the object. The contract of this generic word is as foll
 \item The hashcode must be a fixnum (\ref{integers})\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.}
 \item If two objects are equal under \texttt{=}, they must have the same hashcode.
 \end{itemize}
-If mutable objects are used as hashtable keys, they must not be mutated. Doing so will violate bucket sorting invariants and result in undefined behavior.
+If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior.
 
 \wordtable{
 \vocabulary{hashtables}
@@ -2919,6 +3018,29 @@ Applies the quotation to each key/value pair, collecting the key/value pairs for
 }
 If the key is present in the hashtable, return the associated value, otherwise apply the quotation to the key, yielding a new value that is then stored in the hashtable.
 
+There is a pair of words for working with lazily-instantiated hashtables.
+
+\wordtable{
+\vocabulary{hashtables}
+\ordinaryword{?hash}{?hash ( key hash/f -- value )}
+}
+Outputs the value of the key, or \texttt{f} if the hashtable is \texttt{f}. The standard \verb|hash| word would raise an exception in the latter case.
+
+\wordtable{
+\vocabulary{hashtables}
+\ordinaryword{?set-hash}{?set-hash ( value key hash/f -- hash )}
+}
+If the given hashtable is not \verb|f|, store the key/value pair and output the same hashtable instance. Otherwise if the given hashtable if \verb|f|, create a new hashtable holding the key/value pair.
+
+The following pair of words from the UI framework (see \ref{ui}) demonstrate the lazily-insantiated hashtable idiom:
+\begin{verbatim}
+: paint-prop* ( gadget key -- value )
+    swap gadget-paint ?hash ;
+    
+: set-paint-prop ( gadget value key -- )
+    pick gadget-paint ?set-hash swap set-gadget-paint ;
+\end{verbatim}
+
 \subsection{Converting between mappings}
 
 \wordtable{
@@ -2939,9 +3061,9 @@ Creates an association list with the same key/valie pairs as the hashtable.
 Builds lists of keys and values stored in the hashtable.
 \wordtable{
 \vocabulary{hashtables}
-\ordinaryword{buckets>list}{buckets>list ( hash -- list )}
+\ordinaryword{buckets>vector}{buckets>vector ( hash -- vector )}
 }
-Outputs a list of association lists, where each association list contains the key/value pairs in a certain bucket. Useful for debugging hashcode distribution.
+Outputs a vector of association lists, where each association list contains the key/value pairs in a certain bucket. Useful for debugging hashcode distribution.
 
 \subsection{Hashtable construction}
 
@@ -2954,9 +3076,9 @@ A facility analogous to sequence construction (\ref{make-seq}) exists for hashta
 Calls the quotation in a new dynamic scope. The quotation and any words it calls can execute the \texttt{hash,} word to add key/value pairs to the hashtable being constructed.
 \wordtable{
 \vocabulary{hashtables}
-\ordinaryword{hash,}{hash,~( value key -- )}
+\ordinaryword{hash,}{hash,~( value key -- old )}
 }
-Adds a key/value pair to the hashtable currently being constructed.
+Adds a key/value pair to the hashtable currently being constructed. Outputs the previous value.
 
 As with sequence construction, care must be taken to mind the effects of dynamic scoping on variable assignment performed by the quotation. Details are in \ref{namespaces}.
 
@@ -3082,9 +3204,23 @@ If the variable is set in the current namespace, outputs its value. Otherwise se
 
 Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact fraction rather than a floating point approximation. Floating point numbers are also supported, along with complex numbers.
 
-\section{Number protocol}
+\section{Number protocol}\label{number-protocol}
+
+\glossary{
+name=numerical upgrading,
+description={the stipulation that if one of the inputs to an arithmetic word is a \texttt{bignum} and the other is a \texttt{fixnum}, the latter is first coerced to a \texttt{bignum}, and if one of the inputs is a \texttt{float}, the other is coerced to a \texttt{float}}}
 
 The following usual operations are supported by all numbers.
+
+These words obey the rules of numerical upgrading. If one of the inputs is a \texttt{bignum} and the other is a \texttt{fixnum}, the latter is first coerced to a \texttt{bignum}; if one of the inputs is a \texttt{float}, the other is coerced to a \texttt{float}.
+
+Two examples where you should note the types of the inputs and outputs:
+\begin{alltt}
+  3 >fixnum 6 >bignum * class .
+\textbf{bignum}
+  1/2 2.0 + .
+\textbf{4.5}
+\end{alltt}
 
 \wordtable{
 \vocabulary{math}
@@ -3095,19 +3231,6 @@ The following usual operations are supported by all numbers.
 }
 The non-commutative operations \texttt{-} and \texttt{/} take operands from the stack in the natural order; \texttt{6 2 /} divides 6 by 2.
 
-\wordtable{
-\vocabulary{math}
-\ordinaryword{/i}{/i ( n n -- integer )}
-\ordinaryword{/f}{/f ( n n -- float )}
-}
-The \texttt{/} word gives an exact answer where possible. These two words output the answer in other forms. The \texttt{/i} word truncates the result towards zero, and \texttt{/f} converts it to a floating point approximation.
-\wordtable{
-\vocabulary{math}
-\ordinaryword{\hhat}{\^{} ( x y -- z )}
-
-}
-Raises \texttt{x} to the power of \texttt{y}. If \texttt{y} is an integer the answer is computed exactly, otherwise a floating point approximation is used.
-
 The following ordering operations are supported on real numbers only.
 
 \wordtable{
@@ -3117,6 +3240,15 @@ The following ordering operations are supported on real numbers only.
 \ordinaryword{>}{> ( n n -- ?~)}
 \ordinaryword{>=}{>= ( n n -- ?~)}
 }
+
+The following pair of division operations are supported on integers only.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{/i}{/i ( n n -- integer )}
+\ordinaryword{/f}{/f ( n n -- float )}
+}
+The \texttt{/} word gives an exact answer where possible. These two words output the answer in other forms. The \texttt{/i} word truncates the result towards zero, and \texttt{/f} converts it to a floating point approximation.
 
 \section{Integers}\label{integers}
 
@@ -3164,30 +3296,6 @@ The word \texttt{.} prints numbers in decimal, regardless of how they were input
 }
 Prints an integer in hexadecimal, octal or binary.
 
-\subsection{Counted loops}
-
-A pair of combinators calls a quotation a fixed number of times.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{times}{times ( n quot -- )}
-\texttt{quot:~-- }\\
-}
-Calls the quotation $n$ times. If $n<0$, the quotation is not called at all.
-
-\wordtable{
-\vocabulary{math}
-\ordinaryword{repeat}{repeat ( n quot -- )}
-\texttt{quot:~i -- i }\\
-}
-Calls \texttt{quot} $n$ times, with the parameter \texttt{i} ranging from 0 to $n-1$. The quotation must output $i$ unmodified; or indeed, if it modifies it, the loop continues from that index. That is, the value $i$ on the stack is the actual loop counter, not a copy.
-
-If you wish to perform an iteration over a range of integers that does not begin from zero, or an iteration that starts at a specific index and decreases towards zero, use the \verb|each| combinator (\ref{iteration}) in conjunction with a \verb|<range>| sequence (\ref{virtual-seq}), for example like so:
-\begin{verbatim}
-! Print all integers from 9 down to 4, inclusive
-9 3 <range> [ . ] each
-\end{verbatim}
-
 \subsection{Modular arithmetic}
 
 \wordtable{
@@ -3228,7 +3336,7 @@ $$ax+by=c$$
 Furthermore, $c$ is the greatest integer having this property; that is, it is the greatest common divisor of $a$ and $b$.
 \wordtable{
 \vocabulary{math}
-\ordinaryword{mod-inv}{gcd ( x n -- y )}
+\ordinaryword{mod-inv}{mod-inv ( x n -- y )}
 }
 Computes a value \texttt{y} that satisfies the following property:
 $$xy \equiv 1 \bmod{n}$$ An exception is thrown if no such \texttt{y} exists.
@@ -3295,7 +3403,7 @@ Computes a new integer consisting of the bits of the first integer, shifted to t
 \vocabulary{math}
 \ordinaryword{log2}{log2 ( n -{}- b )}
 }
-Computes the largest integer less than or equal to $log_2 n$. The input must be positive and the result is always an integer. In most cases, the \verb|log| word (\ref{algebraic}) should be used instead, since it allows any complex number as input, and the result is not truncated to an integer.
+Computes the largest integer less than or equal to $\log_2 n$. The input must be positive and the result is always an integer. In most cases, the \verb|log| word (\ref{algebraic}) should be used instead, since it allows any complex number as input, and the result is not truncated to an integer.
 
 \wordtable{
 \vocabulary{math}
@@ -3434,6 +3542,12 @@ Tests if the top of the stack is a complex number. Note that unlike math, where 
 
 \wordtable{
 \vocabulary{math}
+\ordinaryword{conjugate}{conjugate ( n -- n )}
+}
+Outputs the complex conjugate of a complex number. The complex conjugate of $a+bi$ is denoted $\overline{a+bi}$ and equals $a-bi$.
+
+\wordtable{
+\vocabulary{math}
 \ordinaryword{real}{real ( n -- n )}
 \ordinaryword{imaginary}{imaginary ( n -- n )}
 }
@@ -3533,9 +3647,14 @@ The next set of words computes powers and logarithms.
 \vocabulary{math}
 \ordinaryword{sq}{sq ( x -- y )}
 \ordinaryword{sqrt}{sqrt ( x -- y )}
-\ordinaryword{recip}{recip ( x -- y )}
 }
-Computes the square (raised to power 2), square root (raised to power $1/2$), and reciprocal (raised to power $-1$).
+Computes the square (raised to power 2) and square root (raised to power $1/2$).
+\wordtable{
+\vocabulary{math}
+\ordinaryword{\hhat}{\^{} ( x y -- z )}
+
+}
+Raises \texttt{x} to the power of \texttt{y}. If \texttt{y} is an integer the answer is computed exactly, otherwise a floating point approximation is used.
 \wordtable{
 \vocabulary{math}
 \ordinaryword{exp}{exp ( n -- n )}
@@ -3559,6 +3678,31 @@ Computes the natural (base $e$) logarithm. This is the inverse of the \texttt{ex
 \end{alltt}
 The \texttt{math} vocabulary provides the full set of trigonometric and hyperbolic functions, along with inverses and reciprocals. Complex number arguments are supported.
 
+\index{\texttt{sin}}
+\index{\texttt{cos}}
+\index{\texttt{tan}}
+\index{\texttt{cosec}}
+\index{\texttt{sec}}
+\index{\texttt{cot}}
+\index{\texttt{asin}}
+\index{\texttt{acos}}
+\index{\texttt{atan}}
+\index{\texttt{acosec}}
+\index{\texttt{asec}}
+\index{\texttt{acot}}
+\index{\texttt{sinh}}
+\index{\texttt{cosh}}
+\index{\texttt{tanh}}
+\index{\texttt{cosech}}
+\index{\texttt{sech}}
+\index{\texttt{coth}}
+\index{\texttt{asinh}}
+\index{\texttt{acosh}}
+\index{\texttt{atanh}}
+\index{\texttt{acosech}}
+\index{\texttt{asech}}
+\index{\texttt{acoth}}
+
 \begin{tabular}{l|l|l|l|l}
 Function&Trigonometric&Hyperbolic&Trig. inverse&Hyp. inverse\\
 \hline
@@ -3575,6 +3719,13 @@ Cotangent&\texttt{cot}&\texttt{coth}&\texttt{acot}&\texttt{acoth}
 
 The following words in the \texttt{math} vocabulary push constant values on the stack.
 
+\index{\texttt{i}}
+\index{\texttt{-i}}
+\index{\texttt{inf}}
+\index{\texttt{-inf}}
+\index{\texttt{e}}
+\index{\texttt{pi}}
+
 \begin{tabular}{l|l}
 Word&Value\\
 \hline
@@ -3584,12 +3735,9 @@ Word&Value\\
 \texttt{-inf}&Negative floating point infinity\\
 \texttt{e}&Base of natural logarithm ($e\approx 2.7182818284590452354$)\\
 \texttt{pi}&Ratio of circumference to diameter ($\pi\approx 3.14159265358979323846$)\\
-\texttt{pi/2}&$\frac{\pi}{2}\approx 1.5707963267948966$
 \end{tabular}
 
 \section{Linear algebra}
-
-The \verb|matrices| vocabulary provides a set of words for simple algebraic operations on mathematical vectors and matrices.
 
 \subsection{Vectors}
 
@@ -3600,18 +3748,18 @@ The usual mathematical operations on vectors are supported.
 \subsubsection{Scaling operations}
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{vneg}{vneg ( vec -- vec )}
 }
 Negates each element of a vector.
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{v*n}{v*n ( vec n -- vec )}
 \ordinaryword{n*v}{n*v ( n vec -- vec )}
 }
 Multiplies each element of the vector by a scalar. The two words only differ in argument order.
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{v/n}{v/n ( vec n -- vec )}
 \ordinaryword{n/v}{n/v ( n vec -- vec )}
 }
@@ -3622,7 +3770,7 @@ Divides each element of the vector by a scalar, or alternatively, divides the sc
 These words all expect a pair of vectors of equal length. They apply a binary operation to each pair of elements, producing a new vector. They are all implemented using the \verb|2map| combinator (\ref{iteration}).
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{v+}{v+ ( vec vec -- vec )}
 \ordinaryword{v-}{v-~( vec vec -- vec )}
 \ordinaryword{v*}{v*~( vec vec -- vec )}
@@ -3649,54 +3797,39 @@ Note that \verb|v*| is not the inner product. The inner product is the \verb|v.|
 These words take a vector as input and produce a single number (or boolean).
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{sum}{sum~( vec -- n )}
 \ordinaryword{product}{product~( vec -- n )}
 }
 
-Adds or multiplies all numbers in the vector. These are implemented as follows:
+Adds or multiplies all numbers in the vector. These are implemented using the \verb|reduce| combinator (\ref{iteration}):
 \begin{verbatim}
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product 1 [ * ] reduce ;
 \end{verbatim}
 
-using the \verb|reduce| combinator (\ref{iteration}).
-
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{conj}{conj~( vec -- ?~)}
-}
-Tests if all elements in the vector are true values. This is implemented as follows:
-\begin{verbatim}
-: conj [ ] all? ;
-\end{verbatim}
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{disj}{disj~( vec -- ?~)}
-}
-Tests if at least one element in the vector is a true value. This is implemented as follows:
-\begin{verbatim}
-: conj [ ] contains? ;
-\end{verbatim}
-
 \subsubsection{Inner and cross products}\label{inner-product}
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{v.}{v.~( vec vec -- n )}
 }
-Computes the inner product of two vectors. They must be of equal length.
-
-Mathematically speaking, this is a map $<,>: {\mathbb{C}}^n \times {\mathbb{C}}^n \rightarrow \mathbb{C}$. It is the complex inner product; that is, $<a,b> =\overline{<b,a>}$, where $\overline{z}$ is the complex conjugate.
+Computes the real inner product of two vectors. They must be of equal length.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
+\ordinaryword{c.}{c.~( vec vec -- n )}
+}
+Computes the complex inner product of two vectors. The complex inner product is skew-symmetric; that is, $<a,b>=\overline{<b,a>}$, where $\overline{z}$ is the complex conjugate of $z$.
+
+\wordtable{
+\vocabulary{math}
 \ordinaryword{norm}{norm~( vec -- n )}
 }
 Computes the norm (``length'') of a vector. The norm of a vector $v$ is defined as $\sqrt{<v,v>}$.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{normalize}{normalize~( vec -- vec )}
 }
 Outputs a vector with the same direction, but length 1. Defined as follows:
@@ -3705,7 +3838,7 @@ Outputs a vector with the same direction, but length 1. Defined as follows:
 \end{verbatim}
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{cross}{cross~( v1 v2 -- vec )}
 }
 Computes the cross product $v_1\times v_2$. The following example illustrates the fact that a cross product of two vectors is always orthogonal to either vector.
@@ -3720,124 +3853,86 @@ Computes the cross product $v_1\times v_2$. The following example illustrates th
 
 \subsection{Matrices}\label{matrices}
 
-Matrix literal syntax is documented in \ref{syntax:matrices}. In addition to the literal syntax, new matrices may be created from scratch in one of several ways.
+Matrices are represented as sequences of sequences of equal length. For example, consider
+the following object:
+\begin{verbatim}
+{ { 1 0 -1 }
+  { 2 1/3 6 }
+  { 4 -2 0 }
+  { 0 0 8 } }
+\end{verbatim}
+It corresponds to the following mathematical matrix:
+$$\left( \begin{array}{c c c}
+1 & 0 & -1 \\
+2 & 1/3 & 6 \\
+4 & -2 & 0 \\
+0 & 0 & 8 \end{array}
+\right)$$
 
+The transpose of a matrix may be computed with the \verb|flip| word (\ref{reshaping}).
 \wordtable{
-\vocabulary{matrices}
-\ordinaryword{<matrix>}{<matrix> ( rows cols seq -- matrix )}
-}
-Creates a new matrix with the given dimensions and underlying sequence. The underlying sequence stores elements in row-major order.
-
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{matrix-sequence}{matrix-sequence ( matrix -- seq )}
-}
-Outputs the underlying sequence of a matrix.
-
-\begin{alltt}
-  M[ [ 1 2 3 ] [ 4 5 6 ] ]M matrix-sequence .
-\textbf{\tto 1 2 3 4 5 6 \ttc}
-\end{alltt}
-
-\wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{<zero-matrix>}{<zero-matrix> ( rows cols -- matrix )}
 }
 Creates a new matrix with the given dimensions and all elements set to zero.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{<identity-matrix>}{<identity-matrix> ( n -- matrix )}
 }
 Creates a new $n\times n$ matrix where all elements on the main diagonal are 1, and all other elements are zero; for example:
 
 \begin{alltt}
-  3 <identity-matrix> prettyprint
-\textbf{M[ [ 1 0 0 ]
-   [ 0 1 0 ]
-   [ 0 0 1 ] ]M}
+  3 <identity-matrix> .
+\textbf{\tto \tto 1 0 0 \ttc \tto 0 1 0 \ttc \tto 0 0 1 \ttc \ttc}
 \end{alltt}
 
 The following are the usual algebraic operations on matrices.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{n*m}{n*m ( n matrix -- matrix )}
 }
 Multiplies each element of a matrix by a scalar.
 \begin{alltt}
   5 2 <identity-matrix> n*m prettyprint
-\textbf{M[ [ 5 0 ]
-   [ 0 5 ] ]M}
+\textbf{\tto \tto 5 0 \ttc
+   \tto 0 5 \ttc \ttc}
 \end{alltt}
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{m+}{m+~( matrix matrix -- matrix )}
 }
 Adds two matrices. They must have the same dimensions.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{m-}{m-~( matrix matrix -- matrix )}
 }
 Subtracts two matrices. They must have the same dimensions.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{m*}{m*~( matrix matrix -- matrix )}
 }
 Multiplies two matrices element-wise. They must have the same dimensions. This is \emph{not} matrix multiplication in the usual mathematical sense.
 
 \wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{m.}{m.~( matrix matrix -- matrix )}
 }
 Composes two matrices as linear operators. This is the usual mathematical matrix multiplication, and the first matrix must have the same number of columns as the second matrix has rows.
 
 \wordtable{
-\vocabulary{matrices}
-\ordinaryword{transpose}{transpose~( matrix -- matrix )}
-}
-Outputs a matrix where each row is a column of the original matrix, and each column is a row of the original matrix.
-\begin{alltt}
-  M[ [ 1 2 ] [ 3 4 ] [ 5 6 ] ]M transpose .
-\textbf{M[ [ 1 3 5 ] [ 2 4 6 ] ]M}
-\end{alltt}
-
-\subsection{Column and row matrices}
-
-There is a natural isomorphism between the vector space $\mathbb{C}^m$, the $m\times 1$ matrices, and the $1 \times m$ matrices. Additionally, a $m\times n$ matrix acts as a linear operator from the vector space $\mathbb{C}^n$ to $\mathbb{C}^m$ in the same way as multiplying the $m\times n$ matrix by a $n \times 1$ matrix. In Factor, these ideas are embodied by a set of words for converting vectors to matrices, and vice-versa.
-
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{<row-vector>}{<row-vector>~( vector -- matrix )}
-}
-Given a vector with $n$ elements, outputs a $1 \times n$ matrix.
-\begin{alltt}
-  \tto 1.0 4.43 7.6 0.2 \ttc <row-vector> .
-\textbf{M[ [ 1.0 4.43 7.6 0.2 ] ]M}
-\end{alltt}
-
-\wordtable{
-\vocabulary{matrices}
-\ordinaryword{<col-vector>}{<col-vector>~( vector -- matrix )}
-}
-Given a vector with $n$ elements, outputs a $n \times 1$ matrix.
-\begin{alltt}
-  \tto 1.0 4.43 7.6 0.2 \ttc <col-vector> .
-\textbf{M[ [ 1.0 ] [ 4.43 ] [ 7.6 ] [ 0.2 ] ]M}
-\end{alltt}
-
-\wordtable{
-\vocabulary{matrices}
+\vocabulary{math}
 \ordinaryword{m.v}{m.v~( matrix vector -- vector )}
 }
 Applies a matrix to a vector on the right, as a linear transformation. The vector is
 treated as a matrix with one column.
 
 \begin{alltt}
-  \tto 5 -3 \ttc M[ [ 0 1 ] [ 1 0 ] ]M v.m .
+  \tto 5 -3 \ttc \tto \tto 0 1 \ttc \tto 1 0 \ttc \ttc v.m .
 \textbf{\tto -3 5 \ttc}
 \end{alltt}
 
@@ -3887,12 +3982,12 @@ Releases any external resources associated with the stream, such as file handles
 
 You must close streams after you are finished working with them. A convenient way to automate this is by using the \texttt{with-stream} word in \ref{stdio}.
 
-The following two words are optional, and should be implemented on input streams.
+The following three words are optional, and should be implemented on input streams.
 \wordtable{
 \vocabulary{io}
 \genericword{stream-readln}{stream-readln ( s -- str/f )}
 }
-Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream. Streams that do not support this generic word can be wrapped in a line stream that reads lines terminated by \verb|\n|, \verb|\r| or \verb|\r\n| (\ref{special-stream}). File and network streams are automatically wrapped in line streams.
+Reads a line of text and outputs it on the stack. If the end of the stream has been reached, outputs \texttt{f}. The precise meaning of a ``line'' depends on the stream. Streams that do not support this generic word can be wrapped in a line stream that reads lines terminated by \verb|\n|, \verb|\r| or \verb|\r\n| (\ref{special-streams}). File and network streams are automatically wrapped in line streams.
 \wordtable{
 \vocabulary{io}
 \genericword{stream-read1}{stream-read1 ( s -- char/f )}
@@ -3970,7 +4065,7 @@ Outputs a string to the stream, then calls \verb|stream-terpri| to force a newli
 description={the value of the \texttt{stdio} variable, used by various words as an implicit stream parameter}}
 \glossary{name=stdio,
 description={see default stream}}
-Various words take an implicit stream parameter from the \texttt{stdio} variable to reduce stack shuffling.
+Various words take an implicit stream parameter from the \texttt{stdio} variable to reduce stack shuffling. Unless rebound in a child namespace, this variable will be set to a console stream for interacting with the user.
 \wordtable{
 \vocabulary{io}
 \ordinaryword{close}{close ( -- )}
@@ -4076,7 +4171,7 @@ Key&Description\\
 \ttindex{foreground}&The foreground color, as a list with red, green, blue components\\
 \ttindex{background}&The background color, as a list with red, green, blue components\\
 \ttindex{font}&A font family name\\
-\ttindex{font-style}&One of \ttindex{plain}, \ttindex{bold}, \ttindex{italic}, or \ttindex|bold-italic|\\
+\ttindex{font-style}&One of \ttindex{plain}, \ttindex{bold}, \ttindex{italic}, or \ttindex{|bold-italic}\\
 \ttindex{font-size}&An integer\\
 \ttindex{underline}&A boolean\\
 \ttindex{presented}&If set, a presentation for this object is output\\
@@ -4099,7 +4194,7 @@ String buffers support both the stream input and output protocol directly, with 
 \vocabulary{io}
 \ordinaryword{<string-reader>}{<string-reader> ( string -- stream )}
 }
-Creates a new stream for reading characters from a string. First, a string buffer is created holding the reversed string, since characters are read in reverse by repeated calls to \verb|pop| (\ref{stack-seq}). The result is wrapped in a line stream providing a \verb|stream-readln| implementation (\ref{special-streams}):
+Creates a new stream for reading characters from a string. First, a string buffer is created holding the reversed string, since characters are read in reverse by repeated calls to \verb|pop| (\ref{oddball-seq}). The result is wrapped in a line stream providing a \verb|stream-readln| implementation (\ref{special-streams}):
 \begin{verbatim}
 : <string-reader> ( string -- stream )
     <reversed> >sbuf <line-reader> ;
@@ -4382,7 +4477,8 @@ array
 byte-array
 displaced-alien
 \end{verbatim}
-\item Circular structure is not printed in a readable way. Circular references are printed as ``\texttt{...}''.
+\item Shared structure is not reflected in the printed output; if the output is parsed back in, fresh objects are created for all literal denotations.
+\item Circular structure is not printed in a readable way. Circular references are printed as ``\texttt{\&}''.
 \item Floating point numbers might not equal themselves after being printed and read, since a decimal representation of a float is inexact.
 \end{itemize}
 \wordtable{
@@ -4412,7 +4508,7 @@ Specifies the indentation for recursive objects such as lists, vectors, hashtabl
 \vocabulary{prettyprint}
 \symbolword{prettyprint-limit}
 }
-Controls the maximum nesting depth. Printing structures that nest further than this will simply print ``\texttt{...}''. If this is set to \texttt{f}, the nesting depth is unlimited. The default is \texttt{f}. Inside calls to \texttt{.}, set to 16, which translates to four levels of nesting with the default tab size.
+Controls the maximum nesting depth. Printing structures that nest further than this will simply print ``\texttt{\#}''. If this is set to \texttt{f}, the nesting depth is unlimited. The default is \texttt{f}. Inside calls to \texttt{.}, set to 16, which translates to four levels of nesting with the default tab size.
 
 \wordtable{
 \vocabulary{prettyprint}
@@ -4532,7 +4628,7 @@ The \texttt{eval} word is defined as follows:
 
 \section{Parsing from streams}
 
-There are two sets of words for parsing input from streams. The first set uses the following initial values for the \texttt{"use"} and \texttt{"in"} variables:
+Words for parsing input from streams use the following initial values for the \texttt{"use"} and \texttt{"in"} variables:
 
 \begin{description}
 \item[\texttt{"use"}] \texttt{[ "scratchpad" "syntax" ]}
@@ -4561,16 +4657,6 @@ Parses the contents of a file and calls the resulting quotation. Defined as foll
 \begin{verbatim}
 : run-file parse-file call ;
 \end{verbatim}
-
-The next set of stream parsing words takes the vocabulary search path and current vocabulary from the current scope. These words are used to load the \texttt{.factor-rc} file on startup, so that any \texttt{USE:}~and \texttt{USING:}~declarations set in that file take effect in the listener (\ref{listener}).
-
-\wordtable{
-\vocabulary{parser}
-\genericword{(parse-stream)}{(parse-stream)~( name stream -- list )}
-\genericword{(parse-file)}{(parse-file)~( path -- list )}
-\genericword{(run-file)}{(run-file)~( path -- )}
-}
-Like the first set of stream parsing words, except the \texttt{"use"} and \texttt{"in"} variables are taken from the current scope.
 
 \section{Parsing words}\label{parsing-words}
 
@@ -4649,7 +4735,19 @@ Indeed, any type of object can be added to the parse tree in this fashion.
 
 \glossary{name=reading ahead,
 description=a parsing word reads ahead of it scans following tokens from the input string}
-The next idiom to look at is parsing words that read ahead. The first example is the \verb|HEX:| word, documented in \ref{integer-literals}. This word is defined so that the following two lines are equivalent:
+The next idiom to look at is parsing words that read ahead.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{scan}{scan ( -- string )}
+}
+Outputs the next token as a string, or \texttt{f} if the end of the input has been reached. Advances the parser state to after this token.
+\wordtable{
+\vocabulary{parser}
+\ordinaryword{scan-word}{scan-word ( -- word )}
+}
+Reads the next token from the input and looks up a word with this name. If the lookup fails, attempts to parse the word as a number by calling \verb|str>number|. Outputs \verb|f| if the end of input has been reached. There is no confusion with the \verb|f| literal here, since the latter is raad as the \verb|f| parsing word.
+
+The first example is the \verb|HEX:| word, documented in \ref{integer-literals}. This word is defined so that the following two lines are equivalent:
 \begin{verbatim}
 HEX: deadbeef
 3735928559
@@ -4660,27 +4758,49 @@ It is defined in terms of a lower-level \texttt{(BASE)} word that takes the nume
 : HEX: 16 (BASE) ; parsing
 \end{verbatim}
 The key word here is \texttt{scan}.
-\wordtable{
-\vocabulary{parser}
-\ordinaryword{scan}{scan ( -- string )}
-}
-Outputs the next token as a string, or \texttt{f} if the end of the input has been reached. Advances the parser state to after this token.
 
-The next example of a parsing word we will look at is the \verb|\| word. It reads the next token from the input, and appends code to push that word literally on the stack. That is, the following two phrases both have the effect of pushing the word \verb|+| on the stack, rather than executing it:
+The next example of a parsing word we will look at is the \verb|\| word. It is used to insert a word literally in a quotation, that is, push it on the stack during evaluation, so that the following two lines are equivalent:
 \begin{verbatim}
-\ +
-[ + ] car
+\ <vector> execute
+<vector>
 \end{verbatim}
-We can look at how \verb|\| is implemented:
+The implementation of the \verb|\| parsing word reads the next token from the input stream using \verb|scan-word|.
+It then uses the \verb|literalize| word to turn the word into an object that pushes the word
+on the stack, and then appends this to the parse tree:
 \begin{verbatim}
-: \ scan-word unit swons \ car swons ; parsing
+: \ scan-word literalize swons ; parsing
 \end{verbatim}
-The key word here is \verb|scan-word|. It combines \texttt{scan} word with vocabulary search.
+
 \wordtable{
-\vocabulary{parser}
-\ordinaryword{scan-word}{scan-word ( -- word )}
+\vocabulary{words}
+\ordinaryword{literalize}{literalize ( object -- object )}
 }
-Reads the next token from the input and looks up a word with this name. If the lookup fails, attempts to parse the word as a number by calling \verb|str>number|.
+Turns non-self-evaluating objects (words and wrappers) into wrappers that push those objects, and is a no-op on everything else. This word is generic (\ref{generic}), with three trivial methods:
+\begin{verbatim}
+GENERIC: literalize ( object -- object )
+M: object literalize ;
+M: wrapper literalize <wrapper> ;
+M: word literalize <wrapper> ;
+\end{verbatim}
+
+\wrapglos
+
+Instances of the \verb|wrapper| class hold a reference to a single object. When the evaluator encounters a wrapper, it pushes the wrapped object on the data stack.
+
+\wordtable{
+\vocabulary{kernel}
+\ordinaryword{wrapped}{wrapped ( wrapper -- object )}
+}
+Outputs the object wrapped by the wrapper. This word is used in the implementation of the \verb|wrapper| method of the \verb|prettyprint*| generic word:
+\begin{verbatim}
+M: wrapper prettyprint* 
+    dup wrapped word? [
+        \ \ unparse. bl wrapped unparse. 
+    ] [
+        \ W[ unparse. bl wrapped prettyprint* \ ]W unparse. 
+    ] ifte ;
+\end{verbatim}
+The somewhat more verbose \verb|W[ ... ]W| syntax is only part of the language for completeness, to handle the corner case where a wrapper wrapping another wrapper is printed out and read back in by the parser.
 
 \subsection{Defining words}
 
@@ -4790,7 +4910,7 @@ This word is used to implement end-of-line comments:
 : ! until-eol drop ; parsing
 \end{verbatim}
 
-\chapter{UI framework}
+\chapter{UI framework}\label{ui}
 
 \begin{itemize}
 
@@ -5765,14 +5885,14 @@ Probably the most important debugging tool of them all is the \texttt{.} word. I
 
 \begin{alltt}
   [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ] .
-[ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ]
+\textbf{[ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ]}
 \end{alltt}
 
 Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting. Here is an example -- a vector is created, that holds a list whose first element is the vector itself:
 
 \begin{alltt}
   \tto \ttc [ unit 0 ] keep [ set-vector-nth ] keep .
-\tto [ ... ] \ttc
+\textbf{\tto [ ... ] \ttc}
 \end{alltt}
 
 The prettyprinted form of a vector or list with many elements is not always readable. The \texttt{[.]} and \texttt{\tto.\ttc} words output a list or a vector, respectively, with each element on its own line. In fact, the stack printing words are defined in terms of \texttt{[.]} and \texttt{\tto.\ttc}:
@@ -5780,8 +5900,6 @@ The prettyprinted form of a vector or list with many elements is not always read
 \begin{verbatim}
 : .s datastack  {.} ;
 : .r callstack  {.} ;
-: .n namestack  [.] ;
-: .c catchstack [.] ;
 \end{verbatim}
 
 Before we move on, one final set of output words comes is used to output integers in
@@ -5851,21 +5969,21 @@ whose names contain a given string. The \texttt{apropos.} word is also useful wh
 
 \begin{alltt}
   "map" apropos.
-\textbf{IN: inference
-type-value-map
-IN: lists
-map
-map-with
+\textbf{IN: generic
+typemap
+IN: hashtables
+map>hash
 IN: sdl
 set-surface-map
 surface-map
-IN: strings
-string-map
-IN: vectors
-vector-map}
+IN: sequences
+2map
+map
+map-with
+nmap}
 \end{alltt}
 
-From the above output, you can see that \texttt{map} is for lists, \texttt{string-map} is for strings, and \texttt{vector-map} is for vectors.
+From the above output, you can see a few words to explore, such as \verb|map|, \verb|map-with|, and \verb|2map|.
 
 The \texttt{usage} word finds all words that refer to a given word and pushes a list on the stack. This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it. Usually you print the
 return value of \texttt{usage} using \texttt{.}:
@@ -5883,7 +6001,7 @@ both words will be in the output list.
 
 \section{Exploring classes}
 
-Factor supports object-oriented programming via generic words. Generic words are called
+Factor supports object-oriented programming via generic words (\ref{generic}). Generic words are called
 like ordinary words, however they can have multiple definitions, one per class, and
 these definitions do not have to appear in the same source file. Such a definition is
 termed a \emph{method}, and the method is said to \emph{specialize} on a certain
@@ -5948,7 +6066,8 @@ M: list prettyprint*
 
 \section{Looking at stacks}
 
-To see the contents of the data stack, use the \texttt{.s} word. Similarly, the other stacks can be shown with \texttt{.r} (return stack), \texttt{.n} (name stack), and \texttt{.c} (catch stack). Each stack is printed with each element on its own line; the top of the stack is the first element printed.
+To see the contents of the data or return stack, use the \texttt{.s} and \texttt{.r} words.
+Each stack is printed with each element on its own line; the top of the stack is the first element printed.
 
 \section{The debugger}
 
@@ -5959,11 +6078,11 @@ time with Factor at all, you are probably familiar with this type of message:
 \begin{alltt}
   [ 1 2 3 ] 4 append reverse
 \textbf{The generic word car does not have a suitable method for 4
-:s :r :n :c show stacks at time of error.
+:s :r show stacks at time of error.
 :get ( var -- value ) inspects the error namestack.}
 \end{alltt}
 
-The words \texttt{:s}, \texttt{:r}, \texttt{:n} and \texttt{:s} behave like their counterparts that are prefixed with \texttt{.}, except they show the stacks as they were when the error was thrown.
+The words \texttt{:s} and \texttt{:r} behave like their counterparts that are prefixed with \texttt{.}, except they show the stacks as they were when the error was thrown.
 
 The return stack warrants some special attention. To successfully develop Factor, you will need to learn to understand how it works. Lets look at the first few lines of the return stack at the time of the above error:
 
@@ -6010,7 +6129,7 @@ There are two ways to use the walker. First of all, you can call the \texttt{wal
 
 \begin{alltt}
   [ [ 10 [ dup , ] repeat ] make-list ] walk
-\textbf{\&s \&r \&n \&c show stepper stacks.
+\textbf{\&s \&r show stepper stacks.
 \&get ( var -- value ) inspects the stepper namestack.
 step -- single step over
 into -- single step into
@@ -6145,21 +6264,9 @@ The main entry point of the stack checker is a single word.
 
 Takes a quotation and attempts to infer its stack effect. An exception is thrown if the stack effect cannot be inferred.
 
-You can combine unit testing with stack effect inference by writing unit tests that check stack effects of words. In fact, this can be automated with the \texttt{infer>test.} word; it takes a quotation on the stack, and prints a code snippet that tests the stack effect of the quotation:
-
-\begin{alltt}
-  [ draw-shape ] infer>test.
-\textbf{[ [ [ object ] [  ] ] ]
-[ [ draw-shape ] infer ]
-unit-test}
-\end{alltt}
-
-You can then copy and paste this snippet into a test script, and run the test script after
-making changes to the word to ensure its stack effect signature has not changed.
-
 \section{The algorithm}
 
-The stack effect inference algorithm mirrors the interpreter algorithm. A ``meta data stack'' holds two types of entries; computed values, whose type is known but literal value will only be known at runtime, and literals, whose value is known statically. When a literal value is encountered, it is simply placed on the meta data stack. When a word is encountered, one of several actions are taken, depending on the type of the word:
+The stack effect inference algorithm mirrors the evaluator algorithm (\ref{quotations}). A ``meta data stack'' holds two types of entries; computed values, whose type is known but literal value will only be known at runtime, and literals, whose value is known statically. When a literal value is encountered, it is simply placed on the meta data stack. When a word is encountered, one of several actions are taken, depending on the type of the word:
 
 \begin{itemize}
 \item If the word has special stack effect inference behavior, this behavior is invoked. Shuffle words and various primitives fall into this category.
@@ -6283,6 +6390,8 @@ The \verb|node| tuple has the following slots:
 \item[\texttt{in-r}] A list of input values popped the return stack. Only used by \verb|#call >r| nodes.
 \item[\texttt{out-d}] A list of output values pushed on the data stack.
 \item[\texttt{out-r}] A list of output values pushed on the return stack. Only used by \verb|#call r>| nodes.
+\item[\texttt{node-classes}] A hashtable mapping values to classes.
+\item[\texttt{node-literals}] A hashtable mapping values to literals.
 \item[\texttt{node-successor}] The direct successor of the node.
 \item[\texttt{node-children}] A list of the node's children, for example if this is a branch or label node. The number of children depends on the type of node.
 \end{description}
@@ -6290,6 +6399,8 @@ The \verb|node| tuple has the following slots:
 Note that nodes are linked by the \verb|node-successor| slot. Nested structure is realized by a list value in the \verb|node-children| slot.
 
 The stack effect inferencer transforms quotations into dataflow IR.
+
+The \verb|node-classes| and \verb|node-literals| slots are filled in by a separate class inference stage (\ref{class-inference}).
 
 \wordtable{
 \vocabulary{inference}
@@ -6300,10 +6411,10 @@ Produces the dataflow IR of a quotation.
 
 \wordtable{
 \vocabulary{inference}
-\ordinaryword{dataflow.}{dataflow.~( node -- )}
+\ordinaryword{dataflow.}{dataflow.~( quot ? -- )}
 }
 
-Prints dataflow IR in human-readable form.
+Prints dataflow IR in human-readable form. The boolean indicates if stack effect annotations should be output.
 
 \subsection{Values}
 
@@ -6315,12 +6426,7 @@ Values are an abstraction over possibly known computation inputs and outputs. Th
 \item[Joined values] represent a unification of possible values of a stack slot where branched control flow meets
 \end{description}
 
-The \verb|value| tuple has the following slots:
-
-\begin{description}
-\item[\texttt{recursion}] A list of nested lexical scopes, used to resolve recursive stack effects
-\item[\texttt{safe?}] This is a hack. If this is false, the value's type at that point might not potentially be known, since a entry to this block from another entry point can potentially occur
-\end{description}
+The \verb|value| tuple has one slot, \verb|value-recursion|. This is a list of nested lexical scopes, used to resolve recursive stack effects
 
 \subsection{Straight-line code}
 
@@ -6328,29 +6434,23 @@ The \verb|value| tuple has the following slots:
 
 \item[\texttt{\#push}] Pushes literal values on the data stack.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-out-d|&A list of literals.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-out-d}] A list of literals.
+\end{description}
 
 \item[\texttt{\#drop}] Pops literal values from the data stack.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-in-d|&A list of literals.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-in-d}] A list of literals.
+\end{description}
 
 \item[\texttt{\#call}] Invokes the word identified by \verb|node-param|.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-param|&A word.\\
-\verb|node-in-d|&Input values.\\
-\verb|node-out-d|&Output values.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-param}]A word.\\
+\item[\texttt{node-in-d}]Input values.\\
+\item[\texttt{node-out-d}]Output values.
+\end{description}
 
 \item[\texttt{\#call-label}] Like \verb|#call| but \verb|node-param| refers to a parent \verb|#label| node.
 
@@ -6362,52 +6462,65 @@ Slot&Role\\
 
 \item[\texttt{\#ifte}] A conditional expression.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-in-d|&A singleton list holding the condition being tested.\\
-\verb|node-children|&A list of two nodes, the true and false branches.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-in-d}]A singleton list holding the condition being tested.\\
+\item[\texttt{node-children}]A list of two nodes, the true and false branches.
+\end{description}
 
 \item[\texttt{\#dispatch}] A jump table.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-in-d|&A singleton list holding the jump table index.\\
-\verb|node-children|&A list of nodes, in consecutive jump table order.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-in-d}]A singleton list holding the jump table index.\\
+\item[\texttt{node-children}]A list of nodes, in consecutive jump table order.
+\end{description}
 
 \item[\texttt{\#values}] Found at the end of each branch in an \verb|#ifte| or \verb|#dispatch| node.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-out-d|&A list of values present on the data stack at the end of the branch.\\
-\end{tabular}
+\begin{description}
+\item[\texttt{node-out-d}]A list of values present on the data stack at the end of the branch.\\
+\end{description}
+
+\item[\texttt{\#meet}] Must be the successor if an \verb|#ifte| or \verb|#dispatch| node.
+
+\begin{description}
+\item[\texttt{node-in-d}]A list of \verb|meet| values unified from the \verb|#values| node at the end of each branch.\\
+\end{description}
 
 \item[\texttt{\#label}] A named block of code. Child \verb|#call-label| nodes can recurse on this label.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-param|&A gensym identifying the label.\\
-\verb|node-children|&A singleton list whose sole element is the labelled node.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-param}]A gensym identifying the label.\\
+\item[\texttt{node-children}]A singleton list whose sole element is the labelled node.
+\end{description}
+
+\item[\texttt{\#entry}] Must be the first node of a \verb|#label|. These nodes are created by the stack effect inferencer, however are only properly filled out by the recursive value inference stage (\ref{recursive-inference}).
+\begin{description}
+\item[\texttt{node-in-d}]A list of \verb|meet| values unified from all entry points into the block scoped by the \verb|#label| node.\\
+\end{description}
 
 \item[\texttt{\#return}] Found at the end of a word's dataflow IR.
 
-\begin{tabular}{l|l}
-Slot&Role\\
-\hline
-\verb|node-out-d|&Values present on the stack when the word returns.
-\end{tabular}
+\begin{description}
+\item[\texttt{node-out-d}]Values present on the stack when the word returns.
+\end{description}
 
 \end{description}
 
 \section{Dataflow optimizer}
 
+The dataflow optimizer consists of a set of loosely-related words and passes over dataflow IR that apply various transformations with the intent of improving the efficiency of the generated code.
+
 \subsection{Killing unused literals}
+
+\subsection{Class inference}\label{class-inference}
+
+\subsection{Recursive value inference}\label{recursive-inference}
+
+\subsection{Method inlining and type check elimination}
+
+\subsection{Branch folding}
+
+\subsection{Partial evaluation}
 
 \section{Linear intermediate representation}
 
@@ -6416,17 +6529,6 @@ representations used by Factor. It is basically a high-level
 assembly language. Linear IR operations are called VOPs. The last stage of the compiler generates machine code instructions corresponding to each \emph{virtual operation} in the linear IR.
 
 To perform everything except for the machine code generation, use the \texttt{precompile} word. This will dump the optimized linear IR instead of generating code, which can be useful sometimes.
- 
-\begin{alltt}
-  \bs append precompile
-\textbf{<< \%prologue << vop [ ] [ ] [ ] [ ] >> >>
-<< \%peek-d << vop [ ] [ 1 ] [ << vreg ... 0 >> ] [ ] >> >>
-<< \%peek-d << vop [ ] [ 0 ] [ << vreg ... 1 >> ] [ ] >> >>
-<< \%replace-d << vop [ ] [ 0 << vreg ... 0 >> ] [ ] [ ] >> >>
-<< \%replace-d << vop [ ] [ 1 << vreg ... 1 >> ] [ ] [ ] >> >>
-<< \%inc-d << vop [ ] [ -1 ] [ ] [ ] >> >>
-<< \%return << vop [ ] [ ] [ ] [ ] >> >>}
-\end{alltt}
 
 \subsection{Control flow}
 
