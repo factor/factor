@@ -76,3 +76,5 @@ M: object extra-banner ( obj -- ) drop ;
 
 : inspect ( obj -- )
     dup inspecting set dup inspect-banner describe ;
+
+: go ( n -- ) get inspect ;

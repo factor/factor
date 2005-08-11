@@ -29,16 +29,9 @@ M: #label linearize-node* ( node -- )
     f %return ,
     r> %label , ;
 
-M: #simple-label linearize-node* ( node -- )
-    node-children first linearize-node ;
-
 M: #call linearize-node* ( node -- )
     dup node-param
-    dup "intrinsic" word-prop [
-        call
-    ] [
-        %call , drop
-    ] ?ifte ;
+    dup "intrinsic" word-prop [ call ] [ %call , drop ] ?ifte ;
 
 M: #call-label linearize-node* ( node -- )
     node-param %call-label , ;
@@ -74,35 +67,30 @@ M: #drop linearize-node* ( node -- )
     in-1  1 %dec-d , 0 %jump-t , ;
 
 M: #ifte linearize-node* ( node -- )
-    #! The parameter is a list of two lists, each one a dataflow
-    #! IR.
-    node-children 2unseq  <label> [
-        ifte-head
-        linearize-node ( false branch )
-        <label> dup %jump-label ,
-    ] keep %label , ( branch target of BRANCH-T )
-    swap linearize-node ( true branch )
-    %label , ( branch target of false branch end ) ;
+    node-children 2unseq
+    <label> dup ifte-head
+    swap linearize-node ( false branch )
+    %label , ( branch target of BRANCH-T )
+    linearize-node ( true branch ) ;
 
-: dispatch-head ( vtable -- end label/code )
+: dispatch-head ( vtable -- label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     in-1
     1 %dec-d ,
     0 %untag-fixnum ,
     0 %dispatch ,
-    <label> ( end label ) swap
     [ <label> dup %target-label ,  cons ] map
     %end-dispatch , ;
 
-: dispatch-body ( end label/param -- )
+: dispatch-body ( label/param -- )
     #! Output each branch, with a jump to the end label.
-    [ uncons %label , linearize-node %jump-label , ] each-with ;
+    [ uncons %label , linearize-node ] each ;
 
 M: #dispatch linearize-node* ( vtable -- )
     #! The parameter is a list of lists, each one is a branch to
     #! take in case the top of stack has that type.
-    node-children dispatch-head dupd dispatch-body %label , ;
+    node-children dispatch-head dispatch-body ;
 
 M: #return linearize-node* ( node -- )
     drop  f %return , ;

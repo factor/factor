@@ -72,11 +72,6 @@ GENERIC: abs ( z -- |z| )
 : times ( n quot -- | quot: -- )
     swap [ >r dup slip r> ] repeat drop ; inline
 
-: 2repeat ( i j quot -- | quot: i j -- i j )
-    rot [
-        rot [ [ rot dup slip -rot ] repeat ] keep -rot
-    ] repeat 2drop ; inline
-
 : power-of-2? ( n -- ? )
     dup 0 > [
         dup dup neg bitand =

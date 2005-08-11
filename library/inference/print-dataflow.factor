@@ -17,7 +17,7 @@ M: comment prettyprint* ( ann -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
 
 : value-str ( classes values -- str )
-    [ swap ?hash [ object ] unless* ] map-with
+    [ swap hash [ object ] unless* ] map-with
     [ word-name ] map
     " " join ;
 
@@ -52,9 +52,6 @@ M: #call-label node>quot ( ? node -- ) #call>quot ;
 M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
     node-children first swap dataflow>quot , \ call ,  ;
-
-M: #simple-label node>quot ( ? node -- )
-    node-children first swap dataflow>quot % ;
 
 M: #ifte node>quot ( ? node -- )
     [ "#ifte" comment, ] 2keep

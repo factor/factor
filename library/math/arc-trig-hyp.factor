@@ -17,7 +17,7 @@ USING: kernel math math-internals ;
 : acoth recip atanh ; stateless
 : <=1 ( x -- ? ) dup complex? [ drop f ] [ abs 1 <= ] ifte ; stateless
 : asin dup <=1 [ fasin ] [ i * asinh -i * ] ifte ; stateless
-: acos dup <=1 [ facos ] [ asin pi/2 swap - ] ifte ; stateless
+: acos dup <=1 [ facos ] [ asin pi 2 / swap - ] ifte ; stateless
 : atan dup <=1 [ fatan ] [ i * atanh i * ] ifte ; stateless
 : asec recip acos ; stateless
 : acosec recip asin ; stateless

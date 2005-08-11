@@ -23,7 +23,7 @@ GENERIC: inside? ( loc shape -- ? )
 
 M: rectangle inside? ( loc rect -- ? )
     screen-bounds shape-bounds { 1 1 1 } v- { 0 0 0 } vmax
-    >r v- { 0 0 0 } r> vbetween? conj ;
+    >r v- { 0 0 0 } r> vbetween? conjunction ;
 
 : intersect ( shape shape -- rect )
     >r shape-extent r> shape-extent

@@ -87,6 +87,7 @@ parser prettyprint sequences io vectors words ;
         "/library/inference/recursive-values.factor"
         "/library/inference/class-infer.factor"
         "/library/inference/kill-literals.factor"
+        "/library/inference/split-nodes.factor"
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
         "/library/inference/known-words.factor"

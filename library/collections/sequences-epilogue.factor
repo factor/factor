@@ -40,7 +40,7 @@ M: object each ( seq quot -- )
         [ 2swap [ slip push ] 2keep ] 2each nip
     ] keep like ; inline
 
-M: object find* ( i seq quot -- i elt  )
+: find* ( i seq quot -- i elt  )
     pick pick length >= [
         3drop -1 f
     ] [
@@ -49,7 +49,10 @@ M: object find* ( i seq quot -- i elt  )
         ] [
             r> 1 + r> r> find*
         ] ifte
-    ] ifte ;
+    ] ifte ; inline
+
+: find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
+    -rot [ with rot ] find* 2swap 2drop ; inline
 
 M: object find ( seq quot -- i elt )
     0 -rot find* ;
@@ -102,8 +105,8 @@ M: object empty? ( seq -- ? ) length 0 = ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
-: conj ( v -- ? ) [ ] all? ;
-: disj ( v -- ? ) [ ] contains? ;
+: conjunction ( v -- ? ) [ ] all? ;
+: disjunction ( v -- ? ) [ ] contains? ;
 
 : index   ( obj seq -- n )     [ = ] find-with drop ;
 : index*  ( obj i seq -- n )   [ = ] find-with* drop ;

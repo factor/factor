@@ -21,15 +21,19 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : node-classes* ( node seq -- seq )
     >r node-classes r>
-    [ swap ?hash [ object ] unless* ] map-with ;
+    [ swap hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
     dup dup node-param dispatching-values node-classes* ;
 
+: already-inlined? ( node -- ? )
+    #! Was this node inlined from definition of 'word'?
+    dup node-param swap node-history memq? ;
+
 : inlining-class ( #call -- class )
     #! If the generic dispatch can be eliminated, return the
     #! class of the method that will always be invoked here.
-    dup node-param recursive-state get member? [
+    dup already-inlined? [
         drop f
     ] [
         dup dispatching-classes dup empty? [
@@ -43,27 +47,17 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         ] ifte
     ] ifte ;
 
-: unlink-last ( node -- butlast last )
-    dup penultimate-node
-    dup node-successor
-    f rot set-node-successor ;
+: will-inline ( node -- quot )
+    dup inlining-class swap node-param "methods" word-prop hash ;
 
-: subst-node ( label old new -- new )
-    #! #simple-label<label> ---> new-last ---> old
-    #!     |---> new-butlast
-    dup node-successor [
-        unlink-last rot over set-node-successor
-        >r >r #simple-label r> 1vector over set-node-children
-        r> over set-node-successor
-    ] [
-        [ set-node-successor drop ] keep
-    ] ifte ;
+: method-dataflow ( node -- dataflow )
+    dup will-inline swap node-in-d dataflow-with
+    dup solve-recursion ;
 
 : inline-method ( node -- node )
-    dup inlining-class
-    over node-param "methods" word-prop hash
-    over node-in-d dataflow-with dup solve-recursion
-    >r [ node-param ] keep r> subst-node ;
+    dup method-dataflow [
+        >r node-param r> remember-node
+    ] 2keep subst-node ;
 
 : related? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
@@ -81,9 +75,3 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     dup node-param "predicating" word-prop >r
     dup dup node-in-d node-classes* first r> class<
     unit inline-literals ;
-
-M: #return optimize-node* ( node -- node/t )
-    #! A #return followed by another node is a result of
-    #! method inlining. Do a value substitution and drop both
-    #! nodes.
-    dup node-successor dup [ post-inline ] [ 2drop t ] ifte ;

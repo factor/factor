@@ -46,12 +46,15 @@ C: meet ( values -- value )
 ! code with stack flow information and types.
 
 TUPLE: node param in-d out-d in-r out-r
-       classes literals successor children ;
+       classes literals history
+       successor children ;
 
 M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [ >r f f f f <node> r> set-delegate ] keep ;
+    [
+        >r {{ }} {{ }} 10 <vector> f f <node> r> set-delegate
+    ] keep ;
 
 : param-node ( label) { } { } { } { } ;
 : in-d-node ( inputs) >r f r> { } { } { } ;
@@ -63,10 +66,6 @@ M: node = eq? ;
 TUPLE: #label ;
 C: #label make-node ;
 : #label ( label -- node ) param-node <#label> ;
-
-TUPLE: #simple-label ;
-C: #simple-label make-node ;
-: #simple-label ( label -- node ) param-node <#simple-label> ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
@@ -106,7 +105,7 @@ C: #dispatch make-node ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d get clone in-d-node <#merge> ;
+: #merge ( -- node ) meta-d get clone out-d-node <#merge> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -164,31 +163,8 @@ SYMBOL: current-node
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
 
-: penultimate-node ( node -- penultimate )
-    dup node-successor dup [
-        dup node-successor
-        [ nip penultimate-node ] [ drop ] ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 : drop-inputs ( node -- #drop )
     node-in-d clone in-d-node <#drop> ;
-
-: post-inline ( #return #call -- node )
-    [ >r node-in-d r> node-out-d ] keep
-    node-successor [ subst-values ] keep ;
-
-: subst-literals ( successor literals -- #push )
-    #! Make #push -> #return -> successor
-    [ literalize ] map dataflow
-    dup last-node rot post-inline swap
-    [ set-node-successor ] keep ;
-
-: inline-literals ( node literals -- node )
-    #! See the #return optimizer.
-    over drop-inputs
-    [ >r subst-literals r> set-node-successor ] keep ;
 
 : each-node ( node quot -- )
     over [
@@ -252,3 +228,17 @@ DEFER: subst-value
             drop
         ] each-node 2drop
     ] with-scope ;
+
+: remember-node ( word node -- )
+    #! Annotate each node with the fact it was inlined from
+    #! 'word'.
+    [
+        dup #call? [ node-history push ] [ 2drop ] ifte
+    ] each-node-with ;
+
+: clone-node ( node -- node )
+    dup [
+        clone
+        dup node-children [ clone-node ] map over set-node-children
+        dup node-successor clone-node over set-node-successor
+    ] when ;

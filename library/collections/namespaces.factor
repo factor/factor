@@ -142,7 +142,7 @@ SYMBOL: hash-buffer
         hash-buffer get
     ] with-scope ; inline
 
-: hash, ( value key -- ? )
+: hash, ( value key -- old )
     hash-buffer get [ hash swap ] 2keep set-hash ;
 
 : (closure) ( key hash -- )

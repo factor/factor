@@ -10,11 +10,16 @@ matrices namespaces sequences vectors ;
 
 GENERIC: optimize-node* ( node -- node )
 
-GENERIC: optimize-children
-
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
     [ drop f ] [ nip keep-optimizing t or ] ifte ;
+
+DEFER: optimize-node
+
+: optimize-children ( node -- )
+    f swap [
+        node-children [ optimize-node swap >r or r> ] map
+    ] keep set-node-children ;
 
 : optimize-node ( node -- node ? )
     #! Outputs t if any changes were made.
@@ -24,11 +29,6 @@ GENERIC: optimize-children
         over set-node-successor r> r> r> or or
     ] [ r> ] ifte ;
 
-M: node optimize-children ( node -- )
-    f swap [
-        node-children [ optimize-node swap >r or r> ] map
-    ] keep set-node-children ;
-
 : optimize-loop ( dataflow -- dataflow )
     recursive-state off
     dup kill-set over kill-node
@@ -37,8 +37,7 @@ M: node optimize-children ( node -- )
 
 : optimize ( dataflow -- dataflow )
     [
-        dup solve-recursion
-        optimize-loop
+        dup solve-recursion dup split-node optimize-loop
     ] with-scope ;
 
 : prune-if ( node quot -- successor/t )
@@ -59,44 +58,30 @@ M: #push optimize-node* ( node -- node/t )
 M: #drop optimize-node*  ( node -- node/t )
     [ node-in-d empty? ] prune-if ;
 
-! #call
-: flip-branches ( #ifte -- )
-    dup node-children 2unseq swap 2vector swap set-node-children ;
-
-! #label
-: optimize-label ( node -- node )
-    dup node-param recursive-state [ cons ] change
-    delegate optimize-children
-    recursive-state [ cdr ] change ;
-
-M: #label optimize-children optimize-label ;
-
-M: #simple-label optimize-children optimize-label ;
-
 ! #ifte
 : static-branch? ( node -- lit ? )
     node-in-d first dup literal? ;
 
 : static-branch ( conditional n -- node )
-    >r [ drop-inputs ] keep r>
-    over node-children nth
-    over node-successor over last-node set-node-successor
-    pick set-node-successor drop ;
+    over drop-inputs
+    [ >r swap node-children nth r> set-node-successor ] keep ;
 
 M: #ifte optimize-node* ( node -- node )
     dup static-branch?
     [ literal-value 0 1 ? static-branch ] [ 2drop t ] ifte ;
 
-! #values
-: values/merge ( #values #merge -- new old )
-    >r >r node-in-d r> node-in-d unify-length r> ;
+! #values/#return
+: post-inline ( #return/#values #call/#merge -- node )
+    [ >r node-in-d r> node-out-d unify-length ] keep
+    node-successor [ subst-values ] keep ;
 
-: post-split ( #values -- node )
-    #! If a #values is followed by a #merge, we need to replace
-    #! meet values after the merge with their branch value in
-    #! #values.
-    dup node-successor dup node-successor
-    values/merge [ subst-values ] keep ;
+: optimize-fold ( node -- node/t )
+    #! Optimize #return/#call or #values/#merge, resulting from
+    #! method inlining or branch folding, respectively.
+    dup node-successor dup [ post-inline ] [ 2drop t ] ifte ;
 
 M: #values optimize-node* ( node -- node ? )
-    dup node-successor #merge? [ post-split ] [ drop t ] ifte ;
+    optimize-fold ;
+
+M: #return optimize-node* ( node -- node/t )
+    optimize-fold ;

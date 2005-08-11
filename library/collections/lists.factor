@@ -32,9 +32,6 @@ M: cons each ( list quot -- | quot: elt -- )
 M: general-list find ( list quot -- i elt )
     0 (list-find) ;
 
-M: general-list find* ( start list quot -- i elt )
-    >r tail r> find ;
-
 : partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
     rot [ swapd cons ] [ >r cons r> ] ifte ;
 

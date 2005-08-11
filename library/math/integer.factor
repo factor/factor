@@ -42,7 +42,7 @@ IN: math-internals
 : division-by-zero ( x y -- )
     "Division by zero" throw drop ;
 
-: integer/ ( x y -- x/y )
+M: integer / ( x y -- x/y )
     dup 0 number= [
         division-by-zero
     ] [
@@ -50,7 +50,7 @@ IN: math-internals
             swap neg swap neg
         ] when
         2dup gcd nip tuck /i >r /i r> fraction>
-    ] ifte ; inline
+    ] ifte ;
 
 M: fixnum number=
     #! Fixnums are immediate values, so equality testing is
@@ -65,7 +65,6 @@ M: fixnum >= fixnum>= ;
 M: fixnum + fixnum+ ;
 M: fixnum - fixnum- ;
 M: fixnum * fixnum* ;
-M: fixnum / integer/ ;
 M: fixnum /i fixnum/i ;
 M: fixnum /f fixnum/f ;
 M: fixnum mod fixnum-mod ;
@@ -88,7 +87,6 @@ M: bignum >= bignum>= ;
 M: bignum + bignum+ ;
 M: bignum - bignum- ;
 M: bignum * bignum* ;
-M: bignum / integer/ ;
 M: bignum /i bignum/i ;
 M: bignum /f bignum/f ;
 M: bignum mod bignum-mod ;

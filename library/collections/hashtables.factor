@@ -126,11 +126,27 @@ IN: hashtables
 : hash-values ( hash -- alist )
     hash>alist [ cdr ] map ;
 
-: hash-each ( hash quot -- )
+: hash-each ( hash quot -- | quot: [[ k v ]] -- )
     swap hash-array [ swap each ] each-with ; inline
 
-: hash-each-with ( obj hash quot -- | quot: obj elt -- )
+: hash-each-with ( obj hash quot -- | quot: obj [[ k v ]] -- )
     swap [ with ] hash-each 2drop ; inline
+
+: hash-all? ( hash quot -- | quot: [[ k v ]] -- ? )
+    swap hash-array [ swap all? ] all-with? ; inline
+
+: hash-all-with? ( obj hash quot -- ? | quot: [[ k v ]] -- ? )
+    swap [ with rot ] hash-all? 2nip ; inline
+
+: hash-contained? ( h1 h2 -- ? )
+    #! Test if h2 contains all the key/value pairs of h1.
+    swap [
+        uncons >r swap hash* dup [
+            cdr r> =
+        ] [
+            r> 2drop f
+        ] ifte
+    ] hash-all-with? ;
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ; inline
@@ -145,8 +161,7 @@ M: hashtable = ( obj hash -- ? )
         2drop t
     ] [
         over hashtable? [
-            swap hash>alist swap hash>alist 2dup
-            contained? >r swap contained? r> and
+            2dup hash-contained? >r swap hash-contained? r> and
         ] [
             2drop f
         ] ifte

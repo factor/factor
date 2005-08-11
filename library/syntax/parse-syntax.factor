@@ -76,8 +76,7 @@ BUILTIN: f 9 not ;
     CREATE define-symbol ; parsing
 
 : \
-    #! Parsed as a piece of code that pushes a word on the stack
-    #! \ foo ==> [ foo ] car
+    #! Word literals: \ foo
     scan-word literalize swons ; parsing
 
 ! Long wrapper syntax. Only used in the rare case that another

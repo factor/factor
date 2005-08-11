@@ -44,12 +44,6 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
 
-G: find* ( i seq quot -- i elt | quot: elt -- ? )
-    [ over ] [ type ] ; inline
-
-: find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
-    -rot [ with rot ] find* 2swap 2drop ; inline
-
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
 : third 2 swap nth ; inline

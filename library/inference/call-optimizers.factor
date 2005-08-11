@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic hashtables inference kernel
-kernel-internals lists math math-internals strings vectors words ;
+USING: errors hashtables kernel sequences vectors words ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -35,11 +34,18 @@ kernel-internals lists math math-internals strings vectors words ;
     dup literal-in-d over node-param
     [ with-datastack ] [
         [
-            2drop t
+            3drop t
         ] [
             inline-literals
         ] ifte
     ] catch ;
+
+: flip-branches ( #ifte -- )
+    dup node-children 2unseq swap 2vector swap set-node-children ;
+
+\ not {
+    { [ dup node-successor #ifte? ] [ node-successor dup flip-branches ] }
+} define-optimizers
 
 M: #call optimize-node* ( node -- node/t )
     {

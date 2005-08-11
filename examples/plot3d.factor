@@ -35,6 +35,11 @@ namespaces prettyprint sdl sequences ;
        >r 1 + r> plot-vertex
     glEnd ;
 
+: 2repeat ( i j quot -- | quot: i j -- i j )
+    rot [
+        rot [ [ rot dup slip -rot ] repeat ] keep -rot
+    ] repeat 2drop ; inline
+
 : plot-faces ( points -- )
     dup matrix-rows 1 - over matrix-cols 1 - [
         3dup plot-face

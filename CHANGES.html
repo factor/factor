@@ -33,10 +33,12 @@
 <li>Everything else:
 
 <ul>
+<li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
 <li>Object slots are now clickable in the inspector</li>
 <li>The matrices library has been greatly simplified. Matrices are now represented as vectors of vectors, and matrix words have been moved to the <code>math</code> vocabulary.</li>
 <li>More descriptive "out of bounds" errors.</li>
-<li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
+<li>New <code>with-datastack ( stack word -- stack )</code> combinator.</li>
+<li>New <code>cond ( conditions -- )</code> combinator. It behaves like a set of nested <code>ifte</code>s; see its documentation comment for details. Note that it does not compile.</li>
 </ul>
 
 </li>

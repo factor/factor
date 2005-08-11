@@ -78,6 +78,14 @@ f 100000000000000000000000000 "testhash" get set-hash
 "key" "counting" get remove-hash
 [ 0 ] [ "counting" get hash-size ] unit-test
 
+[ t ] [ {{ }} dup hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ }} hash-contained? ] unit-test
+[ t ] [ {{ }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
+[ t ] [ {{ [[ 1 3 ]] }} {{ [[ 1 3 ]] }} hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 3 ]] }} {{ [[ 1 "hey" ]] }} hash-contained? ] unit-test
+[ f ] [ {{ [[ 1 f ]] }} {{ }} hash-contained? ] unit-test
+[ t ] [ {{ [[ 1 f ]] }} {{ [[ 1 f ]] }} hash-contained? ] unit-test
+
 [ t ] [ {{ }} dup = ] unit-test
 [ f ] [ "xyz" {{ }} = ] unit-test
 [ t ] [ {{ }} {{ }} = ] unit-test

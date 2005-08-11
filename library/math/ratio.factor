@@ -32,10 +32,10 @@ M: ratio <= scale <= ;
 M: ratio > scale > ;
 M: ratio >= scale >= ;
 
-M: ratio + ( x y -- x+y ) 2dup scale + -rot ratio+d integer/ ;
-M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d integer/ ;
-M: ratio * ( x y -- x*y ) 2>fraction * >r * r> integer/ ;
-M: ratio / scale integer/ ;
+M: ratio + ( x y -- x+y ) 2dup scale + -rot ratio+d / ;
+M: ratio - ( x y -- x-y ) 2dup scale - -rot ratio+d / ;
+M: ratio * ( x y -- x*y ) 2>fraction * >r * r> / ;
+M: ratio / scale / ;
 M: ratio /i scale /i ;
 M: ratio /f scale /f ;
 
