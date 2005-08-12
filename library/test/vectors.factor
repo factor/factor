@@ -1,6 +1,8 @@
 IN: temporary
-USING: kernel kernel-internals lists math namespaces random
-sequences strings test vectors ;
+USING: errors kernel kernel-internals lists math namespaces
+random sequences strings test vectors ;
+
+[ ] [ 10 [ [ -1000000 <vector> ] [ drop ] catch ] times ] unit-test
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ { t f t } length ] unit-test

@@ -11,18 +11,18 @@ M: integer numerator ;
 M: integer denominator drop 1 ;
 
 : >fraction ( a/b -- a b )
-    dup numerator swap denominator ;
+    dup numerator swap denominator ; inline
 
 IN: math-internals
 
 : 2>fraction ( a/b c/d -- a c b d )
-    >r >fraction r> >fraction swapd ;
+    >r >fraction r> >fraction swapd ; inline
 
 M: ratio number= ( a/b c/d -- ? )
     2>fraction number= [ number= ] [ 2drop f ] ifte ;
 
 : scale ( a/b c/d -- a*d b*c )
-    2>fraction >r * swap r> * swap ;
+    2>fraction >r * swap r> * swap ; inline
 
 : ratio+d ( a/b c/d -- b*d )
     denominator swap denominator * ; inline

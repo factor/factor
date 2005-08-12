@@ -50,7 +50,8 @@ DEFER: wrapper?
 BUILTIN: wrapper 14 wrapper? { 1 "wrapped" f } ;
 
 M: wrapper = ( obj wrapper -- ? )
-    over wrapper? [ swap wrapped = ] [ 2drop f ] ifte ;
+    over wrapper?
+    [ swap wrapped swap wrapped = ] [ 2drop f ] ifte ;
 
 ! defined in parse-syntax.factor
 DEFER: not

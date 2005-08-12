@@ -6,8 +6,8 @@ USING: errors kernel math math-internals ;
 ! Power-related functions:
 !     exp log sqrt pow ^mod
 
-: exp >rect swap fexp swap polar> ;
-: log >polar swap flog swap rect> ;
+: exp >rect swap fexp swap polar> ; inline
+: log >polar swap flog swap rect> ; inline
 
 : sqrt ( z -- sqrt )
     >polar dup pi = [
@@ -16,13 +16,13 @@ USING: errors kernel math math-internals ;
         swap fsqrt swap 2 / polar>
     ] ifte ;
 
-GENERIC: ^ ( z w -- z^w )
+GENERIC: ^ ( z w -- z^w ) foldable
 
 : ^mag ( w abs arg -- magnitude )
-    >r >r >rect swap r> swap fpow r> rot * fexp / ;
+    >r >r >rect swap r> swap fpow r> rot * fexp / ; inline
 
 : ^theta ( w abs arg -- theta )
-    >r >r >rect r> flog * swap r> * + ;
+    >r >r >rect r> flog * swap r> * + ; inline
 
 M: number ^ ( z w -- z^w )
     swap >polar 3dup ^theta >r ^mag r> polar> ;
@@ -38,18 +38,19 @@ M: number ^ ( z w -- z^w )
 
 : (integer^) ( z w -- z^w )
     1 swap [ 1 number= [ dupd * ] when >r sq r> ] each-bit nip ;
+    inline
 
 M: integer ^ ( z w -- z^w )
     over 0 number= over 0 number= and [
         "0^0 is not defined" throw
     ] [
         dup 0 < [ neg ^ recip ] [ (integer^) ] ifte
-    ] ifte ;
+    ] ifte ; foldable
 
 : (^mod) ( n z w -- z^w )
     1 swap [
         1 number= [ dupd * pick mod ] when >r sq over mod r>
-    ] each-bit 2nip ;
+    ] each-bit 2nip ; inline
 
 : ^mod ( z w n -- z^w )
     #! Compute z^w mod n.
@@ -57,4 +58,4 @@ M: integer ^ ( z w -- z^w )
         [ >r neg r> ^mod ] keep mod-inv
     ] [
         -rot (^mod)
-    ] ifte ;
+    ] ifte ; foldable

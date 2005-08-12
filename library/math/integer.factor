@@ -14,7 +14,7 @@ UNION: integer fixnum bignum ;
         drop nip
     ] [
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
-    ] ifte ;
+    ] ifte ; inline
 
 : gcd ( x y -- a d )
     #! Compute the greatest common divisor d and multiplier a
@@ -37,10 +37,10 @@ IN: math-internals
         drop
     ] [
         (fraction>)
-    ] ifte ;
+    ] ifte ; inline
 
 : division-by-zero ( x y -- )
-    "Division by zero" throw drop ;
+    "Division by zero" throw drop ; inline
 
 M: integer / ( x y -- x/y )
     dup 0 number= [

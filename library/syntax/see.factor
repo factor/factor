@@ -15,9 +15,12 @@ streams strings styles unparser words ;
     ] ifte ;
 
 : prettyprint-plist ( word -- )
-    dup
-    \ parsing prettyprint-prop
-    \ inline prettyprint-prop ;
+    [
+        POSTPONE: parsing
+        POSTPONE: inline
+        POSTPONE: foldable
+        POSTPONE: flushable
+    ] [ prettyprint-prop ] each-with ;
 
 : comment. ( comment -- )
     [ [[ font-style italic ]] ] format ;
@@ -78,7 +81,9 @@ M: generic (see) ( word -- )
         over "dispatcher" word-prop prettyprint* bl
     ] with-scope
     drop
-    \ ; unparse. terpri
+    \ ; unparse.
+    dup prettyprint-plist
+    terpri
     dup methods [ method. ] each-with ;
 
 M: word (see) drop ;

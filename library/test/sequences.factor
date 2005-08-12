@@ -69,3 +69,46 @@ unit-test
 
 [ { { 1 4 } { 2 5 } { 3 6 } } ]
 [ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
+
+[ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
+
+[ f ] [ [ { } { } "Hello" ] [ = ] every? ] unit-test
+[ f ] [ [ { 2 } { } { } ] [ = ] every? ] unit-test
+[ t ] [ [ ] [ = ] every? ] unit-test
+[ t ] [ [ 1/2 ] [ = ] every? ] unit-test
+[ t ] [ [ 1.0 10/10 1 ] [ = ] every? ] unit-test
+
+[ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test
+
+[ 1 ] [ 0 [ 1 2 ] nth ] unit-test
+[ 2 ] [ 1 [ 1 2 ] nth ] unit-test
+
+[ [ ]           ] [ [ ]   [ ]       append ] unit-test
+[ [ 1 ]         ] [ [ 1 ] [ ]       append ] unit-test
+[ [ 2 ]         ] [ [ ] [ 2 ]       append ] unit-test
+[ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] [ 4 ] append ] unit-test
+[ [ 1 2 3 4 ]   ] [ [ 1 2 3 ] { 4 } append ] unit-test
+
+[ [ ]       ] [ 1 [ ]           remove ] unit-test
+[ [ ]       ] [ 1 [ 1 ]         remove ] unit-test
+[ [ 3 1 1 ] ] [ 2 [ 3 2 1 2 1 ] remove ] unit-test
+
+[ [ ]       ] [ [ ]       reverse ] unit-test
+[ [ 1 ]     ] [ [ 1 ]     reverse ] unit-test
+[ [ 3 2 1 ] ] [ [ 1 2 3 ] reverse ] unit-test
+
+[ f ] [ 0 f head ] unit-test
+[ f ] [ 0 [ 1 ] head ] unit-test
+[ [ 1 2 3 ] ] [ 3 [ 1 2 3 4 ] head ] unit-test
+[ f ] [ 3 [ 1 2 3 ] tail ] unit-test
+[ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
+
+[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] seq-diff ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
+[ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test
+
+[ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
+[ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
+[ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
+[ f ] [ [ ] [ 1 2 3 ] sequence= ] unit-test

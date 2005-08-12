@@ -10,5 +10,5 @@ USE: kernel
 : e 2.7182818284590452354 ; inline
 : pi 3.14159265358979323846 ; inline
 
-: deg>rad pi * 180 / ;
-: rad>deg 180 * pi / ;
+: deg>rad pi * 180 / ; inline
+: rad>deg 180 * pi / ; inline

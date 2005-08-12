@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
 USING: compiler-backend errors generic lists inference kernel
-kernel-internals math namespaces prettyprint sequences
+math namespaces prettyprint sequences
 strings words ;
 
 GENERIC: linearize-node* ( node -- )
@@ -26,7 +26,6 @@ M: #label linearize-node* ( node -- )
     <label> dup %return-to , >r
     dup node-param %label ,
     node-children first linearize-node
-    f %return ,
     r> %label , ;
 
 M: #call linearize-node* ( node -- )

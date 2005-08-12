@@ -1,8 +1,24 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien assembler command-line compiler generic hashtables
-kernel lists memory namespaces parser sequences io unparser
-words ;
+USING: alien assembler command-line compiler errors generic
+hashtables io kernel lists memory namespaces parser sequences
+unparser words ;
+
+: restarts. ( menu -- )
+    "Restarts:" print
+    dup length [ unparse print ". " write first print ] 2each
+    "> " write flush
+    ;
+
+: try-resource ( path -- )
+    "Loading " write dup print
+    [
+        run-resource
+    ] [
+        [
+            "Error loading resource. Restarts:" print
+        ] when*
+    ] catch ;
 
 : pull-in ( ? list -- )
     swap [

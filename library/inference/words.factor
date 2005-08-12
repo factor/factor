@@ -36,8 +36,9 @@ hashtables parser prettyprint ;
     recursive-state [ cdr ] change ; inline
 
 : inline-block ( word -- node-block )
-    gensym over word-def cons
-    [ #entry node,  word-def infer-quot ] with-block ;
+    gensym over word-def cons [
+        #entry node,  word-def infer-quot  #return node,
+    ] with-block ;
 
 : inline-compound ( word -- )
     #! Infer the stack effect of a compound word in the current

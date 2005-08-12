@@ -9,6 +9,8 @@ USE: test
 USE: sequences
 USE: lists
 
+[ ] [ 10 [ [ -1000000 <sbuf> ] [ drop ] catch ] times ] unit-test
+
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] make-string ] unit-test
 
 [ "abc" ] [ "ab" "c" append ] unit-test

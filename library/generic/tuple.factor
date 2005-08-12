@@ -24,11 +24,14 @@ BUILTIN: tuple 18 tuple? ;
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type builtin-type ] ifte ; inline
 
+: class-tuple ( object -- class )
+    dup tuple? [ 2 slot ] [ drop f ] ifte ; inline
+
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
     dup predicate-word
-    [ \ class , over literalize , \ eq? , ] make-list
+    [ \ class-tuple , over literalize , \ eq? , ] make-list
     define-predicate ;
 
 : forget-tuple ( class -- )
@@ -72,34 +75,31 @@ BUILTIN: tuple 18 tuple? ;
     dup r> tuple-slots
     default-constructor ;
 
+: class-predicates ( generic classes -- predicates )
+    >r "picker" word-prop r> [
+        uncons >r "predicate" word-prop append r> cons
+    ] map-with ;
+
 : alist>quot ( default alist -- quot )
+    reverse-slice [
+        unswons [ % , , \ ifte , ] make-list
+    ] each ;
+
+: (tuple-dispatch-quot) ( default alist -- quot )
     #! Turn an association list that maps values to quotations
     #! into a quotation that executes a quotation depending on
     #! the value on the stack.
     [
         [
             unswons
-            \ dup , unswons literalize , \ eq? , \ drop swons ,
+            \ dup , unswons "predicate" word-prop % ,
             alist>quot , \ ifte ,
         ] make-list
     ] when* ;
 
-: (hash>quot) ( default hash -- quot )
-    [
-        \ dup , \ hashcode , dup bucket-count , \ rem ,
-        buckets>vector [ alist>quot ] map-with ,
-        \ dispatch ,
-    ] make-list ;
-
-: hash>quot ( default hash -- quot )
-    #! Turn a hash  table that maps values to quotations into a
-    #! quotation that executes a quotation depending on the
-    #! value on the stack.
-    ( dup hash-size 4 <= ) t [
-        hash>alist alist>quot
-    ] [
-        (hash>quot)
-    ] ifte ;
+: tuple-methods ( generic -- hash )
+    #! A hashtable of methods on tuples.
+    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
 
 : default-tuple-method ( generic -- quot )
     #! If the generic does not define a specific method for a
@@ -115,16 +115,11 @@ BUILTIN: tuple 18 tuple? ;
         ] ifte
     ] ifte ;
 
-: tuple-methods ( generic -- hash )
-    #! A hashtable of methods on tuples.
-    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
-
 : tuple-dispatch-quot ( generic -- quot )
     #! Generate a quotation that performs tuple class dispatch
     #! for methods defined on the given generic.
-    dup default-tuple-method \ drop swons
-    over tuple-methods hash>quot
-    >r "picker" word-prop [ class ] r> append3 ;
+    dup dup tuple-methods hash>alist class-predicates
+    >r default-tuple-method r> alist>quot ;
 
 : add-tuple-dispatch ( word vtable -- )
     >r tuple-dispatch-quot tuple r> set-vtable ;

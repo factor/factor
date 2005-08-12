@@ -17,10 +17,18 @@ words ;
     #! Mark the last word to be inlined.
     word  t "inline" set-word-prop ; parsing
 
-: stateless ( -- )
-    #! Mark the last word to be evaluated at compile time if
-    #! all inputs are literals.
-    word  t "stateless" set-word-prop ; parsing
+: flushable ( -- )
+    #! Declare that a word may be removed if the value it
+    #! computes is unused.
+    word  t "flushable" set-word-prop ; parsing
+
+: foldable ( -- )
+    #! Declare a word as safe for compile-time evaluation.
+    #! Foldable implies flushable, since we can first fold to
+    #! a constant then flush the constant.
+    word
+    dup t "foldable" set-word-prop
+    t "flushable" set-word-prop ; parsing
 
 ! The variable "in-definition" is set inside a : ... ;.
 ! ( and #! then add "stack-effect" and "documentation"

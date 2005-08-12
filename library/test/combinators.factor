@@ -1,5 +1,5 @@
 IN: temporary
-USING: alien strings ;
+USING: alien errors strings ;
 USE: kernel
 USE: math
 USE: test
@@ -56,4 +56,11 @@ unit-test
         { [ dup alien? ] [ drop "alien" ] }
         { [ t ] [ drop "neither" ] }
     } cond
+] unit-test
+
+[ ] [
+    [
+        [ drop ] [ drop ] catch
+        [ drop ] [ drop ] catch
+    ] keep-datastack
 ] unit-test

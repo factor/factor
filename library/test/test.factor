@@ -85,13 +85,12 @@ SYMBOL: failures
         "math/complex" "math/irrational" "math/integer"
         "math/matrices"
         "httpd/url-encoding" "httpd/html" "httpd/httpd"
-        "httpd/http-client"
-        "crashes" "sbuf" "threads" "parsing-word"
-        "inference" "interpreter"
-        "alien"
+        "httpd/http-client" "sbuf" "threads" "parsing-word"
+        "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
         "gadgets/gradients" "memory"
         "redefine" "annotate" "sequences" "binary" "inspector"
+        "kernel"
     ] run-tests ;
 
 : benchmarks

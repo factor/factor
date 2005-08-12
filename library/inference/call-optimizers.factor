@@ -15,7 +15,7 @@ USING: errors hashtables kernel sequences vectors words ;
     { [ t ] [ drop t ] } add "optimizer-hooks" set-word-prop ;
 
 : partial-eval? ( #call -- ? )
-    dup node-param "stateless" word-prop [
+    dup node-param "foldable" word-prop [
         dup node-in-d [
             dup literal?
             [ 2drop t ] [ swap node-literals hash* ] ifte
@@ -56,3 +56,10 @@ M: #call optimize-node* ( node -- node/t )
         { [ dup optimize-predicate? ] [ optimize-predicate ] }
         { [ t ] [ drop t ] }
     } cond ;
+
+SYMBOL: @
+
+: values-match? ( spec values -- ? )
+    #! spec is a sequence of literals, or the symbol @ which is
+    #! a wildcard.
+    [ dup literal? [ drop @ ] unless = ] 2map conjunction ;
