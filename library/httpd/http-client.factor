@@ -24,7 +24,7 @@ io strings unparser ;
     flush readln parse-response read-header ;
 
 : http-request ( host resource method -- )
-    write CHAR: \s write write " HTTP/1.0" write crlf
+    write " " write write " HTTP/1.0" write crlf
     "Host: " write write crlf ;
 
 : get-request ( host resource -- )
