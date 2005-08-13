@@ -35,7 +35,6 @@ init-assembler
 compile? [
     \ car compile
     \ * compile
-    \ length compile
     \ = compile
     \ unparse compile
     \ scan compile

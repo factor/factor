@@ -71,16 +71,12 @@ M: #ifte optimize-node* ( node -- node )
     [ literal-value 0 1 ? static-branch ] [ 2drop t ] ifte ;
 
 ! #values/#return
-: post-inline ( #return/#values #call/#merge -- node )
-    [ >r node-in-d r> node-out-d unify-length ] keep
-    node-successor [ subst-values ] keep ;
-
 : optimize-fold ( node -- node/t )
     #! Optimize #return/#call or #values/#merge, resulting from
     #! method inlining or branch folding, respectively.
-    dup node-successor dup [ post-inline ] [ 2drop t ] ifte ;
+    node-successor [ node-successor ] [ t ] ifte* ;
 
-M: #values optimize-node* ( node -- node ? )
+M: #values optimize-node* ( node -- node/t )
     optimize-fold ;
 
 M: #return optimize-node* ( node -- node/t )

@@ -57,7 +57,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : inline-method ( node -- node )
     dup method-dataflow [
         >r node-param r> remember-node
-    ] 2keep subst-node ;
+    ] 2keep [ subst-node ] keep ;
 
 : related? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes

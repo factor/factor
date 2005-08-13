@@ -37,16 +37,17 @@ M: #dispatch split-node* ( node -- )
 M: #label split-node* ( node -- )
     node-children first split-node ;
 
-: post-inline ( #return #call -- node )
-    [ >r node-in-d r> node-out-d ] keep
-    node-successor [ subst-values ] keep ;
+: post-inline ( #return/#values #call/#merge -- )
+    [ >r node-in-d r> node-out-d unify-length ] keep
+    node-successor subst-values ;
 
 : subst-node ( old new -- )
-    [ last-node set-node-successor ] keep dup split-node ;
+    [ last-node 2dup swap post-inline set-node-successor ] keep
+    split-node ;
 
 : inline-literals ( node literals -- node )
     #! Make #push -> #return -> successor
     over drop-inputs [
-        >r [ literalize ] map dataflow subst-node
+        >r [ literalize ] map dataflow [ subst-node ] keep
         r> set-node-successor
     ] keep ;

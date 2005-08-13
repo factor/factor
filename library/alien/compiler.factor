@@ -159,8 +159,8 @@ M: compound (uncrossref)
         dup f "infer-effect" set-word-prop
         dup f "base-case" set-word-prop
         dup f "no-effect" set-word-prop
-        dup f "inline" set-word-prop
-        dup f "foldable" set-word-prop
-        dup f "flushable" set-word-prop
+        ! dup f "inline" set-word-prop
+        ! dup f "foldable" set-word-prop
+        ! dup f "flushable" set-word-prop
         decompile
     ] ifte ;

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors hashtables kernel sequences vectors words ;
+USING: errors hashtables kernel math math-internals sequences
+vectors words ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -57,9 +58,108 @@ M: #call optimize-node* ( node -- node/t )
         { [ t ] [ drop t ] }
     } cond ;
 
+! Arithmetic identities
 SYMBOL: @
 
-: values-match? ( spec values -- ? )
-    #! spec is a sequence of literals, or the symbol @ which is
-    #! a wildcard.
-    [ dup literal? [ drop @ ] unless = ] 2map conjunction ;
+: define-identities ( words identities -- )
+    swap [ swap "identities" set-word-prop ] each-with ;
+
+: literals-match? ( values template -- ? )
+    [
+        over literal? [ >r literal-value r> ] [ nip @ ] ifte =
+    ] 2map conjunction ;
+
+: values-match? ( values template -- ? )
+    [ @ = ] 2map [ ] subset [ eq? ] every? ;
+
+: apply-identity? ( values identity -- ? )
+    first 2dup literals-match? >r values-match? r> and ;
+
+: apply-identities ( values identities -- node/f )
+    dupd [ apply-identity? ] find-with nip dup
+    [ second swap dataflow-with ] [ 2drop f ] ifte ;
+
+[ + fixnum+ bignum+ float+ ] {
+    { { @ 0 } [ drop ] }
+    { { 0 @ } [ nip ]  }
+} define-identities
+
+[ - fixnum- bignum- float- ] {
+    { { @ 0 } [ drop ]    }
+    { { @ @ } [ 2drop 0 ] }
+} define-identities
+
+[ * fixnum* bignum* float* ] {
+    { { @ 1 }  [ drop ]          }
+    { { 1 @ }  [ nip ]           }
+    { { @ 0 }  [ 2drop 0 ]       }
+    { { 0 @ }  [ 2drop 0 ]       }
+    { { @ -1 } [ drop 0 swap - ] }
+    { { -1 @ } [ nip 0 swap - ]  }
+} define-identities
+
+[ / /i /f fixnum/i fixnum/f bignum/i bignum/f float/f ] {
+    { { @ 1 }  [ drop ]          }
+    { { @ -1 } [ drop 0 swap - ] }
+} define-identities
+
+[ rem mod fixnum-mod bignum-mod ] {
+    { { @ 1 }  [ 2drop 0 ] }
+} define-identities
+
+! [ ^ ] {
+!     { { 1 @ }  [ 2drop 1 ]             }
+!     { { @ 1 }  [ drop ]                }
+!     { { @ 2 }  [ drop dup * ]          }
+!     { { @ -1 } [ drop 1 swap / ]       }
+!     { { @ -2 } [ drop dup * 1 swap / ] }
+! } define-identities
+
+[ bitand fixnum-bitand bignum-bitand ] {
+    { { @ -1 } [ drop ]    }
+    { { -1 @ } [ nip  ]    }
+    { { @ @ }  [ drop ]    }
+    { { @ 0 }  [ 2drop 0 ] }
+    { { 0 @ }  [ 2drop 0 ] }
+} define-identities
+
+[ bitor fixnum-bitor bignum-bitor ] {
+    { { @ 0 }  [ drop ] }
+    { { 0 @ }  [ nip  ] }
+    { { @ @ }  [ drop ] }
+    { { @ -1 } [ 2drop -1 ] }
+    { { -1 @ } [ 2drop -1 ] }
+} define-identities
+
+[ bitxor fixnum-bitxor bignum-bitxor ] {
+    { { @ 0 }  [ drop ]        }
+    { { 0 @ }  [ nip  ]        }
+    { { @ -1 } [ drop bitnot ] }
+    { { -1 @ } [ nip  bitnot ] }
+    { { @ @ }  [ 2drop 0 ]     }
+} define-identities
+
+[ shift fixnum-shift bignum-shift ] {
+    { { 0 @ } [ 2drop 0 ] }
+    { { @ 0 } [ drop ] }
+} define-identities
+
+[ < fixnum< bignum< float< ] {
+    { { @ @ } [ 2drop f ] }
+} define-identities
+
+[ <= fixnum<= bignum<= float<= ] {
+    { { @ @ } [ 2drop t ] }
+} define-identities
+    
+[ > fixnum> bignum> float>= ] {
+    { { @ @ } [ 2drop f ] }
+} define-identities
+
+[ >= fixnum>= bignum>= float>= ] {
+    { { @ @ } [ 2drop t ] }
+} define-identities
+
+[ eq? number= = ] {
+    { { @ @ } [ 2drop t ] }
+} define-identities

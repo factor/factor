@@ -1,6 +1,7 @@
 IN: inference
-USING: errors generic interpreter kernel kernel-internals lists
-math math-internals parser sequences vectors words ;
+USING: errors generic hashtables interpreter kernel
+kernel-internals lists math math-internals parser sequences
+vectors words ;
 
 ! Primitive combinators
 \ call [
@@ -55,6 +56,7 @@ math math-internals parser sequences vectors words ;
 \ inference-error t "terminator" set-word-prop
 \ throw t "terminator" set-word-prop
 \ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ hash-contained? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
 \ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
 \ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
 \ cdr [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
