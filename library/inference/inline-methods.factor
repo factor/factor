@@ -55,9 +55,11 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
     dup solve-recursion ;
 
 : inline-method ( node -- node )
-    dup method-dataflow [
-        >r node-param r> remember-node
-    ] 2keep [ subst-node ] keep ;
+    #! We set the #call node's param to f so that it gets killed
+    #! later.
+    dup method-dataflow
+    [ >r node-param r> remember-node ] 2keep
+    [ subst-node ] keep ;
 
 : related? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
@@ -74,4 +76,4 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
     dup dup node-in-d node-classes* first r> class<
-    unit inline-literals ;
+    1vector inline-literals ;

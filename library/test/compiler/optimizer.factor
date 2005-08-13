@@ -12,17 +12,17 @@ USE: lists
 USE: sequences
 
 ! Some dataflow tests
-[ 3 ] [ 1 2 3 (subst-value) ] unit-test
-[ 1 ] [ 1 2 2 (subst-value) ] unit-test
-
-[ { "one" "one" "three" "three" } ]
-[
-    { "one" "two" "three" } { 1 2 3 } { 1 1 3 3 }
-    clone [ (subst-values) ] keep
-] unit-test
-
-[ << meet f { "one" 2 3 } >> ]
-[ "one" 1 << meet f { 1 2 3 } >> clone (subst-value) ] unit-test
+! [ 3 ] [ 1 2 3 (subst-value) ] unit-test
+! [ 1 ] [ 1 2 2 (subst-value) ] unit-test
+! 
+! [ { "one" "one" "three" "three" } ]
+! [
+!     { "one" "two" "three" } { 1 2 3 } { 1 1 3 3 }
+!     clone [ (subst-values) ] keep
+! ] unit-test
+! 
+! [ << meet f { "one" 2 3 } >> ]
+! [ "one" 1 << meet f { 1 2 3 } >> clone (subst-value) ] unit-test
 
 ! Literal kill tests
 : kill-set*
@@ -53,7 +53,7 @@ USE: sequences
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ { [ 3 ] [ dup ] } ] [ [ [ 3 ] [ dup ] ifte drop ] kill-set* ] unit-test
+[ { [ 3 ] [ dup ] 3 } ] [ [ [ 3 ] [ dup ] ifte drop ] kill-set* ] unit-test
 
 : literal-kill-test-4
     5 swap [ 3 ] [ dup ] ifte 2drop ; compiled
@@ -61,7 +61,7 @@ USE: sequences
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
 
-[ { [ 3 ] [ dup ] } ] [ \ literal-kill-test-4 word-def kill-set* ] unit-test
+[ { 5 [ 3 ] [ dup ] 3 } ] [ \ literal-kill-test-4 word-def kill-set* ] unit-test
 
 : literal-kill-test-5
     5 swap [ 5 ] [ dup ] ifte 2drop ; compiled
@@ -69,7 +69,7 @@ USE: sequences
 [ ] [ t literal-kill-test-5 ] unit-test
 [ ] [ f literal-kill-test-5 ] unit-test
 
-[ { [ 5 ] [ dup ] } ] [ \ literal-kill-test-5 word-def kill-set* ] unit-test
+[ { 5 [ 5 ] [ dup ] 5 } ] [ \ literal-kill-test-5 word-def kill-set* ] unit-test
 
 : literal-kill-test-6
     5 swap [ dup ] [ dup ] ifte 2drop ; compiled
@@ -164,4 +164,5 @@ TUPLE: pred-test ;
     "nom" = ; compiled
 
 [ t ] [ "nom" inline-test ] unit-test
+[ f ] [ "shayin" inline-test ] unit-test
 [ f ] [ 3 inline-test ] unit-test

@@ -236,9 +236,16 @@ DEFER: subst-value
         dup #call? [ node-history push ] [ 2drop ] ifte
     ] each-node-with ;
 
+: (clone-node) ( node -- node )
+    clone
+    dup node-in-d clone over set-node-in-d
+    dup node-in-r clone over set-node-in-r
+    dup node-out-d clone over set-node-out-d
+    dup node-out-r clone over set-node-out-r ;
+
 : clone-node ( node -- node )
     dup [
-        clone
+        (clone-node)
         dup node-children [ clone-node ] map over set-node-children
         dup node-successor clone-node over set-node-successor
     ] when ;

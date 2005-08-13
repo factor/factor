@@ -15,8 +15,15 @@ GENERIC: can-kill* ( literal node -- ? )
     #! Return false if the literal appears in any node in the
     #! list.
     dup [
-        2dup can-kill*
-        [ node-successor can-kill? ] [ 2drop f ] ifte
+        2dup can-kill* [
+            2dup node-children [ can-kill? ] all-with? [
+                node-successor can-kill?
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
     ] [
         2drop t
     ] ifte ;
@@ -47,15 +54,13 @@ M: node can-kill* ( literal node -- ? ) uses-value? not ;
 M: #push literals* ( node -- )
     node-out-d % ;
 
-M: #push can-kill* ( literal node -- ? )
-    2drop t ;
+M: #push can-kill* ( literal node -- ? ) 2drop t ;
 
 M: #push kill-node* ( literals node -- )
     [ node-out-d seq-diff ] keep set-node-out-d ;
 
 ! #drop
-M: #drop can-kill* ( literal node -- ? )
-    2drop t ;
+M: #drop can-kill* ( literal node -- ? ) 2drop t ;
 
 ! #call
 : (kill-shuffle) ( word -- map )
@@ -101,49 +106,10 @@ M: #call kill-node* ( literals node -- )
     [ kill-shuffle ] [ 2drop ] ifte ;
 
 ! #call-label
-M: #call-label can-kill* ( literal node -- ? )
-     2drop t ;
-
-! #label
-M: #label can-kill* ( literal node -- ? )
-    node-children first can-kill? ;
-
-! #ifte
-SYMBOL: branch-returns
-
-: branch-values ( branches -- )
-    [ last-node node-in-d ] map
-    unify-lengths flip branch-returns set ;
-
-: can-kill-branches? ( literal node -- ? )
-    #! Check if the literal appears in either branch. This
-    #! assumes that the last element of each branch is a #values
-    #! node.
-    2dup uses-value? [
-        2drop f
-    ] [
-        [
-            node-children dup branch-values
-            [ can-kill? ] all-with?
-        ] with-scope
-    ] ifte ;
-
-M: #ifte can-kill* ( literal node -- ? )
-    can-kill-branches? ;
-
-! #dispatch
-M: #dispatch can-kill* ( literal node -- ? )
-    can-kill-branches? ;
+M: #call-label can-kill* ( literal node -- ? ) 2drop t ;
 
 ! #values
-M: #values can-kill* ( literal node -- ? )
-    dupd uses-value? [
-        branch-returns get
-        [ memq? ] subset-with
-        [ [ eq? ] every? ] all?
-    ] [
-        drop t
-    ] ifte ;
+M: #values can-kill* ( literal node -- ? ) 2drop t ;
 
 ! #merge
 M: #merge can-kill* ( literal node -- ? ) 2drop t ;

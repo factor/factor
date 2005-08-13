@@ -22,11 +22,25 @@ GENERIC: split-node* ( node -- )
 
 M: node split-node* ( node -- ) drop ;
 
+: post-inline ( #return/#values #call/#merge -- )
+    dup [
+        [ >r node-in-d r> node-out-d unify-length ] keep
+        node-successor subst-values
+    ] [
+        2drop
+    ] ifte ;
+
+: subst-node ( old new -- )
+    #! The last node of 'new' becomes 'old', then values are
+    #! substituted. A subsequent optimizer phase kills the
+    #! last node of 'new' and the first node of 'old'.
+    [ last-node 2dup swap post-inline set-node-successor ] keep
+    split-node ;
+
 : split-branch ( node -- )
-    dup node-successor over node-children [
-        [ last-node >r clone-node r> set-node-successor ] keep
-        split-node
-    ] each-with f swap set-node-successor ;
+    dup node-successor over node-children
+    [ >r clone-node r> subst-node ] each-with
+    f swap set-node-successor ;
 
 M: #ifte split-node* ( node -- )
     split-branch ;
@@ -36,14 +50,6 @@ M: #dispatch split-node* ( node -- )
 
 M: #label split-node* ( node -- )
     node-children first split-node ;
-
-: post-inline ( #return/#values #call/#merge -- )
-    [ >r node-in-d r> node-out-d unify-length ] keep
-    node-successor subst-values ;
-
-: subst-node ( old new -- )
-    [ last-node 2dup swap post-inline set-node-successor ] keep
-    split-node ;
 
 : inline-literals ( node literals -- node )
     #! Make #push -> #return -> successor
