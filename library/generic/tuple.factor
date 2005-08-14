@@ -55,13 +55,16 @@ BUILTIN: tuple 18 tuple? ;
     "slots" set-word-prop
     define-slots ;
 
-: define-constructor ( word def -- )
-    >r [ word-name "in" get constructor-word ] keep [
+: tuple-constructor ( class -- word )
+    word-name "in" get constructor-word dup save-location ;
+
+: define-constructor ( word class def -- )
+    >r [
         dup literalize , "tuple-size" word-prop , \ make-tuple ,
     ] make-list r> append define-compound ;
 
 : default-constructor ( tuple -- )
-    dup [
+    [ tuple-constructor ] keep dup [
         "slots" word-prop 1 swap tail-slice reverse-slice
         [ peek unit , \ keep , ] each
     ] make-list define-constructor ;

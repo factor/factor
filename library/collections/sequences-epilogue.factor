@@ -207,11 +207,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! positive if s1>s2.
     0 pick length pick length min (lexi) ;
 
-: lexi> ( seq seq -- ? )
-    #! Test if the first sequence follows the second
-    #! lexicographically.
-    lexi 0 > ;
-
 : flip ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }

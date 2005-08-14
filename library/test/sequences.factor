@@ -112,3 +112,7 @@ unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
 [ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
 [ f ] [ [ ] [ 1 2 3 ] sequence= ] unit-test
+
+[ [ ] ] [ [ ] [ - ] sort ] unit-test
+[ [ "2 + 2" ] ] [ [ "2 + 2" ] [ lexi ] sort ] unit-test
+[ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] [ - ] sort ] unit-test

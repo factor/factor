@@ -16,6 +16,10 @@ USING: errors kernel math math-internals ;
         swap fsqrt swap 2 / polar>
     ] ifte ;
 
+: norm ( vec -- n ) norm-sq sqrt ;
+
+: normalize ( vec -- vec ) dup norm v/n ;
+
 GENERIC: ^ ( z w -- z^w ) foldable
 
 : ^mag ( w abs arg -- magnitude )

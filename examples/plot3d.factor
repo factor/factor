@@ -15,20 +15,22 @@
 ! "examples/plot3d.factor" run-file
 
 IN: plot3d
-USING: alien compiler errors gl kernel lists math matrices
-namespaces prettyprint sdl sequences ;
+USING: alien compiler errors gl kernel lists math namespaces
+prettyprint sdl sequences vectors ;
 
 : display-list 1 ;
 
+: matrix-get ( i j matrix -- ) swapd nth nth ;
+
 : plot-vertex ( matrix i j -- )
-    rot matrix-get 3unlist glVertex3f ;
+    rot matrix-get 3unseq glVertex3f ;
 
 : plot-face ( matrix i j -- face )
     GL_QUADS glBegin
        [ rot matrix-get ] 3keep
        [ 1 + rot matrix-get v- ] 3keep
        [ rot matrix-get ] 3keep
-       [ >r 1 + r> rot matrix-get v- cross normalize >list 3unlist glNormal3f ] 3keep
+       [ >r 1 + r> rot matrix-get v- cross normalize 3unseq glNormal3f ] 3keep
        [ plot-vertex ] 3keep
        [ 1 + plot-vertex ] 3keep
        [ >r 1 + r> 1 + plot-vertex ] 3keep
@@ -41,7 +43,7 @@ namespaces prettyprint sdl sequences ;
     ] repeat 2drop ; inline
 
 : plot-faces ( points -- )
-    dup matrix-rows 1 - over matrix-cols 1 - [
+    dup length 1 - over first length 1 - [
         3dup plot-face
     ] 2repeat drop ;
 
@@ -70,23 +72,27 @@ SYMBOL: theta
     swap 15 - 30 / swap 15 - 30 / ;
 
 : max-z ( seq -- z )
-    0.1 swap [ 2 swap nth max ] each ;
+    0.1 [ third max ] reduce ;
 
 : min-z ( seq -- z )
-    -0.1 swap [ 2 swap nth min ] each ;
+    -0.1 [ third min ] reduce ;
 
 : normalize-points ( seq -- )
-    dup min-z over [ over >r 3unlist r> - 3list ] nmap drop
-    dup max-z swap [ over >r 3unlist r> / 3list ] nmap drop ;
+    dup min-z over [ over >r 3unseq r> - 3vector ] nmap drop
+    dup max-z swap [ over >r 3unseq r> / 3vector ] nmap drop ;
 
 : valuate-points ( quot -- matrix )
-    >r 30 30 r>
-    [ i/j>x/y ] swap unit [ 2keep rot 3list ] append3
-    make-matrix ;
+    30 [
+        ( quot i )
+        30 [
+            ( quot i j )
+            [ 3dup i/j>x/y rot call ] 2keep i/j>x/y rot 3vector nip
+        ] map 2nip
+    ] map-with ; inline
 
 : make-plot
-    [ rect> sq exp real ] valuate-points
-    dup matrix-sequence normalize-points
+    [ rect> real ] valuate-points
+    dup [ normalize-points ] each
     display-list GL_COMPILE glNewList
         plot-faces
         plot-axes

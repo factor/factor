@@ -8,7 +8,7 @@ USING: kernel lists namespaces sequences strings ;
 : path+ ( path path -- path ) "/" swap append3 ;
 : exists? ( file -- ? ) stat >boolean ;
 : directory? ( file -- ? ) stat car ;
-: directory ( dir -- list ) (directory) [ lexi> ] sort ;
+: directory ( dir -- list ) (directory) [ lexi ] sort ;
 : file-length ( file -- length ) stat third ;
 : file-extension ( filename -- extension )
     "." split cdr dup [ peek ] when ;

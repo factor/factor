@@ -166,3 +166,7 @@ TUPLE: pred-test ;
 [ t ] [ "nom" inline-test ] unit-test
 [ f ] [ "shayin" inline-test ] unit-test
 [ f ] [ 3 inline-test ] unit-test
+
+: fixnum-declarations >fixnum 24 shift 1234 bitxor ; compiled
+
+[ ] [ 1000000 fixnum-declarations . ] unit-test

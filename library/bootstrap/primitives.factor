@@ -71,7 +71,7 @@ vocabularies get [
     { "fixnum-bitor" "math-internals"         [ [ fixnum fixnum ] [ fixnum ] ] }
     { "fixnum-bitxor" "math-internals"        [ [ fixnum fixnum ] [ fixnum ] ] }
     { "fixnum-bitnot" "math-internals"        [ [ fixnum ] [ fixnum ] ] }
-    { "fixnum-shift" "math-internals"         [ [ fixnum fixnum ] [ fixnum ] ] }
+    { "fixnum-shift" "math-internals"         [ [ fixnum fixnum ] [ integer ] ] }
     { "fixnum<" "math-internals"              [ [ fixnum fixnum ] [ boolean ] ] }
     { "fixnum<=" "math-internals"             [ [ fixnum fixnum ] [ boolean ] ] }
     { "fixnum>" "math-internals"              [ [ fixnum fixnum ] [ boolean ] ] }

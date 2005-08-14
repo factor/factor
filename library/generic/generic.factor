@@ -49,11 +49,14 @@ DEFER: delegate
         0 < 2nip
     ] ifte ;
 
+: class-compare ( cls1 cls2 -- -1/0/1 )
+    2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] ifte ;
+
 : methods ( generic -- alist )
-    "methods" word-prop hash>alist [ 2car class< ] sort ;
+    "methods" word-prop hash>alist [ 2car class-compare ] sort ;
 
 : order ( generic -- list )
-    "methods" word-prop hash-keys [ class< ] sort ;
+    "methods" word-prop hash-keys [ class-compare ] sort ;
 
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
@@ -167,7 +170,7 @@ SYMBOL: typemap
 SYMBOL: object
 
 : lookup-union ( typelist -- class )
-    [ > ] sort typemap get hash [ object ] unless* ;
+    [ - ] sort typemap get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -196,7 +199,7 @@ SYMBOL: object
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
-    dup builtin-supertypes [ > ] sort
+    dup builtin-supertypes [ - ] sort
     typemap get set-hash ;
 
 typemap get [ <namespace> typemap set ] unless

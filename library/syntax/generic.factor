@@ -55,4 +55,5 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! Followed by a tuple name, then constructor code, then ;
     #! Constructor code executes with the empty tuple on the
     #! stack.
-    scan-word [ define-constructor ] [ ] ; parsing
+    scan-word [ tuple-constructor ] keep
+    [ define-constructor ] [ ] ; parsing

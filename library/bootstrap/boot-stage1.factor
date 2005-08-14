@@ -40,6 +40,7 @@ parser prettyprint sequences io vectors words ;
         "/library/collections/namespaces.factor"
         "/library/collections/sequence-eq.factor"
         "/library/collections/slicing.factor"
+        "/library/collections/sequence-sort.factor"
         "/library/collections/strings-epilogue.factor"
         "/library/collections/tree-each.factor"
 

@@ -32,35 +32,6 @@ M: cons each ( list quot -- | quot: elt -- )
 M: general-list find ( list quot -- i elt )
     0 (list-find) ;
 
-: partition-add ( obj ? ret1 ret2 -- ret1 ret2 )
-    rot [ swapd cons ] [ >r cons r> ] ifte ;
-
-: partition-step ( ref list combinator -- ref cdr combinator car ? )
-    pick pick car pick call >r >r unswons r> swap r> ; inline
-
-: (partition) ( ref list combinator ret1 ret2 -- ret1 ret2 )
-    >r >r  over [
-        partition-step  r> r> partition-add  (partition)
-    ] [
-        3drop  r> r>
-    ] ifte ; inline
-
-: partition ( ref list combinator -- list1 list2 )
-    #! The combinator must have stack effect:
-    #! ( ref element -- ? )
-    [ ] [ ] (partition) ; inline
-
-: sort ( list comparator -- sorted )
-    #! To sort in ascending order, comparator must have stack
-    #! effect ( x y -- x>y ).
-    over [
-        ( Partition ) [ >r uncons dupd r> partition ] keep
-        ( Recurse ) [ sort swap ] keep sort
-        ( Combine ) swapd cons append
-    ] [
-        drop
-    ] ifte ; inline
-
 : unique ( elem list -- list )
     #! Prepend an element to a list if it does not occur in the
     #! list.

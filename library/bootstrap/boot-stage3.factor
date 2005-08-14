@@ -49,7 +49,6 @@ t [
 
     "/library/math/constants.factor"
     "/library/math/pow.factor"
-    "/library/math/more-matrices.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
     "/library/math/random.factor"

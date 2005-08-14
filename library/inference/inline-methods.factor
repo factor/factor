@@ -1,14 +1,15 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: namespaces generic hashtables kernel lists sequences
+USING: generic hashtables kernel lists math namespaces sequences
 vectors words ;
 
 ! Method inlining optimization
 
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
-    [ dupd class-and null = not ] subset [ class< not ] sort
+    [ dupd class-and null = not ] subset
+    [ class-compare neg ] sort
     tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
 GENERIC: dispatching-values ( node word -- seq )

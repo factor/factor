@@ -33,7 +33,7 @@ M: word set-word-primitive ( n w -- )
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
-    [ swap word-name swap word-name lexi> ] sort ;
+    [ swap word-name swap word-name lexi ] sort ;
 
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.

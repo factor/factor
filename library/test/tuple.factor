@@ -1,5 +1,5 @@
 IN: temporary
-USING: errors generic kernel math parser sequences test ;
+USING: errors generic kernel math parser sequences test words ;
 
 TUPLE: rect x y w h ;
 C: rect
@@ -90,3 +90,7 @@ TUPLE: delegate-clone ;
 
 ! Compiler regression
 [ t ] [ [ t length ] [ no-method-object ] catch ] unit-test
+
+! This must be the last test in the file!
+[ "<constructor-test>" ]
+[ "TUPLE: constructor-test ; C: constructor-test ;" eval word word-name ] unit-test

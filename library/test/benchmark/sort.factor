@@ -8,6 +8,6 @@ USE: test
 USE: compiler
 
 : sort-benchmark
-    [ 100000 [ 0 10000 random-int , ] times ] make-list [ > ] sort drop ; compiled
+    [ 100000 [ 0 10000 random-int , ] times ] make-vector [ - ] sort drop ; compiled
 
 [ ] [ sort-benchmark ] unit-test
