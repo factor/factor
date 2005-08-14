@@ -189,8 +189,8 @@ This guide uses the standard mathematical notation to denote intervals.
 Notation&Meaning\\
 \hline
 $(a,b)$&All numbers from $a$ to $b$, excluding $a$ and $b$\\
-$[a,b)$&All numbers from $a$ to $b$, including $a$ and excluding and $b$\\
-$(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including and $b$\\
+$[a,b)$&All numbers from $a$ to $b$, including $a$ and excluding $b$\\
+$(a,b]$&All numbers from $a$ to $b$, excluding $a$ and including $b$\\
 $[a,b]$&All numbers from $a$ to $b$, including $a$ and $b$
 \end{tabular}
 
@@ -233,7 +233,7 @@ parsing words. Tokens are appended to the parse tree, the top level of which is 
 returned by the original parser invocation. Nested levels of the parse tree are created
 by parsing words.
 
-Here is the parser algorithm in more detail -- some of the concepts therein will be defined shortly:
+The parser iterates through the input text, checking each character in turn. Here is the parser algorithm in more detail -- some of the concepts therein will be defined shortly:
 
 \begin{itemize}
 \item If the current character is a double-quote (\texttt{"}), the \texttt{"} parsing word is executed, causing a string to be read.
@@ -522,7 +522,7 @@ Escape code&Character\\
 \texttt{\bs{}s}&Space\\
 \texttt{\bs{}t}&Tab\\
 \texttt{\bs{}n}&Newline\\
-\texttt{\bs{}t}&Carriage return\\
+\texttt{\bs{}r}&Carriage return\\
 \texttt{\bs{}0}&Null byte (ASCII 0)\\
 \texttt{\bs{}e}&Escape (ASCII 27)\\
 \texttt{\bs{}"}&Double quote (\texttt{"})\\
@@ -1043,8 +1043,8 @@ There is one final conditional form that is used to implement the ``default valu
 }
 If the condition is \texttt{f}, the \texttt{false} quotation is called with the \texttt{default} value on the stack. Otherwise, the \texttt{true} quotation is called with the condition on the stack. The following two lines are equivalent:
 \begin{verbatim}
-X [ Y ] [ Z ] ?ifte
-X dup [ nip Y ] [ drop Z ] ifte
+D X [ Y ] [ Z ] ?ifte
+D X dup [ nip Y ] [ drop Z ] ifte
 \end{verbatim}
 
 \subsection{Boolean logic}

@@ -110,6 +110,7 @@ SYMBOL: failures
         "compiler/stack" "compiler/ifte"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
+        "compiler/identities"
     ] run-tests ;
 
 : all-tests tests compiler-tests benchmarks ;
