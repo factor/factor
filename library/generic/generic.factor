@@ -15,26 +15,19 @@ math-internals ;
     2dup unit "predicate" set-word-prop
     swap "predicating" set-word-prop ;
 
-DEFER: delegate
-
-! Metaclasses have priority -- this induces an order in which
-! methods are added to the vtable.
-
 : metaclass ( class -- metaclass )
     "metaclass" word-prop ;
 
-: builtin-supertypes ( class -- list )
-    #! A list of builtin supertypes of the class.
-    dup metaclass "builtin-supertypes" word-prop call ;
+: types ( class -- types )
+    dup "types" word-prop [ ] [
+        "superclass" word-prop [ types ] [ [ ] ] ifte*
+    ] ?ifte ;
 
 : set-vtable ( definition class vtable -- )
-    >r "builtin-type" word-prop r> set-nth ;
+    >r types first r> set-nth ;
 
 : 2types ( class class -- seq seq )
-    swap builtin-supertypes swap builtin-supertypes ;
-
-: (class<) ( class class -- ? )
-    2types contained? ;
+    swap types swap types ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
@@ -44,7 +37,7 @@ DEFER: delegate
         2dup "superclass" word-prop dup [
             swap class< not 2nip
         ] [
-            2drop (class<)
+            2drop 2types contained?
         ] ifte
     ] ifte ;
 
@@ -198,7 +191,6 @@ SYMBOL: object
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
-    dup builtin-supertypes [ - ] sort
-    typemap get set-hash ;
+    dup types [ - ] sort typemap get set-hash ;
 
 typemap get [ <namespace> typemap set ] unless

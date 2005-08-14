@@ -22,7 +22,7 @@ BUILTIN: tuple 18 tuple? ;
     dup tuple? [ 3 set-slot ] [ 2drop ] ifte ; inline
 
 : class ( object -- class )
-    dup tuple? [ 2 slot ] [ type builtin-type ] ifte ; inline
+    dup tuple? [ 2 slot ] [ type type>class ] ifte ; inline
 
 : class-tuple ( object -- class )
     dup tuple? [ 2 slot ] [ drop f ] ifte ; inline
@@ -184,10 +184,6 @@ tuple [
     ( generic vtable definition class -- )
     2drop add-tuple-dispatch
 ] "add-method" set-word-prop
-
-tuple [
-    drop tuple "builtin-type" word-prop unit
-] "builtin-supertypes" set-word-prop
 
 PREDICATE: word tuple-class metaclass tuple = ;
 

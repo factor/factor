@@ -9,27 +9,23 @@ sequences vectors words ;
 SYMBOL: complement
 
 complement [
-    "complement" word-prop builtin-supertypes
-    num-types >list
-    seq-diff
-] "builtin-supertypes" set-word-prop
-
-complement [
     ( generic vtable definition class -- )
     drop num-types [
-        >r 3dup r> builtin-type
+        >r 3dup r> type>class
         dup [ add-method ] [ 2drop 2drop ] ifte
     ] each 3drop
 ] "add-method" set-word-prop
 
-complement [ (class<) ] "class<" set-word-prop
-
 : complement-predicate ( complement -- list )
     "predicate" word-prop [ not ] append ;
+
+: complement-types ( class -- types )
+    "complement" word-prop types object types seq-diff ;
 
 : define-complement ( class complement -- )
     2dup "complement" set-word-prop
     dupd complement-predicate "predicate" set-word-prop
+    dup complement-types "types" set-word-prop
     complement define-class ;
 
 PREDICATE: word complement metaclass complement = ;

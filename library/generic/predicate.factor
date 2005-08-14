@@ -20,28 +20,12 @@ SYMBOL: predicate
     ] 2keep set-nth ;
 
 predicate [
-    "superclass" word-prop builtin-supertypes
-] "builtin-supertypes" set-word-prop
-
-predicate [
     ( generic vtable definition class -- )
-    dup builtin-supertypes [
+    dup types [
         ( vtable definition class type# )
         >r 3dup r> predicate-method
     ] each 2drop 2drop
 ] "add-method" set-word-prop
-
-predicate [
-    2dup metaclass= [
-        over "superclass" word-prop dup [
-            swap class< nip
-        ] [
-            drop (class<)
-        ] ifte
-    ] [
-        (class<)
-    ] ifte
-] "class<" set-word-prop
 
 : define-predicate-class ( class predicate definition -- )
     3dup nip "definition" set-word-prop

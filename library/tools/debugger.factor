@@ -18,7 +18,7 @@ vectors words ;
     "Type check error" print
     uncons car dup "Object: " write .
     "Object type: " write class unparse. terpri
-    "Expected type: " write builtin-type unparse. terpri ;
+    "Expected type: " write type>class unparse. terpri ;
 
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;

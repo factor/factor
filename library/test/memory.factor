@@ -8,7 +8,7 @@ TUPLE: testing x y z ;
 
 [ ] [
     num-types [
-        builtin-type [
+        type>class [
             dup \ cons = [
                 ! too many conses!
                 drop

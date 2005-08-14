@@ -105,6 +105,9 @@ M: very-funny gooey sq ;
 [ t ] [ \ generic \ compound class< ] unit-test
 [ f ] [ \ compound \ generic class< ] unit-test
 
+[ f ] [ \ cons \ list class< ] unit-test
+[ f ] [ \ list \ cons class< ] unit-test
+
 DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;

@@ -75,7 +75,7 @@ M: node child-ties ( node -- seq )
     [ [ value-class class-and ] 2map ] keep assume-classes ;
 
 \ type [
-    dup node-in-d first num-types [ builtin-type <class-tie> ] map-with
+    dup node-in-d first num-types [ type>class <class-tie> ] map-with
     swap node-out-d first num-types [ <literal-tie> ] map-with
     [ ties get set-hash ] 2each
 ] "create-ties" set-word-prop

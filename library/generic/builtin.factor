@@ -11,33 +11,29 @@ SYMBOL: builtin
 SYMBOL: builtins
 
 builtin [
-    "builtin-type" word-prop unit
-] "builtin-supertypes" set-word-prop
-
-builtin [
     ( generic vtable definition class -- )
     rot set-vtable drop
 ] "add-method" set-word-prop
 
 : builtin-predicate ( class predicate -- )
     [
-        \ type , over "builtin-type" word-prop , \ eq? ,
+        \ type , over types first , \ eq? ,
     ] make-list define-predicate ;
 
 : register-builtin ( class -- )
-    dup "builtin-type" word-prop builtins get set-nth ;
+    dup types first builtins get set-nth ;
 
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
     dup intern-symbol
-    dup r> "builtin-type" set-word-prop
+    dup r> 1vector "types" set-word-prop
     dup builtin define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
     define-slots
     register-builtin ;
 
-: builtin-type ( n -- symbol ) builtins get nth ;
+: type>class ( n -- symbol ) builtins get nth ;
 
 PREDICATE: word builtin metaclass builtin = ;
 

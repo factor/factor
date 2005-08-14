@@ -86,7 +86,7 @@ M: object each-slot ( obj quot -- )
     dup 0 = [
         3drop
     ] [
-        rot builtin-type word-name write ": " write
+        rot type>class word-name write ": " write
         unparse write " bytes, " write
         unparse write " instances" print
     ] ifte ;

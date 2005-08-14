@@ -104,7 +104,7 @@ M: complement class.
 M: builtin class.
     \ BUILTIN: unparse. bl
     dup unparse. bl
-    dup "builtin-type" word-prop unparse write bl
+    dup types first unparse write bl
     0 swap "slots" word-prop prettyprint-elements drop
     prettyprint-; ;
 

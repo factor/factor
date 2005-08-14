@@ -6,9 +6,7 @@ USING: kernel lists math sequences vectors words ;
 ! Catch-all metaclass for providing a default method.
 SYMBOL: object
 
-object [
-    drop num-types >list
-] "builtin-supertypes" set-word-prop
+object num-types >vector "types" set-word-prop
 
 object [
     ( generic vtable definition class -- )
