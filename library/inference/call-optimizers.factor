@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors hashtables kernel math math-internals sequences
-vectors words ;
+USING: errors generic hashtables kernel math math-internals
+sequences vectors words ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -48,15 +48,13 @@ vectors words ;
     { [ dup node-successor #ifte? ] [ node-successor dup flip-branches ] }
 } define-optimizers
 
-M: #call optimize-node* ( node -- node/t )
-    {
-        { [ dup node-param not ] [ node-successor ] }
-        { [ dup partial-eval? ] [ partial-eval ] }
-        { [ dup optimizer-hooks ] [ optimize-hooks ] }
-        { [ dup inlining-class ] [ inline-method ] }
-        { [ dup optimize-predicate? ] [ optimize-predicate ] }
-        { [ t ] [ drop t ] }
-    } cond ;
+: disjoint-eq? ( node -- ? )
+    dup node-classes swap node-in-d [ swap hash ] map-with
+    2unseq class-and null = ;
+
+\ eq? {
+    { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
+} define-optimizers
 
 ! Arithmetic identities
 SYMBOL: @
@@ -70,14 +68,21 @@ SYMBOL: @
     ] 2map conjunction ;
 
 : values-match? ( values template -- ? )
-    [ @ = ] 2map [ ] subset [ eq? ] every? ;
+    [ @ = [ drop f ] unless ] 2map [ ] subset [ eq? ] every? ;
 
 : apply-identity? ( values identity -- ? )
     first 2dup literals-match? >r values-match? r> and ;
 
-: apply-identities ( values identities -- node/f )
-    dupd [ apply-identity? ] find-with nip dup
-    [ second swap dataflow-with ] [ 2drop f ] ifte ;
+: find-identity ( node -- values identity )
+    dup node-in-d swap node-param "identities" word-prop
+    [ dupd apply-identity? ] find nip ;
+
+: apply-identities ( node -- node/f )
+    dup find-identity dup [
+        second swap dataflow-with [ subst-node ] keep
+    ] [
+        3drop f
+    ] ifte ;
 
 [ + fixnum+ bignum+ float+ ] {
     { { @ 0 } [ drop ] }
@@ -92,8 +97,8 @@ SYMBOL: @
 [ * fixnum* bignum* float* ] {
     { { @ 1 }  [ drop ]          }
     { { 1 @ }  [ nip ]           }
-    { { @ 0 }  [ 2drop 0 ]       }
-    { { 0 @ }  [ 2drop 0 ]       }
+    { { @ 0 }  [ nip ]           }
+    { { 0 @ }  [ drop ]          }
     { { @ -1 } [ drop 0 swap - ] }
     { { -1 @ } [ nip 0 swap - ]  }
 } define-identities
@@ -116,19 +121,19 @@ SYMBOL: @
 ! } define-identities
 
 [ bitand fixnum-bitand bignum-bitand ] {
-    { { @ -1 } [ drop ]    }
-    { { -1 @ } [ nip  ]    }
-    { { @ @ }  [ drop ]    }
-    { { @ 0 }  [ 2drop 0 ] }
-    { { 0 @ }  [ 2drop 0 ] }
+    { { @ -1 } [ drop ] }
+    { { -1 @ } [ nip  ] }
+    { { @ @ }  [ drop ] }
+    { { @ 0 }  [ nip  ] }
+    { { 0 @ }  [ drop ] }
 } define-identities
 
 [ bitor fixnum-bitor bignum-bitor ] {
     { { @ 0 }  [ drop ] }
     { { 0 @ }  [ nip  ] }
     { { @ @ }  [ drop ] }
-    { { @ -1 } [ 2drop -1 ] }
-    { { -1 @ } [ 2drop -1 ] }
+    { { @ -1 } [ nip  ] }
+    { { -1 @ } [ drop ] }
 } define-identities
 
 [ bitxor fixnum-bitxor bignum-bitxor ] {
@@ -140,7 +145,7 @@ SYMBOL: @
 } define-identities
 
 [ shift fixnum-shift bignum-shift ] {
-    { { 0 @ } [ 2drop 0 ] }
+    { { 0 @ } [ drop ] }
     { { @ 0 } [ drop ] }
 } define-identities
 
@@ -163,3 +168,14 @@ SYMBOL: @
 [ eq? number= = ] {
     { { @ @ } [ 2drop t ] }
 } define-identities
+
+M: #call optimize-node* ( node -- node/t )
+    {
+        { [ dup node-param not ] [ node-successor ] }
+        { [ dup partial-eval? ] [ partial-eval ] }
+        { [ dup find-identity nip ] [ apply-identities ] }
+        { [ dup optimizer-hooks ] [ optimize-hooks ] }
+        { [ dup inlining-class ] [ inline-method ] }
+        { [ dup optimize-predicate? ] [ optimize-predicate ] }
+        { [ t ] [ drop t ] }
+    } cond ;

@@ -3,9 +3,6 @@ USING: compiler kernel kernel-internals lists math
 math-internals test words ;
 
 ! Make sure that intrinsic ops compile to correct code.
-: compile-1 ( quot -- word )
-    gensym [ swap define-compound ] keep dup compile execute ;
-
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
 [ 1 ] [ [ [[ 1 2 ]] 0 slot ] compile-1 ] unit-test
 [ 3 ] [ 3 1 2 cons [ [ 0 set-slot ] keep ] compile-1 car ] unit-test

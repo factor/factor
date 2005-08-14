@@ -73,13 +73,9 @@
 - recursion is iffy; no base case needs to throw an error, and if the
   stack at the recursive call doesn't match up, throw an error
 
-+ sequences
-
-- array sort
-- specialized arrays
-
 + kernel:
 
+- specialized arrays
 - clear "predicating" word prop when redefining words
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker

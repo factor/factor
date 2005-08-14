@@ -60,3 +60,6 @@ M: compound (compile) ( word -- )
 
 : recompile ( word -- )
     dup decompile compile ;
+
+: compile-1 ( quot -- word )
+    gensym [ swap define-compound ] keep dup compile execute ;
