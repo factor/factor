@@ -8,19 +8,13 @@ sequences strings words vectors ;
 SYMBOL: union
 
 union [
-    [ ] swap "members" word-prop [
-        builtin-supertypes append
-    ] each
+    "members" word-prop [ builtin-supertypes ] map concat
 ] "builtin-supertypes" set-word-prop
 
 union [
     ( generic vtable definition class -- )
     "members" word-prop [ >r 3dup r> add-method ] each 3drop
 ] "add-method" set-word-prop
-
-union 50 "priority" set-word-prop
-
-union [ (class<) ] "class<" set-word-prop
 
 : union-predicate ( members -- list )
     [

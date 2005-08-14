@@ -49,8 +49,9 @@ sequences vectors words ;
 } define-optimizers
 
 : disjoint-eq? ( node -- ? )
-    dup node-classes swap node-in-d [ swap hash ] map-with
-    2unseq class-and null = ;
+    dup node-classes swap node-in-d
+    [ swap hash ] map-with
+    2unseq 2dup and [ class-and null = ] [ 2drop f ] ifte ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }

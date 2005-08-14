@@ -17,8 +17,6 @@ M: vector clone ( vector -- vector ) >vector ;
 
 M: general-list like drop >list ;
 
-M: range like drop >vector ;
-
 M: vector like drop >vector ;
 
 : (1vector) [ push ] keep ; inline

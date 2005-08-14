@@ -74,6 +74,7 @@ BUILTIN: tuple 18 tuple? ;
     >r create-in
     dup intern-symbol
     dup tuple-predicate
+    dup tuple "superclass" set-word-prop
     dup tuple "metaclass" set-word-prop
     dup r> tuple-slots
     default-constructor ;
@@ -187,12 +188,6 @@ tuple [
 tuple [
     drop tuple "builtin-type" word-prop unit
 ] "builtin-supertypes" set-word-prop
-
-tuple 50 "priority" set-word-prop
-
-tuple [
-    2dup metaclass= [ = ] [ 2drop f ] ifte
-] "class<" set-word-prop
 
 PREDICATE: word tuple-class metaclass tuple = ;
 

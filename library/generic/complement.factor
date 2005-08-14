@@ -22,8 +22,6 @@ complement [
     ] each 3drop
 ] "add-method" set-word-prop
 
-complement 50 "priority" set-word-prop
-
 complement [ (class<) ] "class<" set-word-prop
 
 : complement-predicate ( complement -- list )

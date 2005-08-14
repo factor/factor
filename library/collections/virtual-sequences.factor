@@ -23,33 +23,26 @@ M: reversed set-nth ( elt n seq -- ) reversed@ set-nth ;
 
 M: reversed thaw ( seq -- seq ) delegate reverse ;
 
-! A range of integers.
-TUPLE: range from to step ;
-
-C: range ( from to -- range )
-    >r 2dup > -1 1 ? r>
-    [ set-range-step ] keep
-    [ set-range-to ] keep
-    [ set-range-from ] keep ;
-
-M: range length ( range -- n )
-    dup range-to swap range-from - abs ;
-
-M: range nth ( n range -- n )
-    [ range-step * ] keep range-from + ;
-
 ! A slice of another sequence.
-TUPLE: slice seq ;
+TUPLE: slice seq from to step ;
 
-C: slice ( from to seq -- )
+C: slice ( from to seq -- seq )
     [ set-slice-seq ] keep
-    [ >r <range> r> set-delegate ] keep ;
+    >r 2dup > -1 1 ? r>
+    [ set-slice-step ] keep
+    [ set-slice-to ] keep
+    [ set-slice-from ] keep ;
 
-M: slice nth ( n slice -- obj )
-    [ delegate nth ] keep slice-seq nth ;
+: <range> ( from to -- seq ) 0 <slice> ;
 
-M: slice set-nth ( obj n slice -- )
-    [ delegate nth ] keep slice-seq set-nth ;
+M: slice length ( range -- n )
+    dup slice-to swap slice-from - abs ;
 
-M: slice like ( seq slice -- seq )
-    slice-seq like ;
+: slice@ ( n slice -- n seq )
+    [ [ slice-step * ] keep slice-from + ] keep slice-seq ;
+
+M: slice nth ( n slice -- obj ) slice@ nth ;
+
+M: slice set-nth ( obj n slice -- ) slice@ set-nth ;
+
+M: slice like ( seq slice -- seq ) slice-seq like ;

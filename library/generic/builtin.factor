@@ -19,11 +19,6 @@ builtin [
     rot set-vtable drop
 ] "add-method" set-word-prop
 
-builtin 50 "priority" set-word-prop
-
-! All builtin types are equivalent in ordering
-builtin [ (class<) ] "class<" set-word-prop
-
 : builtin-predicate ( class predicate -- )
     [
         \ type , over "builtin-type" word-prop , \ eq? ,

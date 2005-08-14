@@ -19,8 +19,4 @@ object [
 
 object [ drop t ] "predicate" set-word-prop
 
-object 60 "priority" set-word-prop
-
-object [ (class<) ] "class<" set-word-prop
-
 object object define-class

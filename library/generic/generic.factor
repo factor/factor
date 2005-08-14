@@ -36,17 +36,16 @@ DEFER: delegate
 : (class<) ( class class -- ? )
     2types contained? ;
 
-: class-ord ( class -- n ) metaclass "priority" word-prop ;
-
-: metaclass= ( class class -- ? )
-    swap metaclass swap metaclass = ;
-
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
-    over class-ord over class-ord - dup 0 = [
-        drop dup metaclass "class<" word-prop call
+    2dup eq? [
+        2drop t
     ] [
-        0 < 2nip
+        2dup "superclass" word-prop dup [
+            swap class< not 2nip
+        ] [
+            2drop (class<)
+        ] ifte
     ] ifte ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )

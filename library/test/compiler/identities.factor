@@ -1,5 +1,5 @@
 IN: temporary
-USING: compiler kernel math test ;
+USING: compiler kernel math test vectors ;
 
 [ 5 ] [ 5 [ 0 + ] compile-1 ] unit-test
 [ 5 ] [ 5 [ 0 swap + ] compile-1 ] unit-test
@@ -57,3 +57,4 @@ USING: compiler kernel math test ;
 [ t ] [ 5 [ dup eq? ] compile-1 ] unit-test
 [ t ] [ 5 [ dup = ] compile-1 ] unit-test
 [ t ] [ 5 [ dup number= ] compile-1 ] unit-test
+[ t ] [ \ vector [ \ vector = ] compile-1 ] unit-test
