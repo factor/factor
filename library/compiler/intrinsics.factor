@@ -54,6 +54,8 @@ sequences vectors words ;
     out-1
 ] "intrinsic" set-word-prop
 
+: value-types drop f ;
+
 : node-peek ( node -- obj ) node-in-d peek ;
 
 : peek-2 dup length 2 - swap nth ;
