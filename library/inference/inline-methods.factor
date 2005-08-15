@@ -6,12 +6,6 @@ vectors words ;
 
 ! Method inlining optimization
 
-: min-class ( class seq -- class/f )
-    #! Is this class the smallest class in the sequence?
-    [ dupd class-and null = not ] subset
-    [ class-compare neg ] sort
-    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
-
 GENERIC: dispatching-values ( node word -- seq )
 
 M: object dispatching-values 2drop { } ;

@@ -10,6 +10,7 @@ USE: math
 USE: kernel
 USE: lists
 USE: sequences
+USE: prettyprint
 
 ! Some dataflow tests
 ! [ 3 ] [ 1 2 3 (subst-value) ] unit-test
@@ -87,7 +88,7 @@ USE: sequences
 ! Test method inlining
 [ string ] [
     \ string
-    [ range repeated integer string mirror array reversed sbuf
+    [ repeated integer string mirror array reversed sbuf
     slice vector diagonal general-list ]
     min-class
 ] unit-test

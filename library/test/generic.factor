@@ -108,6 +108,9 @@ M: very-funny gooey sq ;
 [ f ] [ \ cons \ list class< ] unit-test
 [ f ] [ \ list \ cons class< ] unit-test
 
+[ f ] [ \ mirror \ slice class< ] unit-test
+[ f ] [ \ slice \ mirror class< ] unit-test
+
 DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;

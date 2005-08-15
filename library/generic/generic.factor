@@ -26,20 +26,39 @@ math-internals ;
 : set-vtable ( definition class vtable -- )
     >r types first r> set-nth ;
 
-: 2types ( class class -- seq seq )
-    swap types swap types ;
+: 2types ( class class -- seq seq ) swap types swap types ;
 
-: class< ( cls1 cls2 -- ? )
-    #! Test if class1 is a subclass of class2.
+: (class<) 2types contained? ;
+
+: superclass? ( cls1 cls2 -- ? )
+    #! Is cls1 a superclass of cls2?
     2dup eq? [
         2drop t
     ] [
-        2dup "superclass" word-prop dup [
-            swap class< not 2nip
+        "superclass" word-prop dup [
+            superclass?
         ] [
-            2drop 2types contained?
+            2drop f
         ] ifte
     ] ifte ;
+
+: child-has-super? ( cls1 cls2 -- ? )
+    swap "superclass" word-prop not
+    swap "superclass" word-prop and ;
+
+: both-have-super? ( cls1 cls2 -- ? )
+    swap "superclass" word-prop
+    swap "superclass" word-prop and ;
+
+: custom-class< metaclass "class<" word-prop ;
+
+: class< ( cls1 cls2 -- ? )
+    #! Test if class1 is a subclass of class2.
+    {
+        { [ 2dup eq? ] [ 2drop t ] }
+        { [ dup custom-class< ] [ dup custom-class< call ] }
+        { [ t ] [ (class<) ] }
+    } cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] ifte ;
@@ -49,6 +68,12 @@ math-internals ;
 
 : order ( generic -- list )
     "methods" word-prop hash-keys [ class-compare ] sort ;
+
+: min-class ( class seq -- class/f )
+    #! Is this class the smallest class in the sequence?
+    [ dupd class-and null = not ] subset
+    [ class-compare neg ] sort
+    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
 : add-method ( generic vtable definition class -- )
     #! Add the method entry to the vtable. Unlike define-method,
@@ -64,6 +89,8 @@ math-internals ;
 
 : error-method ( generic -- method )
     [ dup picker% literalize , \ no-method , ] make-list ;
+
+DEFER: delegate
 
 : empty-method ( generic -- method )
     dup "picker" word-prop [ dup ] = [

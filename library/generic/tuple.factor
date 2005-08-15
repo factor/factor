@@ -185,6 +185,8 @@ tuple [
     2drop add-tuple-dispatch
 ] "add-method" set-word-prop
 
+tuple [ 2drop f ] "class<" set-word-prop
+
 PREDICATE: word tuple-class metaclass tuple = ;
 
 : is? ( obj pred -- ? | pred: obj -- ? )

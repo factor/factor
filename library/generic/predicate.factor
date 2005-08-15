@@ -27,6 +27,14 @@ predicate [
     ] each 2drop 2drop
 ] "add-method" set-word-prop
 
+predicate [
+    over metaclass over metaclass eq? [
+        >r "superclass" word-prop r> class<
+    ] [
+        drop types empty?
+    ] ifte
+] "class<" set-word-prop
+
 : define-predicate-class ( class predicate definition -- )
     3dup nip "definition" set-word-prop
     pick predicate "metaclass" set-word-prop
