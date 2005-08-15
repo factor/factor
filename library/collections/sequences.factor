@@ -30,7 +30,7 @@ GENERIC: resize ( n seq -- seq )
     swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
 G: each ( seq quot -- | quot: elt -- )
-    [ over ] [ type ] ; inline
+    [ over ] [ standard-combination ] ; inline
 
 : each-with ( obj seq quot -- | quot: obj elt -- )
     swap [ with ] each 2drop ; inline
@@ -39,7 +39,7 @@ G: each ( seq quot -- | quot: elt -- )
     swapd each ; inline
 
 G: find ( seq quot -- i elt | quot: elt -- ? )
-    [ over ] [ type ] ; inline
+    [ over ] [ standard-combination ] ; inline
 
 : find-with ( obj seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline

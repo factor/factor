@@ -61,6 +61,12 @@ M: no-method error. ( error -- )
     "Generic word: " write dup no-method-generic .
     "Object: " write no-method-object . ;
 
+M: no-math-method error. ( error -- )
+    "No suitable arithmetic method." print
+    "Generic word: " write dup no-math-method-generic .
+    "Left operand: " write dup no-math-method-left .
+    "Right operand: " write no-math-method-right . ;
+
 : parse-dump ( error -- )
     "Parsing " write
     dup parse-error-file [ "<interactive>" ] unless* write

@@ -119,7 +119,7 @@ M: compound definer drop \ : ;
     #! involved so that 'see' can work properly.
     over f "methods" set-word-prop
     over f "picker" set-word-prop
-    over f "dispatcher" set-word-prop
+    over f "combination" set-word-prop
     (define-compound) ;
 
 GENERIC: literalize ( obj -- obj )

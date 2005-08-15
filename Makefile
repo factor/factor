@@ -37,7 +37,7 @@ else
 	PLAF_OBJS = $(UNIX_OBJS)
 endif
 
-OBJS = $(PLAF_OBJS) native/arithmetic.o native/array.o native/bignum.o \
+OBJS = $(PLAF_OBJS) native/array.o native/bignum.o \
 	native/s48_bignum.o \
 	native/complex.o native/cons.o native/error.o \
 	native/factor.o native/fixnum.o \

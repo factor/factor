@@ -7,6 +7,11 @@ math-internals ;
 
 ! A simple single-dispatch generic word system.
 
+! Maps lists of builtin type numbers to class objects.
+SYMBOL: typemap
+SYMBOL: object
+SYMBOL: null
+
 : predicate-word ( word -- word )
     word-name "?" append create-in ;
 
@@ -23,32 +28,7 @@ math-internals ;
         "superclass" word-prop [ types ] [ [ ] ] ifte*
     ] ?ifte ;
 
-: set-vtable ( definition class vtable -- )
-    >r types first r> set-nth ;
-
 : 2types ( class class -- seq seq ) swap types swap types ;
-
-: (class<) 2types contained? ;
-
-: superclass? ( cls1 cls2 -- ? )
-    #! Is cls1 a superclass of cls2?
-    2dup eq? [
-        2drop t
-    ] [
-        "superclass" word-prop dup [
-            superclass?
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
-
-: child-has-super? ( cls1 cls2 -- ? )
-    swap "superclass" word-prop not
-    swap "superclass" word-prop and ;
-
-: both-have-super? ( cls1 cls2 -- ? )
-    swap "superclass" word-prop
-    swap "superclass" word-prop and ;
 
 : custom-class< metaclass "class<" word-prop ;
 
@@ -57,7 +37,7 @@ math-internals ;
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup custom-class< ] [ dup custom-class< call ] }
-        { [ t ] [ (class<) ] }
+        { [ t ] [ 2types contained? ] }
     } cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
@@ -69,82 +49,8 @@ math-internals ;
 : order ( generic -- list )
     "methods" word-prop hash-keys [ class-compare ] sort ;
 
-: min-class ( class seq -- class/f )
-    #! Is this class the smallest class in the sequence?
-    [ dupd class-and null = not ] subset
-    [ class-compare neg ] sort
-    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
-
-: add-method ( generic vtable definition class -- )
-    #! Add the method entry to the vtable. Unlike define-method,
-    #! this is called at vtable build time, and in the sorted
-    #! order.
-    dup metaclass "add-method" word-prop [
-        [ "Metaclass is missing add-method" throw ]
-    ] unless* call ;
-
-: picker% "picker" word-prop % ;
-
-: dispatcher% "dispatcher" word-prop % ;
-
-: error-method ( generic -- method )
-    [ dup picker% literalize , \ no-method , ] make-list ;
-
-DEFER: delegate
-
-: empty-method ( generic -- method )
-    dup "picker" word-prop [ dup ] = [
-        [
-            [ dup delegate ] %
-            [ dup , ] make-list ,
-            error-method ,
-            \ ?ifte ,
-        ] make-list
-    ] [
-        error-method
-    ] ifte ;
-
-: <empty-vtable> ( generic -- vtable )
-    empty-method num-types swap <repeated> >vector ;
-
-: <vtable> ( generic -- vtable )
-    dup <empty-vtable> over methods [
-        ( generic vtable method )
-        >r 2dup r> unswons add-method
-    ] each nip ;
-
-: (small-generic) ( word methods -- quot )
-    [
-        2dup cdr (small-generic) [
-            >r >r picker%
-            r> car unswons "predicate" word-prop %
-            , r> , \ ifte ,
-        ] make-list
-    ] [
-        empty-method
-    ] ifte* ;
-
-: small-generic ( word -- def )
-    dup methods reverse (small-generic) ;
-
-: big-generic ( word -- def )
-    [
-        dup picker%
-        dup dispatcher%
-        <vtable> ,
-        \ dispatch ,
-    ] make-list ;
-
-: small-generic? ( word -- ? )
-    dup "methods" word-prop hash-size 3 <=
-    swap "dispatcher" word-prop [ type ] = and ;
-
 : make-generic ( word -- )
-    dup dup small-generic? [
-        small-generic
-    ] [
-        big-generic
-    ] ifte  (define-compound) ;
+    dup dup "combination" word-prop call (define-compound) ;
 
 : define-method ( class generic definition -- )
     -rot
@@ -164,29 +70,18 @@ DEFER: delegate
      ] ifte ;
 
 ! Defining generic words
-: define-generic* ( picker dispatcher word -- )
-    [ swap "dispatcher" set-word-prop ] keep
+: define-generic* ( picker combination word -- )
+    [ swap "combination" set-word-prop ] keep
     [ swap "picker" set-word-prop ] keep
     dup init-methods make-generic ;
 
-: define-generic ( word -- )
-    >r [ dup ] [ type ] r> define-generic* ;
-
 PREDICATE: compound generic ( word -- ? )
-    "dispatcher" word-prop ;
+    "picker" word-prop ;
 
 M: generic definer drop \ G: ;
 
 PREDICATE: generic simple-generic ( word -- ? )
     "picker" word-prop [ dup ] = ;
-
-PREDICATE: generic 2generic ( word -- ? )
-    "dispatcher" word-prop [ arithmetic-type ] = ;
-
-! Maps lists of builtin type numbers to class objects.
-SYMBOL: typemap
-
-SYMBOL: object
 
 : lookup-union ( typelist -- class )
     [ - ] sort typemap get hash [ object ] unless* ;
@@ -215,6 +110,12 @@ SYMBOL: object
             2types seq-intersect lookup-union
         ] ifte
     ] ifte ;
+
+: min-class ( class seq -- class/f )
+    #! Is this class the smallest class in the sequence?
+    [ dupd class-and null = not ] subset
+    [ class-compare neg ] sort
+    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop

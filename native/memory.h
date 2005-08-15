@@ -137,6 +137,7 @@ CELL untagged_object_size(CELL pointer);
 CELL object_size(CELL pointer);
 void primitive_room(void);
 void primitive_type(void);
+void primitive_tag(void);
 void primitive_slot(void);
 void primitive_set_slot(void);
 void primitive_integer_slot(void);

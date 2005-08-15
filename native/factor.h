@@ -116,7 +116,6 @@ typedef unsigned char BYTE;
 #include "ratio.h"
 #include "float.h"
 #include "complex.h"
-#include "arithmetic.h"
 #include "string.h"
 #include "misc.h"
 #include "sbuf.h"

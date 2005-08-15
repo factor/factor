@@ -92,22 +92,3 @@ M: %type generate-node ( vop -- )
     ! The pointer is equal to 3. Load F_TYPE (9).
     f type MOV
     "end" get save-xt ;
-
-M: %arithmetic-type generate-node ( vop -- )
-    #! This one works directly with the stack. It outputs an
-    #! UNBOXED value in vop-out-1.
-    0 <vreg> check-dest
-    <label> "end" set
-    ! Load top two stack values
-    EAX [ ESI -4 ] MOV
-    ECX [ ESI ] MOV
-    ! Compute their tags
-    EAX tag-mask AND
-    ECX tag-mask AND
-    ! Are the tags equal?
-    EAX ECX CMP
-    "end" get JE
-    ! No, they are not equal. Call a runtime function to
-    ! coerce the integers to a higher type.
-    "arithmetic_type" f compile-c-call
-    "end" get save-xt ;

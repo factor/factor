@@ -57,3 +57,10 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! stack.
     scan-word [ tuple-constructor ] keep
     [ define-constructor ] [ ] ; parsing
+
+: MATH-CLASS:
+    #! Followed by class name, priority, and coercer.
+    scan-word
+    dup scan-word "math-priority" set-word-prop
+    scan-word dup \ f = [ drop f ] [ unit ] ifte
+    "coercer" set-word-prop ; parsing

@@ -5,8 +5,12 @@ USING: errors generic kernel math sequences ;
 
 DEFER: fixnum?
 BUILTIN: fixnum 0 fixnum? ;
+MATH-CLASS: fixnum 0 >fixnum
+
 DEFER: bignum?
 BUILTIN: bignum 1 bignum? ;
+MATH-CLASS: bignum 1 >bignum
+
 UNION: integer fixnum bignum ;
 
 : (gcd) ( b a y x -- a d )

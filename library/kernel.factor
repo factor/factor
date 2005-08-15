@@ -40,7 +40,7 @@ M: object clone ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    21 ;
+    21 ; inline
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
@@ -70,6 +70,7 @@ DEFER: t?
     os "macosx" = or ;
 
 : tag-mask BIN: 111 ; inline
+: num-tags 8 ; inline
 : tag-bits 3 ; inline
 
 : fixnum-tag  BIN: 000 ; inline

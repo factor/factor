@@ -74,11 +74,14 @@ M: node child-ties ( node -- seq )
 : intersect-classes ( classes values -- )
     [ [ value-class class-and ] 2map ] keep assume-classes ;
 
-\ type [
-    dup node-in-d first num-types [ type>class <class-tie> ] map-with
-    swap node-out-d first num-types [ <literal-tie> ] map-with
-    [ ties get set-hash ] 2each
-] "create-ties" set-word-prop
+: type/tag-ties ( node n -- )
+    over node-out-d first over [ <literal-tie> ] map-with
+    >r swap node-in-d first swap [ type>class <class-tie> ] map-with r>
+    [ ties get set-hash ] 2each ;
+
+\ type [ num-types type/tag-ties ] "create-ties" set-word-prop
+
+\ tag [ num-tags type/tag-ties ] "create-ties" set-word-prop
 
 : create-ties ( #call -- )
     #! If the node is calling a class test predicate, create a

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: compiler errors kernel math memory words ;
+USING: compiler errors generic kernel math memory words ;
 
 ! See the Motorola or IBM documentation for details. The opcode
 ! names are standard, and the operand order is the same as in
@@ -158,7 +158,7 @@ USING: compiler errors kernel math memory words ;
 : STH d-form 44 insn ;  : STHU d-form 45 insn ;
 : STW d-form 36 insn ;  : STWU d-form 37 insn ;
 
-G: (B) ( dest aa lk -- ) [ pick ] [ type ] ;
+G: (B) ( dest aa lk -- ) [ pick ] [ standard-combination ] ;
 M: integer (B) i-form 18 insn ;
 M: word (B) 0 -rot (B) relative-24 ;
 

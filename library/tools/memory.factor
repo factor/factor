@@ -52,7 +52,8 @@ vectors words ;
         ] each-object drop
     ] make-list ;
 
-G: each-slot ( obj quot -- ) [ over ] [ type ] ; inline
+G: each-slot ( obj quot -- )
+    [ over ] [ standard-combination ] ; inline
 
 M: array each-slot ( array quot -- ) each ;
 

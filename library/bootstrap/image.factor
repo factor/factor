@@ -254,8 +254,7 @@ M: hashtable ' ( hashtable -- pointer )
 
 : global, ( -- )
     <namespace> [
-        { vocabularies typemap builtins crossref }
-        [ [ ] change ] each
+        { vocabularies typemap builtins } [ [ ] change ] each
     ] extend '
     global-offset fixup ;
 

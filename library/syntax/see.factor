@@ -78,7 +78,7 @@ M: generic (see) ( word -- )
     tab-size get dup indent [
         one-line on
         over "picker" word-prop prettyprint* bl
-        over "dispatcher" word-prop prettyprint* bl
+        over "combination" word-prop prettyprint* bl
     ] with-scope
     drop
     \ ; unparse.

@@ -98,6 +98,11 @@ void primitive_type(void)
 	drepl(tag_fixnum(type_of(dpeek())));
 }
 
+void primitive_tag(void)
+{
+	drepl(tag_fixnum(TAG(dpeek())));
+}
+
 #define SLOT(obj,slot) ((obj) + (slot) * CELLS)
 
 void primitive_slot(void)

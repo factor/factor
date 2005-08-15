@@ -302,10 +302,6 @@ C: %type make-vop ;
 : %type ( vreg ) <vreg> dest-vop <%type> ;
 M: %type basic-block? drop t ;
 
-TUPLE: %arithmetic-type ;
-C: %arithmetic-type make-vop ;
-: %arithmetic-type <vreg> dest-vop <%arithmetic-type> ;
-
 TUPLE: %tag-fixnum ;
 C: %tag-fixnum make-vop ;
 : %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;

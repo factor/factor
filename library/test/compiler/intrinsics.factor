@@ -122,9 +122,6 @@ math-internals test words ;
 [ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
 [ t ] [ f type f [ type ] compile-1 eq? ] unit-test
 
-[ 1 1 0 ] [ 1 1 [ arithmetic-type ] compile-1 ] unit-test
-[ 1.0 1.0 5 ] [ 1.0 1 [ arithmetic-type ] compile-1 ] unit-test
-
 [ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
 [ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
 [ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test

@@ -18,7 +18,10 @@ vocabularies
 "generic" vocab clone
 
 <namespace> vocabularies set
-<namespace> typemap set
+
+! Hack
+{{ [[ { } null ]] }} typemap set
+
 num-types empty-vector builtins set
 <namespace> crossref set
 
@@ -48,7 +51,6 @@ vocabularies get [
     { "rehash-string" "strings"               [ [ string ] [ ] ] }
     { "<sbuf>" "strings"                      [ [ integer ] [ sbuf ] ] }
     { "sbuf>string" "strings"                 [ [ sbuf ] [ string ] ] }
-    { "arithmetic-type" "math-internals"      [ [ object object ] [ object object fixnum ] ] }
     { ">fixnum" "math"                        [ [ number ] [ fixnum ] ] }
     { ">bignum" "math"                        [ [ number ] [ bignum ] ] }
     { ">float" "math"                         [ [ number ] [ float ] ] }
@@ -142,6 +144,7 @@ vocabularies get [
     { "millis" "kernel"                       [ [ ] [ integer ] ] }
     { "(random-int)" "math"                   [ [ ] [ integer ] ] }
     { "type" "kernel"                         [ [ object ] [ fixnum ] ] }
+    { "tag" "kernel-internals"                [ [ object ] [ fixnum ] ] }
     { "cwd" "io"                              [ [ ] [ string ] ] }
     { "cd" "io"                               [ [ string ] [ ] ] }
     { "compiled-offset" "assembler"           [ [ ] [ integer ] ] }

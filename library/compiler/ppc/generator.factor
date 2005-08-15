@@ -124,21 +124,3 @@ M: %type generate-node ( vop -- )
     f type 18 LI
     "end" get save-xt
     17 18 MR ;
-
-M: %arithmetic-type generate-node ( vop -- )
-    0 <vreg> check-dest
-    <label> "end" set
-    ! Load top two stack values
-    3 14 -4 LWZ
-    4 14 0 LWZ
-    ! Compute their tags
-    3 3 tag-mask ANDI
-    4 4 tag-mask ANDI
-    ! Are the tags equal?
-    0 3 4 CMPL
-    "end" get BEQ
-    ! No, they are not equal. Call a runtime function to
-    ! coerce the integers to a higher type.
-    "arithmetic_type" f compile-c-call
-    "end" get save-xt
-    17 3 MR ;

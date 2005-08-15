@@ -113,15 +113,6 @@ sequences vectors words ;
     out-1
 ] "intrinsic" set-word-prop
 
-\ arithmetic-type [
-    drop
-    in-1
-    0 %arithmetic-type ,
-    0 %tag-fixnum ,
-    1 %inc-d ,
-    out-1
-] "intrinsic" set-word-prop
-
 \ getenv [
     1 %dec-d ,
     node-peek literal-value 0 <vreg> swap %getenv ,

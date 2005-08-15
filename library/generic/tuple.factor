@@ -89,18 +89,6 @@ BUILTIN: tuple 18 tuple? ;
         unswons [ % , , \ ifte , ] make-list
     ] each ;
 
-: (tuple-dispatch-quot) ( default alist -- quot )
-    #! Turn an association list that maps values to quotations
-    #! into a quotation that executes a quotation depending on
-    #! the value on the stack.
-    [
-        [
-            unswons
-            \ dup , unswons "predicate" word-prop % ,
-            alist>quot , \ ifte ,
-        ] make-list
-    ] when* ;
-
 : tuple-methods ( generic -- hash )
     #! A hashtable of methods on tuples.
     "methods" word-prop [ car metaclass tuple = ] hash-subset ;

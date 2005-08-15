@@ -52,6 +52,7 @@ vectors words ;
 \ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
 \ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
 \ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
+\ no-math-method t "terminator" set-word-prop
 \ not-a-number t "terminator" set-word-prop
 \ inference-error t "terminator" set-word-prop
 \ throw t "terminator" set-word-prop
