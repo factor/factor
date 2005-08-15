@@ -302,10 +302,15 @@ C: %type make-vop ;
 : %type ( vreg ) <vreg> dest-vop <%type> ;
 M: %type basic-block? drop t ;
 
-TUPLE: %tag-fixnum ;
-C: %tag-fixnum make-vop ;
-: %tag-fixnum <vreg> dest-vop <%tag-fixnum> ;
-M: %tag-fixnum basic-block? drop t ;
+TUPLE: %tag ;
+C: %tag make-vop ;
+: %tag ( vreg ) <vreg> dest-vop <%tag> ;
+M: %tag basic-block? drop t ;
+
+TUPLE: %retag-fixnum ;
+C: %retag-fixnum make-vop ;
+: %retag-fixnum <vreg> dest-vop <%retag-fixnum> ;
+M: %retag-fixnum basic-block? drop t ;
 
 TUPLE: %untag-fixnum ;
 C: %untag-fixnum make-vop ;

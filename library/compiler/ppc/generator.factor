@@ -86,7 +86,7 @@ M: %untag-fixnum generate-node ( vop -- )
 
 : tag-fixnum ( dest src -- ) tag-bits SLWI ;
 
-M: %tag-fixnum generate-node ( vop -- )
+M: %retag-fixnum generate-node ( vop -- )
     ! todo: formalize scratch register usage
     dest/src tag-fixnum ;
 
@@ -124,3 +124,6 @@ M: %type generate-node ( vop -- )
     f type 18 LI
     "end" get save-xt
     17 18 MR ;
+
+M: %tag generate-node ( vop -- )
+    dup vop-in-1 swap vop-out-1 tag-mask ANDI ;

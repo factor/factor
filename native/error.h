@@ -8,6 +8,7 @@
 #define ERROR_C_STRING (7<<3)
 #define ERROR_FFI (8<<3)
 #define ERROR_HEAP_SCAN (9<<3)
+#define ERROR_UNDEFINED_SYMBOL (10<<3)
 
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */

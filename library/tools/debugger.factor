@@ -38,6 +38,10 @@ vectors words ;
 : heap-scan-error. ( obj -- )
     "Cannot do next-object outside begin/end-scan" print drop ;
 
+: undefined-symbol-error. ( obj -- )
+    "The image refers to a library or symbol that was not found"
+    " at load time" append print drop ;
+
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;
 
@@ -54,6 +58,7 @@ M: kernel-error error. ( error -- )
         c-string-error.
         ffi-error.
         heap-scan-error.
+        undefined-symbol-error.
     } nth execute ;
 
 M: no-method error. ( error -- )

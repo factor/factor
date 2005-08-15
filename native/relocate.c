@@ -85,12 +85,27 @@ void relocate_data()
 	}
 }
 
+void undefined_symbol(void)
+{
+	
+}
+
 CELL get_rel_symbol(F_REL* rel)
 {
 	F_CONS* cons = untag_cons(get(rel->argument));
 	F_STRING* symbol = untag_string(cons->car);
 	DLL* dll = (cons->cdr == F ? NULL : untag_dll(cons->cdr));
-	return (CELL)ffi_dlsym(dll,symbol);
+	CELL sym;
+
+	if(!dll)
+		return (CELL)undefined_symbol;
+
+	sym = (CELL)ffi_dlsym(dll,symbol,false);
+
+	if(!sym)
+		return (CELL)undefined_symbol;
+
+	return sym;
 }
 
 INLINE CELL compute_code_rel(F_REL *rel, CELL original)

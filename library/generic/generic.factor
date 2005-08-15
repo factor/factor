@@ -76,7 +76,7 @@ SYMBOL: null
     dup init-methods make-generic ;
 
 PREDICATE: compound generic ( word -- ? )
-    "picker" word-prop ;
+    "combination" word-prop ;
 
 M: generic definer drop \ G: ;
 

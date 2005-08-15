@@ -6,12 +6,16 @@ typedef struct {
 	void* dll;
 } DLL;
 
-DLL* untag_dll(CELL tagged);
+INLINE DLL* untag_dll(CELL tagged)
+{
+	type_check(DLL_TYPE,tagged);
+	return (DLL*)UNTAG(tagged);
+}
 
 void init_ffi(void);
 
-void ffi_dlopen(DLL *dll);
-void *ffi_dlsym(DLL *dll, F_STRING *symbol);
+void ffi_dlopen(DLL *dll, bool error);
+void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error);
 void ffi_dlclose(DLL *dll);
 
 void primitive_dlopen(void);

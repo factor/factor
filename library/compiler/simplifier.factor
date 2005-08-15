@@ -71,7 +71,7 @@ M: %inc-d simplify-node ( linear vop -- linear ? )
     [ over first operands= [ cdr cdr t ] [ f ] ifte ]
     [ drop f ] ifte ;
 
-M: %tag-fixnum simplify-node ( linear vop -- linear ? )
+M: %retag-fixnum simplify-node ( linear vop -- linear ? )
     drop \ %untag-fixnum cancel ;
 
 : basic-block ( linear quot -- | quot: vop -- ? )

@@ -43,7 +43,7 @@ M: %return generate-node ( vop -- )
 M: %untag generate-node ( vop -- )
     vop-out-1 v>operand BIN: 111 bitnot AND ;
 
-M: %tag-fixnum generate-node ( vop -- )
+M: %retag-fixnum generate-node ( vop -- )
     vop-out-1 v>operand 3 SHL ;
 
 M: %untag-fixnum generate-node ( vop -- )
@@ -92,3 +92,7 @@ M: %type generate-node ( vop -- )
     ! The pointer is equal to 3. Load F_TYPE (9).
     f type MOV
     "end" get save-xt ;
+
+M: %tag generate-node ( vop -- )
+    dup dup vop-in-1 check-dest
+    vop-in-1 v>operand tag-mask AND ;

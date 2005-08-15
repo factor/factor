@@ -59,8 +59,6 @@ sequences vectors words ;
 : peek-2 dup length 2 - swap nth ;
 : node-peek-2 ( node -- obj ) node-in-d peek-2 ;
 
-: value-types drop f ;
-
 : typed? ( value -- ? ) value-types length 1 = ;
 
 : slot@ ( node -- n )
@@ -109,7 +107,15 @@ sequences vectors words ;
     drop
     in-1
     0 %type ,
-    0 %tag-fixnum ,
+    0 %retag-fixnum ,
+    out-1
+] "intrinsic" set-word-prop
+
+\ tag [
+    drop
+    in-1
+    0 %tag ,
+    0 %retag-fixnum ,
     out-1
 ] "intrinsic" set-word-prop
 

@@ -114,6 +114,9 @@ compile? [
     ] pull-in
 ] when
 
+"Building cross-reference database..." print
+recrossref
+
 compile? [
     "Compiling system..." print
     compile-all

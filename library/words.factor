@@ -49,7 +49,11 @@ SYMBOL: crossref
 : add-crossref ( word -- )
     #! Marks each word in the quotation as being a dependency
     #! of the word.
-    dup word-def [ (add-crossref) ] tree-each-with ;
+    crossref get [
+        dup word-def [ (add-crossref) ] tree-each-with
+    ] [
+        drop
+    ] ifte ;
 
 : (remove-crossref)
     dup word? [
@@ -61,16 +65,20 @@ SYMBOL: crossref
 : remove-crossref ( word -- )
     #! Marks each word in the quotation as not being a
     #! dependency of the word.
-    dup word-def [ (remove-crossref) ] tree-each-with ;
+    crossref get [
+        dup word-def [ (remove-crossref) ] tree-each-with
+    ] [
+        drop
+    ] ifte ;
 
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
     #! so indirect usages are reported.
-    crossref get closure word-sort ;
+    crossref get dup [ closure word-sort ] [ 2drop { } ] ifte ;
 
 : usage ( word -- list )
     #! List all direct usages of a word.
-    crossref get hash dup [ hash-keys ] when word-sort ;
+    crossref get ?hash dup [ hash-keys ] when word-sort ;
 
 GENERIC: (uncrossref) ( word -- )
 M: word (uncrossref) drop ;

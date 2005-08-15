@@ -10,7 +10,7 @@ void primitive_dlopen(void)
 	path = untag_string(dpop());
 	dll = allot_object(DLL_TYPE,sizeof(DLL));
 	dll->path = tag_object(path);
-	ffi_dlopen(dll);
+	ffi_dlopen(dll,true);
 
 	dpush(tag_object(dll));
 }
@@ -18,16 +18,25 @@ void primitive_dlopen(void)
 void primitive_dlsym(void)
 {
 	CELL dll;
-	F_STRING* sym;
+	F_STRING *sym;
+	void *handle;
 
 	maybe_gc(0);
 
 	dll = dpop();
 	sym = untag_string(dpop());
+	
+	if(dll == F)
+		handle = NULL;
+	else
+	{
+		DLL *d = untag_dll(dll);
+		if(d->dll == NULL)
+			general_error(ERROR_EXPIRED,dll);
+		handle = d->dll;
+	}
 
-	dpush(tag_cell((CELL)ffi_dlsym(
-		dll == F ? NULL : untag_dll(dll),
-		sym)));
+	dpush(tag_cell((CELL)ffi_dlsym(handle,sym,true)));
 }
 
 void primitive_dlclose(void)
@@ -35,19 +44,10 @@ void primitive_dlclose(void)
 	ffi_dlclose(untag_dll(dpop()));
 }
 
-DLL* untag_dll(CELL tagged)
-{
-	DLL* dll = (DLL*)UNTAG(tagged);
-	type_check(DLL_TYPE,tagged);
-	if(dll->dll == NULL)
-		general_error(ERROR_EXPIRED,tagged);
-	return (DLL*)UNTAG(tagged);
-}
-
 void fixup_dll(DLL* dll)
 {
 	data_fixup(&dll->path);
-	ffi_dlopen(dll);
+	ffi_dlopen(dll,false);
 }
 
 void collect_dll(DLL* dll)

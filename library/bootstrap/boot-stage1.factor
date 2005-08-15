@@ -118,12 +118,14 @@ parser prettyprint sequences io vectors words ;
 ] make-list
 
 "object" [ "generic" ] search
+"tuple" [ "generic" ] search
 "null" [ "generic" ] search
 "typemap" [ "generic" ] search
 "builtins" [ "generic" ] search
 
 vocabularies get [ "generic" off ] bind
 
+reveal
 reveal
 reveal
 reveal
@@ -137,10 +139,6 @@ reveal
 
         [ hashtable? ] instances
         [ dup hash-size 1 max swap set-bucket-count ] each
-    
-        "Building cross-reference database..." print
-        
-        recrossref
     ] %
 
     {
@@ -158,12 +156,6 @@ reveal
     
         "/library/bootstrap/init.factor"
     } pull-in
-
-    [
-        "Building generics..." print
-    
-        all-words [ generic? ] subset [ make-generic ] each
-    ] %
 ] make-list
 
 swap
