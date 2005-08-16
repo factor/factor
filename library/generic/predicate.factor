@@ -31,7 +31,7 @@ predicate [
     over metaclass over metaclass eq? [
         >r "superclass" word-prop r> class<
     ] [
-        drop types empty?
+        2drop f
     ] ifte
 ] "class<" set-word-prop
 

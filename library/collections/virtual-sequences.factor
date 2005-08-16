@@ -26,7 +26,12 @@ M: reversed thaw ( seq -- seq ) delegate reverse ;
 ! A slice of another sequence.
 TUPLE: slice seq from to step ;
 
+: collapse-slice ( from to slice -- from to seq )
+    dup slice-from swap slice-seq >r tuck + >r + r> r> ;
+
 C: slice ( from to seq -- seq )
+    #! A slice of a slice collapses.
+    >r dup slice? [ collapse-slice ] when r>
     [ set-slice-seq ] keep
     >r 2dup > -1 1 ? r>
     [ set-slice-step ] keep

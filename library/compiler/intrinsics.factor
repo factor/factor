@@ -54,28 +54,28 @@ sequences vectors words ;
     out-1
 ] "intrinsic" set-word-prop
 
-: value-types drop f ;
+: node-peek ( node -- value ) node-in-d peek ;
 
-: node-peek ( node -- obj ) node-in-d peek ;
+: value-tag ( value node -- n/f )
+    #! If the tag is known, output it, otherwise f.
+    node-classes hash dup [
+        types [ type-tag ] map dup [ = ] every?
+        [ first ] [ drop f ] ifte
+    ] [
+        drop f
+    ] ifte ;
 
-: peek-2 dup length 2 - swap nth ;
-: node-peek-2 ( node -- obj ) node-in-d peek-2 ;
-
-: typed? ( value -- ? ) value-types length 1 = ;
-
-: slot@ ( node -- n )
+: slot@ ( node -- n/f )
     #! Compute slot offset.
-    node-in-d
-    dup peek literal-value cell *
-    swap peek-2 value-types car type-tag - ;
-
-: typed-literal? ( node -- ? )
-    #! Output if the node's first input is well-typed, and the
-    #! second is a literal.
-    dup node-peek literal? swap node-peek-2 typed? and ;
+    dup node-in-d reverse dup first dup literal? [
+        literal-value cell * swap second
+        rot value-tag dup [ - ] [ 2drop f ] ifte
+    ] [
+        3drop f
+    ] ifte ;
 
 \ slot [
-    dup typed-literal? [
+    dup slot@ [
         1 %dec-d ,
         in-1
         0 swap slot@ %fast-slot ,
@@ -89,20 +89,19 @@ sequences vectors words ;
 ] "intrinsic" set-word-prop
 
 \ set-slot [
-    dup typed-literal? [
+    dup slot@ [
         1 %dec-d ,
         in-2
         2 %dec-d ,
         slot@ >r 0 1 r> %fast-set-slot ,
-        0 %write-barrier ,
     ] [
         drop
         in-3
         3 %dec-d ,
         1 %untag ,
         0 1 2 %set-slot ,
-        1 %write-barrier ,
     ] ifte
+    1 %write-barrier ,
 ] "intrinsic" set-word-prop
 
 \ type [

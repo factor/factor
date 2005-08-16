@@ -8,8 +8,8 @@ USING: kernel lists math sequences strings test vectors ;
 [ { 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ { 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
 [ { 1 2 } { 3 4 } ] [ 2 { 1 2 3 4 } cut ] unit-test
-[ { 3 4 } ] [ 2 4 1 10 <range> subseq ] unit-test
-[ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq ] unit-test
+[ { 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
+[ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
 [ 1 2 3 ] [ 1 2 3 3vector 3unseq ] unit-test

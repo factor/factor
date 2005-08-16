@@ -12,6 +12,9 @@ math-internals test words ;
 [ 3 ] [ 3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 [ 3 ] [ [ 3 1 2 cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
 
+! Write barrier hits on the wrong value were causing segfaults
+[ -3 ] [ -3 1 2 [ cons [ 1 set-slot ] keep ] compile-1 cdr ] unit-test
+
 [ ] [ 1 [ drop ] compile-1 ] unit-test
 [ ] [ [ 1 drop ] compile-1 ] unit-test
 [ ] [ [ 1 2 2drop ] compile-1 ] unit-test

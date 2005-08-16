@@ -12,6 +12,9 @@
 <li>Optimizing out conditionals where the test value is a constant.</li>
 <li>Optimizing out type checks that are always/never satisfied.</li>
 <li>Inlining method bodies when generic words are called on values with known compile-time types.</li>
+<li>Side-effect-free words that output immutable values are evaluated at compile time if all their inputs are literal. You can declare a word as having this condition by suffixing the definition with <code>foldable</code>, eg:
+<pre>: cube dup dup * * ; foldable</pre></li>
+<li>Various arithmetic identities such as <code>1 *</code> are optimized out.
 </ul>
 
 </li>
