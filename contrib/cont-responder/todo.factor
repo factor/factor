@@ -148,9 +148,10 @@ USE: unparser
   #! return the description for the todo list item.
   "description" swap hash ;
 
-: priority-comparator ( item1 item2 -- bool )
-  #! Return true if item1 is a higher priority than item2
-  >r item-priority r> item-priority lexi> ;
+: priority-comparator ( item1 item2 -- number )
+  #! Return 0 if item equals item2, -1 if item1 < item2 and
+  #! 1 if item1 > item2.
+  >r item-priority r> item-priority lexi ;
   
 : todo-items ( <todo> -- alist )
   #! Return a list of items for the given todo list.
