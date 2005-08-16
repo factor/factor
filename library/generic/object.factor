@@ -4,17 +4,6 @@ IN: generic
 USING: kernel lists math sequences vectors words ;
 
 ! Catch-all metaclass for providing a default method.
-SYMBOL: object
-
 object num-types >vector "types" set-word-prop
-
-object [
-    ( generic vtable definition class -- )
-    drop over length [
-        3dup rot set-nth
-    ] repeat 3drop
-] "add-method" set-word-prop
-
 object [ drop t ] "predicate" set-word-prop
-
 object object define-class

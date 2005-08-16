@@ -2,6 +2,8 @@ IN: generic
 USING: errors generic hashtables kernel kernel-internals lists
 math namespaces sequences words ;
 
+! Math combination for generic dyadic upgrading arithmetic.
+
 : math-priority ( class -- n )
     #! Non-number classes have the highest priority.
     "math-priority" word-prop [ 100 ] unless* ;
@@ -42,7 +44,7 @@ TUPLE: no-math-method left right generic ;
         2drop object applicable-method
     ] ifte ;
 
-: make-vtable ( picker quot -- )
+: math-vtable ( picker quot -- )
     [
         swap , \ tag ,
         [ num-tags swap map % ] make-vector ,
@@ -55,11 +57,11 @@ TUPLE: no-math-method left right generic ;
 : math-combination ( word -- vtable )
     \ over [
         dup type>class math-class? [
-            \ dup [ >r 2dup r> math-method ] make-vtable
+            \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object applicable-method
         ] ifte nip
-    ] make-vtable nip ;
+    ] math-vtable nip ;
 
 PREDICATE: generic 2generic ( word -- ? )
     "combination" word-prop [ math-combination ] = ;

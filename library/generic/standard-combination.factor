@@ -2,17 +2,6 @@ IN: generic
 USING: errors hashtables kernel kernel-internals lists math
 namespaces sequences vectors words ;
 
-: set-vtable ( definition class vtable -- )
-    >r types first r> set-nth ;
-
-: add-method ( generic vtable definition class -- )
-    #! Add the method entry to the vtable. Unlike define-method,
-    #! this is called at vtable build time, and in the sorted
-    #! order.
-    dup metaclass "add-method" word-prop [
-        [ "Metaclass is missing add-method" throw ]
-    ] unless* call ;
-
 : picker% "picker" word-prop % ;
 
 : error-method ( generic -- method )
@@ -32,28 +21,29 @@ DEFER: delegate
         error-method
     ] ifte ;
 
-: <empty-vtable> ( generic -- vtable )
-    empty-method num-types swap <repeated> >vector ;
+: class-predicates ( generic assoc -- assoc )
+    >r "picker" word-prop r> [
+        uncons >r "predicate" word-prop append r> cons
+    ] map-with ;
+
+: alist>quot ( default alist -- quot )
+    [ unswons [ % , , \ ifte , ] make-list ] each ;
+
+: sort-methods ( assoc -- vtable )
+    #! Input is a predicate -> method association.
+    num-types [
+        type>class dup
+        [ swap [ car classes-intersect? ] subset-with ]
+        [ 2drop f ] ifte
+    ] map-with ;
 
 : <vtable> ( generic -- vtable )
-    dup <empty-vtable> over methods [
-        ( generic vtable method )
-        >r 2dup r> unswons add-method
-    ] each nip ;
-
-: (small-generic) ( word methods -- quot )
-    [
-        2dup cdr (small-generic) [
-            >r >r picker%
-            r> car unswons "predicate" word-prop %
-            , r> , \ ifte ,
-        ] make-list
-    ] [
-        empty-method
-    ] ifte* ;
+    dup dup methods sort-methods [ class-predicates ] map-with 
+    >r empty-method r> [ alist>quot ] map-with ;
 
 : small-generic ( word -- def )
-    dup methods reverse (small-generic) ;
+    dup dup methods class-predicates
+    >r empty-method r> alist>quot ;
 
 : big-generic ( word -- def )
     [ dup picker% \ type , <vtable> , \ dispatch , ] make-list ;

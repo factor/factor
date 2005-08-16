@@ -59,7 +59,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : related? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
     #! are disjoint, return t.
-    2dup class< >r class-and null = r> or ;
+    2dup class< >r classes-intersect? not r> or ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [

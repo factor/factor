@@ -7,11 +7,6 @@ sequences strings words vectors ;
 ! Union metaclass for dispatch on multiple classes.
 SYMBOL: union
 
-union [
-    ( generic vtable definition class -- )
-    "members" word-prop [ >r 3dup r> add-method ] each 3drop
-] "add-method" set-word-prop
-
 : union-predicate ( members -- list )
     [
         [

@@ -9,6 +9,8 @@ math-internals ;
 
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: typemap
+
+! Forward definitions.
 SYMBOL: object
 SYMBOL: null
 
@@ -113,9 +115,12 @@ PREDICATE: generic simple-generic ( word -- ? )
         ] ifte
     ] ifte ;
 
+: classes-intersect? ( class class -- ? )
+    class-and null = not ;
+
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
-    [ dupd class-and null = not ] subset
+    [ dupd classes-intersect? ] subset
     [ class-compare neg ] sort
     tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 

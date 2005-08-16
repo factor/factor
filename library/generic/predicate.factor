@@ -7,26 +7,6 @@ sequences strings words vectors ;
 ! Predicate metaclass for generalized predicate dispatch.
 SYMBOL: predicate
 
-: predicate-dispatch ( existing definition class -- dispatch )
-    [
-        \ dup , "predicate" word-prop % , , \ ifte ,
-    ] make-list ;
-
-: predicate-method ( vtable definition class type# -- )
-    >r rot r> swap [
-        nth
-        ( vtable definition class existing )
-        -rot predicate-dispatch
-    ] 2keep set-nth ;
-
-predicate [
-    ( generic vtable definition class -- )
-    dup types [
-        ( vtable definition class type# )
-        >r 3dup r> predicate-method
-    ] each 2drop 2drop
-] "add-method" set-word-prop
-
 predicate [
     over metaclass over metaclass eq? [
         >r "superclass" word-prop r> class<

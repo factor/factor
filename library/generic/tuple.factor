@@ -79,43 +79,6 @@ BUILTIN: tuple 18 tuple? ;
     dup r> tuple-slots
     default-constructor ;
 
-: class-predicates ( generic classes -- predicates )
-    >r "picker" word-prop r> [
-        uncons >r "predicate" word-prop append r> cons
-    ] map-with ;
-
-: alist>quot ( default alist -- quot )
-    reverse-slice [
-        unswons [ % , , \ ifte , ] make-list
-    ] each ;
-
-: tuple-methods ( generic -- hash )
-    #! A hashtable of methods on tuples.
-    "methods" word-prop [ car metaclass tuple = ] hash-subset ;
-
-: default-tuple-method ( generic -- quot )
-    #! If the generic does not define a specific method for a
-    #! tuple, execute the return value of this.
-    dup "methods" word-prop
-    tuple over hash* dup [
-        2nip cdr
-    ] [
-        drop object over hash* dup [
-            2nip cdr
-        ] [
-            2drop empty-method
-        ] ifte
-    ] ifte ;
-
-: tuple-dispatch-quot ( generic -- quot )
-    #! Generate a quotation that performs tuple class dispatch
-    #! for methods defined on the given generic.
-    dup dup tuple-methods hash>alist class-predicates
-    >r default-tuple-method r> alist>quot ;
-
-: add-tuple-dispatch ( word vtable -- )
-    >r tuple-dispatch-quot tuple r> set-vtable ;
-
 ! A sequence of all slots in a tuple, used for equality testing.
 TUPLE: mirror tuple ;
 
@@ -167,11 +130,6 @@ M: tuple = ( obj tuple -- ? )
             2drop f
         ] ifte
     ] ifte ;
-
-tuple [
-    ( generic vtable definition class -- )
-    2drop add-tuple-dispatch
-] "add-method" set-word-prop
 
 tuple [ 2drop f ] "class<" set-word-prop
 

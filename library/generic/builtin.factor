@@ -10,15 +10,9 @@ SYMBOL: builtin
 ! Global vector mapping type numbers to builtin class objects.
 SYMBOL: builtins
 
-builtin [
-    ( generic vtable definition class -- )
-    rot set-vtable drop
-] "add-method" set-word-prop
-
 : builtin-predicate ( class predicate -- )
-    [
-        \ type , over types first , \ eq? ,
-    ] make-list define-predicate ;
+    [ \ type , over types first , \ eq? , ] make-list
+    define-predicate ;
 
 : register-builtin ( class -- )
     dup types first builtins get set-nth ;

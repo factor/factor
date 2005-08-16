@@ -51,7 +51,7 @@ sequences vectors words ;
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
     [ swap hash ] map-with
-    2unseq 2dup and [ class-and null = ] [ 2drop f ] ifte ;
+    2unseq 2dup and [ classes-intersect? not ] [ 2drop f ] ifte ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
