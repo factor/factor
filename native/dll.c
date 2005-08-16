@@ -19,7 +19,7 @@ void primitive_dlsym(void)
 {
 	CELL dll;
 	F_STRING *sym;
-	void *handle;
+	DLL *d;
 
 	maybe_gc(0);
 
@@ -27,16 +27,15 @@ void primitive_dlsym(void)
 	sym = untag_string(dpop());
 	
 	if(dll == F)
-		handle = NULL;
+		d = NULL;
 	else
 	{
-		DLL *d = untag_dll(dll);
+		d = untag_dll(dll);
 		if(d->dll == NULL)
 			general_error(ERROR_EXPIRED,dll);
-		handle = d->dll;
 	}
 
-	dpush(tag_cell((CELL)ffi_dlsym(handle,sym,true)));
+	dpush(tag_cell((CELL)ffi_dlsym(d,sym,true)));
 }
 
 void primitive_dlclose(void)

@@ -6,7 +6,7 @@ typedef struct {
 	void* dll;
 } DLL;
 
-INLINE DLL* untag_dll(CELL tagged)
+INLINE DLL *untag_dll(CELL tagged)
 {
 	type_check(DLL_TYPE,tagged);
 	return (DLL*)UNTAG(tagged);
