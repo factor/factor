@@ -50,8 +50,9 @@ DEFER: http-get
     >r http-get 2nip r> <file-writer> stream-copy ;
 
 : post-request ( content-type content host resource -- )
+    #! Note: It is up to the caller to url encode the content if
+    #! it is required according to the content-type.
     "POST" http-request [
-        url-encode
         "Content-Length: " write length unparse write crlf
         "Content-Type: " write write crlf
         crlf
