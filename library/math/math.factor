@@ -52,7 +52,7 @@ GENERIC: ceiling  ( n -- n ) foldable
 
 : sgn ( n -- -1/0/1 )
     #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ; inline
+    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ; foldable
 
 GENERIC: abs ( z -- |z| )
 

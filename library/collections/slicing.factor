@@ -6,64 +6,64 @@ strings vectors ;
 
 : head-slice ( n seq -- slice )
     #! n is an index from the start of the sequence.
-    0 -rot <slice> ;
+    0 -rot <slice> ; flushable
 
 : head-slice* ( n seq -- slice )
     #! n is an index from the end of the sequence.
-    [ length swap - ] keep head-slice ;
+    [ length swap - ] keep head-slice ; flushable
 
 : tail-slice ( n seq -- slice )
     #! n is an index from the start of the sequence.
-    [ length ] keep <slice> ;
+    [ length ] keep <slice> ; flushable
 
 : tail-slice* ( n seq -- slice )
     #! n is an index from the end of the sequence.
-    [ length swap - ] keep tail-slice ;
+    [ length swap - ] keep tail-slice ; flushable
 
 : subseq ( from to seq -- seq )
     #! Makes a new sequence with the same contents and type as
     #! the slice of another sequence.
-    [ <slice> ] keep like ;
+    [ <slice> ] keep like ; flushable
 
 M: object head ( index seq -- seq )
     [ head-slice ] keep like ;
 
 : head* ( n seq -- seq )
-    [ head-slice* ] keep like ;
+    [ head-slice* ] keep like ; flushable
 
 M: object tail ( index seq -- seq )
     [ tail-slice ] keep like ;
 
 : tail* ( n seq -- seq )
-    [ tail-slice* ] keep like ;
+    [ tail-slice* ] keep like ; flushable
 
 : length< ( seq seq -- ? )
-    swap length swap length < ;
+    swap length swap length < ; flushable
 
 : head? ( seq begin -- ? )
     2dup length< [
         2drop f
     ] [
         dup length rot head-slice sequence=
-    ] ifte ;
+    ] ifte ; flushable
 
 : ?head ( seq begin -- str ? )
-    2dup head? [ length swap tail t ] [ drop f ] ifte ;
+    2dup head? [ length swap tail t ] [ drop f ] ifte ; flushable
 
 : tail? ( seq end -- ? )
     2dup length< [
         2drop f
     ] [
         dup length rot tail-slice* sequence=
-    ] ifte ;
+    ] ifte ; flushable
 
 : ?tail ( seq end -- seq ? )
-    2dup tail? [ length swap head* t ] [ drop f ] ifte ;
+    2dup tail? [ length swap head* t ] [ drop f ] ifte ; flushable
 
 : cut ( index seq -- seq seq )
     #! Returns 2 sequences, that when concatenated yield the
     #! original sequence.
-    [ head ] 2keep tail ;
+    [ head ] 2keep tail ; flushable
 
 : group-advance subseq , >r tuck + swap r> ;
 
@@ -78,7 +78,7 @@ M: object tail ( index seq -- seq )
 
 : group ( n seq -- list )
     #! Split a sequence into element chunks.
-    [ 0 -rot (group) ] make-list ;
+    [ 0 -rot (group) ] make-list ; flushable
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;
@@ -92,20 +92,20 @@ M: object tail ( index seq -- seq )
         ] [
             r> r> 1 + start*
         ] ifte
-    ] ifte ;
+    ] ifte ; flushable
 
 : start ( subseq seq -- n )
     #! The index of a subsequence in a sequence.
-    0 start* ;
+    0 start* ; flushable
 
-: subseq? ( subseq seq -- ? ) start -1 > ;
+: subseq? ( subseq seq -- ? ) start -1 > ; flushable
 
 : split1 ( seq subseq -- before after )
     dup pick start dup -1 = [
         2drop f
     ] [
         [ swap length + over tail ] keep rot head swap
-    ] ifte ;
+    ] ifte ; flushable
 
 : split-next ( index seq subseq -- next )
     pick >r dup pick r> start* dup -1 = [
@@ -124,4 +124,4 @@ M: object tail ( index seq -- seq )
 : split ( seq subseq -- list )
     #! Split the sequence at each occurrence of subseq, and push
     #! a list of the pieces.
-    [ 0 -rot (split) ] make-list ;
+    [ 0 -rot (split) ] make-list ; flushable

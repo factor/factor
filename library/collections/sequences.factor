@@ -11,19 +11,18 @@ USING: errors generic kernel math math-internals strings vectors ;
 ! kernel-internals vocabulary, so don't use them unless you have
 ! a good reason.
 
-GENERIC: empty? ( sequence -- ? )
-GENERIC: length ( sequence -- n )
-GENERIC: set-length ( n sequence -- )
-GENERIC: nth ( n sequence -- obj )
-GENERIC: set-nth ( value n sequence -- obj )
-GENERIC: thaw ( seq -- mutable-seq )
-GENERIC: like ( seq seq -- seq )
-GENERIC: reverse ( seq -- seq )
-GENERIC: reverse-slice ( seq -- seq )
-GENERIC: peek ( seq -- elt )
-GENERIC: head ( n seq -- seq )
-GENERIC: tail ( n seq -- seq )
-GENERIC: concat ( seq -- seq )
+GENERIC: empty? ( sequence -- ? ) flushable
+GENERIC: length ( sequence -- n ) flushable
+GENERIC: set-length ( n sequence -- ) flushable
+GENERIC: nth ( n sequence -- obj ) flushable
+GENERIC: set-nth ( value n sequence -- obj ) flushable
+GENERIC: thaw ( seq -- mutable-seq ) flushable
+GENERIC: like ( seq seq -- seq ) flushable
+GENERIC: reverse ( seq -- seq ) flushable
+GENERIC: reverse-slice ( seq -- seq ) flushable
+GENERIC: peek ( seq -- elt ) flushable
+GENERIC: head ( n seq -- seq ) flushable
+GENERIC: tail ( n seq -- seq ) flushable
 GENERIC: resize ( n seq -- seq )
 
 : immutable ( seq quot -- seq | quot: seq -- )
@@ -56,10 +55,10 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
 : 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
 
 : 2unseq ( { x y } -- x y )
-    dup first swap second ;
+    dup first swap second ; inline
 
 : 3unseq ( { x y z } -- x y z )
-    dup first over second rot third ;
+    dup first over second rot third ; inline
 
 TUPLE: bounds-error index seq ;
 : bounds-error <bounds-error> throw ;

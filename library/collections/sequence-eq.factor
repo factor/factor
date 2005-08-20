@@ -23,7 +23,7 @@ UNION: sequence array string sbuf vector ;
         swap >list swap >list =
     ] [
         2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte
-    ] ifte ;
+    ] ifte ; flushable
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [

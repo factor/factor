@@ -30,7 +30,7 @@ strings vectors words ;
 
 : namespace ( -- namespace )
     #! Push the current namespace.
-    namestack car ;
+    namestack car ; inline
 
 : >n ( namespace -- n:namespace )
     #! Push a namespace on the name stack.
@@ -44,7 +44,7 @@ strings vectors words ;
 
 : <namespace> ( -- n )
     #! Create a new namespace.
-    23 <hashtable> ;
+    23 <hashtable> ; flushable
 
 : (get) ( var ns -- value )
     #! Internal word for searching the namestack.
@@ -56,12 +56,12 @@ strings vectors words ;
         ] ?ifte
     ] [
         2drop f
-    ] ifte ;
+    ] ifte ; flushable
 
 : get ( variable -- value )
     #! Push the value of a variable by searching the namestack
     #! from the top down.
-    namestack (get) ;
+    namestack (get) ; flushable
 
 : set ( value variable -- ) namespace set-hash ;
 

@@ -1,6 +1,4 @@
-- fix bootstrap failure
 - flushing optimization
-- add foldable, flushable, inline to all relevant library words
 - new prettyprinter
   - limit output to n lines
   - limit sequences to n elements

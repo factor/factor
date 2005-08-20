@@ -50,9 +50,9 @@ IN: hashtables
 
 : hash* ( key table -- [[ key value ]] )
     #! Look up a value in the hashtable.
-    2dup (hashcode) swap hash-bucket assoc* ;
+    2dup (hashcode) swap hash-bucket assoc* ; flushable
 
-: hash ( key table -- value ) hash* cdr ;
+: hash ( key table -- value ) hash* cdr ; flushable
 
 : set-hash* ( key hash quot -- )
     #! Apply the quotation to yield a new association list.
@@ -71,6 +71,7 @@ IN: hashtables
 : hash>alist ( hash -- alist )
     #! Push a list of key/value pairs in a hashtable.
     [ ] swap [ hash-bucket [ swons ] each ] each-bucket ;
+    flushable
 
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;
@@ -106,13 +107,13 @@ IN: hashtables
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap
-    [ unswons pick set-hash ] each ;
+    [ unswons pick set-hash ] each ; foldable
 
 : hash-keys ( hash -- list )
-    hash>alist [ car ] map ;
+    hash>alist [ car ] map ; flushable
 
 : hash-values ( hash -- alist )
-    hash>alist [ cdr ] map ;
+    hash>alist [ cdr ] map ; flushable
 
 : hash-each ( hash quot -- | quot: [[ k v ]] -- )
     swap hash-array [ swap each ] each-with ; inline
@@ -134,7 +135,7 @@ IN: hashtables
         ] [
             r> 2drop f
         ] ifte
-    ] hash-all-with? ;
+    ] hash-all-with? ; flushable
 
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ; inline
@@ -174,7 +175,7 @@ M: hashtable hashcode ( hash -- n )
     [ pick set-hash ] 2each ; inline
 
 : ?hash ( key hash/f -- value/f )
-    dup [ hash ] [ 2drop f ] ifte ;
+    dup [ hash ] [ 2drop f ] ifte ; flushable
 
 : ?set-hash ( value key hash/f -- hash )
     [ 1 <hashtable> ] unless* [ set-hash ] keep ;

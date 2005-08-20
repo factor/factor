@@ -25,13 +25,13 @@ USING: generic kernel-internals vectors ;
 UNION: boolean POSTPONE: f POSTPONE: t ;
 COMPLEMENT: general-t f
 
-GENERIC: hashcode ( obj -- n )
+GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;
 
-GENERIC: = ( obj obj -- ? )
+GENERIC: = ( obj obj -- ? ) flushable
 M: object = eq? ;
 
-GENERIC: clone ( obj -- obj )
+GENERIC: clone ( obj -- obj ) flushable
 M: object clone ;
 
 : set-boot ( quot -- )

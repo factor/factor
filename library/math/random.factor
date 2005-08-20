@@ -16,4 +16,5 @@ IN: math USING: kernel ;
         (random-int) 2dup swap mod (random-int-0)
     ] ifte ; inline
 
-: random-int ( min max -- n ) dupd swap - random-int-0 + ;
+: random-int ( min max -- n )
+    dupd swap - random-int-0 + ; flushable

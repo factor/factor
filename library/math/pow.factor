@@ -14,7 +14,7 @@ USING: errors kernel math math-internals ;
         drop fsqrt 0 swap rect>
     ] [
         swap fsqrt swap 2 / polar>
-    ] ifte ;
+    ] ifte ; foldable
 
 : norm ( vec -- n ) norm-sq sqrt ;
 

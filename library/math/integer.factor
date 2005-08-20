@@ -15,16 +15,17 @@ UNION: integer fixnum bignum ;
 : gcd ( x y -- a d )
     #! Compute the greatest common divisor d and multiplier a
     #! such that a*x=d mod y.
-    swap 0 1 2swap (gcd) abs ;
+    swap 0 1 2swap (gcd) abs ; foldable
 
 : mod-inv ( x n -- y )
     #! Compute the multiplicative inverse of x mod n.
-    gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
+    gcd 1 = [ "Non-trivial divisor found" throw ] unless ; foldable
 
 : bitroll ( n s w -- n )
     #! Roll n by s bits to the right, wrapping around after
     #! w bits.
     [ mod shift ] 3keep over 0 >= [ - ] [ + ] ifte shift bitor ;
+    foldable
 
 IN: math-internals
 

@@ -108,15 +108,15 @@ M: object empty? ( seq -- ? ) length 0 = ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
-: conjunction ( v -- ? ) [ ] all? ;
-: disjunction ( v -- ? ) [ ] contains? ;
+: conjunction ( v -- ? ) [ ] all? ; flushable
+: disjunction ( v -- ? ) [ ] contains? ; flushable
 
-: index   ( obj seq -- n )     [ = ] find-with drop ;
-: index*  ( obj i seq -- n )   [ = ] find-with* drop ;
-: member? ( obj seq -- ? )     [ = ] contains-with? ;
-: memq?   ( obj seq -- ? )     [ eq? ] contains-with? ;
-: remove  ( obj list -- list ) [ = not ] subset-with ;
-: remq    ( obj list -- list ) [ eq? not ] subset-with ;
+: index   ( obj seq -- n )     [ = ] find-with drop ; flushable
+: index*  ( obj i seq -- n )   [ = ] find-with* drop ; flushable
+: member? ( obj seq -- ? )     [ = ] contains-with? ; flushable
+: memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
+: remove  ( obj list -- list ) [ = not ] subset-with ; flushable
+: remq    ( obj list -- list ) [ eq? not ] subset-with ; flushable
 
 : copy-into ( start to from -- )
     dup length [ >r pick r> + pick set-nth ] 2each 2drop ;
@@ -128,15 +128,15 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : append ( s1 s2 -- s1+s2 )
     #! Outputs a new sequence of the same type as s1.
-    swap [ swap nappend ] immutable ;
+    swap [ swap nappend ] immutable ; flushable
 
 : add ( seq elt -- seq )
     #! Outputs a new sequence of the same type as seq.
-    swap [ push ] immutable ;
+    swap [ push ] immutable ; flushable
 
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
-    rot [ [ rot nappend ] keep swap nappend ] immutable ;
+    rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable
 
 : concat ( seq -- seq )
     #! Append a sequence of sequences together. The new sequence
@@ -144,7 +144,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     dup empty? [
         [ 1024 <vector> swap [ dupd nappend ] each ] keep
         first like
-    ] unless ;
+    ] unless ; flushable
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.
@@ -160,7 +160,7 @@ M: object peek ( sequence -- element )
 : prune ( seq -- seq )
     [
         dup length <vector> swap [ over push-new ] each
-    ] keep like ;
+    ] keep like ; flushable
 
 : >pop> ( stack -- stack ) dup pop drop ;
 
@@ -172,7 +172,7 @@ M: object peek ( sequence -- element )
         dup length <vector> swap
         [ over push 2dup push ] each nip >pop>
         concat
-    ] ifte ;
+    ] ifte ; flushable
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
@@ -180,17 +180,17 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 ! Set theoretic operations
 : seq-intersect ( seq1 seq2 -- seq1/\seq2 )
-    [ swap member? ] subset-with ;
+    [ swap member? ] subset-with ; flushable
 
 : seq-diff ( seq1 seq2 -- seq2-seq1 )
-    [ swap member? not ] subset-with ;
+    [ swap member? not ] subset-with ; flushable
 
 : seq-union ( seq1 seq2 -- seq1\/seq2 )
-    append prune ;
+    append prune ; flushable
 
 : contained? ( seq1 seq2 -- ? )
     #! Is every element of seq1 in seq2
-    swap [ swap member? ] all-with? ;
+    swap [ swap member? ] all-with? ; flushable
 
 ! Lexicographic comparison
 : (lexi) ( seq seq i limit -- n )
@@ -202,24 +202,24 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
         ] [
             r> drop - >r 3drop r>
         ] ifte
-    ] ifte ;
+    ] ifte ; flushable
 
 : lexi ( s1 s2 -- n )
     #! Lexicographically compare two sequences of numbers
     #! (usually strings). Negative if s1<s2, zero if s1=s2,
     #! positive if s1>s2.
-    0 pick length pick length min (lexi) ;
+    0 pick length pick length min (lexi) ; flushable
 
 : flip ( seq -- seq )
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 2 } { 3 4 } { 5 6 } }
     dup empty? [
         dup first length [ swap [ nth ] map-with ] map-with
-    ] unless ;
+    ] unless ; flushable
 
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
-    0 [ length max ] reduce ;
+    0 [ length max ] reduce ; flushable
 
 IN: kernel
 

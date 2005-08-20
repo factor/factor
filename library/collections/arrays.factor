@@ -42,4 +42,4 @@ M: byte-array resize resize-array ;
     #! since you can fool the runtime and corrupt memory by
     #! specifying an incorrect size. Note that this word is also
     #! handled specially by the compiler's type inferencer.
-    <tuple> [ 2 set-slot ] keep ;
+    <tuple> [ 2 set-slot ] keep ; flushable

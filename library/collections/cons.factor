@@ -18,7 +18,7 @@ M: general-list >list ( list -- list ) ;
 
 : last ( list -- last )
     #! Last cons of a list.
-    dup cdr cons? [ cdr last ] when ;
+    dup cdr cons? [ cdr last ] when ; foldable
 
 PREDICATE: general-list list ( list -- ? )
     #! Proper list test. A proper list is either f, or a cons
@@ -28,30 +28,32 @@ PREDICATE: general-list list ( list -- ? )
 : uncons ( [[ car cdr ]] -- car cdr ) dup car swap cdr ; inline
 : unswons ( [[ car cdr ]] -- cdr car ) dup cdr swap car ; inline
 
-: swons ( cdr car -- [[ car cdr ]] ) swap cons ;
-: unit ( a -- [ a ] ) f cons ;
-: 2list ( a b -- [ a b ] ) unit cons ;
-: 2unlist ( [ a b ] -- a b ) uncons car ;
+: swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
+: unit ( a -- [ a ] ) f cons ; inline
+: 2list ( a b -- [ a b ] ) unit cons ; inline
+: 2unlist ( [ a b ] -- a b ) uncons car ; inline
 
 : 2car ( cons cons -- car car ) swap car swap car ; inline
 : 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
 
 : unpair ( list -- list1 list2 )
     [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
+    flushable
 
 : <queue> ( -- queue )
     #! Make a new functional queue.
-    [[ [ ] [ ] ]] ;
+    [[ [ ] [ ] ]] ; foldable
 
 : queue-empty? ( queue -- ? )
-    uncons or not ;
+    uncons or not ; foldable
 
 : enque ( obj queue -- queue )
-    uncons >r cons r> cons ;
+    uncons >r cons r> cons ; foldable
 
 : deque ( queue -- obj queue )
     uncons
     [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;
+    foldable
 
 M: cons = ( obj cons -- ? )
     2dup eq? [

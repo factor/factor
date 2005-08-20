@@ -12,14 +12,16 @@ sequences strings ;
 
 : padding ( string count char -- string )
     >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] ifte ;
+    flushable
 
 : pad-left ( string count char -- string )
-    pick >r padding r> append ;
+    pick >r padding r> append ; flushable
 
 : pad-right ( string count char -- string )
-    pick >r padding r> swap append ;
+    pick >r padding r> swap append ; flushable
 
-: ch>string ( ch -- str ) 1 <sbuf> [ push ] keep (sbuf>string) ;
+: ch>string ( ch -- str )
+    1 <sbuf> [ push ] keep (sbuf>string) ; flushable
 
 : >sbuf ( seq -- sbuf )
     dup length <sbuf> [ swap nappend ] keep ; inline
