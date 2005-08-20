@@ -14,6 +14,14 @@ SYMBOL: typemap
 SYMBOL: object
 SYMBOL: null
 
+! Global vector mapping type numbers to builtin class objects.
+SYMBOL: builtins
+
+! Builtin metaclass
+SYMBOL: builtin
+
+: type>class ( n -- symbol ) builtins get nth ;
+
 : predicate-word ( word -- word )
     word-name "?" append create-in ;
 

@@ -10,10 +10,6 @@ USING: errors generic kernel kernel-internals math ;
 
 IN: math
 
-DEFER: complex?
-BUILTIN: complex 6 complex? { 0 "real" f } { 1 "imaginary" f } ;
-MATH-CLASS: complex 4 f
-
 UNION: number real complex ;
 
 M: real real ;

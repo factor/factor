@@ -1,3 +1,19 @@
+- fix bootstrap failure
+- flushing optimization
+- add foldable, flushable, inline to all relevant library words
+- new prettyprinter
+  - limit output to n lines
+  - limit sequences to n elements
+  - put newlines where necessary
+  - limit lines to 64 chars
+  - conditional newlines after certain words
+  - rename prettyprint* to pprint, prettyprint to pp
+  - reader syntax for arrays, byte arrays, displaced aliens
+  - print parsing words in bold
+  - unify unparse and prettyprint
+- split, group: return vectors
+- sleep word
+
 + ui:
 
 - fix listener prompt display after presentation commands invoked
@@ -42,7 +58,6 @@
 
 - http keep alive, and range get
 - code walker & exceptions
-- sleep word
 
 + ffi:
 
@@ -59,7 +74,6 @@
 - changing a word to be 'inline' after it was already defined doesn't
   work properly
 - inference needs to be more robust with heavily recursive code
-- powerpc: float ffi parameters
 - fix fixnum<< and /i overflow on PowerPC
 - simplifier:
   - kill replace after a peek
@@ -82,11 +96,9 @@
 - powerpc has weird callstack residue
 - instances: do not use make-list
 - method doc strings
-- clean up metaclasses
 - vectors: ensure its ok with bignum indices
 - code gc
 - doc comments of generics
-- M: object should not inhibit delegation
 
 + i/o:
 
@@ -95,13 +107,9 @@
 - unix io: handle \n\r and \n\0
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
-- unify unparse and prettyprint
 - utf16, utf8 encoding
 - fix i/o on generic x86/ppc unix
 - if two tasks write to a unix stream, the buffer can overflow
-- rename prettyprint* to pprint, prettyprint to pp
-- reader syntax for arrays, byte arrays, displaced aliens
-- print parsing words in bold
 
 + nice to have libraries:
 

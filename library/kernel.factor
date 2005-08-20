@@ -46,16 +46,9 @@ M: object clone ;
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
-DEFER: wrapper?
-BUILTIN: wrapper 14 wrapper? { 1 "wrapped" f } ;
-
 M: wrapper = ( obj wrapper -- ? )
     over wrapper?
     [ swap wrapped swap wrapped = ] [ 2drop f ] ifte ;
-
-! defined in parse-syntax.factor
-DEFER: not
-DEFER: t?
 
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
@@ -92,15 +85,6 @@ DEFER: t?
 
 : 3keep ( x y z quot -- x y z | quot: x y z -- )
     >r 3dup r> swap >r swap >r swap >r call r> r> r> ; inline
-
-: while ( quot generator -- )
-    #! Keep applying the quotation to the value produced by
-    #! calling the generator until the generator returns f.
-    2dup >r >r swap >r call dup [
-        r> call r> r> while
-    ] [
-        r> 2drop r> r> 2drop
-    ] ifte ; inline
 
 : ifte* ( cond true false -- | true: cond -- | false: -- )
     #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte

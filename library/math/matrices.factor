@@ -34,8 +34,8 @@ USING: generic kernel sequences vectors ;
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
-: v. ( v v -- x ) 0 -rot [ * + ] 2each ;
-: c. ( v v -- x ) 0 -rot [ conjugate * + ] 2each ;
+: v. ( v v -- x ) 0 [ * + ] 2reduce ;
+: c. ( v v -- x ) 0 [ conjugate * + ] 2reduce ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
 

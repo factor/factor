@@ -8,7 +8,11 @@ USING: kernel lists namespaces sequences io ;
     [ "syntax" "scratchpad" ] "use" set ;
 
 : (parse-stream) ( stream -- quot )
-    [ f swap [ (parse) ] read-lines reverse ] with-parser ;
+    [
+        lines dup length [ ]
+        [ line-number set (parse) ] 2reduce
+        reverse
+    ] with-parser ;
 
 : parse-stream ( name stream -- quot )
     [

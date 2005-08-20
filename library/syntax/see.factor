@@ -101,13 +101,6 @@ M: complement class.
     dup unparse. bl
     "complement" word-prop unparse. terpri ;
 
-M: builtin class.
-    \ BUILTIN: unparse. bl
-    dup unparse. bl
-    dup types first unparse write bl
-    0 swap "slots" word-prop prettyprint-elements drop
-    prettyprint-; ;
-
 M: predicate class.
     \ PREDICATE: unparse. bl
     dup "superclass" word-prop unparse. bl

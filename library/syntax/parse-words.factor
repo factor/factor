@@ -14,6 +14,8 @@ strings unparser words ;
 ! of vocabularies. If it is a parsing word, it is executed
 ! immediately. Otherwise it is appended to the parse tree.
 
+SYMBOL: line-number
+
 : use+ ( string -- ) "use" [ cons ] change ;
 
 : parsing? ( word -- ? )

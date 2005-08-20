@@ -4,11 +4,6 @@ IN: vectors
 USING: errors generic kernel kernel-internals lists math
 math-internals sequences ;
 
-DEFER: vector?
-BUILTIN: vector 11 vector?
-    { 1 length set-capacity }
-    { 2 underlying set-underlying } ;
-
 M: vector set-length ( len vec -- ) grow-length ;
 
 M: vector nth ( n vec -- obj ) bounds-check underlying array-nth ;

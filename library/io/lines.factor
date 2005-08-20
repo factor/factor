@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: errors generic io kernel math namespaces sequences ;
+USING: errors generic io kernel math namespaces sequences
+vectors ;
 
 TUPLE: line-reader cr ;
 
@@ -40,19 +41,9 @@ M: line-reader stream-read ( count line -- string )
         drop
     ] ifte ;
 
-! Reading lines and counting line numbers.
-SYMBOL: line-number
-SYMBOL: parser-stream
+: (lines) ( seq -- seq )
+    readln [ over push (lines) ] when* ;
 
-: next-line ( -- str )
-    parser-stream get stream-readln
-    line-number [ 1 + ] change ;
-
-: read-lines ( stream quot -- )
-    #! Apply a quotation to each line as its read. Close the
-    #! stream.
-    swap [
-        parser-stream set 0 line-number set [ next-line ] while
-    ] [
-        parser-stream get stream-close rethrow
-    ] catch ;
+: lines ( stream -- seq )
+    #! Read all lines from the stream into a sequence.
+    [ 100 <vector> (lines) ] with-stream ;

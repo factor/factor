@@ -118,14 +118,12 @@ parser prettyprint sequences io vectors words ;
 ] make-list
 
 "object" [ "generic" ] search
-"tuple" [ "generic" ] search
 "null" [ "generic" ] search
 "typemap" [ "generic" ] search
 "builtins" [ "generic" ] search
 
 vocabularies get [ "generic" off ] bind
 
-reveal
 reveal
 reveal
 reveal
@@ -147,7 +145,6 @@ reveal
         "/library/generic/slots.factor"
         "/library/generic/object.factor"
         "/library/generic/null.factor"
-        "/library/generic/builtin.factor"
         "/library/generic/math-combination.factor"
         "/library/generic/predicate.factor"
         "/library/generic/union.factor"

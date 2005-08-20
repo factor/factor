@@ -4,7 +4,7 @@ IN: io
 USING: errors generic kernel lists namespaces strings styles ;
 
 : flush  ( -- )              stdio get stream-flush ;
-: readln ( -- string/f )       stdio get stream-readln ;
+: readln ( -- string/f )     stdio get stream-readln ;
 : read1  ( -- char/f )       stdio get stream-read1 ;
 : read   ( count -- string ) stdio get stream-read ;
 : write  ( string -- )       stdio get stream-write ;
@@ -31,3 +31,7 @@ USING: errors generic kernel lists namespaces strings styles ;
         swap stdio set
         [ [ close rethrow ] when* ] catch
     ] with-scope ;
+
+: contents ( stream -- string )
+    #! Read the entire stream into a string.
+    4096 <sbuf> [ stream-copy ] keep >string ;

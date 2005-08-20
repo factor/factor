@@ -56,6 +56,10 @@ sequences vectors words ;
 
 : node-peek ( node -- value ) node-in-d peek ;
 
+: type-tag ( type -- tag )
+    #! Given a type number, return the tag number.
+    dup 6 > [ drop 3 ] when ;
+
 : value-tag ( value node -- n/f )
     #! If the tag is known, output it, otherwise f.
     node-classes hash dup [

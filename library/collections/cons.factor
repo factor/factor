@@ -6,9 +6,6 @@ IN: lists USING: generic kernel sequences ;
 ! else depends on, and is loaded early in bootstrap.
 ! lists.factor has everything else.
 
-DEFER: cons?
-BUILTIN: cons 2 cons? { 0 "car" f } { 1 "cdr" f } ;
-
 ! We borrow an idiom from Common Lisp. The car/cdr of an empty
 ! list is the empty list.
 M: f car ;

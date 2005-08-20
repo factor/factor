@@ -1,20 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel-internals
-
-DEFER: hash-array
-DEFER: set-hash-array
-DEFER: set-hash-size
-
 IN: hashtables
-USING: generic kernel lists math sequences vectors ;
-
-! We put hash-size in the hashtables vocabulary, and
-! the other words in kernel-internals.
-DEFER: hashtable?
-BUILTIN: hashtable 10 hashtable?
-    { 1 "hash-size" set-hash-size }
-    { 2 hash-array set-hash-array } ;
+USING: generic kernel lists math sequences vectors
+kernel-internals ;
 
 ! A hashtable is implemented as an array of buckets. The
 ! array index is determined using a hash function, and the

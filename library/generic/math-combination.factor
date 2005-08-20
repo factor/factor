@@ -1,3 +1,5 @@
+! Copyright (C) 2005 Slava Pestov.
+! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: errors generic hashtables kernel kernel-internals lists
 math namespaces sequences words ;

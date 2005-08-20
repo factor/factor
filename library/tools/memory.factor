@@ -35,13 +35,17 @@ vectors words ;
 
 ! Some words for iterating through the heap.
 
+: (each-object) ( quot -- )
+    next-object [ swap [ call ] keep (each-object) ] when* ;
+    inline
+
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image. We
     #! use the lower-level >c and c> words here to avoid
     #! copying the stacks.
     [ end-scan rethrow ] >c
-    begin-scan [ next-object ] while
-    f c> call ;
+    begin-scan (each-object) drop
+    f c> call ; inline
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the

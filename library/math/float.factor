@@ -3,10 +3,6 @@
 IN: math
 USING: generic kernel math-internals ;
 
-DEFER: float?
-BUILTIN: float 5 float? ;
-MATH-CLASS: float 3 >float
-
 UNION: real rational float ;
 
 M: real abs dup 0 < [ neg ] when ;

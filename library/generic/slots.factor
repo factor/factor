@@ -29,12 +29,8 @@ sequences strings vectors words ;
 : define-slot ( class slot reader writer -- )
     >r >r 2dup r> define-reader r> define-writer ;
 
-: ?create-in dup string? [ create-in ] when ;
-
 : intern-slots ( spec -- spec )
-    #! For convenience, we permit reader/writers to be specified
-    #! as strings.
-    [ 3unseq swap ?create-in swap ?create-in 3vector ] map ;
+    [ 3unseq swap 2unseq create swap 2unseq create 3vector ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the
@@ -44,10 +40,11 @@ sequences strings vectors words ;
     [ 3unseq define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    >r word-name "-" r> append3 create-in ;
+    >r word-name "-" r> append3 "in" get 2vector ;
 
 : writer-word ( class name -- word )
-    [ swap "set-" % word-name % "-" % % ] make-string create-in ;
+    [ swap "set-" % word-name % "-" % % ] make-string
+    "in" get 2vector ;
 
 : simple-slot ( class name -- reader writer )
     [ reader-word ] 2keep writer-word ;
@@ -58,4 +55,5 @@ sequences strings vectors words ;
     #! set-<class>-<slot>. Slot numbering is consecutive and
     #! begins at base.
     over length [ + ] map-with
-    [ >r dupd simple-slot r> -rot 3vector ] 2map nip ;
+    [ >r dupd simple-slot r> -rot 3vector ] 2map nip
+    intern-slots ;

@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: alien assembler compiler errors files generic generic
-hashtables hashtables io io-internals kernel kernel
-kernel-internals lists lists math math math-internals memory
-namespaces parser parser profiler sequences strings unparser
-vectors vectors words words ;
+USING: alien generic hashtables io kernel kernel-internals lists
+math namespaces sequences strings vectors words ;
+
+! Some very tricky code creating a bootstrap embryo in the
+! host image.
 
 "Creating primitives and basic runtime structures..." print
 
@@ -18,12 +18,7 @@ vocabularies
 "generic" vocab clone
 
 <namespace> vocabularies set
-
-! Hack
-{{ [[ { } null ]] }} typemap set
-
-num-types empty-vector builtins set
-<namespace> crossref set
+f crossref set
 
 vocabularies get [
     "generic" set
@@ -231,3 +226,101 @@ vocabularies get [
 
 FORGET: make-primitive
 FORGET: set-stack-effect
+
+! Okay, now we have primitives fleshed out. Bring up the generic
+! word system.
+: builtin-predicate ( class predicate -- )
+    [ \ type , over types first , \ eq? , ] make-list
+    define-predicate ;
+
+: register-builtin ( class -- )
+    dup types first builtins get set-nth ;
+
+: define-builtin ( symbol type# predicate slotspec -- )
+    >r >r >r
+    dup intern-symbol
+    dup r> 1vector "types" set-word-prop
+    dup builtin define-class
+    dup r> builtin-predicate
+    dup r> intern-slots 2dup "slots" set-word-prop
+    define-slots
+    register-builtin ;
+
+! Hack
+{{ [[ { } null ]] }} typemap set
+
+num-types empty-vector builtins set
+
+"fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
+"fixnum" "math" create 0 "math-priority" set-word-prop
+"fixnum" "math" create ">fixnum" [ "math" ] search unit "coercer" set-word-prop
+
+"bignum" "math" create 1 "bignum?" "math" create { } define-builtin
+"bignum" "math" create 1 "math-priority" set-word-prop
+"bignum" "math" create ">bignum" [ "math" ] search unit "coercer" set-word-prop
+
+"cons" "lists" create 2 "cons?" "lists" create
+{ { 0 { "car" "lists" } f } { 1 { "cdr" "lists" } f } } define-builtin
+
+"ratio" "math" create 4 "ratio?" "math" create
+{ { 0 { "numerator" "math" } f } { 1 { "denominator" "math" } f } } define-builtin
+"ratio" "math" create 2 "math-priority" set-word-prop
+
+"float" "math" create 5 "float?" "math" create { } define-builtin
+"float" "math" create 3 "math-priority" set-word-prop
+"float" "math" create ">float" [ "math" ] search unit "coercer" set-word-prop
+
+"complex" "math" create 6 "complex?" "math" create
+{ { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
+"complex" "math" create 4 "math-priority" set-word-prop
+
+"t" "!syntax" create 7 "t?" "kernel" create
+{ } define-builtin
+
+"array" "kernel-internals" create 8 "array?" "kernel-internals" create
+{ } define-builtin
+
+"f" "!syntax" create 9 "not" "kernel" create
+{ } define-builtin
+
+"hashtable" "hashtables" create 10 "hashtable?" "hashtables" create {
+    { 1 { "hash-size" "hashtables" } { "set-hash-size" "kernel-internals" } }
+    { 2 { "hash-array" "kernel-internals" } { "set-hash-array" "kernel-internals" } }
+} define-builtin
+
+"vector" "vectors" create 11 "vector?" "vectors" create {
+    { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
+    { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
+} define-builtin
+
+"string" "strings" create 12 "string?" "strings" create {
+    { 1 { "length" "sequences" } f }
+    { 2 { "hashcode" "kernel" } f }
+} define-builtin
+
+"sbuf" "strings" create 13 "sbuf?" "strings" create {
+    { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
+    { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
+} define-builtin
+
+"wrapper" "kernel" create 14 "wrapper?" "kernel" create
+{ { 1 { "wrapped" "kernel" } f } } define-builtin
+
+"dll" "alien" create 15 "dll?" "alien" create
+{ { 1 { "dll-path" "alien" } f } } define-builtin
+
+"alien" "alien" create 16 "alien?" "alien" create { } define-builtin
+
+"word" "words" create 17 "word?" "words" create {
+    { 1 { "hashcode" "kernel" } f }
+    { 4 { "word-def" "words" } { "set-word-def" "words" } }
+    { 5 { "word-props" "words" } { "set-word-props" "words" } }
+} define-builtin
+
+"tuple" "kernel" create 18 "tuple?" "kernel" create { } define-builtin
+
+"displaced-alien" "alien" create 20 "displaced-alien?" "alien" create { } define-builtin
+
+FORGET: builtin-predicate
+FORGET: register-builtin
+FORGET: define-builtin

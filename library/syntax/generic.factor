@@ -13,10 +13,6 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! G: word picker dispatcher ;
     CREATE [ 2unlist rot define-generic* ] [ ] ; parsing
 
-: BUILTIN:
-    #! Syntax: BUILTIN: <class> <type#> <predicate> <slots> ;
-    CREATE scan-word scan-word [ define-builtin ] [ ] ; parsing
-
 : COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.
     CREATE
@@ -57,10 +53,3 @@ USING: syntax generic kernel lists namespaces parser words ;
     #! stack.
     scan-word [ tuple-constructor ] keep
     [ define-constructor ] [ ] ; parsing
-
-: MATH-CLASS:
-    #! Followed by class name, priority, and coercer.
-    scan-word
-    dup scan-word "math-priority" set-word-prop
-    scan-word dup \ f = [ drop f ] [ unit ] ifte
-    "coercer" set-word-prop ; parsing

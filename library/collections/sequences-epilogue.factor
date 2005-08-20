@@ -34,6 +34,9 @@ M: object each ( seq quot -- )
     [ [ swap >r >r uncons r> 2nth r> call ] 3keep ] repeat
     2drop ; inline
 
+: 2reduce ( seq seq identity quot -- value | quot: e x y -- z )
+    >r -rot r> 2each ; inline
+
 : 2map ( seq seq quot -- seq | quot: elt elt -- elt )
     over [
         length <vector> 2swap

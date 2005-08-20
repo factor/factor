@@ -12,9 +12,6 @@ namespaces parser sequences strings vectors words ;
 ! slot 2 - the class, a word
 ! slot 3 - the delegate tuple, or f
 
-DEFER: tuple?
-BUILTIN: tuple 18 tuple? ;
-
 : delegate ( object -- delegate )
     dup tuple? [ 3 slot ] [ drop f ] ifte ; inline
 
@@ -47,12 +44,13 @@ BUILTIN: tuple 18 tuple? ;
         r> 2drop
     ] ifte ;
 
+: delegate-slots { { 3 delegate set-delegate } } ;
+
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop
     2dup length 2 + "tuple-size" set-word-prop
     dupd 4 simple-slots
-    2dup { [ 3 delegate set-delegate ] } swap append
-    "slots" set-word-prop
+    2dup delegate-slots swap append "slots" set-word-prop
     define-slots ;
 
 : tuple-constructor ( class -- word )
@@ -83,11 +81,8 @@ BUILTIN: tuple 18 tuple? ;
 TUPLE: mirror tuple ;
 
 C: mirror ( tuple -- mirror )
-    over tuple? [
-        [ set-mirror-tuple ] keep
-    ] [
-        "Not a tuple" throw
-    ] ifte ;
+    over tuple? [ "Not a tuple" throw ] unless
+    [ set-mirror-tuple ] keep ;
 
 M: mirror nth ( n mirror -- elt )
     bounds-check mirror-tuple array-nth ;

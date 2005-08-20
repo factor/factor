@@ -4,15 +4,6 @@ IN: alien
 USING: hashtables io kernel kernel-internals lists math
 namespaces parser ;
 
-DEFER: dll?
-BUILTIN: dll 15 dll? { 1 "dll-path" f } ;
-
-DEFER: alien?
-BUILTIN: alien 16 alien? ;
-
-DEFER: displaced-alien?
-BUILTIN: displaced-alien 20 displaced-alien? ;
-
 UNION: c-ptr byte-array alien displaced-alien ;
 
 : NULL ( -- null )

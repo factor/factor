@@ -30,7 +30,6 @@ void init_stacks(CELL ds_size_, CELL cs_size_)
 	reset_datastack();
 	cs_bot = (CELL)alloc_guarded(cs_size);
 	reset_callstack();
-	callframe = userenv[BOOT_ENV];
 }
 
 void primitive_drop(void)
