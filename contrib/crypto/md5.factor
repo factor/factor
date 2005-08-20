@@ -17,6 +17,10 @@ SYMBOL: old-d
 : nth-int ( string n -- int )
     4 * dup 4 + rot subseq le> ;
 
+: contents ( stream -- string )
+    #! Read the entire stream into a string.
+	    4096 <sbuf> [ stream-copy ] keep >string ;
+
 : initialize ( -- )
     HEX: 67452301 dup a set old-a set
     HEX: efcdab89 dup b set old-b set
@@ -179,7 +183,11 @@ SYMBOL: old-d
     64 * dup 64 + rot subseq ;
 
 : hex-string ( str -- str )
-    [ >hex 2 CHAR: 0 pad-left ] map concat ;
+	[
+		[
+			>hex 2 48 pad-left %
+		] each
+	] make-string ;
 
 : get-md5 ( -- str )
     [
@@ -192,6 +200,15 @@ SYMBOL: old-d
         dup length num-blocks [ 2dup get-block process-block ] repeat
         2drop get-md5
     ] with-scope ;
+
+: stream>md5 ( stream -- md5 )
+	[
+		contents string>md5
+	] with-scope ;
+: file>md5 ( file -- md5 )
+	[
+		<file-reader> stream>md5
+	] with-scope ;
 
 : test-md5 ( -- )
     [ "d41d8cd98f00b204e9800998ecf8427e" ] [ "" string>md5 ] unit-test
