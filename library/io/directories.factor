@@ -15,7 +15,7 @@ strings styles unparser ;
 
 : file. ( dir name -- )
     #! If "doc-root" set, create links relative to it.
-    2dup path+ file-icon. bl file-link. terpri ;
+    2dup path+ file-icon. " " write file-link. terpri ;
 
 : directory. ( dir -- )
     #! If "doc-root" set, create links relative to it.

@@ -15,7 +15,6 @@ USING: errors generic kernel lists namespaces strings styles ;
 : close  ( -- )              stdio get stream-close ;
 
 : crlf   ( -- )              "\r\n" write ;
-: bl     ( -- )              " " write ;
 
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png

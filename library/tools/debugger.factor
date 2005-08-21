@@ -17,8 +17,8 @@ vectors words ;
 : type-check-error. ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write class unparse. terpri
-    "Expected type: " write type>class unparse. terpri ;
+    "Object type: " write class pp
+    "Expected type: " write type>class pp ;
 
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;
@@ -102,10 +102,8 @@ M: object error. ( error -- ) . ;
 : :get ( var -- value ) "error-namestack" get (get) ;
 
 : debug-help ( -- )
-    [ :s :r ] [ unparse. bl ] each
-    "show stacks at time of error." print
-    \ :get unparse.
-    " ( var -- value ) inspects the error namestack." print ;
+    ":s :r show stacks at time of error." print
+    ":get ( var -- value ) inspects the error namestack." print ;
 
 : flush-error-handler ( error -- )
     #! Last resort.

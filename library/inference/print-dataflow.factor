@@ -1,6 +1,6 @@
 IN: inference
 USING: generic hashtables inference io kernel kernel-internals
-math namespaces prettyprint sequences vectors words ;
+lists math namespaces prettyprint sequences styles vectors words ;
 
 ! A simple tool for turning dataflow IR into quotations, for
 ! debugging purposes.
@@ -9,9 +9,9 @@ GENERIC: node>quot ( node -- )
 
 TUPLE: comment node text ;
 
-M: comment prettyprint* ( ann -- )
+M: comment pprint* ( ann -- )
     "( " over comment-text " )" append3
-    swap comment-node object. ;
+    swap comment-node presented swons unit format ;
 
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
@@ -82,4 +82,4 @@ M: #entry node>quot ( ? node -- ) "#entry" comment, ;
 : dataflow. ( quot ? -- )
     #! Print dataflow IR for a quotation. Flag indicates if
     #! annotations should be printed or not.
-    >r dataflow optimize r> dataflow>quot prettyprint ;
+    >r dataflow optimize r> dataflow>quot pp ;

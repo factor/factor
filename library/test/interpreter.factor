@@ -80,10 +80,6 @@ USE: sequences
     [ [ 2 2 + unparse print ] string-out ] test-interpreter
 ] unit-test
 
-[ { "4" } ] [
-    [ [ 0 2 2 + prettyprint* drop ] string-out ] test-interpreter
-] unit-test
-
 [ { "4\n" } ] [
     [ [ 2 2 + . ] string-out ] test-interpreter
 ] unit-test

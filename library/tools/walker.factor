@@ -42,14 +42,12 @@ sequences io strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    [ &s &r ] [ unparse. bl ] each
-    "show stepper stacks." print
-    \ &get unparse.
-    " ( var -- value ) inspects the stepper namestack." print
-    \ step unparse. " -- single step over" print
-    \ into unparse. " -- single step into" print
-    \ continue unparse. " -- continue execution" print
-    \ bye unparse. " -- exit single-stepper" print
+    "&s &r show stepper stacks." print
+    "&get ( var -- value ) inspects the stepper namestack." print
+    "step -- single step over" print
+    "into -- single step into" print
+    "continue -- continue execution" print
+    "bye -- exit single-stepper" print
     report ;
 
 : walk-listener walk-banner "walk " listener-prompt set listener ;

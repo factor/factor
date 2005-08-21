@@ -12,9 +12,7 @@ io kernel lists math namespaces prettyprint words ;
     ] unless ;
 
 : compiling ( word -- word parameter )
-    check-architecture
-    "Compiling " write dup unparse. terpri flush
-    dup word-def ;
+    check-architecture "Compiling " write dup pp dup word-def ;
 
 GENERIC: (compile) ( word -- )
 
@@ -43,7 +41,7 @@ M: compound (compile) ( word -- )
     "compile" get [ word compile ] when ; parsing
 
 : cannot-compile ( word error -- )
-    "Cannot compile " write swap unparse. terpri print-error ;
+    "Cannot compile " write swap pp print-error ;
 
 : try-compile ( word -- )
     [ compile ] [ [ cannot-compile ] when* ] catch ;
@@ -52,7 +50,7 @@ M: compound (compile) ( word -- )
 
 : decompile ( word -- )
     dup compiled? [
-        "Decompiling " write dup unparse. terpri flush
+        "Decompiling " write dup pp
         [ word-primitive ] keep set-word-primitive
     ] [
         drop

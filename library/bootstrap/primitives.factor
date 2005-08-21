@@ -317,6 +317,8 @@ num-types empty-vector builtins set
 
 "tuple" "kernel" create 18 "tuple?" "kernel" create { } define-builtin
 
+"byte-array" "kernel-internals" create 19 "byte-array?" "kernel-internals" create { } define-builtin
+
 "displaced-alien" "alien" create 20 "displaced-alien?" "alien" create { } define-builtin
 
 FORGET: builtin-predicate

@@ -229,7 +229,7 @@ IN: kernel
 
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.
-    #! { { [ X ] [ Y ] } { [ Z ] [ T ] }
+    #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
     #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
     #! The last condition should be a catch-all 't'.
     [ first call ] find nip second call ;

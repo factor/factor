@@ -47,7 +47,7 @@ global [ 100 <vector> commands set ] bind
     "This stream does not support live gadgets"
     swap format terpri ;
 
-[ drop t ] "Prettyprint" [ prettyprint ] define-command
+[ drop t ] "Prettyprint" [ pp ] define-command
 [ drop t ] "Inspect" [ inspect ] define-command
 [ drop t ] "References" [ references inspect ] define-command
 

@@ -31,9 +31,6 @@ M: array resize resize-array ;
         3dup swap array-nth pick rot set-array-nth
     ] repeat 2drop ;
 
-DEFER: byte-array?
-BUILTIN: byte-array 19 byte-array? ;
-
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
 

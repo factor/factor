@@ -57,16 +57,16 @@ M: word extra-banner ( obj -- )
     dup vocab-banner
     metaclass [
         "This is a class whose behavior is specifed by the " write
-        unparse. " metaclass." print
+        pprint " metaclass." print
     ] when* ;
 
 M: object extra-banner ( obj -- ) drop ;
 
 : inspect-banner ( obj -- )
-    "You are looking at an instance of the " write dup class unparse.
+    "You are looking at an instance of the " write dup class pprint
     " class:" print
-    "  " write dup unparse. terpri
-    "It takes up " write dup size unparse write " bytes of memory." print
+    "  " write dup pp
+    "It takes up " write dup size pprint " bytes of memory." print
     extra-banner ;
 
 : describe ( obj -- )

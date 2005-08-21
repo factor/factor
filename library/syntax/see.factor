@@ -1,130 +1,77 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic hashtables io kernel lists namespaces sequences
-streams strings styles unparser words ;
+USING: generic io kernel lists namespaces sequences styles words ;
 
-: prettyprint-IN: ( word -- )
-    \ IN: unparse. bl word-vocabulary write terpri ;
+: declaration. ( word prop -- )
+    tuck word-name word-prop
+    [ bl pprint-object ] [ drop ] ifte ;
 
-: prettyprint-prop ( word prop -- )
-    tuck word-name word-prop [
-        bl unparse.
-    ] [
-        drop
-    ] ifte ;
-
-: prettyprint-plist ( word -- )
+: declarations. ( word -- )
     [
         POSTPONE: parsing
         POSTPONE: inline
         POSTPONE: foldable
         POSTPONE: flushable
-    ] [ prettyprint-prop ] each-with ;
+    ] [ declaration. ] each-with ;
 
 : comment. ( comment -- )
-    [ [[ font-style italic ]] ] format ;
+    [ [[ font-style italic ]] ] text ;
 
-: infer-effect. ( effect -- )
-    [
-        "(" %
-        2unlist >r [ " " % unparse % ] each r>
-        " --" %
-        [ " " % unparse % ] each
-        " )" %
-    ] make-string comment. ;
+: stack-picture ( seq -- string )
+    [ [ word-name % " " % ] each ] make-string ;
 
-: stack-effect. ( word -- )
-    dup "stack-effect" word-prop [
-        [ CHAR: ( , % CHAR: ) , ] make-string
-        comment.
-    ] [
-        "infer-effect" word-prop dup [
-            infer-effect.
-        ] [
-            drop
-        ] ifte
+: effect>string ( effect -- string )
+    2unseq stack-picture >r stack-picture "-- " r> append3 ;
+
+: stack-effect ( word -- string )
+    dup "stack-effect" word-prop [ ] [
+        "infer-effect" word-prop
+        dup [ effect>string ] when
     ] ?ifte ;
 
-: documentation. ( indent word -- indent )
-    "documentation" word-prop [
-        "\n" split [
-            "#!" swap append comment.
-            dup prettyprint-newline
-        ] each
-    ] when* ;
+: stack-effect. ( string -- )
+    [ bl "( " swap ")" append3 comment. ] when* ;
 
-: definer. ( word -- ) dup definer unparse. bl unparse. bl ;
+: in. ( word -- )
+    <block \ IN: pprint-object bl word-vocabulary f text block>
+    t newline ;
+
+: definer. ( word -- )
+    dup definer pprint-object bl
+    dup pprint-object
+    stack-effect stack-effect.
+    f newline ;
 
 GENERIC: (see) ( word -- )
 
-M: compound (see) ( word -- )
-    tab-size get dup indent swap
-    [ documentation. ] keep
-    [ word-def prettyprint-elements \ ; unparse. ] keep
-    prettyprint-plist terpri drop ;
+M: word (see) definer. t newline ;
 
-: prettyprint-M: ( -- indent )
-    \ M: unparse. bl tab-size get ;
+: documentation. ( word -- )
+    "documentation" word-prop [
+        "\n" split [ "#!" swap append comment. t newline ] each
+    ] when* ;
 
-: prettyprint-; \ ; unparse. terpri ;
+: see-body ( quot word -- )
+    dup definer. <block dup documentation. swap pprint-elements
+    \ ; pprint-object declarations. block> ;
+
+M: compound (see)
+    dup word-def swap see-body t newline ;
 
 : method. ( word [[ class method ]] -- )
-    uncons >r >r >r prettyprint-M: r> r> unparse. bl unparse. bl
-    dup prettyprint-newline r> prettyprint-elements
-    prettyprint-; drop ;
+    <block
+    \ M: pprint-object bl
+    unswons pprint-object bl
+    swap pprint-object t newline
+    pprint-elements \ ; pprint-object
+    block> t newline ;
 
-M: generic (see) ( word -- )
-    tab-size get dup indent [
-        one-line on
-        over "picker" word-prop prettyprint* bl
-        over "combination" word-prop prettyprint* bl
-    ] with-scope
-    drop
-    \ ; unparse.
-    dup prettyprint-plist
-    terpri
+M: generic (see)
+    <block
+    dup dup { "picker" "combination" } [ word-prop ] map-with
+    swap see-body block> t newline
     dup methods [ method. ] each-with ;
 
-M: word (see) drop ;
-
-GENERIC: class.
-
-M: union class.
-    \ UNION: unparse. bl
-    dup unparse. bl
-    0 swap "members" word-prop prettyprint-elements drop
-    prettyprint-; ;
-
-M: complement class.
-    \ COMPLEMENT: unparse. bl
-    dup unparse. bl
-    "complement" word-prop unparse. terpri ;
-
-M: predicate class.
-    \ PREDICATE: unparse. bl
-    dup "superclass" word-prop unparse. bl
-    dup unparse. bl
-    tab-size get dup prettyprint-newline swap
-    "definition" word-prop prettyprint-elements drop
-    prettyprint-; ;
-
-M: tuple-class class.
-    \ TUPLE: unparse. bl
-    dup unparse. bl
-    "slot-names" word-prop [ write bl ] each
-    prettyprint-; ;
-
-M: word class. drop ;
-
 : see ( word -- )
-    dup prettyprint-IN: dup definer.
-    dup stack-effect. terpri dup (see) class. ;
-
-: methods. ( class -- )
-    #! List all methods implemented for this class.
-    dup class.
-    dup implementors [
-        dup prettyprint-IN:
-        [ "methods" word-prop hash* ] keep swap method.
-    ] each-with ;
+    [ dup in. (see) ] with-pprint ;
