@@ -11,6 +11,7 @@ parser sequences strings styles unparser vectors words ;
 ! - out of memory when printing global namespace
 ! - formatting HTML code
 ! - limit strings
+! - merge unparse into this
 
 ! State
 SYMBOL: column

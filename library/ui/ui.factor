@@ -10,9 +10,7 @@ prettyprint sdl sequences styles threads words ;
 SYMBOL: stack-display
 
 : ui.s ( -- )
-    stack-display get dup pane-clear [
-        datastack reverse [ unparse. terpri ] each
-    ] with-stream* ;
+    stack-display get dup pane-clear [ .s ] with-stream* ;
 
 : init-world
     global [
@@ -30,13 +28,13 @@ SYMBOL: stack-display
             [[ font-style plain ]]
         }} world get set-gadget-paint
         
-        { 1024 768 0 } world get set-gadget-dim
+        { 640 768 0 } world get set-gadget-dim
         
         <plain-gadget> add-layer
     
         <pane> dup pane set <scroller>
         <pane> dup stack-display set <scroller>
-        3/4 <y-splitter> add-layer
+        3/4 <x-splitter> add-layer
         
         [
             pane get [

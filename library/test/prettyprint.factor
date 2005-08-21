@@ -1,5 +1,5 @@
 IN: temporary
-USING: io kernel math sequences test xp ;
+USING: io kernel lists math prettyprint sequences test words ;
 
 [ "4" ] [ 4 pprint>string ] unit-test
 [ "1.0" ] [ 1.0 pprint>string ] unit-test
@@ -39,3 +39,13 @@ unit-test
 
 [ "IN: temporary\n: foo dup * ; inline\n" ]
 [ [ \ foo see ] string-out ] unit-test
+
+[ ] [ \ fixnum see ] unit-test
+
+[ ] [ \ integer see ] unit-test
+
+[ ] [ \ general-t see ] unit-test
+
+[ ] [ \ compound see ] unit-test
+
+[ ] [ \ pprinter see ] unit-test

@@ -1,8 +1,6 @@
 - flushing optimization
 - new prettyprinter
   - reader syntax for arrays, byte arrays, displaced aliens
-  - print parsing words in bold
-  - unify unparse and prettyprint
 - split, group: return vectors
 - sleep word
 
