@@ -244,17 +244,22 @@ M: wrapper pprint* ( wrapper -- )
 : pprint>string ( object -- string )
     [ pprint ] string-out ;
 
-: pp ( obj -- ) pprint terpri ;
+: . ( obj -- ) pprint terpri ;
 
-: . ( obj -- )
-    [ 2 nesting-limit set 100 length-limit set pp ] with-scope ;
+: pprint-short ( object -- string )
+    [
+        1 line-limit set
+        5 length-limit set
+        2 nesting-limit set
+        pprint
+    ] with-scope ;
+
+: pprint>short-string ( object -- string )
+    [ pprint-short ] string-out ;
 
 : [.] ( sequence -- )
     #! Unparse each element on its own line.
-    [
-        1 line-limit set 10 length-limit set
-        [ pp ] each
-    ] with-scope ;
+    [ [ pprint>short-string print ] each ] with-scope ;
 
 : stack. reverse-slice [.] ;
 

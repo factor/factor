@@ -15,9 +15,7 @@ M: object sheet ( obj -- sheet )
     tuck [ execute ] map-with
     2list ;
 
-PREDICATE: list nonvoid cons? ;
-
-M: nonvoid sheet unit ;
+M: list sheet unit ;
 
 M: vector sheet unit ;
 
@@ -26,7 +24,7 @@ M: array sheet unit ;
 M: hashtable sheet dup hash-keys swap hash-values 2list ;
 
 : format-column ( list -- list )
-    [ unparse ] map
+    [ pprint>short-string ] map
     [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
@@ -45,7 +43,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2list ;
             "This is an orphan not part of the dictionary." print
             "It claims to belong to the " write
         ] ifte
-        word-vocabulary unparse write " vocabulary." print
+        word-vocabulary pprint " vocabulary." print
     ] [
         drop
         "The word is a uniquely generated symbol." print
@@ -65,7 +63,7 @@ M: object extra-banner ( obj -- ) drop ;
 : inspect-banner ( obj -- )
     "You are looking at an instance of the " write dup class pprint
     " class:" print
-    "  " write dup pp
+    "  " write dup pprint-short terpri
     "It takes up " write dup size pprint " bytes of memory." print
     extra-banner ;
 

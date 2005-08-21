@@ -17,8 +17,8 @@ vectors words ;
 : type-check-error. ( list -- )
     "Type check error" print
     uncons car dup "Object: " write .
-    "Object type: " write class pp
-    "Expected type: " write type>class pp ;
+    "Object type: " write class .
+    "Expected type: " write type>class . ;
 
 : float-format-error. ( list -- )
     "Invalid floating point literal format: " write . ;

@@ -82,4 +82,4 @@ M: #entry node>quot ( ? node -- ) "#entry" comment, ;
 : dataflow. ( quot ? -- )
     #! Print dataflow IR for a quotation. Flag indicates if
     #! annotations should be printed or not.
-    >r dataflow optimize r> dataflow>quot pp ;
+    >r dataflow optimize r> dataflow>quot . ;
