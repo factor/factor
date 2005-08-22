@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien assembler command-line compiler errors generic
-hashtables io kernel lists memory namespaces parser sequences words ;
+USING: alien assembler command-line compiler compiler-backend
+errors generic hashtables io io-internals kernel lists math
+memory namespaces parser sequences words ;
 
 : pull-in ( ? list -- )
     swap [
@@ -32,4 +33,148 @@ cpu "ppc" = [
     "/library/compiler/ppc/alien.factor"
 ] pull-in
 
-"/library/bootstrap/boot-stage3.factor" run-resource
+"Compiling base..." print
+
+"statically-linked" get [
+    unix? [
+        "sdl"      "libSDL.so"     "cdecl"    add-library
+        "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library
+        "sdl-ttf"  "libSDL_ttf.so" "cdecl"    add-library
+    ] when
+    
+    win32? [
+        "kernel32" "kernel32.dll"  "stdcall"  add-library
+        "user32"   "user32.dll"    "stdcall"  add-library
+        "gdi32"    "gdi32.dll"     "stdcall"  add-library
+        "winsock"  "ws2_32.dll"    "stdcall"  add-library
+        "mswsock"  "mswsock.dll"   "stdcall"  add-library
+        "libc"     "msvcrt.dll"    "cdecl"    add-library
+        "sdl"      "SDL.dll"       "cdecl"    add-library
+        "sdl-gfx"  "SDL_gfx.dll"   "cdecl"    add-library
+        "sdl-ttf"  "SDL_ttf.dll"   "cdecl"    add-library
+    ] when
+] unless
+
+: compile? "compile" get supported-cpu? and ;
+
+compile? [
+    \ car compile
+    \ * compile
+    \ = compile
+    \ string>number compile
+    \ number>string compile
+    \ scan compile
+    \ (generate) compile
+] when
+
+"Loading more library code..." print
+
+t [
+    "/library/alien/malloc.factor"
+    "/library/io/buffer.factor"
+
+    "/library/math/constants.factor"
+    "/library/math/pow.factor"
+    "/library/math/trig-hyp.factor"
+    "/library/math/arc-trig-hyp.factor"
+    "/library/math/random.factor"
+
+    "/library/in-thread.factor"
+
+    "/library/io/directories.factor"
+    "/library/io/binary.factor"
+    
+    "/library/eval-catch.factor"
+    "/library/tools/listener.factor"
+    "/library/tools/word-tools.factor"
+    "/library/syntax/see.factor"
+    "/library/test/test.factor"
+    "/library/tools/walker.factor"
+    "/library/tools/annotations.factor"
+    "/library/tools/inspector.factor"
+    "/library/bootstrap/image.factor"
+    
+    "/library/io/logging.factor"
+
+    "/library/tools/telnetd.factor"
+    "/library/tools/jedit.factor"
+
+    "/library/httpd/load.factor"
+    "/library/sdl/load.factor"
+    "/library/ui/load.factor"
+    "/library/help/tutorial.factor"
+] pull-in
+
+compile? [
+    unix? [
+        "/library/unix/types.factor"
+    ] pull-in
+
+    os "freebsd" = [
+        "/library/unix/syscalls-freebsd.factor"
+    ] pull-in
+
+    os "linux" = [
+        "/library/unix/syscalls-linux.factor"
+    ] pull-in
+
+    os "macosx" = [
+        "/library/unix/syscalls-macosx.factor"
+    ] pull-in
+    
+    unix? [
+        "/library/unix/syscalls.factor"
+        "/library/unix/io.factor"
+        "/library/unix/sockets.factor"
+        "/library/unix/files.factor"
+    ] pull-in
+    
+    os "win32" = [
+        "/library/win32/win32-io.factor"
+        "/library/win32/win32-errors.factor"
+        "/library/win32/winsock.factor"
+        "/library/win32/win32-io-internals.factor"
+        "/library/win32/win32-stream.factor"
+        "/library/win32/win32-server.factor"
+        "/library/bootstrap/win32-io.factor"
+    ] pull-in
+] when
+
+"Building cross-reference database..." print
+recrossref
+
+compile? [
+    "Compiling system..." print
+    compile-all
+    terpri
+    "Unless you're working on the compiler, ignore the errors above." print
+    "Not every word compiles, by design." print
+    terpri
+    "Initializing native I/O..." print
+    init-io
+] when
+
+[
+    boot
+    run-user-init
+    "shell" get [ "shells" ] search execute
+    0 exit
+] set-boot
+
+0 [ compiled? [ 1 + ] when ] each-word
+number>string write " words compiled" print
+
+0 [ drop 1 + ] each-word
+number>string write " words total" print 
+
+"Total bootstrap GC time: " write gc-time
+number>string write " ms" print
+
+"Bootstrapping is complete." print
+"Now, you can run ./f factor.image" print
+
+"factor.image" save-image
+0 exit
+
+FORGET: pull-in
+FORGET: compile?
