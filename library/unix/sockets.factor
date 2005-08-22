@@ -4,8 +4,8 @@
 ! We need to fiddle with the exact search order here, since
 ! unix-internals::accept shadows streams::accept.
 IN: io-internals
-USING: errors namespaces io threads unparser alien generic
-kernel math unix-internals ;
+USING: alien errors generic io kernel math namespaces parser
+threads unix-internals ;
 
 : <socket-stream> ( fd -- stream )
     dup f <fd-stream> ;
@@ -81,10 +81,10 @@ C: accept-task ( port -- task )
 
 : inet-ntoa ( n -- str )
     ntohl [
-        dup -24 shift HEX: ff bitand unparse % CHAR: . ,
-        dup -16 shift HEX: ff bitand unparse % CHAR: . ,
-        dup -8  shift HEX: ff bitand unparse % CHAR: . ,
-                      HEX: ff bitand unparse %
+        dup -24 shift HEX: ff bitand number>string % CHAR: . ,
+        dup -16 shift HEX: ff bitand number>string % CHAR: . ,
+        dup -8  shift HEX: ff bitand number>string % CHAR: . ,
+                      HEX: ff bitand number>string %
     ] make-string ;
 
 : do-accept ( port sockaddr fd -- )

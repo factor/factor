@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: kernel lists namespaces parser sequences io strings
-unparser words ;
+USING: io kernel lists namespaces parser prettyprint sequences
+strings unparser vectors words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -14,17 +14,17 @@ unparser words ;
 : jedit-server-info ( -- port auth )
     jedit-server-file <file-reader> [
         readln drop
-        readln str>number
-        readln str>number
+        readln string>number
+        readln string>number
     ] with-stream ;
 
 : make-jedit-request ( files params -- code )
     [
-        "EditServer.handleClient(false,false,false,null," %
-        "new String[] {" %
-        [ unparse % "," % ] each
-        "null});\n" %
-    ] make-string ;
+        "EditServer.handleClient(false,false,false,null," write
+        "new String[] {" write
+        [ pprint "," write ] each
+        "null});\n" write
+    ] string-out ;
 
 : send-jedit-request ( request -- )
     jedit-server-info swap "localhost" swap <client> [
@@ -34,11 +34,11 @@ unparser words ;
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
-    unparse "+line:" swap append 2list
+    number>string "+line:" swap append 2vector
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )
-    unit make-jedit-request send-jedit-request ;
+    1vector make-jedit-request send-jedit-request ;
 
 : jedit ( word -- )
     #! Note that line numbers here start from 1

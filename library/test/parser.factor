@@ -1,7 +1,6 @@
 IN: temporary
 USE: parser
 USE: test
-USE: unparser
 USE: lists
 USE: kernel
 USE: generic

@@ -22,7 +22,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 IN: cont-responder
 USING: http httpd math random namespaces io
-       lists strings kernel html unparser hashtables
+       lists strings kernel html hashtables
        parser generic sequences ;
 
 #! Used inside the session state of responders to indicate whether the
@@ -40,7 +40,8 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 0 9 random-int unparse % ] times ] make-string str>number 36 >base ;
+  [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] make-string
+  string>number 36 >base ;
 
 #! Name of variable holding the table of continuations.
 SYMBOL: table 

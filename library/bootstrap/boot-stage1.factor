@@ -73,7 +73,6 @@ parser prettyprint sequences io vectors words ;
         
         "/library/alien/aliens.factor"
         
-        "/library/syntax/unparser.factor"
         "/library/syntax/prettyprint.factor"
 
         "/library/tools/gensym.factor"

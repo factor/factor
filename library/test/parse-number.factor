@@ -1,9 +1,9 @@
 IN: temporary
-USING: errors kernel math parser test unparser ;
+USING: errors kernel math parser test ;
 
 : parse-number ( str -- num )
     #! Convert a string to a number; return f on error.
-    [ str>number ] [ [ drop f ] when ] catch ;
+    [ string>number ] [ [ drop f ] when ] catch ;
 
 [ f ]
 [ f parse-number ]
@@ -30,19 +30,19 @@ unit-test
 unit-test
 
 [ "100.0" ]
-[ "1.0e2" parse-number unparse ]
+[ "1.0e2" parse-number number>string ]
 unit-test
 
 [ "-100.0" ]
-[ "-1.0e2" parse-number unparse ]
+[ "-1.0e2" parse-number number>string ]
 unit-test
 
 [ "0.01" ]
-[ "1.0e-2" parse-number unparse ]
+[ "1.0e-2" parse-number number>string ]
 unit-test
 
 [ "-0.01" ]
-[ "-1.0e-2" parse-number unparse ]
+[ "-1.0e-2" parse-number number>string ]
 unit-test
 
 [ f ]
@@ -50,7 +50,7 @@ unit-test
 unit-test
 
 [ "3.14" ]
-[ "3.14" parse-number unparse ]
+[ "3.14" parse-number number>string ]
 unit-test
 
 [ f ]
@@ -62,19 +62,19 @@ unit-test
 unit-test
 
 [ "101.0" ]
-[ "1.01e2" parse-number unparse ]
+[ "1.01e2" parse-number number>string ]
 unit-test
 
 [ "-101.0" ]
-[ "-1.01e2" parse-number unparse ]
+[ "-1.01e2" parse-number number>string ]
 unit-test
 
 [ "1.01" ]
-[ "101.0e-2" parse-number unparse ]
+[ "101.0e-2" parse-number number>string ]
 unit-test
 
 [ "-1.01" ]
-[ "-101.0e-2" parse-number unparse ]
+[ "-101.0e-2" parse-number number>string ]
 unit-test
 
 [ 5 ]
@@ -106,7 +106,7 @@ unit-test
 unit-test
 
 [ "33/100" ]
-[ "66/200" parse-number unparse ]
+[ "66/200" parse-number number>string ]
 unit-test
 
 [ "12" bin> ] unit-test-fails

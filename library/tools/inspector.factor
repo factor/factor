@@ -3,7 +3,7 @@
 IN: inspector
 USING: generic hashtables io kernel kernel-internals lists math
 memory namespaces prettyprint sequences strings styles test
-unparser vectors words ;
+vectors words ;
 
 SYMBOL: inspecting
 
@@ -13,7 +13,7 @@ M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
     [ second ] map
     tuck [ execute ] map-with
-    2list ;
+    2vector ;
 
 M: list sheet unit ;
 
@@ -24,7 +24,7 @@ M: array sheet unit ;
 M: hashtable sheet dup hash-keys swap hash-values 2list ;
 
 : format-column ( list -- list )
-    [ pprint>short-string ] map
+    [ unparse-short ] map
     [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
@@ -68,9 +68,8 @@ M: object extra-banner ( obj -- ) drop ;
     extra-banner ;
 
 : describe ( obj -- )
-    sheet dup format-sheet
-    swap peek [ presented swons unit ] map
-    [ format terpri ] 2each ;
+    sheet dup format-sheet swap peek
+    [ write-object terpri ] 2each ;
 
 : inspect ( obj -- )
     dup inspecting set dup inspect-banner describe ;

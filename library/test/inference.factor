@@ -180,7 +180,7 @@ M: real iterate drop ;
 [ [ 2 1 ] ] [ [ >= ] infer ] unit-test
 [ [ 2 1 ] ] [ [ number= ] infer ] unit-test
 
-[ [ 1 1 ] ] [ [ str>number ] infer ] unit-test
+[ [ 1 1 ] ] [ [ string>number ] infer ] unit-test
 [ [ 2 1 ] ] [ [ = ] infer ] unit-test
 [ [ 1 1 ] ] [ [ get ] infer ] unit-test
 

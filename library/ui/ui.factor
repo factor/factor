@@ -28,13 +28,13 @@ SYMBOL: stack-display
             [[ font-style plain ]]
         }} world get set-gadget-paint
         
-        { 640 768 0 } world get set-gadget-dim
+        { 700 800 0 } world get set-gadget-dim
         
         <plain-gadget> add-layer
     
         <pane> dup pane set <scroller>
         <pane> dup stack-display set <scroller>
-        3/4 <x-splitter> add-layer
+        5/6 <x-splitter> add-layer
         
         [
             pane get [

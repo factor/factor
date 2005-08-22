@@ -62,7 +62,7 @@ SYMBOL: responders
 
 : read-post-request ( header -- alist )
     "Content-Length" swap assoc dup
-    [ str>number read query>alist ] when ;
+    [ string>number read query>alist ] when ;
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [

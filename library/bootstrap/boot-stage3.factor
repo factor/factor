@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
 compiler-frontend inference io-internals kernel lists math
-namespaces parser sequences io unparser words ;
+namespaces parser sequences io words ;
 
 "Compiling base..." print
 
@@ -36,7 +36,8 @@ compile? [
     \ car compile
     \ * compile
     \ = compile
-    \ unparse compile
+    \ string>number compile
+    \ number>string compile
     \ scan compile
     \ (generate) compile
 ] when

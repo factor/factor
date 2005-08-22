@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: listener
 USING: errors io kernel lists math memory namespaces parser
-presentation sequences strings styles unparser vectors words ;
+presentation sequences strings styles vectors words ;
 
 SYMBOL: listener-prompt
 SYMBOL: quit-flag

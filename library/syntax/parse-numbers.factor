@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: errors generic kernel math sequences strings ;
+USING: errors generic kernel math namespaces sequences strings ;
 
 ! Number parsing
 
@@ -28,19 +28,62 @@ M: object digit> not-a-number ;
     #! conversion fails.
     swap "-" ?head [ (base>) neg ] [ (base>) ] ifte ;
 
-GENERIC: str>number ( str -- num )
+GENERIC: string>number ( str -- num )
 
-M: string str>number 10 base> ;
+M: string string>number 10 base> ;
 
 PREDICATE: string potential-ratio CHAR: / swap member? ;
-M: potential-ratio str>number ( str -- num )
+M: potential-ratio string>number ( str -- num )
     "/" split1 >r 10 base> r> 10 base> / ;
 
 PREDICATE: string potential-float CHAR: . swap member? ;
-M: potential-float str>number ( str -- num )
+M: potential-float string>number ( str -- num )
     str>float ;
 
 : bin> 2 base> ;
 : oct> 8 base> ;
-: dec> 10 base> ;
 : hex> 16 base> ;
+
+GENERIC: number>string ( str -- num )
+
+: >digit ( n -- ch )
+    dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
+
+: integer, ( num radix -- )
+    dup >r /mod >digit , dup 0 > [
+        r> integer,
+    ] [
+        r> 2drop
+    ] ifte ;
+
+: >base ( num radix -- string )
+    #! Convert a number to a string in a certain base.
+    [
+        over 0 < [
+            swap neg swap integer, CHAR: - ,
+        ] [
+            integer,
+        ] ifte
+    ] make-rstring ;
+
+: >bin ( num -- string ) 2 >base ;
+: >oct ( num -- string ) 8 >base ;
+: >hex ( num -- string ) 16 >base ;
+
+M: integer number>string ( obj -- str ) 10 >base ;
+
+M: ratio number>string ( num -- str )
+    [
+        dup
+        numerator number>string %
+        CHAR: / ,
+        denominator number>string %
+    ] make-string ;
+
+: fix-float ( str -- str )
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    CHAR: . over member? [ ".0" append ] unless ;
+
+M: float number>string ( float -- str )
+    (unparse-float) fix-float ;

@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
 USING: hashtables kernel lists namespaces presentation sequences
-strings styles unparser ;
+strings styles ;
 
 ! Hyperlinked directory listings.
 

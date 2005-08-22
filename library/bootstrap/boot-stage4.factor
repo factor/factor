@@ -3,8 +3,7 @@
 IN: kernel
 USING: alien assembler command-line compiler console errors
 generic inference kernel-internals listener lists math memory
-namespaces parser presentation prettyprint random io
-unparser words ;
+namespaces parser presentation prettyprint random io words ;
 
 "Bootstrap stage 4..." print
 
@@ -37,12 +36,13 @@ terpri
 terpri
 
 0 [ compiled? [ 1 + ] when ] each-word
-unparse write " words compiled" print
+number>string write " words compiled" print
 
 0 [ drop 1 + ] each-word
-unparse write " words total" print 
+number>string write " words total" print 
 
-"Total bootstrap GC time: " write gc-time unparse write " ms" print
+"Total bootstrap GC time: " write gc-time
+number>string write " ms" print
 
 "Bootstrapping is complete." print
 "Now, you can run ./f factor.image" print

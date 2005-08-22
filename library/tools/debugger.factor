@@ -2,8 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
 USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint sequences io strings unparser
-vectors words ;
+parser prettyprint sequences io strings vectors words ;
 
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
@@ -76,7 +75,7 @@ M: no-math-method error. ( error -- )
     "Parsing " write
     dup parse-error-file [ "<interactive>" ] unless* write
     ":" write
-    dup parse-error-line [ 1 ] unless* unparse print
+    dup parse-error-line [ 1 ] unless* number>string print
     
     dup parse-error-text dup string? [ print ] [ drop ] ifte
     

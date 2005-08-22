@@ -24,7 +24,7 @@ USING: errors listener kernel namespaces io threads parser ;
 IN: shells
 
 : telnet
-    "telnetd-port" get str>number telnetd ;
+    "telnetd-port" get string>number telnetd ;
 
-! This is a string since we str>number it above.
+! This is a string since we string>number it above.
 global [ "9999" "telnetd-port" set ] bind

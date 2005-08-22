@@ -2,8 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
 USING: generic inspector lists kernel namespaces
-prettyprint io strings sequences unparser math
-hashtables parser ;
+prettyprint io strings sequences math hashtables parser ;
 
 : vocab-apropos ( substring vocab -- list )
     #! Push a list of all words in a vocabulary whose names

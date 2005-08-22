@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
 USING: errors generic interpreter io kernel lists math
-namespaces prettyprint sequences strings unparser vectors words ;
+namespaces parser prettyprint sequences strings vectors words ;
 
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
@@ -112,7 +112,7 @@ M: wrapper apply-object wrapped apply-literal ;
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
     meta-r get empty? [
-        "Word leaves " meta-r get length unparse
+        "Word leaves " meta-r get length number>string
         " element(s) on return stack. Check >r/r> usage." append3
         inference-error
     ] unless ;

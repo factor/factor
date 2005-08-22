@@ -14,11 +14,12 @@ USING: errors generic kernel lists namespaces strings styles ;
 : terpri ( -- )              stdio get stream-terpri ;
 : close  ( -- )              stdio get stream-close ;
 
-: crlf   ( -- )              "\r\n" write ;
-
 : write-icon ( resource -- )
     #! Write an icon. Eg, /library/icons/File.png
     icon swons unit "" swap format ;
+
+: write-object ( string object -- )
+    presented swons unit format ;
 
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happens.

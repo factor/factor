@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler errors generic
-hashtables io kernel lists memory namespaces parser sequences
-unparser words ;
+hashtables io kernel lists memory namespaces parser sequences words ;
 
 : pull-in ( ? list -- )
     swap [

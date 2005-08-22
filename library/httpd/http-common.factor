@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov
 IN: http
 USING: errors kernel lists math namespaces parser sequences
-io strings unparser ;
+io strings ;
 
 : header-line ( alist line -- alist )
     ": " split1 dup [ cons swons ] [ 2drop ] ifte ;

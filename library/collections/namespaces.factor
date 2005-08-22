@@ -65,10 +65,6 @@ strings vectors words ;
 
 : set ( value variable -- ) namespace set-hash ;
 
-: on ( var -- ) t swap set ;
-
-: off ( var -- ) f swap set ;
-
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
@@ -79,6 +75,14 @@ strings vectors words ;
     #! stack. The set the variable to the return value of the
     #! quotation.
     >r dup get r> rot slip set ; inline
+
+: on ( var -- ) t swap set ; inline
+
+: off ( var -- ) f swap set ; inline
+
+: inc ( var -- ) [ 1 + ] change ; inline
+
+: dec ( var -- ) [ 1 - ] change ; inline
 
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.

@@ -44,7 +44,7 @@ vocabularies get [
     { ">float" "math"                       }
     { "(fraction>)" "math-internals"        }
     { "str>float" "parser"                  }
-    { "(unparse-float)" "unparser"          }
+    { "(unparse-float)" "parser"            }
     { "float>bits" "math"                   }
     { "double>bits" "math"                  }
     { "bits>float" "math"                   }

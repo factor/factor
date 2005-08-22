@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: kernel namespaces io sequences strings unparser ;
+USING: io kernel namespaces parser sequences strings ;
 
 ! A simple logging framework.
 SYMBOL: log-stream
@@ -21,7 +21,7 @@ SYMBOL: log-stream
         "Accepted connection from " %
         dup client-stream-host %
         CHAR: : ,
-        client-stream-port unparse % 
+        client-stream-port number>string % 
     ] make-string log ;
 
 : with-log-file ( file quot -- )

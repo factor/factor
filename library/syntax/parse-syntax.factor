@@ -4,7 +4,7 @@
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
 USING: alien errors generic hashtables kernel lists math
-namespaces parser sequences strings syntax unparse vectors
+namespaces parser sequences strings syntax vectors
 words ;
 
 : parsing ( -- )

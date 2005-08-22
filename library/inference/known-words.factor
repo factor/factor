@@ -1,7 +1,7 @@
 IN: inference
 USING: alien assembler errors generic hashtables interpreter io
 io-internals kernel kernel-internals lists math math-internals
-memory parser sequences strings unparser vectors words ;
+memory parser sequences strings vectors words prettyprint ;
 
 ! Primitive combinators
 \ call [

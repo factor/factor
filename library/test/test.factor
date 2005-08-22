@@ -2,7 +2,7 @@
 
 IN: test
 USING: errors kernel lists math memory namespaces parser
-prettyprint sequences io strings unparser vectors words ;
+prettyprint sequences io strings vectors words ;
 
 TUPLE: assert got expect ;
 
@@ -22,7 +22,8 @@ M: assert error.
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
     [
-        unparse % " ms run / " % unparse % " ms GC time" %
+        number>string % " ms run / " %
+        number>string % " ms GC time" %
     ] make-string print ;
 
 : unit-test ( output input -- )
@@ -79,7 +80,7 @@ SYMBOL: failures
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
         "parse-number" "init" "io/io"
-        "listener" "vectors" "words" "unparser" "random"
+        "listener" "vectors" "words" "prettyprint" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational" "math/integer"

@@ -1,5 +1,5 @@
 IN: temporary
-USING: kernel math test unparser ;
+USING: kernel math prettyprint test ;
 
 [ "-8" ] [ -8 unparse ] unit-test
 

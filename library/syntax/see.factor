@@ -5,8 +5,7 @@ USING: generic hashtables io kernel lists namespaces sequences
 styles words ;
 
 : declaration. ( word prop -- )
-    tuck word-name word-prop
-    [ bl pprint-object ] [ drop ] ifte ;
+    tuck word-name word-prop [ bl pprint-word ] [ drop ] ifte ;
 
 : declarations. ( word -- )
     [
@@ -19,11 +18,16 @@ styles words ;
 : comment. ( comment -- )
     [ [[ font-style italic ]] ] text ;
 
-: stack-picture ( seq -- string )
-    [ [ word-name % " " % ] each ] make-string ;
+: stack-picture% ( seq -- string )
+    [ word-name % " " % ] each ;
 
 : effect>string ( effect -- string )
-    2unseq stack-picture >r stack-picture "-- " r> append3 ;
+    [
+        " " %
+        dup first stack-picture%
+        "-- " %
+        second stack-picture%
+    ] make-string ;
 
 : stack-effect ( word -- string )
     dup "stack-effect" word-prop [ ] [
@@ -32,15 +36,15 @@ styles words ;
     ] ?ifte ;
 
 : stack-effect. ( string -- )
-    [ bl "( " swap ")" append3 comment. ] when* ;
+    [ bl "(" swap ")" append3 comment. ] when* ;
 
 : in. ( word -- )
-    <block \ IN: pprint-object bl word-vocabulary f text block>
+    <block \ IN: pprint-word bl word-vocabulary f text block;
     t newline ;
 
 : definer. ( word -- )
-    dup definer pprint-object bl
-    dup pprint-object
+    dup definer pprint-word bl
+    dup pprint-word
     stack-effect stack-effect.
     f newline ;
 
@@ -53,27 +57,26 @@ M: word (see) definer. t newline ;
         "\n" split [ "#!" swap append comment. t newline ] each
     ] when* ;
 
-: pprint-; \ ; pprint-object ;
+: pprint-; \ ; pprint-word ;
 
 : see-body ( quot word -- )
     dup definer. <block dup documentation. swap pprint-elements
-    pprint-; declarations. block> ;
+    pprint-; declarations. block; ;
 
 M: compound (see)
     dup word-def swap see-body t newline ;
 
 : method. ( word [[ class method ]] -- )
-    <block
-    \ M: pprint-object bl
-    unswons pprint-object bl
-    swap pprint-object t newline
-    pprint-elements pprint-;
-    block> t newline ;
+    \ M: pprint-word bl
+    unswons pprint-word bl
+    swap pprint-word f newline
+    <block pprint-elements pprint-;
+    block; t newline ;
 
 M: generic (see)
     <block
     dup dup { "picker" "combination" } [ word-prop ] map-with
-    swap see-body block> t newline
+    swap see-body block; t newline
     dup methods [ method. ] each-with ;
 
 GENERIC: class. ( word -- )
@@ -81,7 +84,6 @@ GENERIC: class. ( word -- )
 : methods. ( class -- )
     #! List all methods implemented for this class.
     dup metaclass [
-        t newline
         dup implementors [
             dup in. tuck "methods" word-prop hash* method.
         ] each-with
@@ -90,28 +92,28 @@ GENERIC: class. ( word -- )
     ] ifte ;
 
 M: union class.
-    \ UNION: pprint-object bl
-    dup pprint-object bl
-    "members" word-prop pprint-elements pprint-; ;
+    \ UNION: pprint-word bl
+    dup pprint-word bl
+    "members" word-prop pprint-elements pprint-; t newline ;
 
 M: complement class.
-    \ COMPLEMENT: pprint-object bl
-    dup pprint-object bl
-    "complement" word-prop pprint-object ;
+    \ COMPLEMENT: pprint-word bl
+    dup pprint-word bl
+    "complement" word-prop pprint-word t newline ;
 
 M: predicate class.
-    \ PREDICATE: pprint-object bl
-    dup "superclass" word-prop pprint-object bl
-    dup pprint-object f newline
+    \ PREDICATE: pprint-word bl
+    dup "superclass" word-prop pprint-word bl
+    dup pprint-word f newline
     <block
     "definition" word-prop pprint-elements
-    pprint-; block> ;
+    pprint-; block; t newline ;
 
 M: tuple-class class.
-    \ TUPLE: pprint-object bl
-    dup pprint-object bl
+    \ TUPLE: pprint-word bl
+    dup pprint-word bl
     "slot-names" word-prop [ f text bl ] each
-    pprint-; ;
+    pprint-; t newline ;
 
 M: word class. drop ;
 

@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic hashtables kernel kernel-internals lists
-math namespaces prettyprint sequences io strings unparser
-vectors words ;
+USING: errors generic hashtables io kernel kernel-internals
+lists math namespaces parser prettyprint sequences strings
+unparser vectors words ;
 
 : generations 15 getenv ;
 
@@ -15,7 +15,10 @@ vectors words ;
 
 ! Printing an overview of heap usage.
 
-: kb. 1024 /i unparse 6 CHAR: \s pad-left  write " KB" write ;
+: kb.
+    1024 /i number>string
+    6 CHAR: \s pad-left  write
+    " KB" write ;
 
 : (room.) ( free total -- )
     2dup swap - swap ( free used total )
@@ -26,7 +29,7 @@ vectors words ;
 : room. ( -- )
     room
     0 swap [
-        "Generation " write over unparse write ":" write
+        "Generation " write over pprint ":" write
         uncons (room.) 1 +
     ] each drop
     "Semi-space:  " write kb. terpri
@@ -92,8 +95,8 @@ M: object each-slot ( obj quot -- )
         3drop
     ] [
         rot type>class word-name write ": " write
-        unparse write " bytes, " write
-        unparse write " instances" print
+        pprint " bytes, " write
+        pprint " instances" print
     ] ifte ;
 
 : heap-stats. ( -- )

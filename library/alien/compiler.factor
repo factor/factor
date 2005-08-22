@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
-errors generic hashtables inference kernel lists math namespaces
-sequences io strings unparser words ;
+errors generic hashtables inference io kernel lists math
+namespaces prettyprint sequences strings words ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -93,7 +93,7 @@ C: alien-node make-node ;
 
 : incr-param ( reg-class -- )
     #! OS X is so ugly.
-    dup class [ 1 + ] change  dup float-regs? [
+    dup class inc  dup float-regs? [
         os "macosx" = [
             int-regs [ swap float-regs-size 4 / + ] change
         ] [

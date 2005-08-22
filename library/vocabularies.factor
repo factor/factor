@@ -88,5 +88,5 @@ SYMBOL: vocabularies
         "jedit" "kernel" "listener" "lists" "math" "matrices"
         "memory" "namespaces" "parser" "prettyprint"
         "sequences" "io" "strings" "styles" "syntax" "test"
-        "threads" "unparser" "vectors" "words" "scratchpad"
+        "threads" "vectors" "words" "scratchpad"
     ] "use" set ;

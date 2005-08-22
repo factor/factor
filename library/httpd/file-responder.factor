@@ -2,14 +2,14 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: file-responder
 USING: html httpd kernel lists namespaces parser sequences
-io strings unparser ;
+io strings ;
 
 : serving-path ( filename -- filename )
     [ "" ] unless* "doc-root" get swap append ;
 
 : file-response ( mime-type length -- )
     [
-        unparse "Content-Length" swons ,
+        number>string "Content-Length" swons ,
         "Content-Type" swons ,
     ] make-list "200 OK" response terpri ;
 

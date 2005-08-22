@@ -14,7 +14,7 @@ USING: kernel lists math parser words ;
     #! END-ENUM
     #!
     #! This is the same as : x 0 ; : y 1 ; : z 2 ;.
-    scan str>number ; parsing
+    scan string>number ; parsing
 
 : ENUM:
     dup CREATE swap unit define-compound 1 + ; parsing

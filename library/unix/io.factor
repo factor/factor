@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
-USING: alien assembler errors generic hashtables kernel
-kernel-internals lists math sequences io strings threads
-unix-internals unparser vectors ;
+USING: alien assembler errors generic hashtables io kernel
+kernel-internals lists math parser sequences strings threads
+unix-internals vectors ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -79,7 +79,7 @@ M: port set-timeout ( timeout port -- )
 : report-error ( error port -- )
     [
         "Error on fd " %
-        dup port-handle unparse %
+        dup port-handle number>string %
         ": " % swap %
     ] make-string swap set-port-error ;
 
