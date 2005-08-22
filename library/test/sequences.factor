@@ -1,5 +1,6 @@
 IN: temporary
-USING: kernel lists math sequences strings test vectors ;
+USING: kernel lists math sequences sorting-internals strings
+test vectors ;
 
 [ { 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
@@ -113,6 +114,50 @@ unit-test
 [ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
 [ f ] [ [ ] [ 1 2 3 ] sequence= ] unit-test
 
+[ { 1 3 2 4 } ] [ { 1 2 3 4 } clone 1 2 pick exchange ] unit-test
+
+[ 3 ] [ { 1 2 3 4 } midpoint ] unit-test
+
+: seq-sorter 0 over length 1 - <sorter> ;
+
+[ { 4 2 3 1 } ]
+[ { 1 2 3 4 } clone dup seq-sorter sorter-exchange ] unit-test
+
+[ -1 ] [ [ - ] { 1 2 3 4 } seq-sorter 1 compare ] unit-test
+
+[ 1 ] [ [ - ] { -5 4 -3 5 } seq-sorter sort-up sorter-start nip ] unit-test
+
+[ 3 ] [ [ - ] { -5 4 -3 -6 5 } seq-sorter sort-down sorter-end nip ] unit-test
+
+[ { 1 2 3 4 5 6 7 8 9 } ] [
+    [ - ] { 9 8 7 6 5 4 3 2 1 } clone seq-sorter sort-step
+    sorter-seq >vector nip
+] unit-test
+
+[ { 1 2 3 4 5 6 7 8 9 } ] [
+    [ - ] { 1 2 3 4 5 6 7 8 9 } clone seq-sorter sort-step
+    sorter-seq >vector nip
+] unit-test
+
 [ [ ] ] [ [ ] [ - ] sort ] unit-test
-[ [ "2 + 2" ] ] [ [ "2 + 2" ] [ lexi ] sort ] unit-test
-[ [ 1 2 3 4 5 6 7 ] ] [ [ 6 4 5 7 2 1 3 ] [ - ] sort ] unit-test
+
+: pairs ( seq quot -- )
+    swap dup length 1 - [
+        [ 2dup 1 + swap nth >r swap nth r> rot call ] 3keep
+    ] repeat 2drop ;
+
+: map-pairs ( seq quot -- seq | quot: elt -- elt )
+    over [
+        length 1 - <vector> rot
+        [ 2swap [ slip push ] 2keep ] pairs nip
+    ] keep like ; inline
+    
+: sorted? ( seq quot -- ? )
+    map-pairs [ 0 <= ] all? ;
+
+[ t ] [
+    10 [
+        drop
+        1000 [ drop 0 1000 random-int ] map [ - ] sort [ - ] sorted?
+    ] all?
+] unit-test

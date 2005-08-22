@@ -221,6 +221,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Longest sequence length in a sequence of sequences.
     0 [ length max ] reduce ; flushable
 
+: exchange ( n n seq -- )
+    [ tuck nth >r nth r> ] 3keep tuck
+    >r >r set-nth r> r> set-nth ;
+
 IN: kernel
 
 : depth ( -- n )

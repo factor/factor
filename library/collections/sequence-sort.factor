@@ -1,105 +1,59 @@
 IN: sorting-internals
 USING: kernel math sequences ;
 
-TUPLE: iterator n seq ;
+: midpoint ( seq -- elt ) dup length 2 /i swap nth ; inline
 
-: >iterator< dup iterator-n swap iterator-seq ;
+TUPLE: sorter seq start end mid ;
 
-: forward ( iterator -- ) dup iterator-n 1 + swap set-iterator-n ;
+C: sorter ( seq start end -- sorter )
+    [ >r 1 + rot <slice> r> set-sorter-seq ] keep
+    dup sorter-seq midpoint over set-sorter-mid
+    dup sorter-seq length 1 - over set-sorter-end
+    0 over set-sorter-start ;
 
-: backward ( iterator -- ) dup iterator-n 1 - swap set-iterator-n ;
+: s*/e* dup sorter-start swap sorter-end ;
+: s*/e dup sorter-start swap sorter-seq length 1 - ;
+: s/e* 0 swap sorter-end ;
+: sorter-exchange dup s*/e* rot sorter-seq exchange ;
+: compare over sorter-seq nth swap sorter-mid rot call ; inline
+: >start> dup sorter-start 1 + swap set-sorter-start ;
+: <end< dup sorter-end 1 - swap set-sorter-end ;
 
-: current ( iterator -- elt ) >iterator< nth ;
+: sort-up ( quot sorter -- quot sorter )
+    dup s*/e < [
+        [ dup sorter-start compare 0 < ] 2keep rot
+        [ dup >start> sort-up ] when 
+    ] when ; inline
 
-: set-current ( elt iterator -- ) >iterator< set-nth ;
+: sort-down ( quot sorter -- quot sorter )
+    dup s/e* <= [
+        [ dup sorter-end compare 0 > ] 2keep rot
+        [ dup <end< sort-down ] when
+    ] when ; inline
 
-: exchange ( iterator iterator -- )
-    #! Exchange elements pointed at by two iterators.
-    over current over current
-    >r swap set-current r> swap set-current ;
+: sort-step ( quot sorter -- quot sorter )
+    dup s*/e* <= [
+        sort-up sort-down dup s*/e* <= [
+            dup sorter-exchange dup >start> dup <end< sort-step
+        ] when
+    ] when ; inline
 
-: iterators ( iterator iterator -- n n )
-    >r iterator-n r> iterator-n ;
+DEFER: (nsort)
 
-: midpoint ( iterator iterator -- elt )
-    #! Both iterators must point at the same collection.
-    [ iterators + 2 /i ] keep iterator-seq nth ;
-
-TUPLE: partition start start* end end* mid ;
-
-C: partition ( start end -- partition )
-    >r 2dup 2dup r>
-    [ >r midpoint r> set-partition-mid ] keep
-    [ set-partition-end ] keep
-    [ set-partition-start ] keep
-    [ >r clone r> set-partition-end* ] keep
-    [ >r clone r> set-partition-start* ] keep ; inline
-
-: s/e dup partition-start swap partition-end ; inline
-: s*/e dup partition-start* swap partition-end ; inline
-: s/e* dup partition-start swap partition-end* ; inline
-: s*/e* dup partition-start* swap partition-end* ; inline
-
-: seq-partition ( seq -- partition )
-    0 over <iterator> swap dup length 1 - swap <iterator>
-    <partition> ; inline
-
-: compare-step ( quot partition iter -- n )
-    current swap partition-mid rot call ; inline
-
-: partition< ( quot partition -- ? )
-    dup s*/e iterators <
-    [ dup partition-start* compare-step 0 < ]
-    [ 2drop f ] ifte ; inline
-
-: partition> ( quot partition -- ? )
-    dup s/e* iterators <=
-    [ dup partition-end* compare-step 0 > ]
-    [ 2drop f ] ifte ; inline
-
-: sort-up ( quot partition -- )
-    [ partition< ] 2keep rot
-    [ dup partition-start* forward sort-up ] [ 2drop ] ifte ;
-    inline
-
-: sort-down ( quot partition -- )
-    [ partition> ] 2keep rot
-    [ dup partition-end* backward sort-down ] [ 2drop ] ifte ;
-    inline
-
-: keep-sorting? ( partition -- ? ) s*/e* iterators <= ; inline
-
-: sort-step ( quot partition -- )
-    dup keep-sorting? [
-        2dup sort-up 2dup sort-down dup keep-sorting?
-        [ dup s*/e* 2dup exchange backward forward sort-step ]
-        [ 2drop ] ifte
+: (nsort) ( quot seq start end -- )
+    2dup < [
+        <sorter> sort-step
+        [ dup sorter-seq swap s/e* (nsort) ] 2keep
+        [ dup sorter-seq swap s*/e (nsort) ] 2keep
     ] [
         2drop
-    ] ifte ; inline
-
-: left ( partition -- partition )
-    dup s/e* iterators < [ s/e* <partition> ] [ drop f ] ifte ;
-    inline
-
-: right ( partition -- partition )
-    dup s*/e iterators < [ s*/e <partition> ] [ drop f ] ifte ;
-    inline
-
-: (nsort) ( quot partition -- )
-    dup keep-sorting? [
-        [ sort-step ] 2keep
-        [ left dup [ (nsort) ] [ 2drop ] ifte ] 2keep
-        right dup [ (nsort) ] [ 2drop ] ifte
-    ] [
-        2drop
-    ] ifte ; inline
+    ] ifte 2drop ; inline
 
 IN: sequences
 
 : nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
-    over empty?
-    [ 2drop ] [ swap seq-partition (nsort) ] ifte ; inline
+    swap dup empty?
+    [ 2drop ] [ 0 over length 1 - (nsort) ] ifte ; inline
 
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
