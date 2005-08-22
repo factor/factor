@@ -11,6 +11,13 @@ sequences io vectors words ;
 
 ! The make-list form creates a boot quotation
 [
+    [
+        [ hashtable? ] instances
+        [ dup hash-size 1 max swap set-bucket-count ] each
+
+        boot
+    ] %
+
     {
         "/version.factor"
 
@@ -71,8 +78,6 @@ sequences io vectors words ;
         "/library/generic/generic.factor"
         "/library/generic/standard-combination.factor"
         "/library/generic/slots.factor"
-        "/library/generic/object.factor"
-        "/library/generic/null.factor"
         "/library/generic/math-combination.factor"
         "/library/generic/predicate.factor"
         "/library/generic/union.factor"
@@ -128,16 +133,7 @@ sequences io vectors words ;
         "/library/bootstrap/init.factor"
     } [ dup print parse-resource % ] each
     
-    [
-        boot
-        
-        "Rehashing hash tables..." print
-
-        [ hashtable? ] instances
-        [ dup hash-size 1 max swap set-bucket-count ] each
-        
-        "/library/bootstrap/boot-stage2.factor" run-resource
-    ] %
+    [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
 ] make-list
 
 vocabularies get [

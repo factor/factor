@@ -85,9 +85,7 @@ M: word (uncrossref) drop ;
 ! word does when invoked.
 
 : define ( word primitive parameter -- )
-    pick uncrossref
-    pick set-word-def
-    swap set-word-primitive ;
+    pick uncrossref pick set-word-def swap set-word-primitive ;
 
 GENERIC: definer ( word -- word )
 #! Return the parsing word that defined this word.
@@ -121,7 +119,7 @@ M: compound definer drop \ : ;
 
 : reset-generic ( word -- )
     #! Make a word no longer be generic.
-    { "methods" "combination" "picker" } reset-props ;
+    { "methods" "combination" } reset-props ;
 
 : define-compound ( word def -- )
      over reset-generic (define-compound) ;

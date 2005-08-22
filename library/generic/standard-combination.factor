@@ -5,8 +5,6 @@ namespaces sequences vectors words ;
 : error-method ( picker word -- method )
     [ swap % literalize , \ no-method , ] make-list ;
 
-DEFER: delegate
-
 : empty-method ( picker word -- method )
     over [ dup ] = [
         [

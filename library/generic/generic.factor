@@ -140,5 +140,3 @@ M: generic definer drop \ G: ;
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
     dup types [ - ] sort typemap get set-hash ;
-
-typemap get [ <namespace> typemap set ] unless

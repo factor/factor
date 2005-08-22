@@ -8,11 +8,6 @@
 ! generate the minimal image, and writing the cons cells, words,
 ! strings etc to the image file in the CFactor object memory
 ! format.
-!
-! What is a bootstrap image? It basically contains enough code
-! to parse a source file. See platform/native/boot.factor --
-! It initializes the core interpreter services, and proceeds to
-! run platform/native/boot-stage2.factor.
 
 IN: image
 USING: errors generic hashtables kernel lists
@@ -24,9 +19,6 @@ SYMBOL: image
 
 ! Object cache
 SYMBOL: objects
-
-! Boot quotation, set by boot.factor
-SYMBOL: boot-quot
 
 ! Image output format
 SYMBOL: big-endian
@@ -258,8 +250,7 @@ M: hashtable ' ( hashtable -- pointer )
     ] make-hash '
     global-offset fixup ;
 
-: boot, ( quot -- )
-    boot-quot get swap append ' boot-quot-offset fixup ;
+: boot, ( quot -- ) ' boot-quot-offset fixup ;
 
 : heap-size image get length header-size - cell * ;
 
@@ -304,8 +295,8 @@ M: hashtable ' ( hashtable -- pointer )
 : make-image ( name -- )
     #! Make a bootstrap image.
     [
-        boot-quot off
         "/library/bootstrap/boot-stage1.factor" run-resource
+        namespace global [ "foobar" set ] bind
     ] with-image
 
     swap write-image ;

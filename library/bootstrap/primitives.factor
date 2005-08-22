@@ -239,10 +239,18 @@ FORGET: set-stack-effect
     define-slots
     register-builtin ;
 
-! Hack
-{{ [[ { } null ]] }} typemap set
-
+<namespace> typemap set
 num-types empty-vector builtins set
+
+! Catch-all metaclass for providing a default method.
+object num-types >vector "types" set-word-prop
+object [ drop t ] "predicate" set-word-prop
+object object define-class
+
+! Null metaclass with no instances.
+null { } "types" set-word-prop
+null [ drop f ] "predicate" set-word-prop
+null null define-class
 
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create 0 "math-priority" set-word-prop

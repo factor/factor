@@ -62,8 +62,6 @@
 
 - flushing optimization
 - compile-byte/cell: instantiating aliens
-- changing a word to be 'inline' after it was already defined doesn't
-  work properly
 - inference needs to be more robust with heavily recursive code
 - fix fixnum<< and /i overflow on PowerPC
 - simplifier:
@@ -80,7 +78,7 @@
 
 + kernel:
 
-- split, group: return vectors
+- split: return vectors
 - specialized arrays
 - clear special word props when redefining words
 - there is a problem with hashcodes of words and bootstrapping
