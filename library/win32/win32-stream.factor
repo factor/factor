@@ -156,7 +156,7 @@ M: win32-stream expire ( stream -- )
     ] bind ;
 
 C: win32-stream ( handle -- stream )
-    swap <namespace> [
+    swap [
         dup NULL GetFileSize dup -1 = not [
             file-size set
         ] [ drop f file-size set ] ifte
@@ -165,7 +165,7 @@ C: win32-stream ( handle -- stream )
         4096 <buffer> out-buffer set
         0 fileptr set 
         dup stream set
-    ] extend over set-win32-stream-this ;
+    ] make-hash over set-win32-stream-this ;
 
 : <win32-file-reader> ( path -- stream )
     t f win32-open-file <win32-stream> <line-reader> ;

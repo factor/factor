@@ -20,15 +20,13 @@ SYMBOL: interned-literals
 : compile-aligned ( n -- )
     compiled-offset cell 2 * align set-compiled-offset ; inline
 
+: add-literal ( obj -- lit# )
+    address
+    literal-top set-compiled-cell
+    literal-top dup cell + set-literal-top ;
+
 : intern-literal ( obj -- lit# )
-    dup interned-literals get hash [ ] [
-        [
-            address
-            literal-top set-compiled-cell
-            literal-top dup cell + set-literal-top
-            dup
-        ] keep interned-literals get set-hash
-    ] ?ifte ;
+    interned-literals get [ add-literal ] cache ;
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte

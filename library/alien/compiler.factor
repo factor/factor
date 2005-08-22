@@ -33,14 +33,11 @@ C: alien-error ( lib sym -- )
     [ set-alien-error-library ] keep ;
 
 M: alien-error error. ( error -- )
-    [
-        "C library interface words cannot be interpreted. " %
-        "Either the compiler is disabled, " %
-        "or the " % dup alien-error-library unparse %
-        " library does not define the " %
-        alien-error-symbol unparse %
-        " symbol." %
-    ] make-string print ;
+    "C library interface words cannot be interpreted. " write
+    "Either the compiler is disabled, " write
+    "or the " write dup alien-error-library pprint
+    " library does not define the " write
+    alien-error-symbol pprint " symbol." print ;
 
 : alien-invoke ( ... return library function parameters -- ... )
     #! Call a C library function.

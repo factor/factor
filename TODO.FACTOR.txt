@@ -1,6 +1,11 @@
++ messy code hall of shame:
+
+- alien/c-types.factor is ugly
+- compile-byte/cell: instantiating aliens
+- buffer: instantiating aliens
+
 - flushing optimization
-- new prettyprinter
-  - reader syntax for arrays, byte arrays, displaced aliens
+- reader syntax for arrays, byte arrays, displaced aliens
 - split, group: return vectors
 - sleep word
 

@@ -60,4 +60,6 @@ M: compound (compile) ( word -- )
     dup decompile compile ;
 
 : compile-1 ( quot -- word )
+    #! Compute a quotation into an uninterned word, for testing
+    #! purposes.
     gensym [ swap define-compound ] keep dup compile execute ;

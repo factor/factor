@@ -18,7 +18,8 @@ math namespaces sequences words ;
 
 : math-upgrade ( left right -- quot )
     2dup math-class< [
-        nip [ \ >r , "coercer" word-prop % \ r> , ] make-list
+        nip "coercer" word-prop
+        dup [ [ >r ] swap [ r> ] append3 ] when
     ] [
         2dup swap math-class< [
             drop "coercer" word-prop

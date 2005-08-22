@@ -45,7 +45,7 @@ SYMBOL: vocabularies
     [ vocab ?hash ] map-with [ ] find nip ;
 
 : <props> ( name vocab -- plist )
-    <namespace> [ "vocabulary" set "name" set ] extend ;
+    [ "vocabulary" set "name" set ] make-hash ;
 
 : (create) ( name vocab -- word )
     #! Create an undefined word without adding to a vocabulary.

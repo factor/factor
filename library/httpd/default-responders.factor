@@ -12,33 +12,33 @@ global [
 
     ! Runs all unit tests and dumps result to the client. This uses
     ! a lot of server resources, so disable it on a busy server.
-    <responder> [
+    [
         "test" "responder" set
         [ test-responder ] "get" set
-    ] extend add-responder
+    ] make-responder
     
     ! 404 error message pages are served by this guy
-    <responder> [
+    [
         "404" "responder" set
         [ drop no-such-responder ] "get" set
-    ] extend add-responder
+    ] make-responder
     
     ! Serves files from a directory stored in the "doc-root"
     ! variable. You can set the variable in the global namespace,
     ! or inside the responder.
-    <responder> [
+    [
         ! "/var/www/" "doc-root" set
         "file" "responder" set
         [ file-responder ] "get" set
         [ file-responder ] "post" set
         [ file-responder ] "head" set
-    ] extend add-responder
+    ] make-responder
     
     ! Serves Factor source code 
-    <responder> [
+    [
         "resource" "responder" set
         [ resource-responder ] "get" set
-    ] extend add-responder
+    ] make-responder
     
     ! Servers Factor word definitions from the image.
     "browser" [ browser-responder ] install-cont-responder

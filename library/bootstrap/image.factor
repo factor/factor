@@ -253,9 +253,9 @@ M: hashtable ' ( hashtable -- pointer )
     all-words [ emit-word ] each ;
 
 : global, ( -- )
-    <namespace> [
+    [
         { vocabularies typemap builtins } [ [ ] change ] each
-    ] extend '
+    ] make-hash '
     global-offset fixup ;
 
 : boot, ( quot -- )

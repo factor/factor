@@ -61,11 +61,11 @@ SYMBOL: history-index
     "" line-text set ;
 
 : <line-editor> ( -- editor )
-    <namespace> [
+    [
         line-clear
         100 <vector> history set
         0 history-index set
-    ] extend ;
+    ] make-hash ;
 
 : caret-insert ( str offset -- )
     #! Call this in the line editor scope.

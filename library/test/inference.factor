@@ -149,6 +149,12 @@ M: real iterate drop ;
 
 [ [ callstack ] infer simple-effect ] unit-test-fails
 
+DEFER: agent
+: smith 1 + agent ; inline
+: agent dup 0 = [ [ swap call ] 2keep [ smith ] 2keep ] when ; inline
+[ [ [ ] [ object object ] ] ]
+[ [ [ drop ] 0 agent ] infer ] unit-test
+
 ! : no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
 ! 
 ! [ [ no-base-case ] infer simple-effect ] unit-test-fails
@@ -201,27 +207,6 @@ M: real iterate drop ;
 
 [ { 0 1 } ] [ [ bad-code ] infer simple-effect ] unit-test
 
-! Type inference
-
-! [ [ [ object ] [ ] ] ] [ [ drop ] infer simple-effect ] unit-test
-! [ [ [ object ] [ object object ] ] ] [ [ dup ] infer simple-effect ] unit-test
-! [ [ [ object object ] [ cons ] ] ] [ [ cons ] infer simple-effect ] unit-test
-! [ [ [ object ] [ boolean ] ] ] [ [ dup [ drop t ] unless ] infer simple-effect ] unit-test
-! [ [ [ general-list ] [ cons ] ] ] [ [ uncons cons ] infer simple-effect ] unit-test
-
-! [ [ 5 car ] infer simple-effect ] unit-test-fails
-
-! [ [ [ number ] [ number ] ] ] [ [ dup + ] infer simple-effect ] unit-test
-! [ [ [ number number number ] [ number ] ] ] [ [ digit+ ] infer simple-effect ] unit-test
-! [ [ [ number ] [ real real ] ] ] [ [ >rect ] infer simple-effect ] unit-test
-
-! [ [ [ ] [ POSTPONE: t ] ] ] [ [ f not ] infer simple-effect ] unit-test
-! [ [ [ ] [ POSTPONE: f ] ] ] [ [ t not ] infer simple-effect ] unit-test
-! [ [ [ ] [ POSTPONE: f ] ] ] [ [ 5 not ] infer simple-effect ] unit-test
-! [ [ [ object ] [ general-t ] ] ] [ [ dup [ not ] unless ] infer simple-effect ] unit-test
-
-! [ [ [ object ] [ cons ] ] ] [ [ dup cons? [ drop [{ 1 2 }] ] unless ] infer simple-effect ] unit-test
-
 ! This form should not have a stack effect
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
 ! [ [ bad-bin ] infer simple-effect ] unit-test-fails
@@ -232,3 +217,7 @@ M: real iterate drop ;
 !     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
 ! 
 ! [ [ bad-recursion-1 ] infer simple-effect ] unit-test-fails
+
+! This hangs
+
+! [ ] [ [ [ dup call ] dup call ] infer ] unit-test-fails

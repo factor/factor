@@ -35,10 +35,7 @@ M: alien = ( obj obj -- ? )
 
 : add-library ( library name abi -- )
     "libraries" get [
-        <namespace> [
-          "abi" set
-          "name" set
-        ] extend swap set
+        [ "abi" set "name" set ] make-hash swap set
     ] bind ;
 
 : library-abi ( library -- abi )

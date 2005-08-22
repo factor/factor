@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel
-USING: assembler command-line errors io io-internals namespaces
-parser threads words ;
+IN: kernel-internals
+USING: assembler command-line errors io io-internals kernel
+namespaces parser threads words ;
 
 : boot ( -- )
     #! Initialize an interpreter with the basic services.

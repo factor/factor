@@ -93,8 +93,12 @@ SYMBOL: responders
 ! - header -- an alist of headers from the user's client
 ! - response -- an alist of the POST request response
 
-: <responder> ( -- responder )
-    <namespace> [
+: add-responder ( responder -- )
+    #! Add a responder object to the list.
+    "responder" over hash  responders get set-hash ;
+
+: make-responder ( quot -- responder )
+    [
         ( url -- )
         [
             drop "GET method not implemented" httpd-error
@@ -111,7 +115,9 @@ SYMBOL: responders
         [
             drop bad-request
         ] "bad" set
-    ] extend ;
+        
+        call
+    ] make-hash add-responder ;
 
 : vhost ( name -- responder )
     vhosts get hash [ "default" vhost ] unless* ;
@@ -160,7 +166,3 @@ SYMBOL: responders
 
 : no-such-responder ( -- )
     "404 No such responder" httpd-error ;
-
-: add-responder ( responder -- )
-    #! Add a responder object to the list.
-    "responder" over hash  responders get set-hash ;

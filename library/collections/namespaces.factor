@@ -88,18 +88,9 @@ strings vectors words ;
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
 
-: with-scope ( quot -- )
-    #! Execute a quotation with a new namespace on the
-    #! namestack.
-    <namespace> >n call n> drop ; inline
+: make-hash ( quot -- hash ) <namespace> >n call n> ; inline
 
-: extend ( namespace code -- namespace )
-    #! Used in code like this:
-    #! : <subclass>
-    #!      <superclass> [
-    #!          ....
-    #!      ] extend ;
-    over >r bind r> ; inline
+: with-scope ( quot -- ) make-hash drop ; inline
 
 ! Building sequences
 SYMBOL: building
@@ -139,28 +130,21 @@ SYMBOL: building
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer
 
-: make-hash ( quot -- hash )
-    [
-        <namespace> hash-buffer set
-        call
-        hash-buffer get
-    ] with-scope ; inline
-
-: hash, ( value key -- old )
+: closure, ( value key -- old )
     hash-buffer get [ hash swap ] 2keep set-hash ;
 
 : (closure) ( key hash -- )
     tuck hash dup [
         hash-keys [
-            dup dup hash, [
-                2drop
-            ] [
-                swap (closure)
-            ] ifte
+            dup dup closure, [ 2drop ] [ swap (closure) ] ifte
         ] each-with
     ] [
         2drop
     ] ifte ;
 
 : closure ( key hash -- list )
-    [ (closure) ] make-hash hash-keys ;
+    [
+        <namespace> hash-buffer set
+        (closure)
+        hash-buffer get hash-keys
+    ] with-scope ;

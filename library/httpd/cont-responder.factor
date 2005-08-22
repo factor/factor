@@ -301,14 +301,13 @@ SYMBOL: root-continuation
   #! Convert the quotation so it is run within a session namespace
   #! and that namespace is initialized first.
   \ init-session-namespace swons [ , \ with-scope , ] make-list
-  <responder> [ 
+  [ 
      [ cont-get/post-responder ] "get" set 
      [ cont-get/post-responder ] "post" set 
-     over "responder-name" set
-     over "responder" set
+     swap "responder" set
      reset-continuation-table 
      permanent register-continuation root-continuation set 
-   ] extend swap responders get set-hash ;
+  ] make-responder ;
 
 : responder-items ( name -- items )
   #! Return the table of continuation items for a given responder. 

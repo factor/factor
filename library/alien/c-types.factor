@@ -6,14 +6,14 @@ hashtables kernel kernel-internals lists math namespaces parser
 sequences strings words ;
 
 : <c-type> ( -- type )
-    <namespace> [
-        [ "No setter" throw ] "setter" set
-        [ "No getter" throw ] "getter" set
-        "no boxer" "boxer" set
-        "no unboxer" "unboxer" set
-        << int-regs f >> "reg-class" set
-        0 "width" set
-    ] extend ;
+    {{
+        [[ "setter" [ "No setter" throw ] ]]
+        [[ "getter" [ "No getter" throw ] ]]
+        [[ "boxer" "no boxer" ]]
+        [[ "unboxer" "no unboxer" ]]
+        [[ "reg-class" << int-regs f >> ]]
+        [[ "width" 0 ]]
+    }} clone ;
 
 SYMBOL: c-types
 
@@ -26,7 +26,7 @@ SYMBOL: c-types
     c-type [ "width" get ] bind ;
 
 : define-c-type ( quot name -- )
-    >r <c-type> swap extend r> c-types get set-hash ;
+    >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
 
 : <c-object> ( size -- c-ptr ) cell / ceiling <byte-array> ;
 

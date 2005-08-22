@@ -51,8 +51,7 @@ TUPLE: wrapper-stream scope ;
 
 C: wrapper-stream ( stream -- stream )
     2dup set-delegate [
-        >r <namespace> [ stdio set ] extend r>
-        set-wrapper-stream-scope
+        >r [ stdio set ] make-hash r> set-wrapper-stream-scope
     ] keep ;
 
 : with-wrapper ( stream quot -- )

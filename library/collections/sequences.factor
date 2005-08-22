@@ -13,9 +13,9 @@ USING: errors generic kernel math math-internals strings vectors ;
 
 GENERIC: empty? ( sequence -- ? ) flushable
 GENERIC: length ( sequence -- n ) flushable
-GENERIC: set-length ( n sequence -- ) flushable
+GENERIC: set-length ( n sequence -- )
 GENERIC: nth ( n sequence -- obj ) flushable
-GENERIC: set-nth ( value n sequence -- obj ) flushable
+GENERIC: set-nth ( value n sequence -- obj )
 GENERIC: thaw ( seq -- mutable-seq ) flushable
 GENERIC: like ( seq seq -- seq ) flushable
 GENERIC: reverse ( seq -- seq ) flushable

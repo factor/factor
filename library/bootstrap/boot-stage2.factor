@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
-errors generic hashtables io io-internals kernel lists math
-memory namespaces parser sequences words ;
+errors generic hashtables io io-internals kernel
+kernel-internals lists math memory namespaces parser sequences
+words ;
 
 : pull-in ( ? list -- )
     swap [

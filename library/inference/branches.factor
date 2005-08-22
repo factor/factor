@@ -73,12 +73,12 @@ namespaces parser prettyprint sequences strings vectors words ;
     #! Return a namespace with inferencer variables:
     #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
-    <namespace> [
+    [
         copy-inference
         dup value-recursion recursive-state set
         literal-value dup infer-quot handle-terminator
         active? [ #values node, ] when
-    ] extend ;
+    ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )
     [ infer-branch ] map dup unify-effects

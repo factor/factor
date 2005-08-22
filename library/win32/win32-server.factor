@@ -79,12 +79,12 @@ M: win32-client-stream client-stream-host win32-client-stream-host ;
 M: win32-client-stream client-stream-port win32-client-stream-port ;
 
 C: win32-server ( port -- server )
-    swap <namespace> [ 
+    swap [ 
         maybe-init-winsock new-socket swap over bind-socket dup listen-socket 
         dup add-completion
         socket set
         dup stream set
-    ] extend over set-win32-server-this ;
+    ] make-hash over set-win32-server-this ;
 
 M: win32-server stream-close ( server -- )
     win32-server-this [ socket get CloseHandle drop ] bind ;

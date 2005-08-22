@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: generic hashtables kernel lists math memory namespaces
-parser prettyprint sequences io vectors words ;
+USING: generic hashtables kernel kernel-internals
+lists math memory namespaces parser prettyprint
+sequences io vectors words ;
 
 "Bootstrap stage 1..." print
 
@@ -28,14 +29,13 @@ parser prettyprint sequences io vectors words ;
 
         "/library/collections/growable.factor"
         "/library/collections/cons.factor"
-        "/library/collections/vectors.factor"
         "/library/collections/virtual-sequences.factor"
         "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
         "/library/collections/assoc.factor"
         "/library/collections/lists.factor"
-        "/library/collections/vectors-epilogue.factor"
+        "/library/collections/vectors.factor"
         "/library/collections/hashtables.factor"
         "/library/collections/namespaces.factor"
         "/library/collections/sequence-eq.factor"
