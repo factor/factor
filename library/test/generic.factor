@@ -1,6 +1,4 @@
 IN: temporary
-USING: parser prettyprint sequences io strings ;
-
 USE: hashtables
 USE: namespaces
 USE: generic
@@ -11,6 +9,11 @@ USE: words
 USE: lists
 USE: vectors
 USE: alien
+USE: sequences
+USE: prettyprint
+USE: io
+USE: parser
+USE: strings
 
 GENERIC: class-of
 

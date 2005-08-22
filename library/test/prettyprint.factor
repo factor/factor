@@ -58,12 +58,3 @@ unit-test
 [ ] [ \ pprinter see ] unit-test
 
 [ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
-
-[ "{\n    5 5 5 5 5 5 5 5 5 5\n}" ]
-[
-    [
-        4 tab-size set
-        23 margin set
-        10 5 <repeated> >vector unparse
-    ] with-scope
-] unit-test

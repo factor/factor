@@ -87,8 +87,7 @@ M: word (uncrossref) drop ;
 : define ( word primitive parameter -- )
     pick uncrossref
     pick set-word-def
-    over set-word-primitive
-    f "parsing" set-word-prop ;
+    swap set-word-primitive ;
 
 GENERIC: definer ( word -- word )
 #! Return the parsing word that defined this word.
@@ -117,13 +116,15 @@ M: compound definer drop \ : ;
 : (define-compound) ( word def -- )
     >r dup dup remove-crossref r> 1 swap define add-crossref ;
 
+: reset-props ( word seq -- )
+    [ f swap set-word-prop ] each-with ;
+
+: reset-generic ( word -- )
+    #! Make a word no longer be generic.
+    { "methods" "combination" "picker" } reset-props ;
+
 : define-compound ( word def -- )
-    #! If the word is a generic word, clear the properties 
-    #! involved so that 'see' can work properly.
-    over f "methods" set-word-prop
-    over f "picker" set-word-prop
-    over f "combination" set-word-prop
-    (define-compound) ;
+     over reset-generic (define-compound) ;
 
 GENERIC: literalize ( obj -- obj )
 

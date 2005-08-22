@@ -181,7 +181,9 @@ GENERIC: pprint* ( obj -- )
 : word-style ( word -- style )
     dup word-vocabulary vocab-style swap presented swons add ;
 
-: pprint-word ( obj -- ) dup word-name swap word-style text ;
+: pprint-word ( obj -- )
+    dup word-name [ "( unnamed )" ] unless*
+    swap word-style text ;
 
 M: object pprint* ( obj -- )
     "( unprintable object: " swap class word-name " )" append3

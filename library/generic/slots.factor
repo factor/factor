@@ -29,8 +29,11 @@ sequences strings vectors words ;
 : define-slot ( class slot reader writer -- )
     >r >r 2dup r> define-reader r> define-writer ;
 
+: ?create ( { name vocab }/f -- word )
+    dup [ 2unseq create ] when ;
+
 : intern-slots ( spec -- spec )
-    [ 3unseq swap 2unseq create swap 2unseq create 3vector ] map ;
+    [ 3unseq swap ?create swap ?create 3vector ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the

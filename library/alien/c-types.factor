@@ -26,13 +26,11 @@ SYMBOL: c-types
     c-type [ "width" get ] bind ;
 
 : define-c-type ( quot name -- )
-    >r <c-type> swap extend r> c-types get set-hash ; inline
+    >r <c-type> swap extend r> c-types get set-hash ;
 
-: <c-object> ( size -- byte-array )
-    cell / ceiling <byte-array> ;
+: <c-object> ( size -- c-ptr ) cell / ceiling <byte-array> ;
 
-: <c-array> ( n size -- byte-array )
-    * cell / ceiling <byte-array> ;
+: <c-array> ( n size -- c-ptr ) * <c-object> ;
 
 : define-pointer ( type -- )
     "void*" c-type swap "*" append c-types get set-hash ;

@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: words
-USING: hashtables kernel lists namespaces strings sequences ;
+USING: hashtables errors kernel lists namespaces strings
+sequences ;
 
 SYMBOL: vocabularies
 
@@ -56,17 +57,16 @@ SYMBOL: vocabularies
         dup word-name over word-vocabulary nest set-hash
     ] bind ;
 
+: check-create ( name vocab -- )
+    string? [ "Vocabulary name is not a string" throw ] unless
+    string? [ "Word name is not a string" throw ] unless ;
+
 : create ( name vocab -- word )
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup vocab ?hash [
-        nip
-        dup f "documentation" set-word-prop
-        dup f "stack-effect" set-word-prop
-    ] [
-        (create) dup reveal
-    ] ?ifte ;
+    2dup check-create 2dup vocab ?hash
+    [ nip ] [ (create) dup reveal ] ?ifte ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;

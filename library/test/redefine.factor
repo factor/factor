@@ -1,5 +1,5 @@
 IN: temporary
-USING: compiler inference math ;
+USING: compiler inference math generic ;
 
 USE: test
 
@@ -8,4 +8,4 @@ USE: test
 : foo 1 2 3 ;
 
 [ 1 2 3 1 2 3 ] [ bar ] unit-test
-[ [ 0 3 ] ] [ [ foo ] infer ] unit-test
+[ [ [ ] [ object object object ] ] ] [ [ foo ] infer ] unit-test
