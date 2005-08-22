@@ -79,7 +79,19 @@ SYMBOL: builtin
      [ drop ] [ <namespace> "methods" set-word-prop ] ifte ;
 
 ! Defining generic words
+
+: bootstrap-combination ( quot -- quot )
+    #! Bootstrap hack.
+    global [
+        [
+            dup word? [
+                dup word-name swap word-vocabulary vocab hash
+            ] when
+        ] map
+    ] bind ;
+
 : define-generic* ( word combination -- )
+    bootstrap-combination
     dupd "combination" set-word-prop
     dup init-methods make-generic ;
 

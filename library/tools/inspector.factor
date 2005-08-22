@@ -15,13 +15,13 @@ M: object sheet ( obj -- sheet )
     tuck [ execute ] map-with
     2vector ;
 
-M: list sheet unit ;
+M: list sheet 1vector ;
 
-M: vector sheet unit ;
+M: vector sheet 1vector ;
 
-M: array sheet unit ;
+M: array sheet 1vector ;
 
-M: hashtable sheet dup hash-keys swap hash-values 2list ;
+M: hashtable sheet dup hash-keys swap hash-values 2vector ;
 
 : format-column ( list -- list )
     [ unparse-short ] map

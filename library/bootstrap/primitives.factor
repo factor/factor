@@ -9,22 +9,17 @@ math namespaces sequences strings vectors words ;
 
 "Creating primitives and basic runtime structures..." print
 
-! This symbol needs the same hashcode in the target as in the
+! These symbols need the same hashcode in the target as in the
 ! host.
-vocabularies
+{ vocabularies object null typemap builtins }
 
 ! Bring up a bare cross-compiling vocabulary.
-"syntax" vocab clone
-"generic" vocab clone
+"syntax" vocab
 
 <namespace> vocabularies set
 f crossref set
 
-vocabularies get [
-    "generic" set
-    "syntax" set
-    reveal
-] bind
+vocabularies get [ "syntax" set [ reveal ] each ] bind
 
 : make-primitive ( { vocab word } n -- )
     >r 2unseq create r> f define ;

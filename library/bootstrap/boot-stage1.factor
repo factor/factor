@@ -7,14 +7,14 @@ sequences io vectors words ;
 
 "Bootstrap stage 1..." print
 
-: pull-in ( list -- ) [ dup print parse-resource % ] each ;
-
 "/library/bootstrap/primitives.factor" run-resource
 
 ! The make-list form creates a boot quotation
 [
     {
         "/version.factor"
+
+        "/library/generic/early-generic.factor"
 
         "/library/kernel.factor"
 
@@ -67,8 +67,19 @@ sequences io vectors words ;
         "/library/syntax/parse-errors.factor"
         "/library/syntax/parser.factor"
         "/library/syntax/parse-stream.factor"
+
+        "/library/generic/generic.factor"
+        "/library/generic/standard-combination.factor"
+        "/library/generic/slots.factor"
+        "/library/generic/object.factor"
+        "/library/generic/null.factor"
+        "/library/generic/math-combination.factor"
+        "/library/generic/predicate.factor"
+        "/library/generic/union.factor"
+        "/library/generic/complement.factor"
+        "/library/generic/tuple.factor"
+
         "/library/syntax/generic.factor"
-        "/library/syntax/math.factor"
         "/library/syntax/parse-syntax.factor"
         
         "/library/alien/aliens.factor"
@@ -113,22 +124,10 @@ sequences io vectors words ;
         "/library/cli.factor"
         
         "/library/tools/memory.factor"
-    } pull-in
-] make-list
-
-"object" [ "generic" ] search
-"null" [ "generic" ] search
-"typemap" [ "generic" ] search
-"builtins" [ "generic" ] search
-
-vocabularies get [ "generic" off ] bind
-
-reveal
-reveal
-reveal
-reveal
-
-[
+    
+        "/library/bootstrap/init.factor"
+    } [ dup print parse-resource % ] each
+    
     [
         boot
         
@@ -136,44 +135,16 @@ reveal
 
         [ hashtable? ] instances
         [ dup hash-size 1 max swap set-bucket-count ] each
+        
+        "/library/bootstrap/boot-stage2.factor" run-resource
     ] %
-
-    {
-        "/library/generic/generic.factor"
-        "/library/generic/standard-combination.factor"
-        "/library/generic/slots.factor"
-        "/library/generic/object.factor"
-        "/library/generic/null.factor"
-        "/library/generic/math-combination.factor"
-        "/library/generic/predicate.factor"
-        "/library/generic/union.factor"
-        "/library/generic/complement.factor"
-        "/library/generic/tuple.factor"
-    
-        "/library/bootstrap/init.factor"
-    } pull-in
 ] make-list
-
-swap
-
-[
-    "/library/bootstrap/boot-stage2.factor" run-resource
-]
-
-append3
 
 vocabularies get [
     "!syntax" get "syntax" set
 
-    "syntax" get [
-        cdr dup word? [
-            "syntax" "vocabulary" set-word-prop
-        ] [
-            drop
-        ] ifte
-    ] hash-each
+    "syntax" get hash-values [ word? ] subset
+    [ "syntax" "vocabulary" set-word-prop ] each
 ] bind
 
 "!syntax" vocabularies get remove-hash
-
-FORGET: pull-in

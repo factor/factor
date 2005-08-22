@@ -60,7 +60,7 @@ unparser vectors words ;
     ] make-list ;
 
 G: each-slot ( obj quot -- )
-    [ over ] [ standard-combination ] ; inline
+    [ over ] standard-combination ; inline
 
 M: array each-slot ( array quot -- ) each ;
 

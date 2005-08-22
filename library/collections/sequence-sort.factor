@@ -3,7 +3,7 @@ USING: kernel math sequences ;
 
 : midpoint ( seq -- elt ) dup length 2 /i swap nth ; inline
 
-TUPLE: sorter start end mid ;
+TUPLE: sorter seq start end mid ;
 
 C: sorter ( seq start end -- sorter )
     [ >r 1 + rot <slice> r> set-sorter-seq ] keep

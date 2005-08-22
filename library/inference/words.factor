@@ -16,7 +16,7 @@ hashtables parser prettyprint ;
     #! produces a number of values.
     swap #call [
         over [
-            2unlist swap consume-d produce-d
+            2unseq swap consume-d produce-d
         ] hairy-node
     ] keep node, ;
 

@@ -47,8 +47,8 @@ M: vop calls-label? vop-label = ;
 : empty-vop f f f ;
 : label-vop ( label) >r f f r> ;
 : label/src-vop ( label src) 1vector swap f swap ;
-: src-vop ( src) unit f f ;
-: dest-vop ( dest) unit dup f ;
+: src-vop ( src) 1vector f f ;
+: dest-vop ( dest) 1vector dup f ;
 : src/dest-vop ( src dest) >r 1vector r> 1vector f ;
 : 2-in-vop ( in1 in2) 2vector f f ;
 : 3-in-vop ( in1 in2 in3) 3vector f f ;
@@ -202,13 +202,13 @@ TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
-    >r >r <vreg> r> <vreg> r> over >r 3vector r> unit f
+    >r >r <vreg> r> <vreg> r> over >r 3vector r> 1vector f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 
 TUPLE: %write-barrier ;
 C: %write-barrier make-vop ;
-: %write-barrier ( ptr ) <vreg> unit dup f <%write-barrier> ;
+: %write-barrier ( ptr ) <vreg> dest-vop <%write-barrier> ;
 
 ! fixnum intrinsics
 TUPLE: %fixnum+ ;

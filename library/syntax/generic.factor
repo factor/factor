@@ -54,3 +54,7 @@ words ;
     #! stack.
     scan-word [ tuple-constructor ] keep
     [ define-constructor ] [ ] ; parsing
+
+! Tuples.
+: << f ; parsing
+: >> reverse literal-tuple swons ; parsing

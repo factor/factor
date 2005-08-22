@@ -175,7 +175,7 @@ M: number union-containment drop 2 ;
 [ "M: vocabularies unhappy ;" eval ] unit-test-fails
 [ ] [ "GENERIC: unhappy" eval ] unit-test
 
-G: complex-combination [ over ] [ standard-combination ] ;
+G: complex-combination [ over ] standard-combination ;
 M: string complex-combination drop ;
 M: object complex-combination nip ;
 

@@ -12,12 +12,6 @@ namespaces parser sequences strings vectors words ;
 ! slot 2 - the class, a word
 ! slot 3 - the delegate tuple, or f
 
-: delegate ( object -- delegate )
-    dup tuple? [ 3 slot ] [ drop f ] ifte ; inline
-
-: set-delegate ( delegate tuple -- )
-    dup tuple? [ 3 set-slot ] [ 2drop ] ifte ; inline
-
 : class ( object -- class )
     dup tuple? [ 2 slot ] [ type type>class ] ifte ; inline
 

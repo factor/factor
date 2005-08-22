@@ -15,7 +15,7 @@ M: assert error.
     2dup = [ 2drop ] [ <assert> throw ] ifte ;
 
 : print-test ( input output -- )
-    "--> " write 2list . flush ;
+    "--> " write 2vector . flush ;
 
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to

@@ -23,7 +23,7 @@ USING: compiler kernel lists namespaces parser sequences words ;
 : LIBRARY: scan "c-library" set ; parsing
 
 : parse-arglist ( lst -- types stack effect )
-    unpair [
+    2 swap group flip 2unseq [
         " " % [ "," ?tail drop % " " % ] each "-- " %
     ] make-string ;
 

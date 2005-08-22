@@ -46,7 +46,7 @@ words ;
 
 ! Conses (whose cdr might not be a list)
 : [[ f ; parsing
-: ]] 2unlist swons swons ; parsing
+: ]] 2unseq swons swons ; parsing
 
 ! Vectors
 : { f ; parsing
@@ -55,10 +55,6 @@ words ;
 ! Hashtables
 : {{ f ; parsing
 : }} alist>hash swons ; parsing
-
-! Tuples.
-: << f ; parsing
-: >> reverse literal-tuple swons ; parsing
 
 ! Do not execute parsing word
 : POSTPONE: ( -- ) scan-word swons ; parsing
@@ -136,3 +132,17 @@ words ;
 : #!
     #! Documentation comment.
     until-eol parsed-documentation ; parsing
+
+! Complex numbers
+: #{ f ; parsing
+: }# dup second swap first rect> swons ; parsing
+
+! Reading integers in other bases
+: (BASE) ( base -- )
+    #! Reads an integer in a specific base.
+    scan swap base> swons ;
+
+: HEX: 16 (BASE) ; parsing
+: DEC: 10 (BASE) ; parsing
+: OCT: 8 (BASE) ; parsing
+: BIN: 2 (BASE) ; parsing

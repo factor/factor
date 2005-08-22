@@ -31,14 +31,9 @@ PREDICATE: general-list list ( list -- ? )
 : swons ( cdr car -- [[ car cdr ]] ) swap cons ; inline
 : unit ( a -- [ a ] ) f cons ; inline
 : 2list ( a b -- [ a b ] ) unit cons ; inline
-: 2unlist ( [ a b ] -- a b ) uncons car ; inline
 
 : 2car ( cons cons -- car car ) swap car swap car ; inline
 : 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
-
-: unpair ( list -- list1 list2 )
-    [ uncons uncons unpair rot swons >r cons r> ] [ f f ] ifte* ;
-    flushable
 
 : <queue> ( -- queue )
     #! Make a new functional queue.

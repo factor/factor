@@ -276,7 +276,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 
 M: cons pprint* ( list -- )
    [
-       dup list? [ \ [ \ ] ] [ uncons 2list \ [[ \ ]] ] ifte
+       dup list? [ \ [ \ ] ] [ uncons 2vector \ [[ \ ]] ] ifte
        pprint-sequence
    ] check-recursion ;
 

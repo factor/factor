@@ -9,8 +9,7 @@ SYMBOL: union
 
 : union-predicate ( members -- list )
     [
-        "predicate" word-prop
-        [ dup ] swap add [ drop t ] cons
+        "predicate" word-prop \ dup swons [ drop t ] cons
     ] map [ drop f ] swap alist>quot ;
 
 : set-members ( class members -- )

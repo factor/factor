@@ -78,7 +78,7 @@ M: object tail ( index seq -- seq )
 
 : group ( n seq -- list )
     #! Split a sequence into element chunks.
-    [ 0 -rot (group) ] make-list ; flushable
+    [ 0 -rot (group) ] make-vector ; flushable
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;

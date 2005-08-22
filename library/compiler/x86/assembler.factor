@@ -88,7 +88,7 @@ M: indirect canonicalize dup car EBP = [ drop [ EBP 0 ] ] when ;
 ( Displaced indirect register operands -- eg, [ EAX 4 ]        )
 PREDICATE: cons displaced
     dup length 2 =
-    [ 2unlist integer? swap register? and ] [ drop f ] ifte ;
+    [ 2unseq integer? swap register? and ] [ drop f ] ifte ;
 
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
