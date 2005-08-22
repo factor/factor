@@ -3,15 +3,16 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: syntax generic kernel lists namespaces parser words ;
+USING: generic kernel lists namespaces parser sequences syntax
+words ;
 
 : GENERIC:
-    #! GENERIC: bar == G: bar [ dup ] [ type ] ;
+    #! GENERIC: bar == G: bar simple-combination ;
     CREATE define-generic ; parsing
 
 : G:
-    #! G: word picker dispatcher ;
-    CREATE [ 2unlist rot define-generic* ] [ ] ; parsing
+    #! G: word combination ;
+    CREATE [ define-generic* ] [ ] ; parsing
 
 : COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.

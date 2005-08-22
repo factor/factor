@@ -75,7 +75,7 @@ M: compound (see)
 
 M: generic (see)
     <block
-    dup dup { "picker" "combination" } [ word-prop ] map-with
+    dup dup "combination" word-prop
     swap see-body block; t newline
     dup methods [ method. ] each-with ;
 

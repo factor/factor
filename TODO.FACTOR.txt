@@ -1,13 +1,6 @@
-+ messy code hall of shame:
-
-- alien/c-types.factor is ugly
-- compile-byte/cell: instantiating aliens
-- buffer: instantiating aliens
-
-- flushing optimization
 - reader syntax for arrays, byte arrays, displaced aliens
-- split, group: return vectors
 - sleep word
+- docstrings appear twice
 
 + ui:
 
@@ -56,6 +49,7 @@
 
 + ffi:
 
+- alien/c-types.factor is ugly
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
 - ffi unicode strings: null char security hole
@@ -66,6 +60,8 @@
 
 + compiler:
 
+- flushing optimization
+- compile-byte/cell: instantiating aliens
 - changing a word to be 'inline' after it was already defined doesn't
   work properly
 - inference needs to be more robust with heavily recursive code
@@ -84,22 +80,21 @@
 
 + kernel:
 
+- split, group: return vectors
 - specialized arrays
-- clear "predicating" word prop when redefining words
+- clear special word props when redefining words
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue
 - instances: do not use make-list
-- method doc strings
 - vectors: ensure its ok with bignum indices
 - code gc
-- doc comments of generics
 
 + i/o:
 
+- buffer: instantiating aliens
 - faster stream-copy
 - reading and writing byte arrays
-- unix io: handle \n\r and \n\0
 - stream server can hang because of exception handler limitations
 - better i/o scheduler
 - utf16, utf8 encoding

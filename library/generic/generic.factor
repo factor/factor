@@ -75,25 +75,18 @@ SYMBOL: builtin
     [ "methods" word-prop remove-hash ] keep make-generic ;
 
 : init-methods ( word -- )
-     dup "methods" word-prop [
-         drop
-     ] [
-        <namespace> "methods" set-word-prop
-     ] ifte ;
+     dup "methods" word-prop
+     [ drop ] [ <namespace> "methods" set-word-prop ] ifte ;
 
 ! Defining generic words
-: define-generic* ( picker combination word -- )
-    [ swap "combination" set-word-prop ] keep
-    [ swap "picker" set-word-prop ] keep
+: define-generic* ( word combination -- )
+    dupd "combination" set-word-prop
     dup init-methods make-generic ;
 
 PREDICATE: compound generic ( word -- ? )
     "combination" word-prop ;
 
 M: generic definer drop \ G: ;
-
-PREDICATE: generic simple-generic ( word -- ? )
-    "picker" word-prop [ dup ] = ;
 
 : lookup-union ( typelist -- class )
     [ - ] sort typemap get hash [ object ] unless* ;
