@@ -22,8 +22,12 @@ USING: compiler kernel lists namespaces parser sequences words ;
 
 : LIBRARY: scan "c-library" set ; parsing
 
+: unpair ( seq -- odds evens )
+    2 swap group flip dup empty?
+    [ drop { } { } ] [ 2unseq ] ifte ;
+
 : parse-arglist ( lst -- types stack effect )
-    2 swap group flip 2unseq [
+    unpair [
         " " % [ "," ?tail drop % " " % ] each "-- " %
     ] make-string ;
 
