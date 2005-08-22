@@ -9,7 +9,7 @@ LIBRARY: factor
 FUNCTION: int err_no ( ) ;
 
 LIBRARY: libc
-FUNCTION: char* strerror ( int ) ;
+FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 FUNCTION: void close ( int fd ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;

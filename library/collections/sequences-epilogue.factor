@@ -225,6 +225,10 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     [ tuck nth >r nth r> ] 3keep tuck
     >r >r set-nth r> r> set-nth ;
 
+: midpoint@ length 2 /i ; inline
+
+: midpoint [ midpoint@ ] keep nth ; inline
+
 IN: kernel
 
 : depth ( -- n )

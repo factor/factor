@@ -1,8 +1,6 @@
 IN: sorting-internals
 USING: kernel math sequences ;
 
-: midpoint ( seq -- elt ) dup length 2 /i swap nth ; inline
-
 TUPLE: sorter seq start end mid ;
 
 C: sorter ( seq start end -- sorter )
@@ -49,6 +47,28 @@ DEFER: (nsort)
         2drop
     ] ifte 2drop ; inline
 
+: partition ( seq -1/1 -- seq )
+    >r dup midpoint@ swap r> 1 <
+    [ head-slice ] [ tail-slice ] ifte ; inline
+
+: (binsearch) ( elt quot seq -- i )
+    dup length 1 <= [
+        2nip slice-from
+    ] [
+        3dup midpoint swap call dup 0 = [
+            drop 2nip dup slice-from swap slice-to + 2 /i
+        ] [
+            partition (binsearch)
+        ] ifte
+    ] ifte ; inline
+
+: binsearch-slice ( seq -- slice )
+    #! Binsearch returns an index relative to the sequence
+    #! being sliced, so if we are given a slice as input,
+    #! unexpected behavior will result.
+    dup slice? [ >vector ] when 0 over length rot <slice> ;
+    inline
+
 IN: sequences
 
 : nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
@@ -57,3 +77,11 @@ IN: sequences
 
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
+
+: binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
+    swap dup empty?
+    [ 3drop -1 ] [ binsearch-slice (binsearch) ] ifte ;
+    inline
+    
+: binsearch-range ( from to seq quot -- from to )
+    [ binsearch ] 2keep rot >r binsearch r> ;
