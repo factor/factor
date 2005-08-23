@@ -166,9 +166,9 @@ init-main-process
 : with-process ( quot process -- )
   #! Calls the quotation with 'self' set
   #! to the given process.
-  <namespace> [
+  [
     self-process set
-  ] extend
+  ] make-hash
   swap bind ;
 
 : spawn ( quot -- process )
