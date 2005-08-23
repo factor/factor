@@ -66,7 +66,7 @@ DEFER: handle-event
         handle-event run-world
     ] [
         drop world-step
-        world get world-running? [ yield run-world ] when
+        world get world-running? [ 10 sleep run-world ] when
     ] ifte ;
 
 : start-world ( -- )

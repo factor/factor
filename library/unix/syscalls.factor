@@ -22,10 +22,14 @@ BEGIN-STRUCT: timeval
 END-STRUCT
 
 : make-timeval ( ms -- timeval )
-    1000 /mod 1000 *
-    <timeval>
-    [ set-timeval-usec ] keep
-    [ set-timeval-sec ] keep ;
+    dup -1 = [
+        drop NULL
+    ] [
+        1000 /mod 1000 *
+        <timeval>
+        [ set-timeval-usec ] keep
+        [ set-timeval-sec ] keep
+    ] ifte ;
 
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 
