@@ -1,4 +1,4 @@
-IN: parse-k
+IN: infix
 USING: sequences kernel math strings combinators namespaces prettyprint io inspector
        errors parser generic lists kernel-internals hashtables words vectors ;
        ! remove: inspector
