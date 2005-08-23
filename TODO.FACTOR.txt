@@ -1,5 +1,4 @@
 - reader syntax for arrays, byte arrays, displaced aliens
-- sleep word
 - fix infer hang
 
 + ui:

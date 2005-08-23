@@ -33,7 +33,7 @@ M: rectangle inside? ( loc rect -- ? )
 ! A gadget is a rectangle, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent.
 TUPLE: gadget
-    paint gestures visible? relayout? root?
+    paint gestures framerate visible? relayout? root?
     parent children ;
 
 : gadget-child gadget-children first ;

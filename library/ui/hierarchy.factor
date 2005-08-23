@@ -6,8 +6,7 @@ sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
     [ 2dup gadget-children remq swap set-gadget-children ] keep
-    relayout
-    f swap set-gadget-parent ;
+    relayout f swap set-gadget-parent ;
 
 : unparent ( gadget -- )
     [

@@ -31,7 +31,7 @@ namespaces parser sequences strings vectors words ;
 : check-shape ( word slots -- )
     #! If the new list of slots is different from the previous,
     #! forget the old definition.
-    >r "use" get search dup [
+    >r "in" get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
         [ drop ] [ forget-tuple ] ifte
     ] [

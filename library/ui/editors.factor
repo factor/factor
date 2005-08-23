@@ -1,8 +1,28 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic kernel line-editor math matrices namespaces
-sdl sequences strings styles vectors ;
+USING: generic kernel math matrices namespaces sdl sequences
+strings styles vectors ;
+
+! A blinking caret
+TUPLE: caret ;
+
+C: caret ( -- caret )
+    <plain-gadget> over set-delegate
+    dup red background set-paint-prop
+    500 over set-gadget-framerate ;
+
+: toggle-visible ( gadget -- )
+    dup gadget-visible? not over set-gadget-visible?
+    relayout ;
+
+M: caret tick* ( ms caret -- ) nip toggle-visible ;
+
+: add-caret ( caret parent -- ) dupd add-gadget add-timer ;
+
+: unparent-caret ( caret -- ) dup remove-timer unparent ;
+
+USE: line-editor
 
 ! An editor gadget wraps a line editor object and passes
 ! gestures to the line editor.
@@ -22,10 +42,10 @@ TUPLE: editor line caret ;
     [ set-line-text ] with-editor ;
 
 : focus-editor ( editor -- )
-    dup editor-caret swap add-gadget ;
+    dup editor-caret swap add-caret ;
 
 : unfocus-editor ( editor -- )
-    editor-caret unparent ;
+    editor-caret unparent-caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
@@ -57,9 +77,6 @@ TUPLE: editor line caret ;
         [[ [ "HOME" ] [ [ home ] with-editor ] ]]
         [[ [ "END" ] [ [ end ] with-editor ] ]]
     ] swap add-actions ;
-
-: <caret> ( -- caret )
-    <plain-gadget> dup red background set-paint-prop ;
 
 C: editor ( text -- )
     <gadget> over set-delegate
