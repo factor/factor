@@ -1,8 +1,6 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - sleep word
-- docstrings appear twice
 - fix infer hang
-- fix sort out of bounds
 
 + ui:
 
@@ -82,7 +80,6 @@
 
 - split: return vectors
 - specialized arrays
-- clear special word props when redefining words
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - powerpc has weird callstack residue

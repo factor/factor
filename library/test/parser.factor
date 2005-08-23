@@ -69,8 +69,4 @@ unit-test
 ! Test EOL comments in multiline strings.
 [ [ "Hello" ] ] [ "#! This calls until-eol.\n\"Hello\"" parse ] unit-test 
 
-[ 4 ] [ "2 2 +" eval-catch ] unit-test
-[ "4\n" ] [ "2 2 + ." eval>string ] unit-test
-[ ] [ "fdafdf" eval-catch ] unit-test
-
 [ word ] [ \ f class ] unit-test

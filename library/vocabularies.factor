@@ -85,10 +85,10 @@ SYMBOL: vocabularies
 : init-search-path ( -- )
     "scratchpad" "in" set
     [
-        "compiler" "errors" "gadgets" "generic"
-        "hashtables" "help" "inference" "inspector" "interpreter"
+        "compiler" "errors" "gadgets" "generic" "hashtables"
+        "help" "inference" "inspector" "interpreter" "io"
         "jedit" "kernel" "listener" "lists" "math" "matrices"
-        "memory" "namespaces" "parser" "prettyprint"
-        "sequences" "io" "strings" "styles" "syntax" "test"
-        "threads" "vectors" "words" "scratchpad"
+        "memory" "namespaces" "parser" "prettyprint" "queues"
+        "scratchpad" "sequences" "strings" "styles" "syntax"
+        "test" "threads" "vectors" "words"
     ] "use" set ;

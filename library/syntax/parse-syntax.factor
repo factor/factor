@@ -62,7 +62,8 @@ words ;
 ! Word definitions
 : :
     #! Begin a word definition. Word name follows.
-    CREATE [ define-compound ] [ ] "in-definition" on ; parsing
+    CREATE dup reset-generic [ define-compound ]
+    [ ] "in-definition" on ; parsing
 
 : ;
     #! End a word definition.
@@ -71,7 +72,7 @@ words ;
 ! Symbols
 : SYMBOL:
     #! A symbol is a word that pushes itself when executed.
-    CREATE define-symbol ; parsing
+    CREATE dup reset-generic define-symbol ; parsing
 
 : \
     #! Word literals: \ foo
@@ -90,7 +91,7 @@ words ;
 : DEFER:
     #! Create a word with no definition. Used for mutually
     #! recursive words.
-    CREATE drop ; parsing
+    CREATE dup reset-generic drop ; parsing
 
 : FORGET:
     #! Followed by a word name. The word is removed from its

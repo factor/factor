@@ -2,32 +2,48 @@
 ! Copyright (C) 2005 Mackenzie Straight.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: threads
-USING: errors kernel kernel-internals lists namespaces ;
- 
-! Core of the multitasker. Used by io-internals.factor and
-! in-thread.factor.
+USING: errors hashtables io-internals kernel lists math
+namespaces queues sequences vectors ;
 
-: run-queue ( -- queue ) 9 getenv ;
-: set-run-queue ( queue -- ) 9 setenv ;
-: init-threads ( -- ) <queue> set-run-queue ;
+! Co-operative multitasker.
+
+: run-queue ( -- queue ) \ run-queue global hash ;
+
+: schedule-thread ( quot -- ) run-queue enque ;
+
+: sleep-queue ( -- vec ) \ sleep-queue global hash ;
+
+: sleep-queue* ( -- vec )
+    sleep-queue dup [ 2car swap - ] nsort ;
+
+: sleep-time ( sorted-queue -- ms )
+    dup empty? [ drop -1 ] [ peek car millis - 0 max ] ifte ;
+
+DEFER: next-thread
+
+: do-sleep ( -- quot )
+    sleep-queue* dup sleep-time dup 0 =
+    [ drop pop ] [ io-multiplex next-thread ] ifte ;
 
 : next-thread ( -- quot )
-    run-queue dup queue-empty? [
-        drop f
-    ] [
-        deque set-run-queue
-    ] ifte ;
+    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;
 
-: schedule-thread ( quot -- )
-    run-queue enque set-run-queue ;
+: stop ( -- ) next-thread call ;
 
-: stop ( -- )
-    #! Stop the current thread and begin executing the next one.
-    next-thread [ call ] [ "No more tasks" throw ] ifte* ;
+: yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
-: yield ( -- )
-    #! Add the current continuation to the run queue, and yield
-    #! to the next quotation. The current continuation will
-    #! eventually be restored by a future call to stop or
-    #! yield.
-    [ schedule-thread stop ] callcc0 ;
+: sleep ( ms -- )
+    millis + [ cons sleep-queue push stop ] callcc0 drop ;
+
+: in-thread ( quot -- )
+    [
+        schedule-thread
+        [ ] set-catchstack { } set-callstack
+        try stop
+    ] callcc0 drop ;
+
+: init-threads ( -- )
+    global [
+        <queue> \ run-queue set
+        10 <vector> \ sleep-queue set
+    ] bind ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: io kernel lists namespaces parser prettyprint sequences
-strings unparser vectors words ;
+USING: errors io kernel lists namespaces parser prettyprint
+sequences strings unparser vectors words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -62,6 +62,9 @@ strings unparser vectors words ;
 : write-packet ( string -- ) dup write-len write flush ;
 
 : read-packet ( -- string ) 4 read be> read ;
+
+: eval>string ( str -- )
+    [ [ [ eval ] keep ] try drop ] string-out ;
 
 : wire-server ( -- )
     #! Repeatedly read jEdit requests and execute them. Return

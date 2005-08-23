@@ -300,10 +300,6 @@ M: port stream-close ( stream -- )
 : <fd-stream> ( infd outfd flush? -- stream )
     >r >r <reader> r> <writer> r> <duplex-stream> ;
 
-: idle-io-task ( -- )
-    [ schedule-thread 10 io-multiplex stop ] callcc0
-    idle-io-task ;
-
 USE: io
 
 : init-io ( -- )
@@ -315,5 +311,4 @@ USE: io
         <namespace> write-tasks set
         FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
-    ] bind
-    [ idle-io-task ] in-thread ;
+    ] bind ;

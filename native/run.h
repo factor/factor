@@ -8,7 +8,7 @@
 #define CATCHSTACK_ENV 6 /* used by library only */
 #define CPU_ENV        7
 #define BOOT_ENV       8
-#define RUNQUEUE_ENV   9 /* used by library only */
+#define UNUSED_ENV     9
 #define ARGS_ENV       10
 #define OS_ENV         11
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */

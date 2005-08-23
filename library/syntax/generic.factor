@@ -8,11 +8,11 @@ words ;
 
 : GENERIC:
     #! GENERIC: bar == G: bar simple-combination ;
-    CREATE define-generic ; parsing
+    CREATE dup reset-word define-generic ; parsing
 
 : G:
     #! G: word combination ;
-    CREATE [ define-generic* ] [ ] ; parsing
+    CREATE dup reset-word [ define-generic* ] [ ] ; parsing
 
 : COMPLEMENT: ( -- )
     #! Followed by a class name, then a complemented class.

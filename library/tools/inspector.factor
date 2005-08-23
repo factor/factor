@@ -28,8 +28,11 @@ M: hashtable sheet dup hash-keys swap hash-values 2vector ;
     [ max-length ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
+: sheet-numbers ( sheet -- sheet )
+    dup first length >vector 1vector swap append ;
+
 : format-sheet ( sheet -- list )
-    dup first length >vector swons
+    sheet-numbers
     dup peek over first [ set ] 2each
     [ format-column ] map
     flip

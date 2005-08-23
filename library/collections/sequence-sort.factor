@@ -72,7 +72,7 @@ DEFER: (nsort)
 IN: sequences
 
 : nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
-    swap dup empty?
+    swap dup length 1 <=
     [ 2drop ] [ 0 over length 1 - (nsort) ] ifte ; inline
 
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )

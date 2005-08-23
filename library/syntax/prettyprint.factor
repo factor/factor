@@ -321,7 +321,7 @@ M: wrapper pprint* ( wrapper -- )
 
 : unparse-short ( object -- str ) [ pprint-short ] string-out ;
 
-: unparse-short ( object -- )
+: unparse-short. ( object -- )
     dup unparse-short swap write-object terpri ;
 
 : [.] ( sequence -- ) [ unparse-short. ] each ;

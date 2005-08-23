@@ -26,11 +26,7 @@ namespaces prettyprint sequences strings words ;
 
 ! FFI code does not run in the interpreter.
 
-TUPLE: alien-error symbol library ;
-
-C: alien-error ( lib sym -- )
-    [ set-alien-error-symbol ] keep
-    [ set-alien-error-library ] keep ;
+TUPLE: alien-error library symbol ;
 
 M: alien-error error. ( error -- )
     "C library interface words cannot be interpreted. " write

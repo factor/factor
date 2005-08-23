@@ -111,18 +111,18 @@ M: symbol definer drop \ SYMBOL: ;
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 M: compound definer drop \ : ;
 
-: (define-compound) ( word def -- )
+: define-compound ( word def -- )
     >r dup dup remove-crossref r> 1 swap define add-crossref ;
 
 : reset-props ( word seq -- )
     [ f swap set-word-prop ] each-with ;
 
-: reset-generic ( word -- )
-    #! Make a word no longer be generic.
-    { "methods" "combination" } reset-props ;
+: reset-word ( word -- )
+    { "parsing" "inline" "foldable" "flushable" "predicating" }
+    reset-props ;
 
-: define-compound ( word def -- )
-     over reset-generic (define-compound) ;
+: reset-generic ( word -- )
+    dup reset-word { "methods" "combination" } reset-props ;
 
 GENERIC: literalize ( obj -- obj )
 

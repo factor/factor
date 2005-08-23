@@ -35,21 +35,6 @@ PREDICATE: general-list list ( list -- ? )
 : 2car ( cons cons -- car car ) swap car swap car ; inline
 : 2cdr ( cons cons -- car car ) swap cdr swap cdr ; inline
 
-: <queue> ( -- queue )
-    #! Make a new functional queue.
-    [[ [ ] [ ] ]] ; foldable
-
-: queue-empty? ( queue -- ? )
-    uncons or not ; foldable
-
-: enque ( obj queue -- queue )
-    uncons >r cons r> cons ; foldable
-
-: deque ( queue -- obj queue )
-    uncons
-    [ uncons swapd cons ] [ reverse uncons f swons ] ifte* ;
-    foldable
-
 M: cons = ( obj cons -- ? )
     2dup eq? [
         2drop t

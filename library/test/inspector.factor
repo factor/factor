@@ -1,7 +1,11 @@
 IN: temporary
-USING: test inspector prettyprint math ;
+USING: inspector math namespaces prettyprint test ;
 
-[[ 1 2 ]] inspect
+[[ "hello" "world" ]] inspect
+
+[ "hello" ] [ 0 get ] unit-test
+[ "world" ] [ 1 get ] unit-test
+
 [ 1 2 3 ] inspect
 f inspect
 \ + inspect

@@ -80,7 +80,7 @@ SYMBOL: failures
         "continuations" "errors" "hashtables" "strings"
         "namespaces" "generic" "tuple" "files" "parser"
         "parse-number" "init" "io/io"
-        "listener" "vectors" "words" "prettyprint" "random"
+        "vectors" "words" "prettyprint" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational" "math/integer"

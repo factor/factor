@@ -33,6 +33,7 @@ sequences io vectors words ;
         "/library/math/ratio.factor"
         "/library/math/float.factor"
         "/library/math/complex.factor"
+        "/library/math/random.factor"
 
         "/library/collections/growable.factor"
         "/library/collections/cons.factor"
@@ -50,6 +51,7 @@ sequences io vectors words ;
         "/library/collections/sequence-sort.factor"
         "/library/collections/strings-epilogue.factor"
         "/library/collections/tree-each.factor"
+        "/library/collections/queues.factor"
 
         "/library/math/matrices.factor"
 
@@ -66,8 +68,8 @@ sequences io vectors words ;
         "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
-
-        "/library/threads.factor"
+        "/library/io/directories.factor"
+        "/library/io/binary.factor"
 
         "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"
@@ -91,10 +93,29 @@ sequences io vectors words ;
         
         "/library/syntax/prettyprint.factor"
 
+        "/library/io/logging.factor"
+
         "/library/tools/gensym.factor"
         "/library/tools/interpreter.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
+        "/library/tools/listener.factor"
+        "/library/tools/word-tools.factor"
+        "/library/tools/walker.factor"
+        "/library/tools/jedit.factor"
+
+        "/library/test/test.factor"
+
+        "/library/tools/annotations.factor"
+        "/library/tools/inspector.factor"
+
+        "/library/syntax/see.factor"
+
+        "/library/threads.factor"
+        
+        "/library/tools/telnetd.factor"
+
+        "/library/bootstrap/image.factor"
 
         "/library/inference/dataflow.factor"
         "/library/inference/inference.factor"
@@ -128,8 +149,6 @@ sequences io vectors words ;
 
         "/library/cli.factor"
         
-        "/library/tools/memory.factor"
-    
         "/library/bootstrap/init.factor"
     } [ dup print parse-resource % ] each
     

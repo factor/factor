@@ -10,7 +10,7 @@ USING: interpreter io kernel lists namespaces prettyprint
 sequences strings test ;
 
 : annotate ( word quot -- | quot: word def -- def )
-    over >r >r dup word-def r> call r> swap (define-compound) ;
+    over >r >r dup word-def r> call r> swap define-compound ;
     inline
 
 : (watch) ( word def -- def )

@@ -34,8 +34,6 @@ cpu "ppc" = [
     "/library/compiler/ppc/alien.factor"
 ] pull-in
 
-"Compiling base..." print
-
 "statically-linked" get [
     unix? [
         "sdl"      "libSDL.so"     "cdecl"    add-library
@@ -59,6 +57,8 @@ cpu "ppc" = [
 : compile? "compile" get supported-cpu? and ;
 
 compile? [
+    "Compiling base..." print
+
     \ car compile
     \ * compile
     \ = compile
@@ -78,27 +78,6 @@ t [
     "/library/math/pow.factor"
     "/library/math/trig-hyp.factor"
     "/library/math/arc-trig-hyp.factor"
-    "/library/math/random.factor"
-
-    "/library/in-thread.factor"
-
-    "/library/io/directories.factor"
-    "/library/io/binary.factor"
-    
-    "/library/eval-catch.factor"
-    "/library/tools/listener.factor"
-    "/library/tools/word-tools.factor"
-    "/library/syntax/see.factor"
-    "/library/test/test.factor"
-    "/library/tools/walker.factor"
-    "/library/tools/annotations.factor"
-    "/library/tools/inspector.factor"
-    "/library/bootstrap/image.factor"
-    
-    "/library/io/logging.factor"
-
-    "/library/tools/telnetd.factor"
-    "/library/tools/jedit.factor"
 
     "/library/httpd/load.factor"
     "/library/sdl/load.factor"

@@ -62,7 +62,7 @@ SYMBOL: builtin
     "methods" word-prop hash-keys [ class-compare ] sort ;
 
 : make-generic ( word -- )
-    dup dup "combination" word-prop call (define-compound) ;
+    dup dup "combination" word-prop call define-compound ;
 
 : define-method ( class generic definition -- )
     -rot
