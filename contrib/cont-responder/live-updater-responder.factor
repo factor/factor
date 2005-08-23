@@ -57,7 +57,7 @@ USE: prettyprint
       <body> 
        [
          [ 
-           "millis" [ millis prettyprint ] "Display Server millis" live-anchor
+           "millis" [ millis pprint ] "Display Server millis" live-anchor
            <div id= "millis" div>  
              "The millisecond time from the server will appear here" write 
            </div>         

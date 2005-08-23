@@ -40,19 +40,19 @@ USE: unparser
 
 : <todo> ( user password -- <todo> )
   #! Create an empty todo list
-  <namespace> [
+  [
     "password" set
      "user" set
      f "items" set
-  ] extend ;
+  ] make-hash ;
 
 : <todo-item> ( priority description -- )
   #! Create a todo item
-  <namespace> [
+  [
     "description" set
     "priority" set
     f "complete?" set
-  ] extend ;
+  ] make-hash ;
 
 : add-todo-item ( <todo> <item> -- )
   #! Add the item to the todo list
@@ -95,13 +95,13 @@ USE: unparser
 : read-todo ( -- <todo> )
   #! Read a todo list from the current input stream.
   readln url-decode readln url-decode <todo> 
-  readln str>number [
+  readln string>number [
     dup
-    <namespace> [
+    [
       readln url-decode "yes" = "complete?" set
       readln url-decode "priority" set
       readln url-decode "description" set
-    ] extend add-todo-item
+    ] make-hash add-todo-item
   ] times ;
 
 : load-todo ( filename -- <todo> )

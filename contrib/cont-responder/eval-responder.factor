@@ -46,11 +46,11 @@ USE: sequences
   #! Create an 'evaluator' object that holds
   #! the current stack, output and history for
   #! do-eval.
-  <namespace> [
+  [
     "history" set
     "output" set
     "stack" set
-  ] extend ;
+  ] make-hash ;
 
 : display-eval-form ( url -- )
   #! Display the components for allowing entry of 
