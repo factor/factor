@@ -1,5 +1,5 @@
 IN: sorting-internals
-USING: kernel math sequences ;
+USING: kernel math sequences vectors ;
 
 TUPLE: sorter seq start end mid ;
 
@@ -7,15 +7,15 @@ C: sorter ( seq start end -- sorter )
     [ >r 1 + rot <slice> r> set-sorter-seq ] keep
     dup sorter-seq midpoint over set-sorter-mid
     dup sorter-seq length 1 - over set-sorter-end
-    0 over set-sorter-start ;
+    0 over set-sorter-start ; inline
 
-: s*/e* dup sorter-start swap sorter-end ;
-: s*/e dup sorter-start swap sorter-seq length 1 - ;
-: s/e* 0 swap sorter-end ;
-: sorter-exchange dup s*/e* rot sorter-seq exchange ;
+: s*/e* dup sorter-start swap sorter-end ; inline
+: s*/e dup sorter-start swap sorter-seq length 1 - ; inline
+: s/e* 0 swap sorter-end ; inline
+: sorter-exchange dup s*/e* rot sorter-seq exchange ; inline
 : compare over sorter-seq nth swap sorter-mid rot call ; inline
-: >start> dup sorter-start 1 + swap set-sorter-start ;
-: <end< dup sorter-end 1 - swap set-sorter-end ;
+: >start> dup sorter-start 1 + swap set-sorter-start ; inline
+: <end< dup sorter-end 1 - swap set-sorter-end ; inline
 
 : sort-up ( quot sorter -- quot sorter )
     dup s*/e < [
@@ -47,18 +47,18 @@ DEFER: (nsort)
         2drop
     ] ifte 2drop ; inline
 
-: partition ( seq -1/1 -- seq )
-    >r dup midpoint@ swap r> 1 <
+: partition ( -1/1 seq -- seq )
+    dup midpoint@ swap rot 1 <
     [ head-slice ] [ tail-slice ] ifte ; inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [
         2nip slice-from
     ] [
-        3dup midpoint swap call dup 0 = [
-            drop 2nip dup slice-from swap slice-to + 2 /i
+        3dup >r >r >r midpoint swap call dup 0 = [
+            r> r> 3drop r> dup slice-from swap slice-to + 2 /i
         ] [
-            partition (binsearch)
+            r> swap r> swap r> partition (binsearch)
         ] ifte
     ] ifte ; inline
 

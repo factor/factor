@@ -1,6 +1,8 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - sleep word
 - docstrings appear twice
+- fix infer hang
+- fix sort out of bounds
 
 + ui:
 

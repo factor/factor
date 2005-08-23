@@ -10,12 +10,13 @@ sequences io strings vectors words ;
 
 : &s
     #! Print stepper data stack.
-    meta-d get reverse [.] ;
+    meta-d get stack. ;
 
 : &r
     #! Print stepper call stack, as well as the currently
     #! executing quotation.
-    meta-cf get . meta-executing get . meta-r get reverse [.] ;
+    meta-cf get unparse-short.
+    meta-executing get . meta-r get stack. ;
 
 : &get ( var -- value )
     #! Get stepper variable value.

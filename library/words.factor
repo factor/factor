@@ -69,17 +69,17 @@ SYMBOL: crossref
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
     #! so indirect usages are reported.
-    crossref get dup [ closure word-sort ] [ 2drop { } ] ifte ;
+    crossref get dup [ closure ] [ 2drop { } ] ifte ;
 
 : usage ( word -- list )
     #! List all direct usages of a word.
-    crossref get ?hash dup [ hash-keys ] when word-sort ;
+    crossref get ?hash dup [ hash-keys ] when ;
 
 GENERIC: (uncrossref) ( word -- )
 M: word (uncrossref) drop ;
 
 : uncrossref ( word -- )
-    dup (uncrossref) usages  [ (uncrossref) ] each ;
+    dup (uncrossref) usages [ (uncrossref) ] each ;
 
 ! The word primitive combined with the word def specify what the
 ! word does when invoked.

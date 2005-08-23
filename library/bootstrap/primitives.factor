@@ -198,7 +198,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 : set-stack-effect ( { vocab word effect } -- )
-    3unseq >r unit search r> "stack-effect" set-word-prop ;
+    3unseq >r lookup r> "stack-effect" set-word-prop ;
 
 {
     { "drop" "kernel" " x -- " }

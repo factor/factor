@@ -61,7 +61,7 @@ C: section ( length -- section )
     last-newline set
     line-count inc
     line-limit? [ " ..." write end-printing get call ] when
-    terpri do-indent ;
+    "\n" write do-indent ;
 
 TUPLE: text string style ;
 
@@ -321,9 +321,10 @@ M: wrapper pprint* ( wrapper -- )
 
 : unparse-short ( object -- str ) [ pprint-short ] string-out ;
 
-: [.] ( sequence -- )
-    #! Unparse each element on its own line.
-    [ dup unparse-short swap write-object terpri ] each ;
+: unparse-short ( object -- )
+    dup unparse-short swap write-object terpri ;
+
+: [.] ( sequence -- ) [ unparse-short. ] each ;
 
 : stack. reverse-slice [.] ;
 

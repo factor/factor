@@ -85,7 +85,7 @@ SYMBOL: builtin
     global [
         [
             dup word? [
-                dup word-name swap word-vocabulary vocab hash
+                dup word-name swap word-vocabulary lookup
             ] when
         ] map
     ] bind ;

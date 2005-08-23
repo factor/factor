@@ -118,6 +118,14 @@ unit-test
 
 [ 3 ] [ { 1 2 3 4 } midpoint ] unit-test
 
+[ -1 ] [ 3 { } [ - ] binsearch ] unit-test
+[ 0 ] [ 3 { 3 } [ - ] binsearch ] unit-test
+[ 1 ] [ 2 { 1 2 3 } [ - ] binsearch ] unit-test
+[ 3 ] [ 4 { 1 2 3 4 5 6 } [ - ] binsearch ] unit-test
+[ 1 ] [ 3.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
+[ 3 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
+[ 10 ] [ 10 20 >vector [ - ] binsearch ] unit-test
+
 : seq-sorter 0 over length 1 - <sorter> ;
 
 [ { 4 2 3 1 } ]
@@ -156,16 +164,8 @@ unit-test
     map-pairs [ 0 <= ] all? ;
 
 [ t ] [
-    10 [
+    100 [
         drop
         1000 [ drop 0 1000 random-int ] map [ - ] sort [ - ] sorted?
     ] all?
 ] unit-test
-
-[ -1 ] [ 3 { } [ - ] binsearch ] unit-test
-[ 0 ] [ 3 { 3 } [ - ] binsearch ] unit-test
-[ 1 ] [ 2 { 1 2 3 } [ - ] binsearch ] unit-test
-[ 3 ] [ 4 { 1 2 3 4 5 6 } [ - ] binsearch ] unit-test
-[ 1 ] [ 3.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
-[ 3 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
-[ 10 ] [ 10 20 >vector [ - ] binsearch ] unit-test

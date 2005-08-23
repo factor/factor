@@ -41,8 +41,10 @@ SYMBOL: vocabularies
     global [ <namespace> crossref set ] bind
     [ add-crossref ] each-word ;
 
+: lookup ( name vocab -- word ) vocab ?hash ;
+
 : search ( name vocabs -- word )
-    [ vocab ?hash ] map-with [ ] find nip ;
+    [ lookup ] map-with [ ] find nip ;
 
 : <props> ( name vocab -- plist )
     [ "vocabulary" set "name" set ] make-hash ;
@@ -65,7 +67,7 @@ SYMBOL: vocabularies
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup check-create 2dup vocab ?hash
+    2dup check-create 2dup lookup
     [ nip ] [ (create) dup reveal ] ?ifte ;
 
 : constructor-word ( string vocab -- word )

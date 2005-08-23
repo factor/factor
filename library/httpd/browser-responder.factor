@@ -53,14 +53,9 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
     swap words [ word-name over swap option ] each drop
   </select> ;
 
-: find-word ( vocab string -- word )
-  #! Given the name of a word, find it in the given vocab. Return the
-  #! word object itself if successfull, otherwise return false.
-  swap unit search ;
-
 : word-source ( vocab word -- )
   #! Write the source for the given word from the vocab as HTML.
-  find-word [
+  swap lookup [
     [ see ] with-simple-html-output
   ] when* ;
 
