@@ -2,15 +2,14 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel math matrices namespaces sdl sequences
-strings styles vectors ;
+strings styles threads vectors ;
 
 ! A blinking caret
 TUPLE: caret ;
 
 C: caret ( -- caret )
     <plain-gadget> over set-delegate
-    dup red background set-paint-prop
-    500 over set-gadget-framerate ;
+    dup red background set-paint-prop ;
 
 : toggle-visible ( gadget -- )
     dup gadget-visible? not over set-gadget-visible?
@@ -18,9 +17,16 @@ C: caret ( -- caret )
 
 M: caret tick* ( ms caret -- ) nip toggle-visible ;
 
-: add-caret ( caret parent -- ) dupd add-gadget add-timer ;
+: caret-block 500 ;
 
-: unparent-caret ( caret -- ) dup remove-timer unparent ;
+: add-caret ( caret parent -- )
+    dupd add-gadget caret-block add-timer ;
+
+: unparent-caret ( caret -- )
+    dup remove-timer unparent ;
+
+: reset-caret ( caret -- )
+    dup restart-timer t swap set-gadget-visible? ;
 
 USE: line-editor
 
@@ -33,6 +39,7 @@ TUPLE: editor line caret ;
     #! Execute a quotation in the line editor scope, then
     #! update the display.
     swap [ editor-line swap bind ] keep
+    dup editor-caret reset-caret
     dup relayout scroll>bottom ; inline
 
 : editor-text ( editor -- text )

@@ -9,7 +9,7 @@ vectors ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? hand glass invalid timers ;
+TUPLE: world running? hand glass invalid ;
 
 DEFER: <hand>
 DEFER: update-hand
@@ -18,8 +18,7 @@ DEFER: do-timers
 C: world ( -- world )
     f <stack> over set-delegate
     t over set-gadget-root?
-    dup <hand> over set-world-hand
-    <namespace> over set-world-timers ;
+    dup <hand> over set-world-hand ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;

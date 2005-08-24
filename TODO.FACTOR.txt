@@ -15,7 +15,6 @@
 - an interior paint that is only painted on rollover and mouse press;
   use it for menu items. give menus a gradient background
 - scroll bar: more intuitive behavior when clicking inside the elevator
-- timers
 - nicer scrollbars with up/down buttons
 - icons
 - use incremental strategy for all pack layouts where possible
