@@ -73,13 +73,13 @@ USE: sequences
   #! Replace occurrences of single quotes with
   #! backslash quote.
   [
-    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ , ] [ , ] ?ifte ] each
+    [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?ifte ] each
   ] make-string ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
   #! executed will set the eval textarea to that string.
-  [ "document.forms.main.eval.value=\"" , escape-quotes , "\"" , ] make-string ;
+  [ "document.forms.main.eval.value=\"" % escape-quotes % "\"" % ] make-string ;
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
