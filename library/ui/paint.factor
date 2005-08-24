@@ -27,7 +27,7 @@ GENERIC: draw-gadget* ( gadget -- )
 
 : translate&clip ( gadget -- )
     screen-bounds dup rect-loc origin set
-    clip [ intersect dup ] change ( set-clip ) drop ;
+    clip [ intersect dup ] change set-clip ;
 
 : draw-gadget ( gadget -- )
     dup gadget-visible? [

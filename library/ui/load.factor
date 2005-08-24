@@ -1,4 +1,4 @@
-USING: image kernel parser sequences io ;
+USING: kernel parser sequences io ;
 [
     "/library/ui/gadgets.factor"
     "/library/ui/hierarchy.factor"
@@ -25,7 +25,5 @@ USING: image kernel parser sequences io ;
     "/library/ui/books.factor"
     "/library/ui/ui.factor"
 ] [
-    dup print
-    bootstrapping? get
-    [ parse-resource % ] [ run-resource ] ifte
+    dup print run-resource
 ] each
