@@ -43,8 +43,8 @@ sequences io strings vectors words ;
     set-callstack call ;
 
 : walk-banner ( -- )
-    "&s &r show stepper stacks." print
-    "&get ( var -- value ) inspects the stepper namestack." print
+    "&s &r show stepper stacks" print
+    "&get ( var -- value ) get stepper variable value" print
     "step -- single step over" print
     "into -- single step into" print
     "continue -- continue execution" print

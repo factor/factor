@@ -1,11 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: generic hashtables io kernel kernel-internals lists math
-memory namespaces prettyprint sequences strings styles test
-vectors words ;
-
-SYMBOL: inspecting
+USING: generic hashtables io kernel kernel-internals listener
+lists math memory namespaces prettyprint sequences strings
+styles test vectors words ;
 
 GENERIC: sheet ( obj -- sheet )
 
@@ -31,9 +29,11 @@ M: hashtable sheet dup hash-keys swap hash-values 2vector ;
 : sheet-numbers ( sheet -- sheet )
     dup first length >vector 1vector swap append ;
 
+SYMBOL: inspector-slots
+
 : format-sheet ( sheet -- list )
     sheet-numbers
-    dup peek over first [ set ] 2each
+    dup peek inspector-slots set
     [ format-column ] map
     flip
     [ " | " join ] map ;
@@ -74,7 +74,38 @@ M: object extra-banner ( obj -- ) drop ;
     sheet dup format-sheet swap peek
     [ write-object terpri ] 2each ;
 
-: inspect ( obj -- )
-    dup inspecting set dup inspect-banner describe ;
+SYMBOL: inspector-stack
 
-: go ( n -- ) get inspect ;
+: inspecting ( -- obj ) inspector-stack get peek ;
+
+: (inspect) ( obj -- )
+    dup inspector-stack get push
+    dup inspect-banner describe ;
+
+: inspector-help ( -- )
+    "Object inspector." print
+    "inspecting ( -- obj ) push current object" print
+    "go ( n -- ) inspect nth slot" print
+    "up -- return to previous object" print
+    "refs -- inspect references to current object" print
+    "bye -- exit inspector" print ;
+
+: inspector ( obj -- )
+    [
+        inspector-help
+        terpri
+        "inspector " listener-prompt set
+        10 <vector> inspector-stack set
+        (inspect)
+        listener
+    ] with-scope ;
+
+: inspect ( obj -- )
+    #! Start an inspector if its not already running.
+    inspector-stack get [ (inspect) ] [ inspector ] ifte ;
+
+: go ( n -- ) inspector-slots get nth (inspect) ;
+
+: up ( -- ) inspector-stack get >pop> pop (inspect) ;
+
+: refs ( -- ) inspecting references (inspect) ;
