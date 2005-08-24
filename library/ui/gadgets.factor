@@ -24,7 +24,7 @@ GENERIC: inside? ( loc rect -- ? )
 : screen-bounds ( rect -- rect )
     dup screen-loc swap rect-dim <rect> ;
 
-M: rectangle inside? ( loc rect -- ? )
+M: rect inside? ( loc rect -- ? )
     screen-bounds rect-bounds { 1 1 1 } v- { 0 0 0 } vmax
     >r v- { 0 0 0 } r> vbetween? conjunction ;
 

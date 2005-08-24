@@ -42,13 +42,6 @@ DEFER: next-thread
         try stop
     ] callcc0 drop ;
 
-: init-threads ( -- )
-    global [
-        <queue> \ run-queue set
-        10 <vector> \ sleep-queue set
-        <namespace> \ timers set
-    ] bind ;
-
 TUPLE: timer object delay last ;
 
 : timer-now millis swap set-timer-last ;
@@ -80,10 +73,17 @@ GENERIC: tick ( ms object -- )
     #! Takes current time, and a timer. If the timer is set to
     #! fire, calls its callback.
     dup next-time pick <= [
-        [ advance-timer ] keep timer-object tick*
+        [ advance-timer ] keep timer-object tick
     ] [
         2drop
     ] ifte ;
 
 : do-timers ( -- )
     millis timers hash-values [ do-timer ] each-with ;
+
+: init-threads ( -- )
+    global [
+        <queue> \ run-queue set
+        10 <vector> \ sleep-queue set
+        <namespace> \ timers set
+    ] bind ;

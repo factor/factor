@@ -1,14 +1,14 @@
 #define USER_ENV 16
 
 #define CARD_OFF_ENV   1 /* for compiling set-slot */
-#define UNUSED_ENV     2
+/* 2 is unused */
 #define NAMESTACK_ENV  3 /* used by library only */
 #define GLOBAL_ENV     4
 #define BREAK_ENV      5
 #define CATCHSTACK_ENV 6 /* used by library only */
 #define CPU_ENV        7
 #define BOOT_ENV       8
-#define UNUSED_ENV     9
+/* 9 is unused */
 #define ARGS_ENV       10
 #define OS_ENV         11
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */

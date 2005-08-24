@@ -90,8 +90,9 @@ M: pack pick-up* ( point pack -- gadget )
     dup pack-vector pick rot gadget-children
     pick-up-fast tuck inside? [ drop f ] unless ;
 
-! M: pack visible-children* ( rect gadget -- list )
-!     gadget-children [ rect-loc origin get v+ intersects? ] subset-with ;
+! M: pack visible-children* ( rect pack -- list )
+!     dup pack-vector -rot gadget-children >r rect-extent r>
+!     [ rect-loc origin get v+ v- over v. ] binsearch-slice nip ;
 
 TUPLE: stack ;
 

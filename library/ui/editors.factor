@@ -15,7 +15,7 @@ C: caret ( -- caret )
     dup gadget-visible? not over set-gadget-visible?
     relayout ;
 
-M: caret tick* ( ms caret -- ) nip toggle-visible ;
+M: caret tick ( ms caret -- ) nip toggle-visible ;
 
 : caret-blink 500 ;
 

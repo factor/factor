@@ -36,11 +36,11 @@ SYMBOL: bpp
     swap bitor ;
 
 : make-rect ( x y w h -- rect )
-    <rect>
-    [ set-rect-h ] keep
-    [ set-rect-w ] keep
-    [ set-rect-y ] keep
-    [ set-rect-x ] keep ;
+    <sdl-rect>
+    [ set-sdl-rect-h ] keep
+    [ set-sdl-rect-w ] keep
+    [ set-sdl-rect-y ] keep
+    [ set-sdl-rect-x ] keep ;
 
 : with-pixels ( quot -- )
     width get [
@@ -60,3 +60,16 @@ SYMBOL: bpp
             slip
         ] ifte SDL_Flip drop
     ] with-scope ; inline
+
+: must-lock-surface? ( surface -- ? )
+    #! This is a macro in SDL_video.h.
+    dup sdl-surface-offset 0 = [
+        sdl-surface-flags
+        SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
+        bitand 0 = not
+    ] [
+        drop t
+    ] ifte ;
+
+: sdl-surface-rect ( x y surface -- rect )
+    dup sdl-surface-w swap sdl-surface-h make-rect ;

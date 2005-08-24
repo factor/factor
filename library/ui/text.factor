@@ -4,14 +4,11 @@ IN: gadgets
 USING: alien hashtables kernel lists namespaces sdl sequences
 strings styles io ;
 
-: surface-rect ( x y surface -- rect )
-    dup surface-w swap surface-h make-rect ;
-
 : draw-surface ( x y surface -- )
     surface get SDL_UnlockSurface
     [
-        [ surface-rect ] keep swap surface get 0 0
-    ] keep surface-rect swap rot SDL_UpperBlit drop
+        [ sdl-surface-rect ] keep swap surface get 0 0
+    ] keep sdl-surface-rect swap rot SDL_UpperBlit drop
     surface get dup must-lock-surface? [
         SDL_LockSurface
     ] when drop ;

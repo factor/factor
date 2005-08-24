@@ -31,9 +31,8 @@ GENERIC: draw-gadget* ( gadget -- )
 
 : draw-gadget ( gadget -- )
     dup gadget-visible? [
-        dup [
-            translate&clip
-            dup draw-gadget*
+        [
+            dup translate&clip dup draw-gadget*
             visible-children [ draw-gadget ] each
         ] with-scope
     ] [ drop ] ifte ;
