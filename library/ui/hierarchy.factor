@@ -57,8 +57,37 @@ sequences vectors ;
     #! The position of the gadget on the screen.
     parents-up { 0 0 0 } [ rect-loc v+ ] reduce ;
 
-: relative ( g1 g2 -- g2-g1 )
-    screen-loc swap screen-loc v- ;
+: relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;
 
-: child? ( parent child -- ? )
-    parents-down memq? ;
+: child? ( parent child -- ? ) parents-down memq? ;
+
+GENERIC: focusable-child* ( gadget -- gadget/t )
+
+M: gadget focusable-child* drop t ;
+
+: focusable-child ( gadget -- gadget )
+    dup focusable-child*
+    dup t = [ drop ] [ nip focusable-child ] ifte ;
+
+GENERIC: children-on ( rect/point gadget -- list )
+
+M: gadget children-on ( rect/point gadget -- list )
+    nip gadget-children ;
+
+: inside? ( bounds gadget -- ? )
+    dup gadget-visible?
+    [ >absolute intersects? ] [ 2drop f ] ifte ;
+
+: pick-up-list ( rect/point gadget -- gadget/f )
+    dupd children-on reverse-slice [ inside? ] find-with nip ;
+
+: translate ( rect/point -- )
+    rect-loc origin [ v+ ] change ;
+
+: pick-up ( rect/point gadget -- gadget )
+    2dup inside? [
+        [
+            dup translate 2dup pick-up-list dup
+            [ nip pick-up ] [ rot 2drop ] ifte
+        ] with-scope
+    ] [ 2drop f ] ifte ;

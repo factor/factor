@@ -242,10 +242,10 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : check-recursion ( obj quot -- indent )
     #! We detect circular structure.
     nesting-limit? [
-        2drop "&" f text
+        2drop "#" f text
     ] [
         over recursion-check get memq? [
-            2drop "#" f text
+            2drop "&" f text
         ] [
             over recursion-check [ cons ] change
             call
@@ -318,7 +318,7 @@ M: wrapper pprint* ( wrapper -- )
 
 : unparse-short ( object -- str ) [ pprint-short ] string-out ;
 
-: unparse-short. ( object -- )
+: short. ( object -- )
     dup unparse-short swap write-object terpri ;
 
 : [.] ( sequence -- ) [ unparse-short. ] each ;

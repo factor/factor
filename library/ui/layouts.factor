@@ -83,18 +83,17 @@ M: pack pref-dim ( pack -- dim )
 
 M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
 
-: pack-comparator rect-loc origin get v+ v- over v. ;
+: fast-children-on ( dim axis gadgets -- i )
+    swapd [ rect-loc origin get v+ v- over v. ] binsearch nip ;
 
-: pick-up-fast ( axis point gadgets -- gadget )
-    [ pack-comparator ] binsearch* nip ;
-
-M: pack pick-up* ( point pack -- gadget )
-    dup pack-vector pick rot gadget-children
-    pick-up-fast tuck inside? [ drop f ] unless ;
-
-M: pack visible-children* ( rect pack -- list )
-    dup pack-vector -rot gadget-children >r rect-extent r>
-    [ pack-comparator ] binsearch-slice nip ;
+M: pack children-on ( rect pack -- list )
+    dup pack-vector swap gadget-children [
+        3dup
+        >r >r dup rect-loc swap rect-dim v+ r> r> fast-children-on 1 +
+        >r
+        >r >r rect-loc r> r> fast-children-on 0 max
+        r>
+    ] keep <slice> ;
 
 TUPLE: stack ;
 
@@ -102,8 +101,5 @@ C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
     0 1 { 0 0 1 } <pack> over set-delegate ;
 
-M: stack pick-up* ( point stack -- gadget )
-    gadget-children reverse-slice pick-up-list ;
-
-M: stack visible-children* ( rect gadget -- list )
+M: stack children-on ( point stack -- gadget )
     nip gadget-children ;

@@ -29,7 +29,3 @@ C: menu ( assoc -- gadget )
     [ f line-border swap set-delegate ] keep
     0 1 <pile> [ swap add-gadget ] 2keep
     rot assoc>menu dup menu-actions ;
-
-! While a menu is open, clicking anywhere sends the click to
-! the menu.
-M: menu inside? ( point menu -- ? ) 2drop t ;

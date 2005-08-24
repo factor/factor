@@ -15,7 +15,7 @@ parser prettyprint sequences io strings vectors words ;
 
 : type-check-error. ( list -- )
     "Type check error" print
-    uncons car dup "Object: " write .
+    uncons car dup "Object: " write short.
     "Object type: " write class .
     "Expected type: " write type>class . ;
 
@@ -63,13 +63,13 @@ M: kernel-error error. ( error -- )
 M: no-method error. ( error -- )
     "No suitable method." print
     "Generic word: " write dup no-method-generic .
-    "Object: " write no-method-object . ;
+    "Object: " write no-method-object short. ;
 
 M: no-math-method error. ( error -- )
     "No suitable arithmetic method." print
     "Generic word: " write dup no-math-method-generic .
-    "Left operand: " write dup no-math-method-left .
-    "Right operand: " write no-math-method-right . ;
+    "Left operand: " write dup no-math-method-left short.
+    "Right operand: " write no-math-method-right short. ;
 
 : parse-dump ( error -- )
     "Parsing " write
@@ -86,7 +86,7 @@ M: parse-error error. ( error -- )
 
 M: bounds-error error. ( error -- )
     "Sequence index out of bounds" print
-    "Sequence: " write dup bounds-error-seq .
+    "Sequence: " write dup bounds-error-seq short.
     "Minimum: 0" print
     "Maximum: " write dup bounds-error-seq length .
     "Requested: " write bounds-error-index . ;

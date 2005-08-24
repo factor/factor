@@ -15,30 +15,22 @@ SYMBOL: clip
     #! intersected clip rectangle.
     surface get swap >sdl-rect SDL_SetClipRect drop ;
 
-GENERIC: visible-children* ( rect gadget -- list )
-
-M: gadget visible-children* ( rect gadget -- list )
-    gadget-children [ >absolute intersects? ] subset-with ;
-
-: visible-children ( gadget -- list )
-    clip get swap visible-children* ;
+: visible-children ( gadget -- seq ) clip get swap children-on ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
-: translate&clip ( gadget -- )
-    >absolute dup rect-loc origin set
-    clip [ intersect dup ] change set-clip ;
+: do-clip ( gadget -- )
+    >absolute clip [ intersect dup ] change set-clip ;
 
 : draw-gadget ( gadget -- )
-    dup gadget-visible? [
+    clip get over inside? [
         [
-            dup translate&clip dup draw-gadget*
+            dup do-clip dup translate dup draw-gadget*
             visible-children [ draw-gadget ] each
         ] with-scope
     ] [ drop ] ifte ;
 
-: paint-prop* ( gadget key -- value )
-    swap gadget-paint ?hash ;
+: paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
 
 : paint-prop ( gadget key -- value )
     over [

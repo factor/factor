@@ -136,7 +136,7 @@ M: general-list tutorial-line
             "The squared word"
             "Try entering the following word definition:"
             ""
-            [ ": squared ( n -- n*n ) dup * ;" ]
+            [ ": square ( n -- n*n ) dup * ;" ]
             ""
             "Shuffle words solve the problem where we need to compose"
             "two words, but their stack effects do not ``fit''."
@@ -166,13 +166,13 @@ M: general-list tutorial-line
             "you will now have several new colon definitions:"
             ""
             "  twice"
-            "  squared"
-            "  negated"
+            "  square"
+            "  negate"
             ""
             "You can look at previously-entered word definitions using 'see'."
             "Try the following:"
             ""
-            [ "\\ negated see" ]
+            [ "\\ negate see" ]
             ""
             "Prefixing a word with \\ pushes it on the stack, instead of"
             "executing it. So the see word has stack effect ( word -- )."
@@ -191,7 +191,7 @@ M: general-list tutorial-line
             "absolute value of a number; that is, if it is less than 0,"
             "the number will be negated to yield a positive result."
             ""
-            [ ": absolute ( x -- |x| ) dup 0 < [ negated ] when ;" ]
+            [ ": absolute ( x -- |x| ) dup 0 < [ negate ] when ;" ]
             ""
             "It duplicates the top of the stack, since negative? pops it."
             "Then if the top of the stack was found to be negative,"

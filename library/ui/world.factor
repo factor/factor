@@ -43,8 +43,6 @@ C: world ( -- world )
     world get 2dup add-gadget set-world-glass
     dupd add-gadget prefer ;
 
-M: world inside? ( point world -- ? ) 2drop t ;
-
 : draw-world ( world -- )
     [
         { 0 0 0 } width get height get 0 3vector <rect> clip set

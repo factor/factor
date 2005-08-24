@@ -62,7 +62,7 @@ DEFER: (nsort)
         ] ifte
     ] ifte ; inline
 
-: binsearch-slice ( seq -- slice )
+: flatten-slice ( seq -- slice )
     #! Binsearch returns an index relative to the sequence
     #! being sliced, so if we are given a slice as input,
     #! unexpected behavior will result.
@@ -84,15 +84,9 @@ IN: sequences
 
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?
-    [ 3drop -1 ] [ binsearch-slice (binsearch) ] ifte ;
+    [ 3drop -1 ] [ flatten-slice (binsearch) ] ifte ;
     inline
 
 : binsearch* ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )
     over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] ifte ;
     inline
-
-: binsearch-range ( from to seq quot -- from to )
-    [ binsearch 0 max ] 2keep rot >r binsearch 1 + r> ; inline
-
-: binsearch-slice ( from to seq quot -- slice )
-    over >r binsearch-range r> <slice> ; inline

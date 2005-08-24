@@ -10,28 +10,24 @@ global [ { 0 0 0 } origin set ] bind
 
 TUPLE: rect loc dim ;
 
-GENERIC: inside? ( loc rect -- ? )
+M: vector rect-loc ;
 
-: rect-bounds ( rect -- loc dim )
-    dup rect-loc swap rect-dim ;
+M: vector rect-dim drop { 0 0 0 } ;
 
-: rect-extent ( rect -- loc dim )
-    dup rect-loc dup rot rect-dim v+ ;
+: rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
+
+: rect-extent ( rect -- loc dim ) rect-bounds over v+ ;
 
 : >absolute ( rect -- rect )
-    dup rect-loc origin get v+ dup rot rect-dim v+ <rect> ;
-
-M: rect inside? ( loc rect -- ? )
-    >absolute rect-bounds { 1 1 1 } v- { 0 0 0 } vmax
-    >r v- { 0 0 0 } r> vbetween? conjunction ;
+    rect-bounds >r origin get v+ r> <rect> ;
 
 : intersect ( rect rect -- rect )
     >r rect-extent r> rect-extent swapd vmin >r vmax dup r>
     swap v- { 0 0 0 } vmax <rect> ;
 
-: intersects? ( rect rect -- ? )
+: intersects? ( rect/point rect -- ? )
     >r rect-extent r> rect-extent swapd vmin >r vmax r> v-
-    [ 0 < ] contains? ;
+    [ 0 <= ] all? ;
 
 ! A gadget is a rectangle, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent.
@@ -86,32 +82,3 @@ M: gadget layout* drop ;
 GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
-
-GENERIC: focusable-child* ( gadget -- gadget/t )
-
-M: gadget focusable-child* drop t ;
-
-: focusable-child ( gadget -- gadget )
-    dup focusable-child*
-    dup t = [ drop ] [ nip focusable-child ] ifte ;
-
-GENERIC: pick-up* ( point gadget -- gadget )
-
-: pick-up-list ( point gadgets -- gadget )
-    [
-        dup gadget-visible? [ inside? ] [ 2drop f ] ifte
-    ] find-with nip ;
-
-M: gadget pick-up* ( point gadget -- gadget )
-    gadget-children pick-up-list ;
-
-: pick-up ( point gadget -- gadget )
-    #! The logic is thus. If the point is definately outside the
-    #! box, return f. Otherwise, see if the point is contained
-    #! in any subgadget. If not, see if it is contained in the
-    #! box delegate.
-    dup gadget-visible? >r 2dup inside? r> drop [
-        pick-up* [ pick-up ] [ nip ] ?ifte
-    ] [
-        2drop f
-    ] ifte ;

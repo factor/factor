@@ -3329,11 +3329,11 @@ Computes both the quotient and remainder. That is, \texttt{/mod} could be define
 \end{verbatim}
 \wordtable{
 \vocabulary{math}
-\ordinaryword{gcd}{gcd ( x y -- a c )}
+\ordinaryword{gcd}{gcd ( x y -- a d )}
 }
 Applies the Euclidian algorithm to \texttt{x} and \texttt{y}. The output values satisfy the following property for some integer $b$:
-$$ax+by=c$$
-Furthermore, $c$ is the greatest integer having this property; that is, it is the greatest common divisor of $a$ and $b$.
+$$ax+by=d$$
+Furthermore, $d$ is the greatest integer having this property; that is, it is the greatest common divisor of $a$ and $b$.
 \wordtable{
 \vocabulary{math}
 \ordinaryword{mod-inv}{mod-inv ( x n -- y )}
