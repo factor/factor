@@ -59,23 +59,23 @@ BEGIN-STRUCT: sdl-format
 END-STRUCT
 
 BEGIN-STRUCT: sdl-surface
-    FIELD: uint    flags
-    FIELD: format* format
-    FIELD: int     w
-    FIELD: int     h
-    FIELD: ushort  pitch
-    FIELD: void*   pixels
-    FIELD: int     offset
-    FIELD: void*   hwdata
-    FIELD: short   clip-x
-    FIELD: short   clip-y
-    FIELD: ushort   clip-w
-    FIELD: ushort   clip-h
-    FIELD: uint    unused1
-    FIELD: uint    locked
-    FIELD: int     map
-    FIELD: uint    format_version
-    FIELD: int     refcount
+    FIELD: uint        flags
+    FIELD: sdl-format* format
+    FIELD: int         w
+    FIELD: int         h
+    FIELD: ushort      pitch
+    FIELD: void*       pixels
+    FIELD: int         offset
+    FIELD: void*       hwdata
+    FIELD: short       clip-x
+    FIELD: short       clip-y
+    FIELD: ushort       clip-w
+    FIELD: ushort       clip-h
+    FIELD: uint        unused1
+    FIELD: uint        locked
+    FIELD: int         map
+    FIELD: uint        format_version
+    FIELD: int         refcount
 END-STRUCT
 
 : SDL_VideoInit ( driver-name flags -- )

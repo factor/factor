@@ -50,6 +50,16 @@ SYMBOL: bpp
         ] repeat
     ] repeat drop ; inline
 
+: must-lock-surface? ( surface -- ? )
+    #! This is a macro in SDL_video.h.
+    dup sdl-surface-offset 0 = [
+        sdl-surface-flags
+        SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
+        bitand 0 = not
+    ] [
+        drop t
+    ] ifte ;
+
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
@@ -60,16 +70,6 @@ SYMBOL: bpp
             slip
         ] ifte SDL_Flip drop
     ] with-scope ; inline
-
-: must-lock-surface? ( surface -- ? )
-    #! This is a macro in SDL_video.h.
-    dup sdl-surface-offset 0 = [
-        sdl-surface-flags
-        SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
-        bitand 0 = not
-    ] [
-        drop t
-    ] ifte ;
 
 : sdl-surface-rect ( x y surface -- rect )
     dup sdl-surface-w swap sdl-surface-h make-rect ;
