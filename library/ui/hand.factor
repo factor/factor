@@ -4,23 +4,6 @@ IN: gadgets
 USING: alien generic io kernel lists math matrices namespaces
 prettyprint sdl sequences vectors ;
 
-: (pick-up) ( point gadget -- gadget )
-    gadget-children reverse-slice [
-        dup gadget-visible? [ inside? ] [ 2drop f ] ifte
-    ] find-with nip ;
-
-: pick-up ( point gadget -- gadget )
-    #! The logic is thus. If the point is definately outside the
-    #! box, return f. Otherwise, see if the point is contained
-    #! in any subgadget. If not, see if it is contained in the
-    #! box delegate.
-    dup gadget-visible? >r 2dup inside? r> drop [
-        [ rectangle-loc v- ] keep 2dup
-        (pick-up) [ pick-up ] [ nip ] ?ifte
-    ] [
-        2drop f
-    ] ifte ;
-
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state. The hand's parent is the world, but
 ! it is special in that the world does not list it as part of
@@ -72,13 +55,13 @@ C: hand ( world -- hand )
 
 : move-hand ( loc hand -- )
     dup hand-gadget parents-down >r
-    2dup set-rectangle-loc
+    2dup set-rect-loc
     [ >r world get pick-up r> set-hand-gadget ] keep
     dup hand-gadget parents-down r> hand-gestures ;
 
 : update-hand ( hand -- )
     #! Called when a gadget is removed or added.
-    dup rectangle-loc swap move-hand ;
+    dup rect-loc swap move-hand ;
 
 : focus-gestures ( new old -- )
     drop-prefix

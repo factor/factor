@@ -4,10 +4,6 @@ IN: prettyprint
 USING: alien generic hashtables io kernel lists math namespaces
 parser sequences strings styles vectors words ;
 
-! TODO:
-! - out of memory when printing global namespace
-! - formatting HTML code
-
 ! State
 SYMBOL: column
 SYMBOL: indent
@@ -110,11 +106,8 @@ C: block ( -- block )
     [ section-end fresh-line ] [ drop ] ifte ;
 
 : advance ( section -- )
-    section-start last-newline get = [
-        last-newline inc
-    ] [
-        " " write
-    ] ifte ;
+    section-start last-newline get =
+    [ last-newline inc ] [ " " write ] ifte ;
 
 : pprint-section ( section -- )
     last-newline? get [
@@ -198,7 +191,7 @@ M: complex pprint* ( num -- )
     \ }# pprint-word ;
 
 : ch>ascii-escape ( ch -- esc )
-    [
+    {{
         [[ CHAR: \e "\\e"  ]]
         [[ CHAR: \n "\\n"  ]]
         [[ CHAR: \r "\\r"  ]]
@@ -206,7 +199,7 @@ M: complex pprint* ( num -- )
         [[ CHAR: \0 "\\0"  ]]
         [[ CHAR: \\ "\\\\" ]]
         [[ CHAR: \" "\\\"" ]]
-    ] assoc ;
+    }} hash ;
 
 : ch>unicode-escape ( ch -- esc )
     >hex 4 CHAR: 0 pad-left "\\u" swap append ;
@@ -290,7 +283,11 @@ M: tuple pprint* ( tuple -- )
     [ <mirror> \ << \ >> pprint-sequence ] check-recursion ;
 
 M: alien pprint* ( alien -- )
-    \ ALIEN: pprint-word bl alien-address number>string f text ;
+    dup expired? [
+        drop "( alien expired )"
+    ] [
+        \ ALIEN: pprint-word bl alien-address number>string
+    ] ifte f text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [

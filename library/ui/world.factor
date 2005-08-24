@@ -16,7 +16,7 @@ DEFER: update-hand
 DEFER: do-timers
 
 C: world ( -- world )
-    f <stack> over set-delegate
+    <stack> over set-delegate
     t over set-gadget-root?
     dup <hand> over set-world-hand ;
 
@@ -47,7 +47,7 @@ M: world inside? ( point world -- ? ) 2drop t ;
 
 : draw-world ( world -- )
     [
-        { 0 0 0 } width get height get 0 3vector <rectangle> clip set
+        { 0 0 0 } width get height get 0 3vector <rect> clip set
         draw-gadget
     ] with-surface ;
 

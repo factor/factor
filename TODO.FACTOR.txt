@@ -1,8 +1,11 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - fix infer hang
+- out of memory error when printing global namespace
+- HTML formatting
 
 + ui:
 
+- adding/removing timers automatically for animated gadgets
 - fix listener prompt display after presentation commands invoked
 - theme abstraction in ui
 - menu dragging
@@ -76,6 +79,8 @@
 
 + kernel:
 
+- merge timers with sleeping tasks
+- what about tasks and timers between image restarts
 - split: return vectors
 - specialized arrays
 - there is a problem with hashcodes of words and bootstrapping

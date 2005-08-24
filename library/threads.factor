@@ -63,7 +63,7 @@ GENERIC: tick ( ms object -- )
 : timers ( -- hash ) \ timers global hash ;
 
 : add-timer ( object delay -- )
-    [ <timer> ] keep timers set-hash ;
+    over >r <timer> r> timers set-hash ;
 
 : remove-timer ( object -- ) timers remove-hash ;
 

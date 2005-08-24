@@ -61,7 +61,7 @@ IN: shells
     #! dimensions.
     ttf-init
     ?init-world
-    world get rectangle-dim 2unseq 0 SDL_RESIZABLE [
+    world get rect-dim 2unseq 0 SDL_RESIZABLE [
         [
             "Factor " version append dup SDL_WM_SetCaption
             start-world

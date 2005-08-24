@@ -27,7 +27,7 @@ TUPLE: pack align fill vector ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [
-        over rectangle-dim { 1 1 1 } vmax over v-
+        over rect-dim { 1 1 1 } vmax over v-
         rot pack-fill v*n v+
     ] map-with ;
 
@@ -42,9 +42,9 @@ TUPLE: pack align fill vector ;
     { 0 0 0 } [ v+ ] accumulate ;
 
 : packed-loc-2 ( gadget sizes -- seq )
-    >r dup rectangle-dim { 1 1 1 } vmax over r>
+    >r dup rect-dim { 1 1 1 } vmax over r>
     packed-dim-2 [ v- ] map-with
-    >r dup pack-align swap rectangle-dim { 1 1 1 } vmax r>
+    >r dup pack-align swap rect-dim { 1 1 1 } vmax r>
     [ >r 2dup r> v- n*v ] map 2nip ;
 
 : (packed-locs) ( gadget sizes -- seq )
@@ -52,7 +52,7 @@ TUPLE: pack align fill vector ;
 
 : packed-locs ( gadget sizes -- )
     over gadget-children >r (packed-locs) r>
-    [ set-rectangle-loc ] 2each ;
+    [ set-rect-loc ] 2each ;
 
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;
@@ -83,6 +83,24 @@ M: pack pref-dim ( pack -- dim )
 
 M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
 
-: <stack> ( list -- gadget )
+: pick-up-fast ( axis point gadgets -- gadget )
+    [ rect-loc v- over v. ] binsearch* nip ;
+
+M: pack pick-up* ( point pack -- gadget )
+    dup pack-vector pick rot gadget-children
+    pick-up-fast tuck inside? [ drop f ] unless ;
+
+! M: pack visible-children* ( rect gadget -- list )
+!     gadget-children [ rect-loc origin get v+ intersects? ] subset-with ;
+
+TUPLE: stack ;
+
+C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
-    0 1 { 0 0 1 } <pack>  swap [ over add-gadget ] each ;
+    0 1 { 0 0 1 } <pack> over set-delegate ;
+
+M: stack pick-up* ( point stack -- gadget )
+    gadget-children reverse-slice pick-up-list ;
+
+M: stack visible-children* ( rect gadget -- list )
+    nip gadget-children ;

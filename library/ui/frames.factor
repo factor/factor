@@ -72,11 +72,11 @@ SYMBOL: frame-bottom-run
 : var-frame-top \ frame-top var-frame-y ;
 : var-frame-right
     dup \ frame-right var-frame-x
-    swap rectangle-dim first \ frame-right [ - ] change
+    swap rect-dim first \ frame-right [ - ] change
     \ frame-right get \ frame-left get - frame-right-run set ;
 : var-frame-bottom
     dup \ frame-bottom var-frame-y
-    swap rectangle-dim second \ frame-bottom [ - ] change
+    swap rect-dim second \ frame-bottom [ - ] change
     \ frame-bottom get \ frame-top get - frame-bottom-run set ;
 
 : setup-frame ( frame -- )
@@ -86,7 +86,7 @@ SYMBOL: frame-bottom-run
     var-frame-bottom ;
 
 : move-gadget ( x y gadget -- )
-    >r 0 3vector r> set-rectangle-loc ;
+    >r 0 3vector r> set-rect-loc ;
 
 : reshape-gadget ( x y w h gadget -- )
     [ >r 0 3vector r> set-gadget-dim ] keep move-gadget ;

@@ -55,7 +55,7 @@ sequences vectors ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents-up { 0 0 0 } [ rectangle-loc v+ ] reduce ;
+    parents-up { 0 0 0 } [ rect-loc v+ ] reduce ;
 
 : relative ( g1 g2 -- g2-g1 )
     screen-loc swap screen-loc v- ;

@@ -10,7 +10,6 @@ USING: kernel parser sequences io ;
     "/library/ui/borders.factor"
     "/library/ui/frames.factor"
     "/library/ui/world.factor"
-    "/library/ui/timer.factor"
     "/library/ui/hand.factor"
     "/library/ui/labels.factor"
     "/library/ui/buttons.factor"

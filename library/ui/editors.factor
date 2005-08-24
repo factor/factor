@@ -17,10 +17,10 @@ C: caret ( -- caret )
 
 M: caret tick* ( ms caret -- ) nip toggle-visible ;
 
-: caret-block 500 ;
+: caret-blink 500 ;
 
 : add-caret ( caret parent -- )
-    dupd add-gadget caret-block add-timer ;
+    dupd add-gadget caret-blink add-timer ;
 
 : unparent-caret ( caret -- )
     dup remove-timer unparent ;
@@ -100,7 +100,7 @@ C: editor ( text -- )
     0 0 3vector ;
 
 : caret-dim ( editor -- w h )
-    rectangle-dim { 0 1 1 } v* { 1 0 0 } v+ ;
+    rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
 
 M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor  t ;
@@ -110,7 +110,7 @@ M: editor pref-dim ( editor -- dim )
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim
-    dup editor-caret swap caret-loc swap set-rectangle-loc ;
+    dup editor-caret swap caret-loc swap set-rect-loc ;
 
 M: editor draw-gadget* ( editor -- )
     dup delegate draw-gadget*

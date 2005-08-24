@@ -17,7 +17,7 @@ TUPLE: splitter split ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over rectangle-dim { 1 1 1 } vmax v/ over pack-vector v.
+    over rect-dim { 1 1 1 } vmax v/ over pack-vector v.
     0 max 1 min over set-splitter-split relayout ;
 
 : divider-actions ( thumb -- )
@@ -45,14 +45,14 @@ C: splitter ( first second split vector -- splitter )
     { 1 0 0 } <splitter> ;
 
 : splitter-part ( splitter -- vec )
-    dup splitter-split swap rectangle-dim
+    dup splitter-split swap rect-dim
     n*v divider-size 1/2 v*n v- ;
 
 : splitter-layout ( splitter -- { a b c } )
     [
         dup splitter-part ,
         divider-size ,
-        dup rectangle-dim divider-size v- swap splitter-part v- ,
+        dup rect-dim divider-size v- swap splitter-part v- ,
     ] make-vector ;
 
 M: splitter layout* ( splitter -- )
