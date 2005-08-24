@@ -142,7 +142,6 @@ sequences io vectors words ;
         "/library/compiler/compiler.factor"
 
         "/library/alien/c-types.factor"
-        "/library/alien/enums.factor"
         "/library/alien/structs.factor"
         "/library/alien/compiler.factor"
         "/library/alien/syntax.factor"

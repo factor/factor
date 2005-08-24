@@ -14,6 +14,9 @@ USING: errors generic hashtables kernel lists
 math namespaces parser prettyprint sequences sequences io
 strings vectors words ;
 
+! If true in current namespace, we are bootstrapping.
+SYMBOL: bootstrapping?
+
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 
@@ -278,8 +281,9 @@ M: hashtable ' ( hashtable -- pointer )
     "Writing image to " write dup write "..." print
     <file-writer> [ (write-image) ] with-stream ;
 
-: with-minimal-image ( quot -- image )
+: with-image ( quot -- image )
     [
+        bootstrapping? on
         800000 <vector> image set
         20000 <hashtable> objects set
         call
@@ -288,15 +292,13 @@ M: hashtable ' ( hashtable -- pointer )
         image get
     ] with-scope ;
 
-: with-image ( quot -- image )
-    #! The quotation leaves a boot quotation on the stack.
-    [ begin call end ] with-minimal-image ;
-
 : make-image ( name -- )
     #! Make a bootstrap image.
     [
+        begin
         "/library/bootstrap/boot-stage1.factor" run-resource
         namespace global [ "foobar" set ] bind
+        end
     ] with-image
 
     swap write-image ;

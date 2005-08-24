@@ -11,7 +11,7 @@ SYMBOL: vocabularies
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
-    vocabularies get hash-keys [ lexi ] sort ;
+    vocabularies get hash-keys string-sort ;
 
 : vocab ( name -- vocab )
     #! Get a vocabulary.

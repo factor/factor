@@ -58,7 +58,7 @@ BEGIN-STRUCT: sdl-format
     FIELD: uchar  alpha
 END-STRUCT
 
-BEGIN-STRUCT: sdl-surface
+BEGIN-STRUCT: surface
     FIELD: uint        flags
     FIELD: sdl-format* format
     FIELD: int         w
@@ -120,7 +120,7 @@ END-STRUCT
     "void" "sdl" "SDL_UnlockSurface" [ "surface*" ] alien-invoke ;
 
 : SDL_SetClipRect ( surface rect -- ? )
-    "bool" "sdl" "SDL_SetClipRect" [ "surface*" "rect*" ] alien-invoke ;
+    "bool" "sdl" "SDL_SetClipRect" [ "surface*" "sdl-rect*" ] alien-invoke ;
 
 : SDL_FreeSurface ( surface -- )
     "void" "sdl" "SDL_FreeSurface" [ "surface*" ] alien-invoke ;
@@ -129,14 +129,14 @@ END-STRUCT
     #! The blit function should not be called on a locked
     #! surface.
     "int" "sdl" "SDL_UpperBlit" [
-        "surface*" "rect*"
-        "surface*" "rect*"
+        "surface*" "sdl-rect*"
+        "surface*" "sdl-rect*"
     ] alien-invoke ;
 
 : SDL_FillRect ( surface rect color -- n )
     #! If rect is null, fills entire surface.
     "bool" "sdl" "SDL_FillRect"
-    [ "surface*" "rect*" "uint" ] alien-invoke ;
+    [ "surface*" "sdl-rect*" "uint" ] alien-invoke ;
 
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"

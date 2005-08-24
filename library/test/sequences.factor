@@ -147,7 +147,7 @@ unit-test
     sorter-seq >vector nip
 ] unit-test
 
-[ [ ] ] [ [ ] [ - ] sort ] unit-test
+[ [ ] ] [ [ ] number-sort ] unit-test
 
 : pairs ( seq quot -- )
     swap dup length 1 - [
@@ -166,6 +166,6 @@ unit-test
 [ t ] [
     100 [
         drop
-        1000 [ drop 0 1000 random-int ] map [ - ] sort [ - ] sorted?
+        1000 [ drop 0 1000 random-int ] map number-sort [ - ] sorted?
     ] all?
 ] unit-test

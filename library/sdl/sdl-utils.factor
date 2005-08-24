@@ -52,8 +52,8 @@ SYMBOL: bpp
 
 : must-lock-surface? ( surface -- ? )
     #! This is a macro in SDL_video.h.
-    dup sdl-surface-offset 0 = [
-        sdl-surface-flags
+    dup surface-offset 0 = [
+        surface-flags
         SDL_HWSURFACE SDL_ASYNCBLIT bitor SDL_RLEACCEL bitor
         bitand 0 = not
     ] [
@@ -71,5 +71,5 @@ SYMBOL: bpp
         ] ifte SDL_Flip drop
     ] with-scope ; inline
 
-: sdl-surface-rect ( x y surface -- rect )
-    dup sdl-surface-w swap sdl-surface-h make-rect ;
+: surface-rect ( x y surface -- rect )
+    dup surface-w swap surface-h make-rect ;

@@ -101,7 +101,7 @@ PREDICATE: compound generic ( word -- ? )
 M: generic definer drop \ G: ;
 
 : lookup-union ( typelist -- class )
-    [ - ] sort typemap get hash [ object ] unless* ;
+    number-sort typemap get hash [ object ] unless* ;
 
 : class-or ( class class -- class )
     #! Return a class that both classes are subclasses of.
@@ -139,4 +139,4 @@ M: generic definer drop \ G: ;
 
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
-    dup types [ - ] sort typemap get set-hash ;
+    dup types number-sort typemap get set-hash ;

@@ -78,6 +78,10 @@ IN: sequences
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
 
+: number-sort ( seq -- seq ) [ - ] sort ;
+
+: string-sort ( seq -- seq ) [ lexi ] sort ;
+
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?
     [ 3drop -1 ] [ binsearch-slice (binsearch) ] ifte ;

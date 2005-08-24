@@ -7,8 +7,8 @@ strings styles io ;
 : draw-surface ( x y surface -- )
     surface get SDL_UnlockSurface
     [
-        [ sdl-surface-rect ] keep swap surface get 0 0
-    ] keep sdl-surface-rect swap rot SDL_UpperBlit drop
+        [ surface-rect ] keep swap surface get 0 0
+    ] keep surface-rect swap rot SDL_UpperBlit drop
     surface get dup must-lock-surface? [
         SDL_LockSurface
     ] when drop ;

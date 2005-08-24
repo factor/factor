@@ -3,7 +3,7 @@
 IN: alien
 USING: assembler compiler compiler-backend compiler-frontend
 errors generic hashtables inference io kernel lists math
-namespaces prettyprint sequences strings words ;
+namespaces prettyprint sequences strings words parser ;
 
 ! ! ! WARNING ! ! !
 ! Reloading this file into a running Factor instance on Win32
@@ -129,6 +129,23 @@ M: alien-node linearize-node* ( node -- )
     cdr library-abi "stdcall" =
     [ dup parameters stack-space %cleanup , ] unless
     linearize-return ;
+
+: unpair ( seq -- odds evens )
+    2 swap group flip dup empty?
+    [ drop { } { } ] [ 2unseq ] ifte ;
+
+: parse-arglist ( lst -- types stack effect )
+    unpair [
+        " " % [ "," ?tail drop % " " % ] each "-- " %
+    ] make-string ;
+
+: (define-c-word) ( type lib func types stack-effect -- )
+    >r over create-in >r 
+    [ alien-invoke ] cons cons cons cons r> swap define-compound
+    word r> "stack-effect" set-word-prop ;
+
+: define-c-word ( type lib func function-args -- )
+    [ "()" subseq? not ] subset parse-arglist (define-c-word) ;
 
 \ alien-invoke [ [ string object string general-list ] [ ] ]
 "infer-effect" set-word-prop

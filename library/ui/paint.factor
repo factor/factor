@@ -18,7 +18,7 @@ SYMBOL: clip
 GENERIC: visible-children* ( rect gadget -- list )
 
 M: gadget visible-children* ( rect gadget -- list )
-    gadget-children [ screen-bounds intersects? ] subset-with ;
+    gadget-children [ >absolute intersects? ] subset-with ;
 
 : visible-children ( gadget -- list )
     clip get swap visible-children* ;
@@ -26,7 +26,7 @@ M: gadget visible-children* ( rect gadget -- list )
 GENERIC: draw-gadget* ( gadget -- )
 
 : translate&clip ( gadget -- )
-    screen-bounds dup rect-loc origin set
+    >absolute dup rect-loc origin set
     clip [ intersect dup ] change set-clip ;
 
 : draw-gadget ( gadget -- )

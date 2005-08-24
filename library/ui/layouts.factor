@@ -83,16 +83,18 @@ M: pack pref-dim ( pack -- dim )
 
 M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
 
+: pack-comparator rect-loc origin get v+ v- over v. ;
+
 : pick-up-fast ( axis point gadgets -- gadget )
-    [ rect-loc v- over v. ] binsearch* nip ;
+    [ pack-comparator ] binsearch* nip ;
 
 M: pack pick-up* ( point pack -- gadget )
     dup pack-vector pick rot gadget-children
     pick-up-fast tuck inside? [ drop f ] unless ;
 
-! M: pack visible-children* ( rect pack -- list )
-!     dup pack-vector -rot gadget-children >r rect-extent r>
-!     [ rect-loc origin get v+ v- over v. ] binsearch-slice nip ;
+M: pack visible-children* ( rect pack -- list )
+    dup pack-vector -rot gadget-children >r rect-extent r>
+    [ pack-comparator ] binsearch-slice nip ;
 
 TUPLE: stack ;
 

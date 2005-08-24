@@ -67,16 +67,6 @@ IN: sdl USING: alien ;
     [ "surface*" "short" "short" "short" "short" "uint" ]
     alien-invoke ;
 
-: pieColor ( surface x y rad start end color -- )
-    "void" "sdl-gfx" "pieColor"
-    [ "surface*" "short" "short" "short" "short" "short" "uint" ]
-    alien-invoke ;
-
-: filledPieColor ( surface x y rad start end color -- )
-    "void" "sdl-gfx" "filledPieColor"
-    [ "surface*" "short" "short" "short" "short" "short" "uint" ]
-    alien-invoke ;
-
 : trigonColor ( surface x1 y1 x2 y2 x3 y3 color -- )
     "void" "sdl-gfx" "trigonColor"
     [ "surface*" "short" "short" "short" "short" "short" "short" "uint" ]

@@ -22,7 +22,6 @@
 - icons
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener
-- sort out clipping off-by-one flaw when filling rectangles
 - better menu positioning
 - only redraw dirty gadgets
 - get stuff in examples dir running in the ui

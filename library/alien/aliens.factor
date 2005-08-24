@@ -41,4 +41,6 @@ M: alien = ( obj obj -- ? )
 : library-abi ( library -- abi )
     library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
 
+: DLL" skip-blank parse-string dlopen swons ; parsing
+
 : ALIEN: scan-word <alien> swons ; parsing

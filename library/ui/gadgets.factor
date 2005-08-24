@@ -18,14 +18,11 @@ GENERIC: inside? ( loc rect -- ? )
 : rect-extent ( rect -- loc dim )
     dup rect-loc dup rot rect-dim v+ ;
 
-: screen-loc ( rect -- loc )
-    rect-loc origin get v+ ;
-
-: screen-bounds ( rect -- rect )
-    dup screen-loc swap rect-dim <rect> ;
+: >absolute ( rect -- rect )
+    dup rect-loc origin get v+ dup rot rect-dim v+ <rect> ;
 
 M: rect inside? ( loc rect -- ? )
-    screen-bounds rect-bounds { 1 1 1 } v- { 0 0 0 } vmax
+    >absolute rect-bounds { 1 1 1 } v- { 0 0 0 } vmax
     >r v- { 0 0 0 } r> vbetween? conjunction ;
 
 : intersect ( rect rect -- rect )
@@ -114,7 +111,6 @@ M: gadget pick-up* ( point gadget -- gadget )
     #! in any subgadget. If not, see if it is contained in the
     #! box delegate.
     dup gadget-visible? >r 2dup inside? r> drop [
-        [ rect-loc v- ] keep 2dup
         pick-up* [ pick-up ] [ nip ] ?ifte
     ] [
         2drop f
