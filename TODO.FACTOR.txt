@@ -5,6 +5,8 @@
 
 + ui:
 
+- off-by-one error in pickup?
+- closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - fix listener prompt display after presentation commands invoked
 - theme abstraction in ui
@@ -13,7 +15,6 @@
 - gaps in pack layout
 - find out why so many small bignums get consed
 - faster mouse tracking
-- binary search to locate visible children of packs
 - rewrite frame layout for new style
 - an interior paint that is only painted on rollover and mouse press;
   use it for menu items. give menus a gradient background

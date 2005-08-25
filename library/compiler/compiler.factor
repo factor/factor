@@ -63,3 +63,7 @@ M: compound (compile) ( word -- )
     #! Compute a quotation into an uninterned word, for testing
     #! purposes.
     gensym [ swap define-compound ] keep dup compile execute ;
+
+\ optimize profile
+\ linearize profile
+\ simplify profile

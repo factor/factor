@@ -321,7 +321,7 @@ M: wrapper pprint* ( wrapper -- )
 : short. ( object -- )
     dup unparse-short swap write-object terpri ;
 
-: [.] ( sequence -- ) [ unparse-short. ] each ;
+: [.] ( sequence -- ) [ short. ] each ;
 
 : stack. reverse-slice [.] ;
 

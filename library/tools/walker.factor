@@ -15,8 +15,7 @@ sequences io strings vectors words ;
 : &r
     #! Print stepper call stack, as well as the currently
     #! executing quotation.
-    meta-cf get unparse-short.
-    meta-executing get . meta-r get stack. ;
+    meta-cf get short. meta-executing get . meta-r get stack. ;
 
 : &get ( var -- value )
     #! Get stepper variable value.
