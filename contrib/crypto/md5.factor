@@ -11,30 +11,11 @@ SYMBOL: old-b
 SYMBOL: old-c
 SYMBOL: old-d
 
-: w+ ( int -- int )
-    + HEX: ffffffff bitand ;
-
-: nth-int ( string n -- int )
-    4 * dup 4 + rot subseq le> ;
-
-: contents ( stream -- string )
-    #! Read the entire stream into a string.
-	    4096 <sbuf> [ stream-copy ] keep >string ;
-
-: initialize ( -- )
+: initialize-md5 ( -- )
     HEX: 67452301 dup a set old-a set
     HEX: efcdab89 dup b set old-b set
     HEX: 98badcfe dup c set old-c set
     HEX: 10325476 dup d set old-d set ;
-
-: float-sin ( int -- int )
-    sin abs 4294967296 * >bignum ;
-
-: update ( num var -- )
-    [ w+ ] change ;
-
-: update-old-new ( old new -- )
-    [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ;
 
 : update-md ( -- )
     old-a a update-old-new
@@ -92,7 +73,7 @@ SYMBOL: old-d
 : S43 15 ;
 : S44 21 ;
 
-: process-block ( block -- )
+: process-md5-block ( block -- )
     S11 1 pick 0 nth-int   [ F ] ABCD
     S12 2 pick 1 nth-int   [ F ] DABC
     S13 3 pick 2 nth-int   [ F ] CDAB
@@ -164,31 +145,6 @@ SYMBOL: old-d
     drop
     ;
 
-! calculate pad length.  leave 8 bytes for length after padding
-: md5-zero-pad-length ( length -- pad-length )
-    dup 64 mod 56 < 55 119 ? swap - ; ! one less for first byte of padding 0x80
-
-! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
-: pad-string ( string  -- padded-string )
-    [
-        dup % "\u0080" %
-        dup length 64 mod md5-zero-pad-length 0 fill %
-        dup length 8 * 8 >le %
-    ] make-string ;
-
-: num-blocks ( length -- num )
-    64 /i ;
-
-: get-block ( string num -- string )
-    64 * dup 64 + rot subseq ;
-
-: hex-string ( str -- str )
-	[
-		[
-			>hex 2 48 pad-left %
-		] each
-	] make-string ;
-
 : get-md5 ( -- str )
     [
         [ a b c d ] [ get 4 >le % ] each
@@ -196,19 +152,20 @@ SYMBOL: old-d
 
 : string>md5 ( string -- md5 )
     [
-        initialize pad-string
-        dup length num-blocks [ 2dup get-block process-block ] repeat
-        2drop get-md5
+        initialize-md5 pad-string-md5
+        dup length num-blocks [ 2dup get-block process-md5-block ] repeat
+        drop get-md5
     ] with-scope ;
 
 : stream>md5 ( stream -- md5 )
-	[
-		contents string>md5
-	] with-scope ;
+    [
+        contents string>md5
+    ] with-scope ;
+
 : file>md5 ( file -- md5 )
-	[
-		<file-reader> stream>md5
-	] with-scope ;
+    [
+        <file-reader> stream>md5
+    ] with-scope ;
 
 : test-md5 ( -- )
     [ "d41d8cd98f00b204e9800998ecf8427e" ] [ "" string>md5 ] unit-test
