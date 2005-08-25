@@ -19,7 +19,7 @@
 
 </li>
 
-<li>Sequences:
+<li>Collections:
 
 <ul>
 <li><code>2each ( seq seq quot -- quot: elt -- elt )</code> combinator</li>
@@ -29,31 +29,35 @@
 <li>Integers now support the sequence protocol. An integer is an increasing sequence of its predecessors. This means the <code>count ( n -- [ 0 ... n-1 ] )</code> word is gone; just use <code>&gt;vector</code> instead. Also, <code>project</code> has been made redundant by <code>map</code>.</li>
 <li>The <code>seq-transpose ( seq -- seq )</code> word is now named <code>flip</code>.
 </li>
+<li>The matrices library has been greatly simplified. Matrices are now represented as vectors of vectors, and matrix words have been moved to the <code>math</code> vocabulary.</li>
+<li>More descriptive "out of bounds" errors.</li>
+<li>New <code>make-hash ( quot -- namespace )</code> combinator executes quotation in a new namespace, which is then pushed on the stack.</li>
+<li>The <code>&lt;namespace&gt;</code> word is gone. It would create a hashtable with a default capacity. Now, just write <code>{{ }} clone</code>.
 </ul>
 
 </li>
 
-<li>Prettyprinter:
+<li>Development tools:
 
 <ul>
+<li>In the UI, object slots are now clickable in the inspector.</li>
+<li>Inspector now supports a history and an interactive loop; it prints a brief help message when it starts describing usage.</li>
 <li>The prettyprinter has been merged with the unparser. The <code>unparse ( object -- string )</code> word has been moved to the <code>prettyprint</code> vocabulary, and can now produce a parsable string for any class supported by the prettyprinter.</li>
 <li>New <code>unparse-short ( object -- string )</code> returns a string no longer than a single line.</li>
 <li>The prettyprinter now supports many more configuration variables. See the handbook for details.</li>
+<li>New <code>profile ( word -- )</code> word. Causes the word's accumulative runtime to be stored in a global variable named by the word. This is done with the annotation facility, the word's definition is modified; use <code>reload ( word -- )</code> to get the old definition back from the source file.</li>
 </ul>
 
 </li>
+
 
 <li>Everything else:
 
 <ul>
 <li>New <code>sleep ( ms -- )</code> word pauses current thread for a number of milliseconds.</li>
-<li>New <code>make-hash ( quot -- namespace )</code> combinator executes quotation in a new namespace, which is then pushed on the stack.</li>
-<li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
-<li>Object slots are now clickable in the inspector</li>
-<li>The matrices library has been greatly simplified. Matrices are now represented as vectors of vectors, and matrix words have been moved to the <code>math</code> vocabulary.</li>
-<li>More descriptive "out of bounds" errors.</li>
 <li>New <code>with-datastack ( stack word -- stack )</code> combinator.</li>
 <li>New <code>cond ( conditions -- )</code> combinator. It behaves like a set of nested <code>ifte</code>s; see its documentation comment for details. Note that it does not compile.</li>
+<li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
 <li>Completely redid infix algebra in <code>conrib/algebra/</code>. Now, vector operations are possible
 and the syntax doesn't use so many spaces. New way to write the quadratic formula:
 <pre>MATH: quadratic[a;b;c] =

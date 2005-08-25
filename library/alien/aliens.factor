@@ -39,7 +39,7 @@ M: alien = ( obj obj -- ? )
     ] bind ;
 
 : library-abi ( library -- abi )
-    library [ [ "abi" get ] bind ] [ "cdecl" ] ifte* ;
+    library "abi" swap ?hash [ "cdecl" ] unless* ;
 
 : DLL" skip-blank parse-string dlopen swons ; parsing
 

@@ -13,7 +13,7 @@ M: #call-label collect-recursion* ( label node -- )
 : collect-recursion ( label node -- seq )
     #! Collect the input stacks of all #call-label nodes that
     #! call given label.
-    [ [ collect-recursion* ] each-node-with ] make-vector ;
+    [ [ collect-recursion* ] each-node-with ] { } make ;
 
 GENERIC: solve-recursion*
 

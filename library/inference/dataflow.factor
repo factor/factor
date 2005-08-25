@@ -53,7 +53,8 @@ M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
     [
-        >r {{ }} {{ }} 10 <vector> f f <node> r> set-delegate
+        >r {{ }} clone {{ }} clone { } clone f f <node> r>
+        set-delegate
     ] keep ;
 
 : param-node ( label) { } { } { } { } ;
@@ -155,7 +156,7 @@ SYMBOL: current-node
     [
         dup node-in-d % dup node-out-d %
         dup node-in-r % node-out-r %
-    ] make-vector ;
+    ] { } make ;
 
 : uses-value? ( value node -- ? )
     node-values [ value-refers? ] contains-with? ;
@@ -220,7 +221,7 @@ DEFER: subst-value
 : subst-values ( new old node -- )
     #! Mutates the node.
     [
-        10 <vector> substituted set [
+        { } clone substituted set [
             3dup node-in-d  (subst-values)
             3dup node-in-r  (subst-values)
             3dup node-out-d (subst-values)

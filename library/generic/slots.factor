@@ -46,7 +46,7 @@ sequences strings vectors words ;
     >r word-name "-" r> append3 "in" get 2vector ;
 
 : writer-word ( class name -- word )
-    [ swap "set-" % word-name % "-" % % ] make-string
+    [ swap "set-" % word-name % "-" % % ] "" make
     "in" get 2vector ;
 
 : simple-slot ( class name -- reader writer )

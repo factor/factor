@@ -38,7 +38,7 @@ USE: lists
 
 : get-live-updater-js ( filename -- string )
   #! Return the liveUpdater javascript code as a string.
-  <file-reader> [ get-live-updater-js* ] make-string ;
+  <file-reader> [ get-live-updater-js* ] "" make ;
 
 : live-updater-url ( -- url )
   #! Generate an URL to the liveUpdater.js code.

@@ -84,6 +84,6 @@ GENERIC: tick ( ms object -- )
 : init-threads ( -- )
     global [
         <queue> \ run-queue set
-        10 <vector> \ sleep-queue set
-        <namespace> \ timers set
+        { } clone \ sleep-queue set
+        {{ }} clone \ timers set
     ] bind ;

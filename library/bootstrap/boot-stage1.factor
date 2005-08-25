@@ -9,7 +9,7 @@ sequences io vectors words ;
 
 "/library/bootstrap/primitives.factor" run-resource
 
-! The make-list form creates a boot quotation
+! The [ ] make form creates a boot quotation
 [
     [
         [ hashtable? ] instances
@@ -152,7 +152,7 @@ sequences io vectors words ;
     } [ dup print parse-resource % ] each
     
     [ "/library/bootstrap/boot-stage2.factor" run-resource ] %
-] make-list
+] [ ] make
 
 vocabularies get [
     "!syntax" get "syntax" set

@@ -35,6 +35,8 @@ TUPLE: gadget
     paint gestures visible? relayout? root?
     parent children ;
 
+M: gadget = eq? ;
+
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )

@@ -64,6 +64,14 @@ M: compound (compile) ( word -- )
     #! purposes.
     gensym [ swap define-compound ] keep dup compile execute ;
 
+\ dataflow profile
 \ optimize profile
 \ linearize profile
 \ simplify profile
+\ generate profile
+\ kill-node profile
+\ partial-eval profile
+\ inline-method profile
+\ apply-identities profile
+\ subst-values profile
+\ split-branch profile

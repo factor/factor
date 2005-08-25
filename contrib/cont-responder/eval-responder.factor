@@ -74,7 +74,7 @@ USE: sequences
   #! backslash quote.
   [
     [ dup [ [[ CHAR: ' "\\'" ]] [[ CHAR: " "\\\"" ]] ] assoc [ % ] [ % ] ?ifte ] each
-  ] make-string ;
+  ] "" make ;
  
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when

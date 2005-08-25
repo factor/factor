@@ -43,7 +43,7 @@ M: object each ( seq quot -- )
         [ 2swap [ slip push ] 2keep ] 2each nip
     ] keep like ; inline
 
-: find* ( i seq quot -- i elt  )
+: find* ( i seq quot -- i elt )
     pick pick length >= [
         3drop -1 f
     ] [
@@ -116,7 +116,6 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : member? ( obj seq -- ? )     [ = ] contains-with? ; flushable
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
-: remq    ( obj list -- list ) [ eq? not ] subset-with ; flushable
 
 : copy-into ( start to from -- )
     dup length [ >r pick r> + pick set-nth ] 2each 2drop ;

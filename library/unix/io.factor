@@ -81,7 +81,7 @@ M: port set-timeout ( timeout port -- )
         "Error on fd " %
         dup port-handle number>string %
         ": " % swap %
-    ] make-string swap set-port-error ;
+    ] "" make swap set-port-error ;
 
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
@@ -306,9 +306,9 @@ USE: io
     #! Should only be called on startup. Calling this at any
     #! other time can have unintended consequences.
     global [
-        <namespace> read-tasks set
+        {{ }} clone read-tasks set
         FD_SETSIZE <bit-array> read-fdset set
-        <namespace> write-tasks set
+        {{ }} clone write-tasks set
         FD_SETSIZE <bit-array> write-fdset set
         0 1 t <fd-stream> stdio set
     ] bind ;

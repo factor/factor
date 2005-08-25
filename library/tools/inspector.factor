@@ -95,7 +95,7 @@ SYMBOL: inspector-stack
         inspector-help
         terpri
         "inspector " listener-prompt set
-        10 <vector> inspector-stack set
+        { } clone inspector-stack set
         (inspect)
         listener
     ] with-scope ;

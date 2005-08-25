@@ -22,7 +22,7 @@ SYMBOL: log-stream
         dup client-stream-host %
         CHAR: : ,
         client-stream-port number>string % 
-    ] make-string log ;
+    ] "" make log ;
 
 : with-log-file ( file quot -- )
     #! Calls to log inside quot will output to a file.

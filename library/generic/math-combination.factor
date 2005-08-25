@@ -50,9 +50,9 @@ TUPLE: no-math-method left right generic ;
 : math-vtable ( picker quot -- )
     [
         swap , \ tag ,
-        [ num-tags swap map % ] make-vector ,
+        [ num-tags swap map % ] { } make ,
         \ dispatch ,
-    ] make-list ; inline
+    ] [ ] make ; inline
 
 : math-class? ( object -- ? )
     dup word? [ "math-priority" word-prop ] [ drop f ] ifte ;

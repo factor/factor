@@ -24,7 +24,7 @@ M: assert error.
     [
         number>string % " ms run / " %
         number>string % " ms GC time" %
-    ] make-string print ;
+    ] "" make print ;
 
 : unit-test ( output input -- )
     [
@@ -89,7 +89,7 @@ SYMBOL: failures
         "httpd/http-client" "sbuf" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/gradients" "memory"
+        "gadgets/gradients" "gadgets/frames" "memory"
         "redefine" "annotate" "sequences" "binary" "inspector"
         "kernel"
     } run-tests ;

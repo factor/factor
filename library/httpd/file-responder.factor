@@ -11,7 +11,7 @@ io strings ;
     [
         number>string "Content-Length" swons ,
         "Content-Type" swons ,
-    ] make-list "200 OK" response terpri ;
+    ] [ ] make "200 OK" response terpri ;
 
 : serve-static ( filename mime-type -- )
     over file-length file-response  "method" get "head" = [

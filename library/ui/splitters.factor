@@ -53,7 +53,7 @@ C: splitter ( first second split vector -- splitter )
         dup splitter-part ,
         divider-size ,
         dup rect-dim divider-size v- swap splitter-part v- ,
-    ] make-vector ;
+    ] { } make ;
 
 M: splitter layout* ( splitter -- )
     dup splitter-layout packed-layout ;

@@ -17,7 +17,7 @@ presentation sequences strings styles words ;
     #! Convert <, >, &, ' and " to HTML entities.
     [
         [ dup html-entities assoc [ % ] [ , ] ?ifte ] each
-    ] make-string ;
+    ] "" make ;
 
 : hex-color, ( triplet -- )
     [ >hex 2 CHAR: 0 pad-left % ] each ;
@@ -49,7 +49,7 @@ presentation sequences strings styles words ;
             [ font-size   size-css, ]
             [ underline   underline-css, ]
         ] assoc-apply
-    ] make-string ;
+    ] "" make ;
 
 : span-tag ( style quot -- )
     over css-style dup "" = [
@@ -66,7 +66,7 @@ presentation sequences strings styles words ;
     ] when* "/" ?tail drop ;
 
 : file-link-href ( path -- href )
-    [ "/" % resolve-file-link url-encode % ] make-string ;
+    [ "/" % resolve-file-link url-encode % ] "" make ;
 
 : file-link-tag ( style quot -- )
     over file swap assoc [
@@ -82,7 +82,7 @@ presentation sequences strings styles words ;
         url-encode %
         "&word=" %
         url-encode %
-    ] make-string ;
+    ] "" make ;
 
 : browser-link-tag ( style quot -- style )
     over presented swap assoc dup word? [

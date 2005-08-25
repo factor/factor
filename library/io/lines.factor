@@ -27,7 +27,7 @@ C: line-reader ( stream -- line ) [ set-delegate ] keep ;
     ] ifte ;
 
 M: line-reader stream-readln ( line -- string )
-    [ f swap (readln) ] make-string
+    [ f swap (readln) ] "" make
     dup empty? [ f ? ] [ nip ] ifte ;
 
 M: line-reader stream-read ( count line -- string )
@@ -46,4 +46,4 @@ M: line-reader stream-read ( count line -- string )
 
 : lines ( stream -- seq )
     #! Read all lines from the stream into a sequence.
-    [ 100 <vector> (lines) ] with-stream ;
+    [ { } clone (lines) ] with-stream ;

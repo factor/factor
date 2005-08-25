@@ -63,7 +63,7 @@ SYMBOL: history-index
 : <line-editor> ( -- editor )
     [
         line-clear
-        100 <vector> history set
+        { } clone history set
         0 history-index set
     ] make-hash ;
 
@@ -79,7 +79,7 @@ SYMBOL: history-index
     #! Call this in the line editor scope.
     reset-history
     2dup caret-insert
-    line-text get cut
+    line-text get [ head ] 2keep tail
     swapd append3 line-text set ;
 
 : insert-char ( ch -- )

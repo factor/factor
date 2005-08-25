@@ -27,7 +27,7 @@ M: comment pprint* ( ann -- )
         2dup node-in-d value-str %
         "--" %
         node-out-d value-str %
-    ] make-string ;
+    ] "" make ;
 
 M: #push node>quot ( ? node -- )
     node-out-d [ literal-value literalize ] map % drop ;
@@ -77,7 +77,7 @@ M: #entry node>quot ( ? node -- ) "#entry" comment, ;
     ] ifte ;
 
 : dataflow>quot ( node ? -- quot )
-    [ swap (dataflow>quot) ] make-list ;
+    [ swap (dataflow>quot) ] [ ] make ;
 
 : dataflow. ( quot ? -- )
     #! Print dataflow IR for a quotation. Flag indicates if

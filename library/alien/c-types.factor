@@ -72,7 +72,7 @@ SYMBOL: c-types
         [
             "width" get , \ <c-object> , \ tuck , 0 ,
             "setter" get %
-        ] make-list
+        ] [ ] make
     ] bind define-compound ;
 
 : init-c-type ( name vocab -- )

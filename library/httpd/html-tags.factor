@@ -67,7 +67,7 @@ USE: sequences
 ! <a href= "http://" swap append a> "click" write </a>
 !
 ! (url -- )
-! <a href= [ "http://" % % ] make-string a> "click" write </a>
+! <a href= [ "http://" % % ] "" make a> "click" write </a>
 !
 ! Tags that have no 'closing' equivalent have a trailing tag/> form:
 !
@@ -78,7 +78,7 @@ USE: sequences
     #! suitable for embedding in an html tag.
     reverse [
         [ dup car % "='" % cdr % "'" % ] each
-    ] make-string ;
+    ] "" make ;
 
 : write-attributes ( n: namespace -- )    
     #! With the attribute namespace on the stack, get the attributes
@@ -106,7 +106,7 @@ USE: sequences
 ! : <p ( -- n: <namespace> )
 !     #! Used for setting inline attributes. Prints out
 !     #! an unclosed opening tag.
-!     "<p" write <namespace> >n ;
+!     "<p" write {{ }} clone >n ;
 !
 ! : p> ( n: <namespace> -- )
 !    #! Used to close off inline attribute version of word.
@@ -125,7 +125,7 @@ USE: sequences
 !
 ! : <input ( -- n: <namespace> )
 !     #! Used for setting inline attributes.
-!     "<input" write <namespace> >n ;
+!     "<input" write {{ }} clone >n ;
 !
 ! : input/> ( n: <namespace> -- )
 !     #! Used to close off inline attribute version of word
@@ -151,7 +151,7 @@ USE: sequences
 : def-for-html-word-<foo ( name -- name quot )
     #! Return the name and code for the <foo patterned
     #! word.
-    "<" swap append dup [ write <namespace> >n ] cons ;
+    "<" swap append dup [ write {{ }} clone >n ] cons ;
 
 : def-for-html-word-foo> ( name -- name quot )
     #! Return the name and code for the foo> patterned
@@ -163,13 +163,13 @@ USE: sequences
 : def-for-html-word-</foo> ( name -- name quot )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    [ "</" % % ">" % ] make-string dup [ write ] cons ;
+    [ "</" % % ">" % ] "" make dup [ write ] cons ;
 
 : def-for-html-word-<foo/> ( name -- name quot )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    [ "<" % dup % "/>" % ] make-string swap
-    [ "<" % % ">" % ] make-string
+    [ "<" % dup % "/>" % ] "" make swap
+    [ "<" % % ">" % ] "" make
     [ write ] cons ;
 
 : def-for-html-word-foo/> ( name -- name quot )

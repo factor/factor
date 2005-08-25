@@ -219,7 +219,7 @@ M: complex pprint* ( num -- )
     ] when ;
 
 : pprint-string ( string prefix -- )
-    [ % [ unparse-ch ] each CHAR: " , ] make-string
+    [ % [ unparse-ch ] each CHAR: " , ] "" make
     do-string-limit f text ;
 
 M: string pprint* ( str -- str ) "\"" pprint-string ;

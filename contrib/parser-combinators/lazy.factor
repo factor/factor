@@ -80,7 +80,7 @@ DEFER: lnil
 
 : lcons ( lcar lcdr -- promise )
   #! Given a car and cdr, both lazy values, return a lazy cons.
-  swap [ , , \ <lcons> , ] make-list delay ;
+  swap [ , , \ <lcons> , ] [ ] make delay ;
 
 : lunit ( lvalue -- llist )
   #! Given a lazy value (a quotation that when called produces
@@ -102,8 +102,8 @@ DEFER: lnil
     drop
   ] [
     swap 2dup
-    [ , \ lcdr , , \ lmap , ] make-list delay >r
-    [ , \ lcar , , \ call , ] make-list delay r> 
+    [ , \ lcdr , , \ lmap , ] [ ] make delay >r
+    [ , \ lcar , , \ call , ] [ ] make delay r> 
     lcons 
   ] ifte ;
 
@@ -117,8 +117,8 @@ DEFER: lnil
       nip
     ] [
         swap dupd     ( llist llist n  -- )
-        [ [ 1 - ] cons , \ call , , \ lcdr , \ ltake , ] make-list delay >r
-        [ , \ lcar , ] make-list delay r> 
+        [ [ 1 - ] cons , \ call , , \ lcdr , \ ltake , ] [ ] make delay >r
+        [ , \ lcar , ] [ ] make delay r> 
         lcons 
     ] ifte 
   ] ifte ;

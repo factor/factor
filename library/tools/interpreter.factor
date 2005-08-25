@@ -24,8 +24,8 @@ SYMBOL: meta-cf
 SYMBOL: meta-executing
 
 : init-interpreter ( -- )
-    10 <vector> meta-r set
-    10 <vector> meta-d set
+    { } clone meta-r set
+    { } clone meta-d set
     namestack meta-n set
     catchstack meta-c set
     f meta-cf set

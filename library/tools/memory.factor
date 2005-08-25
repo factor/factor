@@ -57,7 +57,7 @@ unparser vectors words ;
         [
             [ swap call ] 2keep rot [ , ] [ drop ] ifte
         ] each-object drop
-    ] make-list ;
+    ] [ ] make ;
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline

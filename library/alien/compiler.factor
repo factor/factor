@@ -137,7 +137,7 @@ M: alien-node linearize-node* ( node -- )
 : parse-arglist ( lst -- types stack effect )
     unpair [
         " " % [ "," ?tail drop % " " % ] each "-- " %
-    ] make-string ;
+    ] "" make ;
 
 : (define-c-word) ( type lib func types stack-effect -- )
     >r over create-in >r 
@@ -159,7 +159,7 @@ M: alien-node linearize-node* ( node -- )
 ] "infer" set-word-prop
 
 global [
-    "libraries" get [ <namespace> "libraries" set ] unless
+    "libraries" get [ {{ }} clone "libraries" set ] unless
 ] bind
 
 M: compound (uncrossref)

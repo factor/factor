@@ -44,9 +44,9 @@ SYMBOL: stack-display
                 listener
             ] with-stream
         ] in-thread
+    ] bind
         
-        pane get request-focus
-    ] bind ;
+        pane get request-focus ;
 
 SYMBOL: first-time
 

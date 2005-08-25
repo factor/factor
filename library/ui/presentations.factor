@@ -6,7 +6,7 @@ namespaces parser prettyprint sequences styles vectors words ;
 
 SYMBOL: commands
 
-global [ 100 <vector> commands set ] bind
+{ } clone commands global set-hash
 
 : define-command ( class name quot -- )
     3vector commands get push ;
@@ -15,7 +15,7 @@ global [ 100 <vector> commands set ] bind
     commands get [ first call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
-    [ swap literalize , % ] make-list
+    [ swap literalize , % ] [ ] make
     [ pane get pane-call drop ] cons ;
 
 : command-menu ( presented -- menu )
@@ -29,7 +29,7 @@ global [ 100 <vector> commands set ] bind
             \ drop ,
             literalize ,
             [ command-menu show-menu ] %
-        ] make-list
+        ] [ ] make
         button-gestures
     ] [
         2drop

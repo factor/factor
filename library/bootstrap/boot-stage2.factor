@@ -54,20 +54,6 @@ cpu "ppc" = [
     ] when
 ] unless
 
-: compile? "compile" get supported-cpu? and ;
-
-compile? [
-    "Compiling base..." print
-
-    \ car compile
-    \ * compile
-    \ = compile
-    \ string>number compile
-    \ number>string compile
-    \ scan compile
-    \ (generate) compile
-] when
-
 "Loading more library code..." print
 
 t [
@@ -84,6 +70,20 @@ t [
     "/library/ui/load.factor"
     "/library/help/tutorial.factor"
 ] pull-in
+
+: compile? "compile" get supported-cpu? and ;
+
+compile? [
+    "Compiling base..." print
+
+    \ car compile
+    \ * compile
+    \ = compile
+    \ string>number compile
+    \ number>string compile
+    \ scan compile
+    \ (generate) compile
+] when
 
 compile? [
     unix? [

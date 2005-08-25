@@ -20,7 +20,7 @@ M: node linearize-node* ( node -- ) drop ;
     #! Transform dataflow IR into linear IR. This strips out
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
-    [ %prologue , linearize-node ] make-list ;
+    [ %prologue , linearize-node ] [ ] make ;
 
 M: #label linearize-node* ( node -- )
     <label> dup %return-to , >r

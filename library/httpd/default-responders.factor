@@ -8,7 +8,7 @@ test-responder ;
 #! Remove all existing responders, and create a blank
 #! responder table.
 global [
-    <namespace> responders set
+    {{ }} clone responders set
 
     ! Runs all unit tests and dumps result to the client. This uses
     ! a lot of server resources, so disable it on a busy server.
@@ -46,5 +46,5 @@ global [
     ! The root directory is served by...
     "file" set-default-responder
 
-    vhosts nest [ <namespace> "default" set ] bind
+    vhosts nest [ {{ }} clone "default" set ] bind
 ] bind

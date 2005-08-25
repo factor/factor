@@ -7,7 +7,7 @@ matrices namespaces sequences vectors ;
 GENERIC: literals* ( node -- )
 
 : literals ( node -- seq )
-    [ [ literals* ] each-node ] make-vector ;
+    [ [ literals* ] each-node ] { } make ;
 
 GENERIC: can-kill* ( literal node -- ? )
 

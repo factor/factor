@@ -1,11 +1,11 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - fix infer hang
 - out of memory error when printing global namespace
-- HTML formatting
+- HTML prettyprinting
 
 + ui:
 
-- off-by-one error in pickup?
+- off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - fix listener prompt display after presentation commands invoked
@@ -79,6 +79,7 @@
 
 + kernel:
 
+- first time hash/vector is grown, set size to something big
 - merge timers with sleeping tasks
 - what about tasks and timers between image restarts
 - split: return vectors

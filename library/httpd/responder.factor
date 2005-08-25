@@ -49,7 +49,7 @@ SYMBOL: responders
     [
         "request" get % CHAR: / ,
         "raw-query" get [ CHAR: ? , % ] when*
-    ] make-string redirect ;
+    ] "" make redirect ;
 
 : query>alist ( query -- alist )
     dup [
@@ -66,7 +66,7 @@ SYMBOL: responders
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
-        unswons [ % ": " % % ] make-string log
+        unswons [ % ": " % % ] "" make log
     ] when* ;
 
 : prepare-url ( url -- url )

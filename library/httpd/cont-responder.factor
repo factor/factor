@@ -40,7 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] make-string
+  [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] "" make
   string>number 36 >base ;
 
 #! Name of variable holding the table of continuations.
@@ -52,7 +52,7 @@ SYMBOL: table
     
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
-  <namespace> table set ;
+  {{ }} clone table set ;
 
 #! Tuple for holding data related to a continuation.
 TUPLE: item expire? quot id time-added ;
@@ -202,7 +202,7 @@ SYMBOL: callback-cc
   [ 
     "HTTP/1.1 302 Document Moved\nLocation: " % %
     "\nContent-Length: 0\nContent-Type: text/plain\n\n" %
-  ] make-string call-exit-continuation ;
+  ] "" make call-exit-continuation ;
 
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser
@@ -275,7 +275,7 @@ SYMBOL: root-continuation
   #! Convert the given quotation so it works as a callback
   #! by returning a quotation that will pass the original 
   #! quotation to the callback continuation.
-  [ , callback-cc get , \ call , ] make-list ;
+  [ , callback-cc get , \ call , ] [ ] make ;
   
 : quot-href ( text quot -- )
   #! Write to standard output an HTML HREF where the href,
@@ -300,7 +300,7 @@ SYMBOL: root-continuation
   #!
   #! Convert the quotation so it is run within a session namespace
   #! and that namespace is initialized first.
-  \ init-session-namespace swons [ , \ with-scope , ] make-list
+  \ init-session-namespace swons [ , \ with-scope , ] [ ] make
   [ 
      [ cont-get/post-responder ] "get" set 
      [ cont-get/post-responder ] "post" set 

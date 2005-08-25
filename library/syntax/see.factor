@@ -27,7 +27,7 @@ styles words ;
         dup first stack-picture%
         "-- " %
         second stack-picture%
-    ] make-string ;
+    ] "" make ;
 
 : stack-effect ( word -- string )
     dup "stack-effect" word-prop [ ] [

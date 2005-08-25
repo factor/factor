@@ -6,8 +6,8 @@ sequences ;
 
 SYMBOL: vocabularies
 
-: word ( -- word ) "last-word" global hash ;
-: set-word ( word -- ) "last-word" global set-hash ;
+: word ( -- word ) \ word global hash ;
+: set-word ( word -- ) \ word global set-hash ;
 
 : vocabs ( -- list )
     #! Push a list of vocabularies.
@@ -31,14 +31,14 @@ SYMBOL: vocabularies
 
 : word-subset ( pred -- list | pred: word -- ? )
     #! A list of words matching the predicate.
-    all-words swap subset word-sort ; inline
+    all-words swap subset ; inline
 
 : word-subset-with ( obj pred -- list | pred: obj word -- ? )
-    all-words swap subset-with word-sort ; inline
+    all-words swap subset-with ; inline
 
 : recrossref ( -- )
     #! Update word cross referencing information.
-    global [ <namespace> crossref set ] bind
+    {{ }} clone crossref global set-hash
     [ add-crossref ] each-word ;
 
 : lookup ( name vocab -- word ) vocab ?hash ;
@@ -76,11 +76,11 @@ SYMBOL: vocabularies
 : forget ( word -- )
     #! Remove a word definition.
     dup uncrossref
-    dup word-vocabulary vocab [ word-name off ] bind ;
+    dup word-name swap word-vocabulary vocab remove-hash ;
 
 : interned? ( word -- ? )
     #! Test if the word is a member of its vocabulary.
-    dup word-name over word-vocabulary vocab ?hash eq? ;
+    dup word-name over word-vocabulary lookup eq? ;
 
 : init-search-path ( -- )
     "scratchpad" "in" set

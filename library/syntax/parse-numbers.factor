@@ -64,7 +64,7 @@ GENERIC: number>string ( str -- num )
         ] [
             integer,
         ] ifte
-    ] make-rstring ;
+    ] "" make reverse ;
 
 : >bin ( num -- string ) 2 >base ;
 : >oct ( num -- string ) 8 >base ;
@@ -78,7 +78,7 @@ M: ratio number>string ( num -- str )
         numerator number>string %
         CHAR: / ,
         denominator number>string %
-    ] make-string ;
+    ] "" make ;
 
 : fix-float ( str -- str )
     #! This is terrible. Will go away when we do our own float

@@ -68,7 +68,7 @@ f 100000000000000000000000000 "testhash" get set-hash
 
 ! Testing the hash element counting
 
-<namespace> "counting" set
+{{ }} clone "counting" set
 "value" "key" "counting" get set-hash
 [ 1 ] [ "counting" get hash-size ] unit-test
 "value" "key" "counting" get set-hash
@@ -139,7 +139,7 @@ f 100000000000000000000000000 "testhash" get set-hash
     ] hash-each
 ] unit-test
 
-<namespace> "cache-test" set
+{{ }} clone "cache-test" set
 
 [ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test

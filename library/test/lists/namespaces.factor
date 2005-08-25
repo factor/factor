@@ -37,5 +37,5 @@ USE: sequences
     [ "xyz" , "xyz" unique,
     #{ 3 2 }# , #{ 3 2 }# unique,
     1/5 , 1/5 unique,
-    [ { } unique, ] make-list , ] make-list
+    [ { } unique, ] [ ] make , ] [ ] make
 ] unit-test

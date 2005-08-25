@@ -42,10 +42,6 @@ strings vectors words ;
 
 : global ( -- g ) 4 getenv ;
 
-: <namespace> ( -- n )
-    #! Create a new namespace.
-    23 <hashtable> ; flushable
-
 : (get) ( var ns -- value )
     #! Internal word for searching the namestack.
     dup [
@@ -68,7 +64,7 @@ strings vectors words ;
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash [ ] [ >r <namespace> dup r> set ] ?ifte ;
+    dup namespace hash [ ] [ >r {{ }} clone dup r> set ] ?ifte ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -88,44 +84,27 @@ strings vectors words ;
     #! Execute a quotation with a namespace on the namestack.
     swap >n call n> drop ; inline
 
-: make-hash ( quot -- hash ) <namespace> >n call n> ; inline
+: make-hash ( quot -- hash ) {{ }} clone >n call n> ; inline
 
 : with-scope ( quot -- ) make-hash drop ; inline
 
 ! Building sequences
 SYMBOL: building
 
-: make-seq ( quot sequence -- sequence )
-    #! Call , and % from the quotation to append to a sequence.
-    [ building set call building get ] with-scope ; inline
+: make ( quot proto -- )
+    #! Call , and % from "quot" to append to a sequence
+    #! that has the same type as "proto".
+    [
+        dup thaw building set >r call building get r> like
+    ] with-scope ; inline
 
 : , ( obj -- )
     #! Add to the sequence being built with make-seq.
     building get push ;
 
-: unique, ( obj -- )
-    #! Add the object to the sequence being built with make-seq
-    #! unless an equal object has already been added.
-    building get 2dup member? [ 2drop ] [ push ] ifte ;
-
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
     building get swap nappend ;
-
-: make-vector ( quot -- vector )
-    100 <vector> make-seq ; inline
-
-: make-list ( quot -- list )
-    make-vector >list ; inline
-
-: make-sbuf ( quot -- sbuf )
-    100 <sbuf> make-seq ; inline
-
-: make-string ( quot -- string )
-    make-sbuf >string ; inline
-
-: make-rstring ( quot -- string )
-    make-sbuf <reversed> >string ; inline
 
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer
@@ -144,7 +123,7 @@ SYMBOL: hash-buffer
 
 : closure ( key hash -- list )
     [
-        <namespace> hash-buffer set
+        {{ }} clone hash-buffer set
         (closure)
         hash-buffer get hash-keys
     ] with-scope ;

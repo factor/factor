@@ -22,7 +22,7 @@ io strings ;
                 CHAR: % , >hex 2 CHAR: 0 pad-left %
             ] ifte
         ] each
-    ] make-string ;
+    ] "" make ;
 
 : catch-hex> ( str -- n )
     #! Push f if string is not a valid hex literal.
@@ -53,4 +53,4 @@ io strings ;
     ] ifte ;
 
 : url-decode ( str -- str )
-    [ 0 swap url-decode-iter ] make-string ;
+    [ 0 swap url-decode-iter ] "" make ;

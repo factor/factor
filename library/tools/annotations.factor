@@ -18,7 +18,7 @@ sequences strings test ;
         %
         "===> Leaving:  " swap word-name append ,
         [ print .s ] %
-    ] make-list ;
+    ] [ ] make ;
 
 : watch ( word -- )
     #! Cause a message to be printed out when the word is
@@ -36,7 +36,7 @@ sequences strings test ;
     inline
 
 : (profile) ( word def -- def )
-    [ , literalize , \ with-profile , ] make-list ;
+    [ , literalize , \ with-profile , ] [ ] make ;
 
 : profile ( word -- )
     #! When the word is called, time it, and add the time to

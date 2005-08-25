@@ -3,13 +3,13 @@ USING: errors hashtables kernel kernel-internals lists math
 namespaces sequences vectors words ;
 
 : error-method ( picker word -- method )
-    [ swap % literalize , \ no-method , ] make-list ;
+    [ swap % literalize , \ no-method , ] [ ] make ;
 
 : empty-method ( picker word -- method )
     over [ dup ] = [
         [
             [ dup delegate ] % dup unit , error-method , \ ?ifte ,
-        ] make-list
+        ] [ ] make
     ] [
         error-method
     ] ifte ;
@@ -18,7 +18,7 @@ namespaces sequences vectors words ;
     [ uncons >r "predicate" word-prop append r> cons ] map-with ;
 
 : alist>quot ( default alist -- quot )
-    [ unswons [ % , , \ ifte , ] make-list ] each ;
+    [ unswons [ % , , \ ifte , ] [ ] make ] each ;
 
 : sort-methods ( assoc -- vtable )
     #! Input is a predicate -> method association.
@@ -36,7 +36,7 @@ namespaces sequences vectors words ;
     2dup methods class-predicates >r empty-method r> alist>quot ;
 
 : big-generic ( picker word -- def )
-    [ over % \ type , <vtable> , \ dispatch , ] make-list ;
+    [ over % \ type , <vtable> , \ dispatch , ] [ ] make ;
 
 : small-generic? ( word -- ? )
     "methods" word-prop hash-size 3 <= ;

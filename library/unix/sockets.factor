@@ -85,7 +85,7 @@ C: accept-task ( port -- task )
         dup -16 shift HEX: ff bitand number>string % CHAR: . ,
         dup -8  shift HEX: ff bitand number>string % CHAR: . ,
                       HEX: ff bitand number>string %
-    ] make-string ;
+    ] "" make ;
 
 : do-accept ( port sockaddr fd -- )
     [

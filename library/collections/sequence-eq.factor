@@ -9,20 +9,13 @@ UNION: sequence array string sbuf vector ;
 
 : length= ( seq seq -- ? ) length swap length number= ;
 
-: (sequence=) ( seq seq i -- ? )
-    over length over number= [
-        3drop t
-    ] [
-        3dup 2nth = [ 1 + (sequence=) ] [ 3drop f ] ifte
-    ] ifte ;
-
 : sequence= ( seq seq -- ? )
     #! Check if two sequences have the same length and elements,
     #! but not necessarily the same class.
-    over general-list? over general-list? or [
-        swap >list swap >list =
+    2dup length= [
+        dup length [ >r 2dup r> 2nth = ] all? 2nip
     ] [
-        2dup length= [ 0 (sequence=) ] [ 2drop f ] ifte
+        2drop f
     ] ifte ; flushable
 
 M: sequence = ( obj seq -- ? )

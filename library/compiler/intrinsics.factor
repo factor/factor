@@ -187,7 +187,7 @@ sequences vectors words ;
     [[ fixnum>       %fixnum>       ]]
     [[ eq?           %eq?           ]]
 ] [
-    uncons [ literalize , \ binary-op , ] make-list
+    uncons [ literalize , \ binary-op , ] [ ] make
     "intrinsic" set-word-prop
 ] each
 

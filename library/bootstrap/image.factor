@@ -154,7 +154,7 @@ M: f ' ( obj -- ptr )
     r> emit ;
 
 : word-error ( word msg -- )
-    [ % dup word-vocabulary % " " % word-name % ] make-string
+    [ % dup word-vocabulary % " " % word-name % ] "" make
     throw ;
 
 : transfer-word ( word -- word )

@@ -16,7 +16,7 @@ math namespaces sequences strings vectors words ;
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
 
-<namespace> vocabularies set
+{{ }} clone vocabularies set
 f crossref set
 
 vocabularies get [ "syntax" set [ reveal ] each ] bind
@@ -223,7 +223,7 @@ FORGET: set-stack-effect
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.
 : builtin-predicate ( class predicate -- )
-    [ \ type , over types first , \ eq? , ] make-list
+    [ \ type , over types first , \ eq? , ] [ ] make
     define-predicate ;
 
 : register-builtin ( class -- )
@@ -239,7 +239,7 @@ FORGET: set-stack-effect
     define-slots
     register-builtin ;
 
-<namespace> typemap set
+{{ }} clone typemap set
 num-types empty-vector builtins set
 
 ! Catch-all metaclass for providing a default method.

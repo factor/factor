@@ -65,7 +65,7 @@ SYMBOL: d-in
 
 : init-inference ( recursive-state -- )
     init-interpreter
-    0 <vector> d-in set
+    { } clone d-in set
     recursive-state set
     dataflow-graph off
     current-node off ;

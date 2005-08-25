@@ -5,14 +5,11 @@ USING: kernel-internals lists ;
 DEFER: callcc1
 IN: errors
 
+! This is a very lightweight exception handling system.
+
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- )
-    #! We 2dup here to leave both values on the stack, for
-    #! post-mortem inspection.
-    <no-method> throw ;
-
-! This is a very lightweight exception handling system.
+: no-method ( object generic -- ) <no-method> throw ;
 
 : catchstack ( -- cs ) 6 getenv ;
 : set-catchstack ( cs -- ) 6 setenv ;

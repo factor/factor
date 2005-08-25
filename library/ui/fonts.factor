@@ -21,7 +21,7 @@ styles vectors ;
     }} hash ;
 
 : ttf-path ( name -- string )
-    [ resource-path % "/fonts/" % % ".ttf" % ] make-string ;
+    [ resource-path % "/fonts/" % % ".ttf" % ] "" make ;
 
 : open-font ( [ font style ptsize ] -- alien )
     3unseq >r ttf-name ttf-path r> TTF_OpenFont ;

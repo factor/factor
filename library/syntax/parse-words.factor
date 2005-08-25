@@ -148,5 +148,5 @@ global [ string-mode off ] bind
     #! Read a string from the input stream, until it is
     #! terminated by a ".
     "col" [
-        [ "line" get (parse-string) ] make-string swap
+        [ "line" get (parse-string) ] "" make swap
     ] change ;

@@ -22,7 +22,7 @@ namespaces parser sequences strings vectors words ;
     #! Make a foo? word for testing the tuple class at the top
     #! of the stack.
     dup predicate-word
-    [ \ class-tuple , over literalize , \ eq? , ] make-list
+    [ \ class-tuple , over literalize , \ eq? , ] [ ] make
     define-predicate ;
 
 : forget-tuple ( class -- )
@@ -53,13 +53,13 @@ namespaces parser sequences strings vectors words ;
 : define-constructor ( word class def -- )
     >r [
         dup literalize , "tuple-size" word-prop , \ make-tuple ,
-    ] make-list r> append define-compound ;
+    ] [ ] make r> append define-compound ;
 
 : default-constructor ( tuple -- )
     [ tuple-constructor ] keep dup [
         "slots" word-prop 1 swap tail-slice reverse-slice
         [ peek unit , \ keep , ] each
-    ] make-list define-constructor ;
+    ] [ ] make define-constructor ;
 
 : define-tuple ( tuple slots -- )
     2dup check-shape

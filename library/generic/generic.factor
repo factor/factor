@@ -76,7 +76,7 @@ SYMBOL: builtin
 
 : init-methods ( word -- )
      dup "methods" word-prop
-     [ drop ] [ <namespace> "methods" set-word-prop ] ifte ;
+     [ drop ] [ {{ }} clone "methods" set-word-prop ] ifte ;
 
 ! Defining generic words
 

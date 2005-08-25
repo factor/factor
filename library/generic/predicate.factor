@@ -19,7 +19,7 @@ predicate [
     3dup nip "definition" set-word-prop
     pick predicate "metaclass" set-word-prop
     pick "superclass" word-prop "predicate" word-prop
-    [ \ dup , % , [ drop f ] , \ ifte , ] make-list
+    [ \ dup , % , [ drop f ] , \ ifte , ] [ ] make
     define-predicate ;
 
 PREDICATE: word predicate metaclass predicate = ;
