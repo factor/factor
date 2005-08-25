@@ -1,23 +1,14 @@
 IN: infix
-USING: sequences kernel math strings combinators namespaces prettyprint io inspector
+USING: sequences kernel io math strings combinators namespaces prettyprint
        errors parser generic lists kernel-internals hashtables words vectors ;
-       ! remove: inspector
 
 ! Tokenizer
-
-PREDICATE: fixnum num-char "0123456789." member? ;
-PREDICATE: fixnum special-char ";!@#$%^&*?/|\\=+_-" member? ;
-PREDICATE: fixnum opener-char "([{" member? ;
-PREDICATE: fixnum closer-char "}])" member? ;
-PREDICATE: fixnum apost CHAR: ' = ;
 
 TUPLE: tok char ;
 
 TUPLE: brackets seq ender ;
 
-PREDICATE: symbol apostrophe 
-    #! placeholder
-    apostrophe = ;
+SYMBOL: apostrophe
 
 SYMBOL: code #! Source code
 SYMBOL: spot #! Current index of string
@@ -50,14 +41,12 @@ SYMBOL: spot #! Current index of string
 : parse-num ( -- number )
     #! Take a number from code, advancing spot and
     #! returning the number.
-    [ num-char? not ] take-until parse-number ;
-
-GENERIC: token ( list char -- list )
-    #! Given the first character, decide how to get the
-    #! next token
+    [ "0123456789." member? not ] take-until string>number ;
 
 : get-token ( -- char )
     spot get code get nth ;
+
+DEFER: token
 
 : next-token ( list -- list )
     #! Take one token from code and return it
@@ -65,18 +54,16 @@ GENERIC: token ( list char -- list )
          get-token token
     ] when ;
 
-M: letter token
-    drop parse-var swons next-token ;
-M: num-char token
-    drop parse-num swons next-token ;
-M: special-char token
-    <tok> swons incr-spot next-token ;
-M: opener-char token
-    drop f incr-spot next-token ;
-M: closer-char token
-    <brackets> swons incr-spot next-token ;
-M: apost token
-    drop apostrophe swons incr-spot next-token ;
+: token
+    {
+        { [ dup letter? ] [ drop parse-var swons ] }
+        { [ dup "0123456789." member? ] [ drop parse-num swons ] }
+        { [ dup ";!@#$%^&*?/|\\=+_-~" member? ] [ <tok> swons incr-spot ] }
+        { [ dup "([{" member? ] [ drop f incr-spot ] }
+        { [ dup ")]}" member? ] [ <brackets> swons incr-spot ] }
+        { [ dup CHAR: ' = ] [ drop apostrophe swons incr-spot ] }
+        { [ t ] [ "Bad character " swap ch>string append throw ] }
+    } cond next-token ;
 
 : tokenize ( string -- tokens )
     #! Tokenize a string, returning a list of tokens
@@ -86,13 +73,7 @@ M: apost token
     ] with-scope ;
 
 
-
-
 ! Parser
-
-PREDICATE: tok operator
-    #! A normal operator, like +
-    tok-char "!@#$%^&*?/|=+_-" member? ;
 
 TUPLE: apply func args ;
     #! Function application
@@ -106,9 +87,6 @@ UNION: value number string ;
 : semicolon ( -- semicolon )
     #! The semicolon token
     << tok f CHAR: ; >> ;
-
-PREDICATE: tok semicol
-    semicolon = ;
 
 : nest-apply ( [ ast ] -- apply )
     unswons unit swap [
@@ -126,21 +104,12 @@ DEFER: parse-tokens
 M: value parse-token
     swapd swons swap ;
 
-: case ( value quot-alist -- )
-    #! This is evil. It's just like Joy's case but there's
-    #! no default. [ ] case is equivalent to drop
-    assoc call ;
-
 M: brackets parse-token
-    swapd dup brackets-seq swap brackets-ender [
-          [ CHAR: ]
-            semicolon-split >r unswons r> <apply> swons
-        ] [ CHAR: }
-            semicolon-split >vector swons
-        ] [ CHAR: )
-            reverse parse-tokens swons
-        ]
-    ] case swap ;
+    swapd dup brackets-seq swap brackets-ender {
+        { [ dup CHAR: ] = ] [ drop semicolon-split >r unswons r> <apply> swons ] }
+        { [ dup CHAR: } = ] [ drop semicolon-split >vector swons ] }
+        { [ CHAR: ) = ] [ reverse parse-tokens swons ] }
+    } cond swap ;
 
 M: object tok-char drop -1 ; ! Hack!
 
@@ -157,10 +126,10 @@ M: string tok>string ;
     tok>string -rot nip
     parse-tokens unit <apply> unit ;
 
-: apost-op ( ast tokens token -- ast )
+: null-op ( ast tokens token -- ast )
     nip tok-char ch>string swons ;
 
-M: operator parse-token
+M: tok parse-token
     over [
         pick [
             binary-op
@@ -168,11 +137,13 @@ M: operator parse-token
             unary-op
         ] ifte
     ] [
-        apost-op
+        null-op
     ] ifte f ;
 
-M: apostrophe parse-token 
-    drop unswons >r parse-tokens >r car r> 2list r>
+( ast tokens token -- ast tokens )
+
+M: symbol parse-token ! apostrophe 
+    drop unswons >r parse-tokens >r unswons r> 2list r>
     unit parse-tokens swap <apply> swons f ;
 
 : (parse-tokens) ( ast tokens -- ast )
@@ -213,7 +184,7 @@ M: comp-literal compile-ast ! literal numbers
 : seq-stupid-all? ( seq pred -- ? )
     t -rot [ call and ] cons each ; inline
 
-: accumulator ( vars { asts } closer -- quot )
+: accumulator ( vars { asts } quot -- quot )
     -rot [
         [
             \ dup ,
@@ -247,8 +218,6 @@ M: vector compile-ast ! literal vectors
     #! Regular functions
     #! Gives quotation applicable to stack
     {{
-        [ [[ "sin" 1 ]] sin ]
-        [ [[ "cos" 1 ]] cos ]
         [ [[ "+" 2 ]] + ]
         [ [[ "-" 2 ]] - ]
         [ [[ ">" 2 ]] [ > ] infix-relation ]
@@ -258,13 +227,30 @@ M: vector compile-ast ! literal vectors
         [ [[ "~" 1 ]] not ]
         [ [[ "&" 2 ]] and ]
         [ [[ "|" 2 ]] or ]
+        [ [[ "&" 1 ]] t [ and ] reduce ]
+        [ [[ "|" 1 ]] f [ or ] reduce ]
         [ [[ "*" 2 ]] * ]
-        [ [[ "log" 1 ]] log ]
+        [ [[ "ln" 1 ]] log ]
         [ [[ "plusmin" 2 ]] [ + ] 2keep - ]
         [ [[ "@" 2 ]] swap nth ]
         [ [[ "sqrt" 1 ]] sqrt ]
         [ [[ "/" 2 ]] / ]
         [ [[ "^" 2 ]] ^ ]
+        [ [[ "#" 1 ]] length ]
+        [ [[ "eq" 2 ]] eq? ]
+        [ [[ "*" 1 ]] first ]
+        [ [[ "+" 1 ]] flip ]
+        [ [[ "\\" 1 ]] <reversed> ]
+        [ [[ "sin" 1 ]] sin ]
+        [ [[ "cos" 1 ]] cos ]
+        [ [[ "tan" 1 ]] tan ]
+        [ [[ "max" 2 ]] max ]
+        [ [[ "min" 2 ]] min ]
+        [ [[ "," 2 ]] append ]
+        [ [[ "," 1 ]] concat ]
+        [ [[ "sn" 3 ]] -rot set-nth ]
+        [ [[ "prod" 1 ]] product ]
+        [ [[ "vec" 1 ]] >vector ]
     }} ;
 
 : drc ( list -- list )
@@ -282,11 +268,15 @@ M: vector compile-ast ! literal vectors
     #! Higher-order functions
     #! Gives quotation applicable to quotation and rest of stack
     {{
-        [ [[ "each" 2 ]] 2map ]
-        [ [[ "each" 1 ]] map ]
-        [ [[ "right" 2 ]] map-with ]
-        [ [[ "left" 2 ]] map-with-left ]
-        
+        [ [[ "!" 2 ]] 2map ]
+        [ [[ "!" 1 ]] map ]
+        [ [[ ">" 2 ]] map-with ]
+        [ [[ "<" 2 ]] map-with-left ]
+        [ [[ "^" 1 ]] all? ]
+        [ [[ "~" 1 ]] call not ]
+        [ [[ "~" 2 ]] call not ]
+        [ [[ "/" 2 ]] swapd reduce ]
+        [ [[ "\\" 2 ]] swapd accumulate ]
     }} ;
 
 : get-hash ( key table -- value )
@@ -310,7 +300,7 @@ M: vector compile-ast ! literal vectors
     >apply< length swap make-apply ;
 
 M: apply compile-ast ! function application
-    [ apply-args [ swap ] accumulator drc [ nip ] append ] keep
+    [ apply-args [ swap ] accumulator [ drop ] append ] keep
     get-function append ;
 
 : push-list ( list item -- list )
@@ -333,7 +323,7 @@ M: apply compile-ast ! function application
     over prologue -rot compile-ast append ;
 
 : define-math ( string -- )
-    dup parse-full apply-args 2unlist swap
+    dup parse-full apply-args uncons car swap
     >apply< >r create-in r>
     [ "math-args" set-word-prop ] 2keep
     >r tuck >r >r swap "code" set-word-prop r> r> r>
@@ -351,7 +341,7 @@ M: apply compile-ast ! function application
     #! Executes and prints the result of a math
     #! expression at parsetime
     string-mode on [
-        concat/spaces string-mode off parse-full
+        " " join string-mode off parse-full
         f swap ast>quot call .
     ] f ; parsing
 
@@ -367,15 +357,6 @@ M: apply compile-ast ! function application
 !
 ! PREDICATE: word compound
 !     dup word-primitive 1 = swap infix-word? not and ;
-
-: (watch-after) ( word def -- def )
-    [ % "<== " , \ write , word-name , \ print , \ .s , ] make-list ;
-
-: watch-after ( word -- )
-    [ (watch-after) ] annotate ;
-
-: watch-all ( word -- )
-    dup watch watch-after ;
 
 
 
