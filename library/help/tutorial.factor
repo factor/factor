@@ -2,7 +2,7 @@ IN: help
 USING: gadgets generic kernel lists math matrices namespaces sdl
 sequences strings styles ;
 
-: <title> ( text -- gadget )
+: <slide-title> ( text -- gadget )
     <label> dup 36 font-size set-paint-prop ;
 
 : <underline> ( -- gadget )
@@ -25,7 +25,7 @@ M: general-list tutorial-line
 
 : <page> ( list -- gadget )
     0 1 <pile>
-    over car <title> over add-gadget
+    over car <slide-title> over add-gadget
     <underline> over add-gadget
     swap cdr [ tutorial-line over add-gadget ] each
     empty-border ;
@@ -274,7 +274,8 @@ M: general-list tutorial-line
             ""
             [ "-1 sqrt ." ]
             ""
-            [ "M{ { 10 3 } { 7 5 } { -2 0 } }M M{ { 11 2 } { 4 8 } }M m." ]
+            [ "{ { 10 3 } { 7 5 } { -2 0 } }" ]
+            [ "{ { 11 2 } { 4 8 } } m." ]
             ""
             "... and there is much more for the math geeks."
         ] [

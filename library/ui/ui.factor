@@ -1,42 +1,22 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: help
-DEFER: <tutorial-button>
-
 IN: gadgets
-USING: generic help io kernel listener math namespaces
-prettyprint sdl sequences styles threads words shells ;
-
-SYMBOL: stack-display
-
-: ui.s ( -- )
-    stack-display get dup pane-clear [ .s ] with-stream* ;
-
-: listener-thread
-    pane get [
-        [ ui.s ] listener-hook set <tutorial-button> gadget. tty
-    ] with-stream* ;
-
-: listener-application
-    <pane> dup pane set <scroller>
-    <pane> dup stack-display set <scroller>
-    5/6 <x-splitter> add-layer
-    [ clear listener-thread ] in-thread
-    pane get request-focus ;
+USING: generic help io kernel listener lists math namespaces
+prettyprint sdl sequences shells styles threads words ;
 
 : init-world
     global [
         <world> world set
-        { 700 800 0 } world get set-gadget-dim
+        { 600 800 0 } world get set-gadget-dim
         
         {{
             [[ background { 255 255 255 } ]]
             [[ rollover-bg { 236 230 232 } ]]
             [[ bevel-1 { 160 160 160 } ]]
-            [[ bevel-2 { 216 216 216 } ]]
+            [[ bevel-2 { 232 232 232 } ]]
             [[ foreground { 0 0 0 } ]]
             [[ reverse-video f ]]
-            [[ font "Sans Serif" ]]
+            [[ font "Monospaced" ]]
             [[ font-size 12 ]]
             [[ font-style plain ]]
         }} world get set-gadget-paint

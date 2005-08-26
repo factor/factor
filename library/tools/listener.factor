@@ -6,7 +6,10 @@ presentation sequences strings styles vectors words ;
 
 SYMBOL: listener-prompt
 SYMBOL: quit-flag
+
 SYMBOL: listener-hook
+SYMBOL: datastack-hook
+SYMBOL: callstack-hook
 
 global [ "  " listener-prompt set ] bind
 
@@ -33,9 +36,10 @@ global [ "  " listener-prompt set ] bind
 
 : listen ( -- )
     #! Wait for user input, and execute.
+    listener-hook get call
     listener-prompt get write flush [
         read-multiline
-        [ call listener-hook get call ] [ bye ] ifte
+        [ call ] [ bye ] ifte
     ] try ;
 
 : listener ( -- )

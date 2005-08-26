@@ -12,10 +12,15 @@ sequences io strings vectors words ;
     #! Print stepper data stack.
     meta-d get stack. ;
 
+: meta-r*
+    #! Stepper call stack, as well as the currently
+    #! executing quotation.
+    [ meta-r get % meta-executing get , meta-cf get , ] { } make ;
+
 : &r
     #! Print stepper call stack, as well as the currently
     #! executing quotation.
-    meta-cf get short. meta-executing get . meta-r get stack. ;
+    meta-r* stack. ;
 
 : &get ( var -- value )
     #! Get stepper variable value.
@@ -53,6 +58,8 @@ sequences io strings vectors words ;
 : walk-listener walk-banner "walk " listener-prompt set listener ;
 
 : init-walk ( quot callstack namestack -- )
+    [ meta-d get "Stepper data stack:" ] datastack-hook set
+    [ meta-r* "Stepper return stack:" ] callstack-hook set
     init-interpreter
     meta-n set
     meta-r set

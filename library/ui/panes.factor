@@ -25,9 +25,6 @@ TUPLE: pane output active current input continuation ;
     [ dup pane-input swap pane-current <active-line> ] keep
     2dup set-pane-active add-gadget ;
 
-: pane-paint ( pane -- )
-    "Monospaced" font set-paint-prop ;
-
 : pop-continuation ( pane -- quot )
     dup pane-continuation f rot set-pane-continuation ;
 
@@ -38,7 +35,7 @@ SYMBOL: structured-input
 
 : elements. ( quot -- )
     [
-        1 nesting-limit set
+        2 nesting-limit set
         5 length-limit set
         <block pprint-elements block> t newline
     ] with-pprint ;
@@ -70,7 +67,6 @@ C: pane ( -- pane )
     <line-shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
-    dup pane-paint
     dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )

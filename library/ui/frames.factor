@@ -25,6 +25,12 @@ C: frame ( -- frame )
 : add-top    ( gadget frame -- ) 1 0 set-frame-child ;
 : add-bottom ( gadget frame -- ) 1 2 set-frame-child ;
 
+: get-center ( frame -- gadget ) 1 1 frame-child ;
+: get-left   ( frame -- gadget ) 0 1 frame-child ;
+: get-right  ( frame -- gadget ) 2 1 frame-child ;
+: get-top    ( frame -- gadget ) 1 0 frame-child ;
+: get-bottom ( frame -- gadget ) 1 2 frame-child ;
+
 : reduce-grid ( grid -- seq )
     [ { 0 0 0 } [ vmax ] reduce ] map ;
 

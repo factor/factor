@@ -25,6 +25,7 @@
 - opengl rendering
 - text selection
 - clipboard support
+- clicking outside menu doesn't close
 
 + tutorial:
 

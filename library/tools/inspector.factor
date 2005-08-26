@@ -95,6 +95,7 @@ SYMBOL: inspector-stack
         inspector-help
         terpri
         "inspector " listener-prompt set
+        [ inspector-stack get "Inspector history:" ] callstack-hook set
         { } clone inspector-stack set
         (inspect)
         listener
