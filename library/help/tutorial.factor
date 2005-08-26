@@ -15,9 +15,8 @@ GENERIC: tutorial-line ( object -- gadget )
 M: string tutorial-line <label> ;
 
 : example-theme
-    dup roll-button-theme
-    dup "Monospaced" font set-paint-prop
-    italic font-style set-paint-prop ;
+    dup button-theme
+    "Monospaced" font set-paint-prop ;
 
 M: general-list tutorial-line
     car dup <label> dup rot [ pane get pane-input set-editor-text drop ] cons
@@ -182,15 +181,6 @@ M: general-list tutorial-line
             "Prefixing a word with \\ pushes it on the stack, instead of"
             "executing it. So the see word has stack effect ( word -- )."
         ] [
-            "Booleans"
-            "In Factor, any object can be used as a truth value."
-            "- The f object is false."
-            "- Anything else is true."
-            ""
-            "Here is a word that outputs a boolean:"
-            ""
-            [ ": negative? ( n -- ? ) 0 < ;" ]
-        ] [
             "Branches"
             "Now suppose we want to write a word that computes the"
             "absolute value of a number; that is, if it is less than 0,"
@@ -198,18 +188,22 @@ M: general-list tutorial-line
             ""
             [ ": absolute ( x -- |x| ) dup 0 < [ negate ] when ;" ]
             ""
-            "It duplicates the top of the stack, since negative? pops it."
-            "Then if the top of the stack was found to be negative,"
-            "it is negated, yielding a postive result."
+            "If the top of the stack is negative, the word negates it"
+            "again, making it positive."
+            ""
+            "The < ( x y -- x<y ) word outputs a boolean."
+            "In Factor, any object can be used as a truth value."
+            "- The f object is false."
+            "- Anything else is true."
         ] [
             "More branches"
             "On the previous slide, you saw the 'when' conditional:"
             ""
-            [ "  ... condition ... [ ... code to run if true ... ] when" ]
+            [ "  ... condition ... [ ... true case ... ] when" ]
             ""
             "Another commonly-used form is 'unless':"
             ""
-            [ "  ... condition ... [ ... code to run if true ... ] unless" ]
+            [ "  ... condition ... [ ... false case ... ] unless" ]
             ""
             "The 'ifte' conditional takes action on both branches:"
             ""
