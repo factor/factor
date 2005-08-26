@@ -4,8 +4,8 @@ USING: gadgets kernel namespaces test ;
 [ "Hello world" ]
 [
     <frame> "frame" set
-    "Hello world" <label> 1 2 "frame" get set-frame-child
-    1 2 "frame" get frame-child label-text
+    "Hello world" <label> "frame" get 1 2 set-frame-child
+    "frame" get 1 2 frame-child label-text
 ] unit-test
 
 [ { { 2 2 2 } { 3 3 3 } { 4 4 4 } } ] [
@@ -39,18 +39,26 @@ USING: gadgets kernel namespaces test ;
 [ { 90 120 0 } ]
 [
     <frame> "frame" set
-    { 10 20 0 } sized-gadget 1 2 "frame" get set-frame-child
-    { 30 40 0 } sized-gadget 2 0 "frame" get set-frame-child
-    { 50 60 0 } sized-gadget 0 1 "frame" get set-frame-child
+    { 10 20 0 } sized-gadget "frame" get 1 2 set-frame-child
+    { 30 40 0 } sized-gadget "frame" get 2 0 set-frame-child
+    { 50 60 0 } sized-gadget "frame" get 0 1 set-frame-child
     "frame" get pref-dim
 ] unit-test
 
-[ { 140 250 0 } ]
+[ { 180 210 0 } ]
 [
     <frame> "frame" set
-    { 10 20 0 } sized-gadget 1 2 "frame" get set-frame-child
-    { 30 40 0 } sized-gadget 2 0 "frame" get set-frame-child
-    { 50 60 0 } sized-gadget 0 1 "frame" get set-frame-child
-    { 100 150 0 } sized-gadget 1 1 "frame" get set-frame-child
+    { 10 20 0 } sized-gadget "frame" get add-bottom
+    { 30 40 0 } sized-gadget "frame" get 2 0 set-frame-child
+    { 50 60 0 } sized-gadget "frame" get add-left
+    { 100 150 0 } sized-gadget "frame" get add-center
+    "frame" get pref-dim
+] unit-test
+
+[ { 30 60 0 } ]
+[
+    <frame> "frame" set
+    { 10 20 0 } sized-gadget "frame" get add-top
+    { 30 40 0 } sized-gadget "frame" get add-center
     "frame" get pref-dim
 ] unit-test

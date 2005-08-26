@@ -14,11 +14,15 @@ GENERIC: tutorial-line ( object -- gadget )
 
 M: string tutorial-line <label> ;
 
+: example-theme
+    dup roll-button-theme
+    dup "Monospaced" font set-paint-prop
+    italic font-style set-paint-prop ;
+
 M: general-list tutorial-line
     car dup <label> dup rot [ pane get pane-input set-editor-text drop ] cons
     button-gestures
-    dup roll-button-theme
-    dup "Monospaced" font set-paint-prop ;
+    dup example-theme ;
 
 : <page> ( list -- gadget )
     0 1 <pile>

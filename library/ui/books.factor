@@ -20,7 +20,7 @@ M: book layout* ( book -- )
         set-gadget-dim
     ] each-with
     dup book-page swap gadget-children nth
-    t swap set-gadget-visible? ;
+    [ t swap set-gadget-visible? ] when* ;
 
 : show-page ( n book -- )
     [ gadget-children length rem ] keep

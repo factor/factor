@@ -36,8 +36,8 @@ C: frame ( -- frame )
 
 M: frame pref-dim ( frame -- dim )
     frame-grid pref-dim-grid
-    dup frame-pref-dim first
-    swap flip frame-pref-dim second
+    dup flip frame-pref-dim first
+    swap frame-pref-dim second
     0 3vector ;
 
 : frame-layout ( horiz vert -- grid )
@@ -64,7 +64,7 @@ M: frame pref-dim ( frame -- dim )
 M: frame layout* ( frame -- dim )
     [
         frame-grid dup pref-dim-grid
-        dup reduce-grid [ first ] map
-        swap flip reduce-grid [ second ] map
+        dup flip reduce-grid [ first ] map
+        swap reduce-grid [ second ] map
         2dup
     ] keep rect-dim fill-center 3dup position-grid resize-grid ;
