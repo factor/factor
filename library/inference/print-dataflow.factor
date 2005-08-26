@@ -11,7 +11,7 @@ TUPLE: comment node text ;
 
 M: comment pprint* ( ann -- )
     "( " over comment-text " )" append3
-    swap comment-node presented swons unit format ;
+    swap comment-node presented swons unit text ;
 
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] ifte ;

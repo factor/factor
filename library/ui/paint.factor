@@ -64,6 +64,7 @@ GENERIC: draw-boundary ( gadget boundary -- )
 M: f draw-interior 2drop ;
 M: f draw-boundary 2drop ;
 
+! Solid fill/border
 TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
@@ -77,6 +78,19 @@ M: solid draw-interior
 M: solid draw-boundary
     drop >r surface get r> [ rect>screen ] keep
     fg rgb rectangleColor ;
+
+! Rollover only
+TUPLE: rollover-only ;
+
+C: rollover-only << solid f >> over set-delegate ;
+
+M: rollover-only draw-interior ( gadget interior -- )
+    over rollover paint-prop
+    [ delegate draw-interior ] [ 2drop ] ifte ;
+
+M: rollover-only draw-boundary ( gadget boundary -- )
+    over rollover paint-prop
+    [ delegate draw-boundary ] [ 2drop ] ifte ;
 
 ! Gradient pen
 TUPLE: gradient vector from to ;

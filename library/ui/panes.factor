@@ -32,16 +32,29 @@ TUPLE: pane output active current input continuation ;
     dup pane-continuation f rot set-pane-continuation ;
 
 : pane-eval ( string pane -- )
-    2dup stream-print pop-continuation in-thread drop ;
+    pop-continuation in-thread drop ;
+
+SYMBOL: structured-input
+
+: elements. ( quot -- )
+    [
+        1 nesting-limit set
+        5 length-limit set
+        <block pprint-elements block> t newline
+    ] with-pprint ;
 
 : pane-call ( quot pane -- )
-    [ "(Structured input) " write dup . call ] with-stream* ;
+    2dup [ elements. ] with-stream*
+    >r structured-input global set-hash
+    "structured-input global hash call" r> pane-eval ;
+
+: editor-commit ( editor -- line )
+    #! Add current line to the history, and clear the editor.
+    [ commit-history line-text get line-clear ] with-editor ;
 
 : pane-return ( pane -- )
-    [
-        pane-input
-        [ commit-history line-text get line-clear ] with-editor
-    ] keep pane-eval ;
+    [ pane-input editor-commit ] keep
+    2dup stream-print pane-eval ;
  
 : pane-actions ( line -- )
     [

@@ -13,7 +13,9 @@ TUPLE: world running? hand glass invalid ;
 
 DEFER: <hand>
 DEFER: update-hand
-DEFER: do-timers
+
+: add-layer ( gadget -- )
+    world get add-gadget ;
 
 C: world ( -- world )
     <stack> over set-delegate
@@ -29,9 +31,6 @@ C: world ( -- world )
 : layout-world ( -- )
     world get world-invalid
     [ pop-invalid [ layout ] each layout-world ] when ;
-
-: add-layer ( gadget -- )
-    world get add-gadget ;
 
 : hide-glass ( -- )
     world get world-glass unparent f

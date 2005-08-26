@@ -29,12 +29,20 @@ sequences io sequences styles ;
     dup mouse-over?
     [ [ action ] swap handle-gesture drop ] [ drop ] ifte ;
 
+: button-theme ( button -- )
+    dup { 216 216 216 } background set-paint-prop
+    dup f reverse-video set-paint-prop
+    << solid f >> interior set-paint-prop ;
+
+: roll-button-theme ( button -- )
+    dup f reverse-video set-paint-prop
+    dup <rollover-only> interior set-paint-prop
+    <rollover-only> boundary set-paint-prop ;
+
 : button-action ( action -- quot )
     [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] ifte* ;
 
 : button-gestures ( button quot -- )
-    over f reverse-video set-paint-prop
-    over << solid f >> interior set-paint-prop
     dupd [ action ] set-action
     dup [ dup button-update button-clicked ] [ button-up 1 ] set-action
     dup [ button-update ] [ button-down 1 ] set-action
@@ -42,9 +50,11 @@ sequences io sequences styles ;
     dup [ button-update ] [ mouse-enter ] set-action
     [ drop ] [ drag 1 ] set-action ;
 
+: (button) ( label quot -- button )
+    >r <label> bevel-border dup r> button-gestures ;
+
 : <button> ( label quot -- button )
-    >r
-    <label> bevel-border
-    dup { 216 216 216 } background set-paint-prop
-    dup
-    r> button-gestures ;
+    (button) dup button-theme ;
+
+: <roll-button> ( label quot -- button )
+    (button) dup roll-button-theme ;

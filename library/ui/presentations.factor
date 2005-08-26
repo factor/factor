@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables inspector io jedit kernel lists memory
-namespaces parser prettyprint sequences styles vectors words ;
+USING: compiler generic hashtables inference inspector io jedit
+kernel lists memory namespaces parser prettyprint sequences
+styles vectors words ;
 
 SYMBOL: commands
 
@@ -15,8 +16,10 @@ SYMBOL: commands
     commands get [ first call ] subset-with ;
 
 : command-quot ( presented quot -- quot )
-    [ swap literalize , % ] [ ] make
-    [ pane get pane-call drop ] cons ;
+    [
+        [ swap literalize , % ] [ ] make ,
+        [ pane get pane-call ] %
+    ] [ ] make ;
 
 : command-menu ( presented -- menu )
     dup applicable
@@ -24,6 +27,7 @@ SYMBOL: commands
     <menu> ;
 
 : init-commands ( gadget -- )
+    dup roll-button-theme
     dup presented paint-prop dup [
         [
             \ drop ,
@@ -49,10 +53,21 @@ SYMBOL: commands
 
 [ drop t ] "Prettyprint" [ . ] define-command
 [ drop t ] "Inspect" [ inspect ] define-command
-[ drop t ] "References" [ references inspect ] define-command
+[ drop t ] "Inspect variable" [ get inspect ] define-command
+[ drop t ] "Inspect references" [ references inspect ] define-command
+[ drop t ] "Push on data stack" [ ] define-command
 
-[ word? ] "See" [ see ] define-command
-[ word? ] "Usage" [ usage . ] define-command
-[ word? ] "jEdit" [ jedit ] define-command
+[ word? ] "See word" [ see ] define-command
+[ word? ] "Word usage" [ usage . ] define-command
+[ word? ] "Open in jEdit" [ jedit ] define-command
+[ word? ] "Reload original source" [ reload ] define-command
+[ compound? ] "Annotate with watchpoint" [ watch ] define-command
+[ compound? ] "Annotate with breakpoint" [ break ] define-command
+[ compound? ] "Annotate with profiling" [ profile ] define-command
+[ word? ] "Compile" [ recompile ] define-command
+[ word? ] "Decompile" [ decompile ] define-command
+[ word? ] "Show stack effect" [ unit infer . ] define-command
+[ word? ] "Show dataflow IR" [ word-def t dataflow. ] define-command
+[ word? ] "Show linear IR" [ precompile ] define-command
 
-[ [ gadget? ] is? ] "Display" [ gadget. ] define-command
+[ [ gadget? ] is? ] "Display gadget" [ gadget. ] define-command
