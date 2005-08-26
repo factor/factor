@@ -44,7 +44,9 @@ M: frame pref-dim ( frame -- dim )
     [ swap [ swap 0 3vector ] map-with ] map-with ;
 
 : do-grid ( dim-grid gadget-grid quot -- )
-    -rot [ [ pick call ] 2each ] 2each drop ;
+    -rot [
+        [ dup [ pick call ] [ 2drop ] ifte ] 2each
+    ] 2each drop ; inline
 
 : position-grid ( gadgets horiz vert -- )
     >r 0 [ + ] accumulate r> 0 [ + ] accumulate
@@ -53,8 +55,16 @@ M: frame pref-dim ( frame -- dim )
 : resize-grid ( gadgets horiz vert -- )
     frame-layout swap [ set-gadget-dim ] do-grid ;
 
+: (fill-center) ( vec n -- )
+    over first pick third + - 0 max 1 rot set-nth ;
+
+: fill-center ( horiz vert dim -- )
+    tuck second (fill-center) first (fill-center) ;
+
 M: frame layout* ( frame -- dim )
-    frame-grid dup pref-dim-grid
-    dup reduce-grid [ first ] map
-    swap flip reduce-grid [ second ] map
-    3dup position-grid resize-grid ;
+    [
+        frame-grid dup pref-dim-grid
+        dup reduce-grid [ first ] map
+        swap flip reduce-grid [ second ] map
+        2dup
+    ] keep rect-dim fill-center 3dup position-grid resize-grid ;
