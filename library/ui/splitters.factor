@@ -13,7 +13,7 @@ M: divider pref-dim drop divider-size ;
 TUPLE: splitter split ;
 
 : hand>split ( splitter -- n )
-    hand relative hand hand-click-rel v- divider-size 1/2 v*n v+ ;
+    drag-loc divider-size 1/2 v*n v+ ;
 
 : divider-motion ( splitter -- )
     dup hand>split

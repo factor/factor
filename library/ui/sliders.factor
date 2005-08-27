@@ -25,17 +25,19 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : screen>slider slider-scale / ;
 
-: elevator-click ( elevator pos -- )
-    2drop ;
-
-: elevator-motion ( elevator -- )
-    hand hand-click-rel elevator-click ;
+: elevator-drag ( elevator -- )
+    dup relayout
+    dup drag-loc >r find-slider r> over slider-vector v.
+    over screen>slider
+    swap set-slider-value ;
 
 : thumb-actions ( thumb -- )
-    [ find-elevator elevator-motion ] [ drag 1 ] set-action ;
+    dup [ drop ] [ button-up 1 ] set-action
+    dup [ drop ] [ button-down 1 ] set-action
+    [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    <gadget> [ drop ] <button>
+    <bevel-gadget> dup button-theme
     t over set-gadget-root?
     dup thumb-actions ;
 
@@ -43,8 +45,23 @@ TUPLE: slider vector elevator thumb value max page ;
     dup << solid f >> interior set-paint-prop
     { 128 128 128 } background set-paint-prop ;
 
+: slide-by ( amount gadget -- )
+    #! The gadget can be any child of a slider.
+    find-slider dup slider-elevator relayout
+    [ slider-value + ] keep set-slider-value ;
+
+: slide-by-page ( -1/1 gadget -- )
+    [ slider-page * ] keep slide-by ;
+
+: elevator-click ( elevator -- )
+    dup relayout
+    dup hand relative >r find-slider r>
+    over slider-vector v.
+    over screen>slider over slider-value - sgn
+    swap slide-by-page ;
+
 : elevator-actions ( elevator -- )
-    [ { 0 0 0 } elevator-click ] [ button-down 1 ] set-action ;
+    [ elevator-click ] [ button-down 1 ] set-action ;
 
 C: elevator ( -- elevator )
     <plain-gadget> over set-delegate
@@ -62,18 +79,22 @@ C: elevator ( -- elevator )
     dup thumb-loc over slider-vector n*v
     over slider-thumb set-rect-loc
     dup thumb-dim over slider-vector n*v thumb-min vmax
-    swap slider-thumb set-rect-dim ;
+    swap slider-thumb set-gadget-dim ;
 
 M: elevator layout* ( elevator -- )
     find-slider layout-thumb ;
 
 M: elevator pref-dim drop thumb-min ;
 
-: <up-button> <gadget> [ drop ] <button> ;
+: slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
+
+: <up-button>
+    <gadget> [ -1 swap slide-by-line ] <button> ;
 
 : add-up { 1 1 1 } over slider-vector v- 2unseq set-frame-child ;
 
-: <down-button> <gadget> [ drop ] <button> ;
+: <down-button>
+    <gadget> [ 1 swap slide-by-line ] <button> ;
 
 : add-down { 1 1 1 } over slider-vector v+ 2unseq set-frame-child ;
 

@@ -72,3 +72,6 @@ C: hand ( world -- hand )
     focusable-child
     hand dup hand-focus parents-down >r
     dupd set-hand-focus parents-down r> focus-gestures ;
+
+: drag-loc ( gadget -- loc )
+    hand [ relative ] keep hand-click-rel v- ;

@@ -52,9 +52,11 @@ M: viewport focusable-child* ( viewport -- gadget )
     dup scroller-y swap update-slider ;
 
 : scroll ( origin scroller -- )
-    dup update-sliders
-    scroller-viewport
-    [ [ fix-scroll ] keep set-viewport-origin ] keep relayout ;
+    [
+        scroller-viewport [ fix-scroll ] keep
+        [ set-viewport-origin ] keep
+        relayout
+    ] keep update-sliders ;
 
 : add-viewport 2dup set-scroller-viewport add-center ;
 
@@ -68,12 +70,12 @@ M: viewport focusable-child* ( viewport -- gadget )
 : scroll>bottom ( gadget -- )
     [ scroll>bottom ] swap handle-gesture drop ;
 
-: scroll-by ( scroller amount -- )
-    over scroller-viewport viewport-origin v+ swap scroll ;
+: scroll-by ( amount scroller -- )
+    [ scroller-viewport viewport-origin v+ ] keep scroll ;
 
-: scroll-up-line { 0 32 0 } scroll-by ;
+: scroll-up-line { 0 32 0 } swap scroll-by ;
 
-: scroll-down-line { 0 -32 0 } scroll-by ;
+: scroll-down-line { 0 -32 0 } swap scroll-by ;
 
 : scroller-actions ( scroller -- )
     dup [ (scroll>bottom) ] [ scroll>bottom ] set-action
