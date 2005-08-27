@@ -5,27 +5,26 @@
 
 + ui:
 
+- fix up the min thumb size hack
+- scroll bar: more intuitive behavior when clicking inside the elevator
+- nicer scrollbars with up/down buttons
+- clicking outside menu doesn't close
+- only redraw dirty gadgets
+- faster mouse tracking
+- better menu positioning
+
 - off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - theme abstraction in ui
 - menu dragging
-- fix up the min thumb size hack
-- gaps in pack layout
 - find out why so many small bignums get consed
-- faster mouse tracking
-- scroll bar: more intuitive behavior when clicking inside the elevator
-- nicer scrollbars with up/down buttons
 - icons
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener
-- better menu positioning
-- only redraw dirty gadgets
 - get stuff in examples dir running in the ui
-- opengl rendering
 - text selection
 - clipboard support
-- clicking outside menu doesn't close
 
 + tutorial:
 

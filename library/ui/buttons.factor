@@ -50,11 +50,8 @@ sequences io sequences styles ;
     dup [ button-update ] [ mouse-enter ] set-action
     [ drop ] [ drag 1 ] set-action ;
 
-: (button) ( label quot -- button )
-    >r <label> bevel-border dup r> button-gestures ;
+: <button> ( gadget quot -- button )
+    >r bevel-border dup button-theme dup r> button-gestures ;
 
-: <button> ( label quot -- button )
-    (button) dup button-theme ;
-
-: <roll-button> ( label quot -- button )
-    (button) dup roll-button-theme ;
+: <roll-button> ( gadget quot -- button )
+    >r dup roll-button-theme dup r> button-gestures ;

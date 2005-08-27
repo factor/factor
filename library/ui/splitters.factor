@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic kernel lists math matrices namespaces sequences
-styles ;
+styles vectors ;
 
 TUPLE: divider splitter ;
 
@@ -31,12 +31,9 @@ C: divider ( -- divider )
     dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
-    [ >r 0 1 rot <pack> r> set-delegate ] keep
+    [ >r 1 swap <pack> r> set-delegate ] keep
     [ set-splitter-split ] keep
-    swapd
-    [ add-gadget ] keep
-    <divider> over add-gadget
-    [ add-gadget ] keep ;
+    [ >r >r <divider> r> 3vector r> add-gadgets ] keep ;
 
 : <x-splitter> ( first second split -- splitter )
     { 0 1 0 } <splitter> ;

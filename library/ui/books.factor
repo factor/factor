@@ -8,10 +8,10 @@ TUPLE: book page ;
 C: book ( pages -- book )
     <gadget> over set-delegate
     0 over set-book-page
-    swap [ over add-gadget ] each ;
+    [ add-gadgets ] keep ;
 
 M: book pref-dim ( book -- dim )
-    gadget-children { 0 0 0 } [ pref-dim vmax ] reduce ;
+    gadget-children [ pref-dim ] map { 0 0 0 } [ vmax ] reduce ;
 
 M: book layout* ( book -- )
     dup rect-dim over gadget-children [
@@ -26,28 +26,29 @@ M: book layout* ( book -- )
     [ gadget-children length rem ] keep
     [ set-book-page ] keep relayout ;
 
-: first-page ( book -- )
-    0 swap show-page ;
+: first-page ( book -- ) 0 swap show-page ;
 
-: prev-page ( book -- )
-    [ book-page 1 - ] keep show-page ;
+: prev-page ( book -- ) [ book-page 1 - ] keep show-page ;
 
-: next-page ( book -- )
-    [ book-page 1 + ] keep show-page ;
+: next-page ( book -- ) [ book-page 1 + ] keep show-page ;
 
-: last-page ( book -- )
-    -1 swap show-page ;
+: last-page ( book -- ) -1 swap show-page ;
 
-: book-buttons ( book -- gadget )
-    <line-shelf> swap [
-        [ "|<" first-page drop ]
-        [ "<" prev-page drop ]
-        [ ">" next-page drop ]
-        [ ">|" last-page drop ]
-    ] [
-        uncons swapd cons <button> over add-gadget
-    ] each-with ;
+TUPLE: book-browser book ;
 
-: <book-browser> ( book -- gadget )
-    dup book-buttons <frame>
-    [ add-top ] keep [ add-center ] keep ;
+: find-book ( gadget -- )
+    [ book-browser? ] find-parent book-browser-book ;
+
+: <book-buttons> ( book -- gadget )
+    [
+        { "|<" [ find-book first-page ] }
+        { "<"  [ find-book prev-page  ] }
+        { ">"  [ find-book next-page  ] }
+        { ">|" [ find-book last-page  ] }
+    ] [ 2unseq >r <label> r> <button> ] map
+    0 <shelf> [ add-gadgets ] keep ;
+
+C: book-browser ( book -- gadget )
+    <frame> over set-delegate
+    <book-buttons> over add-top
+    [ 2dup set-book-browser-book add-center ] keep ;

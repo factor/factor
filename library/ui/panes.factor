@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: generic hashtables io kernel line-editor listener lists
-math namespaces prettyprint sequences strings styles threads ;
+math namespaces prettyprint sequences strings styles threads
+vectors ;
 
 DEFER: <presentation>
 
@@ -18,11 +19,11 @@ TUPLE: pane output active current input continuation ;
 : add-input 2dup set-pane-input add-gadget ;
 
 : <active-line> ( input current -- line )
-    <line-shelf> [ add-gadget ] keep [ add-gadget ] keep ;
+    2vector 0 <shelf> [ add-gadgets ] keep ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent
-    [ dup pane-input swap pane-current <active-line> ] keep
+    [ dup pane-current swap pane-input <active-line> ] keep
     2dup set-pane-active add-gadget ;
 
 : pop-continuation ( pane -- quot )
@@ -62,9 +63,9 @@ SYMBOL: structured-input
     ] swap add-actions ;
 
 C: pane ( -- pane )
-    <line-pile> over set-delegate
-    <line-pile> <incremental> over add-output
-    <line-shelf> over set-pane-current
+    0 <pile> over set-delegate
+    0 <pile> <incremental> over add-output
+    0 <shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
     dup pane-actions ;
@@ -95,7 +96,7 @@ M: pane focusable-child* ( pane -- editor )
 
 : pane-terpri ( pane -- )
     dup pane-current over pane-print-1
-    <line-shelf> over set-pane-current init-active-line ;
+    0 <shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )
     3dup car swap pane-write-1 cdr dup

@@ -43,18 +43,17 @@ M: viewport focusable-child* ( viewport -- gadget )
 : update-slider ( slider scroller -- )
     dup rect-dim pick slider-vector v. pick set-slider-page
     dup viewport-dim over rect-dim vmax pick slider-vector v. pick set-slider-max
-    slider-viewport dup viewport-origin over fix-scroll vneg pick slider-vector v. pick set-slider-value
-    drop slider-elevator relayout ;
+    scroller-viewport dup viewport-origin over fix-scroll vneg pick slider-vector v. pick set-slider-value
+    2drop ;
 
 : update-sliders ( scroller -- )
-    dup scroller-x over update-slider
+    dup
+    dup scroller-x swap update-slider
     dup scroller-y swap update-slider ;
 
 : scroll ( origin scroller -- )
-    [
-        scroller-viewport [ fix-scroll ] keep
-        [ set-viewport-origin ] keep
-    ] keep relayout ;
+    scroller-viewport
+    [ [ fix-scroll ] keep set-viewport-origin ] keep relayout ;
 
 : add-viewport 2dup set-scroller-viewport add-center ;
 
@@ -90,6 +89,3 @@ C: scroller ( gadget -- scroller )
 
 M: scroller focusable-child* ( viewport -- gadget )
     scroller-viewport ;
-
-M: scroller layout* ( scroller -- )
-    dup update-sliders delegate layout* ;

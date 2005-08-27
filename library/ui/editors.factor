@@ -87,8 +87,8 @@ TUPLE: editor line caret ;
 
 C: editor ( text -- )
     <gadget> over set-delegate
-    [ <line-editor> swap set-editor-line ] keep
-    [ <caret> swap set-editor-caret ] keep
+    <line-editor> over set-editor-line
+    <caret> over set-editor-caret
     [ set-editor-text ] keep
     dup editor-actions ;
 

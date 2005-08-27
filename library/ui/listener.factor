@@ -23,17 +23,20 @@ TUPLE: display title pane ;
 C: display ( -- display )
     <frame> over set-delegate
     "" <display-title> over add-display-title
-    <line-pile> 2dup swap set-display-pane
+    0 <pile> 2dup swap set-display-pane
     <scroller> over add-center ;
+
+: make-presentations ( seq -- seq )
+    [
+        dup presented swons unit swap unparse-short
+        <presentation>
+    ] map ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep
     [
-        display-pane
-        dup clear-gadget swap reverse-slice [
-            dup presented swons unit swap unparse-short
-            <presentation> swap add-gadget
-        ] each-with
+        display-pane dup clear-gadget
+        >r reverse-slice make-presentations r> add-gadgets
     ] keep relayout ;
 
 : ui-listener-hook ( -- )
@@ -55,8 +58,7 @@ C: display ( -- display )
     1/2 <x-splitter> ;
 
 : listener-application ( -- )
-    <pane> dup pane set <scroller>
-    <stack-display>
+    <pane> dup pane set <scroller> <stack-display>
     2/3 <x-splitter> add-layer
     [ clear listener-thread ] in-thread
     pane get request-focus ;

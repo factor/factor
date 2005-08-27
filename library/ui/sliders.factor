@@ -21,13 +21,11 @@ TUPLE: slider vector elevator thumb value max page ;
     hand hand-click-rel elevator-click ;
 
 : thumb-actions ( thumb -- )
-    dup [ drop ] button-gestures
     [ find-elevator elevator-motion ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    <bevel-gadget>
+    <gadget> [ drop ] <button>
     t over set-gadget-root?
-    dup button-theme
     dup thumb-actions ;
 
 : elevator-theme ( elevator -- )
@@ -62,15 +60,11 @@ M: elevator layout* ( elevator -- )
 
 M: elevator pref-dim drop thumb-min ;
 
-: <empty-button> ( quot -- )
-    >r <bevel-gadget> { 12 12 0 } over set-gadget-dim
-    dup button-theme dup r> button-gestures ;
-
-: <up-button> [ drop ] <empty-button> ;
+: <up-button> <gadget> [ drop ] <button> ;
 
 : add-up { 1 1 1 } over slider-vector v- 2unseq set-frame-child ;
 
-: <down-button> [ drop ] <empty-button>  ;
+: <down-button> <gadget> [ drop ] <button> ;
 
 : add-down { 1 1 1 } over slider-vector v+ 2unseq set-frame-child ;
 
@@ -87,8 +81,7 @@ C: slider ( vector -- slider )
     <elevator> over add-elevator
     <up-button> over add-up
     <down-button> over add-down
-    <thumb> over add-thumb
-    dup slider-actions ;
+    <thumb> over add-thumb ;
 
 : <x-slider> ( -- slider ) { 1 0 0 } <slider> ;
 

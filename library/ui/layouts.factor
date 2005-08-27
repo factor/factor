@@ -57,22 +57,17 @@ TUPLE: pack align fill vector ;
 : packed-layout ( gadget sizes -- )
     2dup packed-locs packed-dims ;
 
-C: pack ( align fill vector -- pack )
-    #! align: 0 left aligns, 1/2 center, 1 right.
+C: pack ( fill vector -- pack )
     #! gap: between each child.
     #! fill: 0 leaves default width, 1 fills to pack width.
     [ <gadget> swap set-delegate ] keep
     [ set-pack-vector ] keep
     [ set-pack-fill ] keep
-    [ set-pack-align ] keep ;
+    0 over set-pack-align ;
 
-: <pile> { 0 1 0 } <pack> ;
+: <pile> ( fill -- pack ) { 0 1 0 } <pack> ;
 
-: <line-pile> 0 0 <pile> ;
-
-: <shelf> { 1 0 0 } <pack> ;
-
-: <line-shelf> 0 0 <shelf> ;
+: <shelf> ( fill -- pack ) { 1 0 0 } <pack> ;
 
 M: pack pref-dim ( pack -- dim )
     [
@@ -99,7 +94,7 @@ TUPLE: stack ;
 
 C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
-    0 1 { 0 0 1 } <pack> over set-delegate ;
+    1 { 0 0 1 } <pack> over set-delegate ;
 
 M: stack children-on ( point stack -- gadget )
     nip gadget-children ;

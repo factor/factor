@@ -9,7 +9,7 @@ TUPLE: border size ;
 C: border ( child delegate size -- border )
     [ set-border-size ] keep
     [ set-delegate ] keep
-    [ over [ add-gadget ] [ 2drop ] ifte ] keep ;
+    [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
     <gadget> { 5 5 0 } <border> ;

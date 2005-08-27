@@ -26,25 +26,22 @@ SYMBOL: commands
     [ [ third command-quot ] keep second swons ] map-with
     <menu> ;
 
-: init-commands ( gadget -- )
-    dup roll-button-theme
-    dup presented paint-prop dup [
+: init-commands ( gadget -- gadget )
+    dup presented paint-prop [
         [
             \ drop ,
             literalize ,
             [ command-menu show-menu ] %
         ] [ ] make
-        button-gestures
-    ] [
-        2drop
-    ] ifte ;
+        <roll-button>
+    ] when* ;
 
 : <styled-label> ( style text -- label )
     <label> swap dup [ alist>hash ] when over set-gadget-paint ;
 
 : <presentation> ( style text -- presentation )
     gadget pick assoc dup
-    [ 2nip ] [ drop <styled-label> dup init-commands ] ifte ;
+    [ 2nip ] [ drop <styled-label> init-commands ] ifte ;
 
 : gadget. ( gadget -- )
     gadget swons unit

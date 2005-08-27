@@ -5,7 +5,7 @@ USING: generic hashtables kernel lists math matrices namespaces
 sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
-    [ 2dup gadget-children remove swap set-gadget-children ] keep
+    2dup gadget-children remove over set-gadget-children
     relayout f swap set-gadget-parent ;
 
 : unparent ( gadget -- )
@@ -33,6 +33,10 @@ sequences vectors ;
 : add-gadget ( gadget parent -- )
     #! Add a gadget to a parent gadget.
     [ (add-gadget) ] keep relayout ;
+
+: add-gadgets ( seq parent -- )
+    #! Add all gadgets in a sequence to a parent gadget.
+    swap [ over (add-gadget) ] each relayout ;
 
 : (parents-down) ( list gadget -- list )
     [ [ swons ] keep gadget-parent (parents-down) ] when* ;
