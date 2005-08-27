@@ -14,6 +14,17 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : find-slider [ slider? ] find-parent ;
 
+: slider-scale ( slider -- n )
+    #! A scaling factor such that if x is a slider co-ordinate,
+    #! x*n is the screen position of the thumb, and conversely
+    #! for x/n. The '1 max' calls avoid division by zero.
+    dup slider-elevator rect-dim over slider-vector v. 1 max
+    swap slider-max 1 max / ;
+
+: slider>screen slider-scale * ;
+
+: screen>slider slider-scale / ;
+
 : elevator-click ( elevator pos -- )
     2drop ;
 
@@ -39,13 +50,11 @@ C: elevator ( -- elevator )
     <plain-gadget> over set-delegate
     dup elevator-theme dup elevator-actions ;
 
-: >thumb ( n slider -- n )
-    [ slider-max 1 max / ] keep
-    dup slider-elevator rect-dim swap slider-vector v. * ;
+: thumb-loc ( slider -- loc )
+    dup slider-value swap slider>screen ;
 
-: thumb-loc ( slider -- loc ) dup slider-value swap >thumb ;
-
-: thumb-dim ( slider -- h ) dup slider-page swap >thumb ;
+: thumb-dim ( slider -- h )
+    dup slider-page swap slider>screen ;
 
 : thumb-min { 12 12 0 } ;
 
