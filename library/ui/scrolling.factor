@@ -40,16 +40,23 @@ M: viewport layout* ( viewport -- )
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
-: update-slider ( slider scroller -- )
-    dup rect-dim pick slider-vector v. pick set-slider-page
-    dup viewport-dim over rect-dim vmax pick slider-vector v. pick set-slider-max
-    scroller-viewport dup viewport-origin over fix-scroll vneg pick slider-vector v. pick set-slider-value
-    drop slider-elevator relayout ;
+: set-slider ( page max value slider -- )
+    #! page/max/value are 3-vectors.
+    [ [ slider-vector v. ] keep set-slider-value ] keep
+    [ [ slider-vector v. ] keep set-slider-max ] keep
+    [ [ slider-vector v. ] keep set-slider-page ] keep
+    fix-slider ;
+
+: update-slider ( scroller slider -- )
+    >r dup rect-dim
+    over viewport-dim
+    rot scroller-viewport viewport-origin vneg
+    r> set-slider ;
 
 : update-sliders ( scroller -- )
     dup
-    dup scroller-x swap update-slider
-    dup scroller-y swap update-slider ;
+    dup scroller-x update-slider
+    dup scroller-y update-slider ;
 
 : scroll ( origin scroller -- )
     [

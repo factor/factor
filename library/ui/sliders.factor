@@ -25,11 +25,24 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : screen>slider slider-scale / ;
 
+: fix-slider-value ( n slider -- n )
+    dup slider-max swap slider-page - min 0 max ;
+
+: fix-slider ( slider -- )
+    #! Call after changing slots, to relayout and do invariants:
+    #! - max <= page
+    #! - 0 <= value <= max-page
+    dup slider-elevator relayout
+    dup slider-max over slider-page max over set-slider-max
+    dup slider-value over fix-slider-value swap set-slider-value ;
+
+: set-slider-value* ( value slider -- )
+    [ set-slider-value ] keep fix-slider ;
+
 : elevator-drag ( elevator -- )
-    dup relayout
     dup drag-loc >r find-slider r> over slider-vector v.
     over screen>slider
-    swap set-slider-value ;
+    swap set-slider-value* ;
 
 : thumb-actions ( thumb -- )
     dup [ drop ] [ button-up 1 ] set-action
@@ -47,14 +60,12 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
-    find-slider dup slider-elevator relayout
-    [ slider-value + ] keep set-slider-value ;
+    find-slider [ slider-value + ] keep set-slider-value* ;
 
 : slide-by-page ( -1/1 gadget -- )
     [ slider-page * ] keep slide-by ;
 
 : elevator-click ( elevator -- )
-    dup relayout
     dup hand relative >r find-slider r>
     over slider-vector v.
     over screen>slider over slider-value - sgn
