@@ -5,6 +5,20 @@ unparser test parser lists ;
 : rot4 ( a b c d -- b c d a )
     >r rot r> swap ;
 
+: (shift-mod) ( n s w -- n )
+     >r shift r> 1 swap shift mod ;
+
+: bitroll ( n s w -- n )
+     #! Roll n by s bits to the left, wrapping around after
+     #! w bits.
+     [ mod ] keep
+     over 0 < [ [ + ] keep ] when
+     [
+         (shift-mod)
+     ] 3keep
+     [ - ] keep (shift-mod) bitor ;
+
+
 : w+ ( int -- int )
     + HEX: ffffffff bitand ;
 
