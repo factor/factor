@@ -12,7 +12,7 @@ prettyprint io strings sequences math hashtables parser ;
 : vocab-apropos. ( substring vocab -- )
     #! List all words in a vocabulary that contain a string.
     tuck vocab-apropos dup [
-        "IN: " write swap print [.]
+        "IN: " write swap print sequence.
     ] [
         2drop
     ] ifte ;

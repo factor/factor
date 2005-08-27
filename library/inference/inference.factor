@@ -17,7 +17,7 @@ M: inference-error error. ( error -- )
     "! Inference error:" print
     dup inference-error-message print
     "! Recursive state:" print
-    inference-error-rstate [.] ;
+    inference-error-rstate sequence. ;
 
 M: value literal-value ( value -- )
     {

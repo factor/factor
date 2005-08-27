@@ -321,9 +321,9 @@ M: wrapper pprint* ( wrapper -- )
 : short. ( object -- )
     dup unparse-short swap write-object terpri ;
 
-: [.] ( sequence -- ) [ short. ] each ;
+: sequence. ( sequence -- ) [ short. ] each ;
 
-: stack. reverse-slice [.] ;
+: stack. reverse-slice sequence. ;
 
 : .s datastack stack. ;
 : .r callstack stack. ;

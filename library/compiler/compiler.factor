@@ -25,7 +25,7 @@ M: compound (compile) ( word -- )
 : precompile ( word -- )
     #! Print linear IR of word.
     [
-        word-def dataflow optimize linearize simplify [.]
+        word-def dataflow optimize linearize simplify sequence.
     ] with-scope ;
 
 : compile-postponed ( -- )
