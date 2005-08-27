@@ -79,7 +79,7 @@ USE: sequences
 : make-eval-javascript ( string -- string )
   #! Give a string return some javascript that when
   #! executed will set the eval textarea to that string.
-  [ "document.forms.main.eval.value=\"" % escape-quotes % "\"" % ] make-string ;
+  [ "document.forms.main.eval.value=\"" % escape-quotes % "\"" % ] "" make ;
 : write-eval-link ( string -- )
   #! Given text to evaluate, create an A HREF link which when
   #! clicked sets the eval textarea to that value.
@@ -115,7 +115,7 @@ USE: sequences
   #! Return an html fragment dispaying the source
   #! of the given word.
   dup dup
-  <namespace> [
+  {{ }} clone [
     "browser" "responder" set
     <table border= "1" table> 
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
