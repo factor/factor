@@ -5,10 +5,10 @@ USING: generic kernel lists math matrices namespaces sequences
 threads vectors styles ;
 
 ! A viewport can be scrolled.
-TUPLE: viewport origin bottom? ;
+TUPLE: viewport origin ;
 
 ! A scroller combines a viewport with two x and y sliders.
-TUPLE: scroller viewport x y ;
+TUPLE: scroller viewport x y bottom? ;
 
 : viewport-dim gadget-child pref-dim ;
 
@@ -23,18 +23,9 @@ C: viewport ( content -- viewport )
 
 M: viewport pref-dim gadget-child pref-dim ;
 
-: viewport-origin* ( viewport -- point )
-    dup viewport-bottom? [
-        f over set-viewport-bottom?
-        dup viewport-dim { 0 -1 0 } v*
-        [ swap set-viewport-origin ] keep
-    ] [
-        viewport-origin
-    ] ifte ;
-
 M: viewport layout* ( viewport -- )
-    dup gadget-child dup prefer
-    >r dup viewport-origin* swap fix-scroll r>
+    dup viewport-origin over fix-scroll
+    swap gadget-child dup prefer
     set-rect-loc ;
 
 M: viewport focusable-child* ( viewport -- gadget )
@@ -71,21 +62,15 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 : add-y-slider 2dup set-scroller-y add-right ;
 
-: (scroll>bottom) ( scroller -- )
-    t swap scroller-viewport set-viewport-bottom? ;
-
 : scroll>bottom ( gadget -- )
-    [ scroll>bottom ] swap handle-gesture drop ;
+    [ scroller? ] find-parent
+    [ t over set-scroller-bottom? relayout ] when* ;
 
-: scroll-by ( amount scroller -- )
-    [ scroller-viewport viewport-origin v+ ] keep scroll ;
+: scroll-up-line scroller-y -1 swap slide-by-line ;
 
-: scroll-up-line { 0 32 0 } swap scroll-by ;
-
-: scroll-down-line { 0 -32 0 } swap scroll-by ;
+: scroll-down-line scroller-y 1 swap slide-by-line ;
 
 : scroller-actions ( scroller -- )
-    dup [ (scroll>bottom) ] [ scroll>bottom ] set-action
     dup [ scroll-up-line ] [ button-down 4 ] set-action
     [ scroll-down-line ] [ button-down 5 ] set-action ;
 
@@ -97,5 +82,11 @@ C: scroller ( gadget -- scroller )
     <y-slider> over add-y-slider
     dup scroller-actions ;
 
-M: scroller focusable-child* ( viewport -- gadget )
+M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;
+
+M: scroller layout* ( scroller -- )
+    dup scroller-bottom? [
+        f over set-scroller-bottom?
+        dup scroller-viewport viewport-dim vneg over scroll
+    ] when delegate layout* ;

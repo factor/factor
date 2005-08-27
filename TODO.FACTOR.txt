@@ -6,7 +6,6 @@
 + ui:
 
 - fix up the min thumb size hack
-- nicer scrollbars with up/down buttons
 - only redraw dirty gadgets
 - faster mouse tracking
 

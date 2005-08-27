@@ -12,10 +12,12 @@ SYMBOL: callstack-display
 
 TUPLE: display title pane ;
 
+: display-title-theme
+    dup { 216 232 255 } background set-paint-prop
+    << solid f >> interior set-paint-prop ;
+
 : <display-title> ( text -- label )
-    <label>
-    dup << solid f >> interior set-paint-prop
-    dup { 216 232 255 } background set-paint-prop ;
+    <label> dup display-title-theme ;
 
 : add-display-title ( title display -- )
     2dup set-display-title add-top ;

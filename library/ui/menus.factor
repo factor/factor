@@ -25,8 +25,7 @@ USING: generic kernel lists math namespaces sequences ;
     1 <pile> [ add-gadgets ] keep ;
 
 : menu-theme ( menu -- )
-    << gradient f { 1 0 0 } { 240 240 255 } { 216 216 216 } >>
-    interior set-paint-prop ;
+    << solid f >> interior set-paint-prop ;
 
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.

@@ -118,8 +118,10 @@ M: compound definer drop \ : ;
     [ f swap set-word-prop ] each-with ;
 
 : reset-word ( word -- )
-    { "parsing" "inline" "foldable" "flushable" "predicating" }
-    reset-props ;
+    {
+        "parsing" "inline" "foldable" "flushable" "predicating"
+        "documentation" "stack-effect"
+    } reset-props ;
 
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;

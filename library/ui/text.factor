@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien hashtables kernel lists namespaces sdl sequences
-strings styles io ;
+USING: alien hashtables io kernel lists math namespaces sdl
+sequences strings styles ;
 
 : draw-surface ( x y surface -- )
     surface get SDL_UnlockSurface
