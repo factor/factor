@@ -8,10 +8,8 @@
 - fix up the min thumb size hack
 - scroll bar: more intuitive behavior when clicking inside the elevator
 - nicer scrollbars with up/down buttons
-- clicking outside menu doesn't close
 - only redraw dirty gadgets
 - faster mouse tracking
-- better menu positioning
 
 - off-by-one error in pick-up?
 - closing ui does not stop timers

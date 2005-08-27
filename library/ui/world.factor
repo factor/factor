@@ -38,8 +38,7 @@ C: world ( -- world )
 
 : show-glass ( gadget -- )
     hide-glass
-    <gadget> dup
-    world get 2dup add-gadget set-world-glass
+    <gadget> dup add-layer dup world get set-world-glass
     dupd add-gadget prefer ;
 
 : draw-world ( world -- )
@@ -54,8 +53,7 @@ DEFER: handle-event
     world get dup world-invalid >r layout-world r>
     [ dup world-hand update-hand draw-world ] [ drop ] ifte ;
 
-: next-event ( -- event ? )
-    <event> dup SDL_PollEvent ;
+: next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 
 : run-world ( -- )
     #! Keep polling for events until there are no more events in

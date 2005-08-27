@@ -3,8 +3,20 @@
 IN: gadgets
 USING: generic kernel lists math namespaces sequences ;
 
+: menu-actions ( glass -- )
+    [ drop hide-glass ] [ button-down 1 ] set-action ;
+
+: fit-bounds ( loc dim max -- loc )
+    #! Adjust loc to fit inside max.
+    swap v- { 0 0 0 } vmax vmin ;
+
+: menu-loc ( menu -- loc )
+    hand rect-loc swap rect-dim world get rect-dim fit-bounds ;
+
 : show-menu ( menu -- )
-    hand screen-loc over set-rect-loc show-glass ;
+    dup show-glass
+    dup menu-loc swap set-rect-loc
+    world get world-glass menu-actions ;
 
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
