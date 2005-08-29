@@ -148,7 +148,7 @@ SYMBOL: old-d
 : get-md5 ( -- str )
     [
         [ a b c d ] [ get 4 >le % ] each
-    ] make-string hex-string ;
+    ] "" make hex-string ;
 
 : string>md5 ( string -- md5 )
     [

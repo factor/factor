@@ -47,14 +47,14 @@ unparser test parser lists ;
         dup % "\u0080" %
         dup length 64 mod zero-pad-length 0 fill %
         dup length 8 * 8 >le %
-    ] make-string nip ;
+    ] "" make nip ;
 
 : pad-string-sha1 ( string  -- padded-string )
     [
         dup % "\u0080" %
         dup length 64 mod zero-pad-length 0 fill %
         dup length 8 * 8 >be %
-    ] make-string nip ;
+    ] "" make nip ;
 
 : num-blocks ( length -- num )
     64 /i ;
@@ -67,5 +67,5 @@ unparser test parser lists ;
         [
             >hex 2 48 pad-left %
         ] each
-    ] make-string ;
+    ] "" make ;
 

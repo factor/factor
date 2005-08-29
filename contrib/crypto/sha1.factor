@@ -33,7 +33,7 @@ SYMBOL: K
         20 [ HEX: 6ed9eba1 , ] times
         20 [ HEX: 8f1bbcdc , ] times
         20 [ HEX: ca62c1d6 , ] times
-    ] make-vector K set ;
+    ] { } make K set ;
 
 : update-hs ( -- )
     A h0 update-old-new
@@ -115,7 +115,7 @@ SYMBOL: K
 : get-sha1 ( -- str )
     [
         [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each
-    ] make-string hex-string ;
+    ] "" make hex-string ;
 
 : string>sha1 ( string -- sha1 )
     [
@@ -139,5 +139,5 @@ SYMBOL: K
     [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1 ] unit-test
     [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1 ] unit-test
     ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1 ] unit-test ! takes a long time...
-    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] make-string nip string>sha1 ] unit-test ;
+    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1 ] unit-test ;
 
