@@ -76,13 +76,9 @@ t [
 compile? [
     "Compiling base..." print
 
-    \ car compile
-    \ * compile
-    \ = compile
-    \ string>number compile
-    \ number>string compile
-    \ scan compile
-    \ (generate) compile
+    [ car * = string>number number>string scan (generate) ]
+    [ compile ]
+    each
 ] when
 
 compile? [

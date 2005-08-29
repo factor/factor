@@ -158,7 +158,7 @@ vocabularies get [
     "!syntax" get "syntax" set
 
     "syntax" get hash-values [ word? ] subset
-    [ "syntax" "vocabulary" set-word-prop ] each
+    [ "syntax" swap set-word-vocabulary ] each
 ] bind
 
 "!syntax" vocabularies get remove-hash

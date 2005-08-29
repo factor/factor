@@ -366,7 +366,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ fsqrt t "flushable" set-word-prop
 \ fsqrt t "foldable" set-word-prop
 
-\ <word> [ [ ] [ word ] ] "infer-effect" set-word-prop
+\ <word> [ [ object object ] [ word ] ] "infer-effect" set-word-prop
 \ <word> t "flushable" set-word-prop
 
 \ update-xt [ [ word ] [ ] ] "infer-effect" set-word-prop
