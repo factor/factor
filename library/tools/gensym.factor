@@ -12,6 +12,6 @@ SYMBOL: gensym-count
 : gensym ( -- word )
     #! Return a word that is distinct from every other word, and
     #! is not contained in any vocabulary.
-    (gensym) f (create) ;
+    (gensym) f <word> ;
 
 global [ 0 gensym-count set ] bind

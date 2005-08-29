@@ -46,13 +46,6 @@ SYMBOL: vocabularies
 : search ( name vocabs -- word )
     [ lookup ] map-with [ ] find nip ;
 
-: <props> ( name vocab -- plist )
-    [ "vocabulary" set "name" set ] make-hash ;
-
-: (create) ( name vocab -- word )
-    #! Create an undefined word without adding to a vocabulary.
-    <props> <word> [ set-word-props ] keep ;
-
 : reveal ( word -- )
     #! Add a new word to its vocabulary.
     vocabularies get [
@@ -67,8 +60,8 @@ SYMBOL: vocabularies
     #! Create a new word in a vocabulary. If the vocabulary
     #! already contains the word, the existing instance is
     #! returned.
-    2dup check-create 2dup lookup
-    [ nip ] [ (create) dup reveal ] ?ifte ;
+    2dup check-create 2dup lookup dup
+    [ 2nip ] [ drop <word> dup reveal ] ifte ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;

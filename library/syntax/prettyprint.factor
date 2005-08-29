@@ -60,7 +60,7 @@ C: section ( length -- section )
     #! n is current column position.
     last-newline set
     line-count inc
-    line-limit? [ " ..." write end-printing get call ] when
+    line-limit? [ "..." write end-printing get call ] when
     "\n" write do-indent ;
 
 TUPLE: text string style ;

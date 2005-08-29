@@ -1,97 +1,5 @@
 #include "factor.h"
 
-F_FIXNUM string_compare(F_STRING* s1, F_STRING* s2)
-{
-	CELL len1 = string_capacity(s1);
-	CELL len2 = string_capacity(s2);
-
-	CELL limit = (len1 < len2 ? len1 : len2);
-
-	CELL i = 0;
-	while(i < limit)
-	{
-		u16 c1 = string_nth(s1,i);
-		u16 c2 = string_nth(s2,i);
-		if(c1 != c2)
-			return c1 - c2;
-		i++;
-	}
-
-	return len1 - len2;
-}
-
-/* Implements some Factor library words in C, to dump a stack in a semi-human-readable
-form without any Factor code executing.. This is not used during normal execution, only
-when the runtime dies. */
-bool equals(CELL obj1, CELL obj2)
-{
-	if(type_of(obj1) == STRING_TYPE
-		&& type_of(obj2) == STRING_TYPE)
-	{
-		return string_compare(untag_string(obj1),untag_string(obj2)) == 0;
-	}
-	else
-		return (obj1 == obj2);
-}
-
-CELL assoc(CELL alist, CELL key)
-{
-	if(alist == F)
-		return F;
-
-	if(TAG(alist) != CONS_TYPE)
-	{
-		fprintf(stderr,"Not an alist: %ld\n",alist);
-		return F;
-	}
-
-	{
-		CELL pair = untag_cons(alist)->car;
-		if(TAG(pair) != CONS_TYPE)
-		{
-			fprintf(stderr,"Not a pair: %ld\n",alist);
-			return F;
-		}
-
-		if(equals(untag_cons(pair)->car,key))
-			return untag_cons(pair)->cdr;
-		else
-			return assoc(untag_cons(alist)->cdr,key);
-	}
-}
-
-CELL hash(CELL hash, CELL key)
-{
-	if(type_of(hash) != HASHTABLE_TYPE)
-	{
-		fprintf(stderr,"Not a hash: %ld\n",hash);
-		return F;
-	}
-
-	{
-		int i;
-
-		CELL array = ((F_HASHTABLE*)UNTAG(hash))->array;
-		F_ARRAY* a;
-
-		if(type_of(array) != ARRAY_TYPE)
-		{
-			fprintf(stderr,"Not an array: %ld\n",hash);
-			return F;
-		}
-
-		a = untag_array_fast(array);
-
-		for(i = 0; i < array_capacity(a); i++)
-		{
-			CELL value = assoc(get(AREF(a,i)),key);
-			if(value != F)
-				return value;
-		}
-		
-		return F;
-	}
-}
 void print_cons(CELL cons)
 {
 	fprintf(stderr,"[ ");
@@ -115,17 +23,16 @@ void print_cons(CELL cons)
 
 void print_word(F_WORD* word)
 {
-	CELL name = hash(word->props,tag_object(from_c_string("name")));
-	if(type_of(name) == STRING_TYPE)
-		fprintf(stderr,"%s",to_c_string(untag_string(name)));
+	if(type_of(word->name) == STRING_TYPE)
+		fprintf(stderr,"%s",to_c_string(untag_string(word->name)));
 	else
 	{
 		fprintf(stderr,"#<not a string: ");
-		print_obj(name);
+		print_obj(word->name);
 		fprintf(stderr,">");
 	}
 
-	fprintf(stderr," (#%ld)",word->primitive);
+	fprintf(stderr," (#%ld)",untag_fixnum_fast(word->primitive));
 }
 
 void print_string(F_STRING* str)

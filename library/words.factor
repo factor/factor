@@ -10,21 +10,11 @@ namespaces sequences strings vectors ;
 : word-prop ( word name -- value ) swap word-props hash ;
 : set-word-prop ( word value name -- ) rot word-props set-hash ;
 
-: word-name ( word -- str ) "name" word-prop ;
-: word-vocabulary ( word -- str ) "vocabulary" word-prop ;
-
 ! Pointer to executable native code
 GENERIC: word-xt
-M: word word-xt ( w -- xt ) 2 integer-slot ;
+M: word word-xt ( w -- xt ) 7 integer-slot ;
 GENERIC: set-word-xt
-M: word set-word-xt ( xt w -- ) 2 set-integer-slot ;
-
-! Primitive number; some are magic, see below.
-GENERIC: word-primitive
-M: word word-primitive ( w -- n ) 3 integer-slot ;
-GENERIC: set-word-primitive
-M: word set-word-primitive ( n w -- )
-    [ 3 set-integer-slot ] keep update-xt ;
+M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
@@ -85,7 +75,10 @@ M: word (uncrossref) drop ;
 ! word does when invoked.
 
 : define ( word primitive parameter -- )
-    pick uncrossref pick set-word-def swap set-word-primitive ;
+    pick uncrossref
+    pick set-word-def
+    over set-word-primitive
+    update-xt ;
 
 GENERIC: definer ( word -- word )
 #! Return the parsing word that defined this word.

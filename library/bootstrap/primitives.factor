@@ -314,8 +314,11 @@ null null define-class
 
 "word" "words" create 17 "word?" "words" create {
     { 1 { "hashcode" "kernel" } f }
-    { 4 { "word-def" "words" } { "set-word-def" "words" } }
-    { 5 { "word-props" "words" } { "set-word-props" "words" } }
+    { 2 { "word-name" "words" } f }
+    { 3 { "word-vocabulary" "words" } f }
+    { 4 { "word-primitive" "words" } { "set-word-primitive" "words" } }
+    { 5 { "word-def" "words" } { "set-word-def" "words" } }
+    { 6 { "word-props" "words" } { "set-word-props" "words" } }
 } define-builtin
 
 "tuple" "kernel" create 18 "tuple?" "kernel" create { } define-builtin

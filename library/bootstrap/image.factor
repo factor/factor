@@ -145,13 +145,18 @@ M: f ' ( obj -- ptr )
 : emit-word ( word -- )
     dup word-props ' >r
     dup word-def ' >r
+    dup word-primitive ' >r
+    dup word-vocabulary ' >r
+    dup word-name ' >r
     object-tag here-as over objects get set-hash
     word-type >header emit
-    dup hashcode emit-fixnum
-    0 emit
-    word-primitive emit
+    hashcode emit-fixnum
     r> emit
-    r> emit ;
+    r> emit
+    r> emit
+    r> emit
+    r> emit
+    0 emit ;
 
 : word-error ( word msg -- )
     [ % dup word-vocabulary % " " % word-name % ] "" make
