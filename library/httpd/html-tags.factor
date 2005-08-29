@@ -77,7 +77,7 @@ USE: sequences
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
-    [ [ dup car % "='" % cdr % "'" % ] "" make ] map " " join ;
+    [ [ " " % dup car % "='" % cdr % "'" % ] each ] "" make ;
 
 : write-attributes ( n: namespace -- )    
     #! With the attribute namespace on the stack, get the attributes
