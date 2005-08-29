@@ -46,20 +46,14 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : ?tail ( seq end -- seq ? )
     2dup tail? [ length swap head* t ] [ drop f ] ifte ; flushable
 
-: group-advance subseq , >r tuck + swap r> ;
-
-: group-finish nip dup length swap subseq , ;
-
-: (group) ( start n seq -- )
-    3dup >r dupd + r> 2dup length < [
-        group-advance (group)
+: (group) ( n seq -- )
+    2dup length >= [
+        dup like , drop
     ] [
-        group-finish 3drop
+        2dup head , dupd tail-slice (group)
     ] ifte ;
 
-: group ( n seq -- list )
-    #! Split a sequence into element chunks.
-    [ 0 -rot (group) ] { } make ; flushable
+: group ( n seq -- seq ) [ (group) ] { } make ; flushable
 
 : start-step ( subseq seq n -- subseq slice )
     pick length dupd + rot <slice> ;
@@ -81,28 +75,19 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : subseq? ( subseq seq -- ? ) start -1 > ; flushable
 
-: split1 ( seq subseq -- before after )
+: (split1) ( seq subseq -- before after )
+    #! After is a slice.
     dup pick start dup -1 = [
-        2drop f
+        2drop dup like f
     ] [
-        [ swap length + over tail ] keep rot head swap
+        [ swap length + over tail-slice ] keep rot head swap
     ] ifte ; flushable
 
-: split-next ( index seq subseq -- next )
-    pick >r dup pick r> start* dup -1 = [
-        >r drop tail , r> ( end of sequence )
-    ] [
-        swap length dupd + >r swap subseq , r>
-    ] ifte ;
+: split1 ( seq subseq -- before after )
+    #! After is of the same type as seq.
+    (split1) dup like ; flushable
 
-: (split) ( index seq subseq -- )
-    2dup >r >r split-next dup -1 = [
-        r> r> 3drop
-    ] [
-        r> r> (split)
-    ] ifte ;
+: (split) ( seq subseq -- )
+    tuck (split1) >r , r> dup [ swap (split) ] [ 2drop ] ifte ;
 
-: split ( seq subseq -- list )
-    #! Split the sequence at each occurrence of subseq, and push
-    #! a list of the pieces.
-    [ 0 -rot (split) ] [ ] make ; flushable
+: split ( seq subseq -- seq ) [ (split) ] [ ] make ; flushable
