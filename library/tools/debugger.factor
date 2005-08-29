@@ -137,7 +137,3 @@ M: object error. ( error -- ) . ;
         save-error rethrow
     ] 5 setenv
     kernel-error 12 setenv ;
-
-! So that stage 2 boot gives a useful error message if something
-! fails after this file is loaded.
-init-error-handler

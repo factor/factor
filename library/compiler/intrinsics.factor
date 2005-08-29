@@ -155,8 +155,8 @@ sequences vectors words ;
     >r load-inputs 2unseq swap dup r> execute ,
     0 0 %replace-d , ; inline
 
-: literal-fixnum? ( value -- ? )
-    dup literal? [ literal-value fixnum? ] [ drop f ] ifte ;
+: literal-immediate? ( value -- ? )
+    dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
 
 : binary-op-imm ( imm op -- )
     1 %dec-d , in-1
@@ -166,7 +166,7 @@ sequences vectors words ;
 : binary-op ( node op -- )
     #! out is a vreg where the vop stores the result.
     fixnum-imm? [
-        >r dup node-peek dup literal-fixnum? [
+        >r dup node-peek dup literal-immediate? [
             literal-value r> binary-op-imm drop
         ] [
             drop r> binary-op-reg

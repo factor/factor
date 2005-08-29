@@ -38,8 +38,11 @@ TUPLE: slider vector elevator thumb value max page ;
     dup slider-max over slider-page max over set-slider-max
     dup slider-value over fix-slider-value swap set-slider-value ;
 
+SYMBOL: slider-changed
+
 : set-slider-value* ( value slider -- )
-    [ set-slider-value ] keep fix-slider ;
+    [ set-slider-value ] keep [ fix-slider ] keep
+    [ slider-changed ] swap handle-gesture drop ;
 
 : elevator-drag ( elevator -- )
     dup drag-loc >r find-slider r> over slider-vector v.

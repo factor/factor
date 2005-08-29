@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
-USING: compiler-backend compiler-frontend errors inference
-io kernel lists math namespaces prettyprint words ;
+USING: compiler-backend compiler-frontend errors inference io
+kernel lists math namespaces prettyprint sequences words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;
@@ -25,7 +25,7 @@ M: compound (compile) ( word -- )
 : precompile ( word -- )
     #! Print linear IR of word.
     [
-        word-def dataflow optimize linearize simplify sequence.
+        word-def dataflow optimize linearize simplify [ . ] each
     ] with-scope ;
 
 : compile-postponed ( -- )

@@ -38,7 +38,7 @@ SYMBOL: structured-input
     [
         2 nesting-limit set
         5 length-limit set
-        <block pprint-elements block> t newline
+        <block pprint-elements block> newline
     ] with-pprint ;
 
 : pane-call ( quot pane -- )
