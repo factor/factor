@@ -1,6 +1,6 @@
 IN: crypto
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists vectors ;
+unparser test parser lists vectors hashtables ;
 
 ! Implemented according to RFC 3174.
 
@@ -17,6 +17,7 @@ SYMBOL: E
 SYMBOL: temp
 SYMBOL: w
 SYMBOL: K
+SYMBOL: f-table
 
 : reset-w ( -- )
     80 <vector> w set ;
@@ -35,12 +36,6 @@ SYMBOL: K
         20 [ HEX: ca62c1d6 , ] times
     ] { } make K set ;
 
-: update-hs ( -- )
-    A h0 update-old-new
-    B h1 update-old-new
-    C h2 update-old-new
-    D h3 update-old-new
-    E h4 update-old-new ;
 
 : get-wth ( n -- wth )
     w get nth ;
@@ -59,35 +54,35 @@ SYMBOL: K
 ! f(t;B,C,D) = B XOR C XOR D                        (20 <= t <= 39)
 ! f(t;B,C,D) = (B AND C) OR (B AND D) OR (C AND D)  (40 <= t <= 59)
 ! f(t;B,C,D) = B XOR C XOR D                        (60 <= t <= 79)
-: sha1-f ( B C D t -- f_tbcd )
-    dup 20 < [
-        drop >r over bitnot r> bitand >r bitand r> bitor
-    ] [ dup 40 < [
-            drop bitxor bitxor
-        ] [ dup 60 < [
-                drop 2dup bitand >r pick bitand >r bitand r> r> bitor bitor
-            ] [
-                drop bitxor bitxor
-            ] ifte
-        ] ifte
-    ] ifte ;
 
-: process-sha1-block ( block -- )
+{{
+    [[ 0 [ >r over bitnot r> bitand >r bitand r> bitor ] ]]
+    [[ 1 [ bitxor bitxor ] ]]
+    [[ 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] ]]
+    [[ 3 [ bitxor bitxor ] ]]
+}} f-table set
+
+: sha1-f ( B C D t -- f_tbcd )
+    20 /i f-table get hash call ;
+
+: make-w ( -- )
     ! compute w, steps a-b of RFC 3174, section 6.1
     80 [ dup 16 < [
             [ nth-int-be w get push ] 2keep
         ] [
             dup sha1-W w get push
         ] ifte 
-    ] repeat
+    ] repeat ;
 
+: init-letters ( -- )
     ! step c of RFC 3174, section 6.1
     h0 get A set
     h1 get B set
     h2 get C set
     h3 get D set
-    h4 get E set
+    h4 get E set ;
 
+: calc-temp-set-letters ( -- )
     ! step d of RFC 3174, section 6.1
     80 [
         ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
@@ -106,11 +101,18 @@ SYMBOL: K
         B get 30 32 bitroll C set
         A get B set
         temp get A set
-    ] repeat
+    ] repeat ;
 
+: update-hs ( -- )
     ! step e of RFC 3174, section 6.1
-    update-hs
-    drop ;
+    A h0 update-old-new
+    B h1 update-old-new
+    C h2 update-old-new
+    D h3 update-old-new
+    E h4 update-old-new ;
+
+: process-sha1-block ( block -- )
+    make-w init-letters calc-temp-set-letters update-hs drop ;
 
 : get-sha1 ( -- str )
     [
