@@ -19,26 +19,17 @@ UNION: integer fixnum bignum ;
 
 : lcm ( a b -- c )
     #! Smallest integer such that c/a and c/b are both integers.
-    2dup gcd nip >r * r> /i ;
+    2dup gcd nip >r * r> /i ; foldable
 
 : mod-inv ( x n -- y )
     #! Compute the multiplicative inverse of x mod n.
-    gcd 1 = [ "Non-trivial divisor found" throw ] unless ; foldable
-
-: bitroll ( n s w -- n )
-    #! Roll n by s bits to the right, wrapping around after
-    #! w bits.
-    [ mod shift ] 3keep over 0 >= [ - ] [ + ] ifte shift bitor ;
+    gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
     foldable
 
 IN: math-internals
 
 : fraction> ( a b -- a/b )
-    dup 1 number= [
-        drop
-    ] [
-        (fraction>)
-    ] ifte ; inline
+    dup 1 number= [ drop ] [ (fraction>) ] ifte ; inline
 
 : division-by-zero ( x y -- )
     "Division by zero" throw drop ; inline

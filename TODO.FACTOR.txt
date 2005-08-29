@@ -1,7 +1,6 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - fix infer hang
 - out of memory error when printing global namespace
-- HTML prettyprinting
 
 + ui:
 

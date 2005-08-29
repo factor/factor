@@ -5,7 +5,7 @@ USING: generic hashtables io kernel lists namespaces sequences
 styles words ;
 
 : declaration. ( word prop -- )
-    tuck word-name word-prop [ bl pprint-word ] [ drop ] ifte ;
+    tuck word-name word-prop [ pprint-word ] [ drop ] ifte ;
 
 : declarations. ( word -- )
     [
@@ -36,25 +36,24 @@ styles words ;
     ] ?ifte ;
 
 : stack-effect. ( string -- )
-    [ bl "(" swap ")" append3 comment. ] when* ;
+    [ "(" swap ")" append3 comment. ] when* ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word bl word-vocabulary f text block;
-    t newline ;
+    <block \ IN: pprint-word word-vocabulary f text block;
+    newline ;
 
 : definer. ( word -- )
-    dup definer pprint-word bl
+    dup definer pprint-word
     dup pprint-word
-    stack-effect stack-effect.
-    f newline ;
+    stack-effect stack-effect. ;
 
 GENERIC: (see) ( word -- )
 
-M: word (see) definer. t newline ;
+M: word (see) definer. newline ;
 
 : documentation. ( word -- )
     "documentation" word-prop [
-        "\n" split [ "#!" swap append comment. t newline ] each
+        "\n" split [ "#!" swap append comment. newline ] each
     ] when* ;
 
 : pprint-; \ ; pprint-word ;
@@ -64,19 +63,19 @@ M: word (see) definer. t newline ;
     pprint-; declarations. block; ;
 
 M: compound (see)
-    dup word-def swap see-body t newline ;
+    dup word-def swap see-body newline ;
 
 : method. ( word [[ class method ]] -- )
-    \ M: pprint-word bl
-    unswons pprint-word bl
-    swap pprint-word f newline
+    \ M: pprint-word
+    unswons pprint-word
+    swap pprint-word
     <block pprint-elements pprint-;
-    block; t newline ;
+    block; newline ;
 
 M: generic (see)
     <block
     dup dup "combination" word-prop
-    swap see-body block; t newline
+    swap see-body block; newline
     dup methods [ method. ] each-with ;
 
 GENERIC: class. ( word -- )
@@ -92,28 +91,28 @@ GENERIC: class. ( word -- )
     ] ifte ;
 
 M: union class.
-    \ UNION: pprint-word bl
-    dup pprint-word bl
-    "members" word-prop pprint-elements pprint-; t newline ;
+    \ UNION: pprint-word
+    dup pprint-word
+    "members" word-prop pprint-elements pprint-; newline ;
 
 M: complement class.
-    \ COMPLEMENT: pprint-word bl
-    dup pprint-word bl
-    "complement" word-prop pprint-word t newline ;
+    \ COMPLEMENT: pprint-word
+    dup pprint-word
+    "complement" word-prop pprint-word newline ;
 
 M: predicate class.
-    \ PREDICATE: pprint-word bl
-    dup "superclass" word-prop pprint-word bl
-    dup pprint-word f newline
+    \ PREDICATE: pprint-word
+    dup "superclass" word-prop pprint-word
+    dup pprint-word
     <block
     "definition" word-prop pprint-elements
-    pprint-; block; t newline ;
+    pprint-; block; newline ;
 
 M: tuple-class class.
-    \ TUPLE: pprint-word bl
-    dup pprint-word bl
-    "slot-names" word-prop [ f text bl ] each
-    pprint-; t newline ;
+    \ TUPLE: pprint-word
+    dup pprint-word
+    "slot-names" word-prop [ f text ] each
+    pprint-; newline ;
 
 M: word class. drop ;
 

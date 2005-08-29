@@ -24,6 +24,7 @@
 ! ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 IN: html
+USING: prettyprint ;
 USE: strings
 USE: lists
 USE: kernel
@@ -76,15 +77,13 @@ USE: sequences
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
     #! suitable for embedding in an html tag.
-    reverse [
-        [ dup car % "='" % cdr % "'" % ] each
-    ] "" make ;
+    [ [ dup car % "='" % cdr % "'" % ] "" make ] map " " join ;
 
 : write-attributes ( n: namespace -- )    
     #! With the attribute namespace on the stack, get the attributes
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
-    "attrs" get [ " " write attrs>string write ] when* ;
+    "attrs" get attrs>string write ;
 
 : store-prev-attribute ( n: tag value -- )     
     #! Assumes an attribute namespace is on the stack.
@@ -92,114 +91,80 @@ USE: sequences
     #! and sets it's value to the current value on the stack.
     #! If there is no previous attribute, no value is expected
     #! on the stack.
-    "current-attribute" get [ swons "attrs" [ cons ] change ] when* ;
+    "current-attribute" get [ swons "attrs" get push ] when* ;
 
-! HTML tag words
-! 
-! Each closable HTML tag has four words defined. The example below is for
-! <p>:
-!
-! : <p> ( -- )
-!    #! Writes the opening tag to standard output.
-!    "<p>" write ;
-
-! : <p ( -- n: <namespace> )
-!     #! Used for setting inline attributes. Prints out
-!     #! an unclosed opening tag.
-!     "<p" write {{ }} clone >n ;
-!
-! : p> ( n: <namespace> -- )
-!    #! Used to close off inline attribute version of word.
-!    #! Prints out attributes and closes opening tag.
-!     store-prev-attribute write-attributes n> drop ">" write ;
-!
-! : </p> ( -- )
-!    #! Write out the closing tag.
-!    "</foo>" write ;
-!
-! Each open only HTML tag has only three words:
-!
-! : <input/> ( -- )
-!     #! Used for printing the tag with no attributes.
-!     "<input>" write ;
-!
-! : <input ( -- n: <namespace> )
-!     #! Used for setting inline attributes.
-!     "<input" write {{ }} clone >n ;
-!
-! : input/> ( n: <namespace> -- )
-!     #! Used to close off inline attribute version of word
-!     #! and print the tag/
-!     store-prev-attribute write-attributes n> drop ">" write ;
-!
-! Each attribute word has the form xxxx= where 'xxxx' is the attribute
-! name. The example below is for href:
-!
-! : href= ( n: <namespace> optional-value -- )
-!    store-prev-attribute "href" "current-attribute" set ;
-
-: create-word ( vocab name def -- )
+: html-word ( name def -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
-    >r swap create r> define-compound ;
+    >r "html" create dup r> define-compound ;
  
-: def-for-html-word-<foo> ( name -- name quot )
+: <foo> "<" swap ">" append3 ;
+
+: do-<foo> <foo> write ;
+
+: def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    "<" swap ">" append3 dup [ write ] cons ;
+    dup <foo> swap [ do-<foo> ] cons html-word define-open ;
 
-: def-for-html-word-<foo ( name -- name quot )
+: <foo "<" swap append ;
+
+: do-<foo write {{ }} clone >n { } clone "attrs" set ;
+
+: def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    "<" swap append dup [ write {{ }} clone >n ] cons ;
+    <foo dup [ do-<foo ] cons html-word drop ;
 
-: def-for-html-word-foo> ( name -- name quot )
+: foo> ">" append ;
+
+: do-foo> store-prev-attribute write-attributes n> drop ">" write ;
+
+: def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    ">" append [
-        store-prev-attribute write-attributes n> drop ">" write
-    ] ;
+    foo> [ do-foo> ] html-word define-open ;
 
-: def-for-html-word-</foo> ( name -- name quot )
+: </foo> [ "</" % % ">" % ] "" make ;
+
+: def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.    
-    [ "</" % % ">" % ] "" make dup [ write ] cons ;
+    </foo> dup [ write ] cons html-word define-close ;
 
-: def-for-html-word-<foo/> ( name -- name quot )
+: <foo/> [ "<" % % "/>" % ] "" make ;
+
+: def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    [ "<" % dup % "/>" % ] "" make swap
-    [ "<" % % ">" % ] "" make
-    [ write ] cons ;
+    dup <foo/> swap [ do-<foo> ] cons html-word drop ;
 
-: def-for-html-word-foo/> ( name -- name quot )
+: foo/> "/>" append ;
+
+: def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.    
-    "/>" append [
-        store-prev-attribute write-attributes n> drop ">" write
-    ] ;
+    foo/> [ do-foo> ] html-word define-close ;
 
 : define-closed-html-word ( name -- ) 
     #! Given an HTML tag name, define the words for
     #! that closable HTML tag.
-    "html" swap
-    2dup def-for-html-word-<foo> create-word
-    2dup def-for-html-word-<foo create-word
-    2dup def-for-html-word-foo> create-word
-    def-for-html-word-</foo> create-word ;
+    dup def-for-html-word-<foo>
+    dup def-for-html-word-<foo
+    dup def-for-html-word-foo>
+    def-for-html-word-</foo> ;
 
 : define-open-html-word ( name -- ) 
     #! Given an HTML tag name, define the words for
     #! that open HTML tag.
-    "html" swap
-    2dup def-for-html-word-<foo/> create-word
-    2dup def-for-html-word-<foo create-word
-    def-for-html-word-foo/> create-word ;
+    dup def-for-html-word-<foo/>
+    dup def-for-html-word-<foo
+    def-for-html-word-foo/> ;
 
 : define-attribute-word ( name -- )
-    "html" swap dup "=" append swap 
-    [ store-prev-attribute ] cons reverse
-    [ "current-attribute" set ] append create-word ;
+    dup "=" append swap [
+        \ store-prev-attribute , , [ "current-attribute" set ] %
+    ] [ ] make html-word drop ;
 
 ! Define some closed HTML tags
 [
