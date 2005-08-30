@@ -241,7 +241,8 @@ IN: kernel
     #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
     #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
     #! The last condition should be a catch-all 't'.
-    [ first call ] find nip [ second call ] [ no-cond ] ifte ;
+    [ first call ] find nip dup
+    [ second call ] [ no-cond ] ifte ;
 
 : with-datastack ( stack word -- stack )
     datastack >r >r set-datastack r> execute

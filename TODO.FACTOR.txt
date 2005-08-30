@@ -56,7 +56,6 @@
 
 - flushing optimization
 - compile-byte/cell: instantiating aliens
-- inference needs to be more robust with heavily recursive code
 - fix fixnum<< and /i overflow on PowerPC
 - simplifier:
   - kill replace after a peek
