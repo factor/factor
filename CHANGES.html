@@ -32,7 +32,15 @@
 <li>The matrices library has been greatly simplified. Matrices are now represented as vectors of vectors, and matrix words have been moved to the <code>math</code> vocabulary.</li>
 <li>More descriptive "out of bounds" errors.</li>
 <li>New <code>make-hash ( quot -- namespace )</code> combinator executes quotation in a new namespace, which is then pushed on the stack.</li>
-<li>The <code>&lt;namespace&gt;</code> word is gone. It would create a hashtable with a default capacity. Now, just write <code>{{ }} clone</code>.
+<li>The <code>&lt;namespace&gt;</code> word is gone. It would create a hashtable with a default capacity. Now, just write <code>{{ }} clone</code>.</li>
+<li>Sequence construction words changed:
+<pre>
+make-list    ==&gt; [ ] make
+make-vector  ==&gt; { } make
+make-string  ==&gt; "" make
+make-rstring ==&gt; "" make reverse
+make-sbuf    ==&gt; SBUF" " make
+</pre></li>
 </ul>
 
 </li>

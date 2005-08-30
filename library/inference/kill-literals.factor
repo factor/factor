@@ -9,28 +9,13 @@ GENERIC: literals* ( node -- )
 : literals ( node -- seq )
     [ [ literals* ] each-node ] { } make ;
 
-GENERIC: can-kill* ( literal node -- ? )
-
-: can-kill? ( literal node -- ? )
-    #! Return false if the literal appears in any node in the
-    #! list.
-    dup [
-        2dup can-kill* [
-            2dup node-children [ can-kill? ] all-with? [
-                node-successor can-kill?
-            ] [
-                2drop f
-            ] ifte
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop t
-    ] ifte ;
+GENERIC: can-kill? ( literal node -- ? )
 
 : kill-set ( node -- list )
     #! Push a list of literals that may be killed in the IR.
-    dup literals [ swap can-kill? ] subset-with ;
+    dup literals [
+        swap [ can-kill? ] all-nodes-with?
+    ] subset-with ;
 
 : remove-values ( values node -- )
     2dup [ node-in-d seq-diff ] keep set-node-in-d
@@ -48,19 +33,19 @@ M: node kill-node* ( literals node -- ) 2drop ;
 ! Generic nodes
 M: node literals* ( node -- ) drop ;
 
-M: node can-kill* ( literal node -- ? ) uses-value? not ;
+M: node can-kill? ( literal node -- ? ) uses-value? not ;
 
 ! #push
 M: #push literals* ( node -- )
     node-out-d % ;
 
-M: #push can-kill* ( literal node -- ? ) 2drop t ;
+M: #push can-kill? ( literal node -- ? ) 2drop t ;
 
 M: #push kill-node* ( literals node -- )
     [ node-out-d seq-diff ] keep set-node-out-d ;
 
 ! #drop
-M: #drop can-kill* ( literal node -- ? ) 2drop t ;
+M: #drop can-kill? ( literal node -- ? ) 2drop t ;
 
 ! #call
 : (kill-shuffle) ( word -- map )
@@ -84,8 +69,8 @@ M: #drop can-kill* ( literal node -- ? ) 2drop t ;
         [[ r> {{ }} ]]
     }} hash ;
 
-M: #call can-kill* ( literal node -- ? )
-    dup node-param (kill-shuffle) >r delegate can-kill* r> or ;
+M: #call can-kill? ( literal node -- ? )
+    dup node-param (kill-shuffle) >r delegate can-kill? r> or ;
 
 : kill-mask ( killing node -- mask )
     dup node-param \ r> = [ node-in-r ] [ node-in-d ] ifte
@@ -106,13 +91,13 @@ M: #call kill-node* ( literals node -- )
     [ kill-shuffle ] [ 2drop ] ifte ;
 
 ! #call-label
-M: #call-label can-kill* ( literal node -- ? ) 2drop t ;
+M: #call-label can-kill? ( literal node -- ? ) 2drop t ;
 
 ! #values
-M: #values can-kill* ( literal node -- ? ) 2drop t ;
+M: #values can-kill? ( literal node -- ? ) 2drop t ;
 
 ! #merge
-M: #merge can-kill* ( literal node -- ? ) 2drop t ;
+M: #merge can-kill? ( literal node -- ? ) 2drop t ;
 
 ! #entry
-M: #entry can-kill* ( literal node -- ? ) 2drop t ;
+M: #entry can-kill? ( literal node -- ? ) 2drop t ;

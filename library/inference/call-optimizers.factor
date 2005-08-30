@@ -34,11 +34,7 @@ sequences vectors words ;
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param
     [ with-datastack ] [
-        [
-            3drop t
-        ] [
-            inline-literals
-        ] ifte
+        [ 3drop t ] [ inline-literals ] ifte
     ] catch ;
 
 : flip-branches ( #ifte -- )

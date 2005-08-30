@@ -164,10 +164,18 @@ SYMBOL: current-node
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
 
+: penultimate-node ( node -- penultimate )
+    dup node-successor dup [
+        dup node-successor
+        [ nip penultimate-node ] [ drop ] ifte
+    ] [
+        2drop f
+    ] ifte ;
+
 : drop-inputs ( node -- #drop )
     node-in-d clone in-d-node <#drop> ;
 
-: each-node ( node quot -- )
+: each-node ( node quot -- | quot: node -- )
     over [
         [ call ] 2keep swap
         [ node-children [ swap each-node ] each-with ] 2keep
@@ -178,6 +186,26 @@ SYMBOL: current-node
 
 : each-node-with ( obj node quot -- | quot: obj node -- )
     swap [ with ] each-node 2drop ; inline
+
+: all-nodes? ( node quot -- ? | quot: node -- ? )
+    over [
+        [ call ] 2keep rot [
+            [
+                swap node-children [ swap all-nodes? ] all-with?
+            ] 2keep rot [
+                >r node-successor r> all-nodes?
+            ] [
+                2drop f
+            ] ifte
+        ] [
+            2drop f
+        ] ifte
+    ] [
+        2drop t
+    ] ifte ; inline
+
+: all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
+    swap [ with rot ] all-nodes? 2nip ; inline
 
 SYMBOL: substituted
 

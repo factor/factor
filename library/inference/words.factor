@@ -25,9 +25,6 @@ hashtables parser prettyprint ;
     " was already attempted, and failed" append3
     inference-error ;
 
-: recursive? ( word -- ? )
-    f swap dup word-def [ = or ] tree-each-with ;
-
 : with-block ( word [[ label quot ]] quot -- block-node )
     #! Execute a quotation with the word on the stack, and add
     #! its dataflow contribution to a new #label node in the IR.
@@ -39,16 +36,6 @@ hashtables parser prettyprint ;
     gensym over word-def cons [
         #entry node,  word-def infer-quot  #return node,
     ] with-block ;
-
-: inline-compound ( word -- )
-    #! Infer the stack effect of a compound word in the current
-    #! inferencer instance. If the word in question is recursive
-    #! we infer its stack effect inside a new block.
-    dup recursive? [
-        inline-block node,
-    ] [
-        word-def infer-quot
-    ] ifte ;
 
 : infer-compound ( word base-case -- effect )
     #! Infer a word's stack effect in a separate inferencer
@@ -137,11 +124,8 @@ M: compound apply-object ( word -- )
     dup recursive-state get assoc [
         recursive-word
     ] [
-        dup "inline" word-prop [
-            inline-compound
-        ] [
-            apply-default
-        ] ifte
+        dup "inline" word-prop
+        [ inline-block node, ] [ apply-default ] ifte
     ] ifte* ;
 
 : infer-shuffle ( word -- )
