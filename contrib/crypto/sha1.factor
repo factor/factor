@@ -1,6 +1,6 @@
 IN: crypto
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists vectors hashtables ;
+unparser test parser lists vectors hashtables kernel-internals ;
 
 ! Implemented according to RFC 3174.
 
@@ -55,15 +55,28 @@ SYMBOL: f-table
 ! f(t;B,C,D) = (B AND C) OR (B AND D) OR (C AND D)  (40 <= t <= 59)
 ! f(t;B,C,D) = B XOR C XOR D                        (60 <= t <= 79)
 
-{{
-    [[ 0 [ >r over bitnot r> bitand >r bitand r> bitor ] ]]
-    [[ 1 [ bitxor bitxor ] ]]
-    [[ 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] ]]
-    [[ 3 [ bitxor bitxor ] ]]
-}} f-table set
+! JUMP-TABLE: f 4 ( maximum )
+! {{
+    ! [[ 0 [ >r over bitnot r> bitand >r bitand r> bitor ] ]]
+    ! [[ 1 [ bitxor bitxor ] ]]
+    ! [[ 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] ]]
+    ! [[ 3 [ bitxor bitxor ] ]]
+! }} f-table set
+
+! J: 0 f >r over bitnot r> bitand >r bitand r> bitor ;
+! J: 1 f bitxor bitxor ;
+! J: 2 f 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ;
+! J: 3 f bitxor bitxor ;
+
+{ 
+    { [ dup 0 = ] [ drop >r over bitnot r> bitand >r bitand r> bitor ] }
+    { [ dup 1 = ] [ drop bitxor bitxor ] }
+    { [ dup 2 = ] [ drop 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
+    { [ dup 3 = ] [ drop bitxor bitxor ] }
+} f-table set
 
 : sha1-f ( B C D t -- f_tbcd )
-    20 /i f-table get hash call ;
+    20 /i f-table get cond ;
 
 : make-w ( -- )
     ! compute w, steps a-b of RFC 3174, section 6.1
