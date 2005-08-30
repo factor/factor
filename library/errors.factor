@@ -9,7 +9,7 @@ IN: errors
 
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- ) <no-method> throw ;
+: no-method ( object generic -- ) <no-method> throw ; inline
 
 : catchstack ( -- cs ) 6 getenv ;
 : set-catchstack ( cs -- ) 6 setenv ;

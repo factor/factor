@@ -7,11 +7,15 @@ namespaces parser prettyprint sequences strings vectors words ;
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
 
+! Called when a recursive call during base case inference is
+! found. Either tries to infer another branch, or gives up.
+SYMBOL: base-case-continuation
+
 TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- )
     recursive-state get meta-d get meta-r get
-    <inference-error> throw ;
+    <inference-error> throw ; inline
 
 M: inference-error error. ( error -- )
     "! Inference error:" print
@@ -22,10 +26,9 @@ M: inference-error error. ( error -- )
 M: value literal-value ( value -- )
     {
         "A literal value was expected where a computed value was found.\n"
-        "This means that an attempt was made to compile a word that\n"
-        "applies 'call' or 'execute' to a value that is not known\n"
-        "at compile time. The value might become known if the word\n"
-        "is marked 'inline'. See the handbook for details."
+        "This means the word you are inferring applies 'call' or 'execute'\n"
+        "to a value that is not known at compile time.\n"
+        "See the handbook for details."
     } concat inference-error ;
 
 ! Word properties that affect inference:
@@ -63,6 +66,13 @@ SYMBOL: d-in
     d-in get length object <repeated> >list
     meta-d get length object <repeated> >list 2list ;
 
+: no-base-case ( word -- )
+    {
+        "The base case of a recursive word could not be inferred.\n"
+        "This means the word calls itself in every control flow path.\n"
+        "See the handbook for details."
+    } concat inference-error ;
+
 : init-inference ( recursive-state -- )
     init-interpreter
     { } clone d-in set
@@ -89,25 +99,14 @@ M: wrapper apply-object wrapped apply-literal ;
     #! Ignore this branch's stack effect.
     meta-d off meta-r off d-in off ;
 
-: terminator? ( obj -- ? )
-    #! Does it throw an error?
-    dup word? [ "terminator" word-prop ] [ drop f ] ifte ;
-
-: handle-terminator ( quot -- )
-    #! If the quotation throws an error, do not count its stack
-    #! effect.
-    [ terminator? ] contains? [ terminate ] when ;
-
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ active? [ apply-object t ] [ drop f ] ifte ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
-    recursive-state get >r
-    swap recursive-state set
-    dup infer-quot handle-terminator
-    r> recursive-state set ;
+    recursive-state get >r swap recursive-state set
+    infer-quot r> recursive-state set ;
 
 : check-return ( -- )
     #! Raise an error if word leaves values on return stack.
@@ -120,6 +119,7 @@ M: wrapper apply-object wrapped apply-literal ;
 : with-infer ( quot -- )
     [
         inferring-base-case off
+        [ no-base-case ] base-case-continuation set
         f init-inference
         call
         check-return

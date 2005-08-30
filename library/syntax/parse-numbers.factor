@@ -5,7 +5,7 @@ USING: errors generic kernel math namespaces sequences strings ;
 
 ! Number parsing
 
-: not-a-number "Not a number" throw ;
+: not-a-number "Not a number" throw ; inline
 
 GENERIC: digit> ( ch -- n )
 M: digit  digit> CHAR: 0 - ;

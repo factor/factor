@@ -155,9 +155,11 @@ DEFER: agent
 [ [ [ ] [ object object ] ] ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
-! : no-base-case dup [ no-base-case ] [ no-base-case ] ifte ;
-! 
-! [ [ no-base-case ] infer simple-effect ] unit-test-fails
+: no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] ifte ;
+[ [ no-base-case-1 ] infer ] unit-test-fails
+
+: no-base-case-2 no-base-case-2 ;
+[ [ no-base-case-2 ] infer ] unit-test-fails
 
 [ { 2 1 } ] [ [ 2vector ] infer simple-effect ] unit-test
 [ { 3 1 } ] [ [ 3vector ] infer simple-effect ] unit-test

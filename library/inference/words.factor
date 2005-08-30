@@ -112,7 +112,7 @@ M: symbol apply-object ( word -- )
             nip consume/produce
         ] [
             inferring-base-case get [
-                2drop terminate
+                t base-case-continuation get call
             ] [
                 car base-case
             ] ifte

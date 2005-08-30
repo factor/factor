@@ -1,6 +1,7 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - removing unneeded #label
+- pprint trailing space regression
 
 + ui:
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
-USING: generic kernel kernel-internals lists math strings
+USING: errors generic kernel kernel-internals lists math strings
 vectors words ;
 
 ! Combinators
@@ -234,12 +234,14 @@ IN: kernel
     #! Push the number of elements on the datastack.
     datastack length ;
 
+: no-cond "cond fall-through" throw ; inline
+
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.
     #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
     #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
     #! The last condition should be a catch-all 't'.
-    [ first call ] find nip second call ;
+    [ first call ] find nip [ second call ] [ no-cond ] ifte ;
 
 : with-datastack ( stack word -- stack )
     datastack >r >r set-datastack r> execute

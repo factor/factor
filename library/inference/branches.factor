@@ -74,10 +74,14 @@ namespaces parser prettyprint sequences strings vectors words ;
     #! meta-d, meta-r, d-in. They are set to f if
     #! terminate was called.
     [
-        copy-inference
-        dup value-recursion recursive-state set
-        literal-value dup infer-quot handle-terminator
-        active? [ #values node, ] when
+        [
+            base-case-continuation set
+            copy-inference
+            dup value-recursion recursive-state set
+            dup literal-value infer-quot
+            active? [ #values node, ] when
+            f
+        ] callcc1 [ terminate ] when drop
     ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )

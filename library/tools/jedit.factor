@@ -76,12 +76,11 @@ sequences strings unparser vectors words ;
     #! required word info.
     dup [
         [
-            "vocabulary"
-            "name"
-            "stack-effect"
-        ] [
-            dupd word-prop
-        ] map >r definer r> cons
+            dup definer ,
+            dup word-vocabulary ,
+            dup word-name ,
+            "stack-effect" word-prop ,
+        ] [ ] make
     ] when ;
 
 : completions ( str pred -- list | pred: str word -- ? )

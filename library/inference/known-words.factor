@@ -4,18 +4,33 @@ io-internals kernel kernel-internals lists math math-internals
 memory parser sequences strings vectors words prettyprint ;
 
 ! Primitive combinators
+\ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
+
 \ call [
     pop-literal infer-quot-value
 ] "infer" set-word-prop
+
+\ execute [ [ word ] [ ] ] "infer-effect" set-word-prop
 
 \ execute [
     pop-literal unit infer-quot-value
 ] "infer" set-word-prop
 
+\ ifte [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
+
 \ ifte [
     2 #drop node, pop-d pop-d swap 2vector
     #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
+
+\ cond [ [ object ] [ ] ] "infer-effect" set-word-prop
+
+\ cond [
+    pop-literal [ 2unseq cons ] map
+    [ no-cond ] swap alist>quot infer-quot-value
+] "infer" set-word-prop
+
+\ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop
 
 \ dispatch [
     pop-literal nip [ <literal> ] map
@@ -23,6 +38,8 @@ memory parser sequences strings vectors words prettyprint ;
 ] "infer" set-word-prop
 
 ! Stack manipulation
+\ >r [ [ object ] [ ] ] "infer-effect" set-word-prop
+
 \ >r [
     \ >r #call
     1 0 pick node-inputs
@@ -30,6 +47,8 @@ memory parser sequences strings vectors words prettyprint ;
     0 1 pick node-outputs
     node,
 ] "infer" set-word-prop
+
+\ r> [ [ ] [ object ] ] "infer-effect" set-word-prop
 
 \ r> [
     \ r> #call
@@ -40,57 +59,25 @@ memory parser sequences strings vectors words prettyprint ;
 ] "infer" set-word-prop
 
 \ drop [ 1 #drop node, pop-d drop ] "infer" set-word-prop
-\ dup  [ \ dup  infer-shuffle ] "infer" set-word-prop
-\ swap [ \ swap infer-shuffle ] "infer" set-word-prop
-\ over [ \ over infer-shuffle ] "infer" set-word-prop
-\ pick [ \ pick infer-shuffle ] "infer" set-word-prop
+\ drop [ [ object ] [ ] ] "infer-effect" set-word-prop
 
-! These hacks will go away soon
-\ delegate [ [ object ] [ object ] ] "infer-effect" set-word-prop
-\ no-method t "terminator" set-word-prop
-\ no-method [ [ object word ] [ ] ] "infer-effect" set-word-prop
-\ <no-method> [ [ object object ] [ tuple ] ] "infer-effect" set-word-prop
-\ set-no-method-generic [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ set-no-method-object [ [ object tuple ] [ ] ] "infer-effect" set-word-prop
-\ no-math-method t "terminator" set-word-prop
-\ not-a-number t "terminator" set-word-prop
-\ inference-error t "terminator" set-word-prop
-\ throw t "terminator" set-word-prop
-\ = [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ hash-contained? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ gcd [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
-\ car [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
-\ cdr [ [ general-list ] [ object ] ] "infer-effect" set-word-prop
-\ < [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ <= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ > [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ >= [ [ real real ] [ boolean ] ] "infer-effect" set-word-prop
-\ number= [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ + [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ - [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ * [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ / [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ /i [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ /f [ [ number number ] [ number ] ] "infer-effect" set-word-prop
-\ mod [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ /mod [ [ integer integer ] [ integer integer ] ] "infer-effect" set-word-prop
-\ bitand [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitxor [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ shift [ [ integer integer ] [ integer ] ] "infer-effect" set-word-prop
-\ bitnot [ [ integer ] [ integer ] ] "infer-effect" set-word-prop
-\ real [ [ number ] [ real ] ] "infer-effect" set-word-prop
-\ imaginary [ [ number ] [ real ] ] "infer-effect" set-word-prop
+\ dup  [ \ dup  infer-shuffle ] "infer" set-word-prop
+\ dup [ [ object ] [ object object ] ] "infer-effect" set-word-prop
+
+\ swap [ \ swap infer-shuffle ] "infer" set-word-prop
+\ swap [ [ object object ] [ object object ] ] "infer-effect" set-word-prop
+
+\ over [ \ over infer-shuffle ] "infer" set-word-prop
+\ over [ [ object object ] [ object object object ] ] "infer-effect" set-word-prop
+
+\ pick [ \ pick infer-shuffle ] "infer" set-word-prop
+\ pick [ [ object object object ] [ object object object object ] ] "infer-effect" set-word-prop
+
+! Non-standard control flow
+\ throw [ [ object ] [ ] ] "infer-effect" set-word-prop
+\ throw [ terminate ] "infer" set-word-prop
 
 ! Stack effects for all primitives
-\ execute [ [ word ] [ ] ] "infer-effect" set-word-prop
-
-\ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
-
-\ ifte [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
-
-\ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop
-
 \ cons [ [ object object ] [ cons ] ] "infer-effect" set-word-prop
 \ cons t "foldable" set-word-prop
 \ cons t "flushable" set-word-prop
@@ -371,13 +358,6 @@ memory parser sequences strings vectors words prettyprint ;
 
 \ update-xt [ [ word ] [ ] ] "infer-effect" set-word-prop
 \ compiled? [ [ word ] [ boolean ] ] "infer-effect" set-word-prop
-\ drop [ [ object ] [ ] ] "infer-effect" set-word-prop
-\ dup [ [ object ] [ object object ] ] "infer-effect" set-word-prop
-\ swap [ [ object object ] [ object object ] ] "infer-effect" set-word-prop
-\ over [ [ object object ] [ object object object ] ] "infer-effect" set-word-prop
-\ pick [ [ object object object ] [ object object object object ] ] "infer-effect" set-word-prop
-\ >r [ [ object ] [ ] ] "infer-effect" set-word-prop
-\ r> [ [ ] [ object ] ] "infer-effect" set-word-prop
 
 \ eq? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
 \ eq? t "flushable" set-word-prop
@@ -395,6 +375,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ os-env [ [ string ] [ object ] ] "infer-effect" set-word-prop
 \ millis [ [ ] [ integer ] ] "infer-effect" set-word-prop
 \ (random-int) [ [ ] [ integer ] ] "infer-effect" set-word-prop
+
 \ type [ [ object ] [ fixnum ] ] "infer-effect" set-word-prop
 \ type t "flushable" set-word-prop
 \ type t "foldable" set-word-prop
@@ -484,7 +465,6 @@ memory parser sequences strings vectors words prettyprint ;
 \ alien-c-string t "flushable" set-word-prop
 
 \ set-alien-c-string [ [ string c-ptr integer ] [ ] ] "infer-effect" set-word-prop
-\ throw [ [ object ] [ ] ] "infer-effect" set-word-prop
 \ string>memory [ [ string integer ] [ ] ] "infer-effect" set-word-prop
 \ memory>string [ [ integer integer ] [ string ] ] "infer-effect" set-word-prop
 \ alien-address [ [ alien ] [ integer ] ] "infer-effect" set-word-prop

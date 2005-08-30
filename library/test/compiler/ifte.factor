@@ -1,4 +1,5 @@
 IN: temporary
+USING: alien strings ;
 USE: compiler
 USE: test
 USE: math
@@ -94,3 +95,32 @@ DEFER: countdown-b
 
 [ 3 ] [ f dummy-unless-3 ] unit-test
 [ 4 ] [ 4 dummy-unless-3 ] unit-test
+
+[ "even" ] [
+    [
+        2 {
+            { [ dup 2 mod 0 = ] [ drop "even" ] }
+            { [ dup 2 mod 1 = ] [ drop "odd" ] }
+        } cond
+    ] compile-1
+] unit-test
+
+[ "odd" ] [
+    [
+        3 {
+            { [ dup 2 mod 0 = ] [ drop "even" ] }
+            { [ dup 2 mod 1 = ] [ drop "odd" ] }
+        } cond
+    ] compile-1
+] unit-test
+
+[ "neither" ] [
+    [
+        3 {
+            { [ dup string? ] [ drop "string" ] }
+            { [ dup float? ] [ drop "float" ] }
+            { [ dup alien? ] [ drop "alien" ] }
+            { [ t ] [ drop "neither" ] }
+        } cond
+    ] compile-1
+] unit-test

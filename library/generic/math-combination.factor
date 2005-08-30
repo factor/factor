@@ -31,7 +31,7 @@ math namespaces sequences words ;
 TUPLE: no-math-method left right generic ;
 
 : no-math-method ( left right generic -- )
-    3dup <no-math-method> throw ;
+    3dup <no-math-method> throw ; inline
 
 : applicable-method ( generic class -- quot )
     over "methods" word-prop hash [ ] [
