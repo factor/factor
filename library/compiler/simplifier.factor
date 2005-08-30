@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: generic inference kernel lists math namespaces
+USING: generic kernel lists math namespaces
 prettyprint sequences strings words ;
 
 ! A peephole optimizer operating on the linear IR.

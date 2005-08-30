@@ -201,7 +201,7 @@ sequences vectors words ;
 
 \ fixnum* [
     ! Turn multiplication by a power of two into a left shift.
-    dup node-peek dup literal-fixnum? [
+    dup node-peek dup literal-immediate? [
         literal-value dup power-of-2? [
             nip fast-fixnum*
         ] [

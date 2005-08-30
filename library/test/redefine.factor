@@ -1,7 +1,5 @@
 IN: temporary
-USING: compiler inference math generic parser ;
-
-USE: test
+USING: compiler inference math generic parser test ;
 
 : foo 1 2 ;
 : bar foo foo ; compiled

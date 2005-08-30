@@ -1,6 +1,6 @@
 - reader syntax for arrays, byte arrays, displaced aliens
 - out of memory error when printing global namespace
-- decompile is broken
+- removing unneeded #label
 
 + ui:
 
@@ -49,6 +49,7 @@
 - value type structs
 - bitfields in C structs
 - setting struct members that are not *
+- callbacks
 
 + compiler:
 

@@ -50,8 +50,7 @@ M: compound (compile) ( word -- )
 
 : decompile ( word -- )
     dup compiled? [
-        "Decompiling " write dup .
-        [ word-primitive ] keep set-word-primitive
+        "Decompiling " write dup . update-xt
     ] [
         drop
     ] ifte ;

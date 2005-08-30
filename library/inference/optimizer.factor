@@ -82,20 +82,23 @@ M: #return optimize-node* ( node -- node/t )
     optimize-fold ;
 
 ! #label
-GENERIC: calls-label? ( label node -- ? )
+GENERIC: calls-label* ( label node -- ? )
 
-M: node calls-label? 2drop f ;
+M: node calls-label* 2drop f ;
 
-M: #call-label calls-label? node-param eq? ;
+M: #call-label calls-label* node-param eq? ;
 
-M: #label optimize-node* ( node -- node/t )
-    dup node-param over node-children first calls-label? [
-        drop t
-    ] [
-        dup node-children first dup node-successor [
-            dup penultimate-node rot
-            node-successor swap set-node-successor
-        ] [
-            drop node-successor
-        ] ifte
-    ] ifte ;
+: calls-label? ( label node -- ? )
+    [ calls-label? not ] all-nodes-with? not ;
+
+! M: #label optimize-node* ( node -- node/t )
+!     dup node-param over node-children first calls-label? [
+!         drop t
+!     ] [
+!         dup node-children first dup node-successor [
+!             dup penultimate-node rot
+!             node-successor swap set-node-successor
+!         ] [
+!             drop node-successor
+!         ] ifte
+!     ] ifte ;

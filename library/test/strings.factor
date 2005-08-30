@@ -73,7 +73,7 @@ unit-test
 
 [ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
 
-[ [ "hell" "o wo" "rld" ] ] [ 4 "hello world" group ] unit-test
+[ { "hell" "o wo" "rld" } ] [ 4 "hello world" group ] unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
