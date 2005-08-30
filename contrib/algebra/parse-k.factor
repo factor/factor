@@ -181,9 +181,6 @@ UNION: comp-literal number general-list ;
 M: comp-literal compile-ast ! literal numbers
     replace-with nip ;
 
-: seq-stupid-all? ( seq pred -- ? )
-    t -rot [ call and ] cons each ; inline
-
 : accumulator ( vars { asts } quot -- quot )
     -rot [
         [
@@ -194,7 +191,7 @@ M: comp-literal compile-ast ! literal numbers
     ] make-list nip ;
 
 M: vector compile-ast ! literal vectors
-    dup [ number? ] seq-stupid-all? [
+    dup [ number? ] all? [
         replace-with nip
     ] [
         [ , ] accumulator [ make-vector nip ] cons
