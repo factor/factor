@@ -61,7 +61,8 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
     dup first over second rot third ; inline
 
 TUPLE: bounds-error index seq ;
-: bounds-error <bounds-error> throw ;
+
+: bounds-error <bounds-error> throw ; inline
 
 : growable-check ( n seq -- fx seq )
     >r >fixnum dup 0 fixnum<

@@ -75,7 +75,11 @@ memory parser sequences strings vectors words prettyprint ;
 
 ! Non-standard control flow
 \ throw [ [ object ] [ ] ] "infer-effect" set-word-prop
-\ throw [ terminate ] "infer" set-word-prop
+
+\ throw [
+    \ throw dup "infer-effect" word-prop consume/produce
+    terminate
+] "infer" set-word-prop
 
 ! Stack effects for all primitives
 \ cons [ [ object object ] [ cons ] ] "infer-effect" set-word-prop
