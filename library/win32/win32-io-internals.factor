@@ -124,20 +124,8 @@ C: io-callback ( -- callback )
     (wait-for-io) overlapped>callback swap indirect-pointer-value 
     rot [ queue-error ] unless ;
 
-: win32-next-io-task ( -- )
-    INFINITE wait-for-io swap call ;
-
-: win32-io-thread ( -- )
-    cancel-timedout 10 wait-for-io swap [
-        [ schedule-thread call ] callcc0 2drop
-    ] [
-        drop yield
-    ] ifte* 
-    win32-io-thread ;
-
 : win32-init-stdio ( -- )
     INVALID_HANDLE_VALUE NULL NULL 1 CreateIoCompletionPort
     completion-port set 
-    <io-queue> io-queue set 
-    [ win32-io-thread ] in-thread ;
+    <io-queue> io-queue set ;
 
