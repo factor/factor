@@ -4125,6 +4125,55 @@ treated as a matrix with one column.
 Applies a matrix to a vector on the left, as a linear transformation. The vector is
 treated as a matrix with one row.
 
+\section{Converting between numbers and strings}\label{parsing-numbers}
+
+Two sets of words convert between numbers and strings.
+
+\wordtable{
+\vocabulary{math}
+\ordinaryword{string>number}{string>number~( string -- number )}
+}
+Attempts to parse the string as a number. An exception is thrown if the string does not represent a number in one of the following forms:
+\begin{itemize}
+\item An integer; see \ref{integer-literals}
+\item A ratio; see \ref{ratio-literals}
+\item A float; see \ref{float-literals}
+\end{itemize}
+In particular, complex numbers are parsed by the \verb|#{| and \verb|}#| parsing words, not by the number parser. To parse complex number literals, use the \texttt{parse} word (\ref{parsing-quotations}).
+\wordtable{
+\vocabulary{math}
+\genericword{base>}{base>~( string base -- integer )}
+}
+Converts a string representation of an integer in the given base into an integer. Throws an exception if the string is not a valid representation of an integer.
+\wordtable{
+\vocabulary{math}
+\ordinaryword{bin>}{bin>~( string -- integer )}
+\ordinaryword{oct>}{oct>~( string -- integer )}
+\ordinaryword{dec>}{dec>~( string -- integer )}
+\ordinaryword{hex>}{hex>~( string -- integer )}
+}
+Convenience words defined in terms of \texttt{base>} for parsing integers in base 2, 8, 10 and 16, respectively.
+
+\wordtable{
+\vocabulary{math}
+\genericword{number>string}{number>string~( number -- string~)}
+}
+Outputs a string representation of a number. As with \verb|string>number|, only real numbers are supported. Printing complex numbers requires the more general prettyprinter facility (see \ref{prettyprint}).
+A set of words are provided for converting integers into strings with various bases.
+\wordtable{
+\vocabulary{unparser}
+\ordinaryword{>base}{>base~( integer base -- string~)}
+}
+Converts the integer into a string representation in the given base. The base must be between 2 and 36, inclusive.
+\wordtable{
+\vocabulary{unparser}
+\ordinaryword{>bin}{>bin~( integer -- string~)}
+\ordinaryword{>oct}{>oct~( integer -- string~)}
+\ordinaryword{>dec}{>dec~( integer -- string~)}
+\ordinaryword{>hex}{>hex~( integer -- string~)}
+}
+Convenience words defined in terms of \texttt{>base} for converting integers into string representations in base 2, 8, 10 and 16, respectively.
+
 \chapter{Streams}
 \glossary{name=stream,
 description={a source or sink of characters supporting some subset of the stream protocol, used as an end-point for input/output operations}}
@@ -4598,57 +4647,16 @@ M: tex-stream stream-format ( string attrs stream -- )
     ] with-wrapper ;
 \end{verbatim}
 
-\section{Printing objects}
+\section{Printing objects}\label{prettyprint}
 
 \glossary{name=prettyprinter,
 description={a set of words for printing objects in readable form}}
 
 One of Factor's key features is the ability to print almost any object in a readable form. This greatly aids debugging and provides the building blocks for light-weight object serialization facilities.
 
-\subsection{The unparser}
-
-The unparser provides a basic facility for turning certain types of objects into strings. A more general facility supporting more types is the prettyprinter (\ref{prettyprint}).
-\glossary{
-name=unreadable string,
-description={a string which raises a parse error when parsed}}
-\glossary{
-name=readable form,
-description={a readable form of an object is a string that parses to that object}}
-
-\wordtable{
-\vocabulary{unparser}
-\genericword{unparse}{unparse~( object -- string~)}
-}
-Outputs a string representation of \texttt{object}. Only the following classes of objects are supported; for anything else, an unreadable string is output:
-\begin{verbatim}
-boolean
-dll
-number
-sbuf
-string
-word
-\end{verbatim}
-A set of words are provided for converting integers into strings with various bases.
-\wordtable{
-\vocabulary{unparser}
-\ordinaryword{>base}{>base~( n base -- string~)}
-}
-Converts \texttt{n} into a string representation in the given base. The base must be between 2 and 36, inclusive.
-\wordtable{
-\vocabulary{unparser}
-\ordinaryword{>bin}{>bin~( n -- string~)}
-\ordinaryword{>oct}{>oct~( n -- string~)}
-\ordinaryword{>dec}{>dec~( n -- string~)}
-\ordinaryword{>hex}{>hex~( n -- string~)}
-}
-Convenience words defined in terms of \texttt{>base} for converting integers into string representations in base 2, 8, 10 and 16, respectively.
-
-\subsection{The prettyprinter}\label{prettyprint}
-
 \wordtable{
 \vocabulary{prettyprint}
-\ordinaryword{prettyprint}{prettyprint~( object --~)}
-
+\ordinaryword{.}{.~( object --~)}
 }
 Prints the object using literal syntax that can be parsed back again. Even though the prettyprinter supports more classes of objects than \texttt{unparse}, it is still not a general serialization mechanism. The following restrictions apply:
 
@@ -4660,21 +4668,29 @@ byte-array
 displaced-alien
 \end{verbatim}
 \item Shared structure is not reflected in the printed output; if the output is parsed back in, fresh objects are created for all literal denotations.
-\item Circular structure is not printed in a readable way. Circular references are printed as ``\texttt{\&}''.
+\item Circular structure is not printed in a readable way. Circular references are printed as ``\texttt{\#}''.
 \item Floating point numbers might not equal themselves after being printed and read, since a decimal representation of a float is inexact.
 \end{itemize}
 \wordtable{
 \vocabulary{prettyprint}
-\ordinaryword{.}{.~( object --~)}
-
+\ordinaryword{unparse}{unparse~( object --~string )}
 }
-Prettyprint the object, except all output is on a single line without indentation, and deeply-nested structure is not printed fully. This word is intended for interactive use at the listener.
+Prints the object to a string.
 \wordtable{
 \vocabulary{prettyprint}
-\ordinaryword{[.]}{[.]~( sequence --~)}
-
+\ordinaryword{short.}{short.~( object --~)}
 }
-Prettyprint each element of the sequence on its own line using the \texttt{.} word.
+Prettyprint the object, with nesting and length limits.
+\wordtable{
+\vocabulary{prettyprint}
+\ordinaryword{unparse-short}{unparse-short~( object --~string )}
+}
+Prints the object to a string with nesting and length limits.
+\wordtable{
+\vocabulary{prettyprint}
+\ordinaryword{sequence.}{sequence.~( sequence --~)}
+}
+Prettyprint each element of the sequence on its own line using the \verb|short.| word.
 
 \subsection{Variables controlling the prettyprinter}
 
@@ -4684,99 +4700,41 @@ The following variables affect the prettyprinter if set in the dynamic scope fro
 \vocabulary{prettyprint}
 \symbolword{tab-size}
 }
-Specifies the indentation for recursive objects such as lists, vectors, hashtables and tuples. The default tab size is 4.
+Specifies the indentation for recursive objects such as lists, vectors, hashtables and tuples. The default is 4.
 
 \wordtable{
 \vocabulary{prettyprint}
-\symbolword{prettyprint-limit}
+\symbolword{margin}
 }
-Controls the maximum nesting depth. Printing structures that nest further than this will simply print ``\texttt{\#}''. If this is set to \texttt{f}, the nesting depth is unlimited. The default is \texttt{f}. Inside calls to \texttt{.}, set to 16, which translates to four levels of nesting with the default tab size.
+Specifies the maximum line length, in characters. Lines longer than the margin are wrapped. The default is 64.
 
 \wordtable{
 \vocabulary{prettyprint}
-\symbolword{one-line}
+\symbolword{nesting-limit}
 }
-If set to true, the prettyprinter does not emit newlines. The default is \texttt{f}. Inside calls to \texttt{.}, set to \texttt{t}.
-
-\subsection{Extending the prettyprinter}
-
-If define your own data type and wish to add new syntax for it, you must implement two facilities:
-\begin{itemize}
-\item Parsing word(s) for reading your data type,
-\item A prettyprinter method for printing your data type.
-\end{itemize}
-Parsing words are documented in \ref{parsing-words}.
+Specifies the maximum nesting level. Structures that nest further than this will simply print ``\texttt{\#}''. The default is \texttt{f}, which denotes unlimited nesting depth.
 
 \wordtable{
 \vocabulary{prettyprint}
-\genericword{prettyprint*}{prettyprint* ( indent object -- indent )}
+\symbolword{length-limit}
 }
-Prettyprints the given object. Unlike \texttt{prettyprint}, this word does not emit a trailing newline, and the current indent level is given. This word is also generic, so you can add methods to have it print your own data types in a nice way.
+Specifies the maximum sequence length. Sequences longer than this are truncated, and \verb|...| is output in place of remaining elements. The default is \texttt{f}, which denotes unlimited sequence length.
 
-The remaining words in this section are useful in the implementation of prettyprinter methods.
 \wordtable{
 \vocabulary{prettyprint}
-\genericword{unparse.}{unparse.~( object -- )}
+\symbolword{line-limit}
 }
-Prints the textual representation of an object as returned by \verb|unparse|. Generally \texttt{prettyprint*} is used instead; one important distinction with \verb|unparse.| is that if the given object is a parsing word, the output is not prefixed with \texttt{POSTPONE:}.
+Specifies the maximum lines of output. If more than this number of lines are printed, remaining output is truncated, and \verb|...| is output in place of remaining lines. The default is \texttt{f}, which denotes unlimited lines of output.
+
 \wordtable{
 \vocabulary{prettyprint}
-\genericword{prettyprint-newline}{prettyprint-newline ( indent -- )}
+\symbolword{string-limit}
 }
-Emits a newline followed by the given amount of indentation.
-\wordtable{
-\vocabulary{prettyprint}
-\genericword{?prettyprint-newline}{?prettyprint-newline ( indent -- )}
-}
-If \texttt{one-line} is on, emits a space, otherwise, emits a newline followed by the given amount of indentation.
-\wordtable{
-\vocabulary{prettyprint}
-\genericword{<prettyprint}{<prettyprint~( indent -- indent )}
-}
-Increases the indent level and emits a newline if \texttt{one-line} is off.
-\wordtable{
-\vocabulary{prettyprint}
-\genericword{prettyprint>}{prettyprint>~( indent -- indent )}
-}
-Decreases the indent level and emits a newline if \texttt{one-line} is off.
+If set to \verb|t|, strings longer than the margin are truncated. Otherwise, strings are printed fully, regardless of length. The default is \verb|f|.
 
 \chapter{The parser}
 
 This section concerns itself with reflective access and extension of the parser. The parser algorithm and standard syntax is described in \ref{syntax}. Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right.
-
-\section{Parsing numbers}\label{parsing-numbers}
-
-\wordtable{
-\vocabulary{parser}
-\ordinaryword{str>number}{str>number~( string -- number )}
-}
-Attempts to parse the string as a number. An exception is thrown if the string does not represent a number in one of the following forms:
-\begin{itemize}
-\item An integer; see \ref{integer-literals}
-\item A ratio; see \ref{ratio-literals}
-\item A float; see \ref{float-literals}
-\end{itemize}
-In particular, complex numbers are parsed by the \verb|#{| and \verb|}#| parsing words, not by the number parser. To parse complex number literals, use the \texttt{parse} word (\ref{parsing-quotations}).
-\wordtable{
-\vocabulary{parser}
-\ordinaryword{parse-number}{parse-number~( string -- number/f )}
-}
-Like \texttt{str>number}, except instead of raising an error, outputs \texttt{f} if the string is not a valid literal number.
-\wordtable{
-\vocabulary{parser}
-\genericword{base>}{base>~( string base -- integer )}
-}
-Converts a string representation of an integer in the given base into an integer. Throws an exception if the string is not a valid representation of an integer.
-\wordtable{
-\vocabulary{parser}
-\ordinaryword{bin>}{bin>~( string -- integer )}
-\ordinaryword{oct>}{oct>~( string -- integer )}
-\ordinaryword{dec>}{dec>~( string -- integer )}
-\ordinaryword{hex>}{hex>~( string -- integer )}
-}
-Convenience words defined in terms of \texttt{base>} for parsing integers in base 2, 8, 10 and 16, respectively.
-
-\section{Parsing quotations}\label{parsing-quotations}
 
 As documented in \ref{vocabsearch}, the parser looks up words in the vocabulary search path. New word definitions are added to the current vocabulary. These two parameters are stored in a pair of variables (\ref{namespaces}):
 \begin{description}
