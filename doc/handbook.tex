@@ -293,7 +293,7 @@ The \texttt{syntax} vocabulary consists of a set of parsing words for reading Fa
 and defining new words. The \texttt{scratchpad} vocabulary is the default vocabulary for new
 word definitions.
 
-At the interactive listener, the default search path contains many more vocabularies. Details on the default search path and parser invocation are found in \ref{parsing-quotations}.
+At the interactive listener, the default search path contains many more vocabularies. Details on the default search path and parser invocation are found in \ref{parser-chapter}.
 \wordtable{
 \vocabulary{syntax}
 \parsingword{USE:}{USE: \emph{vocabulary}}
@@ -1273,7 +1273,7 @@ A pair of words for obtaining a word's name and vocabulary.
 }
 Sort a list of words by name.
 
-\section{Vocabularies}
+\section{Vocabularies}\label{vocabularies}
 \wordtable{
 \vocabulary{words}
 \symbolword{vocabularies}
@@ -4139,7 +4139,7 @@ Attempts to parse the string as a number. An exception is thrown if the string d
 \item A ratio; see \ref{ratio-literals}
 \item A float; see \ref{float-literals}
 \end{itemize}
-In particular, complex numbers are parsed by the \verb|#{| and \verb|}#| parsing words, not by the number parser. To parse complex number literals, use the \texttt{parse} word (\ref{parsing-quotations}).
+In particular, complex numbers are parsed by the \verb|#{| and \verb|}#| parsing words, not by the number parser. To parse complex number literals, use the \texttt{parse} word (\ref{parser-chapter}).
 \wordtable{
 \vocabulary{math}
 \genericword{base>}{base>~( string base -- integer )}
@@ -4732,7 +4732,7 @@ Specifies the maximum lines of output. If more than this number of lines are pri
 }
 If set to \verb|t|, strings longer than the margin are truncated. Otherwise, strings are printed fully, regardless of length. The default is \verb|f|.
 
-\chapter{The parser}
+\chapter{The parser}\label{parser-chapter}
 
 This section concerns itself with reflective access and extension of the parser. The parser algorithm and standard syntax is described in \ref{syntax}. Before the parser proper is documented, we draw attention to a set of words for parsing numbers. They are called by the parser, and are useful in their own right.
 
@@ -5524,6 +5524,473 @@ Character&Entity\\
 \verb|"|   &\verb|&quot;|
 \end{tabular}
 
+\part{The implementation}
+
+\chapter{Development tools}
+
+\section{Command line usage}
+
+On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
+any quick definitions you want available at the listener there. To avoid loading this
+file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image (see \ref{images}).
+
+\section{The listener}\label{listener}
+
+The listener reads Factor code from the terminal and executes it. The listener is a piece of Factor code, like any other; however, it helps to think of it as the primary interface to the Factor system. You can try the classical first program:
+\begin{alltt}
+  "Hello, world." print
+\textbf{Hello, world.}
+\end{alltt}
+Multi-line phrases are supported:
+\begin{alltt}
+  [ 1 2 3 ] [
+.
+] each
+\textbf{1
+2
+3}
+\end{alltt}
+The listener knows when to expect more input by looking at the height of the
+stack. Parsing words such as \texttt{[} and \texttt{:} leave elements on the parser
+stack; these elements are popped by \texttt{]} and \texttt{;}.
+
+Often it is useful to look at the state of the stacks in the listener.
+
+\wordtable{
+\vocabulary{prettyprint}
+\ordinaryword{.s}{.s ( -- )}
+\ordinaryword{.r}{.r ( -- )}
+}
+To see the contents of the data or return stack, use the \texttt{.s} and \texttt{.r} words.
+Each stack is printed with each element on its own line; the top of the stack is the first element printed.
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{watch}{watch ( word -- )}
+}
+To print the stack automatically when a word is entered and exited, use \verb|watch|. It modifies the word definition to act accordingly:
+\begin{alltt}
+  : squared dup * ;
+  \bs squared watch
+  5 squared
+\textbf{===> Entering: squared
+5 
+===> Leaving:  squared
+25}
+\end{alltt}
+This modifies the word definition (as you can verify using \verb|see|); to restore the original definition, reload the word from its source file.
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{reload}{reload ( word -- )}
+}
+Reload the source file the word was originally loaded from. If the word was automatically-generated, or defined in the listener, an exception is thrown.
+
+\section{Looking at word definitions}
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{vocabs}{vocabs ( -- list )}
+}
+Entering \texttt{vocabs .}~in the listener produces a list of all existing vocabularies:
+
+\begin{alltt}
+  vocabs .
+\textbf{[ "alien" "ansi" "assembler" "browser-responder"
+"command-line" "compiler" "cont-responder" "errors"
+"file-responder" "files" "gadgets" "generic"
+"hashtables" "html" "httpd" "httpd-responder" "image"
+"inference" "interpreter" "io-internals" "jedit"
+"kernel" "kernel-internals" "line-editor" "listener"
+"lists" "logging" "math" "math-internals" "memory"
+"namespaces" "parser" "prettyprint" "profiler"
+"quit-responder" "random" "resource-responder"
+"scratchpad" "sdl" "shells" "stdio" "streams"
+"strings" "syntax" "telnetd" "test" "test-responder"
+"threads" "unparser" "url-encoding" "vectors" "words" ]}
+\end{alltt}
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{words}{words ( vocabulary -- list )}
+}
+You can use \texttt{words .}~to list the words inside a given vocabulary:
+
+\begin{alltt}
+  "namespaces" words .
+\textbf{[ (get) , <namespace> >n append, bind change cons@
+dec extend get global inc init-namespaces list-buffer
+literal, make-list make-rlist make-rstring make-string
+make-vector n> namespace namestack nest off on put set
+set-global set-namestack unique, unique@ with-scope ]}
+\end{alltt}
+
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{classes}{classes ( -- list )}
+}
+You can use \texttt{classes .}~to output a list of classes in the system:
+
+\begin{alltt}
+  classes .
+\textbf{[ alien alien-error byte-array displaced-alien
+dll ansi-stream disp-only displaced indirect operand
+register absolute absolute-16/16 relative relative-bitfld
+item kernel-error no-method border checkbox dialog editor
+ellipse etched-rect frame gadget hand hollow-ellipse
+hollow-rect label line menu pane pile plain-ellipse
+plain-rect rectangle roll-rect scroller shelf slider
+stack tile viewport world 2generic arrayed builtin
+complement generic null object predicate tuple
+tuple-class union hashtable html-stream class-tie
+computed inference-error inference-warning literal
+literal-tie value buffer port jedit-stream boolean
+general-t array cons general-list list bignum complex
+fixnum float integer number ratio rational real
+parse-error potential-float potential-ratio
+button-down-event button-up-event joy-axis-event
+joy-ball-event joy-button-down-event joy-button-up-event
+joy-hat-event key-down-event key-up-event motion-event
+quit-event resize-event user-event sequence stdio-stream
+client-stream fd-stream null-stream server string-output
+wrapper-stream LETTER blank digit letter printable sbuf
+string text POSTPONE: f POSTPONE: t vector compound
+primitive symbol undefined word ]}
+\end{alltt}
+
+\wordtable{
+\vocabulary{prettyprint}
+\ordinaryword{see}{see ( word -- )}
+}
+You can look at the definition of any word, including library words, using \texttt{see}. Keep in mind you might have to \texttt{USE:} the vocabulary first.
+
+\begin{alltt}
+  USE: httpd
+  \bs httpd-connection see
+\textbf{IN: httpd
+: httpd-connection ( socket -- )
+    "http-server" get accept [
+        httpd-client
+    ] in-thread drop ;}
+\end{alltt}
+
+If you \texttt{see} a generic word, all methods defined on the generic word are shown. If you see a class word, all methods specializing on the class are shown:
+\begin{alltt}
+  \bs list see
+\textbf{PREDICATE: general-list list
+    dup [
+        last* cdr
+    ] when not ;
+IN: gadgets
+M: list custom-sheet
+    [
+        length count
+    ] keep zip alist>sheet "Elements:" <titled> ;
+IN: prettyprint
+M: list prettyprint*
+    [
+        [
+            POSTPONE: [
+        ] car swap [
+            POSTPONE: ]
+        ] car prettyprint-sequence
+    ] check-recursion ;}
+\end{alltt}
+
+The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
+
+\wordtable{
+\vocabulary{prettyprint}
+\ordinaryword{apropos}{apropos ( string -- )}
+}
+The \texttt{apropos} word is handy when searching for related words. It lists all words
+whose names contain a given string. The \texttt{apropos} word is also useful when you know the exact name of a word, but are unsure what vocabulary it is in. For example, if you're looking for ways to iterate over various collections, you can do an apropos search for \texttt{each}:
+
+\begin{alltt}
+  "each" apropos
+\textbf{IN: gadgets each-gesture
+IN: gadgets each-parent
+IN: hashtables hash-each
+IN: hashtables hash-each-with
+IN: inference each-node
+IN: inference each-node-with
+IN: kernel-internals each-bucket
+IN: math each-bit
+IN: memory (each-object)
+IN: memory each-object
+IN: memory each-slot
+IN: sequences 2each
+IN: sequences each
+IN: sequences each-with
+IN: sequences tree-each
+IN: sequences tree-each-with
+IN: words each-word}
+\end{alltt}
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{usage}{usage ( word -- seq )}
+}
+The \texttt{usage} word finds all words that refer to a given word.
+This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it. Usually you print the
+return value of \texttt{usage} using \texttt{.}:
+\begin{alltt}
+  \bs each-parent usage .
+\textbf{[ handle-gesture user-input ]}
+\end{alltt}
+
+\section{The walker}
+
+The walker lets you step through the execution of a qotation. When a compound definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
+
+There are two ways to use the walker. First of all, you can call the \texttt{walk} word explicitly, giving it a quotation:
+
+\begin{alltt}
+  [ [ 10 [ dup , ] repeat ] [ ] make ] walk
+\textbf{\&s \&r show stepper stacks.
+\&get ( var -- value ) inspects the stepper namestack.
+step -- single step over
+into -- single step into
+continue -- continue execution
+bye -- exit single-stepper
+[ [ 10 [ dup , ] repeat ] make-list ]
+walk}
+\end{alltt}
+
+As you can see, the walker prints a brief help message, then the currently executing quotation. It changes the listener prompt to \texttt{walk}, to remind you that there is a suspended continuation.
+
+The first element of the quotation shown is the next object to be evaluated. If it is a literal, both \texttt{step} and \texttt{into} have the effect of pushing it on the walker data stack. If it is a compound definition, then \texttt{into} will recurse the walker into the compound definition; otherwise, the word executes in one step.
+
+The \texttt{\&r} word shows the walker return stack, which is laid out just like the primary interpreter's return stack. In fact, a good way to understand how Factor's return stack works is to play with the walker.
+
+Note that the walker does not automatically stop when the quotation originally given finishes executing; it just keeps on walking up the return stack, and even lets you step through the listener's code. You can invoke \texttt{continue} or \texttt{bye} to terminate the walker.
+
+While the walker can be invoked explicitly using the \texttt{walk} word, sometimes it is more convenient to \emph{annotate} a word such that the walker is invoked automatically when the word is called. This can be done using the \texttt{break} word:
+
+\begin{alltt}
+  \bs layout* break
+\end{alltt}
+
+Now, when some piece of code calls \texttt{layout*}, the walker will open, and you will be able to step through execution and see exactly what's going on. An important point to keep in mind is that when the walker is invoked in this manner, \texttt{bye} will not have the desired effect; execution will continue, but the data stack will be inconsistent, and an error will most likely be raised a short time later. Always use \texttt{continue} to resume execution after a break.
+
+You can undo the effect of \texttt{break} by reloading the original source file containing the word definition in question.
+
+\section{Unit testing}
+
+Unit tests are very easy to write, and are a great debugging aid in any dynamic language.
+It is highly recommended that you write tests before or during development of any piece of Factor code. This section will not describe unit testing methodology; it only introduces Factor's unit test framework.
+\wordtable{
+\vocabulary{test}
+\ordinaryword{unit-test}{unit-test ( expect quot -- )}
+}
+Asserts that executing the quotation with an empty stack produces the expected stack. If the assertion fails, an exception is thrown. Here is an example unit test:
+
+\begin{verbatim}
+[ "Hello, crazy world" ]
+[ "Hello, " "crazy " "world" append3 ] unit-test
+\end{verbatim}
+
+\wordtable{
+\vocabulary{test}
+\ordinaryword{unit-test-fails}{unit-test-fails ( quot -- )}
+}
+Asserts that executing the quotation throws an exception. If the quotation returns normally, an exception is thrown. For example, the following test should pass, since calling \verb|nth| with a negative index should fail:
+
+\begin{verbatim}
+[ -3 { } nth ] unit-test-fails
+\end{verbatim}
+
+\section{Timing code}
+
+Factor provides two facilities for timing code; a way to time the execution of a particular quotation, and a rudimentary profiler.
+\wordtable{
+\vocabulary{test}
+\ordinaryword{time}{time ( quot -- )}
+}
+Calls the quotation, and reports the time taken. For example:
+
+\begin{alltt}
+  [ 1000000 [ f f cons drop ] repeat ] time
+\textbf{515 ms run / 11 ms GC time}
+\end{alltt}
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{profile}{profile ( word -- )}
+}
+Marks the word for profiling. This modifies the word definition so that when the word executes, the execution time of the word is added to a global variable with the word's name. For example:
+\begin{alltt}
+  : foo 100 sleep ;
+  \bs foo profile
+  10 [ drop foo ] each
+  \bs foo get .
+\textbf{1000}
+\end{alltt}
+
+\section{Exploring memory usage}
+
+Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
+
+\begin{alltt}
+  USE: io-internals
+  [ port? ] instances .
+\textbf{[ \#<port @ 805466443> \#<port @ 805466499> ]}
+\end{alltt}
+
+The \texttt{references} word finds all objects that refer to a given object:
+
+\begin{alltt}
+  [ float? ] instances car references .
+\textbf{[ \#<array @ 805542171> [ -1.0 0.0 / ] ]}
+\end{alltt}
+
+You can print a memory usage summary with \texttt{room.}:
+
+\begin{alltt}
+  room.
+\textbf{Data space: 16384 KB total 2530 KB used 13853 KB free
+Code space: 16384 KB total 490 KB used 15893 KB free}
+\end{alltt}
+
+And finally, a detailed memory allocation breakdown by type with \texttt{heap-stats.}:
+
+\begin{alltt}
+  heap-stats.
+\textbf{bignum: 312 bytes, 17 instances
+cons: 850376 bytes, 106297 instances
+float: 112 bytes, 7 instances
+t: 8 bytes, 1 instances
+array: 202064 bytes, 3756 instances
+hashtable: 54912 bytes, 3432 instances
+vector: 5184 bytes, 324 instances
+string: 391024 bytes, 7056 instances
+sbuf: 64 bytes, 4 instances
+port: 112 bytes, 2 instances
+word: 96960 bytes, 3030 instances
+tuple: 688 bytes, 22 instances}
+\end{alltt}
+
+\chapter{Images}\label{images}
+
+\glossary{name=image,
+description={the complete persistent state of a Factor system, dumped to a file}}
+
+An image is basically a dump of all objects in the heap. When Factor is started, an image name must be specified on the command line:
+\begin{alltt}
+\textbf{\$} ./f factor.image
+\textbf{Loading factor.image... relocating... done
+Factor 0.77 :: http://factor.sourceforge.net :: linux/x86
+(C) 2003, 2005 Slava Pestov, Chris Double,
+Mackenzie Straight}
+\end{alltt}
+The most-recently loaded image is stored in the \verb|"image"| global variable.
+The current image can be saved back to disk using one of two words.
+
+\wordtable{
+\vocabulary{memory}
+\ordinaryword{save}{save ( -- )}
+}
+Save the current image to disk. Defined as:
+\begin{verbatim}
+: save "image" get save-image ;
+\end{verbatim}
+\wordtable{
+\vocabulary{memory}
+\ordinaryword{save-image}{save-image ( name -- )}
+}
+Save the current image to a file with the specified name.
+\begin{alltt}
+  "work.image" save-image
+\textbf{Saving work.image...}
+\end{alltt}
+
+When you save an image before exiting Factor, then start Factor again, everything will be almost as you left it. Try the following:
+
+\begin{alltt}
+\textbf{\$} ./f factor.image
+  "Learn Factor" "reminder" set
+  "factor.image" save-image
+\textbf{Saving factor.image...}
+  bye
+\textbf{\$} ./f factor.image
+  "reminder" get .
+\textbf{"Learn Factor"}
+\end{alltt}
+
+This is what is meant by the image being an \emph{infinite session}. When you shut down and restart Factor, what happends is much closer to a Laptop's ``suspend'' mode, than a desktop computer being fully shut down.
+
+\section{The bootstrap process}
+
+The Factor library source code cannot produce a new image from scratch, because
+of inherent circularity; critical components such as the parser and the generic
+word system are written in Factor itself.
+The Factor runtime, coded in C, knows nothing of the syntax of Factor
+source files, or even the organization of words into vocabularies.
+
+However, if \verb|save-image| was the only way one could save a new image, things
+could get out of hand; since \verb|save-image| performs a memory dump, there would be
+no way to change object formats, or perform major re-organizations of the system, and
+so on.
+
+The bootstrap process builds a new image, from source, from inside another Factor
+image, in a reasonably clean and controlled manner. Bootstrap proceeds in two stages:
+
+\begin{itemize}
+\item In the first stage, the currently-running Factor image (the \emph{host image}) runs the image generator to produce a bootstrap image (the \emph{target image}).
+\item In the second stage, the target image is run, and any final loading and initialization is performed.
+\end{itemize}
+
+The first stage is performed by the following word.
+
+\wordtable{
+\vocabulary{image}
+\ordinaryword{make-image}{make-image ( name -- )}
+}
+Generates a new bootstrap image, and writes it to the file named \verb|name|.
+
+The output format is determined by a pair of variables:
+
+\wordtable{
+\vocabulary{image}
+\symbolword{big-endian}
+\symbolword{64-bits}
+}
+The combination of the four flags allows you to switch between the four image formats supported by Factor:
+\begin{itemize}
+\item Little endian, 32 bit (x86)
+\item Little endian, 64 bit (x86-64, Alpha)
+\item Big endian, 32 bit (PowerPC, ARM, Sparc)
+\item Big endian, 64 bit (PowerPC-64, UltraSparc)
+\end{itemize}
+
+Now we will look at the bootstrap process in more detail.
+
+First note that the \verb|vocabularies| variable can be shadowed in a new dynamic scope, forcing words like \verb|search| and \verb|create| to operate on the new set of vocabularies (see \ref{vocabularies}). Bootstrapping uses this to build the vocabularies for the target image.
+
+After initializing some internal objects, \verb|make-image| runs the file
+\verb|boot-stage1.factor|. This file then runs \verb|primitives.factor|, which sets up the initial target image vocabularies, consisting of a copy of the \verb|syntax| vocabulary from the host image, along with all primitive words defined in the runtime. The \verb|syntax| vocabulary is copied so that further source files can be parsed in.
+
+Note that apart from words in the copied \verb|syntax| vocabulary, no words in the target image may be executed in the host image; doing so can lead to all kinds of problems, since the target image may be linked with a different set of primitives and an incompatible runtime structure than the host image.
+
+Bootstrapping proceeds to load various source files into the
+target vocabulary hash. Each file loaded must only refer to primitive
+words, and words loaded from previous files. So by reading through each
+file referenced by \verb|boot-stage1.factor|, you can see the entire construction of the Factor system from the bottom up.
+
+After the library has been loaded into the target image, there is still a problem; the \verb|syntax| vocabulary in the target image was copied from the host
+image, and not loaded from source. Loading the \verb|syntax| vocabulary for the target image is the very last task performed during bootstrap, since after this point, no more code may be loaded in (since it would invoke parsing words intended for the target image in the host image).
+
+Take a look at the start of any source file in \verb|library/syntax/|:
+
+\begin{verbatim}
+IN: !syntax
+USE: syntax
+\end{verbatim}
+
+The source files defining parsing words are themselves parsed using the \verb|syntax| vocabulary, \emph{but add new definitions} to the \verb|!syntax| vocabulary. This allows bootstrap to replace the \verb|syntax| vocabulary with \verb|!syntax| as the very last step.
+
+Once all source files have been loaded into the target image, the target image is written to disk. This is done by tracing all objects and outputting them manually, without a dependency on their actual memory layout in the host image; this allows object formats to be changed easily.
+
 \chapter{Alien interface}
 
 Factor's alien inteface provides a means of directly calling native libraries written in C and other languages. There are no
@@ -5909,483 +6376,6 @@ Resize a block previously allocated with \verb|malloc|.
 \ordinaryword{free}{free ( address -- )}
 }
 Deallocate a block previously allocated with \verb|malloc|.
-
-\part{Development tools}
-
-Factor supports interactive development in a live environment. Instead of working with
-static executable files and restarting your application after each change, you can
-incrementally make changes to your application and test them immediately. If you
-notice an undesirable behavior, Factor's powerful reflection features will aid in
-pinpointing the error.
-
-If you are used to a statically typed language, you might find Factor's tendency to only fail at runtime hard to work with at first. However, the interactive development tools outlined in this part allow a much quicker turn-around time for testing changes. Also, write unit tests -- unit testing is a great way to ensure that old bugs do not re-appear once they've been fixed.
-
-\chapter{System organization}
-
-\section{The listener}\label{listener}
-
-Factor is an \emph{image-based environment}. When you compiled Factor, you also generated a file named \texttt{factor.image}. I will have more to say about images later, but for now it suffices to understand that to start Factor, you must pass the image file name on the command line:
-\begin{alltt}
-./f factor.image
-\textbf{Loading factor.image... relocating... done
-Factor 0.73 :: http://factor.sourceforge.net :: unix/x86
-(C) 2003, 2005 Slava Pestov, Chris Double,
-Mackenzie Straight
-ok}
-\end{alltt}
-An \texttt{\textbf{ok}} prompt is printed after the initial banner, indicating the listener is ready to execute Factor phrases. The listener is a piece of Factor code, like any other; however, it helps to think of it as the primary interface to the Factor system. The listener reads Factor code and executes it. You can try the classical first program:
-
-\begin{alltt}
-  "Hello, world." print
-\textbf{Hello, world.}
-\end{alltt}
-
-
-Multi-line phrases are supported; if there are unclosed brackets, the listener outputs \texttt{...} instead of the \texttt{ok} prompt, and the entire phrase is executed once all brackets are closed:
-
-\begin{alltt}
-  [ 1 2 3 ] [
-\textbf{...} .
-\textbf{...} ] each
-\textbf{1
-2
-3}
-\end{alltt}
-
-The listener knows when to print a continuation prompt by looking at the height of the
-stack. Parsing words such as \texttt{[} and \texttt{:} leave elements on the parser
-stack; these elements are popped by \texttt{]} and \texttt{;}.
-
-On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
-any quick definitions you want available at the listener there. To avoid loading this
-file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image, as described in the next section.
-
-\section{Source files}
-
-While it is possible to do all development in the listener and save your work in images, it is far more convenient to work with source files, at least until an in-image structure editor is developed.
-
-By convention, Factor source files are saved with the \texttt{.factor} filename extension. They can be loaded into the image as follows:
-
-\begin{alltt}
-  "examples/numbers-game.factor" run-file
-\end{alltt}
-
-In Factor, loading a source file replaces any existing definitions\footnote{But see \ref{compiler} for this is not true of compiled code.}. Each word definition remembers what source file it was loaded from (if any). To reload the source file associated with a definition, use the \texttt{reload} word:
-
-\begin{alltt}
-  \bs draw reload
-\end{alltt}
-
-Word definitions also retain the line number where they are located in their original source file. This allows you to open a word definition in jEdit\footnote{\texttt{http://www.jedit.org}} for editing using the
-\texttt{jedit} word:
-
-\begin{alltt}
-  \bs compile jedit
-\end{alltt}
-
-This word requires that a jEdit instance is already running.
-
-The \texttt{jedit} word will open word definitions from the Factor library once the full path of the Factor source tree is entered into the \texttt{"resource-path"} variable. One way to do this is to add a phrase like the following to your \texttt{.factor-rc}:
-
-\begin{verbatim}
-"/home/slava/Factor/" "resource-path" set
-\end{verbatim}
-
-\section{Images}
-
-The \texttt{factor.image} file is basically a dump of all objects in the heap. A new image can be saved as follows:
-
-\begin{alltt}
-  "work.image" save-image
-\textbf{Saving work.image...}
-\end{alltt}
-
-When you save an image before exiting Factor, then start Factor again, everything will be almost as you left it. Try the following:
-
-\begin{alltt}
-./f factor.image
-  "Learn Factor" "reminder" set
-  "factor.image" save-image bye
-\textbf{Saving factor.image...}
-\end{alltt}
-
-Factor will save the image and exit. Now start it again and see that the reminder is still there:
-
-\begin{alltt}
-./f factor.image
-  "reminder" get .
-\textbf{"Learn Factor"}
-\end{alltt}
-
-This is what is meant by the image being an \emph{infinite session}. When you shut down and restart Factor, what happends is much closer to a Laptop's ``suspend'' mode, than a desktop computer being fully shut down.
-
-\section{Looking at objects}
-
-Probably the most important debugging tool of them all is the \texttt{.} word. It prints the object at the top of the stack in a form that can be parsed by the Factor parser. A related word is \texttt{prettyprint}. It is identical to \texttt{.} except the output is more verbose; lists, vectors and hashtables are broken up into multiple lines and indented.
-
-\begin{alltt}
-  [ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ] .
-\textbf{[ [ \tto 1 \ttc \tto 2 \ttc ] dup car swap cdr ]}
-\end{alltt}
-
-Most objects print in a parsable form, but not all. One exceptions to this rule is objects with external state, such as I/O ports or aliens (pointers to native structures). Also, objects with circular or very deeply nested structure will not print in a fully parsable form, since the prettyprinter has a limit on maximum nesting. Here is an example -- a vector is created, that holds a list whose first element is the vector itself:
-
-\begin{alltt}
-  \tto \ttc [ unit 0 ] keep [ set-vector-nth ] keep .
-\textbf{\tto [ ... ] \ttc}
-\end{alltt}
-
-The prettyprinted form of a vector or list with many elements is not always readable. The \texttt{[.]} and \texttt{\tto.\ttc} words output a list or a vector, respectively, with each element on its own line. In fact, the stack printing words are defined in terms of \texttt{[.]} and \texttt{\tto.\ttc}:
-
-\begin{verbatim}
-: .s datastack  {.} ;
-: .r callstack  {.} ;
-\end{verbatim}
-
-Before we move on, one final set of output words comes is used to output integers in
-different numeric bases. The \texttt{.b} word prints an integer in binary, \texttt{.o} in octal, and \texttt{.h} in hexadecimal.
-
-\begin{alltt}
-  31337 .b
-\textbf{111101001101001}
-  31337 .o
-\textbf{75151}
-  31337 .h
-\textbf{7a69}
-\end{alltt}
-
-\chapter{Word tools}
-
-\section{Exploring vocabularies}\label{exploring-vocabs}
-
-Factor organizes code in a two-tier structure of vocabularies and words. A word is the smallest unit of code; it corresponds to a function or method in other languages. Vocabularies group related words together for easy browsing and tracking of source dependencies.
-
-Entering \texttt{vocabs .}~in the listener produces a list of all existing vocabularies:
-
-\begin{alltt}
-  vocabs .
-\textbf{[ "alien" "ansi" "assembler" "browser-responder"
-"command-line" "compiler" "cont-responder" "errors"
-"file-responder" "files" "gadgets" "generic"
-"hashtables" "html" "httpd" "httpd-responder" "image"
-"inference" "interpreter" "io-internals" "jedit"
-"kernel" "kernel-internals" "line-editor" "listener"
-"lists" "logging" "math" "math-internals" "memory"
-"namespaces" "parser" "prettyprint" "profiler"
-"quit-responder" "random" "resource-responder"
-"scratchpad" "sdl" "shells" "stdio" "streams"
-"strings" "syntax" "telnetd" "test" "test-responder"
-"threads" "unparser" "url-encoding" "vectors" "words" ]}
-\end{alltt}
-
-As you can see, there are a lot of vocabularies! Now, you can use \texttt{words .}~to list the words inside a given vocabulary:
-
-\begin{alltt}
-  "namespaces" words .
-\textbf{[ (get) , <namespace> >n append, bind change cons@
-dec extend get global inc init-namespaces list-buffer
-literal, make-list make-rlist make-rstring make-string
-make-vector n> namespace namestack nest off on put set
-set-global set-namestack unique, unique@ with-scope ]}
-\end{alltt}
-
-You can look at the definition of any word, including library words, using \texttt{see}. Keep in mind you might have to \texttt{USE:} the vocabulary first.
-
-\begin{alltt}
-  USE: httpd
-  \bs httpd-connection see
-\textbf{IN: httpd : httpd-connection ( socket -- )
-    "http-server" get accept [
-        httpd-client
-    ] in-thread drop ;}
-\end{alltt}
-
-The \texttt{see} word shows a reconstruction of the source code, not the original source code. So in particular, formatting and some comments are lost.
-
-\section{Cross-referencing words}
-
-The \texttt{apropos.} word is handy when searching for related words. It lists all words
-whose names contain a given string. The \texttt{apropos.} word is also useful when you know the exact name of a word, but are unsure what vocabulary it is in. For example, if you're looking for ways to iterate over various collections, you can do an apropos search for \texttt{map}:
-
-\begin{alltt}
-  "map" apropos.
-\textbf{IN: generic
-typemap
-IN: hashtables
-map>hash
-IN: sdl
-set-surface-map
-surface-map
-IN: sequences
-2map
-map
-map-with
-nmap}
-\end{alltt}
-
-From the above output, you can see a few words to explore, such as \verb|map|, \verb|map-with|, and \verb|2map|.
-
-The \texttt{usage} word finds all words that refer to a given word and pushes a list on the stack. This word is helpful in two situations; the first is for learning -- a good way to learn a word is to see it used in context. The second is during refactoring -- if you change a word's stack effect, you must also update all words that call it. Usually you print the
-return value of \texttt{usage} using \texttt{.}:
-
-\begin{alltt}
-  \bs string-map usage .
-\textbf{schars>entities
-filter-null
-url-encode}
-\end{alltt}
-
-Another useful word is \texttt{usages}. Unlike \texttt{usage}, it finds all usages, even
-indirect ones -- so if a word refers to another word that refers to the given word,
-both words will be in the output list.
-
-\section{Exploring classes}
-
-Factor supports object-oriented programming via generic words (\ref{generic}). Generic words are called
-like ordinary words, however they can have multiple definitions, one per class, and
-these definitions do not have to appear in the same source file. Such a definition is
-termed a \emph{method}, and the method is said to \emph{specialize} on a certain
-class. A class in the most
-general sense is just a set of objects. You can output a list of classes in the system
-with \texttt{classes .}:
-
-\begin{alltt}
-  classes.
-\textbf{[ alien alien-error byte-array displaced-alien
-dll ansi-stream disp-only displaced indirect operand
-register absolute absolute-16/16 relative relative-bitfld
-item kernel-error no-method border checkbox dialog editor
-ellipse etched-rect frame gadget hand hollow-ellipse
-hollow-rect label line menu pane pile plain-ellipse
-plain-rect rectangle roll-rect scroller shelf slider
-stack tile viewport world 2generic arrayed builtin
-complement generic null object predicate tuple
-tuple-class union hashtable html-stream class-tie
-computed inference-error inference-warning literal
-literal-tie value buffer port jedit-stream boolean
-general-t array cons general-list list bignum complex
-fixnum float integer number ratio rational real
-parse-error potential-float potential-ratio
-button-down-event button-up-event joy-axis-event
-joy-ball-event joy-button-down-event joy-button-up-event
-joy-hat-event key-down-event key-up-event motion-event
-quit-event resize-event user-event sequence stdio-stream
-client-stream fd-stream null-stream server string-output
-wrapper-stream LETTER blank digit letter printable sbuf
-string text POSTPONE: f POSTPONE: t vector compound
-primitive symbol undefined word ]}
-\end{alltt}
-
-If you \texttt{see} a generic word, all methods defined on the generic word are shown.
-Alternatively, you can use \texttt{methods.} to print all methods specializing on a
-given class:
-
-\begin{alltt}
-  \bs list methods.
-\textbf{PREDICATE: general-list list
-    dup [
-        last* cdr
-    ] when not ;
-IN: gadgets
-M: list custom-sheet
-    [
-        length count
-    ] keep zip alist>sheet "Elements:" <titled> ;
-IN: prettyprint
-M: list prettyprint*
-    [
-        [
-            POSTPONE: [
-        ] car swap [
-            POSTPONE: ]
-        ] car prettyprint-sequence
-    ] check-recursion ;}
-\end{alltt}
-
-\chapter{Debugging and optimizing}
-
-\section{Looking at stacks}
-
-To see the contents of the data or return stack, use the \texttt{.s} and \texttt{.r} words.
-Each stack is printed with each element on its own line; the top of the stack is the first element printed.
-
-\section{The debugger}
-
-If the execution of a phrase in the listener causes an error to be thrown, the error
-is printed and the stacks at the time of the error are saved. If you're spent any
-time with Factor at all, you are probably familiar with this type of message:
-
-\begin{alltt}
-  [ 1 2 3 ] 4 append reverse
-\textbf{The generic word car does not have a suitable method for 4
-:s :r show stacks at time of error.
-:get ( var -- value ) inspects the error namestack.}
-\end{alltt}
-
-The words \texttt{:s} and \texttt{:r} behave like their counterparts that are prefixed with \texttt{.}, except they show the stacks as they were when the error was thrown.
-
-The return stack warrants some special attention. To successfully develop Factor, you will need to learn to understand how it works. Lets look at the first few lines of the return stack at the time of the above error:
-
-\begin{verbatim}
-[ swap cdr ]
-uncons
-[ r> tuck 2slip ]
-(each)
-[ swons ]
-[ each ]
-each
-\end{verbatim}
-
-You can see the sequence of calls leading up to the error was \texttt{each} calling \texttt{(each)} calling \texttt{uncons}. The error tells us that the \texttt{car} word is the one that failed. Now, you can stare at the stack dump, at notice that if the call to \texttt{car} was successful and execution returned to \texttt{(each)}, the quotation \texttt{[ r> tuck 2slip ]} would resume executing. The first word there, \texttt{r>}, would take the quotation \texttt{[ swons ]} and put it back on the data stack. After \texttt{(each)} returned, it would then continue executing the quotation \texttt{[ each ]}. So what is going on here is a recursive loop, \texttt{[ swons ] each}. If you look at the definition of \texttt{reverse}, you will see that this is exactly what is being done:
-
-\begin{verbatim}
-: reverse ( list -- list ) [ ] swap [ swons ] each ;
-\end{verbatim}
-
-So a list is being reversed, but at some stage, the \texttt{car} is taken of something that is not a number. Now, you can look at the data stack with \texttt{:s}:
-
-\begin{verbatim}
-<< no-method [ ] 4 car >>
-car
-4
-4
-[ 3 2 1 ]
-\end{verbatim}
-
-So now, the mystery has been solved: as \texttt{reverse} iterates down the input value, it hits a cons cells whose \texttt{cdr} is not a list. Indeed, if you look at the value we are passing to \texttt{reverse}, you will see why:
-
-\begin{alltt}
-  [ 1 2 3 ] 4 append .
-[[ 1 [[ 2 [[ 3 4 ]] ]] ]]
-\end{alltt}
-
-In the future, the debugger will be linked with the walker, documented below. Right now, the walker is a separate tool. Another caveat is that in compiled code, the return stack is not reconstructed if there is an error. Until this is fixed, you should only compile code once it is debugged. For more potential compiler pitfalls, see \ref{compiler}.
-
-\section{The walker}
-
-The walker lets you step through the execution of a qotation. When a compound definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
-
-There are two ways to use the walker. First of all, you can call the \texttt{walk} word explicitly, giving it a quotation:
-
-\begin{alltt}
-  [ [ 10 [ dup , ] repeat ] [ ] make ] walk
-\textbf{\&s \&r show stepper stacks.
-\&get ( var -- value ) inspects the stepper namestack.
-step -- single step over
-into -- single step into
-continue -- continue execution
-bye -- exit single-stepper
-[ [ 10 [ dup , ] repeat ] make-list ]
-walk}
-\end{alltt}
-
-As you can see, the walker prints a brief help message, then the currently executing quotation. It changes the listener prompt from \texttt{ok} to \texttt{walk}, to remind you that there is a suspended continuation.
-
-The first element of the quotation shown is the next object to be evaluated. If it is a literal, both \texttt{step} and \texttt{into} have the effect of pushing it on the walker data stack. If it is a compound definition, then \texttt{into} will recurse the walker into the compound definition; otherwise, the word executes in one step.
-
-The \texttt{\&r} word shows the walker return stack, which is laid out just like the primary interpreter's return stack. In fact, a good way to understand how Factor's return stack works is to play with the walker.
-
-Note that the walker does not automatically stop when the quotation originally given finishes executing; it just keeps on walking up the return stack, and even lets you step through the listener's code. You can invoke \texttt{continue} or \texttt{exit} to terminate the walker.
-
-While the walker can be invoked explicitly using the \texttt{walk} word, sometimes it is more convenient to \emph{annotate} a word such that the walker is invoked automatically when the word is called. This can be done using the \texttt{break} word:
-
-\begin{alltt}
-  \bs layout* break
-\end{alltt}
-
-Now, when some piece of code calls \texttt{layout*}, the walker will open, and you will be able to step through execution and see exactly what's going on. An important point to keep in mind is that when the walker is invoked in this manner, \texttt{exit} will not have the desired effect; execution will continue, but the data stack will be inconsistent, and an error will most likely be raised a short time later. Always use \texttt{continue} to resume execution after a break.
-
-The walker is very handy, but sometimes you just want to see if a word is being called at all and when, and you don't care to single-step it. In that case, you can use the \texttt{watch} word:
-
-\begin{alltt}
-  \bs draw-shape break
-\end{alltt}
-
-Now when \texttt{draw-shape} is called, a message will be printed to that effect.
-
-You can undo the effect of \texttt{break} or \texttt{watch} by reloading the original source file containing the word definition in question:
-
-\begin{alltt}
-  \bs layout* reload
-  \bs draw-shape reload
-\end{alltt}
-
-\section{Dealing with hangs}
-
-If you accidentally start an infinite loop, you can send the Factor runtime a \texttt{QUIT} signal. On Unix, this is done by pressing \texttt{Control-\bs} in the controlling terminal. This will cause the runtime to dump the data and return stacks in a semi-readable form. Note that this will help you find the root cause of the hang, but it will not let you interrupt the infinite loop.
-
-\section{Unit testing}
-
-Unit tests are very easy to write. They are usually placed in source files. A unit test can be executed with the \texttt{unit-test} word in the \texttt{test} vocabulary. This word takes a list and a quotation; the quotation is executed, and the resulting data stack is compared against the list. If they do not equal, the unit test has failed. Here is an example of a unit test:
-
-\begin{verbatim}
-[ "Hello, crazy world" ] [
-    "editor" get [ 0 caret set ] bind
-    ", crazy" 5 "editor" get [ line-insert ] bind
-    "editor" get [ line-text get ] bind
-] unit-test
-\end{verbatim}
-
-To have a unit test assert that a piece of code does not execute successfully, but rather throws an exception, use the \texttt{unit-test-fails} word. It takes only one quotation; if the quotation does \emph{not} throw an exception, the unit test has failed.
-
-\begin{verbatim}
-[ -3 { } vector-nth ] unit-test-fails
-\end{verbatim}
-
-Unit testing is a good habit to get into. Sometimes, writing tests first, before any code, can speed the development process too; by running your unit test script, you can gauge progress.
-
-\section{Timing code}
-
-The \texttt{time} word reports the time taken to execute a quotation, in milliseconds. The portion of time spent in garbage collection is also shown:
-
-\begin{alltt}
-  [ 1000000 [ f f cons drop ] repeat ] time
-\textbf{515 milliseconds run time
-11 milliseconds GC time}
-\end{alltt}
-
-\section{Exploring memory usage}
-
-Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
-
-\begin{alltt}
-  USE: io-internals
-  [ port? ] instances .
-\textbf{[ \#<port @ 805466443> \#<port @ 805466499> ]}
-\end{alltt}
-
-The \texttt{references} word finds all objects that refer to a given object:
-
-\begin{alltt}
-  [ float? ] instances car references .
-\textbf{[ \#<array @ 805542171> [ -1.0 0.0 / ] ]}
-\end{alltt}
-
-You can print a memory usage summary with \texttt{room.}:
-
-\begin{alltt}
-  room.
-\textbf{Data space: 16384 KB total 2530 KB used 13853 KB free
-Code space: 16384 KB total 490 KB used 15893 KB free}
-\end{alltt}
-
-And finally, a detailed memory allocation breakdown by type with \texttt{heap-stats.}:
-
-\begin{alltt}
-  heap-stats.
-\textbf{bignum: 312 bytes, 17 instances
-cons: 850376 bytes, 106297 instances
-float: 112 bytes, 7 instances
-t: 8 bytes, 1 instances
-array: 202064 bytes, 3756 instances
-hashtable: 54912 bytes, 3432 instances
-vector: 5184 bytes, 324 instances
-string: 391024 bytes, 7056 instances
-sbuf: 64 bytes, 4 instances
-port: 112 bytes, 2 instances
-word: 96960 bytes, 3030 instances
-tuple: 688 bytes, 22 instances}
-\end{alltt}
 
 \chapter{Stack effect inference}
 
