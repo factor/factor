@@ -42,7 +42,7 @@ SYMBOL: socket
     WSAGetLastError [
       ERROR_IO_PENDING ERROR_SUCCESS
     ] member? [
-      win32-error-message throw 
+      WSAGetLastError win32-error-message throw 
     ] unless ;
 
 : new-socket ( -- socket )
@@ -97,6 +97,12 @@ M: win32-server expire ( -- )
         timeout get [ millis cutoff get > [ socket get CancelIo ] when ] when
     ] bind ;
 
+: client-sockaddr ( host port -- sockaddr )
+    setup-sockaddr [
+        >r gethostbyname handle-socket-error hostent-addr
+        r> set-sockaddr-in-addr
+    ] keep ;
+
 IN: io
 : accept ( server -- client )
     win32-server-this [
@@ -110,4 +116,9 @@ IN: io
         swap dup add-completion <win32-stream> <line-reader> 
         dupd <win32-client-stream> swap buffer-free
     ] bind ;
+
+: <client> ( host port -- stream )
+    maybe-init-winsock client-sockaddr new-socket
+    [ swap "sockaddr-in" c-size connect drop handle-socket-error ] keep 
+    dup add-completion <win32-stream> <line-reader> ;
 

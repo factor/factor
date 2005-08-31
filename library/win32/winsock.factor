@@ -85,3 +85,21 @@ END-STRUCT
 : GetAcceptExSockaddrs ( stack effect is too long to put here -- )
     "void" "mswsock" "GetAcceptExSockaddrs"
     [ "void*" "int" "int" "int" "void*" "void*" "void*" "void*" ] alien-invoke ;
+
+BEGIN-STRUCT: hostent
+    FIELD: char* name
+    FIELD: void* aliases
+    FIELD: short addrtype
+    FIELD: short length
+    FIELD: void* addr-list
+END-STRUCT
+
+: hostent-addr hostent-addr-list *void* *uint ;
+
+: gethostbyname ( name -- hostent )
+    "hostent*" "winsock" "gethostbyname" [ "char*" ] alien-invoke ;
+
+: connect ( socket sockaddr addrlen -- int )
+    "int" "winsock" "connect" [ "void*" "sockaddr-in*" "int" ] 
+    alien-invoke ;
+
