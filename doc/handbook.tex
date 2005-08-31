@@ -10,6 +10,7 @@
 \usepackage{epsfig}
 \usepackage{amssymb}
 \usepackage{epstopdf}
+%\usepackage{fancyref}
 
 \pagestyle{headings}
 
@@ -173,7 +174,6 @@ The following naming conventions are used in the Factor library.
 \item[\texttt{foo-with}] a form of the \texttt{foo} combinator that takes an extra object, and passes this object on each iteration of the quotation; for example, \texttt{each-with} and \texttt{map-with}
 \item[\texttt{from>}] converts an instance of the \texttt{from} class into some canonical form
 \item[\texttt{from>to}] convert an instance of the \texttt{from} class to the \texttt{to} class
-\item[\texttt{make-foo}] executes a quotation in a namespace where a sequence of type \texttt{foo} is being constructed; for example, \texttt{make-string}
 \item[\texttt{>s}] move top of data stack to the \texttt{s} stack, where \texttt{s} is either \texttt{r} (call stack), \texttt{n} (name stack), or \texttt{c} (catch stack). Sometimes, libraries will define their own words following this naming convention, to implement user-defined stacks, typically stored in variables
 \item[\texttt{s>}] move top of \texttt{s} stack to the data stack, where \texttt{s} is as above
 \item[\texttt{style}] an association list holding text formatting information, possible keys are described in \ref{styles}
@@ -1183,9 +1183,14 @@ I/O or an explicit call to \texttt{yield}. This is implemented by adding the cur
 \wordtable{
 \vocabulary{threads}
 \ordinaryword{yield}{yield ( -- )}
-
 }
 Add the current continuation to the end of the run queue, and call the continuation at the front of the run queue.
+\wordtable{
+\vocabulary{threads}
+\ordinaryword{sleep}{sleep ( ms -- )}
+}
+Pauses the current thread for \verb|ms| milliseconds. Other threads and I/O operations may execute in the meantime. The multitasker guarantees that the thread will not be woken up before \verb|ms| milliseconds passes, however it does not guarantee that the tread will not be woken up late; indeed, since multitasking is co-operative, a non-yielding thread can delay other sleeping threads indefinately.
+
 \wordtable{
 \vocabulary{threads}
 \ordinaryword{stop}{stop ( -- )}
@@ -1241,10 +1246,12 @@ description=the collection of vocabularies making up the code in the Factor imag
 \vocabulary{words}
 \classword{word}
 }
-Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. Words hold two distinct pieces of information:
+Words are the fundamental unit of code in Factor, analogous to functions or procedures in other languages. Words are also objects, and this concept forms the basis for Factor's meta-programming facilities. A word consists of several parts:
 \begin{itemize}
-\item A definition, specifying the behavior of the word when executed,
-\item A set of word properties, including the name of the word, its vocabulary, any documentation strings, and other meta-data.
+\item a word name,
+\item a vocabulary name,
+\item a definition, specifying the behavior of the word when executed,
+\item a set of word properties, including documentation strings and other meta-data.
 \end{itemize}
 \wordtable{
 \vocabulary{words}
@@ -1252,12 +1259,29 @@ Words are the fundamental unit of code in Factor, analogous to functions or proc
 }
 Tests if the \texttt{object} is a word.
 
+\wordtable{
+\vocabulary{words}
+\ordinaryword{word-name}{word-name ( word -- string )}
+\ordinaryword{word-vocabulary}{word-vocabulary ( word -- string )}
+}
+A pair of words for obtaining a word's name and vocabulary.
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{word-sort}{word-sort ( list -- list )}
+
+}
+Sort a list of words by name.
+
 \section{Vocabularies}
 \wordtable{
 \vocabulary{words}
 \symbolword{vocabularies}
 }
-Words are organized into named vocabularies, stored in the global \texttt{vocabularies} variable (\ref{namespaces}).
+\glossary{name=interned word,
+description={a word that is a member of the vocabulary named by its vocabulary slot. Interned words are created by calls to \verb|create|}}
+
+Words are organized into named vocabularies, stored in the global \texttt{vocabularies} variable (\ref{namespaces}). A word is said to be \emph{interned} if it is a member of the vocabulary named by its vocabulary slot. Otherwise, the word is \emph{uninterned}.
 
 Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to \texttt{scratchpad}. The current vocabulary may be changed with the \verb|IN:| parsing word (\ref{vocabsearch}).
 
@@ -1266,10 +1290,16 @@ Parsing words add definitions to the current vocabulary. When a source file is b
 Words whose names are known at parse time -- that is, most words making up your program -- can be referenced by stating their name. However, the parser itself, and sometimes code you write, will need to look up words dynamically.
 \wordtable{
 \vocabulary{words}
-\ordinaryword{search}{search ( name vocabs -- word )}
+\ordinaryword{lookup}{lookup ( name vocabulary -- word/f )}
 
 }
-The \texttt{vocabs} parameter is a list of vocabulary names. If a word with the given name is found, it is pushed on the stack, otherwise, \texttt{f} is pushed.
+Searches for a word named \verb|name| in the vocabulary named \verb|vocab|. If no such word exists, pushes \texttt{f}.
+\wordtable{
+\vocabulary{words}
+\ordinaryword{search}{search ( name vocabs -- word/f )}
+
+}
+The \texttt{vocabs} parameter is a sequence of vocabulary names. If a word with the given name is found, it is pushed on the stack, otherwise, \texttt{f} is pushed.
 
 \subsection{Creating words}\label{creating-words}
 
@@ -1284,11 +1314,39 @@ Creates a new word \texttt{name} in \texttt{vocabulary}. If the vocabulary alrea
 \ordinaryword{create-in}{create-in ( name -- word )}
 
 }
-Creates a new word \texttt{name} in the current vocabulary. This word is intended to be called from parsing words (\ref{parsing-words}), and in fact is defined as follows:
-\begin{verbatim}
-: create-in ( name -- word )
-    "in" get create dup save-location ;
-\end{verbatim}
+Creates a new word \texttt{name} in the current vocabulary. This word is intended to be called from parsing words (\ref{parsing-words}).
+
+\newcommand{\uninternedglos}{
+\glossary{name=uninterned word,
+description={a word whose vocabulary slot is either set to \texttt{f}, or that does not belong to the vocabulary named by its vocabulary slot. Uninterned words are created by calls to \texttt{gensym} and \texttt{<word>}, and interned words can be come uninterned via calls to \texttt{forget}}}}
+\uninternedglos
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{gensym}{gensym ( -- word )}
+}
+Creates an uninterned word that is not equal to any other word in the system, either stored in a vocabulary, or resulting from prior or future calls to \verb|gensym|. Gensyms have an automatically-generated name based on a prefix and an incrementing counter, for debugging:
+\begin{alltt}
+  gensym .
+\textbf{G:260561}
+  gensym .
+\textbf{G:260562}
+\end{alltt}
+Gensyms are often used as placeholders and representitives that must be unique. For example, the compiler uses gensyms internally to label sections of assembly code.
+
+\wordtable{
+\vocabulary{words}
+\ordinaryword{<word>}{<word> ( name vocabulary -- word )}
+}
+Creates an uninterned word whose name and vocabulary slots have the given values, however the word is not actually entered into this vocabulary. This word is used to implement \verb|create| and \verb|gensym|, and it is not usually used directly, since it can give confusing results:
+\begin{alltt}
+  "reverse" "sequences" <word> dup .
+\textbf{reverse}
+  "reverse" "sequences" lookup dup .
+\textbf{reverse}
+  eq?
+\textbf{f}
+\end{alltt}
 
 \section{Word definition}
 
@@ -1424,34 +1482,74 @@ The class that all undefined words are an instance of.
 \parsingword{FORGET:}{FORGET:~\emph{name}}
 }
 Removes the word \texttt{name} from its vocabulary. Existing definitions that reference the word will continue to work, but newly-parsed occurrences of the word will not locate the forgotten definition. No exception is thrown if no such word exists.
+\uninternedglos
 \wordtable{
 \vocabulary{words}
 \ordinaryword{forget}{forget ( word -- )}
-
 }
-Removes the word from its vocabulary. The parsing word \texttt{FORGET:} is implemented using this word.
+Removes the word from its vocabulary. The word becomes uninterned. The parsing word \texttt{FORGET:} is implemented using this word.
+\wordtable{
+\vocabulary{words}
+\ordinaryword{interned?}{interned?~( word -- ?~)}
+}
+Test if the word is interned. If the word's vocabulary slot is \verb|f|, immediately outputs \verb|f|, otherwise, tests if the word with the same name in that vocabulary is actually the given word.
+\begin{alltt}
+  "interning" "scratchpad" create
+  dup interned?
+\textbf{t}
+  dup forget
+  interned?
+\textbf{f}
+\end{alltt}
 
 \subsection{Declarations}\label{declarations}
 
-A compound or generic word (\ref{generic}) can be given special behavior with one of the below parsing words.
+A compound or generic word (\ref{generic}) can be given special behavior with one of the below parsing words. They all act on the most recently-defined word by setting to \verb|t| a word property keyed by the string naming the declaration word.
 
-\wordtable{
-\vocabulary{syntax}
-\parsingword{inline}{inline}
-}
-Declares the most recently defined word as an inline word. The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization; see \ref{compiler}. Inlining does not affect the execution of the word in the interpreter, nor is inlining visible when you \texttt{see} the word (\ref{exploring-vocabs}).
-
+The first declaration specifies the time when a word runs. It affects both interpreted and compiled definitions.
 \wordtable{
 \vocabulary{syntax}
 \parsingword{parsing}{parsing}
 }
-Declares the most recently defined word as a parsing word. Parsing words run at parse time. See \ref{parsing-words}.
+Parsing words run at parse time. See \ref{parsing-words}.
 
+The remaining declarations only affect compiled definitions. They do not change evaluation semantics of a word, but instead declare that the word follows a certain contract, and thus may be compiled differently.
+If a generic word is defined as \verb|flushable| or \verb|foldable|, all methods must satisfy the contract, otherwise unpredicable behavior will occur.
+
+\glossary{name=inline word,
+description={calls to inline words are replaced with the inline word's body by the compiler. Inline words are declared via the \verb|inline| parsing word}}
 \wordtable{
 \vocabulary{syntax}
-\parsingword{stateless}{parsing}
+\parsingword{inline}{inline}
 }
-Declares the most recently defined word as a stateless word, whose outputs only depend on the input values, and not on any runtime state such as variable values. Stateless words are evaluated at compile-time if their inputs are literals; for example, \verb|2 2 +| is compiled to a literal \verb|4|, because \verb|+| is declared as stateless.
+The compiler copies the definitions of inline words directly into the word being compiled. Combinators must be inlined in order to compile. For any other word, inlining is merely an optimization; see \ref{compiler}. Inlining does not affect the execution of the word in the interpreter.
+
+\glossary{name=flushable word,
+description={calls to flushable words may be removed from compiled code if their outputs are subsequently discarded by calls to \verb|drop|. Flushable words are declared via the \verb|flushable| parsing word}}
+\wordtable{
+\vocabulary{syntax}
+\parsingword{flushable}{flushable}
+}
+Calls to flushable words may be removed from compiled code if their outputs are subsequently discarded by calls to \verb|drop|. Flushable words must be side-effect-free; that is, their outputs must solely depend on inputs, and they must not modify their inputs, or any other object visible outside the dynamic extent of the flushable word. Note that if a word with no outputs is declared flushable, calls to it are \emph{never} compiled in.
+
+\glossary{name=foldable word,
+description={calls to foldable words may be evaluated at compile time if all inputs are literal. Foldable words are declared via the \verb|foldable| parsing word}}
+\wordtable{
+\vocabulary{syntax}
+\parsingword{foldable}{foldable}
+}
+Foldable words may be evaluated at compile time if all inputs are literal. Foldable words must satisfy a very strong contract:
+\begin{itemize}
+\item foldable words must satisfy the contract of flushable words,
+\item foldable words must halt\footnote{of course, this cannot be guaranteed in the general case, but for example, a word computing a series until it coverges should not be foldable, since compilation will not halt in the event the series does not converge.}
+\item inputs and outputs of foldable words must be immutable objects.
+\end{itemize}
+The last restriction ensures that words like \verb|clone| do not satisfy the foldable word contract. Indeed, \verb|clone| is flushable, however it may output a mutable object if its input is mutable, and so it is undesirable to evaluate it at compile-time, since the following two definitions have differing semantics:
+\begin{verbatim}
+: foe { } ;
+: foe { } clone ;
+\end{verbatim}
+Most mathematical opeartions are foldable. For example, \verb|2 2 +| is compiled to a literal \verb|4|, because \verb|+| is foldable.
 
 \section{Word properties}\label{word-props}
 
@@ -1473,35 +1571,13 @@ Retrieve and store word properties. Note that the stack effect is designed so th
 The following properties are commonly-set:
 
 \begin{description}
-\item[\texttt{"name"}] The name of the word
-\item[\texttt{"vocabulary"}] The vocabulary containing the word
-\item[\texttt{"parsing"}] A boolean specifying if this is a parsing word (\ref{parsing-words})
-\item[\texttt{"inline"}] A boolean specifying if this word is compiled inline (\ref{declarations})
-\item[\texttt{"stateless"}] A boolean specifying if this word can be evaluated at compile-time if all inputs are literal (\ref{declarations})
-\item[\texttt{"methods"}] Only defined on generic words; a hashtable mapping classes to quotations (\ref{generic})
+\item[\texttt{"parsing"}, \texttt{"inline"}, \texttt{"flushable"}, \texttt{"foldable"}] declarations (see \ref{declarations})
+\item[\texttt{"methods"}] only defined on generic words; a hashtable mapping classes to quotations (see \ref{generic})
+\item[\texttt{"combination"}] only defined on generic words; see \ref{combinations}
 \item[\texttt{"file"}] The source file storing the word definition
 \item[\texttt{"line"}] The line number in the source file storing the word definition
 \item[\texttt{"col"}] The column number in the source file storing the word definition
 \end{description}
-
-\wordtable{
-\vocabulary{words}
-\ordinaryword{word-name}{word-prop ( word -- name )}
-\ordinaryword{word-vocabulary}{word-vocabulary ( word -- vocabulary )}
-
-}
-Retreive the name of a word, and the name of the vocabulary it is stored in. The definitions are trivial:
-\begin{verbatim}
-: word-name "name" word-prop ;
-: word-vocabulary "vocabulary" word-prop ;
-\end{verbatim}
-
-\wordtable{
-\vocabulary{words}
-\ordinaryword{word-sort}{word-sort ( list -- list )}
-
-}
-Sort a list of words by name.
 
 \wordtable{
 \vocabulary{words}
@@ -1533,7 +1609,7 @@ The words outlined in this section should not be used in ordinary code.
 \ordinaryword{set-word-primitive}{set-word-primitive ( word -- n )}
 
 }
-Retreives and stores a word's primitive number.
+Retreives and stores a word's primitive number. Note that changing the primitive number does not update the execution token, and the word will still call the old definition until a subsequent call to \verb|update-xt|.
 
 \wordtable{
 \vocabulary{words}
@@ -1558,7 +1634,7 @@ This is an even lower-level facility for working with the address containing nat
 \ordinaryword{update-xt}{update-xt ( word -- )}
 
 }
-Updates a word's execution token according to its primitive number. When called with a compiled word, has the effect of decompiling the word. The execution token is automatically updated after a call to \texttt{set-word-primitive}.
+Updates a word's execution token according to its primitive number. When called with a compiled word, has the effect of decompiling the word.
 
 \wordtable{
 \vocabulary{words}
@@ -1604,11 +1680,15 @@ Output \texttt{t} if two objects are equal, and \texttt{f} otherwise. The precis
 \item Two tuples are equal if they are of the same class and their slots are equal.
 \item Two words are equal if they are the same object.
 \end{itemize}
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
+
 \wordtable{
 \vocabulary{kernel}
 \genericword{clone}{clone ( object -- object )}
 }
 Make a fresh object that is equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a new shallow copy of the original.
+
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
 
 \section{Generic words and methods}\label{generic}
 
@@ -1909,6 +1989,99 @@ Class membership test pridicates only test if an object is a direct instance of 
 
 Tests if the quotation outputs a true value when applied to the object or some object that it delegates to.
 
+Note that the \verb|standard-combination| method combination does not respect delegation unless the picker quotation is given as \verb|[ dup ]|. The \verb|math-combination| does not respect delegation at all (see \ref{combinations}).
+
+\subsection{Method combination}\label{combinations}
+
+Method combination adds a degree of flexibility to the generic word system, where a particular form of higher-order programming can be used to customize two aspects of generic word behavior:
+\begin{itemize}
+\item which stack item(s) the generic word dispatches upon,
+\item which methods out of the set of applicable methods are called
+\end{itemize}
+The \verb|GENERIC:| parsing word creates a generic word using the \emph{standard method combination}. The \verb|G:| parsing word allows a custom method combination to be specified.
+\wordtable{
+\vocabulary{syntax}
+\parsingword{G:}{G: \emph{generic} \emph{combination ...} ;}
+}
+Defines a generic word using the long-form.
+A method combination is a quotation that is given the generic word on the stack, and outputs a quotation \emph{that becomes the definition of the word}. This is a very profound and abstract concept, and the examples in the remainder of the section will make it easier to grasp. The method combination quotation is called each time the generic word has to be updated (for example, when a method is added), and must not have any side effects.
+
+\subsubsection{Standard method combination}
+
+The following two lines are equivalent:
+\begin{verbatim}
+GENERIC: foo
+G: foo simple-combination ;
+\end{verbatim}
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{simple-combination}{simple-combination~( word -- quot )}
+}
+Perform simple method combination:
+\begin{itemize}
+\item the word dispatches on the top stack item,
+\item only the method with most specific class is invoked,
+\item if no suitable method is found, the generic word is called on the object's delegate
+\end{itemize}
+
+The next level of generality is the standard combination, which also invokes only the most specific method, but dispatches on an arbitrary stack element.
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{standard-combination}{standard-combination~( word picker -- quot )}
+}
+The \verb|picker| quotation must produce exactly one value on the stack. The picker is spliced into the returned quotation at appropriate points, making the generic word dispatch on the stack item produced by the picker. The simple combination is defined in terms of the standard combination as follows:
+\begin{verbatim}
+: simple-combination [ dup ] standard-combination ;
+\end{verbatim}
+Here is an example of a generic word a non-simple picker.
+\begin{verbatim}
+G: sbuf-append [ over ] standard-combination ;
+M: string sbuf-append swap nappend ;
+M: integer sbuf-append push ;
+\end{verbatim}
+Now it may be used as thus:
+\begin{alltt}
+  SBUF" " clone "my-sbuf" set
+  "hello" "my-sbuf" get sbuf-append
+  CHAR: \bs{}s "my-sbuf" get sbuf-append
+  "world" "my-sbuf" get sbuf-append
+  "my-sbuf" get .
+\textbf{SBUF" hello world"}
+\end{alltt}
+
+\subsubsection{Math method combination}
+\newcommand{\numupgradeglos}{
+\glossary{
+name=numerical upgrading,
+description={the stipulation that if one of the inputs to an arithmetic word is a \texttt{bignum} and the other is a \texttt{fixnum}, the latter is first coerced to a \texttt{bignum}, and if one of the inputs is a \texttt{float}, the other is coerced to a \texttt{float}}}}
+\numupgradeglos
+
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{math-combination}{math-combination~( word -- quot )}
+}
+The math method combination is used for binary operators such as \verb|+|, \verb|*|, and so on.
+A method can only be added to a generic word using the math combination if the method specializes on one of the below classes, or a union defined over one or more of the below classes:
+\begin{verbatim}
+fixnum
+bignum
+ratio
+float
+complex
+object
+\end{verbatim}
+The math combination performs numerical upgrading as described in \ref{number-protocol}.
+
+\subsubsection{Custom method combinations}
+
+Development of custom method combination requires a good understanding of higher-order programming (code that writes code) and Factor internals. Custom method combination has not been fully explored at this stage of Factor development, and this section can only give a brief sketch of what is involved.
+
+\wordtable{
+\vocabulary{generic}
+\ordinaryword{methods}{methods~( word -- alist )}
+}
+Outputs an association list mapping classes to method definition quotations. The association list is sorted with the least-specific method first. The task of the method combination is to transform this association list into an executable quotation.
+
 \part{Library reference}
 
 \chapter{Sequences}
@@ -1958,6 +2131,8 @@ An object that is an instance of a class implementing these generic words can be
 \genericword{length}{length ( seq -- n )}
 }
 Outputs the length of the sequence. All sequences support this operation.
+
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
 \wordtable{
 \vocabulary{sequences}
 \genericword{set-length}{set-length ( n seq -- )}
@@ -1969,6 +2144,8 @@ Resizes the sequence. Not all sequences can be resized.
 \genericword{nth}{nth ( n seq -- elt )}
 }
 Outputs the $n$th element of the sequence. Elements are numbered starting from 0, so the last element has an index one less than the length of the sequence. An exception should be thrown if an out-of-bounds index is accessed. All sequences support this operation, however with lists it has non-constant running time.
+
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
 
 \wordtable{
 \vocabulary{sequences}
@@ -1982,11 +2159,15 @@ Sets the $n$th element of the sequence. Storing beyond the end of a resizable se
 }
 Outputs a sequence with the same elements as the input sequence, but ``like'' the template sequence, meaning it either has the same class as the template sequence, or if the template sequence is a virtual sequence, the same class as the template sequence's underlying sequence. The default implementation does nothing.
 
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
+
 \wordtable{
 \vocabulary{sequences}
 \genericword{thaw}{thaw ( seq -- seq )}
 }
 Outputs a sequence with the same elements as the input sequence, but mutable. The default implementation converts the sequence into a vector.
+
+This generic word is flushable, so user-defined methods must satisfy the flushable contract (see \ref{declarations}).
 
 \section{Sequence operations}
 
@@ -2009,20 +2190,6 @@ Compares two sequences of integers lexicographically (dictionary order). The out
 \item[Zero] indicating that \texttt{s1} is equal to \texttt{s2}
 \item[Negative] indicating that \texttt{s1} precedes \texttt{s2}
 \end{description}
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{lexi>}{lexi> ( s1 s2 -- ?~)}
-
-}
-Tests if \texttt{s1} follows \texttt{s2}. Implemented as follows:
-\begin{verbatim}
-: lexi> ( s1 s1 -- ? ) lexi 0 > ;
-\end{verbatim}
-This is usually used to sort lists of strings:
-\begin{alltt}
-  [ "Curry" "Apple" "Veal" "Turkey" ] [ string> ] sort .
-[ "Apple" "Curry" "Turkey" "Veal" ]
-\end{alltt}
 
 \subsection{Iteration}\label{iteration}
 
@@ -2082,24 +2249,30 @@ Applies the quotation to each element yielding a new element, storing the new el
 \ordinaryword{2each}{2each ( s1 s2 quot -- )}
 \texttt{quot:~e1 e2 --}\\
 }
-Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}. Here is an example computing the dot product of two vectors:
-\begin{alltt}
-  0 \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * + ] 2each .
-\textbf{82}
-\end{alltt}
+Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, which must have the same length.
 
-In fact the dot product is encapsulated in the \verb|v.| word of the \verb|math| vocabulary:
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{2reduce}{2reduce ( seq1 seq2 ident quot -- result )}
+\texttt{quot:~previous elt1 elt2 -- next}\\
+}
+Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is \verb|ident|. For example, the \verb|v.| word computing the dot product of two vectors is implemented using \verb|2reduce|:
 \begin{verbatim}
-: v. ( v v -- n ) 0 -rot [ * + ] 2each ;
+: v. ( v v -- n ) 0 [ * + ] 2reduce ;
 \end{verbatim}
 See \ref{inner-product} for details.
+
+The \verb|2reduce| word has a trivial implementation:
+\begin{verbatim}
+: 2reduce >r -rot r> 2each ; inline
+\end{verbatim}
 
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{2map}{2map ( s1 s2 quot -- seq )}
 \texttt{quot:~e1 e2 -- element}\\
 }
-Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The new elements are collected into a sequence of the same class as \texttt{s1}. Here is an example computing the pair-wise product of the elements of two vectors:
+Applies the quotation to pairs of elements from \texttt{s1} and \texttt{s2}, yielding a new element. The two input sequences must have the same length. The new elements are collected into a sequence of the same class as \texttt{s1}. Here is an example computing the pair-wise product of the elements of two vectors:
 \begin{alltt}
   \tto 5 3 -2 \ttc \tto 8 16 3 \ttc [ * ] 2map .
 \textbf{\tto 40 48 -6 \ttc}
@@ -2249,9 +2422,9 @@ Outputs a list of subsequences taken between occurrences of \texttt{split} in \t
 }
 Splits the sequence into groups of $n$ elements and collects each group in a list. If the sequence length is not a multiple of $n$, the final subsequence in the list will be shorter than $n$.
 
-\subsection{Searching}\label{seq-searching}
+\subsection{Searching and sorting}\label{seq-searching}
 
-A set of words dealing with sequence element indices.
+A set of words dealing with sequence element indices, and for sorting sequences.
 
 \wordtable{
 \vocabulary{sequences}
@@ -2270,6 +2443,56 @@ Outputs the start index of a subsequence, or $-1$ if the subsequence does not oc
 \ordinaryword{subseq?}{subseq?~( s1 s2 -- ?~)}
 }
 Tests if \texttt{s2} contains \texttt{s1} as a subsequence.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{sort}{sort~( seq quot -- seq )}
+\texttt{quot:~e1 e2 -- -1/0/1}\\
+}
+Sorts the sequence by comparing each pair of elements with the quotation. The quotation should output one of the following values:
+\begin{description}
+\item[Positive] indicating that \texttt{e1} follows \texttt{e2}
+\item[Zero] indicating that \texttt{e1} is equal to \texttt{e2}
+\item[Negative] indicating that \texttt{e1} precedes \texttt{e2}
+\end{description}
+A new sorted sequence is output, and the given sequence is not modified.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{nsort}{nsort~( seq quot -- )}
+\texttt{quot:~e1 e2 -- -1/0/1}\\
+}
+Like \verb|sort|, except the sequence is sorted in-place. Giving an immutable sequence to this word will raise an exception.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{number-sort}{number-sort~( seq -- seq )}
+}
+Sorts a sequence of real numbers. Defined as follows:
+\begin{verbatim}
+: number-sort [ - ] sort ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{string-sort}{string-sort~( seq -- seq )}
+}
+Sorts a sequence of strings. Defined as follows:
+\begin{verbatim}
+: string-sort [ lexi ] sort ;
+\end{verbatim}
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{binsearch}{binsearch~( elt seq quot -- i )}
+}
+Perform a binary search for \verb|elt| on a sorted sequence. The quotation follows the same protocol as the comaprator quotation given to \verb|sort|, and the sequence must already be sorted under this quotation. The index of the greatest element that is equal to or less than \verb|elt| is output. If the sequence is empty, outputs $-1$.
+
+\wordtable{
+\vocabulary{sequences}
+\ordinaryword{binsearch*}{binsearch*~( elt seq quot -- elt )}
+}
+Like \verb|binsearch|, but outputs the element at that index, rather than the index itself. If the sequence is empty, outputs \verb|f|.
 
 \subsection{Slicing and reshaping}\label{reshaping}
 \glossary{name=slice,
@@ -2376,11 +2599,6 @@ Tests if every element of \texttt{s1} is equal to some element of \texttt{s2}.
 \ordinaryword{remove}{remove ( object seq -- seq )}
 }
 Outputs a new sequence containing all elements of the input sequence except those equal to the \texttt{object}.
-\wordtable{
-\vocabulary{sequences}
-\ordinaryword{remq}{remq ( object seq -- seq )}
-}
-Outputs a new sequence containing all elements of the \texttt{list} except \texttt{object}. Elements are compared by identity.
 \wordtable{
 \vocabulary{sequences}
 \ordinaryword{prune}{prune ( seq -- seq )}
@@ -2626,14 +2844,8 @@ Here is an example:
 
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{2cons}{2cons ( car1 car2 cdr1 cdr2 -- c1 c2 )}
-}
-Cons a pair of elements onto a pair of lists.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{2car}{2car ( c1 c2 -- car1 car2 )}
 \ordinaryword{2cdr}{2cdr ( c1 c2 -- cdr1 cdr2 )}
-\ordinaryword{2uncons}{2uncons ( c1 c2 -- car1 car2 cdr1 cdr2 )}
 }
 Deconstructs paired lists. Compare the stack effects with those of \verb|car|, \verb|cdr| and \verb|uncons|
 
@@ -2701,50 +2913,9 @@ Makes a list of one element.
 Makes a list of two elements.
 \wordtable{
 \vocabulary{lists}
-\ordinaryword{2unlist}{2unlist ( [ o1 o2 ] -- o1 o2 )}
-}
-Pushes the first two elements of a list.
-\wordtable{
-\vocabulary{lists}
 \ordinaryword{unique}{unique ( obj list -- list )}
 }
 If the list already contains an element equal to the object, do nothing, otherwise cons the object into the list.
-
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{sort}{sort~( list quot -- list )}
-\texttt{quot:~e1 e2 -- ?}\\
-}
-Sorts the list by comparing each pair of elements with the quotation. The quotation should output \texttt{t} if \texttt{e2} is to come before \texttt{e1} in the list. For example, to sort a list of numbers in ascending order, you can do the following:
-\begin{alltt}
-  [ 8 6 9 1 10 3 ] [ > ] sort .
-\textbf{[ 1 3 6 8 9 10 ]}
-\end{alltt}
-
-\subsection{Queues}
-
-The following set of words manages LIFO (last-in-first-out) queues. Queues are built up from cons cells, and hence are immutable; queue operations always return a new queue.
-
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{<queue>}{<queue> ( -- queue )}
-}
-Makes a new queue with no elements.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{queue-empty?}{queue-empty?~( queue -- ?~)}
-}
-Outputs \texttt{t} if the given queue does not contain any elements, \texttt{f} otherwise.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{deque}{deque ( queue -- element queue )}
-}
-Dequeues an element and outputs a new queue without that element.
-\wordtable{
-\vocabulary{lists}
-\ordinaryword{enque}{deque ( element queue -- queue )}
-}
-Enqueues an element and outputs a new queue.
 
 \section{Strings}\label{strings}
 
@@ -2832,43 +3003,68 @@ description={a variable binding policy where bindings established in a scope are
 \dynamicscopeglos
 \wordtable{
 \vocabulary{namespaces}
-\ordinaryword{make-list}{make-list ( quot -- list )}
-\ordinaryword{make-string}{make-string ( quot -- string )}
-\ordinaryword{make-sbuf}{make-sbuf ( quot -- string )}
-\ordinaryword{make-vector}{make-vector ( quot -- vector )}
+\ordinaryword{make}{make-list ( quot exemplar -- seq )}
 }
-Calls the quotation in a new \emph{dynamic scope}. The quotation and any words it calls can execute the \texttt{,} and \texttt{\%} words to add elements at the end of the sequence being constructed.
+Calls the quotation in a new \emph{dynamic scope}. The quotation and any words it calls can execute the \texttt{,} and \texttt{\%} words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as \verb|exemplar|.
 \wordtable{
 \vocabulary{namespaces}
 \ordinaryword{,}{,~( element -- )}
 }
-Adds the element to the end of the sequence being constructed by the innermost call to one of the above combinators.
-\wordtable{
-\vocabulary{namespaces}
-\ordinaryword{unique,}{unique,~( element -- )}
-}
-Adds the element to the end of the sequence being constructed as long as the sequence does not already have an equal element.
+Adds the element to the end of the sequence being constructed.
 \wordtable{
 \vocabulary{namespaces}
 \ordinaryword{\%}{\% ( sequence -- )}
 }
-Appends the subsequence to the end of the sequence being constructed.
+Appends the given sequence to the end of the sequence being constructed.
 
 Here is an example of sequence construction:
 \begin{alltt}
-  : silly [ [ dup , ] repeat ] make-vector , ;
-  [ 4 [ silly ] each ] make-list .
+  : silly [ [ dup , ] repeat ] \tto \ttc make , ;
+  [ 4 [ silly ] each ] [ ] make .
 \textbf{[ \tto \ttc \tto 0 \ttc \tto 0 1 \ttc \tto 0 1 2 \ttc ]}
 \end{alltt}
 
-Note that the sequence construction combinators will capture any variables set inside the quotation, due to the dynamic scoping behavior. These combinators are actually implemented using variables. See \ref{namespaces}.
+Note that \verb|make| will capture any variables set inside the quotation, due to dynamic scoping. See \ref{namespaces}.
 
-\chapter{Mappings}
+\chapter{Collections}
 
 \glossary{name=mapping,
 description={an unordered collection of elements, accessed by key. Examples include association lists and hashtables}}
 
-Mappings associate keys with values. The two classes of mappings in the Factor library are association lists and hashtables.
+Apart from sequences, there are two types of collections in Factor:
+\begin{itemize}
+\item queues, which implement first-in-first-out semantics,
+\item mappings, which associate keys with values.
+\end{itemize}
+
+\section{Queues}
+
+The following set of words manages LIFO (last-in-first-out) queues.
+
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{<queue>}{<queue> ( -- queue )}
+}
+Makes a new queue with no elements.
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{queue-empty?}{queue-empty?~( queue -- ?~)}
+}
+Outputs \texttt{t} if the given queue does not contain any elements, \texttt{f} otherwise.
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{deque}{deque ( queue -- element )}
+}
+Dequeues an element. An exception is thrown if the queue is empty.
+\wordtable{
+\vocabulary{lists}
+\ordinaryword{enque}{deque ( element queue -- )}
+}
+Enqueues an element.
+
+\section{Mappings}
+
+The two classes of mappings in the Factor library are association lists and hashtables.
 
 \begin{tabular}[t]{l|c|c|c|l}
 Class&Mutable&Ordered&Lookup&Primary purpose\\
@@ -2879,7 +3075,7 @@ Class&Mutable&Ordered&Lookup&Primary purpose\\
 
 It might be tempting to just always use hashtables, however for very small mappings, association lists are just as efficient, and are easier to work with since the entire set of list words can be used with them.
 
-\section{Association lists}
+\subsection{Association lists}
 
 \glossary{name=association list,
 description={a list of pairs, where the car of each pair is a key and the cdr is the value associated with that key}}
@@ -2932,7 +3128,7 @@ Outputs a new association list which does not have any key/value pairs with the 
 \end{center}
 \end{figure}
 
-\section{Hashtables}\label{hashtables}
+\subsection{Hashtables}\label{hashtables}
 
 \hashglos
 \glossary{name=bucket,
@@ -2950,8 +3146,9 @@ A hashtable sorts key/value pairs into buckets using a hashing function. The num
 }
 Outputs the hashcode of the object. The contract of this generic word is as follows:
 \begin{itemize}
-\item The hashcode must be a fixnum (\ref{integers})\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.}
-\item If two objects are equal under \texttt{=}, they must have the same hashcode.
+\item the hashcode must be a fixnum (\ref{integers})\footnote{Strictly speaking, returning a bignum will not fail, however it will result in lower overall performance since the compiler will no longer make type assumptions when compiling callers of \texttt{hashcode}.},
+\item if two objects are equal under \texttt{=}, they must have the same hashcode,
+\item the word must not have any side effects
 \end{itemize}
 If mutable objects are used as hashtable keys, they must not be mutated in such a way that their hashcode changes. Doing so will violate bucket sorting invariants and result in undefined behavior.
 
@@ -3065,24 +3262,7 @@ Builds lists of keys and values stored in the hashtable.
 }
 Outputs a vector of association lists, where each association list contains the key/value pairs in a certain bucket. Useful for debugging hashcode distribution.
 
-\subsection{Hashtable construction}
-
-A facility analogous to sequence construction (\ref{make-seq}) exists for hashtables.
-
-\wordtable{
-\vocabulary{hashtables}
-\ordinaryword{make-hash}{make-hash ( quot -- hash )}
-}
-Calls the quotation in a new dynamic scope. The quotation and any words it calls can execute the \texttt{hash,} word to add key/value pairs to the hashtable being constructed.
-\wordtable{
-\vocabulary{hashtables}
-\ordinaryword{hash,}{hash,~( value key -- old )}
-}
-Adds a key/value pair to the hashtable currently being constructed. Outputs the previous value.
-
-As with sequence construction, care must be taken to mind the effects of dynamic scoping on variable assignment performed by the quotation. Details are in \ref{namespaces}.
-
-\section{Variables and namespaces}\label{namespaces}
+\subsection{Variables and namespaces}\label{namespaces}
 
 A variable is an entry in a hashtable of bindings, with the hashtable being implicit rather than passed on the stack. These hashtables are termed \emph{namespaces}. Nesting of scopes is implemented with a search order on namespaces, defined by a \emph{name stack}. Since namespaces are just hashtables, any object can be used as a variable, however by convention, variables are keyed by symbols (\ref{symbols}). 
 
@@ -3153,18 +3333,22 @@ outer
 \vocabulary{namespaces}
 \ordinaryword{with-scope}{with-scope ( quot -- )}
 }
-Calls the quotation in a new dynamic scope. Any variables set by the quotation are discarded when it returns.
+Calls the quotation in a new namespace. Any variables set by the quotation are discarded when it returns.
 \wordtable{
 \vocabulary{namespaces}
-\ordinaryword{<namespace>}{<namespace> ( -- ns )}
+\ordinaryword{make-hash}{make-hash ( quot -- hash )}
 }
-Creates a hashtable with a certain default size.
+Calls the quotation in a new namespace, and outputs this namespace when the quotation returns. Useful for quickly building hashtables; for example:
+\begin{alltt}
+  [ 1 "one" set 2 "two" set ] make-hash .
+\textbf{\tto\tto [[ "one" 1 ]] [[ "two" 2 ]] \ttc\ttc}
+\end{alltt}
+
 \wordtable{
 \vocabulary{namespaces}
 \ordinaryword{bind}{bind ( ns quot -- )}
-\ordinaryword{extend}{extend ( ns quot -- namespace )}
 }
-Calls the quotation in the dynamic scope of \texttt{ns}. When variables are looked up by the quotation, \texttt{ns} is checked first, and setting variables in the quotation stores them in \texttt{ns}. The \texttt{extend} word places the namespace back on the data stack when the quotation returns.
+Calls the quotation in the dynamic scope of \texttt{ns}. When variables are looked up by the quotation, \texttt{ns} is checked first, and setting variables in the quotation stores them in \texttt{ns}.
 \wordtable{
 \vocabulary{namespaces}
 \ordinaryword{namespace}{namespace ( -- ns )}
@@ -3206,9 +3390,7 @@ Factor attempts to preserve natural mathematical semantics for numbers. Multiply
 
 \section{Number protocol}\label{number-protocol}
 
-\glossary{
-name=numerical upgrading,
-description={the stipulation that if one of the inputs to an arithmetic word is a \texttt{bignum} and the other is a \texttt{fixnum}, the latter is first coerced to a \texttt{bignum}, and if one of the inputs is a \texttt{float}, the other is coerced to a \texttt{float}}}
+\numupgradeglos
 
 The following usual operations are supported by all numbers.
 
@@ -4221,9 +4403,9 @@ M: sbuf stream-format rot nappend drop ;
 \section{Reading and writing binary data}
 
 \glossary{name=big endian,
-description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, Alpha and ARM processors}}
+description={a representation of an integer as a sequence of bytes, ordered from most significant to least significant. This is the native byte ordering for PowerPC, SPARC, and ARM processors}}
 \glossary{name=little endian,
-description={a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86 and x86-64 processors}}
+description={a representation of an integer as a sequence of bytes, ordered from least significant to most significant. This is the native byte ordering for x86, x86-64 and Alpha processors}}
 The core stream words read and write strings. Packed binary integers can be read and written by converting to and from sequences of bytes. Floating point numbers can be read and written by converting them into a their bitwise integer representation (\ref{float-bits}).
 
 There are two ways to order the bytes making up an integer; \emph{little endian} byte order outputs the least significant byte first, and the most significant byte last, whereas \emph{big endian} is the other way around.
@@ -6128,7 +6310,7 @@ The walker lets you step through the execution of a qotation. When a compound de
 There are two ways to use the walker. First of all, you can call the \texttt{walk} word explicitly, giving it a quotation:
 
 \begin{alltt}
-  [ [ 10 [ dup , ] repeat ] make-list ] walk
+  [ [ 10 [ dup , ] repeat ] [ ] make ] walk
 \textbf{\&s \&r show stepper stacks.
 \&get ( var -- value ) inspects the stepper namestack.
 step -- single step over
