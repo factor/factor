@@ -5528,11 +5528,45 @@ Character&Entity\\
 
 \chapter{Development tools}
 
+This chapter covers various features and library words that are not used directly by user code, but are usually invoked interactively at the listener for development and testing.
+
 \section{Command line usage}
 
+A few command line parameters are supported by the Factor runtime:
+\begin{description}
+\item[\texttt{+D\emph{n}}] Datastack size, kilobytes
+\item[\texttt{+C\emph{n}}] Callstack size, kilobytes
+\item[\texttt{+G\emph{n}}] Number of generations, must be $>= 2$
+\item[\texttt{+Y\emph{n}}] Size of $n-1$ youngest generations, megabytes
+\item[\texttt{+A\emph{n}}] Size of tenured and semi-spaces, megabytes
+\item[\texttt{+X\emph{n}}] Code heap size, megabytes
+\item[\texttt{+L\emph{n}}] Literal table size, kilobytes
+\end{description}
+
+All other command line parameters are handled by the library:
+\begin{description}
+\item[\texttt{-\emph{foo}}] Sets the object path \verb|"foo"| to \verb|t|
+\item[\texttt{-no-\emph{foo}}] Sets the object path \verb|"foo"| to \verb|f|
+\item[\texttt{\emph{foo}=\emph{bar}}] Sets the global variable \verb|"foo"| to \verb|"bar"|
+\end{description}
+
+An object path is a colon-delimited set of strings, where each string is a namespace nested in the one before it, and the first one resides in the global namespace. The following command line switches are supported by the library; others can be handled by user code:
+\begin{description}
+\item[\texttt{-libraries:\emph{foo}:name=\emph{bar}}]
+\item[\texttt{-libraries:\emph{foo}:abi=\emph{bar}}] See \ref{native-libs}
+\item[\texttt{-shell=\emph{foo}}] \verb|foo| is one of the following:
+\begin{description}
+\item[\texttt{tty}] Starts the standard terminal-based listener. Not supported on Windows; the default on Unix.
+\item[\texttt{ui}] Starts the graphical user interface (see \ref{ui}). Default on Windows.
+\item[\texttt{telnet}] Starts the telnet server..
+\end{description}
+\item[\texttt{-telnetd-port}] Port number for \verb|telnet| shell; default is 9999
+\item[\texttt{-no-user-init}] Inhibit loading \verb|.factor-rc|
+
+\end{description}
+
 On startup, Factor reads the \texttt{.factor-rc} file from your home directory. You can put
-any quick definitions you want available at the listener there. To avoid loading this
-file, pass the \texttt{-no-user-init} command line switch. Another way to have a set of definitions available at all times is to save a custom image (see \ref{images}).
+any quick definitions you want available at the listener there. Another way to have a set of definitions available at all times is to save a custom image (see \ref{images}).
 
 \section{The listener}\label{listener}
 
@@ -5739,6 +5773,56 @@ return value of \texttt{usage} using \texttt{.}:
 \textbf{[ handle-gesture user-input ]}
 \end{alltt}
 
+\section{The inspector}
+
+The inspector allows objects to be browsed and inspected in a convenient fashion.
+\wordtable{
+\vocabulary{inspector}
+\ordinaryword{inspect}{inspect ( object -- )}
+}
+Starts the inspector if it is not already running, and prints a short blurb followed by all slot values of the object.
+\begin{alltt}
+  \tto "a" "b" "c" \ttc inspect
+\textbf{Object inspector.
+inspecting ( -- obj ) push current object
+go ( n -- ) inspect nth slot
+up -- return to previous object
+refs -- inspect references to current object
+bye -- exit inspector
+
+You are looking at an instance of the vector class:
+  \tto "a" "b" "c" \ttc 
+It takes up 16 bytes of memory.
+0 | "a" 
+1 | "b" 
+2 | "c" 
+inspector}
+\end{alltt}
+
+The inspector changes the listener prompt to \verb|inspector| to remind you that several additional features are now operational.
+\wordtable{
+\vocabulary{inspector}
+\ordinaryword{inspecting}{inspecting ( -- object )}
+}
+Pushes the currently inspected object on the data stack.
+\wordtable{
+\vocabulary{inspector}
+\ordinaryword{go}{go ( n -- )}
+}
+Inspects the $n$th slot value of the currently inspected object.
+\wordtable{
+\vocabulary{inspector}
+\ordinaryword{up}{up ( -- )}
+}
+Returns to the previous object.
+\wordtable{
+\vocabulary{inspector}
+\ordinaryword{refs}{refs ( -- )}
+}
+Inspects a list of objects that refer to the current object. This uses the heap reflection facility (see \ref{heap-reflection}).
+
+To exit the inspector, issue the \verb|bye| word.
+
 \section{The walker}
 
 The walker lets you step through the execution of a qotation. When a compound definition is reached, you can either keep walking inside the definition, or execute it in one step. The stacks can be inspected at each stage.
@@ -5827,7 +5911,7 @@ Marks the word for profiling. This modifies the word definition so that when the
 \textbf{1000}
 \end{alltt}
 
-\section{Exploring memory usage}
+\section{Exploring memory usage}\label{heap-reflection}
 
 Factor supports heap introspection. You can find all objects in the heap that match a certain predicate using the \texttt{instances} word. For example, if you suspect a resource leak, you can find all I/O ports as follows:
 
@@ -5997,7 +6081,7 @@ Factor's alien inteface provides a means of directly calling native libraries wr
 wrappers to write, other than having to specify the return type and parameter types for
 the functions you wish to call.
 
-\section{Loading native libraries}
+\section{Loading native libraries}\label{native-libs}
 
 A native library must be made available to Factor under a logical name before use. This is done via command line parameters, or the \verb|add-library| word.
 
