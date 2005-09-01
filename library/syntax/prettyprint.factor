@@ -117,9 +117,12 @@ C: newline ( -- section )
 M: newline pprint-section* ( newline -- )
     section-start fresh-line ;
 
+: advance ( section -- )
+    section-start last-newline get = [ " " write ] unless ;
+
 M: block pprint-section* ( block -- )
     f swap block-sections [
-        over [ " " write ] when pprint-section drop t
+        over [ dup advance ] when pprint-section drop t
     ] each drop ;
 
 : <block ( -- ) <block> pprinter get pprinter-stack push ;
