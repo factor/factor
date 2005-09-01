@@ -106,6 +106,10 @@ SYMBOL: building
     #! Append to the sequence being built with make-seq.
     building get swap nappend ;
 
+: # ( n -- )
+    #! Only useful with "" make.
+    number>string % ;
+
 ! Building hashtables, and computing a transitive closure.
 SYMBOL: hash-buffer
 

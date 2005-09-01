@@ -113,13 +113,13 @@ memory parser sequences strings vectors words prettyprint ;
 \ (fraction>) t "flushable" set-word-prop
 \ (fraction>) t "foldable" set-word-prop
 
-\ str>float [ [ string ] [ float ] ] "infer-effect" set-word-prop
-\ str>float t "flushable" set-word-prop
-\ str>float t "foldable" set-word-prop
+\ string>float [ [ string ] [ float ] ] "infer-effect" set-word-prop
+\ string>float t "flushable" set-word-prop
+\ string>float t "foldable" set-word-prop
 
-\ (unparse-float) [ [ float ] [ string ] ] "infer-effect" set-word-prop
-\ (unparse-float) t "flushable" set-word-prop
-\ (unparse-float) t "foldable" set-word-prop
+\ float>string [ [ float ] [ string ] ] "infer-effect" set-word-prop
+\ float>string t "flushable" set-word-prop
+\ float>string t "foldable" set-word-prop
 
 \ float>bits [ [ real ] [ integer ] ] "infer-effect" set-word-prop
 \ float>bits t "flushable" set-word-prop

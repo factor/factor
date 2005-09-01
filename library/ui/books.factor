@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math matrices sequences ;
+IN: gadgets-books
+USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
+generic kernel lists math matrices sequences ;
 
 TUPLE: book page ;
 
@@ -46,7 +47,7 @@ TUPLE: book-browser book ;
         { ">"  [ find-book next-page  ] }
         { ">|" [ find-book last-page  ] }
     ] [ 2unseq >r <label> r> <button> ] map
-    0 <shelf> [ add-gadgets ] keep ;
+    <shelf> [ add-gadgets ] keep ;
 
 C: book-browser ( book -- gadget )
     <frame> over set-delegate

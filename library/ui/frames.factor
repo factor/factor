@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math namespaces sequences vectors ;
+IN: gadgets-layouts
+USING: gadgets generic kernel lists math namespaces sequences
+vectors ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.

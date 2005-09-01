@@ -3,8 +3,10 @@
 IN: help
 DEFER: <tutorial-button>
 
-IN: gadgets
-USING: generic help io kernel listener lists math namespaces
+IN: gadgets-listener
+USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
+gadgets-presentations gadgets-scrolling gadgets-splitters
+generic help io kernel listener lists math namespaces
 prettyprint sdl sequences shells styles threads words ;
 
 SYMBOL: datastack-display
@@ -25,14 +27,11 @@ TUPLE: display title pane ;
 C: display ( -- display )
     <frame> over set-delegate
     "" <display-title> over add-display-title
-    0 <pile> 2dup swap set-display-pane
+    <pile> 2dup swap set-display-pane
     <scroller> over add-center ;
 
 : make-presentations ( seq -- seq )
-    [
-        dup presented swons unit swap unparse-short
-        <presentation>
-    ] map ;
+    [ <object-presentation> ] map ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep

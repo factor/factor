@@ -30,7 +30,7 @@ M: general-list tutorial-line
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map
-    1 <pile> [ add-gadgets ] keep
+    <pile> dup 1 over set-pack-fill [ add-gadgets ] keep
     empty-border ;
 
 : tutorial-pages

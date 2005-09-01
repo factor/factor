@@ -1,28 +1,25 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: io kernel namespaces parser sequences strings ;
+USING: io kernel math namespaces parser sequences strings ;
 
 ! A simple logging framework.
 SYMBOL: log-stream
 
-: log ( msg -- )
+: log-message ( msg -- )
     #! Log a message to the log stream, either stdio or a file.
-    log-stream get [
-        [ stream-print ] keep stream-flush
-    ] [
-        print flush
-    ] ifte* ;
+    log-stream get [ stdio get ] unless*
+    [ stream-print ] keep stream-flush ;
 
-: log-error ( error -- ) "Error: " swap append log ;
+: log-error ( error -- ) "Error: " swap append log-message ;
 
 : log-client ( client-stream -- )
     [
         "Accepted connection from " %
         dup client-stream-host %
         CHAR: : ,
-        client-stream-port number>string % 
-    ] "" make log ;
+        client-stream-port # 
+    ] "" make log-message ;
 
 : with-log-file ( file quot -- )
     #! Calls to log inside quot will output to a file.

@@ -2545,21 +2545,6 @@ Tests if \texttt{s1} starts or ends with \texttt{s1}. If \texttt{s1} is longer t
 
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{cut}{cut ( seq n -- s1 s2 )}
-}
-Outputs a pair of sequences that equal the original sequence when appended. The first sequence has length $n$, the second has length $l-n$ where $l$ is the length of the input.
-\begin{alltt}
-  "Hello world" 5 cut .s
-\textbf{" world"
-"Hello"}
-\end{alltt}
-This word has a simple definition:
-\begin{verbatim}
-: cut ( n seq -- seq seq )
-    [ head ] 2keep tail ;
-\end{verbatim}
-\wordtable{
-\vocabulary{sequences}
 \ordinaryword{?head}{?head~( s1 s2 -- seq ?~)}
 \ordinaryword{?tail}{?tail~( s1 s2 -- seq ?~)}
 }

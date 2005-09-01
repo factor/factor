@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel math matrices namespaces sdl sequences
-strings styles threads vectors ;
+IN: gadgets-editors
+USING: gadgets gadgets-labels gadgets-scrolling generic kernel
+math namespaces sdl sequences strings styles threads vectors ;
 
 ! A blinking caret
 TUPLE: caret ;

@@ -20,38 +20,36 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
     #! Sort a list of words by name.
     [ swap word-name swap word-name lexi ] sort ;
 
+: uses ( word -- uses )
+    #! Outputs a list of words that this word directly calls.
+    [
+        dup word-def [
+            dup word? [ 2dup eq? [ dup , ] unless ] when 2drop
+        ] tree-each-with
+    ] { } make prune ;
+
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.
 SYMBOL: crossref
 
-: (add-crossref)
-    dup word? [
-        crossref get [ dupd nest set-hash ] bind
-    ] [
-        2drop
-    ] ifte ;
+: (add-crossref) crossref get [ dupd nest set-hash ] bind ;
 
 : add-crossref ( word -- )
     #! Marks each word in the quotation as being a dependency
     #! of the word.
     crossref get [
-        dup word-def [ (add-crossref) ] tree-each-with
+        dup uses [ (add-crossref) ] each-with
     ] [
         drop
     ] ifte ;
 
-: (remove-crossref)
-    dup word? [
-        crossref get [ nest remove-hash ] bind
-    ] [
-        2drop
-    ] ifte ;
+: (remove-crossref) crossref get [ nest remove-hash ] bind ;
 
 : remove-crossref ( word -- )
     #! Marks each word in the quotation as not being a
     #! dependency of the word.
     crossref get [
-        dup word-def [ (remove-crossref) ] tree-each-with
+        dup uses [ (remove-crossref) ] each-with
     ] [
         drop
     ] ifte ;
@@ -126,3 +124,12 @@ M: object literalize ;
 M: word literalize <wrapper> ;
 
 M: wrapper literalize <wrapper> ;
+
+: gensym ( -- word )
+    #! Return a word that is distinct from every other word, and
+    #! is not contained in any vocabulary.
+    "G:"
+    global [ \ gensym dup inc get ] bind
+    number>string append f <word> ;
+
+0 \ gensym global set-hash

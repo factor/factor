@@ -21,10 +21,7 @@ M: assert error.
     #! Evaluates the given code and prints the time taken to
     #! execute it.
     millis >r gc-time >r call gc-time r> - millis r> -
-    [
-        number>string % " ms run / " %
-        number>string % " ms GC time" %
-    ] "" make print ;
+    [ # " ms run / " % # " ms GC time" % ] "" make print ;
 
 : unit-test ( output input -- )
     [

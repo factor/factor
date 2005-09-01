@@ -2,13 +2,14 @@
 - out of memory error when printing global namespace
 - removing unneeded #label
 - pprint trailing space regression
+- finish scrollbars
+- fix up the min thumb size hack
 
 + ui:
 
-- fix up the min thumb size hack
+- long lines of text fail in draw-surface
 - only redraw dirty gadgets
 - faster mouse tracking
-
 - off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
@@ -66,8 +67,8 @@
 - the invalid recursion form case needs to be fixed, for inlines too
 - #jump-f #jump-f-label
 - re-introduce #target-label => #target optimization
-- recursion is iffy; no base case needs to throw an error, and if the
-  stack at the recursive call doesn't match up, throw an error
+- recursion is iffy; if the stack at the recursive call doesn't match
+  up, throw an error
 
 + kernel:
 

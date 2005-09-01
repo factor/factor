@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic hashtables io kernel lists math namespaces sdl
-sequences styles vectors ;
+IN: gadgets-labels
+USING: gadgets generic hashtables io kernel lists math
+namespaces sdl sequences styles vectors ;
 
 ! A label gadget draws a string.
 TUPLE: label text ;

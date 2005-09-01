@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: errors generic hashtables kernel lists math matrices
-namespaces sdl sequences ;
+IN: gadgets-layouts
+USING: errors gadgets generic hashtables kernel lists math
+matrices namespaces sdl sequences ;
 
 : layout ( gadget -- )
     #! Set the gadget's width and height to its preferred width
@@ -26,36 +26,24 @@ TUPLE: pack align fill vector ;
     >r >r pack-vector r> r> [ pick set-axis ] 2map nip ;
 
 : packed-dim-2 ( gadget sizes -- list )
-    [
-        over rect-dim { 1 1 1 } vmax over v-
-        rot pack-fill v*n v+
-    ] map-with ;
-
-: (packed-dims) ( gadget sizes -- seq )
-    2dup packed-dim-2 swap orient ;
+    [ over rect-dim over v- rot pack-fill v*n v+ ] map-with ;
 
 : packed-dims ( gadget sizes -- seq )
-    over gadget-children >r (packed-dims) r>
-    [ set-gadget-dim ] 2each ;
+    2dup packed-dim-2 swap orient ;
 
 : packed-loc-1 ( sizes -- seq )
     { 0 0 0 } [ v+ ] accumulate ;
 
 : packed-loc-2 ( gadget sizes -- seq )
-    >r dup rect-dim { 1 1 1 } vmax over r>
-    packed-dim-2 [ v- ] map-with
-    >r dup pack-align swap rect-dim { 1 1 1 } vmax r>
-    [ >r 2dup r> v- n*v ] map 2nip ;
+    [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
 
-: (packed-locs) ( gadget sizes -- seq )
+: packed-locs ( gadget sizes -- seq )
     dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
 
-: packed-locs ( gadget sizes -- )
-    over gadget-children >r (packed-locs) r>
-    [ set-rect-loc ] 2each ;
-
 : packed-layout ( gadget sizes -- )
-    2dup packed-locs packed-dims ;
+    over gadget-children
+    >r dupd packed-dims r> 2dup [ set-gadget-dim ] 2each
+    >r packed-locs r> [ set-rect-loc ] 2each ;
 
 C: pack ( fill vector -- pack )
     #! gap: between each child.
@@ -65,9 +53,9 @@ C: pack ( fill vector -- pack )
     [ set-pack-fill ] keep
     0 over set-pack-align ;
 
-: <pile> ( fill -- pack ) { 0 1 0 } <pack> ;
+: <pile> ( -- pack ) { 0 1 0 } <pack> ;
 
-: <shelf> ( fill -- pack ) { 1 0 0 } <pack> ;
+: <shelf> ( -- pack ) { 1 0 0 } <pack> ;
 
 M: pack pref-dim ( pack -- dim )
     [
@@ -94,7 +82,8 @@ TUPLE: stack ;
 
 C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
-    1 { 0 0 1 } <pack> over set-delegate ;
+    { 0 0 1 } <pack> over set-delegate
+    1 over set-pack-fill ;
 
 M: stack children-on ( point stack -- gadget )
     nip gadget-children ;

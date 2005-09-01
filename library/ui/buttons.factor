@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic io kernel lists math namespaces prettyprint sdl
-sequences sequences styles threads ;
+IN: gadgets-buttons
+USING: gadgets gadgets-borders generic io kernel lists math
+namespaces sdl sequences sequences styles threads ;
 
 : button-down? ( n -- ? ) hand hand-buttons member? ;
 

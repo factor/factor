@@ -54,6 +54,7 @@ sequences io vectors words ;
         "/library/collections/queues.factor"
 
         "/library/math/matrices.factor"
+        "/library/math/parse-numbers.factor"
 
         "/library/words.factor"
         "/library/vocabularies.factor"
@@ -71,7 +72,6 @@ sequences io vectors words ;
         "/library/io/directories.factor"
         "/library/io/binary.factor"
 
-        "/library/syntax/parse-numbers.factor"
         "/library/syntax/parse-words.factor"
         "/library/syntax/parse-errors.factor"
         "/library/syntax/parser.factor"
@@ -95,20 +95,17 @@ sequences io vectors words ;
 
         "/library/io/logging.factor"
 
-        "/library/tools/gensym.factor"
         "/library/tools/interpreter.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
-        "/library/tools/word-tools.factor"
         "/library/tools/walker.factor"
         "/library/tools/jedit.factor"
-
-        "/library/test/test.factor"
-
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
 
+        "/library/test/test.factor"
+        
         "/library/syntax/see.factor"
 
         "/library/threads.factor"

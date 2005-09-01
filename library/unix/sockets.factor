@@ -81,10 +81,10 @@ C: accept-task ( port -- task )
 
 : inet-ntoa ( n -- str )
     ntohl [
-        dup -24 shift HEX: ff bitand number>string % CHAR: . ,
-        dup -16 shift HEX: ff bitand number>string % CHAR: . ,
-        dup -8  shift HEX: ff bitand number>string % CHAR: . ,
-                      HEX: ff bitand number>string %
+        dup -24 shift HEX: ff bitand # CHAR: . ,
+        dup -16 shift HEX: ff bitand # CHAR: . ,
+        dup -8  shift HEX: ff bitand # CHAR: . ,
+                      HEX: ff bitand #
     ] "" make ;
 
 : do-accept ( port sockaddr fd -- )

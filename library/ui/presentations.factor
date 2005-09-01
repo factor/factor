@@ -1,9 +1,10 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: compiler generic hashtables inference inspector io jedit
-kernel lists memory namespaces parser prettyprint sequences
-styles vectors words ;
+IN: gadgets-presentations
+USING: compiler gadgets gadgets-buttons gadgets-labels
+gadgets-menus gadgets-panes generic hashtables inference
+inspector io jedit kernel lists memory namespaces parser
+prettyprint sequences styles vectors words ;
 
 SYMBOL: commands
 
@@ -43,6 +44,9 @@ SYMBOL: commands
     gadget pick assoc dup
     [ 2nip ] [ drop <styled-label> init-commands ] ifte ;
 
+: <object-presentation> ( object -- gadget )
+    dup presented swons unit swap unparse-short <presentation> ;
+
 : gadget. ( gadget -- )
     gadget swons unit
     "This stream does not support live gadgets"
@@ -62,7 +66,6 @@ SYMBOL: commands
 [ compound? ] "Annotate with breakpoint" [ break ] define-command
 [ compound? ] "Annotate with profiling" [ profile ] define-command
 [ word? ] "Compile" [ recompile ] define-command
-[ word? ] "Decompile" [ decompile ] define-command
 [ word? ] "Show stack effect" [ unit infer . ] define-command
 [ word? ] "Show dataflow IR" [ word-def t dataflow. ] define-command
 [ word? ] "Show linear IR" [ precompile ] define-command

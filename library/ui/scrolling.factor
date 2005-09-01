@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math matrices namespaces sequences
-threads vectors styles ;
+IN: gadgets-scrolling
+USING: gadgets gadgets-layouts generic kernel lists math
+namespaces sequences threads vectors styles ;
 
 ! A viewport can be scrolled.
 TUPLE: viewport ;
@@ -83,5 +83,6 @@ M: scroller focusable-child* ( scroller -- viewport )
 M: scroller layout* ( scroller -- )
     dup scroller-bottom? [
         f over set-scroller-bottom?
-        dup dup scroller-viewport viewport-dim scroll
+        dup dup scroller-viewport viewport-dim
+        { 0 1 0 } v* scroll
     ] when delegate layout* ;

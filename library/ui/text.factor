@@ -6,12 +6,10 @@ sequences strings styles ;
 
 : draw-surface ( x y surface -- )
     surface get SDL_UnlockSurface
-    [
-        [ surface-rect ] keep swap surface get 0 0
-    ] keep surface-rect swap rot SDL_UpperBlit drop
-    surface get dup must-lock-surface? [
-        SDL_LockSurface
-    ] when drop ;
+    [ [ surface-rect ] keep swap surface get 0 0 ] keep
+    surface-rect swap rot SDL_UpperBlit drop
+    surface get dup must-lock-surface?
+    [ SDL_LockSurface ] when drop ;
 
 : filter-nulls ( str -- str )
     [ dup 0 = [ drop CHAR: \s ] when ] map ;

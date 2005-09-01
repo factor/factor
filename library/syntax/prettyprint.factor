@@ -11,7 +11,6 @@ SYMBOL: last-newline
 SYMBOL: recursion-check
 SYMBOL: line-count
 SYMBOL: end-printing
-SYMBOL: newline-ok?
 
 ! Configuration
 SYMBOL: tab-size
@@ -30,7 +29,6 @@ global [
     0 last-newline set
     0 line-count set
     string-limit off
-    newline-ok? off
 ] bind
 
 TUPLE: pprinter stack ;
@@ -48,9 +46,6 @@ C: section ( length -- section )
 : section-fits? ( section -- ? )
     section-end last-newline get - indent get + margin get <= ;
 
-: insert-newline? ( section -- ? )
-    section-fits? not newline-ok? and ;
-
 : line-limit? ( -- ? )
     line-limit get dup [ line-count get <= ] when ;
 
@@ -58,10 +53,14 @@ C: section ( length -- section )
 
 : fresh-line ( n -- )
     #! n is current column position.
-    last-newline set
-    line-count inc
-    line-limit? [ "..." write end-printing get call ] when
-    "\n" write do-indent ;
+    dup last-newline get = [
+        drop
+    ] [
+        last-newline set
+        line-count inc
+        line-limit? [ "..." write end-printing get call ] when
+        "\n" write do-indent
+    ] ifte ;
 
 TUPLE: text string style ;
 
@@ -71,7 +70,7 @@ C: text ( string style -- section )
     [ set-text-string ] keep ;
 
 M: text pprint-section*
-    dup text-string swap text-style format  " " write ;
+    dup text-string swap text-style format " " write ;
 
 TUPLE: block sections ;
 
@@ -107,8 +106,8 @@ C: block ( -- block )
     [ section-end fresh-line ] [ drop ] ifte ;
 
 : pprint-section ( section -- )
-    dup insert-newline? newline-ok? on
-    [ inset-section ] [ pprint-section* ] ifte ;
+    dup section-fits?
+    [ pprint-section* ] [ inset-section ] ifte ;
 
 TUPLE: newline ;
 
@@ -116,7 +115,7 @@ C: newline ( -- section )
     0 <section> over set-delegate ;
 
 M: newline pprint-section* ( newline -- )
-    section-start fresh-line newline-ok? off ;
+    section-start fresh-line ;
 
 M: block pprint-section* ( block -- )
     block-sections [ pprint-section ] each ;

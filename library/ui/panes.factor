@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic hashtables io kernel line-editor listener lists
+IN: gadgets-panes
+USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
+gadgets-scrolling generic hashtables io kernel line-editor lists
 math namespaces prettyprint sequences strings styles threads
 vectors ;
 
@@ -19,7 +20,7 @@ TUPLE: pane output active current input continuation ;
 : add-input 2dup set-pane-input add-gadget ;
 
 : <active-line> ( input current -- line )
-    2vector 0 <shelf> [ add-gadgets ] keep ;
+    2vector <shelf> [ add-gadgets ] keep ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent
@@ -53,6 +54,9 @@ SYMBOL: structured-input
 : pane-return ( pane -- )
     [ pane-input editor-commit ] keep
     2dup stream-print pane-eval ;
+
+: pane-clear ( pane -- )
+    dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
     [
@@ -60,21 +64,19 @@ SYMBOL: structured-input
         [[ [ "RETURN" ] [ pane-return ] ]]
         [[ [ "UP" ] [ pane-input [ history-prev ] with-editor ] ]]
         [[ [ "DOWN" ] [ pane-input [ history-next ] with-editor ] ]]
+        [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
     ] swap add-actions ;
 
 C: pane ( -- pane )
-    0 <pile> over set-delegate
-    0 <pile> <incremental> over add-output
-    0 <shelf> over set-pane-current
+    <pile> over set-delegate
+    <pile> <incremental> over add-output
+    <shelf> over set-pane-current
     "" <editor> over set-pane-input
     dup init-active-line
     dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )
     pane-input ;
-
-: pane-clear ( pane -- )
-    dup pane-output clear-incremental pane-current clear-gadget ;
 
 : pane-write-1 ( style text pane -- )
     pick not pick empty? and [
@@ -96,7 +98,7 @@ M: pane focusable-child* ( pane -- editor )
 
 : pane-terpri ( pane -- )
     dup pane-current over pane-print-1
-    0 <shelf> over set-pane-current init-active-line ;
+    <shelf> over set-pane-current init-active-line ;
 
 : pane-write ( style pane list -- )
     3dup car swap pane-write-1 cdr dup

@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math matrices namespaces sequences
-styles vectors ;
+IN: gadgets-splitters
+USING: gadgets gadgets-layouts generic kernel lists math
+namespaces sequences styles vectors ;
 
 TUPLE: divider splitter ;
 
@@ -31,9 +31,10 @@ C: divider ( -- divider )
     dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
-    [ >r 1 swap <pack> r> set-delegate ] keep
+    [ >r <pack> r> set-delegate ] keep
     [ set-splitter-split ] keep
-    [ >r >r <divider> r> 3vector r> add-gadgets ] keep ;
+    [ >r >r <divider> r> 3vector r> add-gadgets ] keep
+    1 over set-pack-fill ;
 
 : <x-splitter> ( first second split -- splitter )
     { 0 1 0 } <splitter> ;

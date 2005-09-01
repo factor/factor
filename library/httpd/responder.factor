@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: httpd
-USING: hashtables http kernel lists namespaces parser sequences
-io strings ;
+USING: hashtables http kernel lists math namespaces parser
+sequences io strings ;
 
 ! Variables
 SYMBOL: vhosts
@@ -66,7 +66,7 @@ SYMBOL: responders
 
 : log-user-agent ( alist -- )
     "User-Agent" swap assoc* [
-        unswons [ % ": " % % ] "" make log
+        unswons [ % ": " % % ] "" make log-message
     ] when* ;
 
 : prepare-url ( url -- url )
@@ -138,7 +138,7 @@ SYMBOL: responders
     "default" responder call-responder ;
 
 : log-responder ( path -- )
-    "Calling responder " swap append log ;
+    "Calling responder " swap append log-message ;
 
 : trim-/ ( url -- url )
     #! Trim a leading /, if there is one.

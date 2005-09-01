@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: http-client
-USING: errors http kernel lists namespaces parser sequences
+USING: errors http kernel lists math namespaces parser sequences
 io strings ;
 
 : parse-host ( url -- host port )

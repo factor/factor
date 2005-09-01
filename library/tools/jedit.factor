@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: errors io kernel lists namespaces parser prettyprint
+USING: errors io kernel lists math namespaces parser prettyprint
 sequences strings unparser vectors words ;
 
 ! Some words to send requests to a running jEdit instance to

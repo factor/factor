@@ -69,8 +69,8 @@ BEGIN-STRUCT: surface
     FIELD: void*       hwdata
     FIELD: short       clip-x
     FIELD: short       clip-y
-    FIELD: ushort       clip-w
-    FIELD: ushort       clip-h
+    FIELD: ushort      clip-w
+    FIELD: ushort      clip-h
     FIELD: uint        unused1
     FIELD: uint        locked
     FIELD: int         map

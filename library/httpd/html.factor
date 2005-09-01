@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists namespaces parser
+USING: generic http io kernel lists math namespaces parser
 presentation sequences strings styles words ;
 
 : html-entities ( -- alist )
@@ -35,7 +35,7 @@ presentation sequences strings styles words ;
     [ "text-decoration: underline; " % ] when ;
 
 : size-css, ( size -- )
-    "font-size: " % number>string % "; " % ;
+    "font-size: " % # "; " % ;
 
 : font-css, ( font -- )
     "font-family: " % % "; " % ;

@@ -77,11 +77,8 @@ M: port set-timeout ( timeout port -- )
     dup port-error f rot set-port-error throw ;
 
 : report-error ( error port -- )
-    [
-        "Error on fd " %
-        dup port-handle number>string %
-        ": " % swap %
-    ] "" make swap set-port-error ;
+    [ "Error on fd " % dup port-handle # ": " % swap % ] "" make
+    swap set-port-error ;
 
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.

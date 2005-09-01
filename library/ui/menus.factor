@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math namespaces sequences ;
+IN: gadgets-menus
+USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
+gadgets-labels generic kernel lists math namespaces sequences ;
 
 : menu-actions ( glass -- )
     [ drop hide-glass ] [ button-down 1 ] set-action ;
@@ -22,7 +23,7 @@ USING: generic kernel lists math namespaces sequences ;
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
     [ uncons \ hide-glass swons >r <label> r> <roll-button> ] map
-    1 <pile> [ add-gadgets ] keep ;
+    <pile> 1 over set-pack-fill [ add-gadgets ] keep ;
 
 : menu-theme ( menu -- )
     << solid f >> interior set-paint-prop ;

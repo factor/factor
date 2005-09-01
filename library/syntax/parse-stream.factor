@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces sequences io ;
+USING: kernel lists namespaces sequences io words ;
 
 : file-vocabs ( -- )
     "scratchpad" "in" set
@@ -38,3 +38,12 @@ USING: kernel lists namespaces sequences io ;
 
 : run-resource ( file -- )
     parse-resource call ;
+
+: word-file ( word -- file )
+    "file" word-prop dup [
+        "resource:/" ?head [ resource-path swap path+ ] when
+    ] when ;
+
+: reload ( word -- )
+    #! Reload the source file the word originated from.
+    word-file run-file ;

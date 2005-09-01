@@ -140,3 +140,12 @@ M: generic definer drop \ G: ;
 : define-class ( class metaclass -- )
     dupd "metaclass" set-word-prop
     dup types number-sort typemap get set-hash ;
+
+: implementors ( class -- list )
+    #! Find a list of generics that implement a method
+    #! specializing on this class.
+    [ "methods" word-prop ?hash ] word-subset-with ;
+
+: classes ( -- list )
+    #! Output a list of all defined classes.
+    [ metaclass ] word-subset ;

@@ -118,3 +118,14 @@ M: word class. drop ;
 
 : see ( word -- )
     [ dup in. dup (see) dup class. methods. ] with-pprint ;
+
+: (apropos) ( substring -- seq )
+    vocabs [
+        words [ word-name subseq? ] subset-with
+    ] map-with concat ;
+
+: apropos ( substring -- )
+    #! List all words that contain a string.
+    (apropos) [
+        "IN: " write dup word-vocabulary write " " write .
+    ] each ;

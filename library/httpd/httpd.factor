@@ -38,7 +38,7 @@ sequences ;
     [ (handle-request) serve-responder ] with-scope ;
 
 : parse-request ( request -- )
-    dup log
+    dup log-message
     " " split1 dup [
         " HTTP" split1 drop url>path secure-path dup [
             swap handle-request

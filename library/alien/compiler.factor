@@ -167,5 +167,5 @@ M: compound (uncrossref)
         drop
     ] [
         dup { "infer-effect" "base-case" "no-effect" }
-        reset-props decompile
+        reset-props update-xt
     ] ifte ;

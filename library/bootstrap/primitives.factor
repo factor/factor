@@ -38,8 +38,8 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { ">bignum" "math"                      }
     { ">float" "math"                       }
     { "(fraction>)" "math-internals"        }
-    { "str>float" "parser"                  }
-    { "(unparse-float)" "parser"            }
+    { "string>float" "math-internals"       }
+    { "float>string" "math-internals"       }
     { "float>bits" "math"                   }
     { "double>bits" "math"                  }
     { "bits>float" "math"                   }

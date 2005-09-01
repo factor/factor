@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic help io kernel listener lists math namespaces
-prettyprint sdl sequences shells styles threads words ;
+USING: gadgets-listener generic help io kernel listener lists
+math namespaces prettyprint sdl sequences shells styles threads
+words ;
 
 : init-world
     global [

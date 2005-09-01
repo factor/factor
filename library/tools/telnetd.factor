@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: telnetd
-USING: errors listener kernel namespaces io threads parser ;
+USING: errors listener kernel math namespaces io threads parser ;
 
 : telnet-client ( socket -- )
     dup [ log-client print-banner listener ] with-stream ;

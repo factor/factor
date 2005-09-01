@@ -48,15 +48,8 @@ M: compound (compile) ( word -- )
 
 : compile-all ( -- ) [ try-compile ] each-word ;
 
-: decompile ( word -- )
-    dup compiled? [
-        "Decompiling " write dup . update-xt
-    ] [
-        drop
-    ] ifte ;
-
 : recompile ( word -- )
-    dup decompile compile ;
+    dup update-xt compile ;
 
 : compile-1 ( quot -- word )
     #! Compute a quotation into an uninterned word, for testing

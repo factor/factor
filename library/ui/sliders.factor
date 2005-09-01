@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
-USING: generic kernel lists math matrices namespaces sequences
-threads vectors styles ;
+IN: gadgets-scrolling
+USING: gadgets gadgets-buttons gadgets-layouts generic kernel
+lists math namespaces sequences threads vectors styles ;
 
 ! An elevator has a thumb that may be moved up and down.
 TUPLE: elevator ;

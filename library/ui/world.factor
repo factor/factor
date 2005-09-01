@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien errors generic io kernel lists math memory
-namespaces prettyprint sdl sequences sequences strings threads
-vectors ;
+USING: alien errors gadgets-layouts generic io kernel lists math
+memory namespaces prettyprint sdl sequences sequences strings
+threads vectors ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the

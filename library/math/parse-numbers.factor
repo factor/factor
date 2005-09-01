@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: parser
-USING: errors generic kernel math namespaces sequences strings ;
+IN: math
+USING: errors generic kernel math-internals namespaces sequences
+strings ;
 
 ! Number parsing
 
@@ -26,9 +27,7 @@ M: object digit> not-a-number ;
 : base> ( str base -- num )
     #! Convert a string to an integer. Throw an error if
     #! conversion fails.
-    swap "-" ?head [ (base>) neg ] [ (base>) ] ifte ;
-
-GENERIC: string>number ( str -- num )
+    swap "-" ?head >r (base>) r> [ neg ] when ;
 
 M: string string>number 10 base> ;
 
@@ -37,24 +36,18 @@ M: potential-ratio string>number ( str -- num )
     "/" split1 >r 10 base> r> 10 base> / ;
 
 PREDICATE: string potential-float CHAR: . swap member? ;
-M: potential-float string>number ( str -- num )
-    str>float ;
+M: potential-float string>number ( str -- num ) string>float ;
 
 : bin> 2 base> ;
 : oct> 8 base> ;
 : hex> 16 base> ;
 
-GENERIC: number>string ( str -- num )
-
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] ifte ;
 
 : integer, ( num radix -- )
-    dup >r /mod >digit , dup 0 > [
-        r> integer,
-    ] [
-        r> 2drop
-    ] ifte ;
+    dup >r /mod >digit , dup 0 >
+    [ r> integer, ] [ r> 2drop ] ifte ;
 
 : >base ( num radix -- string )
     #! Convert a number to a string in a certain base.
@@ -73,17 +66,9 @@ GENERIC: number>string ( str -- num )
 M: integer number>string ( obj -- str ) 10 >base ;
 
 M: ratio number>string ( num -- str )
-    [
-        dup
-        numerator number>string %
-        CHAR: / ,
-        denominator number>string %
-    ] "" make ;
-
-: fix-float ( str -- str )
-    #! This is terrible. Will go away when we do our own float
-    #! output.
-    CHAR: . over member? [ ".0" append ] unless ;
+    [ dup numerator # CHAR: / , denominator # ] "" make ;
 
 M: float number>string ( float -- str )
-    (unparse-float) fix-float ;
+    #! This is terrible. Will go away when we do our own float
+    #! output.
+    float>string CHAR: . over member? [ ".0" append ] unless ;
