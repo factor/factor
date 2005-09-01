@@ -14,7 +14,6 @@ SYMBOL: B
 SYMBOL: C
 SYMBOL: D
 SYMBOL: E
-SYMBOL: temp
 SYMBOL: w
 SYMBOL: K
 SYMBOL: f-table
@@ -35,7 +34,6 @@ SYMBOL: f-table
         20 [ HEX: 8f1bbcdc , ] times
         20 [ HEX: ca62c1d6 , ] times
     ] { } make K set ;
-
 
 : get-wth ( n -- wth )
     w get nth ;
@@ -68,6 +66,7 @@ SYMBOL: f-table
 ! J: 2 f 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ;
 ! J: 3 f bitxor bitxor ;
 
+! todo: make inlined
 { 
     { [ dup 0 = ] [ drop >r over bitnot r> bitand >r bitand r> bitor ] }
     { [ dup 1 = ] [ drop bitxor bitxor ] }
@@ -95,25 +94,25 @@ SYMBOL: f-table
     h3 get D set
     h4 get E set ;
 
-: calc-temp-set-letters ( -- )
+: calculate-letters ( -- )
     ! step d of RFC 3174, section 6.1
     80 [
         ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
-        dup B get C get D get rot4 sha1-f
-        over get-wth
-        pick K get nth
-        A get 5 32 bitroll
-        E get
-        + + + +
-        4294967296 mod
-        temp set
+        [
+            [ B get C get D get ] keep sha1-f ,
+            dup get-wth ,
+            dup K get nth ,
+            A get 5 32 bitroll ,
+            E get ,
+        ] { } make sum 4294967296 mod
 
         ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
+        >r
         D get E set
         C get D set
         B get 30 32 bitroll C set
         A get B set
-        temp get A set
+        r> A set
     ] repeat ;
 
 : update-hs ( -- )
@@ -125,7 +124,7 @@ SYMBOL: f-table
     E h4 update-old-new ;
 
 : process-sha1-block ( block -- )
-    make-w init-letters calc-temp-set-letters update-hs drop ;
+    make-w init-letters calculate-letters update-hs drop ;
 
 : get-sha1 ( -- str )
     [

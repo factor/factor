@@ -2,9 +2,6 @@ IN: crypto
 USING: kernel io strings sequences namespaces math prettyprint
 unparser test parser lists ;
 
-: rot4 ( a b c d -- b c d a )
-    >r rot r> swap ;
-
 : (shift-mod) ( n s w -- n )
      >r shift r> 1 swap shift mod ;
 
