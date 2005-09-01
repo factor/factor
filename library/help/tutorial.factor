@@ -33,7 +33,7 @@ M: general-list tutorial-line
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map
-    <pile> dup 1 over set-pack-fill [ add-gadgets ] keep
+    <pile> 1 over set-pack-fill [ add-gadgets ] keep
     empty-border ;
 
 : tutorial-pages
@@ -361,13 +361,15 @@ M: general-list tutorial-line
         ]
     ] ;
 
-: <tutorial> ( pages -- browser )
-    tutorial-pages [ <page> ] map <book>
+: tutorial-theme
     dup { 204 204 255 } background set-paint-prop
     dup << gradient f { 0 1 0 } { 204 204 255 } { 255 204 255 } >> interior set-paint-prop
     dup "Sans Serif" font set-paint-prop
-    dup 18 font-size set-paint-prop
-    <book-browser> ;
+    18 font-size set-paint-prop ;
+
+: <tutorial> ( pages -- browser )
+    tutorial-pages [ <page> ] map <book>
+    dup tutorial-theme <book-browser> ;
 
 : tutorial ( -- )
     <tutorial> gadget. ;

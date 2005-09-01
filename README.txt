@@ -136,7 +136,6 @@ as, and issue a command similar to the following to bootstrap Factor:
     generic/ - generic words, for object oriented programming style
     help/ - online help system
     httpd/ - HTTP client, server, and web application framework
-    icons/ - images used by web framework and UI
     inference/ - stack effect inference, used by compiler, as well as a
       useful development tool of its own
     io/ - input and output streams

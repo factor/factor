@@ -12,7 +12,6 @@
 - theme abstraction in ui
 - menu dragging
 - find out why so many small bignums get consed
-- icons
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener
 - get stuff in examples dir running in the ui
@@ -39,6 +38,7 @@
 
 + ffi:
 
+- C structs, enums, unions: use new-style string mode parsing
 - alien/c-types.factor is ugly
 - smarter out parameter handling
 - clarify powerpc passing of value struct parameters
@@ -82,6 +82,17 @@
 - instances: do not use make-list
 - vectors: ensure its ok with bignum indices
 - code gc
+- set-path: iterative
+- parse-command-line: no unswons of cli args
+- >c/c>: vector stack
+- tag: move from kernel-internals to kernel
+- word: when bootstrapping, 'word' var is not cleared
+- search: slow
+- investigate if rehashing on startup is really necessary
+- vectorize >n, n>, (get)
+- mutable strings simplifying string operarations
+- 2each, find*, subset are ugly
+- map and 2map duplicate logic
 
 + i/o:
 

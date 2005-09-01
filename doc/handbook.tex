@@ -5377,10 +5377,8 @@ Static content may be served by setting the \verb|"doc-root"| variable to a dire
 "/var/www/" "doc-root" set
 \end{verbatim}
 
-If a directory holds an \verb|index.html| file, the file is served when the directory is requested, otherwise a directory listing is produced. The directory listing references icons sent via the resource responder. The icons are located in the Factor source tree, and the \verb|"resource-path"| variable may be set to the root of the source tree in order for the icons to be located:
-\begin{verbatim}
-"/home/slava/work/Factor/" "resource-path" set
-\end{verbatim}
+If a directory holds an \verb|index.html| file, the file is served when the directory is requested, otherwise a directory listing is produced.
+
 A facility for ad-hoc server-side scripting exists. If a file with the \verb|.factsp| filename extension is requested, the file is run with \verb|run-file| and any output it sends to the default stream is sent to the client (\ref{stdio}). These ``Factor server pages'' are slower and less powerful than responders, so it is recommended that responders be used instead.
 
 A different static site can be associated with each virtual host by setting the \verb|"doc-root"| variable in each virtual host (\ref{vhosts}).
