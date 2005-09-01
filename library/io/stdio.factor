@@ -14,10 +14,6 @@ USING: errors generic kernel lists namespaces strings styles ;
 : terpri ( -- )              stdio get stream-terpri ;
 : close  ( -- )              stdio get stream-close ;
 
-: write-icon ( resource -- )
-    #! Write an icon. Eg, /library/icons/File.png
-    icon swons unit "" swap format ;
-
 : write-object ( string object -- )
     presented swons unit format ;
 

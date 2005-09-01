@@ -1,6 +1,3 @@
-- reader syntax for arrays, byte arrays, displaced aliens
-- out of memory error when printing global namespace
-- removing unneeded #label
 - finish scrollbars
 - fix up the min thumb size hack
 
@@ -54,6 +51,7 @@
 
 + compiler:
 
+- removing unneeded #label
 - flushing optimization
 - compile-byte/cell: instantiating aliens
 - fix fixnum<< and /i overflow on PowerPC
@@ -71,6 +69,8 @@
 
 + kernel:
 
+- reader syntax for arrays, byte arrays, displaced aliens
+- out of memory error when printing global namespace
 - first time hash/vector is grown, set size to something big
 - merge timers with sleeping tasks
 - what about tasks and timers between image restarts

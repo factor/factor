@@ -27,7 +27,5 @@ SYMBOL: bold-italic
 
 SYMBOL: underline
 
-SYMBOL: icon
-
 SYMBOL: presented
 SYMBOL: file

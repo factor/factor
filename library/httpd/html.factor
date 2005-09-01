@@ -91,16 +91,6 @@ presentation sequences strings styles words ;
         drop call
     ] ifte ;
 
-: icon-tag ( string style quot -- )
-    over icon swap assoc dup [
-        <img src= "/responder/resource/" swap append img/>
-        #! Ignore the quotation, since no further style
-        #! can be applied
-        3drop
-    ] [
-        drop call
-    ] ifte ;
-
 TUPLE: html-stream ;
 
 M: html-stream stream-write1 ( char stream -- )
@@ -112,10 +102,8 @@ M: html-stream stream-format ( str style stream -- )
     [
         [
             [
-                [
-                    [ drop chars>entities write ] span-tag
-                ] file-link-tag
-            ] icon-tag
+                [ drop chars>entities write ] span-tag
+            ] file-link-tag
         ] browser-link-tag
     ] with-wrapper ;
 
@@ -131,7 +119,6 @@ C: html-stream ( stream -- stream )
     #! font-style
     #! font-size
     #! underline
-    #! icon
     #! file
     #! word
     #! vocab

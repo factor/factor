@@ -6,10 +6,16 @@ USING: kernel lists namespaces sequences strings ;
 ! Words for accessing filesystem meta-data.
 
 : path+ ( path path -- path ) "/" swap append3 ;
+
 : exists? ( file -- ? ) stat >boolean ;
+
 : directory? ( file -- ? ) stat car ;
-: directory ( dir -- list ) (directory) string-sort ;
+
+: directory ( dir -- list )
+    (directory) { "." ".." } swap seq-diff string-sort ;
+
 : file-length ( file -- length ) stat third ;
+
 : file-extension ( filename -- extension )
     "." split cdr dup [ peek ] when ;
 

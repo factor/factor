@@ -69,7 +69,6 @@ sequences io vectors words ;
         "/library/io/string-streams.factor"
         "/library/io/c-streams.factor"
         "/library/io/files.factor"
-        "/library/io/directories.factor"
         "/library/io/binary.factor"
 
         "/library/syntax/parse-words.factor"
