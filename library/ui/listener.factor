@@ -31,7 +31,7 @@ C: display ( -- display )
     <scroller> over add-center ;
 
 : make-presentations ( seq -- seq )
-    [ <object-presentation> ] map ;
+    [ [ unparse-short <label> ] keep <object-button> ] map ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep

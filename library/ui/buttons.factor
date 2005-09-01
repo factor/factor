@@ -32,7 +32,7 @@ namespaces sdl sequences sequences styles threads ;
 : button-theme ( button -- )
     dup { 216 216 216 } background set-paint-prop
     dup f reverse-video set-paint-prop
-    << solid f >> interior set-paint-prop ;
+    << solid >> interior set-paint-prop ;
 
 : roll-button-theme ( button -- )
     dup f reverse-video set-paint-prop

@@ -4,7 +4,16 @@ IN: gadgets-menus
 USING: gadgets gadgets-borders gadgets-buttons gadgets-layouts
 gadgets-labels generic kernel lists math namespaces sequences ;
 
+: retarget-drag ( -- )
+    hand [ rect-loc world get pick-up ] keep
+    2dup hand-clicked eq? [
+        2drop
+    ] [
+        [ set-hand-clicked ] keep update-hand
+    ] ifte ;
+
 : menu-actions ( glass -- )
+    dup [ drop retarget-drag ] [ drag 1 ] set-action
     [ drop hide-glass ] [ button-down 1 ] set-action ;
 
 : fit-bounds ( loc dim max -- loc )
@@ -17,7 +26,8 @@ gadgets-labels generic kernel lists math namespaces sequences ;
 : show-menu ( menu -- )
     dup show-glass
     dup menu-loc swap set-rect-loc
-    world get world-glass menu-actions ;
+    world get world-glass dup menu-actions
+    hand set-hand-clicked ;
 
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
@@ -26,7 +36,7 @@ gadgets-labels generic kernel lists math namespaces sequences ;
     <pile> 1 over set-pack-fill [ add-gadgets ] keep ;
 
 : menu-theme ( menu -- )
-    << solid f >> interior set-paint-prop ;
+    << solid >> interior set-paint-prop ;
 
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
