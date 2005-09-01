@@ -6,6 +6,4 @@ USE: words
 USE: kernel
 USE: sequences
 
-[ ] [ gensym dup [ ] define-compound . ] unit-test
 [ ] [ vocabs [ words [ see ] each ] each ] unit-test
-[ ] [ classes [ methods. ] each ] unit-test

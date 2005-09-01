@@ -142,12 +142,12 @@ TUPLE: another-one ;
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah \nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary\nSYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 [ t ] [
     DEFER: not-fixnum
-    "IN: temporary\nSYMBOL: not-fixnum \nCOMPLEMENT: not-fixnum fixnum\n"
+    "IN: temporary\nSYMBOL: not-fixnum\nCOMPLEMENT: not-fixnum fixnum\n"
     dup eval
     [ \ not-fixnum see ] string-out =
 ] unit-test

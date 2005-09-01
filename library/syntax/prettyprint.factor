@@ -118,7 +118,11 @@ M: newline pprint-section* ( newline -- )
     section-start fresh-line ;
 
 : advance ( section -- )
-    section-start last-newline get = [ " " write ] unless ;
+    dup newline? [
+        drop
+    ] [
+        section-start last-newline get = [ " " write ] unless
+    ] ifte ;
 
 M: block pprint-section* ( block -- )
     f swap block-sections [
