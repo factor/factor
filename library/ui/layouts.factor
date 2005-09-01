@@ -17,7 +17,7 @@ matrices namespaces sdl sequences ;
         drop
     ] ifte ;
 
-TUPLE: pack align fill vector ;
+TUPLE: pack align fill gap vector ;
 
 : pref-dims ( gadget -- list )
     gadget-children [ pref-dim ] map ;
@@ -31,27 +31,29 @@ TUPLE: pack align fill vector ;
 : packed-dims ( gadget sizes -- seq )
     2dup packed-dim-2 swap orient ;
 
-: packed-loc-1 ( sizes -- seq )
-    { 0 0 0 } [ v+ ] accumulate ;
+: packed-loc-1 ( gadget sizes -- seq )
+    { 0 0 0 } [ v+ over pack-gap v+ ] accumulate nip ;
 
 : packed-loc-2 ( gadget sizes -- seq )
     [ >r dup pack-align swap rect-dim r> v- n*v ] map-with ;
 
 : packed-locs ( gadget sizes -- seq )
-    dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
+    2dup packed-loc-1 >r dupd packed-loc-2 r> orient ;
 
 : packed-layout ( gadget sizes -- )
     over gadget-children
     >r dupd packed-dims r> 2dup [ set-gadget-dim ] 2each
     >r packed-locs r> [ set-rect-loc ] 2each ;
 
-C: pack ( fill vector -- pack )
+C: pack ( vector -- pack )
     #! gap: between each child.
     #! fill: 0 leaves default width, 1 fills to pack width.
-    [ <gadget> swap set-delegate ] keep
+    #! align: 0 left, 1/2 center, 1 right.
     [ set-pack-vector ] keep
-    [ set-pack-fill ] keep
-    0 over set-pack-align ;
+    <gadget> over set-delegate
+    0 over set-pack-align
+    0 over set-pack-fill
+    { 0 0 0 } over set-pack-gap ;
 
 : <pile> ( -- pack ) { 0 1 0 } <pack> ;
 
@@ -59,9 +61,11 @@ C: pack ( fill vector -- pack )
 
 M: pack pref-dim ( pack -- dim )
     [
-        pref-dims
-        [ { 0 0 0 } [ vmax ] reduce ] keep
-        { 0 0 0 } [ v+ ] reduce
+        [
+            pref-dims
+            [ { 0 0 0 } [ vmax ] reduce ] keep
+            [ { 0 0 0 } [ v+ ] reduce ] keep length 1 - 0 max
+        ] keep pack-gap n*v v+
     ] keep pack-vector set-axis ;
 
 M: pack layout* ( pack -- ) dup pref-dims packed-layout ;

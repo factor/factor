@@ -70,7 +70,7 @@ C: text ( string style -- section )
     [ set-text-string ] keep ;
 
 M: text pprint-section*
-    dup text-string swap text-style format " " write ;
+    dup text-string swap text-style format ;
 
 TUPLE: block sections ;
 
@@ -118,7 +118,9 @@ M: newline pprint-section* ( newline -- )
     section-start fresh-line ;
 
 M: block pprint-section* ( block -- )
-    block-sections [ pprint-section ] each ;
+    f swap block-sections [
+        over [ " " write ] when pprint-section drop t
+    ] each drop ;
 
 : <block ( -- ) <block> pprinter get pprinter-stack push ;
 
@@ -278,7 +280,12 @@ M: hashtable pprint* ( hashtable -- )
     [ hash>alist \ {{ \ }} pprint-sequence ] check-recursion ;
 
 M: tuple pprint* ( tuple -- )
-    [ <mirror> \ << \ >> pprint-sequence ] check-recursion ;
+    [
+        \ << pprint*
+        <mirror> dup first pprint*
+        <block 1 swap tail-slice pprint-elements block>
+        \ >> pprint*
+    ] check-recursion ;
 
 M: alien pprint* ( alien -- )
     dup expired? [
@@ -331,15 +338,15 @@ M: wrapper pprint* ( wrapper -- )
 : .o >oct print ;
 : .h >hex print ;
 
-: define-close ( word -- )
-    #! The word will be pretty-printed as a block closer.
-    #! Examples are ] } }} ]] and so on.
-    [ block> ] "pprint-before-hook" set-word-prop ;
-
 : define-open
     #! The word will be pretty-printed as a block opener.
     #! Examples are [ { {{ << and so on.
     [ <block ] "pprint-after-hook" set-word-prop ;
+
+: define-close ( word -- )
+    #! The word will be pretty-printed as a block closer.
+    #! Examples are ] } }} ]] and so on.
+    [ block> ] "pprint-before-hook" set-word-prop ;
 
 {
     { POSTPONE: [ POSTPONE: ] }
@@ -347,5 +354,4 @@ M: wrapper pprint* ( wrapper -- )
     { POSTPONE: {{ POSTPONE: }} }
     { POSTPONE: [[ POSTPONE: ]] }
     { POSTPONE: [[ POSTPONE: ]] }
-    { POSTPONE: << POSTPONE: >> }
 } [ 2unseq define-close define-open ] each

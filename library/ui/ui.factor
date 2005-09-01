@@ -5,22 +5,25 @@ USING: gadgets-listener generic help io kernel listener lists
 math namespaces prettyprint sdl sequences shells styles threads
 words ;
 
+: world-theme
+    {{
+        [[ background { 255 255 255 } ]]
+        [[ rollover-bg { 236 230 232 } ]]
+        [[ bevel-1 { 160 160 160 } ]]
+        [[ bevel-2 { 232 232 232 } ]]
+        [[ foreground { 0 0 0 } ]]
+        [[ reverse-video f ]]
+        [[ font "Monospaced" ]]
+        [[ font-size 12 ]]
+        [[ font-style plain ]]
+    }} ;
+
 : init-world
     global [
         <world> world set
         { 600 800 0 } world get set-gadget-dim
         
-        {{
-            [[ background { 255 255 255 } ]]
-            [[ rollover-bg { 236 230 232 } ]]
-            [[ bevel-1 { 160 160 160 } ]]
-            [[ bevel-2 { 232 232 232 } ]]
-            [[ foreground { 0 0 0 } ]]
-            [[ reverse-video f ]]
-            [[ font "Monospaced" ]]
-            [[ font-size 12 ]]
-            [[ font-style plain ]]
-        }} world get set-gadget-paint
+        world-theme world get set-gadget-paint
 
         <plain-gadget> add-layer
 

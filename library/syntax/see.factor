@@ -73,9 +73,7 @@ M: compound (see)
     block; newline ;
 
 M: generic (see)
-    <block
-    dup dup "combination" word-prop
-    swap see-body block; newline
+    dup dup "combination" word-prop swap see-body newline
     dup methods [ method. ] each-with ;
 
 GENERIC: class. ( word -- )

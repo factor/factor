@@ -171,3 +171,9 @@ M: gadget draw-gadget* ( gadget -- )
 
 : <bevel-gadget> ( -- gadget )
     <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;
+
+: draw-line ( from to color -- )
+    >r >r >r surface get r> 2unseq r> 2unseq r> rgb lineColor ;
+
+: draw-fanout ( from tos color -- )
+    -rot [ >r 2dup r> rot draw-line ] each 2drop ;

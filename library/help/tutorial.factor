@@ -1,5 +1,7 @@
 IN: help
-USING: gadgets generic kernel lists math matrices namespaces sdl
+USING: gadgets gadgets-books gadgets-borders gadgets-buttons
+gadgets-editors gadgets-labels gadgets-layouts gadgets-panes
+gadgets-presentations generic kernel lists math namespaces sdl
 sequences strings styles ;
 
 : <slide-title> ( text -- gadget )
@@ -7,7 +9,8 @@ sequences strings styles ;
 
 : <underline> ( -- gadget )
     <gadget>
-    dup << gradient f { 1 0 0 } { 64 64 64 } { 255 255 255 } >> interior set-paint-prop
+    dup << gradient f { 1 0 0 } { 64 64 64 } { 255 255 255 } >>
+    interior set-paint-prop
     { 0 10 0 } over set-gadget-dim ;
 
 GENERIC: tutorial-line ( object -- gadget )

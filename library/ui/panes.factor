@@ -1,12 +1,13 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: gadgets-presentations
+DEFER: <presentation>
+
 IN: gadgets-panes
 USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
 gadgets-scrolling generic hashtables io kernel line-editor lists
 math namespaces prettyprint sequences strings styles threads
 vectors ;
-
-DEFER: <presentation>
 
 ! A pane is an area that can display text.
 
