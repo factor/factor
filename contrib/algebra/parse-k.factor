@@ -188,13 +188,13 @@ M: comp-literal compile-ast ! literal numbers
             compile-ast %
             dup %
         ] each-with
-    ] make-list nip ;
+    ] [ ] make nip ;
 
 M: vector compile-ast ! literal vectors
     dup [ number? ] all? [
         replace-with nip
     ] [
-        [ , ] accumulator [ make-vector nip ] cons
+        [ , ] accumulator [ { } make nip ] cons
     ] ifte ;
 
 : infix-relation
@@ -314,12 +314,13 @@ M: apply compile-ast ! function application
         [ 1 - ] keep [
             2dup -  [ swap set-array-nth ] cons , \ keep ,
         ] repeat drop
-    ] make-list ;
+    ] [ ] make ;
 
 : ast>quot ( args ast -- quot )
     over prologue -rot compile-ast append ;
 
-: define-math ( string -- )
+: define-math ( seq -- )
+    " " join
     dup parse-full apply-args uncons car swap
     >apply< >r create-in r>
     [ "math-args" set-word-prop ] 2keep
@@ -331,7 +332,7 @@ M: apply compile-ast ! function application
     "in-definition" on
     string-mode on 
     [
-        " " join string-mode off define-math
+        string-mode off define-math
     ] f ; parsing
 
 : TEST-MATH:
