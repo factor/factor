@@ -121,7 +121,7 @@ USE: sequences
       <tr> <th colspan= "2" th> "Source" write </th> </tr>
       <tr> <td colspan= "2" td> [ [ parse ] [ [ "No such word" write ] [ car see ] ifte ] catch ] with-simple-html-output </td> </tr>
       <tr> <th> "Apropos" write </th> <th> "Usages" write </th> </tr>
-      <tr> <td valign= "top" td> [ apropos. ] with-simple-html-output </td> 
+      <tr> <td valign= "top" td> [ apropos ] with-simple-html-output </td> 
            <td valign= "top" td> [ [ parse ] [ [ "No such word" write ] [ car usages. ] ifte ] catch ] with-simple-html-output </td>
       </tr>
     </table>

@@ -41,7 +41,7 @@ USE: prettyprint
     "browser" "responder" set
     <pre> 
         stdio get <html-stream> [   
-          apropos.
+          apropos
         ] with-stream              
     </pre>
   ] with-scope ;

@@ -156,6 +156,8 @@ M: crash-command run-rpc-command ( command -- shutdown? result )
 ! Experimental code below
 ! ******************************
 USE: gadgets
+USE: gadgets-labels
+USE: gadgets-presentations
 USE: generic
 
 TUPLE: promised-label promise ;
