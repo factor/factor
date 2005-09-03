@@ -46,7 +46,8 @@ SYMBOL: structured-input
 : pane-call ( quot pane -- )
     2dup [ elements. ] with-stream*
     >r structured-input global set-hash
-    "structured-input global hash call" r> pane-eval ;
+    "\"structured-input\" \"gadgets-panes\" lookup global hash call"
+    r> pane-eval ;
 
 : editor-commit ( editor -- line )
     #! Add current line to the history, and clear the editor.
