@@ -48,7 +48,7 @@ USING: io kernel math parser strings test ;
 
 [ "" ] [ 0 read ] unit-test
 
-[ ] [ "123" write 9000 CHAR: x fill write flush ] unit-test
+! [ ] [ "123" write 9000 CHAR: x fill write flush ] unit-test
 
 [ "line 1" CHAR: l ]
 [

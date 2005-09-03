@@ -15,9 +15,8 @@ sequences vectors ;
     ] when* ;
 
 : (clear-gadget) ( gadget -- )
-    gadget-children [
-        dup [ f swap set-gadget-parent ] each 0 swap set-length
-    ] when* ;
+    dup gadget-children [ f swap set-gadget-parent ] each
+    f swap set-gadget-children ;
 
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;

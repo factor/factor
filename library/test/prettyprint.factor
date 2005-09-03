@@ -1,6 +1,6 @@
-IN: temporary
 USING: alien io kernel lists math prettyprint sequences
 test words inference namespaces vectors ;
+IN: temporary
 
 [ "4" ] [ 4 unparse ] unit-test
 [ "1.0" ] [ 1.0 unparse ] unit-test

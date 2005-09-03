@@ -52,7 +52,9 @@ SYMBOL: failures
 : test ( name -- ? )
     [
         "=====> " write dup write "..." print
-        test-path [ [ run-resource ] keep ] assert-depth drop
+        test-path [
+            [ [ run-resource ] with-scope ] keep
+        ] assert-depth drop
     ] test-handler ;
 
 : prepare-tests ( -- )

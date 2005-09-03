@@ -124,3 +124,12 @@ DEFER: countdown-b
         } cond
     ] compile-1
 ] unit-test
+
+[ 3 ] [
+    [
+        3 {
+            { [ dup fixnum? ] [ ] }
+            { [ t ] [ drop t ] }
+        } cond
+    ] compile-1
+] unit-test
