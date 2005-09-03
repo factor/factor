@@ -163,3 +163,5 @@ math-internals test words ;
 [ t ] [ 1 20 shift neg 1 20 shift neg [ fixnum* ] compile-1 1 40 shift = ] unit-test
 
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
+
+[ t ] [ f [ f eq? ] compile-1 ] unit-test

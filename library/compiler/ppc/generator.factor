@@ -12,7 +12,6 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
 
-M: integer v>operand tag-bits shift ;
 M: vreg v>operand vreg-n 17 + ;
 
 M: %prologue generate-node ( vop -- )

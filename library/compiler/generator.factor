@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
 USING: assembler compiler errors inference kernel lists math
-namespaces sequences strings vectors words ;
+memory namespaces sequences strings vectors words ;
 
 ! Compile a VOP.
 GENERIC: generate-node ( vop -- )
@@ -58,6 +58,10 @@ M: %target generate-node
     vop-label dup postpone-word  compile-target ;
 
 GENERIC: v>operand
+
+M: integer v>operand tag-bits shift ;
+
+M: f v>operand address ;
 
 : dest/src ( vop -- dest src )
     dup vop-out-1 v>operand swap vop-in-1 v>operand ;

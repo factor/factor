@@ -83,7 +83,7 @@ M: port set-timeout ( timeout port -- )
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
     err_no dup EAGAIN = over EINTR = or
-    [ 2drop f ] [ strerror swap report-error ] ifte ;
+    [ 2drop f ] [ strerror swap report-error t ] ifte ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O

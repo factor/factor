@@ -160,7 +160,7 @@ M: f ' ( obj -- ptr )
 
 : word-error ( word msg -- )
     [ % dup word-vocabulary % " " % word-name % ] "" make
-    throw ;
+    throw ; inline
 
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.

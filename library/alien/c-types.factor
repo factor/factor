@@ -27,6 +27,7 @@ SYMBOL: c-types
 
 : define-c-type ( quot name -- )
     >r <c-type> [ swap bind ] keep r> c-types get set-hash ;
+    inline
 
 : <c-object> ( size -- c-ptr ) cell / ceiling <byte-array> ;
 
