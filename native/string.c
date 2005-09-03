@@ -150,10 +150,13 @@ char *to_c_string_unchecked(F_STRING *s)
 }
 
 /* FFI calls this */
-char *unbox_c_string(void)
+char* unbox_c_string(void)
 {
 	CELL str = dpop();
-	return (str ? to_c_string(untag_string(str)) : NULL);
+	if(type_of(str) == STRING_TYPE)
+		return to_c_string(untag_string(str));
+	else
+		return (char*)alien_offset(str);
 }
 
 /* FFI calls this */

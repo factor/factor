@@ -140,7 +140,7 @@ GENERIC: task-container ( task -- vector )
 : init-fdsets ( -- read write except )
     read-fdset get [ read-tasks get init-fdset ] keep
     write-fdset get [ write-tasks get init-fdset ] keep
-    NULL ;
+    f ;
 
 : io-multiplex ( timeout -- )
     >r FD_SETSIZE init-fdsets r> make-timeval select drop

@@ -6,10 +6,6 @@ namespaces parser ;
 
 UNION: c-ptr byte-array alien displaced-alien ;
 
-: NULL ( -- null )
-    #! C null value.
-    0 <alien> ;
-
 M: alien hashcode ( obj -- n )
     alien-address >fixnum ;
 

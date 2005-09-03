@@ -49,7 +49,7 @@ SYMBOL: cutoff
     0 over set-overlapped-ext-internal-high
     fileptr get dup 0 ? over set-overlapped-ext-offset
     0 over set-overlapped-ext-offset-high
-    NULL over set-overlapped-ext-event ;
+    f over set-overlapped-ext-event ;
 
 : update-file-pointer ( whence -- )
     file-size get [ fileptr [ + ] change ] [ drop ] ifte ;
@@ -61,7 +61,7 @@ SYMBOL: cutoff
     update-timeout [
         stream get alloc-io-callback init-overlapped >r
         handle get out-buffer get [ buffer@ ] keep buffer-length
-        NULL r> WriteFile [ handle-io-error ] unless stop
+        f r> WriteFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
 
     dup update-file-pointer
@@ -89,7 +89,7 @@ M: string do-write ( str -- )
         stream get alloc-io-callback init-overlapped >r
         handle get in-buffer get [ buffer@ ] keep 
         buffer-capacity file-size get [ fileptr get - min ] when*
-        NULL r>
+        f r>
         ReadFile [ handle-io-error ] unless stop
     ] callcc1 pending-error
 
@@ -157,7 +157,7 @@ M: win32-stream expire ( stream -- )
 
 C: win32-stream ( handle -- stream )
     swap [
-        dup NULL GetFileSize dup -1 = not [
+        dup f GetFileSize dup -1 = not [
             file-size set
         ] [ drop f file-size set ] ifte
         handle set 

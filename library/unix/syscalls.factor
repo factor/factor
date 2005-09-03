@@ -23,7 +23,7 @@ END-STRUCT
 
 : make-timeval ( ms -- timeval )
     dup -1 = [
-        drop NULL
+        drop f
     ] [
         1000 /mod 1000 *
         <timeval>

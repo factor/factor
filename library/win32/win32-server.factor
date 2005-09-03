@@ -46,7 +46,7 @@ SYMBOL: socket
     ] unless ;
 
 : new-socket ( -- socket )
-    AF_INET SOCK_STREAM 0 NULL NULL WSA_FLAG_OVERLAPPED WSASocket ;
+    AF_INET SOCK_STREAM 0 f f WSA_FLAG_OVERLAPPED WSASocket ;
 
 : setup-sockaddr ( port -- sockaddr )
     <sockaddr-in> swap
@@ -110,7 +110,7 @@ IN: io
         [
             stream get alloc-io-callback init-overlapped
             >r >r >r socket get r> r> 
-            buffer-ptr <alien> 0 32 32 NULL r> AcceptEx
+            buffer-ptr <alien> 0 32 32 f r> AcceptEx
             [ handle-socket-error ] unless stop
         ] callcc1 pending-error drop
         swap dup add-completion <win32-stream> <line-reader> 
