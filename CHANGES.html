@@ -41,6 +41,8 @@ make-string  ==&gt; "" make
 make-rstring ==&gt; "" make reverse
 make-sbuf    ==&gt; SBUF" " make
 </pre></li>
+<li>The <code>every?</code> word has been replaced with <code>monotonic? ( seq quot -- ? )</code>. Its behavior is a superset of <code>every?</code> -- it now accepts any transitive relation, and checks if the sequence is monotonic under this relation. For example,
+<code>[ = ] monotonic?</code> checks if all elements in a sequence are equal, and <code>[ < ] monotonic?</code> checks for a strictly increasing sequence of integers.</li> 
 </ul>
 
 </li>
@@ -58,6 +60,18 @@ make-sbuf    ==&gt; SBUF" " make
 
 </li>
 
+<li>User interface:
+
+<ul>
+<li>Binary search is now used for spacial indexing where possible. This improves performance when there are a lot of lines of output in the listener.</li>
+<li>Scroll bars now behave in a more intuitive manner, closer to conventional GUIs.</li>
+<li>Menus now appear when the mouse button is pressed, not released, and dragging through the menu with the button held down behaves as one would expect.</li>
+<li>The data stack and call stack are now shown. In the single-stepper, these two display the state of the program being stepped. In the inspector, the call stack display is replaced with an inspector history.</li>
+<li>Pack layouts with gaps are now supported.</li>
+<li>Many bug fixes.</li>
+</ul>
+
+</li>
 
 <li>Everything else:
 
@@ -67,7 +81,7 @@ make-sbuf    ==&gt; SBUF" " make
 <li>New <code>cond ( conditions -- )</code> combinator. It behaves like a set of nested <code>ifte</code>s, and compiles if each branch has the same stack effect. See its documentation comment for details.</li>
 <li>Formally documented method combination (<code>G:</code> syntax) in handbook.
 <li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
-<li>Completely redid infix algebra in <code>conrib/algebra/</code>. Now, vector operations are possible
+<li>Completely redid infix algebra in <code>contrib/algebra/</code>. Now, vector operations are possible
 and the syntax doesn't use so many spaces. New way to write the quadratic formula:
 <pre>MATH: quadratic[a;b;c] =
     plusmin[(-b)/2*a;(sqrt(b^2)-4*a*c)/2*a] ;</pre>

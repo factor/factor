@@ -113,9 +113,6 @@ M: object empty? ( seq -- ? ) length 0 = ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
-: conjunction ( v -- ? ) [ ] all? ; flushable
-: disjunction ( v -- ? ) [ ] contains? ; flushable
-
 : index   ( obj seq -- n )     [ = ] find-with drop ; flushable
 : index*  ( obj i seq -- n )   [ = ] find-with* drop ; flushable
 : member? ( obj seq -- ? )     [ = ] contains-with? ; flushable

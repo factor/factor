@@ -81,16 +81,6 @@ M: #values optimize-node* ( node -- node/t )
 M: #return optimize-node* ( node -- node/t )
     optimize-fold ;
 
-! #label
-GENERIC: calls-label* ( label node -- ? )
-
-M: node calls-label* 2drop f ;
-
-M: #call-label calls-label* node-param eq? ;
-
-: calls-label? ( label node -- ? )
-    [ calls-label? not ] all-nodes-with? not ;
-
 ! M: #label optimize-node* ( node -- node/t )
 !     dup node-param over node-children first calls-label? [
 !         drop t

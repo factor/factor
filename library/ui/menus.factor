@@ -7,10 +7,8 @@ gadgets-labels generic kernel lists math namespaces sequences ;
 : retarget-drag ( -- )
     hand [ rect-loc world get pick-up ] keep
     2dup hand-clicked eq? [
-        2drop
-    ] [
-        [ set-hand-clicked ] keep update-hand
-    ] ifte ;
+        2dup set-hand-clicked dup update-hand
+    ] unless 2drop ;
 
 : menu-actions ( glass -- )
     dup [ drop retarget-drag ] [ drag 1 ] set-action

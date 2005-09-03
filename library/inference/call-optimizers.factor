@@ -62,7 +62,7 @@ SYMBOL: @
 : literals-match? ( values template -- ? )
     [
         over literal? [ >r literal-value r> ] [ nip @ ] ifte =
-    ] 2map conjunction ;
+    ] 2map [ ] all? ;
 
 : values-match? ( values template -- ? )
     [ @ = [ drop f ] unless ] 2map [ ] subset [ eq? ] monotonic? ;

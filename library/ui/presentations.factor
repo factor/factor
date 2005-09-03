@@ -18,6 +18,7 @@ SYMBOL: commands
 
 : command-quot ( presented quot -- quot )
     [
+        \ drop ,
         [ swap literalize , % ] [ ] make ,
         [ pane get pane-call ] %
     ] [ ] make ;

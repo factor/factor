@@ -77,7 +77,7 @@ M: #call can-kill? ( literal node -- ? )
     [ swap memq? ] map-with ;
 
 : lookup-mask ( mask word -- word )
-    over disjunction [ (kill-shuffle) hash ] [ nip ] ifte ;
+    over [ ] contains? [ (kill-shuffle) hash ] [ nip ] ifte ;
 
 : kill-shuffle ( literals node -- )
     #! If certain values passing through a stack op are being

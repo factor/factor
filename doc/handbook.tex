@@ -2624,7 +2624,7 @@ Applies the quotation to each element of the sequence. If an element is found fo
 Outputs \texttt{t} if the quotation yields true when applied to each element, otherwise outputs \texttt{f}. Given an empty sequence, vacuously outputs \texttt{t}.
 \wordtable{
 \vocabulary{sequences}
-\ordinaryword{every?}{every?~( seq quot -- ?~)}
+\ordinaryword{monotonic?}{monotonic?~( seq quot -- ?~)}
 \texttt{quot:~element element -- ?}\\
 }
 Tests if all elements of the sequence are equivalent under the relation. The quotation should be an equality relation (see \ref{equality}), otherwise the result will not be useful. This is implemented by vacuously outputting \verb|t| if the sequence is empty, or otherwise, by applying the quotation to each element together with the first element in turn, and testing if it always yields a true value. Usually, this word is used to test if all elements of a sequence are equal, or the same element:

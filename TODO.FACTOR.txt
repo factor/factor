@@ -1,7 +1,6 @@
-- fix up the min thumb size hack
-
 + ui:
 
+- fix up the min thumb size hack
 - long lines of text fail in draw-surface
 - only redraw dirty gadgets
 - faster mouse tracking
