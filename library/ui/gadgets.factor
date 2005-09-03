@@ -60,26 +60,13 @@ DEFER: add-invalid
         [ gadget-parent [ relayout ] when* ] ifte
     ] ifte ;
 
-: (relayout-down)
-    dup invalidate gadget-children [ (relayout-down) ] each ;
-
 : relayout-down ( gadget -- )
     #! Relayout a gadget and its children.
-    dup add-invalid (relayout-down) ;
+    dup add-invalid invalidate ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup rect-dim =
     [ 2drop ] [ [ set-rect-dim ] keep relayout-down ] ifte ;
-
-GENERIC: pref-dim ( gadget -- dim )
-
-M: gadget pref-dim rect-dim ;
-
-GENERIC: layout* ( gadget -- )
-
-: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
-
-M: gadget layout* drop ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 

@@ -4,6 +4,16 @@ IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
 matrices namespaces sdl sequences ;
 
+GENERIC: pref-dim ( gadget -- dim )
+
+M: gadget pref-dim rect-dim ;
+
+GENERIC: layout* ( gadget -- )
+
+M: gadget layout* drop ;
+
+: prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
+
 : layout ( gadget -- )
     #! Set the gadget's width and height to its preferred width
     #! and height. The gadget's children are laid out first.

@@ -1,4 +1,3 @@
-- finish scrollbars
 - fix up the min thumb size hack
 
 + ui:
