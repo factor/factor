@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders generic io kernel lists math
-namespaces sdl sequences sequences styles threads ;
+USING: gadgets gadgets-borders gadgets-layouts generic io kernel
+lists math namespaces sdl sequences sequences styles threads ;
 
 : button-down? ( n -- ? ) hand hand-buttons member? ;
 

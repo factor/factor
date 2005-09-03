@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-labels
-USING: gadgets generic hashtables io kernel lists math
+USING: gadgets gadgets-layouts generic hashtables io kernel math
 namespaces sdl sequences styles vectors ;
 
 ! A label gadget draws a string.

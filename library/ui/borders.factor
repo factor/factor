@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-borders
-USING: errors gadgets generic hashtables kernel lists math
-namespaces sdl vectors ;
+USING: errors gadgets gadgets-layouts generic hashtables kernel
+math namespaces vectors ;
 
 TUPLE: border size ;
 

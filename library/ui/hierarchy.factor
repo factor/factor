@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math matrices namespaces
-sequences vectors ;
+USING: gadgets-layouts generic hashtables kernel lists math
+namespaces sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
     2dup gadget-children remove over set-gadget-children
@@ -77,26 +77,3 @@ M: gadget focusable-child* drop t ;
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
     dup t = [ drop ] [ nip focusable-child ] ifte ;
-
-GENERIC: children-on ( rect/point gadget -- list )
-
-M: gadget children-on ( rect/point gadget -- list )
-    nip gadget-children ;
-
-: inside? ( bounds gadget -- ? )
-    dup gadget-visible?
-    [ >absolute intersects? ] [ 2drop f ] ifte ;
-
-: pick-up-list ( rect/point gadget -- gadget/f )
-    dupd children-on reverse-slice [ inside? ] find-with nip ;
-
-: translate ( rect/point -- )
-    rect-loc origin [ v+ ] change ;
-
-: pick-up ( rect/point gadget -- gadget )
-    2dup inside? [
-        [
-            dup translate 2dup pick-up-list dup
-            [ nip pick-up ] [ rot 2drop ] ifte
-        ] with-scope
-    ] [ 2drop f ] ifte ;

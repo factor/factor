@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-listener generic help io kernel listener lists
-math namespaces prettyprint sdl sequences shells styles threads
-words ;
+USING: gadgets-layouts gadgets-listener generic help io kernel
+listener lists math namespaces prettyprint sdl sequences shells
+styles threads words ;
 
 : world-theme
     {{
@@ -19,6 +19,7 @@ words ;
     }} ;
 
 : init-world
+    ttf-init
     global [
         <world> world set
         { 600 800 0 } world get set-gadget-dim

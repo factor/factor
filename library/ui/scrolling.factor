@@ -1,14 +1,14 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: gadgets gadgets-layouts generic kernel lists math
-namespaces sequences threads vectors styles ;
+USING: gadgets gadgets-books gadgets-layouts generic kernel
+lists math namespaces sequences styles threads vectors ;
 
 ! A viewport can be scrolled.
-TUPLE: viewport ;
+TUPLE: viewport bottom? ;
 
 ! A scroller combines a viewport with two x and y sliders.
-TUPLE: scroller viewport x y bottom? ;
+TUPLE: scroller viewport x y ;
 
 : scroller-origin ( scroller -- { x y 0 } )
     dup scroller-x slider-value
@@ -16,6 +16,8 @@ TUPLE: scroller viewport x y bottom? ;
     0 3vector ;
 
 : find-scroller [ scroller? ] find-parent ;
+
+: find-viewport [ viewport? ] find-parent ;
 
 : viewport-dim gadget-child pref-dim ;
 
@@ -44,8 +46,12 @@ M: viewport pref-dim gadget-child pref-dim ;
 : update-scroller ( scroller -- ) dup scroller-origin scroll ;
 
 : update-viewport ( viewport scroller -- )
-    scroller-origin vneg
-    swap gadget-child dup prefer set-rect-loc ;
+    over viewport-bottom? [
+        f pick set-viewport-bottom?
+        over viewport-dim
+    ] [
+        dup scroller-origin
+    ] ifte vneg nip swap gadget-child dup prefer set-rect-loc ;
 
 M: viewport layout* ( viewport -- )
     dup find-scroller dup update-scroller update-viewport ;
@@ -60,8 +66,8 @@ M: viewport focusable-child* ( viewport -- gadget )
 : add-y-slider 2dup set-scroller-y add-right ;
 
 : scroll>bottom ( gadget -- )
-    find-scroller
-    [ t over set-scroller-bottom? relayout ] when* ;
+    find-viewport
+    [ t over set-viewport-bottom? relayout ] when* ;
 
 : scroll-up-line scroller-y -1 swap slide-by-line ;
 
@@ -82,10 +88,3 @@ C: scroller ( gadget -- scroller )
 
 M: scroller focusable-child* ( scroller -- viewport )
     scroller-viewport ;
-
-M: scroller layout* ( scroller -- )
-    dup scroller-bottom? [
-        f over set-scroller-bottom?
-        dup dup scroller-viewport viewport-dim
-        { 0 1 0 } v* scroll
-    ] when delegate layout* ;

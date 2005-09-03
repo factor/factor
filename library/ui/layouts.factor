@@ -4,6 +4,25 @@ IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
 matrices namespaces sdl sequences ;
 
+: relayout ( gadget -- )
+    #! Relayout and redraw a gadget and its parent before the
+    #! next iteration of the event loop.
+    dup gadget-relayout? [
+        drop
+    ] [
+        dup invalidate
+        dup gadget-root?
+        [ add-invalid ]
+        [ gadget-parent [ relayout ] when* ] ifte
+    ] ifte ;
+
+: set-gadget-dim ( dim gadget -- )
+    2dup rect-dim = [
+        2drop
+    ] [
+        [ set-rect-dim ] keep dup add-invalid invalidate
+    ] ifte ;
+
 GENERIC: pref-dim ( gadget -- dim )
 
 M: gadget pref-dim rect-dim ;

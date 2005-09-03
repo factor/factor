@@ -43,31 +43,34 @@ C: gadget ( -- gadget )
     { 0 0 0 } dup <rect> over set-delegate
     t over set-gadget-visible? ;
 
-DEFER: add-invalid
+GENERIC: user-input* ( ch gadget -- ? )
+
+M: gadget user-input* 2drop t ;
 
 : invalidate ( gadget -- )
     t swap set-gadget-relayout? ;
 
-: relayout ( gadget -- )
-    #! Relayout and redraw a gadget and its parent before the
-    #! next iteration of the event loop.
-    dup gadget-relayout? [
-        drop
-    ] [
-        dup invalidate
-        dup gadget-root?
-        [ add-invalid ]
-        [ gadget-parent [ relayout ] when* ] ifte
-    ] ifte ;
+DEFER: add-invalid
 
-: relayout-down ( gadget -- )
-    #! Relayout a gadget and its children.
-    dup add-invalid invalidate ;
+GENERIC: children-on ( rect/point gadget -- list )
 
-: set-gadget-dim ( dim gadget -- )
-    2dup rect-dim =
-    [ 2drop ] [ [ set-rect-dim ] keep relayout-down ] ifte ;
+M: gadget children-on ( rect/point gadget -- list )
+    nip gadget-children ;
 
-GENERIC: user-input* ( ch gadget -- ? )
+: inside? ( bounds gadget -- ? )
+    dup gadget-visible?
+    [ >absolute intersects? ] [ 2drop f ] ifte ;
 
-M: gadget user-input* 2drop t ;
+: pick-up-list ( rect/point gadget -- gadget/f )
+    dupd children-on reverse-slice [ inside? ] find-with nip ;
+
+: translate ( rect/point -- )
+    rect-loc origin [ v+ ] change ;
+
+: pick-up ( rect/point gadget -- gadget )
+    2dup inside? [
+        [
+            dup translate 2dup pick-up-list dup
+            [ nip pick-up ] [ rot 2drop ] ifte
+        ] with-scope
+    ] [ 2drop f ] ifte ;
