@@ -26,14 +26,6 @@ C: viewport ( content -- viewport )
 
 M: viewport pref-dim gadget-child pref-dim ;
 
-M: viewport layout* ( viewport -- )
-    dup find-scroller scroller-origin vneg
-    swap gadget-child dup prefer
-    set-rect-loc ;
-
-M: viewport focusable-child* ( viewport -- gadget )
-    gadget-child ;
-
 : set-slider ( page max value slider -- )
     #! page/max/value are 3-vectors.
     [ [ slider-vector v. ] keep set-slider-value ] keep
@@ -46,9 +38,20 @@ M: viewport focusable-child* ( viewport -- gadget )
     r> r> set-slider ;
 
 : scroll ( scroller value -- )
-    2dup
-    over scroller-x update-slider
+    2dup over scroller-x update-slider
     over scroller-y update-slider ;
+
+: update-scroller ( scroller -- ) dup scroller-origin scroll ;
+
+: update-viewport ( viewport scroller -- )
+    scroller-origin vneg
+    swap gadget-child dup prefer set-rect-loc ;
+
+M: viewport layout* ( viewport -- )
+    dup find-scroller dup update-scroller update-viewport ;
+
+M: viewport focusable-child* ( viewport -- gadget )
+    gadget-child ;
 
 : add-viewport 2dup set-scroller-viewport add-center ;
 

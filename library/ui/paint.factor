@@ -7,7 +7,7 @@ namespaces sdl sequences strings styles vectors ;
 SYMBOL: clip
 
 : >sdl-rect ( rectangle -- sdlrect )
-    [ rect-loc 2unseq ] keep rect-dim 2unseq make-rect ;
+    [ rect-loc first2 ] keep rect-dim first2 make-rect ;
 
 : set-clip ( rect -- )
     #! The top/left corner of the clip rectangle is the location
@@ -69,7 +69,7 @@ TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
     >r origin get dup r> rect-dim v+
-    >r 2unseq r> 2unseq >r 1 - r> 1 - ;
+    >r first2 r> first2 >r 1 - r> 1 - ;
 
 ! Solid pen
 M: solid draw-interior
@@ -129,10 +129,10 @@ M: gradient draw-interior ( gadget gradient -- )
 ! Bevel pen
 TUPLE: bevel width ;
 
-: x1/x2/y1 surface get pick pick >r 2unseq r> first swap ;
-: x1/x2/y2 surface get pick pick >r first r> 2unseq ;
-: x1/y1/y2 surface get pick pick >r 2unseq r> second ;
-: x2/y1/y2 surface get pick pick >r second r> 2unseq swapd ;
+: x1/x2/y1 surface get pick pick >r first2 r> first swap ;
+: x1/x2/y2 surface get pick pick >r first r> first2 ;
+: x1/y1/y2 surface get pick pick >r first2 r> second ;
+: x2/y1/y2 surface get pick pick >r second r> first2 swapd ;
 
 SYMBOL: bevel-1
 SYMBOL: bevel-2
@@ -173,7 +173,7 @@ M: gadget draw-gadget* ( gadget -- )
     <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;
 
 : draw-line ( from to color -- )
-    >r >r >r surface get r> 2unseq r> 2unseq r> rgb lineColor ;
+    >r >r >r surface get r> first2 r> first2 r> rgb lineColor ;
 
 : draw-fanout ( from tos color -- )
     -rot [ >r 2dup r> rot draw-line ] each 2drop ;

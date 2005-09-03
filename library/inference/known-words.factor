@@ -26,7 +26,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ cond [ [ object ] [ ] ] "infer-effect" set-word-prop
 
 \ cond [
-    pop-literal [ 2unseq cons ] map
+    pop-literal [ first2 cons ] map
     [ no-cond ] swap alist>quot infer-quot-value
 ] "infer" set-word-prop
 

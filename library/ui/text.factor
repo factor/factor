@@ -27,8 +27,8 @@ sequences strings styles ;
         2drop
     ] [
         >r [ gadget-font ] keep r> swap
-        fg 3unseq make-color
+        fg first3 make-color
         TTF_RenderUNICODE_Blended
-        [ >r origin get 2unseq r> draw-surface ] keep
+        [ >r origin get first2 r> draw-surface ] keep
         SDL_FreeSurface
     ] ifte ;

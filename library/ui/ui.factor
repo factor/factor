@@ -47,7 +47,7 @@ IN: shells
     #! dimensions.
     ttf-init
     ?init-world
-    world get rect-dim 2unseq 0 SDL_RESIZABLE [
+    world get rect-dim first2 0 SDL_RESIZABLE [
         [
             ui-title dup SDL_WM_SetCaption
             start-world

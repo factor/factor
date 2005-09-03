@@ -46,7 +46,7 @@ words ;
 
 ! Conses (whose cdr might not be a list)
 : [[ f ; parsing
-: ]] 2unseq swons swons ; parsing
+: ]] first2 swons swons ; parsing
 
 ! Vectors
 : { f ; parsing

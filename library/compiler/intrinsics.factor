@@ -144,7 +144,7 @@ sequences vectors words ;
 
 : values>vregs ( in -- in )
     value/vreg-list
-    dup [ 3unseq load-value ] each
+    dup [ first3 load-value ] each
     [ first <vreg> ] map ;
 
 : load-inputs ( node -- in )
@@ -152,7 +152,7 @@ sequences vectors words ;
     [ length swap node-out-d length - %dec-d , ] keep ;
 
 : binary-op-reg ( node op -- )
-    >r load-inputs 2unseq swap dup r> execute ,
+    >r load-inputs first2 swap dup r> execute ,
     0 0 %replace-d , ; inline
 
 : literal-immediate? ( value -- ? )

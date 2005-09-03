@@ -132,7 +132,7 @@ M: alien-node linearize-node* ( node -- )
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?
-    [ drop { } { } ] [ 2unseq ] ifte ;
+    [ drop { } { } ] [ first2 ] ifte ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [

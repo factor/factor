@@ -12,7 +12,7 @@ test vectors ;
 [ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
 
-[ 1 2 3 ] [ 1 2 3 3vector 3unseq ] unit-test
+[ 1 2 3 ] [ 1 2 3 3vector first3 ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 

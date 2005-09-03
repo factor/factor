@@ -30,17 +30,17 @@ sequences strings vectors words ;
     >r >r 2dup r> define-reader r> define-writer ;
 
 : ?create ( { name vocab }/f -- word )
-    dup [ 2unseq create ] when ;
+    dup [ first2 create ] when ;
 
 : intern-slots ( spec -- spec )
-    [ 3unseq swap ?create swap ?create 3vector ] map ;
+    [ first3 swap ?create swap ?create 3vector ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the
     #! given class. The spec is a list of lists of length 3 of
     #! the form [ slot reader writer ]. slot is an integer,
     #! reader and writer are either words, strings or f.
-    [ 3unseq define-slot ] each-with ;
+    [ first3 define-slot ] each-with ;
 
 : reader-word ( class name -- word )
     >r word-name "-" r> append3 "in" get 2vector ;

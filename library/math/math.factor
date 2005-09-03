@@ -87,5 +87,4 @@ GENERIC: abs ( z -- |z| )
         dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte
     ] ifte ; foldable
 
-GENERIC: string>number ( str -- num ) foldable
 GENERIC: number>string ( str -- num ) foldable

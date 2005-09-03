@@ -29,14 +29,15 @@ M: object digit> not-a-number ;
     #! conversion fails.
     swap "-" ?head >r (base>) r> [ neg ] when ;
 
-M: string string>number 10 base> ;
-
-PREDICATE: string potential-ratio CHAR: / swap member? ;
-M: potential-ratio string>number ( str -- num )
+: string>ratio ( "a/b" -- a/b )
     "/" split1 >r 10 base> r> 10 base> / ;
 
-PREDICATE: string potential-float CHAR: . swap member? ;
-M: potential-float string>number ( str -- num ) string>float ;
+: string>number ( string -- n )
+    {
+        { [ CHAR: / over member? ] [ string>ratio ] }
+        { [ CHAR: . over member? ] [ string>float ] }
+        { [ t ] [ 10 base> ] }
+    } cond ;
 
 : bin> 2 base> ;
 : oct> 8 base> ;

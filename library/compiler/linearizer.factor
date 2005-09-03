@@ -66,7 +66,7 @@ M: #drop linearize-node* ( node -- )
     in-1  1 %dec-d , 0 %jump-t , ;
 
 M: #ifte linearize-node* ( node -- )
-    node-children 2unseq
+    node-children first2
     <label> dup ifte-head
     swap linearize-node ( false branch )
     %label , ( branch target of BRANCH-T )

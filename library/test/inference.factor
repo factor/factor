@@ -2,7 +2,7 @@ IN: temporary
 USING: generic inference kernel lists math math-internals
 namespaces parser sequences test vectors ;
 
-: simple-effect 2unseq >r length r> length 2vector ;
+: simple-effect first2 >r length r> length 2vector ;
 
 [ { 0 2 } ] [ [ 2 "Hello" ] infer simple-effect ] unit-test
 [ { 1 2 } ] [ [ dup ] infer simple-effect ] unit-test

@@ -21,7 +21,7 @@ SYMBOL: bpp
     [ >r init-screen r> call SDL_Quit ] with-scope ; inline
 
 : rgb ( [ r g b ] -- n )
-    3unseq
+    first3
     255
     swap >fixnum 8 shift bitor
     swap >fixnum 16 shift bitor

@@ -105,12 +105,12 @@ M: elevator pref-dim drop thumb-min ;
 : <up-button>
     <gadget> [ -1 swap slide-by-line ] <repeat-button> ;
 
-: add-up { 1 1 1 } over slider-vector v- 2unseq set-frame-child ;
+: add-up { 1 1 1 } over slider-vector v- first2 set-frame-child ;
 
 : <down-button>
     <gadget> [ 1 swap slide-by-line ] <repeat-button> ;
 
-: add-down { 1 1 1 } over slider-vector v+ 2unseq set-frame-child ;
+: add-down { 1 1 1 } over slider-vector v+ first2 set-frame-child ;
 
 : add-elevator 2dup set-slider-elevator add-center ;
 

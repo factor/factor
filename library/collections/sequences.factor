@@ -54,10 +54,10 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
 
 : 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
 
-: 2unseq ( { x y } -- x y )
+: first2 ( { x y } -- x y )
     dup first swap second ; inline
 
-: 3unseq ( { x y z } -- x y z )
+: first3 ( { x y z } -- x y z )
     dup first over second rot third ; inline
 
 TUPLE: bounds-error index seq ;

@@ -361,4 +361,4 @@ M: wrapper pprint* ( wrapper -- )
     { POSTPONE: {{ POSTPONE: }} }
     { POSTPONE: [[ POSTPONE: ]] }
     { POSTPONE: [[ POSTPONE: ]] }
-} [ 2unseq define-close define-open ] each
+} [ first2 define-close define-open ] each

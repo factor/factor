@@ -10,7 +10,6 @@
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
 - theme abstraction in ui
-- menu dragging
 - find out why so many small bignums get consed
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener

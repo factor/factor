@@ -46,7 +46,7 @@ TUPLE: book-browser book ;
         { "<"  [ find-book prev-page  ] }
         { ">"  [ find-book next-page  ] }
         { ">|" [ find-book last-page  ] }
-    ] [ 2unseq >r <label> r> <button> ] map
+    ] [ first2 >r <label> r> <button> ] map
     <shelf> [ add-gadgets ] keep ;
 
 C: book-browser ( book -- gadget )

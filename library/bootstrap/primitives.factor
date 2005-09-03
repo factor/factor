@@ -22,7 +22,7 @@ f crossref set
 vocabularies get [ "syntax" set [ reveal ] each ] bind
 
 : make-primitive ( { vocab word } n -- )
-    >r 2unseq create r> f define ;
+    >r first2 create r> f define ;
 
 {
     { "execute" "words"                     }
@@ -198,7 +198,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 : set-stack-effect ( { vocab word effect } -- )
-    3unseq >r lookup r> "stack-effect" set-word-prop ;
+    first3 >r lookup r> "stack-effect" set-word-prop ;
 
 {
     { "drop" "kernel" " x -- " }

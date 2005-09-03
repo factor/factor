@@ -38,7 +38,7 @@ sequences vectors words ;
     ] catch ;
 
 : flip-branches ( #ifte -- )
-    dup node-children 2unseq swap 2vector swap set-node-children ;
+    dup node-children first2 swap 2vector swap set-node-children ;
 
 \ not {
     { [ dup node-successor #ifte? ] [ node-successor dup flip-branches ] }
@@ -47,7 +47,7 @@ sequences vectors words ;
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
     [ swap hash ] map-with
-    2unseq 2dup and [ classes-intersect? not ] [ 2drop f ] ifte ;
+    first2 2dup and [ classes-intersect? not ] [ 2drop f ] ifte ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }

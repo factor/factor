@@ -24,7 +24,7 @@ styles vectors ;
     [ resource-path % "/fonts/" % % ".ttf" % ] "" make ;
 
 : open-font ( [ font style ptsize ] -- alien )
-    3unseq >r ttf-name ttf-path r> TTF_OpenFont ;
+    first3 >r ttf-name ttf-path r> TTF_OpenFont ;
 
 SYMBOL: open-fonts
 
