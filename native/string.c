@@ -163,7 +163,11 @@ char* unbox_c_string(void)
 u16* unbox_utf16_string(void)
 {
 	/* Return pointer to first character */
-	return (u16*)(untag_string(dpop()) + 1);
+	CELL str = dpop();
+	if(type_of(str) == STRING_TYPE)
+		return (u16*)(untag_string(str) + 1);
+	else
+		return (u16*)alien_offset(str);
 }
 
 void primitive_char_slot(void)
