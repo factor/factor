@@ -89,10 +89,15 @@ M: object find ( seq quot -- i elt )
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
 
-: every? ( seq quot -- ? | quot: elt elt -- ? )
-    #! Tests if all elements are equivalent under the relation.
-    over empty?
-    [ 2drop t ] [ >r [ first ] keep r> all-with? ] ifte ; inline
+: (monotonic) ( quot seq i -- ? )
+    2dup 1 + swap nth >r swap nth r> rot call ; inline
+
+: monotonic? ( seq quot -- ? | quot: elt elt -- ? )
+    #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
+    #!     { 1 3 2 4 } [ < ] monotonic? ==> f
+    swap dup length 1 - [
+        pick pick >r >r (monotonic) r> r> rot
+    ] all? 2nip ; inline
 
 ! Operations
 M: object like drop ;

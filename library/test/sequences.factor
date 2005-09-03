@@ -72,12 +72,13 @@ unit-test
 
 [ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
-[ f ] [ [ { } { } "Hello" ] [ = ] every? ] unit-test
-[ f ] [ [ { 2 } { } { } ] [ = ] every? ] unit-test
-[ t ] [ [ ] [ = ] every? ] unit-test
-[ t ] [ [ 1/2 ] [ = ] every? ] unit-test
-[ t ] [ [ 1.0 10/10 1 ] [ = ] every? ] unit-test
-
+[ f ] [ [ { } { } "Hello" ] [ = ] monotonic? ] unit-test
+[ f ] [ [ { 2 } { } { } ] [ = ] monotonic? ] unit-test
+[ t ] [ [ ] [ = ] monotonic? ] unit-test
+[ t ] [ [ 1/2 ] [ = ] monotonic? ] unit-test
+[ t ] [ [ 1.0 10/10 1 ] [ = ] monotonic? ] unit-test
+[ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
+[ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test
 
 [ 1 ] [ 0 [ 1 2 ] nth ] unit-test
@@ -148,23 +149,9 @@ unit-test
 
 [ [ ] ] [ [ ] number-sort ] unit-test
 
-: pairs ( seq quot -- )
-    swap dup length 1 - [
-        [ 2dup 1 + swap nth >r swap nth r> rot call ] 3keep
-    ] repeat 2drop ;
-
-: map-pairs ( seq quot -- seq | quot: elt -- elt )
-    over [
-        length 1 - <vector> rot
-        [ 2swap [ slip push ] 2keep ] pairs nip
-    ] keep like ; inline
-    
-: sorted? ( seq quot -- ? )
-    map-pairs [ 0 <= ] all? ;
-
 [ t ] [
     100 [
         drop
-        1000 [ drop 0 1000 random-int ] map number-sort [ - ] sorted?
+        1000 [ drop 0 1000 random-int ] map number-sort [ <= ] monotonic?
     ] all?
 ] unit-test

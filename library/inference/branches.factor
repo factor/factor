@@ -16,7 +16,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup [ eq? ] every? [ first ] [ <meet> ] ifte ;
+    dup [ eq? ] monotonic? [ first ] [ <meet> ] ifte ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
@@ -24,7 +24,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     unify-lengths flip [ unify-values ] map ;
 
 : balanced? ( in out -- ? )
-    [ swap length swap length - ] 2map [ = ] every? ;
+    [ swap length swap length - ] 2map [ = ] monotonic? ;
 
 : unify-effect ( in out -- in out )
     2dup balanced?

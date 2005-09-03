@@ -43,18 +43,21 @@ M: viewport pref-dim gadget-child pref-dim ;
     2dup over scroller-x update-slider
     over scroller-y update-slider ;
 
+: (scroll>bottom) ( viewport scroller -- )
+    over viewport-bottom? [
+        f pick set-viewport-bottom?
+        2dup swap viewport-dim scroll
+    ] when 2drop ;
+
 : update-scroller ( scroller -- ) dup scroller-origin scroll ;
 
 : update-viewport ( viewport scroller -- )
-    over viewport-bottom? [
-        f pick set-viewport-bottom?
-        over viewport-dim
-    ] [
-        dup scroller-origin
-    ] ifte vneg nip swap gadget-child dup prefer set-rect-loc ;
+    scroller-origin vneg
+    swap gadget-child dup prefer set-rect-loc ;
 
 M: viewport layout* ( viewport -- )
-    dup find-scroller dup update-scroller update-viewport ;
+    dup find-scroller dup update-scroller
+    2dup (scroll>bottom) update-viewport ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
