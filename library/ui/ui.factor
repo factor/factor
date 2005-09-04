@@ -22,7 +22,7 @@ styles threads words ;
     ttf-init
     global [
         <world> world set
-        { 600 800 0 } world get set-gadget-dim
+        { 600 700 0 } world get set-gadget-dim
         
         world-theme world get set-gadget-paint
 
@@ -38,10 +38,10 @@ global [ first-time on ] bind
 : ?init-world
     first-time get [ init-world first-time off ] when ;
 
-IN: shells
-
 : ui-title
     [ "Factor " % version % " - " % "image" get % ] "" make ;
+
+IN: shells
 
 : ui ( -- )
     #! Start the Factor graphics subsystem with the given screen

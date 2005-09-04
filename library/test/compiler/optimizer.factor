@@ -171,3 +171,9 @@ TUPLE: pred-test ;
 : fixnum-declarations >fixnum 24 shift 1234 bitxor ; compiled
 
 [ ] [ 1000000 fixnum-declarations . ] unit-test
+
+! regression
+
+: literal-not-branch 0 not [ ] [ ] ifte ; compiled
+
+[ ] [ literal-not-branch ] unit-test

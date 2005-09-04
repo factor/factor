@@ -66,6 +66,7 @@
 
 + kernel:
 
+- friendlier .factor-rc load error handling
 - reader syntax for arrays, byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - first time hash/vector is grown, set size to something big

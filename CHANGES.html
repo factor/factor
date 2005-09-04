@@ -22,6 +22,8 @@
 <li>Collections:
 
 <ul>
+<li><code>sort ( seq quot -- | quot: elt elt -- -1/0/1 )</code> combinator now works with any sequence, not just a list. The comparator also has to return a signed integer, not just a boolean. It is much faster than the old sorting algorithm.</li>
+<li><code>binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )</code> and <code>binsearch ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )</code> combinators perform a binary search on a sorted sequence.</li>
 <li><code>2each ( seq seq quot -- quot: elt -- elt )</code> combinator</li>
 <li><code>join ( seq glue -- seq )</code> word. Takes a sequence of sequences, and constructs a new sequence with the glue in between each sequence. For example:
 <pre>  [ "usr" "bin" "grep" ] "/" join
@@ -79,7 +81,7 @@ make-sbuf    ==&gt; SBUF" " make
 <li>New <code>sleep ( ms -- )</code> word pauses current thread for a number of milliseconds.</li>
 <li>New <code>with-datastack ( stack word -- stack )</code> combinator.</li>
 <li>New <code>cond ( conditions -- )</code> combinator. It behaves like a set of nested <code>ifte</code>s, and compiles if each branch has the same stack effect. See its documentation comment for details.</li>
-<li>Formally documented method combination (<code>G:</code> syntax) in handbook.
+<li>Formally documented method combination (<code>G:</code> syntax) in handbook.</li>
 <li>Erlang/Termite-style concurrency library in <code>contrib/concurrency</code> (Chris Double).</li>
 <li>Completely redid infix algebra in <code>contrib/algebra/</code>. Now, vector operations are possible
 and the syntax doesn't use so many spaces. New way to write the quadratic formula:

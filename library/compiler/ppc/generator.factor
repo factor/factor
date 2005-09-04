@@ -125,4 +125,4 @@ M: %type generate-node ( vop -- )
     17 18 MR ;
 
 M: %tag generate-node ( vop -- )
-    dup vop-in-1 swap vop-out-1 tag-mask ANDI ;
+    dup vop-in-1 v>operand swap vop-out-1 v>operand tag-mask ANDI ;
