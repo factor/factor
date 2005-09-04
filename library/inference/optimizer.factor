@@ -56,7 +56,14 @@ M: #push optimize-node* ( node -- node/t )
 
 ! #shuffle
 M: #shuffle optimize-node*  ( node -- node/t )
-    [ dup node-in-d empty? swap node-in-r empty? and ] prune-if ;
+    dup node-successor dup #shuffle? [
+        [ >r node-shuffle r> node-shuffle compose-shuffle ] keep
+        [ set-node-shuffle ] keep
+    ] [
+        drop [
+            dup node-in-d empty? swap node-in-r empty? and
+        ] prune-if
+    ] ifte ;
 
 ! #ifte
 : static-branch? ( node -- lit ? )

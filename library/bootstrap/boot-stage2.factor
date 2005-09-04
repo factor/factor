@@ -18,6 +18,7 @@ words ;
 
 cpu "x86" = [
     "/library/compiler/x86/assembler.factor"
+    "/library/compiler/x86/architecture.factor"
     "/library/compiler/x86/generator.factor"
     "/library/compiler/x86/slots.factor"
     "/library/compiler/x86/stack.factor"
@@ -27,6 +28,7 @@ cpu "x86" = [
 
 cpu "ppc" = [
     "/library/compiler/ppc/assembler.factor"
+    "/library/compiler/ppc/architecture.factor"
     "/library/compiler/ppc/generator.factor"
     "/library/compiler/ppc/slots.factor"
     "/library/compiler/ppc/stack.factor"

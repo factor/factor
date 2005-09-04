@@ -113,6 +113,7 @@ sequences io vectors words ;
 
         "/library/bootstrap/image.factor"
 
+        "/library/inference/shuffle.factor"
         "/library/inference/dataflow.factor"
         "/library/inference/inference.factor"
         "/library/inference/branches.factor"
@@ -128,6 +129,7 @@ sequences io vectors words ;
         "/library/inference/call-optimizers.factor"
         "/library/inference/print-dataflow.factor"
         
+        "/library/compiler/architecture.factor"
         "/library/compiler/assembler.factor"
         "/library/compiler/relocate.factor"
         "/library/compiler/xt.factor"

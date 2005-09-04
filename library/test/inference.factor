@@ -2,6 +2,22 @@ IN: temporary
 USING: generic inference kernel lists math math-internals
 namespaces parser sequences test vectors ;
 
+[
+    << shuffle f { "a" } { } { "a" } { "a" } >>
+] [
+    << shuffle f { "a" } { } { "a" "a" } { } >>
+    << shuffle f { "b" } { } { } { "b" } >>
+    compose-shuffle
+] unit-test
+
+[
+    << shuffle f { "b" "a" } { } { "b" "b" } { } >>
+] [
+    << shuffle f { "a" } { } { } { } >>
+    << shuffle f { "b" } { } { "b" "b" } { } >>
+    compose-shuffle
+] unit-test
+
 : simple-effect first2 >r length r> length 2vector ;
 
 [ { 0 2 } ] [ [ 2 "Hello" ] infer simple-effect ] unit-test

@@ -132,7 +132,7 @@ M: symbol apply-object ( word -- )
     dup recursive-label? [
         node,
     ] [
-        node-child splice-node
+        node-child node-successor splice-node
     ] ifte ;
 
 M: compound apply-object ( word -- )

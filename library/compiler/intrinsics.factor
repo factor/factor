@@ -5,11 +5,6 @@ USING: assembler compiler-backend generic hashtables inference
 kernel kernel-internals lists math math-internals namespaces
 sequences vectors words ;
 
-! Architecture description
-: fixnum-imm?
-    #! Can fixnum operations take immediate operands?
-    cpu "x86" = ;
-
 : node-peek ( node -- value ) node-in-d peek ;
 
 : type-tag ( type -- tag )

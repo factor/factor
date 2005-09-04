@@ -4,8 +4,6 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces sequences words ;
 
-M: vreg v>operand vreg-n { EAX ECX EDX } nth ;
-
 ! Not used on x86
 M: %prologue generate-node drop ;
 

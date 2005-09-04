@@ -17,17 +17,16 @@ M: comment pprint* ( ann -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
 
 : value-str ( prefix values -- str )
-    [ value-uid word-name append ] map-with
-    " " join ;
+    [ value-uid word-name append ] map-with concat ;
 
 : effect-str ( node -- str )
     [
-        "" over node-in-d value-str %
-        "r: " over node-in-r value-str %
-        "--" %
-        "" over node-out-d value-str %
-        "r: " swap node-out-r value-str %
-    ] "" make ;
+        " " over node-in-d value-str %
+        " r: " over node-in-r value-str %
+        " --" %
+        " " over node-out-d value-str %
+        " r: " swap node-out-r value-str %
+    ] "" make 1 swap tail ;
 
 M: #push node>quot ( ? node -- )
     node-out-d [ literal-value literalize ] map % drop ;

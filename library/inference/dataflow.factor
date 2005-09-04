@@ -45,7 +45,7 @@ C: meet ( values -- value )
 ! representations used by Factor. It annotates concatenative
 ! code with stack flow information and types.
 
-TUPLE: node param in-d out-d in-r out-r
+TUPLE: node param shuffle
        classes literals history
        successor children ;
 
@@ -53,17 +53,29 @@ M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
     [
-        >r {{ }} clone {{ }} clone { } clone f f <node> r>
+        >r
+        swapd <shuffle> {{ }} clone {{ }} clone { } clone f f <node>
+        r>
         set-delegate
     ] keep ;
+
+: node-in-d  node-shuffle shuffle-in-d  ;
+: node-in-r  node-shuffle shuffle-in-r  ;
+: node-out-d node-shuffle shuffle-out-d ;
+: node-out-r node-shuffle shuffle-out-r ;
+
+: set-node-in-d  node-shuffle set-shuffle-in-d  ;
+: set-node-in-r  node-shuffle set-shuffle-in-r  ;
+: set-node-out-d node-shuffle set-shuffle-out-d ;
+: set-node-out-r node-shuffle set-shuffle-out-r ;
 
 : empty-node f { } { } { } { } ;
 : param-node ( label) { } { } { } { } ;
 : in-d-node ( inputs) >r f r> { } { } { } ;
 : out-d-node ( outputs) >r f { } r> { } { } ;
 
-: d-tail ( n -- list ) meta-d get tail* >vector ;
-: r-tail ( n -- list ) meta-r get tail* >vector ;
+: d-tail ( n -- list ) meta-d get tail* ;
+: r-tail ( n -- list ) meta-r get tail* ;
 
 : node-child node-children first ;
 
@@ -145,12 +157,6 @@ SYMBOL: current-node
 
 : with-nesting ( quot -- new-node | quot: -- new-node )
     nest-node 2slip unnest-node ; inline
-
-: copy-effect ( from to -- )
-    over node-in-d over set-node-in-d
-    over node-in-r over set-node-in-r
-    over node-out-d over set-node-out-d
-    swap node-out-r swap set-node-out-r ;
 
 : node-effect ( node -- [[ d-in meta-d ]] )
     dup node-in-d swap node-out-d cons ;
@@ -275,11 +281,7 @@ DEFER: subst-value
     ] each-node-with ;
 
 : (clone-node) ( node -- node )
-    clone
-    dup node-in-d clone over set-node-in-d
-    dup node-in-r clone over set-node-in-r
-    dup node-out-d clone over set-node-out-d
-    dup node-out-r clone over set-node-out-r ;
+    clone dup node-shuffle clone over set-node-shuffle ;
 
 : clone-node ( node -- node )
     dup [
