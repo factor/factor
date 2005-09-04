@@ -56,14 +56,11 @@ M: literal load-value ( vreg n value -- )
 : push-1 ( value -- ) 0 swap push-literal ;
 
 M: #push linearize-node* ( node -- )
-    node-out-d dup length dup %inc-d ,
+    node-out-d dup length dup %inc-d,
     1 - swap [ push-1 0 over %replace-d , ] each drop ;
 
-M: #drop linearize-node* ( node -- )
-    node-in-d length %dec-d , ;
-
 : ifte-head ( label -- )
-    in-1  1 %dec-d , 0 %jump-t , ;
+    in-1  -1 %inc-d, 0 %jump-t , ;
 
 M: #ifte linearize-node* ( node -- )
     node-children first2
@@ -76,7 +73,7 @@ M: #ifte linearize-node* ( node -- )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     in-1
-    1 %dec-d ,
+    -1 %inc-d,
     0 %untag-fixnum ,
     0 %dispatch ,
     [ <label> dup %target-label ,  cons ] map

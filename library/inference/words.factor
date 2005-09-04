@@ -143,9 +143,3 @@ M: compound apply-object ( word -- )
         dup "inline" word-prop
         [ inline-block block, ] [ apply-default ] ifte
     ] ifte* ;
-
-: infer-shuffle ( word -- )
-    dup #call [
-        over "infer-effect" word-prop
-        [ meta-d [ swap with-datastack ] change ] hairy-node
-    ] keep node, ;

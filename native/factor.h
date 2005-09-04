@@ -9,7 +9,6 @@
 	#define DLLEXPORT
 #endif
 
-/* CELL must be 32 bits and your system must have 32-bit pointers */
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
 
@@ -29,10 +28,12 @@ CELL ds_bot;
 CELL cs_bot;
 
 /* raw pointer to callstack top */
-#if defined(FACTOR_PPC)
+#if defined(FACTOR_X86)
+	register CELL cs asm("ebx");
+#elif defined(FACTOR_PPC)
 	register CELL cs asm("r15");
 #else
-	DLLEXPORT CELL cs;
+	CELL cs;
 #endif
 
 /* TAGGED currently executing quotation */

@@ -44,51 +44,8 @@ M: #push can-kill? ( literal node -- ? ) 2drop t ;
 M: #push kill-node* ( literals node -- )
     [ node-out-d seq-diff ] keep set-node-out-d ;
 
-! #drop
-M: #drop can-kill? ( literal node -- ? ) 2drop t ;
-
-! #call
-: (kill-shuffle) ( word -- map )
-    {{
-        [[ dup {{ }} ]]
-        [[ drop {{ }} ]]
-        [[ swap {{ }} ]]
-        [[ over
-            {{
-                [[ { f t } dup  ]]
-            }}
-        ]]
-        [[ pick
-            {{
-                [[ { f f t } over ]]
-                [[ { f t f } over ]]
-                [[ { f t t } dup  ]]
-            }}
-        ]]
-        [[ >r {{ }} ]]
-        [[ r> {{ }} ]]
-    }} hash ;
-
-M: #call can-kill? ( literal node -- ? )
-    dup node-param (kill-shuffle) >r delegate can-kill? r> or ;
-
-: kill-mask ( killing node -- mask )
-    dup node-param \ r> = [ node-in-r ] [ node-in-d ] ifte
-    [ swap memq? ] map-with ;
-
-: lookup-mask ( mask word -- word )
-    over [ ] contains? [ (kill-shuffle) hash ] [ nip ] ifte ;
-
-: kill-shuffle ( literals node -- )
-    #! If certain values passing through a stack op are being
-    #! killed, the stack op can be reduced, in extreme cases
-    #! to a no-op.
-    [ [ kill-mask ] keep node-param lookup-mask ] keep
-    set-node-param ;
-
-M: #call kill-node* ( literals node -- )
-    dup node-param (kill-shuffle)
-    [ kill-shuffle ] [ 2drop ] ifte ;
+! #shuffle
+M: #shuffle can-kill? ( literal node -- ? ) 2drop t ;
 
 ! #call-label
 M: #call-label can-kill? ( literal node -- ? ) 2drop t ;

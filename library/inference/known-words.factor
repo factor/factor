@@ -37,42 +37,6 @@ memory parser sequences strings vectors words prettyprint ;
     #dispatch pop-d drop infer-branches
 ] "infer" set-word-prop
 
-! Stack manipulation
-\ >r [ [ object ] [ ] ] "infer-effect" set-word-prop
-
-\ >r [
-    \ >r #call
-    1 0 pick node-inputs
-    pop-d push-r
-    0 1 pick node-outputs
-    node,
-] "infer" set-word-prop
-
-\ r> [ [ ] [ object ] ] "infer-effect" set-word-prop
-
-\ r> [
-    \ r> #call
-    0 1 pick node-inputs
-    pop-r push-d
-    1 0 pick node-outputs
-    node,
-] "infer" set-word-prop
-
-\ drop [ 1 #drop node, pop-d drop ] "infer" set-word-prop
-\ drop [ [ object ] [ ] ] "infer-effect" set-word-prop
-
-\ dup  [ \ dup  infer-shuffle ] "infer" set-word-prop
-\ dup [ [ object ] [ object object ] ] "infer-effect" set-word-prop
-
-\ swap [ \ swap infer-shuffle ] "infer" set-word-prop
-\ swap [ [ object object ] [ object object ] ] "infer-effect" set-word-prop
-
-\ over [ \ over infer-shuffle ] "infer" set-word-prop
-\ over [ [ object object ] [ object object object ] ] "infer-effect" set-word-prop
-
-\ pick [ \ pick infer-shuffle ] "infer" set-word-prop
-\ pick [ [ object object object ] [ object object object object ] ] "infer-effect" set-word-prop
-
 ! Non-standard control flow
 \ throw [ [ object ] [ ] ] "infer-effect" set-word-prop
 

@@ -54,9 +54,9 @@ M: node optimize-node* ( node -- t )
 M: #push optimize-node* ( node -- node/t )
     [ node-out-d empty? ] prune-if ;
 
-! #drop
-M: #drop optimize-node*  ( node -- node/t )
-    [ node-in-d empty? ] prune-if ;
+! #shuffle
+M: #shuffle optimize-node*  ( node -- node/t )
+    [ dup node-in-d empty? swap node-in-r empty? and ] prune-if ;
 
 ! #ifte
 : static-branch? ( node -- lit ? )

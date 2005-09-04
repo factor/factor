@@ -16,28 +16,24 @@ M: comment pprint* ( ann -- )
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
 
-: value-str ( classes values -- str )
-    [ swap hash [ object ] unless* ] map-with
-    [ word-name ] map
+: value-str ( prefix values -- str )
+    [ value-uid word-name append ] map-with
     " " join ;
 
 : effect-str ( node -- str )
     [
-        dup node-classes swap
-        2dup node-in-d value-str %
+        "" over node-in-d value-str %
+        "r: " over node-in-r value-str %
         "--" %
-        node-out-d value-str %
+        "" over node-out-d value-str %
+        "r: " swap node-out-r value-str %
     ] "" make ;
 
 M: #push node>quot ( ? node -- )
     node-out-d [ literal-value literalize ] map % drop ;
 
-M: #drop node>quot ( ? node -- )
-    node-in-d length dup 3 > [
-        \ drop <repeated>
-    ] [
-        { f [ drop ] [ 2drop ] [ 3drop ] } nth
-    ] ifte % drop ;
+M: #shuffle node>quot ( ? node -- )
+    >r drop t r> dup effect-str "#shuffle: " swap append comment, ;
 
 DEFER: dataflow>quot
 

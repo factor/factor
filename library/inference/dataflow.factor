@@ -57,6 +57,7 @@ M: node = eq? ;
         set-delegate
     ] keep ;
 
+: empty-node f { } { } { } { } ;
 : param-node ( label) { } { } { } { } ;
 : in-d-node ( inputs) >r f r> { } { } { } ;
 : out-d-node ( outputs) >r f { } r> { } { } ;
@@ -86,9 +87,9 @@ TUPLE: #push ;
 C: #push make-node ;
 : #push ( outputs -- node ) d-tail out-d-node <#push> ;
 
-TUPLE: #drop ;
-C: #drop make-node ;
-: #drop ( inputs -- node ) d-tail in-d-node <#drop> ;
+TUPLE: #shuffle ;
+C: #shuffle make-node ;
+: #shuffle ( -- node ) empty-node <#shuffle> ;
 
 TUPLE: #values ;
 C: #values make-node ;
@@ -163,6 +164,9 @@ SYMBOL: current-node
 : uses-value? ( value node -- ? )
     node-values [ value-refers? ] contains-with? ;
 
+: outputs-value? ( value node -- ? )
+    2dup node-out-d member? >r node-out-r member? r> or ;
+
 : last-node ( node -- last )
     dup node-successor [ last-node ] [ ] ?ifte ;
 
@@ -174,8 +178,11 @@ SYMBOL: current-node
         2drop f
     ] ifte ;
 
-: drop-inputs ( node -- #drop )
-    node-in-d clone in-d-node <#drop> ;
+: drop-inputs ( node -- #shuffle )
+    node-in-d clone in-d-node <#shuffle> ;
+
+: #drop ( n -- #shuffle )
+    d-tail in-d-node <#shuffle> ;
 
 : each-node ( node quot -- | quot: node -- )
     over [

@@ -27,9 +27,6 @@ M: %inc-d generate-node ( vop -- )
 M: %inc-r generate-node ( vop -- )
     15 15 rot vop-in-1 cell * ADDI ;
 
-M: %dec-r generate-node ( vop -- )
-    15 15 rot vop-in-1 cell * SUBI ;
-
 M: %peek-r generate-node ( vop -- )
     dup vop-out-1 v>operand swap vop-in-1 cs-op LWZ ;
 

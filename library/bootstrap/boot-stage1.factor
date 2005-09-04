@@ -124,6 +124,7 @@ sequences io vectors words ;
         "/library/inference/optimizer.factor"
         "/library/inference/inline-methods.factor"
         "/library/inference/known-words.factor"
+        "/library/inference/stack.factor"
         "/library/inference/call-optimizers.factor"
         "/library/inference/print-dataflow.factor"
         
@@ -132,6 +133,7 @@ sequences io vectors words ;
         "/library/compiler/xt.factor"
         "/library/compiler/vops.factor"
         "/library/compiler/linearizer.factor"
+        "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
         "/library/compiler/simplifier.factor"
         "/library/compiler/generator.factor"

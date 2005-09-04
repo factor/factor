@@ -131,9 +131,10 @@ M: %replace-d basic-block? drop t ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
-: %inc-d ( n -- ) src-vop <%inc-d> ;
-: %dec-d ( n -- ) neg %inc-d ;
+: %inc-d ( n -- node ) src-vop <%inc-d> ;
 M: %inc-d basic-block? drop t ;
+
+: %inc-d, ( n -- ) dup 0 = [ dup %inc-d , ] unless drop ;
 
 TUPLE: %immediate ;
 C: %immediate make-vop ;
@@ -151,12 +152,10 @@ C: %replace-r make-vop ;
 
 TUPLE: %inc-r ;
 C: %inc-r make-vop ;
+
 : %inc-r ( n -- ) src-vop <%inc-r> ;
 
-! this exists, unlike %dec-d which does not, due to x86 quirks
-TUPLE: %dec-r ;
-C: %dec-r make-vop ;
-: %dec-r ( n -- ) src-vop <%dec-r> ;
+: %inc-r, ( n -- ) dup 0 = [ dup %inc-r , ] unless drop ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;

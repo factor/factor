@@ -44,6 +44,8 @@ parser prettyprint sequences io strings vectors words ;
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;
 
+M: f error. ( f -- ) ;
+
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
