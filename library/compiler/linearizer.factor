@@ -25,7 +25,7 @@ M: node linearize-node* ( node -- ) drop ;
 M: #label linearize-node* ( node -- )
     <label> dup %return-to , >r
     dup node-param %label ,
-    node-children first linearize-node
+    node-child linearize-node
     r> %label , ;
 
 M: #call linearize-node* ( node -- )

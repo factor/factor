@@ -55,7 +55,7 @@ SYMBOL: d-in
     meta-d [ append ] change
     d-in [ append ] change ;
 
-: hairy-node ( node effect quot -- )
+: hairy-node ( node effect quot -- quot: -- )
     over car ensure-d
     -rot 2dup car length 0 rot node-inputs
     2slip

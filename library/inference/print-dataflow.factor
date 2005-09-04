@@ -51,7 +51,7 @@ M: #call-label node>quot ( ? node -- ) #call>quot ;
 
 M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
-    node-children first swap dataflow>quot , \ call ,  ;
+    node-child swap dataflow>quot , \ call ,  ;
 
 M: #ifte node>quot ( ? node -- )
     [ "#ifte" comment, ] 2keep

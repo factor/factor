@@ -2627,10 +2627,11 @@ Outputs \texttt{t} if the quotation yields true when applied to each element, ot
 \ordinaryword{monotonic?}{monotonic?~( seq quot -- ?~)}
 \texttt{quot:~element element -- ?}\\
 }
-Tests if all elements of the sequence are equivalent under the relation. The quotation should be an equality relation (see \ref{equality}), otherwise the result will not be useful. This is implemented by vacuously outputting \verb|t| if the sequence is empty, or otherwise, by applying the quotation to each element together with the first element in turn, and testing if it always yields a true value. Usually, this word is used to test if all elements of a sequence are equal, or the same element:
+Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation. Examples:
 \begin{verbatim}
-[ = ] every?
-[ eq? ] every?
+[ = ] monotonic?    ! is every element equal?
+[ eq? ] monotonic?  ! is every element identical?
+[ < ] monotonic?    ! is the sequence increasing?
 \end{verbatim}
 
 A pair of utility words test of every element in a sequence is true, or if the sequence contains at least one true element.

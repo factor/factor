@@ -3,18 +3,19 @@
 IN: kernel
 USING: generic kernel-internals vectors ;
 
-: 2drop ( x x -- ) drop drop ; inline
-: 3drop ( x x x -- ) drop drop drop ; inline
-: 2dup ( x y -- x y x y ) over over ; inline
-: 3dup ( x y z -- x y z x y z ) pick pick pick ; inline
-: rot ( x y z -- y z x ) >r swap r> swap ; inline
-: -rot ( x y z -- z x y ) swap >r swap r> ; inline
-: dupd ( x y -- x x y ) >r dup r> ; inline
-: swapd ( x y z -- y x z ) >r swap r> ; inline
+: 2drop ( x x -- ) drop drop ;
+: 3drop ( x x x -- ) drop drop drop ;
+: 2dup ( x y -- x y x y ) over over ;
+: 3dup ( x y z -- x y z x y z ) pick pick pick ;
+: rot ( x y z -- y z x ) >r swap r> swap ;
+: -rot ( x y z -- z x y ) swap >r swap r> ;
+: dupd ( x y -- x x y ) >r dup r> ;
+: swapd ( x y z -- y x z ) >r swap r> ;
+: nip ( x y -- y ) swap drop ;
+: 2nip ( x y z -- z ) >r drop drop r> ;
+: tuck ( x y -- y x y ) dup >r swap r> ;
+
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
-: nip ( x y -- y ) swap drop ; inline
-: 2nip ( x y z -- z ) >r drop drop r> ; inline
-: tuck ( x y -- y x y ) dup >r swap r> ; inline
 
 : clear ( -- )
     #! Clear the datastack. For interactive use only; invoking

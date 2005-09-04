@@ -48,7 +48,6 @@
 
 + compiler:
 
-- removing unneeded #label
 - flushing optimization
 - compile-byte/cell: instantiating aliens
 - fix fixnum<< and /i overflow on PowerPC

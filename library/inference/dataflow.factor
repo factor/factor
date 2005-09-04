@@ -64,6 +64,8 @@ M: node = eq? ;
 : d-tail ( n -- list ) meta-d get tail* >vector ;
 : r-tail ( n -- list ) meta-r get tail* >vector ;
 
+: node-child node-children first ;
+
 TUPLE: #label ;
 C: #label make-node ;
 : #label ( label -- node ) param-node <#label> ;
@@ -278,3 +280,15 @@ DEFER: subst-value
         dup node-children [ clone-node ] map over set-node-children
         dup node-successor clone-node over set-node-successor
     ] when ;
+
+GENERIC: calls-label* ( label node -- ? )
+
+M: node calls-label* 2drop f ;
+
+M: #call-label calls-label* node-param eq? ;
+
+: calls-label? ( label node -- ? )
+    [ calls-label* not ] all-nodes-with? not ;
+
+: recursive-label? ( node -- ? )
+    dup node-param swap calls-label? ;

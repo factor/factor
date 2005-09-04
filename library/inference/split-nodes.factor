@@ -14,7 +14,7 @@ USING: kernel sequences words ;
 !   +--> Y --> X
 !   |
 !   +--> Z --> X
-    
+
 GENERIC: split-node* ( node -- )
 
 : split-node ( node -- )
@@ -48,8 +48,9 @@ M: #ifte split-node* ( node -- )
 M: #dispatch split-node* ( node -- )
     split-branch ;
 
+! #label
 M: #label split-node* ( node -- )
-    node-children first split-node ;
+    node-child split-node ;
 
 : inline-literals ( node literals -- node )
     #! Make #push -> #return -> successor

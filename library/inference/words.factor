@@ -119,13 +119,29 @@ M: symbol apply-object ( word -- )
         ] ifte*
     ] ifte* ;
 
+
+: splice-node ( node -- )
+    dup node-successor [
+        dup node, penultimate-node f over set-node-successor
+        dup current-node set
+    ] when drop ;
+
+: block, ( block -- )
+    #! If the block does not call itself, there is no point in
+    #! having the block node in the IR. Just add its contents.
+    dup recursive-label? [
+        node,
+    ] [
+        node-child splice-node
+    ] ifte ;
+
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
     dup recursive-state get assoc [
         recursive-word
     ] [
         dup "inline" word-prop
-        [ inline-block node, ] [ apply-default ] ifte
+        [ inline-block block, ] [ apply-default ] ifte
     ] ifte* ;
 
 : infer-shuffle ( word -- )
