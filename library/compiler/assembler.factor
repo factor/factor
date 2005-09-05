@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: assembler
-USING: alien math memory kernel hashtables namespaces ;
+USING: alien compiler-backend math memory kernel hashtables
+namespaces ;
 
 SYMBOL: interned-literals
 

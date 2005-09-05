@@ -349,6 +349,12 @@ null null define-class
 
 "displaced-alien" "alien" create 20 "displaced-alien?" "alien" create { } define-builtin
 
+! Define general-t type, which is any object that is not f.
+"general-t" "kernel" create dup define-symbol
+"general-t?" "kernel" create
+"f" "!syntax" lookup builtins get remove [ ] subset
+define-union
+
 FORGET: builtin-predicate
 FORGET: register-builtin
 FORGET: define-builtin

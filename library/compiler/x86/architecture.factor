@@ -1,4 +1,4 @@
-IN: compiler-frontend
+IN: compiler-backend
 USING: assembler compiler-backend sequences ;
 
 ! x86 register assignments

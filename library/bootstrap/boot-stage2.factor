@@ -24,6 +24,7 @@ cpu "x86" = [
     "/library/compiler/x86/stack.factor"
     "/library/compiler/x86/fixnum.factor"
     "/library/compiler/x86/alien.factor"
+    "/library/alien/primitive-types.factor"
 ] pull-in
 
 cpu "ppc" = [
@@ -34,6 +35,7 @@ cpu "ppc" = [
     "/library/compiler/ppc/stack.factor"
     "/library/compiler/ppc/fixnum.factor"
     "/library/compiler/ppc/alien.factor"
+    "/library/alien/primitive-types.factor"
 ] pull-in
 
 "statically-linked" get [

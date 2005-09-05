@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: compiler-frontend generic hashtables inference kernel
+USING: compiler-backend generic hashtables inference kernel
 lists math matrices namespaces sequences vectors ;
 
 ! We use the recursive-state variable here, to track nested

@@ -93,11 +93,6 @@ M: union class.
     dup pprint-word
     "members" word-prop pprint-elements pprint-; newline ;
 
-M: complement class.
-    \ COMPLEMENT: pprint-word
-    dup pprint-word
-    "complement" word-prop pprint-word newline ;
-
 M: predicate class.
     \ PREDICATE: pprint-word
     dup "superclass" word-prop pprint-word

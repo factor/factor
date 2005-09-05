@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: alien
-USING: assembler compiler errors generic hashtables kernel lists
-math namespaces parser sequences strings words ;
+USING: assembler compiler compiler-backend errors generic
+hashtables kernel lists math namespaces parser sequences strings
+words ;
 
 ! Some code for interfacing with C structures.
 

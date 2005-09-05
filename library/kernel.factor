@@ -12,7 +12,6 @@ USING: generic kernel-internals vectors ;
     { } set-datastack ;
 
 UNION: boolean POSTPONE: f POSTPONE: t ;
-COMPLEMENT: general-t f
 
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;

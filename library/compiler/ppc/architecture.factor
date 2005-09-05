@@ -1,4 +1,4 @@
-IN: compiler-frontend
+IN: compiler-backend
 USING: assembler compiler-backend math ;
 
 ! PowerPC register assignments

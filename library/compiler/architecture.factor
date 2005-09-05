@@ -1,4 +1,4 @@
-IN: compiler-frontend
+IN: compiler-backend
 
 ! A few things the front-end needs to know about the back-end.
 
