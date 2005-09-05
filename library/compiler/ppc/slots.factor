@@ -32,12 +32,13 @@ M: %fast-set-slot generate-node ( vop -- )
 
 M: %write-barrier generate-node ( vop -- )
     #! Mark the card pointed to by vreg.
+    #! Uses r6 for storage.
     vop-in-1 v>operand
     dup dup card-bits SRAWI
     dup dup 16 ADD
-    20 over 0 LBZ
-    20 20 card-mark ORI
-    20 swap 0 STB ;
+    6 over 0 LBZ
+    6 6 card-mark ORI
+    6 swap 0 STB ;
 
 : userenv ( reg -- )
     #! Load the userenv pointer in a virtual register.

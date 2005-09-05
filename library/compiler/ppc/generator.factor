@@ -12,8 +12,6 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
 
-M: vreg v>operand vreg-n 17 + ;
-
 M: %prologue generate-node ( vop -- )
     drop
     1 1 -16 STWU
@@ -39,18 +37,19 @@ M: %call-label generate-node ( vop -- )
     B ;
 
 : word-addr ( word -- )
-    dup word-xt 19 LOAD32  0 1 rel-word ;
+    #! Load a word address into r3.
+    dup word-xt 3 LOAD32  0 1 rel-word ;
 
 : compile-call ( label -- )
     #! Far C call for primitives, near C call for compiled defs.
-    dup primitive? [ word-addr  19 MTLR  BLRL ] [ BL ] ifte ;
+    dup primitive? [ word-addr  3 MTLR  BLRL ] [ BL ] ifte ;
 
 M: %call generate-node ( vop -- )
     vop-label dup postpone-word compile-call ;
 
 : compile-jump ( label -- )
     #! For tail calls. IP not saved on C stack.
-    dup primitive? [ word-addr  19 MTCTR  BCTR ] [ B ] ifte ;
+    dup primitive? [ word-addr  3 MTCTR  BCTR ] [ B ] ifte ;
 
 M: %jump generate-node ( vop -- )
     vop-label dup postpone-word  compile-epilogue compile-jump ;
@@ -68,9 +67,9 @@ M: %jump-t generate-node ( vop -- )
     conditional BNE ;
 
 M: %return-to generate-node ( vop -- )
-    vop-label 0 18 LOAD32  absolute-16/16
+    vop-label 0 3 LOAD32  absolute-16/16
     1 1 -16 STWU
-    18 1 20 STW ;
+    3 1 20 STW ;
 
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
@@ -91,13 +90,13 @@ M: %retag-fixnum generate-node ( vop -- )
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
-    17 17 2 SLWI
+    3 3 2 SLWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    0 1 rel-address  compiled-offset 24 + 18 LOAD32
-    17 17 18 ADD
-    17 17 0 LWZ
-    17 MTLR
+    0 1 rel-address  compiled-offset 24 + 4 LOAD32
+    3 3 4 ADD
+    3 3 0 LWZ
+    3 MTLR
     BLR ;
 
 M: %type generate-node ( vop -- )
@@ -105,24 +104,24 @@ M: %type generate-node ( vop -- )
     <label> "f" set
     <label> "end" set
     ! Get the tag
-    17 18 tag-mask ANDI
+    3 4 tag-mask ANDI
     ! Compare with object tag number (3).
-    0 18 object-tag CMPI
+    0 4 object-tag CMPI
     ! Jump if the object doesn't store type info in its header
     "end" get BNE
     ! It does store type info in its header
     ! Is the pointer itself equal to 3? Then its F_TYPE (9).
-    0 17 object-tag CMPI
+    0 3 object-tag CMPI
     "f" get BEQ
     ! The pointer is not equal to 3. Load the object header.
-    18 17 object-tag neg LWZ
-    18 18 3 SRAWI
+    4 3 object-tag neg LWZ
+    4 4 3 SRAWI
     "end" get B
     "f" get save-xt
     ! The pointer is equal to 3. Load F_TYPE (9).
-    f type 18 LI
+    f type 4 LI
     "end" get save-xt
-    17 18 MR ;
+    3 4 MR ;
 
 M: %tag generate-node ( vop -- )
     dup vop-in-1 v>operand swap vop-out-1 v>operand tag-mask ANDI ;
