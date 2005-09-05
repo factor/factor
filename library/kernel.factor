@@ -3,18 +3,6 @@
 IN: kernel
 USING: generic kernel-internals vectors ;
 
-: 2drop ( x x -- ) drop drop ;
-: 3drop ( x x x -- ) drop drop drop ;
-: 2dup ( x y -- x y x y ) over over ;
-: 3dup ( x y z -- x y z x y z ) pick pick pick ;
-: rot ( x y z -- y z x ) >r swap r> swap ;
-: -rot ( x y z -- z x y ) swap >r swap r> ;
-: dupd ( x y -- x x y ) >r dup r> ;
-: swapd ( x y z -- y x z ) >r swap r> ;
-: nip ( x y -- y ) swap drop ;
-: 2nip ( x y z -- z ) >r drop drop r> ;
-: tuck ( x y -- y x y ) dup >r swap r> ;
-
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
 : clear ( -- )

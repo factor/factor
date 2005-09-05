@@ -9,13 +9,13 @@ SYMBOL: interned-literals
 : compiled-header HEX: 01c3babe ; inline
 
 : compiled-byte ( a -- n )
-    <alien> 0 alien-signed-1 ; inline
+    f swap alien-signed-1 ; inline
 : set-compiled-byte ( n a -- )
-    <alien> 0 set-alien-signed-1 ; inline
+    f swap set-alien-signed-1 ; inline
 : compiled-cell ( a -- n )
-    <alien> 0 alien-signed-cell ; inline
+    f swap alien-signed-cell ; inline
 : set-compiled-cell ( n a -- )
-    <alien> 0 set-alien-signed-cell ; inline
+    f swap set-alien-signed-cell ; inline
 
 : compile-aligned ( n -- )
     compiled-offset cell 2 * align set-compiled-offset ; inline
