@@ -308,12 +308,11 @@ M: wrapper pprint* ( wrapper -- )
         wrapped 1vector \ W[ \ ]W pprint-sequence
     ] ifte ;
 
-: with-pprint ( quot -- )
+: pprint ( object -- )
     [
-        <pprinter> pprinter set call pprinter get do-pprint
-    ] with-scope ; inline
-
-: pprint ( object -- ) [ pprint* ] with-pprint ;
+        <pprinter> pprinter set pprint* end-blocks
+        pprinter get do-pprint
+    ] with-scope ;
 
 : unparse ( object -- str ) [ pprint ] string-out ;
 
@@ -347,12 +346,12 @@ M: wrapper pprint* ( wrapper -- )
 
 : define-open
     #! The word will be pretty-printed as a block opener.
-    #! Examples are [ { {{ << and so on.
+    #! Examples are [ { {{ [[ << and so on.
     [ <block ] "pprint-after-hook" set-word-prop ;
 
 : define-close ( word -- )
     #! The word will be pretty-printed as a block closer.
-    #! Examples are ] } }} ]] and so on.
+    #! Examples are ] } }} ]] >> and so on.
     [ block> ] "pprint-before-hook" set-word-prop ;
 
 {
