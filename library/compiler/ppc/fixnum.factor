@@ -56,20 +56,24 @@ M: %fixnum* generate-node ( vop -- )
     "end" get save-xt
     3 6 MR ;
 
+: first-bignum ( -- n )
+    1 cell 8 * tag-bits - 1 - shift ; inline
+
+: most-positive-fixnum ( -- n )
+    first-bignum 1 - >fixnum ; inline
+
 : most-negative-fixnum ( -- n )
-      1 cell 8 * tag-bits - 1 - shift neg ; inline
+    first-bignum neg >fixnum ; inline
 
 M: %fixnum/i generate-node ( vop -- )
     #! This has specific vreg requirements.
-    drop
-    0 MTXER
-    5 3 4 DIVWO.
-    <label> "overflow" set
     <label> "end" set
-    "overflow" get BO
-    3 5 tag-fixnum
-    "end" get B
-    "overflow" get save-xt
+    drop
+    5 3 4 DIVW
+    most-positive-fixnum 4 LOAD
+    5 3 tag-fixnum
+    5 0 4 CMP
+    "end" get BLE
     most-negative-fixnum neg 3 LOAD
     "s48_long_to_bignum" f compile-c-call
     3 3 bignum-tag ORI
@@ -128,7 +132,7 @@ M: %fixnum<< generate-node ( vop -- )
     "end" get B
     ! there is not going to be an overflow
     "no-overflow" get save-xt
-    3 3 rot SLWI
+    3 3 rot SLWI.
     "end" get save-xt ;
 
 M: %fixnum>> generate-node ( vop -- )

@@ -4,13 +4,8 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces words ;
 
-! PowerPC register assignments
-! r14 data stack
-! r15 call stack
-! r16-r30 vregs
-
 : compile-c-call ( symbol dll -- )
-    2dup dlsym  19 LOAD32  0 1 rel-dlsym  19 MTLR  BLRL ;
+    2dup dlsym  3 LOAD32  0 1 rel-dlsym  3 MTLR  BLRL ;
 
 M: %prologue generate-node ( vop -- )
     drop
@@ -82,7 +77,7 @@ M: %untag generate-node ( vop -- )
 M: %untag-fixnum generate-node ( vop -- )
     dest/src tag-bits SRAWI ;
 
-: tag-fixnum ( dest src -- ) tag-bits SLWI ;
+: tag-fixnum ( src dest -- ) tag-bits SLWI ;
 
 M: %retag-fixnum generate-node ( vop -- )
     ! todo: formalize scratch register usage

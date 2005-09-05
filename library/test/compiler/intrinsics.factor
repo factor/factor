@@ -164,4 +164,6 @@ math-internals test words ;
 
 [ 268435456 ] [ -268435456 >fixnum -1 [ fixnum/i ] compile-1 ] unit-test
 
+[ 268435456 0 ] [ -268435456 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
+
 [ t ] [ f [ f eq? ] compile-1 ] unit-test

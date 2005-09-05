@@ -51,19 +51,18 @@
 + compiler:
 
 - flushing optimization
-- compile-byte/cell: instantiating aliens
-- fix fixnum<< and /i overflow on PowerPC
-- simplifier:
-  - kill replace after a peek
-  - merge inc-d's across VOPs that don't touch the stack
-- intrinsic char-slot set-char-slot integer-slot set-integer-slot
+- fix fixnum/mod overflow on PowerPC
+- eliminate simplifier
+- intrinsic char-slot set-char-slot
 - [ [ dup call ] dup call ] infer hangs
 - declarations
 - the invalid recursion form case needs to be fixed, for inlines too
-- #jump-f #jump-f-label
-- re-introduce #target-label => #target optimization
 - recursion is iffy; if the stack at the recursive call doesn't match
   up, throw an error
+- remove %fixnum-</<=/>/>=, always use %jump-* form
+- remove %jump-t, use %jump-eq? f instead
+- kill dead code after 'throw'
+- better type inference
 
 + kernel:
 

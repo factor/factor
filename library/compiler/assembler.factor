@@ -5,7 +5,6 @@ USING: alien math memory kernel hashtables namespaces ;
 
 SYMBOL: interned-literals
 
-: cell 4 ; inline
 : compiled-header HEX: 01c3babe ; inline
 
 : compiled-byte ( a -- n )
