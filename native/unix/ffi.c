@@ -2,26 +2,6 @@
 
 static void *null_dll;
 
-void ffi_test_1(int x, int y, int z)
-{
-	fprintf(stderr,"%d %d %d\n",x,y,z);
-}
-
-void ffi_test_2(int x, float y, int z)
-{
-	fprintf(stderr,"%d %f %d\n",x,y,z);
-}
-
-int ffi_test_3(int x, int y, int z)
-{
-	return x + y * z;
-}
-
-float ffi_test_4(int x, float y, int z)
-{
-	return x + y * z;
-}
-
 void init_ffi(void)
 {
 	null_dll = dlopen(NULL,RTLD_LAZY);
