@@ -5,7 +5,7 @@ USING: alien assembler compiler inference kernel
 kernel-internals lists math memory namespaces words ;
 
 : compile-c-call ( symbol dll -- )
-    2dup dlsym  3 LOAD32  0 1 rel-dlsym  3 MTLR  BLRL ;
+    2dup dlsym  11 LOAD32  0 1 rel-dlsym  11 MTLR  BLRL ;
 
 M: %prologue generate-node ( vop -- )
     drop
