@@ -310,7 +310,7 @@ M: wrapper pprint* ( wrapper -- )
 
 : with-pprint ( quot -- )
     [
-        <pprinter> pprinter set pprint* end-block
+        <pprinter> pprinter set call end-blocks
         pprinter get do-pprint
     ] with-scope ; inline
 

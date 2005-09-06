@@ -1,16 +1,7 @@
 IN: temporary
-USING: generic kernel-internals strings vectors ;
-USE: test
-USE: assembler
-USE: compiler
-USE: compiler-frontend
-USE: inference
-USE: words
-USE: math
-USE: kernel
-USE: lists
-USE: sequences
-USE: prettyprint
+USING: assembler compiler compiler-backend generic inference
+kernel kernel-internals lists math prettyprint sequences strings
+test vectors words ;
 
 ! Some dataflow tests
 ! [ 3 ] [ 1 2 3 (subst-value) ] unit-test
