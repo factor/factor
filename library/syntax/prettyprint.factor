@@ -308,11 +308,13 @@ M: wrapper pprint* ( wrapper -- )
         wrapped 1vector \ W[ \ ]W pprint-sequence
     ] ifte ;
 
-: pprint ( object -- )
+: with-pprint ( quot -- )
     [
-        <pprinter> pprinter set pprint* end-blocks
+        <pprinter> pprinter set pprint* end-block
         pprinter get do-pprint
-    ] with-scope ;
+    ] with-scope ; inline
+
+: pprint ( object -- ) [ pprint* ] with-pprint ;
 
 : unparse ( object -- str ) [ pprint ] string-out ;
 
