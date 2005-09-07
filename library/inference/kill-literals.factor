@@ -11,7 +11,7 @@ GENERIC: literals* ( node -- seq )
 
 GENERIC: can-kill* ( literal node -- ? )
 
-: can-kill? ( literals node -- ? )
+: can-kill? ( literal node -- ? )
     dup [
         2dup can-kill* [
             node-successor can-kill?
@@ -38,7 +38,8 @@ GENERIC: can-kill* ( literal node -- ? )
 ! Generic nodes
 M: node literals* ( node -- ) drop { } ;
 
-M: node can-kill* ( literal node -- ? ) uses-value? not ;
+M: node can-kill* ( literal node -- ? )
+    uses-value? not ;
 
 ! #push
 M: #push literals* ( node -- ) node-out-d ;
@@ -57,14 +58,36 @@ M: #merge can-kill* ( literal node -- ? ) 2drop t ;
 ! #entry
 M: #entry can-kill* ( literal node -- ? ) 2drop t ;
 
+! #values
+M: #values can-kill* ( literal node -- ? ) 2drop t ;
+
 ! #return
 SYMBOL: branch-returns
+
+GENERIC: returns*
+
+UNION: #branch #ifte #dispatch ;
+
+M: #branch returns*
+    node-children [ last-node returns* ] each ;
+
+M: #return returns* , ;
+
+M: node returns* node-successor returns* ;
+
+: returns ( node -- seq )
+    #! Trace all control flow paths, build a sequence of
+    #! final #return nodes.
+    [ returns* ] { } make ;
+
+: branch-values ( branches -- )
+    returns [ node-in-d ] map unify-lengths flip \ returns set ;
 
 M: #return can-kill* ( literal node -- ? )
     #! Values returned by local labels can be killed.
     dup node-param [
         dupd uses-value? [
-            branch-returns get
+            \ returns get
             [ memq? ] subset-with
             [ [ eq? ] monotonic? ] all?
         ] [
@@ -74,10 +97,6 @@ M: #return can-kill* ( literal node -- ? )
         delegate can-kill*
     ] ifte ;
 
-: branch-values ( branches -- )
-    [ last-node node-in-d ] map
-    unify-lengths flip branch-returns set ;
-
 : can-kill-branches? ( literal node -- ? )
     #! Check if the literal appears in either branch. This
     #! assumes that the last element of each branch is a #return
@@ -86,8 +105,8 @@ M: #return can-kill* ( literal node -- ? )
         2drop f
     ] [
         [
-            node-children dup branch-values
-            [ can-kill? ] all-with?
+            dup branch-values
+            node-children [ can-kill? ] all-with?
         ] with-scope
     ] ifte ;
 
