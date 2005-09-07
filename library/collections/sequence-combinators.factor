@@ -59,10 +59,12 @@ M: object map ( seq quot -- seq )
 : (2each) ( quot seq seq i -- quot seq seq i )
     [ 2nth rot dup slip ] 3keep ; inline
 
+: min-length ( seq seq -- n )
+    swap length swap length min ; flushable
+
 : 2each ( seq seq quot -- )
     #! Don't use with lists.
-    -rot dup length ( over length over length min )
-    [ (2each) ] repeat 3drop ; inline
+    -rot 2dup min-length [ (2each) ] repeat 3drop ; inline
 
 : 2reduce ( seq seq identity quot -- value | quot: e x y -- z )
     #! Don't use with lists.
@@ -74,9 +76,9 @@ M: object map ( seq quot -- seq )
 
 : 2map ( seq seq quot -- seq )
     #! Don't use with lists.
-    -rot [
-        dup length ( over length over length min ) [ (2map) ] collect
-    ] keep like >r 3drop r> ; inline
+    -rot
+    [ 2dup min-length [ (2map) ] collect ] keep like
+    >r 3drop r> ; inline
 
 : find* ( i seq quot -- i elt )
     pick pick length >= [

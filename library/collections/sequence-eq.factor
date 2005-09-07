@@ -7,7 +7,7 @@ USING: kernel kernel-internals lists math strings vectors ;
 ! defined tuples that respond to the sequence protocol.
 UNION: sequence array string sbuf vector ;
 
-: length= ( seq seq -- ? ) length swap length number= ;
+: length= ( seq seq -- ? ) length swap length number= ; flushable
 
 : sequence= ( seq seq -- ? )
     #! Check if two sequences have the same length and elements,
