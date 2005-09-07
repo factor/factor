@@ -130,7 +130,7 @@ M: wrapper apply-object wrapped apply-literal ;
     [ infer-quot effect ] with-infer ;
 
 : (dataflow) ( quot -- dataflow )
-    infer-quot #return node, dataflow-graph get ;
+    infer-quot f #return node, dataflow-graph get ;
 
 : dataflow ( quot -- dataflow )
     #! Data flow of a quotation.

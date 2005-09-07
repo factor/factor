@@ -38,6 +38,7 @@ sequences io vectors words ;
         "/library/collections/growable.factor"
         "/library/collections/cons.factor"
         "/library/collections/virtual-sequences.factor"
+        "/library/collections/sequence-combinators.factor"
         "/library/collections/sequences-epilogue.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"

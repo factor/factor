@@ -109,7 +109,11 @@ C: #values make-node ;
 
 TUPLE: #return ;
 C: #return make-node ;
-: #return ( -- node ) meta-d get clone in-d-node <#return> ;
+: #return ( label -- node )
+    #! The parameter is the label we are returning from, or if
+    #! f, this is a top-level return.
+    meta-d get clone in-d-node <#return>
+    [ set-node-param ] keep ;
 
 TUPLE: #ifte ;
 C: #ifte make-node ;

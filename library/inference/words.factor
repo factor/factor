@@ -34,7 +34,7 @@ hashtables parser prettyprint ;
 
 : inline-block ( word -- node-block )
     gensym over word-def cons [
-        #entry node,  word-def infer-quot  #return node,
+        #entry node,  word-def infer-quot  t #return node,
     ] with-block ;
 
 : infer-compound ( word base-case -- effect )

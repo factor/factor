@@ -9,11 +9,12 @@ USING: errors kernel math math-internals ;
 : exp >rect swap fexp swap polar> ; inline
 : log >polar swap flog swap rect> ; inline
 
-: sqrt ( z -- sqrt )
-    >polar dup pi = [
-        drop fsqrt 0 swap rect>
+: sqrt ( n -- n )
+    dup complex? [
+        >polar swap fsqrt swap 2 / polar>
     ] [
-        swap fsqrt swap 2 / polar>
+        >float dup 0.0 >=
+        [ fsqrt ] [ neg fsqrt 0 swap rect> ] ifte
     ] ifte ; foldable
 
 : norm ( vec -- n ) norm-sq sqrt ;

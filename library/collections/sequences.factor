@@ -28,21 +28,6 @@ GENERIC: resize ( n seq -- seq )
 : immutable ( seq quot -- seq | quot: seq -- )
     swap [ thaw ] keep >r dup >r swap call r> r> like ; inline
 
-G: each ( seq quot -- | quot: elt -- )
-    [ over ] standard-combination ; inline
-
-: each-with ( obj seq quot -- | quot: obj elt -- )
-    swap [ with ] each 2drop ; inline
-
-: reduce ( seq identity quot -- value | quot: x y -- z )
-    swapd each ; inline
-
-G: find ( seq quot -- i elt | quot: elt -- ? )
-    [ over ] standard-combination ; inline
-
-: find-with ( obj seq quot -- i elt | quot: elt -- ? )
-    swap [ with rot ] find 2swap 2drop ; inline
-
 : first 0 swap nth ; inline
 : second 1 swap nth ; inline
 : third 2 swap nth ; inline

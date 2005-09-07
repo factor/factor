@@ -163,3 +163,10 @@ TUPLE: pred-test ;
 : literal-not-branch 0 not [ ] [ ] ifte ; compiled
 
 [ ] [ literal-not-branch ] unit-test
+
+! regression
+
+: bad-kill-1 [ 3 f ] [ dup bad-kill-1 ] ifte ; inline
+: bad-kill-2 bad-kill-1 drop ; compiled
+
+[ 3 ] [ t bad-kill-2 ] unit-test

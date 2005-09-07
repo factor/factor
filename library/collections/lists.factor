@@ -18,6 +18,11 @@ M: f each ( list quot -- ) 2drop ;
 M: cons each ( list quot -- | quot: elt -- )
     [ >r car r> call ] 2keep >r cdr r> each ;
 
+M: f map ( f quot -- f ) drop ;
+
+M: cons map ( cons quot -- cons )
+    over cdr over >r >r >r car r> call r> r> rot >r map r> swons ;
+
 : (list-find) ( list quot i -- i elt )
     pick [
         >r 2dup >r >r >r car r> call [

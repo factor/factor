@@ -14,9 +14,6 @@ M: vector set-nth ( obj n vec -- )
 M: vector hashcode ( vec -- n )
     dup length 0 number= [ drop 0 ] [ first hashcode ] ifte ;
 
-: empty-vector ( len -- vec )
-    dup <vector> [ set-length ] keep ; inline
-
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ; inline
 
@@ -26,12 +23,18 @@ M: vector clone ( vector -- vector ) >vector ;
 
 M: general-list like drop >list ;
 
-M: vector like drop >vector ;
+M: vector like drop dup vector? [ >vector ] unless ;
 
-: (1vector) [ push ] keep ; inline
-: (2vector) [ swapd push ] keep (1vector) ; inline
-: (3vector) [ >r rot r> push ] keep (2vector) ; inline
+: 1vector ( x -- { x } )
+    1 empty-vector [ 0 swap set-nth ] keep ; flushable
 
-: 1vector ( x -- { x } ) 1 <vector> (1vector) ; flushable
-: 2vector ( x y -- { x y } ) 2 <vector> (2vector) ; flushable
-: 3vector ( x y z -- { x y z } ) 3 <vector> (3vector) ; flushable
+: 2vector ( x y -- { x y } )
+    2 empty-vector
+    [ 1 swap set-nth ] keep
+    [ 0 swap set-nth ] keep ; flushable
+
+: 3vector ( x y z -- { x y z } )
+    3 empty-vector
+    [ 2 swap set-nth ] keep
+    [ 1 swap set-nth ] keep
+    [ 0 swap set-nth ] keep ; flushable

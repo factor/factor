@@ -29,3 +29,9 @@ GENERIC: set-capacity
 : grow-length ( len seq -- )
     growable-check 2dup length > [ 2dup expand ] when
     set-capacity ;
+
+! We need this pretty early on.
+IN: vectors
+
+: empty-vector ( len -- vec )
+    dup <vector> [ set-capacity ] keep ; inline

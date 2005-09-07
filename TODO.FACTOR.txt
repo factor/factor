@@ -48,19 +48,22 @@
 
 + compiler:
 
+- remove dead code after a 'throw'
+- when doing comparison with one arg being a float, inline method
+- investigate overzealous math inlining
+- literals on either side of a shuffle can be more efficient
+- shuffles: eliminate dead loads
+- floating point intrinsics
 - flushing optimization
 - fix fixnum/mod overflow on PowerPC
 - eliminate simplifier
 - intrinsic char-slot set-char-slot
 - [ [ dup call ] dup call ] infer hangs
-- declarations
 - the invalid recursion form case needs to be fixed, for inlines too
 - recursion is iffy; if the stack at the recursive call doesn't match
   up, throw an error
 - remove %fixnum-</<=/>/>=, always use %jump-* form
 - remove %jump-t, use %jump-eq? f instead
-- kill dead code after 'throw'
-- better type inference
 
 + kernel:
 
