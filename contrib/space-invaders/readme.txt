@@ -13,6 +13,14 @@ If you are in the space-invaders directory, and have the ROM as a file
   USE: cpu-8080
   display
 
+This will run the emulator in interpreted mode. To compile the Factor
+code do the following:
+
+  "cpu-8080" words [ try-compile ] each
+  display
+
+This will run much faster.
+
 'Backspace' inserts a coin and '1' is the one player button. It
 currently stops working at the point where it displays the invaders
 and I'm working on fixing this.
