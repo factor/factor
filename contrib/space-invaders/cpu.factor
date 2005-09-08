@@ -209,7 +209,7 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   over HEX: FF bitand 0 = [ zero-flag over cpu-f-bitor= ] when
   over HEX: 80 bitand 0 = not [ sign-flag over cpu-f-bitor= ] when
   over HEX: 100 >= [ carry-flag over cpu-f-bitor= ] when
-  r> rot ( cpu x n )
+  r> swapd ( cpu x n )
   [ pick cpu-a bitxor bitxor HEX: 10 bitand 0 = not [ half-carry-flag over cpu-f-bitor= ] when ] 2keep
   [ bitxor ] 2keep ( cpu x^n x n )
   >r pick cpu-a r> bitxor ( cpu x^n x a^n )
