@@ -3,20 +3,36 @@ USING: assembler compiler compiler-backend generic inference
 kernel kernel-internals lists math prettyprint sequences strings
 test vectors words ;
 
-! Some dataflow tests
-! [ 3 ] [ 1 2 3 (subst-value) ] unit-test
-! [ 1 ] [ 1 2 2 (subst-value) ] unit-test
-! 
-! [ { "one" "one" "three" "three" } ]
-! [
-!     { "one" "two" "three" } { 1 2 3 } { 1 1 3 3 }
-!     clone [ (subst-values) ] keep
-! ] unit-test
-! 
-! [ << meet f { "one" 2 3 } >> ]
-! [ "one" 1 << meet f { 1 2 3 } >> clone (subst-value) ] unit-test
+: kill-1
+    [ 1 2 3 ] [ + ] over drop drop ; compiled
 
-! Literal kill tests
+[ [ 1 2 3 ] ] [ kill-1 ] unit-test
+
+: kill-2
+    [ + ] [ 1 2 3 ] over drop nip ; compiled
+
+[ [ 1 2 3 ] ] [ kill-2 ] unit-test
+
+: kill-3
+    [ + ] dup over 3drop ;
+
+[ ] [ kill-3 ] unit-test
+
+: kill-4
+    [ 1 2 3 ] [ + ] [ - ] pick >r 2drop r> ; compiled
+
+[ [ 1 2 3 ] [ 1 2 3 ] ] [ kill-4 ] unit-test
+
+: kill-5
+    [ + ] [ - ] [ 1 2 3 ] pick pick 2drop >r 2drop r> ; compiled
+
+[ [ 1 2 3 ] ] [ kill-5 ] unit-test
+
+: kill-6
+    [ 1 2 3 ] [ 4 5 6 ] [ + ] pick >r drop r> ; compiled
+
+[ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test
+
 : kill-set*
     dataflow kill-set [ literal-value ] map ;
 

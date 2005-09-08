@@ -51,7 +51,6 @@
 - remove dead code after a 'throw'
 - when doing comparison with one arg being a float, inline method
 - investigate overzealous math inlining
-- literals on either side of a shuffle can be more efficient
 - shuffles: eliminate dead loads
 - floating point intrinsics
 - flushing optimization

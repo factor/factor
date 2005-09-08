@@ -1,5 +1,5 @@
 IN: inference
-USING: kernel math namespaces sequences ;
+USING: hashtables kernel math namespaces sequences ;
 
 TUPLE: shuffle in-d in-r out-d out-r ;
 
@@ -11,7 +11,7 @@ TUPLE: shuffle in-d in-r out-d out-r ;
     tuck shuffle-in-r [ set ] 2each shuffle-in-d [ set ] 2each ;
 
 : shuffled-values ( values -- values )
-    [ dup literal? [ get ] unless ] map ;
+    [ [ namespace hash dup ] keep ? ] map ;
 
 : store-shuffle ( shuffle -- d r )
     dup shuffle-out-d shuffled-values
