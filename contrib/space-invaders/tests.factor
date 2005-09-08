@@ -885,3 +885,417 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ cpu-f ] keep
         drop
 ] unit-test
+
+[ emulate-LD_DE,nn 1 2 HEX: 0201 ] [
+  <cpu> HEX: 11 0 pick cpu-ram set-nth
+        1 1 pick cpu-ram set-nth
+        2 2 pick cpu-ram set-nth
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-e ] keep
+        [ cpu-d ] keep
+        [ cpu-de ] keep
+        drop
+] unit-test
+
+[ emulate-LD_(DE),A 1 ] [
+  <cpu> HEX: 12 0 pick cpu-ram set-nth
+        1 over set-cpu-a
+        HEX: 2000 over set-cpu-de
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ HEX: 2000 swap cpu-ram nth ] keep
+        drop
+] unit-test
+
+[ emulate-INC_DE HEX: 0001 HEX: 0100 HEX: 0000 ] [
+  <cpu> HEX: 13 0 pick cpu-ram set-nth
+        HEX: 0000 over set-cpu-de
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-de ] keep
+        HEX: 13 1 pick cpu-ram set-nth
+        HEX: 00FF over set-cpu-de
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-de ] keep
+        HEX: 13 2 pick cpu-ram set-nth
+        HEX: FFFF over set-cpu-de
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-de ] keep
+        drop
+] unit-test
+
+[ emulate-INC_D HEX: 01 f t f f f  
+                HEX: 00 t f t f f 
+                HEX: 80 f t t t t 
+                HEX: 90 f t t f t 
+] [
+  <cpu> HEX: 14 0 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-d
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 14 1 pick cpu-ram set-nth
+        HEX: FF over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 14 2 pick cpu-ram set-nth
+        HEX: 7F over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 14 3 pick cpu-ram set-nth
+        HEX: 8F over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        drop
+] unit-test
+
+[ emulate-DEC_D HEX: FF f t t f t  
+                HEX: 00 t f f f f 
+                HEX: 7F f t t t f 
+                HEX: 8F f t t f t 
+] [
+  <cpu> HEX: 15 0 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-d
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 15 1 pick cpu-ram set-nth
+        HEX: 01 over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 15 2 pick cpu-ram set-nth
+        HEX: 80 over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        HEX: 15 3 pick cpu-ram set-nth
+        HEX: 90 over set-cpu-d
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ flag-z? ] keep
+        [ flag-nz? ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        drop
+] unit-test
+
+[ emulate-LD_D,n 1 HEX: 0100 ] [
+  <cpu> HEX: 16 0 pick cpu-ram set-nth
+        1 1 pick cpu-ram set-nth
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-d ] keep
+        [ cpu-de ] keep
+        drop
+] unit-test
+
+[ emulate-RLA BIN: 11111110 0 BIN: 00000011 1 ] [
+  <cpu> HEX: 17 0 pick cpu-ram set-nth
+        0 over set-cpu-f
+        BIN: 01111111 over set-cpu-a
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f ] keep
+        HEX: 17 1 pick cpu-ram set-nth
+        19 over set-cpu-f
+        BIN: 10000001 over set-cpu-a
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f ] keep
+        drop
+] unit-test
+
+[ emulate-ADD_A,B HEX: 01 HEX: 01  f f f
+                  HEX: 00 HEX: 01  t f t
+                  HEX: A0 HEX: 50  f t f
+] [
+  <cpu> HEX: 80 0 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-a
+        HEX: 01 over set-cpu-b
+        0 over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-b ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 80 1 pick cpu-ram set-nth
+        HEX: FF over set-cpu-a
+        HEX: 01 over set-cpu-b
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-b ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 80 2 pick cpu-ram set-nth
+        HEX: 50 over set-cpu-a
+        HEX: 50 over set-cpu-b
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep 
+        [ cpu-a ] keep
+        [ cpu-b ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+         drop
+] unit-test
+
+[ emulate-ADD_A,C HEX: 01 HEX: 01  f f f
+                  HEX: 00 HEX: 01  t f t
+                  HEX: A0 HEX: 50  f t f
+] [
+  <cpu> HEX: 81 0 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-a
+        HEX: 01 over set-cpu-c
+        0 over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-c ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 81 1 pick cpu-ram set-nth
+        HEX: FF over set-cpu-a
+        HEX: 01 over set-cpu-c
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-c ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 81 2 pick cpu-ram set-nth
+        HEX: 50 over set-cpu-a
+        HEX: 50 over set-cpu-c
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep 
+        [ cpu-a ] keep
+        [ cpu-c ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+         drop
+] unit-test
+
+[ emulate-ADD_A,A HEX: 00 f f t
+                  HEX: FE t t f
+                  HEX: 00 t f t
+] [
+  <cpu> HEX: 87 0 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 87 1 pick cpu-ram set-nth
+        HEX: FF over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        HEX: 87 2 pick cpu-ram set-nth
+        HEX: 80 over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep 
+        [ cpu-a ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+         drop
+] unit-test
+
+
+[ emulate-SUB_n HEX: FF t f t t t f
+                HEX: 00 t t f f f f
+                HEX: DA t f t f f f
+                HEX: 7F t f f f t t
+] [
+  <cpu> HEX: D6 0 pick cpu-ram set-nth
+        HEX: 01 1 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: D6 2 pick cpu-ram set-nth
+        HEX: 02 3 pick cpu-ram set-nth
+        HEX: 02 over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: D6 4 pick cpu-ram set-nth
+        HEX: 25 5 pick cpu-ram set-nth
+        HEX: FF over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: D6 6 pick cpu-ram set-nth
+        HEX: 01 7 pick cpu-ram set-nth
+        HEX: 80 over set-cpu-a
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+         drop
+] unit-test
+
+[ emulate-SBC_A,n HEX: FE t f t t t f
+                HEX: FF t f t t t f
+                HEX: D9 t f t f f f
+                HEX: 7E t f f f t t
+] [
+  <cpu> HEX: DE 0 pick cpu-ram set-nth
+        HEX: 01 1 pick cpu-ram set-nth
+        HEX: 00 over set-cpu-a
+        HEX: FF over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: DE 2 pick cpu-ram set-nth
+        HEX: 02 3 pick cpu-ram set-nth
+        HEX: 02 over set-cpu-a
+        HEX: FF over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: DE 4 pick cpu-ram set-nth
+        HEX: 25 5 pick cpu-ram set-nth
+        HEX: FF over set-cpu-a
+        HEX: FF over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+        HEX: DE 6 pick cpu-ram set-nth
+        HEX: 01 7 pick cpu-ram set-nth
+        HEX: 80 over set-cpu-a
+        HEX: FF over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        [ cpu-f subtraction-flag bitand 0 = not ] keep
+        [ cpu-f zero-flag bitand 0 = not ] keep
+        [ cpu-f sign-flag bitand 0 = not ] keep
+        [ cpu-f carry-flag bitand 0 = not ] keep
+        [ cpu-f half-carry-flag bitand 0 = not ] keep
+        [ cpu-f overflow-flag bitand 0 = not ] keep
+         drop
+] unit-test
+
+[ emulate-EX_(SP),HL HEX: 41 HEX: 40 HEX: 5051 ] [
+  <cpu> HEX: E3 0 pick cpu-ram set-nth
+        HEX: 2021 over set-cpu-sp
+        HEX: 4041 over set-cpu-hl
+        HEX: 51 HEX: 2021 pick cpu-ram set-nth
+        HEX: 50 HEX: 2022 pick cpu-ram set-nth
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ HEX: 2021 swap cpu-ram nth ] keep
+        [ HEX: 2022 swap cpu-ram nth ] keep
+	[ cpu-hl ] keep
+        drop
+] unit-test

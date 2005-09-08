@@ -155,6 +155,10 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! A ^= quot call 
   [ cpu-a swap call bitxor ] keep set-cpu-a ; inline
 
+: cpu-a-bitxor= ( value cpu -- )
+  #! cpu-a ^= value
+  [ cpu-a bitxor ] keep set-cpu-a ;
+
 : cpu-f-bitand ( quot cpu -- )
   #! F &= quot call 
   [ cpu-f swap call bitand ] keep set-cpu-f ; inline
@@ -199,6 +203,10 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
 : cpu-f-bitand= ( value cpu -- )
   #! cpu-f &= value
   [ cpu-f bitand ] keep set-cpu-f ;
+
+: cpu-f-bitxor= ( value cpu -- )
+  #! cpu-f ^= value
+  [ cpu-f bitxor ] keep set-cpu-f ;
 
 : add-byte-to-a ( carry? n cpu -- )
   #! Adds 'n' to the 'a' register. 'carry?' is try if
@@ -736,6 +744,20 @@ C: cpu ( -- cpu )
   [ " " write peek-instruction word-name write " " write ] keep
   terpri drop ;
 
+: cpu*. ( cpu -- )
+  [ " PC: " write cpu-pc 16 >base 4 CHAR: \s pad-left write ] keep 
+  [ " B: " write cpu-b 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " C: " write cpu-c 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " D: " write cpu-d 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " E: " write cpu-e 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " F: " write cpu-f 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " H: " write cpu-h 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " L: " write cpu-l 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
+  [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
+  [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
+  terpri drop ;
+
 : test-step ( cpu -- cpu )
   [ step ] keep dup cpu. ;
 
@@ -864,7 +886,7 @@ SYMBOL: $4
 
 : (emulate-RLA) ( cpu -- )  
   dup cpu-a dup ( cpu old-a new-a )
-  1 shift pick set-cpu-a ( cpu old-a )
+  1 shift HEX: FF bitand pick set-cpu-a ( cpu old-a )
   over flag-c? [ [ 1 ] pick cpu-a-bitor ] when
   [ add-sub-flag half-carry-flag carry-flag bitor bitor 255 swap - ] pick cpu-f-bitand
   HEX: 80 bitand 0 = not [ [ carry-flag ] over cpu-f-bitor ] when
@@ -872,7 +894,7 @@ SYMBOL: $4
 
 : (emulate-RRA) ( cpu -- )  
   dup cpu-a dup ( cpu old-a new-a )
-  -1 shift pick set-cpu-a ( cpu old-a )
+  -1 shift HEX: FF bitand pick set-cpu-a ( cpu old-a )
   over flag-c? [ [ HEX: 80 ] pick cpu-a-bitor ] when
   [ add-sub-flag half-carry-flag carry-flag bitor bitor 255 swap - ] pick cpu-f-bitand
   HEX: 01 bitand 0 = not [ [ carry-flag ] over cpu-f-bitor ] when
@@ -925,8 +947,8 @@ SYMBOL: $4
     [[ "OR-R"      [ [ dup [ $1 ] cons swap cpu-a-bitor ] keep clear-and-set-flags-psz ] ]]
     [[ "OR-(RR)"      [ [ $1 ] keep [ read-byte unit ] keep [ cpu-a-bitor ] keep clear-and-set-flags-psz ] ]]
     [[ "XOR-N"      [ [ next-byte ] keep [ read-byte unit ] keep [ cpu-a-bitxor ] keep clear-and-set-flags-psz ] ]]
-    [[ "XOR-R"      [ [ dup [ $1 ] cons swap cpu-a-bitxor ] keep clear-and-set-flags-psz ] ]]
-    [[ "XOR-(RR)"      [ [ dup [ $1 ] cons swap cpu-a-bitxor ] keep clear-and-set-flags-psz ] ]]
+    [[ "XOR-R"      [ [ $1 ] keep [ cpu-a-bitxor= ] keep clear-and-set-flags-psz ] ]]
+    [[ "XOR-(RR)"   [ [ $1 ] keep [ read-byte ] keep [ cpu-a-bitxor= ] keep clear-and-set-flags-psz ] ]]
     [[ "AND-A"      [ clear-and-set-flags-psz  ] ]]
     [[ "AND-N"      [ [ dup [ next-byte ] cons swap cpu-a-bitand ] keep clear-and-set-flags-psz  ] ]]
     [[ "AND-R"      [ [ dup [ $1 ] cons swap cpu-a-bitand ] keep clear-and-set-flags-psz ] ]]
@@ -937,7 +959,7 @@ SYMBOL: $4
     [[ "ADD-R,N"      [ [ f swap next-byte ] keep add-byte-to-a ] ]]
     [[ "ADD-R,R"      [ [ f swap $3 ] keep add-byte-to-a ] ]]
     [[ "ADD-RR,RR"    [ [ $1 ] keep [ $3 ] keep add-words ] ]]
-    [[ "ADD-R,(RR)"    [ [ f swap $3 ] keep [ read-byte ] keep add-byte-to-a ]  ]]
+    [[ "ADD-R,(RR)"    [ [ f swap $3 ] keep [ read-byte ] keep add-byte-to-a  ]  ]]
     [[ "SBC-R,N"      [ [ cpu-f carry-flag bitand ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
     [[ "SBC-R,R"      [ drop "SBC-R,R Not Implemented" throw ] ]]
     [[ "SBC-R,(RR)"      [ drop "SBC-R,(RR) Not Implemented" throw ] ]]
@@ -948,8 +970,8 @@ SYMBOL: $4
     [[ "DAA"          [ (emulate-DAA) ]               ]]
     [[ "RLA"          [ (emulate-RLA) ]               ]]
     [[ "RRA"          [ (emulate-RRA) ]               ]]
-    [[ "CCF"          [ [ carry-flag ] swap cpu-f-bitxor ]               ]]
-    [[ "SCF"          [ [ carry-flag ] swap cpu-f-bitor ]               ]]
+    [[ "CCF"          [ carry-flag swap cpu-f-bitxor= ]               ]]
+    [[ "SCF"          [ carry-flag swap cpu-f-bitor= ]               ]]
     [[ "RLCA"          [ (emulate-RLCA) ]               ]]
     [[ "RRCA"          [ (emulate-RRCA) ]               ]]
     [[ "HALT"          [ drop "HALT not implemented" throw ]               ]]
