@@ -16,20 +16,21 @@ M: comment pprint* ( ann -- )
 : comment, ( ? node text -- )
     rot [ <comment> , ] [ 2drop ] ifte ;
 
-: value-str ( prefix values -- str )
-    [ value-uid word-name append ] map-with concat ;
+: values% ( prefix values -- )
+    [
+        swap %
+        dup literal? [ literal-value ] [ value-uid ] ifte
+        unparse %
+    ] each-with ;
 
 : effect-str ( node -- str )
     [
-        " " over node-in-d value-str %
-        " r: " over node-in-r value-str %
+        " " over node-in-d values%
+        " r: " over node-in-r values%
         " --" %
-        " " over node-out-d value-str %
-        " r: " swap node-out-r value-str %
+        " " over node-out-d values%
+        " r: " swap node-out-r values%
     ] "" make 1 swap tail ;
-
-M: #push node>quot ( ? node -- )
-    node-out-d [ literal-value literalize ] map % drop ;
 
 M: #shuffle node>quot ( ? node -- )
     >r drop t r> dup effect-str "#shuffle: " swap append comment, ;

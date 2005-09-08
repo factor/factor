@@ -117,8 +117,9 @@ M: #call infer-classes* ( node -- )
         drop
     ] ifte ;
 
-M: #push infer-classes* ( node -- )
-    node-out-d dup [ literal-value ] map swap assume-literals ;
+M: #shuffle infer-classes* ( node -- )
+    node-out-d [ literal? ] subset
+    dup [ literal-value ] map swap assume-literals ;
 
 M: #ifte child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>

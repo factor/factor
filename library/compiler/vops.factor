@@ -121,12 +121,12 @@ C: %end-dispatch make-vop ;
 ! stack operations
 TUPLE: %peek-d ;
 C: %peek-d make-vop ;
-: %peek-d ( vreg n -- ) swap <vreg> src/dest-vop <%peek-d> ;
+: %peek-d ( vreg n -- vop ) swap <vreg> src/dest-vop <%peek-d> ;
 M: %peek-d basic-block? drop t ;
 
 TUPLE: %replace-d ;
 C: %replace-d make-vop ;
-: %replace-d ( vreg n -- ) swap <vreg> 2-in-vop <%replace-d> ;
+: %replace-d ( vreg n -- vop ) swap <vreg> 2-in-vop <%replace-d> ;
 M: %replace-d basic-block? drop t ;
 
 TUPLE: %inc-d ;
@@ -138,17 +138,17 @@ M: %inc-d basic-block? drop t ;
 
 TUPLE: %immediate ;
 C: %immediate make-vop ;
-: %immediate ( vreg obj -- )
+: %immediate ( vreg obj -- vop )
     swap <vreg> src/dest-vop <%immediate> ;
 M: %immediate basic-block? drop t ;
 
 TUPLE: %peek-r ;
 C: %peek-r make-vop ;
-: %peek-r ( vreg n -- ) swap <vreg> src/dest-vop <%peek-r> ;
+: %peek-r ( vreg n -- vop ) swap <vreg> src/dest-vop <%peek-r> ;
 
 TUPLE: %replace-r ;
 C: %replace-r make-vop ;
-: %replace-r ( vreg n -- ) swap <vreg> 2-in-vop <%replace-r> ;
+: %replace-r ( vreg n -- vop ) swap <vreg> 2-in-vop <%replace-r> ;
 
 TUPLE: %inc-r ;
 C: %inc-r make-vop ;

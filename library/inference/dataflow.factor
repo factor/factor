@@ -95,13 +95,10 @@ TUPLE: #call-label ;
 C: #call-label make-node ;
 : #call-label ( label -- node ) param-node <#call-label> ;
 
-TUPLE: #push ;
-C: #push make-node ;
-: #push ( outputs -- node ) d-tail out-d-node <#push> ;
-
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
 : #shuffle ( -- node ) empty-node <#shuffle> ;
+: #push ( outputs -- node ) d-tail out-d-node <#shuffle> ;
 
 TUPLE: #values ;
 C: #values make-node ;

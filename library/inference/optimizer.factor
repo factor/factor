@@ -50,10 +50,6 @@ M: f optimize-node* drop t ;
 M: node optimize-node* ( node -- t )
     drop t ;
 
-! #push
-M: #push optimize-node* ( node -- node/t )
-    [ node-out-d empty? ] prune-if ;
-
 ! #shuffle
 : compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
     [ >r node-shuffle r> node-shuffle compose-shuffle ] keep
@@ -67,9 +63,7 @@ M: #shuffle optimize-node*  ( node -- node/t )
     dup node-successor dup #shuffle? [
         compose-shuffle-nodes
     ] [
-        drop [
-            dup node-in-d empty? swap node-in-r empty? and
-        ] prune-if
+        drop [ node-values empty? ] prune-if
     ] ifte ;
 
 ! #ifte

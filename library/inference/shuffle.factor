@@ -10,8 +10,12 @@ TUPLE: shuffle in-d in-r out-d out-r ;
 : load-shuffle ( d r shuffle -- )
     tuck shuffle-in-r [ set ] 2each shuffle-in-d [ set ] 2each ;
 
+: shuffled-values ( values -- values )
+    [ dup literal? [ get ] unless ] map ;
+
 : store-shuffle ( shuffle -- d r )
-    dup shuffle-out-d [ get ] map swap shuffle-out-r [ get ] map ;
+    dup shuffle-out-d shuffled-values
+    swap shuffle-out-r shuffled-values ;
 
 : shuffle* ( d r shuffle -- d r )
     [ [ load-shuffle ] keep store-shuffle ] with-scope ;

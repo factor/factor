@@ -41,12 +41,10 @@ M: node literals* ( node -- ) drop { } ;
 M: node can-kill* ( literal node -- ? )
     uses-value? not ;
 
-! #push
-M: #push literals* ( node -- ) node-out-d ;
-
-M: #push can-kill* ( literal node -- ? ) 2drop t ;
-
 ! #shuffle
+M: #shuffle literals* ( node -- )
+    node-out-d [ literal? ] subset ;
+
 M: #shuffle can-kill* ( literal node -- ? ) 2drop t ;
 
 ! #call-label

@@ -53,12 +53,6 @@ M: object load-value ( vreg n value -- )
 M: literal load-value ( vreg n value -- )
     nip push-literal ;
 
-: push-1 ( value -- ) 0 swap push-literal ;
-
-M: #push linearize-node* ( node -- )
-    node-out-d dup length dup %inc-d,
-    1 - swap [ push-1 0 over %replace-d , ] each drop ;
-
 : ifte-head ( label -- )
     in-1  -1 %inc-d, 0 %jump-t , ;
 
