@@ -25,5 +25,15 @@ This will run much faster.
 currently stops working at the point where it displays the invaders
 and I'm working on fixing this.
 
+If the ROM file you have is split into seperate files, you will need
+to merge them into one 'invaders.rom' file. From Windows this is done
+with:
+
+  copy /b invaders.h+invaders.g+invaders.f+invaders.e invaders.rom
+
+Or Linux:
+
+  cat invaders.h invaders.g invaders.f invaders.e >invaders.rom
+
 For more information, contact the author, Chris Double, at
 chris.double@double.co.nz or from my weblog http://radio.weblogs.com/0102385
