@@ -34,7 +34,7 @@ M: fixnum foobar drop "Goodbye cruel world" ;
 [ "Goodbye cruel world" ] [ 4 foobar ] unit-test
 
 GENERIC: bool>str
-M: t bool>str drop "true" ;
+M: general-t bool>str drop "true" ;
 M: f bool>str drop "false" ;
 
 : str>bool

@@ -300,8 +300,7 @@ null null define-class
 { { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
 "complex" "math" create 4 "math-priority" set-word-prop
 
-"t" "!syntax" create 7 "t?" "kernel" create
-{ } define-builtin
+"displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
 
 "array" "kernel-internals" create 8 "array?" "kernel-internals" create
 { } define-builtin
@@ -349,8 +348,6 @@ null null define-class
 "tuple" "kernel" create 18 "tuple?" "kernel" create { } define-builtin
 
 "byte-array" "kernel-internals" create 19 "byte-array?" "kernel-internals" create { } define-builtin
-
-"displaced-alien" "alien" create 20 "displaced-alien?" "alien" create { } define-builtin
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create dup define-symbol

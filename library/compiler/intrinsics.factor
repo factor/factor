@@ -108,6 +108,7 @@ sequences vectors words ;
 [
     [[ fixnum+       %fixnum+       ]]
     [[ fixnum-       %fixnum-       ]]
+    [[ fixnum*       %fixnum*       ]]
     [[ fixnum/i      %fixnum/i      ]]
     [[ fixnum-bitand %fixnum-bitand ]]
     [[ fixnum-bitor  %fixnum-bitor  ]]
@@ -121,27 +122,6 @@ sequences vectors words ;
     uncons [ literalize , \ binary-op , ] [ ] make
     "intrinsic" set-word-prop
 ] each
-
-: fast-fixnum* ( n -- )
-    -1 %inc-d ,
-    in-1
-    log2 0 <vreg> 0 <vreg> %fixnum<< ,
-    out-1 ;
-
-: slow-fixnum* ( node -- ) \ %fixnum* binary-op ;
-
-\ fixnum* [
-    ! Turn multiplication by a power of two into a left shift.
-    dup node-peek dup literal-immediate? [
-        literal-value dup power-of-2? [
-            nip fast-fixnum*
-        ] [
-            drop slow-fixnum*
-        ] ifte
-    ] [
-        drop slow-fixnum*
-    ] ifte
-] "intrinsic" set-word-prop
 
 \ fixnum-mod [
     ! This is not clever. Because of x86, %fixnum-mod is
@@ -158,8 +138,8 @@ sequences vectors words ;
     ! See the remark on fixnum-mod for vreg usage
     drop
     in-2
-    [ << vreg f 1 >> << vreg f 0 >> ]
-    [ << vreg f 2 >> << vreg f 0 >> ]
+    { << vreg f 1 >> << vreg f 0 >> }
+    { << vreg f 2 >> << vreg f 0 >> }
     %fixnum/mod ,
     2 0 %replace-d ,
     0 1 %replace-d ,

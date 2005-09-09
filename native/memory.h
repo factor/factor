@@ -54,9 +54,7 @@ INLINE CELL align8(CELL a)
 
 /*** Header types ***/
 
-/* Canonical T object */
-#define T_TYPE 7
-CELL T;
+#define DISPLACED_ALIEN_TYPE 7
 
 #define ARRAY_TYPE 8
 
@@ -74,9 +72,11 @@ CELL T;
 #define WORD_TYPE 17
 #define TUPLE_TYPE 18
 #define BYTE_ARRAY_TYPE 19
-#define DISPLACED_ALIEN_TYPE 20
 
-#define TYPE_COUNT 21
+#define TYPE_COUNT 20
+
+/* Canonical T object. It's just a word */
+CELL T;
 
 INLINE bool headerp(CELL cell)
 {

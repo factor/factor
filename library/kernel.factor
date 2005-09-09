@@ -11,8 +11,6 @@ USING: generic kernel-internals vectors ;
     #! on the data stack by the caller.
     { } set-datastack ;
 
-UNION: boolean POSTPONE: f POSTPONE: t ;
-
 GENERIC: hashcode ( obj -- n ) flushable
 M: object hashcode drop 0 ;
 
@@ -28,7 +26,7 @@ M: object clone ;
 
 : num-types ( -- n )
     #! One more than the maximum value from type primitive.
-    21 ; inline
+    20 ; inline
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.

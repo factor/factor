@@ -36,8 +36,10 @@ words ;
 
 ! Booleans
 
-: t t swons ; parsing
+! the canonical truth value is just a symbol.
+SYMBOL: t
 
+! the canonical falsity is a special runtime object.
 : f f swons ; parsing
 
 ! Lists

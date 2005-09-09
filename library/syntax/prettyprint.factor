@@ -230,8 +230,6 @@ M: word pprint* ( word -- )
     dup pprint-word
     "pprint-after-hook" word-prop call ;
 
-M: t pprint* drop "t" f text ;
-
 M: f pprint* drop "f" f text ;
 
 M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;

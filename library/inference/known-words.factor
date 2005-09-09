@@ -10,23 +10,23 @@ memory parser sequences strings vectors words prettyprint ;
 
 ! This transformation really belongs in the optimizer, but it
 ! is simpler to do it here.
-\ fixnum< [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum< [ [ fixnum fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ fixnum< t "flushable" set-word-prop
 \ fixnum< t "foldable" set-word-prop
 
-\ fixnum<= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum<= [ [ fixnum fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ fixnum<= t "flushable" set-word-prop
 \ fixnum<= t "foldable" set-word-prop
 
-\ fixnum> [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum> [ [ fixnum fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ fixnum> t "flushable" set-word-prop
 \ fixnum> t "foldable" set-word-prop
 
-\ fixnum>= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum>= [ [ fixnum fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ fixnum>= t "flushable" set-word-prop
 \ fixnum>= t "foldable" set-word-prop
 
-\ eq? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ eq? [ [ object object ] [ object ] ] "infer-effect" set-word-prop
 \ eq? t "flushable" set-word-prop
 \ eq? t "foldable" set-word-prop
 
@@ -189,7 +189,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ fixnum-shift t "flushable" set-word-prop
 \ fixnum-shift t "foldable" set-word-prop
 
-\ bignum= [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ bignum= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ bignum= t "flushable" set-word-prop
 \ bignum= t "foldable" set-word-prop
 
@@ -241,23 +241,23 @@ memory parser sequences strings vectors words prettyprint ;
 \ bignum-shift t "flushable" set-word-prop
 \ bignum-shift t "foldable" set-word-prop
 
-\ bignum< [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ bignum< [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ bignum< t "flushable" set-word-prop
 \ bignum< t "foldable" set-word-prop
 
-\ bignum<= [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ bignum<= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ bignum<= t "flushable" set-word-prop
 \ bignum<= t "foldable" set-word-prop
 
-\ bignum> [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ bignum> [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ bignum> t "flushable" set-word-prop
 \ bignum> t "foldable" set-word-prop
 
-\ bignum>= [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ bignum>= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ bignum>= t "flushable" set-word-prop
 \ bignum>= t "foldable" set-word-prop
 
-\ float= [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
+\ float= [ [ bignum bignum ] [ object ] ] "infer-effect" set-word-prop
 \ float= t "flushable" set-word-prop
 \ float= t "foldable" set-word-prop
 
@@ -277,19 +277,19 @@ memory parser sequences strings vectors words prettyprint ;
 \ float/f t "flushable" set-word-prop
 \ float/f t "foldable" set-word-prop
 
-\ float< [ [ float float ] [ boolean ] ] "infer-effect" set-word-prop
+\ float< [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float< t "flushable" set-word-prop
 \ float< t "foldable" set-word-prop
 
-\ float<= [ [ float float ] [ boolean ] ] "infer-effect" set-word-prop
+\ float<= [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float<= t "flushable" set-word-prop
 \ float<= t "foldable" set-word-prop
 
-\ float> [ [ float float ] [ boolean ] ] "infer-effect" set-word-prop
+\ float> [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float> t "flushable" set-word-prop
 \ float> t "foldable" set-word-prop
 
-\ float>= [ [ float float ] [ boolean ] ] "infer-effect" set-word-prop
+\ float>= [ [ float float ] [ object ] ] "infer-effect" set-word-prop
 \ float>= t "flushable" set-word-prop
 \ float>= t "foldable" set-word-prop
 
@@ -345,7 +345,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ <word> t "flushable" set-word-prop
 
 \ update-xt [ [ word ] [ ] ] "infer-effect" set-word-prop
-\ compiled? [ [ word ] [ boolean ] ] "infer-effect" set-word-prop
+\ compiled? [ [ word ] [ object ] ] "infer-effect" set-word-prop
 
 \ getenv [ [ fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ setenv [ [ object fixnum ] [ ] ] "infer-effect" set-word-prop
@@ -492,7 +492,7 @@ memory parser sequences strings vectors words prettyprint ;
 \ fwrite [ [ string alien ] [ ] ] "infer-effect" set-word-prop
 \ fflush [ [ alien ] [ ] ] "infer-effect" set-word-prop
 \ fclose [ [ alien ] [ ] ] "infer-effect" set-word-prop
-\ expired? [ [ object ] [ boolean ] ] "infer-effect" set-word-prop
+\ expired? [ [ object ] [ object ] ] "infer-effect" set-word-prop
 
 \ <wrapper> [ [ object ] [ wrapper ] ] "infer-effect" set-word-prop
 \ <wrapper> t "flushable" set-word-prop

@@ -48,9 +48,6 @@ CELL untagged_object_size(CELL pointer)
 	case WORD_TYPE:
 		size = sizeof(F_WORD);
 		break;
-	case T_TYPE:
-		size = CELLS * 2;
-		break;
 	case ARRAY_TYPE:
 	case TUPLE_TYPE:
 	case BIGNUM_TYPE:

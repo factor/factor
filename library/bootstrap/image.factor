@@ -27,8 +27,6 @@ SYMBOL: objects
 SYMBOL: big-endian
 SYMBOL: 64-bits
 
-SYMBOL: t-object
-
 : emit ( cell -- ) image get push ;
 
 : emit-seq ( seq -- ) image get swap nappend ;
@@ -119,13 +117,8 @@ M: bignum ' ( bignum -- tagged )
 
 ! Padded with fixnums for 8-byte alignment
 
-: t,
-    object-tag here-as
-    dup t-offset fixup t-object set
-    t-type >header emit
-    0 ' emit ;
+: t, t t-offset fixup ;
 
-M: t ' ( obj -- ptr ) drop t-object get ;
 M: f ' ( obj -- ptr )
     #! f is #define F RETAG(0,OBJECT_TYPE)
     drop object-tag ;
