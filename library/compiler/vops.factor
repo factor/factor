@@ -261,17 +261,6 @@ TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
 M: %fixnum-bitnot basic-block? drop t ;
 
-TUPLE: %fixnum<= ;
-C: %fixnum<= make-vop ;      : %fixnum<= 3-vop <%fixnum<=> ;
-TUPLE: %fixnum< ;
-C: %fixnum< make-vop ;       : %fixnum< 3-vop <%fixnum<> ;
-TUPLE: %fixnum>= ;
-C: %fixnum>= make-vop ;      : %fixnum>= 3-vop <%fixnum>=> ;
-TUPLE: %fixnum> ;
-C: %fixnum> make-vop ;       : %fixnum> 3-vop <%fixnum>> ;
-TUPLE: %eq? ;
-C: %eq? make-vop ;           : %eq? 3-vop <%eq?> ;
-
 ! At the VOP level, the 'shift' operation is split into five
 ! distinct operations:
 ! - shifts with a large positive count: calls runtime to make
@@ -292,7 +281,6 @@ M: %fixnum>> basic-block? drop t ;
 TUPLE: %fixnum-sgn ;
 C: %fixnum-sgn make-vop ; : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
 M: %fixnum-sgn basic-block? drop t ;
-
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
@@ -315,20 +303,6 @@ C: %jump-fixnum> make-vop ;
 TUPLE: %jump-eq? ;
 C: %jump-eq? make-vop ;     
 : %jump-eq? 2-in/label-vop <%jump-eq?> ;
-
-: fast-branch ( class -- class )
-    {{
-        [[ %fixnum<= %jump-fixnum<= ]]
-        [[ %fixnum<  %jump-fixnum<  ]]
-        [[ %fixnum>= %jump-fixnum>= ]]
-        [[ %fixnum>  %jump-fixnum>  ]]
-        [[ %eq?      %jump-eq?      ]]
-    }} hash ;
-
-PREDICATE: tuple fast-branch
-    #! Class of VOPs whose class is a key in fast-branch
-    #! hashtable.
-    class fast-branch ;
 
 ! some slightly optimized inline assembly
 TUPLE: %type ;

@@ -141,37 +141,12 @@ M: %fixnum>> generate-node ( vop -- )
 M: %fixnum-sgn generate-node ( vop -- )
     dest/src dupd 31 SRAWI dup untag ;
 
-: compare ( vop -- )
-    dup 1 vop-in v>operand swap 0 vop-in dup integer? [
-        0 -rot address CMPI
-    ] [
-        0 swap v>operand CMP
-    ] ifte ;
-
-: load-boolean ( dest cond -- )
-    #! Compile this after a conditional jump to store f or t
-    #! in dest depending on the jump being taken or not.
-    <label> "true" set
-    <label> "end" set
-    "true" get swap execute
-    f address over LI
-    "end" get B
-    "true" get save-xt
-    t load-indirect
-    "end" get save-xt ; inline
-
-: fixnum-pred ( vop word -- dest )
-    >r [ compare ] keep 0 vop-out v>operand r> load-boolean ;
-    inline
-
-M: %fixnum<  generate-node ( vop -- ) \ BLT fixnum-pred ;
-M: %fixnum<= generate-node ( vop -- ) \ BLE fixnum-pred ;
-M: %fixnum>  generate-node ( vop -- ) \ BGT fixnum-pred ;
-M: %fixnum>= generate-node ( vop -- ) \ BGE fixnum-pred ;
-M: %eq?      generate-node ( vop -- ) \ BEQ fixnum-pred ;
-
 : fixnum-jump ( vop -- label )
-    [ compare ] keep vop-label ;
+    [
+        dup 1 vop-in v>operand
+        swap 0 vop-in v>operand
+        0 swap CMP
+    ] keep vop-label ;
 
 M: %jump-fixnum<  generate-node ( vop -- ) fixnum-jump BLT ;
 M: %jump-fixnum<= generate-node ( vop -- ) fixnum-jump BLE ;

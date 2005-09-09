@@ -30,14 +30,14 @@ memory parser sequences strings vectors words prettyprint ;
 \ eq? t "flushable" set-word-prop
 \ eq? t "foldable" set-word-prop
 
-! : manual-branch ( word -- )
-!     dup "infer-effect" word-prop consume/produce
-!     [ [ t ] [ f ] ifte ] infer-quot ;
-! 
-! { fixnum<= fixnum< fixnum>= fixnum> eq? } [
-!     dup dup literalize [ manual-branch ] cons
-!     "infer" set-word-prop
-! ] each
+: manual-branch ( word -- )
+    dup "infer-effect" word-prop consume/produce
+    [ [ t ] [ f ] ifte ] infer-quot ;
+
+{ fixnum<= fixnum< fixnum>= fixnum> eq? } [
+    dup dup literalize [ manual-branch ] cons
+    "infer" set-word-prop
+] each
 
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop

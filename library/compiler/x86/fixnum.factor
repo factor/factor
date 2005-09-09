@@ -157,36 +157,6 @@ M: %fixnum-sgn generate-node
     ! give it a fixnum tag.
     0 vop-out v>operand tag-bits SHL ;
 
-: load-boolean ( dest cond -- )
-    #! Compile this after a conditional jump to store f or t
-    #! in dest depending on the jump being taken or not.
-    <label> "true" set
-    <label> "end" set
-    "true" get swap execute
-    dup f address MOV
-    "end" get JMP
-    "true" get save-xt
-    t load-indirect
-    "end" get save-xt ; inline
-
-: fixnum-compare ( vop -- dest )
-    dup 0 vop-out v>operand dup rot 0 vop-in v>operand CMP ;
-
-M: %fixnum< generate-node ( vop -- )
-    fixnum-compare  \ JL  load-boolean ;
-
-M: %fixnum<= generate-node ( vop -- )
-    fixnum-compare  \ JLE  load-boolean ;
-
-M: %fixnum> generate-node ( vop -- )
-    fixnum-compare  \ JG  load-boolean ;
-
-M: %fixnum>= generate-node ( vop -- )
-    fixnum-compare  \ JGE  load-boolean ;
-
-M: %eq? generate-node ( vop -- )
-    fixnum-compare  \ JE  load-boolean ;
-
 : fixnum-jump ( vop -- label )
     dup 1 vop-in v>operand over 0 vop-in v>operand CMP
     vop-label ;

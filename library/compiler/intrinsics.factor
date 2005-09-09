@@ -105,22 +105,33 @@ sequences vectors words ;
 : binary-op ( node op -- )
     >r load-inputs first2 swap dup r> execute , out-1 ; inline
 
-[
-    [[ fixnum+       %fixnum+       ]]
-    [[ fixnum-       %fixnum-       ]]
-    [[ fixnum*       %fixnum*       ]]
-    [[ fixnum/i      %fixnum/i      ]]
-    [[ fixnum-bitand %fixnum-bitand ]]
-    [[ fixnum-bitor  %fixnum-bitor  ]]
-    [[ fixnum-bitxor %fixnum-bitxor ]]
-    [[ fixnum<=      %fixnum<=      ]]
-    [[ fixnum<       %fixnum<       ]]
-    [[ fixnum>=      %fixnum>=      ]]
-    [[ fixnum>       %fixnum>       ]]
-    [[ eq?           %eq?           ]]
-] [
-    uncons [ literalize , \ binary-op , ] [ ] make
+{
+    { fixnum+       %fixnum+       }
+    { fixnum-       %fixnum-       }
+    { fixnum*       %fixnum*       }
+    { fixnum/i      %fixnum/i      }
+    { fixnum-bitand %fixnum-bitand }
+    { fixnum-bitor  %fixnum-bitor  }
+    { fixnum-bitxor %fixnum-bitxor }
+} [
+    first2 [ literalize , \ binary-op , ] [ ] make
     "intrinsic" set-word-prop
+] each
+
+: binary-jump ( node label op -- )
+    >r >r node-in-d values>vregs
+    dup length neg %inc-d , first2 swap
+    r> r> execute , ; inline
+
+{
+    { fixnum<= %jump-fixnum<= }
+    { fixnum<  %jump-fixnum<  }
+    { fixnum>= %jump-fixnum>= }
+    { fixnum>  %jump-fixnum>  }
+    { eq?      %jump-eq?      }
+} [
+    first2 [ literalize , \ binary-jump , ] [ ] make
+    "ifte-intrinsic" set-word-prop
 ] each
 
 \ fixnum-mod [
