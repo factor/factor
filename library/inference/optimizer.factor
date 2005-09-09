@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
+IN: optimizer
 USING: compiler-backend generic hashtables inference kernel
 lists math matrices namespaces sequences vectors ;
 

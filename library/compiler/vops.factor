@@ -37,9 +37,7 @@ TUPLE: cs-loc n ;
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
-: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
-: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
@@ -203,10 +201,12 @@ M: %slot basic-block? drop t ;
 
 TUPLE: %set-slot ;
 C: %set-slot make-vop ;
+
 : %set-slot ( value obj n )
-    #! %set-slot writes to vreg n.
-    >r >r <vreg> r> <vreg> r> <vreg> 3vector dup second f
-    <%set-slot> ;
+    #! %set-slot writes to vreg obj.
+    rot <vreg> rot <vreg> rot <vreg> over >r 3vector r> 1vector
+    f <%set-slot> ;
+
 M: %set-slot basic-block? drop t ;
 
 ! in the 'fast' versions, the object's type and slot number is

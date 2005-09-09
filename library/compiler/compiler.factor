@@ -1,7 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 IN: compiler
 USING: compiler-backend compiler-frontend errors inference io
-kernel lists math namespaces prettyprint sequences words ;
+kernel lists math namespaces optimizer prettyprint sequences
+words ;
 
 : supported-cpu? ( -- ? )
     cpu "unknown" = not ;

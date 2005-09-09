@@ -61,8 +61,6 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ [ dataflow-graph get ] bind ] map ;
 
 : copy-inference ( -- )
-    #! We avoid cloning the same object more than once in order
-    #! to preserve identity structure.
     meta-r [ clone ] change
     meta-d [ clone ] change
     d-in [ clone ] change

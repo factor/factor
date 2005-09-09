@@ -1,5 +1,5 @@
-IN: inference
-USING: kernel sequences words ;
+IN: optimizer
+USING: inference kernel sequences words ;
 
 ! #ifte --> X
 !   |

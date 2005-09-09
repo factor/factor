@@ -55,12 +55,6 @@ SYMBOL: d-in
     meta-d [ append ] change
     d-in [ append ] change ;
 
-: hairy-node ( node effect quot -- quot: -- )
-    over car ensure-d
-    -rot 2dup car length 0 rot node-inputs
-    2slip
-    second length 0 rot node-outputs ; inline
-
 : effect ( -- [[ in# out# ]] )
     #! After inference is finished, collect information.
     d-in get length object <repeated> >list

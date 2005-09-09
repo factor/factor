@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
-USING: generic hashtables kernel kernel-internals namespaces
-sequences vectors words ;
+IN: optimizer
+USING: generic hashtables inference kernel kernel-internals
+namespaces sequences vectors words ;
 
 ! Infer possible classes of values in a dataflow IR.
 

@@ -5,8 +5,8 @@ USING: alien assembler compiler inference kernel lists math
 memory sequences words ;
 
 : reg-stack ( reg n -- op ) cell * neg 2list ;
-: ds-op ( n -- op ) ESI swap reg-stack ;
-: cs-op ( n -- op ) EBX swap reg-stack ;
+: ds-op ( ds-loc -- op ) ds-loc-n ESI swap reg-stack ;
+: cs-op ( cs-loc -- op ) cs-loc-n EBX swap reg-stack ;
 
 : (%peek) dup 0 vop-out v>operand swap 0 vop-in ;
 
@@ -14,7 +14,7 @@ M: %peek-d generate-node ( vop -- ) (%peek) ds-op MOV ;
 
 M: %peek-r generate-node ( vop -- ) (%peek) cs-op MOV ;
 
-: (%replace) dup 1 vop-in v>operand swap 0 vop-in ;
+: (%replace) dup 0 vop-in v>operand swap 0 vop-out ;
     
 M: %replace-d generate-node ( vop -- ) (%replace) ds-op swap MOV ;
 

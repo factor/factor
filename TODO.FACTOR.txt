@@ -1,4 +1,6 @@
 - remove t object and type
+- compiling string>md5 hangs
+- mersenne 42 runs out of memory
 
 + ui:
 

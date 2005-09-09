@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: inference
-USING: kernel namespaces prettyprint sequences vectors ;
+IN: optimizer
+USING: inference kernel namespaces prettyprint sequences vectors ;
 
 GENERIC: collect-recursion* ( label node -- )
 

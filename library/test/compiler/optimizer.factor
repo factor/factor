@@ -1,7 +1,7 @@
 IN: temporary
 USING: assembler compiler compiler-backend generic inference
-kernel kernel-internals lists math prettyprint sequences strings
-test vectors words ;
+kernel kernel-internals lists math optimizer prettyprint
+sequences strings test vectors words ;
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled

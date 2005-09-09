@@ -11,6 +11,12 @@ hashtables parser prettyprint ;
 : produce-d ( typelist -- )
     [ drop <computed> push-d ] each ;
 
+: hairy-node ( node effect quot -- quot: -- )
+    over car ensure-d
+    -rot 2dup car length 0 rot node-inputs
+    2slip
+    second length 0 rot node-outputs ; inline
+
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
@@ -118,7 +124,6 @@ M: symbol apply-object ( word -- )
             ] ifte
         ] ifte*
     ] ifte* ;
-
 
 : splice-node ( node -- )
     dup node-successor [

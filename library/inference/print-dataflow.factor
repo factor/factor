@@ -1,4 +1,4 @@
-IN: inference
+IN: optimizer
 USING: generic hashtables inference io kernel kernel-internals
 lists math namespaces prettyprint sequences styles vectors words ;
 

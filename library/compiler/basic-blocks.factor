@@ -1,5 +1,5 @@
 IN: compiler-backend
-USING: kernel math namespaces sequences vectors ;
+USING: hashtables kernel math namespaces sequences vectors ;
 
 : (split-blocks) ( n linear -- )
     2dup length = [
@@ -78,10 +78,16 @@ M: cs-loc live@end? cs-loc-n r-height get + 0 >= ;
         [ dup live@end? ] unless*
     ] callcc1 2nip ;
 
-! Set if trim-dead* removed some VOPs.
+! Used for elimination of dead loads from the stack:
+! we keep a map of vregs to ds-loc/cs-loc/f.
+SYMBOL: vreg-contents
+
 GENERIC: trim-dead* ( tail vop -- )
 
-M: tuple trim-dead* ( tail vop -- ) , drop ;
+: forget-vregs ( vop -- )
+    vop-outputs [ vreg-contents get remove-hash ] each ;
+
+M: tuple trim-dead* ( tail vop -- ) dup forget-vregs , drop ;
 
 : simplify-inc ( vop -- ) dup 0 vop-in 0 = not ?, ;
 
@@ -89,22 +95,44 @@ M: %inc-d trim-dead* ( tail vop -- ) simplify-inc drop ;
 
 M: %inc-r trim-dead* ( tail vop -- ) simplify-inc drop ;
 
-: ?dead-load ( tail vop -- )
+: live-load? ( tail vop -- ? )
     #! If the VOP's output location is overwritten before being
     #! read again, kill the VOP.
-    dup 0 vop-out rot location-live? ?, ;
+    0 vop-out swap location-live? ;
 
-M: %peek-d trim-dead* ( tail vop -- ) ?dead-load ;
+: remember-peek ( vop -- )
+    dup 0 vop-in swap 0 vop-out vreg-contents get set-hash ;
 
-M: %peek-r trim-dead* ( tail vop -- ) ?dead-load ;
+: redundant-peek? ( vop -- ? )
+    dup 0 vop-in swap 0 vop-out vreg-contents get hash = ;
 
-M: %replace-d trim-dead* ( tail vop -- ) ?dead-load ;
+: ?dead-peek ( tail vop -- )
+    dup redundant-peek? >r tuck live-load? not r> or
+    [ dup remember-peek dup , ] unless drop ;
 
-M: %replace-r trim-dead* ( tail vop -- ) ?dead-load ;
+M: %peek-d trim-dead* ( tail vop -- ) ?dead-peek ;
 
-M: %immediate trim-dead* ( tail vop -- ) ?dead-load ;
+M: %peek-r trim-dead* ( tail vop -- ) ?dead-peek ;
 
-M: %indirect trim-dead* ( tail vop -- ) ?dead-load ;
+: redundant-replace? ( vop -- ? )
+    dup 0 vop-out swap 0 vop-in vreg-contents get hash = ;
+
+: remember-replace ( vop -- )
+    dup 0 vop-out swap 0 vop-in vreg-contents get set-hash ;
+
+: ?dead-replace ( tail vop -- )
+    dup redundant-replace? >r tuck live-load? not r> or
+    [ dup remember-replace dup , ] unless drop ;
+
+M: %replace-d trim-dead* ( tail vop -- ) ?dead-replace ;
+
+M: %replace-r trim-dead* ( tail vop -- ) ?dead-replace ;
+
+: ?dead-literal dup forget-vregs tuck live-load? ?, ;
+
+M: %immediate trim-dead* ( tail vop -- ) ?dead-literal ;
+
+M: %indirect trim-dead* ( tail vop -- ) ?dead-literal ;
 
 : trim-dead ( block -- )
     #! Remove dead loads and stores.
@@ -115,14 +143,15 @@ M: %indirect trim-dead* ( tail vop -- ) ?dead-load ;
     [
         0 d-height set
         0 r-height set
+        {{ }} clone vreg-contents set
         dup simplify-stack
         d-height get %inc-d r-height get %inc-r 2vector append
         trim-dead
     ] { } make ;
 
 : keep-simplifying ( block -- block )
-    dup length >r simplify-block dup length r>
-    = [ keep-simplifying ] unless ;
+    dup length >r simplify-block dup length r> =
+    [ keep-simplifying ] unless ;
 
 : simplify ( blocks -- blocks )
     #! Simplify basic block IR.
