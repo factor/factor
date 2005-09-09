@@ -1,6 +1,7 @@
 - remove t object and type
 - compiling string>md5 hangs
 - mersenne 42 runs out of memory
+- uncrossref: don't clear infer-effect of words with an infer quotation
 
 + ui:
 
@@ -57,7 +58,6 @@
 - floating point intrinsics
 - flushing optimization
 - fix fixnum/mod overflow on PowerPC
-- eliminate simplifier
 - intrinsic char-slot set-char-slot
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too

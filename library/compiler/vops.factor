@@ -334,7 +334,6 @@ PREDICATE: tuple fast-branch
 TUPLE: %type ;
 C: %type make-vop ;
 : %type ( vreg ) <vreg> dest-vop <%type> ;
-M: %type basic-block? drop t ;
 
 TUPLE: %tag ;
 C: %tag make-vop ;

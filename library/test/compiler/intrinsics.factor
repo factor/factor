@@ -167,3 +167,6 @@ math-internals test words ;
 [ 268435456 0 ] [ -268435456 >fixnum -1 [ fixnum/mod ] compile-1 ] unit-test
 
 [ t ] [ f [ f eq? ] compile-1 ] unit-test
+
+! regression
+[ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-1 2nip ] unit-test

@@ -1,6 +1,7 @@
 IN: temporary
 USE: lists
 USE: test
+USE: sequences
 
 [ f ] [ f car ] unit-test
 [ f ] [ f cdr ] unit-test
