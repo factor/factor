@@ -53,11 +53,7 @@ unparser vectors words ;
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
     #! quotation is applied to them.
-    [
-        [
-            [ swap call ] 2keep rot [ , ] [ drop ] ifte
-        ] each-object drop
-    ] [ ] make ;
+    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] [ ] make ;
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline

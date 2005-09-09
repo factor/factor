@@ -5,9 +5,9 @@ USING: assembler compiler kernel math math-internals memory
 namespaces words ;
 
 : >3-imm< ( vop -- out1 in2 in1 )
-    [ vop-out-1 v>operand ] keep
-    [ vop-in-2 v>operand ] keep
-    vop-in-1 ;
+    [ 0 vop-out v>operand ] keep
+    [ 1 vop-in v>operand ] keep
+    0 vop-in ;
 
 : >3-vop< ( vop -- out1 in1 in2 )
     >3-imm< v>operand swap ;
@@ -24,7 +24,7 @@ namespaces words ;
     drop
     "s48_long_to_bignum" f compile-c-call
     ! An untagged pointer to the bignum is now in r3; tag it
-    3 swap vop-out-1 v>operand bignum-tag ORI
+    3 swap 0 vop-out v>operand bignum-tag ORI
     "end" get save-xt ; inline
 
 M: %fixnum+ generate-node ( vop -- )
@@ -114,7 +114,7 @@ M: %fixnum<< generate-node ( vop -- )
     ! This has specific register requirements.
     <label> "no-overflow" set
     <label> "end" set
-    vop-in-1
+    0 vop-in
     ! check for potential overflow
     dup shift-add dup 5 LOAD
     4 3 5 ADD
@@ -142,7 +142,7 @@ M: %fixnum-sgn generate-node ( vop -- )
     dest/src dupd 31 SRAWI dup untag ;
 
 : compare ( vop -- )
-    dup vop-in-2 v>operand swap vop-in-1 dup integer? [
+    dup 1 vop-in v>operand swap 0 vop-in dup integer? [
         0 -rot address CMPI
     ] [
         0 swap v>operand CMP
@@ -161,7 +161,7 @@ M: %fixnum-sgn generate-node ( vop -- )
     "end" get save-xt ; inline
 
 : fixnum-pred ( vop word -- dest )
-    >r [ compare ] keep vop-out-1 v>operand r> load-boolean ;
+    >r [ compare ] keep 0 vop-out v>operand r> load-boolean ;
     inline
 
 M: %fixnum<  generate-node ( vop -- ) \ BLT fixnum-pred ;

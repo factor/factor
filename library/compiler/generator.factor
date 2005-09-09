@@ -64,7 +64,7 @@ M: integer v>operand tag-bits shift ;
 M: f v>operand address ;
 
 : dest/src ( vop -- dest src )
-    dup vop-out-1 v>operand swap vop-in-1 v>operand ;
+    dup 0 vop-out v>operand swap 0 vop-in v>operand ;
 
 ! These constants must match native/card.h
 : card-bits 7 ;

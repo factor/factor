@@ -447,10 +447,10 @@ memory parser sequences strings vectors words prettyprint ;
 
 \ set-integer-slot [ [ integer object fixnum ] [ ] ] "infer-effect" set-word-prop
 
-\ char-slot [ [ object fixnum ] [ fixnum ] ] "infer-effect" set-word-prop
+\ char-slot [ [ fixnum object ] [ fixnum ] ] "infer-effect" set-word-prop
 \ char-slot t "flushable" set-word-prop
 
-\ set-char-slot [ [ integer object fixnum ] [ ] ] "infer-effect" set-word-prop
+\ set-char-slot [ [ integer fixnum object ] [ ] ] "infer-effect" set-word-prop
 \ resize-array [ [ integer array ] [ array ] ] "infer-effect" set-word-prop
 \ resize-string [ [ integer string ] [ string ] ] "infer-effect" set-word-prop
 

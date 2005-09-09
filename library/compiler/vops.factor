@@ -18,6 +18,9 @@ parser sequences vectors words ;
 : label? ( obj -- ? )
     dup word? [ "label" word-prop ] [ drop f ] ifte ;
 
+! A location is a virtual register or a stack slot. We can
+! ask a VOP if it reads or writes a location.
+
 ! A virtual register
 TUPLE: vreg n ;
 
@@ -25,21 +28,23 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
+! A data stack location.
+TUPLE: ds-loc n ;
+
+! A call stack location.
+TUPLE: cs-loc n ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
-: vop-in-1 ( vop -- input ) vop-inputs first ;
-: vop-in-2 ( vop -- input ) vop-inputs second ;
-: vop-in-3 ( vop -- input ) vop-inputs third ;
-: vop-out-1 ( vop -- output ) vop-outputs first ;
-: vop-out-2 ( vop -- output ) vop-outputs second ;
+: vop-in ( vop n -- input ) swap vop-inputs nth ;
+: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
+: vop-out ( vop n -- input ) swap vop-outputs nth ;
+: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
 ! simplifies some code
 M: f basic-block? drop f ;
-
-GENERIC: calls-label? ( label vop -- ? )
-M: vop calls-label? vop-label = ;
 
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
@@ -64,7 +69,6 @@ C: %prologue make-vop ;
 TUPLE: %label ;
 C: %label make-vop ;
 : %label label-vop <%label> ;
-M: %label calls-label? 2drop f ;
 
 ! Return vops take a label that is ignored, to have the
 ! same stack effect as jumps. This is needed for the
@@ -121,41 +125,57 @@ C: %end-dispatch make-vop ;
 ! stack operations
 TUPLE: %peek-d ;
 C: %peek-d make-vop ;
-: %peek-d ( vreg n -- vop ) swap <vreg> src/dest-vop <%peek-d> ;
+
+: %peek-d ( vreg n -- vop )
+    <ds-loc> swap <vreg> src/dest-vop <%peek-d> ;
+
 M: %peek-d basic-block? drop t ;
 
 TUPLE: %replace-d ;
 C: %replace-d make-vop ;
-: %replace-d ( vreg n -- vop ) swap <vreg> 2-in-vop <%replace-d> ;
+
+: %replace-d ( vreg n -- vop )
+    <ds-loc> swap <vreg> swap src/dest-vop <%replace-d> ;
+
 M: %replace-d basic-block? drop t ;
 
 TUPLE: %inc-d ;
 C: %inc-d make-vop ;
 : %inc-d ( n -- node ) src-vop <%inc-d> ;
-M: %inc-d basic-block? drop t ;
 
-: %inc-d, ( n -- ) dup 0 = [ dup %inc-d , ] unless drop ;
+M: %inc-d basic-block? drop t ;
 
 TUPLE: %immediate ;
 C: %immediate make-vop ;
+
 : %immediate ( vreg obj -- vop )
     swap <vreg> src/dest-vop <%immediate> ;
+
 M: %immediate basic-block? drop t ;
 
 TUPLE: %peek-r ;
 C: %peek-r make-vop ;
-: %peek-r ( vreg n -- vop ) swap <vreg> src/dest-vop <%peek-r> ;
+
+: %peek-r ( vreg n -- vop )
+    <cs-loc> swap <vreg> src/dest-vop <%peek-r> ;
+
+M: %peek-r basic-block? drop t ;
 
 TUPLE: %replace-r ;
 C: %replace-r make-vop ;
-: %replace-r ( vreg n -- vop ) swap <vreg> 2-in-vop <%replace-r> ;
+
+: %replace-r ( vreg n -- vop )
+    <cs-loc> swap <vreg> swap src/dest-vop <%replace-r> ;
+
+M: %replace-r basic-block? drop t ;
 
 TUPLE: %inc-r ;
+
 C: %inc-r make-vop ;
 
 : %inc-r ( n -- ) src-vop <%inc-r> ;
 
-: %inc-r, ( n -- ) dup 0 = [ dup %inc-r , ] unless drop ;
+M: %inc-r basic-block? drop t ;
 
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
@@ -222,14 +242,22 @@ TUPLE: %fixnum/i ;
 C: %fixnum/i make-vop ;      : %fixnum/i 3-vop <%fixnum/i> ;
 TUPLE: %fixnum/mod ;
 C: %fixnum/mod make-vop ;    : %fixnum/mod f <%fixnum/mod> ;
+
 TUPLE: %fixnum-bitand ;
 C: %fixnum-bitand make-vop ; : %fixnum-bitand 3-vop <%fixnum-bitand> ;
+M: %fixnum-bitand basic-block? drop t ;
+
 TUPLE: %fixnum-bitor ;
 C: %fixnum-bitor make-vop ;  : %fixnum-bitor 3-vop <%fixnum-bitor> ;
+M: %fixnum-bitor basic-block? drop t ;
+
 TUPLE: %fixnum-bitxor ;
 C: %fixnum-bitxor make-vop ; : %fixnum-bitxor 3-vop <%fixnum-bitxor> ;
+M: %fixnum-bitxor basic-block? drop t ;
+
 TUPLE: %fixnum-bitnot ;
 C: %fixnum-bitnot make-vop ; : %fixnum-bitnot 2-vop <%fixnum-bitnot> ;
+M: %fixnum-bitnot basic-block? drop t ;
 
 TUPLE: %fixnum<= ;
 C: %fixnum<= make-vop ;      : %fixnum<= 3-vop <%fixnum<=> ;
@@ -252,12 +280,17 @@ C: %eq? make-vop ;           : %eq? 3-vop <%eq?> ;
 ! - shifts with a large negative count: %fixnum-sgn
 TUPLE: %fixnum<< ;
 C: %fixnum<< make-vop ;   : %fixnum<<   3-vop <%fixnum<<> ;
+
 TUPLE: %fixnum>> ;
 C: %fixnum>> make-vop ;   : %fixnum>>   3-vop <%fixnum>>> ;
+M: %fixnum>> basic-block? drop t ;
+
 ! due to x86 limitations the destination of this VOP must be
 ! vreg 2 (EDX), and the source must be vreg 0 (EAX).
 TUPLE: %fixnum-sgn ;
 C: %fixnum-sgn make-vop ; : %fixnum-sgn src/dest-vop <%fixnum-sgn> ;
+M: %fixnum-sgn basic-block? drop t ;
+
 
 ! Integer comparison followed by a conditional branch is
 ! optimized
@@ -317,10 +350,10 @@ C: %untag-fixnum make-vop ;
 M: %untag-fixnum basic-block? drop t ;
 
 : check-dest ( vop reg -- )
-    swap vop-out-1 = [ "bad VOP destination" throw ] unless ;
+    swap 0 vop-out = [ "bad VOP destination" throw ] unless ;
 
 : check-src ( vop reg -- )
-    swap vop-in-1 = [ "bad VOP source" throw ] unless ;
+    swap 0 vop-in = [ "bad VOP source" throw ] unless ;
 
 TUPLE: %getenv ;
 C: %getenv make-vop ;

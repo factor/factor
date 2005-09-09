@@ -112,7 +112,7 @@ M: %fixnum-bitxor generate-node ( vop -- ) dest/src XOR ;
 
 M: %fixnum-bitnot generate-node ( vop -- )
     ! Negate the bits of the operand
-    vop-out-1 v>operand dup NOT
+    0 vop-out v>operand dup NOT
     ! Mask off the low 3 bits to give a fixnum tag
     tag-mask XOR ;
 
@@ -122,7 +122,7 @@ M: %fixnum<< generate-node
     <label> "end" set
     ! make a copy
     ECX EAX MOV
-    vop-in-1
+    0 vop-in
     ! check for potential overflow
     dup shift-add ECX over ADD
     2 * 1 - ECX swap CMP
@@ -147,7 +147,7 @@ M: %fixnum<< generate-node
 
 M: %fixnum>> generate-node
     ! shift register
-    dup vop-out-1 v>operand dup rot vop-in-1 SAR
+    dup 0 vop-out v>operand dup rot 0 vop-in SAR
     ! give it a fixnum tag
     tag-mask bitnot AND ;
 
@@ -155,7 +155,7 @@ M: %fixnum-sgn generate-node
     ! store 0 in EDX if EAX is >=0, otherwise store -1.
     CDQ
     ! give it a fixnum tag.
-    vop-out-1 v>operand tag-bits SHL ;
+    0 vop-out v>operand tag-bits SHL ;
 
 : load-boolean ( dest cond -- )
     #! Compile this after a conditional jump to store f or t
@@ -170,7 +170,7 @@ M: %fixnum-sgn generate-node
     "end" get save-xt ; inline
 
 : fixnum-compare ( vop -- dest )
-    dup vop-out-1 v>operand dup rot vop-in-1 v>operand CMP ;
+    dup 0 vop-out v>operand dup rot 0 vop-in v>operand CMP ;
 
 M: %fixnum< generate-node ( vop -- )
     fixnum-compare  \ JL  load-boolean ;
@@ -188,7 +188,7 @@ M: %eq? generate-node ( vop -- )
     fixnum-compare  \ JE  load-boolean ;
 
 : fixnum-jump ( vop -- label )
-    dup vop-in-2 v>operand over vop-in-1 v>operand CMP
+    dup 1 vop-in v>operand over 0 vop-in v>operand CMP
     vop-label ;
 
 M: %jump-fixnum<  generate-node ( vop -- ) fixnum-jump JL ;

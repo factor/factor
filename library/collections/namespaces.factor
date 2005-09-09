@@ -102,6 +102,8 @@ SYMBOL: building
     #! Add to the sequence being built with make-seq.
     building get push ;
 
+: ?, ( obj ? -- ) [ , ] [ drop ] ifte ;
+
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
     building get swap nappend ;

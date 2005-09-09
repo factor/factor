@@ -31,13 +31,13 @@ sequences vectors words ;
 
 \ slot [
     dup slot@ [
-        -1 %inc-d,
+        -1 %inc-d ,
         in-1
         0 swap slot@ %fast-slot ,
     ] [
         drop
         in-2
-        -1 %inc-d,
+        -1 %inc-d ,
         0 %untag ,
         1 0 %slot ,
     ] ifte  out-1
@@ -45,14 +45,14 @@ sequences vectors words ;
 
 \ set-slot [
     dup slot@ [
-        -1 %inc-d,
+        -1 %inc-d ,
         in-2
-        -2 %inc-d,
+        -2 %inc-d ,
         slot@ >r 0 1 r> %fast-set-slot ,
     ] [
         drop
         in-3
-        -3 %inc-d,
+        -3 %inc-d ,
         1 %untag ,
         0 1 2 %set-slot ,
     ] ifte
@@ -76,17 +76,17 @@ sequences vectors words ;
 ] "intrinsic" set-word-prop
 
 \ getenv [
-    -1 %inc-d,
+    -1 %inc-d ,
     node-peek literal-value 0 <vreg> swap %getenv ,
-    1 %inc-d,
+    1 %inc-d ,
     out-1
 ] "intrinsic" set-word-prop
 
 \ setenv [
-    -1 %inc-d,
+    -1 %inc-d ,
     in-1
     node-peek literal-value 0 <vreg> swap %setenv ,
-    -1 %inc-d,
+    -1 %inc-d ,
 ] "intrinsic" set-word-prop
 
 : value/vreg-list ( in -- list )
@@ -100,7 +100,7 @@ sequences vectors words ;
 
 : load-inputs ( node -- in )
     dup node-in-d values>vregs
-    [ >r node-out-d length r> length - %inc-d, ] keep ;
+    [ >r node-out-d length r> length - %inc-d , ] keep ;
 
 : binary-op-reg ( node op -- )
     >r load-inputs first2 swap dup r> execute ,
@@ -110,7 +110,7 @@ sequences vectors words ;
     dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
 
 : binary-op-imm ( imm op -- )
-    -1 %inc-d, in-1
+    -1 %inc-d , in-1
     >r 0 <vreg> dup r> execute ,
     0 0 %replace-d , ; inline
 
@@ -143,7 +143,7 @@ sequences vectors words ;
 ] each
 
 : fast-fixnum* ( n -- )
-    -1 %inc-d,
+    -1 %inc-d ,
     in-1
     log2 0 <vreg> 0 <vreg> %fixnum<< ,
     0 0 %replace-d , ;
@@ -169,7 +169,7 @@ sequences vectors words ;
     ! be EDX there.
     drop
     in-2
-    -1 %inc-d,
+    -1 %inc-d ,
     1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
     2 0 %replace-d ,
 ] "intrinsic" set-word-prop
@@ -201,7 +201,7 @@ sequences vectors words ;
 : slow-shift ( -- ) \ fixnum-shift %call , ;
 
 : negative-shift ( n -- )
-    -1 %inc-d,
+    -1 %inc-d ,
     in-1
     dup cell -8 * <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
@@ -213,7 +213,7 @@ sequences vectors words ;
 
 : positive-shift ( n -- )
     dup cell 8 * tag-bits - <= [
-        -1 %inc-d,
+        -1 %inc-d ,
         in-1
         0 <vreg> 0 <vreg> %fixnum<< ,
         out-1
@@ -223,7 +223,7 @@ sequences vectors words ;
 
 : fast-shift ( n -- )
     dup 0 = [
-        -1 %inc-d,
+        -1 %inc-d ,
         drop
     ] [
         dup 0 < [

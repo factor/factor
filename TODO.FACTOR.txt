@@ -1,3 +1,5 @@
+- remove t object and type
+
 + ui:
 
 - fix up the min thumb size hack
@@ -48,10 +50,8 @@
 
 + compiler:
 
+- declare slot types for built-ins
 - remove dead code after a 'throw'
-- when doing comparison with one arg being a float, inline method
-- investigate overzealous math inlining
-- shuffles: eliminate dead loads
 - floating point intrinsics
 - flushing optimization
 - fix fixnum/mod overflow on PowerPC
@@ -78,7 +78,6 @@
 - specialized arrays
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
-- powerpc has weird callstack residue
 - instances: do not use make-list
 - vectors: ensure its ok with bignum indices
 - code gc
@@ -91,8 +90,6 @@
 - investigate if rehashing on startup is really necessary
 - vectorize >n, n>, (get)
 - mutable strings simplifying string operarations
-- 2each, find*, subset are ugly
-- map and 2map duplicate logic
 
 + i/o:
 

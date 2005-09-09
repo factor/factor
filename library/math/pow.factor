@@ -50,7 +50,7 @@ M: integer ^ ( z w -- z^w )
         "0^0 is not defined" throw
     ] [
         dup 0 < [ neg ^ recip ] [ (integer^) ] ifte
-    ] ifte ; foldable
+    ] ifte ;
 
 : (^mod) ( n z w -- z^w )
     1 swap [

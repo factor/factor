@@ -92,4 +92,6 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : split ( seq subseq -- seq ) [ (split) ] [ ] make ; flushable
 
-: cut ( n seq -- ) [ head ] 2keep tail ; flushable
+: (cut) ( n seq -- ) [ head ] 2keep tail-slice ; flushable
+
+: cut ( n seq -- ) [ (cut) ] keep like ; flushable

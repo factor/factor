@@ -34,7 +34,8 @@ test vectors words ;
 [ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test
 
 : kill-set*
-    dataflow kill-set [ literal-value ] map ;
+    dataflow dup solve-recursion dup split-node
+    kill-set [ literal-value ] map ;
 
 : foo 1 2 3 ;
 

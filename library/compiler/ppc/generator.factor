@@ -53,7 +53,7 @@ M: %jump-label generate-node ( vop -- )
     vop-label B ;
 
 : conditional ( vop -- label )
-    dup vop-in-1 v>operand 0 swap f address CMPI vop-label ;
+    dup 0 vop-in v>operand 0 swap f address CMPI vop-label ;
 
 M: %jump-f generate-node ( vop -- )
     conditional BEQ ;
@@ -119,4 +119,4 @@ M: %type generate-node ( vop -- )
     3 4 MR ;
 
 M: %tag generate-node ( vop -- )
-    dup vop-in-1 v>operand swap vop-out-1 v>operand tag-mask ANDI ;
+    dup 0 vop-in v>operand swap 0 vop-out v>operand tag-mask ANDI ;

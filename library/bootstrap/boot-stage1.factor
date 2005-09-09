@@ -138,7 +138,7 @@ sequences io vectors words ;
         "/library/compiler/linearizer.factor"
         "/library/compiler/stack.factor"
         "/library/compiler/intrinsics.factor"
-        "/library/compiler/simplifier.factor"
+        "/library/compiler/basic-blocks.factor"
         "/library/compiler/generator.factor"
         "/library/compiler/compiler.factor"
 

@@ -63,8 +63,6 @@ SYMBOL: commands
 [ compound? ] "Annotate with breakpoint" [ break ] define-command
 [ compound? ] "Annotate with profiling" [ profile ] define-command
 [ word? ] "Compile" [ recompile ] define-command
-[ word? ] "Show stack effect" [ unit infer . ] define-command
-[ word? ] "Show dataflow IR" [ word-def t dataflow. ] define-command
-[ word? ] "Show linear IR" [ precompile ] define-command
+[ word? ] "Infer stack effect" [ unit infer . ] define-command
 
 [ [ gadget? ] is? ] "Display gadget" [ gadget. ] define-command

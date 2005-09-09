@@ -9,6 +9,8 @@ M: cons length cdr length 1 + ;
 M: f empty? drop t ;
 M: cons empty? drop f ;
 
+M: f peek ( f -- f ) ;
+
 M: cons peek ( list -- last )
     #! Last element of a list.
     last car ;

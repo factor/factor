@@ -5,82 +5,72 @@ USING: compiler-backend errors generic lists inference kernel
 math namespaces prettyprint sequences
 strings words ;
 
-GENERIC: linearize-node* ( node -- )
-
-M: f linearize-node* ( f -- ) drop ;
-
-M: node linearize-node* ( node -- ) drop ;
-
-: linearize-node ( node -- )
-    [
-        dup linearize-node* node-successor linearize-node
-    ] when* ;
+GENERIC: linearize* ( node -- )
 
 : linearize ( dataflow -- linear )
     #! Transform dataflow IR into linear IR. This strips out
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
-    [ %prologue , linearize-node ] [ ] make ;
+    [ %prologue , linearize* ] { } make ;
 
-M: #label linearize-node* ( node -- )
+: linearize-next node-successor linearize* ;
+
+M: f linearize* ( f -- ) drop ;
+
+M: node linearize* ( node -- ) linearize-next ;
+
+M: #label linearize* ( node -- )
     <label> dup %return-to , >r
     dup node-param %label ,
-    node-child linearize-node
-    r> %label , ;
+    dup node-child linearize*
+    r> %label ,
+    linearize-next ;
 
-M: #call linearize-node* ( node -- )
-    dup node-param
-    dup "intrinsic" word-prop [ call ] [ %call , drop ] ?ifte ;
+: ?tail-call ( node caller jumper -- next )
+    >r >r dup node-successor #return? [
+        node-param r> drop r> execute ,
+    ] [
+        dup node-param r> execute , r> drop linearize-next
+    ] ifte ; inline
 
-M: #call-label linearize-node* ( node -- )
-    node-param %call-label , ;
+: intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
-: immediate? ( obj -- ? )
-    #! fixnums and f have a pointerless representation, and
-    #! are compiled immediately. Everything else can be moved
-    #! by GC, and is indexed through a table.
-    dup fixnum? swap f eq? or ;
+M: #call linearize* ( node -- )
+    dup intrinsic [
+        dupd call linearize-next
+    ] [
+        \ %call \ %jump ?tail-call
+    ] ifte* ;
 
-GENERIC: load-value ( vreg n value -- )
+M: #call-label linearize* ( node -- )
+    \ %call-label \ %jump-label ?tail-call ;
 
-M: object load-value ( vreg n value -- )
-    drop %peek-d , ;
+: ifte-head ( label -- ) in-1  -1 %inc-d , 0 %jump-t , ;
 
-: push-literal ( vreg value -- )
-    literal-value dup
-    immediate? [ %immediate ] [ %indirect ] ifte , ;
-
-M: literal load-value ( vreg n value -- )
-    nip push-literal ;
-
-: ifte-head ( label -- )
-    in-1  -1 %inc-d, 0 %jump-t , ;
-
-M: #ifte linearize-node* ( node -- )
+M: #ifte linearize* ( node -- )
     node-children first2
     <label> dup ifte-head
-    swap linearize-node ( false branch )
+    swap linearize* ( false branch )
     %label , ( branch target of BRANCH-T )
-    linearize-node ( true branch ) ;
+    linearize* ( true branch ) ;
 
 : dispatch-head ( vtable -- label/code )
     #! Output the jump table insn and return a list of
     #! label/branch pairs.
     in-1
-    -1 %inc-d,
+    -1 %inc-d ,
     0 %untag-fixnum ,
     0 %dispatch ,
     [ <label> dup %target-label ,  cons ] map
     %end-dispatch , ;
 
 : dispatch-body ( label/param -- )
-    #! Output each branch, with a jump to the end label.
-    [ uncons %label , linearize-node ] each ;
+    [ uncons %label , linearize* ] each ;
 
-M: #dispatch linearize-node* ( vtable -- )
-    #! The parameter is a list of lists, each one is a branch to
+M: #dispatch linearize* ( vtable -- )
+    #! The parameter is a list of nodes, each one is a branch to
     #! take in case the top of stack has that type.
     node-children dispatch-head dispatch-body ;
 
-M: #return linearize-node* ( node -- )
-    drop  f %return , ;
+M: #return linearize* ( node -- )
+    drop f %return , ;

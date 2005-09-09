@@ -4,13 +4,13 @@ IN: compiler-backend
 USING: alien assembler kernel math ;
 
 M: %alien-invoke generate-node ( vop -- )
-    dup vop-in-1 swap vop-in-2 load-library compile-c-call ;
+    dup 0 vop-in swap 1 vop-in load-library compile-c-call ;
 
 : stack-reserve 8 + 16 align ;
 : stack@ 12 + ;
 
 M: %parameters generate-node ( vop -- )
-    vop-in-1 dup 0 =
+    0 vop-in dup 0 =
     [ drop ] [ stack-reserve 1 1 rot SUBI ] ifte ;
 
 GENERIC: store-insn
@@ -28,19 +28,19 @@ M: float-regs load-insn
     >r 1 + 1 rot r> float-regs-size 4 = [ LFS ] [ LFD ] ifte ;
 
 M: %unbox generate-node ( vop -- )
-    [ vop-in-2 f compile-c-call ] keep
-    [ vop-in-3 return-reg 1 ] keep
-    [ vop-in-1 stack@ ] keep
-    vop-in-3 store-insn ; 
+    [ 1 vop-in f compile-c-call ] keep
+    [ 2 vop-in return-reg 1 ] keep
+    [ 0 vop-in stack@ ] keep
+    2 vop-in store-insn ; 
 
 M: %parameter generate-node ( vop -- )
-    dup vop-in-1 stack@
-    over vop-in-2
-    rot vop-in-3 load-insn ;
+    dup 0 vop-in stack@
+    over 1 vop-in
+    rot 2 vop-in load-insn ;
 
 M: %box generate-node ( vop -- )
-    vop-in-1 f compile-c-call ;
+    0 vop-in f compile-c-call ;
 
 M: %cleanup generate-node ( vop -- )
-    vop-in-1 dup 0 =
+    0 vop-in dup 0 =
     [ drop ] [ stack-reserve 1 1 rot ADDI ] ifte ;

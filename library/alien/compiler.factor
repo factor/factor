@@ -116,19 +116,19 @@ C: alien-node make-node ;
     dup stack-space %parameters ,
     dup unbox-parameters load-parameters ;
 
-: linearize-return ( return -- )
+: linearize-return ( node -- )
     alien-node-return dup "void" = [
         drop
     ] [
         c-type [ "boxer" get "reg-class" get ] bind %box ,
     ] ifte ;
 
-M: alien-node linearize-node* ( node -- )
+M: alien-node linearize* ( node -- )
     dup parameters linearize-parameters
     dup node-param dup uncons %alien-invoke ,
     cdr library-abi "stdcall" =
     [ dup parameters stack-space %cleanup , ] unless
-    linearize-return ;
+    dup linearize-return linearize-next ;
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?

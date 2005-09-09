@@ -23,7 +23,7 @@ M: %jump-label generate-node ( vop -- )
     vop-label JMP ;
 
 : conditional ( vop -- label )
-    dup vop-in-1 v>operand f address CMP vop-label ;
+    dup 0 vop-in v>operand f address CMP vop-label ;
 
 M: %jump-f generate-node ( vop -- )
     conditional JE ;
@@ -38,19 +38,19 @@ M: %return generate-node ( vop -- )
     drop RET ;
 
 M: %untag generate-node ( vop -- )
-    vop-out-1 v>operand BIN: 111 bitnot AND ;
+    0 vop-out v>operand BIN: 111 bitnot AND ;
 
 M: %retag-fixnum generate-node ( vop -- )
-    vop-out-1 v>operand 3 SHL ;
+    0 vop-out v>operand 3 SHL ;
 
 M: %untag-fixnum generate-node ( vop -- )
-    vop-out-1 v>operand 3 SHR ;
+    0 vop-out v>operand 3 SHR ;
 
 M: %dispatch generate-node ( vop -- )
     #! Compile a piece of code that jumps to an offset in a
     #! jump table indexed by the fixnum at the top of the stack.
     #! The jump table must immediately follow this macro.
-    vop-in-1 v>operand
+    0 vop-in v>operand
     ! Multiply by 4 to get a jump table offset
     dup 2 SHL
     ! Add to jump table base
@@ -64,10 +64,10 @@ M: %dispatch generate-node ( vop -- )
 
 M: %type generate-node ( vop -- )
     #! Intrinstic version of type primitive. It outputs an
-    #! UNBOXED value in vop-out-1.
+    #! UNBOXED value in 0 vop-out.
     <label> "f" set
     <label> "end" set
-    vop-out-1 v>operand
+    0 vop-out v>operand
     ! Make a copy
     ECX over MOV
     ! Get the tag
@@ -91,5 +91,5 @@ M: %type generate-node ( vop -- )
     "end" get save-xt ;
 
 M: %tag generate-node ( vop -- )
-    dup dup vop-in-1 check-dest
-    vop-in-1 v>operand tag-mask AND ;
+    dup dup 0 vop-in check-dest
+    0 vop-in v>operand tag-mask AND ;

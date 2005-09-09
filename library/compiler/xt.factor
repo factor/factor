@@ -144,7 +144,7 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     ] with-scope ;
 
 : postpone-word ( word -- )
-    dup compiling? [
+    dup compiling? over compound? not or [
         drop
     ] [
         compile-words [ unique ] change
