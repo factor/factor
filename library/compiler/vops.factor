@@ -37,7 +37,9 @@ TUPLE: cs-loc n ;
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
+: set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
+: set-vop-out ( input vop n -- ) swap vop-outputs set-nth ;
 
 GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
