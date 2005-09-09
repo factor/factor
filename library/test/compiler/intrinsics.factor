@@ -170,3 +170,8 @@ math-internals test words ;
 
 ! regression
 [ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-1 2nip ] unit-test
+
+! regression
+: blah over cons? [ "x" get >r 2cdr r> ] [ 2drop f f f ] ifte ; compiled
+
+[ f ] [ f "x" set [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test

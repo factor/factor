@@ -1,5 +1,5 @@
 IN: compiler-backend
-USING: hashtables kernel math namespaces sequences vectors ;
+USING: hashtables kernel lists math namespaces sequences vectors ;
 
 : (split-blocks) ( n linear -- )
     2dup length = [
@@ -117,7 +117,15 @@ M: %peek-r trim-dead* ( tail vop -- ) ?dead-peek ;
 : redundant-replace? ( vop -- ? )
     dup 0 vop-out swap 0 vop-in vreg-contents get hash = ;
 
+: forget-stack-loc ( loc -- )
+    #! Forget that any vregs hold this stack location.
+    vreg-contents [ [ cdr swap = not ] hash-subset-with ] change ;
+
 : remember-replace ( vop -- )
+    #! If a vreg claims to hold the stack location we are
+    #! writing to, we must forget this fact, since that stack
+    #! location no longer holds this value!
+    dup 0 vop-out forget-stack-loc
     dup 0 vop-out swap 0 vop-in vreg-contents get set-hash ;
 
 : ?dead-replace ( tail vop -- )

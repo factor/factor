@@ -245,7 +245,10 @@ FORGET: set-stack-effect
 ! Okay, now we have primitives fleshed out. Bring up the generic
 ! word system.
 : builtin-predicate ( class predicate -- )
-    [ \ type , over types first , \ eq? , ] [ ] make
+    [
+        over types first dup
+        tag-mask < \ tag \ type ? , , \ eq? ,
+    ] [ ] make
     define-predicate ;
 
 : register-builtin ( class -- )

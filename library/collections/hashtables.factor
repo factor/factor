@@ -140,6 +140,9 @@ IN: hashtables
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
     >r hash>alist r> subset alist>hash ; inline
 
+: hash-subset-with ( obj hash quot -- hash )
+    swap [ with rot ] hash-subset 2nip ; inline
+
 M: hashtable clone ( hash -- hash )
     dup bucket-count <hashtable>
     over hash-size over set-hash-size

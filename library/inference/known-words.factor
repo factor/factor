@@ -3,6 +3,42 @@ USING: alien assembler errors generic hashtables interpreter io
 io-internals kernel kernel-internals lists math math-internals
 memory parser sequences strings vectors words prettyprint ;
 
+! We transform calls to these words into 'branched' forms;
+! eg, there is no VOP for fixnum<=, only fixnum<= followed
+! by an #ifte, so if we have a 'bare' fixnum<= we add
+! [ t ] [ f ] ifte at the end.
+
+! This transformation really belongs in the optimizer, but it
+! is simpler to do it here.
+\ fixnum< [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum< t "flushable" set-word-prop
+\ fixnum< t "foldable" set-word-prop
+
+\ fixnum<= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum<= t "flushable" set-word-prop
+\ fixnum<= t "foldable" set-word-prop
+
+\ fixnum> [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum> t "flushable" set-word-prop
+\ fixnum> t "foldable" set-word-prop
+
+\ fixnum>= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
+\ fixnum>= t "flushable" set-word-prop
+\ fixnum>= t "foldable" set-word-prop
+
+\ eq? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
+\ eq? t "flushable" set-word-prop
+\ eq? t "foldable" set-word-prop
+
+! : manual-branch ( word -- )
+!     dup "infer-effect" word-prop consume/produce
+!     [ [ t ] [ f ] ifte ] infer-quot ;
+! 
+! { fixnum<= fixnum< fixnum>= fixnum> eq? } [
+!     dup dup literalize [ manual-branch ] cons
+!     "infer" set-word-prop
+! ] each
+
 ! Primitive combinators
 \ call [ [ general-list ] [ ] ] "infer-effect" set-word-prop
 
@@ -152,22 +188,6 @@ memory parser sequences strings vectors words prettyprint ;
 \ fixnum-shift [ [ fixnum fixnum ] [ integer ] ] "infer-effect" set-word-prop
 \ fixnum-shift t "flushable" set-word-prop
 \ fixnum-shift t "foldable" set-word-prop
-
-\ fixnum< [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
-\ fixnum< t "flushable" set-word-prop
-\ fixnum< t "foldable" set-word-prop
-
-\ fixnum<= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
-\ fixnum<= t "flushable" set-word-prop
-\ fixnum<= t "foldable" set-word-prop
-
-\ fixnum> [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
-\ fixnum> t "flushable" set-word-prop
-\ fixnum> t "foldable" set-word-prop
-
-\ fixnum>= [ [ fixnum fixnum ] [ boolean ] ] "infer-effect" set-word-prop
-\ fixnum>= t "flushable" set-word-prop
-\ fixnum>= t "foldable" set-word-prop
 
 \ bignum= [ [ bignum bignum ] [ boolean ] ] "infer-effect" set-word-prop
 \ bignum= t "flushable" set-word-prop
@@ -326,10 +346,6 @@ memory parser sequences strings vectors words prettyprint ;
 
 \ update-xt [ [ word ] [ ] ] "infer-effect" set-word-prop
 \ compiled? [ [ word ] [ boolean ] ] "infer-effect" set-word-prop
-
-\ eq? [ [ object object ] [ boolean ] ] "infer-effect" set-word-prop
-\ eq? t "flushable" set-word-prop
-\ eq? t "foldable" set-word-prop
 
 \ getenv [ [ fixnum ] [ object ] ] "infer-effect" set-word-prop
 \ setenv [ [ object fixnum ] [ ] ] "infer-effect" set-word-prop

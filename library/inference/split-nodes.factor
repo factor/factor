@@ -37,6 +37,13 @@ M: node split-node* ( node -- ) drop ;
     [ last-node 2dup swap post-inline set-node-successor ] keep
     split-node ;
 
+: inline-literals ( node literals -- node )
+    #! Make #push -> #return -> successor
+    over drop-inputs [
+        >r [ literalize ] map dataflow [ subst-node ] keep
+        r> set-node-successor
+    ] keep ;
+
 : split-branch ( node -- )
     dup node-successor over node-children
     [ >r clone-node r> subst-node ] each-with
@@ -51,10 +58,3 @@ M: #dispatch split-node* ( node -- )
 ! #label
 M: #label split-node* ( node -- )
     node-child split-node ;
-
-: inline-literals ( node literals -- node )
-    #! Make #push -> #return -> successor
-    over drop-inputs [
-        >r [ literalize ] map dataflow [ subst-node ] keep
-        r> set-node-successor
-    ] keep ;
