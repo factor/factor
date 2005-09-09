@@ -102,33 +102,13 @@ sequences vectors words ;
     dup node-in-d values>vregs
     [ >r node-out-d length r> length - %inc-d , ] keep ;
 
-: binary-op-reg ( node op -- )
-    >r load-inputs first2 swap dup r> execute ,
-    0 0 %replace-d , ; inline
-
-: literal-immediate? ( value -- ? )
-    dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
-
-: binary-op-imm ( imm op -- )
-    -1 %inc-d , in-1
-    >r 0 <vreg> dup r> execute ,
-    0 0 %replace-d , ; inline
-
 : binary-op ( node op -- )
-    #! out is a vreg where the vop stores the result.
-    fixnum-imm? [
-        >r dup node-peek dup literal-immediate? [
-            literal-value r> binary-op-imm drop
-        ] [
-            drop r> binary-op-reg
-        ] ifte
-    ] [
-        binary-op-reg
-    ] ifte ;
+    >r load-inputs first2 swap dup r> execute , out-1 ; inline
 
 [
     [[ fixnum+       %fixnum+       ]]
     [[ fixnum-       %fixnum-       ]]
+    [[ fixnum/i      %fixnum/i      ]]
     [[ fixnum-bitand %fixnum-bitand ]]
     [[ fixnum-bitor  %fixnum-bitor  ]]
     [[ fixnum-bitxor %fixnum-bitxor ]]
@@ -146,9 +126,9 @@ sequences vectors words ;
     -1 %inc-d ,
     in-1
     log2 0 <vreg> 0 <vreg> %fixnum<< ,
-    0 0 %replace-d , ;
+    out-1 ;
 
-: slow-fixnum* ( node -- ) \ %fixnum* binary-op-reg ;
+: slow-fixnum* ( node -- ) \ %fixnum* binary-op ;
 
 \ fixnum* [
     ! Turn multiplication by a power of two into a left shift.
@@ -172,12 +152,6 @@ sequences vectors words ;
     -1 %inc-d ,
     1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
     2 0 %replace-d ,
-] "intrinsic" set-word-prop
-
-\ fixnum/i t "intrinsic" set-word-prop
-
-\ fixnum/i [
-    \ %fixnum/i binary-op-reg
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [

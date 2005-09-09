@@ -5,8 +5,5 @@ IN: compiler-backend
 DEFER: cell ( -- n )
 #! Word size
 
-DEFER: fixnum-imm? ( -- ? )
-#! Can fixnum operations take immediate operands?
-
 DEFER: vregs ( -- n )
 #! Number of vregs
