@@ -2,8 +2,8 @@ This is a first cut at a simple space invaders emulator. The goal is
 to produce an emulator, disassembler and assembler for the 8080
 processor.
 
-Running 'load.factor' will load the CPU emulation routines and runs
-some tests. Run 'gui.factor' to get the SDL based GUI code. 
+Running 'load.factor' will load the CPU emulation routines and
+supporting code. Run 'gui.factor' to get the SDL based GUI code. 
 
 If you are in the space-invaders directory, and have the ROM as a file
 'invaders.rom' in that same directory, the following starts the GUI:
@@ -21,9 +21,8 @@ code do the following:
 
 This will run much faster.
 
-'Backspace' inserts a coin and '1' is the one player button. It
-currently stops working at the point where it displays the invaders
-and I'm working on fixing this.
+'Backspace' inserts a coin and '1' is the one player button. The left
+and right arrow keys move and the left control key fires.
 
 If the ROM file you have is split into seperate files, you will need
 to merge them into one 'invaders.rom' file. From Windows this is done
