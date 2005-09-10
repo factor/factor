@@ -3,7 +3,12 @@ typedef struct {
 	double n;
 } F_FLOAT;
 
-F_FLOAT* make_float(double n);
+INLINE F_FLOAT* make_float(double n)
+{
+	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
+	flo->n = n;
+	return flo;
+}
 
 INLINE double untag_float_fast(CELL tagged)
 {

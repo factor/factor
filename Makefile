@@ -3,7 +3,7 @@ ifdef DEBUG
 	DEFAULT_CFLAGS = -g
 	STRIP = touch
 else
-	DEFAULT_CFLAGS = -Wall -O3 -fomit-frame-pointer $(SITE_CFLAGS)
+	DEFAULT_CFLAGS = -Wall -O3 -ffast-math -fomit-frame-pointer $(SITE_CFLAGS)
 	STRIP = strip
 endif
 

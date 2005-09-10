@@ -31,17 +31,21 @@ hashtables parser prettyprint ;
     " was already attempted, and failed" append3
     inference-error ;
 
-: with-block ( word [[ label quot ]] quot -- block-node )
-    #! Execute a quotation with the word on the stack, and add
-    #! its dataflow contribution to a new #label node in the IR.
-    >r 2dup cons recursive-state [ cons ] change r>
-    [ swap car #label slip ] with-nesting
+: with-recursive-state ( word label quot -- )
+    >r over word-def cons cons
+    recursive-state [ cons ] change r>
+    call
     recursive-state [ cdr ] change ; inline
 
 : inline-block ( word -- node-block )
-    gensym over word-def cons [
-        #entry node,  word-def infer-quot  t #return node,
-    ] with-block ;
+    gensym 2dup [
+        [
+            dup #label >r
+            #entry node,
+            swap word-def infer-quot
+            #return node, r>
+        ] with-nesting
+    ] with-recursive-state ;
 
 : infer-compound ( word base-case -- effect )
     #! Infer a word's stack effect in a separate inferencer

@@ -1,12 +1,5 @@
 #include "factor.h"
 
-F_FLOAT* make_float(double n)
-{
-	F_FLOAT* flo = allot_object(FLOAT_TYPE,sizeof(F_FLOAT));
-	flo->n = n;
-	return flo;
-}
-
 double to_float(CELL tagged)
 {
 	F_RATIO* r;

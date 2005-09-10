@@ -12,8 +12,10 @@ IN: math
 
 UNION: number real complex ;
 
-M: real real ;
-M: real imaginary drop 0 ;
+! These should be defined on real, not object, but real? is
+! expensive.
+M: object real ;
+M: object imaginary drop 0 ;
 
 M: number = ( n n -- ? ) number= ;
 
