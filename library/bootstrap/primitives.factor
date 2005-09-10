@@ -324,7 +324,7 @@ null null define-class
 "vector?" "vectors" create t "inline" set-word-prop
 "vector" "vectors" create 11 "vector?" "vectors" create
 {
-    { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
+    { 1 { "length" "sequences" } { "set-fill" "kernel-internals" } }
     { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
 } define-builtin
 
@@ -338,7 +338,7 @@ null null define-class
 "sbuf?" "strings" create t "inline" set-word-prop 
 "sbuf" "strings" create 13 "sbuf?" "strings" create
 {
-    { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
+    { 1 { "length" "sequences" } { "set-fill" "kernel-internals" } }
     { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
 } define-builtin
 

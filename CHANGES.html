@@ -4,15 +4,32 @@
 <head><title>Factor change log</title></head>
 <body>
 
-<h1>Factor 0.78:</h1>
+<h1>Factor 0.79:</h1>
 
 <ul>
+
+<li>Compiler:
+
+<ul>
+<li>New basic block optimizer performs more aggressive dead load and store elimination.</li>
+<li>Stack shuffles are compiled more efficiently.</li>
+<li>Pushing literals on either side of a stack shuffle is now compiled more efficiently.</li>
+<li>Tail-recursive inlined words are compiled in a new way, saving a few instructions.</li>
+</ul>
+
+</li>
 
 <li>Sequences:
 
 <ul>
-<li>Faster <code>map</code>, <code>2each</code> and <code>2map</code></li>
+<li>Faster <code>map</code>, <code>2each</code> and <code>2map</code>.</li>
 </li>
+
+<li>Everything else:
+
+<ul>
+<li>The distinct <code>t</code> type is gone. Now, the <code>t</code> object is just a symbol.</li>
+</ul>
 
 </ul>
 

@@ -18,13 +18,10 @@ SYMBOL: compiled-xts
 : save-xt ( word -- )
     compiled-offset swap compiled-xts [ acons ] change ;
 
-: commit-xt ( xt word -- )
-    dup t "compiled" set-word-prop  set-word-xt ;
-
 : commit-xts ( -- )
     #! We must flush the instruction cache on PowerPC.
     flush-icache
-    compiled-xts get [ unswons commit-xt ] each
+    compiled-xts get [ unswons set-word-xt ] each
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )

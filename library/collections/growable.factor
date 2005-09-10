@@ -7,7 +7,12 @@ USING: errors kernel math math-internals sequences ;
 
 GENERIC: underlying
 GENERIC: set-underlying
-GENERIC: set-capacity
+
+! fill pointer mutation. user code should use set-length
+! instead, since it will also resize the underlying sequence.
+GENERIC: set-fill
+
+: capacity ( seq -- n ) underlying length ; inline
 
 : expand ( len seq -- )
     [ underlying resize ] keep set-underlying ;
@@ -18,20 +23,19 @@ GENERIC: set-capacity
     #! optimistic doubling of its size.
     2dup length fixnum>= [
         >r 1 fixnum+ r>
-        2dup underlying length fixnum> [
+        2dup capacity fixnum> [
             over 2 fixnum* over expand
         ] when
-        set-capacity
+        set-fill
     ] [
         2drop
     ] ifte ;
 
 : grow-length ( len seq -- )
-    growable-check 2dup length > [ 2dup expand ] when
-    set-capacity ;
+    growable-check 2dup capacity > [ 2dup expand ] when set-fill ;
 
 ! We need this pretty early on.
 IN: vectors
 
 : empty-vector ( len -- vec )
-    dup <vector> [ set-capacity ] keep ; inline
+    dup <vector> [ set-fill ] keep ; inline

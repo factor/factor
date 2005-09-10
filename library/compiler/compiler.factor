@@ -27,7 +27,7 @@ words ;
     "compile" get [ word compile ] when ; parsing
 
 : try-compile ( word -- )
-    [ compile ] [ error. ] catch ;
+    [ compile ] [ [ error. drop ] when* ] catch ;
 
 : compile-all ( -- ) [ try-compile ] each-word ;
 
