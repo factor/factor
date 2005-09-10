@@ -219,6 +219,18 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! F |= quot call 
   [ cpu-f swap call bitxor ] keep set-cpu-f ; inline
 
+: cpu-f-bitor= ( value cpu -- )
+  #! cpu-f |= value
+  [ cpu-f bitor ] keep set-cpu-f ;
+
+: cpu-f-bitand= ( value cpu -- )
+  #! cpu-f &= value
+  [ cpu-f bitand ] keep set-cpu-f ;
+
+: cpu-f-bitxor= ( value cpu -- )
+  #! cpu-f ^= value
+  [ cpu-f bitxor ] keep set-cpu-f ;
+
 : set-flag ( cpu flag -- )
   swap cpu-f-bitor= ;
 
@@ -290,17 +302,6 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   bitand HEX: 80 bitand ( cpu v )
   0 = not [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
 
-: cpu-f-bitor= ( value cpu -- )
-  #! cpu-f |= value
-  [ cpu-f bitor ] keep set-cpu-f ;
-
-: cpu-f-bitand= ( value cpu -- )
-  #! cpu-f &= value
-  [ cpu-f bitand ] keep set-cpu-f ;
-
-: cpu-f-bitxor= ( value cpu -- )
-  #! cpu-f ^= value
-  [ cpu-f bitxor ] keep set-cpu-f ;
 
 : add-byte ( lhs rhs cpu -- result )
   #! Add rhs to lhs
