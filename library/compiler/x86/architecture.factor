@@ -10,6 +10,10 @@ USING: assembler compiler-backend sequences ;
     #! Word size.
     4 ; inline
 
+: fixnum-imm? ( -- ? )
+    #! Can fixnum operations take immediate operands?
+    t ; inline
+
 : vregs ( -- n )
     #! Number of vregs
     3 ; inline

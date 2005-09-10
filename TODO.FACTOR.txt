@@ -1,4 +1,3 @@
-- remove t object and type
 - compiling string>md5 hangs
 - mersenne 42 runs out of memory
 - uncrossref: don't clear infer-effect of words with an infer quotation
@@ -63,8 +62,6 @@
 - the invalid recursion form case needs to be fixed, for inlines too
 - recursion is iffy; if the stack at the recursive call doesn't match
   up, throw an error
-- remove %fixnum-</<=/>/>=, always use %jump-* form
-- remove %jump-t, use %jump-eq? f instead
 
 + kernel:
 

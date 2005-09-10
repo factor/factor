@@ -28,9 +28,29 @@ namespaces sequences vectors words ;
         [ 2drop f ] ifte
     ] map-with ;
 
+: simplify-alist ( class alist -- default alist )
+    dup cdr [
+        2dup cdr car car class< [
+            cdr simplify-alist
+        ] [
+            uncons >r cdr nip r>
+        ] ifte
+    ] [
+        nip car cdr [ ]
+    ] ifte ;
+
+: vtable-methods ( picker alist-seq -- alist-seq )
+    num-types [
+        type>class dup [
+            swap simplify-alist
+        ] [
+            2drop [ "Internal error" throw ] [ ]
+        ] ifte >r over r> class-predicates alist>quot
+    ] 2map nip ;
+
 : <vtable> ( picker word -- vtable )
-    2dup methods sort-methods [ class-predicates ] map-with
-    >r empty-method r> [ alist>quot ] map-with ;
+    2dup empty-method \ object swons >r methods r> swons
+    sort-methods vtable-methods ;
 
 : small-generic ( picker word -- def )
     2dup methods class-predicates >r empty-method r> alist>quot ;

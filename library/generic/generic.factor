@@ -26,9 +26,14 @@ SYMBOL: builtin
     word-name "?" append create-in ;
 
 : define-predicate ( class predicate quot -- )
-    dupd define-compound
-    2dup unit "predicate" set-word-prop
-    swap "predicating" set-word-prop ;
+    #! predicate may be f, in which case it is ignored.
+    over [
+        dupd define-compound
+        2dup unit "predicate" set-word-prop
+        swap "predicating" set-word-prop
+    ] [
+        3drop
+    ] ifte ;
 
 : metaclass ( class -- metaclass )
     "metaclass" word-prop ;

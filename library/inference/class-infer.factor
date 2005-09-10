@@ -61,9 +61,8 @@ M: node child-ties ( node -- seq )
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
-    dup node-values ( 2dup )
-    [ value-class ] map>hash swap set-node-classes
-    ( [ value-literal ] map>hash swap set-node-literals ) ;
+    dup node-values
+    [ value-class ] map>hash swap set-node-classes ;
 
 : assume-classes ( classes values -- )
     [ set-value-class ] 2each ;
@@ -82,6 +81,14 @@ M: node child-ties ( node -- seq )
 \ type [ num-types type/tag-ties ] "create-ties" set-word-prop
 
 \ tag [ num-tags type/tag-ties ] "create-ties" set-word-prop
+
+\ eq? [
+    dup node-in-d second literal? [
+        dup node-in-d first2 literal-value <literal-tie>
+        over node-out-d first general-t <class-tie>
+        ties get set-hash
+    ] when drop
+] "create-ties" set-word-prop
 
 : create-ties ( #call -- )
     #! If the node is calling a class test predicate, create a

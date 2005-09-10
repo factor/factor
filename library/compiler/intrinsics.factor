@@ -98,18 +98,32 @@ sequences vectors words ;
     dup [ first3 load-value ] each
     [ first <vreg> ] map ;
 
-: load-inputs ( node -- in )
-    dup node-in-d values>vregs
-    [ >r node-out-d length r> length - %inc-d , ] keep ;
+: binary-inputs ( node -- in1 in2 )
+    node-in-d values>vregs first2 swap ;
+
+: binary-op-reg ( node op -- )
+    >r binary-inputs dup -1 %inc-d , r> execute , out-1 ; inline
+
+: binary-imm ( node -- in1 in2 )
+    -1 %inc-d , in-1 node-peek literal-value 0 <vreg> ;
+
+: binary-op-imm ( node op -- )
+    >r binary-imm dup r> execute , out-1 ; inline
+
+: literal-immediate? ( value -- ? )
+    dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
+
+: binary-op-imm? ( node -- ? )
+    fixnum-imm? >r node-peek literal-immediate? r> and ;
 
 : binary-op ( node op -- )
-    >r load-inputs first2 swap dup r> execute , out-1 ; inline
+    #! out is a vreg where the vop stores the result.
+    over binary-op-imm?
+    [ binary-op-imm ] [ binary-op-reg ] ifte ;
 
 {
     { fixnum+       %fixnum+       }
     { fixnum-       %fixnum-       }
-    { fixnum*       %fixnum*       }
-    { fixnum/i      %fixnum/i      }
     { fixnum-bitand %fixnum-bitand }
     { fixnum-bitor  %fixnum-bitor  }
     { fixnum-bitxor %fixnum-bitxor }
@@ -118,11 +132,15 @@ sequences vectors words ;
     "intrinsic" set-word-prop
 ] each
 
-: binary-jump ( node label op -- )
-    >r >r node-in-d values>vregs
-    dup length neg %inc-d , first2 swap
-    r> r> execute , ; inline
+: binary-jump-reg ( node label op -- )
+    >r >r binary-inputs -2 %inc-d , r> r> execute , ; inline
 
+: binary-jump-imm ( node label op -- )
+    >r >r binary-imm -1 %inc-d , r> r> execute , ; inline
+
+: binary-jump ( node label op -- )
+    pick binary-op-imm?
+    [ binary-jump-imm ] [ binary-jump-reg ] ifte ;
 {
     { fixnum<= %jump-fixnum<= }
     { fixnum<  %jump-fixnum<  }
@@ -133,6 +151,10 @@ sequences vectors words ;
     first2 [ literalize , \ binary-jump , ] [ ] make
     "ifte-intrinsic" set-word-prop
 ] each
+
+\ fixnum/i [
+    \ %fixnum/i binary-op-reg
+] "intrinsic" set-word-prop
 
 \ fixnum-mod [
     ! This is not clever. Because of x86, %fixnum-mod is
@@ -161,6 +183,27 @@ sequences vectors words ;
     in-1
     0 <vreg> 0 <vreg> %fixnum-bitnot ,
     out-1
+] "intrinsic" set-word-prop
+
+: fast-fixnum* ( n -- )
+    -1 %inc-d ,
+    in-1
+    log2 0 <vreg> 0 <vreg> %fixnum<< ,
+    out-1 ;
+
+: slow-fixnum* ( node -- ) \ %fixnum* binary-op-reg ;
+
+\ fixnum* [
+    ! Turn multiplication by a power of two into a left shift.
+    dup node-peek dup literal-immediate? [
+        literal-value dup power-of-2? [
+            nip fast-fixnum*
+        ] [
+            drop slow-fixnum*
+        ] ifte
+    ] [
+        drop slow-fixnum*
+    ] ifte
 ] "intrinsic" set-word-prop
 
 : slow-shift ( -- ) \ fixnum-shift %call , ;

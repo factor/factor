@@ -248,8 +248,7 @@ FORGET: set-stack-effect
     [
         over types first dup
         tag-mask < \ tag \ type ? , , \ eq? ,
-    ] [ ] make
-    define-predicate ;
+    ] [ ] make define-predicate ;
 
 : register-builtin ( class -- )
     dup types first builtins get set-nth ;
@@ -277,66 +276,86 @@ null { } "types" set-word-prop
 null [ drop f ] "predicate" set-word-prop
 null null define-class
 
+"fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
 "fixnum" "math" create 0 "math-priority" set-word-prop
 "fixnum" "math" create ">fixnum" [ "math" ] search unit "coercer" set-word-prop
 
+"bignum?" "math" create t "inline" set-word-prop
 "bignum" "math" create 1 "bignum?" "math" create { } define-builtin
 "bignum" "math" create 1 "math-priority" set-word-prop
 "bignum" "math" create ">bignum" [ "math" ] search unit "coercer" set-word-prop
 
+"cons?" "lists" create t "inline" set-word-prop
 "cons" "lists" create 2 "cons?" "lists" create
 { { 0 { "car" "lists" } f } { 1 { "cdr" "lists" } f } } define-builtin
 
+"ratio?" "math" create t "inline" set-word-prop
 "ratio" "math" create 4 "ratio?" "math" create
 { { 0 { "numerator" "math" } f } { 1 { "denominator" "math" } f } } define-builtin
 "ratio" "math" create 2 "math-priority" set-word-prop
 
+"float?" "math" create t "inline" set-word-prop
 "float" "math" create 5 "float?" "math" create { } define-builtin
 "float" "math" create 3 "math-priority" set-word-prop
 "float" "math" create ">float" [ "math" ] search unit "coercer" set-word-prop
 
+"complex?" "math" create t "inline" set-word-prop
 "complex" "math" create 6 "complex?" "math" create
 { { 0 { "real" "math" } f } { 1 { "imaginary" "math" } f } } define-builtin
 "complex" "math" create 4 "math-priority" set-word-prop
 
 "displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
 
+"array?" "kernel-internals" create t "inline" set-word-prop
 "array" "kernel-internals" create 8 "array?" "kernel-internals" create
 { } define-builtin
 
 "f" "!syntax" create 9 "not" "kernel" create
 { } define-builtin
 
-"hashtable" "hashtables" create 10 "hashtable?" "hashtables" create {
+"hashtable?" "hashtables" create t "inline" set-word-prop
+"hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
+{
     { 1 { "hash-size" "hashtables" } { "set-hash-size" "kernel-internals" } }
     { 2 { "hash-array" "kernel-internals" } { "set-hash-array" "kernel-internals" } }
 } define-builtin
 
-"vector" "vectors" create 11 "vector?" "vectors" create {
+"vector?" "vectors" create t "inline" set-word-prop
+"vector" "vectors" create 11 "vector?" "vectors" create
+{
     { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
     { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
 } define-builtin
 
-"string" "strings" create 12 "string?" "strings" create {
+"string?" "strings" create t "inline" set-word-prop
+"string" "strings" create 12 "string?" "strings" create
+{
     { 1 { "length" "sequences" } f }
     { 2 { "hashcode" "kernel" } f }
 } define-builtin
 
-"sbuf" "strings" create 13 "sbuf?" "strings" create {
+"sbuf?" "strings" create t "inline" set-word-prop 
+"sbuf" "strings" create 13 "sbuf?" "strings" create
+{
     { 1 { "length" "sequences" } { "set-capacity" "kernel-internals" } }
     { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
 } define-builtin
 
+"wrapper?" "kernel" create t "inline" set-word-prop
 "wrapper" "kernel" create 14 "wrapper?" "kernel" create
 { { 1 { "wrapped" "kernel" } f } } define-builtin
 
+"dll?" "alien" create t "inline" set-word-prop
 "dll" "alien" create 15 "dll?" "alien" create
 { { 1 { "dll-path" "alien" } f } } define-builtin
 
+"alien?" "alien" create t "inline" set-word-prop
 "alien" "alien" create 16 "alien?" "alien" create { } define-builtin
 
-"word" "words" create 17 "word?" "words" create {
+"word?" "words" create t "inline" set-word-prop
+"word" "words" create 17 "word?" "words" create
+{
     { 1 { "hashcode" "kernel" } f }
     { 2 { "word-name" "words" } f }
     { 3 { "word-vocabulary" "words" } { "set-word-vocabulary" "words" } }
@@ -345,14 +364,18 @@ null null define-class
     { 6 { "word-props" "words" } { "set-word-props" "words" } }
 } define-builtin
 
-"tuple" "kernel" create 18 "tuple?" "kernel" create { } define-builtin
+"tuple?" "kernel" create t "inline" set-word-prop
+"tuple" "kernel" create 18 "tuple?" "kernel" create
+{ } define-builtin
 
-"byte-array" "kernel-internals" create 19 "byte-array?" "kernel-internals" create { } define-builtin
+"byte-array?" "kernel-internals" create t "inline" set-word-prop
+"byte-array" "kernel-internals" create 19
+"byte-array?" "kernel-internals" create
+{ } define-builtin
 
 ! Define general-t type, which is any object that is not f.
 "general-t" "kernel" create dup define-symbol
-"general-t?" "kernel" create
-"f" "!syntax" lookup builtins get remove [ ] subset
+f "f" "!syntax" lookup builtins get remove [ ] subset
 define-union
 
 FORGET: builtin-predicate

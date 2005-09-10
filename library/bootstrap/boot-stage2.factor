@@ -80,7 +80,7 @@ t [
 compile? [
     "Compiling base..." print
 
-    [ car * length nth = string>number number>string scan (generate) ]
+    { car * length nth = string>number number>string scan (generate) }
     [ compile ]
     each
 ] when
