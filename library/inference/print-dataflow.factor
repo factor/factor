@@ -57,7 +57,8 @@ M: #dispatch node>quot ( ? node -- )
     [ "#dispatch" comment, ] 2keep
     node-children [ swap dataflow>quot ] map-with , \ dispatch , ;
 
-M: #return node>quot ( ? node -- ) "#return" comment, ;
+M: #return node>quot ( ? node -- )
+    dup node-param unparse "#return " swap append comment, ;
 
 M: #values node>quot ( ? node -- ) "#values" comment, ;
 

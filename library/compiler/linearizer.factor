@@ -46,8 +46,20 @@ M: #label linearize* ( node -- )
         dup <label> [ %return-to , simple-label ] keep %label ,
     ] ifte linearize-next ;
 
+: tail-call? ( node -- ? )
+    #! A #call to some other label or word, followed by a
+    #! #return from a simple label is not allowed to be
+    #! tail-call-optimized; indeed, that #return will not be
+    #! generated at all.
+    dup node-successor dup #return? [
+        swap node-param swap node-param
+        dup simple-labels get memq? not >r eq? r> or
+    ] [
+        2drop f
+    ] ifte ;
+
 : ?tail-call ( node caller jumper -- next )
-    >r >r dup node-successor #return? [
+    >r >r dup tail-call? [
         node-param r> drop r> execute ,
     ] [
         dup node-param r> execute , r> drop linearize-next
@@ -104,6 +116,4 @@ M: #dispatch linearize* ( vtable -- )
 M: #return linearize* ( node -- )
     #! Simple label returns do not count, since simple labels do
     #! not push a stack frame on the C stack.
-    dup node-param simple-labels get memq? [
-        f %return ,
-    ] unless drop ;
+    node-param simple-labels get memq? [ %return , ] unless ;

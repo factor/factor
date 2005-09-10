@@ -75,7 +75,7 @@ C: %label make-vop ;
 ! simplifier.
 TUPLE: %return ;
 C: %return make-vop ;
-: %return ( label) label-vop <%return> ;
+: %return empty-vop <%return> ;
 
 TUPLE: %return-to ;
 C: %return-to make-vop ;

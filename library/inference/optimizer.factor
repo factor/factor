@@ -63,7 +63,10 @@ M: #shuffle optimize-node*  ( node -- node/t )
     dup node-successor dup #shuffle? [
         compose-shuffle-nodes
     ] [
-        drop [ node-values empty? ] prune-if
+        drop [
+            dup node-in-d over node-out-d =
+            >r dup node-in-r swap node-out-r = r> and
+        ] prune-if
     ] ifte ;
 
 ! #ifte
