@@ -65,6 +65,9 @@ M: key-down-event handle-si-event ( cpu event -- quit? )
     { [ dup "ESCAPE" = ] [ 2drop t ] }
     { [ dup "BACKSPACE" = ] [ drop [ cpu-port1 1 bitor ] keep set-cpu-port1 f ] }
     { [ dup 1 = ] [ drop [ cpu-port1 4 bitor ] keep set-cpu-port1 f ] }
+    { [ dup "LCTRL" = ] [ drop [ cpu-port1 HEX: 10 bitor ] keep set-cpu-port1 f ] }
+    { [ dup "LEFT" = ] [ drop [ cpu-port1 HEX: 20 bitor ] keep set-cpu-port1 f ] }
+    { [ dup "RIGHT" = ] [ drop [ cpu-port1 HEX: 40 bitor ] keep set-cpu-port1 f ] }
     { [ t ] [ . drop f ] }
   } cond ;
 
@@ -74,6 +77,9 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
     { [ dup "ESCAPE" = ] [ 2drop t ] }
     { [ dup "BACKSPACE" = ] [ drop [ cpu-port1 255 1 - bitand ] keep set-cpu-port1 f ] }
     { [ dup 1 = ] [ drop [ cpu-port1 255 4 - bitand ] keep set-cpu-port1 f ] }
+    { [ dup "LCTRL" = ] [ drop [ cpu-port1 255 HEX: 10 - bitand ] keep set-cpu-port1 f ] }
+    { [ dup "LEFT" = ] [ drop [ cpu-port1 255 HEX: 20 - bitand ] keep set-cpu-port1 f ] }
+    { [ dup "RIGHT" = ] [ drop [ cpu-port1 255 HEX: 40 - bitand ] keep set-cpu-port1 f ] }
     { [ t ] [ . drop f ] }
   } cond ;
 
@@ -119,7 +125,7 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
 
 : display ( -- )
   224 256 0 SDL_HWSURFACE [ 
-   test-cpu [ do-video-update ] over set-cpu-display
+   test-cpu [ do-video-update ] over set-cpu-display dup
    <event> event-loop
     SDL_Quit
   ] with-screen ;

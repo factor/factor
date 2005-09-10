@@ -264,14 +264,14 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
 { cpu-a set-cpu-a cpu-l set-cpu-l } "ADC-R,R" "ADC A,L" instruction-parse-test
 { cpu-a set-cpu-a cpu-hl set-cpu-hl } "ADC-R,(RR)" "ADC A,(HL)" instruction-parse-test
 { cpu-a set-cpu-a cpu-a set-cpu-a } "ADC-R,R" "ADC A,A" instruction-parse-test
-{ cpu-a set-cpu-a cpu-b set-cpu-b } "SUB-R" "SUB B" instruction-parse-test
-{ cpu-a set-cpu-a cpu-c set-cpu-c } "SUB-R" "SUB C" instruction-parse-test
-{ cpu-a set-cpu-a cpu-d set-cpu-d } "SUB-R" "SUB D" instruction-parse-test
-{ cpu-a set-cpu-a cpu-e set-cpu-e } "SUB-R" "SUB E" instruction-parse-test
-{ cpu-a set-cpu-a cpu-h set-cpu-h } "SUB-R" "SUB H" instruction-parse-test
-{ cpu-a set-cpu-a cpu-l set-cpu-l } "SUB-R" "SUB L" instruction-parse-test
+{ cpu-b set-cpu-b } "SUB-R" "SUB B" instruction-parse-test
+{ cpu-c set-cpu-c } "SUB-R" "SUB C" instruction-parse-test
+{ cpu-d set-cpu-d } "SUB-R" "SUB D" instruction-parse-test
+{ cpu-e set-cpu-e } "SUB-R" "SUB E" instruction-parse-test
+{ cpu-h set-cpu-h } "SUB-R" "SUB H" instruction-parse-test
+{ cpu-l set-cpu-l } "SUB-R" "SUB L" instruction-parse-test
 { cpu-hl set-cpu-hl } "SUB-(RR)" "SUB (HL)" instruction-parse-test
-{ cpu-a set-cpu-a cpu-a set-cpu-a } "SUB-R" "SUB A" instruction-parse-test
+{ cpu-a set-cpu-a } "SUB-R" "SUB A" instruction-parse-test
 { cpu-a set-cpu-a cpu-b set-cpu-b } "SBC-R,R" "SBC A,B" instruction-parse-test
 { cpu-a set-cpu-a cpu-c set-cpu-c } "SBC-R,R" "SBC A,C" instruction-parse-test
 { cpu-a set-cpu-a cpu-d set-cpu-d } "SBC-R,R" "SBC A,D" instruction-parse-test
@@ -535,10 +535,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         drop
 ] unit-test
 
-[ emulate-INC_B HEX: 01 f t f f f  
-                HEX: 00 t f t f f 
-                HEX: 80 f t t t t 
-                HEX: 90 f t t f t 
+[ emulate-INC_B HEX: 01 f t f f  
+                HEX: 00 t f t f 
+                HEX: 80 f t t t 
+                HEX: 90 f t t t 
 ] [
   <cpu> 4 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-b
@@ -548,7 +548,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         4 1 pick cpu-ram set-nth
         HEX: FF over set-cpu-b
@@ -558,7 +557,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         4 2 pick cpu-ram set-nth
         HEX: 7F over set-cpu-b
@@ -568,7 +566,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         4 3 pick cpu-ram set-nth
         HEX: 8F over set-cpu-b
@@ -578,15 +575,14 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
 
-[ emulate-DEC_B HEX: FF f t t f t  
-                HEX: 00 t f f f f 
-                HEX: 7F f t t t f 
-                HEX: 8F f t t f t 
+[ emulate-DEC_B HEX: FF f t t t  
+                HEX: 00 t f f f 
+                HEX: 7F f t t f 
+                HEX: 8F f t t t 
 ] [
   <cpu> 5 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-b
@@ -596,7 +592,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         5 1 pick cpu-ram set-nth
         HEX: 01 over set-cpu-b
@@ -606,7 +601,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         5 2 pick cpu-ram set-nth
         HEX: 80 over set-cpu-b
@@ -616,7 +610,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         5 3 pick cpu-ram set-nth
         HEX: 90 over set-cpu-b
@@ -626,7 +619,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
@@ -762,10 +754,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         drop
 ] unit-test
 
-[ emulate-INC_C HEX: 01 f t f f f  
-                HEX: 00 t f t f f 
-                HEX: 80 f t t t t 
-                HEX: 90 f t t f t 
+[ emulate-INC_C HEX: 01 f t f f  
+                HEX: 00 t f t f 
+                HEX: 80 f t t t 
+                HEX: 90 f t t t 
 ] [
   <cpu> HEX: 0C 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-c
@@ -775,7 +767,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0C 1 pick cpu-ram set-nth
         HEX: FF over set-cpu-c
@@ -785,7 +776,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0C 2 pick cpu-ram set-nth
         HEX: 7F over set-cpu-c
@@ -795,7 +785,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0C 3 pick cpu-ram set-nth
         HEX: 8F over set-cpu-c
@@ -805,15 +794,14 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
 
-[ emulate-DEC_C HEX: FF f t t f t  
-                HEX: 00 t f f f f 
-                HEX: 7F f t t t f 
-                HEX: 8F f t t f t 
+[ emulate-DEC_C HEX: FF f t t t  
+                HEX: 00 t f f f 
+                HEX: 7F f t t f 
+                HEX: 8F f t t t 
 ] [
   <cpu> HEX: 0D 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-c
@@ -823,7 +811,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0D 1 pick cpu-ram set-nth
         HEX: 01 over set-cpu-c
@@ -833,7 +820,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0D 2 pick cpu-ram set-nth
         HEX: 80 over set-cpu-c
@@ -843,7 +829,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 0D 3 pick cpu-ram set-nth
         HEX: 90 over set-cpu-c
@@ -853,7 +838,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
@@ -927,10 +911,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         drop
 ] unit-test
 
-[ emulate-INC_D HEX: 01 f t f f f  
-                HEX: 00 t f t f f 
-                HEX: 80 f t t t t 
-                HEX: 90 f t t f t 
+[ emulate-INC_D HEX: 01 f t f f  
+                HEX: 00 t f t f 
+                HEX: 80 f t t t 
+                HEX: 90 f t t t 
 ] [
   <cpu> HEX: 14 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-d
@@ -940,7 +924,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 14 1 pick cpu-ram set-nth
         HEX: FF over set-cpu-d
@@ -950,7 +933,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 14 2 pick cpu-ram set-nth
         HEX: 7F over set-cpu-d
@@ -960,7 +942,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 14 3 pick cpu-ram set-nth
         HEX: 8F over set-cpu-d
@@ -970,15 +951,14 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
 
-[ emulate-DEC_D HEX: FF f t t f t  
-                HEX: 00 t f f f f 
-                HEX: 7F f t t t f 
-                HEX: 8F f t t f t 
+[ emulate-DEC_D HEX: FF f t t t  
+                HEX: 00 t f f f 
+                HEX: 7F f t t f 
+                HEX: 8F f t t t 
 ] [
   <cpu> HEX: 15 0 pick cpu-ram set-nth
         HEX: 00 over set-cpu-d
@@ -988,7 +968,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 15 1 pick cpu-ram set-nth
         HEX: 01 over set-cpu-d
@@ -998,7 +977,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 15 2 pick cpu-ram set-nth
         HEX: 80 over set-cpu-d
@@ -1008,7 +986,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         HEX: 15 3 pick cpu-ram set-nth
         HEX: 90 over set-cpu-d
@@ -1018,7 +995,6 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ flag-z? ] keep
         [ flag-nz? ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         drop
 ] unit-test
@@ -1166,10 +1142,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
 ] unit-test
 
 
-[ emulate-SUB_n HEX: FF t f t t t f
-                HEX: 00 t t f f f f
-                HEX: DA t f t f f f
-                HEX: 7F t f f f t t
+[ emulate-SUB_n HEX: FF f t t t
+                HEX: 00 t f f f
+                HEX: DA f t f f
+                HEX: 7F f f f t
 ] [
   <cpu> HEX: D6 0 pick cpu-ram set-nth
         HEX: 01 1 pick cpu-ram set-nth
@@ -1178,12 +1154,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car dup ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: D6 2 pick cpu-ram set-nth
         HEX: 02 3 pick cpu-ram set-nth
         HEX: 02 over set-cpu-a
@@ -1191,12 +1165,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: D6 4 pick cpu-ram set-nth
         HEX: 25 5 pick cpu-ram set-nth
         HEX: FF over set-cpu-a
@@ -1204,12 +1176,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: D6 6 pick cpu-ram set-nth
         HEX: 01 7 pick cpu-ram set-nth
         HEX: 80 over set-cpu-a
@@ -1217,19 +1187,17 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
          drop
 ] unit-test
 
-[ emulate-SBC_A,n HEX: FE t f t t t f
-                HEX: FF t f t t t f
-                HEX: D9 t f t f f f
-                HEX: 7E t f f f t t
+[ emulate-SBC_A,n HEX: FE f t t t
+                HEX: FF f t t t
+                HEX: D9 f t f f
+                HEX: 7E f f f t
 ] [
   <cpu> HEX: DE 0 pick cpu-ram set-nth
         HEX: 01 1 pick cpu-ram set-nth
@@ -1238,12 +1206,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car dup ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: DE 2 pick cpu-ram set-nth
         HEX: 02 3 pick cpu-ram set-nth
         HEX: 02 over set-cpu-a
@@ -1251,12 +1217,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: DE 4 pick cpu-ram set-nth
         HEX: 25 5 pick cpu-ram set-nth
         HEX: FF over set-cpu-a
@@ -1264,12 +1228,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
         HEX: DE 6 pick cpu-ram set-nth
         HEX: 01 7 pick cpu-ram set-nth
         HEX: 80 over set-cpu-a
@@ -1277,12 +1239,10 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ read-instruction instructions nth car ] keep 
         [ swap execute ] keep
         [ cpu-a ] keep
-        [ cpu-f subtraction-flag bitand 0 = not ] keep
         [ cpu-f zero-flag bitand 0 = not ] keep
         [ cpu-f sign-flag bitand 0 = not ] keep
         [ cpu-f carry-flag bitand 0 = not ] keep
         [ cpu-f half-carry-flag bitand 0 = not ] keep
-        [ cpu-f overflow-flag bitand 0 = not ] keep
          drop
 ] unit-test
 
@@ -1298,4 +1258,57 @@ USING: kernel cpu-8080 test lazy parser-combinators math hashtables lists sequen
         [ HEX: 2022 swap cpu-ram nth ] keep
 	[ cpu-hl ] keep
         drop
+] unit-test
+
+[ emulate-ADD_A,(HL) HEX: 51
+] [
+  <cpu> HEX: 86 0 pick cpu-ram set-nth
+        HEX: 01 over set-cpu-a
+        HEX: 2001 over set-cpu-hl
+	HEX: 50 HEX: 2001 pick cpu-ram set-nth
+        236 over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-a ] keep
+        drop
+] unit-test
+
+[ emulate-SCF 1 1 t
+] [
+  <cpu> HEX: 37 0 pick cpu-ram set-nth
+        carry-flag over set-cpu-f
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        [ cpu-f ] keep
+	HEX: 37 1 pick cpu-ram set-nth
+        0 over set-cpu-f
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        [ cpu-f ] keep	
+        drop
+	256 [ <cpu> [ set-cpu-f ] keep [ emulate-SCF ] keep cpu-f carry-flag bitand 0 = not ] map [ ] all?
+] unit-test
+
+[ emulate-INC_(HL) HEX: 00 
+                   HEX: 01 
+                   HEX: 80 ] [
+  <cpu> HEX: 34 0 pick cpu-ram set-nth
+        HEX: 3500 over set-cpu-hl
+	HEX: FF HEX: 3500 pick cpu-ram set-nth
+        [ read-instruction instructions nth car dup ] keep 
+        [ swap execute ] keep
+        HEX: 3500 over cpu-ram nth swap
+	HEX: 34 1 pick cpu-ram set-nth
+        HEX: 3500 over set-cpu-hl
+	HEX: 00 HEX: 3500 pick cpu-ram set-nth
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        HEX: 3500 over cpu-ram nth swap
+	HEX: 34 2 pick cpu-ram set-nth
+        HEX: 3500 over set-cpu-hl 
+	HEX: 7F HEX: 3500 pick cpu-ram set-nth
+        [ read-instruction instructions nth car ] keep 
+        [ swap execute ] keep
+        HEX: 3500 over cpu-ram nth swap
+	drop
 ] unit-test

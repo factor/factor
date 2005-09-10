@@ -4,6 +4,12 @@ IN: cpu-8080
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port2o port3o port4lo port4hi port5o ram display ;
 
+: valid-byte? ( b -- )
+  dup 0 >= swap HEX: FF <= and not [ "Invalid byte" throw ] when ;
+
+: valid-word? ( w -- )
+  dup 0 >= swap HEX: FFFF <= and not [ "Invalid word" throw ] when ;
+
 : carry-flag        HEX: 01 ; inline
 : add-sub-flag      HEX: 02 ; inline
 : subtraction-flag  HEX: 02 ; inline
@@ -62,21 +68,59 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! Set the value of the 16-bit pseudo register HL
   >r >word< r> tuck set-cpu-l set-cpu-h ;
 
+: flag-set? ( flag cpu -- bool )
+  cpu-f bitand 0 = not ;
+
+: flag-clear? ( flag cpu -- bool )
+  cpu-f bitand 0 = ;
+
+: flag-nz? ( cpu -- bool )
+  #! Test flag status
+  cpu-f zero-flag bitand 0 = ;
+
+: flag-z? ( cpu -- bool )
+  #! Test flag status
+  cpu-f zero-flag bitand 0 = not ;
+
+: flag-nc? ( cpu -- bool )
+  #! Test flag status
+  cpu-f carry-flag bitand 0 = ;
+
+: flag-c? ( cpu -- bool )
+  #! Test flag status
+  cpu-f carry-flag bitand 0 = not ;
+
+: flag-po? ( cpu -- bool )
+  #! Test flag status
+  cpu-f parity-flag bitand 0 =  ;
+
+: flag-pe? ( cpu -- bool )
+  #! Test flag status
+  cpu-f parity-flag bitand 0 = not ;
+
+: flag-p? ( cpu -- bool )
+  #! Test flag status
+  cpu-f sign-flag bitand 0 = ;
+
+: flag-m? ( cpu -- bool )
+  #! Test flag status
+  cpu-f sign-flag bitand 0 = not ;
+
 : read-byte ( addr cpu -- byte )
   #! Read one byte from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
-  cpu-ram 2dup length < [
-    nth
+  over HEX: FFFF <= [
+    cpu-ram nth
   ] [
     2drop HEX: FF
-  ] ifte ;
+  ] ifte dup valid-byte? ;
 
 : read-word ( addr cpu -- word )  
   #! Read a 16-bit word from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
-  [ read-byte ] 2keep >r 1 + r> read-byte 8 shift bitor ;
+  [ read-byte ] 2keep >r 1 + r> read-byte 8 shift bitor dup valid-word? ;
  
 : next-byte ( cpu -- byte )
   #! Return the value of the byte at PC, and increment PC.
@@ -107,7 +151,9 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
 
 : write-byte ( value addr cpu -- )
   #! Write a byte to the specified memory address.
-  over dup HEX: 2000 < swap HEX: FFFF >= or [
+  pick valid-byte? 
+  over valid-word?
+  over dup HEX: 2000 < swap HEX: FFFF > or [
     3drop
   ] [
     3dup cpu-ram set-nth
@@ -117,6 +163,7 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
 
 : write-word ( value addr cpu -- )
   #! Write a 16-bit word to the specified memory address.
+  pick valid-word?
   >r >r >word< r> r> [ write-byte ] 2keep >r 1 + r> write-byte ;
 
 : read-port ( port cpu -- byte )
@@ -128,11 +175,12 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
     { [ over 2 = ] [ nip [ cpu-port2i HEX: 8F bitand ] keep cpu-port1 HEX: 70 bitand bitor ] }
     { [ over 3 = ] [ nip [ cpu-port4hi 8 shift ] keep [ cpu-port4lo bitor ] keep cpu-port2o shift -8 shift HEX: FF bitand ] }
     { [ t ] [ 2drop 0 ] }    
-  } cond ;
+  } cond dup valid-byte? ;
 
 : write-port ( value port cpu -- )
   #! Write a byte to the hardware port, where 'port' is
   #! an 8-bit value.  
+  pick valid-byte?
 !  3dup drop "OUT to " write unparse write " value " write unparse print 
   {
     { [ over 2 = ] [ nip set-cpu-port2o ] }
@@ -171,6 +219,52 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! F |= quot call 
   [ cpu-f swap call bitxor ] keep set-cpu-f ; inline
 
+: set-flag ( cpu flag -- )
+  swap cpu-f-bitor= ;
+
+: clear-flag ( cpu flag -- )
+   bitnot HEX: FF bitand swap cpu-f-bitand= ;
+
+: update-zero-flag ( result cpu -- )
+  #! If the result of an instruction has the value 0, this
+  #! flag is set, otherwise it is reset.
+  swap HEX: FF bitand 0 = [ zero-flag set-flag ] [ zero-flag clear-flag ] ifte ;
+
+: update-sign-flag ( result cpu -- )
+  #! If the most significant bit of the result 
+  #! has the value 1 then the flag is set, otherwise
+  #! it is reset.
+  swap HEX: 80 bitand 0 = [ sign-flag clear-flag ] [ sign-flag set-flag ] ifte ;
+
+: update-parity-flag ( result cpu -- )
+  #! If the modulo 2 sum of the bits of the result
+  #! is 0, (ie. if the result has even parity) this flag
+  #! is set, otherwise it is reset.
+  swap HEX: FF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] ifte ;
+: update-carry-flag ( result cpu -- )
+  #! If the instruction resulted in a carry (from addition) 
+  #! or a borrow (from subtraction or a comparison) out of the
+  #! higher order bit, this flag is set, otherwise it is reset.
+  swap dup HEX: 100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] ifte ;
+
+: update-half-carry-flag ( result cpu -- )
+  #! If the instruction caused a carry out of bit 3 and into bit 4 of the
+  #! resulting value, the half carry flag is set, otherwise it is reset.
+  swap HEX: 10 bitand 0 = [ half-carry-flag clear-flag ] [ half-carry-flag set-flag ] ifte ;
+
+: update-flags ( result cpu -- )
+  2dup update-half-carry-flag
+  2dup update-carry-flag
+  2dup update-parity-flag
+  2dup update-sign-flag
+  update-zero-flag ;
+
+: update-flags-no-carry ( result cpu -- )
+  2dup update-half-carry-flag
+  2dup update-parity-flag
+  2dup update-sign-flag
+  update-zero-flag ;
+
 : trigger-zero-flag ( n cpu -- )
   #! Given the value n, set the zero flag if required.
   swap HEX: FF bitand 0 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
@@ -208,34 +302,79 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! cpu-f ^= value
   [ cpu-f bitxor ] keep set-cpu-f ;
 
-: add-byte-to-a ( carry? n cpu -- )
-  #! Adds 'n' to the 'a' register. 'carry?' is try if
-  #! the carry flag should be considered in the add.
-  over >r
-  [ cpu-a + swap [ 1 + ] when ] keep ( x cpu )
-  flag3-flag flag5-flag bitor over cpu-f-bitand= ( x cpu )  
-  over HEX: FF bitand 0 = [ zero-flag over cpu-f-bitor= ] when
-  over HEX: 80 bitand 0 = not [ sign-flag over cpu-f-bitor= ] when
-  over HEX: 100 >= [ carry-flag over cpu-f-bitor= ] when
-  r> swapd ( cpu x n )
-  [ pick cpu-a bitxor bitxor HEX: 10 bitand 0 = not [ half-carry-flag over cpu-f-bitor= ] when ] 2keep
-  [ bitxor ] 2keep ( cpu x^n x n )
-  >r pick cpu-a r> bitxor ( cpu x^n x a^n )
-  bitnot HEX: FF bitand ( cpu x^n x ~a^n )
-  swapd bitand HEX: 80 bitand 0 = not [ overflow-flag pick cpu-f-bitor= ] when 
-  HEX: FF bitand swap set-cpu-a ;
+: add-byte ( lhs rhs cpu -- result )
+  #! Add rhs to lhs
+  >r + r> [ update-flags ] 2keep drop HEX: FF bitand ;
 
-: add-words ( hl rr cpu ) 
-  >r 2dup + r>      ( hl rr x cpu )
-  flag3-flag flag5-flag bitor sign-flag bitor 
-  zero-flag bitor parity-flag bitor over cpu-f-bitand= ( hl rr x cpu )
-  over HEX: FFFF > [ carry-flag over cpu-f-bitor= ] when ( hl rr x cpu )
-  swap >r ( hl rr cpu )
-  rot HEX: FFF bitand ( rr cpu hl )
-  rot HEX: FFF bitand ( cpu hl rr )
-  + HEX: FFF > [ half-carry-flag over cpu-f-bitor= ] when ( cpu )
-  r> ( cpu x )
-  HEX: FFFF bitand swap set-cpu-hl ;
+: add-carry ( result cpu -- result )
+  #! Add the effect of the carry flag to the result
+  flag-c? [ 1 + ] when ;
+
+: add-byte-with-carry ( lhs rhs cpu -- result )
+  #! Add rhs to lhs plus carry.
+  >r + r> [ add-carry ] keep [ update-flags ] 2keep drop HEX: FF bitand ;
+
+: sub-carry ( result cpu -- result ) 
+  #! Subtract the effect of the carry flag from the result
+  flag-c? [ 1 - ] when ;
+
+: sub-byte ( lhs rhs cpu -- result )
+  #! Subtract rhs from lhs
+  >r - r> [ update-flags ] 2keep drop HEX: FF bitand ;
+
+: sub-byte-with-carry ( lhs rhs cpu -- result )
+  #! Subtract rhs from lhs and take carry into account
+  >r - r> [ sub-carry ] keep [ update-flags ] 2keep drop HEX: FF bitand ;
+ 
+: inc-byte ( byte cpu -- result )
+  #! Increment byte by one. Note that carry flag is not affected
+  #! by this operation.
+  >r 1 + r> [ update-flags-no-carry ] 2keep drop HEX: FF bitand ;
+
+: dec-byte ( byte cpu -- result )
+  #! Decrement byte by one. Note that carry flag is not affected
+  #! by this operation.
+  >r 1 - r> [ update-flags-no-carry ] 2keep drop HEX: FF bitand ;
+
+: inc-word ( w cpu -- w )
+  #! Increment word by one. Note that no flags are modified.
+  drop 1 + HEX: FFFF bitand ;
+
+: dec-word ( w cpu -- w )
+  #! Decrement word by one. Note that no flags are modified.
+  drop 1 - HEX: FFFF bitand ;
+
+: add-word ( lhs rhs cpu -- result )
+  #! Add rhs to lhs. Note that only the carry flag is modified
+  #! and only if there is a carry out of the double precision add.
+  >r + r> over HEX: FFFF > [ carry-flag over set-flag ] when drop HEX: FFFF bitand ;
+
+: bit3or ( lhs rhs -- 0|1 )
+  #! bitor bit 3 of the two numbers on the stack
+  BIN: 00001000 bitand -3 shift >r
+  BIN: 00001000 bitand -3 shift r> 
+  bitor ;
+
+: and-byte ( lhs rhs cpu -- result )
+  #! Logically and rhs to lhs. The carry flag is cleared and
+  #! the half carry is set to the ORing of bits 3 of the operands.
+  [ drop bit3or ] 3keep ( bit3or lhs rhs cpu )
+  >r bitand r> [ update-flags ] 2keep 
+  [ carry-flag clear-flag ] keep
+  rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] ifte
+  HEX: FF bitand ;
+
+: xor-byte ( lhs rhs cpu -- result )
+  #! Logically xor rhs to lhs. The carry and half-carry flags are cleared.
+  >r bitxor r> [ update-flags ] 2keep 
+  [ half-carry-flag carry-flag bitor clear-flag ] keep
+  drop HEX: FF bitand ;
+
+: or-byte ( lhs rhs cpu -- result )
+  #! Logically or rhs to lhs. The carry and half-carry flags are cleared.
+  >r bitor r> [ update-flags ] 2keep 
+  [ half-carry-flag carry-flag bitor clear-flag ] keep
+  drop HEX: FF bitand ;
 
 : flags ( seq -- seq )
   [ 0 [ execute bitor ] reduce ] map ;
@@ -538,6 +677,7 @@ SYMBOL: psz-vector
 
 : call-sub ( addr cpu -- )
   #! Call the address as a subroutine.
+  over valid-word?
   dup push-pc 
   >r HEX: FFFF bitand r> set-cpu-pc ;
 
@@ -546,7 +686,8 @@ SYMBOL: psz-vector
   [ cpu-a psz nth bitor ] keep ( v cpu -- )
   set-cpu-f ;
 
-: dec-byte ( b cpu -- b )
+: dec-byte-old ( b cpu -- b )
+  over valid-byte?
   [ 
     cpu-f 
     zero-flag sign-flag half-carry-flag overflow-flag bitor bitor bitor 
@@ -559,24 +700,7 @@ SYMBOL: psz-vector
   [ swap HEX: 7F = [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
   [ swap HEX: 80 bitand 0 = not [ [ sign-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
   [ swap HEX: 00 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep 
-  drop ;
-
-: inc-byte ( b cpu -- b )
-  >r 1 + HEX: FF bitand r> 
-  [ [ add-sub-flag zero-flag sign-flag half-carry-flag overflow-flag bitor bitor bitor bitor 255 swap - ] swap cpu-f-bitand ] keep
-  [ swap HEX: 0F bitand 0 = [ [ half-carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ]  2keep
-  [ swap HEX: 80 =  [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ]  2keep
-  [ swap HEX: 80 bitand 0 = not [ [ sign-flag ] swap cpu-f-bitor ] [ drop ] ifte ]  2keep
-  [ swap 0 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ]  2keep
-  drop ;
-
-: inc-word ( w cpu -- w )
-  #! TODO: Flags?
-  drop 1 + HEX: FFFF bitand ;
-
-: dec-word ( w cpu -- w )
-  #! TODO: Flags?
-  drop 1 - HEX: FFFF bitand ;
+  drop dup valid-byte? ;
 
 : ret-from-sub ( cpu -- )
   [ pop-pc ] keep set-cpu-pc ;
@@ -588,8 +712,9 @@ SYMBOL: psz-vector
   
 SYMBOL: cf
 
-: sub-byte ( cf n cpu -- x ) 
+: sub-byte-old ( cf n cpu -- x ) 
   #! Subtracts 'n' from the 'a' register. 'cf' is carry flag settings.
+  over valid-byte?
   pick cf set
   [ rot drop cpu-a swap - HEX: FF bitand ] 3keep  ( x cf n cpu )
   rot 0 = not [ >r >r 1 - HEX: FF bitand r> r> ] when ( x n cpu )
@@ -600,7 +725,7 @@ SYMBOL: cf
   [ swap over cpu-a >= ( n cpu >=  ) rot cf get bitor 0 = not and [ [ carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
   [ dup >r cpu-a bitxor bitxor HEX: 10 bitand r> swap 0 = not [ [ half-carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
   [ dup >r cpu-a swapd bitxor swap r> dup >r cpu-a bitxor bitand HEX: 80 bitand r> swap 0 = not [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
-  drop nip  ;
+  drop nip  dup valid-byte? ;
 
 : interrupt ( number cpu -- )
   #! Perform a hardware interrupt
@@ -789,37 +914,6 @@ C: cpu ( -- cpu )
     [[ "SP" { cpu-sp set-cpu-sp } ]]
   }} hash ;
 
-: flag-nz? ( cpu -- bool )
-  #! Test flag status
-  cpu-f zero-flag bitand 0 = ;
-
-: flag-z? ( cpu -- bool )
-  #! Test flag status
-  cpu-f zero-flag bitand 0 = not ;
-
-: flag-nc? ( cpu -- bool )
-  #! Test flag status
-  cpu-f carry-flag bitand 0 = ;
-
-: flag-c? ( cpu -- bool )
-  #! Test flag status
-  cpu-f carry-flag bitand 0 = not ;
-
-: flag-po? ( cpu -- bool )
-  #! Test flag status
-  cpu-f parity-flag bitand 0 =  ;
-
-: flag-pe? ( cpu -- bool )
-  #! Test flag status
-  cpu-f parity-flag bitand 0 = not ;
-
-: flag-p? ( cpu -- bool )
-  #! Test flag status
-  cpu-f sign-flag bitand 0 = ;
-
-: flag-m? ( cpu -- bool )
-  #! Test flag status
-  cpu-f sign-flag bitand 0 = not ;
 
 : flag-lookup ( string -- vector )
   #! Given a string containing a flag name, return a vector
@@ -905,26 +999,23 @@ SYMBOL: $4
   [ add-sub-flag half-carry-flag bitor ] swap cpu-f-bitor ;
 
 : (emulate-DAA) ( cpu -- )  
-  dup cpu-a HEX: 0F bitand 9 > ( cpu test1 )
-  over cpu-f half-carry-flag bitand 0 = not ( cpu test1 test2 )
-  or [
-    [ cpu-a 6 + HEX: FF bitand ] keep 
-    [ set-cpu-a ] keep
-    [ [ half-carry-flag ] swap cpu-f-bitor ] keep
-  ] [
-    [ [ 255 half-carry-flag - ] swap cpu-f-bitand ] keep
-  ] ifte ( cpu )
-  dup cpu-a HEX: 9F > ( cpu test1 )
-  over cpu-f carry-flag bitand 0 = not ( cpu test1 test2 )
-  or [
-    [ cpu-a HEX: 60 + HEX: FF bitand ] keep 
-    [ set-cpu-a ] keep
-    [ [ carry-flag ] swap cpu-f-bitor ] keep    
-  ] [
-    [ [ 255 carry-flag - ] swap cpu-f-bitand ] keep
-  ] ifte 
-  set-flags-psz ;
-
+  #! The eight bit number in the accumulator is
+  #! adjusted to form two four-bit binary-coded-decimal
+  #! digits.
+  [
+    dup half-carry-flag swap flag-set? swap 
+    cpu-a BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] ifte 
+  ] keep 
+  [ cpu-a + ] keep
+  [ update-flags ] 2keep  
+  [ swap HEX: FF bitand swap set-cpu-a ] keep 
+  [
+    dup carry-flag swap flag-set? swap 
+    cpu-a -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] ifte 
+  ] keep 
+  [ cpu-a + ] keep
+  [ update-flags ] 2keep  
+  swap HEX: FF bitand swap set-cpu-a ;
   
 : patterns ( -- hashtable )
   #! table of code quotation patterns for each type of instruction.
@@ -940,32 +1031,31 @@ SYMBOL: $4
     [[ "RST-30H"      [ drop "RST 30H Not Implemented" throw ] ]]
     [[ "RST-38H"      [ drop "RST 38H Not Implemented" throw ] ]]
     [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] ifte ] ]]
-    [[ "CP-N"      [ [ next-byte ] keep 0 -rot sub-byte drop  ] ]]
-    [[ "CP-R"      [ [ $1 ] keep 0 -rot sub-byte drop ] ]]
-    [[ "CP-(RR)"      [ [ $1 ] keep [ read-byte ] keep 0 -rot sub-byte drop ] ]]
-    [[ "OR-N"      [ [ next-byte ] keep [ read-byte unit ] keep [ cpu-a-bitor ] keep clear-and-set-flags-psz ] ]]
-    [[ "OR-R"      [ [ dup [ $1 ] cons swap cpu-a-bitor ] keep clear-and-set-flags-psz ] ]]
-    [[ "OR-(RR)"      [ [ $1 ] keep [ read-byte unit ] keep [ cpu-a-bitor ] keep clear-and-set-flags-psz ] ]]
-    [[ "XOR-N"      [ [ next-byte ] keep [ read-byte unit ] keep [ cpu-a-bitxor ] keep clear-and-set-flags-psz ] ]]
-    [[ "XOR-R"      [ [ $1 ] keep [ cpu-a-bitxor= ] keep clear-and-set-flags-psz ] ]]
-    [[ "XOR-(RR)"   [ [ $1 ] keep [ read-byte ] keep [ cpu-a-bitxor= ] keep clear-and-set-flags-psz ] ]]
-    [[ "AND-A"      [ clear-and-set-flags-psz  ] ]]
-    [[ "AND-N"      [ [ dup [ next-byte ] cons swap cpu-a-bitand ] keep clear-and-set-flags-psz  ] ]]
-    [[ "AND-R"      [ [ dup [ $1 ] cons swap cpu-a-bitand ] keep clear-and-set-flags-psz ] ]]
-    [[ "AND-(RR)"      [ [ $1 ] keep [ read-byte unit ] keep [ cpu-a-bitand ] keep clear-and-set-flags-psz ] ]]
-    [[ "ADC-R,N"      [ drop "ADC-R,N Not Implemented" throw ] ]]
-    [[ "ADC-R,R"      [ drop "ADC-R,R Not Implemented" throw ] ]]
-    [[ "ADC-R,(RR)"      [ drop "ADC-R,(RR) Not Implemented" throw ] ]]
-    [[ "ADD-R,N"      [ [ f swap next-byte ] keep add-byte-to-a ] ]]
-    [[ "ADD-R,R"      [ [ f swap $3 ] keep add-byte-to-a ] ]]
-    [[ "ADD-RR,RR"    [ [ $1 ] keep [ $3 ] keep add-words ] ]]
-    [[ "ADD-R,(RR)"    [ [ f swap $3 ] keep [ read-byte ] keep add-byte-to-a  ]  ]]
-    [[ "SBC-R,N"      [ [ cpu-f carry-flag bitand ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
-    [[ "SBC-R,R"      [ drop "SBC-R,R Not Implemented" throw ] ]]
-    [[ "SBC-R,(RR)"      [ drop "SBC-R,(RR) Not Implemented" throw ] ]]
-    [[ "SUB-R"      [ drop "SUB-R Not Implemented" throw ] ]]
-    [[ "SUB-(RR)"      [ drop "SUB-(RR) Not Implemented" throw ] ]]
-    [[ "SUB-N"      [ [ next-byte ] keep 0 -rot [ sub-byte ] keep set-cpu-a ] ]]
+    [[ "CP-N"      [ [ next-byte ] keep 0 -rot sub-byte-old drop  ] ]]
+    [[ "CP-R"      [ [ $1 ] keep 0 -rot sub-byte-old drop ] ]]
+    [[ "CP-(RR)"      [ [ $1 ] keep [ read-byte ] keep 0 -rot sub-byte-old drop ] ]]
+    [[ "OR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ or-byte ] keep set-cpu-a ] ]]
+    [[ "OR-R"      [ [ cpu-a ] keep [ $1 ] keep [ or-byte ] keep set-cpu-a ] ]]
+    [[ "OR-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep set-cpu-a  ] ]]
+    [[ "XOR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ xor-byte ] keep set-cpu-a ] ]]
+    [[ "XOR-R"      [ [ cpu-a ] keep [ $1 ] keep [ xor-byte ] keep set-cpu-a ] ]]
+    [[ "XOR-(RR)"   [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ xor-byte ] keep set-cpu-a  ] ]]
+    [[ "AND-N"      [ [ cpu-a ] keep [ next-byte ] keep [ and-byte ] keep set-cpu-a  ] ]]
+    [[ "AND-R"      [ [ cpu-a ] keep [ $1 ] keep [ and-byte ] keep set-cpu-a ] ]]
+    [[ "AND-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ and-byte ] keep set-cpu-a  ] ]]
+    [[ "ADC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte-with-carry ] keep $2 ] ]]
+    [[ "ADC-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte-with-carry ] keep $2 ] ]]
+    [[ "ADC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte-with-carry ] keep $2 ] ]]
+    [[ "ADD-R,N"      [ [ $1 ] keep [ next-byte ] keep [ add-byte ] keep $2 ] ]]
+    [[ "ADD-R,R"      [ [ $1 ] keep [ $3 ] keep [ add-byte ] keep $2 ] ]]
+    [[ "ADD-RR,RR"    [ [ $1 ] keep [ $3 ] keep [ add-word ] keep $2 ] ]]
+    [[ "ADD-R,(RR)"    [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ add-byte ] keep $2   ]  ]]
+    [[ "SBC-R,N"      [ [ $1 ] keep [ next-byte ] keep [ sub-byte-with-carry ] keep $2 ] ]]
+    [[ "SBC-R,R"      [ [ $1 ] keep [ $3 ] keep [ sub-byte-with-carry ] keep $2 ] ]]
+    [[ "SBC-R,(RR)"      [ [ $1 ] keep [ $3 ] keep [ read-byte ] keep [ sub-byte-with-carry ] keep $2 ] ]]
+    [[ "SUB-R"      [ [ cpu-a ] keep [ $1 ] keep [ sub-byte ] keep set-cpu-a ] ]]
+    [[ "SUB-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
+    [[ "SUB-N"      [ [ cpu-a ] keep [ next-byte ] keep [ sub-byte ] keep set-cpu-a ] ]]
     [[ "CPL"          [ (emulate-CPL) ]               ]]
     [[ "DAA"          [ (emulate-DAA) ]               ]]
     [[ "RLA"          [ (emulate-RLA) ]               ]]
@@ -1223,11 +1313,6 @@ SYMBOL: $4
   "AND-N" "AND" complex-instruction
   "n" token sp <&
   just [ 0 empty-vector swons  ] <@ ;
-
-: AND-A-instruction  ( -- parser )
-  "AND-A" "AND" complex-instruction
-  "A" token  [ register-lookup ] <@ sp <&>
-  just [ uncons swons ] <@ ;
 
 : AND-R-instruction  ( -- parser )
   "AND-R" "AND" complex-instruction
@@ -1489,7 +1574,6 @@ SYMBOL: $4
   HALT-instruction <|> 
   DI-instruction <|> 
   EI-instruction <|> 
-  AND-A-instruction <|> 
   AND-N-instruction <|> 
   AND-R-instruction <|> 
   AND-(RR)-instruction <|> 
