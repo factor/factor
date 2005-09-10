@@ -5,7 +5,7 @@ USING: generic kernel math-internals ;
 
 UNION: real rational float ;
 
-M: real abs dup 0 < [ neg ] when ;
+M: object abs dup 0 < [ neg ] when ;
 
 M: real hashcode ( n -- n ) >fixnum ;
 

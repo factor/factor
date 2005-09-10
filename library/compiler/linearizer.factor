@@ -5,8 +5,6 @@ USING: compiler-backend errors generic lists inference kernel
 math namespaces prettyprint sequences
 strings words ;
 
-SYMBOL: simple-labels
-
 GENERIC: linearize* ( node -- )
 
 : linearize ( dataflow -- linear )
@@ -14,7 +12,6 @@ GENERIC: linearize* ( node -- )
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
     [
-        { } clone simple-labels set
         %prologue ,
         linearize*
     ] { } make ;
@@ -25,41 +22,16 @@ M: f linearize* ( f -- ) drop ;
 
 M: node linearize* ( node -- ) linearize-next ;
 
-: simple-label? ( #label -- ? )
-    #! A simple label only contains tail calls to itself.
-    dup node-param swap node-child [
-        dup #call-label? [
-            [ node-param = not ] keep node-successor #return? or
-        ] [
-            2drop t
-        ] ifte
-    ] all-nodes-with? ;
-
-: simple-label ( #label -- )
-    dup node-param %label , node-child linearize* ;
-
 M: #label linearize* ( node -- )
-    dup simple-label? [
-        dup node-param simple-labels get push
-        dup simple-label
-    ] [
-        dup <label> [ %return-to , simple-label ] keep %label ,
-    ] ifte linearize-next ;
-
-: tail-call? ( node -- ? )
-    #! A #call to some other label or word, followed by a
-    #! #return from a simple label is not allowed to be
-    #! tail-call-optimized; indeed, that #return will not be
-    #! generated at all.
-    dup node-successor dup #return? [
-        swap node-param swap node-param
-        dup simple-labels get memq? not >r eq? r> or
-    ] [
-        2drop f
-    ] ifte ;
+    <label> [
+        %return-to ,
+        dup node-param %label ,
+        dup node-child linearize*
+    ] keep %label ,
+    linearize-next ;
 
 : ?tail-call ( node caller jumper -- next )
-    >r >r dup tail-call? [
+    >r >r dup node-successor #return? [
         node-param r> drop r> execute ,
     ] [
         dup node-param r> execute , r> drop linearize-next
@@ -116,4 +88,4 @@ M: #dispatch linearize* ( vtable -- )
 M: #return linearize* ( node -- )
     #! Simple label returns do not count, since simple labels do
     #! not push a stack frame on the C stack.
-    node-param simple-labels get memq? [ %return , ] unless ;
+    drop %return , ;
