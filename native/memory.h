@@ -144,6 +144,7 @@ void primitive_integer_slot(void);
 void primitive_set_integer_slot(void);
 void primitive_address(void);
 void primitive_size(void);
+void primitive_clone(void);
 void primitive_begin_scan(void);
 void primitive_next_object(void);
 void primitive_end_scan(void);

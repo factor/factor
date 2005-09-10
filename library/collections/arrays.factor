@@ -11,28 +11,26 @@
 ! low-level... but be aware that vectors are usually a better
 ! choice.
 
-IN: math
-DEFER: repeat
-
-IN: kernel-internals
-USING: kernel math-internals sequences ;
+IN: sequences-internals
+USING: kernel kernel-internals math-internals sequences ;
 
 : array-capacity ( a -- n ) 1 slot ; inline
 : array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
 : set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
 
+M: array clone (clone) ;
 M: array length array-capacity ;
-M: array nth array-nth ;
-M: array set-nth set-array-nth ;
+M: array nth bounds-check array-nth ;
+M: array set-nth bounds-check set-array-nth ;
+M: array nth-unsafe array-nth ;
+M: array set-nth-unsafe set-array-nth ;
 M: array resize resize-array ;
 
-: copy-array ( to from -- )
-    dup array-capacity [
-        3dup swap array-nth pick rot set-array-nth
-    ] repeat 2drop ;
-
+M: byte-array clone (clone) ;
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
+
+IN: kernel-internals
 
 : make-tuple ( class size -- tuple )
     #! Internal allocation function. Do not call it directly,

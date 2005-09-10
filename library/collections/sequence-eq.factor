@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
-USING: kernel kernel-internals lists math strings vectors ;
+USING: kernel kernel-internals lists math sequences-internals
+strings vectors ;
 
 ! Note that the sequence union does not include lists, or user
 ! defined tuples that respond to the sequence protocol.
@@ -13,7 +14,7 @@ UNION: sequence array string sbuf vector ;
     #! Check if two sequences have the same length and elements,
     #! but not necessarily the same class.
     2dup length= [
-        dup length [ >r 2dup r> 2nth = ] all? 2nip
+        dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [
         2drop f
     ] ifte ; flushable

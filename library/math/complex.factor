@@ -26,7 +26,8 @@ M: number = ( n n -- ? ) number= ;
         "Complex number must have real components" throw drop
     ] ifte ; inline
 
-: >rect ( x -- xr xi ) dup real swap imaginary ; inline
+: >rect ( x -- xr xi )
+    dup complex? [ dup real swap imaginary ] [ 0 ] ifte ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 

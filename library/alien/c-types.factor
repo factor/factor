@@ -3,7 +3,7 @@
 IN: alien
 USING: assembler compiler compiler-backend errors generic
 hashtables kernel kernel-internals lists math namespaces parser
-sequences strings words ;
+sequences sequences-internals strings words ;
 
 : <c-type> ( -- type )
     {{

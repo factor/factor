@@ -1,14 +1,30 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: sequences
+IN: sequences-internals
 USING: generic kernel kernel-internals math vectors ;
+
+: (map) ( quot seq i -- quot seq value )
+    pick pick >r >r swap nth-unsafe swap call r> r> rot ; inline
+
+: (2each) ( quot seq seq i -- quot seq seq i )
+    [ 2nth-unsafe rot dup slip ] 3keep ; inline
+
+: (2map) ( quot seq seq i -- quot seq seq value )
+    pick pick >r >r 2nth-unsafe rot dup slip
+    swap r> swap r> swap ; inline
+
+: (monotonic) ( quot seq i -- ? )
+    2dup 1 + swap nth-unsafe >r swap nth-unsafe r> rot call ;
+    inline
+
+IN: sequences
 
 G: each ( seq quot -- | quot: elt -- )
     [ over ] standard-combination ; inline
 
 M: object each ( seq quot -- )
     swap dup length [
-        [ swap nth swap call ] 3keep
+        [ swap nth-unsafe swap call ] 3keep
     ] repeat 2drop ;
 
 : each-with ( obj seq quot -- | quot: obj elt -- )
@@ -28,16 +44,10 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
     #! vector. Used by map and 2map. Don't call, use map
     #! instead.
     >r [ empty-vector ] keep r> swap [
-        [
-            rot >r [ swap call ] keep r>
-            underlying set-array-nth
-        ] 3keep
+        [ rot >r [ swap call ] keep r> set-nth-unsafe ] 3keep
     ] repeat drop ; inline
 
 G: map [ over ] standard-combination ; inline
-
-: (map) ( quot seq i -- quot seq value )
-    pick pick >r >r swap nth swap call r> r> rot ; inline
 
 M: object map ( seq quot -- seq )
     swap [ dup length [ (map) ] collect ] keep like 2nip ;
@@ -48,16 +58,10 @@ M: object map ( seq quot -- seq )
 : accumulate ( list identity quot -- values | quot: x y -- z )
     rot [ pick >r swap call r> ] map-with nip ; inline
 
-: change-nth ( seq i quot -- )
-    pick pick >r >r >r swap nth r> call r> r> swap set-nth ;
-    inline
-
 : nmap ( seq quot -- seq | quot: elt -- elt )
-    over length [ [ swap change-nth ] 3keep ] repeat 2drop ;
+    over length
+    [ [ swap change-nth-unsafe ] 3keep ] repeat 2drop ;
     inline
-
-: (2each) ( quot seq seq i -- quot seq seq i )
-    [ 2nth rot dup slip ] 3keep ; inline
 
 : min-length ( seq seq -- n )
     swap length swap length min ; flushable
@@ -70,10 +74,6 @@ M: object map ( seq quot -- seq )
     #! Don't use with lists.
     >r -rot r> 2each ; inline
 
-: (2map) ( quot seq seq i -- quot seq seq value )
-    pick pick >r >r 2nth rot dup slip
-    swap r> swap r> swap ; inline
-
 : 2map ( seq seq quot -- seq )
     #! Don't use with lists.
     -rot
@@ -84,8 +84,8 @@ M: object map ( seq quot -- seq )
     pick pick length >= [
         3drop -1 f
     ] [
-        3dup >r >r >r >r nth r> call [
-            r> dup r> nth r> drop
+        3dup >r >r >r >r nth-unsafe r> call [
+            r> dup r> nth-unsafe r> drop
         ] [
             r> 1 + r> r> find*
         ] ifte
@@ -125,9 +125,6 @@ M: object find ( seq quot -- i elt )
 
 : subset-with ( obj seq quot -- seq | quot: obj elt -- ? )
     swap [ with rot ] subset 2nip ; inline
-
-: (monotonic) ( quot seq i -- ? )
-    2dup 1 + swap nth >r swap nth r> rot call ; inline
 
 : monotonic? ( seq quot -- ? | quot: elt elt -- ? )
     #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t

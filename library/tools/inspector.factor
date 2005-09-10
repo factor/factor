@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: generic hashtables io kernel kernel-internals listener
-lists math memory namespaces prettyprint sequences strings
-styles test vectors words ;
+USING: generic hashtables io kernel listener
+lists math memory namespaces prettyprint sequences
+sequences-internals strings styles test vectors words ;
 
 GENERIC: sheet ( obj -- sheet )
 

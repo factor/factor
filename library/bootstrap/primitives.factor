@@ -150,7 +150,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
     { "<alien>" "alien"                     }
-    { "<byte-array>" "kernel-internals"     }
+    { "<byte-array>" "sequences-internals"   }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
     { "set-alien-signed-cell" "alien"       }
@@ -188,10 +188,10 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-integer-slot" "kernel-internals" }
     { "char-slot" "kernel-internals"        }
     { "set-char-slot" "kernel-internals"    }
-    { "resize-array" "kernel-internals"     }
+    { "resize-array" "sequences-internals"   }
     { "resize-string" "strings"             }
     { "<hashtable>" "hashtables"            }
-    { "<array>" "kernel-internals"          }
+    { "<array>" "sequences-internals"        }
     { "<tuple>" "kernel-internals"          }
     { "begin-scan" "memory"                 }
     { "next-object" "memory"                }
@@ -206,6 +206,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "fclose" "io-internals"               }
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
+    { "(clone)" "kernel-internals"          }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 : set-stack-effect ( { vocab word effect } -- )
@@ -307,8 +308,8 @@ null null define-class
 
 "displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
 
-"array?" "kernel-internals" create t "inline" set-word-prop
-"array" "kernel-internals" create 8 "array?" "kernel-internals" create
+"array?" "sequences-internals" create t "inline" set-word-prop
+"array" "sequences-internals" create 8 "array?" "sequences-internals" create
 { } define-builtin
 
 "f" "!syntax" create 9 "not" "kernel" create
@@ -318,14 +319,14 @@ null null define-class
 "hashtable" "hashtables" create 10 "hashtable?" "hashtables" create
 {
     { 1 { "hash-size" "hashtables" } { "set-hash-size" "kernel-internals" } }
-    { 2 { "hash-array" "kernel-internals" } { "set-hash-array" "kernel-internals" } }
+    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
 } define-builtin
 
 "vector?" "vectors" create t "inline" set-word-prop
 "vector" "vectors" create 11 "vector?" "vectors" create
 {
-    { 1 { "length" "sequences" } { "set-fill" "kernel-internals" } }
-    { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
+    { 1 { "length" "sequences" } { "set-fill" "sequences-internals" } }
+    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
 } define-builtin
 
 "string?" "strings" create t "inline" set-word-prop
@@ -338,8 +339,8 @@ null null define-class
 "sbuf?" "strings" create t "inline" set-word-prop 
 "sbuf" "strings" create 13 "sbuf?" "strings" create
 {
-    { 1 { "length" "sequences" } { "set-fill" "kernel-internals" } }
-    { 2 { "underlying" "kernel-internals" } { "set-underlying" "kernel-internals" } }
+    { 1 { "length" "sequences" } { "set-fill" "sequences-internals" } }
+    { 2 { "underlying" "sequences-internals" } { "set-underlying" "sequences-internals" } }
 } define-builtin
 
 "wrapper?" "kernel" create t "inline" set-word-prop
@@ -368,9 +369,9 @@ null null define-class
 "tuple" "kernel" create 18 "tuple?" "kernel" create
 { } define-builtin
 
-"byte-array?" "kernel-internals" create t "inline" set-word-prop
-"byte-array" "kernel-internals" create 19
-"byte-array?" "kernel-internals" create
+"byte-array?" "sequences-internals" create t "inline" set-word-prop
+"byte-array" "sequences-internals" create 19
+"byte-array?" "sequences-internals" create
 { } define-builtin
 
 ! Define general-t type, which is any object that is not f.

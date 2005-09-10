@@ -2,14 +2,19 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: vectors
 USING: errors generic kernel kernel-internals lists math
-math-internals sequences ;
+math-internals sequences sequences-internals ;
 
 M: vector set-length ( len vec -- ) grow-length ;
 
-M: vector nth ( n vec -- obj ) bounds-check underlying array-nth ;
+M: vector nth-unsafe ( n vec -- obj ) underlying array-nth ;
+
+M: vector nth ( n vec -- obj ) bounds-check nth-unsafe ;
+
+M: vector set-nth-unsafe ( obj n vec -- )
+    underlying set-array-nth ;
 
 M: vector set-nth ( obj n vec -- )
-    growable-check 2dup ensure underlying set-array-nth ;
+    growable-check 2dup ensure set-nth-unsafe ;
 
 M: vector hashcode ( vec -- n )
     dup length 0 number= [ drop 0 ] [ first hashcode ] ifte ;
@@ -19,7 +24,7 @@ M: vector hashcode ( vec -- n )
 
 M: object thaw >vector ;
 
-M: vector clone ( vector -- vector ) >vector ;
+M: vector clone ( vector -- vector ) clone-growable ;
 
 M: general-list like drop >list ;
 

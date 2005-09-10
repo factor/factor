@@ -1,7 +1,8 @@
 IN: inference
 USING: alien assembler errors generic hashtables interpreter io
 io-internals kernel kernel-internals lists math math-internals
-memory parser sequences strings vectors words prettyprint ;
+memory parser sequences sequences-internals strings vectors
+words prettyprint ;
 
 ! We transform calls to these words into 'branched' forms;
 ! eg, there is no VOP for fixnum<=, only fixnum<= followed
@@ -497,3 +498,6 @@ memory parser sequences strings vectors words prettyprint ;
 \ <wrapper> [ [ object ] [ wrapper ] ] "infer-effect" set-word-prop
 \ <wrapper> t "flushable" set-word-prop
 \ <wrapper> t "foldable" set-word-prop
+
+\ (clone) [ [ object ] [ object ] ] "infer-effect" set-word-prop
+\ (clone) t "flushable" set-word-prop

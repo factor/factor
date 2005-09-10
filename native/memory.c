@@ -143,6 +143,16 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
+void primitive_clone(void)
+{
+	CELL obj = dpeek();
+	CELL size = object_size(obj);
+	CELL tag = TAG(obj);
+	void *new_obj = allot(size);
+	new_obj = RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+	drepl(new_obj);
+}
+
 void primitive_room(void)
 {
 	CELL list = F;

@@ -1,6 +1,6 @@
 IN: temporary
 USING: compiler kernel kernel-internals lists math
-math-internals test words ;
+math-internals sequences test words ;
 
 ! Make sure that intrinsic ops compile to correct code.
 [ 1 ] [ [[ 1 2 ]] [ 0 slot ] compile-1 ] unit-test
@@ -170,3 +170,9 @@ math-internals test words ;
 
 ! regression
 [ t ] [ { 1 2 3 } { 1 2 3 } [ over type over type eq? ] compile-1 2nip ] unit-test
+
+! regression
+[ 3 ] [
+    100001 <array> 3 100000 pick set-nth
+    [ 100000 swap array-nth ] compile-1
+] unit-test

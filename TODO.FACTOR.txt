@@ -1,4 +1,3 @@
-- compiling string>md5 hangs
 - mersenne 42 runs out of memory
 - uncrossref: don't clear infer-effect of words with an infer quotation
 
@@ -70,7 +69,6 @@
 - friendlier .factor-rc load error handling
 - reader syntax for arrays, byte arrays, displaced aliens
 - out of memory error when printing global namespace
-- first time hash/vector is grown, set size to something big
 - merge timers with sleeping tasks
 - what about tasks and timers between image restarts
 - split: return vectors
@@ -83,7 +81,6 @@
 - set-path: iterative
 - parse-command-line: no unswons of cli args
 - >c/c>: vector stack
-- tag: move from kernel-internals to kernel
 - word: when bootstrapping, 'word' var is not cleared
 - search: slow
 - investigate if rehashing on startup is really necessary

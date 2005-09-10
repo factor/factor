@@ -2,8 +2,9 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 
 ! Some low-level code used by vectors and string buffers.
-IN: kernel-internals
-USING: errors kernel math math-internals sequences ;
+IN: sequences-internals
+USING: errors kernel kernel-internals math math-internals
+sequences ;
 
 GENERIC: underlying
 GENERIC: set-underlying
@@ -17,22 +18,26 @@ GENERIC: set-fill
 : expand ( len seq -- )
     [ underlying resize ] keep set-underlying ;
 
+: new-size ( n -- n )
+    3 fixnum* dup 100 fixnum< [ drop 100 ] when ;
+
 : ensure ( n seq -- )
     #! If n is beyond the sequence's length, increase the length,
     #! growing the underlying storage if necessary, with an
     #! optimistic doubling of its size.
     2dup length fixnum>= [
         >r 1 fixnum+ r>
-        2dup capacity fixnum> [
-            over 2 fixnum* over expand
-        ] when
-        set-fill
-    ] [
-        2drop
-    ] ifte ;
+        2dup capacity fixnum>
+        [ over new-size over expand ] when
+        2dup set-fill
+    ] when 2drop ;
 
 : grow-length ( len seq -- )
     growable-check 2dup capacity > [ 2dup expand ] when set-fill ;
+
+: clone-growable ( obj -- obj )
+    #! Cloning vectors, sbufs, hashtables.
+    (clone) dup underlying clone over set-underlying ;
 
 ! We need this pretty early on.
 IN: vectors

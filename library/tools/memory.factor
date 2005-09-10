@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
 USING: errors generic hashtables io kernel kernel-internals
-lists math namespaces parser prettyprint sequences strings
-unparser vectors words ;
+lists math namespaces parser prettyprint sequences
+sequences-internals strings unparser vectors words ;
 
 : generations 15 getenv ;
 

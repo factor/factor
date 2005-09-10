@@ -32,7 +32,5 @@ M: string thaw >sbuf ;
 
 M: string like ( seq sbuf -- string ) drop >string ;
 
-M: sbuf clone ( sbuf -- sbuf ) >sbuf ;
-
 M: sbuf like ( seq sbuf -- sbuf )
     drop dup sbuf? [ >sbuf ] unless ;

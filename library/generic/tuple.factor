@@ -2,7 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
 USING: errors hashtables kernel kernel-internals lists math
-namespaces parser sequences strings vectors words ;
+namespaces parser sequences sequences-internals strings vectors
+words ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -78,11 +79,17 @@ C: mirror ( tuple -- mirror )
     over tuple? [ "Not a tuple" throw ] unless
     [ set-mirror-tuple ] keep ;
 
+M: mirror nth-unsafe ( n mirror -- elt )
+    mirror-tuple array-nth ;
+
 M: mirror nth ( n mirror -- elt )
-    bounds-check mirror-tuple array-nth ;
+    bounds-check nth-unsafe ;
+
+M: mirror set-nth-unsafe ( n mirror -- elt )
+    mirror-tuple set-array-nth ;
 
 M: mirror set-nth ( n mirror -- elt )
-    bounds-check mirror-tuple set-array-nth ;
+    bounds-check set-nth-unsafe ;
 
 M: mirror length ( mirror -- len )
     mirror-tuple array-capacity ;
@@ -91,14 +98,9 @@ M: mirror length ( mirror -- len )
     dup first "tuple-size" word-prop <tuple>
     [ <mirror> 0 swap rot copy-into ] keep ;
 
-: clone-tuple ( tuple -- tuple )
-    #! Make a shallow copy of a tuple, without cloning its
-    #! delegate.
-    [ array-capacity <tuple> dup ] keep copy-array ;
-
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
-    clone-tuple dup delegate clone over set-delegate ;
+    (clone) dup delegate clone over set-delegate ;
 
 M: tuple hashcode ( vec -- n )
     #! If the capacity is two, then all we have is the class

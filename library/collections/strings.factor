@@ -1,9 +1,12 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: strings
-USING: generic kernel kernel-internals lists math sequences ;
+USING: generic kernel kernel-internals lists math sequences
+sequences-internals ;
 
 M: string nth ( n str -- ch ) bounds-check char-slot ;
+
+M: string nth-unsafe ( n str -- ch ) char-slot ;
 
 GENERIC: >string ( seq -- string ) flushable
 

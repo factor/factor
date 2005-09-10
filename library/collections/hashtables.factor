@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: hashtables
 USING: generic kernel lists math sequences vectors
-kernel-internals ;
+kernel-internals sequences-internals ;
 
 ! A hashtable is implemented as an array of buckets. The
 ! array index is determined using a hash function, and the
@@ -13,18 +13,18 @@ kernel-internals ;
 ! if it is somewhat 'implementation detail', is in the
 ! public 'hashtables' vocabulary.
 
-: bucket-count ( hash -- n ) hash-array array-capacity ;
+: bucket-count ( hash -- n ) underlying array-capacity ;
 
 IN: kernel-internals
 
 : hash-bucket ( n hash -- alist )
-    >r >fixnum r> hash-array array-nth ;
+    >r >fixnum r> underlying array-nth ;
 
 : set-hash-bucket ( obj n hash -- )
-    >r >fixnum r> hash-array set-array-nth ;
+    >r >fixnum r> underlying set-array-nth ;
 
 : change-bucket ( n hash quot -- )
-    -rot hash-array
+    -rot underlying
     [ array-nth swap call ] 2keep
     set-array-nth ; inline
 
@@ -37,10 +37,10 @@ IN: kernel-internals
 
 : grow-hash ( hash -- )
     #! A good way to earn a living.
-    dup hash-size 2 * <array> swap set-hash-array ;
+    dup hash-size 2 * <array> swap set-underlying ;
 
 : (set-bucket-count) ( n hash -- )
-    >r <array> r> set-hash-array ;
+    >r <array> r> set-underlying ;
     
 IN: hashtables
 
@@ -103,7 +103,7 @@ IN: hashtables
     0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
 
 : buckets>vector ( hash -- vector )
-    hash-array >vector ;
+    underlying >vector ;
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap
@@ -116,13 +116,13 @@ IN: hashtables
     hash>alist [ cdr ] map ; flushable
 
 : hash-each ( hash quot -- | quot: [[ k v ]] -- )
-    swap hash-array [ swap each ] each-with ; inline
+    swap underlying [ swap each ] each-with ; inline
 
 : hash-each-with ( obj hash quot -- | quot: obj [[ k v ]] -- )
     swap [ with ] hash-each 2drop ; inline
 
 : hash-all? ( hash quot -- | quot: [[ k v ]] -- ? )
-    swap hash-array [ swap all? ] all-with? ; inline
+    swap underlying [ swap all? ] all-with? ; inline
 
 : hash-all-with? ( obj hash quot -- ? | quot: [[ k v ]] -- ? )
     swap [ with rot ] hash-all? 2nip ; inline
@@ -143,10 +143,7 @@ IN: hashtables
 : hash-subset-with ( obj hash quot -- hash )
     swap [ with rot ] hash-subset 2nip ; inline
 
-M: hashtable clone ( hash -- hash )
-    dup bucket-count <hashtable>
-    over hash-size over set-hash-size
-    [ hash-array swap hash-array copy-array ] keep ;
+M: hashtable clone ( hash -- hash ) clone-growable ;
 
 M: hashtable = ( obj hash -- ? )
     2dup eq? [

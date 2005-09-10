@@ -29,6 +29,7 @@ IN: win32-api
 USE: alien
 USE: kernel
 USE: kernel-internals
+USE: sequences-internals
 
 : <wsadata> HEX: 190 <byte-array> ;
 

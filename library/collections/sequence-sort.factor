@@ -1,5 +1,9 @@
-IN: sorting-internals
+IN: sequences-internals
 USING: kernel math sequences vectors ;
+
+: midpoint@ length 2 /i ; inline
+
+: midpoint [ midpoint@ ] keep nth-unsafe ; inline
 
 TUPLE: sorter seq start end mid ;
 
@@ -9,11 +13,15 @@ C: sorter ( seq start end -- sorter )
     dup sorter-seq length 1 - over set-sorter-end
     0 over set-sorter-start ; inline
 
+: exchange ( n n seq -- )
+    [ tuck nth-unsafe >r nth r> ] 3keep tuck
+    >r >r set-nth-unsafe r> r> set-nth-unsafe ;
+
 : s*/e* dup sorter-start swap sorter-end ; inline
 : s*/e dup sorter-start swap sorter-seq length 1 - ; inline
 : s/e* 0 swap sorter-end ; inline
 : sorter-exchange dup s*/e* rot sorter-seq exchange ; inline
-: compare over sorter-seq nth swap sorter-mid rot call ; inline
+: compare over sorter-seq nth-unsafe swap sorter-mid rot call ; inline
 : >start> dup sorter-start 1 + swap set-sorter-start ; inline
 : <end< dup sorter-end 1 - swap set-sorter-end ; inline
 

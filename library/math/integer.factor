@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: errors generic kernel math sequences ;
+USING: errors generic kernel math sequences sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
@@ -99,3 +99,4 @@ M: integer ceiling ;
 ! Integers support the sequence protocol
 M: integer length ;
 M: integer nth drop ;
+M: integer nth-unsafe drop ;

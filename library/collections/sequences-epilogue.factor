@@ -1,8 +1,21 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
+IN: sequences-internals
+USING: errors generic kernel kernel-internals lists math
+sequences strings vectors words ;
+
+: (lexi) ( seq seq i limit -- n )
+    2dup >= [
+        2drop swap length swap length -
+    ] [
+        >r 3dup 2nth-unsafe 2dup = [
+            2drop 1 + r> (lexi)
+        ] [
+            r> drop - >r 3drop r>
+        ] ifte
+    ] ifte ; flushable
+
 IN: sequences
-USING: errors generic kernel kernel-internals lists math strings
-vectors words ;
 
 M: object like drop ;
 
@@ -23,8 +36,14 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
+: copy-into-check ( start to from -- )
+    rot rot length + swap length < [
+        "Cannot copy beyond end of sequence" throw
+    ] when ;
+
 : copy-into ( start to from -- )
-    dup length [ >r pick r> + pick set-nth ] 2each 2drop ;
+    3dup copy-into-check
+    dup length [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
 
 : nappend ( to from -- )
     >r dup length swap r>
@@ -98,22 +117,11 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     swap [ swap member? ] all-with? ; flushable
 
 ! Lexicographic comparison
-: (lexi) ( seq seq i limit -- n )
-    2dup >= [
-        2drop swap length swap length -
-    ] [
-        >r 3dup 2nth 2dup = [
-            2drop 1 + r> (lexi)
-        ] [
-            r> drop - >r 3drop r>
-        ] ifte
-    ] ifte ; flushable
-
 : lexi ( s1 s2 -- n )
     #! Lexicographically compare two sequences of numbers
     #! (usually strings). Negative if s1<s2, zero if s1=s2,
     #! positive if s1>s2.
-    0 pick length pick length min (lexi) ; flushable
+    0 pick pick min-length (lexi) ; flushable
 
 : flip ( seq -- seq )
     #! An example illustrates this word best:
@@ -125,14 +133,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 : max-length ( seq -- n )
     #! Longest sequence length in a sequence of sequences.
     0 [ length max ] reduce ; flushable
-
-: exchange ( n n seq -- )
-    [ tuck nth >r nth r> ] 3keep tuck
-    >r >r set-nth r> r> set-nth ;
-
-: midpoint@ length 2 /i ; inline
-
-: midpoint [ midpoint@ ] keep nth ; inline
 
 IN: kernel
 

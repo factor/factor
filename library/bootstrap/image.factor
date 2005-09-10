@@ -11,8 +11,8 @@
 
 IN: image
 USING: errors generic hashtables kernel lists
-math namespaces parser prettyprint sequences sequences io
-strings vectors words ;
+math namespaces parser prettyprint sequences
+sequences-internals io strings vectors words ;
 
 ! If true in current namespace, we are bootstrapping.
 SYMBOL: bootstrapping?

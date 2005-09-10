@@ -37,8 +37,6 @@ GENERIC: resize ( n seq -- seq )
     #! Push a value on the end of a sequence.
     dup length swap set-nth ; inline
 
-: 2nth ( s s n -- x x ) tuck swap nth >r swap nth r> ; inline
-
 : first2 ( { x y } -- x y )
     dup first swap second ; inline
 
@@ -56,3 +54,19 @@ TUPLE: bounds-error index seq ;
 : bounds-check ( n seq -- fx seq )
     growable-check 2dup length fixnum>=
     [ 2dup bounds-error ] when ; inline
+
+IN: sequences-internals
+
+! Unsafe sequence protocol for inner loops
+GENERIC: nth-unsafe
+GENERIC: set-nth-unsafe
+
+M: object nth-unsafe nth ;
+M: object set-nth-unsafe set-nth ;
+
+: 2nth-unsafe ( s s n -- x x )
+    tuck swap nth-unsafe >r swap nth-unsafe r> ; inline
+
+: change-nth-unsafe ( seq i quot -- )
+    pick pick >r >r >r swap nth-unsafe
+    r> call r> r> swap set-nth-unsafe ; inline
