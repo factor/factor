@@ -2,7 +2,7 @@ USING: kernel math infix parser namespaces sequences strings prettyprint
     errors lists hashtables vectors html io generic ;
 IN: xml
 
-! * Simple parser, not for tree
+! * Simple SAX-ish parser
 
 !   -- Basic utility words
 
@@ -27,10 +27,10 @@ SYMBOL: column
     spot [ 1 + ] change
     char "\n\r" member? [
         0 column set
-        line [ 1 + ] change
+        line
     ] [
-        column [ 1 + ] change
-    ] ifte ;
+        column
+    ] ifte [ 1 + ] change ;
 
 : skip-until ( quot -- | quot: char -- ? )
     more? [
@@ -53,7 +53,7 @@ SYMBOL: column
 : string-matches? ( string -- ? )
     spot get dup pick length + code get subseq = ;
 
-DEFER: <my-xml-error>
+DEFER: <xml-string-error>
 : (take-until-string) ( string -- n )
     more? [
         dup string-matches? [
@@ -61,7 +61,7 @@ DEFER: <my-xml-error>
         ] [
             incr-spot (take-until-string)
         ] ifte
-    ] [ "Missing closing token" <my-xml-error> throw ] ifte ;
+    ] [ "Missing closing token" <xml-string-error> throw ] ifte ;
 
 : take-until-string ( string -- string )
     [ >r spot get r> (take-until-string) code get subseq ] keep
@@ -89,7 +89,7 @@ C: expected ( should-be was -- error )
     [ set-expected-should-be ] keep ;
 
 M: expected error.
-    dup delegate xml-error.
+    dup xml-error.
     "Token expected: " write dup expected-should-be print
     "Token present: " write expected-was print ;
 
@@ -99,17 +99,17 @@ C: no-entity ( string -- entitiy )
     [ set-no-entity-thing ] keep ;
 
 M: no-entity error.
-    dup delegate xml-error.
+    dup xml-error.
     "Entity does not exist: &" write no-entity-thing write ";" print ;
 
-TUPLE: my-xml-error string ;
-C: my-xml-error ( -- my-xml-error )
-    [ set-my-xml-error-string ] keep
+TUPLE: xml-string-error string ;
+C: xml-string-error ( -- xml-string-error )
+    [ set-xml-string-error-string ] keep
     [ <xml-error> swap set-delegate ] keep ;
 
-M: my-xml-error error.
-    dup delegate xml-error.
-    my-xml-error-string print ;
+M: xml-string-error error.
+    dup xml-error.
+    xml-string-error-string print ;
 
 !   -- Parsing strings
 
@@ -175,7 +175,7 @@ M: my-xml-error error.
     char dup name-start-char? [
         incr-spot ch>string [ name-char? not ] take-until append
     ] [
-        "Malformed name" <my-xml-error> throw
+        "Malformed name" <xml-string-error> throw
     ] ifte ;
 
 : parse-quot ( ch -- str )
@@ -185,7 +185,7 @@ M: my-xml-error error.
     char dup "'\"" member? [
         parse-quot
     ] [
-        "Attribute lacks quote" <my-xml-error> throw
+        "Attribute lacks quote" <xml-string-error> throw
     ] ifte ;
 
 : parse-prop ( -- [[ name value ]] )
@@ -379,15 +379,3 @@ M: comment (xml>string)
         xml-stack get
         first cdr
     ] with-scope ; inline
-
-: xml-example
-    [
-        "html" {{ }} [
-            "head" {{ [[ "title" "unimportant" ]] }} [ ] tag
-            "body" {{ [[ "bgcolor" "white" ]] }} [
-                "boring" {{ }} [ ] tag
-                "text" text
-                "something about the code" comment
-            ] tag
-        ] tag
-    ] make-xml ;
