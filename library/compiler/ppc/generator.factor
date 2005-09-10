@@ -52,14 +52,8 @@ M: %jump generate-node ( vop -- )
 M: %jump-label generate-node ( vop -- )
     vop-label B ;
 
-: conditional ( vop -- label )
-    dup 0 vop-in v>operand 0 swap f address CMPI vop-label ;
-
-M: %jump-f generate-node ( vop -- )
-    conditional BEQ ;
-
 M: %jump-t generate-node ( vop -- )
-    conditional BNE ;
+    dup 0 vop-in v>operand 0 swap f address CMPI vop-label BNE ;
 
 M: %return-to generate-node ( vop -- )
     vop-label 0 3 LOAD32  absolute-16/16
@@ -74,14 +68,7 @@ M: %return generate-node ( vop -- )
 M: %untag generate-node ( vop -- )
     dest/src untag ;
 
-M: %untag-fixnum generate-node ( vop -- )
-    dest/src tag-bits SRAWI ;
-
 : tag-fixnum ( src dest -- ) tag-bits SLWI ;
-
-M: %retag-fixnum generate-node ( vop -- )
-    ! todo: formalize scratch register usage
-    dest/src tag-fixnum ;
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src

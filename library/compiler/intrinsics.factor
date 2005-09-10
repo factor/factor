@@ -63,7 +63,6 @@ sequences vectors words ;
     drop
     in-1
     0 %type ,
-    0 %retag-fixnum ,
     out-1
 ] "intrinsic" set-word-prop
 
@@ -71,7 +70,6 @@ sequences vectors words ;
     drop
     in-1
     0 %tag ,
-    0 %retag-fixnum ,
     out-1
 ] "intrinsic" set-word-prop
 
@@ -164,7 +162,7 @@ sequences vectors words ;
     in-2
     -1 %inc-d ,
     1 <vreg> 0 <vreg> 2 <vreg> %fixnum-mod ,
-    2 0 %replace-d ,
+    << vreg f 2 >> 0 %replace-d ,
 ] "intrinsic" set-word-prop
 
 \ fixnum/mod [
@@ -174,8 +172,8 @@ sequences vectors words ;
     { << vreg f 1 >> << vreg f 0 >> }
     { << vreg f 2 >> << vreg f 0 >> }
     %fixnum/mod ,
-    2 0 %replace-d ,
-    0 1 %replace-d ,
+    << vreg f 2 >> 0 %replace-d ,
+    << vreg f 0 >> 1 %replace-d ,
 ] "intrinsic" set-word-prop
 
 \ fixnum-bitnot [
@@ -213,7 +211,7 @@ sequences vectors words ;
     in-1
     dup cell -8 * <= [
         drop 0 <vreg> 2 <vreg> %fixnum-sgn ,
-        2 0 %replace-d ,
+        << vreg f 2 >> 0 %replace-d ,
     ] [
         neg 0 <vreg> 0 <vreg> %fixnum>> ,
         out-1

@@ -101,10 +101,6 @@ TUPLE: %jump-t ;
 C: %jump-t make-vop ;
 : %jump-t <vreg> label/src-vop <%jump-t> ;
 
-TUPLE: %jump-f ;
-C: %jump-f make-vop ;
-: %jump-f <vreg> label/src-vop <%jump-f> ;
-
 ! dispatch tables
 TUPLE: %dispatch ;
 C: %dispatch make-vop ;
@@ -135,7 +131,7 @@ TUPLE: %replace-d ;
 C: %replace-d make-vop ;
 
 : %replace-d ( vreg n -- vop )
-    <ds-loc> swap <vreg> swap src/dest-vop <%replace-d> ;
+    <ds-loc> src/dest-vop <%replace-d> ;
 
 M: %replace-d basic-block? drop t ;
 
@@ -165,7 +161,7 @@ TUPLE: %replace-r ;
 C: %replace-r make-vop ;
 
 : %replace-r ( vreg n -- vop )
-    <cs-loc> swap <vreg> swap src/dest-vop <%replace-r> ;
+    <cs-loc> src/dest-vop <%replace-r> ;
 
 M: %replace-r basic-block? drop t ;
 
@@ -180,7 +176,7 @@ M: %inc-r basic-block? drop t ;
 : in-1 0 0 %peek-d , ;
 : in-2 0 1 %peek-d ,  1 0 %peek-d , ;
 : in-3 0 2 %peek-d ,  1 1 %peek-d ,  2 0 %peek-d , ;
-: out-1 0 0 %replace-d , ;
+: out-1 << vreg f 0 >> 0 %replace-d , ;
 
 ! indirect load of a literal through a table
 TUPLE: %indirect ;
@@ -190,7 +186,6 @@ C: %indirect make-vop ;
 M: %indirect basic-block? drop t ;
 
 ! object slot accessors
-! mask off a tag (see also %untag-fixnum)
 TUPLE: %untag ;
 C: %untag make-vop ;
 : %untag <vreg> dest-vop <%untag> ;
@@ -313,16 +308,6 @@ TUPLE: %tag ;
 C: %tag make-vop ;
 : %tag ( vreg ) <vreg> dest-vop <%tag> ;
 M: %tag basic-block? drop t ;
-
-TUPLE: %retag-fixnum ;
-C: %retag-fixnum make-vop ;
-: %retag-fixnum <vreg> dest-vop <%retag-fixnum> ;
-M: %retag-fixnum basic-block? drop t ;
-
-TUPLE: %untag-fixnum ;
-C: %untag-fixnum make-vop ;
-: %untag-fixnum <vreg> dest-vop <%untag-fixnum> ;
-M: %untag-fixnum basic-block? drop t ;
 
 : check-dest ( vop reg -- )
     swap 0 vop-out = [ "bad VOP destination" throw ] unless ;

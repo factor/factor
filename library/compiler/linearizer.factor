@@ -72,7 +72,6 @@ M: #ifte linearize* ( node -- )
     #! label/branch pairs.
     in-1
     -1 %inc-d ,
-    0 %untag-fixnum ,
     0 %dispatch ,
     [ <label> dup %target-label ,  cons ] map
     %end-dispatch , ;

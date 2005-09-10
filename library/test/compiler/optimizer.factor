@@ -187,3 +187,9 @@ TUPLE: pred-test ;
 : bad-kill-2 bad-kill-1 drop ; compiled
 
 [ 3 ] [ t bad-kill-2 ] unit-test
+
+! regression
+: bleh 3 ;
+: blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] ifte ; compiled
+
+[ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test
