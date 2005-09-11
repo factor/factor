@@ -217,57 +217,79 @@ M: cpu write-port ( value port cpu -- )
   #! higher order bit, this flag is set, otherwise it is reset.
   swap dup HEX: 100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] ifte ;
 
-: update-half-carry-flag ( result cpu -- )
+: update-half-carry-flag ( original change-by result cpu -- )
   #! If the instruction caused a carry out of bit 3 and into bit 4 of the
   #! resulting value, the half carry flag is set, otherwise it is reset.
-  swap HEX: 10 bitand 0 = [ half-carry-flag clear-flag ] [ half-carry-flag set-flag ] ifte ;
+  #! The 'original' is the original value of the register being changed.
+  #! 'change-by' is the amount it is being added or decremented by.
+  #! 'result' is the result of that change.
+  >r bitxor bitxor HEX: 10 bitand 0 = not r> 
+  swap [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] ifte ;
 
 : update-flags ( result cpu -- )
-  2dup update-half-carry-flag
   2dup update-carry-flag
   2dup update-parity-flag
   2dup update-sign-flag
   update-zero-flag ;
 
 : update-flags-no-carry ( result cpu -- )
-  2dup update-half-carry-flag
   2dup update-parity-flag
   2dup update-sign-flag
   update-zero-flag ;
 
 : add-byte ( lhs rhs cpu -- result )
   #! Add rhs to lhs
-  >r + r> [ update-flags ] 2keep drop HEX: FF bitand ;
+  >r 2dup + r> ( lhs rhs result cpu )
+  [ update-flags ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
 
-: add-carry ( result cpu -- result )
+: add-carry ( change-by result cpu -- change-by result )
   #! Add the effect of the carry flag to the result
-  flag-c? [ 1 + ] when ;
+  flag-c? [ 1 + >r 1 + r> ] when ;
 
 : add-byte-with-carry ( lhs rhs cpu -- result )
   #! Add rhs to lhs plus carry.
-  >r + r> [ add-carry ] keep [ update-flags ] 2keep drop HEX: FF bitand ;
+  >r 2dup + r> ( lhs rhs result cpu )
+  [ add-carry ] keep
+  [ update-flags ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
 
-: sub-carry ( result cpu -- result ) 
+: sub-carry ( change-by result cpu -- change-by result ) 
   #! Subtract the effect of the carry flag from the result
-  flag-c? [ 1 - ] when ;
+  flag-c? [ 1 - >r 1 - r>  ] when ;
 
 : sub-byte ( lhs rhs cpu -- result )
   #! Subtract rhs from lhs
-  >r - r> [ update-flags ] 2keep drop HEX: FF bitand ;
+  >r 2dup - r> 
+  [ update-flags ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
 
 : sub-byte-with-carry ( lhs rhs cpu -- result )
   #! Subtract rhs from lhs and take carry into account
-  >r - r> [ sub-carry ] keep [ update-flags ] 2keep drop HEX: FF bitand ;
+  >r 2dup - r> 
+  [ sub-carry ] keep 
+  [ update-flags ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
  
 : inc-byte ( byte cpu -- result )
   #! Increment byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 + r> [ update-flags-no-carry ] 2keep drop HEX: FF bitand ;
+  >r 1 2dup + r> ( lhs rhs result cpu )
+  [ update-flags-no-carry ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
 
 : dec-byte ( byte cpu -- result )
   #! Decrement byte by one. Note that carry flag is not affected
   #! by this operation.
-  >r 1 - r> [ update-flags-no-carry ] 2keep drop HEX: FF bitand ;
+  >r 1 2dup - r> ( lhs rhs result cpu )
+  [ update-flags-no-carry ] 2keep 
+  [ update-half-carry-flag ] 2keep
+  drop HEX: FF bitand ;
 
 : inc-word ( w cpu -- w )
   #! Increment word by one. Note that no flags are modified.
@@ -280,7 +302,7 @@ M: cpu write-port ( value port cpu -- )
 : add-word ( lhs rhs cpu -- result )
   #! Add rhs to lhs. Note that only the carry flag is modified
   #! and only if there is a carry out of the double precision add.
-  >r + r> over HEX: FFFF > [ carry-flag over set-flag ] when drop HEX: FFFF bitand ;
+  >r + r> over HEX: FFFF > [ carry-flag set-flag ] [ drop ] ifte HEX: FFFF bitand ;
 
 : bit3or ( lhs rhs -- 0|1 )
   #! bitor bit 3 of the two numbers on the stack
@@ -428,6 +450,13 @@ C: cpu ( cpu -- cpu )
     0 swap (load-rom)
   ] with-stream ;
 
+: load-rom* ( addr filename <cpu> -- )
+  #! Load the contents of the file into ROM, starting at
+  #! the specified address.
+  cpu-ram swap <file-reader> [ 
+    (load-rom)
+  ] with-stream ;
+
 : read-instruction ( cpu -- word )
   #! Read the next instruction from the cpu's program 
   #! counter, and increment the program counter.
@@ -571,6 +600,14 @@ SYMBOL: $4
 : test-rp 
   { 4 5 3 } [ 1 $2 [ $1 4 ] ] replace-patterns ;
 
+: (emulate-RST) ( n cpu -- )
+  #! RST nn
+  [ cpu-sp 2 - dup ] keep ( sp sp cpu )
+  [ set-cpu-sp ] keep ( sp cpu )
+  [ cpu-pc ] keep ( sp pc cpu )
+  swapd [ write-word ] keep ( cpu )
+  >r 8 * r> set-cpu-pc ;
+
 : (emulate-CALL) ( cpu -- )
   #! 205 - CALL nn
   [ next-word HEX: FFFF bitand ] keep ( addr cpu )
@@ -653,14 +690,14 @@ SYMBOL: $4
   {{
     [[ "NOP"          [ drop ]               ]]
     [[ "RET-NN"          [ ret-from-sub  ]               ]]
-    [[ "RST-0"      [ drop "RST 0 Not Implemented" throw ] ]]
-    [[ "RST-8"      [ drop "RST 8 Not Implemented" throw ] ]]
-    [[ "RST-10H"      [ drop "RST 10H Not Implemented" throw ] ]]
-    [[ "RST-18H"      [ drop "RST 18H Not Implemented" throw ] ]]
-    [[ "RST-20H"      [ drop "RST 20H Not Implemented" throw ] ]]
-    [[ "RST-28H"      [ drop "RST 28H Not Implemented" throw ] ]]
-    [[ "RST-30H"      [ drop "RST 30H Not Implemented" throw ] ]]
-    [[ "RST-38H"      [ drop "RST 38H Not Implemented" throw ] ]]
+    [[ "RST-0"      [ 0 swap (emulate-RST) ] ]]
+    [[ "RST-8"      [ 8 swap (emulate-RST) ] ]]
+    [[ "RST-10H"      [ HEX: 10 swap (emulate-RST) ] ]]
+    [[ "RST-18H"      [ HEX: 18 swap (emulate-RST) ] ]]
+    [[ "RST-20H"      [ HEX: 20 swap (emulate-RST) ] ]]
+    [[ "RST-28H"      [ HEX: 28 swap (emulate-RST) ] ]]
+    [[ "RST-30H"      [ HEX: 30 swap (emulate-RST) ] ]]
+    [[ "RST-38H"      [ HEX: 38 swap (emulate-RST) ] ]]
     [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] ifte ] ]]
     [[ "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] ]]
     [[ "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] ]]
@@ -712,7 +749,7 @@ SYMBOL: $4
     [[ "CALL-NN"         [ (emulate-CALL) ] ]]
     [[ "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] ifte ]   ]]
     [[ "LD-RR,NN"     [ [ next-word ] keep $2 ] ]]
-    [[ "LD-RR,RR"     [ drop "LD-RR,RR not implemented" throw ] ]]
+    [[ "LD-RR,RR"     [ [ $3 ] keep $2 ] ]]
     [[ "LD-R,N"     [ [ next-byte ] keep $2 ] ]]
     [[ "LD-(RR),N"    [ [ next-byte ] keep [ $1 ] keep write-byte ] ]]
     [[ "LD-(RR),R"    [ [ $3 ] keep [ $1 ] keep write-byte ] ]]

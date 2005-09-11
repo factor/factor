@@ -7,5 +7,6 @@ USING: parser compiler words sequences io ;
 "space-invaders.factor" run-file
 
 "cpu-8080" words [ try-compile ] each
+"space-invaders" words [ try-compile ] each
 
 "Use 'run' in the 'space-invaders' vocabulary to start." print
