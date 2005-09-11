@@ -1,7 +1,11 @@
 IN: scratchpad
-USE: parser
+USING: parser compiler words sequences io ;
 
 "../parser-combinators/lazy.factor" run-file
 "../parser-combinators/parser-combinators.factor" run-file
-"cpu.factor" run-file 
-! "tests.factor" run-file
+"cpu-8080.factor" run-file 
+"space-invaders.factor" run-file
+
+"cpu-8080" words [ try-compile ] each
+
+"Use 'run' in the 'space-invaders' vocabulary to start." print

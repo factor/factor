@@ -2,35 +2,32 @@ USING: kernel lists math sequences errors vectors prettyprint io unparser namesp
        words parser hashtables lazy parser-combinators kernel-internals strings ;
 IN: cpu-8080
 
-TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port2o port3o port4lo port4hi port5o ram display ;
+TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
 
-: valid-byte? ( b -- )
-  dup 0 >= swap HEX: FF <= and not [ "Invalid byte" throw ] when ;
+GENERIC: reset        ( cpu            -- )
+GENERIC: update-video ( value addr cpu -- )
+GENERIC: read-port    ( port cpu       -- byte )
+GENERIC: write-port   ( value port cpu -- )
 
-: valid-word? ( w -- )
-  dup 0 >= swap HEX: FFFF <= and not [ "Invalid word" throw ] when ;
+M: cpu update-video ( value addr cpu -- )
+  3drop ;
+
+M: cpu read-port ( port cpu -- byte )
+  #! Read a byte from the hardware port. 'port' should
+  #! be an 8-bit value.
+  2drop 0 ;
+
+M: cpu write-port ( value port cpu -- )
+  #! Write a byte to the hardware port, where 'port' is
+  #! an 8-bit value.
+  3drop ;
 
 : carry-flag        HEX: 01 ; inline
-: add-sub-flag      HEX: 02 ; inline
-: subtraction-flag  HEX: 02 ; inline
 : parity-flag       HEX: 04 ; inline
-: overflow-flag     HEX: 04 ; inline
-: flag3-flag        HEX: 08 ; inline
 : half-carry-flag   HEX: 10 ; inline
-: aux-carry-flag    HEX: 10 ; inline
 : interrupt-flag    HEX: 20 ; inline
-: flag5-flag        HEX: 20 ; inline
 : zero-flag         HEX: 40 ; inline
 : sign-flag         HEX: 80 ; inline
-
-: increment-8bit ( v -- v overflow? )
-  #! Increment an 8 bit value by 1. Return the new
-  #! value plus t if the value overflowed back to zero.
-  1 + dup 256 = [
-    drop 0 t
-  ] [
-    f
-  ] ifte ;
 
 : >word< ( word -- byte byte )
   #! Explode a word into its two 8 bit values.
@@ -114,13 +111,13 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
     cpu-ram nth
   ] [
     2drop HEX: FF
-  ] ifte dup valid-byte? ;
+  ] ifte ;
 
 : read-word ( addr cpu -- word )  
   #! Read a 16-bit word from memory at the specified address.
   #! The address is 16-bit, but if a value greater than
   #! 0xFFFF is provided then return a default value.
-  [ read-byte ] 2keep >r 1 + r> read-byte 8 shift bitor dup valid-word? ;
+  [ read-byte ] 2keep >r 1 + r> read-byte 8 shift bitor ;
  
 : next-byte ( cpu -- byte )
   #! Return the value of the byte at PC, and increment PC.
@@ -136,23 +133,9 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   [ cpu-pc 2 + ] keep
   set-cpu-pc ;
 
-: update-video ( value addr cpu -- )
-  #! If a 'display' quotation is set for the cpu, call it
-  #! if the write to RAM is within video memory range.
-  over HEX: 2400 >= [
-    dup cpu-display [ ( value addr cpu quot -- )
-      call
-    ] [
-      3drop
-    ] ifte*
-  ] [
-    3drop
-  ] ifte ;
 
 : write-byte ( value addr cpu -- )
   #! Write a byte to the specified memory address.
-  pick valid-byte? 
-  over valid-word?
   over dup HEX: 2000 < swap HEX: FFFF > or [
     3drop
   ] [
@@ -163,33 +146,7 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
 
 : write-word ( value addr cpu -- )
   #! Write a 16-bit word to the specified memory address.
-  pick valid-word?
   >r >r >word< r> r> [ write-byte ] 2keep >r 1 + r> write-byte ;
-
-: read-port ( port cpu -- byte )
-  #! Read a byte from the hardware port. 'port' should
-  #! be an 8-bit value.
-!  2dup drop "IN from " write number>string print 
-  {
-    { [ over 1 = ] [ nip [ cpu-port1 dup HEX: FE bitand ] keep set-cpu-port1 ] }
-    { [ over 2 = ] [ nip [ cpu-port2i HEX: 8F bitand ] keep cpu-port1 HEX: 70 bitand bitor ] }
-    { [ over 3 = ] [ nip [ cpu-port4hi 8 shift ] keep [ cpu-port4lo bitor ] keep cpu-port2o shift -8 shift HEX: FF bitand ] }
-    { [ t ] [ 2drop 0 ] }    
-  } cond dup valid-byte? ;
-
-: write-port ( value port cpu -- )
-  #! Write a byte to the hardware port, where 'port' is
-  #! an 8-bit value.  
-  pick valid-byte?
-!  3dup drop "OUT to " write unparse write " value " write unparse print 
-  {
-    { [ over 2 = ] [ nip set-cpu-port2o ] }
-    { [ over 3 = ] [ nip set-cpu-port3o ] }
-    { [ over 4 = ] [ nip [ cpu-port4hi ] keep [ set-cpu-port4lo ] keep set-cpu-port4hi ] }
-    { [ over 5 = ] [ nip set-cpu-port5o ] }
-    { [ over 6 = ] [ 3drop ] }
-    { [ t ] [ 3drop "Invalid port write" throw ] }
-  } cond ;
 
 : cpu-a-bitand ( quot cpu -- )
   #! A &= quot call 
@@ -253,6 +210,7 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   #! is 0, (ie. if the result has even parity) this flag
   #! is set, otherwise it is reset.
   swap HEX: FF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] ifte ;
+
 : update-carry-flag ( result cpu -- )
   #! If the instruction resulted in a carry (from addition) 
   #! or a borrow (from subtraction or a comparison) out of the
@@ -276,32 +234,6 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
   2dup update-parity-flag
   2dup update-sign-flag
   update-zero-flag ;
-
-: trigger-zero-flag ( n cpu -- )
-  #! Given the value n, set the zero flag if required.
-  swap HEX: FF bitand 0 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
-
-: trigger-sign-flag ( n cpu -- )
-  #! Given the value n, set the sign flag if required.
-  swap HEX: 80 bitand 0 = not [ [ sign-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
-
-: trigger-carry-flag ( n cpu -- )
-  #! Given the value n, set the carry flag if required.
-  swap HEX: 100 >= [ [ carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
-
-: trigger-half-carry-flag ( n a+n+cf cpu -- )
-  #! Given the value n, set the half carry flag if required.
-  -rot ( cpu n a+n+cf )
-  pick cpu-a bitxor bitxor HEX: 10 bitand 0 = not [ [ half-carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
-
-: trigger-overflow-flag ( n a+n+cf cpu -- )
-  #! Given the value n, set the half carry flag if required.
-  -rot ( cpu n a+n+cf )
-  over bitxor ( cpu n x^n )
-  pick cpu-a rot bitxor ( cpu x^n a^n )
-  bitand HEX: 80 bitand ( cpu v )
-  0 = not [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ;
-
 
 : add-byte ( lhs rhs cpu -- result )
   #! Add rhs to lhs
@@ -380,270 +312,6 @@ TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles port1 port2i port
 : flags ( seq -- seq )
   [ 0 [ execute bitor ] reduce ] map ;
 
-SYMBOL: psz-vector 
-
-: psz ( -- vector )
-  psz-vector get ;
-
-{
-    [ zero-flag parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ]  
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ ] 
-    [ parity-flag ] 
-    [ ] 
-    [ parity-flag ] 
-    [ parity-flag ] 
-    [ ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ] 
-    [ sign-flag ] 
-    [ sign-flag ] 
-    [ sign-flag parity-flag ]
-} flags psz-vector set
-
 : decrement-sp ( n cpu -- )
   #! Decrement the stackpointer by n.  
   [ cpu-sp ] keep 
@@ -678,56 +346,12 @@ SYMBOL: psz-vector
 
 : call-sub ( addr cpu -- )
   #! Call the address as a subroutine.
-  over valid-word?
   dup push-pc 
   >r HEX: FFFF bitand r> set-cpu-pc ;
 
-: clear-and-set-flags-psz ( cpu -- )
-  [ cpu-f flag3-flag flag5-flag bitor bitand ] keep
-  [ cpu-a psz nth bitor ] keep ( v cpu -- )
-  set-cpu-f ;
-
-: dec-byte-old ( b cpu -- b )
-  over valid-byte?
-  [ 
-    cpu-f 
-    zero-flag sign-flag half-carry-flag overflow-flag bitor bitor bitor 
-    255 swap - bitand 
-    add-sub-flag bitor
-  ] keep   
-  [ set-cpu-f ] keep ( b cpu -- )
-  [ swap HEX: 0f bitand 0 = [ [ half-carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
-  >r 1 - HEX: FF bitand r>
-  [ swap HEX: 7F = [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
-  [ swap HEX: 80 bitand 0 = not [ [ sign-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
-  [ swap HEX: 00 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep 
-  drop dup valid-byte? ;
-
 : ret-from-sub ( cpu -- )
   [ pop-pc ] keep set-cpu-pc ;
-
-: set-flags-psz ( cpu -- )
-  [ cpu-f parity-flag sign-flag zero-flag bitor bitor 255 swap - bitand ] keep
-  [ cpu-a psz nth bitor ] keep ( v cpu -- )
-  set-cpu-f ;
-  
-SYMBOL: cf
-
-: sub-byte-old ( cf n cpu -- x ) 
-  #! Subtracts 'n' from the 'a' register. 'cf' is carry flag settings.
-  over valid-byte?
-  pick cf set
-  [ rot drop cpu-a swap - HEX: FF bitand ] 3keep  ( x cf n cpu )
-  rot 0 = not [ >r >r 1 - HEX: FF bitand r> r> ] when ( x n cpu )
-  [ cpu-f flag3-flag flag5-flag bitor bitand subtraction-flag bitor ] keep ( x n f cpu )
-  [ set-cpu-f ] keep  swapd ( n x cpu )
-  [ swap 0 = [ [ zero-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
-  [ swap HEX: 80 bitand 0 = not [ [ sign-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 2keep
-  [ swap over cpu-a >= ( n cpu >=  ) rot cf get bitor 0 = not and [ [ carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
-  [ dup >r cpu-a bitxor bitxor HEX: 10 bitand r> swap 0 = not [ [ half-carry-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
-  [ dup >r cpu-a swapd bitxor swap r> dup >r cpu-a bitxor bitand HEX: 80 bitand r> swap 0 = not [ [ overflow-flag ] swap cpu-f-bitor ] [ drop ] ifte ] 3keep
-  drop nip  dup valid-byte? ;
-
+ 
 : interrupt ( number cpu -- )
   #! Perform a hardware interrupt
 !  "***Interrupt: " write over 16 >base print 
@@ -742,7 +366,7 @@ SYMBOL: cf
   #! Increment the number of cpu cycles
   [ cpu-cycles + ] keep set-cpu-cycles ;
   
-: instruction-cycles ( -- )
+: instruction-cycles ( -- vector )
   #! Return a 256 element vector containing the cycles for
   #! each opcode in the 8080 instruction set.
   { 
@@ -755,7 +379,7 @@ SYMBOL: cf
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ;
 
-: instructions ( -- )
+: instructions ( -- vector )
   #! Return a 256 element vector containing the emulation words for
   #! each opcode in the 8080 instruction set.
   { 
@@ -766,9 +390,9 @@ SYMBOL: cf
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ;
+    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ; inline
 
-: reset ( cpu -- )
+M: cpu reset ( cpu -- )
   #! Reset the CPU to its poweron state
   [ 0 swap set-cpu-b  ] keep
   [ 0 swap set-cpu-c  ] keep
@@ -783,16 +407,9 @@ SYMBOL: cf
   [ HEX: FFFF 0 <repeated> >vector swap set-cpu-ram ] keep
   [ f swap set-cpu-halted? ] keep
   [ HEX: 10 swap set-cpu-last-interrupt ] keep
-  [ 0 swap set-cpu-port1 ] keep
-  [ 0 swap set-cpu-port2i ] keep
-  [ 0 swap set-cpu-port2o ] keep
-  [ 0 swap set-cpu-port3o ] keep
-  [ 0 swap set-cpu-port4lo ] keep
-  [ 0 swap set-cpu-port4hi ] keep
-  [ 0 swap set-cpu-port5o ] keep
   0 swap set-cpu-cycles ;
 
-C: cpu ( -- cpu )
+C: cpu ( cpu -- cpu )
   [ reset ] keep ;
 
 : (load-rom) ( n ram -- )
@@ -964,40 +581,53 @@ SYMBOL: $4
   set-cpu-pc ;
 
 : (emulate-RLCA) ( cpu -- )
-  dup cpu-a dup ( cpu a a )
-  1 shift HEX: FF bitand swap -7 shift HEX: FF bitand bitor ( cpu a )
-  HEX: FF bitand dup pick set-cpu-a 
-  add-sub-flag half-carry-flag carry-flag bitor bitor HEX: FF swap - ( cpu a newf )
-  pick cpu-f bitand pick set-cpu-f 
-  HEX: 01 bitand 0 = not [ dup cpu-f carry-flag bitor swap set-cpu-f ] [ drop ] ifte ;
+  #! The content of the accumulator is rotated left
+  #! one position. The low order bit and the carry flag
+  #! are both set to the value shifted out of the high
+  #! order bit position. Only the carry flag is affected.
+  [ cpu-a -7 shift ] keep 
+  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  [ cpu-a 1 shift HEX: FF bitand ] keep 
+  >r bitor r> set-cpu-a ;
 
 : (emulate-RRCA) ( cpu -- )
-  dup cpu-a dup ( cpu a a )
-  -1 shift HEX: FF bitand swap 7 shift HEX: FF bitand bitor ( cpu a )
-  HEX: FF bitand dup pick set-cpu-a 
-  add-sub-flag half-carry-flag carry-flag bitor bitor HEX: FF swap - ( cpu a newf )
-  pick cpu-f bitand pick set-cpu-f 
-  HEX: 80 bitand 0 = not [ dup cpu-f carry-flag bitor swap set-cpu-f ] [ drop ] ifte ;
+  #! The content of the accumulator is rotated right
+  #! one position. The high order bit and the carry flag
+  #! are both set to the value shifted out of the low
+  #! order bit position. Only the carry flag is affected.
+  [ cpu-a 1 bitand 7 shift ] keep 
+  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  [ cpu-a 254 bitand -1 shift ] keep 
+  >r bitor r> set-cpu-a ;
 
 : (emulate-RLA) ( cpu -- )  
-  dup cpu-a dup ( cpu old-a new-a )
-  1 shift HEX: FF bitand pick set-cpu-a ( cpu old-a )
-  over flag-c? [ [ 1 ] pick cpu-a-bitor ] when
-  [ add-sub-flag half-carry-flag carry-flag bitor bitor 255 swap - ] pick cpu-f-bitand
-  HEX: 80 bitand 0 = not [ [ carry-flag ] over cpu-f-bitor ] when
-  drop ;
+  #! The content of the accumulator is rotated left
+  #! one position through the carry flag. The low
+  #! order bit is set equal to the carry flag and
+  #! the carry flag is set to the value shifted out 
+  #! of the high order bit. Only the carry flag is
+  #! affected.
+  [ carry-flag swap flag-set? [ 1 ] [ 0 ] ifte ] keep 
+  [ cpu-a 127 bitand 7 shift ] keep 
+  dup cpu-a 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  >r bitor r> set-cpu-a ;
 
 : (emulate-RRA) ( cpu -- )  
-  dup cpu-a dup ( cpu old-a new-a )
-  -1 shift HEX: FF bitand pick set-cpu-a ( cpu old-a )
-  over flag-c? [ [ HEX: 80 ] pick cpu-a-bitor ] when
-  [ add-sub-flag half-carry-flag carry-flag bitor bitor 255 swap - ] pick cpu-f-bitand
-  HEX: 01 bitand 0 = not [ [ carry-flag ] over cpu-f-bitor ] when
-  drop ;
+  #! The content of the accumulator is rotated right
+  #! one position through the carry flag. The high order
+  #! bit is set to the carry flag and the carry flag is
+  #! set to the value shifted out of the low order bit. 
+  #! Only the carry flag is affected.
+  [ carry-flag swap flag-set? [ BIN: 10000000 ] [ 0 ] ifte ] keep 
+  [ cpu-a 254 bitand -1 shift ] keep 
+  dup cpu-a 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  >r bitor r> set-cpu-a ;
 
 : (emulate-CPL) ( cpu -- )  
-  [ HEX: FF ] over cpu-a-bitxor 
-  [ add-sub-flag half-carry-flag bitor ] swap cpu-f-bitor ;
+  #! The contents of the accumulator are complemented
+  #! (zero bits become one, one bits becomes zero).
+  #! No flags are affected.
+  HEX: FF swap cpu-a-bitxor= ;
 
 : (emulate-DAA) ( cpu -- )  
   #! The eight bit number in the accumulator is
@@ -1032,9 +662,9 @@ SYMBOL: $4
     [[ "RST-30H"      [ drop "RST 30H Not Implemented" throw ] ]]
     [[ "RST-38H"      [ drop "RST 38H Not Implemented" throw ] ]]
     [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] ifte ] ]]
-    [[ "CP-N"      [ [ next-byte ] keep 0 -rot sub-byte-old drop  ] ]]
-    [[ "CP-R"      [ [ $1 ] keep 0 -rot sub-byte-old drop ] ]]
-    [[ "CP-(RR)"      [ [ $1 ] keep [ read-byte ] keep 0 -rot sub-byte-old drop ] ]]
+    [[ "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] ]]
+    [[ "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] ]]
+    [[ "CP-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] ]]
     [[ "OR-N"      [ [ cpu-a ] keep [ next-byte ] keep [ or-byte ] keep set-cpu-a ] ]]
     [[ "OR-R"      [ [ cpu-a ] keep [ $1 ] keep [ or-byte ] keep set-cpu-a ] ]]
     [[ "OR-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep [ or-byte ] keep set-cpu-a  ] ]]
