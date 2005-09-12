@@ -30,6 +30,7 @@ USE: alien
 USE: kernel
 USE: kernel-internals
 USE: sequences-internals
+USE: arrays
 
 : <wsadata> HEX: 190 <byte-array> ;
 
