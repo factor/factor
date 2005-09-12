@@ -1,5 +1,5 @@
 IN: sequences-internals
-USING: kernel math sequences vectors ;
+USING: arrays kernel math sequences ;
 
 : midpoint@ length 2 /i ; inline
 
@@ -74,7 +74,7 @@ DEFER: (nsort)
     #! Binsearch returns an index relative to the sequence
     #! being sliced, so if we are given a slice as input,
     #! unexpected behavior will result.
-    dup slice? [ >vector ] when 0 over length rot <slice> ;
+    dup slice? [ >array ] when 0 over length rot <slice> ;
     inline
 
 IN: sequences

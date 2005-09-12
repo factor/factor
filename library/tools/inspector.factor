@@ -27,7 +27,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2array ;
     [ swap CHAR: \s pad-right ] map-with ;
 
 : sheet-numbers ( sheet -- sheet )
-    dup first length >vector 1array swap append ;
+    dup first length >array 1array swap append ;
 
 SYMBOL: inspector-slots
 

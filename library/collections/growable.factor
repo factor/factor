@@ -38,9 +38,3 @@ GENERIC: set-fill
 : clone-growable ( obj -- obj )
     #! Cloning vectors, sbufs, hashtables.
     (clone) dup underlying clone over set-underlying ;
-
-! We need this pretty early on.
-IN: vectors
-
-: empty-vector ( len -- vec )
-    dup <vector> [ set-fill ] keep ; inline

@@ -10,7 +10,7 @@
 ! format.
 
 IN: image
-USING: errors generic hashtables kernel lists
+USING: arrays errors generic hashtables kernel lists
 math namespaces parser prettyprint sequences
 sequences-internals io strings vectors words ;
 
@@ -220,6 +220,9 @@ M: string ' ( string -- pointer )
 
 M: tuple ' ( tuple -- pointer )
     tuple>array tuple-type emit-array ;
+
+M: array ' ( array -- pointer )
+    array-type emit-array ;
 
 M: vector ' ( vector -- pointer )
     dup array-type emit-array swap length

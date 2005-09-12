@@ -261,7 +261,7 @@ FORGET: set-stack-effect
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
     dup intern-symbol
-    dup r> 1array "types" set-word-prop
+    dup r> 1 <vector> [ push ] keep "types" set-word-prop
     dup builtin define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
@@ -269,7 +269,7 @@ FORGET: set-stack-effect
     register-builtin ;
 
 {{ }} clone typemap set
-num-types empty-vector builtins set
+num-types <array> builtins set
 
 ! Catch-all metaclass for providing a default method.
 object num-types >vector "types" set-word-prop

@@ -67,7 +67,7 @@ prettyprint ;
     [ no-cond ] swap alist>quot infer-quot-value
 ] "infer" set-word-prop
 
-\ dispatch [ [ fixnum vector ] [ ] ] "infer-effect" set-word-prop
+\ dispatch [ [ fixnum array ] [ ] ] "infer-effect" set-word-prop
 
 \ dispatch [
     pop-literal nip [ <literal> ] map

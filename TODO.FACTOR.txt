@@ -61,6 +61,7 @@
 
 + kernel:
 
+- typemap keys need to be arrays
 - better handling of random arrangements of html words when
   prettyprinting
 - friendlier .factor-rc load error handling
