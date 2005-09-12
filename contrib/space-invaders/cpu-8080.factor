@@ -414,6 +414,17 @@ M: cpu write-port ( value port cpu -- )
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f }@ ; inline
 
+: not-implemented ( <cpu> -- )
+  drop ;
+
+instructions length [ 
+  dup instructions nth [
+    drop
+  ] [
+    [ not-implemented ] swap instructions set-nth 
+  ] ifte
+] each
+
 M: cpu reset ( cpu -- )
   #! Reset the CPU to its poweron state
   [ 0 swap set-cpu-b  ] keep
@@ -732,7 +743,7 @@ SYMBOL: $4
     [[ "SCF"          [ carry-flag swap cpu-f-bitor= ]               ]]
     [[ "RLCA"          [ (emulate-RLCA) ]               ]]
     [[ "RRCA"          [ (emulate-RRCA) ]               ]]
-    [[ "HALT"          [ drop "HALT not implemented" throw ]               ]]
+    [[ "HALT"          [ drop  ]               ]]
     [[ "DI"          [ [ 255 interrupt-flag - ] swap cpu-f-bitand  ]               ]]
     [[ "EI"          [ [ interrupt-flag ] swap cpu-f-bitor  ]  ]]  
     [[ "POP-RR"     [ [ pop-sp ] keep $2 ] ]]
