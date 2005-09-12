@@ -14,7 +14,7 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : find-slider [ slider? ] find-parent ;
 
-: thumb-min { 12 12 0 } ;
+: thumb-min @{ 12 12 0 }@ ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
@@ -61,7 +61,7 @@ SYMBOL: slider-changed
 
 : elevator-theme ( elevator -- )
     dup << solid f >> interior set-paint-prop
-    { 128 128 128 } background set-paint-prop ;
+    @{ 128 128 128 }@ background set-paint-prop ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
@@ -105,12 +105,12 @@ M: elevator pref-dim drop thumb-min ;
 : <up-button>
     <gadget> [ -1 swap slide-by-line ] <repeat-button> ;
 
-: add-up { 1 1 1 } over slider-vector v- first2 set-frame-child ;
+: add-up @{ 1 1 1 }@ over slider-vector v- first2 set-frame-child ;
 
 : <down-button>
     <gadget> [ 1 swap slide-by-line ] <repeat-button> ;
 
-: add-down { 1 1 1 } over slider-vector v+ first2 set-frame-child ;
+: add-down @{ 1 1 1 }@ over slider-vector v+ first2 set-frame-child ;
 
 : add-elevator 2dup set-slider-elevator add-center ;
 
@@ -127,6 +127,6 @@ C: slider ( vector -- slider )
     <down-button> over add-down
     <thumb> over add-thumb ;
 
-: <x-slider> ( -- slider ) { 1 0 0 } <slider> ;
+: <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;
 
-: <y-slider> ( -- slider ) { 0 1 0 } <slider> ;
+: <y-slider> ( -- slider ) @{ 0 1 0 }@ <slider> ;

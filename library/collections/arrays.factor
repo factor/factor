@@ -1,22 +1,20 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 
-! An array is a range of memory storing pointers to other
-! objects. Arrays are not used directly, and their access words
-! are not bounds checked. Examples of abstractions built on
-! arrays include vectors, hashtables, and tuples.
+IN: kernel-internals
+USING: kernel math math-internals sequences sequences-internals ;
 
-! These words are unsafe. I'd say "do not call them", but that
-! Java-esque. By all means, do use arrays if you need something
-! low-level... but be aware that vectors are usually a better
-! choice.
+: array= ( seq seq -- ? )
+    #! This is really only used to compare tuples.
+    over array-capacity over array-capacity number= [
+        dup array-capacity [
+            >r 2dup r> tuck swap array-nth >r swap array-nth r> =
+        ] all? 2nip
+    ] [
+        2drop f
+    ] ifte ; flushable
 
-IN: sequences-internals
-USING: kernel kernel-internals math-internals sequences ;
-
-: array-capacity ( a -- n ) 1 slot ; inline
-: array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
-: set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
+IN: arrays
 
 M: array clone (clone) ;
 M: array length array-capacity ;
@@ -26,15 +24,27 @@ M: array nth-unsafe array-nth ;
 M: array set-nth-unsafe set-array-nth ;
 M: array resize resize-array ;
 
+: >array ( seq -- array )
+    [ length <array> 0 over ] keep copy-into ; inline
+
+M: array like drop dup array? [ >array ] unless ;
+
 M: byte-array clone (clone) ;
 M: byte-array length array-capacity ;
 M: byte-array resize resize-array ;
 
-IN: kernel-internals
+: 1array ( x -- { x } )
+    1 <array> [ 0 swap set-array-nth ] keep ; flushable
 
-: make-tuple ( class size -- tuple )
-    #! Internal allocation function. Do not call it directly,
-    #! since you can fool the runtime and corrupt memory by
-    #! specifying an incorrect size. Note that this word is also
-    #! handled specially by the compiler's type inferencer.
-    <tuple> [ 2 set-slot ] keep ; flushable
+: 2array ( x y -- @{ x y }@ )
+    2 <array>
+    [ 1 swap set-array-nth ] keep
+    [ 0 swap set-array-nth ] keep ; flushable
+
+: 3array ( x y z -- @{ x y z }@ )
+    3 <array>
+    [ 2 swap set-array-nth ] keep
+    [ 1 swap set-array-nth ] keep
+    [ 0 swap set-array-nth ] keep ; flushable
+
+: zero-array ( n -- array ) 0 <repeated> >array ;

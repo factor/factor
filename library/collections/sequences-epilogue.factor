@@ -127,7 +127,8 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! An example illustrates this word best:
     #! { { 1 2 3 } { 4 5 6 } } ==> { { 1 4 } { 2 5 } { 3 6 } }
     dup empty? [
-        dup first length [ swap [ nth ] map-with ] map-with
+        dup first [ length ] keep like
+        [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
 
 : max-length ( seq -- n )

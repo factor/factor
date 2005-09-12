@@ -1,18 +1,15 @@
 IN: temporary
-USING: kernel lists math sequences sorting-internals strings
+USING: kernel lists math sequences sequences-internals strings
 test vectors ;
 
 [ { 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
-[ { 4 3 2 1 } ] [ 4 0 <range> >vector ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
 [ { 2 3 } ] [ 1 3 { 1 2 3 4 } <slice> >vector ] unit-test
 [ { 4 5 } ] [ 2 { 1 2 3 4 5 } tail-slice* >vector ] unit-test
 [ { 3 4 } ] [ 2 4 1 10 <range> subseq >vector ] unit-test
 [ { 3 4 } ] [ 0 2 2 4 1 10 <range> <slice> subseq >vector ] unit-test
 [ "cba" ] [ 3 "abcdef" head-slice reverse ] unit-test
-
-[ 1 2 3 ] [ 1 2 3 3vector first3 ] unit-test
 
 [ 5040 ] [ [ 1 2 3 4 5 6 7 ] 1 [ * ] reduce ] unit-test
 
@@ -60,15 +57,12 @@ unit-test
 
 [ "" ] [ { } "" join ] unit-test
 
-[ { 1 2 }   ] [ 1 2   2vector ] unit-test
-[ { 1 2 3 } ] [ 1 2 3 3vector ] unit-test
-
 [ { } ] [ { } flip ] unit-test
 
-[ { "b" "e" } ] [ 1 { { "a" "b" "c" } { "d" "e" "f" } } flip nth ] unit-test
+[ @{ "b" "e" }@ ] [ 1 @{ @{ "a" "b" "c" }@ @{ "d" "e" "f" }@ }@ flip nth ] unit-test
 
-[ { { 1 4 } { 2 5 } { 3 6 } } ]
-[ { { 1 2 3 } { 4 5 6 } } flip ] unit-test
+[ @{ @{ 1 4 }@ @{ 2 5 }@ @{ 3 6 }@ }@ ]
+[ @{ @{ 1 2 3 }@ @{ 4 5 6 }@ }@ flip ] unit-test
 
 [ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
@@ -155,3 +149,7 @@ unit-test
         1000 [ drop 0 1000 random-int ] map number-sort [ <= ] monotonic?
     ] all?
 ] unit-test
+
+[ @{ "" "a" "aa" "aaa" }@ ]
+[ 4 [ CHAR: a fill ] map ]
+unit-test

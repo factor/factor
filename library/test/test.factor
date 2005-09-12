@@ -1,8 +1,8 @@
 ! Factor test suite.
 
 IN: test
-USING: errors kernel lists math memory namespaces parser
-prettyprint sequences io strings vectors words ;
+USING: arrays errors kernel lists math memory namespaces parser
+prettyprint sequences io strings words ;
 
 TUPLE: assert got expect ;
 
@@ -15,7 +15,7 @@ M: assert error.
     2dup = [ 2drop ] [ <assert> throw ] ifte ;
 
 : print-test ( input output -- )
-    "--> " write 2vector . flush ;
+    "--> " write 2array . flush ;
 
 : time ( code -- )
     #! Evaluates the given code and prints the time taken to
@@ -74,22 +74,26 @@ SYMBOL: failures
 : tests
     {
         "lists/cons" "lists/lists" "lists/assoc"
-        "lists/namespaces" "lists/queues"
+        "lists/namespaces"
         "combinators"
-        "continuations" "errors" "hashtables" "strings"
-        "namespaces" "generic" "tuple" "files" "parser"
+        "continuations" "errors"
+        "collections/hashtables" "collections/sbuf"
+        "collections/strings" "collections/namespaces"
+        "collections/vectors" "collections/sequences"
+        "collections/queues"
+        "generic" "tuple" "files" "parser"
         "parse-number" "init" "io/io"
-        "vectors" "words" "prettyprint" "random"
+        "words" "prettyprint" "random"
         "stream" "math/bitops"
         "math/math-combinators" "math/rational" "math/float"
         "math/complex" "math/irrational" "math/integer"
         "math/matrices"
         "httpd/url-encoding" "httpd/html" "httpd/httpd"
-        "httpd/http-client" "sbuf" "threads" "parsing-word"
+        "httpd/http-client" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
         "gadgets/gradients" "gadgets/frames" "memory"
-        "redefine" "annotate" "sequences" "binary" "inspector"
+        "redefine" "annotate" "binary" "inspector"
         "kernel"
     } run-tests ;
 

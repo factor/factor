@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: assembler compiler-backend generic hashtables inference
-kernel kernel-internals lists math math-internals namespaces
-sequences vectors words ;
+USING: arrays assembler compiler-backend generic hashtables
+inference kernel kernel-internals lists math math-internals
+namespaces sequences words ;
 
 : node-peek ( node -- value ) node-in-d peek ;
 
@@ -89,7 +89,7 @@ sequences vectors words ;
 
 : value/vreg-list ( in -- list )
     [ 0 swap length 1 - ] keep
-    [ >r 2dup r> 3vector >r 1 - >r 1 + r> r> ] map 2nip ;
+    [ >r 2dup r> 3array >r 1 - >r 1 + r> r> ] map 2nip ;
 
 : values>vregs ( in -- in )
     value/vreg-list

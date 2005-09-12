@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: memory
-USING: errors generic hashtables io kernel kernel-internals
-lists math namespaces parser prettyprint sequences
-sequences-internals strings unparser vectors words ;
+USING: arrays errors generic hashtables io kernel
+kernel-internals lists math namespaces parser prettyprint
+sequences strings unparser vectors words ;
 
 : generations 15 getenv ;
 
@@ -83,7 +83,7 @@ M: object each-slot ( obj quot -- )
 
 : heap-stats ( -- counts sizes )
     #! Return a list of instance count/total size pairs.
-    num-types zero-vector num-types zero-vector
+    num-types zero-array num-types zero-array
     [ >r 2dup r> heap-stat-step ] each-object ;
 
 : heap-stat. ( type instances bytes -- )

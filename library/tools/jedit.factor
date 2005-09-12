@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: errors io kernel lists math namespaces parser prettyprint
-sequences strings unparser vectors words ;
+USING: arrays errors io kernel lists math namespaces parser
+prettyprint sequences strings unparser words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -34,11 +34,11 @@ sequences strings unparser vectors words ;
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
-    number>string "+line:" swap append 2vector
+    number>string "+line:" swap append 2array
     make-jedit-request send-jedit-request ;
 
 : jedit-file ( file -- )
-    1vector make-jedit-request send-jedit-request ;
+    1array make-jedit-request send-jedit-request ;
 
 : jedit ( word -- )
     #! Note that line numbers here start from 1

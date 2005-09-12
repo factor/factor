@@ -104,9 +104,9 @@ void primitive_ifte(void)
 
 void primitive_dispatch(void)
 {
-	F_VECTOR *v = (F_VECTOR*)UNTAG(dpop());
+	F_ARRAY *a = untag_array_fast(dpop());
 	F_FIXNUM n = untag_fixnum_fast(dpop());
-	call(get(AREF(untag_array_fast(v->array),n)));
+	call(get(AREF(a,n)));
 }
 
 void primitive_getenv(void)

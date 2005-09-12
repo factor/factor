@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien hashtables io kernel lists namespaces sdl sequences
-styles vectors ;
+USING: alien arrays hashtables io kernel lists namespaces sdl
+sequences styles ;
 
 : ttf-name ( font style -- name )
     cons {{
@@ -29,7 +29,7 @@ styles vectors ;
 SYMBOL: open-fonts
 
 : lookup-font ( font style ptsize -- font )
-    3vector open-fonts get [ open-font ] cache ;
+    3array open-fonts get [ open-font ] cache ;
 
 global [ open-fonts nest drop ] bind
 

@@ -122,8 +122,8 @@ TUPLE: gradient vector from to ;
     dup first [ 3dup gradient-y ] repeat 2drop ;
 
 M: gradient draw-interior ( gadget gradient -- )
-    swap rect-dim { 1 1 1 } vmax
-    over gradient-vector { 1 0 0 } =
+    swap rect-dim @{ 1 1 1 }@ vmax
+    over gradient-vector @{ 1 0 0 }@ =
     [ horiz-gradient ] [ vert-gradient ] ifte ;
 
 ! Bevel pen
@@ -154,7 +154,7 @@ M: bevel draw-boundary ( gadget boundary -- )
     #! Ugly code.
     bevel-width [
         >r origin get over rect-dim over v+ r>
-        { 1 1 0 } n*v tuck v- { 1 1 0 } v- >r v+ r>
+        @{ 1 1 0 }@ n*v tuck v- @{ 1 1 0 }@ v- >r v+ r>
         rot draw-bevel
     ] each-with ;
 

@@ -12,13 +12,13 @@ C: border ( child delegate size -- border )
     [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
-    <gadget> { 5 5 0 } <border> ;
+    <gadget> @{ 5 5 0 }@ <border> ;
 
 : line-border ( child -- border )
-    <etched-gadget> { 5 5 0 } <border> ;
+    <etched-gadget> @{ 5 5 0 }@ <border> ;
 
 : bevel-border ( child -- border )
-    <bevel-gadget> { 5 5 0 } <border> ;
+    <bevel-gadget> @{ 5 5 0 }@ <border> ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;

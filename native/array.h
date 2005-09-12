@@ -9,6 +9,12 @@ INLINE F_ARRAY* untag_array_fast(CELL tagged)
 	return (F_ARRAY*)UNTAG(tagged);
 }
 
+INLINE F_ARRAY* untag_array(CELL tagged)
+{
+	type_check(ARRAY_TYPE,tagged);
+	return untag_array_fast(tagged);
+}
+
 INLINE F_ARRAY* untag_byte_array_fast(CELL tagged)
 {
 	return (F_ARRAY*)UNTAG(tagged);
@@ -28,6 +34,8 @@ void primitive_byte_array(void);
 
 F_ARRAY* resize_array(F_ARRAY* array, CELL capacity, CELL fill);
 void primitive_resize_array(void);
+void primitive_array_to_tuple(void);
+void primitive_tuple_to_array(void);
 
 #define AREF(array,index) ((CELL)(array) + sizeof(F_ARRAY) + (index) * CELLS)
 

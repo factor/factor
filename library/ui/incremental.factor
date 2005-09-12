@@ -16,7 +16,7 @@ TUPLE: incremental cursor ;
 
 C: incremental ( pack -- incremental )
     [ set-delegate ] keep
-    { 0 0 0 } over set-incremental-cursor ;
+    @{ 0 0 0 }@ over set-incremental-cursor ;
 
 M: incremental pref-dim incremental-cursor ;
 
@@ -47,5 +47,5 @@ M: incremental layout* drop ;
 
 : clear-incremental ( incremental -- )
     dup (clear-gadget)
-    { 0 0 0 } over set-incremental-cursor
+    @{ 0 0 0 }@ over set-incremental-cursor
     gadget-parent [ relayout ] when* ;

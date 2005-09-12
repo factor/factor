@@ -30,7 +30,7 @@ lists math namespaces sdl sequences sequences styles threads ;
     [ [ action ] swap handle-gesture ] when drop ;
 
 : button-theme ( button -- )
-    dup { 216 216 216 } background set-paint-prop
+    dup @{ 216 216 216 }@ background set-paint-prop
     dup f reverse-video set-paint-prop
     << solid >> interior set-paint-prop ;
 

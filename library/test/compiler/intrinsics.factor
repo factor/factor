@@ -1,5 +1,5 @@
 IN: temporary
-USING: compiler kernel kernel-internals lists math
+USING: arrays compiler kernel kernel-internals lists math
 math-internals sequences test words ;
 
 ! Make sure that intrinsic ops compile to correct code.

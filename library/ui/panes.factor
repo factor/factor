@@ -4,10 +4,10 @@ IN: gadgets-presentations
 DEFER: <presentation>
 
 IN: gadgets-panes
-USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
-gadgets-scrolling generic hashtables io kernel line-editor lists
-math namespaces prettyprint sequences strings styles threads
-vectors ;
+USING: arrays gadgets gadgets-editors gadgets-labels
+gadgets-layouts gadgets-scrolling generic hashtables io kernel
+line-editor lists math namespaces prettyprint sequences strings
+styles threads ;
 
 ! A pane is an area that can display text.
 
@@ -21,7 +21,7 @@ TUPLE: pane output active current input continuation ;
 : add-input 2dup set-pane-input add-gadget ;
 
 : <active-line> ( input current -- line )
-    2vector <shelf> [ add-gadgets ] keep ;
+    2array <shelf> [ add-gadgets ] keep ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent

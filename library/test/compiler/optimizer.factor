@@ -1,7 +1,7 @@
 IN: temporary
-USING: assembler compiler compiler-backend generic inference
-kernel kernel-internals lists math optimizer prettyprint
-sequences strings test vectors words ;
+USING: arrays assembler compiler compiler-backend generic
+inference kernel kernel-internals lists math optimizer
+prettyprint sequences strings test vectors words ;
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -91,8 +91,8 @@ sequences strings test vectors words ;
 ! Test method inlining
 [ string ] [
     \ string
-    [ repeated integer string mirror array reversed sbuf
-    slice vector diagonal general-list ]
+    [ repeated integer string array reversed sbuf
+    slice vector general-list ]
     min-class
 ] unit-test
 

@@ -3,8 +3,8 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: generic kernel lists namespaces parser sequences syntax
-words ;
+USING: arrays generic kernel lists namespaces parser sequences
+syntax words ;
 
 : GENERIC:
     #! GENERIC: bar == G: bar simple-combination ;
@@ -51,4 +51,4 @@ words ;
 
 ! Tuples.
 : << f ; parsing
-: >> reverse literal-tuple swons ; parsing
+: >> reverse >array array>tuple swons ; parsing

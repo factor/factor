@@ -1,11 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: math
-USING: generic kernel sequences vectors ;
+USING: arrays generic kernel sequences ;
 
 ! Vectors
-: zero-vector ( n -- vector ) 0 <repeated> >vector ;
-
 : vneg ( v -- v ) [ neg ] map ;
 
 : n*v ( n v -- v ) [ * ] map-with ;
@@ -53,27 +51,16 @@ USING: generic kernel sequences vectors ;
     #! Cross product of two 3-dimensional vectors.
     [ 1 2 cross-minor ] 2keep
     [ 2 0 cross-minor ] 2keep
-    0 1 cross-minor 3vector ;
+    0 1 cross-minor 3array ;
 
 ! Matrices
 
-! A diagonal of a matrix stored as a sequence of rows.
-TUPLE: diagonal index ;
-
-C: diagonal ( seq -- diagonal ) [ set-delegate ] keep ;
-
-: diagonal@ ( n diag -- n vec ) dupd delegate nth ;
-
-M: diagonal nth ( n diag -- elt ) diagonal@ nth ;
-
-M: diagonal set-nth ( elt n diag -- ) diagonal@ set-nth ;
-
 : zero-matrix ( m n -- matrix )
-    swap [ drop zero-vector ] map-with ;
+    swap [ drop zero-array ] map-with ;
 
 : identity-matrix ( n -- matrix )
     #! Make a nxn identity matrix.
-    dup zero-matrix dup <diagonal> [ drop 1 ] nmap ;
+    dup [ swap [ = 1 0 ? ] map-with ] map-with ;
 
 ! Matrix operations
 : mneg ( m -- m ) [ vneg ] map ;
@@ -99,5 +86,3 @@ M: diagonal set-nth ( elt n diag -- ) diagonal@ set-nth ;
 : v.m ( v m -- v ) flip [ v. ] map-with ;
 : m.v ( m v -- v ) swap [ v. ] map-with ;
 : m.  ( m m -- m ) flip swap [ m.v ] map-with ;
-
-: trace ( matrix -- tr ) <diagonal> product ;

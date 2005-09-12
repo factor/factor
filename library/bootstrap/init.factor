@@ -10,7 +10,6 @@ namespaces parser threads words ;
     init-threads
     init-io
     "HOME" os-env [ "." ] unless* "~" set
-    init-search-path
     init-assembler
     init-error-handler
     default-cli-args

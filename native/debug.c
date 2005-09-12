@@ -64,7 +64,7 @@ void print_obj(CELL obj)
 		fprintf(stderr,"f");
 		break;
 	case TUPLE_TYPE:
-		array = untag_array_fast(obj);
+		array = (F_ARRAY*)UNTAG(obj);
 		fprintf(stderr,"<< ");
 		print_word(untag_word(get(AREF(array,0))));
 		fprintf(stderr," %lx >>",obj);

@@ -78,6 +78,8 @@ INLINE CELL align8(CELL a)
 /* Canonical T object. It's just a word */
 CELL T;
 
+#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
+
 INLINE bool headerp(CELL cell)
 {
 	return (cell != F
@@ -144,6 +146,7 @@ void primitive_integer_slot(void);
 void primitive_set_integer_slot(void);
 void primitive_address(void);
 void primitive_size(void);
+CELL clone(CELL obj);
 void primitive_clone(void);
 void primitive_begin_scan(void);
 void primitive_next_object(void);

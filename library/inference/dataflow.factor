@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: generic interpreter kernel lists namespaces parser
-sequences vectors words ;
+USING: arrays generic interpreter kernel lists namespaces parser
+sequences words ;
 
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
@@ -152,7 +152,7 @@ SYMBOL: current-node
     current-node get    current-node off ;
 
 : unnest-node ( new-node dataflow current -- new-node )
-    >r >r dataflow-graph get 1vector over set-node-children
+    >r >r dataflow-graph get 1array over set-node-children
     r> dataflow-graph set
     r> current-node set ;
 

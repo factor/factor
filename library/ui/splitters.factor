@@ -1,12 +1,12 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-splitters
-USING: gadgets gadgets-layouts generic kernel lists math
-namespaces sequences styles vectors ;
+USING: arrays gadgets gadgets-layouts generic kernel lists math
+namespaces sequences styles ;
 
 TUPLE: divider splitter ;
 
-: divider-size { 8 8 0 } ;
+: divider-size @{ 8 8 0 }@ ;
 
 M: divider pref-dim drop divider-size ;
 
@@ -17,7 +17,7 @@ TUPLE: splitter split ;
 
 : divider-motion ( splitter -- )
     dup hand>split
-    over rect-dim { 1 1 1 } vmax v/ over pack-vector v.
+    over rect-dim @{ 1 1 1 }@ vmax v/ over pack-vector v.
     0 max 1 min over set-splitter-split relayout ;
 
 : divider-actions ( thumb -- )
@@ -33,14 +33,14 @@ C: divider ( -- divider )
 C: splitter ( first second split vector -- splitter )
     [ >r <pack> r> set-delegate ] keep
     [ set-splitter-split ] keep
-    [ >r >r <divider> r> 3vector r> add-gadgets ] keep
+    [ >r >r <divider> r> 3array r> add-gadgets ] keep
     1 over set-pack-fill ;
 
 : <x-splitter> ( first second split -- splitter )
-    { 0 1 0 } <splitter> ;
+    @{ 0 1 0 }@ <splitter> ;
 
 : <y-splitter> ( first second split -- splitter )
-    { 1 0 0 } <splitter> ;
+    @{ 1 0 0 }@ <splitter> ;
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap rect-dim

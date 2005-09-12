@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-backend
-USING: errors generic hashtables kernel lists math namespaces
-parser sequences vectors words ;
+USING: arrays errors generic hashtables kernel lists math
+namespaces parser sequences words ;
 
 ! The linear IR is the second of the two intermediate
 ! representations used by Factor. It is basically a high-level
@@ -51,15 +51,15 @@ M: f basic-block? drop f ;
 
 : empty-vop f f f ;
 : label-vop ( label) >r f f r> ;
-: label/src-vop ( label src) 1vector swap f swap ;
-: src-vop ( src) 1vector f f ;
-: dest-vop ( dest) 1vector dup f ;
-: src/dest-vop ( src dest) >r 1vector r> 1vector f ;
-: 2-in-vop ( in1 in2) 2vector f f ;
-: 3-in-vop ( in1 in2 in3) 3vector f f ;
-: 2-in/label-vop ( in1 in2 label) >r 2vector f r> ;
-: 2-vop ( in dest) [ 2vector ] keep 1vector f ;
-: 3-vop ( in1 in2 dest) >r 2vector r> 1vector f ;
+: label/src-vop ( label src) 1array swap f swap ;
+: src-vop ( src) 1array f f ;
+: dest-vop ( dest) 1array dup f ;
+: src/dest-vop ( src dest) >r 1array r> 1array f ;
+: 2-in-vop ( in1 in2) 2array f f ;
+: 3-in-vop ( in1 in2 in3) 3array f f ;
+: 2-in/label-vop ( in1 in2 label) >r 2array f r> ;
+: 2-vop ( in dest) [ 2array ] keep 1array f ;
+: 3-vop ( in1 in2 dest) >r 2array r> 1array f ;
 
 ! miscellanea
 TUPLE: %prologue ;
@@ -201,7 +201,7 @@ C: %set-slot make-vop ;
 
 : %set-slot ( value obj n )
     #! %set-slot writes to vreg obj.
-    rot <vreg> rot <vreg> rot <vreg> over >r 3vector r> 1vector
+    rot <vreg> rot <vreg> rot <vreg> over >r 3array r> 1array
     f <%set-slot> ;
 
 M: %set-slot basic-block? drop t ;
@@ -218,7 +218,7 @@ TUPLE: %fast-set-slot ;
 C: %fast-set-slot make-vop ;
 : %fast-set-slot ( value obj n )
     #! %fast-set-slot writes to vreg obj.
-    >r >r <vreg> r> <vreg> r> over >r 3vector r> 1vector f
+    >r >r <vreg> r> <vreg> r> over >r 3array r> 1array f
     <%fast-set-slot> ;
 M: %fast-set-slot basic-block? drop t ;
 

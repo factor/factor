@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences-internals
-USING: generic kernel kernel-internals math vectors ;
+USING: arrays generic kernel kernel-internals math vectors ;
 
 : (map) ( quot seq i -- quot seq value )
     pick pick >r >r swap nth-unsafe swap call r> r> rot ; inline
@@ -40,11 +40,11 @@ G: find ( seq quot -- i elt | quot: elt -- ? )
     swap [ with rot ] find 2swap 2drop ; inline
 
 : collect ( n generator -- vector | quot: n -- value )
-    #! Primitive mapping out of an integer sequence into a
-    #! vector. Used by map and 2map. Don't call, use map
+    #! Primitive mapping out of an integer sequence into an
+    #! array. Used by map and 2map. Don't call, use map
     #! instead.
-    >r [ empty-vector ] keep r> swap [
-        [ rot >r [ swap call ] keep r> set-nth-unsafe ] 3keep
+    >r [ <array> ] keep r> swap [
+        [ rot >r [ swap call ] keep r> set-array-nth ] 3keep
     ] repeat drop ; inline
 
 G: map [ over ] standard-combination ; inline

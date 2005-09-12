@@ -1,5 +1,5 @@
 IN: compiler-backend
-USING: hashtables kernel lists math namespaces sequences vectors ;
+USING: arrays hashtables kernel lists math namespaces sequences ;
 
 : (split-blocks) ( n linear -- )
     2dup length = [
@@ -153,7 +153,7 @@ M: %indirect trim-dead* ( tail vop -- ) ?dead-literal ;
         0 r-height set
         {{ }} clone vreg-contents set
         dup simplify-stack
-        d-height get %inc-d r-height get %inc-r 2vector append
+        d-height get %inc-d r-height get %inc-r 2array append
         trim-dead
     ] { } make ;
 

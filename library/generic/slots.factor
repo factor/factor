@@ -4,8 +4,8 @@
 ! Some code for defining slot accessors and mutators. Used to
 ! implement tuples, as well as builtin types.
 IN: generic
-USING: kernel kernel-internals lists math namespaces parser
-sequences strings vectors words ;
+USING: arrays kernel kernel-internals lists math namespaces
+parser sequences strings words ;
 
 : define-typecheck ( class generic def -- )
     #! Just like:
@@ -33,7 +33,7 @@ sequences strings vectors words ;
     dup [ first2 create ] when ;
 
 : intern-slots ( spec -- spec )
-    [ first3 swap ?create swap ?create 3vector ] map ;
+    [ first3 swap ?create swap ?create 3array ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the
@@ -43,11 +43,11 @@ sequences strings vectors words ;
     [ first3 define-slot ] each-with ;
 
 : reader-word ( class name -- word )
-    >r word-name "-" r> append3 "in" get 2vector ;
+    >r word-name "-" r> append3 "in" get 2array ;
 
 : writer-word ( class name -- word )
     [ swap "set-" % word-name % "-" % % ] "" make
-    "in" get 2vector ;
+    "in" get 2array ;
 
 : simple-slot ( class name -- reader writer )
     [ reader-word ] 2keep writer-word ;
@@ -58,5 +58,5 @@ sequences strings vectors words ;
     #! set-<class>-<slot>. Slot numbering is consecutive and
     #! begins at base.
     over length [ + ] map-with
-    [ >r dupd simple-slot r> -rot 3vector ] 2map nip
+    [ >r dupd simple-slot r> -rot 3array ] 2map nip
     intern-slots ;

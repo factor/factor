@@ -72,32 +72,6 @@ words ;
     dup r> tuple-slots
     default-constructor ;
 
-! A sequence of all slots in a tuple, used for equality testing.
-TUPLE: mirror tuple ;
-
-C: mirror ( tuple -- mirror )
-    over tuple? [ "Not a tuple" throw ] unless
-    [ set-mirror-tuple ] keep ;
-
-M: mirror nth-unsafe ( n mirror -- elt )
-    mirror-tuple array-nth ;
-
-M: mirror nth ( n mirror -- elt )
-    bounds-check nth-unsafe ;
-
-M: mirror set-nth-unsafe ( n mirror -- elt )
-    mirror-tuple set-array-nth ;
-
-M: mirror set-nth ( n mirror -- elt )
-    bounds-check set-nth-unsafe ;
-
-M: mirror length ( mirror -- len )
-    mirror-tuple array-capacity ;
-
-: literal-tuple ( seq -- tuple )
-    dup first "tuple-size" word-prop <tuple>
-    [ <mirror> 0 swap rot copy-into ] keep ;
-
 M: tuple clone ( tuple -- tuple )
     #! Clone a tuple and its delegate.
     (clone) dup delegate clone over set-delegate ;
@@ -115,11 +89,7 @@ M: tuple = ( obj tuple -- ? )
     2dup eq? [
         2drop t
     ] [
-        over tuple? [
-            swap <mirror> swap <mirror> sequence=
-        ] [
-            2drop f
-        ] ifte
+        over tuple? [ array= ] [ 2drop f ] ifte
     ] ifte ;
 
 tuple [ 2drop f ] "class<" set-word-prop

@@ -1,8 +1,8 @@
 IN: inference
-USING: alien assembler errors generic hashtables interpreter io
-io-internals kernel kernel-internals lists math math-internals
-memory parser sequences sequences-internals strings vectors
-words prettyprint ;
+USING: arrays alien assembler errors generic hashtables
+interpreter io io-internals kernel kernel-internals lists math
+math-internals memory parser sequences strings vectors words
+prettyprint ;
 
 ! We transform calls to these words into 'branched' forms;
 ! eg, there is no VOP for fixnum<=, only fixnum<= followed
@@ -56,7 +56,7 @@ words prettyprint ;
 \ ifte [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
 
 \ ifte [
-    2 #drop node, pop-d pop-d swap 2vector
+    2 #drop node, pop-d pop-d swap 2array
     #ifte pop-d drop infer-branches
 ] "infer" set-word-prop
 
@@ -501,3 +501,12 @@ words prettyprint ;
 
 \ (clone) [ [ object ] [ object ] ] "infer-effect" set-word-prop
 \ (clone) t "flushable" set-word-prop
+
+\ array>tuple [ [ array ] [ tuple ] ] "infer-effect" set-word-prop
+\ array>tuple t "flushable" set-word-prop
+
+\ tuple>array [ [ tuple ] [ array ] ] "infer-effect" set-word-prop
+\ tuple>array t "flushable" set-word-prop
+
+\ array>vector [ [ array ] [ vector ] ] "infer-effect" set-word-prop
+\ array>vector t "flushable" set-word-prop

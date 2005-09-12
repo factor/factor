@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: alien generic hashtables io kernel lists math namespaces
-parser sequences strings styles vectors words ;
+USING: alien arrays generic hashtables io kernel lists math
+namespaces parser sequences strings styles vectors words ;
 
 ! State
 SYMBOL: column
@@ -155,7 +155,7 @@ M: block pprint-section* ( block -- )
 : end-blocks ( -- ) last-block? [ (block>) end-blocks ] unless ;
 
 C: pprinter ( -- stream )
-    <block> 1vector over set-pprinter-stack ;
+    <block> 1 <vector> [ push ] keep over set-pprinter-stack ;
 
 : do-pprint ( pprinter -- )
     [
@@ -226,6 +226,7 @@ M: string pprint* ( str -- str ) "\"" pprint-string ;
 M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 
 M: word pprint* ( word -- )
+    dup interned? [ "( uninterned )" f text ] unless
     dup "pprint-before-hook" word-prop call
     dup pprint-word
     "pprint-after-hook" word-prop call ;
@@ -269,13 +270,16 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
     swap pprint* swap pprint-elements pprint* ;
 
 M: complex pprint* ( num -- )
-    >rect 2vector \ #{ \ }# pprint-sequence ;
+    >rect 2array \ #{ \ }# pprint-sequence ;
 
 M: cons pprint* ( list -- )
    [
-       dup list? [ \ [ \ ] ] [ uncons 2vector \ [[ \ ]] ] ifte
+       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] ifte
        pprint-sequence
    ] check-recursion ;
+
+M: array pprint* ( vector -- )
+    [ \ @{ \ }@ pprint-sequence ] check-recursion ;
 
 M: vector pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
@@ -286,7 +290,7 @@ M: hashtable pprint* ( hashtable -- )
 M: tuple pprint* ( tuple -- )
     [
         \ << pprint*
-        <mirror> dup first pprint*
+        tuple>array dup first pprint*
         <block 1 swap tail-slice pprint-elements block>
         \ >> pprint*
     ] check-recursion ;
@@ -302,7 +306,7 @@ M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
         \ \ pprint-word wrapped pprint-word
     ] [
-        wrapped 1vector \ W[ \ ]W pprint-sequence
+        wrapped 1array \ W[ \ ]W pprint-sequence
     ] ifte ;
 
 : with-pprint ( quot -- )

@@ -1,6 +1,6 @@
 IN: temporary
 USING: errors kernel kernel-internals lists math namespaces
-random sequences strings test vectors ;
+random sequences sequences-internals strings test vectors ;
 
 [ ] [ 10 [ [ -1000000 <vector> ] [ drop ] catch ] times ] unit-test
 
@@ -50,10 +50,6 @@ random sequences strings test vectors ;
 
 [ f ] [ f concat ] unit-test
 [ { 1 2 3 4 } ] [ [ { 1 } [ 2 ] { 3 4 } ] concat ] unit-test
-
-[ { "" "a" "aa" "aaa" } ]
-[ 4 [ CHAR: a fill ] map ]
-unit-test
 
 [ { } ] [ 0 { } tail ] unit-test
 [ { } ] [ 2 { 1 2 } tail ] unit-test

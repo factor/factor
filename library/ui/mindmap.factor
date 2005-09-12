@@ -29,7 +29,7 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
 
 : mindmap-children ( seq left? right? -- gadget )
     rot [ >r 2dup r> mindmap-child ] map 2nip
-    <pile> { 0 5 0 } over set-pack-gap [ add-gadgets ] keep ;
+    <pile> @{ 0 5 0 }@ over set-pack-gap [ add-gadgets ] keep ;
 
 : (expand-left) ( node -- gadget )
     mindmap-node node-left t f mindmap-children
@@ -74,14 +74,14 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
 C: mindmap ( left? right? node -- gadget )
     <shelf> over set-delegate
     1/2 over set-pack-align
-    { 50 0 0 } over set-pack-gap
+    @{ 50 0 0 }@ over set-pack-gap
     [ set-mindmap-node ] keep
     [ set-mindmap-right? ] keep
     [ set-mindmap-left? ] keep
     dup collapse-mindmap ;
 
 : draw-arrows ( mindmap child point -- )
-    tuck >r >r >r mindmap-gadget r> { 1 1 1 } swap v-
+    tuck >r >r >r mindmap-gadget r> @{ 1 1 1 }@ swap v-
     gadget-point r> gadget-children r> swap
     [ swap gadget-point ] map-with gray draw-fanout ;
 

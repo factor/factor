@@ -3,7 +3,7 @@
 
 ! Bootstrapping trick; see doc/bootstrap.txt.
 IN: !syntax
-USING: alien errors generic hashtables kernel lists math
+USING: alien arrays errors generic hashtables kernel lists math
 namespaces parser sequences strings syntax vectors
 words ;
 
@@ -49,6 +49,10 @@ SYMBOL: t
 ! Conses (whose cdr might not be a list)
 : [[ f ; parsing
 : ]] first2 swons swons ; parsing
+
+! Arrays
+: @{ f ; parsing
+: }@ reverse >array swons ; parsing
 
 ! Vectors
 : { f ; parsing

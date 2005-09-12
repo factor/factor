@@ -12,12 +12,12 @@ C: book ( pages -- book )
     [ add-gadgets ] keep ;
 
 M: book pref-dim ( book -- dim )
-    gadget-children [ pref-dim ] map { 0 0 0 } [ vmax ] reduce ;
+    gadget-children [ pref-dim ] map @{ 0 0 0 }@ [ vmax ] reduce ;
 
 M: book layout* ( book -- )
     dup rect-dim over gadget-children [
         f over set-gadget-visible?
-        { 0 0 0 } over set-rect-loc
+        @{ 0 0 0 }@ over set-rect-loc
         set-gadget-dim
     ] each-with
     dup book-page swap gadget-children nth

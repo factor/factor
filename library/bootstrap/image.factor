@@ -189,7 +189,7 @@ M: cons ' ( c -- tagged )
 ( Strings )
 
 : emit-chars ( seq -- )
-    big-endian get [ [ reverse ] map ] unless
+    big-endian get [ [ reverse-slice ] map ] unless
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )
@@ -219,7 +219,7 @@ M: string ' ( string -- pointer )
     align-here r> ;
 
 M: tuple ' ( tuple -- pointer )
-    <mirror> tuple-type emit-array ;
+    tuple>array tuple-type emit-array ;
 
 M: vector ' ( vector -- pointer )
     dup array-type emit-array swap length
@@ -232,7 +232,7 @@ M: vector ' ( vector -- pointer )
 ( Hashes )
 
 M: hashtable ' ( hashtable -- pointer )
-    dup buckets>vector array-type emit-array
+    dup underlying array-type emit-array
     swap hash-size
     object-tag here-as >r
     hashtable-type >header emit
@@ -288,6 +288,7 @@ M: hashtable ' ( hashtable -- pointer )
         "Image length: " write image get length .
         "Object cache size: " write objects get hash-size .
         image get
+        \ word global remove-hash
     ] with-scope ;
 
 : make-image ( name -- )
@@ -295,7 +296,6 @@ M: hashtable ' ( hashtable -- pointer )
     [
         begin
         "/library/bootstrap/boot-stage1.factor" run-resource
-        namespace global [ "foobar" set ] bind
         end
     ] with-image
 

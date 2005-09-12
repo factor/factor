@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: vectors
-USING: errors generic kernel kernel-internals lists math
+USING: arrays errors generic kernel kernel-internals lists math
 math-internals sequences sequences-internals ;
 
 M: vector set-length ( len vec -- ) grow-length ;
@@ -28,18 +28,7 @@ M: vector clone ( vector -- vector ) clone-growable ;
 
 M: general-list like drop >list ;
 
-M: vector like drop dup vector? [ >vector ] unless ;
-
-: 1vector ( x -- { x } )
-    1 empty-vector [ 0 swap set-nth ] keep ; flushable
-
-: 2vector ( x y -- { x y } )
-    2 empty-vector
-    [ 1 swap set-nth ] keep
-    [ 0 swap set-nth ] keep ; flushable
-
-: 3vector ( x y z -- { x y z } )
-    3 empty-vector
-    [ 2 swap set-nth ] keep
-    [ 1 swap set-nth ] keep
-    [ 0 swap set-nth ] keep ; flushable
+M: vector like
+    drop dup vector? [
+        dup array? [ array>vector ] [ >vector ] ifte
+    ] unless ;

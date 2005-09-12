@@ -163,7 +163,8 @@ global [
 ] bind
 
 M: compound (uncrossref)
-    dup word-def \ alien-invoke swap member? [
+    dup word-def \ alien-invoke swap member?
+    over "infer" word-prop or [
         drop
     ] [
         dup { "infer-effect" "base-case" "no-effect" }

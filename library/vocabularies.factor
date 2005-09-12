@@ -75,13 +75,13 @@ SYMBOL: vocabularies
     #! Test if the word is a member of its vocabulary.
     dup word-name over word-vocabulary lookup eq? ;
 
-: init-search-path ( -- )
-    "scratchpad" "in" set
-    [
-        "compiler" "errors" "generic" "hashtables"
-        "help" "inference" "inspector" "interpreter" "io"
-        "jedit" "kernel" "listener" "lists" "math" "matrices"
-        "memory" "namespaces" "parser" "prettyprint" "queues"
-        "scratchpad" "sequences" "shells" "strings" "styles"
-        "syntax" "test" "threads" "vectors" "words"
-    ] "use" set ;
+"scratchpad" "in" set
+[
+    "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
+    "help" "inference" "inspector" "interpreter" "io"
+    "jedit" "kernel" "listener" "lists" "math"
+    "memory" "namespaces" "parser" "prettyprint" "queues"
+    "sequences" "shells" "strings" "styles"
+    "test" "threads" "vectors" "words"
+    "scratchpad"
+] "use" set

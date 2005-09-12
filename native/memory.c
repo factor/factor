@@ -100,8 +100,6 @@ void primitive_tag(void)
 	drepl(tag_fixnum(TAG(dpeek())));
 }
 
-#define SLOT(obj,slot) ((obj) + (slot) * CELLS)
-
 void primitive_slot(void)
 {
 	F_FIXNUM slot = untag_fixnum_fast(dpop());
@@ -143,14 +141,17 @@ void primitive_size(void)
 	drepl(tag_fixnum(object_size(dpeek())));
 }
 
-void primitive_clone(void)
+CELL clone(CELL obj)
 {
-	CELL obj = dpeek();
 	CELL size = object_size(obj);
 	CELL tag = TAG(obj);
 	void *new_obj = allot(size);
-	new_obj = RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
-	drepl(new_obj);
+	return RETAG(memcpy(new_obj,(void*)UNTAG(obj),size),tag);
+}
+
+void primitive_clone(void)
+{
+	drepl(clone(dpeek()));
 }
 
 void primitive_room(void)

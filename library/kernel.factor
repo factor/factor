@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-USING: generic kernel-internals vectors ;
+USING: generic kernel-internals math-internals vectors ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
@@ -111,3 +111,18 @@ M: wrapper = ( obj wrapper -- ? )
 
 : keep-datastack ( quot -- )
     datastack slip set-datastack drop ;
+
+IN: kernel-internals
+
+! These words are unsafe. Don't use them.
+
+: array-capacity ( a -- n ) 1 slot ; inline
+: array-nth ( n a -- obj ) swap 2 fixnum+ slot ; inline
+: set-array-nth ( obj n a -- ) swap 2 fixnum+ set-slot ; inline
+
+: make-tuple ( class size -- tuple )
+    #! Internal allocation function. Do not call it directly,
+    #! since you can fool the runtime and corrupt memory by
+    #! specifying an incorrect size. Note that this word is also
+    #! handled specially by the compiler's type inferencer.
+    <tuple> [ 2 set-slot ] keep ; flushable

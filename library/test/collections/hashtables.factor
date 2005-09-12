@@ -7,6 +7,7 @@ USE: namespaces
 USE: test
 USE: vectors
 USE: sequences
+USE: sequences-internals
 
 16 <hashtable> "testhash" set
 
@@ -63,7 +64,7 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 4 ] [
     "hey"
     {{ [[ "hey" 4 ]] [[ "whey" 5 ]] }} 2dup (hashcode)
-    swap buckets>vector nth assoc
+    swap underlying nth assoc
 ] unit-test
 
 ! Testing the hash element counting

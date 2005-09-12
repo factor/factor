@@ -1,17 +1,17 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
-USING: compiler gadgets gadgets-buttons gadgets-labels
+USING: arrays compiler gadgets gadgets-buttons gadgets-labels
 gadgets-menus gadgets-panes generic hashtables inference
 inspector io jedit kernel lists memory namespaces parser
-prettyprint sequences styles vectors words ;
+prettyprint sequences styles words ;
 
 SYMBOL: commands
 
 { } clone commands global set-hash
 
 : define-command ( class name quot -- )
-    3vector commands get push ;
+    3array commands get push ;
 
 : applicable ( object -- seq )
     commands get [ first call ] subset-with ;

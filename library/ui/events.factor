@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien gadgets-layouts generic kernel lists math
-namespaces sdl sequences vectors ;
+USING: arrays alien gadgets-layouts generic kernel lists math
+namespaces sdl sequences ;
 
 GENERIC: handle-event ( event -- )
 
@@ -14,7 +14,7 @@ M: quit-event handle-event ( event -- )
 
 M: resize-event handle-event ( event -- )
     dup resize-event-w swap resize-event-h
-    [ 0 3vector world get set-gadget-dim ] 2keep
+    [ 0 3array world get set-gadget-dim ] 2keep
     0 SDL_HWSURFACE SDL_RESIZABLE bitor init-screen
     world get relayout ;
 
@@ -30,7 +30,7 @@ M: button-up-event handle-event ( event -- )
     [ button-up ] button-gesture ;
 
 : motion-event-loc ( event -- loc )
-    dup motion-event-x swap motion-event-y 0 3vector ;
+    dup motion-event-x swap motion-event-y 0 3array ;
 
 M: motion-event handle-event ( event -- )
     motion-event-loc hand move-hand ;

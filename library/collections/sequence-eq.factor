@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sequences
-USING: kernel kernel-internals lists math sequences-internals
-strings vectors ;
+USING: arrays kernel lists math sequences-internals strings
+vectors ;
 
 ! Note that the sequence union does not include lists, or user
 ! defined tuples that respond to the sequence protocol.

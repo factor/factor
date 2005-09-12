@@ -74,8 +74,26 @@ void primitive_resize_array(void)
 	F_ARRAY* array;
 	CELL capacity = to_fixnum(dpeek2());
 	maybe_gc(array_size(capacity));
-	array = untag_array_fast(dpop());
+	array = untag_array(dpop());
 	drepl(tag_object(resize_array(array,capacity,F)));
+}
+
+void primitive_array_to_tuple(void)
+{
+	CELL array = dpeek();
+	type_check(ARRAY_TYPE,array);
+	array = clone(array);
+	put(SLOT(UNTAG(array),0),tag_header(TUPLE_TYPE));
+	drepl(array);
+}
+
+void primitive_tuple_to_array(void)
+{
+	CELL tuple = dpeek();
+	type_check(TUPLE_TYPE,tuple);
+	tuple = clone(tuple);
+	put(SLOT(UNTAG(tuple),0),tag_header(ARRAY_TYPE));
+	drepl(tuple);
 }
 
 void fixup_array(F_ARRAY* array)

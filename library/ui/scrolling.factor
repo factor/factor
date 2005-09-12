@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: gadgets gadgets-books gadgets-layouts generic kernel
-lists math namespaces sequences styles threads vectors ;
+USING: arrays gadgets gadgets-books gadgets-layouts generic kernel
+lists math namespaces sequences styles threads ;
 
 ! A viewport can be scrolled.
 TUPLE: viewport bottom? ;
@@ -13,7 +13,7 @@ TUPLE: scroller viewport x y ;
 : scroller-origin ( scroller -- { x y 0 } )
     dup scroller-x slider-value
     swap scroller-y slider-value
-    0 3vector ;
+    0 3array ;
 
 : find-scroller [ scroller? ] find-parent ;
 

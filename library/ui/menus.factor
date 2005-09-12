@@ -16,7 +16,7 @@ gadgets-labels generic kernel lists math namespaces sequences ;
 
 : fit-bounds ( loc dim max -- loc )
     #! Adjust loc to fit inside max.
-    swap v- { 0 0 0 } vmax vmin ;
+    swap v- @{ 0 0 0 }@ vmax vmin ;
 
 : menu-loc ( menu -- loc )
     hand rect-loc swap rect-dim world get rect-dim fit-bounds ;

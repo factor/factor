@@ -1,5 +1,5 @@
 IN: temporary
-USING: alien kernel kernel-internals namespaces test ;
+USING: arrays alien kernel kernel-internals namespaces test ;
 
 [ t ] [ 0 <alien> 0 <alien> = ] unit-test
 [ f ] [ 0 <alien> 1024 <alien> = ] unit-test

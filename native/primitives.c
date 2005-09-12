@@ -185,7 +185,10 @@ void* primitives[] = {
 	primitive_fclose,
 	primitive_expired,
 	primitive_wrapper,
-	primitive_clone
+	primitive_clone,
+	primitive_array_to_tuple,
+	primitive_tuple_to_array,
+	primitive_array_to_vector
 };
 
 CELL primitive_to_xt(CELL primitive)

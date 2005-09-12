@@ -6,13 +6,13 @@ sequences styles vectors ;
 
 SYMBOL: origin
 
-global [ { 0 0 0 } origin set ] bind
+@{ 0 0 0 }@ origin global set-hash
 
 TUPLE: rect loc dim ;
 
 M: vector rect-loc ;
 
-M: vector rect-dim drop { 0 0 0 } ;
+M: vector rect-dim drop @{ 0 0 0 }@ ;
 
 : rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 
@@ -23,7 +23,7 @@ M: vector rect-dim drop { 0 0 0 } ;
 
 : intersect ( rect rect -- rect )
     >r rect-extent r> rect-extent swapd vmin >r vmax dup r>
-    swap v- { 0 0 0 } vmax <rect> ;
+    swap v- @{ 0 0 0 }@ vmax <rect> ;
 
 : intersects? ( rect/point rect -- ? )
     >r rect-extent r> rect-extent swapd vmin >r vmax r> v-
@@ -40,7 +40,7 @@ M: gadget = eq? ;
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    { 0 0 0 } dup <rect> over set-delegate
+    @{ 0 0 0 }@ dup <rect> over set-delegate
     t over set-gadget-visible? ;
 
 GENERIC: user-input* ( ch gadget -- ? )

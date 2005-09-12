@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
-USING: generic hashtables inference kernel kernel-internals
-namespaces sequences vectors words ;
+USING: arrays generic hashtables inference kernel
+kernel-internals namespaces sequences words ;
 
 ! Infer possible classes of values in a dataflow IR.
 
@@ -106,7 +106,7 @@ M: node child-ties ( node -- seq )
     ] ifte ;
 
 \ make-tuple [
-    dup node-in-d first literal-value 1vector
+    dup node-in-d first literal-value 1array
 ] "output-classes" set-word-prop
 
 : output-classes ( node -- seq )
@@ -130,7 +130,7 @@ M: #shuffle infer-classes* ( node -- )
 
 M: #ifte child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>
-    swap f <literal-tie> 2vector ;
+    swap f <literal-tie> 2array ;
 
 M: #dispatch child-ties ( node -- seq )
     dup node-in-d first

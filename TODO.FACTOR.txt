@@ -1,6 +1,3 @@
-- mersenne 42 runs out of memory
-- uncrossref: don't clear infer-effect of words with an infer quotation
-
 + ui:
 
 - fix up the min thumb size hack
@@ -67,7 +64,7 @@
 - better handling of random arrangements of html words when
   prettyprinting
 - friendlier .factor-rc load error handling
-- reader syntax for arrays, byte arrays, displaced aliens
+- reader syntax for byte arrays, displaced aliens
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks
 - what about tasks and timers between image restarts
@@ -81,7 +78,6 @@
 - set-path: iterative
 - parse-command-line: no unswons of cli args
 - >c/c>: vector stack
-- word: when bootstrapping, 'word' var is not cleared
 - search: slow
 - investigate if rehashing on startup is really necessary
 - vectorize >n, n>, (get)
@@ -97,13 +93,6 @@
 - utf16, utf8 encoding
 - fix i/o on generic x86/ppc unix
 - if two tasks write to a unix stream, the buffer can overflow
-
-+ nice to have libraries:
-
-- regexps
-- XML
 - real Unicode support (strings are already 16 bits and can be extended
   to 21 if the need arises, but we need full character classification
   predicates, comparison, case conversion, sorting...)
-- full Win32 binding
-- Cairo binding

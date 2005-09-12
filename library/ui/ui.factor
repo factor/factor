@@ -7,11 +7,11 @@ styles threads words ;
 
 : world-theme
     {{
-        [[ background { 255 255 255 } ]]
-        [[ rollover-bg { 236 230 232 } ]]
-        [[ bevel-1 { 160 160 160 } ]]
-        [[ bevel-2 { 232 232 232 } ]]
-        [[ foreground { 0 0 0 } ]]
+        [[ background @{ 255 255 255 }@ ]]
+        [[ rollover-bg @{ 236 230 232 }@ ]]
+        [[ bevel-1 { 160 160 160 }@ ]]
+        [[ bevel-2 @{ 232 232 232 }@ ]]
+        [[ foreground @{ 0 0 0 }@ ]]
         [[ reverse-video f ]]
         [[ font "Monospaced" ]]
         [[ font-size 12 ]]
@@ -22,7 +22,7 @@ styles threads words ;
     ttf-init
     global [
         <world> world set
-        { 600 700 0 } world get set-gadget-dim
+        @{ 600 700 0 }@ world get set-gadget-dim
         
         world-theme world get set-gadget-paint
 

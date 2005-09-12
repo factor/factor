@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: hashtables
-USING: generic kernel lists math sequences vectors
+USING: arrays generic kernel lists math sequences vectors
 kernel-internals sequences-internals ;
 
 ! A hashtable is implemented as an array of buckets. The
@@ -101,9 +101,6 @@ IN: hashtables
 
 : hash-clear ( hash -- )
     0 over set-hash-size [ f -rot set-hash-bucket ] each-bucket ;
-
-: buckets>vector ( hash -- vector )
-    underlying >vector ;
 
 : alist>hash ( alist -- hash )
     dup length 1 max <hashtable> swap

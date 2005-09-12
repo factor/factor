@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-layouts
-USING: gadgets generic kernel lists math namespaces sequences
-vectors ;
+USING: arrays gadgets generic kernel lists math namespaces
+sequences ;
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
@@ -33,22 +33,22 @@ C: frame ( -- frame )
 : get-bottom ( frame -- gadget ) 1 2 frame-child ;
 
 : reduce-grid ( grid -- seq )
-    [ { 0 0 0 } [ vmax ] reduce ] map ;
+    [ @{ 0 0 0 }@ [ vmax ] reduce ] map ;
 
 : frame-pref-dim ( grid -- dim )
-    reduce-grid { 0 0 0 } [ v+ ] reduce ;
+    reduce-grid @{ 0 0 0 }@ [ v+ ] reduce ;
 
 : pref-dim-grid ( grid -- grid )
-    [ [ [ pref-dim ] [ { 0 0 0 } ] ifte* ] map ] map ;
+    [ [ [ pref-dim ] [ @{ 0 0 0 }@ ] ifte* ] map ] map ;
 
 M: frame pref-dim ( frame -- dim )
     frame-grid pref-dim-grid
     dup flip frame-pref-dim first
     swap frame-pref-dim second
-    0 3vector ;
+    0 3array ;
 
 : frame-layout ( horiz vert -- grid )
-    [ swap [ swap 0 3vector ] map-with ] map-with ;
+    [ swap [ swap 0 3array ] map-with ] map-with ;
 
 : do-grid ( dim-grid gadget-grid quot -- )
     -rot [

@@ -15,7 +15,7 @@ SYMBOL: callstack-display
 TUPLE: display title pane ;
 
 : display-title-theme
-    dup { 216 232 255 } background set-paint-prop
+    dup @{ 216 232 255 }@ background set-paint-prop
     << solid f >> interior set-paint-prop ;
 
 : <display-title> ( text -- label )

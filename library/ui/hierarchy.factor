@@ -22,7 +22,7 @@ namespaces sequences vectors ;
     dup (clear-gadget) relayout ;
 
 : ?push ( elt seq/f -- seq )
-    [ [ push ] keep ] [ 1vector ] ifte* ;
+    [ 1 <vector> ] unless* [ push ] keep ;
 
 : (add-gadget) ( gadget box -- )
     over unparent
@@ -58,12 +58,12 @@ namespaces sequences vectors ;
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents-up { 0 0 0 } [ rect-loc v+ ] reduce ;
+    parents-up @{ 0 0 0 }@ [ rect-loc v+ ] reduce ;
 
 : gadget-point ( gadget vector -- point )
-    #! { 0 0 0 } - top left corner
-    #! { 1/2 1/2 0 } - middle
-    #! { 1 1 0 } - bottom right corner
+    #! @{ 0 0 0 }@ - top left corner
+    #! @{ 1/2 1/2 0 }@ - middle
+    #! @{ 1 1 0 }@ - bottom right corner
     >r dup screen-loc swap rect-dim r> v* v+ ;
 
 : relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;

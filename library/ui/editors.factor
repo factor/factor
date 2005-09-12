@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
-USING: gadgets gadgets-labels gadgets-layouts gadgets-scrolling
-generic kernel math namespaces sdl sequences strings styles
-threads vectors ;
+USING: arrays gadgets gadgets-labels gadgets-layouts
+gadgets-scrolling generic kernel math namespaces sdl sequences
+strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;
@@ -57,7 +57,7 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    >vector [ ch>string size-string drop ] map-with
+    >array [ ch>string size-string drop ] map-with
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : x>offset ( x font str -- offset )
@@ -98,16 +98,16 @@ C: editor ( text -- )
 
 : caret-loc ( editor -- x y )
     dup editor-line [ caret get line-text get ] bind offset>x
-    0 0 3vector ;
+    0 0 3array ;
 
 : caret-dim ( editor -- w h )
-    rect-dim { 0 1 1 } v* { 1 0 0 } v+ ;
+    rect-dim @{ 0 1 1 }@ v* @{ 1 0 0 }@ v+ ;
 
 M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor  t ;
 
 M: editor pref-dim ( editor -- dim )
-    dup editor-text label-size { 1 0 0 } v+ ;
+    dup editor-text label-size @{ 1 0 0 }@ v+ ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim

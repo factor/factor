@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
-USING: errors generic hashtables inference kernel lists math
-math-internals sequences vectors words ;
+USING: arrays errors generic hashtables inference kernel lists
+math math-internals sequences words ;
 
 ! A system for associating dataflow optimizers with words.
 
@@ -48,7 +48,7 @@ math-internals sequences vectors words ;
     #! If a not is followed by an #ifte, flip branches and
     #! remove the note.
     dup flip-subst node-successor dup
-    dup node-children first2 swap 2vector swap set-node-children ;
+    dup node-children first2 swap 2array swap set-node-children ;
 
 \ not {
     { [ dup node-successor #ifte? ] [ flip-branches ] }

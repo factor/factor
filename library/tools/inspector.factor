@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: generic hashtables io kernel listener
+USING: arrays generic hashtables io kernel listener
 lists math memory namespaces prettyprint sequences
-sequences-internals strings styles test vectors words ;
+strings styles test vectors words ;
 
 GENERIC: sheet ( obj -- sheet )
 
@@ -11,15 +11,15 @@ M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
     [ second ] map
     tuck [ execute ] map-with
-    2vector ;
+    2array ;
 
-M: list sheet 1vector ;
+M: list sheet 1array ;
 
-M: vector sheet 1vector ;
+M: vector sheet 1array ;
 
-M: array sheet 1vector ;
+M: array sheet 1array ;
 
-M: hashtable sheet dup hash-keys swap hash-values 2vector ;
+M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
 : format-column ( list -- list )
     [ unparse-short ] map
@@ -27,7 +27,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2vector ;
     [ swap CHAR: \s pad-right ] map-with ;
 
 : sheet-numbers ( sheet -- sheet )
-    dup first length >vector 1vector swap append ;
+    dup first length >vector 1array swap append ;
 
 SYMBOL: inspector-slots
 

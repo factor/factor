@@ -26,7 +26,6 @@ sequences io vectors words ;
         "/library/kernel.factor"
 
         "/library/collections/sequences.factor"
-        "/library/collections/arrays.factor"
 
         "/library/math/math.factor"
         "/library/math/integer.factor"
@@ -40,6 +39,7 @@ sequences io vectors words ;
         "/library/collections/virtual-sequences.factor"
         "/library/collections/sequence-combinators.factor"
         "/library/collections/sequences-epilogue.factor"
+        "/library/collections/arrays.factor"
         "/library/collections/strings.factor"
         "/library/collections/sbuf.factor"
         "/library/collections/assoc.factor"

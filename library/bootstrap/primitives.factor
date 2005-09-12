@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: image
-USING: alien generic hashtables io kernel kernel-internals lists
-math namespaces sequences strings vectors words ;
+USING: arrays alien generic hashtables io kernel
+kernel-internals lists math namespaces sequences strings vectors
+words ;
 
 ! Some very tricky code creating a bootstrap embryo in the
 ! host image.
@@ -150,7 +151,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "dlsym" "alien"                       }
     { "dlclose" "alien"                     }
     { "<alien>" "alien"                     }
-    { "<byte-array>" "sequences-internals"   }
+    { "<byte-array>" "arrays"               }
     { "<displaced-alien>" "alien"           }
     { "alien-signed-cell" "alien"           }
     { "set-alien-signed-cell" "alien"       }
@@ -188,10 +189,10 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "set-integer-slot" "kernel-internals" }
     { "char-slot" "kernel-internals"        }
     { "set-char-slot" "kernel-internals"    }
-    { "resize-array" "sequences-internals"   }
+    { "resize-array" "arrays"               }
     { "resize-string" "strings"             }
     { "<hashtable>" "hashtables"            }
-    { "<array>" "sequences-internals"        }
+    { "<array>" "arrays"                    }
     { "<tuple>" "kernel-internals"          }
     { "begin-scan" "memory"                 }
     { "next-object" "memory"                }
@@ -207,6 +208,9 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
+    { "array>tuple" "generic"               }
+    { "tuple>array" "generic"               }
+    { "array>vector" "vectors"              }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each
 
 : set-stack-effect ( { vocab word effect } -- )
@@ -257,7 +261,7 @@ FORGET: set-stack-effect
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
     dup intern-symbol
-    dup r> 1vector "types" set-word-prop
+    dup r> 1array "types" set-word-prop
     dup builtin define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
@@ -308,8 +312,8 @@ null null define-class
 
 "displaced-alien" "alien" create 7 "displaced-alien?" "alien" create { } define-builtin
 
-"array?" "sequences-internals" create t "inline" set-word-prop
-"array" "sequences-internals" create 8 "array?" "sequences-internals" create
+"array?" "arrays" create t "inline" set-word-prop
+"array" "arrays" create 8 "array?" "arrays" create
 { } define-builtin
 
 "f" "!syntax" create 9 "not" "kernel" create
@@ -369,9 +373,9 @@ null null define-class
 "tuple" "kernel" create 18 "tuple?" "kernel" create
 { } define-builtin
 
-"byte-array?" "sequences-internals" create t "inline" set-word-prop
-"byte-array" "sequences-internals" create 19
-"byte-array?" "sequences-internals" create
+"byte-array?" "arrays" create t "inline" set-word-prop
+"byte-array" "arrays" create 19
+"byte-array?" "arrays" create
 { } define-builtin
 
 ! Define general-t type, which is any object that is not f.

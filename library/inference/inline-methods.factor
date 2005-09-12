@@ -1,16 +1,16 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
-USING: generic hashtables inference kernel lists math namespaces
-sequences vectors words ;
+USING: arrays generic hashtables inference kernel lists math
+namespaces sequences words ;
 
 ! Method inlining optimization
 
 GENERIC: dispatching-values ( node word -- seq )
 
-M: object dispatching-values 2drop { } ;
+M: object dispatching-values 2drop @{ }@ ;
 
-M: simple-generic dispatching-values drop node-in-d peek 1vector ;
+M: simple-generic dispatching-values drop node-in-d peek 1array ;
 
 M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
@@ -71,4 +71,4 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r
     dup dup node-in-d node-classes* first r> class<
-    1vector inline-literals ;
+    1array inline-literals ;
