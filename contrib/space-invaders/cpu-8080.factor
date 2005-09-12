@@ -391,7 +391,7 @@ M: cpu write-port ( value port cpu -- )
 : instruction-cycles ( -- vector )
   #! Return a 256 element vector containing the cycles for
   #! each opcode in the 8080 instruction set.
-  { 
+  @{ 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
@@ -399,12 +399,12 @@ M: cpu write-port ( value port cpu -- )
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ;
+    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f }@ ;
 
 : instructions ( -- vector )
   #! Return a 256 element vector containing the emulation words for
   #! each opcode in the 8080 instruction set.
-  { 
+  @{ 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
@@ -412,7 +412,7 @@ M: cpu write-port ( value port cpu -- )
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
     f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f 
-    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f } ; inline
+    f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f f }@ ; inline
 
 M: cpu reset ( cpu -- )
   #! Reset the CPU to its poweron state
