@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables kernel lists math matrices namespaces
-sequences styles vectors ;
+USING: arrays generic hashtables kernel lists math
+namespaces sequences styles ;
 
 SYMBOL: origin
 
@@ -10,9 +10,9 @@ SYMBOL: origin
 
 TUPLE: rect loc dim ;
 
-M: vector rect-loc ;
+M: array rect-loc ;
 
-M: vector rect-dim drop @{ 0 0 0 }@ ;
+M: array rect-dim drop @{ 0 0 0 }@ ;
 
 : rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 

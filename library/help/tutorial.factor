@@ -16,11 +16,11 @@ sequences strings styles ;
 GENERIC: tutorial-line ( object -- gadget )
 
 M: string tutorial-line
-    {
-        { [ "* " ?head ] [ <slide-title> ] }
-        { [ dup "--" = ] [ drop <underline> ] }
-        { [ t ] [ <label> ] }
-    } cond ;
+    @{
+        @{ [ "* " ?head ] [ <slide-title> ] }@
+        @{ [ dup "--" = ] [ drop <underline> ] }@
+        @{ [ t ] [ <label> ] }@
+    }@ cond ;
 
 : example-theme
     dup button-theme

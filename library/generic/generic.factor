@@ -49,13 +49,13 @@ SYMBOL: builtin
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ over types empty? ] [ 2drop t ] }
-        { [ dup types empty? ] [ 2drop f ] }
-        { [ dup custom-class< ] [ dup custom-class< call ] }
-        { [ t ] [ 2types contained? ] }
-    } cond ;
+    @{
+        @{ [ 2dup eq? ] [ 2drop t ] }@
+        @{ [ over types empty? ] [ 2drop t ] }@
+        @{ [ dup types empty? ] [ 2drop f ] }@
+        @{ [ dup custom-class< ] [ dup custom-class< call ] }@
+        @{ [ t ] [ 2types contained? ] }@
+    }@ cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
     2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] ifte ;

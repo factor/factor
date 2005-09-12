@@ -39,31 +39,41 @@ namespaces sequences vectors words ;
         nip car cdr [ ]
     ] ifte ;
 
-: vtable-methods ( picker alist-seq -- alist-seq )
-    num-types [
-        type>class dup [
-            swap simplify-alist
-        ] [
-            2drop [ "Internal error" throw ] [ ]
-        ] ifte >r over r> class-predicates alist>quot
+: vtable-methods ( picker alist-seq n -- alist-seq )
+    [
+        type>class [ object ] unless*
+        swap simplify-alist
+        >r over r> class-predicates alist>quot
     ] 2map nip ;
 
-: <vtable> ( picker word -- vtable )
-    2dup empty-method \ object swons >r methods r> swons
-    sort-methods vtable-methods ;
+: <vtable> ( picker word n -- vtable )
+    #! n is vtable size; either num-types or num-tags.
+    >r 2dup empty-method \ object swons >r methods r> swons
+    sort-methods r> vtable-methods ;
 
 : small-generic ( picker word -- def )
     2dup methods class-predicates >r empty-method r> alist>quot ;
 
-: big-generic ( picker word -- def )
-    [ over % \ type , <vtable> , \ dispatch , ] [ ] make ;
+: big-generic ( picker word n dispatcher -- def )
+    [ >r pick % r> , <vtable> , \ dispatch , ] [ ] make ;
+
+: tag-generic? ( word -- ? )
+    "methods" word-prop hash-keys [ types ] map concat
+    [ tag-mask < ] all? ;
 
 : small-generic? ( word -- ? )
     "methods" word-prop hash-size 3 <= ;
 
 : standard-combination ( word picker -- quot )
-    swap dup small-generic?
-    [ small-generic ] [ big-generic ] ifte ;
+    swap dup tag-generic? [
+        num-tags \ tag big-generic
+    ] [
+        dup small-generic? [
+            small-generic
+        ] [
+            num-types \ type big-generic
+        ] ifte
+    ] ifte ;
 
 : simple-combination ( word -- quot )
     [ dup ] standard-combination ;

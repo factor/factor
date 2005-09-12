@@ -56,11 +56,11 @@ M: %replace-r simplify-stack* ( vop -- ) 0 vop-out update-cs ;
 : preserves-location? ( exitcc location vop -- ? )
     #! If the VOP writes the register, call the loop exit
     #! continuation with 'f'.
-    {
-        { [ 2dup vop-inputs member? ] [ 3drop t ] }
-        { [ 2dup vop-outputs member? ] [ 2drop f swap call ] }
-        { [ t ] [ 3drop f ] }
-    } cond ;
+    @{
+        @{ [ 2dup vop-inputs member? ] [ 3drop t ] }@
+        @{ [ 2dup vop-outputs member? ] [ 2drop f swap call ] }@
+        @{ [ t ] [ 3drop f ] }@
+    }@ cond ;
 
 GENERIC: live@end? ( location -- ? )
 

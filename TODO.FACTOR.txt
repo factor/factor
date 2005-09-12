@@ -59,9 +59,24 @@
 - recursion is iffy; if the stack at the recursive call doesn't match
   up, throw an error
 
-+ kernel:
++ sequences:
 
 - typemap keys need to be arrays
+- split: return vectors
+- specialized arrays
+- instances: do not use make-list
+- vectors: ensure its ok with bignum indices
+- nth-unsafe and set-nth-unsafe; ensure it works with bignum indices
+- >c/c>: vector stack
+- search: slow
+- vectorize >n, n>, (get)
+- mutable strings simplifying string operarations
+- real Unicode support (strings are already 16 bits and can be extended
+  to 21 if the need arises, but we need full character classification
+  predicates, comparison, case conversion, sorting...)
+
++ kernel:
+
 - better handling of random arrangements of html words when
   prettyprinting
 - friendlier .factor-rc load error handling
@@ -69,24 +84,15 @@
 - out of memory error when printing global namespace
 - merge timers with sleeping tasks
 - what about tasks and timers between image restarts
-- split: return vectors
-- specialized arrays
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
-- instances: do not use make-list
-- vectors: ensure its ok with bignum indices
 - code gc
 - set-path: iterative
 - parse-command-line: no unswons of cli args
-- >c/c>: vector stack
-- search: slow
 - investigate if rehashing on startup is really necessary
-- vectorize >n, n>, (get)
-- mutable strings simplifying string operarations
 
 + i/o:
 
-- buffer: instantiating aliens
 - faster stream-copy
 - reading and writing byte arrays
 - stream server can hang because of exception handler limitations
@@ -94,6 +100,3 @@
 - utf16, utf8 encoding
 - fix i/o on generic x86/ppc unix
 - if two tasks write to a unix stream, the buffer can overflow
-- real Unicode support (strings are already 16 bits and can be extended
-  to 21 if the need arises, but we need full character classification
-  predicates, comparison, case conversion, sorting...)

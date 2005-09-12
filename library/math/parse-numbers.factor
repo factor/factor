@@ -33,11 +33,11 @@ M: object digit> not-a-number ;
     "/" split1 >r 10 base> r> 10 base> / ;
 
 : string>number ( string -- n )
-    {
-        { [ CHAR: / over member? ] [ string>ratio ] }
-        { [ CHAR: . over member? ] [ string>float ] }
-        { [ t ] [ 10 base> ] }
-    } cond ;
+    @{
+        @{ [ CHAR: / over member? ] [ string>ratio ] }@
+        @{ [ CHAR: . over member? ] [ string>float ] }@
+        @{ [ t ] [ 10 base> ] }@
+    }@ cond ;
 
 : bin> 2 base> ;
 : oct> 8 base> ;

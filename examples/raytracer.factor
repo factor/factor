@@ -146,6 +146,13 @@ DEFER: create ( level c r -- scene )
         ] map-with
     ] map ;
 
+: pixel-grid ( -- grid )
+    size reverse [
+        size [
+            size 0.5 * - swap size 0.5 * - size >float 3array
+        ] map-with
+    ] map ;
+
 : pnm-header ( w h -- )
     "P5\n" % swap # " " % # "\n255\n" % ;
 

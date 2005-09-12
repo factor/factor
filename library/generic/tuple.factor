@@ -39,7 +39,7 @@ words ;
         r> 2drop
     ] ifte ;
 
-: delegate-slots { { 3 delegate set-delegate } } ;
+: delegate-slots @{ @{ 3 delegate set-delegate }@ }@ ;
 
 : tuple-slots ( tuple slots -- )
     2dup "slot-names" set-word-prop
