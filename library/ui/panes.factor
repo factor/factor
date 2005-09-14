@@ -32,7 +32,7 @@ TUPLE: pane output active current input continuation ;
     dup pane-continuation f rot set-pane-continuation ;
 
 : pane-eval ( string pane -- )
-    pop-continuation in-thread drop ;
+    pop-continuation [ continue-with ] in-thread 2drop ;
 
 SYMBOL: structured-input
 
@@ -112,7 +112,7 @@ M: pane stream-flush ( pane -- ) drop ;
 M: pane stream-finish ( pane -- ) drop ;
 
 M: pane stream-readln ( pane -- line )
-    [ over set-pane-continuation stop ] callcc1 nip ;
+    [ over set-pane-continuation stop ] with-continuation nip ;
 
 M: pane stream-write1 ( char pane -- )
     [ >r ch>string <label> r> pane-current add-gadget ] keep

@@ -39,16 +39,13 @@ sequences strings unparser vectors words ;
 ! Some words for iterating through the heap.
 
 : (each-object) ( quot -- )
-    next-object [ swap [ call ] keep (each-object) ] when* ;
-    inline
+    next-object dup
+    [ swap [ call ] keep (each-object) ] [ 2drop ] ifte ; inline
 
 : each-object ( quot -- )
-    #! Applies the quotation to each object in the image. We
-    #! use the lower-level >c and c> words here to avoid
-    #! copying the stacks.
-    [ end-scan rethrow ] >c
-    begin-scan (each-object) drop
-    f c> call ; inline
+    #! Applies the quotation to each object in the image.
+    [ begin-scan (each-object) ]
+    [ end-scan rethrow ] catch ; inline
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
@@ -86,19 +83,13 @@ M: object each-slot ( obj quot -- )
     num-types zero-array num-types zero-array
     [ >r 2dup r> heap-stat-step ] each-object ;
 
-: heap-stat. ( type instances bytes -- )
-    dup 0 = [
-        3drop
-    ] [
-        rot type>class word-name write ": " write
-        pprint " bytes, " write
-        pprint " instances" print
-    ] ifte ;
+: heap-stat. ( { instances bytes type } -- )
+    dup first 0 = [
+        dup third type>class pprint ": " write
+        dup second pprint " bytes, " write
+        dup first pprint " instances" print
+    ] unless drop ;
 
 : heap-stats. ( -- )
     #! Print heap allocation breakdown.
-    0 heap-stats [ >r >r dup r> r> heap-stat. 1 + ] 2each drop ;
-
-: orphans ( word -- list )
-    #! Orphans are forgotten but still referenced.
-    [ word? ] instances [ interned? not ] subset ;
+    heap-stats dup length 3array flip [ heap-stat. ] each ;

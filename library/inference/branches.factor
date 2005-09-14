@@ -79,7 +79,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             dup literal-value infer-quot
             active? [ #values node, ] when
             f
-        ] callcc1 [ terminate ] when drop
+        ] with-continuation [ terminate ] when drop
     ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )

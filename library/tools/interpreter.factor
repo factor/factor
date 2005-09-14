@@ -52,10 +52,9 @@ SYMBOL: meta-executing
 
 : host-word ( word -- )
     [
-        \ call push-r  interp [
-            interp over interp-data push
-            [ ] set-interp
-        ] cons cons push-r  meta-interp [ ] set-interp
+        \ call push-r  continuation [
+            continuation over interp-data push continue
+        ] cons cons push-r  meta-interp continue
     ] call  set-meta-interp  pop-d 2drop ;
 
 : meta-call ( quot -- )

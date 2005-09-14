@@ -85,11 +85,12 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
+void call_into_factor(F_WORD *word, XT xt);
 void run(void);
 void platform_run(void);
-void undefined(F_WORD* word);
-void docol(F_WORD* word);
-void dosym(F_WORD* word);
+void undefined(F_WORD *word);
+void docol(F_WORD *word);
+void dosym(F_WORD *word);
 void primitive_execute(void);
 void primitive_call(void);
 void primitive_ifte(void);

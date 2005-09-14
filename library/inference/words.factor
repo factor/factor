@@ -5,26 +5,20 @@ USING: errors generic interpreter kernel lists math
 math-internals namespaces sequences strings vectors words
 hashtables parser prettyprint ;
 
-: consume-d ( typelist -- )
-    [ pop-d 2drop ] each ;
+: consume-values ( n node -- )
+    over ensure-values
+    over 0 rot node-inputs [ pop-d 2drop ] each ;
 
-: produce-d ( typelist -- )
-    [ drop <computed> push-d ] each ;
-
-: hairy-node ( node effect quot -- quot: -- )
-    over car ensure-d
-    -rot 2dup car length 0 rot node-inputs
-    2slip
-    second length 0 rot node-outputs ; inline
+: produce-values ( n node -- )
+    over [ drop <computed> push-d ] each 0 swap node-outputs ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and
     #! produces a number of values.
-    swap #call [
-        over [
-            first2 swap consume-d produce-d
-        ] hairy-node
-    ] keep node, ;
+    swap #call
+    over first length over consume-values
+    swap second length over produce-values
+    node, ;
 
 : no-effect ( word -- )
     "Stack effect inference of the word " swap word-name
@@ -77,7 +71,7 @@ M: compound apply-word ( word -- )
     ] [
         dup "infer-effect" word-prop [
             over "infer" word-prop [
-                swap car ensure-d call drop
+                swap first length ensure-values call drop
             ] [
                 consume/produce
             ] ifte*
@@ -111,6 +105,17 @@ M: symbol apply-object ( word -- )
         rethrow
     ] catch ;
 
+: no-base-case ( word -- )
+    {
+        "The base case of a recursive word could not be inferred.\n"
+        "This means the word calls itself in every control flow path.\n"
+        "See the handbook for details."
+    } concat inference-error ;
+
+: notify-base-case ( -- )
+    base-case-continuation get
+    [ t swap continue-with ] [ no-base-case ] ifte* ;
+
 : recursive-word ( word [[ label quot ]] -- )
     #! Handle a recursive call, by either applying a previously
     #! inferred base case, or raising an error. If the recursive
@@ -122,7 +127,7 @@ M: symbol apply-object ( word -- )
             nip consume/produce
         ] [
             inferring-base-case get [
-                t base-case-continuation get call
+                notify-base-case
             ] [
                 car base-case
             ] ifte

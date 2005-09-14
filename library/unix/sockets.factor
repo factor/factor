@@ -106,7 +106,9 @@ M: accept-task do-io-task ( task -- ? )
 M: accept-task task-container drop read-tasks get ;
 
 : wait-to-accept ( server -- )
-    [ swap <accept-task> add-io-task stop ] callcc0 drop ;
+    [
+        swap <accept-task> add-io-task stop
+    ] with-continuation drop ;
 
 : timeout-opt ( fd level opt value -- )
     "timeval" c-size setsockopt io-error ;

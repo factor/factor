@@ -29,11 +29,14 @@ DEFER: optimize-node
         over set-node-successor r> r> r> or or
     ] [ r> ] ifte ;
 
-: optimize-loop ( dataflow -- dataflow )
+: optimize-1 ( dataflow -- dataflow ? )
     recursive-state off
     dup kill-set over kill-node
     dup infer-classes
-    optimize-node [ optimize-loop ] when ;
+    optimize-node ;
+
+: optimize-loop ( dataflow -- dataflow )
+    optimize-1 [ optimize-loop ] when ;
 
 : optimize ( dataflow -- dataflow )
     [

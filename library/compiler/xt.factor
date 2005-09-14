@@ -27,10 +27,9 @@ SYMBOL: compiled-xts
 : compiled-xt ( word -- xt )
     dup compiled-xts get assoc [ ] [ word-xt ] ?ifte ;
 
-! Words being compiled are consed onto this list. When a word
-! is encountered that has not been previously compiled, it is
-! consed onto this list. Compilation stops when the list is
-! empty.
+! When a word is encountered that has not been previously
+! compiled, it is pushed onto this vector. Compilation stops
+! when the vector is empty.
 
 SYMBOL: compile-words
 
@@ -135,14 +134,12 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
     [
         deferred-xts off
         compiled-xts off
+        { } clone compile-words set
         call
         fixup-xts
         commit-xts
     ] with-scope ;
 
 : postpone-word ( word -- )
-    dup compiling? over compound? not or [
-        drop
-    ] [
-        compile-words [ unique ] change
-    ] ifte ;
+    dup compiling? not over compound? and
+    [ dup compile-words get push ] when drop ;

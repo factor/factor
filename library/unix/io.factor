@@ -114,7 +114,7 @@ GENERIC: task-container ( task -- vector )
 
 : handle-fd ( task -- )
     dup do-io-task [
-        dup io-task-port touch-port pop-callback call
+        dup io-task-port touch-port pop-callback continue
     ] [
         drop
     ] ifte ;
@@ -126,7 +126,7 @@ GENERIC: task-container ( task -- vector )
     [
         cdr dup io-task-port timeout? [
             dup io-task-port "Timeout" swap report-error
-            nip pop-callback call
+            nip pop-callback continue
         ] [
             tuck io-task-fd swap bit-nth
             [ handle-fd ] [ drop ] ifte
@@ -208,7 +208,7 @@ M: read-task task-container drop read-tasks get ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
-        [ -rot <read-task> add-io-task stop ] callcc0 
+        [ -rot <read-task> add-io-task stop ] with-continuation
     ] unless 2drop ;
 
 M: port stream-read ( count stream -- string )
@@ -273,7 +273,9 @@ M: write-task task-container drop write-tasks get ;
 
 M: port stream-flush ( stream -- )
     dup port-output? [
-        [ swap <write-task> add-write-io-task stop ] callcc0
+        [
+            swap <write-task> add-write-io-task stop
+        ] with-continuation
     ] when drop ;
 
 M: port stream-finish ( stream -- ) drop ;

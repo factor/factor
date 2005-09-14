@@ -15,6 +15,7 @@ TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( world -- hand )
     <gadget> over set-delegate
+    { } clone over set-hand-buttons
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;
 
@@ -24,22 +25,22 @@ C: hand ( world -- hand )
     dup hand-gadget over set-hand-clicked
     dup screen-loc over set-hand-click-loc
     dup hand-gadget over relative over set-hand-click-rel
-    [ hand-buttons unique ] keep set-hand-buttons ;
+    hand-buttons adjoin ;
 
 : button\ ( n hand -- )
-    [ hand-buttons remove ] keep set-hand-buttons ;
+    hand-buttons delete ;
 
 : drag-gesture ( hand gadget gesture -- )
     #! Send a gesture like [ drag 2 ].
-    rot hand-buttons car add swap handle-gesture drop ;
+    rot hand-buttons first add swap handle-gesture drop ;
 
 : fire-motion ( hand -- )
     #! Fire a motion gesture to the gadget underneath the hand,
     #! and if a mouse button is down, fire a drag gesture to the
     #! gadget that was clicked.
     [ motion ] over hand-gadget handle-gesture drop
-    dup hand-buttons
-    [ dup hand-clicked [ drag ] drag-gesture ] [ drop ] ifte ;
+    dup hand-buttons empty?
+    [ dup dup hand-clicked [ drag ] drag-gesture ] unless drop ;
 
 : drop-prefix ( l1 l2 -- l1 l2 )
     2dup and [ 2dup 2car eq? [ 2cdr drop-prefix ] when ] when ;

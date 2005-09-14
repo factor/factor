@@ -15,9 +15,8 @@ words ;
     "Compiling " write dup . dup word-def precompile generate ;
 
 : compile-postponed ( -- )
-    compile-words get [
-        uncons compile-words set (compile) compile-postponed
-    ] when* ;
+    compile-words get dup empty?
+    [ dup pop (compile) compile-postponed ] unless drop ;
 
 : compile ( word -- )
     [ postpone-word compile-postponed ] with-compiler ;
@@ -40,3 +39,15 @@ words ;
     ] [
         call
     ] ifte ;
+
+\ dataflow profile
+\ optimize profile
+\ linearize profile
+\ split-blocks profile
+\ simplify profile
+\ keep-optimizing profile
+\ kill-set profile
+\ kill-node profile
+\ infer-classes profile
+\ solve-recursion profile
+\ split-node profile

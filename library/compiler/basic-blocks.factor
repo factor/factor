@@ -58,7 +58,7 @@ M: %replace-r simplify-stack* ( vop -- ) 0 vop-out update-cs ;
     #! continuation with 'f'.
     @{
         @{ [ 2dup vop-inputs member? ] [ 3drop t ] }@
-        @{ [ 2dup vop-outputs member? ] [ 2drop f swap call ] }@
+        @{ [ 2dup vop-outputs member? ] [ 2drop f swap continue-with ] }@
         @{ [ t ] [ 3drop f ] }@
     }@ cond ;
 
@@ -76,7 +76,7 @@ M: cs-loc live@end? cs-loc-n r-height get + 0 >= ;
     [
         -rot [ >r 2dup r> preserves-location? ] contains?
         [ dup live@end? ] unless*
-    ] callcc1 2nip ;
+    ] with-continuation 2nip ;
 
 ! Used for elimination of dead loads from the stack:
 ! we keep a map of vregs to ds-loc/cs-loc/f.

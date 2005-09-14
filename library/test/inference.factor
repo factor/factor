@@ -18,21 +18,19 @@ namespaces parser sequences test vectors ;
     compose-shuffle
 ] unit-test
 
-: simple-effect first2 >r length r> length 2array ;
+[ @{ 0 2 }@ ] [ [ 2 "Hello" ] infer ] unit-test
+[ @{ 1 2 }@ ] [ [ dup ] infer ] unit-test
 
-[ @{ 0 2 }@ ] [ [ 2 "Hello" ] infer simple-effect ] unit-test
-[ @{ 1 2 }@ ] [ [ dup ] infer simple-effect ] unit-test
+[ @{ 1 2 }@ ] [ [ [ dup ] call ] infer ] unit-test
+[ [ call ] infer ] unit-test-fails
 
-[ @{ 1 2 }@ ] [ [ [ dup ] call ] infer simple-effect ] unit-test
-[ [ call ] infer simple-effect ] unit-test-fails
+[ @{ 2 4 }@ ] [ [ 2dup ] infer ] unit-test
 
-[ @{ 2 4 }@ ] [ [ 2dup ] infer simple-effect ] unit-test
-
-[ @{ 1 0 }@ ] [ [ [ ] [ ] ifte ] infer simple-effect ] unit-test
-[ [ ifte ] infer simple-effect ] unit-test-fails
-[ [ [ ] ifte ] infer simple-effect ] unit-test-fails
-[ [ [ 2 ] [ ] ifte ] infer simple-effect ] unit-test-fails
-[ @{ 4 3 }@ ] [ [ [ rot ] [ -rot ] ifte ] infer simple-effect ] unit-test
+[ @{ 1 0 }@ ] [ [ [ ] [ ] ifte ] infer ] unit-test
+[ [ ifte ] infer ] unit-test-fails
+[ [ [ ] ifte ] infer ] unit-test-fails
+[ [ [ 2 ] [ ] ifte ] infer ] unit-test-fails
+[ @{ 4 3 }@ ] [ [ [ rot ] [ -rot ] ifte ] infer ] unit-test
 
 [ @{ 4 3 }@ ] [
     [
@@ -41,18 +39,18 @@ namespaces parser sequences test vectors ;
         ] [
             -rot
         ] ifte
-    ] infer simple-effect
+    ] infer
 ] unit-test
 
-[ @{ 1 1 }@ ] [ [ dup [ ] when ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ dup [ dup fixnum* ] when ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ [ dup fixnum* ] when ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ dup [ ] when ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ dup [ dup fixnum* ] when ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ [ dup fixnum* ] when ] infer ] unit-test
 
-[ @{ 1 0 }@ ] [ [ [ drop ] when* ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ [ { { [ ] } } ] unless* ] infer simple-effect ] unit-test
+[ @{ 1 0 }@ ] [ [ [ drop ] when* ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ [ { { [ ] } } ] unless* ] infer ] unit-test
 
 [ @{ 0 1 }@ ] [
-    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer simple-effect
+    [ [ 2 2 fixnum+ ] dup [ ] when call ] infer
 ] unit-test
 
 [
@@ -64,27 +62,27 @@ namespaces parser sequences test vectors ;
 : simple-recursion-1
     dup [ simple-recursion-1 ] [ ] ifte ;
 
-[ @{ 1 1 }@ ] [ [ simple-recursion-1 ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ simple-recursion-1 ] infer ] unit-test
 
 : simple-recursion-2
     dup [ ] [ simple-recursion-2 ] ifte ;
 
-[ @{ 1 1 }@ ] [ [ simple-recursion-2 ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ simple-recursion-2 ] infer ] unit-test
 
 : bad-recursion-2
     dup [ uncons bad-recursion-2 ] [ ] ifte ;
 
-[ [ bad-recursion-2 ] infer simple-effect ] unit-test-fails
+[ [ bad-recursion-2 ] infer ] unit-test-fails
 
 ! Not sure how to fix this one
 
 : funny-recursion
     dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
 
-[ @{ 1 1 }@ ] [ [ funny-recursion ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ funny-recursion ] infer ] unit-test
 
 ! Simple combinators
-[ @{ 1 2 }@ ] [ [ [ car ] keep cdr ] infer simple-effect ] unit-test
+[ @{ 1 2 }@ ] [ [ [ car ] keep cdr ] infer ] unit-test
 
 ! Mutual recursion
 DEFER: foe
@@ -107,8 +105,8 @@ DEFER: foe
         2drop f
     ] ifte ;
 
-[ @{ 2 1 }@ ] [ [ fie ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ foe ] infer simple-effect ] unit-test
+[ @{ 2 1 }@ ] [ [ fie ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ foe ] infer ] unit-test
 
 : nested-when ( -- )
     t [
@@ -117,7 +115,7 @@ DEFER: foe
         ] when
     ] when ;
 
-[ @{ 0 0 }@ ] [ [ nested-when ] infer simple-effect ] unit-test
+[ @{ 0 0 }@ ] [ [ nested-when ] infer ] unit-test
 
 : nested-when* ( -- )
     [
@@ -126,11 +124,11 @@ DEFER: foe
         ] when*
     ] when* ;
 
-[ @{ 1 0 }@ ] [ [ nested-when* ] infer simple-effect ] unit-test
+[ @{ 1 0 }@ ] [ [ nested-when* ] infer ] unit-test
 
 SYMBOL: sym-test
 
-[ @{ 0 1 }@ ] [ [ sym-test ] infer simple-effect ] unit-test
+[ @{ 0 1 }@ ] [ [ sym-test ] infer ] unit-test
 
 : terminator-branch
     dup [
@@ -139,7 +137,7 @@ SYMBOL: sym-test
         not-a-number
     ] ifte ;
 
-[ @{ 1 1 }@ ] [ [ terminator-branch ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ terminator-branch ] infer ] unit-test
 
 : recursive-terminator
     dup [
@@ -148,7 +146,7 @@ SYMBOL: sym-test
         not-a-number
     ] ifte ;
 
-[ @{ 1 1 }@ ] [ [ recursive-terminator ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ recursive-terminator ] infer ] unit-test
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;
@@ -161,14 +159,14 @@ M: funny-cons iterate funny-cons-cdr iterate ;
 M: f iterate drop ;
 M: real iterate drop ;
 
-[ @{ 1 0 }@ ] [ [ iterate ] infer simple-effect ] unit-test
+[ @{ 1 0 }@ ] [ [ iterate ] infer ] unit-test
 
-[ [ callstack ] infer simple-effect ] unit-test-fails
+[ [ callstack ] infer ] unit-test-fails
 
 DEFER: agent
 : smith 1 + agent ; inline
 : agent dup 0 = [ [ swap call ] 2keep smith ] when ; inline
-[ [ [ ] [ object object ] ] ]
+[ @{ 0 2 }@ ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
 ! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] ifte ;
@@ -177,62 +175,62 @@ DEFER: agent
 : no-base-case-2 no-base-case-2 ;
 [ [ no-base-case-2 ] infer ] unit-test-fails
 
-[ @{ 2 1 }@ ] [ [ swons ] infer simple-effect ] unit-test
-[ @{ 1 2 }@ ] [ [ uncons ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ unit ] infer simple-effect ] unit-test
-[ @{ 1 2 }@ ] [ [ unswons ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ last ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ list? ] infer simple-effect ] unit-test
+[ @{ 2 1 }@ ] [ [ swons ] infer ] unit-test
+[ @{ 1 2 }@ ] [ [ uncons ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ unit ] infer ] unit-test
+[ @{ 1 2 }@ ] [ [ unswons ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ last ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ list? ] infer ] unit-test
 
-[ @{ 1 0 }@ ] [ [ >n ] infer simple-effect ] unit-test
-[ @{ 0 1 }@ ] [ [ n> ] infer simple-effect ] unit-test
+[ @{ 1 0 }@ ] [ [ >n ] infer ] unit-test
+[ @{ 0 1 }@ ] [ [ n> ] infer ] unit-test
 
-[ @{ 2 1 }@ ] [ [ bitor ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ bitand ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ bitxor ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ mod ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ /i ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ /f ] infer simple-effect ] unit-test
-[ @{ 2 2 }@ ] [ [ /mod ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ + ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ - ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ * ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ / ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ < ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ <= ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ > ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ >= ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ number= ] infer simple-effect ] unit-test
+[ @{ 2 1 }@ ] [ [ bitor ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ bitand ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ bitxor ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ mod ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ /i ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ /f ] infer ] unit-test
+[ @{ 2 2 }@ ] [ [ /mod ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ + ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ - ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ * ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ / ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ < ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ <= ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ > ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ >= ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ number= ] infer ] unit-test
 
-[ @{ 1 1 }@ ] [ [ string>number ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ = ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ get ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ string>number ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ = ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ get ] infer ] unit-test
 
-[ @{ 2 0 }@ ] [ [ push ] infer simple-effect ] unit-test
-[ @{ 2 0 }@ ] [ [ set-length ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ append ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ peek ] infer simple-effect ] unit-test
+[ @{ 2 0 }@ ] [ [ push ] infer ] unit-test
+[ @{ 2 0 }@ ] [ [ set-length ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ append ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ peek ] infer ] unit-test
 
-[ @{ 1 1 }@ ] [ [ length ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ reverse ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ member? ] infer simple-effect ] unit-test
-[ @{ 2 1 }@ ] [ [ remove ] infer simple-effect ] unit-test
-[ @{ 1 1 }@ ] [ [ prune ] infer simple-effect ] unit-test
+[ @{ 1 1 }@ ] [ [ length ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ reverse ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ member? ] infer ] unit-test
+[ @{ 2 1 }@ ] [ [ remove ] infer ] unit-test
+[ @{ 1 1 }@ ] [ [ prune ] infer ] unit-test
 
 : bad-code "1234" car ;
 
-[ @{ 0 1 }@ ] [ [ bad-code ] infer simple-effect ] unit-test
+[ @{ 0 1 }@ ] [ [ bad-code ] infer ] unit-test
 
 ! This form should not have a stack effect
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
-! [ [ bad-bin ] infer simple-effect ] unit-test-fails
+! [ [ bad-bin ] infer ] unit-test-fails
 
-! [ [ infinite-loop ] infer simple-effect ] unit-test-fails
+! [ [ infinite-loop ] infer ] unit-test-fails
 
 ! : bad-recursion-1
 !     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
 ! 
-! [ [ bad-recursion-1 ] infer simple-effect ] unit-test-fails
+! [ [ bad-recursion-1 ] infer ] unit-test-fails
 
 ! This hangs
 

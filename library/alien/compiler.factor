@@ -47,16 +47,11 @@ C: alien-node make-node ;
 
 : set-alien-return ( return node -- )
     2dup set-alien-node-return
-    swap "void" = [
-        drop
-    ] [
-        [ object ] produce-d 1 0 rot node-outputs
-    ] ifte ;
+    swap "void" = [ 1 over produce-values ] unless drop ;
 
 : set-alien-parameters ( parameters node -- )
     2dup set-alien-node-parameters
-    >r [ drop object ] map dup dup ensure-d
-    length 0 r> node-inputs consume-d ;
+    >r length r> consume-values ;
 
 : ensure-dlsym ( symbol library -- ) load-library dlsym drop ;
 

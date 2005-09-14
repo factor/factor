@@ -1,7 +1,4 @@
 IN: temporary
-USE: kernel
-USE: math
-USE: test
+USING: kernel sequences test ;
 
-! This caused the Java Factor to run out of memory
-[ ] [ 100000 [ [ call ] callcc0 ] times ] unit-test
+[ ] [ 100000 [ drop [ continue ] with-continuation ] each ] unit-test

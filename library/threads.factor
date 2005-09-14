@@ -28,19 +28,20 @@ DEFER: next-thread
 : next-thread ( -- quot )
     run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;
 
-: stop ( -- ) next-thread call ;
+: stop ( -- ) next-thread continue ;
 
-: yield ( -- ) [ schedule-thread stop ] callcc0 ;
+: yield ( -- ) [ schedule-thread stop ] with-continuation ;
 
 : sleep ( ms -- )
-    millis + [ cons sleep-queue push stop ] callcc0 drop ;
+    millis +
+    [ cons sleep-queue push stop ] with-continuation drop ;
 
 : in-thread ( quot -- )
     [
         schedule-thread
         [ ] set-catchstack { } set-callstack
         try stop
-    ] callcc0 drop ;
+    ] with-continuation drop ;
 
 TUPLE: timer object delay last ;
 

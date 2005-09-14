@@ -87,7 +87,6 @@ SYMBOL: inspector-stack
     "inspecting ( -- obj ) push current object" print
     "go ( n -- ) inspect nth slot" print
     "up -- return to previous object" print
-    "refs -- inspect references to current object" print
     "bye -- exit inspector" print ;
 
 : inspector ( obj -- )
@@ -107,6 +106,4 @@ SYMBOL: inspector-stack
 
 : go ( n -- ) inspector-slots get nth (inspect) ;
 
-: up ( -- ) inspector-stack get >pop> pop (inspect) ;
-
-: refs ( -- ) inspecting references (inspect) ;
+: up ( -- ) inspector-stack get dup pop* pop (inspect) ;

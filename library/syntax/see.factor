@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: prettyprint
-USING: generic hashtables io kernel lists namespaces sequences
-styles words ;
+USING: generic hashtables io kernel lists math namespaces
+sequences styles words ;
 
 : declaration. ( word prop -- )
     tuck word-name word-prop [ pprint-word ] [ drop ] ifte ;
@@ -19,6 +19,7 @@ styles words ;
     [ [[ font-style italic ]] ] text ;
 
 : stack-picture% ( seq -- string )
+    dup integer? [ object <repeated> ] when
     [ word-name % " " % ] each ;
 
 : effect>string ( effect -- string )

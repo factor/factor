@@ -23,9 +23,8 @@ namespaces sequences vectors words ;
 : sort-methods ( assoc -- vtable )
     #! Input is a predicate -> method association.
     num-types [
-        type>class dup
-        [ swap [ car classes-intersect? ] subset-with ]
-        [ 2drop f ] ifte
+        type>class [ object ] unless*
+        swap [ car classes-intersect? ] subset-with
     ] map-with ;
 
 : simplify-alist ( class alist -- default alist )

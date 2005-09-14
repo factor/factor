@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
 USING: arrays generic hashtables inference kernel
-kernel-internals namespaces sequences words ;
+kernel-internals math namespaces sequences words ;
 
 ! Infer possible classes of values in a dataflow IR.
 
@@ -114,15 +114,15 @@ M: node child-ties ( node -- seq )
         call
     ] [
         node-param "infer-effect" word-prop second
+        dup integer? [ drop f ] when
     ] ?ifte ;
 
 M: #call infer-classes* ( node -- )
     dup node-param [
         dup create-ties
-        dup output-classes swap node-out-d intersect-classes
-    ] [
-        drop
-    ] ifte ;
+        dup output-classes
+        [ over node-out-d intersect-classes ] when*
+    ] when drop ;
 
 M: #shuffle infer-classes* ( node -- )
     node-out-d [ literal? ] subset

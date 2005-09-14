@@ -36,6 +36,20 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
+: move ( to from seq -- )
+    pick pick number=
+    [ 3drop ] [ [ nth swap ] keep set-nth ] ifte ; inline
+
+: (delete) ( elt store scan seq -- )
+    2dup length < [
+        3dup move
+        >r pick over r> dup >r nth = r> swap
+        [ >r >r 1 + r> r> ] unless >r 1 + r> (delete)
+    ] when ;
+
+: delete ( elt seq -- )
+    0 0 rot (delete) nip set-length drop ;
+
 : copy-into-check ( start to from -- )
     rot rot length + swap length < [
         "Cannot copy beyond end of sequence" throw
@@ -74,19 +88,21 @@ M: object peek ( sequence -- element )
     #! Get value at end of sequence.
     dup length 1 - swap nth ;
 
+: pop* ( sequence -- )
+    #! Shorten the sequence by one element.
+    dup length 1 - swap set-length ;
+
 : pop ( sequence -- element )
     #! Get value at end of sequence and remove it.
-    dup peek >r dup length 1 - swap set-length r> ;
+    dup peek swap pop* ;
 
-: push-new ( elt seq -- )
+: adjoin ( elt seq -- )
     2dup member? [ 2drop ] [ push ] ifte ;
 
 : prune ( seq -- seq )
     [
-        dup length <vector> swap [ over push-new ] each
+        dup length <vector> swap [ over adjoin ] each
     ] keep like ; flushable
-
-: >pop> ( stack -- stack ) dup pop drop ;
 
 : join ( seq glue -- seq )
     #! The new sequence is of the same type as glue.
@@ -94,7 +110,7 @@ M: object peek ( sequence -- element )
         swap like
     ] [
         dup length <vector> swap
-        [ over push 2dup push ] each nip >pop>
+        [ over push 2dup push ] each nip dup pop*
         concat
     ] ifte ; flushable
 

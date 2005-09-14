@@ -21,7 +21,7 @@ sequences styles ;
     }} hash ;
 
 : ttf-path ( name -- string )
-    [ resource-path % "/fonts/" % % ".ttf" % ] "" make ;
+    [ "/fonts/" % % ".ttf" % ] "" make resource-path ;
 
 : open-font ( [ font style ptsize ] -- alien )
     first3 >r ttf-name ttf-path r> TTF_OpenFont ;

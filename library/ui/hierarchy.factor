@@ -5,13 +5,14 @@ USING: gadgets-layouts generic hashtables kernel lists math
 namespaces sequences vectors ;
 
 : remove-gadget ( gadget parent -- )
-    2dup gadget-children remove over set-gadget-children
-    relayout f swap set-gadget-parent ;
+    f pick set-gadget-parent
+    [ gadget-children delete ] keep
+    relayout ;
 
 : unparent ( gadget -- )
     [
         dup gadget-parent dup
-        [ remove-gadget ] [ 2drop ] ifte
+        [ 2dup remove-gadget ] when 2drop
     ] when* ;
 
 : (clear-gadget) ( gadget -- )

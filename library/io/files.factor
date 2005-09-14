@@ -21,9 +21,9 @@ USING: kernel lists namespaces sequences strings ;
 
 DEFER: <file-reader>
 
-: resource-path ( -- path )
-    "resource-path" get [ "." ] unless* ;
+: resource-path ( path -- path )
+    "resource-path" get [ "." ] unless* swap path+ ;
 
 : <resource-stream> ( path -- stream )
     #! Open a file path relative to the Factor source code root.
-    resource-path swap path+ <file-reader> ;
+    resource-path <file-reader> ;

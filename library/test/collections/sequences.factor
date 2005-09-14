@@ -153,3 +153,9 @@ unit-test
 [ @{ "" "a" "aa" "aaa" }@ ]
 [ 4 [ CHAR: a fill ] map ]
 unit-test
+
+[ { } ] [ "f" { } clone [ delete ] keep ] unit-test
+[ { } ] [ "f" { "f" } clone [ delete ] keep ] unit-test
+[ { } ] [ "f" { "f" "f" } clone [ delete ] keep ] unit-test
+[ { "x" } ] [ "f" { "f" "x" "f" } clone [ delete ] keep ] unit-test
+[ { "y" "x" } ] [ "f" { "y" "f" "x" "f" } clone [ delete ] keep ] unit-test

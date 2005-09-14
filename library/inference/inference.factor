@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: errors generic interpreter io kernel lists math
+USING: arrays errors generic interpreter io kernel lists math
 namespaces parser prettyprint sequences strings vectors words ;
 
 ! This variable takes a boolean value.
@@ -50,22 +50,13 @@ SYMBOL: d-in
 : required-inputs ( n stack -- values )
     length - 0 max computed-value-vector ;
 
-: ensure-d ( typelist -- )
+: ensure-values ( n -- )
     length meta-d get required-inputs dup
-    meta-d [ append ] change
-    d-in [ append ] change ;
+    meta-d [ append ] change d-in [ append ] change ;
 
-: effect ( -- [[ in# out# ]] )
+: effect
     #! After inference is finished, collect information.
-    d-in get length object <repeated> >list
-    meta-d get length object <repeated> >list 2list ;
-
-: no-base-case ( word -- )
-    {
-        "The base case of a recursive word could not be inferred.\n"
-        "This means the word calls itself in every control flow path.\n"
-        "See the handbook for details."
-    } concat inference-error ;
+    d-in get length meta-d get length 2array ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
@@ -113,7 +104,7 @@ M: wrapper apply-object wrapped apply-literal ;
 : with-infer ( quot -- )
     [
         inferring-base-case off
-        [ no-base-case ] base-case-continuation set
+        base-case-continuation off
         f init-inference
         call
         check-return

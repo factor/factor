@@ -58,7 +58,7 @@ C: section ( length -- section )
     ] [
         last-newline set
         line-count inc
-        line-limit? [ "..." write end-printing get call ] when
+        line-limit? [ "..." write end-printing get continue ] when
         "\n" write do-indent
     ] ifte ;
 
@@ -161,7 +161,7 @@ C: pprinter ( -- stream )
     [
         end-printing set
         dup pprinter-block pprint-section
-    ] callcc0 drop ;
+    ] with-continuation drop ;
 
 GENERIC: pprint* ( obj -- )
 
@@ -264,7 +264,7 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
 : pprint-elements ( seq -- )
     length-limit? >r
     [ pprint-element ] each
-    r> [ "... " f text ] when ;
+    r> [ "..." f text ] when ;
 
 : pprint-sequence ( seq start end -- )
     swap pprint* swap pprint-elements pprint* ;

@@ -7,12 +7,8 @@ prettyprint sequences strings unparser words ;
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
 
-: jedit-server-file ( -- path )
-    "jedit-server-file" get
-    [ "~" get "/.jedit/server" append ] unless* ;
-
 : jedit-server-info ( -- port auth )
-    jedit-server-file <file-reader> [
+    "~" get "/.jedit/server" append <file-reader> [
         readln drop
         readln string>number
         readln string>number
@@ -30,7 +26,7 @@ prettyprint sequences strings unparser words ;
     jedit-server-info swap "localhost" swap <client> [
         4 >be write
         dup length 2 >be write
-        write flush
+        write
     ] with-stream ;
 
 : jedit-line/file ( file line -- )
@@ -42,11 +38,7 @@ prettyprint sequences strings unparser words ;
 
 : jedit ( word -- )
     #! Note that line numbers here start from 1
-    dup word-file dup [
-        swap "line" word-prop jedit-line/file
-    ] [
-        2drop "Unknown source" print
-    ] ifte ;
+    dup word-file swap "line" word-prop jedit-line/file ;
 
 ! Wire protocol for jEdit to evaluate Factor code.
 ! Packets are of the form:

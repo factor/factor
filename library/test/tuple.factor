@@ -1,5 +1,5 @@
-IN: temporary
 USING: errors generic kernel math parser sequences test words ;
+IN: temporary
 
 TUPLE: rect x y w h ;
 C: rect

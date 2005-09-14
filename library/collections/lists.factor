@@ -39,11 +39,6 @@ M: cons map ( cons quot -- cons )
 M: general-list find ( list quot -- i elt )
     0 (list-find) ;
 
-: unique ( elem list -- list )
-    #! Prepend an element to a list if it does not occur in the
-    #! list.
-    2dup member? [ nip ] [ cons ] ifte ;
-
 M: general-list reverse-slice ( list -- list )
     [ ] [ swons ] reduce ;
 

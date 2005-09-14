@@ -2,7 +2,7 @@
 
 INLINE void execute(F_WORD* word)
 {
-	((XT)(word->xt))(word);
+	call_into_factor((XT)word->xt,word);
 }
 
 void run(void)
