@@ -12,7 +12,7 @@ USING: kernel lists namespaces sequences strings ;
 : directory? ( file -- ? ) stat car ;
 
 : directory ( dir -- list )
-    (directory) { "." ".." } swap seq-diff string-sort ;
+    (directory) { "." ".." } swap remove-all string-sort ;
 
 : file-length ( file -- length ) stat third ;
 

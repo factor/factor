@@ -40,7 +40,7 @@ syntax words ;
 : M: ( -- class generic [ ] )
     #! M: foo bar begins a definition of the bar generic word
     #! specialized to the foo type.
-    scan-word scan-word [ define-method ] [ ] ; parsing
+    scan-word scan-word [ -rot define-method ] [ ] ; parsing
 
 : C:
     #! Followed by a tuple name, then constructor code, then ;

@@ -67,8 +67,8 @@ words ;
     >r create-in
     dup intern-symbol
     dup tuple-predicate
-    dup tuple "superclass" set-word-prop
-    dup tuple "metaclass" set-word-prop
+    dup \ tuple reintern "superclass" set-word-prop
+    dup define-class
     dup r> tuple-slots
     default-constructor ;
 
@@ -77,13 +77,8 @@ M: tuple clone ( tuple -- tuple )
     (clone) dup delegate clone over set-delegate ;
 
 M: tuple hashcode ( vec -- n )
-    #! If the capacity is two, then all we have is the class
-    #! slot and delegate.
-    dup array-capacity 2 number= [
-        drop 0
-    ] [
-        2 swap array-nth hashcode
-    ] ifte ;
+    #! Poor.
+    array-capacity ;
 
 M: tuple = ( obj tuple -- ? )
     2dup eq? [
@@ -92,9 +87,7 @@ M: tuple = ( obj tuple -- ? )
         over tuple? [ array= ] [ 2drop f ] ifte
     ] ifte ;
 
-tuple [ 2drop f ] "class<" set-word-prop
-
-PREDICATE: word tuple-class metaclass tuple = ;
+PREDICATE: word tuple-class "tuple-size" word-prop ;
 
 : is? ( obj pred -- ? | pred: obj -- ? )
     #! Tests if the object satisfies the predicate, or if

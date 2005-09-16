@@ -34,3 +34,11 @@ USE: test
     ] with-continuation "cc" get interp-data ;
 
 [ 5 { } ] [ multishot-test ] unit-test
+
+[ ] [
+    [
+        global [ "x" set ] bind
+        [ global [ "x" get ] bind continue ] quot>interp
+        continue
+    ] with-continuation global [ "x" off ] bind
+] unit-test

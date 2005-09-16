@@ -47,5 +47,3 @@ M: cons = ( obj cons -- ? )
     ] ifte ;
 
 M: f = ( obj f -- ? ) eq? ;
-
-M: cons hashcode ( cons -- hash ) car hashcode ;

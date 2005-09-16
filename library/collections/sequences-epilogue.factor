@@ -36,6 +36,9 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
+: remove-all ( seq1 seq2 -- seq2-seq1 )
+    [ swap member? not ] subset-with ; flushable
+
 : move ( to from seq -- )
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] ifte ; inline
@@ -48,6 +51,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     ] when ;
 
 : delete ( elt seq -- )
+    #! Delete all occurrences of elt from seq.
     0 0 rot (delete) nip set-length drop ;
 
 : copy-into-check ( start to from -- )
@@ -56,10 +60,13 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     ] when ;
 
 : copy-into ( start to from -- )
+    #! Copy all elements in 'from' to 'to', storing at
+    #! consecutive indices numbered from 'start'.
     3dup copy-into-check
     dup length [ >r pick r> + pick set-nth-unsafe ] 2each 2drop ;
 
 : nappend ( to from -- )
+    #! Add all elements of 'from' at the end of 'to'.
     >r dup length swap r>
     over length over length + pick set-length
     copy-into ;
@@ -117,20 +124,6 @@ M: object peek ( sequence -- element )
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
 M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
-
-! Set theoretic operations
-: seq-intersect ( seq1 seq2 -- seq1/\seq2 )
-    [ swap member? ] subset-with ; flushable
-
-: seq-diff ( seq1 seq2 -- seq2-seq1 )
-    [ swap member? not ] subset-with ; flushable
-
-: seq-union ( seq1 seq2 -- seq1\/seq2 )
-    append prune ; flushable
-
-: contained? ( seq1 seq2 -- ? )
-    #! Is every element of seq1 in seq2
-    swap [ swap member? ] all-with? ; flushable
 
 ! Lexicographic comparison
 : lexi ( s1 s2 -- n )

@@ -8,12 +8,10 @@ vectors ;
 ! defined tuples that respond to the sequence protocol.
 UNION: sequence array string sbuf vector ;
 
-: length= ( seq seq -- ? ) length swap length number= ; flushable
-
 : sequence= ( seq seq -- ? )
     #! Check if two sequences have the same length and elements,
     #! but not necessarily the same class.
-    2dup length= [
+    2dup [ length ] 2apply = [
         dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [
         2drop f
@@ -25,6 +23,10 @@ M: sequence = ( obj seq -- ? )
     ] [
         over type over type eq? [ sequence= ] [ 2drop f ] ifte
     ] ifte ;
+
+M: sequence hashcode ( seq -- n )
+    #! Poor
+    length ;
 
 M: string = ( obj str -- ? )
     over string? [

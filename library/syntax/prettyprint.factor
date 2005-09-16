@@ -226,7 +226,6 @@ M: string pprint* ( str -- str ) "\"" pprint-string ;
 M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 
 M: word pprint* ( word -- )
-    dup interned? [ "( uninterned )" f text ] unless
     dup "pprint-before-hook" word-prop call
     dup pprint-word
     "pprint-after-hook" word-prop call ;
@@ -360,6 +359,7 @@ M: wrapper pprint* ( wrapper -- )
 {
     { POSTPONE: [ POSTPONE: ] }
     { POSTPONE: { POSTPONE: } }
+    { POSTPONE: @{ POSTPONE: }@ }
     { POSTPONE: {{ POSTPONE: }} }
     { POSTPONE: [[ POSTPONE: ]] }
     { POSTPONE: [[ POSTPONE: ]] }

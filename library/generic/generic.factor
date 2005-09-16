@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors hashtables kernel kernel-internals lists
+USING: arrays errors hashtables kernel kernel-internals lists
 namespaces parser sequences strings words vectors math
 math-internals ;
 
@@ -10,15 +10,8 @@ math-internals ;
 ! Maps lists of builtin type numbers to class objects.
 SYMBOL: typemap
 
-! Forward definitions.
-SYMBOL: object
-SYMBOL: null
-
 ! Global vector mapping type numbers to builtin class objects.
 SYMBOL: builtins
-
-! Builtin metaclass
-SYMBOL: builtin
 
 : type>class ( n -- symbol ) builtins get nth ;
 
@@ -35,26 +28,44 @@ SYMBOL: builtin
         3drop
     ] ifte ;
 
-: metaclass ( class -- metaclass )
-    "metaclass" word-prop ;
+: superclass "superclass" word-prop ;
+
+: members "members" word-prop ;
+
+: (flatten) ( class -- )
+    dup members [ [ (flatten) ] each ] [ dup set ] ?ifte ;
+
+: flatten ( class -- classes )
+    #! Outputs a sequence of classes whose union is this class.
+    [ (flatten) ] make-hash ;
+
+DEFER: types
+
+: (types) ( class -- )
+    #! Only valid for a flattened class.
+    dup superclass [ types % ] [ "type" word-prop , ] ?ifte ;
 
 : types ( class -- types )
-    dup "types" word-prop [ ] [
-        "superclass" word-prop [ types ] [ [ ] ] ifte*
-    ] ?ifte ;
+    [ flatten hash-keys [ (types) ] each ] { } make prune ;
 
-: 2types ( class class -- seq seq ) swap types swap types ;
+DEFER: class<
 
-: custom-class< metaclass "class<" word-prop ;
+: superclass< ( cls1 cls2 -- ? )
+    >r superclass r> over [ class< ] [ 2drop f ] ifte ;
+
+: (class<) ( cls1 cls2 -- ? )
+    [ flatten hash-keys ] 2apply
+    swap [ swap [ class< ] contains-with? ] all-with? ;
 
 : class< ( cls1 cls2 -- ? )
     #! Test if class1 is a subclass of class2.
     @{
         @{ [ 2dup eq? ] [ 2drop t ] }@
-        @{ [ over types empty? ] [ 2drop t ] }@
-        @{ [ dup types empty? ] [ 2drop f ] }@
-        @{ [ dup custom-class< ] [ dup custom-class< call ] }@
-        @{ [ t ] [ 2types contained? ] }@
+        @{ [ over flatten hash-size 0 = ] [ 2drop t ] }@
+        @{ [ over superclass ] [ >r superclass r> class< ] }@
+        @{ [ dup superclass ] [ superclass< ] }@
+        @{ [ 2dup [ members ] 2apply or not ] [ 2drop f ] }@
+        @{ [ t ] [ (class<) ] }@
     }@ cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
@@ -64,16 +75,28 @@ SYMBOL: builtin
     "methods" word-prop hash>alist [ 2car class-compare ] sort ;
 
 : order ( generic -- list )
-    "methods" word-prop hash-keys [ class-compare ] sort ;
+    methods [ car ] map ;
+
+PREDICATE: compound generic ( word -- ? )
+    "combination" word-prop ;
+
+M: generic definer drop \ G: ;
 
 : make-generic ( word -- )
     dup dup "combination" word-prop call define-compound ;
 
-: define-method ( class generic definition -- )
-    -rot
-    over metaclass word? [
-        over word-name " is not a class" append throw
+: class? ( word -- ? ) "class" word-prop ;
+
+: check-method ( class generic -- )
+    dup generic? [
+        dup word-name " is not a generic word" append throw
     ] unless
+    over "class" word-prop [
+        over word-name " is not a class" append throw
+    ] unless 2drop ;
+
+: define-method ( definition class generic -- )
+    >r reintern r> 2dup check-method
     [ "methods" word-prop set-hash ] keep make-generic ;
 
 : forget-method ( class generic -- )
@@ -100,41 +123,41 @@ SYMBOL: builtin
     dupd "combination" set-word-prop
     dup init-methods make-generic ;
 
-PREDICATE: compound generic ( word -- ? )
-    "combination" word-prop ;
+: lookup-union ( class-set -- class )
+    #! The class set is a hashtable with equal keys/values.
+    typemap get hash [ object ] unless* ;
 
-M: generic definer drop \ G: ;
-
-: lookup-union ( typelist -- class )
-    number-sort typemap get hash [ object ] unless* ;
-
-: class-or ( class class -- class )
-    #! Return a class that both classes are subclasses of.
-    2dup class< [
-        nip
+: (builtin-supertypes) ( class -- )
+    dup members [
+        [ (builtin-supertypes) ] each
     ] [
-        2dup swap class< [
-            drop
+        dup superclass [
+            (builtin-supertypes)
         ] [
-            2types seq-union lookup-union
-        ] ifte
-    ] ifte ;
+            dup set
+        ] ?ifte
+    ] ?ifte ;
+
+: builtin-supertypes ( class -- classes )
+    #! Outputs a sequence of builtin classes whose union is the
+    #! smallest union of builtin classes that contains this
+    #! class.
+    [ (builtin-supertypes) ] make-hash ;
+
+: (class-and) ( class class -- class )
+    [ builtin-supertypes ] 2apply hash-intersect lookup-union ;
 
 : class-and ( class class -- class )
     #! Return a class that is a subclass of both, or null in
     #! the degenerate case.
-    2dup class< [
-        drop
-    ] [
-        2dup swap class< [
-            nip 
-        ] [
-            2types seq-intersect lookup-union
-        ] ifte
-    ] ifte ;
+    @{
+        @{ [ 2dup class< ] [ drop ] }@
+        @{ [ 2dup swap class< ] [ nip ] }@
+        @{ [ t ] [ (class-and) ] }@
+    }@ cond ;
 
 : classes-intersect? ( class class -- ? )
-    class-and null = not ;
+    class-and flatten hash-size 0 > ;
 
 : min-class ( class seq -- class/f )
     #! Is this class the smallest class in the sequence?
@@ -142,9 +165,9 @@ M: generic definer drop \ G: ;
     [ class-compare neg ] sort
     tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
 
-: define-class ( class metaclass -- )
-    dupd "metaclass" set-word-prop
-    dup types number-sort typemap get set-hash ;
+: define-class ( class -- )
+    dup t "class" set-word-prop
+    dup flatten typemap get set-hash ;
 
 : implementors ( class -- list )
     #! Find a list of generics that implement a method
@@ -153,4 +176,30 @@ M: generic definer drop \ G: ;
 
 : classes ( -- list )
     #! Output a list of all defined classes.
-    [ metaclass ] word-subset ;
+    [ class? ] word-subset ;
+
+! Predicate classes for generalized predicate dispatch.
+: define-predicate-class ( class predicate definition -- )
+    pick define-class
+    3dup nip "definition" set-word-prop
+    pick superclass "predicate" word-prop
+    [ \ dup , % , [ drop f ] , \ ifte , ] [ ] make
+    define-predicate ;
+
+PREDICATE: word predicate "definition" word-prop ;
+
+! Union classes for dispatch on multiple classes.
+: union-predicate ( members -- list )
+    [
+        "predicate" word-prop \ dup swons [ drop t ] cons
+    ] map [ drop f ] swap alist>quot ;
+
+: set-members ( class members -- )
+    [ reintern ] map "members" set-word-prop ;
+
+: define-union ( class predicate members -- )
+    #! We have to turn the f object into the f word, same for t.
+    3dup nip set-members pick define-class
+    union-predicate define-predicate ;
+
+PREDICATE: word union members ;

@@ -154,16 +154,13 @@ M: hashtable = ( obj hash -- ? )
     ] ifte ;
 
 M: hashtable hashcode ( hash -- n )
-    dup bucket-count 0 number= [
-        drop 0
-    ] [
-        0 swap hash-bucket hashcode
-    ] ifte ;
+    #! Poor.
+    hash-size ;
 
 : cache ( key hash quot -- value | quot: key -- value )
     pick pick hash [
         >r 3drop r>
-    ] [
+    ] [                                             
         pick rot >r >r call dup r> r> set-hash
     ] ifte* ; inline
 
@@ -176,3 +173,20 @@ M: hashtable hashcode ( hash -- n )
 
 : ?set-hash ( value key hash/f -- hash )
     [ 1 <hashtable> ] unless* [ set-hash ] keep ;
+
+: hash-intersect ( hash1 hash2 -- hash1/\hash2 )
+    #! Remove all keys from hash2 not in hash1.
+    [ car swap hash ] hash-subset-with ;
+
+: hash-diff ( hash1 hash2 -- hash2-hash1 )
+    #! Remove all keys from hash2 in hash1.
+    [ car swap hash not ] hash-subset-with ;
+
+: hash-update ( hash1 hash2 -- )
+    #! Add all key/value pairs from hash2 to hash1.
+    [ unswons rot set-hash ] hash-each-with ;
+
+: hash-union ( hash1 hash2 -- hash1\/hash2 )
+    #! Make a new hashtable with all key/value pairs from
+    #! hash1 and hash2. Values in hash2 take precedence.
+    >r clone dup r> hash-update ;

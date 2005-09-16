@@ -16,9 +16,6 @@ M: vector set-nth-unsafe ( obj n vec -- )
 M: vector set-nth ( obj n vec -- )
     growable-check 2dup ensure set-nth-unsafe ;
 
-M: vector hashcode ( vec -- n )
-    dup length 0 number= [ drop 0 ] [ first hashcode ] ifte ;
-
 : >vector ( list -- vector )
     dup length <vector> [ swap nappend ] keep ; inline
 

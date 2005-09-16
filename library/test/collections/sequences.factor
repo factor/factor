@@ -98,10 +98,7 @@ unit-test
 [ f ] [ 3 [ 1 2 3 ] tail ] unit-test
 [ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
 
-[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] seq-diff ] unit-test
-
-[ t ] [ [ 1 2 3 ] [ 1 2 3 4 5 ] contained? ] unit-test
-[ f ] [ [ 1 2 3 6 ] [ 1 2 3 4 5 ] contained? ] unit-test
+[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] remove-all ] unit-test
 
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test

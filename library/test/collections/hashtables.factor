@@ -146,3 +146,34 @@ f 100000000000000000000000000 "testhash" get set-hash
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
 [ 4 ] [ 1 "cache-test" get [ 3 + ] cache ] unit-test
 [ 5 ] [ 2 "cache-test" get [ 3 + ] cache ] unit-test
+
+[
+    {{ [[ "factor" "rocks" ]] [[ 3 4 ]] }}
+] [
+    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
+    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    hash-intersect
+] unit-test
+
+[
+    {{ [[ 1 2 ]] [[ 2 3 ]] }}
+] [
+    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
+    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    hash-diff
+] unit-test
+
+[
+    t
+] [
+    {{ [[ "hello" "world" ]] }}
+    clone
+    100 [ 1 + over set-bucket-count hashcode ] map-with [ = ] monotonic?
+] unit-test
+
+[
+    {{ [[ 1 2 ]] [[ 2 3 ]] [[ 6 5 ]] }}
+] [
+    {{ [[ 2 4 ]] [[ 6 5 ]] }} {{ [[ 1 2 ]] [[ 2 3 ]] }}
+    hash-union
+] unit-test

@@ -72,6 +72,9 @@ M: wrapper = ( obj wrapper -- ? )
 : 3keep ( x y z quot -- x y z | quot: x y z -- )
     >r 3dup r> swap >r swap >r swap >r call r> r> r> ; inline
 
+: 2apply ( x y quot -- | quot: x/y -- )
+    tuck 2slip call ; inline
+
 : ifte* ( cond true false -- | true: cond -- | false: -- )
     #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
     pick [ drop call ] [ 2nip call ] ifte ; inline

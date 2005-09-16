@@ -17,13 +17,10 @@ namespaces sequences vectors words ;
 : class-predicates ( picker assoc -- assoc )
     [ uncons >r "predicate" word-prop append r> cons ] map-with ;
 
-: alist>quot ( default alist -- quot )
-    [ unswons [ % , , \ ifte , ] [ ] make ] each ;
-
-: sort-methods ( assoc -- vtable )
+: sort-methods ( assoc n -- vtable )
     #! Input is a predicate -> method association.
-    num-types [
-        type>class [ object ] unless*
+    [
+        type>class [ object reintern ] unless*
         swap [ car classes-intersect? ] subset-with
     ] map-with ;
 
@@ -38,17 +35,16 @@ namespaces sequences vectors words ;
         nip car cdr [ ]
     ] ifte ;
 
-: vtable-methods ( picker alist-seq n -- alist-seq )
-    [
-        type>class [ object ] unless*
-        swap simplify-alist
+: vtable-methods ( picker alist-seq -- alist-seq )
+    dup length [
+        type>class [ swap simplify-alist ] [ car cdr [ ] ] ifte*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
 : <vtable> ( picker word n -- vtable )
     #! n is vtable size; either num-types or num-tags.
-    >r 2dup empty-method \ object swons >r methods r> swons
-    sort-methods r> vtable-methods ;
+    >r 2dup empty-method \ object reintern
+    swons >r methods r> swons r> sort-methods vtable-methods ;
 
 : small-generic ( picker word -- def )
     2dup methods class-predicates >r empty-method r> alist>quot ;

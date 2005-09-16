@@ -81,8 +81,6 @@ sequences io vectors words ;
         "/library/generic/standard-combination.factor"
         "/library/generic/slots.factor"
         "/library/generic/math-combination.factor"
-        "/library/generic/predicate.factor"
-        "/library/generic/union.factor"
         "/library/generic/tuple.factor"
 
         "/library/syntax/generic.factor"

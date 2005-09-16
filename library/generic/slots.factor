@@ -11,7 +11,7 @@ parser sequences strings words ;
     #! Just like:
     #! GENERIC: generic
     #! M: class generic def ;
-    over define-generic define-method ;
+    over define-generic -rot define-method ;
 
 : define-slot-word ( class slot word quot -- )
     over [

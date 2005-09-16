@@ -12,7 +12,7 @@ words ;
 
 ! These symbols need the same hashcode in the target as in the
 ! host.
-{ vocabularies object null typemap builtins }
+{ vocabularies typemap builtins }
 
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab
@@ -251,18 +251,18 @@ FORGET: set-stack-effect
 ! word system.
 : builtin-predicate ( class predicate -- )
     [
-        over types first dup
+        over "type" word-prop dup
         tag-mask < \ tag \ type ? , , \ eq? ,
     ] [ ] make define-predicate ;
 
 : register-builtin ( class -- )
-    dup types first builtins get set-nth ;
+    dup "type" word-prop builtins get set-nth ;
 
 : define-builtin ( symbol type# predicate slotspec -- )
     >r >r >r
     dup intern-symbol
-    dup r> 1 <vector> [ push ] keep "types" set-word-prop
-    dup builtin define-class
+    dup r> "type" set-word-prop
+    dup define-class
     dup r> builtin-predicate
     dup r> intern-slots 2dup "slots" set-word-prop
     define-slots
@@ -271,15 +271,9 @@ FORGET: set-stack-effect
 {{ }} clone typemap set
 num-types <array> builtins set
 
-! Catch-all metaclass for providing a default method.
-object num-types >vector "types" set-word-prop
-object [ drop t ] "predicate" set-word-prop
-object object define-class
-
-! Null metaclass with no instances.
-null { } "types" set-word-prop
-null [ drop f ] "predicate" set-word-prop
-null null define-class
+! These symbols are needed by the code that executes below
+"object" "generic" create drop
+"null" "generic" create drop
 
 "fixnum?" "math" create t "inline" set-word-prop
 "fixnum" "math" create 0 "fixnum?" "math" create { } define-builtin
@@ -382,6 +376,15 @@ null null define-class
 "general-t" "kernel" create dup define-symbol
 f "f" "!syntax" lookup builtins get remove [ ] subset
 define-union
+
+! Catch-all class for providing a default method.
+"object" "generic" create [ drop t ] "predicate" set-word-prop
+"object" "generic" create dup define-symbol
+f builtins get [ ] subset define-union
+
+! Null class with no instances.
+"null" "generic" create [ drop f ] "predicate" set-word-prop
+"null" "generic" create dup define-symbol f @{ }@ define-union
 
 FORGET: builtin-predicate
 FORGET: register-builtin

@@ -1,3 +1,5 @@
+- quot>interp needs to go
+
 + ui:
 
 - fix up the min thumb size hack
@@ -61,7 +63,6 @@
 
 + sequences:
 
-- typemap keys need to be arrays
 - split: return vectors
 - specialized arrays
 - instances: do not use make-list

@@ -81,7 +81,7 @@ GENERIC: class. ( word -- )
 
 : methods. ( class -- )
     #! List all methods implemented for this class.
-    dup metaclass [
+    dup class? [
         dup implementors [
             dup in. tuck "methods" word-prop hash* method.
         ] each-with
@@ -92,11 +92,11 @@ GENERIC: class. ( word -- )
 M: union class.
     \ UNION: pprint-word
     dup pprint-word
-    "members" word-prop pprint-elements pprint-; newline ;
+    members pprint-elements pprint-; newline ;
 
 M: predicate class.
     \ PREDICATE: pprint-word
-    dup "superclass" word-prop pprint-word
+    dup superclass pprint-word
     dup pprint-word
     <block
     "definition" word-prop pprint-elements

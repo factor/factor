@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-USING: errors lists namespaces sequences words vectors ;
+USING: arrays errors lists namespaces sequences words vectors ;
 
 TUPLE: interp data call name catch ;
 
@@ -21,7 +21,7 @@ TUPLE: interp data call name catch ;
     #! Make a continuation that executes the quotation.
     #! The quotation should not return, or a call stack
     #! underflow will be signalled.
-    { } swap 1 <vector> [ push ] keep f f <interp> ;
+    { } f rot 2array >vector f f <interp> ;
 
 : continue ( continuation -- )
     #! Restore a continuation.

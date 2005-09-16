@@ -38,13 +38,16 @@ TUPLE: no-math-method left right generic ;
         literalize [ no-math-method ] cons
     ] ?ifte ;
 
+: object-method ( generic -- quot )
+    object reintern applicable-method ;
+
 : math-method ( word left right -- quot )
     swap type>class swap type>class 2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
         r> swap append
     ] [
-        2drop object applicable-method
+        2drop object-method
     ] ifte ;
 
 : math-vtable ( picker quot -- )
@@ -62,7 +65,7 @@ TUPLE: no-math-method left right generic ;
         dup type>class math-class? [
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
-            over object applicable-method
+            over object-method
         ] ifte nip
     ] math-vtable nip ;
 

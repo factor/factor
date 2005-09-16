@@ -24,10 +24,8 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : tail* ( n seq -- seq ) [ tail-slice* ] keep like ; flushable
 
-: length< ( seq seq -- ? ) swap length swap length < ; flushable
-
 : head? ( seq begin -- ? )
-    2dup length< [
+    2dup [ length ] 2apply < [
         2drop f
     ] [
         dup length rot head-slice sequence=
@@ -37,7 +35,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
     2dup head? [ length swap tail t ] [ drop f ] ifte ; flushable
 
 : tail? ( seq end -- ? )
-    2dup length< [
+    2dup [ length ] 2apply < [
         2drop f
     ] [
         dup length rot tail-slice* sequence=

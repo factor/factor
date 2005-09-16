@@ -46,6 +46,7 @@ words ;
 \ split-blocks profile
 \ simplify profile
 \ keep-optimizing profile
+\ literals profile
 \ kill-set profile
 \ kill-node profile
 \ infer-classes profile

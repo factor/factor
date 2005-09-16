@@ -1,121 +1,75 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
-USING: generic hashtables inference kernel lists
-matrices namespaces sequences vectors ;
+USING: arrays generic hashtables inference kernel
+namespaces sequences ;
+
+: node-union ( node quot -- hash | quot: node -- seq )
+    #! Build a hash with equal keys/values, effectively taking
+    #! the set union over all return values of the quotation.
+    [
+        swap [ swap call [ dup set ] each ] each-node-with
+    ] make-hash ; inline
 
 GENERIC: literals* ( node -- seq )
 
-: literals ( node -- seq )
-    [ [ literals* % ] each-node ] { } make prune ;
+: literals ( node -- hash )
+    [ literals* ] node-union ;
 
-GENERIC: can-kill* ( literal node -- ? )
+GENERIC: live-values* ( node -- seq )
 
-: can-kill? ( literal node -- ? )
-    dup [
-        2dup can-kill* [
-            node-successor can-kill?
-        ] [
-            2drop f
-        ] ifte
-    ] [
-        2drop t
-    ] ifte ;
+: live-values ( node -- hash )
+    #! All values that are returned or passed to calls.
+    [ live-values* ] node-union ;
 
-: kill-set ( node -- list )
+GENERIC: returns*
+
+: returns ( node -- hash )
+    #! Trace all control flow paths, build a hash of
+    #! final #return nodes.
+    [ returns* ] node-union ;
+
+: kill-set ( node -- seq )
     #! Push a list of literals that may be killed in the IR.
-    dup literals [ swap can-kill? ] subset-with ;
+    dup live-values swap literals hash-diff hash-keys ;
 
 : remove-values ( values node -- )
-    2dup [ node-in-d seq-diff ] keep set-node-in-d
-    2dup [ node-out-d seq-diff ] keep set-node-out-d
-    2dup [ node-in-r seq-diff ] keep set-node-in-r
-    [ node-out-r seq-diff ] keep set-node-out-r ;
+    2dup [ node-in-d remove-all ] keep set-node-in-d
+    2dup [ node-out-d remove-all ] keep set-node-out-d
+    2dup [ node-in-r remove-all ] keep set-node-in-r
+    [ node-out-r remove-all ] keep set-node-out-r ;
 
 : kill-node ( literals node -- )
     [ remove-values ] each-node-with ;
 
 ! Generic nodes
-M: node literals* ( node -- ) drop { } ;
+M: node literals* ( node -- seq ) drop @{ }@ ;
 
-M: node can-kill* ( literal node -- ? )
-    uses-value? not ;
+M: node live-values* ( node -- seq ) node-values ;
+
+M: node returns* ( node -- seq ) drop @{ }@ ;
 
 ! #shuffle
-M: #shuffle literals* ( node -- )
+M: #shuffle literals* ( node -- seq )
     node-out-d [ literal? ] subset ;
 
-M: #shuffle can-kill* ( literal node -- ? ) 2drop t ;
-
-! #call-label
-M: #call-label can-kill* ( literal node -- ? ) 2drop t ;
-
-! #merge
-M: #merge can-kill* ( literal node -- ? ) 2drop t ;
-
-! #entry
-M: #entry can-kill* ( literal node -- ? ) 2drop t ;
-
-! #values
-M: #values can-kill* ( literal node -- ? ) 2drop t ;
-
 ! #return
-SYMBOL: branch-returns
+M: #return returns* 1array ;
 
-GENERIC: returns*
+M: #return live-values* ( node -- seq )
+    #! Values returned by local labels can be killed.
+    dup node-param [ drop @{ }@ ] [ delegate live-values* ] ifte ;
 
+! nodes that don't use their input values directly
+UNION: #killable #shuffle #call-label #merge #entry #values ;
+
+M: #killable live-values* ( node -- seq ) drop @{ }@ ;
+
+! branching
 UNION: #branch #ifte #dispatch ;
 
-M: #branch returns*
-    node-children [ last-node returns* ] each ;
-
-M: #return returns* , ;
-
-M: node returns* node-successor returns* ;
-
-: returns ( node -- seq )
-    #! Trace all control flow paths, build a sequence of
-    #! final #return nodes.
-    [ returns* ] { } make ;
-
-: branch-values ( branches -- )
-    returns [ node-in-d ] map unify-lengths flip \ returns set ;
-
-M: #return can-kill* ( literal node -- ? )
-    #! Values returned by local labels can be killed.
-    dup node-param [
-        dupd uses-value? [
-            \ returns get
-            [ memq? ] subset-with
-            [ [ eq? ] monotonic? ] all?
-        ] [
-            drop t
-        ] ifte
-    ] [
-        delegate can-kill*
-    ] ifte ;
-
-: can-kill-branches? ( literal node -- ? )
-    #! Check if the literal appears in either branch. This
-    #! assumes that the last element of each branch is a #return
-    #! node.
-    2dup uses-value? [
-        2drop f
-    ] [
-        [
-            dup branch-values
-            node-children [ can-kill? ] all-with?
-        ] with-scope
-    ] ifte ;
-
-! #ifte
-M: #ifte can-kill* ( literal node -- ? )
-    can-kill-branches? ;
-
-! #dispatch
-M: #dispatch can-kill* ( literal node -- ? )
-    can-kill-branches? ;
-
-! #label
-M: #label can-kill* ( literal node -- ? )
-    node-child can-kill? ;
+M: #branch live-values* ( node -- seq )
+    #! This assumes that the last element of each branch is a
+    #! #return node.
+    returns hash-keys [ node-in-d ] map unify-lengths flip
+    [ [ eq? ] monotonic? not ] subset concat ;

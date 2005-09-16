@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: parser
-USING: kernel lists namespaces sequences io words ;
+USING: io kernel lists math namespaces sequences words ;
 
 : file-vocabs ( -- )
     "scratchpad" "in" set
@@ -10,7 +10,7 @@ USING: kernel lists namespaces sequences io words ;
 : parse-lines ( lines -- quot )
     [
         dup length [ ]
-        [ line-number set (parse) ] 2reduce
+        [ 1 + line-number set (parse) ] 2reduce
         reverse
     ] with-parser ;
 

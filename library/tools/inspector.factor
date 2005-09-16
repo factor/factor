@@ -38,7 +38,9 @@ SYMBOL: inspector-slots
     flip
     [ " | " join ] map ;
 
-: vocab-banner ( word -- )
+GENERIC: extra-banner ( obj -- )
+
+M: word extra-banner ( word -- )
     dup word-vocabulary [
         dup interned? [
             "This word is located in the " write
@@ -51,15 +53,6 @@ SYMBOL: inspector-slots
         drop
         "The word is a uniquely generated symbol." print
     ] ifte ;
-
-GENERIC: extra-banner ( obj -- )
-
-M: word extra-banner ( obj -- )
-    dup vocab-banner
-    metaclass [
-        "This is a class whose behavior is specifed by the " write
-        pprint " metaclass." print
-    ] when* ;
 
 M: object extra-banner ( obj -- ) drop ;
 

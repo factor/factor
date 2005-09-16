@@ -1,19 +1,6 @@
+USING: hashtables namespaces generic test kernel math words
+lists vectors alien sequences prettyprint io parser strings ;
 IN: temporary
-USE: hashtables
-USE: namespaces
-USE: generic
-USE: test
-USE: kernel
-USE: math
-USE: words
-USE: lists
-USE: vectors
-USE: alien
-USE: sequences
-USE: prettyprint
-USE: io
-USE: parser
-USE: strings
 
 GENERIC: class-of
 
@@ -80,6 +67,8 @@ M: very-funny gooey sq ;
 
 [ 1/4 ] [ 1/2 gooey ] unit-test
 
+[ cons ] [ [ 1 2 ] class ] unit-test
+
 [ object ] [ object object class-and ] unit-test
 [ fixnum ] [ fixnum object class-and ] unit-test
 [ fixnum ] [ object fixnum class-and ] unit-test
@@ -87,13 +76,8 @@ M: very-funny gooey sq ;
 [ fixnum ] [ fixnum integer class-and ] unit-test
 [ fixnum ] [ integer fixnum class-and ] unit-test
 [ null ] [ vector fixnum class-and ] unit-test
-[ integer ] [ fixnum bignum class-or ] unit-test
-[ integer ] [ fixnum integer class-or ] unit-test
-[ rational ] [ ratio integer class-or ] unit-test
 [ number ] [ number object class-and ] unit-test
 [ number ] [ object number class-and ] unit-test
-
-[ cons ] [ [ 1 2 ] class ] unit-test
 
 [ t ] [ \ fixnum \ integer class< ] unit-test
 [ t ] [ \ fixnum \ fixnum class< ] unit-test
@@ -114,10 +98,16 @@ M: very-funny gooey sq ;
 [ f ] [ \ reversed \ slice class< ] unit-test
 [ f ] [ \ slice \ reversed class< ] unit-test
 
+TUPLE: a ;
+TUPLE: b ;
+UNION: c a b ;
+
+[ t ] [ \ c \ tuple class< ] unit-test
+[ f ] [ \ tuple \ c class< ] unit-test
+
 DEFER: bah
 FORGET: bah
 UNION: bah fixnum alien ;
-[ bah ] [ fixnum alien class-or ] unit-test
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
 DEFER: complement-test

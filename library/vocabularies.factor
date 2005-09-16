@@ -4,6 +4,9 @@ IN: words
 USING: hashtables errors kernel lists namespaces strings
 sequences ;
 
+! If true in current namespace, we are bootstrapping.
+SYMBOL: bootstrapping?
+
 SYMBOL: vocabularies
 
 : word ( -- word ) \ word global hash ;
@@ -75,13 +78,19 @@ SYMBOL: vocabularies
     #! Test if the word is a member of its vocabulary.
     dup word-name over word-vocabulary lookup eq? ;
 
+: reintern ( word -- word )
+    dup word-name swap word-vocabulary
+    bootstrapping? get [
+        dup "syntax" = [ drop "!syntax" ] when
+    ] when lookup ;
+
 "scratchpad" "in" set
 [
+    "scratchpad"
     "syntax" "arrays" "compiler" "errors" "generic" "hashtables"
     "help" "inference" "inspector" "interpreter" "io"
     "jedit" "kernel" "listener" "lists" "math"
     "memory" "namespaces" "parser" "prettyprint" "queues"
     "sequences" "shells" "strings" "styles"
     "test" "threads" "vectors" "words"
-    "scratchpad"
 ] "use" set

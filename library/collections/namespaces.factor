@@ -133,3 +133,8 @@ SYMBOL: hash-buffer
         (closure)
         hash-buffer get hash-keys
     ] with-scope ;
+
+IN: lists
+
+: alist>quot ( default alist -- quot )
+    [ unswons [ % , , \ ifte , ] [ ] make ] each ;

@@ -14,9 +14,6 @@ USING: arrays errors generic hashtables kernel lists
 math namespaces parser prettyprint sequences
 sequences-internals io strings vectors words ;
 
-! If true in current namespace, we are bootstrapping.
-SYMBOL: bootstrapping?
-
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
 
@@ -292,6 +289,7 @@ M: hashtable ' ( hashtable -- pointer )
         "Object cache size: " write objects get hash-size .
         image get
         \ word global remove-hash
+        namespace global [ "foobar" set ] bind
     ] with-scope ;
 
 : make-image ( name -- )
