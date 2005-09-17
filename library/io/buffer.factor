@@ -83,7 +83,7 @@ C: buffer ( size -- buffer )
 : ch>buffer ( char buffer -- )
     1 over check-overflow
     [ buffer-end f swap set-alien-unsigned-1 ] keep
-    [ buffer-fill 1 + ] keep set-buffer-fill ;
+    [ buffer-fill 1+ ] keep set-buffer-fill ;
 
 : n>buffer ( count buffer -- )
     #! Increases the fill pointer by count.

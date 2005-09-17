@@ -10,7 +10,7 @@ USING: io kernel lists math namespaces sequences words ;
 : parse-lines ( lines -- quot )
     [
         dup length [ ]
-        [ 1 + line-number set (parse) ] 2reduce
+        [ 1+ line-number set (parse) ] 2reduce
         reverse
     ] with-parser ;
 

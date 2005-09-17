@@ -26,6 +26,16 @@ SYMBOL: 64-bits
 
 : emit ( cell -- ) image get push ;
 
+: emit-64 ( cell -- )
+    64-bits get [
+        emit
+    ] [
+        dup 1 32 shift 1- bitand
+        swap -32 shift 1 32 shift 1- bitand
+        big-endian get [ swap ] unless
+        emit emit
+    ] ifte ;
+
 : emit-seq ( seq -- ) image get swap nappend ;
 
 : fixup ( value offset -- ) image get set-nth ;
@@ -41,7 +51,6 @@ SYMBOL: 64-bits
 : untag ( cell tag -- ) tag-mask bitnot bitand ;
 : tag ( cell -- tag ) tag-mask bitand ;
 
-: t-type         7  ; inline
 : array-type     8  ; inline
 : hashtable-type 10 ; inline
 : vector-type    11 ; inline
@@ -109,6 +118,15 @@ M: bignum ' ( bignum -- tagged )
         [[ -1 [ 2 1 1 ] ]]
         [[ 1  [ 2 0 1 ] ]]
     }} hash unswons emit-fixnum emit-seq align-here r> ;
+
+( Floats )
+
+M: float ' ( float -- tagged )
+    float-tag here-as >r
+    float-tag >header emit
+    align-here
+    double>bits emit-64
+    r> ;
 
 ( Special objects )
 
@@ -178,10 +196,14 @@ M: wrapper ' ( wrapper -- pointer )
 
 ( Conses )
 
-M: cons ' ( c -- tagged )
-    uncons ' swap '
-    cons-tag here-as
-    -rot emit emit ;
+: emit-cons ( first second tag -- pointer )
+    >r ' swap ' r> here-as -rot emit emit ;
+
+M: cons ' ( c -- tagged ) uncons cons-tag emit-cons ;
+
+M: ratio ' ( c -- tagged ) >fraction ratio-tag emit-cons ;
+
+M: complex ' ( c -- tagged ) >rect complex-tag emit-cons ;
 
 ( Strings )
 
@@ -190,7 +212,7 @@ M: cons ' ( c -- tagged )
     [ 0 [ swap 16 shift + ] reduce emit ] each ;
 
 : pack-string ( string -- seq )
-    dup length 1 + char align CHAR: \0 pad-right char swap group ;
+    dup length 1+ char align CHAR: \0 pad-right char swap group ;
 
 : emit-string ( string -- ptr )
     object-tag here-as swap
@@ -289,7 +311,6 @@ M: hashtable ' ( hashtable -- pointer )
         "Object cache size: " write objects get hash-size .
         image get
         \ word global remove-hash
-        namespace global [ "foobar" set ] bind
     ] with-scope ;
 
 : make-image ( name -- )

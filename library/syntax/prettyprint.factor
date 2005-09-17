@@ -65,7 +65,7 @@ C: section ( length -- section )
 TUPLE: text string style ;
 
 C: text ( string style -- section )
-    pick length 1 + <section> over set-delegate
+    pick length 1+ <section> over set-delegate
     [ set-text-style ] keep
     [ set-text-string ] keep ;
 

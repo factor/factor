@@ -8,9 +8,9 @@ USING: arrays kernel math sequences ;
 TUPLE: sorter seq start end mid ;
 
 C: sorter ( seq start end -- sorter )
-    [ >r 1 + rot <slice> r> set-sorter-seq ] keep
+    [ >r 1+ rot <slice> r> set-sorter-seq ] keep
     dup sorter-seq midpoint over set-sorter-mid
-    dup sorter-seq length 1 - over set-sorter-end
+    dup sorter-seq length 1- over set-sorter-end
     0 over set-sorter-start ; inline
 
 : exchange ( n n seq -- )
@@ -18,12 +18,12 @@ C: sorter ( seq start end -- sorter )
     >r >r set-nth-unsafe r> r> set-nth-unsafe ;
 
 : s*/e* dup sorter-start swap sorter-end ; inline
-: s*/e dup sorter-start swap sorter-seq length 1 - ; inline
+: s*/e dup sorter-start swap sorter-seq length 1- ; inline
 : s/e* 0 swap sorter-end ; inline
 : sorter-exchange dup s*/e* rot sorter-seq exchange ; inline
 : compare over sorter-seq nth-unsafe swap sorter-mid rot call ; inline
-: >start> dup sorter-start 1 + swap set-sorter-start ; inline
-: <end< dup sorter-end 1 - swap set-sorter-end ; inline
+: >start> dup sorter-start 1+ swap set-sorter-start ; inline
+: <end< dup sorter-end 1- swap set-sorter-end ; inline
 
 : sort-up ( quot sorter -- quot sorter )
     dup s*/e < [
@@ -81,7 +81,7 @@ IN: sequences
 
 : nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
     swap dup length 1 <=
-    [ 2drop ] [ 0 over length 1 - (nsort) ] ifte ; inline
+    [ 2drop ] [ 0 over length 1- (nsort) ] ifte ; inline
 
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline

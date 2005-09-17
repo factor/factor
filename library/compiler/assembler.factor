@@ -30,7 +30,7 @@ SYMBOL: interned-literals
 
 : compile-byte ( n -- )
     compiled-offset set-compiled-byte
-    compiled-offset 1 + set-compiled-offset ; inline
+    compiled-offset 1+ set-compiled-offset ; inline
 
 : compile-cell ( n -- )
     compiled-offset set-compiled-cell

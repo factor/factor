@@ -77,7 +77,7 @@ unit-test
 
 [ 4 ] [
     0 "There are Four Upper Case characters"
-    [ LETTER? [ 1 + ] when ] each
+    [ LETTER? [ 1+ ] when ] each
 ] unit-test
 
 [ "Replacing+spaces+with+plus" ]

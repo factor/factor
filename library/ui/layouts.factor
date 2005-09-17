@@ -105,7 +105,7 @@ M: pack layout* ( pack -- ) dup pref-dims packed-layout ;
 M: pack children-on ( rect pack -- list )
     dup pack-vector swap gadget-children [
         3dup
-        >r >r dup rect-loc swap rect-dim v+ r> r> fast-children-on 1 +
+        >r >r dup rect-loc swap rect-dim v+ r> r> fast-children-on 1+
         >r
         >r >r rect-loc r> r> fast-children-on 0 max
         r>

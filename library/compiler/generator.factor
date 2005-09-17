@@ -72,4 +72,4 @@ M: f v>operand address ;
 
 : shift-add ( by -- n )
     #! Used in fixnum-shift overflow check.
-    1 swap cell 8 * swap 1 - - shift ;
+    1 swap cell 8 * swap 1- - shift ;

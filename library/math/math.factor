@@ -27,6 +27,9 @@ G: bitor  ( x y -- z ) math-combination ; foldable
 G: bitxor ( x y -- z ) math-combination ; foldable
 G: shift  ( x n -- y ) math-combination ; foldable
 
+GENERIC: 1+ ( x -- x+1 ) foldable
+GENERIC: 1- ( x -- x-1 ) foldable
+
 GENERIC: bitnot ( n -- n ) foldable
 
 GENERIC: truncate ( n -- n ) foldable
@@ -54,14 +57,15 @@ GENERIC: ceiling  ( n -- n ) foldable
     #! Push the sign of a real number.
     dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ; foldable
 
-GENERIC: abs ( z -- |z| )
+GENERIC: abs ( z -- |z| ) foldable
+GENERIC: absq ( n -- |n|^2 ) foldable
 
 : align ( offset width -- offset )
     2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >=
-    [ 3drop ] [ [ swap >r call 1 + r> ] keep (repeat) ] ifte ;
+    [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] ifte ;
     inline
 
 : repeat ( n quot -- | quot: n -- n )
@@ -84,7 +88,7 @@ GENERIC: abs ( z -- |z| )
     dup 0 <= [
         "Input must be positive" throw
     ] [
-        dup 1 = [ drop 0 ] [ 2 /i log2 1 + ] ifte
+        dup 1 = [ drop 0 ] [ 2 /i log2 1+ ] ifte
     ] ifte ; foldable
 
 GENERIC: number>string ( str -- num ) foldable

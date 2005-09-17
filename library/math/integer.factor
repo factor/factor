@@ -61,6 +61,9 @@ M: fixnum mod fixnum-mod ;
 
 M: fixnum /mod fixnum/mod ;
 
+M: fixnum 1+ 1 fixnum+ ;
+M: fixnum 1- 1 fixnum- ;
+
 M: fixnum bitand fixnum-bitand ;
 M: fixnum bitor fixnum-bitor ;
 M: fixnum bitxor fixnum-bitxor ;
@@ -82,6 +85,9 @@ M: bignum /f bignum/f ;
 M: bignum mod bignum-mod ;
 
 M: bignum /mod bignum/mod ;
+
+M: bignum 1+ 1 >bignum bignum+ ;
+M: bignum 1- 1 >bignum bignum- ;
 
 M: bignum bitand bignum-bitand ;
 M: bignum bitor bignum-bitor ;

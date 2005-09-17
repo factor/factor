@@ -46,7 +46,7 @@ M: node literals* ( node -- ) drop ;
 M: node live-values* ( node -- )
     node-values [ (flatten-value) ] each ;
 
-M: node returns* ( node -- seq ) node-successor returns ;
+M: node returns* ( node -- seq ) node-successor returns* ;
 
 ! #shuffle
 M: #shuffle literals* ( node -- )

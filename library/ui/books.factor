@@ -29,9 +29,9 @@ M: book layout* ( book -- )
 
 : first-page ( book -- ) 0 swap show-page ;
 
-: prev-page ( book -- ) [ book-page 1 - ] keep show-page ;
+: prev-page ( book -- ) [ book-page 1- ] keep show-page ;
 
-: next-page ( book -- ) [ book-page 1 + ] keep show-page ;
+: next-page ( book -- ) [ book-page 1+ ] keep show-page ;
 
 : last-page ( book -- ) -1 swap show-page ;
 

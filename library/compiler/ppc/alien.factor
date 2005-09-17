@@ -25,7 +25,7 @@ M: float-regs store-insn
     float-regs-size 4 = [ STFS ] [ STFD ] ifte ;
 M: float-regs return-reg drop 1 ;
 M: float-regs load-insn
-    >r 1 + 1 rot r> float-regs-size 4 = [ LFS ] [ LFD ] ifte ;
+    >r 1+ 1 rot r> float-regs-size 4 = [ LFS ] [ LFD ] ifte ;
 
 M: %unbox generate-node ( vop -- )
     [ 1 vop-in f compile-c-call ] keep

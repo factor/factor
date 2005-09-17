@@ -63,7 +63,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
         2dup >r >r start-step dupd sequence= [
             r> 2drop r>
         ] [
-            r> r> 1 + start*
+            r> r> 1+ start*
         ] ifte
     ] ifte ; flushable
 

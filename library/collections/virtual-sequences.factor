@@ -17,7 +17,7 @@ TUPLE: reversed ;
 
 C: reversed [ set-delegate ] keep ;
 
-: reversed@ delegate [ length swap - 1 - ] keep ; inline
+: reversed@ delegate [ length swap - 1- ] keep ; inline
 
 M: reversed nth ( n seq -- elt ) reversed@ nth ;
 

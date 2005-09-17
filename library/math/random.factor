@@ -10,7 +10,7 @@ IN: math USING: kernel ;
     ] ifte ; inline
 
 : random-int-0 ( max -- n )
-    1 + dup power-of-2? [
+    1+ dup power-of-2? [
         (random-int) * -31 shift
     ] [
         (random-int) 2dup swap mod (random-int-0)

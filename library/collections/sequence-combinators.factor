@@ -14,7 +14,7 @@ USING: arrays generic kernel kernel-internals math vectors ;
     swap r> swap r> swap ; inline
 
 : (monotonic) ( quot seq i -- ? )
-    2dup 1 + swap nth-unsafe >r swap nth-unsafe r> rot call ;
+    2dup 1+ swap nth-unsafe >r swap nth-unsafe r> rot call ;
     inline
 
 IN: sequences
@@ -90,7 +90,7 @@ M: object map ( seq quot -- seq )
         3dup >r >r >r >r nth-unsafe r> call [
             r> dup r> nth-unsafe r> drop
         ] [
-            r> 1 + r> r> find*
+            r> 1+ r> r> find*
         ] ifte
     ] ifte ; inline
 
@@ -133,6 +133,6 @@ M: object find ( seq quot -- i elt )
     #! Eg, { 1 2 3 4 } [ < ] monotonic? ==> t
     #!     { 1 3 2 4 } [ < ] monotonic? ==> f
     #! Don't use with lists.
-    swap dup length 1 - [
+    swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline

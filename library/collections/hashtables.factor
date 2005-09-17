@@ -32,8 +32,8 @@ IN: kernel-internals
     over bucket-count [ [ -rot call ] 3keep ] repeat 2drop ;
     inline
 
-: hash-size+ ( hash -- ) dup hash-size 1 + swap set-hash-size ;
-: hash-size- ( hash -- ) dup hash-size 1 - swap set-hash-size ;
+: hash-size+ ( hash -- ) dup hash-size 1+ swap set-hash-size ;
+: hash-size- ( hash -- ) dup hash-size 1- swap set-hash-size ;
 
 : grow-hash ( hash -- )
     #! A good way to earn a living.

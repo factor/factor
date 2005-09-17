@@ -88,8 +88,8 @@ namespaces sequences words ;
 ] "intrinsic" set-word-prop
 
 : value/vreg-list ( in -- list )
-    [ 0 swap length 1 - ] keep
-    [ >r 2dup r> 3array >r 1 - >r 1 + r> r> ] map 2nip ;
+    [ 0 swap length 1- ] keep
+    [ >r 2dup r> 3array >r 1- >r 1+ r> r> ] map 2nip ;
 
 : values>vregs ( in -- in )
     value/vreg-list

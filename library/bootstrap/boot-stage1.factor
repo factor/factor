@@ -57,6 +57,11 @@ sequences io vectors words ;
         "/library/math/matrices.factor"
         "/library/math/parse-numbers.factor"
 
+        "/library/math/constants.factor"
+        "/library/math/pow.factor"
+        "/library/math/trig-hyp.factor"
+        "/library/math/arc-trig-hyp.factor"
+
         "/library/words.factor"
         "/library/vocabularies.factor"
         "/library/errors.factor"

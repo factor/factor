@@ -125,7 +125,7 @@ M: %fixnum<< generate-node
     0 vop-in
     ! check for potential overflow
     dup shift-add ECX over ADD
-    2 * 1 - ECX swap CMP
+    2 * 1- ECX swap CMP
     ! is there going to be an overflow?
     "no-overflow" get JBE
     ! there is going to be an overflow, make a bignum

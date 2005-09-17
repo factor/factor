@@ -20,7 +20,7 @@ USE: namespaces
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
 : fib ( n -- nth fibonacci number )
-    dup 1 <= [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] ifte ;
+    dup 1 <= [ drop 1 ] [ 1- dup fib swap 1- fib + ] ifte ;
     compiled
 
 [ 9227465 ] [ 34 fib ] unit-test
@@ -31,10 +31,10 @@ TUPLE: box i ;
     dup box-i 1 <= [
         drop 1 <box>
     ] [
-        box-i 1 - <box>
+        box-i 1- <box>
         dup tuple-fib
         swap
-        box-i 1 - <box>
+        box-i 1- <box>
         tuple-fib
         swap box-i swap box-i + <box>
     ] ifte ; compiled

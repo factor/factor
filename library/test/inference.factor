@@ -164,7 +164,7 @@ M: real iterate drop ;
 [ [ callstack ] infer ] unit-test-fails
 
 DEFER: agent
-: smith 1 + agent ; inline
+: smith 1+ agent ; inline
 : agent dup 0 = [ [ swap call ] 2keep smith ] when ; inline
 [ @{ 0 2 }@ ]
 [ [ [ drop ] 0 agent ] infer ] unit-test

@@ -64,14 +64,8 @@ M: node child-ties ( node -- seq )
     dup node-values
     [ value-class ] map>hash swap set-node-classes ;
 
-: assume-classes ( classes values -- )
-    [ set-value-class ] 2each ;
-
-: assume-literals ( literals values -- )
-    [ set-value-literal ] 2each ;
-
 : intersect-classes ( classes values -- )
-    [ [ value-class class-and ] 2map ] keep assume-classes ;
+    [ [ value-class class-and ] keep set-value-class ] 2each ;
 
 : type/tag-ties ( node n -- )
     over node-out-d first over [ <literal-tie> ] map-with
@@ -126,7 +120,7 @@ M: #call infer-classes* ( node -- )
 
 M: #shuffle infer-classes* ( node -- )
     node-out-d [ literal? ] subset
-    dup [ literal-value ] map swap assume-literals ;
+    [ [ literal-value ] keep set-value-literal ] each ;
 
 M: #ifte child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>

@@ -49,10 +49,10 @@ SYMBOL: history-index
 
 : history-next ( -- )
     #! Call this in the line editor scope.
-    history-index get dup 1 + history-length >= [
+    history-index get dup 1+ history-length >= [
         drop
     ] [
-        1 + goto-history
+        1+ goto-history
     ] ifte ;
 
 : line-clear ( -- )
@@ -108,15 +108,15 @@ SYMBOL: history-index
 
 : backspace ( -- )
     #! Call this in the line editor scope.
-    caret get dup 0 = [ drop ] [ 1 - 1 line-remove ] ifte ;
+    caret get dup 0 = [ drop ] [ 1- 1 line-remove ] ifte ;
 
 : left ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 - 0 max ] change ;
+    caret [ 1- 0 max ] change ;
 
 : right ( -- )
     #! Call this in the line editor scope.
-    caret [ 1 + line-text get length min ] change ;
+    caret [ 1+ line-text get length min ] change ;
 
 : home ( -- )
     #! Call this in the line editor scope.

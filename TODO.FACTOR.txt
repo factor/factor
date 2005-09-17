@@ -1,4 +1,5 @@
 - quot>interp needs to go
+- nth-unsafe and set-nth-unsafe with bignums
 
 + ui:
 

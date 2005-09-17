@@ -63,7 +63,7 @@ sequences words ;
     scan string>number ; parsing
 
 : ENUM:
-    dup CREATE swap unit define-compound 1 + ; parsing
+    dup CREATE swap unit define-compound 1+ ; parsing
 
 : END-ENUM
     drop ; parsing

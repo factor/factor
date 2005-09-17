@@ -178,7 +178,6 @@ SYMBOL: @
 
 M: #call optimize-node* ( node -- node/t )
     @{
-        @{ [ dup node-param not ] [ node-successor ] }@
         @{ [ dup partial-eval? ] [ partial-eval ] }@
         @{ [ dup find-identity nip ] [ apply-identities ] }@
         @{ [ dup optimizer-hooks ] [ optimize-hooks ] }@

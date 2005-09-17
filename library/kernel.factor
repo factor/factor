@@ -32,9 +32,6 @@ M: object clone ;
     #! Push t if cond is true, otherwise push f.
     rot [ drop ] [ nip ] ifte ; inline
 
-M: wrapper = ( obj wrapper -- ? )
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] ifte ;
-
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
 : or ( a b -- a|b ) t swap ? ; inline
@@ -55,6 +52,9 @@ M: wrapper = ( obj wrapper -- ? )
 : bignum-tag  BIN: 001 ; inline
 : cons-tag    BIN: 010 ; inline
 : object-tag  BIN: 011 ; inline
+: ratio-tag   BIN: 100 ; inline
+: float-tag   BIN: 101 ; inline
+: complex-tag BIN: 110 ; inline
 
 : slip ( quot x -- x | quot: -- )
     >r call r> ; inline
@@ -113,6 +113,9 @@ M: wrapper = ( obj wrapper -- ? )
 
 : keep-datastack ( quot -- )
     datastack slip set-datastack drop ;
+
+M: wrapper = ( obj wrapper -- ? )
+    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] ifte ;
 
 IN: kernel-internals
 

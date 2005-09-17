@@ -31,7 +31,7 @@ SYMBOL: file
     "col" [ "line" get [ blank? not ] skip ] change ;
 
 : skip-word ( n line -- n )
-    2dup nth CHAR: " = [ drop 1 + ] [ [ blank? ] skip ] ifte ;
+    2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] ifte ;
 
 : (scan) ( n line -- start end )
     dupd 2dup length < [ skip-word ] [ drop ] ifte ;
@@ -69,7 +69,7 @@ global [ string-mode off ] bind
     "col" get "line" get index* ;
 
 : (until) ( index -- str )
-    "col" get swap dup 1 + "col" set "line" get subseq ;
+    "col" get swap dup 1+ "col" set "line" get subseq ;
 
 : until ( ch -- str )
     ch-search (until) ;
@@ -98,16 +98,16 @@ global [ string-mode off ] bind
 
 : next-escape ( n str -- ch n )
     2dup nth CHAR: u = [
-        swap 1 + dup 4 + [ rot subseq hex> ] keep
+        swap 1+ dup 4 + [ rot subseq hex> ] keep
     ] [
-        over 1 + >r nth escape r>
+        over 1+ >r nth escape r>
     ] ifte ;
 
 : next-char ( n str -- ch n )
     2dup nth CHAR: \\ = [
-        >r 1 + r> next-escape
+        >r 1+ r> next-escape
     ] [
-        over 1 + >r nth r>
+        over 1+ >r nth r>
     ] ifte ;
 
 : doc-comment-here? ( parsed -- ? )
@@ -139,7 +139,7 @@ global [ string-mode off ] bind
 
 : (parse-string) ( n str -- n )
     2dup nth CHAR: " = [
-        drop 1 +
+        drop 1+
     ] [
         [ next-char swap , ] keep (parse-string)
     ] ifte ;

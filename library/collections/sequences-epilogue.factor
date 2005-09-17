@@ -9,7 +9,7 @@ sequences strings vectors words ;
         2drop [ length ] 2apply -
     ] [
         >r 3dup 2nth-unsafe 2dup = [
-            2drop 1 + r> (lexi)
+            2drop 1+ r> (lexi)
         ] [
             r> drop - >r 3drop r>
         ] ifte
@@ -25,7 +25,7 @@ M: object empty? ( seq -- ? ) length 0 = ;
     pick pick <= [
         3drop [ ]
     ] [
-        2dup nth >r >r 1 + r> (>list) r> swons
+        2dup nth >r >r 1+ r> (>list) r> swons
     ] ifte ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
@@ -47,7 +47,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     2dup length < [
         3dup move
         >r pick over r> dup >r nth = r> swap
-        [ >r >r 1 + r> r> ] unless >r 1 + r> (delete)
+        [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
     ] when ;
 
 : delete ( elt seq -- )
@@ -93,11 +93,11 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 M: object peek ( sequence -- element )
     #! Get value at end of sequence.
-    dup length 1 - swap nth ;
+    dup length 1- swap nth ;
 
 : pop* ( sequence -- )
     #! Shorten the sequence by one element.
-    dup length 1 - swap set-length ;
+    dup length 1- swap set-length ;
 
 : pop ( sequence -- element )
     #! Get value at end of sequence and remove it.

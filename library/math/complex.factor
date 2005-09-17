@@ -12,10 +12,8 @@ IN: math
 
 UNION: number real complex ;
 
-! These should be defined on real, not object, but real? is
-! expensive.
-M: object real ;
-M: object imaginary drop 0 ;
+M: real real ;
+M: real imaginary drop 0 ;
 
 M: number = ( n n -- ? ) number= ;
 
@@ -26,8 +24,7 @@ M: number = ( n n -- ? ) number= ;
         "Complex number must have real components" throw drop
     ] ifte ; inline
 
-: >rect ( x -- xr xi )
-    dup complex? [ dup real swap imaginary ] [ 0 ] ifte ; inline
+: >rect ( x -- xr xi ) dup real swap imaginary ; inline
 
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
@@ -44,7 +41,7 @@ M: number = ( n n -- ? ) number= ;
 : polar> ( abs arg -- z )
     cis * ; inline
 
-: absq >rect [ sq ] 2apply + ; inline
+M: complex absq >rect [ sq ] 2apply + ;
 
 IN: math-internals
 
@@ -67,6 +64,9 @@ M: complex * ( x y -- x*y ) 2dup *re - -rot *im + (rect>) ;
 
 M: complex / ( x y -- x/y ) complex/ tuck / >r / r> (rect>) ;
 M: complex /f ( x y -- x/y ) complex/ tuck /f >r /f r> (rect>) ;
+
+M: complex 1+ >rect >r 1+ r> (rect>) ;
+M: complex 1- >rect >r 1- r> (rect>) ;
 
 M: complex abs ( z -- |z| ) absq fsqrt ;
 

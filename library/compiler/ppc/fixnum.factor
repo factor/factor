@@ -57,10 +57,10 @@ M: %fixnum* generate-node ( vop -- )
     3 6 MR ;
 
 : first-bignum ( -- n )
-    1 cell 8 * tag-bits - 1 - shift ; inline
+    1 cell 8 * tag-bits - 1- shift ; inline
 
 : most-positive-fixnum ( -- n )
-    first-bignum 1 - >fixnum ; inline
+    first-bignum 1- >fixnum ; inline
 
 : most-negative-fixnum ( -- n )
     first-bignum neg >fixnum ; inline
@@ -118,7 +118,7 @@ M: %fixnum<< generate-node ( vop -- )
     ! check for potential overflow
     dup shift-add dup 5 LOAD
     4 3 5 ADD
-    2 * 1 - 5 LOAD
+    2 * 1- 5 LOAD
     5 0 4 CMPL
     ! is there going to be an overflow?
     "no-overflow" get BGE

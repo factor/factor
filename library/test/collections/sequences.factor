@@ -117,7 +117,7 @@ unit-test
 [ 3 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ - ] binsearch ] unit-test
 [ 10 ] [ 10 20 >vector [ - ] binsearch ] unit-test
 
-: seq-sorter 0 over length 1 - <sorter> ;
+: seq-sorter 0 over length 1- <sorter> ;
 
 [ { 4 2 3 1 } ]
 [ { 1 2 3 4 } clone dup seq-sorter sorter-exchange ] unit-test

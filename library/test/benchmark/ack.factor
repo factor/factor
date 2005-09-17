@@ -7,12 +7,12 @@ USE: test
 
 : ack ( m n -- x )
     over 0 = [
-        nip 1 +
+        nip 1+
     ] [
         dup 0 = [
-            drop 1 - 1 ack
+            drop 1- 1 ack
         ] [
-            dupd 1 - ack >r 1 - r> ack
+            dupd 1- ack >r 1- r> ack
         ] ifte
     ] ifte ; compiled
 

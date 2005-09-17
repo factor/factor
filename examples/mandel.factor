@@ -93,11 +93,8 @@ USE: test
     ] map-with ;
 
 : iter ( c z nb-iter -- x )
-    over absq 4 >= over 0 = or [
-        nip nip
-    ] [
-        1 - >r sq dupd + r> iter
-    ] ifte ;
+    over absq 4.0 >= over 0 = or
+    [ 2nip ] [ 1- >r sq dupd + r> iter ] ifte ;
 
 : max-color 360 ;
 

@@ -7,7 +7,7 @@ USE: io
 USE: test
 
 : (callcc1-test)
-    swap 1 - tuck swons
+    swap 1- tuck swons
     over 0 = [ "test-cc" get continue-with ] when
     (callcc1-test) ;
 

@@ -9,11 +9,11 @@ USING: kernel math math-internals ;
 ! Inverse hyperbolic functions:
 !    acosh asech asinh acosech atanh acoth
 
-: acosh dup sq 1 - sqrt + log ; inline
+: acosh dup sq 1- sqrt + log ; inline
 : asech recip acosh ; inline
-: asinh dup sq 1 + sqrt + log ; inline
+: asinh dup sq 1+ sqrt + log ; inline
 : acosech recip asinh ; inline
-: atanh dup 1 + swap 1 - neg / log 2 / ; inline
+: atanh dup 1+ swap 1- neg / log 2 / ; inline
 : acoth recip atanh ; inline
 : <=1 ( x -- ? ) dup complex? [ drop f ] [ abs 1 <= ] ifte ; inline
 : asin dup <=1 [ fasin ] [ i * asinh -i * ] ifte ; inline

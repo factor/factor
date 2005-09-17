@@ -30,7 +30,7 @@ sequences strings unparser vectors words ;
     room
     0 swap [
         "Generation " write over pprint ":" write
-        uncons (room.) 1 +
+        uncons (room.) 1+
     ] each drop
     "Semi-space:  " write kb. terpri
     "Cards:       " write kb. terpri

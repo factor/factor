@@ -64,11 +64,6 @@ t [
     "/library/alien/malloc.factor"
     "/library/io/buffer.factor"
 
-    "/library/math/constants.factor"
-    "/library/math/pow.factor"
-    "/library/math/trig-hyp.factor"
-    "/library/math/arc-trig-hyp.factor"
-
     "/library/httpd/load.factor"
     "/library/sdl/load.factor"
     "/library/ui/load.factor"
@@ -141,10 +136,10 @@ compile? [
     0 exit
 ] set-boot
 
-0 [ compiled? [ 1 + ] when ] each-word
+0 [ compiled? [ 1+ ] when ] each-word
 number>string write " words compiled" print
 
-0 [ drop 1 + ] each-word
+0 [ drop 1+ ] each-word
 number>string write " words total" print 
 
 "Total bootstrap GC time: " write gc-time

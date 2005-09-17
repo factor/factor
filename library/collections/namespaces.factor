@@ -76,9 +76,9 @@ strings vectors words ;
 
 : off ( var -- ) f swap set ; inline
 
-: inc ( var -- ) [ 1 + ] change ; inline
+: inc ( var -- ) [ 1+ ] change ; inline
 
-: dec ( var -- ) [ 1 - ] change ; inline
+: dec ( var -- ) [ 1- ] change ; inline
 
 : bind ( namespace quot -- )
     #! Execute a quotation with a namespace on the namestack.
