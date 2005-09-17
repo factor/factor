@@ -38,9 +38,7 @@ M: integer / ( x y -- x/y )
     dup 0 number= [
         division-by-zero
     ] [
-        dup 0 < [
-            swap neg swap neg
-        ] when
+        dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
     ] ifte ;
 

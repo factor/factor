@@ -69,7 +69,7 @@ TUPLE: solid ;
 
 : rect>screen ( shape -- x1 y1 x2 y2 )
     >r origin get dup r> rect-dim v+
-    >r first2 r> first2 >r 1 - r> 1 - ;
+    [ first2 ] 2apply [ 1 - ] 2apply ;
 
 ! Solid pen
 M: solid draw-interior

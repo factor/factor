@@ -164,6 +164,14 @@ f 100000000000000000000000000 "testhash" get set-hash
 ] unit-test
 
 [
+    2
+] [
+    {{ [[ "factor" "rocks" ]] [[ "dup" "sq" ]] [[ 3 4 ]] }}
+    {{ [[ "factor" "rocks" ]] [[ 1 2 ]] [[ 2 3 ]] [[ 3 4 ]] }}
+    hash-diff hash-size
+] unit-test
+
+[
     t
 ] [
     {{ [[ "hello" "world" ]] }}

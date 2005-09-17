@@ -19,7 +19,7 @@ GENERIC: set-fill
     [ underlying resize ] keep set-underlying ;
 
 : new-size ( n -- n )
-    3 fixnum* dup 100 fixnum< [ drop 100 ] when ;
+    3 fixnum* dup 50 fixnum< [ drop 50 ] when ;
 
 : ensure ( n seq -- )
     #! If n is beyond the sequence's length, increase the length,

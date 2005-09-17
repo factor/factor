@@ -33,8 +33,7 @@ M: object clone ;
     rot [ drop ] [ nip ] ifte ; inline
 
 M: wrapper = ( obj wrapper -- ? )
-    over wrapper?
-    [ swap wrapped swap wrapped = ] [ 2drop f ] ifte ;
+    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] ifte ;
 
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline

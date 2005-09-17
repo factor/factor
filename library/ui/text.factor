@@ -19,7 +19,7 @@ sequences strings styles ;
         drop 0 swap TTF_FontHeight
     ] [
         0 <int> 0 <int> [ TTF_SizeUNICODE drop ] 2keep
-        swap *int swap *int
+        [ *int ] 2apply
     ] ifte ;
 
 : draw-string ( gadget text -- )

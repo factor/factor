@@ -11,7 +11,7 @@ math namespaces sequences words ;
     "math-priority" word-prop [ 100 ] unless* ;
 
 : math-class< ( class class -- ? )
-    swap math-priority swap math-priority < ;
+    [ math-priority ] 2apply < ;
 
 : math-class-max ( class class -- class )
     [ swap math-class< ] 2keep ? ;
@@ -42,7 +42,7 @@ TUPLE: no-math-method left right generic ;
     object reintern applicable-method ;
 
 : math-method ( word left right -- quot )
-    swap type>class swap type>class 2dup and [
+    [ type>class ] 2apply 2dup and [
         2dup math-upgrade >r
         math-class-max over order min-class applicable-method
         r> swap append

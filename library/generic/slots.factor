@@ -33,7 +33,7 @@ parser sequences strings words ;
     dup [ first2 create ] when ;
 
 : intern-slots ( spec -- spec )
-    [ first3 swap ?create swap ?create 3array ] map ;
+    [ first3 [ ?create ] 2apply 3array ] map ;
 
 : define-slots ( class spec -- )
     #! Define a collection of slot readers and writers for the

@@ -56,7 +56,7 @@ M: frame pref-dim ( frame -- dim )
     ] 2each drop ; inline
 
 : position-grid ( gadgets horiz vert -- )
-    >r 0 [ + ] accumulate r> 0 [ + ] accumulate
+    [ 0 [ + ] accumulate ] 2apply
     frame-layout swap [ set-rect-loc ] do-grid ;
 
 : resize-grid ( gadgets horiz vert -- )

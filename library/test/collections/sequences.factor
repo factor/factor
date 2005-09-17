@@ -156,3 +156,7 @@ unit-test
 [ { } ] [ "f" { "f" "f" } clone [ delete ] keep ] unit-test
 [ { "x" } ] [ "f" { "f" "x" "f" } clone [ delete ] keep ] unit-test
 [ { "y" "x" } ] [ "f" { "y" "f" "x" "f" } clone [ delete ] keep ] unit-test
+
+[ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
+
+[ { 3 4 5 } ] [ 2 { 1 2 3 } clone [ [ + ] inject-with ] keep ] unit-test

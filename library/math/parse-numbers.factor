@@ -30,7 +30,7 @@ M: object digit> not-a-number ;
     swap "-" ?head >r (base>) r> [ neg ] when ;
 
 : string>ratio ( "a/b" -- a/b )
-    "/" split1 >r 10 base> r> 10 base> / ;
+    "/" split1 [ 10 base> ] 2apply / ;
 
 : string>number ( string -- n )
     @{

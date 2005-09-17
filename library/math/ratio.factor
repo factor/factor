@@ -14,7 +14,7 @@ M: integer denominator drop 1 ;
 IN: math-internals
 
 : 2>fraction ( a/b c/d -- a c b d )
-    >r >fraction r> >fraction swapd ; inline
+    [ >fraction ] 2apply swapd ; inline
 
 M: ratio number= ( a/b c/d -- ? )
     2>fraction number= [ number= ] [ 2drop f ] ifte ;

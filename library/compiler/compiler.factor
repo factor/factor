@@ -52,3 +52,11 @@ words ;
 \ infer-classes profile
 \ solve-recursion profile
 \ split-node profile
+\ post-inline profile
+\ compose-shuffle-nodes profile
+\ static-branch profile
+\ optimize-hooks profile
+\ partial-eval? profile
+\ partial-eval profile
+\ flip-branches profile
+\ apply-identities profile

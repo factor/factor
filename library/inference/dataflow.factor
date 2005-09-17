@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: arrays generic interpreter kernel lists namespaces parser
-sequences words ;
+USING: arrays generic hashtables interpreter kernel lists
+namespaces parser sequences words ;
 
 ! Recursive state. An alist, mapping words to labels.
 SYMBOL: recursive-state
@@ -19,27 +19,32 @@ TUPLE: computed ;
 
 C: computed ( -- value ) <value> over set-delegate ;
 
+M: computed hashcode value-uid hashcode ;
+
 TUPLE: literal value ;
 
 C: literal ( obj -- value )
     <value> over set-delegate
     [ set-literal-value ] keep ;
 
+M: literal hashcode value-uid hashcode ;
+
 TUPLE: meet values ;
 
 C: meet ( values -- value )
     <value> over set-delegate [ set-meet-values ] keep ;
 
+M: meet hashcode value-uid hashcode ;
+
+: (flatten-value)
+    dup meet?
+    [ meet-values [ (flatten-value) ] each ] [ dup set ] ifte ;
+
+: flatten-value ( value -- seq )
+    [ (flatten-value) ] make-hash hash-keys ;
+
 : value-refers? ( referee referrer -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        dup meet? [
-            meet-values [ value-refers? ] contains-with?
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
+    2dup eq? [ 2drop t ] [ flatten-value memq? ] ifte ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
@@ -252,11 +257,8 @@ DEFER: subst-value
     ] ifte ;
 
 : subst-value ( new old seq -- )
-    pick pick eq? over empty? or [
-        3drop
-    ] [
-        [ >r 2dup r> (subst-value) ] nmap 2drop
-    ] ifte ;
+    pick pick eq? over empty? or
+    [ 3drop ] [ [ >r 2dup r> (subst-value) ] inject 2drop ] ifte ;
 
 : (subst-values) ( newseq oldseq seq -- )
     #! Mutates seq.

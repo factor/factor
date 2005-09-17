@@ -44,13 +44,12 @@ M: number = ( n n -- ? ) number= ;
 : polar> ( abs arg -- z )
     cis * ; inline
 
-: absq >rect swap sq swap sq + ; inline
+: absq >rect [ sq ] 2apply + ; inline
 
 IN: math-internals
 
 : 2>rect ( x y -- xr yr xi yi )
-    [ swap real swap real ] 2keep
-    swap imaginary swap imaginary ; inline
+    [ [ real ] 2apply ] 2keep [ imaginary ] 2apply ; inline
 
 M: complex number= ( x y -- ? )
     2>rect number= [ number= ] [ 2drop f ] ifte ;

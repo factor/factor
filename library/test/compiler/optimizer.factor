@@ -39,11 +39,11 @@ prettyprint sequences strings test vectors words ;
 
 : foo 1 2 3 ;
 
-[ { } ] [ \ foo word-def dataflow kill-set ] unit-test
+[ f ] [ \ foo word-def dataflow kill-set ] unit-test
 
-[ { [ 1 ] [ 2 ] } ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
+[ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
 
-[ { [ 1 ] [ 2 ] } ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
+[ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
 
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
 
@@ -57,7 +57,7 @@ prettyprint sequences strings test vectors words ;
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ { [ 3 ] [ dup ] 3 } ] [ [ [ 3 ] [ dup ] ifte drop ] kill-set* ] unit-test
+[ [ [ 3 ] [ dup ] 3 ] ] [ [ [ 3 ] [ dup ] ifte drop ] kill-set* ] unit-test
 
 : literal-kill-test-4
     5 swap [ 3 ] [ dup ] ifte 2drop ; compiled
@@ -65,7 +65,15 @@ prettyprint sequences strings test vectors words ;
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
 
-[ { 5 [ 3 ] [ dup ] 3 } ] [ \ literal-kill-test-4 word-def kill-set* ] unit-test
+: subset? swap [ swap member? ] all-with? ;
+
+: set= 2dup subset? >r swap subset? r> and ;
+
+[ t ] [
+    [ 5 [ 3 ] [ dup ] 3 ]
+    \ literal-kill-test-4 word-def kill-set*
+    set=
+] unit-test
 
 : literal-kill-test-5
     5 swap [ 5 ] [ dup ] ifte 2drop ; compiled
@@ -73,7 +81,11 @@ prettyprint sequences strings test vectors words ;
 [ ] [ t literal-kill-test-5 ] unit-test
 [ ] [ f literal-kill-test-5 ] unit-test
 
-[ { 5 [ 5 ] [ dup ] 5 } ] [ \ literal-kill-test-5 word-def kill-set* ] unit-test
+[ t ] [
+    [ 5 [ 5 ] [ dup ] 5 ]
+    \ literal-kill-test-5 word-def kill-set*
+    set=
+] unit-test
 
 : literal-kill-test-6
     5 swap [ dup ] [ dup ] ifte 2drop ; compiled
@@ -81,7 +93,9 @@ prettyprint sequences strings test vectors words ;
 [ ] [ t literal-kill-test-6 ] unit-test
 [ ] [ f literal-kill-test-6 ] unit-test
 
-[ { 5 [ dup ] [ dup ] } ] [ \ literal-kill-test-6 word-def kill-set* ] unit-test
+[ t ] [ [
+    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set* set=
+] unit-test
 
 : literal-kill-test-7
     [ 1 2 3 ] >r + r> drop ; compiled

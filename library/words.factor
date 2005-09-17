@@ -18,7 +18,7 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
 : word-sort ( list -- list )
     #! Sort a list of words by name.
-    [ swap word-name swap word-name lexi ] sort ;
+    [ [ word-name ] 2apply lexi ] sort ;
 
 : uses ( word -- uses )
     #! Outputs a list of words that this word directly calls.

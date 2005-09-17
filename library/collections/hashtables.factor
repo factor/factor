@@ -84,7 +84,7 @@ IN: hashtables
 : grow-hash ( hash -- )
     #! Increase the hashtable size if its too small.
     dup grow-hash? [
-        dup hash-size 2 * swap set-bucket-count
+        dup hash-size new-size swap set-bucket-count
     ] [
         drop
     ] ifte ;
@@ -134,24 +134,42 @@ IN: hashtables
         ] ifte
     ] hash-all-with? ; flushable
 
+: hash-filter-step ( quot assoc -- assoc n )
+    [ swap subset dup length ] keep length - ; inline
+
+: (hash-filter) ( quot hash -- n )
+    #! Output the number of key/value pairs that were removed.
+    0 swap underlying [
+        pick >r swap >r hash-filter-step r> + swap r> -rot
+    ] inject nip ; inline
+
+: hash-filter ( hash quot -- | quot: [[ k v ]] -- ? )
+    #! Remove all key/value pairs that do not satisfy the
+    #! predicate.
+    swap [ (hash-filter) ] keep
+    [ hash-size + ] keep
+    set-hash-size ; inline
+
 : hash-subset ( hash quot -- hash | quot: [[ k v ]] -- ? )
-    >r hash>alist r> subset alist>hash ; inline
+    #! Make a new hash that only includes the key/value pairs
+    #! which satisfy the predicate.
+    >r clone r> over >r hash-filter r> ; inline
 
 : hash-subset-with ( obj hash quot -- hash )
     swap [ with rot ] hash-subset 2nip ; inline
 
 M: hashtable clone ( hash -- hash ) clone-growable ;
 
+: hashtable= ( hash hash -- ? )
+    2dup hash-contained? >r swap hash-contained? r> and ;
+
 M: hashtable = ( obj hash -- ? )
-    2dup eq? [
-        2drop t
-    ] [
-        over hashtable? [
-            2dup hash-contained? >r swap hash-contained? r> and
-        ] [
-            2drop f
-        ] ifte
-    ] ifte ;
+    @{
+        @{ [ 2dup eq? ] [ 2drop t ] }@
+        @{ [ over hashtable? not ] [ 2drop f ] }@
+        @{ [ 2dup [ hash-size ] 2apply number= not ] [ 2drop f ] }@
+        @{ [ t ] [ hashtable= ] }@
+    }@ cond ;
 
 M: hashtable hashcode ( hash -- n )
     #! Poor.

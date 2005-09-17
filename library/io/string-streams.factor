@@ -22,7 +22,7 @@ M: sbuf stream-read ( count sbuf -- string )
         2drop f
     ] [
         swap over length min empty-sbuf
-        [ [ drop dup pop ] nmap drop ] keep
+        [ [ drop dup pop ] inject drop ] keep
     ] ifte ;
 
 : <string-reader> ( string -- stream )

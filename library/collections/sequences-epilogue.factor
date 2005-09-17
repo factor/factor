@@ -6,7 +6,7 @@ sequences strings vectors words ;
 
 : (lexi) ( seq seq i limit -- n )
     2dup >= [
-        2drop swap length swap length -
+        2drop [ length ] 2apply -
     ] [
         >r 3dup 2nth-unsafe 2dup = [
             2drop 1 + r> (lexi)

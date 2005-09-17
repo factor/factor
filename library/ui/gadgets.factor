@@ -22,11 +22,11 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
     rect-bounds >r origin get v+ r> <rect> ;
 
 : intersect ( rect rect -- rect )
-    >r rect-extent r> rect-extent swapd vmin >r vmax dup r>
+    [ rect-extent ] 2apply swapd vmin >r vmax dup r>
     swap v- @{ 0 0 0 }@ vmax <rect> ;
 
 : intersects? ( rect/point rect -- ? )
-    >r rect-extent r> rect-extent swapd vmin >r vmax r> v-
+    [ rect-extent ] 2apply swapd vmin >r vmax r> v-
     [ 0 <= ] all? ;
 
 ! A gadget is a rectangle, a paint, a mapping of gestures to

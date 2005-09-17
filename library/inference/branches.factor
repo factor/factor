@@ -24,7 +24,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     unify-lengths flip [ unify-values ] map ;
 
 : balanced? ( in out -- ? )
-    [ swap length swap length - ] 2map [ = ] monotonic? ;
+    [ [ length ] 2apply - ] 2map [ = ] monotonic? ;
 
 : unify-effect ( in out -- in out )
     2dup balanced?

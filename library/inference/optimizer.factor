@@ -8,7 +8,7 @@ lists math matrices namespaces sequences vectors ;
 ! label scopes, to prevent infinite loops when inlining
 ! recursive methods.
 
-GENERIC: optimize-node* ( node -- node )
+GENERIC: optimize-node* ( node -- node/t )
 
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
@@ -16,7 +16,7 @@ GENERIC: optimize-node* ( node -- node )
 
 DEFER: optimize-node
 
-: optimize-children ( node -- )
+: optimize-children ( node -- ? )
     f swap [
         node-children [ optimize-node swap >r or r> ] map
     ] keep set-node-children ;
@@ -55,7 +55,7 @@ M: node optimize-node* ( node -- t )
 
 ! #shuffle
 : compose-shuffle-nodes ( #shuffle #shuffle -- #shuffle/t )
-    [ >r node-shuffle r> node-shuffle compose-shuffle ] keep
+    [ [ node-shuffle ] 2apply compose-shuffle ] keep
     over shuffle-in-d length pick shuffle-in-r length + vregs > [
         2drop t
     ] [
@@ -68,7 +68,7 @@ M: #shuffle optimize-node*  ( node -- node/t )
     ] [
         drop [
             dup node-in-d over node-out-d =
-            >r dup node-in-r swap node-out-r = r> and
+            [ dup node-in-r swap node-out-r = ] [ drop f ] ifte
         ] prune-if
     ] ifte ;
 

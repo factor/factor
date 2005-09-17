@@ -164,7 +164,7 @@ M: f ' ( obj -- ptr )
     [ nip ] [ "Not in image: " word-error ] ifte ;
 
 : fixup-words ( -- )
-    image get [ dup word? [ fixup-word ] when ] nmap ;
+    image get [ dup word? [ fixup-word ] when ] inject ;
 
 M: word ' ( word -- pointer ) ;
 

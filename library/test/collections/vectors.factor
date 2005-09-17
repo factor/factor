@@ -77,7 +77,7 @@ random sequences sequences-internals strings test vectors ;
 
 [ f ] [
     { 1 2 3 4 } dup clone
-    swap underlying swap underlying eq?
+    [ underlying ] 2apply eq?
 ] unit-test
 
 [ 0 ] [

@@ -51,7 +51,7 @@ TUPLE: shuffle in-d in-r out-d out-r ;
     #! s1's d and r output lengths must be at least the required
     #! length for the shuffle. If they are not, a special
     #! behavior is used which is only valid for the optimizer.
-    >r clone r> clone 2dup fix-compose-d 2dup fix-compose-r
+    [ clone ] 2apply 2dup fix-compose-d 2dup fix-compose-r
     >r dup shuffle-out-d over shuffle-out-r r> shuffle
     >r >r dup shuffle-in-d swap shuffle-in-r r> r> <shuffle> ;
 
