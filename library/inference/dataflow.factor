@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: arrays generic hashtables interpreter kernel lists
+USING: arrays generic hashtables interpreter kernel lists math
 namespaces parser sequences words ;
 
 ! Recursive state. An alist, mapping words to labels.
@@ -28,23 +28,6 @@ C: literal ( obj -- value )
     [ set-literal-value ] keep ;
 
 M: literal hashcode value-uid hashcode ;
-
-TUPLE: meet values ;
-
-C: meet ( values -- value )
-    <value> over set-delegate [ set-meet-values ] keep ;
-
-M: meet hashcode value-uid hashcode ;
-
-: (flatten-value)
-    dup meet?
-    [ meet-values [ (flatten-value) ] each ] [ dup set ] ifte ;
-
-: flatten-value ( value -- seq )
-    [ (flatten-value) ] make-hash hash-keys ;
-
-: value-refers? ( referee referrer -- ? )
-    2dup eq? [ 2drop t ] [ flatten-value memq? ] ifte ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative
@@ -173,8 +156,7 @@ SYMBOL: current-node
         dup node-in-r % node-out-r %
     ] { } make ;
 
-: uses-value? ( value node -- ? )
-    node-values [ value-refers? ] contains-with? ;
+: uses-value? ( value node -- ? ) node-values memq? ;
 
 : outputs-value? ( value node -- ? )
     2dup node-out-d member? >r node-out-r member? r> or ;
@@ -228,53 +210,13 @@ SYMBOL: current-node
 : all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
 
-SYMBOL: substituted
-
-DEFER: subst-value
-
-: subst-meet ( new old meet -- )
-    #! We avoid mutating the same meet more than once, since
-    #! doing so can introduce cycles.
-    dup substituted get memq? [
-        3drop
-    ] [
-        dup substituted get push meet-values subst-value
-    ] ifte ;
-
-: (subst-value) ( new old value -- value )
-    2dup eq? [
-        2drop
-    ] [
-        dup meet? [
-            pick over swap value-refers? [
-                2nip ! don't substitute a meet into itself
-            ] [
-                [ subst-meet ] keep
-            ] ifte
-        ] [
-            2nip
-        ] ifte
-    ] ifte ;
-
-: subst-value ( new old seq -- )
-    pick pick eq? over empty? or
-    [ 3drop ] [ [ >r 2dup r> (subst-value) ] inject 2drop ] ifte ;
-
-: (subst-values) ( newseq oldseq seq -- )
-    #! Mutates seq.
-    -rot [ pick subst-value ] 2each drop ;
+: (subst-values) ( new old node -- )
+    [ node-in-d subst ] 3keep [ node-in-r subst ] 3keep
+    [ node-out-d subst ] 3keep node-out-r subst ;
 
 : subst-values ( new old node -- )
     #! Mutates the node.
-    [
-        { } clone substituted set [
-            3dup node-in-d  (subst-values)
-            3dup node-in-r  (subst-values)
-            3dup node-out-d (subst-values)
-            3dup node-out-r (subst-values)
-            drop
-        ] each-node 2drop
-    ] with-scope ;
+    [ >r 2dup r> (subst-values) ] each-node 2drop ;
 
 : remember-node ( word node -- )
     #! Annotate each node with the fact it was inlined from

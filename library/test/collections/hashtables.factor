@@ -185,3 +185,5 @@ f 100000000000000000000000000 "testhash" get set-hash
     {{ [[ 2 4 ]] [[ 6 5 ]] }} {{ [[ 1 2 ]] [[ 2 3 ]] }}
     hash-union
 ] unit-test
+
+[ [ 1 3 ] ] [ {{ [[ 2 2 ]] }} [ 1 2 3 ] remove-all ] unit-test

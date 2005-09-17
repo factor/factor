@@ -32,7 +32,7 @@ SYMBOL: 64-bits
     ] [
         dup 1 32 shift 1- bitand
         swap -32 shift 1 32 shift 1- bitand
-        big-endian get [ swap ] unless
+        big-endian get [ swap ] when
         emit emit
     ] ifte ;
 

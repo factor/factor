@@ -1,7 +1,7 @@
 IN: temporary
 USING: arrays assembler compiler compiler-backend generic
-inference kernel kernel-internals lists math optimizer
-prettyprint sequences strings test vectors words ;
+hashtables inference kernel kernel-internals lists math
+optimizer prettyprint sequences strings test vectors words ;
 
 : kill-1
     [ 1 2 3 ] [ + ] over drop drop ; compiled
@@ -33,17 +33,21 @@ prettyprint sequences strings test vectors words ;
 
 [ [ 1 2 3 ] [ 4 5 6 ] [ 1 2 3 ] ] [ kill-6 ] unit-test
 
-: kill-set*
+: subset? swap [ swap member? ] all-with? ;
+
+: set= 2dup subset? >r swap subset? r> and ;
+
+: kill-set=
     dataflow dup solve-recursion dup split-node
-    kill-set [ literal-value ] map ;
+    kill-set hash-keys [ literal-value ] map set= ;
 
 : foo 1 2 3 ;
 
-[ f ] [ \ foo word-def dataflow kill-set ] unit-test
+[ {{ }} ] [ \ foo word-def dataflow kill-set ] unit-test
 
-[ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
+[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] ifte ] kill-set= ] unit-test
 
-[ [ [ 1 ] [ 2 ] ] ] [ [ [ 1 ] [ 2 ] ifte ] kill-set* ] unit-test
+[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] ifte ] kill-set= ] unit-test
 
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
 
@@ -57,7 +61,7 @@ prettyprint sequences strings test vectors words ;
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ [ [ 3 ] [ dup ] 3 ] ] [ [ [ 3 ] [ dup ] ifte drop ] kill-set* ] unit-test
+[ t ] [ [ [ 3 ] [ dup ] 3 ] [ [ 3 ] [ dup ] ifte drop ] kill-set= ] unit-test
 
 : literal-kill-test-4
     5 swap [ 3 ] [ dup ] ifte 2drop ; compiled
@@ -65,14 +69,9 @@ prettyprint sequences strings test vectors words ;
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
 
-: subset? swap [ swap member? ] all-with? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
-
 [ t ] [
     [ 5 [ 3 ] [ dup ] 3 ]
-    \ literal-kill-test-4 word-def kill-set*
-    set=
+    \ literal-kill-test-4 word-def kill-set=
 ] unit-test
 
 : literal-kill-test-5
@@ -83,8 +82,7 @@ prettyprint sequences strings test vectors words ;
 
 [ t ] [
     [ 5 [ 5 ] [ dup ] 5 ]
-    \ literal-kill-test-5 word-def kill-set*
-    set=
+    \ literal-kill-test-5 word-def kill-set=
 ] unit-test
 
 : literal-kill-test-6
@@ -94,7 +92,7 @@ prettyprint sequences strings test vectors words ;
 [ ] [ f literal-kill-test-6 ] unit-test
 
 [ t ] [ [
-    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set* set=
+    5 [ dup ] [ dup ] ] \ literal-kill-test-6 word-def kill-set=
 ] unit-test
 
 : literal-kill-test-7

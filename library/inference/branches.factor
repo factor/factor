@@ -16,7 +16,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup [ eq? ] monotonic? [ first ] [ <meet> ] ifte ;
+    dup [ eq? ] monotonic? [ first ] [ drop <computed> ] ifte ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown

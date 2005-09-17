@@ -17,7 +17,9 @@ GENERIC: optimize-node* ( node -- node/t )
 DEFER: optimize-node
 
 : optimize-children ( node -- ? )
-    f swap node-children [ optimize-node swap >r or r> ] inject ;
+    f swap [
+        node-children [ optimize-node swap >r or r> ] map
+    ] keep set-node-children ;
 
 : optimize-node ( node -- node ? )
     #! Outputs t if any changes were made.

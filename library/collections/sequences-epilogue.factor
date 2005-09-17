@@ -36,6 +36,15 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
+: (subst) ( newseq oldseq elt -- new/elt )
+    [ swap index ] keep
+    over -1 > [ drop swap nth ] [ 2nip ] ifte ;
+
+: subst ( newseq oldseq seq -- )
+    #! Mutates seq. If an element of seq occurs in oldseq,
+    #! replace it with the corresponding element in newseq.
+    [ >r 2dup r> (subst) ] inject 2drop ;
+
 : move ( to from seq -- )
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] ifte ; inline

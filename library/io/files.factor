@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: kernel lists namespaces sequences strings ;
+USING: hashtables kernel lists namespaces sequences strings ;
 
 ! Words for accessing filesystem meta-data.
 

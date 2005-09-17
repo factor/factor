@@ -98,8 +98,6 @@ unit-test
 [ f ] [ 3 [ 1 2 3 ] tail ] unit-test
 [ [ 3 ] ] [ 2 [ 1 2 3 ] tail ] unit-test
 
-[ [ 1 3 ] ] [ [ 2 ] [ 1 2 3 ] remove-all ] unit-test
-
 [ t ] [ [ 1 2 3 ] [ 1 2 3 ] sequence= ] unit-test
 [ t ] [ [ 1 2 3 ] { 1 2 3 } sequence= ] unit-test
 [ t ] [ { 1 2 3 } [ 1 2 3 ] sequence= ] unit-test
@@ -160,3 +158,9 @@ unit-test
 [ { 1 4 9 } ] [ { 1 2 3 } clone dup [ sq ] inject ] unit-test
 
 [ { 3 4 5 } ] [ 2 { 1 2 3 } clone [ [ + ] inject-with ] keep ] unit-test
+
+[ { "one" "two" "three" 4 5 6 } ]
+[
+    { "one" "two" "three" }
+    { 1 2 3 } { 1 2 3 4 5 6 } clone [ subst ] keep
+] unit-test

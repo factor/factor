@@ -70,8 +70,7 @@ IN: hashtables
 
 : hash>alist ( hash -- alist )
     #! Push a list of key/value pairs in a hashtable.
-    [ ] swap [ hash-bucket [ swons ] each ] each-bucket ;
-    flushable
+    underlying concat ; flushable
 
 : (set-hash) ( value key hash -- )
     dup hash-size+ [ set-assoc ] set-hash* ;

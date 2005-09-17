@@ -7,11 +7,7 @@ IN: ray
 ! parameters
 : light
     #! Normalized { -1 -3 2 }.
-    @{
-        -0.2672612419124244
-        -0.8017837257372732
-        0.5345224838248488
-    }@ ; inline
+    @{ -0.2672612419124244 -0.8017837257372732 0.5345224838248488 }@ ; inline
 
 : oversampling 4 ; inline
 
@@ -125,7 +121,7 @@ DEFER: create ( level c r -- scene )
     pick 1 = [ <sphere> nip ] [ create-group ] ifte ;
 
 : ss-point ( dx dy -- point )
-    >r oversampling /f r> oversampling /f 0.0 3array ;
+    [ oversampling /f ] 2apply 0.0 3array ;
 
 : ss-grid ( -- ss-grid )
     oversampling [ oversampling [ ss-point ] map-with ] map ;
@@ -142,14 +138,7 @@ DEFER: create ( level c r -- scene )
 : pixel-grid ( -- grid )
     size reverse [
         size [
-            size 0.5 * - swap size 0.5 * - size >float 3array
-        ] map-with
-    ] map ;
-
-: pixel-grid ( -- grid )
-    size reverse [
-        size [
-            size 0.5 * - swap size 0.5 * - size >float 3array
+            [ size 0.5 * - ] 2apply swap size >float 3array
         ] map-with
     ] map ;
 

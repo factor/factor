@@ -3,7 +3,7 @@
 USING: alien assembler command-line compiler compiler-backend
 errors generic hashtables io io-internals kernel
 kernel-internals lists math memory namespaces parser sequences
-words ;
+sequences-internals words ;
 
 : pull-in ( ? list -- )
     swap [
@@ -75,9 +75,11 @@ t [
 compile? [
     "Compiling base..." print
 
-    { car * length nth = string>number number>string scan (generate) }
-    [ compile ]
-    each
+    {
+        uncons 1+ 1- + <= > >= mod length
+        nth-unsafe set-nth-unsafe
+        = string>number number>string scan (generate)
+    } [ compile ] each
 ] when
 
 compile? [
