@@ -208,3 +208,8 @@ M: hashtable hashcode ( hash -- n )
     #! Make a new hashtable with all key/value pairs from
     #! hash1 and hash2. Values in hash2 take precedence.
     >r clone dup r> hash-update ;
+
+: remove-all ( hash seq -- seq )
+    #! Remove all elements from the sequence that are keys
+    #! in the hashtable.
+    [ swap hash* not ] subset-with ; flushable

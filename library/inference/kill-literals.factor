@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: optimizer
-USING: arrays generic hashtables inference kernel
+USING: arrays generic hashtables inference kernel math
 namespaces sequences ;
 
 : node-union ( node quot -- hash | quot: node -- )
@@ -27,9 +27,9 @@ GENERIC: returns* ( node -- )
 
 M: f returns* drop ;
 
-: kill-set ( node -- seq )
+: kill-set ( node -- hash )
     #! Push a list of literals that may be killed in the IR.
-    dup live-values swap literals hash-diff hash-keys ;
+    dup live-values swap literals hash-diff ;
 
 : remove-values ( values node -- )
     2dup [ node-in-d remove-all ] keep set-node-in-d
@@ -37,8 +37,12 @@ M: f returns* drop ;
     2dup [ node-in-r remove-all ] keep set-node-in-r
     [ node-out-r remove-all ] keep set-node-out-r ;
 
-: kill-node ( literals node -- )
-    [ remove-values ] each-node-with ;
+: kill-node ( values node -- )
+    over hash-size 0 > [
+        [ remove-values ] each-node-with
+    ] [
+       2drop
+    ] ifte ;
 
 ! Generic nodes
 M: node literals* ( node -- ) drop ;
@@ -49,8 +53,12 @@ M: node live-values* ( node -- )
 M: node returns* ( node -- seq ) node-successor returns* ;
 
 ! #shuffle
+: shuffle-literals
+    [ dup literal? [ dup set ] [ drop ] ifte ] each ;
+
 M: #shuffle literals* ( node -- )
-    node-out-d [ dup literal? [ dup set ] [ drop ] ifte ] each ;
+    dup node-out-d shuffle-literals
+    node-out-r shuffle-literals ;
 
 ! #return
 M: #return returns* , ;

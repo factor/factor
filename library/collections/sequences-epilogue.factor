@@ -36,9 +36,6 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 : memq?   ( obj seq -- ? )     [ eq? ] contains-with? ; flushable
 : remove  ( obj list -- list ) [ = not ] subset-with ; flushable
 
-: remove-all ( seq1 seq2 -- seq2-seq1 )
-    [ swap member? not ] subset-with ; flushable
-
 : move ( to from seq -- )
     pick pick number=
     [ 3drop ] [ [ nth swap ] keep set-nth ] ifte ; inline

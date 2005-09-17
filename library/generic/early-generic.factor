@@ -8,11 +8,11 @@ DEFER: standard-combination
 DEFER: math-combination
 
 : delegate ( object -- delegate )
-    dup tuple? [ 3 slot ] [ drop f ] ifte ; inline
+    dup tuple? [ 3 slot ] [ drop f ] ifte ;
 
 : set-delegate ( delegate tuple -- )
     dup tuple? [
         3 set-slot
     ] [
         "Only tuples can have delegates" throw
-    ] ifte ; inline
+    ] ifte ;
