@@ -23,7 +23,7 @@ DEFER: next-thread
 
 : do-sleep ( -- quot )
     sleep-queue* dup sleep-time dup 0 =
-    [ drop pop ] [ nip io-multiplex next-thread ] ifte ;
+    [ drop pop cdr ] [ nip io-multiplex next-thread ] ifte ;
 
 : next-thread ( -- quot )
     run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;

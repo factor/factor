@@ -15,11 +15,7 @@ C: value ( -- value )
 
 M: value = eq? ;
 
-TUPLE: computed ;
-
-C: computed ( -- value ) <value> over set-delegate ;
-
-M: computed hashcode value-uid hashcode ;
+M: value hashcode value-uid hashcode ;
 
 TUPLE: literal value ;
 
@@ -27,7 +23,7 @@ C: literal ( obj -- value )
     <value> over set-delegate
     [ set-literal-value ] keep ;
 
-M: literal hashcode value-uid hashcode ;
+M: literal hashcode delegate hashcode ;
 
 ! The dataflow IR is the first of the two intermediate
 ! representations used by Factor. It annotates concatenative

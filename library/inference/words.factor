@@ -10,7 +10,7 @@ hashtables parser prettyprint ;
     over 0 rot node-inputs [ pop-d 2drop ] each ;
 
 : produce-values ( n node -- )
-    over [ drop <computed> push-d ] each 0 swap node-outputs ;
+    over [ drop <value> push-d ] each 0 swap node-outputs ;
 
 : consume/produce ( word effect -- )
     #! Add a node to the dataflow graph that consumes and

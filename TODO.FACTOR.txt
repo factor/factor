@@ -1,5 +1,5 @@
 - quot>interp needs to go
-- nth-unsafe and set-nth-unsafe with bignums
+- nodes: lazily create history, class/literal map hashes
 
 + ui:
 
@@ -92,6 +92,7 @@
 - set-path: iterative
 - parse-command-line: no unswons of cli args
 - investigate if rehashing on startup is really necessary
+- remove word transfer hack in bootstrap
 
 + i/o:
 

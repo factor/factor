@@ -44,11 +44,11 @@ SYMBOL: d-in
 : pop-literal ( -- rstate obj )
     1 #drop node, pop-d dup value-recursion swap literal-value ;
 
-: computed-value-vector ( n -- vector )
-    [ drop <computed> ] map >vector ;
+: value-vector ( n -- vector )
+    [ drop <value> ] map >vector ;
 
 : required-inputs ( n stack -- values )
-    length - 0 max computed-value-vector ;
+    length - 0 max value-vector ;
 
 : ensure-values ( n -- )
     length meta-d get required-inputs dup
