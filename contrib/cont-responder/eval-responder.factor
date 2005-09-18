@@ -174,6 +174,8 @@ USE: sequences
     "eval" get
   ] bind ;
    
+: >pop> dup pop* ;
+
 : infra ( list quot -- list )
   #! Call the quotation using 'list' as the datastack
   #! return the result datastack as a list.

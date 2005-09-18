@@ -43,13 +43,17 @@ SYMBOL: post-refresh-get?
   [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] "" make
   string>number 36 >base ;
 
+SYMBOL: table
+
 : continuation-table ( -- <hashtable> ) 
   #! Return the global table of continuations
-  {{ }} ;
+  table global hash ;
     
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
   continuation-table hash-clear ;
+
+{{ }} clone table global set-hash
 
 #! Tuple for holding data related to a continuation.
 TUPLE: item expire? quot id time-added ;
@@ -190,7 +194,7 @@ SYMBOL: callback-cc
       continue
     ] callcc1 ( 0 [ ] == )
     nip
-    continue
+    call
     store-callback-cc
   ] callcc0 ;
 
