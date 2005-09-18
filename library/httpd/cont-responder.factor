@@ -43,16 +43,13 @@ SYMBOL: post-refresh-get?
   [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] "" make
   string>number 36 >base ;
 
-#! Name of variable holding the table of continuations.
-SYMBOL: table 
-
-: continuation-table ( -- <namespace> ) 
+: continuation-table ( -- <hashtable> ) 
   #! Return the global table of continuations
-  table get ;
+  {{ }} ;
     
 : reset-continuation-table ( -- ) 
   #! Create the initial global table
-  {{ }} clone table set ;
+  continuation-table hash-clear ;
 
 #! Tuple for holding data related to a continuation.
 TUPLE: item expire? quot id time-added ;
@@ -75,22 +72,17 @@ TUPLE: item expire? quot id time-added ;
   #! timeout milliseconds ago).
   [ item-time-added swap seconds>millis + millis - 0 < ] keep item-expire? and ;
 
-: continuation-items ( -- alist )
-  #! Return an alist of all continuation items in the continuation
-  #! table with the car as the id and the cdr as the item.
-  continuation-table hash>alist ;
-
 : expire-continuations ( timeout-seconds -- )
   #! Expire all continuations in the continuation table
   #! if they are 'timeout-seconds' old (ie. were added
   #! more than 'timeout-seconds' ago.
-  continuation-items [ 
-    uncons pick swap expired? [
+  continuation-table clone [ ( timeout-seconds [[ id item ]] -- )
+    uncons swapd expired? [
       continuation-table remove-hash
     ] [
       drop
     ] ifte
-  ] each drop ;
+  ] hash-each-with ;
 
 : expirable ( quot -- t quot )
   #! Set the stack up for a register-continuation call 
@@ -108,7 +100,9 @@ TUPLE: item expire? quot id time-added ;
   #! Store a continuation in the table and associate it with
   #! a random id. That continuation will be expired after
   #! a certain period of time if 'expire?' is true.  
-  get-random-id -rot pick continuation-item over continuation-table set-hash ;
+  get-random-id 
+  [ continuation-item ] keep ( item id -- )
+  [ continuation-table set-hash ] keep ;
   
 : register-continuation* ( expire? quots -- id ) 
   #! Like register-continuation but registers a quotation 
@@ -140,6 +134,11 @@ DEFER: show
     </html> 
   ] show-final ;
 
+: >callable ( quot|interp|f -- interp )
+  dup interp? [
+    [ continue-with ] cons
+  ] when ;
+
 : get-registered-continuation ( id -- cont ) 
   #! Return the continuation or quotation 
   #! associated with the given id.  
@@ -149,7 +148,7 @@ DEFER: show
     item-quot
   ] [
     [ expired-page-handler ]
-  ] ifte* ;
+  ] ifte* >callable ;
 
 : resume-continuation ( value id  -- ) 
   #! Call the continuation associated with the given id,
@@ -167,7 +166,7 @@ SYMBOL: exit-cc
 : call-exit-continuation ( value -- ) 
   #! Call the exit continuation, passing it the given value on the
   #! top of the stack.
-  exit-cc get call ;
+  exit-cc get continue-with ;
 
 : with-exit-continuation ( quot -- ) 
   #! Call the quotation with the variable exit-cc bound such that when
@@ -188,10 +187,10 @@ SYMBOL: callback-cc
   [  ( 0 -- )
     [ ( 0 1 -- )
       callback-cc set ( 0 -- )
-      call 
+      continue
     ] callcc1 ( 0 [ ] == )
     nip
-    call 
+    continue
     store-callback-cc
   ] callcc0 ;
 
@@ -275,7 +274,7 @@ SYMBOL: root-continuation
   #! Convert the given quotation so it works as a callback
   #! by returning a quotation that will pass the original 
   #! quotation to the callback continuation.
-  [ , callback-cc get , \ call , ] [ ] make ;
+  [ , callback-cc get , \ continue-with , ] [ ] make ;
   
 : quot-href ( text quot -- )
   #! Write to standard output an HTML HREF where the href,
@@ -305,15 +304,8 @@ SYMBOL: root-continuation
      [ cont-get/post-responder ] "get" set 
      [ cont-get/post-responder ] "post" set 
      swap "responder" set
-     reset-continuation-table 
      permanent register-continuation root-continuation set 
   ] make-responder ;
-
-: responder-items ( name -- items )
-  #! Return the table of continuation items for a given responder. 
-  #! Useful for debugging.
-  responders get hash [ continuation-table ] bind ;
-
 
 : simple-page ( title quot -- )
   #! Call the quotation, with all output going to the
