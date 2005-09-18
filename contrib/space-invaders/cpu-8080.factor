@@ -834,7 +834,7 @@ SYMBOL: $4
   #! Return a parser for then instruction identified by the token. 
   #! The parser return parses the token only and expects no additional
   #! arguments to the instruction.
-  token [ [ 0 empty-vector , , \ generate-instruction , ] [ ] make ] <@ ;
+  token [ [ { } clone , , \ generate-instruction , ] [ ] make ] <@ ;
 
 : complex-instruction ( type token -- parser )
   #! Return a parser for an instruction identified by the token. 
@@ -849,52 +849,52 @@ SYMBOL: $4
 : RET-NN-instruction ( -- parser )  
   "RET-NN" "RET" complex-instruction  
   "nn" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-0-instruction ( -- parser )  
   "RST-0" "RST" complex-instruction  
   "0" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-8-instruction ( -- parser )  
   "RST-8" "RST" complex-instruction  
   "8" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-10H-instruction ( -- parser )  
   "RST-10H" "RST" complex-instruction  
   "10H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-18H-instruction ( -- parser )  
   "RST-18H" "RST" complex-instruction  
   "18H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-20H-instruction ( -- parser )  
   "RST-20H" "RST" complex-instruction  
   "20H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-28H-instruction ( -- parser )  
   "RST-28H" "RST" complex-instruction  
   "28H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-30H-instruction ( -- parser )  
   "RST-30H" "RST" complex-instruction  
   "30H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : RST-38H-instruction ( -- parser )  
   "RST-38H" "RST" complex-instruction  
   "38H" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : JP-NN-instruction ( -- parser )  
   "JP-NN" "JP" complex-instruction  
   "nn" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : JP-F|FF,NN-instruction ( -- parser )
   "JP-F|FF,NN" "JP" complex-instruction  
@@ -910,7 +910,7 @@ SYMBOL: $4
 : CALL-NN-instruction ( -- parser )  
   "CALL-NN" "CALL" complex-instruction  
   "nn" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : CALL-F|FF,NN-instruction ( -- parser )
   "CALL-F|FF,NN" "CALL" complex-instruction  
@@ -991,7 +991,7 @@ SYMBOL: $4
 : AND-N-instruction ( -- parser )
   "AND-N" "AND" complex-instruction
   "n" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : AND-R-instruction  ( -- parser )
   "AND-R" "AND" complex-instruction
@@ -1004,7 +1004,7 @@ SYMBOL: $4
 : XOR-N-instruction ( -- parser )
   "XOR-N" "XOR" complex-instruction
   "n" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : XOR-R-instruction  ( -- parser )
   "XOR-R" "XOR" complex-instruction
@@ -1017,7 +1017,7 @@ SYMBOL: $4
 : OR-N-instruction ( -- parser )
   "OR-N" "OR" complex-instruction
   "n" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : OR-R-instruction  ( -- parser )
   "OR-R" "OR" complex-instruction
@@ -1030,7 +1030,7 @@ SYMBOL: $4
 : CP-N-instruction ( -- parser )
   "CP-N" "CP" complex-instruction
   "n" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : CP-R-instruction  ( -- parser )
   "CP-R" "CP" complex-instruction
@@ -1093,7 +1093,7 @@ SYMBOL: $4
 : SUB-N-instruction ( -- parser )
   "SUB-N" "SUB" complex-instruction
   "n" token sp <&
-  just [ 0 empty-vector swons  ] <@ ;
+  just [ { } clone swons  ] <@ ;
 
 : ADD-R,N-instruction ( -- parser )
   "ADD-R,N" "ADD" complex-instruction
