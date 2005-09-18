@@ -51,6 +51,7 @@
 
 + compiler:
 
+- [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
 - declare slot types for built-ins
 - remove dead code after a 'throw'
 - floating point intrinsics

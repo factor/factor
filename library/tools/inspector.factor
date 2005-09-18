@@ -23,7 +23,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
 : format-column ( list -- list )
     [ unparse-short ] map
-    [ max-length ] keep
+    [ [ length ] map supremum ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
 : sheet-numbers ( sheet -- sheet )

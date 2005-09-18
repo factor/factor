@@ -28,6 +28,8 @@ USING: arrays generic kernel sequences ;
 
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product ( v -- n ) 1 [ * ] reduce ;
+: infimum ( v -- n ) dup first [ min ] reduce ;
+: supremum ( v -- n ) dup first [ max ] reduce ;
 
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;

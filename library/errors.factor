@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: kernel
-DEFER: with-continuation
+DEFER: callcc1
 DEFER: continue-with
 
 IN: errors
@@ -20,7 +20,7 @@ TUPLE: no-method object generic ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
 
 : (catch) ( try -- exception/f )
-    [ >c call f c> drop f ] with-continuation nip ;
+    [ >c call f c> drop f ] callcc1 nip ;
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the
@@ -31,6 +31,6 @@ TUPLE: no-method object generic ;
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
     #! For convinience, this word is a no-op if error is f.
-    [ c> continue-with ] when* ;
+    [ catchstack empty? [ die ] [ c> continue-with ] ifte ] when* ;
 
 GENERIC: error. ( error -- )

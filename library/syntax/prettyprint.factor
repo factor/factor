@@ -161,7 +161,7 @@ C: pprinter ( -- stream )
     [
         end-printing set
         dup pprinter-block pprint-section
-    ] with-continuation drop ;
+    ] callcc0 drop ;
 
 GENERIC: pprint* ( obj -- )
 

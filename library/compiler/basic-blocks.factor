@@ -76,7 +76,7 @@ M: cs-loc live@end? cs-loc-n r-height get + 0 >= ;
     [
         -rot [ >r 2dup r> preserves-location? ] contains?
         [ dup live@end? ] unless*
-    ] with-continuation 2nip ;
+    ] callcc1 2nip ;
 
 ! Used for elimination of dead loads from the stack:
 ! we keep a map of vregs to ds-loc/cs-loc/f.

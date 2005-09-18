@@ -44,23 +44,25 @@ SYMBOL: d-in
 : pop-literal ( -- rstate obj )
     1 #drop node, pop-d dup value-recursion swap literal-value ;
 
-: value-vector ( n -- vector )
-    [ drop <value> ] map >vector ;
+: value-vector ( n -- vector ) [ drop <value> ] map >vector ;
 
-: required-inputs ( n stack -- values )
-    length - 0 max value-vector ;
+: required-inputs ( n stack -- n ) length - 0 max ;
+
+: add-inputs ( n stack -- stack )
+    tuck required-inputs dup 0 >
+    [ value-vector swap append ] [ drop ] ifte ;
 
 : ensure-values ( n -- )
-    length meta-d get required-inputs dup
-    meta-d [ append ] change d-in [ append ] change ;
+    dup meta-d get required-inputs d-in [ + ] change
+    meta-d [ add-inputs ] change ;
 
-: effect
+: effect ( -- @{ in# out# }@ )
     #! After inference is finished, collect information.
-    d-in get length meta-d get length 2array ;
+    d-in get meta-d get length 2array ;
 
 : init-inference ( recursive-state -- )
     init-interpreter
-    { } clone d-in set
+    0 d-in set
     recursive-state set
     dataflow-graph off
     current-node off ;

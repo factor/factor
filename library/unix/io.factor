@@ -208,7 +208,7 @@ M: read-task task-container drop read-tasks get ;
 
 : wait-to-read ( count port -- )
     2dup can-read-count? [
-        [ -rot <read-task> add-io-task stop ] with-continuation
+        [ -rot <read-task> add-io-task stop ] callcc0
     ] unless 2drop ;
 
 M: port stream-read ( count stream -- string )
@@ -273,9 +273,7 @@ M: write-task task-container drop write-tasks get ;
 
 M: port stream-flush ( stream -- )
     dup port-output? [
-        [
-            swap <write-task> add-write-io-task stop
-        ] with-continuation
+        [ swap <write-task> add-write-io-task stop ] callcc0
     ] when drop ;
 
 M: port stream-finish ( stream -- ) drop ;

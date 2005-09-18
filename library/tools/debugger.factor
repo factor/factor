@@ -131,8 +131,6 @@ M: object error. ( error -- ) . ;
     ] bind ;
 
 : init-error-handler ( -- )
-    [ die ] quot>interp >c ( last resort )
-    [ global [ print-error ] bind die ] quot>interp >c
     ( kernel calls on error )
     [
         datastack dupd callstack namestack catchstack

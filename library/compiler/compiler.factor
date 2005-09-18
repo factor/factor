@@ -41,7 +41,6 @@ words ;
     ] ifte ;
 
 \ dataflow profile
-\ optimize profile
 \ linearize profile
 \ split-blocks profile
 \ simplify profile
@@ -51,7 +50,6 @@ words ;
 \ kill-node profile
 \ infer-classes profile
 \ solve-recursion profile
-\ split-node profile
 \ post-inline profile
 \ compose-shuffle-nodes profile
 \ static-branch profile

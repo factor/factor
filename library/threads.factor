@@ -30,18 +30,18 @@ DEFER: next-thread
 
 : stop ( -- ) next-thread continue ;
 
-: yield ( -- ) [ schedule-thread stop ] with-continuation ;
+: yield ( -- ) [ schedule-thread stop ] callcc0 ;
 
 : sleep ( ms -- )
     millis +
-    [ cons sleep-queue push stop ] with-continuation drop ;
+    [ cons sleep-queue push stop ] callcc0 drop ;
 
 : in-thread ( quot -- )
     [
         schedule-thread
         [ ] set-catchstack { } set-callstack
         try stop
-    ] with-continuation drop ;
+    ] callcc0 drop ;
 
 TUPLE: timer object delay last ;
 

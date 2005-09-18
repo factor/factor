@@ -147,9 +147,6 @@ SYMBOL: current-node
 : with-nesting ( quot -- new-node | quot: -- new-node )
     nest-node 2slip unnest-node ; inline
 
-: node-effect ( node -- [[ d-in meta-d ]] )
-    dup node-in-d swap node-out-d cons ;
-
 : node-values ( node -- values )
     [
         dup node-in-d % dup node-out-d %

@@ -112,7 +112,7 @@ M: pane stream-flush ( pane -- ) drop ;
 M: pane stream-finish ( pane -- ) drop ;
 
 M: pane stream-readln ( pane -- line )
-    [ over set-pane-continuation stop ] with-continuation nip ;
+    [ over set-pane-continuation stop ] callcc1 nip ;
 
 M: pane stream-write1 ( char pane -- )
     [ >r ch>string <label> r> pane-current add-gadget ] keep

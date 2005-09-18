@@ -17,12 +17,6 @@ TUPLE: interp data call name catch ;
     [ interp-name ] keep
     interp-catch ;
 
-: quot>interp ( quot -- continuation )
-    #! Make a continuation that executes the quotation.
-    #! The quotation should not return, or a call stack
-    #! underflow will be signalled.
-    { } f rot 2array >vector f f <interp> ;
-
 : continue ( continuation -- )
     #! Restore a continuation.
     >interp<
@@ -34,14 +28,24 @@ TUPLE: interp data call name catch ;
     >interp< set-catchstack set-namestack
     >r swap >r set-datastack r> r> set-callstack ;
 
-: with-continuation ( quot -- | quot: continuation -- )
+: (callcc) ( terminator balance  -- | quot: continuation -- )
+    #! Direct calls to this word will not compile correctly;
+    #! use callcc0 or callcc1 to declare continuation arity
+    #! instead. The terminator branch always executes. It might
+    #! contain a call to 'continue', which ends control flow.
+    #! The balance branch is never called, but it is there to
+    #! give the callcc form a stack effect.
+    >r >r
+    continuation dup interp-call dup pop* pop*
+    t r> r> ifte ;
+    inline
+
+: callcc0 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
-    #! be restored using continue or continue-with.
-    >r continuation dup interp-call dup pop* drop
-    r> call ; inline
+    #! be restored using continue.
+    [ drop ] (callcc) ; inline
 
-: callcc0 ( quot ++ | quot: cont -- | cont: ++ )
-    with-continuation ;
-
-: callcc1 ( quot ++ obj | quot: cont -- | cont: obj ++ obj )
-    with-continuation ;
+: callcc1 ( quot -- | quot: continuation -- )
+    #! Call a quotation with the current continuation, which may
+    #! be restored using continue-with.
+    [ ] (callcc) ; inline

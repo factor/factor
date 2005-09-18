@@ -154,7 +154,7 @@ SYMBOL: sym-test
         not-a-number
     ] ifte ;
 
-[ @{ 1 1 }@ ] [ [ recursive-terminator ] infer ] unit-test
+[ @{ 1 0 }@ ] [ [ recursive-terminator ] infer ] unit-test
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;

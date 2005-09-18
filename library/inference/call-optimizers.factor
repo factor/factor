@@ -75,7 +75,7 @@ SYMBOL: @
     ] 2map [ ] all? ;
 
 : values-match? ( values template -- ? )
-    [ @ = [ drop f ] unless ] 2map [ ] subset [ eq? ] monotonic? ;
+    [ @ = [ drop f ] unless ] 2map [ ] subset all-eq? ;
 
 : apply-identity? ( values identity -- ? )
     first 2dup literals-match? >r values-match? r> and ;

@@ -131,6 +131,10 @@ M: object reverse-slice ( seq -- seq ) <reversed> ;
 
 M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
+: all-equal? ( seq -- ? ) [ = ] monotonic? ;
+
+: all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
+
 ! Lexicographic comparison
 : lexi ( s1 s2 -- n )
     #! Lexicographically compare two sequences of numbers
@@ -145,10 +149,6 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
         dup first [ length ] keep like
         [ swap [ nth ] map-with ] map-with
     ] unless ; flushable
-
-: max-length ( seq -- n )
-    #! Longest sequence length in a sequence of sequences.
-    0 [ length max ] reduce ; flushable
 
 IN: kernel
 

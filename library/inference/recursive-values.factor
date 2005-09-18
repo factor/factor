@@ -23,7 +23,7 @@ M: node solve-recursion* ( node -- ) drop ;
 : purge-invariants ( stacks -- seq )
     #! Output a sequence of values which are not present in the
     #! same position in each sequence of the stacks sequence.
-    flip [ [ eq? ] monotonic? not ] subset concat ;
+    flip [ all-eq? not ] subset concat ;
 
 : join-values ( calls entry -- new old live )
     add unify-lengths

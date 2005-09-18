@@ -34,7 +34,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         dup dispatching-classes dup empty? [
             2drop f
         ] [
-            dup [ = ] monotonic? [
+            dup all-eq? [
                 first swap node-param order min-class
             ] [
                 2drop f

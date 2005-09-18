@@ -176,7 +176,7 @@ f 100000000000000000000000000 "testhash" get set-hash
 ] [
     {{ [[ "hello" "world" ]] }}
     clone
-    100 [ 1+ over set-bucket-count hashcode ] map-with [ = ] monotonic?
+    100 [ 1+ over set-bucket-count hashcode ] map-with all-equal?
 ] unit-test
 
 [

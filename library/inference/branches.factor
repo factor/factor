@@ -7,8 +7,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup max-length swap
-    [ [ required-inputs ] keep append ] map-with ;
+    dup [ length ] map supremum swap [ add-inputs ] map-with ;
 
 : unify-length ( seq seq -- seq )
     2array unify-lengths first2 ;
@@ -16,23 +15,26 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup [ eq? ] monotonic? [ first ] [ drop <value> ] ifte ;
+    dup all-eq? [ first ] [ drop <value> ] ifte ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
-    unify-lengths flip [ unify-values ] map ;
+    [ ] subset dup empty?
+    [ drop f ] [ unify-lengths flip [ unify-values ] map ] ifte ;
 
 : balanced? ( in out -- ? )
-    [ [ length ] 2apply - ] 2map [ = ] monotonic? ;
+    [ dup [ length - ] [ 2drop f ] ifte ] 2map
+    [ ] subset all-equal? ;
 
 : unify-effect ( in out -- in out )
+    #! In is a sequence of integers; out is a sequence of stacks.
     2dup balanced?
-    [ unify-stacks >r unify-stacks r> ]
+    [ unify-stacks >r supremum r> ]
     [
         { "Unbalanced branches:" } -rot [
-            swap length number>string
-            " " rot length number>string append3
+            swap number>string " " rot length number>string
+            append3
         ] 2map append "\n" join inference-error
     ] ifte ;
 
@@ -43,7 +45,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     meta-d set d-in set ;
 
 : callstack-effect ( seq -- )
-    dup length { } <repeated>
+    dup length 0 <repeated>
     swap [ meta-r swap hash ] map
     unify-effect
     meta-r set drop ;
@@ -53,9 +55,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ [ active? ] bind ] subset ;
 
 : unify-effects ( seq -- )
-    filter-terminators dup empty?
-    [ drop terminate ]
-    [ dup datastack-effect callstack-effect ] ifte ;
+    dup datastack-effect callstack-effect ;
 
 : unify-dataflow ( effects -- nodes )
     [ [ dataflow-graph get ] bind ] map ;
@@ -63,7 +63,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : copy-inference ( -- )
     meta-r [ clone ] change
     meta-d [ clone ] change
-    d-in [ clone ] change
+    d-in [ ] change
     dataflow-graph off
     current-node off ;
 
@@ -79,7 +79,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             dup literal-value infer-quot
             active? [ #values node, ] when
             f
-        ] with-continuation [ terminate ] when drop
+        ] callcc1 [ terminate ] when drop
     ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )

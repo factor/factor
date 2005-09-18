@@ -66,11 +66,11 @@ unit-test
 
 [ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
 
-[ f ] [ [ { } { } "Hello" ] [ = ] monotonic? ] unit-test
-[ f ] [ [ { 2 } { } { } ] [ = ] monotonic? ] unit-test
-[ t ] [ [ ] [ = ] monotonic? ] unit-test
-[ t ] [ [ 1/2 ] [ = ] monotonic? ] unit-test
-[ t ] [ [ 1.0 10/10 1 ] [ = ] monotonic? ] unit-test
+[ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
+[ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
+[ t ] [ [ ] all-equal? ] unit-test
+[ t ] [ [ 1/2 ] all-equal? ] unit-test
+[ t ] [ [ 1.0 10/10 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ 1 [ 1 2 3 ] [ + ] map-with ] unit-test
