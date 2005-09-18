@@ -41,7 +41,7 @@ TUPLE: interp data call name catch ;
     r> call ; inline
 
 : callcc0 ( quot ++ | quot: cont -- | cont: ++ )
-    "use with-continuation instead" throw ;
+    with-continuation ;
 
 : callcc1 ( quot ++ obj | quot: cont -- | cont: obj ++ obj )
-    "use with-continuation instead" throw ;
+    with-continuation ;
