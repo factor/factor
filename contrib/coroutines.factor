@@ -42,38 +42,25 @@ TUPLE: coroutine resumecc exitcc ;
   [ 
     over set-coroutine-exitcc
     coroutine-resumecc call
-  ] callcc1 >r >r drop r> r> ;
+  ] callcc1 rot drop ;
 
 : coyield ( v co -- result )
   #! Suspend a coroutine, leaving the value 'v' on the 
   #! stack when control is passed to the 'coresume' caller.
   [  
+    [ continue-with ] cons
     over set-coroutine-resumecc  
-    coroutine-exitcc call
-  ] callcc1 >r >r drop r> r> ;
+    coroutine-exitcc continue-with
+  ] callcc1 rot drop ;
 
-: tree-each ( [ tree ] [ quotation ] -- )
-  #! Perform a preorder iteration of the tree, calling
-  #! the quotation on each key.
-  over [
-      over cons? [
-          >r uncons r> tuck >r >r tree-each r> r> tree-each
-      ] [
-          call
-      ] ifte
-  ] [
-    2drop
-  ] ifte ;
-
+USE: prettyprint
+USE: sequences
 
 : test1 ( -- co )
   [ swap [ over coyield 2drop ] tree-each f swap coyield ] cocreate ; 
   
 : test2 ( -- co )
   [ 1 over coyield drop 2 over coyield drop 3 over coyield ] cocreate ;
-
-USE: prettyprint
-USE: sequences
 
 test2 f swap coresume . f swap coresume . f swap coresume . drop
 
