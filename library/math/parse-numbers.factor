@@ -6,7 +6,7 @@ strings ;
 
 ! Number parsing
 
-: not-a-number "Not a number" throw ; inline
+: not-a-number "Not a number" throw ;
 
 GENERIC: digit> ( ch -- n )
 M: digit  digit> CHAR: 0 - ;

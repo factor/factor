@@ -21,7 +21,7 @@ M: number = ( n n -- ? ) number= ;
     over real? over real? and [
         (rect>)
     ] [
-        "Complex number must have real components" throw drop
+        "Complex number must have real components" throw
     ] ifte ; inline
 
 : >rect ( x -- xr xi ) dup real swap imaginary ; inline

@@ -15,7 +15,7 @@ TUPLE: inference-error message rstate data-stack call-stack ;
 
 : inference-error ( msg -- )
     recursive-state get meta-d get meta-r get
-    <inference-error> throw ; inline
+    <inference-error> throw ;
 
 M: inference-error error. ( error -- )
     "! Inference error:" print
@@ -78,11 +78,11 @@ M: wrapper apply-object wrapped apply-literal ;
 
 : active? ( -- ? )
     #! Is this branch not terminated?
-    d-in get meta-d get and ;
+    meta-d get meta-r get and ;
 
 : terminate ( -- )
     #! Ignore this branch's stack effect.
-    meta-d off meta-r off d-in off ;
+    meta-d off meta-r off #terminate node, ;
 
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested

@@ -50,9 +50,7 @@ void throw_error(CELL error, bool keep_stacks)
 
 void primitive_throw(void)
 {
-	CELL error = dpop();
-	if(error != F)
-		throw_error(error,true);
+	throw_error(dpop(),true);
 }
 
 void primitive_die(void)

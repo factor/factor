@@ -1,6 +1,6 @@
 IN: temporary
-USING: arrays generic inference kernel lists math math-internals
-namespaces parser sequences test vectors ;
+USING: arrays errors generic inference kernel lists math
+math-internals namespaces parser sequences test vectors ;
 
 [
     << shuffle f { "a" } { } { "a" } { "a" } >>
@@ -56,6 +56,14 @@ namespaces parser sequences test vectors ;
 [
     [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] ifte call
 ] unit-test-fails
+
+! Test inference of termination of control flow
+: termination-test-1
+    "foo" throw ;
+
+: termination-test-2 [ termination-test-1 ] [ 3 ] ifte ;
+
+[ @{ 1 1 }@ ] [ [ termination-test-2 ] infer ] unit-test
 
 : infinite-loop infinite-loop ;
 

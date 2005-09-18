@@ -83,8 +83,7 @@ namespaces parser prettyprint sequences strings vectors words ;
     ] make-hash ;
 
 : (infer-branches) ( branchlist -- list )
-    [ infer-branch ] map dup unify-effects
-    unify-dataflow ;
+    [ infer-branch ] map dup unify-effects unify-dataflow ;
 
 : infer-branches ( branches node -- )
     #! Recursive stack effect inference is done here. If one of

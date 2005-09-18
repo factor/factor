@@ -74,7 +74,7 @@ M: port set-timeout ( timeout port -- )
 : >port< dup port-handle swap delegate ;
 
 : pending-error ( port -- )
-    dup port-error f rot set-port-error throw ;
+    dup port-error f rot set-port-error [ throw ] when* ;
 
 : report-error ( error port -- )
     [ "Error on fd " % dup port-handle # ": " % swap % ] "" make

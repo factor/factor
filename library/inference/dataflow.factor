@@ -55,8 +55,8 @@ M: node = eq? ;
 
 : empty-node f { } { } { } { } ;
 : param-node ( label) { } { } { } { } ;
-: in-d-node ( inputs) >r f r> { } { } { } ;
-: out-d-node ( outputs) >r f { } r> { } { } ;
+: in-node ( inputs) >r f r> { } { } { } ;
+: out-node ( outputs) >r f { } r> { } { } ;
 
 : d-tail ( n -- list ) meta-d get tail* ;
 : r-tail ( n -- list ) meta-r get tail* ;
@@ -69,7 +69,7 @@ C: #label make-node ;
 
 TUPLE: #entry ;
 C: #entry make-node ;
-: #entry ( -- node ) meta-d get clone in-d-node <#entry> ;
+: #entry ( -- node ) meta-d get clone in-node <#entry> ;
 
 TUPLE: #call ;
 C: #call make-node ;
@@ -82,31 +82,35 @@ C: #call-label make-node ;
 TUPLE: #shuffle ;
 C: #shuffle make-node ;
 : #shuffle ( -- node ) empty-node <#shuffle> ;
-: #push ( outputs -- node ) d-tail out-d-node <#shuffle> ;
+: #push ( outputs -- node ) d-tail out-node <#shuffle> ;
 
 TUPLE: #values ;
 C: #values make-node ;
-: #values ( -- node ) meta-d get clone in-d-node <#values> ;
+: #values ( -- node ) meta-d get clone in-node <#values> ;
 
 TUPLE: #return ;
 C: #return make-node ;
 : #return ( label -- node )
     #! The parameter is the label we are returning from, or if
     #! f, this is a top-level return.
-    meta-d get clone in-d-node <#return>
+    meta-d get clone in-node <#return>
     [ set-node-param ] keep ;
 
 TUPLE: #ifte ;
 C: #ifte make-node ;
-: #ifte ( in -- node ) 1 d-tail in-d-node <#ifte> ;
+: #ifte ( in -- node ) 1 d-tail in-node <#ifte> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
-: #dispatch ( in -- node ) 1 d-tail in-d-node <#dispatch> ;
+: #dispatch ( in -- node ) 1 d-tail in-node <#dispatch> ;
 
 TUPLE: #merge ;
 C: #merge make-node ;
-: #merge ( -- node ) meta-d get clone out-d-node <#merge> ;
+: #merge ( -- node ) meta-d get clone out-node <#merge> ;
+
+TUPLE: #terminate ;
+C: #terminate make-node ;
+: #terminate ( -- node ) empty-node <#terminate> ;
 
 : node-inputs ( d-count r-count node -- )
     tuck
@@ -169,10 +173,10 @@ SYMBOL: current-node
     ] ifte ;
 
 : drop-inputs ( node -- #shuffle )
-    node-in-d clone in-d-node <#shuffle> ;
+    node-in-d clone in-node <#shuffle> ;
 
 : #drop ( n -- #shuffle )
-    d-tail in-d-node <#shuffle> ;
+    d-tail in-node <#shuffle> ;
 
 : each-node ( node quot -- | quot: node -- )
     over [

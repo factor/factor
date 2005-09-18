@@ -11,7 +11,7 @@ USING: kernel-internals lists ;
 
 TUPLE: no-method object generic ;
 
-: no-method ( object generic -- ) <no-method> throw ; inline
+: no-method ( object generic -- ) <no-method> throw ;
 
 : catchstack ( -- cs ) 6 getenv ;
 : set-catchstack ( cs -- ) 6 setenv ;

@@ -156,7 +156,7 @@ IN: kernel
     #! Push the number of elements on the datastack.
     datastack length ;
 
-: no-cond "cond fall-through" throw ; inline
+: no-cond "cond fall-through" throw ;
 
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.

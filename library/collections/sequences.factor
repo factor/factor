@@ -45,7 +45,7 @@ GENERIC: resize ( n seq -- seq )
 
 TUPLE: bounds-error index seq ;
 
-: bounds-error <bounds-error> throw ; inline
+: bounds-error <bounds-error> throw ;
 
 : growable-check ( n seq -- fx seq )
     >r >fixnum dup 0 fixnum<

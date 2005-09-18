@@ -1,5 +1,4 @@
 IN: temporary
-USING: memory ;
 USE: errors
 USE: kernel
 USE: namespaces
@@ -7,6 +6,7 @@ USE: test
 USE: lists
 USE: parser
 USE: io
+USE: memory
 
 [ f ] [ [ ] [ ] catch ] unit-test
 

@@ -162,6 +162,6 @@ M: compound (uncrossref)
     over "infer" word-prop or [
         drop
     ] [
-        dup { "infer-effect" "base-case" "no-effect" }
+        dup { "infer-effect" "base-case" "no-effect" "terminates" }
         reset-props update-xt
     ] ifte ;

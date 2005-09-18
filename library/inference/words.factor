@@ -41,15 +41,16 @@ hashtables parser prettyprint ;
         ] with-nesting
     ] with-recursive-state ;
 
-: infer-compound ( word base-case -- effect )
+: infer-compound ( word base-case -- terminates? effect )
     #! Infer a word's stack effect in a separate inferencer
-    #! instance.
+    #! instance. Outputs a boolean if the word terminates
+    #! control flow by throwing an exception or restoring a
+    #! continuation.
     [
         inferring-base-case set
         recursive-state get init-inference
-        dup inline-block drop
-        effect
-    ] with-scope [ consume/produce ] keep ;
+        [ inline-block drop active? not effect ] keep
+    ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word
 
@@ -60,7 +61,9 @@ M: object apply-word ( word -- )
 M: compound apply-word ( word -- )
     #! Infer a compound word's stack effect.
     [
-        dup f infer-compound "infer-effect" set-word-prop
+        dup dup f infer-compound
+        >r "terminates" set-word-prop r>
+        "infer-effect" set-word-prop
     ] [
         [ swap t "no-effect" set-word-prop rethrow ] when*
     ] catch ;
@@ -73,7 +76,8 @@ M: compound apply-word ( word -- )
             over "infer" word-prop [
                 swap first length ensure-values call drop
             ] [
-                consume/produce
+                dupd consume/produce
+                "terminates" word-prop [ terminate ] when
             ] ifte*
         ] [
             apply-word
@@ -93,7 +97,7 @@ M: symbol apply-object ( word -- )
         [ #call-label ] [ #call ] ?ifte
         r> over set-node-in-d node,
     ] [
-        drop dup t infer-compound "base-case" set-word-prop
+        drop dup t infer-compound nip "base-case" set-word-prop
     ] ifte ;
 
 : base-case ( word label -- )

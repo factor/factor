@@ -31,8 +31,7 @@ IN: math-internals
 : fraction> ( a b -- a/b )
     dup 1 number= [ drop ] [ (fraction>) ] ifte ; inline
 
-: division-by-zero ( x y -- )
-    "Division by zero" throw drop ; inline
+: division-by-zero ( x y -- ) "Division by zero" throw ;
 
 M: integer / ( x y -- x/y )
     dup 0 number= [

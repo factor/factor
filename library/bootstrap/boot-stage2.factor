@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 USING: alien assembler command-line compiler compiler-backend
 errors generic hashtables io io-internals kernel
-kernel-internals lists math memory namespaces parser sequences
-sequences-internals words ;
+kernel-internals lists math memory namespaces optimizer parser
+sequences sequences-internals words ;
 
 : pull-in ( ? list -- )
     swap [
@@ -78,7 +78,8 @@ compile? [
     {
         uncons 1+ 1- + <= > >= mod length
         nth-unsafe set-nth-unsafe
-        = string>number number>string scan (generate)
+        = string>number number>string scan solve-recursion
+        kill-set kill-node (generate)
     } [ compile ] each
 ] when
 
