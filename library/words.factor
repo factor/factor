@@ -24,9 +24,11 @@ M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
     #! Outputs a list of words that this word directly calls.
     [
         dup word-def [
-            dup word? [ 2dup eq? [ dup , ] unless ] when 2drop
+            dup word?
+            [ 2dup eq? [ dup dup set ] unless ] when
+            2drop
         ] tree-each-with
-    ] { } make prune ;
+    ] make-hash hash-keys ;
 
 ! The cross-referencer keeps track of word dependencies, so that
 ! words can be recompiled when redefined.

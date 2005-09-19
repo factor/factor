@@ -39,14 +39,15 @@ SYMBOL: builtins
     #! Outputs a sequence of classes whose union is this class.
     [ (flatten) ] make-hash ;
 
-DEFER: types
-
 : (types) ( class -- )
     #! Only valid for a flattened class.
-    dup superclass [ types % ] [ "type" word-prop , ] ?ifte ;
+    flatten [
+        car dup superclass
+        [ (types) ] [ "type" word-prop dup set ] ?ifte
+    ] hash-each ;
 
 : types ( class -- types )
-    [ flatten hash-keys [ (types) ] each ] { } make prune ;
+    [ (types) ] make-hash hash-keys ;
 
 DEFER: class<
 

@@ -45,15 +45,17 @@ SYMBOL: meta-executing
     meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
 
 : meta-interp ( -- interp )
-    meta-d get meta-r get meta-n get meta-c get <interp> ;
+    meta-d get f meta-r get meta-n get meta-c get
+    <continuation> ;
 
 : set-meta-interp ( interp -- )
-    >interp< meta-c set meta-n set meta-r set meta-d set ;
+    >continuation<
+    meta-c set meta-n set meta-r set drop meta-d set ;
 
 : host-word ( word -- )
     [
         \ call push-r  continuation [
-            continuation over interp-data push continue
+            continuation over continuation-data push continue
         ] cons cons push-r  meta-interp continue
     ] call  set-meta-interp  pop-d 2drop ;
 

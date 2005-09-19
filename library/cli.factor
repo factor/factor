@@ -1,14 +1,14 @@
 ! Copyright (C) 2003, 2004 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: command-line
-USING: io kernel kernel-internals lists namespaces parser
+USING: errors io kernel kernel-internals lists namespaces parser
 sequences strings ;
 
 ! This file is run as the last stage of boot.factor; it relies
 ! on all other words already being defined.
 
 : ?run-file ( file -- )
-    dup exists? [ run-file ] [ drop ] ifte ;
+    dup exists? [ [ dup run-file ] try drop ] [ drop ] ifte ;
 
 : run-user-init ( -- )
     #! Run user init file if it exists

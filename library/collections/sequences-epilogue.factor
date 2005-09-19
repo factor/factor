@@ -109,14 +109,6 @@ M: object peek ( sequence -- element )
     #! Get value at end of sequence and remove it.
     dup peek swap pop* ;
 
-: adjoin ( elt seq -- )
-    2dup member? [ 2drop ] [ push ] ifte ;
-
-: prune ( seq -- seq )
-    [
-        dup length <vector> swap [ over adjoin ] each
-    ] keep like ; flushable
-
 : join ( seq glue -- seq )
     #! The new sequence is of the same type as glue.
     swap dup empty? [

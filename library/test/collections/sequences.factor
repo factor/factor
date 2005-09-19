@@ -64,8 +64,6 @@ unit-test
 [ @{ @{ 1 4 }@ @{ 2 5 }@ @{ 3 6 }@ }@ ]
 [ @{ @{ 1 2 3 }@ @{ 4 5 6 }@ }@ flip ] unit-test
 
-[ [ "a" 43 [ ] ] ] [ [ "a" 43 43 43 [ ] 43 "a" [ ] ] prune ] unit-test
-
 [ f ] [ [ { } { } "Hello" ] all-equal? ] unit-test
 [ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
 [ t ] [ [ ] all-equal? ] unit-test

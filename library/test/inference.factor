@@ -223,7 +223,6 @@ DEFER: agent
 [ @{ 1 1 }@ ] [ [ reverse ] infer ] unit-test
 [ @{ 2 1 }@ ] [ [ member? ] infer ] unit-test
 [ @{ 2 1 }@ ] [ [ remove ] infer ] unit-test
-[ @{ 1 1 }@ ] [ [ prune ] infer ] unit-test
 
 : bad-code "1234" car ;
 

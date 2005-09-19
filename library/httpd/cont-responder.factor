@@ -139,7 +139,7 @@ DEFER: show
   ] show-final ;
 
 : >callable ( quot|interp|f -- interp )
-  dup interp? [
+  dup continuation? [
     [ continue-with ] cons
   ] when ;
 

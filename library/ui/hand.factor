@@ -25,7 +25,7 @@ C: hand ( world -- hand )
     dup hand-gadget over set-hand-clicked
     dup screen-loc over set-hand-click-loc
     dup hand-gadget over relative over set-hand-click-rel
-    hand-buttons adjoin ;
+    hand-buttons push ;
 
 : button\ ( n hand -- )
     hand-buttons delete ;

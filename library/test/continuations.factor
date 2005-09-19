@@ -31,14 +31,6 @@ USE: test
 : multishot-test ( -- stack )
     [
         dup "cc" set 5 swap continue-with
-    ] callcc1 "cc" get interp-data ;
+    ] callcc1 "cc" get continuation-data ;
 
 [ 5 { } ] [ multishot-test ] unit-test
-
-[ ] [
-    [
-        global [ "x" set ] bind
-        [ global [ "x" get ] bind continue ] quot>interp
-        continue
-    ] callcc0 global [ "x" off ] bind
-] unit-test

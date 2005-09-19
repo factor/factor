@@ -8,7 +8,7 @@ sequences sequences-internals words ;
 : pull-in ( ? list -- )
     swap [
         [
-            dup print run-resource
+            dup print [ dup run-resource ] try drop
         ] each
     ] [
         drop

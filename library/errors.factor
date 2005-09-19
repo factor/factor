@@ -5,7 +5,7 @@ DEFER: callcc1
 DEFER: continue-with
 
 IN: errors
-USING: kernel-internals lists ;
+USING: kernel-internals lists sequences ;
 
 ! This is a very lightweight exception handling system.
 
@@ -20,13 +20,13 @@ TUPLE: no-method object generic ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
 
 : (catch) ( try -- exception/f )
-    [ >c call f c> drop f ] callcc1 nip ;
+    [ >c call f c> drop f ] callcc1 nip ; inline
 
 : catch ( try catch -- )
     #! Call the try quotation. If an error occurs restore the
     #! datastack, push the error, and call the catch block.
     #! If no error occurs, push f and call the catch block.
-    >r (catch) r> call ;
+    >r (catch) r> call ; inline
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.

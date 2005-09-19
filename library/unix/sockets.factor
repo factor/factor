@@ -67,7 +67,8 @@ TUPLE: server client ;
 
 C: server ( port -- server )
     #! Starts listening for TCP connections on localhost:port.
-    [ >r server-socket 0 <port> r> set-delegate ] keep ;
+    [ >r server-socket 0 <port> r> set-delegate ] keep
+    server over set-port-type ;
 
 IN: io-internals
 USE: unix-internals

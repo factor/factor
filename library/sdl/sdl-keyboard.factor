@@ -13,22 +13,17 @@ sequences ;
 : SDL_EnableKeyRepeat ( delay interval -- )
     "int" "sdl" "SDL_EnableKeyRepeat" [ "int" "int" ] alien-invoke ;
 
-: modifiers, ( mod -- )
-    modifiers get [
-        uncons pick bitand 0 = [ drop ] [ , ] ifte
-    ] each
-    drop ;
+: modifier ( mod -- str )
+    [ modifiers [ uncons rot bitand 0 > ?, ] each-with ] [ ] make ;
 
-: keysym, ( sym -- )
+: keysym ( sym -- str )
     #! Return the original keysym number if its unknown.
-    [ keysyms get hash dup ] keep ? , ;
+    [ keysyms hash dup ] keep ? ;
 
 : keyboard-event>binding ( event -- binding )
     #! Turn a key event into a binding, which is a list where
     #! all elements but the last one are modifier names looked
     #! up the modifiers alist, and the last element is a keysym
     #! look up in the keysyms hash.
-    [
-        dup keyboard-event-mod modifiers,
-        keyboard-event-sym keysym,
-    ] [ ] make prune ;
+    dup keyboard-event-mod modifier
+    swap keyboard-event-sym keysym add ;

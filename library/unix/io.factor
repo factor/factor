@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io-internals
 USING: alien arrays compiler-backend errors generic hashtables
-io kernel kernel-internals lists math parser sequences
-strings threads unix-internals vectors ;
+io kernel kernel-internals lists math parser sequences strings
+threads unix-internals vectors words ;
 
 ! We want namespaces::bind to shadow the bind system call from
 ! unix-internals
@@ -49,7 +49,19 @@ SYMBOL: write-tasks
 : init-handle ( fd -- ) F_SETFL O_NONBLOCK fcntl io-error ;
 
 ! Common delegate of native stream readers and writers
-TUPLE: port handle buffer error timeout cutoff output? sbuf eof? ;
+SYMBOL: input
+SYMBOL: output
+SYMBOL: closed
+
+TUPLE: port handle error timeout cutoff type sbuf eof? ;
+
+: check-port ( port expected -- )
+    >r port-type r> 2dup eq? [
+        [
+            "Cannot perform " % word-name %
+            " on " % word-name % " port" %
+        ] "" make throw
+    ] unless 2drop ;
 
 : make-buffer ( n -- buffer/f )
     dup 0 > [ <buffer> ] [ drop f ] ifte ;
@@ -150,7 +162,7 @@ GENERIC: task-container ( task -- vector )
 ! Readers
 
 : <reader> ( fd -- stream )
-    buffered-port <line-reader> ;
+    buffered-port input over set-port-type <line-reader> ;
 
 : open-read ( path -- fd )
     O_RDONLY file-mode open dup io-error ;
@@ -212,10 +224,12 @@ M: read-task task-container drop read-tasks get ;
     ] unless 2drop ;
 
 M: port stream-read ( count stream -- string )
+    dup input check-port
     [ wait-to-read ] keep dup port-eof?
     [ drop f ] [ port-sbuf >string ] ifte ;
 
 M: port stream-read1 ( stream -- char/f )
+    dup input check-port
     1 over wait-to-read dup port-eof?
     [ drop f ] [ port-sbuf first ] ifte ;
 
@@ -226,7 +240,7 @@ M: port stream-read1 ( stream -- char/f )
     dup io-error ;
 
 : <writer> ( fd -- writer )
-    buffered-port t over set-port-output? ;
+    buffered-port output over set-port-type ;
 
 : write-step ( port -- )
     dup >port< dup buffer@ swap buffer-length write dup 0 >= [
@@ -272,25 +286,30 @@ M: write-task task-container drop write-tasks get ;
     ] ifte* ;
 
 M: port stream-flush ( stream -- )
-    dup port-output? [
-        [ swap <write-task> add-write-io-task stop ] callcc0
-    ] when drop ;
+    dup output check-port
+    [ swap <write-task> add-write-io-task stop ] callcc0 drop ;
 
-M: port stream-finish ( stream -- ) drop ;
+M: port stream-finish ( stream -- ) output check-port ;
 
 : wait-to-write ( len port -- )
     tuck can-write? [ dup stream-flush ] unless pending-error ;
 
 M: port stream-write1 ( char writer -- )
+    dup output check-port
     1 over wait-to-write ch>buffer ;
 
 M: port stream-format ( string style writer -- )
+    dup output check-port
     nip over length over wait-to-write >buffer ;
 
 M: port stream-close ( stream -- )
-    dup stream-flush
-    dup port-handle close
-    delegate [ buffer-free ] when* ;
+    dup port-type closed eq? [
+        dup port-type output eq? [ dup stream-flush ] when
+        dup port-handle close
+        dup delegate [ buffer-free ] when*
+        f over set-delegate
+        closed over set-port-type
+    ] unless drop ;
 
 ! Make a duplex stream for reading/writing a pair of fds
 
