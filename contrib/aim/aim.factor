@@ -283,6 +283,7 @@ SYMBOL: opcode
     ] send-aim ;
 
 : send-second-bunch ( -- )
+    stage-num [ 1 + ] change
     [
         1 HEX: 17 0 HEX: 17 make-snac
         [ 1 4  HEX: 13 3  2 1  3 1  4 1  6 1  8 1  9 1  HEX: a 1  HEX: b 1 ]
@@ -371,9 +372,9 @@ SYMBOL: opcode
 : second-server
     1 stage-num set
     aim-chat-ip get aim-chat-port get <client> conn set
-    send-second-login
-    read-aim drop
-    stage-num [ 1 + ] change
+    send-second-login read-aim drop
+
+    ! normal transmission stage
     send-second-bunch ;
 
 : connect-aim ( -- )
