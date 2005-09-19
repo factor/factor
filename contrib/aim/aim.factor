@@ -1,5 +1,5 @@
 IN: aim
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto ;
+USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables ;
 
 SYMBOL: aim-login-server
 SYMBOL: icq-login-server
@@ -27,6 +27,9 @@ SYMBOL: login-key
 SYMBOL: aim-chat-ip
 SYMBOL: aim-chat-port
 SYMBOL: auth-code
+
+SYMBOL: family
+SYMBOL: opcode
 
 : initialize ( username password -- )
     "login.oscar.aol.com" aim-login-server set
@@ -58,7 +61,6 @@ SYMBOL: auth-code
 : (send-aim) ( str -- )
     conn get [ stream-write ] keep stream-flush ;
 
-
 : (prepend-aim-protocol) ( data -- )
     [
         HEX: 2a >byte
@@ -70,39 +72,197 @@ SYMBOL: auth-code
 : send-aim ( data -- )
     make-packet
     (prepend-aim-protocol)
-    "Sending: " print dup hexdump
+    "Sending: " write dup hexdump
     (send-aim) ;
-
-: read-net ( n s -- bc )
-    stream-read
-    "Received: " print dup hexdump ;
 
 : drop-header ( str -- )
     6 swap tail ;
 
-: parse-snac ( str -- )
-    "SNAC" print
-    dup head-short .
-    dup head-short .
-    dup head-short .
-    head-int . ;
-
 : with-aim ( quot -- )
     conn get swap with-default-stream ;
 
+
 : read-aim ( -- bc )
     [
-        head-byte .
-        head-byte .
+        head-byte drop
+        head-byte drop
+        head-short drop
+        head-short head-string
     ] with-aim ;
+    ! "Received: " write dup hexdump ;
+
 
 : make-snac ( fam subtype flags req-id -- )
     4 >nvector { >short >short >short >int } papply ;
 
-: send-first ( -- )
+: parse-snac ( stream -- )
+    head-short family set
+    head-short opcode set
+    head-short drop
+    head-int drop ;
+
+: (unhandled-opcode) ( -- )
+    "Family: " write family get >hex "h" append write
+    ", opcode: " write opcode get >hex "h" append write terpri
+    default-stream get contents hexdump ;
+
+: unhandled-opcode ( -- )
+    "Unhandled opcode: " write (unhandled-opcode) ;
+
+: incomplete-opcode ( -- )
+    "Incomplete handling: " write (unhandled-opcode) ;
+
+: unhandled-family-opcode ( -- )
+    "Unhandled family: " write family get >hex "h" append write terpri
+    unhandled-opcode ;
+
+! returns handler table for a family
+: FAMILY-TABLE
+    {{
+    }} ;
+
+: add-family ( -- )
+    word dup unparse "-" split second dup length 1- swap head hex> FAMILY-TABLE set-hash ; parsing
+
+! : FAMILY-1h
+    ! {{
+    ! }} ; add-family
+
+: handle-3h-bh ( -- )
+    ;
+    
+
+: FAMILY-3h ( -- hash)
+    {{
+        [[ HEX: b handle-3h-bh ]]
+    }} ; add-family
+
+: drop-family-4h-header
+    head-short drop
+    head-short drop
+    head-short drop
+    head-short drop
+    8 head-string drop  ! message-id
+    ;
+
+: handle-incoming-message ( -- )
+    drop-family-4h-header
+    head-short drop ! channel
+    head-byte head-string "Incoming msg from: " write write terpri ! from name
+    head-short drop ! warning-level
+    ;
+
+: handle-typing-message ( -- )
+    drop-family-4h-header
+    head-short drop
+    head-byte head-string write
+    head-short
+    {
+        { [ dup 0 = ] [ drop " has an empty textbox." write terpri ] }
+        { [ dup 1 = ] [ drop " has entered text." write terpri ] }
+        { [ dup 2 = ] [ drop " is typing..." write terpri ] }
+        { [ t ] [ " does 4h.14h unknown: " write unparse write terpri ] }
+    } cond ;
+
+: FAMILY-4h ( -- hash)
+    {{
+        [[ 7 handle-incoming-message ]]
+        [[ HEX: 14 handle-typing-message ]]
+    }} ; add-family
+
+: FAMILY-13h ( -- hash)
+    {{
+    }} ; add-family
+
+: print-op ( op -- )
+    "Op: " write . ;
+
+: parse-server ( ip:port -- )
+    ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
+
+
+: process-login-chunks ( stream -- )
+    default-stream get empty?  [
+        head-short
+        head-short
+        swap
+        {
+            { [ dup 1 = ] [ print-op head-string . ] }
+            { [ dup 5 = ] [ print-op head-string dup . parse-server ] }
+            { [ dup 6 = ] [ print-op head-string dup . auth-code set ] }
+            { [ dup 8 = ] [ print-op head-string . ] }
+            { [ t ] [ print-op head-string . ] }
+        } cond
+        process-login-chunks
+    ] unless ;
+
+: handle-login-packet ( -- )
+    process-login-chunks ;
+
+: password-md5 ( password -- md5 )
+    login-key get
+    password get string>md5 append
+    client-md5-string get append
+    string>md5 >string ;
+
+: respond-login-key-packet ( -- )
+    [
+        HEX: 17 HEX: 2 0 0 make-snac
+        1 >short
+        username get length >short
+        username get
+
+        ! password hash chunk
+        HEX: 25 >short
+        HEX: 10 >short
+        password-md5
+
+        HEX: 4c >short
+        HEX: 00 >short
+        HEX: 03 >short client-id-string get length >short client-id-string get
+        HEX: 16 >short HEX: 02 >short client-id-num get >short
+        HEX: 17 >short HEX: 02 >short client-major-ver get >short
+        HEX: 18 >short HEX: 02 >short client-minor-ver get >short
+        HEX: 19 >short HEX: 02 >short client-lesser-ver get >short
+        HEX: 1a >short HEX: 02 >short client-build-num get >short
+        HEX: 14 >short HEX: 04 >short client-distro-num get >int
+        HEX: 0f >short client-language get length >short client-language get
+        HEX: 0e >short client-country get length >short client-country get
+        HEX: 4a >short HEX: 01 >short client-ssi-flag get >byte
+    ] send-aim ;
+
+: handle-login-key-packet ( -- )
+    head-short head-string login-key set
+    respond-login-key-packet ;
+
+: FAMILY-17h ( -- hash)
+    {{
+        [[ 7 handle-login-key-packet ]]
+        [[ 3 handle-login-packet ]]
+    }} ; add-family
+
+
+: handle-packet ( packet -- )
+    <string-reader>
+    [
+        parse-snac
+        family get FAMILY-TABLE hash dup [
+            execute opcode get swap hash dup [
+                execute ] [
+                    unhandled-opcode drop
+                ] ifte
+            ] [
+            unhandled-family-opcode
+            drop
+        ] ifte
+        default-stream get empty? [ incomplete-opcode ] unless
+    ] with-default-stream ;
+
+: send-first-login ( -- )
     [ 1 >int ] send-aim ;
 
-: send-second ( -- )
+: send-first-request-auth ( -- )
+    stage-num [ 1 + ] change
     [
         HEX: 17 HEX: 6 0 0 make-snac
         1 >short
@@ -114,119 +274,36 @@ SYMBOL: auth-code
         HEX: 00 >short
     ] send-aim ;
 
-
-: respond-second ( -- )
-    [
-        HEX: 17 HEX: 2 0 0 make-snac
-        1 >short
-        username get length >short
-        username get
-
-        ! password hash chunk
-        25 >short
-        10 >short append
-        login-key get append
-        password get string>md5 append
-        client-md5-string get append
-        string>md5 >string
-
-        HEX: 4c >short
-        HEX: 00 >short
-        HEX: 16 >short HEX: 02 >short client-id-num get >short
-        HEX: 03 >short client-id-string get length >short client-id-string get
-        HEX: 17 >short HEX: 02 >short client-major-ver get >short
-        HEX: 18 >short HEX: 02 >short client-minor-ver get >short
-        HEX: 19 >short HEX: 02 >short client-lesser-ver get >short
-        HEX: 1a >short HEX: 02 >short client-build-num get >short
-        HEX: 14 >short HEX: 04 >short client-distro-num get >int
-        HEX: 0f >short client-language get length >short client-language get
-        HEX: 0e >short client-country get length >short client-country get
-        HEX: 4a >short HEX: 01 >short client-ssi-flag get >byte
-    ] send-aim ;
-
-: parse-second ( str -- )
-    ;
-    ! drop-header
-    ! dup parse-snac
-    ! dup head-short-be swap head-string-nonull login-key set
-    ! respond-second ;
-
-: print-op ( op -- )
-    "Op: " write . ;
-
-: parse-server ( ip:port -- )
-    ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
-
-! : process-third-chunks ( bc -- )
-    ! dup bc-bytes empty? [
-        ! drop
-    ! ] [
-        ! dup head-short-be
-        ! over head-short-be
-        ! swap
-        ! {
-            ! { [ dup 1 = ] [ print-op over head-string-nonull . ] }
-            ! { [ dup 5 = ] [ print-op over head-string-nonull dup . parse-server ] }
-            ! { [ dup 6 = ] [ print-op over head-string-nonull dup . auth-code set ] }
-            ! { [ dup 8 = ] [ print-op over head-string-nonull . ] }
-            ! { [ t ] [ print-op over head-string-nonull . ] }
-        ! } cond
-        ! process-third-chunks
-    ! ] ifte ;
-! 
-! : parse-third ( bc -- )
-    ! dup drop-header
-    ! dup parse-snac
-    ! process-third-chunks ;
-
-: send-third ( -- )
+: send-second-login
     [
         1 >int
         6 >short
-        auth-code get length
+        auth-code get length >short
         auth-code get
     ] send-aim ;
 
-: send-fourth ( -- )
+: send-second-bunch ( -- )
     [
         1 HEX: 17 0 HEX: 17 make-snac
         [ 1 4  HEX: 13 3  2 1  3 1  4 1  6 1  8 1  9 1  HEX: a 1  HEX: b 1 ]
         [ >short ] each
-    ] send-aim ;
-
-: send-fifth ( -- )
-    [
-        1 6 0 6 make-snac
-    ] send-aim ;
-
-: send-sixth ( -- )
-    [
-        1 8 0 8 make-snac
-        [ 1 2 3 4 5 ] [ >short ] each
-    ] send-aim ;
-
-: send-bunch ( -- )
+    ] send-aim
+    [ 1 6 0 6 make-snac ] send-aim
+    [ 1 8 0 8 make-snac [ 1 2 3 4 5 ] [ >short ] each ] send-aim
     [ 1 HEX: e 0 HEX: e make-snac ] send-aim
     [ HEX: 13 2 0 2 make-snac ] send-aim
-
     [
         HEX: 13 5 HEX: 7e6d 5 make-snac
         HEX: 41c1 >int
         HEX: 3670 >int
         HEX: bb >short
     ] send-aim
-
     [ 2 2 0 2 make-snac ] send-aim
     [ 2 3 0 2 make-snac ] send-aim
     [ 3 2 0 2 make-snac ] send-aim
     [ 4 4 0 4 make-snac ] send-aim
-    [ 9 2 0 2 make-snac ] send-aim ;
-    
-: send-bunch2
-    [
-        HEX: 13 7 0 7 make-snac
-    ] send-aim
-
+    [ 9 2 0 2 make-snac ] send-aim
+    [ HEX: 13 7 0 7 make-snac ] send-aim
     [
         2 4 0 4 make-snac
         5 >short
@@ -252,7 +329,6 @@ SYMBOL: auth-code
         2 >short
         2 >short
     ] send-aim
-
     [
         4 2 0 2 make-snac
         0 >int
@@ -262,7 +338,6 @@ SYMBOL: auth-code
         HEX: 03e70 >short
         0 >int
     ] send-aim
-    
     [
         1 2 0 2 make-snac
         [
@@ -279,45 +354,39 @@ SYMBOL: auth-code
         ] [ >short ] each
     ] send-aim ;
 
-: connect-aim ( -- )
+: handle-loop ( -- )
+    read-aim handle-packet handle-loop ;
+
+: first-server
     ! first server
-    ! new connection stage
-    ! send-first
-    ! read-aim drop
-    ! stage-num [ 1 + ] change
+    1 stage-num set
+    send-first-login read-aim drop
 
     ! normal transmission stage
-    ! send-second
-    ! read-aim parse-second
-    ! read-aim parse-third
-    ! read-aim drop
-    ! conn get stream-close
+    send-first-request-auth read-aim handle-packet
+    read-aim handle-packet
+    read-aim drop
+    conn get stream-close ;
 
-    ! second server
-    ! 1 stage-num set
-    ! aim-chat-ip get aim-chat-port get <client> conn set
-    ! send-third
-    ! read-aim drop
-    ! stage-num [ 1 + ] change
-    ! ! read-aim
-    ! send-fourth 
-    ! send-fifth
-    ! ! read-aim
-    ! ! read-aim
-    ! ! read-aim
-    ! send-sixth
-    ! send-bunch
-    ! ! 9 [ drop read-aim drop ] each
-    ! send-bunch2
-    ;
+: second-server
+    1 stage-num set
+    aim-chat-ip get aim-chat-port get <client> conn set
+    send-second-login
+    read-aim drop
+    stage-num [ 1 + ] change
+    send-second-bunch ;
 
-: bug-demo ( -- )
-    "username" "password" initialize
-    send-first
-    [ head-byte . ] with-aim 
-    [ head-byte . ] with-aim 
-    ;
+: connect-aim ( -- )
+    first-server
+    aim-chat-ip get 
+    [ "No aim server received (too many logins, try again later)" throw ] unless
+    second-server [ handle-loop ] in-thread ;
 
-: test-login ( <net> -- )
-    "username" "password" initialize connect-aim ;
+: run ( username password -- )
+    initialize connect-aim ;
+    ! [ initialize connect-aim ] with-scope ;
+
+! my aim test account.  you can use it.
+: run-test-account
+    "FactorTest" "factoraim" run ;
 
