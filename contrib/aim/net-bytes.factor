@@ -23,11 +23,8 @@ SYMBOL: default-stream
 ! "\0\u0001\0\0\0\0\0\0\0\u0006"
 
 : with-default-stream ( stream quot -- )
-    [
-        swap default-stream set
-        [ default-stream get stream-close rethrow ]
-        catch
-    ] with-scope ;
+    swap default-stream set
+    [ dup [ default-stream get stream-close ] when rethrow ] catch ;
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] ifte ;
@@ -36,7 +33,7 @@ SYMBOL: default-stream
     big-endian get [ be> ] [ le> ] ifte ;
 
 : >byte ( byte -- str )
-    1 >le ;
+    unit >string ;
 
 : >short ( short -- str )
     2 >endian ;
@@ -53,8 +50,6 @@ SYMBOL: default-stream
 : make-packet ( quot -- )
     depth >r call depth r> - [ drop append ] each ;
 
-: (head-byte) ( str -- byte )
-    1 swap head endian> ;
 : (head-short) ( str -- short )
     2 swap head endian> ;
 : (head-int) ( str -- int )
@@ -64,7 +59,7 @@ SYMBOL: default-stream
 
 
 : head-byte ( -- byte )
-    1 default-stream get stream-read (head-byte) ;
+    1 default-stream get stream-read first ;
 
 : head-short ( -- short )
     2 default-stream get stream-read (head-short) ;
@@ -74,6 +69,9 @@ SYMBOL: default-stream
 
 : head-long ( -- long )
     8 default-stream get stream-read (head-long) ;
+
+: head-string ( n -- str )
+    default-stream get stream-read >string ;
 
 
 ! wrote this months and months ago..
