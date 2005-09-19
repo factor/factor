@@ -92,26 +92,26 @@ SYMBOL: K
     h3 get D set
     h4 get E set ;
 
+: (inner-loop) ( -- )
+    ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
+    [
+        [ B get C get D get ] keep sha1-f ,
+        dup get-wth ,
+        dup K get nth ,
+        A get 5 32 bitroll ,
+        E get ,
+    ] { } make sum 4294967295 bitand ; inline
+
+: (set-vars) ( -- )
+    ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
+    D get E set
+    C get D set
+    B get 30 32 bitroll C set
+    A get B set ;
+
 : calculate-letters ( -- )
     ! step d of RFC 3174, section 6.1
-    80 [
-        ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
-        [
-            [ B get C get D get ] keep sha1-f ,
-            dup get-wth ,
-            dup K get nth ,
-            A get 5 32 bitroll ,
-            E get ,
-        ] { } make sum 4294967296 mod
-
-        ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
-        >r
-        D get E set
-        C get D set
-        B get 30 32 bitroll C set
-        A get B set
-        r> A set
-    ] repeat ;
+    80 [ (inner-loop) >r (set-vars) r> A set ] repeat ;
 
 : update-hs ( -- )
     ! step e of RFC 3174, section 6.1
@@ -125,9 +125,7 @@ SYMBOL: K
     make-w init-letters calculate-letters update-hs drop ;
 
 : get-sha1 ( -- str )
-    [
-        [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each
-    ] "" make hex-string ;
+    [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
 : string>sha1 ( string -- sha1 )
     [
@@ -136,20 +134,17 @@ SYMBOL: K
         drop get-sha1
     ] with-scope ;
 
-: stream>sha1 ( stream -- sha1 )
-    [
-        contents string>sha1
-    ] with-scope ;
+: string>sha1str ( string -- sha1str )
+    string>sha1 hex-string ;
 
-: file>sha1 ( file -- sha1 )
-    [
-        <file-reader> stream>sha1
-    ] with-scope ;
+: stream>sha1 ( stream -- sha1 ) contents string>sha1 ;
+
+: file>sha1 ( file -- sha1 ) <file-reader> stream>sha1 ;
 
 ! unit test from the RFC
 : test-sha1 ( -- )
-    [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1 ] unit-test
-    [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1 ] unit-test
-    ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1 ] unit-test ! takes a long time...
-    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1 ] unit-test ;
+    [ "a9993e364706816aba3e25717850c26c9cd0d89d" ] [ "abc" string>sha1str ] unit-test
+    [ "84983e441c3bd26ebaae4aa1f95129e5e54670f1" ] [ "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq" string>sha1str ] unit-test
+    ! [ "34aa973cd4c4daa4f61eeb2bdbad27316534016f" ] [ 1000000 CHAR: a fill string>sha1str ] unit-test ! takes a long time...
+    [ "dea356a2cddd90c7a7ecedc5ebb563934f460452" ] [ "0123456701234567012345670123456701234567012345670123456701234567" [ 10 [ dup % ] times ] "" make nip string>sha1str ] unit-test ;
 
