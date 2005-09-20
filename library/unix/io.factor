@@ -74,7 +74,6 @@ C: port ( handle buffer -- port )
     80 <sbuf> over set-port-sbuf ;
 
 : touch-port ( port -- )
-    ! "touch-port called\n" 14 getenv fwrite 14 getenv fflush
     dup port-timeout dup 0 =
     [ 2drop ] [ millis + swap set-port-cutoff ] ifte ;
 

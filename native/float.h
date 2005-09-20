@@ -1,5 +1,9 @@
 typedef struct {
-	CELL header;
+/* C sucks. */
+	union {
+		CELL header;
+		long long padding;
+	};
 	double n;
 } F_FLOAT;
 

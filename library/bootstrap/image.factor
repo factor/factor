@@ -26,14 +26,17 @@ SYMBOL: 64-bits
 
 : emit ( cell -- ) image get push ;
 
+: d>w/w ( d -- w w )
+    #! I cannot use bignum literals here because of bootstrap
+    #! deficencies.
+    dup 1 32 shift 1- bitand
+    swap -32 shift 1 32 shift 1- bitand ;
+
 : emit-64 ( cell -- )
     64-bits get [
         emit
     ] [
-        dup 1 32 shift 1- bitand
-        swap -32 shift 1 32 shift 1- bitand
-        big-endian get [ swap ] when
-        emit emit
+        d>w/w big-endian get [ swap ] unless emit emit
     ] ifte ;
 
 : emit-seq ( seq -- ) image get swap nappend ;

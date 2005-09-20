@@ -7,7 +7,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-lengths ( seq -- seq )
     #! Pad all vectors to the same length. If one vector is
     #! shorter, pad it with unknown results at the bottom.
-    dup [ length ] map supremum swap [ add-inputs ] map-with ;
+    dup 0 [ length max ] reduce swap [ add-inputs ] map-with ;
 
 : unify-length ( seq seq -- seq )
     2array unify-lengths first2 ;
@@ -27,15 +27,23 @@ namespaces parser prettyprint sequences strings vectors words ;
     [ dup [ length - ] [ 2drop f ] ifte ] 2map
     [ ] subset all-equal? ;
 
+: unify-in-d ( seq -- n )
+    #! Input is a sequence of positive integers or f.
+    #! Output is the maximum or 0.
+    0 [ [ max ] when* ] reduce ;
+
+: unbalanced-branches ( in out -- )
+    { "Unbalanced branches:" } -rot [
+        swap number>string " " rot length number>string
+        append3
+    ] 2map append "\n" join inference-error ;
+
 : unify-effect ( in out -- in out )
     #! In is a sequence of integers; out is a sequence of stacks.
-    2dup balanced?
-    [ unify-stacks >r supremum r> ]
-    [
-        { "Unbalanced branches:" } -rot [
-            swap number>string " " rot length number>string
-            append3
-        ] 2map append "\n" join inference-error
+    2dup balanced? [
+        unify-stacks >r unify-in-d r>
+    ] [
+        unbalanced-branches
     ] ifte ;
 
 : datastack-effect ( seq -- )
