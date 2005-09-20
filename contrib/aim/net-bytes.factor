@@ -2,7 +2,8 @@ IN: aim
 USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto ;
 
 SYMBOL: big-endian t big-endian set
-SYMBOL: default-stream
+SYMBOL: unscoped-stream
+SYMBOL: unscoped-stack
 
 
 : >nvector ( elems n -- )
@@ -11,6 +12,9 @@ SYMBOL: default-stream
 ! TODO: make this work for types other than ""
 : papply ( seq seq -- seq )
     [ [ 2list call % ] 2each ] "" make ;
+
+: writeln ( string -- )
+    write terpri ;
 
 ! Examples:
 ! 1 2 3 4 4 >nvector .
@@ -22,9 +26,17 @@ SYMBOL: default-stream
 ! [ 1 >short  6 >long ] make-packet .
 ! "\0\u0001\0\0\0\0\0\0\0\u0006"
 
-: with-default-stream ( stream quot -- )
-    swap default-stream set
-    [ dup [ default-stream get stream-close ] when rethrow ] catch ;
+: with-unscoped-stream ( stream quot -- )
+    unscoped-stack get [ { } clone unscoped-stack set ] unless
+    swap dup unscoped-stream set unscoped-stack get push
+    [
+        dup [ unscoped-stream get stream-close ] when
+        unscoped-stack get dup length 1 > [ [ pop ] keep nip peek unscoped-stream set ] [ pop drop ] ifte
+        rethrow
+    ] catch ;
+
+: close-unscoped-stream ( -- )
+    unscoped-stream get stream-close ;
 
 : >endian ( obj n -- str )
     big-endian get [ >be ] [ >le ] ifte ;
@@ -59,19 +71,19 @@ SYMBOL: default-stream
 
 
 : head-byte ( -- byte )
-    1 default-stream get stream-read first ;
+    1 unscoped-stream get stream-read first ;
 
 : head-short ( -- short )
-    2 default-stream get stream-read (head-short) ;
+    2 unscoped-stream get stream-read (head-short) ;
 
 : head-int ( -- int )
-    4 default-stream get stream-read (head-int) ;
+    4 unscoped-stream get stream-read (head-int) ;
 
 : head-long ( -- long )
-    8 default-stream get stream-read (head-long) ;
+    8 unscoped-stream get stream-read (head-long) ;
 
 : head-string ( n -- str )
-    default-stream get stream-read >string ;
+    unscoped-stream get stream-read >string ;
 
 
 ! wrote this months and months ago..
