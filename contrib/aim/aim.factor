@@ -75,12 +75,8 @@ SYMBOL: opcode
     "Sending: " write dup hexdump
     (send-aim) ;
 
-: drop-header ( str -- )
-    6 swap tail ;
-
 : with-aim ( quot -- )
-    conn get swap with-default-stream ;
-
+    conn get swap with-unscoped-stream ;
 
 : read-aim ( -- bc )
     [
@@ -90,7 +86,6 @@ SYMBOL: opcode
         head-short head-string
     ] with-aim ;
     ! "Received: " write dup hexdump ;
-
 
 : make-snac ( fam subtype flags req-id -- )
     4 >nvector { >short >short >short >int } papply ;
@@ -103,8 +98,8 @@ SYMBOL: opcode
 
 : (unhandled-opcode) ( -- )
     "Family: " write family get >hex "h" append write
-    ", opcode: " write opcode get >hex "h" append write terpri
-    default-stream get contents hexdump ;
+    ", opcode: " write opcode get >hex "h" append writeln
+    unscoped-stream get contents hexdump ;
 
 : unhandled-opcode ( -- )
     "Unhandled opcode: " write (unhandled-opcode) ;
@@ -113,9 +108,10 @@ SYMBOL: opcode
     "Incomplete handling: " write (unhandled-opcode) ;
 
 : unhandled-family-opcode ( -- )
-    "Unhandled family: " write family get >hex "h" append write terpri
+    "Unhandled family: " write family get >hex "h" append writeln
     unhandled-opcode ;
 
+! FAMILY/OPCODE TABLES
 ! returns handler table for a family
 : FAMILY-TABLE
     {{
@@ -124,20 +120,23 @@ SYMBOL: opcode
 : add-family ( -- )
     word dup unparse "-" split second dup length 1- swap head hex> FAMILY-TABLE set-hash ; parsing
 
-! : FAMILY-1h
-    ! {{
-    ! }} ; add-family
+: FAMILY-1h
+    {{
+    }} ; add-family
+
+
 
 : handle-3h-bh ( -- )
     ;
-    
 
 : FAMILY-3h ( -- hash)
     {{
         [[ HEX: b handle-3h-bh ]]
     }} ; add-family
 
-: drop-family-4h-header
+
+
+: (drop-family-4h-header)
     head-short drop
     head-short drop
     head-short drop
@@ -145,23 +144,75 @@ SYMBOL: opcode
     8 head-string drop  ! message-id
     ;
 
+    
+: (parse-incoming-message-text) ( -- str )
+    head-short drop head-short unscoped-stream get contents ;
+
+: (parse-incoming-message-tlv2)
+    unscoped-stream get empty? [
+        head-byte
+        head-byte drop ! fragVer
+        head-short head-string <string-reader>
+        [ 
+            {
+                { [ dup 1 = ] [ drop (parse-incoming-message-text) writeln ] }
+                { [ dup 5 = ] [ drop ] }
+                { [ t ] [ "Unknown frag: " write unparse writeln ] }
+            } cond
+        ] with-unscoped-stream
+        (parse-incoming-message-tlv2)
+    ] unless ;
+
+
+: (parse-incoming-message-chunks)
+    unscoped-stream get empty? [
+        head-short
+        head-short head-string <string-reader> [
+            {
+                { [ dup 2 = ] [ drop (parse-incoming-message-tlv2) ] }
+                { [ dup 11 = ] [ 2drop ] }
+                { [ dup 13 = ] [ drop ] }
+                { [ t ] [ "Unhandled chunk: " write unparse writeln ] }
+            } cond
+        ] with-unscoped-stream
+        (parse-incoming-message-chunks)
+    ] unless ;
+
+: (parse-incoming-message-tlv) ( n -- )
+    [
+        head-short
+        head-short head-string <string-reader>
+        [
+            {
+                { [ dup 1 = ] [ drop head-short drop ] }
+                { [ dup 2 = ] [ drop 15 head-string drop ] }
+                { [ dup 3 = ] [ drop ] }
+                { [ dup 15 = ] [ drop ] }
+                { [ dup 29 = ] [ drop ] }
+                { [ t ] [ "Unknown tlv: " write unparse writeln ] }
+            } cond
+        ] with-unscoped-stream
+    ] repeat ;
+
 : handle-incoming-message ( -- )
-    drop-family-4h-header
+    (drop-family-4h-header)
     head-short drop ! channel
-    head-byte head-string "Incoming msg from: " write write terpri ! from name
+    head-byte head-string "Incoming msg from " write write ": " write ! from name
     head-short drop ! warning-level
+    head-short (parse-incoming-message-tlv)
+    (parse-incoming-message-chunks)
     ;
 
 : handle-typing-message ( -- )
-    drop-family-4h-header
+    (drop-family-4h-header)
     head-short drop
     head-byte head-string write
     head-short
     {
-        { [ dup 0 = ] [ drop " has an empty textbox." write terpri ] }
-        { [ dup 1 = ] [ drop " has entered text." write terpri ] }
-        { [ dup 2 = ] [ drop " is typing..." write terpri ] }
-        { [ t ] [ " does 4h.14h unknown: " write unparse write terpri ] }
+        { [ dup 0 = ] [ drop " has an empty textbox." writeln ] }
+        { [ dup 1 = ] [ drop " has entered text." writeln ] }
+        { [ dup 2 = ] [ drop " is typing..." writeln ] }
+        { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
     } cond ;
 
 : FAMILY-4h ( -- hash)
@@ -170,34 +221,37 @@ SYMBOL: opcode
         [[ HEX: 14 handle-typing-message ]]
     }} ; add-family
 
+
+
+
 : FAMILY-13h ( -- hash)
     {{
     }} ; add-family
 
-: print-op ( op -- )
+: (print-op) ( op -- )
     "Op: " write . ;
 
-: parse-server ( ip:port -- )
+: (parse-server) ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
 
 
-: process-login-chunks ( stream -- )
-    default-stream get empty?  [
+: (process-login-chunks) ( stream -- )
+    unscoped-stream get empty?  [
         head-short
         head-short
         swap
         {
-            { [ dup 1 = ] [ print-op head-string . ] }
-            { [ dup 5 = ] [ print-op head-string dup . parse-server ] }
-            { [ dup 6 = ] [ print-op head-string dup . auth-code set ] }
-            { [ dup 8 = ] [ print-op head-string . ] }
-            { [ t ] [ print-op head-string . ] }
+            { [ dup 1 = ] [ (print-op) head-string . ] }
+            { [ dup 5 = ] [ (print-op) head-string dup . (parse-server) ] }
+            { [ dup 6 = ] [ (print-op) head-string dup . auth-code set ] }
+            { [ dup 8 = ] [ (print-op) head-string . ] }
+            { [ t ] [ (print-op) head-string . ] }
         } cond
-        process-login-chunks
+        (process-login-chunks)
     ] unless ;
 
 : handle-login-packet ( -- )
-    process-login-chunks ;
+    (process-login-chunks) ;
 
 : password-md5 ( password -- md5 )
     login-key get
@@ -242,6 +296,8 @@ SYMBOL: opcode
     }} ; add-family
 
 
+
+
 : handle-packet ( packet -- )
     <string-reader>
     [
@@ -255,8 +311,8 @@ SYMBOL: opcode
             unhandled-family-opcode
             drop
         ] ifte
-        default-stream get empty? [ incomplete-opcode ] unless
-    ] with-default-stream ;
+        unscoped-stream get empty? [ incomplete-opcode ] unless
+    ] with-unscoped-stream ;
 
 : send-first-login ( -- )
     [ 1 >int ] send-aim ;
