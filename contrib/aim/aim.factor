@@ -30,6 +30,8 @@ SYMBOL: auth-code
 
 SYMBOL: family
 SYMBOL: opcode
+SYMBOL: name
+SYMBOL: message
 
 : initialize ( username password -- )
     "login.oscar.aol.com" aim-login-server set
@@ -125,13 +127,53 @@ SYMBOL: opcode
     }} ; add-family
 
 
-
 : handle-3h-bh ( -- )
-    ;
+    head-byte head-string name set
+    head-short drop
+    head-short
+    [
+        head-short
+        head-short head-string <string-reader> [
+            {
+                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand [ " is away." ] [ " is online." ] ifte writeln ] }
+                { [ dup 2 = ] [ drop ] }
+                { [ dup 3 = ] [ drop name get write " went online at " write head-short unparse writeln ] }
+                { [ dup 4 = ] [ drop name get write head-short " has been idle for " writeln ] }
+                { [ dup 5 = ] [ drop ] }
+                { [ dup 6 = ] [ drop ] }
+                { [ dup 10 = ] [ drop ] }
+                { [ dup 12 = ] [ drop ] }
+                { [ dup 13 = ] [ drop ] }
+                { [ dup 14 = ] [ drop ] }
+                { [ dup 15 = ] [ drop ] }
+                { [ dup HEX: 19 = ] [ drop ] }
+                { [ dup HEX: 1b = ] [ drop ] }
+                { [ dup HEX: 1d = ] [ drop ] }
+                { [ t ] [ "Unhandled tlv 3h-bh: " write unparse writeln ] }
+            } cond
+        ] with-unscoped-stream
+    ] repeat ;
+
+: handle-3h-ch ( -- )
+    head-byte head-string name set
+    head-short drop
+    head-short
+    [
+        head-short
+        head-short head-string <string-reader> [
+            {
+                { [ dup 1 = ] [ drop name get write " signed off." writeln ] }
+                { [ dup HEX: 1d = ] [ drop ] }
+                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln ] }
+            } cond
+        ] with-unscoped-stream
+    ] repeat ;
 
 : FAMILY-3h ( -- hash)
     {{
+        
         [[ HEX: b handle-3h-bh ]]
+        [[ HEX: c handle-3h-ch ]]
     }} ; add-family
 
 
@@ -313,6 +355,30 @@ SYMBOL: opcode
         ] ifte
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
+
+: send-im ( message name -- )
+    message set
+    name set
+    [
+        4 6 0 HEX: 7c3a0006 make-snac
+        "1973973" >cstring
+        1 >short
+        name get length >byte
+        name get
+        2 >short
+
+        [
+            5 >byte 1 >byte 3 >short 1 >byte 1 >byte 2 >byte
+            HEX: 101 >short
+            message get length 4 + >short
+            0 >short
+            HEX: ffff >short
+            message get
+        ] make-packet
+
+        dup >r length >short r>
+        3 >short 0 >short 6 >short 0 >short
+    ] send-aim ;
 
 : send-first-login ( -- )
     [ 1 >int ] send-aim ;
