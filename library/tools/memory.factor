@@ -44,12 +44,14 @@ sequences strings unparser vectors words ;
 
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.
-    [ begin-scan (each-object) ] [ end-scan ] cleanup ; inline
+    [ begin-scan [ (each-object) ] keep ]
+    [ end-scan ] cleanup drop ; inline
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the
     #! quotation is applied to them.
     [ [ [ swap call ] 2keep rot ?, ] each-object drop ] [ ] make ;
+    inline
 
 G: each-slot ( obj quot -- )
     [ over ] standard-combination ; inline

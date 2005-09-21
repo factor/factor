@@ -524,3 +524,5 @@ prettyprint ;
 \ set-c-stack [
     "set-c-stack cannot be compiled (yet)" throw
 ] "infer" set-word-prop
+
+\ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop

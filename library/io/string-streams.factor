@@ -12,6 +12,7 @@ M: sbuf stream-finish drop ;
 
 : string-out ( quot -- str )
     [ 512 <sbuf> stdio set call stdio get >string ] with-scope ;
+    inline
 
 ! Reversed string buffers support the stream input protocol.
 M: sbuf stream-read1 ( sbuf -- char/f )
@@ -29,4 +30,4 @@ M: sbuf stream-read ( count sbuf -- string )
     <reversed> >sbuf <line-reader> ;
 
 : string-in ( str quot -- )
-    [ swap <string-reader> stdio set call ] with-scope ;
+    [ swap <string-reader> stdio set call ] with-scope ; inline

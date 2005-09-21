@@ -28,14 +28,25 @@ TUPLE: no-method object generic ;
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
-    catchstack empty? [ die ] [ c> continue-with ] ifte ;
+    catchstack empty? [
+        die "Can't happen" throw
+    ] [
+        c> continue-with
+    ] ifte ;
 
 : cleanup ( try cleanup -- | try: -- | cleanup: -- )
     #! Call the try quotation. If an exception is thrown in the
     #! dynamic extent of the quotation, restore the datastack
     #! and run the cleanup quotation. Then throw the error to
     #! the next outermost catch handler.
-    >r [ call ] catch r> swap slip
-    [ nip rethrow ] when* ; inline
+    >r [ dup slip ] catch nip r>
+    swap slip [ rethrow ] when* ; inline
+
+: recover ( try recovery -- | try: -- | recovery: -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack,
+    #! push the exception on the datastack, and call the
+    #! recovery quotation.
+    >r catch r> when* ; inline
 
 GENERIC: error. ( error -- )

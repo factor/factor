@@ -64,9 +64,9 @@ M: compound apply-word ( word -- )
         dup dup f infer-compound
         >r "terminates" set-word-prop r>
         "infer-effect" set-word-prop
-    ] catch [
+    ] [
         swap t "no-effect" set-word-prop rethrow
-    ] when* ;
+    ] recover ;
 
 : apply-default ( word -- )
     dup "no-effect" word-prop [

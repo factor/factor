@@ -1,16 +1,16 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inspector
-USING: arrays generic hashtables io kernel listener
-lists math memory namespaces prettyprint sequences
+USING: arrays generic hashtables io kernel kernel-internals
+listener lists math memory namespaces prettyprint sequences
 strings styles test vectors words ;
 
 GENERIC: sheet ( obj -- sheet )
 
 M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
-    [ second ] map
-    tuck [ execute ] map-with
+    dup [ second ] map -rot
+    [ first slot ] map-with
     2array ;
 
 M: list sheet 1array ;
@@ -23,7 +23,7 @@ M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
 : format-column ( list -- list )
     [ unparse-short ] map
-    [ 0 [ length ] reduce ] keep
+    [ 0 [ length max ] reduce ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
 : sheet-numbers ( sheet -- sheet )

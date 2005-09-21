@@ -24,7 +24,7 @@ io strings ;
         ] each
     ] "" make ;
 
-: catch-hex> ( str -- n )
+: catch-hex> ( str -- n/f )
     #! Push f if string is not a valid hex literal.
     [ hex> ] catch [ drop f ] when ;
 

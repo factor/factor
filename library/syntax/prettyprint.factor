@@ -226,9 +226,9 @@ M: string pprint* ( str -- str ) "\"" pprint-string ;
 M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 
 M: word pprint* ( word -- )
-    dup "pprint-before-hook" word-prop call
+    dup "pprint-open" word-prop [ <block ] when
     dup pprint-word
-    "pprint-after-hook" word-prop call ;
+    "pprint-after-hook" word-prop [ block> ] when ;
 
 M: f pprint* drop "f" f text ;
 
@@ -349,12 +349,12 @@ M: wrapper pprint* ( wrapper -- )
 : define-open
     #! The word will be pretty-printed as a block opener.
     #! Examples are [ { {{ [[ << and so on.
-    [ <block ] "pprint-after-hook" set-word-prop ;
+    t "pprint-open" set-word-prop ;
 
 : define-close ( word -- )
     #! The word will be pretty-printed as a block closer.
     #! Examples are ] } }} ]] >> and so on.
-    [ block> ] "pprint-before-hook" set-word-prop ;
+    t "pprint-close" set-word-prop ;
 
 {
     { POSTPONE: [ POSTPONE: ] }

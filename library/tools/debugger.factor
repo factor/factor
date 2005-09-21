@@ -47,24 +47,22 @@ parser prettyprint sequences io strings vectors words ;
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;
 
-M: f error. ( f -- ) drop ;
-
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
-        expired-error.
-        io-error.
-        undefined-word-error.
-        type-check-error.
-        float-format-error.
-        signal-error.
-        negative-array-size-error.
-        c-string-error.
-        ffi-error.
-        heap-scan-error.
-        undefined-symbol-error.
-        user-interrupt.
-    } nth execute ;
+        [ expired-error. ]
+        [ io-error. ]
+        [ undefined-word-error. ]
+        [ type-check-error. ]
+        [ float-format-error. ]
+        [ signal-error. ]
+        [ negative-array-size-error. ]
+        [ c-string-error. ]
+        [ ffi-error. ]
+        [ heap-scan-error. ]
+        [ undefined-symbol-error. ]
+        [ user-interrupt. ]
+    } dispatch ;
 
 M: no-method error. ( error -- )
     "No suitable method." print
@@ -116,12 +114,12 @@ M: object error. ( error -- ) . ;
 
 : print-error ( error -- )
     #! Print the error.
-    [ error. ] catch flush-error-handler ;
+    [ dup error. ] catch nip flush-error-handler ;
 
 : try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
-    catch [ print-error debug-help ] when* ;
+    [ print-error debug-help ] recover ;
 
 : save-error ( error ds rs ns cs -- )
     #! Save the stacks and parser state for post-mortem
