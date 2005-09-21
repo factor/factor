@@ -50,5 +50,5 @@ USE: parser
   #! in factor core.
   "../../library/httpd/cont-responder.factor" run-file ;
 DEFER: la
-: la [ 8888 httpd ] [ dup . flush [ la ] when* ] catch ;
+: la 8888 httpd ;
 : lb [ la "httpd thread exited.\n" write flush ] in-thread  ;
