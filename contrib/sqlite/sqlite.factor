@@ -36,6 +36,7 @@ USE: errors
 USE: strings
 USE: namespaces
 USE: sequences
+USE: lists
 
 BEGIN-STRUCT: sqlite3
 END-STRUCT
@@ -95,58 +96,58 @@ END-STRUCT
 : SQLITE_TRANSIENT   -1 ;
 
 : sqlite3_open ( filename sqlite3-indirect -- result )
-  "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_open" [ "char*" "sqlite3-indirect*" ] alien-invoke ; 
 
 : sqlite3_close ( db -- )
-  "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_close" [ "sqlite3*" ] alien-invoke ; 
 
 : sqlite3_prepare ( db sql sql-len sqlite3-stmt-indirect tail -- result )
-  "int" "sqlite" "sqlite3_prepare" [ "sqlite3*" "char*" "int" "sqlite3-stmt-indirect*" "char*-indirect*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_prepare" [ "sqlite3*" "char*" "int" "sqlite3-stmt-indirect*" "char*-indirect*" ] alien-invoke ; 
 
 : sqlite3_finalize ( stmt -- result ) 
-  "int" "sqlite" "sqlite3_finalize" [ "sqlite3-stmt*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_finalize" [ "sqlite3-stmt*" ] alien-invoke ; 
 
 : sqlite3_reset ( stmt -- result )
-  "int" "sqlite" "sqlite3_reset" [ "sqlite3-stmt*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_reset" [ "sqlite3-stmt*" ] alien-invoke ; 
 
 : sqlite3_step ( stmt -- result )
-  "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; 
 
 : sqlite3_bind_blob ( stmt index pointer len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ; 
 
 : sqlite3_bind_int ( stmt index int -- result )
-  "int" "sqlite" "sqlite3_bind_int" [ "sqlite3-stmt*" "int" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_bind_int" [ "sqlite3-stmt*" "int" "int" ] alien-invoke ; 
 
 : sqlite3_bind_null ( stmt index  -- result )
-  "int" "sqlite" "sqlite3_bind_null" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_bind_null" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_bind_text ( stmt index text len destructor -- result )
-  "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ; 
 
 : sqlite3_column_count ( stmt -- count )
-  "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ; 
 
 : sqlite3_column_blob ( stmt col -- void* )
-  "void*" "sqlite" "sqlite3_column_blob" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "void*" "sqlite" "sqlite3_column_blob" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_bytes ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_bytes" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_column_bytes" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_decltype ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_decltype" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "char*" "sqlite" "sqlite3_column_decltype" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_int ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_int" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_column_int" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_name ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_name" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "char*" "sqlite" "sqlite3_column_name" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_text ( stmt col -- string )
-  "char*" "sqlite" "sqlite3_column_text" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "char*" "sqlite" "sqlite3_column_text" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 : sqlite3_column_type ( stmt col -- int )
-  "int" "sqlite" "sqlite3_column_type" [ "sqlite3-stmt*" "int" ] alien-invoke ; compiled
+  "int" "sqlite" "sqlite3_column_type" [ "sqlite3-stmt*" "int" ] alien-invoke ; 
 
 ! High level sqlite routines
 : sqlite-check-result ( result -- )
@@ -176,7 +177,11 @@ END-STRUCT
   dup length <sqlite3-stmt-indirect> dup >r 
   <char*-indirect> sqlite3_prepare sqlite-check-result
   r> sqlite3-stmt-indirect-pointer ;
-    
+
+: sqlite-bind-text ( statement col text -- )
+  #! Bind the text to the parameterized value in the statement.  
+  dup length SQLITE_TRANSIENT sqlite3_bind_text sqlite-check-result ;
+
 : sqlite-finalize ( statement -- )
   #! Clean up all resources related to a statement. Once called
   #! the statement cannot be used. All statements must be finalized
@@ -208,7 +213,7 @@ END-STRUCT
     dup SQLITE_DONE = [
       drop t 
     ] [
-      sqlite-check-result
+      sqlite-check-result t
     ] ifte
   ] ifte ;
 
@@ -227,3 +232,17 @@ END-STRUCT
 ! [ 2drop ]
 ! [ 2dup 2slip ]
 ! [ ] linrec ; 
+
+: (sqlite-map) ( statement quot seq -- )    
+  pick sqlite3_step step-complete? [ 
+    2nip
+  ] [
+    >r 2dup call r> cons (sqlite-map)
+  ] ifte ;
+
+: sqlite-map ( statement quot -- )
+  [ ] (sqlite-map) ;
+
+
+USE: words
+"sqlite" words [ try-compile ] each
