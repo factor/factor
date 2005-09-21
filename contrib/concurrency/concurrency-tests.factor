@@ -164,8 +164,7 @@ USING: kernel concurrency concurrency-examples threads vectors
     ] spawn-link drop
     receive
   ] 
-  [
-  ] catch
+  catch
 ] unit-test 
 
 [ 50 ] [

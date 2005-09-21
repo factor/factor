@@ -128,12 +128,12 @@ M: crash-command run-rpc-command ( command -- shutdown? result )
 : (robust-rpc-server) ( worker -- )
   [
     receive over send
-  ] [
-    [  
-      "Worker died, Starting a new worker" print
-      drop [ handle-rpc-message ] spawn-linked-server
-    ] when
-  ] catch 
+  ] 
+  catch 
+  [  
+    "Worker died, Starting a new worker" print
+    drop [ handle-rpc-message ] spawn-linked-server
+  ] when
   (robust-rpc-server) ;
   
 : robust-rpc-server ( -- process )

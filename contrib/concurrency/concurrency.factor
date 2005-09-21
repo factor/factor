@@ -209,7 +209,7 @@ TUPLE: linked-exception error ;
   #! Same as spawn but if the quotation throws an error that
   #! is uncaught, that error gets propogated to the process
   #! performing the spawn-link.
-  [ [ [ rethrow-linked ] when* ] catch ] cons
+  [ catch [ rethrow-linked ] when* ] cons
   [ in-thread ] self make-linked-process [ with-process ] over slip ;
 
 #! A common operation is to send a message to a process containing

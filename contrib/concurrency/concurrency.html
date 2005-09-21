@@ -349,9 +349,9 @@ can catch it:</p>
     "This will not print" print
   ] spawn-link drop
   receive
-] [ 
-  [ "Exception caught." print ] when
-] catch</span>
+] 
+catch [ "Exception caught." print ] when
+</span>
   => "Exception caught."
 </pre>
 <p>Exceptions are only raised in the parent when the parent does a
@@ -427,12 +427,12 @@ worker:</p>
   [
     #! Forward all messages to worker
     receive over send
-  ] [
-    [  
-      "Worker died, Starting a new worker" print
-      drop [ handle-rpc-message ] spawn-linked-server
-    ] when
-  ] catch 
+  ] 
+  catch 
+  [  
+    "Worker died, Starting a new worker" print
+    drop [ handle-rpc-message ] spawn-linked-server
+  ] when
   (robust-rpc-server) ;
   
 : robust-rpc-server ( -- process )
