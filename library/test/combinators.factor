@@ -56,7 +56,7 @@ USE: namespaces
 
 [ ] [
     [
-        [ drop ] [ drop ] catch
-        [ drop ] [ drop ] catch
+        [ drop ] catch drop
+        [ drop ] catch drop
     ] keep-datastack
 ] unit-test

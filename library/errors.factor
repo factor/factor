@@ -19,18 +19,23 @@ TUPLE: no-method object generic ;
 : >c ( catch -- ) catchstack cons set-catchstack ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
 
-: (catch) ( try -- exception/f )
+: catch ( try -- exception/f | try: -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack
+    #! and push the exception. Otherwise, the data stack is
+    #! not restored, and f is pushed.
     [ >c call f c> drop f ] callcc1 nip ; inline
-
-: catch ( try catch -- )
-    #! Call the try quotation. If an error occurs restore the
-    #! datastack, push the error, and call the catch block.
-    #! If no error occurs, push f and call the catch block.
-    >r (catch) r> call ; inline
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
-    #! For convinience, this word is a no-op if error is f.
-    [ catchstack empty? [ die ] [ c> continue-with ] ifte ] when* ;
+    catchstack empty? [ die ] [ c> continue-with ] ifte ;
+
+: cleanup ( try cleanup -- | try: -- | cleanup: -- )
+    #! Call the try quotation. If an exception is thrown in the
+    #! dynamic extent of the quotation, restore the datastack
+    #! and run the cleanup quotation. Then throw the error to
+    #! the next outermost catch handler.
+    >r [ call ] catch r> swap slip
+    [ nip rethrow ] when* ; inline
 
 GENERIC: error. ( error -- )

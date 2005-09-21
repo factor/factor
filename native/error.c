@@ -33,6 +33,7 @@ void throw_error(CELL error, bool keep_stacks)
 {
 	early_error(error);
 
+	throwing = true;
 	thrown_error = error;
 	thrown_keep_stacks = keep_stacks;
 	thrown_ds = ds;

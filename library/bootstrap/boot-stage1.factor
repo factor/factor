@@ -95,14 +95,12 @@ sequences io vectors words ;
         
         "/library/syntax/prettyprint.factor"
 
-        "/library/io/logging.factor"
-
         "/library/tools/interpreter.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
         "/library/tools/walker.factor"
-        "/library/tools/jedit.factor"
+
         "/library/tools/annotations.factor"
         "/library/tools/inspector.factor"
 
@@ -112,7 +110,8 @@ sequences io vectors words ;
 
         "/library/threads.factor"
         
-        "/library/tools/telnetd.factor"
+        "/library/io/server.factor"
+        "/library/tools/jedit.factor"
 
         "/library/bootstrap/image.factor"
 

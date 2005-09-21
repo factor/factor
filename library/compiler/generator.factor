@@ -36,12 +36,10 @@ SYMBOL: previous-offset
     [
         compiled-offset previous-offset set
         (generate)
-    ] [
-        [
-            previous-offset get set-compiled-offset
-            rethrow
-        ] when*
-    ] catch ;
+    ] catch [
+        previous-offset get set-compiled-offset
+        rethrow
+    ] when* ;
 
 ! A few VOPs have trivial generators.
 

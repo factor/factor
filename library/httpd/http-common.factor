@@ -26,7 +26,7 @@ io strings ;
 
 : catch-hex> ( str -- n )
     #! Push f if string is not a valid hex literal.
-    [ hex> ] [ [ drop f ] when ] catch ;
+    [ hex> ] catch [ drop f ] when ;
 
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [

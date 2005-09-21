@@ -44,8 +44,7 @@ sequences strings unparser vectors words ;
 
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.
-    [ begin-scan (each-object) ]
-    [ end-scan rethrow ] catch ; inline
+    [ begin-scan (each-object) ] [ end-scan ] cleanup ; inline
 
 : instances ( quot -- list )
     #! Return a list of all object that return true when the

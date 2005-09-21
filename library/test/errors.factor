@@ -8,12 +8,12 @@ USE: parser
 USE: io
 USE: memory
 
-[ f ] [ [ ] [ ] catch ] unit-test
+[ f ] [ [ ] catch ] unit-test
 
-[ 5 ] [ [ 5 throw ] [ ] catch ] unit-test
+[ 5 ] [ [ 5 throw ] catch ] unit-test
 
 [ t ] [
-    [ "Hello" throw ] [ drop ] catch
+    [ "Hello" throw ] catch drop
     global [ "error" get ] bind
     "Hello" =
 ] unit-test
@@ -24,7 +24,7 @@ USE: memory
 
 "!!! The following error is part of the test" print
 
-[ [ "2 car" ] parse ] [ print-error ] catch
+[ [ "2 car" ] parse ] catch print-error
 
 ! This should not raise an error
 [ 1 2 3 ] [ 1 2 3 f throw ] unit-test
@@ -35,7 +35,7 @@ USE: memory
 
 ! Weird PowerPC bug.
 [ ] [
-    [ "4" throw ] [ drop ] catch
+    [ "4" throw ] catch drop
     full-gc
     full-gc
 ] unit-test

@@ -9,7 +9,7 @@ USE: test
 USE: sequences
 USE: lists
 
-[ ] [ 10 [ [ -1000000 <sbuf> ] [ drop ] catch ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <sbuf> ] catch drop ] times ] unit-test
 
 [ "abc" ] [ [ "a" "b" "c" ] [ [ % ] each ] "" make ] unit-test
 
@@ -71,7 +71,7 @@ unit-test
 [ t ] [ "abc" "abd" lexi 0 < ] unit-test
 [ t ] [ "z" "abd" lexi 0 > ] unit-test
 
-[ f ] [ [ 0 10 "hello" subseq ] [ not ] catch ] unit-test
+[ f ] [ [ 0 10 "hello" subseq ] catch not ] unit-test
 
 [ { "hell" "o wo" "rld" } ] [ 4 "hello world" group ] unit-test
 

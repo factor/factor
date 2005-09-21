@@ -33,9 +33,8 @@ math math-internals sequences words ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param
-    [ with-datastack ] [
-        [ 3drop t ] [ inline-literals ] ifte
-    ] catch ;
+    [ with-datastack ] catch
+    [ 3drop t ] [ inline-literals ] ifte ;
 
 : flip-subst ( not -- )
     #! Note: cloning the vectors, since subst-values will modify

@@ -89,7 +89,7 @@ TUPLE: delegate-clone ;
 [ f ] [ \ tuple \ delegate-clone class< ] unit-test
 
 ! Compiler regression
-[ t ] [ [ t length ] [ no-method-object ] catch ] unit-test
+[ t ] [ [ t length ] catch no-method-object ] unit-test
 
 ! This must be the last test in the file!
 [ "<constructor-test>" ]

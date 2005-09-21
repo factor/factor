@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: jedit
-USING: arrays errors io kernel lists math namespaces parser
-prettyprint sequences strings unparser words ;
+USING: arrays errors io kernel listener lists math namespaces
+parser prettyprint sequences strings unparser words ;
 
 ! Some words to send requests to a running jEdit instance to
 ! edit files and position the cursor on a specific line number.
@@ -79,3 +79,15 @@ prettyprint sequences strings unparser words ;
     #! Make a list of completions. Each element of the list is
     #! a vocabulary/name/stack-effect triplet list.
     word-subset-with [ jedit-lookup ] map ;
+
+! The telnet server is for the jEdit plugin.
+: telnetd ( port -- )
+    \ telnetd [ print-banner listener ] with-server ;
+
+IN: shells
+
+: telnet
+    "telnetd-port" get string>number telnetd ;
+
+! This is a string since we string>number it above.
+global [ "9999" "telnetd-port" set ] bind

@@ -160,10 +160,16 @@ void factorbug(void)
 	fcntl(1,F_SETFL,0);
 #endif
 
+	fprintf(stderr,"  Front end processor commands:\n");
+	fprintf(stderr,"t                -- throw exception in Factor\n");
+	fprintf(stderr,"q                -- continue executing Factor\n");
+	fprintf(stderr,"im               -- save image to fep.image\n");
+	fprintf(stderr,"x                -- exit Factor\n");
+	fprintf(stderr,"  Advanced commands:\n");
 	fprintf(stderr,"d <addr> <count> -- dump memory\n");
-	fprintf(stderr,". <addr>         -- print object at <addr>\n");
-	fprintf(stderr,"sz <addr>        -- print size of object at <addr>\n");
-	fprintf(stderr,"s r              -- dump data and return stacks\n");
+	fprintf(stderr,"u <addr>         -- dump object at tagged <addr>\n");
+	fprintf(stderr,". <addr>         -- print object at tagged <addr>\n");
+	fprintf(stderr,"s s              -- dump data and return stacks\n");
 	fprintf(stderr,".s .r            -- print data and return stacks\n");
 	fprintf(stderr,"i                -- dump interpreter state\n");
 	fprintf(stderr,"e                -- dump environment\n");
@@ -171,18 +177,15 @@ void factorbug(void)
 	fprintf(stderr,"card <addr>      -- print card containing address\n");
 	fprintf(stderr,"addr <card>      -- print address containing card\n");
 	fprintf(stderr,"c <gen>          -- force garbage collection\n");
-	fprintf(stderr,"t                -- throw t\n");
-	fprintf(stderr,"x                -- exit debugger\n");
-	fprintf(stderr,"im               -- save factor.crash.image\n");
 	
 	for(;;)
 	{
 		char cmd[1024];
 
-		fprintf(stderr,"fep ");
+		fprintf(stderr,"fep> ");
 		fflush(stdout);
 
-		if(scanf("%s",cmd) <= 0)
+		if(scanf("%1000s",cmd) <= 0)
 			exit(1);
 
 		if(strcmp(cmd,"d") == 0)
@@ -191,18 +194,19 @@ void factorbug(void)
 			scanf("%lx %lx",&addr,&count);
 			dump_memory(addr,addr+count);
 		}
+		if(strcmp(cmd,"u") == 0)
+		{
+			CELL addr, count;
+			scanf("%lx",&addr);
+			count = object_size(addr);
+			dump_memory(addr,addr+count);
+		}
 		else if(strcmp(cmd,".") == 0)
 		{
 			CELL addr;
 			scanf("%lx",&addr);
 			print_obj(addr);
 			fprintf(stderr,"\n");
-		}
-		else if(strcmp(cmd,"sz") == 0)
-		{
-			CELL addr;
-			scanf("%lx",&addr);
-			fprintf(stderr,"%ld\n",object_size(addr));
 		}
 		else if(strcmp(cmd,"s") == 0)
 			dump_memory(ds_bot,(ds + CELLS));
@@ -248,11 +252,13 @@ void factorbug(void)
 			fprintf(stderr,"%lx\n",(CELL)CARD_TO_ADDR(card));
 		}
 		else if(strcmp(cmd,"t") == 0)
-			throw_error(T,true);
-		else if(strcmp(cmd,"x") == 0)
+			general_error(ERROR_USER_INTERRUPT,F);
+		else if(strcmp(cmd,"q") == 0)
 			return;
+		else if(strcmp(cmd,"x") == 0)
+			exit(1);
 		else if(strcmp(cmd,"im") == 0)
-			save_image("factor.crash.image");
+			save_image("fep.image");
 		else
 			fprintf(stderr,"unknown command\n");
 	}

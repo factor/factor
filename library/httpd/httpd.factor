@@ -49,23 +49,12 @@ sequences ;
         2drop bad-request
     ] ifte ;
 
-: httpd-client ( socket -- )
-    dup log-client [
+: httpd ( port -- )
+    \ httpd [
         60000 stdio get set-timeout
         readln [ parse-request ] when*
-    ] with-stream ;
-
-: httpd-connection ( socket -- )
-    "http-server" get accept [ httpd-client ] in-thread drop ;
-
-: httpd-loop ( -- ) httpd-connection httpd-loop ;
-
-: httpd ( port -- )
-    <server> "http-server" set [
-        [ httpd-loop ]
-        [ "http-server" get stream-close rethrow ] catch
-    ] with-logging ;
+    ] with-server ;
 
 : stop-httpd ( -- )
     #! Stop the server.
-    "http-server" get stream-close ;
+    \ httpd get stream-close ;

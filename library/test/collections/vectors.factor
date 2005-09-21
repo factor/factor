@@ -2,7 +2,7 @@ IN: temporary
 USING: errors kernel kernel-internals lists math namespaces
 random sequences sequences-internals strings test vectors ;
 
-[ ] [ 10 [ [ -1000000 <vector> ] [ drop ] catch ] times ] unit-test
+[ ] [ 10 [ [ -1000000 <vector> ] catch drop ] times ] unit-test
 
 [ 3 ] [ [ t f t ] length ] unit-test
 [ 3 ] [ { t f t } length ] unit-test

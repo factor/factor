@@ -34,7 +34,7 @@ M: assert error.
 
 : unit-test-fails ( quot -- )
     #! Assert that the quotation throws an error.
-    [ [ not ] catch ] cons [ f ] swap unit-test ;
+    [ catch not ] cons [ f ] swap unit-test ;
 
 : assert-depth ( quot -- )
     depth slip depth assert= ;
@@ -44,7 +44,7 @@ SYMBOL: failures
 : failure failures [ cons ] change ;
 
 : test-handler ( name quot -- ? )
-    [ [ dup error. cons failure f ] [ t ] ifte* ] catch ;
+    catch [ dup error. cons failure f ] [ t ] ifte* ;
 
 : test-path ( name -- path )
     "/library/test/" swap ".factor" append3 ;

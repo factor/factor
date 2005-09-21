@@ -13,7 +13,7 @@ void signal_handler(int signal, siginfo_t* siginfo, void* uap)
 
 void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap)
 {
-	factorbug();
+	interrupt = true;
 }
 
 void init_signals(void)
@@ -34,6 +34,7 @@ void init_signals(void)
 	sigaction(SIGBUS,&custom_sigaction,NULL);
 	sigaction(SIGILL,&custom_sigaction,NULL);
 	sigaction(SIGSEGV,&custom_sigaction,NULL);
+	sigaction(SIGQUIT,&custom_sigaction,NULL);
+	sigaction(SIGINT,&dump_sigaction,NULL);
 	sigaction(SIGPIPE,&ign_sigaction,NULL);
-	sigaction(SIGQUIT,&dump_sigaction,NULL);
 }

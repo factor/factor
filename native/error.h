@@ -9,7 +9,10 @@
 #define ERROR_FFI (8<<3)
 #define ERROR_HEAP_SCAN (9<<3)
 #define ERROR_UNDEFINED_SYMBOL (10<<3)
+#define ERROR_USER_INTERRUPT (11<<3)
 
+/* Are we throwing an error? */
+bool throwing;
 /* When throw_error throws an error, it sets this global and
 longjmps back to the top-level. */
 CELL thrown_error;

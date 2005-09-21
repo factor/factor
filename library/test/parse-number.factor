@@ -3,7 +3,7 @@ USING: errors kernel math parser test ;
 
 : parse-number ( str -- num )
     #! Convert a string to a number; return f on error.
-    [ string>number ] [ [ drop f ] when ] catch ;
+    [ string>number ] catch [ drop f ] when ;
 
 [ f ]
 [ f parse-number ]

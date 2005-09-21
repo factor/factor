@@ -31,8 +31,7 @@ GENERIC: set-timeout   ( timeout stream -- )
     [ over stream-write (stream-copy) ] [ 2drop ] ifte* ;
 
 : stream-copy ( in out -- )
-    [ 2dup (stream-copy) ]
-    [ >r stream-close stream-close r> [ rethrow ] when* ] catch ;
+    [ 2dup (stream-copy) ] [ stream-close stream-close ] cleanup ;
 
 ! Think '/dev/null'.
 TUPLE: null-stream ;

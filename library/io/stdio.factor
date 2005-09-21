@@ -19,14 +19,11 @@ USING: errors generic kernel lists namespaces strings styles ;
 
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happens.
-    [ swap stdio set [ close rethrow ] catch ] with-scope ;
+    [ swap stdio set [ close ] cleanup ] with-scope ;
 
 : with-stream* ( stream quot -- )
     #! Close the stream if there is an error.
-    [
-        swap stdio set
-        [ [ close rethrow ] when* ] catch
-    ] with-scope ;
+    [ swap stdio set catch [ close rethrow ] when* ] with-scope ;
 
 : contents ( stream -- string )
     #! Read the entire stream into a string.

@@ -15,8 +15,10 @@ void run(void)
 #else
 	sigsetjmp(toplevel, 1);
 #endif
-	if(thrown_error != F)
+	if(throwing)
 	{
+		interrupt = false;
+
 		if(thrown_keep_stacks)
 		{
 			ds = thrown_ds;
@@ -34,13 +36,19 @@ void run(void)
 		dpush(thrown_error);
 		/* Notify any 'catch' blocks */
 		call(userenv[BREAK_ENV]);
-		thrown_error = F;
+		throwing = false;
 	}
 
 	for(;;)
 	{
 		if(callframe == F)
 		{
+			if(interrupt)
+			{
+				factorbug();
+				interrupt = false;
+			}
+	
 			callframe = cpop();
 			executing = cpop();
 			continue;

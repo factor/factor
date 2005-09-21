@@ -41,6 +41,9 @@ parser prettyprint sequences io strings vectors words ;
     "The image refers to a library or symbol that was not found"
     " at load time" append print drop ;
 
+: user-interrupt. ( obj -- )
+    "User interrupt" print drop ;
+
 PREDICATE: cons kernel-error ( obj -- ? )
     car kernel-error = ;
 
@@ -60,6 +63,7 @@ M: kernel-error error. ( error -- )
         ffi-error.
         heap-scan-error.
         undefined-symbol-error.
+        user-interrupt.
     } nth execute ;
 
 M: no-method error. ( error -- )
@@ -112,12 +116,12 @@ M: object error. ( error -- ) . ;
 
 : print-error ( error -- )
     #! Print the error.
-    [ error. ] [ flush-error-handler ] catch ;
+    [ error. ] catch flush-error-handler ;
 
 : try ( quot -- )
     #! Execute a quotation, and if it throws an error, print it
     #! and return to the caller.
-    [ [ print-error debug-help ] when* ] catch ;
+    catch [ print-error debug-help ] when* ;
 
 : save-error ( error ds rs ns cs -- )
     #! Save the stacks and parser state for post-mortem

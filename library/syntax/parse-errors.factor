@@ -9,4 +9,4 @@ TUPLE: parse-error file line col text ;
     file get line-number get "col" get "line" get
     <parse-error> [ set-delegate ] keep throw ;
 
-: with-parser ( quot -- ) [ [ parse-error ] when* ] catch ;
+: with-parser ( quot -- ) catch [ parse-error ] when* ;
