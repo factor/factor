@@ -27,6 +27,7 @@ SYMBOL: login-key
 SYMBOL: aim-chat-ip
 SYMBOL: aim-chat-port
 SYMBOL: auth-code
+SYMBOL: charset
 
 SYMBOL: family
 SYMBOL: opcode
@@ -50,12 +51,12 @@ SYMBOL: message
     "en" client-language set
     "us" client-country set
     1 client-ssi-flag set
+    "text/aolrtf; charset=\"us-ascii\"" charset set
 
     0 65535 random-int seq-num set
     1 stage-num set
     password set
-    username set
-    aim-login-server get login-port get <client> conn set ;
+    username set ;
 
 : get-seq-num ( -- int )
     seq-num get seq-num [ 1 + ] change ;
@@ -71,10 +72,15 @@ SYMBOL: message
     ] make-packet
     swap dup >r length >short r> append append ;
 
-: send-aim ( data -- )
+: send-aim-print ( data -- )
     make-packet
     (prepend-aim-protocol)
     "Sending: " write dup hexdump
+    (send-aim) ;
+
+: send-aim ( data -- )
+    make-packet
+    (prepend-aim-protocol)
     (send-aim) ;
 
 : with-aim ( quot -- )
@@ -90,7 +96,7 @@ SYMBOL: message
     ! "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
-    4 >nvector { >short >short >short >int } papply ;
+    4vector { >short >short >short >int } papply ;
 
 : parse-snac ( stream -- )
     head-short family set
@@ -125,6 +131,18 @@ SYMBOL: message
 : FAMILY-1h
     {{
     }} ; add-family
+
+
+
+! : handle-2h-6h
+    ! head-byte head-string name set
+    ! name get write "'s away message" writeln ;
+
+
+! : FAMILY-2h
+    ! {{
+        ! [[ 6 handle-2h-6h ]]
+    ! }} ; add-family
 
 
 : handle-3h-bh ( -- )
@@ -283,11 +301,12 @@ SYMBOL: message
         head-short
         swap
         {
-            { [ dup 1 = ] [ (print-op) head-string . ] }
-            { [ dup 5 = ] [ (print-op) head-string dup . (parse-server) ] }
-            { [ dup 6 = ] [ (print-op) head-string dup . auth-code set ] }
-            { [ dup 8 = ] [ (print-op) head-string . ] }
-            { [ t ] [ (print-op) head-string . ] }
+            ! { [ dup 1 = ] [ (print-op) head-string . ] }
+            { [ dup 5 = ] [ drop head-string (parse-server) ] }
+            { [ dup 6 = ] [ drop head-string auth-code set ] }
+            ! { [ dup 8 = ] [ (print-op) head-string . ] }
+            ! { [ t ] [ (print-op) head-string . ] }
+            { [ t ] [ drop head-string drop ] }
         } cond
         (process-login-chunks)
     ] unless ;
@@ -379,6 +398,102 @@ SYMBOL: message
         dup >r length >short r>
         3 >short 0 >short 6 >short 0 >short
     ] send-aim ;
+
+: query-info ( name -- )
+    name set
+    [
+        2 HEX: 15 0 HEX: 29cb0015 make-snac
+        1 >int
+        name get length >byte
+        name get
+    ] send-aim ;
+
+: query-away ( name -- )
+    name set
+    [
+        2 HEX: 15 0 HEX: 29cb0015 make-snac
+        2 >int
+        name get length >byte
+        name get
+    ] send-aim ;
+
+: set-away ( message -- )
+    message set
+    [
+        2 4 0 4 make-snac
+        3 >short
+        charset get length >short
+        charset get
+        4 >short
+        message get length >short
+        message get
+    ] send-aim ;
+
+: return-from-away ( -- )
+    [
+        2 4 0 4 make-snac
+        4 >short
+        0 >short
+    ] send-aim ;
+
+: set-info ( message -- )
+    message set
+    ! [ 2 9 0 HEX: 63e40000 ] send-aim
+    [
+        2 4 0 4 make-snac
+        1 >short
+        charset get length >short
+        charset get
+        2 >short
+        message get length >short
+        message get
+    ] send-aim ;
+
+: (buddy-list-edit-start)
+    [ HEX: 13 HEX: 11 0 HEX: 11 ] send-aim ;
+
+: (buddy-list-edit-stop)
+    [ HEX: 13 HEX: 12 0 HEX: 12 ] send-aim ;
+    
+
+! add, delete groups, move buddies from group to group
+! parse buddy list
+
+: add-buddy ( name group -- )
+    name set
+    (buddy-list-edit-start)
+    [
+        HEX: 13 8 0 HEX: 57e60008
+        name get length >short
+        name get
+        ! BUDDY GROUP ID HEX: 1a4c
+        ! BUDDY ID HEX: 1812
+        0 >short
+        0 >short
+    ] send-aim
+    (buddy-list-edit-stop) ;
+
+! : (modify-buddy)
+    ! [
+        ! HEX: 13 9 0 HEX: 56ef0009
+        ! group length
+        ! group name
+    ! ] send-aim ;
+
+: delete-buddy ( name group -- )
+    name set
+    (buddy-list-edit-start)
+    [
+        HEX: 13 HEX: a 0 HEX: 60c0000a
+        name get length >short
+        name get
+        ! BUDDY GROUP ID HEX: 1a4c
+        ! BUDDY ID HEX: 1812
+        0 >short
+        0 >short
+    ] send-aim
+    ! (modify-buddy)
+    (buddy-list-edit-stop) ;
 
 : send-first-login ( -- )
     [ 1 >int ] send-aim ;
@@ -483,6 +598,8 @@ SYMBOL: message
 : first-server
     ! first server
     1 stage-num set
+    aim-login-server get login-port get <client> conn set
+
     send-first-login read-aim drop
 
     ! normal transmission stage
