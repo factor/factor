@@ -226,9 +226,9 @@ M: string pprint* ( str -- str ) "\"" pprint-string ;
 M: sbuf pprint* ( str -- str ) "SBUF\" " pprint-string ;
 
 M: word pprint* ( word -- )
-    dup "pprint-open" word-prop [ <block ] when
+    dup "pprint-close" word-prop [ block> ] when
     dup pprint-word
-    "pprint-after-hook" word-prop [ block> ] when ;
+    "pprint-open" word-prop [ <block ] when ;
 
 M: f pprint* drop "f" f text ;
 

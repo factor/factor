@@ -42,7 +42,7 @@ TUPLE: no-method object generic ;
     >r [ dup slip ] catch nip r>
     swap slip [ rethrow ] when* ; inline
 
-: recover ( try recovery -- | try: -- | recovery: -- )
+: recover ( try recovery -- | try: -- | recovery: error -- )
     #! Call the try quotation. If an exception is thrown in the
     #! dynamic extent of the quotation, restore the datastack,
     #! push the exception on the datastack, and call the

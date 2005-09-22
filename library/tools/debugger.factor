@@ -50,19 +50,19 @@ PREDICATE: cons kernel-error ( obj -- ? )
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
     cdr uncons car swap {
-        [ expired-error. ]
-        [ io-error. ]
-        [ undefined-word-error. ]
-        [ type-check-error. ]
-        [ float-format-error. ]
-        [ signal-error. ]
-        [ negative-array-size-error. ]
-        [ c-string-error. ]
-        [ ffi-error. ]
-        [ heap-scan-error. ]
-        [ undefined-symbol-error. ]
-        [ user-interrupt. ]
-    } dispatch ;
+        expired-error.
+        io-error.
+        undefined-word-error.
+        type-check-error.
+        float-format-error.
+        signal-error.
+        negative-array-size-error.
+        c-string-error.
+        ffi-error.
+        heap-scan-error.
+        undefined-symbol-error.
+        user-interrupt.
+    } nth execute ;
 
 M: no-method error. ( error -- )
     "No suitable method." print
@@ -108,9 +108,9 @@ M: object error. ( error -- ) . ;
     ":s :r show stacks at time of error." print
     ":get ( var -- value ) inspects the error namestack." print ;
 
-: flush-error-handler ( error -- )
+: flush-error-handler ( -- )
     #! Last resort.
-    [ "Error in default error handler!" print drop ] when ;
+    [ "Error in default error handler!" print ] when ;
 
 : print-error ( error -- )
     #! Print the error.

@@ -24,7 +24,7 @@ SYMBOL: responders
 : httpd-error ( error -- )
     #! This must be run from handle-request
     error-head
-    "head" "method" get = [ terpri error-body ] unless ;
+    "head" "method" get = [ drop ] [ terpri error-body ] ifte ;
 
 : bad-request ( -- )
     [
@@ -33,13 +33,13 @@ SYMBOL: responders
         "400 Bad request" httpd-error
     ] with-scope ;
 
-: serving-html ( -- )
-    [ [[ "Content-Type" "text/html" ]] ]
+: serving-content ( mime -- )
+    "Content-Type" swons unit
     "200 Document follows" response terpri ;
 
-: serving-text ( -- )
-    [ [[ "Content-Type" "text/plain" ]] ]
-    "200 Document follows" response terpri ;
+: serving-html "text/html" serving-content ;
+
+: serving-text "text/plain" serving-content ;
 
 : redirect ( to -- )
     "Location" swons unit
