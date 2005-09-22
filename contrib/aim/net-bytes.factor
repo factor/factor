@@ -5,17 +5,6 @@ SYMBOL: big-endian t big-endian set
 SYMBOL: unscoped-stream
 SYMBOL: unscoped-stack
 
-
-: >nvector ( elems n -- )
-    { } clone swap [ drop swap add ] each reverse ;
-
-! TODO: make this work for types other than ""
-: papply ( seq seq -- seq )
-    [ [ 2list call % ] 2each ] "" make ;
-
-: writeln ( string -- )
-    write terpri ;
-
 ! Examples:
 ! 1 2 3 4 4 >nvector .
 ! { 1 2 3 4 }
@@ -26,14 +15,44 @@ SYMBOL: unscoped-stack
 ! [ 1 >short  6 >long ] make-packet .
 ! "\0\u0001\0\0\0\0\0\0\0\u0006"
 
-: with-unscoped-stream ( stream quot -- )
+
+
+! doesn't compile
+! : >nvector ( elems n -- )
+    ! { } clone swap [ drop swap add ] each reverse ;
+
+: 4vector ( elems -- )
+    { } clone 4 [ drop swap add ] each reverse ;
+
+! TODO: make this work for types other than ""
+: papply ( seq seq -- seq )
+    [ [ 2list call % ] 2each ] "" make ;
+
+: writeln ( string -- )
+    write terpri ;
+
+
+: save-current-scope
     unscoped-stack get [ { } clone unscoped-stack set ] unless
-    swap dup unscoped-stream set unscoped-stack get push
-    [
-        dup [ unscoped-stream get stream-close ] when
-        unscoped-stack get dup length 1 > [ [ pop ] keep nip peek unscoped-stream set ] [ pop drop ] ifte
-        rethrow
-    ] catch ;
+    swap dup unscoped-stream set unscoped-stack get push ;
+
+: set-previous-scope
+    unscoped-stack get dup length 1 > [ 
+        [ pop ] keep nip peek unscoped-stream set ] [
+        pop drop
+    ] ifte ;
+
+: with-unscoped-stream ( stream quot -- )
+    save-current-scope catch set-previous-scope
+    [ dup [ unscoped-stream get stream-close ] when rethrow ] when ;
+
+        ! dup [ unscoped-stream get stream-close
+        ! ] [
+            ! unscoped-stream get contents dup empty? [
+                ! drop
+            ! ] [ "Remainder of stream: " writeln hexdump
+            ! ] ifte
+        ! ] ifte
 
 : close-unscoped-stream ( -- )
     unscoped-stream get stream-close ;
@@ -59,6 +78,7 @@ SYMBOL: unscoped-stack
 : >cstring ( str -- str )
     "\0" append ;
 
+! doesn't compile
 : make-packet ( quot -- )
     depth >r call depth r> - [ drop append ] each ;
 
