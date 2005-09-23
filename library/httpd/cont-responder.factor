@@ -286,7 +286,7 @@ SYMBOL: root-continuation
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a =href callback-quot expirable register-continuation id>url a> write </a> ;
+  <a callback-quot expirable register-continuation id>url =href a> write </a> ;
 
 : init-session-namespace ( -- )
   #! Setup the initial session namespace. Currently this only
