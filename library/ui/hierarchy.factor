@@ -22,9 +22,6 @@ namespaces sequences vectors ;
 : clear-gadget ( gadget -- )
     dup (clear-gadget) relayout ;
 
-: ?push ( elt seq/f -- seq )
-    [ 1 <vector> ] unless* [ push ] keep ;
-
 : (add-gadget) ( gadget box -- )
     over unparent
     dup pick set-gadget-parent

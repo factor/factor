@@ -36,12 +36,7 @@ TUPLE: node param shuffle
 M: node = eq? ;
 
 : make-node ( param in-d out-d in-r out-r node -- node )
-    [
-        >r
-        swapd <shuffle> {{ }} clone {{ }} clone { } clone f f <node>
-        r>
-        set-delegate
-    ] keep ;
+    [ >r swapd <shuffle> f f f f f <node> r> set-delegate ] keep ;
 
 : node-in-d  node-shuffle shuffle-in-d  ;
 : node-in-r  node-shuffle shuffle-in-r  ;
@@ -219,7 +214,9 @@ SYMBOL: current-node
     #! Annotate each node with the fact it was inlined from
     #! 'word'.
     [
-        dup #call? [ node-history push ] [ 2drop ] ifte
+        dup #call?
+        [ [ node-history ?push ] keep set-node-history ]
+        [ 2drop ] ifte
     ] each-node-with ;
 
 : (clone-node) ( node -- node )

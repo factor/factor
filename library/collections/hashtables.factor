@@ -188,6 +188,9 @@ M: hashtable hashcode ( hash -- n )
 : ?hash ( key hash/f -- value/f )
     dup [ hash ] [ 2drop f ] ifte ; flushable
 
+: ?hash* ( key hash/f -- value/f )
+    dup [ hash* ] [ 2drop f ] ifte ; flushable
+
 : ?set-hash ( value key hash/f -- hash )
     [ 1 <hashtable> ] unless* [ set-hash ] keep ;
 

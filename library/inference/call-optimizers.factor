@@ -19,7 +19,7 @@ math math-internals sequences words ;
     dup node-param "foldable" word-prop [
         dup node-in-d [
             dup literal?
-            [ 2drop t ] [ swap node-literals hash* ] ifte
+            [ 2drop t ] [ swap node-literals ?hash* ] ifte
         ] all-with?
     ] [
         drop f
@@ -28,7 +28,7 @@ math math-internals sequences words ;
 : literal-in-d ( #call -- inputs )
     dup node-in-d [
         dup literal?
-        [ nip literal-value ] [ swap node-literals hash ] ifte
+        [ nip literal-value ] [ swap node-literals ?hash ] ifte
     ] map-with ;
 
 : partial-eval ( #call -- node )
@@ -55,7 +55,7 @@ math math-internals sequences words ;
 
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
-    [ swap hash ] map-with
+    [ swap ?hash ] map-with
     first2 2dup and [ classes-intersect? not ] [ 2drop f ] ifte ;
 
 \ eq? {

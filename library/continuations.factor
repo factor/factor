@@ -38,22 +38,22 @@ TUPLE: continuation data c call name catch ;
         dup continuation-data f over push f swap push t
     ] call 2swap ifte ; inline
 
-: (continue-with) 9 getenv ;
-
-: callcc1 ( quot -- | quot: continuation -- )
-    #! Call a quotation with the current continuation, which may
-    #! be restored using continue-with.
-    [ drop (continue-with) ] ifcc ; inline
-
 : callcc0 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
-    #! be restored using continue-with.
+    #! be restored using continue.
     [ drop ] ifcc ; inline
 
 : continue ( continuation -- )
     #! Restore a continuation.
     >continuation< set-catchstack set-namestack set-callstack
     >r set-datastack r> set-c-stack ; inline
+
+: (continue-with) 9 getenv ;
+
+: callcc1 ( quot -- | quot: continuation -- )
+    #! Call a quotation with the current continuation, which may
+    #! be restored using continue-with.
+    [ drop (continue-with) ] ifcc ; inline
 
 : continue-with ( object continuation -- object )
     #! Restore a continuation, and place the object in the

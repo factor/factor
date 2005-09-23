@@ -13,7 +13,7 @@ namespaces sequences words ;
 
 : value-tag ( value node -- n/f )
     #! If the tag is known, output it, otherwise f.
-    node-classes hash dup [
+    node-classes ?hash dup [
         types [ type-tag ] map dup all-equal?
         [ first ] [ drop f ] ifte
     ] [

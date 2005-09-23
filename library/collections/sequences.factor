@@ -37,6 +37,9 @@ GENERIC: resize ( n seq -- seq )
     #! Push a value on the end of a sequence.
     dup length swap set-nth ; inline
 
+: ?push ( elt seq/f -- seq )
+    [ 1 <vector> ] unless* [ push ] keep ;
+
 : first2 ( { x y } -- x y )
     dup first swap second ; inline
 

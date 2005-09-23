@@ -16,7 +16,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
 
 : node-classes* ( node seq -- seq )
     >r node-classes r>
-    [ swap hash [ object ] unless* ] map-with ;
+    [ swap ?hash [ object ] unless* ] map-with ;
 
 : dispatching-classes ( node -- seq )
     dup dup node-param dispatching-values node-classes* ;
