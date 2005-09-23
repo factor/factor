@@ -45,24 +45,24 @@ parser prettyprint sequences io strings vectors words ;
     "User interrupt" print drop ;
 
 PREDICATE: cons kernel-error ( obj -- ? )
-    car kernel-error = ;
+    dup first kernel-error = swap second 0 11 between? and ;
 
 M: kernel-error error. ( error -- )
     #! Kernel errors are indexed by integers.
-    cdr uncons car swap {
-        expired-error.
-        io-error.
-        undefined-word-error.
-        type-check-error.
-        float-format-error.
-        signal-error.
-        negative-array-size-error.
-        c-string-error.
-        ffi-error.
-        heap-scan-error.
-        undefined-symbol-error.
-        user-interrupt.
-    } nth execute ;
+    cdr uncons car swap @{
+        [ expired-error. ]
+        [ io-error. ]
+        [ undefined-word-error. ]
+        [ type-check-error. ]
+        [ float-format-error. ]
+        [ signal-error. ]
+        [ negative-array-size-error. ]
+        [ c-string-error. ]
+        [ ffi-error. ]
+        [ heap-scan-error. ]
+        [ undefined-symbol-error. ]
+        [ user-interrupt. ]
+    }@ dispatch ;
 
 M: no-method error. ( error -- )
     "No suitable method." print

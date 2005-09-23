@@ -1,5 +1,6 @@
 - nodes: lazily create history, class/literal map hashes
-- write tests for callcc and catch inference
+- 5 car gives wrong error
+- compile interruption checks
 
 + ui:
 

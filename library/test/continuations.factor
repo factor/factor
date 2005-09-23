@@ -27,10 +27,3 @@ USE: test
 
 [ t ] [ 10 callcc1-test 10 >list = ] unit-test
 [ t ] [ callcc-namespace-test ] unit-test
-
-: multishot-test ( -- stack )
-    [
-        dup "cc" set 5 swap continue-with
-    ] callcc1 "cc" get continuation-data ;
-
-[ 5 { } ] [ multishot-test ] unit-test

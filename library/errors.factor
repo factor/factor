@@ -1,20 +1,13 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: kernel
-DEFER: callcc1
-DEFER: continue-with
-
 IN: errors
-USING: kernel-internals lists sequences ;
+USING: kernel kernel-internals lists sequences ;
 
 ! This is a very lightweight exception handling system.
 
 TUPLE: no-method object generic ;
 
 : no-method ( object generic -- ) <no-method> throw ;
-
-: catchstack ( -- cs ) 6 getenv ;
-: set-catchstack ( cs -- ) 6 setenv ;
 
 : >c ( catch -- ) catchstack cons set-catchstack ;
 : c> ( catch -- ) catchstack uncons set-catchstack ;
@@ -28,25 +21,23 @@ TUPLE: no-method object generic ;
 
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
-    catchstack empty? [
-        die "Can't happen" throw
-    ] [
-        c> continue-with
-    ] ifte ;
+    catchstack empty?
+    [ die "Can't happen" throw ] [ c> continue-with ] ifte ;
 
 : cleanup ( try cleanup -- | try: -- | cleanup: -- )
     #! Call the try quotation. If an exception is thrown in the
     #! dynamic extent of the quotation, restore the datastack
     #! and run the cleanup quotation. Then throw the error to
     #! the next outermost catch handler.
-    >r [ dup slip ] catch nip r>
-    swap slip [ rethrow ] when* ; inline
+    [ >c >r call c> drop r> call ]
+    [ (callcc1) >r nip call r> rethrow ] ifcc ; inline
 
 : recover ( try recovery -- | try: -- | recovery: error -- )
     #! Call the try quotation. If an exception is thrown in the
     #! dynamic extent of the quotation, restore the datastack,
     #! push the exception on the datastack, and call the
     #! recovery quotation.
-    >r catch r> when* ; inline
+    [ >c drop call c> drop ]
+    [ (callcc1) rot drop swap call ] ifcc ; inline
 
 GENERIC: error. ( error -- )

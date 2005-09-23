@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays hashtables io kernel lists namespaces sdl
-sequences styles ;
+USING: alien arrays errors hashtables io kernel lists namespaces
+sdl sequences styles ;
 
 : ttf-name ( font style -- name )
     cons {{
@@ -23,8 +23,9 @@ sequences styles ;
 : ttf-path ( name -- string )
     [ "/fonts/" % % ".ttf" % ] "" make resource-path ;
 
-: open-font ( [ font style ptsize ] -- alien )
-    first3 >r ttf-name ttf-path r> TTF_OpenFont ;
+: open-font ( { font style ptsize } -- alien )
+    first3 >r ttf-name ttf-path r> TTF_OpenFont
+    dup alien-address 0 = [ SDL_GetError throw ] when ;
 
 SYMBOL: open-fonts
 
@@ -34,7 +35,7 @@ SYMBOL: open-fonts
 global [ open-fonts nest drop ] bind
 
 : ttf-init ( -- )
-    TTF_Init
+    TTF_Init -1 = [ SDL_GetError throw ] when
     global [
         open-fonts [ [ cdr expired? not ] hash-subset ] change
     ] bind ;

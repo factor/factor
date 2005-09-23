@@ -41,11 +41,11 @@ C: world ( -- world )
     <gadget> dup add-layer dup world get set-world-glass
     dupd add-gadget prefer ;
 
+: world-clip ( -- rect )
+    @{ 0 0 0 }@ width get height get 0 3array <rect> ;
+
 : draw-world ( world -- )
-    [
-        @{ 0 0 0 }@ width get height get 0 3array <rect> clip set
-        draw-gadget
-    ] with-surface ;
+    [ world-clip clip set draw-gadget ] with-surface ;
 
 DEFER: handle-event
 

@@ -42,14 +42,14 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
 : vocab-list ( vocab -- )
   #! Write out the HTML for the list of vocabularies. Make the currently 
   #! selected vocab be 'vocab'.
-  <select name= "vocab" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
+  <select "vocab" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
     vocabs [ over swap option ] each drop
   </select> ;
 
 : word-list ( vocab word -- )
   #! Write out the HTML for the list of words in a vocabulary. Make the 'word' item
   #! the currently selected option.
-  <select name= "word" style= "width: 200" size= "20" onchange= "document.forms.main.submit()" select> 
+  <select "word" =name "width: 200" =style "20" =size "document.forms.main.submit()" =onchange select> 
     swap words [ word-name over swap option ] each drop
   </select> ;
 
@@ -65,16 +65,16 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
 
 : browser-body ( vocab word -- )
   #! Write out the HTML for the body of the main browser page.
-  <table width= "100%" table> 
+  <table "100%" =width table> 
     <tr>  
-      <td> "<b>Vocabularies</b>" write </td>
-      <td> "<b>Words</b>" write </td>
-      <td> "<b>Source</b>" write </td>
+      <td> <b> "Vocabularies" write </b> </td>
+      <td> <b> "Words" write </b> </td>
+      <td> <b> "Source" write </b> </td>
     </tr>
     <tr>  
-      <td valign= "top" style= "width: 200" td> over vocab-list </td> 
-      <td valign= "top" style= "width: 200" td> 2dup word-list </td> 
-      <td valign= "top" td> word-source </td> 
+      <td "top" =valign "width: 200" =style td> over vocab-list </td> 
+      <td "top" =valign "width: 200" =style td> 2dup word-list </td> 
+      <td "top" =valign td> word-source </td> 
     </tr>
   </table>
   vm-statistics ;
@@ -104,7 +104,7 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
     <html> 
       <head> 2dup browser-title browser-style </head>
       <body> 
-        <form name= "main" action= "" method= "get" form> browser-body </form>
+        <form "main" =name "" =action "get" =method form> browser-body </form>
       </body>
     </html> 
   ] show-final ;

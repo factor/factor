@@ -26,8 +26,9 @@ USE: memory
 
 [ [ "2 car" ] parse ] catch print-error
 
-! This should not raise an error
-[ 1 2 3 ] [ 1 2 3 f throw ] unit-test
+[ car ] [ [ 5 car ] catch no-method-generic ] unit-test
+
+[ 1 2 3 ] [ f throw ] unit-test-fails
 
 ! See how well callstack overflow is handled
 : callstack-overflow callstack-overflow f ;

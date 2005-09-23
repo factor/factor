@@ -42,18 +42,16 @@ USE: sequences
 ! 
 ! <p> "someoutput" write </p>
 !
-! <p> will outupt the opening tag and </p> will output the closing
+! <p> will output the opening tag and </p> will output the closing
 ! tag with no attributes.
 !
-! <p class= "red" p> "someoutput" write </p>
+! <p "red" =class p> "someoutput" write </p>
 !
 ! This time the opening tag does not have the '>'. It pushes
 ! a namespace on the stack to hold the attributes and values.
 ! Any attribute words used will store the attribute and values
-! in that namespace. After the attribute word should come the
-! value of that attribute. The next attribute word or 
-! finishing word (which is the html word followed by '>') 
-! will actually set the attribute to that value in the namespace.
+! in that namespace. Before the attribute word should come the
+! value of that attribute.
 ! The finishing word will print out the operning tag including
 ! attributes. 
 ! Any writes after this will appear after the opening tag.
@@ -62,17 +60,17 @@ USE: sequences
 ! operations:
 !
 ! (url -- )
-! <a href= a> "Click me" write </a>
+! <a =href a> "Click me" write </a>
 !
 ! (url -- )
-! <a href= "http://" swap append a> "click" write </a>
+! <a "http://" swap append =href a> "click" write </a>
 !
 ! (url -- )
-! <a href= [ "http://" % % ] "" make a> "click" write </a>
+! <a [ "http://" % % ] "" make =href a> "click" write </a>
 !
 ! Tags that have no 'closing' equivalent have a trailing tag/> form:
 !
-! <input type= "text" name= "name" size= "20" input/>
+! <input "text" =type "name" =name "20" =size input/>
 
 : attrs>string ( alist -- string )
     #! Convert the attrs alist to a string
@@ -84,14 +82,6 @@ USE: sequences
     #! and write them to standard output. If no attributes exist, write
     #! nothing.
     "attrs" get attrs>string write ;
-
-: store-prev-attribute ( n: tag value -- )     
-    #! Assumes an attribute namespace is on the stack.
-    #! Gets the previous attribute that was used (if any)
-    #! and sets it's value to the current value on the stack.
-    #! If there is no previous attribute, no value is expected
-    #! on the stack.
-    "current-attribute" get [ swons "attrs" get push ] when* ;
 
 : html-word ( name def -- )
     #! Define 'word creating' word to allow
@@ -118,7 +108,7 @@ USE: sequences
 
 : foo> ">" append ;
 
-: do-foo> store-prev-attribute write-attributes n> drop ">" write ;
+: do-foo> write-attributes n> drop ">" write ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
@@ -162,8 +152,8 @@ USE: sequences
     def-for-html-word-foo/> ;
 
 : define-attribute-word ( name -- )
-    dup "=" append swap [
-        \ store-prev-attribute , , [ "current-attribute" set ] %
+    dup "=" swap append swap [
+        , [ swons "attrs" get push ] %
     ] [ ] make html-word drop ;
 
 ! Define some closed HTML tags

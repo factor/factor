@@ -55,7 +55,7 @@ presentation sequences strings styles words ;
     over css-style dup "" = [
         drop call
     ] [
-        <span style= span> call </span>
+        <span =style span> call </span>
     ] ifte ;
 
 : resolve-file-link ( path -- link )
@@ -70,7 +70,7 @@ presentation sequences strings styles words ;
 
 : file-link-tag ( style quot -- )
     over file swap assoc [
-        <a href= file-link-href a> call </a>
+        <a file-link-href =href a> call </a>
     ] [
         call
     ] ifte* ;
@@ -86,7 +86,7 @@ presentation sequences strings styles words ;
 
 : browser-link-tag ( style quot -- style )
     over presented swap assoc dup word? [
-        <a href= browser-link-href a> call </a>
+        <a browser-link-href =href a> call </a>
     ] [
         drop call
     ] ifte ;

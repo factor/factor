@@ -64,8 +64,8 @@ sequences io vectors words ;
 
         "/library/words.factor"
         "/library/vocabularies.factor"
-        "/library/errors.factor"
         "/library/continuations.factor"
+        "/library/errors.factor"
         "/library/styles.factor"
 
         "/library/io/stream.factor"

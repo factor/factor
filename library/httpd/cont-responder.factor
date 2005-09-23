@@ -286,7 +286,7 @@ SYMBOL: root-continuation
   #! back to the most recent 'show' call (via the callback-cc).
   #! The text of the link will be the 'text' argument on the 
   #! stack.
-  <a href= callback-quot expirable register-continuation id>url a> write </a> ;
+  <a =href callback-quot expirable register-continuation id>url a> write </a> ;
 
 : init-session-namespace ( -- )
   #! Setup the initial session namespace. Currently this only
@@ -340,7 +340,7 @@ SYMBOL: root-continuation
   [
     "Press OK to Continue" [
        swap paragraph 
-       <a href= a> "OK" write </a>
+       <a =href a> "OK" write </a>
     ] simple-page 
   ] show 2drop ;
 
@@ -353,12 +353,12 @@ SYMBOL: root-continuation
 : horizontal-layout ( list -- )
   #! Given a list of HTML components, arrange them horizontally.
   <table> 
-    <tr valign= "top" tr> [ <td> call </td> ] each </tr>
+    <tr "top" =valign tr> [ <td> call </td> ] each </tr>
   </table> ;
 
 : button ( label -- )
   #! Output an HTML submit button with the given label.
-  <input type= "submit" value= input/> ;
+  <input "submit" =type =value input/> ;
 
 : with-simple-html-output ( quot -- )
   #! Run the quotation inside an HTML stream wrapped
