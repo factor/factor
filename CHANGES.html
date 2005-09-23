@@ -14,23 +14,44 @@
 <li>New basic block optimizer performs more aggressive dead load and store elimination.</li>
 <li>Stack shuffles are compiled more efficiently.</li>
 <li>Pushing literals on either side of a stack shuffle is now compiled more efficiently.</li>
-<li>Tail-recursive inlined words are compiled in a new way, saving a few instructions.</li>
 </ul>
 
 </li>
 
-<li>Sequences:
+<li>Collections:
 
 <ul>
 <li>Faster <code>map</code>, <code>2each</code> and <code>2map</code>.</li>
 <li>Arrays are now better supported and should be used instead of vectors where resizing is not desired.</li>
+<li>Some new sequence words that do not bounds check: <code>nth-unsafe</code> and <code>set-nth-unsafe</code>. These should only be used in special circumstances, such as inner loops (<code>each</code>, <code>map</code> and so on use them).</li>
+<li>Hashtables did not obey the rule that equal objects must have equal hashcodes, so using hashtables as hashtable keys did not work.</li>
 </li>
 
 <li>Everything else:
 
 <ul>
+<li>Easier exception handling. The <code>cleanup ( try cleanup -- )</code> word encapsulates the following idiom:
+<pre>
+[ A ] [ B rethrow ] catch
+[ A ] [ B ] cleanup
+</pre>
+The <code>recover ( try recover -- )</code> word encapsulates the following idiom:
+<pre>
+[ A ] [ [ B ] when* ] catch
+[ A ] [ B ] recover
+</pre>
+The <code>catch ( try -- error/f )</code> word no longer takes a quotation that receives the error caught; rather, it just pushes the error that was caught on the stack. That is, the old way:
+<pre>
+[ A ] [ B ] catch
+</pre>
+Becomes:
+<pre>
+[ A ] catch B
+</pre>
+However, most uses of <code>catch</code> can be replaced by <code>cleanup</code> and <code>recover</code>.</li>
 <li>The distinct <code>t</code> type is gone. Now, the <code>t</code> object is just a symbol.</li>
-<li>Hashtables did not obey the rule that equal objects must have equal hashcodes, so using hashtables as hashtable keys did not work.</li>
+<li>A new <code>with-server ( port ident quot -- )</code> combinator takes care of listening on a network socket, logging client connections, spawning client handler threads, and error handling. The quotation is called for each client, in a new scope with the client socket as the default stream.</li>
+<li>New <code>1+</code>, <code>1-</code> words are a bit faster than <code>1 +</code> and <code>1 -</code> since there is one less generic dispatch involved.</li>
 </ul>
 
 </ul>

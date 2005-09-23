@@ -30,19 +30,17 @@ M: %inc-d simplify-stack* ( vop -- ) d-height accum-height ;
 
 M: %inc-r simplify-stack* ( vop -- ) r-height accum-height ;
 
-: update-ds ( vop -- )
+GENERIC: update-loc ( loc -- )
+
+M: ds-loc update-loc
     dup ds-loc-n d-height get - swap set-ds-loc-n ;
 
-: update-cs ( vop -- )
+M: cs-loc update-loc
     dup cs-loc-n r-height get - swap set-cs-loc-n ;
 
-M: %peek-d simplify-stack* ( vop -- ) 0 vop-in update-ds ;
+M: %peek simplify-stack* ( vop -- ) 0 vop-in update-loc ;
 
-M: %peek-r simplify-stack* ( vop -- ) 0 vop-in update-cs ;
-
-M: %replace-d simplify-stack* ( vop -- ) 0 vop-out update-ds ;
-
-M: %replace-r simplify-stack* ( vop -- ) 0 vop-out update-cs ;
+M: %replace simplify-stack* ( vop -- ) 0 vop-out update-loc ;
 
 : simplify-stack ( block -- )
     #! Combine all %inc-d/%inc-r into two final ones.
@@ -106,13 +104,9 @@ M: %inc-r trim-dead* ( tail vop -- ) simplify-inc drop ;
 : redundant-peek? ( vop -- ? )
     dup 0 vop-in swap 0 vop-out vreg-contents get hash = ;
 
-: ?dead-peek ( tail vop -- )
+M: %peek trim-dead* ( tail vop -- )
     dup redundant-peek? >r tuck live-load? not r> or
     [ dup remember-peek dup , ] unless drop ;
-
-M: %peek-d trim-dead* ( tail vop -- ) ?dead-peek ;
-
-M: %peek-r trim-dead* ( tail vop -- ) ?dead-peek ;
 
 : redundant-replace? ( vop -- ? )
     dup 0 vop-out swap 0 vop-in vreg-contents get hash = ;
@@ -128,13 +122,9 @@ M: %peek-r trim-dead* ( tail vop -- ) ?dead-peek ;
     dup 0 vop-out forget-stack-loc
     dup 0 vop-out swap 0 vop-in vreg-contents get set-hash ;
 
-: ?dead-replace ( tail vop -- )
+M: %replace trim-dead* ( tail vop -- )
     dup redundant-replace? >r tuck live-load? not r> or
     [ dup remember-replace dup , ] unless drop ;
-
-M: %replace-d trim-dead* ( tail vop -- ) ?dead-replace ;
-
-M: %replace-r trim-dead* ( tail vop -- ) ?dead-replace ;
 
 : ?dead-literal dup forget-vregs tuck live-load? ?, ;
 

@@ -72,7 +72,7 @@ M: %untag generate-node ( vop -- )
 
 M: %dispatch generate-node ( vop -- )
     0 <vreg> check-src
-    3 3 2 SLWI
+    3 3 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
     0 1 rel-address  compiled-offset 24 + 4 LOAD32
@@ -86,9 +86,11 @@ M: %type generate-node ( vop -- )
     <label> "f" set
     <label> "end" set
     ! Get the tag
-    3 4 tag-mask ANDI
+    3 5 tag-mask ANDI
+    ! Tag the tag
+    5 4 tag-fixnum
     ! Compare with object tag number (3).
-    0 4 object-tag CMPI
+    0 5 object-tag CMPI
     ! Jump if the object doesn't store type info in its header
     "end" get BNE
     ! It does store type info in its header
@@ -97,13 +99,14 @@ M: %type generate-node ( vop -- )
     "f" get BEQ
     ! The pointer is not equal to 3. Load the object header.
     4 3 object-tag neg LWZ
-    4 4 3 SRAWI
+    4 4 untag
     "end" get B
     "f" get save-xt
     ! The pointer is equal to 3. Load F_TYPE (9).
-    f type 4 LI
+    f type tag-bits shift 4 LI
     "end" get save-xt
     3 4 MR ;
 
 M: %tag generate-node ( vop -- )
-    dup 0 vop-in v>operand swap 0 vop-out v>operand tag-mask ANDI ;
+    dup 0 vop-in v>operand swap 0 vop-out v>operand
+    [ tag-mask ANDI ] keep dup tag-fixnum ;

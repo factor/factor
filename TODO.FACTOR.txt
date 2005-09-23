@@ -1,6 +1,21 @@
-- nodes: lazily create history, class/literal map hashes
 - 5 car gives wrong error
 - compile interruption checks
+- check that set-datastack and set-callstack compile correctly in the
+  face of optimization
+- [ 2cdr < ] sort -- sig11
+- slice: if sequence or seq start is changed, abstraction violation
+- array>tuple: check length and class
+- code walker & exceptions
+- floating point intrinsics
+- fix fixnum/mod overflow on PowerPC
+- intrinsic char-slot set-char-slot
+- split: return vectors
+- vectors: ensure its ok with bignum indices
+- nth-unsafe and set-nth-unsafe; ensure it works with bignum indices
+- set-path: iterative
+- parse-command-line: no unswons of cli args
+- investigate if rehashing on startup is really necessary
+- remove word transfer hack in bootstrap
 
 + ui:
 
@@ -35,7 +50,6 @@
   http://clozure.com/cgi-bin/viewcvs.cgi/ccl/lisp-kernel/lisp-exceptions.c?rev=1.9&content-type=text/vnd.viewcvs-markup
 
 - http keep alive, and range get
-- code walker & exceptions
 
 + ffi:
 
@@ -55,10 +69,7 @@
 - [ ] [ throw ] ifte ==> should raise 'unbalanced branches' error
 - declare slot types for built-ins
 - remove dead code after a 'throw'
-- floating point intrinsics
 - flushing optimization
-- fix fixnum/mod overflow on PowerPC
-- intrinsic char-slot set-char-slot
 - [ [ dup call ] dup call ] infer hangs
 - the invalid recursion form case needs to be fixed, for inlines too
 - recursion is iffy; if the stack at the recursive call doesn't match
@@ -66,11 +77,8 @@
 
 + sequences:
 
-- split: return vectors
 - specialized arrays
 - instances: do not use make-list
-- vectors: ensure its ok with bignum indices
-- nth-unsafe and set-nth-unsafe; ensure it works with bignum indices
 - >c/c>: vector stack
 - search: slow
 - vectorize >n, n>, (get)
@@ -91,10 +99,6 @@
 - there is a problem with hashcodes of words and bootstrapping
 - delegating generic words with a non-standard picker
 - code gc
-- set-path: iterative
-- parse-command-line: no unswons of cli args
-- investigate if rehashing on startup is really necessary
-- remove word transfer hack in bootstrap
 
 + i/o:
 
