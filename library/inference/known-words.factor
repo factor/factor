@@ -529,11 +529,3 @@ prettyprint ;
 
 \ infer-only [ [ object ] [ ] ] "infer-effect" set-word-prop
 \ infer-only [ pop-literal infer-quot-value ] "infer" set-word-prop
-
-\ (callcc0) [
-    "(callcc0) cannot be compiled (yet)" throw
-] "infer" set-word-prop
-
-\ (callcc1) [
-    "(callcc1) cannot be compiled (yet)" throw
-] "infer" set-word-prop

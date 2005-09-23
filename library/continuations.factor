@@ -44,24 +44,20 @@ TUPLE: continuation data c call name catch ;
     #! there, but ignore it during execution.
     drop ;
 
-: (callcc0) ( -- ) [ drop ] infer-only ; inline
-
-: (callcc1) ( -- value ) (callcc0) 9 getenv ; inline
-
 : callcc1 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
     #! be restored using continue-with.
-    [ (callcc1) ] ifcc ; inline
+    [ [ drop ] infer-only 9 getenv ] ifcc ; inline
 
 : callcc0 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
     #! be restored using continue-with.
-    [ (callcc0) ] ifcc ; inline
+    [ [ drop ] infer-only ] ifcc ; inline
 
 : continue ( continuation -- )
     #! Restore a continuation.
     >continuation< set-catchstack set-namestack set-callstack
-    >r set-datastack r> set-c-stack ;
+    >r set-datastack r> set-c-stack ; inline
 
 : continue-with ( object continuation -- object )
     #! Restore a continuation, and place the object in the
