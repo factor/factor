@@ -526,6 +526,3 @@ prettyprint ;
 ] "infer" set-word-prop
 
 \ flush-icache [ [ ] [ ] ] "infer-effect" set-word-prop
-
-\ infer-only [ [ object ] [ ] ] "infer-effect" set-word-prop
-\ infer-only [ pop-literal infer-quot-value ] "infer" set-word-prop

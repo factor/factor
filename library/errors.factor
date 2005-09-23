@@ -30,7 +30,7 @@ TUPLE: no-method object generic ;
     #! and run the cleanup quotation. Then throw the error to
     #! the next outermost catch handler.
     [ >c >r call c> drop r> call ]
-    [ [ drop ] infer-only 9 getenv >r nip call r> rethrow ] ifcc ; inline
+    [ drop (continue-with) >r nip call r> rethrow ] ifcc ; inline
 
 : recover ( try recovery -- | try: -- | recovery: error -- )
     #! Call the try quotation. If an exception is thrown in the
@@ -38,6 +38,6 @@ TUPLE: no-method object generic ;
     #! push the exception on the datastack, and call the
     #! recovery quotation.
     [ >c drop call c> drop ]
-    [ [ drop ] infer-only 9 getenv rot drop swap call ] ifcc ; inline
+    [ drop (continue-with) rot drop swap call ] ifcc ; inline
 
 GENERIC: error. ( error -- )

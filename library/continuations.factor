@@ -34,25 +34,21 @@ TUPLE: continuation data c call name catch ;
 
 : ifcc ( terminator balance -- | quot: continuation -- )
     [
-        t continuation
-        dup continuation-data dup pop* f swap push
-        swap >r -rot r>
-    ] call -rot ifte ; inline
+        continuation
+        dup continuation-data f over push f swap push t
+    ] call 2swap ifte ; inline
 
-: infer-only ( quot -- )
-    #! For stack effect inference, pretend the quotation is
-    #! there, but ignore it during execution.
-    drop ;
+: (continue-with) 9 getenv ;
 
 : callcc1 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
     #! be restored using continue-with.
-    [ [ drop ] infer-only 9 getenv ] ifcc ; inline
+    [ drop (continue-with) ] ifcc ; inline
 
 : callcc0 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may
     #! be restored using continue-with.
-    [ [ drop ] infer-only ] ifcc ; inline
+    [ drop ] ifcc ; inline
 
 : continue ( continuation -- )
     #! Restore a continuation.

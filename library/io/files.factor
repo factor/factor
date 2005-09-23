@@ -21,8 +21,6 @@ USING: hashtables kernel lists namespaces sequences strings ;
 : file-extension ( filename -- extension )
     "." split cdr dup [ peek ] when ;
 
-DEFER: <file-reader>
-
 : resource-path ( path -- path )
     "resource-path" get [ "." ] unless* swap path+ ;
 
