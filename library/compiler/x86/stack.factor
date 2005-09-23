@@ -4,18 +4,18 @@ IN: compiler-backend
 USING: alien assembler compiler inference kernel lists math
 memory sequences words ;
 
-: reg-stack ( reg n -- op ) cell * neg 2list ;
+: reg-stack ( n reg -- op ) swap cell * neg 2list ;
 
 GENERIC: loc>operand
 
-M: ds-loc loc>operand ds-loc-n ESI swap reg-stack ;
-M: cs-loc loc>operand cs-loc-n EBX swap reg-stack ;
+M: ds-loc loc>operand ds-loc-n ESI reg-stack ;
+M: cs-loc loc>operand cs-loc-n EBX reg-stack ;
 
 M: %peek generate-node ( vop -- )
-    dup 0 vop-out v>operand swap 0 vop-in loc>operand swap MOV ;
+    dup 0 vop-out v>operand swap 0 vop-in loc>operand MOV ;
 
 M: %replace generate-node ( vop -- )
-    dup 0 vop-in v>operand swap 0 vop-out loc>operand swap MOV ;
+    dup 0 vop-out loc>operand swap 0 vop-in v>operand MOV ;
 
 : (%inc) swap 0 vop-in cell * dup 0 > [ ADD ] [ neg SUB ] ifte ;
 
