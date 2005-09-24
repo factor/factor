@@ -1,4 +1,4 @@
-#define USER_ENV 16
+#define USER_ENV 32
 
 #define CARD_OFF_ENV   1 /* for compiling set-slot */
 /* 2 is unused */
