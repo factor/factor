@@ -6,7 +6,7 @@ sequences-internals ;
 
 M: string nth ( n str -- ch ) bounds-check char-slot ;
 
-M: string nth-unsafe ( n str -- ch ) char-slot ;
+M: string nth-unsafe ( n str -- ch ) >r >fixnum r> char-slot ;
 
 GENERIC: >string ( seq -- string ) flushable
 

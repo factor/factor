@@ -4,14 +4,15 @@ IN: vectors
 USING: arrays errors generic kernel kernel-internals lists math
 math-internals sequences sequences-internals ;
 
-M: vector set-length ( len vec -- ) grow-length ;
+M: vector set-length ( len vec -- )
+    grow-length ;
 
-M: vector nth-unsafe ( n vec -- obj ) underlying array-nth ;
+M: vector nth-unsafe ( n vec -- obj ) underlying nth-unsafe ;
 
 M: vector nth ( n vec -- obj ) bounds-check nth-unsafe ;
 
 M: vector set-nth-unsafe ( obj n vec -- )
-    underlying set-array-nth ;
+    underlying set-nth-unsafe ;
 
 M: vector set-nth ( obj n vec -- )
     growable-check 2dup ensure set-nth-unsafe ;

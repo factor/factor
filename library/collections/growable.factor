@@ -18,19 +18,28 @@ GENERIC: set-fill
 : expand ( len seq -- )
     [ underlying resize ] keep set-underlying ;
 
-: new-size ( n -- n )
-    3 fixnum* dup 50 fixnum< [ drop 50 ] when ;
+: new-size ( n -- n ) 3 * dup 50 < [ drop 50 ] when ;
 
 : ensure ( n seq -- )
     #! If n is beyond the sequence's length, increase the length,
     #! growing the underlying storage if necessary, with an
     #! optimistic doubling of its size.
-    2dup length fixnum>= [
-        >r 1 fixnum+ r>
-        2dup capacity fixnum>
-        [ over new-size over expand ] when
+    2dup length >= [
+        >r 1+ r>
+        2dup capacity > [ over new-size over expand ] when
         2dup set-fill
     ] when 2drop ;
+
+TUPLE: bounds-error index seq ;
+
+: bounds-error <bounds-error> throw ;
+
+: growable-check ( n seq -- fx seq )
+    over 0 < [ 2dup bounds-error ] when ; inline
+
+: bounds-check ( n seq -- fx seq )
+    growable-check 2dup length >= [ 2dup bounds-error ] when ;
+    inline
 
 : grow-length ( len seq -- )
     growable-check 2dup capacity > [ 2dup expand ] when set-fill ;

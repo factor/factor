@@ -32,7 +32,7 @@ C: sorter ( seq start end -- sorter )
     ] when ; inline
 
 : sort-down ( quot sorter -- quot sorter )
-    dup s/e* <= [
+    dup s/e* < [
         [ dup sorter-end compare 0 > ] 2keep rot
         [ dup <end< sort-down ] when
     ] when ; inline
@@ -92,8 +92,7 @@ IN: sequences
 
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?
-    [ 3drop -1 ] [ flatten-slice (binsearch) ] if ;
-    inline
+    [ 3drop -1 ] [ flatten-slice (binsearch) ] if ; inline
 
 : binsearch* ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )
     over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;

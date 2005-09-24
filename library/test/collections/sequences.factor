@@ -162,3 +162,9 @@ unit-test
     { "one" "two" "three" }
     { 1 2 3 } { 1 2 3 4 5 6 } clone [ subst ] keep
 ] unit-test
+
+[ ] [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
+
+[ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum @{ 1 5 7 }@ nth-unsafe ] unit-test
+[ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test

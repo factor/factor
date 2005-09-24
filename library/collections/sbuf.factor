@@ -12,12 +12,12 @@ M: string resize resize-string ;
 
 M: sbuf set-length ( n sbuf -- ) grow-length ;
 
-M: sbuf nth-unsafe underlying char-slot ;
+M: sbuf nth-unsafe underlying >r >fixnum r> char-slot ;
 
 M: sbuf nth ( n sbuf -- ch ) bounds-check nth-unsafe ;
 
 M: sbuf set-nth-unsafe ( ch n sbuf -- )
-    underlying >r >r >fixnum r> r> set-char-slot ;
+    underlying >r >fixnum >r >fixnum r> r> set-char-slot ;
 
 M: sbuf set-nth ( ch n sbuf -- )
     growable-check 2dup ensure set-nth-unsafe ;

@@ -1,4 +1,5 @@
-USING: errors generic kernel math parser sequences test words ;
+USING: errors generic kernel kernel-internals math parser
+sequences test words ;
 IN: temporary
 
 TUPLE: rect x y w h ;
@@ -101,4 +102,11 @@ TUPLE: delegate-clone ;
 [
     "IN: temporary-1 SYMBOL: foobar IN: temporary TUPLE: foobar ;" eval
     "foobar" [ "temporary-1" "temporary" ] search word-vocabulary
+] unit-test
+
+TUPLE: size-test a b c d ;
+
+[ t ] [
+    << size-test >> array-capacity
+    size-test "tuple-size" word-prop =
 ] unit-test

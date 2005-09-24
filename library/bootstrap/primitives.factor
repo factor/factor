@@ -208,7 +208,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "expired?" "alien"                    }
     { "<wrapper>" "kernel"                  }
     { "(clone)" "kernel-internals"          }
-    { "array>tuple" "generic"               }
+    { "(array>tuple)" "kernel-internals"    }
     { "tuple>array" "generic"               }
     { "array>vector" "vectors"              }
 } dup length 3 swap [ + ] map-with [ make-primitive ] 2each

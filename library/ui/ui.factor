@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: gadgets-layouts gadgets-listener generic help io kernel
-listener lists math namespaces prettyprint sdl sequences shells
-styles threads words ;
+listener lists math memory namespaces prettyprint sdl sequences
+shells styles threads words ;
 
 : world-theme
     {{

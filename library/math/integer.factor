@@ -98,8 +98,3 @@ M: bignum bitnot bignum-bitnot ;
 M: integer truncate ;
 M: integer floor ;
 M: integer ceiling ;
-
-! Integers support the sequence protocol
-M: integer length ;
-M: integer nth drop ;
-M: integer nth-unsafe drop ;

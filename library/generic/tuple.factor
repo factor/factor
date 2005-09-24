@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: generic
-USING: errors hashtables kernel kernel-internals lists math
-namespaces parser sequences sequences-internals strings vectors
-words ;
+USING: arrays errors hashtables kernel kernel-internals lists
+math namespaces parser sequences sequences-internals strings
+vectors words ;
 
 ! Tuples are really arrays in the runtime, but with a different
 ! type number. The layout is as follows:
@@ -97,3 +97,7 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     ] [
         over [ >r delegate r> is? ] [ 2drop f ] if
     ] if ; inline
+
+: array>tuple ( seq -- tuple )
+    >vector dup first "tuple-size" word-prop over set-length
+    >array (array>tuple) ;

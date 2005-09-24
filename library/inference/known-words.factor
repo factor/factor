@@ -502,8 +502,8 @@ prettyprint ;
 \ (clone) [ [ object ] [ object ] ] "infer-effect" set-word-prop
 \ (clone) t "flushable" set-word-prop
 
-\ array>tuple [ [ array ] [ tuple ] ] "infer-effect" set-word-prop
-\ array>tuple t "flushable" set-word-prop
+\ (array>tuple) [ [ array ] [ tuple ] ] "infer-effect" set-word-prop
+\ (array>tuple) t "flushable" set-word-prop
 
 \ tuple>array [ [ tuple ] [ array ] ] "infer-effect" set-word-prop
 \ tuple>array t "flushable" set-word-prop

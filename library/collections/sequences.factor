@@ -46,18 +46,6 @@ GENERIC: resize ( n seq -- seq )
 : first3 ( { x y z } -- x y z )
     dup first over second rot third ; inline
 
-TUPLE: bounds-error index seq ;
-
-: bounds-error <bounds-error> throw ;
-
-: growable-check ( n seq -- fx seq )
-    >r >fixnum dup 0 fixnum<
-    [ r> 2dup bounds-error ] [ r> ] if ; inline
-
-: bounds-check ( n seq -- fx seq )
-    growable-check 2dup length fixnum>=
-    [ 2dup bounds-error ] when ; inline
-
 IN: sequences-internals
 
 ! Unsafe sequence protocol for inner loops
@@ -73,3 +61,8 @@ M: object set-nth-unsafe set-nth ;
 : change-nth-unsafe ( seq i quot -- )
     pick pick >r >r >r swap nth-unsafe
     r> call r> r> swap set-nth-unsafe ; inline
+
+! Integers support the sequence protocol
+M: integer length ;
+M: integer nth drop ;
+M: integer nth-unsafe drop ;

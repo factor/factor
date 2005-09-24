@@ -51,4 +51,4 @@ syntax words ;
 
 ! Tuples.
 : << f ; parsing
-: >> reverse >array array>tuple swons ; parsing
+: >> reverse array>tuple swons ; parsing

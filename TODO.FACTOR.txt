@@ -2,18 +2,13 @@
 - compile interruption checks
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization
-- [ 2cdr < ] sort -- sig11
 - slice: if sequence or seq start is changed, abstraction violation
-- array>tuple: check length and class
 - code walker & exceptions
 - floating point intrinsics
 - fix fixnum/mod overflow on PowerPC
 - intrinsic char-slot set-char-slot
 - split: return vectors
-- vectors: ensure its ok with bignum indices
-- nth-unsafe and set-nth-unsafe; ensure it works with bignum indices
 - set-path: iterative
-- parse-command-line: no unswons of cli args
 - investigate if rehashing on startup is really necessary
 - remove word transfer hack in bootstrap
 
