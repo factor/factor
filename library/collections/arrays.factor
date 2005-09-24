@@ -12,7 +12,7 @@ USING: kernel math math-internals sequences sequences-internals ;
         ] all? 2nip
     ] [
         2drop f
-    ] ifte ; flushable
+    ] if ; flushable
 
 IN: arrays
 

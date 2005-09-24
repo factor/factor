@@ -22,14 +22,14 @@ USE: namespaces
 [ 1 [ ] 2keep ] unit-test-fails
 [ 3 1 2 ] [ 1 2 [ 2drop 3 ] 2keep ] unit-test
 
-[ 0 ] [ f [ sq ] [ 0 ] ifte* ] unit-test
-[ 4 ] [ 2 [ sq ] [ 0 ] ifte* ] unit-test
+[ 0 ] [ f [ sq ] [ 0 ] if* ] unit-test
+[ 4 ] [ 2 [ sq ] [ 0 ] if* ] unit-test
 
 [ 0 ] [ f [ 0 ] unless* ] unit-test
 [ t ] [ t [ "Hello" ] unless* ] unit-test
 
-[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?ifte ] string-out ] unit-test
-[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?ifte ] string-out ] unit-test
+[ "2\n" ] [ [ 1 2 [ . ] [ sq . ] ?if ] string-out ] unit-test
+[ "9\n" ] [ [ 3 f [ . ] [ sq . ] ?if ] string-out ] unit-test
 
 [ "even" ] [
     2 @{

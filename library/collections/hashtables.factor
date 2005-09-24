@@ -61,7 +61,7 @@ IN: hashtables
     -rot 2dup (hashcode) over [
         ( quot key hash assoc -- )
         swapd 2dup
-        assoc* [ rot hash-size- ] [ rot drop ] ifte
+        assoc* [ rot hash-size- ] [ rot drop ] if
         rot call
     ] change-bucket ; inline
 
@@ -86,7 +86,7 @@ IN: hashtables
         dup hash-size new-size swap set-bucket-count
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : set-hash ( value key table -- )
     #! Store the value in the hashtable. Either replaces an
@@ -130,7 +130,7 @@ IN: hashtables
             cdr r> =
         ] [
             r> 2drop f
-        ] ifte
+        ] if
     ] hash-all-with? ; flushable
 
 : hash-filter-step ( quot assoc -- assoc n )
@@ -179,17 +179,17 @@ M: hashtable hashcode ( hash -- n )
         >r 3drop r>
     ] [                                             
         pick rot >r >r call dup r> r> set-hash
-    ] ifte* ; inline
+    ] if* ; inline
 
 : map>hash ( seq quot -- hash | quot: elt -- value )
     over >r map r> dup length <hashtable> -rot
     [ pick set-hash ] 2each ; inline
 
 : ?hash ( key hash/f -- value/f )
-    dup [ hash ] [ 2drop f ] ifte ; flushable
+    dup [ hash ] [ 2drop f ] if ; flushable
 
 : ?hash* ( key hash/f -- value/f )
-    dup [ hash* ] [ 2drop f ] ifte ; flushable
+    dup [ hash* ] [ 2drop f ] if ; flushable
 
 : ?set-hash ( value key hash/f -- hash )
     [ 1 <hashtable> ] unless* [ set-hash ] keep ;

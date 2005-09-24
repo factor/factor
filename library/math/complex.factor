@@ -6,7 +6,7 @@ USING: errors generic kernel kernel-internals math ;
 : (rect>) ( xr xi -- x )
     #! Does not perform a check that the arguments are reals.
     #! Do not use in your own code.
-    dup 0 number= [ drop ] [ <complex> ] ifte ; inline
+    dup 0 number= [ drop ] [ <complex> ] if ; inline
 
 IN: math
 
@@ -22,7 +22,7 @@ M: number = ( n n -- ? ) number= ;
         (rect>)
     ] [
         "Complex number must have real components" throw
-    ] ifte ; inline
+    ] if ; inline
 
 : >rect ( x -- xr xi ) dup real swap imaginary ; inline
 
@@ -49,7 +49,7 @@ IN: math-internals
     [ [ real ] 2apply ] 2keep [ imaginary ] 2apply ; inline
 
 M: complex number= ( x y -- ? )
-    2>rect number= [ number= ] [ 2drop f ] ifte ;
+    2>rect number= [ number= ] [ 2drop f ] if ;
 
 : *re ( x y -- xr*yr xi*ri ) 2>rect * >r * r> ; inline
 : *im ( x y -- xi*yr xr*yi ) 2>rect >r * swap r> * ; inline

@@ -91,9 +91,9 @@ C: #return make-node ;
     meta-d get clone in-node <#return>
     [ set-node-param ] keep ;
 
-TUPLE: #ifte ;
-C: #ifte make-node ;
-: #ifte ( in -- node ) 1 d-tail in-node <#ifte> ;
+TUPLE: #if ;
+C: #if make-node ;
+: #if ( in -- node ) 1 d-tail in-node <#if> ;
 
 TUPLE: #dispatch ;
 C: #dispatch make-node ;
@@ -128,7 +128,7 @@ SYMBOL: current-node
     ] [
         ! first node
         dup dataflow-graph set  current-node set
-    ] ifte ;
+    ] if ;
 
 : nest-node ( -- dataflow current )
     dataflow-graph get  dataflow-graph off
@@ -154,15 +154,15 @@ SYMBOL: current-node
     2dup node-out-d member? >r node-out-r member? r> or ;
 
 : last-node ( node -- last )
-    dup node-successor [ last-node ] [ ] ?ifte ;
+    dup node-successor [ last-node ] [ ] ?if ;
 
 : penultimate-node ( node -- penultimate )
     dup node-successor dup [
         dup node-successor
-        [ nip penultimate-node ] [ drop ] ifte
+        [ nip penultimate-node ] [ drop ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : drop-inputs ( node -- #shuffle )
     node-in-d clone in-node <#shuffle> ;
@@ -177,7 +177,7 @@ SYMBOL: current-node
         node-successor swap each-node
     ] [
         2drop
-    ] ifte ; inline
+    ] if ; inline
 
 : each-node-with ( obj node quot -- | quot: obj node -- )
     swap [ with ] each-node 2drop ; inline
@@ -191,13 +191,13 @@ SYMBOL: current-node
                 >r node-successor r> all-nodes?
             ] [
                 2drop f
-            ] ifte
+            ] if
         ] [
             2drop f
-        ] ifte
+        ] if
     ] [
         2drop t
-    ] ifte ; inline
+    ] if ; inline
 
 : all-nodes-with? ( obj node quot -- ? | quot: obj node -- ? )
     swap [ with rot ] all-nodes? 2nip ; inline
@@ -216,7 +216,7 @@ SYMBOL: current-node
     [
         dup #call?
         [ [ node-history ?push ] keep set-node-history ]
-        [ 2drop ] ifte
+        [ 2drop ] if
     ] each-node-with ;
 
 : (clone-node) ( node -- node )

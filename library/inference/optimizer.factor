@@ -12,7 +12,7 @@ GENERIC: optimize-node* ( node -- node/t )
 
 : keep-optimizing ( node -- node ? )
     dup optimize-node* dup t =
-    [ drop f ] [ nip keep-optimizing t or ] ifte ;
+    [ drop f ] [ nip keep-optimizing t or ] if ;
 
 DEFER: optimize-node
 
@@ -27,7 +27,7 @@ DEFER: optimize-node
         dup optimize-children >r
         dup node-successor optimize-node >r
         over set-node-successor r> r> r> or or
-    ] [ r> ] ifte ;
+    ] [ r> ] if ;
 
 : optimize-1 ( dataflow -- dataflow ? )
     recursive-state off
@@ -44,7 +44,7 @@ DEFER: optimize-node
     ] with-scope ;
 
 : prune-if ( node quot -- successor/t )
-    over >r call [ r> node-successor ] [ r> drop t ] ifte ;
+    over >r call [ r> node-successor ] [ r> drop t ] if ;
     inline
 
 ! Generic nodes
@@ -60,7 +60,7 @@ M: node optimize-node* ( node -- t )
         2drop t
     ] [
         [ set-node-shuffle ] keep
-    ] ifte ;
+    ] if ;
 
 M: #shuffle optimize-node*  ( node -- node/t )
     dup node-successor dup #shuffle? [
@@ -68,11 +68,11 @@ M: #shuffle optimize-node*  ( node -- node/t )
     ] [
         drop [
             dup node-in-d over node-out-d =
-            [ dup node-in-r swap node-out-r = ] [ drop f ] ifte
+            [ dup node-in-r swap node-out-r = ] [ drop f ] if
         ] prune-if
-    ] ifte ;
+    ] if ;
 
-! #ifte
+! #if
 : static-branch? ( node -- lit ? )
     node-in-d first dup literal? ;
 
@@ -80,13 +80,13 @@ M: #shuffle optimize-node*  ( node -- node/t )
     over drop-inputs
     [ >r swap node-children nth r> set-node-successor ] keep ;
 
-M: #ifte optimize-node* ( node -- node )
+M: #if optimize-node* ( node -- node )
     dup static-branch?
-    [ literal-value 0 1 ? static-branch ] [ 2drop t ] ifte ;
+    [ literal-value 0 1 ? static-branch ] [ 2drop t ] if ;
 
 ! #values
 : optimize-fold ( node -- node/t )
-    node-successor [ node-successor ] [ t ] ifte* ;
+    node-successor [ node-successor ] [ t ] if* ;
 
 M: #values optimize-node* ( node -- node/t )
     optimize-fold ;

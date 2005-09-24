@@ -12,7 +12,7 @@ M: assert error.
     "Got: " write assert-got . ;
 
 : assert= ( a b -- )
-    2dup = [ 2drop ] [ <assert> throw ] ifte ;
+    2dup = [ 2drop ] [ <assert> throw ] if ;
 
 : print-test ( input output -- )
     "--> " write 2array . flush ;
@@ -44,7 +44,7 @@ SYMBOL: failures
 : failure failures [ cons ] change ;
 
 : test-handler ( name quot -- ? )
-    catch [ dup error. cons failure f ] [ t ] ifte* ;
+    catch [ dup error. cons failure f ] [ t ] if* ;
 
 : test-path ( name -- path )
     "/library/test/" swap ".factor" append3 ;
@@ -111,7 +111,7 @@ SYMBOL: failures
     {
         "io/buffer" "compiler/optimizer"
         "compiler/simple"
-        "compiler/stack" "compiler/ifte"
+        "compiler/stack" "compiler/if"
         "compiler/generic" "compiler/bail-out"
         "compiler/linearizer" "compiler/intrinsics"
         "compiler/identities"

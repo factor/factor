@@ -20,5 +20,5 @@ C: queue ( -- queue ) ;
             f rot set-queue-in
         ] [
             "Empty queue" throw
-        ] ifte*
-    ] ifte* ;
+        ] if*
+    ] if* ;

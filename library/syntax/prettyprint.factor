@@ -60,7 +60,7 @@ C: section ( length -- section )
         line-count inc
         line-limit? [ "..." write end-printing get continue ] when
         "\n" write do-indent
-    ] ifte ;
+    ] if ;
 
 TUPLE: text string style ;
 
@@ -83,14 +83,14 @@ C: block ( -- block )
 : pprinter-block pprinter-stack peek ;
 
 : block-empty? ( section -- ? )
-    dup block? [ block-sections empty? ] [ drop f ] ifte ;
+    dup block? [ block-sections empty? ] [ drop f ] if ;
 
 : add-section ( section stream -- )
     over block-empty? [
         2drop
     ] [
         pprinter-block block-sections push
-    ] ifte ;
+    ] if ;
 
 : text ( string style -- ) <text> pprinter get add-section ;
 
@@ -103,11 +103,11 @@ C: block ( -- block )
     dup section-start fresh-line dup pprint-section*
     dup indent>
     dup section-nl-after?
-    [ section-end fresh-line ] [ drop ] ifte ;
+    [ section-end fresh-line ] [ drop ] if ;
 
 : pprint-section ( section -- )
     dup section-fits?
-    [ pprint-section* ] [ inset-section ] ifte ;
+    [ pprint-section* ] [ inset-section ] if ;
 
 TUPLE: newline ;
 
@@ -122,7 +122,7 @@ M: newline pprint-section* ( newline -- )
         drop
     ] [
         section-start last-newline get = [ " " write ] unless
-    ] ifte ;
+    ] if ;
 
 M: block pprint-section* ( block -- )
     f swap block-sections [
@@ -207,8 +207,8 @@ M: real pprint* ( obj -- ) number>string f text ;
     dup quotable? [
         ,
     ] [
-        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?ifte %
-    ] ifte ;
+        dup ch>ascii-escape [ ] [ ch>unicode-escape ] ?if %
+    ] if ;
 
 : do-string-limit ( string -- string )
     string-limit get [
@@ -249,13 +249,13 @@ M: dll pprint* ( obj -- str ) dll-path "DLL\" " pprint-string ;
             over recursion-check [ cons ] change
             call
             recursion-check [ cdr ] change
-        ] ifte
-    ] ifte ; inline
+        ] if
+    ] if ; inline
 
 : length-limit? ( seq -- seq ? )
     length-limit get dup
-    [ swap 2dup length < [ head t ] [ nip f ] ifte ]
-    [ drop f ] ifte ;
+    [ swap 2dup length < [ head t ] [ nip f ] if ]
+    [ drop f ] if ;
 
 : pprint-element ( object -- )
     dup parsing? [ \ POSTPONE: pprint-word ] when pprint* ;
@@ -273,7 +273,7 @@ M: complex pprint* ( num -- )
 
 M: cons pprint* ( list -- )
    [
-       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] ifte
+       dup list? [ \ [ \ ] ] [ uncons 2array \ [[ \ ]] ] if
        pprint-sequence
    ] check-recursion ;
 
@@ -299,14 +299,14 @@ M: alien pprint* ( alien -- )
         drop "( alien expired )"
     ] [
         \ ALIEN: pprint-word alien-address number>string
-    ] ifte f text ;
+    ] if f text ;
 
 M: wrapper pprint* ( wrapper -- )
     dup wrapped word? [
         \ \ pprint-word wrapped pprint-word
     ] [
         wrapped 1array \ W[ \ ]W pprint-sequence
-    ] ifte ;
+    ] if ;
 
 : with-pprint ( quot -- )
     [

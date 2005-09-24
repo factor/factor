@@ -13,7 +13,7 @@ GENERIC: sqrt ( n -- n ) foldable
 
 M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
 
-M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] ifte ;
+M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
 : norm ( vec -- n ) norm-sq sqrt ;
 
@@ -37,7 +37,7 @@ M: number ^ ( z w -- z^w )
         2drop
     ] [
         2dup >r >r >r 1 bitand r> call r> -1 shift r> each-bit
-    ] ifte ; inline
+    ] if ; inline
 
 : (integer^) ( z w -- z^w )
     1 swap [ 1 number= [ dupd * ] when >r sq r> ] each-bit nip ;
@@ -47,8 +47,8 @@ M: integer ^ ( z w -- z^w )
     over 0 number= over 0 number= and [
         "0^0 is not defined" throw
     ] [
-        dup 0 < [ neg ^ recip ] [ (integer^) ] ifte
-    ] ifte ;
+        dup 0 < [ neg ^ recip ] [ (integer^) ] if
+    ] if ;
 
 : (^mod) ( n z w -- z^w )
     1 swap [
@@ -61,4 +61,4 @@ M: integer ^ ( z w -- z^w )
         [ >r neg r> ^mod ] keep mod-inv
     ] [
         -rot (^mod)
-    ] ifte ; foldable
+    ] if ; foldable

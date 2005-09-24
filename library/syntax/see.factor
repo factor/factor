@@ -5,7 +5,7 @@ USING: generic hashtables io kernel lists math namespaces
 sequences styles words ;
 
 : declaration. ( word prop -- )
-    tuck word-name word-prop [ pprint-word ] [ drop ] ifte ;
+    tuck word-name word-prop [ pprint-word ] [ drop ] if ;
 
 : declarations. ( word -- )
     [
@@ -34,7 +34,7 @@ sequences styles words ;
     dup "stack-effect" word-prop [ ] [
         "infer-effect" word-prop
         dup [ effect>string ] when
-    ] ?ifte ;
+    ] ?if ;
 
 : stack-effect. ( string -- )
     [ "(" swap ")" append3 comment. ] when* ;
@@ -87,7 +87,7 @@ GENERIC: class. ( word -- )
         ] each-with
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 M: union class.
     \ UNION: pprint-word

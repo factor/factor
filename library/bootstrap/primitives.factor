@@ -28,7 +28,7 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
 {
     { "execute" "words"                     }
     { "call" "kernel"                       }
-    { "ifte" "kernel"                       }
+    { "if" "kernel"                         }
     { "dispatch" "kernel-internals"         }
     { "cons" "lists"                        }
     { "<vector>" "vectors"                  }

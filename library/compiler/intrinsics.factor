@@ -15,19 +15,19 @@ namespaces sequences words ;
     #! If the tag is known, output it, otherwise f.
     node-classes ?hash dup [
         types [ type-tag ] map dup all-equal?
-        [ first ] [ drop f ] ifte
+        [ first ] [ drop f ] if
     ] [
         drop f
-    ] ifte ;
+    ] if ;
 
 : slot@ ( node -- n/f )
     #! Compute slot offset.
     dup node-in-d reverse dup first dup literal? [
         literal-value cell * swap second
-        rot value-tag dup [ - ] [ 2drop f ] ifte
+        rot value-tag dup [ - ] [ 2drop f ] if
     ] [
         3drop f
-    ] ifte ;
+    ] if ;
 
 \ slot [
     dup slot@ [
@@ -40,7 +40,7 @@ namespaces sequences words ;
         -1 %inc-d ,
         0 %untag ,
         1 0 %slot ,
-    ] ifte  out-1
+    ] if  out-1
 ] "intrinsic" set-word-prop
 
 \ set-slot [
@@ -55,7 +55,7 @@ namespaces sequences words ;
         -3 %inc-d ,
         1 %untag ,
         0 1 2 %set-slot ,
-    ] ifte
+    ] if
     1 %write-barrier ,
 ] "intrinsic" set-word-prop
 
@@ -109,7 +109,7 @@ namespaces sequences words ;
     >r binary-imm dup r> execute , out-1 ; inline
 
 : literal-immediate? ( value -- ? )
-    dup literal? [ literal-value immediate? ] [ drop f ] ifte ;
+    dup literal? [ literal-value immediate? ] [ drop f ] if ;
 
 : binary-op-imm? ( node -- ? )
     fixnum-imm? >r node-peek literal-immediate? r> and ;
@@ -117,7 +117,7 @@ namespaces sequences words ;
 : binary-op ( node op -- )
     #! out is a vreg where the vop stores the result.
     over binary-op-imm?
-    [ binary-op-imm ] [ binary-op-reg ] ifte ;
+    [ binary-op-imm ] [ binary-op-reg ] if ;
 
 {
     { fixnum+       %fixnum+       }
@@ -138,7 +138,7 @@ namespaces sequences words ;
 
 : binary-jump ( node label op -- )
     pick binary-op-imm?
-    [ binary-jump-imm ] [ binary-jump-reg ] ifte ;
+    [ binary-jump-imm ] [ binary-jump-reg ] if ;
 {
     { fixnum<= %jump-fixnum<= }
     { fixnum<  %jump-fixnum<  }
@@ -147,7 +147,7 @@ namespaces sequences words ;
     { eq?      %jump-eq?      }
 } [
     first2 [ literalize , \ binary-jump , ] [ ] make
-    "ifte-intrinsic" set-word-prop
+    "if-intrinsic" set-word-prop
 ] each
 
 \ fixnum/i [
@@ -198,10 +198,10 @@ namespaces sequences words ;
             nip fast-fixnum*
         ] [
             drop slow-fixnum*
-        ] ifte
+        ] if
     ] [
         drop slow-fixnum*
-    ] ifte
+    ] if
 ] "intrinsic" set-word-prop
 
 : slow-shift ( -- ) \ fixnum-shift %call , ;
@@ -215,7 +215,7 @@ namespaces sequences words ;
     ] [
         neg 0 <vreg> 0 <vreg> %fixnum>> ,
         out-1
-    ] ifte ;
+    ] if ;
 
 : positive-shift ( n -- )
     dup cell 8 * tag-bits - <= [
@@ -225,7 +225,7 @@ namespaces sequences words ;
         out-1
     ] [
         drop slow-shift
-    ] ifte ;
+    ] if ;
 
 : fast-shift ( n -- )
     dup 0 = [
@@ -236,13 +236,13 @@ namespaces sequences words ;
             negative-shift
         ] [
             positive-shift
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 \ fixnum-shift [
     node-peek dup literal? [
         literal-value fast-shift
     ] [
         drop slow-shift
-    ] ifte
+    ] if
 ] "intrinsic" set-word-prop

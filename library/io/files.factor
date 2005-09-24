@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: io
-USING: hashtables kernel lists namespaces sequences strings ;
+USING: hashtables kernel lists math namespaces sequences strings ;
 
 ! Words for accessing filesystem meta-data.
 
@@ -19,7 +19,7 @@ USING: hashtables kernel lists namespaces sequences strings ;
 : file-length ( file -- length ) stat third ;
 
 : file-extension ( filename -- extension )
-    "." split cdr dup [ peek ] when ;
+    "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
 : resource-path ( path -- path )
     "resource-path" get [ "." ] unless* swap path+ ;

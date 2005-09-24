@@ -37,7 +37,7 @@ SYMBOL: 64-bits
         emit
     ] [
         d>w/w big-endian get [ swap ] unless emit emit
-    ] ifte ;
+    ] if ;
 
 : emit-seq ( seq -- ) image get swap nappend ;
 
@@ -175,13 +175,13 @@ M: f ' ( obj -- ptr )
 : transfer-word ( word -- word )
     #! This is a hack. See doc/bootstrap.txt.
     dup dup word-name swap word-vocabulary lookup
-    [ ] [ dup "Missing DEFER: " word-error ] ?ifte ;
+    [ ] [ dup "Missing DEFER: " word-error ] ?if ;
 
 : pooled-object ( object -- ptr ) objects get hash ;
 
 : fixup-word ( word -- offset )
     transfer-word dup pooled-object dup
-    [ nip ] [ "Not in image: " word-error ] ifte ;
+    [ nip ] [ "Not in image: " word-error ] if ;
 
 : fixup-words ( -- )
     image get [ dup word? [ fixup-word ] when ] inject ;
@@ -297,7 +297,7 @@ M: hashtable ' ( hashtable -- pointer )
         [ swap >be write ] each-with
     ] [
         [ swap >le write ] each-with
-    ] ifte ;
+    ] if ;
 
 : write-image ( image file -- )
     "Writing image to " write dup write "..." print

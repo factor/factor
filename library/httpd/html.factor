@@ -16,7 +16,7 @@ presentation sequences strings styles words ;
 : chars>entities ( str -- str )
     #! Convert <, >, &, ' and " to HTML entities.
     [
-        [ dup html-entities assoc [ % ] [ , ] ?ifte ] each
+        [ dup html-entities assoc [ % ] [ , ] ?if ] each
     ] "" make ;
 
 : hex-color, ( triplet -- )
@@ -56,7 +56,7 @@ presentation sequences strings styles words ;
         drop call
     ] [
         <span =style span> call </span>
-    ] ifte ;
+    ] if ;
 
 : resolve-file-link ( path -- link )
     #! The file responder needs relative links not absolute
@@ -73,7 +73,7 @@ presentation sequences strings styles words ;
         <a file-link-href =href a> call </a>
     ] [
         call
-    ] ifte* ;
+    ] if* ;
 
 : browser-link-href ( word -- href )
     dup word-name swap word-vocabulary
@@ -89,13 +89,13 @@ presentation sequences strings styles words ;
         <a browser-link-href =href a> call </a>
     ] [
         drop call
-    ] ifte ;
+    ] if ;
 
 TUPLE: html-stream ;
 
 M: html-stream stream-write1 ( char stream -- )
     [
-        dup html-entities assoc [ write ] [ write1 ] ?ifte
+        dup html-entities assoc [ write ] [ write1 ] ?if
     ] with-wrapper ;
 
 M: html-stream stream-format ( str style stream -- )

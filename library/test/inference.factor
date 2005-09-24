@@ -26,19 +26,19 @@ math-internals namespaces parser sequences test vectors ;
 
 [ @{ 2 4 }@ ] [ [ 2dup ] infer ] unit-test
 
-[ @{ 1 0 }@ ] [ [ [ ] [ ] ifte ] infer ] unit-test
-[ [ ifte ] infer ] unit-test-fails
-[ [ [ ] ifte ] infer ] unit-test-fails
-[ [ [ 2 ] [ ] ifte ] infer ] unit-test-fails
-[ @{ 4 3 }@ ] [ [ [ rot ] [ -rot ] ifte ] infer ] unit-test
+[ @{ 1 0 }@ ] [ [ [ ] [ ] if ] infer ] unit-test
+[ [ if ] infer ] unit-test-fails
+[ [ [ ] if ] infer ] unit-test-fails
+[ [ [ 2 ] [ ] if ] infer ] unit-test-fails
+[ @{ 4 3 }@ ] [ [ [ rot ] [ -rot ] if ] infer ] unit-test
 
 [ @{ 4 3 }@ ] [
     [
         [
-            [ swap 3 ] [ nip 5 5 ] ifte
+            [ swap 3 ] [ nip 5 5 ] if
         ] [
             -rot
-        ] ifte
+        ] if
     ] infer
 ] unit-test
 
@@ -54,38 +54,38 @@ math-internals namespaces parser sequences test vectors ;
 ] unit-test
 
 [
-    [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] ifte call
+    [ [ 2 2 fixnum+ ] ] [ [ 2 2 fixnum* ] ] if call
 ] unit-test-fails
 
 ! Test inference of termination of control flow
 : termination-test-1
     "foo" throw ;
 
-: termination-test-2 [ termination-test-1 ] [ 3 ] ifte ;
+: termination-test-2 [ termination-test-1 ] [ 3 ] if ;
 
 [ @{ 1 1 }@ ] [ [ termination-test-2 ] infer ] unit-test
 
 : infinite-loop infinite-loop ;
 
 : simple-recursion-1
-    dup [ simple-recursion-1 ] [ ] ifte ;
+    dup [ simple-recursion-1 ] [ ] if ;
 
 [ @{ 1 1 }@ ] [ [ simple-recursion-1 ] infer ] unit-test
 
 : simple-recursion-2
-    dup [ ] [ simple-recursion-2 ] ifte ;
+    dup [ ] [ simple-recursion-2 ] if ;
 
 [ @{ 1 1 }@ ] [ [ simple-recursion-2 ] infer ] unit-test
 
 : bad-recursion-2
-    dup [ uncons bad-recursion-2 ] [ ] ifte ;
+    dup [ uncons bad-recursion-2 ] [ ] if ;
 
 [ [ bad-recursion-2 ] infer ] unit-test-fails
 
 ! Not sure how to fix this one
 
 : funny-recursion
-    dup [ funny-recursion 1 ] [ 2 ] ifte drop ;
+    dup [ funny-recursion 1 ] [ 2 ] if drop ;
 
 [ @{ 1 1 }@ ] [ [ funny-recursion ] infer ] unit-test
 
@@ -96,7 +96,7 @@ math-internals namespaces parser sequences test vectors ;
 DEFER: foe
 
 : fie ( element obj -- ? )
-    dup cons? [ foe ] [ eq? ] ifte ;
+    dup cons? [ foe ] [ eq? ] if ;
 
 : foe ( element tree -- ? )
     dup [
@@ -107,11 +107,11 @@ DEFER: foe
                 foe
             ] [
                 fie
-            ] ifte
-        ] ifte
+            ] if
+        ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 [ @{ 2 1 }@ ] [ [ fie ] infer ] unit-test
 [ @{ 2 1 }@ ] [ [ foe ] infer ] unit-test
@@ -143,7 +143,7 @@ SYMBOL: sym-test
         car
     ] [
         not-a-number
-    ] ifte ;
+    ] if ;
 
 [ @{ 1 1 }@ ] [ [ terminator-branch ] infer ] unit-test
 
@@ -152,7 +152,7 @@ SYMBOL: sym-test
         recursive-terminator
     ] [
         not-a-number
-    ] ifte ;
+    ] if ;
 
 [ @{ 1 0 }@ ] [ [ recursive-terminator ] infer ] unit-test
 
@@ -177,7 +177,7 @@ DEFER: agent
 [ @{ 0 2 }@ ]
 [ [ [ drop ] 0 agent ] infer ] unit-test
 
-! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] ifte ;
+! : no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
 ! [ [ no-base-case-1 ] infer ] unit-test-fails
 
 : no-base-case-2 no-base-case-2 ;
@@ -229,13 +229,13 @@ DEFER: agent
 [ @{ 0 1 }@ ] [ [ bad-code ] infer ] unit-test
 
 ! This form should not have a stack effect
-! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] ifte ;
+! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 ! [ [ bad-bin ] infer ] unit-test-fails
 
 ! [ [ infinite-loop ] infer ] unit-test-fails
 
 ! : bad-recursion-1
-!     dup [ drop bad-recursion-1 5 ] [ ] ifte ;
+!     dup [ drop bad-recursion-1 5 ] [ ] if ;
 ! 
 ! [ [ bad-recursion-1 ] infer ] unit-test-fails
 

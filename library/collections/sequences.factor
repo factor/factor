@@ -52,7 +52,7 @@ TUPLE: bounds-error index seq ;
 
 : growable-check ( n seq -- fx seq )
     >r >fixnum dup 0 fixnum<
-    [ r> 2dup bounds-error ] [ r> ] ifte ; inline
+    [ r> 2dup bounds-error ] [ r> ] if ; inline
 
 : bounds-check ( n seq -- fx seq )
     growable-check 2dup length fixnum>=

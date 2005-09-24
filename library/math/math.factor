@@ -51,21 +51,21 @@ GENERIC: ceiling  ( n -- n ) foldable
 
 : rem ( x y -- x%y )
     #! Like modulus, but always gives a positive result.
-    [ mod ] keep  over 0 < [ + ] [ drop ] ifte ; inline
+    [ mod ] keep  over 0 < [ + ] [ drop ] if ; inline
 
 : sgn ( n -- -1/0/1 )
     #! Push the sign of a real number.
-    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] ifte ; foldable
+    dup 0 = [ drop 0 ] [ 1 < -1 1 ? ] if ; foldable
 
 GENERIC: abs ( z -- |z| ) foldable
 GENERIC: absq ( n -- |n|^2 ) foldable
 
 : align ( offset width -- offset )
-    2dup mod dup 0 number= [ 2drop ] [ - + ] ifte ; inline
+    2dup mod dup 0 number= [ 2drop ] [ - + ] if ; inline
 
 : (repeat) ( i n quot -- )
     pick pick >=
-    [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] ifte ;
+    [ 3drop ] [ [ swap >r call 1+ r> ] keep (repeat) ] if ;
     inline
 
 : repeat ( n quot -- | quot: n -- n )
@@ -81,14 +81,14 @@ GENERIC: absq ( n -- |n|^2 ) foldable
         dup dup neg bitand =
     ] [
         drop f
-    ] ifte ; foldable
+    ] if ; foldable
 
 : log2 ( n -- b )
     #! Log base two for integers.
     dup 0 <= [
         "Input must be positive" throw
     ] [
-        dup 1 = [ drop 0 ] [ 2 /i log2 1+ ] ifte
-    ] ifte ; foldable
+        dup 1 = [ drop 0 ] [ 2 /i log2 1+ ] if
+    ] if ; foldable
 
 GENERIC: number>string ( str -- num ) foldable

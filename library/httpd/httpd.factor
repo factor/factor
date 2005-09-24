@@ -14,7 +14,7 @@ sequences ;
       >r (url>path) "?" r> append3
     ] [
       drop (url>path)
-    ] ifte ;
+    ] if ;
 
 : secure-path ( path -- path )
     ".." over subseq? [ drop f ] when ;
@@ -44,10 +44,10 @@ sequences ;
             swap handle-request
         ] [
             2drop bad-request
-        ] ifte
+        ] if
     ] [
         2drop bad-request
-    ] ifte ;
+    ] if ;
 
 : httpd ( port -- )
     \ httpd [

@@ -17,7 +17,7 @@ IN: math-internals
     [ >fraction ] 2apply swapd ; inline
 
 M: ratio number= ( a/b c/d -- ? )
-    2>fraction number= [ number= ] [ 2drop f ] ifte ;
+    2>fraction number= [ number= ] [ 2drop f ] if ;
 
 : scale ( a/b c/d -- a*d b*c )
     2>fraction >r * swap r> * swap ; inline

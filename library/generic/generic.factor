@@ -26,14 +26,14 @@ SYMBOL: builtins
         swap "predicating" set-word-prop
     ] [
         3drop
-    ] ifte ;
+    ] if ;
 
 : superclass "superclass" word-prop ;
 
 : members "members" word-prop ;
 
 : (flatten) ( class -- )
-    dup members [ [ (flatten) ] each ] [ dup set ] ?ifte ;
+    dup members [ [ (flatten) ] each ] [ dup set ] ?if ;
 
 : flatten ( class -- classes )
     #! Outputs a sequence of classes whose union is this class.
@@ -43,7 +43,7 @@ SYMBOL: builtins
     #! Only valid for a flattened class.
     flatten [
         car dup superclass
-        [ (types) ] [ "type" word-prop dup set ] ?ifte
+        [ (types) ] [ "type" word-prop dup set ] ?if
     ] hash-each ;
 
 : types ( class -- types )
@@ -52,7 +52,7 @@ SYMBOL: builtins
 DEFER: class<
 
 : superclass< ( cls1 cls2 -- ? )
-    >r superclass r> over [ class< ] [ 2drop f ] ifte ;
+    >r superclass r> over [ class< ] [ 2drop f ] if ;
 
 : (class<) ( cls1 cls2 -- ? )
     [ flatten hash-keys ] 2apply
@@ -70,7 +70,7 @@ DEFER: class<
     }@ cond ;
 
 : class-compare ( cls1 cls2 -- -1/0/1 )
-    2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] ifte ;
+    2dup eq? [ 2drop 0 ] [ class< 1 -1 ? ] if ;
 
 : methods ( generic -- alist )
     "methods" word-prop hash>alist [ 2car class-compare ] sort ;
@@ -105,7 +105,7 @@ M: generic definer drop \ G: ;
 
 : init-methods ( word -- )
      dup "methods" word-prop
-     [ drop ] [ {{ }} clone "methods" set-word-prop ] ifte ;
+     [ drop ] [ {{ }} clone "methods" set-word-prop ] if ;
 
 ! Defining generic words
 
@@ -136,8 +136,8 @@ M: generic definer drop \ G: ;
             (builtin-supertypes)
         ] [
             dup set
-        ] ?ifte
-    ] ?ifte ;
+        ] ?if
+    ] ?if ;
 
 : builtin-supertypes ( class -- classes )
     #! Outputs a sequence of builtin classes whose union is the
@@ -164,7 +164,7 @@ M: generic definer drop \ G: ;
     #! Is this class the smallest class in the sequence?
     [ dupd classes-intersect? ] subset
     [ class-compare neg ] sort
-    tuck [ class< ] all-with? [ first ] [ drop f ] ifte ;
+    tuck [ class< ] all-with? [ first ] [ drop f ] if ;
 
 : define-class ( class -- )
     dup t "class" set-word-prop
@@ -184,7 +184,7 @@ M: generic definer drop \ G: ;
     pick define-class
     3dup nip "definition" set-word-prop
     pick superclass "predicate" word-prop
-    [ \ dup , % , [ drop f ] , \ ifte , ] [ ] make
+    [ \ dup , % , [ drop f ] , \ if , ] [ ] make
     define-predicate ;
 
 PREDICATE: word predicate "definition" word-prop ;

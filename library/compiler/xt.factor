@@ -25,7 +25,7 @@ SYMBOL: compiled-xts
     compiled-xts off ;
 
 : compiled-xt ( word -- xt )
-    dup compiled-xts get assoc [ ] [ word-xt ] ?ifte ;
+    dup compiled-xts get assoc [ ] [ word-xt ] ?if ;
 
 ! When a word is encountered that has not been previously
 ! compiled, it is pushed onto this vector. Compilation stops
@@ -124,8 +124,8 @@ M: absolute-16/16 fixup ( absolute -- ) >absolute fixup-16/16 ;
             drop t
         ] [
             compiled-xts get assoc
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 : fixup-xts ( -- )
     deferred-xts get [ fixup ] each  deferred-xts off ;

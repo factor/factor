@@ -10,7 +10,7 @@ USING: compiler kernel math namespaces sequences strings test ;
         string-step
     ] [
         2drop
-    ] ifte ; compiled
+    ] if ; compiled
 
 : string-benchmark ( n -- )
     "abcdef" 10 [ 2dup string-step ] times 2drop ; compiled

@@ -48,10 +48,10 @@ SYMBOL: d
             drop
         ] [
             event-loop
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ; compiled
+    ] if ; compiled
 
 : dejong ( -- )
     ! Fiddle with these four values!

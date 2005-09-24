@@ -19,27 +19,27 @@ SYMBOL: line-number
 : use+ ( string -- ) "use" [ cons ] change ;
 
 : parsing? ( word -- ? )
-    dup word? [ "parsing" word-prop ] [ drop f ] ifte ;
+    dup word? [ "parsing" word-prop ] [ drop f ] if ;
 
 SYMBOL: file
 
 : skip ( i seq quot -- n | quot: elt -- ? )
     over >r find* drop dup -1 =
-    [ drop r> length ] [ r> drop ] ifte ; inline
+    [ drop r> length ] [ r> drop ] if ; inline
 
 : skip-blank ( -- )
     "col" [ "line" get [ blank? not ] skip ] change ;
 
 : skip-word ( n line -- n )
-    2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] ifte ;
+    2dup nth CHAR: " = [ drop 1+ ] [ [ blank? ] skip ] if ;
 
 : (scan) ( n line -- start end )
-    dupd 2dup length < [ skip-word ] [ drop ] ifte ;
+    dupd 2dup length < [ skip-word ] [ drop ] if ;
 
 : scan ( -- token )
     skip-blank
     "col" [ "line" get (scan) dup ] change
-    2dup = [ 2drop f ] [ "line" get subseq ] ifte ;
+    2dup = [ 2drop f ] [ "line" get subseq ] if ;
 
 : save-location ( word -- )
     #! Remember where this word was defined.
@@ -60,7 +60,7 @@ global [ string-mode off ] bind
 : scan-word ( -- obj )
     scan dup [
         dup ";" = not string-mode get and [
-            dup "use" get search [ ] [ string>number ] ?ifte
+            dup "use" get search [ ] [ string>number ] ?if
         ] unless
     ] when ;
 
@@ -101,14 +101,14 @@ global [ string-mode off ] bind
         swap 1+ dup 4 + [ rot subseq hex> ] keep
     ] [
         over 1+ >r nth escape r>
-    ] ifte ;
+    ] if ;
 
 : next-char ( n str -- ch n )
     2dup nth CHAR: \\ = [
         >r 1+ r> next-escape
     ] [
         over 1+ >r nth r>
-    ] ifte ;
+    ] if ;
 
 : doc-comment-here? ( parsed -- ? )
     not "in-definition" get and ;
@@ -119,10 +119,10 @@ global [ string-mode off ] bind
             drop
         ] [
             word swap "stack-effect" set-word-prop
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : documentation+ ( word str -- )
     over "documentation" word-prop [
@@ -135,14 +135,14 @@ global [ string-mode off ] bind
         word swap documentation+
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : (parse-string) ( n str -- n )
     2dup nth CHAR: " = [
         drop 1+
     ] [
         [ next-char swap , ] keep (parse-string)
-    ] ifte ;
+    ] if ;
 
 : parse-string ( -- str )
     #! Read a string from the input stream, until it is

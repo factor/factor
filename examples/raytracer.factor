@@ -39,11 +39,11 @@ TUPLE: sphere center radius ;
 : -+ ( x y -- x-y x+y ) [ - ] 2keep + ;
 
 : sphere-b/d ( b d -- t )
-    -+ dup 0.0 < [ 2drop inf ] [ >r [ 0.0 > ] keep r> ? ] ifte ;
+    -+ dup 0.0 < [ 2drop inf ] [ >r [ 0.0 > ] keep r> ? ] if ;
 
 : ray-sphere ( sphere ray -- t )
     2dup sphere-v tuck sphere-b [ sphere-disc ] keep
-    over 0.0 < [ 2drop inf ] [ swap sqrt sphere-b/d ] ifte ;
+    over 0.0 < [ 2drop inf ] [ swap sqrt sphere-b/d ] if ;
 
 : sphere-n ( ray sphere l -- n )
     pick ray-dir n*v swap sphere-center v- swap ray-orig v+ ;
@@ -51,7 +51,7 @@ TUPLE: sphere center radius ;
 : if-ray-sphere ( hit ray sphere quot -- hit )
     #! quot: hit ray sphere l -- hit
     >r pick hit-lambda >r 2dup swap ray-sphere dup r> >=
-    [ 3drop ] r> ifte ; inline
+    [ 3drop ] r> if ; inline
 
 M: sphere intersect-scene ( hit ray sphere -- hit )
     [ [ sphere-n normalize ] keep <hit> nip ] if-ray-sphere ;
@@ -91,8 +91,8 @@ M: group intersect-scene ( hit ray group -- hit )
         3drop 0.0
     ] [
         dup ray-g >r sray-intersect hit-lambda inf =
-        [ r> neg ] [ r> drop 0.0 ] ifte
-    ] ifte ;
+        [ r> neg ] [ r> drop 0.0 ] if
+    ] if ;
 
 : create-center ( c r d -- c2 ) >r 3.0 12.0 sqrt / * r> n*v v+ ;
 
@@ -118,7 +118,7 @@ DEFER: create ( level c r -- scene )
     ] make-group ;
 
 : create ( level c r -- scene )
-    pick 1 = [ <sphere> nip ] [ create-group ] ifte ;
+    pick 1 = [ <sphere> nip ] [ create-group ] if ;
 
 : ss-point ( dx dy -- point )
     [ oversampling /f ] 2apply 0.0 3array ;

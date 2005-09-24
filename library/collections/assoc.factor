@@ -29,5 +29,5 @@ IN: lists USING: kernel sequences ;
     #! corresponding quotation, the value is popped off the
     #! stack.
     swap [
-        unswons rot assoc* dup [ cdr call ] [ 2drop ] ifte
+        unswons rot assoc* dup [ cdr call ] [ 2drop ] if
     ] each-with ;

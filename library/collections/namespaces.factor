@@ -49,10 +49,10 @@ strings vectors words ;
             nip cdr ( found )
         ] [
             cdr (get) ( keep looking )
-        ] ?ifte
+        ] ?if
     ] [
         2drop f
-    ] ifte ; flushable
+    ] if ; flushable
 
 : get ( variable -- value )
     #! Push the value of a variable by searching the namestack
@@ -64,7 +64,7 @@ strings vectors words ;
 : nest ( variable -- hash )
     #! If the variable is set in the current namespace, return
     #! its value, otherwise set its value to a new namespace.
-    dup namespace hash [ ] [ >r {{ }} clone dup r> set ] ?ifte ;
+    dup namespace hash [ ] [ >r {{ }} clone dup r> set ] ?if ;
 
 : change ( var quot -- )
     #! Execute the quotation with the variable value on the
@@ -102,7 +102,7 @@ SYMBOL: building
     #! Add to the sequence being built with make-seq.
     building get push ;
 
-: ?, ( obj ? -- ) [ , ] [ drop ] ifte ;
+: ?, ( obj ? -- ) [ , ] [ drop ] if ;
 
 : % ( seq -- )
     #! Append to the sequence being built with make-seq.
@@ -121,11 +121,11 @@ SYMBOL: hash-buffer
 : (closure) ( key hash -- )
     tuck hash dup [
         hash-keys [
-            dup dup closure, [ 2drop ] [ swap (closure) ] ifte
+            dup dup closure, [ 2drop ] [ swap (closure) ] if
         ] each-with
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : closure ( key hash -- list )
     [
@@ -137,4 +137,4 @@ SYMBOL: hash-buffer
 IN: lists
 
 : alist>quot ( default alist -- quot )
-    [ unswons [ % , , \ ifte , ] [ ] make ] each ;
+    [ unswons [ % , , \ if , ] [ ] make ] each ;

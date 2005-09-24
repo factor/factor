@@ -16,7 +16,7 @@ namespaces parser sequences words ;
     gensym  dup t "label" set-word-prop ;
 
 : label? ( obj -- ? )
-    dup word? [ "label" word-prop ] [ drop f ] ifte ;
+    dup word? [ "label" word-prop ] [ drop f ] if ;
 
 ! A location is a virtual register or a stack slot. We can
 ! ask a VOP if it reads or writes a location.

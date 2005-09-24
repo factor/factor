@@ -14,10 +14,10 @@ words ;
 ! slot 3 - the delegate tuple, or f
 
 : class ( object -- class )
-    dup tuple? [ 2 slot ] [ type type>class ] ifte ; inline
+    dup tuple? [ 2 slot ] [ type type>class ] if ; inline
 
 : class-tuple ( object -- class )
-    dup tuple? [ 2 slot ] [ drop f ] ifte ; inline
+    dup tuple? [ 2 slot ] [ drop f ] if ; inline
 
 : tuple-predicate ( word -- )
     #! Make a foo? word for testing the tuple class at the top
@@ -34,10 +34,10 @@ words ;
     #! forget the old definition.
     >r "in" get lookup dup [
         dup "tuple-size" word-prop r> length 2 + =
-        [ drop ] [ forget-tuple ] ifte
+        [ drop ] [ forget-tuple ] if
     ] [
         r> 2drop
-    ] ifte ;
+    ] if ;
 
 : delegate-slots @{ @{ 3 delegate set-delegate }@ }@ ;
 
@@ -84,8 +84,8 @@ M: tuple = ( obj tuple -- ? )
     2dup eq? [
         2drop t
     ] [
-        over tuple? [ array= ] [ 2drop f ] ifte
-    ] ifte ;
+        over tuple? [ array= ] [ 2drop f ] if
+    ] if ;
 
 PREDICATE: word tuple-class "tuple-size" word-prop ;
 
@@ -95,5 +95,5 @@ PREDICATE: word tuple-class "tuple-size" word-prop ;
     [ call ] 2keep rot [
         2drop t
     ] [
-        over [ >r delegate r> is? ] [ 2drop f ] ifte
-    ] ifte ; inline
+        over [ >r delegate r> is? ] [ 2drop f ] if
+    ] if ; inline

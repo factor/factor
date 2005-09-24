@@ -13,7 +13,7 @@ USE: test
             drop 1- 1 ack
         ] [
             dupd 1- ack >r 1- r> ack
-        ] ifte
-    ] ifte ; compiled
+        ] if
+    ] if ; compiled
 
 [ 4093 ] [ 3 9 ack ] unit-test

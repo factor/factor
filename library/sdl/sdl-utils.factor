@@ -58,7 +58,7 @@ SYMBOL: bpp
         bitand 0 = not
     ] [
         drop t
-    ] ifte ;
+    ] if ;
 
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
@@ -68,7 +68,7 @@ SYMBOL: bpp
             dup SDL_LockSurface drop slip dup SDL_UnlockSurface
         ] [
             slip
-        ] ifte SDL_Flip drop
+        ] if SDL_Flip drop
     ] with-scope ; inline
 
 : surface-rect ( x y surface -- rect )

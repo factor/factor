@@ -34,7 +34,7 @@ M: value literal-value ( value -- )
 ! Word properties that affect inference:
 ! - infer-effect -- must be set. controls number of inputs
 ! expected, and number of outputs produced.
-! - infer - quotation with custom inference behavior; ifte uses
+! - infer - quotation with custom inference behavior; if uses
 ! this. Word is passed on the stack.
 
 ! Vector of results we had to add to the datastack. Ie, the
@@ -50,7 +50,7 @@ SYMBOL: d-in
 
 : add-inputs ( n stack -- stack )
     tuck required-inputs dup 0 >
-    [ value-vector swap append ] [ drop ] ifte ;
+    [ value-vector swap append ] [ drop ] if ;
 
 : ensure-values ( n -- )
     dup meta-d get required-inputs d-in [ + ] change
@@ -89,7 +89,7 @@ M: wrapper apply-object wrapped apply-literal ;
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ active? [ apply-object t ] [ drop f ] ifte ] all? drop ;
+    [ active? [ apply-object t ] [ drop f ] if ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r swap recursive-state set

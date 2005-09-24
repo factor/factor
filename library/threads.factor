@@ -17,16 +17,16 @@ namespaces queues sequences vectors ;
     sleep-queue dup [ 2car swap - ] nsort ;
 
 : sleep-time ( sorted-queue -- ms )
-    dup empty? [ drop -1 ] [ peek car millis - 0 max ] ifte ;
+    dup empty? [ drop -1 ] [ peek car millis - 0 max ] if ;
 
 DEFER: next-thread
 
 : do-sleep ( -- quot )
     sleep-queue* dup sleep-time dup 0 =
-    [ drop pop cdr ] [ nip io-multiplex next-thread ] ifte ;
+    [ drop pop cdr ] [ nip io-multiplex next-thread ] if ;
 
 : next-thread ( -- quot )
-    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] ifte ;
+    run-queue dup queue-empty? [ drop do-sleep ] [ deque ] if ;
 
 : stop ( -- ) next-thread continue ;
 
@@ -77,7 +77,7 @@ GENERIC: tick ( ms object -- )
         [ advance-timer ] keep timer-object tick
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : do-timers ( -- )
     millis timers hash-values [ do-timer ] each-with ;

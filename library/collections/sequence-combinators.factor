@@ -91,8 +91,8 @@ M: object map ( seq quot -- seq )
             r> dup r> nth-unsafe r> drop
         ] [
             r> 1+ r> r> find*
-        ] ifte
-    ] ifte ; inline
+        ] if
+    ] if ; inline
 
 : find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
     -rot [ with rot ] find* 2swap 2drop ; inline
@@ -122,7 +122,7 @@ M: object find ( seq quot -- i elt )
                 r> r> r> [ push ] keep swap
             ] [
                 r> r> drop r> swap
-            ] ifte
+            ] if
         ] each drop
     ] keep like ; inline
 

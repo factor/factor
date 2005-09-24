@@ -25,7 +25,7 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
     add-mindmap-node ;
 
 : mindmap-child ( left? right? obj -- gadget )
-    dup [ gadget? ] is? [ 2nip ] [ <mindmap> ] ifte ;
+    dup [ gadget? ] is? [ 2nip ] [ <mindmap> ] if ;
 
 : mindmap-children ( seq left? right? -- gadget )
     rot [ >r 2dup r> mindmap-child ] map 2nip
@@ -40,10 +40,10 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
     0 over set-pack-align ;
 
 : add-nonempty ( child gadget -- )
-    over gadget-children empty? [ 2drop ] [ add-gadget ] ifte ;
+    over gadget-children empty? [ 2drop ] [ add-gadget ] if ;
 
 : if-left ( mindmap quot -- | quot: mindmap -- )
-    >r dup mindmap-left? r> [ drop ] ifte ; inline
+    >r dup mindmap-left? r> [ drop ] if ; inline
 
 : expand-left ( mindmap -- )
     [
@@ -52,7 +52,7 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
     ] if-left ;
 
 : if-right ( mindmap quot -- | quot: mindmap -- )
-    >r dup mindmap-right? r> [ drop ] ifte ; inline
+    >r dup mindmap-right? r> [ drop ] if ; inline
 
 : expand-right ( mindmap -- )
     [
@@ -69,7 +69,7 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
 
 : toggle-expanded ( mindmap -- )
     dup mindmap-expanded?
-    [ collapse-mindmap ] [ expand-mindmap ] ifte ;
+    [ collapse-mindmap ] [ expand-mindmap ] if ;
 
 C: mindmap ( left? right? node -- gadget )
     <shelf> over set-delegate

@@ -22,7 +22,7 @@ USING: namespaces ;
     byte-bit 1 swap shift bitand 0 > ;
 
 : set-bit ( ? byte bit -- byte )
-    1 swap shift rot [ bitor ] [ bitnot bitand ] ifte ;
+    1 swap shift rot [ bitor ] [ bitnot bitand ] if ;
 
 : set-bit-nth ( ? n alien -- )
     [ byte-bit set-bit ] 2keep
@@ -64,7 +64,7 @@ TUPLE: port handle error timeout cutoff type sbuf eof? ;
     ] unless 2drop ;
 
 : make-buffer ( n -- buffer/f )
-    dup 0 > [ <buffer> ] [ drop f ] ifte ;
+    dup 0 > [ <buffer> ] [ drop f ] if ;
 
 C: port ( handle buffer -- port )
     [ 0 swap set-port-timeout ] keep
@@ -75,7 +75,7 @@ C: port ( handle buffer -- port )
 
 : touch-port ( port -- )
     dup port-timeout dup 0 =
-    [ 2drop ] [ millis + swap set-port-cutoff ] ifte ;
+    [ 2drop ] [ millis + swap set-port-cutoff ] if ;
 
 M: port set-timeout ( timeout port -- )
     [ set-port-timeout ] keep touch-port ;
@@ -94,7 +94,7 @@ M: port set-timeout ( timeout port -- )
 : defer-error ( port -- ? )
     #! Return t if it is an unrecoverable error.
     err_no dup EAGAIN = over EINTR = or
-    [ 2drop f ] [ strerror swap report-error t ] ifte ;
+    [ 2drop f ] [ strerror swap report-error t ] if ;
 
 ! Associates a port with a list of continuations waiting on the
 ! port to finish I/O
@@ -121,14 +121,14 @@ GENERIC: task-container ( task -- vector )
         rot set-io-task-callbacks
     ] [
         drop swap remove-io-task
-    ] ifte ;
+    ] if ;
 
 : handle-fd ( task -- )
     dup do-io-task [
         dup io-task-port touch-port pop-callback continue
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : timeout? ( port -- ? )
     port-cutoff dup 0 = not swap millis < and ;
@@ -140,8 +140,8 @@ GENERIC: task-container ( task -- vector )
             nip pop-callback continue
         ] [
             tuck io-task-fd swap bit-nth
-            [ handle-fd ] [ drop ] ifte
-        ] ifte
+            [ handle-fd ] [ drop ] if
+        ] if
     ] hash-each-with ;
 
 : init-fdset ( fdset tasks -- )
@@ -167,7 +167,7 @@ GENERIC: task-container ( task -- vector )
     O_RDONLY file-mode open dup io-error ;
 
 : reader-eof ( reader -- )
-    dup port-sbuf empty? [ t swap set-port-eof? ] [ drop ] ifte ;
+    dup port-sbuf empty? [ t swap set-port-eof? ] [ drop ] if ;
 
 : (refill) ( port -- n )
     >port< dup buffer-end swap buffer-capacity read ;
@@ -179,10 +179,10 @@ GENERIC: task-container ( task -- vector )
             swap n>buffer t
         ] [
             drop defer-error
-        ] ifte
+        ] if
     ] [
         drop t
-    ] ifte ;
+    ] if ;
 
 ! Reading character counts
 : read-step ( count reader -- ? )
@@ -191,7 +191,7 @@ GENERIC: task-container ( task -- vector )
         buffer> nappend t
     ] [
         buffer>> nip nappend f
-    ] ifte ;
+    ] if ;
 
 : can-read-count? ( count reader -- ? )
     dup pending-error 0 over port-sbuf set-length read-step ;
@@ -210,10 +210,10 @@ M: read-task do-io-task ( task -- ? )
             reader-eof drop t
         ] [
             read-step
-        ] ifte
+        ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 M: read-task task-container drop read-tasks get ;
 
@@ -225,12 +225,12 @@ M: read-task task-container drop read-tasks get ;
 M: port stream-read ( count stream -- string )
     dup input check-port
     [ wait-to-read ] keep dup port-eof?
-    [ drop f ] [ port-sbuf >string ] ifte ;
+    [ drop f ] [ port-sbuf >string ] if ;
 
 M: port stream-read1 ( stream -- char/f )
     dup input check-port
     1 over wait-to-read dup port-eof?
-    [ drop f ] [ port-sbuf first ] ifte ;
+    [ drop f ] [ port-sbuf first ] if ;
 
 ! Writers
 
@@ -246,7 +246,7 @@ M: port stream-read1 ( stream -- char/f )
         swap buffer-consume
     ] [
         drop defer-error drop
-    ] ifte ;
+    ] if ;
 
 : can-write? ( len writer -- ? )
     #! If the buffer is empty and the string is too long,
@@ -256,7 +256,7 @@ M: port stream-read1 ( stream -- char/f )
         2drop t
     ] [
         [ buffer-fill + ] keep buffer-capacity <=
-    ] ifte ;
+    ] if ;
 
 TUPLE: write-task ;
 
@@ -268,7 +268,7 @@ M: write-task do-io-task
         0 swap buffer-reset t
     ] [
         write-step f
-    ] ifte ;
+    ] if ;
 
 M: write-task task-container drop write-tasks get ;
 
@@ -279,10 +279,10 @@ M: write-task task-container drop write-tasks get ;
             set-io-task-callbacks
         ] [
             drop add-io-task
-        ] ifte
+        ] if
     ] [
         add-io-task
-    ] ifte* ;
+    ] if* ;
 
 M: port stream-flush ( stream -- )
     dup output check-port

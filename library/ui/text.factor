@@ -20,7 +20,7 @@ sequences strings styles ;
     ] [
         0 <int> 0 <int> [ TTF_SizeUNICODE drop ] 2keep
         [ *int ] 2apply
-    ] ifte ;
+    ] if ;
 
 : draw-string ( gadget text -- )
     filter-nulls dup empty? [
@@ -31,4 +31,4 @@ sequences strings styles ;
         TTF_RenderUNICODE_Blended
         [ >r origin get first2 r> draw-surface ] keep
         SDL_FreeSurface
-    ] ifte ;
+    ] if ;

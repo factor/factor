@@ -6,13 +6,13 @@ io strings ;
 
 : parse-host ( url -- host port )
     #! Extract the host name and port number from an HTTP URL.
-    ":" split1 [ string>number ] [ 80 ] ifte* ;
+    ":" split1 [ string>number ] [ 80 ] if* ;
 
 : parse-url ( url -- host resource )
     "http://" ?head [
         "URL must begin with http://" throw
     ] unless
-    "/" split1 [ "/" swap append ] [ "/" ] ifte* ;
+    "/" split1 [ "/" swap append ] [ "/" ] if* ;
 
 : parse-response ( line -- code )
     "HTTP/" ?head [ " " split1 nip ] when

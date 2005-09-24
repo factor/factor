@@ -13,15 +13,15 @@ matrices namespaces sdl sequences ;
         dup invalidate
         dup gadget-root?
         [ add-invalid ]
-        [ gadget-parent [ relayout ] when* ] ifte
-    ] ifte ;
+        [ gadget-parent [ relayout ] when* ] if
+    ] if ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup rect-dim = [
         2drop
     ] [
         [ set-rect-dim ] keep dup add-invalid invalidate
-    ] ifte ;
+    ] if ;
 
 GENERIC: pref-dim ( gadget -- dim )
 
@@ -44,7 +44,7 @@ M: gadget layout* drop ;
         gadget-children [ layout ] each
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 TUPLE: pack align fill gap vector ;
 

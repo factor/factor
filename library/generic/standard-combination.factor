@@ -8,11 +8,11 @@ namespaces sequences vectors words ;
 : empty-method ( picker word -- method )
     over [ dup ] = [
         [
-            [ dup delegate ] % dup unit , error-method , \ ?ifte ,
+            [ dup delegate ] % dup unit , error-method , \ ?if ,
         ] [ ] make
     ] [
         error-method
-    ] ifte ;
+    ] if ;
 
 : class-predicates ( picker assoc -- assoc )
     [ uncons >r "predicate" word-prop append r> cons ] map-with ;
@@ -30,14 +30,14 @@ namespaces sequences vectors words ;
             cdr simplify-alist
         ] [
             uncons >r cdr nip r>
-        ] ifte
+        ] if
     ] [
         nip car cdr [ ]
-    ] ifte ;
+    ] if ;
 
 : vtable-methods ( picker alist-seq -- alist-seq )
     dup length [
-        type>class [ swap simplify-alist ] [ car cdr [ ] ] ifte*
+        type>class [ swap simplify-alist ] [ car cdr [ ] ] if*
         >r over r> class-predicates alist>quot
     ] 2map nip ;
 
@@ -67,8 +67,8 @@ namespaces sequences vectors words ;
             small-generic
         ] [
             num-types \ type big-generic
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 : simple-combination ( word -- quot )
     [ dup ] standard-combination ;

@@ -1,7 +1,7 @@
 IN: optimizer
 USING: inference kernel sequences words ;
 
-! #ifte --> X
+! #if --> X
 !   |
 !   +--> Y
 !   |
@@ -9,7 +9,7 @@ USING: inference kernel sequences words ;
 
 ! Becomes:
 
-! #ifte
+! #if
 !   |
 !   +--> Y --> X
 !   |
@@ -28,7 +28,7 @@ M: node split-node* ( node -- ) drop ;
         node-successor subst-values
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : subst-node ( old new -- )
     #! The last node of 'new' becomes 'old', then values are
@@ -49,7 +49,7 @@ M: node split-node* ( node -- ) drop ;
     [ >r clone-node r> subst-node ] each-with
     f swap set-node-successor ;
 
-M: #ifte split-node* ( node -- )
+M: #if split-node* ( node -- )
     split-branch ;
 
 M: #dispatch split-node* ( node -- )

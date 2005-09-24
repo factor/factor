@@ -24,10 +24,10 @@ global [ "  " listener-prompt set ] bind
             ( we're done ) r> drop t
         ] [
             ( more input needed ) r> (read-multiline)
-        ] ifte
+        ] if
     ] [
         ( EOF ) r> 2drop f
-    ] ifte ;
+    ] if ;
 
 : read-multiline ( -- quot ? )
     #! Keep parsing until the end is reached. Flag indicates
@@ -39,12 +39,12 @@ global [ "  " listener-prompt set ] bind
     listener-hook get call
     listener-prompt get write flush [
         read-multiline
-        [ call ] [ bye ] ifte
+        [ call ] [ bye ] if
     ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.
-    quit-flag get [ quit-flag off ] [ listen listener ] ifte ;
+    quit-flag get [ quit-flag off ] [ listen listener ] if ;
 
 : print-banner ( -- )
     "Factor " write version write

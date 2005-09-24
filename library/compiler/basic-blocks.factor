@@ -9,8 +9,8 @@ USING: arrays hashtables kernel lists math namespaces sequences ;
             >r 1+ r> (split-blocks)
         ] [
             (cut) >r , 1 r> (cut) >r , 0 r> (split-blocks)
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 : split-blocks ( linear -- blocks )
     [ 0 swap (split-blocks) ] { } make ;

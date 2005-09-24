@@ -16,7 +16,7 @@ M: sbuf stream-finish drop ;
 
 ! Reversed string buffers support the stream input protocol.
 M: sbuf stream-read1 ( sbuf -- char/f )
-    dup empty? [ drop f ] [ pop ] ifte ;
+    dup empty? [ drop f ] [ pop ] if ;
 
 M: sbuf stream-read ( count sbuf -- string )
     dup empty? [
@@ -24,7 +24,7 @@ M: sbuf stream-read ( count sbuf -- string )
     ] [
         swap over length min empty-sbuf
         [ [ drop dup pop ] inject drop ] keep
-    ] ifte ;
+    ] if ;
 
 : <string-reader> ( string -- stream )
     <reversed> >sbuf <line-reader> ;

@@ -151,10 +151,10 @@ SYMBOL: theta
             drop
         ] [
             event-loop
-        ] ifte
+        ] if
     ] [
         event-loop
-    ] ifte ;
+    ] if ;
 
 : plot3d ( -- )
     1024 768 16 flags [

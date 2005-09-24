@@ -6,8 +6,8 @@ prettyprint ;
 
 ! We transform calls to these words into 'branched' forms;
 ! eg, there is no VOP for fixnum<=, only fixnum<= followed
-! by an #ifte, so if we have a 'bare' fixnum<= we add
-! [ t ] [ f ] ifte at the end.
+! by an #if, so if we have a 'bare' fixnum<= we add
+! [ t ] [ f ] if at the end.
 
 ! This transformation really belongs in the optimizer, but it
 ! is simpler to do it here.
@@ -33,7 +33,7 @@ prettyprint ;
 
 : manual-branch ( word -- )
     dup "infer-effect" word-prop consume/produce
-    [ [ t ] [ f ] ifte ] infer-quot ;
+    [ [ t ] [ f ] if ] infer-quot ;
 
 { fixnum<= fixnum< fixnum>= fixnum> eq? } [
     dup dup literalize [ manual-branch ] cons
@@ -53,11 +53,11 @@ prettyprint ;
     pop-literal unit infer-quot-value
 ] "infer" set-word-prop
 
-\ ifte [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
+\ if [ [ object general-list general-list ] [ ] ] "infer-effect" set-word-prop
 
-\ ifte [
+\ if [
     2 #drop node, pop-d pop-d swap 2array
-    #ifte pop-d drop infer-branches
+    #if pop-d drop infer-branches
 ] "infer" set-word-prop
 
 \ cond [ [ object ] [ ] ] "infer-effect" set-word-prop

@@ -94,7 +94,7 @@ USE: test
 
 : iter ( c z nb-iter -- x )
     over absq 4.0 >= over 0 = or
-    [ 2nip ] [ 1- >r sq dupd + r> iter ] ifte ;
+    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ;
 
 : max-color 360 ;
 
@@ -123,7 +123,7 @@ SYMBOL: center
             drop 0
         ] [
             cols get [ length mod ] keep nth
-        ] ifte
+        ] if
     ] with-pixels ; compiled
 
 : event-loop ( event -- )
@@ -132,10 +132,10 @@ SYMBOL: center
             drop
         ] [
             event-loop
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ; compiled
+    ] if ; compiled
 
 : mandel ( -- )
     1280 1024 0 SDL_HWSURFACE  [

@@ -16,7 +16,7 @@ USE: sequences
 
 : interpret ( quot -- )
     #! The quotation is called with each word as its executed.
-    done? [ drop ] [ [ next swap call ] keep interpret ] ifte ;
+    done? [ drop ] [ [ next swap call ] keep interpret ] if ;
 
 : run ( -- ) [ do ] interpret ;
 
@@ -32,11 +32,11 @@ USE: sequences
 ] unit-test
 
 [ { 2 } ] [
-    [ t [ 2 ] [ "hi" ] ifte ] test-interpreter
+    [ t [ 2 ] [ "hi" ] if ] test-interpreter
 ] unit-test
 
 [ { "hi" } ] [
-    [ f [ 2 ] [ "hi" ] ifte ] test-interpreter
+    [ f [ 2 ] [ "hi" ] if ] test-interpreter
 ] unit-test
 
 [ { 4 } ] [

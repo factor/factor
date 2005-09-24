@@ -31,10 +31,10 @@ M: cons map ( cons quot -- cons )
             r> car r> drop r> swap
         ] [
             r> cdr r> r> 1+ (list-find)
-        ] ifte
+        ] if
     ] [
         3drop -1 f
-    ] ifte ; inline
+    ] if ; inline
 
 M: general-list find ( list quot -- i elt )
     0 (list-find) ;
@@ -50,14 +50,14 @@ M: general-list head ( n list -- list )
         unswons >r >r 1- r> head r> swons
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 M: general-list tail ( n list -- tail )
     #! Return the rest of the list, from the nth index onward.
     swap [ cdr ] times ;
 
 M: general-list nth ( n list -- element )
-    over 0 number= [ nip car ] [ >r 1- r> cdr nth ] ifte ;
+    over 0 number= [ nip car ] [ >r 1- r> cdr nth ] if ;
 
 M: cons = ( obj cons -- ? )
     @{

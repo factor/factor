@@ -8,13 +8,14 @@
 #define CATCHSTACK_ENV 6 /* used by library only */
 #define CPU_ENV        7
 #define BOOT_ENV       8
-/* 9 is unused */
+#define CALLCC_1_ENV   9 /* used by library only */
 #define ARGS_ENV       10
 #define OS_ENV         11
 #define ERROR_ENV      12 /* a marker consed onto kernel errors */
 #define IN_ENV         13
 #define OUT_ENV        14
 #define GEN_ENV        15 /* set to gen_count */
+#define IMAGE_ENV      16 /* image name */
 
 /* TAGGED user environment data; see getenv/setenv prims */
 DLLEXPORT CELL userenv[USER_ENV];

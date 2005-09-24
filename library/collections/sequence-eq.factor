@@ -15,14 +15,14 @@ UNION: sequence array string sbuf vector ;
         dup length [ >r 2dup r> 2nth-unsafe = ] all? 2nip
     ] [
         2drop f
-    ] ifte ; flushable
+    ] if ; flushable
 
 M: sequence = ( obj seq -- ? )
     2dup eq? [
         2drop t
     ] [
-        over type over type eq? [ sequence= ] [ 2drop f ] ifte
-    ] ifte ;
+        over type over type eq? [ sequence= ] [ 2drop f ] if
+    ] if ;
 
 M: sequence hashcode ( seq -- n )
     #! Poor
@@ -31,7 +31,7 @@ M: sequence hashcode ( seq -- n )
 M: string = ( obj str -- ? )
     over string? [
         over hashcode over hashcode number=
-        [ sequence= ] [ 2drop f ] ifte
+        [ sequence= ] [ 2drop f ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;

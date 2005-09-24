@@ -36,7 +36,7 @@ TUPLE: continuation data c call name catch ;
     [
         continuation
         dup continuation-data f over push f swap push t
-    ] call 2swap ifte ; inline
+    ] call 2swap if ; inline
 
 : callcc0 ( quot -- | quot: continuation -- )
     #! Call a quotation with the current continuation, which may

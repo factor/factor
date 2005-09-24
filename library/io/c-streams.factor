@@ -25,7 +25,7 @@ M: c-stream stream-flush ( stream -- )
     c-stream-out [ fflush ] when* ;
 
 M: c-stream stream-finish ( stream -- )
-    dup c-stream-flush? [ stream-flush ] [ drop ] ifte ;
+    dup c-stream-flush? [ stream-flush ] [ drop ] if ;
 
 M: c-stream stream-close ( stream -- )
     dup c-stream-in [ fclose ] when*

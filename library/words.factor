@@ -43,7 +43,7 @@ SYMBOL: crossref
         dup uses [ (add-crossref) ] each-with
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : (remove-crossref) crossref get [ nest remove-hash ] bind ;
 
@@ -54,12 +54,12 @@ SYMBOL: crossref
         dup uses [ (remove-crossref) ] each-with
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
     #! so indirect usages are reported.
-    crossref get dup [ closure ] [ 2drop { } ] ifte ;
+    crossref get dup [ closure ] [ 2drop { } ] if ;
 
 : usage ( word -- list )
     #! List all direct usages of a word.
@@ -98,7 +98,7 @@ M: symbol definer drop \ SYMBOL: ;
 : define-symbol ( word -- ) 2 over define ;
 
 : intern-symbol ( word -- )
-    dup undefined? [ define-symbol ] [ drop ] ifte ;
+    dup undefined? [ define-symbol ] [ drop ] if ;
 
 ! Compound words invoke a quotation when executed.
 PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;

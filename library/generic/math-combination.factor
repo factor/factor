@@ -25,8 +25,8 @@ math namespaces sequences words ;
             drop "coercer" word-prop
         ] [
             2drop [ ]
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 TUPLE: no-math-method left right generic ;
 
@@ -36,7 +36,7 @@ TUPLE: no-math-method left right generic ;
 : applicable-method ( generic class -- quot )
     over "methods" word-prop hash [ ] [
         literalize [ no-math-method ] cons
-    ] ?ifte ;
+    ] ?if ;
 
 : object-method ( generic -- quot )
     object reintern applicable-method ;
@@ -48,7 +48,7 @@ TUPLE: no-math-method left right generic ;
         r> swap append
     ] [
         2drop object-method
-    ] ifte ;
+    ] if ;
 
 : math-vtable ( picker quot -- )
     [
@@ -58,7 +58,7 @@ TUPLE: no-math-method left right generic ;
     ] [ ] make ; inline
 
 : math-class? ( object -- ? )
-    dup word? [ "math-priority" word-prop ] [ drop f ] ifte ;
+    dup word? [ "math-priority" word-prop ] [ drop f ] if ;
 
 : math-combination ( word -- vtable )
     \ over [
@@ -66,7 +66,7 @@ TUPLE: no-math-method left right generic ;
             \ dup [ >r 2dup r> math-method ] math-vtable
         ] [
             over object-method
-        ] ifte nip
+        ] if nip
     ] math-vtable nip ;
 
 PREDICATE: generic 2generic ( word -- ? )

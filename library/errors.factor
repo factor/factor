@@ -22,7 +22,7 @@ TUPLE: no-method object generic ;
 : rethrow ( error -- )
     #! Use rethrow when passing an error on from a catch block.
     catchstack empty?
-    [ die "Can't happen" throw ] [ c> continue-with ] ifte ;
+    [ die "Can't happen" throw ] [ c> continue-with ] if ;
 
 : cleanup ( try cleanup -- | try: -- | cleanup: -- )
     #! Call the try quotation. If an exception is thrown in the

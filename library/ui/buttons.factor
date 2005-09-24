@@ -13,10 +13,10 @@ lists math namespaces sdl sequences sequences styles threads ;
     #! is currently over the button.
     dup mouse-over? [
         1 button-down?
-        [ hand hand-clicked child? ] [ drop f ] ifte
+        [ hand hand-clicked child? ] [ drop f ] if
     ] [
         drop f
-    ] ifte ;
+    ] if ;
 
 : button-update ( button -- )
     dup dup mouse-over? rollover set-paint-prop
@@ -40,7 +40,7 @@ lists math namespaces sdl sequences sequences styles threads ;
     <rollover-only> boundary set-paint-prop ;
 
 : button-action ( action -- quot )
-    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] ifte* ;
+    [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] if* ;
 
 : button-gestures ( button quot -- )
     dupd [ action ] set-action

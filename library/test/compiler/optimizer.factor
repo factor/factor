@@ -45,9 +45,9 @@ optimizer prettyprint sequences strings test vectors words ;
 
 [ {{ }} ] [ \ foo word-def dataflow kill-set ] unit-test
 
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] ifte ] kill-set= ] unit-test
+[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
-[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] ifte ] kill-set= ] unit-test
+[ t ] [ [ [ 1 ] [ 2 ] ] [ [ 1 ] [ 2 ] if ] kill-set= ] unit-test
 
 : literal-kill-test-1 4 compiled-offset cell 2 * - ; compiled
 
@@ -61,10 +61,10 @@ optimizer prettyprint sequences strings test vectors words ;
 
 [ 3 ] [ literal-kill-test-3 ] unit-test
 
-[ t ] [ [ [ 3 ] [ dup ] 3 ] [ [ 3 ] [ dup ] ifte drop ] kill-set= ] unit-test
+[ t ] [ [ [ 3 ] [ dup ] 3 ] [ [ 3 ] [ dup ] if drop ] kill-set= ] unit-test
 
 : literal-kill-test-4
-    5 swap [ 3 ] [ dup ] ifte 2drop ; compiled
+    5 swap [ 3 ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-4 ] unit-test
 [ ] [ f literal-kill-test-4 ] unit-test
@@ -75,7 +75,7 @@ optimizer prettyprint sequences strings test vectors words ;
 ] unit-test
 
 : literal-kill-test-5
-    5 swap [ 5 ] [ dup ] ifte 2drop ; compiled
+    5 swap [ 5 ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-5 ] unit-test
 [ ] [ f literal-kill-test-5 ] unit-test
@@ -86,7 +86,7 @@ optimizer prettyprint sequences strings test vectors words ;
 ] unit-test
 
 : literal-kill-test-6
-    5 swap [ dup ] [ dup ] ifte 2drop ; compiled
+    5 swap [ dup ] [ dup ] if 2drop ; compiled
 
 [ ] [ t literal-kill-test-6 ] unit-test
 [ ] [ f literal-kill-test-6 ] unit-test
@@ -140,19 +140,19 @@ M: cons xyz xyz ;
 ! Test predicate inlining
 : pred-test-1
     dup cons? [
-        dup general-list? [ "general-list" ] [ "nope" ] ifte
+        dup general-list? [ "general-list" ] [ "nope" ] if
     ] [
         "not a cons"
-    ] ifte ; compiled
+    ] if ; compiled
 
 [ [[ 1 2 ]] "general-list" ] [ [[ 1 2 ]] pred-test-1 ] unit-test
 
 : pred-test-2
     dup fixnum? [
-        dup integer? [ "integer" ] [ "nope" ] ifte
+        dup integer? [ "integer" ] [ "nope" ] if
     ] [
         "not a fixnum"
-    ] ifte ; compiled
+    ] if ; compiled
 
 [ 1 "integer" ] [ 1 pred-test-2 ] unit-test
 
@@ -160,19 +160,19 @@ TUPLE: pred-test ;
 
 : pred-test-3
     dup tuple? [
-        dup pred-test? [ "pred-test" ] [ "nope" ] ifte
+        dup pred-test? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
-    ] ifte ; compiled
+    ] if ; compiled
 
 [ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-3 ] unit-test
 
 : pred-test-4
     dup pred-test? [
-        dup tuple? [ "pred-test" ] [ "nope" ] ifte
+        dup tuple? [ "pred-test" ] [ "nope" ] if
     ] [
         "not a tuple"
-    ] ifte ; compiled
+    ] if ; compiled
 
 [ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-4 ] unit-test
 
@@ -189,19 +189,19 @@ TUPLE: pred-test ;
 
 ! regression
 
-: literal-not-branch 0 not [ ] [ ] ifte ; compiled
+: literal-not-branch 0 not [ ] [ ] if ; compiled
 
 [ ] [ literal-not-branch ] unit-test
 
 ! regression
 
-: bad-kill-1 [ 3 f ] [ dup bad-kill-1 ] ifte ; inline
+: bad-kill-1 [ 3 f ] [ dup bad-kill-1 ] if ; inline
 : bad-kill-2 bad-kill-1 drop ; compiled
 
 [ 3 ] [ t bad-kill-2 ] unit-test
 
 ! regression
 : bleh 3 ;
-: blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] ifte ; compiled
+: blah over cons? [ bleh >r 2cdr r> ] [ 2drop f f f ] if ; compiled
 
 [ f ] [ [ 1 2 3 ] [ 1 3 2 ] blah drop 2car = ] unit-test

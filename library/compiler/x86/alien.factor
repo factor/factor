@@ -25,7 +25,7 @@ M: int-regs push-reg drop EAX PUSH ;
 M: float-regs reg-size float-regs-size ;
 M: float-regs push-reg
     ESP swap reg-size [ SUB  [ ESP ] ] keep
-    4 = [ FSTPS ] [ FSTPL ] ifte ;
+    4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: %unbox generate-node
     dup 1 vop-in f compile-c-call  2 vop-in push-reg ;
@@ -36,4 +36,4 @@ M: %box generate-node
     1 vop-in ESP swap reg-size ADD ;
 
 M: %cleanup generate-node
-    0 vop-in dup 0 = [ drop ] [ ESP swap ADD ] ifte ;
+    0 vop-in dup 0 = [ drop ] [ ESP swap ADD ] if ;

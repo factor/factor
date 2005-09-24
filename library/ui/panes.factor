@@ -85,7 +85,7 @@ M: pane focusable-child* ( pane -- editor )
         3drop
     ] [
         >r <presentation> r> pane-current add-gadget
-    ] ifte ;
+    ] if ;
 
 : prepare-print ( current -- gadget )
     #! Optimization: if line has 1 child, add the child.
@@ -104,7 +104,7 @@ M: pane focusable-child* ( pane -- editor )
 
 : pane-write ( style pane list -- )
     3dup car swap pane-write-1 cdr dup
-    [ over pane-terpri pane-write ] [ 3drop ] ifte ;
+    [ over pane-terpri pane-write ] [ 3drop ] if ;
 
 ! Panes are streams.
 M: pane stream-flush ( pane -- ) drop ;

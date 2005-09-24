@@ -39,7 +39,7 @@ global [ first-time on ] bind
     first-time get [ init-world first-time off ] when ;
 
 : ui-title
-    [ "Factor " % version % " - " % "image" get % ] "" make ;
+    [ "Factor " % version % " - " % image % ] "" make ;
 
 IN: shells
 

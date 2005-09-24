@@ -17,7 +17,7 @@ M: %peek generate-node ( vop -- )
 M: %replace generate-node ( vop -- )
     dup 0 vop-out loc>operand swap 0 vop-in v>operand MOV ;
 
-: (%inc) swap 0 vop-in cell * dup 0 > [ ADD ] [ neg SUB ] ifte ;
+: (%inc) swap 0 vop-in cell * dup 0 > [ ADD ] [ neg SUB ] if ;
 
 M: %inc-d generate-node ( vop -- ) ESI (%inc) ;
 

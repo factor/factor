@@ -42,7 +42,7 @@ M: key-down-event handle-event ( event -- )
             drop
         ] [
             hand hand-focus user-input drop
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ;
+    ] if ;

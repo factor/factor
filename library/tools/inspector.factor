@@ -47,12 +47,12 @@ M: word extra-banner ( word -- )
         ] [
             "This is an orphan not part of the dictionary." print
             "It claims to belong to the " write
-        ] ifte
+        ] if
         word-vocabulary pprint " vocabulary." print
     ] [
         drop
         "The word is a uniquely generated symbol." print
-    ] ifte ;
+    ] if ;
 
 M: object extra-banner ( obj -- ) drop ;
 
@@ -95,7 +95,7 @@ SYMBOL: inspector-stack
 
 : inspect ( obj -- )
     #! Start an inspector if its not already running.
-    inspector-stack get [ (inspect) ] [ inspector ] ifte ;
+    inspector-stack get [ (inspect) ] [ inspector ] if ;
 
 : go ( n -- ) inspector-slots get nth (inspect) ;
 

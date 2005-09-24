@@ -51,7 +51,7 @@ DEFER: handle-event
 
 : world-step ( -- ? )
     world get dup world-invalid >r layout-world r>
-    [ dup world-hand update-hand draw-world ] [ drop ] ifte ;
+    [ dup world-hand update-hand draw-world ] [ drop ] if ;
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 
@@ -63,7 +63,7 @@ DEFER: handle-event
     ] [
         drop world-step do-timers
         world get world-running? [ 10 sleep run-world ] when
-    ] ifte ;
+    ] if ;
 
 : start-world ( -- )
     world get t over set-world-running? relayout ;

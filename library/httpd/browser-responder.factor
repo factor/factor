@@ -35,7 +35,7 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
     "<option selected>" write
   ] [
     "<option>" write
-  ] ifte      
+  ] if      
   chars>entities write 
   "</option>\n" write drop ;
 
@@ -116,4 +116,4 @@ USING: html cont-responder kernel io namespaces words lists prettyprint
      "word" swap assoc
   ] [
     "browser-responder" "browse" 
-  ] ifte* browse ;
+  ] if* browse ;

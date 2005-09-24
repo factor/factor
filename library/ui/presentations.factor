@@ -42,7 +42,7 @@ SYMBOL: commands
 
 : <presentation> ( style text -- presentation )
     gadget pick assoc dup
-    [ 2nip ] [ drop <styled-label> init-commands ] ifte ;
+    [ 2nip ] [ drop <styled-label> init-commands ] if ;
 
 : gadget. ( gadget -- )
     gadget swons unit

@@ -96,8 +96,8 @@ M: node child-ties ( node -- seq )
             ties get set-hash
         ] [
             2drop
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 \ make-tuple [
     dup node-in-d first literal-value 1array
@@ -109,7 +109,7 @@ M: node child-ties ( node -- seq )
     ] [
         node-param "infer-effect" word-prop second
         dup integer? [ drop f ] when
-    ] ?ifte ;
+    ] ?if ;
 
 M: #call infer-classes* ( node -- )
     dup node-param [
@@ -122,7 +122,7 @@ M: #shuffle infer-classes* ( node -- )
     node-out-d [ literal? ] subset
     [ [ literal-value ] keep set-value-literal ] each ;
 
-M: #ifte child-ties ( node -- seq )
+M: #if child-ties ( node -- seq )
     node-in-d first dup general-t <class-tie>
     swap f <literal-tie> 2array ;
 

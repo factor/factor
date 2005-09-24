@@ -19,22 +19,22 @@ math math-internals sequences words ;
     dup node-param "foldable" word-prop [
         dup node-in-d [
             dup literal?
-            [ 2drop t ] [ swap node-literals ?hash* ] ifte
+            [ 2drop t ] [ swap node-literals ?hash* ] if
         ] all-with?
     ] [
         drop f
-    ] ifte ;
+    ] if ;
 
 : literal-in-d ( #call -- inputs )
     dup node-in-d [
         dup literal?
-        [ nip literal-value ] [ swap node-literals ?hash ] ifte
+        [ nip literal-value ] [ swap node-literals ?hash ] if
     ] map-with ;
 
 : partial-eval ( #call -- node )
     dup literal-in-d over node-param
     [ with-datastack ] catch
-    [ 3drop t ] [ inline-literals ] ifte ;
+    [ 3drop t ] [ inline-literals ] if ;
 
 : flip-subst ( not -- )
     #! Note: cloning the vectors, since subst-values will modify
@@ -43,20 +43,20 @@ math math-internals sequences words ;
     [ node-out-d clone ] keep
     subst-values ;
 
-: flip-branches ( not -- #ifte )
-    #! If a not is followed by an #ifte, flip branches and
+: flip-branches ( not -- #if )
+    #! If a not is followed by an #if, flip branches and
     #! remove the note.
     dup flip-subst node-successor dup
     dup node-children first2 swap 2array swap set-node-children ;
 
 \ not {
-    { [ dup node-successor #ifte? ] [ flip-branches ] }
+    { [ dup node-successor #if? ] [ flip-branches ] }
 } define-optimizers
 
 : disjoint-eq? ( node -- ? )
     dup node-classes swap node-in-d
     [ swap ?hash ] map-with
-    first2 2dup and [ classes-intersect? not ] [ 2drop f ] ifte ;
+    first2 2dup and [ classes-intersect? not ] [ 2drop f ] if ;
 
 \ eq? {
     { [ dup disjoint-eq? ] [ [ f ] inline-literals ] }
@@ -70,7 +70,7 @@ SYMBOL: @
 
 : literals-match? ( values template -- ? )
     [
-        over literal? [ >r literal-value r> ] [ nip @ ] ifte =
+        over literal? [ >r literal-value r> ] [ nip @ ] if =
     ] 2map [ ] all? ;
 
 : values-match? ( values template -- ? )
@@ -88,7 +88,7 @@ SYMBOL: @
         second swap dataflow-with [ subst-node ] keep
     ] [
         3drop f
-    ] ifte ;
+    ] if ;
 
 [ + fixnum+ bignum+ float+ ] @{
     @{ @{ @ 0 }@ [ drop ] }@

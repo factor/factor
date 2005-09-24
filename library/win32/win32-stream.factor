@@ -52,7 +52,7 @@ SYMBOL: cutoff
     f over set-overlapped-ext-event ;
 
 : update-file-pointer ( whence -- )
-    file-size get [ fileptr [ + ] change ] [ drop ] ifte ;
+    file-size get [ fileptr [ + ] change ] [ drop ] if ;
 
 : update-timeout ( -- )
     timeout get [ millis + cutoff set ] when* ;
@@ -81,8 +81,8 @@ M: string do-write ( str -- )
     ] [
         dup length out-buffer get buffer-size > [
             dup length out-buffer get buffer-extend do-write
-        ] [ flush-output do-write ] ifte
-    ] ifte ;
+        ] [ flush-output do-write ] if
+    ] if ;
 
 : fill-input ( -- ) 
     update-timeout [
@@ -102,7 +102,7 @@ M: string do-write ( str -- )
     swap in-buffer get buffer-consume ;
 
 : >string-or-f ( sbuf -- str-or-? )
-    dup length 0 > [ >string ] [ drop f ] ifte ;
+    dup length 0 > [ >string ] [ drop f ] if ;
 
 : do-read-count ( sbuf count -- str )
     dup 0 = [ 
@@ -113,8 +113,8 @@ M: string do-write ( str -- )
             3drop >string-or-f
         ] [
             >r swap r> - >r swap [ swap nappend ] keep r> do-read-count
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 : peek-input ( -- str )
     1 in-buffer get buffer-first-n ;
@@ -159,7 +159,7 @@ C: win32-stream ( handle -- stream )
     swap [
         dup f GetFileSize dup -1 = not [
             file-size set
-        ] [ drop f file-size set ] ifte
+        ] [ drop f file-size set ] if
         handle set 
         4096 <buffer> in-buffer set 
         4096 <buffer> out-buffer set

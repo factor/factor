@@ -18,7 +18,7 @@ parser sequences strings words ;
         >r swap >fixnum r> cons define-typecheck
     ] [
         2drop 2drop
-    ] ifte ;
+    ] if ;
 
 : define-reader ( class slot reader -- )
     [ slot ] define-slot-word ;

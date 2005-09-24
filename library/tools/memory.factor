@@ -5,13 +5,17 @@ USING: arrays errors generic hashtables io kernel
 kernel-internals lists math namespaces parser prettyprint
 sequences strings unparser vectors words ;
 
-: generations 15 getenv ;
+: generations ( -- n ) 15 getenv ;
 
-: full-gc generations 1 - gc ;
+: full-gc ( -- ) generations 1 - gc ;
+
+: image ( -- path )
+    #! Current image name.
+    16 getenv ;
 
 : save
     #! Save the current image.
-    "image" get save-image ;
+    image save-image ;
 
 ! Printing an overview of heap usage.
 
@@ -40,7 +44,7 @@ sequences strings unparser vectors words ;
 
 : (each-object) ( quot -- )
     next-object dup
-    [ swap [ call ] keep (each-object) ] [ 2drop ] ifte ; inline
+    [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
 
 : each-object ( quot -- )
     #! Applies the quotation to each object in the image.

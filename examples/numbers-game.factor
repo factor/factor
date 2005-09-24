@@ -11,15 +11,15 @@ USING: kernel math parser random io ;
 : correct "Correct - you win!" print ;
 
 : inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
+     < [ too-high ] [ too-low ] if ;
 
 : judge-guess ( actual guess -- ? )
-    2dup = [ 2drop correct f ] [ inexact-guess t ] ifte ;
+    2dup = [ 2drop correct f ] [ inexact-guess t ] if ;
 
 : number-to-guess ( -- n ) 0 100 random-int ;
 
 : numbers-game-loop ( actual -- )
     dup guess-prompt read-number judge-guess
-    [ numbers-game-loop ] [ drop ] ifte ;
+    [ numbers-game-loop ] [ drop ] if ;
 
 : numbers-game number-to-guess numbers-game-loop ;

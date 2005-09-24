@@ -14,7 +14,7 @@ sequences ;
     swap [ unswons set-action ] each-with ;
 
 : handle-gesture* ( gesture gadget -- ? )
-    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] ifte ;
+    tuck gadget-gestures ?hash dup [ call f ] [ 2drop t ] if ;
 
 : handle-gesture ( gesture gadget -- ? )
     #! If a gadget's handle-gesture* generic returns t, the

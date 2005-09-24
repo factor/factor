@@ -42,7 +42,7 @@ SYMBOL: meta-executing
 : up ( -- ) pop-r meta-cf set  pop-r drop ;
 
 : next ( -- obj )
-    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] ifte ;
+    meta-cf get [ meta-cf [ uncons ] change ] [ up next ] if ;
 
 : meta-interp ( -- interp )
     meta-d get f meta-r get meta-n get meta-c get
@@ -75,8 +75,8 @@ M: word do ( word -- )
             dup word-def meta-call  meta-executing set
         ] [
             host-word
-        ] ifte
-    ] ?ifte ;
+        ] if
+    ] ?if ;
 
 M: wrapper do ( wrapper -- ) wrapped push-d ;
 
@@ -85,7 +85,7 @@ M: object do ( object -- ) push-d ;
 GENERIC: do-1 ( object -- )
 
 M: word do-1 ( word -- )
-    dup "meta-word" word-prop [ call ] [ host-word ] ?ifte ;
+    dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
 
 M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
 
@@ -101,7 +101,7 @@ M: object do-1 ( object -- ) push-d ;
 \ set-callstack [ pop-d clone meta-r set ] set-meta-word
 \ call [ pop-d meta-call ] set-meta-word
 \ execute [ pop-d do ] set-meta-word
-\ ifte [ pop-d pop-d pop-d [ nip ] [ drop ] ifte meta-call ] set-meta-word
+\ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] set-meta-word
 \ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
 
 \ set-meta-word forget

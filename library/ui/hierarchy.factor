@@ -74,4 +74,4 @@ M: gadget focusable-child* drop t ;
 
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
-    dup t = [ drop ] [ nip focusable-child ] ifte ;
+    dup t = [ drop ] [ nip focusable-child ] if ;

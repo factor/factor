@@ -53,11 +53,11 @@ DEFER: (nsort)
         [ dup sorter-seq swap s*/e (nsort) ] 2keep
     ] [
         2drop
-    ] ifte 2drop ; inline
+    ] if 2drop ; inline
 
 : partition ( -1/1 seq -- seq )
     dup midpoint@ swap rot 1 <
-    [ head-slice ] [ tail-slice ] ifte ; inline
+    [ head-slice ] [ tail-slice ] if ; inline
 
 : (binsearch) ( elt quot seq -- i )
     dup length 1 <= [
@@ -67,8 +67,8 @@ DEFER: (nsort)
             r> r> 3drop r> dup slice-from swap slice-to + 2 /i
         ] [
             r> swap r> swap r> partition (binsearch)
-        ] ifte
-    ] ifte ; inline
+        ] if
+    ] if ; inline
 
 : flatten-slice ( seq -- slice )
     #! Binsearch returns an index relative to the sequence
@@ -81,7 +81,7 @@ IN: sequences
 
 : nsort ( seq quot -- | quot: elt elt -- -1/0/1 )
     swap dup length 1 <=
-    [ 2drop ] [ 0 over length 1- (nsort) ] ifte ; inline
+    [ 2drop ] [ 0 over length 1- (nsort) ] if ; inline
 
 : sort ( seq quot -- seq | quot: elt elt -- -1/0/1 )
     swap [ swap nsort ] immutable ; inline
@@ -92,9 +92,9 @@ IN: sequences
 
 : binsearch ( elt seq quot -- i | quot: elt elt -- -1/0/1 )
     swap dup empty?
-    [ 3drop -1 ] [ flatten-slice (binsearch) ] ifte ;
+    [ 3drop -1 ] [ flatten-slice (binsearch) ] if ;
     inline
 
 : binsearch* ( elt seq quot -- elt | quot: elt elt -- -1/0/1 )
-    over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] ifte ;
+    over >r binsearch dup -1 = [ r> 2drop f ] [ r> nth ] if ;
     inline

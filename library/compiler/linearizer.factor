@@ -35,37 +35,37 @@ M: #label linearize* ( node -- )
         node-param r> drop r> execute ,
     ] [
         dup node-param r> execute , r> drop linearize-next
-    ] ifte ; inline
+    ] if ; inline
 
 : intrinsic ( #call -- quot ) node-param "intrinsic" word-prop ;
 
-: ifte-intrinsic ( #call -- quot )
-    dup node-successor #ifte?
-    [ node-param "ifte-intrinsic" word-prop ] [ drop f ] ifte ;
+: if-intrinsic ( #call -- quot )
+    dup node-successor #if?
+    [ node-param "if-intrinsic" word-prop ] [ drop f ] if ;
 
-: linearize-ifte ( node label -- )
+: linearize-if ( node label -- )
     #! Assume the quotation emits a VOP that jumps to the label
     #! if some condition holds; we linearize the false branch,
     #! then the label, then the true branch.
     >r node-children first2 linearize* r> %label , linearize* ;
 
 M: #call linearize* ( node -- )
-    dup ifte-intrinsic [
+    dup if-intrinsic [
         >r <label> 2dup r> call
-        >r node-successor r> linearize-ifte
+        >r node-successor r> linearize-if
     ] [
         dup intrinsic [
             dupd call linearize-next
         ] [
             \ %call \ %jump ?tail-call
-        ] ifte*
-    ] ifte* ;
+        ] if*
+    ] if* ;
 
 M: #call-label linearize* ( node -- )
     \ %call-label \ %jump-label ?tail-call ;
 
-M: #ifte linearize* ( node -- )
-    <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-ifte ;
+M: #if linearize* ( node -- )
+    <label> dup in-1  -1 %inc-d , 0 %jump-t , linearize-if ;
 
 : dispatch-head ( vtable -- label/code )
     #! Output the jump table insn and return a list of

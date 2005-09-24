@@ -27,7 +27,7 @@ SYMBOL: history-index
     ] [
         history-index get history get set-nth
         reset-history
-    ] ifte ;
+    ] if ;
 
 : set-line-text ( text -- )
     #! Call this in the line editor scope.
@@ -45,7 +45,7 @@ SYMBOL: history-index
     ] [
         dup history-length = [ commit-history ] when
         1 - goto-history
-    ] ifte ;
+    ] if ;
 
 : history-next ( -- )
     #! Call this in the line editor scope.
@@ -53,7 +53,7 @@ SYMBOL: history-index
         drop
     ] [
         1+ goto-history
-    ] ifte ;
+    ] if ;
 
 : line-clear ( -- )
     #! Call this in the line editor scope.
@@ -73,7 +73,7 @@ SYMBOL: history-index
         length caret [ + ] change
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : line-insert ( str offset -- )
     #! Call this in the line editor scope.
@@ -95,8 +95,8 @@ SYMBOL: history-index
             drop caret set
         ] [
             2drop
-        ] ifte
-    ] ifte ;
+        ] if
+    ] if ;
 
 : line-remove ( offset length -- )
     #! Call this in the line editor scope.
@@ -108,7 +108,7 @@ SYMBOL: history-index
 
 : backspace ( -- )
     #! Call this in the line editor scope.
-    caret get dup 0 = [ drop ] [ 1- 1 line-remove ] ifte ;
+    caret get dup 0 = [ drop ] [ 1- 1 line-remove ] if ;
 
 : left ( -- )
     #! Call this in the line editor scope.

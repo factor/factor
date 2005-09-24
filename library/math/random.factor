@@ -7,14 +7,14 @@ IN: math USING: kernel ;
         2drop (random-int) 2dup swap mod (random-int-0)
     ] [
         2nip
-    ] ifte ; inline
+    ] if ; inline
 
 : random-int-0 ( max -- n )
     1+ dup power-of-2? [
         (random-int) * -31 shift
     ] [
         (random-int) 2dup swap mod (random-int-0)
-    ] ifte ; inline
+    ] if ; inline
 
 : random-int ( min max -- n )
     dupd swap - random-int-0 + ; flushable

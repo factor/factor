@@ -62,7 +62,7 @@ TUPLE: editor line caret ;
 
 : x>offset ( x font str -- offset )
     dup >r run-char-widths [ <= ] find-with drop dup -1 =
-    [ drop r> length ] [ r> drop ] ifte ;
+    [ drop r> length ] [ r> drop ] if ;
 
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.

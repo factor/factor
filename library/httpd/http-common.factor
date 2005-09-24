@@ -4,11 +4,11 @@ USING: errors kernel lists math namespaces parser sequences
 io strings ;
 
 : header-line ( alist line -- alist )
-    ": " split1 dup [ cons swons ] [ 2drop ] ifte ;
+    ": " split1 dup [ cons swons ] [ 2drop ] if ;
 
 : (read-header) ( alist -- alist )
     readln dup
-    empty? [ drop ] [ header-line (read-header) ] ifte ;
+    empty? [ drop ] [ header-line (read-header) ] if ;
 
 : read-header ( -- alist )
     [ ] (read-header) ;
@@ -20,7 +20,7 @@ io strings ;
                 ,
             ] [
                 CHAR: % , >hex 2 CHAR: 0 pad-left %
-            ] ifte
+            ] if
         ] each
     ] "" make ;
 
@@ -33,7 +33,7 @@ io strings ;
         2drop
     ] [
         >r 1+ dup 2 + r> subseq  catch-hex> [ , ] when*
-    ] ifte ;
+    ] if ;
 
 : url-decode-% ( index str -- index str )
     2dup url-decode-hex >r 3 + r> ;
@@ -49,8 +49,8 @@ io strings ;
             drop url-decode-%
         ] [
             url-decode-+-or-other
-        ] ifte url-decode-iter
-    ] ifte ;
+        ] if url-decode-iter
+    ] if ;
 
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make ;

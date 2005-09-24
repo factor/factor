@@ -39,7 +39,7 @@ C: frame ( -- frame )
     reduce-grid @{ 0 0 0 }@ [ v+ ] reduce ;
 
 : pref-dim-grid ( grid -- grid )
-    [ [ [ pref-dim ] [ @{ 0 0 0 }@ ] ifte* ] map ] map ;
+    [ [ [ pref-dim ] [ @{ 0 0 0 }@ ] if* ] map ] map ;
 
 M: frame pref-dim ( frame -- dim )
     frame-grid pref-dim-grid
@@ -52,7 +52,7 @@ M: frame pref-dim ( frame -- dim )
 
 : do-grid ( dim-grid gadget-grid quot -- )
     -rot [
-        [ dup [ pick call ] [ 2drop ] ifte ] 2each
+        [ dup [ pick call ] [ 2drop ] if ] 2each
     ] 2each drop ; inline
 
 : position-grid ( gadgets horiz vert -- )

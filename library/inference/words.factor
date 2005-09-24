@@ -78,11 +78,11 @@ M: compound apply-word ( word -- )
             ] [
                 dupd consume/produce
                 "terminates" word-prop [ terminate ] when
-            ] ifte*
+            ] if*
         ] [
             apply-word
-        ] ifte*
-    ] ifte ;
+        ] if*
+    ] if ;
 
 M: word apply-object ( word -- )
     apply-default ;
@@ -94,11 +94,11 @@ M: symbol apply-object ( word -- )
     over "inline" word-prop [
         meta-d get clone >r
         over inline-block drop
-        [ #call-label ] [ #call ] ?ifte
+        [ #call-label ] [ #call ] ?if
         r> over set-node-in-d node,
     ] [
         drop dup t infer-compound nip "base-case" set-word-prop
-    ] ifte ;
+    ] if ;
 
 : base-case ( word label -- )
     [ inferring-base-case on (base-case) ]
@@ -113,7 +113,7 @@ M: symbol apply-object ( word -- )
 
 : notify-base-case ( -- )
     base-case-continuation get
-    [ t swap continue-with ] [ no-base-case ] ifte* ;
+    [ t swap continue-with ] [ no-base-case ] if* ;
 
 : recursive-word ( word [[ label quot ]] -- )
     #! Handle a recursive call, by either applying a previously
@@ -129,9 +129,9 @@ M: symbol apply-object ( word -- )
                 notify-base-case
             ] [
                 car base-case
-            ] ifte
-        ] ifte*
-    ] ifte* ;
+            ] if
+        ] if*
+    ] if* ;
 
 : splice-node ( node -- )
     dup node-successor [
@@ -146,7 +146,7 @@ M: symbol apply-object ( word -- )
         node,
     ] [
         node-child node-successor splice-node
-    ] ifte ;
+    ] if ;
 
 M: compound apply-object ( word -- )
     #! Apply the word's stack effect to the inferencer state.
@@ -154,5 +154,5 @@ M: compound apply-object ( word -- )
         recursive-word
     ] [
         dup "inline" word-prop
-        [ inline-block block, ] [ apply-default ] ifte
-    ] ifte* ;
+        [ inline-block block, ] [ apply-default ] if
+    ] if* ;

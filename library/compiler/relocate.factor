@@ -23,14 +23,14 @@ SYMBOL: relocation-table
 
 : rel-address ( rel/abs 16/16 -- )
     #! Relocate address just compiled.
-    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] ifte ;
+    over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] if ;
 
 : rel-word ( word rel/abs 16/16 -- )
     pick primitive? [
         rel-primitive
     ] [
         rot drop rel-address
-    ] ifte ;
+    ] if ;
 
 : rel-userenv ( n 16/16 -- )
     0 swap 3 rel-type, relocating rel, ;

@@ -49,7 +49,7 @@ threads unix-internals ;
     server-sockaddr [
         dup SOL_SOCKET SO_REUSEADDR sockopt
         swap dupd "sockaddr-in" c-size bind
-        dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] ifte
+        dup 0 >= [ drop 1 listen ] [ ( fd n - n) nip ] if
     ] with-socket-fd ;
 
 IN: io
@@ -102,7 +102,7 @@ M: accept-task do-io-task ( task -- ? )
         do-accept t
     ] [
         2drop defer-error
-    ] ifte ;
+    ] if ;
 
 M: accept-task task-container drop read-tasks get ;
 

@@ -6,7 +6,7 @@ USING: compiler kernel math sequences test ;
         drop
     ] [
         [ * ] keep 1- (fac)
-    ] ifte ;
+    ] if ;
 
 : fac ( n -- n! )
     1 swap (fac) ;

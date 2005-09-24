@@ -30,7 +30,7 @@ M: object clone ;
 
 : ? ( cond t f -- t/f )
     #! Push t if cond is true, otherwise push f.
-    rot [ drop ] [ nip ] ifte ; inline
+    rot [ drop ] [ nip ] if ; inline
 
 : >boolean t f ? ; inline
 : and ( a b -- a&b ) f ? ; inline
@@ -74,38 +74,38 @@ M: object clone ;
 : 2apply ( x y quot -- | quot: x/y -- )
     tuck 2slip call ; inline
 
-: ifte* ( cond true false -- | true: cond -- | false: -- )
-    #! [ X ] [ Y ] ifte* ==> dup [ X ] [ drop Y ] ifte
-    pick [ drop call ] [ 2nip call ] ifte ; inline
+: if* ( cond true false -- | true: cond -- | false: -- )
+    #! [ X ] [ Y ] if* ==> dup [ X ] [ drop Y ] if
+    pick [ drop call ] [ 2nip call ] if ; inline
 
-: ?ifte ( default cond true false -- )
-    #! [ X ] [ Y ] ?ifte ==> dup [ nip X ] [ drop Y ] ifte
+: ?if ( default cond true false -- )
+    #! [ X ] [ Y ] ?if ==> dup [ nip X ] [ drop Y ] if
     >r >r dup [
         nip r> r> drop call
     ] [
         drop r> drop r> call
-    ] ifte ; inline
+    ] if ; inline
 
 : unless ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is f. The
     #! condition is popped off the stack.
-    [ ] swap ifte ; inline
+    [ ] swap if ; inline
 
 : unless* ( cond quot -- | quot: -- )
     #! If cond is f, pop it off the stack and evaluate the
     #! quotation. Otherwise, leave cond on the stack.
-    over [ drop ] [ nip call ] ifte ; inline
+    over [ drop ] [ nip call ] if ; inline
 
 : when ( cond quot -- | quot: -- )
     #! Execute a quotation only when the condition is not f. The
     #! condition is popped off the stack.
-    [ ] ifte ; inline
+    [ ] if ; inline
 
 : when* ( cond quot -- | quot: cond -- )
     #! If the condition is true, it is left on the stack, and
     #! the quotation is evaluated. Otherwise, the condition is
     #! popped off the stack.
-    dupd [ drop ] ifte ; inline
+    dupd [ drop ] if ; inline
 
 : with ( obj quot elt -- obj quot )
     #! Utility word for each-with, map-with.
@@ -115,7 +115,7 @@ M: object clone ;
     datastack slip set-datastack drop ;
 
 M: wrapper = ( obj wrapper -- ? )
-    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] ifte ;
+    over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
 
 IN: kernel-internals
 

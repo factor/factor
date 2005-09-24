@@ -13,7 +13,7 @@ M: alien = ( obj obj -- ? )
         alien-address swap alien-address =
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : library ( name -- object )
     dup [ "libraries" get hash ] when ;

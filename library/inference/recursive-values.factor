@@ -8,7 +8,7 @@ GENERIC: collect-recursion* ( label node -- )
 M: node collect-recursion* ( label node -- ) 2drop ;
 
 M: #call-label collect-recursion* ( label node -- )
-    tuck node-param = [ node-in-d , ] [ drop ] ifte ;
+    tuck node-param = [ node-in-d , ] [ drop ] if ;
 
 : collect-recursion ( #label -- seq )
     #! Collect the input stacks of all #call-label nodes that

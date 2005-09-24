@@ -38,9 +38,9 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
                 first swap node-param order min-class
             ] [
                 2drop f
-            ] ifte
-        ] ifte
-    ] ifte ;
+            ] if
+        ] if
+    ] if ;
 
 : will-inline ( node -- quot )
     dup inlining-class swap node-param "methods" word-prop hash ;
@@ -66,7 +66,7 @@ M: 2generic dispatching-values drop node-in-d 2 swap tail* ;
         >r dup node-in-d node-classes* first r> related?
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : optimize-predicate ( #call -- node )
     dup node-param "predicating" word-prop >r

@@ -14,13 +14,13 @@ USE: namespaces
         drop 1
     ] [
         1 fixnum- dup fixnum-fib swap 1 fixnum- fixnum-fib fixnum+
-    ] ifte ;
+    ] if ;
     compiled
 
 [ 9227465 ] [ 34 fixnum-fib ] unit-test
 
 : fib ( n -- nth fibonacci number )
-    dup 1 <= [ drop 1 ] [ 1- dup fib swap 1- fib + ] ifte ;
+    dup 1 <= [ drop 1 ] [ 1- dup fib swap 1- fib + ] if ;
     compiled
 
 [ 9227465 ] [ 34 fib ] unit-test
@@ -37,7 +37,7 @@ TUPLE: box i ;
         box-i 1- <box>
         tuple-fib
         swap box-i swap box-i + <box>
-    ] ifte ; compiled
+    ] if ; compiled
 
 [ << box f 9227465 >> ] [ << box f 34 >> tuple-fib ] unit-test
 
@@ -51,7 +51,7 @@ SYMBOL: n
             n get 1 - namespace-fib
             n get 2 - namespace-fib
             +
-        ] ifte
+        ] if
     ] with-scope ; compiled
 
 [ 9227465 ] [ 34 namespace-fib ] unit-test

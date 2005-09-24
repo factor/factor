@@ -14,12 +14,12 @@ M: comment pprint* ( ann -- )
     swap comment-node presented swons unit text ;
 
 : comment, ( ? node text -- )
-    rot [ <comment> , ] [ 2drop ] ifte ;
+    rot [ <comment> , ] [ 2drop ] if ;
 
 : values% ( prefix values -- )
     [
         swap %
-        dup literal? [ literal-value ] [ value-uid ] ifte
+        dup literal? [ literal-value ] [ value-uid ] if
         unparse %
     ] each-with ;
 
@@ -39,7 +39,7 @@ DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )
     dup node-param dup
-    [ , dup effect-str comment, ] [ 3drop ] ifte ;
+    [ , dup effect-str comment, ] [ 3drop ] if ;
 
 M: #call node>quot ( ? node -- ) #call>quot ;
 
@@ -49,9 +49,9 @@ M: #label node>quot ( ? node -- )
     [ "#label: " over node-param word-name append comment, ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
-M: #ifte node>quot ( ? node -- )
-    [ "#ifte" comment, ] 2keep
-    node-children [ swap dataflow>quot ] map-with % \ ifte , ;
+M: #if node>quot ( ? node -- )
+    [ "#if" comment, ] 2keep
+    node-children [ swap dataflow>quot ] map-with % \ if , ;
 
 M: #dispatch node>quot ( ? node -- )
     [ "#dispatch" comment, ] 2keep
@@ -73,7 +73,7 @@ M: #terminate node>quot ( ? node -- ) "#terminate" comment, ;
         2dup node>quot node-successor (dataflow>quot)
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : dataflow>quot ( node ? -- quot )
     [ swap (dataflow>quot) ] [ ] make ;

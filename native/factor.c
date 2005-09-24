@@ -37,6 +37,7 @@ INLINE bool factor_arg(const char* str, const char* arg, CELL* value)
 
 int main(int argc, char** argv)
 {
+	char *image;
 	CELL ds_size = 2048;
 	CELL cs_size = 2048;
 	CELL generations = 2;
@@ -81,7 +82,9 @@ int main(int argc, char** argv)
 		}
 	}
 
-	init_factor(argv[1],
+	image = argv[1];
+
+	init_factor(image,
 		ds_size * 1024,
 		cs_size * 1024,
 		generations,
@@ -91,11 +94,12 @@ int main(int argc, char** argv)
 		literal_size * 1024);
 
 	args = F;
-	while(--argc != 0)
+	while(--argc != 1)
 	{
 		args = cons(tag_object(from_c_string(argv[argc])),args);
 	}
 
+	userenv[IMAGE_ENV] = tag_object(from_c_string(image));
 	userenv[ARGS_ENV] = args;
 
 	platform_run();

@@ -24,7 +24,7 @@ SYMBOL: responders
 : httpd-error ( error -- )
     #! This must be run from handle-request
     error-head
-    "head" "method" get = [ drop ] [ terpri error-body ] ifte ;
+    "head" "method" get = [ drop ] [ terpri error-body ] if ;
 
 : bad-request ( -- )
     [
@@ -150,7 +150,7 @@ SYMBOL: responders
     ] [
         ! Just a responder name by itself
         drop "request" get "/" append redirect drop
-    ] ifte ;
+    ] if ;
 
 : serve-responder ( method path host -- )
     #! Responder paths come in two forms:
@@ -161,7 +161,7 @@ SYMBOL: responders
             serve-explicit-responder
         ] [
             serve-default-responder
-        ] ifte
+        ] if
     ] bind ;
 
 : no-such-responder ( -- )

@@ -46,7 +46,7 @@ M: privmsg handle-irc ( line -- )
     parse-privmsg
     " " split1 swap
     [ "factorbot-commands" ] search dup
-    [ execute ] [ 2drop ] ifte ;
+    [ execute ] [ 2drop ] if ;
 
 M: ping handle-irc ( line -- )
     "PING " ?head drop "PONG " swap append irc-print ;
@@ -97,7 +97,7 @@ IN: factorbot-commands
         nip [
             dup word-string " -- " rot word-url append3 respond
         ] each
-    ] ifte ;
+    ] if ;
 
 : quit ( text -- )
     drop speaker get "slava" = [ disconnect ] when ;

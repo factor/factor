@@ -18,14 +18,14 @@ io strings ;
         drop
     ] [
         <file-reader> stdio get stream-copy
-    ] ifte ;
+    ] if ;
 
 : serve-file ( filename -- )
     dup mime-type dup "application/x-factor-server-page" = [
         drop run-file
     ] [
         serve-static
-    ] ifte ;
+    ] if ;
 
 : file-link. ( text path -- )
     file swons unit format ;
@@ -45,7 +45,7 @@ io strings ;
         drop
     ] [
         "request" get [ directory. ] simple-html-document
-    ] ifte ;
+    ] if ;
 
 : serve-directory ( filename -- )
     "/" ?tail [
@@ -53,13 +53,13 @@ io strings ;
             nip serve-file
         ] [
             drop list-directory
-        ] ifte
+        ] if
     ] [
         drop directory-no/
-    ] ifte ;
+    ] if ;
 
 : serve-object ( filename -- )
-    dup directory? [ serve-directory ] [ serve-file ] ifte ;
+    dup directory? [ serve-directory ] [ serve-file ] if ;
 
 : file-responder ( filename -- )
     "doc-root" get [
@@ -67,7 +67,7 @@ io strings ;
             serve-object
         ] [
             drop "404 not found" httpd-error
-        ] ifte
+        ] if
     ] [
         drop "404 doc-root not set" httpd-error
-    ] ifte ;
+    ] if ;

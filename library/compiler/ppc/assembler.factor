@@ -190,7 +190,7 @@ M: word BC >r 0 BC r> relative-14 ;
 
 : LOAD ( n r -- )
     #! PowerPC cannot load a 32 bit literal in one instruction.
-   >r dup dup HEX: ffff bitand = [ r> LI ] [ r> LOAD32 ] ifte ;
+   >r dup dup HEX: ffff bitand = [ r> LI ] [ r> LOAD32 ] if ;
 
 ! Floating point
 : (FMR) >r 0 -rot 72 r> x-form 63 insn ;

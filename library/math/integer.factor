@@ -10,7 +10,7 @@ UNION: integer fixnum bignum ;
         drop nip
     ] [
         tuck /mod >r pick * swap >r swapd - r> r> (gcd)
-    ] ifte ; inline
+    ] if ; inline
 
 : gcd ( x y -- a d )
     #! Compute the greatest common divisor d and multiplier a
@@ -29,7 +29,7 @@ UNION: integer fixnum bignum ;
 IN: math-internals
 
 : fraction> ( a b -- a/b )
-    dup 1 number= [ drop ] [ (fraction>) ] ifte ; inline
+    dup 1 number= [ drop ] [ (fraction>) ] if ; inline
 
 : division-by-zero ( x y -- ) "Division by zero" throw ;
 
@@ -39,7 +39,7 @@ M: integer / ( x y -- x/y )
     ] [
         dup 0 < [ [ neg ] 2apply ] when
         2dup gcd nip tuck /i >r /i r> fraction>
-    ] ifte ;
+    ] if ;
 
 M: fixnum number=
     #! Fixnums are immediate values, so equality testing is

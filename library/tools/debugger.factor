@@ -81,7 +81,7 @@ M: no-math-method error. ( error -- )
     ":" write
     dup parse-error-line [ 1 ] unless* number>string print
     
-    dup parse-error-text dup string? [ print ] [ drop ] ifte
+    dup parse-error-text dup string? [ print ] [ drop ] if
     
     parse-error-col [ 0 ] unless* CHAR: \s fill write "^" print ;
 

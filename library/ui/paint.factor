@@ -28,17 +28,17 @@ GENERIC: draw-gadget* ( gadget -- )
             dup do-clip dup translate dup draw-gadget*
             visible-children [ draw-gadget ] each
         ] with-scope
-    ] [ drop ] ifte ;
+    ] [ drop ] if ;
 
 : paint-prop* ( gadget key -- value ) swap gadget-paint ?hash ;
 
 : paint-prop ( gadget key -- value )
     over [
         2dup paint-prop* dup
-        [ 2nip ] [ drop >r gadget-parent r> paint-prop ] ifte
+        [ 2nip ] [ drop >r gadget-parent r> paint-prop ] if
     ] [
         2drop f
-    ] ifte ;
+    ] if ;
 
 : set-paint-prop ( gadget value key -- )
     pick gadget-paint ?set-hash swap set-gadget-paint ;
@@ -52,7 +52,7 @@ GENERIC: draw-gadget* ( gadget -- )
         foreground
     ] [
         dup rollover paint-prop rollover-bg background ?
-    ] ifte paint-prop ;
+    ] if paint-prop ;
 
 ! Pen paint properties
 SYMBOL: interior
@@ -86,11 +86,11 @@ C: rollover-only << solid f >> over set-delegate ;
 
 M: rollover-only draw-interior ( gadget interior -- )
     over rollover paint-prop
-    [ delegate draw-interior ] [ 2drop ] ifte ;
+    [ delegate draw-interior ] [ 2drop ] if ;
 
 M: rollover-only draw-boundary ( gadget boundary -- )
     over rollover paint-prop
-    [ delegate draw-boundary ] [ 2drop ] ifte ;
+    [ delegate draw-boundary ] [ 2drop ] if ;
 
 ! Gradient pen
 TUPLE: gradient vector from to ;
@@ -124,7 +124,7 @@ TUPLE: gradient vector from to ;
 M: gradient draw-interior ( gadget gradient -- )
     swap rect-dim @{ 1 1 1 }@ vmax
     over gradient-vector @{ 1 0 0 }@ =
-    [ horiz-gradient ] [ vert-gradient ] ifte ;
+    [ horiz-gradient ] [ vert-gradient ] if ;
 
 ! Bevel pen
 TUPLE: bevel width ;

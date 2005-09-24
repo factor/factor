@@ -85,7 +85,7 @@ TUPLE: item expire? quot id time-added ;
       continuation-table remove-hash
     ] [
       drop
-    ] ifte
+    ] if
   ] hash-each-with ;
 
 : expirable ( quot -- t quot )
@@ -152,7 +152,7 @@ DEFER: show
     item-quot
   ] [
     [ expired-page-handler ]
-  ] ifte* >callable ;
+  ] if* >callable ;
 
 : resume-continuation ( value id  -- ) 
   #! Call the continuation associated with the given id,
@@ -222,7 +222,7 @@ SYMBOL: callback-cc
     ] callcc1 drop 
   ] [
     t post-refresh-get? set
-  ] ifte ;
+  ] if ;
   
 : show ( quot -- namespace )   
   #! Call the quotation with the URL associated with the current
@@ -271,7 +271,7 @@ SYMBOL: root-continuation
       resume-continuation
     ] [
       expired-page-handler 
-    ] ifte* 
+    ] if* 
   ] with-exit-continuation [ write flush ] when* ;
 
 : callback-quot ( quot -- quot )

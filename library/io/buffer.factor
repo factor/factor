@@ -70,10 +70,10 @@ C: buffer ( size -- buffer )
             buffer-extend
         ] [
             "Buffer overflow" throw
-        ] ifte
+        ] if
     ] [
         2drop
-    ] ifte ;
+    ] if ;
 
 : >buffer ( string buffer -- )
     over length over check-overflow

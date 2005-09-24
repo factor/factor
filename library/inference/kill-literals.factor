@@ -41,7 +41,7 @@ M: f returns* drop ;
 
 : kill-node ( values node -- )
     over hash-size 0 >
-    [ [ remove-values ] each-node-with ] [ 2drop ] ifte ;
+    [ [ remove-values ] each-node-with ] [ 2drop ] if ;
 
 ! Generic nodes
 M: node literals* ( node -- ) drop @{ }@ ;
@@ -60,7 +60,7 @@ M: #return returns* , ;
 
 M: #return live-values* ( node -- seq )
     #! Values returned by local labels can be killed.
-    dup node-param [ drop @{ }@ ] [ delegate live-values* ] ifte ;
+    dup node-param [ drop @{ }@ ] [ delegate live-values* ] if ;
 
 ! nodes that don't use their input values directly
 UNION: #killable #shuffle #call-label #merge #values ;
@@ -75,7 +75,7 @@ M: #entry live-values* ( node -- seq )
     node-out-d ;
 
 ! branching
-UNION: #branch #ifte #dispatch ;
+UNION: #branch #if #dispatch ;
 
 M: #branch returns* ( node -- ) node-children [ returns* ] each ;
 

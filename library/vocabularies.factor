@@ -64,7 +64,7 @@ SYMBOL: vocabularies
     #! already contains the word, the existing instance is
     #! returned.
     2dup check-create 2dup lookup dup
-    [ 2nip ] [ drop <word> dup reveal ] ifte ;
+    [ 2nip ] [ drop <word> dup reveal ] if ;
 
 : constructor-word ( string vocab -- word )
     >r "<" swap ">" append3 r> create ;

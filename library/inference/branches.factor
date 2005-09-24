@@ -15,16 +15,16 @@ namespaces parser prettyprint sequences strings vectors words ;
 : unify-values ( seq -- value )
     #! If all values in list are equal, return the value.
     #! Otherwise, unify.
-    dup all-eq? [ first ] [ drop <value> ] ifte ;
+    dup all-eq? [ first ] [ drop <value> ] if ;
 
 : unify-stacks ( seq -- stack )
     #! Replace differing literals in stacks with unknown
     #! results.
     [ ] subset dup empty?
-    [ drop f ] [ unify-lengths flip [ unify-values ] map ] ifte ;
+    [ drop f ] [ unify-lengths flip [ unify-values ] map ] if ;
 
 : balanced? ( in out -- ? )
-    [ dup [ length - ] [ 2drop f ] ifte ] 2map
+    [ dup [ length - ] [ 2drop f ] if ] 2map
     [ ] subset all-equal? ;
 
 : unify-in-d ( seq -- n )
@@ -44,7 +44,7 @@ namespaces parser prettyprint sequences strings vectors words ;
         unify-stacks >r unify-in-d r>
     ] [
         unbalanced-branches
-    ] ifte ;
+    ] if ;
 
 : datastack-effect ( seq -- )
     dup [ d-in swap hash ] map

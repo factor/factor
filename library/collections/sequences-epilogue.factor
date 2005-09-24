@@ -12,8 +12,8 @@ sequences strings vectors words ;
             2drop 1+ r> (lexi)
         ] [
             r> drop - >r 3drop r>
-        ] ifte
-    ] ifte ; flushable
+        ] if
+    ] if ; flushable
 
 IN: sequences
 
@@ -26,7 +26,7 @@ M: object empty? ( seq -- ? ) length 0 = ;
         3drop [ ]
     ] [
         2dup nth >r >r 1+ r> (>list) r> swons
-    ] ifte ;
+    ] if ;
 
 M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
@@ -38,7 +38,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : (subst) ( newseq oldseq elt -- new/elt )
     [ swap index ] keep
-    over -1 > [ drop swap nth ] [ 2nip ] ifte ;
+    over -1 > [ drop swap nth ] [ 2nip ] if ;
 
 : subst ( newseq oldseq seq -- )
     #! Mutates seq. If an element of seq occurs in oldseq,
@@ -47,7 +47,7 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
 
 : move ( to from seq -- )
     pick pick number=
-    [ 3drop ] [ [ nth swap ] keep set-nth ] ifte ; inline
+    [ 3drop ] [ [ nth swap ] keep set-nth ] if ; inline
 
 : (delete) ( elt store scan seq -- )
     2dup length < [
@@ -117,7 +117,7 @@ M: object peek ( sequence -- element )
         dup length <vector> swap
         [ over push 2dup push ] each nip dup pop*
         concat
-    ] ifte ; flushable
+    ] if ; flushable
 
 M: object reverse-slice ( seq -- seq ) <reversed> ;
 
@@ -153,10 +153,10 @@ IN: kernel
 : cond ( conditions -- )
     #! Conditions is a sequence of quotation pairs.
     #! { { [ X ] [ Y ] } { [ Z ] [ T ] } }
-    #! => X [ Y ] [ Z [ T ] [ ] ifte ] ifte
+    #! => X [ Y ] [ Z [ T ] [ ] if ] if
     #! The last condition should be a catch-all 't'.
     [ first call ] find nip dup
-    [ second call ] [ no-cond ] ifte ;
+    [ second call ] [ no-cond ] if ;
 
 : with-datastack ( stack word -- stack )
     datastack >r >r set-datastack r> execute

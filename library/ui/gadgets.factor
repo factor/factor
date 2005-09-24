@@ -59,7 +59,7 @@ M: gadget children-on ( rect/point gadget -- list )
 
 : inside? ( bounds gadget -- ? )
     dup gadget-visible?
-    [ >absolute intersects? ] [ 2drop f ] ifte ;
+    [ >absolute intersects? ] [ 2drop f ] if ;
 
 : pick-up-list ( rect/point gadget -- gadget/f )
     dupd children-on reverse-slice [ inside? ] find-with nip ;
@@ -71,6 +71,6 @@ M: gadget children-on ( rect/point gadget -- list )
     2dup inside? [
         [
             dup translate 2dup pick-up-list dup
-            [ nip pick-up ] [ rot 2drop ] ifte
+            [ nip pick-up ] [ rot 2drop ] if
         ] with-scope
-    ] [ 2drop f ] ifte ;
+    ] [ 2drop f ] if ;

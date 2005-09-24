@@ -937,10 +937,10 @@ It is very important to balance usages of \texttt{>r} and \texttt{r>} within a s
 \end{verbatim}
 Basically, the rule is you must leave the call stack in the same state as you found it, so that when the current quotation finishes executing, the interpreter can return to the caller.
 
-One exception is that when \texttt{ifte} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{ifte} pop the values off the call stack before returning.
+One exception is that when \texttt{if} occurs as the last word in a definition, values may be pushed on the call stack before the condition value is computed, as long as both branches of the \texttt{if} pop the values off the call stack before returning.
 \begin{verbatim}
 : foo ( m ? n -- m+n/n )
-    >r [ r> + ] [ drop r> ] ifte ; ! Okay
+    >r [ r> + ] [ drop r> ] if ; ! Okay
 \end{verbatim}
 
 \subsection{Quotation variants}
@@ -986,10 +986,10 @@ Call a quotation with three values on the stack, restoring the values when the q
 
 \section{Conditionals}
 
-The simplest style of a conditional form is the \texttt{ifte} word.
+The simplest style of a conditional form is the \texttt{if} word.
 \wordtable{
 \vocabulary{kernel}
-\ordinaryword{ifte}{ifte ( cond true false -- )}
+\ordinaryword{if}{if ( cond true false -- )}
 }
 The \texttt{cond} is a generalized boolean. If it is \texttt{f}, the \texttt{false} quotation is called, and if \texttt{cond} is any other value, the \texttt{true} quotation is called. The condition flag is removed from the stack before either quotation executes.
 
@@ -999,52 +999,52 @@ Note that in general, both branches should have the same stack effect. Not only 
 \ordinaryword{when}{when ( cond true -- | true:~-- )}
 \ordinaryword{unless}{unless ( cond false -- | false:~-- )}
 }
-This pair are minor variations on \texttt{ifte} where only one branch is specified. The other is implicitly \texttt{[ ]}. They are implemented in the trivial way:
+This pair are minor variations on \texttt{if} where only one branch is specified. The other is implicitly \texttt{[ ]}. They are implemented in the trivial way:
 \begin{verbatim}
-: when [ ] ifte ; inline
-: unless [ ] swap ifte ; inline
+: when [ ] if ; inline
+: unless [ ] swap if ; inline
 \end{verbatim}
-The \texttt{ifte} word removes the condition flag from the stack before calling either quotation. Sometimes this is not desirable, if the condition flag is serving a dual purpose as a value to be consumed by the \texttt{true} quotation. The \texttt{ifte*} word exists for this purpose.
+The \texttt{if} word removes the condition flag from the stack before calling either quotation. Sometimes this is not desirable, if the condition flag is serving a dual purpose as a value to be consumed by the \texttt{true} quotation. The \texttt{if*} word exists for this purpose.
 \wordtable{
 \vocabulary{kernel}
-\ordinaryword{ifte*}{ifte*~( cond true false -- )}
+\ordinaryword{if*}{if*~( cond true false -- )}
 \texttt{true:~cond --}\\
 \texttt{false:~--}\\
 }
 If the condition is true, it is retained on the stack before the \texttt{true} quotation is called. Otherwise, the condition is removed from the stack and the \texttt{false} quotation is called. The following two lines are equivalent:
 \begin{verbatim}
-X [ Y ] [ Z ] ifte*
-X dup [ Y ] [ drop Z ] ifte
+X [ Y ] [ Z ] if*
+X dup [ Y ] [ drop Z ] if
 \end{verbatim}
 \wordtable{
 \vocabulary{kernel}
 \ordinaryword{when*}{when*~( cond true -- | true:~cond -- )}
 \ordinaryword{unless*}{unless*~( cond false -- | false:~-- )}
 }
-These are variations of \texttt{ifte*} where one of the quotations is \texttt{[ ]}.
+These are variations of \texttt{if*} where one of the quotations is \texttt{[ ]}.
 
 The following two lines are equivalent:
 \begin{verbatim}
 X [ Y ] when*
-X dup [ Y ] [ drop ] ifte
+X dup [ Y ] [ drop ] if
 \end{verbatim}
 The following two lines are equivalent:
 \begin{verbatim}
 X [ Y ] unless*
-X dup [ ] [ drop Y ] ifte
+X dup [ ] [ drop Y ] if
 \end{verbatim}
 
 There is one final conditional form that is used to implement the ``default value'' idiom.
 \wordtable{
 \vocabulary{kernel}
-\ordinaryword{?ifte}{?ifte ( default cond true false -- )}
+\ordinaryword{?if}{?if ( default cond true false -- )}
 \texttt{true:~cond --}\\
 \texttt{false:~default --}\\
 }
 If the condition is \texttt{f}, the \texttt{false} quotation is called with the \texttt{default} value on the stack. Otherwise, the \texttt{true} quotation is called with the condition on the stack. The following two lines are equivalent:
 \begin{verbatim}
-D X [ Y ] [ Z ] ?ifte
-D X dup [ nip Y ] [ drop Z ] ifte
+D X [ Y ] [ Z ] ?if
+D X dup [ nip Y ] [ drop Z ] if
 \end{verbatim}
 
 \subsection{Boolean logic}
@@ -1057,7 +1057,7 @@ The \texttt{?}~word chooses between two values, rather than two quotations.
 It is implemented in the obvious way.
 \begin{verbatim}
 : ? ( cond t f -- t/f )
-    rot [ drop ] [ nip ] ifte ; inline
+    rot [ drop ] [ nip ] if ; inline
 \end{verbatim}
 Several words use \texttt{?}~to implement typical boolean algebraic operations.
 \wordtable{
@@ -3559,7 +3559,7 @@ Computes the bitwise complement of the input; that is, each bit in the input num
 \vocabulary{math}
 \ordinaryword{shift}{shift ( x n -{}- y )}
 }
-Computes a new integer consisting of the bits of the first integer, shifted to the left by $n$ positions. If $n$ is negative, the bits are shifted to the right instead, and bits that ``fall off'' are discarded.
+Computes a new integer consisting of the bits of the first integer, shifd to the left by $n$ positions. If $n$ is negative, the bits are shifd to the right instead, and bits that ``fall off'' are discarded.
 \begin{alltt}
   BIN: 101 5 shift .b
 \textbf{10100000}
@@ -4628,7 +4628,7 @@ M: tex-stream stream-format ( string attrs stream -- )
             "\textbf{" write write "}" write
         ] [
             write
-        ] ifte
+        ] if
     ] with-wrapper ;
 \end{verbatim}
 
@@ -4923,7 +4923,7 @@ M: wrapper prettyprint*
         \ \ unparse. bl wrapped unparse. 
     ] [
         \ W[ unparse. bl wrapped prettyprint* \ ]W unparse. 
-    ] ifte ;
+    ] if ;
 \end{verbatim}
 The somewhat more verbose \verb|W[ ... ]W| syntax is only part of the language for completeness, to handle the corner case where a wrapper wrapping another wrapper is printed out and read back in by the parser.
 
@@ -6510,12 +6510,12 @@ Simpler than a stack effect is the concept of a stack height difference. This is
 
 The following two examples exhibit balanced conditionals:
 \begin{verbatim}
-[ 1 ] [ dup ] ifte
+[ 1 ] [ dup ] if
 dup cons? [ unit ] when cons
 \end{verbatim}
 The following example is not balanced and raises an error when we attempt to infer its stack effect:
 \begin{alltt}
-  [ [ dup ] [ drop ] ifte ] infer .
+  [ [ dup ] [ drop ] if ] infer .
 \textbf{! Inference error: Unbalanced branches
 ! Recursive state:
 :s :r :n :c show stacks at time of error.
@@ -6529,7 +6529,7 @@ Recursive words all have the same general form; there is a conditional, and one 
 Consider the following implementation of a word that measures the length of a list:
 \begin{verbatim}
 : length ( list -- n )
-    [ cdr length 1 + ] [ 0 ] ifte* ;
+    [ cdr length 1 + ] [ 0 ] if* ;
 \end{verbatim}
 The stack effect can be inferred without difficulty:
 \begin{alltt}
@@ -6542,7 +6542,7 @@ On the other hand if the top of the stack is something else, the inductive case 
 
 If both branches contain a recursive call, the stack effect inferencer gives up.
 \begin{alltt}
-  : fie [ fie ] [ fie ] ifte ;
+  : fie [ fie ] [ fie ] if ;
   [ fie ] infer .
 \textbf{! Inference error: fie does not have a base case
 ! Recursive state:
@@ -6657,7 +6657,7 @@ The \verb|value| tuple has one slot, \verb|value-recursion|. This is a list of n
 
 \begin{description}
 
-\item[\texttt{\#ifte}] A conditional expression.
+\item[\texttt{\#if}] A conditional expression.
 
 \begin{description}
 \item[\texttt{node-in-d}]A singleton list holding the condition being tested.\\
@@ -6671,13 +6671,13 @@ The \verb|value| tuple has one slot, \verb|value-recursion|. This is a list of n
 \item[\texttt{node-children}]A list of nodes, in consecutive jump table order.
 \end{description}
 
-\item[\texttt{\#values}] Found at the end of each branch in an \verb|#ifte| or \verb|#dispatch| node.
+\item[\texttt{\#values}] Found at the end of each branch in an \verb|#if| or \verb|#dispatch| node.
 
 \begin{description}
 \item[\texttt{node-out-d}]A list of values present on the data stack at the end of the branch.\\
 \end{description}
 
-\item[\texttt{\#meet}] Must be the successor if an \verb|#ifte| or \verb|#dispatch| node.
+\item[\texttt{\#meet}] Must be the successor if an \verb|#if| or \verb|#dispatch| node.
 
 \begin{description}
 \item[\texttt{node-in-d}]A list of \verb|meet| values unified from the \verb|#values| node at the end of each branch.\\

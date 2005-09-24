@@ -11,7 +11,7 @@ sequences strings ;
     <repeated> >string ; inline
 
 : padding ( string count char -- string )
-    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] ifte ;
+    >r swap length - dup 0 <= [ r> 2drop "" ] [ r> fill ] if ;
     flushable
 
 : pad-left ( string count char -- string )

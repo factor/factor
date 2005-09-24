@@ -225,13 +225,13 @@ M: general-list tutorial-line
             ""
             [ "  ... condition ... [ ... false case ... ] unless" ]
             ""
-            "The 'ifte' conditional takes action on both branches:"
+            "The 'if' conditional takes action on both branches:"
             ""
-            [ "  ... condition ... [ ... ] [ ... ] ifte" ]
+            [ "  ... condition ... [ ... ] [ ... ] if" ]
         ] [
             "* Combinators"
             "--"
-            "ifte, when, unless are words that take lists of code as input."
+            "if, when, unless are words that take lists of code as input."
             ""
             "Lists of code are called ``quotations''."
             "Words that take quotations are called ``combinators''."

@@ -1,26 +1,23 @@
 ! Copyright (C) 2003, 2004 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: command-line
-USING: errors io kernel kernel-internals lists namespaces parser
-sequences strings ;
-
-! This file is run as the last stage of boot.factor; it relies
-! on all other words already being defined.
+IN: kernel
+USING: errors hashtables io kernel-internals lists namespaces
+parser sequences strings ;
 
 : ?run-file ( file -- )
-    dup exists? [ [ dup run-file ] try drop ] [ drop ] ifte ;
+    dup exists? [ [ dup run-file ] try ] when drop ;
 
 : run-user-init ( -- )
     #! Run user init file if it exists
     "user-init" get
     [ "~" get "/.factor-rc" append ?run-file ] when ;
 
-: set-path ( value list -- )
-    unswons over [ nest [ set-path ] bind ] [ nip set ] ifte ;
+: set-path ( value seq -- )
+    unswons over [ nest [ set-path ] bind ] [ nip set ] if ;
 
 : cli-var-param ( name value -- ) swap ":" split set-path ;
 
-: cli-bool-param ( name -- ) "no-" ?head not swap set ;
+: cli-bool-param ( name -- ) "no-" ?head not cli-var-param ;
 
 : cli-param ( param -- )
     #! Handle a command-line argument starting with '-' by
@@ -29,7 +26,7 @@ sequences strings ;
     #!
     #! Arguments containing = are handled differently; they
     #! set the object path.
-    "=" split1 [ cli-var-param ] [ cli-bool-param ] ifte* ;
+    "=" split1 [ cli-var-param ] [ cli-bool-param ] if* ;
 
 : cli-arg ( argument -- argument )
     #! Handle a command-line argument. If the argument was
@@ -39,12 +36,6 @@ sequences strings ;
         "-" ?head [ cli-param f ] when
         dup [ "+" ?head [ drop f ] when ] when
     ] unless ;
-
-: parse-switches ( args -- args )
-    [ cli-arg ] map ;
-
-: run-files ( args -- )
-    [ [ run-file ] when* ] each ;
 
 : cli-args ( -- args ) 10 getenv ;
 
@@ -57,6 +48,4 @@ sequences strings ;
     os "win32" = "ui" "tty" ? "shell" set ;
 
 : parse-command-line ( -- )
-    #! Parse command line arguments.
-    #! The first CLI arg is the image name.
-    cli-args unswons "image" set parse-switches run-files ;
+    cli-args [ cli-arg ] subset [ run-file ] each  ;

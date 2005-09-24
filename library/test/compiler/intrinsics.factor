@@ -125,10 +125,10 @@ math-internals sequences test words ;
 [ t ] [ "hey" type "hey" [ type ] compile-1 eq? ] unit-test
 [ t ] [ f type f [ type ] compile-1 eq? ] unit-test
 
-[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
-[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] ifte ] compile-1 ] unit-test
+[ 5 ] [ 1 2 [ eq? [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 3 ] [ 2 2 [ eq? [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 3 ] [ 1 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-1 ] unit-test
+[ 5 ] [ 2 2 [ fixnum< [ 3 ] [ 5 ] if ] compile-1 ] unit-test
 
 [ 8 ] [ 1 3 [ fixnum-shift ] compile-1 ] unit-test
 [ 8 ] [ 1 [ 3 fixnum-shift ] compile-1 ] unit-test

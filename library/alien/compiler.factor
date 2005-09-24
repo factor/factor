@@ -86,10 +86,10 @@ C: alien-node make-node ;
             int-regs [ swap float-regs-size 4 / + ] change
         ] [
             drop
-        ] ifte
+        ] if
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : load-parameter ( n parameter -- node )
     c-type "reg-class" swap hash
@@ -116,7 +116,7 @@ C: alien-node make-node ;
         drop
     ] [
         c-type [ "boxer" get "reg-class" get ] bind %box ,
-    ] ifte ;
+    ] if ;
 
 M: alien-node linearize* ( node -- )
     dup parameters linearize-parameters
@@ -127,7 +127,7 @@ M: alien-node linearize* ( node -- )
 
 : unpair ( seq -- odds evens )
     2 swap group flip dup empty?
-    [ drop { } { } ] [ first2 ] ifte ;
+    [ drop { } { } ] [ first2 ] if ;
 
 : parse-arglist ( lst -- types stack effect )
     unpair [
@@ -164,4 +164,4 @@ M: compound (uncrossref)
     ] [
         dup { "infer-effect" "base-case" "no-effect" "terminates" }
         reset-props update-xt
-    ] ifte ;
+    ] if ;

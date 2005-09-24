@@ -78,7 +78,7 @@ M: register displacement drop ;
 
 ( Indirect register operands -- eg, [ ECX ]                    )
 PREDICATE: cons indirect
-    dup cdr [ drop f ] [ car register? ] ifte ;
+    dup cdr [ drop f ] [ car register? ] if ;
 
 M: indirect modifier drop BIN: 00 ;
 M: indirect register car register ;
@@ -88,18 +88,18 @@ M: indirect canonicalize dup car EBP = [ drop [ EBP 0 ] ] when ;
 ( Displaced indirect register operands -- eg, [ EAX 4 ]        )
 PREDICATE: cons displaced
     dup length 2 =
-    [ first2 integer? swap register? and ] [ drop f ] ifte ;
+    [ first2 integer? swap register? and ] [ drop f ] if ;
 
 M: displaced modifier second byte? BIN: 01 BIN: 10 ? ;
 M: displaced register car register ;
 M: displaced displacement
-    second dup byte? [ compile-byte ] [ compile-cell ] ifte ;
+    second dup byte? [ compile-byte ] [ compile-cell ] if ;
 M: displaced canonicalize
     dup first EBP = not over second 0 = and [ first unit ] when ;
 
 ( Displacement-only operands -- eg, [ 1234 ]                   )
 PREDICATE: cons disp-only
-    dup length 1 = [ car integer? ] [ drop f ] ifte ;
+    dup length 1 = [ car integer? ] [ drop f ] if ;
 
 M: disp-only modifier drop BIN: 00 ;
 M: disp-only register
@@ -131,7 +131,7 @@ UNION: operand register indirect displaced disp-only ;
     ] [
         compile-byte swap r> 1-operand
         compile-cell
-    ] ifte ;
+    ] if ;
 
 : immediate-8 ( dst imm code reg -- )
     #! The 'reg' is not really a register, but a value for the

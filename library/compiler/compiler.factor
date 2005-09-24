@@ -38,7 +38,7 @@ words ;
         gensym [ swap define-compound ] keep dup compile execute
     ] [
         call
-    ] ifte ;
+    ] if ;
 
 \ dataflow profile
 \ linearize profile

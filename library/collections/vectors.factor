@@ -27,5 +27,5 @@ M: general-list like drop >list ;
 
 M: vector like
     drop dup vector? [
-        dup array? [ array>vector ] [ >vector ] ifte
+        dup array? [ array>vector ] [ >vector ] if
     ] unless ;

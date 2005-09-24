@@ -27,7 +27,7 @@ memory namespaces words ;
         literal-overflow
     ] [
         computed-overflow
-    ] ifte
+    ] if
     ! Compute a result, this time it will fit.
     dupd r> execute
     ! Create a bignum.

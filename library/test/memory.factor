@@ -16,7 +16,7 @@ TUPLE: testing x y z ;
                 "predicate" word-prop instances [
                     class drop
                 ] each
-            ] ifte
+            ] if
         ] when*
     ] each
 ] unit-test

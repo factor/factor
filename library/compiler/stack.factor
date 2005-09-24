@@ -16,7 +16,7 @@ M: object load-value ( vreg n value -- )
     drop %peek-d , ;
 
 : load-literal ( vreg obj -- )
-    dup immediate? [ %immediate ] [ %indirect ] ifte , ;
+    dup immediate? [ %immediate ] [ %indirect ] if , ;
 
 M: literal load-value ( vreg n value -- )
     nip literal-value load-literal ;
@@ -80,7 +80,7 @@ SYMBOL: live-r
     swapd (vregs>stacks) (vregs>stacks) ;
 
 : ?nth ( n seq -- elt/f )
-    2dup length >= [ 2drop f ] [ nth ] ifte ;
+    2dup length >= [ 2drop f ] [ nth ] if ;
 
 : live-stores ( instack outstack -- stack )
     #! Avoid storing a value into its former position.
