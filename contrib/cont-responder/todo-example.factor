@@ -197,9 +197,9 @@ USE: sequences
         t
       ] [
         f
-      ] ifte
-    ] ifte
-  ] ifte ;
+      ] if
+    ] if
+  ] if ;
 
 : replace-invalid-username-chars ( str -- str ) 
   #! Return a string with invalid username characters mapped to underscores.
@@ -207,7 +207,7 @@ USE: sequences
     dup valid-username-char [ 
     ] [ 
       drop CHAR: _ 
-    ] ifte 
+    ] if 
   ] map ;
 
 : is-valid-username? ( username -- bool )
@@ -260,7 +260,7 @@ USE: sequences
   ] [
     <todo> init-new-todo
     "You have successfully registered your todo list." show-message-page
-  ] ifte ;
+  ] if ;
 
 : login-request-paragraph ( -- )
   #! Display the paragraph requesting the user to login or register.
@@ -334,11 +334,11 @@ USE: sequences
 : priority-valid? ( string -- bool )
   #! Test the string containing a priority to see if it is 
   #! valid. It should be a single digit from 0-9.
-  dup length 1 = [ 0 swap nth digit? ] [ drop f ] ifte ;
+  dup length 1 = [ 0 swap nth digit? ] [ drop f ] if ;
 
 : todo-details-valid? ( priority description -- bool )
   #! Return true if a valid priority and description were entered.
-  length 0 > [ priority-valid? ] [ drop f ] ifte ;
+  length 0 > [ priority-valid? ] [ drop f ] if ;
 
 : get-new-todo-item ( -- <todo-item> )
   #! Enter a new item to the current todo list.
@@ -352,7 +352,7 @@ USE: sequences
     2drop 
     "Please ensure you enter a Priority from 0-9 and a description." show-message-page
     get-new-todo-item
-  ] ifte ;
+  ] if ;
 
 : write-get-password-form ( url -- )
   #! Display the HTML for a form allowing entry of a 
@@ -388,11 +388,11 @@ USE: sequences
       ] [
         "Your new password did not match. The password was NOT changed." show-message-page
         f
-      ] ifte
+      ] if
     ] [
       "You entered an incorrect old password. The password was NOT changed." show-message-page
       f
-    ] ifte
+    ] if
   ] bind ;
 
 : edit-item-details ( item -- )
@@ -407,7 +407,7 @@ USE: sequences
     drop drop 
     "Please ensure you enter a Priority from 0-9 and a description." show-message-page
     edit-item-details
-  ] ifte ;
+  ] if ;
 
 : save-current-todo ( -- )
   #! Save the current todo list
@@ -426,7 +426,7 @@ USE: sequences
     "Delete" swap [ "todo" get swap delete-item save-current-todo ] lcurry1 quot-href
   ] [
     "Complete" swap [ set-item-completed save-current-todo ] lcurry1 quot-href
-  ] ifte ;
+  ] if ;
 
 : write-edit-action ( item -- )
   #! Write out html to allow editing an item.
@@ -435,14 +435,14 @@ USE: sequences
 : item-class ( <todo-item> -- string )
   #! Return the class to use for displaying the row for the
   #! item.
-  item-complete? [ "complete" ] [ "item" ] ifte ;
+  item-complete? [ "complete" ] [ "item" ] if ;
 
 : write-item-row ( <todo-item> -- )
   #! Write the todo list item as an HTML row.
   dup dup dup dup
   dup item-class [ 
     [ item-priority write ] 
-    [ item-complete? [ "Yes" ] [ "No" ] ifte write ] 
+    [ item-complete? [ "Yes" ] [ "No" ] if write ] 
     [ item-description write ] 
     [ write-mark-complete-action ]
     [ write-edit-action ] 
@@ -468,7 +468,7 @@ USE: sequences
     "Your password has been changed." show-message-page 
   ] [
     drop
-  ] ifte ;
+  ] if ;
 
 : show-todo-list ( -- )
   #! Show the current todo list.

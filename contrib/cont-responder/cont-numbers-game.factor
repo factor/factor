@@ -78,14 +78,14 @@ USE: namespaces
 : too-low "Too low" web-print ;
 : correct "Correct - you win!" web-print ;
 : inexact-guess ( actual guess -- )
-     < [ too-high ] [ too-low ] ifte ;
+     < [ too-high ] [ too-low ] if ;
 
 : judge-guess ( actual guess -- ? )
     2dup = [
         2drop correct f
     ] [
         inexact-guess t
-    ] ifte ;
+    ] if ;
 
 : number-to-guess ( -- n ) 0 100 random-int ;
 
@@ -94,7 +94,7 @@ USE: namespaces
         numbers-game-loop
     ] [
         drop
-    ] ifte ;
+    ] if ;
 
 : numbers-game number-to-guess numbers-game-loop ;
 

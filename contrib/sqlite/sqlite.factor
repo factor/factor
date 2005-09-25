@@ -158,7 +158,7 @@ END-STRUCT
     drop 
   ] [
     "sqlite returned an error. See datastack for the error value." throw
-  ] ifte ;
+  ] if ;
 
 : sqlite-open ( filename -- db )
   #! Open the database referenced by the filename and return
@@ -214,8 +214,8 @@ END-STRUCT
       drop t 
     ] [
       sqlite-check-result t
-    ] ifte
-  ] ifte ;
+    ] if
+  ] if ;
 
 : sqlite-each ( statement quot -- )    
   #! Execute the SQL statement, and call the quotation for
@@ -225,7 +225,7 @@ END-STRUCT
     2drop
   ] [
     [ call ] 2keep sqlite-each
-  ] ifte ;
+  ] if ;
 
 ! For comparison, here is the linrec implementation of sqlite-each
 ! [ drop sqlite3_step step-complete? ]
@@ -238,7 +238,7 @@ END-STRUCT
     2nip
   ] [
     >r 2dup call r> cons (sqlite-map)
-  ] ifte ;
+  ] if ;
 
 : sqlite-map ( statement quot -- )
   [ ] (sqlite-map) ;

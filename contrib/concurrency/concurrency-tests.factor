@@ -130,7 +130,7 @@ USING: kernel concurrency concurrency-examples threads vectors
       "received" reply    
     ] [
       drop f
-    ] ifte
+    ] if
   ] spawn
   "sent" swap send-synchronous
 ] unit-test

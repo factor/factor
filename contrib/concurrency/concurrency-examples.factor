@@ -40,7 +40,7 @@ USING: concurrency kernel io lists threads math sequences namespaces unparser pr
     "pong" swap send (pong-server0)
   ] [
     "Pong server shutting down" swap send
-  ] ifte ;
+  ] if ;
   
 : pong-server0 ( -- process)
   [ (pong-server0) ] spawn ;
@@ -172,7 +172,7 @@ C: promised-label ( promise -- promised-label )
     ?promise
   ] [
     drop "Unfulfilled Promise" 
-  ] ifte ;
+  ] if ;
 
 M: promised-label pref-dim ( promised-label - dim )
   dup promised-label-text label-size ;
@@ -182,7 +182,7 @@ M: promised-label draw-gadget* ( promised-label -- )
     dup promised-label-text draw-string ;
 
 : fib ( n -- n )
-  yield dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] ifte ;
+  yield dup 2 < [ drop 1 ] [ dup 1 - fib swap 2 - fib + ] if ;
   
 : test-promise-ui ( -- )
   <promise> dup <promised-label> gadget. [ 12 fib unparse swap fulfill ] cons spawn drop ;

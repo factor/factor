@@ -111,7 +111,7 @@ M: cpu write-port ( value port cpu -- )
     cpu-ram nth
   ] [
     2drop HEX: FF
-  ] ifte ;
+  ] if ;
 
 : read-word ( addr cpu -- word )  
   #! Read a 16-bit word from memory at the specified address.
@@ -141,7 +141,7 @@ M: cpu write-port ( value port cpu -- )
   ] [
     3dup cpu-ram set-nth
     update-video
-  ] ifte ;
+  ] if ;
 
 
 : write-word ( value addr cpu -- )
@@ -197,25 +197,25 @@ M: cpu write-port ( value port cpu -- )
 : update-zero-flag ( result cpu -- )
   #! If the result of an instruction has the value 0, this
   #! flag is set, otherwise it is reset.
-  swap HEX: FF bitand 0 = [ zero-flag set-flag ] [ zero-flag clear-flag ] ifte ;
+  swap HEX: FF bitand 0 = [ zero-flag set-flag ] [ zero-flag clear-flag ] if ;
 
 : update-sign-flag ( result cpu -- )
   #! If the most significant bit of the result 
   #! has the value 1 then the flag is set, otherwise
   #! it is reset.
-  swap HEX: 80 bitand 0 = [ sign-flag clear-flag ] [ sign-flag set-flag ] ifte ;
+  swap HEX: 80 bitand 0 = [ sign-flag clear-flag ] [ sign-flag set-flag ] if ;
 
 : update-parity-flag ( result cpu -- )
   #! If the modulo 2 sum of the bits of the result
   #! is 0, (ie. if the result has even parity) this flag
   #! is set, otherwise it is reset.
-  swap HEX: FF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] ifte ;
+  swap HEX: FF bitand 2 mod 0 = [ parity-flag set-flag ] [ parity-flag clear-flag ] if ;
 
 : update-carry-flag ( result cpu -- )
   #! If the instruction resulted in a carry (from addition) 
   #! or a borrow (from subtraction or a comparison) out of the
   #! higher order bit, this flag is set, otherwise it is reset.
-  swap dup HEX: 100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] ifte ;
+  swap dup HEX: 100 >= swap 0 < or [ carry-flag set-flag ] [ carry-flag clear-flag ] if ;
 
 : update-half-carry-flag ( original change-by result cpu -- )
   #! If the instruction caused a carry out of bit 3 and into bit 4 of the
@@ -224,7 +224,7 @@ M: cpu write-port ( value port cpu -- )
   #! 'change-by' is the amount it is being added or decremented by.
   #! 'result' is the result of that change.
   >r bitxor bitxor HEX: 10 bitand 0 = not r> 
-  swap [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] ifte ;
+  swap [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if ;
 
 : update-flags ( result cpu -- )
   2dup update-carry-flag
@@ -302,7 +302,7 @@ M: cpu write-port ( value port cpu -- )
 : add-word ( lhs rhs cpu -- result )
   #! Add rhs to lhs. Note that only the carry flag is modified
   #! and only if there is a carry out of the double precision add.
-  >r + r> over HEX: FFFF > [ carry-flag set-flag ] [ drop ] ifte HEX: FFFF bitand ;
+  >r + r> over HEX: FFFF > [ carry-flag set-flag ] [ drop ] if HEX: FFFF bitand ;
 
 : bit3or ( lhs rhs -- 0|1 )
   #! bitor bit 3 of the two numbers on the stack
@@ -316,7 +316,7 @@ M: cpu write-port ( value port cpu -- )
   [ drop bit3or ] 3keep ( bit3or lhs rhs cpu )
   >r bitand r> [ update-flags ] 2keep 
   [ carry-flag clear-flag ] keep
-  rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] ifte
+  rot 0 = [ half-carry-flag set-flag ] [ half-carry-flag clear-flag ] if
   HEX: FF bitand ;
 
 : xor-byte ( lhs rhs cpu -- result )
@@ -382,7 +382,7 @@ M: cpu write-port ( value port cpu -- )
     set-cpu-pc
   ] [
     2drop
-  ] ifte ;
+  ] if ;
 
 : inc-cycles ( n cpu -- )
   #! Increment the number of cpu cycles
@@ -422,7 +422,7 @@ instructions length [
     drop
   ] [
     [ not-implemented ] swap instructions set-nth 
-  ] ifte
+  ] if
 ] each
 
 M: cpu reset ( cpu -- )
@@ -450,7 +450,7 @@ C: cpu ( cpu -- cpu )
     -rot [ set-nth ] 2keep >r 1 + r> (load-rom)
   ] [
     2drop
-  ] ifte* ;
+  ] if* ;
 
   #! Reads the ROM from stdin and stores it in ROM from
   #! offset n.
@@ -482,7 +482,7 @@ C: cpu ( cpu -- cpu )
     nip  
   ] [
     [ "Undefined 8080 opcode: " % number>string % ] "" make throw
-  ] ifte* ;
+  ] if* ;
 
 : process-interrupts ( cpu -- )
   #! Process any hardware interrupts
@@ -495,8 +495,8 @@ C: cpu ( cpu -- cpu )
       HEX: 08 over set-cpu-last-interrupt HEX: 08 swap interrupt
     ] [
       HEX: 10 over set-cpu-last-interrupt HEX: 10 swap interrupt
-    ] ifte     
-  ] ifte ;
+    ] if     
+  ] if ;
 
 : step ( cpu -- )
   #! Run a single 8080 instruction
@@ -606,7 +606,7 @@ SYMBOL: $4
     dup $3 = [ drop 2 over nth  ] when 
     dup $4 = [ drop 3 over nth  ] when 
     nip
-  ] ifte ;
+  ] if ;
 
 : test-rp 
   { 4 5 3 } [ 1 $2 [ $1 4 ] ] replace-patterns ;
@@ -631,20 +631,20 @@ SYMBOL: $4
 : (emulate-RLCA) ( cpu -- )
   #! The content of the accumulator is rotated left
   #! one position. The low order bit and the carry flag
-  #! are both set to the value shifted out of the high
+  #! are both set to the value shifd out of the high
   #! order bit position. Only the carry flag is affected.
   [ cpu-a -7 shift ] keep 
-  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
   [ cpu-a 1 shift HEX: FF bitand ] keep 
   >r bitor r> set-cpu-a ;
 
 : (emulate-RRCA) ( cpu -- )
   #! The content of the accumulator is rotated right
   #! one position. The high order bit and the carry flag
-  #! are both set to the value shifted out of the low
+  #! are both set to the value shifd out of the low
   #! order bit position. Only the carry flag is affected.
   [ cpu-a 1 bitand 7 shift ] keep 
-  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  over 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
   [ cpu-a 254 bitand -1 shift ] keep 
   >r bitor r> set-cpu-a ;
 
@@ -652,23 +652,23 @@ SYMBOL: $4
   #! The content of the accumulator is rotated left
   #! one position through the carry flag. The low
   #! order bit is set equal to the carry flag and
-  #! the carry flag is set to the value shifted out 
+  #! the carry flag is set to the value shifd out 
   #! of the high order bit. Only the carry flag is
   #! affected.
-  [ carry-flag swap flag-set? [ 1 ] [ 0 ] ifte ] keep 
+  [ carry-flag swap flag-set? [ 1 ] [ 0 ] if ] keep 
   [ cpu-a 127 bitand 7 shift ] keep 
-  dup cpu-a 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  dup cpu-a 128 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
   >r bitor r> set-cpu-a ;
 
 : (emulate-RRA) ( cpu -- )  
   #! The content of the accumulator is rotated right
   #! one position through the carry flag. The high order
   #! bit is set to the carry flag and the carry flag is
-  #! set to the value shifted out of the low order bit. 
+  #! set to the value shifd out of the low order bit. 
   #! Only the carry flag is affected.
-  [ carry-flag swap flag-set? [ BIN: 10000000 ] [ 0 ] ifte ] keep 
+  [ carry-flag swap flag-set? [ BIN: 10000000 ] [ 0 ] if ] keep 
   [ cpu-a 254 bitand -1 shift ] keep 
-  dup cpu-a 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] ifte
+  dup cpu-a 1 bitand 0 = [ dup carry-flag clear-flag ] [ dup carry-flag set-flag ] if
   >r bitor r> set-cpu-a ;
 
 : (emulate-CPL) ( cpu -- )  
@@ -683,14 +683,14 @@ SYMBOL: $4
   #! digits.
   [
     dup half-carry-flag swap flag-set? swap 
-    cpu-a BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] ifte 
+    cpu-a BIN: 1111 bitand 9 > or [ 6 ] [ 0 ] if 
   ] keep 
   [ cpu-a + ] keep
   [ update-flags ] 2keep  
   [ swap HEX: FF bitand swap set-cpu-a ] keep 
   [
     dup carry-flag swap flag-set? swap 
-    cpu-a -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] ifte 
+    cpu-a -4 shift BIN: 1111 bitand 9 > or [ 96 ] [ 0 ] if 
   ] keep 
   [ cpu-a + ] keep
   [ update-flags ] 2keep  
@@ -709,7 +709,7 @@ SYMBOL: $4
     [[ "RST-28H"      [ HEX: 28 swap (emulate-RST) ] ]]
     [[ "RST-30H"      [ HEX: 30 swap (emulate-RST) ] ]]
     [[ "RST-38H"      [ HEX: 38 swap (emulate-RST) ] ]]
-    [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] ifte ] ]]
+    [[ "RET-F|FF"      [ dup $1 [ 6 over inc-cycles ret-from-sub ] [ drop ] if ] ]]
     [[ "CP-N"      [ [ cpu-a ] keep [ next-byte ] keep sub-byte drop ] ]]
     [[ "CP-R"      [ [ cpu-a ] keep [ $1 ] keep sub-byte drop  ] ]]
     [[ "CP-(RR)"      [ [ cpu-a ] keep [ $1 ] keep [ read-byte ] keep sub-byte drop ] ]]
@@ -755,10 +755,10 @@ SYMBOL: $4
     [[ "DEC-(RR)"     [ [ $1 ] keep [ read-byte ] keep [ dec-byte ] keep [ $1 ] keep write-byte ] ]]
     [[ "INC-(RR)" [ [ $1 ] keep [ read-byte ] keep [ inc-byte ] keep  [ $1 ] keep write-byte ] ]]
     [[ "JP-NN"           [ [ cpu-pc ] keep [ read-word ] keep set-cpu-pc ]               ]]
-    [[ "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ set-cpu-pc ] keep [ cpu-cycles ] keep swap 5 + swap set-cpu-cycles ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] ifte ] ]]
+    [[ "JP-F|FF,NN"      [ [ $1 ] keep swap [ [ next-word ] keep [ set-cpu-pc ] keep [ cpu-cycles ] keep swap 5 + swap set-cpu-cycles ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ] ]]
     [[ "JP-(RR)"      [ [ $1 ] keep set-cpu-pc ] ]]
     [[ "CALL-NN"         [ (emulate-CALL) ] ]]
-    [[ "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] ifte ]   ]]
+    [[ "CALL-F|FF,NN"    [ [ $1 ] keep swap [ 7 over inc-cycles (emulate-CALL) ] [ [ cpu-pc 2 + ] keep set-cpu-pc ] if ]   ]]
     [[ "LD-RR,NN"     [ [ next-word ] keep $2 ] ]]
     [[ "LD-RR,RR"     [ [ $3 ] keep $2 ] ]]
     [[ "LD-R,N"     [ [ next-byte ] keep $2 ] ]]
@@ -1599,7 +1599,7 @@ INSTRUCTION: RST  38H     ; opcode FF cycles 11
             " 0 0 0" write
           ] [
             " 1 1 1" write
-          ] ifte
+          ] if
         ] each-8bit
       ] repeat terpri
     ] repeat

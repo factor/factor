@@ -193,7 +193,7 @@ USING: kernel lazy parser-combinators test errors strings parser lists math sequ
 
 : pdigit [ digit? ] satisfy [ digit> ] <@ ;
 : pnatural pdigit <*> ;
-: pnatural2 pnatural [ car [ >digit ] map >string dup pempty? [ drop 0 ] [ string>number ] ifte unit ] <@ ;
+: pnatural2 pnatural [ car [ >digit ] map >string dup pempty? [ drop 0 ] [ string>number ] if unit ] <@ ;
 
 [ 
   [ "" 12345 ]

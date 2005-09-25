@@ -98,14 +98,14 @@ M: list pempty? ( object -- bool )
     2drop ""
   ] [
     head
-  ] ifte ;
+  ] if ;
 
 : (list-take) ( n list accum -- list )
   >r >r 1 - dup 0 < [ 
     drop r> drop r> reverse 
   ] [ 
     r> uncons swap r> cons (list-take) 
-  ] ifte ;
+  ] if ;
 
 : list-take ( n list -- list )
   #! Return a list with the first 'n' characters
@@ -133,7 +133,7 @@ M: list ptake ( n object -- object )
     2drop "" 
   ] [
     tail 
-  ] ifte ;
+  ] if ;
 
 : list-drop ( n list -- list )
   #! Return a list with the first 'n' items
@@ -142,7 +142,7 @@ M: list ptake ( n object -- object )
     drop r>
   ] [
     r> cdr list-drop
-  ] ifte ;
+  ] if ;
 
 GENERIC: pdrop
 
@@ -165,7 +165,7 @@ M: list pdrop ( n object -- object )
     swap over length swap pdrop swons unit delay lunit
   ] [
     2drop lnil
-  ] ifte ;
+  ] if ;
 
 : token ( string -- parser )
   #! Return a token parser that parses the given string.
@@ -182,8 +182,8 @@ M: list pdrop ( n object -- object )
       ph:t swons unit delay lunit
     ] [
       drop lnil
-    ] ifte
-  ] ifte ;
+    ] if
+  ] if ;
   
 : satisfy ( p -- parser )
   #! Return a parser that succeeds if the predicate 'p',
@@ -202,7 +202,7 @@ M: list pdrop ( n object -- object )
     ph:t >r swap call r> swons unit delay lunit
   ] [
     2drop lnil
-  ] ifte ;
+  ] if ;
 
   : satisfy2 ( pred quot -- parser )
   #! Return a satisfy2-parser.
@@ -322,7 +322,7 @@ M: list pdrop ( n object -- object )
     nip
   ] [ ( quot result -- )
     [ (<@-parser-replace) ] rot swons lmap
-  ] ifte ;
+  ] if ;
 
 : <@ ( parser quot -- parser )
   #! Return an <@-parser.

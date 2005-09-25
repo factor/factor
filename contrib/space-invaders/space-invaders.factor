@@ -57,8 +57,8 @@ M: space-invaders reset ( cpu -- )
       HEX: 08 over set-cpu-last-interrupt HEX: 08 swap interrupt
     ] [
       HEX: 10 over set-cpu-last-interrupt HEX: 10 swap interrupt
-    ] ifte     
-  ] ifte ;
+    ] if     
+  ] if ;
 
 : gui-frame ( cpu -- )
   dup gui-frame/2 gui-frame/2 ;
@@ -101,7 +101,7 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
 
 : sync-frame ( millis -- millis )
   #! Sleep until the time for the next frame arrives.
-  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] ifte millis ;
+  1000 60 / >fixnum + millis - dup 0 > [ sleep ] [ drop ] if millis ;
 
 : (event-loop) ( millis cpu event -- )
     dup SDL_PollEvent [
@@ -109,12 +109,12 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
             3drop
         ] [
             (event-loop)
-        ] ifte
+        ] if
     ] [
 	>r >r sync-frame r> r>
         [ over gui-frame ] with-surface
         (event-loop)
-    ] ifte ; 
+    ] if ; 
   
 : event-loop ( cpu event -- )
     millis -rot (event-loop) ;
@@ -143,7 +143,7 @@ M: key-up-event handle-si-event ( cpu event -- quit? )
     - surface get -rot black rgb pixelColor
   ] [
     - surface get -rot 2dup color rgb pixelColor
-  ] ifte ;
+  ] if ;
 
 : do-video-update ( value addr cpu -- )
   drop addr>xy rot ( x y value )
@@ -161,7 +161,7 @@ M: space-invaders update-video ( value addr cpu -- )
     do-video-update
   ] [
     3drop
-  ] ifte ;
+  ] if ;
 
 : run ( -- )
   224 256 0 SDL_HWSURFACE [ 

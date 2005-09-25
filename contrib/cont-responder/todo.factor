@@ -119,7 +119,7 @@ USE: unparser
     load-todo password-matches?
   ] [
     2drop f 
-  ] ifte ;
+  ] if ;
 
 : each-bind ( quot list -- )
   [ swap [ bind ] keep ] each drop ;

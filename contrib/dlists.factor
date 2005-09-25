@@ -17,7 +17,7 @@ C: dlist-node
     [ dlist-last f <dlist-node> ] keep
     [ dlist-last [ dupd set-dlist-node-next ] when* ] keep
     2dup set-dlist-last
-    dup dlist-first [ 2drop ] [ set-dlist-first ] ifte ;
+    dup dlist-first [ 2drop ] [ set-dlist-first ] if ;
 
 : dlist-empty? ( dlist -- ? )
     dlist-first f = ;
@@ -28,7 +28,7 @@ C: dlist-node
     ] when*
     2dup swap dlist-first eq? [ 
         dlist-node-next swap set-dlist-first 
-    ] [ 2drop ] ifte ;
+    ] [ 2drop ] if ;
 
 : (unlink-next) ( dlist dnode -- )
     dup dlist-node-next [
@@ -36,7 +36,7 @@ C: dlist-node
     ] when*
     2dup swap dlist-last eq? [
         dlist-node-prev swap set-dlist-last
-    ] [ 2drop ] ifte ;
+    ] [ 2drop ] if ;
 
 : (dlist-unlink) ( dlist dnode -- )
     [ (unlink-prev) ] 2keep (unlink-next) ;
@@ -45,7 +45,7 @@ C: dlist-node
     [ dlist-first dlist-node-data ] keep dup dlist-first (dlist-unlink) ;
 
 : dlist-pop-front ( dlist -- data )
-    dup dlist-empty? [ drop f ] [ (dlist-pop-front) ] ifte ;
+    dup dlist-empty? [ drop f ] [ (dlist-pop-front) ] if ;
 
 : (dlist-each) ( quot dnode -- )
     [
@@ -53,7 +53,7 @@ C: dlist-node
         dlist-node-next (dlist-each)
     ] [
         drop
-    ] ifte* ; inline
+    ] if* ; inline
 
 : dlist-each ( dlist quot -- )
     swap dlist-first (dlist-each) ; inline

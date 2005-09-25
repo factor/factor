@@ -36,10 +36,10 @@ USE:  prettyprint
       swapd [ (dlist-unlink) ] keep dlist-node-data nip
     ] [
       dlist-node-next (dlist-pop?)
-    ] ifte
+    ] if
   ] [
     2drop f
-  ] ifte* ;
+  ] if* ;
 
 : dlist-pop? ( pred dlist -- obj | f )
   #! Return first item in the dlist that when passed to the
@@ -55,10 +55,10 @@ USE:  prettyprint
       2drop t
     ] [
       dlist-node-next (dlist-pred?)
-    ] ifte
+    ] if
   ] [
     drop f
-  ] ifte* ;
+  ] if* ;
 
 : dlist-pred? ( pred dlist -- obj | f )
   #! Return true if any item in the dlist that when passed to the
@@ -237,7 +237,7 @@ TUPLE: tagged-message data from tag ;
     r> car call
   ] [
     r> 2drop
-  ] ifte ;
+  ] if ;
 
 : recv ( forms -- ) 
   #! Get a message from the processes mailbox. Compare it against the
@@ -266,7 +266,7 @@ TUPLE: tagged-message data from tag ;
     tagged-message-tag =
   ] [
     2drop f
-  ] ifte ;
+  ] if ;
 
 : send-synchronous ( message process -- reply )
   #! Sends a message to the process using the 'message' 
@@ -337,7 +337,7 @@ SYMBOL: quit-cc
     <tagged-message> swap send
   ] [
     r> drop 3drop
-  ] ifte ;
+  ] if ;
 
 : maybe-send-reply ( message pred quot -- )
   #! Same as !result but if false is returned from
@@ -351,10 +351,10 @@ SYMBOL: quit-cc
       <tagged-message> swap send
     ] [
       2drop
-    ] ifte*
+    ] if*
   ] [
     r> drop 3drop
-  ] ifte ;
+  ] if ;
 
 : server-cc ( -- cc | process)
   #! Captures the current continuation and returns the value.

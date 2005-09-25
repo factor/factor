@@ -34,7 +34,7 @@ USE: lists
 
 : get-live-updater-js* ( stream -- string )
   #! Read all lines from the stream, creating a string of the result.
-  dup stream-readln dup [ % "\n" % get-live-updater-js* ] [ drop stream-close ] ifte ;
+  dup stream-readln dup [ % "\n" % get-live-updater-js* ] [ drop stream-close ] if ;
 
 : get-live-updater-js ( filename -- string )
   #! Return the liveUpdater javascript code as a string.
