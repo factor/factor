@@ -50,7 +50,7 @@ USE: namespaces
       <head> <title> write </title> </head>
       <body>
         <p> write </p>
-        <p> <a href= a> "Press to continue" write </a> </p>
+        <p> <a =href a> "Press to continue" write </a> </p>
       </body>
     </html>
   ] show 2drop ;
@@ -60,11 +60,11 @@ USE: namespaces
     <html>
       <head> <title> "Enter a number" write </title> </head>
       <body>
-        <form action= method= "post" form>
+        <form =action "post" =method form>
           <p> 
             "Enter a number:" write
-            <input type= "text" name= "num" size= "20" input/>
-            <input type= "submit" value= "Press to continue" input/>
+            <input "text" =type "num" =name "20" =size input/>
+            <input "submit" =type "Press to continue" =value input/>
           </p>
         </form>
       </body>

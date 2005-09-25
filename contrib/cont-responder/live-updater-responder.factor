@@ -58,7 +58,7 @@ USE: prettyprint
        [
          [ 
            "millis" [ millis pprint ] "Display Server millis" live-anchor
-           <div id= "millis" div>  
+           <div "millis" =id div>  
              "The millisecond time from the server will appear here" write 
            </div>         
          ]
@@ -67,7 +67,7 @@ USE: prettyprint
            "apropos" [ live-search-apropos-word ] live-search
          ]
          [
-           <div id= "apropos" div> 
+           <div "apropos" =id div> 
              "" write
            </div>
          ] 

@@ -110,7 +110,7 @@ USE: sequences
 
 : include-todo-stylesheet ( -- )  
   #! Generate HTML to include the todo stylesheet
-  <link rel= "stylesheet" href= todo-stylesheet-url link/> ;
+  <link "stylesheet" =rel todo-stylesheet-url =href link/> ;
 
 : show-stack-page ( -- )
   #! Debug function to show a page containing the current call stack.
@@ -126,39 +126,39 @@ USE: sequences
 : styled-row ( class list -- )
   #! Output an html TR row with each element of the list
   #! being called to produce the output for each TD.
-  <tr class= swap tr> 
+  <tr swap =class tr> 
     [ <td> call </td> ] each
   </tr> ;
 
 : simple-input ( name -- )
   #! Output a simple HTML input field which will have the
   #! specified name.
-  <input type= "text" size= "20" name= input/> ;
+  <input "text" =type "20" =size =name input/> ;
 
 : simple-input-with-value ( name value -- )
   #! Output a simple HTML input field which will have the
   #! specified name and value.
-  <input type= "text" size= "20" value= name= input/> ;
+  <input "text" =type "20" =size =value =name input/> ;
 
 : textarea-input ( name -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name.
-  <textarea name= rows= "10" cols= "40" textarea> "Enter description here." write </textarea> ;
+  <textarea =name "10" =rows "40" =cols textarea> "Enter description here." write </textarea> ;
 
 : textarea-input-with-value ( name value -- )
   #! Output a simple HTML textarea field which will have the
   #! specified name and value.
-  <textarea name= swap rows= "10" cols= "40" textarea> write </textarea> ;
+  <textarea swap =name "10" =rows "40" =cols textarea> write </textarea> ;
 
 : password-input ( name -- )
   #! Output an HTML password input field which will have the
   #! specified name.
-  <input type= "password" size= "20" name= input/> ;
+  <input "password" =type "20" =size =name input/> ;
 
 : form ( action quot  -- )
   #! Call quot with any output appearing inside an HTML form.
   #! The form is a POST form where the action is as specified.
-  <form method= "post" action= swap form> call </form> ;
+  <form "post" =method swap =action form> call </form> ;
 
 : input-value ( name -- value )
   #! Get the value of the variable "name". If it is f 
@@ -300,12 +300,12 @@ USE: sequences
   #! todo item details.
   [
     <table> 
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Priority" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class td> "Priority" write </td>
         <td> "priority" simple-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Description" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "Description" write </td>
         <td> "description" textarea-input </td> 
       </tr>
     </table>
@@ -318,12 +318,12 @@ USE: sequences
   swap [
     [   
       <table> 
-        <tr class= "required" tr> 
-          <td class= "lbl" td> "Priority" write </td>
+        <tr "required" =class tr> 
+          <td "lbl" =class td> "Priority" write </td>
           <td> "priority" dup get simple-input-with-value  </td> 
         </tr>
-        <tr class= "required" tr> 
-          <td class= "lbl" td> "Description" write </td>
+        <tr "required" =class tr> 
+          <td "lbl" =class td> "Description" write </td>
           <td> "description" dup get textarea-input-with-value </td> 
         </tr>
       </table>
@@ -359,16 +359,16 @@ USE: sequences
   #! new password.
   [
     <table> 
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Old Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "Old Password" write </td>
         <td> "old-password" password-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "New Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class  td> "New Password" write </td>
         <td> "new-password" password-input </td> 
       </tr>
-      <tr class= "required" tr> 
-        <td class= "lbl" td> "Verify Password" write </td>
+      <tr "required" =class tr> 
+        <td "lbl" =class td> "Verify Password" write </td>
         <td> "verify-password" password-input </td> 
       </tr>
     </table>

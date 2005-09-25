@@ -51,7 +51,7 @@ USE: lists
 : include-live-updater-js ( -- )
   #! Write out the HTML script to include the live updater
   #! javascript code.
-  <script language= "JavaScript" src= live-updater-url script> 
+  <script "JavaScript" =language live-updater-url =src script> 
     "" write
   </script> ;
 
@@ -61,7 +61,7 @@ USE: lists
   #! an onclick is set via DHTML later to make it run a
   #! quotation on the server. The randomly generated id
   #! for the anchor is returned.
-  <a id= get-random-id dup href= "#" a>  
+  <a get-random-id dup =id "#" =href a>  
     swap write
   </a> ;  
 
@@ -78,7 +78,7 @@ USE: lists
     [
       t "disable-initial-redirect?" set
       [ 
-        <div id= "div-id" get div> "div-quot" get call </div>    
+        <div "div-id" get =id div> "div-quot" get call </div>    
       ] show 
     ] bind 
   ] cons t swap register-continuation ;
@@ -91,7 +91,7 @@ USE: lists
   #! in a 'div' tag with the 'div-id'. That 'div' tag will
   #! replace whatever HTML DOM object currently has that same
   #! id.
-  <script language= "JavaScript" script> 
+  <script "JavaScript" =language script> 
     "document.getElementById('" write
     write
     "').onclick=liveUpdaterUri('" write
@@ -113,7 +113,7 @@ USE: lists
   #! a keydown is set via DHTML later to make it run a
   #! quotation on the server. The randomly generated id
   #! for the input box is returned.
-  <input id= get-random-id dup type= "text" input/> ;
+  <input get-random-id dup =id "text" =type input/> ;
 
 : register-live-search-quot ( div-id div-quot -- kid )
   #! Register the 'quot' with the cont-responder so
@@ -134,7 +134,7 @@ USE: lists
       [ 
         #! Don't need the URL as the 'show' won't be resumed.
         drop
-        <div id= "div-id" get div> "div-quot" get call </div>    
+        <div "div-id" get =id div> "div-quot" get call </div>    
       ] show 
     ] bind 
   ] cons t swap register-continuation ;
@@ -148,7 +148,7 @@ USE: lists
   #! a 'div' with the id 'div-id' and will 
   #! replace whatever HTML DOM object currently has that same
   #! id.
-  <script language= "JavaScript" script> 
+  <script "JavaScript" =language script> 
     "liveSearch('" write
     write
     "', '" write

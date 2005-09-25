@@ -41,7 +41,7 @@ USE: sequences
   #! The page has a link to the 'next' continuation.
   [ 
     swap [ 
-      <a href= a> "Next" write </a>
+      <a =href a> "Next" write </a>
     ] html-document 
   ] show drop drop ;
 
@@ -49,10 +49,10 @@ USE: sequences
   #! Display a page prompting for input of a name and return that name.
   [ 
     "Enter your name" [
-      <form method= "post" action= form> 
+      <form "post" =method =action form> 
         "Name: " write
-        <input type= "text" name= "name" size= "20" input/>
-        <input type= "submit" value= "Ok" input/>
+        <input "text" =type "name" =name "20" =size input/>
+        <input "submit" =type "Ok" =value input/>
       </form>
     ] html-document
   ] show [
