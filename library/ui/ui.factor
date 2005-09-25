@@ -5,19 +5,6 @@ USING: gadgets-layouts gadgets-listener generic help io kernel
 listener lists math memory namespaces prettyprint sdl sequences
 shells styles threads words ;
 
-: world-theme
-    {{
-        [[ background @{ 255 255 255 }@ ]]
-        [[ rollover-bg @{ 236 230 232 }@ ]]
-        [[ bevel-1 { 160 160 160 }@ ]]
-        [[ bevel-2 @{ 232 232 232 }@ ]]
-        [[ foreground @{ 0 0 0 }@ ]]
-        [[ reverse-video f ]]
-        [[ font "Monospaced" ]]
-        [[ font-size 12 ]]
-        [[ font-style plain ]]
-    }} ;
-
 : init-world
     ttf-init
     global [

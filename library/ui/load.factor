@@ -25,7 +25,6 @@ USING: kernel parser sequences io ;
     "/library/ui/presentations.factor"
     "/library/ui/books.factor"
     "/library/ui/outliner.factor"
-    "/library/ui/mindmap.factor"
     "/library/ui/listener.factor"
     "/library/ui/ui.factor"
 ] [

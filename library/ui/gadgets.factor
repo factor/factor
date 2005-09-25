@@ -74,8 +74,3 @@ M: gadget children-on ( rect/point gadget -- list )
             [ nip pick-up ] [ rot 2drop ] if
         ] with-scope
     ] [ 2drop f ] if ;
-
-! Mind-map/outliner node protocol
-GENERIC: node-gadget ( node -- gadget )
-GENERIC: node-left ( node -- seq )
-GENERIC: node-right ( node -- seq )

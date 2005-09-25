@@ -33,7 +33,7 @@ C: display ( -- display )
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep
     [ display-title relayout ] keep
-    display-pane dup pane-clear [ stack. ] with-stream* ;
+    display-pane [ stack. ] with-pane ;
 
 : ui-listener-hook ( -- )
     datastack-hook get call datastack-display get present-stack

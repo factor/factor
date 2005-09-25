@@ -3,7 +3,7 @@
 IN: gadgets
 USING: alien arrays errors gadgets-layouts generic io kernel
 lists math memory namespaces prettyprint sdl sequences sequences
-strings threads ;
+strings styles threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -67,3 +67,16 @@ DEFER: handle-event
 
 : start-world ( -- )
     world get t over set-world-running? relayout ;
+
+: world-theme
+    {{
+        [[ background @{ 255 255 255 }@ ]]
+        [[ rollover-bg @{ 236 230 232 }@ ]]
+        [[ bevel-1 { 160 160 160 }@ ]]
+        [[ bevel-2 @{ 232 232 232 }@ ]]
+        [[ foreground @{ 0 0 0 }@ ]]
+        [[ reverse-video f ]]
+        [[ font "Monospaced" ]]
+        [[ font-size 12 ]]
+        [[ font-style plain ]]
+    }} ;

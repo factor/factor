@@ -30,7 +30,8 @@ TUPLE: pane output active current input continuation scrolls? ;
     dup pane-continuation f rot set-pane-continuation ;
 
 : pane-eval ( string pane -- )
-    pop-continuation [ continue-with ] in-thread 2drop ;
+    pop-continuation dup
+    [ [ continue-with ] in-thread ] when 2drop ;
 
 SYMBOL: structured-input
 
@@ -133,3 +134,8 @@ M: pane stream-close ( pane -- ) drop ;
     #! Execute the quotation with output to an output-only pane.
     f f <pane> world-theme over set-gadget-paint
     [ swap with-stream ] keep ; inline
+
+: with-pane ( pane quot -- )
+    #! Clear the pane and run the quotation in a scope with
+    #! stdio set to the pane.
+    >r dup pane-clear r> with-stream* ; inline
