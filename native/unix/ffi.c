@@ -2,11 +2,6 @@
 
 static void *null_dll;
 
-void ffi_test(void *font, char *text, int fg)
-{
-	fprintf(stderr,"%d %d %d",font,text,fg);
-}
-
 void init_ffi(void)
 {
 	null_dll = dlopen(NULL,RTLD_LAZY);
@@ -48,7 +43,6 @@ void *ffi_dlsym(DLL *dll, F_STRING *symbol, bool error)
 	}
 	return sym;
 }
-
 
 void ffi_dlclose(DLL *dll)
 {

@@ -6,7 +6,7 @@ DEFER: <tutorial-button>
 IN: gadgets-listener
 USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-splitters
-generic help io kernel listener lists math namespaces
+generic hashtables help io kernel listener lists math namespaces
 prettyprint sdl sequences shells styles threads words ;
 
 SYMBOL: datastack-display
@@ -27,15 +27,13 @@ TUPLE: display title pane ;
 C: display ( -- display )
     <frame> over set-delegate
     "" <display-title> over add-display-title
-    <pile> 2dup swap set-display-pane
+    f f <pane> 2dup swap set-display-pane
     <scroller> over add-center ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep
-    [
-        display-pane dup clear-gadget
-        >r reverse-slice [ <object-button> ] map r> add-gadgets
-    ] keep relayout ;
+    [ display-title relayout ] keep
+    display-pane dup pane-clear [ stack. ] with-stream* ;
 
 : ui-listener-hook ( -- )
     datastack-hook get call datastack-display get present-stack
@@ -56,7 +54,8 @@ C: display ( -- display )
     1/2 <x-splitter> ;
 
 : listener-application ( -- )
-    <pane> dup pane set <scroller> <stack-display>
+    t t <pane> dup pane global set-hash
+    <scroller> <stack-display>
     2/3 <x-splitter> add-layer
     [ clear listener-thread ] in-thread
     pane get request-focus ;

@@ -6,13 +6,7 @@ kernel-internals lists math memory namespaces optimizer parser
 sequences sequences-internals words ;
 
 : pull-in ( ? list -- )
-    swap [
-        [
-            dup print [ dup run-resource ] try drop
-        ] each
-    ] [
-        drop
-    ] if ;
+    swap [ [ dup print run-resource ] each ] [ drop ] if ;
 
 "Loading compiler backend..." print
 
@@ -40,23 +34,32 @@ cpu "ppc" = [
 
 "statically-linked" get [
     unix? [
-        "sdl"      "libSDL.so"     "cdecl"    add-library
-        "sdl-gfx"  "libSDL_gfx.so" "cdecl"    add-library
-        "sdl-ttf"  "libSDL_ttf.so" "cdecl"    add-library
+        os "macosx" = [
+            "sdl"     "libSDL.dylib"     "cdecl" add-library
+            "sdl-gfx" "libSDL_gfx.dylib" "cdecl" add-library
+            "sdl-ttf" "libSDL_ttf.dylib" "cdecl" add-library
+        ] [
+            "sdl"     "libSDL.so"     "cdecl" add-library
+            "sdl-gfx" "libSDL_gfx.so" "cdecl" add-library
+            "sdl-ttf" "libSDL_ttf.so" "cdecl" add-library
+        ] if
     ] when
     
     win32? [
-        "kernel32" "kernel32.dll"  "stdcall"  add-library
-        "user32"   "user32.dll"    "stdcall"  add-library
-        "gdi32"    "gdi32.dll"     "stdcall"  add-library
-        "winsock"  "ws2_32.dll"    "stdcall"  add-library
-        "mswsock"  "mswsock.dll"   "stdcall"  add-library
-        "libc"     "msvcrt.dll"    "cdecl"    add-library
-        "sdl"      "SDL.dll"       "cdecl"    add-library
-        "sdl-gfx"  "SDL_gfx.dll"   "cdecl"    add-library
-        "sdl-ttf"  "SDL_ttf.dll"   "cdecl"    add-library
+        "kernel32" "kernel32.dll" "stdcall" add-library
+        "user32"   "user32.dll"   "stdcall" add-library
+        "gdi32"    "gdi32.dll"    "stdcall" add-library
+        "winsock"  "ws2_32.dll"   "stdcall" add-library
+        "mswsock"  "mswsock.dll"  "stdcall" add-library
+        "libc"     "msvcrt.dll"   "cdecl"   add-library
+        "sdl"      "SDL.dll"      "cdecl"   add-library
+        "sdl-gfx"  "SDL_gfx.dll"  "cdecl"   add-library
+        "sdl-ttf"  "SDL_ttf.dll"  "cdecl"   add-library
     ] when
 ] unless
+
+! Handle -libraries:... overrides
+parse-command-line
 
 "Loading more library code..." print
 

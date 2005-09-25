@@ -14,14 +14,12 @@ styles threads ;
 ! output: pile
 ! current: shelf
 ! input: editor
-TUPLE: pane output active current input continuation ;
+TUPLE: pane output active current input continuation scrolls? ;
 
 : add-output 2dup set-pane-output add-gadget ;
 
-: add-input 2dup set-pane-input add-gadget ;
-
-: <active-line> ( input current -- line )
-    2array <shelf> [ add-gadgets ] keep ;
+: <active-line> ( current input -- line )
+    [ 2array ] [ 1array ] if* <shelf> [ add-gadgets ] keep ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent
@@ -54,31 +52,36 @@ SYMBOL: structured-input
     [ commit-history line-text get line-clear ] with-editor ;
 
 : pane-return ( pane -- )
-    [ pane-input editor-commit ] keep
-    2dup stream-print pane-eval ;
+    dup pane-input dup [
+        editor-commit swap 2dup stream-print 2dup pane-eval
+    ] when 2drop ;
 
 : pane-clear ( pane -- )
     dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
     [
-        [[ [ button-down 1 ] [ pane-input click-editor ] ]]
+        [[ [ button-down 1 ] [ pane-input [ click-editor ] when* ] ]]
         [[ [ "RETURN" ] [ pane-return ] ]]
-        [[ [ "UP" ] [ pane-input [ history-prev ] with-editor ] ]]
-        [[ [ "DOWN" ] [ pane-input [ history-next ] with-editor ] ]]
+        [[ [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] ]]
+        [[ [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] ]]
         [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
     ] swap add-actions ;
 
-C: pane ( -- pane )
+C: pane ( input? scrolls? -- pane )
+    #! You can create output-only panes. If the scrolls flag is
+    #! set, the pane will scroll to the bottom when input is
+    #! added.
+    [ set-pane-scrolls? ] keep
     <pile> over set-delegate
     <pile> <incremental> over add-output
     <shelf> over set-pane-current
-    "" <editor> over set-pane-input
+    swap [ "" <editor> over set-pane-input ] when
     dup init-active-line
     dup pane-actions ;
 
 M: pane focusable-child* ( pane -- editor )
-    pane-input ;
+    pane-input [ t ] unless* ;
 
 : pane-write-1 ( style text pane -- )
     pick not pick empty? and [
@@ -114,11 +117,19 @@ M: pane stream-finish ( pane -- ) drop ;
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
+: ?scroll>bottom ( pane -- )
+    dup pane-scrolls? [ dup scroll>bottom ] when drop ;
+
 M: pane stream-write1 ( char pane -- )
     [ >r ch>string <label> r> pane-current add-gadget ] keep
-    scroll>bottom ;
+    ?scroll>bottom ;
 
 M: pane stream-format ( string style pane -- )
-    [ rot "\n" split pane-write ] keep scroll>bottom ;
+    [ rot "\n" split pane-write ] keep ?scroll>bottom ;
 
 M: pane stream-close ( pane -- ) drop ;
+
+: make-pane ( quot -- pane )
+    #! Execute the quotation with output to an output-only pane.
+    f f <pane> world-theme over set-gadget-paint
+    [ swap with-stream ] keep ; inline
