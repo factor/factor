@@ -1,20 +1,18 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-mindmap
-USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-generic kernel math sequences styles ;
+USING: arrays gadgets gadgets-buttons gadgets-labels
+gadgets-layouts generic kernel math sequences styles ;
 
 ! Mind-map tree-view gadget, like http://freemind.sf.net.
 
-! Mind-map node protocol
-GENERIC: node-gadget ( node -- gadget )
-GENERIC: node-left ( node -- seq )
-GENERIC: node-right ( node -- seq )
-
 TUPLE: mindmap left node gadget right expanded? left? right? ;
 
+DEFER: <expand-button>
+
 : add-mindmap-node ( mindmap -- )
-    dup mindmap-node node-gadget swap
+    dup mindmap-node node-gadget <expand-button> 2array
+    <shelf> [ add-gadgets ] keep swap
     2dup add-gadget set-mindmap-gadget ;
 
 : collapse-mindmap ( mindmap -- )
@@ -67,7 +65,7 @@ TUPLE: mindmap left node gadget right expanded? left? right? ;
     dup add-mindmap-node
     expand-right ;
 
-: toggle-expanded ( mindmap -- )
+: toggle-mindmap ( mindmap -- )
     dup mindmap-expanded?
     [ collapse-mindmap ] [ expand-mindmap ] if ;
 
@@ -100,4 +98,4 @@ M: mindmap draw-gadget* ( mindmap -- )
 : find-mindmap [ mindmap? ] find-parent ;
 
 : <expand-button> ( label -- gadget )
-    <label> [ find-mindmap toggle-expanded ] <roll-button> ;
+    "+" <label> [ find-mindmap toggle-mindmap ] <roll-button> ;

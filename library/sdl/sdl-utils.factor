@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: sdl
-USING: kernel lists math namespaces sequences ;
+USING: errors kernel lists math namespaces sequences ;
 
 SYMBOL: surface
 SYMBOL: width
@@ -12,9 +12,12 @@ SYMBOL: bpp
     >r 3dup bpp set height set width set r>
     SDL_SetVideoMode surface set ;
 
+: sdl-error ( 0/-1 -- )
+    0 = [ SDL_GetError throw ] unless ;
+
 : with-screen ( width height bpp flags quot -- )
     #! Set up SDL graphics and call the quotation.
-    SDL_INIT_EVERYTHING SDL_Init drop
+    SDL_INIT_EVERYTHING SDL_Init sdl-error
     1 SDL_EnableUNICODE drop
     SDL_DEFAULT_REPEAT_DELAY SDL_DEFAULT_REPEAT_INTERVAL
     SDL_EnableKeyRepeat drop

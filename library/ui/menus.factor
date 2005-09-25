@@ -39,3 +39,9 @@ gadgets-labels generic kernel lists math namespaces sequences ;
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
     menu-items line-border dup menu-theme ;
+
+: <menu-button> ( gadget quot -- button )
+    [ show-menu ] append <roll-button>
+    dup [ button-clicked ] [ button-down 1 ] set-action
+    dup [ button-update ] [ button-up 1 ] set-action ;
+

@@ -54,10 +54,10 @@ SYMBOL: meta-executing
 
 : host-word ( word -- )
     [
-        \ call push-r  continuation [
-            continuation over continuation-data push continue
-        ] cons cons push-r  meta-interp continue
-    ] call  set-meta-interp  pop-d 2drop ;
+        \ call push-r
+        [ continuation swap continue-with ] cons cons push-r
+        meta-interp continue
+    ] callcc1 set-meta-interp pop-d 2drop ;
 
 : meta-call ( quot -- )
     #! Note we do tail call optimization here.

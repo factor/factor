@@ -2,6 +2,11 @@
 
 static void *null_dll;
 
+void ffi_test(void *font, char *text, int fg)
+{
+	fprintf(stderr,"%d %d %d",font,text,fg);
+}
+
 void init_ffi(void)
 {
 	null_dll = dlopen(NULL,RTLD_LAZY);

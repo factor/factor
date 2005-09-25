@@ -26,16 +26,17 @@ SYMBOL: commands
 : command-menu ( presented -- menu )
     dup applicable
     [ [ third command-quot ] keep second swons ] map-with
-    <menu> show-menu ;
+    <menu> ;
 
-: <object-button> ( gadget object -- button )
+: <command-button> ( gadget object -- button )
     [ \ drop , literalize , \ command-menu , ] [ ] make
-    <roll-button>
-    dup [ button-clicked ] [ button-down 1 ] set-action
-    dup [ button-update ] [ button-up 1 ] set-action ;
-    
+    <menu-button> ;
+
+: <object-button> ( object -- button )
+    [ unparse-short <label> ] keep <command-button> ;
+
 : init-commands ( gadget -- gadget )
-    dup presented paint-prop [ <object-button> ] when* ;
+    dup presented paint-prop [ <command-button> ] when* ;
 
 : <styled-label> ( style text -- label )
     <label> swap dup [ alist>hash ] when over set-gadget-paint ;

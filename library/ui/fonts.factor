@@ -35,7 +35,7 @@ SYMBOL: open-fonts
 global [ open-fonts nest drop ] bind
 
 : ttf-init ( -- )
-    TTF_Init -1 = [ SDL_GetError throw ] when
+    TTF_Init sdl-error
     global [
         open-fonts [ [ cdr expired? not ] hash-subset ] change
     ] bind ;

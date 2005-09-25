@@ -30,14 +30,11 @@ C: display ( -- display )
     <pile> 2dup swap set-display-pane
     <scroller> over add-center ;
 
-: make-presentations ( seq -- seq )
-    [ [ unparse-short <label> ] keep <object-button> ] map ;
-
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep
     [
         display-pane dup clear-gadget
-        >r reverse-slice make-presentations r> add-gadgets
+        >r reverse-slice [ <object-button> ] map r> add-gadgets
     ] keep relayout ;
 
 : ui-listener-hook ( -- )

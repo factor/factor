@@ -36,23 +36,17 @@ sequences io strings vectors words ;
     #! Step into current word.
     next do report ;
 
-: continue
+: end-walk
     #! Continue executing the single-stepped continuation in the
     #! primary interpreter.
-    meta-d get set-datastack
-    meta-c get set-catchstack
-    meta-cf get
-    meta-r get
-    meta-n get set-namestack
-    set-callstack call ;
+    \ call push-r meta-cf get push-r meta-interp continue ;
 
 : walk-banner ( -- )
     "&s &r show stepper stacks" print
     "&get ( var -- value ) get stepper variable value" print
     "step -- single step over" print
     "into -- single step into" print
-    "continue -- continue execution" print
-    "bye -- exit single-stepper" print
+    "bye -- continue execution" print
     report ;
 
 : walk-listener walk-banner "walk " listener-prompt set listener ;
@@ -71,4 +65,5 @@ sequences io strings vectors words ;
     callstack namestack [
         init-walk
         walk-listener
+        end-walk
     ] with-scope ;
