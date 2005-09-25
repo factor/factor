@@ -14,9 +14,10 @@ TUPLE: outliner gadget quot pile expanded? ;
     swap outliner-pile add-gadget ;
 
 : setup-outliner ( quot outliner -- )
-    dup outliner-pile clear-gadget
-    dup outliner-gadget over outliner-pile add-gadget
-    over [ >r make-pane r> outliner-pile add-gadget ] [ 2drop ] if ;
+    dup outliner-gadget >r
+    outliner-pile dup clear-gadget
+    r> over add-gadget
+    over [ >r make-pane r> add-gadget ] [ 2drop ] if ;
 
 : collapse-outliner ( outliner -- )
     f over set-outliner-expanded? f swap setup-outliner ;
