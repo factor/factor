@@ -153,7 +153,7 @@ SYMBOL: message
         head-short
         head-short head-string <string-reader> [
             {
-                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand [ " is away." ] [ " is online." ] ifte writeln ] }
+                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand [ " is away." ] [ " is online." ] if writeln ] }
                 { [ dup 2 = ] [ drop ] }
                 { [ dup 3 = ] [ drop name get write " went online at " write head-short unparse writeln ] }
                 { [ dup 4 = ] [ drop name get write head-short " has been idle for " writeln ] }
@@ -367,11 +367,11 @@ SYMBOL: message
             execute opcode get swap hash dup [
                 execute ] [
                     unhandled-opcode drop
-                ] ifte
+                ] if
             ] [
             unhandled-family-opcode
             drop
-        ] ifte
+        ] if
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
 

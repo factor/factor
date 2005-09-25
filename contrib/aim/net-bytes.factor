@@ -40,28 +40,20 @@ SYMBOL: unscoped-stack
     unscoped-stack get dup length 1 > [ 
         [ pop ] keep nip peek unscoped-stream set ] [
         pop drop
-    ] ifte ;
+    ] if ;
 
 : with-unscoped-stream ( stream quot -- )
     save-current-scope catch set-previous-scope
     [ dup [ unscoped-stream get stream-close ] when rethrow ] when ;
 
-        ! dup [ unscoped-stream get stream-close
-        ! ] [
-            ! unscoped-stream get contents dup empty? [
-                ! drop
-            ! ] [ "Remainder of stream: " writeln hexdump
-            ! ] ifte
-        ! ] ifte
-
 : close-unscoped-stream ( -- )
     unscoped-stream get stream-close ;
 
 : >endian ( obj n -- str )
-    big-endian get [ >be ] [ >le ] ifte ;
+    big-endian get [ >be ] [ >le ] if ;
 
 : endian> ( obj n -- str )
-    big-endian get [ be> ] [ le> ] ifte ;
+    big-endian get [ be> ] [ le> ] if ;
 
 : >byte ( byte -- str )
     unit >string ;
@@ -122,9 +114,9 @@ SYMBOL: unscoped-stack
 	[ ! partial line
 		[ 2dup swap nth (print-hex-digit) " " write ] repeat  
 		dup length 16 swap - [ "   " write ] repeat
-	] ifte
+	] if
 	dup length
-	[ 2dup swap nth dup printable? [ write1 ] [ "." write drop ] ifte ] repeat
+	[ 2dup swap nth dup printable? [ write1 ] [ "." write drop ] if ] repeat
 	terpri drop ;
 
 : (num-full-lines) ( bytes -- )
@@ -138,7 +130,7 @@ SYMBOL: unscoped-stack
 
 : (print-bytes) ( bytes -- )
 	dup (num-full-lines) [ over (get-slice) (print-hex-line) ] repeat
-	dup (num-full-lines) over (get-last-slice) dup empty? [ 3drop ] [ (print-hex-line) 2drop ] ifte ;
+	dup (num-full-lines) over (get-last-slice) dup empty? [ 3drop ] [ (print-hex-line) 2drop ] if ;
 	
 : (print-length) ( len -- )
     [

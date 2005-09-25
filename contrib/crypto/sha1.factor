@@ -81,7 +81,7 @@ SYMBOL: K
             [ nth-int-be w get push ] 2keep
         ] [
             dup sha1-W w get push
-        ] ifte 
+        ] if 
     ] repeat ;
 
 : init-letters ( -- )
