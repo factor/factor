@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: errors
-USING: generic kernel kernel-internals lists math namespaces
-parser prettyprint sequences io sequences-internals
+USING: generic inspector kernel kernel-internals lists math
+namespaces parser prettyprint sequences io sequences-internals
 strings vectors words ;
 
 : expired-error. ( obj -- )
@@ -100,8 +100,8 @@ M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;
 
-: :s ( -- ) "error-datastack"  get stack. ;
-: :r ( -- ) "error-callstack"  get stack. ;
+: :s ( -- ) "error-datastack" stack. ;
+: :r ( -- ) "error-callstack" stack. ;
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 

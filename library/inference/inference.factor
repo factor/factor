@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: inference
-USING: arrays errors generic interpreter io kernel lists math
-namespaces parser prettyprint sequences strings vectors words ;
+USING: arrays errors generic inspector interpreter io kernel
+lists math namespaces parser prettyprint sequences strings
+vectors words ;
 
 ! This variable takes a boolean value.
 SYMBOL: inferring-base-case
@@ -21,7 +22,7 @@ M: inference-error error. ( error -- )
     "! Inference error:" print
     dup inference-error-message print
     "! Recursive state:" print
-    inference-error-rstate sequence. ;
+    inference-error-rstate describe ;
 
 M: value literal-value ( value -- )
     {

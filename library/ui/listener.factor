@@ -6,8 +6,9 @@ DEFER: <tutorial-button>
 IN: gadgets-listener
 USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-splitters
-generic hashtables help io kernel listener lists math namespaces
-prettyprint sdl sequences shells styles threads words ;
+generic hashtables help inspector io kernel listener lists math
+namespaces prettyprint sdl sequences shells styles threads
+words ;
 
 SYMBOL: datastack-display
 SYMBOL: callstack-display

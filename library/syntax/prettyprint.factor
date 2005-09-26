@@ -316,9 +316,9 @@ M: wrapper pprint* ( wrapper -- )
 
 : pprint ( object -- ) [ pprint* ] with-pprint ;
 
-: unparse ( object -- str ) [ pprint ] string-out ;
-
 : . ( obj -- ) pprint terpri ;
+
+: unparse ( object -- str ) [ pprint ] string-out ;
 
 : pprint-short ( object -- string )
     [
@@ -329,17 +329,7 @@ M: wrapper pprint* ( wrapper -- )
         pprint
     ] with-scope ;
 
-: unparse-short ( object -- str ) [ pprint-short ] string-out ;
-
-: short. ( object -- )
-    dup unparse-short swap write-object terpri ;
-
-: sequence. ( sequence -- ) [ short. ] each ;
-
-: stack. ( sequence -- ) reverse-slice sequence. ;
-
-: .s datastack stack. ;
-: .r callstack stack. ;
+: short. ( object -- ) pprint-short terpri ;
 
 ! For integers only
 : .b >bin print ;

@@ -22,22 +22,34 @@ M: array sheet 1array ;
 M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
 : format-column ( list -- list )
-    [ unparse-short ] map
+    [ [ pprint-short ] string-out ] map
     [ 0 [ length max ] reduce ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
-: sheet-numbers ( sheet -- sheet )
-    dup first length >array 1array swap append ;
-
-SYMBOL: inspector-slots
-
 : format-sheet ( sheet -- list )
-    sheet-numbers
-    dup peek inspector-slots set
-    [ format-column ] map
-    flip
-    [ " | " join ] map ;
+    [ format-column ] map flip [ " " join ] map ;
 
+: describe ( object -- )
+    sheet dup format-sheet swap peek
+    [ dup [ describe ] curry write-outliner ] 2each ;
+
+: word. ( word -- )
+    dup word-name swap dup [ see ] curry write-outliner ;
+
+: vocab. ( vocab -- )
+    f over [ words [ word. ] each ] curry write-outliner ;
+
+: browser ( -- )
+    #! Outlining word browser.
+    vocabs [ vocab. ] each ;
+
+: stack. ( seq -- seq )
+    reverse-slice >array describe ;
+
+: .s datastack stack. ;
+: .r callstack stack. ;
+
+! Interactive inspector
 GENERIC: extra-banner ( obj -- )
 
 M: word extra-banner ( word -- )
@@ -63,9 +75,11 @@ M: object extra-banner ( obj -- ) drop ;
     "It takes up " write dup size pprint " bytes of memory." print
     extra-banner ;
 
-: describe ( obj -- )
-    sheet dup format-sheet swap peek
-    [ write-object terpri ] 2each ;
+SYMBOL: inspector-slots
+
+: sheet-numbers ( sheet -- sheet )
+    dup first length >array 1array swap append
+    dup peek inspector-slots set ;
 
 SYMBOL: inspector-stack
 
@@ -73,7 +87,8 @@ SYMBOL: inspector-stack
 
 : (inspect) ( obj -- )
     dup inspector-stack get push
-    dup inspect-banner describe ;
+    dup inspect-banner
+    sheet sheet-numbers sheet. ;
 
 : inspector-help ( -- )
     "Object inspector." print
