@@ -93,8 +93,10 @@ sequences io vectors words ;
         "/library/alien/aliens.factor"
         
         "/library/syntax/prettyprint.factor"
+        "/library/syntax/see.factor"
 
         "/library/tools/interpreter.factor"
+        
         "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
@@ -105,8 +107,6 @@ sequences io vectors words ;
         "/library/tools/inspector.factor"
 
         "/library/test/test.factor"
-        
-        "/library/syntax/see.factor"
 
         "/library/threads.factor"
         

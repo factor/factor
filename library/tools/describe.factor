@@ -28,9 +28,13 @@ M: hashtable sheet dup hash-keys swap hash-values 2array ;
 : format-sheet ( sheet -- list )
     [ format-column ] map flip [ " " join ] map ;
 
-: describe ( object -- )
-    sheet dup format-sheet swap peek
+DEFER: describe
+
+: sheet. ( sheet -- )
+    dup format-sheet swap peek
     [ dup [ describe ] curry write-outliner ] 2each ;
+
+: describe ( object -- ) sheet sheet. ;
 
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
