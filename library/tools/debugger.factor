@@ -100,8 +100,8 @@ M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;
 
-: :s ( -- ) "error-datastack" stack. ;
-: :r ( -- ) "error-callstack" stack. ;
+: :s ( -- ) "error-datastack" get stack. ;
+: :r ( -- ) "error-callstack" get stack. ;
 
 : :get ( var -- value ) "error-namestack" get (get) ;
 

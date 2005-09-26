@@ -39,15 +39,28 @@ DEFER: describe
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
 
-: vocab. ( vocab -- )
-    f over [ words [ word. ] each ] curry write-outliner ;
+: word-outline ( words quot -- )
+    swap [
+        [ word-name ] keep rot dupd curry write-outliner
+    ] each-with ;
 
-: browser ( -- )
+: words. ( vocab -- )
+    words [ see ] word-outline ;
+
+: vocabs. ( -- )
     #! Outlining word browser.
-    vocabs [ vocab. ] each ;
+    vocabs [ f over [ words. ] curry write-outliner ] each ;
 
 : stack. ( seq -- seq )
     reverse-slice >array describe ;
+
+: usage. ( word -- )
+    #! Outlining usages browser.
+    usage [ usage. ] word-outline ;
+
+: uses. ( word -- )
+    #! Outlining call hierarchy browser.
+    uses [ uses. ] word-outline ;
 
 : .s datastack stack. ;
 : .r callstack stack. ;
