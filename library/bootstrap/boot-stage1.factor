@@ -95,6 +95,7 @@ sequences io vectors words ;
         "/library/syntax/prettyprint.factor"
 
         "/library/tools/interpreter.factor"
+        "/library/tools/describe.factor"
         "/library/tools/debugger.factor"
         "/library/tools/memory.factor"
         "/library/tools/listener.factor"
