@@ -21,7 +21,7 @@ M: array sheet 1array ;
 M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
 : format-column ( list -- list )
-    [ [ pprint-short ] string-out ] map
+    [ unparse-short ] map
     [ 0 [ length max ] reduce ] keep
     [ swap CHAR: \s pad-right ] map-with ;
 
@@ -39,13 +39,13 @@ DEFER: describe
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
 
-: word-outline ( words quot -- )
+: object-outline ( seq quot -- )
     swap [
-        [ word-name ] keep rot dupd curry write-outliner
+        [ unparse-short ] keep rot dupd curry write-outliner
     ] each-with ;
 
 : words. ( vocab -- )
-    words [ see ] word-outline ;
+    words [ see ] object-outline ;
 
 : vocabs. ( -- )
     #! Outlining word browser.
@@ -56,11 +56,11 @@ DEFER: describe
 
 : usage. ( word -- )
     #! Outlining usages browser.
-    usage [ usage. ] word-outline ;
+    usage [ usage. ] object-outline ;
 
 : uses. ( word -- )
     #! Outlining call hierarchy browser.
-    uses [ uses. ] word-outline ;
+    uses [ uses. ] object-outline ;
 
 : .s datastack stack. ;
 : .r callstack stack. ;

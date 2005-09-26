@@ -331,6 +331,8 @@ M: wrapper pprint* ( wrapper -- )
 
 : short. ( object -- ) pprint-short terpri ;
 
+: unparse-short ( object -- string ) [ pprint-short ] string-out ;
+
 ! For integers only
 : .b >bin print ;
 : .o >oct print ;
