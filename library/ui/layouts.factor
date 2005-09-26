@@ -6,7 +6,8 @@ matrices namespaces sdl sequences ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the
-    #! next iteration of the event loop.
+    #! next iteration of the event loop. Should be used when the
+    #! gadget's size has potentially changed. See relayout-1.
     dup gadget-relayout? [
         drop
     ] [
@@ -15,6 +16,17 @@ matrices namespaces sdl sequences ;
         [ add-invalid ]
         [ gadget-parent [ relayout ] when* ] if
     ] if ;
+
+: relayout-1 ( gadget -- )
+    #! Relayout and redraw a gadget before th next iteration of
+    #! the event loop. Should be used if the gadget should be
+    #! repainted, or if its internal layout changed, but its
+    #! preferred size did not change.
+    dup gadget-relayout?
+    [ drop ] [ dup invalidate add-invalid ] if ;
+
+: toggle-visible ( gadget -- )
+    dup gadget-visible? not over set-gadget-visible? relayout-1 ;
 
 : set-gadget-dim ( dim gadget -- )
     2dup rect-dim = [

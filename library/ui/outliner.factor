@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-outliner
 USING: arrays gadgets gadgets-buttons gadgets-labels
-gadgets-layouts gadgets-panes gadgets-presentations generic io
+gadgets-layouts gadgets-panes generic io
 kernel sequences ;
 
 ! Outliner widget.

@@ -21,7 +21,7 @@ lists math namespaces sdl sequences sequences styles threads ;
 : button-update ( button -- )
     dup dup mouse-over? rollover set-paint-prop
     dup dup button-pressed? reverse-video set-paint-prop
-    relayout ;
+    relayout-1 ;
 
 : button-clicked ( button -- )
     #! If the mouse is released while still inside the button,

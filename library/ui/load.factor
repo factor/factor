@@ -22,9 +22,9 @@ USING: kernel parser sequences io ;
     "/library/ui/splitters.factor"
     "/library/ui/incremental.factor"
     "/library/ui/panes.factor"
-    "/library/ui/presentations.factor"
     "/library/ui/books.factor"
     "/library/ui/outliner.factor"
+    "/library/ui/presentations.factor"
     "/library/ui/listener.factor"
     "/library/ui/ui.factor"
 ] [

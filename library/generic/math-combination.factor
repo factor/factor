@@ -34,9 +34,8 @@ TUPLE: no-math-method left right generic ;
     3dup <no-math-method> throw ;
 
 : applicable-method ( generic class -- quot )
-    over "methods" word-prop hash [ ] [
-        literalize [ no-math-method ] cons
-    ] ?if ;
+    over "methods" word-prop hash
+    [ ] [ [ no-math-method ] curry ] ?if ;
 
 : object-method ( generic -- quot )
     object reintern applicable-method ;

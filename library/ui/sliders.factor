@@ -34,7 +34,7 @@ TUPLE: slider vector elevator thumb value max page ;
     #! Call after changing slots, to relayout and do invariants:
     #! - max <= page
     #! - 0 <= value <= max-page
-    dup slider-elevator relayout
+    dup slider-elevator relayout-1
     dup slider-max over slider-page max over set-slider-max
     dup slider-value over fix-slider-value swap set-slider-value ;
 

@@ -3,7 +3,7 @@ USING: errors hashtables kernel kernel-internals lists math
 namespaces sequences vectors words ;
 
 : error-method ( picker word -- method )
-    [ swap % literalize , \ no-method , ] [ ] make ;
+    [ no-method ] curry append ;
 
 : empty-method ( picker word -- method )
     over [ dup ] = [

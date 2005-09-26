@@ -112,10 +112,16 @@ M: object clone ;
     pick pick >r >r swap call r> r> ; inline
 
 : keep-datastack ( quot -- )
-    datastack slip set-datastack drop ;
+    datastack slip set-datastack drop ; inline
 
 M: wrapper = ( obj wrapper -- ? )
     over wrapper? [ [ wrapped ] 2apply = ] [ 2drop f ] if ;
+
+GENERIC: literalize ( obj -- obj )
+
+M: object literalize ;
+
+M: wrapper literalize <wrapper> ;
 
 IN: kernel-internals
 

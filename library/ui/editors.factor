@@ -12,10 +12,6 @@ C: caret ( -- caret )
     <plain-gadget> over set-delegate
     dup red background set-paint-prop ;
 
-: toggle-visible ( gadget -- )
-    dup gadget-visible? not over set-gadget-visible?
-    relayout ;
-
 M: caret tick ( ms caret -- ) nip toggle-visible ;
 
 : caret-blink 500 ;

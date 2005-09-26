@@ -36,10 +36,7 @@ sequences strings test ;
     millis >r >r call r> millis r> - swap global [ +@ ] bind ;
     inline
 
-: (profile) ( word def -- def )
-    [ , literalize , \ with-profile , ] [ ] make ;
-
 : profile ( word -- )
     #! When the word is called, time it, and add the time to
     #! the value in a global variable named by the word.
-    [ (profile) ] annotate ;
+    [ swap [ with-profile ] curry cons ] annotate ;

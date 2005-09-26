@@ -17,6 +17,9 @@ USING: errors generic kernel lists namespaces strings styles ;
 : write-object ( string object -- )
     presented swons unit format ;
 
+: write-outliner ( string object quot -- )
+    outline swons >r presented swons r> 2list format terpri ;
+
 : with-stream ( stream quot -- )
     #! Close the stream no matter what happens.
     [ swap stdio set [ close ] cleanup ] with-scope ; inline

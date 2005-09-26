@@ -29,3 +29,6 @@ SYMBOL: underline
 
 SYMBOL: presented
 SYMBOL: file
+
+! A quotation that writes an outline expansion to stdio
+SYMBOL: outline

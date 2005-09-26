@@ -79,7 +79,7 @@ M: viewport focusable-child* ( viewport -- gadget )
 : scroller-actions ( scroller -- )
     dup [ scroll-up-line ] [ button-down 4 ] set-action
     dup [ scroll-down-line ] [ button-down 5 ] set-action
-    [ scroller-viewport relayout ] [ slider-changed ] set-action ;
+    [ scroller-viewport relayout-1 ] [ slider-changed ] set-action ;
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.

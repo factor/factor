@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-layouts
-USING: gadgets generic kernel math ;
+USING: gadgets generic io kernel math namespaces ;
 
 ! Incremental layout allows adding lines to panes to be O(1).
 ! Note that incremental packs are distinct from ordinary packs
@@ -20,7 +20,10 @@ C: incremental ( pack -- incremental )
 
 M: incremental pref-dim incremental-cursor ;
 
-M: incremental layout* drop ;
+M: incremental layout*
+    global [ "hi" print ] bind
+    dup delegate pref-dim over set-incremental-cursor
+    delegate layout* ;
 
 : next-cursor ( gadget incremental -- cursor )
     [

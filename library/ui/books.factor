@@ -25,7 +25,7 @@ M: book layout* ( book -- )
 
 : show-page ( n book -- )
     [ gadget-children length rem ] keep
-    [ set-book-page ] keep relayout ;
+    [ set-book-page ] keep relayout-1 ;
 
 : first-page ( book -- ) 0 swap show-page ;
 

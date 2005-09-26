@@ -47,8 +47,7 @@ GENERIC: user-input* ( ch gadget -- ? )
 
 M: gadget user-input* 2drop t ;
 
-: invalidate ( gadget -- )
-    t swap set-gadget-relayout? ;
+: invalidate ( gadget -- ) t swap set-gadget-relayout? ;
 
 DEFER: add-invalid
 

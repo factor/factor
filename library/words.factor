@@ -119,10 +119,6 @@ M: compound definer drop \ : ;
 : reset-generic ( word -- )
     dup reset-word { "methods" "combination" } reset-props ;
 
-GENERIC: literalize ( obj -- obj )
-
-M: object literalize ;
-
 M: word literalize <wrapper> ;
 
 M: wrapper literalize <wrapper> ;
