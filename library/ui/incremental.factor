@@ -18,12 +18,10 @@ C: incremental ( pack -- incremental )
     [ set-delegate ] keep
     @{ 0 0 0 }@ over set-incremental-cursor ;
 
-M: incremental pref-dim incremental-cursor ;
-
-M: incremental layout*
-    global [ "hi" print ] bind
-    dup delegate pref-dim over set-incremental-cursor
-    delegate layout* ;
+M: incremental pref-dim ( incremental -- dim )
+    dup gadget-relayout? [
+        dup delegate pref-dim over set-incremental-cursor
+    ] when incremental-cursor ;
 
 : next-cursor ( gadget incremental -- cursor )
     [
