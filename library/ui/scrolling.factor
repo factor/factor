@@ -62,11 +62,11 @@ M: viewport layout* ( viewport -- )
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
 
-: add-viewport 2dup set-scroller-viewport frame-center frame-add ;
+: add-viewport 2dup set-scroller-viewport @center frame-add ;
 
-: add-x-slider 2dup set-scroller-x frame-bottom frame-add ;
+: add-x-slider 2dup set-scroller-x @bottom frame-add ;
 
-: add-y-slider 2dup set-scroller-y frame-right frame-add ;
+: add-y-slider 2dup set-scroller-y @right frame-add ;
 
 : scroll>bottom ( gadget -- )
     find-viewport

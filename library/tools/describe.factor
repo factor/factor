@@ -44,13 +44,13 @@ DEFER: describe
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
 
-: object-outline ( seq quot -- )
+: simple-outliner ( seq quot -- quot: obj -- )
     swap [
         [ unparse-short ] keep rot dupd curry write-outliner
     ] each-with ;
 
 : words. ( vocab -- )
-    words [ see ] object-outline ;
+    words [ see ] simple-outliner ;
 
 : vocabs. ( -- )
     #! Outlining word browser.
@@ -58,11 +58,11 @@ DEFER: describe
 
 : usage. ( word -- )
     #! Outlining usages browser.
-    usage [ usage. ] object-outline ;
+    usage [ usage. ] simple-outliner ;
 
 : uses. ( word -- )
     #! Outlining call hierarchy browser.
-    uses [ uses. ] object-outline ;
+    uses [ uses. ] simple-outliner ;
 
 : stack. ( seq -- seq )
     reverse-slice >array describe ;
