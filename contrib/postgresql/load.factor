@@ -6,7 +6,7 @@ win32? [
     ! "postgresql" "dll" "stdcall" add-library
 ] [
     "postgresql" "libpq.so" "cdecl" add-library
-] ifte
+] if
 
 [ "postgresql.factor" ]
 [ "contrib/postgresql/" swap append run-file ] each

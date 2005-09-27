@@ -88,7 +88,7 @@ FUNCTION: PGconn* PQsetdbLogin ( char* pghost, char* pgport,
 	! PQsetdbLogin(M_PGHOST, M_PGPORT, M_PGOPT, M_PGTTY, M_DBNAME, NULL, NULL)
 
 : PQsetdb ( M_PGHOST M_PGPORT M_PGOPT M_PGTTY M_DBNAME -- PGconn* )
-	NULL NULL PQsetdbLogin ;
+	f f PQsetdbLogin ;
 
 ! close the current connection and free the PGconn data structure
 FUNCTION: void PQfinish ( PGconn* conn ) ;

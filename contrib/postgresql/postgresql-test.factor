@@ -31,11 +31,12 @@ USING: kernel postgresql alien errors io ;
 
 : do-query-drop-nofail ( PGconn query -- PGresult * )
 	[ do-query ]
+    catch
 	[
 		"non-fatal error, continuing" print
 		drop
 		PQclear ! clear memory
-	] catch ;
+	] when ;
 
 ! just a basic demo
 : run-test ( -- )
