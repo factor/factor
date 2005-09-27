@@ -37,5 +37,5 @@ C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.
     <frame> over set-delegate
     [ set-outliner-quot ] keep
-    [ @top frame-add ] keep
+    [ >r 1array make-shelf r> @top frame-add ] keep
     f over set-outliner-expanded? ;

@@ -20,13 +20,18 @@ M: array sheet 1array ;
 
 M: hashtable sheet dup hash-keys swap hash-values 2array ;
 
-: format-column ( list -- list )
-    [ unparse-short ] map
-    [ 0 [ length max ] reduce ] keep
-    [ swap CHAR: \s pad-right ] map-with ;
+: format-column ( list ? -- list )
+    >r [ unparse-short ] map
+    r> [
+        [ 0 [ length max ] reduce ] keep
+        [ swap CHAR: \s pad-right ] map-with
+    ] unless ;
 
 : format-sheet ( sheet -- list )
-    [ format-column ] map flip [ " " join ] map ;
+    #! We use an idiom to notify format-column if it is
+    #! formatting the last column.
+    dup length reverse-slice [ 0 = format-column ] 2map
+    flip [ " " join ] map ;
 
 DEFER: describe
 

@@ -8,7 +8,8 @@ namespaces sequences strings vectors ;
 ! identity. They hold a property map.
 
 : word-prop ( word name -- value ) swap word-props hash ;
-: set-word-prop ( word value name -- ) rot word-props set-hash ;
+: set-word-prop ( word value name -- )
+    rot word-props pick [ set-hash ] [ remove-hash drop ] if ;
 
 ! Pointer to executable native code
 GENERIC: word-xt
@@ -120,8 +121,6 @@ M: compound definer drop \ : ;
     dup reset-word { "methods" "combination" } reset-props ;
 
 M: word literalize <wrapper> ;
-
-M: wrapper literalize <wrapper> ;
 
 : gensym ( -- word )
     #! Return a word that is distinct from every other word, and
