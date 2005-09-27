@@ -17,11 +17,15 @@
 
 + ui:
 
+- tabular output
+- arrows in outliner and scrollbars
+- completion
+- debugger should use outlining
+- support nested incremental layouts more efficiently
 - make-pane should not need world-theme
 - fix up the min thumb size hack
 - long lines of text fail in draw-surface
 - only redraw dirty gadgets
-- faster mouse tracking
 - off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets

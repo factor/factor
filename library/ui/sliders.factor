@@ -14,8 +14,6 @@ TUPLE: slider vector elevator thumb value max page ;
 
 : find-slider [ slider? ] find-parent ;
 
-: thumb-min @{ 12 12 0 }@ ;
-
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
     #! x*n is the screen position of the thumb, and conversely
@@ -61,7 +59,7 @@ SYMBOL: slider-changed
 
 : elevator-theme ( elevator -- )
     dup << solid f >> interior set-paint-prop
-    @{ 128 128 128 }@ background set-paint-prop ;
+    light-gray background set-paint-prop ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
@@ -83,32 +81,42 @@ C: elevator ( -- elevator )
     <plain-gadget> over set-delegate
     dup elevator-theme dup elevator-actions ;
 
+: (layout-thumb) ( slider n -- n )
+    over slider-vector n*v swap slider-thumb ;
+
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
+
+: layout-thumb-loc ( slider -- )
+    dup thumb-loc (layout-thumb) set-rect-loc ;
 
 : thumb-dim ( slider -- h )
     dup slider-page swap slider>screen ;
 
+: layout-thumb-dim ( slider -- )
+    dup dup thumb-dim (layout-thumb)
+    >r >r dup rect-dim r> rot slider-vector set-axis r>
+    set-gadget-dim ;
+
 : layout-thumb ( slider -- )
-    dup thumb-loc over slider-vector n*v
-    over slider-thumb set-rect-loc
-    dup thumb-dim over slider-vector n*v thumb-min vmax
-    swap slider-thumb set-gadget-dim ;
+    dup layout-thumb-loc layout-thumb-dim ;
 
 M: elevator layout* ( elevator -- )
     find-slider layout-thumb ;
 
-M: elevator pref-dim drop thumb-min ;
-
 : slide-by-line ( -1/1 slider -- ) >r 32 * r> slide-by ;
 
-: <up-button>
-    <gadget> [ -1 swap slide-by-line ] <repeat-button> ;
+: slider-vertical? slider-vector @{ 0 1 0 }@ = ;
+
+: <up-button> ( slider -- button )
+    slider-vertical? up left ? <polygon-gadget>
+    [ -1 swap slide-by-line ] <repeat-button> ;
 
 : add-up @{ 1 1 1 }@ over slider-vector v- first2 set-frame-child ;
 
-: <down-button>
-    <gadget> [ 1 swap slide-by-line ] <repeat-button> ;
+: <down-button> ( slider -- button )
+    slider-vertical? down right ? <polygon-gadget>
+    [ 1 swap slide-by-line ] <repeat-button> ;
 
 : add-down @{ 1 1 1 }@ over slider-vector v+ first2 set-frame-child ;
 
@@ -123,8 +131,8 @@ C: slider ( vector -- slider )
     0 over set-slider-page
     0 over set-slider-max
     <elevator> over add-elevator
-    <up-button> over add-up
-    <down-button> over add-down
+    dup <up-button> over add-up
+    dup <down-button> over add-down
     <thumb> over add-thumb ;
 
 : <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;

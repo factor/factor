@@ -11,12 +11,8 @@ lists math namespaces sdl sequences sequences styles threads ;
 : button-pressed? ( button -- ? )
     #! Return true if the mouse was clicked on the button, and
     #! is currently over the button.
-    dup mouse-over? [
-        1 button-down?
-        [ hand hand-clicked child? ] [ drop f ] if
-    ] [
-        drop f
-    ] if ;
+    dup mouse-over? 1 button-down? and
+    [ hand hand-clicked child? ] [ drop f ] if ;
 
 : button-update ( button -- )
     dup dup mouse-over? rollover set-paint-prop
@@ -52,11 +48,12 @@ lists math namespaces sdl sequences sequences styles threads ;
 TUPLE: button ;
 
 C: button ( gadget quot -- button )
-    rot bevel-border over set-delegate
-    dup button-theme [ swap button-gestures ] keep ;
+    <bevel-gadget> @{ 5 5 0 }@ <border> over set-delegate
+    dup button-theme [ swap button-gestures ] keep
+    [ add-gadget ] keep ;
 
 : <roll-button> ( gadget quot -- button )
-    >r dup roll-button-theme dup r> button-gestures ;
+    >r empty-border dup roll-button-theme dup r> button-gestures ;
 
 : repeat-button-down ( button -- )
     dup 100 add-timer button-clicked ;

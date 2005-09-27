@@ -33,7 +33,8 @@ TUPLE: outliner gadget quot pile expanded? ;
 : find-outliner [ outliner? ] find-parent ;
 
 : <expand-button> ( -- gadget )
-    "+" <label> [ find-outliner toggle-outliner ] <roll-button> ;
+    right <polygon-gadget>
+    [ find-outliner toggle-outliner ] <roll-button> ;
 
 C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.

@@ -33,8 +33,8 @@ M: general-list tutorial-line
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map
-    <pile> 1 over set-pack-fill [ add-gadgets ] keep
-    empty-border ;
+    make-pile 1 over set-pack-fill
+    gap-border ;
 
 : tutorial-pages
     [

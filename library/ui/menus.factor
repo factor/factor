@@ -16,7 +16,7 @@ gadgets-labels generic kernel lists math namespaces sequences ;
 
 : fit-bounds ( loc dim max -- loc )
     #! Adjust loc to fit inside max.
-    swap v- @{ 0 0 0 }@ vmax vmin ;
+    swap |v-| vmin ;
 
 : menu-loc ( menu -- loc )
     hand rect-loc swap rect-dim world get rect-dim fit-bounds ;
@@ -31,7 +31,7 @@ gadgets-labels generic kernel lists math namespaces sequences ;
     #! Given an association list mapping labels to quotations.
     #! Prepend a call to hide-menu to each quotation.
     [ uncons \ hide-glass swons >r <label> r> <roll-button> ] map
-    <pile> 1 over set-pack-fill [ add-gadgets ] keep ;
+    make-pile 1 over set-pack-fill ;
 
 : menu-theme ( menu -- )
     << solid >> interior set-paint-prop ;

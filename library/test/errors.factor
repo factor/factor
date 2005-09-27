@@ -14,7 +14,7 @@ USE: memory
 
 [ t ] [
     [ "Hello" throw ] catch drop
-    global [ "error" get ] bind
+    global [ error get ] bind
     "Hello" =
 ] unit-test
 

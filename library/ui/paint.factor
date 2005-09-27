@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: generic hashtables io kernel lists math matrices
-namespaces sdl sequences strings styles vectors ;
+USING: alien arrays gadgets-layouts generic hashtables io kernel
+lists math matrices namespaces sdl sequences strings styles
+vectors ;
 
 SYMBOL: clip
 
@@ -137,17 +138,15 @@ TUPLE: bevel width ;
 SYMBOL: bevel-1
 SYMBOL: bevel-2
 
-: bevel-up ( gadget -- rgb )
-    dup reverse-video paint-prop bevel-1 bevel-2 ? paint-prop rgb ;
-
-: bevel-down ( gadget -- rgb )
-    dup reverse-video paint-prop bevel-2 bevel-1 ? paint-prop rgb ;
+: bevel-color ( gadget ? -- rgb )
+    >r dup reverse-video paint-prop bevel-1 bevel-2
+    r> [ swap ] when ? paint-prop rgb ;
 
 : draw-bevel ( v1 v2 gadget -- )
-    [ >r x1/x2/y1 r> bevel-up   hlineColor ] keep
-    [ >r x1/x2/y2 r> bevel-down hlineColor ] keep
-    [ >r x1/y1/y2 r> bevel-up   vlineColor ] keep
-    [ >r x2/y1/y2 r> bevel-down vlineColor ] keep
+    [ >r x1/x2/y1 r> f bevel-color hlineColor ] keep
+    [ >r x1/x2/y2 r> t bevel-color hlineColor ] keep
+    [ >r x1/y1/y2 r> f bevel-color vlineColor ] keep
+    [ >r x2/y1/y2 r> t bevel-color vlineColor ] keep
     3drop ;
 
 M: bevel draw-boundary ( gadget boundary -- )
@@ -172,8 +171,49 @@ M: gadget draw-gadget* ( gadget -- )
 : <bevel-gadget> ( -- gadget )
     <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;
 
-: draw-line ( from to color -- )
-    >r >r >r surface get r> first2 r> first2 r> rgb lineColor ;
+! Polygon pen
+TUPLE: polygon points ;
 
-: draw-fanout ( from tos color -- )
-    -rot [ >r 2dup r> rot draw-line ] each 2drop ;
+: >short-array ( seq -- short-array )
+    dup length <short-array> over length [
+        [ tuck >r >r swap nth r> r> swap set-short-nth ] 3keep
+    ] repeat nip ;
+
+: polygon-x/y ( polygon -- vx vy n )
+    polygon-points [
+        origin get swap [ v+ ] map-with
+        dup [ first ] map swap [ second ] map
+        [ >short-array ] 2apply
+    ] keep length ;
+
+: (polygon) ( gadget polygon -- surface vx vy n gadget )
+    swap >r surface get swap polygon-x/y r> ;
+
+M: polygon draw-boundary ( gadget polygon -- )
+    (polygon) fg rgb polygonColor ;
+
+M: polygon draw-interior ( gadget polygon -- )
+    (polygon) bg rgb filledPolygonColor ;
+
+: up    @{ @{ 4 0 0 }@ @{ 8 8 0 }@ @{ 0 8 0 }@ }@ ;
+: right @{ @{ 0 0 0 }@ @{ 8 4 0 }@ @{ 0 8 0 }@ }@ ;
+: down  @{ @{ 0 0 0 }@ @{ 8 0 0 }@ @{ 4 8 0 }@ }@ ;
+: left  @{ @{ 0 4 0 }@ @{ 8 0 0 }@ @{ 8 8 0 }@ }@ ;
+
+: right|
+    @{
+        @{ 0 0 0 }@ @{ 0 8 0 }@ @{ 8 4 0 }@
+        @{ 8 8 0 }@ @{ 8 0 0 }@ @{ 8 4 0 }@
+    }@ ;
+
+: |left
+    @{
+        @{ 8 0 0 }@ @{ 8 8 0 }@ @{ 0 4 0 }@
+        @{ 0 8 0 }@ @{ 0 0 0 }@ @{ 0 4 0 }@
+    }@ ;
+
+: <polygon-gadget> ( points -- gadget )
+    dup max-dim >r <polygon> <gadget> r> over set-rect-dim
+    dup rot interior set-paint-prop
+    dup gray background set-paint-prop
+    dup light-gray rollover-bg set-paint-prop ;

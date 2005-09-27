@@ -5,6 +5,9 @@ USING: generic inspector kernel kernel-internals lists math
 namespaces parser prettyprint sequences io sequences-internals
 strings vectors words ;
 
+SYMBOL: error
+SYMBOL: error-continuation
+
 : expired-error. ( obj -- )
     "Object did not survive image save/load: " write . ;
 
@@ -100,10 +103,12 @@ M: string error. ( error -- ) print ;
 
 M: object error. ( error -- ) . ;
 
-: :s ( -- ) "error-datastack" get stack. ;
-: :r ( -- ) "error-callstack" get stack. ;
+: :s ( -- ) error-continuation get continuation-data stack. ;
 
-: :get ( var -- value ) "error-namestack" get (get) ;
+: :r ( -- ) error-continuation get continuation-call stack. ;
+
+: :get ( var -- value )
+    error-continuation get continuation-name (get) ;
 
 : debug-help ( -- )
     ":s :r show stacks at time of error." print
@@ -122,21 +127,10 @@ M: object error. ( error -- ) . ;
     #! and return to the caller.
     [ print-error debug-help ] recover ;
 
-: save-error ( error ds rs ns cs -- )
-    #! Save the stacks and parser state for post-mortem
-    #! inspection after an error.
-    global [
-        "error-catchstack" set
-        "error-namestack" set
-        "error-callstack" set
-        "error-datastack" set
-        "error" set
-    ] bind ;
+: save-error ( error continuation -- )
+    global [ error-continuation set error set ] bind ;
 
 : init-error-handler ( -- )
     ( kernel calls on error )
-    [
-        datastack dupd callstack namestack catchstack
-        save-error rethrow
-    ] 5 setenv
+    [ dup continuation save-error rethrow ] 5 setenv
     kernel-error 12 setenv ;

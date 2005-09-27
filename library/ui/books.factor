@@ -2,24 +2,17 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-generic kernel lists math matrices sequences ;
+generic kernel lists math matrices namespaces sequences ;
 
 TUPLE: book page ;
 
 C: book ( pages -- book )
-    <gadget> over set-delegate
-    0 over set-book-page
-    [ add-gadgets ] keep ;
-
-M: book pref-dim ( book -- dim )
-    gadget-children [ pref-dim ] map @{ 0 0 0 }@ [ vmax ] reduce ;
+    <stack> over set-delegate
+    0 over set-book-page [ add-gadgets ] keep ;
 
 M: book layout* ( book -- )
-    dup rect-dim over gadget-children [
-        f over set-gadget-visible?
-        @{ 0 0 0 }@ over set-rect-loc
-        set-gadget-dim
-    ] each-with
+    dup delegate layout*
+    dup gadget-children [ f swap set-gadget-visible? ] each
     dup book-page swap gadget-children nth
     [ t swap set-gadget-visible? ] when* ;
 
@@ -42,12 +35,11 @@ TUPLE: book-browser book ;
 
 : <book-buttons> ( book -- gadget )
     [
-        { "|<" [ find-book first-page ] }
-        { "<"  [ find-book prev-page  ] }
-        { ">"  [ find-book next-page  ] }
-        { ">|" [ find-book last-page  ] }
-    ] [ first2 >r <label> r> <button> ] map
-    <shelf> [ add-gadgets ] keep ;
+        |left  <polygon-gadget> [ find-book first-page ] <button> ,
+        left   <polygon-gadget> [ find-book prev-page  ] <button> ,
+        right  <polygon-gadget> [ find-book next-page  ] <button> ,
+        right| <polygon-gadget> [ find-book last-page  ] <button> ,
+    ] { } make make-shelf ;
 
 C: book-browser ( book -- gadget )
     <frame> over set-delegate

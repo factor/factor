@@ -106,9 +106,14 @@ SYMBOL: history-index
     >r line-text get head r> append
     line-text set ;
 
-: backspace ( -- )
+: delete-prev ( -- )
     #! Call this in the line editor scope.
     caret get dup 0 = [ drop ] [ 1- 1 line-remove ] if ;
+
+: delete-next ( -- )
+    #! Call this in the line editor scope.
+    caret get dup line-text get length =
+    [ drop ] [ 1 line-remove ] if ;
 
 : left ( -- )
     #! Call this in the line editor scope.

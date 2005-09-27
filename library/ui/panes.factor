@@ -19,7 +19,7 @@ TUPLE: pane output active current input continuation scrolls? ;
 : add-output 2dup set-pane-output add-gadget ;
 
 : <active-line> ( current input -- line )
-    [ 2array ] [ 1array ] if* <shelf> [ add-gadgets ] keep ;
+    [ 2array ] [ 1array ] if* make-shelf ;
 
 : init-active-line ( pane -- )
     dup pane-active unparent

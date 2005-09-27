@@ -21,9 +21,11 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 : >absolute ( rect -- rect )
     rect-bounds >r origin get v+ r> <rect> ;
 
+: |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
+
 : intersect ( rect rect -- rect )
     [ rect-extent ] 2apply swapd vmin >r vmax dup r>
-    swap v- @{ 0 0 0 }@ vmax <rect> ;
+    swap |v-| <rect> ;
 
 : intersects? ( rect/point rect -- ? )
     [ rect-extent ] 2apply swapd vmin >r vmax r> v-
@@ -73,3 +75,5 @@ M: gadget children-on ( rect/point gadget -- list )
             [ nip pick-up ] [ rot 2drop ] if
         ] with-scope
     ] [ 2drop f ] if ;
+
+: max-dim ( dims -- dim ) @{ 0 0 0 }@ [ vmax ] reduce ;

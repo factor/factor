@@ -33,7 +33,7 @@ C: frame ( -- frame )
 : get-bottom ( frame -- gadget ) 1 2 frame-child ;
 
 : reduce-grid ( grid -- seq )
-    [ @{ 0 0 0 }@ [ vmax ] reduce ] map ;
+    [ max-dim ] map ;
 
 : frame-pref-dim ( grid -- dim )
     reduce-grid @{ 0 0 0 }@ [ v+ ] reduce ;

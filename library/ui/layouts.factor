@@ -98,13 +98,16 @@ C: pack ( vector -- pack )
 
 : <pile> ( -- pack ) @{ 0 1 0 }@ <pack> ;
 
+: make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
+
 : <shelf> ( -- pack ) @{ 1 0 0 }@ <pack> ;
+
+: make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
 
 M: pack pref-dim ( pack -- dim )
     [
         [
-            pref-dims
-            [ @{ 0 0 0 }@ [ vmax ] reduce ] keep
+            pref-dims [ max-dim ] keep
             [ @{ 0 0 0 }@ [ v+ ] reduce ] keep length 1 - 0 max
         ] keep pack-gap n*v v+
     ] keep pack-vector set-axis ;

@@ -51,9 +51,6 @@ DEFER: describe
     #! Outlining word browser.
     vocabs [ f over [ words. ] curry write-outliner ] each ;
 
-: stack. ( seq -- seq )
-    reverse-slice >array describe ;
-
 : usage. ( word -- )
     #! Outlining usages browser.
     usage [ usage. ] object-outline ;
@@ -61,6 +58,9 @@ DEFER: describe
 : uses. ( word -- )
     #! Outlining call hierarchy browser.
     uses [ uses. ] object-outline ;
+
+: stack. ( seq -- seq )
+    reverse-slice >array describe ;
 
 : .s datastack stack. ;
 : .r callstack stack. ;

@@ -6,19 +6,24 @@ math namespaces vectors ;
 
 TUPLE: border size ;
 
-C: border ( child delegate size -- border )
+C: border ( delegate size -- border )
     [ set-border-size ] keep
-    [ set-delegate ] keep
-    [ add-gadget ] keep ;
+    [ set-delegate ] keep ;
+
+: make-border ( child delegate size -- boder )
+    <border> [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
-    <gadget> @{ 5 5 0 }@ <border> ;
+    <gadget> @{ 0 0 0 }@ make-border ;
+
+: gap-border ( child -- border )
+    <gadget> @{ 5 5 0 }@ make-border ;
 
 : line-border ( child -- border )
-    <etched-gadget> @{ 5 5 0 }@ <border> ;
+    <etched-gadget> @{ 5 5 0 }@ make-border ;
 
 : bevel-border ( child -- border )
-    <bevel-gadget> @{ 5 5 0 }@ <border> ;
+    <bevel-gadget> @{ 5 5 0 }@ make-border ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;
