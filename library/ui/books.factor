@@ -35,13 +35,13 @@ TUPLE: book-browser book ;
 
 : <book-buttons> ( book -- gadget )
     [
-        |left  <polygon-gadget> [ find-book first-page ] <button> ,
-        left   <polygon-gadget> [ find-book prev-page  ] <button> ,
-        right  <polygon-gadget> [ find-book next-page  ] <button> ,
-        right| <polygon-gadget> [ find-book last-page  ] <button> ,
+        arrow-|left  <polygon-gadget> [ find-book first-page ] <button> ,
+        arrow-left   <polygon-gadget> [ find-book prev-page  ] <button> ,
+        arrow-right  <polygon-gadget> [ find-book next-page  ] <button> ,
+        arrow-right| <polygon-gadget> [ find-book last-page  ] <button> ,
     ] { } make make-shelf ;
 
 C: book-browser ( book -- gadget )
     <frame> over set-delegate
-    <book-buttons> over add-top
-    [ 2dup set-book-browser-book add-center ] keep ;
+    <book-buttons> over @top frame-add
+    [ 2dup set-book-browser-book @center frame-add ] keep ;

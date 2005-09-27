@@ -109,18 +109,18 @@ M: elevator layout* ( elevator -- )
 : slider-vertical? slider-vector @{ 0 1 0 }@ = ;
 
 : <up-button> ( slider -- button )
-    slider-vertical? up left ? <polygon-gadget>
+    slider-vertical? arrow-up arrow-left ? <polygon-gadget>
     [ -1 swap slide-by-line ] <repeat-button> ;
 
-: add-up @{ 1 1 1 }@ over slider-vector v- first2 set-frame-child ;
+: add-up @{ 1 1 1 }@ over slider-vector v- first2 frame-add ;
 
 : <down-button> ( slider -- button )
-    slider-vertical? down right ? <polygon-gadget>
+    slider-vertical? arrow-down arrow-right ? <polygon-gadget>
     [ 1 swap slide-by-line ] <repeat-button> ;
 
-: add-down @{ 1 1 1 }@ over slider-vector v+ first2 set-frame-child ;
+: add-down @{ 1 1 1 }@ over slider-vector v+ first2 frame-add ;
 
-: add-elevator 2dup set-slider-elevator add-center ;
+: add-elevator 2dup set-slider-elevator @center frame-add ;
 
 : add-thumb 2dup slider-elevator add-gadget set-slider-thumb ;
 

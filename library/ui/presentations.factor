@@ -44,13 +44,12 @@ SYMBOL: commands
     swap format terpri ;
 
 [ drop t ] "Prettyprint" [ . ] define-command
-[ drop t ] "Inspect" [ inspect ] define-command
-[ drop t ] "Inspect variable" [ get inspect ] define-command
-[ drop t ] "Inspect references" [ references inspect ] define-command
+[ drop t ] "Describe" [ describe ] define-command
 [ drop t ] "Push on data stack" [ ] define-command
 
 [ word? ] "See word" [ see ] define-command
-[ word? ] "Word usage" [ usage . ] define-command
+[ word? ] "Word call hierarchy" [ uses. ] define-command
+[ word? ] "Word caller hierarchy" [ usage. ] define-command
 [ word? ] "Open in jEdit" [ jedit ] define-command
 [ word? ] "Reload original source" [ reload ] define-command
 [ compound? ] "Annotate with watchpoint" [ watch ] define-command

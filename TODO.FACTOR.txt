@@ -19,8 +19,6 @@
 
 - arrows rendering flaw
 - bottom part of thumb: sometimes not drawn?
-- vertical positioning of outliner arrows
-- outliner arrow rollover
 - tabular output
 - completion
 - debugger should use outlining

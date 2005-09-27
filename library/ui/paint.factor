@@ -179,15 +179,16 @@ TUPLE: polygon points ;
         [ tuck >r >r swap nth r> r> swap set-short-nth ] 3keep
     ] repeat nip ;
 
-: polygon-x/y ( polygon -- vx vy n )
+: polygon-x/y ( gadget polygon -- vx vy n )
     polygon-points [
-        origin get swap [ v+ ] map-with
+        swap rect-dim over max-dim v- 2 v/n origin get v+
+        swap [ v+ ] map-with
         dup [ first ] map swap [ second ] map
         [ >short-array ] 2apply
     ] keep length ;
 
 : (polygon) ( gadget polygon -- surface vx vy n gadget )
-    swap >r surface get swap polygon-x/y r> ;
+    over >r surface get -rot polygon-x/y r> ;
 
 M: polygon draw-boundary ( gadget polygon -- )
     (polygon) fg rgb polygonColor ;
@@ -195,18 +196,18 @@ M: polygon draw-boundary ( gadget polygon -- )
 M: polygon draw-interior ( gadget polygon -- )
     (polygon) bg rgb filledPolygonColor ;
 
-: up    @{ @{ 4 0 0 }@ @{ 8 8 0 }@ @{ 0 8 0 }@ }@ ;
-: right @{ @{ 0 0 0 }@ @{ 8 4 0 }@ @{ 0 8 0 }@ }@ ;
-: down  @{ @{ 0 0 0 }@ @{ 8 0 0 }@ @{ 4 8 0 }@ }@ ;
-: left  @{ @{ 0 4 0 }@ @{ 8 0 0 }@ @{ 8 8 0 }@ }@ ;
+: arrow-up    @{ @{ 4 0 0 }@ @{ 8 8 0 }@ @{ 0 8 0 }@ }@ ;
+: arrow-right @{ @{ 0 0 0 }@ @{ 8 4 0 }@ @{ 0 8 0 }@ }@ ;
+: arrow-down  @{ @{ 0 0 0 }@ @{ 8 0 0 }@ @{ 4 8 0 }@ }@ ;
+: arrow-left  @{ @{ 0 4 0 }@ @{ 8 0 0 }@ @{ 8 8 0 }@ }@ ;
 
-: right|
+: arrow-right|
     @{
         @{ 0 0 0 }@ @{ 0 8 0 }@ @{ 8 4 0 }@
         @{ 8 8 0 }@ @{ 8 0 0 }@ @{ 8 4 0 }@
     }@ ;
 
-: |left
+: arrow-|left
     @{
         @{ 8 0 0 }@ @{ 8 8 0 }@ @{ 0 4 0 }@
         @{ 0 8 0 }@ @{ 0 0 0 }@ @{ 0 4 0 }@

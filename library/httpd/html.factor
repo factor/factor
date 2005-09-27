@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: html
-USING: generic http io kernel lists math namespaces parser
+USING: generic http io kernel lists math namespaces
 presentation sequences strings styles words ;
 
 : html-entities ( -- alist )

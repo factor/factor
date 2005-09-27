@@ -8,29 +8,35 @@ sequences ;
 ! gadgets gets left-over space.
 TUPLE: frame grid ;
 
-: <frame-grid> { { f f f } { f f f } { f f f } } [ clone ] map ;
+: <frame-grid>
+    @{ @{ f f f }@ @{ f f f }@ @{ f f f }@ }@ [ clone ] map ;
+
+: @center 1 1 ;
+: @left 0 1 ;
+: @right 2 1 ;
+: @top 1 0 ;
+: @bottom 1 2 ;
+
+: @top-left 0 0 ;
+: @top-right 2 0 ;
+: @bottom-left 0 2 ;
+: @bottom-right 2 2 ;
 
 C: frame ( -- frame )
     <gadget> over set-delegate <frame-grid> over set-frame-grid ;
 
 : frame-child ( frame i j -- gadget ) rot frame-grid nth nth ;
 
-: set-frame-child ( gadget frame i j -- )
-    3dup frame-child unparent
-    >r >r 2dup add-gadget r> r>
-    rot frame-grid nth set-nth ;
+: frame-add ( gadget frame i j -- )
+    #! Add a gadget to a frame. Use this with frames instead
+    #! of add-gadget.
+    >r >r over [ over add-gadget ] when* r> r>
+    3dup frame-child unparent rot frame-grid nth set-nth ;
 
-: add-center ( gadget frame -- ) 1 1 set-frame-child ;
-: add-left   ( gadget frame -- ) 0 1 set-frame-child ;
-: add-right  ( gadget frame -- ) 2 1 set-frame-child ;
-: add-top    ( gadget frame -- ) 1 0 set-frame-child ;
-: add-bottom ( gadget frame -- ) 1 2 set-frame-child ;
-
-: get-center ( frame -- gadget ) 1 1 frame-child ;
-: get-left   ( frame -- gadget ) 0 1 frame-child ;
-: get-right  ( frame -- gadget ) 2 1 frame-child ;
-: get-top    ( frame -- gadget ) 1 0 frame-child ;
-: get-bottom ( frame -- gadget ) 1 2 frame-child ;
+: frame-remove ( frame i j -- )
+    #! Remove a gadget from a frame. Use this with frames
+    #! instead of unparent.
+    >r >r >r f r> r> r> frame-add ;
 
 : reduce-grid ( grid -- seq )
     [ max-dim ] map ;

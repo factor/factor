@@ -23,13 +23,13 @@ TUPLE: display title pane ;
     <label> dup display-title-theme ;
 
 : add-display-title ( title display -- )
-    2dup set-display-title add-top ;
+    2dup set-display-title @top frame-add ;
 
 C: display ( -- display )
     <frame> over set-delegate
     "" <display-title> over add-display-title
     f f <pane> 2dup swap set-display-pane
-    <scroller> over add-center ;
+    <scroller> over @center frame-add ;
 
 : present-stack ( seq title display -- )
     [ display-title set-label-text ] keep

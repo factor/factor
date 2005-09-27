@@ -1,47 +1,41 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-outliner
-USING: arrays gadgets gadgets-buttons gadgets-labels
-gadgets-layouts gadgets-panes generic io
-kernel sequences ;
+USING: arrays gadgets gadgets-borders gadgets-buttons
+gadgets-labels gadgets-layouts gadgets-panes generic io kernel
+lists sequences ;
 
-! Outliner widget.
+! Outliner gadget.
+TUPLE: outliner quot ;
 
-TUPLE: outliner gadget quot pile expanded? ;
+: outliner-expanded? ( outliner -- ? )
+    #! If the outliner is expanded, it has a center gadget.
+    @center frame-child >boolean ;
 
-: add-outliner-node ( outliner -- )
-    dup outliner-gadget
-    swap outliner-pile add-gadget ;
+DEFER: <expand-button>
 
-: setup-outliner ( quot outliner -- )
-    dup outliner-gadget >r
-    outliner-pile dup clear-gadget
-    r> over add-gadget
-    over [ >r make-pane r> add-gadget ] [ 2drop ] if ;
+: set-outliner-expanded? ( expanded? outliner -- )
+    #! Call the expander quotation if expanding.
+    over not <expand-button> over @top-left frame-add
+    swap [ dup outliner-quot make-pane ] [ f ] if
+    swap @center frame-add ;
 
-: collapse-outliner ( outliner -- )
-    f over set-outliner-expanded? f swap setup-outliner ;
+: find-outliner ( gadget -- outliner )
+    [ outliner? ] find-parent ;
 
-: expand-outliner ( outliner -- )
-    t over set-outliner-expanded?
-    dup outliner-quot swap setup-outliner ;
+: <expand-arrow> ( ? -- gadget )
+    arrow-right arrow-down ? <polygon-gadget>
+    <gadget> @{ 5 0 0 }@ make-border ;
 
-: toggle-outliner ( outliner -- )
-    dup outliner-expanded?
-    [ collapse-outliner ] [ expand-outliner ] if ;
-
-: find-outliner [ outliner? ] find-parent ;
-
-: <expand-button> ( -- gadget )
-    right <polygon-gadget>
-    [ find-outliner toggle-outliner ] <highlight-button> ;
+: <expand-button> ( ? -- gadget )
+    #! If true, the button expands, otherwise it collapses.
+    dup [ swap find-outliner set-outliner-expanded? ] curry
+    >r <expand-arrow> r>
+    <highlight-button> ;
 
 C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.
+    <frame> over set-delegate
     [ set-outliner-quot ] keep
-    [ set-outliner-gadget ] keep
-    <shelf> over set-delegate
-    @{ 5 0 0 }@ over set-pack-gap
-    <expand-button> over add-gadget
-    <pile> over 2dup set-outliner-pile add-gadget
-    dup collapse-outliner ;
+    [ @top frame-add ] keep
+    f over set-outliner-expanded? ;

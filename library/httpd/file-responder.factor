@@ -27,18 +27,6 @@ io strings ;
         serve-static
     ] if ;
 
-: file-link. ( text path -- )
-    file swons unit format ;
-
-: file-type. ( path -- )
-    directory? "[DIR ] " "[FILE] " ? write ;
-
-: file. ( dir name -- )
-    tuck path+ [ file-type. ] keep file-link. ;
-
-: directory. ( dir -- )
-    dup directory [ file. terpri ] each-with ;
-
 : list-directory ( directory -- )
     serving-html
      "method" get "head" = [
