@@ -20,7 +20,7 @@ SYMBOL: column
     code get length spot get = not ;
 
 : char ( -- char/f )
-    more? [ spot get code get nth ] [ f ] ifte ;
+    more? [ spot get code get nth ] [ f ] if ;
 
 : incr-spot ( -- )
     #! Increment spot.
@@ -30,14 +30,14 @@ SYMBOL: column
         line
     ] [
         column
-    ] ifte [ 1 + ] change ;
+    ] if [ 1 + ] change ;
 
 : skip-until ( quot -- | quot: char -- ? )
     more? [
         char swap [ call ] keep swap [ drop ] [
              incr-spot skip-until
-        ] ifte
-    ] [ drop ] ifte ; inline
+        ] if
+    ] [ drop ] if ; inline
 
 : take-until ( quot -- string | quot: char -- ? )
     #! Take the substring of a string starting at spot
@@ -60,8 +60,8 @@ DEFER: <xml-string-error>
             drop spot get
         ] [
             incr-spot (take-until-string)
-        ] ifte
-    ] [ "Missing closing token" <xml-string-error> throw ] ifte ;
+        ] if
+    ] [ "Missing closing token" <xml-string-error> throw ] if ;
 
 : take-until-string ( string -- string )
     [ >r spot get r> (take-until-string) code get subseq ] keep
@@ -116,12 +116,12 @@ M: xml-string-error error.
 : expect ( ch -- )
     char 2dup = [ 2drop ] [
         >r ch>string r> ch>string <expected> throw
-    ] ifte incr-spot ;
+    ] if incr-spot ;
 
 : expect-string ( string -- )
     >r spot get r> t over [ char incr-spot = and ] each [ 2drop ] [
         swap spot get code get subseq <expected> throw
-    ] ifte ;
+    ] if ;
 
 : entities
     {{
@@ -137,8 +137,8 @@ M: xml-string-error error.
     dup first CHAR: # = [
         1 swap tail "x" ?head 16 10 ? base>
     ] [
-        dup entities hash [ nip ] [ <no-entity> throw ] ifte*
-    ] ifte ;
+        dup entities hash [ nip ] [ <no-entity> throw ] if*
+    ] if ;
 
 : (parse-text) ( vector -- vector )
     [ CHAR: & = ] take-until over push
@@ -176,7 +176,7 @@ M: xml-string-error error.
         incr-spot ch>string [ name-char? not ] take-until append
     ] [
         "Malformed name" <xml-string-error> throw
-    ] ifte ;
+    ] if ;
 
 : parse-quot ( ch -- str )
     incr-spot [ dupd = ] take-until parse-text nip incr-spot ;
@@ -186,7 +186,7 @@ M: xml-string-error error.
         parse-quot
     ] [
         "Attribute lacks quote" <xml-string-error> throw
-    ] ifte ;
+    ] if ;
 
 : parse-prop ( -- [[ name value ]] )
     parse-name pass-blank CHAR: = expect pass-blank
@@ -213,7 +213,7 @@ TUPLE: comment text ;
         <contained> incr-spot
     ] [
         <opener>
-    ] ifte ;
+    ] if ;
 
 : skip-comment ( -- comment )
     "--" expect-string "--" take-until-string <comment> CHAR: > expect ;
@@ -222,7 +222,7 @@ TUPLE: comment text ;
     "[CDATA[" expect-string "]]>" take-until-string ;
 
 : cdata/comment ( -- object )
-    incr-spot char CHAR: - = [ skip-comment ] [ cdata ] ifte ;
+    incr-spot char CHAR: - = [ skip-comment ] [ cdata ] if ;
 
 : make-tag ( -- tag/f )
     CHAR: < expect
@@ -233,8 +233,8 @@ TUPLE: comment text ;
             <closer>
         ] [
             middle-tag end-tag
-        ] ifte pass-blank CHAR: > expect
-    ] ifte ;
+        ] if pass-blank CHAR: > expect
+    ] if ;
 
 !   -- Overall
 
@@ -252,7 +252,7 @@ TUPLE: comment text ;
     get-text swap [ dip-ns ] keep
     more? [
         make-tag [ swap [ dip-ns ] keep ] when* (xml-each)
-    ] [ drop ] ifte ; inline
+    ] [ drop ] if ; inline
 
 : xml-each ( string quot -- | quot: node -- )
     #! Quotation is called with each node: an opener, closer, contained,
@@ -270,6 +270,21 @@ TUPLE: comment text ;
 TUPLE: tag name props children ;
 
 SYMBOL: xml-stack
+
+TUPLE: mismatched open close ;
+M: mismatched error.
+    "Mismatched tags" print
+    "Opening tag: <" write dup mismatched-open write ">" print
+    "Closing tag: </" write mismatched-close write ">" print ;
+
+TUPLE: unclosed tags ;
+C: unclosed ( -- unclosed )
+    1 xml-stack get tail-slice [ car opener-name ] map
+    swap [ set-unclosed-tags  ] keep ;
+M: unclosed error.
+    "Unclosed tags" print
+    "Tags: " print
+    unclosed-tags [ "  <" write write ">" print ] each ;
 
 : seq-last ( seq -- last )
     [ length 1 - ] keep nth ;
@@ -292,16 +307,21 @@ M: opener process
 M: closer process
     closer-name xml-stack get pop uncons
     >r [ 
-        opener-name [ = [ "Mismatched tags" throw ] unless ] keep
+        opener-name [
+	    2dup = [ 2drop ] [ swap <mismatched> throw ] if
+	] keep
     ] keep opener-props r> <tag> push-datum ;
+
+: initialize-xml-stack ( -- )
+    f 10 <vector> cons unit >vector xml-stack set ;
 
 : xml ( string -- vector )
     #! Produces a tree of XML nodes
     [
-        f 10 <vector> cons 1vector xml-stack set
+	initialize-xml-stack
         [ process ] xml-each
         xml-stack get
-        dup length 1 = [ "Unclosed tags!" throw ] unless
+        dup length 1 = [ <unclosed> throw ] unless
         first cdr
     ] with-scope ;
 
@@ -327,7 +347,7 @@ M: string (xml>string)
             CHAR: & , % CHAR: ; ,
         ] [
             ,
-        ] ?ifte
+        ] ?if
     ] each ;
 
 : print-open/close ( tag -- )
@@ -345,7 +365,7 @@ M: tag (xml>string)
         drop "/>" %
     ] [
         print-open/close
-    ] ifte ;
+    ] if ;
 
 M: comment (xml>string)
     "<!--" %
@@ -358,7 +378,7 @@ M: comment (xml>string)
 : xml-reprint ( string -- string )
     xml xml>string ;
 
-! * Easy XML generation
+! * Easy XML generation for more literal things
 
 : text ( string -- )
     chars>entities push-datum ;
@@ -374,7 +394,7 @@ M: comment (xml>string)
 : make-xml ( quot -- vector )
     #! Produces a tree of XML from a quotation to generate it
     [
-        f 10 <vector> cons 1vector xml-stack set
+        initialize-xml-stack
         call
         xml-stack get
         first cdr
