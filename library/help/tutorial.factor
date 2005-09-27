@@ -34,7 +34,7 @@ M: general-list tutorial-line
 : <page> ( list -- gadget )
     [ tutorial-line ] map
     make-pile 1 over set-pack-fill
-    gap-border ;
+    empty-border ;
 
 : tutorial-pages
     [

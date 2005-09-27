@@ -98,11 +98,7 @@ C: pack ( vector -- pack )
 
 : <pile> ( -- pack ) @{ 0 1 0 }@ <pack> ;
 
-: make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
-
 : <shelf> ( -- pack ) @{ 1 0 0 }@ <pack> ;
-
-: make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
 
 M: pack pref-dim ( pack -- dim )
     [

@@ -75,3 +75,9 @@ M: gadget focusable-child* drop t ;
 : focusable-child ( gadget -- gadget )
     dup focusable-child*
     dup t = [ drop ] [ nip focusable-child ] if ;
+
+IN: gadgets-layouts
+
+: make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
+
+: make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;

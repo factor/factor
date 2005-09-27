@@ -14,9 +14,6 @@ C: border ( delegate size -- border )
     <border> [ add-gadget ] keep ;
 
 : empty-border ( child -- border )
-    <gadget> @{ 0 0 0 }@ make-border ;
-
-: gap-border ( child -- border )
     <gadget> @{ 5 5 0 }@ make-border ;
 
 : line-border ( child -- border )

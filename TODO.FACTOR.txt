@@ -17,8 +17,11 @@
 
 + ui:
 
+- arrows rendering flaw
+- bottom part of thumb: sometimes not drawn?
+- vertical positioning of outliner arrows
+- outliner arrow rollover
 - tabular output
-- arrows in outliner and scrollbars
 - completion
 - debugger should use outlining
 - support nested incremental layouts more efficiently

@@ -53,7 +53,10 @@ C: button ( gadget quot -- button )
     [ add-gadget ] keep ;
 
 : <roll-button> ( gadget quot -- button )
-    >r empty-border dup roll-button-theme dup r> button-gestures ;
+    >r dup roll-button-theme dup r> button-gestures ;
+
+: <highlight-button> ( gadget quot -- button )
+    dupd button-gestures ;
 
 : repeat-button-down ( button -- )
     dup 100 add-timer button-clicked ;
