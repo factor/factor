@@ -383,7 +383,8 @@ M: comment (xml>string)
 : text ( string -- )
     chars>entities push-datum ;
 
-: tag ( string hashtable quote -- )
+: tag ( string attr-quot contents-quot -- )
+    >r swap >r make-hash r> swap r> 
     -rot dupd <opener> process
     slip
     <closer> process ; inline
