@@ -33,6 +33,7 @@ USE: strings
 USE: math
 USE: namespaces
 USE: prettyprint
+USE: inspector
 USE: unparser
 USE: sequences
 
