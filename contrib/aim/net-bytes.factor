@@ -31,12 +31,64 @@ SYMBOL: unscoped-stack
 : writeln ( string -- )
     write terpri ;
 
+! wrote this months and months ago..
+! NEEDS REFACTORING, GOSH!
+! Hexdump
+: (print-offset) ( lineno -- )
+	16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
+
+: (print-hex-digit) ( digit -- )
+	>hex 2 CHAR: 0 pad-left write ;
+
+: (print-hex-line) ( lineno string -- )
+	over (print-offset)
+	dup length dup 16 =
+	[ [ 2dup swap nth (print-hex-digit) " " write ] repeat ] ! full line
+	[ ! partial line
+		[ 2dup swap nth (print-hex-digit) " " write ] repeat  
+		dup length 16 swap - [ "   " write ] repeat
+	] if
+	dup length
+	[ 2dup swap nth dup printable? [ write1 ] [ "." write drop ] if ] repeat
+	terpri drop ;
+
+: (num-full-lines) ( bytes -- )
+	length 16 / floor ;
+
+: (get-slice) ( lineno bytes -- <slice> )
+	>r dup 16 * dup 16 + r> <slice> ;
+
+: (get-last-slice) ( bytes -- <slice> )
+	dup length dup 16 mod - over length rot <slice> ;
+
+: (print-bytes) ( bytes -- )
+	dup (num-full-lines) [ over (get-slice) (print-hex-line) ] repeat
+	dup (num-full-lines) over (get-last-slice) dup empty? [ 3drop ] [ (print-hex-line) 2drop ] if ;
+	
+: (print-length) ( len -- )
+    [
+        "Length: " %
+        dup unparse %
+        ", " %
+        >hex %
+        "h\n" %
+    ] "" make write ;
+
+: hexdump ( str -- )
+    dup length (print-length) (print-bytes) ;
+
+
 
 : save-current-scope
     unscoped-stack get [ { } clone unscoped-stack set ] unless
     swap dup unscoped-stream set unscoped-stack get push ;
 
 : set-previous-scope
+    ! unscoped-stream get contents 
+    ! [
+        ! "UNREAD BYTES" writeln
+        ! hexdump
+    ! ] when
     unscoped-stack get dup length 1 > [ 
         [ pop ] keep nip peek unscoped-stream set ] [
         pop drop
@@ -97,50 +149,4 @@ SYMBOL: unscoped-stack
 : head-string ( n -- str )
     unscoped-stream get stream-read >string ;
 
-
-! wrote this months and months ago..
-! NEEDS REFACTORING, GOSH!
-! Hexdump
-: (print-offset) ( lineno -- )
-	16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
-
-: (print-hex-digit) ( digit -- )
-	>hex 2 CHAR: 0 pad-left write ;
-
-: (print-hex-line) ( lineno string -- )
-	over (print-offset)
-	dup length dup 16 =
-	[ [ 2dup swap nth (print-hex-digit) " " write ] repeat ] ! full line
-	[ ! partial line
-		[ 2dup swap nth (print-hex-digit) " " write ] repeat  
-		dup length 16 swap - [ "   " write ] repeat
-	] if
-	dup length
-	[ 2dup swap nth dup printable? [ write1 ] [ "." write drop ] if ] repeat
-	terpri drop ;
-
-: (num-full-lines) ( bytes -- )
-	length 16 / floor ;
-
-: (get-slice) ( lineno bytes -- <slice> )
-	>r dup 16 * dup 16 + r> <slice> ;
-
-: (get-last-slice) ( bytes -- <slice> )
-	dup length dup 16 mod - over length rot <slice> ;
-
-: (print-bytes) ( bytes -- )
-	dup (num-full-lines) [ over (get-slice) (print-hex-line) ] repeat
-	dup (num-full-lines) over (get-last-slice) dup empty? [ 3drop ] [ (print-hex-line) 2drop ] if ;
-	
-: (print-length) ( len -- )
-    [
-        "Length: " %
-        dup unparse %
-        ", " %
-        >hex %
-        "h\n" %
-    ] "" make write ;
-
-: hexdump ( str -- )
-    dup length (print-length) (print-bytes) ;
 

@@ -153,21 +153,21 @@ SYMBOL: message
         head-short
         head-short head-string <string-reader> [
             {
-                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand [ " is away." ] [ " is online." ] if writeln ] }
-                { [ dup 2 = ] [ drop ] }
-                { [ dup 3 = ] [ drop name get write " went online at " write head-short unparse writeln ] }
-                { [ dup 4 = ] [ drop name get write head-short " has been idle for " writeln ] }
-                { [ dup 5 = ] [ drop ] }
-                { [ dup 6 = ] [ drop ] }
-                { [ dup 10 = ] [ drop ] }
-                { [ dup 12 = ] [ drop ] }
-                { [ dup 13 = ] [ drop ] }
-                { [ dup 14 = ] [ drop ] }
-                { [ dup 15 = ] [ drop ] }
-                { [ dup HEX: 19 = ] [ drop ] }
-                { [ dup HEX: 1b = ] [ drop ] }
-                { [ dup HEX: 1d = ] [ drop ] }
-                { [ t ] [ "Unhandled tlv 3h-bh: " write unparse writeln ] }
+                { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand 1 > [ " is away." ] [ " is online." ] if writeln ] }
+                { [ dup 2 = ] [ drop "2: " write head-short unparse writeln ] }
+                { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln ] }
+                { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
+                ! { [ dup 5 = ] [ drop ] }
+                ! { [ dup 6 = ] [ drop name get write ": (6): " write head-short head-short unparse writeln ] }
+                ! { [ dup HEX: a = ] [ drop ] }
+                ! { [ dup HEX: c = ] [ drop ] }
+                ! { [ dup HEX: d = ] [ drop ] }
+                ! { [ dup HEX: e = ] [ drop ] }
+                { [ dup HEX: f = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
+                ! { [ dup HEX: 19 = ] [ drop ] }
+                ! { [ dup HEX: 1b = ] [ drop ] }
+                ! { [ dup HEX: 1d = ] [ drop ] }
+                { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
     ] repeat ;
@@ -593,7 +593,7 @@ SYMBOL: message
     ] send-aim ;
 
 : handle-loop ( -- )
-    read-aim handle-packet handle-loop ;
+    read-aim handle-packet terpri handle-loop ;
 
 : first-server
     ! first server
