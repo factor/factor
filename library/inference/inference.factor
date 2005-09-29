@@ -61,8 +61,12 @@ SYMBOL: d-in
     #! After inference is finished, collect information.
     d-in get meta-d get length 2array ;
 
+SYMBOL: terminated?
+
 : init-inference ( recursive-state -- )
-    init-interpreter
+    terminated? off
+    { } clone meta-r set
+    { } clone meta-d set
     0 d-in set
     recursive-state set
     dataflow-graph off
@@ -79,18 +83,14 @@ M: object apply-object apply-literal ;
 
 M: wrapper apply-object wrapped apply-literal ;
 
-: active? ( -- ? )
-    #! Is this branch not terminated?
-    meta-d get meta-r get and ;
-
 : terminate ( -- )
     #! Ignore this branch's stack effect.
-    d-in off meta-d off meta-r off #terminate node, ;
+    terminated? on meta-d off meta-r off #terminate node, ;
 
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
-    [ active? [ apply-object t ] [ drop f ] if ] all? drop ;
+    [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;
 
 : infer-quot-value ( rstate quot -- )
     recursive-state get >r swap recursive-state set

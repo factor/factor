@@ -49,7 +49,7 @@ hashtables parser prettyprint ;
     [
         inferring-base-case set
         recursive-state get init-inference
-        [ inline-block drop active? not effect ] keep
+        [ inline-block drop terminated? get effect ] keep
     ] with-scope over consume/produce over [ terminate ] when ;
 
 GENERIC: apply-word

@@ -67,3 +67,6 @@ M: cons = ( obj cons -- ? )
     }@ cond ;
 
 M: f = ( obj f -- ? ) eq? ;
+
+: curry ( obj quot -- quot )
+    >r literalize r> cons ;

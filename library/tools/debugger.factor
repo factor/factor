@@ -130,7 +130,10 @@ M: object error. ( error -- ) . ;
 : save-error ( error continuation -- )
     global [ error-continuation set error set ] bind ;
 
+: error-handler ( error -- )
+    dup continuation save-error rethrow ;
+
 : init-error-handler ( -- )
     ( kernel calls on error )
-    [ dup continuation save-error rethrow ] 5 setenv
+    [ error-handler ] 5 setenv
     kernel-error 12 setenv ;

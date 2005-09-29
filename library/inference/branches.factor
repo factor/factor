@@ -60,7 +60,7 @@ namespaces parser prettyprint sequences strings vectors words ;
 
 : filter-terminators ( seq -- seq )
     #! Remove branches that unconditionally throw errors.
-    [ [ active? ] bind ] subset ;
+    [ terminated? swap hash not ] subset ;
 
 : unify-effects ( seq -- )
     dup datastack-effect callstack-effect ;
@@ -85,7 +85,7 @@ namespaces parser prettyprint sequences strings vectors words ;
             copy-inference
             dup value-recursion recursive-state set
             dup literal-value infer-quot
-            active? [ #values node, ] when
+            terminated? get [ #values node, ] unless
             f
         ] callcc1 [ terminate ] when drop
     ] make-hash ;

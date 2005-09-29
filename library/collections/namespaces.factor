@@ -138,6 +138,3 @@ IN: lists
 
 : alist>quot ( default alist -- quot )
     [ unswons [ % , , \ if , ] [ ] make ] each ;
-
-: curry ( obj quot -- quot )
-    [ swap literalize , , \ call , ] [ ] make ;

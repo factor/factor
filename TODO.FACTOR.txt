@@ -22,6 +22,12 @@
 - off-by-one error in pick-up?
 - closing ui does not stop timers
 - adding/removing timers automatically for animated gadgets
+- [ ... is annoying
+  perhaps on the last line of output, if a block doesn't fit, print
+  it anyway?
+- get outliner working with lots of lines of output
+- input in another color
+- listener continuations
 
 + ui:
 

@@ -1,15 +1,6 @@
+USING: errors interpreter io kernel lists math math-internals
+namespaces prettyprint sequences test ;
 IN: temporary
-USE: vectors
-USE: interpreter
-USE: test
-USE: namespaces
-USE: io
-USE: prettyprint
-USE: math
-USE: math-internals
-USE: lists
-USE: kernel
-USE: sequences
 
 : done-cf? ( -- ? ) meta-cf get not ;
 : done? ( -- ? ) done-cf? meta-r get length 0 = and ;
@@ -19,6 +10,14 @@ USE: sequences
     done? [ drop ] [ [ next swap call ] keep interpret ] if ;
 
 : run ( -- ) [ do ] interpret ;
+
+: init-interpreter ( -- )
+    { } clone meta-r set
+    { } clone meta-d set
+    namestack meta-n set
+    catchstack meta-c set
+    meta-cf off
+    meta-executing off ;
 
 : test-interpreter
     init-interpreter meta-cf set run meta-d get ;

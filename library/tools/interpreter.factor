@@ -23,21 +23,6 @@ SYMBOL: meta-cf
 ! Currently executing word.
 SYMBOL: meta-executing
 
-: init-interpreter ( -- )
-    { } clone meta-r set
-    { } clone meta-d set
-    namestack meta-n set
-    catchstack meta-c set
-    f meta-cf set
-    f meta-executing set ;
-
-: copy-interpreter ( -- )
-    #! Copy interpreter state from containing namespaces.
-    meta-r [ clone ] change
-    meta-d [ clone ] change
-    meta-n [ ] change
-    meta-c [ ] change ;
-
 ! Callframe.
 : up ( -- ) pop-r meta-cf set  pop-r drop ;
 
@@ -65,6 +50,15 @@ SYMBOL: meta-executing
         [ meta-executing get push-r  push-r ] when*
     ] change ;
 
+GENERIC: do-1 ( object -- )
+
+M: word do-1 ( word -- )
+    dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
+
+M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
+
+M: object do-1 ( object -- ) push-d ;
+
 GENERIC: do ( obj -- )
 
 M: word do ( word -- )
@@ -78,30 +72,9 @@ M: word do ( word -- )
         ] if
     ] ?if ;
 
-M: wrapper do ( wrapper -- ) wrapped push-d ;
+M: object do ( object -- ) do-1 ;
 
-M: object do ( object -- ) push-d ;
-
-GENERIC: do-1 ( object -- )
-
-M: word do-1 ( word -- )
-    dup "meta-word" word-prop [ call ] [ host-word ] ?if ;
-
-M: wrapper do-1 ( wrapper -- ) wrapped push-d ;
-
-M: object do-1 ( object -- ) push-d ;
-
-: set-meta-word ( word quot -- ) "meta-word" set-word-prop ;
-
-\ datastack [ meta-d get clone push-d ] set-meta-word
-\ set-datastack [ pop-d clone meta-d set ] set-meta-word
-\ >r [ pop-d push-r ] set-meta-word
-\ r> [ pop-r push-d ] set-meta-word
-\ callstack [ meta-r get clone push-d ] set-meta-word
-\ set-callstack [ pop-d clone meta-r set ] set-meta-word
-\ call [ pop-d meta-call ] set-meta-word
-\ execute [ pop-d do ] set-meta-word
-\ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] set-meta-word
-\ dispatch [ pop-d pop-d swap nth meta-call ] set-meta-word
-
-\ set-meta-word forget
+\ call [ pop-d meta-call ] "meta-word" set-word-prop
+\ execute [ pop-d do ] "meta-word" set-word-prop
+\ if [ pop-d pop-d pop-d [ nip ] [ drop ] if meta-call ] "meta-word" set-word-prop
+\ dispatch [ pop-d pop-d swap nth meta-call ] "meta-word" set-word-prop

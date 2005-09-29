@@ -40,3 +40,6 @@ M: ratio /f scale /f ;
 M: ratio truncate >fraction /i ;
 M: ratio floor [ truncate ] keep 0 < [ 1- ] when ;
 M: ratio ceiling [ truncate ] keep 0 > [ 1+ ] when ;
+
+M: ratio 1+ >fraction tuck >r + r> fraction> ;
+M: ratio 1- >fraction tuck >r - r> fraction> ;
