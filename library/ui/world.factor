@@ -67,16 +67,3 @@ DEFER: handle-event
 
 : start-world ( -- )
     world get t over set-world-running? relayout ;
-
-: world-theme
-    {{
-        [[ background @{ 255 255 255 }@ ]]
-        [[ rollover-bg @{ 236 230 232 }@ ]]
-        [[ bevel-1 { 160 160 160 }@ ]]
-        [[ bevel-2 @{ 232 232 232 }@ ]]
-        [[ foreground @{ 0 0 0 }@ ]]
-        [[ reverse-video f ]]
-        [[ font "Monospaced" ]]
-        [[ font-size 12 ]]
-        [[ font-style plain ]]
-    }} ;

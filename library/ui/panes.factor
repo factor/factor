@@ -5,9 +5,9 @@ DEFER: <presentation>
 
 IN: gadgets-panes
 USING: arrays gadgets gadgets-editors gadgets-labels
-gadgets-layouts gadgets-scrolling generic hashtables io kernel
-line-editor lists math namespaces prettyprint sequences strings
-styles threads ;
+gadgets-layouts gadgets-scrolling gadgets-theme generic
+hashtables io kernel line-editor lists math namespaces
+prettyprint sequences strings styles threads ;
 
 ! A pane is an area that can display text.
 
@@ -52,9 +52,13 @@ SYMBOL: structured-input
     #! Add current line to the history, and clear the editor.
     [ commit-history line-text get line-clear ] with-editor ;
 
+: print-input ( string pane -- )
+    [ [[ font-style bold ]] ] swap
+    [ stream-format ] keep stream-terpri ;
+
 : pane-return ( pane -- )
     dup pane-input dup [
-        editor-commit swap 2dup stream-print 2dup pane-eval
+        editor-commit swap 2dup print-input 2dup pane-eval
     ] when 2drop ;
 
 : pane-clear ( pane -- )
@@ -132,8 +136,7 @@ M: pane stream-close ( pane -- ) drop ;
 
 : make-pane ( quot -- pane )
     #! Execute the quotation with output to an output-only pane.
-    f f <pane> world-theme over set-gadget-paint
-    [ swap with-stream ] keep ; inline
+    f f <pane> dup world-theme [ swap with-stream ] keep ; inline
 
 : with-pane ( pane quot -- )
     #! Clear the pane and run the quotation in a scope with

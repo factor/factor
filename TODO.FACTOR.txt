@@ -1,5 +1,4 @@
 - i/o tasks hanging around
-- 5 car gives wrong error
 - compile interruption checks
 - check that set-datastack and set-callstack compile correctly in the
   face of optimization
@@ -15,8 +14,6 @@
 - investigate if rehashing on startup is really necessary
 - remove word transfer hack in bootstrap
 - swap @{ }@ and { } syntax
-- arrows rendering flaw
-- bottom part of thumb: sometimes not drawn?
 - fix up the min thumb size hack
 - long lines of text fail in draw-surface
 - off-by-one error in pick-up?
@@ -26,8 +23,8 @@
   perhaps on the last line of output, if a block doesn't fit, print
   it anyway?
 - get outliner working with lots of lines of output
-- input in another color
 - listener continuations
+- test copy-into of a sequence into itself
 
 + ui:
 
@@ -37,7 +34,6 @@
 - support nested incremental layouts more efficiently
 - make-pane should not need world-theme
 - only redraw dirty gadgets
-- theme abstraction in ui
 - find out why so many small bignums get consed
 - use incremental strategy for all pack layouts where possible
 - multiline editing in listener

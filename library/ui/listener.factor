@@ -6,18 +6,14 @@ DEFER: <tutorial-button>
 IN: gadgets-listener
 USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
 gadgets-presentations gadgets-scrolling gadgets-splitters
-generic hashtables help inspector io kernel listener lists math
-namespaces prettyprint sdl sequences shells styles threads
-words ;
+gadgets-theme generic hashtables help inspector io kernel
+listener lists math namespaces prettyprint sdl sequences shells
+styles threads words ;
 
 SYMBOL: datastack-display
 SYMBOL: callstack-display
 
 TUPLE: display title pane ;
-
-: display-title-theme
-    dup @{ 216 232 255 }@ background set-paint-prop
-    << solid f >> interior set-paint-prop ;
 
 : <display-title> ( text -- label )
     <label> dup display-title-theme ;
@@ -26,7 +22,7 @@ TUPLE: display title pane ;
     2dup set-display-title @top frame-add ;
 
 C: display ( -- display )
-    <frame> over set-delegate
+    dup frame-delegate
     "" <display-title> over add-display-title
     f f <pane> 2dup swap set-display-pane
     <scroller> over @center frame-add ;
@@ -57,6 +53,6 @@ C: display ( -- display )
 : listener-application ( -- )
     t t <pane> dup pane global set-hash
     <scroller> <stack-display>
-    2/3 <x-splitter> add-layer
+    2/3 <y-splitter> add-layer
     [ clear listener-thread ] in-thread
     pane get request-focus ;

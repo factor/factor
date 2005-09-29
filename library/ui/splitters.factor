@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-splitters
-USING: arrays gadgets gadgets-layouts generic kernel lists math
-namespaces sequences styles ;
+USING: arrays gadgets gadgets-layouts gadgets-theme generic
+kernel lists math namespaces sequences styles ;
 
 TUPLE: divider splitter ;
 
@@ -26,12 +26,10 @@ TUPLE: splitter split ;
     [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
 
 C: divider ( -- divider )
-    <plain-gadget> over set-delegate
-    dup t reverse-video set-paint-prop
-    dup divider-actions ;
+    dup gadget-delegate dup divider-theme dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
-    [ >r <pack> r> set-delegate ] keep
+    [ pack-delegate ] keep
     [ set-splitter-split ] keep
     [ >r >r <divider> r> 3array r> add-gadgets ] keep
     1 over set-pack-fill ;
@@ -44,7 +42,7 @@ C: splitter ( first second split vector -- splitter )
 
 : splitter-part ( splitter -- vec )
     dup splitter-split swap rect-dim
-    n*v divider-size 1/2 v*n v- ;
+    n*v [ >fixnum ] map divider-size 1/2 v*n v- ;
 
 : splitter-layout ( splitter -- { a b c } )
     [

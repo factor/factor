@@ -46,21 +46,20 @@ namespaces parser prettyprint sequences strings vectors words ;
         unbalanced-branches
     ] if ;
 
+: active-variable ( seq symbol -- seq )
+    swap [
+        terminated? over hash [ 2drop f ] [ hash ] if
+    ] map-with ;
+
 : datastack-effect ( seq -- )
-    dup [ d-in swap hash ] map
-    swap [ meta-d swap hash ] map
-    unify-effect
-    meta-d set d-in set ;
+    dup d-in active-variable
+    swap meta-d active-variable
+    unify-effect meta-d set d-in set ;
 
 : callstack-effect ( seq -- )
     dup length 0 <repeated>
-    swap [ meta-r swap hash ] map
-    unify-effect
-    meta-r set drop ;
-
-: filter-terminators ( seq -- seq )
-    #! Remove branches that unconditionally throw errors.
-    [ terminated? swap hash not ] subset ;
+    swap meta-r active-variable
+    unify-effect meta-r set drop ;
 
 : unify-effects ( seq -- )
     dup datastack-effect callstack-effect ;

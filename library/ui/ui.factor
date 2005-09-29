@@ -1,19 +1,19 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: gadgets-layouts gadgets-listener generic help io kernel
-listener lists math memory namespaces prettyprint sdl sequences
-shells styles threads words ;
+USING: gadgets-layouts gadgets-listener gadgets-theme generic
+help io kernel listener lists math memory namespaces prettyprint
+sdl sequences shells styles threads words ;
 
 : init-world
     ttf-init
     global [
         <world> world set
-        @{ 600 700 0 }@ world get set-gadget-dim
+        @{ 800 600 0 }@ world get set-gadget-dim
         
-        world-theme world get set-gadget-paint
+        world get dup world-theme
 
-        <plain-gadget> add-layer
+        <gadget> dup solid-interior add-layer
 
         listener-application
     ] bind ;

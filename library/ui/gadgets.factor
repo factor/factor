@@ -37,13 +37,18 @@ TUPLE: gadget
     paint gestures visible? relayout? root?
     parent children ;
 
+: show-gadget t swap set-gadget-visible? ;
+
+: hide-gadget f swap set-gadget-visible? ;
+
 M: gadget = eq? ;
 
 : gadget-child gadget-children first ;
 
 C: gadget ( -- gadget )
-    @{ 0 0 0 }@ dup <rect> over set-delegate
-    t over set-gadget-visible? ;
+    @{ 0 0 0 }@ dup <rect> over set-delegate dup show-gadget ;
+
+: gadget-delegate ( tuple -- ) <gadget> swap set-delegate ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 

@@ -83,7 +83,7 @@ M: solid draw-boundary
 ! Rollover only
 TUPLE: rollover-only ;
 
-C: rollover-only << solid f >> over set-delegate ;
+C: rollover-only << solid >> over set-delegate ;
 
 M: rollover-only draw-interior ( gadget interior -- )
     over rollover paint-prop
@@ -162,15 +162,6 @@ M: gadget draw-gadget* ( gadget -- )
     dup interior paint-prop* draw-interior
     dup boundary paint-prop* draw-boundary ;
 
-: <plain-gadget> ( -- gadget )
-    <gadget> dup << solid f >> interior set-paint-prop ;
-
-: <etched-gadget> ( -- gadget )
-    <plain-gadget> dup << solid f >> boundary set-paint-prop ;
-
-: <bevel-gadget> ( -- gadget )
-    <plain-gadget> dup << bevel f 2 >> boundary set-paint-prop ;
-
 ! Polygon pen
 TUPLE: polygon points ;
 
@@ -196,25 +187,24 @@ M: polygon draw-boundary ( gadget polygon -- )
 M: polygon draw-interior ( gadget polygon -- )
     (polygon) bg rgb filledPolygonColor ;
 
-: arrow-up    @{ @{ 4 0 0 }@ @{ 8 8 0 }@ @{ 0 8 0 }@ }@ ;
-: arrow-right @{ @{ 0 0 0 }@ @{ 8 4 0 }@ @{ 0 8 0 }@ }@ ;
-: arrow-down  @{ @{ 0 0 0 }@ @{ 8 0 0 }@ @{ 4 8 0 }@ }@ ;
-: arrow-left  @{ @{ 0 4 0 }@ @{ 8 0 0 }@ @{ 8 8 0 }@ }@ ;
+: arrow-up    @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ ;
+: arrow-right @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ ;
+: arrow-down  @{ @{ 0 0 0 }@ @{ 6 0 0 }@ @{ 3 6 0 }@ }@ ;
+: arrow-left  @{ @{ 0 3 0 }@ @{ 6 0 0 }@ @{ 6 6 0 }@ }@ ;
 
 : arrow-right|
     @{
-        @{ 0 0 0 }@ @{ 0 8 0 }@ @{ 8 4 0 }@
-        @{ 8 8 0 }@ @{ 8 0 0 }@ @{ 8 4 0 }@
+        @{ 0 0 0 }@ @{ 0 6 0 }@ @{ 6 3 0 }@
+        @{ 6 6 0 }@ @{ 6 0 0 }@ @{ 6 3 0 }@
     }@ ;
 
 : arrow-|left
     @{
-        @{ 8 0 0 }@ @{ 8 8 0 }@ @{ 0 4 0 }@
-        @{ 0 8 0 }@ @{ 0 0 0 }@ @{ 0 4 0 }@
+        @{ 6 0 0 }@ @{ 6 6 0 }@ @{ 0 3 0 }@
+        @{ 0 6 0 }@ @{ 0 0 0 }@ @{ 0 3 0 }@
     }@ ;
 
 : <polygon-gadget> ( points -- gadget )
-    dup max-dim >r <polygon> <gadget> r> over set-rect-dim
-    dup rot interior set-paint-prop
-    dup gray background set-paint-prop
-    dup light-gray rollover-bg set-paint-prop ;
+    dup max-dim @{ 1 1 0 }@ v+
+    >r <polygon> <gadget> r> over set-rect-dim
+    dup rot interior set-paint-prop ;

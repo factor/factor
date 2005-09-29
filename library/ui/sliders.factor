@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: gadgets gadgets-buttons gadgets-layouts generic kernel
-lists math namespaces sequences threads vectors styles ;
+USING: gadgets gadgets-buttons gadgets-layouts gadgets-theme
+generic kernel lists math namespaces sequences styles threads
+vectors ;
 
 ! An elevator has a thumb that may be moved up and down.
 TUPLE: elevator ;
@@ -53,13 +54,9 @@ SYMBOL: slider-changed
     [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    <bevel-gadget> dup button-theme
+    <gadget> dup button-theme
     t over set-gadget-root?
     dup thumb-actions ;
-
-: elevator-theme ( elevator -- )
-    dup << solid f >> interior set-paint-prop
-    light-gray background set-paint-prop ;
 
 : slide-by ( amount gadget -- )
     #! The gadget can be any child of a slider.
@@ -78,8 +75,9 @@ SYMBOL: slider-changed
     [ elevator-click ] [ button-down 1 ] set-action ;
 
 C: elevator ( -- elevator )
-    <plain-gadget> over set-delegate
-    dup elevator-theme dup elevator-actions ;
+    dup gadget-delegate
+    dup elevator-theme
+    dup elevator-actions ;
 
 : (layout-thumb) ( slider n -- n )
     over slider-vector n*v swap slider-thumb ;
@@ -108,15 +106,17 @@ M: elevator layout* ( elevator -- )
 
 : slider-vertical? slider-vector @{ 0 1 0 }@ = ;
 
+: <slide-button> ( polygon amount -- )
+    >r <polygon-gadget> dup icon-theme r>
+    [ swap slide-by-line ] curry <repeat-button> ;
+
 : <up-button> ( slider -- button )
-    slider-vertical? arrow-up arrow-left ? <polygon-gadget>
-    [ -1 swap slide-by-line ] <repeat-button> ;
+    slider-vertical? arrow-up arrow-left ? -1 <slide-button> ;
 
 : add-up @{ 1 1 1 }@ over slider-vector v- first2 frame-add ;
 
 : <down-button> ( slider -- button )
-    slider-vertical? arrow-down arrow-right ? <polygon-gadget>
-    [ 1 swap slide-by-line ] <repeat-button> ;
+    slider-vertical? arrow-down arrow-right ? 1 <slide-button> ;
 
 : add-down @{ 1 1 1 }@ over slider-vector v+ first2 frame-add ;
 
@@ -126,7 +126,7 @@ M: elevator layout* ( elevator -- )
 
 C: slider ( vector -- slider )
     [ set-slider-vector ] keep
-    <frame> over set-delegate
+    dup frame-delegate
     0 over set-slider-value
     0 over set-slider-page
     0 over set-slider-max

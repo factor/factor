@@ -22,7 +22,7 @@ TUPLE: scroller viewport x y ;
 : viewport-dim gadget-child pref-dim ;
 
 C: viewport ( content -- viewport )
-    <gadget> over set-delegate
+    dup gadget-delegate
     t over set-gadget-root?
     [ add-gadget ] keep ;
 
@@ -83,7 +83,7 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 C: scroller ( gadget -- scroller )
     #! Wrap a scrolling pane around the gadget.
-    <frame> over set-delegate
+    dup frame-delegate
     [ >r <viewport> r> add-viewport ] keep
     <x-slider> over add-x-slider
     <y-slider> over add-y-slider

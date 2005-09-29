@@ -14,7 +14,7 @@ prettyprint sdl sequences vectors ;
 TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( world -- hand )
-    <gadget> over set-delegate
+    dup gadget-delegate
     { } clone over set-hand-buttons
     [ set-gadget-parent ] 2keep
     [ set-hand-gadget ] keep ;

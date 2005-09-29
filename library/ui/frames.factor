@@ -23,7 +23,9 @@ TUPLE: frame grid ;
 : @bottom-right 2 2 ;
 
 C: frame ( -- frame )
-    <gadget> over set-delegate <frame-grid> over set-frame-grid ;
+    dup gadget-delegate <frame-grid> over set-frame-grid ;
+
+: frame-delegate ( tuple -- ) <frame> swap set-delegate ;
 
 : frame-child ( frame i j -- gadget ) rot frame-grid nth nth ;
 

@@ -4,6 +4,7 @@ USING: kernel parser sequences io ;
     "/library/ui/layouts.factor"
     "/library/ui/hierarchy.factor"
     "/library/ui/paint.factor"
+    "/library/ui/theme.factor"
     "/library/ui/fonts.factor"
     "/library/ui/text.factor"
     "/library/ui/gestures.factor"

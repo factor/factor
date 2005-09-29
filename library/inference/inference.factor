@@ -85,7 +85,7 @@ M: wrapper apply-object wrapped apply-literal ;
 
 : terminate ( -- )
     #! Ignore this branch's stack effect.
-    terminated? on meta-d off meta-r off #terminate node, ;
+    terminated? on #terminate node, ;
 
 : infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested

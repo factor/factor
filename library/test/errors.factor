@@ -28,7 +28,7 @@ USE: memory
 
 [ car ] [ [ 5 car ] catch no-method-generic ] unit-test
 
-[ 1 2 3 ] [ f throw ] unit-test-fails
+[ f throw ] unit-test-fails
 
 ! See how well callstack overflow is handled
 : callstack-overflow callstack-overflow f ;

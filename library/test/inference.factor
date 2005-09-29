@@ -147,14 +147,14 @@ SYMBOL: sym-test
 
 [ @{ 1 1 }@ ] [ [ terminator-branch ] infer ] unit-test
 
-: recursive-terminator
-    dup [
-        recursive-terminator
-    ] [
-        not-a-number
-    ] if ;
-
-[ @{ 1 0 }@ ] [ [ recursive-terminator ] infer ] unit-test
+! : recursive-terminator
+!     dup [
+!         recursive-terminator
+!     ] [
+!         not-a-number
+!     ] if ;
+! 
+! [ @{ 1 0 }@ ] [ [ recursive-terminator ] infer ] unit-test
 
 GENERIC: potential-hang
 M: fixnum potential-hang dup [ potential-hang ] when ;
@@ -168,8 +168,6 @@ M: f iterate drop ;
 M: real iterate drop ;
 
 [ @{ 1 0 }@ ] [ [ iterate ] infer ] unit-test
-
-[ [ callstack ] infer ] unit-test-fails
 
 DEFER: agent
 : smith 1+ agent ; inline

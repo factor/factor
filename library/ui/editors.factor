@@ -2,15 +2,14 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
 USING: arrays gadgets gadgets-labels gadgets-layouts
-gadgets-scrolling generic kernel math namespaces sdl sequences
-strings styles threads ;
+gadgets-scrolling gadgets-theme generic kernel math namespaces
+sdl sequences strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;
 
 C: caret ( -- caret )
-    <plain-gadget> over set-delegate
-    dup red background set-paint-prop ;
+    dup gadget-delegate dup caret-theme ;
 
 M: caret tick ( ms caret -- ) nip toggle-visible ;
 
@@ -23,7 +22,7 @@ M: caret tick ( ms caret -- ) nip toggle-visible ;
     dup remove-timer unparent ;
 
 : reset-caret ( caret -- )
-    dup restart-timer t swap set-gadget-visible? ;
+    dup restart-timer show-gadget ;
 
 USE: line-editor
 
@@ -84,7 +83,8 @@ TUPLE: editor line caret ;
     ] swap add-actions ;
 
 C: editor ( text -- )
-    <gadget> over set-delegate
+    dup gadget-delegate
+    dup editor-theme
     <line-editor> over set-editor-line
     <caret> over set-editor-caret
     [ set-editor-text ] keep

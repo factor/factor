@@ -34,7 +34,8 @@ M: assert error.
 
 : unit-test-fails ( quot -- )
     #! Assert that the quotation throws an error.
-    [ catch not ] cons [ f ] swap unit-test ;
+    [ f ] swap [ [ call t ] [ 2drop f ] recover ]
+    curry unit-test ;
 
 : assert-depth ( quot -- )
     depth slip depth assert= ;

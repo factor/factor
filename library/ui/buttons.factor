@@ -1,8 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-buttons
-USING: gadgets gadgets-borders gadgets-layouts generic io kernel
-lists math namespaces sdl sequences sequences styles threads ;
+USING: gadgets gadgets-borders gadgets-layouts gadgets-theme
+generic io kernel lists math namespaces sdl sequences sequences
+styles threads ;
 
 : button-down? ( n -- ? ) hand hand-buttons member? ;
 
@@ -25,16 +26,6 @@ lists math namespaces sdl sequences sequences styles threads ;
     dup button-update dup mouse-over?
     [ [ action ] swap handle-gesture ] when drop ;
 
-: button-theme ( button -- )
-    dup @{ 216 216 216 }@ background set-paint-prop
-    dup f reverse-video set-paint-prop
-    << solid >> interior set-paint-prop ;
-
-: roll-button-theme ( button -- )
-    dup f reverse-video set-paint-prop
-    dup <rollover-only> interior set-paint-prop
-    <rollover-only> boundary set-paint-prop ;
-
 : button-action ( action -- quot )
     [ [ swap handle-gesture drop ] cons ] [ [ drop ] ] if* ;
 
@@ -48,8 +39,9 @@ lists math namespaces sdl sequences sequences styles threads ;
 TUPLE: button ;
 
 C: button ( gadget quot -- button )
-    <bevel-gadget> @{ 5 5 0 }@ <border> over set-delegate
-    dup button-theme [ swap button-gestures ] keep
+    @{ 5 5 0 }@ <border> over set-delegate
+    dup button-theme
+    [ swap button-gestures ] keep
     [ add-gadget ] keep ;
 
 : <roll-button> ( gadget quot -- button )
