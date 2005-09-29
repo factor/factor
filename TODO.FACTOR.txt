@@ -40,6 +40,7 @@
 - get stuff in examples dir running in the ui
 - text selection
 - clipboard support
+- get things working without the [ >fixnum ] map hack
 
 + tutorial:
 

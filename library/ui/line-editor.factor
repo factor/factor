@@ -25,8 +25,7 @@ SYMBOL: history-index
     line-text get dup empty? [
         drop
     ] [
-        history-index get history get set-nth
-        reset-history
+        history get push reset-history
     ] if ;
 
 : set-line-text ( text -- )
