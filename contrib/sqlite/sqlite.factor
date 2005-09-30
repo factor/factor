@@ -113,6 +113,9 @@ END-STRUCT
 : sqlite3_step ( stmt -- result )
   "int" "sqlite" "sqlite3_step" [ "sqlite3-stmt*" ] alien-invoke ; 
 
+: sqlite3_last_insert_rowid ( stmt index int -- result )
+  "int" "sqlite" "sqlite3_last_insert_rowid" [ "sqlite3*" ] alien-invoke ; 
+
 : sqlite3_bind_blob ( stmt index pointer len destructor -- result )
   "int" "sqlite" "sqlite3_bind_blob" [ "sqlite3-stmt*" "int" "void*" "int" "int" ] alien-invoke ; 
 
@@ -169,6 +172,10 @@ END-STRUCT
 : sqlite-close ( db -- )
   #! Close the given database
   sqlite3_close sqlite-check-result ;
+
+: sqlite-last-insert-rowid ( db -- rowid )
+  #! Return the rowid of the last insert
+  sqlite3_last_insert_rowid ;
 
 : sqlite-prepare ( db sql -- statement )
   #! Prepare a SQL statement. Returns the statement which
