@@ -83,22 +83,38 @@ M: object map ( seq quot -- seq )
     [ 2dup min-length [ (2map) ] collect ] keep like
     >r 3drop r> ; inline
 
+: if-bounds ( i seq quot -- )
+    >r pick pick bounds-check? r> [ 3drop -1 f ] if ; inline
+
 : find* ( i seq quot -- i elt )
-    pick pick length >= [
-        3drop -1 f
-    ] [
+    [
         3dup >r >r >r >r nth-unsafe r> call [
             r> dup r> nth-unsafe r> drop
         ] [
             r> 1+ r> r> find*
         ] if
-    ] if ; inline
+    ] if-bounds ; inline
 
 : find-with* ( obj i seq quot -- i elt | quot: elt -- ? )
     -rot [ with rot ] find* 2swap 2drop ; inline
 
 M: object find ( seq quot -- i elt )
     0 -rot find* ;
+
+: find-last* ( i seq quot -- i elt )
+    [
+        3dup >r >r >r >r nth-unsafe r> call [
+            r> dup r> nth-unsafe r> drop
+        ] [
+            r> 1- r> r> find-last*
+        ] if
+    ] if-bounds ; inline
+
+: find-last-with* ( obj i seq quot -- i elt | quot: elt -- ? )
+    -rot [ with rot ] find-last* 2swap 2drop ; inline
+
+: find-last ( seq quot -- i elt )
+    >r [ length 1- ] keep r> find-last* ; inline
 
 : contains? ( seq quot -- ? )
     find drop -1 > ; inline

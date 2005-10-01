@@ -51,10 +51,10 @@ sequences strings unparser vectors words ;
     [ begin-scan [ (each-object) ] keep ]
     [ end-scan ] cleanup drop ; inline
 
-: instances ( quot -- list )
+: instances ( quot -- seq )
     #! Return a list of all object that return true when the
     #! quotation is applied to them.
-    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] [ ] make ;
+    [ [ [ swap call ] 2keep rot ?, ] each-object drop ] { } make ;
     inline
 
 G: each-slot ( obj quot -- )

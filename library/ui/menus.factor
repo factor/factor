@@ -19,14 +19,16 @@ namespaces sequences ;
     #! Adjust loc to fit inside max.
     swap |v-| vmin ;
 
-: menu-loc ( menu -- loc )
-    hand rect-loc swap rect-dim world get rect-dim fit-bounds ;
+: menu-loc ( menu loc -- loc )
+    swap rect-dim world get rect-dim fit-bounds ;
 
-: show-menu ( menu -- )
-    dup show-glass
-    dup menu-loc swap set-rect-loc
+: show-menu ( menu loc -- )
+    >r dup dup show-glass r>
+    menu-loc swap set-rect-loc
     world get world-glass dup menu-actions
     hand set-hand-clicked ;
+
+: show-hand-menu ( menu -- ) hand rect-loc show-menu ;
 
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.
@@ -39,7 +41,7 @@ namespaces sequences ;
     menu-items line-border dup menu-theme ;
 
 : <menu-button> ( gadget quot -- button )
-    [ show-menu ] append <roll-button>
+    [ show-hand-menu ] append <roll-button>
     dup [ button-clicked ] [ button-down 1 ] set-action
     dup [ button-update ] [ button-up 1 ] set-action ;
 

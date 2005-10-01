@@ -42,7 +42,7 @@ GENERIC: ceiling  ( n -- n ) foldable
 : between? ( x min max -- ? )
     #! Push if min <= x <= max. Handles case where min > max
     #! by swapping them.
-    2dup > [ swap ] when  >r dupd max r> min = ; foldable
+    pick rot >= [ <= ] [ 2drop f ] if ; inline
 
 : sq dup * ; inline
 

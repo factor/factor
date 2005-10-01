@@ -23,13 +23,10 @@ M: string tutorial-line
     }@ cond ;
 
 : example-theme
-    dup button-theme
-    "Monospaced" font set-paint-prop ;
+    dup solid-interior "Monospaced" font set-paint-prop ;
 
 M: general-list tutorial-line
-    car
-    <label> [ label-text pane get pane-input set-editor-text ]
-    <roll-button> dup example-theme ;
+    car <input-button> dup example-theme ;
 
 : <page> ( list -- gadget )
     [ tutorial-line ] map

@@ -14,7 +14,6 @@ sequences io vectors words ;
     [
         [ hashtable? ] instances
         [ dup hash-size 1 max swap set-bucket-count ] each
-
         boot
     ] %
 

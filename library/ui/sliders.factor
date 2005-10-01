@@ -27,7 +27,7 @@ TUPLE: slider vector elevator thumb value max page ;
 : screen>slider slider-scale / ;
 
 : fix-slider-value ( n slider -- n )
-    dup slider-max swap slider-page - min 0 max ;
+    dup slider-max swap slider-page - min 0 max >fixnum ;
 
 : fix-slider ( slider -- )
     #! Call after changing slots, to relayout and do invariants:

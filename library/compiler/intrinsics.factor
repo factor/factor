@@ -126,8 +126,7 @@ namespaces sequences words ;
     { fixnum-bitor  %fixnum-bitor  }
     { fixnum-bitxor %fixnum-bitxor }
 } [
-    first2 [ literalize , \ binary-op , ] [ ] make
-    "intrinsic" set-word-prop
+    first2 [ binary-op ] curry "intrinsic" set-word-prop
 ] each
 
 : binary-jump-reg ( node label op -- )
@@ -146,8 +145,7 @@ namespaces sequences words ;
     { fixnum>  %jump-fixnum>  }
     { eq?      %jump-eq?      }
 } [
-    first2 [ literalize , \ binary-jump , ] [ ] make
-    "if-intrinsic" set-word-prop
+    first2 [ binary-jump ] curry "if-intrinsic" set-word-prop
 ] each
 
 \ fixnum/i [

@@ -168,3 +168,9 @@ unit-test
 [ 5 ] [ 1 >bignum { 1 5 7 } nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum @{ 1 5 7 }@ nth-unsafe ] unit-test
 [ 5 ] [ 1 >bignum "\u0001\u0005\u0007" nth-unsafe ] unit-test
+
+[ "before&after" ] [ "&" 6 11 "before and after" replace-slice ] unit-test
+
+[ 3 "a" ] [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
+
+[ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test

@@ -44,6 +44,12 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 : ?tail ( seq end -- seq ? )
     2dup tail? [ length swap head* t ] [ drop f ] if ; flushable
 
+: replace-slice ( new from to seq -- seq )
+    #! Replace the range between 'from' and 'to' in 'seq' with
+    #! 'new'. The new sequence has the same type as 'seq'.
+    tuck >r >r head-slice r> r> tail-slice swapd append3 ;
+    flushable
+
 : (group) ( n seq -- )
     2dup length >= [
         dup like , drop
@@ -90,6 +96,8 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : split ( seq subseq -- seq ) [ (split) ] [ ] make ; flushable
 
-: (cut) ( n seq -- ) [ head ] 2keep tail-slice ; flushable
+: (cut) ( n seq -- before after )
+    [ head ] 2keep tail-slice ; flushable
 
-: cut ( n seq -- ) [ (cut) ] keep like ; flushable
+: cut ( n seq -- before after )
+    [ (cut) ] keep like ; flushable

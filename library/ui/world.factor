@@ -33,8 +33,7 @@ C: world ( -- world )
     [ pop-invalid [ layout ] each layout-world ] when ;
 
 : hide-glass ( -- )
-    world get world-glass unparent f
-    world get set-world-glass ;
+    f world get dup world-glass unparent set-world-glass ;
 
 : show-glass ( gadget -- )
     hide-glass

@@ -71,7 +71,9 @@ M: kernel-error error. ( error -- )
 M: no-method error. ( error -- )
     "No suitable method." print
     "Generic word: " write dup no-method-generic .
-    "Object: " write no-method-object short. ;
+    "Methods: " write dup no-method-generic order .
+    "Object: " write dup no-method-object short.
+    "Object class: " write no-method-object class short. ;
 
 M: no-math-method error. ( error -- )
     "No suitable arithmetic method." print

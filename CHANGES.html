@@ -26,6 +26,7 @@
 <li>Faster <code>map</code>, <code>2each</code> and <code>2map</code>.</li>
 <li>Arrays are now better supported and should be used instead of vectors where resizing is not desired.</li>
 <li>Some new sequence words that do not bounds check: <code>nth-unsafe</code> and <code>set-nth-unsafe</code>. These should only be used in special circumstances, such as inner loops (<code>each</code>, <code>map</code> and so on use them).</li>
+<li>New <code>replace-slice ( new from to seq -- seq )</code> word replaces a slice of a sequence with another sequence.</li>
 <li>Hashtables did not obey the rule that equal objects must have equal hashcodes, so using hashtables as hashtable keys did not work.</li>
 </li>
 

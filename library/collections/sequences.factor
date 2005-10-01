@@ -46,6 +46,9 @@ GENERIC: resize ( n seq -- seq )
 : first3 ( { x y z } -- x y z )
     dup first over second rot third ; inline
 
+: bounds-check? ( n seq -- ? )
+    over 0 >= [ length < ] [ 2drop f ] if ;
+
 IN: sequences-internals
 
 ! Unsafe sequence protocol for inner loops

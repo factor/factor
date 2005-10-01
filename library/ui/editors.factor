@@ -62,7 +62,7 @@ TUPLE: editor line caret ;
 : set-caret-x ( x editor -- )
     #! Move the caret to a clicked location.
     dup [
-        gadget-font line-text get x>offset caret set
+        gadget-font line-text get x>offset set-caret-pos
     ] with-editor ;
 
 : click-editor ( editor -- )
@@ -73,13 +73,19 @@ TUPLE: editor line caret ;
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
         [[ [ button-down 1 ] [ click-editor ] ]]
-        [[ [ "BACKSPACE" ] [ [ delete-prev ] with-editor ] ]]
-        [[ [ "DELETE" ] [ [ delete-next ] with-editor ] ]]
-        [[ [ "LEFT" ] [ [ left ] with-editor ] ]]
-        [[ [ "RIGHT" ] [ [ right ] with-editor ] ]]
+        [[ [ "BACKSPACE" ] [ [ << char-elt >> delete-prev-elt ] with-editor ] ]]
+        [[ [ "DELETE" ] [ [ << char-elt >> delete-next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "BACKSPACE" ] [ [ << word-elt >> delete-prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "DELETE" ] [ [ << word-elt >> delete-next-elt ] with-editor ] ]]
+        [[ [ "ALT" "BACKSPACE" ] [ [ << document-elt >> delete-prev-elt ] with-editor ] ]]
+        [[ [ "ALT" "DELETE" ] [ [ << document-elt >> delete-next-elt ] with-editor ] ]]
+        [[ [ "LEFT" ] [ [ << char-elt >> prev-elt ] with-editor ] ]]
+        [[ [ "RIGHT" ] [ [ << char-elt >> next-elt ] with-editor ] ]]
+        [[ [ "CTRL" "LEFT" ] [ [ << word-elt >> prev-elt ] with-editor ] ]]
+        [[ [ "CTRL" "RIGHT" ] [ [ << word-elt >> next-elt ] with-editor ] ]]
+        [[ [ "HOME" ] [ [ << document-elt >> prev-elt ] with-editor ] ]]
+        [[ [ "END" ] [ [ << document-elt >> next-elt ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
-        [[ [ "HOME" ] [ [ home ] with-editor ] ]]
-        [[ [ "END" ] [ [ end ] with-editor ] ]]
     ] swap add-actions ;
 
 C: editor ( text -- )
@@ -94,7 +100,7 @@ C: editor ( text -- )
     head >r gadget-font r> size-string drop ;
 
 : caret-loc ( editor -- x y )
-    dup editor-line [ caret get line-text get ] bind offset>x
+    dup editor-line [ caret-pos line-text get ] bind offset>x
     0 0 3array ;
 
 : caret-dim ( editor -- w h )

@@ -4,7 +4,7 @@ IN: gadgets-presentations
 USING: arrays compiler gadgets gadgets-buttons gadgets-labels
 gadgets-menus gadgets-outliner gadgets-panes generic hashtables
 inference inspector io jedit kernel lists memory namespaces
-parser prettyprint sequences styles words ;
+parser prettyprint sequences strings styles words ;
 
 SYMBOL: commands
 
@@ -26,6 +26,10 @@ SYMBOL: commands
 
 : <command-button> ( gadget object -- button )
     [ nip command-menu ] curry <menu-button> ;
+
+: <input-button> ( string -- button )
+    dup <label> swap [ nip pane get replace-input ] curry
+    <roll-button> ;
 
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;

@@ -10,11 +10,8 @@ sdl sequences shells styles threads words ;
     global [
         <world> world set
         @{ 800 600 0 }@ world get set-gadget-dim
-        
-        world get dup world-theme
-
+        world get world-theme
         <gadget> dup solid-interior add-layer
-
         listener-application
     ] bind ;
 

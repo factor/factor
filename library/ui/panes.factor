@@ -2,6 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
 DEFER: <presentation>
+DEFER: <input-button>
+DEFER: gadget.
 
 IN: gadgets-panes
 USING: arrays gadgets gadgets-editors gadgets-labels
@@ -52,9 +54,13 @@ SYMBOL: structured-input
     #! Add current line to the history, and clear the editor.
     [ commit-history line-text get line-clear ] with-editor ;
 
+: replace-input ( string pane -- )
+    pane-input set-editor-text ;
+
 : print-input ( string pane -- )
-    [ [[ font-style bold ]] ] swap
-    [ stream-format ] keep stream-terpri ;
+    [
+        <input-button> dup bold font-style set-paint-prop gadget.
+    ] with-stream* ;
 
 : pane-return ( pane -- )
     dup pane-input dup [
