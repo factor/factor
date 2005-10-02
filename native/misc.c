@@ -57,6 +57,7 @@ void primitive_random_int(void)
 F_STRING *last_error()
 {
 	char *buffer;
+	int len;
 	F_STRING *error;
 	DWORD dw = GetLastError();
 	
@@ -68,6 +69,13 @@ F_STRING *last_error()
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR) &buffer,
 		0, NULL);
+
+	// strip \r\n
+	len = strlen(buffer);
+	if(len > 2 && isspace(buffer[len - 2]))
+		buffer[len - 2] = 0;
+	if(len > 1 && isspace(buffer[len - 1]))
+		buffer[len - 1] = 0;
 
 	error = from_c_string(buffer);
 	LocalFree(buffer);
