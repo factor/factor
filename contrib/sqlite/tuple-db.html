@@ -1,0 +1,232 @@
+<html>
+  <head>
+    <title>Tuple Database Library</title>
+    <style>
+    body { background: white; color: black; }
+    p { margin-left: 10%; margin-right: 10%;
+        font: normal 100% Verdana, Arial, Helvetica; }
+    td { margin-left: 10%; margin-right: 10%;
+        font: normal 100% Verdana, Arial, Helvetica; }
+    table { margin-left: 10%; margin-right: 10%; }
+    ul { margin-left: 10%; margin-right: 10%;
+        font: normal 100% Verdana, Arial, Helvetica; }
+    ol { margin-left: 10%; margin-right: 10%;
+        font: normal 100% Verdana, Arial, Helvetica; }
+    h1 { text-align: center; margin-bottom: 0; margin-top: 1em; }
+    h2 { margin: 0 5% 0 7.5%; font-size: 120%; font-style: italic; }
+    h3 { border: 2px solid blue; border-width: 2px 0.5em 2px 0.5em; 
+            padding: 0.2em 0.2em 0.2em 0.5em; background: #fafafa; 
+            margin-left: 10%; margin-right: 10%; margin-top: 2em;
+            font-size: 100%; }
+    .note { border: 2px solid blue; border-width: 2px 2px 2px 2em;
+             padding: 0.5em 0.5em 0.5em 1em; background: #ffe; }
+    .code { border: 1px solid black; border-width: 1px; 
+            padding: 0.5em; background: #ffe; 
+            margin-left: 10%; margin-right: 10%; }
+    blockquote { margin-left: 25%; margin-right: 25%; 
+                 font-style: italic; }
+    .highlite { color: red; }
+    .footer { margin-top: 2.5em; border-top: 1px solid gray; color:
+  #AAA; font-size: 85%; padding-top: 0.33em;  }    
+    #copyright { text-align: center; color: #AAA; 
+                 font-size: 65%;   }    
+    </style>
+      </head>
+  <body>
+    <h1>Tuple Database Library</h1>
+<h1>Overview</h1>
+<p class="note">The version of sqlite supported by this library is
+  version 3 or greater.</p>
+<p>This library allows storing Factor tuples in a sqlite database. It
+provides words to create, read update and delete these entries as well
+as simple searching.</p>
+<p>The library is in a very early state and is likely to change quite
+a bit in the near future. Its most notable omission is it cannot currently
+handle relationships between tuples. This feature is currently being
+worked on.</p>
+<h1>Loading</h1>
+<p>The Factor image must have been bootstrapped with the
+sqlite shared library name provided. This can be done with the
+following command:</p>
+<pre class="code">
+./f boot.image.le32 -libraries:sqlite:name=libsqlite3.so
+</pre>
+<p>The quickest way to get up and running with this library is to
+change to the 'sqlite' directory and run Factor. Then execute the
+following commands:</p>
+<pre class="code">
+"sqlite.factor" run-file
+"tuple-db.factor" run-file
+USE: sqlite
+USE: tuple-db
+</pre>
+<p>Some simple tests can be run to check that everything is working
+ok:</p>
+<pre class="code">
+"tuple-db-tests.factor" run-file
+</pre>
+<h1>Basic Usage</h1>
+<p>This library can be used for storing simple Factor tuples in a
+sqlite database. In its current form the tuples must not contain
+references to other tuples and should not have a delegate set.</p>
+<p>This document will use the following tuple for demonstration
+purposes:</p>
+<pre class="code">
+TUPLE: person name surname phone ;
+</pre>
+<p>The sqlite database to store tuples must be created, or an existing
+one opened. This
+is done using the 'sqlite-open word. If the database does not exist
+then it is created. The examples in this document
+store the database pointer in a variable called 'db':</p>
+<pre class="code">
+SYMBOL: db
+"example.db" sqlite-open db set
+</pre>
+<h2>Tuple Mappings</h2>
+<p>Each tuple has a 'mapping' tuple associated with it. The 'mapping'
+stores information about what table the tuple will be stored in, the
+datatypes of the tuple slots, etc. A mapping must be created before a
+tuple can be stored in a database. A default mapping is easily created
+using the 'default-mapping' word. Given the tuple class, this will use
+reflection to get the slots of it, assume that all slots are of
+database type 'text', and store the tuple objects in a table with the
+same name as the tuple.</p>
+<p>The following shows how to create the default mapping for the
+'person' tuple, and how to register that mapping so the 'tuple-db'
+system can know how to handle 'person' instances:</p>
+<pre class="code">
+person default-mapping set-mapping
+</pre>
+<h2>Creating the table</h2>
+<p>The table used to store tuple instances may need to be
+created. This can be done manually using 'sqlite' or via the
+'create-tuple-table' word:</p>
+<pre class="code">
+<span class="highlite">! create-tuple-table ( db class -- )</span>
+db get person create-tuple-table
+</pre>
+<p>The SQL used to create the table is produced by the 'create-sql'
+word. This is a generic word dispatched on the mapping object, and
+could be specialised if needed. If you wish to see the SQL used to
+create the table, use the following code:</p>
+<pre class="code">
+<span class="highlite">! M: mapping create-sql ( mapping -- string )</span>
+person get-mapping create-sql .
+ =&gt; "create table person (name text,surname text,phone text);"
+</pre>
+<h2>Inserting instances</h2>
+<p>The 'insert-tuple' word will store instances of a tuple 
+into the database table defined by its mapping object. It's as
+simple as:</p>
+<pre class="code">
+<span class="highlite">! insert-tuple ( db tuple -- )</span>
+db get "John" "Smith" "123-456-789" &lt;person&gt; insert-tuple
+</pre>
+<p>'insert-tuple' internally uses the 'insert-sql' word to produce 
+the SQL used to store the tuple. Like 'create-sql', 'insert-sql' is 
+a generic word specialized on the mapping object. You can call it 
+directly to see what SQL is generated:</p>
+<pre class="code">
+<span class="highlite">! M: mapping insert-sql ( mapping -- string )</span>
+person get-mapping insert-sql .
+ =&gt; "insert into person values(:name,:surname,:phone);"
+</pre>
+<p>Notice that the SQL uses named parameters. This parameters are bound to the values stored in the tuple object when the SQL is compiled. This helps prevent SQL injection techniques.</p>
+<p>When the 'insert-sql' word is run, it adds a delegate to the tuple being stored. The delegate is of type 'persistent' and holds the row id of the tuple in its 'key' slot. This way the exact record can be updated or retrieved later. The following demonstates this fact:</p>
+<pre class="code">
+"Mandy" "Jones" "987-654-321" &lt;person&gt; dup .
+  =&gt; &lt;&lt; person f "Mandy" "Jones" "987-654-321" &gt;&gt;
+db get over insert-tuple .
+  =&gt; &lt;&lt; person
+       &lt;&lt; persistent ... <span class="highlite">"2"</span> &gt;&gt;
+       "Mandy" "Jones" "987-654-321" 
+     &gt;&gt;
+</pre>
+<p>The '2' highlited in the above example is the row id of the record inserted. We can go into the 'sqlite' command and view this record:</p>
+<pre class="code">
+  $ sqlite3 example.db
+    SQLite version 3.0.8
+    Enter ".help" for instructions
+    sqlite&gt; select ROWID,* from person;
+      1|John|Smith|123-456-789
+      <span class="highlite">2|Mandy|Jones|987-654-321</span>
+    sqlite&gt;
+</pre>
+<h2>Finding Instances</h2>
+<p>The 'find-tuples' word is used to return tuples populated with data already
+existing in the database. As well as the database pointer, it takes a tuple that should be populated only with the fields that should be matched in the database. All fields you do not wish to match against should be set to 'f':</p>
+<pre class="code">
+<span class="highlite">! find-tuples ( db tuple -- seq )</span>
+db get f "Smith" f &lt;person&gt; find-tuples short.
+ =&gt; [ &lt;&lt; person # "John" "Smith" "123-456-789" &gt;&gt; ]
+db get "Mandy" f f &lt;person&gt; find-tuples short.
+ =&gt; [ &lt;&lt; person # "Mandy" "Jones" "987-654-321" &gt;&gt; ]
+db get "Joe" f f &lt;person&gt; find-tuples short.
+ =&gt; f
+</pre>
+<p>Notice that if no matching tuples are found then 'f' is returned. The returned tuples also have their delegate set to 'persistent' with the correct row id set as the key. This can be used to later update the tuples with new information and store them in the database.</p>
+<h2>Updating Instances</h2>
+<p>Given a tuple that has the 'persistent' delegate with the row id
+set as the key, you can update this specific record using the
+'update-tuple' word:</p>
+<pre class="code">
+<span class="highlite">! update-tuple ( db tuple -- )</span>
+db get f "Smith" f &lt;person&gt; find-tuples dup short.
+ =&gt; [ &lt;&lt; person # "John" "Smith" "123-456-789" &gt;&gt; ]
+first [ "999-999-999" swap set-person-phone ] keep dup short.
+ =&gt; &lt;&lt; person &lt;&lt; persistent f # "1" &gt;&gt; "John" "Smith" "999-999-999" ...
+ db get swap update-tuple
+</pre>
+<p>Using the 'sqlite' command from the system shell you can see the
+record was updated:</p>
+<pre class="code">
+  $ sqlite3 example.db
+    SQLite version 3.0.8
+    Enter ".help" for instructions
+    sqlite&gt; select ROWID,* from person;
+      1|John|Smith|999-999-999
+      <span class="highlite">2|Mandy|Jones|987-654-321</span>
+    sqlite&gt;
+</pre>
+<h2>Inserting or Updating</h2>
+<p>The 'save-tuple' word can be used to insert a tuple if it has not
+already been stored in the database, or update it if it already
+exists. Whether to insert or update is decided by the existance of the
+'persistent' delegate:</p>
+<pre class="code">
+<span class="highlite">! save-tuple ( db tuple -- )</span>
+"Mary" "Smith" "111-111-111" &lt;person&gt; dup short.
+  =&gt; &lt;&lt; person f "Mary" "Smith" "111-111-111" &gt;&gt;
+! This will insert the tuple
+db get over save-tuple dup short.
+  => &lt;&lt; person &lt;&lt; persistent f # "3" &gt;&gt; "Mary" "Smith" "111-111-111" ...
+[ "222-222-222" swap set-person-phone ] keep dup short.
+  => &lt;&lt; person &lt;&lt; persistent f # "3" &gt;&gt; "Mary"  "Smith" "222-222-222" ...
+! This will update the tuple
+db get over save-tuple short.
+  => &lt;&lt; person &lt;&lt; persistent f # "3" &gt;&gt; "Mary"  "Smith" "222-222-222" ...
+</pre>
+<h2>Deleting</h2>
+<p>Given a tuple with the delegate set to 'persistent' (ie. One
+already stored in the database) you can delete it from the database
+with the 'delete-tuple' word:</p>
+<pre class="code">
+<span class="highlite">! delete-tuple ( db tuple -- )</span>
+db get f "Smith" f &lt;person&gt; find-tuples [
+  db get swap delete-tuple
+] each
+</pre>
+<h2>Closing the database</h2>
+<p>It's important to close the sqlite database when you've finished
+using it. The word for this is 'sqlite-close':</p>
+<pre class="code">
+<span class="highlite">! sqlite-close ( db -- )</span>
+db get sqlite-close
+</pre>
+
+<p class="footer">
+News and updates to this software can be obtained from the authors
+weblog: <a href="http://radio.weblogs.com/0102385">Chris Double</a>.</p>
+<p id="copyright">Copyright (c) 2004, Chris Double. All Rights Reserved.</p>
+</body> </html>
