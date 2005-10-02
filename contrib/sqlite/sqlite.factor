@@ -128,6 +128,9 @@ END-STRUCT
 : sqlite3_bind_text ( stmt index text len destructor -- result )
   "int" "sqlite" "sqlite3_bind_text" [ "sqlite3-stmt*" "int" "char*" "int" "int" ] alien-invoke ; 
 
+: sqlite3_bind_parameter_index ( stmt name -- result )
+  "int" "sqlite" "sqlite3_bind_parameter_index" [ "sqlite3-stmt*" "char*" ] alien-invoke ; 
+
 : sqlite3_column_count ( stmt -- count )
   "int" "sqlite" "sqlite3_column_count" [ "sqlite3-stmt*" ] alien-invoke ; 
 
@@ -189,6 +192,12 @@ END-STRUCT
   #! Bind the text to the parameterized value in the statement.  
   dup length SQLITE_TRANSIENT sqlite3_bind_text sqlite-check-result ;
 
+: sqlite-bind-parameter-index ( statement name -- index )
+  sqlite3_bind_parameter_index ;
+
+: sqlite-bind-text-by-name ( statement name text -- )
+  >r dupd sqlite-bind-parameter-index r> sqlite-bind-text ;
+
 : sqlite-finalize ( statement -- )
   #! Clean up all resources related to a statement. Once called
   #! the statement cannot be used. All statements must be finalized
@@ -232,7 +241,7 @@ END-STRUCT
     2drop
   ] [
     [ call ] 2keep sqlite-each
-  ] if ;
+  ] if ; inline
 
 ! For comparison, here is the linrec implementation of sqlite-each
 ! [ drop sqlite3_step step-complete? ]
