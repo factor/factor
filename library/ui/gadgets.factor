@@ -23,13 +23,14 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 
 : |v-| ( vec vec -- vec ) v- [ 0 max ] map ;
 
+: (intersect) ( rect rect -- array array )
+    [ rect-extent ] 2apply swapd vmin >r vmax r> ;
+
 : intersect ( rect rect -- rect )
-    [ rect-extent ] 2apply swapd vmin >r vmax dup r>
-    swap |v-| <rect> ;
+    (intersect) dupd swap |v-| <rect> ;
 
 : intersects? ( rect/point rect -- ? )
-    [ rect-extent ] 2apply swapd vmin >r vmax r> v-
-    [ 0 <= ] all? ;
+    (intersect) v- [ 0 <= ] all? ;
 
 ! A gadget is a rectangle, a paint, a mapping of gestures to
 ! actions, and a reference to the gadget's parent.
@@ -73,12 +74,13 @@ M: gadget children-on ( rect/point gadget -- list )
 : translate ( rect/point -- )
     rect-loc origin [ v+ ] change ;
 
-: pick-up ( rect/point gadget -- gadget )
+: (pick-up) ( rect/point gadget -- gadget )
     2dup inside? [
-        [
-            dup translate 2dup pick-up-list dup
-            [ nip pick-up ] [ rot 2drop ] if
-        ] with-scope
+        dup translate 2dup pick-up-list dup
+        [ nip (pick-up) ] [ rot 2drop ] if
     ] [ 2drop f ] if ;
+
+: pick-up ( rect/point gadget -- gadget )
+    [ (pick-up) ] with-scope ;
 
 : max-dim ( dims -- dim ) @{ 0 0 0 }@ [ vmax ] reduce ;
