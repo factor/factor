@@ -7,7 +7,7 @@ win32? [
 ] [
     "gl" "libGL.so" "cdecl" add-library
     "glu" "libGLU.so" "cdecl" add-library
-] ifte
+] if
 
 [ "sdl-gl.factor" "gl.factor" "glu.factor" ]
 [ "contrib/gl/" swap append run-file ] each

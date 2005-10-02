@@ -63,10 +63,10 @@ M: object process-event
 	    event-loop
 	] [
 	    drop
-	] ifte
+	] if
     ] [
 	event-loop
-    ] ifte ;
+    ] if ;
 
 : simple-gl
     800 600 colour-depth flags [
