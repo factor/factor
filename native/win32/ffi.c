@@ -13,6 +13,7 @@ void ffi_dlopen (DLL *dll, bool error)
 
 	if (!module)
 	{
+		dll->dll = NULL;
 		if(error)
 			general_error(ERROR_FFI, tag_object(last_error()));
 		else
