@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
 USING: arrays gadgets gadgets-labels gadgets-layouts
-gadgets-scrolling gadgets-theme generic kernel math namespaces
-sdl sequences strings styles threads ;
+gadgets-menus gadgets-scrolling gadgets-theme generic kernel
+lists math namespaces sdl sequences strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;
@@ -68,6 +68,28 @@ TUPLE: editor line caret ;
 : click-editor ( editor -- )
     dup hand relative first over set-caret-x request-focus ;
 
+: popup-location ( editor -- loc )
+    dup screen-loc swap editor-caret rect-extent nip v+ ;
+
+: <completion-item> ( completion editor -- menu-item )
+    dupd [ [ complete ] with-editor ] curry curry cons ;
+
+: <completion-menu> ( editor completions -- menu )
+    [ swap <completion-item> ] map-with <menu> ;
+
+: completion-menu ( editor completions -- )
+    over >r <completion-menu> r> popup-location show-menu ;
+
+: do-completion-1 ( editor completions -- )
+    swap [ first complete ] with-editor ;
+
+: do-completion ( editor -- )
+    dup [ completions ] with-editor @{
+        @{ [ dup empty? ] [ 2drop ] }@
+        @{ [ dup length 1 = ] [ do-completion-1 ] }@
+        @{ [ t ] [ completion-menu ] }@
+    }@ cond ;
+
 : editor-actions ( editor -- )
     [
         [[ [ gain-focus ] [ focus-editor ] ]]
@@ -86,6 +108,7 @@ TUPLE: editor line caret ;
         [[ [ "HOME" ] [ [ << document-elt >> prev-elt ] with-editor ] ]]
         [[ [ "END" ] [ [ << document-elt >> next-elt ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
+        [[ [ "TAB" ] [ do-completion ] ]]
     ] swap add-actions ;
 
 C: editor ( text -- )
@@ -119,3 +142,7 @@ M: editor layout* ( editor -- )
 M: editor draw-gadget* ( editor -- )
     dup delegate draw-gadget*
     dup editor-text draw-string ;
+
+: set-possibilities ( possibilities editor -- )
+    #! Set completion possibilities.
+    [ possibilities set ] with-editor ;

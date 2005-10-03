@@ -85,6 +85,14 @@ M: object >list ( seq -- list ) dup length 0 rot (>list) ;
     #! Outputs a new sequence of the same type as seq.
     swap [ push ] immutable ; flushable
 
+: adjoin ( elt seq -- )
+    #! Push the element if its not already there.
+    2dup member? [ 2drop ] [ push ] if ;
+
+: prune ( seq -- seq )
+    #! Remove duplicates.
+    dup dup length <vector> swap [ over adjoin ] each swap like ;
+
 : append3 ( s1 s2 s3 -- s1+s2+s3 )
     #! Return a new sequence of the same type as s1.
     rot [ [ rot nappend ] keep swap nappend ] immutable ; flushable

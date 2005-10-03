@@ -23,7 +23,7 @@ SYMBOL: vocabularies
 : words ( vocab -- list )
     #! Push a list of all words in a vocabulary.
     #! Filter empty slots.
-    vocab dup [ hash-values [ ] subset word-sort ] when ;
+    vocab dup [ hash-values ] when ;
 
 : all-words ( -- list )
     vocabs [ words ] map concat ;

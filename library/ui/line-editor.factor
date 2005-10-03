@@ -9,6 +9,9 @@ SYMBOL: history-index
 SYMBOL: line-text
 SYMBOL: caret
 
+! Completion
+SYMBOL: possibilities
+
 : history-length ( -- n )
     #! Call this in the line editor scope.
     history get length ;
@@ -116,6 +119,7 @@ M: document-elt prev-elt* 3drop 0 ;
         0 <point> caret set
         { } clone history set
         0 history-index set
+        possibilities off
     ] make-hash ;
 
 : goto-history ( n -- )
@@ -135,3 +139,18 @@ M: document-elt prev-elt* 3drop 0 ;
     #! Call this in the line editor scope.
     history-index get dup 1+ history-length >=
     [ drop ] [ 1+ goto-history ] if ;
+
+: completion? ( partial completion -- ? )
+    [ "-" split ] 2apply 2dup [ length ] 2apply <=
+    [ [ swap head? ] 2map [ ] all? ] [ 2drop f ] if ;
+
+: completions ( -- seq )
+    << word-elt >> prev-elt@ 2dup = [
+        2drop f
+    ] [
+        line-text get subseq
+        possibilities get [ completion? ] subset-with
+    ] if ;
+
+: complete ( completion -- )
+    << word-elt >> prev-elt@ line-replace ;

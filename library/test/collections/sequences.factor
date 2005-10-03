@@ -174,3 +174,5 @@ unit-test
 [ 3 "a" ] [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
 
 [ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
+
+[ { 1 2 3 } ] [ { 1 1 2 2 3 3 } prune ] unit-test

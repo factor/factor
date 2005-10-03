@@ -44,13 +44,13 @@ DEFER: describe
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
 
-: simple-outliner ( seq quot -- quot: obj -- )
+: simple-outliner ( seq quot -- | quot: obj -- )
     swap [
         [ unparse-short ] keep rot dupd curry write-outliner
     ] each-with ;
 
 : words. ( vocab -- )
-    words [ see ] simple-outliner ;
+    words word-sort [ see ] simple-outliner ;
 
 : vocabs. ( -- )
     #! Outlining word browser.

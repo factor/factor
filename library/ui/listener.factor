@@ -4,11 +4,11 @@ IN: help
 DEFER: <tutorial-button>
 
 IN: gadgets-listener
-USING: gadgets gadgets-labels gadgets-layouts gadgets-panes
-gadgets-presentations gadgets-scrolling gadgets-splitters
-gadgets-theme generic hashtables help inspector io kernel
-listener lists math namespaces prettyprint sdl sequences shells
-styles threads words ;
+USING: gadgets gadgets-editors gadgets-labels gadgets-layouts
+gadgets-panes gadgets-presentations gadgets-scrolling
+gadgets-splitters gadgets-theme generic hashtables help
+inspector io kernel listener lists math namespaces prettyprint
+sdl sequences shells styles threads words ;
 
 SYMBOL: datastack-display
 SYMBOL: callstack-display
@@ -32,9 +32,21 @@ C: display ( -- display )
     [ display-title relayout ] keep
     display-pane [ stack. ] with-pane ;
 
-: ui-listener-hook ( -- )
-    datastack-hook get call datastack-display get present-stack
+: present-datastack ( -- )
+    datastack-hook get call datastack-display get present-stack ;
+
+: present-callstack ( -- )
     callstack-hook get call callstack-display get present-stack ;
+
+: usable-words ( -- words )
+    "use" get prune [ words ] map concat ;
+
+: word-completion ( -- )
+    usable-words [ word-name ] map
+    pane get pane-input set-possibilities ;
+
+: ui-listener-hook ( -- )
+    present-datastack present-callstack word-completion ;
 
 : listener-thread
     pane get [

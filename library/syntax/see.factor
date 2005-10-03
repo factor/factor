@@ -40,17 +40,21 @@ sequences styles words ;
     [ "(" swap ")" append3 comment. ] when* ;
 
 : in. ( word -- )
-    <block \ IN: pprint-word word-vocabulary f text block;
-    newline ;
+    <block \ IN: pprint-word word-vocabulary f text block; ;
 
-: definer. ( word -- )
+: (synopsis) ( word -- )
+    dup in.
     dup definer pprint-word
     dup pprint-word
     stack-effect stack-effect. ;
 
+: synopsis ( word -- )
+    #! Print a brief description of the word in question.
+    [ (synopsis) ] with-pprint ;
+
 GENERIC: (see) ( word -- )
 
-M: word (see) definer. newline ;
+M: word (see) drop ;
 
 : documentation. ( word -- )
     "documentation" word-prop [
@@ -60,21 +64,22 @@ M: word (see) definer. newline ;
 : pprint-; \ ; pprint-word ;
 
 : see-body ( quot word -- )
-    dup definer. <block dup documentation. swap pprint-elements
+    <block dup documentation. swap pprint-elements
     pprint-; declarations. block; ;
 
 M: compound (see)
-    dup word-def swap see-body newline ;
+    dup word-def swap see-body ;
 
 : method. ( word [[ class method ]] -- )
+    newline
     \ M: pprint-word
     unswons pprint-word
     swap pprint-word
     <block pprint-elements pprint-;
-    block; newline ;
+    block; ;
 
 M: generic (see)
-    dup dup "combination" word-prop swap see-body newline
+    dup dup "combination" word-prop swap see-body
     dup methods [ method. ] each-with ;
 
 GENERIC: class. ( word -- )
@@ -111,12 +116,16 @@ M: tuple-class class.
 M: word class. drop ;
 
 : see ( word -- )
-    [ dup in. dup (see) dup class. methods. ] with-pprint ;
+    [
+        dup (synopsis)
+        dup (see)
+        newline
+        dup class.
+        methods.
+    ] with-pprint ;
 
 : (apropos) ( substring -- seq )
-    vocabs [
-        words [ word-name subseq? ] subset-with
-    ] map-with concat ;
+    all-words [ word-name subseq? ] subset-with ;
 
 : apropos ( substring -- )
     #! List all words that contain a string.

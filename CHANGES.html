@@ -55,6 +55,7 @@ However, most uses of <code>catch</code> can be replaced by <code>cleanup</code>
 <li>The distinct <code>t</code> type is gone. Now, the <code>t</code> object is just a symbol.</li>
 <li>A new <code>with-server ( port ident quot -- )</code> combinator takes care of listening on a network socket, logging client connections, spawning client handler threads, and error handling. The quotation is called for each client, in a new scope with the client socket as the default stream.</li>
 <li>New <code>1+</code>, <code>1-</code> words are a bit faster than <code>1 +</code> and <code>1 -</code> since there is one less generic dispatch involved.</li>
+<li>On Windows, FFI errors would raise a signal 11 instead of reporting a nice message</li>
 </ul>
 
 <li>Contributed code:
