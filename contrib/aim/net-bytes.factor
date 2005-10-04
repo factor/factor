@@ -107,24 +107,42 @@ SYMBOL: unscoped-stack
 : endian> ( obj n -- str )
     big-endian get [ be> ] [ le> ] if ;
 
-: >byte ( byte -- str )
+: (>byte) ( byte -- str )
     unit >string ;
 
-: >short ( short -- str )
+: (>short) ( short -- str )
     2 >endian ;
 
-: >int ( int -- str )
+: (>int) ( int -- str )
     4 >endian ;
 
-: >long ( long -- str )
+: (>long) ( long -- str )
     8 >endian ;
 
-: >cstring ( str -- str )
+: (>cstring) ( str -- str )
     "\0" append ;
 
+: >byte ( byte -- )
+    (>byte) % ;
+
+: >short ( short -- )
+    (>short) % ;
+
+: >int ( int -- )
+    (>int) % ;
+
+: >long ( long -- )
+    (>long) % ;
+
+: >cstring ( str -- )
+    (>cstring) % ;
+
+
 ! doesn't compile
-: make-packet ( quot -- )
-    depth >r call depth r> - [ drop append ] each ;
+! : make-packet ( quot -- )
+    ! depth >r call depth r> - [ drop append ] each ;
+: make-packet
+    "" make ;
 
 : (head-short) ( str -- short )
     2 swap head endian> ;
