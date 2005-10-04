@@ -50,7 +50,7 @@ DEFER: handle-event
 
 : world-step ( -- ? )
     world get dup world-invalid >r layout-world r>
-    [ dup world-hand update-hand draw-world ] [ drop ] if ;
+    [ dup world-hand update-hand dup draw-world ] when drop ;
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 

@@ -5,31 +5,6 @@ USING: arrays generic io kernel listener memory namespaces
 prettyprint sequences words ;
 
 ! Interactive inspector
-GENERIC: extra-banner ( obj -- )
-
-M: word extra-banner ( word -- )
-    dup word-vocabulary [
-        dup interned? [
-            "This word is located in the " write
-        ] [
-            "This is an orphan not part of the dictionary." print
-            "It claims to belong to the " write
-        ] if
-        word-vocabulary pprint " vocabulary." print
-    ] [
-        drop
-        "The word is a uniquely generated symbol." print
-    ] if ;
-
-M: object extra-banner ( obj -- ) drop ;
-
-: inspect-banner ( obj -- )
-    "You are looking at an instance of the " write dup class pprint
-    " class:" print
-    "  " write dup pprint-short terpri
-    "It takes up " write dup size pprint " bytes of memory." print
-    extra-banner ;
-
 SYMBOL: inspector-slots
 
 : sheet-numbers ( sheet -- sheet )
@@ -42,7 +17,7 @@ SYMBOL: inspector-stack
 
 : (inspect) ( obj -- )
     dup inspector-stack get push
-    dup inspect-banner
+    dup summary print
     sheet sheet-numbers sheet. ;
 
 : inspector-help ( -- )

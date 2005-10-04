@@ -72,7 +72,7 @@ TUPLE: editor line caret ;
     dup screen-loc swap editor-caret rect-extent nip v+ ;
 
 : <completion-item> ( completion editor -- menu-item )
-    dupd [ [ complete ] with-editor ] curry curry cons ;
+    dupd [ [ complete ] with-editor drop ] curry curry cons ;
 
 : <completion-menu> ( editor completions -- menu )
     [ swap <completion-item> ] map-with <menu> ;

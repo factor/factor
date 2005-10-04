@@ -4,7 +4,30 @@ IN: inspector
 USING: arrays generic hashtables io kernel kernel-internals
 lists math prettyprint sequences strings vectors words ;
 
+GENERIC: summary ( object -- string )
+
+: sign-string ( n -- string )
+    0 > "a positive " "a negative " ? ;
+
+M: integer summary
+    dup sign-string over 2 mod 0 = "even " "odd " ?
+    rot class word-name append3 ;
+
+M: real summary
+    dup sign-string swap class word-name append ;
+
+: quadrant ( z -- n )
+    >rect >r 0 >= 2 0 ? r> 0 >= 1 0 ? + ;
+
+M: complex summary
+    "a complex number in the "
+    swap quadrant { "first" "second" "third" "fourth" } nth
+    " quadrant" append3 ;
+
 GENERIC: sheet ( obj -- sheet )
+
+M: object summary
+    "an instance of the " swap class word-name " class" append3 ;
 
 M: object sheet ( obj -- sheet )
     dup class "slots" word-prop
@@ -12,13 +35,34 @@ M: object sheet ( obj -- sheet )
     [ first slot ] map-with
     2array ;
 
+M: sequence summary
+    dup length 1 = [
+        drop "a sequence of 1 element"
+    ] [
+        "a sequence of " swap length number>string
+        " elements" append3
+    ] if ;
+
 M: list sheet 1array ;
 
 M: vector sheet 1array ;
 
 M: array sheet 1array ;
 
+M: hashtable summary
+    "a hashtable storing " swap hash-size number>string
+    " keys" append3 ;
+
 M: hashtable sheet dup hash-keys swap hash-values 2array ;
+
+M: word summary ( word -- )
+    dup word-vocabulary [
+        dup interned?
+        "a word in the " "a word orphaned from the " ?
+        swap word-vocabulary " vocabulary" append3
+    ] [
+        drop "a uniquely generated symbol"
+    ] if ;
 
 : format-column ( list ? -- list )
     >r [ unparse-short ] map
@@ -39,7 +83,7 @@ DEFER: describe
     dup format-sheet swap peek
     [ dup [ describe ] curry write-outliner ] 2each ;
 
-: describe ( object -- ) sheet sheet. ;
+: describe ( object -- ) dup summary print sheet sheet. ;
 
 : word. ( word -- )
     dup word-name swap dup [ see ] curry write-outliner ;
