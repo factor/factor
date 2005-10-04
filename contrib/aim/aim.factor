@@ -1,65 +1,41 @@
 IN: aim
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables ;
-
-SYMBOL: aim-login-server
-SYMBOL: icq-login-server
-SYMBOL: login-port
-
-SYMBOL: client-md5-string
-SYMBOL: client-id-string
-SYMBOL: client-id-num
-SYMBOL: client-major-ver
-SYMBOL: client-minor-ver
-SYMBOL: client-lesser-ver
-SYMBOL: client-build-num
-SYMBOL: client-distro-num
-SYMBOL: client-language
-SYMBOL: client-country
-SYMBOL: client-ssi-flag
+USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector ;
 
 SYMBOL: username
 SYMBOL: password
 SYMBOL: conn
 SYMBOL: seq-num 
-
 SYMBOL: stage-num
 SYMBOL: login-key
 SYMBOL: aim-chat-ip
 SYMBOL: aim-chat-port
 SYMBOL: auth-code
-SYMBOL: charset
-
 SYMBOL: family
 SYMBOL: opcode
 SYMBOL: name
 SYMBOL: message
 
+: aim-login-server "login.oscar.aol.com" ; inline
+: icq-login-server "login.icq.com" ; inline
+: login-port 5190 ; inline
+: client-md5-string "AOL Instant Messenger (SM)" ; inline
+: client-id-string "AOL Instant Messenger, version 5.5 3595/WIN32" ; inline
+: client-id-num HEX: 109 ; inline
+: client-major-ver 5 ; inline
+: client-minor-ver 5 ; inline
+: client-lesser-ver 0 ; inline
+: client-build-num 3595 ; inline
+: client-distro-num 260 ; inline
+: client-language "en" ; inline
+: client-country "us" ; inline
+: client-ssi-flag 1 ; inline
+: client-charset "text/aolrtf; charset=\"us-ascii\"" ; inline
+
 : initialize ( username password -- )
-    "login.oscar.aol.com" aim-login-server set
-    "login.icq.com" icq-login-server set
-    5190 login-port set
-
-    "AOL Instant Messenger (SM)" client-md5-string set
-    "AOL Instant Messenger, version 5.5 3595/WIN32" client-id-string set
-    ! "AOL Instant Messenger, version 5.9 3690/WIN32" client-id-string set
-    HEX: 109 client-id-num set
-    5 client-major-ver set
-    5 client-minor-ver set
-    0 client-lesser-ver set
-    3595 client-build-num set
-    260 client-distro-num set
-    "en" client-language set
-    "us" client-country set
-    1 client-ssi-flag set
-    "text/aolrtf; charset=\"us-ascii\"" charset set
-
-    0 65535 random-int seq-num set
+    0 65534 random-int seq-num set
     1 stage-num set
     password set
     username set ;
-
-: get-seq-num ( -- int )
-    seq-num get seq-num [ 1 + ] change ;
 
 : (send-aim) ( str -- )
     conn get [ stream-write ] keep stream-flush ;
@@ -68,9 +44,10 @@ SYMBOL: message
     [
         HEX: 2a >byte
         stage-num get >byte
-        get-seq-num >short
-    ] make-packet
-    swap dup >r length >short r> append append ;
+        seq-num get >short
+    ] "" make
+    seq-num [ 1+ ] change
+    swap dup >r length (>short) r> append append ;
 
 : send-aim-print ( data -- )
     make-packet
@@ -81,6 +58,7 @@ SYMBOL: message
 : send-aim ( data -- )
     make-packet
     (prepend-aim-protocol)
+    "Sending: " write dup hexdump
     (send-aim) ;
 
 : with-aim ( quot -- )
@@ -92,11 +70,11 @@ SYMBOL: message
         head-byte drop
         head-short drop
         head-short head-string
-    ] with-aim ;
-    ! "Received: " write dup hexdump ;
+    ] with-aim 
+    "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
-    4vector { >short >short >short >int } papply ;
+    4vector { (>short) (>short) (>short) (>int) } papply % ;
 
 : parse-snac ( stream -- )
     head-short family set
@@ -119,33 +97,27 @@ SYMBOL: message
     "Unhandled family: " write family get >hex "h" append writeln
     unhandled-opcode ;
 
-! FAMILY/OPCODE TABLES
-! returns handler table for a family
-: FAMILY-TABLE
-    {{
-    }} ;
+: family-table ( -- hash )
+    {{ }} ;
 
-: add-family ( -- )
-    word dup unparse "-" split second dup length 1- swap head hex> FAMILY-TABLE set-hash ; parsing
+: FAMILY: ( -- fam# )
+    ! "FAMILY:"
+    scan hex> swons dup car family-table hash dup [
+        drop
+    ] [
+        ! "NEW FAMILY, creating table" print
+        drop {{ }} clone over car family-table set-hash
+    ] if ; parsing
 
-: FAMILY-1h
-    {{
-    }} ; add-family
+: OPCODE: ( fam# -- )
+    ! "OPCODE:" 
+    car family-table hash word scan hex> rot set-hash f ; parsing
 
-
-
-! : handle-2h-6h
+! : handle-away-message
     ! head-byte head-string name set
     ! name get write "'s away message" writeln ;
 
-
-! : FAMILY-2h
-    ! {{
-        ! [[ 6 handle-2h-6h ]]
-    ! }} ; add-family
-
-
-: handle-3h-bh ( -- )
+: handle-buddy-status
     head-byte head-string name set
     head-short drop
     head-short
@@ -170,9 +142,9 @@ SYMBOL: message
                 { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ;
+    ] repeat ; FAMILY: 03 OPCODE: 0b
 
-: handle-3h-ch ( -- )
+: handle-buddy-signoff ( -- )
     head-byte head-string name set
     head-short drop
     head-short
@@ -185,25 +157,14 @@ SYMBOL: message
                 { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ;
-
-: FAMILY-3h ( -- hash)
-    {{
-        
-        [[ HEX: b handle-3h-bh ]]
-        [[ HEX: c handle-3h-ch ]]
-    }} ; add-family
-
-
+    ] repeat ; FAMILY: 03 OPCODE: 0C
 
 : (drop-family-4h-header)
     head-short drop
     head-short drop
     head-short drop
     head-short drop
-    8 head-string drop  ! message-id
-    ;
-
+    8 head-string drop  ( message-id ) ;
     
 : (parse-incoming-message-text) ( -- str )
     head-short drop head-short unscoped-stream get contents ;
@@ -260,8 +221,7 @@ SYMBOL: message
     head-byte head-string "Incoming msg from " write write ": " write ! from name
     head-short drop ! warning-level
     head-short (parse-incoming-message-tlv)
-    (parse-incoming-message-chunks)
-    ;
+    (parse-incoming-message-chunks) ; FAMILY: 4 OPCODE: 7
 
 : handle-typing-message ( -- )
     (drop-family-4h-header)
@@ -273,27 +233,13 @@ SYMBOL: message
         { [ dup 1 = ] [ drop " has entered text." writeln ] }
         { [ dup 2 = ] [ drop " is typing..." writeln ] }
         { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
-    } cond ;
-
-: FAMILY-4h ( -- hash)
-    {{
-        [[ 7 handle-incoming-message ]]
-        [[ HEX: 14 handle-typing-message ]]
-    }} ; add-family
-
-
-
-
-: FAMILY-13h ( -- hash)
-    {{
-    }} ; add-family
+    } cond ; FAMILY: 4 OPCODE: 14
 
 : (print-op) ( op -- )
     "Op: " write . ;
 
 : (parse-server) ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
-
 
 : (process-login-chunks) ( stream -- )
     unscoped-stream get empty?  [
@@ -312,12 +258,12 @@ SYMBOL: message
     ] unless ;
 
 : handle-login-packet ( -- )
-    (process-login-chunks) ;
+    (process-login-chunks) ; FAMILY: 17 OPCODE: 3
 
-: password-md5 ( password -- md5 )
+: (password-md5) ( password -- md5 )
     login-key get
     password get string>md5 append
-    client-md5-string get append
+    client-md5-string append
     string>md5 >string ;
 
 : respond-login-key-packet ( -- )
@@ -325,57 +271,54 @@ SYMBOL: message
         HEX: 17 HEX: 2 0 0 make-snac
         1 >short
         username get length >short
-        username get
+        username get %
 
         ! password hash chunk
         HEX: 25 >short
         HEX: 10 >short
-        password-md5
+        (password-md5) %
 
         HEX: 4c >short
         HEX: 00 >short
-        HEX: 03 >short client-id-string get length >short client-id-string get
-        HEX: 16 >short HEX: 02 >short client-id-num get >short
-        HEX: 17 >short HEX: 02 >short client-major-ver get >short
-        HEX: 18 >short HEX: 02 >short client-minor-ver get >short
-        HEX: 19 >short HEX: 02 >short client-lesser-ver get >short
-        HEX: 1a >short HEX: 02 >short client-build-num get >short
-        HEX: 14 >short HEX: 04 >short client-distro-num get >int
-        HEX: 0f >short client-language get length >short client-language get
-        HEX: 0e >short client-country get length >short client-country get
-        HEX: 4a >short HEX: 01 >short client-ssi-flag get >byte
+        HEX: 03 >short client-id-string length >short client-id-string %
+        HEX: 16 >short HEX: 02 >short client-id-num >short
+        HEX: 17 >short HEX: 02 >short client-major-ver >short
+        HEX: 18 >short HEX: 02 >short client-minor-ver >short
+        HEX: 19 >short HEX: 02 >short client-lesser-ver >short
+        HEX: 1a >short HEX: 02 >short client-build-num >short
+        HEX: 14 >short HEX: 04 >short client-distro-num >int
+        HEX: 0f >short client-language length >short client-language %
+        HEX: 0e >short client-country length >short client-country %
+        HEX: 4a >short HEX: 01 >short client-ssi-flag >byte
     ] send-aim ;
+
 
 : handle-login-key-packet ( -- )
     head-short head-string login-key set
-    respond-login-key-packet ;
-
-: FAMILY-17h ( -- hash)
-    {{
-        [[ 7 handle-login-key-packet ]]
-        [[ 3 handle-login-packet ]]
-    }} ; add-family
-
-
+    respond-login-key-packet ; FAMILY: 17 OPCODE: 7
 
 
 : handle-packet ( packet -- )
     <string-reader>
     [
         parse-snac
-        family get FAMILY-TABLE hash dup [
-            execute opcode get swap hash dup [
-                execute ] [
+        family get family-table hash dup [
+            opcode get swap hash dup [
+                    execute
+		] [
                     unhandled-opcode drop
                 ] if
             ] [
-            unhandled-family-opcode
-            drop
+            	unhandled-family-opcode
+            	drop
         ] if
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
 
-: send-im ( message name -- )
+
+
+! Commands
+: send-im ( name message -- )
     message set
     name set
     [
@@ -383,7 +326,7 @@ SYMBOL: message
         "1973973" >cstring
         1 >short
         name get length >byte
-        name get
+        name get %
         2 >short
 
         [
@@ -392,10 +335,9 @@ SYMBOL: message
             message get length 4 + >short
             0 >short
             HEX: ffff >short
-            message get
-        ] make-packet
-
-        dup >r length >short r>
+            message get %
+        ] make-packet 
+        dup length >short %
         3 >short 0 >short 6 >short 0 >short
     ] send-aim ;
 
@@ -405,7 +347,7 @@ SYMBOL: message
         2 HEX: 15 0 HEX: 29cb0015 make-snac
         1 >int
         name get length >byte
-        name get
+        name get %
     ] send-aim ;
 
 : query-away ( name -- )
@@ -414,7 +356,7 @@ SYMBOL: message
         2 HEX: 15 0 HEX: 29cb0015 make-snac
         2 >int
         name get length >byte
-        name get
+        name get %
     ] send-aim ;
 
 : set-away ( message -- )
@@ -422,11 +364,11 @@ SYMBOL: message
     [
         2 4 0 4 make-snac
         3 >short
-        charset get length >short
-        charset get
+        client-charset length >short
+        client-charset %
         4 >short
         message get length >short
-        message get
+        message get %
     ] send-aim ;
 
 : return-from-away ( -- )
@@ -442,11 +384,11 @@ SYMBOL: message
     [
         2 4 0 4 make-snac
         1 >short
-        charset get length >short
-        charset get
+        client-charset length >short
+        client-charset %
         2 >short
         message get length >short
-        message get
+        message get %
     ] send-aim ;
 
 : (buddy-list-edit-start)
@@ -465,7 +407,7 @@ SYMBOL: message
     [
         HEX: 13 8 0 HEX: 57e60008
         name get length >short
-        name get
+        name get %
         ! BUDDY GROUP ID HEX: 1a4c
         ! BUDDY ID HEX: 1812
         0 >short
@@ -486,7 +428,7 @@ SYMBOL: message
     [
         HEX: 13 HEX: a 0 HEX: 60c0000a
         name get length >short
-        name get
+        name get %
         ! BUDDY GROUP ID HEX: 1a4c
         ! BUDDY ID HEX: 1812
         0 >short
@@ -495,6 +437,7 @@ SYMBOL: message
     ! (modify-buddy)
     (buddy-list-edit-stop) ;
 
+! Login
 : send-first-login ( -- )
     [ 1 >int ] send-aim ;
 
@@ -504,7 +447,7 @@ SYMBOL: message
         HEX: 17 HEX: 6 0 0 make-snac
         1 >short
         username get length >short
-        username get
+        username get %
         HEX: 4b >short
         HEX: 00 >short
         HEX: 5a >short
@@ -516,7 +459,7 @@ SYMBOL: message
         1 >int
         6 >short
         auth-code get length >short
-        auth-code get
+        auth-code get %
     ] send-aim ;
 
 : send-second-bunch ( -- )
@@ -598,7 +541,7 @@ SYMBOL: message
 : first-server
     ! first server
     1 stage-num set
-    aim-login-server get login-port get <client> conn set
+    aim-login-server login-port <client> conn set
 
     send-first-login read-aim drop
 
