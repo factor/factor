@@ -138,6 +138,7 @@ namespaces sequences words ;
 : binary-jump ( node label op -- )
     pick binary-op-imm?
     [ binary-jump-imm ] [ binary-jump-reg ] if ;
+
 {
     { fixnum<= %jump-fixnum<= }
     { fixnum<  %jump-fixnum<  }

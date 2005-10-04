@@ -62,8 +62,7 @@ M: word summary ( word -- )
     ] if ;
 
 : format-column ( list ? -- list )
-    >r [ unparse-short ] map
-    r> [
+    >r [ unparse-short ] map r> [
         [ 0 [ length max ] reduce ] keep
         [ swap CHAR: \s pad-right ] map-with
     ] unless ;

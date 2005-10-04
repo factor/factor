@@ -132,7 +132,7 @@ TUPLE: another-one ;
 [ << another-one f >> ] [ <another-one> empty-method-test ] unit-test
 
 ! Test generic see and parsing
-[ "IN: temporary\nSYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
+[ "IN: temporary SYMBOL: bah\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] string-out ] unit-test
 
 ! Weird bug

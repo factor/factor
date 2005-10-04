@@ -16,7 +16,7 @@ USING: kernel line-editor namespaces sequences strings test ;
 [ 0 ] [ 0 0 10 10 (point-update) ] unit-test
 
 [ "Hello world" ] [
-    "Hello world" 0 "editor" get [ line-insert ] bind
+    "Hello world" 0 0 "editor" get [ line-replace ] bind
     "editor" get [ line-text get ] bind
 ] unit-test
 
@@ -27,7 +27,7 @@ USING: kernel line-editor namespaces sequences strings test ;
 
 [ "Hello, crazy world" ] [
     "editor" get [ 0 set-caret-pos ] bind
-    ", crazy" 5 "editor" get [ line-insert ] bind
+    ", crazy" 5 5 "editor" get [ line-replace ] bind
     "editor" get [ line-text get ] bind
 ] unit-test
 
@@ -35,7 +35,7 @@ USING: kernel line-editor namespaces sequences strings test ;
 
 [ "Hello, crazy world" ] [
     "editor" get [ 5 set-caret-pos "Hello world" line-text set ] bind
-    ", crazy" 5 "editor" get [ line-insert ] bind
+    ", crazy" 5 5 "editor" get [ line-replace ] bind
     "editor" get [ line-text get ] bind
 ] unit-test
 

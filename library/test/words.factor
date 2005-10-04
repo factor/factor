@@ -1,5 +1,6 @@
 IN: temporary
-USING: generic kernel lists math namespaces test words sequences ;
+USING: generic hashtables kernel lists math namespaces sequences
+test words ;
 
 [ 4 ] [
     "poo" "scratchpad" create [ 2 2 + ] define-compound
@@ -73,6 +74,16 @@ FORGET: another-forgotten
 : another-forgotten ;
 
 [ t ] [ \ car interned? ] unit-test
+
+! I forgot remove-crossref calls!
+: fee ;
+: foe fee ;
+: fie foe ;
+
+[ 0 ] [ \ fee crossref get hash hash-size ] unit-test
+[ t ] [ \ foe crossref get hash not ] unit-test
+
+FORGET: foe
 
 ! This has to be the last test in the file.
 : test-last ( -- ) ;

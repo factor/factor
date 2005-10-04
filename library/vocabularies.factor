@@ -72,6 +72,7 @@ SYMBOL: vocabularies
 : forget ( word -- )
     #! Remove a word definition.
     dup uncrossref
+    crossref get [ dupd remove-hash ] when*
     dup word-name swap word-vocabulary vocab remove-hash ;
 
 : interned? ( word -- ? )

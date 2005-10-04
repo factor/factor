@@ -7,13 +7,16 @@ namespaces sequences strings vectors ;
 ! The basic word type. Words can be named and compared using
 ! identity. They hold a property map.
 
-: word-prop ( word name -- value ) swap word-props hash ;
+: word-prop ( word name -- value )
+    swap word-props hash ;
+
 : set-word-prop ( word value name -- )
     rot word-props pick [ set-hash ] [ remove-hash drop ] if ;
 
 ! Pointer to executable native code
 GENERIC: word-xt
 M: word word-xt ( w -- xt ) 7 integer-slot ;
+
 GENERIC: set-word-xt
 M: word set-word-xt ( xt w -- ) 7 set-integer-slot ;
 
@@ -41,21 +44,8 @@ SYMBOL: crossref
     #! Marks each word in the quotation as being a dependency
     #! of the word.
     crossref get [
-        dup uses [ (add-crossref) ] each-with
-    ] [
-        drop
-    ] if ;
-
-: (remove-crossref) crossref get [ nest remove-hash ] bind ;
-
-: remove-crossref ( word -- )
-    #! Marks each word in the quotation as not being a
-    #! dependency of the word.
-    crossref get [
-        dup uses [ (remove-crossref) ] each-with
-    ] [
-        drop
-    ] if ;
+        dup dup uses [ (add-crossref) ] each-with
+    ] when drop ;
 
 : usages ( word -- deps )
     #! List all usages of a word. This is a transitive closure,
@@ -67,10 +57,17 @@ SYMBOL: crossref
     crossref get ?hash dup [ hash-keys ] when ;
 
 GENERIC: (uncrossref) ( word -- )
+
 M: word (uncrossref) drop ;
 
+: remove-crossref ( usage user -- )
+    crossref get [ nest remove-hash ] bind ;
+
 : uncrossref ( word -- )
-    dup (uncrossref) usages [ (uncrossref) ] each ;
+    crossref get [
+        dup dup uses [ remove-crossref ] each-with
+        dup (uncrossref) dup usages [ (uncrossref) ] each
+    ] when drop ;
 
 ! The word primitive combined with the word def specify what the
 ! word does when invoked.
@@ -106,7 +103,7 @@ PREDICATE: word compound  ( obj -- ? ) word-primitive 1 = ;
 M: compound definer drop \ : ;
 
 : define-compound ( word def -- )
-    >r dup dup remove-crossref r> 1 swap define add-crossref ;
+    over >r 1 swap define r> add-crossref ;
 
 : reset-props ( word seq -- )
     [ f swap set-word-prop ] each-with ;

@@ -34,17 +34,17 @@ unit-test
 
 : foo dup * ; inline
 
-[ "IN: temporary\n: foo dup * ; inline\n" ]
+[ "IN: temporary : foo dup * ; inline\n" ]
 [ [ \ foo see ] string-out ] unit-test
 
 : bar ( x -- y ) 2 + ;
 
-[ "IN: temporary\n: bar ( x -- y ) 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
+[ "IN: temporary : bar ( x -- y ) 2 + ;\n" ] [ [ \ bar see ] string-out ] unit-test
 
 : baz dup ;
 
 [ ] [ [ baz ] infer drop ] unit-test
-[ "IN: temporary\n: baz ( object -- object object ) dup ;\n" ]
+[ "IN: temporary : baz ( object -- object object ) dup ;\n" ]
 [ [ \ baz see ] string-out ] unit-test
 
 [ ] [ \ fixnum see ] unit-test

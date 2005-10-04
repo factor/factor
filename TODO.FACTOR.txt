@@ -26,13 +26,11 @@
 - test copy-into of a sequence into itself
 - vertical alignment of arrows -vs- outliner gadget
 - slice: if sequence or seq start is changed, abstraction violation
-- find* should test for index below 0
 
 + ui:
 
 - multi-part gradients
 - tabular output
-- completion
 - debugger should use outlining
 - support nested incremental layouts more efficiently
 - make-pane should not need world-theme
