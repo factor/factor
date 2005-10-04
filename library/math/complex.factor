@@ -41,6 +41,9 @@ M: number = ( n n -- ? ) number= ;
 : polar> ( abs arg -- z )
     cis * ; inline
 
+: quadrant ( z -- n )
+    >rect >r 0 >= 0 1 ? r> 0 >= 0 3 ? bitxor ;
+
 M: complex absq >rect [ sq ] 2apply + ;
 
 IN: math-internals

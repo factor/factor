@@ -59,3 +59,8 @@ USE: test
 [ 1 0 ] [ 1 >polar ] unit-test
 [ 1 ] [ -1 >polar drop ] unit-test
 [ t ] [ -1 >polar nip 3.14 3.15 between? ] unit-test
+
+[ 0 ] [ #{ 1 1 }# quadrant ] unit-test
+[ 1 ] [ #{ -1 1 }# quadrant ] unit-test
+[ 2 ] [ #{ -1 -1 }# quadrant ] unit-test
+[ 3 ] [ #{ 1 -1 }# quadrant ] unit-test

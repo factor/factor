@@ -16,12 +16,9 @@ M: integer summary
 M: real summary
     dup sign-string swap class word-name append ;
 
-: quadrant ( z -- n )
-    >rect >r 0 >= 2 0 ? r> 0 >= 1 0 ? + ;
-
 M: complex summary
     "a complex number in the "
-    swap quadrant { "first" "second" "third" "fourth" } nth
+    swap quadrant { "first" "second" "fourth" "third" } nth
     " quadrant" append3 ;
 
 GENERIC: sheet ( obj -- sheet )
