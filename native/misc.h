@@ -5,6 +5,7 @@ s64 current_millis(void);
 void primitive_millis(void);
 void primitive_random_int(void);
 #ifdef WIN32
-F_STRING *last_error();
+char *buffer_to_c_string(char *buffer);
+DLLEXPORT char *last_error();
 #endif
 

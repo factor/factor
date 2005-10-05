@@ -53,12 +53,28 @@ void primitive_random_int(void)
 	dpush(tag_bignum(s48_long_to_bignum(rand())));
 }
 
+
+
+
 #ifdef WIN32
-F_STRING *last_error()
+// frees memory allocated by win32 api calls
+char *buffer_to_c_string(char *buffer)
+{
+	int i;
+	int capacity = strlen(buffer);
+	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
+	BYTE *c_str = (BYTE*)(_c_str + 1);
+	for(i = 0; i < capacity; i++)
+		c_str[i] = buffer[i];
+	c_str[capacity] = '\0';
+	LocalFree(buffer);
+	return (char*)c_str;
+}
+
+char *last_error()
 {
 	char *buffer;
-	int len;
-	F_STRING *error;
+	int index;
 	DWORD dw = GetLastError();
 	
 	FormatMessage(
@@ -70,16 +86,11 @@ F_STRING *last_error()
 		(LPTSTR) &buffer,
 		0, NULL);
 
-	// strip \r\n
-	len = strlen(buffer);
-	if(len > 2 && isspace(buffer[len - 2]))
-		buffer[len - 2] = 0;
-	if(len > 1 && isspace(buffer[len - 1]))
-		buffer[len - 1] = 0;
-
-	error = from_c_string(buffer);
-	LocalFree(buffer);
-
-	return error;
+	// strip whitespace from end
+	index = strlen(buffer) - 1;
+	while(index >= 0 && isspace(buffer[index]))
+		buffer[index--] = 0;
+	
+	return buffer_to_c_string(buffer);
 }
 #endif
