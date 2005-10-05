@@ -15,7 +15,6 @@ USING: kernel math namespaces sequences ;
 : HI-MASK HEX: 80000000 ; inline
 : LO-MASK HEX: 7fffffff ; inline
 
-SYMBOL: init
 SYMBOL: mt
 SYMBOL: mti
 
@@ -25,42 +24,42 @@ SYMBOL: mti
 : mt-nth ( n -- nth )
     mt get nth ; inline
 
-: (formula) ( mt mti magic -- mt[mti] )
-    -rot dup rot nth dup -30 shift bitxor rot * + HEX: ffffffff bitand ; inline
+: formula ( mt mti -- mt[mti] )
+    dup rot nth dup -30 shift bitxor 1812433253 * + HEX: ffffffff bitand ; inline
 
-: (y) ( index -- y )
+: y ( index -- y )
     dup 1+ mt-nth LO-MASK bitand >r mt-nth HI-MASK bitand r> bitor ; inline
     
-: (set-mt-ith) ( y index index1 -- )
-    mt-nth rot dup odd? [ A ] [ 0 ] if swap -1 shift bitxor bitxor swap mt get set-nth ; inline
+: set-mt-ith ( y index index1 -- )
+    mt-nth rot dup odd? A 0 ? swap -1 shift bitxor bitxor swap mt get set-nth ; inline
 
-: (temper) ( y -- yt )
+: temper ( y -- yt )
     dup -11 shift bitxor
     dup 7 shift HEX: 9d2c5680 bitand bitxor
     dup 15 shift HEX: efc60000 bitand bitxor
     dup -18 shift bitxor ; inline
 
-: (generate-new-mt)
-    N M - [ dup (y) over dup M + (set-mt-ith) ] repeat
-    M 1 - [ dup 227 + dup (y) over dup M N - + (set-mt-ith) drop ] repeat
+: generate-new-mt
+    N M - [ dup y over dup M + set-mt-ith ] repeat
+    M 1 - [ dup 227 + dup y over dup M N - + set-mt-ith drop ] repeat
     0 mti set ;
 
-: init-genrand ( seed -- )
-    init on
+: init ( seed -- )
     [ N 1- [ drop 0 , ] each ] { } make swap
     HEX: ffffffff bitand 0 pick set-nth
-    N 1- [ 2dup 1812433253 (formula) 1+ pick pick 1+ swap set-nth ] repeat
+    N 1- [ 2dup formula 1+ pick pick 1+ swap set-nth ] repeat
     mt set 0 mti set
-    (generate-new-mt) ;
+    generate-new-mt ;
 
 : genrand ( -- rand )
-    init get [ 5489 init-genrand ] unless
-    mti get N >= [
-        (generate-new-mt)
-    ] when
-    mti get mt get nth
-    mti [ 1+ ] change
-    (temper) ;
+    mti get
+    { ! leave mti
+        { [ dup not ] [ drop 5489 init 0 ] }
+        { [ dup N < ] [ ] }
+        { [ t ] [ drop generate-new-mt 0 ] }
+    } cond
+    mt get nth temper
+    mti [ 1+ ] change ;
 
 USE: compiler
 USE: test
