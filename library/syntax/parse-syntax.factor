@@ -153,3 +153,9 @@ SYMBOL: t
 : DEC: 10 (BASE) ; parsing
 : OCT: 8 (BASE) ; parsing
 : BIN: 2 (BASE) ; parsing
+
+: Q{ f ; parsing
+
+: }Q
+    reverse 2 swap cut
+    [ first2 rect> ] 2apply 2array swons ; parsing

@@ -33,7 +33,7 @@ USING: arrays generic kernel sequences ;
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
 : v. ( v v -- x ) 0 [ * + ] 2reduce ;
-: c. ( v v -- x ) 0 [ conjugate * + ] 2reduce ;
+: c. ( v v -- x ) 0 [ ** + ] 2reduce ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
 

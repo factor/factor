@@ -278,7 +278,15 @@ M: cons pprint* ( list -- )
    ] check-recursion ;
 
 M: array pprint* ( vector -- )
-    [ \ @{ \ }@ pprint-sequence ] check-recursion ;
+    #! This does a hack for printing quaternions.
+    [
+        dup quaternion? [
+            [ >rect 2array ] map concat
+            \ Q{ \ }Q
+        ] [
+            \ @{ \ }@
+        ] if pprint-sequence
+    ] check-recursion ;
 
 M: vector pprint* ( vector -- )
     [ \ { \ } pprint-sequence ] check-recursion ;
