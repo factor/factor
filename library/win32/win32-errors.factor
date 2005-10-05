@@ -63,17 +63,8 @@ CONSTANT: WAIT_TIMEOUT 258 ;
 : GetLastError ( -- int )
     "int" "kernel32" "GetLastError" [ ] alien-invoke ;
 
-: FormatMessage ( flags source messageid langid buf size args -- int )
-    "int" "kernel32" "FormatMessageA" 
-    [ "int" "void*" "int" "int" "void*" "int" "void*" ]
-    alien-invoke ;
-
 : win32-error-message ( id -- string )
-    4096 <buffer> dup >r >r >r
-    FORMAT_MESSAGE_FROM_SYSTEM f r>
-    LANG_NEUTRAL SUBLANG_DEFAULT MAKELANGID r> buffer-ptr <alien> 4096 f
-    FormatMessage r> 2dup buffer-reset nip dup buffer-contents 
-    swap buffer-free ;
+	"char*" f "last_error" [ ] alien-invoke ;
 
 : win32-throw-error ( -- )
     GetLastError win32-error-message throw ;
