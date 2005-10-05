@@ -36,12 +36,24 @@ TUPLE: db-field name bind-name slot type ;
 ! a tuple are mapped to the fields of a sqlite database. 
 TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 
+: sanitize-conversions ( -- alist )
+  [ 
+    [[ CHAR: - "_" ]]
+    [[ CHAR: ? "p" ]] 
+  ] ;
+
+: sanitize ( string -- string ) 
+  #! Convert a string so it can be used as a table or field name.
+    [
+        [ dup sanitize-conversions assoc [ % ] [ , ] ?if ] each
+    ] "" make ;
+
 : tuple-fields ( class -- seq )
   #! Given a tuple class return a list of the fields
   #! within that tuple. Ignores the delegate field.
   [ word-name length 1+ ] keep
   "slots" word-prop 1 swap tail [ ( name-len @{ slot getter setter }@ )
-    [ 1 swap nth word-name tail dup ":" swap append ] keep    
+    [ 1 swap nth word-name tail sanitize dup ":" swap append ] keep    
     0 swap nth
     "text"
     <db-field>
@@ -50,7 +62,7 @@ TUPLE: mapping tuple table fields one-to-one one-to-many   ;
 : default-mapping ( class -- mapping )  
   #! Given a tuple class, create a default mappings object. It assumes
   #! there are no one-to-one or one-to-many relationships.
-  dup [ word-name ] keep tuple-fields f f <mapping> ;
+  dup [ word-name sanitize ] keep tuple-fields f f <mapping> ;
 
 ! The mappings variable holds a hashtable mapping the tuple symbol
 ! to the mapping object, describing how that tuple is stored
@@ -59,16 +71,19 @@ SYMBOL: mappings
 
 : init-mappings ( -- )
   #! 
-  {{ }} mappings set ;
+  {{ }} mappings global set-hash ;
+
+: get-mappings ( -- hashtable )
+  mappings global hash ;
 
 : set-mapping ( mapping -- )
   #! Store a database mapping so that the persistence system 
   #! knows how to store instances of the relevant tuple in the database.
-  dup mapping-tuple mappings get set-hash ;
+  dup mapping-tuple get-mappings set-hash ;
 
 : get-mapping ( class -- mapping )
   #! Return the database mapping for the given tuple class.
-  mappings get hash ;
+  get-mappings hash ;
 
 ! The 'persistent' tuple will be set to the delegate of any tuple
 ! instance stored in the database. It contains the database key
@@ -164,7 +179,7 @@ M: mapping select-sql ( tuple mapping -- select )
   #! Execute the SQL, which should contain a database update
   #! statement (update, insert, create, etc). Ignore the result.
   sqlite-prepare dup [ drop ] sqlite-each sqlite-finalize ;
-  
+
 : create-tuple-table ( db class -- )
   #! Create the table for the tuple class.
   get-mapping create-sql execute-update-sql ;
@@ -272,4 +287,4 @@ M: mapping select-sql ( tuple mapping -- select )
   rot sqlite-finalize nip ;
   
  
-mappings get [ init-mappings ] unless 
+get-mappings [ init-mappings ] unless 
