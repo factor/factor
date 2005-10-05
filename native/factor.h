@@ -67,6 +67,7 @@ typedef signed long long s64;
 
 #ifdef WIN32
 	#include <windows.h>
+	#include <ctype.h>
 
 	/* Difference between Jan 1 00:00:00 1601 and Jan 1 00:00:00 1970 */
 	#define EPOCH_OFFSET 0x019db1ded53e8000LL
