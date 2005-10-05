@@ -7,7 +7,7 @@
 ! initializes to seed 5489 automatically
 
 IN: crypto
-USING: kernel math namespaces sequences ;
+USING: kernel math namespaces sequences arrays ;
 
 : N 624 ; inline
 : M 397 ; inline
@@ -41,25 +41,19 @@ SYMBOL: mti
 
 : generate-new-mt
     N M - [ dup y over dup M + set-mt-ith ] repeat
-    M 1 - [ dup 227 + dup y over dup M N - + set-mt-ith drop ] repeat
+    M 1- [ dup 227 + dup y over dup M N - + set-mt-ith drop ] repeat
     0 mti set ;
 
-: init ( seed -- )
-    [ N 1- [ drop 0 , ] each ] { } make swap
+: init-random ( seed -- )
+    N zero-array swap
     HEX: ffffffff bitand 0 pick set-nth
     N 1- [ 2dup formula 1+ pick pick 1+ swap set-nth ] repeat
     mt set 0 mti set
     generate-new-mt ;
 
 : genrand ( -- rand )
-    mti get
-    { ! leave mti
-        { [ dup not ] [ drop 5489 init 0 ] }
-        { [ dup N < ] [ ] }
-        { [ t ] [ drop generate-new-mt 0 ] }
-    } cond
-    mt get nth temper
-    mti [ 1+ ] change ;
+    mti get dup N < [ drop generate-new-mt 0 ] unless
+    mt get nth temper mti inc ;
 
 USE: compiler
 USE: test
