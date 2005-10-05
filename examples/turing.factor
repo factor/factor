@@ -13,14 +13,14 @@ SYMBOL: states
 SYMBOL: halt
 
 ! This is a simple program that outputs 5 1's
-[
+{{
     [[ [[ 1 0 ]] << state f 1 1 2 >> ]]
     [[ [[ 2 0 ]] << state f 1 1 3 >> ]]
     [[ [[ 3 0 ]] << state f 1 -1 1 >> ]]
     [[ [[ 1 1 ]] << state f 1 -1 2 >> ]]
     [[ [[ 2 1 ]] << state f 1 -1 3 >> ]]
     [[ [[ 3 1 ]] << state f 1 -1 halt >> ]]
-] states set
+}} states set
 
 ! Current state
 SYMBOL: state
@@ -38,7 +38,7 @@ SYMBOL: position
 SYMBOL: tape
 
 ! Initial tape
-20 zero-vector tape set
+20 0 <repeated> >vector tape set
 
 : sym ( -- sym )
     #! Symbol at head position.
@@ -50,7 +50,7 @@ SYMBOL: tape
 
 : next-state ( -- state )
     #! Look up the next state/symbol/direction triplet.
-    state get sym cons states get assoc ;
+    state get sym cons states get hash ;
 
 : turing-step ( -- )
     #! Do one step of the turing machine.

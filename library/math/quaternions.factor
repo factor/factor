@@ -7,11 +7,11 @@
 USING: arrays kernel math sequences ;
 IN: math-internals
 
-: 2q [ first2 ] 2apply ;
+: 2q [ first2 ] 2apply ; inline
 
-: q*a 2q swapd ** >r * r> - ;
+: q*a 2q swapd ** >r * r> - ; inline
 
-: q*b 2q >r ** swap r> * + ;
+: q*b 2q >r ** swap r> * + ; inline
 
 IN: math
 
@@ -19,14 +19,20 @@ IN: math
     dup length 2 = [
         first2 [ number? ] 2apply and
     ] [
-        2drop f
+        drop f
     ] if ;
 
-: q* ( u v -- u*v ) [ q*a ] 2keep q*b 2array ;
+: q* ( u v -- u*v )
+    #! Multiply quaternions.
+    [ q*a ] 2keep q*b 2array ;
 
-: qconjugate ( u -- u' ) first2 neg >r conjugate r> 2array ;
+: qconjugate ( u -- u' )
+    #! Quaternion conjugate.
+    first2 neg >r conjugate r> 2array ;
 
-: q/ ( u v -- u/v ) [ qconjugate q* ] keep norm-sq v/n ;
+: q/ ( u v -- u/v )
+    #! Divide quaternions.
+    [ qconjugate q* ] keep norm-sq v/n ;
 
 : q*n ( q n -- q )
     #! Note: you will get the wrong result if you try to
@@ -38,6 +44,15 @@ IN: math
 : c>q ( c -- q )
     #! Turn a complex number into a quaternion.
     0 2array ;
+
+: v>q ( v -- q )
+    #! Turn a 3-vector into a quaternion with real part 0.
+    first3 rect> >r 0 swap rect> r> 2array ;
+
+: q>v ( q -- v )
+    #! Get the vector part of a quaternion, discarding the real
+    #! part.
+    first2 >r imaginary r> >rect 3array ;
 
 ! Zero
 : q0 Q{ 0 0 0 0 }Q ;

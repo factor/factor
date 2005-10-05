@@ -20,6 +20,17 @@
 
 </li>
 
+<li>User interface:
+
+<ul>
+
+<li>Added expandable outliners. Used by the inspector, <code>.s</code>, <code>usage.</code>, <code>uses.</code>, <code>vocabs.</code>, and various other words.</li>
+<li>Added word completion to the listener pane; press <code>TAB</code>.</li>
+<li>Added word navigation shortcuts to the listener pane; press <code>C+LEFT</code> and <code>C+RIGHT</code> to move a word at a time, and <code>C+BACKSPACE</code> and <code>C+DELETE</code> to delete the previous and next word, respectively.</li>
+</ul>
+
+</li>
+
 <li>Collections:
 
 <ul>
@@ -33,6 +44,29 @@
 <li>Everything else:
 
 <ul>
+<li>Quaternions added to math library.
+
+Quaternions are represented as pairs of real numbers. Literal syntax is <code>Q{ a b c d }Q</code>, where <code>a</code>, <code>b</code>, <code>c</code> and <code>d</code> are real numbers.
+
+Many quaternion operations can be done using Factor's existing vector algebra words; this follows from the mathematical fact that the quaternions are a 2-dimensional vector space over the complex numbers:
+<ul>
+<li>Addition: <code>v+</code></li>
+<li>Subtraction: <code>v-</code></li>
+<li>Negation: <code>vneg</code></li>
+<li>Norm: <code>norm</code></li>
+<li>Multiplication by a complex number on the left: <code>n*v</code></li>
+</ul>
+A few new words are also needed:
+<ul>
+<li>Convert complex number to quaternion: <code>c&gt;n</code></li>
+<li>Multiply by a complex number on the right: <code>q*n</code></li>
+<li>Quaternion multiplication: <code>q*</code></li>
+<li>Quaternion division: <code>q/</code></li>
+<li>Quaternion conjugate: <code>qconjugate</code></li>
+</ul>
+
+</li>
+
 <li>Easier exception handling. The <code>cleanup ( try cleanup -- )</code> word encapsulates the following idiom:
 <pre>
 [ A ] [ B rethrow ] catch
@@ -55,7 +89,7 @@ However, most uses of <code>catch</code> can be replaced by <code>cleanup</code>
 <li>The distinct <code>t</code> type is gone. Now, the <code>t</code> object is just a symbol.</li>
 <li>A new <code>with-server ( port ident quot -- )</code> combinator takes care of listening on a network socket, logging client connections, spawning client handler threads, and error handling. The quotation is called for each client, in a new scope with the client socket as the default stream.</li>
 <li>New <code>1+</code>, <code>1-</code> words are a bit faster than <code>1 +</code> and <code>1 -</code> since there is one less generic dispatch involved.</li>
-<li>On Windows, FFI errors would raise a signal 11 instead of reporting a nice message</li>
+<li>On Windows, FFI errors would raise a signal 11 instead of reporting a nice message.</li>
 </ul>
 
 <li>Contributed code:

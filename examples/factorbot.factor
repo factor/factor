@@ -66,7 +66,7 @@ M: ping handle-irc ( line -- )
         " " % dup definer word-name %
         " " % dup word-name %
         "stack-effect" word-prop [ " (" % % ")" % ] when*
-    ] make-string ;
+    ] "" make ;
 
 : word-url ( word -- url )
     [
@@ -74,7 +74,7 @@ M: ping handle-irc ( line -- )
         dup word-vocabulary url-encode %
         "&word=" %
         word-name url-encode %
-    ] make-string ;
+    ] "" make ;
 
 : irc-loop ( -- )
     irc-stream get stream-readln
