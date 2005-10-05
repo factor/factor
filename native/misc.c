@@ -60,13 +60,10 @@ void primitive_random_int(void)
 // frees memory allocated by win32 api calls
 char *buffer_to_c_string(char *buffer)
 {
-	int i;
 	int capacity = strlen(buffer);
 	F_STRING *_c_str = allot_string(capacity / CHARS + 1);
 	BYTE *c_str = (BYTE*)(_c_str + 1);
-	for(i = 0; i < capacity; i++)
-		c_str[i] = buffer[i];
-	c_str[capacity] = '\0';
+	strcpy(c_str, buffer);
 	LocalFree(buffer);
 	return (char*)c_str;
 }
