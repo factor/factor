@@ -35,10 +35,13 @@ M: button-up-event handle-event ( event -- )
 M: motion-event handle-event ( event -- )
     motion-event-loc hand move-hand ;
 
+: control-char? ( ch -- ? )
+    "\0\e\r\u0008\u007f" member? ;
+
 M: key-down-event handle-event ( event -- )
     dup keyboard-event>binding
     hand hand-focus handle-gesture [
-        keyboard-event-unicode dup 0 = [
+        keyboard-event-unicode dup control-char? [
             drop
         ] [
             hand hand-focus user-input drop

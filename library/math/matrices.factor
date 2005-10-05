@@ -11,20 +11,12 @@ USING: arrays generic kernel sequences ;
 : n/v ( n v -- v ) [ / ] map-with ;
 : v/n ( v n -- v ) swap [ swap / ] map-with ;
 
-: v+   ( v v -- v ) [ + ]   2map ;
-: v-   ( v v -- v ) [ - ]   2map ;
-: v*   ( v v -- v ) [ * ]   2map ;
-: v/   ( v v -- v ) [ / ]   2map ;
+: v+   ( v v -- v ) [ + ] 2map ;
+: v-   ( v v -- v ) [ - ] 2map ;
+: v*   ( v v -- v ) [ * ] 2map ;
+: v/   ( v v -- v ) [ / ] 2map ;
 : vmax ( v v -- v ) [ max ] 2map ;
 : vmin ( v v -- v ) [ min ] 2map ;
-: vand ( v v -- v ) [ and ] 2map ;
-: vor  ( v v -- v ) [ or ]  2map ;
-: v<   ( v v -- v ) [ < ]   2map ;
-: v<=  ( v v -- v ) [ <= ]  2map ;
-: v>   ( v v -- v ) [ > ]   2map ;
-: v>=  ( v v -- v ) [ >= ]  2map ;
-
-: vbetween? ( v from to -- v ) >r over >r v>= r> r> v<= vand ;
 
 : sum ( v -- n ) 0 [ + ] reduce ;
 : product ( v -- n ) 1 [ * ] reduce ;
@@ -32,29 +24,25 @@ USING: arrays generic kernel sequences ;
 : set-axis ( x y axis -- v )
     2dup v* >r >r drop dup r> v* v- r> v+ ;
 
-: v. ( v v -- x ) 0 [ * + ] 2reduce ;
-: c. ( v v -- x ) 0 [ ** + ] 2reduce ;
+: v. ( v v -- x )
+    #! Real inner product.
+    0 [ * + ] 2reduce ;
+
+: c. ( v v -- x )
+    #! Complex inner product.
+    0 [ ** + ] 2reduce ;
 
 : norm-sq ( v -- n ) 0 [ absq + ] reduce ;
+
+: norm ( vec -- n ) norm-sq sqrt ;
+
+: normalize ( vec -- vec ) dup norm v/n ;
 
 : proj ( u v -- w )
     #! Orthogonal projection of u onto v.
     [ [ v. ] keep norm-sq v/n ] keep n*v ;
 
-: cross-trace ( v1 v2 i1 i2 -- v1 v2 n )
-    pick nth >r pick nth r> * ;
-
-: cross-minor ( v1 v2 i1 i2 -- n )
-    [ cross-trace -rot ] 2keep swap cross-trace 2nip - ;
-
-: cross ( { x1 y1 z1 } { x2 y2 z2 } -- { z1 z2 z3 } )
-    #! Cross product of two 3-dimensional vectors.
-    [ 1 2 cross-minor ] 2keep
-    [ 2 0 cross-minor ] 2keep
-    0 1 cross-minor 3array ;
-
 ! Matrices
-
 : zero-matrix ( m n -- matrix )
     swap [ drop zero-array ] map-with ;
 
@@ -70,18 +58,10 @@ USING: arrays generic kernel sequences ;
 : n/m ( n m -- m ) [ n/v ] map-with ;
 : m/n ( m n -- m ) swap [ swap v/n ] map-with ;
 
-: m+   ( m m -- m ) [ v+ ]   2map ;
-: m-   ( m m -- m ) [ v- ]   2map ;
-: m*   ( m m -- m ) [ v* ]   2map ;
-: m/   ( m m -- m ) [ v/ ]   2map ;
-: mmax ( m m -- m ) [ vmax ] 2map ;
-: mmin ( m m -- m ) [ vmin ] 2map ;
-: mand ( m m -- m ) [ vand ] 2map ;
-: mor  ( m m -- m ) [ vor ]  2map ;
-: m<   ( m m -- m ) [ v< ]   2map ;
-: m<=  ( m m -- m ) [ v<= ]  2map ;
-: m>   ( m m -- m ) [ v> ]   2map ;
-: m>=  ( m m -- m ) [ v>= ]  2map ;
+: m+   ( m m -- m ) [ v+ ] 2map ;
+: m-   ( m m -- m ) [ v- ] 2map ;
+: m*   ( m m -- m ) [ v* ] 2map ;
+: m/   ( m m -- m ) [ v/ ] 2map ;
 
 : v.m ( v m -- v ) flip [ v. ] map-with ;
 : m.v ( m v -- v ) swap [ v. ] map-with ;

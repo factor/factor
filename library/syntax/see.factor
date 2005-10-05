@@ -71,7 +71,6 @@ M: compound (see)
     dup word-def swap see-body ;
 
 : method. ( word [[ class method ]] -- )
-    newline
     \ M: pprint-word
     unswons pprint-word
     swap pprint-word
@@ -80,7 +79,7 @@ M: compound (see)
 
 M: generic (see)
     dup dup "combination" word-prop swap see-body
-    dup methods [ method. ] each-with ;
+    dup methods [ newline method. ] each-with ;
 
 GENERIC: class. ( word -- )
 
@@ -88,6 +87,7 @@ GENERIC: class. ( word -- )
     #! List all methods implemented for this class.
     dup class? [
         dup implementors [
+            newline
             dup in. tuck "methods" word-prop hash* method.
         ] each-with
     ] [
@@ -95,23 +95,26 @@ GENERIC: class. ( word -- )
     ] if ;
 
 M: union class.
+    newline
     \ UNION: pprint-word
     dup pprint-word
-    members pprint-elements pprint-; newline ;
+    members pprint-elements pprint-; ;
 
 M: predicate class.
+    newline
     \ PREDICATE: pprint-word
     dup superclass pprint-word
     dup pprint-word
     <block
     "definition" word-prop pprint-elements
-    pprint-; block; newline ;
+    pprint-; block; ;
 
 M: tuple-class class.
+    newline
     \ TUPLE: pprint-word
     dup pprint-word
     "slot-names" word-prop [ f text ] each
-    pprint-; newline ;
+    pprint-; ;
 
 M: word class. drop ;
 
@@ -119,9 +122,9 @@ M: word class. drop ;
     [
         dup (synopsis)
         dup (see)
-        newline
         dup class.
         methods.
+        newline
     ] with-pprint ;
 
 : (apropos) ( substring -- seq )

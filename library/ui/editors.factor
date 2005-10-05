@@ -130,7 +130,7 @@ C: editor ( text -- )
     rect-dim @{ 0 1 1 }@ v* @{ 1 0 0 }@ v+ ;
 
 M: editor user-input* ( ch editor -- ? )
-    [ insert-char ] with-editor  t ;
+    [ insert-char ] with-editor f ;
 
 M: editor pref-dim ( editor -- dim )
     dup editor-text label-size @{ 1 0 0 }@ v+ ;

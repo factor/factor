@@ -18,3 +18,8 @@ USING: kernel math test ;
 [ t ] [ qk qj q/ qi = ] unit-test
 [ t ] [ qi qk q/ qj = ] unit-test
 [ t ] [ qj qi q/ qk = ] unit-test
+[ t ] [ qi q>v v>q qi = ] unit-test
+[ t ] [ qj q>v v>q qj = ] unit-test
+[ t ] [ qk q>v v>q qk = ] unit-test
+[ t ] [ 1 c>q q1 = ] unit-test
+[ t ] [ i c>q qi = ] unit-test

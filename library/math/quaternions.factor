@@ -2,8 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 
 ! Everybody's favorite non-commutative skew field, the
-! quaternions! Represented as pairs of complex numbers,
-! that is, (a+bi)+(c+di)j.
+! quaternions!
+
+! Quaternions are represented as pairs of complex numbers,
+! using the identity: (a+bi)+(c+di)j = a+bi+cj+dk.
 USING: arrays kernel math sequences ;
 IN: math-internals
 
@@ -15,13 +17,6 @@ IN: math-internals
 
 IN: math
 
-: quaternion? ( seq -- ? )
-    dup length 2 = [
-        first2 [ number? ] 2apply and
-    ] [
-        drop f
-    ] if ;
-
 : q* ( u v -- u*v )
     #! Multiply quaternions.
     [ q*a ] 2keep q*b 2array ;
@@ -30,9 +25,13 @@ IN: math
     #! Quaternion conjugate.
     first2 neg >r conjugate r> 2array ;
 
+: qrecip ( u -- 1/u )
+    #! Quaternion inverse.
+    qconjugate dup norm-sq v/n ;
+
 : q/ ( u v -- u/v )
     #! Divide quaternions.
-    [ qconjugate q* ] keep norm-sq v/n ;
+    qrecip q* ;
 
 : q*n ( q n -- q )
     #! Note: you will get the wrong result if you try to
@@ -54,20 +53,25 @@ IN: math
     #! part.
     first2 >r imaginary r> >rect 3array ;
 
+: cross ( u v -- u*v )
+    #! Cross product of two 3-vectors can be computed using
+    #! quaternion multiplication.
+    [ v>q ] 2apply q* q>v ;
+
 ! Zero
-: q0 Q{ 0 0 0 0 }Q ;
+: q0 @{ 0 0 }@ ;
 
 ! Units
-: q1 Q{ 1 0 0 0 }Q ;
-: qi Q{ 0 1 0 0 }Q ;
-: qj Q{ 0 0 1 0 }Q ;
-: qk Q{ 0 0 0 1 }Q ;
+: q1 @{ 1 0 }@ ;
+: qi @{ #{ 0 1 }# 0 }@ ;
+: qj @{ 0 1 }@ ;
+: qk @{ 0 #{ 0 1 }# }@ ;
 
 ! Euler angles -- see
 ! http://www.mathworks.com/access/helpdesk/help/toolbox/aeroblks/euleranglestoquaternions.html
 
 : (euler) ( theta unit -- q )
-    >r -0.5 * dup cos c>q swap sin r> n*q v- ;
+    >r -0.5 * dup cos c>q swap sin r> n*v v- ;
 
 : euler ( phi theta psi -- q )
     qk (euler) >r qj (euler) >r qi (euler) r> q* r> q* ;

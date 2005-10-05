@@ -15,10 +15,6 @@ M: complex sqrt >polar swap fsqrt swap 2 / polar> ;
 
 M: real sqrt dup 0 < [ neg fsqrt 0 swap rect> ] [ fsqrt ] if ;
 
-: norm ( vec -- n ) norm-sq sqrt ;
-
-: normalize ( vec -- vec ) dup norm v/n ;
-
 GENERIC: ^ ( z w -- z^w ) foldable
 
 : ^mag ( w abs arg -- magnitude )
