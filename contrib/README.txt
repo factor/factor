@@ -29,3 +29,5 @@ library, but is useful enough to ship with the Factor distribution.
 - contrib/dlists.factor -- double-linked-lists (Mackenzie Straight)
 
 - contrib/xml.factor -- XML parser and writer (Daniel Ehrenberg)
+
+- contrib/cairo/ -- cairo bindings (Sampo Vuori)
