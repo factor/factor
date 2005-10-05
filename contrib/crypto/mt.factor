@@ -39,7 +39,6 @@ SYMBOL: mti
     dup 15 shift HEX: efc60000 bitand bitxor
     dup -18 shift bitxor ; inline
 
-USE: io
 : generate-new-mt
     N M - [ dup 2dup >r 1+ r> dup M + set-mt-ith ] repeat
     M 1- [ dup 227 + dup 2dup >r 1+ r> dup M N - + set-mt-ith drop ] repeat
