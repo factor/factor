@@ -40,8 +40,8 @@ SYMBOL: mti
     dup -18 shift bitxor ; inline
 
 : generate-new-mt
-    N M - [ dup over dup M + set-mt-ith ] repeat
-    M 1- [ dup 227 + dup over dup M N - + set-mt-ith drop ] repeat
+    N M - [ dup 2dup M + set-mt-ith ] repeat
+    M 1- [ dup 227 + dup 2dup M N - + set-mt-ith drop ] repeat
     0 mti set ;
 
 : init-random ( seed -- )
