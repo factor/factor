@@ -27,11 +27,11 @@ SYMBOL: mti
 : formula ( mt mti -- mt[mti] )
     dup rot nth dup -30 shift bitxor 1812433253 * + HEX: ffffffff bitand ; inline
 
-: y ( index -- y )
-    dup 1+ mt-nth LO-MASK bitand >r mt-nth HI-MASK bitand r> bitor ; inline
+: y ( i0 i1 -- y )
+    mt-nth LO-MASK bitand >r mt-nth HI-MASK bitand r> bitor ; inline
     
-: set-mt-ith ( index index1 -- )
-    >r dup >r y r> r> mt-nth rot dup odd? A 0 ? swap -1 shift bitxor bitxor swap mt get set-nth ; inline
+: set-mt-ith ( yi0 yi1 mt-set mt-get -- )
+    >r >r y r> r> mt-nth rot dup odd? A 0 ? swap -1 shift bitxor bitxor swap mt get set-nth ; inline
 
 : temper ( y -- yt )
     dup -11 shift bitxor
@@ -39,9 +39,11 @@ SYMBOL: mti
     dup 15 shift HEX: efc60000 bitand bitxor
     dup -18 shift bitxor ; inline
 
+USE: io
 : generate-new-mt
-    N M - [ dup 2dup M + set-mt-ith ] repeat
-    M 1- [ dup 227 + dup 2dup M N - + set-mt-ith drop ] repeat
+    N M - [ dup 2dup >r 1+ r> dup M + set-mt-ith ] repeat
+    M 1- [ dup 227 + dup 2dup >r 1+ r> dup M N - + set-mt-ith drop ] repeat
+    N 1- 0 N 1- M 1- set-mt-ith
     0 mti set ;
 
 : init-random ( seed -- )
@@ -60,6 +62,8 @@ USE: test
 
 : million-genrand 1000000 [ drop genrand drop ] each ;
 : test-genrand \ million-genrand compile [ million-genrand ] time ;
+
+[ 4123659995 ] [ 5489 init-random 9999 [ drop genrand drop ] each genrand millis init-random ] unit-test
 
 ! test-genrand
 ! 5987 ms run / 56 ms GC time
