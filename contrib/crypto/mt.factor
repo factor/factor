@@ -30,8 +30,8 @@ SYMBOL: mti
 : y ( index -- y )
     dup 1+ mt-nth LO-MASK bitand >r mt-nth HI-MASK bitand r> bitor ; inline
     
-: set-mt-ith ( y index index1 -- )
-    mt-nth rot dup odd? A 0 ? swap -1 shift bitxor bitxor swap mt get set-nth ; inline
+: set-mt-ith ( index index1 -- )
+    >r dup >r y r> r> mt-nth rot dup odd? A 0 ? swap -1 shift bitxor bitxor swap mt get set-nth ; inline
 
 : temper ( y -- yt )
     dup -11 shift bitxor
@@ -40,8 +40,8 @@ SYMBOL: mti
     dup -18 shift bitxor ; inline
 
 : generate-new-mt
-    N M - [ dup y over dup M + set-mt-ith ] repeat
-    M 1- [ dup 227 + dup y over dup M N - + set-mt-ith drop ] repeat
+    N M - [ dup over dup M + set-mt-ith ] repeat
+    M 1- [ dup 227 + dup over dup M N - + set-mt-ith drop ] repeat
     0 mti set ;
 
 : init-random ( seed -- )
