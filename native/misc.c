@@ -68,17 +68,22 @@ char *buffer_to_c_string(char *buffer)
 	return (char*)c_str;
 }
 
-char *last_error()
+F_STRING *get_error_message()
+{
+	DWORD id = GetLastError();
+	return from_c_string(error_message(id));
+}
+
+char *error_message(DWORD id)
 {
 	char *buffer;
 	int index;
-	DWORD dw = GetLastError();
 	
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM,
 		NULL,
-		dw,
+		id,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR) &buffer,
 		0, NULL);

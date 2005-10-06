@@ -6,6 +6,7 @@ void primitive_millis(void);
 void primitive_random_int(void);
 #ifdef WIN32
 char *buffer_to_c_string(char *buffer);
-DLLEXPORT char *last_error();
+F_STRING *get_error_message();
+DLLEXPORT char *error_message(DWORD id);
 #endif
 
