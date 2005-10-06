@@ -64,7 +64,7 @@ CONSTANT: WAIT_TIMEOUT 258 ;
     "int" "kernel32" "GetLastError" [ ] alien-invoke ;
 
 : win32-error-message ( id -- string )
-	"char*" f "last_error" [ ] alien-invoke ;
+    "char*" f "error_message" [ "int" ] alien-invoke ;
 
 : win32-throw-error ( -- )
     GetLastError win32-error-message throw ;
