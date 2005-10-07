@@ -167,6 +167,31 @@ BEGIN-ENUM: 0
 	ENUM:	CAIRO_ANTIALIAS_SUBPIXEL
 END-ENUM
 
+! cairo_subpixel_order_t
+BEGIN-ENUM: 0
+	ENUM:	CAIRO_SUBPIXEL_ORDER_DEFAULT
+	ENUM:	CAIRO_SUBPIXEL_ORDER_RGB
+	ENUM:	CAIRO_SUBPIXEL_ORDER_BGR
+	ENUM:	CAIRO_SUBPIXEL_ORDER_VRGB
+	ENUM:	CAIRO_SUBPIXEL_ORDER_VBGR
+END-ENUM
+
+! cairo_hint_style_t
+BEGIN-ENUM: 0
+	ENUM:	CAIRO_HINT_STYLE_DEFAULT
+	ENUM:	CAIRO_HINT_STYLE_NONE
+	ENUM:	CAIRO_HINT_STYLE_SLIGHT
+	ENUM:	CAIRO_HINT_STYLE_MEDIUM
+	ENUM:	CAIRO_HINT_STYLE_FULL
+END-ENUM
+
+! cairo_hint_metrics_t
+BEGIN-ENUM: 0
+	ENUM:	CAIRO_HINT_METRICS_DEFAULT
+	ENUM:	CAIRO_HINT_METRICS_OFF
+	ENUM:	CAIRO_HINT_METRICS_ON
+END-ENUM
+
 : cairo_create ( cairo_surface_t -- cairo_t )
 	"cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ; compiled
 
@@ -221,6 +246,9 @@ END-ENUM
 : cairo_rotate ( cairo_t angle -- )
 	"void" "cairo" "cairo_rotate" [ "cairo_t*" "double" ] alien-invoke ; compiled
 
+
+! cairo path creating functions
+
 : cairo_new_path ( cairo_t -- )
 	"void" "cairo" "cairo_new_path" [ "cairo_t*" ] alien-invoke ; compiled
 
@@ -251,14 +279,63 @@ END-ENUM
 : cairo_rectangle ( cairo_t x y width height -- )
 	"void" "cairo" "cairo_rectangle" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
 
+: cairo_close_path ( cairo_t -- )
+	"void" "cairo" "cairo_close_path" [ "cairo_t*" ] alien-invoke ; compiled
+
+! painting functions
+: cairo_paint ( cairo_t -- )
+	"void" "cairo" "cairo_paint" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_paint_with_alpha ( cairo_t alpha -- )
+	"void" "cairo" "cairo_paint_with_alpha" [ "cairo_t*" "double" ] alien-invoke ; compiled
+
+: cairo_mask ( cairo_t cairo_pattern_t -- )
+	"void" "cairo" "cairo_mask" [ "cairo_t*" "void*" ] alien-invoke ; compiled
+
+: cairo_mask_surface ( cairo_t cairo_pattern_t surface-x surface-y -- )
+	"void" "cairo" "cairo_mask_surface" [ "cairo_t*" "void*" "double" "double" ] alien-invoke ; compiled
+
 : cairo_stroke ( cairo_t -- )
 	"void" "cairo" "cairo_stroke" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_stroke_preserve ( cairo_t -- )
+	"void" "cairo" "cairo_stroke_preserve" [ "cairo_t*" ] alien-invoke ; compiled
 
 : cairo_fill ( cairo_t -- )
 	"void" "cairo" "cairo_fill" [ "cairo_t*" ] alien-invoke ; compiled
 
 : cairo_fill_preserve ( cairo_t -- )
 	"void" "cairo" "cairo_fill_preserve" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_copy_page ( cairo_t -- )
+	"void" "cairo" "cairo_copy_page" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_show_page ( cairo_t -- )
+	"void" "cairo" "cairo_show_page" [ "cairo_t*" ] alien-invoke ; compiled
+
+! insideness testing
+: cairo_in_stroke ( cairo_t x y -- t/f )
+	"int" "cairo" "cairo_in_stroke" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_in_fill ( cairo_t x y -- t/f )
+	"int" "cairo" "cairo_in_fill" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+! rectangular extents
+: cairo_stroke_extents ( cairo_t x1 y1 x2 y2 -- )
+	"void" "cairo" "cairo_stroke_extents" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+: cairo_fill_extents ( cairo_t x1 y1 x2 y2 -- )
+	"void" "cairo" "cairo_fill_extents" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+! clipping
+: cairo_reset_clip ( cairo_t -- )
+	"void" "cairo" "cairo_reset_clip" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_clip ( cairo_t -- )
+	"void" "cairo" "cairo_clip" [ "cairo_t*" ] alien-invoke ; compiled
+
+: cairo_clip_preserve ( cairo_t -- )
+	"void" "cairo" "cairo_clip_preserve" [ "cairo_t*" ] alien-invoke ; compiled
 
 : cairo_set_source ( cairo_t cairo_pattern_t -- )
 	"void" "cairo" "cairo_set_source" [ "cairo_t*" "void*" ] alien-invoke ; compiled
