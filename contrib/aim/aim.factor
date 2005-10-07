@@ -31,14 +31,10 @@ SYMBOL: message
 : client-ssi-flag 1 ; inline
 : client-charset "text/aolrtf; charset=\"us-ascii\"" ; inline
 
-: initialize ( username password -- )
+: initialize-aim ( username password -- )
+    password set username set
     0 65534 random-int seq-num set
-    1 stage-num set
-    password set
-    username set ;
-
-: (send-aim) ( str -- )
-    conn get [ stream-write ] keep stream-flush ;
+    1 stage-num set ;
 
 : (prepend-aim-protocol) ( data -- )
     [
@@ -49,17 +45,11 @@ SYMBOL: message
     seq-num [ 1+ ] change
     swap dup >r length (>short) r> append append ;
 
-: send-aim-print ( data -- )
-    make-packet
-    (prepend-aim-protocol)
-    "Sending: " write dup hexdump
-    (send-aim) ;
+: (send-aim) ( str -- )
+    conn get [ stream-write ] keep stream-flush ;
 
 : send-aim ( data -- )
-    make-packet
-    (prepend-aim-protocol)
-    "Sending: " write dup hexdump
-    (send-aim) ;
+    make-packet (prepend-aim-protocol) (send-aim) ;
 
 : with-aim ( quot -- )
     conn get swap with-unscoped-stream ;
@@ -82,7 +72,7 @@ SYMBOL: message
     head-short drop
     head-int drop ;
 
-: (unhandled-opcode) ( -- )
+: (unhandled-opcode) ( str -- )
     "Family: " write family get >hex "h" append write
     ", opcode: " write opcode get >hex "h" append writeln
     unscoped-stream get contents hexdump ;
@@ -235,32 +225,32 @@ SYMBOL: message
         { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
     } cond ; FAMILY: 4 OPCODE: 14
 
-: (print-op) ( op -- )
+: print-op ( op -- )
     "Op: " write . ;
 
 : (parse-server) ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
 
-: (process-login-chunks) ( stream -- )
+: process-login-chunks ( stream -- )
     unscoped-stream get empty?  [
         head-short
         head-short
         swap
         {
-            ! { [ dup 1 = ] [ (print-op) head-string . ] }
+            ! { [ dup 1 = ] [ print-op head-string . ] }
             { [ dup 5 = ] [ drop head-string (parse-server) ] }
             { [ dup 6 = ] [ drop head-string auth-code set ] }
-            ! { [ dup 8 = ] [ (print-op) head-string . ] }
-            ! { [ t ] [ (print-op) head-string . ] }
+            ! { [ dup 8 = ] [ print-op head-string . ] }
+            ! { [ t ] [ print-op head-string . ] }
             { [ t ] [ drop head-string drop ] }
         } cond
-        (process-login-chunks)
+        process-login-chunks
     ] unless ;
 
 : handle-login-packet ( -- )
-    (process-login-chunks) ; FAMILY: 17 OPCODE: 3
+    process-login-chunks ; FAMILY: 17 OPCODE: 3
 
-: (password-md5) ( password -- md5 )
+: password-md5 ( password -- md5 )
     login-key get
     password get string>md5 append
     client-md5-string append
@@ -276,7 +266,7 @@ SYMBOL: message
         ! password hash chunk
         HEX: 25 >short
         HEX: 10 >short
-        (password-md5) %
+        password-md5 %
 
         HEX: 4c >short
         HEX: 00 >short
@@ -297,7 +287,6 @@ SYMBOL: message
     head-short head-string login-key set
     respond-login-key-packet ; FAMILY: 17 OPCODE: 7
 
-
 : handle-packet ( packet -- )
     <string-reader>
     [
@@ -314,8 +303,6 @@ SYMBOL: message
         ] if
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
-
-
 
 ! Commands
 : send-im ( name message -- )
@@ -391,10 +378,10 @@ SYMBOL: message
         message get %
     ] send-aim ;
 
-: (buddy-list-edit-start)
+: buddy-list-edit-start
     [ HEX: 13 HEX: 11 0 HEX: 11 ] send-aim ;
 
-: (buddy-list-edit-stop)
+: buddy-list-edit-stop
     [ HEX: 13 HEX: 12 0 HEX: 12 ] send-aim ;
     
 
@@ -403,7 +390,7 @@ SYMBOL: message
 
 : add-buddy ( name group -- )
     name set
-    (buddy-list-edit-start)
+    buddy-list-edit-start
     [
         HEX: 13 8 0 HEX: 57e60008
         name get length >short
@@ -413,9 +400,9 @@ SYMBOL: message
         0 >short
         0 >short
     ] send-aim
-    (buddy-list-edit-stop) ;
+    buddy-list-edit-stop ;
 
-! : (modify-buddy)
+! : modify-buddy
     ! [
         ! HEX: 13 9 0 HEX: 56ef0009
         ! group length
@@ -424,7 +411,7 @@ SYMBOL: message
 
 : delete-buddy ( name group -- )
     name set
-    (buddy-list-edit-start)
+    buddy-list-edit-start
     [
         HEX: 13 HEX: a 0 HEX: 60c0000a
         name get length >short
@@ -434,8 +421,8 @@ SYMBOL: message
         0 >short
         0 >short
     ] send-aim
-    ! (modify-buddy)
-    (buddy-list-edit-stop) ;
+    ! modify-buddy
+    buddy-list-edit-stop ;
 
 ! Login
 : send-first-login ( -- )
@@ -566,8 +553,8 @@ SYMBOL: message
     second-server [ handle-loop ] in-thread ;
 
 : run ( username password -- )
-    initialize connect-aim ;
-    ! [ initialize connect-aim ] with-scope ;
+    initialize-aim connect-aim ;
+    ! [ initialize-aim connect-aim ] with-scope ;
 
 ! my aim test account.  you can use it.
 : run-test-account
