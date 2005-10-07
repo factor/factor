@@ -159,24 +159,98 @@ BEGIN-ENUM: 0
 	ENUM:	CAIRO_FORMAT_A1
 END-ENUM
 
+! cairo_antialias_t
+BEGIN-ENUM: 0
+	ENUM:	CAIRO_ANTIALIAS_DEFAULT
+	ENUM:	CAIRO_ANTIALIAS_NONE
+	ENUM:	CAIRO_ANTIALIAS_GRAY
+	ENUM:	CAIRO_ANTIALIAS_SUBPIXEL
+END-ENUM
+
 : cairo_create ( cairo_surface_t -- cairo_t )
 	"cairo_t*" "cairo" "cairo_create" [ "void*" ] alien-invoke ; compiled
 
 : cairo_destroy ( cairo_t -- )
 	"void" "cairo" "cairo_destroy" [ "cairo_t*" ] ; compiled
 
+: cairo_set_operator ( cairo_t cairo_operator_t -- )
+	"void" "cairo" "cairo_set_operator" [ "cairo_t*" "int" ] ; compiled
+
 : cairo_image_surface_create_for_data ( data format width height stride -- cairo_surface_t)
 	"void*" "cairo" "cairo_image_surface_create_for_data" [ "void*" "uint" "int" "int" "int" ] alien-invoke ; compiled
 	
-: cairo_set_source_rgb ( cairo_t r g b -- )
+: cairo_set_source_rgb ( cairo_t red green blue -- )
 	"void" "cairo" "cairo_set_source_rgb" [ "cairo_t*" "double" "double" "double" ] alien-invoke ; compiled
-	
+
+: cairo_set_source_rgba ( cairo_t red green blue alpha -- )
+	"void" "cairo" "cairo_set_source_rgb" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+: cairo_set_source_surface ( cairo_t cairo_surface_t x y -- )
+	"void" "cairo" "cairo_set_source_surface" [ "cairo_t*" "void*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_set_tolerance ( cairo_t tolerance -- )
+	"void" "cairo" "cairo_set_tolerance" [ "cairo_t*" "double" ] alien-invoke ; compiled
+
+: cairo_set_antialias ( cairo_t cairo_antialias_t -- )
+	"void" "cairo" "cairo_set_antialias" [ "cairo_t*" "int" ] alien-invoke ; compiled
+
+: cairo_set_fill_rule ( cairo_t cairo_fill_rule_t -- )
+	"void" "cairo" "cairo_set_fill_rule" [ "cairo_t*" "int" ] alien-invoke ; compiled
+
+: cairo_set_line_width ( cairo_t width -- )
+	"void" "cairo" "cairo_set_line_width" [ "cairo_t*" "double" ] alien-invoke ; compiled
+
+: cairo_set_line_cap ( cairo_t cairo_line_cap_t -- )
+	"void" "cairo" "cairo_set_line_cap" [ "cairo_t*" "int" ] alien-invoke ; compiled
+
+: cairo_set_line_join ( cairo_t cairo_line_join_t -- )
+	"void" "cairo" "cairo_set_line_join" [ "cairo_t*" "int" ] alien-invoke ; compiled
+
+: cairo_set_dash ( cairo_t dashes num_dashes offset -- )
+	"void" "cairo" "cairo_set_dash" [ "cairo_t*" "double" "int" "double" ] alien-invoke ; compiled
+
+: cairo_set_miter_limit ( cairo_t limit -- )
+	"void" "cairo" "cairo_set_miter_limit" [ "cairo_t*" "double" ] alien-invoke ; compiled
+
+: cairo_translate ( cairo_t x y -- )
+	"void" "cairo" "cairo_translate" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_scale ( cairo_t sx sy -- )
+	"void" "cairo" "cairo_scale" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_rotate ( cairo_t angle -- )
+	"void" "cairo" "cairo_rotate" [ "cairo_t*" "double" ] alien-invoke ; compiled
+
+: cairo_new_path ( cairo_t -- )
+	"void" "cairo" "cairo_new_path" [ "cairo_t*" ] alien-invoke ; compiled
+
 : cairo_move_to ( cairo_t x y -- )
 	"void" "cairo" "cairo_move_to" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
 	
 : cairo_line_to ( cairo_t x y -- )
 	"void" "cairo" "cairo_line_to" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_curve_to ( cairo_t x1 y1 x2 y2 x3 y3 -- )
+	"void" "cairo" "cairo_curve_to" [ "cairo_t*" "double" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+: cairo_arc ( cairo_t xc yc radius angle1 angle2 -- )
+	"void" "cairo" "cairo_arc" [ "cairo_t*" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+: cairo_arc_negative ( cairo_t xc yc radius angle1 angle2 -- )
+	"void" "cairo" "cairo_arc_negative" [ "cairo_t*" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
 	
+: cairo_rel_move_to ( cairo_t dx dy -- )
+	"void" "cairo" "cairo_rel_move_to" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+	
+: cairo_rel_line_to ( cairo_t dx dy -- )
+	"void" "cairo" "cairo_rel_line_to" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
+
+: cairo_rel_curve_to ( cairo_t dx1 dy1 dx2 dy2 dx3 dy3 -- )
+	"void" "cairo" "cairo_rel_curve_to" [ "cairo_t*" "double" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
+
+: cairo_rectangle ( cairo_t x y width height -- )
+	"void" "cairo" "cairo_rectangle" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
+
 : cairo_stroke ( cairo_t -- )
 	"void" "cairo" "cairo_stroke" [ "cairo_t*" ] alien-invoke ; compiled
 
@@ -186,9 +260,6 @@ END-ENUM
 : cairo_fill_preserve ( cairo_t -- )
 	"void" "cairo" "cairo_fill_preserve" [ "cairo_t*" ] alien-invoke ; compiled
 
-: cairo_rectangle ( cairo_t x y width height -- )
-	"void" "cairo" "cairo_rectangle" [ "cairo_t*" "double" "double" "double" "double" ] alien-invoke ; compiled
-
 : cairo_set_source ( cairo_t cairo_pattern_t -- )
 	"void" "cairo" "cairo_set_source" [ "cairo_t*" "void*" ] alien-invoke ; compiled
 
@@ -197,9 +268,6 @@ END-ENUM
 
 : cairo_pattern_create_radial ( cx0 cy0 radius0 cx1 cy1 radius1 -- cairo_pattern_t )
 	"void*" "cairo" "cairo_pattern_create_radial" [ "double" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
-
-: cairo_set_source ( cairo_t pattern -- )
-	"void" "cairo" "cairo_set_source" [ "cairo_t*" "void*" ] alien-invoke ; compiled
 
 : cairo_pattern_add_color_stop_rgba ( pattern offset red green blue alpha -- status )
 	"uint" "cairo" "cairo_pattern_add_color_stop_rgba" [ "void*" "double" "double" "double" "double" "double" ] alien-invoke ; compiled
@@ -216,14 +284,6 @@ END-ENUM
 : cairo_set_font_size ( cairo_t scale -- )
 	"void" "cairo" "cairo_set_font_size" [ "cairo_t*" "double" ] alien-invoke ; compiled
 
-: cairo_rotate ( cairo_t angle -- )
-	"void" "cairo" "cairo_rotate" [ "cairo_t*" "double" ] alien-invoke ; compiled
-
-: cairo_translate ( cairo_t x y -- )
-	"void" "cairo" "cairo_translate" [ "cairo_t*" "double" "double" ] alien-invoke ; compiled
-
 : cairo_identity_matrix ( cairo_t -- )
 	"void" "cairo" "cairo_identity_matrix" [ "cairo_t*" ] alien-invoke ; compiled
 
-: cairo_set_line_width ( cairo_t width -- )
-	"void" "cairo" "cairo_set_line_width" [ "cairo_t*" "double" ] alien-invoke ; compiled
