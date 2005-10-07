@@ -14,6 +14,7 @@ SYMBOL: family
 SYMBOL: opcode
 SYMBOL: name
 SYMBOL: message
+SYMBOL: buddy-list
 
 : aim-login-server "login.oscar.aol.com" ; inline
 : icq-login-server "login.icq.com" ; inline
@@ -33,6 +34,7 @@ SYMBOL: message
 
 : initialize-aim ( username password -- )
     password set username set
+    {{ }} clone buddy-list set
     0 65534 random-int seq-num set
     1 stage-num set ;
 
@@ -87,6 +89,20 @@ SYMBOL: message
     "Unhandled family: " write family get >hex "h" append writeln
     unhandled-opcode ;
 
+
+! Events
+: buddy-signon ( name -- )
+    0 swap buddy-list get set-hash ;
+
+: buddy-signoff ( name -- )
+    buddy-list get remove-hash ;
+
+: print-buddy-list
+    buddy-list get hash-keys string-sort [ print ] each ;
+
+
+
+
 : family-table ( -- hash )
     {{ }} ;
 
@@ -117,7 +133,7 @@ SYMBOL: message
             {
                 { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand 1 > [ " is away." ] [ " is online." ] if writeln ] }
                 { [ dup 2 = ] [ drop "2: " write head-short unparse writeln ] }
-                { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln ] }
+                { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln name get buddy-signon ] }
                 { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
                 ! { [ dup 5 = ] [ drop ] }
                 ! { [ dup 6 = ] [ drop name get write ": (6): " write head-short head-short unparse writeln ] }
@@ -142,7 +158,7 @@ SYMBOL: message
         head-short
         head-short head-string <string-reader> [
             {
-                { [ dup 1 = ] [ drop name get write " signed off." writeln ] }
+                { [ dup 1 = ] [ drop name get write " signed off." writeln name get buddy-signoff ] }
                 { [ dup HEX: 1d = ] [ drop ] }
                 { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln ] }
             } cond
