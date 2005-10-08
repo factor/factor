@@ -66,7 +66,7 @@ SYMBOL: slider-changed
     [ slider-page * ] keep slide-by ;
 
 : elevator-click ( elevator -- )
-    dup hand relative >r find-slider r>
+    dup hand get relative >r find-slider r>
     over slider-vector v.
     over screen>slider over slider-value - sgn
     swap slide-by-page ;

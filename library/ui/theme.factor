@@ -61,4 +61,4 @@ USING: gadgets kernel styles ;
         [[ font "Monospaced" ]]
         [[ font-size 12 ]]
         [[ font-style plain ]]
-    }} clone swap set-gadget-paint ;
+    }} add-paint ;

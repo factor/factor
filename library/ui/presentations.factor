@@ -27,15 +27,11 @@ SYMBOL: commands
 : <command-button> ( gadget object -- button )
     [ nip command-menu ] curry <menu-button> ;
 
-: <input-button> ( string -- button )
-    dup <label> swap [ nip pane get replace-input ] curry
-    <roll-button> ;
-
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;
 
 : <styled-label> ( style text -- label )
-    <label> swap dup [ alist>hash ] when over set-gadget-paint ;
+    <label> dup rot dup [ alist>hash ] when add-paint ;
 
 : <presentation> ( style text -- presentation )
     gadget pick assoc dup

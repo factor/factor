@@ -41,8 +41,15 @@ GENERIC: draw-gadget* ( gadget -- )
         2drop f
     ] if ;
 
+: init-paint ( gadget -- gestures )
+    dup gadget-paint
+    [ ] [ {{ }} clone dup rot set-gadget-paint ] ?if ;
+
 : set-paint-prop ( gadget value key -- )
-    pick gadget-paint ?set-hash swap set-gadget-paint ;
+    rot init-paint set-hash ;
+
+: add-paint ( gadget hash -- )
+    dup [ >r init-paint r> hash-update ] [ 2drop ] if ;
 
 : fg ( gadget -- color )
     dup reverse-video paint-prop

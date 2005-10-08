@@ -2,13 +2,12 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
 DEFER: <presentation>
-DEFER: <input-button>
 DEFER: gadget.
 
 IN: gadgets-panes
-USING: arrays gadgets gadgets-editors gadgets-labels
-gadgets-layouts gadgets-scrolling gadgets-theme generic
-hashtables io kernel line-editor lists math namespaces
+USING: arrays gadgets gadgets-buttons gadgets-editors
+gadgets-labels gadgets-layouts gadgets-scrolling gadgets-theme
+generic hashtables io kernel line-editor lists math namespaces
 prettyprint sequences strings styles threads ;
 
 ! A pane is an area that can display text.
@@ -57,6 +56,10 @@ SYMBOL: structured-input
 : replace-input ( string pane -- )
     pane-input set-editor-text ;
 
+: <input-button> ( string -- button )
+    dup <label> swap [ nip pane get replace-input ] curry
+    <roll-button> ;
+
 : print-input ( string pane -- )
     [
         <input-button> dup bold font-style set-paint-prop gadget.
@@ -71,13 +74,13 @@ SYMBOL: structured-input
     dup pane-output clear-incremental pane-current clear-gadget ;
  
 : pane-actions ( line -- )
-    [
+    {{
         [[ [ button-down 1 ] [ pane-input [ click-editor ] when* ] ]]
         [[ [ "RETURN" ] [ pane-return ] ]]
         [[ [ "UP" ] [ pane-input [ [ history-prev ] with-editor ] when* ] ]]
         [[ [ "DOWN" ] [ pane-input [ [ history-next ] with-editor ] when* ] ]]
         [[ [ "CTRL" "l" ] [ pane get pane-clear ] ]]
-    ] swap add-actions ;
+    }} add-actions ;
 
 C: pane ( input? scrolls? -- pane )
     #! You can create output-only panes. If the scrolls flag is

@@ -9,18 +9,14 @@ strings styles threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? hand glass invalid ;
-
-DEFER: <hand>
-DEFER: update-hand
+TUPLE: world running? glass invalid ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
 C: world ( -- world )
     <stack> over set-delegate
-    t over set-gadget-root?
-    dup <hand> over set-world-hand ;
+    t over set-gadget-root? ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;
@@ -46,23 +42,53 @@ C: world ( -- world )
 : draw-world ( world -- )
     [ world-clip clip set draw-gadget ] with-surface ;
 
-DEFER: handle-event
+: move-hand ( loc hand -- )
+    dup hand-gadget parents-down >r
+    2dup set-rect-loc
+    [ >r world get pick-up r> set-hand-gadget ] keep
+    dup hand-gadget parents-down r> hand-gestures ;
 
-: world-step ( -- ? )
+M: motion-event handle-event ( event -- )
+    motion-event-loc hand get move-hand ;
+
+: update-hand ( hand -- )
+    #! Called when a gadget is removed or added.
+    dup rect-loc swap move-hand ;
+
+: stop-world ( -- )
+    f world get set-world-running? ;
+
+: ui-title
+    [ "Factor " % version % " - " % image % ] "" make ;
+
+: start-world ( -- )
+    ui-title dup SDL_WM_SetCaption
+    world get dup relayout t swap set-world-running? ;
+
+: world-step ( -- )
     world get dup world-invalid >r layout-world r>
-    [ dup world-hand update-hand dup draw-world ] when drop ;
+    [ dup hand get update-hand dup draw-world ] when drop ;
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 
-: run-world ( -- )
+: world-loop ( -- )
     #! Keep polling for events until there are no more events in
     #! the queue; then block for the next event.
     next-event [
-        handle-event run-world
+        handle-event world-loop
     ] [
         drop world-step do-timers
-        world get world-running? [ 10 sleep run-world ] when
+        world get world-running? [ 10 sleep world-loop ] when
     ] if ;
 
-: start-world ( -- )
-    world get t over set-world-running? relayout ;
+: run-world ( -- )
+    [ start-world world-loop ] [ stop-world ] cleanup ;
+
+M: quit-event handle-event ( event -- )
+    drop stop-world ;
+
+M: resize-event handle-event ( event -- )
+    dup resize-event-w swap resize-event-h
+    [ 0 3array world get set-gadget-dim ] 2keep
+    0 SDL_HWSURFACE SDL_RESIZABLE bitor init-surface
+    world get relayout ;

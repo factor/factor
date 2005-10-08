@@ -6,7 +6,7 @@ gadgets-labels gadgets-theme generic kernel lists math
 namespaces sequences ;
 
 : retarget-drag ( -- )
-    hand [ rect-loc world get pick-up ] keep
+    hand get [ rect-loc world get pick-up ] keep
     2dup hand-clicked eq? [
         2dup set-hand-clicked dup update-hand
     ] unless 2drop ;
@@ -26,9 +26,9 @@ namespaces sequences ;
     >r dup dup show-glass r>
     menu-loc swap set-rect-loc
     world get world-glass dup menu-actions
-    hand set-hand-clicked ;
+    hand get set-hand-clicked ;
 
-: show-hand-menu ( menu -- ) hand rect-loc show-menu ;
+: show-hand-menu ( menu -- ) hand get rect-loc show-menu ;
 
 : menu-items ( assoc -- pile )
     #! Given an association list mapping labels to quotations.

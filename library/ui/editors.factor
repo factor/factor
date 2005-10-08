@@ -66,7 +66,7 @@ TUPLE: editor line caret ;
     ] with-editor ;
 
 : click-editor ( editor -- )
-    dup hand relative first over set-caret-x request-focus ;
+    dup hand get relative first over set-caret-x request-focus ;
 
 : popup-location ( editor -- loc )
     dup screen-loc swap editor-caret rect-extent nip v+ ;
@@ -91,7 +91,7 @@ TUPLE: editor line caret ;
     }@ cond ;
 
 : editor-actions ( editor -- )
-    [
+    {{
         [[ [ gain-focus ] [ focus-editor ] ]]
         [[ [ lose-focus ] [ unfocus-editor ] ]]
         [[ [ button-down 1 ] [ click-editor ] ]]
@@ -109,7 +109,7 @@ TUPLE: editor line caret ;
         [[ [ "END" ] [ [ << document-elt >> next-elt ] with-editor ] ]]
         [[ [ "CTRL" "k" ] [ [ line-clear ] with-editor ] ]]
         [[ [ "TAB" ] [ do-completion ] ]]
-    ] swap add-actions ;
+    }} add-actions ;
 
 C: editor ( text -- )
     dup gadget-delegate

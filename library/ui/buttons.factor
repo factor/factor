@@ -5,15 +5,15 @@ USING: gadgets gadgets-borders gadgets-layouts gadgets-theme
 generic io kernel lists math namespaces sdl sequences sequences
 styles threads ;
 
-: button-down? ( n -- ? ) hand hand-buttons member? ;
+: button-down? ( n -- ? ) hand get hand-buttons member? ;
 
-: mouse-over? ( gadget -- ? ) hand hand-gadget child? ;
+: mouse-over? ( gadget -- ? ) hand get hand-gadget child? ;
 
 : button-pressed? ( button -- ? )
     #! Return true if the mouse was clicked on the button, and
     #! is currently over the button.
     dup mouse-over? 1 button-down? and
-    [ hand hand-clicked child? ] [ drop f ] if ;
+    [ hand get hand-clicked child? ] [ drop f ] if ;
 
 : button-update ( button -- )
     dup dup mouse-over? rollover set-paint-prop
