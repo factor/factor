@@ -87,7 +87,7 @@ USE: namespaces
         inexact-guess t
     ] if ;
 
-: number-to-guess ( -- n ) 0 100 random-int ;
+: number-to-guess ( -- n ) 100 random-int ;
 
 : numbers-game-loop ( actual -- )
     dup guess-prompt read-number judge-guess [

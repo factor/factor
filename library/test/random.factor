@@ -7,8 +7,8 @@ USE: random
 USE: test
 USE: errors
 
-: check-random-int ( min max -- )
-    2dup random-int -rot between?
+: check-random-int ( max -- )
+    dup random-int 0 rot between?
     [ "Assertion failed" throw ] unless ;
 
-[ ] [ 100 [ -12 674 check-random-int ] times ] unit-test
+[ ] [ 100 [ 674 check-random-int ] times ] unit-test

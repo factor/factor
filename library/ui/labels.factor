@@ -13,8 +13,15 @@ C: label ( text -- label )
 : label-size ( gadget text -- dim )
     >r gadget-font r> size-string 0 3array ;
 
+: set-label-text* ( text label -- )
+    2dup label-text =
+    [ 2dup [ set-label-text ] keep relayout ] unless 2drop ;
+
 M: label pref-dim ( label -- dim )
     dup label-text label-size ;
 
 M: label draw-gadget* ( label -- )
     dup delegate draw-gadget* dup label-text draw-string ;
+
+M: label set-message ( string/f label -- )
+    >r [ "" ] unless* r> set-label-text* ;

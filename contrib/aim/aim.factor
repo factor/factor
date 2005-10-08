@@ -35,7 +35,7 @@ SYMBOL: buddy-list
 : initialize-aim ( username password -- )
     password set username set
     {{ }} clone buddy-list set
-    0 65534 random-int seq-num set
+    65534 random-int seq-num set
     1 stage-num set ;
 
 : (prepend-aim-protocol) ( data -- )

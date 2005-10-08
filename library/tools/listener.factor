@@ -46,12 +46,16 @@ global [ "  " listener-prompt set ] bind
     #! Run a listener loop that executes user input.
     quit-flag get [ quit-flag off ] [ listen listener ] if ;
 
+: credits ( -- )
+    "Slava Pestov:       dup drop swap >r r>" print
+    "Chris Double:       continuation-based web framework" print
+    "Mackenzie Straight: Windows port" print
+    "Doug Coleman:       Mersenne Twister random number generator" print ;
+
 : print-banner ( -- )
     "Factor " write version write
-    " :: http://factor.sourceforge.net :: " write
-    os write
-    "/" write cpu print
-    "(C) 2003, 2005 Slava Pestov, Chris Double, Mackenzie Straight" print ;
+    " on " write os write "/" write cpu write
+    ". For credits, type ``credits''." print ;
 
 IN: shells
 

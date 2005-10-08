@@ -359,7 +359,6 @@ prettyprint ;
 \ room [ [ ] [ integer integer integer integer general-list ] ] "infer-effect" set-word-prop
 \ os-env [ [ string ] [ object ] ] "infer-effect" set-word-prop
 \ millis [ [ ] [ integer ] ] "infer-effect" set-word-prop
-\ (random-int) [ [ ] [ integer ] ] "infer-effect" set-word-prop
 
 \ type [ [ object ] [ fixnum ] ] "infer-effect" set-word-prop
 \ type t "flushable" set-word-prop

@@ -9,14 +9,22 @@ strings styles threads ;
 ! gadgets are contained in. The current world is stored in the
 ! world variable. The invalid slot is a list of gadgets that
 ! need to be layout.
-TUPLE: world running? glass invalid ;
+TUPLE: world running? glass status content invalid ;
 
 : add-layer ( gadget -- )
     world get add-gadget ;
 
 C: world ( -- world )
     <stack> over set-delegate
+    <frame> over 2dup set-world-content add-gadget
     t over set-gadget-root? ;
+
+: set-application ( gadget -- )
+    world get world-content @center frame-add ;
+
+: set-status ( gadget -- )
+    world get 2dup set-world-status
+    world-content @bottom frame-add ;
 
 : add-invalid ( gadget -- )
     world get [ world-invalid cons ] keep set-world-invalid ;
@@ -39,21 +47,37 @@ C: world ( -- world )
 : world-clip ( -- rect )
     @{ 0 0 0 }@ width get height get 0 3array <rect> ;
 
-: draw-world ( world -- )
-    [ world-clip clip set draw-gadget ] with-surface ;
+: draw-world ( -- )
+    world get [ world-clip clip set draw-gadget ] with-surface ;
 
-: move-hand ( loc hand -- )
-    dup hand-gadget parents-down >r
+! Status bar protocol
+GENERIC: set-message ( string/f status -- )
+
+M: f set-message 2drop ;
+
+: show-message ( string/f -- )
+    #! Show a message in the status bar.
+    world get world-status set-message ;
+
+: update-help ( -- )
+    #! Update mouse-over help message.
+    hand get hand-gadget
+    parents-up [ gadget-help ] map [ ] find nip
+    show-message ;
+
+: move-hand ( loc -- )
+    hand get dup hand-gadget parents-down >r
     2dup set-rect-loc
     [ >r world get pick-up r> set-hand-gadget ] keep
-    dup hand-gadget parents-down r> hand-gestures ;
+    dup hand-gadget parents-down r> hand-gestures
+    update-help ;
 
 M: motion-event handle-event ( event -- )
-    motion-event-loc hand get move-hand ;
+    motion-event-loc move-hand ;
 
-: update-hand ( hand -- )
+: update-hand ( -- )
     #! Called when a gadget is removed or added.
-    dup rect-loc swap move-hand ;
+    hand get rect-loc move-hand ;
 
 : stop-world ( -- )
     f world get set-world-running? ;
@@ -66,8 +90,8 @@ M: motion-event handle-event ( event -- )
     world get dup relayout t swap set-world-running? ;
 
 : world-step ( -- )
-    world get dup world-invalid >r layout-world r>
-    [ dup hand get update-hand dup draw-world ] when drop ;
+    world get world-invalid >r layout-world r>
+    [ update-hand draw-world ] when ;
 
 : next-event ( -- event ? ) <event> dup SDL_PollEvent ;
 

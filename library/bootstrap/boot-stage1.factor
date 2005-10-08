@@ -29,7 +29,6 @@ sequences io vectors words ;
         "/library/math/ratio.factor"
         "/library/math/float.factor"
         "/library/math/complex.factor"
-        "/library/math/random.factor"
 
         "/library/collections/sequences.factor"
         "/library/collections/growable.factor"
@@ -52,6 +51,7 @@ sequences io vectors words ;
         "/library/collections/tree-each.factor"
         "/library/collections/queues.factor"
 
+        "/library/math/random.factor"
         "/library/math/constants.factor"
         "/library/math/pow.factor"
         "/library/math/trig-hyp.factor"

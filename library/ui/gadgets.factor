@@ -36,7 +36,7 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 ! actions, and a reference to the gadget's parent.
 TUPLE: gadget
     paint gestures visible? relayout? root?
-    parent children ;
+    parent children help ;
 
 : show-gadget t swap set-gadget-visible? ;
 

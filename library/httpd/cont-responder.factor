@@ -40,7 +40,7 @@ SYMBOL: post-refresh-get?
 
 : get-random-id ( -- id ) 
   #! Generate a random id to use for continuation URL's
-  [ 32 [ 0 9 random-int CHAR: 0 + , ] times ] "" make
+  [ 32 [ 9 random-int CHAR: 0 + , ] times ] "" make
   string>number 36 >base ;
 
 SYMBOL: table

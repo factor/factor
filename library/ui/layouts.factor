@@ -46,17 +46,14 @@ M: gadget layout* drop ;
 : prefer ( gadget -- ) dup pref-dim swap set-gadget-dim ;
 
 : layout ( gadget -- )
-    #! Set the gadget's width and height to its preferred width
-    #! and height. The gadget's children are laid out first.
+    #! Position the children of the gadget inside the gadget.
     #! Note that nothing is done if the gadget does not need to
     #! be laid out.
     dup gadget-relayout? [
         f over set-gadget-relayout?
         dup layout*
-        gadget-children [ layout ] each
-    ] [
-        drop
-    ] if ;
+        dup gadget-children [ layout ] each
+    ] when drop ;
 
 TUPLE: pack align fill gap vector ;
 

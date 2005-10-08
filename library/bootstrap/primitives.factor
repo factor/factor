@@ -137,7 +137,6 @@ vocabularies get [ "syntax" set [ reveal ] each ] bind
     { "room" "memory"                       }
     { "os-env" "kernel"                     }
     { "millis" "kernel"                     }
-    { "(random-int)" "math"                 }
     { "type" "kernel"                       }
     { "tag" "kernel-internals"              }
     { "cwd" "io"                            }

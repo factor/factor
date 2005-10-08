@@ -5,6 +5,10 @@ USING: errors generic kernel math sequences sequences-internals ;
 
 UNION: integer fixnum bignum ;
 
+: even? ( n -- ? ) 1 bitand 0 = ;
+
+: odd? ( n -- ? ) 1 bitand 1 = ;
+
 : (gcd) ( b a y x -- a d )
     dup 0 number= [
         drop nip

@@ -105,7 +105,7 @@ END-STRUCT
 ! UpdateRects, UpdateRect
 
 : SDL_Flip ( surface -- )
-    "bool" "sdl" "SDL_Flip" [ "surface*" ] alien-invoke ;
+    "void" "sdl" "SDL_Flip" [ "surface*" ] alien-invoke ;
 
 ! SDL_SetGamma: float types
 

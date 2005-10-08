@@ -139,7 +139,7 @@ unit-test
 [ t ] [
     100 [
         drop
-        1000 [ drop 0 1000 random-int ] map number-sort [ <= ] monotonic?
+        1000 [ drop 1000 random-int ] map number-sort [ <= ] monotonic?
     ] all?
 ] unit-test
 

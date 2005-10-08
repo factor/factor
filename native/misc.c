@@ -47,15 +47,6 @@ void primitive_millis(void)
 	dpush(tag_bignum(s48_long_long_to_bignum(current_millis())));
 }
 
-void primitive_random_int(void)
-{
-	maybe_gc(0);
-	dpush(tag_bignum(s48_long_to_bignum(rand())));
-}
-
-
-
-
 #ifdef WIN32
 // frees memory allocated by win32 api calls
 char *buffer_to_c_string(char *buffer)

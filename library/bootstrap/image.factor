@@ -27,10 +27,7 @@ SYMBOL: 64-bits
 : emit ( cell -- ) image get push ;
 
 : d>w/w ( d -- w w )
-    #! I cannot use bignum literals here because of bootstrap
-    #! deficencies.
-    dup 1 32 shift 1- bitand
-    swap -32 shift 1 32 shift 1- bitand ;
+    dup HEX: ffffffff bitand swap -32 shift HEX: ffffffff bitand ;
 
 : emit-64 ( cell -- )
     64-bits get [
@@ -112,15 +109,32 @@ M: fixnum ' ( n -- tagged ) fixnum-tag immediate ;
 
 ( Bignums )
 
+: bignum-bits cell 8 * 2 - ;
+
+: bignum-radix bignum-bits 1 swap shift 1- ;
+
+: (bignum>seq) ( n -- )
+    dup 0 = [
+        drop
+    ] [
+        dup bignum-radix bitand ,
+        bignum-bits neg shift (bignum>seq)
+    ] if ;
+
+: bignum>seq ( n -- seq )
+    #! n is positive or zero.
+    [ (bignum>seq) ] { } make ;
+
+: emit-bignum ( n -- )
+    [ 0 < 1 0 ? ] keep abs bignum>seq
+    dup length 1+ emit-fixnum
+    swap emit emit-seq ;
+
 M: bignum ' ( bignum -- tagged )
     #! This can only emit 0, -1 and 1.
     bignum-tag here-as >r
     bignum-tag >header emit
-    {{
-        [[ 0  [ 1 0   ] ]]
-        [[ -1 [ 2 1 1 ] ]]
-        [[ 1  [ 2 0 1 ] ]]
-    }} hash unswons emit-fixnum emit-seq align-here r> ;
+    emit-bignum align-here r> ;
 
 ( Floats )
 

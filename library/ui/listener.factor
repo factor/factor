@@ -62,9 +62,14 @@ C: display ( -- display )
     <display> dup callstack-display set
     1/2 <x-splitter> ;
 
+: <status-bar> ( -- gadget )
+    "" <label> dup solid-interior
+    dup t reverse-video set-paint-prop ;
+
 : listener-application ( -- )
     t t <pane> dup pane global set-hash
     <scroller> <stack-display>
-    2/3 <y-splitter> add-layer
+    2/3 <y-splitter> set-application
+    <status-bar> set-status
     [ clear listener-thread ] in-thread
     pane get request-focus ;

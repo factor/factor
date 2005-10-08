@@ -21,6 +21,12 @@ sequences strings styles ;
         [ *int ] 2apply
     ] if ;
 
+: gadget-font ( gadget -- font )
+    [ font paint-prop ] keep
+    [ font-style paint-prop ] keep
+    [ font-size paint-prop ] keep
+    >r lookup-font r> drop ;
+
 : draw-string ( gadget text -- )
     filter-nulls dup empty? [
         2drop

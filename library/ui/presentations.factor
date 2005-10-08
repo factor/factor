@@ -25,7 +25,8 @@ SYMBOL: commands
     <menu> ;
 
 : <command-button> ( gadget object -- button )
-    [ nip command-menu ] curry <menu-button> ;
+    [ [ nip command-menu ] curry <menu-button> ] keep
+    summary over set-gadget-help ;
 
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;
