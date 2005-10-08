@@ -137,10 +137,14 @@ M: gradient draw-interior ( gadget gradient -- )
 ! Bevel pen
 TUPLE: bevel width ;
 
-: x1/x2/y1 surface get pick pick >r first2 r> first swap ;
-: x1/x2/y2 surface get pick pick >r first r> first2 ;
-: x1/y1/y2 surface get pick pick >r first2 r> second ;
-: x2/y1/y2 surface get pick pick >r second r> first2 swapd ;
+: x1/x2/y1 ( vector vector -- surface n n n )
+    surface get -rot >r first2 r> first swap ;
+: x1/x2/y2 ( vector vector -- surface n n n )
+    surface get -rot >r first r> first2 ;
+: x1/y1/y2 ( vector vector -- surface n n n )
+    surface get -rot >r first2 r> second ;
+: x2/y1/y2 ( vector vector -- surface n n n )
+    surface get -rot >r second r> first2 swapd ;
 
 SYMBOL: bevel-1
 SYMBOL: bevel-2
@@ -150,11 +154,10 @@ SYMBOL: bevel-2
     r> [ swap ] when ? paint-prop rgb ;
 
 : draw-bevel ( v1 v2 gadget -- )
-    [ >r x1/x2/y1 r> f bevel-color hlineColor ] keep
-    [ >r x1/x2/y2 r> t bevel-color hlineColor ] keep
-    [ >r x1/y1/y2 r> f bevel-color vlineColor ] keep
-    [ >r x2/y1/y2 r> t bevel-color vlineColor ] keep
-    3drop ;
+    [ >r x1/x2/y1 r> f bevel-color hlineColor ] 3keep
+    [ >r x1/x2/y2 r> t bevel-color hlineColor ] 3keep
+    [ >r x1/y1/y2 r> f bevel-color vlineColor ] 3keep
+    >r x2/y1/y2 r> t bevel-color vlineColor ;
 
 M: bevel draw-boundary ( gadget boundary -- )
     #! Ugly code.
