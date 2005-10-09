@@ -176,9 +176,9 @@ M: gadget draw-gadget* ( gadget -- )
 TUPLE: polygon points ;
 
 : >short-array ( seq -- short-array )
-    dup length <short-array> over length [
-        [ tuck >r >r swap nth r> r> swap set-short-nth ] 3keep
-    ] repeat nip ;
+    dup length dup <short-array> -rot [
+        pick set-short-nth
+    ] 2each ;
 
 : polygon-x/y ( gadget polygon -- vx vy n )
     polygon-points [
