@@ -84,7 +84,7 @@ SYMBOL: unscoped-stack
     swap dup unscoped-stream set unscoped-stack get push ;
 
 : set-previous-scope
-    ! unscoped-stream get contents 
+    ! unscoped-stream get contents .
     ! [
         ! "UNREAD BYTES" writeln
         ! hexdump

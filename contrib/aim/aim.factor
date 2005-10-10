@@ -75,8 +75,8 @@ SYMBOL: buddy-list
     head-int drop ;
 
 : (unhandled-opcode) ( str -- )
-    "Family: " write family get >hex "h" append write
-    ", opcode: " write opcode get >hex "h" append writeln
+    "Family: " write family get unparse write
+    ", opcode: " write opcode get unparse writeln
     unscoped-stream get contents hexdump ;
 
 : unhandled-opcode ( -- )
@@ -86,7 +86,7 @@ SYMBOL: buddy-list
     "Incomplete handling: " write (unhandled-opcode) ;
 
 : unhandled-family-opcode ( -- )
-    "Unhandled family: " write family get >hex "h" append writeln
+    "Unhandled family: " write family get unparse writeln
     unhandled-opcode ;
 
 
@@ -107,21 +107,69 @@ SYMBOL: buddy-list
     {{ }} ;
 
 : FAMILY: ( -- fam# )
-    ! "FAMILY:"
-    scan hex> swons dup car family-table hash dup [
+    scan 10 base> swons dup car family-table hash dup [
         drop
     ] [
-        ! "NEW FAMILY, creating table" print
         drop {{ }} clone over car family-table set-hash
     ] if ; parsing
 
 : OPCODE: ( fam# -- )
-    ! "OPCODE:" 
-    car family-table hash word scan hex> rot set-hash f ; parsing
+    car family-table hash word scan 10 base> rot set-hash f ; parsing
+
+
+
+: (handle-reply-info)
+    head-byte head-string name set
+    "Warning: " write head-short unparse writeln
+    head-short dup unparse print
+    [
+        head-short
+        head-short head-string <string-reader> [
+            {
+                ! { [ 1 = ] [ drop head-short drop ] }
+                ! { [ 3 = ] [ drop ] }
+                ! { [ 5 = ] [ drop ] }
+                ! { [ 10 = ] [ drop ] }
+                ! { [ 13 = ] [ drop ] }
+                ! { [ 15 = ] [ drop ] }
+                ! { [ 29 = ] [ drop ] }
+                ! { [ 30 = ] [ drop ] }
+                ! { [ 34 = ] [ drop ] }
+                { [ t ] [ "  Unhandled tlv 1-15: " write unparse writeln unscoped-stream get contents hexdump ] }
+            } cond
+        ] with-unscoped-stream
+    ] repeat ;
+
+! : handle-reply-info
+    ! "HANDLE REPLY INFO" print
+    ! 4 [ head-short drop ] repeat
+        ! (handle-reply-info)
+    ! ; FAMILY: 1 OPCODE: 15
+
+    ! unscoped-stream get empty? [
+    ! ] unless ; FAMILY: 1 OPCODE: 15
+
+
 
 ! : handle-away-message
     ! head-byte head-string name set
-    ! name get write "'s away message" writeln ;
+    ! name get write "'s away message: " write
+
+    ! ; FAMILY: 2 OPCODE: 6
+
+
+: handle-capabilities
+    unscoped-stream get empty? [
+        head-long unparse write " " write head-long unparse writeln
+        handle-capabilities
+    ] unless ;
+
+: handle-29
+    "(29)" print
+    head-short drop
+    head-byte drop
+    head-byte head-string drop
+    unscoped-stream get empty? [ handle-29 ] unless ;
 
 : handle-buddy-status
     head-byte head-string name set
@@ -132,23 +180,20 @@ SYMBOL: buddy-list
         head-short head-string <string-reader> [
             {
                 { [ dup 1 = ] [ drop name get write head-short HEX: 20 bitand 1 > [ " is away." ] [ " is online." ] if writeln ] }
-                { [ dup 2 = ] [ drop "2: " write head-short unparse writeln ] }
+                { [ dup 2 = ] [ drop "Member since: " write head-short unparse writeln ] }
                 { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln name get buddy-signon ] }
                 { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
-                ! { [ dup 5 = ] [ drop ] }
-                ! { [ dup 6 = ] [ drop name get write ": (6): " write head-short head-short unparse writeln ] }
-                ! { [ dup HEX: a = ] [ drop ] }
-                ! { [ dup HEX: c = ] [ drop ] }
-                ! { [ dup HEX: d = ] [ drop ] }
-                ! { [ dup HEX: e = ] [ drop ] }
-                { [ dup HEX: f = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
-                ! { [ dup HEX: 19 = ] [ drop ] }
-                ! { [ dup HEX: 1b = ] [ drop ] }
-                ! { [ dup HEX: 1d = ] [ drop ] }
+                { [ dup 6 = ] [ drop name get write ": (6): " write head-short unparse write " " write head-short unparse writeln ] }
+                ! { [ dup 10 = ] [ drop ] } ! external ip
+                ! { [ dup 12 = ] [ drop ] } ! same as CLI_SETSTATUS
+                { [ dup 13 = ] [ drop "Capabilities:" print handle-capabilities  ] }
+                { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
+                { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
+                { [ dup 29 = ] [ drop handle-29 ] }
                 { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ; FAMILY: 03 OPCODE: 0b
+    ] repeat ; FAMILY: 3 OPCODE: 11
 
 : handle-buddy-signoff ( -- )
     head-byte head-string name set
@@ -160,10 +205,10 @@ SYMBOL: buddy-list
             {
                 { [ dup 1 = ] [ drop name get write " signed off." writeln name get buddy-signoff ] }
                 { [ dup HEX: 1d = ] [ drop ] }
-                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln ] }
+                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ; FAMILY: 03 OPCODE: 0C
+    ] repeat ; FAMILY: 3 OPCODE: 12
 
 : (drop-family-4h-header)
     head-short drop
@@ -184,7 +229,7 @@ SYMBOL: buddy-list
             {
                 { [ dup 1 = ] [ drop (parse-incoming-message-text) writeln ] }
                 { [ dup 5 = ] [ drop ] }
-                { [ t ] [ "Unknown frag: " write unparse writeln ] }
+                { [ t ] [ "Unknown frag: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
         (parse-incoming-message-tlv2)
@@ -199,7 +244,7 @@ SYMBOL: buddy-list
                 { [ dup 2 = ] [ drop (parse-incoming-message-tlv2) ] }
                 { [ dup 11 = ] [ 2drop ] }
                 { [ dup 13 = ] [ drop ] }
-                { [ t ] [ "Unhandled chunk: " write unparse writeln ] }
+                { [ t ] [ "Unhandled chunk: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
         (parse-incoming-message-chunks)
@@ -216,7 +261,7 @@ SYMBOL: buddy-list
                 { [ dup 3 = ] [ drop ] }
                 { [ dup 15 = ] [ drop ] }
                 { [ dup 29 = ] [ drop ] }
-                { [ t ] [ "Unknown tlv: " write unparse writeln ] }
+                { [ t ] [ "Unknown tlv: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
     ] repeat ;
@@ -239,7 +284,7 @@ SYMBOL: buddy-list
         { [ dup 1 = ] [ drop " has entered text." writeln ] }
         { [ dup 2 = ] [ drop " is typing..." writeln ] }
         { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
-    } cond ; FAMILY: 4 OPCODE: 14
+    } cond ; FAMILY: 4 OPCODE: 20
 
 : print-op ( op -- )
     "Op: " write . ;
@@ -264,7 +309,7 @@ SYMBOL: buddy-list
     ] unless ;
 
 : handle-login-packet ( -- )
-    process-login-chunks ; FAMILY: 17 OPCODE: 3
+    process-login-chunks ; FAMILY: 23 OPCODE: 3
 
 : password-md5 ( password -- md5 )
     login-key get
@@ -298,10 +343,9 @@ SYMBOL: buddy-list
         HEX: 4a >short HEX: 01 >short client-ssi-flag >byte
     ] send-aim ;
 
-
 : handle-login-key-packet ( -- )
     head-short head-string login-key set
-    respond-login-key-packet ; FAMILY: 17 OPCODE: 7
+    respond-login-key-packet ; FAMILY: 23 OPCODE: 7
 
 : handle-packet ( packet -- )
     <string-reader>
@@ -319,6 +363,9 @@ SYMBOL: buddy-list
         ] if
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
+
+
+
 
 ! Commands
 : send-im ( name message -- )
@@ -439,6 +486,9 @@ SYMBOL: buddy-list
     ] send-aim
     ! modify-buddy
     buddy-list-edit-stop ;
+
+
+
 
 ! Login
 : send-first-login ( -- )
