@@ -39,6 +39,11 @@
 <li>Some new sequence words that do not bounds check: <code>nth-unsafe</code> and <code>set-nth-unsafe</code>. These should only be used in special circumstances, such as inner loops (<code>each</code>, <code>map</code> and so on use them).</li>
 <li>New <code>replace-slice ( new from to seq -- seq )</code> word replaces a slice of a sequence with another sequence.</li>
 <li>Hashtables did not obey the rule that equal objects must have equal hashcodes, so using hashtables as hashtable keys did not work.</li>
+<li>New <code>mismatch ( seq seq -- i )</code> word returns first index where two sequences
+differ, or -1 if they have equal elements.</li>
+<li>New <code>drop-prefix ( seq seq -- seq seq )</code> word returns a pair of
+sequences which have the same elements as the two input sequences, with the common
+prefix removed.</li>
 </li>
 
 <li>Everything else:
