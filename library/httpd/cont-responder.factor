@@ -207,6 +207,12 @@ SYMBOL: callback-cc
     "\nContent-Length: 0\nContent-Type: text/plain\n\n" %
   ] "" make call-exit-continuation ;
 
+: forward-to-id ( id -- )
+  #! When executed inside a 'show' call, this will force a
+  #! HTTP 302 to occur to instruct the browser to forward to
+  #! the request URL.
+  >r "request" get r> id>url append forward-to-url ;
+
 : redirect-to-here ( -- )
   #! Force a redirect to the client browser so that the browser
   #! goes to the current point in the code. This forces an URL
@@ -217,8 +223,7 @@ SYMBOL: callback-cc
   #! known as the 'post-refresh-get' pattern.
   post-refresh-get? get [
     [ 
-      expirable register-continuation 
-      id>url forward-to-url
+      expirable register-continuation forward-to-id
     ] callcc1 drop 
   ] [
     t post-refresh-get? set
