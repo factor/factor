@@ -75,6 +75,7 @@ SYMBOL: unscoped-stack
     ] "" make write ;
 
 : hexdump ( str -- )
+! drop ;
     dup length (print-length) (print-bytes) ;
 
 
@@ -167,4 +168,6 @@ SYMBOL: unscoped-stack
 : head-string ( n -- str )
     unscoped-stream get stream-read >string ;
 
+! : head-cstring ( -- str )
+	! head-byte ] 
 

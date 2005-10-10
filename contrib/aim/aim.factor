@@ -62,8 +62,8 @@ SYMBOL: buddy-list
         head-byte drop
         head-short drop
         head-short head-string
-    ] with-aim 
-    "Received: " write dup hexdump ;
+    ] with-aim ;
+    ! "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
     4vector { (>short) (>short) (>short) (>int) } papply % ;
@@ -98,7 +98,7 @@ SYMBOL: buddy-list
     buddy-list get remove-hash ;
 
 : print-buddy-list
-    buddy-list get hash-keys string-sort [ print ] each ;
+    [ buddy-list get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
 
 
 
@@ -140,6 +140,26 @@ SYMBOL: buddy-list
         ] with-unscoped-stream
     ] repeat ;
 
+: (handle-supported-families)
+	unscoped-stream get empty? [
+		head-short .
+		(handle-supported-families)
+	] unless ;
+
+: handle-supported-families
+	"Families: " print
+	(handle-supported-families) ; FAMILY: 1 OPCODE: 3
+
+: handle-
+	; FAMILY: 1 OPCODE: 7
+: handle-
+	; FAMILY: 1 OPCODE: 15
+: handle-
+	; FAMILY: 1 OPCODE: 19
+: handle-
+	; FAMILY: 1 OPCODE: 24
+
+
 ! : handle-reply-info
     ! "HANDLE REPLY INFO" print
     ! 4 [ head-short drop ] repeat
@@ -149,7 +169,12 @@ SYMBOL: buddy-list
     ! unscoped-stream get empty? [
     ! ] unless ; FAMILY: 1 OPCODE: 15
 
+: handle-2-1
+	"2-1: " write head-short unparse writeln 
+	; FAMILY: 2 OPCODE: 1
 
+! : handle-
+	! ; FAMILY: 2 OPCODE: 3
 
 ! : handle-away-message
     ! head-byte head-string name set
@@ -210,7 +235,7 @@ SYMBOL: buddy-list
         ] with-unscoped-stream
     ] repeat ; FAMILY: 3 OPCODE: 12
 
-: (drop-family-4h-header)
+: drop-family-4h-header
     head-short drop
     head-short drop
     head-short drop
@@ -267,15 +292,22 @@ SYMBOL: buddy-list
     ] repeat ;
 
 : handle-incoming-message ( -- )
-    (drop-family-4h-header)
+    drop-family-4h-header
     head-short drop ! channel
-    head-byte head-string "Incoming msg from " write write ": " write ! from name
+    head-byte head-string "Incoming msg from " write write ": " write
     head-short drop ! warning-level
     head-short (parse-incoming-message-tlv)
     (parse-incoming-message-chunks) ; FAMILY: 4 OPCODE: 7
 
+! : handle-4-12
+	! head-short 2 / [ head-short drop ] repeat
+	! head-cstring drop
+	! head-short drop
+	! head-byte head-string
+	! ; FAMILY: 4 OPCODE: 12
+
 : handle-typing-message ( -- )
-    (drop-family-4h-header)
+    drop-family-4h-header
     head-short drop
     head-byte head-string write
     head-short
@@ -285,6 +317,10 @@ SYMBOL: buddy-list
         { [ dup 2 = ] [ drop " is typing..." writeln ] }
         { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
     } cond ; FAMILY: 4 OPCODE: 20
+
+
+! : handle-
+	! ; FAMILY: 19 OPCODE: 3
 
 : print-op ( op -- )
     "Op: " write . ;
