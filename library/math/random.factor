@@ -49,16 +49,20 @@ IN: math
 
 : init-random ( seed -- )
     #! Initialize the random number generator with a new seed.
-    mt-n zero-array swap
-    HEX: ffffffff bitand 0 pick set-nth
-    mt-n 1- [ 2dup mt-formula 1+ pick pick 1+ swap set-nth ] repeat
-    mt set 0 mti set
-    generate-mt ;
+    global [
+        mt-n zero-array swap
+        HEX: ffffffff bitand 0 pick set-nth
+        mt-n 1- [ 2dup mt-formula 1+ pick pick 1+ swap set-nth ] repeat
+        mt set 0 mti set
+        generate-mt
+    ] bind ;
 
 : (random-int) ( -- rand )
     #! Generate a random integer between 0 and 2^32-1 inclusive.
-    mti get dup mt-n < [ drop generate-mt 0 ] unless
-    mt-nth mt-temper mti inc ;
+    global [
+        mti get dup mt-n < [ drop generate-mt 0 ] unless
+        mt-nth mt-temper mti inc
+    ] bind ;
 
 : random-int ( n -- rand )
     #! Generate a random integer between 0 and n-1 inclusive.
