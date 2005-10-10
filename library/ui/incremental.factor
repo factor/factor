@@ -15,8 +15,8 @@ USING: gadgets generic io kernel math namespaces ;
 TUPLE: incremental cursor ;
 
 C: incremental ( pack -- incremental )
-    [ set-delegate ] keep
-    @{ 0 0 0 }@ over set-incremental-cursor ;
+    [ set-gadget-delegate ] keep
+    dup delegate pref-dim over set-incremental-cursor ;
 
 M: incremental pref-dim ( incremental -- dim )
     dup gadget-relayout? [

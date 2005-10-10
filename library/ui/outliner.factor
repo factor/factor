@@ -25,7 +25,7 @@ DEFER: <expand-button>
 
 : <expand-arrow> ( ? -- gadget )
     arrow-right arrow-down ? <polygon-gadget>
-    dup icon-theme empty-border ;
+    dup icon-theme <border> ;
 
 : <expand-button> ( ? -- gadget )
     #! If true, the button expands, otherwise it collapses.
@@ -35,7 +35,7 @@ DEFER: <expand-button>
 
 C: outliner ( gadget quot -- gadget )
     #! The quotation generates child gadgets.
-    dup frame-delegate
+    dup delegate>frame
     [ set-outliner-quot ] keep
     [ >r 1array make-shelf r> @top frame-add ] keep
     f over set-outliner-expanded? ;

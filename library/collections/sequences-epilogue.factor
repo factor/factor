@@ -135,12 +135,19 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
 
 : all-eq? ( seq -- ? ) [ eq? ] monotonic? ;
 
+: mismatch ( seq1 seq2 -- i )
+    #! Return the first index where the two sequences differ.
+    2dup min-length
+    [ >r 2dup r> 2nth-unsafe = not ] find
+    swap >r 3drop r> ; flushable
+
 ! Lexicographic comparison
 : lexi ( s1 s2 -- n )
     #! Lexicographically compare two sequences of numbers
     #! (usually strings). Negative if s1<s2, zero if s1=s2,
     #! positive if s1>s2.
-    0 pick pick min-length (lexi) ; flushable
+    2dup mismatch dup -1 = [ 3drop 0 ] [ 2nth-unsafe - ] if ;
+    flushable
 
 : flip ( seq -- seq )
     #! An example illustrates this word best:

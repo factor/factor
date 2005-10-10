@@ -11,18 +11,13 @@ USING: gadgets kernel styles ;
 
 : bevel-theme ( gadget -- )
     dup solid-interior
+    dup @{ 216 216 216 }@ background set-paint-prop
     << bevel f 2 >> boundary set-paint-prop ;
 
 : editor-theme ( editor -- )
     bold font-style set-paint-prop ;
 
-: button-theme ( button -- )
-    dup bevel-theme
-    dup @{ 216 216 216 }@ background set-paint-prop
-    f reverse-video set-paint-prop ;
-
 : roll-button-theme ( button -- )
-    dup f reverse-video set-paint-prop
     dup <rollover-only> interior set-paint-prop
     <rollover-only> boundary set-paint-prop ;
 

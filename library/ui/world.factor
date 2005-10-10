@@ -62,15 +62,21 @@ M: f set-message 2drop ;
 : update-help ( -- )
     #! Update mouse-over help message.
     hand get hand-gadget
-    parents-up [ gadget-help ] map [ ] find nip
+    parents [ gadget-help ] map [ ] find nip
     show-message ;
 
+: under-hand ( -- seq )
+    #! A sequence whose first element is the world and last is
+    #! the current gadget, with all parents in between.
+    hand get hand-gadget parents reverse-slice ;
+
+: hand-grab ( -- gadget )
+    hand get rect-loc world get pick-up ;
+
 : move-hand ( loc -- )
-    hand get dup hand-gadget parents-down >r
-    2dup set-rect-loc
-    [ >r world get pick-up r> set-hand-gadget ] keep
-    dup hand-gadget parents-down r> hand-gestures
-    update-help ;
+    under-hand >r hand get set-rect-loc
+    hand-grab hand get set-hand-gadget
+    under-hand r> hand-gestures update-help ;
 
 M: motion-event handle-event ( event -- )
     motion-event-loc move-hand ;

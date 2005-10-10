@@ -35,28 +35,24 @@ namespaces sequences vectors ;
     #! Add all gadgets in a sequence to a parent gadget.
     swap [ over (add-gadget) ] each relayout ;
 
-: (parents-down) ( list gadget -- list )
-    [ [ swons ] keep gadget-parent (parents-down) ] when* ;
+: (parents) ( gadget vector -- )
+    over
+    [ 2dup push >r gadget-parent r> (parents) ] [ 2drop ] if ;
 
-: parents-down ( gadget -- list )
-    #! A list of all parents of the gadget, the last element
-    #! is the gadget itself.
-    f swap (parents-down) ;
-
-: parents-up ( gadget -- list )
+: parents ( gadget -- vector )
     #! A list of all parents of the gadget, the first element
     #! is the gadget itself.
-    dup [ dup gadget-parent parents-up cons ] when ;
+    { } clone [ (parents) ] keep ;
 
 : each-parent ( gadget quot -- ? )
-    >r parents-up r> all? ; inline
+    >r parents r> all? ; inline
 
 : find-parent ( gadget quot -- ? )
-    >r parents-up r> find nip ; inline
+    >r parents r> find nip ; inline
 
 : screen-loc ( gadget -- point )
     #! The position of the gadget on the screen.
-    parents-up @{ 0 0 0 }@ [ rect-loc v+ ] reduce ;
+    parents @{ 0 0 0 }@ [ rect-loc v+ ] reduce ;
 
 : gadget-point ( gadget vector -- point )
     #! @{ 0 0 0 }@ - top left corner
@@ -66,7 +62,7 @@ namespaces sequences vectors ;
 
 : relative ( g1 g2 -- g2-g1 ) screen-loc swap screen-loc v- ;
 
-: child? ( parent child -- ? ) parents-down memq? ;
+: child? ( parent child -- ? ) parents memq? ;
 
 GENERIC: focusable-child* ( gadget -- gadget/t )
 
@@ -81,3 +77,5 @@ IN: gadgets-layouts
 : make-pile ( children -- pack ) <pile> [ add-gadgets ] keep ;
 
 : make-shelf ( children -- pack ) <shelf> [ add-gadgets ] keep ;
+
+: make-stack ( children -- pack ) <stack> [ add-gadgets ] keep ;

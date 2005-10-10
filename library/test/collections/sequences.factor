@@ -176,3 +176,17 @@ unit-test
 [ -1 f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
 
 [ { 1 2 3 } ] [ { 1 1 2 2 3 3 } prune ] unit-test
+
+[ 0 ] [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
+
+[ 1 ] [ { "a" "b" "c" } { "a" "B" "C" } mismatch ] unit-test
+
+[ -1 ] [ { "a" "b" "c" } { "a" "b" "c" } mismatch ] unit-test
+
+[ { } { } ] [ { "a" "b" } { "a" "b" } drop-prefix [ >vector ] 2apply ] unit-test
+
+[ { "C" } { "c" } ] [ { "a" "b" "C" } { "a" "b" "c" } drop-prefix [ >vector ] 2apply ] unit-test
+
+[ -1 1 "abc" <slice> ] unit-test-fails
+
+[ { "a" "b" } { } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test

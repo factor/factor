@@ -2,9 +2,10 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-presentations
 USING: arrays compiler gadgets gadgets-buttons gadgets-labels
-gadgets-menus gadgets-outliner gadgets-panes generic hashtables
-inference inspector io jedit kernel lists memory namespaces
-parser prettyprint sequences strings styles words ;
+gadgets-menus gadgets-outliner gadgets-panes gadgets-theme
+generic hashtables inference inspector io jedit kernel lists
+memory namespaces parser prettyprint sequences strings styles
+words ;
 
 SYMBOL: commands
 
@@ -19,14 +20,23 @@ SYMBOL: commands
 : command-quot ( presented quot -- quot )
     [ \ drop , curry , [ pane get pane-call ] % ] [ ] make ;
 
-: command-menu ( presented -- menu )
-    dup applicable
-    [ [ third command-quot ] keep second swons ] map-with
-    <menu> ;
+TUPLE: command-button object ;
 
-: <command-button> ( gadget object -- button )
-    [ [ nip command-menu ] curry <menu-button> ] keep
-    summary over set-gadget-help ;
+: command-menu ( command-button -- )
+    command-button-object dup applicable
+    [ [ third command-quot ] keep second swons ] map-with
+    <menu> show-hand-menu ;
+
+C: command-button ( gadget object -- button )
+    [ set-command-button-object ] keep
+    [ set-gadget-delegate ] keep
+    dup [ command-menu ] button-gestures
+    dup roll-button-theme
+    dup menu-button-actions ;
+
+M: command-button gadget-help ( button -- string )
+    command-button-object
+    dup word? [ [ synopsis ] string-out ] [ summary ] if ;
 
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;

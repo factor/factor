@@ -49,6 +49,9 @@ GENERIC: resize ( n seq -- seq )
 : bounds-check? ( n seq -- ? )
     over 0 >= [ length < ] [ 2drop f ] if ;
 
+: 2nth ( s s n -- x x )
+    tuck swap nth >r swap nth r> ; inline
+
 IN: sequences-internals
 
 ! Unsafe sequence protocol for inner loops
@@ -57,9 +60,6 @@ GENERIC: set-nth-unsafe
 
 M: object nth-unsafe nth ;
 M: object set-nth-unsafe set-nth ;
-
-: 2nth-unsafe ( s s n -- x x )
-    tuck swap nth-unsafe >r swap nth-unsafe r> ; inline
 
 : change-nth-unsafe ( seq i quot -- )
     pick pick >r >r >r swap nth-unsafe

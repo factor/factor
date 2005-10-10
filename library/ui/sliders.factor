@@ -54,7 +54,7 @@ SYMBOL: slider-changed
     [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
 
 : <thumb> ( -- thumb )
-    <gadget> dup button-theme
+    <gadget> dup bevel-theme
     t over set-gadget-root?
     dup thumb-actions ;
 
@@ -75,7 +75,7 @@ SYMBOL: slider-changed
     [ elevator-click ] [ button-down 1 ] set-action ;
 
 C: elevator ( -- elevator )
-    dup gadget-delegate
+    dup delegate>gadget
     dup elevator-theme
     dup elevator-actions ;
 
@@ -126,7 +126,7 @@ M: elevator layout* ( elevator -- )
 
 C: slider ( vector -- slider )
     [ set-slider-vector ] keep
-    dup frame-delegate
+    dup delegate>frame
     0 over set-slider-value
     0 over set-slider-page
     0 over set-slider-max

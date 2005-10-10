@@ -8,7 +8,7 @@ kernel math namespaces sdl sequences styles ;
 TUPLE: label text ;
 
 C: label ( text -- label )
-    dup gadget-delegate [ set-label-text ] keep ;
+    dup delegate>gadget [ set-label-text ] keep ;
 
 : label-size ( gadget text -- dim )
     >r gadget-font r> size-string 0 3array ;

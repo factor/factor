@@ -6,17 +6,16 @@ hashtables kernel math namespaces vectors ;
 
 TUPLE: border size ;
 
-C: border ( size -- border )
-    dup gadget-delegate [ set-border-size ] keep ;
-
-: empty-border ( child -- border )
-    @{ 5 5 0 }@ <border> [ add-gadget ] keep ;
+C: border ( child -- border )
+    dup delegate>gadget
+    @{ 5 5 0 }@ over set-border-size
+    [ add-gadget ] keep ;
 
 : line-border ( child -- border )
-    empty-border dup solid-boundary ;
+    <border> dup solid-boundary ;
 
 : bevel-border ( child -- border )
-    empty-border dup bevel-theme ;
+    <border> dup bevel-theme ;
 
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;

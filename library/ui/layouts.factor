@@ -91,12 +91,12 @@ C: pack ( vector -- pack )
     #! fill: 0 leaves default width, 1 fills to pack width.
     #! align: 0 left, 1/2 center, 1 right.
     [ set-pack-vector ] keep
-    dup gadget-delegate
+    dup delegate>gadget
     0 over set-pack-align
     0 over set-pack-fill
     @{ 0 0 0 }@ over set-pack-gap ;
 
-: pack-delegate ( vector tuple -- ) >r <pack> r> set-delegate ;
+: delegate>pack ( vector tuple -- ) >r <pack> r> set-delegate ;
 
 : <pile> ( -- pack ) @{ 0 1 0 }@ <pack> ;
 
@@ -128,7 +128,7 @@ TUPLE: stack ;
 
 C: stack ( -- gadget )
     #! A stack lays out all its children on top of each other.
-    @{ 0 0 1 }@ over pack-delegate 1 over set-pack-fill ;
+    @{ 0 0 1 }@ over delegate>pack 1 over set-pack-fill ;
 
 M: stack children-on ( point stack -- gadget )
     nip gadget-children ;

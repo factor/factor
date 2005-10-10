@@ -101,3 +101,7 @@ M: object tail ( index seq -- seq ) [ tail-slice ] keep like ;
 
 : cut ( n seq -- before after )
     [ (cut) ] keep like ; flushable
+
+: drop-prefix ( seq1 seq2 -- seq1 seq2 )
+    2dup mismatch dup -1 = [ drop 2dup min-length ] when
+    tuck swap tail-slice >r swap tail-slice r> ;

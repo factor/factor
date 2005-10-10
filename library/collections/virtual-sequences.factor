@@ -37,6 +37,7 @@ TUPLE: slice seq from to ;
     dup slice-from swap slice-seq >r tuck + >r + r> r> ;
 
 : check-slice ( from to seq -- )
+    pick 0 < [ "Slice begins before 0" throw ] when
     length over < [ "Slice longer than sequence" throw ] when
     > [ "Slice start is after slice end" throw ] when ;
 

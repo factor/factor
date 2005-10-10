@@ -22,7 +22,7 @@ TUPLE: display title pane ;
     2dup set-display-title @top frame-add ;
 
 C: display ( -- display )
-    dup frame-delegate
+    dup delegate>frame
     "" <display-title> over add-display-title
     f f <pane> 2dup swap set-display-pane
     <scroller> over @center frame-add ;

@@ -9,7 +9,7 @@ lists math namespaces sdl sequences strings styles threads ;
 TUPLE: caret ;
 
 C: caret ( -- caret )
-    dup gadget-delegate dup caret-theme ;
+    dup delegate>gadget dup caret-theme ;
 
 M: caret tick ( ms caret -- ) nip toggle-visible ;
 
@@ -112,7 +112,7 @@ TUPLE: editor line caret ;
     }} add-actions ;
 
 C: editor ( text -- )
-    dup gadget-delegate
+    dup delegate>gadget
     dup editor-theme
     <line-editor> over set-editor-line
     <caret> over set-editor-caret

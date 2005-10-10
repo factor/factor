@@ -26,10 +26,10 @@ TUPLE: splitter split ;
     [ gadget-parent divider-motion ] [ drag 1 ] set-action ;
 
 C: divider ( -- divider )
-    dup gadget-delegate dup divider-theme dup divider-actions ;
+    dup delegate>gadget dup divider-theme dup divider-actions ;
 
 C: splitter ( first second split vector -- splitter )
-    [ pack-delegate ] keep
+    [ delegate>pack ] keep
     [ set-splitter-split ] keep
     [ >r >r <divider> r> 3array r> add-gadgets ] keep
     1 over set-pack-fill ;

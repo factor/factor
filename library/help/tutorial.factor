@@ -29,9 +29,7 @@ M: general-list tutorial-line
     car <input-button> dup example-theme ;
 
 : <page> ( list -- gadget )
-    [ tutorial-line ] map
-    make-pile 1 over set-pack-fill
-    empty-border ;
+    [ tutorial-line ] map make-pile 1 over set-pack-fill <border> ;
 
 : tutorial-pages
     {

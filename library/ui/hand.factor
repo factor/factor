@@ -14,7 +14,7 @@ prettyprint sdl sequences vectors ;
 TUPLE: hand click-loc click-rel clicked buttons gadget focus ;
 
 C: hand ( -- hand )
-    dup gadget-delegate { } clone over set-hand-buttons ;
+    dup delegate>gadget { } clone over set-hand-buttons ;
 
 : button/ ( n hand -- )
     dup hand-gadget over set-hand-clicked
@@ -37,27 +37,27 @@ C: hand ( -- hand )
     dup hand-buttons empty?
     [ dup dup hand-clicked [ drag ] drag-gesture ] unless drop ;
 
-: drop-prefix ( l1 l2 -- l1 l2 )
-    2dup and [ 2dup 2car eq? [ 2cdr drop-prefix ] when ] when ;
-
 : each-gesture ( gesture seq -- )
     [ handle-gesture* drop ] each-with ;
 
-: hand-gestures ( hand new old -- )
-    drop-prefix
-    reverse [ mouse-leave ] swap each-gesture
-    swap fire-motion
+: hand-gestures ( new old -- )
+    drop-prefix reverse-slice
+    [ mouse-leave ] swap each-gesture
+    hand get fire-motion
     [ mouse-enter ] swap each-gesture ;
 
 : focus-gestures ( new old -- )
-    drop-prefix
-    reverse [ lose-focus ] swap each-gesture
+    drop-prefix reverse-slice
+    [ lose-focus ] swap each-gesture
     [ gain-focus ] swap each-gesture ;
 
+: focused-ancestors ( hand -- seq )
+    hand get hand-focus parents reverse-slice ;
+
 : request-focus ( gadget -- )
-    focusable-child
-    hand get dup hand-focus parents-down >r
-    dupd set-hand-focus parents-down r> focus-gestures ;
+    focusable-child focused-ancestors >r
+    hand get set-hand-focus focused-ancestors
+    r> focus-gestures ;
 
 : drag-loc ( gadget -- loc )
     hand get [ relative ] keep hand-click-rel v- ;

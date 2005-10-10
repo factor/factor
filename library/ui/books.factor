@@ -8,8 +8,8 @@ sequences ;
 TUPLE: book page ;
 
 C: book ( pages -- book )
-    <stack> over set-delegate
-    0 over set-book-page [ add-gadgets ] keep ;
+    [ >r make-stack r> set-gadget-delegate ] keep
+    0 over set-book-page ;
 
 M: book layout* ( book -- )
     dup delegate layout*
@@ -47,6 +47,6 @@ TUPLE: book-browser book ;
     ] { } make make-shelf ;
 
 C: book-browser ( book -- gadget )
-    dup frame-delegate
+    dup delegate>frame
     <book-buttons> over @top frame-add
     [ 2dup set-book-browser-book @center frame-add ] keep ;

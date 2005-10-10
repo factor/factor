@@ -36,7 +36,7 @@ M: array rect-dim drop @{ 0 0 0 }@ ;
 ! actions, and a reference to the gadget's parent.
 TUPLE: gadget
     paint gestures visible? relayout? root?
-    parent children help ;
+    parent children ;
 
 : show-gadget t swap set-gadget-visible? ;
 
@@ -49,7 +49,7 @@ M: gadget = eq? ;
 C: gadget ( -- gadget )
     @{ 0 0 0 }@ dup <rect> over set-delegate dup show-gadget ;
 
-: gadget-delegate ( tuple -- ) <gadget> swap set-delegate ;
+: delegate>gadget ( tuple -- ) <gadget> swap set-delegate ;
 
 GENERIC: user-input* ( ch gadget -- ? )
 
@@ -74,13 +74,21 @@ M: gadget children-on ( rect/point gadget -- list )
 : translate ( rect/point -- )
     rect-loc origin [ v+ ] change ;
 
-: (pick-up) ( rect/point gadget -- gadget )
-    2dup inside? [
-        dup translate 2dup pick-up-list dup
-        [ nip (pick-up) ] [ rot 2drop ] if
-    ] [ 2drop f ] if ;
-
 : pick-up ( rect/point gadget -- gadget )
-    [ (pick-up) ] with-scope ;
+    [
+        2dup inside? [
+            dup translate 2dup pick-up-list dup
+            [ nip pick-up ] [ rot 2drop ] if
+        ] [ 2drop f ] if
+    ] with-scope ;
 
 : max-dim ( dims -- dim ) @{ 0 0 0 }@ [ vmax ] reduce ;
+
+: set-gadget-delegate ( delegate gadget -- )
+    dup pick gadget-children [ set-gadget-parent ] each-with
+    set-delegate ;
+
+! Pointer help protocol
+GENERIC: gadget-help
+
+M: gadget gadget-help drop f ;
