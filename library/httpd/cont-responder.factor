@@ -228,6 +228,17 @@ SYMBOL: callback-cc
   ] [
     t post-refresh-get? set
   ] if ;
+
+: (show) ( quot -- namespace )   
+  #! See comments for show. The difference is the 
+  #! quotation MUST set the content-type using 'serving-html'
+  #! or similar.
+  store-callback-cc  redirect-to-here 
+  [ 
+    expirable register-continuation id>url swap 
+    string-out call-exit-continuation
+  ] callcc1 
+  nip ;
   
 : show ( quot -- namespace )   
   #! Call the quotation with the URL associated with the current
@@ -238,12 +249,14 @@ SYMBOL: callback-cc
   #! NOTE: On return from 'show' the stack is exactly the same as
   #! initial entry with 'quot' popped off an <namespace> put on. Even
   #! if the quotation consumes items on the stack.
+  \ serving-html swons (show) ;
+
+: (show-final) ( quot -- namespace )
+  #! See comments for show-final. The difference is the 
+  #! quotation MUST set the content-type using 'serving-html'
+  #! or similar.
   store-callback-cc  redirect-to-here 
-  [ 
-    expirable register-continuation id>url swap 
-    \ serving-html swons string-out call-exit-continuation
-  ] callcc1 
-  nip ;
+  string-out call-exit-continuation ;
 
 : show-final ( quot -- namespace )
   #! Similar to 'show', except the quotation does not receive the URL
@@ -252,8 +265,7 @@ SYMBOL: callback-cc
   #! when a page is to be displayed with no further action to occur. Its
   #! use is an optimisation to save having to generate and save a continuation
   #! in that special case.
-  store-callback-cc  redirect-to-here 
-  \ serving-html swons string-out call-exit-continuation ;
+  \ serving-html swons (show-final) ;
 
 #! Name of variable for holding initial continuation id that starts
 #! the responder.
