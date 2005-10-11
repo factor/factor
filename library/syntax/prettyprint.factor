@@ -44,7 +44,11 @@ C: section ( length -- section )
     0 over set-section-indent ;
 
 : section-fits? ( section -- ? )
-    section-end last-newline get - indent get + margin get <= ;
+    margin get dup 0 = [
+        2drop t
+    ] [
+        >r section-end last-newline get - indent get + r> <=
+    ] if ;
 
 : line-limit? ( -- ? )
     line-limit get dup [ line-count get <= ] when ;

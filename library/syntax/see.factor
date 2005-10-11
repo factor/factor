@@ -48,9 +48,9 @@ sequences styles words ;
     dup pprint-word
     stack-effect stack-effect. ;
 
-: synopsis ( word -- )
-    #! Print a brief description of the word in question.
-    [ (synopsis) ] with-pprint ;
+: synopsis ( word -- string )
+    #! Output a brief description of the word in question.
+    [ 0 margin set [ (synopsis) ] with-pprint ] string-out ;
 
 GENERIC: (see) ( word -- )
 

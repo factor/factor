@@ -5,10 +5,11 @@ USING: arrays gadgets gadgets-books gadgets-layouts generic kernel
 lists math namespaces sequences styles threads ;
 
 ! A viewport can be scrolled.
-TUPLE: viewport bottom? ;
+TUPLE: viewport ;
 
 ! A scroller combines a viewport with two x and y sliders.
-TUPLE: scroller viewport x y ;
+! The follows slot is set by scroll-to.
+TUPLE: scroller viewport x y follows ;
 
 : scroller-origin ( scroller -- { x y 0 } )
     dup scroller-x slider-value
@@ -43,21 +44,19 @@ M: viewport pref-dim gadget-child pref-dim ;
     2dup over scroller-x update-slider
     over scroller-y update-slider ;
 
-: (scroll>bottom) ( viewport scroller -- )
-    over viewport-bottom? [
-        f pick set-viewport-bottom?
-        2dup swap viewport-dim scroll
-    ] when 2drop ;
+: update-scroller ( scroller -- )
+    dup dup scroller-follows dup [
+        f rot set-scroller-follows screen-loc
+    ] [
+        drop scroller-origin
+    ] if scroll ;
 
-: update-scroller ( scroller -- ) dup scroller-origin scroll ;
-
-: update-viewport ( viewport scroller -- )
-    scroller-origin vneg
-    swap gadget-child dup prefer set-rect-loc ;
+: position-viewport ( viewport scroller -- )
+    scroller-origin vneg swap gadget-child set-rect-loc ;
 
 M: viewport layout* ( viewport -- )
-    dup find-scroller dup update-scroller
-    2dup (scroll>bottom) update-viewport ;
+    dup gadget-child dup prefer layout
+    dup find-scroller dup update-scroller position-viewport ;
 
 M: viewport focusable-child* ( viewport -- gadget )
     gadget-child ;
@@ -68,9 +67,11 @@ M: viewport focusable-child* ( viewport -- gadget )
 
 : add-y-slider 2dup set-scroller-y @right frame-add ;
 
-: scroll>bottom ( gadget -- )
-    find-viewport
-    [ t over set-viewport-bottom? relayout ] when* ;
+: scroll-to ( gadget -- )
+    #! Scroll the scroller that contains this gadget, if any, so
+    #! that the gadget becomes visible.
+    dup find-scroller dup
+    [ [ set-scroller-follows ] keep relayout ] [ 2drop ] if ;
 
 : scroll-up-line scroller-y -1 swap slide-by-line ;
 

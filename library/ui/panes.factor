@@ -131,15 +131,15 @@ M: pane stream-finish ( pane -- ) drop ;
 M: pane stream-readln ( pane -- line )
     [ over set-pane-continuation stop ] callcc1 nip ;
 
-: ?scroll>bottom ( pane -- )
-    dup pane-scrolls? [ dup scroll>bottom ] when drop ;
+: scroll-pane ( pane -- )
+    dup pane-scrolls? [ pane-input scroll>caret ] [ drop ] if ;
 
 M: pane stream-write1 ( char pane -- )
     [ >r ch>string <label> r> pane-current add-gadget ] keep
-    ?scroll>bottom ;
+    scroll-pane ;
 
 M: pane stream-format ( string style pane -- )
-    [ rot "\n" split pane-write ] keep ?scroll>bottom ;
+    [ rot "\n" split pane-write ] keep scroll-pane ;
 
 M: pane stream-close ( pane -- ) drop ;
 

@@ -31,12 +31,14 @@ USE: line-editor
 
 TUPLE: editor line caret ;
 
+: scroll>caret ( editor -- ) editor-caret scroll-to ;
+
 : with-editor ( editor quot -- )
     #! Execute a quotation in the line editor scope, then
     #! update the display.
     swap [ editor-line swap bind ] keep
     dup editor-caret reset-caret
-    dup relayout scroll>bottom ; inline
+    dup relayout scroll>caret ; inline
 
 : editor-text ( editor -- text )
     editor-line [ line-text get ] bind ;

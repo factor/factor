@@ -36,7 +36,7 @@ C: command-button ( gadget object -- button )
 
 M: command-button gadget-help ( button -- string )
     command-button-object
-    dup word? [ [ synopsis ] string-out ] [ summary ] if ;
+    dup word? [ synopsis ] [ summary ] if ;
 
 : init-commands ( gadget -- gadget )
     dup presented paint-prop [ <command-button> ] when* ;
