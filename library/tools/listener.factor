@@ -37,10 +37,8 @@ global [ "  " listener-prompt set ] bind
 : listen ( -- )
     #! Wait for user input, and execute.
     listener-hook get call
-    listener-prompt get write flush [
-        read-multiline
-        [ call ] [ bye ] if
-    ] try ;
+    listener-prompt get write flush
+    [ read-multiline [ call ] [ bye ] if ] try ;
 
 : listener ( -- )
     #! Run a listener loop that executes user input.
@@ -48,9 +46,10 @@ global [ "  " listener-prompt set ] bind
 
 : credits ( -- )
     "Slava Pestov:       dup drop swap >r r>" print
+    "Alex Chapman:       OpenGL binding" print
+    "Doug Coleman:       Mersenne Twister random number generator" print
     "Chris Double:       continuation-based web framework" print
-    "Mackenzie Straight: Windows port" print
-    "Doug Coleman:       Mersenne Twister random number generator" print ;
+    "Mackenzie Straight: Windows port" print ;
 
 : print-banner ( -- )
     "Factor " write version write

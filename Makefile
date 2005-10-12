@@ -1,4 +1,7 @@
 CC = gcc
+
+BINARY = f
+
 ifdef DEBUG
 	DEFAULT_CFLAGS = -g
 	STRIP = touch
@@ -65,35 +68,35 @@ default:
 	@echo "export SITE_CFLAGS=\"-march=pentium4 -ffast-math\""
 
 bsd:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -pthread" \
 		LIBS="$(DEFAULT_LIBS)" 
-	$(STRIP) f
+	$(STRIP) $(BINARY)
 
 macosx:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
 		LIBS="$(DEFAULT_LIBS)" 
 
 macosx-sdl:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
 		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" 
 
 linux:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic" \
 		LIBS="-ldl $(DEFAULT_LIBS)"
-	$(STRIP) f
+	$(STRIP) $(BINARY)
 
 linux-ppc:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -export-dynamic -mregnames" \
 		LIBS="-ldl $(DEFAULT_LIBS)"
-	$(STRIP) f
+	$(STRIP) $(BINARY)
 
 windows:
-	$(MAKE) f \
+	$(MAKE) $(BINARY) \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFFI -DWIN32" \
 		LIBS="$(DEFAULT_LIBS)" WIN32=y
 

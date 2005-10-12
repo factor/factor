@@ -32,31 +32,33 @@ cpu "ppc" = [
     "/library/alien/primitive-types.factor"
 ] pull-in
 
-"statically-linked" get [
-    unix? [
-        "sdl-gfx" "libSDL_gfx.so" "cdecl" add-library
+unix? [
+    "sdl-gfx" "libSDL_gfx.so" "cdecl" add-library
 
-        os "macosx" = [
-            ! SDL is linked into the runtime
-            "sdl-ttf" "libSDL_ttf.dylib" "cdecl" add-library
-        ] [
-            "sdl"     "libSDL.so"     "cdecl" add-library
-            "sdl-ttf" "libSDL_ttf.so" "cdecl" add-library
-        ] if
-    ] when
-    
-    win32? [
-        "kernel32" "kernel32.dll" "stdcall" add-library
-        "user32"   "user32.dll"   "stdcall" add-library
-        "gdi32"    "gdi32.dll"    "stdcall" add-library
-        "winsock"  "ws2_32.dll"   "stdcall" add-library
-        "mswsock"  "mswsock.dll"  "stdcall" add-library
-        "libc"     "msvcrt.dll"   "cdecl"   add-library
-        "sdl"      "SDL.dll"      "cdecl"   add-library
-        "sdl-gfx"  "SDL_gfx.dll"  "cdecl"   add-library
-        "sdl-ttf"  "SDL_ttf.dll"  "cdecl"   add-library
-    ] when
-] unless
+    os "macosx" = [
+        ! SDL and OpenGL are linked into the runtime
+        "sdl-ttf" "libSDL_ttf.dylib" "cdecl" add-library
+    ] [
+        "sdl"     "libSDL.so"     "cdecl" add-library
+        "sdl-ttf" "libSDL_ttf.so" "cdecl" add-library
+        "gl"      "libGL.so"      "cdecl" add-library
+        "glu"     "libGLU.so"     "cdecl" add-library
+    ] if
+] when
+
+win32? [
+    "kernel32" "kernel32.dll" "stdcall" add-library
+    "user32"   "user32.dll"   "stdcall" add-library
+    "gdi32"    "gdi32.dll"    "stdcall" add-library
+    "winsock"  "ws2_32.dll"   "stdcall" add-library
+    "mswsock"  "mswsock.dll"  "stdcall" add-library
+    "libc"     "msvcrt.dll"   "cdecl"   add-library
+    "sdl"      "SDL.dll"      "cdecl"   add-library
+    "sdl-gfx"  "SDL_gfx.dll"  "cdecl"   add-library
+    "sdl-ttf"  "SDL_ttf.dll"  "cdecl"   add-library
+    "gl"       "opengl32.dll" "stdcall" add-library
+    "glu"      "glu32.dll"    "stdcall" add-library
+] when
 
 ! Handle -libraries:... overrides
 parse-command-line
@@ -69,6 +71,7 @@ t [
 
     "/library/httpd/load.factor"
     "/library/sdl/load.factor"
+    "/library/opengl/load.factor"
     "/library/ui/load.factor"
     "/library/help/tutorial.factor"
 ] pull-in

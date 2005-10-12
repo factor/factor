@@ -146,7 +146,8 @@ M: object reverse ( seq -- seq ) [ <reversed> ] keep like ;
     #! Lexicographically compare two sequences of numbers
     #! (usually strings). Negative if s1<s2, zero if s1=s2,
     #! positive if s1>s2.
-    2dup mismatch dup -1 = [ 3drop 0 ] [ 2nth-unsafe - ] if ;
+    2dup mismatch dup -1 =
+    [ drop [ length ] 2apply - ] [ 2nth-unsafe - ] if ;
     flushable
 
 : flip ( seq -- seq )

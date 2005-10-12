@@ -3,8 +3,8 @@
 
 ! This file is based on the gl.h that comes with xorg-x11 6.8.2
 
-IN: gl 
-USING: alien gl-internals ;
+IN: opengl 
+USING: alien ;
 
 TYPEDEF: uint    GLenum
 TYPEDEF: uchar   GLboolean

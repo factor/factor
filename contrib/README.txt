@@ -12,8 +12,6 @@ library, but is useful enough to ship with the Factor distribution.
   
 - contrib/crypto/ -- MD5 and SHA1 cryptographic hashes (Doug Coleman)
 
-- contrib/gl/ -- OpenGL binding (Alex Chapman)
-
 - contrib/parser-combinators/ -- Lazy lists and Haskell-style parser
   combinators (Chris Double)
 

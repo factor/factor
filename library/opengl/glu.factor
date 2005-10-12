@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Alex Chapman.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gl
-USING: alien gl-internals gl ;
+IN: opengl
+USING: alien ;
 
 ! These are defined as structs in glu.h, but we only ever use pointers to them
 TYPEDEF: void* GLUnurbs*

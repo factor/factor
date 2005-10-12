@@ -190,3 +190,6 @@ unit-test
 [ -1 1 "abc" <slice> ] unit-test-fails
 
 [ { "a" "b" } { } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] 2apply ] unit-test
+
+[ -1 ] [ "ab" "abc" lexi ] unit-test
+[ 1 ] [ "abc" "ab" lexi ] unit-test
