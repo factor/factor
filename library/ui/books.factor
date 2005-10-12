@@ -2,8 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-books
 USING: gadgets gadgets-buttons gadgets-labels gadgets-layouts
-gadgets-theme generic kernel lists math matrices namespaces
-sequences ;
+gadgets-theme generic kernel lists math namespaces sequences ;
 
 TUPLE: book page ;
 

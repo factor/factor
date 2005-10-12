@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-labels
 USING: arrays gadgets gadgets-layouts generic hashtables io
-kernel math namespaces sdl sequences styles ;
+kernel math namespaces sequences styles ;
 
 ! A label gadget draws a string.
 TUPLE: label text ;

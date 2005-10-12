@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien generic io kernel lists math matrices namespaces
-prettyprint sdl sequences vectors ;
+prettyprint sequences vectors ;
 
 ! The hand is a special gadget that holds mouse position and
 ! mouse button click state.

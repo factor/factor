@@ -9,8 +9,6 @@ void run(void)
 {
 	CELL next;
 
-	CELL height = cs - cs_bot;
-
 	/* Error handling. */
 	SETJMP(toplevel);
 
@@ -47,9 +45,6 @@ void run(void)
 				factorbug();
 				interrupt = false;
 			}
-
-			if(cs - cs_bot < height)
-				return;
 
 			callframe = cpop();
 			executing = cpop();

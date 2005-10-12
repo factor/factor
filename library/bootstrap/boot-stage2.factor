@@ -34,11 +34,15 @@ cpu "ppc" = [
 
 "statically-linked" get [
     unix? [
+        "sdl-gfx" "libSDL_gfx.so" "cdecl" add-library
+
         os "macosx" = [
+            ! SDL is linked into the runtime
+            "sdl-ttf" "libSDL_ttf.dylib" "cdecl" add-library
+        ] [
             "sdl"     "libSDL.so"     "cdecl" add-library
-            "sdl-gfx" "libSDL_gfx.so" "cdecl" add-library
             "sdl-ttf" "libSDL_ttf.so" "cdecl" add-library
-        ] unless
+        ] if
     ] when
     
     win32? [

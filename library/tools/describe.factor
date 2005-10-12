@@ -34,9 +34,9 @@ M: object sheet ( obj -- sheet )
 
 M: sequence summary
     dup length 1 = [
-        drop "a sequence of 1 element"
+        drop "a sequence containing 1 element"
     ] [
-        "a sequence of " swap length number>string
+        "a sequence containing " swap length number>string
         " elements" append3
     ] if ;
 

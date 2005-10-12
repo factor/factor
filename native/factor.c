@@ -9,6 +9,7 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	init_arena(gen_count,young_size,aging_size);
 	init_compiler(code_size);
 	init_stacks(ds_size,cs_size);
+	/* callframe must be valid in case load_image() does GC */
 	callframe = F;
 	load_image(image,literal_size);
 	callframe = userenv[BOOT_ENV];

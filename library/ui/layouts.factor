@@ -2,7 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-layouts
 USING: errors gadgets generic hashtables kernel lists math
-matrices namespaces sdl sequences ;
+namespaces sequences ;
 
 : relayout ( gadget -- )
     #! Relayout and redraw a gadget and its parent before the

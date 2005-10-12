@@ -1,8 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien generic hashtables kernel lists math matrices sdl
-sequences ;
+USING: alien generic hashtables kernel lists math sequences ;
 
 : action ( gadget gesture -- quot )
     swap gadget-gestures ?hash ;

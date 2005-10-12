@@ -3,7 +3,7 @@
 IN: gadgets-editors
 USING: arrays gadgets gadgets-labels gadgets-layouts
 gadgets-menus gadgets-scrolling gadgets-theme generic kernel
-lists math namespaces sdl sequences strings styles threads ;
+lists math namespaces sequences strings styles threads ;
 
 ! A blinking caret
 TUPLE: caret ;

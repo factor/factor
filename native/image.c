@@ -5,9 +5,7 @@ void init_objects(HEADER *h)
 	int i;
 	for(i = 0; i < USER_ENV; i++)
 		userenv[i] = F;
-	profile_depth = 0;
 	executing = F;
-
 	userenv[GLOBAL_ENV] = h->global;
 	userenv[BOOT_ENV] = h->boot;
 	T = h->t;

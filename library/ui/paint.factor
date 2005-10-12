@@ -2,8 +2,7 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien arrays gadgets-layouts generic hashtables io kernel
-lists math matrices namespaces sdl sequences strings styles
-vectors ;
+lists math namespaces sdl sequences strings styles vectors ;
 
 SYMBOL: clip
 

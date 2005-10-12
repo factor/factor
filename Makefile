@@ -78,7 +78,7 @@ macosx:
 macosx-sdl:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
-		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL -lSDL_ttf -lSDL_gfx" 
+		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL" 
 
 linux:
 	$(MAKE) f \
