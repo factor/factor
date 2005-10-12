@@ -45,6 +45,7 @@ void print_string(F_STRING* str)
 void print_obj(CELL obj)
 {
 	F_ARRAY *array;
+	CELL class;
 
 	switch(type_of(obj))
 	{
@@ -66,7 +67,11 @@ void print_obj(CELL obj)
 	case TUPLE_TYPE:
 		array = (F_ARRAY*)UNTAG(obj);
 		fprintf(stderr,"<< ");
-		print_word(untag_word(get(AREF(array,0))));
+		class = get(AREF(array,0));
+		if(type_of(class) == WORD_TYPE)
+			print_word(untag_word(class));
+		else
+			fprintf(stderr," corrupt tuple: %lx ",class);
 		fprintf(stderr," %lx >>",obj);
 		break;
 	default:
@@ -209,13 +214,13 @@ void factorbug(void)
 			fprintf(stderr,"\n");
 		}
 		else if(strcmp(cmd,"s") == 0)
-			dump_memory(ds_bot,(ds + CELLS));
+			dump_memory(ds_bot,ds);
 		else if(strcmp(cmd,"r") == 0)
-			dump_memory(cs_bot,(cs + CELLS));
+			dump_memory(cs_bot,cs);
 		else if(strcmp(cmd,".s") == 0)
-			print_objects(ds_bot,(ds + CELLS));
+			print_objects(ds_bot,ds);
 		else if(strcmp(cmd,".r") == 0)
-			print_objects(cs_bot,(cs + CELLS));
+			print_objects(cs_bot,cs);
 		else if(strcmp(cmd,"i") == 0)
 		{
 			fprintf(stderr,"Call frame:\n");
@@ -229,7 +234,7 @@ void factorbug(void)
 		{
 			int i;
 			for(i = 0; i < USER_ENV; i++)
-				dump_cell(userenv[i]);
+				dump_cell((CELL)&userenv[i]);
 		}
 		else if(strcmp(cmd,"g") == 0)
 			dump_generations();

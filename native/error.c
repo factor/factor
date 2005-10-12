@@ -42,11 +42,7 @@ void throw_error(CELL error, bool keep_stacks)
 	thrown_executing = executing;
 
 	/* Return to run() method */
-#ifdef WIN32
-	longjmp(toplevel,1);
-#else
-	siglongjmp(toplevel,1);
-#endif
+	LONGJMP(toplevel,1);
 }
 
 void primitive_throw(void)

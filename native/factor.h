@@ -3,14 +3,32 @@
 
 #include "platform.h"
 
-#if defined(WIN32)
-	#define DLLEXPORT __declspec(dllexport)
-#else
-	#define DLLEXPORT
-#endif
+#define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
+#define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
+
+#define F_FIXNUM long int /* unboxed */
+
+#define WORD_SIZE (CELLS*8)
+#define HALF_WORD_SIZE (CELLS*4)
+#define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
+
+/* must always be 16 bits */
+#define CHARS ((signed)sizeof(u16))
 
 typedef unsigned long int CELL;
 #define CELLS ((signed)sizeof(CELL))
+
+typedef unsigned char u8; 	 
+typedef unsigned short u16; 	 
+typedef unsigned int u32; 	 
+typedef unsigned long long u64; 	 
+typedef signed char s8; 	 
+typedef signed short s16; 	 
+typedef signed int s32; 	 
+typedef signed long long s64;
+
+/* must always be 8 bits */
+typedef unsigned char BYTE;
 
 /* raw pointer to datastack bottom */
 CELL ds_bot;
@@ -54,14 +72,9 @@ CELL executing;
 #include <string.h>
 #include <time.h>
 
-typedef unsigned char u8; 	 
-typedef unsigned short u16; 	 
-typedef unsigned int u32; 	 
-typedef unsigned long long u64; 	 
-typedef signed char s8; 	 
-typedef signed short s16; 	 
-typedef signed int s32; 	 
-typedef signed long long s64;
+#ifdef FACTOR_SDL
+#include "SDL/SDL.h"
+#endif
 
 #include <sys/param.h>
 
@@ -78,28 +91,8 @@ typedef signed long long s64;
 	#include <sys/stat.h>
 	#include <unistd.h>
 	#include <sys/time.h>
+    #include <dlfcn.h>
 #endif
-
-#if !defined(WIN32)
-#include <dlfcn.h>
-#endif
-
-#define INLINE inline static
-
-#define FIXNUM_MAX (LONG_MAX >> TAG_BITS)
-#define FIXNUM_MIN (LONG_MIN >> TAG_BITS)
-
-#define F_FIXNUM long int /* unboxed */
-
-#define WORD_SIZE (CELLS*8)
-#define HALF_WORD_SIZE (CELLS*4)
-#define HALF_WORD_MASK (((unsigned long)1<<HALF_WORD_SIZE)-1)
-
-/* must always be 16 bits */
-#define CHARS ((signed)sizeof(u16))
-
-/* must always be 8 bits */
-typedef unsigned char BYTE;
 
 #include "error.h"
 #include "cards.h"

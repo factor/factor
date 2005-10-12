@@ -26,7 +26,7 @@ M: %call-label generate-node ( vop -- )
     #! Near calling convention for inlined recursive combinators
     #! Note: length of instruction sequence is hard-coded.
     vop-label
-    0 1 rel-address  compiled-offset 20 + 18 LOAD32
+    compiled-offset 20 + 18 LOAD32  0 1 rel-address
     1 1 -16 STWU
     18 1 20 STW
     B ;
@@ -75,7 +75,7 @@ M: %dispatch generate-node ( vop -- )
     3 3 1 SRAWI
     ! The value 24 is a magic number. It is the length of the
     ! instruction sequence that follows to be generated.
-    0 1 rel-address  compiled-offset 24 + 4 LOAD32
+    compiled-offset 24 + 4 LOAD32  0 1 rel-address
     3 3 4 ADD
     3 3 0 LWZ
     3 MTLR

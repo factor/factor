@@ -74,10 +74,11 @@ SYMBOL: open-fonts
 : make-color ( r g b -- color )
     #! Make an SDL_Color struct. This will go away soon in favor
     #! of pass-by-value support in the FFI.
-    255 24 shift
-    swap 16 shift bitor
-    swap 8 shift bitor
-    swap bitor ;
+    <sdl-color>
+    [ set-sdl-color-b ] keep
+    [ set-sdl-color-g ] keep
+    [ set-sdl-color-r ] keep
+    0 alien-unsigned-4 ;
 
 : make-rect ( x y w h -- rect )
     <sdl-rect>
@@ -105,7 +106,7 @@ SYMBOL: open-fonts
     ] if ;
 
 : lock-surface ( -- )
-    surface get SDL_LockSurface sdl-error ;
+    surface get SDL_LockSurface drop ;
 
 : unlock-surface ( -- )
     surface get SDL_UnlockSurface ;

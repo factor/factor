@@ -7,16 +7,7 @@ else
 	STRIP = strip
 endif
 
-ifdef STATIC
-	DEFAULT_LIBS = -lm -Wl,-static -Wl,-whole-archive \
-		-Wl,-export-dynamic \
-		-lSDL -lSDL_gfx -lSDL_ttf \
-		-Wl,-no-whole-archive \
-		-lfreetype -lz -L/usr/X11R6/lib -lX11 -lXext \
-		-Wl,-Bdynamic
-else
-	DEFAULT_LIBS = -lm
-endif
+DEFAULT_LIBS = -lm
 
 UNIX_OBJS = native/unix/file.o \
 	native/unix/signal.o \
@@ -64,6 +55,7 @@ default:
 	@echo "linux"
 	@echo "linux-ppc"
 	@echo "macosx"
+	@echo "macosx-sdl -- if you wish to use the Factor GUI on Mac OS X"
 	@echo "windows"
 	@echo ""
 	@echo "Also, you might want to set the SITE_CFLAGS environment"
@@ -82,6 +74,11 @@ macosx:
 	$(MAKE) f \
 		CFLAGS="$(DEFAULT_CFLAGS)" \
 		LIBS="$(DEFAULT_LIBS)" 
+
+macosx-sdl:
+	$(MAKE) f \
+		CFLAGS="$(DEFAULT_CFLAGS) -DFACTOR_SDL" \
+		LIBS="$(DEFAULT_LIBS) -lSDL -lSDLmain -framework Cocoa -framework OpenGL -lSDL_ttf -lSDL_gfx" 
 
 linux:
 	$(MAKE) f \

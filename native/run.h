@@ -24,15 +24,7 @@ DLLEXPORT CELL userenv[USER_ENV];
 DLLEXPORT bool interrupt;
 
 /* Error handlers restore this */
-#ifdef WIN32
-jmp_buf toplevel;
-#else
-sigjmp_buf toplevel;
-#endif
-
-/* Call stack depth to start profile counter from */
-/* This ensures that words in the user's interpreter do not count */
-CELL profile_depth;
+JMP_BUF toplevel;
 
 INLINE CELL dpop(void)
 {
@@ -89,7 +81,6 @@ INLINE void call(CELL quot)
 	callframe = quot;
 }
 
-void call_into_factor(F_WORD *word, XT xt);
 void run(void);
 void platform_run(void);
 void undefined(F_WORD *word);

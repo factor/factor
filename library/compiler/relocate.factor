@@ -26,11 +26,7 @@ SYMBOL: relocation-table
     over 1 = [ 2drop ] [ 2 rel-type, relocating 0 rel, ] if ;
 
 : rel-word ( word rel/abs 16/16 -- )
-    pick primitive? [
-        rel-primitive
-    ] [
-        rot drop rel-address
-    ] if ;
+    pick primitive? [ rel-primitive ] [ rel-address drop ] if ;
 
 : rel-userenv ( n 16/16 -- )
     0 swap 3 rel-type, relocating rel, ;

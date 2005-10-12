@@ -5,8 +5,6 @@ void init_factor(char* image, CELL ds_size, CELL cs_size,
 	CELL young_size, CELL aging_size,
 	CELL code_size, CELL literal_size)
 {
-	/* initialize random number generator */
-	srand((unsigned)time(NULL));
 	init_ffi();
 	init_arena(gen_count,young_size,aging_size);
 	init_compiler(code_size);
@@ -103,6 +101,8 @@ int main(int argc, char** argv)
 	userenv[ARGS_ENV] = args;
 
 	platform_run();
+
+	critical_error("run() returned due to empty callstack",0);
 
 	return 0;
 }
