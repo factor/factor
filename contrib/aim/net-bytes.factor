@@ -120,6 +120,9 @@ SYMBOL: unscoped-stack
 : (>long) ( long -- str )
     8 >endian ;
 
+: (>longlong) ( longlong -- str )
+    16 >endian ;
+
 : (>cstring) ( str -- str )
     "\0" append ;
 
@@ -134,6 +137,9 @@ SYMBOL: unscoped-stack
 
 : >long ( long -- )
     (>long) % ;
+
+: >longlong ( longlong -- )
+    (>longlong) % ;
 
 : >cstring ( str -- )
     (>cstring) % ;
@@ -151,6 +157,8 @@ SYMBOL: unscoped-stack
     4 swap head endian> ;
 : (head-long) ( str -- long )
     8 swap head endian> ;
+: (head-longlong) ( str -- longlong )
+    16 swap head endian> ;
 
 
 : head-byte ( -- byte )
@@ -164,6 +172,10 @@ SYMBOL: unscoped-stack
 
 : head-long ( -- long )
     8 unscoped-stream get stream-read (head-long) ;
+
+! 128 bits
+: head-longlong ( -- longlong )
+    16 unscoped-stream get stream-read (head-longlong) ;
 
 : head-string ( n -- str )
     unscoped-stream get stream-read >string ;

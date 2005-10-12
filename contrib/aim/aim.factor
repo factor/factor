@@ -1,3 +1,5 @@
+! All Talk
+
 IN: aim
 USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector ;
 
@@ -32,10 +34,47 @@ SYMBOL: buddy-list
 : client-ssi-flag 1 ; inline
 : client-charset "text/aolrtf; charset=\"us-ascii\"" ; inline
 
+! Family names from ethereal
+: family-names
+{{
+    [[ 1 "Generic" ]]
+    [[ 2 "Location" ]]
+    [[ 3 "Buddylist" ]]
+    [[ 4 "Messaging" ]]
+    [[ 6 "Invitation" ]]
+    [[ 8 "Popup" ]]
+    [[ 9 "BOS" ]]
+    [[ 10 "User Lookup" ]]
+    [[ 11 "Stats" ]]
+    [[ 12 "Translate" ]]
+    [[ 19 "SSI" ]]
+    [[ 21 "ICQ" ]]
+    [[ 34 "Unknown Family" ]]
+}} ;
+
+: capability-names
+{{
+    [[ HEX: 094601054c7f11d18222444553540000 "Unknown1" ]]
+    [[ HEX: 0946134a4c7f11d18222444553540000 "Games" ]]
+    [[ HEX: 0946134b4c7f11d18222444553540000 "Send Buddy List" ]]
+    [[ HEX: 748f2420628711d18222444553540000 "Chat" ]]
+    [[ HEX: 0946134d4c7f11d18222444553540000 "AIM/ICQ Interoperability" ]]
+    [[ HEX: 094613414c7f11d18222444553540000 "Voice Chat" ]]
+    [[ HEX: 094600004c7f11d18222444553540000 "iChat" ]]
+    [[ HEX: 094613434c7f11d18222444553540000 "Send File" ]]
+    [[ HEX: 094601ff4c7f11d18222444553540000 "Unknown2" ]]
+    [[ HEX: 094601014c7f11d18222444553540000 "Live Video" ]]
+    [[ HEX: 094613454c7f11d18222444553540000 "Direct Instant Messaging" ]]
+    [[ HEX: 094601034c7f11d18222444553540000 "Unknown3" ]]
+    [[ HEX: 094613464c7f11d18222444553540000 "Buddy Icon" ]]
+    [[ HEX: 094613474c7f11d18222444553540000 "Add-Ins" ]]
+}} ;
+
 : initialize-aim ( username password -- )
     password set username set
     {{ }} clone buddy-list set
-    65534 random-int seq-num set
+    ! 65535 random-int seq-num set
+    0 seq-num set
     1 stage-num set ;
 
 : (prepend-aim-protocol) ( data -- )
@@ -48,10 +87,12 @@ SYMBOL: buddy-list
     swap dup >r length (>short) r> append append ;
 
 : (send-aim) ( str -- )
+    "Sending: " print
+    dup hexdump
     conn get [ stream-write ] keep stream-flush ;
 
 : send-aim ( data -- )
-    make-packet (prepend-aim-protocol) (send-aim) ;
+    make-packet (prepend-aim-protocol) (send-aim) terpri ;
 
 : with-aim ( quot -- )
     conn get swap with-unscoped-stream ;
@@ -62,8 +103,8 @@ SYMBOL: buddy-list
         head-byte drop
         head-short drop
         head-short head-string
-    ] with-aim ;
-    ! "Received: " write dup hexdump ;
+    ] with-aim
+    "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
     4vector { (>short) (>short) (>short) (>int) } papply % ;
@@ -142,7 +183,7 @@ SYMBOL: buddy-list
 
 : (handle-supported-families)
 	unscoped-stream get empty? [
-		head-short .
+		head-short family-names hash .
 		(handle-supported-families)
 	] unless ;
 
@@ -185,8 +226,8 @@ SYMBOL: buddy-list
 
 : handle-capabilities
     unscoped-stream get empty? [
-        head-long unparse write " " write head-long unparse writeln
-        handle-capabilities
+        head-longlong capability-names hash dup [ "Unknown Capability" nip ] unless
+        writeln handle-capabilities
     ] unless ;
 
 : handle-29
@@ -212,6 +253,7 @@ SYMBOL: buddy-list
                 ! { [ dup 10 = ] [ drop ] } ! external ip
                 ! { [ dup 12 = ] [ drop ] } ! same as CLI_SETSTATUS
                 { [ dup 13 = ] [ drop "Capabilities:" print handle-capabilities  ] }
+                { [ dup 14 = ] [ drop "Capabilities:" print handle-capabilities  ] }
                 { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
                 { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
                 { [ dup 29 = ] [ drop handle-29 ] }
@@ -553,61 +595,86 @@ SYMBOL: buddy-list
 
 : send-second-bunch ( -- )
     stage-num [ 1 + ] change
+    ! Generic, Capabilities
     [
         1 HEX: 17 0 HEX: 17 make-snac
         [ 1 4  HEX: 13 3  2 1  3 1  4 1  6 1  8 1  9 1  HEX: a 1  HEX: b 1 ]
         [ >short ] each
     ] send-aim
+    ! Handle Message of the Day
+    ! read-aim handle-packet
+
+    ! Generic, Rate Info Request
     [ 1 6 0 6 make-snac ] send-aim
+    ! handle rate info
+    ! read-aim handle-packet ! send rate info ack
+
+    ! BOS, Rights Query
     [ 1 8 0 8 make-snac [ 1 2 3 4 5 ] [ >short ] each ] send-aim
+    ! BOS, handle rights
+    ! read-aim handle-packet
+
+    ! SSI, No List
+    ! read-aim handle-packet
+
+    ! Self Info Request
     [ 1 HEX: e 0 HEX: e make-snac ] send-aim
+
+    ! Request Rights
     [ HEX: 13 2 0 2 make-snac ] send-aim
+
+    ! Request List
+    ! [
+        ! HEX: 13 5 HEX: 7e6d 5 make-snac
+        ! HEX: 41c1 >int
+        ! HEX: 3670 >int
+        ! HEX: bb >short
+    ! ] send-aim
     [
-        HEX: 13 5 HEX: 7e6d 5 make-snac
-        HEX: 41c1 >int
-        HEX: 3670 >int
-        HEX: bb >short
+        HEX: 13 5 HEX: 2575 5 make-snac
+        HEX: 434d >short
+        HEX: 4951 >short
+        HEX: 0b >short
     ] send-aim
+
+    ! Location, Request Rights
     [ 2 2 0 2 make-snac ] send-aim
-    [ 2 3 0 2 make-snac ] send-aim
+
+    ! Buddylist Service, Rights Request
     [ 3 2 0 2 make-snac ] send-aim
+
+    ! Messaging, Request Parameter Info
     [ 4 4 0 4 make-snac ] send-aim
+
+    ! Privacy Management Service, Rights Query
     [ 9 2 0 2 make-snac ] send-aim
+
+    ! [ 2 3 0 2 make-snac ] send-aim
+
+    ! SSI, Activate
     [ HEX: 13 7 0 7 make-snac ] send-aim
+
+    ! Set User Info.  Capabilities!
     [
         2 4 0 4 make-snac
         5 >short
-        HEX: d >short
-        [
-            HEX: 094601054c7f11d1 HEX: 8222444553540000
-            HEX: 0946134a4c7f11d1 HEX: 8222444553540000
-            HEX: 0946134b4c7f11d1 HEX: 8222444553540000
-            HEX: 748f2420628711d1 HEX: 8222444553540000
-            HEX: 0946134d4c7f11d1 HEX: 8222444553540000
-            HEX: 094613414c7f11d1 HEX: 8222444553540000
-            HEX: 094600004c7f11d1 HEX: 8222444553540000
-            HEX: 094613434c7f11d1 HEX: 8222444553540000
-            HEX: 094601ff4c7f11d1 HEX: 8222444553540000
-            HEX: 094601014c7f11d1 HEX: 8222444553540000
-            HEX: 094613454c7f11d1 HEX: 8222444553540000
-            HEX: 094601034c7f11d1 HEX: 8222444553540000
-            HEX: 094613474c7f11d1 HEX: 8222444553540000
-        ] [ >long ] each
-        6 >short
-        6 >short
-        4 >short
-        2 >short
-        2 >short
+        HEX: e0 >short
+        capability-names hash-keys [ >longlong ] each
+        6 >short 6 >short 4 >short 2 >short 2 >short
     ] send-aim
+
+    ! Set ICBM Parameter
     [
         4 2 0 2 make-snac
         0 >int
         HEX: b >short
         HEX: 1f40 >short
-        HEX: 03e70 >short
-        HEX: 03e70 >short
+        HEX: 03e7 >short
+        HEX: 03e7 >short
         0 >int
     ] send-aim
+
+    ! Client Ready
     [
         1 2 0 2 make-snac
         [
@@ -642,6 +709,7 @@ SYMBOL: buddy-list
 
 : second-server
     1 stage-num set
+    1 seq-num set
     aim-chat-ip get aim-chat-port get <client> conn set
     send-second-login read-aim drop
 
