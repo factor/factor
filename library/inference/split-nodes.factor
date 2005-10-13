@@ -1,5 +1,5 @@
 IN: optimizer
-USING: inference kernel sequences words ;
+USING: inference kernel lists sequences words ;
 
 ! #if --> X
 !   |
@@ -40,7 +40,7 @@ M: node split-node* ( node -- ) drop ;
 : inline-literals ( node literals -- node )
     #! Make #push -> #return -> successor
     over drop-inputs [
-        >r [ literalize ] map dataflow [ subst-node ] keep
+        >r >list [ literalize ] map dataflow [ subst-node ] keep
         r> set-node-successor
     ] keep ;
 

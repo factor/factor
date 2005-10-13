@@ -80,10 +80,10 @@ TUPLE: solid ;
 
 ! Solid pen
 M: solid draw-interior
-    drop dup rect-dim swap bg gl-box ;
+    drop dup rect-dim swap bg gl-fill-rect ;
 
 M: solid draw-boundary
-    drop dup rect-dim @{ 1 1 0 }@ v- swap fg gl-rectangle ;
+    drop dup rect-dim @{ 1 1 0 }@ v- swap fg gl-rect ;
 
 ! Rollover only
 TUPLE: rollover-only ;

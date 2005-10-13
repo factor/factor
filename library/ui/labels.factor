@@ -21,7 +21,7 @@ M: label pref-dim ( label -- dim )
     dup label-text label-size ;
 
 M: label draw-gadget* ( label -- )
-    drop ; ! dup delegate draw-gadget* dup label-text draw-string ;
+    dup delegate draw-gadget* drop ; ! label-text draw-string ;
 
 M: label set-message ( string/f label -- )
     >r [ "" ] unless* r> set-label-text* ;
