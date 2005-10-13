@@ -122,7 +122,7 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : make-dlist ( type quot -- id )
     #! Make a display list.
-    gen-dlist swap glNewList call glEndList ; inline
+    gen-dlist [ rot glNewList call glEndList ] keep ; inline
 
 : texture>dlist ( width height id -- id )
     #! Given a texture width/height and ID, make a display list

@@ -93,7 +93,7 @@ SYMBOL: failures
         "httpd/http-client" "threads" "parsing-word"
         "inference" "interpreter" "alien"
         "gadgets/line-editor" "gadgets/rectangles"
-        "gadgets/gradients" "gadgets/frames" "memory"
+        "gadgets/frames" "memory"
         "redefine" "annotate" "binary" "inspector"
         "kernel"
     } run-tests ;

@@ -69,14 +69,6 @@ USING: kernel math prettyprint test ;
 [ 134217728 dup + dup + dup + dup + dup + dup + unparse ]
 unit-test
 
-[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
-[ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
-[ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
-[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
-[ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
-[ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
-[ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test
-
 [ 0 0 ^ ] unit-test-fails
 [ 1 ] [ 10 0 ^ ] unit-test
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
@@ -92,3 +84,17 @@ unit-test
 [ 2 ] [ 3/2 ceiling ] unit-test
 [ 0 ] [ -7/8 ceiling ] unit-test
 [ -1 ] [ -3/2 ceiling ] unit-test
+
+[ 2 ] [ 1 next-power-of-2 ] unit-test
+[ 2 ] [ 2 next-power-of-2 ] unit-test
+[ 4 ] [ 3 next-power-of-2 ] unit-test
+[ 16 ] [ 13 next-power-of-2 ] unit-test
+[ 16 ] [ 16 next-power-of-2 ] unit-test
+
+[ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test
+[ 268435456 ] [ -268435456 >fixnum -1 /i ] unit-test
+[ 268435456 0 ] [ -268435456 >fixnum -1 /mod ] unit-test
+[ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
+[ 0 ] [ -1 -268435456 >fixnum /i ] unit-test
+[ 0 -1 ] [ -1 -268435456 >fixnum /mod ] unit-test
+[ 14355 ] [ 1591517158873146351817850880000000 32769 mod ] unit-test

@@ -30,6 +30,12 @@ UNION: integer fixnum bignum ;
     gcd 1 = [ "Non-trivial divisor found" throw ] unless ;
     foldable
 
+: (next-power-of-2) ( i n -- n )
+    2dup >= [ drop ] [ >r 1 shift r> (next-power-of-2) ] if ;
+
+: next-power-of-2 ( n -- n )
+    2 swap (next-power-of-2) ;
+
 IN: math-internals
 
 : fraction> ( a b -- a/b )

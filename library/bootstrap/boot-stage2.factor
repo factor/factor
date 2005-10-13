@@ -38,11 +38,13 @@ unix? [
     os "macosx" = [
         ! SDL and OpenGL are linked into the runtime
         "sdl-ttf" "libSDL_ttf.dylib" "cdecl" add-library
+        "freetype" "libfreetype.dylib" "cdecl" add-library
     ] [
-        "sdl"     "libSDL.so"     "cdecl" add-library
+        "sdl" "libSDL.so" "cdecl" add-library
         "sdl-ttf" "libSDL_ttf.so" "cdecl" add-library
-        "gl"      "libGL.so"      "cdecl" add-library
-        "glu"     "libGLU.so"     "cdecl" add-library
+        "gl" "libGL.so" "cdecl" add-library
+        "glu" "libGLU.so" "cdecl" add-library
+        "freetype" "libfreetype.so" "cdecl" add-library
     ] if
 ] when
 

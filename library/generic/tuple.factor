@@ -51,8 +51,13 @@ vectors words ;
 : tuple-constructor ( class -- word )
     word-name "in" get constructor-word dup save-location ;
 
+PREDICATE: word tuple-class "tuple-size" word-prop ;
+
+: check-tuple-class ( class -- )
+    tuple-class? [ "Not a tuple class" throw ] unless ;
+
 : define-constructor ( word class def -- )
-    >r [
+    over check-tuple-class >r [
         dup literalize , "tuple-size" word-prop , \ make-tuple ,
     ] [ ] make r> append define-compound ;
 
@@ -86,8 +91,6 @@ M: tuple = ( obj tuple -- ? )
     ] [
         over tuple? [ array= ] [ 2drop f ] if
     ] if ;
-
-PREDICATE: word tuple-class "tuple-size" word-prop ;
 
 : is? ( obj pred -- ? | pred: obj -- ? )
     #! Tests if the object satisfies the predicate, or if

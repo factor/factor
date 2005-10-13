@@ -87,7 +87,9 @@ M: wrapper apply-object wrapped apply-literal ;
     #! Ignore this branch's stack effect.
     terminated? on #terminate node, ;
 
-: infer-quot ( quot -- )
+GENERIC: infer-quot
+
+M: general-list infer-quot ( quot -- )
     #! Recursive calls to this word are made for nested
     #! quotations.
     [ terminated? get [ drop f ] [ apply-object t ] if ] all? drop ;

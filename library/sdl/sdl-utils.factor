@@ -106,21 +106,17 @@ SYMBOL: open-fonts
     ] if ;
 
 : lock-surface ( -- )
-    surface get SDL_LockSurface drop ;
+    must-lock-surface? [ surface get SDL_LockSurface drop ] when ;
 
 : unlock-surface ( -- )
-    surface get SDL_UnlockSurface ;
+    must-lock-surface? [ surface get SDL_UnlockSurface ] when ;
 
 : with-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
-    [
-        must-lock-surface? [ lock-surface ] when
-        call
-    ] [
-        must-lock-surface? [ unlock-surface ] when
-        surface get SDL_Flip
-    ] cleanup ; inline
+    [ lock-surface call ]
+    [ unlock-surface surface get SDL_Flip ]
+    cleanup ; inline
 
 : with-unlocked-surface ( quot -- )
     must-lock-surface?

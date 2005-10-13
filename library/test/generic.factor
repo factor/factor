@@ -194,3 +194,5 @@ TUPLE: delegating ;
 [ f ] [ \ each simple-generic? ] unit-test
 [ f ] [ \ object simple-generic? ] unit-test
 [ t ] [ \ + 2generic? ] unit-test
+
+[ "SYMBOL: not-a-class C: not-a-class ;" parse ] unit-test-fails

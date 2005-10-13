@@ -226,6 +226,8 @@ DEFER: agent
 
 [ @{ 0 1 }@ ] [ [ bad-code ] infer ] unit-test
 
+[ 1234 infer ] unit-test-fails
+
 ! This form should not have a stack effect
 ! : bad-bin 5 [ 5 bad-bin bad-bin 5 ] [ 2drop ] if ;
 ! [ [ bad-bin ] infer ] unit-test-fails

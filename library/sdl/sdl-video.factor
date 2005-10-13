@@ -141,3 +141,6 @@ END-STRUCT
 : SDL_WM_SetCaption ( title icon -- )
     "void" "sdl" "SDL_WM_SetCaption"
     [ "char*" "char*" ] alien-invoke ;
+
+: SDL_GL_SwapBuffers ( -- )
+    "void" "sdl" "SDL_GL_SwapBuffers" [ ] alien-invoke ;
