@@ -163,7 +163,6 @@ M: mapping select-sql ( tuple mapping -- select )
   #! will select based on only the filled in fields of the tuple (ie. all non-f).
   [
     "select ROWID,* from " % dup mapping-table %
-    " where " % 
     mapping-fields [ ( tuple field )
       swap over db-field-slot slot ( field value )
       [
@@ -171,7 +170,12 @@ M: mapping select-sql ( tuple mapping -- select )
       ] [
         drop f
       ] if
-    ] map-with [ ] subset " and " join %
+    ] map-with [ ] subset dup length 0 > [
+      " where " % 
+      " and " join % 
+    ] [
+      drop
+    ] if
     ";" %
   ] "" make ;
 
