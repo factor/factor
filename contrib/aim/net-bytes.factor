@@ -1,4 +1,4 @@
-IN: aim
+IN: aim-internals
 USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto ;
 
 SYMBOL: big-endian t big-endian set
@@ -14,6 +14,13 @@ SYMBOL: unscoped-stack
 
 ! [ 1 >short  6 >long ] make-packet .
 ! "\0\u0001\0\0\0\0\0\0\0\u0006"
+
+: int>ip ( n -- str )
+    [ HEX: ff000000 over bitand -24 shift unparse % CHAR: . ,
+    HEX: 00ff0000 over bitand -16 shift unparse % CHAR: . ,
+    HEX: 0000ff00 over bitand -8 shift unparse % CHAR: . ,
+    HEX: 000000ff bitand unparse % ] "" make ;
+
 
 
 
@@ -117,10 +124,10 @@ SYMBOL: unscoped-stack
 : (>int) ( int -- str )
     4 >endian ;
 
-: (>long) ( long -- str )
+: (>longlong) ( longlong -- str )
     8 >endian ;
 
-: (>longlong) ( longlong -- str )
+: (>u128) ( u128 -- str )
     16 >endian ;
 
 : (>cstring) ( str -- str )
@@ -135,11 +142,11 @@ SYMBOL: unscoped-stack
 : >int ( int -- )
     (>int) % ;
 
-: >long ( long -- )
-    (>long) % ;
-
 : >longlong ( longlong -- )
     (>longlong) % ;
+
+: >u128 ( u128 -- )
+    (>u128) % ;
 
 : >cstring ( str -- )
     (>cstring) % ;
@@ -155,9 +162,9 @@ SYMBOL: unscoped-stack
     2 swap head endian> ;
 : (head-int) ( str -- int )
     4 swap head endian> ;
-: (head-long) ( str -- long )
-    8 swap head endian> ;
 : (head-longlong) ( str -- longlong )
+    8 swap head endian> ;
+: (head-u128) ( str -- u128 )
     16 swap head endian> ;
 
 
@@ -170,16 +177,19 @@ SYMBOL: unscoped-stack
 : head-int ( -- int )
     4 unscoped-stream get stream-read (head-int) ;
 
-: head-long ( -- long )
-    8 unscoped-stream get stream-read (head-long) ;
+: head-longlong ( -- longlong )
+    8 unscoped-stream get stream-read (head-longlong) ;
 
 ! 128 bits
-: head-longlong ( -- longlong )
-    16 unscoped-stream get stream-read (head-longlong) ;
+: head-u128 ( -- u128 )
+    16 unscoped-stream get stream-read (head-u128) ;
 
 : head-string ( n -- str )
     unscoped-stream get stream-read >string ;
 
 ! : head-cstring ( -- str )
 	! head-byte ] 
+
+: head-contents ( -- str )
+    unscoped-stream get contents ;
 

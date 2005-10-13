@@ -1,7 +1,7 @@
 ! All Talk
 
-IN: aim
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector ;
+IN: aim-internals
+USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals ;
 
 SYMBOL: username
 SYMBOL: password
@@ -16,7 +16,18 @@ SYMBOL: family
 SYMBOL: opcode
 SYMBOL: name
 SYMBOL: message
+SYMBOL: encoding
+SYMBOL: warning
 SYMBOL: buddy-list
+SYMBOL: channel
+SYMBOL: icbm-cookie
+SYMBOL: message-type
+SYMBOL: my-ip
+SYMBOL: blue-ip
+SYMBOL: file-transfer-cancelled
+SYMBOL: direct-connect-cancelled
+SYMBOL: remote-internal-ip
+SYMBOL: remote-external-ip
 
 : aim-login-server "login.oscar.aol.com" ; inline
 : icq-login-server "login.icq.com" ; inline
@@ -33,6 +44,11 @@ SYMBOL: buddy-list
 : client-country "us" ; inline
 : client-ssi-flag 1 ; inline
 : client-charset "text/aolrtf; charset=\"us-ascii\"" ; inline
+: file-transfer-url "http://dynamic.aol.com/cgi/redir?http://www.aol.com/aim/filetransfer/antivirus.html" ; inline
+! : akadns-aol.com "http://www.aol.com.websys.akadns.net" ;
+! 205.188.210.203
+: aim-file-server-port 5190 ; inline
+
 
 ! Family names from ethereal
 : family-names
@@ -53,6 +69,24 @@ SYMBOL: buddy-list
 }} ;
 
 : capability-names
+{{
+    [[ "Unknown1" HEX: 094601054c7f11d18222444553540000 ]]
+    [[ "Games" HEX: 0946134a4c7f11d18222444553540000 ]]
+    [[ "Send Buddy List" HEX: 0946134b4c7f11d18222444553540000 ]]
+    [[ "Chat" HEX: 748f2420628711d18222444553540000 ]]
+    [[ "AIM/ICQ Interoperability" HEX: 0946134d4c7f11d18222444553540000 ]]
+    [[ "Voice Chat" HEX: 094613414c7f11d18222444553540000 ]]
+    [[ "iChat" HEX: 094600004c7f11d18222444553540000 ]]
+    [[ "Send File" HEX: 094613434c7f11d18222444553540000 ]]
+    [[ "Unknown2" HEX: 094601ff4c7f11d18222444553540000 ]]
+    [[ "Live Video" HEX: 094601014c7f11d18222444553540000 ]]
+    [[ "Direct Instant Messaging" HEX: 094613454c7f11d18222444553540000 ]]
+    [[ "Unknown3" HEX: 094601034c7f11d18222444553540000 ]]
+    [[ "Buddy Icon" HEX: 094613464c7f11d18222444553540000 ]]
+    [[ "Add-Ins" HEX: 094613474c7f11d18222444553540000 ]]
+}} ;
+
+: capability-values
 {{
     [[ HEX: 094601054c7f11d18222444553540000 "Unknown1" ]]
     [[ HEX: 0946134a4c7f11d18222444553540000 "Games" ]]
@@ -77,7 +111,7 @@ SYMBOL: buddy-list
     0 seq-num set
     1 stage-num set ;
 
-: (prepend-aim-protocol) ( data -- )
+: prepend-aim-protocol ( data -- )
     [
         HEX: 2a >byte
         stage-num get >byte
@@ -92,18 +126,18 @@ SYMBOL: buddy-list
     conn get [ stream-write ] keep stream-flush ;
 
 : send-aim ( data -- )
-    make-packet (prepend-aim-protocol) (send-aim) terpri ;
+    make-packet prepend-aim-protocol (send-aim) terpri ;
 
 : with-aim ( quot -- )
     conn get swap with-unscoped-stream ;
 
 : read-aim ( -- bc )
-    [
+    [ [
         head-byte drop
         head-byte drop
         head-short drop
         head-short head-string
-    ] with-aim
+    ] with-aim ] catch [ "Socket error" print throw ] when
     "Received: " write dup hexdump ;
 
 : make-snac ( fam subtype flags req-id -- )
@@ -118,7 +152,7 @@ SYMBOL: buddy-list
 : (unhandled-opcode) ( str -- )
     "Family: " write family get unparse write
     ", opcode: " write opcode get unparse writeln
-    unscoped-stream get contents hexdump ;
+    head-contents hexdump ;
 
 : unhandled-opcode ( -- )
     "Unhandled opcode: " write (unhandled-opcode) ;
@@ -159,27 +193,15 @@ SYMBOL: buddy-list
 
 
 
-: (handle-reply-info)
-    head-byte head-string name set
-    "Warning: " write head-short unparse writeln
-    head-short dup unparse print
+
+
+! Generic, Capabilities
+: send-generic-capabilities
     [
-        head-short
-        head-short head-string <string-reader> [
-            {
-                ! { [ 1 = ] [ drop head-short drop ] }
-                ! { [ 3 = ] [ drop ] }
-                ! { [ 5 = ] [ drop ] }
-                ! { [ 10 = ] [ drop ] }
-                ! { [ 13 = ] [ drop ] }
-                ! { [ 15 = ] [ drop ] }
-                ! { [ 29 = ] [ drop ] }
-                ! { [ 30 = ] [ drop ] }
-                ! { [ 34 = ] [ drop ] }
-                { [ t ] [ "  Unhandled tlv 1-15: " write unparse writeln unscoped-stream get contents hexdump ] }
-            } cond
-        ] with-unscoped-stream
-    ] repeat ;
+        1 HEX: 17 0 HEX: 17 make-snac
+        [ 1 4  HEX: 13 3  2 1  3 1  4 1  6 1  8 1  9 1  HEX: a 1  HEX: b 1 ]
+        [ >short ] each
+    ] send-aim ;
 
 : (handle-supported-families)
 	unscoped-stream get empty? [
@@ -189,17 +211,73 @@ SYMBOL: buddy-list
 
 : handle-supported-families
 	"Families: " print
-	(handle-supported-families) ; FAMILY: 1 OPCODE: 3
+	(handle-supported-families) 
+    send-generic-capabilities
+    ; FAMILY: 1 OPCODE: 3
 
-: handle-
-	; FAMILY: 1 OPCODE: 7
-: handle-
-	; FAMILY: 1 OPCODE: 15
-: handle-
-	; FAMILY: 1 OPCODE: 19
-: handle-
-	; FAMILY: 1 OPCODE: 24
+: send-requests ( -- )
+    ! Self Info Request
+    [ 1 HEX: e 0 HEX: e make-snac ] send-aim
 
+    ! Request Rights
+    [ HEX: 13 2 0 2 make-snac ] send-aim
+
+    ! Request List
+    [ HEX: 13 4 0 HEX: 3efb0004 make-snac ] send-aim
+
+    ! Location, Request Rights
+    [ 2 2 0 2 make-snac ] send-aim
+
+    ! Buddylist Service, Rights Request
+    [ 3 2 0 2 make-snac ] send-aim
+
+    ! Messaging, Request Parameter Info
+    [ 4 4 0 4 make-snac ] send-aim
+
+    ! Privacy Management Service, Rights Query
+    [ 9 2 0 2 make-snac ] send-aim ;
+
+: handle-1-7
+    [
+        1 8 0 8 make-snac
+        head-short dup [ 
+            ! "Rate Classes: " write
+            head-short >short ! rate class id
+            head-int drop ! window size
+            head-int drop ! clear level
+            head-int drop ! alert level
+            head-int drop ! limit level
+            head-int drop ! disconnect level
+            head-int drop ! current level
+            head-int drop ! max level
+            head-int drop ! last time
+            head-byte drop ! current state
+        ] repeat
+        [ 
+            head-short drop ( rate class id again )
+            ! Pairs
+            head-short [ head-int drop ] repeat
+        ] repeat
+    ] send-aim ( BOS, Rights Query )
+    send-requests ; FAMILY: 1 OPCODE: 7
+
+! : handle-1-15
+    ! head-byte head-string drop
+	! ; FAMILY: 1 OPCODE: 15
+
+: (handle-reply-info)
+    head-byte head-string name set
+    "Warning: " write head-short unparse writeln
+    head-short dup unparse print
+    [
+        head-short
+        head-short head-string <string-reader> [
+            {
+                ! { [ 1 = ] [ drop ] }
+                { [ t ] [ "  Unhandled tlv 1-15: " write unparse writeln head-contents hexdump ] }
+            } cond
+        ] with-unscoped-stream
+    ] repeat ;
 
 ! : handle-reply-info
     ! "HANDLE REPLY INFO" print
@@ -207,8 +285,25 @@ SYMBOL: buddy-list
         ! (handle-reply-info)
     ! ; FAMILY: 1 OPCODE: 15
 
-    ! unscoped-stream get empty? [
-    ! ] unless ; FAMILY: 1 OPCODE: 15
+! message of the day
+: handle-1-19
+    7 [ head-short drop ] repeat
+    ! Generic, Rate Info Request
+    [ 1 6 0 6 make-snac ] send-aim ; FAMILY: 1 OPCODE: 19
+
+! capabilities ack
+: handle-1-24
+    "Unhandled ack: " write head-contents writeln
+	; FAMILY: 1 OPCODE: 24
+
+! : handle-1-33
+    ! AIM Email
+    ! [ 1 4 HEX: 02cc 4 make-snac HEX: 18 >short ] send-aim
+
+    ! AIM Location
+    ! [ 2 HEX: b HEX: 446d HEX: b make-snac username get length >byte username get % ] send-aim
+    ! ; FAMILY: 1 OPCODE: 33
+
 
 : handle-2-1
 	"2-1: " write head-short unparse writeln 
@@ -220,13 +315,12 @@ SYMBOL: buddy-list
 ! : handle-away-message
     ! head-byte head-string name set
     ! name get write "'s away message: " write
-
     ! ; FAMILY: 2 OPCODE: 6
 
 
 : handle-capabilities
     unscoped-stream get empty? [
-        head-longlong capability-names hash dup [ "Unknown Capability" nip ] unless
+        head-u128 capability-values hash dup [ "Unknown Capability" nip ] unless
         writeln handle-capabilities
     ] unless ;
 
@@ -257,7 +351,7 @@ SYMBOL: buddy-list
                 { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
                 { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
                 { [ dup 29 = ] [ drop handle-29 ] }
-                { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln unscoped-stream get contents hexdump ] }
+                { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
     ] repeat ; FAMILY: 3 OPCODE: 11
@@ -272,52 +366,170 @@ SYMBOL: buddy-list
             {
                 { [ dup 1 = ] [ drop name get write " signed off." writeln name get buddy-signoff ] }
                 { [ dup HEX: 1d = ] [ drop ] }
-                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln unscoped-stream get contents hexdump ] }
+                { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
     ] repeat ; FAMILY: 3 OPCODE: 12
 
-: drop-family-4h-header
+: parse-family-4h-header
     head-short drop
     head-short drop
     head-short drop
     head-short drop
-    8 head-string drop  ( message-id ) ;
+    8 head-string drop
+    head-short channel set ;
     
-: (parse-incoming-message-text) ( -- str )
-    head-short drop head-short unscoped-stream get contents ;
+: parse-message-text ( -- str )
+    head-short drop head-short drop head-contents ;
 
-: (parse-incoming-message-tlv2)
+: parse-message-tlv2
     unscoped-stream get empty? [
         head-byte
         head-byte drop ! fragVer
         head-short head-string <string-reader>
         [ 
             {
-                { [ dup 1 = ] [ drop (parse-incoming-message-text) writeln ] }
+                { [ dup 1 = ] [ drop parse-message-text message set ] }
                 { [ dup 5 = ] [ drop ] }
                 { [ t ] [ "Unknown frag: " write unparse writeln unscoped-stream get contents hexdump ] }
             } cond
         ] with-unscoped-stream
-        (parse-incoming-message-tlv2)
+        parse-message-tlv2
     ] unless ;
 
+: handle-file-transfer-start-tlvs
+    unscoped-stream get empty? [
+        head-short
+        head-short head-string <string-reader> [
+            file-transfer-cancelled off
+            dup unparse write ": " write
+            {
+                { [ dup 2 = ] [ drop head-int int>ip dup my-ip set "my ip: " write write ] }
+                { [ dup 3 = ] [ drop head-int int>ip dup blue-ip set "blue.aol ip: " write write  ] }
+                { [ dup 4 = ] [ drop head-int unparse write ] }
+                { [ dup 5 = ] [ drop head-short unparse write ] }
+                { [ dup 10 = ] [ drop head-short unparse write ] }
+                { [ dup 11 = ] [ drop head-short unparse . "Transfer canclled" print file-transfer-cancelled on ] }
+                { [ dup 12 = ] [ drop head-contents message set "Message: " write message get writeln ] }
+                { [ dup 13 = ] [ drop head-contents encoding set ] }
+                { [ dup 14 = ] [ drop head-short unparse write ] }
+                { [ dup 15 = ] [ drop ( do nothing ) ] }
+                { [ dup 22 = ] [ drop head-int unparse write ] }
+                { [ dup 23 = ] [ drop head-short unparse write ] }
+                { [ dup 10001 = ] [ drop head-contents write ] }
+                { [ dup 10002 = ] [ drop head-contents write ] }
+                { [ t ] [ "Unhandled file transfer tlv: " write unparse writeln head-contents hexdump ] }
+            } cond terpri
+        ] with-unscoped-stream
+        handle-file-transfer-start-tlvs
+    ] unless ;
 
-: (parse-incoming-message-chunks)
+: send-file-transfer-start
+    "STARTING FILE TRANSFER" print
+    [
+        4 6 0 HEX: 778f0006 make-snac
+        icbm-cookie get >longlong
+        2 >short
+        name get length >byte
+        name get %
+        5 >short
+        56 >short
+        0 >short
+        icbm-cookie get >longlong
+        "Send File" capability-names hash >u128
+        10 >short 2 >short 2 >short
+        2 >short 4 >short 0 >int
+        22 >short 4 >short HEX: ffffffff >int ! gateway?
+        3 >short 4 >short 0 >int
+    ] send-aim ;
+
+: handle-chat-start-tlvs
+    unscoped-stream get empty? [
+        head-short
+        head-short head-string <string-reader> [
+            dup unparse write ": " write
+            {
+                { [ dup 10 = ] [ drop head-short unparse write ] }
+                { [ dup 12 = ] [ drop head-contents message set ] }
+                { [ dup 13 = ] [ drop head-contents encoding set ] }
+                { [ dup 14 = ] [ drop head-byte unparse write ] }
+                { [ dup 15 = ] [ drop ( do nothing ) ] }
+                { [ dup 10001 = ] [ drop head-contents hexdump ] }
+                { [ t ] [ "Unhandled chat transfer tlv: " write unparse writeln head-contents hexdump ] }
+            } cond terpri
+        ] with-unscoped-stream
+        handle-chat-start-tlvs
+    ] unless ;
+
+: handle-direct-start-tlvs
+    unscoped-stream get empty? [
+        head-short
+        head-short head-string <string-reader> [
+            dup unparse write ": " write
+            {
+                { [ dup 2 = ] [ drop head-int int>ip dup remote-internal-ip set "remote internal ip: " write write ] }
+                { [ dup 3 = ] [ drop head-int int>ip dup remote-external-ip set "remote external? ip: " write write ] }
+                { [ dup 4 = ] [ drop head-int int>ip dup my-ip set "my? ip: " write write ] }
+                { [ dup 5 = ] [ drop head-short unparse "port?" write write ] }
+                { [ dup 10 = ] [ drop head-short unparse write ] }
+                { [ dup 11 = ] [ drop head-short unparse write direct-connect-cancelled set ] }
+                { [ dup 15 = ] [ drop ( do nothing ) ] }
+                { [ dup 22 = ] [ drop head-int unparse write ] }
+                { [ dup 23 = ] [ drop head-short unparse "port?" write write ] }
+                { [ t ] [ "Unhandled direct transfer tlv: " write unparse writeln head-contents hexdump ] }
+            } cond terpri
+        ] with-unscoped-stream
+        handle-direct-start-tlvs
+    ] unless ;
+
+: send-direct-connect-start
+    ;
+
+: send-auth-file-transfer
+    [
+        0 >short
+        1 >short
+        "Send File" capability-names hash >u128
+        0 >short
+    ] send-aim ;
+
+: connect-aim-file-transfer-server
+    "205.188.210.203" aim-file-server-port <client> ;
+    
+
+: handle-file-transfer-start
+    head-short message-type set
+    head-longlong icbm-cookie set
+    head-u128 capability-values hash 
+    {
+        { [ dup "Send File" = ]
+            [ . handle-file-transfer-start-tlvs 
+                file-transfer-cancelled get [ send-file-transfer-start ] unless
+            ] }
+        { [ dup "Chat" = ] [ . handle-chat-start-tlvs 
+            "Chat join message: " write message get writeln ] }
+        { [ dup "Direct Instant Messaging" = ] [ . handle-direct-start-tlvs
+                direct-connect-cancelled get [ send-direct-connect-start ] unless
+            ] }
+        { [ t ] [ "Unsupported capability in channel 2: " write writeln head-contents hexdump ] }
+    } cond ;
+
+: parse-message-chunks
     unscoped-stream get empty? [
         head-short
         head-short head-string <string-reader> [
             {
-                { [ dup 2 = ] [ drop (parse-incoming-message-tlv2) ] }
-                { [ dup 11 = ] [ 2drop ] }
-                { [ dup 13 = ] [ drop ] }
-                { [ t ] [ "Unhandled chunk: " write unparse writeln unscoped-stream get contents hexdump ] }
+                { [ dup 2 = ] [ drop parse-message-tlv2 ] }
+                { [ dup 5 = ] [ drop handle-file-transfer-start ] }
+                { [ dup 11 = ] [ drop ] }
+                ! { [ dup 13 = ] [ drop ] }
+                { [ t ] [ "Unhandled chunk: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
-        (parse-incoming-message-chunks)
+        parse-message-chunks
     ] unless ;
 
-: (parse-incoming-message-tlv) ( n -- )
+: parse-message-tlv ( n -- )
     [
         head-short
         head-short head-string <string-reader>
@@ -328,18 +540,23 @@ SYMBOL: buddy-list
                 { [ dup 3 = ] [ drop ] }
                 { [ dup 15 = ] [ drop ] }
                 { [ dup 29 = ] [ drop ] }
-                { [ t ] [ "Unknown tlv: " write unparse writeln unscoped-stream get contents hexdump ] }
+                { [ t ] [ "Unknown tlv: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
     ] repeat ;
 
 : handle-incoming-message ( -- )
-    drop-family-4h-header
-    head-short drop ! channel
-    head-byte head-string "Incoming msg from " write write ": " write
-    head-short drop ! warning-level
-    head-short (parse-incoming-message-tlv)
-    (parse-incoming-message-chunks) ; FAMILY: 4 OPCODE: 7
+    parse-family-4h-header
+    head-byte head-string name set
+    head-short warning set
+    head-short parse-message-tlv
+    parse-message-chunks
+
+    channel get 1 = [
+        "Incoming msg from " write name get write ": " write
+        "Warning: " write warning get 10 /f unparse write "%" writeln
+        "Message: " write message get writeln
+    ] when ; FAMILY: 4 OPCODE: 7
 
 ! : handle-4-12
 	! head-short 2 / [ head-short drop ] repeat
@@ -349,8 +566,7 @@ SYMBOL: buddy-list
 	! ; FAMILY: 4 OPCODE: 12
 
 : handle-typing-message ( -- )
-    drop-family-4h-header
-    head-short drop
+    parse-family-4h-header
     head-byte head-string write
     head-short
     {
@@ -361,13 +577,54 @@ SYMBOL: buddy-list
     } cond ; FAMILY: 4 OPCODE: 20
 
 
-! : handle-
-	! ; FAMILY: 19 OPCODE: 3
+: handle-19-3
+    ! SSI, Activate
+    [ HEX: 13 7 0 7 make-snac ] send-aim
+    ! Set User Info.  Capabilities!
+    [
+        2 4 0 4 make-snac
+        5 >short
+        HEX: e0 >short
+        capability-values hash-keys [ >u128 ] each
+        6 >short 6 >short 4 >short 2 >short 2 >short
+    ] send-aim
+
+    ! Set ICBM Parameter
+    [
+        4 2 0 2 make-snac
+        0 >int
+        HEX: b >short
+        HEX: 1f40 >short
+        HEX: 03e7 >short
+        HEX: 03e7 >short
+        0 >int
+    ] send-aim
+
+    ! Client Ready
+    [
+        1 2 0 2 make-snac
+        [
+            HEX: 1 HEX: 4 HEX: 110 HEX: 8f1
+            HEX: 13 HEX: 3 HEX: 110 HEX: 8f1
+            HEX: 2 HEX: 1 HEX: 110 HEX: 8f1
+            HEX: 3 HEX: 1 HEX: 110 HEX: 8f1
+            HEX: 4 HEX: 4 HEX: 110 HEX: 8f1
+            HEX: 6 HEX: 1 HEX: 110 HEX: 8f1
+            HEX: 8 HEX: 1 HEX: 104 HEX: 8f1
+            HEX: 9 HEX: 1 HEX: 110 HEX: 8f1
+            HEX: a HEX: 1 HEX: 110 HEX: 8f1
+            HEX: b HEX: 1 HEX: 110 HEX: 8f1
+        ] [ >short ] each
+    ] send-aim
+    ; FAMILY: 19 OPCODE: 3
+
+: handle-19-6
+    ; FAMILY: 19 OPCODE: 6
 
 : print-op ( op -- )
     "Op: " write . ;
 
-: (parse-server) ( ip:port -- )
+: parse-server ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
 
 : process-login-chunks ( stream -- )
@@ -377,7 +634,7 @@ SYMBOL: buddy-list
         swap
         {
             ! { [ dup 1 = ] [ print-op head-string . ] }
-            { [ dup 5 = ] [ drop head-string (parse-server) ] }
+            { [ dup 5 = ] [ drop head-string parse-server ] }
             { [ dup 6 = ] [ drop head-string auth-code set ] }
             ! { [ dup 8 = ] [ print-op head-string . ] }
             ! { [ t ] [ print-op head-string . ] }
@@ -442,8 +699,62 @@ SYMBOL: buddy-list
         unscoped-stream get empty? [ incomplete-opcode ] unless
     ] with-unscoped-stream ;
 
+! Login
+: send-first-login ( -- )
+    [ 1 >int ] send-aim ;
 
+: send-first-request-auth ( -- )
+    2 stage-num set
+    [
+        HEX: 17 HEX: 6 0 0 make-snac
+        1 >short
+        username get length >short
+        username get %
+        HEX: 4b >short
+        HEX: 00 >short
+        HEX: 5a >short
+        HEX: 00 >short
+    ] send-aim ;
 
+! AIM Chat Server
+: send-second-login
+    [
+        1 >int
+        6 >short
+        auth-code get length >short
+        auth-code get %
+    ] send-aim ;
+
+: first-server
+    ! first server
+    1 stage-num set
+    aim-login-server login-port <client> conn set
+
+    send-first-login read-aim drop
+
+    ! normal transmission stage
+    send-first-request-auth read-aim handle-packet
+    read-aim handle-packet
+    read-aim drop
+    conn get stream-close ;
+
+: second-server
+    aim-chat-ip get aim-chat-port get <client> conn set
+    1 stage-num set
+    65535 random-int seq-num set
+    send-second-login read-aim drop
+    2 stage-num set ;
+
+: handle-loop ( -- )
+    read-aim handle-packet terpri handle-loop ;
+
+: connect-aim ( -- )
+    first-server
+    aim-chat-ip get 
+    [ "No aim server received (too many logins, try again later)" throw ] unless
+    second-server [ handle-loop ] in-thread ;
+
+IN: aim
 
 ! Commands
 : send-im ( name message -- )
@@ -538,14 +849,14 @@ SYMBOL: buddy-list
         name get %
         ! BUDDY GROUP ID HEX: 1a4c
         ! BUDDY ID HEX: 1812
-        0 >short
-        0 >short
+        0 >short ! buddy type
+        0 >short ! tlv len
     ] send-aim
     buddy-list-edit-stop ;
 
 ! : modify-buddy
     ! [
-        ! HEX: 13 9 0 HEX: 56ef0009
+        ! HEX: 13 9 0 HEX: 6e190009
         ! group length
         ! group name
     ! ] send-aim ;
@@ -565,162 +876,6 @@ SYMBOL: buddy-list
     ! modify-buddy
     buddy-list-edit-stop ;
 
-
-
-
-! Login
-: send-first-login ( -- )
-    [ 1 >int ] send-aim ;
-
-: send-first-request-auth ( -- )
-    stage-num [ 1 + ] change
-    [
-        HEX: 17 HEX: 6 0 0 make-snac
-        1 >short
-        username get length >short
-        username get %
-        HEX: 4b >short
-        HEX: 00 >short
-        HEX: 5a >short
-        HEX: 00 >short
-    ] send-aim ;
-
-: send-second-login
-    [
-        1 >int
-        6 >short
-        auth-code get length >short
-        auth-code get %
-    ] send-aim ;
-
-: send-second-bunch ( -- )
-    stage-num [ 1 + ] change
-    ! Generic, Capabilities
-    [
-        1 HEX: 17 0 HEX: 17 make-snac
-        [ 1 4  HEX: 13 3  2 1  3 1  4 1  6 1  8 1  9 1  HEX: a 1  HEX: b 1 ]
-        [ >short ] each
-    ] send-aim
-    ! Handle Message of the Day
-    ! read-aim handle-packet
-
-    ! Generic, Rate Info Request
-    [ 1 6 0 6 make-snac ] send-aim
-    ! handle rate info
-    ! read-aim handle-packet ! send rate info ack
-
-    ! BOS, Rights Query
-    [ 1 8 0 8 make-snac [ 1 2 3 4 5 ] [ >short ] each ] send-aim
-    ! BOS, handle rights
-    ! read-aim handle-packet
-
-    ! SSI, No List
-    ! read-aim handle-packet
-
-    ! Self Info Request
-    [ 1 HEX: e 0 HEX: e make-snac ] send-aim
-
-    ! Request Rights
-    [ HEX: 13 2 0 2 make-snac ] send-aim
-
-    ! Request List
-    ! [
-        ! HEX: 13 5 HEX: 7e6d 5 make-snac
-        ! HEX: 41c1 >int
-        ! HEX: 3670 >int
-        ! HEX: bb >short
-    ! ] send-aim
-    [
-        HEX: 13 5 HEX: 2575 5 make-snac
-        HEX: 434d >short
-        HEX: 4951 >short
-        HEX: 0b >short
-    ] send-aim
-
-    ! Location, Request Rights
-    [ 2 2 0 2 make-snac ] send-aim
-
-    ! Buddylist Service, Rights Request
-    [ 3 2 0 2 make-snac ] send-aim
-
-    ! Messaging, Request Parameter Info
-    [ 4 4 0 4 make-snac ] send-aim
-
-    ! Privacy Management Service, Rights Query
-    [ 9 2 0 2 make-snac ] send-aim
-
-    ! [ 2 3 0 2 make-snac ] send-aim
-
-    ! SSI, Activate
-    [ HEX: 13 7 0 7 make-snac ] send-aim
-
-    ! Set User Info.  Capabilities!
-    [
-        2 4 0 4 make-snac
-        5 >short
-        HEX: e0 >short
-        capability-names hash-keys [ >longlong ] each
-        6 >short 6 >short 4 >short 2 >short 2 >short
-    ] send-aim
-
-    ! Set ICBM Parameter
-    [
-        4 2 0 2 make-snac
-        0 >int
-        HEX: b >short
-        HEX: 1f40 >short
-        HEX: 03e7 >short
-        HEX: 03e7 >short
-        0 >int
-    ] send-aim
-
-    ! Client Ready
-    [
-        1 2 0 2 make-snac
-        [
-            HEX: 1 HEX: 4 HEX: 110 HEX: 8f1
-            HEX: 13 HEX: 3 HEX: 110 HEX: 8f1
-            HEX: 2 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 3 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 4 HEX: 4 HEX: 110 HEX: 8f1
-            HEX: 6 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 8 HEX: 1 HEX: 104 HEX: 8f1
-            HEX: 9 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: a HEX: 1 HEX: 110 HEX: 8f1
-            HEX: b HEX: 1 HEX: 110 HEX: 8f1
-        ] [ >short ] each
-    ] send-aim ;
-
-: handle-loop ( -- )
-    read-aim handle-packet terpri handle-loop ;
-
-: first-server
-    ! first server
-    1 stage-num set
-    aim-login-server login-port <client> conn set
-
-    send-first-login read-aim drop
-
-    ! normal transmission stage
-    send-first-request-auth read-aim handle-packet
-    read-aim handle-packet
-    read-aim drop
-    conn get stream-close ;
-
-: second-server
-    1 stage-num set
-    1 seq-num set
-    aim-chat-ip get aim-chat-port get <client> conn set
-    send-second-login read-aim drop
-
-    ! normal transmission stage
-    send-second-bunch ;
-
-: connect-aim ( -- )
-    first-server
-    aim-chat-ip get 
-    [ "No aim server received (too many logins, try again later)" throw ] unless
-    second-server [ handle-loop ] in-thread ;
 
 : run ( username password -- )
     initialize-aim connect-aim ;
