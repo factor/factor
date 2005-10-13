@@ -36,7 +36,7 @@ namespaces sequences ;
 
 : <menu> ( assoc -- gadget )
     #! Given an association list mapping labels to quotations.
-    menu-items line-border dup menu-theme ;
+    menu-items <border> dup menu-theme ;
 
 : menu-button-actions ( gadget -- )
     dup [ button-clicked ] [ button-down 1 ] set-action

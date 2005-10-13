@@ -11,12 +11,6 @@ C: border ( child -- border )
     @{ 5 5 0 }@ over set-border-size
     [ add-gadget ] keep ;
 
-: line-border ( child -- border )
-    <border> dup solid-boundary ;
-
-: bevel-border ( child -- border )
-    <border> dup bevel-theme ;
-
 : layout-border-loc ( border -- )
     dup border-size swap gadget-child set-rect-loc ;
 

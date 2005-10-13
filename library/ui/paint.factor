@@ -1,32 +1,32 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-IN: gadgets
 USING: alien arrays gadgets-layouts generic hashtables io kernel
-lists math namespaces sdl sequences strings styles vectors ;
+lists math namespaces opengl sdl sequences strings styles vectors ;
+IN: gadgets
 
 SYMBOL: clip
-
-: >sdl-rect ( rectangle -- sdlrect )
-    [ rect-loc first2 ] keep rect-dim first2 make-rect ;
-
-: set-clip ( rect -- )
-    #! The top/left corner of the clip rectangle is the location
-    #! of the gadget on the screen. The bottom/right is the
-    #! intersected clip rectangle.
-    surface get swap >sdl-rect SDL_SetClipRect drop ;
 
 : visible-children ( gadget -- seq ) clip get swap children-on ;
 
 GENERIC: draw-gadget* ( gadget -- )
 
 : do-clip ( gadget -- )
-    >absolute clip [ intersect dup ] change set-clip ;
+    >absolute clip [ intersect dup ] change
+    dup rect-loc swap rect-dim gl-set-clip ;
+
+: with-translation ( gadget quot -- | quot: gadget -- )
+    GL_MODELVIEW [
+        >r dup rect-loc dup translate first3 glTranslated
+        r> call
+    ] do-matrix ; inline
 
 : draw-gadget ( gadget -- )
     clip get over inside? [
         [
-            dup do-clip dup translate dup draw-gadget*
-            visible-children [ draw-gadget ] each
+            dup do-clip [
+                dup draw-gadget*
+                visible-children [ draw-gadget ] each
+            ] with-translation
         ] with-scope
     ] [ drop ] if ;
 
@@ -80,11 +80,10 @@ TUPLE: solid ;
 
 ! Solid pen
 M: solid draw-interior
-    drop >r surface get r> [ rect>screen ] keep bg rgb boxColor ;
+    drop dup rect-dim swap bg gl-box ;
 
 M: solid draw-boundary
-    drop >r surface get r> [ rect>screen ] keep
-    fg rgb rectangleColor ;
+    drop dup rect-dim @{ 1 1 0 }@ v- swap fg gl-rectangle ;
 
 ! Rollover only
 TUPLE: rollover-only ;
@@ -100,71 +99,11 @@ M: rollover-only draw-boundary ( gadget boundary -- )
     [ delegate draw-boundary ] [ 2drop ] if ;
 
 ! Gradient pen
-TUPLE: gradient vector from to ;
-
-: gradient-color ( gradient prop -- color )
-    over gradient-from 1 pick - v*n
-    >r swap gradient-to n*v r> v+ ;
-
-: (gradient-x) ( gradient dim y -- x1 x2 y color )
-    dup pick second / >r rot r> gradient-color >r
-    >r >r origin get first r> origin get v+ first
-    r> origin get second + r> ;
-
-: gradient-x ( gradient dim y -- )
-    >r >r >r surface get r> r> r> (gradient-x) rgb hlineColor ;
-
-: vert-gradient ( gradient dim -- )
-    dup second [ 3dup gradient-x ] repeat 2drop ;
-
-: (gradient-y) ( gradient dim x -- x y1 y2 color )
-    dup pick first / >r rot r> gradient-color
-    >r origin get first + origin get second rot
-    origin get v+ second r> ;
-
-: gradient-y ( gradient dim x -- )
-    >r >r >r surface get r> r> r> (gradient-y) rgb vlineColor ;
-
-: horiz-gradient ( gradient dim -- )
-    dup first [ 3dup gradient-y ] repeat 2drop ;
+TUPLE: gradient direction colors ;
 
 M: gradient draw-interior ( gadget gradient -- )
-    swap rect-dim @{ 1 1 1 }@ vmax
-    over gradient-vector @{ 1 0 0 }@ =
-    [ horiz-gradient ] [ vert-gradient ] if ;
-
-! Bevel pen
-TUPLE: bevel width ;
-
-: x1/x2/y1 ( vector vector -- surface n n n )
-    surface get -rot >r first2 r> first swap ;
-: x1/x2/y2 ( vector vector -- surface n n n )
-    surface get -rot >r first r> first2 ;
-: x1/y1/y2 ( vector vector -- surface n n n )
-    surface get -rot >r first2 r> second ;
-: x2/y1/y2 ( vector vector -- surface n n n )
-    surface get -rot >r second r> first2 swapd ;
-
-SYMBOL: bevel-1
-SYMBOL: bevel-2
-
-: bevel-color ( gadget ? -- rgb )
-    >r dup reverse-video paint-prop bevel-1 bevel-2
-    r> [ swap ] when ? paint-prop rgb ;
-
-: draw-bevel ( v1 v2 gadget -- )
-    [ >r x1/x2/y1 r> f bevel-color hlineColor ] 3keep
-    [ >r x1/x2/y2 r> t bevel-color hlineColor ] 3keep
-    [ >r x1/y1/y2 r> f bevel-color vlineColor ] 3keep
-    >r x2/y1/y2 r> t bevel-color vlineColor ;
-
-M: bevel draw-boundary ( gadget boundary -- )
-    #! Ugly code.
-    bevel-width [
-        >r origin get over rect-dim over v+ r>
-        @{ 1 1 0 }@ n*v tuck v- @{ 1 1 0 }@ v- >r v+ r>
-        rot draw-bevel
-    ] each-with ;
+    dup gradient-direction swap gradient-colors rot rect-dim
+    gl-gradient ;
 
 M: gadget draw-gadget* ( gadget -- )
     dup
@@ -174,27 +113,11 @@ M: gadget draw-gadget* ( gadget -- )
 ! Polygon pen
 TUPLE: polygon points ;
 
-: >short-array ( seq -- short-array )
-    dup length dup <short-array> -rot [
-        pick set-short-nth
-    ] 2each ;
-
-: polygon-x/y ( gadget polygon -- vx vy n )
-    polygon-points [
-        swap rect-dim over max-dim v- 2 v/n origin get v+
-        swap [ v+ ] map-with
-        dup [ first ] map swap [ second ] map
-        [ >short-array ] 2apply
-    ] keep length ;
-
-: (polygon) ( gadget polygon -- surface vx vy n gadget )
-    over >r surface get -rot polygon-x/y r> ;
-
 M: polygon draw-boundary ( gadget polygon -- )
-    (polygon) fg rgb polygonColor ;
+    polygon-points swap fg gl-poly ;
 
 M: polygon draw-interior ( gadget polygon -- )
-    (polygon) bg rgb filledPolygonColor ;
+    polygon-points swap bg gl-fill-poly ;
 
 : arrow-up    @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ ;
 : arrow-right @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ ;

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: errors gadgets-layouts gadgets-listener gadgets-theme generic
-help io kernel listener lists math memory namespaces prettyprint
-sdl sequences shells styles threads words ;
+USING: errors gadgets-layouts gadgets-listener gadgets-theme
+generic help io kernel listener lists math memory namespaces
+opengl prettyprint sdl sequences shells styles threads words ;
 
 : init-world ( -- )
     global [
@@ -37,5 +37,5 @@ IN: shells
     #! dimensions.
     init-ttf
     ?init-world
-    check-running world get rect-dim first2 0 SDL_RESIZABLE
-    [ run-world ] with-screen ;
+    check-running world get rect-dim first2
+    0 gl-flags [ run-world ] with-screen ;

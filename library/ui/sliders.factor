@@ -1,9 +1,9 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-scrolling
-USING: gadgets gadgets-buttons gadgets-layouts gadgets-theme
-generic kernel lists math namespaces sequences styles threads
-vectors ;
+USING: arrays gadgets gadgets-buttons gadgets-layouts
+gadgets-theme generic kernel lists math namespaces sequences
+styles threads vectors ;
 
 ! An elevator has a thumb that may be moved up and down.
 TUPLE: elevator ;
@@ -53,8 +53,8 @@ SYMBOL: slider-changed
     dup [ drop ] [ button-down 1 ] set-action
     [ find-elevator elevator-drag ] [ drag 1 ] set-action ;
 
-: <thumb> ( -- thumb )
-    <gadget> dup bevel-theme
+: <thumb> ( vector -- thumb )
+    <gadget> dup rot button-theme
     t over set-gadget-root?
     dup thumb-actions ;
 
@@ -74,9 +74,9 @@ SYMBOL: slider-changed
 : elevator-actions ( elevator -- )
     [ elevator-click ] [ button-down 1 ] set-action ;
 
-C: elevator ( -- elevator )
+C: elevator ( vector -- elevator )
     dup delegate>gadget
-    dup elevator-theme
+    dup rot elevator-theme
     dup elevator-actions ;
 
 : (layout-thumb) ( slider n -- n )
@@ -124,16 +124,19 @@ M: elevator layout* ( elevator -- )
 
 : add-thumb 2dup slider-elevator add-gadget set-slider-thumb ;
 
+: slider-opposite ( slider -- vector )
+    slider-vector @{ 1 1 0 }@ swap v- ;
+
 C: slider ( vector -- slider )
     [ set-slider-vector ] keep
     dup delegate>frame
     0 over set-slider-value
     0 over set-slider-page
     0 over set-slider-max
-    <elevator> over add-elevator
+    dup slider-opposite <elevator> over add-elevator
     dup <up-button> over add-up
     dup <down-button> over add-down
-    <thumb> over add-thumb ;
+    dup slider-opposite <thumb> over add-thumb ;
 
 : <x-slider> ( -- slider ) @{ 1 0 0 }@ <slider> ;
 

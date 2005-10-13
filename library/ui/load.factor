@@ -1,5 +1,7 @@
 USING: kernel parser sequences io ;
 [
+    "/library/ui/opengl.factor"
+    "/library/ui/freetype.factor"
     "/library/ui/gadgets.factor"
     "/library/ui/layouts.factor"
     "/library/ui/hierarchy.factor"

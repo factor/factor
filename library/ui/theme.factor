@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-theme
-USING: gadgets kernel styles ;
+USING: arrays gadgets kernel sequences styles ;
 
 : solid-interior ( gadget -- )
     << solid >> interior set-paint-prop ;
@@ -9,10 +9,15 @@ USING: gadgets kernel styles ;
 : solid-boundary ( gadget -- )
     << solid f >> boundary set-paint-prop ;
 
-: bevel-theme ( gadget -- )
-    dup solid-interior
-    dup @{ 216 216 216 }@ background set-paint-prop
-    << bevel f 2 >> boundary set-paint-prop ;
+: button-theme ( gadget vector -- )
+    dupd @{
+        @{ 240 240 240 }@
+        @{ 192 192 192 }@
+        @{ 192 192 192 }@
+        @{ 96 96 96 }@
+    }@ <gradient> interior set-paint-prop
+    dup @{ 96 96 96 }@ foreground set-paint-prop
+    << solid >> boundary set-paint-prop ;
 
 : editor-theme ( editor -- )
     bold font-style set-paint-prop ;
@@ -25,8 +30,13 @@ USING: gadgets kernel styles ;
     dup solid-interior
     red background set-paint-prop ;
 
-: elevator-theme ( elevator -- )
-    dup solid-interior
+: elevator-theme ( elevator vector -- )
+    dupd @{
+            @{ 64 64 64 }@
+            @{ 96 96 96 }@
+            @{ 128 128 128 }@
+        }@
+    <gradient> interior set-paint-prop
     light-gray background set-paint-prop ;
 
 : divider-theme ( divider -- )
@@ -37,7 +47,8 @@ USING: gadgets kernel styles ;
     solid-interior ;
 
 : menu-theme ( menu -- )
-    << gradient f @{ 1 0 0 }@ @{ 216 216 216 }@ @{ 255 255 255 }@ >>
+    dup solid-boundary
+    << gradient f @{ 1 0 0 }@ @{ @{ 216 216 216 }@ @{ 255 255 255 }@ }@ >>
     interior set-paint-prop ;
 
 : icon-theme ( gadget -- )
@@ -49,8 +60,6 @@ USING: gadgets kernel styles ;
     {{
         [[ background @{ 255 255 255 }@ ]]
         [[ rollover-bg @{ 236 230 232 }@ ]]
-        [[ bevel-1 { 160 160 160 }@ ]]
-        [[ bevel-2 @{ 232 232 232 }@ ]]
         [[ foreground @{ 0 0 0 }@ ]]
         [[ reverse-video f ]]
         [[ font "Monospaced" ]]

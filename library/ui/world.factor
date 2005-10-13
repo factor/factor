@@ -2,8 +2,8 @@
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
 USING: alien arrays errors gadgets-layouts generic io kernel
-lists math memory namespaces prettyprint sdl sequences sequences
-strings styles threads ;
+lists math memory namespaces opengl prettyprint sdl
+sequences sequences strings styles threads ;
 
 ! The world gadget is the top level gadget that all (visible)
 ! gadgets are contained in. The current world is stored in the
@@ -48,7 +48,7 @@ C: world ( -- world )
     @{ 0 0 0 }@ width get height get 0 3array <rect> ;
 
 : draw-world ( -- )
-    world get [ world-clip clip set draw-gadget ] with-surface ;
+    world get [ world-clip clip set draw-gadget ] with-gl-surface ;
 
 ! Status bar protocol
 GENERIC: set-message ( string/f status -- )
@@ -118,7 +118,5 @@ M: quit-event handle-event ( event -- )
     drop stop-world ;
 
 M: resize-event handle-event ( event -- )
-    dup resize-event-w swap resize-event-h
-    [ 0 3array world get set-gadget-dim ] 2keep
-    0 SDL_HWSURFACE SDL_RESIZABLE bitor init-surface
-    world get relayout ;
+    gl-resize
+    width get height get 0 3array world get set-gadget-dim ;
