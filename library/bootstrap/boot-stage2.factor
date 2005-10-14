@@ -74,6 +74,7 @@ t [
     "/library/httpd/load.factor"
     "/library/sdl/load.factor"
     "/library/opengl/load.factor"
+    "/library/freetype/load.factor"
     "/library/ui/load.factor"
     "/library/help/tutorial.factor"
 ] pull-in

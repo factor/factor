@@ -1,6 +1,6 @@
 IN: temporary
-USING: kernel lists math sequences sequences-internals strings
-test vectors ;
+USING: kernel lists math namespaces sequences
+sequences-internals strings test vectors ;
 
 [ { 1 2 3 4 } ] [ 1 5 <range> >vector ] unit-test
 [ 3 ] [ 1 4 <range> length ] unit-test
@@ -193,3 +193,13 @@ unit-test
 
 [ -1 ] [ "ab" "abc" lexi ] unit-test
 [ 1 ] [ "abc" "ab" lexi ] unit-test
+
+[ 1 4 9 16 16 { f 1 4 9 16 } ] [
+    { } clone "cache-test" set
+    1 "cache-test" get [ sq ] cache-nth
+    2 "cache-test" get [ sq ] cache-nth
+    3 "cache-test" get [ sq ] cache-nth
+    4 "cache-test" get [ sq ] cache-nth
+    4 "cache-test" get [ "wrong" ] cache-nth
+    "cache-test" get
+] unit-test

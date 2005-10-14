@@ -79,9 +79,6 @@ SYMBOL: live-r
     live-r get literals/computed
     swapd (vregs>stacks) (vregs>stacks) ;
 
-: ?nth ( n seq -- elt/f )
-    2dup length >= [ 2drop f ] [ nth ] if ;
-
 : live-stores ( instack outstack -- stack )
     #! Avoid storing a value into its former position.
     dup length [ pick ?nth dupd eq? [ drop f ] when ] 2map nip ;

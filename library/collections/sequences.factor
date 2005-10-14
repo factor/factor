@@ -49,6 +49,10 @@ GENERIC: resize ( n seq -- seq )
 : bounds-check? ( n seq -- ? )
     over 0 >= [ length < ] [ 2drop f ] if ;
 
+: ?nth ( n seq/f -- elt/f )
+    #! seq can even be f, since f answers with zero length.
+    2dup length >= [ 2drop f ] [ nth ] if ;
+
 IN: sequences-internals
 
 ! Unsafe sequence protocol for inner loops

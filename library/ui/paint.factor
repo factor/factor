@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: alien arrays gadgets-layouts generic hashtables io kernel
-lists math namespaces opengl sdl sequences strings styles vectors ;
+USING: alien arrays freetype gadgets-layouts generic hashtables
+io kernel lists math namespaces opengl sdl sequences strings
+styles vectors ;
 IN: gadgets
 
 SYMBOL: clip
@@ -140,3 +141,9 @@ M: polygon draw-interior ( gadget polygon -- )
     dup max-dim @{ 1 1 0 }@ v+
     >r <polygon> <gadget> r> over set-rect-dim
     dup rot interior set-paint-prop ;
+
+: gadget-font ( gadget -- font )
+    [ font paint-prop ] keep
+    [ font-style paint-prop ] keep
+    [ font-size paint-prop ] keep
+    >r lookup-font r> drop ;

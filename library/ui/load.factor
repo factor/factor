@@ -1,6 +1,5 @@
 USING: kernel parser sequences io ;
 [
-    "/library/ui/freetype.factor"
     "/library/ui/gadgets.factor"
     "/library/ui/layouts.factor"
     "/library/ui/hierarchy.factor"
@@ -11,7 +10,6 @@ USING: kernel parser sequences io ;
     "/library/ui/events.factor"
     "/library/ui/frames.factor"
     "/library/ui/world.factor"
-    "/library/ui/text.factor"
     "/library/ui/borders.factor"
     "/library/ui/labels.factor"
     "/library/ui/buttons.factor"

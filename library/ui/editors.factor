@@ -1,7 +1,7 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets-editors
-USING: arrays gadgets gadgets-labels gadgets-layouts
+USING: arrays freetype gadgets gadgets-labels gadgets-layouts
 gadgets-menus gadgets-scrolling gadgets-theme generic kernel
 lists math namespaces sequences strings styles threads ;
 
@@ -54,7 +54,7 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    >array [ ch>string size-string drop ] map-with
+    >array [ char-size drop ] map-with
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : x>offset ( x font str -- offset )
@@ -122,7 +122,7 @@ C: editor ( text -- )
     dup editor-actions ;
 
 : offset>x ( gadget offset str -- x )
-    head >r gadget-font r> size-string drop ;
+    head-slice >r gadget-font r> string-size drop ;
 
 : caret-loc ( editor -- x y )
     dup editor-line [ caret-pos line-text get ] bind offset>x
@@ -135,17 +135,17 @@ M: editor user-input* ( ch editor -- ? )
     [ insert-char ] with-editor f ;
 
 M: editor pref-dim ( editor -- dim )
-    dup editor-text label-size @{ 1 0 0 }@ v+ ;
+    label-size @{ 1 0 0 }@ v+ ;
 
 M: editor layout* ( editor -- )
     dup editor-caret over caret-dim swap set-gadget-dim
     dup editor-caret swap caret-loc swap set-rect-loc ;
 
+M: editor label-text ( editor -- string )
+    editor-text ;
+
 M: editor draw-gadget* ( editor -- )
-    drop
-    ! dup delegate draw-gadget*
-    ! dup editor-text draw-string
-    ;
+    dup delegate draw-gadget* draw-label ;
 
 : set-possibilities ( possibilities editor -- )
     #! Set completion possibilities.

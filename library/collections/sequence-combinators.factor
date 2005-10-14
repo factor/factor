@@ -152,3 +152,10 @@ M: object find ( seq quot -- i elt )
     swap dup length 1- [
         pick pick >r >r (monotonic) r> r> rot
     ] all? 2nip ; inline
+
+: cache-nth ( i seq quot -- elt | quot: i -- elt )
+    pick pick ?nth dup [
+        >r 3drop r>
+    ] [
+        drop swap >r over >r call dup r> r> set-nth
+    ] if ; inline
