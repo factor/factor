@@ -16,6 +16,7 @@ USING: io hashtables kernel lists namespaces ;
     [[ "html"   "text/html"                        ]]
     [[ "txt"    "text/plain"                       ]]
     [[ "xml"    "text/xml"                         ]]
+    [[ "css"    "text/css"                         ]]
                                                     
     [[ "gif"    "image/gif"                        ]]
     [[ "png"    "image/png"                        ]]
