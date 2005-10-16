@@ -96,7 +96,7 @@ IN: math
     p/mod-setup [ [ (p/mod) ] times ] { } make reverse nip swap 2ptrim pextend ;
 
 : (pgcd) ( b a y x -- a d )
-    dup { 0 } p= [
+    dup { 0 } clone p= [
         drop nip
     ] [
         tuck p/mod >r pick p* swap >r swapd p- r> r> (pgcd)
