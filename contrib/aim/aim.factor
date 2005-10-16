@@ -12,13 +12,19 @@ SYMBOL: login-key
 SYMBOL: aim-chat-ip
 SYMBOL: aim-chat-port
 SYMBOL: auth-code
+! snac
 SYMBOL: family
 SYMBOL: opcode
+SYMBOL: snac-flags
+SYMBOL: snac-request-id
+
 SYMBOL: name
 SYMBOL: message
 SYMBOL: encoding
 SYMBOL: warning
 SYMBOL: buddy-list
+SYMBOL: group-list
+SYMBOL: banned-list
 SYMBOL: channel
 SYMBOL: icbm-cookie
 SYMBOL: message-type
@@ -28,6 +34,10 @@ SYMBOL: file-transfer-cancelled
 SYMBOL: direct-connect-cancelled
 SYMBOL: remote-internal-ip
 SYMBOL: remote-external-ip
+SYMBOL: ssi-length
+
+TUPLE: group name id ;
+TUPLE: buddy name id gid capabilities buddy-icon online ;
 
 : aim-login-server "login.oscar.aol.com" ; inline
 : icq-login-server "login.icq.com" ; inline
@@ -49,24 +59,20 @@ SYMBOL: remote-external-ip
 ! 205.188.210.203
 : aim-file-server-port 5190 ; inline
 
-
 ! Family names from ethereal
 : family-names
 {{
-    [[ 1 "Generic" ]]
-    [[ 2 "Location" ]]
-    [[ 3 "Buddylist" ]]
-    [[ 4 "Messaging" ]]
-    [[ 6 "Invitation" ]]
-    [[ 8 "Popup" ]]
-    [[ 9 "BOS" ]]
-    [[ 10 "User Lookup" ]]
-    [[ 11 "Stats" ]]
-    [[ 12 "Translate" ]]
-    [[ 19 "SSI" ]]
-    [[ 21 "ICQ" ]]
-    [[ 34 "Unknown Family" ]]
-}} ;
+    [[ 1 "Generic" ]] [[ 2 "Location" ]] [[ 3 "Buddylist" ]]
+    [[ 4 "Messaging" ]] [[ 6 "Invitation" ]] [[ 8 "Popup" ]]
+    [[ 9 "BOS" ]] [[ 10 "User Lookup" ]] [[ 11 "Stats" ]]
+    [[ 12 "Translate" ]] [[ 19 "SSI" ]] [[ 21 "ICQ" ]]
+    [[ 34 "Unknown Family" ]] }} ;
+
+: hash-swap ( hash -- hash )
+    [ [ unswons cons , ] hash-each ] { } make alist>hash ;
+
+: 2list>hash ( keys values -- hash )
+    {{ }} clone -rot [ swap pick set-hash ] 2each ;
 
 : capability-names
 {{
@@ -86,27 +92,28 @@ SYMBOL: remote-external-ip
     [[ "Add-Ins" HEX: 094613474c7f11d18222444553540000 ]]
 }} ;
 
+
 : capability-values
+    capability-names hash-swap ;
+
+: capability-abbrevs
 {{
-    [[ HEX: 094601054c7f11d18222444553540000 "Unknown1" ]]
-    [[ HEX: 0946134a4c7f11d18222444553540000 "Games" ]]
-    [[ HEX: 0946134b4c7f11d18222444553540000 "Send Buddy List" ]]
-    [[ HEX: 748f2420628711d18222444553540000 "Chat" ]]
-    [[ HEX: 0946134d4c7f11d18222444553540000 "AIM/ICQ Interoperability" ]]
-    [[ HEX: 094613414c7f11d18222444553540000 "Voice Chat" ]]
-    [[ HEX: 094600004c7f11d18222444553540000 "iChat" ]]
-    [[ HEX: 094613434c7f11d18222444553540000 "Send File" ]]
-    [[ HEX: 094601ff4c7f11d18222444553540000 "Unknown2" ]]
-    [[ HEX: 094601014c7f11d18222444553540000 "Live Video" ]]
-    [[ HEX: 094613454c7f11d18222444553540000 "Direct Instant Messaging" ]]
-    [[ HEX: 094601034c7f11d18222444553540000 "Unknown3" ]]
-    [[ HEX: 094613464c7f11d18222444553540000 "Buddy Icon" ]]
-    [[ HEX: 094613474c7f11d18222444553540000 "Add-Ins" ]]
+    [[ CHAR: A "Voice" ]]
+    [[ CHAR: C "Send File" ]]
+    [[ CHAR: E "AIM Direct IM" ]]
+    [[ CHAR: F "Buddy Icon" ]]
+    [[ CHAR: G "Add-Ins" ]]
+    [[ CHAR: H "Get File" ]]
+    [[ CHAR: K "Send Buddy List" ]]
 }} ;
+
 
 : initialize-aim ( username password -- )
     password set username set
-    {{ }} clone buddy-list set
+    ! {{ }} clone buddy-list set
+    { } clone buddy-list set
+    { } clone group-list set
+    { } clone banned-list set
     ! 65535 random-int seq-num set
     0 seq-num set
     1 stage-num set ;
@@ -146,8 +153,8 @@ SYMBOL: remote-external-ip
 : parse-snac ( stream -- )
     head-short family set
     head-short opcode set
-    head-short drop
-    head-int drop ;
+    head-short snac-flags set
+    head-int snac-request-id set ;
 
 : (unhandled-opcode) ( str -- )
     "Family: " write family get unparse write
@@ -164,18 +171,20 @@ SYMBOL: remote-external-ip
     "Unhandled family: " write family get unparse writeln
     unhandled-opcode ;
 
-
 ! Events
 : buddy-signon ( name -- )
-    0 swap buddy-list get set-hash ;
+    drop ; !  0 swap buddy-list get set-hash ;
 
 : buddy-signoff ( name -- )
-    buddy-list get remove-hash ;
+    drop ; !  buddy-list get remove-hash ;
+
+: get-gid-by-name ( name -- gid )
+    
 
 : print-buddy-list
-    [ buddy-list get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
-
-
+    group-list get [ [ buddy-name , ] each ] { } make
+    ;
+    ! [ buddy-list get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
 
 
 : family-table ( -- hash )
@@ -190,9 +199,6 @@ SYMBOL: remote-external-ip
 
 : OPCODE: ( fam# -- )
     car family-table hash word scan 10 base> rot set-hash f ; parsing
-
-
-
 
 
 ! Generic, Capabilities
@@ -331,6 +337,12 @@ SYMBOL: remote-external-ip
     head-byte head-string drop
     unscoped-stream get empty? [ handle-29 ] unless ;
 
+: handle-abbrev-capabilities
+    unscoped-stream get empty? [
+        head-short .h
+        handle-abbrev-capabilities
+    ] unless ;
+
 : handle-buddy-status
     head-byte head-string name set
     head-short drop
@@ -344,11 +356,10 @@ SYMBOL: remote-external-ip
                 { [ dup 3 = ] [ drop name get write " went online at " write head-int unparse writeln name get buddy-signon ] }
                 { [ dup 4 = ] [ drop name get write " has been idle for " write head-short unparse write " minutes." writeln ] }
                 { [ dup 6 = ] [ drop name get write ": (6): " write head-short unparse write " " write head-short unparse writeln ] }
-                ! { [ dup 10 = ] [ drop ] } ! external ip
-                ! { [ dup 12 = ] [ drop ] } ! same as CLI_SETSTATUS
-                { [ dup 13 = ] [ drop "Capabilities:" print handle-capabilities  ] }
-                { [ dup 14 = ] [ drop "Capabilities:" print handle-capabilities  ] }
+                { [ dup 13 = ] [ drop "Capabilities3:" print handle-capabilities  ] }
+                { [ dup 14 = ] [ drop "Capabilities4:" print handle-capabilities  ] }
                 { [ dup 15 = ] [ drop name get write " has been online for " write head-int unparse write " seconds." writeln ] }
+                { [ dup 25 = ] [ drop "Abbreviated capabilities: " write handle-abbrev-capabilities ] }
                 { [ dup 27 = ] [ drop "(27): " write 4 [ head-int unparse write " " write ] repeat terpri ] }
                 { [ dup 29 = ] [ drop handle-29 ] }
                 { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln head-contents hexdump ] }
@@ -508,7 +519,7 @@ SYMBOL: remote-external-ip
             ] }
         { [ dup "Chat" = ] [ . handle-chat-start-tlvs 
             "Chat join message: " write message get writeln ] }
-        { [ dup "Direct Instant Messaging" = ] [ . handle-direct-start-tlvs
+        { [ dup "AIM Direct IM" = ] [ . handle-direct-start-tlvs
                 direct-connect-cancelled get [ send-direct-connect-start ] unless
             ] }
         { [ t ] [ "Unsupported capability in channel 2: " write writeln head-contents hexdump ] }
@@ -578,51 +589,83 @@ SYMBOL: remote-external-ip
 
 
 : handle-19-3
-    ! SSI, Activate
-    [ HEX: 13 7 0 7 make-snac ] send-aim
-    ! Set User Info.  Capabilities!
-    [
-        2 4 0 4 make-snac
-        5 >short
-        HEX: e0 >short
-        capability-values hash-keys [ >u128 ] each
-        6 >short 6 >short 4 >short 2 >short 2 >short
-    ] send-aim
-
-    ! Set ICBM Parameter
-    [
-        4 2 0 2 make-snac
-        0 >int
-        HEX: b >short
-        HEX: 1f40 >short
-        HEX: 03e7 >short
-        HEX: 03e7 >short
-        0 >int
-    ] send-aim
-
-    ! Client Ready
-    [
-        1 2 0 2 make-snac
-        [
-            HEX: 1 HEX: 4 HEX: 110 HEX: 8f1
-            HEX: 13 HEX: 3 HEX: 110 HEX: 8f1
-            HEX: 2 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 3 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 4 HEX: 4 HEX: 110 HEX: 8f1
-            HEX: 6 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: 8 HEX: 1 HEX: 104 HEX: 8f1
-            HEX: 9 HEX: 1 HEX: 110 HEX: 8f1
-            HEX: a HEX: 1 HEX: 110 HEX: 8f1
-            HEX: b HEX: 1 HEX: 110 HEX: 8f1
-        ] [ >short ] each
-    ] send-aim
     ; FAMILY: 19 OPCODE: 3
 
-: handle-19-6
-    ; FAMILY: 19 OPCODE: 6
 
-: print-op ( op -- )
-    "Op: " write . ;
+! : handle-19-6-tlv ( str-reader -- )
+    ! empty? [ (handle-19-6-tlv) handle-19-6-tlv ] unless ;
+
+SYMBOL: g-id ! group id
+SYMBOL: b-id ! buddy id
+SYMBOL: type
+: handle-19-6
+    head-byte drop ! ssi version, probably 0
+    head-short [ 
+        head-short head-string name set   name get .
+        head-short g-id set    g-id get .
+        head-short b-id set    b-id get .
+        head-short type set      type get .  ! type 0 is a buddy, 1 is a group
+        "TLV CHAIN DATA: " print
+        head-short head-string hexdump   ! short short data
+
+        type get
+        {
+            { [ dup 0 = ] [ drop name get b-id get g-id get { } clone f f <buddy> buddy-list get push ] }
+            { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ g-id get <group> group-list get push ] if ] }
+            { [ dup 3 = ] [ drop name get b-id get g-id get { } clone f f <buddy> banned-list get push ] }
+            { [ t ] [ drop "Unknown 19-6 type" print ] }
+        } cond
+
+    ] repeat
+    head-short drop ! timestamp
+
+    snac-flags get 1 = [
+        ! SSI, Activate
+        [ HEX: 13 7 0 7 make-snac ] send-aim
+        ! Set User Info.  Capabilities!
+        ! if you send this packet correctly you get capabilities
+        ! and others' capabilities turn into letters instead of u128s
+        [
+            2 4 0 4 make-snac
+            5 >short
+            capability-values hash-keys length 16 * >short ! size
+            capability-values hash-keys [ >u128 ] each
+            6 >short 6 >short 4 >short 2 >short 2 >short
+        ] send-aim
+    
+        ! Set ICBM Parameter
+        [
+            4 2 0 2 make-snac
+            0 >int
+            HEX: b >short
+            HEX: 1f40 >short
+            HEX: 03e7 >short
+            HEX: 03e7 >short
+            0 >int
+        ] send-aim
+    
+        ! Client Ready
+        [
+            1 2 0 2 make-snac
+            [
+                HEX: 1 HEX: 4 HEX: 110 HEX: 8f1
+                HEX: 13 HEX: 3 HEX: 110 HEX: 8f1
+                HEX: 2 HEX: 1 HEX: 110 HEX: 8f1
+                HEX: 3 HEX: 1 HEX: 110 HEX: 8f1
+                HEX: 4 HEX: 4 HEX: 110 HEX: 8f1
+                HEX: 6 HEX: 1 HEX: 110 HEX: 8f1
+                HEX: 8 HEX: 1 HEX: 104 HEX: 8f1
+                HEX: 9 HEX: 1 HEX: 110 HEX: 8f1
+                HEX: a HEX: 1 HEX: 110 HEX: 8f1
+                HEX: b HEX: 1 HEX: 110 HEX: 8f1
+            ] [ >short ] each
+        ] send-aim
+        
+        ! Process
+    ] when
+    
+    
+    ; FAMILY: 19 OPCODE: 6
 
 : parse-server ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
@@ -633,11 +676,8 @@ SYMBOL: remote-external-ip
         head-short
         swap
         {
-            ! { [ dup 1 = ] [ print-op head-string . ] }
             { [ dup 5 = ] [ drop head-string parse-server ] }
             { [ dup 6 = ] [ drop head-string auth-code set ] }
-            ! { [ dup 8 = ] [ print-op head-string . ] }
-            ! { [ t ] [ print-op head-string . ] }
             { [ t ] [ drop head-string drop ] }
         } cond
         process-login-chunks
