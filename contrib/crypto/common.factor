@@ -1,17 +1,7 @@
-IN: crypto
+IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
 unparser test parser lists ;
 
-: (shift-mod) ( n s w -- n )
-     >r shift r> 1 swap shift 1 - bitand ; inline
-
-: bitroll ( n s w -- n )
-     #! Roll n by s bits to the left, wrapping around after
-     #! w bits.
-     [ 1 - bitand ] keep
-     over 0 < [ [ + ] keep ] when
-     [ (shift-mod) ] 3keep
-     [ - ] keep (shift-mod) bitor ; inline
 
 : w+ ( int -- int )
     + HEX: ffffffff bitand ; inline
@@ -55,6 +45,18 @@ unparser test parser lists ;
 
 : get-block ( string num -- string )
     6 shift dup 64 + rot <slice> ;
+
+: shift-mod ( n s w -- n )
+     >r shift r> 1 swap shift 1 - bitand ; inline
+
+IN: crypto
+: bitroll ( n s w -- n )
+     #! Roll n by s bits to the left, wrapping around after
+     #! w bits.
+     [ 1 - bitand ] keep
+     over 0 < [ [ + ] keep ] when
+     [ shift-mod ] 3keep
+     [ - ] keep shift-mod bitor ; inline
 
 : hex-string ( str -- str )
     [ [ >hex 2 48 pad-left % ] each ] "" make ;

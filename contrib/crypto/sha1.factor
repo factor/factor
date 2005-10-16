@@ -1,6 +1,6 @@
-IN: crypto
+IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists vectors hashtables kernel-internals ;
+unparser test parser lists vectors hashtables kernel-internals crypto ;
 
 ! Implemented according to RFC 3174.
 
@@ -92,7 +92,7 @@ SYMBOL: K
     h3 get D set
     h4 get E set ;
 
-: (inner-loop) ( -- )
+: inner-loop ( -- )
     ! TEMP = S^5(A) + f(t;B,C,D) + E + W(t) + K(t);
     [
         [ B get C get D get ] keep sha1-f ,
@@ -102,7 +102,7 @@ SYMBOL: K
         E get ,
     ] { } make sum 4294967295 bitand ; inline
 
-: (set-vars) ( -- )
+: set-vars ( -- )
     ! E = D;  D = C;  C = S^30(B);  B = A; A = TEMP;
     D get E set
     C get D set
@@ -111,7 +111,7 @@ SYMBOL: K
 
 : calculate-letters ( -- )
     ! step d of RFC 3174, section 6.1
-    80 [ (inner-loop) >r (set-vars) r> A set ] repeat ;
+    80 [ inner-loop >r set-vars r> A set ] repeat ;
 
 : update-hs ( -- )
     ! step e of RFC 3174, section 6.1
@@ -127,6 +127,7 @@ SYMBOL: K
 : get-sha1 ( -- str )
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
+IN: crypto
 : string>sha1 ( string -- sha1 )
     [
         initialize-sha1 pad-string-sha1

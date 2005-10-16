@@ -1,6 +1,6 @@
-IN: crypto
+IN: crypto-internals
 USING: kernel io strings sequences namespaces math prettyprint
-unparser test parser lists ;
+unparser test parser lists crypto ;
 
 SYMBOL: a
 SYMBOL: b
@@ -147,6 +147,7 @@ SYMBOL: old-d
 : get-md5 ( -- str )
     [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
 
+IN: crypto
 : string>md5 ( string -- md5 )
     [
         initialize-md5 pad-string-md5
