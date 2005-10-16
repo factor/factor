@@ -103,7 +103,7 @@ IN: math
     ] if ;
     
 : pgcd ( p p -- p )
-    swap { 0 } { 1 } 2swap (pgcd) ;
+    swap { 0 } clone { 1 } clone 2swap (pgcd) ;
 
 : test-p*
     100000 [ drop { 1 1 1 } { 1 1 1 } p* drop ] each ;
