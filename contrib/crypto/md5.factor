@@ -23,6 +23,16 @@ SYMBOL: old-d
     old-c c update-old-new
     old-d d update-old-new ;
 
+: get-md5-debug ( -- str )
+    [ [ a b c d ] [ get 4 >be % ] each ] "" make ;
+
+: get-md5 ( -- str )
+    [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
+
+: get-old-md5-debug ( -- str )
+    [ [ old-a old-b old-c old-d ] [ get 4 >be % ] each ] "" make ;
+
+
 ! Let [abcd k s i] denote the operation
 ! a = b + ((a + F(b,c,d) + X[k] + T[i]) <<< s)
 
@@ -55,7 +65,6 @@ SYMBOL: old-d
 ! I(X,Y,Z) = Y xor (X v not(Z))
 : I ( X Y Z -- IXYZ )
     rot swap bitnot bitor bitxor ;
-
 : S11 7  ; inline
 : S12 12 ; inline
 : S13 17 ; inline
@@ -140,20 +149,28 @@ SYMBOL: old-d
     S41 61 pick 4 nth-int  [ I ] ABCD
     S42 62 pick 11 nth-int [ I ] DABC
     S43 63 pick 2 nth-int  [ I ] CDAB
+
+    "63: " write get-old-md5-debug hex-string print
+    "63change: " write get-md5-debug hex-string print
+
     S44 64 pick 9 nth-int  [ I ] BCDA
+
+    "64: " write get-old-md5-debug hex-string print
+    "64change: " write get-md5-debug hex-string print
+
     update-md
     drop ;
 
-: get-md5 ( -- str )
-    [ [ a b c d ] [ get 4 >le % ] each ] "" make ;
+
 
 IN: crypto
 : string>md5 ( string -- md5 )
-    [
+    ! [
         initialize-md5 pad-string-md5
         dup length num-blocks [ 2dup get-block process-md5-block ] repeat
         drop get-md5
-    ] with-scope ;
+        ;
+    ! ] with-scope ;
 
 : string>md5str ( string -- str )
     string>md5 hex-string ;

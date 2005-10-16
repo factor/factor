@@ -81,7 +81,11 @@ SYMBOL: K
             [ nth-int-be w get push ] 2keep
         ] [
             dup sha1-W w get push
+<<<<<<< sha1.factor
+        ] if
+=======
         ] if 
+>>>>>>> 1.8
     ] repeat ;
 
 : init-letters ( -- )

@@ -77,7 +77,7 @@ IN: math
 IN: math-internals
 
 : pop-front ( seq -- seq )
-    reverse dup pop drop reverse ;
+    1 swap tail ;
 
 : /-last ( seq seq -- a )
     #! divide the last two numbers in the sequences
