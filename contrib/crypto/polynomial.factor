@@ -1,4 +1,4 @@
-USING: kernel sequences vectors math math-internals ;
+USING: kernel sequences vectors math math-internals namespaces ;
 
 USING: prettyprint inspector io test ;
 
@@ -9,10 +9,9 @@ IN: math
     [ length ] 2apply max ; flushable
 
 IN: math-internals
-: 2length ( seq seq -- ) >r length r> length ;
+: 2length ( seq seq -- ) [ length ] 2apply ;
 
 : zero-vector ( n -- vector ) 0 <repeated> >vector ;
-
 
 : nzero-pad ( n seq -- seq )
     #! extend seq by n zeros
@@ -32,15 +31,19 @@ IN: math-internals
 : 2zero-extend ( seq seq -- )
     2dup max-length [ swap zero-extend ] keep swap zero-extend ;
 
+: pextend ( p p -- p p )
+    2dup 2zero-extend ;
+
 IN: math
+
+: p= ( p p -- )
+    pextend = ;
 
 : ptrim ( p -- p )
     dup length 1 > [ dup peek 0 = [ dup pop drop ptrim ] when ] when ;
-: 2ptrim ( p -- p )
-    ptrim >r ptrim r> ;
 
-: pextend ( p p -- p p )
-    2dup 2zero-extend ;
+: 2ptrim ( p -- p )
+    [ ptrim ] 2apply ;
 
 : p+ ( p p -- p )
     pextend v+ ;
@@ -72,48 +75,31 @@ IN: math
     dup p* ;
 
 IN: math-internals
-: (nth-div) ( n v1 v2 -- a )
-    #! get nth from end
-    rot 1+ >r 2dup 2length r> swap over - >r - r> rot nth >r swap nth r> ;
 
-: nth-divi ( n v1 v2 -- a )
-    #! get nth from end
-    (nth-div) /i ;
+: pop-front ( seq -- seq )
+    reverse dup pop drop reverse ;
 
-: nth-div
-    (nth-div) / ;
+: /-last ( seq seq -- a )
+    #! divide the last two numbers in the sequences
+    [ peek ] 2apply /i ;
 
-: shift-seq-left ( seq -- seq )
-    ! 1 over [ length ] keep <slice> [ change-nth ]
-    reverse dup pop drop reverse 0 over push ;
-
-: p/mod-a ( u v -- q u v i )
-    #! set up the stack
+: p/mod-setup
     2ptrim 2dup 2length - dup 1 < [ drop 1 ] when
-    dup >r swap zero-pad-front r> 1+ dup >r zero-vector -rot pextend r> ;
-    
-: p/mod-b
-    >r >r pick r> r> swapd pick pick length swap - 1- rot
-    pick >r set-nth r> swap >r over n*p rot swap v- swap shift-seq-left r> ;
+    dup >r swap zero-pad-front pextend r> 1+ ;
+
+: (p/mod)
+    2dup /-last 2dup , n*p swapd p- dup pop drop swap pop-front ;
 
 IN: math
 
-: p/modi ( u v -- q r )
-    #! integer coefficients
-    p/mod-a [ 3dup -rot nth-divi p/mod-b ] repeat drop 2ptrim pextend ;
+: p/mod
+    p/mod-setup [ [ (p/mod) ] times ] { } make reverse nip swap 2ptrim pextend ;
 
-: p/mod ( u v -- q r )
-    #! non-integer coefficients
-    p/mod-a [ 3dup -rot nth-div p/mod-b ] repeat drop 2ptrim pextend ;
-
-: p= ( p p -- )
-    pextend = ;
-    
 : (pgcd) ( b a y x -- a d )
     dup { 0 } p= [
         drop nip
     ] [
-        tuck p/modi >r pick p* swap >r swapd p- r> r> (pgcd)
+        tuck p/mod >r pick p* swap >r swapd p- r> r> (pgcd)
     ] if ;
     
 : pgcd ( p p -- p )
@@ -136,12 +122,13 @@ IN: math
     [ { 4 8 0 12 } ] [ 4 { 1 2 0 3 } n*p ] unit-test
     [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } conv ] unit-test
     [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
-    [ { 7 -2 1 } { -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/modi ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/modi ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/modi ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/modi ] unit-test
-    [ { 5.0 } { 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
-    [ { 15/16 } { 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
+    [ { 7 -2 1 } { -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/mod ] unit-test
+    [ { 0 0 } { 1 1 } ] [ { 1 1 } { 1 1 1 1 } p/mod ] unit-test
+    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/mod ] unit-test
+    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/mod ] unit-test
+    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/mod ] unit-test
+    ! [ { 5.0 } { 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
+    ! [ { 15/16 } { 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
     [ t ] [ { 0 1 } { 0 1 0 } p= ] unit-test
     [ f ] [ { 0 0 1 } { 0 1 0 } p= ] unit-test
     [ t ] [ { 1 1 1 } { 1 1 1 } p= ] unit-test
