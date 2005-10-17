@@ -118,6 +118,35 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [[ CHAR: K "Send Buddy List" ]]
 }} ;
 
+! AIM errors
+: aim-errors
+{{
+    [[ 1 "Invalid SNAC header." ]]
+    [[ 2 "Server rate limit exceeded." ]]
+    [[ 3 "Client rate limit exceeded." ]]
+    [[ 4 "Recipient is not logged in." ]]
+    [[ 5 "Requested service unavailable." ]]
+    [[ 6 "Requested service not defined." ]]
+    [[ 7 "You sent obsolete SNAC." ]]
+    [[ 8 "Not supported by server." ]]
+    [[ 9 "Not supported by client." ]]
+    [[ 10 "Refused by client." ]]
+    [[ 11 "Reply too big." ]]
+    [[ 12 "Responses lost." ]]
+    [[ 13 "Request denied." ]]
+    [[ 14 "Incorrect SNAC format." ]]
+    [[ 15 "Insufficient rights." ]]
+    [[ 16 "In local permit/deny. (recipient blocked)" ]]
+    [[ 17 "Sender too evil." ]]
+    [[ 18 "Receiver too evil." ]]
+    [[ 19 "User temporarily unavailable." ]]
+    [[ 20 "No match." ]]
+    [[ 22 "List overflow." ]]
+    [[ 23 "Request ambiguous." ]]
+    [[ 24 "Server queue full." ]]
+    [[ 25 "Not while on AOL." ]]
+}} ;
+
 
 : initialize-aim ( username password -- )
     password set username set
@@ -171,12 +200,12 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     head-int snac-request-id set ;
 
 : (unhandled-opcode) ( str -- )
-    "Family: " write family get unparse write
-    ", opcode: " write opcode get unparse writeln
+    ! "Family: " write family get >hex write
+    ! ", opcode: " write opcode get >hex writeln
     head-contents hexdump ;
 
 : unhandled-opcode ( -- )
-    "Unhandled opcode: " write (unhandled-opcode) ;
+    "Unhandled opcode!" writeln (unhandled-opcode) ;
 
 : incomplete-opcode ( -- )
     "Incomplete handling: " write (unhandled-opcode) ;
@@ -235,14 +264,14 @@ M: object get-banned ( name -- <buddy> )
     {{ }} ;
 
 : FAMILY: ( -- fam# )
-    scan 10 base> swons dup car family-table hash dup [
+    scan hex> swons dup car family-table hash dup [
         drop
     ] [
         drop {{ }} clone over car family-table set-hash
     ] if ; parsing
 
 : OPCODE: ( fam# -- )
-    car family-table hash word scan 10 base> rot set-hash f ; parsing
+    car family-table hash word scan hex> rot set-hash f ; parsing
 
 
 ! Generic, Capabilities
@@ -311,55 +340,79 @@ M: object get-banned ( name -- <buddy> )
     ] send-aim ( BOS, Rights Query )
     send-requests ; FAMILY: 1 OPCODE: 7
 
-! : handle-1-15
-    ! head-byte head-string drop
-	! ; FAMILY: 1 OPCODE: 15
+: handle-capabilities
+    unscoped-stream get empty? [
+        head-u128 capability-values hash dup [ "Unknown Capability" nip ] unless
+        writeln handle-capabilities
+    ] unless ;
 
-: (handle-reply-info)
-    head-byte head-string name set
-    "Warning: " write head-short unparse writeln
-    head-short dup unparse print
-    [
+: (handle-online-info)
+    unscoped-stream get empty? [
+        head-byte head-string name set
+        head-short drop
         head-short
-        head-short head-string <string-reader> [
-            {
-                ! { [ 1 = ] [ drop ] }
-                { [ t ] [ "  Unhandled tlv 1-15: " write unparse writeln head-contents hexdump ] }
+        [
+            head-short
+            head-short head-string <string-reader> [
+                {
+                    { [ dup 1 = ] [ drop head-short "Class: " write unparse writeln ] }
+                    { [ dup 3 = ] [ drop head-int "Time went online: " write unparse writeln ] }
+                    { [ dup 4 = ] [ drop head-short "Unknown4: " write unparse writeln ] }
+                    { [ dup 5 = ] [ drop head-int "Time registered: " write unparse writeln ] }
+                    { [ dup 10 = ] [ drop head-int int>ip "IP: " write writeln ] }
+                    { [ dup 13 = ] [ drop handle-capabilities ] }
+                    { [ dup 15 = ] [ drop head-int "Idle: " write unparse writeln ] }
+                    { [ dup 20 = ] [ drop head-byte "Unknown20: " write unparse writeln ] }
+                    ! { [ dup 29 = ] [ drop ] }
+                    { [ dup 30 = ] [ drop head-int "Unknown30: " write unparse writeln ] }
+                    { [ dup 34 = ] [ drop head-short "Unknown32: " write unparse writeln ] }
+                    { [ t ] [ "  Unhandled tlv 1h-fh: " write unparse writeln head-contents hexdump ] }
             } cond
-        ] with-unscoped-stream
-    ] repeat ;
+            ] with-unscoped-stream
+        ] repeat (handle-online-info)
+    ] unless ;
 
-! : handle-reply-info
-    ! "HANDLE REPLY INFO" print
-    ! 4 [ head-short drop ] repeat
-        ! (handle-reply-info)
-    ! ; FAMILY: 1 OPCODE: 15
+: handle-online-info
+    (handle-online-info)
+    ; FAMILY: 1 OPCODE: f
 
 ! message of the day
-: handle-1-19
+: handle-1-13
     7 [ head-short drop ] repeat
     ! Generic, Rate Info Request
-    [ 1 6 0 6 make-snac ] send-aim ; FAMILY: 1 OPCODE: 19
+    [ 1 6 0 6 make-snac ] send-aim ; FAMILY: 1 OPCODE: 13
 
 ! capabilities ack
-: handle-1-24
+: handle-1-18
     "Unhandled ack: " write head-contents writeln
-	; FAMILY: 1 OPCODE: 24
+	; FAMILY: 1 OPCODE: 18
 
-! : handle-1-33
+: handle-1-21
     ! AIM Email
     ! [ 1 4 HEX: 02cc 4 make-snac HEX: 18 >short ] send-aim
 
     ! AIM Location
     ! [ 2 HEX: b HEX: 446d HEX: b make-snac username get length >byte username get % ] send-aim
-    ! ; FAMILY: 1 OPCODE: 33
+
+    ! head-short
+    ! [
+        ! head-short
+        ! head-short head-string <string-reader> [
+            ! {
+                ! ! { [ ] [ ] }
+                ! { [ t ] [ "  Unhandled tlv 1h-21h: " write unparse writeln head-contents hexdump ] }
+            ! } cond
+        ! ] with-unscoped-stream
+    ! ] repeat
+    ; FAMILY: 1 OPCODE: 21
 
 
 : handle-2-1
-	"2-1: " write head-short unparse writeln 
+    head-short aim-errors hash "Error: " write writeln
 	; FAMILY: 2 OPCODE: 1
 
-! : handle-
+
+! : handle-2-3
 	! ; FAMILY: 2 OPCODE: 3
 
 ! : handle-away-message
@@ -367,19 +420,18 @@ M: object get-banned ( name -- <buddy> )
     ! name get write "'s away message: " write
     ! ; FAMILY: 2 OPCODE: 6
 
+! : handle-3-3
+	! ; FAMILY: 3 OPCODE: 3
 
-: handle-capabilities
-    unscoped-stream get empty? [
-        head-u128 capability-values hash dup [ "Unknown Capability" nip ] unless
-        writeln handle-capabilities
-    ] unless ;
 
 : handle-29
-    "(29)" print
-    head-short drop
-    head-byte drop
-    head-byte head-string drop
-    unscoped-stream get empty? [ handle-29 ] unless ;
+    unscoped-stream get empty? [
+        "(29)" print
+        head-short drop
+        head-byte drop
+        head-byte head-string drop
+        handle-29
+    ] unless ;
 
 : handle-abbrev-capabilities
     unscoped-stream get empty? [
@@ -409,7 +461,10 @@ M: object get-banned ( name -- <buddy> )
                 { [ t ] [ "  Unhandled tlv 3h-bh: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ; FAMILY: 3 OPCODE: 11
+    ] repeat ; FAMILY: 3 OPCODE: b
+
+! : handle-4-5
+	! ; FAMILY: 4 OPCODE: 5
 
 : handle-buddy-signoff ( -- )
     head-byte head-string name set
@@ -424,7 +479,7 @@ M: object get-banned ( name -- <buddy> )
                 { [ t ] [ "Unhandled tlv 3h-ch: " write unparse writeln head-contents hexdump ] }
             } cond
         ] with-unscoped-stream
-    ] repeat ; FAMILY: 3 OPCODE: 12
+    ] repeat ; FAMILY: 3 OPCODE: c
 
 : parse-family-4h-header
     head-short drop
@@ -629,15 +684,18 @@ M: object get-banned ( name -- <buddy> )
         { [ dup 1 = ] [ drop " has entered text." writeln ] }
         { [ dup 2 = ] [ drop " is typing..." writeln ] }
         { [ t ] [ " does 4h.14h unknown: " write unparse writeln ] }
-    } cond ; FAMILY: 4 OPCODE: 20
+    } cond ; FAMILY: 4 OPCODE: 14
 
+! : handle-9-3
+	! ; FAMILY: 9 OPCODE: 3
 
-: handle-19-3
-    ; FAMILY: 19 OPCODE: 3
+: handle-b-2
+    head-short "Send status report every: " write unparse write " hours" writeln
+    head-short "Unknown: " write unparse writeln
+    ; FAMILY: b OPCODE: 2
 
-
-! : handle-19-6-tlv ( str-reader -- )
-    ! empty? [ (handle-19-6-tlv) handle-19-6-tlv ] unless ;
+! : handle-19-3
+    ! ; FAMILY: 13 OPCODE: 3
 
 SYMBOL: gid ! group id
 SYMBOL: bid ! buddy id
@@ -663,7 +721,8 @@ SYMBOL: type
             { [ t ] [ drop "Unknown 19-6 type" print ] }
         } cond
     ] repeat
-    head-short drop ! timestamp
+    head-short drop ! unknown or timestamp
+    head-short drop ! unknown or timestamp
 
     snac-flags get 0 = [
         ! SSI, Activate
@@ -708,7 +767,7 @@ SYMBOL: type
         ] send-aim
         
         ! Process
-    ] when ; FAMILY: 19 OPCODE: 6
+    ] when ; FAMILY: 13 OPCODE: 6
 
 
 : parse-server ( ip:port -- )
@@ -728,7 +787,7 @@ SYMBOL: type
     ] unless ;
 
 : handle-login-packet ( -- )
-    process-login-chunks ; FAMILY: 23 OPCODE: 3
+    process-login-chunks ; FAMILY: 17 OPCODE: 3
 
 : password-md5 ( password -- md5 )
     login-key get
@@ -764,12 +823,14 @@ SYMBOL: type
 
 : handle-login-key-packet ( -- )
     head-short head-string login-key set
-    respond-login-key-packet ; FAMILY: 23 OPCODE: 7
+    respond-login-key-packet ; FAMILY: 17 OPCODE: 7
 
 : handle-packet ( packet -- )
     <string-reader>
     [
         parse-snac
+        "Family: " write family get >hex write
+        ", Opcode: " write opcode get >hex writeln
         family get family-table hash dup [
             opcode get swap hash dup [
                     execute
@@ -819,7 +880,7 @@ SYMBOL: type
     ! normal transmission stage
     send-first-request-auth read-aim handle-packet
     read-aim handle-packet
-    read-aim drop
+    read-aim drop  ! handle-packet
     conn get stream-close ;
 
 : second-server
@@ -956,6 +1017,18 @@ IN: aim
     dup name set modify-queue get enque
     buddylist-edit-start
     [
+        HEX: 13 9 0 HEX: 72470009 make-snac
+        0 >short
+        0 >short
+        0 >short
+        1 >short
+        6 >short
+        HEX: c8 >short
+        2 >short
+        HEX: 6dc5 >short
+    ] send-aim
+
+    [
         HEX: 13 8 0 HEX: 5b2f0008 make-snac
         name get length >short
         name get %
@@ -966,7 +1039,7 @@ IN: aim
     ] send-aim ;
 
 : delete-buddy ( name -- )
-    dup name set modify-queue enque
+    dup name set modify-queue get enque
     buddylist-edit-start
     [
         HEX: 13 HEX: a 0 HEX: 5086000a make-snac
@@ -998,9 +1071,12 @@ IN: aim
     drop ;
 
 IN: aim-internals
+: buddylist-error
+    ; FAMILY: 13 OPCODE: b
+
 : buddylist-ack
-    modify-queue get deque modify-buddylist
-    buddylist-edit-stop ; FAMILY: 19 OPCODE: 14
+    ! modify-queue get deque modify-buddylist
+    buddylist-edit-stop ; FAMILY: 13 OPCODE: d
 
 IN: aim
 
