@@ -20,6 +20,11 @@ PREDICATE: integer digit     CHAR: 0 CHAR: 9 between? ;
 PREDICATE: integer printable CHAR: \s CHAR: ~ between? ;
 PREDICATE: integer control   "\0\e\r\n\t\u0008\u007f" member? ;
 
+: ch>lower ( n -- n ) dup LETTER? [ HEX: 20 + ] when ;
+: ch>upper ( n -- n ) dup letter? [ HEX: 20 - ] when ;
+: >lower ( str -- str ) [ ch>lower ] map ;
+: >upper ( str -- str ) [ ch>upper ] map ;
+
 : quotable? ( ch -- ? )
     #! In a string literal, can this character be used without
     #! escaping?
