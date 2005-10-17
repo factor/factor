@@ -639,33 +639,32 @@ M: object get-banned ( name -- <buddy> )
 ! : handle-19-6-tlv ( str-reader -- )
     ! empty? [ (handle-19-6-tlv) handle-19-6-tlv ] unless ;
 
-SYMBOL: g-id ! group id
-SYMBOL: b-id ! buddy id
+SYMBOL: gid ! group id
+SYMBOL: bid ! buddy id
 SYMBOL: type
 : handle-19-6
     head-byte drop ! ssi version, probably 0
     head-short [ 
         head-short head-string name set   name get .
-        head-short g-id set    g-id get .
-        head-short b-id set    b-id get .
+        head-short gid set    gid get .
+        head-short bid set    bid get .
         head-short type set      type get .  ! type 0 is a buddy, 1 is a group
         "TLV CHAIN DATA: " print
         head-short head-string hexdump   ! short short data
 
         type get
         {
-            { [ dup 0 = ] [ drop name get b-id get g-id get { } clone f f <buddy> 
-            dup name get sanitize-name buddy-hash-name get set-hash b-id get buddy-hash-id get set-hash ] }
-            { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ g-id get <group> 
-            dup name get sanitize-name group-hash-name get set-hash g-id get group-hash-id get set-hash ] if ] }
-            { [ dup 3 = ] [ drop name get b-id get g-id get { } clone f f <buddy>
-            dup name get sanitize-name banned-hash-name get set-hash b-id get banned-hash-id get set-hash ] }
+            { [ dup 0 = ] [ drop name get bid get gid get { } clone f f <buddy> 
+            dup name get sanitize-name buddy-hash-name get set-hash bid get buddy-hash-id get set-hash ] }
+            { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ gid get <group> 
+            dup name get sanitize-name group-hash-name get set-hash gid get group-hash-id get set-hash ] if ] }
+            { [ dup 3 = ] [ drop name get bid get gid get { } clone f f <buddy>
+            dup name get sanitize-name banned-hash-name get set-hash bid get banned-hash-id get set-hash ] }
             { [ t ] [ drop "Unknown 19-6 type" print ] }
         } cond
     ] repeat
     head-short drop ! timestamp
 
-    snac-flags get .
     snac-flags get 0 = [
         ! SSI, Activate
         [ HEX: 13 7 0 7 make-snac ] send-aim
@@ -942,8 +941,14 @@ IN: aim
     dup name set modify-queue get enque
     buddylist-edit-start
     [
-    ] send-aim
-    ;
+        HEX: 13 HEX: a 0 HEX: 5086000a make-snac
+        name get length >short
+        name get %
+        name get get-group group-id >short
+        0 >short
+        1 >short
+        0 >short
+    ] send-aim ;
 
 ! TODO: make sure buddy doesnt already exist, makd sure group exists
 : add-buddy ( name group -- )
@@ -951,11 +956,11 @@ IN: aim
     dup name set modify-queue get enque
     buddylist-edit-start
     [
-        HEX: 13 8 0 HEX: 57e60008
+        HEX: 13 8 0 HEX: 5b2f0008 make-snac
         name get length >short
         name get %
-        ! BUDDY GROUP ID HEX: 1a4c
-        ! BUDDY ID HEX: 1812
+        group get get-group group-id >short
+        random-buddy-id >short
         0 >short ! buddy type
         0 >short ! tlv len
     ] send-aim ;
@@ -964,7 +969,7 @@ IN: aim
     dup name set modify-queue enque
     buddylist-edit-start
     [
-        HEX: 13 HEX: a 0 HEX: 60c0000a make-snac
+        HEX: 13 HEX: a 0 HEX: 5086000a make-snac
         name get length >short
         name get %
         name get get-buddy dup buddy-gid >short
@@ -974,20 +979,23 @@ IN: aim
     ] send-aim ;
 
 : modify-buddylist ( name -- )
-    [
-        HEX: 13 9 0 HEX: 6e190009 make-snac
-        get-buddy buddy-gid get-group
-        dup group-name dup length >short %
-        group-id >short
-        0 >short
-        1 >short  ! group type = 1
-
+    ! dup buddy-name? [ dup name set dup buddy-id bid set buddy-gid gid set ] when
+    ! dup group-name? [ dup name set dup group-id gid set 0 bid set ] when
+    ! dup banned-name? [ dup name set dup buddy-id bid set buddy-gid gid set ] when
+    ! [
+        ! HEX: 13 9 0 HEX: 6e190009 make-snac
+        ! name get dup length >short %
+        ! gid get >short
+        ! 0 >short
+        ! 1 >short  ! group type = 1
+   
         ! "members of this group" tlv
         ! 8 >short
         ! HEX: c8 >short
         ! 4 >short
         ! HEX: 4e833ea8 >int
-    ] make-packet ; ! send-aim buddylist-edit-stop ;
+    ! ] send-aim ;
+    drop ;
 
 IN: aim-internals
 : buddylist-ack
