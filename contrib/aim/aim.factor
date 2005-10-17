@@ -373,6 +373,12 @@ M: object get-banned ( name -- <buddy> )
     ] unless ;
 
 : handle-online-info
+    snac-flags get 32768 = [
+        head-short drop
+        head-short drop
+        head-short drop
+        head-short drop
+    ] when
     (handle-online-info)
     ; FAMILY: 1 OPCODE: f
 
