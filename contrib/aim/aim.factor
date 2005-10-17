@@ -1,7 +1,7 @@
 ! All Talk
 
 IN: aim-internals
-USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals ;
+USING: kernel sequences lists stdio prettyprint strings namespaces math unparser threads vectors errors parser interpreter test io crypto words hashtables inspector aim-internals generic queues ;
 
 SYMBOL: username
 SYMBOL: password
@@ -22,9 +22,12 @@ SYMBOL: name
 SYMBOL: message
 SYMBOL: encoding
 SYMBOL: warning
-SYMBOL: buddy-list
-SYMBOL: group-list
-SYMBOL: banned-list
+SYMBOL: buddy-hash-name
+SYMBOL: buddy-hash-id
+SYMBOL: group-hash-name
+SYMBOL: group-hash-id
+SYMBOL: banned-hash-name
+SYMBOL: banned-hash-id
 SYMBOL: channel
 SYMBOL: icbm-cookie
 SYMBOL: message-type
@@ -35,6 +38,7 @@ SYMBOL: direct-connect-cancelled
 SYMBOL: remote-internal-ip
 SYMBOL: remote-external-ip
 SYMBOL: ssi-length
+SYMBOL: modify-queue
 
 TUPLE: group name id ;
 TUPLE: buddy name id gid capabilities buddy-icon online ;
@@ -67,6 +71,13 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     [[ 9 "BOS" ]] [[ 10 "User Lookup" ]] [[ 11 "Stats" ]]
     [[ 12 "Translate" ]] [[ 19 "SSI" ]] [[ 21 "ICQ" ]]
     [[ 34 "Unknown Family" ]] }} ;
+
+: ch>lower ( int -- int ) dup LETTER? [ HEX: 20 + ] when ;
+: ch>upper ( int -- int ) dup letter? [ HEX: 20 - ] when ;
+: >lower ( seq -- seq ) [ ch>lower ] map ;
+: >upper ( seq -- seq ) [ ch>upper ] map ;
+
+: sanitize-name ( name -- name ) HEX: 20 swap remove >lower ;
 
 : hash-swap ( hash -- hash )
     [ [ unswons cons , ] hash-each ] { } make alist>hash ;
@@ -110,10 +121,13 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
 
 : initialize-aim ( username password -- )
     password set username set
-    ! {{ }} clone buddy-list set
-    { } clone buddy-list set
-    { } clone group-list set
-    { } clone banned-list set
+    {{ }} clone buddy-hash-name set
+    {{ }} clone buddy-hash-id set
+    {{ }} clone group-hash-name set
+    {{ }} clone group-hash-id set
+    {{ }} clone banned-hash-name set
+    {{ }} clone banned-hash-id set
+    <queue> modify-queue set
     ! 65535 random-int seq-num set
     0 seq-num set
     1 stage-num set ;
@@ -171,21 +185,51 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     "Unhandled family: " write family get unparse writeln
     unhandled-opcode ;
 
+GENERIC: get-buddy
+M: integer get-buddy ( bid -- <buddy> )
+    buddy-hash-id get hash ;
+M: object get-buddy ( name -- <buddy> )
+    sanitize-name buddy-hash-name get hash ;
+
+GENERIC: get-group
+M: integer get-group ( bid -- <group> )
+    group-hash-id get hash ;
+M: object get-group ( name -- <group> )
+    sanitize-name group-hash-name get hash ;
+
+GENERIC: get-banned
+M: integer get-banned ( bid -- <buddy> )
+    banned-hash-id get hash ;
+M: object get-banned ( name -- <buddy> )
+    sanitize-name banned-hash-name get hash ;
+
+: buddy-name? ( name -- bool )
+    get-buddy >boolean ;
+
+: group-name? ( name -- bool )
+    get-group >boolean ;
+
+: banned-name? ( name -- bool )
+    get-banned >boolean ;
+
+: random-buddy-id ( -- id )
+    HEX: fff0 random-int 1+ dup get-buddy [ drop random-buddy-id ] when ;
+
+: random-group-id ( -- id )
+    HEX: fff0 random-int 1+ dup get-group [ drop random-group-id ] when ;
+
+
 ! Events
 : buddy-signon ( name -- )
-    drop ; !  0 swap buddy-list get set-hash ;
+    get-buddy dup [ t swap set-buddy-online ] [ drop "Can't find buddy in buddylist: " write name get writeln ] if ;
 
 : buddy-signoff ( name -- )
-    drop ; !  buddy-list get remove-hash ;
+    get-buddy dup [ f swap set-buddy-online ] [ drop "Can't find buddy in buddylist: " write name get writeln ] if ;
 
-: get-gid-by-name ( name -- gid )
-    
-
-: print-buddy-list
-    group-list get [ [ buddy-name , ] each ] { } make
+: print-buddylist
+    ! group-list get [ [ buddy-name , ] each ] { } make
+    ! [ buddylist get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
     ;
-    ! [ buddy-list get hash-keys string-sort [ , ] each ] { } make [ drop ] simple-outliner ;
-
 
 : family-table ( -- hash )
     {{ }} ;
@@ -610,16 +654,19 @@ SYMBOL: type
 
         type get
         {
-            { [ dup 0 = ] [ drop name get b-id get g-id get { } clone f f <buddy> buddy-list get push ] }
-            { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ g-id get <group> group-list get push ] if ] }
-            { [ dup 3 = ] [ drop name get b-id get g-id get { } clone f f <buddy> banned-list get push ] }
+            { [ dup 0 = ] [ drop name get b-id get g-id get { } clone f f <buddy> 
+            dup name get sanitize-name buddy-hash-name get set-hash b-id get buddy-hash-id get set-hash ] }
+            { [ dup 1 = ] [ drop name get dup length 0 = [ drop ] [ g-id get <group> 
+            dup name get sanitize-name group-hash-name get set-hash g-id get group-hash-id get set-hash ] if ] }
+            { [ dup 3 = ] [ drop name get b-id get g-id get { } clone f f <buddy>
+            dup name get sanitize-name banned-hash-name get set-hash b-id get banned-hash-id get set-hash ] }
             { [ t ] [ drop "Unknown 19-6 type" print ] }
         } cond
-
     ] repeat
     head-short drop ! timestamp
 
-    snac-flags get 1 = [
+    snac-flags get .
+    snac-flags get 0 = [
         ! SSI, Activate
         [ HEX: 13 7 0 7 make-snac ] send-aim
         ! Set User Info.  Capabilities!
@@ -662,10 +709,8 @@ SYMBOL: type
         ] send-aim
         
         ! Process
-    ] when
-    
-    
-    ; FAMILY: 19 OPCODE: 6
+    ] when ; FAMILY: 19 OPCODE: 6
+
 
 : parse-server ( ip:port -- )
     ":" split [ first ] keep second string>number aim-chat-port set aim-chat-ip set ;
@@ -870,19 +915,41 @@ IN: aim
         message get %
     ] send-aim ;
 
-: buddy-list-edit-start
-    [ HEX: 13 HEX: 11 0 HEX: 11 ] send-aim ;
+: buddylist-edit-start
+    [ HEX: 13 HEX: 11 0 HEX: 11 make-snac ] send-aim ;
 
-: buddy-list-edit-stop
-    [ HEX: 13 HEX: 12 0 HEX: 12 ] send-aim ;
+: buddylist-edit-stop
+    [ HEX: 13 HEX: 12 0 HEX: 12 make-snac ] send-aim ;
     
 
 ! add, delete groups, move buddies from group to group
 ! parse buddy list
 
+: add-group ( name -- )
+    dup name set modify-queue get enque
+    buddylist-edit-start
+    [
+        HEX: 13 8 0 HEX: 4fb20008 make-snac
+        name get length >short
+        name get %
+        random-group-id >short
+        0 >short ! buddy id
+        1 >short ! buddy type
+        0 >short ! tlv len
+    ] send-aim ;
+
+: delete-group ( name -- )
+    dup name set modify-queue get enque
+    buddylist-edit-start
+    [
+    ] send-aim
+    ;
+
+! TODO: make sure buddy doesnt already exist, makd sure group exists
 : add-buddy ( name group -- )
-    name set
-    buddy-list-edit-start
+    group set 
+    dup name set modify-queue get enque
+    buddylist-edit-start
     [
         HEX: 13 8 0 HEX: 57e60008
         name get length >short
@@ -891,31 +958,43 @@ IN: aim
         ! BUDDY ID HEX: 1812
         0 >short ! buddy type
         0 >short ! tlv len
-    ] send-aim
-    buddy-list-edit-stop ;
+    ] send-aim ;
 
-! : modify-buddy
-    ! [
-        ! HEX: 13 9 0 HEX: 6e190009
-        ! group length
-        ! group name
-    ! ] send-aim ;
-
-: delete-buddy ( name group -- )
-    name set
-    buddy-list-edit-start
+: delete-buddy ( name -- )
+    dup name set modify-queue enque
+    buddylist-edit-start
     [
-        HEX: 13 HEX: a 0 HEX: 60c0000a
+        HEX: 13 HEX: a 0 HEX: 60c0000a make-snac
         name get length >short
         name get %
-        ! BUDDY GROUP ID HEX: 1a4c
-        ! BUDDY ID HEX: 1812
+        name get get-buddy dup buddy-gid >short
+        buddy-id >short
         0 >short
         0 >short
-    ] send-aim
-    ! modify-buddy
-    buddy-list-edit-stop ;
+    ] send-aim ;
 
+: modify-buddylist ( name -- )
+    [
+        HEX: 13 9 0 HEX: 6e190009 make-snac
+        get-buddy buddy-gid get-group
+        dup group-name dup length >short %
+        group-id >short
+        0 >short
+        1 >short  ! group type = 1
+
+        ! "members of this group" tlv
+        ! 8 >short
+        ! HEX: c8 >short
+        ! 4 >short
+        ! HEX: 4e833ea8 >int
+    ] make-packet ; ! send-aim buddylist-edit-stop ;
+
+IN: aim-internals
+: buddylist-ack
+    modify-queue get deque modify-buddylist
+    buddylist-edit-stop ; FAMILY: 19 OPCODE: 14
+
+IN: aim
 
 : run ( username password -- )
     initialize-aim connect-aim ;
