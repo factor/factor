@@ -17,6 +17,7 @@ SYMBOL: family
 SYMBOL: opcode
 SYMBOL: snac-flags
 SYMBOL: snac-request-id
+SYMBOL: extra-data
 
 SYMBOL: name
 SYMBOL: message
@@ -157,8 +158,7 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     {{ }} clone banned-hash-name set
     {{ }} clone banned-hash-id set
     <queue> modify-queue set
-    ! 65535 random-int seq-num set
-    0 seq-num set
+    HEX: 7fff random-int seq-num set
     1 stage-num set ;
 
 : prepend-aim-protocol ( data -- )
@@ -167,7 +167,7 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
         stage-num get >byte
         seq-num get >short
     ] "" make
-    seq-num [ 1+ ] change
+    seq-num get dup HEX: 7fff >= [ 0 ] [ 1+ ] if seq-num set
     swap dup >r length (>short) r> append append ;
 
 : (send-aim) ( str -- )
@@ -197,7 +197,11 @@ TUPLE: buddy name id gid capabilities buddy-icon online ;
     head-short family set
     head-short opcode set
     head-short snac-flags set
-    head-int snac-request-id set ;
+    head-int snac-request-id set 
+    snac-flags get HEX: 8000 bitand 0 > [
+        head-short head-string extra-data set
+        extra-data get "Extra data: " writeln hexdump
+    ] when ;
 
 : (unhandled-opcode) ( str -- )
     ! "Family: " write family get >hex write
@@ -288,6 +292,16 @@ M: object get-banned ( name -- <buddy> )
 		(handle-supported-families)
 	] unless ;
 
+! : unscoped-stream get empty? [
+        ! head-short
+        ! [
+            ! head-short
+            ! head-short head-string <string-reader> [
+            ! cond
+            ! ] with-unscoped-stream
+        ! ] repeat 
+    ! ] unless ;
+
 : handle-supported-families
 	"Families: " print
 	(handle-supported-families) 
@@ -373,12 +387,6 @@ M: object get-banned ( name -- <buddy> )
     ] unless ;
 
 : handle-online-info
-    snac-flags get 32768 = [
-        head-short drop
-        head-short drop
-        head-short drop
-        head-short drop
-    ] when
     (handle-online-info)
     ; FAMILY: 1 OPCODE: f
 
@@ -488,12 +496,11 @@ M: object get-banned ( name -- <buddy> )
     ] repeat ; FAMILY: 3 OPCODE: c
 
 : parse-family-4h-header
-    head-short drop
-    head-short drop
-    head-short drop
-    head-short drop
-    8 head-string drop
-    head-short channel set ;
+    extra-data get <string-reader> [
+        head-short drop
+        head-short drop
+        head-short drop
+    ] with-unscoped-stream ;
     
 : parse-message-text ( -- str )
     head-short drop head-short drop head-contents ;
@@ -663,6 +670,8 @@ M: object get-banned ( name -- <buddy> )
 
 : handle-incoming-message ( -- )
     parse-family-4h-header
+    head-longlong drop
+    head-short channel set 
     head-byte head-string name set
     head-short warning set
     head-short parse-message-tlv
@@ -683,6 +692,8 @@ M: object get-banned ( name -- <buddy> )
 
 : handle-typing-message ( -- )
     parse-family-4h-header
+    head-longlong drop
+    head-short channel set
     head-byte head-string write
     head-short
     {
@@ -892,7 +903,7 @@ SYMBOL: type
 : second-server
     aim-chat-ip get aim-chat-port get <client> conn set
     1 stage-num set
-    65535 random-int seq-num set
+    HEX: 7fff random-int seq-num set
     send-second-login read-aim drop
     2 stage-num set ;
 
