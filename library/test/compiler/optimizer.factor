@@ -176,12 +176,12 @@ TUPLE: pred-test ;
 
 [ << pred-test >> "pred-test" ] [ << pred-test >> pred-test-4 ] unit-test
 
-: inline-test
-    "nom" = ; compiled
-
-[ t ] [ "nom" inline-test ] unit-test
-[ f ] [ "shayin" inline-test ] unit-test
-[ f ] [ 3 inline-test ] unit-test
+! : inline-test
+!     "nom" = ; compiled
+! 
+! [ t ] [ "nom" inline-test ] unit-test
+! [ f ] [ "shayin" inline-test ] unit-test
+! [ f ] [ 3 inline-test ] unit-test
 
 : fixnum-declarations >fixnum 24 shift 1234 bitxor ; compiled
 

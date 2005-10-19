@@ -30,7 +30,7 @@ M: %call-label generate-node ( vop -- )
     vop-label
     compiled-offset 20 + 18 LOAD32  0 1 rel-address
     1 1 stack-increment neg STWU
-    18 1 stack-increment cell + STW
+    18 1 stack-increment lr@ STW
     B ;
 
 : word-addr ( word -- )
@@ -59,8 +59,8 @@ M: %jump-t generate-node ( vop -- )
 
 M: %return-to generate-node ( vop -- )
     vop-label 0 3 LOAD32  absolute-16/16
-    1 1 -16 STWU
-    3 1 20 STW ;
+    1 1 stack-increment neg STWU
+    3 1 stack-increment lr@ STW ;
 
 M: %return generate-node ( vop -- )
     drop compile-epilogue BLR ;
