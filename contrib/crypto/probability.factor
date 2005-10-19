@@ -139,7 +139,11 @@ IN: math
     [ t ] [ 3 gamma 2 - abs .0001 < ] unit-test
     [ t ] [ 11 gamma 3628800 - abs .0001 < ] unit-test
     [ t ] [ 90000000000000000000000000000000000000000000 gamma inf = ] unit-test
-
+    ! some fun identities
+    [ t ] [ 2/3 gamma 2 pi * 3 sqrt 1/3 gamma * / - abs .00001 < ] unit-test
+    [ t ] [ 3/4 gamma 2 sqrt pi * 1/4 gamma / - abs .0001 < ] unit-test
+    [ t ] [ 4/5 gamma 2 5 sqrt / 2 + sqrt pi * 1/5 gamma / - abs .0001 < ] unit-test
+    [ t ] [ 3/5 gamma 2 2 5 sqrt / - sqrt pi * 2/5 gamma / - abs .0001 < ] unit-test
 
     [ t ] [ -90000000000000000000000000000000000000000000 gammaln inf = ] unit-test
     [ t ] [ -1.5 gammaln inf = ] unit-test
