@@ -28,14 +28,24 @@ TUPLE: vreg n ;
 TUPLE: int-regs ;
 TUPLE: float-regs size ;
 
+GENERIC: fastcall-regs ( register-class -- n )
+
+GENERIC: reg-class-size ( register-class -- n )
+
+M: float-regs reg-class-size float-regs-size ;
+
 ! A data stack location.
 TUPLE: ds-loc n ;
 
 ! A call stack location.
 TUPLE: cs-loc n ;
 
+! A pseudo-register class for parameters spilled on the stack
+TUPLE: stack-params ;
+
 ! A virtual operation
 TUPLE: vop inputs outputs label ;
+
 : vop-in ( vop n -- input ) swap vop-inputs nth ;
 : set-vop-in ( input vop n -- ) swap vop-inputs set-nth ;
 : vop-out ( vop n -- input ) swap vop-outputs nth ;
@@ -45,6 +55,12 @@ GENERIC: basic-block? ( vop -- ? )
 M: vop basic-block? drop f ;
 ! simplifies some code
 M: f basic-block? drop f ;
+
+! Only on PowerPC. The %parameters node needs to reserve space
+! in the stack frame.
+GENERIC: stack-reserve
+
+M: vop stack-reserve drop 0 ;
 
 : make-vop ( inputs outputs label vop -- vop )
     [ >r <vop> r> set-delegate ] keep ;
@@ -318,6 +334,7 @@ M: %setenv basic-block? drop t ;
 ! alien operations
 TUPLE: %parameters ;
 C: %parameters make-vop ;
+M: %parameters stack-reserve 0 vop-in ;
 : %parameters ( n -- vop ) src-vop <%parameters> ;
 
 TUPLE: %parameter ;

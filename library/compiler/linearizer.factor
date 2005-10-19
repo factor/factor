@@ -1,9 +1,8 @@
 ! Copyright (C) 2004, 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: compiler-frontend
-USING: compiler-backend errors generic lists inference kernel
-math namespaces prettyprint sequences
-strings words ;
+USING: arrays compiler-backend errors generic inference kernel
+lists math namespaces prettyprint sequences strings words ;
 
 GENERIC: linearize* ( node -- )
 
@@ -11,10 +10,7 @@ GENERIC: linearize* ( node -- )
     #! Transform dataflow IR into linear IR. This strips out
     #! stack flow information, and flattens conditionals into
     #! jumps and labels.
-    [
-        %prologue ,
-        linearize*
-    ] { } make ;
+    [ %prologue , linearize* ] { } make ;
 
 : linearize-next node-successor linearize* ;
 

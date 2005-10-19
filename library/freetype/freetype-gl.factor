@@ -1,7 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: #<unknown> alien arrays errors hashtables io kernel lists
-math namespaces opengl prettyprint sequences styles ;
+USING: #<unknown> alien arrays errors hashtables io kernel
+kernel-internals lists math namespaces opengl prettyprint
+sequences styles ;
 IN: freetype
 
 ! Memory management: freetype is allocated and freed by
@@ -19,7 +20,7 @@ SYMBOL: open-fonts
     ] bind ;
 
 ! A sprite are a texture and display list.
-TUPLE: sprite width height dlist texture ;
+TUPLE: sprite dlist texture ;
 
 : free-dlists ( seq -- )
     "Freeing display lists: " print . ;
@@ -77,11 +78,13 @@ TUPLE: font height handle sprites metrics ;
 
 : dpi 100 ;
 
-: font-units>pixels ( n font-size -- n )
-    face-size-y-scale FT_MulFix fix>float ;
+: fix>float 64 /f ;
+
+: font-units>pixels ( n font -- n )
+    face-size face-size-y-scale FT_MulFix fix>float ;
 
 : init-font-height ( font -- )
-    dup font-handle face-size 
+    dup font-handle
     dup face-y-max over face-y-min - swap font-units>pixels 
     swap set-font-height ;
 
@@ -103,8 +106,6 @@ C: font ( handle -- font )
 : load-glyph ( face char -- glyph )
     dupd 0 FT_Load_Char freetype-error face-glyph ;
 
-: fix>float 64 /f ;
-
 : (char-size) ( font char -- dim )
     >r font-handle r> load-glyph
     dup glyph-width fix>float
@@ -122,31 +123,40 @@ C: font ( handle -- font )
     load-glyph dup
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
-: copy-row ( width texture bitmap row -- )
-    #! Copy a row of the bitmap to the texture.
-    2drop 2drop ;
+: with-locked-block ( size quot -- | quot: address -- )
+    swap malloc [ swap call ] keep free ; inline
 
-: <glyph-texture> ( bitmap -- texture )
-    dup glyph-bitmap-width next-power-of-2
-    swap glyph-bitmap-rows next-power-of-2 * <c-object> ;
+: (copy-bitmap) ( bitmap-chase texture-chase width width-pow2 )
+    >r 3dup swapd memcpy tuck >r >r + r> r> r> tuck >r >r + r> r> ;
 
-: copy-glyph ( bitmap texture -- )
-    #! Copy a bitmap into a texture whose width/height are
-    #! the width/height of the bitmap rounded up to the nearest
-    #! power of 2.
-    >r [ bitmap-width next-power-of-2 ] keep r>
-    over bitmap-rows [ >r 3dup r> copy-row ] each 3drop ;
+: copy-bitmap ( glyph texture width-pow2 -- )
+    pick glyph-bitmap-rows >r >r over glyph-bitmap-pitch >r >r
+    glyph-bitmap-buffer alien-address r> r> r> r>
+    [ (copy-bitmap) ] times 2drop 2drop ;
 
-: glyph>texture ( bitmap -- texture )
-    #! Given a glyph bitmap, copy it to a texture whose size is
-    #! a power of two.
-    dup <glyph-texture> [ copy-glyph ] keep ;
+: bitmap>texture ( width height glyph -- id )
+    #! Given a glyph bitmap, copy it to a texture with the given
+    #! width/height (which must be powers of two).
+    3drop
+    32 32 * 4 * [
+        <alien> 32 32 * 4 * [
+            128 pick rot set-alien-signed-1
+        ] each 32 32 rot gray-texture
+    ] with-locked-block ;
 
-: <char-sprite> ( font char -- sprite )
-    0 0 <sprite> ;
+: char-texture-size ( bitmap -- width height )
+    dup glyph-bitmap-width swap glyph-bitmap-rows
+    [ next-power-of-2 ] 2apply ;
+
+: <char-sprite> ( face char -- sprite )
+    render-glyph [ char-texture-size 2dup ] keep
+    bitmap>texture [ texture>dlist ] keep <sprite> ;
 
 : char-sprite ( open-font char -- sprite )
-    over font-sprites [ dupd <char-sprite> ] cache-nth nip ;
+    over font-sprites
+    [ >r dup font-handle r> <char-sprite> ] cache-nth nip ;
 
 : draw-string ( font string -- )
-    [ char-sprite drop ( sprite-dlist glCallList ) ] each-with ;
+    GL_TEXTURE_BIT [
+        [ char-sprite sprite-dlist glCallList ] each-with
+    ] save-attribs ;

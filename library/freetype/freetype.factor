@@ -32,17 +32,6 @@ TYPEDEF: long FT_F26Dot6
 
 FUNCTION: FT_Error FT_Init_FreeType ( void* library ) ;
 
-BEGIN-STRUCT: bitmap
-    FIELD: int     rows
-    FIELD: int     width
-    FIELD: int     pitch
-    FIELD: uchar*  buffer
-    FIELD: short   num-grays
-    FIELD: char    pixel-mode
-    FIELD: char    palette-mode
-    FIELD: void*   palette
-END-STRUCT
-
 ! circular reference between glyph and face
 TYPEDEF: void face
 TYPEDEF: void glyph

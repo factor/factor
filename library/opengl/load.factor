@@ -1,4 +1,16 @@
-USING: io kernel parser sequences ;
+USING: alien io kernel parser sequences ;
+
+@{
+    @{ [ os "macosx" = ] [ ] }@
+    @{ [ os "win32" = ] [
+            "gl" "opengl32.dll" "stdcall" add-library
+            "glu" "glu32.dll" "stdcall" add-library
+    ] }@
+    @{ [ t ] [
+            "gl" "libGL.so" "cdecl" add-library
+            "glu" "libGLU.so" "cdecl" add-library
+    ] }@
+}@ cond
 
 [
     "/library/opengl/gl.factor"

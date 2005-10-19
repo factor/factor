@@ -7,19 +7,21 @@ kernel-internals lists math memory namespaces words ;
 : compile-c-call ( symbol dll -- )
     2dup dlsym  11 LOAD32  0 1 rel-dlsym  11 MTLR  BLRL ;
 
+: stack-increment \ stack-reserve get stack@ 16 align ;
+
 M: %prologue generate-node ( vop -- )
     drop
-    1 1 -16 STWU
+    1 1 stack-increment neg STWU
     0 MFLR
-    0 1 20 STW ;
+    0 1 stack-increment lr@ STW ;
 
 : compile-epilogue
     #! At the end of each word that calls a subroutine, we store
     #! the previous link register value in r0 by popping it off
     #! the stack, set the link register to the contents of r0,
     #! and jump to the link register.
-    0 1 20 LWZ
-    1 1 16 ADDI
+    0 1 stack-increment lr@ LWZ
+    1 1 stack-increment ADDI
     0 MTLR ;
 
 M: %call-label generate-node ( vop -- )
@@ -27,8 +29,8 @@ M: %call-label generate-node ( vop -- )
     #! Note: length of instruction sequence is hard-coded.
     vop-label
     compiled-offset 20 + 18 LOAD32  0 1 rel-address
-    1 1 -16 STWU
-    18 1 20 STW
+    1 1 stack-increment neg STWU
+    18 1 stack-increment cell + STW
     B ;
 
 : word-addr ( word -- )

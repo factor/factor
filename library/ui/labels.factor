@@ -21,7 +21,7 @@ M: label pref-dim ( label -- dim )
     label-size ;
 
 : draw-label ( label -- )
-    dup label-text swap gadget-font draw-string ;
+    dup gadget-font swap label-text draw-string ;
 
 M: label draw-gadget* ( label -- )
     dup delegate draw-gadget* draw-label ;

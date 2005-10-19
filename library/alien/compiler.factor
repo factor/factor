@@ -77,31 +77,38 @@ C: alien-node make-node ;
 
 : unbox-parameters ( params -- )
     [ stack-space ] keep
-    [ [ c-aligned - dup ] keep unbox-parameter ] map nip % ;
+    [ [ c-aligned - dup ] keep unbox-parameter , ] each drop ;
 
-: incr-param ( reg-class -- )
-    #! OS X is so ugly.
-    dup class inc  dup float-regs? [
-        os "macosx" = [
-            int-regs [ swap float-regs-size 4 / + ] change
-        ] [
-            drop
-        ] if
-    ] [
-        drop
-    ] if ;
+: reg-class-full? ( class -- ? )
+    dup class get swap fastcall-regs >= ;
+
+: spill-param ( reg-class -- n reg-class )
+    reg-class-size stack-params [ tuck + ] change
+    << stack-params >> ;
+
+: inc-reg-class ( reg-class -- )
+    #! On Mac OS X, float parameters 'shadow' integer registers.
+    dup class inc dup float-regs? dual-fp/int-regs? and [
+        int-regs [ over reg-class-size 4 / + ] change
+    ] when drop ;
+
+: fastcall-param ( reg-class -- n reg-class )
+    [ dup class get swap inc-reg-class ] keep ;
 
 : load-parameter ( n parameter -- node )
-    c-type "reg-class" swap hash
-    [ [ class get ] keep  incr-param ] keep  %parameter ;
+    #! n is a stack location, and the value of the class
+    #! variable is a register number.
+    c-type "reg-class" swap hash dup reg-class-full?
+    [ spill-param ] [ fastcall-param ] if %parameter ;
 
 : load-parameters ( params -- )
     [
+        reverse
         0 int-regs set
         0 float-regs set
-        reverse 0 swap
-        [ 2dup load-parameter >r c-aligned + r> ] map nip
-    ] with-scope % ;
+        0 stack-params set
+        0 [ 2dup load-parameter , c-aligned + ] reduce drop
+    ] with-scope ;
 
 : linearize-parameters ( parameters -- )
     #! Generate code for boxing a list of C types, then generate

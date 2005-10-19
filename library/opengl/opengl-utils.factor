@@ -4,7 +4,6 @@ IN: opengl
 USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : init-gl ( -- )
-    GL_FLAT glShadeModel
     0.0 0.0 0.0 0.0 glClearColor 
     1.0 0.0 0.0 glColor3d
     GL_COLOR_BUFFER_BIT glClear
@@ -14,14 +13,8 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     glLoadIdentity
     0 0 width get height get glViewport
     0 width get height get 0 gluOrtho2D
-    GL_SMOOTH glShadeModel ;
-
-: render ( -- )
-    GL_TRIANGLES glBegin
-        0.0 0.0 0.0 glVertex3f
-        100.0 0.0 0.0 glVertex3f
-        100.0 100.0 0.0 glVertex3f
-    glEnd ;
+    GL_SMOOTH glShadeModel
+    GL_TEXTURE_2D glEnable ;
 
 : gl-flags
     SDL_OPENGL SDL_RESIZABLE bitor SDL_HWSURFACE bitor SDL_DOUBLEBUF bitor ;
@@ -34,10 +27,13 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : with-gl-screen ( quot -- )
     >r 0 gl-flags r> with-screen ;
 
+: gl-error ( -- )
+    glGetError dup 0 = [ drop ] [ gluErrorString throw ] if ;
+
 : with-gl-surface ( quot -- )
     #! Execute a quotation, locking the current surface if it
     #! is required (eg, hardware surface).
-    [ init-gl call ] [ SDL_GL_SwapBuffers ] cleanup ;
+    [ init-gl call gl-error ] [ SDL_GL_SwapBuffers ] cleanup ;
 
 : do-state ( what quot -- )
     swap glBegin call glEnd ; inline
@@ -105,15 +101,22 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Generate texture ID.
     1 0 <uint> [ glGenTextures ] keep *uint ;
 
+: save-attribs ( bits quot -- )
+    swap glPushAttrib call glPopAttrib ; inline
+
 : gray-texture ( width height buffer -- id )
     #! Given a buffer holding a width x height (powers of two)
     #! grayscale texture, bind it and return the ID.
     gen-texture [
-        GL_TEXTURE_2D swap glBindTexture
-        GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-        GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
-        >r >r >r GL_TEXTURE_2D 0 GL_RGBA r> r> 0 GL_ALPHA
-        GL_UNSIGNED_BYTE r> glTexImage2D
+        GL_TEXTURE_BIT [
+            GL_TEXTURE_2D swap glBindTexture
+            GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
+            GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
+            GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
+            GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf
+            >r >r >r GL_TEXTURE_2D 0 GL_RGBA r> r> 0 GL_RGBA
+            GL_UNSIGNED_BYTE r> glTexImage2D
+        ] save-attribs
     ] keep ;
 
 : gen-dlist ( -- id )
@@ -127,12 +130,16 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : texture>dlist ( width height id -- id )
     #! Given a texture width/height and ID, make a display list
     #! for draws a quad with this texture.
-    GL_COMPILE [
-        GL_TEXTURE_2D swap glBindTexture
-        GL_QUADS [
-            0 0 glTexCoord2d 0 over glVertex2i
-            0 over glTexCoord2d 0 0 glVertex2i
-            2dup glTexCoord2d over 0 glVertex2i
-            over 0 glTexCoord2d glVertex2i
-        ] do-state
-    ] make-dlist ;
+    GL_MODELVIEW [
+        GL_COMPILE [
+            1 1 1 glColor3f
+            GL_TEXTURE_2D swap glBindTexture
+            GL_QUADS [
+                0 0 glTexCoord2d 0 0 glVertex2i
+                0 1 glTexCoord2d 0 over glVertex2i
+                1 1 glTexCoord2d 2dup glVertex2i
+                1 0 glTexCoord2d over 0 glVertex2i
+            ] do-state
+            drop 0 0 glTranslatef
+        ] make-dlist
+    ] do-matrix ;

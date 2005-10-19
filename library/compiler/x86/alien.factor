@@ -8,10 +8,6 @@ M: %alien-invoke generate-node
     #! call a C function.
     dup 0 vop-in swap 1 vop-in load-library compile-c-call ;
 
-M: %parameters generate-node
-    #! x86 does not pass parameters in registers
-    drop ;
-
 M: %parameter generate-node
     #! x86 does not pass parameters in registers
     drop ;

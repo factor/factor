@@ -1,4 +1,11 @@
-USING: kernel parser sequences io ;
+USING: alien io kernel parser sequences ;
+
+@{
+    @{ [ os "macosx" = ] [ ] }@
+    @{ [ os "win32" = ] [ "sdl" "sdl.dll" "cdecl" add-library ] }@
+    @{ [ t ] [ "sdl" "libSDL.so" "cdecl" add-library ] }@
+}@ cond
+
 [
     "/library/sdl/sdl.factor"
     "/library/sdl/sdl-video.factor"
