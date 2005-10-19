@@ -64,9 +64,18 @@ IN: math-internals
 : gamma-z ( x n -- seq )
     [ [ over + 1.0 swap / , ] each ] { } make 1.0 0 pick set-nth nip ;
 
-: gamma-lanczos6 ( x -- gamma[x] )
+: (gamma-lanczos6) ( x -- log[gamma[x+1]] )
+    #! log(gamma(x+1)
     dup 0.5 + dup gamma-g6 + dup >r log * r> -
-    dupd swap 6 gamma-z gamma-p6 v. log + exp swap / ;
+    swap 6 gamma-z gamma-p6 v. log + ;
+
+: gamma-lanczos6 ( x -- gamma[x] )
+    #! gamma(x) = gamma(x+1) / x
+    dup (gamma-lanczos6) exp swap / ;
+
+: gammaln-lanczos6 ( x -- gammaln[x] )
+    #! log(gamma(x)) = log(gamma(x+1)) - log(x)
+    dup (gamma-lanczos6) swap log - ;
 
 : gamma-neg ( gamma[abs[x]] x -- gamma[x] )
     dup pi * sin * * pi neg swap / ; inline
@@ -80,6 +89,15 @@ IN: math
             drop inf
         ] [
             dup abs gamma-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
+    ] if ;
+
+: gammaln ( x -- gamma[x] )
+    #! gammaln(x) is an alternative when gamma(x)'s range
+    #! varies too widely
+    dup 0 < [
+            drop inf
+        ] [
+            dup abs gammaln-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
     ] if ;
 
 ! Tests
@@ -111,15 +129,28 @@ IN: math
     [ 1 ] [ 2 0 nCk ] unit-test
     [ 1 ] [ 2 0 nPk ] unit-test
     [ t ] [ -9000000000000000000000000000000000000000000 gamma inf = ] unit-test
-    [ t ] [ -1.5 gamma 2.36327 - .0001 < ] unit-test
+    [ t ] [ -1.5 gamma 2.36327 - abs .0001 < ] unit-test
     [ t ] [ -1 gamma inf = ] unit-test
-    [ t ] [ -0.5 gamma -3.5449 - .0001 < ] unit-test
+    [ t ] [ -0.5 gamma -3.5449 - abs .0001 < ] unit-test
     [ t ] [ 0 gamma inf = ] unit-test
-    [ t ] [ .5 gamma 1.7725 - .0001 < ] unit-test
-    [ t ] [ 1 gamma 1 - .0001 < ] unit-test
-    [ t ] [ 2 gamma 1 - .0001 < ] unit-test
-    [ t ] [ 3 gamma 6 - .0001 < ] unit-test
-    [ t ] [ 11 gamma 3628800 - .0001 < ] unit-test
+    [ t ] [ .5 gamma 1.7725 - abs .0001 < ] unit-test
+    [ t ] [ 1 gamma 1 - abs .0001 < ] unit-test
+    [ t ] [ 2 gamma 1 - abs .0001 < ] unit-test
+    [ t ] [ 3 gamma 2 - abs .0001 < ] unit-test
+    [ t ] [ 11 gamma 3628800 - abs .0001 < ] unit-test
     [ t ] [ 90000000000000000000000000000000000000000000 gamma inf = ] unit-test
+
+
+    [ t ] [ -90000000000000000000000000000000000000000000 gammaln inf = ] unit-test
+    [ t ] [ -1.5 gammaln inf = ] unit-test
+    [ t ] [ -1 gammaln inf = ] unit-test
+    [ t ] [ -0.5 gammaln inf = ] unit-test
+    [ t ] [ 0 gammaln inf = ] unit-test
+    [ t ] [ .5 gammaln .5724 - abs .0001 < ] unit-test
+    [ t ] [ 1 gammaln 0 - abs .0001 < ] unit-test
+    [ t ] [ 2 gammaln 0 - abs .0001 < ] unit-test
+    [ t ] [ 3 gammaln 0.6931 - abs .0001 < ] unit-test
+    [ t ] [ 11 gammaln 15.1044 - abs .0001 < ] unit-test
+    [ t ] [ 9000000000000000000000000000000000000000000 gammaln 8.811521863477754e44 - abs .001 < ] unit-test
     ;
 
