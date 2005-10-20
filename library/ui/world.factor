@@ -1,8 +1,8 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
 IN: gadgets
-USING: alien arrays errors gadgets-layouts generic io kernel
-lists math memory namespaces opengl prettyprint sdl
+USING: alien arrays errors freetype gadgets-layouts generic io
+kernel lists math memory namespaces opengl prettyprint sdl
 sequences sequences strings styles threads ;
 
 ! The world gadget is the top level gadget that all (visible)
@@ -118,5 +118,6 @@ M: quit-event handle-event ( event -- )
     drop stop-world ;
 
 M: resize-event handle-event ( event -- )
+    flush-fonts
     gl-resize
     width get height get 0 3array world get set-gadget-dim ;

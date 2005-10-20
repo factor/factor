@@ -81,10 +81,10 @@ TUPLE: solid ;
 
 ! Solid pen
 M: solid draw-interior
-    drop dup rect-dim swap bg gl-fill-rect ;
+    drop dup bg gl-color rect-dim gl-fill-rect ;
 
 M: solid draw-boundary
-    drop dup rect-dim @{ 1 1 0 }@ v- swap fg gl-rect ;
+    drop dup fg gl-color rect-dim @{ 1 1 0 }@ v- gl-rect ;
 
 ! Rollover only
 TUPLE: rollover-only ;
@@ -115,10 +115,10 @@ M: gadget draw-gadget* ( gadget -- )
 TUPLE: polygon points ;
 
 M: polygon draw-boundary ( gadget polygon -- )
-    polygon-points swap fg gl-poly ;
+    swap fg gl-color polygon-points gl-poly ;
 
 M: polygon draw-interior ( gadget polygon -- )
-    polygon-points swap bg gl-fill-poly ;
+    swap bg gl-color polygon-points gl-fill-poly ;
 
 : arrow-up    @{ @{ 3 0 0 }@ @{ 6 6 0 }@ @{ 0 6 0 }@ }@ ;
 : arrow-right @{ @{ 0 0 0 }@ @{ 6 3 0 }@ @{ 0 6 0 }@ }@ ;

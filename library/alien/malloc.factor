@@ -5,6 +5,7 @@ USING: alien errors kernel ;
 
 LIBRARY: libc
 FUNCTION: ulong malloc ( ulong size ) ;
+FUNCTION: ulong calloc ( ulong count, ulong size ) ;
 FUNCTION: void free ( ulong ptr ) ;
 FUNCTION: ulong realloc ( ulong ptr, ulong size ) ;
 FUNCTION: void memcpy ( ulong dst, ulong src, ulong size ) ;

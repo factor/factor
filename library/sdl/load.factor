@@ -10,7 +10,6 @@ USING: alien io kernel parser sequences ;
     "/library/sdl/sdl.factor"
     "/library/sdl/sdl-video.factor"
     "/library/sdl/sdl-event.factor"
-    "/library/sdl/sdl-gfx.factor"
     "/library/sdl/sdl-keysym.factor"
     "/library/sdl/sdl-keyboard.factor"
     "/library/sdl/sdl-utils.factor"

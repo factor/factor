@@ -31,10 +31,14 @@ UNION: integer fixnum bignum ;
     foldable
 
 : (next-power-of-2) ( i n -- n )
-    2dup >= [ drop ] [ >r 1 shift r> (next-power-of-2) ] if ;
+    2dup >= [
+        drop
+    ] [
+        >r 1 shift 1 max r> (next-power-of-2)
+    ] if ;
 
 : next-power-of-2 ( n -- n )
-    2 swap (next-power-of-2) ;
+    0 swap (next-power-of-2) ;
 
 IN: math-internals
 

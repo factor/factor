@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Slava Pestov.
 ! See http://factor.sf.net/license.txt for BSD license.
-USING: #<unknown> alien arrays errors hashtables io kernel
+USING: alien arrays errors hashtables io kernel
 kernel-internals lists math namespaces opengl prettyprint
 sequences styles ;
 IN: freetype
@@ -19,14 +19,11 @@ SYMBOL: open-fonts
         {{ }} clone open-fonts set
     ] bind ;
 
-! A sprite are a texture and display list.
-TUPLE: sprite dlist texture ;
-
 : free-dlists ( seq -- )
-    "Freeing display lists: " print . ;
+    drop ;
 
 : free-textures ( seq -- )
-    "Freeing textures: " print . ;
+    drop ;
 
 : free-sprites ( glyphs -- )
     dup [ sprite-dlist ] map free-dlists
@@ -35,11 +32,19 @@ TUPLE: sprite dlist texture ;
 ! A font object from FreeType.
 ! the handle is an FT_Face.
 ! sprites is a vector.
-TUPLE: font height handle sprites metrics ;
+TUPLE: font ascent descent height handle sprites ;
+
+: flush-font ( font -- )
+    #! Only do this after re-creating a GL context!
+    dup font-sprites [ ] subset free-sprites
+    { } clone swap set-font-sprites ;
 
 : close-font ( font -- )
-    dup font-sprites [ ] subset free-sprites
-    font-handle FT_Done_Face ;
+    dup flush-font font-handle FT_Done_Face ;
+
+: flush-fonts ( -- )
+    #! Only do this after re-creating a GL context!
+    open-fonts get hash-values [ flush-font ] each ;
 
 : close-freetype ( -- )
     global [
@@ -76,23 +81,25 @@ TUPLE: font height handle sprites metrics ;
     ttf-name ttf-path >r freetype get r>
     0 f <void*> [ FT_New_Face freetype-error ] keep *void* ;
 
-: dpi 100 ;
+: dpi 72 ;
 
 : fix>float 64 /f ;
 
 : font-units>pixels ( n font -- n )
     face-size face-size-y-scale FT_MulFix fix>float ;
 
-: init-font-height ( font -- )
-    dup font-handle
-    dup face-y-max over face-y-min - swap font-units>pixels 
-    swap set-font-height ;
+: init-ascent ( font face -- )
+    dup face-y-max swap font-units>pixels swap set-font-ascent ;
+
+: init-descent ( font face -- )
+    dup face-y-min swap font-units>pixels swap set-font-descent ;
+
+: init-font ( font -- )
+    dup font-handle 2dup init-ascent dupd init-descent
+    dup font-ascent over font-descent - swap set-font-height ;
 
 C: font ( handle -- font )
-    { } clone over set-font-sprites
-    { } clone over set-font-metrics
-    [ set-font-handle ] keep
-    dup init-font-height ;
+    [ set-font-handle ] keep dup flush-font dup init-font ;
 
 : open-font ( { font style ptsize } -- font )
     #! Open a font and set the point size of the font.
@@ -103,60 +110,81 @@ C: font ( handle -- font )
     #! Cache open fonts.
     3array open-fonts get [ open-font ] cache ;
 
-: load-glyph ( face char -- glyph )
-    dupd 0 FT_Load_Char freetype-error face-glyph ;
+: load-glyph ( font char -- glyph )
+    >r font-handle r> dupd 0 FT_Load_Char
+    freetype-error face-glyph ;
 
-: (char-size) ( font char -- dim )
-    >r font-handle r> load-glyph
-    dup glyph-width fix>float
+: glyph-size ( glyph -- dim )
+    dup glyph-advance-x fix>float
     swap glyph-height fix>float 0 3array ;
 
-: char-size ( open-font char -- w h )
-    over font-metrics [ dupd (char-size) ] cache-nth nip first2 ;
-
-: string-size ( font string -- w h )
-    0 pick font-height
-    2swap [ char-size >r rot + swap r> max ] each-with ;
-
-: render-glyph ( face char -- bitmap )
+: render-glyph ( font char -- bitmap )
     #! Render a character and return a pointer to the bitmap.
     load-glyph dup
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
 : with-locked-block ( size quot -- | quot: address -- )
-    swap malloc [ swap call ] keep free ; inline
+    swap 1 calloc [ swap call ] keep free ; inline
 
-: (copy-bitmap) ( bitmap-chase texture-chase width width-pow2 )
-    >r 3dup swapd memcpy tuck >r >r + r> r> r> tuck >r >r + r> r> ;
+: b/b>w 8 shift bitor ;
 
-: copy-bitmap ( glyph texture width-pow2 -- )
-    pick glyph-bitmap-rows >r >r over glyph-bitmap-pitch >r >r
-    glyph-bitmap-buffer alien-address r> r> r> r>
-    [ (copy-bitmap) ] times 2drop 2drop ;
+: copy-pixel ( bit tex -- bit tex )
+    f pick alien-unsigned-1 255 b/b>w
+    f pick set-alien-unsigned-2
+    >r 1+ r> 2 + ;
 
-: bitmap>texture ( width height glyph -- id )
+: (copy-row) ( bit tex bitend texend -- bitend texend )
+    >r pick over >= [
+        r> 2swap 2drop
+    ] [
+        >r copy-pixel r> r> (copy-row)
+    ] if ;
+
+: copy-row ( bit tex width width2 -- bitend texend width width2 )
+    [ pick + >r pick + r> (copy-row) ] 2keep ;
+
+: copy-bitmap ( glyph texture -- )
+    over glyph-bitmap-rows >r
+    over glyph-bitmap-width dup next-power-of-2 2 *
+    >r >r >r glyph-bitmap-buffer alien-address r> r> r> r> 
+    [ copy-row ] times 2drop 2drop ;
+
+: bitmap>texture ( glyph sprite -- id )
     #! Given a glyph bitmap, copy it to a texture with the given
     #! width/height (which must be powers of two).
-    3drop
-    32 32 * 4 * [
-        <alien> 32 32 * 4 * [
-            128 pick rot set-alien-signed-1
-        ] each 32 32 rot gray-texture
+    tuck sprite-size2 * 2 * [
+        [ copy-bitmap ] keep <alien> gray-texture
     ] with-locked-block ;
 
-: char-texture-size ( bitmap -- width height )
-    dup glyph-bitmap-width swap glyph-bitmap-rows
-    [ next-power-of-2 ] 2apply ;
+: glyph-texture-loc ( glyph font -- loc )
+    font-ascent swap glyph-hori-bearing-y fix>float -
+    0 swap 0 3array ;
 
-: <char-sprite> ( face char -- sprite )
-    render-glyph [ char-texture-size 2dup ] keep
-    bitmap>texture [ texture>dlist ] keep <sprite> ;
+: glyph-texture-size ( glyph -- dim )
+    dup glyph-bitmap-width next-power-of-2
+    swap glyph-bitmap-rows next-power-of-2 0 3array ;
+
+: <char-sprite> ( font char -- sprite )
+    #! Create a new display list of a rendered glyph. This
+    #! allocates external resources. See free-sprites.
+    over >r render-glyph dup r> glyph-texture-loc
+    over glyph-size pick glyph-texture-size <sprite>
+    [ bitmap>texture ] keep [ init-sprite ] keep ;
 
 : char-sprite ( open-font char -- sprite )
-    over font-sprites
-    [ >r dup font-handle r> <char-sprite> ] cache-nth nip ;
+    #! Get a cached display list of a FreeType-rendered
+    #! glyph.
+    over font-sprites [ dupd <char-sprite> ] cache-nth nip ;
 
-: draw-string ( font string -- )
-    GL_TEXTURE_BIT [
-        [ char-sprite sprite-dlist glCallList ] each-with
-    ] save-attribs ;
+: char-width ( open-font char -- w )
+    char-sprite sprite-width ;
+
+: string-width ( open-font string -- w )
+    0 -rot [ char-width + ] each-with ;
+
+: draw-string ( open-font string -- )
+    GL_MODELVIEW [
+        GL_TEXTURE_BIT [
+            [ char-sprite sprite-dlist glCallList ] each-with
+        ] save-attribs
+    ] do-matrix ;

@@ -30,28 +30,6 @@ SYMBOL: bpp
     [ [ >r init-sdl r> call ] [ SDL_Quit ] cleanup ] with-scope ;
     inline
 
-: rgb ( [ r g b ] -- n )
-    first3
-    255
-    swap >fixnum 8 shift bitor
-    swap >fixnum 16 shift bitor
-    swap >fixnum 24 shift bitor ;
-
-: make-rect ( x y w h -- rect )
-    <sdl-rect>
-    [ set-sdl-rect-h ] keep
-    [ set-sdl-rect-w ] keep
-    [ set-sdl-rect-y ] keep
-    [ set-sdl-rect-x ] keep ;
-
-: with-pixels ( quot -- )
-    width get [
-        height get [
-            [ rot dup slip swap surface get swap ] 2keep
-            [ rot pixelColor ] 2keep
-        ] repeat
-    ] repeat drop ; inline
-
 : must-lock-surface? ( -- ? )
     #! This is a macro in SDL_video.h.
     surface get dup surface-offset 0 = [

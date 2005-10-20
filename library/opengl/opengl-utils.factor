@@ -14,10 +14,16 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     0 0 width get height get glViewport
     0 width get height get 0 gluOrtho2D
     GL_SMOOTH glShadeModel
-    GL_TEXTURE_2D glEnable ;
+    GL_TEXTURE_2D glEnable
+    GL_BLEND glEnable
+    GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA glBlendFunc
+    GL_SCISSOR_TEST glEnable ;
 
 : gl-flags
-    SDL_OPENGL SDL_RESIZABLE bitor SDL_HWSURFACE bitor SDL_DOUBLEBUF bitor ;
+    SDL_OPENGL
+    SDL_RESIZABLE bitor
+    SDL_HWSURFACE bitor
+    SDL_DOUBLEBUF bitor ;
 
 : gl-resize ( event -- )
     #! Acts on an SDL resize event.
@@ -44,13 +50,13 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 
 : gl-vertex first3 glVertex3d ;
 
-: top-left drop @{ 0 0 0 }@ gl-vertex ;
+: top-left drop 0 0 glTexCoord2d @{ 0 0 0 }@ gl-vertex ;
 
-: top-right @{ 1 0 0 }@ v* gl-vertex ;
+: top-right 1 0 glTexCoord2d @{ 1 0 0 }@ v* gl-vertex ;
 
-: bottom-left @{ 0 1 0 }@ v* gl-vertex ;
+: bottom-left 0 1 glTexCoord2d @{ 0 1 0 }@ v* gl-vertex ;
 
-: bottom-right gl-vertex ;
+: bottom-right 1 1 glTexCoord2d gl-vertex ;
 
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
@@ -58,19 +64,17 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : gl-line ( from to { r g b } -- )
     gl-color [ gl-vertex ] 2apply ;
 
-: (gl-rect) swap gl-color [ four-sides ] do-state ;
-
-: gl-fill-rect ( dim { r g b } -- )
+: gl-fill-rect ( dim -- )
     #! Draws a two-dimensional box.
-    GL_QUADS (gl-rect) ;
+    GL_QUADS [ four-sides ] do-state ;
 
-: gl-rect ( dim { r g b } -- )
+: gl-rect ( dim -- )
     #! Draws a two-dimensional box.
-    GL_LINE_LOOP (gl-rect) ;
+    GL_LINE_LOOP [ four-sides ] do-state ;
 
-: (gl-poly) swap gl-color [ [ gl-vertex ] each ] do-state ;
+: (gl-poly) [ [ gl-vertex ] each ] do-state ;
 
-: gl-fill-poly ( points { r g b } -- )
+: gl-fill-poly ( points -- )
     #! Draw a filled polygon.
     GL_POLYGON (gl-poly) ;
 
@@ -82,7 +86,9 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     swap glMatrixMode glPushMatrix call glPopMatrix ; inline
 
 : gl-set-clip ( loc dim -- )
-    [ first2 ] 2apply glScissor ;
+    dup first2 >r >r
+    over second swap second + height get swap - >r
+    first r> r> r> glScissor ;
 
 : prepare-gradient ( direction dim -- v1 v2 )
     tuck v* [ v- ] keep ;
@@ -104,17 +110,26 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
 : save-attribs ( bits quot -- )
     swap glPushAttrib call glPopAttrib ; inline
 
-: gray-texture ( width height buffer -- id )
+! A sprite is a texture and a display list.
+TUPLE: sprite dlist texture loc dim dim2 ;
+
+C: sprite ( loc dim dim2 -- )
+    [ set-sprite-dim2 ] keep
+    [ set-sprite-dim ] keep
+    [ set-sprite-loc ] keep ;
+
+: sprite-size2 sprite-dim2 first2 ;
+
+: sprite-width sprite-dim first ;
+
+: gray-texture ( sprite buffer -- id )
     #! Given a buffer holding a width x height (powers of two)
     #! grayscale texture, bind it and return the ID.
     gen-texture [
         GL_TEXTURE_BIT [
             GL_TEXTURE_2D swap glBindTexture
-            GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
-            GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
-            GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
-            GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf
-            >r >r >r GL_TEXTURE_2D 0 GL_RGBA r> r> 0 GL_RGBA
+            >r >r GL_TEXTURE_2D 0 GL_RGBA r>
+            sprite-size2 0 GL_LUMINANCE_ALPHA
             GL_UNSIGNED_BYTE r> glTexImage2D
         ] save-attribs
     ] keep ;
@@ -127,19 +142,25 @@ USING: alien errors kernel math namespaces opengl sdl sequences ;
     #! Make a display list.
     gen-dlist [ rot glNewList call glEndList ] keep ; inline
 
-: texture>dlist ( width height id -- id )
-    #! Given a texture width/height and ID, make a display list
-    #! for draws a quad with this texture.
+: init-texture ( -- )
+    GL_TEXTURE_2D GL_TEXTURE_MAG_FILTER GL_LINEAR glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_MIN_FILTER GL_LINEAR glTexParameteri
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_S GL_CLAMP glTexParameterf
+    GL_TEXTURE_2D GL_TEXTURE_WRAP_T GL_CLAMP glTexParameterf ;
+
+: make-sprite-dlist ( sprite -- id )
     GL_MODELVIEW [
         GL_COMPILE [
-            1 1 1 glColor3f
-            GL_TEXTURE_2D swap glBindTexture
-            GL_QUADS [
-                0 0 glTexCoord2d 0 0 glVertex2i
-                0 1 glTexCoord2d 0 over glVertex2i
-                1 1 glTexCoord2d 2dup glVertex2i
-                1 0 glTexCoord2d over 0 glVertex2i
-            ] do-state
-            drop 0 0 glTranslatef
+            GL_MODELVIEW [
+                dup sprite-loc first3 glTranslatef
+                GL_TEXTURE_2D over sprite-texture glBindTexture
+                init-texture
+                dup sprite-dim2 gl-fill-rect
+            ] do-matrix
+            sprite-width 0 0 glTranslatef
         ] make-dlist
     ] do-matrix ;
+
+: init-sprite ( texture sprite -- )
+    [ set-sprite-texture ] keep
+    [ make-sprite-dlist ] keep set-sprite-dlist ;

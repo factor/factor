@@ -54,7 +54,7 @@ TUPLE: editor line caret ;
 
 : run-char-widths ( font str -- wlist )
     #! List of x co-ordinates of each character.
-    >array [ char-size drop ] map-with
+    >array [ char-width ] map-with
     dup 0 [ + ] accumulate swap 2 v/n v+ ;
 
 : x>offset ( x font str -- offset )
@@ -122,7 +122,7 @@ C: editor ( text -- )
     dup editor-actions ;
 
 : offset>x ( gadget offset str -- x )
-    head-slice >r gadget-font r> string-size drop ;
+    head-slice >r gadget-font r> string-width ;
 
 : caret-loc ( editor -- x y )
     dup editor-line [ caret-pos line-text get ] bind offset>x
