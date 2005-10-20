@@ -105,33 +105,3 @@ IN: math
 : pgcd ( p p -- p )
     swap { 0 } clone { 1 } clone 2swap (pgcd) ;
 
-: test-p*
-    100000 [ drop { 1 1 1 } { 1 1 1 } p* drop ] each ;
-
-: test-polynomial
-    [ { 0 1 } ] [ { 0 1 0 0 } ptrim ] unit-test
-    [ { 1 } ] [ { 1 0 0 } ptrim ] unit-test
-    [ { 0 } ] [ { 0 } ptrim ] unit-test
-    [ { 3 10 8 } ] [ { 1 2 } { 3 4 } p* ] unit-test
-    [ { 3 10 8 } ] [ { 3 4 } { 1 2 } p* ] unit-test
-    [ { 0 0 0 0 0 0 0 0 0 0 } ] [ { 0 0 0 } { 0 0 0 0 0 0 0 0 } p* ] unit-test
-    [ { 0 1 } ] [ { 0 1 } { 1 } p* ] unit-test
-    [ { 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p+ ] unit-test
-    [ { 0 0 0 } ] [ { 0 0 0 } { 0 0 0 } p- ] unit-test
-    [ { 0 0 0 } ] [ 4 { 0 0 0 } n*p ] unit-test
-    [ { 4 8 0 12 } ] [ 4 { 1 2 0 3 } n*p ] unit-test
-    [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } conv ] unit-test
-    [ { 1 4 7 6 0 0 0 0 0 } ] [ { 1 2 3 0 0 0 } { 1 2 0 0 } p* ] unit-test
-    [ { 7 -2 1 } { -20 0 0 } ] [ { 1 1 1 1 } { 3 1 } p/mod ] unit-test
-    [ { 0 0 } { 1 1 } ] [ { 1 1 } { 1 1 1 1 } p/mod ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/mod ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/mod ] unit-test
-    [ { 1 0 1 } { 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/mod ] unit-test
-    ! [ { 5.0 } { 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
-    ! [ { 15/16 } { 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
-    [ t ] [ { 0 1 } { 0 1 0 } p= ] unit-test
-    [ f ] [ { 0 0 1 } { 0 1 0 } p= ] unit-test
-    [ t ] [ { 1 1 1 } { 1 1 1 } p= ] unit-test
-    [ { 0 0 } { 1 1 } ] [ { 1 1 1 1 } { 1 1 } pgcd ] unit-test
-    ;
-
