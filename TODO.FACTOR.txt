@@ -60,6 +60,10 @@
 - bitfields in C structs
 - setting struct members that are not *
 - callbacks
+- FIELD: char key_vector[32];
+- FIELD: union { char b[20]; short s[10]; long l[5]; } data;
+- MEMBER: long pad[24];
+- convert factor sequences to c arrays, and vice versa
 
 + compiler:
 
