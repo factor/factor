@@ -44,9 +44,12 @@ M: viewport pref-dim gadget-child pref-dim ;
     2dup over scroller-x update-slider
     over scroller-y update-slider ;
 
+: (scroll-to) ( scroller gadget -- point )
+    >r scroller-viewport gadget-child r> relative ;
+
 : update-scroller ( scroller -- )
     dup dup scroller-follows dup [
-        f rot set-scroller-follows screen-loc
+        f pick set-scroller-follows (scroll-to)
     ] [
         drop scroller-origin
     ] if scroll ;

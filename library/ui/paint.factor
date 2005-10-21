@@ -12,7 +12,7 @@ SYMBOL: clip
 GENERIC: draw-gadget* ( gadget -- )
 
 : do-clip ( gadget -- )
-    >absolute clip [ intersect dup ] change
+    >absolute clip [ rect-intersect dup ] change
     dup rect-loc swap rect-dim gl-set-clip ;
 
 : with-translation ( gadget quot -- | quot: gadget -- )
