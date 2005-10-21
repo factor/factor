@@ -1,0 +1,58 @@
+Nice to have:
+
+- Permutations -- composition and inverse (trivial; use sort and map-with)
+- Analysis:
+  - error function, cosine integral, sine integral, fresnel functions
+  - exponential integral, logarithm integral, zeta function
+  - airy wave function
+  - hypergeometric functions
+  - elliptic functions
+  - numerical integration
+  - numerical differentiation
+  - infinite limits, sums, products
+  - finding roots with Newton's method
+  - solving ODEs with Runge-Kutta
+  - matrices: singular value decomposition, eigenvalues, LU decomposition
+  - square root of a matrix, e^matrix
+  - finding roots of polynomials
+- Algebra:
+  - ^mod for polynomials
+  - mod-inv for polynomials
+  - arithmetic modulo a+sqrt(b)
+  - matrices: row reduction, integer row reduction, matrix inverse,
+    determinant
+  - probablistic primality tests
+  - polynomials over finite fields
+  - elliptic curves: group of points, over Q and finite fields
+  - elliptic curve factorization of integers
+  - interval arithmetic
+  - combinatorics: stirling numbers
+  - factoring polynomials over finite fields
+- Graphs:
+  - minimum spanning trees
+- Logic:
+  - tautology checker
+  - CNF, DNF
+  - natural deduction proof checker
+  - symbolic rewriting of expression trees
+- Statistics:
+  - mean, median, range, standard deviation
+  - linear regression
+- Geometry:
+  - regions
+  - rectangles, ellipses, lines
+  - unions, intersections, complements of regions
+  - shortest distance between two regions
+  - tangents
+  - intersection testing
+  - projections
+- Symbolic algebra:
+  - trigonometric identities
+  - symbolic differentiation
+  - differential forms
+  - wedge product
+- Graphics:
+  - 2D, 3D plots
+  - y=f(x), implicit, parametric
+  - "4D" animated 3D plots
+  - prettyprinting of symbolic expressions
